@@ -1,5 +1,5 @@
 /*
- * $Id: descend.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: descend.c,v 1.43 2002/01/06 09:17:59 vszakats Exp $
  */
 
 /*
@@ -52,7 +52,6 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
-#include "hbfast.h"
 
 void hb_strDescend( char * szStringTo, const char * szStringFrom, ULONG ulLen )
 {
@@ -76,21 +75,22 @@ HB_FUNC( DESCEND )
       if( HB_IS_STRING( pItem ) )
       {
          ULONG ulLen = hb_itemGetCLen( pItem );
-         char * szBuffer = ( char * ) hb_xgrab( ulLen + 1 );
-         hb_strDescend( szBuffer, hb_itemGetCPtr( pItem ), ulLen );
-         hb_retclenAdopt( szBuffer, ulLen );
+
+         if( ulLen > 0 )
+         {
+            char * szBuffer = ( char * ) hb_xgrab( ulLen );
+            hb_strDescend( szBuffer, hb_itemGetCPtr( pItem ), ulLen );
+            hb_retclen( szBuffer, ulLen );
+            hb_xfree( szBuffer );
+         }
+         else
+            hb_retc( "" );
       }
       else if( HB_IS_DATE( pItem ) )
-      {
          hb_retnl( 5231808 - hb_itemGetDL( pItem ) );
-      }
       else if( HB_IS_NUMERIC( pItem ) )
-      {
          hb_retnd( -1 * hb_itemGetND( pItem ) );
-      }
       else if( HB_IS_LOGICAL( pItem ) )
-      {
          hb_retl( ! hb_itemGetL( pItem ) );
-      }
    }
 }

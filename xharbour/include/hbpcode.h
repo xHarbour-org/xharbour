@@ -186,10 +186,16 @@ typedef enum
    HB_P_TRUE,                  /* 120 pushes true on the virtual machine stack */
    HB_P_ZERO,                  /* 121 places a ZERO on the virtual machine stack */
    HB_P_ONE,                   /* 122 places a ONE on the virtual machine stack */
-   HB_P_MACROLIST,             /* 122 HB_P_MACROPUSHLIST envelope start. */
-   HB_P_MACROLISTEND,          /* 123 HB_P_MACROPUSHLIST envelope end. */
+   HB_P_MACROLIST,             /* 123 HB_P_MACROPUSHLIST envelope start. */
+   HB_P_MACROLISTEND,          /* 124 HB_P_MACROPUSHLIST envelope end. */
+   HB_P_LOCALNEARADDINT,       /* 125 Add/Subtract specified int into specified local without using the stack. */
+   HB_P_LOCALNEARSETINT,       /* 126 Set specified int into specified local without using the stack.*/
+   HB_P_LOCALNEARSETSTR,       /* 127 Set specified string into specified local without using the stack.*/
+   HB_P_LEFT,                  /* 128 Optimized Left(). */
+   HB_P_RIGHT,                 /* 129 Optimized Right(). */
+   HB_P_SUBSTR,                /* 130 Optimized SubStr() */
 /* NOTE: This have to be the last definition */
-   HB_P_LAST_PCODE             /* 123 this defines the number of defined pcodes */
+   HB_P_LAST_PCODE             /* 126 this defines the number of defined pcodes */
 } HB_PCODE;
 
 #endif /* HB_PCODE_H_ */

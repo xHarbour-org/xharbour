@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.2 2002/01/12 10:04:27 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.187 2002/01/17 18:48:40 alkresin Exp $
  */
 
 /*
@@ -58,7 +58,6 @@
 #include "hbapierr.h"
 #include "hbapilng.h"
 #include "hbapiitm.h"
-#include "hbfast.h"
 #include "hbrddwrk.h"
 
 
@@ -2319,7 +2318,7 @@ HB_FUNC( ORDCONDSET )
       lpdbOrdCondInfo->fCustom     = hb_parl( 15 );
       lpdbOrdCondInfo->fNoOptimize = hb_parl( 16 );
 
-      if( !lpdbOrdCondInfo->itmCobWhile )
+      if( lpdbOrdCondInfo->itmCobWhile )
          lpdbOrdCondInfo->fRest = TRUE;
       if( lpdbOrdCondInfo->lNextCount || lpdbOrdCondInfo->lRecno || lpdbOrdCondInfo->fRest )
          lpdbOrdCondInfo->fAll = FALSE;

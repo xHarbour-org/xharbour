@@ -73,15 +73,8 @@ void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
 
    if( pDest == pSource )
    {
-      hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemCopy()", NULL );
+      hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemFastCopy()", NULL );
    }
-
- #ifdef HARBOUR_CLASSIC
-   hb_itemClear( pDest );
-   memcpy( pDest, pSource, sizeof( HB_ITEM ) );
-   pSource->type = HB_IT_NIL;
-   return;
- #endif
 
    if( pDest->type )
    {
@@ -107,18 +100,13 @@ void hb_itemReleaseString( PHB_ITEM pItem )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_itemReleaseString(%p), '%s'", pItem, pItem->item.asString.value ) );
 
- #ifdef HARBOUR_CLASSIC
-   hb_xfree( pItem->item.asString.value );
-   pItem->item.asString.value = NULL;
-   return;
- #endif
-
-
-   if( ! pItem->item.asString.bStatic )
+   if( pItem->item.asString.bStatic == FALSE )
    {
       if( --*( pItem->item.asString.puiHolders ) == 0 )
       {
+         HB_TRACE( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.puiHolders ) );
          hb_xfree( pItem->item.asString.puiHolders );
+         HB_TRACE( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.value ) );
          hb_xfree( pItem->item.asString.value );
       }
    }
@@ -128,14 +116,39 @@ void hb_itemReleaseString( PHB_ITEM pItem )
    //pItem->item.asString.length = 0;
 }
 
+void hb_itemClear( PHB_ITEM pItem )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemClear(%p)", pItem));
+
+   if( HB_IS_STRING( pItem ) )
+   {
+      if( pItem->item.asString.value )
+      {
+         hb_itemReleaseString( pItem );
+      }
+   }
+   else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
+   {
+      if( ( pItem->item.asArray.value )->uiHolders && --( pItem->item.asArray.value )->uiHolders == 0 )
+      {
+         hb_arrayRelease( pItem );
+      }
+   }
+   else if( HB_IS_BLOCK( pItem ) )
+   {
+      hb_codeblockDelete( pItem );
+   }
+   else if( HB_IS_MEMVAR( pItem ) )
+   {
+      hb_memvarValueDecRef( pItem->item.asMemvar.value );
+   }
+
+   pItem->type = HB_IT_NIL;
+}
+
 void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_itemCopy(%p, %p)", pDest, pSource));
-
- #ifdef HARBOUR_CLASSIC
-   hb_itemCopy( pDest, pSource );
-   return;
- #endif
 
    if( pDest == pSource )
    {
@@ -144,7 +157,7 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 
    if( pDest->type )
    {
-      if( HB_IS_STRING( pDest ) )
+      if( HB_IS_STRING( pDest ) && pDest->item.asString.value )
       {
          hb_itemReleaseString( pDest );
       }
@@ -172,6 +185,90 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
    {
       hb_memvarValueIncRef( pSource->item.asMemvar.value );
    }
+}
+
+PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
+
+   if( pItem )
+   {
+      hb_itemClear( pItem );
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   if( szText == NULL )
+   {
+      szText = "";
+   }
+
+   pItem->type = HB_IT_STRING;
+   pItem->item.asString.puiHolders = hb_xgrab( sizeof( USHORT ) );
+   *( pItem->item.asString.puiHolders ) = 1;
+   pItem->item.asString.bStatic = FALSE;
+   pItem->item.asString.length = strlen( szText );
+   pItem->item.asString.value = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
+   strcpy( pItem->item.asString.value, szText );
+
+   return pItem;
+}
+
+PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
+
+   if( pItem )
+   {
+      hb_itemClear( pItem );
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   if( szText == NULL )
+   {
+      szText = "";
+      ulLen = 0;
+   }
+
+   pItem->type = HB_IT_STRING;
+   pItem->item.asString.puiHolders = hb_xgrab( sizeof( USHORT ) );
+   *( pItem->item.asString.puiHolders ) = 1;
+   pItem->item.asString.bStatic = FALSE;
+   pItem->item.asString.length = ulLen;
+   pItem->item.asString.value = ( char * ) hb_xgrab( ulLen + 1 );
+   hb_xmemcpy( pItem->item.asString.value, szText, ulLen );
+   pItem->item.asString.value[ ulLen ] = '\0';
+
+   return pItem;
+}
+
+PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
+
+   if( pItem )
+   {
+      hb_itemClear( pItem );
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_STRING;
+   pItem->item.asString.puiHolders = hb_xgrab( sizeof( USHORT ) );
+   *( pItem->item.asString.puiHolders ) = 1;
+   pItem->item.asString.bStatic = FALSE;
+   pItem->item.asString.length = ulLen;
+   pItem->item.asString.value = szText;
+   pItem->item.asString.value[ ulLen ] = '\0';
+
+   return pItem;
 }
 
 void hb_itemFastClear( PHB_ITEM pItem )
@@ -203,7 +300,7 @@ void hb_itemPushStaticString( char * szText, ULONG length )
 {
    PHB_ITEM pTop = hb_stackTopItem();
 
-   HB_TRACE(HB_TR_DEBUG, ( "hb_itemPushStaticString( \"%s\", %lu ) %p", szText, length, pTop ) );
+   HB_TRACE(HB_TR_DEBUG, ( "hb_itemPushStaticString( \"%s\", %lu ) %p %p", szText, length, pTop, szText ) );
 
    pTop->type = HB_IT_STRING;
    //pTop->item.asString.puiHolders = hb_xgrab( sizeof( USHORT ) );

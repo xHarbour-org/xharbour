@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.1.1.1 2001/12/21 10:44:08 ronpinkas Exp $
+ * $Id: harbour.c,v 1.195 2002/01/02 01:54:42 andijahja Exp $
  */
 
 /*
@@ -113,7 +113,7 @@ BOOL           hb_comp_bForceMemvars = FALSE;             /* holds if memvars ar
 BOOL           hb_comp_bDebugInfo = FALSE;                /* holds if generate debugger required info */
 char           hb_comp_szPrefix[ 20 ] = { '\0' };         /* holds the prefix added to the generated symbol init function name (in C output currently) */
 int            hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE; /* C code generation should be verbose (use comments) or not */
-BOOL           hb_comp_bNoStartUp = FALSE;                /* C code with or without HB_FS_FIRST */
+BOOL           hb_comp_bNoStartUp = FALSE ;               /* C code generation embed HB_FS_FIRST or not */
 int            hb_comp_iExitLevel = HB_EXITLEVEL_DEFAULT; /* holds if there was any warning during the compilation process */
 HB_PATHNAMES * hb_comp_pIncludePath = NULL;
 int            hb_comp_iFunctionCnt;
@@ -940,7 +940,7 @@ void hb_compDeclaredInit( void )
    _DECL s_006 = { "ADEL"            , 'A', 2 , (BYTE*)"AN"                                                   , NULL     , NULL , &s_005};
    _DECL s_007 = { "ADIR"            , 'N', 6 , (BYTE*)"\x9d\x9b\x9b\x9b\x9b\x9b"                             , NULL     , NULL , &s_006};
    _DECL s_008 = { "AEVAL"           , 'A', 4 , (BYTE*)"AB\xa8\xa8"                                           , NULL     , NULL , &s_007};
-   _DECL s_009 = { "AFIELDS"         , 'N', 4 , (BYTE*)"A\x9b\x9b\x9b"                                        , NULL     , NULL , &s_008};
+   _DECL s_009 = { "AFIELDS"         , 'N', 4 , (BYTE*)"A\x9b\x9b\x9b"                                        , NULL     , NULL , &s_008};           
    _DECL s_010 = { "AFILL"           , 'A', 4 , (BYTE*)"A \xa8\xa8"                                           , NULL     , NULL , &s_009};
    _DECL s_011 = { "AINS"            , 'A', 2 , (BYTE*)"AN"                                                   , NULL     , NULL , &s_010};
    _DECL s_012 = { "ALERT"           , 'N', 4 , (BYTE*)"C\x9b\x9d\xa8"                                        , NULL     , NULL , &s_011};
@@ -949,7 +949,7 @@ void hb_compDeclaredInit( void )
    _DECL s_015 = { "AMPM"            , 'C', 1 , (BYTE*)"C"                                                    , NULL     , NULL , &s_014};
    _DECL s_016 = { "ARRAY"           , 'A', 3 , (BYTE*)"N\xa8\xa8"                                            , NULL     , NULL , &s_015};
    _DECL s_017 = { "ASC"             , 'N', 1 , (BYTE*)"C"                                                    , NULL     , NULL , &s_016};
-   _DECL s_018 = { "ASCAN"           , 'N', 4 , (BYTE*)"A \xa8\xa8"                                        , NULL     , NULL , &s_017};
+   _DECL s_018 = { "ASCAN"           , 'N', 4 , (BYTE*)"A\xa7\xa8\xa8"                                        , NULL     , NULL , &s_017};
    _DECL s_019 = { "ASIZE"           , 'A', 2 , (BYTE*)"AN"                                                   , NULL     , NULL , &s_018};
    _DECL s_020 = { "ASORT"           , 'A', 4 , (BYTE*)"A\xa8\xa8\x9c"                                        , NULL     , NULL , &s_019};
    _DECL s_021 = { "AT"              , 'N', 2 , (BYTE*)"CC"                                                   , NULL     , NULL , &s_020};

@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.1.1.1 2001/12/21 10:44:25 ronpinkas Exp $
+ * $Id: hbusage.c,v 1.41 2002/01/08 08:59:52 patrickmast Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ void hb_compPrintUsage( char * szSelf )
            "\n          %ces[<level>]     set exit severity",
            "\n          %cg<type>         output type generated is <type> (see below)",
            "\n          %cgc[<type>]      output type: C source (.c) (default)",
-           "\n                           <type>: 0=compact, 1=normal, 2=verbose (default)",
+           "\n                           <type>: 0=compact 1=normal 2=verbose (default)",
            "\n          %cgo              output type: Platform dependant object module",
            "\n          %cgw              output type: Windows/DOS OBJ32 (.obj)",
            "\n          %cgh              output type: Harbour Portable Object (.hrb)",
@@ -108,7 +108,7 @@ void hb_compPrintUsage( char * szSelf )
 }
 
 /*
- * List of compatibility/features modes 
+ * List of compatibility/features modes
  */
 void hb_compPrintModes( void )
 {
@@ -180,7 +180,7 @@ void hb_compPrintCredits( void )
  */
 void hb_compPrintLogo( void )
 {
-   printf( "Harbour Compiler %d.%d.%d (%s)\n",
-      HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
+   printf( "Harbour Compiler Alpha build %d.%d (%s)\n",
+      HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
    printf( "Copyright 1999-2002, http://www.harbour-project.org/\n" );
 }

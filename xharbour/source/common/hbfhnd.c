@@ -1,5 +1,5 @@
 /*
- * $Id: hbfhnd.c,v 1.3 2001/12/14 09:32:51 vszakats Exp $
+ * $Id: hbfhnd.c,v 1.4 2002/01/15 00:21:16 dholm Exp $
  */
 
 /*
@@ -50,7 +50,7 @@
  *
  */
 
-#if defined(__BORLANDC__)
+#if defined(HB_OS_WIN_32) && defined(__BORLANDC__)
 
    #define ___NFILE_H
    
@@ -92,7 +92,7 @@ void hb_fhnd_ForceLink( void )
    /* Intentionally do nothing */
 };
 
-#if defined(__BORLANDC__)
+#if defined(HB_OS_WIN_32) && defined(__BORLANDC__)
 
 #define _F_STDIN        (_F_READ | _F_TERM | _F_LBUF)
 #define _F_STDOUT       (_F_WRIT | _F_TERM | _F_LBUF)

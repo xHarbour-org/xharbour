@@ -1,5 +1,5 @@
 /*
- * $Id: msgpt.c,v 1.9 2001/04/12 18:24:40 dholm Exp $
+ * $Id: msgpt.c,v 1.13 2002/01/07 02:47:30 lculik Exp $
  */
 
 /*
@@ -72,14 +72,14 @@ static HB_LANG s_lang =
 {
    {
       /* Identification */
-   
+
       "PT",                        /* ID */
       "Portuguese",                /* Name (in English) */
       "Portugues",                 /* Name (in native language) */
       "PT",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.9 $ $Date: 2001/04/12 18:24:40 $",         /* Version */
-   
+      "$Revision: 1.13 $ $Date: 2002/01/07 02:47:30 $",         /* Version */
+
       /* Month names */
 
       "Janeiro",
@@ -94,7 +94,7 @@ static HB_LANG s_lang =
       "Outubro",
       "Novembro",
       "Dezembro",
-   
+
       /* Day names */
 
       "Domingo",
@@ -104,9 +104,9 @@ static HB_LANG s_lang =
       "Quinta-feira",
       "Sexta-feira",
       "S bado",
-   
+
       /* CA-Cl*pper compatible natmsg items */
-   
+
       "Banco de Dados    # Registro    Ult. Atuali.    Tam.",
       "Voce quer mais testes?",
       "Pagina No.",
@@ -120,9 +120,9 @@ static HB_LANG s_lang =
       " - ",
       "S/N",
       "EXPRESSÇO INVALIDA",
-   
+
       /* Error description names */
-   
+
       "Erro desconhecido",
       "Erro nos parƒmetros",
       "Erro de limite",
@@ -176,7 +176,7 @@ static HB_LANG s_lang =
       "condicional",
 
       /* Internal error names */
- 
+
       "Erro irrecuper vel %lu: ",
       "Erro na recupera‡ao do erro",
       "ERRORBLOCK() para erro ausente",
@@ -200,9 +200,12 @@ static HB_LANG s_lang =
       "Um item iria ser copiado para ele mesmo em %s",
       "Symbol item inv lido passado como memvar  %s",
       "Memory buffer overflow",
+      "hb_xgrab requisitou para alocar zero bytes",
+      "hb_xrealloc requisitou para redimensiorar para zero byte",
+      "hb_xalloc requisitou para alocar zero bytes"
 
       /* Texts */
-   
+
       "DD/MM/YYYY",
       "S",
       "N"
@@ -217,4 +220,3 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_PT )
 #if ! defined(__GNUC__) && ! defined(_MSC_VER)
    #pragma startup hb_lang_Init_PT
 #endif
-

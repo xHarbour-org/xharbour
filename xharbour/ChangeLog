@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.28 2002/01/14 06:14:17 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.29 2002/01/17 23:20:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,147 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-19 06:11 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.slx
+    ! Minor bug correction.
+
+  * include/hbpcode.h
+  * include/hbcomp.h
+  * source/compiler/genc.c
+  * source/vm/hvm.c
+    + Added support for HB_P_LOCALNEARADDINT, HB_P_LOCALNEARSETINT, HB_P_LEFT, HB_P_RIGHT*, HB_P_SUBSTR*
+      /* HB_P_RIGHT & HB_P_SUBSTR are not completed yet. */
+
+  * include/hbapi.h
+  * source/vm/eval.c
+  * source/vm/extend.c
+  * source/vm/fastitem.c
+  * source/vm/fm.c
+  * source/vm/hvm.c
+  * source/compiler/harbour.c
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+    * Enhanced string sharing and fast item technology, and optimized loops, := += -= ++ -- and Left().
+
+  + tests/tstloop.prg
+    + Added extensive loop speed testing.
+
+/* xHarbour is now more than 400% faster than Harbour on most common code, and about 40% faster than Clipper on same.  */
+
+     Here are the results for tests/tstloop.prg:
+
+              Empty Loops    Eval()      :=      := +=      -=      Left()     Total
+              -----------    ------    ------    -----    ------    ------    ------
+  xHarbour:          7.71     32.07      9.02    13.79     11.11     19.72     93.47 Sec.
+  Clippe  :         13.29     34.22     14.94    17.52     18.90     31.80    130.67 Sec.
+  Harbour :         12.77     43.76     15.92    24.75     24.15    140.77    262.17 Sec.
+
+  The above was for 10,000,000 loops for each operation on an 1Ghz Athlon Win XP using BCC 5.5.
+
+  You can confirm those results by downloading BCC 5.5 bin distribution from http://www.Profit-Master/Downloads/xhb-bin-bcc.zip
+
+  NOTE: FWH users *must* recompile ALL FWH PRG files!!!
+
+*/
+
+  * makefile.bc
+  * makefile.vc
+  * config/bsd/gcc.cf
+  * config/dos/bcc16.cf
+  * config/dos/djgpp.cf
+  * config/dos/rsx32.cf
+  * config/dos/watcom.cf
+  * config/linux/gcc.cf
+  * config/os2/gcc.cf
+  * config/os2/icc.cf
+  * config/w32/bcc32.cf
+  * config/w32/gcc.cf
+  * config/w32/mingw32.cf
+  * config/w32/msvc.cf
+  * config/w32/rsxnt.cf
+  * doc/dirstruc.txt
+  * include/hbrddntx.h
+  * include/hbver.h
+  * source/common/hbffind.c
+  * source/common/hbfhnd.c
+  * source/common/hbgete.c
+  * source/common/hbver.c
+  * source/compiler/cmdcheck.c
+  * source/compiler/gencobj.c
+  * source/compiler/genjava.c
+  * source/compiler/genobj32.c
+  * source/compiler/hbusage.c
+  * source/lang/msg_tpl.c
+  * source/lang/msgca.c
+  * source/lang/msgcs852.c
+  * source/lang/msgcsiso.c
+  * source/lang/msgcskam.c
+  * source/lang/msgcswin.c
+  * source/lang/msgde.c
+  * source/lang/msgen.c
+  * source/lang/msgeo.c
+  * source/lang/msges.c
+  * source/lang/msgeu.c
+  * source/lang/msgfr.c
+  * source/lang/msggl.c
+  * source/lang/msghe862.c
+  * source/lang/msghewin.c
+  * source/lang/msghr852.c
+  * source/lang/msghriso.c
+  * source/lang/msghu852.c
+  * source/lang/msghucwi.c
+  * source/lang/msghuwin.c
+  * source/lang/msgid.c
+  * source/lang/msgis850.c
+  * source/lang/msgit.c
+  * source/lang/msgko.c
+  * source/lang/msgpl852.c
+  * source/lang/msgpliso.c
+  * source/lang/msgplmaz.c
+  * source/lang/msgpt.c
+  * source/lang/msgro.c
+  * source/lang/msgru866.c
+  * source/lang/msgruwin.c
+  * source/lang/msgsr852.c
+  * source/lang/msgsriso.c
+  * source/lang/msgzhb5.c
+  * source/lang/msgzhgb.c
+  * source/macro/macro.y
+  * source/pp/ppcore.c
+  * source/pp/pptable.c
+  * source/rdd/dbcmd.c
+  * source/rdd/dbf1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/console.c
+  * source/rtl/direct.c
+  * source/rtl/filehb.c
+  * source/rtl/gete.c
+  * source/rtl/isprint.c
+  * source/rtl/listbox.prg
+  * source/rtl/memofile.c
+  * source/rtl/profiler.prg
+  * source/rtl/spfiles.c
+  * source/rtl/tget.prg
+  * source/rtl/typefile.prg
+  * source/rtl/gtsln/kbsln.c
+  * source/vm/Makefile
+  * source/vm/dynlibhb.c
+  * source/rtl/descend.c
+  * source/rtl/transfrm.c
+  * source/vm/maindll.c
+  * source/vm/maindllh.c
+  * source/vm/maindllp.c
+  * utils/hbmake/ffile1.prg
+  * utils/hbmake/ft_funcs.prg
+  * utils/hbmake/hbmake.prg
+    * Synched with Harbour upto:
+        2002-01-18 17:45 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+          * source/rdd/dbfntx/dbfntx1.c
+            * support of EVAL and EVERY clauses of INDEX ON command implemented
 
 2002-01-17 15:03 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapiitm.h

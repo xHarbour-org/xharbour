@@ -1,5 +1,5 @@
 /*
- * $Id: dynlibhb.c,v 1.2 2001/12/23 18:01:37 ronpinkas Exp $
+ * $Id: dynlibhb.c,v 1.7 2001/12/30 09:45:43 andijahja Exp $
  */
 
 /*
@@ -112,4 +112,3 @@ HB_FUNC( HB_LIBDO )
       hb_vmDo( uiPCount - 1 );
    }
 }
-

@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.1.1.1 2001/12/21 10:44:14 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.26 2001/12/15 19:20:59 andijahja Exp $
  */
 
 /*
@@ -1297,14 +1297,14 @@ ExtVarDef  : VarDef
                }
            | MacroVar DimList
                {
-                  USHORT uCount = ( USHORT ) hb_compExprListLen( $2 );
+                  USHORT uCount = hb_compExprListLen( $2 );
                   hb_compExprDelete( hb_compExprGenPush( $2 ) );
                   hb_compGenPCode3( HB_P_ARRAYDIM, HB_LOBYTE( uCount ), HB_HIBYTE( uCount ), ( BOOL ) 1 );
                   hb_compRTVariableAdd( hb_compExprNewRTVar( NULL, $1 ), TRUE );
                }
            | MacroVar DimList AsArray
                {
-                  USHORT uCount = ( USHORT ) hb_compExprListLen( $2 );
+                  USHORT uCount = hb_compExprListLen( $2 );
                   hb_compExprDelete( hb_compExprGenPush( $2 ) );
                   hb_compGenPCode3( HB_P_ARRAYDIM, HB_LOBYTE( uCount ), HB_HIBYTE( uCount ), ( BOOL ) 1 );
                   hb_compRTVariableAdd( hb_compExprNewRTVar( NULL, $1 ), TRUE );
@@ -1705,11 +1705,40 @@ ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
                }
              ForStatements                            /* 12 */
                {
+                  short iStep, iLocal;
+
                   hb_compLoopHere();
+
                   if( $<asExpr>8 )
-                     hb_compExprClear( hb_compExprGenStatement( hb_compExprSetOperand( hb_compExprNewPlusEq( $2 ), $<asExpr>8 ) ) );
+                  {
+                     if( $<asExpr>8->ExprType == HB_ET_NUMERIC && $<asExpr>8->value.asNum.NumType == HB_ET_LONG &&
+                         $<asExpr>8->value.asNum.lVal >= -32768 && $<asExpr>8->value.asNum.lVal <= 32767 )
+                     {
+                        iStep = ( short ) $<asExpr>8->value.asNum.lVal;
+                     }
+                     else
+                     {
+                        iStep = 0;
+                     }
+                  }
                   else
+                  {
+                     iStep = 1;
+                  }
+
+                  if( iStep && ( iLocal = hb_compLocalGetPos( $<asExpr>2->value.asSymbol ) ) > 0 && iLocal < 256 )
+                  {
+                     hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iStep ), HB_HIBYTE( iStep ), ( BOOL ) 0 );
+                  }
+                  else if( $<asExpr>8 )
+                  {
+                     hb_compExprClear( hb_compExprGenStatement( hb_compExprSetOperand( hb_compExprNewPlusEq( $2 ), $<asExpr>8 ) ) );
+                  }
+                  else
+                  {
                      hb_compExprClear( hb_compExprGenStatement( hb_compExprNewPreInc( $2 ) ) );
+                  }
+
                   hb_compGenJump( $<lNumber>9 - hb_comp_functions.pLast->lPCodePos );
                   hb_compGenJumpHere( $<lNumber>11 );
                   hb_compLoopEnd();
@@ -2231,7 +2260,7 @@ static void hb_compVariableDim( char * szName, HB_EXPR_PTR pInitValue )
 {
   if( hb_comp_iVarScope == VS_PUBLIC || hb_comp_iVarScope == VS_PRIVATE )
   {
-     USHORT uCount = ( USHORT ) hb_compExprListLen( pInitValue );
+     USHORT uCount = hb_compExprListLen( pInitValue );
      hb_compVariableAdd( szName, 'A' );
      hb_compExprDelete( hb_compExprGenPush( pInitValue ) );
      hb_compGenPCode3( HB_P_ARRAYDIM, HB_LOBYTE( uCount ), HB_HIBYTE( uCount ), ( BOOL ) 1 );
@@ -2239,7 +2268,7 @@ static void hb_compVariableDim( char * szName, HB_EXPR_PTR pInitValue )
   }
   else if( hb_comp_iVarScope == VS_STATIC )
   {
-     USHORT uCount = ( USHORT ) hb_compExprListLen( pInitValue );
+     USHORT uCount = hb_compExprListLen( pInitValue );
      HB_EXPR_PTR pVar = hb_compExprNewVar( szName );
      HB_EXPR_PTR pAssign;
 
@@ -2259,7 +2288,7 @@ static void hb_compVariableDim( char * szName, HB_EXPR_PTR pInitValue )
   }
   else
   {
-     USHORT uCount = ( USHORT ) hb_compExprListLen( pInitValue );
+     USHORT uCount = hb_compExprListLen( pInitValue );
 
      hb_compVariableAdd( szName, 'A' );
      hb_compExprDelete( hb_compExprGenPush( pInitValue ) );

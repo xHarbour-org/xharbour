@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.2 2002/01/04 07:15:22 ronpinkas Exp $
+ * $Id: eval.c,v 1.3 2002/01/12 10:04:28 ronpinkas Exp $
  */
 
 /*
@@ -63,9 +63,9 @@
  */
 
 #include "hbapi.h"
-#include "hbfast.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 #include "hbvm.h"
 
 BOOL hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )

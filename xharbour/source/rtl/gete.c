@@ -1,5 +1,5 @@
 /*
- * $Id: gete.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: gete.c,v 1.8 2001/12/16 11:12:22 vszakats Exp $
  */
 
 /*
@@ -63,7 +63,6 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
-#include "hbfast.h"
 
 /* NOTE: The second parameter is a Harbour extension. In CA-Cl*pper the
          function will return an empty string if called with more than one
@@ -103,31 +102,18 @@ HB_FUNC( GETENV )
 
          szValue = hb_getenv( pszName );
 
-         if( szValue && szValue[ 0 ] )
-         {
-            hb_retcAdopt( szValue );
-         }
-         else
-         {
-            hb_retc( ISCHAR( 2 ) ? hb_parc( 2 ) : "" );
-
-            if( szValue )
-            {
-               hb_xfree( ( void * ) szValue );
-            }
-         }
+         hb_retc( szValue && szValue[ 0 ] != '\0' ? szValue : ( ( ISCHAR( 2 ) ? hb_parc( 2 ) : "" ) ) );
+         
+         if( szValue )
+            hb_xfree( ( void * ) szValue );
       }
       else
-      {
          hb_retc( "" );
-      }
 
       hb_itemFreeC( pszName );
    }
    else
-   {
       hb_retc( "" );
-   }
 }
 
 /* NOTE: Undocumented Clipper function. [vszakats] */

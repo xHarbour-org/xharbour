@@ -597,7 +597,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                hb_itemClear( &hb_stack.Return );
             }
             hb_vmDo( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
-            hb_itemCopy( hb_stackTopItem(), &hb_stack.Return );
+            hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
             hb_stackPush();
             w += 3;
             break;
@@ -608,7 +608,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
                hb_itemClear( &hb_stack.Return );
             }
             hb_vmDo( pCode[ w + 1 ] );
-            hb_itemCopy( hb_stackTopItem(), &hb_stack.Return );
+            hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
             hb_stackPush();
             w += 2;
             break;
@@ -618,10 +618,21 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             {
                hb_itemClear( &hb_stack.Return );
             }
+
             hb_vmSend( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
-            hb_itemCopy( hb_stackTopItem(), &hb_stack.Return );
-            hb_stackPush();
+
             w += 3;
+
+            if( pCode[w] == HB_P_POP )
+            {
+               w++;
+            }
+            else
+            {
+               hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
+               hb_stackPush();
+            }
+
             break;
 
          case HB_P_SENDSHORT:
@@ -629,10 +640,21 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             {
                hb_itemClear( &hb_stack.Return );
             }
+
             hb_vmSend( pCode[ w + 1 ] );
-            hb_itemCopy( hb_stackTopItem(), &hb_stack.Return );
-            hb_stackPush();
+
             w += 2;
+
+            if( pCode[w] == HB_P_POP )
+            {
+               w++;
+            }
+            else
+            {
+               hb_itemForwardValue( hb_stackTopItem(), &hb_stack.Return );
+               hb_stackPush();
+            }
+
             break;
 
          case HB_P_LINE:
@@ -1072,6 +1094,130 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             hb_vmPushLocal( ( signed char ) pCode[ w + 1 ] );
             w += 2;  /* only first two bytes are used */
             break;
+
+         case HB_P_LOCALNEARADDINT:
+         {
+            PHB_ITEM pLocal = hb_stackItemFromBase( pCode[ w + 1 ] );
+            double dNewVal;
+
+            if( HB_IS_BYREF( pLocal ) )
+            {
+               pLocal = hb_itemUnRef( pLocal );
+            }
+
+            if( HB_IS_NUMERIC( pLocal ) )
+            {
+               dNewVal = (double) ( pLocal->item.asInteger.value + ( short ) ( pCode[ w + 2 ] + ( pCode[ w + 3 ] * 256 ) ) );
+            }
+            else
+            {
+               PHB_ITEM pStep = hb_itemPutNI( NULL, ( int ) ( ( short ) ( pCode[ w + 2 ] + ( pCode[ w + 3 ] * 256 ) ) ) );
+               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLocal, pStep );
+
+               hb_itemRelease( pStep );
+
+               if( pResult )
+               {
+                  hb_itemForwardValue( pLocal, pResult );
+                  w += 4;
+                  break;
+               }
+            }
+
+            if( pLocal->type & HB_IT_DOUBLE )
+            {
+               pLocal->item.asDouble.value = dNewVal;
+            }
+            else if( SHRT_MIN <= dNewVal && dNewVal <= SHRT_MAX )
+            {
+               pLocal->item.asInteger.value = ( int ) dNewVal;
+            }
+            else if( LONG_MIN <= dNewVal && dNewVal <= LONG_MAX )
+            {
+               pLocal->item.asLong.value = ( long ) dNewVal;
+            }
+            else
+            {
+               pLocal->item.asDouble.value = dNewVal;
+               pLocal->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
+               pLocal->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
+            }
+
+            w += 4;
+            break;
+         }
+
+         case HB_P_LOCALNEARSETINT:
+         {
+            PHB_ITEM pLocal = hb_stackItemFromBase( pCode[ w + 1 ] );
+            short iNewVal = ( short ) ( pCode[ w + 2 ] + ( pCode[ w + 3 ] * 256 ) );
+
+            if( HB_IS_BYREF( pLocal ) )
+            {
+               pLocal = hb_itemUnRef( pLocal );
+            }
+
+            hb_itemPutNI( pLocal, iNewVal );
+
+            w += 4;
+            break;
+         }
+
+         case HB_P_LEFT:
+         {
+            unsigned short iNewLen = ( unsigned short ) ( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );
+            PHB_ITEM pString = hb_stackItemFromTop( -1 ), pTmp;
+            char *sString;
+
+            HB_TRACE(HB_TR_DEBUG, ("HB_P_LEFT %i", iNewLen ) );
+
+            if( HB_IS_STRING( pString ) )
+            {
+               if( HB_IS_BYREF( pString ) )
+               {
+                  pString = hb_itemUnRef( pString );
+               }
+
+               if( ( ULONG ) iNewLen < pString->item.asString.length )
+               {
+                  if( pString->item.asString.bStatic )
+                  {
+                     sString = hb_xgrab( iNewLen + 1 );
+                     memcpy( sString, pString->item.asString.value, iNewLen );
+                     sString[ iNewLen ] = '\0';
+                     pString->item.asString.bStatic = FALSE;
+                     pString->item.asString.puiHolders = hb_xgrab( sizeof( USHORT ) );
+                     *( pString->item.asString.puiHolders ) = 1;
+                     pString->item.asString.value = sString;
+                     pString->item.asString.length = iNewLen;
+                  }
+                  else if( *( pString->item.asString.puiHolders ) == 1 )
+                  {
+                     pString->item.asString.value[ iNewLen ] = '\0';
+                     pString->item.asString.length = iNewLen;
+                  }
+                  else
+                  {
+                     sString = hb_xgrab( iNewLen + 1 );
+                     memcpy( sString, pString->item.asString.value, iNewLen );
+                     sString[ iNewLen ] = '\0';
+                     hb_itemReleaseString( pString );
+                     pString->item.asString.puiHolders = hb_xgrab( sizeof( USHORT ) );
+                     *( pString->item.asString.puiHolders ) = 1;
+                     pString->item.asString.value = sString;
+                     pString->item.asString.length = iNewLen;
+                  }
+               }
+            }
+            else
+            {
+               hb_errRT_BASE_SubstR( EG_ARG, 1124, NULL, "LEFT", 2, pString, ( pTmp = hb_itemPutNI( NULL, iNewLen ) ) );
+               hb_itemRelease( pTmp );
+            }
+
+            w += 3;
+            break;
+         }
 
          case HB_P_PUSHLOCALREF:
             hb_vmPushLocalByRef( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) );

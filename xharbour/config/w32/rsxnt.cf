@@ -1,5 +1,5 @@
 #
-# $Id: rsxnt.cf,v 1.4 2001/02/09 17:18:26 dholm Exp $
+# $Id: rsxnt.cf,v 1.5 2001/12/26 21:21:08 dholm Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -32,7 +32,7 @@ endif
 # cyclic dependencies, but I think it is not really necessary if the
 # libraries are kept in proper order.
 # LINKLIBS += -Wl,-(
-LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(lib))
+LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # This library is needed for CharToOemBuff() and OemToCharBuff() support.

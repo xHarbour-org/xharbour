@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: transfrm.c,v 1.89 2002/01/06 09:17:59 vszakats Exp $
  */
 
 /*
@@ -65,7 +65,6 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
-#include "hbfast.h"
 #include "hbapierr.h"
 #include "hbdate.h"
 #include "hbset.h"
@@ -197,6 +196,7 @@ HB_FUNC( TRANSFORM )
          BOOL bAnyPic = FALSE;
 
          /* Grab enough */
+
          szResult = ( char * ) hb_xgrab( ulExpLen + ulPicLen + 1 );
          ulResultPos = 0;
 
@@ -513,7 +513,7 @@ HB_FUNC( TRANSFORM )
       {
          BOOL bDone = FALSE;
 
-         szResult = ( char * ) hb_xgrab( ulPicLen + 1 + 1 );
+         szResult = ( char * ) hb_xgrab( ulPicLen + 1 );
          ulResultPos = 1;
 
          if( ulPicLen )                      /* Template string          */
@@ -590,9 +590,8 @@ HB_FUNC( TRANSFORM )
          if( uiPicFlags & PF_EMPTY )
             memset( szResult, ' ', ulResultPos );
 
-         hb_retclenAdopt( szResult, ( uiPicFlags & PF_WIDTH && ulResultPos > ulParamS ) ? ulParamS : ulResultPos );
-         HB_TRACE( HB_TR_INFO, ( "Would have called hb_xfree( %p ) for \"%s\"", szResult, szResult ) );
-         //hb_xfree( szResult );
+         hb_retclen( szResult, ( uiPicFlags & PF_WIDTH && ulResultPos > ulParamS ) ? ulParamS : ulResultPos );
+         hb_xfree( szResult );
       }
    }
    else if( pPic || ISNIL( 2 ) ) /* Picture is an empty string or NIL */
@@ -607,12 +606,11 @@ HB_FUNC( TRANSFORM )
 
          if( szStr )
          {
-            hb_retcAdopt( szStr );
+            hb_retc( szStr );
+            hb_xfree( szStr );
          }
          else
-         {
             hb_retc( "" );
-         }
       }
       else if( HB_IS_DATE( pValue ) )
       {
@@ -626,14 +624,10 @@ HB_FUNC( TRANSFORM )
          hb_retc( hb_itemGetL( pValue ) ? "T" : "F" );
       }
       else
-      {
          bError = TRUE;
-      }
    }
    else
-   {
       bError = TRUE;
-   }
 
    /* If there was any parameter error, launch a runtime error */
 

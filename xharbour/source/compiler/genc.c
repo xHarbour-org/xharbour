@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.1.1.1 2001/12/21 10:44:28 ronpinkas Exp $
+ * $Id: genc.c,v 1.102 2002/01/08 08:59:52 patrickmast Exp $
  */
 
 /*
@@ -48,12 +48,13 @@ typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
 void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language output */
 {
    char szFileName[ _POSIX_PATH_MAX ];
-   PFUNCTION pFunc = hb_comp_functions.pFirst, pFTemp;
+   PFUNCTION pFunc = hb_comp_functions.pFirst;
    PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
    PCOMDECLARED pDeclared;
    PCOMCLASS    pClass;
    FILE * yyc; /* file handle for C output */
    PINLINE pInline = hb_comp_inlines.pFirst;
+
    BOOL bIsPublicFunction ;
    BOOL bIsInitFunction   ;
    BOOL bIsExitFunction   ;
@@ -76,8 +77,8 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
       fflush( stdout );
    }
 
-   fprintf( yyc, "/*\n * Harbour Compiler, %d.%d.%d (%s)\n",
-      HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
+   fprintf( yyc, "/*\n * Harbour Compiler, Apha build %d.%d (%s)\n",
+      HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
    fprintf( yyc, " * Generated C source code\n */\n\n" );
 
    if( hb_comp_iFunctionCnt )
@@ -101,19 +102,18 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          /* Is it a PUBLIC FUNCTION/PROCEDURE */
          if ( bIsPublicFunction )
             fprintf( yyc, "HB_FUNC( %s );\n", pFunc->szName );
+         /* Is it a STATIC$ */
+         else if ( bIsStaticVariable )
+            fprintf( yyc, "static HARBOUR hb_INITSTATICS( void );\n" ); /* NOTE: hb_ intentionally in lower case */
+         /* Is it an INIT FUNCTION/PROCEDURE */
+         else if ( bIsInitFunction )
+            fprintf( yyc, "HB_FUNC_INIT( %s );\n", pFunc->szName );
+         /* Is it an EXIT FUNCTION/PROCEDURE */
+         else if ( bIsExitFunction )
+            fprintf( yyc, "HB_FUNC_EXIT( %s );\n", pFunc->szName );
+         /* Then it must be a STATIC FUNCTION/PROCEDURE */
          else
-            /* Is it a STATIC$ */
-            if ( bIsStaticVariable )
-               fprintf( yyc, "static HARBOUR hb_INITSTATICS( void );\n" ); /* NOTE: hb_ intentionally in lower case */
-            /* Is it an INIT FUNCTION/PROCEDURE */
-            else if ( bIsInitFunction )
-               fprintf( yyc, "HB_FUNC_INIT( %s );\n", pFunc->szName );
-            /* Is it an EXIT FUNCTION/PROCEDURE */
-            else if ( bIsExitFunction )
-                fprintf( yyc, "HB_FUNC_EXIT( %s );\n", pFunc->szName );
-            /* Then it must be a STATIC FUNCTION/PROCEDURE */
-            else
-                fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pFunc->szName );
+            fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pFunc->szName );
 
          pFunc = pFunc->pNext;
       }
@@ -122,7 +122,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
       while( pInline )
       {
          if( pInline->szName )
-            fprintf( yyc, "static HB_FUNC( %s );\n", pInline->szName );
+            fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pInline->szName );
          pInline = pInline->pNext;
       }
 
@@ -130,14 +130,9 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
       pFunc = hb_comp_funcalls.pFirst;
       while( pFunc )
       {
-         pFTemp = hb_compFunctionFind( pFunc->szName );
-         if( ! pFTemp || pFTemp == hb_comp_functions.pFirst )
-         {
-            if( pFTemp == NULL && hb_compInlineFind( pFunc->szName ) == NULL )
-            {
-               fprintf( yyc, "extern HB_FUNC( %s );\n", pFunc->szName );
-            }
-         }
+         if( hb_compFunctionFind( pFunc->szName ) == NULL &&
+             hb_compInlineFind( pFunc->szName ) == NULL )
+            fprintf( yyc, "extern HB_FUNC( %s );\n", pFunc->szName );
 
          pFunc = pFunc->pNext;
       }
@@ -228,28 +223,26 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
 
       while( pFunc )
       {
-
          bIsInitFunction   = ( pFunc->cScope & HB_FS_INIT ) ;
          bIsExitFunction   = ( pFunc->cScope & HB_FS_EXIT ) ;
          bIsStaticVariable = ( pFunc == hb_comp_pInitFunc ) ;
          bIsPublicFunction = ( pFunc->cScope == HB_FS_PUBLIC ) ;
 
+         /* Is it a PUBLIC FUNCTION/PROCEDURE */
          if ( bIsPublicFunction )
-            /* Is it a PUBLIC FUNCTION/PROCEDURE */
             fprintf( yyc, "HB_FUNC( %s )", pFunc->szName );
+         /* Is it STATICS$ */
+         else if( bIsStaticVariable )
+            fprintf( yyc, "static HARBOUR hb_INITSTATICS( void )" ); /* NOTE: hb_ intentionally in lower case */
+         /* Is it an INIT FUNCTION/PROCEDURE */
+         else if ( bIsInitFunction )
+            fprintf( yyc, "HB_FUNC_INIT( %s )", pFunc->szName );
+         /* Is it an EXIT FUNCTION/PROCEDURE */
+         else if ( bIsExitFunction )
+            fprintf( yyc, "HB_FUNC_EXIT( %s )", pFunc->szName );
+         /* Then it must be a STATIC FUNCTION/PROCEDURE */
          else
-            /* Is it STATICS$ */
-            if( bIsStaticVariable )
-               fprintf( yyc, "static HARBOUR hb_INITSTATICS( void )" ); /* NOTE: hb_ intentionally in lower case */
-            /* Is it an INIT FUNCTION/PROCEDURE */
-            else if ( bIsInitFunction )
-               fprintf( yyc, "HB_FUNC_INIT( %s )", pFunc->szName );
-            /* Is it an EXIT FUNCTION/PROCEDURE */
-            else if ( bIsExitFunction )
-               fprintf( yyc, "HB_FUNC_EXIT( %s )", pFunc->szName );
-            /* Then it must be a STATIC FUNCTION/PROCEDURE */
-            else
-               fprintf( yyc, "HB_FUNC_STATIC( %s )", pFunc->szName );
+            fprintf( yyc, "HB_FUNC_STATIC( %s )", pFunc->szName );
 
          fprintf( yyc, "\n{\n   static const BYTE pcode[] =\n   {\n" );
 
@@ -283,7 +276,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
 
          if( pInline->szName )
          {
-            fprintf( yyc, "static HB_FUNC( %s )\n", pInline->szName );
+            fprintf( yyc, "HB_FUNC_STATIC( %s )\n", pInline->szName );
          }
          fprintf( yyc, "%s", pInline->pCode );
          pInline = pInline->pNext;
@@ -1816,6 +1809,138 @@ static HB_GENC_FUNC( hb_p_macrolistend )
    return 1;
 }
 
+static HB_GENC_FUNC( hb_p_localnearaddint )
+{
+   fprintf( cargo->yyc, "\tHB_P_LOCALNEARADDINT, %i, %i, %i,", pFunc->pCode[ lPCodePos + 1 ],
+                                                               pFunc->pCode[ lPCodePos + 2 ],
+                                                               pFunc->pCode[ lPCodePos + 3 ] );
+
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "\t/* %s %i*/", hb_compLocalVariableFind( pFunc, ( signed char ) pFunc->pCode[ lPCodePos + 1 ] )->szName,
+               ( short ) ( pFunc->pCode[ lPCodePos + 2 ] + pFunc->pCode[ lPCodePos + 3 ] * 256 ) );
+   }
+
+   fprintf( cargo->yyc, "\n" );
+
+   return 4;
+}
+
+static HB_GENC_FUNC( hb_p_localnearsetint )
+{
+   fprintf( cargo->yyc, "\tHB_P_LOCALNEARSETINT, %i, %i, %i,", pFunc->pCode[ lPCodePos + 1 ],
+                                                               pFunc->pCode[ lPCodePos + 2 ],
+                                                               pFunc->pCode[ lPCodePos + 3 ] );
+
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "\t/* %s %i*/", hb_compLocalVariableFind( pFunc, ( signed char ) pFunc->pCode[ lPCodePos + 1 ] )->szName,
+               ( short ) ( pFunc->pCode[ lPCodePos + 2 ] + pFunc->pCode[ lPCodePos + 3 ] * 256 ) );
+   }
+
+   fprintf( cargo->yyc, "\n" );
+
+   return 4;
+}
+
+static HB_GENC_FUNC( hb_p_localnearsetstr )
+{
+
+   ULONG ulStart = lPCodePos;
+   USHORT wLen = pFunc->pCode[ lPCodePos + 2 ] +
+                 pFunc->pCode[ lPCodePos + 3 ] * 256;
+
+   fprintf( cargo->yyc, "\tHB_P_LOCALNEARSETSTR, %i, %i, %i,",
+            pFunc->pCode[ lPCodePos + 1 ],
+            pFunc->pCode[ lPCodePos + 2 ],
+            pFunc->pCode[ lPCodePos + 3 ] );
+
+   if( cargo->bVerbose )
+   {
+         fprintf( cargo->yyc, "\t/* %i */", wLen );
+   }
+
+   lPCodePos += 4;
+
+   if( wLen > 0 )
+   {
+      fprintf( cargo->yyc, "\n\t" );
+
+      while( wLen-- )
+      {
+         BYTE uchr = ( BYTE ) pFunc->pCode[ lPCodePos++ ];
+         /*
+          * NOTE: After optimization some CHR(n) can be converted
+          *    into a string containing nonprintable characters.
+          *
+          * TODO: add switch to use hexadecimal format "%#04x"
+          */
+         if( ( uchr < ( BYTE ) ' ' ) || ( uchr >= 127 ) )
+         {
+            fprintf( cargo->yyc, "%i, ", uchr );
+         }
+         else if( strchr( "\'\\\"", uchr ) )
+         {
+            fprintf( cargo->yyc, "%i, ", uchr );
+         }
+         else
+         {
+            fprintf( cargo->yyc, "\'%c\', ", uchr );
+         }
+      }
+   }
+
+   fprintf( cargo->yyc, "\n" );
+
+   return ( USHORT ) ( lPCodePos - ulStart );
+}
+
+static HB_GENC_FUNC( hb_p_left )
+{
+   fprintf( cargo->yyc, "\tHB_P_LEFT, %i, %i,", pFunc->pCode[ lPCodePos + 1 ], pFunc->pCode[ lPCodePos + 2 ] );
+
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "\t/* %i */", pFunc->pCode[ lPCodePos + 1 ] + pFunc->pCode[ lPCodePos + 2 ] * 256 );
+   }
+
+   fprintf( cargo->yyc, "\n" );
+
+   return 3;
+}
+
+static HB_GENC_FUNC( hb_p_right )
+{
+   fprintf( cargo->yyc, "\tHB_P_RIGHT, %i, %i,", pFunc->pCode[ lPCodePos + 1 ], pFunc->pCode[ lPCodePos + 2 ] );
+
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "\t/* %i */", pFunc->pCode[ lPCodePos + 1 ] + pFunc->pCode[ lPCodePos + 2 ] * 256 );
+   }
+
+   fprintf( cargo->yyc, "\n" );
+
+   return 3;
+}
+
+static HB_GENC_FUNC( hb_p_substr )
+{
+   fprintf( cargo->yyc, "\tHB_P_SUBSTR, %i, %i, %i, %i,",
+            pFunc->pCode[ lPCodePos + 1 ], pFunc->pCode[ lPCodePos + 2 ],
+            pFunc->pCode[ lPCodePos + 3 ], pFunc->pCode[ lPCodePos + 4 ] );
+
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "\t/* %i %i*/",
+               pFunc->pCode[ lPCodePos + 1 ] + pFunc->pCode[ lPCodePos + 2 ] * 256,
+               pFunc->pCode[ lPCodePos + 3 ] + pFunc->pCode[ lPCodePos + 4 ] * 256 );
+   }
+
+   fprintf( cargo->yyc, "\n" );
+
+   return 5;
+}
+
 /* NOTE: The  order of functions have to match the order of opcodes
  *       mnemonics
  */
@@ -1946,7 +2071,13 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_zero,
    hb_p_one,
    hb_p_macrolist,
-   hb_p_macrolistend
+   hb_p_macrolistend,
+   hb_p_localnearaddint,
+   hb_p_localnearsetint,
+   hb_p_localnearsetstr,
+   hb_p_left,
+   hb_p_right,
+   hb_p_substr
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )
@@ -1965,7 +2096,6 @@ static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )
    if( genc_info.bVerbose )
       fprintf( yyc, "/* %05li */\n", pFunc->lPCodePos );
 }
-
 
 static void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc )
 {

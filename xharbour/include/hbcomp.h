@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.1.1.1 2001/12/21 10:47:40 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.77 2002/01/02 02:00:21 andijahja Exp $
  */
 
 /*
@@ -386,6 +386,7 @@ extern void hb_compChkDefines( int iArg, char * Args[] );
 
 extern void hb_compPrintUsage( char * );
 extern void hb_compPrintCredits( void );
+extern void hb_compFileInfo( void );
 extern void hb_compPrintLogo( void );
 extern void hb_compPrintModes( void );
 
@@ -467,6 +468,10 @@ extern char *         hb_comp_szAnnounce;
 extern PHB_FNAME      hb_comp_pOutPath;
 extern BOOL           hb_comp_bCredits;
 extern BOOL           hb_comp_bBuildInfo;
+
+/* Andi Jahja */
+extern BOOL           hb_comp_bFileVersionInfo;
+
 extern BOOL           hb_comp_bLogo;
 extern BOOL           hb_comp_bSyntaxCheckOnly;
 extern int            hb_comp_iLanguage;
@@ -478,21 +483,21 @@ extern USHORT         hb_comp_wWhileCounter;
 extern USHORT         hb_comp_wCaseCounter;
                       
 extern char *         hb_comp_szDeclaredFun;
-                      
+
 extern char *         hb_comp_szLastMethod;
-                      
+
 extern char *         hb_comp_szErrors[];
 extern char *         hb_comp_szWarnings[];
-                      
+
 extern char *         hb_pp_STD_CH;
 extern BOOL           hb_comp_bAutoOpen;
 extern BOOL           hb_comp_bError;
 extern char           hb_comp_cInlineID;
-                      
+
 extern INLINES        hb_comp_inlines;
 extern int            hb_comp_iLineINLINE;
 extern int            hb_comp_iLinePRG;
-                      
+
 extern ULONG          hb_comp_Supported;
 
 /* /GC command line setting types */

@@ -1,5 +1,5 @@
 # 
-# $Id: bcc16.cf,v 1.7 2000/11/30 20:29:01 dholm Exp $
+# $Id: bcc16.cf,v 1.8 2001/12/26 21:21:08 dholm Exp $
 #
 # The Harbour Project
 # GNU MAKE file for Borland C/C++ 3.x, 4.x, 5.0x
@@ -44,11 +44,13 @@ endef
 LD = bcc
 LDFLAGS = -O2 -mh $(L_USR)
 ifeq ($(HB_LIB_COMPILE),)
+LINKLIBS = $(foreach lib, $(CONTRIBS), $(TOP)$(ROOT)contrib/$(lib)/$(ARCH)/$(subst lib,,$(lib))$(LIB_EXT))
 LINKLIBS = $(foreach lib, $(LIBS), $(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)$(LIB_EXT))
 ifeq ($(findstring rdd,$(LIBS)),rdd)
 LINKLIBS += $(foreach lib, $(HB_DB_DRIVERS), $(TOP)$(ROOT)source/rdd/$(lib)/$(ARCH)/$(lib)$(LIB_EXT))
 endif
 else
+LINKLIBS = $(foreach lib, $(CONTRIBS), $(lib)$(LIB_EXT))
 LINKLIBS = $(foreach lib, $(LIBS), $(lib)$(LIB_EXT))
 ifeq ($(findstring rdd,$(LIBS)),rdd)
 LINKLIBS += $(foreach lib, $(HB_DB_DRIVERS), $(lib)$(LIB_EXT))

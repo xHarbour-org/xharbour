@@ -1,5 +1,5 @@
 /*
- * $Id: msghewin.c,v 1.6 2001/12/16 12:20:48 ckedem Exp $
+ * $Id: msghewin.c,v 1.8 2002/01/06 13:37:33 antoniolinares Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "עברית",                     /* Name (in native language) */
       "HE",                        /* RFC ID */
       "1255",                      /* Codepage */
-      "$Revision: 1.6 $ $Date: 2001/12/16 12:20:48 $",         /* Version */
+      "$Revision: 1.8 $ $Date: 2002/01/06 13:37:33 $",         /* Version */
 
       /* Month names */
 
@@ -189,6 +189,9 @@ static HB_LANG s_lang =
       "An item was going to be copied to itself from %s",
       "Invalid symbol item passed as memvar %s",
       "Memory buffer overflow",
+      "hb_xgrab requested to allocate zero bytes",
+      "hb_xrealloc requested to resize to zero bytes",
+      "hb_xalloc requested to allocate zero bytes"
 
       /* Texts */
 

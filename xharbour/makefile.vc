@@ -653,7 +653,6 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)\initexit.obj \
    $(OBJ_DIR)\initsymb.obj \
    $(OBJ_DIR)\itemapi.obj \
-   $(OBJ_DIR)\fatitem.obj \
    $(OBJ_DIR)\macro.obj \
    $(OBJ_DIR)\maindll.obj \
    $(OBJ_DIR)\mainstd.obj \

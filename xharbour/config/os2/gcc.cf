@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.21 2001/08/30 20:34:51 dholm Exp $
+# $Id: gcc.cf,v 1.22 2001/12/26 21:21:08 dholm Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -38,7 +38,7 @@ else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
 #LINKLIBS += -Wl,-(
-LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(lib))
+LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # If LIBS specifies the rdd library, add all DB drivers.

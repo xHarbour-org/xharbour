@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.11 2001/11/05 02:59:24 vszakats Exp $
+# $Id: mingw32.cf,v 1.12 2001/12/26 21:21:08 dholm Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -30,7 +30,7 @@ else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
 
-LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(lib))
+LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # This library is needed for CharToOemBuff() and OemToCharBuff() support.

@@ -1,5 +1,5 @@
 /*
- * $Id: msgsr852.c,v 1.4 2000/07/27 08:10:42 rglab Exp $
+ * $Id: msgsr852.c,v 1.6 2002/01/06 13:37:33 antoniolinares Exp $
  */
 
 /*
@@ -49,7 +49,7 @@ static HB_LANG s_lang =
       "Srpski",                   /* Name (in native language) */
       "SR",                       /* RFC ID */
       "852",                      /* Codepage */
-      "$Revision: 1.4 $ $Date: 2000/07/27 08:10:42 $",     /* Version */
+      "$Revision: 1.6 $ $Date: 2002/01/06 13:37:33 $",     /* Version */
 
       /* Month names */
 
@@ -171,6 +171,9 @@ static HB_LANG s_lang =
       "An item was going to be copied to itself from %s",
       "Invalid symbol item passed as memvar %s",
       "Memory buffer overflow",
+      "hb_xgrab requested to allocate zero bytes",
+      "hb_xrealloc requested to resize to zero bytes",
+      "hb_xalloc requested to allocate zero bytes"
 
       /* Texts */
 
@@ -188,4 +191,3 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_SR852 )
 #if ! defined(__GNUC__) && ! defined(_MSC_VER)
    #pragma startup hb_lang_Init_SR852
 #endif
-

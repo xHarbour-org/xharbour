@@ -1,5 +1,5 @@
 /*
- * $Id: msgeu.c,v 1.3 2000/07/27 08:10:42 rglab Exp $
+ * $Id: msgeu.c,v 1.5 2002/01/06 13:37:33 antoniolinares Exp $
  */
 
 /*
@@ -49,7 +49,7 @@ static HB_LANG s_lang =
       "English",                   /* Name (in native language) */
       "EU",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.3 $ $Date: 2000/07/27 08:10:42 $",         /* Version */
+      "$Revision: 1.5 $ $Date: 2002/01/06 13:37:33 $",         /* Version */
 
       /* Month names */
 
@@ -77,7 +77,7 @@ static HB_LANG s_lang =
       "Larunbata",
 
       /* CA-Cl*pper compatible natmsg items */
-   
+
       "Database Files    # Records    Last Update     Size",
       "Do you want more samples?",
       "Page No.",
@@ -93,7 +93,7 @@ static HB_LANG s_lang =
       "INVALID EXPRESSION",
 
       /* Error description names */
-   
+
       "Errore ezezaguna",
       "Argumentu-errore",
       "Maila-errore",
@@ -150,27 +150,30 @@ static HB_LANG s_lang =
 
       "Unrecoverable error %lu: ",
       "Error recovery failure",
-      "No ERRORBLOCK() for error", 
-      "Too many recursive error handler calls", 
+      "No ERRORBLOCK() for error",
+      "Too many recursive error handler calls",
       "RDD invalid or failed to load",
-      "Invalid method type from %s", 
-      "hb_xgrab can't allocate memory", 
-      "hb_xrealloc called with a NULL pointer", 
-      "hb_xrealloc called with an invalid pointer", 
-      "hb_xrealloc can't reallocate memory", 
-      "hb_xfree called with an invalid pointer", 
-      "hb_xfree called with a NULL pointer", 
+      "Invalid method type from %s",
+      "hb_xgrab can't allocate memory",
+      "hb_xrealloc called with a NULL pointer",
+      "hb_xrealloc called with an invalid pointer",
+      "hb_xrealloc can't reallocate memory",
+      "hb_xfree called with an invalid pointer",
+      "hb_xfree called with a NULL pointer",
       "Can\'t locate the starting procedure: \'%s\'",
-      "No starting procedure", 
-      "Unsupported VM opcode", 
+      "No starting procedure",
+      "Unsupported VM opcode",
       "Symbol item expected from %s",
-      "Invalid symbol type for self from %s", 
-      "Codeblock expected from %s", 
+      "Invalid symbol type for self from %s",
+      "Codeblock expected from %s",
       "Incorrect item type on the stack trying to pop from %s",
-      "Stack underflow", 
-      "An item was going to be copied to itself from %s", 
+      "Stack underflow",
+      "An item was going to be copied to itself from %s",
       "Invalid symbol item passed as memvar %s",
       "Memory buffer overflow",
+      "hb_xgrab requested to allocate zero bytes",
+      "hb_xrealloc requested to resize to zero bytes",
+      "hb_xalloc requested to allocate zero bytes"
 
       /* Texts */
 
@@ -188,4 +191,3 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_EU )
 #if ! defined(__GNUC__) && ! defined(_MSC_VER)
    #pragma startup hb_lang_Init_EU
 #endif
-

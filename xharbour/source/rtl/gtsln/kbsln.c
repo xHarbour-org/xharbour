@@ -114,7 +114,7 @@ unsigned char *hb_DeadKeyEnvName = "HRBNATIONDEADKEY";
 
 /* a table for Keys work with a Dead key. The first
    element contains a number of defined keys */
-unsigned char s_convKDeadKeys[ 257 ];  /* it should be allocated by hb_xgrab() */
+unsigned char s_convKDeadKeys[ 257 ];  /* it should be allocated by hb_xalloc() */
 
 /* contains an integer value of a DeadKey or -1 */
 int hb_DeadKey = -1;

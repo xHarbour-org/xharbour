@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.11 2001/12/18 00:03:25 vszakats Exp $
+ * $Id: gencobj.c,v 1.12 2001/12/27 00:16:59 lculik Exp $
  */
 
 /*
@@ -55,7 +55,7 @@ void hb_compGenCObj( PHB_FNAME pFileName )
    char * pszCfg;
    char * pszEnv;
    BOOL bVerbose = FALSE;   /* Don't show C compiler messages (default). */
-   BOOL bDelTmp = FALSE;    /* Delete intermediate C file (default). */
+   BOOL bDelTmp = TRUE;     /* Delete intermediate C file (default). */
    int iSuccess;
 
    /* First pass: build the C output */
@@ -181,9 +181,9 @@ void hb_compGenCObj( PHB_FNAME pFileName )
       if( hb_comp_pOutPath->szPath )
          pOut->szPath = hb_comp_pOutPath->szPath;
 
-#if defined(__MSDOS__) || defined(__WIN32__) || defined(_Windows)
+#if defined(__BORLANDC__) || defined(_MSC_VER)
       pOut->szExtension = ".obj";
-#elif defined( OS_UNIX_COMPATIBLE )
+#else
       pOut->szExtension = ".o";  /* Don't know if we can hardcode it for Un*x */
 #endif
       hb_fsFNameMerge( pszTemp, pOut );

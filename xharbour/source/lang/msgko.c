@@ -1,5 +1,5 @@
 /*
- * $Id: msgko.c,v 1.10 2001/12/16 12:20:48 ckedem Exp $
+ * $Id: msgko.c,v 1.12 2002/01/06 13:37:33 antoniolinares Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "ÇÑ±¹¾î",                    /* Name (in native language) */
       "KO",                        /* RFC ID */
       "949",                       /* Codepage */
-      "$Revision: 1.10 $ $Date: 2001/12/16 12:20:48 $",         /* Version */
+      "$Revision: 1.12 $ $Date: 2002/01/06 13:37:33 $",         /* Version */
 
       /* Month names */
 
@@ -188,6 +188,9 @@ static HB_LANG s_lang =
       "An item was going to be copied to itself from %s",
       "Invalid symbol item passed as memvar %s",
       "Memory buffer overflow",
+      "hb_xgrab requested to allocate zero bytes",
+      "hb_xrealloc requested to resize to zero bytes",
+      "hb_xalloc requested to allocate zero bytes"
 
       /* Texts */
 

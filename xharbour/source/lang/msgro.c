@@ -1,5 +1,5 @@
 /*
- * $Id: msgro.c,v 1.5 2001/06/19 21:40:42 vszakats Exp $
+ * $Id: msgro.c,v 1.7 2002/01/06 13:37:33 antoniolinares Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Romƒn",                     /* Name (in native language) */
       "RO",                        /* RFC ID */
       "852",                       /* Codepage */
-      "$Revision: 1.5 $ $Date: 2001/06/19 21:40:42 $",         /* Version */
+      "$Revision: 1.7 $ $Date: 2002/01/06 13:37:33 $",         /* Version */
 
       /* Month names */
 
@@ -188,6 +188,9 @@ static HB_LANG s_lang =
       "An item was going to be copied to itself from %s",
       "Invalid symbol item passed as memvar %s",
       "Memory buffer overflow",
+      "hb_xgrab requested to allocate zero bytes",
+      "hb_xrealloc requested to resize to zero bytes",
+      "hb_xalloc requested to allocate zero bytes"
 
       /* Texts */
 

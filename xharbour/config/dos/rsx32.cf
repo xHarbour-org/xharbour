@@ -1,5 +1,5 @@
 #
-# $Id: rsx32.cf,v 1.3 2001/02/09 17:18:26 dholm Exp $
+# $Id: rsx32.cf,v 1.4 2001/12/26 21:21:08 dholm Exp $
 #
 # GNU Make file for RSXNT for DOS target
 
@@ -33,7 +33,7 @@ endif
 # cyclic dependencies, but I think it is not really necessary if the
 # libraries are kept in proper order.
 # LINKLIBS += -Wl,-(
-LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(lib))
+LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # If LIBS specifies the rdd library, add all DB drivers.

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.46 2002/01/06 11:24:18 lculik Exp $
+ * $Id: hbmake.prg,v 1.47 2002/01/11 00:21:19 lculik Exp $
  */
 /*
  * Harbour Project source code:

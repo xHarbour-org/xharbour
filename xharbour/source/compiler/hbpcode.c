@@ -168,7 +168,13 @@ static BYTE s_pcode_len[] = {
    1,        /* HB_P_ZERO,                 */
    1,        /* HB_P_ONE,                  */
    1,        /* HB_P_MACROLIST,            */
-   1         /* HB_P_MACROLISTEND,         */
+   1,        /* HB_P_MACROLISTEND,         */
+   4,        /* HB_P_LOCALNEARADDINT,      */
+   4,        /* HB_P_LOCALNEARSETINT,      */
+   0,        /* HB_P_LOCALNEARSETSTR,      */
+   3,        /* HB_P_LEFT,                 */
+   3,        /* HB_P_RIGHT,                */
+   5,        /* HB_P_SUBSTR,               */
 };
 
 static PVAR hb_compPrivateFind( char * szPrivateName )
@@ -953,7 +959,7 @@ void hb_compStrongType( int iSize )
        /*
        printf( "\nBefore Cond: %i\n", pFunc->iStackIndex );
        */
-       
+
        /* Saving Stack depth befor Jump. */
        /* TODO: Remove Hard coded limitation. */
        if( s_iCondIndex < 16 )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbgete.c,v 1.8 2001/12/16 11:12:22 vszakats Exp $
+ * $Id: hbgete.c,v 1.10 2002/01/16 23:15:29 mauriliolongo Exp $
  */
 
 /*
@@ -60,9 +60,9 @@
 
 #include "hbapi.h"
 
-/* NOTE: Warning, this function _may_ return NULL as a result if 
+/* NOTE: Warning, this function _may_ return NULL as a result if
          the environment variable reading fails form some reason.
-         If the return value is not NULL, the caller must free 
+         If the return value is not NULL, the caller must free
          the pointer. [vszakats] */
 
 char * hb_getenv( const char * szName )

@@ -1,5 +1,5 @@
 /*
- * $Id: memofile.c,v 1.1.1.1 2001/12/21 10:41:50 ronpinkas Exp $
+ * $Id: memofile.c,v 1.12 2001/09/27 12:44:36 vszakats Exp $
  */
 
 /*

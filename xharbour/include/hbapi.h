@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.3 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.82 2001/12/31 07:38:10 andijahja Exp $
  */
 
 /*
@@ -200,8 +200,8 @@ struct hb_struString
 {
    ULONG  length;
    char   *value;
-   USHORT *puiHolders;
    BOOL   bStatic;
+   USHORT *puiHolders; /* number of holders of this string */
 };
 
 struct hb_struSymbol
@@ -276,20 +276,20 @@ typedef USHORT ERRCODE;
 extern HB_SYMB  hb_symEval;
 
 /* Extend API */
-extern char *   hb_parc( int iParam, ... );  /* retrieve a string parameter */
-extern ULONG    hb_parclen( int iParam, ... ); /* retrieve a string parameter length */
-extern ULONG    hb_parcsiz( int iParam, ... ); /* retrieve a by-reference string parameter length, including terminator */
-extern char *   hb_pards( int iParam, ... ); /* retrieve a date as a string yyyymmdd */
-extern char *   hb_pardsbuff( char * szDate, int iParam, ... ); /* retrieve a date as a string yyyymmdd */
-extern ULONG    hb_parinfa( int iParamNum, ULONG uiArrayIndex ); /* retrieve length or element type of an array parameter */
-extern int      hb_parinfo( int iParam ); /* Determine the param count or data type */
-extern int      hb_parl( int iParam, ... ); /* retrieve a logical parameter as an int */
-extern double   hb_parnd( int iParam, ... ); /* retrieve a numeric parameter as a double */
-extern int      hb_parni( int iParam, ... ); /* retrieve a numeric parameter as a integer */
-extern long     hb_parnl( int iParam, ... ); /* retrieve a numeric parameter as a long */
-extern PHB_ITEM hb_param( int iParam, int iMask ); /* retrieve a generic parameter */
-extern PHB_ITEM hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
-
+extern char HB_EXPORT * hb_parc( int iParam, ... );  /* retrieve a string parameter */
+extern ULONG    HB_EXPORT hb_parclen( int iParam, ... ); /* retrieve a string parameter length */
+extern ULONG    HB_EXPORT hb_parcsiz( int iParam, ... ); /* retrieve a by-reference string parameter length, including terminator */
+extern char     HB_EXPORT * hb_pards( int iParam, ... ); /* retrieve a date as a string yyyymmdd */
+extern char     HB_EXPORT * hb_pardsbuff( char * szDate, int iParam, ... ); /* retrieve a date as a string yyyymmdd */
+extern ULONG    HB_EXPORT hb_parinfa( int iParamNum, ULONG uiArrayIndex ); /* retrieve length or element type of an array parameter */
+extern int      HB_EXPORT hb_parinfo( int iParam ); /* Determine the param count or data type */
+extern int      HB_EXPORT hb_parl( int iParam, ... ); /* retrieve a logical parameter as an int */
+extern double   HB_EXPORT hb_parnd( int iParam, ... ); /* retrieve a numeric parameter as a double */
+extern int      HB_EXPORT hb_parni( int iParam, ... ); /* retrieve a numeric parameter as a integer */
+extern long     HB_EXPORT hb_parnl( int iParam, ... ); /* retrieve a numeric parameter as a long */
+extern PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask ); /* retrieve a generic parameter */
+extern PHB_ITEM HB_EXPORT hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
+extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 #ifdef HB_API_MACROS
 
 #include "hbapiitm.h"
@@ -314,41 +314,41 @@ extern PHB_ITEM hb_paramError( int iParam ); /* Returns either the generic param
 
 #else
 
-extern int      hb_pcount( void );          /* returns the number of suplied parameters */
+extern int   HB_EXPORT  hb_pcount( void );          /* returns the number of suplied parameters */
 
-extern void     hb_ret( void );             /* post a NIL return value */
-extern void     hb_retc( char * szText );   /* returns a string */
-extern void     hb_retclen( char * szText, ULONG ulLen ); /* returns a string with a specific length */
-extern void     hb_retds( char * szDate );  /* returns a date, must use yyyymmdd format */
-extern void     hb_retd( long lYear, long lMonth, long lDay ); /* returns a date */
-extern void     hb_retdl( long lJulian );   /* returns a long value as a julian date */
-extern void     hb_retl( int iTrueFalse );  /* returns a logical integer */
-extern void     hb_retnd( double dNumber ); /* returns a double */
-extern void     hb_retni( int iNumber );    /* returns a integer number */
-extern void     hb_retnl( long lNumber );   /* returns a long number */
-extern void     hb_retnlen( double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
-extern void     hb_retndlen( double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
-extern void     hb_retnilen( int iNumber, int iWidth ); /* returns a integer number, with specific width */
-extern void     hb_retnllen( long lNumber, int iWidth ); /* returns a long number, with specific width */
-extern void     hb_reta( ULONG ulLen );  /* returns an array with a specific length */
+extern void  HB_EXPORT  hb_ret( void );             /* post a NIL return value */
+extern void  HB_EXPORT  hb_retc( char * szText );   /* returns a string */
+extern void  HB_EXPORT  hb_retclen( char * szText, ULONG ulLen ); /* returns a string with a specific length */
+extern void  HB_EXPORT  hb_retds( char * szDate );  /* returns a date, must use yyyymmdd format */
+extern void  HB_EXPORT  hb_retd( long lYear, long lMonth, long lDay ); /* returns a date */
+extern void  HB_EXPORT  hb_retdl( long lJulian );   /* returns a long value as a julian date */
+extern void  HB_EXPORT  hb_retl( int iTrueFalse );  /* returns a logical integer */
+extern void  HB_EXPORT  hb_retnd( double dNumber ); /* returns a double */
+extern void  HB_EXPORT  hb_retni( int iNumber );    /* returns a integer number */
+extern void  HB_EXPORT  hb_retnl( long lNumber );   /* returns a long number */
+extern void  HB_EXPORT  hb_retnlen( double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
+extern void  HB_EXPORT  hb_retndlen( double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
+extern void  HB_EXPORT  hb_retnilen( int iNumber, int iWidth ); /* returns a integer number, with specific width */
+extern void  HB_EXPORT  hb_retnllen( long lNumber, int iWidth ); /* returns a long number, with specific width */
+extern void  HB_EXPORT  hb_reta( ULONG ulLen );  /* returns an array with a specific length */
 
 #endif
 
-extern void     hb_storc( char * szText, int iParam, ... ); /* stores a szString on a variable by reference */
-extern void     hb_storclen( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
-extern void     hb_stords( char * szDate, int iParam, ... );   /* szDate must have yyyymmdd format */
-extern void     hb_storl( int iLogical, int iParam, ... ); /* stores a logical integer on a variable by reference */
-extern void     hb_storni( int iValue, int iParam, ... ); /* stores an integer on a variable by reference */
-extern void     hb_stornl( long lValue, int iParam, ... ); /* stores a long on a variable by reference */
-extern void     hb_stornd( double dValue, int iParam, ... ); /* stores a double on a variable by reference */
+extern void  HB_EXPORT  hb_storc( char * szText, int iParam, ... ); /* stores a szString on a variable by reference */
+extern void  HB_EXPORT  hb_storclen( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
+extern void  HB_EXPORT  hb_stords( char * szDate, int iParam, ... );   /* szDate must have yyyymmdd format */
+extern void  HB_EXPORT  hb_storl( int iLogical, int iParam, ... ); /* stores a logical integer on a variable by reference */
+extern void  HB_EXPORT  hb_storni( int iValue, int iParam, ... ); /* stores an integer on a variable by reference */
+extern void  HB_EXPORT  hb_stornl( long lValue, int iParam, ... ); /* stores a long on a variable by reference */
+extern void  HB_EXPORT  hb_stornd( double dValue, int iParam, ... ); /* stores a double on a variable by reference */
 
-extern void     hb_xinit( void );                         /* Initialize fixed memory subsystem */
-extern void     hb_xexit( void );                         /* Deinitialize fixed memory subsystem */
-extern void *   hb_xalloc( ULONG ulSize );                /* allocates memory, returns NULL on failure */
-extern void *   hb_xgrab( ULONG ulSize );                 /* allocates memory, exits on failure */
-extern void     hb_xfree( void * pMem );                  /* frees memory */
-extern void *   hb_xrealloc( void * pMem, ULONG ulSize ); /* reallocates memory */
-extern ULONG    hb_xsize( void * pMem );                  /* returns the size of an allocated memory block */
+extern void    HB_EXPORT hb_xinit( void );                         /* Initialize fixed memory subsystem */
+extern void    HB_EXPORT hb_xexit( void );                         /* Deinitialize fixed memory subsystem */
+extern void    HB_EXPORT * hb_xalloc( ULONG ulSize );                /* allocates memory, returns NULL on failure */
+extern void    HB_EXPORT * hb_xgrab( ULONG ulSize );                 /* allocates memory, exits on failure */
+extern void    HB_EXPORT   hb_xfree( void * pMem );                  /* frees memory */
+extern void    HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize ); /* reallocates memory */
+extern ULONG   HB_EXPORT hb_xsize( void * pMem );                  /* returns the size of an allocated memory block */
 extern ULONG    hb_xquery( USHORT uiMode );               /* Query different types of memory information */
 
 #if UINT_MAX == ULONG_MAX
@@ -363,17 +363,17 @@ extern void *   hb_xmemset( void * pDestArg, int iFill, ULONG ulLen ); /* set mo
 #endif
 
 /* array management */
-extern BOOL     hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ); /* creates a new array */
-extern ULONG    hb_arrayLen( PHB_ITEM pArray ); /* retrives the array len */
-extern BOOL     hb_arrayIsObject( PHB_ITEM pArray ); /* retrives if the array is an object */
-extern BOOL     hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pItemValue ); /* add a new item to the end of an array item */
-extern BOOL     hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex ); /* insert a nil item into an array, without changing the length */
-extern BOOL     hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex ); /* delete an array item, without changing length */
-extern BOOL     hb_arraySize( PHB_ITEM pArray, ULONG ulLen ); /* sets the array total length */
+extern BOOL     HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ); /* creates a new array */
+extern ULONG    HB_EXPORT hb_arrayLen( PHB_ITEM pArray ); /* retrives the array len */
+extern BOOL     HB_EXPORT hb_arrayIsObject( PHB_ITEM pArray ); /* retrives if the array is an object */
+extern BOOL     HB_EXPORT hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pItemValue ); /* add a new item to the end of an array item */
+extern BOOL     HB_EXPORT hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex ); /* insert a nil item into an array, without changing the length */
+extern BOOL     HB_EXPORT hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex ); /* delete an array item, without changing length */
+extern BOOL     HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen ); /* sets the array total length */
 extern BOOL     hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult ); /* retrieve last item in an array */
 extern BOOL     hb_arrayRelease( PHB_ITEM pArray ); /* releases an array - don't call it - use ItemRelease() !!! */
-extern BOOL     hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem ); /* sets an array element */
-extern BOOL     hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem ); /* retrieves an item */
+extern BOOL     HB_EXPORT hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem ); /* sets an array element */
+extern BOOL     HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem ); /* retrieves an item */
 extern PHB_ITEM hb_arrayGetItemPtr( PHB_ITEM pArray, ULONG ulIndex ); /* returns pointer to specified element of the array */
 extern ULONG    hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, ULONG ulLen ); /* copy a string into an array item */
 extern char *   hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the string contained on an array element */

@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.10 2001/02/09 17:18:26 dholm Exp $
+# $Id: watcom.cf,v 1.11 2001/12/26 21:21:08 dholm Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -44,7 +44,7 @@ endef
 LD = wlink
 LDFLAGS = debug all OP osn=DOS4G OP stack=65536 OP CASEEXACT
 ifeq ($(HB_LIB_COMPILE),)
-LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst /,\,$(TOP)$(ROOT)contrib/$(lib)/$(ARCH)/$(lib)))
+LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst /,\,$(TOP)$(ROOT)contrib/$(lib)/$(ARCH)/$(subst lib,,$(lib))))
 LINKLIBS := $(foreach lib, $(LIBS), $(subst /,\,$(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)))
 else
 LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst /,\,$(HB_LIB_COMPILE)/$(lib)))

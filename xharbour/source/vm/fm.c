@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.2 2001/12/22 06:36:17 ronpinkas Exp $
+ * $Id: fm.c,v 1.3 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -111,7 +111,7 @@ static PHB_MEMINFO s_pLastBlock = NULL;
 
 #endif
 
-void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on failure */
+void HB_EXPORT * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on failure */
 {
    void * pMem;
 
@@ -119,6 +119,9 @@ void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on fail
     * function name/line number of code which called hb_xalloc/hb_xgrab
     */
    HB_TRACE_STEALTH(HB_TR_INFO, ("hb_xgrab(%lu)", ulSize));
+
+   if( ulSize == 0 )
+      hb_errInternal( HB_EI_XGRABNULLSIZE, NULL, NULL, NULL );
 
 #ifdef HB_FM_STATISTICS
 
@@ -195,7 +198,7 @@ void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on fail
 #endif
 }
 
-void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
+void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 {
 #ifdef HB_FM_STATISTICS
 
@@ -207,6 +210,9 @@ void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 
    if( ! pMem )
       hb_errInternal( HB_EI_XREALLOCNULL, NULL, NULL, NULL );
+
+   if( ulSize == 0 )
+      hb_errInternal( HB_EI_XREALLOCNULLSIZE, NULL, NULL, NULL );
 
    pMemBlock = ( PHB_MEMINFO ) ( ( char * ) pMem - sizeof( HB_MEMINFO ) );
 
@@ -251,6 +257,9 @@ void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 
    if( ! pMem )
       hb_errInternal( HB_EI_XREALLOCNULL, NULL, NULL, NULL );
+
+   if( ulSize == 0 )
+      hb_errInternal( HB_EI_XREALLOCNULLSIZE, NULL, NULL, NULL );
 
    pMem = realloc( pMem, ulSize );
 
@@ -331,7 +340,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 /* NOTE: Debug function, it will always return 0 when HB_FM_STATISTICS is
          not defined, don't use it for final code [vszakats] */
 
-ULONG hb_xsize( void * pMem ) /* returns the size of an allocated memory block */
+ULONG HB_EXPORT hb_xsize( void * pMem ) /* returns the size of an allocated memory block */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xsize(%p)", pMem));
 
@@ -344,12 +353,12 @@ ULONG hb_xsize( void * pMem ) /* returns the size of an allocated memory block *
 #endif
 }
 
-void hb_xinit( void ) /* Initialize fixed memory subsystem */
+void HB_EXPORT hb_xinit( void ) /* Initialize fixed memory subsystem */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xinit()"));
 }
 
-void hb_xexit( void ) /* Deinitialize fixed memory subsystem */
+void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xexit()"));
 

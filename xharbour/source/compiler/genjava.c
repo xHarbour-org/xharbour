@@ -1,5 +1,5 @@
 /*
- * $Id: genjava.c,v 1.32 2001/12/17 14:03:42 vszakats Exp $
+ * $Id: genjava.c,v 1.33 2002/01/08 08:59:52 patrickmast Exp $
  */
 
 /*
@@ -67,8 +67,8 @@ void hb_compGenJava( PHB_FNAME pFileName )
 
    s_nChar = 0;
 
-   fprintf( s_yyc, "/*\n * Harbour Compiler, %d.%d.%d (%s)\n",
-      HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
+   fprintf( s_yyc, "/*\n * Harbour Compiler, Alpha build %d.%d (%s)\n",
+      HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
    fprintf( s_yyc, " * Generated JAVA source code\n */\n\n" );
 
    fprintf( s_yyc, "public class %s\n", pFileName->szName );
@@ -186,4 +186,3 @@ static void hb_fputs( char * szName )
    while( nPos < strlen( szName ) )
       hb_fputc( szName[ nPos++ ] );
 }
-

@@ -64,6 +64,8 @@
 #include "hbcomp.h"
 #include "hbmacro.ch"
 
+extern int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
+
 /* ************************************************************************* */
 
 #if defined( HB_MACRO_SUPPORT )
@@ -152,6 +154,40 @@ void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
     */
    else
    {
+    #if defined( HB_MACRO_SUPPORT )
+
+       /* This optimization is not applicable in Macro Compiler. */
+
+    #else
+
+      if( bOpEq == HB_P_PLUS || bOpEq == HB_P_MINUS )
+      {
+         short iIncrement, iLocal;
+
+         if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC && pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
+             pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
+         {
+            iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
+         }
+         else
+         {
+            iIncrement = 0;
+         }
+
+         if( iIncrement && ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+         {
+            if( bOpEq == HB_P_MINUS )
+            {
+               iIncrement = -iIncrement;
+            }
+
+            hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+            HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
+            return;
+         }
+      }
+    #endif
       /* push old value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
       /* push increment value */
@@ -208,6 +244,40 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
    }
    else
    {
+    #if defined( HB_MACRO_SUPPORT )
+
+       /* This optimization is not applicable in Macro Compiler. */
+
+    #else
+
+      if( bOpEq == HB_P_PLUS || bOpEq == HB_P_MINUS )
+      {
+         short iIncrement, iLocal;
+
+         if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC && pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
+             pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
+         {
+            iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
+         }
+         else
+         {
+            iIncrement = 0;
+         }
+
+         if( iIncrement && ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+         {
+            if( bOpEq == HB_P_MINUS )
+            {
+               iIncrement = -iIncrement;
+            }
+
+            hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+
+            return;
+         }
+      }
+    #endif
+
       /* push old value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
       /* push increment value */
@@ -457,9 +527,9 @@ BOOL hb_compExprCheckMacroVar( char * szText )
       if( bTextSubst )
       {
 #if defined( HB_MACRO_SUPPORT )
-         HB_SYMBOL_UNUSED( bMacroText );     
+         HB_SYMBOL_UNUSED( bMacroText );
          return TRUE;    /*there is no need to check all '&' occurences */
-#else    
+#else
          /* There is a valid character after '&' that can be used in
           * variable name - check if the whole variable name is valid
           * (local, static and field  variable names are invalid because

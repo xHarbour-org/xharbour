@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.1.1.1 2001/12/21 10:47:48 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.26 2001/12/15 22:54:07 vszakats Exp $
  */
 
 /*
@@ -63,6 +63,8 @@
 #include <math.h>
 #include "hbcomp.h"
 #include "hbmacro.ch"
+
+extern int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
 
 /* memory allocation
  */
@@ -1088,7 +1090,7 @@ static HB_EXPR_FUNC( hb_compExprUseMacro )
              */
             if( pSelf->value.asMacro.SubType == HB_ET_MACRO_SYMBOL )
                HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_MACROSYMBOL );
-               
+
             else if( pSelf->value.asMacro.SubType != HB_ET_MACRO_ALIASED )
             {
                if( pSelf->value.asMacro.SubType & HB_ET_MACRO_ARGLIST )
@@ -1260,6 +1262,39 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
          {
             USHORT usCount;
 
+         #if defined( HB_MACRO_SUPPORT )
+
+            /* This optimization is not applicable in Macro Compiler. */
+
+         #else
+
+            if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "LEFT", 4 ) == 0 )
+            {
+               usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
+
+               if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+               {
+                  --usCount;
+               }
+
+               if( usCount == 2 )
+               {
+                  HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
+                  HB_EXPR_PTR pLen    = pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext;
+
+                  if( pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG &&
+                      pLen->value.asNum.lVal >= 0 && pLen->value.asNum.lVal <= 65535 )
+                  {
+                     HB_EXPR_USE( pString, HB_EA_PUSH_PCODE );
+
+                     hb_compGenPCode3( HB_P_LEFT, HB_LOBYTE( pLen->value.asNum.lVal ), HB_HIBYTE( pLen->value.asNum.lVal ), (BOOL) 0 );
+                     break;
+                  }
+               }
+            }
+
+         #endif
+
             HB_EXPR_USE( pSelf->value.asFunCall.pFunName, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
 
@@ -1308,6 +1343,41 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
          {
             USHORT usCount;
 
+         #if defined( HB_MACRO_SUPPORT )
+
+            /* This optimization is not applicable in Macro Compiler. */
+
+         #else
+
+            if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "LEFT", 4 ) == 0 )
+            {
+               usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
+
+               if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+               {
+                  --usCount;
+               }
+
+               if( usCount == 2 )
+               {
+
+                  //HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
+                  HB_EXPR_PTR pLen    = pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext;
+
+                  if( pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG &&
+                      pLen->value.asNum.lVal >= 0 && pLen->value.asNum.lVal <= 65535 )
+                  {
+                     /* Nothing to do really!
+                     HB_EXPR_USE( pString, HB_EA_PUSH_PCODE );
+
+                     hb_compGenPCode3( HB_P_LEFT, HB_LOBYTE( pLen->value.asNum.lVal ), HB_HIBYTE( pLen->value.asNum.lVal ), (BOOL) 0 );
+                     */
+                     break;
+                  }
+               }
+            }
+
+         #endif
             HB_EXPR_USE( pSelf->value.asFunCall.pFunName, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
 
@@ -1907,6 +1977,30 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
             {
                /* it assigns a value and leaves it on the stack */
 
+             #if defined( HB_MACRO_SUPPORT )
+
+               /* This optimization is not applicable in Macro Compiler. */
+
+             #else
+
+               short iNewVal, iLocal;
+
+               if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC && pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
+                   pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
+               {
+                  iNewVal = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
+
+                  if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+                  {
+                     hb_compGenPCode4( HB_P_LOCALNEARSETINT, ( BYTE ) iLocal, HB_LOBYTE( iNewVal ), HB_HIBYTE( iNewVal ), ( BOOL ) 0 );
+                     HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
+                     return pSelf;;
+                  }
+               }
+
+             #endif
+
                HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
                /* QUESTION: Can  we replace DUPLICATE+POP with a single PUT opcode
                */
@@ -1935,6 +2029,29 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
             }
             else
             {
+             #if defined( HB_MACRO_SUPPORT )
+
+               /* This optimization is not applicable in Macro Compiler. */
+
+             #else
+
+               short iNewVal, iLocal;
+
+               if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC && pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
+                   pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
+               {
+                  iNewVal = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
+
+                  if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+                  {
+                     hb_compGenPCode4( HB_P_LOCALNEARSETINT, ( BYTE ) iLocal, HB_LOBYTE( iNewVal ), HB_HIBYTE( iNewVal ), ( BOOL ) 0 );
+
+                     return pSelf;;
+                  }
+               }
+
+             #endif
+
                /* it assigns a value and removes it from the stack */
                HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
                HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
