@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.759 2003/02/22 15:01:26 jonnymind Exp $
+ * $Id: ChangeLog,v 1.760 2003/02/22 17:15:46 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-22 20:40 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/rtl/dbdelim.prg
+    ! Fixed bug importing from txt: if the last txt line does not ends with CRLF it 
+      is not ignored anymore, exact as Cl*pper does.
+    ! Tab idents removed
 
 2003-02-22 09:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c

@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.3 2003/01/27 03:37:23 walito Exp $
+ * $Id: dbdelim.prg,v 1.4 2003/02/03 11:15:20 mlombardo Exp $
  */
 
 /*
@@ -56,33 +56,34 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.3 2003/01/27 03:37:23 walito Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.4 2003/02/03 11:15:20 mlombardo Exp $" )
 
 #define AppendEOL( handle )       FWRITE( handle, CHR( 13 ) + CHR( 10 ) )
 #define AppendEOF( handle )       FWRITE( handle, CHR( 26 ) )
 #define AppendSep( handle, cSep ) FWRITE( handle, cSep )
 
 PROCEDURE __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest )
-   LOCAL index, handle, lWriteSep, cFileName := cFile, nStart, nCount, oErr
-   LOCAL cSeparator := ",", cDelim := CHR( 34 )
-//------------------
-local Pos:=0
-local nPosFl:=0
-local nDimBuff:=65535
-local cByte :=""
-local lunghezze:={}
-local eol:=chr(13)+chr(10)
-local contacamp:=0
-local primariga:=.t.
-local offset:=0
-local rig:=0
-local cont_r:=""
-local Lfinefile:=.f.
-local nFileLen
-local cCharEol:=HB_OSNewLine()
-local nPosLasteol
-local lcisonoeol
-//------------------
+
+   local index, handle, lWriteSep, cFileName := cFile, nStart, nCount, oErr
+   local cSeparator := ",", cDelim := CHR( 34 )
+   local Pos:=0
+   local nPosFl:=0
+   local nDimBuff:=65535
+   local cByte :=""
+   local lunghezze:={}
+   local eol:=chr(13)+chr(10)
+   local contacamp:=0
+   local primariga:=.t.
+   local offset:=0
+   local rig:=0
+   local cont_r:=""
+   local Lfinefile:=.f.
+   local nFileLen
+   local cCharEol:=HB_OSNewLine()
+   local nPosLasteol
+   local lcisonoeol
+   local lNoTerm
+
    // Process the delimiter argument.
    IF !EMPTY( cDelimArg )
       IF UPPER( cDelimArg ) == "BLANK"
@@ -212,8 +213,8 @@ local lcisonoeol
          Eval(ErrorBlock(), oErr)
       ELSE
          IF EMPTY( bWhile )
-             // This simplifies the looping logic.
-             bWhile := {||.T.}
+            // This simplifies the looping logic.
+            bWhile := {||.T.}
          ENDIF 
          // ---------------------------------------
          // Please fill with the other test here
@@ -222,48 +223,57 @@ local lcisonoeol
          // ---------------------------------------
 
          nFileLen:=FSEEK(handle,0,FS_END)
-	 nDimBuff:=min(nFileLen,nDimBuff)
-	 cByte:=space(nDimBuff)
-	 FSEEK(handle,0)
-//	 cCharEol:=chr(13)
-	 nPosLastEol:=0
+         nDimBuff:=min(nFileLen,nDimBuff)
+         cByte:=space(nDimBuff)
+         FSEEK(handle,0)
+         //	 cCharEol:=chr(13)
+         nPosLastEol:=0
          do while .not. lFineFile
-	    fseek(handle,nPoslastEol,FS_SET)   // forward the pointer
+            fseek(handle,nPoslastEol,FS_SET)   // forward the pointer
             //we must not go after the eof
+            lNoTerm := .F.
             if nPosLastEol + nDimBuff > nFileLen
                // change the buffer size
                nDimBuff:=nFileLen-nPosLastEol
                cByte:=space(nDimBuff)
                Lfinefile:=.t. 
-             endif
-             // fill the buffer
-             cByte:=space(nDimBuff)
-             fread(handle,@cByte,nDimBuff)
-             //we test the last position of the last eol +1 in this buffer
-             nPoslastEol+=rat(cCharEol,cByte)+1
-             //do this if in the buffer there are eol char
-             lcisonoeol:=.t.
-             do while lcisonoeol
-                // the position of the first eol
-                nposfl:=at(cCharEol,cByte) 
-                lcisonoeol:=(nPosfl>0)
-                if lcisonoeol
-                   // cut the row
-                   Pos:=1
-                   cont_r:=substr(cByte,Pos,nposfl-Pos)
-                   appendtodb(cont_r,cSeparator)
-                   // skipping the line feed and now we are on a good char
-                   pos:=nposfl+2
-                   cont_r:=""
-                   //cut the row  
-                   cByte:=substr(cByte,Pos)
-                endif     
-              enddo
+               lNoTerm := right(cByte,2) != cCharEol
+            endif
+            // fill the buffer
+            cByte:=space(nDimBuff)
+            fread(handle,@cByte,nDimBuff)
+            //we test the last position of the last eol +1 in this buffer
+            if Lfinefile .and. lNoTerm
+               cByte += cCharEol
+            EndIf
+
+            nposfl := rat(cCharEol,cByte)
+            nPoslastEol+=if( nposfl == 0, len(cByte) ,nposfl)+1
+            //do this if in the buffer there are eol char
+            lcisonoeol:=.t.
+
+            do while lcisonoeol
+               // the position of the first eol
+               nposfl:=at(cCharEol,cByte)
+               lcisonoeol:=(nPosfl>0)
+               if lcisonoeol
+                  // cut the row
+                  Pos:=1
+                  cont_r:=substr(cByte,Pos,nposfl-Pos)
+                  if !(len(cont_r) == 0 .and. Lfinefile)
+                     appendtodb(cont_r,cSeparator)
+                  endif
+                  // skipping the line feed and now we are on a good char
+                  pos:=nposfl+2
+                  cont_r:=""
+                  //cut the row
+                  cByte:=substr(cByte,Pos)
+               endif
+            enddo
          enddo
          FCLOSE( handle )
-      END IF
-
-   END IF
+      endif
+   endif
 RETURN
 
 STATIC FUNCTION ExportVar( handle, xField, cDelim )
