@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.433 2002/10/10 16:44:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.434 2002/10/12 00:40:51 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-12 22:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+   * contrib/hbzlib/*
+     ! Updated all source to take advantage of new ziparchive function
+     ! Fixed also some memory leak on unziping functions
+   - adler32.c compress.c crc32.c deflate.c deflate.h gvmat32c.c gzio.c infblock.c infblock.h infcodes.c infcodes.h inffast.c inffast.h inffixed.h inflate.c inftrees.c inftrees.h infutil.c infutil.h maketree.c trees.c trees.h uncompr.c
+     ! This Files are now in zlib dir
+   + Linux/*
+       The Files necessary to compile hbzlib on linux.
+   + Licence.txt
+       The license of Ziparchive Library
 
 2002-10-11 21:35 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
    * include/hbapirdd.h
