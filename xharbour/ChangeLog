@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2433 2004/03/01 05:16:42 andijahja Exp $
+ * $Id: ChangeLog,v 1.2434 2004/03/01 09:36:19 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-01 15:20 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/rtl/teditor.prg
+    * Optimized to avoid any occurance of recusion.
+
+  * xharbour/debug/tbrwtext.prg
+    - Removed Up(), Down(), PageUp(), PageDown(), Left(), Right(), GoTop(), GoBottom() Methods
+      in Class TBrwText causing recursion as the same were introduced in TEditor() recently.
+    
+    /* I am sorry, I could not preceive TEditor() was being used in Debugger as I never use it.
+       If TEditor() class is inherited in some other classes let me know.
+       Phil and Paul, will you please confirm if my changes are correct!
+    */
 
 2004-03-01 04:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
     * source/rtl/achoice.prg
