@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.14 2004/01/19 20:50:22 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.15 2004/02/03 15:19:41 vouchcac Exp $
  */
 
 /*
@@ -66,23 +66,15 @@
 
 //-------------------------------------------------------------------//
 
-#define HB_OS_WIN_32_USED
 #ifndef CINTERFACE
    #define CINTERFACE 1
 #endif
 
-#include "hbset.h"
-#include "hbapigt.h"
-#include "hbapierr.h"
-#include "hbapiitm.h"
-#include "inkey.ch"
-#include "error.ch"
-#include "hbvm.h"
-#include "hbstack.h"
-
+#include <windows.h>
 #include <winuser.h>
 #include <commctrl.h>
 #include <commdlg.h>
+
 #if defined(__MINGW32__) || defined(__WATCOMC__) || defined(_MSC_VER)
    #include <ole2.h>
    #include <ocidl.h>
@@ -94,8 +86,18 @@
 #else
    #include <olectl.h>
 #endif
+
 #include <time.h>
 #include <ctype.h>
+
+#include "hbset.h"
+#include "hbapigt.h"
+#include "hbapierr.h"
+#include "hbapiitm.h"
+#include "inkey.ch"
+#include "error.ch"
+#include "hbvm.h"
+#include "hbstack.h"
 
 //-------------------------------------------------------------------//
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.61 2004/02/01 23:40:51 jonnymind Exp $
+ * $Id: gtwvt.c,v 1.62 2004/02/03 15:16:31 vouchcac Exp $
  */
 
 /*
@@ -244,11 +244,11 @@ void HB_GT_FUNC( gt_Exit( void ) )
       DeleteObject( ( HPEN   ) _s.penDarkGray  );
       DeleteObject( ( HPEN   ) _s.currentPen   );
       DeleteObject( ( HBRUSH ) _s.currentBrush );
-      
+
       if ( _s.hdc )
       {
          ReleaseDC( _s.hWnd, _s.hdc );
-      }   
+      }
 
       DestroyWindow( _s.hWnd );
     }
@@ -1359,7 +1359,7 @@ static void hb_wvt_gtCreateObjects( void )
 
    lb.lbStyle      = BS_NULL;
    lb.lbColor      = RGB( 198,198,198 );
-   lb.lbHatch      = NULL;
+   lb.lbHatch      = 0;
 
    _s.currentBrush = CreateBrushIndirect( &lb );
 }
@@ -2751,7 +2751,7 @@ static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
   POINT xy, colrow ;
   SHORT keyCode;
   SHORT keyState = 0;
-  
+
   HB_SYMBOL_UNUSED( hWnd );
   HB_SYMBOL_UNUSED( wParam );
 
@@ -3863,11 +3863,11 @@ HB_FUNC( WVT_SETONTOP )
 
    GetWindowRect( _s.hWnd, &rect );
 
-   hb_retl( SetWindowPos( _s.hWnd, HWND_TOPMOST, 
-                          rect.left, 
-                          rect.top, 
+   hb_retl( SetWindowPos( _s.hWnd, HWND_TOPMOST,
+                          rect.left,
+                          rect.top,
                           0,
-                          0, 
+                          0,
                           SWP_NOSIZE + SWP_NOMOVE + SWP_NOACTIVATE ) );
 }
 
@@ -3944,7 +3944,6 @@ HB_FUNC( WVT_SAVESCREEN )
 //
 HB_FUNC( WVT_RESTSCREEN )
 {
-   HBITMAP hBmp;
    POINT   xy;
    int     iTop, iLeft, iBottom, iRight, iWidth, iHeight;
    HDC     hDCComp;
@@ -4009,7 +4008,7 @@ HB_FUNC( WVT_RESTSCREEN )
    {
       DeleteObject( ( HBITMAP ) hb_parnl( 5,3 ) );
    }
-   
+
    hb_retl( bResult );
 }
 
@@ -4075,7 +4074,7 @@ HB_FUNC( WVT_SETBRUSH )
 
    lb.lbStyle = hb_parnl( 1 );
    lb.lbColor = ISNIL( 2 ) ? RGB( 0,0,0 ) : ( COLORREF ) hb_parnl( 2 ) ;
-   lb.lbHatch = ISNIL( 3 ) ? NULL : hb_parnl( 3 );
+   lb.lbHatch = ISNIL( 3 ) ? 0 : hb_parnl( 3 );
 
    hBrush     = CreateBrushIndirect( &lb );
 
@@ -4716,7 +4715,7 @@ HB_FUNC( WVT_DRAWBUTTON )
 
    lb.lbStyle = BS_SOLID;
    lb.lbColor = bkColor;
-   lb.lbHatch = NULL;
+   lb.lbHatch = 0;
 
    hBrush     = CreateBrushIndirect( &lb );
 
@@ -4768,7 +4767,7 @@ HB_FUNC( WVT_DRAWBUTTON )
          xy.x = xy.x + 2;
          xy.y = xy.y + 2;
       }
-      
+
       iAlign = TA_CENTER + TA_TOP ;
 
       oldTextAlign = SetTextAlign( _s.hdc, iAlign );
@@ -4914,17 +4913,17 @@ HB_FUNC( WVT_CHOOSECOLOR )
 HB_FUNC( WVT_SETMOUSEPOS )
 {
    POINT xy;
-   
-   xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );   
 
-   if ( ClientToScreen( _s.hWnd, &xy ) ) 
+   xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+
+   if ( ClientToScreen( _s.hWnd, &xy ) )
    {
       hb_retl( SetCursorPos( xy.x, xy.y + ( _s.PTEXTSIZE.y / 2 ) ) );
    }
    else
    {
       hb_retl( FALSE );
-   }   
+   }
 }
 
 //-------------------------------------------------------------------//
