@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.36 2003/08/25 16:24:52 druzus Exp $
+ * $Id: dbf1.c,v 1.38 2003/09/08 12:56:53 druzus Exp $
  */
 
 /*
@@ -2318,7 +2318,7 @@ static ERRCODE hb_dbfSetFilter( DBFAREAP pArea, LPDBFILTERINFO pFilterInfo )
  */
 static ERRCODE hb_dbfRawLock( DBFAREAP pArea, USHORT uiAction, ULONG ulRecNo )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbfRawLock(%p, %hu, %lu)", pArea, uiAction, lRecNo));
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfRawLock(%p, %hu, %lu)", pArea, uiAction, ulRecNo));
 
    switch( uiAction )
    {
