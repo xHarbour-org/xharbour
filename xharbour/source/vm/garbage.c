@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.21 2002/09/20 19:48:20 ronpinkas Exp $
+ * $Id: garbage.c,v 1.22 2002/09/21 05:21:07 ronpinkas Exp $
  */
 
 /*
@@ -454,8 +454,6 @@ void hb_gcCollectAll( void )
 {
    //extern PHB_ITEM **hb_vm_pGlobals;
    //extern short    hb_vm_iGlobals;
-
-   short iGlobal;
 
    HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.392 2002/09/21 05:21:05 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.393 2002/09/21 11:50:26 map Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-09-21 09:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/dbf1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/vm/garbage.c
+    ! Corrected few typos discovered by MSVC
+
 2002-09-21 13:50 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
   * ChangeLog
     * Fixed ChangLog entry for my last commit
-    
+
   * doc/en/gtslang.txt
     * Synchronized with last gtsln improvements
 
@@ -121,16 +127,16 @@
   * source/rtl/gtwin/gtwin.c
     * Fixed long waiting problem with OutStd()/OutErr()
       (gt layer can now track OutStd()/OutErr() usage)
-      
+
   * source/rtl/gtsln/gtsln.c
   * source/rtl/gtsln/gtsln.h
   * source/rtl/gtsln/keytrans.c
     * Fixed problem with OutStd()/OutErr() redirected
-        to a file (MANY THANKS to Przemyslaw Czerpak 
+        to a file (MANY THANKS to Przemyslaw Czerpak
         for detailed information on how to do that)
     * Fixed long waiting problem with OutStd()/OutErr()
         (gt layer can now track OutStd()/OutErr() usage)
-    * Fixed broken logic in gtsln keyboard handling 
+    * Fixed broken logic in gtsln keyboard handling
 
 2002-09-19 18:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
    * source/rtl/tbrowse.prg
