@@ -96,28 +96,21 @@ METHOD create(hParent,nStyle)
 *-----------------------------------------------------------------------------*
 
 METHOD rbProc(nMsg,nwParam,nlParam)
-
    LOCAL acRect
    LOCAL aRect
-
    DO CASE
    CASE nMsg==WM_SIZE
      acRect:=GetClientRect(::hParent)
      aRect:=GetWindowRect(::hWnd)
-     
-//     MoveWindow(::hWnd,0,0,aRect[3],acRect[4],.t.)
-
      MoveWindow(::hWnd,0,0,acRect[3],aRect[4]-aRect[2],.t.)
-
    ENDCASE
-
 RETURN( CallWindowProc(::nProc,::hParent,nMsg,nwParam,nlParam))
 
 
 
 
 *-----------------------------------------------------------------------------*
-METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp)
+METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp,nPos)
 
    LOCAL rbBand IS REBARBANDINFO
    LOCAL aRect:=GetWindowRect(hChild)
@@ -128,7 +121,7 @@ METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp)
    rbBand:cbSize = rbBand:sizeof()  // Required
 
    rbBand:fMask  = IFNIL(nMask,RBBIM_TEXT +; //RBBIM_BACKGROUND +;
-                               RBBIM_STYLE +RBBIM_CHILDSIZE +;
+                               RBBIM_STYLE +RBBIM_CHILDSIZE+;
                                RBBIM_SIZE+RBBIM_CHILD,nMask)
 
    rbBand:fStyle     := IFNIL(nStyle,RBBS_GRIPPERALWAYS+RBBS_NOVERT/*+RBBS_CHILDEDGE*/,nStyle)// + RBBS_FIXEDBMP
@@ -138,6 +131,7 @@ METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp)
    rbBand:cx         := IFNIL(cx,GetClientRect(::hParent)[3],cx)
    rbBand:lpText     := IFNIL(cText,"Test",cText)
    rbBand:hbmBack    := IFNIL(hBmp,0,hBmp) //LoadBitmap(hInstance(), "IDB_BACKGRND"),hBmp)
+
 
   // view rbBand,aRect,LoadBitmap(hInstance(), "IDB_BACKGRND"), rbBand:value
 
