@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2245 2004/02/09 02:29:27 andijahja Exp $
+ * $Id: ChangeLog,v 1.2246 2004/02/09 04:51:31 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-09 03:25 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/vm/extend.c
+  * include/hbapi.h
+    + New functions hb_retnint and hb_retnintlen
+  * source/rtl/round.c
+    % Optimized and corrected algorithm.
+      Thank you Andi for your test.
+  * source/rtl/val.c
+    % Optimized for integer values. Now is compatible with LONGLONG numbers.
+      Thank you Andi, too.
+
 2004-02-09 11:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * utils/hbtest/rt_array.prg
     * change return value to xHarbour specific.
