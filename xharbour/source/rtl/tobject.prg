@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.13 2003/12/17 18:48:28 walito Exp $
+ * $Id: tobject.prg,v 1.14 2005/04/04 05:56:49 ronpinkas Exp $
  */
 
 /*
@@ -169,8 +169,6 @@ return QSelf():MSGNOTFOUND( __GetMessage() )
 static function HBObject_Error( cDesc, cClass, cMsg, nCode, aArgs )
 
    DEFAULT nCode TO 1004
-
-   Alert( ProcName(1) + "," + ProcName(2) + "," + ProcName(3) + "," + ProcName(4) )
 
    IF nCode == 1005
       //RETURN __errRT_SBASE( EG_NOVARMETHOD, 1005, cDesc, cClass + ":" + cMsg )
