@@ -823,7 +823,7 @@ FUNCTION Compfiles()
                         cComm := Strtran( cComm, "o$*", "o" + aCs[ nPos ] )
                         cComm := Strtran( cComm, "$**", cPrg )
 
-                        cComm += " > test.out"
+                        cComm += " >> Test.out"
                         Outstd( cComm )
                         Outstd( hb_osnewline() )
                         ! ( cComm )
@@ -979,10 +979,9 @@ FUNCTION Compfiles()
                             ENDIF
 
                             cComm := Strtran( cComm, "$**", acs[ nFiles ] )
-                            cComm += " > test.out"
+                            cComm += " >> Test.out"
                             Outstd( cComm )
-                            Outstd( hb_osnewline() )
-                            ! ( cComm )
+                                     ! ( cComm )
                             cErrText := Memoread( 'test.out' )
                             lEnd     := 'Error' $ cErrText
 
@@ -1058,7 +1057,7 @@ FUNCTION Compfiles()
                         ENDIF
 
                         cComm := Strtran( cComm, "$**", cPrg )
-                        cComm += " > test.out"
+                        cComm += " >> Test.out"
                         Outstd( " " )
 
                         Outstd( cComm )
@@ -2118,9 +2117,9 @@ FUNCTION CompUpdatedfiles()
 
                         IF nPos > 0
 
-                            cComm := Strtran( cComm, "o$*", "o" + aobjs[ nPos ] )
+                            cComm := Strtran( cComm, "o$*", "o" + aobjsc[ nPos ] )
                             cComm := Strtran( cComm, "$**", acs[ nFiles ] )
-                            cComm += " > test.out"
+                            cComm += " >> Test.out"
                             Outstd( cComm )
                             Outstd( hb_osnewline() )
                             ! ( cComm )
@@ -2189,7 +2188,7 @@ FUNCTION CompUpdatedfiles()
 
                             cComm := Strtran( cComm, "o$*", "o" + aObjs[ nPos ] )
                             cComm := Strtran( cComm, "$**", cPrg )
-                            cComm += " > test.out"
+                            cComm += " >> Test.out"
                             Outstd( " " )
                             Outstd( cComm )
                             Outstd( hb_osnewline() )
@@ -3658,7 +3657,8 @@ FUNCTION WriteMakeFileHeader()
     Fwrite( nLinkHandle, "BHC = $(HMAKEDIR)" + CRLF )
     Fwrite( nLinkHandle, "!endif" + CRLF )
     Fwrite( nLinkHandle, " " + CRLF )
-
+    Fwrite( nLinkHandle, "RECURSE="+if(lRecurse," YES "," NO ") + CRLF )    
+    Fwrite( nLinkHandle, " " + CRLF )
 RETURN nil
 
 FUNCTION BuildLangArray( cLang )

@@ -32,6 +32,7 @@ Function GetSourceFiles( lSubdir )
      Local nPos
      Local xItem
      local ccc,ddd
+     Local nLen
      Default lSubdir To .t.
 
 
@@ -55,12 +56,14 @@ Function GetSourceFiles( lSubdir )
            For y := 1 To nDataLen
               If At( '.PRG', Upper( adata[ y, 1 ] ) ) > 0 .or. At( '.C', Upper( adata[ y, 1 ] ) ) > 0
                  If lSubdir
-                    Aadd( aRet, Strtran( astru[ nCounter ], cDir, '' ) + Pad( aData[ y, 1 ], 13 ) + ;
+                  nLen:=At(" ",aData[ y, 1 ])+1
+
+                    Aadd( aRet, Strtran( astru[ nCounter ], cDir, '' ) +  aData[ y, 1 ] + ;
                           Str( aData[ y, 2 ], 8 ) + '  ' + ;
                           Dtoc( aData[ y, 3 ] ) + '  ' + ;
                           aData[ y, 4 ] )
                  Elseif !lsubdir .and. At( If( lLinux, "/", "\" ), Strtran( astru[ nCounter ], cDir, '' ) ) == 0
-                    Aadd( aRet, Pad( aData[ y, 1 ], 18 ) + ;
+                    Aadd( aRet, Pad( aData[ y, 1 ],18) + ;
                           Str( aData[ y, 2 ], 8 ) + '  ' + ;
                           Dtoc( aData[ y, 3 ] ) + '  ' + ;
                           aData[ y, 4 ] )
@@ -353,6 +356,7 @@ Function GetinstaledLibs( clibs, lGcc )
      Next
     
 Return aReturnLibs
+
 Function Getlibs( lgcc ,cDir)
      Local lLinux:=at('linux',lower(os()))>0
      Local ainstaledlibs := Getinstaledlibs( If( !llinux, if(!lgcc, cDir+"\*.lib",cDir+"\*.a") , '/usr/lib/harbour/*.a' ),lGcc )
