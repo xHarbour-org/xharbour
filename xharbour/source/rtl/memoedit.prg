@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.26 2004/09/01 09:15:33 mauriliolongo Exp $
+ * $Id: memoedit.prg,v 1.27 2004/09/06 14:59:03 mauriliolongo Exp $
  */
 
 /*
@@ -193,8 +193,15 @@ return Self
 METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
 
    // HBEditor does not handle these keys and would call ::KeyboardHook() causing infinite loop
-   static aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T, K_CTRL_U }
 
+   #ifdef HB_NEW_KCTRL
+   // I Have to add the value of K_CTRL_x when HB_NEW_KCTRL is not defined since those values cause
+   // infinite loop
+   static aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T, K_CTRL_U ,;
+                              10,       11,       12,       14,       15,       16,       17,       20,       21 }
+   #else
+   static aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T, K_CTRL_U }
+   #endif
 
    /* 05/08/2004 - <maurilio.longo@libero.it>
                    A little trick to be able to handle a nUserKey with value of NIL
