@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.24 2004/08/29 00:26:22 druzus Exp $
+# $Id: hb-func.sh,v 1.25 2004/08/29 18:30:28 lf_sfnet Exp $
 #
 
 # ---------------------------------------------------------------
@@ -45,7 +45,7 @@ mk_hbgetlibs()
 {
     if [ -z "$@" ]
     then
-        echo -n "vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx ${HB_DB_DRVEXT} macro common lang codepage gtnul gtcrs gtsln gtxvt gtalleg gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 hbtip hbct debug profiler"
+        echo -n "vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx ${HB_DB_DRVEXT} macro common lang codepage gtnul gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 hbtip hbct debug profiler"
     else
         echo -n "$@"
     fi
@@ -244,8 +244,10 @@ if [ -f "\${HB_LIB_INSTALL}/libgtcrs.a" ]; then
     SYSTEM_LIBS="\${SYSTEM_LIBS} -l${HB_CRS_LIB:-ncurses}"
     [ "\${HB_GPM_MOUSE}" = "yes" ] && HB_GPM_LIB="gpm"
 fi
-if [ -f "\${HB_LIB_INSTALL}/libgtxvt.a" ] && [ "\${HB_WITHOUT_X11}" != "yes" ]; then
-    SYSTEM_LIBS="\${SYSTEM_LIBS} -L/usr/X11R6/lib -lX11"
+if [ "\${HB_WITHOUT_X11}" != "yes" ]; then
+    if [ -f "\${HB_LIB_INSTALL}/libgtxvt.a" ] || [ -f "\${HB_LIB_INSTALL}/libgtxwc.a" ]; then
+        SYSTEM_LIBS="\${SYSTEM_LIBS} -L/usr/X11R6/lib -lX11"
+    fi
 fi
 [ -n "\${HB_GPM_LIB}" ] && SYSTEM_LIBS="\${SYSTEM_LIBS} -l\${HB_GPM_LIB}"
 

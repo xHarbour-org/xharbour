@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.16 2004/08/02 01:46:13 maurifull Exp $
+ * $Id: gtcgi.c,v 1.17 2004/08/06 02:25:38 maurifull Exp $
  */
 
 /*
@@ -397,8 +397,11 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
    HB_SYMBOL_UNUSED( dDuration );
 }
 
-char * HB_GT_FUNC(gt_Version( void ))
+char * HB_GT_FUNC(gt_Version( int iType ))
 {
+   if ( iType == 0 )
+      return HB_GT_DRVNAME( HB_GT_NAME );
+
    return "Harbour Terminal: Standard stream console";
 }
 

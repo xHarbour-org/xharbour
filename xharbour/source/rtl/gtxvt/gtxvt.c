@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.42 2004/08/30 08:40:59 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.43 2004/09/01 16:18:51 jonnymind Exp $
  */
 
 /*
@@ -3807,8 +3807,13 @@ void HB_GT_FUNC(gt_SetBlink( BOOL bBlink ))
 
 /* *********************************************************************** */
 
-char * HB_GT_FUNC(gt_Version( void ))
+char * HB_GT_FUNC(gt_Version( int iType ))
 {
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Version()" ) );
+
+   if ( iType == 0 )
+      return HB_GT_DRVNAME( HB_GT_NAME );
+
   return("xHarbour Terminal: XWindows buffered XVT");
 }
 

@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.9 2004/05/11 01:22:40 druzus Exp $
+# $Id: gcc.cf,v 1.10 2004/05/28 18:51:21 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -116,6 +116,11 @@ endif
 ifeq ($(HB_GT_LIB),gtxvt)
 LINKLIBS += -lX11
 LINKPATHS +=-L/usr/X11R6/lib
+else
+ifeq ($(HB_GT_LIB),gtxwc)
+LINKLIBS += -lX11
+LINKPATHS +=-L/usr/X11R6/lib
+endif
 endif
 
 endif

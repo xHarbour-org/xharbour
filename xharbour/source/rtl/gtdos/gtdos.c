@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.20 2004/08/06 02:25:38 maurifull Exp $
+ * $Id: gtdos.c,v 1.21 2004/08/30 23:43:24 druzus Exp $
  */
 
 /*
@@ -1198,8 +1198,13 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 #endif
 }
 
-char * HB_GT_FUNC(gt_Version( void ))
+char * HB_GT_FUNC(gt_Version( int iType ))
 {
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Version()" ) );
+
+   if ( iType == 0 )
+      return HB_GT_DRVNAME( HB_GT_NAME );
+
    return "Harbour Terminal: DOS console";
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.29 2004/08/02 01:46:13 maurifull Exp $
+ * $Id: gtalleg.c,v 1.30 2004/08/06 02:25:37 maurifull Exp $
  */
 
 /*
@@ -597,8 +597,11 @@ int HB_GT_FUNC(gt_RectSize( USHORT usRows, USHORT usCols ))
    return usRows * usCols * 2;
 }
 
-char * HB_GT_FUNC(gt_Version( void ))
+char * HB_GT_FUNC(gt_Version( int iType ))
 {
+   if ( iType == 0 )
+      return HB_GT_DRVNAME( HB_GT_NAME );
+
    return "Harbour Terminal: Multiplatform Allegro graphics console";
 }
 

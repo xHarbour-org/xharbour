@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.66 2004/08/31 12:57:17 vouchcac Exp $
+ * $Id: gtwin.c,v 1.67 2004/09/03 01:35:00 druzus Exp $
  */
 
 /*
@@ -1148,8 +1148,13 @@ void HB_GT_FUNC(gt_SetBlink( BOOL bBlink ))
 
 /* *********************************************************************** */
 
-char * HB_GT_FUNC(gt_Version( void ))
+char * HB_GT_FUNC(gt_Version( int iType ))
 {
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Version()" ) );
+
+   if ( iType == 0 )
+      return HB_GT_DRVNAME( HB_GT_NAME );
+
     return "Harbour Terminal: Win32 buffered console";
 }
 

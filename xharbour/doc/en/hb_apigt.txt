@@ -1,5 +1,5 @@
 /*
- * $Id: hb_apigt.txt,v 1.2 2001/03/12 04:19:56 april Exp $
+ * $Id: hb_apigt.txt,v 1.1.1.1 2001/12/21 10:48:32 ronpinkas Exp $
  */
 
 /*
@@ -1477,7 +1477,7 @@
  *      C Prototype
  *      
  *      #include <hbapigt.h>
- *      hb_gtVersion( void ) --> ( char * )pszResult
+ *      hb_gtVersion( int iType ) --> ( char * )pszResult
  *  $ARGUMENTS$
  *      
  *  $RETURNS$
@@ -3239,7 +3239,7 @@
  *      C Prototype
  *      
  *      #include <hbapigt.h>
- *      hb_gt_Version( void ) --> ( char * )pszResult
+ *      hb_gt_Version( int iType ) --> ( char * )pszResult
  *  $ARGUMENTS$
  *      
  *  $RETURNS$

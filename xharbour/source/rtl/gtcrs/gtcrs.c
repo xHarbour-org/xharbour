@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.43 2004/08/08 11:34:29 lf_sfnet Exp $
+ * $Id: gtcrs.c,v 1.44 2004/09/01 01:13:59 druzus Exp $
  */
 
 /*
@@ -2522,9 +2522,12 @@ void HB_GT_FUNC( gt_Tone( double dFrequency, double dDuration ) )
 
 /* *********************************************************************** */
 
-char *HB_GT_FUNC( gt_Version( void ) )
+char * HB_GT_FUNC(gt_Version( int iType ))
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Version()" ) );
+
+   if ( iType == 0 )
+      return HB_GT_DRVNAME( HB_GT_NAME );
 
    return "Harbour Terminal: nCurses";
 }

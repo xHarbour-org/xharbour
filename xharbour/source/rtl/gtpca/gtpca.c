@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.14 2004/08/02 01:46:15 maurifull Exp $
+ * $Id: gtpca.c,v 1.15 2004/08/06 02:25:39 maurifull Exp $
  */
 
 /*
@@ -474,8 +474,13 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
    hb_idleSleep( dDuration / 18.2 );
 }
 
-char * HB_GT_FUNC(gt_Version( void ))
+char * HB_GT_FUNC(gt_Version( int iType ))
 {
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Version()" ) );
+
+   if ( iType == 0 )
+      return HB_GT_DRVNAME( HB_GT_NAME );
+
    return "Harbour Terminal: PC ANSI";
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.126 2004/08/30 14:10:19 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.127 2004/08/31 12:57:28 vouchcac Exp $
  */
 
 /*
@@ -821,9 +821,14 @@ void HB_GT_FUNC( gt_SetBlink( BOOL bBlink ) )
 
 //-------------------------------------------------------------------//
 
-char * HB_GT_FUNC( gt_Version( void ) )
+char * HB_GT_FUNC(gt_Version( int iType ))
 {
-  return( "xHarbour Terminal: Win32 buffered WVT" );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Version()" ) );
+
+   if ( iType == 0 )
+      return HB_GT_DRVNAME( HB_GT_NAME );
+
+  return "xHarbour Terminal: Win32 buffered WVT";
 }
 
 //-------------------------------------------------------------------//

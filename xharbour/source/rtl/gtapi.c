@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.31 2004/06/28 18:10:17 paultucker Exp $
+ * $Id: gtapi.c,v 1.32 2004/08/16 12:51:51 mauriliolongo Exp $
  */
 
 /*
@@ -185,7 +185,7 @@ void hb_gtInit( int s_iFilenoStdin, int s_iFilenoStdout, int s_iFilenoStderr )
 
    if( hb_cmdargCheck( "INFO" ) )
    {
-      hb_conOutErr( hb_gt_Version(), 0 );
+      hb_conOutErr( hb_gt_Version( 1 ), 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
    }
 
@@ -1205,11 +1205,11 @@ void HB_EXPORT hb_gtTone( double dFrequency, double dDuration )
    hb_gt_Tone( dFrequency, dDuration );
 }
 
-char HB_EXPORT * hb_gtVersion( void )
+char HB_EXPORT * hb_gtVersion( int iType )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtVersion()"));
 
-   return hb_gt_Version();
+   return hb_gt_Version( iType );
 }
 /* prepare the terminal for system call */
 USHORT HB_EXPORT hb_gtSuspend( void )

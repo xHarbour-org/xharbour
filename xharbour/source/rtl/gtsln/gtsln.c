@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.25 2004/06/09 16:42:56 druzus Exp $
+ * $Id: gtsln.c,v 1.26 2004/06/17 13:35:08 druzus Exp $
  */
 
 /*
@@ -1099,8 +1099,13 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 
 /* *********************************************************************** */
 
-char * HB_GT_FUNC(gt_Version( void ))
+char * HB_GT_FUNC(gt_Version( int iType ))
 {
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Version()" ) );
+
+   if ( iType == 0 )
+      return HB_GT_DRVNAME( HB_GT_NAME );
+
     return "Harbour Terminal: Slang";
 }
 

@@ -1,5 +1,5 @@
 /*
-* $Id: gtQTc.cpp,v 1.5 2003/05/21 09:35:35 druzus Exp $
+* $Id: gtQTc.cpp,v 1.6 2003/08/25 23:56:45 druzus Exp $
 */
 
 /*
@@ -808,9 +808,12 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 	HB_SYMBOL_UNUSED( dDuration );
 }
 
-char * HB_GT_FUNC(gt_Version( void ))
+char * HB_GT_FUNC(gt_Version( int iType ))
 {
-	return "Harbour Terminal: QT lib (3.1) console";
+   if ( iType == 0 )
+      return HB_DEF2STR( HB_GT_NAME );
+
+   return "Harbour Terminal: QT lib (3.1) console";
 }
 
 USHORT HB_GT_FUNC(gt_DispCount())

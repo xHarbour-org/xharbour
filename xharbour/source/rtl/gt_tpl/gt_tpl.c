@@ -1,5 +1,5 @@
 /*
- * $Id: gt_tpl.c,v 1.7 2004/02/06 17:07:28 jonnymind Exp $
+ * $Id: gt_tpl.c,v 1.8 2004/02/18 21:35:56 druzus Exp $
  */
 
 /*
@@ -445,8 +445,11 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
    HB_SYMBOL_UNUSED( dDuration );
 }
 
-char * HB_GT_FUNC(gt_Version( void ))
+char * HB_GT_FUNC(gt_Version( int iType ))
 {
+   if ( iType == 0 )
+      return HB_GT_DRVNAME( HB_GT_NAME );
+
    return "Harbour Terminal: (template)";
 }
 
@@ -729,7 +732,7 @@ void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
 
 /* ************************** Clipboard support ********************************** */
 static char *s_clipboard = NULL;
-static int s_clipsize = 0;
+static ULONG s_clipsize = 0;
 
 void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
 {

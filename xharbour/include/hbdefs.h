@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.53 2004/08/04 20:39:38 lf_sfnet Exp $
+ * $Id: hbdefs.h,v 1.54 2004/08/31 08:38:23 likewolf Exp $
  */
 
 /*
@@ -343,6 +343,14 @@ typedef unsigned long HB_COUNTER;
 
 /* type for memory pointer diff */
 typedef unsigned long HB_PTRDIFF;
+
+#ifdef HB_LONG_LONG_OFF
+    typedef LONG HB_FOFFSET;
+    /* we can add hack with double as work around what should
+       effectively give 52bit file size limit */
+#else
+    typedef LONGLONG HB_FOFFSET;
+#endif
 
 /* maximum length of double number in decimal representation:
    log10(2^1024) ~ 308.25 */

@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.23 2004/08/02 01:46:14 maurifull Exp $
+ * $Id: gtnul.c,v 1.24 2004/08/06 02:25:38 maurifull Exp $
  */
 
 /*
@@ -451,9 +451,12 @@ void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
 }
 
 
-char * HB_GT_FUNC(gt_Version( void ))
+char * HB_GT_FUNC(gt_Version( int iType ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_NUL_gt_Version()"));
+
+   if ( iType == 0 )
+      return HB_GT_DRVNAME( HB_GT_NAME );
 
    return "Harbour Terminal: NULL";
 }
@@ -885,9 +888,9 @@ void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
    GT_FUNCS.OutErr( pbyStr, ulLen );
 }
 
-char * hb_gt_Version( void )
+char * hb_gt_Version( int iType )
 {
-   return GT_FUNCS.Version();
+   return GT_FUNCS.Version( iType );
 }
 
 BOOL hb_gt_SetMode( USHORT uiRows, USHORT uiCols )

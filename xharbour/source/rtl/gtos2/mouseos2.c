@@ -1,5 +1,5 @@
 /*
- * $Id: mouseos2.c,v 1.2 2003/05/16 19:52:10 druzus Exp $
+ * $Id: mouseos2.c,v 1.3 2003/05/21 09:35:36 druzus Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 
 static HMOU s_uMouHandle;                   /* mouse logical handle */
 
-void hb_mouse_Init()
+void HB_GT_FUNC(mouse_Init())
 {
     USHORT fsEvents = MOUSE_MOTION_WITH_BN1_DOWN | MOUSE_BN1_DOWN |
                       MOUSE_MOTION_WITH_BN2_DOWN | MOUSE_BN2_DOWN |
@@ -73,7 +73,7 @@ void hb_mouse_Init()
         MouSetEventMask ( &fsEvents, s_uMouHandle );     /* mask some events */
 }
 
-void hb_mouse_Exit(void)
+void HB_GT_FUNC(mouse_Exit(void))
 {
     if ( s_uMouHandle )
     {
@@ -82,18 +82,18 @@ void hb_mouse_Exit(void)
     }
 }
 
-BOOL hb_mouse_IsPresent(void)
+BOOL HB_GT_FUNC(mouse_IsPresent(void))
 {
     return ( s_uMouHandle != 0 );
 }
 
-void hb_mouse_Show(void)
+void HB_GT_FUNC(mouse_Show(void))
 {
     if ( s_uMouHandle )
         MouDrawPtr ( s_uMouHandle );
 }
 
-void hb_mouse_Hide(void)
+void HB_GT_FUNC(mouse_Hide(void))
 {
     /*
        NOTE: mouse cursor always visible if not in full screen
@@ -121,10 +121,14 @@ void hb_mouse_Hide(void)
 /*
    QUESTION: when getting mouse coordinate you normally need both
    row and column, we should think about using just one function
-   hb_mouse_GetPos( &row, &col ) or something like that
+   HB_GT_FUNC(mouse_GetPos( &row, &col )) or something like that
+   I agree. And we also need the mRow and mCol positions for the
+   last mouse event (mouse key UP/DOWN) to avoid race condition
+   with current API which is Clipper compatible but it doesn't
+   means it was well defined.
 */
 
-int hb_mouse_Col(void)
+int HB_GT_FUNC(mouse_Col(void))
 {
     PTRLOC pos;
     if ( s_uMouHandle )
@@ -134,7 +138,7 @@ int hb_mouse_Col(void)
     return ( (int)pos.col );
 }
 
-int hb_mouse_Row(void)
+int HB_GT_FUNC(mouse_Row(void))
 {
     PTRLOC pos;
     if ( s_uMouHandle )
@@ -144,7 +148,7 @@ int hb_mouse_Row(void)
     return ( (int)pos.row );
 }
 
-void hb_mouse_SetPos( int row, int col )
+void HB_GT_FUNC(mouse_SetPos( int row, int col ))
 {
     PTRLOC pos;
     if ( s_uMouHandle )
@@ -155,7 +159,7 @@ void hb_mouse_SetPos( int row, int col )
     }
 }
 
-BOOL hb_mouse_IsButtonPressed( int iButton )
+BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
 {
     /*
        TOFIX: every time I read event from the queue I lose the result
@@ -195,7 +199,7 @@ BOOL hb_mouse_IsButtonPressed( int iButton )
     return ( uMask != 0 );
 }
 
-int hb_mouse_CountButton(void)
+int HB_GT_FUNC(mouse_CountButton(void))
 {
     USHORT usButtons = 0;
     if ( s_uMouHandle )
@@ -205,14 +209,14 @@ int hb_mouse_CountButton(void)
     return ( (int)usButtons );
 }
 
-void hb_mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight )
+void HB_GT_FUNC(mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ))
 {
     /*
        TODO: (I don't think that the OS/2 got a function to do it)
     */
 }
 
-void hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight )
+void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ))
 {
     /*
        TODO: (I don't think that the OS/2 got a function to do it)

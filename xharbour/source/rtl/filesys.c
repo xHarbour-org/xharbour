@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.119 2004/09/01 17:15:13 srobert Exp $
+ * $Id: filesys.c,v 1.120 2004/09/06 00:24:21 peterrees Exp $
  */
 
 /*
@@ -98,10 +98,13 @@
  */
 
 
+#if defined(HB_OS_LINUX)
+#  define _LARGEFILE64_SOURCE
+#endif
+
 #ifndef HB_OS_WIN_32_USED
    #define HB_OS_WIN_32_USED
 #endif
-
 #define HB_THREAD_OPTIMIZE_STACK
 
 #include <ctype.h>
@@ -2100,233 +2103,90 @@ ULONG   HB_EXPORT hb_fsWriteLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCo
    return ulWritten;
 }
 
-ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
+void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
 {
    HB_THREAD_STUB
-   /* Clipper compatibility: under clipper, ulPos is returned as it was
-      before; on error it is not changed. This is not thread compliant,
-      but does not cares as MT prg are required to test FError(). */
-   /* This is nothing compilat, this static var is not bound with file
-      handle and it will cause overwriting database files and many other
-      bad side effect if seek fails - it's one of the most serious bug
-      I've found so far in filesys.c - ulPos _CANNOT_BE_ static, Druzus */
-   ULONG ulPos;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsSeek(%p, %ld, %hu)", hFileHandle, lOffset, uiFlags));
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsCommit(%p)", hFileHandle));
 
    HB_STACK_UNLOCK
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
 
-#if defined(HB_FS_FILE_IO)
-{
-   USHORT Flags = convert_seek_flags( uiFlags );
-
-   #if defined(HB_OS_OS2)
+#if defined(HB_OS_WIN_32)
    {
-      APIRET ret;
-
-      /* This DOS hack creates 2GB file size limit, Druzus */
-      if( lOffset < 0 && Flags == SEEK_SET )
-      {
-         ret = 1;
-         hb_fsSetError( 25 ); /* 'Seek Error' */
-      }
-      else
-      {
-         ret = DosSetFilePtr( hFileHandle, lOffset, Flags, &ulPos );
-         /* TODO: what we should do with this error code? Is it DOS compatible? */
-         hb_fsSetError(( USHORT ) ret );
-      }
-      if( ret != 0 )
-      {
-         /* FIXME: it should work if DosSetFilePtr is lseek compatible
-            but maybe OS2 has DosGetFilePtr too, if not then remove this
-            comment, Druzus */
-         if ( DosSetFilePtr( hFileHandle, 0, SEEK_CUR, &ulPos ) != 0 )
-         {
-            ulPos = 0;
-         }
-      }
-   }
-   #elif defined(HB_WIN32_IO)
-      /* This DOS hack creates 2GB file size limit, Druzus */
-      if( lOffset < 0 && Flags == SEEK_SET )
-      {
-         ulPos = (ULONG) INVALID_SET_FILE_POINTER;
-         hb_fsSetError( 25 ); /* 'Seek Error' */
-      }
-      else
-      {
-         ulPos = (DWORD) SetFilePointer( DostoWinHandle(hFileHandle), lOffset, NULL, (DWORD)Flags );
-         hb_fsSetIOError( (DWORD) ulPos != INVALID_SET_FILE_POINTER, 0 );
-      }
-
-      if ( (DWORD) ulPos == INVALID_SET_FILE_POINTER )
-      {
-         ulPos = (DWORD) SetFilePointer( DostoWinHandle(hFileHandle), 0, NULL, SEEK_CUR );
-      }
-   #else
-      /* This DOS hack creates 2GB file size limit, Druzus */
-      if( lOffset < 0 && Flags == SEEK_SET )
-      {
-         ulPos = (ULONG) -1;
-         hb_fsSetError( 25 ); /* 'Seek Error' */
-      }
-      else
-      {
-         ulPos = lseek( hFileHandle, lOffset, Flags );
-         hb_fsSetIOError( ulPos != (ULONG) -1, 0 );
-      }
-      if ( ulPos == (ULONG) -1 )
-      {
-         ulPos = lseek( hFileHandle, 0L, SEEK_CUR );
-         if ( ulPos == (ULONG) -1 )
-         {
-            ulPos = 0;
-         }
-      }
-   #endif
-   }
-#else
-   hb_fsSetError( 25 );
-   ulPos = 0;
-#endif
-
-   HB_DISABLE_ASYN_CANC
-   HB_STACK_LOCK
-
-   return ulPos;
-}
-
-ULONG   HB_EXPORT hb_fsTell( FHANDLE hFileHandle )
-{
-   HB_THREAD_STUB
-   ULONG ulPos;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsTell(%p)", hFileHandle));
-
-   HB_STACK_UNLOCK
-
-#if defined(HB_FS_FILE_IO)
-
-   #if defined(HB_WIN32_IO)
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
-      ulPos = (DWORD) SetFilePointer( DostoWinHandle(hFileHandle), 0, NULL, FILE_CURRENT );
-      hb_fsSetIOError( (DWORD) ulPos != INVALID_SET_FILE_POINTER, 0 );
+      #if defined(HB_WIN32_IO)
+         hb_fsSetIOError( FlushFileBuffers( ( HANDLE ) DostoWinHandle( hFileHandle ) ), 0 );
+      #else
+         #if defined(__WATCOMC__)
+            hb_fsSetIOError( fsync( hFileHandle ) == 0, 0 );
+         #else
+            hb_fsSetIOError( _commit( hFileHandle ) == 0, 0 );
+         #endif
+      #endif
       HB_DISABLE_ASYN_CANC
+   }
+
+#elif defined(HB_OS_OS2)
+
+   {
+      errno = 0;
+      /* TODO: what about error code from DosResetBuffer() call? */
+      DosResetBuffer( hFileHandle );
+      hb_fsSetIOError( errno == 0, 0 );
+   }
+
+#elif defined(HB_OS_UNIX)
+
+   /* NOTE: close() functions releases all lock regardles if it is an
+    * original or duplicated file handle
+   */
+   #if defined(_POSIX_SYNCHRONIZED_IO)
+      /* faster - flushes data buffers only, without updating directory info
+      */
+      hb_fsSetIOError( fdatasync( hFileHandle ) == 0, 0 );
    #else
-      // allowing async cancelation here
-      HB_TEST_CANCEL_ENABLE_ASYN
-      ulPos = lseek( hFileHandle, 0L, SEEK_CUR );
-      hb_fsSetIOError( ulPos != (ULONG) -1, 0 );
-      HB_DISABLE_ASYN_CANC
+      /* slower - flushes all file data buffers and i-node info
+      */
+      hb_fsSetIOError( fsync( hFileHandle ) == 0, 0 );
    #endif
 
+#elif defined(__WATCOMC__)
+
+   hb_fsSetIOError( fsync( hFileHandle ) == 0, 0 );
+
+#elif defined(HB_FS_FILE_IO) && !defined(HB_OS_OS2) && !defined(HB_OS_UNIX)
+
+   /* This hack is very dangerous. POSIX standard define that if _ANY_
+      file handle is closed all locks set by the process on the file
+      pointed by this descriptor are removed. It doesn't matter they
+      were done using different descriptor. It means that we now clean
+      all locks on hFileHandle with the code below if the OS is POSIX
+      compilant. I vote to disable it.
+    */
+   {
+      int dup_handle;
+      BOOL fResult = FALSE;
+
+      dup_handle = dup( hFileHandle );
+      if( dup_handle != -1 )
+      {
+         close( dup_handle );
+         fResult = TRUE;
+      }
+      hb_fsSetIOError( fResult, 0 );
+   }
 
 #else
 
-   ulPos = (ULONG) -1;
    hb_fsSetError( FS_ERROR );
 
 #endif
 
    HB_STACK_LOCK
-
-   return ulPos;
-}
-
-BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
-{
-   HB_THREAD_STUB
-   BOOL bResult;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsDelete(%s)", (char*) pFilename));
-
-   pFilename = ( BYTE *) hb_fileNameConv( hb_strdup( ( char * ) pFilename) );
-
-   HB_STACK_UNLOCK
-
-
-#if defined(HB_OS_WIN_32)
-
-   HB_TEST_CANCEL_ENABLE_ASYN
-   bResult = DeleteFile( ( char * ) pFilename );
-   hb_fsSetIOError( bResult, 0 );
-   HB_DISABLE_ASYN_CANC
-
-#elif defined(HAVE_POSIX_IO)
-
-   bResult = ( remove( ( char * ) pFilename ) == 0 );
-   hb_fsSetIOError( bResult, 0 );
-
-#elif defined(_MSC_VER) || defined(__MINGW32__)
-
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
-   bResult = ( remove( ( char * ) pFilename ) == 0 );
-   hb_fsSetIOError( bResult, 0 );
-   HB_DISABLE_ASYN_CANC
-
-#else
-
-   bResult = FALSE;
-   hb_fsSetError( FS_ERROR );
-
-#endif
-
-   HB_STACK_LOCK
-
-   hb_xfree( pFilename ) ;
-
-   return bResult;
-}
-
-BOOL HB_EXPORT hb_fsRename( BYTE * pOldName, BYTE * pNewName )
-{
-   HB_THREAD_STUB
-   BOOL bResult;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsRename(%s, %s)", (char*) pOldName, (char*) pNewName));
-
-   pOldName = ( BYTE *) hb_fileNameConv( hb_strdup( ( char * )pOldName) );
-   pNewName = ( BYTE *) hb_fileNameConv( hb_strdup( ( char * )pNewName) );
-
-   HB_STACK_UNLOCK
-
-
-#if defined(HB_OS_WIN_32)
-
-   // allowing async cancelation here
-   HB_TEST_CANCEL_ENABLE_ASYN
-   bResult = MoveFile( ( char * ) pOldName, ( char * ) pNewName );
-   hb_fsSetIOError( bResult, 0 );
-   HB_DISABLE_ASYN_CANC
-
-#elif defined(HB_FS_FILE_IO)
-
-   bResult = ( rename( ( char * ) pOldName, ( char * ) pNewName ) == 0 );
-   hb_fsSetIOError( bResult, 0 );
-
-#else
-
-   bResult = FALSE;
-   hb_fsSetError( FS_ERROR );
-
-#endif
-
-
-   HB_STACK_LOCK
-
-   hb_xfree( pOldName ) ;
-   hb_xfree( pNewName ) ;
-
-   return bResult;
 }
 
 BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
-                      ULONG ulLength, USHORT uiMode )
+                                ULONG ulLength, USHORT uiMode )
 {
    HB_THREAD_STUB
    BOOL bResult;
@@ -2545,86 +2405,324 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
    return bResult;
 }
 
-void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
+BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
+                               HB_FOFFSET ulLength, USHORT uiMode )
 {
    HB_THREAD_STUB
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsCommit(%p)", hFileHandle));
+   BOOL bResult;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsLock(%p, %lu, %lu, %hu)", hFileHandle, ulStart, ulLength, uiMode));
+
+#if defined(HB_FS_FILE_IO) && defined(HB_OS_LINUX) && \
+    defined(__USE_LARGEFILE64)
+   /* 
+    * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+    * define and efectively enables lseek64/flock64 functions on 32bit
+    * machines.
+    */
+   HB_STACK_UNLOCK
+   HB_TEST_CANCEL_ENABLE_ASYN
+   {
+      struct flock64 lock_info;
+
+      switch( uiMode & FL_MASK )
+      {
+         case FL_LOCK:
+
+            lock_info.l_type   = (uiMode & FLX_SHARED) ? F_RDLCK : F_WRLCK;
+            lock_info.l_start  = ulStart;
+            lock_info.l_len    = ulLength;
+            lock_info.l_whence = SEEK_SET;   /* start from the beginning of the file */
+            lock_info.l_pid    = getpid();
+
+            bResult = ( fcntl( hFileHandle,
+                               (uiMode & FLX_WAIT) ? F_SETLKW64: F_SETLK64,
+                               &lock_info ) != -1 );
+            break;
+
+         case FL_UNLOCK:
+
+            lock_info.l_type   = F_UNLCK;   /* unlock */
+            lock_info.l_start  = ulStart;
+            lock_info.l_len    = ulLength;
+            lock_info.l_whence = SEEK_SET;
+            lock_info.l_pid    = getpid();
+
+            bResult = ( fcntl( hFileHandle, F_SETLK64, &lock_info ) != -1 );
+            break;
+
+         default:
+            bResult = FALSE;
+      }
+      hb_fsSetIOError( bResult, 0 );
+   }
+   HB_DISABLE_ASYN_CANC
+   HB_STACK_LOCK
+#else
+   bResult = hb_fsLock( hFileHandle, (ULONG) ulStart, (ULONG) ulLength, uiMode );
+#endif
+
+   return bResult;
+}
+
+ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
+{
+   HB_THREAD_STUB
+   /* Clipper compatibility: under clipper, ulPos is returned as it was
+      before; on error it is not changed. This is not thread compliant,
+      but does not cares as MT prg are required to test FError(). */
+   /* This is nothing compilat, this static var is not bound with file
+      handle and it will cause overwriting database files and many other
+      bad side effect if seek fails - it's one of the most serious bug
+      I've found so far in filesys.c - ulPos _CANNOT_BE_ static, Druzus */
+   ULONG ulPos;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsSeek(%p, %ld, %hu)", hFileHandle, lOffset, uiFlags));
+
+   HB_STACK_UNLOCK
+   // allowing async cancelation here
+   HB_TEST_CANCEL_ENABLE_ASYN
+
+#if defined(HB_FS_FILE_IO)
+{
+   USHORT Flags = convert_seek_flags( uiFlags );
+
+   #if defined(HB_OS_OS2)
+   {
+      APIRET ret;
+
+      /* This DOS hack creates 2GB file size limit, Druzus */
+      if( lOffset < 0 && Flags == SEEK_SET )
+      {
+         ret = 1;
+         hb_fsSetError( 25 ); /* 'Seek Error' */
+      }
+      else
+      {
+         ret = DosSetFilePtr( hFileHandle, lOffset, Flags, &ulPos );
+         /* TODO: what we should do with this error code? Is it DOS compatible? */
+         hb_fsSetError(( USHORT ) ret );
+      }
+      if( ret != 0 )
+      {
+         /* FIXME: it should work if DosSetFilePtr is lseek compatible
+            but maybe OS2 has DosGetFilePtr too, if not then remove this
+            comment, Druzus */
+         if ( DosSetFilePtr( hFileHandle, 0, SEEK_CUR, &ulPos ) != 0 )
+         {
+            ulPos = 0;
+         }
+      }
+   }
+   #elif defined(HB_WIN32_IO)
+      /* This DOS hack creates 2GB file size limit, Druzus */
+      if( lOffset < 0 && Flags == SEEK_SET )
+      {
+         ulPos = (ULONG) INVALID_SET_FILE_POINTER;
+         hb_fsSetError( 25 ); /* 'Seek Error' */
+      }
+      else
+      {
+         ulPos = (DWORD) SetFilePointer( DostoWinHandle(hFileHandle), lOffset, NULL, (DWORD)Flags );
+         hb_fsSetIOError( (DWORD) ulPos != INVALID_SET_FILE_POINTER, 0 );
+      }
+
+      if ( (DWORD) ulPos == INVALID_SET_FILE_POINTER )
+      {
+         ulPos = (DWORD) SetFilePointer( DostoWinHandle(hFileHandle), 0, NULL, SEEK_CUR );
+      }
+   #else
+      /* This DOS hack creates 2GB file size limit, Druzus */
+      if( lOffset < 0 && Flags == SEEK_SET )
+      {
+         ulPos = (ULONG) -1;
+         hb_fsSetError( 25 ); /* 'Seek Error' */
+      }
+      else
+      {
+         ulPos = lseek( hFileHandle, lOffset, Flags );
+         hb_fsSetIOError( ulPos != (ULONG) -1, 0 );
+      }
+      if ( ulPos == (ULONG) -1 )
+      {
+         ulPos = lseek( hFileHandle, 0L, SEEK_CUR );
+         if ( ulPos == (ULONG) -1 )
+         {
+            ulPos = 0;
+         }
+      }
+   #endif
+   }
+#else
+   hb_fsSetError( 25 );
+   ulPos = 0;
+#endif
+
+   HB_DISABLE_ASYN_CANC
+   HB_STACK_LOCK
+
+   return ulPos;
+}
+
+HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, USHORT uiFlags )
+{
+   HB_THREAD_STUB
+   HB_FOFFSET llPos;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsSeekLarge(%p, %Ld, %hu)", hFileHandle, llOffset, uiFlags));
+
+#if defined(HB_FS_FILE_IO) && defined(HB_OS_LINUX) && \
+    defined(__USE_LARGEFILE64)
+   /* 
+    * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+    * define and efectively enables lseek64/flock64 functions on 32bit
+    * machines.
+    */
+   HB_STACK_UNLOCK
+   HB_TEST_CANCEL_ENABLE_ASYN
+   {
+      USHORT Flags = convert_seek_flags( uiFlags );
+      llPos = lseek64( hFileHandle, llOffset, Flags );
+      hb_fsSetIOError( llPos != (HB_FOFFSET) -1, 0 );
+
+      if ( llPos == (HB_FOFFSET) -1 )
+      {
+         llPos = lseek64( hFileHandle, 0L, SEEK_CUR );
+      }
+   }
+   HB_DISABLE_ASYN_CANC
+   HB_STACK_LOCK
+#else
+   llPos = (HB_FOFFSET) hb_fsSeek( hFileHandle, (LONG) llOffset, uiFlags );
+#endif
+
+   return llPos;
+}
+
+ULONG   HB_EXPORT hb_fsTell( FHANDLE hFileHandle )
+{
+   HB_THREAD_STUB
+   ULONG ulPos;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsTell(%p)", hFileHandle));
 
    HB_STACK_UNLOCK
 
-#if defined(HB_OS_WIN_32)
-   {
+#if defined(HB_FS_FILE_IO)
+
+   #if defined(HB_WIN32_IO)
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
-      #if defined(HB_WIN32_IO)
-         hb_fsSetIOError( FlushFileBuffers( ( HANDLE ) DostoWinHandle( hFileHandle ) ), 0 );
-      #else
-         #if defined(__WATCOMC__)
-            hb_fsSetIOError( fsync( hFileHandle ) == 0, 0 );
-         #else
-            hb_fsSetIOError( _commit( hFileHandle ) == 0, 0 );
-         #endif
-      #endif
+      ulPos = (DWORD) SetFilePointer( DostoWinHandle(hFileHandle), 0, NULL, FILE_CURRENT );
+      hb_fsSetIOError( (DWORD) ulPos != INVALID_SET_FILE_POINTER, 0 );
       HB_DISABLE_ASYN_CANC
-   }
-
-#elif defined(HB_OS_OS2)
-
-   {
-      errno = 0;
-      /* TODO: what about error code from DosResetBuffer() call? */
-      DosResetBuffer( hFileHandle );
-      hb_fsSetIOError( errno == 0, 0 );
-   }
-
-#elif defined(HB_OS_UNIX)
-
-   /* NOTE: close() functions releases all lock regardles if it is an
-    * original or duplicated file handle
-   */
-   #if defined(_POSIX_SYNCHRONIZED_IO)
-      /* faster - flushes data buffers only, without updating directory info
-      */
-      hb_fsSetIOError( fdatasync( hFileHandle ) == 0, 0 );
    #else
-      /* slower - flushes all file data buffers and i-node info
-      */
-      hb_fsSetIOError( fsync( hFileHandle ) == 0, 0 );
+      // allowing async cancelation here
+      HB_TEST_CANCEL_ENABLE_ASYN
+      ulPos = lseek( hFileHandle, 0L, SEEK_CUR );
+      hb_fsSetIOError( ulPos != (ULONG) -1, 0 );
+      HB_DISABLE_ASYN_CANC
    #endif
 
-#elif defined(__WATCOMC__)
-
-   hb_fsSetIOError( fsync( hFileHandle ) == 0, 0 );
-
-#elif defined(HB_FS_FILE_IO) && !defined(HB_OS_OS2) && !defined(HB_OS_UNIX)
-
-   /* This hack is very dangerous. POSIX standard define that if _ANY_
-      file handle is closed all locks set by the process on the file
-      pointed by this descriptor are removed. It doesn't matter they
-      were done using different descriptor. It means that we now clean
-      all locks on hFileHandle with the code below if the OS is POSIX
-      compilant. I vote to disable it.
-    */
-   {
-      int dup_handle;
-      BOOL fResult = FALSE;
-
-      dup_handle = dup( hFileHandle );
-      if( dup_handle != -1 )
-      {
-         close( dup_handle );
-         fResult = TRUE;
-      }
-      hb_fsSetIOError( fResult, 0 );
-   }
 
 #else
 
+   ulPos = (ULONG) -1;
    hb_fsSetError( FS_ERROR );
 
 #endif
 
    HB_STACK_LOCK
+
+   return ulPos;
+}
+
+BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
+{
+   HB_THREAD_STUB
+   BOOL bResult;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsDelete(%s)", (char*) pFilename));
+
+   pFilename = ( BYTE *) hb_fileNameConv( hb_strdup( ( char * ) pFilename) );
+
+   HB_STACK_UNLOCK
+
+
+#if defined(HB_OS_WIN_32)
+
+   HB_TEST_CANCEL_ENABLE_ASYN
+   bResult = DeleteFile( ( char * ) pFilename );
+   hb_fsSetIOError( bResult, 0 );
+   HB_DISABLE_ASYN_CANC
+
+#elif defined(HAVE_POSIX_IO)
+
+   bResult = ( remove( ( char * ) pFilename ) == 0 );
+   hb_fsSetIOError( bResult, 0 );
+
+#elif defined(_MSC_VER) || defined(__MINGW32__)
+
+   // allowing async cancelation here
+   HB_TEST_CANCEL_ENABLE_ASYN
+   bResult = ( remove( ( char * ) pFilename ) == 0 );
+   hb_fsSetIOError( bResult, 0 );
+   HB_DISABLE_ASYN_CANC
+
+#else
+
+   bResult = FALSE;
+   hb_fsSetError( FS_ERROR );
+
+#endif
+
+   HB_STACK_LOCK
+
+   hb_xfree( pFilename ) ;
+
+   return bResult;
+}
+
+BOOL HB_EXPORT hb_fsRename( BYTE * pOldName, BYTE * pNewName )
+{
+   HB_THREAD_STUB
+   BOOL bResult;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsRename(%s, %s)", (char*) pOldName, (char*) pNewName));
+
+   pOldName = ( BYTE *) hb_fileNameConv( hb_strdup( ( char * )pOldName) );
+   pNewName = ( BYTE *) hb_fileNameConv( hb_strdup( ( char * )pNewName) );
+
+   HB_STACK_UNLOCK
+
+
+#if defined(HB_OS_WIN_32)
+
+   // allowing async cancelation here
+   HB_TEST_CANCEL_ENABLE_ASYN
+   bResult = MoveFile( ( char * ) pOldName, ( char * ) pNewName );
+   hb_fsSetIOError( bResult, 0 );
+   HB_DISABLE_ASYN_CANC
+
+#elif defined(HB_FS_FILE_IO)
+
+   bResult = ( rename( ( char * ) pOldName, ( char * ) pNewName ) == 0 );
+   hb_fsSetIOError( bResult, 0 );
+
+#else
+
+   bResult = FALSE;
+   hb_fsSetError( FS_ERROR );
+
+#endif
+
+
+   HB_STACK_LOCK
+
+   hb_xfree( pOldName ) ;
+   hb_xfree( pNewName ) ;
+
+   return bResult;
 }
 
 BOOL HB_EXPORT    hb_fsMkDir( BYTE * pDirname )

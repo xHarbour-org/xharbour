@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.7 2004/08/29 00:26:22 druzus Exp $
+# $Id: pack_src.sh,v 1.8 2004/09/03 13:45:15 lf_sfnet Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -56,9 +56,8 @@ $hb_collect doc/es/*.txt
 
 # INCLUDE
 $hb_collect include/Makefile
-$hb_collect include/*.c
+$hb_collect include/*.[ch]
 $hb_collect include/*.api
-$hb_collect include/*.h
 $hb_collect include/*.ch
 
 # SOURCE\COMMON
@@ -139,70 +138,61 @@ $hb_collect source/rtl/*.prg
 
 # SOURCE\RTL\GT_TPL
 $hb_collect source/rtl/gt_tpl/Makefile
-$hb_collect source/rtl/gt_tpl/*.c
-$hb_collect source/rtl/gt_tpl/*.h
+$hb_collect source/rtl/gt_tpl/*.[ch]
 
 # SOURCE\RTL\GTNUL
 $hb_collect source/rtl/gtnul/Makefile
-$hb_collect source/rtl/gtnul/*.c
-$hb_collect source/rtl/gtnul/*.h
+$hb_collect source/rtl/gtnul/*.[ch]
 
 # SOURCE\RTL\GTCGI
 $hb_collect source/rtl/gtcgi/Makefile
-$hb_collect source/rtl/gtcgi/*.c
-$hb_collect source/rtl/gtcgi/*.h
+$hb_collect source/rtl/gtcgi/*.[ch]
 
 # SOURCE\RTL\GTCRS
 $hb_collect source/rtl/gtcrs/Makefile
-$hb_collect source/rtl/gtcrs/*.c
-$hb_collect source/rtl/gtcrs/*.h
+$hb_collect source/rtl/gtcrs/*.[ch]
 $hb_collect source/rtl/gtcrs/*.def
 
 # SOURCE\RTL\GTDOS
 $hb_collect source/rtl/gtdos/Makefile
-$hb_collect source/rtl/gtdos/*.c
-$hb_collect source/rtl/gtdos/*.h
+$hb_collect source/rtl/gtdos/*.[ch]
 
 # SOURCE\RTL\GTOS2
 $hb_collect source/rtl/gtos2/Makefile
-$hb_collect source/rtl/gtos2/*.c
-$hb_collect source/rtl/gtos2/*.h
+$hb_collect source/rtl/gtos2/*.[ch]
 $hb_collect source/rtl/gtos2/*.gcc
 
 # SOURCE\RTL\GTPCA
 $hb_collect source/rtl/gtpca/Makefile
-$hb_collect source/rtl/gtpca/*.c
-$hb_collect source/rtl/gtpca/*.h
+$hb_collect source/rtl/gtpca/*.[ch]
 
 # SOURCE\RTL\GTSLN
 $hb_collect source/rtl/gtsln/Makefile
-$hb_collect source/rtl/gtsln/*.c
-$hb_collect source/rtl/gtsln/*.h
+$hb_collect source/rtl/gtsln/*.[ch]
 
 # SOURCE\RTL\GTSTD
 $hb_collect source/rtl/gtstd/Makefile
-$hb_collect source/rtl/gtstd/*.c
-$hb_collect source/rtl/gtstd/*.h
+$hb_collect source/rtl/gtstd/*.[ch]
 
 # SOURCE\RTL\GTWIN
 $hb_collect source/rtl/gtwin/Makefile
-$hb_collect source/rtl/gtwin/*.c
-$hb_collect source/rtl/gtwin/*.h
+$hb_collect source/rtl/gtwin/*.[ch]
 
 # SOURCE\RTL\GTWVT
 $hb_collect source/rtl/gtwvt/Makefile
-$hb_collect source/rtl/gtwvt/*.c
-$hb_collect source/rtl/gtwvt/*.h
+$hb_collect source/rtl/gtwvt/*.[ch]
 
 # SOURCE\RTL\GTXVT
 $hb_collect source/rtl/gtxvt/Makefile
-$hb_collect source/rtl/gtxvt/*.c
-$hb_collect source/rtl/gtxvt/*.h
+$hb_collect source/rtl/gtxvt/*.[ch]
+
+# SOURCE\RTL\GTXWC
+$hb_collect source/rtl/gtxwc/Makefile
+$hb_collect source/rtl/gtxwc/*.[ch]
 
 # SOURCE\RTL\GTALLEG
 $hb_collect source/rtl/gtalleg/Makefile
-$hb_collect source/rtl/gtalleg/*.c
-$hb_collect source/rtl/gtalleg/*.h
+$hb_collect source/rtl/gtalleg/*.[ch]
 $hb_collect source/rtl/gtalleg/*.sfc
 
 # SOURCE\VM
@@ -286,23 +276,20 @@ $hb_collect utils/hbtest/*.prg
 
 # CONTRIB\RDD_ADS
 $hb_collect contrib/rdd_ads/Makefile
-$hb_collect contrib/rdd_ads/*.c
+$hb_collect contrib/rdd_ads/*.[ch]
 $hb_collect contrib/rdd_ads/*.prg
-$hb_collect contrib/rdd_ads/*.h
 $hb_collect contrib/rdd_ads/*.ch
 
 # CONTRIB\MYSQL
 $hb_collect contrib/mysql/Makefile
-$hb_collect contrib/mysql/*.c
+$hb_collect contrib/mysql/*.[ch]
 $hb_collect contrib/mysql/*.prg
-$hb_collect contrib/mysql/*.h
 $hb_collect contrib/mysql/*.ch
 
 # CONTRIB\PGSQL
 $hb_collect contrib/pgsql/Makefile
-$hb_collect contrib/pgsql/*.c
+$hb_collect contrib/pgsql/*.[ch]
 $hb_collect contrib/pgsql/*.prg
-$hb_collect contrib/pgsql/*.h
 $hb_collect contrib/pgsql/*.ch
 
 # CONTRIB\LIBNF

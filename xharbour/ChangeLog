@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3411 2004/09/06 19:53:38 kaddath Exp $
+ * $Id: ChangeLog,v 1.3412 2004/09/06 20:01:01 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,62 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-08 01:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/gtos2/gtos2.c
+  * xharbour/source/rtl/gtos2/mouseos2.c
+   + added multi GT support - sorry I'm not an OS2 user - can someone
+     check it, please. I do not know if it even compile - I hope so.
+
+  * xharbour/doc/en/hb_apigt.txt
+  * xharbour/include/hbapigt.h
+  * xharbour/source/rtl/gt.c
+  * xharbour/source/rtl/gtapi.c
+  * xharbour/source/rtl/gtQTc/gtQTc.cpp
+  * xharbour/source/rtl/gt_tpl/gt_tpl.c
+  * xharbour/source/rtl/gtalleg/gtalleg.c
+  * xharbour/source/rtl/gtcgi/gtcgi.c
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtdos/gtdos.c
+  * xharbour/source/rtl/gtnul/gtnul.c
+  * xharbour/source/rtl/gtos2/gtos2.c
+  * xharbour/source/rtl/gtos2/mouseos2.c
+  * xharbour/source/rtl/gtpca/gtpca.c
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtstd/gtstd.c
+  * xharbour/source/rtl/gtwin/gtwin.c
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+  * xharbour/source/rtl/gtxvt/gtxvt.c
+   + added parameter int iType integer to hb_gtVersion() / 
+     HB_GT_FUNC(gt_Version()) / HB_GT_VERSION() - when iType is 0 then
+     short version WIN / WVT / CRS / SLN / OS2 / STD / ... is returned
+     when nonzero then full previous name - it was necessary for clear
+     checking which GT is use and allow to prg programmers use things
+     like:
+         if HB_GT_VERSION() == "WVT"
+            [...]
+         else if HB_GT_VERSION() == "WIN"
+            [...]
+     instead of parsing the string returned by previous version of
+     HB_GT_VERSION() - if someone needs nice long description then
+     please use: HB_GT_VERSION(1)
+
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/pack_src.bat
+  * xharbour/bin/pack_src.sh
+  * xharbour/config/bsd/gcc.cf
+  * xharbour/config/darwin/gcc.cf
+  * xharbour/config/linux/gcc.cf
+  * xharbour/config/linux/global.cf
+  + xharbour/source/rtl/gtxwc/Makefile
+  + xharbour/source/rtl/gtxwc/gtxwc.c
+  + xharbour/source/rtl/gtxwc/gtxwc.h
+    + added clone of GTXVT called GTXWC
+
+  * xharbour/include/hbdefs.h
+  * xharbour/include/hbapifs.h
+  * xharbour/source/rtl/filesys.c
+    + added hb_fsSeekLarge and hb_fsLockLarge
 
 2004-09-06 22:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/libnf/color2n.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.36 2004/05/04 17:03:24 jonnymind Exp $
+ * $Id: hbapifs.h,v 1.37 2004/06/08 18:05:48 lculik Exp $
  */
 
 /*
@@ -127,11 +127,13 @@ extern BOOL     HB_EXPORT hb_fsFile       ( BYTE * pszFileName ); /* determine i
 extern BOOL     HB_EXPORT hb_fsIsDirectory( BYTE * pFilename ); /* Determine if given name is a directory */
 extern ULONG    HB_EXPORT hb_fsFSize      ( BYTE * pszFileName, BOOL bUseDirEntry ); /* determine the size of a file */
 extern FHANDLE  HB_EXPORT hb_fsExtOpen    ( BYTE * pszFileName, BYTE * pDefExt,
-                                  USHORT uiFlags, BYTE * pPaths, PHB_ITEM pError ); /* open a file using default extension and a list of paths */
+                                            USHORT uiFlags, BYTE * pPaths, PHB_ITEM pError ); /* open a file using default extension and a list of paths */
 extern USHORT   HB_EXPORT hb_fsIsDrv      ( BYTE nDrive ); /* determine if a drive number is a valid drive */
 extern BOOL     HB_EXPORT hb_fsIsDevice   ( FHANDLE hFileHandle ); /* determine if a file is attached to a device (console?) */
 extern BOOL     HB_EXPORT hb_fsLock       ( FHANDLE hFileHandle, ULONG ulStart,
-                                  ULONG ulLength, USHORT uiMode ); /* request a lock on a portion of a file */
+                                            ULONG ulLength, USHORT uiMode ); /* request a lock on a portion of a file */
+extern BOOL     HB_EXPORT hb_fsLockLarge  ( FHANDLE hFileHandle, HB_FOFFSET ulStart,
+                                            HB_FOFFSET ulLength, USHORT uiMode ); /* request a lock on a portion of a file using 64bit API */
 extern BOOL     HB_EXPORT hb_fsMkDir      ( BYTE * pszDirName ); /* create a directory */
 extern FHANDLE  HB_EXPORT hb_fsOpen       ( BYTE * pszFileName, USHORT uiFlags ); /* open a file */
 extern USHORT   HB_EXPORT hb_fsRead       ( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount ); /* read contents of a file into a buffer (<=64K) */
@@ -139,6 +141,7 @@ extern ULONG    HB_EXPORT hb_fsReadLarge  ( FHANDLE hFileHandle, BYTE * pBuff, U
 extern BOOL     HB_EXPORT hb_fsRmDir      ( BYTE * pszDirName ); /* remove a directory */
 extern BOOL     HB_EXPORT hb_fsRename     ( BYTE * pszOldName, BYTE * pszNewName ); /* rename a file */
 extern ULONG    HB_EXPORT hb_fsSeek       ( FHANDLE hFileHandle, LONG lOffset, USHORT uiMode ); /* reposition an open file */
+extern HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, USHORT uiFlags ); /* reposition an open file using 64bit API */
 extern ULONG    HB_EXPORT hb_fsTell       ( FHANDLE hFileHandle ); /* retrieve the current position of a file */
 extern void     HB_EXPORT hb_fsSetDevMode ( FHANDLE hFileHandle, USHORT uiDevMode ); /* change the device mode of a file (text/binary) */
 extern void     HB_EXPORT hb_fsSetError   ( USHORT uiError ); /* set the file system DOS error number */

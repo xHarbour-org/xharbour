@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.33 2004/08/02 01:46:12 maurifull Exp $
+ * $Id: hbapigt.h,v 1.34 2004/08/06 02:25:35 maurifull Exp $
  */
 
 /*
@@ -274,7 +274,7 @@ extern USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pbyStr,
 extern USHORT HB_EXPORT hb_gtWriteCon( BYTE * pbyStr, ULONG ulLen );
 extern int    HB_EXPORT hb_gtCurrentColor( void );
 extern int    HB_EXPORT hb_gtIndexedColor( int idx );
-extern char   HB_EXPORT * hb_gtVersion( void );
+extern char   HB_EXPORT * hb_gtVersion( int iType );
 #define hb_gtOutStd( pbyStr, ulLen ) hb_gt_OutStd( pbyStr, ulLen )
 #define hb_gtOutErr( pbyStr, ulLen ) hb_gt_OutErr( pbyStr, ulLen )
 
@@ -354,7 +354,7 @@ extern void   hb_gt_SetCursorStyle( USHORT uiCursorShape );
 extern BOOL   hb_gt_SetMode( USHORT uiRows, USHORT uiCols );
 extern void   hb_gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod );
 extern void   hb_gt_Tone( double dFrequency, double dDuration );
-extern char * hb_gt_Version( void );
+extern char * hb_gt_Version( int iType );
 extern USHORT hb_gt_VertLine( SHORT uiCol, SHORT uiTop, SHORT uiBottom, BYTE byChar, BYTE byAttr );
 
 extern void   hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen );
@@ -461,70 +461,51 @@ extern void hb_gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSiz
 #  undef HB_MULTI_GT
 #endif
 
+#define HB_DEF2STR( id )      HB_DEF2STR_( id )
+#define HB_DEF2STR_( id )     #id
+
+#define HB_GT_DRVNAME( id )   HB_DEF2STR( id )
+
 #ifdef HB_MULTI_GT
 
 #include "hbinit.h"
 
-#if defined(__WATCOMC__)
-    #undef _DOS
-    #undef _WIN
-#endif
+/* convert lower case suffixes to upper */
+#define HB_GT_nul    HB_GT_NUL
+#define HB_GT_std    HB_GT_STD
+#define HB_GT_cgi    HB_GT_CGI
+#define HB_GT_pca    HB_GT_PCA
+#define HB_GT_crs    HB_GT_CRS
+#define HB_GT_sln    HB_GT_SLN
+#define HB_GT_win    HB_GT_WIN
+#define HB_GT_wvt    HB_GT_WVT
+#define HB_GT_dos    HB_GT_DOS
+#define HB_GT_os2    HB_GT_OS2
+#define HB_GT_tpl    HB_GT_TPL
+#define HB_GT_QTc    HB_GT_QTC
+#define HB_GT_xvt    HB_GT_XVT
+#define HB_GT_xwc    HB_GT_XWC
+#define HB_GT_alleg  HB_GT_ALLEG
+
 /* These hacks are needed to force preprocessing if id/x is also a macro */
 #define _HB_GT_PREF_( id )      _HB_GT_PREF__( id )
-#define _HB_GT_PREF__( id )     _##id
+#define _HB_GT_PREF__( id )     HB_GT_##id
 
-#define HB_GT_FUNC( x )         HB_GT_FUNC_( x, _HB_GT_PREF_( HB_GT_NAME ) )
+#define HB_GT_FUNC( x )         HB_GT_FUNC_( x, HB_GT_NAME )
 #define HB_GT_FUNC_( x, id )    HB_GT_FUNC__( x, id )
-#define HB_GT_FUNC__( x, id )   hb##id##_##x
-
-#define HB_GT_DRVNAME( id )     HB_GT_DRVNAME_( _HB_GT_PREF_( id ) )
-#define HB_GT_DRVNAME_( id )    HB_GT_DRVNAME__( id )
-#define HB_GT_DRVNAME__( id )   HB_GT_DRV##id
+#define HB_GT_FUNC__( x, id )   hb##_##id##_##x
 
 #define HB_GT_REQUEST( id )     HB_GT_REQUEST_( _HB_GT_PREF_( id ) )
 #define HB_GT_REQUEST_( id )    HB_GT_REQUEST__( id )
-#define HB_GT_REQUEST__( id )   HB_FUNC_EXTERN( HB_GT##id ); \
-                                void hb_gt_ForceLink##id( void ) \
+#define HB_GT_REQUEST__( id )   HB_FUNC_EXTERN( id ); \
+                                void hb_gt_ForceLink_##id( void ) \
                                 { \
-                                   HB_FUNCNAME( HB_GT##id )(); \
+                                   HB_FUNCNAME( id )(); \
                                 }
 
 #define HB_GT_ANNOUNCE( id )    HB_GT_ANNOUNCE_( _HB_GT_PREF_( id ) )
 #define HB_GT_ANNOUNCE_( id )   HB_GT_ANNOUNCE__( id )
-#define HB_GT_ANNOUNCE__( id )  HB_FUNC( HB_GT##id ) {}
-
-/* convert lower case suffixes to upper */
-#define _nul   _NUL
-#define _std   _STD
-#define _cgi   _CGI
-#define _pca   _PCA
-#define _crs   _CRS
-#define _sln   _SLN
-#define _win   _WIN
-#define _wvt   _WVT
-#define _dos   _DOS
-#define _os2   _OS2
-#define _tpl   _TPL
-#define _QTc   _QTC
-#define _xvt   _XVT
-#define _alleg _ALLEG
-
-/* names of GT */
-#define HB_GT_DRV_NUL   "nul"
-#define HB_GT_DRV_STD   "std"
-#define HB_GT_DRV_CGI   "cgi"
-#define HB_GT_DRV_PCA   "pca"
-#define HB_GT_DRV_CRS   "crs"
-#define HB_GT_DRV_SLN   "sln"
-#define HB_GT_DRV_WIN   "win"
-#define HB_GT_DRV_WVT   "wvt"
-#define HB_GT_DRV_DOS   "dos"
-#define HB_GT_DRV_OS2   "os2"
-#define HB_GT_DRV_TPL   "tpl"
-#define HB_GT_DRV_QTC   "QTc"
-#define HB_GT_DRV_XVT   "xvt"
-#define HB_GT_DRV_ALLEG "alleg"
-
+#define HB_GT_ANNOUNCE__( id )  HB_FUNC( id ) {}
 
 typedef struct _HB_GT_FUNCS
 {
@@ -552,7 +533,7 @@ typedef struct _HB_GT_FUNCS
     BOOL    (* SetMode) ( USHORT, USHORT );
     BOOL    (* GetBlink) ( void );
     void    (* SetBlink) ( BOOL );
-    char *  (* Version) ( void );
+    char *  (* Version) ( int );
     USHORT  (* Box) ( SHORT, SHORT, SHORT, SHORT, BYTE *, BYTE );
     USHORT  (* BoxD) ( SHORT, SHORT, SHORT, SHORT, BYTE *, BYTE );
     USHORT  (* BoxS) ( SHORT, SHORT, SHORT, SHORT, BYTE *, BYTE );
@@ -645,7 +626,7 @@ extern void   HB_GT_FUNC( gt_SetCursorStyle( USHORT uiCursorShape ) );
 extern BOOL   HB_GT_FUNC( gt_SetMode( USHORT uiRows, USHORT uiCols ) );
 extern void   HB_GT_FUNC( gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod ) );
 extern void   HB_GT_FUNC( gt_Tone( double dFrequency, double dDuration ) );
-extern char * HB_GT_FUNC( gt_Version( void ) );
+extern char * HB_GT_FUNC( gt_Version( int iType ) );
 extern USHORT HB_GT_FUNC( gt_VertLine( SHORT uiCol, SHORT uiTop, SHORT uiBottom, BYTE byChar, BYTE byAttr ) );
 
 extern void   HB_GT_FUNC( gt_OutStd( BYTE * pbyStr, ULONG ulLen ) );
