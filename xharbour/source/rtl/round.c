@@ -1,5 +1,5 @@
 /*
- * $Id: round.c,v 1.11 2004/02/13 11:02:35 druzus Exp $
+ * $Id: round.c,v 1.12 2004/02/18 21:35:56 druzus Exp $
  */
 
 /*
@@ -118,16 +118,22 @@ HB_FUNC( INT )
 
          if( (double) LONG_MIN <= dNumber && dNumber <= (double) LONG_MAX )
          {
-            PHB_ITEM pNumber = hb_itemNew( NULL );
-            hb_itemPutNIntLen( pNumber, (LONG) dNumber, iWidth );
-            hb_itemRelease( hb_itemReturn( pNumber ) );
+            HB_ITEM Number;
+
+            Number.type = HB_IT_NIL;
+            hb_itemPutNIntLen( &Number, (LONG) dNumber, iWidth );
+
+            hb_itemReturn( &Number );
          }
 #ifndef HB_LONG_LONG_OFF
          else if( (double) LONGLONG_MIN <= dNumber && dNumber <= (double) LONGLONG_MAX )
          {
-            PHB_ITEM pNumber = hb_itemNew( NULL );
-            hb_itemPutNIntLen( pNumber, (LONGLONG) dNumber, iWidth );
-            hb_itemRelease( hb_itemReturn( pNumber ) );
+            HB_ITEM Number;
+
+            Number.type = HB_IT_NIL;
+            hb_itemPutNIntLen( &Number, (LONGLONG) dNumber, iWidth );
+
+            hb_itemReturn( &Number );
          }
 #endif
          else
@@ -200,20 +206,22 @@ HB_FUNC( ROUND )
 
             if( (double) LONG_MIN <= dNumber && dNumber <= (double) LONG_MAX )
             {
-               PHB_ITEM pNumber = hb_itemNew( NULL );
+               HB_ITEM Number;
 
-               hb_itemPutNInt( pNumber, (LONG) dNumber );
+               Number.type = HB_IT_NIL;
+               hb_itemPutNInt( &Number, (LONG) dNumber );
 
-               hb_itemReturn( pNumber );
+               hb_itemReturn( &Number );
             }
 #ifndef HB_LONG_LONG_OFF
             else if( (double) LONGLONG_MIN <= dNumber && dNumber <= (double) LONGLONG_MAX )
             {
-               PHB_ITEM pNumber = hb_itemNew( NULL );
+               HB_ITEM Number;
 
-               hb_itemPutNInt( pNumber, (LONGLONG) dNumber );
+               Number.type = HB_IT_NIL;
+               hb_itemPutNInt( &Number, (LONGLONG) dNumber );
 
-               hb_itemReturn( pNumber );
+               hb_itemReturn( &Number );
             }
 #endif
             else
