@@ -47,7 +47,7 @@
 
      METHOD AddLine( cLine )                            INLINE ( ::cText += ( cLine + Chr(10) ) )
      METHOD AddText( cText, nStartLine )                INLINE ( ::cText += cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, ::nCompiledLines + 1 ) )
-     METHOD SetScript( cText, nStartLine, cName )       INLINE ( ::nProcs := 0, ::cText := cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ), ::cName := cName )
+     METHOD SetScript( cText, nStartLine, cName )       INLINE ( ::aScriptHostGlobals := {}, ::nProcs := 0, ::cText := cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ), ::cName := cName )
      METHOD GetPPO()                                    INLINE ( ::cPPed )
 
      METHOD Compile()
@@ -104,7 +104,6 @@
            ::aInitExit          := { {}, {} }
            ::nCompiledLines     := 0
            ::nProcs             := 0
-           ::aScriptHostGlobals := {}
            ::nNextStartProc     := 1
 	   ::nID                := 0
         ELSE
