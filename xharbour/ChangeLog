@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2054 2004/01/14 13:05:13 lculik Exp $
+ * $Id: ChangeLog,v 1.2055 2004/01/14 21:44:04 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-35 10:47 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * Fix typo's in previous changelog
+
 2004-01-35 10:44 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/gtwvt/gtwvt.c
     + Fix translation of CTRL-A-Z to inkey.ch value of K_CTRL_A-Z
@@ -22,11 +25,11 @@
         WVT_SETMENUKEYEVENT(nEventToReturnForMenuEvents ) ( Default ==1024 )
 
     + added other useful utility functions
-        WVT_GETSCREENWIDTH() -> Return screen with in pixels
+        WVT_GETSCREENWIDTH() -> Return screen width in pixels
         WVT_GETSCREENHEIGHT() -> return screen height in pixels
         WVT_SETCLOSEEVENT(nEventNumber) -> set a K_ value to return if 'X' clicked or WM_CLOSE is received
                                         need to add handler with SetKey(K_CLOSE, { || CloseHandler() }
-                                        The default behaviour is to return HB_
+                                        The default behaviour is to return HB_BREAK_FLAG
         WVT_SETSHUTDOWNEVENT(nEventNumber) -> event to return for WM_SHUTDOWN message
                                         need to add handler with SetKey(K_SHUTDOWN, { || ShutdownHandler() }
         WVT_SETWINDOWCENTRE( .T. or .F.) -> Tells WVT whether to create window centred
