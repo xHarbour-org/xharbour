@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.100 2004/03/30 18:37:28 ronpinkas Exp $
+ * $Id: arrays.c,v 1.101 2004/03/30 18:40:55 ronpinkas Exp $
  */
 
 /*
@@ -1444,11 +1444,6 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromStack(%iu)", uiLen));
 
-   if( uiLen < 0 )
-   {
-	  uiLen = 0;
-   }
-
    hb_arrayNew( pArray, uiLen );
 
    for( uiPos = 1; uiPos <= uiLen; uiPos++ )
@@ -1473,11 +1468,6 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    if( uiPCount > 255 )
    {
       uiPCount -= 256;
-   }
-
-   if( uiPCount < 0 )
-   {
-	 uiPCount = 0;
    }
 
    hb_arrayNew( pArray, uiPCount );
