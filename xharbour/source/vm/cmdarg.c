@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.12 2004/05/04 18:39:31 kaddath Exp $
+ * $Id: cmdarg.c,v 1.13 2004/05/06 23:42:02 peterrees Exp $
  */
 
 /*
@@ -49,12 +49,13 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
-  #define HB_OS_WIN_32_USED
-#endif
 
 #include "hbapi.h"
 #include "hbmemory.ch"
+
+#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
+  #include <windows.h>
+#endif
 
 /* To disable mouse in Windows Console Mode
    This variable will be set to FALSE upon
