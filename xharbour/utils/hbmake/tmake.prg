@@ -43,6 +43,7 @@ data  lFwh           init .F.
 data  lCw            init .F.
 Data  lmini          init .F.
 Data  lHwgui         init .F.
+Data  lWhoo          init .F.
 data  lRddAds        init .F.
 DAta  lMediator      init .F.
 Data  cMakefile      init ""
@@ -125,6 +126,9 @@ Method WriteMakeFileHeader() Class THbmake
 
     ELSEIF ::lHwgui
         Fwrite( ::nLinkHandle, "HWGUI =" + ::cFMC + CRLF )
+    ELSEIF ::lWhoo
+        Fwrite( ::nLinkHandle, "WHOO =" + ::cFMC + CRLF )
+
     ENDIF
 
 
@@ -1038,26 +1042,36 @@ tracelog(aTemp[ 1 ], atemp[ 2 ])
                 ENDIF
 
                 IF aTemp[ 1 ] == "C4W"
-                ::cFMC:= aTemp[2]
-                ::lCw :=.t.
-                endif
-                IF aTemp[ 1 ] == "FWH"
-                ::cFMC:= aTemp[2]
-                ::lFwh           :=.t.
-                endif
-                IF aTemp[ 1 ] == "MINIGUI"
-                ::cFMC:= aTemp[2]
-                ::lmini :=.t.
-                endif
-                IF aTemp[ 1 ] == "HWGUI"
-                ::cFMC:= aTemp[2]
-                ::lHwGui :=.t.
+                   ::cFMC:= aTemp[2]
+                   ::lCw :=.t.
                 endif
 
-                IF aTemp[ 1 ] == "MEDIATOR"
-                ::cMedpath:= aTemp[2]
-                ::lmEDIATOR :=.t.
+                IF aTemp[ 1 ] == "FWH"
+                   ::cFMC:= aTemp[2]
+                   ::lFwh           :=.t.
                 endif
+
+                IF aTemp[ 1 ] == "MINIGUI"
+                   ::cFMC:= aTemp[2]
+                   ::lmini :=.t.
+                endif
+
+                IF aTemp[ 1 ] == "HWGUI"
+                   ::cFMC:= aTemp[2]
+                   ::lHwGui :=.t.
+                endif
+
+                IF aTemp[ 1 ] == "WHOO"
+                   ::cFMC:= aTemp[2]
+                   ::lWhoo  :=.t.
+                endif
+
+
+                IF aTemp[ 1 ] == "MEDIATOR"
+                   ::cMedpath:= aTemp[2]
+                   ::lmEDIATOR :=.t.
+                endif
+
                 IF aTemp[ 1 ] == "COMPRESS"
                    ::lCompress := "YES" IN aTemp[ 2 ]
                 endif
@@ -1065,9 +1079,9 @@ tracelog(aTemp[ 1 ], atemp[ 2 ])
 
                 IF aTemp[ 1 ] == "OBJFILES"
                      cObjitem := substr( atemp[ 2 ],1,at(")",atemp[ 2 ]))
-                     tracelog( cObjitem ) 
+      
                     ::cObj := ::replacemacros(cObjItem)
-                     tracelog( ::cObj ) 
+      
                     ::aObjs := Listasarray2( ::replacemacros( atemp[ 2 ] ), " " )
 
                 ENDIF

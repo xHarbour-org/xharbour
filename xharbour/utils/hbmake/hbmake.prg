@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.89 2003/08/21 04:02:13 ronpinkas Exp $
+ * $Id: hbmake.prg,v 1.90 2003/08/28 16:59:51 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -372,7 +372,7 @@ FUNCTION ParseMakeFile( cFile )
                               lMt := .T.
                            ENDIF
 
-                           IF At( 'fivehc.lib', Lower( aLibx ) ) > 0 .OR. At( 'minigui.lib', Lower( aLibx ) ) > 0
+                           IF At( 'fivehc.lib', Lower( aLibx ) ) > 0 .OR. At( 'minigui.lib', Lower( aLibx ) ) > 0 .OR. At( 'whoo.lib', Lower( aLibx ) ) > 0 .or. At( 'hwgui.lib', Lower( aLibx ) ) > 0
                               lGui := .T.
                            ENDIF
 
@@ -1126,6 +1126,7 @@ FUNC CreateMakeFile( cFile )
    LOCAL lMiniGui     := .f.
    LOCAL lHwGui       := .f.
    LOCAL lRddAds      := .f.
+   LOCAL lWhoo        := .f.
    LOCAL lMediator    := .f.
    LOCAL lApollo      := .f.
    LOCAL lMt          := .F.
@@ -1136,6 +1137,7 @@ FUNC CreateMakeFile( cFile )
    LOCAL cApolloPath     := Space( 200 )
    LOCAL ccwpath      := Space( 200 )
    LOCAL cMiniPath    := Space( 200 )
+   LOCAL cWhooPath    := Space( 200 )
    LOCAL cHwPath      := Space( 200 )
    LOCAL cObjDir      := "obj" + Space( 20 )
    LOCAL lAutomemvar  := .f.
@@ -1158,7 +1160,7 @@ FUNC CreateMakeFile( cFile )
    LOCAL cDefBccLibs      := "bcc640.lib lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib common.lib gtwin.lib codepage.lib"
    LOCAL cDefGccLibs      := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lcodepage -lm"
    LOCAL cGccLibsOs2      := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lcodepage -lm"
-   LOCAL cDefLibGccLibs   := "-lvm -lrtl -lgtcrs -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lcodepage -lncurses -lgpm -lpthread -lm"
+   LOCAL cDefLibGccLibs   := "-lvm -lrtl -lgtcrs -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lcodepage -lgtnul"
    LOCAL cDefBccLibsMt    := "bcc640.lib lang.lib vmmt.lib rtlMt.lib rddmt.lib macromt.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib common.lib gtwin.lib codepage.lib"
    LOCAL cDefGccLibsMt    := "-lvmmt -lrtlMt -lgtdos -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lcodepage -lm"
    LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlMt -lgtos2 -llang -lrddmt -lrtlMt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lcodepage -lm"
@@ -1224,11 +1226,12 @@ FUNC CreateMakeFile( cFile )
          lCompMod     := oMake:lCompMod
          lGenppo      := oMake:lGenppo
          cRdd         := IIF( oMake:lRddAds, "RddAds", IIF( oMake:lMediator, "Mediator", "None" ) )
-         cGui         := IIF( oMake:lFwh, "FWH", IIF( oMake:lmini , "MiniGui", IIF( oMake:lCw, "C4W", IIF( oMake:lHwGui, "HWGUI","None" ) ) ) )
+         cGui         := IIF( oMake:lFwh, "FWH", IIF( oMake:lmini , "MiniGui",IIF(oMake:lWhoo, "Whoo",  IIF( oMake:lCw, "C4W", IIF( oMake:lHwGui, "HWGUI","None" ) ) ) ) )
          cfwhpath     := oMake:cFmc
          ccwpath      := oMake:cFmc
          cMiniPath    := oMake:cFmc
          cHwPath      := oMake:cFmc
+         cWhooPath    := oMake:cFmc
          cmedpath     := oMake:cMedpath
          cAppName     := oMake:cAppLibName
          s_cAppName     := oMake:cAppLibName
@@ -1279,6 +1282,7 @@ FUNC CreateMakeFile( cFile )
    lMediator :=  "Mediator" IN cRdd
    lApollo := "Apollo" IN cRdd
    lHwGui := "HWGUI" in cGui
+   lWhoo  := "Whoo" in cGui
 
    IF lUseXharbourDll
       cDefBccLibs      := cHarbDll+"bc.lib"
@@ -1294,6 +1298,9 @@ FUNC CreateMakeFile( cFile )
       @  3, 40 SAY "MinuGui path" GET cMiniPath PICT "@s20"
    ELSEIF lHwGui
       @  3, 40 SAY "Hwgui path" GET cHwPath PICT "@s20"
+   ELSEIF lWhoo
+      @  3, 40 SAY "Whoo path" GET cWhooPath PICT "@s20"
+
    ENDIF
    IF lMediator
       @  3, 40 SAY "Mediator path" GET cmedpath PICT "@s20"
@@ -1423,7 +1430,7 @@ cResname += cAllRes
       aAdd( s_aCommands, { ".c.obj:", "$(BCB)\BIN\bcc32 -I$(BHC)\include $(CFLAG1) $(CFLAG2) -o$* $**" } )
 
       IF s_lExtended
-         aAdd( s_aCommands, { ".prg.obj:", "$(BHC)\bin\harbour -n -go -I$(BHC)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) ) ) + IIF( lMediator," -I$(MEDIATOR)\include ","")+" -o$* $**" } )
+         aAdd( s_aCommands, { ".prg.obj:", "$(BHC)\bin\harbour -n -go -I$(BHC)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) ) )+IIF( lWhoo," -I$(WHOO)\include ","")+  IIF( lMediator," -I$(MEDIATOR)\include ","")+" -o$* $**" } )
       ELSE
          aAdd( s_aCommands, { ".prg.c:", "$(BHC)\bin\harbour -n -I$(BHC)\include $(HARBOURFLAGS)" + IIF( lFwh, " -I$(FWH)\include", IIF( lMinigui, " -I$(MINIGUI)\include",IIF( lHwgui, " -I$(HWGUI)\include","" ) )) + " -o$* $**" } )
       ENDIF
@@ -1567,6 +1574,9 @@ cResname += cAllRes
    ELSEIF lHwGui
       fWrite( s_nLinkHandle, "HWGUI = " + cHwPath + CRLF )
       lGui := .T.
+   ELSEIF lWhoo
+      fWrite( s_nLinkHandle, "WHOO = " + cWhooPath + CRLF )
+      lGui := .T.
 
    ENDIF
 
@@ -1575,7 +1585,7 @@ cResname += cAllRes
       lGui := .F.
    ENDIF
 
-   fWrite( s_nLinkHandle, "GUI = " + IIF( lFwh .OR. lCw .OR. lMinigui, "YES", "NO" ) + CRLF )
+   fWrite( s_nLinkHandle, "GUI = " + IIF(lWhoo .OR. lFwh .OR. lCw .OR. lMinigui, "YES", "NO" ) + CRLF )
    fWrite( s_nLinkHandle, "MT = " + IIF( lMt, "YES", "NO" ) + CRLF )
 
    FOR x := 1 TO Len( s_aMacros )
@@ -1830,6 +1840,8 @@ cResname += cAllRes
 
       ELSEIF lMiniGui
          fWrite( s_nLinkHandle, "LIBFILES = Minigui.lib optgui.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+      ELSEIF lWhoo
+         fWrite( s_nLinkHandle, "LIBFILES = whoo.lib what32.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSEIF lHwGui
          fWrite( s_nLinkHandle, "LIBFILES = hwgui.lib procmisc.lib hwg_qhtm.lib optgui.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSEIF lCw
@@ -1858,11 +1870,11 @@ cResname += cAllRes
       fWrite( s_nLinkHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include" + IIF( lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
 
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
-      fWrite( s_nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib -Gn -M -m -s -Tpe" + IIF( lFWH, " -aa", IIF( lMiniGui, " -aa", IIF( lHwgui, " -aa"," -ap" ) ) ) + IIF( lMinigui, " -L$(MINIGUI)\lib",IIF( lFwh, " -L$(FWH)\lib",IIF( lHwgui, " -L$(HWGUI)\lib","" ))) + CRLF )
+      fWrite( s_nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib -Gn -M -m -s -Tpe" + IIF( lFWH, " -aa", IIF( lMiniGui .or. lWhoo , " -aa", IIF( lHwgui, " -aa"," -ap" ) ) ) + IIF( lMinigui, " -L$(MINIGUI)\lib",IIF( lFwh, " -L$(FWH)\lib",IIF( lHwgui, " -L$(HWGUI)\lib","" ))) + CRLF )
       fWrite( s_nLinkHandle, "IFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LINKER = ilink32" + CRLF )
       fWrite( s_nLinkHandle, " " + CRLF )
-      fWrite( s_nLinkHandle, "ALLOBJ = " + IIF( ( lFwh .OR. lMinigui .OR. lHwgui ), "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + ;
+      fWrite( s_nLinkHandle, "ALLOBJ = " + IIF( ( lWhoo .OR. lFwh .OR. lMinigui .OR. lHwgui ), "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + ;
                + CRLF )
       fWrite( s_nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
       fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) import32.lib " + IIF( lMt,"cw32.lib", "cw32.lib" )+ CRLF )
