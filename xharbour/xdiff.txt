@@ -1,6 +1,98 @@
 As it stands at this point, xHarbour offers many syntax extensions over Harbour
 and Clipper, including:
 
+Escaped strings:
+----------------
+   Strings beginning with 'e"' are interpreted as C strings with "\"
+   escapes.
+   
+   Var1 := e"One Row\r\nAnotherRow\r\nYetAnother\rOverwrite\t\tTabbed"
+   
+   Is Equivalent to:
+   
+   Var1 := "OneRow" + Chr(10) + Chr(13) + "Another Row" + Chr(10) + Chr(13) +;
+      "YetAnother" + Chr(10) + "Overwrite" + Chr(8) + Chr(8) + "Tabbed"
+      
+   ? Var1  // you'll see returns only in CGI/STDOUT based output.
+   
+   
+HASH Variable type:
+-------------------
+   Hashes are mainly arrays with non numerical keys
+   
+   LOCAL hVar := Hash()
+   LOCAL hVar1 := { => } // Alternate hash declaration method.
+   LOCAL dDate := ctod( "02/01/2004" )
+   
+   // complete charset & case sensitive 
+   // string key support (case sens. can be turned on/off)
+   hVar[ e"first Key\n" ] := 10  
+   
+   // Date key support!!
+   hVar[ dDate ] := 20
+   
+   // Non integer numerical key support
+   hVar[ 25.2 ] := 30
+   
+   // Set operation support
+   hVar1 := hVar - { dDate => 0 }  // removing dDate key
+   
+   For more deails, see doc/hash.txt
+   
+   
+XML Support:
+------------
+   hFile := FOpen( cFileName )
+
+   xmlDoc := TXmlDocument():New( hFile )
+   xmlNode := xmlDoc:oRoot:oChild
+   cXml := xmlNode:Path()
+
+   // there are methods to find nodes (but also attributes, values and data):
+   xmlNode := xmlDoc:FindFirstRegex( cNode )
+   // to modify them:
+   xmlNode:SetAttribute( "Name", "MyNode" )
+   // or to add them
+   xmlNode:InsertAfter( TXmlNode:New(HBXML_TYPE_TAG, "ANewNode" ) )
+   
+   // and to write them back
+   hFile := FCreate( "output.xml" )
+   xmlDoc:Write( hFile )
+   
+   More details in doc/hbxml.txt
+   
+   
+Indirect execution support:
+---------------------------
+
+   Other than codeblocks, XHarbour provides the inderect execution function
+   HB_ExecFromArray() that has the following syntax:
+   
+   HB_ExecFromArray( cFuncName, [aParams] ) --> result
+   HB_ExecFromArray( @nFuncId(), [aParams] ) --> result
+   HB_ExecFromArray( bCodeBlock, [aParams] ) --> result
+   HB_ExecFromArray( oObject, cMethodName, [aParams] ) --> result
+   HB_ExecFromArray( oObject, nMethodID, [aParams] ) --> result
+   HB_ExecFromArray( aExecutableArray ) --> result
+   
+   Other array parameter in HB_ExecFromArray past the function name or address,
+   the codeblock or the object and method identifier is directly passed as
+   that function, codeblock or method parameters (element 1 being the first
+   parameter and so on); the return of the function, codeblock or method, 
+   if present, is returned.
+   
+   An executable array is an array that has the elements structured as the other
+   HB_ExecFromArray function calls:
+   
+   { cFuncName, param1, ..., paramN }
+   { @nFuncId(), param1, ..., paramN }
+   { bCodeBlock, param1, ..., paramN }
+   { oObject, cMethodName, param1, ..., paramN }
+   {oObject, nMethodID, param1, ..., paramN }
+   
+   For more details, see doc/en/indirect.txt
+   
+   
 Portable Service-like startup:
 ------------------------------
    HB_Service( .T. ) 
@@ -11,7 +103,8 @@ Portable Service-like startup:
       based program (as services), like i.e. Windows message
       handling and GC collecting (can be used from any
       platform, it's duty varies from platform to platform).
-      
+   
+         
 STANDARD LOG sytem:
 -------------------
    #include "hblog.ch"
@@ -56,8 +149,6 @@ Protable signal and error handling system:
       
    See doc/hbsignal.txt for further details.
 
-   
-   
 
 
 OOP Macros:
@@ -214,13 +305,22 @@ Basic sample can be found at:
 NOTE: MT Application must link against the MT versions of the Libraries, i.e.
       vmmt.lib, rtlmt.lib, ppmt.lib, rddmt.lib, dbfntxmt.lib, and dbfcdxmt.lib.
 
-The full description of MT is beyond the scope of this document.
+The full description of MT is beyond the scope of this document; see more
+   in doc/thread.txt and doc/xhbt_internals.txt
 
+   
 Portable Sockets Support:
 -------------------------
 
-The full description is beyond the scope of this document - please refer to
-samples/sitesvr/sitesvr.prg for a WebServer example.
+   LOCAL Socket
+   
+   Socket := InetConnect( "www.host.com", nPort )
+   Socket := InetSend( "Hello from me" )
+   InetClsoe( Socket )
+   
+The full description is beyond the scope of this document; see doc/inet.txt
+for further details.
+
 
 Perl-5 compatible RegEx:
 ------------------------
