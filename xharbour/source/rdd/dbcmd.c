@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.66 2003/12/23 06:40:28 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.67 2004/01/17 17:51:42 lculik Exp $
  */
 
 /*
@@ -95,6 +95,9 @@ extern HB_FUNC( _DBF );
 extern HB_FUNC( _SDF );
 extern HB_FUNC( _DELIM );
 extern HB_FUNC( RDDSYS );
+
+// AJ: 2004-01-30
+BYTE * hb_szDBFNotExist = NULL;
 
 static char * s_szDefDriver = NULL;    /* Default RDD name */
 static LPRDDNODE s_pRddList = NULL;    /* Registered RDD's */
@@ -1078,6 +1081,16 @@ void  HB_EXPORT hb_rddShutDown( void )
    }
 
    s_szDefDriver = NULL;
+
+   /* AJ: 2004-01-30
+      Added to release memory when opening a DBF which does not exist
+   */
+   if( hb_szDBFNotExist )
+   {
+      hb_xfree( hb_szDBFNotExist );
+   }
+
+   hb_szDBFNotExist = NULL;
 
    while( s_pRddList )
    {
