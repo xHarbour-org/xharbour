@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3152 2004/07/14 01:26:00 paultucker Exp $
+ * $Id: ChangeLog,v 1.3153 2004/07/14 02:14:59 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,35 +8,39 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-07-13 23:54 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/cstruct.ch
+    ! Corrected all #command to #xcommand and all #translate to #xtranslate
+
 2004-07-13 22:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
    * source/rtl/listbox.prg
      * formatting, spelling.
 
 2004-07-13 15:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-   * source/rtl/mssgline.prg 
-   * source/rtl/tbcolumn.prg 
-   * source/rtl/tgetint.prg 
-   * source/rtl/tmenuitm.prg 
-   * source/rtl/tpopup.prg 
-   * source/rtl/ttopbar.prg 
+   * source/rtl/mssgline.prg
+   * source/rtl/tbcolumn.prg
+   * source/rtl/tgetint.prg
+   * source/rtl/tmenuitm.prg
+   * source/rtl/tpopup.prg
+   * source/rtl/ttopbar.prg
      - #include "hbsetup.ch"
 
 2004-07-13 15:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-   * source/rtl/pushbtn.prg 
-   * source/rtl/checkbox.prg 
-   * source/rtl/radiobtn.prg 
-   * source/rtl/tget.prg 
-   * source/rtl/radiogrp.prg 
+   * source/rtl/pushbtn.prg
+   * source/rtl/checkbox.prg
+   * source/rtl/radiobtn.prg
+   * source/rtl/tget.prg
+   * source/rtl/radiogrp.prg
      - #include "hbsetup.ch"
 
 2004-07-13 15:10 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-   * source/rtl/pushbtn.prg 
-   * source/rtl/radiogrp.prg 
-   * source/rtl/checkbox.prg 
-   * source/rtl/listbox.prg 
-   * source/rtl/scrollbr.prg 
-   * source/rtl/radiobtn.prg 
-   * source/rtl/tget.prg 
+   * source/rtl/pushbtn.prg
+   * source/rtl/radiogrp.prg
+   * source/rtl/checkbox.prg
+   * source/rtl/listbox.prg
+   * source/rtl/scrollbr.prg
+   * source/rtl/radiobtn.prg
+   * source/rtl/tget.prg
      + #include "color.ch"
      * changed __GuiColor() Calls
      * moved __GuiColor and IsDefColor() from Checkbox.prg to Tget.prg

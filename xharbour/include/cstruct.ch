@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.ch,v 1.12 2004/01/10 05:51:26 ronpinkas Exp $
+ * $Id: cstruct.ch,v 1.13 2004/04/12 21:03:09 ronpinkas Exp $
  */
 
 /*
@@ -84,37 +84,37 @@
 
    // Exclude from C compilation
    #ifdef _SET_CH
-      #command C STRUCTURE <!stru!> [ALIGN <align> ] => ;
+      #xcommand C STRUCTURE <!stru!> [ALIGN <align> ] => ;
                INIT PROCEDURE __INIT_<stru>; ;
                   __ActiveStructure( #<stru>, <align> ) ; ;
-               #translate IS <stru> \[ \<x: :=, INIT> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ); ;
-               #translate IS <stru> FROM \<pointer> => := HB_CStructure( #<stru> ):Buffer( \<pointer> )
+               #xtranslate IS <stru> \[ \<x: :=, INIT> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ); ;
+               #xtranslate IS <stru> FROM \<pointer> => := HB_CStructure( #<stru> ):Buffer( \<pointer> )
 
       // <elem> instead of <!elem!> to allow ElemName[n] syntax.
-      #command MEMBER <elem> IS <type> => HB_Member( #<elem>, <type> )
+      #xcommand MEMBER <elem> IS <type> => HB_Member( #<elem>, <type> )
 
       /*
          Will match:
             MEMBER <elem> IS <!stru!>
          due to expansion of:
-            #translate IS <stru> [...] => := HB_CStructure( #<stru> ):Init( {} )
-         as established by C STRUCTURE <!stru!> #command for the given structure.
+            #xtranslate IS <stru> [...] => := HB_CStructure( #<stru> ):Init( {} )
+         as established by C STRUCTURE <!stru!> #xcommand for the given structure.
       */
-      #command MEMBER <elem> := HB_CStructure( <literalstru> ):Init( {} ) => ;
+      #xcommand MEMBER <elem> := HB_CStructure( <literalstru> ):Init( {} ) => ;
                HB_Member( #<elem>, HB_CStructureId( <literalstru>, .T. ) )
 
-      #command MEMBER <!elem!> IS <type> ( <nlen> ) => HB_Member( #<elem>, HB_CTypeArrayID( <type>, <nlen> ) )
+      #xcommand MEMBER <!elem!> IS <type> ( <nlen> ) => HB_Member( #<elem>, HB_CTypeArrayID( <type>, <nlen> ) )
 
-      #command MEMBER <!elem!> AS <!stru!> => ;
+      #xcommand MEMBER <!elem!> AS <!stru!> => ;
                HB_Member( #<elem>, HB_CStructureId( #<stru>, .F. ) )
 
-      #command END C STRUCTURE [<!stru!>] => ; ;
+      #xcommand END C STRUCTURE [<!stru!>] => ; ;
                   __ClsSetModule( __ActiveStructure() ); ;
                RETURN
 
-      #command IMPORT C STRUCTURE <!stru!> => ;
-               #translate IS <stru> \[ \<x: :=, INIT> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ); ;
-               #translate IS <stru> FROM \<pointer> => := HB_CStructure( #<stru> ):Buffer( \<pointer> )
+      #xcommand IMPORT C STRUCTURE <!stru!> => ;
+               #xtranslate IS <stru> \[ \<x: :=, INIT> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ); ;
+               #xtranslate IS <stru> FROM \<pointer> => := HB_CStructure( #<stru> ):Buffer( \<pointer> )
 
       //----------------------------- C Syntax support ---------------------------------//
       /* NOTES:
@@ -131,8 +131,8 @@
                    HB_CStructureCSyntax( #<stru>, {[#<elem>,]}, <(tag)>, <"synon">, __PACK ); ;
                    __ClsSetModule( __ActiveStructure() ); ;
                 RETURN; ;
-                #translate IS <stru> \[ \<x: :=, INIT> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ); ;
-                #translate IS <stru> FROM \<pointer> => := HB_CStructure( #<stru> ):Buffer( \<pointer> )
+                #xtranslate IS <stru> \[ \<x: :=, INIT> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ); ;
+                #xtranslate IS <stru> FROM \<pointer> => := HB_CStructure( #<stru> ):Buffer( \<pointer> )
 
       #xcommand pragma pack( <pack> ) => #undef __PACK; #define __PACK <pack>
       #xcommand pragma pack() => #undef __PACK; #define __PACK 8
