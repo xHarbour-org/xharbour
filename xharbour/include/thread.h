@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.32 2003/03/10 23:21:55 jonnymind Exp $
+* $Id: thread.h,v 1.33 2003/03/12 00:24:02 jonnymind Exp $
 */
 
 /*
@@ -60,7 +60,6 @@
 
 #ifdef HB_THREAD_SUPPORT
 
-
 /* We should assert that cleanup functions must be in limited number */
 typedef void (*HB_CLEANUP_FUNC)(void *);
 #define HB_MAX_CLEANUPS  12
@@ -83,15 +82,12 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
 
    #define HB_COND_T                   HANDLE
    #define HB_COND_INIT( x )           x = CreateEvent( NULL,FALSE, FALSE, NULL )
-
-   DWORD hb_SignalObjectAndWait( HB_CRITICAL_T hToSignal, HB_COND_T hToWaitFor, DWORD dwMillisec, BOOL bUnused );
-   void hb_threadSuspendAll();
-   void hb_threadResumeAll();
-   
    #define HB_COND_WAIT( x, y )        hb_SignalObjectAndWait( y, x, INFINITE, FALSE )
    #define HB_COND_WAITTIME( x, y, t ) hb_SignalObjectAndWait( y, x, t, FALSE )
    #define HB_COND_SIGNAL( x )         SetEvent( x )
    #define HB_COND_DESTROY( x )        CloseHandle( x )
+
+   typedef void ( * HB_IDLE_FUNC )();
 
    #define HB_CURRENT_THREAD           GetCurrentThreadId
 
@@ -155,10 +151,6 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       }\
       HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
    } 
-
-   typedef void ( * HB_IDLE_FUNC )();
-   void hb_threadSubscribeIdle( HB_IDLE_FUNC );
-   void hb_threadCallIdle(); 
    
    typedef struct tag_HB_IDLE_FUNC_LIST
    {
@@ -198,7 +190,6 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #define HB_COND_WAITTIME( x, y, t )  hb_condTimeWait( &(x) , &(y), t )
    #define HB_COND_SIGNAL( x )         pthread_cond_broadcast( &(x) )
    #define HB_COND_DESTROY( x )        pthread_cond_destroy( &(x) )
-   
    
    #define HB_CURRENT_THREAD           pthread_self
    #define HB_CLEANUP_PUSH(x, y )      pthread_cleanup_push( x, (void *)&(y) )
@@ -242,7 +233,6 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       }\
       HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
    } 
-
 #endif
 
 /**********************************************************/
@@ -285,7 +275,6 @@ typedef struct tag_HB_STACK
 
 } HB_STACK;
 
-
 /* Complex Mutex Structure*/
 typedef struct tag_HB_MUTEX_STRUCT {
    HB_CRITICAL_T mutex;
@@ -296,14 +285,6 @@ typedef struct tag_HB_MUTEX_STRUCT {
    PHB_ITEM aEventObjects;
    struct tag_HB_MUTEX_STRUCT *next;
 } HB_MUTEX_STRUCT;
-
-/* Ligthweight system indepented reentrant mutex, used internally by harbour */
-typedef struct tag_HB_LWR_MUTEX
-{
-    HB_THREAD_T Locker;
-    HB_CRITICAL_T Critical;
-    int nCount;
-} HB_LWR_MUTEX;
 
 /*********************************************************************/
 /* Shared resource is a set of a resource, a mutex and a condition. */
@@ -370,32 +351,7 @@ typedef struct tag_HB_SHARED_RESOURCE
    HB_CRITICAL_UNLOCK( pshr.Mutex );\
    HB_CLEANUP_POP;\
 }
-    
-/***********************************************************************/
-/* Function and globals definitions */
-extern HB_STACK *last_stack;
-extern HB_STACK *hb_ht_stack;
-extern HB_MUTEX_STRUCT *hb_ht_mutex;
-extern HB_THREAD_T hb_main_thread_id;
-
-extern HB_STACK *hb_threadCreateStack( HB_THREAD_T th_id );
-extern HB_STACK *hb_threadLinkStack( HB_STACK *tc );
-extern HB_STACK *hb_threadUnlinkStack( HB_THREAD_T th_id );
-extern void hb_threadDestroyStack( HB_STACK *pStack );
-extern HB_STACK *hb_threadGetStack( HB_THREAD_T th_id );
-extern void hb_threadInit( void );
-extern void hb_threadExit( void );
-extern void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs );
-extern void hb_threadWaitAll();
-extern void hb_threadKillAll();
-extern void hb_threadSleep( int millisec );
-extern void hb_mutexForceUnlock( void *);
-extern void hb_rawMutexForceUnlock( void *);
-extern HB_MUTEX_STRUCT *hb_threadLinkMutex( HB_MUTEX_STRUCT *mx );
-extern HB_MUTEX_STRUCT *hb_threadUnlinkMutex( HB_MUTEX_STRUCT *mx );
-extern void hb_threadTerminator( void *pData );
-extern void hb_threadCancelInternal();   
-            
+                
 /** JC1:
    In MT libs, every function accessing stack will record the HB_STACK 
    (provided by hb_threadGetCurrentContext()) into a local Stack variable, and
@@ -422,6 +378,14 @@ extern void hb_threadUnlock( HB_LWR_MUTEX *m );
 /** AUTO reentrant mutex if using UNIX */
 /** JC1: we'll be using it in POSIX implementation without reentrant mutexes */
 #if 0
+/* Ligthweight system indepented reentrant mutex, used internally by harbour */
+typedef struct tag_HB_LWR_MUTEX
+{
+    HB_THREAD_T Locker;
+    HB_CRITICAL_T Critical;
+    int nCount;
+} HB_LWR_MUTEX;
+
    ! defined( HB_OS_LINUX )
 
     #define HB_CRITICAL_T               HB_LWR_MUTEX
@@ -504,6 +468,41 @@ extern HB_SHARED_RESOURCE hb_runningStacks;
 
 #define HB_STACK_STOP    ( HB_WAIT_SHARED( hb_runningStacks, HB_COND_EQUAL, 0, HB_COND_SET, -1 ) )
 #define HB_STACK_START   HB_SET_SHARED( hb_runningStacks, HB_COND_SET, 0 )
+
+/***********************************************************************/
+/* Function and globals definitions */
+extern HB_STACK *last_stack;
+extern HB_STACK *hb_ht_stack;
+extern HB_MUTEX_STRUCT *hb_ht_mutex;
+extern HB_THREAD_T hb_main_thread_id;
+
+extern HB_STACK *hb_threadCreateStack( HB_THREAD_T th_id );
+extern HB_STACK *hb_threadLinkStack( HB_STACK *tc );
+extern HB_STACK *hb_threadUnlinkStack( HB_THREAD_T th_id );
+extern void hb_threadDestroyStack( HB_STACK *pStack );
+extern HB_STACK *hb_threadGetStack( HB_THREAD_T th_id );
+extern void hb_threadInit( void );
+extern void hb_threadExit( void );
+extern void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs );
+extern void hb_threadWaitAll();
+extern void hb_threadKillAll();
+extern void hb_threadSleep( int millisec );
+extern void hb_mutexForceUnlock( void *);
+extern void hb_rawMutexForceUnlock( void *);
+extern HB_MUTEX_STRUCT *hb_threadLinkMutex( HB_MUTEX_STRUCT *mx );
+extern HB_MUTEX_STRUCT *hb_threadUnlinkMutex( HB_MUTEX_STRUCT *mx );
+extern void hb_threadTerminator( void *pData );
+extern void hb_threadCancelInternal();   
+
+/* Win 32 specific functions */
+#ifdef HB_OS_WIN_32
+   DWORD hb_SignalObjectAndWait( HB_CRITICAL_T hToSignal, HB_COND_T hToWaitFor, DWORD dwMillisec, BOOL bUnused );
+   void hb_threadSuspendAll();
+   void hb_threadResumeAll();
+   void hb_threadSubscribeIdle( HB_IDLE_FUNC );
+   void hb_threadCallIdle(); 
+#endif
+
 
    
 /******************************************************/

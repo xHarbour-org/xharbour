@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrypt.c,v 1.2 2003/02/24 01:58:10 jonnymind Exp $
+ * $Id: hbcrypt.c,v 1.3 2003/02/24 05:55:54 jonnymind Exp $
  */
 
 /*
@@ -174,9 +174,11 @@ void nxs_partial_scramble(
    int *scramble,
    unsigned long len, unsigned short keylen )
 {
-   int pos, kpos;
+   unsigned long pos;
+   unsigned short kpos;
 
-   pos = kpos = 0;
+   pos = 0l;
+   kpos = 0;
    while( pos + kpos < len )
    {
       cipher[ pos + scramble[ kpos ] ] = source[ pos + kpos ];
@@ -225,10 +227,12 @@ void nxs_partial_unscramble(
    int *scramble,
    unsigned long len, unsigned short keylen )
 {
-   int pos, kpos;
+   unsigned long pos;
+   unsigned short kpos;
    unsigned char buf[ NXS_MAX_KEYLEN ];
 
-   pos = kpos = 0;
+   pos = 0l;
+   kpos = 0;
    while( pos + kpos < len )
    {
       buf[ kpos ] = cipher[ pos + scramble[ kpos ]  ];
@@ -248,10 +252,11 @@ void nxs_xorcode(
    unsigned char *cipher, unsigned long cipherlen,
    const unsigned char *key, unsigned short keylen )
 {
-   int keypos, pos;
+   unsigned long pos;
+   unsigned short keypos;
    unsigned char c_bitrest;
 
-   for ( keypos = 0, pos = 0; pos < cipherlen; pos ++ )
+   for ( keypos = 0, pos = 0l; pos < cipherlen; pos ++ )
    {
 
       if (keypos == 0 )
@@ -284,10 +289,11 @@ void nxs_xordecode(
    unsigned char *cipher, unsigned long cipherlen,
    const unsigned char *key, unsigned short keylen )
 {
-   int keypos, pos;
+   unsigned long pos;
+   unsigned short keypos;
    unsigned char c_bitrest, c_bitleft;
 
-   for ( keypos = 0, pos = 0; pos < cipherlen; pos ++ )
+   for ( keypos = 0, pos = 0l; pos < cipherlen; pos ++ )
    {
       cipher[pos] ^= key[ keypos ];
 
@@ -321,7 +327,7 @@ void nxs_xorcyclic(
    unsigned char *cipher, unsigned long cipherlen,
    const unsigned char *key, unsigned short keylen )
 {
-   int pos, crcpos;
+   unsigned long pos, crcpos;
    unsigned long crc1, crc2, crc3;
    unsigned long crc1l, crc2l, crc3l;
 

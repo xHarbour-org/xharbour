@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.61 2003/03/10 23:22:09 jonnymind Exp $
+* $Id: thread.c,v 1.62 2003/03/12 00:24:10 jonnymind Exp $
 */
 
 /*
@@ -549,7 +549,7 @@ void hb_threadSubscribeIdle( HB_IDLE_FUNC pFunc )
    HB_CRITICAL_LOCK( hb_idleQueueRes.Mutex );
       
    /* Continue to signal waiting threaeds */
-   pIdle = (HB_IDLE_FUNC)hb_idleQueueRes.content.asPointer;
+   pIdle = (HB_IDLE_FUNC_LIST *)hb_idleQueueRes.content.asPointer;
    if ( pIdle != NULL )
    {
       HB_COND_SIGNAL( hb_idleQueueRes.Cond );
