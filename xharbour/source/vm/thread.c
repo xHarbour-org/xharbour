@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.58 2003/03/08 02:06:47 jonnymind Exp $
+* $Id: thread.c,v 1.59 2003/03/08 02:25:34 jonnymind Exp $
 */
 
 /*
@@ -111,6 +111,10 @@ BOOL hb_critical_mutex_trylock( HB_CRITICAL_T *lpMutex )
 }
 
 #endif  //LWR mutexes for OS without them.
+
+#if defined( HB_OS_LINUX )
+   pthread_key_t hb_thread_stack_key;
+#endif
 
 HB_STACK *hb_ht_stack;
 HB_STACK *last_stack;
@@ -489,8 +493,13 @@ void hb_rawMutexForceUnlock( void * mtx)
    void *hb_create_a_thread( void *Cargo )
 #endif
 {
-   HB_THREAD_STUB
-   
+   HB_STACK *_pStack_ = hb_threadGetStack( HB_CURRENT_THREAD() );
+
+   #if defined( HB_OS_LINUX )
+      /* link stack to local thread data */
+      pthread_setspecific(hb_thread_stack_key, _pStack_);
+   #endif
+
    /* avoid warning */
    if ( Cargo != 0 ) return 0;
    /* Sets the cancellation handler so small delays in
@@ -1371,6 +1380,13 @@ void hb_threadInit( void )
    hb_main_thread_id = HB_CURRENT_THREAD();
    hb_ht_stack = hb_threadCreateStack( hb_main_thread_id );
    s_threadStarted = 1;
+
+   #if defined( HB_OS_LINUX )
+      /* create key for stack in thread local data */
+      pthread_key_create(&hb_thread_stack_key, NULL);
+      /* link stack to local thread data */
+      pthread_setspecific(hb_thread_stack_key, hb_threadGetStack( hb_main_thread_id ));
+   #endif
    
    #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
       HB_CRITICAL_INIT( s_mtxTryLock );

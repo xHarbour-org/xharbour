@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.29 2003/03/08 02:06:44 jonnymind Exp $
+* $Id: thread.h,v 1.30 2003/03/08 02:25:25 jonnymind Exp $
 */
 
 /*
@@ -304,13 +304,20 @@ extern void hb_threadTerminator2( );
 #endif
 
 extern void hb_threadTerminator( void *pData );
+#if defined( HB_OS_LINUX )
+   extern pthread_key_t hb_thread_stack_key;
+#endif
 
 /** JC1:
    In MT libs, every function accessing stack will record the HB_STACK 
    (provided by hb_threadGetCurrentContext()) into a local Stack variable, and
    this variable will be accessed instead of HB_VM_STACK.
 */
-#define hb_threadGetCurrentStack() ( hb_threadGetStack( HB_CURRENT_THREAD() ) )
+#if defined( HB_OS_LINUX )
+   #define hb_threadGetCurrentStack() ( (HB_STACK *) pthread_getspecific( hb_thread_stack_key ) )
+#else
+   #define hb_threadGetCurrentStack() ( hb_threadGetStack( HB_CURRENT_THREAD() ) )
+#endif
 
 #ifdef HB_THREAD_OPTIMIZE_STACK
    #define HB_VM_STACK (*_pStack_)
