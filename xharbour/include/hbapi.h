@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.27 2002/08/08 19:36:07 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.28 2002/08/09 16:50:54 ronpinkas Exp $
  */
 
 /*
@@ -255,12 +255,14 @@ typedef struct _HB_BASEARRAY
 /* internal structure for codeblocks */
 typedef struct _HB_CODEBLOCK
 {
-   BYTE *   pCode;        /* codeblock pcode */
+   BYTE     *pCode;       /* codeblock pcode */
    PHB_ITEM pLocals;      /* table with referenced local variables */
    USHORT   uiLocals;     /* number of referenced local variables */
    PHB_SYMB pSymbols;     /* codeblocks symbols */
    ULONG    ulCounter;    /* numer of references to this codeblock */
    BOOL     dynBuffer;    /* is pcode buffer allocated dynamically */
+   PHB_ITEM **pGlobals;
+   short    iGlobals;
 } HB_CODEBLOCK, * PHB_CODEBLOCK, * HB_CODEBLOCK_PTR;
 
 typedef struct _HB_VALUE

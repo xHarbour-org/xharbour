@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.4 2002/01/12 10:04:28 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.5 2002/02/01 01:05:58 ronpinkas Exp $
  */
 
 /*
@@ -57,6 +57,9 @@
 #include "hbvm.h"
 #include "hbstack.h"
 
+extern PHB_ITEM **hb_vm_pGlobals;
+extern short hb_vm_iGlobals;
+
 /* Creates the codeblock structure
  *
  * pBuffer -> the buffer with pcodes (without HB_P_PUSHBLOCK)
@@ -73,6 +76,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
             PHB_SYMB pSymbols )
 {
    HB_CODEBLOCK_PTR pCBlock;
+
 
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockNew(%p, %hu, %p, %p)", pBuffer, uiLocals, pLocalPosTable, pSymbols));
 
@@ -183,6 +187,9 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
    pCBlock->pSymbols  = pSymbols;
    pCBlock->ulCounter = 1;
 
+   pCBlock->pGlobals  = hb_vm_pGlobals;
+   pCBlock->iGlobals  = hb_vm_iGlobals;
+
    HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
 
    return pCBlock;
@@ -211,6 +218,9 @@ HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
 
    pCBlock->pSymbols  = NULL; /* macro-compiled codeblock cannot acces a local symbol table */
    pCBlock->ulCounter = 1;
+
+   pCBlock->pGlobals  = hb_vm_pGlobals;
+   pCBlock->iGlobals  = hb_vm_iGlobals;
 
    HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
 
@@ -306,12 +316,20 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
 void hb_codeblockEvaluate( HB_ITEM_PTR pItem )
 {
    int iStatics = hb_stack.iStatics;
+   PHB_ITEM **Saved_pGlobals = hb_vm_pGlobals;
+   short      Saved_iGlobals = hb_vm_iGlobals;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockEvaluate(%p)", pItem));
+
+   hb_vm_pGlobals = pItem->item.asBlock.value->pGlobals;
+   hb_vm_iGlobals = pItem->item.asBlock.value->iGlobals;
 
    hb_stack.iStatics = pItem->item.asBlock.statics;
    hb_vmExecute( pItem->item.asBlock.value->pCode, pItem->item.asBlock.value->pSymbols );
    hb_stack.iStatics = iStatics;
+
+   hb_vm_pGlobals = Saved_pGlobals;
+   hb_vm_iGlobals = Saved_iGlobals;
 }
 
 /* Get local variable referenced in a codeblock

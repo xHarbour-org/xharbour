@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.16 2002/09/16 18:17:29 ronpinkas Exp $
+ * $Id: genc.c,v 1.17 2002/09/16 18:35:53 ronpinkas Exp $
  */
 
 /*
@@ -56,7 +56,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
    PCOMCLASS    pClass;
    FILE * yyc; /* file handle for C output */
    PINLINE pInline = hb_comp_inlines.pFirst;
-   PVAR pGlobal = hb_comp_pGlobals, pDelete;
+   PVAR pGlobal, pDelete;
    short iGlobals;
 
    BOOL bIsPublicFunction ;
@@ -238,12 +238,11 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
 
       if( hb_comp_pGlobals )
       {
-         PVAR pGlobal = hb_comp_pGlobals;
-
          fprintf( yyc, "\n#include \"hbapi.h\"\n\n" );
 
          iGlobals       = 0;
 
+         pGlobal = hb_comp_pGlobals;
          while( pGlobal )
          {
             if( pGlobal->szAlias == NULL )
@@ -261,7 +260,6 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          fprintf( yyc, "\nstatic PHB_ITEM pGlobals[] = {\n" );
 
          pGlobal = hb_comp_pGlobals;
-
          while( pGlobal )
          {
             fprintf( yyc, "                                &%s%c\n", pGlobal->szName, pGlobal->pNext ? ',' : ' ' );
@@ -269,9 +267,10 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
             pGlobal = pGlobal->pNext;
          }
 
-         fprintf( yyc, "                             };\n\n" );
-
-         fprintf( yyc, "extern PHB_ITEM *hb_vm_pGlobals;\n"
+         fprintf( yyc, "                             };\n"
+                       "static PHB_ITEM *pLiveStorage = pGlobals;\n"
+                       "\n"
+                       "extern PHB_ITEM **hb_vm_pGlobals;\n"
                        "extern short hb_vm_iGlobals;\n\n" );
       }
 
@@ -336,10 +335,10 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
 
          if( hb_comp_pGlobals )
          {
-            fprintf( yyc, "   PHB_ITEM *Saved_pGlobals = hb_vm_pGlobals;\n"
-                          "   short     Saved_iGlobals = hb_vm_iGlobals;\n"
+            fprintf( yyc, "   PHB_ITEM **Saved_pGlobals = hb_vm_pGlobals;\n"
+                          "   short      Saved_iGlobals = hb_vm_iGlobals;\n"
                           "\n"
-                          "   hb_vm_pGlobals = pGlobals;\n"
+                          "   hb_vm_pGlobals = (PHB_ITEM **) &pLiveStorage;\n"
                           "   hb_vm_iGlobals = %i;\n\n", iGlobals );
          }
 
@@ -449,6 +448,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
       pSym = hb_compSymbolKill( pSym );
    }
 
+   pGlobal = hb_comp_pGlobals;
    while( pGlobal )
    {
       pDelete = pGlobal;
@@ -2186,7 +2186,7 @@ static HB_GENC_FUNC( hb_p_pushglobal )
 
    if( cargo->bVerbose )
    {
-      fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, (USHORT) pFunc->pCode[ lPCodePos + 1 ] )->szName );
+      fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, (USHORT) pFunc->pCode[ lPCodePos + 1 ] + 1 )->szName );
    }
 
    fprintf( cargo->yyc, "\n" );
@@ -2201,7 +2201,22 @@ static HB_GENC_FUNC( hb_p_popglobal )
 
    if( cargo->bVerbose )
    {
-      fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, (USHORT) pFunc->pCode[ lPCodePos + 1 ] )->szName );
+      fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, (USHORT) pFunc->pCode[ lPCodePos + 1 ] + 1 )->szName );
+   }
+
+   fprintf( cargo->yyc, "\n" );
+
+   return 2;
+}
+
+static HB_GENC_FUNC( hb_p_pushglobalref )
+{
+   fprintf( cargo->yyc, "\tHB_P_PUSHGLOBALREF, %i,",
+            pFunc->pCode[ lPCodePos + 1 ] );
+
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, (USHORT) pFunc->pCode[ lPCodePos + 1 ] + 1 )->szName );
    }
 
    fprintf( cargo->yyc, "\n" );
@@ -2358,7 +2373,8 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_enumerate,
    hb_p_endenumerate,
    hb_p_pushglobal,
-   hb_p_popglobal
+   hb_p_popglobal,
+   hb_p_pushglobalref
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.17 2002/08/24 01:48:13 ronpinkas Exp $
+ * $Id: garbage.c,v 1.18 2002/09/16 05:34:02 ronpinkas Exp $
  */
 
 /*
@@ -448,7 +448,7 @@ void hb_gcCollect( void )
 */
 void hb_gcCollectAll( void )
 {
-   extern PHB_ITEM *hb_vm_pGlobals;
+   extern PHB_ITEM **hb_vm_pGlobals;
    extern short    hb_vm_iGlobals;
 
    short iGlobal;
@@ -487,7 +487,7 @@ void hb_gcCollectAll( void )
 
       for( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
       {
-         hb_gcItemRef( hb_vm_pGlobals[ iGlobal ] );
+         hb_gcItemRef( (*hb_vm_pGlobals)[ iGlobal ] );
       }
 
       HB_TRACE( HB_TR_INFO, ( "Locked Scan" ) );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.379 2002/09/16 18:17:27 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.380 2002/09/16 20:31:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-16 22:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+    + Added support for new HB_PUSHGLOBALREF
+    + Added PHB_ITEM *pLiveStorage to shadow pGlobals because BCC can't support &pGlobals
+     (apparantly because the static array is saved as constant ) so &pLiveStorage is used instead.
+    * Modified usage of hb_vm_pGlobals from PHB_ITEM* to PHB_ITEM** required for new GLOBAL by refernce support.
+
+  * include/hbapi.h
+    + Added members pGlobals and iGlobals to _HB_CODEBLOCK
+
+  * source/vm/codebloc.c
+    + Added support for GLOBALS refrenced in CodeBlocks.
+
+  * source/vm/hvm.c
+    + Added hb_vmPushGlobalByRef() to support new HB_P_PUSHGLOBALREF.
+    * Modified usage of hb_vm_pGlobals from PHB_ITEM* to PHB_ITEM** required for new GLOBAL by refernce support.
+
+  * source/vm/garbage.c
+    * Modified usage of hb_vm_pGlobals from PHB_ITEM* to PHB_ITEM**
 
 2002-09-16 13:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/global1.prg
