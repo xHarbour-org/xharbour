@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.6 2002/01/17 23:20:47 ronpinkas Exp $
+ * $Id: hbapiitm.h,v 1.7 2002/01/21 09:11:56 ronpinkas Exp $
  */
 
 /*
@@ -109,6 +109,7 @@ extern PHB_ITEM hb_itemPutNDLen ( PHB_ITEM pItem, double dNumber, int iWidth, in
 extern PHB_ITEM hb_itemPutNILen ( PHB_ITEM pItem, int iNumber, int iWidth );
 extern PHB_ITEM hb_itemPutNLLen ( PHB_ITEM pItem, long lNumber, int iWidth );
 extern PHB_ITEM hb_itemPutPtr   ( PHB_ITEM pItem, void * pValue );
+extern PHB_ITEM hb_itemPutPtrGC ( PHB_ITEM pItem, void * pValue );
 extern BOOL     hb_itemRelease  ( PHB_ITEM pItem );
 extern PHB_ITEM hb_itemReturn   ( PHB_ITEM pItem );
 extern ULONG    hb_itemSize     ( PHB_ITEM pItem );
