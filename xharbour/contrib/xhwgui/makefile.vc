@@ -1,13 +1,20 @@
-# $Id: makefile.vc,v 1.3 2003/12/01 12:57:38 lculik Exp $
+# $Id: makefile.vc,v 1.1 2004/02/19 02:35:42 lculik Exp $
 # makefile for Visual C++ 32 bits
 # Building of hwgui.lib - Harbour Win32 GUI library
 
 #.SUFFIXESS: .prg .lib .c .obj
 
-HRB_DIR = \harbour
+.prg.c:
+  $(HRB_DIR)\bin\harbour.exe $** -n -w -i$(HRB_DIR)\include -i$(INC_DIR) -d__WINDOWS__ -o$@
+
+.c.obj:
+  cl $(CFLAGS) /c /I$(INC_DIR) /I$(HRB_DIR)\include /TP /W3 /nologo /Fo$@ $**
+
+
+HRB_DIR = ..\..
 INC_DIR = include
-OBJ_DIR = obj
-LIB_DIR = lib
+OBJ_DIR = obj\vc
+LIB_DIR = lib\vc
 SRC_DIR = source
 
 all: \
@@ -25,7 +32,6 @@ $(LIB_DIR)\hwgui.lib :   \
    $(OBJ_DIR)\media_c.obj \
    $(OBJ_DIR)\menu_c.obj \
    $(OBJ_DIR)\message.obj \
-   $(OBJ_DIR)\misc.obj \
    $(OBJ_DIR)\registry.obj \
    $(OBJ_DIR)\resource.obj \
    $(OBJ_DIR)\richedit.obj \
@@ -34,7 +40,7 @@ $(LIB_DIR)\hwgui.lib :   \
    $(OBJ_DIR)\window.obj \
    $(OBJ_DIR)\wprint.obj \
    $(OBJ_DIR)\drawwidg.obj \
-   $(OBJ_DIR)\errorsys.obj \
+   $(OBJ_DIR)\herrosys.obj \
    $(OBJ_DIR)\guimain.obj \
    $(OBJ_DIR)\hbrowse.obj \
    $(OBJ_DIR)\hcheck.obj \
@@ -101,7 +107,7 @@ $(OBJ_DIR)\wprint.obj   : $(SRC_DIR)\wprint.c
   cl $(CFLAGS) /c /I$(INC_DIR) /I$(HRB_DIR)\include /TP /W3 /nologo /Fo$@ $**
 
 $(OBJ_DIR)\drawwidg.obj : $(OBJ_DIR)\drawwidg.c
-$(OBJ_DIR)\errorsys.obj : $(OBJ_DIR)\errorsys.c
+$(OBJ_DIR)\herrosys.obj : $(OBJ_DIR)\herrosys.c
 $(OBJ_DIR)\guimain.obj  : $(OBJ_DIR)\guimain.c
 $(OBJ_DIR)\hbrowse.obj  : $(OBJ_DIR)\hbrowse.c
 $(OBJ_DIR)\hcheck.obj   : $(OBJ_DIR)\hcheck.c
@@ -131,7 +137,7 @@ $(OBJ_DIR)\video.obj     : $(OBJ_DIR)\video.c
 $(OBJ_DIR)\tmci.obj     : $(OBJ_DIR)\tmci.c
 $(OBJ_DIR)\repexec.obj  : $(OBJ_DIR)\repexec.c
 
-$(OBJ_DIR)\errorsys.c   : $(SRC_DIR)\errorsys.prg
+$(OBJ_DIR)\herrosys.c   : $(SRC_DIR)\herrosys.prg
   $(HRB_DIR)\bin\harbour.exe $** -n -w -i$(HRB_DIR)\include -i$(INC_DIR) -d__WINDOWS__ -o$@
 $(OBJ_DIR)\hdialog.c    : $(SRC_DIR)\hdialog.prg
   $(HRB_DIR)\bin\harbour.exe $** -n -w -i$(HRB_DIR)\include -i$(INC_DIR) -d__WINDOWS__ -o$@
@@ -193,6 +199,7 @@ $(OBJ_DIR)\hgraph.c     : $(SRC_DIR)\hgraph.prg
   $(HRB_DIR)\bin\harbour.exe $** -n -w -i$(HRB_DIR)\include -i$(INC_DIR) -d__WINDOWS__ -o$@
 
 $(LIB_DIR)\procmisc.lib : \
+   $(OBJ_DIR)\misc.obj \
    $(OBJ_DIR)\arr2str.obj \
    $(OBJ_DIR)\blowfish.obj \
    $(OBJ_DIR)\procini.obj \
@@ -208,10 +215,15 @@ $(OBJ_DIR)\procscri.c   : $(SRC_DIR)\procmisc\procscri.prg
   $(HRB_DIR)\bin\harbour.exe $** -n -w -i$(HRB_DIR)\include -i$(INC_DIR) -d__WINDOWS__ -o$@
 
 $(OBJ_DIR)\arr2str.obj  : $(SRC_DIR)\procmisc\arr2str.c
+  cl $(CFLAGS) /c /I$(INC_DIR) /I$(HRB_DIR)\include /TP /W3 /nologo /Fo$@ $**
 $(OBJ_DIR)\blowfish.obj : $(SRC_DIR)\procmisc\blowfish.c
+  cl $(CFLAGS) /c /I$(INC_DIR) /I$(HRB_DIR)\include /TP /W3 /nologo /Fo$@ $**
 $(OBJ_DIR)\procini.obj  : $(OBJ_DIR)\procini.c
+  cl $(CFLAGS) /c /I$(INC_DIR) /I$(HRB_DIR)\include /TP /W3 /nologo /Fo$@ $**
 $(OBJ_DIR)\procs7.obj   : $(OBJ_DIR)\procs7.c
+  cl $(CFLAGS) /c /I$(INC_DIR) /I$(HRB_DIR)\include /TP /W3 /nologo /Fo$@ $**
 $(OBJ_DIR)\procscri.obj : $(OBJ_DIR)\procscri.c
+  cl $(CFLAGS) /c /I$(INC_DIR) /I$(HRB_DIR)\include /TP /W3 /nologo /Fo$@ $**
 
 $(LIB_DIR)\hwg_qhtm.lib : \
    $(OBJ_DIR)\hqhtm.obj \
@@ -223,11 +235,5 @@ $(OBJ_DIR)\hqhtm.c    : $(SRC_DIR)\qhtm\hqhtm.prg
 
 $(OBJ_DIR)\hqhtm.obj  : $(OBJ_DIR)\hqhtm.c
 $(OBJ_DIR)\hwg_qhtm.obj  : $(SRC_DIR)\qhtm\hwg_qhtm.c
-  cl $(CFLAGS) /c /I$(INC_DIR) /I$(HRB_DIR)\include /TP /W3 /nologo /Fo$@ $**
-
-.prg.c:
-  $(HRB_DIR)\bin\harbour.exe $** -n -w -i$(HRB_DIR)\include -i$(INC_DIR) -d__WINDOWS__ -o$@
-
-.c.obj:
   cl $(CFLAGS) /c /I$(INC_DIR) /I$(HRB_DIR)\include /TP /W3 /nologo /Fo$@ $**
 

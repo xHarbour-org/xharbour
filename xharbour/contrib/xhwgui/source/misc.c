@@ -1,5 +1,5 @@
 /*
- *$Id: misc.c,v 1.2 2004/02/07 15:24:22 lculik Exp $
+ *$Id: misc.c,v 1.1 2004/02/19 02:35:44 lculik Exp $
  * HWGUI - Harbour Win32 GUI library source code:
  * Miscellaneous functions
  *
@@ -13,6 +13,7 @@
 #define OEMRESOURCE
 #include <windows.h>
 #include <commctrl.h>
+#include "hbmath.h"
 #include "hbapifs.h"
 #include "hbapiitm.h"
 #include "hbvm.h"
@@ -207,7 +208,7 @@ HB_FUNC ( GETCURRENTDIR )
 {
    BYTE pbyBuffer[ _POSIX_PATH_MAX + 1 ];
    GetCurrentDirectory( _POSIX_PATH_MAX, ( char * ) pbyBuffer );
-   hb_retc( pbyBuffer );
+   hb_retc( ( char *) pbyBuffer );
 }
 
 HB_FUNC ( WINEXEC )
@@ -220,7 +221,7 @@ HB_FUNC ( GETKEYBOARDSTATE )
    BYTE lpbKeyState[256];
    GetKeyboardState( lpbKeyState );
    lpbKeyState[255] = '\0';
-   hb_retclen( lpbKeyState,255 );
+   hb_retclen( ( char *) lpbKeyState,255 );
 }
 
 /* Functions Contributed  By Luiz Rafael Culik Guimaraes( culikr@uol.com.br) */

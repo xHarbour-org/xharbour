@@ -3,8 +3,8 @@
 
 HRB_DIR = ..\..
 INCLUDE_DIR = include;$(HRB_DIR)\include
-OBJ_DIR = ..\..\obj\b32
-LIB_DIR = ..\..\lib\b32
+OBJ_DIR = obj\b32
+LIB_DIR = lib\b32
 SRC_DIR = source
 #C_DEFINES= -DHB_THREAD_SUPPORT
 #H_DEFINES= -DHB_THREAD_SUPPORT
