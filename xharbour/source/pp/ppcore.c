@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.173 2004/10/06 02:06:40 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.174 2004/10/20 03:14:41 ronpinkas Exp $
  */
 
 /*
@@ -859,7 +859,9 @@ int hb_pp_ParseDirective( char * sLine )
         char cDelimChar;
 
         // Ron Pinkas added Oct-16-2004 to allow support of #defines #translates etc.
+        szExpandedLine[0] = '\0';
         hb_pp_ParseExpression( sLine, szExpandedLine );
+
         if( szExpandedLine[0] )
         {
            strcpy( sLine, szExpandedLine );
@@ -871,6 +873,7 @@ int hb_pp_ParseDirective( char * sLine )
         }
 
         cDelimChar = *sLine;
+
         if( cDelimChar == '<' )
         {
            cDelimChar = '>';
@@ -1146,9 +1149,10 @@ static int ParseIfdef( char * sLine, int usl )
 
   HB_TRACE(HB_TR_DEBUG, ("ParseIfdef(%s, %d)", sLine, usl));
 
-  if( hb_pp_nCondCompile==0 || hb_pp_aCondCompile[hb_pp_nCondCompile-1])
+  if( hb_pp_nCondCompile==0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] )
   {
      NextWord( &sLine, defname, FALSE );
+
      if( *defname == '\0' )
      {
         hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_DEFINE_ABSENT, NULL, NULL );
@@ -1158,19 +1162,18 @@ static int ParseIfdef( char * sLine, int usl )
   if( hb_pp_nCondCompile == s_maxCondCompile )
   {
       s_maxCondCompile += 5;
-      hb_pp_aCondCompile = (int*)hb_xrealloc( hb_pp_aCondCompile, sizeof( int ) * s_maxCondCompile );
+      hb_pp_aCondCompile = (int*) hb_xrealloc( hb_pp_aCondCompile, sizeof( int ) * s_maxCondCompile );
   }
 
-  if( hb_pp_nCondCompile==0 || hb_pp_aCondCompile[hb_pp_nCondCompile-1])
+  if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] )
   {
-      if( ( (stdef = DefSearch(defname,NULL)) != NULL && usl )
-           || ( stdef == NULL && !usl ) )
+      if( ( ( stdef = DefSearch(defname,NULL)) != NULL && usl ) || ( stdef == NULL && !usl ) )
       {
-         hb_pp_aCondCompile[hb_pp_nCondCompile] = 1;
+         hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 1;
       }
       else
       {
-         hb_pp_aCondCompile[hb_pp_nCondCompile] = 0;
+         hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 0;
       }
   }
   else
