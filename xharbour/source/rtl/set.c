@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.49 2004/05/20 04:38:14 peterrees Exp $
+ * $Id: set.c,v 1.50 2004/07/18 14:29:55 lculik Exp $
  */
 
 /*
@@ -1550,13 +1550,14 @@ void hb_setInitialize( void )
    hb_set.HB_SET_UNIQUE = FALSE;
    hb_set.HB_SET_VIDEOMODE = 0;
 
-#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
    hb_set.HB_SET_FILECASE = HB_SET_CASE_MIXED;
    hb_set.HB_SET_DIRCASE = HB_SET_CASE_MIXED;
+
+#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
    hb_set.HB_SET_DIRSEPARATOR = '/';
 #else
-   hb_set.HB_SET_FILECASE = HB_SET_CASE_LOWER;
-   hb_set.HB_SET_DIRCASE = HB_SET_CASE_LOWER;
+//   hb_set.HB_SET_FILECASE = HB_SET_CASE_LOWER;
+//   hb_set.HB_SET_DIRCASE = HB_SET_CASE_LOWER;
    hb_set.HB_SET_DIRSEPARATOR = '\\';
 #endif
 

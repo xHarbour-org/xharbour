@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3165 2004/07/18 14:35:28 lculik Exp $
+ * $Id: ChangeLog,v 1.3166 2004/07/18 17:55:58 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-07-19 15:50 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/set.c
+    - default HB_SET_FILECASE/DIRCASE for all platforms is now HB_SET_CASE_MIXED
 
 2004-07-18 10:54 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/pp/ppcore.c
