@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2048 2004/01/13 00:14:17 andijahja Exp $
+ * $Id: ChangeLog,v 1.2049 2004/01/13 06:22:19 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-13 16:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * xharbour/source/rtl/gtwvt/gtwvt.c
+     + Wvt_DrawGridHorz( nTop, nLeft, nRight, nRows )
+       Draws horizontal grid begining nTop through nTop + nRows with the
+       pen set with Wvt_SetPen()
+
+     + Wvt_DrawGridVert( nTop, nBottom, aCols, nCols )
+       Draws vertical grid begining aCols[ 1 ] through aCols[ n ] with the
+       pen set with Wvt_SetPen().
+
+   * xharbour/tests/wvtgui.prg
+     Enhanced . Press F5 repeatedly to bring GUI TBrowse in focus. It 
+     exploits above two functions to draw hotizontal and vertical grid.
+
+   * xharbour/source/rtl/tbrowse.prg
+     + DATA aColumnsSep, an array to hold the nColumn where seperator is 
+       displayed. This array is used to draw vertical grid of GUI Tbrowse above.
 
 2004-01-12 22:21 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * tests/wvtgui.PRG
