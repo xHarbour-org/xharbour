@@ -1,6 +1,6 @@
 ************************************************************
 * threadstress.prg
-* $Id: logtest.prg,v 1.4 2003/07/14 08:00:23 jonnymind Exp $
+* $Id: mtstress.prg,v 1.1 2003/07/14 19:18:47 jonnymind Exp $
 *
 * Stresstest for thread programs
 * Stress all those feature that are thread-critical:
@@ -47,6 +47,7 @@ PROCEDURE Stress( nId, nRow )
    LOCAL cData, aData
    LOCAL nCount
    LOCAL cRndVal
+   LOCAL oTest
    PRIVATE cRnd
    //PRIVATE cMemVal
 
@@ -55,8 +56,8 @@ PROCEDURE Stress( nId, nRow )
    cRndVal := "ABCDEFGHILMNOPQRSTUVZ"
    //Step 1: foreach test
 
-   aData := Array( 1000 )
-   FOR nCount := 1 TO 1000
+   aData := Array( 10000 )
+   FOR nCount := 1 TO 10000
       aData[ nCount ] := cRndVal[ Int( HB_Random(1, 21) ) ]
       @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Foreach pre-test " +;
           Alltrim( Str( nCount ) )
@@ -70,12 +71,31 @@ PROCEDURE Stress( nId, nRow )
       nCount ++
    NEXT
 
-   // Step 1: private test
+   // generates garbage
+   aData:= NIL
+
+   // STEP 2: With object test.
+   @nRow,5 SAY Space( 80 )
+
+   oTest := TTest():New()
+   WITH OBJECT oTest
+
+      FOR nCount := 1 TO 10000
+         cData := :cFirst[ Int( HB_Random(1, 21) ) ] + :cSecond[ Int( HB_Random(1, 21)) ] + ;
+               :cThird[ Int( HB_Random(1, 21) ) ] + :cFuorth[ Int( HB_Random(1, 21) ) ]
+         @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" With Object test " +;
+            Alltrim( Str( nCount ) ) + ": " + cData
+         nCount ++
+      NEXT
+
+   END
+
+   // Step 3: private test
 
    @nRow,5 SAY Space( 80 )
 
    m->cMemVal := "XXX"
-   FOR nCount := 1 TO 1000
+   FOR nCount := 1 TO 10000
       m->cMemVal := m->cRnd[ Int( HB_Random(1, 21) ) ]
       m->cMemVal += m->cRnd[ Int( HB_Random(1, 21) ) ]
       m->cMemVal += m->cRnd[ Int( HB_Random(1, 21) ) ]
@@ -85,10 +105,10 @@ PROCEDURE Stress( nId, nRow )
    NEXT
 
 
-   // Step 2: Public Memvar test
+   // Step 4: Public Memvar test
 
    @nRow,5 SAY Space( 80 )
-   FOR nCount := 1 TO 1000
+   FOR nCount := 1 TO 10000
       m->var1 := m->cRnd[ Int( HB_Random(1, 21) ) ]
       m->var1 += m->cRnd[ Int( HB_Random(1, 21) ) ]
       m->var1 += m->cRnd[ Int( HB_Random(1, 21) ) ]
@@ -97,9 +117,9 @@ PROCEDURE Stress( nId, nRow )
        Alltrim( Str( nCount ) ) + ": "+m->var1
    NEXT
 
-   // Step 3: macro test
+   // Step 5: macro test
    @nRow,5 SAY Space( 80 )
-   FOR nCount := 1 TO 1000
+   FOR nCount := 1 TO 10000
       cData := "cRndMem := cRnd[ Int( HB_Random(1, 21) ) ] + cRnd[ Int( HB_Random(1, 21) ) ] + cRnd[ Int( HB_Random(1, 21) ) ]"
       &cData
       @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Macro test " +;
@@ -107,6 +127,7 @@ PROCEDURE Stress( nId, nRow )
    NEXT
 
 RETURN
+
 
 PROCEDURE Collector( nRow )
    LOCAL nCount
@@ -125,3 +146,19 @@ PROCEDURE Collector( nRow )
 
 RETURN
 
+
+CLASS TTest
+   DATA cFirst
+   DATA cSecond
+   DATA cThird
+   DATA cFuorth
+
+   METHOD New()
+ENDCLASS
+
+METHOD New()
+   ::cFirst  := "ABCDEFGHILMNOPQRSTUVZ"
+   ::cSecond := "ABCDEFGHILMNOPQRSTUVZ"
+   ::cThird  := "ABCDEFGHILMNOPQRSTUVZ"
+   ::cFuorth := "ABCDEFGHILMNOPQRSTUVZ"
+RETURN Self

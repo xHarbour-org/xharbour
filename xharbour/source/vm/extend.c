@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.24 2003/07/13 18:15:40 walito Exp $
+ * $Id: extend.c,v 1.25 2003/07/14 19:18:47 jonnymind Exp $
  */
 
 /*
@@ -78,7 +78,7 @@
 #include "hbapiitm.h"
 #include "hbset.h"
 #include "hbdate.h"
-#include "hbstack.h"
+#include "thread.h"
 
 /* NOTE: iParam = -1 can be used to access the return value. */
 /* NOTE: iParam = 0 can be used to access the SELF object. */
@@ -1067,8 +1067,6 @@ void HB_EXPORT hb_stornll( LONGLONG llNumber, int iParam, ... )
 /* LONGLONG support */
 LONGLONG  HB_EXPORT hb_parnll( int iParam, ... )
 {
-   HB_THREAD_STUB
-   
    HB_TRACE(HB_TR_DEBUG, ("hb_parnll(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )

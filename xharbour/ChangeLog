@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1248 2003/07/14 21:37:06 walito Exp $
+ * $Id: ChangeLog,v 1.1249 2003/07/14 23:27:54 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-07-15 02:15 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hbxml.c
+  * source/vm/extend.c
+    ! Fixed compilation warnings
+
+  * tests/mtstress.prg
+    ! Added WITH OBJECT TEST
+    ! Tests are now 10000 for test type, for higher stress :-)
 
 2003-07-15 01:25 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/estack.c

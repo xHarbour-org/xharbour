@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.5 2003/06/24 11:32:35 andijahja Exp $
+ * $Id: hbxml.c,v 1.6 2003/06/30 23:06:27 jonnymind Exp $
  */
 
 /*
@@ -125,7 +125,7 @@ static void hbxml_doc_new_node( PHB_ITEM pDoc, int amount )
 PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
 {
    PHB_ITEM pRet;
-   int chr, quotechr;
+   int chr, quotechr = '"';
    char buf_name[ MXML_MAX_NAME_LEN + 1];
    char buf_attrib[ MXML_MAX_NAME_LEN *2 + 1];
    int iPosn = 0, iPosa = 0;
@@ -587,7 +587,7 @@ static void mxml_node_read_data( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc, 
    int iPos = 0;
    int chr;
    HB_ITEM hbtemp;
-   int iStatus = 0, iPosAmper;
+   int iStatus = 0, iPosAmper = 0;
 
    chr = mxml_refil_getc( ref );
    while ( chr != MXML_EOF ) {
