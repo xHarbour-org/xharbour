@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclienthttp.prg,v 1.4 2003/11/22 15:10:22 jonnymind Exp $
+* $Id: tipclienthttp.prg,v 1.5 2003/11/28 23:56:46 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -22,12 +22,18 @@ CLASS tIPClientHTTP FROM tIPClient
    DATA nSubversion
    DATA bChunked
    DATA hHeaders     INIT  {=>}
+   DATA hCookies     INIT  {=>}
+   DATA hFields      INIT  {=>}
+   DATA cUserAgent   INIT  "Mozilla/3.0 (compatible XHarbour-Tip/1.0)"
 
    METHOD New()
    METHOD GetRequest( cQuery )
    METHOD PostRequest( cQuery, cPostData )
    METHOD ReadHeaders()
    METHOD Read( nLen )
+
+HIDDEN:
+   METHOD StandardFields()
 
 ENDCLASS
 
@@ -40,9 +46,8 @@ RETURN Self
 
 
 METHOD GetRequest( cQuery ) CLASS tIPClientHTTP
-   InetSendAll( ::SocketCon, "GET " + cQuery + " HTTP/1.0" + ::cCRLF )
-   InetSendAll( ::SocketCon, "Host: " + ::oUrl:cServer + ::cCRLF )
-   InetSendAll( ::SocketCon, "Connection: close" + ::cCRLF )
+   InetSendAll( ::SocketCon, "GET " + cQuery + " HTTP/1.1" + ::cCRLF )
+   ::StandardFields()
    InetSendAll( ::SocketCon, ::cCRLF )
    IF InetErrorCode( ::SocketCon ) ==  0
       RETURN ::ReadHeaders()
@@ -52,8 +57,7 @@ RETURN .F.
 
 METHOD PostRequest( cQuery, cPostData ) CLASS tIPClientHTTP
    InetSendAll( ::SocketCon, "POST " + cQuery + " HTTP/1.1" + ::cCRLF )
-   InetSendAll( ::SocketCon, "Host: " + ::oUrl:cServer + ::cCRLF )
-   InetSendAll( ::SocketCon, "Connection: close" + ::cCRLF )
+   ::StandardFields()
    InetSendAll( ::SocketCon, "Content-Length: " + ;
          LTrim(Str( Len( cPostData ) ) ) + ::cCRLF )
    InetSendAll( ::SocketCon, ::cCRLF )
@@ -64,9 +68,38 @@ METHOD PostRequest( cQuery, cPostData ) CLASS tIPClientHTTP
 RETURN .F.
 
 
+METHOD StandardFields() CLASS tIPClientHTTP
+   LOCAL iCount
+
+   InetSendAll( ::SocketCon, "Host: " + ::oUrl:cServer + ::cCRLF )
+   InetSendAll( ::SocketCon, "User-agent: " + ::cUserAgent + ::cCRLF )
+   InetSendAll( ::SocketCon, "Connection: close" + ::cCRLF )
+
+   // send cookies
+   IF ! Empty( ::hCookies )
+      InetSendAll( ::SocketCon, "Cookie: " )
+      FOR iCount := 1 TO Len( ::hCookies ) - 1
+         InetSendAll( ::SocketCon, HGetKeyAt( ::hCookies, iCount ) +;
+            "=" + HGetValueAt( ::hCookies, iCount ) +"; ")
+      NEXT
+      iCount = Len( ::hCookies )
+      InetSendAll( ::SocketCon, HGetKeyAt( ::hCookies, iCount ) +;
+         "=" + HGetValueAt( ::hCookies, iCount ) + ::cCRLF)
+   ENDIF
+
+   //Send optional Fields
+   FOR iCount := 1 TO Len( ::hFields )
+      InetSendAll( ::SocketCon, HGetKeyAt( ::hFields, iCount ) +;
+         ": " + HGetValueAt( ::hFields, iCount ) + ::cCRLF )
+   NEXT
+
+RETURN .T.
+
+
+
 METHOD ReadHeaders() CLASS tIPClientHTTP
    LOCAL cLine, nPos, aVersion
-   LOCAL aHead
+   LOCAL aHead, aCookie, cCookie
 
    // Now reads the fields and set the content lenght
    cLine := InetRecvLine( ::SocketCon, @nPos, 500 )
@@ -103,14 +136,27 @@ METHOD ReadHeaders() CLASS tIPClientHTTP
 
       ::hHeaders[ aHead[1] ] := LTrim(aHead[2])
 
-      IF At( "content-length:", lower(cLine) ) > 0
-         cLine := Substr( cLine, 16 )
-         ::nLength := Val( cLine )
-      ELSEIF At( "transfer-encoding:", lower(cLine) ) > 0
-         IF At( "chunked", lower( cLine ) ) > 0
-            ::bChunked := .T.
-         ENDIF
-      ENDIF
+      DO CASE
+
+         CASE lower( aHead[1] ) == "content-length:"
+            cLine := Substr( cLine, 16 )
+            ::nLength := Val( cLine )
+
+         CASE lower( aHead[1] ) == "transfer-encoding:"
+            IF At( "chunked", lower( cLine ) ) > 0
+               ::bChunked := .T.
+            ENDIF
+
+         CASE lower( aHead[1] ) == "set-cookie:"
+            aCookie := HB_RegexSplit( ";", aHead[2] )
+            FOR EACH cCookie IN aCookie
+               aCookie := HB_RegexSplit( "=", cCookie, 1)
+               IF Len( aCookie ) == 2
+                  ::hCookie[ aCookie[1] ] := aCookie[2]
+               ENDIF
+            NEXT
+
+      ENDCASE
       cLine := InetRecvLine( ::SocketCon, @nPos, 500 )
    ENDDO
 

@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.14 2003/11/28 16:05:40 jonnymind Exp $
+ * $Id: Changelog,v 1.15 2003/11/28 23:56:46 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-29 04:23 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * tipclienthttp.prg
+    + Added field ::cUserAgent to mimic various User-Agents
+    + Added automatic cookie setting (and eventually re-sending) in
+      field ::hCookie
+    + Added custom request header fields in ::hFields
+    * NOTE: Probably this name will change.
 
 2003-11-29 00:59 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * tipclienthttp.prg
