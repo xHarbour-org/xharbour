@@ -1,5 +1,5 @@
 /*
- * $Id: ofile.prg,v 1.1 2001/12/25 16:51:58 lculik Exp $
+ * $Id: ofile.prg,v 1.1 2003/02/23 23:15:17 lculik Exp $
  */
 
 /*
@@ -82,9 +82,8 @@ CLASS FileBase      // ALIAS FB
 
    METHOD Open( nMode )
 
-   METHOD CLOSE() INLINE Fclose( ::Handle )
-
-   METHOD ::Handle := - 999
+   METHOD CLOSE() INLINE Fclose( ::Handle ),;
+          ::Handle := - 999
 
    METHOD RENAME( c ) INLINE Frename( ::File, c ) == 0
 
