@@ -1,5 +1,5 @@
 /*
- * $Id: xPad.prg,v 1.14 2002/11/20 06:03:15 what32 Exp $
+ * $Id: xPad.prg,v 1.15 2003/01/09 08:22:38 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -2511,7 +2511,7 @@ METHOD OnMouseMove(x,y,fwKeys)
 
   If ::Selecting
 
-    If x > 35534   // arbitrary but less than 65534 (C4W problem)
+    If x > 35534
       ::Left()
     ElseIf x > ::xWnd
       ::Right()
@@ -2519,7 +2519,7 @@ METHOD OnMouseMove(x,y,fwKeys)
       ::xPos:=Int(x/::cxChar)+1
     EndIf
 
-    If y > 35534  // arbitrary but less than 65534  (C4W problem)
+    If y > 35534
       ::up()
     ElseIf y > ::yWnd
       ::down()

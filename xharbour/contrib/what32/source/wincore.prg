@@ -455,7 +455,6 @@ FUNCTION MakeDlgTemplate( cTitle, nStyle , x, y, nWidth, nHeight, nPointSize, ;
 
 
    // Prepare the template array
-   // NOTE: internally not compatible with C4W
    // Element 1: dialog template
    // Elements 2-12: Properties of an item (each elemet - different property)
 
@@ -474,7 +473,6 @@ FUNCTION MakeDlgTemplate( cTitle, nStyle , x, y, nWidth, nHeight, nPointSize, ;
       //  acnDlg+=DS_SETFONT
    EndIf
 
-   // The array layout is different from the C4W one !!!
    // But the programming interface and the result is the same.
 
    aAdd( aDlg[ 1 ] , If( Empty( nHelpId ) , 0, nHelpId ) )   // new
