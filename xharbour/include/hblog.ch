@@ -1,5 +1,5 @@
 /*
- * $Id: hblog.ch,v 1.1 2003/07/10 10:48:58 jonnymind Exp $
+ * $Id: hblog.ch,v 1.2 2003/07/13 19:34:33 jonnymind Exp $
  */
 
 /*
@@ -58,26 +58,38 @@
 // a pretty high number  that should log any debug level
 #define HB_LOG_ALL         9999
 
-#define HB_LOG_ST_DATE     1
-#define HB_LOG_ST_TIME     2
-#define HB_LOG_ST_SECS     4
-#define HB_LOG_ST_LEVEL    8
-#define HB_LOG_ST_ISODATE  16
+#define HB_LOG_ST_DATE     0x0001
+#define HB_LOG_ST_TIME     0x0002
+#define HB_LOG_ST_SECS     0x0004
+#define HB_LOG_ST_LEVEL    0x0008
+#define HB_LOG_ST_ISODATE  0x0010
+#define HB_LOG_ST_NAME     0x0020
 
-#xcommand INIT LOG [ON] <data,...> [NAME <cName>] => ;
-    #xtranslate CONSOLE => HB_LogConsole():New(, <(cName)> );;
-    #xtranslate CONSOLE( <nPrio> )=> HB_LogConsole():New( <nPrio>, <(cName)> );;
-    #xtranslate SYSLOG => HB_LogSyslog():New(, <(cName)> );;
-    #xtranslate SYSLOG( <nPrio>[, <nId>] )=> HB_LogSyslog():New( <nPrio>, <(cName)>, <nId> );;
-    #xtranslate FILE( <cFname> [, <nPrio>[,<nMaxSize>[, <nBackup>]]] )=> ;
-         HB_LogFile():New( <nPrio>, <cName>, <cFname>, <nMaxSize>, <nBackup> );;
-    #xtranslate EMAIL( <nPrio>, <cHelo>, <cServer>, <cDest> [, <cSubject> [,<cFrom>]] ) =>;
-         HB_LogEmail():New( <nPrio>, <cName>, <cServer>, <cDest>,;
-                <cFrom>, <cSubject>, <cHelo> ) ;;
-    #xtranslate MONITOR => HB_LogInetPort():New(, <(cName)> );;
-    #xtranslate MONITOR( <nPrio> [,<nPort>] )=>;
-             HB_LogInetPort():New( <nPrio>, <(cName)>, <nPort> );;
-    HB_InitStandardLog( <data> );;
+#xcommand INIT LOG [ON] ;
+   [<fil: FILE> ([<nFilPrio> [,<cFileName>[,<nFileSize>[,<nFileCount>]]]])] ;
+   [<con: CONSOLE> ([<nConPrio>])] ;
+   [<mon: MONITOR> ([<nMonPrio>[,<nMonPort>]])] ;
+   [<sys: SYSLOG> ([<nSysPrio>[,<nSysId>]])] ;
+   [<ema: EMAIL> ([<nEmaPrio> [,<cHelo>[,<cServer>[,<cDest>[,<cSubject>[,<cFrom>]]]]]])] ;
+   [NAME <cName>]=>;
+   HB_InitStandardLog() ;;
+   if <.con.>;;
+      HB_StandardLogAdd( HB_LogConsole():New( <nConPrio> ));;
+   endif;;
+   if <.fil.> ;;
+      HB_StandardLogAdd( HB_LogFile():New( <nFilPrio>, <cFileName> ));;
+   endif ;;
+   if <.mon.> ;;
+      HB_StandardLogAdd( HB_LogInetPort():New( <nMonPrio>, <nMonPort> ));;
+   endif ;;
+   if <.sys.> ;;
+      HB_StandardLogAdd( HB_LogSyslog():New( <nSysPrio>, <nSysId> ));;
+   endif ;;
+   if <.ema.> ;;
+      HB_StandardLogAdd( HB_LogEmail():New( <nEmaPrio> ,<cHelo>,<cServer>,<cDest>,<cSubject>,<cFrom>));;
+   endif;;
+   HB_OpenStandardLog()
+
 
 #xcommand SET LOG STYLE <nStyle> => HB_SetStandardLogStyle( <nStyle> )
 

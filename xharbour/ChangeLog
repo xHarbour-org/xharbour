@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1274 2003/07/22 01:54:27 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1275 2003/07/22 09:40:42 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2003-07-22 13:35 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hblog.prg
+  * source/rtl/hbloginet.prg
+  * include/hblog.ch
+    ! Fixed name clashes in hblog.ch.
+    * Grammar declaration of INIT LOG is a little more strict
+    
 2003-07-22 06:30 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * contrib/rdd_ads/ads1.c
   * contrib/rdd_ads/adsfunc.c

@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.4 2003/07/17 19:19:41 jonnymind Exp $
+* $Id: hblog.prg,v 1.5 2003/07/17 20:49:33 jonnymind Exp $
 */
 
 /*
@@ -94,7 +94,11 @@ PROCEDURE HB_InitStandardLog( ... )
    #ifdef HB_THREAD_SUPPORT
       MutexUnlock( StdLogMutex )
    #endif
+RETURN
 
+
+PROCEDURE HB_OpenStandardLog()
+   LOCAL nCount
 
    // This avoid using the LOG mutex to open the logs, as each
    // log channel could have his own mutexes, and could be subject
@@ -103,7 +107,6 @@ PROCEDURE HB_InitStandardLog( ... )
    FOR nCount := 1 TO PCount()
       HB_Pvalue( nCount ):Open()
    NEXT
-
 RETURN
 
 
@@ -179,7 +182,12 @@ FUNCTION HB_BldLogMsg( ... )
    LOCAL cMsg := ""
 
    FOR nCount := 1 TO PCount()
-      cMsg += CStr( HB_PValue( nCount ) )
+      IF ValType( nCount ) == "N"
+         cMsg += AllTrim( CStr( HB_PValue( nCount ) ) )
+      ELSE
+         cMsg += CStr( HB_PValue( nCount ) )
+      ENDIF
+
       IF nCount < PCount()
          cMsg += " "
       ENDIF
@@ -198,6 +206,7 @@ RETURN  Str(Year( dToday ), 4 ) +"-"+ Padl( Month( dToday ) , 2, "0" ) +;
 ***********************************************/
 
 CLASS HB_Logger
+   DATA cProgName
    DATA aLogToChannel                  INIT  {}
    DATA nStyle                         INIT  -1
    DATA nDefaultPriority               INIT  HB_LOG_INFO
@@ -236,8 +245,12 @@ RETURN Self
 METHOD Open() CLASS HB_Logger
    LOCAL oChannel
 
+   IF ::cProgName == NIL
+      HB_FnameSplit( hb_argv(0),,@::cProgName )
+   ENDIF
+
    FOR EACH oChannel IN ::aLogToChannel
-      oChannel:Open()
+      oChannel:Open( ::cProgName )
    NEXT
 
 RETURN NIL
@@ -249,8 +262,12 @@ RETURN NIL
 METHOD Close() CLASS HB_Logger
    LOCAL oChannel
 
+   IF ::cProgName == NIL
+      HB_FnameSplit( hb_argv(0),,@::cProgName )
+   ENDIF
+
    FOR EACH oChannel IN ::aLogToChannel
-      oChannel:Close()
+      oChannel:Close( ::cProgName )
    NEXT
 
 RETURN NIL
@@ -270,7 +287,7 @@ METHOD Log( cMessage, nPriority ) CLASS HB_Logger
    FOR EACH oChannel IN ::aLogToChannel
       /* Channels may want to have something to say about the format,
          so message formatting is done by the channels */
-      oChannel:Log( ::nStyle, cMessage, nPriority )
+      oChannel:Log( ::nStyle, cMessage, ::cProgName, nPriority )
    NEXT
 
 RETURN NIL
@@ -280,20 +297,19 @@ RETURN NIL
 ***********************************************/
 
 CLASS HB_LogChannel
-   DATA cProgramName
    DATA lOpened                  INIT .F.
 
-   METHOD New( nLevel, cName )   CONSTRUCTOR
-   METHOD Open()                 VIRTUAL
-   METHOD Close()                VIRTUAL
+   METHOD New( nLevel )          CONSTRUCTOR
+   METHOD Open( cName )          VIRTUAL
+   METHOD Close( cName )         VIRTUAL
 
    METHOD Log( cMessage, nPriority )
    METHOD SetActive( lAct )      INLINE   ::lActive := lAct
 
-   METHOD Format( nStyle, cMessage, nPriority )
+   METHOD Format( nStyle, cMessage, cName, nPriority )
 
 PROTECTED:
-   METHOD Send( nStyle, cMessage, nPriority )       VIRTUAL
+   METHOD Send( nStyle, cMessage, cName, nPriority )    VIRTUAL
 
 HIDDEN:
    DATA nLevel
@@ -305,7 +321,7 @@ ENDCLASS
 *  Creates a new channel. nLeven can be nil ( and will log all ),
 *  cName is the "program name" and must be given
 */
-METHOD New( nLevel, cName ) CLASS HB_LogChannel
+METHOD New( nLevel ) CLASS HB_LogChannel
 
    IF nLevel == NIL
       // log everything by default
@@ -313,8 +329,6 @@ METHOD New( nLevel, cName ) CLASS HB_LogChannel
    ENDIF
 
    ::nLevel := nLevel
-   ::cProgramName := cName
-
 RETURN Self
 
 /**
@@ -322,9 +336,9 @@ RETURN Self
 * if the log level is higher or equal than the channel setting
 */
 
-METHOD Log( nStyle, cMessage, nPriority ) CLASS HB_LogChannel
+METHOD Log( nStyle, cMessage, cName, nPriority ) CLASS HB_LogChannel
    IF nPriority <= ::nLevel .and. ::lActive
-      ::Send( nStyle, cMessage, nPriority )
+      ::Send( nStyle, cMessage, cName, nPriority )
    ENDIF
 RETURN NIL
 
@@ -334,7 +348,7 @@ RETURN NIL
 * may or may not call it.
 */
 
-METHOD Format( nStyle, cMessage, nPriority ) CLASS HB_LogChannel
+METHOD Format( nStyle, cMessage, cName, nPriority ) CLASS HB_LogChannel
    LOCAL cPrefix := ""
 
    IF HB_BitAnd( nStyle, HB_LOG_ST_DATE ) > 0
@@ -344,6 +358,10 @@ METHOD Format( nStyle, cMessage, nPriority ) CLASS HB_LogChannel
          cPrefix += DtoC( Date() )
       ENDIF
       cPrefix += " "
+   ENDIF
+
+   IF HB_BitAnd( nStyle, HB_LOG_ST_NAME ) > 0
+      cPrefix += cName + " "
    ENDIF
 
    IF HB_BitAnd( nStyle, HB_LOG_ST_TIME ) > 0
@@ -384,39 +402,39 @@ RETURN cPrefix + cMessage
 ***********************************************/
 
 CLASS HB_LogConsole FROM HB_LogChannel
-   METHOD New( cName, nLevel )          INLINE ::Super:New( cName, nLevel )
-   METHOD Open()
-   METHOD Close()
+   METHOD New( nLevel )
+   METHOD Open( cName )
+   METHOD Close( cName )
 
 PROTECTED:
    METHOD Send( nStyle, cMessage, nPriority )
 
 ENDCLASS
 
-METHOD Open() CLASS HB_LogConsole
+METHOD New( nLevel ) CLASS HB_LogChannel
+   ::Super:New( nLevel )
+RETURN Self
+
+METHOD Open( cName ) CLASS HB_LogConsole
    IF ::lOpened
       RETURN .F.
    ENDIF
 
-   IF ::cProgramName == NIL
-      HB_FnameSplit( hb_argv(0),,@::cProgramName )
-   ENDIF
-
-   OutStd( HB_LogDateStamp(), Time(), "--", ::cProgramName, "start --", HB_OsNewLine() )
+   OutStd( HB_LogDateStamp(), Time(), "--", cName, "start --", HB_OsNewLine() )
    ::lOpened := .T.
 RETURN .T.
 
-METHOD Close() CLASS HB_LogConsole
+METHOD Close( cName ) CLASS HB_LogConsole
    IF .not. ::lOpened
       RETURN .F.
    ENDIF
 
-   OutStd( HB_LogDateStamp(), Time(), "--", ::cProgramName, "end --", HB_OsNewLine() )
+   OutStd( HB_LogDateStamp(), Time(), "--", cName, "end --", HB_OsNewLine() )
    ::lOpened := .F.
 RETURN .T.
 
-METHOD Send( nStyle, cMessage, nPriority )
-   OutStd( ::Format( nStyle, cMessage, nPriority ) , HB_OsNewLine() )
+METHOD Send( nStyle, cMessage, cName, nPriority )
+   OutStd( ::Format( nStyle, cMessage, cName, nPriority ) , HB_OsNewLine() )
 RETURN NIL
 
 
@@ -431,8 +449,8 @@ CLASS HB_LogFile FROM HB_LogChannel
    DATA nBackup            INIT 5
 
    METHOD New( nLevel, cName, cFile, nMaxSize, nBackup )
-   METHOD Open()
-   METHOD Close()
+   METHOD Open( cName )
+   METHOD Close( cName )
 
 PROTECTED:
    METHOD Send( nStyle, cMessage, nPriority )
@@ -440,8 +458,8 @@ PROTECTED:
 ENDCLASS
 
 
-METHOD New( nLevel, cProgName, cFilename, nMaxSize, nBackup ) CLASS HB_LogFile
-   ::Super:New( nLevel, cProgName )
+METHOD New( nLevel, cFilename, nMaxSize, nBackup ) CLASS HB_LogFile
+   ::Super:New( nLevel )
    ::cFileName := cFileName
 
    IF nMaxSize != NIL
@@ -454,7 +472,7 @@ METHOD New( nLevel, cProgName, cFilename, nMaxSize, nBackup ) CLASS HB_LogFile
 RETURN Self
 
 
-METHOD Open() CLASS HB_LogFile
+METHOD Open( cProgName ) CLASS HB_LogFile
    IF ::lOpened
       RETURN .F.
    ENDIF
@@ -472,24 +490,20 @@ METHOD Open() CLASS HB_LogFile
       RETURN .F.
    ENDIF
 
-   IF ::cProgramName == NIL
-      HB_FnameSplit( hb_argv(0),,@::cProgramName )
-   ENDIF
-
    Fwrite( ::nFileHandle,;
-      HB_BldLogMsg( HB_LogDateStamp(), Time(), "--", ::cProgramName, ;
+      HB_BldLogMsg( HB_LogDateStamp(), Time(), "--", cProgName, ;
          "start --", HB_OsNewLine() ) )
 
    ::lOpened := .T.
 RETURN .T.
 
-METHOD Close() CLASS HB_LogFile
+METHOD Close( cProgName ) CLASS HB_LogFile
    IF .not. ::lOpened
       RETURN .F.
    ENDIF
 
    Fwrite( ::nFileHandle,;
-      HB_BldLogMsg( HB_LogDateStamp(), Time(), "--", ::cProgramName, ;
+      HB_BldLogMsg( HB_LogDateStamp(), Time(), "--", cProgName, ;
          "end --", HB_OsNewLine() ) )
 
    FClose( ::nFileHandle )
@@ -498,10 +512,10 @@ METHOD Close() CLASS HB_LogFile
    ::lOpened := .F.
 RETURN .T.
 
-METHOD Send( nStyle, cMessage, nPrio ) CLASS HB_LogFile
+METHOD Send( nStyle, cMessage, cProgName, nPrio ) CLASS HB_LogFile
    LOCAL cExt, nCount
 
-   FWrite( ::nFileHandle, ::Format( nStyle, cMessage, nPrio ) + HB_OsNewLine() )
+   FWrite( ::nFileHandle, ::Format( nStyle, cMessage, cProgName, nPrio ) + HB_OsNewLine() )
 
    // see file limit and eventually swap file.
    IF ::nFileLimit > 0 .and. FError() == 0
@@ -538,7 +552,7 @@ RETURN Ferror() == 0
 CLASS HB_LogSyslog FROM HB_LogChannel
    DATA nId
 
-   METHOD New( nLevel, cName, nId )
+   METHOD New( nLevel, nId )
    METHOD Open()
    METHOD Close()
 
@@ -547,35 +561,35 @@ PROTECTED:
 
 ENDCLASS
 
-METHOD New( nLevel, cName, nId ) CLASS HB_LogSyslog
-   ::Super:New( nLevel, cName )
+METHOD New( nLevel, nId ) CLASS HB_LogSyslog
+   ::Super:New( nLevel )
    ::nId := nId
 RETURN SELF
 
-METHOD Open() CLASS HB_LogSyslog
+METHOD Open( cName ) CLASS HB_LogSyslog
    IF ::lOpened
       RETURN .F.
    ENDIF
 
-   IF HB_SyslogOpen( ::cProgramName )
+   IF HB_SyslogOpen( cName )
       ::lOpened := .T.
       RETURN .T.
    ENDIF
 RETURN .F.
 
-METHOD Close() CLASS HB_LogSyslog
+METHOD Close( cName ) CLASS HB_LogSyslog
    IF .not. ::lOpened
       RETURN .F.
    ENDIF
 
-   IF HB_SyslogClose( ::cProgramName )
+   IF HB_SyslogClose( cName )
       ::lOpened := .F.
       RETURN .T.
    ENDIF
 RETURN .F.
 
-METHOD Send( nType, cMessage, nPrio ) CLASS HB_LogSyslog
+METHOD Send( nType, cMessage, cName, nPrio ) CLASS HB_LogSyslog
 // Syslog does not need timestamp, nor priority
-RETURN HB_SyslogMessage( ::Format( HB_LOG_ST_LEVEL, cMessage, nPrio ), nPrio, ::nId )
+RETURN HB_SyslogMessage( ::Format( HB_LOG_ST_LEVEL, cMessage, cName, nPrio ), nPrio, ::nId )
 
 

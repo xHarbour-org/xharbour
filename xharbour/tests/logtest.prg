@@ -1,6 +1,6 @@
 ************************************************************
 * logtest.prg
-* $Id: logtest.prg,v 1.3 2003/07/13 19:34:34 jonnymind Exp $
+* $Id: logtest.prg,v 1.4 2003/07/14 08:00:23 jonnymind Exp $
 *
 * Demonstrates the standard log system
 * See inline help strings to know how to use this
@@ -66,11 +66,15 @@ Procedure MAIN()
    @22,0 SAY Space( 80 )
    @22,0
 
-   INIT LOG ON ;
-      File( "logtest.log", HB_LOG_INFO, 2, 5 ), ;
+      /*
       SYSLOG( HB_LOG_ERROR,  0x3ffaaffaa ), ;
       MONITOR, ;
-      CONSOLE ;
+*/
+   INIT LOG ON ;
+      File( HB_LOG_INFO, "logtest.log", 2, 5 ) ;
+      CONSOLE() ;
+      SYSLOG( HB_LOG_ERROR, 0xff33ff33ff33) ;
+      MONITOR() ;
       NAME "Log test program"
 
    //The above creates the default HB_Logger and automatically adds
