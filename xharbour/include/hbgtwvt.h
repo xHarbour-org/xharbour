@@ -15,6 +15,9 @@
 //-------------------------------------------------------------------//
 
 #define HB_OS_WIN_32_USED
+#ifndef CINTERFACE
+   #define CINTERFACE 1
+#endif
 
 #include "hbset.h"
 #include "hbapigt.h"
@@ -24,10 +27,6 @@
 #include "error.ch"
 #include "hbvm.h"
 #include "hbstack.h"
-
-#ifndef CINTERFACE
-   #define CINTERFACE 1
-#endif
 
 #include <winuser.h>
 #include <commctrl.h>
