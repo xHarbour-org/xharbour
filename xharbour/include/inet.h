@@ -1,5 +1,5 @@
 /*
-* $Id$
+* $Id: inet.h,v 1.1 2002/12/19 19:29:30 jonnymind Exp $
 */
 
 /*
@@ -94,7 +94,7 @@ typedef struct tag_HB_SOCKET_STRUCT
     s->com = 0;\
     s->count = 0;\
     }
-
+#define HB_SOCKET_FREE( s ) hb_xfree( s )
 
 
 #endif

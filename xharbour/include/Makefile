@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.46 2001/12/18 20:51:20 vszakats Exp $
+# $Id: Makefile,v 1.2 2002/01/29 07:19:50 ronpinkas Exp $
 #
 
 ROOT = ../
@@ -41,6 +41,8 @@ C_HEADERS=\
 	hbvm.h       \
 	hbvmpub.h    \
 	hb_io.h      \
+	inet.h       \
+	thread.h     \
 
 PRG_HEADERS=\
 	achoice.ch   \

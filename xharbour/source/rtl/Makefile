@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.8 2002/12/15 23:41:30 lculik Exp $
+# $Id: Makefile,v 1.9 2002/12/16 06:02:47 ronpinkas Exp $
 #
 
 ROOT = ../../
@@ -47,6 +47,7 @@ C_SOURCES=\
 	gx.c         \
 	hardcr.c     \
 	idle.c       \
+	inet.c       \
 	inkey.c      \
 	is.c         \
 	isprint.c    \
