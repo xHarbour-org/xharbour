@@ -1,5 +1,5 @@
 /*
- * $Id: nulsys.prg,v 1.4 2001/06/18 18:04:05 dholm Exp $
+ * $Id: nulsys.prg,v 1.1.1.1 2001/12/21 10:43:00 ronpinkas Exp $
  */
 
 /*
@@ -57,3 +57,55 @@ ANNOUNCE RDDSYS
 init procedure RDDInit
 
 return
+
+FUNCTION NetErr()
+RETURN .F.
+
+#pragma BEGINDUMP
+
+#include "hbrddwrk.h"
+
+void hb_rddShutDown( void )
+{
+}
+
+ERRCODE  HB_EXPORT hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+{
+   return FAILURE;
+}
+
+ERRCODE  HB_EXPORT hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
+{
+   return FAILURE;
+}
+
+ERRCODE  HB_EXPORT hb_rddSelectWorkAreaAlias( char * szName )
+{
+   return FAILURE;
+}
+
+ERRCODE  HB_EXPORT hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+{
+   return FAILURE;
+}
+
+ERRCODE  HB_EXPORT hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+{
+   return FAILURE;
+}
+
+ERRCODE  HB_EXPORT hb_rddSelectWorkAreaNumber( int iArea )
+{
+   return FAILURE;
+}
+
+ERRCODE  HB_EXPORT hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+{
+   return FAILURE;
+}
+
+int      HB_EXPORT hb_rddGetCurrentWorkAreaNumber( void )
+{
+   return 0;
+}
+#pragma ENDDUMP

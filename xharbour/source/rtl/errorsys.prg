@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.17 2003/02/04 23:43:44 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.18 2003/03/07 03:04:46 ronpinkas Exp $
  */
 
 /*
@@ -214,7 +214,6 @@ STATIC FUNCTION LogError( oerr )
 
      LOCAL cScreen     := Savescreen()
      LOCAL cLogFile    := 'error.log'
-     LOCAL nWorkArea   := Select()
      LOCAL nRange      := ( Maxcol() + 1 ) * 2
      LOCAL nStart      := 1
      LOCAL nFhandle
@@ -248,7 +247,11 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, '              Date: ' + Dtoc( Date() ) )
         FWriteLine( nHandle, '              Time: ' + Time() )
         FWriteLine( nHandle, ' Avaliavle Memory :' + strvalue( Memory( 0 ) ) )
-        FWriteLine( nHandle, '     Current Area :' + strvalue( Select() ) )
+
+        IF Type( "Select()" ) == "UI"
+           FWriteLine( nHandle, '     Current Area :' + strvalue( &("Select()") ) )
+        ENDIF
+
         FWriteLine( nHandle, Padc( ' Enviromental Information ', 79, '-' ) )
         FWriteLine( nHandle, '' )
         FWriteLine( nHandle, "Exact is :" + strvalue( Set( 1 ), .T. ) )
@@ -288,18 +291,21 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, "" )
         FWriteLine( nHandle, Padc( 'Detalaid Work Area Items', Maxcol(), "=" ) )
         FWriteLine( nHandle, "" )
-        For nCount := 1 To 600
-           If !Empty( ( nCount )->( Alias() ) )
-              ( nCount )->( FWriteLine( nHandle, "   Work Area No.: " + strvalue( Select() ) ) )
-              ( nCount )->( FWriteLine( nHandle, "   Alias Alias  : " + Alias() ) )
-              ( nCount )->( FWriteLine( nHandle, "  Current Recno : " + strvalue( Recno() ) ) )
-              ( nCount )->( FWriteLine( nHandle, "  Current Filter: " + Dbfilter() ) )
-              ( nCount )->( FWriteLine( nHandle, "   Relation Exp.: " + Dbrelation() ) )
-              ( nCount )->( FWriteLine( nHandle, "     Index Order: " + strvalue( Indexord() ) ) )
-              ( nCount )->( FWriteLine( nHandle, "      Ative Key : " + strvalue( Indexord() ) ) )
-              ( nCount )->( FWriteLine( nHandle, "" ) )
-           Endif
-        Next
+
+        IF Type( "Select()" ) == "UI"
+           For nCount := 1 To 600
+              If !Empty( ( nCount )->( &("Alias()") ) )
+                 ( nCount )->( FWriteLine( nHandle, "   Work Area No.: " + strvalue( &("Select()") ) ) )
+                 ( nCount )->( FWriteLine( nHandle, "           Alias: " + &("Alias()") ) )
+                 ( nCount )->( FWriteLine( nHandle, "  Current Recno : " + strvalue( &("RecNo()") ) ) )
+                 ( nCount )->( FWriteLine( nHandle, "  Current Filter: " + &("DbFilter()") ) )
+                 ( nCount )->( FWriteLine( nHandle, "   Relation Exp.: " + &("DbRelation()") ) )
+                 ( nCount )->( FWriteLine( nHandle, "     Index Order: " + strvalue( &("IndexOrd(0)") ) ) )
+                 ( nCount )->( FWriteLine( nHandle, "      Ative Key : " + strvalue( &("IndexKey(0)") ) ) )
+                 ( nCount )->( FWriteLine( nHandle, "" ) )
+              Endif
+           Next
+        ENDIF
 
         FWriteLine( nHandle, "" )
         FWriteLine( nHandle, Padc( " Internal Error Handling Information  ", Maxcol(), "+" ) )

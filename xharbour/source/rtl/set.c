@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.19 2003/01/12 15:29:47 lculik Exp $
+ * $Id: set.c,v 1.20 2003/03/07 11:32:04 jonnymind Exp $
  */
 
 /*
@@ -907,8 +907,71 @@ HB_FUNC( SET )
          break;
        case HB_SET_TRACE :
           hb_retl( hb_set.HB_SET_TRACE );
-          if( args > 1 ) hb_set.HB_SET_TRACE = set_logical( pArg2 );
+          if( args > 1 )
+          {
+             hb_set.HB_SET_TRACE = set_logical( pArg2 );
+          }
           break;
+       case HB_SET_TRACEFILE :
+          hb_retc( (char *) ( hb_set.HB_SET_TRACEFILE ) );
+          if( args > 1 && HB_IS_STRING( pArg2 ) )
+          {
+             FILE *fpTrace;
+
+             strcpy( hb_set.HB_SET_TRACEFILE, pArg2->item.asString.value );
+
+             /* Create trace.log for tracing. */
+             fpTrace = fopen( (char *) (hb_set.HB_SET_TRACEFILE), "w" );
+             if( fpTrace )
+             {
+                fclose( fpTrace );
+             }
+             else
+             {
+                //hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
+             }
+          }
+          break;
+      case HB_SET_TRACESTACK :
+         hb_retni( hb_set.HB_SET_TRACESTACK );
+         if( args > 1 )
+         {
+            if( HB_IS_STRING( pArg2 ) )
+            {
+               if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "NONE" ) )
+               {
+                  hb_set.HB_SET_TRACESTACK = HB_SET_TRACESTACK_NONE;
+               }
+               else if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "CURRENT" ) )
+               {
+                  hb_set.HB_SET_TRACESTACK = HB_SET_TRACESTACK_CURRENT;
+               }
+               else if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "ALL" ) )
+               {
+                  hb_set.HB_SET_TRACESTACK = HB_SET_TRACESTACK_ALL;
+               }
+               else
+               {
+                  hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+               }
+            }
+            else if( HB_IS_NUMERIC( pArg2 ) )
+            {
+               if( set_number( pArg2, hb_set.HB_SET_TRACESTACK ) < 0 )
+               {
+                  hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+               }
+               else
+               {
+                  hb_set.HB_SET_TRACESTACK = set_number( pArg2, hb_set.HB_SET_TRACESTACK );
+               }
+            }
+            else
+            {
+               hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+            }
+         }
+         break;
 /*
       case HB_SET_PRINTERJOB    :
          if( hb_set.HB_SET_PRINTERJOB ) hb_retc( hb_set.HB_SET_PRINTERJOB );
@@ -1055,6 +1118,8 @@ void hb_setInitialize( void )
    hb_set.HB_SET_SOFTSEEK = FALSE;
    hb_set.HB_SET_STRICTREAD = FALSE;
    hb_set.HB_SET_TRACE = TRUE; /* Default Trace to ON */
+   strcpy( (char *) (hb_set.HB_SET_TRACEFILE), "trace.log" );
+   hb_set.HB_SET_TRACESTACK = HB_SET_TRACESTACK_ALL;
    hb_set.HB_SET_TYPEAHEAD = 50; hb_inkeyReset( TRUE ); /* Allocate keyboard typeahead buffer */
    hb_set.HB_SET_UNIQUE = FALSE;
    hb_set.HB_SET_VIDEOMODE = 0;
@@ -1062,7 +1127,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_FILECASE = HB_SET_CASE_MIXED;
    hb_set.HB_SET_DIRCASE = HB_SET_CASE_MIXED;
    hb_set.HB_SET_DIRSEPARATOR = '/';
-#else   
+#else
    hb_set.HB_SET_FILECASE = HB_SET_CASE_LOWER;
    hb_set.HB_SET_DIRCASE = HB_SET_CASE_LOWER;
    hb_set.HB_SET_DIRSEPARATOR = '\\';

@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.6 2002/10/27 14:41:37 lculik Exp $
+ * $Id: hbset.h,v 1.7 2003/01/12 11:55:22 lculik Exp $
  */
 
 /*
@@ -126,9 +126,11 @@ typedef enum
    HB_SET_LANGUAGE      = 100,
    HB_SET_IDLEREPEAT    = 101,
    HB_SET_TRACE         = 102,
-   HB_SET_FILECASE      = 103,
-   HB_SET_DIRCASE       = 104,
-   HB_SET_DIRSEPARATOR  = 105
+   HB_SET_TRACEFILE     = 103,
+   HB_SET_TRACESTACK    = 104,
+   HB_SET_FILECASE      = 105,
+   HB_SET_DIRCASE       = 106,
+   HB_SET_DIRSEPARATOR  = 107
 
 
 } HB_set_enum;
@@ -188,6 +190,8 @@ typedef struct
    BOOL    HB_SET_SOFTSEEK;
    BOOL    HB_SET_STRICTREAD;
    BOOL    HB_SET_TRACE;
+   char    HB_SET_TRACEFILE[_POSIX_PATH_MAX];
+   char    HB_SET_TRACESTACK;
    int     HB_SET_TYPEAHEAD;
    BOOL    HB_SET_UNIQUE;
    int     HB_SET_VIDEOMODE;
@@ -202,6 +206,9 @@ typedef struct
 #define HB_SET_CASE_LOWER  1
 #define HB_SET_CASE_UPPER  2
 
+#define HB_SET_TRACESTACK_NONE    0
+#define HB_SET_TRACESTACK_CURRENT 1
+#define HB_SET_TRACESTACK_ALL     2
 
 extern HB_EXPORT HB_SET_STRUCT hb_set;
 

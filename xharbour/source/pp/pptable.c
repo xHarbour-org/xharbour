@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.13 2003/01/12 19:47:58 lculik Exp $
+ * $Id: pptable.c,v 1.14 2003/03/09 17:30:36 ronpinkas Exp $
  */
 
 /*
@@ -122,9 +122,11 @@ void hb_pp_Table( void )
    static DEFINES sD___51 = {"_SET_LANGUAGE",NULL,-1,"100", &sD___50 };
    static DEFINES sD___52 = {"_SET_IDLEREPEAT",NULL,-1,"101", &sD___51 };
    static DEFINES sD___53 = {"_SET_TRACE",NULL,-1,"102", &sD___52 };
-   static DEFINES sD___54 = {"_SET_FILECASE",NULL,-1,"102", &sD___53 };
-   static DEFINES sD___55 = {"_SET_DIRCASE",NULL,-1,"103", &sD___54 };
-   static DEFINES sD___56 = {"_SET_DIRSEPARATOR",NULL,-1,"104", &sD___55 };
+   static DEFINES sD___54 = {"_SET_TRACEFILE",NULL,-1,"103", &sD___53 };
+   static DEFINES sD___55 = {"_SET_TRACESTACK",NULL,-1,"104", &sD___54 };
+   static DEFINES sD___56 = {"_SET_FILECASE",NULL,-1,"105", &sD___55 };
+   static DEFINES sD___57 = {"_SET_DIRCASE",NULL,-1,"106", &sD___56 };
+   static DEFINES sD___58 = {"_SET_DIRSEPARATOR",NULL,-1,"107", &sD___57 };
 
    static COMMANDS sC___1 = {0,"NOTE","\1A30",NULL,NULL };
    static COMMANDS sC___2 = {0,"DO","WHILE \1A00","while \1A00",&sC___1 };

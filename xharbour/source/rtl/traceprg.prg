@@ -1,5 +1,5 @@
 /*
- * $Id: traceprg.prg,v 1.4 2003/01/02 23:31:00 ronpinkas Exp $
+ * $Id: traceprg.prg,v 1.5 2003/01/02 23:46:27 ronpinkas Exp $
  */
 
 /*
@@ -62,15 +62,19 @@ FUNCTION TraceLog( ... )
 
    aParams := HB_aParams()
 
-   FileHandle := FOpen( 'Trace.Log', 1 )
+   FileHandle := FOpen( SET( _SET_TRACEFILE ), 1 )
 
    FSeek( FileHandle, 0, 2 )
 
-   FWrite( FileHandle, '[' + ProcName(1) + '] (' + Str( Procline(1), 5 ) + ') Called from: '  + CRLF )
+   IF SET( _SET_TRACESTACK ) > 0
+      FWrite( FileHandle, '[' + ProcName(1) + '] (' + Str( Procline(1), 5 ) + ') Called from: '  + CRLF )
+   ENDIF
 
-   DO WHILE ! ( ( ProcName := ProcName( ++Counter ) ) == '' )
-      FWrite( FileHandle, space(30) + ProcName + '(' + Str( Procline( Counter), 5 ) + ')' + CRLF )
-   ENDDO
+   IF SET( _SET_TRACESTACK ) > 1
+      DO WHILE ! ( ( ProcName := ProcName( ++Counter ) ) == '' )
+         FWrite( FileHandle, space(30) + ProcName + '(' + Str( Procline( Counter), 5 ) + ')' + CRLF )
+      ENDDO
+   ENDIF
 
    FOR EACH xParam IN aParams
       FWrite( FileHandle, '>>>' + CStr( xParam ) + '<<<' + CRLF )
