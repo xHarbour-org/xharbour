@@ -1,0 +1,375 @@
+/*
+ * whatsnew.txt
+ * What's new in GTWVW since the last release.
+ * Copyright 2004 Budyanto Dj. <budyanto@centrin.net.id>
+ */
+
+/****************************************************************
+ * Release Date: 2004/10/25 (CVS contrib)
+ * Prev Release: 2004/09/26
+ ****************************************************************/
+
+ 2004/10/25:
+ * hbgtwvw.h
+   * lpwAlign() and nCopyAnsiToWideChar() are now static
+ * gtwvw.c
+   * lpwAlign() and nCopyAnsiToWideChar() are now static
+   + some #define by Lorenzo Fiorini
+   - some unused functions and variables
+   - some castings
+   This is to get rid of warnings in mingw32 as reported by Lorenzo Fiorini.
+
+
+ 2004/10/18:
+ Synchronizing with:  (Beta1-2)
+ =Id: hbgtwvt.h,v 1.31 2004/09/28 03:25:07 vouchcac Exp =
+ =Id: gtwvt.c,v 1.133 2004/09/28 03:25:17 vouchcac Exp =
+ =Id: wvtutils.c,v 1.18 2004/09/28 03:25:18 vouchcac Exp =
+ (wvtcore.c is not changed since last sync:
+ =Id: wvtcore.c,v 1.10 2004/08/30 14:10:20 vouchcac Exp =
+ )
+
+ ------------------
+ Summary of changes
+ ------------------
+
+ Adopting Modal Dialog, original work of Pritpal Bedi in gtwvt.
+ Like Modeless Dialog, this is attached to Main Window (by default).
+ There is an option, however, to attach it to other window by specifying
+ the window's handle.
+
+ * gtwvw.c
+   + HB_FUNC( WVW_CREATEDIALOGMODAL )
+
+
+ 2004/10/14:
+ * gtwvw.c:
+   ! wvw_pbenable(): after wvw_pbenable(..., ..., .f.) focus should be
+     set to parent window, otherwise no input is accepted. Fixed.
+     Thanks to Fabio for reporting it.
+
+
+ 2004/09/30:
+ * gtwvw.c:
+   * WVW_TBAddButton() new parm lMap3Dcolors
+     This is to support transparent toolbar button
+     (applicable to 256 color bitmap only).
+
+
+/****************************************************************
+ * Release Date: 2004/09/26
+ * Prev Release: 2004/07/25
+ ****************************************************************/
+
+Contents
+
+- WARNING: Your program may need to change!
+
+- New Native Controls
+  = Push Buttons
+  = Progress Bar
+
+- New Callback Functions
+
+- New/Revised Functions
+
+- Bugfix and Enhancements
+
+- Adopted (and Adapted) Features from GTWVT
+
+- Epilogue
+
+
+/*-------------------------------------------------------------------*/
+/*                                                                   */
+/*   WARNING: Your program may need to change!                       */
+/*                                                                   */
+/*-------------------------------------------------------------------*/
+
+-------------------
+WVW_DrawRoundRect()
+-------------------
+
+If you use this function, you may need to make a change:
+
+Previously:
+
+Wvw_DrawRoundRect( nWinNum, nTop, nLeft, nBottom, nRight, ;
+                   nRoundHeight, nRoundWidth )
+
+Now:
+
+Wvw_DrawRoundRect( nWinNum, nTop, nLeft, nBottom, nRight, ;
+                   aOffset, ; <-- new optional parm following GTWVT's
+                   nRoundHeight, nRoundWidth )
+
+
+----------------------------------------
+Toolbar, Menu Command Id vs Push Buttons
+----------------------------------------
+
+This release introduces native push buttons. Internally pushbuttons use
+command id 65000 and above. Therefore, do NOT use menu/toolbar commands
+with id >= 65000.
+
+You are further recommended not to use high numbered id (say >= 40000),
+because future GTWVW may need that for its internal use.
+
+
+-------------------------------
+WVW_SetPen() and WVW_SetBrush()
+-------------------------------
+
+First parameter of WVW_SetPen() and WVW_SetBrush() are nWinNum.
+This is still true in current release. However, it is now ignored,
+because now the same PENs and BRUSHes are now used by all window.
+There is no more specific PENs and BRUSHes for specific window.
+
+I have to do this change, because previous release of GTWVW causes
+GDI leak because of this PENs and BRUSHes stuff...
+
+
+
+/*-------------------------------------------------------------------*/
+/*                                                                   */
+/*   New Native Controls                                             */
+/*                                                                   */
+/*-------------------------------------------------------------------*/
+
+------------
+Push Buttons
+------------
+
+You can now create pushbutton very easily. Simply define where do you
+want it to sit, and what action do you want it to do when it's clicked
+by means of a codeblock.
+
+In previous version, we had to use WVWMOUSE.PRG to simulate pushbuttons
+using wvw_DrawBoxRaised(). We also had to handle 'OnMouseHover', 'OnMouseOut',
+'OnPressed', etc, to simulate the pressed/released state of the button.
+By using native push buttons, we don't have to worry about all that anymore.
+Windows will take care about it.
+
+If we are using Windows XP style, pushbuttons will automatically behave
+as they should in Windows XP: round shaped, hot when mouse hovers, etc.
+
+Push button functions are prefixed with wvw_pb*, for example:
+wvw_pbCreate()
+wvw_pbDestroy()
+wvw_pbSetFont()
+etc
+
+------------
+Progress Bar
+------------
+
+Progress Bar is one of the simplest controls. Gtwvw now uses native
+progress bar. It is a preferred method instead of the simulated one
+using wvw_DrawProgressBar().
+
+Progress bar functions are prefixed with wvw_pg*, for example:
+wvw_pgCreate()
+wvw_pgDestroy()
+wvw_pgSetRange()
+wvw_pgSetPos()
+etc.
+
+
+/*-------------------------------------------------------------------*/
+/*                                                                   */
+/*   New Callback Functions                                          */
+/*                                                                   */
+/*-------------------------------------------------------------------*/
+
+----------------
+WVW_INPUTFOCUS()
+----------------
+
+If exists, this function is called by GTWVW whenever input occurs on
+non topmost window. (Currently GTWVW allows only topmost window, that
+is the last window opened, to accept input.)
+
+For example, assume your program is displaying Main Window and another
+window. If at this point the user click the Main Window and select
+some menu item, GTWVW will reject to handle this event because Main
+Window is not currently topmost.
+
+Typically GTWVW will produce an asterisk sound and flash the topmost
+window to tell user which window is expecting input.
+
+In current GTWVW, prior to do that GTWVW will call WVW_INPUTFOCUS()
+function, if exists, and inspect its return value. If it returns .t.,
+then GTWVW do nothing, assuming the event has been handled properly
+by WVW_INPUTFOCUS().
+
+If no WVW_INPUTFOCUS() exists, or if it returns .f., GTWVW will do
+the usual response: asterisk sound and flashing window.
+
+See INPFOCUS.PRG sample program demonstrating this feature.
+
+
+/*-------------------------------------------------------------------*/
+/*                                                                   */
+/*   New/Revised Functions                                           */
+/*                                                                   */
+/*-------------------------------------------------------------------*/
+
++ WVW_SETWINSTYLE(): get/set window style
+
+* WVW_DrawBoxRecessed(): optional parm lTight can now be passed as aOffset
+
++ WVW_NoStartupSubWindow(): disable/enabling displaying window when we open it.
+                            (this is the adaptation of Main Window's
+                             ANNOUNCE NOSTARTUPWINDOW
+                             adopted from GTWVT)
+
++ WVW_ShowWindow(): show/hide a window.
+
+* WVW_nOpenWindow(): has new optional parms allowing prg to define prefered
+                     window style and parent window.
+
++ WVW_NOCLOSE(): disable CLOSE 'X' button
+
+! WVW_SBAddPart(): now more accurate when measuring expected panel width.
+
++ WVW_TBIndex2Cmd(): convert toolbar button's index to command id.
++ WVW_TBCmd2Index(): and vice versa.
+
++ WVW_PB* : pushbutton functions
+
++ WVW_PG* : progress bar functions
+
+- WVW_DeleteObject(): removed as GTWVT's. See also WIN_DeleteObject()
+
+
+/*-------------------------------------------------------------------*/
+/*                                                                   */
+/*   Bugfix and Enhancements                                         */
+/*                                                                   */
+/*-------------------------------------------------------------------*/
+
+---------------
+Windows 98's DC
+---------------
+
+Thanks to Anatole Kolotovkin who reported this bug in Win98, where
+GDI objects are display incorrectly after opening some 5 windows or
+more. (In WinXP this bug doesn't occur.)
+
+This bug has now been fixed in current release.
+
+
+--------
+GDI Leak
+--------
+
+Some GDI objects (PENs and BRUSHes) mysteriously persist, even after
+the objects are successfully deleted.
+
+This has now been fixed. But as a side effect, GTWVW does not support
+specific window's PENs and BRUSHes anymore. PENs and BRUSHes are now
+application-wide.
+
+
+-------------------------------
+Other bugfixes and enhancements
+-------------------------------
+
+There are also many other minor bugfixes and enhancements.
+Some of the enhancements are additional aOffset parameter to
+WVW_Draw* functions.
+
+
+/*-------------------------------------------------------------------*/
+/*                                                                   */
+/*   Adopted (and Adapted) Features from GTWVT                       */
+/*                                                                   */
+/*-------------------------------------------------------------------*/
+
+======================================================================
+ Synchronizing with: (xHarbour Beta1-1 aka 0.99.1)
+ =Id: hbgtwvt.h,v 1.30 2004/09/15 03:52:49 bdj Exp =
+ =Id: gtwvt.c,v 1.132 2004/09/21 04:04:58 peterrees Exp =
+ =Id: wvtutils.c,v 1.17 2004/09/15 03:52:49 bdj Exp =
+ (wvtcore.c is not changed since last sync)
+======================================================================
+
+ ------------------
+ Summary of changes
+ ------------------
+
+ * handling of ANSI to OEM conversion (and vice versa)
+ * new gt_info() set/get: GTI_MOUSESTATUS and GTI_FONTNAME
+ ! fix handling of codeblock as wndproc of DlgProcMLess
+ ! fix inkey code for K_SH_BS
+ * some changes in defaults:
+     * font height: 20 (was 12)
+     * font width : 10 (was 8)
+     * font face  : Courier New (was Terminal)
+ * some castings
+
+ These are based on revisions by Lorenzo Fiorini, Peter Rees, Paul Tucker
+ and myself in GTWVT.
+
+
+======================================================================
+ Synchronizing with:
+ =Id: gtwvt.c,v 1.127 2004/08/31 12:57:28 vouchcac Exp =
+ =Id: wvtcore.c,v 1.10 2004/08/30 14:10:20 vouchcac Exp =
+ =Id: wvtutils.c,v 1.13 2004/08/30 14:10:20 vouchcac Exp =
+ Changelog:
+ =Id: ChangeLog,v 1.3412 2004/09/06 20:01:01 druzus Exp =
+ Last Entry:
+ 2004-09-06 22:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+======================================================================
+
+ -----------------------------------
+ APPLIED CHANGES ADOPTED FROM GTWVT:
+ -----------------------------------
+ + Support Modeless Dialog (attached to Main Window).
+   This is adopted from original work of Pritpal Bedi on GTWVT.
+ ! Bugfix in Clipboard function, copied from the fix by Pritpal Bedi on GTWVT.
+ + some new GTI_ functions, adopted from Lorenzo Fiorini's work on GTWVT.
+ + gt_gfxPrimitive() function, adopted from original work of Mauricio Abre
+   on GTWVT
+ ! Improvement in internal point to char conversion, adopted from
+   Peter Rees' work on GTWVT
+ * If app has ANNOUNCE HB_NOSTARTUPWINDOW Main Window is not displayed
+   until after the app ready and call WVW_SHOWWINDOW(0).
+   This may result in a better visual effect as opposed to watching
+   the window resized or prepared during window initialization.
+   (Some app may also choose to never show the Main Window.)
+   This is adopted from original idea of Pritpal Bedi on GTWVT.
+ + New Function WVW_NoStartupSubWindow() to get similar feature on subwindows.
+   If this feature is used, app must call WVW_ShowWindow([nWinNum], 1)
+   or simply WVW_ShowWindow([nWinNum]) to display the previously opened
+   window.
+ * Some castings and optimizations.
+ * Some changes in some EXPORTed C functions.
+   (All .PRG / HB_FUNC functions are not affected)
+ * aOffset parameter to more primitive GUI drawing functions
+   (following the changes on GTWVT by Pritpal Bedi)
+
+   *****************************************************************
+   WARNING!!!
+   WVW_DRAWROUNDRECT() parameter is shifted because of insertion of
+   a new parameter aOffset.
+   *****************************************************************
+
+ * Some changes to Tooltip functions
+   (adopted from Pritpal Bedi's work on GTWVT)
+
+ + New .PRG / HB_FUNC functions: (adopted from Pritpal Bedi's on GTWVT)
+   + HB_FUNC( WVW_UPDATEWINDOW )
+   + HB_FUNC( WVW_DRAWCOLORRECT ) (similar to WVW_FillRectangle)
+   + DlgModeless functions
+   + many WIN_* functions, general window API wrapper functions
+
+ - Removed .PRG / HB_FUNC functions:
+   - WVW_DeleteObject()
+     (following GTWVT. Use WIN_DeleteObject() instead)
+
+ -----------------------------------------------
+ CHANGES ON GTWVT THAT ARE NOT ADOPTED ON GTWVW:
+ -----------------------------------------------
+ * "second layer of GUI"
