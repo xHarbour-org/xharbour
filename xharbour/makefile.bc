@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.67 2003/09/13 20:53:27 walito Exp $
+# $Id: makefile.bc,v 1.68 2003/10/09 20:45:54 paultucker Exp $
 #
 
 #
@@ -355,6 +355,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hbloginet.obj \
    $(RTL_OBJ_DIR)\hboutdebug.obj \
    $(RTL_OBJ_DIR)\hbrandom.obj \
+   $(RTL_OBJ_DIR)\hbservice.obj \
    $(RTL_OBJ_DIR)\hbsrlraw.obj \
    $(RTL_OBJ_DIR)\hbsyslog.obj \
    $(RTL_OBJ_DIR)\hbxml.obj \
@@ -1747,6 +1748,9 @@ $(RTL_OBJ_DIR)\hbserial.c : $(RTL_DIR)\hbserial.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\hbserial.obj : $(RTL_OBJ_DIR)\hbserial.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\hbservice.obj : $(RTL_DIR)\hbservice.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\hbsrlraw.obj : $(RTL_DIR)\hbsrlraw.c

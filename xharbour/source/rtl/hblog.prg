@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.11 2003/08/01 16:56:52 jonnymind Exp $
+* $Id: hblog.prg,v 1.12 2003/09/11 12:08:28 jonnymind Exp $
 */
 
 /*
@@ -181,13 +181,17 @@ RETURN
 
 FUNCTION HB_BldLogMsg( ... )
    LOCAL nCount
+   LOCAL xVar
    LOCAL cMsg := ""
 
    FOR nCount := 1 TO PCount()
-      IF ValType( nCount ) == "N"
+      xVar := HB_PValue( nCount )
+      IF ValType( xVar ) == "N"
          cMsg += AllTrim( CStr( HB_PValue( nCount ) ) )
+      ELSEIF ValType( xVar ) != "C"
+         cMsg += CStr( xVar )
       ELSE
-         cMsg += CStr( HB_PValue( nCount ) )
+         cMsg += xVar
       ENDIF
 
       IF nCount < PCount()
@@ -496,6 +500,7 @@ METHOD Open( cProgName ) CLASS HB_LogFile
       HB_BldLogMsg( HB_LogDateStamp(), Time(), "--", cProgName, ;
          "start --", HB_OsNewLine() ) )
 
+   HB_Fcommit( ::nFileHandle )
    ::lOpened := .T.
 RETURN .T.
 
@@ -518,6 +523,7 @@ METHOD Send( nStyle, cMessage, cProgName, nPrio ) CLASS HB_LogFile
    LOCAL cExt, nCount
 
    FWrite( ::nFileHandle, ::Format( nStyle, cMessage, cProgName, nPrio ) + HB_OsNewLine() )
+   HB_FCommit( ::nFileHandle );
 
    // see file limit and eventually swap file.
    IF ::nFileLimit > 0 .and. FError() == 0

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1607 2003/10/19 22:41:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1609 2003/10/20 02:37:25 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-10-20 04:10 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * makefile.bc
+    + Added support for compiling hbservice.c
+
+  * source/rtl/hblog.prg
+    ! Corrected HB_BldLogMsg, internally used by LOG command, that trimmed
+      return characters.
+
+  * source/rtl/hbservice.c
+    ! Fixed support for windows
+    + Added handling of console signals (CTRL+BREAK and console closing)
+
+  * source/vm/fm.c
+    ! Not recording stats in hb_xgrab() if the HB_VM_STACK is not available.
+
+  * tests/service.prg
+    % Beautify
+    + Recording on file. 
+
+2003-10-19 23:00 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/rdd/dbcmd.c
+    ! Fixed rddMoveFields() to use the proper workarea method to
+      retrieve filed names.
 
 2003-10-19 95:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/codebloc.c

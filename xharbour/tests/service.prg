@@ -3,6 +3,10 @@
 *
 * This program demonstrates how to use signal (error)
 * handlers and what to do to start services.
+* Compile defining DEBUG constant; at timeout (0) an hard
+* error will be issiued.
+* On windows, use CTRL+BREAK to see an INTERRUPT SIGNAL 
+* handling.
 *
 * Best viewed with gtcgi. On unix, you can change
 *      HB_StartService( .F. )
@@ -12,7 +16,7 @@
 *
 * (C) 2003 Giancarlo Niccolai
 *
-* $Id: service.prg,v 1.1 2003/09/11 12:08:29 jonnymind Exp $
+* $Id: service.prg,v 1.2 2003/09/26 08:22:44 jonnymind Exp $
 *
 
 #include "hbservice.ch"
@@ -24,7 +28,8 @@ PROCEDURE Main()
    LOCAL nTime := 10, nStart
 
    // put it on a file: windows console could be detached!
-   INIT LOG ON CONSOLE()
+   INIT LOG ON CONSOLE();
+   FILE(HB_LOG_ALL, "service.log", 10, 10)
 
    bWait := .T.
    HB_PushSignalHandler( HB_SIGNAL_ALL, "Handle" )
@@ -32,8 +37,6 @@ PROCEDURE Main()
    HB_PushSignalHandler( HB_SIGNAL_FAULT + HB_SIGNAL_MATHERR, @SignalFault())
 
    //Service can be started before or after pushing handler.
-   // Don't detach under windws (just pass .F.); it works, but must be
-   // finetuned.
    HB_StartService( .F. )
 
    StartThread( @waiter() )
@@ -46,10 +49,9 @@ PROCEDURE Main()
       SecondsSleep( 0.5 )
    ENDDO
 
-   ? "Main thread terminated"
-   ? "Press Any key"
-   Inkey(0)
-   ? ""
+   LOG "Main thread terminated"
+   CLOSE LOG   
+   
 RETURN
 
 
@@ -60,7 +62,8 @@ Function Handle( nSignal, aParams )
    //StartThread(@Teller(), nSignal, aParams)
 
    Teller( nSignal, aParams)
-   IF nSignal == HB_SIGNAL_QUIT
+   IF nSignal == HB_SIGNAL_QUIT .or. nSignal == HB_SIGNAL_INTERRUPT
+      // Use only if you want to use INTERRUPT to exit prg.
       bWait = .F.
    ENDIF
 RETURN HB_SERVICE_HANDLED
@@ -70,7 +73,7 @@ PROCEDURE Waiter()
 
    WHILE bWait
       ThreadSleep( 1000 )
-      OutStd( "." )
+      OutStd( str(nCount,3),", " )
       // create a segfault after a while..
       IF nCount == 0
          #ifdef DEBUG
@@ -89,6 +92,7 @@ PROCEDURE Teller(nSignal, aParams)
    ? "Thread: ", ThreadGetCurrent(), ThreadGetCurrentInternal()
    ? "Handled: ", nSignal
    ? "Syserror: ", aParams[1], aParams[2], HB_SignalDesc( aParams[1], aParams[2] )
+   ?
 RETURN
 
 // A generic and useful fault detector using LOG system
