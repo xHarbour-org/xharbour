@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.548 2002/12/24 00:42:47 lculik Exp $
+ * $Id: ChangeLog,v 1.549 2002/12/24 06:42:19 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2002-12-23 22:41 UTC+0100 Giancarlo Niccolai <giancarlo@niccolai.ws>
+2002-12-23 22:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbtrace.h
   * source/rtl/trace.c
     Added:
