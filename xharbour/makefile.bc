@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.55 2003/06/20 18:25:38 ronpinkas Exp $
+# $Id: makefile.bc,v 1.56 2003/06/24 08:37:21 andijahja Exp $
 #
 
 #
@@ -335,13 +335,14 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\gtapiu.obj \
    $(RTL_OBJ_DIR)\gx.obj \
    $(RTL_OBJ_DIR)\hardcr.obj \
-   $(RTL_OBJ_DIR)\hbrandom.obj \
+   $(RTL_OBJ_DIR)\hbbitfield.obj \
    $(RTL_OBJ_DIR)\hbcompress.obj \
    $(RTL_OBJ_DIR)\hbcrypt.obj \
    $(RTL_OBJ_DIR)\hbcrc32.obj \
    $(RTL_OBJ_DIR)\hbchecksum.obj \
    $(RTL_OBJ_DIR)\hbhextonum.obj \
    $(RTL_OBJ_DIR)\hbffind.obj \
+   $(RTL_OBJ_DIR)\hbrandom.obj \
    $(RTL_OBJ_DIR)\hbreadini.obj \
    $(RTL_OBJ_DIR)\hbxml.obj \
    $(RTL_OBJ_DIR)\idle.obj \
@@ -1688,7 +1689,7 @@ $(RTL_OBJ_DIR)\hardcr.obj : $(RTL_DIR)\hardcr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
-$(RTL_OBJ_DIR)\hbrandom.obj : $(RTL_DIR)\hbrandom.c
+$(RTL_OBJ_DIR)\hbbitfield.obj : $(RTL_DIR)\hbbitfield.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
@@ -1713,6 +1714,10 @@ $(RTL_OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbhextonum.obj : $(RTL_DIR)\hbhextonum.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(RTL_OBJ_DIR)\hbrandom.obj : $(RTL_DIR)\hbrandom.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 

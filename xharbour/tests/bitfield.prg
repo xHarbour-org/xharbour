@@ -3,7 +3,7 @@
 *
 * (C) 2003 Giancarlo Niccolai
 *
-* $Id$
+* $Id: bitfield.prg,v 1.1 2003/07/08 06:05:40 jonnymind Exp $
 *
 
 PROCEDURE Main()
@@ -31,7 +31,7 @@ PROCEDURE Main()
    ?
 
    ? "Bitfields"
-   ? "Setting fuorth bit into 2", HB_BitSet( 12, 4 )
+   ? "Setting fuorth bit into 12", HB_BitSet( 12, 4 )
    ? "Resetting second bit into 14", HB_BitReset( 14, 2 )
    ? "Shifting 64 two bit left", HB_BitShift( 64, 2 )
    ? "Shifting 64 two bit right", HB_BitShift( 64, -2 )

@@ -1,6 +1,5 @@
-
 /*
- * $Id: ChangeLog,v 1.1224 2003/07/07 18:41:22 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1225 2003/07/08 06:05:38 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-07-08 07:51 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
+  * makefile.bc
+    + added compilation of hbbitfield.c 
+    (please, someone add it also to makefile.vc)
+
+  * tests/bitfield.prg
+    ! fixed a little typo
+  
 2003-07-08 07:51 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
   * source/rtl/Makefile
   + source/rtl/hbbitfield.c
