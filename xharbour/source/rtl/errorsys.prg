@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.5 2002/04/17 17:16:09 lculik Exp $
+ * $Id: errorsys.prg,v 1.6 2002/04/17 17:31:40 lculik Exp $
  */
 
 /*
@@ -138,7 +138,6 @@ STATIC FUNCTION DefError( oError )
      If !Empty( nChoice )
         Do Case
             Case aOptions[ nChoice ] == "Break"
-                LogError( oError )
                 Break( oError )
             Case aOptions[ nChoice ] == "Retry"
                 Return .T.
@@ -164,6 +163,7 @@ STATIC FUNCTION DefError( oError )
      /// For some strange reason, the DOS prompt gets written on the first line
      /// *of* the message instead of on the first line *after* the message after
      /// the program quits, unless the screen has scrolled. - dgh
+     LogError( oError )
      Quit
 
 Return .F.
