@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.27 2005/02/10 23:08:00 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.28 2005/02/15 19:55:04 ronpinkas Exp $
  */
 
 /*
@@ -189,7 +189,7 @@ DECLARE HBClass ;
   <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), <(Message)>, {|Self, <params>| <code> }, HB_OO_MSG_INLINE, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
 
 // EXTEND native type classes.
-#xcommand OVERRIDE METHOD <Message> [IN] CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH [METHOD] <!Method!> [SCOPE <Scope>] => ;
+#xcommand OVERRIDE METHOD <!Message!> [IN] CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH [METHOD] <!Method!> [SCOPE <Scope>] => ;
   _<type>(); __clsModMsg( __ClsGetHandleFromName( #<type> ), <(Message)>, @<Method>(), IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ) )
 
 #xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER> WITH <data: DATA, VAR> <Data> [SCOPE <Scope>] [<Persistent: PERSISTENT> ] [<Case: NOUPPER>] => ;

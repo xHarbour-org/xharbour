@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3941 2005/03/15 04:05:27 andijahja Exp $
+ * $Id: ChangeLog,v 1.3942 2005/03/15 06:49:36 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-15 10:01 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+  * include/hbclass.ch
+    * Corrected 1 matcher from <Message> to <!Message!>
+  * source/pp/ppcore.c
+    + Added explicit support for minimal matachers.
+  * source/rtl/str2ptr.c
+    + Added optional support for HB_IS_INT() and HB_IS_LONG() argument.
+      ( i.e. WinAPI may forward string pointer as a WPARAM, or LPARAM argument)
+  * source/rtl/win32ole.prg
+    + Added hack in New() in the rare case that New() method is directed at the OLE Server itself.
+
 2005-03-15 13:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/ct/disk.c
     ! more cast

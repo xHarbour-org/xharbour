@@ -1,5 +1,5 @@
 /*
- * $Id: str2ptr.c,v 1.2 2004/05/20 21:09:22 ronpinkas Exp $
+ * $Id: str2ptr.c,v 1.3 2004/07/20 20:46:17 ronpinkas Exp $
  */
 
 /*
@@ -57,19 +57,20 @@
 
 HB_FUNC( HB_POINTER2STRING )
 {
-   PHB_ITEM pPointer = hb_param( 1, HB_IT_POINTER );
+   PHB_ITEM pPointer = hb_param( 1, HB_IT_ANY );
    PHB_ITEM pLen     = hb_param( 2, HB_IT_NUMERIC );
 
-   if( pPointer )
+   if( HB_IS_POINTER( pPointer ) && pLen )
    {
-      if( pLen )
-      {
-         hb_retclenAdoptRawStatic( (char *) hb_itemGetPtr( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
-      }
-      else
-      {
-         hb_retcAdoptStatic( (char *) hb_itemGetPtr( pPointer ) );
-      }
+      hb_retclenAdoptRawStatic( (char *) hb_itemGetPtr( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
+   }
+   else if( HB_IS_INTEGER( pPointer ) && pLen )
+   {
+      hb_retclenAdoptRawStatic( (char *) hb_itemGetNI( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
+   }
+   else if( HB_IS_LONG( pPointer ) && pLen )
+   {
+      hb_retclenAdoptRawStatic( (char *) hb_itemGetNL( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
    }
    else
    {

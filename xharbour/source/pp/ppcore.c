@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.199 2005/03/09 21:19:56 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.200 2005/03/10 23:19:39 andijahja Exp $
  */
 
 /*
@@ -3578,20 +3578,27 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
 
   if( *(exppatt+2) == '5' )       /*  ----  minimal match marker  */
   {
-     /* Copying a real expression to 'expreal' */
-     if( !lenreal )
+     if( lenreal )
+     {
+        if( ! IsIdentifier( expreal ) )
+        {
+           return 0;
+        }
+     }
+     else
      {
         lenreal = getExpReal( expreal, ptri, '5', maxlenreal, 0 );
      }
 
      //printf("Len: %i Pat: %s Exp: %s\n", lenreal, exppatt, expreal );
 
-     if( lenreal && IsIdentifier( expreal ) )
+     if( lenreal )
      {
         SearnRep( exppatt, expreal, lenreal, ptro, lenres);
      }
      else
      {
+        //printf( "*** FAILED! %i %s\n", lenreal, expreal );
         return 0;
      }
   }
@@ -3789,6 +3796,37 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
       goto Done;
    }
+   else if( cMarkerType == '5' )
+   {
+      if( ISID( **ptri ) )
+      {
+         if( expreal )
+         {
+            *expreal = **ptri;
+            expreal++;
+         }
+
+         (*ptri)++;
+         lens++;
+
+         while( ISNAME( **ptri ) )
+         {
+            if( expreal )
+            {
+               *expreal = **ptri;
+               expreal++;
+            }
+
+            (*ptri)++;
+            lens++;
+         }
+
+         expreal -= lens;
+         expreal[lens] = '\0';
+      }
+
+      goto Done;
+   }
 
    // Was:  "}]),|=*/^%" removed '/' to allow for Unix Paths starting with '/'
    if( strchr( "}]),|=*^%", ( *ptri )[0] ) ||
@@ -3815,15 +3853,20 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             if( expreal )
             {
                *expreal++ = **ptri;
+            }
 
-               /* Modified by Giancarlo Niccolai 2003-06-20 */
-               if ( IS_ESC_STRING( **ptri ) )
+            /* Modified by Giancarlo Niccolai 2003-06-20 */
+            if ( IS_ESC_STRING( **ptri ) )
+            {
+               (*ptri)++;
+               lens++;
+
+               if( expreal )
                {
-                  (*ptri)++;
-                  lens++;
                   *expreal++ = **ptri;
-                  bEsc = TRUE;
                }
+
+               bEsc = TRUE;
             }
 
             (*ptri)++;
@@ -4752,7 +4795,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
          }
          /* Ron Pinkas end 2000-06-17 */
 
-         if( expreal != NULL )
+         if( expreal )
          {
             *expreal++ = **ptri;
          }
@@ -4791,6 +4834,11 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       if( lens )
       {
          printf( "Len=%i >%.*s<\n", lens, lens, *ptri - lens );
+
+         if( expreal )
+         {
+            printf( "expreal: <%s>\n", expreal );
+         }
       }
       else
       {

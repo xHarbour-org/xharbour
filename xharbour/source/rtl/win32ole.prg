@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.71 2005/03/04 22:58:50 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.72 2005/03/05 16:58:40 ronpinkas Exp $
  */
 
 /*
@@ -179,6 +179,11 @@ ENDCLASS
 METHOD New( uObj, cClass ) CLASS TOleAuto
 
    LOCAL oErr
+
+   // Hack incase OLE Server already created and New() is attempted as an OLE Method.
+   IF ::hObj != NIL
+      RETURN HB_ExecFromArray( Self, "_New", HB_aParams() )
+   ENDIF
 
    IF ValType( uObj ) = 'C'
       ::hObj := CreateOleObject( uObj )
