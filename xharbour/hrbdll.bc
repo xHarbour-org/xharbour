@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.68 2004/11/10 15:23:47 paultucker Exp $
+# $Id: hrbdll.bc,v 1.69 2004/11/24 04:01:48 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -443,7 +443,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\uc8859_2.obj \
   $(OBJ_DIR)\uc88591b.obj \
   $(OBJ_DIR)\uckoi8.obj  \
-  $(OBJ_DIR)\ucmaz.obj
+  $(OBJ_DIR)\ucmaz.obj \
 #
 # hbtip
 #

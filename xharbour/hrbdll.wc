@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.20 2004/11/10 15:23:47 paultucker Exp $
+# $Id: hrbdll.wc,v 1.21 2004/11/24 04:01:49 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -441,7 +441,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\uc8859_2.obj \
   $(OBJ_DIR)\uc88591b.obj \
   $(OBJ_DIR)\uckoi8.obj  \
-  $(OBJ_DIR)\ucmaz.obj
+  $(OBJ_DIR)\ucmaz.obj \
   $(OBJ_DIR)\ppcomp.obj \
   $(OBJ_DIR)\ppcore.obj \
   $(OBJ_DIR)\pplib.obj \
