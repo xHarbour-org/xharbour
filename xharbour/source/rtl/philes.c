@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.17 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: philes.c,v 1.18 2004/03/30 22:47:23 druzus Exp $
  */
 
 /*
@@ -136,7 +136,12 @@ HB_FUNC( FWRITE )
 
 HB_FUNC( FERROR )
 {
+// For clipper compatibility MSC return 32 for file open in share mode !
+   #if defined(_MSC_VER)
+   hb_retni( hb_fsError() == 32 ? 5 : hb_fsError() ) ;
+   #else
    hb_retni( hb_fsError() );
+   #endif
 }
 
 HB_FUNC( HB_OSERROR )
