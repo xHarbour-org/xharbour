@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.3 2002/09/24 03:26:12 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.4 2002/10/14 23:54:32 ronpinkas Exp $
  */
 
 /*
@@ -150,7 +150,7 @@ DECLARE HBClass ;
 #xtranslate HBCLSCHOICE( .F., .F., .T., .F. ) => HB_OO_CLSTP_PROTECTED
 #xtranslate HBCLSCHOICE( .F., .F., .F., .T. ) => HB_OO_CLSTP_HIDDEN
 #xtranslate HBCLSCHOICE( .F., .T., .F., .F. ) => HB_OO_CLSTP_EXPORTED
-#xtranslate HBCLSCHOICE( .F., .F., .F., .F. ) => HB_OO_CLSTP_EXPORTED  // Default
+#xtranslate HBCLSCHOICE( .F., .F., .F., .F. ) => nScope  // Default
 
 /* CLASSY SYNTAX */
 #IFDEF HB_CLS_CSY
