@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbmake.prg,v 1.41 2003/01/25 20:43:41 lculik Exp $
+ * $Id: hbmake.prg,v 1.42 2003/01/27 12:31:38 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -385,11 +385,11 @@ FUNCTION ParseMakfi( cFile )
                              next
                             endif
                             if aTemp[1] == "ALLOBJ" .and. !lmt
-                                if at('hvm',lower(atemp[2]))==0
-                                   aTemp[2]+= if( !lmt .and. !lgui, " $(BHC)\obj\hvm.obj",;
-                                            if( lmt .and. !lgui," $(BHC)\obj\hvmmt.obj",;
-                                            if( !lmt .and. lgui, " $(BHC)\obj\hvmgui.obj",;
-                                            " $(BHC)\obj\hvmguimt.obj")))
+                                if at('hvm',lower(atemp[2]))==0 .and. !lLinux
+                                   aTemp[2]+= if( !lmt .and. !lgui, " $(BHC)\lib\hvm.obj",;
+                                            if( lmt .and. !lgui," $(BHC)\lib\hvmmt.obj",;
+                                            if( !lmt .and. lgui, " $(BHC)\lib\hvmgui.obj",;
+                                            " $(BHC)\lib\hvmguimt.obj")))
                                 endif
                             endif
                                           
