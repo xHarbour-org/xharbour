@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.39 2003/06/06 06:45:10 druzus Exp $
+ * $Id: itemapi.c,v 1.40 2003/07/05 17:38:45 lculik Exp $
  */
 
 /*
@@ -1366,7 +1366,7 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
          #endif
          {
          #ifndef HB_LONG_DOUBLE_OFF
-            long double dNumber = hb_itemGetNLD( pNumber );
+            long long dNumber = hb_itemGetNLD( pNumber );
          #else
             double dNumber = hb_itemGetND( pNumber );
          #endif
@@ -1720,7 +1720,7 @@ PHB_ITEM HB_EXPORT hb_itemValToStr( PHB_ITEM pItem )
    return pResult;
 }
 #ifndef HB_LONG_DOUBLE_OFF
-long double HB_EXPORT hb_itemGetNLD( PHB_ITEM pItem )
+long long HB_EXPORT hb_itemGetNLD( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetND(%p)", pItem));
 
@@ -1732,22 +1732,22 @@ long double HB_EXPORT hb_itemGetNLD( PHB_ITEM pItem )
             return pItem->item.asLDouble.value;
 
          case HB_IT_DOUBLE:
-            return ( long double ) pItem->item.asDouble.value;
+            return ( long long ) pItem->item.asDouble.value;
 
          case HB_IT_INTEGER:
-            return ( long double ) pItem->item.asInteger.value;
+            return ( long long ) pItem->item.asInteger.value;
 
          case HB_IT_LONG:
-            return ( long double ) pItem->item.asLong.value;
+            return ( long long ) pItem->item.asLong.value;
 
          case HB_IT_DATE:
-            return ( long double ) pItem->item.asDate.value;
+            return ( long long ) pItem->item.asDate.value;
 
          case HB_IT_LOGICAL:
-            return ( long double ) pItem->item.asLogical.value;
+            return ( long long ) pItem->item.asLogical.value;
 
          case HB_IT_STRING:
-            return ( long double ) pItem->item.asString.value[0];
+            return ( long long ) pItem->item.asString.value[0];
       }
    }
 
@@ -1755,7 +1755,7 @@ long double HB_EXPORT hb_itemGetNLD( PHB_ITEM pItem )
 }
 
 
-PHB_ITEM HB_EXPORT hb_itemPutNLD( PHB_ITEM pItem, long double dNumber )
+PHB_ITEM HB_EXPORT hb_itemPutNLD( PHB_ITEM pItem, long long dNumber )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutND(%p, %lf)", pItem, dNumber));
 
@@ -1780,7 +1780,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNLD( PHB_ITEM pItem, long double dNumber )
 
    return pItem;
 }
-PHB_ITEM HB_EXPORT hb_itemPutNLDLen( PHB_ITEM pItem, long double dNumber, int iWidth, int iDec )
+PHB_ITEM HB_EXPORT hb_itemPutNLDLen( PHB_ITEM pItem, long long dNumber, int iWidth, int iDec )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutNLDLen(%p, %lf, %d, %d)", pItem, dNumber, iWidth, iDec));
 

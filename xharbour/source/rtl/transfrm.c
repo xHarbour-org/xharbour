@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.18 2003/05/28 11:59:06 druzus Exp $
+ * $Id: transfrm.c,v 1.19 2003/07/05 17:40:42 lculik Exp $
  */
 
 /*
@@ -439,7 +439,7 @@ HB_FUNC( TRANSFORM )
       else if( HB_IS_NUMERIC( pValue ) )
       {
       #ifndef HB_LONG_DOUBLE_OFF
-         long double   dPush;
+         long long   dPush;
       #else
          double   dPush;
       #endif

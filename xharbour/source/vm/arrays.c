@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.51 2003/05/25 17:03:18 jonnymind Exp $
+ * $Id: arrays.c,v 1.52 2003/07/05 17:38:45 lculik Exp $
  */
 
 /*
@@ -1421,7 +1421,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 }
 
 #ifndef HB_LONG_DOUBLE_OFF
-long double HB_EXPORT hb_arrayGetNLD( PHB_ITEM pArray, ULONG ulIndex )
+long long HB_EXPORT hb_arrayGetNLD( PHB_ITEM pArray, ULONG ulIndex )
 {
    double dRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetND(%p, %lu)", pArray, ulIndex));
