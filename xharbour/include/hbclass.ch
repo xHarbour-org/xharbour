@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.16 2004/06/17 20:29:34 modalsist Exp $
+ * $Id: hbclass.ch,v 1.17 2004/06/17 23:33:43 modalsist Exp $
  */
 
 /*
@@ -169,6 +169,44 @@ DECLARE HBClass ;
 #xtranslate _HB_MEMBER {AS Char => _HB_MEMBER {AS Character
 #endif
 
+// Extend Classes
+#xcommand OVERRIDE METHOD <!Message!> [IN] CLASS <!Class!> WITH [METHOD] <!Method!> [SCOPE <Scope>] => ;
+  <Class>(); __clsModMsg( __ClsGetHandleFromName( #<Class> ), #<Message>, @<Method>(), IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ) )
+
+#xcommand EXTEND CLASS <!Class!> WITH <data: DATA, VAR> <!Data!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), #<Data>, __cls_IncData( __ClsGetHandleFromName( #<Class> ) ), HB_OO_MSG_PROPERTY, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
+
+#xcommand EXTEND CLASS <!Class!> WITH METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), #<Method>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
+
+#xcommand EXTEND CLASS <!Class!> WITH MESSAGE <!Message!> METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  <Class>(); __clsAddMsg( __ClsGetHandleFromName( #<Class> ), #<Message>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
+
+
+// EXTEND native type classes.
+#xcommand OVERRIDE METHOD <!Message!> [IN] CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER> WITH [METHOD] <!Method!> [SCOPE <Scope>] => ;
+  _<type>(); __clsModMsg( __ClsGetHandleFromName( #<type> ), #<Message>, @<Method>(), IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ) )
+
+#xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER> WITH <data: DATA, VAR> <!Data!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), #<Data>, __cls_IncData( __ClsGetHandleFromName( #<type> ) ), HB_OO_MSG_PROPERTY, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
+
+#xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER> WITH METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), #<Method>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
+
+#xcommand EXTEND CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER> WITH MESSAGE <!Message!> METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  _<type>(); __clsAddMsg( __ClsGetHandleFromName( #<type> ), #<Message>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
+
+
+// Extend native type (NOT using standard classes)
+#xcommand EXTEND [TYPE] <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER> WITH METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  __clsAddMsg( __ClsGetHandleFromName( #<type> ), #<Method>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
+
+#xcommand EXTEND [TYPE] <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER> WITH MESSAGE <!Message!> METHOD <!Method!> [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>] => ;
+  __clsAddMsg( __ClsGetHandleFromName( #<type> ), #<Message>, @<Method>(), HB_OO_MSG_METHOD, NIL, IIF( <.Scope.>, <Scope>, HB_OO_CLSTP_EXPORTED ), <.Persistent>, <.Case.> )
+
+// ENABLE
+#xcommand ENABLE TYPE CLASS <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER> [, <typeN: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NUMERIC, POINTER>] => _<type>() [;_<typeN>()]
+
 #ifdef HB_CLS_ALLOWCLASS  /* DONT DECLARE IT ! WORK IN PROGRESS !!! */
 
 #ifndef HB_SHORTNAMES
@@ -236,6 +274,28 @@ DECLARE HBClass ;
    _HB_CLASS <ClassName> ;;
    [ REQUEST <SuperClass1> ] [ ,<SuperClassN> ] ;;
    <static> function <ClassName>(...) ;;
+      static s_oClass ;;
+      local oClassInstance ;;
+      local nScope ;;
+      nScope := HB_OO_CLSTP_EXPORTED ;;
+      if s_oClass == NIL ;;
+         s_oClass  := IIF(<.metaClass.>, <(metaClass)>, HBClass():new( <(ClassName)> , __HB_CLS_PAR ( [ <(SuperClass1)> ] [ ,<(SuperClassN)> ] ) ) ) ;;
+     #undef  _CLASS_NAME_ ;;
+     #define _CLASS_NAME_ <ClassName> ;;
+     #undef  _CLASS_MODE_ ;;
+     #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
+     #xtranslate CLSMETH <ClassName> \<MethodName> => @<ClassName>_\<MethodName> ;;
+     #xtranslate DECLCLASS <ClassName> => ;;
+     [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
+     [ ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ] ;
+     [ ; #translate Super() : => ::<SuperClass1>: ] ;
+     [ ; #translate Super : => ::<SuperClass1>: ] ;
+     [ ; #translate : Super : => :<SuperClass1>: ]
+
+#xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN>] ] [<static: STATIC>] FUNCTION <FuncName> => ;
+   _HB_CLASS <ClassName> ;;
+   [ REQUEST <SuperClass1> ] [ ,<SuperClassN> ] ;;
+   <static> function <FuncName>(...) ;;
       static s_oClass ;;
       local oClassInstance ;;
       local nScope ;;

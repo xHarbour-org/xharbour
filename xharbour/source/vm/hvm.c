@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.409 2004/07/03 03:34:54 ronpinkas Exp $
+ * $Id: hvm.c,v 1.410 2004/07/22 15:36:51 vouchcac Exp $
  */
 
 /*
@@ -6120,7 +6120,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       pSelf = hb_itemUnRef( pSelf );
    }
 
-   if( HB_IS_BLOCK( pSelf ) )
+   if( HB_IS_BLOCK( pSelf ) && hb_cls_uiBlockClass == 0 )
    {
       if( pSym == &( hb_symEval ) )
       {
@@ -6132,7 +6132,15 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
       }
    }
-   else if( HB_IS_OBJECT( pSelf ) )               /* Object passed            */
+   else if( HB_IS_OBJECT( pSelf ) ||
+            ( HB_IS_ARRAY( pSelf ) && hb_cls_uiArrayClass ) ||
+            ( HB_IS_BLOCK( pSelf ) && hb_cls_uiBlockClass ) ||
+            ( HB_IS_STRING( pSelf ) && hb_cls_uiCharacterClass ) ||
+            ( HB_IS_DATE( pSelf ) && hb_cls_uiDateClass ) ||
+            ( HB_IS_LOGICAL( pSelf ) && hb_cls_uiLogicalClass ) ||
+            ( HB_IS_NUMERIC( pSelf ) && hb_cls_uiNumericClass ) ||
+            ( HB_IS_POINTER( pSelf ) && hb_cls_uiPointerClass )
+          )               /* Object passed            */
    {
       //TraceLog( NULL, "Object: '%s' Message: '%s'\n", hb_objGetClsName( pSelf ), pSym->szName );
 
@@ -6149,53 +6157,56 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             pFunc = hb___msgSetData;
          }
 
-         lPopSuper = FALSE;
-         pSelfBase = pSelf->item.asArray.value;
-
-         if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
+         if( HB_IS_OBJECT( pSelf ) )
          {
-            HB_ITEM RealSelf;
-            USHORT nPos;
-            USHORT uiClass;
+            lPopSuper = FALSE;
+            pSelfBase = pSelf->item.asArray.value;
 
-            //printf( "\n VmSend Method: %s \n", pSym->szName );
-            uiClass = pSelfBase->uiClass;
-            pItem->item.asSymbol.uiSuperClass = uiClass;
-
-            RealSelf.type = HB_IT_NIL;
-
-            //TraceLog( NULL, "pRealSelf %p pItems %p\n", pRealSelf, pSelfBase->pItems );
-
-            if( pSelfBase )
+            if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
             {
-               hb_itemCopy( &RealSelf, pSelfBase->pItems ) ;  // hb_arrayGetItemPtr(pSelf,1) ;
+               HB_ITEM RealSelf;
+               USHORT nPos;
+               USHORT uiClass;
+
+               //printf( "\n VmSend Method: %s \n", pSym->szName );
+               uiClass = pSelfBase->uiClass;
+               pItem->item.asSymbol.uiSuperClass = uiClass;
+
+               RealSelf.type = HB_IT_NIL;
+
+               //TraceLog( NULL, "pRealSelf %p pItems %p\n", pRealSelf, pSelfBase->pItems );
+
+               if( pSelfBase )
+               {
+                  hb_itemCopy( &RealSelf, pSelfBase->pItems ) ;  // hb_arrayGetItemPtr(pSelf,1) ;
+               }
+               else
+               {
+                  //TraceLog( NULL, "OOPS!!! Object: '%s' Message: '%s' Len: %i\n", hb_objGetClsName( pSelf ), pSym->szName, pSelfBase->ulLen );
+                  hb_errInternal( HB_EI_ERRUNRECOV, "Faked super object has no datas (missing real self)!", NULL, NULL );
+               }
+
+               /* and take back the good pSelfBase */
+               pSelfBase = (&RealSelf)->item.asArray.value;
+
+               /* Now I should exchnage it with the current stacked value */
+               hb_itemSwap( pSelf, &RealSelf );
+               hb_itemClear( &RealSelf ) ; /* and release the fake one */
+
+               /* Push current SuperClass handle */
+               lPopSuper = TRUE ;
+
+               if( ! pSelf->item.asArray.value->puiClsTree )
+               {
+                  pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
+                  pSelf->item.asArray.value->puiClsTree[0]=0;
+               }
+
+               nPos = pSelfBase->puiClsTree[0] + 1;
+               pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos+1) ) ;
+               pSelfBase->puiClsTree[0] = nPos ;
+               pSelfBase->puiClsTree[ nPos ] = uiClass;
             }
-            else
-            {
-               //TraceLog( NULL, "OOPS!!! Object: '%s' Message: '%s' Len: %i\n", hb_objGetClsName( pSelf ), pSym->szName, pSelfBase->ulLen );
-               hb_errInternal( HB_EI_ERRUNRECOV, "Faked super object has no datas (missing real self)!", NULL, NULL );
-            }
-
-            /* and take back the good pSelfBase */
-            pSelfBase = (&RealSelf)->item.asArray.value;
-
-            /* Now I should exchnage it with the current stacked value */
-            hb_itemSwap( pSelf, &RealSelf );
-            hb_itemClear( &RealSelf ) ; /* and release the fake one */
-
-            /* Push current SuperClass handle */
-            lPopSuper = TRUE ;
-
-            if( ! pSelf->item.asArray.value->puiClsTree )
-            {
-               pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
-               pSelf->item.asArray.value->puiClsTree[0]=0;
-            }
-
-            nPos = pSelfBase->puiClsTree[0] + 1;
-            pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos+1) ) ;
-            pSelfBase->puiClsTree[0] = nPos ;
-            pSelfBase->puiClsTree[ nPos ] = uiClass;
          }
       }
    }

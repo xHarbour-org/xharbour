@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3212 2004/07/26 01:09:37 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3213 2004/07/26 01:43:50 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-26 03:36 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/rtl/objfunc.prg
+    * Some correction of iconsistencies.
+
+  * include/classes.h
+  * source/vm/classes.c
+  * source/vm/hvm.c
+    + Added support for using native types as objects.
+
+  * source/rtl/tclass.prg
+    + Added basic classes definitions for native types.
+
+  * include/hbclass.ch
+    + Added support for new syntax:
+      EXTEND [TYPE] ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NUMERIC|POINTER WITH METHOD <SomeFunc>
+      EXTEND [TYPE] ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NUMERIC|POINTER WITH MESSAGE <SomeMessage> METHOD <SomeFunc>
+
+      OVERRIDE METHOD <SomeMethod> [IN] CLASS <SomeClass> WITH [METHOD] <SomeFunc> [SCOPE <Scope>]
+      EXTEND CLASS <SomeClass> WITH METHOD <SomeFunc>
+      EXTEND CLASS <SomeClass> WITH METHOD <SomeFunc>
+      EXTEND CLASS <SomeClass> WITH MESSAGE <SomeMessage> METHOD <SomeFunc>
+
+  + tests/enbltype.prg
+    + New sample to demonstrate enabling and utilization of native types as extendable objects.
+
+  + tests/exttype.prg
+     + New sample to demonstrate extension of native types with OUT using any class deinitions.
+
+  + tests/extend.prg
+     + New sample to demonstrate how to extend normal classes as well as native type base classes.
+
+  + tests/override.prg
+    + New sample to demonstrate how to override methods of existing classes as well as native type base classes.
+
 2004-07-25 22:30 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com
   + contrib/pdflib/fonts.dat
   + contrib/pdflib/pdf.ch

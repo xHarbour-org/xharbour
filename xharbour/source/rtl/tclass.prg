@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.9 2003/11/10 00:59:32 fsgiudice Exp $
+ * $Id: tclass.prg,v 1.10 2004/03/03 11:41:10 ronpinkas Exp $
  */
 
 /*
@@ -75,6 +75,8 @@
 
 #include "common.ch"
 #include "hboo.ch"
+
+#include "hbclass.ch"
 
 STATIC s_nDataId
 
@@ -536,4 +538,49 @@ FUNCTION __ClassIns( hClass )
 RETURN __ClsInst( hClass )
 
 //----------------------------------------------------------------------------//
+
+CLASS SCALAROBJECT
+   METHOD IsScalar() INLINE .T.
+ENDCLASS
+
+//----------------------------------------------------------------------------//
+
+CLASS ARRAY FROM SCALAROBJECT FUNCTION _ARRAY
+   METHOD AsString() INLINE ValToPrgExp( HB_QSelf() )
+ENDCLASS
+
+//----------------------------------------------------------------------------//
+CLASS BLOCK FROM SCALAROBJECT FUNCTION _BLOCK
+   METHOD AsString() INLINE "{||...}"
+ENDCLASS
+
+//----------------------------------------------------------------------------//
+
+CLASS CHARACTER FROM SCALAROBJECT FUNCTION _CHARACTER
+   METHOD AsString INLINE HB_QSelf()
+ENDCLASS
+
+//----------------------------------------------------------------------------//
+
+CLASS DATE FROM SCALAROBJECT FUNCTION _DATE
+   METHOD AsString INLINE DToc( HB_QSelf() )
+ENDCLASS
+
+//----------------------------------------------------------------------------//
+
+CLASS LOGICAL FROM SCALAROBJECT FUNCTION _LOGICAL
+   METHOD AsString INLINE IIF( HB_QSelf(), ".T.", ".F." )
+ENDCLASS
+
+//----------------------------------------------------------------------------//
+
+CLASS NUMERIC FROM SCALAROBJECT FUNCTION _NUMERIC
+   METHOD AsString INLINE LTrim( Str( ( HB_QSelf() ) ) )
+ENDCLASS
+
+//----------------------------------------------------------------------------//
+
+CLASS POINTER FROM SCALAROBJECT FUNCTION _POINTER
+   METHOD AsString INLINE HB_NumToHex( HB_QSelf() )
+ENDCLASS
 

@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.18 2004/01/31 08:24:26 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.19 2004/07/23 01:43:52 ronpinkas Exp $
  */
 
 /*
@@ -331,27 +331,37 @@ FUNCTION __ObjSetValueList( oObject, aData )
 
 RETURN oObject
 
-FUNCTION __objAddMethod( oObject, cSymbol, pFuncPtr )
+FUNCTION __objAddMethod( oObject, cSymbol, pFuncPtr, nScope, lPersistent, lCase )
 
    IF !ISOBJECT( oObject ) .OR. !ISCHARACTER( cSymbol ) .OR. !ISPOINTER( pFuncPtr )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ELSEIF !__objHasMsg( oObject, cSymbol )
-      __clsAddMsg( oObject:ClassH, cSymbol, pFuncPtr, HB_OO_MSG_METHOD, NIL, 1 )
+      IF PCount() < 4
+         nScope := HB_OO_CLSTP_EXPORTED
+      ENDIF
+
+    //__clsAddMsg( <hClass/pObject>, <cMessage>, <Func_or_Block_or_ID>, <nType>,         [<Super_or_Init>], [<nScope>], [<lPersistent>], [<lCase> ] )
+      __clsAddMsg( oObject:ClassH,    cSymbol,    pFuncPtr,              HB_OO_MSG_METHOD, NIL,               nScope,     lPersistent,     lCase )
    ENDIF
 
 RETURN oObject
 
-FUNCTION __objAddInline( oObject, cSymbol, bInline )
+FUNCTION __objAddInline( oObject, cSymbol, bInline, nScope, lPersistent, lCase )
 
    IF !ISOBJECT( oObject ) .OR. !ISCHARACTER( cSymbol )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ELSEIF !__objHasMsg( oObject, cSymbol )
-      __clsAddMsg( oObject:ClassH, cSymbol, bInline, HB_OO_MSG_INLINE, NIL, 1 )
+      IF PCount() < 4
+         nScope := HB_OO_CLSTP_EXPORTED
+      ENDIF
+
+    //__clsAddMsg( <hClass/pObject>, <cMessage>, <Func_or_Block_or_ID>, <nType>,         [<Super_or_Init>], [<nScope>], [<lPersistent>], [<lCase> ] )
+      __clsAddMsg( oObject:ClassH,    cSymbol,    bInline,               HB_OO_MSG_INLINE, NIL,               nScope, lPersistent, lCase )
    ENDIF
 
 RETURN oObject
 
-FUNCTION __objAddData( oObject, cSymbol, nScope )
+FUNCTION __objAddData( oObject, cSymbol, nScope, lPersistent, lCase )
 
    LOCAL nSeq, hClass
 
@@ -361,17 +371,17 @@ FUNCTION __objAddData( oObject, cSymbol, nScope )
       hClass := oObject:ClassH
       nSeq   := __cls_IncData( hClass )         // Allocate new Seq#
 
-      IF nScope == NIL
+      IF PCount() < 4
          nScope := HB_OO_CLSTP_EXPORTED
       ENDIF
 
-      __clsAddMsg( hClass,       cSymbol, nSeq, HB_OO_MSG_PROPERTY, NIL, nScope )
-      //__clsAddMsg( hClass, "_" + cSymbol, nSeq, HB_OO_MSG_DATA, NIL, nScope )
+    //__clsAddMsg( <hClass/pObject>, <cMessage>, <Func_or_Block_or_ID>, <nType>,           [<Super_or_Init>], [<nScope>], [<lPersistent>], [<lCase> ] )
+      __clsAddMsg( hClass,            cSymbol,    nSeq,                  HB_OO_MSG_PROPERTY, NIL,               nScope, lPersistent, lCase )
    ENDIF
 
 RETURN oObject
 
-FUNCTION __objAddAccessAssign( oObject, cSymbol, bInLine )
+FUNCTION __objAddAccessAssign( oObject, cSymbol, bInLine, nScope, lPersistent, lCase )
 
    LOCAL hClass
 
@@ -380,7 +390,8 @@ FUNCTION __objAddAccessAssign( oObject, cSymbol, bInLine )
    ELSEIF !__objHasMsg( oObject, cSymbol ) .AND. !__objHasMsg( oObject, "_" + cSymbol )
       hClass := oObject:ClassH
 
-      __clsAddMsg( hClass,       cSymbol, bInLine, HB_OO_MSG_INLINE, NIL, 1 + 16 )
+    //__clsAddMsg( <hClass/pObject>, <cMessage>, <Func_or_Block_or_ID>, <nType>,         [<Super_or_Init>], [<nScope>], [<lPersistent>], [<lCase> ] )
+      __clsAddMsg( hClass,            cSymbol,    bInLine,               HB_OO_MSG_INLINE, NIL,              nScope, lPersistent, lCase )
       __clsAddMsg( hClass, "_" + cSymbol, bInLine, HB_OO_MSG_INLINE, NIL, 1 )
    ENDIF
 
@@ -434,6 +445,7 @@ FUNCTION __objSetMethod( oObject, cMsg, FuncOrBlock, nScope )
 
 RETURN oObject
 
+// WARNING - do NOT use this Function, not supported yet!!!
 FUNCTION __objDelData( oObject, cSymbol )
 
    IF !ISOBJECT( oObject ) .OR. !ISCHARACTER( cSymbol )

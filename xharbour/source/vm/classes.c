@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.123 2004/07/01 23:26:26 ronpinkas Exp $
+ * $Id: classes.c,v 1.124 2004/07/03 03:34:54 ronpinkas Exp $
  */
 
 /*
@@ -178,6 +178,9 @@ static PHB_DYNS s_msgClsParent = NULL;
 static BOOL     s_bClsScope    = TRUE;
 static BOOL     s_bClsAutoInit = TRUE;
 /* static PHB_DYNS s_msgClass     = NULL; */
+
+USHORT hb_cls_uiArrayClass = 0, hb_cls_uiBlockClass = 0, hb_cls_uiCharacterClass = 0, hb_cls_uiDateClass = 0,
+       hb_cls_uiLogicalClass = 0, hb_cls_uiNumericClass = 0, hb_cls_uiPointerClass = 0;
 
 HB_SYMB  hb_symDestructor = { "__Destructor", HB_FS_PUBLIC, {NULL}, NULL };
 
@@ -896,7 +899,48 @@ HB_EXPORT USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
       return 0;
    }
 
-   uiClass = pObject->item.asArray.value->uiClass;
+   if( HB_IS_OBJECT( pObject ) )
+   {
+      uiClass = pObject->item.asArray.value->uiClass;
+   }
+   else
+   {
+      switch( pObject->type )
+      {
+         case HB_IT_ARRAY :
+            uiClass = hb_cls_uiArrayClass;
+            break;
+
+         case HB_IT_BLOCK :
+            uiClass = hb_cls_uiBlockClass;
+            break;
+
+         case HB_IT_STRING :
+            uiClass = hb_cls_uiCharacterClass;
+            break;
+
+         case HB_IT_DATE :
+            uiClass = hb_cls_uiDateClass;
+            break;
+
+         case HB_IT_LOGICAL :
+            uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_INTEGER:
+         case HB_IT_LONG:
+         case HB_IT_DOUBLE:
+            uiClass = hb_cls_uiNumericClass;
+            break;
+
+         case HB_IT_POINTER :
+            uiClass = hb_cls_uiPointerClass;
+            break;
+
+         default:
+            uiClass = 0;
+      }
+   }
 
    /* default value to current class object */
    if( pObject->item.asArray.value->puiClsTree && pObject->item.asArray.value->puiClsTree[0] )
@@ -1025,13 +1069,47 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
 
    //TraceLog( NULL, "Message: %s -> hb_objGetMthd(%p, '%s', %i)\n", pMessage->szName, pObject, pMsg->pSymbol->szName, lAllowErrFunc, bConstructor );
 
-   if( HB_IS_ARRAY( pObject ) )
+   if( HB_IS_OBJECT( pObject ) )
    {
       uiClass = pObject->item.asArray.value->uiClass;
    }
    else
    {
-      uiClass = 0;
+      switch( pObject->type )
+      {
+         case HB_IT_ARRAY :
+            uiClass = hb_cls_uiArrayClass;
+            break;
+
+         case HB_IT_BLOCK :
+            uiClass = hb_cls_uiBlockClass;
+            break;
+
+         case HB_IT_STRING :
+            uiClass = hb_cls_uiCharacterClass;
+            break;
+
+         case HB_IT_DATE :
+            uiClass = hb_cls_uiDateClass;
+            break;
+
+         case HB_IT_LOGICAL :
+            uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_INTEGER:
+         case HB_IT_LONG:
+         case HB_IT_DOUBLE:
+            uiClass = hb_cls_uiNumericClass;
+            break;
+
+         case HB_IT_POINTER :
+            uiClass = hb_cls_uiPointerClass;
+            break;
+
+         default:
+            uiClass = 0;
+      }
    }
 
    if( uiClass && uiClass <= s_uiClasses )
@@ -1198,13 +1276,47 @@ HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetpMethod(%p, %p)", pObject, pMessage));
 
-   if( HB_IS_ARRAY( pObject ) )
+   if( HB_IS_OBJECT( pObject ) )
    {
       uiClass = pObject->item.asArray.value->uiClass;
    }
    else
    {
-      uiClass = 0;
+      switch( pObject->type )
+      {
+         case HB_IT_ARRAY :
+            uiClass = hb_cls_uiArrayClass;
+            break;
+
+         case HB_IT_BLOCK :
+            uiClass = hb_cls_uiBlockClass;
+            break;
+
+         case HB_IT_STRING :
+            uiClass = hb_cls_uiCharacterClass;
+            break;
+
+         case HB_IT_DATE :
+            uiClass = hb_cls_uiDateClass;
+            break;
+
+         case HB_IT_LOGICAL :
+            uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_INTEGER:
+         case HB_IT_LONG:
+         case HB_IT_DOUBLE:
+            uiClass = hb_cls_uiNumericClass;
+            break;
+
+         case HB_IT_POINTER :
+            uiClass = hb_cls_uiPointerClass;
+            break;
+
+         default:
+            uiClass = 0;
+      }
    }
 
    if( uiClass && uiClass <= s_uiClasses )
@@ -1582,7 +1694,8 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
 }
 
 /*
- * __clsAddMsg( <hClass/pObject>, <cMessage>, <pFunction>, <nType>, [xInit], <uiScope>, <lPersistent> )
+/*               1                  2            3                     4         5                  6           7                8
+ * __clsAddMsg( <hClass/pObject>,  <cMessage>, <Func_or_Block_or_ID>, <nType>, [<Super_or_Init>], [<nScope>], [<lPersistent>], [<lCase> ] )
  *
  * Add a message to the class.
  *
@@ -1640,6 +1753,7 @@ HB_FUNC( __CLSADDMSG )
    {
       pFunc_or_BlockPointer = hb_parptr( 3 );
    }
+   //3 Alternate
    uiID = hb_parni( 3 );
 
    // 4
@@ -1710,12 +1824,13 @@ HB_FUNC( __CLSNEW )
    /*USHORT nLenShrDatas = 0;*/
    USHORT nLenClsDatas = 0;
    USHORT nLenInlines = 0;
-   USHORT nLenDatas = 0;
    USHORT uiKnownMethods = ( hb_parni(2) * 2 ) + hb_parni(3);
 
    HB_THREAD_STUB
 
    HB_TRACE( HB_TR_DEBUG, ( "__ClsNew( %s, %i, %i, %i )\n", hb_parcx(1), hb_parni(2), hb_parni(3), hb_itemSize( hb_param(4, HB_IT_ARRAY) ) ) );
+
+   //TraceLog( NULL, "__ClsNew( %s, %i, %i, %i )\n", hb_parcx(1), hb_parni(2), hb_parni(3), hb_itemSize( hb_param(4, HB_IT_ARRAY) ) );
 
    if ( pahSuper )
    {
@@ -1733,10 +1848,8 @@ HB_FUNC( __CLSNEW )
 
    pNewCls = s_pClasses + s_uiClasses;
    pNewCls->szName = ( char * ) hb_xgrab( hb_parclen( 1 ) + 1 );
+   memcpy( pNewCls->szName, hb_parcx( 1 ), hb_parclen( 1 ) + 1 );
 
-   memset( pNewCls->szName, 0, hb_parclen( 1 ) + 1);
-
-   strcpy( pNewCls->szName, hb_parcx( 1 ) );
    pNewCls->uiDataFirst = 0;
    pNewCls->uiDatas = 0;
    pNewCls->uiMethods = 0;
@@ -1799,7 +1912,6 @@ HB_FUNC( __CLSNEW )
             /* Ok add now the previous len to the offset */
             nLenClsDatas  = ( USHORT ) pNewCls->pClassDatas->item.asArray.value->ulLen;
             nLenInlines   = ( USHORT ) pNewCls->pInlines->item.asArray.value->ulLen;
-            nLenDatas     = ( USHORT ) pNewCls->uiDatas;
 
             /* ClassDatas */
             pClsAnyTmp = hb_arrayClone( pSprCls->pClassDatas, NULL );
@@ -1983,9 +2095,41 @@ HB_FUNC( __CLSNEW )
 
    HB_TRACE( HB_TR_DEBUG, ( "Finalized: '%s' Known: %i Key: %i\n", pNewCls->szName, uiKnownMethods, pNewCls->uiHashKey ) );
 
-   hb_retni( ++s_uiClasses );
-}
+   ++s_uiClasses;
 
+   if( strcmp( pNewCls->szName, "ARRAY" ) == 0 )
+   {
+      hb_cls_uiArrayClass = s_uiClasses;
+   }
+   else if( strcmp( pNewCls->szName, "BLOCK" ) == 0 )
+   {
+      hb_cls_uiBlockClass = s_uiClasses;
+   }
+   else if( strcmp( pNewCls->szName, "CHARACTER" ) == 0 )
+   {
+      hb_cls_uiCharacterClass = s_uiClasses;
+   }
+   else if( strcmp( pNewCls->szName, "DATE" ) == 0 )
+   {
+      hb_cls_uiDateClass = s_uiClasses;
+   }
+   else if( strcmp( pNewCls->szName, "LOGICAL" ) == 0 )
+   {
+      hb_cls_uiLogicalClass = s_uiClasses;
+   }
+   else if( strcmp( pNewCls->szName, "NUMERIC" ) == 0 )
+   {
+      hb_cls_uiNumericClass = s_uiClasses;
+   }
+   else if( strcmp( pNewCls->szName, "POINTER" ) == 0 )
+   {
+      hb_cls_uiPointerClass = s_uiClasses;
+   }
+
+   //TraceLog( NULL, "Class >%s< >%s< %i\n", hb_parc(1), pNewCls->szName, hb_cls_uiNumericClass );
+
+   hb_retni( s_uiClasses );
+}
 
 /*
  * __clsDelMsg( <oObj>, <cMessage> )
@@ -2859,16 +3003,54 @@ HB_FUNC( __SENDER )
 HB_FUNC( __CLASSH )
 {
    HB_THREAD_STUB
-   PHB_ITEM pObject = hb_param( 1, HB_IT_OBJECT );
 
-   if( pObject )
+   PHB_ITEM pObject = hb_param( 1, HB_IT_ANY );
+   USHORT uiClass;
+
+   switch( pObject->type )
    {
-      hb_retni( pObject->item.asArray.value->uiClass );
+      case HB_IT_ARRAY :
+         if( pObject->item.asArray.value->uiClass )
+         {
+            uiClass = pObject->item.asArray.value->uiClass;
+         }
+         else
+         {
+            uiClass = hb_cls_uiArrayClass;
+         }
+         break;
+
+      case HB_IT_BLOCK :
+         uiClass = hb_cls_uiBlockClass;
+         break;
+
+      case HB_IT_STRING :
+         uiClass = hb_cls_uiCharacterClass;
+         break;
+
+      case HB_IT_DATE :
+         uiClass = hb_cls_uiDateClass;
+         break;
+
+      case HB_IT_LOGICAL :
+         uiClass = hb_cls_uiLogicalClass;
+         break;
+
+      case HB_IT_INTEGER:
+      case HB_IT_LONG:
+      case HB_IT_DOUBLE:
+         uiClass = hb_cls_uiNumericClass;
+         break;
+
+      case HB_IT_POINTER :
+         uiClass = hb_cls_uiPointerClass;
+         break;
+
+      default:
+         uiClass = 0;
    }
-   else
-   {
-      hb_retni( 0 );
-   }
+
+   hb_retni( uiClass );
 }
 
 /*
@@ -2910,12 +3092,55 @@ HB_FUNC( __EVAL )
 static HARBOUR hb___msgClsH( void )
 {
    HB_THREAD_STUB
-   if( HB_IS_ARRAY( hb_stackSelfItem() ) )
-      hb_retni( ( hb_stackSelfItem() )->item.asArray.value->uiClass );
-   else
-      hb_retni( 0 );
-}
 
+   PHB_ITEM pObject = hb_stackSelfItem();
+   USHORT uiClass;
+
+   switch( pObject->type )
+   {
+      case HB_IT_ARRAY :
+         if( pObject->item.asArray.value->uiClass )
+         {
+            uiClass = pObject->item.asArray.value->uiClass;
+         }
+         else
+         {
+            uiClass = hb_cls_uiArrayClass;
+         }
+         break;
+
+      case HB_IT_BLOCK :
+         uiClass = hb_cls_uiBlockClass;
+         break;
+
+      case HB_IT_STRING :
+         uiClass = hb_cls_uiCharacterClass;
+         break;
+
+      case HB_IT_DATE :
+         uiClass = hb_cls_uiDateClass;
+         break;
+
+      case HB_IT_LOGICAL :
+         uiClass = hb_cls_uiLogicalClass;
+         break;
+
+      case HB_IT_INTEGER:
+      case HB_IT_LONG:
+      case HB_IT_DOUBLE:
+         uiClass = hb_cls_uiNumericClass;
+         break;
+
+      case HB_IT_POINTER :
+         uiClass = hb_cls_uiPointerClass;
+         break;
+
+      default:
+         uiClass = 0;
+   }
+
+   hb_retni( uiClass );
+}
 
 /* Added by JfL&RaC
  * <logical> <= <obj>:IsDerivedFrom( xParam )
@@ -2941,7 +3166,48 @@ static HARBOUR hb___msgClsParent( void )
       pItemRef = hb_stackSelfItem();
    }
 
-   uiClass = pItemRef->item.asArray.value->uiClass;
+   if( HB_IS_OBJECT( pItemRef ) )
+   {
+      uiClass = pItemRef->item.asArray.value->uiClass;
+   }
+   else
+   {
+      switch( pItemRef->type )
+      {
+         case HB_IT_ARRAY :
+            uiClass = hb_cls_uiArrayClass;
+            break;
+
+         case HB_IT_BLOCK :
+            uiClass = hb_cls_uiBlockClass;
+            break;
+
+         case HB_IT_STRING :
+            uiClass = hb_cls_uiCharacterClass;
+            break;
+
+         case HB_IT_DATE :
+            uiClass = hb_cls_uiDateClass;
+            break;
+
+         case HB_IT_LOGICAL :
+            uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_INTEGER:
+         case HB_IT_LONG:
+         case HB_IT_DOUBLE:
+            uiClass = hb_cls_uiNumericClass;
+            break;
+
+         case HB_IT_POINTER :
+            uiClass = hb_cls_uiPointerClass;
+            break;
+
+         default:
+            uiClass = 0;
+      }
+   }
 
    pItemParam = hb_stackItemFromBase( 1 );
 
@@ -2996,9 +3262,52 @@ static HARBOUR hb___msgClsFullSel( void )
 {
    HB_THREAD_STUB
    HB_ITEM_PTR pSelf = hb_stackSelfItem();
-   USHORT uiClass = ( USHORT ) ( HB_IS_ARRAY( pSelf ) ? pSelf->item.asArray.value->uiClass : 0 );
+   USHORT uiClass;
    HB_ITEM Return;
    USHORT nParam = hb_parni( 1 ), uiScope = hb_parni( 2 );
+
+   if( HB_IS_OBJECT( pSelf ) )
+   {
+      uiClass = pSelf->item.asArray.value->uiClass;
+   }
+   else
+   {
+      switch( pSelf->type )
+      {
+         case HB_IT_ARRAY :
+            uiClass = hb_cls_uiArrayClass;
+            break;
+
+         case HB_IT_BLOCK :
+            uiClass = hb_cls_uiBlockClass;
+            break;
+
+         case HB_IT_STRING :
+            uiClass = hb_cls_uiCharacterClass;
+            break;
+
+         case HB_IT_DATE :
+            uiClass = hb_cls_uiDateClass;
+            break;
+
+         case HB_IT_LOGICAL :
+            uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_INTEGER:
+         case HB_IT_LONG:
+         case HB_IT_DOUBLE:
+            uiClass = hb_cls_uiNumericClass;
+            break;
+
+         case HB_IT_POINTER :
+            uiClass = hb_cls_uiPointerClass;
+            break;
+
+         default:
+            uiClass = 0;
+      }
+   }
 
    Return.type = HB_IT_NIL;
 
@@ -3080,9 +3389,52 @@ static HARBOUR hb___msgClsSel( void )
 {
    HB_THREAD_STUB
    HB_ITEM_PTR pSelf = hb_stackSelfItem();
-   USHORT uiClass = ( USHORT ) ( HB_IS_ARRAY( pSelf ) ? pSelf->item.asArray.value->uiClass : 0 );
+   USHORT uiClass;
    HB_ITEM Return ;
    USHORT nParam = hb_parni( 1 ), uiScope = hb_parni( 2 );
+
+   if( HB_IS_OBJECT( pSelf ) )
+   {
+      uiClass = pSelf->item.asArray.value->uiClass;
+   }
+   else
+   {
+      switch( pSelf->type )
+      {
+         case HB_IT_ARRAY :
+            uiClass = hb_cls_uiArrayClass;
+            break;
+
+         case HB_IT_BLOCK :
+            uiClass = hb_cls_uiBlockClass;
+            break;
+
+         case HB_IT_STRING :
+            uiClass = hb_cls_uiCharacterClass;
+            break;
+
+         case HB_IT_DATE :
+            uiClass = hb_cls_uiDateClass;
+            break;
+
+         case HB_IT_LOGICAL :
+            uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_INTEGER:
+         case HB_IT_LONG:
+         case HB_IT_DOUBLE:
+            uiClass = hb_cls_uiNumericClass;
+            break;
+
+         case HB_IT_POINTER :
+            uiClass = hb_cls_uiPointerClass;
+            break;
+
+         default:
+            uiClass = 0;
+      }
+   }
 
    Return.type = HB_IT_NIL;
 
@@ -3154,9 +3506,53 @@ static HARBOUR hb___msgEvalInline( void )
    HB_THREAD_STUB
 
    HB_ITEM block;
-   USHORT uiClass = ( hb_stackSelfItem() )->item.asArray.value->uiClass;
+   USHORT uiClass;
    USHORT uiParam;
    USHORT uiPCount=hb_pcount();
+   PHB_ITEM pSelf = hb_stackSelfItem();
+
+   if( HB_IS_OBJECT( pSelf ) )
+   {
+      uiClass = pSelf->item.asArray.value->uiClass;
+   }
+   else
+   {
+      switch( pSelf->type )
+      {
+         case HB_IT_ARRAY :
+            uiClass = hb_cls_uiArrayClass;
+            break;
+
+         case HB_IT_BLOCK :
+            uiClass = hb_cls_uiBlockClass;
+            break;
+
+         case HB_IT_STRING :
+            uiClass = hb_cls_uiCharacterClass;
+            break;
+
+         case HB_IT_DATE :
+            uiClass = hb_cls_uiDateClass;
+            break;
+
+         case HB_IT_LOGICAL :
+            uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_INTEGER:
+         case HB_IT_LONG:
+         case HB_IT_DOUBLE:
+            uiClass = hb_cls_uiNumericClass;
+            break;
+
+         case HB_IT_POINTER :
+            uiClass = hb_cls_uiPointerClass;
+            break;
+
+         default:
+            uiClass = 0;
+      }
+   }
 
    ( &block )->type = HB_IT_NIL;
 
@@ -3216,6 +3612,50 @@ static HARBOUR hb___msgSuper( void )
    PHB_ITEM pObject = hb_stackSelfItem();
    //ULONG ulLen = pObject->item.asArray.value->ulLen;
    HB_ITEM Super;
+   USHORT uiClass;
+
+   if( HB_IS_OBJECT( pObject ) )
+   {
+      uiClass = pObject->item.asArray.value->uiClass;
+   }
+   else
+   {
+      switch( pObject->type )
+      {
+         case HB_IT_ARRAY :
+            uiClass = hb_cls_uiArrayClass;
+            break;
+
+         case HB_IT_BLOCK :
+            uiClass = hb_cls_uiBlockClass;
+            break;
+
+         case HB_IT_STRING :
+            uiClass = hb_cls_uiCharacterClass;
+            break;
+
+         case HB_IT_DATE :
+            uiClass = hb_cls_uiDateClass;
+            break;
+
+         case HB_IT_LOGICAL :
+            uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_INTEGER:
+         case HB_IT_LONG:
+         case HB_IT_DOUBLE:
+            uiClass = hb_cls_uiNumericClass;
+            break;
+
+         case HB_IT_POINTER :
+            uiClass = hb_cls_uiPointerClass;
+            break;
+
+         default:
+            uiClass = 0;
+      }
+   }
 
    Super.type = HB_IT_NIL;
    hb_arrayNew( &Super, 1 );
@@ -3224,7 +3664,7 @@ static HARBOUR hb___msgSuper( void )
    hb_arraySet( &Super, 1 , pObject );
 
    /* And transform it into a fake object */
-   Super.item.asArray.value->uiPrevCls  = pObject->item.asArray.value->uiClass; /* backup of actual handel */
+   Super.item.asArray.value->uiPrevCls  = uiClass; /* backup of actual handel */
    Super.item.asArray.value->uiClass    = (HB_VM_STACK.pMethod)->uiSprClass;                /* superclass handel casting */
    Super.item.asArray.value->puiClsTree = NULL;
 
@@ -3251,7 +3691,51 @@ static HARBOUR hb___msgClass( void )
 HARBOUR hb___msgGetClsData( void )
 {
    HB_THREAD_STUB
-   USHORT uiClass = ( hb_stackSelfItem() )->item.asArray.value->uiClass;
+   USHORT uiClass;
+   PHB_ITEM pObject = hb_stackSelfItem();
+
+   if( HB_IS_OBJECT( pObject ) )
+   {
+      uiClass = pObject->item.asArray.value->uiClass;
+   }
+   else
+   {
+      switch( pObject->type )
+      {
+         case HB_IT_ARRAY :
+            uiClass = hb_cls_uiArrayClass;
+            break;
+
+         case HB_IT_BLOCK :
+            uiClass = hb_cls_uiBlockClass;
+            break;
+
+         case HB_IT_STRING :
+            uiClass = hb_cls_uiCharacterClass;
+            break;
+
+         case HB_IT_DATE :
+            uiClass = hb_cls_uiDateClass;
+            break;
+
+         case HB_IT_LOGICAL :
+            uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_INTEGER:
+         case HB_IT_LONG:
+         case HB_IT_DOUBLE:
+            uiClass = hb_cls_uiNumericClass;
+            break;
+
+         case HB_IT_POINTER :
+            uiClass = hb_cls_uiPointerClass;
+            break;
+
+         default:
+            uiClass = 0;
+      }
+   }
 
    if( uiClass && uiClass <= s_uiClasses )
    {
@@ -3268,9 +3752,54 @@ HARBOUR hb___msgGetClsData( void )
 HARBOUR hb___msgSetClsData( void )
 {
    HB_THREAD_STUB
-   USHORT uiClass = ( hb_stackSelfItem() )->item.asArray.value->uiClass;
+
+   USHORT uiClass;
+   PHB_ITEM pObject = hb_stackSelfItem();
 
    PHB_ITEM pReturn = hb_stackItemFromBase( 1 );
+
+   if( HB_IS_OBJECT( pObject ) )
+   {
+      uiClass = pObject->item.asArray.value->uiClass;
+   }
+   else
+   {
+      switch( pObject->type )
+      {
+         case HB_IT_ARRAY :
+            uiClass = hb_cls_uiArrayClass;
+            break;
+
+         case HB_IT_BLOCK :
+            uiClass = hb_cls_uiBlockClass;
+            break;
+
+         case HB_IT_STRING :
+            uiClass = hb_cls_uiCharacterClass;
+            break;
+
+         case HB_IT_DATE :
+            uiClass = hb_cls_uiDateClass;
+            break;
+
+         case HB_IT_LOGICAL :
+            uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_INTEGER:
+         case HB_IT_LONG:
+         case HB_IT_DOUBLE:
+            uiClass = hb_cls_uiNumericClass;
+            break;
+
+         case HB_IT_POINTER :
+            uiClass = hb_cls_uiPointerClass;
+            break;
+
+         default:
+            uiClass = 0;
+      }
+   }
 
    if( uiClass && uiClass <= s_uiClasses )
    {
@@ -3558,99 +4087,177 @@ HB_FUNC( __CLSGETPROPERTIES )
 
 HB_FUNC( __CLSGETPROPERTIESANDVALUES )
 {
-   PHB_ITEM pObject = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pObject = hb_param( 1, HB_IT_ANY );
+   USHORT uiClass;
 
-   if( pObject )
+   if( HB_IS_OBJECT( pObject ) )
    {
-      USHORT uiClass = pObject->item.asArray.value->uiClass;
-
-      if( uiClass && uiClass <= s_uiClasses )
+      uiClass = pObject->item.asArray.value->uiClass;
+   }
+   else
+   {
+      switch( pObject->type )
       {
-         PCLASS pClass = s_pClasses + ( uiClass - 1 );
-         USHORT uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET ); /* Number of Hash keys      */
-         USHORT uiAt;
+         case HB_IT_ARRAY :
+            uiClass = hb_cls_uiArrayClass;
+            break;
 
-         HB_ITEM Return;
-         HB_ITEM Value;
-         HB_ITEM SubArray;
+         case HB_IT_BLOCK :
+            uiClass = hb_cls_uiBlockClass;
+            break;
 
-         Return.type   = HB_IT_NIL;
-         Value.type    = HB_IT_NIL;
-         SubArray.type = HB_IT_NIL;
+         case HB_IT_STRING :
+            uiClass = hb_cls_uiCharacterClass;
+            break;
 
-         hb_arrayNew( &Return, 0 );
+         case HB_IT_DATE :
+            uiClass = hb_cls_uiDateClass;
+            break;
 
-         for( uiAt = 0; uiAt < uiLimit; uiAt++ )
+         case HB_IT_LOGICAL :
+            uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_INTEGER:
+         case HB_IT_LONG:
+         case HB_IT_DOUBLE:
+            uiClass = hb_cls_uiNumericClass;
+            break;
+
+         case HB_IT_POINTER :
+            uiClass = hb_cls_uiPointerClass;
+            break;
+
+         default:
+            uiClass = 0;
+      }
+   }
+
+   if( uiClass && uiClass <= s_uiClasses )
+   {
+      PCLASS pClass = s_pClasses + ( uiClass - 1 );
+      USHORT uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET ); /* Number of Hash keys      */
+      USHORT uiAt;
+
+      HB_ITEM Return;
+      HB_ITEM Value;
+      HB_ITEM SubArray;
+
+      Return.type   = HB_IT_NIL;
+      Value.type    = HB_IT_NIL;
+      SubArray.type = HB_IT_NIL;
+
+      hb_arrayNew( &Return, 0 );
+
+      for( uiAt = 0; uiAt < uiLimit; uiAt++ )
+      {
+         PHB_DYNS pMessage = ( PHB_DYNS ) pClass->pMethods[ uiAt ].pMessage;
+
+         // if( pMessage && pClass->pMethods[ uiAt ].bIsPersistent && pClass->pMethods[ uiAt ].uiData )
+         if( pMessage && ( pClass->pMethods[ uiAt ].uiScope & HB_OO_CLSTP_PUBLISHED || pClass->pMethods[ uiAt ].bIsPersistent ) && pClass->pMethods[ uiAt ].uiData )
          {
-            PHB_DYNS pMessage = ( PHB_DYNS ) pClass->pMethods[ uiAt ].pMessage;
+            hb_arrayGet( pObject, pClass->pMethods[ uiAt ].uiData, &Value );
 
-            // if( pMessage && pClass->pMethods[ uiAt ].bIsPersistent && pClass->pMethods[ uiAt ].uiData )
-            if( pMessage && ( pClass->pMethods[ uiAt ].uiScope & HB_OO_CLSTP_PUBLISHED || pClass->pMethods[ uiAt ].bIsPersistent ) && pClass->pMethods[ uiAt ].uiData )
+            hb_arrayNew( &SubArray, 2 );
+
+            hb_itemPutC( hb_arrayGetItemPtr( &SubArray, 1), pMessage->pSymbol->szName );
+            hb_arraySetForward( &SubArray, 2, &Value );
+
+            hb_arrayAddForward( &Return, &SubArray );
+         }
+      }
+
+      hb_itemReturn( &Return );
+   }
+}
+
+HB_FUNC( __CLSGETIVARNAMESANDVALUES )
+{
+   PHB_ITEM pObject = hb_param( 1, HB_IT_ANY );
+   USHORT uiScope = hb_parni( 2 );
+   USHORT uiClass;
+
+   if( HB_IS_OBJECT( pObject ) )
+   {
+      uiClass = pObject->item.asArray.value->uiClass;
+   }
+   else
+   {
+      switch( pObject->type )
+      {
+         case HB_IT_ARRAY :
+            uiClass = hb_cls_uiArrayClass;
+            break;
+
+         case HB_IT_BLOCK :
+            uiClass = hb_cls_uiBlockClass;
+            break;
+
+         case HB_IT_STRING :
+            uiClass = hb_cls_uiCharacterClass;
+            break;
+
+         case HB_IT_DATE :
+            uiClass = hb_cls_uiDateClass;
+            break;
+
+         case HB_IT_LOGICAL :
+            uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_INTEGER:
+         case HB_IT_LONG:
+         case HB_IT_DOUBLE:
+            uiClass = hb_cls_uiNumericClass;
+            break;
+
+         case HB_IT_POINTER :
+            uiClass = hb_cls_uiPointerClass;
+            break;
+
+         default:
+            uiClass = 0;
+      }
+   }
+
+   if( uiClass && uiClass <= s_uiClasses )
+   {
+      PCLASS pClass = s_pClasses + ( uiClass - 1 );
+      USHORT uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET ); /* Number of Hash keys      */
+      USHORT uiAt;
+
+      HB_ITEM Return;
+      HB_ITEM Value;
+      HB_ITEM SubArray;
+
+      Return.type   = HB_IT_NIL;
+      Value.type    = HB_IT_NIL;
+      SubArray.type = HB_IT_NIL;
+
+      hb_arrayNew( &Return, 0 );
+
+      for( uiAt = 0; uiAt < uiLimit; uiAt++ )
+      {
+         PHB_DYNS pMessage = ( PHB_DYNS ) pClass->pMethods[ uiAt ].pMessage;
+
+         if( pMessage && pClass->pMethods[ uiAt ].uiData && ( uiScope == 0 || pClass->pMethods[ uiAt ].uiScope & uiScope ) )
+         {
+            if( pClass->pMethods[ uiAt ].pFunction == hb___msgGetData ||
+                pClass->pMethods[ uiAt ].pFunction == hb___msgGetClsData ||
+                pClass->pMethods[ uiAt ].pFunction == hb___msgGetShrData )
             {
                hb_arrayGet( pObject, pClass->pMethods[ uiAt ].uiData, &Value );
 
                hb_arrayNew( &SubArray, 2 );
-
                hb_itemPutC( hb_arrayGetItemPtr( &SubArray, 1), pMessage->pSymbol->szName );
                hb_arraySetForward( &SubArray, 2, &Value );
 
                hb_arrayAddForward( &Return, &SubArray );
             }
          }
-
-         hb_itemReturn( &Return );
       }
-   }
-}
 
-HB_FUNC( __CLSGETIVARNAMESANDVALUES )
-{
-   PHB_ITEM pObject = hb_param( 1, HB_IT_ARRAY );
-   USHORT uiScope = hb_parni( 2 );
-
-   if( pObject )
-   {
-      USHORT uiClass = pObject->item.asArray.value->uiClass;
-
-      if( uiClass && uiClass <= s_uiClasses )
-      {
-         PCLASS pClass = s_pClasses + ( uiClass - 1 );
-         USHORT uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET ); /* Number of Hash keys      */
-         USHORT uiAt;
-
-         HB_ITEM Return;
-         HB_ITEM Value;
-         HB_ITEM SubArray;
-
-         Return.type   = HB_IT_NIL;
-         Value.type    = HB_IT_NIL;
-         SubArray.type = HB_IT_NIL;
-
-         hb_arrayNew( &Return, 0 );
-
-         for( uiAt = 0; uiAt < uiLimit; uiAt++ )
-         {
-            PHB_DYNS pMessage = ( PHB_DYNS ) pClass->pMethods[ uiAt ].pMessage;
-
-            if( pMessage && pClass->pMethods[ uiAt ].uiData && ( uiScope == 0 || pClass->pMethods[ uiAt ].uiScope & uiScope ) )
-            {
-               if( pClass->pMethods[ uiAt ].pFunction == hb___msgGetData ||
-                   pClass->pMethods[ uiAt ].pFunction == hb___msgGetClsData ||
-                   pClass->pMethods[ uiAt ].pFunction == hb___msgGetShrData )
-               {
-                  hb_arrayGet( pObject, pClass->pMethods[ uiAt ].uiData, &Value );
-
-                  hb_arrayNew( &SubArray, 2 );
-                  hb_itemPutC( hb_arrayGetItemPtr( &SubArray, 1), pMessage->pSymbol->szName );
-                  hb_arraySetForward( &SubArray, 2, &Value );
-
-                  hb_arrayAddForward( &Return, &SubArray );
-               }
-            }
-         }
-
-         hb_itemReturn( &Return );
-      }
+      hb_itemReturn( &Return );
    }
 }
 
@@ -3660,13 +4267,47 @@ PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_clsSymbolFromFunction(%p, %p)", pObject, pFunction));
 
-   if( HB_IS_ARRAY( pObject ) )
+   if( HB_IS_OBJECT( pObject ) )
    {
       uiClass = pObject->item.asArray.value->uiClass;
    }
    else
    {
-      uiClass = 0;
+      switch( pObject->type )
+      {
+         case HB_IT_ARRAY :
+            uiClass = hb_cls_uiArrayClass;
+            break;
+
+         case HB_IT_BLOCK :
+            uiClass = hb_cls_uiBlockClass;
+            break;
+
+         case HB_IT_STRING :
+            uiClass = hb_cls_uiCharacterClass;
+            break;
+
+         case HB_IT_DATE :
+            uiClass = hb_cls_uiDateClass;
+            break;
+
+         case HB_IT_LOGICAL :
+            uiClass = hb_cls_uiLogicalClass;
+            break;
+
+         case HB_IT_INTEGER:
+         case HB_IT_LONG:
+         case HB_IT_DOUBLE:
+            uiClass = hb_cls_uiNumericClass;
+            break;
+
+         case HB_IT_POINTER :
+            uiClass = hb_cls_uiPointerClass;
+            break;
+
+         default:
+            uiClass = 0;
+      }
    }
 
    if( uiClass && uiClass <= s_uiClasses )
@@ -3738,8 +4379,34 @@ UINT hb_clsGetHandleFromName( char *szClassName )
 
 HB_FUNC( __CLSGETHANDLEFROMNAME )
 {
+   USHORT uiClass;
+   char *szClass;
+
    HB_THREAD_STUB
-   hb_retni( hb_clsGetHandleFromName( hb_parcx(1) ) );
+
+   szClass = hb_parcx(1);
+
+   uiClass = hb_clsGetHandleFromName( szClass );
+
+   if( uiClass == 0 )
+   {
+      if( ( strcmp( szClass, "ARRAY" )     == 0 ) ||
+          ( strcmp( szClass, "BLOCK" )     == 0 ) ||
+          ( strcmp( szClass, "CHARACTER" ) == 0 ) ||
+          ( strcmp( szClass, "DATE" )      == 0 ) ||
+          ( strcmp( szClass, "LOGICAL" )   == 0 ) ||
+          ( strcmp( szClass, "NUMERIC" )   == 0 ) ||
+          ( strcmp( szClass, "POINTER" )   == 0 ) )
+      {
+         //szClass is already pushed on stack as Param #1, so this hack is possible.
+         //__clsNew( szClass, 0, 0, 0 );
+         HB_FUNCNAME( __CLSNEW )();
+         uiClass = s_uiClasses;
+         //TraceLog( NULL, "Class >%s< %i %i\n", szClass, uiClass, hb_cls_uiNumericClass );
+      }
+   }
+
+   hb_retni( uiClass );
 }
 
 void hb_clsSetModule( USHORT uiClass )
