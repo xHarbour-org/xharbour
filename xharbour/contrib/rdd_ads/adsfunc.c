@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.15 2003/07/23 09:43:33 brianhays Exp $
+ * $Id: adsfunc.c,v 1.16 2003/09/04 16:40:16 iananderson Exp $
  */
 
 /*
@@ -1415,112 +1415,36 @@ HB_FUNC( ADSCACHERECORDS )
    hb_retl( ulRetVal );
 }
 
+/*
+  Reindex all tags of the currently selected table
+  Returns true if successful, false if fails.
+  Error code available by calling AdsGetLastError()
+*/
+
+HB_FUNC( ADSREINDEX )
+{
+   UNSIGNED32 ulRetVal ;
+   ADSAREAP pArea;
+
+   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   if( pArea )
+      ulRetVal = AdsReindex( pArea->hTable);
+   else
+      ulRetVal = AdsReindex( -1 ); // should return error!
+
+   if ( ulRetVal == AE_SUCCESS )
+   {
+      hb_retl( 1 );
+   }
+   else
+   {
+      hb_retl( 0 );
+   }
+}
+
 #ifdef ADS_REQUIRE_VERSION6
 
-HB_FUNC( ADSADDTABLE )
-{
-   UNSIGNED32 ulRetVal;
-   UNSIGNED8 *pTableName     = hb_parc( 1 );
-   UNSIGNED8 *pTableFileName = hb_parc( 2 );
-   UNSIGNED8 *pTableIndexFileName = hb_parc( 3 );
-
-   ulRetVal= AdsDDAddTable( adsConnectHandle, pTableName, pTableFileName, adsFileType, adsCharType, pTableIndexFileName, NULL);
-
-   if ( ulRetVal == AE_SUCCESS )
-   {
-      hb_retl( 1 );
-   }
-   else
-   {
-      hb_retl( 0 );
-   }
-
-}
-
-HB_FUNC( ADSADDUSERTOGROUP )
-{
-   UNSIGNED32 ulRetVal;
-   UNSIGNED8 *pGroup = hb_parc( 1 );
-   UNSIGNED8 *pName  = hb_parc( 2 );
-
-   ulRetVal = AdsDDAddUserToGroup( adsConnectHandle,
-                                   pGroup,
-                                   pName);
-
-   if ( ulRetVal == AE_SUCCESS )
-   {
-      hb_retl( 1 );
-   }
-   else
-   {
-      hb_retl( 0 );
-   }
-
-}
-
-HB_FUNC( ADSUSEDICTIONARY )
-{
-   BOOL bOld = bDictionary;
-   if ( ISLOG( 1 ) )
-   {
-      bDictionary = hb_parl( 1 ) ;
-   }
-
-   hb_retl( bOld );
-}
-
-HB_FUNC( ADSCONNECT60 )
-{
-
-   UNSIGNED32 ulRetVal ;
-   UNSIGNED8  *pucServerPath = hb_parc( 1 );
-   UNSIGNED16 usServerTypes  = hb_parnl( 2 );
-   UNSIGNED8  *pucUserName   = ISCHAR( 3 ) ? hb_parc( 3 ) : NULL ;
-   UNSIGNED8  *pucPassword   = ISCHAR( 4 ) ? hb_parc( 4 ) : NULL ;
-   UNSIGNED32 ulOptions      = ISNUM( 5 ) ? hb_parnl( 5 ) : ADS_DEFAULT ;
-
-   ulRetVal = AdsConnect60( pucServerPath,
-                            usServerTypes,
-                            pucUserName,
-                            pucPassword,
-                            ulOptions,
-                            &adsConnectHandle );
-
-   if (ulRetVal == AE_SUCCESS )
-   {
-      hb_retl( 1 ) ;
-   }
-   else
-   {
-      hb_retl( 0 ) ;
-   }
-
-}
-
-HB_FUNC( ADSDDCREATE )
-{
-   UNSIGNED32 ulRetVal;
-   UNSIGNED8  *pucDictionaryPath = hb_parc( 1 ) ;
-   UNSIGNED16 usEncrypt          = ISNUM(2) ? hb_parnl( 0 ) : 0 ;
-   UNSIGNED8  *pucDescription    = ISCHAR( 3 ) ? hb_parc( 3 ) : NULL ;
-
-   ulRetVal = AdsDDCreate( ( UNSIGNED8 *)pucDictionaryPath,
-                           usEncrypt,
-                           ( UNSIGNED8 *)pucDescription,
-                           &adsConnectHandle );
-
-   if (ulRetVal == AE_SUCCESS)
-   {
-      hb_retl( 1 );
-   }
-   else
-   {
-      hb_retl( 0 );
-   }
-
-}
-
-HB_FUNC( ADSADDTABLE )
+HB_FUNC( ADSDDADDTABLE )
 {
    UNSIGNED32 ulRetVal;
    UNSIGNED8 *pTableName     = hb_parc( 1 );
@@ -1644,7 +1568,6 @@ HB_FUNC( ADSDDGETDATABASEPROPERTY )
     char sBuffer[ADS_MAX_PARAMDEF_LEN];
     UNSIGNED16 ulLength;
     UNSIGNED16 ulBuffer;
-    UNSIGNED32 ulRetVal;
     BOOL bChar = FALSE ;
 
 
@@ -1657,7 +1580,7 @@ HB_FUNC( ADSDDGETDATABASEPROPERTY )
        case ADS_DD_VERSION:
        {
           ulLength = ADS_MAX_PARAMDEF_LEN ;
-          ulRetVal = AdsDDGetDatabaseProperty( adsConnectHandle, ulProperty, &sBuffer, &ulLength );
+          AdsDDGetDatabaseProperty( adsConnectHandle, ulProperty, &sBuffer, &ulLength );
           bChar = TRUE ;
           break;
        }
@@ -1667,7 +1590,7 @@ HB_FUNC( ADSDDGETDATABASEPROPERTY )
        case ADS_DD_ENCRYPT_NEW_TABLE:
        {
           ulLength = sizeof( UNSIGNED16 );
-          ulRetVal = AdsDDGetDatabaseProperty( adsConnectHandle, ulPropety, &ulBuffer, &ulLength );
+          AdsDDGetDatabaseProperty( adsConnectHandle, ulProperty, &ulBuffer, &ulLength );
           break;
        }
     }
