@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.17 2004/04/26 12:29:45 lf_sfnet Exp $
+ * $Id: odbc.c,v 1.18 2004/04/26 15:45:18 lf_sfnet Exp $
  */
 
 /*
@@ -76,6 +76,8 @@
  *    SQLCOMMIT()
  *    SQLROLLBACK()
  *    SQLCOLATTRIBUTE()
+ *    SQLBINDOUTPARAM()
+ *    SQLMORERESULTS()
  *
  * See doc/license.txt for licensing terms.
  */
@@ -194,9 +196,9 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
    int iReallocs = 0;
 
    lLen       = ( SDWORD )( hb_parnl( 4 ) ? hb_parnl( 4 ) : 64 );
-   bBuffer    = hb_xgrab( lLen+1 );
+   bBuffer    = hb_xgrab( (ULONG) lLen+1 );
    bOut       = NULL;
-   lInitBuff  = (int) lLen;
+   lInitBuff  = lLen;
    wType      = ( hb_parni( 3 ) ? hb_parni( 3 ) : SQL_BINARY );
 
    do
@@ -204,7 +206,7 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
       wResult    = SQLGetData( ( HSTMT ) hb_parnl( 1 ), hb_parni( 2 ), wType, ( PTR ) bBuffer, lLen, &lLen );
       if( wResult == SQL_SUCCESS && iReallocs == 0 )
       {
-         hb_storclen( ( LPSTR ) bBuffer, ( WORD ) ( lLen < 0 ? 0 : ( lLen < hb_parnl( 4 ) ? lLen : hb_parnl( 4 ) ) ), 5 );
+         hb_storclen( ( LPSTR ) bBuffer, ( ULONG ) ( lLen < 0 ? 0 : ( lLen < hb_parnl( 4 ) ? lLen : hb_parnl( 4 ) ) ), 5 );
          hb_xfree( ( PTR ) bBuffer );
          break;
       }
@@ -214,14 +216,14 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
          if( lLen >= lInitBuff )
          {
             /* data right truncated! */
-            bOut    = ( char * ) hb_xgrab( lLen + 1 );
+            bOut    = ( char * ) hb_xgrab( (ULONG) lLen + 1 );
             lLen = lLen - lInitBuff+2;
             strcpy( (char *) bOut, (char *) bBuffer );
-            bBuffer = ( char * ) hb_xrealloc( bBuffer, lLen );
+            bBuffer = ( char * ) hb_xrealloc( bBuffer, (ULONG) lLen );
          }
          else
          {
-            hb_storclen( ( LPSTR ) bBuffer, ( WORD ) ( lLen < 0 ? 0 : ( lLen < hb_parnl( 4 ) ? lLen : hb_parnl( 4 ) ) ), 5 );
+            hb_storclen( ( LPSTR ) bBuffer, ( ULONG ) ( lLen < 0 ? 0 : ( lLen < hb_parnl( 4 ) ? lLen : hb_parnl( 4 ) ) ), 5 );
             hb_xfree( ( PTR ) bBuffer );
             break;
          }
@@ -230,7 +232,7 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
       else if( (wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO ) && iReallocs > 0 )
       {
          strcat( (char*) bOut, (char *) bBuffer );
-         hb_storclen( ( LPSTR ) bOut, ( WORD ) ( lLen + lInitBuff - 1 ), 5 );
+         hb_storclen( ( LPSTR ) bOut, ( ULONG ) ( lLen + lInitBuff - 1 ), 5 );
          hb_xfree( ( PTR ) bBuffer );
          hb_xfree( ( PTR ) bOut );
          wResult = SQL_SUCCESS;
@@ -445,33 +447,47 @@ HB_FUNC( SQLEXECUTESCALAR )
    wResult = SQLAllocStmt( ( HDBC ) hb_parnl( 2 ), &hStmt );
 
    if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
-   { 
+   {
       wResult = SQLExecDirect( ( HSTMT ) hStmt, (unsigned char*) hb_parcx( 1 ), SQL_NTS );
       if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
       {
-         wResult = SQLFetch( ( HSTMT ) hStmt ); 
+         wResult = SQLFetch( ( HSTMT ) hStmt );
          if( wResult != SQL_NO_DATA )
          {
-            wResult = SQLGetData( ( HSTMT ) hStmt, 1, SQL_C_CHAR, bBuffer, lLen, &lLen );            
-            hb_storc( (char *)bBuffer, 3 );            
-         }   
-      }   
-   }  
+            wResult = SQLGetData( ( HSTMT ) hStmt, 1, SQL_C_CHAR, bBuffer, lLen, &lLen );
+            hb_storc( (char *)bBuffer, 3 );
+         }
+      }
+   }
 
    hb_retni( wResult );
-   
+
    SQLFreeStmt( ( HSTMT ) hStmt, 0 );
-   
+
 }
 
 HB_FUNC( SQLSTOD )
 {
    char *szSqlDate = hb_parcx( 1 ); /* YYYY-MM-DD */
    char szHrbDate[8];               /* YYYYMMDD */
-  
-   sprintf( szHrbDate, "%c%c%c%c%c%c%c%c", szSqlDate[0], szSqlDate[1], szSqlDate[2], szSqlDate[3], szSqlDate[5], szSqlDate[6], szSqlDate[8], szSqlDate[9] ); 
- 
+
+   sprintf( szHrbDate, "%c%c%c%c%c%c%c%c", szSqlDate[0], szSqlDate[1], szSqlDate[2], szSqlDate[3], szSqlDate[5], szSqlDate[6], szSqlDate[8], szSqlDate[9] );
+
    hb_retds( szHrbDate );
+}
+
+HB_FUNC( SQLMORERESULTS ) // hEnv, hDbc
+{
+   hb_retni( SQLMoreResults( ( SQLHSTMT ) hb_parnl( 1 ) ) );
+}
+
+HB_FUNC( SQLBINDOUTPARAM ) /* SqlBindOutParam( nStatementHandle, nParameterNumber, nParameterType, ColumnSize, DecimalDigits, @ParamValue, @ParamLength    ) --> nRetCode */
+{
+   PHB_ITEM pResult = hb_param( 6, HB_IT_BYREF );
+   PHB_ITEM pLen    = hb_param( 7, HB_IT_BYREF );
+
+   RETCODE ret = SQLBindParameter( ( HSTMT ) hb_parnl( 1 ), (USHORT) hb_parni( 2 ), SQL_PARAM_OUTPUT, SQL_CHAR, (USHORT) hb_parni( 3 ), (USHORT) hb_parni( 4 ), (USHORT) hb_parni( 5 ), pResult->item.asString.value, pResult->item.asString.length, &(pLen->item.asLong.value) );
+   hb_retni( ret );
 }
 
 #endif

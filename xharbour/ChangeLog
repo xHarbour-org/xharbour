@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3161 2004/07/16 01:35:06 lculik Exp $
+ * $Id: ChangeLog,v 1.3162 2004/07/16 03:19:23 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-07-16 14:30 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/odbc/odbc.c
+    ! Fixed GPF in SqlGetData()
+    + Added SQLMoreResults()
+    + Added SQLBindOutParam() - This is a big trap, and should be
+      used only if you know EXACTLY what you're doing!
+
 2004-07-16 08:45 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * source/rtl/tbrowse.prg
     !HitTest( oBrowse, nRow, nCol )
     Now properly adjusts the ::mColPos.
-	
+
 2004-07-15 20:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/checkbox.prg
   * source/rtl/pushbtn.prg
