@@ -1,6 +1,7 @@
 #!/bin/sh
+[ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: postinst.sh,v 1.4 2004/02/18 21:35:55 druzus Exp $
+# $Id: postinst.sh,v 1.5 2004/03/02 17:31:28 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -36,6 +37,11 @@ fi
 
 if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "mingw32" ] || [ "$HB_COMPILER" = "djgpp" ]
 then
+    if [ "${HB_ARCHITECTURE}" == "bsd" ]; then
+        MAKE=gmake
+    else
+        MAKE=make
+    fi
     if [ "${HB_ARCHITECTURE}" != "dos" ]; then
         install -m755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
     fi
@@ -46,11 +52,11 @@ then
     pushd ${hb_root}/source/vm
     C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/}
     rm -f fm.o
-    make -r fm.o
+    ${MAKE} -r fm.o
     ar -r ${HB_LIB_INSTALL}/libfm.a fm.o
     rm -f fm.o
     if [ "${HB_MT}" = "MT" ]; then
-        make -r fm.o 'HB_LIBCOMP_MT=YES'
+        ${MAKE} -r fm.o 'HB_LIBCOMP_MT=YES'
         ar -r ${HB_LIB_INSTALL}/libfmmt.a fm.o
         rm -f fm.o
     fi

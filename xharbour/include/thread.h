@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.87 2004/05/17 14:21:01 mauriliolongo Exp $
+* $Id: thread.h,v 1.88 2004/05/24 10:31:44 jonnymind Exp $
 */
 
 /*
@@ -278,6 +278,10 @@ extern PPVOID hb_dwCurrentStack;
    /* ODD: this definition is missing on some linux headers;
       we should remove it when this bug is fixed */
    int pthread_mutexattr_setkind_np( pthread_mutexattr_t * attr, int kind );
+   /* Some Unices (e.g., FreeBSD 4.8) don't have this define: */
+   #ifndef PTHREAD_MUTEX_RECURSIVE_NP
+      #define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
+   #endif
    #define HB_CRITICAL_INIT( x )       \
       {\
          pthread_mutexattr_t attr;\

@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.8 2004/03/18 21:46:52 druzus Exp $
+# $Id: gcc.cf,v 1.9 2004/05/11 01:22:40 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -12,10 +12,23 @@ LIB_EXT = .a
 CC = gcc
 CC_IN = -c
 CC_OUT = -o
-CPPFLAGS = -fsigned-char -I. -I$(TOP)include -I$(HB_INC_COMPILE)
-CFLAGS = -Wall -W -g -DHB_OS_BSD
+CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
+CFLAGS = -fsigned-char -Wall -W -DHB_OS_BSD
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
+endif
+
+ifeq ($(HB_LIBCOMP_MT),)
+#always add thread support if not compiling a lib and using vmmt
+ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE -pthread
+endif
+else
+#Add thread support to lib compilation only if compiling a _mt lib
+ifeq ($(HB_LIBCOMP_MT),YES)
+CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE -pthread
+HB_MT_FLAGS = -DHB_THREAD_SUPPORT
+endif
 endif
 
 LD = gcc
@@ -30,6 +43,12 @@ ifeq ($(HB_LIB_COMPILE),)
 LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
 LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/lib$(lib)/$(ARCH))
 LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+
+#Adding MT libs on need
+ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(patsubst %mt,%,$(lib))/$(ARCH_DIR)_mt)
+endif
+
 else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
@@ -38,9 +57,32 @@ LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(lib))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # If LIBS specifies the rdd library, add all DB drivers.
+ifeq ($(findstring rddmt,$(LIBS)),rddmt)
+#DBFNTX and DBFCDX are MTzed
+ifeq ($(findstring dbfcdx,$(HB_DB_DRIVERS)),dbfcdx)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfcdx/$(ARCH)_mt
+LINKLIBS += -ldbfcdxmt
+endif
+ifeq ($(findstring dbfntx,$(HB_DB_DRIVERS)),dbfntx)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfntx/$(ARCH)_mt
+LINKLIBS += -ldbfntxmt
+endif
+
+#DBFDBT and DBFFTP are not MTzed
+ifeq ($(findstring dbfdbt,$(HB_DB_DRIVERS)),dbfdbt)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfdbt/$(ARCH)
+LINKLIBS += -ldbfdbt
+endif
+ifeq ($(findstring dbfftp,$(HB_DB_DRIVERS)),dbfftp)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfftp/$(ARCH)
+LINKLIBS += -ldbfftp
+endif
+
+else
 ifeq ($(findstring rdd,$(LIBS)),rdd)
 LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
 LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
+endif
 endif
 
 # Add the specified GT driver library
@@ -50,7 +92,6 @@ LINKLIBS += -l$(HB_GT_LIB)
 ifeq ($(HB_MULTI_GT),yes)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
 LINKLIBS += -lgtnul
-endif
 endif
 
 # HB_SCREEN_LIB: empty, or one of ncurses, slang
@@ -77,12 +118,14 @@ LINKLIBS += -lX11
 LINKPATHS +=-L/usr/X11R6/lib
 endif
 
+endif
+
 LINKLIBS += -lm -Wl,--end-group
 
 LDFLAGS +=  $(LINKPATHS)
 
 AR = ar
 ARFLAGS = $(A_USR)
-AR_RULE = $(AR) $(ARFLAGS) r $@ $^ || $(RM) $@
+AR_RULE = $(AR) $(ARFLAGS) r $@ $^ && $(RANLIB) $@ || ( $(RM) $@ && false )
 
 include $(TOP)$(ROOT)config/rules.cf

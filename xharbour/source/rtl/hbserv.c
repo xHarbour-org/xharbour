@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.19 2004/04/30 19:42:23 druzus Exp $
+* $Id: hbserv.c,v 1.20 2004/05/10 10:38:07 mauriliolongo Exp $
 */
 
 /*
@@ -136,7 +136,7 @@ static S_TUPLE s_sigTable[] = {
    {0 , 0, 0}
 };
 
-#ifdef HARBOUR_GCC_OS2
+#if defined( HARBOUR_GCC_OS2 )
 static void s_signalHandler( int sig )
 #else
 static void s_signalHandler( int sig, siginfo_t *info, void *v )
@@ -152,7 +152,7 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
    Ret.type = HB_IT_NIL;
    ExecArray.type = HB_IT_NIL;
 
-   #ifndef HARBOUR_GCC_OS2
+   #if !defined( HARBOUR_GCC_OS2 )
    HB_SYMBOL_UNUSED(v);
    #endif
 
@@ -186,18 +186,25 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
 
          // the third parameter is an array:
 
-         #ifdef HARBOUR_GCC_OS2
+         #if defined( HARBOUR_GCC_OS2 )
          hb_arrayNew( &Ret, 1 );
+	 #elif defined( HB_OS_BSD )
+	 hb_arrayNew( &Ret, info ? 6 : 1 );
          #else
          hb_arrayNew( &Ret, 6 );
          #endif
          hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSSIGNAL), sig );
-         #ifndef HARBOUR_GCC_OS2
-         hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSSUBSIG), info->si_code );
-         hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSERROR), info->si_errno );
-         hb_itemPutPtr( hb_arrayGetItemPtr( &Ret, HB_SERVICE_ADDRESS), (void *) info->si_addr );
-         hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_PROCESS), info->si_pid );
-         hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_UID), info->si_uid );
+         #if !defined( HARBOUR_GCC_OS2 )
+	 #if defined( HB_OS_BSD )
+	 if (info)
+	 #endif
+	 {
+            hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSSUBSIG), info->si_code );
+            hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSERROR), info->si_errno );
+            hb_itemPutPtr( hb_arrayGetItemPtr( &Ret, HB_SERVICE_ADDRESS), (void *) info->si_addr );
+            hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_PROCESS), info->si_pid );
+            hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_UID), info->si_uid );
+	 }
          #endif
          hb_itemForwardValue( hb_arrayGetItemPtr( &ExecArray, 3), &Ret );
 
@@ -261,8 +268,12 @@ void *s_signalListener( void *my_stack )
 {
    static BOOL bFirst = TRUE;
    sigset_t passall;
-   siginfo_t sinfo;
    HB_STACK *pStack = (HB_STACK*) my_stack;
+#if defined( HB_OS_BSD )
+   int sig;
+#else
+   siginfo_t sinfo;
+#endif
 
    pthread_setspecific( hb_pkCurrentStack, my_stack );
    pStack->th_id = HB_CURRENT_THREAD();
@@ -306,11 +317,19 @@ void *s_signalListener( void *my_stack )
       // ATM we don't care very much about signal handling during
       // termination: no handler is set for them, so the DFL
       // action is taken (and that should be fine).
+#if defined( HB_OS_BSD )
+      sigwait( &passall, &sig );
+#else
       sigwaitinfo( &passall, &sinfo );
+#endif
 
       // lock stack before passing the ball to VM.
       HB_STACK_LOCK;
+#if defined( HB_OS_BSD )
+      s_signalHandler( sig, NULL, NULL );
+#else
       s_signalHandler( sinfo.si_signo, &sinfo, NULL );
+#endif
    }
 
    pthread_cleanup_pop( 1 );
@@ -717,7 +736,7 @@ static void s_signalHandlersInit()
 /**
 * Starts the service system.
 * Initializes the needed variables.
-* On unix: if the parameter is .T., puts the server in daemonic mode, deteaching
+* On unix: if the parameter is .T., puts the server in daemonic mode, detaching
 * the main thread from the console and terminating it.
 */
 

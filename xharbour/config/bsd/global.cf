@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.1.1.1 2001/12/21 10:48:00 ronpinkas Exp $
+# $Id: global.cf,v 1.2 2003/05/16 19:48:36 druzus Exp $
 #
 
 all : first
@@ -18,7 +18,7 @@ endif
 
 MAKE = gmake
 
-ARCH_DIR = $(ARCH)/
+ARCH_DIR = $(ARCH)
 
 MK = $(MAKE)
 
@@ -27,13 +27,15 @@ RD = rm -f -r
 CP = cp -f
 MV = mv -f
 MD = mkdir
+MDP = mkdir -p
+RANLIB = ranlib
 
 dirbase::
-	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \
-	 [ -d $(ARCH) ] || $(MD) $(ARCH)
+	@[ -d $(ARCH_DIR) ] || $(MDP) $(ARCH_DIR)
+
+dirbase_mt::
+	@[ -d $(ARCH_DIR)_mt ] || $(MDP) $(ARCH_DIR)_mt
 
 clean::
 	-$(RD) $(ARCH_DIR)
-
-
-
+	-$(RD) $(ARCH_DIR)_mt

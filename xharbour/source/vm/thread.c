@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.172 2004/05/17 14:21:01 mauriliolongo Exp $
+* $Id: thread.c,v 1.173 2004/05/18 15:05:45 ronpinkas Exp $
 */
 
 /*
@@ -165,7 +165,9 @@ void hb_threadInit( void )
    HB_CRITICAL_INIT( s_thread_unique_id_mutex );
    HB_SHARED_INIT( hb_runningStacks, 0 );
 
-   #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
+   #if defined( HB_OS_UNIX ) && !defined( HB_OS_LINUX ) && !defined( HB_OS_BSD )
+      /* If your OS doesn't support trylock, you can implement it here;
+       * if it does, add it to #if. */
       HB_CRITICAL_INIT( s_mtxTryLock );
    #endif
 
@@ -237,7 +239,9 @@ void hb_threadCloseHandles( void )
       #endif
    #endif
 
-   #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
+   #if defined( HB_OS_UNIX ) && !defined( HB_OS_LINUX ) && !defined( HB_OS_BSD )
+      /* If your OS doesn't support trylock, you can implement it here;
+       * if it does, add it to #if. */
       HB_CRITICAL_DESTROY( s_mtxTryLock );
    #endif
 

@@ -1,6 +1,7 @@
 #!/bin/sh
+[ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.15 2004/03/02 22:42:05 druzus Exp $
+# $Id: hb-func.sh,v 1.16 2004/03/18 04:28:30 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -95,9 +96,7 @@ mk_hbtools()
 
     cat > ${hb_tool} <<EOF
 #!/bin/sh
-#
-# Warning! it's a bash script not a pure sh,
-# /bin/sh is used for MSys compatibility
+[ "$BASH" ] || exec bash `which \$0` \${1+"\$@"}
 #
 # ---------------------------------------------------------------
 # Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
