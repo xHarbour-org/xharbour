@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.7 2004/03/09 11:17:29 mlombardo Exp $
+ * $Id: dbdelim.prg,v 1.8 2004/03/10 02:54:53 andijahja Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.7 2004/03/09 11:17:29 mlombardo Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.8 2004/03/10 02:54:53 andijahja Exp $" )
 
 #define AppendEOL( handle )       FWrite( handle, CHR( 13 ) + CHR( 10 ) )
 #define AppendEOF( handle )       FWrite( handle, CHR( 26 ) )
@@ -249,7 +249,7 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
    2003-03-10
 */
          FClose( handle )
-         IF !Empty( aTextContent := FParseEX( cFileName ) )
+         IF !Empty( aTextContent := FParseEX( cFileName, cSeparator ) )
             AppendToDb( aTextContent, aStruct )
          ENDIF
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2535 2004/03/10 02:32:14 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2536 2004/03/10 02:54:42 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-10 10:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/dbdelim.prg
+    ! forget to pass cSeparator to FPARSEEX()
+
 2004-03-10 10:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/fparse.c
     + FPARSEEX( cFile ) -> two dimension array of parsed text
