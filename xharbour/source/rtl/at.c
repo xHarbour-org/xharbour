@@ -1,5 +1,5 @@
 /*
- * $Id: at.c,v 1.9 2001/04/12 18:56:29 dholm Exp $
+ * $Id: at.c,v 1.1.1.1 2001/12/21 10:41:11 ronpinkas Exp $
  */
 
 /*
@@ -63,10 +63,11 @@ HB_FUNC( AT )
 
    if( pText && pSub )
    {
-      hb_retnl( hb_strAt( hb_itemGetCPtr( pSub ), hb_itemGetCLen( pSub ),
-                          hb_itemGetCPtr( pText ), hb_itemGetCLen( pText ) ) );
+      hb_retnl( hb_strAt( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value, pText->item.asString.length ) );
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1108, NULL, "AT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
 }
 

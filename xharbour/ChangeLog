@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.153 2002/04/17 00:35:42 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.154 2002/04/17 01:33:06 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-16 19:44 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexpra.c
+    + Added compile time optimization of AT() and removed 1 TODO item.
+
+  * source/rtl/at.c
+    * Minor optimization.
 
 2002-04-16 18:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/fastitem.c

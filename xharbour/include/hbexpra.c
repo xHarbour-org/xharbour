@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.2 2001/12/21 11:36:01 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.3 2002/01/17 23:20:47 ronpinkas Exp $
  */
 
 /*
@@ -270,21 +270,45 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
          * replace it with NIL value
          */
          if( iCount == 1 && pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+         {
             --iCount;
+         }
       }
       else
+      {
          iCount = 0;
+      }
 
 #ifndef HB_MACRO_SUPPORT
       hb_compFunCallCheck( pName->value.asSymbol, iCount );
 #endif
 
-      /* TODO: AT() (also done by Clipper, already mentioned)
-               LEN() (also done by Clipper)
+      /* TODO: LEN() (also done by Clipper)
                ASC() (not done by Clipper)
                EMPTY() (not done by Clipper) */
 
-      if( ( strcmp( "CHR", pName->value.asSymbol ) == 0 ) && iCount )
+      if( ( strcmp( "AT", pName->value.asSymbol ) == 0 ) && iCount == 2 )
+      {
+         HB_EXPR_PTR pSub  = pParms->value.asList.pExprList;
+         HB_EXPR_PTR pText = pSub->pNext;
+
+
+         if( pSub->ExprType == HB_ET_STRING && pText->ExprType == HB_ET_STRING )
+         {
+            if( pSub->value.asString.string[0] == '\0' )
+            {
+               pExpr = hb_compExprNewLong( 1 );
+            }
+            else
+            {
+               pExpr = hb_compExprNewLong( hb_strAt( pSub->value.asString.string, pSub->ulLength, pText->value.asString.string, pText->ulLength ) );
+            }
+
+            HB_EXPR_PCODE1( hb_compExprDelete, pParms );
+            HB_EXPR_PCODE1( hb_compExprDelete, pName );
+         }
+      }
+      else if( ( strcmp( "CHR", pName->value.asSymbol ) == 0 ) && iCount )
       {
          /* try to change it into a string */
          HB_EXPR_PTR pArg = pParms->value.asList.pExprList;
@@ -453,7 +477,7 @@ HB_EXPR_PTR hb_compExprNewString( char *szValue )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewString(%s)", szValue));
 
-   pExpr =hb_compExprNew( HB_ET_STRING );
+   pExpr = hb_compExprNew( HB_ET_STRING );
 
    pExpr->value.asString.string = szValue;
 #ifdef HB_MACRO_SUPPORT
