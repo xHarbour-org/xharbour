@@ -1,10 +1,10 @@
 /*
- * $Id: genchm.prg,v 1.9 2001/04/15 03:04:00 lculik Exp $
+ * $Id: genchm.prg,v 1.1.1.1 2001/12/21 10:45:16 ronpinkas Exp $
  */
 
 /*
  * Harbour Project source code:
- * GENCHM support module for hbdoc document Extractor 
+ * GENCHM support module for hbdoc document Extractor
  *
  * Copyright 2000 Luiz Rafael Culik <culik@sl.conex.net>
  * www - http://www.harbour-project.org
@@ -85,6 +85,15 @@ STATIC nCurDoc := 1
 STATIC lWasTestExamples := .f.
 
 STATIC aColorTable := { 'aqua', 'black', 'fuchia', 'grey', 'green', 'lime', 'maroon', 'navy', 'olive', 'purple', 'red', 'silver', 'teal', 'white', 'yellow' }
+
+// Static variables added for the chm2 addition
+STATIC cDocType       := ""
+STATIC nArrayItem := 1      // Index used to loop through the array of the array
+STATIC nArrayItemLine := 1  // Index used to loop through the items in the array of the array
+STATIC oHtmClass
+STATIC oHtmClassContent
+STATIC cFileName := ""      // Stores filenames of files that will be created
+STATIC cInherits := ""      // Stores the inheritance of a class (if known and present)
 
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
 *+
@@ -182,8 +191,8 @@ FUNCTION ProcessChm()
    //  Entry Point
    //
    //  Put up information labels
-   @ INFILELINE, 20 SAY "Extracting: "          
-   @ MODULELINE, 20 SAY "Documenting: "         
+   @ INFILELINE, 20 SAY "Extracting: "
+   @ MODULELINE, 20 SAY "Documenting: "
    //  loop through all of the files
    lFirstArg    := .T.
    lFirstPass   := .T.
@@ -793,6 +802,10 @@ oChm:writeText("<br>")  //:endpar()
 
    NEXT
 RETURN nil
+
+  
+
+
 /***********************************
 * Function ProcChmBuf(cBuffer)   -> cTemp
 * Parameter cBuffer  -> Strip the "<" and ">" symbols from the imput String

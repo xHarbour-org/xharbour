@@ -1,10 +1,10 @@
 /*
- * $Id: genhtm.prg,v 1.2 2003/12/29 18:25:56 lculik Exp $
+ * $Id: genhtm.prg,v 1.3 2004/03/01 13:00:22 lculik Exp $
  */
 
 /*
  * Harbour Project source code:
- * GENHTM support module for hbdoc document Extractor 
+ * GENHTM support module for hbdoc document Extractor
  *
  * Copyright 2000 Luiz Rafael Culik <culik@sl.conex.net>
  * www - http://www.harbour-project.org
@@ -80,12 +80,21 @@ STATIC lEof
 STATIC aFoiTable      := {}
 STATIC atiTable       := {}
 STATIC nNumTableItems := 0
-STATIC aCurDoc        := {}
+STATIC aCurDoc        := {} // x
 static cLastText      := ""
 Static clastBuffer    := ""
 STATIC nCurDoc := 1
 STATIC lWasTestExamples := .f.
 STATIC aColorTable := { 'aqua', 'black', 'fuchia', 'grey', 'green', 'lime', 'maroon', 'navy', 'olive', 'purple', 'red', 'silver', 'teal', 'white', 'yellow' }
+
+// Static variables added for the htm2 addition
+STATIC cDocType       := ""
+STATIC nArrayItem := 1      // Index used to loop through the array of the array
+STATIC nArrayItemLine := 1  // Index used to loop through the items in the array of the array
+STATIC oHtmClass
+STATIC oHtmClassContent
+STATIC cFileName := ""      // Stores filenames of files that will be created
+STATIC cInherits := ""      // Stores the inheritance of a class (if known and present)
 
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
 *+
@@ -185,8 +194,8 @@ FUNCTION ProcessWww()
    //  Entry Point
    //
    //  Put up information labels
-   @ INFILELINE, 20 SAY "Extracting: "          
-   @ MODULELINE, 20 SAY "Documenting: "         
+   @ INFILELINE, 20 SAY "Extracting: "
+   @ MODULELINE, 20 SAY "Documenting: "
    //  loop through all of the files
    lFirstArg    := .T.
    lFirstPass   := .T.
@@ -198,7 +207,7 @@ FUNCTION ProcessWww()
       nCommentLen := IIF( AT( ".ASM", UPPER( aDirList[ i, F_NAME ] ) ) > 0, 2, 4 )
       nReadHandle := FT_FUSE( aDirList[ i, F_NAME ] )
       #ifdef GAUGE
-      if i == 1
+      if i == 1 
         aGauge1:= Gauge():New( 5, 5, 7, MaxCol() - 5)
        Endif
      #endif
@@ -800,6 +809,432 @@ oHtm:writeText("<br>")  //:endpar()
 
    NEXT
 RETURN nil
+
+
+FUNCTION ProcessWww2()
+   LOCAL aTempArray := {}         // Temporary array used for storing list of methods and properties   
+   LOCAL cTempString              // Temporary string used for storing random strings
+   LOCAL nClassNamePos            // Stores the position in the array where the classname can be found 
+   LOCAL nFunctionNamePos         // Stores the position in the array where the functionname can be found
+   LOCAL nReadHandle              // Stores the text file's workarea 
+   LOCAL nSubArrayItem := 1       // Index used to loop through the items of the array of the array
+   LOCAL nTemp1 := 1              // Used to scroll through the DirList array
+   LOCAL nTemp2 := 1              // Used to scroll through the aFunctionItems array
+   LOCAL aFunctionItems := {{"Category", "Category"}, {"Syntax", "Syntax"}, {"Arguments", "Arguments"}, ;
+      + {"Returns", "Returns"}, {"Description", "Description"}, {"Examples", "Examples"}, {"Tests", "Tests"}, ;
+      + {"Status", "Status"}, {"Compliance", "Compliance"}, {"Platforms", "Platforms"}, {"Files", "Files"}, ;
+      + {"Seealso", "See also"}}
+
+   FOR nTemp1 := 1 TO LEN(aDirList)  
+      // Calculate the amount of characters the source files uses each line      
+      nCommentLen := IIF(AT(".ASM", UPPER(aDirList[nTemp1, F_NAME])) > 0, 2, 4)    
+      // Select the file to read from  
+      nReadHandle := FT_FUSE(aDirList[nTemp1, F_NAME])
+
+      IF nReadHandle < 0 
+         WRITE_ERROR("Can't open file: (Dos Error " + STR( FERROR() ) + ")",,,, aDirList[ nTemp1, F_NAME ])
+         @ ERRORLINE,  0 CLEAR TO ERRORLINE, MAXCOL()
+         @ ERRORLINE, 20 SAY "Can't open file: (Dos Error " + STR( FERROR() ) + ") File=" + aDirList[ nTemp1, F_NAME ]         
+         LOOP
+      ENDIF
+
+      // Read the entire file into the aCurDoc array 
+      ReadFromTop2(nReadHandle)
+
+      // Generate a new document, based on the name of the class or function 
+      // Check if the file contains a class or function definition   
+      IF LEN(aCurDoc) > 0  
+         IF ASCAN(aCurDoc[nArrayItem], " $CLASSDOC$") > 0
+            cDocType := "Class" 
+            nClassNamePos := ASCAN(aCurDoc[nArrayItem], " $CLASS$", ASCAN(aCurDoc[nArrayItem], " $CLASSDOC$") + 1) + 1
+            cFileName := aCurDoc[nArrayItem][nClassNamePos]  
+         ELSEIF ASCAN(aCurDoc[nArrayItem], " $DOC$") > 0 
+            cDocType := "Function" 
+            nFunctionNamePos := ASCAN(aCurDoc[nArrayItem], " $FUNCNAME$") + 1 
+            cFileName := aCurDoc[nArrayItem][nFunctionNamePos] 
+         ELSE
+            LOOP 
+         ENDIF
+          
+         // Check whether the function name has "FT_" in it, if so, ignore the first three characters
+         IF AT("FT_", cFileName) > 0 
+            cTemp := UPPER(SUBSTR(cFileName, 4))
+         ELSE
+            cTemp := UPPER(cFileName)
+         ENDIF
+          
+         // Check whether the function name has "(" in it, if so, ignore it + the following chars 
+         IF (nEnd := AT("(", cTemp)) > 0
+            cTemp := LEFT(cTemp, nEnd - 1) 
+         ENDIF
+          
+         // Strip off any other non-alphabetical or -numeric characters
+         cFileName := "" 
+         FOR j := 1 TO LEN( cTemp ) 
+            cChar := SUBSTR( cTemp, j, 1 )
+            IF ( cChar >= "0" .AND. cChar <= "9" ) .OR. ( cChar >= "A" .AND. cChar <= "Z" ) .OR. cChar = "_" 
+               cFileName += cChar
+            ENDIF
+         NEXT
+          
+         // Check whether the file name already exists, if so, modify the name 
+         cFileName := LEFT(cFileName, 36)
+         nEnd := 1
+         nCount := 0
+         DO WHILE nEnd > 0
+            nEnd := ASCAN(aDocInfo, { | a | a[ 2 ] == cFileName + ".htm" })
+            IF nEnd > 0
+               IF LEN( cFileName ) = 36
+                  cFileName := STUFF( cFileName, 36, 1, STR( nCount, 1, 0 ) )
+               ELSE
+                  cFileName = cFileName + STR( nCount, 1, 0 )
+               ENDIF
+               nCount ++
+            ENDIF
+         ENDDO 
+          
+         // Add the file extension 
+         cFileName := LEFT( cFileName, 36 ) + ".htm"
+         oHtmClass := THTML():New( 'htm\' + cFileName ) 
+          
+         // If file creation was successful 
+         IF oHtmClass:nHandle > 0
+            // Add a title to the HTML  
+            oHtmClass:WriteText("<title>xHarbour - Reference Guide</title>") 
+          
+            // Add CSS to the HTML 
+            oHtmClass:WriteText("<style>")
+            oHtmClass:WriteText("body {font-family:arial;font-size:14px;line-height:18px;}")  
+            oHtmClass:WriteText(".classtitle {font-weight:bold;font-size:22px;padding-bottom:4px;}") 
+            oHtmClass:WriteText(".oneliner {font-style:italic;margin-bottom:12px;}")
+            oHtmClass:WriteText(".itemtitle {font-weight:bold;margin-left:8px;padding-bottom:2px;}")   
+            oHtmClass:WriteText(".itemtext {margin-left:20px;padding-bottom:6px;}")     
+            oHtmClass:WriteText("</style></head><body>")
+
+            // Loop through the first array (list with arrays) 
+            DO WHILE nArrayItem <= LEN(aCurDoc)
+               nSubArrayItem := 1 
+ 
+               IF cDocType = "Class"
+                  // Loop through the second array (list with methods, properties, ...) 
+ 
+                  IF ASCAN(aCurDoc[nArrayItem], " $CLASS$") > 0
+                     // Write class name 
+                     nArrayItemLine = ASCAN(aCurDoc[nArrayItem], {|a| "CLASS" $ UPPER(a)}, 2) + 1 
+                     cTempString := HTMFormat(aCurDoc[nArrayItem][nArrayItemLine])
+         
+                     DO WHILE "$" $ aCurDoc[nArrayItem][nArrayItemLine + 1] = .F.
+                        nArrayItemLine ++  
+                        cTempString = cTempString + "<br>" + HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                     ENDDO 
+                     //oHtmClass:WriteText(aCurDoc[nArrayItem][nArrayItemLine])
+                     oHtmClass:WriteText("<div class='classtitle'>Class " + cTempString + "</div>")
+          
+                     // Add classname and filename to the docinfo array 
+                     AADD( aDocInfo, { cTempString, cFileName, .T. } ) 
+          
+                     // Write oneliner 
+                     nArrayItemLine = ASCAN(aCurDoc[nArrayItem], {|a| "ONELINER" $ UPPER(a)}) + 1
+                     cTempString := HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                     DO WHILE "$" $ aCurDoc[nArrayItem][nArrayItemLine + 1] = .F.
+                        nArrayItemLine ++  
+                        cTempString = cTempString + "<br>" + HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                     ENDDO 
+                     oHtmClass:WriteText("<div class='oneliner'>" + cTempString + "</div>")
+          
+                     WriteClass("Inherits", "Inherits")
+                     cInherits := aCurDoc[nArrayItem][nArrayItemLine] 
+                     WriteClass("Constructor", "Constructor")
+                     WriteClass("Syntax", "Syntax") 
+                     WriteClass("Arguments", "Arguments") 
+                     WriteClass("Returns", "Returns")
+                     WriteClassDataMethod("Method", "Methods", nArrayItem, nArrayItemLine)                  
+                     WriteClassDataMethod("Data", "Properties", nArrayItem, nArrayItemLine)  
+                     WriteClass("Category", "Category")
+                     WriteClass("Description", "Description") 
+                     WriteClass("Seealso", "See also") 
+          
+                     oHtmClass:WriteText("</body></html>")
+          
+                     // Create new HTML for the properties and methods 
+                     IF LEN(aCurDoc) > 1 
+                        cFileName := LEFT(cFileName, LEN(cFileName) - 4) + "_content.htm"
+                        oHtmClassContent := THTML():New( 'htm\' + cFileName )
+          
+                        IF oHtmClassContent:nHandle > 0
+                           // Add a title to the HTML   
+                           oHtmClassContent:WriteText("<title>xHarbour - Reference Guide</title>")  
+                         
+                           // Add CSS to the HTML 
+                           oHtmClassContent:WriteText("<style>")
+                           oHtmClassContent:WriteText("body {font-family:arial;font-size:14px;line-height:18px;}")  
+                           oHtmClassContent:WriteText(".classtitle {font-weight:bold;font-size:22px;padding-bottom:4px;}")  
+                           oHtmClassContent:WriteText(".title {font-weight:bold;font-size:18px;padding-bottom:2px;padding-top:8px;}") 
+                           oHtmClassContent:WriteText(".oneliner {font-style:italic;margin-bottom:8px;}")
+                           oHtmClassContent:WriteText(".itemtitle {font-weight:bold;margin-left:8px;padding-bottom:2px;}")   
+                           oHtmClassContent:WriteText(".itemtext {margin-left:20px;padding-bottom:6px;}")    
+                           oHtmClassContent:WriteText("</style></head><body>")
+          
+                           // Write class name  
+                           nArrayItemLine = ASCAN(aCurDoc[nArrayItem], {|a| "CLASS" $ UPPER(a)}, 2) + 1 
+                           cTempString := HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                           DO WHILE "$" $ aCurDoc[nArrayItem][nArrayItemLine + 1] = .F.
+                              nArrayItemLine ++  
+                              cTempString = cTempString + "<br>" + HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                           ENDDO 
+                           oHtmClassContent:WriteText("<div class='classtitle'>Class " + cTempString + "</div>")
+                        ENDIF 
+                     ENDIF
+                  ELSEIF ASCAN(aCurDoc[nArrayItem], " $DATA$") > 0 
+                     IF oHtmClassContent:nHandle > 0 
+                        // Write property name  
+                        nArrayItemLine = ASCAN(aCurDoc[nArrayItem], {|a| "DATA" $ UPPER(a)}, 2) + 1 
+                        cTempString := HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                        DO WHILE "$" $ aCurDoc[nArrayItem][nArrayItemLine + 1] = .F.
+                           nArrayItemLine ++  
+                           cTempString = cTempString + "<br>" + HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                        ENDDO 
+                        oHtmClassContent:WriteText("<div class='title'><a name='" + cTempString + "'>Property " + cTempString + "</a></div>")
+          
+                        // Write property oneliner 
+                        nArrayItemLine = ASCAN(aCurDoc[nArrayItem], {|a| "ONELINER" $ UPPER(a)}, 2) + 1 
+                        cTempString := HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                        DO WHILE "$" $ aCurDoc[nArrayItem][nArrayItemLine + 1] = .F.
+                           nArrayItemLine ++  
+                           cTempString = cTempString + "<br>" + HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                        ENDDO 
+                        oHtmClassContent:WriteText("<div class='oneliner'>" + cTempString + "</div>")
+          
+                        WriteData("Category", "Category")
+                        WriteData("Description", "Description") 
+                     ENDIF
+                  ELSEIF ASCAN(aCurDoc[nArrayItem], " $METHOD$") > 0  
+                     IF oHtmClassContent:nHandle > 0  
+                        // Write method name  
+                        nArrayItemLine = ASCAN(aCurDoc[nArrayItem], {|a| "METHOD" $ UPPER(a)}, 2) + 1 
+                        cTempString := HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                        DO WHILE "$" $ aCurDoc[nArrayItem][nArrayItemLine + 1] = .F.
+                           nArrayItemLine ++  
+                           cTempString = cTempString + "<br>" + HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                        ENDDO 
+                        oHtmClassContent:WriteText("<div class='title'><a name='" + cTempString + "'>Method " + cTempString + "</a></div>")
+          
+                        // Write method oneliner 
+                        nArrayItemLine = ASCAN(aCurDoc[nArrayItem], {|a| "ONELINER" $ UPPER(a)}, 2) + 1 
+                        cTempString := HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                        DO WHILE "$" $ aCurDoc[nArrayItem][nArrayItemLine + 1] = .F.
+                           nArrayItemLine ++  
+                           cTempString = cTempString + "<br>" + HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                        ENDDO 
+                        oHtmClassContent:WriteText("<div class='oneliner'>" + cTempString + "</div>")
+          
+                        WriteMethod("Syntax", "Syntax") 
+                        WriteMethod("Arguments", "Arguments") 
+                        WriteMethod("Returns", "Returns") 
+                        WriteMethod("Description", "Description")  
+                     ENDIF
+                  ELSE
+                     // ... 
+                  ENDIF  
+               ELSE
+                  // Write function name 
+                  nArrayItemLine = ASCAN(aCurDoc[nArrayItem], {|a| "FUNCNAME" $ UPPER(a)}, 2) + 1 
+                  cTempString := HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                  DO WHILE "$" $ aCurDoc[nArrayItem][nArrayItemLine + 1] = .F.
+                     nArrayItemLine ++  
+                     cTempString = cTempString + "<br>" + HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                  ENDDO 
+                  oHtmClass:WriteText("<div class='classtitle'>Function " + cTempString + "</div>") 
+          
+                  // Add function name and filename to the docinfo array  
+                  AADD( aDocInfo, { cTempString, cFileName, .F. } ) 
+          
+                  // Write function oneliner 
+                  nArrayItemLine = ASCAN(aCurDoc[nArrayItem], {|a| "ONELINER" $ UPPER(a)}, 2) + 1 
+                  cTempString := HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                  DO WHILE "$" $ aCurDoc[nArrayItem][nArrayItemLine + 1] = .F.
+                     nArrayItemLine ++  
+                     cTempString = cTempString + "<br>" + HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+                  ENDDO 
+                  oHtmClass:WriteText("<div class='oneliner'>" + cTempString + "</div>")  
+          
+                  // Write selected function items 
+                  DO WHILE nTemp2 <= LEN(aFunctionItems) 
+                     WriteFunction(aFunctionItems[nTemp2][1], aFunctionItems[nTemp2][2]) 
+                     nTemp2 ++ 
+                  ENDDO 
+               ENDIF  
+          
+               nArrayItem ++ 
+            ENDDO
+          
+            oHtmClassContent:WriteText("</body></html>") 
+         ELSE
+            // HTML file could not be created, skip current source file 
+            LOOP 
+         ENDIF 
+      ENDIF
+
+   NEXT 
+RETURN NIL
+
+
+FUNCTION ReadFromTop2(nh)
+   LOCAL cBuffer   := '' 
+   LOCAL aTempArray   := {}
+
+   DO WHILE FReadLine(nH, @cBuffer, 4096)
+      cBuffer := TRIM(SUBSTR(cBuffer, nCommentLen))
+
+      AADD(aTempArray, cBuffer)
+      IF AT(DELIM + "END" + DELIM, cBuffer) > 0
+         AADD(aCurdoc, aTempArray)
+         aTempArray := {}
+      ENDIF
+   ENDDO 
+ 
+   FT_FGOTOP() 
+RETURN NIL 
+
+
+FUNCTION WriteClass(cItem, cTitle)
+   nArrayItemLine = ASCAN(aCurDoc[nArrayItem], {|a| UPPER(cItem) $ UPPER(a)}) + 1 
+   IF nArrayItemLine - 1 <> 0 
+      cTempString := HTMFormat(aCurDoc[nArrayItem][nArrayItemLine])
+   ELSE
+      cTempString := "-" 
+   ENDIF 
+   DO WHILE "$" $ aCurDoc[nArrayItem][nArrayItemLine + 1] = .F.
+      nArrayItemLine ++  
+      cTempString = cTempString + "<br>" + HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+   ENDDO
+   IF EMPTY(cTempString)
+      cTempString := "-" 
+   ENDIF
+ 
+   oHtmClass:WriteText("<div class='itemtitle'>&raquo; " + cTitle + "</div>") 
+   oHtmClass:WriteText("<div class='itemtext'>" + cTempString + "</div>") 
+RETURN NIL
+
+
+FUNCTION WriteClassDataMethod(cItem, cTitle, nArrayItem, nArrayItemLine)
+   LOCAL nPrevArrayItem := nArrayItem 
+   LOCAL nPrevArrayItemLine := nArrayItemLine
+   LOCAL aTmpArray := {}
+   LOCAL nTmpCount := 1 
+
+   nArrayItem ++ 
+   cTempString := "" 
+   DO WHILE nArrayItem <= LEN(aCurDoc)
+      nArrayItemLine := ASCAN(aCurDoc[nArrayItem], {|a| "$" + UPPER(cItem) + "$" $ UPPER(a)}) + 1
+      IF nArrayItemLine -1 <> 0 
+         AADD(aTmpArray, {"&bull; <a href='" + LOWER(LEFT(cFileName, LEN(cFileName) - 4)) + "_content.htm#" + aCurDoc[nArrayItem][nArrayItemLine] + "' target=_self>" + aCurDoc[nArrayItem][nArrayItemLine] + "</a><br>", aCurDoc[nArrayItem][nArrayItemLine]}) 
+         nTmpCount ++ 
+      ENDIF 
+      nArrayItem ++ 
+   ENDDO
+
+   ASORT(aTmpArray,,, {|x, y| UPPER(x[2]) < UPPER(y[2])}) 
+   FOR nTmpCount := 1 TO LEN(aTmpArray)
+      cTempString = cTempString + aTmpArray[nTmpCount][1] 
+   NEXT 
+   IF EMPTY(cTempString) 
+      cTempString := "-" 
+   ENDIF
+  
+   oHtmClass:WriteText("<div class='itemtitle'>&raquo; " + cTitle + "</div>")  
+   oHtmClass:WriteText("<div class='itemtext'>" + cTempString + "</div>")
+
+   nArrayItem = nPrevArrayItem
+   nArrayItemLine = nPrevArrayItemLine
+
+   LinkInheritance(cItem) 
+RETURN NIL
+
+
+FUNCTION LinkInheritance(cItem)
+   LOCAL nTemp1 := 1 
+
+   DO WHILE nTemp1 <= LEN(aDirList)
+      IF UPPER(aDirList[nTemp1][1]) = UPPER(cInherits + ".TXT")
+         oHtmClass:WriteText("<div class='itemtext'>&bull; <a href='" + cInherits + ".htm' target=_self>" + IIF(cItem ="Data", "Properties", "Methods") + " inherited via " + cInherits + "</a></div>") 
+      ENDIF
+      nTemp1 ++
+   ENDDO
+RETURN NIL 
+
+
+FUNCTION WriteData(cItem, cTitle)
+   nArrayItemLine = ASCAN(aCurDoc[nArrayItem], {|a| UPPER(cItem) $ UPPER(a)}) + 1 
+   cTempString := HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+   DO WHILE "$" $ aCurDoc[nArrayItem][nArrayItemLine + 1] = .F.
+      nArrayItemLine ++  
+      cTempString = cTempString + "<br>" + HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+   ENDDO
+   IF EMPTY(cTempString)
+      cTempString := "-" 
+   ENDIF
+ 
+   oHtmClassContent:WriteText("<div class='itemtitle'>&raquo; " + cTitle + "</div>") 
+   oHtmClassContent:WriteText("<div class='itemtext'>" + cTempString + "</div>") 
+RETURN NIL 
+
+
+FUNCTION WriteMethod(cItem, cTitle)
+   nArrayItemLine = ASCAN(aCurDoc[nArrayItem], {|a| UPPER(cItem) $ UPPER(a)}) + 1 
+   cTempString := HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+   DO WHILE "$" $ aCurDoc[nArrayItem][nArrayItemLine + 1] = .F.
+      nArrayItemLine ++  
+      cTempString = cTempString + "<br>" + HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+   ENDDO
+   IF EMPTY(cTempString) 
+      cTempString := "-" 
+   ENDIF
+
+   oHtmClassContent:WriteText("<div class='itemtitle'>&raquo; " + cTitle + "</div>") 
+   oHtmClassContent:WriteText("<div class='itemtext'>" + cTempString + "</div>") 
+RETURN NIL
+
+
+FUNCTION WriteFunction(cItem, cTitle)
+   nArrayItemLine := ASCAN(aCurDoc[nArrayItem], {|a| UPPER(cItem) $ UPPER(a)}) + 1 
+   cTempString := aCurDoc[nArrayItem][nArrayItemLine]
+   DO WHILE "$" $ aCurDoc[nArrayItem][nArrayItemLine + 1] = .F.
+      nArrayItemLine ++  
+      cTempString = cTempString + "<br>" + HTMFormat(aCurDoc[nArrayItem][nArrayItemLine]) 
+   ENDDO
+   IF EMPTY(cTempString) 
+      cTempString := "-" 
+   ENDIF
+
+   oHtmClassContent:WriteText("<div class='itemtitle'>&raquo; " + cTitle + "</div>") 
+   oHtmClassContent:WriteText("<div class='itemtext'>" + cTempString + "</div>") 
+RETURN NIL
+
+
+FUNCTION HTMFormat(cTempString)
+   LOCAL cTmpString1 := cTempString 
+   LOCAL cTmpString2 := "" 
+   LOCAL nTmpCount := 1
+
+   DO WHILE nTmpCount <= LEN(cTmpString1)
+      cTmpChar := SUBSTR(cTmpString1, nTmpCount, 1) 
+
+      DO CASE
+      CASE cTmpChar = "<"
+         cTmpString2 = cTmpString2 + "&lt;"
+      CASE cTmpChar = ">"
+         cTmpString2 = cTmpString2 + "&gt;" 
+      OTHERWISE
+         cTmpString2 = cTmpString2 + cTmpChar
+      ENDCASE 
+
+      nTmpCount ++ 
+   ENDDO 
+RETURN cTmpString2 
+ 
+
+
 /***********************************
 * Function ProcWwwBuf(cBuffer)   -> cTemp
 * Parameter cBuffer  -> Strip the "<" and ">" symbols from the imput String
@@ -1462,6 +1897,7 @@ STATIC FUNCTION GetItem( cItem, nCurdoc )
 
    ENDIF
 RETURN lReturn
+
 #ifdef GAUGE
 function CountDocs(aCurDoc)
 return len(aCurdoc)
