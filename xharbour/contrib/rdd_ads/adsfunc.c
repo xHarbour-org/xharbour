@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.6 2003/02/03 00:48:17 lculik Exp $
+ * $Id: adsfunc.c,v 1.7 2003/02/11 03:53:40 paultucker Exp $
  */
 
 /*
@@ -1292,22 +1292,27 @@ HB_FUNC( ADSGETLASTERROR )
 
 #ifdef ADS_REQUIRE_VERSION6
 
-HB_FUNC(ADSADDTABLE)
+HB_FUNC( ADSADDTABLE )
 {
    UNSIGNED32 ulRetVal;
-   UNSIGNED8 *pTableName = hb_parc( 1 );
+   UNSIGNED8 *pTableName     = hb_parc( 1 );
    UNSIGNED8 *pTableFileName = hb_parc( 2 );
    UNSIGNED8 *pTableIndexFileName = hb_parc( 3 );
 
    ulRetVal= AdsDDAddTable( adsConnectHandle, pTableName, pTableFileName, adsFileType, adsCharType, pTableIndexFileName, NULL);
 
    if ( ulRetVal == AE_SUCCESS )
-      hb_retl(1);
+   {
+      hb_retl( 1 );
+   }
    else
-      hb_retl(0);
+   {
+      hb_retl( 0 );
+   }
+
 }
 
-HB_FUNC(ADSADDUSERTOGROUP)
+HB_FUNC( ADSADDUSERTOGROUP )
 {
    UNSIGNED32 ulRetVal;
    UNSIGNED8 *pGroup = hb_parc( 1 );
@@ -1318,81 +1323,158 @@ HB_FUNC(ADSADDUSERTOGROUP)
                                    pName);
 
    if ( ulRetVal == AE_SUCCESS )
-        hb_retl(1);
-    else
-        hb_retl(0);
+   {
+      hb_retl( 1 );
+   }
+   else
+   {
+      hb_retl( 0 );
+   }
+
 }
 
-HB_FUNC(ADSUSEDICTIONARY)
+HB_FUNC( ADSUSEDICTIONARY )
 {
    BOOL bOld = bDictionary;
    if ( ISLOG( 1 ) )
+   {
       bDictionary = hb_parl( 1 ) ;
+   }
 
-   hb_retl(bOld);
+   hb_retl( bOld );
+}
+
+HB_FUNC( ADSCONNECT60 )
+{
+
+   UNSIGNED32 ulRetVal ;
+   UNSIGNED8  *pucServerPath = hb_parc( 1 );
+   UNSIGNED16 usServerTypes  = hb_parnl( 2 );
+   UNSIGNED8  *pucUserName   = ISCHAR( 3 ) ? hb_parc( 3 ) : NULL ;
+   UNSIGNED8  *pucPassword   = ISCHAR( 4 ) ? hb_parc( 4 ) : NULL ;
+   UNSIGNED32 ulOptions      = ISNUM( 5 ) ? hb_parnl( 5 ) : ADS_DEFAULT ;
+
+   ulRetVal = AdsConnect60( pucServerPath,
+                            usServerTypes,
+                            pucUserName,
+                            pucPassword,
+                            ulOptions,
+                            &adsConnectHandle );
+
+   if (ulRetVal == AE_SUCCESS )
+   {
+      hb_retl( 1 ) ;
+   }
+   else
+   {
+      hb_retl( 0 ) ;
+   }
+
+}
+
+HB_FUNC( ADSDDCREATE )
+{
+   UNSIGNED32 ulRetVal;
+   UNSIGNED8  *pucDictionaryPath = hb_parc( 1 ) ;
+   UNSIGNED16 usEncrypt          = ISNUM(2) ? hb_parnl( 0 ) : 0 ;
+   UNSIGNED8  *pucDescription    = ISCHAR( 3 ) ? hb_parc( 3 ) : NULL ;
+
+   ulRetval = AdsDDCreate( pucDictionaryPath,
+                           usEncrypt,
+                           pucDescription,
+                           adsConnectHandle );
+
+   if (ulRetVal == AE_SUCCESS)
+   {
+      hb_retl( 1 );
+   }
+   else
+   {
+      hb_retl( 0 );
+   }
+
 }
 
 #endif
 
-HB_FUNC(ADSBEGINTRANSACTION)
+HB_FUNC( ADSBEGINTRANSACTION )
 {
 
-    ADSHANDLE hConnect = ISNUM(1) ? hb_parnl(1) : 0;
+   ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : 0;
 
-    if ( AdsBeginTransaction( hConnect )  == AE_SUCCESS )
-        hb_retl(TRUE);
-    else
-        hb_retl(FALSE);
+   if ( AdsBeginTransaction( hConnect )  == AE_SUCCESS )
+   {
+      hb_retl( TRUE );
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
+
+}
+
+HB_FUNC( ADSCOMMITTRANSACTION )
+{
+
+   ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : 0;
+
+   if ( AdsCommitTransaction( hConnect )  == AE_SUCCESS )
+   {
+      hb_retl( TRUE );
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
+
+}
+
+HB_FUNC( ADSFAILEDTRANSACTIONRECOVERY )
+{
+
+   UNSIGNED8 *pucServer =  ( UNSIGNED8 *) ( ISCHAR( 1 ) ? hb_parc( 1 ) : NULL);
+
+   if ( AdsFailedTransactionRecovery( pucServer )  == AE_SUCCESS )
+   {
+      hb_retl( TRUE );
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
 }
 
 
-
-
-
-HB_FUNC(ADSCOMMITTRANSACTION)
+HB_FUNC( ADSINTRANSACTION )
 {
 
-    ADSHANDLE hConnect = ISNUM(1) ? hb_parnl(1) : 0;
+   ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : 0;
+   UNSIGNED16       pbInTrans ;
 
-    if ( AdsCommitTransaction( hConnect )  == AE_SUCCESS )
-        hb_retl(TRUE);
-    else
-        hb_retl(FALSE);
-}
-
-HB_FUNC(ADSFAILEDTRANSACTIONRECOVERY)
-{
-
-    UNSIGNED8 *pucServer =  ( UNSIGNED8 *) ( ISCHAR(1) ? hb_parc(1) : NULL);
-
-    if ( AdsFailedTransactionRecovery( pucServer )  == AE_SUCCESS )
-        hb_retl(TRUE);
-    else
-        hb_retl(FALSE);
+   if ( AdsInTransaction( hConnect, &pbInTrans)  == AE_SUCCESS )
+   {
+      hb_retl( pbInTrans );
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
 }
 
 
-HB_FUNC(ADSINTRANSACTION)
+HB_FUNC( ROOLBACK )
 {
 
-    ADSHANDLE hConnect = ISNUM(1) ? hb_parnl(1) : 0;
-    UNSIGNED16       pbInTrans ;
-    if ( AdsInTransaction( hConnect, &pbInTrans)  == AE_SUCCESS )
-        hb_retl(pbInTrans);
-    else
-        hb_retl(FALSE);
-}
+   ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : 0;
 
-
-HB_FUNC(ADSROOLBACKTRANSACTION)
-{
-
-    ADSHANDLE hConnect = ISNUM(1) ? hb_parnl(1) : 0;
-
-    if ( AdsRollbackTransaction( hConnect )  == AE_SUCCESS )
-        hb_retl(TRUE);
-    else
-        hb_retl(FALSE);
+   if ( AdsRollbackTransaction( hConnect )  == AE_SUCCESS )
+   {
+      hb_retl( TRUE );
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
 }
 
 
