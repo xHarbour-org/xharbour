@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.119 2001/12/15 11:22:29 vszakats Exp $
+ * $Id: debugger.prg,v 1.121 2002/02/24 08:34:54 antoniolinares Exp $
  */
 
 /*
@@ -336,10 +336,12 @@ METHOD New() CLASS TDebugger
                               SetPos( ::oWndCode:Cargo[1],::oWndCode:Cargo[2] ) }
    ::oWndCode:bLostFocus  := { || ::oWndCode:Cargo[1] := Row(), ::oWndCode:Cargo[2] := Col(), ;
                               SetCursor( SC_NONE ) }
+   /*
    ::oWndCode:bPainted := { || ::oBrwText:SetColor( __DbgColors()[ 2 ] + "," + ;
                                __DbgColors()[ 5 ] + "," + __DbgColors()[ 3 ] + "," + ;
                                __DbgColors()[ 6 ] ),;
                                iif( ::oBrwText != nil, ::oBrwText:RefreshWindow(), nil ) }
+   */
 
    AAdd( ::aWindows, ::oWndCode )
 
@@ -492,10 +494,10 @@ METHOD Colors() CLASS TDebugger
    endif
    oBrwColors:Cargo :={ 1,{}} // Actual highligthed row
    oBrwColors:ColorSpec := ::ClrModal()
-   oBrwColors:GOTOPBLOCK := { || oBrwColors:cargo[ 1 ]:= 1 } 
-   oBrwColors:GoBottomBlock := { || oBrwColors:cargo[ 1 ]:= Len(oBrwColors:cargo[ 2 ][ 1 ])} 
+   oBrwColors:GOTOPBLOCK := { || oBrwColors:cargo[ 1 ]:= 1 }
+   oBrwColors:GoBottomBlock := { || oBrwColors:cargo[ 1 ]:= Len(oBrwColors:cargo[ 2 ][ 1 ])}
    oBrwColors:SKIPBLOCK := { |nPos| ( nPos:= ArrayBrowseSkip(nPos, oBrwColors), oBrwColors:cargo[ 1 ]:= ;
-   oBrwColors:cargo[ 1 ] + nPos,nPos ) } 
+   oBrwColors:cargo[ 1 ] + nPos,nPos ) }
 
    oBrwColors:AddColumn( ocol := TBColumnNew( "", { || PadR( aColors[ oBrwColors:Cargo[1] ], 14 ) } ) )
    oCol:DefColor:={1,2}
@@ -505,7 +507,7 @@ METHOD Colors() CLASS TDebugger
    aadd(oBrwColors:Cargo[2],acolors)
    oCol:DefColor:={1,3}
    ocol:width:=50
-   oBrwColors:autolite:=.f.   
+   oBrwColors:autolite:=.f.
 
    oWndColors:bPainted    := { || oBrwColors:ForceStable(),RefreshVarsS(oBrwColors)}
 
@@ -1004,7 +1006,7 @@ METHOD ShowCallStack() CLASS TDebugger
 
       ::oBrwStack:AddColumn( oCol:=TBColumnNew( "",  { || PadC( ::aCallStack[ n ][ 1 ], 14 ) } ) )
       ocol:ColorBlock := { || { iif( n == ::oBrwStack:Cargo, 2, 1 ), 3 } }
-      ocol:Defcolor :=    { 2,1 } 
+      ocol:Defcolor :=    { 2,1 }
 
       ::oWndStack:bPainted := { || ::oBrwStack:ColorSpec := __DbgColors()[ 2 ] + "," + ;
                                   __DbgColors()[ 5 ] + "," + __DbgColors()[ 4 ],;
@@ -1128,10 +1130,14 @@ METHOD ShowVars() CLASS TDebugger
                                ::oWndStack:nWidth(), 0 ) - 1 )
       ::oBrwVars:Cargo :={ 1,{}} // Actual highligthed row
       ::oBrwVars:ColorSpec := ::aColors[ 2 ] + "," + ::aColors[ 5 ] + "," + ::aColors[ 3 ]
-      ::oBrwVars:GOTOPBLOCK := { || ::oBrwVars:cargo[ 1 ]:= 1 } 
-      ::oBrwVars:GoBottomBlock := { || ::oBrwVars:cargo[ 1 ]:= Len(::oBrwVars:cargo[ 2 ][ 1 ])} 
-      ::oBrwVars:SKIPBLOCK := { |nPos| ( nPos:= ArrayBrowseSkip(nPos, ::oBrwVars), ::oBrwVars:cargo[ 1 ]:= ;
-      ::oBrwVars:cargo[ 1 ] + nPos,nPos ) } 
+      ::oBrwVars:GOTOPBLOCK := { || ::oBrwVars:cargo[ 1 ] := Min( 1, Len( ::aVars ) ) }
+      ::oBrwVars:GoBottomBlock := { || ::oBrwVars:cargo[ 1 ] := Len( ::aVars ) }
+      ::oBrwVars:SkipBlock = { | nSkip, nOld | nOld := ::oBrwVars:Cargo[ 1 ],;
+                               ::oBrwVars:Cargo[ 1 ] += nSkip,;
+                               ::oBrwVars:Cargo[ 1 ] := Min( Max( ::oBrwVars:Cargo[ 1 ], 1 ),;
+                                                             Len( ::aVars ) ),;
+                               If( Len( ::aVars ) > 0, ::oBrwVars:Cargo[ 1 ] - nOld, 0 ) }
+
 
       ::oWndVars:bKeyPressed := { | nKey | ( iif( nKey == K_DOWN ;
       , ::oBrwVars:Down(), nil ), iif( nKey == K_UP, ::oBrwVars:Up(), nil ) ;
@@ -1142,11 +1148,11 @@ METHOD ShowVars() CLASS TDebugger
       , iif( nKey == K_ENTER, ::EditVar( ::oBrwVars:Cargo[1] ), nil ), ::oBrwVars:ForceStable() ) }
 
       nWidth := ::oWndVars:nWidth() - 1
-      ::oBrwVars:AddColumn( oCol:=TBColumnNew( "",  { || AllTrim( Str( ::oBrwVars:Cargo[1] -1 ) ) + ") " + ;
-         iif( Len( ::aVars ) > 0, PadR( GetVarInfo( ::aVars[ ::oBrwVars:Cargo[1] ] ),;
+      ::oBrwVars:AddColumn( oCol:=TBColumnNew( "",  { || If( Len( ::aVars ) > 0, AllTrim( Str( ::oBrwVars:Cargo[1] -1 ) ) + ") " + ;
+         PadR( GetVarInfo( ::aVars[ Max( ::oBrwVars:Cargo[1], 1 ) ] ),;
          ::oWndVars:nWidth() - 5 ), "" ) } ) )
-   aadd(::oBrwVars:Cargo[2],::avars)
-   oCol:DefColor:={2,1}
+      AAdd(::oBrwVars:Cargo[2],::avars)
+      oCol:DefColor:={2,1}
       if Len( ::aVars ) > 0
          ::oBrwVars:ForceStable()
       endif
@@ -1155,7 +1161,8 @@ METHOD ShowVars() CLASS TDebugger
 
       ::oWndVars:cCaption := "Monitor:" + ;
       iif( ::lShowLocals, " Local", "" ) + ;
-      iif( ::lShowStatics, " Static", "" ) + iif( ::lShowPrivates, " Private", "" ) + ;
+      iif( ::lShowStatics, " Static", "" ) + ;
+      iif( ::lShowPrivates, " Private", "" ) + ;
       iif( ::lShowPublics, " Public", "" )
 
       if Len( ::aVars ) == 0
@@ -1167,6 +1174,13 @@ METHOD ShowVars() CLASS TDebugger
       if Len( ::aVars ) > ::oWndVars:nBottom - ::oWndVars:nTop - 1
          ::oWndVars:nBottom := ::oWndVars:nTop + Min( Len( ::aVars ) + 1, 7 )
          ::oBrwVars:nBottom := ::oWndVars:nBottom - 1
+         ::oBrwVars:Configure()
+         lRepaint := .t.
+      endif
+      if Len( ::aVars ) < ::oWndVars:nBottom - ::oWndVars:nTop - 1
+         ::oWndVars:nBottom := ::oWndVars:nTop + Len( ::aVars ) + 1
+         ::oBrwVars:nBottom := ::oWndVars:nBottom - 1
+         ::oBrwVars:Configure()
          lRepaint := .t.
       endif
       if ! ::oWndVars:lVisible
@@ -1176,10 +1190,10 @@ METHOD ShowVars() CLASS TDebugger
       else
          if lRepaint
             ::oWndCode:nTop := ::oWndVars:nBottom + 1
+            ::oBrwText:Resize( ::oWndCode:nTop + 1 )
             ::oWndCode:Refresh()
-            ::oBrwText:Resize( ::oWndVars:nBottom + 2 )
+            ::oWndVars:Refresh()
          endif
-         ::oWndVars:Refresh()
       endif
       if Len( ::aVars ) > 0
          ::oBrwVars:RefreshAll()
@@ -1344,12 +1358,11 @@ return AScan( ::aBreakPoints, { | aBreak | aBreak[ 1 ] == nLine } ) != 0
 
 METHOD GotoLine( nLine ) CLASS TDebugger
 
-   ::oBrwText:GotoLine( nLine )
-
    if ::oBrwVars != nil
-      ::oBrwVars:RefreshAll()
-      ::oBrwVars:ForceStable()
+      ::ShowVars()
    endif
+
+   ::oBrwText:GotoLine( nLine )
 
    if ::oBrwStack != nil .and. ! ::oBrwStack:Stable
       ::oBrwStack:ForceStable()
@@ -1537,10 +1550,10 @@ METHOD ViewSets() CLASS TDebugger
    oBrwSets:Cargo :={ 1,{}} // Actual highligthed row
    oBrwSets:autolite:=.f.
    oBrwSets:ColorSpec := ::ClrModal()
-   oBrwSets:GOTOPBLOCK := { || oBrwSets:cargo[ 1 ]:= 1 } 
-   oBrwSets:GoBottomBlock := { || oBrwSets:cargo[ 1 ]:= Len(oBrwSets:cargo[ 2 ][ 1 ])} 
+   oBrwSets:GOTOPBLOCK := { || oBrwSets:cargo[ 1 ]:= 1 }
+   oBrwSets:GoBottomBlock := { || oBrwSets:cargo[ 1 ]:= Len(oBrwSets:cargo[ 2 ][ 1 ])}
    oBrwSets:SKIPBLOCK := { |nPos| ( nPos:= ArrayBrowseSkip(nPos, oBrwSets), oBrwSets:cargo[ 1 ]:= ;
-   oBrwSets:cargo[ 1 ] + nPos,nPos ) } 
+   oBrwSets:cargo[ 1 ] + nPos,nPos ) }
    oBrwSets:AddColumn( ocol := TBColumnNew( "", { || PadR( aSets[ oBrwSets:cargo[ 1 ] ], 12 ) } ) )
    aadd(oBrwSets:Cargo[2],asets)
    ocol:defcolor:={1,2}
@@ -1613,7 +1626,7 @@ static procedure SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cCaption, bEdit )
 
       oWnd:SetCaption( cCaption + "[" + AllTrim( Str( oBrwSets:Cargo[1] ) ) + ;
                        ".." + AllTrim( Str( nSets ) ) + "]" )
-   
+
 return
 static procedure SetsKeyVarPressed( nKey, oBrwSets, nSets, oWnd, bEdit )
    Local nRectoMove
@@ -1782,7 +1795,7 @@ static procedure RefreshVarsS( oBrowse )
    if ( nLen == 2 )
       oBrowse:hilite():colpos:=1
    endif
-   oBrowse:hilite()  
+   oBrowse:hilite()
    return
 static function ArrayBrowseSkip( nPos, oBrwSets,n )
 
