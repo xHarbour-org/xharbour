@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.15 2003/09/09 02:07:54 paultucker Exp $
+# $Id: hrbdll.vc,v 1.16 2003/09/09 03:07:36 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -72,7 +72,7 @@ HARBOUR_DLL  = lib\vc\harbour.dll
 # from DLL
 
 HARBOURFLAGS  = /D__EXPORT__ /i$(INCLUDE_DIR) /n /q0 /w /es2 /n1
-CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /MT /G6 /Ogtyb2 /Gs /GD /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32
+CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /MT /FD /G6 /Ogtyb2 /Gs /GD /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³  HARBOUR_DLL rules  ³Û
@@ -186,6 +186,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\spfiles.obj \
   $(OBJ_DIR)\str.obj \
   $(OBJ_DIR)\strcase.obj \
+  $(OBJ_DIR)\strdel.obj \
   $(OBJ_DIR)\strings.obj \
   $(OBJ_DIR)\strmatch.obj \
   $(OBJ_DIR)\strpeek.obj \
@@ -1262,6 +1263,9 @@ $(OBJ_DIR)\str.obj : $(RTL_DIR)\str.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\strcase.obj : $(RTL_DIR)\strcase.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\strdel.obj : $(RTL_DIR)\strdel.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\strings.obj : $(RTL_DIR)\strings.c
