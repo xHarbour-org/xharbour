@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3144 2004/07/13 03:44:36 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3145 2004/07/13 05:30:14 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-13 13:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.nt
+    ! undef only ifdef
+  * source/rtl/tget.prg
+    * BuildGetColor modified so ::Colorspec has better Clipper (5.3!)
+    * compatibility under Set Intensity and not.
+    * (the only difference to 5.2 is the 2 additional color pairs)
 
 2004-07-12 23:55 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
    * source/rtl/tbrowse.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.81 2004/06/09 05:26:49 guerra000 Exp $
+ * $Id: tget.prg,v 1.82 2004/06/19 02:01:55 ronpinkas Exp $
  */
 
 /*
@@ -184,7 +184,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    DEFAULT cVarName   TO ""
    DEFAULT bVarBlock  TO IIF( ValType( cVarName ) == 'C', MemvarBlock( cVarName ), NIL )
    DEFAULT cPicture   TO ""
-   DEFAULT cColorSpec TO SetColor()
+   DEFAULT cColorSpec TO BuildGetColor(cColorSpec) // SetColor()
 
    ::HasFocus   := .f.
    ::lEdit      := .f.
@@ -1599,13 +1599,13 @@ return Self
  *
   // QUESTIONS, is realy necessary this method? the ::colorspec generated was
   not clipper 5.x compatible, and also was not respecting SET INTENSITY
-*/    
+*/
 METHOD ColorSpec( cColorSpec ) CLASS Get
 
-   local cClrUnSel, cClrEnh
+//   local cClrUnSel, cClrEnh
 
    if cColorSpec != NIL
-   
+
 /*      cClrUnSel := iif( !Empty( hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ) ),;
                                 hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ),;
                                 hb_ColorIndex( SetColor(), GET_CLR_UNSELECTED ) )
@@ -1763,60 +1763,31 @@ Return
 */
 
 STATIC FUNCTION BuildGetColor(cColorSpec)
-     
-   LOCAL lIntensity := SET( _SET_INTENSITY )
-   LOCAL cEndColor
    LOCAL cCur
-   LOCAL cRet := ""
    LOCAL aTokens
-   DEFAULT cColorSpec to SetColor()
-   aTokens := HB_ATOKENS(cColorSpec,",")
-   /* ONLY ONE PAIR COLOR PASSED */
-   
-   IF  len( aTokens ) == 1
-   // replicate to 4 colors pairs as clipper do
-      cCur := cColorSpec
-      cColorSpec := cCur + "," + cCur + "," + cCur + "," + cCur + "," + cCur + "," + cCur
-   elseif   len( aTokens ) == 2
-      cCur := cColorSpec
-      cColorSpec := cCur + "," + aTokens[ 1 ] + "," + aTokens[ 1 ] + "," + aTokens[ 1 ] 
 
-   elseif   len( aTokens ) == 3
-      cCur := cColorSpec
-      cColorSpec := cCur + "," +aTokens[ 1 ] + "," + aTokens[ 1 ] 
-
-   elseif   len( aTokens ) == 4
-      cCur := cColorSpec
-      cColorSpec := cCur + "," +aTokens[ 1 ]
-
-   ENDIF
-
-   // now process color acording to set intensity setting
-
-   cEndColor := "," + __guiColor( cColorSpec, CLR_STANDARD + 1 ) + "," + __guiColor( cColorSpec, CLR_BACKGROUND + 1 )
-
-   cCur := hb_ColorIndex( cColorSpec, CLR_UNSELECTED )
-
-
-   IF ( lIntensity)
-      cRet += cCur +","
+   IF SET( _SET_INTENSITY )
+      DEFAULT cColorSpec to __guiColor( SetColor(), CLR_UNSELECTED + 1 ) +","+;
+                            __guiColor( SetColor(), CLR_ENHANCED   + 1 ) +","+;
+                            __guiColor( SetColor(), CLR_STANDARD   + 1 ) +","+;
+                            __guiColor( SetColor(), CLR_BACKGROUND + 1 )
    ELSE
-      IF cCur == "N/W"
-         cRet += "W/N" +","
-      ELSE
-         cRet += cCur[1] + "+/" + cCur[3] +","
-      ENDIF
+      DEFAULT cColorSpec to __guiColor( SetColor(), CLR_STANDARD   + 1 )
    ENDIF
 
-   cCur := hb_ColorIndex( cColorSpec, CLR_ENHANCED )
-   IF ( lIntensity)
-      cRet += cCur + cEndColor
+   aTokens := HB_ATOKENS( cCur := Upper( cColorSpec ),",")
+
+   IF Len( aTokens ) == 1
+      cColorSpec := cCur + "," + cCur + "," + cCur + "," + cCur
+
+   ELSEIF Len( aTokens ) == 2
+      cColorSpec := cCur + "," + aTokens[ 1 ] + "," + aTokens[ 1 ]
+
+   ELSEIF Len( aTokens ) == 3
+      cColorSpec := cCur + "," + aTokens[ 1 ]
+
    ELSE
-      IF cCur == "N/W"
-         cRet += "W/N" + cEndColor
-      ELSE
-         cRet += cCur[1] + "+/" + cCur[3] + cEndColor
-      ENDIF
+      cColorSpec := cCur
    ENDIF
 
-RETURN cRet
+Return cColorSpec

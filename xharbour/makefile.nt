@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.81 2004/07/01 13:18:35 vouchcac Exp $
+# $Id: makefile.nt,v 1.82 2004/07/01 14:45:30 paultucker Exp $
 #
 
 #
@@ -89,8 +89,9 @@ DEL = del
 MT           =MT
 HB_MT        =-MT -DHB_THREAD_SUPPORT
 !else
+!ifdef MT
 !undef MT
-!undef HB_MT
+!endif
 !endif
 
 # SimpLex is the only supported Scanner in xHarbour.
