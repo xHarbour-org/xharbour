@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.5 2002/11/04 12:25:28 mlombardo Exp $
+ * $Id: macro.y,v 1.6 2002/11/18 00:38:41 ronpinkas Exp $
  */
 
 /*
@@ -262,10 +262,6 @@ Main : Expression '\n' {
      | error   {
                  HB_TRACE(HB_TR_DEBUG, ("macro -> invalid syntax: %s", HB_MACRO_DATA->string));
                  hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
-                 if( yylval.string )
-                 {
-                    hb_xfree( yylval.string );
-                 }
 		 YYABORT;
 	       }
 ;

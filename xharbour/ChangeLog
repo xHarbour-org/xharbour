@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.517 2002/12/07 02:54:51 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.518 2002/12/07 23:49:15 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-07 18:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/macro/macro.slx
+    * Removed recent addition of of reset yylval.string to NIL on EOF token.
+
+  * source/macro/macro.y
+    ! Fixed gpf related to hb_xfree() of yylval.string
 
 2002-11-07 21:45 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/menuto.prg
