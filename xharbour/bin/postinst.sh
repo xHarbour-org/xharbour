@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: postinst.sh,v 1.11 2004/11/01 05:38:08 likewolf Exp $
+# $Id: postinst.sh,v 1.12 2004/11/01 21:36:45 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -61,12 +61,12 @@ then
     rm -f fm.o
     ${MAKE} -r fm.o
     ${AR} ${HB_LIB_INSTALL}/libfm.a fm.o
-    [ -n "${RANLIB}" ] && ${HB_LIB_INSTALL}/libfm.a
+    [ -n "${RANLIB}" ] && ${RANLIB} ${HB_LIB_INSTALL}/libfm.a
     rm -f fm.o
     if [ "${HB_MT}" = "MT" ]; then
         ${MAKE} -r fm.o 'HB_LIBCOMP_MT=YES'
         ${AR} ${HB_LIB_INSTALL}/libfmmt.a fm.o
-        [ -n "${RANLIB}" ] && ${HB_LIB_INSTALL}/libfmmt.a
+        [ -n "${RANLIB}" ] && ${RANLIB} ${HB_LIB_INSTALL}/libfmmt.a
         rm -f fm.o
     fi
     )

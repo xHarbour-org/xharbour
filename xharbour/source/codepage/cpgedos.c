@@ -1,13 +1,14 @@
 /*
- * $Id: cdpsrwin.c,v 1.3 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: cdpgedos.c,v 1.4 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module (RUWIN)
+ * National Collation Support Module ( German MS-DOS )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
+ * v1.0 2003 Guenther Steiner <byte-one@aon.at>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,25 +51,50 @@
  *
  */
 
-/* Language name: Russian */
-/* ISO language code (2 chars): RU */
-/* Codepage: Windows-1251 */
+/* Language name: German */
+/* ISO language code (2 chars): DE */
+/* Codepage: 850 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-static HB_CODEPAGE s_codepage = { "SRWIN",
-    CPID_1251,UNITB_1251,32,
-    "¿¡¬√ƒ≈∆«»… ÀÃÕŒœ–—“”‘’÷◊ÿŸ⁄€‹›ﬁﬂ","‡·‚„‰ÂÊÁËÈÍÎÏÌÓÔÒÚÛÙıˆ˜¯˘˙˚¸˝˛ˇ",
-    0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
+#define NUMBER_OF_CHARACTERS  30    /* The number of single characters in the
+                                       alphabet, two-as-one aren't considered
+                                       here, accented - are considered. */
+#define IS_LATIN               1    /* Should be 1, if the national alphabet
+                                       is based on Latin */
+#define ACCENTED_EQUAL         0    /* Should be 1, if accented character
+                                       has the same weight as appropriate
+                                       unaccented. */
+#define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
+                                       sort after their unaccented counterparts
+                                       only if the unaccented versions of all
+                                       characters being compared are the same
+                                       ( interleaving ) */
 
-HB_CODEPAGE_ANNOUNCE( SRWIN );
+/* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
+   accented characters with the symbol '~' before each of them, for example:
+    a~Ä
+   If there is two-character sequence, which is considered as one, it should
+   be marked with '.' before and after it, for example:
+      ... h.ch.i ...
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_SRWIN )
+   The Upper case string and the Lower case string should be absolutely the
+   same excepting the characters case, of course.
+ */
+
+static HB_CODEPAGE s_codepage = { "DE",
+    CPID_850,UNITB_850,NUMBER_OF_CHARACTERS,
+    "AéBCDEFGHIJKLMNOôPQRS·TUöVWXYZ","aÑbcdefghijklmnoîpqrs·tuÅvwxyz",
+    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
+
+HB_CODEPAGE_ANNOUNCE( DE );
+
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_DE )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_SRWIN )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_DE )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_SRWIN
+   #pragma startup hb_codepage_Init_DE
 #endif
 

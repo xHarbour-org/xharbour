@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.23 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: hbsrlraw.c,v 1.24 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -60,17 +60,13 @@
 * HB_CreateLen8( nLen ) --> returns the bytes containing the code
 */
 
-#ifndef HB_LONG_LONG_OFF
-void hb_createlen8( BYTE *ret, ULONGLONG uRet )
-#else
-void hb_createlen8( BYTE *ret, ULONG uRet )
-#endif
+static void hb_createlen8( BYTE *ret, HB_LONG uRet )
 {
    int i;
-   for( i = 7; i >= 0; i -- )
+   for( i = 7; i >= 0; i-- )
    {
-      ret[i] = (BYTE) (uRet % 256 );
-      uRet /= 256l;
+      ret[i] = (BYTE) (uRet & 0xff );
+      uRet >>= 8;
    }
 }
 
@@ -80,23 +76,15 @@ HB_FUNC( HB_CREATELEN8 )
 
    if( ISNUM(1) )
    {
-      #ifndef HB_LONG_LONG_OFF
-      ULONGLONG uRet = (ULONGLONG) hb_parnll(1 );
-      #else
-      ULONG uRet = (ULONG) hb_parnl( 1 );
-      #endif
+      HB_LONG uRet = hb_parnint( 1 );
       hb_createlen8( ret, uRet );
       hb_retclen( ( char *) ret, 8 );
    }
    else if( ISCHAR(1) )
    {
       PHB_ITEM pItem = hb_param(1, HB_IT_STRING);
-      #ifndef HB_LONG_LONG_OFF
-      ULONGLONG uRet = (ULONGLONG) hb_parnll( 2 );
-      #else
-      ULONG uRet = (ULONG) hb_parnl( 2 );
-      #endif
-      if( pItem->item.asString.length >= 8)
+      HB_LONG uRet = hb_parnint( 2 );
+      if( pItem->item.asString.length >= 8 )
       {
          hb_createlen8( ( BYTE *) pItem->item.asString.value, uRet );
       }
@@ -108,36 +96,17 @@ HB_FUNC( HB_CREATELEN8 )
 /* Returns a numeric length using the first 4 bytes of the given string
 * HB_GetLen8( cStr ) --> nLength
 */
-#ifndef HB_LONG_LONG_OFF
-ULONGLONG hb_getlen8( BYTE *cStr )
+static HB_LONG hb_getlen8( BYTE *cStr )
 {
-   int i;
-   ULONGLONG lFact = 1;
-   ULONGLONG ulRet = 0;
+   int i, iShift;
+   HB_LONG ulRet = 0;
 
-   for (i = 7; i >= 0; i-- )
+   for ( i = 7, iShift = 0; i >= 0; i--, iShift += 8 )
    {
-      ulRet += (( ULONGLONG ) cStr[i]) * lFact;
-      lFact *= 256l;
+      ulRet += (( HB_LONG ) cStr[i]) << iShift;
    }
    return ulRet;
 }
-#else
-ULONG hb_getlen8( BYTE *cStr )
-{
-   int i;
-   ULONG lFact = 1;
-   ULONG ulRet = 0;
-
-   for (i = 7; i >= 4; i-- )
-   {
-      ulRet += (( ULONG ) cStr[i]) * lFact;
-      lFact *= 256l;
-   }
-   return ulRet;
-}
-#endif
-
 
 
 HB_FUNC( HB_GETLEN8 )
@@ -149,11 +118,7 @@ HB_FUNC( HB_GETLEN8 )
    }
    else
    {
-#ifndef HB_LONG_LONG_OFF
-      hb_retnll( hb_getlen8( cStr ) );
-#else
-      hb_retnl( hb_getlen8( cStr ) );
-#endif
+      hb_retnint( hb_getlen8( cStr ) );
    }
 }
 
@@ -221,16 +186,6 @@ HB_FUNC( HB_SERIALIZESIMPLE )
          cRet[1] = (BYTE)'L';
          hb_createlen8( cRet + 2, pItem->item.asLong.value );
       break;
-
-#ifndef HB_LONG_LONG_OFF
-      case HB_IT_LONGLONG:
-         ulRet = 10;
-         cRet = (BYTE *) hb_xgrab( ulRet );
-         cRet[0] = (BYTE)'N';
-         cRet[1] = (BYTE)'X';
-         hb_createlen8( cRet + 2, pItem->item.asLongLong.value );
-      break;
-#endif
 
       case HB_IT_DOUBLE:
          ulRet = 2 + sizeof( double );
@@ -318,13 +273,10 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
             ulData = (ULONG) hb_getlen8( ( BYTE * )cBuf + 2 );
             hb_retnl( (LONG) ulData );
          }
-#ifndef HB_LONG_LONG_OFF
          else if( cBuf[1] == 'X' )
          {
-            ulData = (ULONG) hb_getlen8( ( BYTE * )cBuf + 2 );
-            hb_retnll( (LONGLONG) ulData );
+            hb_retnint( (HB_LONG) hb_getlen8( ( BYTE * )cBuf + 2 ) );
          }
-#endif
          else
          {
             hb_retnd( *((double *) (cBuf +2) ) );

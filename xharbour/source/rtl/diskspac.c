@@ -1,5 +1,5 @@
 /*
- * $Id: diskspac.c,v 1.6 2004/04/05 02:29:31 druzus Exp $
+ * $Id: diskspac.c,v 1.7 2004/04/14 20:59:10 andijahja Exp $
  */
 
 /*
@@ -67,6 +67,8 @@
 #if defined(HB_OS_BSD)
    #include <sys/param.h>
    #include <sys/mount.h>
+#elif defined(HB_OS_SUNOS)
+   #include <sys/statvfs.h>
 #elif defined(HB_OS_UNIX)
    #include <sys/vfs.h>
 #endif
@@ -204,15 +206,20 @@ HB_FUNC( DISKSPACE )
 #elif defined(HB_OS_UNIX)
 
    {
-      struct statfs st;
       char *szName = ISCHAR( 1 ) ? hb_parc( 1 ) : "/";
 
-      HB_SYMBOL_UNUSED( uiDrive );
-
+#if defined(HB_OS_SUNOS)
+      struct statvfs st;
+      if ( statvfs( szName, &st) == 0 )
+#else
+      struct statfs st;
       if ( statfs( szName, &st) == 0 )
+#endif
          dSpace = ( double ) st.f_blocks * ( double ) st.f_bsize;
       else
          bError = TRUE;
+
+      HB_SYMBOL_UNUSED( uiDrive );
    }
 
 #else

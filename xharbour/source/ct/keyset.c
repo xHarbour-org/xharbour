@@ -1,5 +1,5 @@
 /*
- * $Id: keyset.c,v 1.2 2003/12/28 22:25:33 druzus Exp $
+ * $Id: keyset.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  */
 
 /*
@@ -139,7 +139,7 @@ static void SetGet( char cKey )
 
    #if defined(__WATCOMC__) && defined(__386__)
 
-      *( ( char * ) 0x0417 ) = ( *( ( char * ) 0x0417 ) & ( !cKey ) ) | cKey ;
+      *( ( char * ) 0x0417 ) = ( *( ( char * ) 0x0417 ) & ( !cKey ) ) | cKey;
 
    #elif defined(__DJGPP__)
 

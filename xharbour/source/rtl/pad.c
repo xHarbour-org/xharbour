@@ -1,5 +1,5 @@
 /*
- * $Id: pad.c,v 1.1.1.1 2001/12/21 10:41:55 ronpinkas Exp $
+ * $Id: pad.c,v 1.2 2004/04/01 09:35:37 andijahja Exp $
  */
 
 /*
@@ -59,4 +59,3 @@ HB_FUNC( PAD )
 {
    HB_FUNCNAME( PADR )();
 }
-

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3603 2004/11/16 01:16:36 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3604 2004/11/21 16:26:11 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,480 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-21 22:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  + xharbour/config/sunos/dir.cf
+  + xharbour/config/sunos/gcc.cf
+  + xharbour/config/sunos/global.cf
+  + xharbour/config/sunos/install.cf
+    + added make files for SunOS (Solaris)
+
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/postinst.sh
+    * modifications for SunOS and Linux on AMD64
+
+  * xharbour/bin/pack_src.bat
+  * xharbour/bin/pack_src.sh
+    + added new files and some missing ones
+
+  * xharbour/config/darwin/gcc.cf
+    * removed -DHB_OS_BSD - it's defined inside hbsetup.h
+
+  * xharbour/source/codepage/Makefile
+  - xharbour/source/codepage/cdp_tpl.c
+  - xharbour/source/codepage/cdpesdos.c
+  - xharbour/source/codepage/cdpesmwin.c
+  - xharbour/source/codepage/cdpeswin.c
+  - xharbour/source/codepage/cdpgedos.c
+  - xharbour/source/codepage/cdpgewin.c
+  - xharbour/source/codepage/cdphr1250.c
+  - xharbour/source/codepage/cdphr852.c
+  - xharbour/source/codepage/cdpltwin.c
+  - xharbour/source/codepage/cdppl852.c
+  - xharbour/source/codepage/cdppliso.c
+  - xharbour/source/codepage/cdpplmaz.c
+  - xharbour/source/codepage/cdpplwin.c
+  - xharbour/source/codepage/cdppt850.c
+  - xharbour/source/codepage/cdpptiso.c
+  - xharbour/source/codepage/cdpru866.c
+  - xharbour/source/codepage/cdprukoi.c
+  - xharbour/source/codepage/cdpruwin.c
+  - xharbour/source/codepage/cdpsl852.c
+  - xharbour/source/codepage/cdpsliso.c
+  - xharbour/source/codepage/cdpslwin.c
+  - xharbour/source/codepage/cdpsrwin.c
+  + xharbour/source/codepage/cp_tpl.c
+  + xharbour/source/codepage/cpesdos.c
+  + xharbour/source/codepage/cpesmwin.c
+  + xharbour/source/codepage/cpeswin.c
+  + xharbour/source/codepage/cpgedos.c
+  + xharbour/source/codepage/cpgewin.c
+  + xharbour/source/codepage/cphr1250.c
+  + xharbour/source/codepage/cphr852.c
+  + xharbour/source/codepage/cpltwin.c
+  + xharbour/source/codepage/cppl852.c
+  + xharbour/source/codepage/cppliso.c
+  + xharbour/source/codepage/cpplmaz.c
+  + xharbour/source/codepage/cpplwin.c
+  + xharbour/source/codepage/cppt850.c
+  + xharbour/source/codepage/cpptiso.c
+  + xharbour/source/codepage/cpru866.c
+  + xharbour/source/codepage/cprukoi.c
+  + xharbour/source/codepage/cpruwin.c
+  + xharbour/source/codepage/cpsl852.c
+  + xharbour/source/codepage/cpsliso.c
+  + xharbour/source/codepage/cpslwin.c
+  + xharbour/source/codepage/cpsrwin.c
+    * renamed cdp*.c to cp*.c to make the names 8.3 compliant
+
+  + xharbour/source/codepage/cpitdos.c
+  + xharbour/source/codepage/cpitisb.c
+  + xharbour/source/codepage/cpitiso.c
+  + xharbour/source/codepage/uc88591b.c
+    * added IT codepages
+
+  * xharbour/contrib/libmisc/dates2.c
+  * xharbour/contrib/rdd_ads/adsfunc.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_calendar.c
+  * xharbour/source/clipsamp/date.c
+  * xharbour/source/tip/base64x.c
+  * xharbour/source/tip/utils.c
+    * changed DAY/MONTH/YEAR in date functions from LONG to INT
+
+  * xharbour/contrib/rdd_ads/ads1.c
+    * changed DAY/MONTH/YEAR in date functions from LONG to INT
+    + added adsRecInfo() - Brian please look at it - I cannot test
+      this code
+
+  * xharbour/include/hbapi.h
+  * xharbour/include/hbapiitm.h
+    - removed HB_IT_LONGLONG item
+    + added HB_IT_NUMINT/HB_IS_NUMINT(p) macros as in Harbour
+      (the HB_IT_NUMERINT/HB_IS_NUMBER_INT(p) left for compatibility)
+    + added(changed) hb_parnint()/hb_retnint()/hb_retnintlen()/hb_stornint()/
+      hb_itemPutNInt()/hb_itemPutNIntLen()/hb_itemGetNInt()/hb_arrayGetNInt()
+      functions which operates on HB_LONG - maximum supported integer but
+      internally chose the optimal HB_ITEM type for storing the value if
+      possible
+    * changed DAY/MONTH/YEAR in date functions from LONG to INT
+    + added [ double hb_numInt(double) ] function which makes similar
+      hack to hb_numRound() 'fixating' the results
+    * hb_strValInt() now returns HB_LONG
+    ! reverted hb_strVal( szText, ... ) to
+      hb_strVal( const char * szText, ULONG ulLen );
+      This modification caused incompatibilities with 3-rd party libs and
+      even with some core xHarbour code
+    + added new functions for string to number conversions - each of
+      them use the same internal function to keep the same FL results
+      in different conversions as hb_numRound()/hb_numInt() and return
+      the BOOL value which informs about type of results (TRUE-double,
+      FALSE-HB_LONG) stored in one of argument passed by reference -
+      it's necessary for eliminating INT64<->double conversions which
+      can INT64 number.
+
+  * xharbour/include/hbapicdp.h
+    + added #define hb_cdp_page s_cdpage
+    + added IT codepages
+
+  * xharbour/include/hbapifs.h
+    * changed the size member of HB_FFIND from LONGLONG to HB_FOFFSET
+
+  * xharbour/include/hbcomp.h
+    * changed the argument in hb_compGenPushLong() to HB_LONG
+
+  * xharbour/include/hbdate.h
+    * changed DAY/MONTH/YEAR in date functions from LONG to INT
+
+  * xharbour/include/hbdbf.h
+    - removed pack() for OS/2 and __EMX__ - it should be no more pack
+      dependent structure in RDD - if I'm wrong then I should fix the
+      code instead of adding the pack commands
+
+  * xharbour/include/hbdefs.h
+    + added definitions and macros for 64bit platforms.
+    + added macros for integer range checking
+    + added macros for length setting in numeric ITEMs
+    + added macros for limiting the range of integer numbers in PCODE
+      for strict CLIPPER compatibility
+    + added support for HB_STRICT_ALIGNMENT and HB_ALLOC_ALIGNMENT
+      macros - some platforms like based on SPARC processors need it
+    + added HB_PUT_PTR()/HB_GET_PTR() macros for platforms which needs
+      strict alignment - they should be used instead of C casting in
+      places like PCODE when we do not now the exact address alignment
+
+  * xharbour/include/hbexprb.c
+    * casting
+
+  * xharbour/include/hbexprop.h
+    * changed LONG to HB_LONG in asNum structure and hb_compExprNewLong()
+      functions for 64bit support
+
+  * xharbour/include/hbmacro.h
+    * changed LONG to HB_LONG in hb_compGenPushLong()
+
+  * xharbour/include/hbpcode.h
+    + added new PCODE HB_P_PUSHLONGLONG
+
+  * xharbour/include/hbapirdd.h
+    * some modification still not enabled for future use
+
+  * xharbour/include/hbrddfpt.h
+    - removed some commented out definitions
+
+  * xharbour/include/hbrddntx.h
+    ! added NTX_MAX_TAGNAME to avoid buffer overflow and GPFs when
+      long file names are used
+    * changed variable length structure definitions to fixed one
+      Now DBFNTX works on 64bit machines but it's still not endian free
+      so the index files created on BE platforms are not binary compatible 
+
+  * xharbour/include/hbsetup.h
+    * define HB_OS_BSD when HB_OS_DARWIN is set
+    * define HB_OS_UNIX when HB_OS_SUNOS is set
+
+  * xharbour/include/hbvm.h
+    + hb_vmPushLongLong() now operates on HB_LONG
+    - removed hb_vmPushNumInt()
+
+  * xharbour/include/hbvmpub.h
+    * HB_IT_LONG now use internaly HB_LONG C type
+    - removed HB_IT_LONGLONG structures
+
+  * xharbour/source/common/expropt1.c
+  * xharbour/source/common/expropt2.c
+    + added support for 64bit integers
+    * modifications to operate on HB_LONG instead of LONG
+    ! fixed the bad ITEM size in some optimizations
+    * modifications to reduce when possible HB_LONG<->double conversions
+
+  * xharbour/source/common/hbfsapi.c
+
+  * xharbour/source/common/hbstr.c
+    + added support for 64bit integers
+    + added new functions for string to number conversions - each of
+      them use the same internal function to keep the same FL results
+      in different conversions as hb_numRound()/hb_numInt() and return
+      the BOOL value which informs about type of results (TRUE-double,
+      FALSE-HB_LONG) stored in one of argument passed by reference -
+      it's necessary for eliminating INT64<->double conversions which
+      can INT64 number.
+    + added [ double hb_numInt(double) ] function which makes similar
+      hack to hb_numRound() 'fixating' the results
+    * grouped functions which converts string to number with the ones
+      which make rounding to keep the same algorithm and be sure that
+      they are compiled together with the same compiler switches
+      
+  * xharbour/source/common/hbver.c
+    + added machine type to string returned by hb_verPlatform() in
+      *nixes
+
+  * xharbour/source/compiler/cmdcheck.c
+    * casting
+
+  * xharbour/source/compiler/harbour.c
+  * xharbour/source/compiler/hbfix.c
+  * xharbour/source/compiler/hbpcode.c
+  * xharbour/source/compiler/genc.c
+    + added support for 64bit integers
+    * replaced all manual offset calculations with proper macros
+    ! fixes for 64 bit platform where LONG is 64bit integer
+    + added HB_GENC_FUNC( hb_p_pushlonglong )
+    ! fixed bug in jump optimization (calculation of jump size) - fix
+      borrowed from Harbour and was originally done by Ryszard - thanks
+    * fixed yet another bug in jump optimization (updating new jump address)
+    ! fixed memory leak in jump optimization with updating of 
+
+  * xharbour/source/compiler/harbour.slx
+  * xharbour/source/compiler/harbour.sly
+  * xharbour/source/macro/macro.slx
+  * xharbour/source/macro/macro.y
+    + added support for 64bit integers
+    - removed hb_comp_SLX_Hex2L()
+    + added hb_comp_SLX_Str2Num() which is common for all type of numbers
+    * modifications to operate on HB_LONG instead of LONG
+
+  * xharbour/source/ct/Makefile
+  * xharbour/source/ct/keyset.c
+    * formating
+
+  * xharbour/source/ct/files.c
+    * modified for SunOS
+
+  * xharbour/source/odbc/odbc.c
+    ! fixed a bad use of ITEM references
+
+  * xharbour/source/pp/ppcore.c
+    * casting
+    + added .prg definition: __PLATFORM__UNIX - which is common for
+      all *nixes to avoid redunt definitions for __PLATFORM__Linux,
+      __PLATFORM__BSD, __PLATFORM__Darwin, __PLATFORM__SunOS, ...
+    * added new .prg definitions: __ARCH{16|32|64}BIT__,
+      __{LITTLE|BIG|PDP}_ENDIAN__ - they are set to sizeof( void * )
+
+  * xharbour/source/pp/pragma.c
+    * some small simplifications
+
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/workarea.c
+    - removed HB_IT_LONGLONG
+    * modifications for new integer macros
+    + added support for {*, "I", 1, 0} and {*, "I", 3, 0} field types
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    - removed HB_IT_LONGLONG
+    ! fixed problem with scopes in decending orders
+
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+    ! fixed some endian dependent code
+
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    - removed HB_IT_LONGLONG
+    * modifications for new integer macros
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! added NTX_MAX_TAGNAME to avoid buffer overflow and GPFs when
+      long file names are used
+    * changed variable length structure definitions to fixed one
+      Now DBFNTX works on 64bit machines but it's still not endian free
+      so the index files created on BE platforms are not binary compatible 
+    ! fixed a scope problem reported quite long time ago
+    ! fixed a seek problem (as above) borrowed from Harbour - thx
+      to Alexander
+    * use hb_fsCreateTemp() for temporary files when index is created
+
+  * xharbour/source/rtl/abs.c
+    ! cleaned the bugs with negating integers - on most machines (like x86)
+      the integers are not 0 symmetric - it means that x = -x does not work
+      for {INT,LONG,LONGLONG}_MIN (hb_vmNegate, ABS())
+
+  * xharbour/source/rtl/at.c
+  * xharbour/source/rtl/hbxml.c
+  * xharbour/source/rtl/transfrm.c
+    * casting
+
+  * xharbour/source/rtl/binnum.c
+    * use new macros for number conversion
+
+  * xharbour/source/rtl/cstruct.prg
+    + added a hack for pointers hacked to numbers which may be necessary
+      when VM chose the optimal ITEM type
+
+  * xharbour/source/rtl/datec.c
+  * xharbour/source/rtl/dates.c
+  * xharbour/source/rtl/dateshb.c
+    * changed DAY/MONTH/YEAR in date functions from LONG to INT
+
+
+  * xharbour/source/rtl/diskspac.c
+  * xharbour/source/rtl/disksphb.c
+  * xharbour/source/rtl/fstemp.c
+    * modified for SunOS
+
+  * xharbour/source/rtl/empty.c
+    - removed HB_IT_LONGLONG
+
+  * xharbour/source/rtl/direct.c
+  * xharbour/source/rtl/filestat.c
+  * xharbour/source/rtl/filesys.c
+  * xharbour/source/rtl/hbffind.c
+    * modified for HB_FOFFSET used as file size
+
+  * xharbour/source/rtl/gtgraph.c
+  * xharbour/source/rtl/hbhex2n.c
+  * xharbour/source/rtl/hbrandom.c
+  * xharbour/source/rtl/hbsrlraw.c
+    - removed HB_IT_LONGLONG
+    * simplified the code and use HB_LONG
+
+  * xharbour/source/rtl/math.c
+    * clean the code and mak it a little bit faster when HB_MATH_ERRNO is
+      used
+
+  * xharbour/source/rtl/minmax.c
+    * modified to reduce HB_LONG<->double conversion
+
+  * xharbour/source/rtl/pad.c
+  * xharbour/source/rtl/padc.c
+  * xharbour/source/rtl/padl.c
+  * xharbour/source/rtl/padr.c
+  * xharbour/source/rtl/run.c
+  * xharbour/source/rtl/strmatch.c
+    * replaced hb_parcx() by hb_parc()
+
+  * xharbour/source/rtl/round.c
+  * xharbour/source/rtl/val.c
+    * moved the math logic to common/hb_str.c
+    ! fixed all known problems with VAL
+
+  * xharbour/source/rtl/win32ole.prg
+    - removed HB_IT_LONGLONG
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+  * xharbour/source/rtl/gtcrs/hb-charmap.def
+    * modifications for SunOS
+    * formating
+
+  * xharbour/source/rtl/gtsln/Makefile
+    * formating
+
+  * xharbour/source/rtl/gtxvt/gtxvt.c
+    ! fixed bad params in one of HB_TRACE() messages
+
+  * xharbour/source/vm/Makefile
+    * formating
+    * build mainstd lib only for MINGW
+
+  * xharbour/source/vm/arrays.c
+    + added hb_arrayGetNInt()
+    * modified for other changes
+
+  * xharbour/source/vm/arrayshb.c
+    * modified ArrayToStructure to respect that pointer maybe also
+      in HB_IT_INTEGER on some platforms - I do not use this feature
+      please fix me if I made sth wrong
+
+  * xharbour/source/vm/classes.c
+    ! fixed bug in __CLSGETHANDLEFROMNAME
+
+  * xharbour/source/vm/dynsym.c
+    ! fixed pDynSym initialization in hb_dynsymNew()
+
+  * xharbour/source/vm/estack.c
+    * modified to respect that HB_IT_LONG may be long long C type
+
+  * xharbour/source/vm/extend.c
+  * xharbour/source/vm/itemapi.c
+    - removed HB_IT_LONGLONG
+    + added casting for GCC in double to long conversion - it's necessary
+      when the double value is not in long what can be caused by storing
+      ULONG value inside double
+    * changed DAY/MONTH/YEAR in date functions from LONG to INT
+    + added(changed) hb_parnint()/hb_retnint()hb_retnintlen()/hb_stornint()
+      hb_itemGetNInt()/hb_itemPutNInt() - they operates on HB_LONG but
+      internally chose to optimum integer ITEM
+    
+  * xharbour/source/vm/fm.c
+    + added support for HB_STRICT_ALIGNMENT and HB_ALLOC_ALIGNMENT
+      macros - some platforms like based on SPARC processors need it
+    * use HB_PUT_LONG()/HB_GET_LONG() macros instead of direct casting
+      to avoid GPF on platforms where strict alignment is necessary
+
+  * xharbour/source/vm/hash.c
+    * modified to work with HB_LONG
+
+  * xharbour/source/vm/hbi18n.c
+    ! fixed bug with hb_fs*() operation on bad handle
+      Gian you often use 'int' as handle type in hb_fs*() functions.
+      It could cause troubles in some systems where handle is bitfiled,
+      can be bigger then 'int' and can returnes negative values which
+      are still proper handles - try to always use FHANDLE type and
+      to detect error compare ( hFile == FS_ERROR ) instead of
+      ( hFile < 0 )
+
+  * xharbour/source/vm/hvm.c
+    - removed HB_IT_LONGLONG
+    + added support for 64bit integers
+    * modified to work with HB_LONG
+    ! fixed badly set (or not set at all) numeric ITEMs length in
+      some places
+    ! cleaned the bugs with negating integers - on most machines (like x86)
+      the integers are not 0 symmetric - it means that x = -x does not work
+      for {INT,LONG,LONGLONG}_MIN (hb_vmNegate, ABS())
+    * use HB_PUT_PTR()/HB_GET_PTR(), HB_PUT_LONG()/HB_GET_LONG() macros
+       instead of direct casting to avoid GPF on platforms where strict
+       alignment is necessary
+    ! modified to eliminate unnecessary HB_LONG<->double conversions to
+      reduce the possibility of destroying 64bit values
+    ! fixed possible GPF in hb_vmSelectWorkarea()
+    ! fixed some RT errors to be Clipper compatible
+    % some optimizations
+
+  * xharbour/source/vm/macro.c
+    + added support for 64bit integers
+
+  * xharbour/source/vm/maindllp.c
+    * changed DAY/MONTH/YEAR in date functions from LONG to INT
+
+  * xharbour/tests/rddspeed.prg
+    * removed additional CR at EOLs
+
+  * xharbour/tests/skipeval.prg
+    * small modification to make the results similar
+
+  * xharbour/tests/bldtest/bldtest.c
+    * modified to respect recent changes
+
+  * xharbour/utils/hbtest/hbtest.prg
+  * xharbour/utils/hbtest/rt_ccall.prg
+  * xharbour/utils/hbtest/rt_misc.prg
+  * xharbour/utils/hbtest/rt_str.prg
+    * replaced __PLATFORM__Linux with __PLATFORM__UNIX
+    * some set proper string length to force RT error for __ARCH64BIT__
+    - removed HB_IT_LONGLONG and modified to work with HB_LONG
+
+  * xharbour/utils/xbscript/xbs_harb.ch
+  * xharbour/utils/xbscript/xbscript.prg
+    * replaced __PLATFORM__Linux with __PLATFORM__UNIX
+    * casting
+
+    After such long time there is no way I'll describe all things.
+    I only collect what I remember - for deeper information please
+    ask me and/or look at the sources. Also in last month I was adding
+    some of this modification in small peaces when I was working and
+    committing to the CVS. I hope I haven't broken any vital functions
+    but in fact for a quite long time this modifications was synced
+    with other changes in CVS - at the beginning after each CVS update
+    I was analyzing the modifications and made manual synchronization
+    but later I simply left them as is and only fixed the conflicts so
+    I'm not sure the final effect as I should.
+    HBTEST shows much more errors now but this are not errors I
+    introduced - just simply some fixes exploits bad hacks in HBTEST
+    which were hiding some xHarbour bugs or Clipper incompatibilities.
+    In a few days I plan to begin the work on RDD modifications I was
+    talking about. I will be thankful if you can report any problems
+    with this version to this time.
 
 2004-11-21 23:30 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * makallbc.bat

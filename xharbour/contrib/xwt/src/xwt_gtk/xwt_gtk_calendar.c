@@ -3,7 +3,7 @@
 
    (C) 2004 Luiz Rafael Culik
 
-   $Id: xwt_gtk_calendar.c,v 1.2 2004/01/26 13:52:21 lculik Exp $
+   $Id: xwt_gtk_calendar.c,v 1.3 2004/01/26 20:30:31 lculik Exp $
 
    GTK interface - File Selection Box 
 */
@@ -157,13 +157,13 @@ void calendar_next_year (GtkWidget    *widget,
 BOOL xwt_gtk_createCalendar( PXWT_WIDGET xwtData )
 {
    GtkWidget *filew;
-   long lyear,lmonth,lday;
-   hb_dateToday(&lyear,&lmonth,&lday );
+   int iyear, imonth, iday;
+   hb_dateToday(&iyear,&imonth,&iday );
        
 
    filew = gtk_calendar_new ();
-  gtk_calendar_select_month ( GTK_CALENDAR(filew), lmonth, lyear);
-  gtk_calendar_mark_day ( GTK_CALENDAR(filew),lday);	
+  gtk_calendar_select_month ( GTK_CALENDAR(filew), imonth, iyear);
+  gtk_calendar_mark_day ( GTK_CALENDAR(filew),iday);	
   gtk_calendar_display_options(GTK_CALENDAR(filew),GTK_CALENDAR_SHOW_DAY_NAMES | GTK_CALENDAR_SHOW_HEADING);
    // we need both the owner of the widget, and the widget itself;
    // so it is useful to pass the xwt_gtk data.
@@ -206,7 +206,7 @@ BOOL xwt_gtk_createCalendarModal( PXWT_WIDGET xwtData )
 
    GtkWidget *filew;
    PXWT_GTK_MODAL xwtCalendarW;
-   long lyear,lmonth,lday;
+   int iyear, imonth, iday;
 
    xwtCalendarW = (PXWT_GTK_MODAL) hb_xgrab( sizeof( XWT_GTK_MODAL ) );
 
@@ -220,12 +220,12 @@ BOOL xwt_gtk_createCalendarModal( PXWT_WIDGET xwtData )
    xwtCalendarW->modal = FALSE;
    xwtCalendarW->canceled = FALSE;
 
-  hb_dateToday(&lyear,&lmonth,&lday );
+  hb_dateToday(&iyear,&imonth,&iday );
 
 //  xwtCalendarW->calendar = calendar;
 //  calendar_set_flags (&xwtCalendarW);
-  gtk_calendar_select_month ( GTK_CALENDAR( GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->calendar), lmonth, lyear);
-  gtk_calendar_mark_day ( GTK_CALENDAR( GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->calendar),lday);	
+  gtk_calendar_select_month ( GTK_CALENDAR( GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->calendar), imonth, iyear);
+  gtk_calendar_mark_day ( GTK_CALENDAR( GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->calendar),iday);	
   gtk_calendar_display_options(GTK_CALENDAR( GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->calendar),GTK_CALENDAR_SHOW_DAY_NAMES | GTK_CALENDAR_SHOW_HEADING  );
 
   g_signal_connect ( G_OBJECT (GTK_XWTCALENDAR_SELECTION_DIALOG(filew)->button1),

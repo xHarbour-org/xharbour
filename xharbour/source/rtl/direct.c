@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.53 2004/08/04 14:48:10 druzus Exp $
+ * $Id: direct.c,v 1.54 2004/08/17 09:58:18 druzus Exp $
  */
 
 /*
@@ -139,12 +139,7 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
                hb_itemPutC( hb_arrayGetItemPtr( &Subarray, F_NAME), ffind->szName );
             }
 
-         #ifndef HB_LONG_LONG_OFF
-            hb_itemPutNLL( hb_arrayGetItemPtr( &Subarray, F_SIZE ), ffind->size );
-         #else
-            hb_itemPutNL( hb_arrayGetItemPtr( &Subarray, F_SIZE ), ffind->size );
-         #endif
-
+            hb_itemPutNInt( hb_arrayGetItemPtr( &Subarray, F_SIZE ), ffind->size );
             hb_itemPutDL( hb_arrayGetItemPtr( &Subarray, F_DATE ), ffind->lDate );
             hb_itemPutC( hb_arrayGetItemPtr( &Subarray, F_TIME ), ffind->szTime );
             hb_itemPutC( hb_arrayGetItemPtr( &Subarray, F_ATTR ), hb_fsAttrDecode( ffind->attr, buffer ) );

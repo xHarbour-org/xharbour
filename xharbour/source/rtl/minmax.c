@@ -1,5 +1,5 @@
 /*
- * $Id: minmax.c,v 1.5 2004/02/23 10:01:42 andijahja Exp $
+ * $Id: minmax.c,v 1.6 2004/06/15 02:32:17 kaddath Exp $
  */
 
 /*
@@ -67,9 +67,16 @@ HB_FUNC( MAX )
 
       hb_retds( p1->item.asDate.value >= p2->item.asDate.value ? hb_pardsbuff( szDate, 1 ) : hb_pardsbuff( szDate, 2 ) );
    }
-   else if( ( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) ) && ( ( ! ( HB_IS_DATE( p1 ) ) || ( ! HB_IS_DATE( p2 ) ) ) ) )
+   else if ( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1093, NULL, "MAX", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
+   else if( HB_IS_NUMINT( p1 ) && HB_IS_NUMINT( p2 ) )
+   {
+      HB_LONG l1 = hb_itemGetNInt( p1 );
+      HB_LONG l2 = hb_itemGetNInt( p2 );
+
+      hb_retnint( l1 >= l2 ? l1 : l2 );
    }
    else if( HB_IS_NUMERIC( p1 ) && HB_IS_NUMERIC( p2 ) )
    {
@@ -94,10 +101,10 @@ HB_FUNC( MAX )
       }
       else if( HB_IS_LONG( p1 ) || HB_IS_LONG( p2 ) )
       {
-         LONG l1 = hb_itemGetNL( p1 );
-         LONG l2 = hb_itemGetNL( p2 );
+         HB_LONG l1 = hb_itemGetNInt( p1 );
+         HB_LONG l2 = hb_itemGetNInt( p2 );
 
-         hb_retnl( l1 >= l2 ? l1 : l2 );
+         hb_retnint( l1 >= l2 ? l1 : l2 );
       }
       else
       {
@@ -133,9 +140,16 @@ HB_FUNC( MIN )
 
       hb_retds( p1->item.asDate.value <= p2->item.asDate.value ? hb_pardsbuff( szDate, 1 ) : hb_pardsbuff( szDate, 2 ) );
    }
-   else if( ( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) ) && ( ( ! ( HB_IS_DATE( p1 ) ) || ( ! HB_IS_DATE( p2 ) ) ) ) )
+   else if ( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1092, NULL, "MIN", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
+   else if( HB_IS_NUMINT( p1 ) && HB_IS_NUMINT( p2 ) )
+   {
+      HB_LONG l1 = hb_itemGetNInt( p1 );
+      HB_LONG l2 = hb_itemGetNInt( p2 );
+
+      hb_retnint( l1 <= l2 ? l1 : l2 );
    }
    else if( HB_IS_NUMERIC( p1 ) && HB_IS_NUMERIC( p2 ) )
    {
@@ -160,10 +174,10 @@ HB_FUNC( MIN )
       }
       else if( HB_IS_LONG( p1 ) || HB_IS_LONG( p2 ) )
       {
-         LONG l1 = hb_itemGetNL( p1 );
-         LONG l2 = hb_itemGetNL( p2 );
+         HB_LONG l1 = hb_itemGetNInt( p1 );
+         HB_LONG l2 = hb_itemGetNInt( p2 );
 
-         hb_retnl( l1 <= l2 ? l1 : l2 );
+         hb_retnint( l1 <= l2 ? l1 : l2 );
       }
       else
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.12 2004/06/04 00:18:09 druzus Exp $
+ * $Id: hbapicdp.h,v 1.13 2004/10/01 01:56:57 druzus Exp $
  */
 
 /*
@@ -119,34 +119,38 @@ extern USHORT HB_EXPORT hb_cdpGetU16( PHB_CODEPAGE, BYTE );
 extern BOOL HB_EXPORT hb_cdpGetFromUTF8( PHB_CODEPAGE cdp, BYTE ch, int * n, USHORT * uc );
 extern ULONG HB_EXPORT hb_cdpStrnToUTF( PHB_CODEPAGE, BYTE*, ULONG, BYTE* );
 extern ULONG HB_EXPORT hb_cdpStrnToU16( PHB_CODEPAGE, BYTE*, ULONG, BYTE* );
+extern PHB_CODEPAGE s_cdpage;
+#define hb_cdp_page s_cdpage
 
 extern PHB_CODEPAGE s_cdpage;
 
 #define hb_cdp_page s_cdpage
 
-#define CPID_437     "cp437"
-#define CPID_850     "cp850"
-#define CPID_852     "cp852"
-#define CPID_866     "cp866"
-#define CPID_1250    "cp1250"
-#define CPID_1251    "cp1251"
-#define CPID_1257    "cp1257"
-#define CPID_8859_1  "iso8859-1"
-#define CPID_8859_2  "iso8859-2"
-#define CPID_KOI_8   "koi-8"
-#define CPID_MAZ     "plmaz"
-#define UNITB_437    &hb_uniTbl_437
-#define UNITB_850    &hb_uniTbl_850
-#define UNITB_852    &hb_uniTbl_852
-#define UNITB_866    &hb_uniTbl_866
-#define UNITB_1250   &hb_uniTbl_1250
-#define UNITB_1251   &hb_uniTbl_1251
-#define UNITB_1257   &hb_uniTbl_1257
-#define UNITB_8859_1 &hb_uniTbl_8859_1
-#define UNITB_8859_2 &hb_uniTbl_8859_2
-#define UNITB_KOI_8  &hb_uniTbl_KOI_8
-#define UNITB_MAZ    &hb_uniTbl_mazovia
-#define UNITB_UNDEF  NULL /* ((PHB_UNITABLE) (-1)) */
+#define CPID_437        "cp437"
+#define CPID_850        "cp850"
+#define CPID_852        "cp852"
+#define CPID_866        "cp866"
+#define CPID_1250       "cp1250"
+#define CPID_1251       "cp1251"
+#define CPID_1257       "cp1257"
+#define CPID_8859_1     "iso8859-1"
+#define CPID_8859_1B    "iso8859-1b"
+#define CPID_8859_2     "iso8859-2"
+#define CPID_KOI_8      "koi-8"
+#define CPID_MAZ        "plmaz"
+#define UNITB_437       &hb_uniTbl_437
+#define UNITB_850       &hb_uniTbl_850
+#define UNITB_852       &hb_uniTbl_852
+#define UNITB_866       &hb_uniTbl_866
+#define UNITB_1250      &hb_uniTbl_1250
+#define UNITB_1251      &hb_uniTbl_1251
+#define UNITB_1257      &hb_uniTbl_1257
+#define UNITB_8859_1    &hb_uniTbl_8859_1
+#define UNITB_8859_1B   &hb_uniTbl_8859_1b
+#define UNITB_8859_2    &hb_uniTbl_8859_2
+#define UNITB_KOI_8     &hb_uniTbl_KOI_8
+#define UNITB_MAZ       &hb_uniTbl_mazovia
+#define UNITB_UNDEF     NULL /* ((PHB_UNITABLE) (-1)) */
 
 extern HB_UNITABLE hb_uniTbl_437;
 extern HB_UNITABLE hb_uniTbl_850;
@@ -156,6 +160,7 @@ extern HB_UNITABLE hb_uniTbl_1250;
 extern HB_UNITABLE hb_uniTbl_1251;
 extern HB_UNITABLE hb_uniTbl_1257;
 extern HB_UNITABLE hb_uniTbl_8859_1;
+extern HB_UNITABLE hb_uniTbl_8859_1b;
 extern HB_UNITABLE hb_uniTbl_8859_2;
 extern HB_UNITABLE hb_uniTbl_KOI_8;
 extern HB_UNITABLE hb_uniTbl_mazovia;

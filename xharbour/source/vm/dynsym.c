@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.17 2004/04/26 19:32:10 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.18 2004/04/28 18:31:16 druzus Exp $
  */
 
 /*
@@ -184,20 +184,24 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
    pDynSym->ulCalls        = 0; /* profiler support */
    pDynSym->ulTime         = 0; /* profiler support */
    pDynSym->ulRecurse      = 0;
-   pDynSym->pModuleSymbols = NULL;
 
    if( pSymbol->cScope & HB_FS_PUBLIC ) /* only for HB_FS_PUBLIC */
    {
-      if( pDynSym->pFunPtr != pSymbol->value.pFunPtr ) /* it contains a function pointer */
-      {
-         pDynSym->pFunPtr = pSymbol->value.pFunPtr;    /* place the function at DynSym */
-      }
+      pDynSym->pFunPtr = pSymbol->value.pFunPtr;    /* place the function pointer at DynSym */
+   }
+   else
+   {
+      pDynSym->pFunPtr = NULL;
    }
 
    if( pSymbol->pDynSym == (PHB_DYNS) 1 )
    {
       pDynSym->pModuleSymbols = pModuleSymbols;
       //printf( "Symbol: '%s' Module: '%s'\n", pSymbol->szName, pModuleSymbols->szModuleName );
+   }
+   else
+   {
+      pDynSym->pModuleSymbols = NULL;
    }
 
    pSymbol->pDynSym = pDynSym;                /* place a pointer to DynSym */

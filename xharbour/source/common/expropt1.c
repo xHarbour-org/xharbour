@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.13 2004/05/24 07:34:01 ronpinkas Exp $
+ * $Id: expropt1.c,v 1.14 2004/10/27 05:27:37 ronpinkas Exp $
  */
 
 /*
@@ -209,11 +209,11 @@ HB_EXPR_PTR hb_compExprNewDouble( double dValue, BYTE ucWidth, BYTE ucDec )
    return pExpr;
 }
 
-HB_EXPR_PTR hb_compExprNewLong( LONG lValue )
+HB_EXPR_PTR hb_compExprNewLong( HB_LONG lValue )
 {
    HB_EXPR_PTR pExpr;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewLong(%li)", lValue));
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewLong(%" PFHL "i)", lValue));
 
    pExpr = hb_compExprNew( HB_ET_NUMERIC );
 
@@ -970,9 +970,15 @@ HB_EXPR_PTR hb_compExprNewNegate( HB_EXPR_PTR pNegExpr )
    if( pNegExpr->ExprType == HB_ET_NUMERIC )
    {
       if( pNegExpr->value.asNum.NumType == HB_ET_DOUBLE )
+      {
          pNegExpr->value.asNum.dVal = - pNegExpr->value.asNum.dVal;
+         pNegExpr->value.asNum.bWidth = HB_DBL_LENGTH( pNegExpr->value.asNum.dVal );
+      }
       else
+      {
          pNegExpr->value.asNum.lVal = - pNegExpr->value.asNum.lVal;
+         pNegExpr->value.asNum.bWidth = HB_LONG_LENGTH( pNegExpr->value.asNum.lVal );
+      }
       pExpr = pNegExpr;
    }
    else

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.84 2004/10/27 05:27:36 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.85 2004/10/29 01:28:59 ronpinkas Exp $
  */
 
 /*
@@ -1072,7 +1072,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
 
                   if( pIdx->value.asNum.NumType == HB_ET_LONG )
                   {
-                     lIndex = pIdx->value.asNum.lVal;
+                     lIndex = ( LONG ) pIdx->value.asNum.lVal;
                   }
                   else
                   {
@@ -1121,7 +1121,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
 
                   if( pIdx->value.asNum.NumType == HB_ET_LONG )
                   {
-                     lIndex = pIdx->value.asNum.lVal;
+                     lIndex = ( LONG ) pIdx->value.asNum.lVal;
                   }
                   else
                   {
@@ -5041,4 +5041,3 @@ static HB_EXPR_FUNC( hb_compExprUsePreDec )
    }
    return pSelf;
 }
-

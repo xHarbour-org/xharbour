@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.8 2004/09/18 20:16:43 ronpinkas Exp $
+ * $Id: hbstr.c,v 1.10 2004/09/21 04:09:20 druzus Exp $
  */
 
 /*
@@ -65,6 +65,7 @@
 #include <ctype.h> /* Needed by hb_strupr() */
 
 #include "hbapi.h"
+#include "hbmath.h"
 
 ULONG HB_EXPORT hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
 {
@@ -229,6 +230,383 @@ char HB_EXPORT * hb_xstrcpy ( char *szDest, const char *szSrc, ...)
    }
    va_end (va);
    return (szDest);
+}
+
+static double hb_numPow10( int nPrecision )
+{
+   static double s_dPow10[16] = {                1.0,   /*  0 */
+                                                10.0,   /*  1 */
+                                               100.0,   /*  2 */
+                                              1000.0,   /*  3 */
+                                             10000.0,   /*  4 */
+                                            100000.0,   /*  5 */
+                                           1000000.0,   /*  6 */
+                                          10000000.0,   /*  7 */
+                                         100000000.0,   /*  8 */
+                                        1000000000.0,   /*  9 */
+                                       10000000000.0,   /* 10 */
+                                      100000000000.0,   /* 11 */
+                                     1000000000000.0,   /* 12 */
+                                    10000000000000.0,   /* 13 */
+                                   100000000000000.0,   /* 14 */
+                                  1000000000000000.0 }; /* 15 */
+   if ( nPrecision < 16 )
+   {
+      if ( nPrecision >= 0 )
+      {
+         return s_dPow10[ nPrecision ];
+      }
+      else if ( nPrecision > -16 )
+      {
+         return 1.0 / s_dPow10[ -nPrecision ];
+      }
+   }
+
+   return pow(10.0, (double) nPrecision);
+}
+
+double HB_EXPORT hb_numRound( double dNum, int iDec )
+{
+   static const double doBase = 10.0f;
+   double doComplete5, doComplete5i, dPow;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_numRound(%lf, %d)", dNum, iDec));
+
+   if( dNum == 0.0 )
+      return 0.0;
+
+   if ( iDec < 0 )
+   {
+      dPow = hb_numPow10( -iDec );
+      doComplete5 = dNum / dPow * doBase;
+   }
+   else
+   {
+      dPow = hb_numPow10( iDec );
+      doComplete5 = dNum * dPow * doBase;
+   }
+
+/*
+ * double precision if 15 digit the 16th one is usually wrong but
+ * can give some information about number,
+ * Clipper display 16 digit only others are set to 0
+ * many people don't know/understand FL arithmetic. They expect
+ * that it will behaves in the same way as real numbers. It's not
+ * true but in business application we can try to hide this problem
+ * for them. Usually they not need such big precision in presented
+ * numbers so we can decrease the precision to 15 digits and use
+ * the cut part for proper rounding. It should resolve
+ * most of problems. But if someone totally  not understand FL
+ * and will try to convert big matrix or sth like that it's quite
+ * possible that he chose one of the natural school algorithm which
+ * works nice with real numbers but can give very bad results in FL.
+ * In such case it could be good to decrease precision even more.
+ * It not fixes the used algorithm of course but will make many users
+ * happy because they can see nice (proper) result.
+ * So maybe it will be good to add SET PRECISION TO <n> for them and
+ * use the similar hack in ==, >=, <=, <, > operations if it's set.
+ */
+
+//#define HB_NUM_PRECISION  16
+
+#ifdef HB_NUM_PRECISION
+   /*
+    * this is a hack for people who cannot live without hacked FL values
+    * in rounding
+    */
+   {
+      int iDecR, iPrec;
+      BOOL fNeg;
+
+      if ( dNum < 0 )
+      {
+         fNeg = TRUE;
+         dNum = -dNum;
+      }
+      else
+      {
+         fNeg = FALSE;
+      }
+      iDecR = (int) log10( dNum );
+      iPrec = iDecR + iDec;
+
+      if ( iPrec < -1 )
+      {
+         return 0.0;
+      }
+      else
+      {
+         if ( iPrec > HB_NUM_PRECISION )
+         {
+            iDec = HB_NUM_PRECISION - ( dNum < 1.0 ? 0 : 1 ) - iDecR;
+            iPrec = -1;
+         }
+         else
+         {
+            iPrec -= HB_NUM_PRECISION;
+         }
+      }
+      if ( iDec < 0 )
+      {
+         dPow = hb_numPow10( -iDec );
+         doComplete5 = dNum / dPow * doBase + 5.0 + hb_numPow10( iPrec );
+      }
+      else
+      {
+         dPow = hb_numPow10( iDec );
+         doComplete5 = dNum * dPow * doBase + 5.0 + hb_numPow10( iPrec );
+      }
+
+      if ( fNeg )
+      {
+         doComplete5 = -doComplete5;
+      }
+   }
+#else
+   if( dNum < 0.0f )
+      doComplete5 -= 5.0f;
+   else
+      doComplete5 += 5.0f;
+#endif
+
+   doComplete5 /= doBase;
+
+#if defined( HB_DBLFL_PREC_FACTOR ) && !defined( HB_C52_STRICT )
+   /* similar operation is done by Cl5.3
+      it's a hack to force rounding FL values UP */
+   doComplete5 *= HB_DBLFL_PREC_FACTOR;
+#endif
+
+   modf( doComplete5, &doComplete5i );
+
+   if ( iDec < 0 )
+      return doComplete5i * dPow;
+   else
+      return doComplete5i / dPow;
+}
+
+double HB_EXPORT hb_numInt( double dNum )
+{
+   double dInt;
+
+#if defined( HB_DBLFL_PREC_FACTOR ) && !defined( HB_C52_STRICT )
+   /* Similar hack as in round to make this functions compatible */
+   dNum *= HB_DBLFL_PREC_FACTOR;
+#endif
+   modf( dNum, &dInt );
+
+   return dInt;
+}
+
+static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG * lVal, double * dVal, int * piDec, int * piWidth )
+{
+   BOOL fDbl = FALSE, fDec = FALSE, fNeg = FALSE, fHex = FALSE;
+   ULONG ulPos = 0;
+   int c, iWidth = 0, iDec = 0, iDecR = 0;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_str2number(%d, %p, %lu, %p, %p, %p, %p)", (int) fPCode, szNum, ulLen, lVal, dVal, piDec, piWidth ));
+
+   while ( ulPos < ulLen && isspace( (BYTE) szNum[ulPos] ) )
+      ulPos++;
+
+   if ( ulPos >= ulLen )
+   {
+      fNeg = FALSE;
+   }
+   else if ( szNum[ulPos] == '-' )
+   {
+      fNeg = TRUE;
+      ulPos++;
+   }
+   else
+   {
+      fNeg = FALSE;
+      if ( szNum[ulPos] == '+' )
+         ulPos++;
+   }
+
+   *lVal = 0;
+
+   /* Hex Number */
+   if( fPCode && ulPos + 1 < ulLen && szNum[ulPos] == '0' &&
+       ( szNum[ulPos+1] == 'X' || szNum[ulPos+1] == 'x' ) )
+   {
+      ulPos += 2;
+      iWidth = HB_DEFAULT_WIDTH;
+      fHex = TRUE;
+      for ( ; ulPos < ulLen; ulPos++ )
+      {
+         c = szNum[ulPos];
+         if ( c >= '0' && c <= '9' )
+            c -= '0';
+         else if ( c >= 'A' && c <= 'F' )
+            c -= 'A' - 10;
+         else if ( c >= 'a' && c <= 'f' )
+            c -= 'a' - 10;
+         else
+            break;
+         *lVal = ( *lVal << 4 ) + c;
+      }
+   }
+   else
+   {
+      HB_LONG lLimV;
+      int iLimC;
+
+      lLimV = HB_LONG_MAX / 10;
+      iLimC = HB_LONG_MAX % 10;
+
+      iWidth = ulPos;
+
+      for ( ; ulPos < ulLen; ulPos++ )
+      {
+         c = szNum[ulPos];
+         if ( c >= '0' && c <= '9' )
+         {
+            if ( fDbl )
+            {
+               *dVal = *dVal * 10.0 + ( c - '0' );
+            }
+            else if ( *lVal < lLimV || ( *lVal <= lLimV && ( c - '0' ) <= iLimC ) )
+            {
+               *lVal = *lVal * 10 + ( c - '0' );
+            }
+            else
+            {
+               *dVal = (double) *lVal * 10.0 + ( c - '0' );
+               fDbl = TRUE;
+            }
+            if ( fDec )
+               iDec++;
+            else
+               iWidth++;
+         }
+         else if ( c == '.' && !fDec )
+         {
+            fDec = TRUE;
+         }
+         else
+         {
+            while ( !fDec && ulPos < ulLen )
+            {
+               if ( szNum[ulPos++] == '.' )
+                  fDec = TRUE;
+               else
+                  iWidth++;
+            }
+            if ( fDec )
+               iDecR = ulLen - ulPos;
+            break;
+         }
+      }
+   }
+
+   if ( fNeg )
+   {
+      if ( fDbl )
+         *dVal = -*dVal;
+      else
+         *lVal = -*lVal;
+   }
+   if ( !fDbl && (
+#if defined( PCODE_LONG_LIM )
+        ( fPCode && !fHex && !PCODE_LONG_LIM( *lVal ) ) ||
+#endif
+        fDec ) )
+   {
+      *dVal = (double) *lVal;
+      fDbl = TRUE;
+   }
+   if ( fDbl && iDec )
+      *dVal /= hb_numPow10( iDec );
+
+   if ( piDec )
+      *piDec = iDec + iDecR;
+   if ( piWidth )
+   {
+      if ( fHex )
+         *piWidth = iWidth;
+      else
+      {
+         int iSize = fDbl ? HB_DBL_LENGTH( *dVal ) : HB_LONG_LENGTH( *lVal );
+
+         if ( fPCode )
+         {
+            if ( iWidth < 10 || fNeg )
+               *piWidth = iSize;
+            else
+               *piWidth = iWidth + ( iDec == 0 ? 1 : 0 );
+         }
+         else
+         {
+            if ( iSize > 10 || iWidth > 10 )
+               *piWidth = iSize;
+            else if ( iDec + iDecR == 0 )
+               *piWidth = ( int ) ulLen;
+            else if ( iWidth == 0 )
+               *piWidth = 1;
+            else if ( fNeg && iWidth == 1 && *dVal != 0 )
+               *piWidth = 2;
+            else
+               *piWidth = iWidth;
+         }
+      }
+   }
+
+   return fDbl;
+}
+
+BOOL HB_EXPORT hb_compStrToNum( const char* szNum, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_compStrToNum( %s, %p, %p, %p, %p)", szNum, plVal, pdVal, piDec, piWidth ));
+   return hb_str2number( TRUE, szNum, strlen( szNum ), plVal, pdVal, piDec, piWidth );
+}
+
+BOOL HB_EXPORT hb_valStrnToNum( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_valStrToNum( %s, %lu, %p, %p, %p, %p)", szNum, ulLen, plVal, pdVal, piDec, piWidth ));
+   return hb_str2number( FALSE, szNum, ulLen, plVal, pdVal, piDec, piWidth );
+}
+
+BOOL HB_EXPORT hb_strToNum( const char* szNum, HB_LONG * plVal, double * pdVal )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_strToNum(%s, %p, %p)", szNum, plVal, pdVal ));
+   return hb_str2number( FALSE, szNum, strlen( szNum ), plVal, pdVal, NULL, NULL );
+}
+
+BOOL HB_EXPORT hb_strnToNum( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_strToNum(%s, %lu, %p, %p)", szNum, ulLen, plVal, pdVal ));
+   return hb_str2number( FALSE, szNum, ulLen, plVal, pdVal, NULL, NULL );
+}
+
+/* returns the numeric value of a character string representation of a number */
+double HB_EXPORT hb_strVal( const char * szText, ULONG ulLen )
+{
+   HB_LONG lVal;
+   double dVal;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strVal(%s, %lu)", szText, ulLen));
+
+   if ( ! hb_str2number( FALSE, szText, ulLen, &lVal, &dVal, NULL, NULL ) )
+      dVal = ( double ) lVal;
+   return dVal;
+}
+
+HB_LONG HB_EXPORT hb_strValInt( const char * szText, int * iOverflow )
+{
+   HB_LONG lVal;
+   double dVal;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strValInt(%s)", szText));
+
+   if ( ! hb_str2number( FALSE, szText, strlen( szText ), &lVal, &dVal, NULL, NULL ) )
+   {
+      *iOverflow = 1;
+      return 0;
+   }
+   *iOverflow = 0;
+   return lVal;
 }
 
 /*

@@ -1,14 +1,14 @@
 /*
- * $Id: cdpesdos.c,v 1.3 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: cdpplmaz.c,v 1.4 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Spanish MS-DOS )
+ * National Collation Support Module ( PLMAZ )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
- * Spanish MS-DOS support by Antonio Linares <alinares@fivetechsoft.com>
+ * Polish collating sequence (PLMAZ) Mazovia done by Jacek Kubica <kubica@wssk.wroc.pl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,15 +51,15 @@
  *
  */
 
-/* Language name: Spanish */
-/* ISO language code (2 chars): ES */
-/* Codepage: 850 */
+/* Language name: Polish */
+/* ISO language code (2 chars): PL */
+/* Codepage: Mazovia */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  33    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  35    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
@@ -84,16 +84,16 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "ES",
-    CPID_850, UNITB_850, NUMBER_OF_CHARACTERS,
-    "AµBCDEêFGHI÷JKLMN•O‡PQRSTUÈöVWXYZ", "a†bcdeÇfghi°jklmn§o¢pqrstu£Åvwxyz",
-    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0,NULL, NULL,NULL,NULL,0,NULL };
+static HB_CODEPAGE s_codepage = { "PLMAZ",
+    CPID_MAZ,UNITB_MAZ,NUMBER_OF_CHARACTERS,
+    "AèBCïDEêFGHIJKLúMN•O£PQRSòTUVWXYZ†°","aÜbcçdeëfghijklímn§o¢pqrsûtuvwxyz¶ß",
+    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( ES );
+HB_CODEPAGE_ANNOUNCE( PLMAZ );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_ES )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_PLMAZ )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_ES )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_PLMAZ )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_ES
+   #pragma startup hb_codepage_Init_PLMAZ
 #endif

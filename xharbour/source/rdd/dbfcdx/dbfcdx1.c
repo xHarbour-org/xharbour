@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.166 2004/10/14 22:42:16 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.167 2004/10/22 01:45:50 druzus Exp $
  */
 
 /*
@@ -73,7 +73,9 @@
 #include "hbvm.h"
 #include "hbset.h"
 #include "hbrddcdx.h"
+#ifdef __XHARBOUR__
 #include "regex.h"
+#endif
 
 #define __PRG_SOURCE__ __FILE__
 #ifndef __XHARBOUR__
@@ -636,9 +638,6 @@ static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LP
       case HB_IT_INTEGER:
       case HB_IT_LONG:
       case HB_IT_DOUBLE:
-#ifdef HB_IT_LONGLONG
-      case HB_IT_LONGLONG:
-#endif
          d = hb_itemGetND( pItem );
          HB_DBL2ORD( &d, ptr );
          len = 8;
@@ -3489,9 +3488,6 @@ static void hb_cdxTagLoad( LPCDXTAG pTag )
    {
       case HB_IT_INTEGER:
       case HB_IT_LONG:
-#ifdef HB_IT_LONGLONG
-      case HB_IT_LONGLONG:
-#endif
       case HB_IT_DOUBLE:
          pTag->uiType = 'N';
          pTag->uiLen = 8;
@@ -4155,6 +4151,35 @@ static ULONG hb_cdxTagKeyFind( LPCDXTAG pTag, LPCDXKEY pKey )
    int K;
    ULONG ulKeyRec = pKey->rec;
 
+   pTag->CurKey->rec = 0;
+   pTag->fRePos = FALSE;
+   hb_cdxTagOpen( pTag );
+
+   pTag->TagBOF = pTag->TagEOF = FALSE;
+   K = hb_cdxPageSeekKey( pTag->RootPage, pKey, ulKeyRec, FALSE );
+   if ( ulKeyRec == CDX_MAX_REC_NUM )
+      K = - K;
+
+   if ( K > 0 )
+      pTag->TagEOF = TRUE;
+   else
+   {
+      hb_cdxSetCurKey( pTag->RootPage );
+      if ( K == 0 )
+         return pTag->CurKey->rec;
+   }
+   return 0;
+}
+
+#if 0
+/*
+ * find pKey in pTag return 0 or record number, respect descend/unique flags
+ */
+static ULONG hb_cdxTagKeySeek( LPCDXTAG pTag, LPCDXKEY pKey )
+{
+   int K;
+   ULONG ulKeyRec = pKey->rec;
+
    if ( pTag->UsrUnique )
    {
       if ( pTag->UsrAscend )
@@ -4192,6 +4217,7 @@ static ULONG hb_cdxTagKeyFind( LPCDXTAG pTag, LPCDXKEY pKey )
    }
    return 0;
 }
+#endif
 
 /*
  * add the Key into the Tag
@@ -5853,14 +5879,19 @@ static ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pKeyItm, BOO
    {
       LPCDXKEY pKey;
       ERRCODE retval = SUCCESS;
-      BOOL  fEOF = FALSE;
+      BOOL  fEOF = FALSE, fLast;
       ULONG ulRec;
 
       pArea->fTop = pArea->fBottom = FALSE;
       pArea->fEof = FALSE;
 
+      if ( pTag->UsrUnique )
+         fLast = !pTag->UsrAscend;
+      else
+         fLast = pTag->UsrAscend ? fFindLast : !fFindLast;
+
       /* TODO: runtime error if valtype(pKeyItm) != pTag->Type */
-      pKey = hb_cdxKeyPutItem( NULL, pKeyItm, fFindLast ? CDX_MAX_REC_NUM : CDX_IGNORE_REC_NUM, pTag, TRUE, FALSE );
+      pKey = hb_cdxKeyPutItem( NULL, pKeyItm, fLast ? CDX_MAX_REC_NUM : CDX_IGNORE_REC_NUM, pTag, TRUE, FALSE );
 
       hb_cdxIndexLockRead( pTag->pIndex );
       ulRec = hb_cdxTagKeyFind( pTag, pKey );
@@ -6696,9 +6727,6 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    {
       case HB_IT_INTEGER:
       case HB_IT_LONG:
-#ifdef HB_IT_LONGLONG
-      case HB_IT_LONGLONG:
-#endif
       case HB_IT_DOUBLE:
          bType = 'N';
          uiLen = 8;
@@ -7564,16 +7592,19 @@ static ERRCODE hb_cdxSetScope( CDXAREAP pArea, LPDBORDSCOPEINFO sInfo )
          {
             PHB_ITEM *pScope;
             LPCDXKEY *pScopeKey;
+            ULONG ulRec;
 
             if ( pTag->UsrAscend ? sInfo->nScope == 0 : sInfo->nScope != 0 )
             {
                pScope    = &(pTag->topScope);
                pScopeKey = &(pTag->topScopeKey);
+               ulRec = CDX_IGNORE_REC_NUM;
             }
             else
             {
                pScope    = &(pTag->bottomScope);
                pScopeKey = &(pTag->bottomScopeKey);
+               ulRec = CDX_MAX_REC_NUM;
             }
 
             if ( *pScope == NULL )
@@ -7581,8 +7612,7 @@ static ERRCODE hb_cdxSetScope( CDXAREAP pArea, LPDBORDSCOPEINFO sInfo )
             hb_itemCopy( *pScope, sInfo->scopeValue );
             *pScopeKey = hb_cdxKeyPutItem( *pScopeKey,
                            fCB ? &(HB_VM_STACK.Return) : sInfo->scopeValue,
-                           (sInfo->nScope == 0) ? CDX_IGNORE_REC_NUM : CDX_MAX_REC_NUM,
-                           pTag, TRUE, FALSE );
+                           ulRec, pTag, TRUE, FALSE );
             pTag->curKeyState &= ~( CDX_CURKEY_RAWCNT | CDX_CURKEY_LOGCNT );
             if ( sInfo->nScope == 0 )
                pTag->curKeyState &= ~( CDX_CURKEY_RAWPOS | CDX_CURKEY_LOGPOS );
@@ -8280,9 +8310,6 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
 
                case HB_IT_INTEGER:
                case HB_IT_LONG:
-#ifdef HB_IT_LONGLONG
-               case HB_IT_LONGLONG:
-#endif
                case HB_IT_DOUBLE:
                   d = hb_itemGetND( pItem );
                   HB_DBL2ORD( &d, &cTemp[0] );

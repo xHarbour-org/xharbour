@@ -1,5 +1,5 @@
 /*
- * $Id: pragma.c,v 1.5 2004/11/03 21:20:06 ronpinkas Exp $
+ * $Id: pragma.c,v 1.6 2004/11/04 14:06:04 druzus Exp $
  */
 
 /*
@@ -226,10 +226,7 @@ void hb_pp_ParsePragma( char * szLine, BOOL bValidCode )
                pBuffer++;
             }
 
-            strncpy( (char *) sDirective, pBuffer, 6 );
-            sDirective[6] = '\0';
-            hb_strupr( sDirective );
-
+            hb_strncpyUpper( sDirective, pBuffer, 6 );
             if( memcmp( sDirective, "PRAGMA", 6 ) == 0 )
             {
                pBuffer += 6;
@@ -240,10 +237,7 @@ void hb_pp_ParsePragma( char * szLine, BOOL bValidCode )
                pBuffer++;
             }
 
-            strncpy( sDirective, pBuffer, 7 );
-            sDirective[7] = '\0';
-            hb_strupr( sDirective );
-
+            hb_strncpyUpper( sDirective, pBuffer, 7 );
             if( memcmp( sDirective, "ENDDUMP", 7 ) == 0 )
             {
                hb_pp_bInline = FALSE;

@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.36 2004/06/23 17:55:59 guerra000 Exp $
+ * $Id: transfrm.c,v 1.37 2004/07/10 04:52:08 guerra000 Exp $
  */
 
 /*
@@ -683,7 +683,7 @@ HB_FUNC( TRANSFORM )
                   }
                   else if( cPic == ',' && bInit )    /* Comma                    */
                   {
-                     if( iCount && isdigit( ( int ) szStr[ iCount - 1 ] ) )
+                     if( iCount && isdigit( ( BYTE ) szStr[ iCount - 1 ] ) )
                      {                                /* May we place it     */
                         if( uiPicFlags & PF_EXCHANG )
                            szResult[ i ] = '.';
@@ -722,23 +722,23 @@ HB_FUNC( TRANSFORM )
                for( iCount = 0; ( ULONG ) iCount < i; iCount++ )
                    /* Permit to detect overflow when picture init with mask */
                {
-                  if( isdigit( ( int ) szResult[ iCount ] ) &&
+                  if( isdigit( ( BYTE ) szResult[ iCount ] ) &&
                        !( szResult[ iCount ] == '0' ) &&       /* if not PF_PADL */
                        ( iCount == 0 ||
-                       !isdigit( ( int ) szPic[ iCount ] ) ) ) /* if not mask symbol */
+                       !isdigit( ( BYTE ) szPic[ iCount ] ) ) ) /* if not mask symbol */
                                                                /* Overflow */
                   {
                      for( iCount++; ( ULONG ) iCount < i; iCount++ )
                      {
-                        if( isdigit( ( int ) szResult[ iCount ] ) )
+                        if( isdigit( ( BYTE ) szResult[ iCount ] ) )
                            szResult[ iCount ] = '*';
                      }
                      break;
                   }
                   else
                   {
-                     if( !isdigit( ( int ) szResult[ iCount ] ) ||
-                            ( szResult[ iCount ] == '0' && !isdigit( ( int ) szPic[ iCount ] ) ) )
+                     if( !isdigit( ( BYTE ) szResult[ iCount ] ) ||
+                            ( szResult[ iCount ] == '0' && !isdigit( ( BYTE ) szPic[ iCount ] ) ) )
                         break;
                   }
                }
@@ -751,23 +751,23 @@ HB_FUNC( TRANSFORM )
                for( iCount = 0; ( ULONG ) iCount < i; iCount++ )
                    /* Permit to detect overflow when picture init with mask */
                {
-                  if( isdigit( ( int ) szResult[ iCount ] ) &&
+                  if( isdigit( ( BYTE ) szResult[ iCount ] ) &&
                        !( szResult[ iCount ] == '0' ) &&       /* if not PF_PADL */
                        ( iCount == 0 ||
-                       !isdigit( ( int ) szPic[ iCount ] ) ) ) /* if not mask symbol */
+                       !isdigit( ( BYTE ) szPic[ iCount ] ) ) ) /* if not mask symbol */
                                                                /* Overflow */
                   {
                      for( iCount++; ( ULONG ) iCount < i; iCount++ )
                      {
-                        if( isdigit( ( int ) szResult[ iCount ] ) )
+                        if( isdigit( ( BYTE ) szResult[ iCount ] ) )
                            szResult[ iCount ] = '*';
                      }
                      break;
                   }
                   else
                   {
-                     if( !isdigit( ( int ) szResult[ iCount ] ) ||
-                            ( szResult[ iCount ] == '0' && !isdigit( ( int ) szPic[ iCount ] ) ) )
+                     if( !isdigit( ( BYTE ) szResult[ iCount ] ) ||
+                            ( szResult[ iCount ] == '0' && !isdigit( ( BYTE ) szPic[ iCount ] ) ) )
                      {
                         for( ; ( ULONG ) iCount < i; iCount++ )
                         {

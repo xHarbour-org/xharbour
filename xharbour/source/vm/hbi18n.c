@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.16 2004/02/23 10:01:44 andijahja Exp $
+ * $Id: hbi18n.c,v 1.17 2004/10/18 10:22:27 likewolf Exp $
  */
 
 /*
@@ -387,7 +387,6 @@ BOOL hb_i18n_load_language( char *language )
 {
    char *path;
    FHANDLE handle;
-   int nRead;
    HB_I18N_TAB_HEADER header;
    PHB_ITEM pTable;
 
@@ -395,8 +394,11 @@ BOOL hb_i18n_load_language( char *language )
    handle = hb_fsOpen( (BYTE *) path, FO_READ ); // on error will fail on next op
    hb_xfree( path );
 
-   nRead = hb_fsRead( handle, (BYTE *) &header, sizeof( header ) );
-   if ( nRead != sizeof( header ) )
+   if ( handle == FS_ERROR )
+   {
+      return FALSE;
+   }
+   if ( hb_fsRead( handle, (BYTE *) &header, sizeof( header ) ) != sizeof( header ) )
    {
       hb_fsClose( handle );
       return FALSE;
@@ -452,7 +454,7 @@ HB_FUNC( HB_I18NLOADTABLE )
    PHB_ITEM pHeader;
    PHB_ITEM pTable;
    HB_ITEM ArrRet;
-   int handle;
+   FHANDLE handle;
 
    if ( pParam == NULL ||
       ( ! HB_IS_STRING( pParam ) && ! HB_IS_NUMERIC( pParam ) )
@@ -570,7 +572,7 @@ HB_FUNC( HB_I18NSAVETABLE )
    PHB_ITEM pParam = hb_param( 1, HB_IT_ANY );
    PHB_ITEM pHeader = hb_param( 2, HB_IT_ARRAY );
    PHB_ITEM pTable = hb_param( 3, HB_IT_ARRAY );
-   int handle;
+   FHANDLE handle;
 
    if ( pParam == NULL ||
       ( ! HB_IS_STRING( pParam ) && ! HB_IS_NUMERIC( pParam ) )
@@ -589,14 +591,14 @@ HB_FUNC( HB_I18NSAVETABLE )
       handle = hb_fsCreate( (BYTE *) pParam->item.asString.value, FC_NORMAL );
 
       // an opening failure will cause following operations to fail
-      if ( handle < 0 ) {
+      if ( handle == FS_ERROR ) {
          hb_retl( FALSE );
          return;
       }
    }
    else
    {
-      handle = hb_itemGetNI( pParam );
+      handle = hb_itemGetNL( pParam );
    }
 
    if ( hb_i18n_write_table_header( handle, pHeader ) &&

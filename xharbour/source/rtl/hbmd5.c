@@ -1,5 +1,5 @@
 /*
- * $Id: hbmd5.c,v 1.1 2004/04/25 11:26:14 andijahja Exp $
+ * $Id: hbmd5.c,v 1.2 2004/08/13 11:11:58 alexstrickland Exp $
  */
 
 /*
@@ -368,7 +368,7 @@ HB_FUNC(HB_MD5FILE)
          hb_md5go(&md5);
          for (i=0;i<16;i++)
          {
-            sprintf(digest+(i<<1),"%02x",md5.accum[i>>2]>>((i&3)<<3)&0xFF);
+            sprintf(digest+(i<<1),"%02x",(int)(md5.accum[i>>2]>>((i&3)<<3)&0xFF));
          }
          hb_retclen(digest,32);
       }

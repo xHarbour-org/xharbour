@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.124 2004/11/02 14:40:03 mauriliolongo Exp $
+ * $Id: filesys.c,v 1.125 2004/11/08 18:50:17 paultucker Exp $
  */
 
 /*
@@ -231,7 +231,6 @@
 #ifndef S_IEXEC
    #define S_IEXEC      0x0040  /* owner may execute <directory search> */
 #endif
-
 
 #ifndef S_IRWXU
    #define S_IRWXU      (S_IRUSR | S_IWUSR | S_IXUSR)
@@ -575,19 +574,7 @@ static void convert_create_flags_ex( USHORT uiAttr, USHORT uiFlags, int * result
    if ( uiFlags & FO_EXCL )
       *result_flags |= O_EXCL;
 
-   *result_pmode = S_IRUSR | S_IWUSR;
-
-   if( uiAttr & FC_READONLY )
-   {
-      *result_pmode = S_IRUSR;
-      HB_TRACE(HB_TR_INFO, ("convert_create_flags_ex: S_IRUSR"));
-   }
-
-   if( uiAttr & FC_HIDDEN )
-      *result_flags |= 0;
-
-   if( uiAttr & FC_SYSTEM )
-      *result_flags |= 0;
+   *result_pmode = convert_pmode_flags( uiAttr );
 
    HB_TRACE(HB_TR_INFO, ("convert_create_flags_ex: 0x%04x, 0x%04x\n", *result_flags, *result_pmode));
 }
@@ -632,14 +619,12 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 
 #if defined(OS_UNIX_COMPATIBLE)
    {
-#ifndef MAXFD
-      #define MAXFD     1024
-#endif
       FHANDLE hPipeHandle[2], hNullHandle;
       pid_t pid;
       BYTE * pbyTmp;
       BOOL bRead;
       ULONG ulLen;
+      int iMaxFD;
 
       //JC1: unlocking the stack to allow cancelation points
       HB_STACK_UNLOCK;
@@ -664,9 +649,8 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
       }
       if( pFilename[ ulLen - 1 ] == '|' )
       {
-          pbyTmp = hb_xgrab( ulLen );
-          hb_xmemcpy( pbyTmp, pFilename, --ulLen );
-          pbyTmp[ulLen] = 0;
+          pbyTmp = hb_strdup( pFilename );
+          pbyTmp[--ulLen] = 0;
           pFilename = pbyTmp;
       } else
           pbyTmp = NULL;
@@ -699,7 +683,10 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
                   dup2( hNullHandle, 1 );
                   dup2( hNullHandle, 2 );
                }
-               for( hNullHandle = 3; hNullHandle < MAXFD; ++hNullHandle )
+               iMaxFD = sysconf( _SC_OPEN_MAX );
+               if ( iMaxFD < 3 )
+                  iMaxFD = 1024;
+               for( hNullHandle = 3; hNullHandle < iMaxFD; ++hNullHandle )
                   close(hNullHandle);
                setuid(getuid());
                setgid(getgid());
@@ -741,7 +728,7 @@ int s_parametrize( char *out, char *in )
    int count = 0;  // we'll have at least one token
 
    // removes leading spaces
-   while ( *in && isspace(*in) )
+   while ( *in && isspace( (BYTE) *in) )
       in++;
    if (! *in ) return 0;
 
@@ -769,7 +756,7 @@ int s_parametrize( char *out, char *in )
          // out++ will be done later; if in is done,
          // '\0' will be added at loop exit.
       }
-      else if (! isspace( *in ) ) {
+      else if (! isspace( (BYTE) *in ) ) {
          *out = *in;
          in++;
          out++;
@@ -777,7 +764,7 @@ int s_parametrize( char *out, char *in )
       else {
          *out = '\0';
          count ++;
-         while (*in && isspace( *in ) )
+         while (*in && isspace( (BYTE) *in ) )
             in++;
          out++;
       }
@@ -2449,7 +2436,7 @@ BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
    HB_THREAD_STUB
    BOOL bResult;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsLock(%p, %lu, %lu, %hu)", hFileHandle, ulStart, ulLength, uiMode));
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsLockLarge(%p, %" PFHL "u, %" PFHL "u, %hu)", hFileHandle, ulStart, ulLength, uiMode));
 
 #if defined(HB_FS_FILE_IO) && defined(HB_OS_LINUX) && \
     defined(__USE_LARGEFILE64)
@@ -2607,7 +2594,7 @@ HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, U
    HB_THREAD_STUB
    HB_FOFFSET llPos;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsSeekLarge(%p, %Ld, %hu)", hFileHandle, llOffset, uiFlags));
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsSeekLarge(%p, %" PFHL "u, %hu)", hFileHandle, llOffset, uiFlags));
 
 #if defined(HB_FS_FILE_IO) && defined(HB_OS_LINUX) && \
     defined(__USE_LARGEFILE64)

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmacro.h,v 1.7 2004/03/31 11:33:56 likewolf Exp $
+ * $Id: hbmacro.h,v 1.8 2004/04/15 16:04:27 likewolf Exp $
  */
 
 /*
@@ -132,7 +132,7 @@ extern void hb_compGenJumpHere( ULONG ulOffset, HB_BISON_PTR pMacro );
 extern ULONG hb_compGenJumpTrue( LONG lOffset, HB_BISON_PTR pMacro );
 extern void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_BISON_PTR pMacro );
 extern void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_BISON_PTR pMacro );
-extern void hb_compGenPushLong( LONG lNumber, HB_BISON_PTR pMacro );
+extern void hb_compGenPushLong( HB_LONG lNumber, HB_BISON_PTR pMacro );
 extern void hb_compGenMessage( char * szMsgName, HB_BISON_PTR pMacro );
 extern void hb_compGenMessageData( char * szMsg, HB_BISON_PTR pMacro );
 extern void hb_compGenPopVar( char * szVarName, HB_BISON_PTR pMacro );

@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.50 2004/08/27 07:20:56 brianhays Exp $
+ * $Id: ads1.c,v 1.51 2004/10/01 01:21:00 brianhays Exp $
  */
 
 /*
@@ -1458,7 +1458,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    USHORT uiCount;
    BYTE * szText;
    BOOL bTypeError = TRUE;
-   long lDay, lMonth, lYear;
+   int iDay, iMonth, iYear;
 
    UNSIGNED8 pucFormat[ 11 ];
    UNSIGNED16 pusLen = 11;
@@ -1554,8 +1554,8 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             bTypeError = FALSE;
             AdsGetDateFormat( pucFormat, &pusLen );
             AdsSetDateFormat( (UNSIGNED8*)"YYYYMMDD" );
-            hb_dateDecode( hb_itemGetDL( pItem ), &lYear, &lMonth, &lDay );
-            hb_dateStrPut( ( char * ) szText, lYear, lMonth, lDay );
+            hb_dateDecode( hb_itemGetDL( pItem ), &iYear, &iMonth, &iDay );
+            hb_dateStrPut( ( char * ) szText, iYear, iMonth, iDay );
             ulRetVal = AdsSetDate( pArea->hTable, ADSFIELD( uiIndex ), szText, 8 );
             AdsSetDateFormat( pucFormat );
          }
@@ -1644,7 +1644,69 @@ static ERRCODE adsRecCount( ADSAREAP pArea, ULONG * pRecCount )
    return SUCCESS;
 }
 
-#define  adsRecInfo               NULL
+static ERRCODE adsRecInfo( ADSAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType, PHB_ITEM pInfo )
+{
+   UNSIGNED32 ulRecNo = hb_itemGetNL( pRecID );
+   ERRCODE uiRetVal = SUCCESS;
+
+   HB_TRACE(HB_TR_DEBUG, ("adsRecInfo(%p, %p, %hu, %p)", pArea, pRecID, uiInfoType, pInfo));
+
+   if ( ulRecNo == 0 )
+   {
+      AdsGetRecordNum( pArea->hTable, ADS_IGNOREFILTERS, &ulRecNo );
+      pArea->ulRecNo = ulRecNo;
+   }
+
+   switch( uiInfoType )
+   {
+      case DBRI_DELETED:
+      {
+         BOOL bDeleted = FALSE;
+         ULONG ulPrevRec = 0;
+         
+         if( pArea->ulRecNo != ulRecNo )
+         {
+            ulPrevRec = pArea->ulRecNo;
+            SELF_GOTO( ( AREAP ) pArea, ulRecNo );
+         }
+         SELF_DELETED( ( AREAP ) pArea, &bDeleted );
+         if( ulPrevRec != 0 )
+         {
+            SELF_GOTO( ( AREAP ) pArea, ulPrevRec );
+         }
+         hb_itemPutL( pInfo, bDeleted );
+         break;
+      }
+
+      case DBRI_LOCKED:
+      {
+         UNSIGNED16 pbLocked = FALSE;
+         if ( AdsIsRecordLocked( pArea->hTable, ulRecNo, &pbLocked ) != AE_SUCCESS )
+         {
+            uiRetVal = FAILURE;
+         }
+         hb_itemPutL( pInfo, pbLocked );
+         break;
+      }
+      case DBRI_RECSIZE:
+         hb_itemPutNL( pInfo, pArea->uiRecordLen );
+         break;
+
+      case DBRI_RECNO:
+         hb_itemPutNL( pInfo, ulRecNo );
+         break;
+
+      case DBRI_UPDATED:
+         /* this will not work properly with current ADS RDD */
+         hb_itemPutL( pInfo, ulRecNo == pArea->ulRecNo && pArea->fRecordChanged );
+         break;
+
+      default:
+         return SUPER_RECINFO( ( AREAP ) pArea, pRecID, uiInfoType, pInfo );
+   }
+   return uiRetVal;
+}
+
 
 static ERRCODE adsRecNo( ADSAREAP pArea, PHB_ITEM pRecNo )
 {

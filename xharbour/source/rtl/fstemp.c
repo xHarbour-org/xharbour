@@ -1,5 +1,5 @@
  /*
- * $Id: fstemp.c,v 1.16 2004/07/28 02:45:23 peterrees Exp $
+ * $Id: fstemp.c,v 1.17 2004/07/28 22:50:23 peterrees Exp $
  */
 
 /*
@@ -55,13 +55,14 @@
    #define HB_OS_WIN_32_USED
 #endif
 
-#ifdef HB_OS_BSD
-#include <unistd.h>  /* We need mkstemp() */
-#endif
-
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbmath.h"
+
+#if defined( HB_OS_UNIX )
+#include <stdlib.h>
+#include <unistd.h>  /* We need for mkstemp() on BSD */
+#endif
 
 /* NOTE: The buffer must be at least _POSIX_PATH_MAX chars long */
 #if !defined( HB_OS_LINUX ) && !defined( HB_OS_BSD )

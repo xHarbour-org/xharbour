@@ -1480,13 +1480,13 @@
             }
          }
 
-         if( isalpha( sLine[0] ) || sLine[0] == '_' )
+         if( isalpha( (BYTE) sLine[0] ) || sLine[0] == '_' )
          {
             sReturn[0] = sLine[0];
             Counter = 1;
 
             // Why did I have the '\\' is NOT clear - document if and when reinstating!!!
-            while( isalnum( sLine[Counter] ) || sLine[Counter] == '_' ) //|| sLine[Counter] == '\\' )
+            while( isalnum( (BYTE) sLine[Counter] ) || sLine[Counter] == '_' ) //|| sLine[Counter] == '\\' )
             {
                sReturn[Counter] = sLine[Counter];
                Counter++;
@@ -1495,24 +1495,24 @@
             sReturn[Counter] = '\0';
             goto Done;
          }
-         else if( isdigit( sLine[0] ) )
+         else if( isdigit( (BYTE) sLine[0] ) )
          {
             sReturn[0] = sLine[0];
             Counter = 1;
-            while( isdigit( sLine[Counter] ) || sLine[Counter] == '\\' )
+            while( isdigit( (BYTE) sLine[Counter] ) || sLine[Counter] == '\\' )
             {
                sReturn[Counter] = sLine[Counter];
                Counter++;
             }
 
             // Consume the point (and subsequent digits) only if digits follow...
-            if( sLine[Counter] == '.' && isdigit( sLine[Counter + 1] ) )
+            if( sLine[Counter] == '.' && isdigit( (BYTE) sLine[Counter + 1] ) )
             {
                sReturn[Counter] = '.';
                Counter++;
                sReturn[Counter] = sLine[Counter];
                Counter++;
-               while( isdigit( sLine[Counter] ) || sLine[Counter] == '\\' )
+               while( isdigit( (BYTE) sLine[Counter] ) || sLine[Counter] == '\\' )
                {
                   sReturn[Counter] = sLine[Counter];
                   Counter++;
@@ -1523,12 +1523,12 @@
             sReturn[Counter] = '\0';
             goto Done;
          }
-         else if( sLine[0] == '.' && isdigit( sLine[1] ) )
+         else if( sLine[0] == '.' && isdigit( (BYTE) sLine[1] ) )
          {
             sReturn[0] = '.';
             sReturn[1] = sLine[1];
             Counter = 2;
-            while( isdigit( sLine[Counter] ) )
+            while( isdigit( (BYTE) sLine[Counter] ) )
             {
                sReturn[Counter] = sLine[Counter];
                Counter++;
@@ -1541,7 +1541,7 @@
          {
             if( nLen >= 5 && sLine[4] == '.' )
             {
-               if( toupper( sLine[1] ) == 'A' && toupper( sLine[2] ) == 'N' && toupper( sLine[3] ) == 'D' )
+               if( toupper( (BYTE) sLine[1] ) == 'A' && toupper( (BYTE) sLine[2] ) == 'N' && toupper( (BYTE) sLine[3] ) == 'D' )
                {
                   sReturn[0] = '.';
                   sReturn[1] = 'A';
@@ -1552,7 +1552,7 @@
 
                   goto Done;
                }
-               else if( toupper( sLine[1] ) == 'N' && toupper( sLine[2] ) == 'O' && toupper( sLine[3] ) == 'T' )
+               else if( toupper( (BYTE) sLine[1] ) == 'N' && toupper( (BYTE) sLine[2] ) == 'O' && toupper( (BYTE) sLine[3] ) == 'T' )
                {
                   sReturn[0] = '!';
                   sReturn[1] = '\0';
@@ -1564,7 +1564,7 @@
                }
             }
 
-            if( nLen >= 4 && sLine[3] == '.' && toupper( sLine[1] ) == 'O' && toupper( sLine[2] ) == 'R' )
+            if( nLen >= 4 && sLine[3] == '.' && toupper( (BYTE) sLine[1] ) == 'O' && toupper( (BYTE) sLine[2] ) == 'R' )
             {
                sReturn[0] = '.';
                sReturn[1] = 'O';
@@ -1577,7 +1577,7 @@
 
             if( nLen >= 3 && sLine[2] == '.' )
             {
-               if( toupper( sLine[1] ) == 'T' )
+               if( toupper( (BYTE) sLine[1] ) == 'T' )
                {
                   sReturn[0] = '.';
                   sReturn[1] = 'T';
@@ -1586,7 +1586,7 @@
 
                   goto Done;
                }
-               else if( toupper( sLine[1] ) == 'F' )
+               else if( toupper( (BYTE) sLine[1] ) == 'F' )
                {
                   sReturn[0] = '.';
                   sReturn[1] = 'F';
@@ -1711,7 +1711,7 @@
             }
             else
             {
-               s_bArrayPrefix = ( isalnum( sReturn[0] ) || strchr( "])}._", sReturn[0] ) );
+               s_bArrayPrefix = ( isalnum( (BYTE) sReturn[0] ) || strchr( "])}._", sReturn[0] ) );
 
                if( nLen < 7 && toupper( sReturn[0] ) == 'R' && toupper( sReturn[1] ) == 'E' &&
                    toupper( sReturn[2] ) == 'T' && toupper( sReturn[3] ) == 'U'  )
@@ -1811,7 +1811,7 @@
              }
              else if( cChar == '[' )
              {
-                if( ! ( isalnum( cLastChar ) || strchr( "])}_.", cLastChar ) ) )
+                if( ! ( isalnum( (BYTE) cLastChar ) || strchr( "])}_.", cLastChar ) ) )
                 {
                    while( nAt < nLen && sLine[++nAt] != ']' );
                 }
@@ -1851,7 +1851,7 @@
                    continue;
                 }
              }
-             else if( nStart == -1 && ( isalpha( cChar ) || cChar == '_' ) )
+             else if( nStart == -1 && ( isalpha( (BYTE) cChar ) || cChar == '_' ) )
              {
                 nStart = nAt;
              }

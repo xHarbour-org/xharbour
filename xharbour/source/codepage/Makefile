@@ -5,25 +5,30 @@
 ROOT = ../../
 
 C_SOURCES=\
-      cdpesdos.c    \
-      cdpeswin.c    \
-      cdpgedos.c    \
-      cdpgewin.c    \
-      cdphr852.c    \
-      cdpltwin.c    \
-      cdppl852.c    \
-      cdppliso.c    \
-      cdpplmaz.c    \
-      cdpplwin.c    \
-      cdppt850.c    \
-      cdpptiso.c    \
-      cdpru866.c    \
-      cdprukoi.c    \
-      cdpruwin.c    \
-      cdpsl852.c    \
-      cdpsliso.c    \
-      cdpslwin.c    \
-      cdpsrwin.c    \
+      cpesdos.c    \
+      cpeswin.c    \
+      cpesmwin.c   \
+      cpgedos.c    \
+      cpgewin.c    \
+      cphr852.c    \
+      cphr1250.c   \
+      cpitiso.c    \
+      cpitisb.c    \
+      cpitdos.c    \
+      cpltwin.c    \
+      cppl852.c    \
+      cppliso.c    \
+      cpplmaz.c    \
+      cpplwin.c    \
+      cppt850.c    \
+      cpptiso.c    \
+      cpru866.c    \
+      cprukoi.c    \
+      cpruwin.c    \
+      cpsl852.c    \
+      cpsliso.c    \
+      cpslwin.c    \
+      cpsrwin.c    \
       uc1250.c      \
       uc1251.c      \
       uc1257.c      \
@@ -31,14 +36,11 @@ C_SOURCES=\
       uc852.c       \
       uc866.c       \
       uc8859_1.c    \
+      uc88591b.c    \
       uc8859_2.c    \
       uckoi8.c      \
       ucmaz.c       \
 
-# temporary hack for 8.3 file name length in DOS
-ifneq ($(HB_ARCHITECTURE),dos)
-C_SOURCES += cdpesmwin.c cdphr1250.c
-endif
 
 LIBNAME=codepage
 

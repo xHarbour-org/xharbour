@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2003/05/16 19:52:11 druzus Exp $
+# $Id: Makefile,v 1.5 2004/11/01 05:38:11 likewolf Exp $
 #
 
 ROOT = ../../../
@@ -16,15 +16,13 @@ include $(TOP)$(ROOT)config/lib.cf
 
 # a workaround of a problem with different include directories 
 # for slang header files between different unix distributions
-#TEMPOR := $(CFLAGS)
 CFLAGS := -I/usr/include/slang -I/usr/local/include \
-	  -I/usr/local/include/slang -I/sw/include $(CFLAGS)
+          -I/usr/local/include/slang -I/sw/include $(CFLAGS)
 
-#TEMPOR  := $(LDFLAGS)
-#LDFLAGS := -L/usr/lib/slang -L/usr/local/lib -L/usr/local/lib/slang $(TEMPOR)
+#LDFLAGS := -L/usr/lib/slang -L/usr/local/lib -L/usr/local/lib/slang $(LDFLAGS)
 
 ifeq ($(HB_GPM_MOUSE),yes)
-CFLAGS := $(CFLAGS) -DHAVE_GPM_H
+CFLAGS += -DHAVE_GPM_H
 endif
 
 ifeq ($(HB_MULTI_GT),yes)

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.49 2004/10/23 12:02:11 druzus Exp $
+ * $Id: gtxvt.c,v 1.50 2004/10/24 09:37:59 oh1 Exp $
  */
 
 /*
@@ -3655,7 +3655,7 @@ static void xvt_putTextInternal (
 void HB_GT_FUNC(gt_SetAttribute( USHORT rowStart, USHORT colStart, USHORT rowStop, USHORT colStop, BYTE attr ))
 {
    USHORT irow, icol, index;
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d", usTop, usLeft, usBottom, usRight, (int) attr));
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d", rowStart, colStart, rowStop, colStop, (int) attr));
    for ( irow = rowStart; irow <=rowStop; irow++)
    {
       index = HB_GT_INDEXOF(s_buffer, colStart, irow);

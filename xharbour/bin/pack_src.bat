@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: pack_src.bat,v 1.4 2004/10/04 15:48:00 ronpinkas Exp $
+rem $Id: pack_src.bat,v 1.5 2004/11/16 01:16:44 ronpinkas Exp $
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
@@ -34,9 +34,11 @@ rem BIN
 
 rem CONFIG
 %hb_archbin% %hb_archopt%  %hb_filename% config/*.cf
-%hb_archbin% %hb_archopt%  %hb_filename% config/bsd/*.cf
 %hb_archbin% %hb_archopt%  %hb_filename% config/dos/*.cf
 %hb_archbin% %hb_archopt%  %hb_filename% config/linux/*.cf
+%hb_archbin% %hb_archopt%  %hb_filename% config/bsd/*.cf
+%hb_archbin% %hb_archopt%  %hb_filename% config/darwin/*.cf
+%hb_archbin% %hb_archopt%  %hb_filename% config/sunos/*.cf
 %hb_archbin% %hb_archopt%  %hb_filename% config/os2/*.cf
 %hb_archbin% %hb_archopt%  %hb_filename% config/w32/*.cf
 

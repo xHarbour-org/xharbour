@@ -1,5 +1,5 @@
 /*
- * $Id: utils.c,v 1.2 2004/09/30 15:32:00 jonnymind Exp $
+ * $Id: utils.c,v 1.3 2004/11/01 05:38:11 likewolf Exp $
  */
 
 /*
@@ -79,7 +79,8 @@ HB_FUNC( TIP_TIMESTAMP )
    ULONG ulHour = hb_parl(2);
    int nLen;
    TIME_ZONE_INFORMATION tzInfo;
-   long lDate, lYear, lMonth, lDay;
+   LONG lDate;
+   int iYear, iMonth, iDay;
    char *days[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
    char *months[] = {
          "Jan", "Feb", "Mar",
@@ -118,11 +119,11 @@ HB_FUNC( TIP_TIMESTAMP )
    else
    {
       lDate = hb_itemGetDL( pDate );
-      hb_dateDecode( lDate, &lYear, &lMonth, &lDay );
+      hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
 
       sprintf( szRet, "%s, %d %s %d %02d:%02d:%02d %+03d%02d",
-            days[ hb_dateDOW( lYear, lMonth, lDay ) - 1 ], lDay,
-            months[ lMonth -1], lYear,
+            days[ hb_dateDOW( iYear, iMonth, iDay ) - 1 ], iDay,
+            months[ iMonth -1], iYear,
             ulHour / 3600, (ulHour % 3600) / 60, (ulHour % 60),
             tzInfo.Bias/60,
             tzInfo.Bias % 60 > 0 ? - tzInfo.Bias % 60 : tzInfo.Bias % 60 );
@@ -160,11 +161,13 @@ HB_FUNC( TIP_TIMESTAMP )
 
    /* init time structure anyway */
    time( &current );
-   #if defined( HB_OS_OS2 ) || defined( HB_OS_DARWIN_5 )
+#if defined( HB_OS_OS2 ) || defined( HB_OS_DARWIN_5 )
    memcpy((void *)&tmTime, (void *)localtime( &current ), sizeof(tmTime));
-   #else
+#elif defined( HB_OS_DAWIN ) || defined( HB_OS_SUNOS )
+   tmTime = *localtime( &current );
+#else
    localtime_r( &current , &tmTime );
-   #endif
+#endif
 
    if ( pDate )
    {

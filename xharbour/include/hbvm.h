@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.21 2004/05/16 23:54:11 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.22 2004/05/17 01:51:04 ronpinkas Exp $
  */
 
 /*
@@ -106,7 +106,8 @@ HB_EXPORT extern void    hb_vmPush( PHB_ITEM pItem );     /* pushes a generic it
 HB_EXPORT extern void    hb_vmPushNil( void );            /* in this case it places nil at self */
 HB_EXPORT extern void    hb_vmPushNumber( double dNumber, int iDec ); /* pushes a number on to the stack and decides if it is SHORT, LONG or double */
 HB_EXPORT extern void    hb_vmPushInteger( int iNumber ); /* pushes a integer number onto the stack */
-HB_EXPORT extern void    hb_vmPushLong( LONG lNumber ); /* pushes a LONG number onto the stack */
+HB_EXPORT extern void    hb_vmPushLong( long lNumber ); /* pushes a LONG number onto the stack */
+HB_EXPORT extern void    hb_vmPushLongLong( HB_LONG lNumber ); /* pushes a long long number onto the stack */
 HB_EXPORT extern void    hb_vmPushDouble( double lNumber, int iDec ); /* pushes a double number onto the stack */
 HB_EXPORT extern void    hb_vmPushLogical( BOOL bValue );    /* pushes a logical value onto the stack */
 HB_EXPORT extern void    hb_vmPushString( char * szText, ULONG length );  /* pushes a string on to the stack */
@@ -114,13 +115,6 @@ HB_EXPORT extern void    hb_vmPushDate( LONG lDate );   /* pushes a LONG date on
 HB_EXPORT extern void    hb_vmPushSymbol( PHB_SYMB pSym ); /* pushes a function pointer onto the stack */
 HB_EXPORT extern void    hb_vmPushPointer( void * ); /* push an item of HB_IT_POINTER type */
 HB_EXPORT extern void    hb_vmPushBaseArray( PHB_BASEARRAY pBaseArray );
-
-#ifndef HB_LONG_LONG_OFF
-   HB_EXPORT extern void hb_vmPushLongLong( LONGLONG lNumber );
-   HB_EXPORT extern void hb_vmPushNumInt( LONGLONG lNumber );
-#else
-   HB_EXPORT extern void hb_vmPushNumInt( LONG lNumber );
-#endif
 
 HB_EXPORT extern void hb_vmDoExitFunctions( void );
 HB_EXPORT extern PSYMBOLS hb_vmLastModule( void );

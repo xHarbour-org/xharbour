@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.3 2004/09/21 02:52:35 druzus Exp $
+ * $Id: hbfsapi.c,v 1.4 2004/09/21 22:31:12 druzus Exp $
  */
 
 /*
@@ -202,7 +202,7 @@ PHB_FNAME hb_fsFNameSplit( char * pszFileName )
 /* This function joins path, name and extension into a string with a filename */
 char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
 {
-   char szPathSep[] = {OS_PATH_DELIMITER,0}; /* see NOTE below */
+   static char szPathSep[] = {OS_PATH_DELIMITER,0}; /* see NOTE below */
    char * pszName;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsFNameMerge(%p, %p)", pszFileName, pFileName));

@@ -1,14 +1,13 @@
 /*
- * $Id: cdpeswin.c,v 1.3 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: cdp_tpl.c,v 1.3 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Spanish WIN )
+ * National Collation Support Module ( template )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
- * Spanish Windows support by Antonio Linares <alinares@fivetechsoft.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,15 +50,15 @@
  *
  */
 
-/* Language name: Spanish */
-/* ISO language code (2 chars): ES */
-/* Codepage: ISO-8859-1 */
+/* Language name: <Your language> */
+/* ISO language code (2 chars): (please look it up in /doc/lang_id.txt) */
+/* Codepage: <Your codepage> */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  33    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  26    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
@@ -84,16 +83,16 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "ESWIN",
-    CPID_8859_1, UNITB_8859_1, NUMBER_OF_CHARACTERS,
-    "AÁBCDEÉFGHIÍJKLMNÑOÓPQRSTUÚÜVWXYZ", "aábcdeéfghiíjklmnñoópqrstuúüvwxyz",
-    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0,NULL, NULL,NULL,NULL,0,NULL };
+static HB_CODEPAGE s_codepage = { "EN",
+    CPID_437,UNITB_437,NUMBER_OF_CHARACTERS,
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz",
+    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( ESWIN );
+HB_CODEPAGE_ANNOUNCE( EN );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_ESWIN )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_EN )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_ESWIN )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_EN )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_ESWIN
+   #pragma startup hb_codepage_Init_EN
 #endif

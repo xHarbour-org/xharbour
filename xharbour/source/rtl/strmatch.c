@@ -1,5 +1,5 @@
 /*
- * $Id: strmatch.c,v 1.6 2004/03/23 12:43:00 andijahja Exp $
+ * $Id: strmatch.c,v 1.7 2004/08/04 14:48:11 druzus Exp $
  */
 
 /*
@@ -195,5 +195,5 @@ BOOL HB_EXPORT hb_strMatchWild(const char *szString, const char *szPattern )
 HB_FUNC( WILDMATCH )
 {
    hb_retl( ( ! ISCHAR( 1 ) || ! ISCHAR( 2 ) ) ? FALSE :
-            hb_strMatchWild( hb_parcx( 2 ), hb_parcx( 1 ) ) );
+            hb_strMatchWild( hb_parc( 2 ), hb_parc( 1 ) ) );
 }

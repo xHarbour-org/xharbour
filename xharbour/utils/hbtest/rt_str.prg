@@ -1,5 +1,5 @@
 /*
- * $Id: rt_str.prg,v 1.4 2003/12/18 21:12:44 ronpinkas Exp $
+ * $Id: rt_str.prg,v 1.5 2004/02/10 22:34:33 andijahja Exp $
  */
 
 /*
@@ -481,7 +481,11 @@ FUNCTION Main_STR()
    /* REPLICATE() */
 
 #ifdef __HARBOUR__
-   TEST_LINE( Replicate("XXX", 2000000000)    , "E BASE 1234 String overflow REPLICATE A:2:C:XXX;N:2000000000 F:S" )
+   #ifdef __ARCH64BIT__
+      TEST_LINE( Replicate("XXX", 9000000000000000000) , "E BASE 1234 String overflow REPLICATE A:2:C:XXX;N:9000000000000000000 F:S" )
+   #else
+      TEST_LINE( Replicate("XXX", 2000000000)    , "E BASE 1234 String overflow REPLICATE A:2:C:XXX;N:2000000000 F:S" )
+   #endif
 #else
    TEST_LINE( Replicate("XXX", 30000)         , "E BASE 1234 String overflow REPLICATE A:2:C:XXX;N:30000 F:S" )
 #endif

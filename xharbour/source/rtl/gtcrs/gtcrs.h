@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.11 2004/03/03 21:45:23 likewolf Exp $
+ * $Id: gtcrs.h,v 1.12 2004/11/01 05:38:10 likewolf Exp $
  */
 
 /*
@@ -76,14 +76,11 @@ extern PHB_CODEPAGE s_cdpage;
    extern int tigetflag(char *);
    extern int tigetnum(char *);
    extern char *tigetstr(char *);
-/*
-#  include <ncur194/term.h>
-*/
 #else
 #  include <curses.h>
-/*
-#  include <term.h>
-*/
+#  if defined( HB_OS_SUNOS )
+#     include <term.h>
+#   endif
 #endif
 #ifdef HAVE_GPM_H
 # include <gpm.h>
@@ -97,6 +94,7 @@ extern PHB_CODEPAGE s_cdpage;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/ioctl.h>
 #include <signal.h>
 #include <errno.h>
 #include <unistd.h>
@@ -114,8 +112,12 @@ extern PHB_CODEPAGE s_cdpage;
 # include <utmp.h> /* for login_tty */
 #endif
 
+#ifndef O_ACCMODE
+#  define O_ACCMODE           ( O_RDONLY | O_WRONLY | O_RDWR )
+#endif
+
 #ifndef _POSIX_PATH_MAX
-#define _POSIX_PATH_MAX 256
+#  define _POSIX_PATH_MAX     256
 #endif
 
 /* #define HB_GT_CRS_TTYHACK */

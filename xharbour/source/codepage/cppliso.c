@@ -1,14 +1,14 @@
 /*
- * $Id: cdppl852.c,v 1.2 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: cdppliso.c,v 1.4 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( PL852 )
+ * National Collation Support Module ( PLISO )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
- * Polish collating sequence (PL852) CP852 done by Jacek Kubica <kubica@wssk.wroc.pl>
+ * Polish collating sequence (PLISO) done by Jacek Kubica <kubica@wssk.wroc.pl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@
 
 /* Language name: Polish */
 /* ISO language code (2 chars): PL */
-/* Codepage: 852 */
+/* Codepage: ISO-8859-2 */
 
 #include <ctype.h>
 #include "hbapi.h"
@@ -84,17 +84,17 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "PL852",
-    CPID_852,UNITB_852,NUMBER_OF_CHARACTERS,
-    "A§BCèDE®FGHIJKLùMN„O‡PQRSóTUVWXYZçΩ","a•bcÜde©fghijklàmn‰o¢pqrsòtuvwxyz´æ",
+static HB_CODEPAGE s_codepage = { "PLISO",
+    CPID_8859_2,UNITB_8859_2,NUMBER_OF_CHARACTERS,
+    "A°BC∆DE FGHIJKL£MN—O”PQRS¶TUVWXYZ¨Ø","a±bcÊdeÍfghijkl≥mnÒoÛpqrs∂tuvwxyzºø",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( PL852 );
+HB_CODEPAGE_ANNOUNCE( PLISO );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_PL852 )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_PLISO )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_PL852 )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_PLISO )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_PL852
+   #pragma startup hb_codepage_Init_PLISO
 #endif
 

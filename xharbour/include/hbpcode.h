@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.h,v 1.21 2004/05/30 20:44:10 ronpinkas Exp $
+ * $Id: hbpcode.h,v 1.22 2004/07/03 03:34:53 ronpinkas Exp $
  */
 
 /*
@@ -222,9 +222,10 @@ typedef enum
    HB_P_BITSHIFTL,             /* 156 */
    HB_P_LARGEFRAME,            /* 157 */
    HB_P_PUSHWITH,              /* 158 */
+   HB_P_PUSHLONGLONG,          /* 159 places 64bit integer number on the virtual machine stack */
 
 /* NOTE: This have to be the last definition */
-   HB_P_LAST_PCODE             /* 159 this defines the number of defined pcodes */
+   HB_P_LAST_PCODE             /* 160 this defines the number of defined pcodes */
 } HB_PCODE;
 
 #endif /* HB_PCODE_H_ */

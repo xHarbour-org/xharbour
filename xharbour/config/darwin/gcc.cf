@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.14 2004/10/31 13:15:45 druzus Exp $
+# $Id: gcc.cf,v 1.15 2004/11/01 05:38:08 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -26,8 +26,7 @@ CFLAGS += -Wno-long-double
 ifeq ($(HB_LEX),SIMPLEX)
   CFLAGS += -DSIMPLEX
 endif
-
-CFLAGS += -DHB_OS_BSD -DHB_OS_DARWIN
+CFLAGS += -DHB_OS_DARWIN
 
 # The following is enabled automatically for old Darwin versions, e.g. 5.5
 # CFLAGS += -DHB_NO_RECURSIVE_MUTEXES

@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.28 2004/08/24 00:30:24 druzus Exp $
+ * $Id: workarea.c,v 1.29 2004/09/21 02:52:36 druzus Exp $
  */
 
 /*
@@ -307,7 +307,7 @@ ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
 
          case 'I':
             pFieldInfo.uiType = HB_IT_INTEGER;
-            pFieldInfo.uiLen = ( uiLen == 2 || uiLen == 8 ) ? uiLen : 4;
+            pFieldInfo.uiLen = ( ( uiLen > 0 && uiLen <= 4 ) || uiLen != 8 ) ? uiLen : 4;
             break;
 
          case '2':

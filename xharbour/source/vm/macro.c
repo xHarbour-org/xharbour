@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.48 2004/06/12 13:23:09 druzus Exp $
+ * $Id: macro.c,v 1.49 2004/08/29 00:52:12 ronpinkas Exp $
  */
 
 /*
@@ -1173,7 +1173,7 @@ ULONG hb_compGenJump( LONG lOffset, HB_MACRO_DECL )
 {
    /* TODO: We need a longer offset (longer then two bytes)
     */
-   if( lOffset < ( LONG ) SHRT_MIN || lOffset > ( LONG ) SHRT_MAX )
+   if ( ! HB_LIM_INT16( lOffset ) )
    {
       hb_macroError( HB_MACRO_TOO_COMPLEX, HB_MACRO_PARAM );
    }
@@ -1187,7 +1187,7 @@ ULONG hb_compGenJumpFalse( LONG lOffset, HB_MACRO_DECL )
 {
    /* TODO: We need a longer offset (longer then two bytes)
     */
-   if( lOffset < ( LONG ) SHRT_MIN || lOffset > ( LONG ) SHRT_MAX )
+   if ( ! HB_LIM_INT16( lOffset ) )
    {
       hb_macroError( HB_MACRO_TOO_COMPLEX, HB_MACRO_PARAM );
    }
@@ -1204,7 +1204,7 @@ void hb_compGenJumpThere( ULONG ulFrom, ULONG ulTo, HB_MACRO_DECL )
 
    /* TODO: We need a longer offset (longer then two bytes)
     */
-   if( lOffset < ( LONG ) SHRT_MIN || lOffset > ( LONG ) SHRT_MAX )
+   if ( ! HB_LIM_INT16( lOffset ) )
    {
       hb_macroError( HB_MACRO_TOO_COMPLEX, HB_MACRO_PARAM );
    }
@@ -1222,7 +1222,7 @@ ULONG hb_compGenJumpTrue( LONG lOffset, HB_MACRO_DECL )
 {
    /* TODO: We need a longer offset (longer then two bytes)
     */
-   if( lOffset < ( LONG ) SHRT_MIN || lOffset > ( LONG ) SHRT_MAX )
+   if ( ! HB_LIM_INT16( lOffset ) )
    {
       hb_macroError( HB_MACRO_TOO_COMPLEX, HB_MACRO_PARAM );
    }
@@ -1312,8 +1312,13 @@ void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
    pSym = hb_dynsymGet( szVarName );
 
    hb_compGenPCode1( bPCode, HB_MACRO_PARAM );
-   hb_compGenPCodeN( ( BYTE * )( &pSym ), sizeof( pSym ), HB_MACRO_PARAM );
+   {
+      BYTE byBuf[ sizeof( HB_DYNS_PTR ) ];
 
+      HB_PUT_PTR( byBuf, pSym );
+      hb_compGenPCodeN( byBuf, sizeof( pSym ), HB_MACRO_PARAM );
+   }
+   /* hb_compGenPCodeN( ( BYTE * ) &pSym, sizeof( pSym ), HB_MACRO_PARAM ); */
    hb_dynsymUnlock();
 }
 
@@ -1356,26 +1361,49 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_
    }
 
    hb_compGenPCode1( HB_P_MPUSHSYM, HB_MACRO_PARAM );
-   hb_compGenPCodeN( ( BYTE * ) &pSym, sizeof( pSym ), HB_MACRO_PARAM );
+   {
+      BYTE byBuf[ sizeof( HB_DYNS_PTR ) ];
+
+      HB_PUT_PTR( byBuf, pSym );
+      hb_compGenPCodeN( byBuf, sizeof( pSym ), HB_MACRO_PARAM );
+   }
+   /* hb_compGenPCodeN( ( BYTE * ) &pSym, sizeof( pSym ), HB_MACRO_PARAM ); */
    hb_dynsymUnlock();
 }
 
-/* generates the pcode to push a LONG number on the virtual machine stack */
-void hb_compGenPushLong( LONG lNumber, HB_MACRO_DECL )
+/* generates the pcode to push integer number on the virtual machine stack */
+void hb_compGenPushLong( HB_LONG lNumber, HB_MACRO_DECL )
 {
-   if( lNumber )
+   if( lNumber == 0 )
    {
-      int i = sizeof( LONG );
-      hb_compGenPCode1( HB_P_PUSHLONG, HB_MACRO_PARAM );
-      do
-      {
-         hb_compGenPCode1( HB_LOBYTE( lNumber ), HB_MACRO_PARAM );
-         lNumber >>= 8;
-      }
-      while ( --i );
+      hb_compGenPCode1( HB_P_ZERO, HB_MACRO_PARAM );
+   }
+   else if( lNumber == 1 )
+   {
+      hb_compGenPCode1( HB_P_ONE, HB_MACRO_PARAM );
+   }
+   else if( HB_LIM_INT8( lNumber ) )
+   {
+      hb_compGenPCode2( HB_P_PUSHBYTE, (BYTE) lNumber, HB_MACRO_PARAM );
+   }
+   else if( HB_LIM_INT16( lNumber ) )
+   {
+      hb_compGenPCode3( HB_P_PUSHINT, HB_LOBYTE( lNumber ), HB_HIBYTE( lNumber ), HB_MACRO_PARAM );
+   }
+   else if( HB_LIM_INT32( lNumber ) )
+   {
+      BYTE pBuffer[ 5 ];
+      pBuffer[ 0 ] = HB_P_PUSHLONG;
+      HB_PUT_LE_UINT32( pBuffer + 1, lNumber );
+      hb_compGenPCodeN( pBuffer, sizeof( pBuffer ), HB_MACRO_PARAM );
    }
    else
-      hb_compGenPCode1( HB_P_ZERO, HB_MACRO_PARAM );
+   {
+      BYTE pBuffer[ 9 ];
+      pBuffer[ 0 ] = HB_P_PUSHLONGLONG;
+      HB_PUT_LE_UINT64( pBuffer + 1, lNumber );
+      hb_compGenPCodeN( pBuffer, sizeof( pBuffer ), HB_MACRO_PARAM );
+   }
 }
 
 
@@ -1390,7 +1418,13 @@ void hb_compGenMessage( char * szMsgName, HB_MACRO_DECL )
    pSym = hb_dynsymGet( szMsgName );
 
    hb_compGenPCode1( HB_P_MMESSAGE, HB_MACRO_PARAM );
-   hb_compGenPCodeN( ( BYTE * ) &pSym, sizeof( pSym ), HB_MACRO_PARAM );
+   {
+      BYTE byBuf[ sizeof( HB_DYNS_PTR ) ];
+
+      HB_PUT_PTR( byBuf, pSym );
+      hb_compGenPCodeN( byBuf, sizeof( pSym ), HB_MACRO_PARAM );
+   }
+   /* hb_compGenPCodeN( ( BYTE * ) &pSym, sizeof( pSym ), HB_MACRO_PARAM ); */
    hb_dynsymUnlock();
 }
 
@@ -1627,18 +1661,14 @@ void hb_compGenPushLogical( int iTrueFalse, HB_MACRO_DECL )
 /* generates the pcode to push a double number on the virtual machine stack */
 void hb_compGenPushDouble( double dNumber, BYTE bWidth, BYTE bDec, HB_MACRO_DECL )
 {
-#ifdef BIG_ENDIAN
-   double dLENumber = HB_DOUBLE_TO_LE( dNumber );
-#endif
+   BYTE pBuffer[ sizeof( double ) + sizeof( BYTE ) + sizeof( BYTE ) + 1 ];
 
-   hb_compGenPCode1( HB_P_PUSHDOUBLE, HB_MACRO_PARAM );
-#ifdef BIG_ENDIAN
-   hb_compGenPCodeN( ( BYTE * ) &dLENumber, sizeof( double ), HB_MACRO_PARAM );
-#else
-   hb_compGenPCodeN( ( BYTE * ) &dNumber, sizeof( double ), HB_MACRO_PARAM );
-#endif
-   hb_compGenPCode1( bWidth, HB_MACRO_PARAM );
-   hb_compGenPCode1( bDec, HB_MACRO_PARAM );
+   pBuffer[ 0 ] = HB_P_PUSHDOUBLE;
+   HB_PUT_LE_DOUBLE( &( pBuffer[ 1 ] ), dNumber );
+   pBuffer[ 1 + sizeof( double ) ] = bWidth;
+   pBuffer[ 1 + sizeof( double ) + sizeof( BYTE ) ] = bDec;
+
+   hb_compGenPCodeN( pBuffer, 1 + sizeof( double ) + sizeof( BYTE ) + sizeof( BYTE ), HB_MACRO_PARAM );
 }
 
 void hb_compGenPushFunCall( char * szFunName, HB_MACRO_DECL )

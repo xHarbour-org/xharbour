@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.19 2004/09/13 13:16:39 druzus Exp $
+ * $Id: hbapirdd.h,v 1.20 2004/11/02 20:45:52 guerra000 Exp $
  */
 
 /*
@@ -74,7 +74,7 @@ HB_EXTERN_BEGIN
 extern USHORT  HB_EXPORT hb_rddInsertAreaNode( char *szDriver );
 extern USHORT  HB_EXPORT hb_rddGetCurrentFieldPos( char * szName );
 extern int     HB_EXPORT hb_rddGetCurrentWorkAreaNumber( void );
-void           HB_EXPORT * hb_rddGetCurrentWorkAreaPointer( void );
+extern void    HB_EXPORT * hb_rddGetCurrentWorkAreaPointer( void );
 extern ERRCODE HB_EXPORT hb_rddSelectWorkAreaAlias( char * szAlias );
 extern ERRCODE HB_EXPORT hb_rddSelectWorkAreaNumber( int iArea );
 extern ERRCODE HB_EXPORT hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias );
@@ -498,6 +498,10 @@ typedef FIELD * LPFIELD;
 typedef struct _AREA
 {
    struct _RDDFUNCS * lprfsHost; /* Virtual method table for this workarea */
+#if 0
+   /* I'll add this soon, Druzus */
+   struct _RDDFUNCS * lprfsSuper;/* Virtual super method table for this workarea */
+#endif
    USHORT uiArea;                /* The number assigned to this workarea */
    void * atomAlias;             /* Pointer to the alias symbol for this workarea */
    USHORT uiFieldExtent;         /* Total number of fields allocated */

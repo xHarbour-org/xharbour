@@ -1,5 +1,5 @@
 /*
- * $Id: base64x.c,v 1.2 2004/08/05 16:41:45 paultucker Exp $
+ * $Id: base64x.c,v 1.3 2004/10/18 10:22:27 likewolf Exp $
  */
 
 /*
@@ -54,7 +54,6 @@
 #include <string.h>
 #include <limits.h>
 #include <stdlib.h>
-
 #include "hbapi.h"
 
 /*

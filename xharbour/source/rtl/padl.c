@@ -1,5 +1,5 @@
 /*
- * $Id: padl.c,v 1.5 2004/03/02 00:28:18 druzus Exp $
+ * $Id: padl.c,v 1.6 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -79,7 +79,7 @@ HB_FUNC( PADL )
 
          hb_xmemcpy( szResult + lPos, szText, ( LONG ) ulSize );
 
-         cPad = ( ISCHAR( 3 ) ? *( hb_parcx( 3 ) ) : ' ' );
+         cPad = ( ISCHAR( 3 ) ? *( hb_parc( 3 ) ) : ' ' );
 
          for(; lPos > 0; lPos-- )
          {

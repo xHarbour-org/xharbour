@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.30 2004/08/05 17:11:13 paultucker Exp $
+ * $Id: hbcomp.h,v 1.31 2004/10/20 03:14:40 ronpinkas Exp $
  */
 
 /*
@@ -363,12 +363,12 @@ extern void hb_compGenMessageData( char * szMsg );     /* generates an underscor
 extern void hb_compGenPopVar( char * szVarName );         /* generates the pcode to pop a value from the virtual machine stack onto a variable */
 extern void hb_compGenPushDouble( double dNumber, BYTE bWidth, BYTE bDec ); /* Pushes a number on the virtual machine stack */
 extern void hb_compGenPushFunCall( char * );             /* generates the pcode to push function's call */
-extern void hb_compGenPushVar( char * szVarName );        /* generates the pcode to push a variable value to the virtual machine stack */
+extern void hb_compGenPushVar( char * szVarName );       /* generates the pcode to push a variable value to the virtual machine stack */
 extern void hb_compGenPushVarRef( char * szVarName );    /* generates the pcode to push a variable by reference to the virtual machine stack */
-extern void hb_compGenPushMemVarRef( char * szVarName );    /* generates the pcode to push a memvar variable by reference to the virtual machine stack */
+extern void hb_compGenPushMemVarRef( char * szVarName ); /* generates the pcode to push a memvar variable by reference to the virtual machine stack */
 extern void hb_compGenPushInteger( int iNumber );        /* Pushes a integer number on the virtual machine stack */
 extern void hb_compGenPushLogical( int iTrueFalse );     /* pushes a logical value on the virtual machine stack */
-extern void hb_compGenPushLong( LONG lNumber );          /* Pushes a LONG number on the virtual machine stack */
+extern void hb_compGenPushLong( HB_LONG lNumber );       /* Pushes an integer number on the virtual machine stack */
 extern void hb_compGenPushNil( void );                   /* Pushes nil on the virtual machine stack */
 extern void hb_compGenPushString( char * szText, ULONG ulLen );       /* Pushes a string on the virtual machine stack */
 extern void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias ); /* Pushes a symbol on to the Virtual machine stack */

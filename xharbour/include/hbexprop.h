@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.12 2004/05/24 07:34:00 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.13 2004/10/27 05:27:36 ronpinkas Exp $
  */
 
 /*
@@ -194,11 +194,11 @@ typedef struct HB_EXPR_
       } asRTVar;      /* PUBLIC or PRIVATE variable declaration */
       struct
       {
-         LONG lVal;           /* LONG value */
-         double dVal;         /* double value */
-         unsigned char bWidth; /* unsigned char used intentionally */
-         unsigned char bDec;  /* unsigned char used intentionally */
-         unsigned char NumType;    /* used to distinguish LONG and DOUBLE */
+         HB_LONG lVal;               /* integer value */
+         double dVal;                  /* double value */
+         unsigned char bWidth;         /* unsigned char used intentionally */
+         unsigned char bDec;           /* unsigned char used intentionally */
+         unsigned char NumType;        /* used to distinguish LONG and DOUBLE */
       } asNum;
       struct
       {
@@ -309,7 +309,7 @@ HB_EXPR_PTR hb_compExprNewDummy( void );
 HB_EXPR_PTR hb_compExprNewEmpty( void );
 HB_EXPR_PTR hb_compExprNewNil( void );
 HB_EXPR_PTR hb_compExprNewDouble( double, BYTE, BYTE );
-HB_EXPR_PTR hb_compExprNewLong( LONG );
+HB_EXPR_PTR hb_compExprNewLong( HB_LONG );
 HB_EXPR_PTR hb_compExprNewString( char * );
 HB_EXPR_PTR hb_compExprNewLogical( int );
 HB_EXPR_PTR hb_compExprNewSelf( void );

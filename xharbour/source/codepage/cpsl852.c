@@ -1,15 +1,14 @@
 /*
- * $Id: cdphr852.c,v 1.1 2003/12/18 19:33:33 ronpinkas Exp $
+ * $Id: cdpsl852.c,v 1.3 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( HR852 )
+ * National Collation Support Module ( SL852 )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
  * 2003 Mitja Podgornik <Mitja.Podgornik@zgs.gov.si>
- * 2003 Vlado Miholic <Vladimir.Miholic@sk.hinet.hr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,8 +51,8 @@
  *
  */
 
-/* Language name: Croatien */
-/* ISO language code (2 chars): HR */
+/* Language name: Slovenian */
+/* ISO language code (2 chars): SL */
 /* Codepage: 852 */
 
 #include <ctype.h>
@@ -85,17 +84,17 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "HR852",
+static HB_CODEPAGE s_codepage = { "SL852",
     CPID_852,UNITB_852,NUMBER_OF_CHARACTERS,
-    "ABCè¨D—EFGHIJKLMNOPQRSÊTUVWZ¶XY","abcÜüd–efghijklmnopqrsÁtuvwzßxy",
+    "ABC¨èD—EFGHIJKLMNOPQRSÊTUVWZ¶XY","abcüd–efghijklmnopqrsÁtuvwzßxy",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( HR852 );
+HB_CODEPAGE_ANNOUNCE( SL852 );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_HR852 )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_SL852 )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_HR852 )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_SL852 )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_HR852
+   #pragma startup hb_codepage_Init_SL852
 #endif
 

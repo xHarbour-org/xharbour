@@ -1,5 +1,5 @@
 /*
- * $Id: hbtest.prg,v 1.6 2004/02/12 07:37:57 andijahja Exp $
+ * $Id: hbtest.prg,v 1.7 2004/03/03 00:07:37 druzus Exp $
  */
 
 /*
@@ -608,7 +608,7 @@ FUNCTION HB_SToD( cDate )
 #endif
 
 STATIC FUNCTION BADFNAME()
-#ifdef __PLATFORM__Linux
+#ifdef __PLATFORM__UNIX
    return "*BADNAM/*.MEM"
 #else
    return "*BADNAM*.MEM"
@@ -617,4 +617,3 @@ STATIC FUNCTION BADFNAME()
 
 /* Don't change the position of this #include. */
 #include "rt_init.ch"
-

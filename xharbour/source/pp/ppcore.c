@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.188 2004/11/04 19:50:06 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.189 2004/11/05 04:37:46 ronpinkas Exp $
  */
 
 /*
@@ -158,8 +158,8 @@ char *strpbrkSkipStrings( const char* string, const char *strCharSet );
 
 int hb_pp_NextToken( char** pLine, char *sToken );
 
-#define ISID( c )  ( isalpha( ( int ) c ) || ( c ) == '_' || ( c ) > 0x7E )
-#define ISNAME( c )  ( isalnum( ( int ) c ) || ( c ) == '_' || ( c ) > 0x7E )
+#define ISID( c )  ( isalpha( ( BYTE ) c ) || ( c ) == '_' || ( c ) > 0x7E )
+#define ISNAME( c )  ( isalnum( ( BYTE ) c ) || ( c ) == '_' || ( c ) > 0x7E )
 /** Added by Giancarlo Niccolai 2003-06-20 */
 #define IS_ESC_STRING( c ) ( toupper( c ) == 'E' && (&c)[1] == '\"' )
 /** END **/
@@ -675,7 +675,7 @@ char * hb_ppPlatform( void )
             int i;
 
             /* Skip the leading spaces (Win95B, Win98) */
-            for( i = 0; osVer.szCSDVersion[ i ] != '\0' && isspace( ( int ) osVer.szCSDVersion[ i ] ); i++ );
+            for( i = 0; osVer.szCSDVersion[ i ] != '\0' && isspace( ( BYTE ) osVer.szCSDVersion[ i ] ); i++ );
 
             if( osVer.szCSDVersion[ i ] != '\0' )
             {
@@ -767,8 +767,11 @@ void hb_pp_Init( void )
       *pDst++ = '"';
       *pDst = 0;
 
-      hb_pp_AddDefine( (char *) sOS, (char *) sVer );
-
+      hb_pp_AddDefine( sOS, sVer );
+#ifdef HB_OS_UNIX
+      strcpy( &sOS[12], "UNIX" );
+      hb_pp_AddDefine( sOS, sVer );
+#endif
       hb_xfree( szPlatform );
    }
 
@@ -801,6 +804,27 @@ void hb_pp_Init( void )
 
       sprintf( szResult, "\"%02d:%02d:%02d\"", oTime->tm_hour, oTime->tm_min, oTime->tm_sec );
       hb_pp_AddDefine( "__TIME__", szResult );
+   }
+
+   {
+      char szResult[ 11 ];
+
+      sprintf( szResult, "%d", ( int ) sizeof( void * ) );
+#if defined( HB_ARCH_16BIT )
+      hb_pp_AddDefine( "__ARCH16BIT__", szResult );
+#elif defined( HB_ARCH_32BIT )
+      hb_pp_AddDefine( "__ARCH32BIT__", szResult );
+#elif defined( HB_ARCH_64BIT )
+      hb_pp_AddDefine( "__ARCH64BIT__", szResult );
+#endif
+
+#if defined( HB_LITTLE_ENDIAN )
+      hb_pp_AddDefine( "__LITTLE_ENDIAN__", szResult );
+#elif defined( HB_BIG_ENDIAN )
+      hb_pp_AddDefine( "__BIG_ENDIAN__", szResult );
+#elif defined( HB_PDP_ENDIAN )
+      hb_pp_AddDefine( "__PDP_ENDIAN__", szResult );
+#endif
    }
 
 #ifdef HARBOUR_START_PROCEDURE
@@ -2009,7 +2033,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 
               while( *pTmp && *pTmp != '>' )
               {
-                 if( exptype != 2 && isalnum( *pTmp ) )
+                 if( exptype != 2 && isalnum( (BYTE) *pTmp ) )
                  {
                     break;
                  }
@@ -3213,7 +3237,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
   *(ptro + *lenres) = '\0';
 
   //printf( "%s\n", ptro );
-  s_bArray = isalnum( (int) sKey[0] ) || strchr( "])}._", sKey[0] );
+  s_bArray = isalnum( ( BYTE ) sKey[0] ) || strchr( "])}._", sKey[0] );
   strotrim( ptro, 2 ); // Removing excess spaces.
   //printf( "%s\n", ptro );
 
@@ -3935,7 +3959,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
          case STATE_ID:
          case STATE_ID_END:
          {
-            if( ( ( ISNAME(**ptri) || **ptri=='\\' || ( **ptri == '&' && isspace( (*ptri)[1] ) == FALSE ) ) && State == STATE_ID_END ) || **ptri == ',' )
+            if( ( ( ISNAME(**ptri) || **ptri=='\\' || ( **ptri == '&' && isspace( (BYTE) (*ptri)[1] ) == FALSE ) ) && State == STATE_ID_END ) || **ptri == ',' )
             {
                if( **ptri == ',' )
                {
@@ -4096,7 +4120,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                }
                continue;
             }
-            else if( strchr( sZnaki, **ptri ) || ( **ptri == '&' && isspace( (*ptri)[1] ) ) )
+            else if( strchr( sZnaki, **ptri ) || ( **ptri == '&' && isspace( (BYTE) (*ptri)[1] ) ) )
             {
                /* Ron Pinkas added 2000-06-02 */
                if( **ptri == '.' && bMacro )
@@ -4148,7 +4172,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                         // always accept as extended marker, or end of stream.
                         State = STATE_ID;
                      }
-                     else if( isdigit((int) *(*ptri + 1) ) )
+                     else if( isdigit( ( BYTE ) *(*ptri + 1) ) )
                      {
                         int iLen;
 
@@ -4156,13 +4180,13 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                         {
                            //printf( "Back scan: %c %i of %i\n", *(*ptri - iLen), iLen, lens );
 
-                           if( isalpha((int) *(*ptri - iLen) ) )
+                           if( isalpha( ( BYTE ) *(*ptri - iLen) ) )
                            {
                               //printf( "Rejected: >%s< after: >%.*s<\n", *ptri, lens, expreal - lens  );
                               rez = TRUE;
                               break;
                            }
-                           else if( ! isdigit((int) *(*ptri - iLen) ) )
+                           else if( ! isdigit( ( BYTE ) *(*ptri - iLen) ) )
                            {
                               break;
                            }
@@ -4182,7 +4206,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            lens++;
 
                            // grab while digits
-                           while( isdigit((int) **ptri ) && lens < maxrez )
+                           while( isdigit( ( BYTE ) **ptri ) && lens < maxrez )
                            {
                               //printf( "Grabing: %c\n", **ptri );
 
@@ -4197,7 +4221,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
                            //printf( "Stopper: %c\n", **ptri );
 
-                           if( isalpha((int) **ptri ) )
+                           if( isalpha( ( BYTE ) **ptri ) )
                            {
                               rez = TRUE;
                            }
@@ -4210,7 +4234,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            }
                         }
                      }
-                     else if( isalpha((int) *(*ptri + 1) ) || *(*ptri + 1) == '_' )
+                     else if( isalpha( ( BYTE ) *(*ptri + 1) ) || *(*ptri + 1) == '_' )
                      {
                         // Accept even following a digit.
                         State = STATE_ID;
@@ -5543,7 +5567,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
        {
           char *pTmp = expreal + 1;
 
-          while( isspace( *pTmp ) )
+          while( isspace( (BYTE) *pTmp ) )
           {
              pTmp++;
           }
@@ -5582,7 +5606,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
     {
        char *pTmp = expreal + 1;
 
-       while( isspace( *pTmp ) )
+       while( isspace( (BYTE) *pTmp ) )
        {
           pTmp++;
        }
@@ -6105,11 +6129,11 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
               {
                  lPos += 5;
               }
-              else if( lPos && isdigit((int) szText[lPos - 1] ) && isdigit((int) szText[lPos + 1] ) )
+              else if( lPos && isdigit( ( BYTE ) szText[lPos - 1] ) && isdigit( ( BYTE ) szText[lPos + 1] ) )
               {
                  lPos++;
 
-                 while( isdigit((int) szText[lPos] ) )
+                 while( isdigit( ( BYTE ) szText[lPos] ) )
                  {
                     lPos++;
                  }
@@ -6676,12 +6700,12 @@ static int NextName( char ** sSource, char * sDest )
      (*sSource)++;
   }
 
-  if( ! isalpha((int) **sSource ) )
+  if( ! isalpha( ( BYTE ) **sSource ) )
   {
      s_bNewLine = FALSE;
   }
 
-  while( **sSource != '\0' && ( State != STATE_NORMAL || ( **sSource != '_' && ! isalpha((int) **sSource ) ) ) )
+  while( **sSource != '\0' && ( State != STATE_NORMAL || ( **sSource != '_' && ! isalpha( ( BYTE ) **sSource ) ) ) )
   {
      if( State == STATE_QUOTE1 )
      {
@@ -7066,7 +7090,7 @@ static int NextParm( char ** sSource, char * sDest )
 
 static BOOL IsIdentifier( char *szProspect )
 {
-   if( isalpha( (int) szProspect[0] ) || szProspect[0] == '_' )
+   if( isalpha( ( BYTE ) szProspect[0] ) || szProspect[0] == '_' )
    {
       int i = 1;
 
@@ -7326,13 +7350,13 @@ int hb_pp_NextToken( char** pLine, char *sToken )
    }
    /* END - Added by Giancarlo Niccolai */
 
-   if( isalpha((int) sLine[0] ) || sLine[0] == '_' )
+   if( isalpha( ( BYTE ) sLine[0] ) || sLine[0] == '_' )
    {
       sToken[0] = sLine[0];
       Counter = 1;
 
       // Why did I have the '\\' is NOT clear - document if and when reinstating!!!
-      while( isalnum((int) sLine[Counter] ) || sLine[Counter] == '_'  ) //|| sLine[Counter] == '\\' )
+      while( isalnum( ( BYTE ) sLine[Counter] ) || sLine[Counter] == '_'  ) //|| sLine[Counter] == '\\' )
       {
          sToken[Counter] = sLine[Counter];
          Counter++;
@@ -7341,24 +7365,24 @@ int hb_pp_NextToken( char** pLine, char *sToken )
       sToken[Counter] = '\0';
       goto Done;
    }
-   else if( isdigit((int) sLine[0] ) )
+   else if( isdigit( ( BYTE ) sLine[0] ) )
    {
       sToken[0] = sLine[0];
       Counter = 1;
-      while( isdigit((int) sLine[Counter] ) || sLine[Counter] == '\\' )
+      while( isdigit( ( BYTE ) sLine[Counter] ) || sLine[Counter] == '\\' )
       {
          sToken[Counter] = sLine[Counter];
          Counter++;
       }
 
       // Consume the point (and subsequent digits) only if digits follow...
-      if( sLine[Counter] == '.' && isdigit((int) sLine[Counter + 1] ) )
+      if( sLine[Counter] == '.' && isdigit( ( BYTE ) sLine[Counter + 1] ) )
       {
          sToken[Counter] = '.';
          Counter++;
          sToken[Counter] = sLine[Counter];
          Counter++;
-         while( isdigit((int) sLine[Counter] ) || sLine[Counter] == '\\' )
+         while( isdigit( ( BYTE ) sLine[Counter] ) || sLine[Counter] == '\\' )
          {
             sToken[Counter] = sLine[Counter];
             Counter++;
@@ -7369,12 +7393,12 @@ int hb_pp_NextToken( char** pLine, char *sToken )
       sToken[Counter] = '\0';
       goto Done;
    }
-   else if( sLine[0] == '.' && isdigit((int) sLine[1] ) )
+   else if( sLine[0] == '.' && isdigit( ( BYTE ) sLine[1] ) )
    {
       sToken[0] = '.';
       sToken[1] = sLine[1];
       Counter = 2;
-      while( isdigit((int) sLine[Counter] ) )
+      while( isdigit( ( BYTE ) sLine[Counter] ) )
       {
          sToken[Counter] = sLine[Counter];
          Counter++;
@@ -7555,7 +7579,7 @@ int hb_pp_NextToken( char** pLine, char *sToken )
    }
    else
    {
-      s_bArray = ( isalnum((int) sToken[0] ) || strchr( "])}._", sToken[0] ) );
+      s_bArray = ( isalnum( ( BYTE ) sToken[0] ) || strchr( "])}._", sToken[0] ) );
    }
 
    while( sLine[0] == ' ' || sLine[0] == '\t' )
@@ -7608,7 +7632,7 @@ char *strpbrkSkipStrings( const char* string, const char *strCharSet )
        }
        else if( cChar == '[' )
        {
-          if( ! ( isalpha( cLastChar  ) || isdigit( cLastChar ) || strchr( "])}_.", cLastChar ) ) )
+          if( ! ( isalpha( (BYTE) cLastChar  ) || isdigit( (BYTE) cLastChar ) || strchr( "])}_.", cLastChar ) ) )
           {
              while( string[ ++ulAt ] != ']' )
              {

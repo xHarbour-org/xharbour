@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbf.h,v 1.5 2003/11/30 12:32:29 druzus Exp $
+ * $Id: hbdbf.h,v 1.6 2004/03/18 21:34:54 druzus Exp $
  */
 
 /*
@@ -55,12 +55,6 @@
 
 #include "hbapirdd.h"
 
-/* 23/10/00 - maurilio.longo@libero.it
-   When using GCC under OS/2 pack(1) byte aligns every structure */
-#if defined(__EMX__) && ! defined(__RSXNT__)
-   #pragma pack(1)
-#endif
-
 HB_EXTERN_BEGIN
 
 /* DBF header */
@@ -100,10 +94,5 @@ typedef struct _DBFFIELD
 typedef DBFFIELD * LPDBFFIELD;
 
 HB_EXTERN_END
-
-#if defined(__EMX__) && ! defined(__RSXNT__)
-   #pragma pack()
-#endif
-
 
 #endif /* HB_DBF_H_ */

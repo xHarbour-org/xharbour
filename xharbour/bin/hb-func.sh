@@ -1,11 +1,11 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.32 2004/11/01 05:38:08 likewolf Exp $
+# $Id: hb-func.sh,v 1.33 2004/11/01 21:01:41 druzus Exp $
 #
 
 # ---------------------------------------------------------------
-# Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
+# Copyright 2003 Przemyslaw Czerpak <druzus@priv.onet.pl>
 # small set of functions used by xHarbour scripts
 # warning: some bash extensions are used
 #
@@ -36,9 +36,9 @@ get_hbver()
 
     hb_rootdir="${1-.}"
     FVER="${hb_rootdir}/include/hbver.h"
-    MAJOR=`sed -e '/HB_VER_MAJOR/    s/[^0-9]*\([^ ]*\).*/\1/g p' -e 'd' "${FVER}"`
-    MINOR=`sed -e '/HB_VER_MINOR/    s/[^0-9]*\([^ ]*\).*/\1/g p' -e 'd' "${FVER}"`
-    REVIS=`sed -e '/HB_VER_REVISION/ s/[^0-9]*\([^ ]*\).*/\1/g p' -e 'd' "${FVER}"`
+    MAJOR=`sed -e '/HB_VER_MAJOR/    !d' -e 's/[^0-9]*\([^ ]*\).*/\1/g' "${FVER}"`
+    MINOR=`sed -e '/HB_VER_MINOR/    !d' -e 's/[^0-9]*\([^ ]*\).*/\1/g' "${FVER}"`
+    REVIS=`sed -e '/HB_VER_REVISION/ !d' -e 's/[^0-9]*\([^ ]*\).*/\1/g' "${FVER}"`
     echo -n "${MAJOR}.${MINOR}.${REVIS}"
 }
 
@@ -100,7 +100,10 @@ mk_hbtools()
     elif [ "${HB_COMPILER}" = "djgpp" ]; then
         HB_SYS_LIBS="${HB_SYS_LIBS}"
     else
-        if [ "${HB_NCURSES_194}" = "yes" ]; then
+        if [ "${HB_ARCHITECTURE}" = "sunos" ]; then
+            HB_SYS_LIBS="${HB_SYS_LIBS} -lrt"
+            HB_CRS_LIB="curses"
+        elif [ "${HB_NCURSES_194}" = "yes" ]; then
             HB_CRS_LIB="ncur194"
         else
             HB_CRS_LIB="ncurses"
@@ -114,7 +117,7 @@ mk_hbtools()
 [ "\$BASH" ] || exec bash \`which \$0\` \${1+"\$@"}
 #
 # ---------------------------------------------------------------
-# Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
+# Copyright 2003 Przemyslaw Czerpak <druzus@priv.onet.pl>
 # simple script to build binaries .tgz from xHarbour sources
 #
 # See doc/license.txt for licensing terms.
@@ -224,13 +227,13 @@ HB_GT_STAT=""
 [ -z "\${HB_GT_REQ}" ] && HB_GT_REQ="\${HB_GT}"
 if [ "\${HB_MG}" != "yes" ]; then
     if [ "\${HB_STATIC}" = "yes" ] || [ "\${HB_STATIC}" = "full" ]; then
-        HB_GT_STAT=\`echo \${HB_GT_REQ}|tr A-Z a-z\`
+        HB_GT_STAT=\`echo \${HB_GT_REQ}|tr "[A-Z]" "[a-z]"\`
     fi
     HB_GT_REQ=""
 else
-    HB_GT_REQ=\`echo \${HB_GT_REQ}|tr a-z A-Z\`
+    HB_GT_REQ=\`echo \${HB_GT_REQ}|tr "[a-z]" "[A-Z]"\`
 fi
-HB_MAIN_FUNC=\`echo \${HB_MAIN_FUNC}|tr a-z A-Z\`
+HB_MAIN_FUNC=\`echo \${HB_MAIN_FUNC}|tr "[a-z]" "[A-Z]"\`
 
 # set environment variables
 export HB_ARCHITECTURE="${HB_ARCHITECTURE}"
@@ -261,6 +264,7 @@ if [ -f "\${HB_LIB_INSTALL}/libgtcrs.a" ]; then
 fi
 if [ "\${HB_WITHOUT_X11}" != "yes" ]; then
     if [ -f "\${HB_LIB_INSTALL}/libgtxvt.a" ] || [ -f "\${HB_LIB_INSTALL}/libgtxwc.a" ]; then
+        [ -d "/usr/X11R6/lib64" ] && SYSTEM_LIBS="\${SYSTEM_LIBS} -L/usr/X11R6/lib64"
         SYSTEM_LIBS="\${SYSTEM_LIBS} -L/usr/X11R6/lib -lX11"
     fi
 fi
@@ -313,7 +317,7 @@ do
         fi
     fi
 done
-if [ "\${HB_ARCHITECTURE}" = "darwin" ]; then
+if [ "\${HB_ARCHITECTURE}" = "darwin" ] || [ "\${HB_ARCHITECTURE}" = "sunos" ]; then
     HARBOUR_LIBS="\${HARBOUR_LIBS} \${HARBOUR_LIBS}"
 else
     HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
@@ -330,6 +334,8 @@ fi
 
 if [ "\${HB_ARCHITECTURE}" = "darwin" ]; then
     CC_OPT="-no-cpp-precomp -Wno-long-double"
+elif [ "\${HB_ARCHITECTURE}" = "sunos" ]; then
+    HB_STRIP="no"
 fi
 
 FOUTC1="\${FILEOUT%.*}.c"

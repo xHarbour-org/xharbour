@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.73 2004/10/27 05:27:37 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.74 2004/10/30 18:17:10 ronpinkas Exp $
  */
 
 /*
@@ -144,9 +144,9 @@ static void hb_compDebugStart( void ) { };
 
 %union                  /* special structure used by lex and yacc to share info */
 {
-   char * string;       /* to hold a string returned by lex */
-   int    iNumber;      /* to hold a temporary integer number */
-   LONG   lNumber;      /* to hold a temporary long number */
+   char *    string;       /* to hold a string returned by lex */
+   int       iNumber;      /* to hold a temporary integer number */
+   HB_LONG   lNumber;      /* to hold a temporary long number */
    struct
    {
       int    iNumber;      /* to hold a number returned by lex */
@@ -154,8 +154,8 @@ static void hb_compDebugStart( void ) { };
    } valInteger;
    struct
    {
-      LONG   lNumber;      /* to hold a long number returned by lex */
-      char * szValue;
+      HB_LONG   lNumber;   /* to hold a long number returned by lex */
+      char *    szValue;
    } valLong;
    struct
    {
@@ -231,9 +231,9 @@ static void hb_compDebugStart( void ) { };
 /*the highest precedence*/
 
 %type <string>  IdentName IDENTIFIER LITERAL MACROVAR MACROTEXT CompTimeStr
-%type <valDouble>  NUM_DOUBLE
-%type <valInteger> NUM_INTEGER
-%type <valLong>    NUM_LONG
+%type <valDouble>   NUM_DOUBLE
+%type <valInteger>  NUM_INTEGER
+%type <valLong>     NUM_LONG
 %type <iNumber> FunScope
 %type <iNumber> Params ParamList
 %type <iNumber> IfBegin VarList ExtVarList
@@ -521,9 +521,9 @@ NumValue   : NUM_DOUBLE          { $$ = hb_compExprNewDouble( $1.dNumber, $1.bWi
            | NUM_LONG            { $$ = hb_compExprNewLong( $1.lNumber ); }
            ;
 
-NumAlias   : NUM_INTEGER ALIASOP      { $$ = hb_compExprNewLong( $1.iNumber ); }
-           | NUM_LONG    ALIASOP      { $$ = hb_compExprNewLong( $1.lNumber ); }
-           | NUM_DOUBLE  ALIASOP      { $$ = hb_compErrorAlias( hb_compExprNewDouble( $1.dNumber, $1.bWidth, $1.bDec ) ); }
+NumAlias   : NUM_INTEGER  ALIASOP      { $$ = hb_compExprNewLong( $1.iNumber ); }
+           | NUM_LONG     ALIASOP      { $$ = hb_compExprNewLong( $1.lNumber ); }
+           | NUM_DOUBLE   ALIASOP      { $$ = hb_compErrorAlias( hb_compExprNewDouble( $1.dNumber, $1.bWidth, $1.bDec ) ); }
            ;
 
 /* NIL value
@@ -1762,7 +1762,7 @@ Declaration: DECLARE IdentName '(' { hb_compDeclaredAdd( $2 ); hb_comp_szDeclare
                    if( ! hb_comp_pLastDeclared->Extended.pClass )
                    {
                      hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, hb_comp_pLastDeclared->szName );
-                     hb_comp_pLastDeclared->cType = ( isupper(  ( int ) hb_comp_cVarType ) ? 'O' : 'o' );
+                     hb_comp_pLastDeclared->cType = ( isupper(  ( BYTE ) hb_comp_cVarType ) ? 'O' : 'o' );
                    }
 
                    /* Resetting */
@@ -1800,7 +1800,7 @@ DecMethod  : IdentName '(' { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLa
                    if( ! hb_comp_pLastMethod->Extended.pClass )
                    {
                      hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, hb_comp_pLastMethod->szName );
-                     hb_comp_pLastMethod->cType = ( isupper(  ( int ) hb_comp_cVarType ) ? 'O' : 'o' );
+                     hb_comp_pLastMethod->cType = ( isupper( ( BYTE ) hb_comp_cVarType ) ? 'O' : 'o' );
                    }
 
                    hb_comp_szFromClass = NULL;
@@ -1829,7 +1829,7 @@ DecData    : IdentName { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastCl
                    if( ! hb_comp_pLastMethod->Extended.pClass )
                    {
                      hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, hb_comp_pLastMethod->szName );
-                     hb_comp_pLastMethod->cType = ( isupper(  ( int ) hb_comp_cVarType ) ? 'O' :'o' );
+                     hb_comp_pLastMethod->cType = ( isupper( ( BYTE ) hb_comp_cVarType ) ? 'O' :'o' );
                    }
                  }
                  else
@@ -2100,7 +2100,7 @@ EndSwitch  : END
                           break;
 
                         case HB_P_JUMPFALSEFAR :
-                          lOffset = HB_PCODE_MK24BIT( &( hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ] ) ) - 4;
+                          lOffset = HB_PCODE_MKUINT24( &( hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ] ) ) - 4;
                           hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ]     = HB_LOBYTE( lOffset );
                           hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) + 1 ] = HB_HIBYTE( lOffset );
                           hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) + 2 ] = HB_LOBYTE( HB_HIWORD( lOffset ) );
@@ -2260,7 +2260,7 @@ Default    : DEFAULT
                           break;
 
                         case HB_P_JUMPFALSEFAR :
-                          lOffset = HB_PCODE_MK24BIT( &( hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ] ) ) - 4;
+                          lOffset = HB_PCODE_MKUINT24( &( hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ] ) ) - 4;
                           hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) ]     = HB_LOBYTE( lOffset );
                           hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) + 1 ] = HB_HIBYTE( lOffset );
                           hb_comp_functions.pLast->pCode[ ( ULONG ) ( $<iNumber>0 ) + 2 ] = HB_LOBYTE( HB_HIWORD( lOffset ) );

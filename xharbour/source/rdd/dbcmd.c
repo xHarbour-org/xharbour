@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.132 2004/10/01 01:56:57 druzus Exp $
+ * $Id: dbcmd.c,v 1.133 2004/11/02 20:45:53 guerra000 Exp $
  */
 
 /*
@@ -413,7 +413,7 @@ ERRCODE HB_EXPORT hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNC
    }
 
    /* Copy the pSuperTable into pTable */
-   if( !szDrvName || ( uiCount = strlen( ( const char * ) szDrvName ) ) == 0 )
+   if( !szDrvName || ! *szDrvName )
    {
       /* no name for inherited driver - use the default one */
       memcpy( pTable, &waTable, sizeof( RDDFUNCS ) );
@@ -422,7 +422,7 @@ ERRCODE HB_EXPORT hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNC
    else
    {
       char szSuperName[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
-      hb_strncpyUpper( szSuperName, ( char * ) szDrvName, HB_MIN( uiCount, HARBOUR_MAX_RDD_DRIVERNAME_LENGTH ) );
+      hb_strncpyUpper( szSuperName, ( char * ) szDrvName, HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
       pRddNode = hb_rddFindNode( szSuperName, NULL );
 
       if( !pRddNode )
@@ -1466,16 +1466,9 @@ HB_FUNC( DBCREATE )
 
    uiPrevArea = hb_rddGetCurrentWorkAreaNumber();
 
-   uiLen = ( USHORT ) hb_parclen( 3 );
-
-   if( uiLen > 0 )
+   if( hb_parclen( 3 ) > 0 )
    {
-      if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
-      {
-         uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
-      }
-
-      hb_strncpyUpper( szDriverBuffer, hb_parc( 3 ), uiLen );
+      hb_strncpyUpper( szDriverBuffer, hb_parc( 3 ), HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
       szDriver = szDriverBuffer;
    }
    else
@@ -2387,15 +2380,9 @@ HB_FUNC( DBUSEAREA )
       hb_rddReleaseCurrentArea();
    }
 
-   uiLen = ( USHORT ) hb_parclen( 2 );
-
-   if( ISCHAR(2) && ( uiLen > 0 ) )
+   if( hb_parclen( 2 ) > 0 )
    {
-      if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
-      {
-         uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
-      }
-      hb_strncpyUpper( szDriverBuffer, hb_parcx( 2 ), uiLen );
+      hb_strncpyUpper( szDriverBuffer, hb_parc( 2 ), HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
       szDriver = szDriverBuffer;
    }
    else
@@ -2649,35 +2636,27 @@ HB_FUNC( FIELDNAME )
 HB_FUNC( FIELDPOS )
 {
    HB_THREAD_STUB
-   /* char szName[ HARBOUR_MAX_RDD_FIELDNAME_LENGTH ]; */
-   char * szName;
    AREAP pArea = HB_CURRENT_WA;
 
    if( pArea )
    {
-      char *szFieldName = hb_parcx( 1 );
+      int iLen = hb_parclen( 1 );
 
-      if( szFieldName )
+      if( iLen > 0 )
       {
-         int iLen = hb_parclen( 1 );
-
+         /* char szName[ HARBOUR_MAX_RDD_FIELDNAME_LENGTH ]; */
+         char * szName;
          if( iLen > (int) pArea->uiMaxFieldNameLength )
          {
             iLen = (int) pArea->uiMaxFieldNameLength;
          }
-
          szName = ( char * ) hb_xgrab( iLen + 1 );
-
-         hb_strncpyUpperTrim( szName, szFieldName, iLen );
-
-         hb_retni( hb_rddFieldIndex( pArea, szName ) );
-
+         hb_strncpyUpperTrim( szName, hb_parc( 1 ), iLen );
          hb_xfree( szName );
-
+         hb_retni( hb_rddFieldIndex( pArea, szName ) );
          return;
       }
    }
-
    hb_retni( 0 );
 }
 
@@ -4961,7 +4940,7 @@ static void hb_AppendToDb( PHB_ITEM pDelimitedFile, PHB_ITEM pDelimiter )
 
                      /* It's a NUMERIC field */
                      case 'N':
-                        hb_itemPutND( &FieldValue, hb_strVal( cBuffer ) );
+                        hb_itemPutND( &FieldValue, hb_strVal( cBuffer, strlen( cBuffer ) ) );
                         break;
 
                      /* It's a CHARACTER field */
@@ -5058,9 +5037,6 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
       // an "N" field
       case HB_IT_INTEGER:
       case HB_IT_LONG:
-#ifndef HB_LONG_LONG_OFF
-      case HB_IT_LONGLONG:
-#endif
       case HB_IT_DOUBLE:
       {
          char *szResult = hb_itemStr( pValue, NULL, NULL );
@@ -5576,9 +5552,6 @@ static BOOL hb_ExportBufSqlVar( PHB_FILEBUF pFileBuf, PHB_ITEM pValue, char *cDe
 
       case HB_IT_INTEGER:
       case HB_IT_LONG:
-#ifndef HB_LONG_LONG_OFF
-      case HB_IT_LONGLONG:
-#endif
       case HB_IT_DOUBLE:
       {
          char szResult[ HB_MAX_DOUBLE_LENGTH ];

@@ -5,18 +5,18 @@
 ROOT = ../../
 
 ifeq ($(HB_ARCHITECTURE),w32)
-      C_MAIN := mainstd.c mainwin.c
-   ifeq ($(HB_COMPILER),mingw32)
-      ifeq ($(HB_MULTI_GT),yes)
+    C_MAIN := mainstd.c mainwin.c
+    ifeq ($(HB_COMPILER),mingw32)
+        ifeq ($(HB_MULTI_GT),yes)
             C_MAIN := mainwin.c
-      endif
-   endif
+        endif
+    endif
 else
-      ifeq ($(HB_ARCHITECTURE),os2)
-            C_MAIN := mainstd.c 
-      else
-            C_MAIN := main.c
-      endif
+    ifeq ($(HB_ARCHITECTURE),os2)
+        C_MAIN := mainstd.c 
+    else
+        C_MAIN := main.c
+    endif
 endif
 
 C_SOURCES=\
@@ -66,9 +66,12 @@ endif
 LIBNAME=vm
 
 DIRS=\
-	mainstd     \
-	optcon 	\
-	optgui	\
+	optcon  \
+	optgui  \
+
+ifeq ($(HB_COMPILER),mingw32)
+   DIRS += mainstd
+endif
 
 include $(TOP)$(ROOT)config/lib.cf
 include $(TOP)$(ROOT)config/dir.cf

@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.26 2004/11/13 18:39:28 paultucker Exp $
+ * $Id: hbsetup.h,v 1.27 2004/11/13 18:52:11 ronpinkas Exp $
  */
 
 /*
@@ -331,8 +331,14 @@
    #endif
 #endif
 
+#ifdef HB_OS_DARWIN
+   #if ! defined(HB_OS_BSD)
+      #define HB_OS_BSD
+   #endif
+#endif
+
 #ifndef HB_OS_UNIX
-   #if defined(OS_UNIX_COMPATIBLE) || defined(HB_OS_LINUX) || defined(HB_OS_BSD)
+   #if defined(OS_UNIX_COMPATIBLE) || defined(HB_OS_LINUX) || defined(HB_OS_BSD) || defined(HB_OS_SUNOS)
       #define HB_OS_UNIX
    #endif
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.65 2004/05/27 22:44:13 mlombardo Exp $
+ * $Id: estack.c,v 1.66 2004/08/17 19:32:51 ronpinkas Exp $
  */
 
 /*
@@ -462,12 +462,12 @@ void hb_stackDispLocal( void )
             printf( HB_I_("LOGICAL = %s "), hb_itemGetL( *pBase ) ? ".T." : ".F." );
             break;
 
-         case HB_IT_LONG:
-            printf( HB_I_("LONG = %lu "), hb_itemGetNL( *pBase ) );
-            break;
-
          case HB_IT_INTEGER:
             printf( HB_I_("INTEGER = %i "), hb_itemGetNI( *pBase ) );
+            break;
+
+         case HB_IT_LONG:
+            printf( HB_I_("LONG = %" PFHL "i "), hb_itemGetNInt( *pBase ) );
             break;
 
          case HB_IT_STRING:

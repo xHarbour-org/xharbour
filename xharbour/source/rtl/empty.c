@@ -1,5 +1,5 @@
 /*
- * $Id: empty.c,v 1.6 2004/01/12 22:51:41 paultucker Exp $
+ * $Id: empty.c,v 1.7 2004/02/22 20:37:40 andijahja Exp $
  */
 
 /*
@@ -76,12 +76,6 @@ HB_FUNC( EMPTY )
       case HB_IT_LONG:
          hb_retl( pItem->item.asLong.value == 0l );
          break;
-
-#ifndef HB_LONG_LONG_OFF
-      case HB_IT_LONGLONG:
-         hb_retl( pItem->item.asLongLong.value == (LONGLONG) 0 );
-         break;
-#endif
 
       case HB_IT_DOUBLE:
          hb_retl( pItem->item.asDouble.value == 0.0 );

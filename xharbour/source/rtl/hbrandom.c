@@ -1,5 +1,5 @@
 /*
- * $Id: hbrandom.c,v 1.13 2004/07/03 03:34:54 ronpinkas Exp $
+ * $Id: hbrandom.c,v 1.14 2004/08/13 11:11:58 alexstrickland Exp $
  */
 
 /*
@@ -114,58 +114,30 @@ HB_FUNC( HB_RANDOM )
 HB_FUNC( HB_RANDOMINT )
 {
    double dRnd;
-
-   #ifndef HB_LONG_LONG_OFF
-   LONGLONG lX, lY;
-   #else
-   LONG lX, lY;
-   #endif
+   HB_LONG lX, lY;
 
    dRnd = hb_random_num();
 
    if( ! ISNUM( 1 ) )
    {
-      #ifndef HB_LONG_LONG_OFF
-      hb_retnll( (LONGLONG) (dRnd >= 0.5 ? 0 : 1) );
-      #else
-      hb_retnl( (LONG) (dRnd >= 0.5 ? 0 : 1) );
-      #endif
+      hb_retnint( ( HB_LONG ) (dRnd >= 0.5 ? 0 : 1) );
    }
    else if( ! ISNUM(2) )
    {
-      #ifndef HB_LONG_LONG_OFF
-      hb_retnll( (LONGLONG) (1 + ( dRnd * hb_parnll(1)) ));
-      #else
-      hb_retnl( (LONG) (1 + ( dRnd * hb_parnl(1))) );
-      #endif
+      hb_retnint( ( HB_LONG )  ( 1 + ( dRnd * hb_parnint(1) ) ) );
    }
    else
    {
-      #ifndef HB_LONG_LONG_OFF
-      lX = hb_parnll( 1 );
-      lY = hb_parnll( 2 );
-      #else
-      lX = hb_parnl( 1 );
-      lY = hb_parnl( 2 );
-      #endif
+      lX = hb_parnint( 1 );
+      lY = hb_parnint( 2 );
 
       if ( lX > lY )
       {
-         #ifndef HB_LONG_LONG_OFF
-         LONGLONG lZ = lY;
-         #else
-         LONG lZ = lY;
-         #endif
-
+         HB_LONG lZ = lY;
          lY = lX;
          lX = lZ;
       }
-
-      #ifndef HB_LONG_LONG_OFF
-      hb_retnll( (LONGLONG) (lX + ( dRnd * (lY-lX+1) ) ));
-      #else
-      hb_retnl( (LONG) (lX + ( dRnd * (lY-lX+1) ) ));
-      #endif
+      hb_retnint( ( HB_LONG ) ( lX + ( dRnd * ( lY-lX+1 ) ) ) );
    }
 }
 

@@ -1,14 +1,14 @@
 /*
- * $Id: cdpplwin.c,v 1.4 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: cdpesdos.c,v 1.4 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( PLWIN )
+ * National Collation Support Module ( Spanish MS-DOS )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
- * Polish collating sequence (PLWIN) done by Przemyslaw Czerpak <druzus@polbox.com>
+ * Spanish MS-DOS support by Antonio Linares <alinares@fivetechsoft.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,15 +51,15 @@
  *
  */
 
-/* Language name: Polish */
-/* ISO language code (2 chars): PL */
-/* Codepage: Windows-1250 */
+/* Language name: Spanish */
+/* ISO language code (2 chars): ES */
+/* Codepage: 850 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  35    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  33    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
@@ -84,17 +84,16 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "PLWIN",
-    CPID_1250,UNITB_1250,NUMBER_OF_CHARACTERS,
-    "A•BC∆DE FGHIJKL£MN—O”PQRSåTUVWXYZèØ","aπbcÊdeÍfghijkl≥mnÒoÛpqrsútuvwxyzüø",
-    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
+static HB_CODEPAGE s_codepage = { "ES",
+    CPID_850, UNITB_850, NUMBER_OF_CHARACTERS,
+    "AµBCDEêFGHI÷JKLMN•O‡PQRSTUÈöVWXYZ", "a†bcdeÇfghi°jklmn§o¢pqrstu£Åvwxyz",
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0,NULL, NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( PLWIN );
+HB_CODEPAGE_ANNOUNCE( ES );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_PLWIN )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_ES )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_PLWIN )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_ES )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_PLWIN
+   #pragma startup hb_codepage_Init_ES
 #endif
-

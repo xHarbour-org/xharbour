@@ -1,15 +1,15 @@
 /*
- * $Id: cdpptiso.c,v 1.4 2003/07/16 17:03:04 druzus Exp $
+ * $Id: cdpltwin.c,v 1.3 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( PTISO )
+ * National Collation Support Module ( LT )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
- * Portuguese collating sequence (PTISO) done
- * by Przemyslaw Czerpak <druzus@polbox.com>
+ * Lithuanian collation sequence
+ * 2003, by Mindaugas Kavaliauskas <dbtopas@dbtopas.lt>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,15 +52,15 @@
  *
  */
 
-/* Language name: Portuguese */
-/* ISO language code (2 chars): PT */
-/* Codepage: ISO-8859-1 */
+/* Language name: Lithuanian */
+/* ISO language code (2 chars): LT */
+/* Codepage: Windows-1257 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  49    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  35    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
@@ -76,7 +76,7 @@
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-      a~Ç
+      a~€
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -85,16 +85,17 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "PTISO",
-    CPID_8859_1,UNITB_8859_1,NUMBER_OF_CHARACTERS,
-    "AÁÀÂÃÄBCÇDEÉÈÊFGHIÍÌÎÏJKLMNÑOÓÒÔÕÖPQRSTUÚÙÛÜVWXYZ","aáàâãäbcçdeéèêfghiíìîïjklmnñoóòôõöpqrstuúùûüvwxyz",
+static HB_CODEPAGE s_codepage = { "LT",
+    CPID_1257,UNITB_1257,NUMBER_OF_CHARACTERS,
+    "AÀBCÈDEÆËFGHIÁYJKLMNOPQRSÐTUØÛVWXZÞ","aàbcèdeæëfghiáyjklmnopqrsðtuøûvwxzþ",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( PTISO );
+HB_CODEPAGE_ANNOUNCE( LT );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_PTISO )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_LT )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_PTISO )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_LT )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_PTISO
+   #pragma startup hb_codepage_Init_LT
 #endif
+

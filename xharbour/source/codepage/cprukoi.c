@@ -1,14 +1,13 @@
 /*
- * $Id: cdpesmwin.c,v 1.4 2004/01/26 14:59:46 druzus Exp $
+ * $Id: cdprukoi.c,v 1.4 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Spanish Modern WIN )
+ * National Collation Support Module (RUKOI-8)
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
- * Spanish Windows support by Antonio Linares <alinares@fivetechsoft.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,49 +50,25 @@
  *
  */
 
-/* Language name: Spanish (Modern)*/
-/* ISO language code (2 chars): ES */
-/* Codepage: ISO-8859-1 */
+/* Language name: Russian */
+/* ISO language code (2 chars): RU */
+/* Codepage: KOI-8 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  43    /* The number of single characters in the
-                                       alphabet, two-as-one aren't considered
-                                       here, accented - are considered. */
-#define IS_LATIN               1    /* Should be 1, if the national alphabet
-                                       is based on Latin */
-#define ACCENTED_EQUAL         0    /* Should be 1, if accented character
-                                       has the same weight as appropriate
-                                       unaccented. */
-#define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
-                                       sort after their unaccented counterparts
-                                       only if the unaccented versions of all
-                                       characters being compared are the same
-                                       ( interleaving ) */
+static HB_CODEPAGE s_codepage = { "RUKOI8",
+    CPID_KOI_8,UNITB_KOI_8,32,
+    "áâ÷çäåöúéêëìíîïðòóôõæèãþûýÿùøüàñ","ÁÂ×ÇÄÅÖÚÉÊËÌÍÎÏÐÒÓÔÕÆÈÃÞÛÝßÙØÜÀÑ",
+    0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
-/* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
-   accented characters with the symbol '~' before each of them, for example:
-      a~€
-   If there is two-character sequence, which is considered as one, it should
-   be marked with '.' before and after it, for example:
-      ... h.ch.i ...
+HB_CODEPAGE_ANNOUNCE( RUKOI8 );
 
-   The Upper case string and the Lower case string should be absolutely the
-   same excepting the characters case, of course.
- */
-
-static HB_CODEPAGE s_codepage = { "ESMWIN",
-    CPID_8859_1, UNITB_8859_1, NUMBER_OF_CHARACTERS,
-    "AÁÀÄBCÇDEÉÈËFGHIÍÌÏJKLMNÑOÓÒÖPQRSTUÚÙÜVWXYZ", "aáàäbcçdeéèëfghiíìïjklmnñoóòöpqrstuúùüvwxyz",
-    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0,NULL, NULL,NULL,NULL,0,NULL };
-
-HB_CODEPAGE_ANNOUNCE( ESMWIN );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_ESMWIN )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_RUKOI8 )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_ESMWIN )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_RUKOI8 )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_ESMWIN
+   #pragma startup hb_codepage_Init_RUKOI8
 #endif
+

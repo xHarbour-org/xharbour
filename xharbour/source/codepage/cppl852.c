@@ -1,15 +1,14 @@
 /*
- * $Id: cdpltwin.c,v 1.2 2003/11/11 20:20:53 ronpinkas Exp $
+ * $Id: cdppl852.c,v 1.3 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( LT )
+ * National Collation Support Module ( PL852 )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
- * Lithuanian collation sequence
- * 2003, by Mindaugas Kavaliauskas <dbtopas@dbtopas.lt>
+ * Polish collating sequence (PL852) CP852 done by Jacek Kubica <kubica@wssk.wroc.pl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,9 +51,9 @@
  *
  */
 
-/* Language name: Lithuanian */
-/* ISO language code (2 chars): LT */
-/* Codepage: Windows-1257 */
+/* Language name: Polish */
+/* ISO language code (2 chars): PL */
+/* Codepage: 852 */
 
 #include <ctype.h>
 #include "hbapi.h"
@@ -85,17 +84,17 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "LT",
-    CPID_1257,UNITB_1257,NUMBER_OF_CHARACTERS,
-    "A¿BC»DE∆ÀFGHI¡YJKLMNOPQRS–TUÿ€VWXZﬁ","a‡bcËdeÊÎfghi·yjklmnopqrstu¯˚vwxz˛",
+static HB_CODEPAGE s_codepage = { "PL852",
+    CPID_852,UNITB_852,NUMBER_OF_CHARACTERS,
+    "A§BCèDE®FGHIJKLùMN„O‡PQRSóTUVWXYZçΩ","a•bcÜde©fghijklàmn‰o¢pqrsòtuvwxyz´æ",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( LT );
+HB_CODEPAGE_ANNOUNCE( PL852 );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_LT )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_PL852 )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_LT )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_PL852 )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_LT
+   #pragma startup hb_codepage_Init_PL852
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: disksphb.c,v 1.3 2004/04/05 02:29:31 druzus Exp $
+ * $Id: disksphb.c,v 1.4 2004/04/14 20:59:10 andijahja Exp $
  */
 
 /*
@@ -65,6 +65,8 @@
 #if defined( HB_OS_BSD )
    #include <sys/param.h>
    #include <sys/mount.h>
+#elif defined(HB_OS_SUNOS)
+   #include <sys/statvfs.h>
 #elif defined( HB_OS_UNIX )
    #include <sys/vfs.h>
 #endif
@@ -307,9 +309,13 @@ HB_FUNC( HB_DISKSPACE )
 #elif defined(HB_OS_UNIX)
 
    {
+#if defined(HB_OS_SUNOS)
+      struct statvfs sf;
+      if ( statvfs( szPath, &sf ) == 0 )
+#else
       struct statfs sf;
-
       if ( statfs( szPath, &sf ) == 0 )
+#endif
       {
          switch( uiType )
          {
@@ -336,7 +342,7 @@ HB_FUNC( HB_DISKSPACE )
 #else
 
    {
-      HB_SYMBOL_UNUSED( uiDrive );
+      HB_SYMBOL_UNUSED( szPath );
       HB_SYMBOL_UNUSED( uiType );
    }
 

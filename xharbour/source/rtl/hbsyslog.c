@@ -122,6 +122,7 @@ HB_FUNC( HB_SYSLOGMESSAGE )
       #endif
    #elif defined( HB_OS_UNIX ) || defined( HB_OS_LINUX )
       int logval;
+
       switch( hb_parni(2) )
       {
          case HB_LOG_CRITICAL: logval = LOG_CRIT; break;

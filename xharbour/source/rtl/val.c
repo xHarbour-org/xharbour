@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.17 2004/02/23 08:31:57 andijahja Exp $
+ * $Id: val.c,v 1.18 2004/09/09 21:27:53 druzus Exp $
  */
 
 /*
@@ -49,142 +49,10 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-#include <math.h>
-#include <ctype.h>
 
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
-#include "hbapifs.h"
-
-/* returns the numeric value of a character string representation of a number */
-/*
-  ... to remain compatible with Harbour version which utilizes a 2nd paramater ulLen
- */
-double HB_EXPORT hb_strVal( const char * szText, ... )
-{
-   double dResult;
-   char *pCopy = NULL;
-   ULONG ulPad = 0, ulLen;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_strVal(%s)", szText));
-
-   while( isspace((int) szText[ulPad] ) )
-   {
-      ulPad++;
-   }
-
-   if( szText[ulPad] == '-' || szText[ulPad] == '+' )
-   {
-      ulPad++;
-   }
-
-   ulLen = ulPad;
-
-   while( szText[ulLen] )
-   {
-      if( ! ( isdigit((int) szText[ulLen] ) || szText[ulLen] == '.' ) )
-      {
-         if( ulLen > ulPad )
-         {
-            pCopy = (char *) hb_xgrab( ulLen + 1 );
-            strncpy( pCopy, szText, ulLen );
-            pCopy[ulLen] = '\0';
-            szText = pCopy;
-            break;
-         }
-         else
-         {
-            return 0.0;
-         }
-      }
-
-      ulLen++;
-   }
-
-   dResult = atof( szText );
-
-#if 0
-   // Maybe -0.00
-   /* AJ: Commented 2004-02-16 because it seems that minus zero problem
-      has been dissapread even without this hack
-   */
-   if( dResult == -0.00 )
-   {
-      dResult = 0.0;
-   }
-#endif
-
-   //printf( "String: >%s< Val:%f\n", szText, dResult );
-
-   if( pCopy )
-   {
-      hb_xfree( (void *) pCopy );
-   }
-
-   return dResult;
-}
-
-#ifndef HB_LONG_LONG_OFF
-LONGLONG HB_EXPORT hb_strValInt( const char * szText, int * iOverflow )
-#else
-LONG     HB_EXPORT hb_strValInt( const char * szText, int * iOverflow )
-#endif
-{
-#ifndef HB_LONG_LONG_OFF
-   LONGLONG lResult = 0, lPrev;
-#else
-   LONG     lResult = 0, lPrev;
-#endif
-   ULONG ulPad = 0, ulLen;
-   BOOL bNeg = FALSE;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_strValInt(%s)", szText));
-
-   while( isspace( szText[ulPad] ) )
-   {
-      ulPad++;
-   }
-
-   if( szText[ulPad] == '-' )
-   {
-      bNeg = TRUE;
-      ulPad++;
-   }
-   else if ( szText[ulPad] == '+' )
-   {
-      ulPad++;
-   }
-
-   ulLen = ulPad;
-
-   while( szText[ulLen] && isdigit( szText[ulLen] ) )
-   {
-      lPrev = lResult;
-      lResult *= 10;
-      lResult += bNeg ? -( szText[ulLen] - '0' ) : ( szText[ulLen] - '0' );
-
-      if ( bNeg ? lPrev < lResult : lPrev > lResult )
-      {
-        // Overflow
-        if( iOverflow )
-        {
-           *iOverflow = 1;
-        }
-        return 0;
-      }
-      ulLen++;
-   }
-
-   if( iOverflow )
-   {
-      *iOverflow = 0;
-   }
-
-//   printf( "String: >%s< Val:%Ld\n", szText, lResult );
-
-   return lResult;
-}
 
 /* returns the numeric value of a character string representation of a number  */
 HB_FUNC( VAL )
@@ -194,53 +62,17 @@ HB_FUNC( VAL )
    if( pText )
    {
       char * szText = pText->item.asString.value;
-      int iWidth, iLen = ( int ) pText->item.asString.length;
-      int iDec;
-      BOOL bInteger = TRUE;
+      int iWidth, iDec, iLen = ( int ) pText->item.asString.length;
+      BOOL fDbl;
+      HB_LONG lValue;
+      double dValue;
 
-      for( iWidth = 0; iWidth < iLen; iWidth++ )
-      {
-         if( szText[ iWidth ] == '.' )
-         {
-            bInteger = FALSE;
-            break;
-         }
-      }
+      fDbl = hb_valStrnToNum( szText, iLen, &lValue, &dValue , &iDec, &iWidth );
 
-      if( bInteger )
-      {
-#ifndef HB_LONG_LONG_OFF
-         LONGLONG lValue;
-#else
-         LONG lValue;
-#endif
-         int iOverflow;
-
-         lValue = hb_strValInt( szText, &iOverflow );
-
-         if( !iOverflow )
-         {
-            hb_retnintlen( lValue, iLen );
-            return;
-         }
-      }
-
-      {
-         double dValue = hb_strVal( szText );
-
-         iDec = iLen - iWidth - 1;
-
-         if( iWidth == 0 || iDec == 0 )
-         {
-            iWidth++;
-         }
-         else if( iWidth == 1 && szText[ 0 ] == '-' /*&& dValue != 0.0*/ )
-         {
-            iWidth++;
-         }
-
-         hb_retnlen( dValue, iWidth, HB_MAX( 0, iDec ) );
-      }
+      if ( !fDbl )
+         hb_retnintlen( lValue, iLen );
+      else
+         hb_retnlen( dValue, iWidth, iDec );
    }
    else
    {

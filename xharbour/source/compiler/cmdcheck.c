@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.18 2004/07/07 04:39:36 ronpinkas Exp $
+ * $Id: cmdcheck.c,v 1.19 2004/10/20 03:14:40 ronpinkas Exp $
  */
 
 /*
@@ -222,7 +222,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 
                      case 'e' :
                      case 'E' :
-                       if( Args[i][j + 1] && toupper( Args[i][j + 1] ) == 'S' && Args[i][j + 2] && isdigit((int) Args[i][j + 2] ) )
+                       if( Args[i][j + 1] && toupper( ( BYTE ) Args[i][j + 1] ) == 'S' && Args[i][j + 2] && isdigit( ( BYTE ) Args[i][j + 2] ) )
                        {
                           Switch[2] = 'S';
                           Switch[3] = Args[i][j + 2];
@@ -245,7 +245,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                      case 'G' :
                           /* Required argument */
                           Switch[2] = Args[i][j + 1];
-                          if( isdigit( (int) Args[i][j + 2] ) )
+                          if( isdigit( ( BYTE ) Args[i][j + 2] ) )
                           {
                              /* Optional argument */
                              Switch[3] = Args[i][j + 2];
@@ -346,7 +346,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 
                      case 'q' :
                      case 'Q' :
-                       if( Args[i][j + 1] && isdigit((int) Args[i][j + 1] ) )
+                       if( Args[i][j + 1] && isdigit( ( BYTE ) Args[i][j + 1] ) )
                        {
                           Switch[2] = Args[i][j + 1];
                           Switch[3] = '\0';
@@ -375,7 +375,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 
                      case 'w' :
                      case 'W' :
-                       if( Args[i][j + 1] && isdigit((int) Args[i][j + 1] ) )
+                       if( Args[i][j + 1] && isdigit( ( BYTE ) Args[i][j + 1] ) )
                        {
                           Switch[2] = Args[i][j + 1];
                           Switch[3] = '\0';

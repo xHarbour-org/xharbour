@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.18 2004/03/20 23:24:46 druzus Exp $
+ * $Id: hbrddntx.h,v 1.19 2004/03/25 12:13:13 druzus Exp $
  */
 
 /*
@@ -62,7 +62,6 @@
 HB_EXTERN_BEGIN
 
 /* DBFNTX default extensions */
-#define NTX_MEMOEXT                               ".dbt"
 #define NTX_INDEXEXT                              ".ntx"
 
 /* DBFNTX constants declarations */
@@ -74,6 +73,7 @@ HB_EXTERN_BEGIN
 
 #define NTX_MAX_KEY          256      /* Max len of key */
 #define NTXBLOCKSIZE         1024     /* Size of block in NTX file */
+#define NTX_MAX_TAGNAME      12       /* Max len of tag name */
 #define NTX_LOCK_OFFSET      1000000000
 #define NTX_PAGES_PER_TAG    32
 
@@ -177,22 +177,22 @@ typedef NTXINDEX * LPNTXINDEX;
 
 typedef struct _NTXHEADER    /* Header of NTX file */
 {
-   USHORT   type;
-   USHORT   version;
-   ULONG    root;
-   ULONG    next_page;
-   USHORT   item_size;
-   USHORT   key_size;
-   USHORT   key_dec;
-   USHORT   max_item;
-   USHORT   half_page;
+   UINT16   type;
+   UINT16   version;
+   UINT32   root;
+   UINT32   next_page;
+   UINT16   item_size;
+   UINT16   key_size;
+   UINT16   key_dec;
+   UINT16   max_item;
+   UINT16   half_page;
    char     key_expr[ NTX_MAX_KEY ];
    char     unique;
    char     unknown1;
    char     descend;
    char     unknown2;
    char     for_expr[ NTX_MAX_KEY ];
-   char     tag_name[ 12 ];
+   char     tag_name[ NTX_MAX_TAGNAME ];
    char     custom;
 } NTXHEADER;
 
@@ -201,16 +201,16 @@ typedef NTXHEADER * LPNTXHEADER;
 typedef struct _NTXBUFFER    /* Header of each block in NTX file (only block
                                 with header has other format */
 {
-   USHORT   item_count;
-   USHORT   item_offset[ 1 ];
+   UINT16   item_count;
+   UINT16   item_offset[ 1 ];
 } NTXBUFFER;
 
 typedef NTXBUFFER * LPNTXBUFFER;
 
 typedef struct _NTXITEM      /* each item in NTX block has following format */
 {
-   ULONG    page;     /* subpage (each key in subpage has < value like this key */
-   ULONG    rec_no;   /* RecNo of record with this key */
+   UINT32   page;     /* subpage (each key in subpage has < value like this key */
+   UINT32   rec_no;   /* RecNo of record with this key */
    char     key[ 1 ]; /* value of key */
 } NTXITEM;
 

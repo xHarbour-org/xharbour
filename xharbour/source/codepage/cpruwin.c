@@ -1,10 +1,10 @@
 /*
- * $Id: cdpru866.c,v 1.2 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: cdpruwin.c,v 1.3 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module (RU866)
+ * National Collation Support Module (RUWIN)
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
@@ -52,23 +52,23 @@
 
 /* Language name: Russian */
 /* ISO language code (2 chars): RU */
-/* Codepage: 866 */
+/* Codepage: Windows-1251 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-static HB_CODEPAGE s_codepage = { "RU866",
-    CPID_866,UNITB_866,32,
-    "€‚ƒ„…†‡‰‹‘’“”•–—™›"," ΅Ά£¤¥¦§¨©ª«¬­®―ΰαβγδεζηθικλμνξο",
+static HB_CODEPAGE s_codepage = { "RU1251",
+    CPID_1251,UNITB_1251,32,
+    "ΐΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡÒΣΤΥΦΧΨΩΪΫάέήί","ΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώÿ",
     0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( RU866 );
+HB_CODEPAGE_ANNOUNCE( RU1251 );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_RU866 )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_RU1251 )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_RU866 )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_RU1251 )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_RU866
+   #pragma startup hb_codepage_Init_RU1251
 #endif
 

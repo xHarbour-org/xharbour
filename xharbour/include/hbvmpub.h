@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.31 2004/04/28 18:22:08 druzus Exp $
+ * $Id: hbvmpub.h,v 1.32 2004/09/28 15:32:39 ronpinkas Exp $
  */
 
 /*
@@ -155,7 +155,7 @@
     struct hb_struLong
     {
        USHORT length;
-       LONG value;
+       HB_LONG value;
     };
 
     struct hb_struMemvar
@@ -199,14 +199,6 @@
        UINT uiSuperClass;
     };
 
-#ifndef HB_LONG_LONG_OFF
-    struct hb_struLongLong
-    {
-       USHORT length;
-       LONGLONG value;
-    };
-#endif
-
     /* items hold at the virtual machine stack */
     typedef struct _HB_ITEM
     {
@@ -217,9 +209,6 @@
           struct hb_struBlock   asBlock;
           struct hb_struDate    asDate;
           struct hb_struDouble  asDouble;
-       #ifndef HB_LONG_LONG_OFF
-          struct hb_struLongLong asLongLong;
-       #endif
           struct hb_struInteger asInteger;
           struct hb_struLogical asLogical;
           struct hb_struLong    asLong;
@@ -255,7 +244,7 @@
 
     /* Hash utility functions */
     #define HB_HASH_ORDER_FUNC_( hbfunc )\
-      int hbfunc( PHB_ITEM, PHB_ITEM, BOOL )
+                     int hbfunc( PHB_ITEM, PHB_ITEM, BOOL )
     typedef HB_HASH_ORDER_FUNC_( HB_HASH_ORDER_FUNC );
     typedef HB_HASH_ORDER_FUNC *PHB_HASH_ORDER_FUNC;
 

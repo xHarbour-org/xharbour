@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.8 2004/09/03 13:45:15 lf_sfnet Exp $
+# $Id: pack_src.sh,v 1.9 2004/09/08 00:17:09 druzus Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -35,7 +35,8 @@ $hb_collect *.sh
 $hb_collect *.cmd
 $hb_collect *.spec
 $hb_collect [Mm]akefile*
-$hb_collect ChangeLog
+$hb_collect Change[Ll]og*
+$hb_collect COPYING
 
 # BIN
 $hb_collect bin/*.bat
@@ -43,15 +44,20 @@ $hb_collect bin/*.sh
 
 # CONFIG
 $hb_collect config/*.cf
-$hb_collect config/bsd/*.cf
 $hb_collect config/dos/*.cf
 $hb_collect config/linux/*.cf
+$hb_collect config/bsd/*.cf
+$hb_collect config/darwin/*.cf
+$hb_collect config/sunos/*.cf
 $hb_collect config/os2/*.cf
 $hb_collect config/w32/*.cf
 
 # DOC
+$hb_collect dos/[Mm]akefile*
 $hb_collect doc/*.txt
+$hb_collect doc/en/[Mm]akefile*
 $hb_collect doc/en/*.txt
+$hb_collect doc/es/[Mm]akefile*
 $hb_collect doc/es/*.txt
 
 # INCLUDE
@@ -62,16 +68,16 @@ $hb_collect include/*.ch
 
 # SOURCE\COMMON
 $hb_collect source/common/Makefile
-$hb_collect source/common/*.c
+$hb_collect source/common/*.[ch]
 
 # SOURCE
 $hb_collect source/Makefile
 
 # SOURCE\COMPILER
 $hb_collect source/compiler/Makefile
-$hb_collect source/compiler/*.c
-$hb_collect source/compiler/*.slx
-$hb_collect source/compiler/*.sly
+$hb_collect source/compiler/*.[cylh]
+$hb_collect source/compiler/*.sl[xy]
+$hb_collect source/compiler/*.simple
 
 # SOURCE\DEBUG
 $hb_collect source/debug/Makefile
@@ -79,25 +85,24 @@ $hb_collect source/debug/*.prg
 
 # SOURCE\LANG
 $hb_collect source/lang/Makefile
-$hb_collect source/lang/*.c
+$hb_collect source/lang/*.[ch]
 
 # SOURCE\CODEPAGE
 $hb_collect source/codepage/Makefile
-$hb_collect source/codepage/*.c
+$hb_collect source/codepage/*.[ch]
 
 # SOURCE\MACRO
 $hb_collect source/macro/Makefile
-$hb_collect source/macro/*.c
+$hb_collect source/macro/*.[cylh]
 $hb_collect source/macro/*.slx
-$hb_collect source/macro/*.y
 
 # SOURCE\PP
 $hb_collect source/pp/Makefile
-$hb_collect source/pp/*.c
+$hb_collect source/pp/*.[ch]
 
 # SOURCE\RDD
 $hb_collect source/rdd/Makefile
-$hb_collect source/rdd/*.c
+$hb_collect source/rdd/*.[ch]
 $hb_collect source/rdd/*.prg
 
 # SOURCE\RDD\DBFDBT
@@ -133,7 +138,7 @@ done
 
 # SOURCE\RTL
 $hb_collect source/rtl/Makefile
-$hb_collect source/rtl/*.c
+$hb_collect source/rtl/*.[ch]
 $hb_collect source/rtl/*.prg
 
 # SOURCE\RTL\GT_TPL
@@ -197,7 +202,7 @@ $hb_collect source/rtl/gtalleg/*.sfc
 
 # SOURCE\VM
 $hb_collect source/vm/Makefile
-$hb_collect source/vm/*.c
+$hb_collect source/vm/*.[ch]
 $hb_collect source/vm/*.prg
 
 # SOURCE\samples
@@ -231,6 +236,10 @@ $hb_collect tests/*.prg
 $hb_collect tests/*.src
 $hb_collect tests/*.txt
 
+# TESTS\BLDTEST
+$hb_collect tests/bldtest/Makefile
+$hb_collect tests/bldtest/*.[ch]
+
 # UTILS
 $hb_collect utils/Makefile
 
@@ -248,7 +257,7 @@ $hb_collect utils/hbextern/*.prg
 $hb_collect utils/hbmake/Makefile
 $hb_collect utils/hbmake/*.ch
 $hb_collect utils/hbmake/*.prg
-$hb_collect utils/hbmake/*.c
+$hb_collect utils/hbmake/*.[ch]
 
 # UTILS\XBSCRIPT
 $hb_collect utils/xbscript/Makefile
@@ -262,7 +271,7 @@ $hb_collect utils/xprompt/*.txt
 
 # UTILS\HBPP
 $hb_collect utils/hbpp/Makefile
-$hb_collect utils/hbpp/*.c
+$hb_collect utils/hbpp/*.[ch]
 
 # UTILS\HBRUN
 $hb_collect utils/hbrun/Makefile
@@ -273,6 +282,9 @@ $hb_collect utils/hbtest/Makefile
 $hb_collect utils/hbtest/*.ch
 $hb_collect utils/hbtest/*.cmd
 $hb_collect utils/hbtest/*.prg
+
+# CONTRIB
+$hb_collect contrib/Makefile
 
 # CONTRIB\RDD_ADS
 $hb_collect contrib/rdd_ads/Makefile

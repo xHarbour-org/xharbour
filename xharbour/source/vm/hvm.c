@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.422 2004/10/18 10:22:26 likewolf Exp $
+ * $Id: hvm.c,v 1.423 2004/11/01 05:38:11 likewolf Exp $
  */
 
 /*
@@ -222,13 +222,14 @@ static void    hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols ); /* create
 static void    hb_vmPushLocal( SHORT iLocal );    /* pushes the containts of a local onto the stack */
 static void    hb_vmPushLocalByRef( SHORT iLocal );    /* pushes a local by refrence onto the stack */
 static void    hb_vmPushLongConst( LONG lNumber );  /* Pushes a LONG constant (pcode) */
-// HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 ); /* pushes a number on to the stack and decides if it is SHORT, LONG or double */
-// #ifndef HB_LONG_LONG_OFF
-//    HB_EXPORT void    hb_vmPushLongLong( LONGLONG lNumber );  /* Pushes a LONGLONG (pcode) */
-//    HB_EXPORT void    hb_vmPushNumInt( LONGLONG lNumber );
-// #else
-//    HB_EXPORT void    hb_vmPushNumInt( LONG lNumber );
-// #endif
+static void    hb_vmPushHBLong( HB_LONG lNumber ); /* pushes a HB_LONG number onto the stack */
+#if !defined( HB_LONG_LONG_OFF )
+   static void hb_vmPushLongLongConst( LONGLONG lNumber );  /* Pushes a LONGLONG constant (pcode) */
+#endif
+#if HB_INT_MAX >= INT32_MAX
+static void    hb_vmPushIntegerConst( int iNumber );  /* Pushes a int constant (pcode) */
+#endif
+static void    hb_vmPushNumInt( HB_LONG lNumber );     /* pushes a number on to the stack and decides if it is integer or HB_LONG */
 static void    hb_vmPushStatic( USHORT uiStatic );     /* pushes the containts of a static onto the stack */
 static void    hb_vmPushStaticByRef( USHORT uiStatic ); /* pushes a static by refrence onto the stack */
 static void    hb_vmPushVariable( PHB_SYMB pVarSymb ); /* pushes undeclared variable */
@@ -237,6 +238,7 @@ static void    hb_vmDuplTwo( void );              /* duplicates the latest two v
 
 /* Pop */
 static BOOL    hb_vmPopLogical( void );           /* pops the stack latest value and returns its logical value */
+static HB_LONG hb_vmPopHBLong( void );            /* pops the stack latest value and returns its HB_LONG value */
 static double  hb_vmPopNumber( void );            /* pops the stack latest value and returns its numeric value */
 static double  hb_vmPopDouble( int * );           /* pops the stack latest value and returns its double numeric format value */
 static void    hb_vmPopAlias( void );             /* pops the workarea number form the eval stack */
@@ -902,7 +904,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    LONG w = 0;
    BOOL bCanRecover = FALSE;
    ULONG ulPrivateBase;
-   LONG lOffset;
    ULONG wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
    ULONG wWithObjectCounter = hb_vm_wWithObjectCounter;
 
@@ -2038,14 +2039,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              */
             ( * HB_VM_STACK.pPos )->type = HB_IT_LONG;
 
-            lOffset = HB_PCODE_MK24BIT( &( pCode[ w + 1 ] ) );
-
-            if( lOffset > 8388607L )
-            {
-               lOffset -= 16777216;
-            }
-
-            pSequence->lRecover = w + lOffset;
+            pSequence->lRecover = w + HB_PCODE_MKINT24( &pCode[ w + 1 ] );
 
             /*
              * 3) store current RECOVER base
@@ -2098,17 +2092,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /*
              * skip over RECOVER section, if any.
              */
-            lOffset = HB_PCODE_MK24BIT( &( pCode[ w + 1 ] ) );
-
-            if( lOffset > 8388607L )
-            {
-               lOffset -= 16777216;
-            }
-
             hb_vm_pSequence = hb_vm_pSequence->pPrev;
             hb_xfree( (void *) pFree );
 
-            w += lOffset;
+            w += HB_PCODE_MKINT24( &pCode[ w + 1 ] );;
             break;
          }
 
@@ -2143,38 +2130,17 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_JUMPNEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPNEAR") );
-
-            lOffset = pCode[ w + 1 ];
-            if( lOffset > 127 )
-            {
-               lOffset -= 256 ;
-            }
-
-            w += lOffset;
+            w += (signed char) pCode[ w + 1 ];
             break;
 
          case HB_P_JUMP:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMP") );
-
-            lOffset = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
-            if( lOffset > SHRT_MAX )
-            {
-               lOffset -= 65536;
-            }
-
-            w += lOffset;
+            w += HB_PCODE_MKSHORT( &pCode[ w + 1 ] );
             break;
 
          case HB_P_JUMPFAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPFAR") );
-
-            lOffset = HB_PCODE_MK24BIT( &( pCode[ w + 1 ] ) );
-            if( lOffset > 8388607L )
-            {
-               lOffset -= 16777216L;
-            }
-
-            w += lOffset;
+            w += HB_PCODE_MKINT24( &pCode[ w + 1 ] );
             break;
 
          case HB_P_JUMPFALSENEAR:
@@ -2182,14 +2148,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( ! hb_vmPopLogical() )
             {
-               lOffset = pCode[ w + 1 ];
-
-               if( lOffset > 127 )
-               {
-                  lOffset -= 256;
-               }
-
-               w += lOffset;
+               w += (signed char) pCode[ w + 1 ];
             }
             else
             {
@@ -2203,14 +2162,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( ! hb_vmPopLogical() )
             {
-               lOffset = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
-
-               if( lOffset > SHRT_MAX )
-               {
-                  lOffset -= 65536;
-               }
-
-               w += lOffset;
+               w += HB_PCODE_MKSHORT( &pCode[ w + 1 ] );
             }
             else
             {
@@ -2224,14 +2176,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( ! hb_vmPopLogical() )
             {
-               lOffset = HB_PCODE_MK24BIT( &( pCode[ w + 1 ] ) );
-
-               if( lOffset > 8388607L )
-               {
-                  lOffset -= 16777216L;
-               }
-
-               w += lOffset;
+               w += HB_PCODE_MKINT24( &pCode[ w + 1 ] );
             }
             else
             {
@@ -2245,14 +2190,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( hb_vmPopLogical() )
             {
-               lOffset = pCode[ w + 1 ];
-
-               if( lOffset > 127 )
-               {
-                  lOffset -= 256;
-               }
-
-               w += lOffset;
+               w += (signed char) pCode[ w + 1 ];
             }
             else
             {
@@ -2266,14 +2204,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( hb_vmPopLogical() )
             {
-               lOffset = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
-
-               if( lOffset > SHRT_MAX )
-               {
-                  lOffset -= 65536;
-               }
-
-               w += lOffset;
+               w += HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) );
             }
             else
             {
@@ -2287,14 +2218,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( hb_vmPopLogical() )
             {
-               lOffset = HB_PCODE_MK24BIT( &( pCode[ w + 1 ] ) );
-
-               if( lOffset > 8388607L )
-               {
-                  lOffset -= 16777216L;
-               }
-
-               w += lOffset;
+               w += HB_PCODE_MKINT24( &pCode[ w + 1 ] );
             }
             else
             {
@@ -2360,7 +2284,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHBYTE") );
 
             ( * HB_VM_STACK.pPos )->type = HB_IT_INTEGER;
-            ( * HB_VM_STACK.pPos )->item.asInteger.value = ( char ) pCode[ w + 1 ];
+            ( * HB_VM_STACK.pPos )->item.asInteger.value = ( signed char ) pCode[ w + 1 ];
             ( * HB_VM_STACK.pPos )->item.asInteger.length = 10;
             hb_stackPush();
 
@@ -2375,15 +2299,30 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             ( * HB_VM_STACK.pPos )->item.asInteger.length = 10;
             hb_stackPush();
 
-            w += 1 + sizeof( SHORT );
+            w += 3;
             break;
 
          case HB_P_PUSHLONG:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLONG") );
 
-            hb_vmPushLongConst( HB_PCODE_MKLONG( &pCode[ w + 1 ] ) );
+#if HB_INT_MAX >= INT32_MAX
+            hb_vmPushIntegerConst( ( int ) HB_PCODE_MKLONG( &pCode[ w + 1 ] ) );
+#else
+            hb_vmPushLongConst( ( LONG ) HB_PCODE_MKLONG( &pCode[ w + 1 ] ) );
+#endif
+            w += 5;
+            break;
 
-            w += 1 + sizeof( LONG );
+         case HB_P_PUSHLONGLONG:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLONGLONG") );
+#if !defined( HB_LONG_LONG_OFF )
+            hb_vmPushLongLongConst( HB_PCODE_MKLONGLONG( &pCode[ w + 1 ] ) );
+#else
+            hb_vmPushDoubleConst( HB_PCODE_MKLONGLONG( &pCode[ w + 1 ] ),
+                                  HB_DEFAULT_WIDTH, HB_DEFAULT_DECIMALS );
+#endif
+            w += 9;
+
             break;
 
          case HB_P_PUSHDOUBLE:
@@ -2555,20 +2494,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_PUSHLOCALNEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLOCALNEAR") );
-            hb_vmPushLocal( (signed char ) pCode[ w + 1 ] );
+            hb_vmPushLocal( ( signed char ) pCode[ w + 1 ] );
             w += 2;  /* only first two bytes are used */
             break;
 
          case HB_P_LOCALNEARADDINT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARADDINT") );
          {
-            PHB_ITEM pLocal = hb_stackItemFromBase( (unsigned char) pCode[ w + 1 ] );
-            short iAdd = HB_PCODE_MKSHORT( &( pCode[ w + 2 ] ) );
-            #ifndef HB_LONG_LONG_OFF
-               long double dNewVal;
-            #else
-               double dNewVal;
-            #endif
+            PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] );
+            int iAdd = HB_PCODE_MKSHORT( &( pCode[ w + 2 ] ) );
+            double dNewVal;
 
             w += 4;
 
@@ -2577,13 +2512,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                pLocal = hb_itemUnRef( pLocal );
             }
 
-            if( HB_IS_NUMBER_INT( pLocal ) )
+            if( HB_IS_NUMINT( pLocal ) )
             {
-               #ifndef HB_LONG_LONG_OFF
-                  LONGLONG lNewVal, lVal;
-               #else
-                  LONG lNewVal, lVal;
-               #endif
+               HB_LONG lNewVal, lVal;
 
                if( HB_IS_INTEGER( pLocal ) )
                {
@@ -2593,25 +2524,14 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                {
                   lVal = pLocal->item.asLong.value;
                }
-            #ifndef HB_LONG_LONG_OFF
-               else if( HB_IS_LONGLONG( pLocal ) )
-               {
-                  lVal = pLocal->item.asLongLong.value;
-               }
                else
                {
-                  lVal = hb_itemGetNLL( pLocal );
+                  lVal = hb_itemGetNInt( pLocal );
                }
-            #else
-               else
-               {
-                  lVal = hb_itemGetNL( pLocal );
-               }
-            #endif
 
                lNewVal = lVal + iAdd;
 
-               if(( iAdd >= 0 && lNewVal >= lVal ) || ( iAdd <  0 && lNewVal <  lVal ) )
+               if( iAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
                {
                   hb_itemPutNInt( pLocal, lNewVal );
                   break;
@@ -2633,7 +2553,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else if( HB_IS_DOUBLE( pLocal ) )
             {
-               dNewVal = pLocal->item.asDouble.value + iAdd;
+               dNewVal = pLocal->item.asDouble.value + ( double ) iAdd;
             }
             else if( HB_IS_OBJECT( pLocal ) )
             {
@@ -2684,15 +2604,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                }
             }
 
-            pLocal->item.asDouble.value = ( double ) dNewVal;
-            pLocal->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
-
             if( !HB_IS_DOUBLE( pLocal ) )
             {
                pLocal->type = HB_IT_DOUBLE;
                pLocal->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
             }
-
+            pLocal->item.asDouble.value = dNewVal;
+            pLocal->item.asDouble.length = HB_DBL_LENGTH( dNewVal );
             break;
          }
 
@@ -2728,7 +2646,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             pLocal->type = HB_IT_INTEGER;
             pLocal->item.asInteger.length = 10;
             pLocal->item.asInteger.value = iNewVal;
-
             w += 4;
             break;
          }
@@ -2736,7 +2653,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_LOCALNEARSETSTR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETSTR") );
          {
-            PHB_ITEM pLocal = hb_stackItemFromBase( (unsigned char) pCode[ w + 1 ] );
+            PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] );
             USHORT uiSize = HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) );
 
             if( HB_IS_BYREF( pLocal ) )
@@ -2775,22 +2692,14 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ADDINT") );
          {
             PHB_ITEM pTop = hb_stackItemFromTop( -1 );
-            short iAdd = HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) );
-            #ifndef HB_LONG_LONG_OFF
-               long double dNewVal = 0.0;
-            #else
-               double dNewVal = 0.0;
-            #endif
+            int iAdd = HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) );
+            double dNewVal = 0.0;
 
             w += 3;
 
-            if( HB_IS_NUMBER_INT( pTop ) )
+            if( HB_IS_NUMINT( pTop ) )
             {
-               #ifndef HB_LONG_LONG_OFF
-                  LONGLONG lNewVal, lVal;
-               #else
-                  LONG lNewVal, lVal;
-               #endif
+               HB_LONG lNewVal, lVal;
 
                if( HB_IS_INTEGER( pTop ) )
                {
@@ -2800,26 +2709,14 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                {
                   lVal = pTop->item.asLong.value;
                }
-            #ifndef HB_LONG_LONG_OFF
-               else if( HB_IS_LONGLONG( pTop ) )
-               {
-                  lVal = pTop->item.asLongLong.value;
-               }
                else
                {
-                  lVal = hb_itemGetNLL( pTop );
+                  lVal = hb_itemGetNInt( pTop );
                }
-            #else
-               else
-               {
-                  lVal = hb_itemGetNL( pTop );
-               }
-            #endif
 
                lNewVal = lVal + iAdd;
 
-               if(( iAdd >= 0 && lNewVal >= lVal ) ||
-                  ( iAdd <  0 && lNewVal <  lVal ))
+               if ( iAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
                {
                   hb_itemPutNInt( pTop, lNewVal );
                   break;
@@ -2831,7 +2728,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else if( HB_IS_DOUBLE( pTop ) )
             {
-               dNewVal = pTop->item.asDouble.value + iAdd;
+               dNewVal = pTop->item.asDouble.value + ( double ) iAdd;
             }
             else if( HB_IS_DATE( pTop ) )
             {
@@ -2840,10 +2737,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else if( HB_IS_STRING( pTop ) && pTop->item.asString.length == 1 )
             {
+               HB_LONG lVal = iAdd + pTop->item.asString.value[0];
+               hb_itemClear( pTop );
                pTop->type = HB_IT_LONG;
-               pTop->item.asLong.value  = pTop->item.asString.value[0] + iAdd;
+               pTop->item.asLong.value  = lVal;
                pTop->item.asLong.length = 10;
-               //printf( "Added: %i, Result: %i", iAdd, pTop->item.asLong.value );
                break;
             }
             else if( HB_IS_OBJECT( pTop ) )
@@ -2855,7 +2753,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   Add.type = HB_IT_INTEGER;
                   Add.item.asInteger.value = iAdd;
                   Add.item.asInteger.length = 10;
-
                   // hb_vmOperatorCall() will POP 2 arguments but we only have 1 argument on the Stack.
                   hb_vmPushNil();
                   hb_vmOperatorCall( pTop, &Add, "__OPPLUS", NULL );
@@ -2897,15 +2794,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                }
             }
 
-            pTop->item.asDouble.value = ( double ) dNewVal;
-            pTop->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
-
             if( !HB_IS_DOUBLE( pTop ) )
             {
                pTop->type = HB_IT_DOUBLE;
                pTop->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
             }
-
+            pTop->item.asDouble.value = dNewVal;
+            pTop->item.asDouble.length = HB_DBL_LENGTH( dNewVal );
             break;
          }
 
@@ -2921,7 +2816,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else if( pTop->type & HB_IT_LONG )
             {
-               hb_vmPushLogical( pTop->item.asLong.value == lCase );
+               hb_vmPushLogical( (LONG) pTop->item.asLong.value == lCase );
             }
             else if( pTop->type & HB_IT_STRING && pTop->item.asString.length == 1 )
             {
@@ -2932,7 +2827,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                hb_vmPush( hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "SWITCH", 1, pTop ) );
             }
 
-            w += 1 + sizeof( LONG );
+            w += 5;
             break;
          }
 
@@ -3185,7 +3080,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_POPLOCALNEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPLOCALNEAR") );
-            hb_vmPopLocal( (signed char) pCode[ w + 1 ] );
+            hb_vmPopLocal( ( signed char ) pCode[ w + 1 ] );
             w += 2;  /* only first two bytes are used */
             break;
 
@@ -3283,9 +3178,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                }
                else if( pCode[w] == HB_P_MPUSHSYM )
                {
-                  HB_DYNS_PTR *pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
+                  HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
 
-                  hb_vm_apExtraParamsSymbol[hb_vm_iExtraParamsIndex - 1] = ( *pDynSym )->pSymbol;
+                  hb_vm_apExtraParamsSymbol[hb_vm_iExtraParamsIndex - 1] = pDynSym->pSymbol;
                   w += sizeof( HB_DYNS_PTR ) + 1;
                }
                else
@@ -3304,9 +3199,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                }
                else if( pCode[w] == HB_P_MPUSHSYM )
                {
-                  HB_DYNS_PTR *pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
+                  HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
 
-                  HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex - 1] = ( *pDynSym )->pSymbol;
+                  HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex - 1] = pDynSym->pSymbol;
                   w += sizeof( HB_DYNS_PTR ) + 1;
                }
                else
@@ -3461,38 +3356,38 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_MMESSAGE:
          {
-            HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
 
-            hb_vmPushSymbol( ( *pDynSym )->pSymbol );
+            hb_vmPushSymbol( pDynSym->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
          }
 
          case HB_P_MPOPALIASEDFIELD:
          {
-            HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
 
-            hb_vmPopAliasedField( ( *pDynSym )->pSymbol );
+            hb_vmPopAliasedField( pDynSym->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
          }
 
          case HB_P_MPOPALIASEDVAR:
          {
-            HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
-            hb_vmPopAliasedVar( ( *pDynSym )->pSymbol );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
+            hb_vmPopAliasedVar( pDynSym->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
          }
 
          case HB_P_MPOPFIELD:
          {
-            HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
 
             /* Pops a value from the eval stack and uses it to set
             * a new value of the given field
             */
-            hb_rddPutFieldValue( ( hb_stackItemFromTop(-1) ), ( *pDynSym )->pSymbol );
+            hb_rddPutFieldValue( ( hb_stackItemFromTop(-1) ), pDynSym->pSymbol );
 
             hb_stackPop();
 
@@ -3502,12 +3397,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_MPOPMEMVAR:
          {
-            HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
             PHB_ITEM pTop;
 
             pTop = *( HB_VM_STACK.pPos - 1 );
 
-            hb_memvarSetValue( ( *pDynSym )->pSymbol, pTop );
+            hb_memvarSetValue( pDynSym->pSymbol, pTop );
 
             hb_stackPop();
 
@@ -3518,16 +3413,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_MPUSHALIASEDFIELD:
          {
-            HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
-            hb_vmPushAliasedField( ( *pDynSym )->pSymbol );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
+            hb_vmPushAliasedField( pDynSym->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
          }
 
          case HB_P_MPUSHALIASEDVAR:
          {
-            HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
-            hb_vmPushAliasedVar( ( *pDynSym )->pSymbol );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
+            hb_vmPushAliasedVar( pDynSym->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
          }
@@ -3550,10 +3445,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_MPUSHFIELD:
          {
-            HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
             /* It pushes the current value of the given field onto the eval stack
             */
-            hb_rddGetFieldValue( ( * HB_VM_STACK.pPos ), ( *pDynSym )->pSymbol );
+            hb_rddGetFieldValue( ( * HB_VM_STACK.pPos ), pDynSym->pSymbol );
             hb_stackPush();
             HB_TRACE(HB_TR_INFO, ("(hb_vmMPushField)"));
             w += sizeof( HB_DYNS_PTR ) + 1;
@@ -3562,8 +3457,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_MPUSHMEMVAR:
          {
-            HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
-            hb_memvarGetValue( ( * HB_VM_STACK.pPos ), ( *pDynSym )->pSymbol );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
+            hb_memvarGetValue( ( * HB_VM_STACK.pPos ), pDynSym->pSymbol );
             hb_stackPush();
             HB_TRACE(HB_TR_INFO, ("(hb_vmMPushMemvar)"));
             w += sizeof( HB_DYNS_PTR ) + 1;
@@ -3572,8 +3467,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_MPUSHMEMVARREF:
          {
-            HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
-            hb_memvarGetRefer( ( * HB_VM_STACK.pPos ), ( *pDynSym )->pSymbol );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
+            hb_memvarGetRefer( ( * HB_VM_STACK.pPos ), pDynSym->pSymbol );
             hb_stackPush();
             HB_TRACE(HB_TR_INFO, ("(hb_vmMPushMemvarRef)"));
             w += sizeof( HB_DYNS_PTR ) + 1;
@@ -3582,16 +3477,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_MPUSHSYM:
          {
-            HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
-            hb_vmPushSymbol( ( *pDynSym )->pSymbol );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
+            hb_vmPushSymbol( pDynSym->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
          }
 
          case HB_P_MPUSHVARIABLE:
          {
-            HB_DYNS_PTR * pDynSym = ( HB_DYNS_PTR * ) ( pCode + w + 1 );
-            hb_vmPushVariable( ( *pDynSym )->pSymbol );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
+            hb_vmPushVariable( pDynSym->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
          }
@@ -3601,7 +3496,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          {
             USHORT uiSize = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
 
-            hb_vmPushString( ( char * ) ( pCode ) + w + 3, ( ULONG )( uiSize - 1 ) );
+            hb_vmPushString( ( char * ) ( pCode + w + 3 ), ( ULONG )( uiSize - 1 ) );
 
             w += ( 3 + uiSize );
             break;
@@ -3758,31 +3653,53 @@ static void hb_vmNegate( void )
 
    if( HB_IS_INTEGER( pItem ) )
    {
-      pItem->item.asInteger.value = -pItem->item.asInteger.value;
-      pItem->item.asInteger.length = 10;
+#if -HB_INT_MAX > HB_INT_MIN
+      if ( pItem->item.asInteger.value < -HB_INT_MAX )
+      {
+#if HB_LONG_MAX > HB_INT_MAX
+         HB_LONG lValue = ( HB_LONG ) pItem->item.asInteger.value;
+         pItem->type = HB_IT_LONG;
+         pItem->item.asLong.value = -lValue;
+         pItem->item.asLong.length = HB_LONG_LENGTH( -lValue );
+#else
+         double dValue = ( double ) pItem->item.asInteger.value;
+         pItem->type = HB_IT_DOUBLE;
+         pItem->item.asDouble.value = -dValue;
+         pItem->item.asDouble.length = HB_DBL_LENGTH( -dValue );
+#endif
+      }
+      else
+#endif
+      {
+         pItem->item.asInteger.value = -pItem->item.asInteger.value;
+         pItem->item.asInteger.length = HB_INT_LENGTH( pItem->item.asInteger.value );
+      }
    }
    else if( HB_IS_LONG( pItem ) )
    {
-      pItem->item.asLong.value = -pItem->item.asLong.value;
-      pItem->item.asLong.length = ( pItem->item.asLong.value <= -1000000000 ) ? 20 : 10;
+#if -HB_LONG_MAX > HB_LONG_MIN
+      if ( pItem->item.asLong.value < -HB_LONG_MAX )
+      {
+         double dValue = ( double ) pItem->item.asLong.value;
+         pItem->type = HB_IT_DOUBLE;
+         pItem->item.asDouble.value = -dValue;
+         pItem->item.asDouble.length = HB_DBL_LENGTH( -dValue );
+      }
+      else
+#endif
+      {
+         pItem->item.asLong.value = -pItem->item.asLong.value;
+         pItem->item.asLong.length = HB_LONG_LENGTH( pItem->item.asLong.value );
+      }
    }
    else if( HB_IS_DOUBLE( pItem ) )
    {
       pItem->item.asDouble.value = -pItem->item.asDouble.value;
-      /* NOTE: Yes, -999999999.0 is right instead of -1000000000.0 [vszakats] */
-      pItem->item.asDouble.length = ( pItem->item.asDouble.value >= 10000000000.0 || pItem->item.asDouble.value <= -999999999.0 ) ? 20 : 10;
+      pItem->item.asDouble.length = HB_DBL_LENGTH( pItem->item.asDouble.value );
    }
-#ifndef HB_LONG_LONG_OFF
-   else if( HB_IS_LONGLONG( pItem ) )
-   {
-      pItem->item.asLongLong.value = -pItem->item.asLongLong.value;
-      pItem->item.asLongLong.length = 20 ;
-   }
-#endif
-
    else if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
    {
-      pItem->item.asInteger.value = - pItem->item.asString.value[0];
+      pItem->item.asInteger.value = - ( int ) pItem->item.asString.value[0];
       pItem->type = HB_IT_INTEGER;
       pItem->item.asInteger.length = 10;
    }
@@ -3819,9 +3736,11 @@ static void hb_vmPlus( void )
 
       //printf( "Adding '%s' + '%s'\n", pItem1->item.asString.value, pItem2->item.asString.value );
 
-      if( ( double ) ( ( double ) ulLen1 + ( double ) ulLen2 ) < ( double ) ULONG_MAX )
+//      if( ( double ) ( ( double ) ulLen1 + ( double ) ulLen2 ) < ( double ) ULONG_MAX )
+      if( ulLen1 < ULONG_MAX - ulLen2 )
       {
-         ULONG ulNewLen   = ulLen1 + ulLen2; char *pNewString;
+         ULONG ulNewLen   = ulLen1 + ulLen2;
+         char *pNewString;
 
          if( pItem1->item.asString.bStatic || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
          {
@@ -3875,6 +3794,16 @@ static void hb_vmPlus( void )
    else if( ( HB_IS_DATE( pItem1 ) || HB_IS_DATE( pItem2 ) ) && ( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) ) )
    {
       hb_vmPushDate( (LONG) hb_vmPopNumber() + (LONG) hb_vmPopNumber() );
+   }
+   else if( HB_IS_NUMINT( pItem1 ) && HB_IS_NUMINT( pItem2 ) )
+   {
+      HB_LONG lNumber2 = hb_vmPopHBLong();
+      HB_LONG lNumber1 = hb_vmPopHBLong();
+      HB_LONG lResult = lNumber1 + lNumber2;
+      if ( lNumber2 >= 0 ? lResult >= lNumber1 : lResult < lNumber1 )
+         hb_vmPushNumInt( lResult );
+      else
+         hb_vmPushDouble( ( double ) lNumber1 + ( double ) lNumber2, 0 );
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
@@ -3933,35 +3862,31 @@ static void hb_vmMinus( void )
    // Must be first because STRING (length 1) qualifies as NUMERIC!
    if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
    {
-      if( ( double ) ( ( double ) pItem1->item.asString.length + ( double ) pItem2->item.asString.length ) < ( double ) ULONG_MAX )
+      ULONG ulLen1 = pItem1->item.asString.length;
+      ULONG ulLen2 = pItem2->item.asString.length;
+
+      if( ulLen1 < ULONG_MAX - ulLen2 )
       {
-         ULONG ulLen      = pItem1->item.asString.length;
-         ULONG ulNewLen   = pItem1->item.asString.length + pItem2->item.asString.length;
-         char *pNewString = ( char * ) hb_xgrab( ulNewLen + 1 );
+         char * szNewString = ( char * ) hb_xgrab( ulLen1 + ulLen2 + 1 );
+         ULONG ulNewLen = ulLen1 + ulLen2;
 
-         hb_xmemcpy( pNewString, pItem1->item.asString.value, pItem1->item.asString.length );
+         while( ulLen1 && pItem1->item.asString.value[ ulLen1 - 1 ] == ' ' )
+            ulLen1--;
 
-         hb_itemReleaseString( pItem1 );
+         hb_xmemcpy( szNewString, pItem1->item.asString.value, ulLen1 );
+         hb_xmemcpy( szNewString + ulLen1, pItem2->item.asString.value, ulLen2 );
+         hb_xmemset( szNewString + ulLen1 + ulLen2, ' ', pItem1->item.asString.length - ulLen1 );
+         szNewString[ ulNewLen ] = '\0';
 
          HB_TRACE( HB_TR_DEBUG, ( "Released hb_vmMinus() Created \"%s\"", pNewString ) );
 
+         hb_itemReleaseString( pItem1 );
          //pItem1->type = HB_IT_STRING;
          pItem1->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
          *( pItem1->item.asString.pulHolders ) = 1;
          pItem1->item.asString.bStatic = FALSE;
-         pItem1->item.asString.value   = pNewString;
-
-         pItem1->item.asString.length = ulNewLen;
-
-         while( ulLen && pItem1->item.asString.value[ ulLen - 1 ] == ' ' )
-         {
-            ulLen--;
-         }
-
-         hb_xmemcpy( pItem1->item.asString.value + ulLen, pItem2->item.asString.value, pItem2->item.asString.length );
-         ulLen += pItem2->item.asString.length;
-         hb_xmemset( pItem1->item.asString.value + ulLen, ' ', pItem1->item.asString.length - ulLen );
-         pItem1->item.asString.value[ pItem1->item.asString.length ] = '\0';
+         pItem1->item.asString.value   = szNewString;
+         pItem1->item.asString.length  = ulNewLen;
 
          hb_stackPop();
       }
@@ -3989,6 +3914,16 @@ static void hb_vmMinus( void )
       double dNumber1 = hb_vmPopNumber();
 
       hb_vmPushDate( (LONG) dNumber1 - (LONG) dNumber2 );
+   }
+   else if( HB_IS_NUMINT( pItem1 ) && HB_IS_NUMINT( pItem2 ) )
+   {
+      HB_LONG lNumber2 = hb_vmPopHBLong();
+      HB_LONG lNumber1 = hb_vmPopHBLong();
+      HB_LONG lResult = lNumber1 - lNumber2;
+      if ( lNumber2 <= 0 ? lResult >= lNumber1 : lResult < lNumber1 )
+         hb_vmPushNumInt( lResult );
+      else
+         hb_vmPushDouble( ( double ) lNumber1 - ( double ) lNumber2, 0 );
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
@@ -4088,16 +4023,7 @@ static void hb_vmMult( void )
       int iDec2, iDec1, iType2 = pItem2->type, iType1 = pItem1->type;
       double d2 = hb_vmPopDouble( &iDec2 );
       double d1 = hb_vmPopDouble( &iDec1 );
-
-#if 0
-      /* AJ: Commented 2004-02-16 because it seems that minus zero problem
-      has been dissapread even without this hack
-      */
-      if ( ( d1 * d2 ) == -0 )
-         hb_vmPushNumType( 0, iDec1 + iDec2, iType1, iType2 );
-      else
-#endif
-         hb_vmPushNumType( d1 * d2, iDec1 + iDec2, iType1, iType2 );
+      hb_vmPushNumType( d1 * d2, iDec1 + iDec2, iType1, iType2 );
    }
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpMult" ) )
    {
@@ -4131,32 +4057,35 @@ static void hb_vmDivide( void )
 
    if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      double d2 = hb_vmPopNumber();
-      double d1 = hb_vmPopNumber();
+      double dDivisor = hb_itemGetND( pItem2 );
 
-      if( d2 == 0.0 )
+      if( dDivisor == 0.0 )
       {
          PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1340, NULL, "/", 2, pItem1, pItem2 );
 
          if( pResult )
          {
+            hb_stackPop();
+            hb_stackPop();
             hb_itemPushForward( pResult );
             hb_itemRelease( pResult );
          }
       }
       else
       {
+         hb_stackPop(); /* pop divisor from the stack */
+
          /* If all both operand was integer and the result is an integer, too,
             push the number without decimals. Clipper compatible. Actually,
             this is not Clipper compatible. The only time Clipper returns 0
             decimal places is for compiler optimized integer division with an
             integer result. Therefore this code is not needed and has been
             removed - David G. Holm <dholm@jsd-llc.com>
-         if( bIntegerOperands && fmod( d1, d2 ) == 0.0 )
-            hb_vmPushNumber( d1 / d2, 0 );
+         if( bIntegerOperands && fmod( hb_itemGetND( pItem1 ), dDivisor ) == 0.0 )
+            hb_vmPushNumber( hb_vmPopNumber() / dDivisor, 0 );
          else
          */
-         hb_vmPushDouble( d1 / d2, hb_set.HB_SET_DECIMALS );
+         hb_vmPushDouble( hb_vmPopNumber() / dDivisor, hb_set.HB_SET_DECIMALS );
       }
    }
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpDivide" ) )
@@ -4191,16 +4120,17 @@ static void hb_vmModulus( void )
 
    if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
-      int iDec2, iDec1, iType2 = pItem2->type, iType1 = pItem1->type;
-      double d2 = hb_vmPopDouble( &iDec2 );
-      double d1 = hb_vmPopDouble( &iDec1 );
+      int iType2 = pItem2->type, iType1 = pItem1->type;
+      double dDivisor = hb_itemGetND( pItem2 );
 
-      if( d2 == 0.0 )
+      if( dDivisor == 0.0 )
       {
          PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1341, NULL, "%", 2, pItem1, pItem2 );
 
          if( pResult )
          {
+            hb_stackPop();
+            hb_stackPop();
             hb_itemPushForward( pResult );
             hb_itemRelease( pResult );
          }
@@ -4208,7 +4138,8 @@ static void hb_vmModulus( void )
       else
          /* NOTE: Clipper always returns the result of modulus
                   with the SET number of decimal places. */
-         hb_vmPushNumType( fmod( d1, d2 ), hb_set.HB_SET_DECIMALS, iType1, iType2 );
+         hb_stackPop(); /* pop divisor from the stack */
+         hb_vmPushNumType( fmod( hb_vmPopNumber(), dDivisor ), hb_set.HB_SET_DECIMALS, iType1, iType2 );
    }
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpMod" ) )
    {
@@ -4284,25 +4215,18 @@ static void hb_vmInc( void )
    {
       pItem->item.asDate.value++;
    }
-   else if( HB_IS_NUMBER_INT( pItem  ) )
+   else if( HB_IS_NUMINT( pItem  ) )
    {
-      if( HB_IS_INTEGER( pItem ) && pItem->item.asInteger.value < SHRT_MAX )
+      if( HB_IS_INTEGER( pItem ) && pItem->item.asInteger.value < HB_INT_MAX )
       {
          pItem->item.asInteger.value++;
-         pItem->item.asInteger.length = 10;
+         pItem->item.asInteger.length = HB_INT_LENGTH( pItem->item.asInteger.value );
       }
-      else if( HB_IS_LONG( pItem ) && pItem->item.asLong.value < LONG_MAX )
+      else if( HB_IS_LONG( pItem ) && pItem->item.asLong.value < HB_LONG_MAX )
       {
          pItem->item.asLong.value++;
-         pItem->item.asLong.length = ( pItem->item.asLong.value <= -1000000000 ) ? 20 : 10;
+         pItem->item.asLong.length = HB_LONG_LENGTH( pItem->item.asLong.value );
       }
-#ifndef HB_LONG_LONG_OFF
-      else if( HB_IS_LONGLONG( pItem ) && pItem->item.asLongLong.value < LONGLONG_MAX )
-      {
-         pItem->item.asLongLong.value++;
-         pItem->item.asLongLong.length = 20 ;
-      }
-#endif
       else
       {
          int iDec, iType = pItem->type;
@@ -4313,7 +4237,7 @@ static void hb_vmInc( void )
    else if( HB_IS_DOUBLE( pItem ) )
    {
       pItem->item.asDouble.value++;
-      pItem->item.asDouble.length = ( pItem->item.asDouble.value >= 10000000000.0 || pItem->item.asDouble.value <= -999999999.0 ) ? 20 : 10;
+      pItem->item.asDouble.length = HB_DBL_LENGTH( pItem->item.asDouble.value );
    }
    else if( HB_IS_OBJECT( pItem ) && hb_objHasMsg( pItem, "__OpInc" ) )
    {
@@ -4350,25 +4274,18 @@ static void hb_vmDec( void )
    {
       pItem->item.asDate.value--;
    }
-   else if( HB_IS_NUMBER_INT( pItem  ) )
+   else if( HB_IS_NUMINT( pItem  ) )
    {
-      if( HB_IS_INTEGER( pItem ) && pItem->item.asInteger.value > SHRT_MIN )
+      if( HB_IS_INTEGER( pItem ) && pItem->item.asInteger.value > HB_INT_MIN )
       {
          pItem->item.asInteger.value--;
-         pItem->item.asInteger.length = 10;
+         pItem->item.asInteger.length = HB_INT_LENGTH( pItem->item.asInteger.value );
       }
-      else if( HB_IS_LONG( pItem ) && pItem->item.asLong.value > LONG_MIN )
+      else if( HB_IS_LONG( pItem ) && pItem->item.asLong.value > HB_LONG_MIN )
       {
          pItem->item.asLong.value--;
-         pItem->item.asLong.length = ( pItem->item.asLong.value <= -1000000000 ) ? 20 : 10;
+         pItem->item.asLong.length = HB_LONG_LENGTH( pItem->item.asLong.value );
       }
-#ifndef HB_LONG_LONG_OFF
-      else if( HB_IS_LONGLONG( pItem ) && pItem->item.asLongLong.value > LONGLONG_MIN )
-      {
-         pItem->item.asLongLong.value--;
-         pItem->item.asLongLong.length = 20 ;
-      }
-#endif
       else
       {
          int iDec, iType = pItem->type;
@@ -4379,7 +4296,7 @@ static void hb_vmDec( void )
    else if( HB_IS_DOUBLE( pItem ) )
    {
       pItem->item.asDouble.value--;
-      pItem->item.asDouble.length = ( pItem->item.asDouble.value >= 10000000000.0 || pItem->item.asDouble.value <= -999999999.0 ) ? 20 : 10;
+      pItem->item.asDouble.length = HB_DBL_LENGTH( pItem->item.asDouble.value );
    }
    else if( HB_IS_OBJECT( pItem ) && hb_objHasMsg( pItem, "__OpDec" ) )
    {
@@ -4457,7 +4374,10 @@ static void hb_vmEqual( BOOL bExact )
       hb_stackPop();
       hb_vmPushLogical( i == 0 );
    }
-
+   else if( HB_IS_NUMINT( pItem1 ) && HB_IS_NUMINT( pItem2 ) )
+   {
+      hb_vmPushLogical( hb_vmPopHBLong() == hb_vmPopHBLong() );
+   }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
       hb_vmPushLogical( hb_vmPopNumber() == hb_vmPopNumber() );
@@ -4544,6 +4464,10 @@ static void hb_vmNotEqual( void )
       hb_stackPop();
       hb_vmPushLogical( i != 0 );
    }
+   else if( HB_IS_NUMINT( pItem1 ) && HB_IS_NUMINT( pItem2 ) )
+   {
+      hb_vmPushLogical( hb_vmPopHBLong() != hb_vmPopHBLong() );
+   }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
       hb_vmPushLogical( hb_vmPopNumber() != hb_vmPopNumber() );
@@ -4598,6 +4522,12 @@ static void hb_vmLess( void )
       hb_stackPop();
       hb_vmPushLogical( i < 0 );
    }
+   else if( HB_IS_NUMINT( hb_stackItemFromTop( -1 ) ) && HB_IS_NUMINT( hb_stackItemFromTop( -2 ) ) )
+   {
+      HB_LONG lNumber2 = hb_vmPopHBLong();
+      HB_LONG lNumber1 = hb_vmPopHBLong();
+      hb_vmPushLogical( lNumber1 < lNumber2 );
+   }
    else if( HB_IS_NUMERIC( hb_stackItemFromTop( - 1  ) ) && HB_IS_NUMERIC( hb_stackItemFromTop( -2 ) ) )
    {
       double dNumber2 = hb_vmPopNumber();
@@ -4642,6 +4572,12 @@ static void hb_vmLessEqual( void )
       hb_stackPop();
       hb_stackPop();
       hb_vmPushLogical( i <= 0 );
+   }
+   else if( HB_IS_NUMINT( hb_stackItemFromTop( -1 ) ) && HB_IS_NUMINT( hb_stackItemFromTop( -2 ) ) )
+   {
+      HB_LONG lNumber2 = hb_vmPopHBLong();
+      HB_LONG lNumber1 = hb_vmPopHBLong();
+      hb_vmPushLogical( lNumber1 <= lNumber2 );
    }
    else if( HB_IS_NUMERIC( hb_stackItemFromTop( -1 ) ) && HB_IS_NUMERIC( hb_stackItemFromTop( -2 ) ) )
    {
@@ -4688,6 +4624,12 @@ static void hb_vmGreater( void )
       hb_stackPop();
       hb_vmPushLogical( i > 0 );
    }
+   else if( HB_IS_NUMINT( hb_stackItemFromTop( -1 ) ) && HB_IS_NUMINT( hb_stackItemFromTop( -2 ) ) )
+   {
+      HB_LONG lNumber2 = hb_vmPopHBLong();
+      HB_LONG lNumber1 = hb_vmPopHBLong();
+      hb_vmPushLogical( lNumber1 > lNumber2 );
+   }
    else if( HB_IS_NUMERIC( hb_stackItemFromTop( -1 ) ) && HB_IS_NUMERIC( hb_stackItemFromTop( -2 ) ) )
    {
       double dNumber2 = hb_vmPopNumber();
@@ -4732,6 +4674,12 @@ static void hb_vmGreaterEqual( void )
       hb_stackPop();
       hb_stackPop();
       hb_vmPushLogical( i >= 0 );
+   }
+   else if( HB_IS_NUMINT( hb_stackItemFromTop( -1 ) ) && HB_IS_NUMINT( hb_stackItemFromTop( -2 ) ) )
+   {
+      HB_LONG lNumber2 = hb_vmPopHBLong();
+      HB_LONG lNumber1 = hb_vmPopHBLong();
+      hb_vmPushLogical( lNumber1 >= lNumber2 );
    }
    else if( HB_IS_NUMERIC( hb_stackItemFromTop( -1 ) ) && HB_IS_NUMERIC( hb_stackItemFromTop( -2 ) ) )
    {
@@ -5166,12 +5114,6 @@ static void hb_vmArrayPush( void )
    {
       lIndex = ( LONG ) pIndex->item.asDouble.value;
    }
-#ifndef HB_LONG_LONG_OFF
-   else if( HB_IS_LONGLONG( pIndex ) )
-   {
-      lIndex = ( LONG ) pIndex->item.asLongLong.value;
-   }
-#endif
 #ifndef HB_C52_STRICT
    else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
    {
@@ -5399,12 +5341,6 @@ static void hb_vmArrayPop( void )
    {
       lIndex = ( LONG ) pIndex->item.asDouble.value;
    }
-#ifndef HB_LONG_LONG_OFF
-   else if( HB_IS_LONGLONG( pIndex ) )
-   {
-      lIndex = ( LONG ) pIndex->item.asLongLong.value;
-   }
-#endif
 #ifndef HB_C52_STRICT
    else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
    {
@@ -5521,12 +5457,6 @@ static void hb_vmArrayPop( void )
          {
             bNewChar = (BYTE) pValue->item.asLong.value;
          }
-         #ifndef HB_LONG_LONG_OFF
-         else if( pValue->type == HB_IT_LONGLONG )
-         {
-            bNewChar = (BYTE) pValue->item.asLongLong.value;
-         }
-         #endif
          else
          {
             bNewChar = (BYTE) pValue->item.asDouble.value;
@@ -5653,12 +5583,6 @@ static void hb_vmArrayNew( PHB_ITEM pArray, USHORT uiDimension )
       case HB_IT_DOUBLE:
          ulElements = ( ULONG ) pDim->item.asDouble.value;
          break;
-
-      #ifndef HB_LONG_LONG_OFF
-      case HB_IT_LONGLONG:
-         ulElements = ( ULONG ) pDim->item.asLongLong.value;
-         break;
-      #endif
 
       default:
          /* NOTE: Clipper creates empty array if non-numeric value is
@@ -5794,36 +5718,12 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
          pAlias->type = HB_IT_NIL;
          break;
 
-      /*
-       These types were added for Clipper compatibility
-      */
-      case HB_IT_ARRAY:
-      case HB_IT_BLOCK:
-         hb_itemClear( pAlias );
-         // Fall through.
-
-      case HB_IT_NIL:
-      case HB_IT_LOGICAL:
-      case HB_IT_DATE:
-         hb_rddSelectWorkAreaNumber( -1 );
-         pAlias->type = HB_IT_NIL;
-         break;
-
       case HB_IT_DOUBLE:
          /* Alias was evaluated from an expression, (nWorkArea)->field
           */
          hb_rddSelectWorkAreaNumber( ( int ) pAlias->item.asDouble.value );
          pAlias->type = HB_IT_NIL;
          break;
-
-      #ifndef HB_LONG_LONG_OFF
-      case HB_IT_LONGLONG:
-         /* Alias was evaluated from an expression, (nWorkArea)->field
-          */
-         hb_rddSelectWorkAreaNumber( ( int ) pAlias->item.asLongLong.value );
-         pAlias->type = HB_IT_NIL;
-         break;
-     #endif
 
       case HB_IT_SYMBOL:
          /* Alias was specified using alias identifier, for example: al->field
@@ -5850,6 +5750,20 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
 
             hb_itemClear( pAlias );
          }
+         break;
+
+      /*
+       These types were added for Clipper compatibility
+      */
+      case HB_IT_ARRAY:
+      case HB_IT_BLOCK:
+         hb_itemClear( pAlias );
+         /* Fall through. */
+      case HB_IT_NIL:
+      case HB_IT_LOGICAL:
+      case HB_IT_DATE:
+         hb_rddSelectWorkAreaNumber( -1 );
+         pAlias->type = HB_IT_NIL;
          break;
 
       default:
@@ -6784,56 +6698,56 @@ HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumType(%lf, %d, %i, %i)", dNumber, iDec, iType1, iType2));
 
-   //printf( "%i\n", (int) dNumber );
-
    if( iDec || iType1 & HB_IT_DOUBLE || iType2 & HB_IT_DOUBLE )
    {
       hb_vmPushDouble( dNumber, iDec );
    }
-   else if( SHRT_MIN <= dNumber && dNumber <= SHRT_MAX )
+   else if ( HB_DBL_LIM_INT( dNumber ) )
    {
       hb_vmPushInteger( ( int ) dNumber );
    }
-   else if( LONG_MIN <= dNumber && dNumber <= LONG_MAX )
+   else if ( HB_DBL_LIM_LONG( dNumber ) )
    {
-      hb_vmPushLong( ( LONG ) dNumber );
+      hb_vmPushHBLong( ( HB_LONG ) dNumber );
    }
-#ifndef HB_LONG_LONG_OFF
-   else if( LONGLONG_MIN <= dNumber && dNumber <= LONGLONG_MAX )
-   {
-      hb_vmPushLongLong( ( LONGLONG ) dNumber );
-   }
-#endif
    else
    {
       hb_vmPushDouble( dNumber, hb_set.HB_SET_DECIMALS );
    }
 }
 
-#ifndef HB_LONG_LONG_OFF
-HB_EXPORT void hb_vmPushNumInt( LONGLONG lNumber )
-#else
-HB_EXPORT void hb_vmPushNumInt( LONG lNumber )
-#endif
+HB_EXPORT void hb_vmPushNumInt( HB_LONG lNumber )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumType(%Ld, %i, %i)", lNumber ));
 
-   //printf( "%i\n", (int) dNumber );
-
-   if( SHRT_MIN <= lNumber && lNumber <= SHRT_MAX )
+   if ( HB_LIM_INT( lNumber ) )
    {
       hb_vmPushInteger( ( int ) lNumber );
    }
-   else if( LONG_MIN <= lNumber && lNumber <= LONG_MAX )
+   else
    {
-      hb_vmPushLong( ( LONG ) lNumber );
+      hb_vmPushHBLong( lNumber );
    }
-#ifndef HB_LONG_LONG_OFF
-   else //if( LONGLONG_MIN <= lNumber && lNumber <= LONGLONG_MAX )
+}
+
+static int hb_vmCalcIntWidth( HB_LONG lNumber )
+{
+   int iWidth;
+
+   if( lNumber <= -1000000000L )
    {
-      hb_vmPushLongLong( lNumber );
+      iWidth = 20;
    }
-#endif
+   else
+   {
+      iWidth = 10;
+      while ( lNumber >= 1000000000L )
+      {
+         iWidth++;
+         lNumber /= 10;
+      }
+   }
+   return iWidth;
 }
 
 HB_EXPORT void hb_vmPushInteger( int iNumber )
@@ -6844,9 +6758,23 @@ HB_EXPORT void hb_vmPushInteger( int iNumber )
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_INTEGER;
    ( * HB_VM_STACK.pPos )->item.asInteger.value = iNumber;
-   ( * HB_VM_STACK.pPos )->item.asInteger.length = 10;
+   ( * HB_VM_STACK.pPos )->item.asInteger.length = HB_INT_LENGTH( iNumber );
    hb_stackPush();
 }
+
+#if HB_INT_MAX >= INT32_MAX
+static void hb_vmPushIntegerConst( int iNumber )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushIntegerConst(%d)", iNumber));
+
+   ( * HB_VM_STACK.pPos )->type = HB_IT_INTEGER;
+   ( * HB_VM_STACK.pPos )->item.asInteger.value = iNumber;
+   ( * HB_VM_STACK.pPos )->item.asInteger.length = hb_vmCalcIntWidth( iNumber );
+   hb_stackPush();
+}
+#endif
 
 HB_EXPORT void hb_vmPushLong( LONG lNumber )
 {
@@ -6854,22 +6782,15 @@ HB_EXPORT void hb_vmPushLong( LONG lNumber )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushLong(%ld)", lNumber));
 
+#if HB_INT_MAX >= LONG_MAX
+   ( * HB_VM_STACK.pPos )->type = HB_IT_INTEGER;
+   ( * HB_VM_STACK.pPos )->item.asInteger.value = ( int ) lNumber;
+   ( * HB_VM_STACK.pPos )->item.asInteger.length = HB_INT_LENGTH( lNumber );
+#else
    ( * HB_VM_STACK.pPos )->type = HB_IT_LONG;
    ( * HB_VM_STACK.pPos )->item.asLong.value = lNumber;
-
-   if( lNumber >= 1000000000 )
-   {
-      ( * HB_VM_STACK.pPos )->item.asLong.length = 11;
-   }
-   else if( lNumber <= -1000000000 )
-   {
-      ( * HB_VM_STACK.pPos )->item.asLong.length = 20;
-   }
-   else
-   {
-      ( * HB_VM_STACK.pPos )->item.asLong.length = 10;
-   }
-
+   ( * HB_VM_STACK.pPos )->item.asLong.length = HB_LONG_LENGTH( lNumber );
+#endif
    hb_stackPush();
 }
 
@@ -6879,35 +6800,42 @@ static void hb_vmPushLongConst( LONG lNumber )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushLongConst(%ld)", lNumber));
 
+#if HB_INT_MAX >= LONG_MAX
+   ( * HB_VM_STACK.pPos )->type = HB_IT_INTEGER;
+   ( * HB_VM_STACK.pPos )->item.asInteger.value = ( int ) lNumber;
+   ( * HB_VM_STACK.pPos )->item.asInteger.length = hb_vmCalcIntWidth( lNumber );
+#else
    ( * HB_VM_STACK.pPos )->type = HB_IT_LONG;
    ( * HB_VM_STACK.pPos )->item.asLong.value = lNumber;
+   ( * HB_VM_STACK.pPos )->item.asLong.length = hb_vmCalcIntWidth( lNumber );
+#endif
+   hb_stackPush();
+}
 
-   if( lNumber >= 1000000000 )
-   {
-      ( * HB_VM_STACK.pPos )->item.asLong.length = 11;
-   }
-   else if( lNumber <= -1000000000 )
-   {
-      ( * HB_VM_STACK.pPos )->item.asLong.length = 20;
-   }
-   else
-   {
-      ( * HB_VM_STACK.pPos )->item.asLong.length = 10;
-   }
+static void hb_vmPushHBLong( HB_LONG lNumber )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushHBLong(%" PFHL "d)", lNumber));
+
+   ( * HB_VM_STACK.pPos )->type = HB_IT_LONG;
+   ( * HB_VM_STACK.pPos )->item.asLong.value = lNumber;
+   ( * HB_VM_STACK.pPos )->item.asLong.length = HB_LONG_LENGTH( lNumber );
 
    hb_stackPush();
 }
 
-#ifndef HB_LONG_LONG_OFF
-HB_EXPORT void hb_vmPushLongLong( LONGLONG lNumber )
+#if !defined( HB_LONG_LONG_OFF )
+static void hb_vmPushLongLongConst( LONGLONG llNumber )
 {
    HB_THREAD_STUB
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushLongLong(%Ld)", lNumber));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushLongLongConst(%" PFLL "d)", llNumber));
 
-   ( * HB_VM_STACK.pPos )->type = HB_IT_LONGLONG;
-   ( * HB_VM_STACK.pPos )->item.asLongLong.value = lNumber;
-   ( * HB_VM_STACK.pPos )->item.asLongLong.length = 20;
+   ( * HB_VM_STACK.pPos )->type = HB_IT_LONG;
+   ( * HB_VM_STACK.pPos )->item.asLong.value = llNumber;
+   ( * HB_VM_STACK.pPos )->item.asLong.length = hb_vmCalcIntWidth( llNumber );
+
    hb_stackPush();
 }
 #endif
@@ -6920,7 +6848,7 @@ HB_EXPORT void hb_vmPushDouble( double dNumber, int iDec )
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_DOUBLE;
    ( * HB_VM_STACK.pPos )->item.asDouble.value = dNumber;
-   ( * HB_VM_STACK.pPos )->item.asDouble.length = ( dNumber >= 10000000000.0 || dNumber <= -1000000000.0 ) ? 20 : 10;
+   ( * HB_VM_STACK.pPos )->item.asDouble.length = HB_DBL_LENGTH( dNumber );
    if( iDec == HB_DEFAULT_DECIMALS )
       ( * HB_VM_STACK.pPos )->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
    else
@@ -6929,6 +6857,7 @@ HB_EXPORT void hb_vmPushDouble( double dNumber, int iDec )
    hb_stackPush();
 }
 
+#if 0
 static int hb_vmCalcDoubleWidth( double dNumber, int iDec )
 {
    int iSize;
@@ -6944,6 +6873,7 @@ static int hb_vmCalcDoubleWidth( double dNumber, int iDec )
 
    return iDec == 0 ? iSize + 1 : iSize;
 }
+#endif
 
 static void hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec )
 {
@@ -6959,28 +6889,10 @@ static void hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec )
    else
       ( * HB_VM_STACK.pPos )->item.asDouble.decimal = iDec;
 
-   /* NOTE: Part of these width calculations could be moved to the compiler for
-            maximum speed. */
-
-   if( iDec != HB_DEFAULT_DECIMALS && dNumber >= 1000000000.0 )
-   {
-      /* NOTE: If the width info is not provided by the pcode stream,
-               it will be determined at runtime with a relatively slow
-               method. [vszakats] */
-
-      if( iWidth == HB_DEFAULT_WIDTH )
-         ( * HB_VM_STACK.pPos )->item.asDouble.length = hb_vmCalcDoubleWidth( dNumber, iDec );
-      else
-         ( * HB_VM_STACK.pPos )->item.asDouble.length = iWidth;
-   }
-   else if( dNumber < -999999999.0 || dNumber > 9999999999.0 )
-   {
-      ( * HB_VM_STACK.pPos )->item.asDouble.length = 20;
-   }
+   if( iWidth == HB_DEFAULT_WIDTH )
+      ( * HB_VM_STACK.pPos )->item.asDouble.length = HB_DBL_LENGTH( dNumber );
    else
-   {
-      ( * HB_VM_STACK.pPos )->item.asDouble.length = 10;
-   }
+      ( * HB_VM_STACK.pPos )->item.asDouble.length = iWidth;
 
    hb_stackPush();
 }
@@ -7275,9 +7187,15 @@ static void hb_vmPushAliasedField( PHB_SYMB pSym )
    /*
     This was added for Clipper compatibility
    */
-   if( ( pAlias->type == HB_IT_ARRAY ) || ( pAlias->type == HB_IT_HASH ) || ( pAlias->type == HB_IT_LOGICAL ) || ( pAlias->type == HB_IT_NIL ) || ( pAlias->type == HB_IT_BLOCK ) )
+   if( ( pAlias->type == HB_IT_ARRAY ) || ( pAlias->type == HB_IT_HASH ) || 
+       ( pAlias->type == HB_IT_LOGICAL ) || ( pAlias->type == HB_IT_NIL ) ||
+       ( pAlias->type == HB_IT_BLOCK ) || ( pAlias->type == HB_IT_DATE ) )
    {
-      hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, pAlias );
+      PHB_ITEM pFName = hb_itemNew( NULL );
+
+      hb_itemPutC( pFName, pSym->szName );
+      hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 2, pAlias, pFName );
+      hb_itemRelease( pFName );
    }
    else
    {
@@ -7643,12 +7561,6 @@ static double hb_vmPopNumber( void )
          dNumber = pItem->item.asDouble.value;
          break;
 
-      #ifndef HB_LONG_LONG_OFF
-      case HB_IT_LONGLONG:
-         dNumber = (double) pItem->item.asLongLong.value;
-         break;
-      #endif
-
       case HB_IT_DATE:
          dNumber = (double) pItem->item.asDate.value;
          break;
@@ -7667,6 +7579,45 @@ static double hb_vmPopNumber( void )
    ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
 
    return dNumber;
+}
+
+/* NOTE: Type checking should be done by the caller. */
+
+static HB_LONG hb_vmPopHBLong( void )
+{
+   HB_THREAD_STUB
+
+   PHB_ITEM pItem;
+   HB_LONG lNumber;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPopHBLong()"));
+
+   pItem = hb_stackItemFromTop( -1 );
+   hb_stackDec();
+
+   switch( pItem->type & ~HB_IT_BYREF )
+   {
+      case HB_IT_INTEGER:
+         lNumber = ( HB_LONG ) pItem->item.asInteger.value;
+         break;
+
+      case HB_IT_LONG:
+         lNumber = ( HB_LONG ) pItem->item.asLong.value;
+         break;
+
+      case HB_IT_DOUBLE:
+         lNumber = ( HB_LONG ) pItem->item.asDouble.value;
+         break;
+
+      default:
+         lNumber = 0;  /* To avoid GCC -O2 warning */
+         hb_errInternal( HB_EI_VMPOPINVITEM, NULL, "hb_vmPopNumber()", NULL );
+         break;
+   }
+
+   ( hb_stackTopItem() )->type = HB_IT_NIL;
+
+   return lNumber;
 }
 
 /* NOTE: Type checking should be done by the caller. */
@@ -7700,13 +7651,6 @@ static double hb_vmPopDouble( int * piDec )
          dNumber = pItem->item.asDouble.value;
          *piDec = pItem->item.asDouble.decimal;
          break;
-
-      #ifndef HB_LONG_LONG_OFF
-      case HB_IT_LONGLONG:
-         dNumber = ( double ) pItem->item.asLongLong.value;
-         *piDec = 0;
-         break;
-      #endif
 
       case HB_IT_DATE:
          dNumber = (double) pItem->item.asDate.value;

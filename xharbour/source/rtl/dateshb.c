@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.8 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: dateshb.c,v 1.9 2004/10/22 11:56:14 paultucker Exp $
  */
 
 /*
@@ -232,11 +232,11 @@ HB_FUNC( YEAR )
 
    if( pDate )
    {
-      LONG lYear, lMonth, lDay;
+      int iYear, iMonth, iDay;
 
-      hb_dateDecode( pDate->item.asDate.value, &lYear, &lMonth, &lDay );
+      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
 
-      hb_retnllen( lYear, 5 );
+      hb_retnllen( iYear, 5 );
    }
    else
    {
@@ -250,11 +250,11 @@ HB_FUNC( MONTH )
 
    if( pDate )
    {
-      LONG lYear, lMonth, lDay;
+      int iYear, iMonth, iDay;
 
-      hb_dateDecode( pDate->item.asDate.value, &lYear, &lMonth, &lDay );
+      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
 
-      hb_retnllen( lMonth, 3 );
+      hb_retnilen( iMonth, 3 );
    }
    else
    {
@@ -268,11 +268,11 @@ HB_FUNC( DAY )
 
    if( pDate )
    {
-      LONG lYear, lMonth, lDay;
+      int iYear, iMonth, iDay;
 
-      hb_dateDecode( pDate->item.asDate.value, &lYear, &lMonth, &lDay );
+      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
 
-      hb_retnllen( lDay, 3 );
+      hb_retnilen( iDay, 3 );
    }
    else
    {
@@ -310,9 +310,9 @@ HB_FUNC( TIMEOFDAY )
 
 HB_FUNC( DATE )
 {
-   LONG lYear, lMonth, lDay;
-   hb_dateToday( &lYear, &lMonth, &lDay );
-   hb_retd( lYear, lMonth, lDay );
+   int iYear, iMonth, iDay;
+   hb_dateToday( &iYear, &iMonth, &iDay );
+   hb_retd( iYear, iMonth, iDay );
 }
 
 HB_FUNC( DOW )
@@ -325,15 +325,15 @@ HB_FUNC( DOW )
 
       if( lDate )
       {
-         LONG lYear, lMonth, lDay;
+         int iYear, iMonth, iDay;
 
-         hb_dateDecode( lDate, &lYear, &lMonth, &lDay );
+         hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
 
-         hb_retnllen( hb_dateDOW( lYear, lMonth, lDay ), 3 );
+         hb_retnilen( hb_dateDOW( iYear, iMonth, iDay ), 3 );
       }
       else
       {
-         hb_retnllen( 0, 3 );
+         hb_retnilen( 0, 3 );
       }
    }
    else

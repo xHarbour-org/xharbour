@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.56 2004/04/23 22:52:07 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.57 2004/05/07 16:20:53 ronpinkas Exp $
  */
 
 /*
@@ -117,10 +117,6 @@ RETURN TOleAuto():GetActiveObject( cString )
    #ifdef __MINGW32__
       // Missing in oleauto.h
       WINOLEAUTAPI VarR8FromDec(DECIMAL *pdecIn, DOUBLE *pdblOut);
-   #endif
-
-   #if ( defined(__MINGW32__) || ( defined(__WATCOMC__) && !defined(__FORCE_LONG_LONG__) ) )
-      #define HB_LONG_LONG_OFF
    #endif
 
    static HRESULT  s_nOleError;
@@ -1022,21 +1018,6 @@ RETURN uObj
                 }
                 break;
 
-           #ifndef HB_LONG_LONG_OFF
-              case HB_IT_LONGLONG:
-                if( bByRef )
-                {
-                   pArgs[ n ].n1.n2.vt = VT_BYREF | VT_I8;
-                   pArgs[ n ].n1.n2.n3.pllVal = &( uParam->item.asLongLong.value ) ;
-                }
-                else
-                {
-                   pArgs[ n ].n1.n2.vt = VT_I8;
-                   pArgs[ n ].n1.n2.n3.llVal = hb_parnll( nArg );
-                }
-                break;
-            #endif
-
               case HB_IT_DOUBLE:
                 if( bByRef )
                 {
@@ -1345,13 +1326,6 @@ RETURN uObj
         case VT_UINT:
           hb_retnl( ( LONG ) RetVal.n1.n2.n3.lVal );
           break;
-
-     #ifndef HB_LONG_LONG_OFF
-        case VT_I8:     // Long (4 bytes)
-        case VT_UI8:
-          hb_retnll( ( LONG ) RetVal.n1.n2.n3.llVal );
-          break;
-     #endif
 
         case VT_R4:     // Single
           hb_retnd( RetVal.n1.n2.n3.fltVal );

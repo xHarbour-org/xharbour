@@ -1,5 +1,5 @@
 /*
- * $Id: gtgraph.c,v 1.7 2004/05/09 23:40:05 druzus Exp $
+ * $Id: gtgraph.c,v 1.8 2004/08/13 11:11:58 alexstrickland Exp $
  */
 
 /*
@@ -68,18 +68,15 @@ static HB_GT_GCOLOR *s_paramToColor( PHB_ITEM pColor, char *funcname )
          hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong color code", funcname, 0 );
       }
    }
+   else if ( HB_IS_NUMBER( pColor ) )
+   {
+      HB_LONG col  = hb_itemGetNInt( pColor );
 #ifndef HB_LONG_LONG_OFF
-   else if ( HB_IS_LONGLONG( pColor ) )
-   {
-      ULONGLONG col  = (ULONGLONG) hb_itemGetNLL( pColor );
-      lcolor.usAlpha = (USHORT) ( (col & HB_LL(0xFFFF000000000000)) >> 48 );
-      lcolor.usRed   = (USHORT) ( (col & HB_LL(0x0000FFFF00000000)) >> 32 );
-      lcolor.usGreen = (USHORT) ( (col & HB_LL(0x00000000FFFF0000)) >> 16 );
-      lcolor.usBlue  = (USHORT) ( (col & HB_LL(0x000000000000FFFF)) );
+      lcolor.usAlpha = ( (col & HB_LL(0xFFFF000000000000)) >> 48 );
+      lcolor.usRed   = ( (col & HB_LL(0x0000FFFF00000000)) >> 32 );
+      lcolor.usGreen = ( (col & HB_LL(0x00000000FFFF0000)) >> 16 );
+      lcolor.usBlue  = ( (col & HB_LL(0x000000000000FFFF)) );
 #else
-   else if ( HB_IS_LONG( pColor ) )
-   {
-      ULONG col  = (ULONG) hb_itemGetNL( pColor );
       lcolor.usAlpha = 0xFF;
       lcolor.usRed   = (BYTE)(col);
       lcolor.usGreen = (BYTE)(((USHORT)(col)) >> 8);
@@ -105,31 +102,12 @@ HB_FUNC( GTRGB )
    PHB_ITEM pGreen = hb_param(2, HB_IT_NUMERIC );
    PHB_ITEM pBlue  = hb_param(3, HB_IT_NUMERIC );
    PHB_ITEM pAlpha = hb_param(4, HB_IT_NUMERIC );
-#ifndef HB_LONG_LONG_OFF
-   ULONGLONG color = (ULONGLONG) 0;
-#else
-   ULONG color = (ULONG) 0;
-#endif
+   HB_LONG color = 0;
    BOOL lCorrect = TRUE;
 
    if ( pRed )
    {
-      if ( HB_IS_DOUBLE( pRed ) )
-      {
-#ifndef HB_LONG_LONG_OFF
-         color |= ((ULONGLONG)(0xFFFF * hb_itemGetND( pRed  ) ) ) << 32;
-#else
-         color |= ((ULONG)(0xFFFF * hb_itemGetND( pRed  ) ) ) << 32;
-#endif
-      }
-      else
-      {
-#ifndef HB_LONG_LONG_OFF
-         color |= ((ULONGLONG)(0xFFFF & hb_itemGetNL( pRed ) ) ) << 32;
-#else
-         color |= ((ULONG)(0xFFFF & hb_itemGetNL( pRed ) ) ) << 32;
-#endif
-      }
+      color |= ( 0xFFFF & hb_itemGetNInt( pRed ) ) << 32;
    }
    else
    {
@@ -138,22 +116,7 @@ HB_FUNC( GTRGB )
 
    if ( lCorrect && pGreen )
    {
-     if ( HB_IS_DOUBLE( pGreen ) )
-      {
-#ifndef HB_LONG_LONG_OFF
-         color |= ((ULONGLONG)(0xFFFF * hb_itemGetND( pGreen  ) ) ) << 16;
-#else
-         color |= ((ULONG)(0xFFFF * hb_itemGetND( pGreen  ) ) ) << 16;
-#endif
-      }
-      else
-      {
-#ifndef HB_LONG_LONG_OFF
-         color |= ((ULONGLONG)(0xFFFF & hb_itemGetNL( pGreen ) ) ) << 16;
-#else
-         color |= ((ULONG)(0xFFFF & hb_itemGetNL( pGreen ) ) ) << 16;
-#endif
-      }
+      color |= ( 0xFFFF & hb_itemGetNInt( pGreen ) ) << 16;
    }
    else
    {
@@ -162,22 +125,7 @@ HB_FUNC( GTRGB )
 
    if ( lCorrect && pBlue )
    {
-     if ( HB_IS_DOUBLE( pGreen ) )
-      {
-#ifndef HB_LONG_LONG_OFF
-         color |= ((ULONGLONG)(0xFFFF * hb_itemGetND( pBlue  ) ) );
-#else
-         color |= ((ULONG)(0xFFFF * hb_itemGetND( pBlue  ) ) );
-#endif
-      }
-      else
-      {
-#ifndef HB_LONG_LONG_OFF
-         color |= ((ULONGLONG)(0xFFFF & hb_itemGetNL( pBlue ) ) );
-#else
-         color |= ((ULONG)(0xFFFF & hb_itemGetNL( pBlue ) ) );
-#endif
-      }
+      color |= ( 0xFFFF & hb_itemGetNInt( pBlue ) );
    }
    else
    {
@@ -186,37 +134,13 @@ HB_FUNC( GTRGB )
 
    if ( lCorrect && pAlpha )
    {
-     if ( HB_IS_DOUBLE( pAlpha ) )
-      {
-#ifndef HB_LONG_LONG_OFF
-         color |= ((ULONGLONG)(0xFFFF * hb_itemGetND( pBlue  ) ) ) << 48;
-#else
-         color |= ((ULONG)(0xFFFF * hb_itemGetND( pBlue  ) ) ) << 48;
-#endif
-      }
-      else
-      {
-#ifndef HB_LONG_LONG_OFF
-         color |= ((ULONGLONG)(0xFFFF & hb_itemGetNL( pBlue ) ) ) << 48;
-#else
-         color |= ((ULONG)(0xFFFF & hb_itemGetNL( pBlue ) ) ) << 48;
-#endif
-      }
+      color |= ( 0xFFFF & hb_itemGetNInt( pBlue ) ) << 48;
    }
    else
    {
-#ifndef HB_LONG_LONG_OFF
-      color |= ((ULONGLONG)0xFFFF) << 48;
-#else
-      color |= ((ULONG)0xFFFF) << 48;
-#endif
+      color |= ( HB_LONG )( 0xFFFF ) << 48;
    }
-
-#ifndef HB_LONG_LONG_OFF
-   hb_retnll( color );
-#else
-   hb_retnl( color );
-#endif
+   hb_retnint( color );
 }
 
 /**********************************************************************

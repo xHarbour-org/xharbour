@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.17 2004/06/09 06:26:50 ronpinkas Exp $
+ * $Id: macro.slx,v 1.18 2004/06/12 01:31:04 ronpinkas Exp $
  */
 
 /*
@@ -88,7 +88,7 @@ static YYSTYPE *pYYLVAL;
 
 static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char *sToken );
 static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen );
-LONG hb_macro_SLX_Hex2L( char* sHex );
+static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * lVal, double * dVal, int * iDec, int * iWidth );
 
 void * yy_bytes_buffer( char * pBuffer, int iBufSize );
 
@@ -211,26 +211,26 @@ LANGUAGE_RULES_ARE {
 #ifdef SHOW_LEX_TOKENS
    #undef INTERCEPT_ACTION
    	#define INTERCEPT_ACTION(x) \
-      	if( x == IDENTIFIER ) \
+         if( x == IDENTIFIER ) \
            printf( "   IDENTIFIER = \"%s\"\n", pYYLVAL->string  ); \
-      	else if( x == LITERAL ) \
+         else if( x == LITERAL ) \
            printf( "   LITERAL = \"%s\"\n", pYYLVAL->string  ); \
-      	else if( x == MACROVAR ) \
+         else if( x == MACROVAR ) \
            printf( "   MACROVAR = \"%s\"\n", pYYLVAL->string  ); \
-      	else if( x == MACROTEXT ) \
+         else if( x == MACROTEXT ) \
            printf( "   MACROTEXT = \"%s\"\n", pYYLVAL->string  ); \
-      	else if( x == NUM_LONG ) \
+         else if( x == NUM_LONG ) \
            printf( "   INTEGER = %li\n", pYYLVAL->valLong.lNumber  ); \
-      	else if( x == NUM_DOUBLE ) \
+         else if( x == NUM_DOUBLE ) \
            printf( "   DOUBLE = %f\n", pYYLVAL->valDouble.dNumber  ); \
-      	else if( x < 256 ) \
+         else if( x < 256 ) \
            if( x == '\n' || x == ';' ) \
               printf( "                  NEW LINE %i\n", hb_comp_iLine - 1  ); \
            else if( iRet == -1 ) \
               printf( "!!!<EOF>\n" ); \
            else \
               printf( "   DELIMITER = \"%c\"\n", x  ); \
-      	else \
+         else \
            printf( "   TOKEN = %i\n", x  );
 #endif
 
@@ -317,58 +317,25 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    }
    else
    {
+      /* ConverNumber */
 
-      if( yytext[0] == '0' && yytext[1] == 'X' )
+      HB_LONG lNumber;
+      double dNumber;
+      int iDec, iWidth;
+
+      iRet = hb_comp_SLX_Str2Num( yytext, &lNumber, &dNumber, &iDec, &iWidth );
+
+      if ( iRet == NUM_DOUBLE )
       {
-      	 LONG lNumber = hb_macro_SLX_Hex2L( yytext + 2 );
-
-      	 if( ( double ) LONG_MIN <= lNumber && lNumber <= ( double ) LONG_MAX )
-      	 {
-            pYYLVAL->valLong.lNumber = lNumber;
-            pYYLVAL->valLong.szValue = yytext;
-            iRet = NUM_LONG;
-      	 }
-      	 else
-      	 {
-            pYYLVAL->valDouble.dNumber = lNumber;
-            pYYLVAL->valDouble.bWidth = HB_DEFAULT_WIDTH;
-            pYYLVAL->valDouble.bDec = 0;
-            pYYLVAL->valDouble.szValue = yytext;
-       	    iRet = NUM_DOUBLE;
-      	 }
+         pYYLVAL->valDouble.dNumber = dNumber;
+         pYYLVAL->valDouble.bDec = iDec;
+         pYYLVAL->valDouble.bWidth = iWidth;
+         pYYLVAL->valDouble.szValue = yytext;
       }
-      else if( isdigit( yytext[0] ) || ( yytext[0] == '.' && isdigit( yytext[1] ) ) )
+      else if( isdigit( (BYTE) yytext[0] ) || ( yytext[0] == '.' && isdigit( (BYTE) yytext[1] ) ) )
       {
-       	 pYYLVAL->valDouble.dNumber = atof( yytext );
-      	 tmpPtr = strchr( yytext, '.' );
-
-      	 if( tmpPtr )
-      	 {
-            pYYLVAL->valDouble.bDec = strlen( tmpPtr + 1 );
-            pYYLVAL->valDouble.bWidth = yyleng - pYYLVAL->valDouble.bDec;
-            if( pYYLVAL->valDouble.bDec )
-	    {
-            	pYYLVAL->valDouble.bWidth--;
-	    }
-            pYYLVAL->valDouble.szValue = yytext;
-            iRet = NUM_DOUBLE;
-      	 }
-      	 else
-      	 {
-            if( ( double )LONG_MIN <= pYYLVAL->valDouble.dNumber && pYYLVAL->valDouble.dNumber <= ( double )LONG_MAX )
-            {
-            	pYYLVAL->valLong.lNumber = ( LONG ) pYYLVAL->valDouble.dNumber;
-            	pYYLVAL->valLong.szValue = yytext;
-            	iRet = NUM_LONG;
-            }
-            else
-            {
-            	pYYLVAL->valDouble.bWidth = yyleng + 1;
-            	pYYLVAL->valDouble.bDec = 0;
-            	pYYLVAL->valDouble.szValue = yytext;
-            	iRet = NUM_DOUBLE;
-            }
-      	 }
+         pYYLVAL->valLong.lNumber = lNumber;
+         pYYLVAL->valLong.szValue = yytext;
       }
       else
       {
@@ -381,40 +348,12 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    return iRet;
 }
 
-LONG hb_macro_SLX_Hex2L( char* sHex )
+static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
 {
-   int i, iExp = 0, iLen = strlen( sHex ) - 1;
-   LONG lVal, lSum = 0;
-   char cChar;
-
-   while( iLen >= 0 )
-   {
-      cChar = sHex[ iLen-- ];
-
-      if( cChar > 64 && cChar < 91 )
-      {
-         lVal = cChar - 55;
-      }
-      else
-      {
-         lVal = cChar - 48;
-      }
-
-      if( lVal)
-      {
-	 i = 0;
-	 while( i++ < iExp )
-	 {
-	    lVal *= 16;
-	 }
-
-         lSum += lVal;
-      }
-
-      iExp++;
-   }
-
-   return lSum;
+   BOOL fDbl;
+   
+   fDbl = hb_compStrToNum( szNum, plVal, pdVal, piDec, piWidth );
+   return fDbl ? NUM_DOUBLE : NUM_LONG;
 }
 
 static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char *sToken )

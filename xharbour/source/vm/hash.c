@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.33 2004/05/08 20:32:41 ronpinkas Exp $
+ * $Id: hash.c,v 1.34 2004/09/28 09:44:36 likewolf Exp $
  */
 
 /*
@@ -91,13 +91,8 @@ static int s_hashOrderComplex( PHB_ITEM pFirst,
          else
          {
 
-#ifndef HB_LONG_LONG_OFF
-            LONGLONG l1 = hb_itemGetNLL(pFirst);
-            LONGLONG l2 = hb_itemGetNLL(pSecond);
-#else
-            LONG l1 = hb_itemGetNL(pFirst);
-            LONG l2 = hb_itemGetNL(pSecond);
-#endif
+            HB_LONG l1 = hb_itemGetNInt(pFirst);
+            HB_LONG l2 = hb_itemGetNInt(pSecond);
             if ( l1 < l2 )
             {
                return -1;
@@ -1376,7 +1371,7 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource, ULONG ulStart, UL
                   hb_vmPush( pBlock );
                   hb_vmPush( pKey );
                   hb_vmPush( pValue );
-                  hb_vmPushNumInt( ulElem + 1 );
+                  hb_vmPushLong( ulElem + 1 );
                   hb_vmSend( 3 );
                   if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) &&
                         HB_VM_STACK.Return.item.asLogical.value )
@@ -1422,7 +1417,7 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource, ULONG ulStart, UL
                   hb_vmPush( pBlock );
                   hb_vmPush( pKey );
                   hb_vmPush( pValue );
-                  hb_vmPushNumInt( ulElem );
+                  hb_vmPushLong( ulElem );
                   hb_vmSend( 3 );
                   if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) &&
                         HB_VM_STACK.Return.item.asLogical.value )

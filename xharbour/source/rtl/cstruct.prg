@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.34 2004/05/27 02:31:10 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.35 2004/08/26 08:00:31 ronpinkas Exp $
  */
 
 /*
@@ -638,8 +638,14 @@ RETURN cString
 
      if( HB_IS_LONG( pTarget ) )
      {
-        pPointer = (void *) pTarget->item.asLong.value;
+        pPointer = (void *) ( HB_PTRDIFF ) pTarget->item.asLong.value;
      }
+#if UINT_MAX == ULONG_MAX
+     else if( HB_IS_INTEGER( pTarget ) )
+     {
+        pPointer = (void *) ( HB_PTRDIFF ) pTarget->item.asInteger.value;
+     }
+#endif
      else if( HB_IS_POINTER( pTarget ) )
      {
         pPointer = pTarget->item.asPointer.value;

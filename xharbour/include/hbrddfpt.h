@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.11 2004/09/01 01:13:58 druzus Exp $
+ * $Id: hbrddfpt.h,v 1.12 2004/09/03 08:14:16 druzus Exp $
  */
 
 /*
@@ -137,18 +137,6 @@ HB_EXTERN_BEGIN
 #define FPTIT_FLEXAR_SHORT2 0x1E
 #define FPTIT_FLEXAR_LONG2  0x20
 #define FPTIT_FLEXAR_ULONG  0x21
-
-/*
-#define HB_IT_NIL       ( ( USHORT ) 0x0000 )
-#define HB_IT_POINTER   ( ( USHORT ) 0x0001 )
-#define HB_IT_LONGLONG  ( ( USHORT ) 0x0040 )
-#define HB_IT_SYMBOL    ( ( USHORT ) 0x0100 )
-#define HB_IT_ALIAS     ( ( USHORT ) 0x0200 )
-#define HB_IT_BLOCK     ( ( USHORT ) 0x1000 )
-#define HB_IT_BYREF     ( ( USHORT ) 0x2000 )
-#define HB_IT_MEMVAR    ( ( USHORT ) 0x4000 )
-#define HB_IT_ANY       ( ( USHORT ) 0xFFFF )
-*/
 
 /* MEMO file strucutres */
 typedef struct _FPTHEADER

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.3 2004/10/23 12:02:12 druzus Exp $
+ * $Id: gtxwc.c,v 1.4 2004/10/24 09:44:49 oh1 Exp $
  */
 
 /*
@@ -3270,7 +3270,7 @@ void HB_GT_FUNC(gt_GetText( USHORT top, USHORT left, USHORT bottom, USHORT right
    USHORT col;
    int index;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetText(%hu, %hu, %hu, %hu, %p)", top, left, bottom, right, sBuffer));
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetText(%hu, %hu, %hu, %hu, %p)", top, left, bottom, right, pBuffer));
 
    if ( bottom >= _GetScreenHeight() )
       bottom = _GetScreenHeight() - 1;
@@ -3302,7 +3302,7 @@ void HB_GT_FUNC(gt_PutText( USHORT top, USHORT left, USHORT bottom, USHORT right
    USHORT col, row;
    int index;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_gt_PutText(%hu, %hu, %hu, %hu, %p)", top, left, bottom, right, sBuffer));
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_PutText(%hu, %hu, %hu, %hu, %p)", top, left, bottom, right, pBuffer));
 
    if ( bottom >= _GetScreenHeight() )
       bottom = _GetScreenHeight() - 1;

@@ -1,5 +1,5 @@
 /*
- * $Id: filestat.c,v 1.7 2004/04/14 20:59:10 andijahja Exp $
+ * $Id: filestat.c,v 1.8 2004/11/01 05:38:10 likewolf Exp $
  */
 
 /*
@@ -69,18 +69,14 @@
    #endif
 #endif
 
-BOOL hb_fsFileStats(
-                     BYTE *pszFileName,
-                     BYTE *pszAttr,
-#ifndef HB_LONG_LONG_OFF
-                     LONGLONG *llSize,
-#else
-                     LONG *llSize,
-#endif
-                     LONG *lcDate,
-                     LONG *lcTime,
-                     LONG *lmDate,
-                     LONG *lmTime )
+static BOOL hb_fsFileStats(
+                           BYTE *pszFileName,
+                           BYTE *pszAttr,
+                           HB_FOFFSET *llSize,
+                           LONG *lcDate,
+                           LONG *lcTime,
+                           LONG *lmDate,
+                           LONG *lmTime )
 {
    BOOL fResult = FALSE;
 
@@ -169,11 +165,7 @@ BOOL hb_fsFileStats(
          ushbAttr |= HB_FA_ARCHIVE;
       }
 
-#ifdef HB_LONG_LONG_OFF
-      *llSize = (LONG) statbuf.st_size;
-#else
-      *llSize = (LONGLONG) statbuf.st_size;
-#endif
+      *llSize = ( HB_FOFFSET ) statbuf.st_size;
 
       ftime = statbuf.st_mtime;
 #if _POSIX_C_SOURCE >= 199506L && !defined( HB_OS_DARWIN_5 )
@@ -226,11 +218,7 @@ BOOL hb_fsFileStats(
       CloseHandle( hFind );
 
       /* get file times and work them out */
-#ifdef HB_LONG_LONG_OFF
-      *llSize = ffind.nFileSizeLow;
-#else
-      *llSize = ffind.nFileSizeLow + ( ((LONGLONG)ffind.nFileSizeHigh << 32 ));
-#endif
+      *llSize = ( HB_FOFFSET ) ffind.nFileSizeLow + ( ( HB_FOFFSET ) ffind.nFileSizeHigh << 32 );
 
       if ( FileTimeToLocalFileTime( &ffind.ftCreationTime, &filetime ) &&
            FileTimeToSystemTime( &filetime, &time ) )
@@ -264,7 +252,7 @@ BOOL hb_fsFileStats(
    if ( findinfo )
    {
       hb_fsAttrDecode( findinfo->attr, (char*) pszAttr );
-      *llSize = findinfo->size;
+      *llSize = ( HB_FOFFSET ) findinfo->size;
       *lcDate = findinfo->lDate;
       *lcTime = (findinfo->szTime[0] - '0') * 36000 +
                 (findinfo->szTime[1] - '0') * 3600 +
@@ -296,11 +284,7 @@ HB_FUNC( FILESTATS )
    PHB_ITEM pMTime = hb_param( 7, HB_IT_BYREF );
 
    BYTE szAttr[21];
-#ifndef HB_LONG_LONG_OFF
-   LONGLONG llSize;
-#else
-   LONG llSize;
-#endif
+   HB_FOFFSET lSize;
    LONG lcDate;
    LONG lcTime;
    LONG lmDate;
@@ -315,7 +299,7 @@ HB_FUNC( FILESTATS )
    }
 
    if ( hb_fsFileStats( (BYTE*) pFileName->item.asString.value,
-            szAttr, &llSize, &lcDate, &lcTime, &lmDate, &lmTime ) )
+            szAttr, &lSize, &lcDate, &lcTime, &lmDate, &lmTime ) )
    {
       if ( pAttr != NULL )
       {
@@ -323,11 +307,7 @@ HB_FUNC( FILESTATS )
       }
       if ( pSize != NULL )
       {
-         #ifndef HB_LONG_LONG_OFF
-         hb_itemPutNLL( pSize, llSize );
-         #else
-         hb_itemPutNL( pSize, llSize );
-         #endif
+         hb_itemPutNInt( pSize, lSize );
       }
       if ( pCDate != NULL )
       {

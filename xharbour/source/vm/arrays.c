@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.111 2004/05/18 23:07:39 walito Exp $
+ * $Id: arrays.c,v 1.112 2004/06/04 03:27:50 ronpinkas Exp $
  */
 
 /*
@@ -626,6 +626,34 @@ LONG HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex )
    return 0;
 }
 
+#ifndef HB_LONG_LONG_OFF
+LONGLONG HB_EXPORT hb_arrayGetNLL( PHB_ITEM pArray, ULONG ulIndex )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNLL(%p, %lu)", pArray, ulIndex));
+
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
+      return hb_itemGetNLL( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
+   else
+   {
+      return 0;
+   }
+}
+#endif
+
+HB_LONG HB_EXPORT hb_arrayGetNInt( PHB_ITEM pArray, ULONG ulIndex )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNInt(%p, %lu)", pArray, ulIndex));
+
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
+      return hb_itemGetNInt( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
+
+   return 0;
+}
+
 double HB_EXPORT hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetND(%p, %lu)", pArray, ulIndex));
@@ -892,7 +920,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
             }
 
             hb_vmPush( pItems + ulStart );
-            hb_vmPushNumInt( ulStart + 1 );
+            hb_vmPushLong( ulStart + 1 );
             hb_vmSend( (USHORT) ulParams );
 
             if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) && HB_VM_STACK.Return.item.asLogical.value )
@@ -1085,7 +1113,7 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
                hb_vmPush( pKeys + ulStart );
             }
             hb_vmPush( pItems + ulStart );
-            hb_vmPushNumInt( ulStart + 1 );
+            hb_vmPushLong( ulStart + 1 );
             hb_vmSend( (USHORT) ulParams );
          }
       }
@@ -1828,21 +1856,3 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    }
 #endif
 
-#ifndef HB_LONG_LONG_OFF
-   LONGLONG HB_EXPORT hb_arrayGetNLL( PHB_ITEM pArray, ULONG ulIndex )
-   {
-      LONGLONG llRet;
-      HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNLL(%p, %lu)", pArray, ulIndex));
-
-      if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
-      {
-         llRet = hb_itemGetNLL( pArray->item.asArray.value->pItems + ulIndex - 1 );
-      }
-      else
-      {
-         llRet = 0;
-      }
-
-      return llRet;
-   }
-#endif

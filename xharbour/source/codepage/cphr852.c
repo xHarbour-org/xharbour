@@ -1,14 +1,15 @@
 /*
- * $Id: cdppliso.c,v 1.3 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: cdphr852.c,v 1.2 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( PLISO )
+ * National Collation Support Module ( HR852 )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
- * Polish collating sequence (PLISO) done by Jacek Kubica <kubica@wssk.wroc.pl>
+ * 2003 Mitja Podgornik <Mitja.Podgornik@zgs.gov.si>
+ * 2003 Vlado Miholic <Vladimir.Miholic@sk.hinet.hr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,15 +52,15 @@
  *
  */
 
-/* Language name: Polish */
-/* ISO language code (2 chars): PL */
-/* Codepage: ISO-8859-2 */
+/* Language name: Croatien */
+/* ISO language code (2 chars): HR */
+/* Codepage: 852 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  35    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  31    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
@@ -84,17 +85,17 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "PLISO",
-    CPID_8859_2,UNITB_8859_2,NUMBER_OF_CHARACTERS,
-    "A°BC∆DE FGHIJKL£MN—O”PQRS¶TUVWXYZ¨Ø","a±bcÊdeÍfghijkl≥mnÒoÛpqrs∂tuvwxyzºø",
+static HB_CODEPAGE s_codepage = { "HR852",
+    CPID_852,UNITB_852,NUMBER_OF_CHARACTERS,
+    "ABCè¨D—EFGHIJKLMNOPQRSÊTUVWZ¶XY","abcÜüd–efghijklmnopqrsÁtuvwzßxy",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( PLISO );
+HB_CODEPAGE_ANNOUNCE( HR852 );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_PLISO )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_HR852 )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_PLISO )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_HR852 )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_PLISO
+   #pragma startup hb_codepage_Init_HR852
 #endif
 

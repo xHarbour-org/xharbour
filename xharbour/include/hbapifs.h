@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.38 2004/09/08 00:17:11 druzus Exp $
+ * $Id: hbapifs.h,v 1.39 2004/09/21 02:52:34 druzus Exp $
  */
 
 /*
@@ -130,8 +130,7 @@ extern FHANDLE  HB_EXPORT hb_fsExtOpen    ( BYTE * pszFileName, BYTE * pDefExt,
                                             USHORT uiFlags, BYTE * pPaths, PHB_ITEM pError ); /* open a file using default extension and a list of paths */
 extern USHORT   HB_EXPORT hb_fsIsDrv      ( BYTE nDrive ); /* determine if a drive number is a valid drive */
 extern BOOL     HB_EXPORT hb_fsIsDevice   ( FHANDLE hFileHandle ); /* determine if a file is attached to a device (console?) */
-extern BOOL     HB_EXPORT hb_fsLock       ( FHANDLE hFileHandle, ULONG ulStart,
-                                            ULONG ulLength, USHORT uiMode ); /* request a lock on a portion of a file */
+extern BOOL     HB_EXPORT hb_fsLock       ( FHANDLE hFileHandle, ULONG ulStart, ULONG ulLength, USHORT uiMode ); /* request a lock on a portion of a file */
 extern BOOL     HB_EXPORT hb_fsLockLarge  ( FHANDLE hFileHandle, HB_FOFFSET ulStart,
                                             HB_FOFFSET ulLength, USHORT uiMode ); /* request a lock on a portion of a file using 64bit API */
 extern BOOL     HB_EXPORT hb_fsMkDir      ( BYTE * pszDirName ); /* create a directory */
@@ -191,17 +190,13 @@ extern FHANDLE HB_EXPORT hb_spCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT 
 /* File Find API structure */
 typedef struct
 {
-   char      szName[ _POSIX_PATH_MAX + 1 ];
-   LONG      lDate;
-   char      szDate[ 9 ]; /* in YYYYMMDD format */
-   char      szTime[ 9 ]; /* in HH:MM:SS format */
-   USHORT    attr;
-#ifndef HB_LONG_LONG_OFF
-   LONGLONG  size;
-#else
-   ULONG     size;
-#endif
-   void *    info; /* Pointer to the platform specific find info */
+   char        szName[ _POSIX_PATH_MAX + 1 ];
+   LONG        lDate;
+   char        szDate[ 9 ]; /* in YYYYMMDD format */
+   char        szTime[ 9 ]; /* in HH:MM:SS format */
+   USHORT      attr;
+   HB_FOFFSET  size;
+   void *      info; /* Pointer to the platform specific find info */
 
 } HB_FFIND, * PHB_FFIND;
 

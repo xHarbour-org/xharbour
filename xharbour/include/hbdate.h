@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.h,v 1.4 2003/11/30 12:32:29 druzus Exp $
+ * $Id: hbdate.h,v 1.5 2004/02/14 22:11:51 andijahja Exp $
  */
 
 /*
@@ -58,16 +58,16 @@
 HB_EXTERN_BEGIN
 
 extern double   HB_EXPORT hb_dateSeconds( void );
-extern void     HB_EXPORT hb_dateToday( LONG * plYear, LONG * plMonth, LONG * plDay );
+extern void     HB_EXPORT hb_dateToday( int * piYear, int * piMonth, int * piDay );
 extern void     HB_EXPORT hb_dateTimeStr( char * pszTime );
 extern char     HB_EXPORT * hb_dateCMonth( int iMonth );
 extern char     HB_EXPORT * hb_dateCDOW( int iDay );
-extern LONG     HB_EXPORT hb_dateDOW( LONG lYear, LONG lMonth, LONG lDay );
+extern int      HB_EXPORT hb_dateDOW( int iYear, int iMonth, int iDay );
 extern char     HB_EXPORT * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * szDateFormat );
-extern LONG     HB_EXPORT hb_dateEncode( LONG lYear, LONG lMonth, LONG lDay );
-extern void     HB_EXPORT hb_dateDecode( LONG julian, LONG * plYear, LONG * plMonth, LONG * plDay );
-extern void     HB_EXPORT hb_dateStrPut( char * szDate, LONG lYear, LONG lMonth, LONG lDay );
-extern void     HB_EXPORT hb_dateStrGet( const char * szDate, LONG * plYear, LONG * plMonth, LONG * plDay );
+extern LONG     HB_EXPORT hb_dateEncode( int iYear, int iMonth, int iDay );
+extern void     HB_EXPORT hb_dateDecode( LONG julian, int * piYear, int * piMonth, int * piDay );
+extern void     HB_EXPORT hb_dateStrPut( char * szDate, int iYear, int iMonth, int iDay );
+extern void     HB_EXPORT hb_dateStrGet( const char * szDate, int * piYear, int * piMonth, int * piDay );
 extern char     HB_EXPORT * hb_dateDecStr( char * szDate, LONG lJulian );
 extern LONG     HB_EXPORT hb_dateEncStr( char * szDate );
 

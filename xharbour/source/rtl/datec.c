@@ -1,5 +1,5 @@
 /*
- * $Id: datec.c,v 1.5 2004/02/14 21:01:16 andijahja Exp $
+ * $Id: datec.c,v 1.6 2004/02/23 10:01:42 andijahja Exp $
  */
 
 /*
@@ -76,10 +76,10 @@ HB_FUNC( CMONTH )
 
    if( pDate )
    {
-      LONG lYear, lMonth, lDay;
+      int iYear, iMonth, iDay;
 
-      hb_dateDecode( pDate->item.asDate.value, &lYear, &lMonth, &lDay );
-      hb_retc( hb_dateCMonth( lMonth ) );
+      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+      hb_retc( hb_dateCMonth( iMonth ) );
    }
    else
    {
@@ -97,10 +97,10 @@ HB_FUNC( CDOW )
 
       if( lDate )
       {
-         LONG lYear, lMonth, lDay;
+         int iYear, iMonth, iDay;
 
-         hb_dateDecode( lDate, &lYear, &lMonth, &lDay );
-         hb_retc( hb_dateCDOW( hb_dateDOW( lYear, lMonth, lDay ) ) );
+         hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
+         hb_retc( hb_dateCDOW( hb_dateDOW( iYear, iMonth, iDay ) ) );
       }
       else
       {

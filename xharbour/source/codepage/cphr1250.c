@@ -1,14 +1,15 @@
 /*
- * $Id: cdpplmaz.c,v 1.3 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: cdphr1250.c,v 1.2 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( PLMAZ )
+ * National Collation Support Module ( HR1250 )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
- * Polish collating sequence (PLMAZ) Mazovia done by Jacek Kubica <kubica@wssk.wroc.pl>
+ * 2003 Mitja Podgornik <Mitja.Podgornik@zgs.gov.si>
+ * 2003 Vlado Miholic <Vladimir.Miholic@sk.hinet.hr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,15 +52,15 @@
  *
  */
 
-/* Language name: Polish */
-/* ISO language code (2 chars): PL */
-/* Codepage: Mazovia */
+/* Language name: Croatien */
+/* ISO language code (2 chars): HR */
+/* Codepage: 1250 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  35    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  31    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
@@ -84,16 +85,17 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "PLMAZ",
-    CPID_MAZ,UNITB_MAZ,NUMBER_OF_CHARACTERS,
-    "AèBCïDEêFGHIJKLúMN•O£PQRSòTUVWXYZ†°","aÜbcçdeëfghijklímn§o¢pqrsûtuvwxyz¶ß",
+static HB_CODEPAGE s_codepage = { "HR1250",
+    CPID_1250,UNITB_1250,NUMBER_OF_CHARACTERS,
+    "ABCCCD–EFGHIJKLMNOPQRSäTUVWZéXY","abcccddefghijklmnopqrsötuvwzûxy",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( PLMAZ );
+HB_CODEPAGE_ANNOUNCE( HR1250 );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_PLMAZ )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_HR1250 )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_PLMAZ )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_HR1250 )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_PLMAZ
+   #pragma startup hb_codepage_Init_HR1250
 #endif
+

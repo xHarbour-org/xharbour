@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.130 2004/09/13 06:42:58 druzus Exp $
+ * $Id: classes.c,v 1.131 2004/10/21 21:18:48 ronpinkas Exp $
  */
 
 /*
@@ -4455,8 +4455,6 @@ HB_FUNC( __CLSGETHANDLEFROMNAME )
 
    uiClass = hb_clsGetHandleFromName( szClass );
 
-   hb_xfree( szClass );
-
    if( uiClass == 0 )
    {
       if( ( strcmp( szClass, "ARRAY" )     == 0 ) ||
@@ -4474,6 +4472,8 @@ HB_FUNC( __CLSGETHANDLEFROMNAME )
          uiClass = s_uiClasses;
       }
    }
+
+   hb_xfree( szClass );
 
    hb_retni( uiClass );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: abs.c,v 1.6 2004/01/12 22:51:41 paultucker Exp $
+ * $Id: abs.c,v 1.7 2004/02/14 21:01:16 andijahja Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 
 HB_FUNC( ABS )
 {
-   PHB_ITEM pNumber = hb_param( 1, HB_IT_NUMERIC ) ;
+   PHB_ITEM pNumber = hb_param( 1, HB_IT_NUMERIC );
 
    if( pNumber )
    {
@@ -71,36 +71,31 @@ HB_FUNC( ABS )
 
          if( iNumber >= 0 )
             hb_retnilen( iNumber, iWidth );
+#if -HB_INT_MAX > HB_INT_MIN
+         else if ( iNumber < -HB_INT_MAX )
+#if HB_LONG_MAX > HB_INT_MAX
+            hb_retnint( - ( HB_LONG ) iNumber );
+#else
+            hb_retndlen( - ( double ) iNumber, 0, iDec );
+#endif
+#endif
          else
             hb_retni( -iNumber );
       }
       else if( HB_IS_LONG( pNumber ) )
       {
-         LONG lNumber = hb_itemGetNL( pNumber );
+         HB_LONG lNumber = hb_itemGetNInt( pNumber );
 
          if( lNumber >= 0 )
-            hb_retnllen( lNumber, iWidth );
-         else
-            hb_retnl( -lNumber );
-      }
-#ifndef HB_LONG_LONG_OFF
-      else if( HB_IS_LONGLONG( pNumber ) )
-      {
-         LONGLONG lNumber = hb_itemGetNLL( pNumber );
-
-         if( lNumber >= 0 )
-            hb_retnlllen( lNumber, iWidth );
-         else
-            hb_retnlllen( -lNumber, iWidth );
-      }
+            hb_retnintlen( lNumber, iWidth );
+#if -HB_LONG_MAX > HB_LONG_MIN
+         else if ( lNumber < -HB_LONG_MAX )
+            hb_retndlen( - ( double ) lNumber, 0, iDec );
 #endif
-      else if( HB_IS_DOUBLE( pNumber ) )
-      {
-         double dNumber = hb_itemGetND( pNumber );
-
-         hb_retndlen( dNumber >= 0.0 ? dNumber : -dNumber, 0, iDec );
+         else
+            hb_retnint( -lNumber );
       }
-      else if( HB_IS_STRING( pNumber ) )
+      else
       {
          double dNumber = hb_itemGetND( pNumber );
 
@@ -110,4 +105,3 @@ HB_FUNC( ABS )
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1089, NULL, "ABS", 1, hb_paramError( 1 ) );
 }
-

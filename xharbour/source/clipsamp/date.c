@@ -1,5 +1,5 @@
 /*
- * $Id: date.c,v 1.2 2003/12/04 09:26:53 druzus Exp $
+ * $Id: date.c,v 1.3 2004/03/06 02:32:37 andijahja Exp $
  */
 
 /*
@@ -59,23 +59,23 @@
 */
 HB_FUNC( MDY )
 {
-   LONG lYear, lMonth, lDay;
+   int iYear, iMonth, iDay;
    char szDate[ 9 ];
    char szFormatted[ 11 ];
    char * szReturn;
    int iBufferLen;
    int iLen;
 
-   hb_dateDecode( hb_parnl( 1 ), &lYear, &lMonth, &lDay );
+   hb_dateDecode( hb_parnl( 1 ), &iYear, &iMonth, &iDay );
    hb_dateFormat( hb_pardsbuff( szDate, 1 ), szFormatted, "MM/DD/YYYY" );
 
-   iLen = strlen( hb_dateCMonth( lMonth ) );
+   iLen = strlen( hb_dateCMonth( iMonth ) );
 
    iBufferLen = iLen + ( hb_set.hb_set_century ? 9 : 7 );
    szReturn = ( char * ) hb_xgrab( iBufferLen );
 
    memset( szReturn, ' ', iBufferLen + 1 );
-   memcpy( szReturn, hb_dateCMonth( lMonth ), iLen );
+   memcpy( szReturn, hb_dateCMonth( iMonth ), iLen );
    memcpy( szReturn + iLen + 1, szFormatted + 3, 2 );
    szReturn[ iLen + 3 ] = ',';
    memcpy( szReturn + iLen + 5, szFormatted + 6 + ( hb_set.hb_set_century ? 0 : 2 ), 2 + ( hb_set.hb_set_century ? 2 : 0 ) );
@@ -88,24 +88,24 @@ HB_FUNC( MDY )
 */
 HB_FUNC( DMY )
 {
-   LONG lYear, lMonth, lDay;
+   int  iYear, iMonth, iDay;
    char szDate[ 9 ];
    char szFormatted[ 11 ];
    char * szReturn;
    int iBufferLen;
    int iLen;
 
-   hb_dateDecode( hb_parnl( 1 ), &lYear, &lMonth, &lDay );
+   hb_dateDecode( hb_parnl( 1 ), &iYear, &iMonth, &iDay );
    hb_dateFormat( hb_pardsbuff( szDate, 1 ), szFormatted, "MM/DD/YYYY" );
 
-   iLen = strlen( hb_dateCMonth( lMonth ) );
+   iLen = strlen( hb_dateCMonth( iMonth ) );
 
    iBufferLen = iLen + ( hb_set.hb_set_century ? 9 : 7 );
    szReturn = ( char * ) hb_xgrab( iBufferLen );
 
    memset( szReturn, ' ', iBufferLen );
    memcpy( szReturn, szFormatted + 3, 2 );
-   memcpy( szReturn + 3, hb_dateCMonth( lMonth ), iLen );
+   memcpy( szReturn + 3, hb_dateCMonth( iMonth ), iLen );
    memcpy( szReturn + iLen + 4, szFormatted + 6 + ( hb_set.hb_set_century ? 0 : 2 ), 2 + ( hb_set.hb_set_century ? 2 : 0 ) );
 
    hb_retclen( szReturn, iBufferLen );
@@ -116,27 +116,27 @@ HB_FUNC( DMY )
 */
 HB_FUNC( DATEASAGE )
 {
-   LONG lAge = 0;
+   int iAge = 0;
    PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
 
    if( pDate )
    {
-      LONG lYear, lMonth, lDay;
-      LONG lThisYear, lThisMonth, lThisDay;
+      int iYear, iMonth, iDay;
+      int iThisYear, iThisMonth, iThisDay;
 
-      hb_dateToday( &lThisYear, &lThisMonth, &lThisDay );
-      hb_dateDecode( hb_itemGetDL( pDate ), &lYear, &lMonth, &lDay );
+      hb_dateToday( &iThisYear, &iThisMonth, &iThisDay );
+      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
       
-      if( lThisYear > lYear )
+      if( iThisYear > iYear )
       {
-         lAge = lThisYear - lYear;
+         iAge = iThisYear - iYear;
       
-         if( lThisMonth < lMonth || ( lThisMonth == lMonth && lThisDay < lDay ) )
-            --lAge;
+         if( iThisMonth < iMonth || ( iThisMonth == iMonth && iThisDay < iDay ) )
+            --iAge;
       }
    }
 
-   hb_retnl( lAge );
+   hb_retni( iAge );
 }
 
 /* ADDMONTH( <dDate>, <nMonths> ) --> <dNewDate>
@@ -144,39 +144,39 @@ HB_FUNC( DATEASAGE )
 */
 HB_FUNC( ADDMONTH )
 {
-   LONG lMonths = hb_parnl( 2 );
-   LONG lYear, lMonth, lDay;
+   int iMonths = hb_parni( 2 );
+   int iYear, iMonth, iDay;
 
    int iLimit, iMonthAdd, iYearAdd;
    LONG lNew;
 
-   hb_dateDecode( hb_parnl( 1 ), &lYear, &lMonth, &lDay );
+   hb_dateDecode( hb_parnl( 1 ), &iYear, &iMonth, &iDay );
 
-   iLimit = 12 - lMonth + 1;
-   iYearAdd = lMonths / 12;
-   lMonths %= 12;
+   iLimit = 12 - iMonth + 1;
+   iYearAdd = iMonths / 12;
+   iMonths %= 12;
 
-   if( lMonths >= iLimit )
+   if( iMonths >= iLimit )
       iYearAdd++;
 
-   lYear += iYearAdd;
+   iYear += iYearAdd;
 
-   iMonthAdd = lMonths % 12;
-   lMonth    = ( lMonth + iMonthAdd ) % 12;
+   iMonthAdd = iMonths % 12;
+   iMonth    = ( iMonth + iMonthAdd ) % 12;
 
-   if( lMonth == 0 )
-      lMonth = 12;
+   if( iMonth == 0 )
+      iMonth = 12;
 
-   lNew = hb_dateEncode( lYear, lMonth, lDay );
+   lNew = hb_dateEncode( iYear, iMonth, iDay );
 
    if( !lNew )
    {
-      lMonth = ( lMonth + 1 ) % 12;
-      lDay = 1;
-      lYear = lYear + ( ( lMonth + 1 ) / 12 );
+      iMonth = ( iMonth + 1 ) % 12;
+      iDay = 1;
+      iYear = iYear + ( ( iMonth + 1 ) / 12 );
    }
 
-   hb_retd( lYear, lMonth, lDay );
+   hb_retd( iYear, iMonth, iDay );
 }
 
 /* DATEASARRAY( <dDate> ) --> { Year, Month, Day }
@@ -193,19 +193,19 @@ HB_FUNC( DATEASARRAY )
    if( pDate )
    {
       HB_ITEM Item;
-      LONG lYear, lMonth, lDay;
+      int iYear, iMonth, iDay;
 
       Item.type = HB_IT_NIL;
 
-      hb_dateDecode( hb_itemGetDL( pDate ), &lYear, &lMonth, &lDay );
+      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
 
-      hb_itemPutNL( &Item, lYear );
+      hb_itemPutNL( &Item, iYear );
       hb_arrayAddForward( &Return, &Item );
 
-      hb_itemPutNL( &Item, lMonth );
+      hb_itemPutNL( &Item, iMonth );
       hb_arrayAddForward( &Return, &Item );
 
-      hb_itemPutNL( &Item, lDay );
+      hb_itemPutNL( &Item, iDay );
       hb_arrayAddForward( &Return, &Item );
    }
 
@@ -232,11 +232,11 @@ HB_FUNC( DATEISLEAP )
 
    if( pDate )
    {
-      LONG lYear, lMonth, lDay;
+      int iYear, iMonth, iDay;
 
-      hb_dateDecode( hb_itemGetDL( pDate ), &lYear, &lMonth, &lDay );
+      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
 
-      hb_retl( ( lYear % 4 == 0 && lYear % 100 != 0 ) || ( lYear % 400 == 0 ) );
+      hb_retl( ( iYear % 4 == 0 && iYear % 100 != 0 ) || ( iYear % 400 == 0 ) );
    }
    else
       hb_retl( FALSE );
@@ -246,5 +246,5 @@ HB_FUNC( DATEISLEAP )
 */
 HB_FUNC( NTOD )
 {
-   hb_retd( hb_parnl( 3 ), hb_parnl( 1 ), hb_parnl( 2 ) );
+   hb_retd( hb_parni( 3 ), hb_parni( 1 ), hb_parni( 2 ) );
 }

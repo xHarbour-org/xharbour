@@ -1,15 +1,14 @@
 /*
- * $Id: cdphr1250.c,v 1.1 2003/12/18 19:33:33 ronpinkas Exp $
+ * $Id: cdpgewin.c,v 1.4 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( HR1250 )
+ * National Collation Support Module ( German WIN )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
- * 2003 Mitja Podgornik <Mitja.Podgornik@zgs.gov.si>
- * 2003 Vlado Miholic <Vladimir.Miholic@sk.hinet.hr>
+ * v1.0 2003 Guenther Steiner <byte-one@aon.at>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,15 +51,15 @@
  *
  */
 
-/* Language name: Croatien */
-/* ISO language code (2 chars): HR */
-/* Codepage: 1250 */
+/* Language name: German */
+/* ISO language code (2 chars): DE */
+/* Codepage: ISO-8859-1 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  31    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  30    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
@@ -76,7 +75,7 @@
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-      a~€
+    a~€
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -85,17 +84,17 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "HR1250",
-    CPID_1250,UNITB_1250,NUMBER_OF_CHARACTERS,
-    "ABCCCDÐEFGHIJKLMNOPQRSŠTUVWZŽXY","abcccddefghijklmnopqrsštuvwzžxy",
+static HB_CODEPAGE s_codepage = { "DEWIN",
+    CPID_8859_1,UNITB_8859_1,NUMBER_OF_CHARACTERS,
+    "AÄBCDEFGHIJKLMNOÖPQRSßTUÜVWXYZ","aäbcdefghijklmnoöpqrsßtuüvwxyz",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( HR1250 );
+HB_CODEPAGE_ANNOUNCE( DEWIN );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_HR1250 )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_DEWIN )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_HR1250 )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_DEWIN )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_HR1250
+   #pragma startup hb_codepage_Init_DEWIN
 #endif
 

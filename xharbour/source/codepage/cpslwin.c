@@ -1,10 +1,10 @@
 /*
- * $Id: cdpsliso.c,v 1.2 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: cdpslwin.c,v 1.4 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( SLISO )
+ * National Collation Support Module ( SLWIN )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
@@ -53,7 +53,7 @@
 
 /* Language name: Slovenian */
 /* ISO language code (2 chars): SL */
-/* Codepage: ISO-8859-2 */
+/* Codepage: Windows-1250 */
 
 #include <ctype.h>
 #include "hbapi.h"
@@ -84,17 +84,17 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "SLISO",
-    CPID_8859_2,UNITB_8859_2,NUMBER_OF_CHARACTERS,
-    "ABCÈÆDÐEFGHIJKLMNOPQRS©TUVWZ®XY","abcèdðefghijklmnopqrs¹tuvwz¾xy",
+static HB_CODEPAGE s_codepage = { "SLWIN",
+    CPID_1250,UNITB_1250,NUMBER_OF_CHARACTERS,
+    "ABCÈÆDÐEFGHIJKLMNOPQRSŠTUVWZŽXY","abcèdðefghijklmnopqrsštuvwzžxy",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( SLISO );
+HB_CODEPAGE_ANNOUNCE( SLWIN );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_SLISO )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_SLWIN )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_SLISO )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_SLWIN )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_SLISO
+   #pragma startup hb_codepage_Init_SLWIN
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.43 2004/06/04 19:15:47 kaddath Exp $
+ * $Id: adsfunc.c,v 1.44 2004/09/06 19:53:42 kaddath Exp $
  */
 
 /*
@@ -1589,7 +1589,7 @@ HB_FUNC( ADSISEXPRVALID )               /* cExpr */
    pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
    if( pArea && ISCHAR( 1 ) )
    {
-      AdsIsExprValid( pArea->hTable, (UNSIGNED8*) hb_parcx( 1 ), &bValidExpr );
+      AdsIsExprValid( pArea->hTable, (UNSIGNED8*) hb_parc( 1 ), &bValidExpr );
    }
 
    hb_retl( bValidExpr != FALSE );

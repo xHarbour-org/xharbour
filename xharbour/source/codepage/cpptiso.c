@@ -1,15 +1,15 @@
 /*
- * $Id: cdppt850.c,v 1.3 2003/07/16 17:03:04 druzus Exp $
+ * $Id: cdpptiso.c,v 1.5 2004/01/26 14:59:46 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Latin 850 )
+ * National Collation Support Module ( PTISO )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
- * Portuguese collating sequence (PT850) done
- * by Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
+ * Portuguese collating sequence (PTISO) done
+ * by Przemyslaw Czerpak <druzus@polbox.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@
 
 /* Language name: Portuguese */
 /* ISO language code (2 chars): PT */
-/* Codepage: 850 */
+/* Codepage: ISO-8859-1 */
 
 #include <ctype.h>
 #include "hbapi.h"
@@ -76,7 +76,7 @@
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-      a~Ä
+      a~«
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -85,16 +85,16 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "PT850",
-    CPID_850,UNITB_850,NUMBER_OF_CHARACTERS,
-    "Aµ∑∂«éBCÄDEê‘“FGHI÷ﬁ◊ÿJKLMN•O‡„‚ÂôPQRSTUÈÎÍöVWXYZ","a†ÖÉ∆ÑbcádeÇäàfghi°çåãjklmn§o¢ïì‰îpqrstu£óñÅvwxyz",
+static HB_CODEPAGE s_codepage = { "PTISO",
+    CPID_8859_1,UNITB_8859_1,NUMBER_OF_CHARACTERS,
+    "A¡¿¬√ƒBC«DE…» FGHIÕÃŒœJKLMN—O”“‘’÷PQRSTU⁄Ÿ€‹VWXYZ","a·‡‚„‰bcÁdeÈËÍfghiÌÏÓÔjklmnÒoÛÚÙıˆpqrstu˙˘˚¸vwxyz",
     IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( PT850 );
+HB_CODEPAGE_ANNOUNCE( PTISO );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_PT850 )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_PTISO )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_PT850 )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_PTISO )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_PT850
+   #pragma startup hb_codepage_Init_PTISO
 #endif

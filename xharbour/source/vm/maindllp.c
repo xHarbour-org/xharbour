@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.7 2004/03/17 02:29:01 druzus Exp $
+ * $Id: maindllp.c,v 1.8 2004/04/02 22:38:32 andijahja Exp $
  */
 
 /*
@@ -227,13 +227,13 @@ void hb_retds( char * szDate )  /* returns a date, must use yyyymmdd format */
 }
 
 #undef hb_retd
-void hb_retd( LONG lYear, LONG lMonth, LONG lDay ) /* returns a date */
+void hb_retd( int iYear, int iMonth, int iDay ) /* returns a date */
 {
    FARPROC pRetd=GetProcAddress( GetModuleHandle( NULL ), "_hb_retd" );
 
    if( pRetd )
    {
-      ( ( HB_RETD ) pRetd )( lYear,lMonth,lDay );
+      ( ( HB_RETD ) pRetd )( iYear, iMonth, iDay );
    }
 }
 

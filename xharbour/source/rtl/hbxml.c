@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.25 2004/04/05 00:16:04 andijahja Exp $
+ * $Id: hbxml.c,v 1.26 2004/04/08 13:26:53 druzus Exp $
  */
 
 /*
@@ -858,7 +858,7 @@ static void mxml_node_read_data( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc, 
    }
 
    // trimming unneded spaces
-   while ( iPos >1 && isspace( buf[iPos-1] ) )
+   while ( iPos >1 && isspace( (BYTE) buf[iPos-1] ) )
    {
       iPos--;
    }

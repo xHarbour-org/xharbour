@@ -1,5 +1,5 @@
 /*
- * $Id: rt_misc.prg,v 1.4 2004/03/03 00:07:37 druzus Exp $
+ * $Id: rt_misc.prg,v 1.5 2004/04/03 00:27:04 druzus Exp $
  */
 
 /*
@@ -510,7 +510,7 @@ FUNCTION Main_MISC()
    TEST_LINE( __CopyFile("$$COPYFR.TMP")                 , "E BASE 2010 Argument error __COPYFILE A:2:C:$$COPYFR.TMP;U:NIL " )
    TEST_LINE( __CopyFile("$$COPYFR.TMP", "$$COPYTO.TMP") , NIL                                        )
    TEST_LINE( __CopyFile("NOT_HERE.$$$", "$$COPYTO.TMP") , "E BASE 2012 Open error NOT_HERE.$$$ A:0: F:DR")
-   TEST_LINE( __CopyFile("$$COPYFR.TMP", BADFNAME())   , "E BASE 2012 Create error " + BADFNAME() + " A:0: F:DR")
+   TEST_LINE( __CopyFile("$$COPYFR.TMP", BADFNAME())     , "E BASE 2012 Create error " + BADFNAME() + " A:0: F:DR")
 
    FErase("$$COPYFR.TMP")
    FErase("$$COPYTO.TMP")
@@ -592,7 +592,7 @@ FUNCTION Main_MISC()
 #ifndef __XPP__
    TEST_LINE( MemoRead()                         , ""               )
 #endif
-   TEST_LINE( MemoRead(BADFNAME2())              , ""               )
+   TEST_LINE( MemoRead( BADFNAME2() )            , ""               )
 
    FErase("$$MEMOFI.TMP")
 
@@ -602,7 +602,11 @@ FUNCTION Main_MISC()
 
    TEST_LINE( TESTFNAME( ""                            ) , ";;;;"                                                                    )
    TEST_LINE( TESTFNAME( "                           " ) , ";;;;"                                                                    )
+#ifdef __PLATFORM__UNIX
+   TEST_LINE( TESTFNAME( ":                          " ) , ":;;:;;"                                                                  )
+#else
    TEST_LINE( TESTFNAME( ":                          " ) , ":;:;;;"                                                                  )
+#endif
    TEST_LINE( TESTFNAME( "C:/WORK/HELLO              " ) , "C:/WORK/HELLO;C:/WORK/;HELLO;;"                                          )
    TEST_LINE( TESTFNAME( "C:/WORK/HELLO              " ) , "C:/WORK/HELLO;C:/WORK/;HELLO;;"                                          )
    TEST_LINE( TESTFNAME( "C:/WORK/HELLO              " ) , "C:/WORK/HELLO;C:/WORK/;HELLO;;"                                          )
@@ -661,9 +665,15 @@ FUNCTION Main_MISC()
    TEST_LINE( TESTFNAME( "C:/HELLO/.PRG              " ) , "C:/HELLO/.PRG;C:/HELLO/;.PRG;;"                                          )
    TEST_LINE( TESTFNAME( "C:/HELLO/A.PRG             " ) , "C:/HELLO/A.PRG;C:/HELLO/;A;.PRG;"                                        )
    TEST_LINE( TESTFNAME( "C:/HELLO/A.B.PRG           " ) , "C:/HELLO/A.B.PRG;C:/HELLO/;A.B;.PRG;"                                    )
+#ifdef __PLATFORM__UNIX
+   TEST_LINE( TESTFNAME( "C:HELLO                    " ) , "C:HELLO;;C:HELLO;;"                                                      )
+   TEST_LINE( TESTFNAME( "C:HELLO.                   " ) , "C:HELLO.;;C:HELLO;.;"                                                    )
+   TEST_LINE( TESTFNAME( "C:HELLO.PRG                " ) , "C:HELLO.PRG;;C:HELLO;.PRG;"                                              )
+#else
    TEST_LINE( TESTFNAME( "C:HELLO                    " ) , "C:HELLO;C:;HELLO;;"                                                      )
    TEST_LINE( TESTFNAME( "C:HELLO.                   " ) , "C:HELLO.;C:;HELLO;.;"                                                    )
    TEST_LINE( TESTFNAME( "C:HELLO.PRG                " ) , "C:HELLO.PRG;C:;HELLO;.PRG;"                                              )
+#endif
    TEST_LINE( TESTFNAME( "C:HELLO/                   " ) , "C:HELLO/;C:HELLO/;;;"                                                    )
    TEST_LINE( TESTFNAME( "C:HELLO/.PRG               " ) , "C:HELLO/.PRG;C:HELLO/;.PRG;;"                                            )
    TEST_LINE( TESTFNAME( "C:HELLO/A.PRG              " ) , "C:HELLO/A.PRG;C:HELLO/;A;.PRG;"                                          )
@@ -693,7 +703,11 @@ FUNCTION Main_MISC()
    TEST_LINE( TESTFNAME( "/                          " ) , "/;/;;;"                                                                  )
    TEST_LINE( TESTFNAME( "//                         " ) , "//;//;;;"                                                                )
    TEST_LINE( TESTFNAME( "C                          " ) , "C;;C;;"                                                                  )
+#ifdef __PLATFORM__UNIX
+   TEST_LINE( TESTFNAME( "C:                         " ) , "C:;;C:;;"                                                                )
+#else
    TEST_LINE( TESTFNAME( "C:                         " ) , "C:;C:;;;"                                                                )
+#endif
    TEST_LINE( TESTFNAME( "C:/                        " ) , "C:/;C:/;;;"                                                              )
    TEST_LINE( TESTFNAME( "C://                       " ) , "C://;C://;;;"                                                            )
 
@@ -845,14 +859,14 @@ STATIC FUNCTION BADFNAME()
    /* NOTE: The dot in the "*INVALID*." filename is intentional and serves
             to hide different path handling, since Harbour is platform
             independent. */
-#ifdef __PLATFORM__Linux
+#ifdef __PLATFORM__UNIX
    return "*INVALID/*."
 #else
    return "*INVALID*."
 #endif
 
 STATIC FUNCTION BADFNAME2()
-#ifdef __PLATFORM__Linux
+#ifdef __PLATFORM__UNIX
    return "*INVALI/*.TMP"
 #else
    return "*INVALI*.TMP"

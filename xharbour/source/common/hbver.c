@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.17 2004/04/17 09:22:47 andijahja Exp $
+ * $Id: hbver.c,v 1.18 2004/09/05 22:51:59 peterrees Exp $
  */
 
 /*
@@ -356,7 +356,7 @@ char * hb_verPlatform( void )
             int i;
 
             /* Skip the leading spaces (Win95B, Win98) */
-            for( i = 0; osVer.szCSDVersion[ i ] != '\0' && isspace( ( int ) osVer.szCSDVersion[ i ] ); i++ );
+            for( i = 0; osVer.szCSDVersion[ i ] != '\0' && isspace( ( BYTE ) osVer.szCSDVersion[ i ] ); i++ );
 
             if( osVer.szCSDVersion[ i ] != '\0' )
             {
@@ -377,7 +377,7 @@ char * hb_verPlatform( void )
       struct utsname un;
 
       uname( &un );
-      sprintf( szPlatform, "%s %s", un.sysname, un.release );
+      sprintf( szPlatform, "%s %s %s", un.sysname, un.release, un.machine );
    }
 
 #elif defined(HB_OS_MAC)

@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.18 2004/04/26 15:45:18 lf_sfnet Exp $
+ * $Id: odbc.c,v 1.19 2004/07/16 17:32:14 mlombardo Exp $
  */
 
 /*
@@ -485,8 +485,10 @@ HB_FUNC( SQLBINDOUTPARAM ) /* SqlBindOutParam( nStatementHandle, nParameterNumbe
 {
    PHB_ITEM pResult = hb_param( 6, HB_IT_BYREF );
    PHB_ITEM pLen    = hb_param( 7, HB_IT_BYREF );
+   ULONG ulLen = ( ULONG ) hb_itemGetNL( pLen );
 
-   RETCODE ret = SQLBindParameter( ( HSTMT ) hb_parnl( 1 ), (USHORT) hb_parni( 2 ), SQL_PARAM_OUTPUT, SQL_CHAR, (USHORT) hb_parni( 3 ), (USHORT) hb_parni( 4 ), (USHORT) hb_parni( 5 ), pResult->item.asString.value, pResult->item.asString.length, &(pLen->item.asLong.value) );
+   RETCODE ret = SQLBindParameter( ( HSTMT ) hb_parnl( 1 ), (USHORT) hb_parni( 2 ), SQL_PARAM_OUTPUT, SQL_CHAR, (USHORT) hb_parni( 3 ), (USHORT) hb_parni( 4 ), (USHORT) hb_parni( 5 ), pResult->item.asString.value, pResult->item.asString.length, &ulLen );
+   hb_stornl( 7, ulLen );
    hb_retni( ret );
 }
 

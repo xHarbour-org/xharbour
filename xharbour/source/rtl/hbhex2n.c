@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.11 2004/08/01 19:22:16 mlombardo Exp $
+ * $Id: hbhex2n.c,v 1.12 2004/08/13 11:11:58 alexstrickland Exp $
  */
 
 /*
@@ -64,27 +64,15 @@ HB_FUNC( HB_NUMTOHEX )
    int iCipher;
    char ret[33];
    int len = 33;
-#ifndef HB_LONG_LONG_OFF
-   ULONGLONG ulNum;
+   HB_ULONG ulNum;
    if( ISNUM(1) )
    {
-      ulNum = (ULONGLONG) hb_parnll( 1 );
+      ulNum = hb_parnint( 1 );
    }
    else if ( ISPOINTER( 1 ) )
    {
       ulNum = (HB_PTRDIFF) hb_parptr( 1 );
    }
-#else
-   ULONG ulNum;
-   if( ISNUM(1) )
-   {
-      ulNum = (ULONG) hb_parnl( 1 );
-   }
-   else if ( ISPOINTER( 1 ) )
-   {
-      ulNum = (ULONG) hb_parptr( 1 );
-   }
-#endif
    else
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_NUMTOHEX", 1, hb_param(1,HB_IT_ANY) );
@@ -110,13 +98,9 @@ HB_FUNC( HB_NUMTOHEX )
 
 HB_FUNC( HB_HEXTONUM )
 {
-#ifndef HB_LONG_LONG_OFF
-   ULONGLONG ulNum = 0;
-#else
-   ULONG ulNum = 0;
-#endif
+   HB_ULONG ulNum = 0;
    char *cHex, c;
-   ULONG ulCipher;
+   int iCipher;
 
    if( ! ISCHAR(1) )
    {
@@ -131,22 +115,22 @@ HB_FUNC( HB_HEXTONUM )
       ulNum <<= 4;
       if ( c >= '0' && c <= '9' )
       {
-         ulCipher = (ULONG) ( c - '0' );
+         iCipher = ( c - '0' );
       }
       else if ( c >= 'A' && c <= 'F' )
       {
-         ulCipher = (ULONG) ( c - 'A' ) + 10;
+         iCipher = ( c - 'A' ) + 10;
       }
       else if ( c >= 'a' && c <= 'f' )
       {
-         ulCipher = (ULONG) ( c - 'a' ) + 10;
+         iCipher = ( c - 'a' ) + 10;
       }
       else
       {
          ulNum = 0;
          break;
       }
-      ulNum += ulCipher;
+      ulNum += iCipher;
       cHex++;
    }
    hb_retnint( ulNum );

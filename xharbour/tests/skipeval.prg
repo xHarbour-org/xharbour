@@ -58,7 +58,7 @@ enddo
 nSec:=secondscpu()-nSec
 ? "SKIPEVAL:", nSec, "sec."
 
-cRegex:="\b.*1001[D-O].*\b"
+cRegex:=".*101.*A"
 cRegex:=HB_REGEXCOMP(cRegex)
 nSec:=secondscpu()
 dbgotop()

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.31 2004/05/30 20:44:11 ronpinkas Exp $
+ * $Id: hbpcode.c,v 1.32 2004/07/03 03:34:53 ronpinkas Exp $
  */
 
 /*
@@ -210,7 +210,8 @@ static char *pCodeList[] =
     "HB_P_BITSHIFTL",             /* 156 */
     "HB_P_LARGEFRAME",            /* 157 */
     "HB_P_PUSHWITH",              /* 158 pushes QWith for the current procedure/method */
-    "HB_P_LAST_PCODE"             /* 159 this defines the number of defined pcodes */
+    "HB_P_PUSHLONGLONG",          /* 159 places 64bit integer number on the virtual machine stack */
+    "HB_P_LAST_PCODE"             /* 160 this defines the number of defined pcodes */
 };
 
 static BYTE s_pcode_len[] = {
@@ -313,7 +314,7 @@ static BYTE s_pcode_len[] = {
    3,        /* HB_P_PUSHLOCAL,            */
    2,        /* HB_P_PUSHLOCALNEAR,        */
    3,        /* HB_P_PUSHLOCALREF,         */
-   1 + sizeof( LONG ),        /* HB_P_PUSHLONG,             */
+   5,        /* HB_P_PUSHLONG,             */
    3,        /* HB_P_PUSHMEMVAR,           */
    3,        /* HB_P_PUSHMEMVARREF,        */
    1,        /* HB_P_PUSHNIL,              */
@@ -362,7 +363,7 @@ static BYTE s_pcode_len[] = {
    2,        /* HB_P_POPGLOBAL,            */
    2,        /* HB_P_PUSHGLOBALREF,        */
    1,        /* HB_P_ENUMINDEX,            */
-   1 + sizeof( LONG ), /* HB_P_SWITCHCASE, */
+   5,        /* HB_P_SWITCHCASE,           */
    1,        /* HB_P_LIKE,                 */
    1,        /* HB_P_MATCH,                */
    1,        /* HB_P_PUSHMACROREF,         */
@@ -373,8 +374,9 @@ static BYTE s_pcode_len[] = {
    1,        /* HB_P_BITXOR,               */
    1,        /* HB_P_BITSHIFTR,            */
    1,        /* HB_P_BITSHIFTL,            */
-   4,        /* HB_P_LARGEFRAME            */
-   1         /* HB_P_PUSHWITH,             */
+   4,        /* HB_P_LARGEFRAME,           */
+   1,        /* HB_P_PUSHWITH,             */
+   9         /* HB_P_PUSHLONGLONG          */
 };
 
 extern BOOL hb_comp_iGenVarList;
@@ -596,7 +598,7 @@ void hb_compStrongType( int iSize )
                 else
                 {
                    hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, pDeclared->szName );
-                   pFunc->pStack[ pFunc->iStackIndex ] = ( isupper(  ( int ) hb_comp_cCastType ) ? 'O' : 'o' );
+                   pFunc->pStack[ pFunc->iStackIndex ] = ( isupper( ( BYTE ) hb_comp_cCastType ) ? 'O' : 'o' );
                 }
 
                 hb_comp_cCastType = ' ';
@@ -2127,6 +2129,7 @@ void hb_compStrongType( int iSize )
 
      /* Numerics */
      case HB_P_PUSHDOUBLE :
+     case HB_P_PUSHLONGLONG :
      case HB_P_PUSHLONG :
      case HB_P_PUSHINT :
      case HB_P_PUSHBYTE :
@@ -2940,7 +2943,7 @@ void hb_compStrongType( int iSize )
                    else
                    {
                       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, pVar->szName );
-                      pFunc->pStack[ pFunc->iStackIndex ] = ( isupper(  ( int ) hb_comp_cCastType ) ? 'O' : 'o' );
+                      pFunc->pStack[ pFunc->iStackIndex ] = ( isupper( ( BYTE ) hb_comp_cCastType ) ? 'O' : 'o' );
                    }
 
                    hb_comp_cCastType = ' ';
@@ -3260,7 +3263,7 @@ void hb_compStrongType( int iSize )
                else
                {
                   hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, pVar->szName );
-                  pFunc->pStack[ pFunc->iStackIndex ] = ( isupper(  ( int ) hb_comp_cCastType ) ? 'O' : 'o' );
+                  pFunc->pStack[ pFunc->iStackIndex ] = ( isupper( ( BYTE ) hb_comp_cCastType ) ? 'O' : 'o' );
                }
 
                hb_comp_cCastType = ' ';
@@ -3441,7 +3444,7 @@ void hb_compStrongType( int iSize )
                else
                {
                   hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, pVar->szName );
-                  pFunc->pStack[ pFunc->iStackIndex ] = ( isupper(  ( int ) hb_comp_cCastType ) ? 'O' : 'o' );
+                  pFunc->pStack[ pFunc->iStackIndex ] = ( isupper( ( BYTE ) hb_comp_cCastType ) ? 'O' : 'o' );
                }
 
                hb_comp_cCastType = ' ';

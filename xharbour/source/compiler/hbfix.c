@@ -1,5 +1,5 @@
 /*
- * $Id: hbfix.c,v 1.25 2004/05/30 20:44:11 ronpinkas Exp $
+ * $Id: hbfix.c,v 1.26 2004/07/03 03:34:53 ronpinkas Exp $
  */
 
 /*
@@ -208,7 +208,7 @@ static HB_FIX_FUNC( hb_p_poplocalnear )
       iVar += pFunc->wParamCount;
       pVar[ 0 ] = HB_LOBYTE( iVar );
       pVar[ 1 ] = HB_HIBYTE( iVar );
-      if( iVar >= -128 && iVar <= 127 )
+      if ( HB_LIM_INT8( iVar ) )
       {
          pFunc->pCode[ lPCodePos + 2 ] = HB_P_NOOP;
          hb_compNOOPadd( pFunc, lPCodePos + 2 );
@@ -236,7 +236,7 @@ static HB_FIX_FUNC( hb_p_pushlocalnear )
       iVar += pFunc->wParamCount;
       pVar[ 0 ] = HB_LOBYTE( iVar );
       pVar[ 1 ] = HB_HIBYTE( iVar );
-      if( iVar >= -128 && iVar <= 127 )
+      if ( HB_LIM_INT8( iVar ) )
       {
          pFunc->pCode[ lPCodePos + 2 ] = HB_P_NOOP;
          hb_compNOOPadd( pFunc, lPCodePos + 2 );
@@ -506,8 +506,9 @@ static HB_FIX_FUNC_PTR s_fixlocals_table[] =
    NULL,                       /* HB_P_BITXOR,               */
    NULL,                       /* HB_P_SHIFTR,               */
    NULL,                       /* HB_P_SHIFTL,               */
-   NULL,                       /* HB_P_LARGEFRAME            */
-   NULL                        /* HB_P_PUSHWITH              */
+   NULL,                       /* HB_P_LARGEFRAME,           */
+   NULL,                       /* HB_P_PUSHWITH,             */
+   NULL                        /* HB_P_PUSHLONGLONG          */
 };
 
 void hb_compFixFuncPCode( PFUNCTION pFunc )
