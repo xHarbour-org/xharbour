@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.10 2002/12/29 08:32:41 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.11 2003/01/02 03:31:02 jonnymind Exp $
  */
 
 /*
@@ -63,8 +63,10 @@
 #if !defined( STACK_INITHB_ITEMS )
    #define STACK_INITHB_ITEMS      200
 #endif
-#if !defined( STACK_THREADHB_ITEMS )
-   #define STACK_THREADHB_ITEMS    100
+#ifdef HB_THREAD_SUPPORT
+   #if !defined( STACK_THREADHB_ITEMS )
+      #define STACK_THREADHB_ITEMS    100
+   #endif
 #endif
 #if !defined( STACK_EXPANDHB_ITEMS )
    #define STACK_EXPANDHB_ITEMS    20

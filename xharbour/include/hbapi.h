@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.54 2003/01/05 06:50:35 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.55 2003/01/05 20:20:02 ronpinkas Exp $
  */
 
 /*
@@ -184,7 +184,9 @@ extern void   hb_gcReleaseAll( void ); /* release all memory blocks unconditiona
 extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers passed memory block pointer */
 extern void   HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
 extern void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as used */
-extern void   hb_threadIsLocalRef( void ); /* thread.c - mark all local variables as used */
+#ifdef HB_THREAD_SUPPORT
+   extern void   hb_threadIsLocalRef( void ); /* thread.c - mark all local variables as used */
+#endif
 extern void   hb_vmIsStaticRef( void ); /* hvm.c - mark all static variables as used */
 extern void   hb_vmIsGlobalRef( void ); /* hvm.c - mark all global variables as used */
 extern void   hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals ); /* hvm.c - Register module globals into s_aGlobals */

@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.1.1.1 2001/12/21 10:38:56 ronpinkas Exp $
+rem $Id: make_b32.bat,v 1.2 2002/01/29 07:24:23 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -13,8 +13,11 @@ rem ---------------------------------------------------------------
 
 if not exist obj md obj
 if not exist obj\b32 md obj\b32
+if not exist obj\b32\mt md obj\b32\mt
+
 if not exist lib md lib
 if not exist lib\b32 md lib\b32
+
 if not exist bin md bin
 if not exist bin\b32 md bin\b32
 
