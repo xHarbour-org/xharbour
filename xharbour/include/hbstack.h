@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.3 2002/10/19 01:22:38 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.4 2002/10/25 00:49:14 ronpinkas Exp $
  */
 
 /*
@@ -86,7 +86,7 @@ typedef struct
 } HB_STACK_STATE;    /* used to save/restore stack state in hb_vmDo)_ */
 
 #ifndef HB_NO_DEFAULT_STACK_MACROS
-  #define HB_STACK_MACROS
+    #define HB_STACK_MACROS
 #endif
 
 #ifdef HB_STACK_MACROS
@@ -99,14 +99,14 @@ typedef struct
     #define hb_stackSelfItem( )         ( * ( hb_stack.pBase + 1 ) )
     #define hb_stackItem( iItemPos )    ( * ( hb_stack.pItems + iItemPos ) )
 #else
-    extern HB_ITEM_PTR hb_stackItemFromTop( int nFromTop );
-    extern HB_ITEM_PTR hb_stackItemFromBase( int nFromBase );
-    extern LONG hb_stackTopOffset( void );
-    extern LONG hb_stackBaseOffset( void );
-    extern HB_ITEM_PTR hb_stackTopItem( void );
-    extern HB_ITEM_PTR hb_stackBaseItem( void );
-    extern HB_ITEM_PTR hb_stackSelfItem( void );
-    extern HB_ITEM_PTR hb_stackItem( LONG iItemPos );
+    extern HB_ITEM_PTR HB_EXPORT hb_stackItemFromTop( int nFromTop );
+    extern HB_ITEM_PTR HB_EXPORT hb_stackItemFromBase( int nFromBase );
+    extern LONG HB_EXPORT hb_stackTopOffset( void );
+    extern LONG HB_EXPORT hb_stackBaseOffset( void );
+    extern HB_ITEM_PTR HB_EXPORT hb_stackTopItem( void );
+    extern HB_ITEM_PTR HB_EXPORT hb_stackBaseItem( void );
+    extern HB_ITEM_PTR HB_EXPORT hb_stackSelfItem( void );
+    extern HB_ITEM_PTR HB_EXPORT hb_stackItem( LONG iItemPos );
 #endif
 
 extern void hb_stackRemove( LONG lUntilPos );
