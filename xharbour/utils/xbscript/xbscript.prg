@@ -1992,7 +1992,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ENDIF
                ENDIF
 
-               //TraceLog( sBlock )
+               //TraceLog( sBlock, sSymbol )
                aAdd( aProcedures[ nProcId ][2], { 0, &( "{||" + sBlock + "}" ), nLine } )
             ENDIF
          ENDIF
@@ -3303,6 +3303,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
    LOCAL sSkipped
    LOCAL bArrayPrefix
    LOCAL bErrHandler
+   LOCAL bPresetCompile
 
    #ifdef __XHARBOUR__
       LOCAL sTemp
@@ -3515,8 +3516,11 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                ExtractLeadingWS( @sLine )
                DropTrailingWS( @sLine )
 
-               // Added Oct-16-2004 to support #defines a nd translates.
+               // Added Oct-16-2004 to support #defines and translates.
+               bPresetCompile := bCompile
+               bCompile := .F.
                sLine := PP_PreProLine( sLine )
+               bCompile := bPresetCompile
 
                // Strip the ""
                sLine := SubStr( sLine, 2, Len( sLine ) - 2 )
@@ -3620,6 +3624,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                   s_sIncludeFile := sLine
                ENDIF
 
+               //TraceLog( sLine )
                sLine := ''
                LOOP
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3504 2004/10/20 20:19:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3505 2004/10/20 22:40:36 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-20 16:30 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * utils/xbscript/xbscript.prg
+    * Minor correction to recent #directive support in #include directives.
 
 2004-10-20 15:39 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/pp/ppcore.c
