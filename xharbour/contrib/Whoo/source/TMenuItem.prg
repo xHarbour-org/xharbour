@@ -24,7 +24,11 @@ METHOD New( cText, nId, bAction, oMenu ) CLASS TMenuItem
    ::Action := bAction
    ::oMenu  := oMenu
    aAdd( ::oMenu:oMenu:aItems, self )
-   AppendMenu( oMenu:handle, MF_ENABLED + MF_STRING, nId, cText)
+   IF cText==NIL.AND.nId==NIL.AND.bAction==NIL
+      AppendMenu( oMenu:handle, MF_SEPARATOR)
+     else
+      AppendMenu( oMenu:handle, MF_ENABLED + MF_STRING, nId, cText)
+   endif
 
    return(self)
 

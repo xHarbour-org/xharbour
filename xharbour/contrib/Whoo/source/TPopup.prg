@@ -15,7 +15,7 @@ CLASS TPopup
    METHOD New() CONSTRUCTOR
    METHOD Add()
    METHOD AddItem()
-
+   METHOD AddSeparator() INLINE ::AddItem()
 ENDCLASS
 
 *-----------------------------------------------------------------------------*

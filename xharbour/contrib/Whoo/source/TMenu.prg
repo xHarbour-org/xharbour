@@ -13,7 +13,7 @@ CLASS TMenu
    DATA handle
    DATA Popup  AS OBJECT
    DATA aItems AS ARRAY INIT {}
-   
+   DATA name
    METHOD New() CONSTRUCTOR
    METHOD AddPopUp()
    METHOD Set()

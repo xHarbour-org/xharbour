@@ -40,7 +40,8 @@ METHOD New( oParent ) CLASS TForm
 *-----------------------------------------------------------------------------*
 
 METHOD Add( cName, oObj ) CLASS TForm
-
+   
+   oObj:propname := cName
    __objAddData( self, cName )
    __ObjSetValueList( self, { { cName, oObj } } )
    oObj:Create()

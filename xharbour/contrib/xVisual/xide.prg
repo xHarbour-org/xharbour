@@ -28,7 +28,7 @@ FUNCTION Main
 
             WITH OBJECT :Popup
                :AddItem( 'Editor'  , 101, {||oApp:CreateForm( 'SubForm', TFormEdit(),oApp:MainFrame ) } )
-
+               :AddSeparator()
                :AddItem( 'Button'     , 102, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'Edit'       , 103, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'ComboBox'   , 104, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
@@ -56,7 +56,20 @@ FUNCTION Main
       
       
       :MainFrame:Rebar:Add( 'Tools', TToolBar():New( :MainFrame:Rebar, 444, 14, , , 32, 32, 24, 24 ) )
-      :MainFrame:Rebar:Tools:AddButton( 0, 10,,,,  ,,'New Project' )
+      :MainFrame:Rebar:Tools:AddButton( 0, 500,,,,  ,,'New Project' )
+      :MainFrame:Rebar:Tools:AddButton( 1, 11,,,,  ,,'Open Project' )
+      :MainFrame:Rebar:Tools:AddButton( 2, 12,,,,  ,,'Properties' )
+      :MainFrame:Rebar:Tools:AddButton( 3, 13,,,,  ,,'Build Application' )
+      :MainFrame:Rebar:Tools:AddButton( 4, 14,,,,  ,,'Build and Launch Application' )
+      :MainFrame:Rebar:Tools:AddButton( 5, 15,,,,  ,,'Re-Build Application' )
+      :MainFrame:Rebar:Tools:AddButton( 6, 16,,,,  ,,'Re-Build and Launch Application' )
+      :MainFrame:Rebar:Tools:AddButton( 7, 17,,,,  ,,'Launch Application' )
+      :MainFrame:Rebar:Tools:AddButton( 8, 18,,,,  ,,'Compile Single Source' )
+      :MainFrame:Rebar:Tools:AddButton( 9, 19,,,,  ,,'Compile All Sources' )
+      :MainFrame:Rebar:Tools:AddButton(10, 20,,,,  ,,'Link Only' )
+      :MainFrame:Rebar:Tools:AddButton(11, 21,,,,  ,,'Compile to PPO' )
+      :MainFrame:Rebar:Tools:AddButton(12, 22,,,,  ,,'View' )
+      :MainFrame:Rebar:Tools:AddButton(14, 23,,,,  ,,'Files')
 
       SendMessage( :MainFrame:Rebar:Tools:handle, TB_SETIMAGELIST, 0, hImg )
       SendMessage( :MainFrame:Rebar:Tools:handle, TB_SETBUTTONSIZE, 0, MAKELONG( 26, 26 ) )

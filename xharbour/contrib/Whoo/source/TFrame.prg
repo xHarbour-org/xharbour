@@ -39,6 +39,7 @@ METHOD New( oParent ) CLASS TFrame
 
 METHOD Add( cName, oObj ) CLASS TFrame
    
+   oObj:propname := cName
    __objAddData( self, cName )
    __ObjSetValueList( self, { { cName, oObj } } )
    oObj:Create()
