@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.35 2003/06/09 10:29:01 jacekp Exp $
+ * $Id: dbcmd.c,v 1.36 2003/06/19 02:44:49 druzus Exp $
  */
 
 /*
@@ -2873,16 +2873,18 @@ HB_FUNC( ORDLISTADD )
             hb_itemRelease( pOrderInfo.itmResult );
          return;
       }
-      SELF_ORDLSTADD( ( AREAP ) s_pCurrArea->pArea, &pOrderInfo );
 
-      if ( bFirst )                     /* set as controlling order and go top */
+      if (SELF_ORDLSTADD( ( AREAP ) s_pCurrArea->pArea, &pOrderInfo ) == SUCCESS )
       {
-         pOrderInfo.itmOrder  = hb_itemPutNI( NULL, 1 );
-         SELF_ORDLSTFOCUS( ( AREAP ) s_pCurrArea->pArea, &pOrderInfo );
-         hb_itemRelease( pOrderInfo.itmOrder );
-         SELF_GOTOP( ( AREAP ) s_pCurrArea->pArea );
+         if ( bFirst )                     /* set as controlling order and go top */
+         {
+            pOrderInfo.itmOrder  = hb_itemPutNI( NULL, 1 );
+            SELF_ORDLSTFOCUS( ( AREAP ) s_pCurrArea->pArea, &pOrderInfo );
+            hb_itemRelease( pOrderInfo.itmOrder );
+            SELF_GOTOP( ( AREAP ) s_pCurrArea->pArea );
+         }
+         hb_itemRelease( pOrderInfo.itmResult );
       }
-      hb_itemRelease( pOrderInfo.itmResult );
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDLISTADD" );
