@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.29 2004/04/05 22:25:42 andijahja Exp $
+ * $Id: hbpcode.c,v 1.30 2004/05/08 04:25:13 ronpinkas Exp $
  */
 
 /*
@@ -208,7 +208,8 @@ static char *pCodeList[] =
     "HB_P_BITXOR",                /* 154 */
     "HB_P_BITSHIFTR",             /* 155 */
     "HB_P_BITSHIFTL",             /* 156 */
-    "HB_P_LAST_PCODE"             /* 157 this defines the number of defined pcodes */
+    "HB_P_LARGEFRAME",            /* 157 */
+    "HB_P_LAST_PCODE"             /* 158 this defines the number of defined pcodes */
 };
 
 static BYTE s_pcode_len[] = {
@@ -362,15 +363,16 @@ static BYTE s_pcode_len[] = {
    1,        /* HB_P_ENUMINDEX,            */
    1 + sizeof( LONG ), /* HB_P_SWITCHCASE, */
    1,        /* HB_P_LIKE,                 */
-   1,        /* HB_P_MATCH                 */
-   1,        /* HB_P_PUSHMACROREF          */
-   1,        /* HB_P_IVARREF               */
-   1,        /* HB_P_CLASSSETMODULE        */
-   1,        /* HB_P_BITAND                */
-   1,        /* HB_P_BITOR                 */
-   1,        /* HB_P_BITXOR                */
-   1,        /* HB_P_BITSHIFTR             */
-   1         /* HB_P_BITSHIFTL             */
+   1,        /* HB_P_MATCH,                */
+   1,        /* HB_P_PUSHMACROREF,         */
+   1,        /* HB_P_IVARREF,              */
+   1,        /* HB_P_CLASSSETMODULE,       */
+   1,        /* HB_P_BITAND,               */
+   1,        /* HB_P_BITOR,                */
+   1,        /* HB_P_BITXOR,               */
+   1,        /* HB_P_BITSHIFTR,            */
+   1,        /* HB_P_BITSHIFTL,            */
+   4         /* HB_P_LARGEFRAME            */
 };
 
 extern BOOL hb_comp_iGenVarList;

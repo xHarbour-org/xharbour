@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.399 2004/05/18 15:05:44 ronpinkas Exp $
+ * $Id: hvm.c,v 1.400 2004/05/24 07:34:01 ronpinkas Exp $
  */
 
 /*
@@ -186,7 +186,7 @@ static void    hb_vmLocalName( USHORT uiLocal, char * szLocalName ); /* locals a
 // static void    hb_vmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticName ); /* statics vars information for the debugger */
 static void    hb_vmStaticName( USHORT uiStatic, char * szStaticName ); /* statics vars information for the debugger */
 static void    hb_vmModuleName( char * szModuleName ); /* PRG and function name information for the debugger */
-static void    hb_vmFrame( BYTE bLocals, BYTE bParams ); /* increases the stack pointer for the amount of locals and params suplied */
+static void    hb_vmFrame( unsigned short iLocals, BYTE bParams ); /* increases the stack pointer for the amount of locals and params suplied */
 static void    hb_vmSFrame( PHB_SYMB pSym );     /* sets the statics frame for a function */
 static void    hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ); /* increases the global statics array to hold a PRG statics */
 static void    hb_vmEndBlock( void );            /* copies the last codeblock pushed value into the return value */
@@ -1904,8 +1904,14 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_FRAME:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FRAME") );
-            hb_vmFrame( pCode[ w + 1 ], pCode[ w + 2 ] );
+            hb_vmFrame( (unsigned short) pCode[ w + 1 ], pCode[ w + 2 ] );
             w += 3;
+            break;
+
+         case HB_P_LARGEFRAME:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_FRAME") );
+            hb_vmFrame( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ), pCode[ w + 3 ] );
+            w += 4;
             break;
 
          case HB_P_SFRAME:
@@ -2493,7 +2499,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_PUSHLOCAL:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLOCAL") );
-            hb_vmPushLocal( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
+            hb_vmPushLocal( HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
@@ -2612,7 +2618,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_LOCALNEARSETINT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETINT") );
          {
-            PHB_ITEM pLocal = hb_stackItemFromBase( pCode[ w + 1 ] );
+            PHB_ITEM pLocal = hb_stackItemFromBase( (signed char) pCode[ w + 1 ] );
             int iNewVal = HB_PCODE_MKSHORT( &( pCode[ w + 2 ] ) );
 
             if( HB_IS_BYREF( pLocal ) )
@@ -2934,7 +2940,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_PUSHLOCALREF:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLOCALREF") );
-            hb_vmPushLocalByRef( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
+            hb_vmPushLocalByRef( HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
@@ -3068,7 +3074,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_POPLOCAL:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPLOCAL") );
-            hb_vmPopLocal( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
+            hb_vmPopLocal( HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
@@ -6439,19 +6445,19 @@ static void hb_vmModuleName( char * szModuleName ) /* PRG and function name info
    s_bDebugShowLines = TRUE;
 }
 
-static void hb_vmFrame( BYTE bLocals, BYTE bParams )
+static void hb_vmFrame( unsigned short iLocals, BYTE bParams )
 {
    HB_THREAD_STUB
 
    int iTotal, iExtra;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmFrame(%d, %d)", (int) bLocals, (int) bParams));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmFrame(%d, %d)", iLocals, (int) bParams));
 
    if( bParams == 255 )
    {
       hb_stackBaseItem()->item.asSymbol.paramcnt += 256;
 
-      while( bLocals-- > 0 )
+      while( iLocals-- > 0 )
       {
          hb_vmPushNil();
       }
@@ -6476,7 +6482,7 @@ static void hb_vmFrame( BYTE bLocals, BYTE bParams )
       iExtra--;
    }
 
-   iTotal = bLocals + bParams;
+   iTotal = iLocals + bParams;
    if( iTotal )
    {
       int i = iTotal - hb_pcount();

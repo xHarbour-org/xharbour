@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3007 2004/05/30 16:09:45 lculik Exp $
+ * $Id: ChangeLog,v 1.3008 2004/05/30 20:37:14 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-28 13:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/exproptb.c
+  * source/compiler/exproptc.c
+  * include/hbexprb.c
+  * include/hbexprc.c
+    ! Fixed HB_P_LOCALNEAR* optimization on for locals in range 0-127
+
+  * source/vm/hvm.c
+    ! HB_P_PUSHLOACL and HB_P_POPLOCAL to use HB_PCODE_MKSHORT() instead of HB_PCODE_MKUSHORT
+    ! Fixed hb_vmFrame() to accept unsigned int, instead of BYTE
+
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * source/vm/hvm.c
+    + Added support for new HB_P_LARGEFRAME to fix bug when function has more than 255 LOCALs
 
 2004-05-31 00:35 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * make_drw.sh
@@ -42,7 +61,7 @@
     makefile.vc
     makefile.nt
     ! added dllmain.lib tobe generate(for usage with xharbour dll)
-    
+
 2004-05-28 22:50 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   + make_bsd.sh
   * bin/hb-func.sh

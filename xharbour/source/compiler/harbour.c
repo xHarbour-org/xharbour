@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.80 2004/05/11 01:22:40 druzus Exp $
+ * $Id: harbour.c,v 1.81 2004/05/12 02:25:24 druzus Exp $
  */
 
 /*
@@ -2310,6 +2310,7 @@ PVAR hb_compLocalVariableFind( PFUNCTION pFunc, USHORT wVar )
    {
       wVar -= pFunc->wParamCount;
    }
+
    return hb_compVariableFind( pFunc->pLocals, wVar );
 }
 
@@ -4088,6 +4089,7 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
 static void hb_compOptimizeFrames( PFUNCTION pFunc )
 {
    USHORT w;
+   int iOffset = 0;
 
    if( pFunc == NULL )
    {
@@ -4142,7 +4144,7 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
             pFunc->pCode[ 3 ] == HB_P_SFRAME )
    {
       PVAR pLocal;
-      int bLocals = 0;
+      int iLocals = 0;
       BOOL bSkipFRAME;
       BOOL bSkipSFRAME;
 
@@ -4152,30 +4154,45 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
       {
          if( hb_comp_VariableList != NULL )
          {
-            fprintf(hb_comp_VariableList,"%s=%i\n",pLocal->szName, pLocal->iUsed);
+            fprintf( hb_comp_VariableList,"%s=%i\n",pLocal->szName, pLocal->iUsed );
          }
+
          pLocal = pLocal->pNext;
-         bLocals++;
+         iLocals++;
       }
 
-      if( bLocals || pFunc->wParamCount )
+      if( iLocals || pFunc->wParamCount )
       {
          if( pFunc->bFlags & FUN_USES_LOCAL_PARAMS )
          {
-            pFunc->pCode[ 1 ] = ( BYTE )( bLocals ) - ( BYTE )( pFunc->wParamCount );
+            iLocals -= pFunc->wParamCount;
+         }
+
+         if( iLocals < 256 )
+         {
+            pFunc->pCode[ 1 ] = ( BYTE )( iLocals );
          }
          else
          {
-            /* Parameters declared with PARAMETERS statement are not
-             * placed in the local variable list.
-             */
-            pFunc->pCode[ 1 ] = ( BYTE )( bLocals );
+            iOffset = 1;
+
+            if( ( pFunc->lPCodeSize - pFunc->lPCodePos ) < 1 )
+            {
+               pFunc->pCode = ( BYTE * ) hb_xrealloc( pFunc->pCode, pFunc->lPCodeSize += 1 );
+            }
+
+            memmove( pFunc->pCode + 3, pFunc->pCode + 2, pFunc->lPCodePos - 2 );
+            pFunc->lPCodePos++;
+
+            pFunc->pCode[ 0 ] = HB_P_LARGEFRAME;
+            pFunc->pCode[ 1 ] = HB_LOBYTE( iLocals );
+            pFunc->pCode[ 2 ] = HB_HIBYTE( iLocals);
          }
 
          // SomeFunc( ... ) - Variable number paramaters.
-         if( pFunc->pCode[ 2 ] < 255 )
+         if( pFunc->pCode[ 2 + iOffset ] < 255 )
          {
-            pFunc->pCode[ 2 ] = ( BYTE )( pFunc->wParamCount );
+            pFunc->pCode[ 2 + iOffset ] = ( BYTE )( pFunc->wParamCount );
          }
 
          bSkipFRAME = FALSE;
@@ -4188,8 +4205,8 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
       if( pFunc->bFlags & FUN_USES_STATICS )
       {
          hb_compSymbolFind( hb_comp_pInitFunc->szName, &w );
-         pFunc->pCode[ 4 ] = HB_LOBYTE( w );
-         pFunc->pCode[ 5 ] = HB_HIBYTE( w );
+         pFunc->pCode[ 4 + iOffset ] = HB_LOBYTE( w );
+         pFunc->pCode[ 5 + iOffset ] = HB_HIBYTE( w );
          bSkipSFRAME = FALSE;
       }
       else
@@ -4217,7 +4234,6 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
 
       // hb_xfree( szFunctionName );
    }
-
 }
 
 int
@@ -4492,6 +4508,7 @@ int hb_compFieldsCount()
 void hb_compStaticDefStart( void )
 {
    hb_comp_functions.pLast->bFlags |= FUN_USES_STATICS;
+
    if( ! hb_comp_pInitFunc )
    {
       BYTE pBuffer[ 5 ];
@@ -5141,7 +5158,10 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                   bFunc = ( ( strlen( pFunc->szName ) != 0 ) && ( strcmp(pFunc->szName,"(_INITSTATICS)") > 0  ) ) ;
 
                   /* Using function name as section name */
-                  if ( bFunc && hb_comp_iGenVarList ) fprintf(hb_comp_VariableList,"[%s]\n",pFunc->szName);
+                  if( bFunc && hb_comp_iGenVarList )
+                  {
+                     fprintf(hb_comp_VariableList,"[%s]\n",pFunc->szName);
+                  }
 
                   hb_compOptimizeFrames( pFunc );
 

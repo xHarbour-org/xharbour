@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.74 2004/04/28 18:23:41 druzus Exp $
+ * $Id: genc.c,v 1.75 2004/05/08 04:25:12 ronpinkas Exp $
  */
 
 /*
@@ -2995,6 +2995,22 @@ static HB_GENC_FUNC( hb_p_bitshiftl )
    return 1;
 }
 
+static HB_GENC_FUNC( hb_p_largeframe )
+{
+   fprintf( cargo->yyc, "\tHB_P_LARGEFRAME, %i, %i, %i,",
+            pFunc->pCode[ lPCodePos + 1 ],
+            pFunc->pCode[ lPCodePos + 2 ],
+            pFunc->pCode[ lPCodePos + 3 ] );
+
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "\t/* (lo)locals, (hi)locals, params */" );
+   }
+
+   fprintf( cargo->yyc, "\n" );
+   return 4;
+}
+
 /* NOTE: The order of functions has to match the order of opcodes
  *       mnemonics
  */
@@ -3157,7 +3173,8 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_bitor,
    hb_p_bitxor,
    hb_p_bitshiftr,
-   hb_p_bitshiftl
+   hb_p_bitshiftl,
+   hb_p_largeframe
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

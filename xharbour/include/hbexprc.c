@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.11 2003/09/04 19:27:08 ronpinkas Exp $
+ * $Id: hbexprc.c,v 1.12 2004/02/13 03:13:25 walito Exp $
  */
 
 /*
@@ -205,7 +205,7 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
             {
                iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
 
-               if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+               if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 128 )
                {
                   if( bOpEq == HB_P_MINUS )
                   {
@@ -326,7 +326,7 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
             {
                iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
 
-               if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+               if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 128 )
                {
                   if( bOpEq == HB_P_MINUS )
                   {
@@ -436,7 +436,7 @@ void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
          {
-            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 128 )
             {
                if( bOper == HB_P_DEC )
                {
@@ -504,7 +504,7 @@ void hb_compExprPushPostOp( HB_EXPR_PTR pSelf, BYTE bOper )
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
          {
-            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 128 )
             {
                if( bOper == HB_P_DEC )
                {
@@ -569,7 +569,7 @@ void hb_compExprUsePreOp( HB_EXPR_PTR pSelf, BYTE bOper )
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
          {
-            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 128 )
             {
                if( bOper == HB_P_DEC )
                {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.h,v 1.19 2003/07/23 12:35:57 druzus Exp $
+ * $Id: hbpcode.h,v 1.20 2004/05/08 04:25:09 ronpinkas Exp $
  */
 
 /*
@@ -220,9 +220,10 @@ typedef enum
    HB_P_BITXOR,                /* 154 */
    HB_P_BITSHIFTR,             /* 155 */
    HB_P_BITSHIFTL,             /* 156 */
+   HB_P_LARGEFRAME,            /* 157 */
 
 /* NOTE: This have to be the last definition */
-   HB_P_LAST_PCODE             /* 157 this defines the number of defined pcodes */
+   HB_P_LAST_PCODE             /* 158 this defines the number of defined pcodes */
 } HB_PCODE;
 
 #endif /* HB_PCODE_H_ */
