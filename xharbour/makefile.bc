@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.60 2003/07/09 10:50:59 andijahja Exp $
+# $Id: makefile.bc,v 1.61 2003/07/09 14:19:36 andijahja Exp $
 #
 
 #
@@ -340,9 +340,12 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hbcrc32.obj \
    $(RTL_OBJ_DIR)\hbchecksum.obj \
    $(RTL_OBJ_DIR)\hbhextonum.obj \
+   $(RTL_OBJ_DIR)\hblog.obj \
+   $(RTL_OBJ_DIR)\hbloginet.obj \
    $(RTL_OBJ_DIR)\hbffind.obj \
    $(RTL_OBJ_DIR)\hbrandom.obj \
    $(RTL_OBJ_DIR)\hbreadini.obj \
+   $(RTL_OBJ_DIR)\hbsyslog.obj \
    $(RTL_OBJ_DIR)\hbxml.obj \
    $(RTL_OBJ_DIR)\idle.obj \
    $(RTL_OBJ_DIR)\inkey.obj \
@@ -1673,6 +1676,18 @@ $(RTL_OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
 $(RTL_OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(RTL_OBJ_DIR)\hblog.c : $(RTL_DIR)\hblog.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\hblog.obj : $(RTL_OBJ_DIR)\hblog.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\hbloginet.c : $(RTL_DIR)\hbloginet.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\hbloginet.obj : $(RTL_OBJ_DIR)\hbloginet.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(RTL_OBJ_DIR)\hbhextonum.obj : $(RTL_DIR)\hbhextonum.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -1692,6 +1707,9 @@ $(RTL_OBJ_DIR)\hbserial.obj : $(RTL_OBJ_DIR)\hbserial.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\hbsrlraw.obj : $(RTL_DIR)\hbsrlraw.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\hbsyslog.obj : $(RTL_DIR)\hbsyslog.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\hbxml.obj : $(RTL_DIR)\hbxml.c

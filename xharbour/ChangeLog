@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1240 2003/07/13 19:34:13 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1241 2003/07/13 22:21:24 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-14 00:24 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * makefile.bc
+    + Added compilation of logger
+
+  * sourvce/vm/thread.c
+    ! A variable was initialzied too late in hb_threadInit(), causing
+      M$ compiled app to GPF at startup. Fixed
+
+  * source/vm/fm.c
+    ! hb_threadInit() was called two times. Fixed
+
 2003-07-13 20:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/compiler/hbpcode.c
     * Fixed compiler warnings

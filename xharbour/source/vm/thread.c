@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.83 2003/07/13 18:19:15 walito Exp $
+* $Id: thread.c,v 1.84 2003/07/13 19:34:34 jonnymind Exp $
 */
 
 /*
@@ -1794,8 +1794,13 @@ void hb_threadInit( void )
    HB_CRITICAL_INIT( hb_macroMutex );
    HB_CRITICAL_INIT( hb_outputMutex );
    HB_CRITICAL_INIT( hb_mutexMutex );
-
+   s_thread_unique_id = 1;
+   HB_CRITICAL_INIT( s_thread_unique_id_mutex );
    HB_SHARED_INIT( hb_runningStacks, 0 );
+
+   #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
+      HB_CRITICAL_INIT( s_mtxTryLock );
+   #endif
 
    last_stack = NULL;
    hb_main_thread_id = HB_CURRENT_THREAD();
@@ -1808,6 +1813,7 @@ void hb_threadInit( void )
    #ifdef HB_OS_WIN_32
       HB_CRITICAL_INIT( hb_fenceMutex );
       HB_CRITICAL_INIT( hb_cancelMutex );
+
       hb_dwCurrentStack = TlsAlloc();
       TlsSetValue( hb_dwCurrentStack, (void *)hb_ht_stack );
       HB_SHARED_INIT( hb_idleQueueRes, 0 );
@@ -1815,14 +1821,9 @@ void hb_threadInit( void )
       pthread_key_create( &hb_pkCurrentStack, NULL );
       pthread_setspecific( hb_pkCurrentStack, (void *)hb_ht_stack );
    #endif
+   
    hb_threadSetupStack( &hb_stack, HB_CURRENT_THREAD() );
 
-   #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
-      HB_CRITICAL_INIT( s_mtxTryLock );
-   #endif
-
-   s_thread_unique_id = 1;
-   HB_CRITICAL_INIT( s_thread_unique_id_mutex );
 }
 
 void hb_threadExit( void )
