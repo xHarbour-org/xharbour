@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.3 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: listbox.prg,v 1.4 2002/03/17 23:27:28 lculik Exp $
  */
 
 /*
@@ -285,8 +285,9 @@ Method DELITEM( xitem )
 
      If ( xitem < 1 )
      Elseif ( xitem <= ::iTemCount )
-        Adel( ::aItems[ xitem ] )
-        Asize( ::aItems, -- ::iTemCount )
+        Adel( ::aItems[ xitem ], .T. )
+//        Asize( ::aItems, -- ::iTemCount )
+        ::iTemCount--
         If ( ::Value > ::iTemCount )
            ::Value := ::iTemCount
            If ( ::Value == 0 )
@@ -745,9 +746,10 @@ Method INSITEM( nPosition, cText, xExp )
      If ( !( Ischaracter( cText ) ) )
      Elseif ( !( Isnumber( nPosition ) ) )
      Elseif ( nPosition < ::itemCount )
-        Asize( ::aitems, ++ ::itemCount )
-        Ains( ::aitems, nPosition )
-        ::aitems[ nPosition ] := { cText, xExp }
+//        Asize( ::aitems, ++ ::itemCount )
+        ::itemCount++
+        Ains( ::aitems, nPosition, { cText, xExp }, .T. )
+//        ::aitems[ nPosition ] := { cText, xExp }
         If ( ::itemCount == 1 )
            ::topitem  := 1
            ::ntopitem := 1
