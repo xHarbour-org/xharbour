@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.131 2004/03/31 02:16:43 druzus Exp $
+ * $Id: hbapi.h,v 1.132 2004/03/31 09:19:53 andijahja Exp $
  */
 
 /*
@@ -89,35 +89,33 @@ HB_EXTERN_BEGIN
 #define HB_IT_NUMERIC   ( ( USHORT ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE | HB_IT_LONGLONG ) )
 #define HB_IT_NUMERINT  ( ( USHORT ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_LONGLONG ) )
 #define HB_IT_ANY       ( ( USHORT ) 0xFFFF )
-#define HB_IT_COMPLEX   ( ( USHORT ) ( HB_IT_STRING | HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_MEMVAR | HB_IT_HASH ) )
+#define HB_IT_COMPLEX   ( ( USHORT ) ( HB_IT_STRING | HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_MEMVAR | HB_IT_HASH | HB_IT_BYREF ) )
 
 #define HB_IS_OF_TYPE( p, t ) ( ( ( p )->type & ~HB_IT_BYREF ) == t )
-#define HB_IS_BYREF( p )   ( ( p )->type & HB_IT_BYREF )
-#define HB_IS_ARRAY( p )   HB_IS_OF_TYPE( p, HB_IT_ARRAY )
-#define HB_IS_NIL( p )     HB_IS_OF_TYPE( p, HB_IT_NIL )
-#define HB_IS_BLOCK( p )   HB_IS_OF_TYPE( p, HB_IT_BLOCK )
-#define HB_IS_DATE( p )    HB_IS_OF_TYPE( p, HB_IT_DATE )
-#define HB_IS_DOUBLE( p )  HB_IS_OF_TYPE( p, HB_IT_DOUBLE )
-#define HB_IS_LONGLONG( p )  HB_IS_OF_TYPE( p, HB_IT_LONGLONG )
-#define HB_IS_INTEGER( p ) HB_IS_OF_TYPE( p, HB_IT_INTEGER )
-#define HB_IS_LOGICAL( p ) HB_IS_OF_TYPE( p, HB_IT_LOGICAL )
-#define HB_IS_LONG( p )    HB_IS_OF_TYPE( p, HB_IT_LONG )
-#define HB_IS_NUMERIC( p ) ( ( p )->type & HB_IT_NUMERIC  || HB_IS_DATE(p) || ( HB_IS_STRING(p) && (p)->item.asString.length == 1 ) )
-#define HB_IS_NUMBER( p )  ( ( p )->type & HB_IT_NUMERIC )
+
+#define HB_IS_BYREF( p )      ( ( p )->type & HB_IT_BYREF )
+#define HB_IS_ARRAY( p )      ( ( p )->type == HB_IT_ARRAY )
+#define HB_IS_NIL( p )        ( ( p )->type == HB_IT_NIL )
+#define HB_IS_BLOCK( p )      ( ( p )->type == HB_IT_BLOCK )
+#define HB_IS_DATE( p )       ( ( p )->type == HB_IT_DATE )
+#define HB_IS_DOUBLE( p )     ( ( p )->type == HB_IT_DOUBLE )
+#define HB_IS_LONGLONG( p )   ( ( p )->type == HB_IT_LONGLONG )
+#define HB_IS_INTEGER( p )    ( ( p )->type == HB_IT_INTEGER )
+#define HB_IS_LOGICAL( p )    ( ( p )->type == HB_IT_LOGICAL )
+#define HB_IS_LONG( p )       ( ( p )->type == HB_IT_LONG )
+#define HB_IS_NUMERIC( p )    ( ( p )->type & HB_IT_NUMERIC  || HB_IS_DATE(p) || ( HB_IS_STRING(p) && (p)->item.asString.length == 1 ) )
+#define HB_IS_NUMBER( p )     ( ( p )->type & HB_IT_NUMERIC )
 #define HB_IS_NUMBER_INT( p ) ( ( p )->type & HB_IT_NUMERINT )
-#define HB_IS_OBJECT( p )  ( HB_IS_OF_TYPE( p, HB_IT_OBJECT ) && ( p )->item.asArray.value->uiClass != 0 )
-#define HB_IS_STRING( p )  ( ( ( p )->type & ~( HB_IT_BYREF | HB_IT_MEMOFLAG ) ) == HB_IT_STRING )
-#define HB_IS_MEMO( p )    HB_IS_OF_TYPE( p, HB_IT_MEMO )
-#define HB_IS_SYMBOL( p )  HB_IS_OF_TYPE( p, HB_IT_SYMBOL )
-#define HB_IS_MEMVAR( p )  HB_IS_OF_TYPE( p, HB_IT_MEMVAR )
-#define HB_IS_POINTER( p ) HB_IS_OF_TYPE( p, HB_IT_POINTER )
-#define HB_IS_HASH( p )    HB_IS_OF_TYPE( p, HB_IT_HASH )
-#define HB_IS_ORDERABLE( p )    ( ( p )->type & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) )
-/* Slower version */
-/* #define HB_IS_COMPLEX( p )  ( ( p )->type  && ( HB_IS_STRING( p ) || HB_IS_BLOCK( p ) || HB_IS_ARRAY( p ) || HB_IS_MEMVAR( p ) || HB_IS_HASH( p )) ) */
-/* Optimized version */
-#define HB_IS_COMPLEX( p ) ( ( p )->type & HB_IT_COMPLEX )
-#define HB_IS_SIMPLE( p )  ( ! HB_IS_COMPLEX( p ) )
+#define HB_IS_OBJECT( p )     ( HB_IS_ARRAY( p ) && ( p )->item.asArray.value->uiClass )
+#define HB_IS_STRING( p )     ( ( p )->type & HB_IT_STRING )
+#define HB_IS_MEMO( p )       ( ( p )->type & HB_IT_MEMO )
+#define HB_IS_SYMBOL( p )     ( ( p )->type == HB_IT_SYMBOL )
+#define HB_IS_MEMVAR( p )     ( ( p )->type & HB_IT_MEMVAR )
+#define HB_IS_POINTER( p )    ( ( p )->type & HB_IT_POINTER )
+#define HB_IS_HASH( p )       ( ( p )->type == HB_IT_HASH )
+#define HB_IS_ORDERABLE( p )  ( ( p )->type & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) )
+#define HB_IS_COMPLEX( p )    ( ( p )->type & HB_IT_COMPLEX )
+#define HB_IS_SIMPLE( p )     ( ( p )->type & ( HB_IT_NIL | HB_IT_NUMERIC | HB_IT_DATE | HB_IT_LOGICAL ) )
 
 #if defined(__GNUC__)
 #  define HB_ITEM_NIL      { HB_IT_NIL, {} }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.24 2003/12/04 09:26:54 druzus Exp $
+ * $Id: hbpcode.c,v 1.25 2004/01/06 09:45:32 paultucker Exp $
  */
 
 /*
@@ -494,6 +494,7 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
 
 void hb_compStrongType( int iSize )
 {
+#if 0
    PFUNCTION pFunc = hb_comp_functions.pLast, pTmp;
    PVAR pVar = NULL;
    PCOMSYMBOL pSym = NULL;
@@ -3321,6 +3322,7 @@ void hb_compStrongType( int iSize )
 	  printf( "\nStrongType Stack underflow!\n" );
       pFunc->iStackIndex = 0;
    }
+#endif
 }
 
 void hb_compGenPCode1( BYTE byte )

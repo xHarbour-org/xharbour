@@ -1,5 +1,5 @@
 /*
- * $Id: hbfast.h,v 1.11 2003/01/19 21:44:02 andijahja Exp $
+ * $Id: hbfast.h,v 1.12 2003/11/30 12:32:29 druzus Exp $
  */
 
 /*
@@ -66,7 +66,6 @@
    extern void     HB_EXPORT hb_itemPushForward( PHB_ITEM pItem );
    extern void     HB_EXPORT hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
    extern void     HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem );
-   extern void     HB_EXPORT hb_itemFastClear( PHB_ITEM pItem );
    extern void     HB_EXPORT hb_itemPushStaticString( char * szText, ULONG length );
 
    extern USHORT HB_EXPORT hb_itemArrayCyclicCount( PHB_ITEM pArray );

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.369 2004/04/01 09:35:37 andijahja Exp $
+ * $Id: hvm.c,v 1.370 2004/04/02 04:30:52 ronpinkas Exp $
  */
 
 /*
@@ -7005,6 +7005,12 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
    pTop->item.asRefer.value = HB_VM_STACK.iStatics + uiStatic - 1;
    pTop->item.asRefer.offset = 0;    /* 0 for static variables */
    pTop->item.asRefer.BasePtr.pBaseArray = s_aStatics.item.asArray.value;
+
+   #ifdef HB_ARRAY_USE_COUNTER
+      s_aStatics.item.asArray.value->uiHolders++;
+   #else
+       hb_arrayRegisterHolder( s_aStatics.item.asArray.value, (void *) pTop );
+   #endif
 
    hb_stackPush();
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2730 2004/04/03 00:27:00 druzus Exp $
+ * $Id: ChangeLog,v 1.2731 2004/04/03 00:49:14 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-02 18:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    ! Corrected HB_IS*() to NOT use complex and wrong HB_IS_OF_TYPE()
+
+  * include/hbfast.h
+  * source/vm/fastitem.c
+    - Removed redundant hb_fastClear()
+
+  * source/compiler/hbpcode.c
+    - Deffed OUT content of hb_compStrongType() - outdated!
+
+  * source/rtl/filesys.c
+    + Added temporary hack for xCC to provide _doserrno functionality.
+
+  * source/vm/fastitem.c
+  * source/vm/arrays.c
+  * source/vm/memvars.c
+  * source/vm/asort.c
+  * source/vm/estack.c
+  * source/vm/hvm.c
+    + Added OWNERS support for HB_IT_BYREF
+
+  * source/vm/fastitem.c
+  * source/vm/arrays.c
+  * source/vm/memvars.c
+    ! Corrected HB_IS_*() to ->type == * (before reviewing and correcting HB_IS_*())
+
+  * source/vm/codebloc.c
+    ! Fixed GPF Trap in hb_codeblockDeleteGarbage()
+
+  * source/vm/garbage.c
+    * Converted static s_bReleaseAll to global hb_gc_bReleaseAll
+
+  * source/vm/itemapi.c
+    * Corrected compile warning
 
 2004-04-03 02:59 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/config/dos/djgpp.cf
@@ -43,7 +79,7 @@
 
 2004-04-03 00:31 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
   * source/rtl/hbxml.c
-    ! fixed castings 
+    ! fixed castings
   /* Plz, someone add stricter casting to GCC compilation */
 
 2004-04-03 05:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>

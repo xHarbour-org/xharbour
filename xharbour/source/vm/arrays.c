@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.104 2004/04/02 04:30:51 ronpinkas Exp $
+ * $Id: arrays.c,v 1.105 2004/04/03 00:27:04 druzus Exp $
  */
 
 /*
@@ -77,6 +77,10 @@
 #include "hbstack.h"
 #include "classes.h"
 
+#ifndef HB_ARRAY_USE_COUNTER
+   extern BOOL hb_gc_bReleaseAll;
+#endif
+
 extern char *hb_vm_acAscii[256];
 
 BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
@@ -142,7 +146,7 @@ BOOL HB_EXPORT hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pValue )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayAdd(%p, %p)", pArray, pValue));
 
-   if( HB_IS_ARRAY( pArray ) )
+   if( pArray->type == HB_IT_ARRAY  )
    {
       PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
 
@@ -163,7 +167,7 @@ BOOL HB_EXPORT hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pValue )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayAddForward(%p, %p)", pArray, pValue));
 
-   if( HB_IS_ARRAY( pArray ) )
+   if( pArray->type == HB_IT_ARRAY )
    {
       PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
 
@@ -185,7 +189,7 @@ ULONG HB_EXPORT hb_arrayLen( PHB_ITEM pArray )
    ULONG ulLen = 0;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayLen(%p)", pArray));
 
-   if( HB_IS_ARRAY( pArray ) )
+   if( pArray->type == HB_IT_ARRAY )
    {
       ulLen = pArray->item.asArray.value->ulLen;
    }
@@ -198,7 +202,7 @@ BOOL HB_EXPORT hb_arrayIsObject( PHB_ITEM pArray )
    BOOL bObj = FALSE;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayIsObject(%p)", pArray));
 
-   if( HB_IS_ARRAY( pArray ) )
+   if( pArray->type == HB_IT_ARRAY )
    {
       bObj = pArray->item.asArray.value->uiClass != 0;
    }
@@ -210,7 +214,7 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arraySize(%p, %lu)", pArray, ulLen));
 
-   if( HB_IS_ARRAY( pArray ) )
+   if( pArray->type == HB_IT_ARRAY )
    {
       PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
 
@@ -242,9 +246,13 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
                   {
                      for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
                      {
-                        if( HB_IS_ARRAY( pBaseArray->pItems + ulPos ) && ( pBaseArray->pItems + ulPos )->item.asArray.value )
+                        if( ( pBaseArray->pItems + ulPos )->type == HB_IT_ARRAY && ( pBaseArray->pItems + ulPos )->item.asArray.value )
                         {
-                           hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, ( pOldItems + ulPos ), ( pBaseArray->pItems + ulPos ) );
+                           hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, (void *) ( pOldItems + ulPos ), (void *) ( pBaseArray->pItems + ulPos ) );
+                        }
+                        else if( ( pBaseArray->pItems + ulPos )->type == HB_IT_BYREF && ( pBaseArray->pItems + ulPos )->item.asRefer.offset == 0 )
+                        {
+                           hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asRefer.BasePtr.pBaseArray, (void *) ( pOldItems + ulPos ), ( void *) ( pBaseArray->pItems + ulPos ) );
                         }
                      }
                   }
@@ -289,9 +297,13 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
                      {
                         for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
                         {
-                           if( HB_IS_ARRAY( pBaseArray->pItems + ulPos ) && ( pBaseArray->pItems + ulPos )->item.asArray.value )
+                           if( ( pBaseArray->pItems + ulPos )->type == HB_IT_ARRAY && ( pBaseArray->pItems + ulPos )->item.asArray.value )
                            {
                               hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, (void *) ( pOldItems + ulPos ), (void *) ( pBaseArray->pItems + ulPos ) );
+                           }
+                           else if( ( pBaseArray->pItems + ulPos )->type == HB_IT_BYREF && ( pBaseArray->pItems + ulPos )->item.asRefer.offset == 0 )
+                           {
+                              hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asRefer.BasePtr.pBaseArray, (void *) ( pOldItems + ulPos ), ( void *) ( pBaseArray->pItems + ulPos ) );
                            }
                         }
                      }
@@ -315,7 +327,7 @@ BOOL HB_EXPORT hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayDel(%p, %lu)", pArray, ulIndex));
 
-   if( HB_IS_ARRAY( pArray ) )
+   if( pArray->type == HB_IT_ARRAY )
    {
       ULONG ulLen = pArray->item.asArray.value->ulLen;
 
@@ -340,7 +352,7 @@ BOOL HB_EXPORT hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayIns(%p, %lu)", pArray, ulIndex));
 
-   if( HB_IS_ARRAY( pArray ) )
+   if( pArray->type == HB_IT_ARRAY )
    {
       ULONG ulLen = pArray->item.asArray.value->ulLen;
 
@@ -376,7 +388,7 @@ BOOL HB_EXPORT hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arraySet(%p, %lu, %p)", pArray, ulIndex, pItem));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
 
@@ -402,7 +414,7 @@ BOOL HB_EXPORT hb_arraySetForward( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pIte
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arraySetForward(%p, %lu, %p)", pArray, ulIndex, pItem));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
 
@@ -426,7 +438,7 @@ BOOL HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGet(%p, %lu, %p) Base: %p Items: %p", pArray, ulIndex, pItem, pArray->item.asArray.value, pArray->item.asArray.value->pItems));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       PHB_ITEM pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
 
@@ -464,7 +476,7 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
       hb_itemClear( pItem );
    }
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       PHB_ITEM pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
 
@@ -477,7 +489,7 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
       #ifdef HB_ARRAY_USE_COUNTER
          pArray->item.asArray.value->uiHolders++;
       #else
-          hb_arrayRegisterHolder( pArray->item.asArray.value, (void *) pArray->item.asArray.value );
+          hb_arrayRegisterHolder( pArray->item.asArray.value, (void *) pItem );
       #endif
 
       if( pElement->type == HB_IT_STRING && ( pElement->item.asString.bStatic || *( pElement->item.asString.puiHolders ) > 1 ) )
@@ -497,7 +509,7 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
 
       return TRUE;
    }
-   else if( HB_IS_STRING( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asString.length )
+   else if( pArray->type == HB_IT_STRING && ulIndex > 0 && ulIndex <= pArray->item.asString.length )
    {
       BYTE cChar = pArray->item.asString.value[ ulIndex - 1 ];
 
@@ -519,7 +531,7 @@ char HB_EXPORT * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate )
    char *exData;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetDS(%p, %lu, %s)", pArray, ulIndex, szDate));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       exData = hb_itemGetDS( pArray->item.asArray.value->pItems + ulIndex - 1, szDate );
    }
@@ -538,7 +550,7 @@ LONG HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
    LONG lData;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetDL(%p, %lu)", pArray, ulIndex ));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       lData = ( pArray->item.asArray.value->pItems + ulIndex - 1 )->item.asDate.value;
    }
@@ -561,7 +573,7 @@ PHB_ITEM HB_EXPORT hb_arrayGetItemPtr( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetItemPtr(%p, %lu)", pArray, ulIndex));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       return pArray->item.asArray.value->pItems + ulIndex - 1;
    }
@@ -573,7 +585,7 @@ BOOL HB_EXPORT hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetL(%p, %lu)", pArray, ulIndex));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       return hb_itemGetL( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
@@ -585,7 +597,7 @@ int HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNI(%p, %lu)", pArray, ulIndex));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       return hb_itemGetNI( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
@@ -597,7 +609,7 @@ LONG HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNL(%p, %lu)", pArray, ulIndex));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       return hb_itemGetNL( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
@@ -609,7 +621,7 @@ double HB_EXPORT hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetND(%p, %lu)", pArray, ulIndex));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       return hb_itemGetND( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
@@ -621,7 +633,7 @@ ULONG HB_EXPORT hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, 
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayCopyC(%p, %lu, %s, %lu)", pArray, ulIndex, szBuffer, ulLen));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen && (pArray->item.asArray.value->pItems + ulIndex - 1)->type == HB_IT_STRING )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen && (pArray->item.asArray.value->pItems + ulIndex - 1)->type == HB_IT_STRING )
    {
       return hb_itemCopyC( pArray->item.asArray.value->pItems + ulIndex - 1, szBuffer, ulLen );
    }
@@ -633,7 +645,7 @@ char HB_EXPORT * hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetC(%p, %lu)", pArray, ulIndex));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen && (pArray->item.asArray.value->pItems + ulIndex - 1)->type == HB_IT_STRING )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen && (pArray->item.asArray.value->pItems + ulIndex - 1)->type == HB_IT_STRING )
    {
       return hb_itemGetC( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
@@ -645,7 +657,7 @@ char HB_EXPORT * hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetCPtr(%p, %lu)", pArray, ulIndex));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen && (pArray->item.asArray.value->pItems + ulIndex - 1)->type == HB_IT_STRING )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen && (pArray->item.asArray.value->pItems + ulIndex - 1)->type == HB_IT_STRING )
    {
       return (pArray->item.asArray.value->pItems + ulIndex - 1)->item.asString.value;
    }
@@ -657,7 +669,7 @@ ULONG HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetCLen(%p, %lu)", pArray, ulIndex));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen && (pArray->item.asArray.value->pItems + ulIndex - 1)->type == HB_IT_STRING )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen && (pArray->item.asArray.value->pItems + ulIndex - 1)->type == HB_IT_STRING )
    {
       return ( pArray->item.asArray.value->pItems + ulIndex - 1 )->item.asString.length;
    }
@@ -670,7 +682,7 @@ USHORT HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex )
    USHORT uType;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetType(%p, %lu)", pArray, ulIndex));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
       uType = hb_itemType( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
@@ -686,7 +698,7 @@ BOOL HB_EXPORT hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayLast(%p, %p)", pArray, pResult));
 
-   if( HB_IS_ARRAY( pArray ) )
+   if( pArray->type == HB_IT_ARRAY )
    {
       if( pArray->item.asArray.value->ulLen > 0 )
       {
@@ -758,16 +770,15 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayScan(%p, %p, %p, %p)", pArray, pValue, pulStart, pulCount, bExact));
 
-   if( HB_IS_ARRAY( pArray ) || HB_IS_HASH( pArray ) )
+   if( pArray->type == HB_IT_ARRAY || pArray->type == HB_IT_HASH )
    {
-
       PHB_ITEM pItems;
       ULONG ulLen;
       ULONG ulStart;
       ULONG ulCount;
 
       /* Select array type */
-      if ( HB_IS_ARRAY( pArray ) )
+      if( pArray->type == HB_IT_ARRAY )
       {
          pItems = pArray->item.asArray.value->pItems;
          ulLen = pArray->item.asArray.value->ulLen;
@@ -777,7 +788,6 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
          pItems = pArray->item.asHash.value->pValues;
          ulLen = pArray->item.asHash.value->ulTotalLen;
       }
-
 
       /* sanitize scan range */
       if( pulStart && ( *pulStart >= 1 ) )
@@ -808,9 +818,8 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
          ulCount = ulLen - ulStart + 1;
       }
 
-
       /* work with subhashes */
-      if ( HB_IS_HASH( pArray ) && pArray->item.asHash.value->uiLevel > 0 )
+      if( pArray->type == HB_IT_HASH && pArray->item.asHash.value->uiLevel > 0 )
       {
          ULONG ulPos, ulTotal = 0;
 
@@ -844,7 +853,6 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
          return ulPos+ulTotal;
       }
 
-
       /* Make separate search loops for different types to find, so that
          the loop can be faster. */
 
@@ -856,18 +864,20 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
          {
             hb_vmPushSymbol( &hb_symEval );
             hb_vmPush( pValue );
+
             if ( ulParams == 3)
             {
                hb_vmPush( pArray->item.asHash.value->pKeys + ulStart );
             }
+
             hb_vmPush( pItems + ulStart );
             hb_vmPushNumInt( ulStart + 1 );
             hb_vmSend( (USHORT) ulParams );
+
             if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) && HB_VM_STACK.Return.item.asLogical.value )
             {
                return ulStart + 1;                  /* arrays start from 1 */
             }
-
          }
       }
       else if( HB_IS_STRING( pValue ) ) // Must precede HB_IS_NUMERIC()
@@ -890,7 +900,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
             }
          }
       }
-      else if( HB_IS_DATE( pValue ) ) // Must precede HB_IS_NUMERIC()
+      else if( pValue->type == HB_IT_DATE ) // Must precede HB_IS_NUMERIC()
       {
          LONG lValue = pValue->item.asDate.value;
 
@@ -898,7 +908,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
          {
             PHB_ITEM pItem = pItems + ulStart;
 
-            if( HB_IS_DATE( pItem ) && pItem->item.asDate.value == lValue )
+            if( pItem->type == HB_IT_DATE && pItem->item.asDate.value == lValue )
             {
                return ulStart + 1;
             }
@@ -947,7 +957,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
             }
          }
       }
-      else if( bExact && HB_IS_ARRAY( pValue ) )
+      else if( bExact && pValue->type == HB_IT_ARRAY )
       {
          for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
          {
@@ -955,7 +965,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 
             HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %p", pItem, pValue->item.asArray.value ) );
 
-            if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value == pValue->item.asArray.value )
+            if( pItem->type == HB_IT_ARRAY && pItem->item.asArray.value == pValue->item.asArray.value )
             {
                return ulStart + 1;
             }
@@ -970,7 +980,7 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayEval(%p, %p, %p, %p)", pArray, bBlock, pulStart, pulCount));
 
-   if(( HB_IS_ARRAY( pArray )|| HB_IS_HASH(pArray) ) && HB_IS_BLOCK( bBlock ))
+   if( ( pArray->type == HB_IT_ARRAY || pArray->type == HB_IT_HASH ) && HB_IS_BLOCK( bBlock ) )
    {
       PHB_ITEM pItems, pKeys = NULL;
       ULONG ulLen;
@@ -978,7 +988,7 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
       ULONG ulCount;
       ULONG ulParams;
 
-      if ( HB_IS_ARRAY(pArray) )
+      if( pArray->type == HB_IT_ARRAY )
       {
          pItems = pArray->item.asArray.value->pItems;
          ulLen = pArray->item.asArray.value->ulLen;
@@ -1019,7 +1029,7 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
          }
 
          /* work with subhashes */
-         if ( HB_IS_HASH( pArray ) && pArray->item.asHash.value->uiLevel > 0 )
+         if ( pArray->type == HB_IT_HASH && pArray->item.asHash.value->uiLevel > 0 )
          {
             ULONG ulTotal = 0;
 
@@ -1145,7 +1155,7 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
           * allocated by the GC, its just a portion of the
           * pItems chunk, which will be released as one piece.
           * --------------------------------------------------*/
-         if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value == pBaseArray )
+         if( pItem->type == HB_IT_ARRAY && pItem->item.asArray.value == pBaseArray )
          {
             HB_TRACE( HB_TR_DEBUG, ("Warning! Nested Release (Cyclic) %p %p", pItem, pItem->item.asArray.value ) );
             TraceLog( NULL, "Warning! Nested Release (Cyclic) %p %p\n", pItem, pItem->item.asArray.value );
@@ -1179,7 +1189,7 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
 
    //printf( "hb_arrayRelease(%p) type: %i %p\n", pArray, pArray->type, pArray->item.asArray.value );
 
-   if( HB_IS_ARRAY( pArray ) )
+   if( pArray->type == HB_IT_ARRAY )
    {
       #ifdef HB_ARRAY_USE_COUNTER
           hb_arrayReleaseBase( pArray->item.asArray.value );
@@ -1233,7 +1243,7 @@ BOOL HB_EXPORT hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pul
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayCopy(%p, %p, %p, %p, %p)", pSrcArray, pDstArray, pulStart, pulCount, pulTarget));
 
-   if( HB_IS_ARRAY( pSrcArray ) && HB_IS_ARRAY( pDstArray ) )
+   if( pSrcArray->type == HB_IT_ARRAY && pDstArray->type == HB_IT_ARRAY )
    {
       PHB_BASEARRAY pSrcBaseArray = pSrcArray->item.asArray.value;
       PHB_BASEARRAY pDstBaseArray = pDstArray->item.asArray.value;
@@ -1319,7 +1329,7 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayClone(%p, %p)", pSrcArray, pClonedList));
 
-   if( HB_IS_ARRAY( pSrcArray ) )
+   if( pSrcArray->type == HB_IT_ARRAY )
    {
       PHB_BASEARRAY pSrcBaseArray = pSrcArray->item.asArray.value;
       PHB_BASEARRAY pDstBaseArray;
@@ -1374,7 +1384,7 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
          PHB_ITEM pSrcItem = pSrcBaseArray->pItems + ulCount;
 
          /* Clipper clones nested array ONLY if NOT an Object!!! */
-         if( HB_IS_ARRAY( pSrcItem ) && pSrcItem->item.asArray.value->uiClass == 0 )
+         if( pSrcItem->type == HB_IT_ARRAY && pSrcItem->item.asArray.value->uiClass == 0 )
          {
             PHB_ITEM pClone;
 
@@ -1529,7 +1539,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
          HB_TRACE( HB_TR_INFO, ( "Array Item %p type:%i", pItem, pItem->type ) );
 
 		 // All other complex types will be released directly by the GC.
-         if( HB_IS_STRING( pItem ) )
+         if( pItem->type == HB_IT_STRING )
          {
             hb_itemClear( pItem );
          }
@@ -1547,39 +1557,59 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    #ifndef HB_ARRAY_USE_COUNTER
       pOwners = pBaseArray->pOwners;
 
-      while( pOwners )
+      if( hb_gc_bReleaseAll == FALSE )
       {
-         if( HB_IS_ARRAY( (PHB_ITEM) (pOwners->pOwner) ) )
+         while( pOwners )
          {
-            //TraceLog( NULL, "Warning! (2) Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
-
-            if( ((PHB_ITEM) (pOwners->pOwner))->item.asArray.value == pBaseArray || ((PHB_ITEM) (pOwners->pOwner))->item.asArray.value == NULL )
+            if( ((PHB_ITEM) (pOwners->pOwner))->type == HB_IT_ARRAY )
             {
+               //TraceLog( NULL, "Warning! (2) Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
+
+               if( ((PHB_ITEM) (pOwners->pOwner))->item.asArray.value == pBaseArray || ((PHB_ITEM) (pOwners->pOwner))->item.asArray.value == NULL )
+               {
+                  // Forcing reset of the orphan refernce or else a GPF will folow when that item will be passed to hb_itemClear().
+                  ((PHB_ITEM) (pOwners->pOwner) )->type = HB_IT_NIL;
+               }
+               else
+               {
+                  TraceLog( NULL, "Warning! (4) Invalid Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
+               }
+            }
+            else if( ((HB_CODEBLOCK_PTR) (pOwners->pOwner))->pSelfBase == pBaseArray )
+            {
+               //TraceLog( NULL, "Warning! (3) Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
+
                // Forcing reset of the orphan refernce or else a GPF will folow when that item will be passed to hb_itemClear().
-               ((PHB_ITEM) (pOwners->pOwner) )->type = HB_IT_NIL;
+               ((HB_CODEBLOCK_PTR) (pOwners->pOwner) )->pSelfBase = NULL;
+            }
+            else if( ((PHB_ITEM) (pOwners->pOwner))->type == HB_IT_BYREF &&
+                     ((PHB_ITEM) (pOwners->pOwner))->item.asRefer.offset == 0 )
+            {
+               if( ((PHB_ITEM) (pOwners->pOwner))->item.asRefer.BasePtr.pBaseArray == pBaseArray || ((PHB_ITEM) (pOwners->pOwner))->item.asRefer.BasePtr.pBaseArray == NULL )
+               {
+                  // Forcing reset of the orphan refernce or else a GPF will folow when that item will be passed to hb_itemClear().
+                  ((PHB_ITEM) (pOwners->pOwner))->type = HB_IT_NIL;
+               }
+               else
+               {
+                  TraceLog( NULL, "Warning! (4-2) Invalid Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
+               }
+
+            }
+            else if( HB_IS_NIL( (PHB_ITEM) (pOwners->pOwner) ) )
+            {
             }
             else
             {
-               TraceLog( NULL, "Warning! (4) Invalid Residual owner %p of array %p Stack: %p\n", pOwners->pOwner, pBaseArray, hb_stackItemFromTop( 1 ) );
+               TraceLog( NULL, "Warning! (5) Invalid Residual owner %p type: %i\n", pOwners->pOwner, ((PHB_ITEM) (pOwners->pOwner))->type );
             }
+
+            pFree = pOwners;
+
+            pOwners = pOwners->pNext;
+
+            hb_xfree( pFree );
          }
-         else if( ((HB_CODEBLOCK_PTR) (pOwners->pOwner))->pSelfBase == pBaseArray )
-         {
-            //TraceLog( NULL, "Warning! (3) Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
-
-            // Forcing reset of the orphan refernce or else a GPF will folow when that item will be passed to hb_itemClear().
-            ((HB_CODEBLOCK_PTR) (pOwners->pOwner) )->pSelfBase = NULL;
-         }
-         else
-         {
-            TraceLog( NULL, "Warning! (5) Invalid Residual owner %p Type: %i of array %p Stack: %p\n", pOwners->pOwner, ((PHB_ITEM) (pOwners->pOwner))->type, pBaseArray, hb_stackItemFromTop( 1 ) );
-         }
-
-         pFree = pOwners;
-
-         pOwners = pOwners->pNext;
-
-         hb_xfree( pFree );
       }
 
       pBaseArray->pOwners = NULL;
@@ -1783,7 +1813,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       LONGLONG llRet;
       HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNLL(%p, %lu)", pArray, ulIndex));
 
-      if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+      if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
       {
          llRet = hb_itemGetNLL( pArray->item.asArray.value->pItems + ulIndex - 1 );
       }

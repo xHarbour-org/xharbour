@@ -1,5 +1,5 @@
 /*
- * $Id: asort.c,v 1.9 2003/09/10 06:07:31 ronpinkas Exp $
+ * $Id: asort.c,v 1.10 2004/02/23 10:01:43 andijahja Exp $
  */
 
 /*
@@ -122,6 +122,11 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
       {
          hb_arrayResetHolder( pivot.item.asArray.value, (void *) ( pItems + p ), (void *) &pivot );
       }
+      else if( HB_IS_BYREF( &pivot ) && HB_IS_MEMVAR( &pivot ) == FALSE && pivot.item.asRefer.offset == 0 )
+      {
+         hb_arrayResetHolder( pivot.item.asRefer.BasePtr.pBaseArray, (void *) ( pItems + p ), ( void *) &pivot );
+      }
+
    #endif
 
    if( p != lb )
@@ -132,6 +137,10 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
          if( HB_IS_ARRAY( pItems + p ) && ( pItems + p )->item.asArray.value )
          {
             hb_arrayResetHolder( ( pItems + p )->item.asArray.value, (void *) ( pItems + lb ), (void *) ( pItems + p ) );
+         }
+         else if( HB_IS_BYREF( pItems + p ) && HB_IS_MEMVAR( pItems + p ) == FALSE && ( pItems + p )->item.asRefer.offset == 0 )
+         {
+            hb_arrayResetHolder( ( pItems + p )->item.asRefer.BasePtr.pBaseArray, (void *) ( pItems + lb ), (void *) ( pItems + p ) );
          }
       #endif
    }
@@ -209,10 +218,18 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
             {
                hb_arrayResetHolder( ( pItems + j )->item.asArray.value, (void *) ( pItems + j ), (void *) ( pItems + i ) );
             }
+            else if( HB_IS_BYREF( pItems + j ) && HB_IS_MEMVAR( pItems + j ) == FALSE && ( pItems + j )->item.asRefer.offset == 0 )
+            {
+               hb_arrayResetHolder( ( pItems + j )->item.asRefer.BasePtr.pBaseArray, (void *) ( pItems + j ), (void *) ( pItems + i ) );
+            }
 
             if( HB_IS_ARRAY( pItems + i ) && ( pItems + i )->item.asArray.value )
             {
                hb_arrayResetHolder( ( pItems + i )->item.asArray.value, (void *) ( pItems + i ), (void *) ( pItems + j ) );
+            }
+            else if( HB_IS_BYREF( pItems + i ) && HB_IS_MEMVAR( pItems + i ) == FALSE && ( pItems + i )->item.asRefer.offset == 0 )
+            {
+               hb_arrayResetHolder( ( pItems + i )->item.asRefer.BasePtr.pBaseArray, (void *) ( pItems + i ), (void *) ( pItems + j ) );
             }
          #endif
 
@@ -235,6 +252,10 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
          {
             hb_arrayResetHolder( ( pItems + j )->item.asArray.value, (void *) ( pItems + j ), (void *) ( pItems + lb ) );
          }
+         else if( HB_IS_BYREF( pItems + j ) && HB_IS_MEMVAR( pItems + j ) == FALSE && ( pItems + j )->item.asRefer.offset == 0 )
+         {
+            hb_arrayResetHolder( ( pItems + j )->item.asRefer.BasePtr.pBaseArray, (void *) ( pItems + j ), (void *) ( pItems + lb ) );
+         }
       #endif
    }
 
@@ -242,6 +263,10 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
 
    #ifndef HB_ARRAY_USE_COUNTER
       if( HB_IS_ARRAY( &pivot ) && pivot.item.asArray.value )
+      {
+         hb_arrayResetHolder( pivot.item.asArray.value, (void *) &pivot, (void *) ( pItems + j ) );
+      }
+      else if( HB_IS_BYREF( &pivot ) && HB_IS_MEMVAR( &pivot ) == FALSE && pivot.item.asRefer.offset == 0 )
       {
          hb_arrayResetHolder( pivot.item.asArray.value, (void *) &pivot, (void *) ( pItems + j ) );
       }

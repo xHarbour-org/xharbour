@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.90 2004/03/30 18:37:30 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.91 2004/04/02 04:30:52 ronpinkas Exp $
  */
 
 /*
@@ -1244,7 +1244,7 @@ PHB_ITEM HB_EXPORT hb_itemUnRefOnce( PHB_ITEM pItem )
          {
             if( pItem->item.asRefer.offset == 0 )
             {
-               if( pItem->item.asRefer.BasePtr.pBaseArray->pItems == NULL || pItem->item.asRefer.BasePtr.pBaseArray->ulLen <= pItem->item.asRefer.value )
+               if( pItem->item.asRefer.BasePtr.pBaseArray->pItems == NULL || pItem->item.asRefer.BasePtr.pBaseArray->ulLen <= (ULONG) pItem->item.asRefer.value )
                {
                   HB_ITEM Array, Index;
 

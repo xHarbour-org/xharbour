@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.78 2004/03/30 18:37:29 ronpinkas Exp $
+ * $Id: garbage.c,v 1.79 2004/04/02 04:30:52 ronpinkas Exp $
  */
 
 /*
@@ -91,7 +91,7 @@ static HB_GARBAGE_PTR s_pLockedBlock = NULL;
 static volatile BOOL s_bCollecting = FALSE;
 
 /* Signify ReleaseAll Processing is taking place. */
-static BOOL s_bReleaseAll = FALSE;
+BOOL hb_gc_bReleaseAll = FALSE;
 
 /* flag for used/unused blocks - the meaning of the HB_GC_USED_FLAG bit
  * is reversed on every collecting attempt
@@ -174,7 +174,6 @@ HB_EXPORT void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 
    if( pAlloc )
    {
-
       pAlloc->pFunc  = pCleanupFunc;
       pAlloc->locked = 0;
       pAlloc->used   = s_uUsedFlag;
@@ -199,7 +198,7 @@ HB_EXPORT void hb_gcFree( void *pBlock )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p)", pBlock ) );
 
-   if( s_bReleaseAll )
+   if( hb_gc_bReleaseAll )
    {
       HB_TRACE( HB_TR_DEBUG, ( "Aborted - hb_gcFree(%p)", pBlock ) );
       return;
@@ -307,7 +306,7 @@ HB_EXPORT void hb_gcGripDrop( HB_ITEM_PTR pItem )
 
    HB_TRACE( HB_TR_DEBUG, ( "hb_gcGripDrop(%p)", pItem ) );
 
-   if( s_bReleaseAll )
+   if( hb_gc_bReleaseAll )
    {
       HB_TRACE( HB_TR_DEBUG, ( "Aborted - hb_gcGripDrop(%p)", pItem ) );
       return;
@@ -770,7 +769,7 @@ void hb_gcReleaseAll( void )
 
    HB_TRACE( HB_TR_INFO, ( "hb_gcReleaseAll()" ) );
 
-   s_bReleaseAll = TRUE;
+   hb_gc_bReleaseAll = TRUE;
    s_bCollecting = TRUE;
 
    if( s_pLockedBlock )
@@ -849,7 +848,7 @@ void hb_gcReleaseAll( void )
    #endif
 
    s_bCollecting = FALSE;
-   s_bReleaseAll = FALSE;
+   hb_gc_bReleaseAll = FALSE;
 
    HB_TRACE( HB_TR_INFO, ( "DONE Release All" ) );
 }
@@ -865,7 +864,7 @@ void hb_gcInit( void )
     #endif
 
     s_bCollecting = FALSE;
-    s_bReleaseAll = FALSE;
+    hb_gc_bReleaseAll = FALSE;
     s_uUsedFlag = HB_GC_USED_FLAG;
     s_uAllocated = 0;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.39 2003/11/10 22:28:37 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.40 2004/03/18 04:28:31 druzus Exp $
  */
 
 /*
@@ -340,17 +340,6 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
 
    if( pCBlock->pSelfBase )
    {
-      #ifdef HB_ARRAY_USE_COUNTER
-         pCBlock->pSelfBase->uiHolders--;
-      #else
-         PHB_BASEARRAY pSelfBase = pCBlock->pSelfBase;
-
-         // HACK! Avoid possible recursion problem when one of the array items of the attached object in turn points to this block.
-         pCBlock->pSelfBase = (PHB_BASEARRAY) 1;
-
-         hb_arrayReleaseHolder( pSelfBase, (void *) pCBlock );
-      #endif
-
       pCBlock->pSelfBase = NULL;
    }
 

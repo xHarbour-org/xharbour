@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.85 2004/04/02 21:28:37 jonnymind Exp $
+ * $Id: filesys.c,v 1.86 2004/04/02 22:38:24 andijahja Exp $
  */
 
 /*
@@ -1542,23 +1542,42 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
       int iShare = _SH_DENYNO;
 
       if( ( uiFlags & FO_DENYREAD ) == FO_DENYREAD )
+      {
          iShare = _SH_DENYRD;
-
+      }
       else if( uiFlags & FO_EXCLUSIVE )
+      {
          iShare = _SH_DENYRW;
-
+      }
       else if( uiFlags & FO_DENYWRITE )
+      {
          iShare = _SH_DENYWR;
+      }
 
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
 
-      errno = 0;
+      #ifdef __XCC__
+         extern unsigned long _doserrno;
+         extern void __cdecl _dosmaperr( unsigned long oserrno );
+      #endif
+
+      errno     = 0;
       _doserrno = 0 ;
+
       if( iShare )
+      {
          hFileHandle = _sopen( ( char * ) pFilename, convert_open_flags( uiFlags ), iShare );
+      }
       else
+      {
          hFileHandle = _open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
+      }
+
+      #ifdef __XCC__
+         _dosmaperr( GetLastError() );
+      #endif
+
       hb_fsSetError( _doserrno != 0 ? ( USHORT ) _doserrno : errno ) ;
 
       HB_DISABLE_ASYN_CANC
@@ -1570,22 +1589,32 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
       int iShare = SH_DENYNO;
 
       if( ( uiFlags & FO_DENYREAD ) == FO_DENYREAD )
+      {
          iShare = SH_DENYRD;
-
+      }
       else if( uiFlags & FO_EXCLUSIVE )
+      {
          iShare = SH_DENYRW;
-
+      }
       else if( uiFlags & FO_DENYWRITE )
+      {
          iShare = SH_DENYWR;
+      }
 
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
 
       errno = 0;
+
       if( iShare )
+      {
          hFileHandle = sopen( ( char * ) pFilename, convert_open_flags( uiFlags ), iShare );
+      }
       else
+      {
          hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
+      }
+
       hb_fsSetError( errno );
 
       HB_DISABLE_ASYN_CANC
@@ -1597,6 +1626,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
    HB_TEST_CANCEL_ENABLE_ASYN
 
    errno = 0;
+
    hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
    hb_fsSetError( errno );
 

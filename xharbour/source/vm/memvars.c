@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.69 2004/03/30 18:37:30 ronpinkas Exp $
+ * $Id: memvars.c,v 1.70 2004/03/31 09:25:52 andijahja Exp $
  */
 
 /*
@@ -372,9 +372,13 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
             {
                for( ulPos = 0; ulPos < ulValues; ulPos++ )
                {
-                  if( HB_IS_ARRAY( &( ( s_globalTable + ulPos )->item ) ) && ( s_globalTable + ulPos )->item.item.asArray.value )
+                  if( ( s_globalTable + ulPos )->item.type == HB_IT_ARRAY && ( s_globalTable + ulPos )->item.item.asArray.value )
                   {
                      hb_arrayResetHolder( ( s_globalTable + ulPos )->item.item.asArray.value, (void *) &( ( pOldValues + ulPos )->item ), (void * ) &( ( s_globalTable + ulPos )->item ) );
+                  }
+                  else if( ( s_globalTable + ulPos )->item.type == HB_IT_BYREF && ( s_globalTable + ulPos )->item.item.asRefer.offset == 0 )
+                  {
+                     hb_arrayResetHolder( ( s_globalTable + ulPos )->item.item.asRefer.BasePtr.pBaseArray, (void *) &( ( pOldValues + ulPos )->item ), (void * ) &( ( s_globalTable + ulPos )->item ) );
                   }
                }
             }
@@ -403,14 +407,17 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
       {
          memcpy( &pValue->item, pSource, sizeof(HB_ITEM) );
 
-         if( HB_IS_ARRAY( pSource ) && pSource->item.asArray.value )
-         {
-            //TraceLog( NULL, "Detached %p array: %p to %p\n", pSource, pSource->item.asArray.value, &pValue->item );
-
-            #ifndef HB_ARRAY_USE_COUNTER
+         #ifndef HB_ARRAY_USE_COUNTER
+            if( pSource->type == HB_IT_ARRAY && pSource->item.asArray.value )
+            {
+               //TraceLog( NULL, "Detached %p array: %p to %p\n", pSource, pSource->item.asArray.value, &pValue->item );
                hb_arrayResetHolder( pSource->item.asArray.value, pSource, &pValue->item );
-            #endif
-         }
+            }
+            else if( pSource->type == HB_IT_BYREF && pSource->item.asRefer.offset == 0 )
+            {
+               hb_arrayResetHolder( pSource->item.asRefer.BasePtr.pBaseArray, pSource, &pValue->item );
+            }
+         #endif
       }
    }
 
