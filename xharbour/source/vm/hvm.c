@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.361 2004/03/20 00:27:21 ronpinkas Exp $
+ * $Id: hvm.c,v 1.362 2004/03/21 15:55:06 druzus Exp $
  */
 
 /*
@@ -422,6 +422,11 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
       PHB_DYNS pDynSymHbNoMouse;
    #endif
 
+   #if defined(HB_OS_OS2)
+      EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
+      APIRET rc = NO_ERROR;                           /* Return code                   */
+   #endif
+
    // Moved to hb_vmProcessSymbols() because hb_xgrab is used from static initializers before we get here.
    // Here again incase hb_vmInit() hb_vmQuit() are called multiple times by host application.
    if( s_fmInit )
@@ -436,11 +441,6 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    #if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
       pDynSymHbNoMouse = hb_dynsymFind( "HB_NOMOUSE" );
-   #endif
-
-   #if defined(HB_OS_OS2)
-      EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
-      APIRET rc = NO_ERROR;                           /* Return code                   */
    #endif
 
    #if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
@@ -6562,7 +6562,7 @@ HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
    ( * HB_VM_STACK.pPos )->item.asSymbol.uiSuperClass = 0;
 
    if( pSym == &( hb_symEval ) && HB_VM_STACK.pBase && (* HB_VM_STACK.pBase)->type == HB_IT_SYMBOL &&
-	   (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
+      (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
    {
       pSym->pDynSym->pModuleSymbols = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols;
    }
