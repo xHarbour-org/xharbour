@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.98 2002/10/27 01:29:26 what32 Exp $
+ * $Id: xide.prg,v 1.99 2002/10/27 19:36:16 ronpinkas Exp $
  */
 
 /*
@@ -470,7 +470,7 @@ int XFMParse( char *sText )
 
       case '"' :
         Exp.type = HB_IT_STRING;
-        sExp[ strlen( sVar ) - 1] = '\0';
+        sExp[ strlen( sExp ) - 1 ] = '\0';
         Exp.item.asString.value = (char *) sExp + 1;
         Exp.item.asString.bStatic = TRUE;
         break;
