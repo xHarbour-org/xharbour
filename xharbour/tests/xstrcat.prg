@@ -1,4 +1,4 @@
-* $Id$
+* $Id: xstrcat.prg,v 1.1 2004/02/22 20:37:40 andijahja Exp $
 *
 * test program for hb_xstrcat()
 * not very useful in prg level but may be handy in c level
@@ -20,7 +20,7 @@ HB_FUNC( TESTXSTRCAT )
    hb_xmemset( szResult, 0, 256 );
    /* must end string merging with NULL */
    hb_xstrcat( szResult, hb_parc(1), hb_parc(2), hb_parc(3), hb_parc(4), NULL );
-   hb_retc( szResult );
-   hb_xfree( szResult );
+   /* in c level, programmer has to free szResult after usage */
+   hb_retcAdopt( szResult );
 }
 #PRAGMA ENDDUMP
