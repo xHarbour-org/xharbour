@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.10 2003/06/18 08:57:02 ronpinkas Exp $
+ * $Id: terror.prg,v 1.11 2003/06/26 01:29:15 ronpinkas Exp $
  */
 
 /*
@@ -61,8 +61,15 @@
 
 FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args, ModuleName )
 
-   STATIC s_oClass
+   STATIC lInErr := .F., s_oClass
    LOCAL oErr
+
+   // Avoid RECURSIVE Errors.
+   IF lInErr
+      RETURN NIL
+   ELSE
+      lInErr := .T.
+   ENDIF
 
    IF s_oClass == NIL
       s_oClass := HBClass():New( "ERROR" )
@@ -127,6 +134,8 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args, ModuleName 
       oErr:OsThreadId     := ThreadGetCurrent()
       oErr:VMThreadId     := ThreadGetCurrentInternal()
    #endif
+
+   lInErr := .F.
 
 RETURN oErr
 

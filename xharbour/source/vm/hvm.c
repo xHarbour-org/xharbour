@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.307 2004/01/21 22:09:44 walito Exp $
+ * $Id: hvm.c,v 1.308 2004/01/21 23:08:46 walito Exp $
  */
 
 /*
@@ -220,8 +220,7 @@ static void    hb_vmPopStatic( USHORT uiStatic ); /* pops the stack latest value
 /* misc */
 static void    hb_vmDoInitStatics( void );        /* executes all _INITSTATICS functions */
 static void    hb_vmDoInitFunctions( void );      /* executes all defined PRGs INIT functions */
-static void    hb_vmDoExitFunctions( void );      /* executes all defined PRGs EXIT functions */
-static void    hb_vmReleaseLocalSymbols( void );  /* releases the memory of the local symbols linked list */
+HB_EXPORT void hb_vmDoExitFunctions( void );      /* executes all defined PRGs EXIT functions */
 
 #ifndef HB_CDP_SUPPORT_OFF
    extern void hb_cdpReleaseAll( void );
@@ -408,21 +407,37 @@ void hb_vmDoInitOle( void )
 /* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
-#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
-   PHB_DYNS pDynSymHbNoMouse = hb_dynsymFind( "HB_NOMOUSE" );
-#endif
+   #if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
+      PHB_DYNS pDynSymHbNoMouse;
+   #endif
+
+   // Moved to hb_vmProcessSymbols() because hb_xgrab is used from static initializers before we get here.
+   // Here again incase hb_vmInit() hb_vmQuit() are called multiple times by host application.
+   if( s_fmInit )
+   {
+      s_fmInit = FALSE;
+      /* JC1: xinit initializes also thread, which initializes the main stack */
+      hb_xinit();
+      hb_gcInit();
+   }
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmInit()"));
+
+   #if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
+      pDynSymHbNoMouse = hb_dynsymFind( "HB_NOMOUSE" );
+   #endif
 
    #if defined(HB_OS_OS2)
       EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
       APIRET rc = NO_ERROR;                           /* Return code                   */
    #endif
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmInit()"));
-
-#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
-   if( pDynSymHbNoMouse )
-      b_MouseEnable = FALSE;
-#endif
+   #if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
+      if( pDynSymHbNoMouse )
+      {
+         b_MouseEnable = FALSE;
+      }
+   #endif
 
    /* initialize internal data structures */
    s_aStatics.type = HB_IT_NIL;
@@ -459,11 +474,6 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    hb_arrayNew( &s_aGlobals, 0 );
    //printf( "Allocated s_aGlobals: %p Owner: %p\n", &s_aGlobals, s_aGlobals.item.asArray.value->pOwners );
 
-   /* Moved to hb_vmProcessSymbols() because hb_xgrab is used from static initializers before we get here.
-   HB_TRACE( HB_TR_INFO, ("xinit" ) );
-   hb_xinit();
-   */
-
    HB_TRACE( HB_TR_INFO, ("errInit" ) );
    hb_errInit();
 
@@ -486,7 +496,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
       hb_memvarsInit();
    #endif
 
-   HB_TRACE( HB_TR_INFO, ("memvarsInit" ) );
+   HB_TRACE( HB_TR_INFO, ("il18Init" ) );
    hb_i18nInit( NULL, NULL);  // try to open default language.
 
    //HB_TRACE( HB_TR_INFO, ("SymbolInit_RT" ) );
@@ -500,9 +510,11 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    HB_LANG_SELECT_DEFAULT( HB_LANG_DEFAULT );
 
    /* Check for some internal switches */
+   HB_TRACE( HB_TR_INFO, ("cmdarg" ) );
    hb_cmdargProcessVM();
 
    #ifndef HB_NO_PROFILER
+      HB_TRACE( HB_TR_INFO, ("porfiler" ) );
       /* Initialize opcodes profiler support arrays */
       {
          ULONG ul;
@@ -520,20 +532,22 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
     * because INIT function can use static variables.
     */
 
-   //printf( "Before InitStatics\n" );
+   HB_TRACE( HB_TR_INFO, ("InitStatics" ) );
    hb_vmDoInitStatics();
 
-   //printf( "Before InitClip\n" );
+   HB_TRACE( HB_TR_INFO, ("InitClip" ) );
    hb_vmDoInitClip(); // Initialize ErrorBlock() and __SetHelpK()
 
    //printf( "Before InitRdd\n" );
    hb_vmDoInitRdd();  // Initialize DBFCDX and DBFNTX if linked.
 
    #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
+      HB_TRACE( HB_TR_INFO, ("InitOle" ) );
       hb_vmDoInitOle();
    #endif
 
    //printf( "Before InitFunctions\n" );
+   HB_TRACE( HB_TR_INFO, ("InitFunctions" ) );
    hb_vmDoInitFunctions(); /* process defined INIT functions */
 
    /* This is undocumented CA-Clipper, if there's a function called _APPMAIN
@@ -586,14 +600,15 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 #endif
    }
 
-#if defined(HB_OS_OS2) /* Add OS2TermHandler to this thread's chain of exception handlers */
+   #if defined(HB_OS_OS2) /* Add OS2TermHandler to this thread's chain of exception handlers */
+      RegRec.ExceptionHandler = (ERR)OS2TermHandler;
+      rc = DosSetExceptionHandler( &RegRec );
 
-   RegRec.ExceptionHandler = (ERR)OS2TermHandler;
-   rc = DosSetExceptionHandler( &RegRec );
-   if (rc != NO_ERROR) {
-      hb_errInternal( HB_EI_ERRUNRECOV, "Unable to setup exception handler (DosSetExceptionHandler())", NULL, NULL );
-   }
-#endif
+      if (rc != NO_ERROR)
+      {
+         hb_errInternal( HB_EI_ERRUNRECOV, "Unable to setup exception handler (DosSetExceptionHandler())", NULL, NULL );
+      }
+   #endif
 
    if( bStartMainProc && s_pSymStart )
    {
@@ -620,10 +635,35 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
       hb_vmDo( iArgCount ); /* invoke it with number of supplied parameters */
    }
 
-#if defined(HB_OS_OS2)
-   /* I don't do any check on return code since harbour is exiting in any case */
-   rc = DosUnsetExceptionHandler( &RegRec );
-#endif
+   #if defined(HB_OS_OS2)
+      /* I don't do any check on return code since harbour is exiting in any case */
+      rc = DosUnsetExceptionHandler( &RegRec );
+   #endif
+}
+
+void hb_vmReleaseLocalSymbols( void )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmReleaseLocalSymbols()"));
+
+   while( s_pSymbols )
+   {
+      PSYMBOLS pDestroy;
+
+      pDestroy = s_pSymbols;
+      s_pSymbols = s_pSymbols->pNext;
+
+      if( pDestroy->szModuleName )
+      {
+         hb_xfree( pDestroy->szModuleName );
+      }
+
+      if( pDestroy )
+      {
+         hb_xfree( pDestroy );
+      }
+   }
+
+   HB_TRACE(HB_TR_DEBUG, ("Done hb_vmReleaseLocalSymbols()"));
 }
 
 int HB_EXPORT hb_vmQuit( void )
@@ -782,6 +822,8 @@ int HB_EXPORT hb_vmQuit( void )
    hb_threadCloseHandles();
 #endif
 
+   s_fmInit = TRUE;
+
    return s_iErrorLevel;
 }
 
@@ -802,6 +844,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p, %p)", pCode, pSymbols, pGlobals));
+
+   //TraceLog( NULL, "%s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pCode, pSymbols, pGlobals );
 
    /* NOTE: if pSymbols == NULL then hb_vmExecute is called from macro
     * evaluation. In this case all PRIVATE variables created during
@@ -1096,6 +1140,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_MESSAGE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_MESSAGE") );
+            //TraceLog( NULL, "%s->HB_P_MESSAGE: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             hb_vmPushSymbol( pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
@@ -1326,6 +1371,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_SENDSHORT:
          {
             USHORT usParams =  pCode[ w + 1 ];
+            PHB_FUNC pFunc;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SENDSHORT") );
 
@@ -1342,7 +1388,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   if( HB_IS_OBJECT( pSelf ) && pSelf->item.asArray.value->uiPrevCls == 0 )
                   {
                      BOOL bConstructor;
-                     PHB_FUNC pFunc;
 
                      pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor, 1 );
 
@@ -1403,7 +1448,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   if( HB_IS_OBJECT( pSelf ) && pSelf->item.asArray.value->uiPrevCls == 0 )
                   {
                      BOOL bConstructor;
-                     PHB_FUNC pFunc;
 
                      pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -3 )->item.asSymbol.value, FALSE, &bConstructor, 1 );
 
@@ -1459,6 +1503,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( s_uiActionRequest != HB_BREAK_REQUESTED )
             {
+               //TraceLog( NULL, "Func: %p Trying hb_vmSend()\n", pFunc );
                hb_vmSend( usParams );
             }
 
@@ -1677,7 +1722,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /*
              * *** NOTE!!! Return!!!
              */
-            return;
+            goto Done;
+            //return;
 
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
 
@@ -3164,6 +3210,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       #endif
    }
 
+ Done:
+
    /* No cancellation here */
    HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
@@ -3198,6 +3246,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
    //JC1: do not allow cancellation or idle MT func: thread cleanup procedure
    // is under way, or another VM might return in control
+
+   //TraceLog( NULL, "DONE! %s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pCode, pSymbols, pGlobals );
 }
 
 /* ------------------------------- */
@@ -5322,8 +5372,8 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
 
    if( hb_stackItemFromTop( - ( uiParams + 1 ) )->type )
    {
+      //TraceLog( NULL, "DIVERTED hb_vmDo() to hb_vmSend()\n" );
       hb_vmSend( uiParams );
-
       return;
    }
 
@@ -5334,7 +5384,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
       }
    #endif
 
-   HB_TRACE( HB_TR_INFO, ( "StackNewFrame %hu", uiParams ) );
+   //TraceLog( NULL, "StackNewFrame %hu\n", uiParams );
 
    pItem = hb_stackNewFrame( &sStackState, uiParams );
    pSym = pItem->item.asSymbol.value;
@@ -5342,7 +5392,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
    bDebugPrevState = s_bDebugging;
    s_bDebugging = FALSE;
 
-   HB_TRACE( HB_TR_INFO, ( "Symbol: '%s'", pSym->szName ) );
+   //TraceLog( NULL, "Symbol: '%s'\n", pSym->szName );
 
    if( HB_IS_NIL( pSelf ) ) /* are we sending a message ? */
    {
@@ -5443,7 +5493,6 @@ static void s_hb_vmClassError( int uiParams, char *szClassName, char *szMsg )
    }
 }
 
-
 HB_EXPORT void hb_vmSend( USHORT uiParams )
 {
    HB_THREAD_STUB
@@ -5466,6 +5515,8 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    #endif
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmSend(%hu)", uiParams ) );
+
+   //TraceLog( NULL, "From: '%s'\n", hb_stackBaseItem()->item.asSymbol.value->szName );
 
    if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
    {
@@ -5701,6 +5752,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       }
       else
       {
+         //TraceLog( NULL, "METHOD NOT FOUND!\n" );
          s_hb_vmClassError( uiParams, sClass, pSym->szName );
       }
    }
@@ -5971,7 +6023,7 @@ static void hb_vmSFrame( PHB_SYMB pSym )      /* sets the statics frame for a fu
    HB_TRACE(HB_TR_DEBUG, ("hb_vmSFrame(%p)", pSym));
 
    /* _INITSTATICS is now the statics frame. Statics() changed it! */
-   HB_VM_STACK.iStatics = ( int ) pSym->pFunPtr; /* pSym is { "$_INITSTATICS", HB_FS_INIT | HB_FS_EXIT, _INITSTATICS } for each PRG */
+   HB_VM_STACK.iStatics = ( int ) pSym->pDynSym; /* pSym is { "$_INITSTATICS", HB_FS_INIT | HB_FS_EXIT, _INITSTATICS } for each PRG */
 }
 
 static void hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ) /* initializes the global aStatics array or redimensionates it */
@@ -5980,13 +6032,13 @@ static void hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ) /* initializes the g
 
    if( HB_IS_NIL( &s_aStatics ) )
    {
-      pSym->pFunPtr = NULL;         /* statics frame for this PRG */
+      pSym->pDynSym = NULL;         /* statics frame for this PRG */
       hb_arrayNew( &s_aStatics, uiStatics );
       //printf( "Allocated s_aStatics: %p %p\n", &s_aStatics, s_aStatics.item.asArray.value->pOwners );
    }
    else
    {
-      pSym->pFunPtr = ( PHB_FUNC ) hb_arrayLen( &s_aStatics );
+      pSym->pDynSym = ( PHB_DYNS ) hb_arrayLen( &s_aStatics );
       hb_arraySize( &s_aStatics, hb_arrayLen( &s_aStatics ) + uiStatics );
       //TraceLog( NULL, "Symbol: %s Statics: %i Size: %i\n", pSym->szName, uiStatics, hb_arrayLen( &s_aStatics ) );
    }
@@ -7321,6 +7373,11 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols i
    }
 }
 
+HB_EXPORT PSYMBOLS * hb_vmSymbols( void )
+{
+   return &s_pSymbols;
+}
+
 HB_EXPORT PSYMBOLS hb_vmLastModule( void )
 {
    PSYMBOLS pLastModule = s_pSymbols;
@@ -7342,26 +7399,6 @@ HB_EXPORT void hb_vmExplicitStartup( PHB_SYMB pSymbol )
    //printf( "Startup: '%s' Func: %p\n", pSymbol->szName, pSymbol->pFunPtr );
 }
 
-static void hb_vmReleaseLocalSymbols( void )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmReleaseLocalSymbols()"));
-
-   while( s_pSymbols )
-   {
-      PSYMBOLS pDestroy;
-
-      pDestroy = s_pSymbols;
-      s_pSymbols = s_pSymbols->pNext;
-
-      if( pDestroy->szModuleName )
-         hb_xfree( pDestroy->szModuleName );
-
-      if( pDestroy )
-         hb_xfree( pDestroy );
-   }
-
-   HB_TRACE(HB_TR_DEBUG, ("Done hb_vmReleaseLocalSymbols()"));
-}
 
 /* This calls all _INITSTATICS functions defined in the application.
  * We are using a special symbol's scope ( HB_FS_INIT | HB_FS_EXIT ) to mark
@@ -7398,7 +7435,7 @@ static void hb_vmDoInitStatics( void )
    } while( pLastSymbols );
 }
 
-static void hb_vmDoExitFunctions( void )
+HB_EXPORT void hb_vmDoExitFunctions( void )
 {
    HB_THREAD_STUB
 
@@ -7406,7 +7443,7 @@ static void hb_vmDoExitFunctions( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDoExitFunctions()"));
 
-   do
+   while( pLastSymbols )
    {
       /* only if module contains some EXIT functions */
       if( pLastSymbols->hScope & HB_FS_EXIT )
@@ -7434,9 +7471,9 @@ static void hb_vmDoExitFunctions( void )
             }
          }
       }
-      pLastSymbols = pLastSymbols->pNext;
 
-   } while( pLastSymbols );
+      pLastSymbols = pLastSymbols->pNext;
+   }
 }
 
 static void hb_vmDoInitFunctions( void )
@@ -7463,6 +7500,8 @@ static void hb_vmDoInitFunctions( void )
 
                int i;
                int iArgCount;
+
+               //TraceLog( NULL, "Module: %s, INIT: %p, Name: >%s<, Func: %p\n", pLastSymbols->szModuleName, pLastSymbols->pModuleSymbols + ui, ( pLastSymbols->pModuleSymbols + ui )->szName, ( pLastSymbols->pModuleSymbols + ui )->pFunPtr );
 
                hb_vmPushSymbol( pLastSymbols->pModuleSymbols + ui );
                hb_vmPushNil();

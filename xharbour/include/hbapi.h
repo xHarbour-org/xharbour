@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.111 2003/12/29 19:25:52 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.112 2004/01/21 13:37:59 walito Exp $
  */
 
 /*
@@ -148,10 +148,17 @@ typedef struct _HB_NESTED_CLONED
    struct _HB_NESTED_CLONED * pNext;
 } HB_NESTED_CLONED, * PHB_NESTED_CLONED;
 
+typedef struct
+{
+   PHB_DYNS pDynSym;             /* Pointer to dynamic symbol */
+} DYNHB_ITEM, *PDYNHB_ITEM, *DYNHB_ITEM_PTR;
+
 /* RDD method return codes */
 typedef USHORT ERRCODE;
 #define SUCCESS            0
 #define FAILURE            1
+
+#define SYM_ALLOCATED ( ( HB_SYMBOLSCOPE ) -1 )
 
 extern HB_SYMB  hb_symEval;
 
@@ -185,6 +192,7 @@ extern HB_EXPORT void   hb_gcCollectAll( void ); /* checks if all memory blocks 
 
 extern void   hb_gcReleaseAll( void ); /* release all memory blocks unconditionally */
 extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers passed memory block pointer */
+extern void   hb_gcInit( void );
 
 extern void   HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
 extern void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as used */
@@ -438,16 +446,19 @@ extern HB_EXPORT PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg,
 extern HB_EXPORT USHORT   hb_objGetRealCls( PHB_ITEM pObject, char * szName );
 
 /* dynamic symbol table management */
-extern HB_EXPORT PHB_DYNS hb_dynsymGet( char * szName );    /* finds and creates a dynamic symbol if not found */
-extern HB_EXPORT PHB_DYNS hb_dynsymGetCase( char * szName );    /* finds and creates a dynamic symbol if not found CASE SENSTIVE! */
-extern HB_EXPORT PHB_DYNS hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols ); /* creates a new dynamic symbol based on a local one */
-extern HB_EXPORT PHB_DYNS hb_dynsymFind( char * szName );   /* finds a dynamic symbol */
-extern HB_EXPORT PHB_DYNS hb_dynsymFindName( char * szName ); /* converts to uppercase and finds a dynamic symbol */
-extern HB_EXPORT void     hb_dynsymLog( void );             /* displays all dynamic symbols */
-extern HB_EXPORT void     hb_dynsymRelease( void );         /* releases the memory of the dynamic symbol table */
-extern HB_EXPORT USHORT   hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo ); /* enumerates all dynamic symbols */
-extern HB_EXPORT PHB_DYNS hb_dynsymFindFromFunction( PHB_FUNC pFunc ); /* returns a dynamic symbol for a given function pointer. */
-extern HB_EXPORT PHB_DYNS hb_dynsymPos( USHORT uiPos ); /* returns a dynamic symbol from a position index. */
+
+extern HB_EXPORT PHB_DYNS    hb_dynsymGet( char * szName );    /* finds and creates a dynamic symbol if not found */
+extern HB_EXPORT PHB_DYNS    hb_dynsymGetCase( char * szName );    /* finds and creates a dynamic symbol if not found CASE SENSTIVE! */
+extern HB_EXPORT PHB_DYNS    hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols ); /* creates a new dynamic symbol based on a local one */
+extern HB_EXPORT PHB_DYNS    hb_dynsymFind( char * szName );   /* finds a dynamic symbol */
+extern HB_EXPORT PHB_DYNS    hb_dynsymFindName( char * szName ); /* converts to uppercase and finds a dynamic symbol */
+extern HB_EXPORT void        hb_dynsymLog( void );             /* displays all dynamic symbols */
+extern HB_EXPORT void        hb_dynsymRelease( void );         /* releases the memory of the dynamic symbol table */
+extern HB_EXPORT USHORT      hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo ); /* enumerates all dynamic symbols */
+extern HB_EXPORT PHB_DYNS    hb_dynsymFindFromFunction( PHB_FUNC pFunc ); /* returns a dynamic symbol for a given function pointer. */
+extern HB_EXPORT PHB_DYNS    hb_dynsymPos( USHORT uiPos ); /* returns a dynamic symbol from a position index. */
+extern HB_EXPORT PDYNHB_ITEM hb_dynsymItems( void );
+extern HB_EXPORT USHORT    * hb_dynsymCount( void );
 
 /* JC1: reentrant function support for dynsym where locking is unapplicable. */
 #ifdef HB_THREAD_SUPPORT

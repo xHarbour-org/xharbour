@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.89 2003/12/03 15:07:13 jonnymind Exp $
+ * $Id: classes.c,v 1.90 2003/12/07 00:10:07 jonnymind Exp $
  */
 
 /*
@@ -383,8 +383,17 @@ void hb_clsReleaseAll( void )
       hb_xfree( s_pClasses );
    }
 
-   s_uiClasses = 0;
-   s_pClasses  = NULL;
+   s_pClasses        = NULL;
+   s_uiClasses       = 0;
+   s_msgClassName    = NULL;
+
+   s_msgClassH       = NULL;
+   s_msgEval         = NULL;
+   s_msgClassSel     = NULL;
+   s_msgClassFullSel = NULL;
+   s_msgClsParent    = NULL;
+   s_bClsScope       = TRUE;
+   s_bClsAutoInit    = TRUE;
 }
 
 /* Mark all internal data as used so it will not be released by the
@@ -1039,6 +1048,8 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
    HB_THREAD_STUB
 
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetMthd(%p, '%s', %i)", pObject, pMsg->pSymbol->szName, lAllowErrFunc, bConstructor));
+
+   //TraceLog( NULL, "Message: %s -> hb_objGetMthd(%p, '%s', %i)\n", pMessage->szName, pObject, pMsg->pSymbol->szName, lAllowErrFunc, bConstructor );
 
    if( HB_IS_ARRAY( pObject ) )
    {
@@ -3320,29 +3331,31 @@ USHORT hb_clsMaxClasses( void )
 HB_FUNC( __CLS_PARAM )
 {
    HB_THREAD_STUB
-   PHB_ITEM array;
+   HB_ITEM Array;
    USHORT uiParam = ( USHORT ) hb_pcount();
    USHORT n;
 
+   Array.type = HB_IT_NIL;
+   hb_arrayNew( &Array, uiParam );
+
    if( uiParam >= 1 )
    {
-      array = hb_itemArrayNew( uiParam );
       for( n = 1; n <= uiParam; n++ )
       {
-         PHB_ITEM iTmp = hb_itemParam( n );
-         hb_arraySet( array, n, iTmp );
-         hb_itemRelease( iTmp );
+         hb_arraySet( &Array, n, hb_param( n, HB_IT_ANY ) );
       }
    }
    else
    {
-      PHB_ITEM iTmp = hb_itemPutC( NULL, (char *) "HBObject" );
-      array = hb_itemArrayNew( 1 );
-      hb_arraySet( array, 1, iTmp );
-      hb_itemRelease( iTmp );
+      HB_ITEM Parent;
+
+      Parent.type = HB_IT_NIL;
+      hb_itemPutCStatic( &Parent, (char *) "HBObject" );
+
+      hb_arraySetForward( &Array, 1, &Parent );
    }
 
-   hb_itemRelease( hb_itemReturn( array ) );
+   hb_itemReturn( &Array );
 }
 
 /* This one is used when HB_NOTOBJECT is defined before HBCLASS.CH */

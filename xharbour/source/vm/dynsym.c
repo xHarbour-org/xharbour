@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.11 2003/12/05 18:04:40 jonnymind Exp $
+ * $Id: dynsym.c,v 1.12 2003/12/06 15:33:39 jonnymind Exp $
  */
 
 /*
@@ -56,15 +56,8 @@
 #include "hbapi.h"
 #include "thread.h"
 
-#define SYM_ALLOCATED ( ( HB_SYMBOLSCOPE ) -1 )
-
 //JC1: the search of an intem could depend on the current thread stack
 #ifndef HB_THREAD_SUPPORT
-
-typedef struct
-{
-   PHB_DYNS pDynSym;             /* Pointer to dynamic symbol */
-} DYNHB_ITEM, * PDYNHB_ITEM, * DYNHB_ITEM_PTR;
 
 static PDYNHB_ITEM s_pDynItems = NULL;    /* Pointer to dynamic items */
 static USHORT      s_uiDynSymbols = 0;    /* Number of symbols present */
@@ -265,6 +258,8 @@ PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName )  /* finds and creates a symbol 
 
    if( ! pDynSym )       /* Does it exists ? */
    {
+      //TraceLog( NULL, "*** Did NOT find >%s< - CREATED New!\n", szUprName );
+
       if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym )
       {
          pDynSym = hb_dynsymNew( hb_symbolNew( szUprName ), (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols );   /* Make new symbol */
@@ -651,6 +646,8 @@ void HB_EXPORT hb_dynsymRelease( void )
    }
 
    hb_xfree( s_pDynItems );
+   s_pDynItems = NULL;
+   s_uiDynSymbols = 0;
 }
 
 
@@ -691,9 +688,20 @@ PHB_DYNS HB_EXPORT hb_dynsymPos( USHORT uiPos )
    {
       ret = NULL;
    }
+
    hb_dynsymUnlock();
 
    return ret;
+}
+
+HB_EXPORT PDYNHB_ITEM hb_dynsymItems( void )
+{
+   return s_pDynItems;
+}
+
+HB_EXPORT USHORT *hb_dynsymCount( void )
+{
+   return &s_uiDynSymbols;
 }
 
 #ifdef HB_EXTENSION

@@ -2484,7 +2484,7 @@
             */
 
             #ifdef AX
-               TraceLog( NULL, "Dyn: '%s'\n", sFunctionName );
+               TraceLog( NULL, "PP_GENDYNPROCEDURE: '%s'\n", sFunctionName );
             #endif
 
             BYTE *pcode = (BYTE *) hb_xgrab( 31 );

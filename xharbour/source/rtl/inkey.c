@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.17 2004/01/21 23:48:57 peterrees Exp $
+ * $Id: inkey.c,v 1.18 2004/01/22 23:12:42 walito Exp $
  */
 
 /*
@@ -90,7 +90,7 @@
   #include <unistd.h>
 #endif
 
-static int *  s_inkeyBuffer = 0; /* Harbour keyboard buffer (empty if head == tail)     */
+static int *  s_inkeyBuffer = NULL; /* Harbour keyboard buffer (empty if head == tail)     */
 static int    s_inkeyHead;       /* Harbour keyboard buffer head pointer (next insert)  */
 static int    s_inkeyTail;       /* Harbour keyboard buffer tail pointer (next extract) */
 static int    s_inkeyLast = 0;       /* Last key extracted from Harbour keyboard buffer     */
@@ -135,9 +135,13 @@ static int hb_inkeyFetch( void ) /* Extract the next key from the keyboard buffe
             s_inkeyLast = s_inkeyKB->String[ s_inkeyKB->Pos-- ];
 
             if( s_inkeyKB->Pos >= 0 )
+            {
                s_inkeyTail--;
+            }
             else
+            {
                hb_inkeyKBfree( );
+            }
          }
 
          if( s_inkeyTail >= hb_set.HB_SET_TYPEAHEAD )
@@ -263,13 +267,17 @@ int hb_inkeyNext( HB_inkey_enum event_mask )      /* Return the next key without
    {
       /* Proper typeahead support is enabled */
       if( s_inkeyHead == s_inkeyTail )
+      {
          key = 0;
+      }
       else
       {
          key = s_inkeyBuffer[ s_inkeyTail ];    /* Next key */
 
          if( key == -99  && s_inkeyKB )
+         {
             key = s_inkeyKB->String[ s_inkeyKB->Pos ];
+         }
       }
    }
    else
@@ -327,7 +335,10 @@ void hb_inkeyReset( BOOL allocate )     /* Reset the keyboard buffer */
    s_inkeyForce = 0;
 
    while( s_inkeyKB )
+   {
       hb_inkeyKBfree( );
+   }
+
    s_inkeyKB = NULL;
 
    /* The allocate flag allows the same function to be used to reset the
@@ -336,7 +347,10 @@ void hb_inkeyReset( BOOL allocate )     /* Reset the keyboard buffer */
    {
       /* If the buffer already exists, free it */
       if( s_inkeyBuffer )
+      {
          hb_xfree( s_inkeyBuffer );
+         s_inkeyBuffer = NULL;
+      }
 
       /* Always allocate a new buffer, unless it's being freed from hb_setRelease() */
       if( hb_set.HB_SET_TYPEAHEAD > -1 )
@@ -346,8 +360,7 @@ void hb_inkeyReset( BOOL allocate )     /* Reset the keyboard buffer */
             minimum buffer size (which is 16) must still be allocated, because
             even when polling is disabled, calling INKEY() or NEXTKEY() will
             temporarily re-enable polling */
-         s_inkeyBuffer = ( int * ) hb_xgrab( sizeof( int )
-            * ( hb_set.HB_SET_TYPEAHEAD == 0 ? 16 : hb_set.HB_SET_TYPEAHEAD ) );
+         s_inkeyBuffer = ( int * ) hb_xgrab( sizeof( int ) * ( hb_set.HB_SET_TYPEAHEAD == 0 ? 16 : hb_set.HB_SET_TYPEAHEAD ) );
       }
    }
 }
@@ -535,12 +548,25 @@ void HB_EXPORT hb_inkeyPut( int ch )
          int head = s_inkeyHead;
 
          s_inkeyBuffer[ head++ ] = ch;
-         if( head >= hb_set.HB_SET_TYPEAHEAD ) head = 0;
-         if( head != s_inkeyTail ) s_inkeyHead = head;
-         else /* TODO: Add error sound */ ;
+
+         if( head >= hb_set.HB_SET_TYPEAHEAD )
+         {
+            head = 0;
+         }
+
+         if( head != s_inkeyTail )
+         {
+            s_inkeyHead = head;
+         }
+         else
+         {
+            /* TODO: Add error sound */ ;
+         }
       }
       else
+      {
          s_inkeyForce = ch; /* Typeahead support is disabled */
+      }
    }
 }
 

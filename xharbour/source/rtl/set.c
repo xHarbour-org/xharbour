@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.37 2003/12/19 01:32:39 fsgiudice Exp $
+ * $Id: set.c,v 1.38 2004/01/16 11:41:20 lculik Exp $
  */
 
 /*
@@ -1392,10 +1392,7 @@ End listener test (1 of 2) */
 
 void hb_setInitialize( void )
 {
-
-
    HB_TRACE(HB_TR_DEBUG, ("hb_setInitialize()"));
-
 
    hb_set.HB_SET_ALTERNATE = FALSE;
    hb_set.HB_SET_ALTFILE = NULL;
@@ -1406,12 +1403,16 @@ void hb_setInitialize( void )
    hb_set.HB_SET_BELL = FALSE;
    hb_set.HB_SET_CANCEL = TRUE;
    hb_set.hb_set_century = FALSE;
+
    strncpy( hb_set.HB_SET_COLOR, "W/N,N/W,N/N,N/N,N/W", sizeof( hb_set.HB_SET_COLOR ) );
+
    hb_set.HB_SET_COLOR[ sizeof( hb_set.HB_SET_COLOR ) - 1 ] = '\0';
    hb_set.HB_SET_CONFIRM = FALSE;
    hb_set.HB_SET_CONSOLE = TRUE;
    hb_set.HB_SET_DATEFORMAT = ( char * ) hb_xgrab( 9 );
+
    memcpy( hb_set.HB_SET_DATEFORMAT, "mm/dd/yy", 9 );
+
    /* hb_set.HB_SET_DEBUG = TRUE; */
    hb_set.HB_SET_DEBUG = hb_dynsymFind( "__DBGENTRY" ) ? TRUE : FALSE;
    hb_set.HB_SET_DECIMALS = 2;
@@ -1419,10 +1420,14 @@ void hb_setInitialize( void )
    hb_set.HB_SET_DEFAULT[ 0 ] = '\0';
    hb_set.HB_SET_DELETED = FALSE;
    hb_set.HB_SET_DELIMCHARS = ( char * ) hb_xgrab( 3 );
+
    memcpy( hb_set.HB_SET_DELIMCHARS, "::", 3 );
+
    hb_set.HB_SET_DELIMITERS = FALSE;
    hb_set.HB_SET_DEVICE = ( char * ) hb_xgrab( 7 );
+
    memcpy( hb_set.HB_SET_DEVICE, "SCREEN", 7 );
+
    hb_set.HB_SET_EPOCH = 1900;
    hb_set.HB_SET_ESCAPE = TRUE;
    hb_set.HB_SET_EVENTMASK = INKEY_KEYBOARD;
@@ -1446,6 +1451,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_PATH = ( char * ) hb_xgrab( 1 );
    hb_set.HB_SET_PATH[ 0 ] = '\0';
    hb_set.HB_SET_PRINTER = FALSE;
+
 #ifdef HB_OS_UNIX
    hb_set.HB_SET_PRINTFILE = ( char * ) hb_xgrab( 5 );
    memcpy( hb_set.HB_SET_PRINTFILE, "|lpr", 5 ); /* Default printer device */
@@ -1453,6 +1459,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_PRINTFILE=NULL;
    hb_set_SetDefaultPrinter() ;
 #endif
+
    hb_set.hb_set_printhan = FS_ERROR;
    hb_set.hb_set_winhan=FS_ERROR;
    hb_set.HB_SET_SCOREBOARD = TRUE;
@@ -1460,11 +1467,14 @@ void hb_setInitialize( void )
    hb_set.HB_SET_SOFTSEEK = FALSE;
    hb_set.HB_SET_STRICTREAD = FALSE;
    hb_set.HB_SET_TRACE = TRUE; /* Default Trace to ON */
+
    strcpy( (char *) (hb_set.HB_SET_TRACEFILE), "trace.log" );
+
    hb_set.HB_SET_TRACESTACK = HB_SET_TRACESTACK_ALL;
    hb_set.HB_SET_TYPEAHEAD = 50; hb_inkeyReset( TRUE ); /* Allocate keyboard typeahead buffer */
    hb_set.HB_SET_UNIQUE = FALSE;
    hb_set.HB_SET_VIDEOMODE = 0;
+
 #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
    hb_set.HB_SET_FILECASE = HB_SET_CASE_MIXED;
    hb_set.HB_SET_DIRCASE = HB_SET_CASE_MIXED;
@@ -1474,6 +1484,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_DIRCASE = HB_SET_CASE_LOWER;
    hb_set.HB_SET_DIRSEPARATOR = '\\';
 #endif
+
    hb_set.HB_SET_ERRORLOOP = 8;
 
 /* JC1: Set for output thread safety */
@@ -1487,6 +1498,7 @@ void hb_setInitialize( void )
    hb_set.hb_set_winprinter=FALSE;
    hb_set.hb_set_printerjob=NULL;
    hb_set.hb_set_winprinter=FALSE;
+
    sp_sl_first = sp_sl_last = NULL;
    s_next_listener = 1;
    s_HaveSetPrinterName = FALSE ;
@@ -1523,7 +1535,6 @@ void hb_setRelease( void )
    if( hb_set.HB_SET_PATH )       hb_xfree( hb_set.HB_SET_PATH );
    if( hb_set.HB_SET_PRINTFILE )  hb_xfree( hb_set.HB_SET_PRINTFILE );
    if( hb_set.hb_set_printerjob )  hb_xfree( hb_set.hb_set_printerjob );
-
 
    hb_set.HB_SET_TYPEAHEAD = -1; hb_inkeyReset( TRUE ); /* Free keyboard typeahead buffer */
 

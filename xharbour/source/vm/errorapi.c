@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.31 2003/12/11 16:32:23 lf_sfnet Exp $
+ * $Id: errorapi.c,v 1.32 2003/12/28 22:25:35 druzus Exp $
  */
 
 /*
@@ -96,6 +96,8 @@
    better shows what is really the problem. [vszakats] */
 #define HB_ERROR_LAUNCH_MAX hb_set.HB_SET_ERRORLOOP
 
+static PHB_DYNS s_pDynErrorNew;
+
 /* In MT, this data is held in the stack */
 #ifndef HB_THREAD_SUPPORT
    static HB_ERROR_INFO_PTR s_errorHandler = NULL;
@@ -187,12 +189,21 @@ HB_FUNC( DOSERROR )
 
 void HB_EXPORT hb_errInit( void )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_errInit()"));
 
-   /* initialize an item
-    * NOTE: hb_itemClear() cannot be used to initialize an item because
-    * memory occupied by the item can contain garbage bits
-   */
+   s_errorHandler = NULL;
+   s_iLaunchCount = 0;
+   s_uiErrorDOS = 0;
+
+   s_pDynErrorNew = hb_dynsymGet( "ERRORNEW" );
+
+   if( s_pDynErrorNew == NULL )
+   {
+      hb_errInternal( HB_EI_ERRUNRECOV, "Couldn't locate ErrorNew() symbol in hb_errInit()", NULL, NULL );
+   }
+
    #ifndef HB_THREAD_SUPPORT
       s_errorBlock = hb_itemNew( NULL );
    #endif
@@ -213,25 +224,11 @@ void HB_EXPORT hb_errExit( void )
 PHB_ITEM HB_EXPORT hb_errNew( void )
 {
    HB_THREAD_STUB
-   #ifdef HB_THREAD_SUPPORT
-   HB_DYNS Dyn;
-   #endif
 
-   static PHB_DYNS pDyn;
    PHB_ITEM pError;
    char *szModuleName;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_errNew()"));
-
-   if( pDyn == NULL )
-   {
-      pDyn = hb_dynsymGet_r( "ERRORNEW", &Dyn );
-
-      if( pDyn == NULL )
-      {
-         hb_errInternal( HB_EI_ERRUNRECOV, "Couldn't locate ErrorNew() symbol in hb_errNew()", NULL, NULL );
-      }
-   }
 
    if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
    {
@@ -244,7 +241,7 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
 
    pError = hb_itemNew( NULL );
 
-   hb_vmPushSymbol( pDyn->pSymbol );
+   hb_vmPushSymbol( s_pDynErrorNew->pSymbol );
    hb_vmPushNil();
    hb_vmDo( 0 );
 

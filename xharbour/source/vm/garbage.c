@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.70 2003/12/19 07:30:01 ronpinkas Exp $
+ * $Id: garbage.c,v 1.71 2003/12/20 01:15:57 ronpinkas Exp $
  */
 
 /*
@@ -841,6 +841,21 @@ void hb_gcReleaseAll( void )
    HB_TRACE( HB_TR_INFO, ( "DONE Release All" ) );
 }
 
+void hb_gcInit( void )
+{
+    s_pCurrBlock = NULL;
+    s_pLockedBlock = NULL;
+
+    #ifdef GC_RECYCLE
+       s_pAvailableItems = NULL;
+       s_pAvailableBaseArrays = NULL;
+    #endif
+
+    s_bCollecting = FALSE;
+    s_bReleaseAll = FALSE;
+    s_uUsedFlag = HB_GC_USED_FLAG;
+    s_uAllocated = 0;
+}
 
 /* service a single garbage collector step
  * Check a single memory block if it can be released

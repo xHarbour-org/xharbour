@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.78 2003/12/19 16:36:41 jonnymind Exp $
+* $Id: thread.h,v 1.79 2003/12/27 02:57:13 fsgiudice Exp $
 */
 
 /*
@@ -224,11 +224,6 @@ extern "C" {
 /*
 * Enanched stack for multithreading
 */
-
-typedef struct
-{
-   PHB_DYNS pDynSym;             /* Pointer to dynamic symbol */
-} DYNHB_ITEM, * PDYNHB_ITEM, * DYNHB_ITEM_PTR;
 
 /* Forward declarations for stack */
 struct HB_ERROR_INFO_;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2148 2004/01/26 22:03:22 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.2149 2004/01/27 02:55:14 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-26 18:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/dynsym.c
+  * include/thread.h
+  * include/hbapi.h
+    -+ Moved definition of DYNHB_ITEM to hbapi
+
+  * include/hbapi.h
+  * source/vm/dynsym.c
+    + HB_EXPORT PDYNHB_ITEM hb_dynsymItems( void );
+    + HB_EXPORT USHORT    * hb_dynsymCount( void );
+
+  * source/rtl/terror.prg
+    + Added logic to intercept and stop recusrive errors.
+
+  * source/vm/classes.c
+    % Optimized __CLS_PARAM()
+
+  * source/rtl/inkey.c
+  * source/rtl/set.c
+  * source/vm/dynsym.c
+  * source/vm/errorapi.c
+  * source/vm/fm.c
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+    * Revised Init/Exit rutines to allow multiple sets of hb_vmInit()/hb_vmQuit()
+
+  * tests/pp.prg
+  * tests/pp_harb.ch
+    * Minor revision.
 
 2004-01-27 03:54 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   ! tests/tbrowse.prg -> tbrowse_old.prg

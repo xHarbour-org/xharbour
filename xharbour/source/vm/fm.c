@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.50 2003/12/15 02:35:37 jonnymind Exp $
+ * $Id: fm.c,v 1.51 2003/12/23 00:49:09 druzus Exp $
  */
 
 /*
@@ -207,13 +207,13 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
 #ifdef HB_FM_STATISTICS
 
    HB_CRITICAL_LOCK( hb_allocMutex );
-   
+
 #ifdef HB_FM_WIN32_ALLOC
    pMem = (void *) LocalAlloc( LMEM_FIXED, ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
 #else
    pMem = malloc( ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
 #endif
-   
+
    if( ! pMem )
    {
       HB_CRITICAL_UNLOCK( hb_allocMutex );
@@ -312,7 +312,7 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
 #else
    pMem = malloc( ulSize );
 #endif
-   
+
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
 #endif
@@ -338,7 +338,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 #ifdef HB_FM_STATISTICS
 
    HB_CRITICAL_LOCK( hb_allocMutex );
-   
+
 #ifdef HB_FM_WIN32_ALLOC
    pMem = (void *) LocalAlloc( LMEM_FIXED, ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
 #else
@@ -390,7 +390,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    else
    {
       HB_THREAD_STUB
-      
+
       if(
          #if defined( HB_THREAD_SUPPORT )  /*** Se JC1: notes at begin */
             hb_ht_stack != 0 &&
@@ -503,12 +503,12 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    }
 
 #ifdef HB_FM_WIN32_ALLOC
-   pMem = (void *) LocalReAlloc( (HLOCAL) pMemBlock, 
+   pMem = (void *) LocalReAlloc( (HLOCAL) pMemBlock,
           ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ), LMEM_MOVEABLE );
 #else
    pMem = realloc( pMemBlock, ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
 #endif
-   
+
    s_lMemoryConsumed += ( ulSize - ulMemSize );
 
    if( s_lMemoryMaxConsumed < s_lMemoryConsumed )
@@ -580,7 +580,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 #else
    pMem = realloc( pMem, ulSize );
 #endif
-   
+
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
 #endif
@@ -715,6 +715,19 @@ ULONG HB_EXPORT hb_xsize( void * pMem ) /* returns the size of an allocated memo
 void HB_EXPORT hb_xinit( void ) /* Initialize fixed memory subsystem */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xinit()"));
+
+   #ifdef HB_FM_STATISTICS
+      s_lMemoryBlocks = 0;      /* memory blocks used */
+      s_lMemoryMaxBlocks = 0;   /* maximum number of used memory blocks */
+      s_lMemoryMaxConsumed = 0; /* memory size consumed */
+      s_lMemoryConsumed = 0;    /* memory max size consumed */
+      s_lAllocations = 0;
+      s_lReAllocations = 0;
+      s_lFreed = 0;
+
+      s_pFirstBlock = NULL;
+      s_pLastBlock = NULL;
+   #endif
 
    #ifdef HB_THREAD_SUPPORT
       hb_threadInit();
