@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.31 2004/03/24 03:18:05 lculik Exp $
+ * $Id: zip.c,v 1.32 2004/03/24 12:17:39 lculik Exp $
  */
 
 /*
@@ -342,7 +342,6 @@ HB_FUNC( HB_ZIPFILE )
 
       if ( pParam )
       {
-//s.r. Error if the 4 paramater is passed and it's not a codeblock
          char szFile[ _POSIX_PATH_MAX ];
          PHB_ITEM pProgress = hb_param( 9, HB_IT_BLOCK );
          PHB_ITEM pExclude = hb_param( 10, HB_IT_STRING | HB_IT_ARRAY );
@@ -359,18 +358,18 @@ HB_FUNC( HB_ZIPFILE )
                                   hb_paramError( 4 ) );
             return;
          }
-//
 
          iProgress.type = HB_IT_NIL;
 
-//s.r. Keep current directory because hb_fsdirectory change it !
 
-            pCurDir = ( BYTE * )hb_xstrcpy( NULL, OS_PATH_DELIMITER_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
-//
+         pCurDir = ( BYTE * )hb_xstrcpy( NULL, OS_PATH_DELIMITER_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
 
          ZipCreateExclude( pExclude );
 
          ZipCreateArray( pParam );
+
+         hb_fsChDir( pCurDir ) ;
+         hb_xfree( pCurDir ) ;
 
          if( pProgress )
          {
@@ -397,10 +396,6 @@ HB_FUNC( HB_ZIPFILE )
 
          hb_itemClear( &iProgress );
          hb_xfree( szZipFileName );
-//s.r. restore to the old directory
-         hb_fsChDir( pCurDir ) ;
-         hb_xfree( pCurDir ) ;
-//
       }
    }
 
@@ -572,10 +567,8 @@ HB_FUNC( HB_UNZIPFILE )
       Temp.type = HB_IT_NIL;
       iProgress.type = HB_IT_NIL;
 
-//s.r. Keep current directory  !
 
       pCurDir = ( BYTE * )hb_xstrcpy( NULL, OS_PATH_DELIMITER_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
-//
 
       if( pProgress )
       {
@@ -642,10 +635,8 @@ HB_FUNC( HB_UNZIPFILE )
       hb_xfree( szZipFileName );
       hb_itemClear( &iProgress );
       hb_itemClear( &UnzipFiles );
-//s.r. restore to the old directory
       hb_fsChDir( pCurDir ) ;
       hb_xfree( pCurDir ) ;
-//
    }
 
    hb_retl( bRet );
