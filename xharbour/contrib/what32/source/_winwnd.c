@@ -1017,7 +1017,7 @@ HB_FUNC( SETWINDOWLONGPTR )
 
 //-----------------------------------------------------------------------------
 // WINUSERAPI ULONG_PTR WINAPI GetClassLongPtrA( IN HWND hWnd, IN int nIndex);
-
+#ifndef __WATCOMC__
 HB_FUNC( GETCLASSLONGPTR )
 {
     hb_retnl((ULONG_PTR) GetClassLongPtr( (HWND) hb_parnl( 1 ), hb_parni( 2 ) ) ) ;
@@ -1030,6 +1030,7 @@ HB_FUNC( SETCLASSLONGPTR )
 {
    hb_retnl( (ULONG_PTR) SetClassLongPtr( (HWND) hb_parnl( 1 ), hb_parni( 2 ), (LONG_PTR) hb_parnl(3) ) ) ;
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI GetWindowInfo( IN HWND hwnd, OUT PWINDOWINFO pwi );

@@ -17,6 +17,7 @@
 #define _WIN32_IE      0x0500
 
 #ifndef __MINGW32__
+#ifndef __WATCOMC__
 
 #include   "windows.h"
 #include   "shlobj.h"
@@ -271,7 +272,6 @@ HB_FUNC( FTPCOMMAND )
          hb_stornl( ( ULONG ) phFtpCommand, 6 ) ;
    }
 }
-
 //---------------------------------------------------------------------//
 /*
    HINTERNET FtpFindFirstFile(
@@ -616,4 +616,5 @@ HB_FUNC( INTERNETATTEMPTCONNECT )
 
 //---------------------------------------------------------------------//
 
+#endif
 #endif

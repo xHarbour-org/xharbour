@@ -217,14 +217,14 @@ HB_FUNC( GETICONINFO )
 //-----------------------------------------------------------------------------
 // SHSTDAPI_(HICON) DuplicateIcon(HINSTANCE hInst, HICON hIcon);
 
-
+#ifndef __WATCOMC__
 HB_FUNC( DUPLICATEICON )
 {
    hb_retnl( (LONG) DuplicateIcon(  ISNIL( 1 ) ? GetModuleHandle(NULL) : (HINSTANCE) hb_parnl( 1 ),
                                    (HICON) hb_parnl( 2 )
                                  ) ) ;
 }
-
+#endif
 //-----------------------------------------------------------------------------
 // SHSTDAPI_(HICON) ExtractAssociatedIconA(HINSTANCE hInst, LPSTR lpIconPath, LPWORD lpiIcon);
 

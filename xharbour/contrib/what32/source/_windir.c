@@ -4,15 +4,10 @@
 
 
 #define HB_OS_WIN_32_USED
-#define _WIN32_WINNT   0x0400
+#define _WIN32_WINNT   0x0500
 
 #include <windows.h>
 #include "hbapi.h"
-/*
-#include "hbvm.h"
-#include "hbstack.h"
-#include "hbapiitm.h"
-*/
 
 //-----------------------------------------------------------------------------
 // WINBASEAPI DWORD WINAPI GetLogicalDrives( VOID );

@@ -169,14 +169,14 @@ HB_FUNC( SHAPPBARMESSAGE )
 //-----------------------------------------------------------------------------
 // SHSTDAPI_(DWORD) DoEnvironmentSubstA(LPSTR szString, UINT cchString);
 
-
+#ifndef __WATCOMC__
 HB_FUNC( DOENVIRONMENTSUBST )
 {
    hb_retnl((LONG) DoEnvironmentSubst( (LPSTR) hb_parcx( 1 ) ,
                                        (UINT) hb_parni( 2 )
                                      ) ) ;
 }
-
+#endif
 //-----------------------------------------------------------------------------
 // SHSTDAPI_(UINT) ExtractIconExA(LPCSTR lpszFile, int nIconIndex, HICON *phiconLarge, HICON *phiconSmall, UINT nIcons);
 

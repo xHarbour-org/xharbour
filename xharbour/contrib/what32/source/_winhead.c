@@ -8,19 +8,17 @@
 
 #include <windows.h>
 #include <shlobj.h>
-//#include <commctrl.h>
+#include <commctrl.h>
 
 #include "item.api"
 #include "hbapi.h"
-//#include "hbvm.h"
-//#include "hbstack.h"
-//#include "hbapiitm.h"
 
 extern PHB_ITEM Rect2Array( RECT *rc  );
 extern BOOL Array2Rect(PHB_ITEM aRect, RECT *rc );
 extern PHB_ITEM Point2Array( POINT *pt  );
 extern BOOL Array2Point(PHB_ITEM aPoint, POINT *pt );
 
+#ifndef __WATCOMC__
 
 //-----------------------------------------------------------------------------
 
@@ -354,3 +352,6 @@ HB_FUNC( HEADER_LAYOUT )
 
 
 //--------- eof.
+//
+
+#endif

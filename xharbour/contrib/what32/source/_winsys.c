@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.25 2004/08/16 12:51:51 mauriliolongo Exp $
+ * $Id: _winsys.c,v 1.26 2004/08/29 09:56:37 lf_sfnet Exp $
  */
 
 //-------------------------------------------------------------------//
@@ -35,7 +35,7 @@
 
 #include <shlobj.h>
 #include <windows.h>
-#ifndef __MINGW32__
+#if !defined(__MINGW32__) && !defined(__WATCOMC__)
 #include <htmlhelp.h>
 #endif
 

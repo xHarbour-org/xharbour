@@ -1,6 +1,7 @@
 #define _WIN32_WINNT   0x0400
 
 #ifndef __MINGW32__
+#ifndef __WATCOMC__
 
 #include <windows.h>
 #include <shlobj.h>
@@ -355,4 +356,5 @@ HB_FUNC( TABCTRL_GETUNICODEFORMAT )
 
 //---------------------------------------------------------------------------//
 
+#endif
 #endif

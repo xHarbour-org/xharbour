@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.66 2004/08/16 12:51:50 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.67 2004/08/29 09:56:35 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-29 13:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * contrib/what32/_windir.c
+  * contrib/what32/_winhead.c
+  * contrib/what32/_winicon.c
+  * contrib/what32/_winilst.c
+  * contrib/what32/_wininet.c
+  * contrib/what32/_winshell.c
+  * contrib/what32/_winsys.c
+  * contrib/what32/_wintab.c
+  * contrib/what32/_winwnd.c
+    * added some #ifdef __WATCOMC__ and some includes to get it built
+    * with OpenWatcom 1.3 W32. Some are completely commented out due to lack of
+    * support in the free w32api.
 
 2004-08-29 12:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * contrib/what32/_wincall.c
