@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2369 2004/02/22 10:16:54 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2370 2004/02/22 12:15:53 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-22 18:01 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
+  + doc/howtoext.txt
+    + beginned a small tutorial on essential things to know to write an
+      xharbour extension. Important notes on memory usage and concepts.
+      Everyone's invited in adding it's contribute.
+
+  * doc/hbxml.txt
+    * minor layout
+
+  * include/hbapi.h
+    - removed unexisting function definition. Was a leftover of some other
+      works.
+
 2004-02-22 19:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * include/hbapiitm.h
   * source/vm/itemapi.c

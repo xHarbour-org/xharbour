@@ -1,0 +1,1136 @@
+
+                                 X H A R B O U R
+                            HOWTO write new functions
+                             and extension libraries
+
+                         Technical Notes for xHB developers
+
+                               Giancarlo Niccolai
+
+                                 gc@niccolai.ws
+
+
+$Id$
+
+
+STATUS OF THIS DOCUMENT
+=======================
+
+This is a draft written in the eve of xharbour .93 release; it's currently
+awaiting for approval of xharbour core developers.
+
+
+
+ABSTRACT
+========
+
+This is a short HOWTO targeted to explain the "correct" programming
+techniques and standards that have been developed lately by the xharbour
+core developers group. Theese are guidelines meant to help developers
+to build extensions to xharbour language, 3d party libraries or to
+contribute to the core xharbour project, both by refining older
+existing functions and add new functionalities.
+
+Here it's presumed a very basic knowledge of C and xharbour/clipper
+"extend" api; actually, the most important things are explained, so
+you can continue reading this text even if you have never written
+an clipper extension. If you're missing details, you can consult
+the api guide (somewhere in this directory).
+
+This document is divided into fuor sections:
+
+   1) Coding conventions: how to lay down C code to make other developers
+      happy (to be written).
+
+   2) Anatomy of a function: basic overview of a well written xharbour
+      extension in C.
+
+   3) Memory management: usage of xharbour memory management and item
+      interface.
+
+   4) Advanced memory usage: writing your own opaque objects.
+
+
+
+                        SECTION 1: CODING CONVENTIONS
+
+             How to lay down C code to make other developers happy
+             =====================================================
+
+Xharbour is quite rigid about coding convention and styles. In short,
+Follow those rules:
+
+   1) use xharbour defined types: USHORT, INT, LONG, LONGLONG, DOUBLE etc,
+      do not rely on compiler provided types as int, short, unsigned short
+      etc. A list of currently available macros is in include/clipdefs.h
+
+   2) name variables using meaningful initials; generally, usName for
+      unsigned short variables, iName for integers, dName for doubles
+      szName for string (zero terminated). For objects, capitalize
+      first letter, as struct MYSTRUCT MyObject. For HB_ITEM variables,
+      use hbName, or something better if you have an idea of what kind
+      of object they'll hold, like i.e. hbArrName if you know you are
+      using a variable just to store a name. for HB_ITEM pointers
+      (PHB_ITEM) just use pName.
+
+   3) Indent with three spaces; avoid both tabs and different spacings.
+
+   4) always use "brackts on separate lines" convention, like that:
+      if statement
+      {
+         statement
+      }
+      else
+      {
+         statement
+      }
+      No matter if the bracketed statement is just one line.
+
+   5) write well formatted lists: parenthesis of function calls should
+      be separed by one space from the parameter list, and every element
+      should be separated by a comma then a space from the next. Statements
+      before the parenthesis (i.e. function calls) should be immediately
+      followed by open brackets. Separate operators with two spaces on
+      each sides (exception: ++ and -- operators).
+      Brackets indicating a cast should touch their content, without spaces.
+      This is an example of well formatted line:
+
+      pItem = (PHB_ITEM) hb_someFunction( param1, param2, param3 );
+
+   6) use one indent for multiline statements; try to arrange on multiple
+      lines meaningfull contents. This is an example:
+
+      if( ( condition 1 || condition2 ) &&
+         ( condition 3 || condition 4 ) &&
+         ( condition 5 || condition 6 ) )
+      {
+         statements...
+      }
+
+   7) Please, try to write lots of comment. Put comments before the
+      instruction they refer to, with the same indentation level.
+      Also, avoid absolutely trivial comments; some comments are
+      more confusing than the code they wish to explain. Use //
+      for single line comments and /* */ for multiple line,
+      indenting three spaces under the multiple line comment.
+      Possibly, put the closing */ on a line alone.
+      Use // on the same line of the statement to provide
+      very small reminders. Like:
+
+      /* This is the main cicle.
+         Here you will see how comments are proficiently used.
+      */
+      while( iCount < 100 )
+      {
+         // store the data.
+         myFuncStore( data );
+
+         // wait for the system to be ready.
+         // TODO: find a non-polling way.(*)
+         while( ! myFuncIsSysReady() )
+         {
+            Wait( time );
+         }
+
+         myFuncWrite( data ); // "data" has been updated.
+
+         // avoid to say things like: increment counter here
+         iCount ++;
+      }
+
+         (*) Theese are two single line comments each near the other;
+             it's preferable to avoid to put them in the same /* */
+             group.
+
+      8) Remember to put the CVS Id Command and the xharbour disclaimer
+         at the head of each file you write. It's important.
+
+Of course, no one will torture you (maybe) if you don't follow this rules,
+but you can bet that sooner or later someone will change your code to match
+them; so, it's better to make it right from the start.
+
+
+
+                       SECTION 2: ANATOMY OF A FUNCTION
+
+           Basic overview of a well written xharbour extension in C
+           ========================================================
+
+An xharbour extension function may be divided into parts as follows:
+
+// minimal include set:
+#include "hbapi.h"
+#include "hbapiitm.h"
+#include "hbapierr.h"
+
+HB_FUNC( FUNCTION_NAME )
+{
+   // 1: Parameter retrival logic
+   // 2: Parameter check logic & error signaling
+   // 3: Parameter manipulation logic
+   // 4: Processing logic
+   // 5: Feedback logic
+}
+
+All this parts except 4 (processing logic, that is, the real job) are optionals,
+and in some cases, for efficiency reason as we'll see, they may be intermixed.
+
+Let's see the various parts in detail:
+
+
+Parameter retrival logic
+========================
+
+The first part of the function is dedicated to retreive data passed as
+parameters from xharbour. Xharbour supports variable length parameter functions,
+and NIL (that is missing) parameters, although your function may accept only
+fixed parameter prototypes if it prefers so.
+
+It's common to accept the parameters in a set of PHB_ITEM variables,
+declared and possibly assigned right after the function bracket opening;
+this helps the readers to have an immediate idea of what kind of parameters
+you are willing to receive.
+
+Unless steps 1 to 3 are exceptionally simple, use hb_param( num, TYPE ) to
+retreive parameter values; this function return NULL if the given parameter
+does not matches the kind of data you are expecting, so checks are easy
+to do. Also, older hb_parxx( num ) functions does not return any information
+of the item that were holding the data, so you won't be able to know details
+as i.e. a string length without using strlen(), which is an heavy function,
+and you will loose numeric precision hints stored in parameters. In other
+words, generally avoid them.
+
+hb_param( num, type ); returns a PHB_ITEM, a pointer to an xharbour variable
+representing a parameter of the function, numbered starting from 1,
+that should not be altered, changed or de-allocated. In general, you should
+consider the data you receive as read only, unless the variable is passed
+by reference. In that latter case, you should receive the data as
+hb_param( num, HB_IT_BYREF ). This will provide you with a read-write instance
+of the variable, that you can alter to the point that you may even destroy it
+and set it to NIL, or put a completely different data type inside it. We'll
+go into further detail in the next session.
+
+The type you pass may be a combination of several HB_IT_* values; one most
+common case is the HB_IT_ALL value that combines all the values (except
+HB_IT_BYREF). If the required parameter is missing, or if the parameter
+is of an incompatible type with the bitmask you have passed, hb_param
+will return null. The list of available types is at beginning of
+include/hbapi.h.
+
+This is a well written extension function prolog:
+
+#include "hbapi.h"
+#include "hbapiitm.h"
+#include "hbapierr.h"
+
+HB_FUNC( MYFUNC )
+{
+   PHB_ITEM pName = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pAge = hb_param( 2, HB_IT_NUMERIC );  // if nil must default to 18
+   PHB_ITEM pResult = hb_param( 3, HB_IT_BYREF ); // may be NIL
+
+   USHORT usTempVar;  // parameters are over here.
+   HB_ITEM hbMyInternalItem;
+   ....
+
+
+
+Parameter check logic
+=====================
+
+A well written xharbour extension should check for the user to have correctly
+called the functions, and should give a consistent error message if the
+function has been misused. Also, it's possible that the function will want to
+act differently if some parameter is missing, or may accept a variable count
+of parameters.
+
+The function hb_pcount() returns the amount of parameters that the function
+has been called with. If this number has to be used frequently, it's advisable
+to record it in a USHORT variable right after the parameter declaration,
+in function prolog.
+
+The most common case you'll encounter will be a "can't do without" situation,
+like this:
+
+#include "hbapi.h"
+#include "hbapiitm.h"
+#include "hbapierr.h"
+
+HB_FUNC( MYFUNC )
+{
+   PHB_ITEM pName = hb_param( 1, HB_IT_STRING );
+
+   if ( pName == NULL )
+   {
+      // signal error
+   }
+   ...
+
+Another common situation is when a parameter may be missing, but if it's not
+missing, then it MUST be of a certain kind:
+
+HB_FUNC( MYFUNC )
+{
+   PHB_ITEM pName = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pAge = hb_param( 2, HB_IT_NUMERIC );
+   USHORT usParams = hb_pcount();
+
+   if ( pName == NULL || ( usParam > 1 && pAge == NULL ) )
+   {
+      // signal error
+   }
+   ...
+
+As you can see, we can accept that pAge is nil, but only if just one
+parameter has been given. If a second parameter has been given but it's
+not a numeric variable, then we report the misuse of the function.
+
+It's a common behavior to ignore eventual other parameters; i.e. if the above
+function had two or more parameters, they should simply be ignored, and
+the system should not report any error.
+
+
+Parameter error signaling
+=========================
+
+To signal an error bound to wrong arguments, two functions has been provided:
+they are hb_errRT_BASE_SubstR() and hb_paramError(). The first creates an
+error event that reports a list of hb_items, the second reterivs a given
+argument of any kind, returning a valid PHB_ITEM with NIL value if the
+parameter is missing. hb_errRT_BASE_SubstR() also informs the VM that an
+error condition has been rised, and so triggers BEGIN SEQUENCE, TRY/CATCH or
+default error handlers, as soon as the Virtual Machine returns in control.
+
+They both are defined in hbapierr.h:
+
+extern void HB_EXPORT hb_errRT_BASE_SubstR(
+   ULONG ulGenCode, // error code
+   ULONG ulSubCode, // subsystem code
+   char * szDescription, // description of error or NULL
+   char * szOperation,   // name of function causing the error
+   ULONG ulArgCount,     // number of expected parameters
+   ... );                // lists of expected parameters
+
+The error code you want to pass in occasion of wrong arguments is defined as
+EG_ARG. The subsystem code depends on the function group the calling function
+belongs to. In example, if your function were a part of a database management
+extension, you should use one fitting EDBCMD_* macro; for file related
+operation, you would use 4001. Those number were defined long ago in CLIPPER
+language, and you may find some documentation on the internet about it; also,
+you should look at source code of similar functions to get an hint. If you
+are writing an extension on your own (i.e. a set of function to manage the
+USB port), you may wish to use a unique number. If uncertain, use 0.
+
+szDescription may be safely left to NULL; in this case, a consistent
+internationalized description of the ulGenCode will be used. Use this field
+only if you are confident in the fact that the user needs a more specific int
+about WHAT has gone wrong with its parameters. In example, if your function
+accepts only parameters in a determined numeric range, you may want to
+inform the user that the function failed specifically because the nth
+parameters were outside the valid range.
+
+As szOperation, use the name of the function that caused the error.
+generally, use the capitalized function name you have in the HB_FUNC()
+macro. If the error has been detected in a service function called
+by HB_FUNC( xxx ), you may want to use the original PRG fucntion name
+or to signal specifically the uncapitalized C name of the service function
+where the error has been detected.
+
+ulArgCount should be set to the amount of parameters you are willing to
+accept in this function. Even if the function has been actually called
+with fewer parameters, and may wish to allow this by defaulting the
+missing ones,  you should anyhow set here the amount of parameters
+that you are ready to accept; in this way, the user will be hinted about
+the fact that the function is interpreting some ungiven parameter as NIL, or
+providing useful defaults, or if the number of passed parameters is greater
+than ulArgCount, that the function is discarding those extra parameters.
+
+Then you must pass an amount of hb_paramError( n ) equal to ulArgCount,
+with n ranging from 1 to ulArgCount. If you fail to do so, you'll probably
+get a page fault on most architectures.
+
+Right after calling this function, you should immediately place a return
+statement. Some books or some high-school grade courses are disregarding
+return statements before the end of a function as "non-structured programming",
+and preach to avoid it like plague, with the claim that a program full of
+non-structured programming flows is unreadable, and theoretically wrong.
+
+Please, forget about it. There's a BIG function below our initial prologue
+and parameter check. We want to have a function that, after a visual
+point that can be known by heart with an experience of just 10 minutes in
+xharbour extension programming, hasn't any problem with unchecked parameters.
+Parameters, after parameter check, must be just right; so, please, return
+immediately here if there's something wrong, and avoid to put another
+indentation level and bracket compound around the rest of function body.
+
+There are some extremely complex functions that may require constant
+reference to the parameter checking and validity. In the whole set of
+RTL and VM xharbour functions, they can be counted in less than 10; so
+it's unlikely that you have a similar case; if you do, check 10 times
+if you can simplify your function, and put all the parameter checking
+and error signaling right after the function prologue. Do it for
+your own mental sanity, and for ours. Mad IT developers are quite useless.
+
+This is a viable example:
+
+#include "hbapi.h"
+#include "hbapiitm.h"
+#include "hbapierr.h"
+
+HB_FUNC( MYFUNC )
+{
+   PHB_ITEM pName = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pAge = hb_param( 2, HB_IT_NUMERIC ); // valid in 0 .. 150
+   USHORT usParams = hb_pcount();
+   USHORT usAge;
+
+   if ( pName == NULL || ( usParam > 1 && pAge == NULL ) )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
+         "MYFUNC", 2,
+         hb_paramError( 1 ), hb_paramError( 2 ) );
+      return;
+   }
+
+   usAge = hb_itemGetNI( pAge );
+   if ( usAge < 0 || usAge > 150 )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 0,
+         "Second argument must be a numeric in 0..150 range.",
+         "MYFUNC", 2,
+         hb_paramError( 1 ), hb_paramError( 2 ) );
+      return;
+   }
+
+   ...
+
+
+Parameter manipulation logic
+============================
+
+After having retreived parameters in local variables, you may want to
+extract them into C variables for easier processing, and possibly give
+some defaults if some optional parameters are missing.
+
+If the variables are holding a NULL pointer, you can safely set some
+defaults, like in this example:
+
+#include "hbapi.h"
+#include "hbapiitm.h"
+#include "hbapierr.h"
+
+HB_FUNC( MYFUNC )
+{
+   PHB_ITEM pName = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pAge = hb_param( 2, HB_IT_NUMERIC ); // defaults to 18
+   USHORT usAge;
+
+   /* parameter cheching here;
+      ripped for simplicity
+   */
+
+   if( pAge == NULL )
+   {
+      usAge = 18;
+   }
+   else
+   {
+      usAge = hb_itemGetNI( pAge );
+   }
+   ...
+
+Resist the temptation to write some defaults into the parameters by using
+hb_itemPutxxxx( pParameter, someValue ); doing this my have unexpected
+results, from page faults to memory leaks, at best.
+
+There's two way to alter parameters so that the calling program receives
+the parameters changed: first method consists in having the calling program
+to pass a variable by reference with the "@" Xharbour pass-by-reference
+operator, like i.e. MyFunc( @xParam ). The called function will retreive
+that data  with hb_param( n, HB_IT_BYREF ); if the data is both input and
+output, that is, if the data must be used by the called function before
+being altered, the object returned by hb_param( n, HB_IT_BYREF ) must be
+checked both to be not NULL and to be of the same kind that we expect, like:
+
+
+#include "hbapi.h"
+#include "hbapiitm.h"
+#include "hbapierr.h"
+
+HB_FUNC( MYFUNC )
+{
+   PHB_ITEM pName = hb_param( 1, HB_IT_BYREF );
+
+   if ( pName == NULL || ! HB_IS_STRING( pName ) )
+   {
+      // signal error
+   }
+   ...
+   // use pName's string.
+   // change pName to something else.
+
+As a shortcut, you may combine HB_IT_BYREF with other types, like i.e.
+
+   PHB_ITEM pName = hb_param( 1, HB_IT_BYREF | HB_IT_STRING );
+
+but in most cases you'll want to ignore the kind of data the variable
+had before, or provide different error messages if the variable is
+not passed by reference and if its passed by reference, but its
+not the right type. Finally, you may wish to have the parameter passed
+by reference, but act differently if it had an initial value or if it
+was NIL.
+
+Is then also possible to alter the content of deep variables passed as
+normal parameters; deep variables are strings, arrays, hashes, objects
+and in general any item whose PHB_ITEM->item.asXXXX.value field is
+just a pointer to "something else".
+
+In this case, the PHB_ITEM you receive is just a shell, a discardable
+thing with no importance at all; but the item.asXXX.value field contains
+the real object as seen by the PRG program, and you may alter it at will,
+provided you change it in a consistent way.
+
+In general, you can use functions that alters arrays, hashes and strings
+provided you use them respectively on arrays, hashes and strings.
+You may add items to arrays, change the value of any item, delete them
+or even shrink them and erase each one element; the calling program
+will have the object changed. You can put new string values into string
+parameters, and you can alter hash values; what you can't do is touch
+the NATURE of the passed-by-value deep parameter. If the parameter
+is NOT retreived with the HB_IT_BYREF flag, at the end of the function
+the parameters MUST retain the type they had, and their value must be
+valid. Trying to change the type of the parameter will result in very
+bad things; the parameter as WHOLE, its shell and its real value, may be
+changed only if it was passed and retreived by reference.
+
+This applies also if the parameter is not a deep type; you can't put
+an array in a parameter that had been a number, or change that number,
+unless it was passed by reference.
+
+
+Processing logic
+================
+
+XHarbour library functions, and the extensions you may want to write, can be
+grouped in two classes:
+
+   1) pure PRG extensions: functions and procedures should never
+      be used if not called directly from XHARBOUR code.
+
+   2) utility extensions that may be used both by xharbour and other
+      code internal to your extension.
+
+In the latter case, the processing logic should be removed from the
+function, and isolated in a pure C function that will be able to
+serve both the PRG extension and other parts of the libraries. This helps
+to insolate the extension interface logic from the real operation, and
+encourages the reusability of the internal engine.
+
+Even if the function is just meant to be used directly from the Xharbour
+code, it's OFTEN advisable to separate the function from the extension
+interface. If the parameters are simple enough, the waste of an extra
+function call is a absolutely trascurable overhead with respect to the
+same extension parameter processing, not to mention an entire virtual
+machine loop. On the other hand, if the internal processing logic code
+is ever needed by other parts of the libraries, calling the extended
+procedure with the VM api, that is, by using the Xharbour virtual machine
+stack to push the parameters and then call the hb_vmDo() or equivalent
+api function, is *times* heavier than have an extra call in the
+extended function body.
+
+As a general rule, the processing logic should be kept inside the function
+only if it takes greatly benefit from the variable and untyped parameter
+scheme of the xharbour function call convention. In all the other cases,
+if the XHarbour function parameters can be easly translated into C function
+parameters, it's advisable to have all non-trival processing logic into
+separate pure C functions.
+
+This helps to create whole interfaces levels that are relatively insolated;
+a desiderable side effect of this habit is that other extensions will be able
+to use the whole engine available to the Xharbour programs directly from
+simpler C calls. In example, this is how hashes and arrays are implemented:
+there are simple C functions as hb_hashAdd() and hb_hashLen() that are used
+by the PRG interfaces. This makes easier to use hashes objects directly
+inside C extensions, and use them even as convenience dictionary constructs
+when needed.
+
+
+Feedback logic
+==============
+
+Xharbour functions can inform the calling program about their processing
+results in two ways: by altering the parameters and by returning a value.
+We've already spoke about how the parameters may be changed to return
+some value to the calling program, so we'll concentrate here on the
+proper "return value".
+
+The return value may be collected by the Virtual Machine and stored
+into a variable, or checked into a conditional statement, or it can
+be immediately discarded.
+
+Functions, and even procedures, cannot "not-return" a value; the return
+value is always defaulted to NIL before calling the extended function.
+
+To return values, the hb_retxxx() functions are provied in hbapi.h; if
+you create elaborate return values, as whole arrays, or you evolve
+different results that are stored in an unique PHB_ITEM object, you
+may use hb_itemReturn and hb_itemReturnCopy. We'll speak about that
+in the section dedicated to memory management, as the way those
+functions are handled is quite delicate, and deserves a deeper look.
+
+hb_retxxx() does not returns immediately; this means that it's possible
+to issue more than one hb_retxxx() call; each will overwrite the previous,
+deleting the previously returned HB_ITEM. Anyhow, is quite preferable to
+have all the hb_retxxx() calls in one place, or have just one accepting some
+data created by the processing logic.
+
+There are general principles working in the return functions. Most notably,
+there are three kind of return functions: flat returns, supported returns
+and deep returns.
+
+Flat returns functions are those one returning numeric, date or logical data:
+hb_retn*(), hb_retd*() and hb_retl(). They just return an xharbour representation
+of numbers, dates or logical entitites into the VM, and translates more or less
+into a simple data copy inside the HB_VM_STACK.Return conveniency item.
+
+Supported returns are a set of hb_ret functions using their parameter to create
+a new item, that is then referenced by the virtual machin return. In this
+class, you can find hb_reta( ulLen ), hb_retc( szText ) and
+hb_retclen( szText, ulLen ). hb_reta returns a newly created array that has ulLen
+elements, all of them set to NIL. hb_retc abd hb_retclen return a text, creating
+a new string and copying the passed data into it. They can be used to return
+data that you may wish to copy in the virtual machine: in example
+
+   hb_retc( "a text" );
+
+Will cause "a text" to be duplicated and the duplicate will be used in the
+virtual machine. Don't use this functions with data that you have already
+allocated:
+
+HB_FUNC( CAUSINGLEAK )
+{
+   BYTE *szData = (BYTE *) hb_xgrab(100); // memory allocated: 100 bytes
+   sprintf( szData, "test" );
+   hb_retc( szData ); // MEMORY LEAK. szData is not returned, only a copy of it is.
+}
+
+To store in the VM some value you may have produced in the processing logic, use
+the deep return functions:
+   hb_retcAdopt( szText )
+   hb_retclenAdopt( szText, ulLen )
+   hb_retclenAdoptRaw( szText, ulLen )
+
+And static version:
+   hb_retcAdoptStatic( szText )
+   hb_retclenAdoptStatic( szText, ulLen )
+   hb_retclenAdoptRawStatic( szText, ulLen )
+
+The hb_retcAdopt function family saves the address of szText as a string in the
+VM; the already allocated address of szText is just used as the value of the
+string item. hb_retclenAdopt avoids the string length to be recalculated with
+C call strlen(), sparing time, and adds a CHR( 0 ) byte at szText[ ulLen ]; this
+means that szText must have ulLen + 1 bytes allocated, or the function may
+segfault. hb_retclenAdoptRaw does the same thing, except adding a CHR(0) at
+the end of the string; this is useful if you are certain that the CHR(0) must
+NOT be added (i.e. the string is made of all-binary data taken from a file) or
+if the termination character is already present.
+
+The static version of hb_retcAdopt function family acts as their non-static
+omologue, but they mark the string object as "static"; this means that Xharbour
+virtual machine will never try to free the object, even if the string is item
+is discarded. It's supposed that the calling program wishes this specific memory
+location to remain valid for all the program lifetime.
+
+The function hb_retptr() is provided to create user-defined atomic objects; objects
+that are stored inside an xharbour variable (in this case, objects that are
+returned as a variable) and that the XHarbour program can't manipulate directly.
+We'll see this function in a separate section.
+
+
+
+
+
+                           SECTION 3: MEMORY MANAGEMENT
+               usage of xharbour memory management and item interface
+               =======================================================
+
+Memory management in xharbour is simple; but it can get tricky if not well understood.
+So we'll introduce some general concept before entering into the details.
+
+Xharbour api provides two kind of dynamic memrory abstractions: collectable and
+unmanaged. Collectable memory is employed for items, and for the vast majority of
+item values. Unmanaged memory is at disposal of extensions to just have dynamic
+heap memory allocation handy; it's also used by some internal functions.
+
+Xharbour api works with two levels of item allocation hierarcy: flat items and
+deep items. Flat items just have their structure and the data held inside that;
+deep items have this structure and a "lone" pointer, referencing the "real"
+object, called "base" object. You can consider xharbour items as shells; some
+of those shells are just shells, on which you can scratch some data. Others are
+oysters containing something, and is that something's inside that is what matters.
+
+Namely, the flat items are the ones of type NIL, of any numeric type, dates and
+logical. Objects, arrays, hashes and pointers are deep items; each of them
+contains a "value", that can be accessed with api functions or querying directly the
+HB_ITEM structure: hbItem.item.asXXXX.value.
+
+All the "shells", all the items that are created and managed by the virtual machine
+are allocated using collectable memory; so are all deep contets, that is, all
+the values.
+
+Strings are an hybrid having both some data in the basic item strucutre and a
+pointer to a value that is allocated using unmanaged memory. By carefully recording
+string useage, in a process called reference counting, is possible to automatically
+get rid of unused string, but this "special" case for string is unefficient and
+may be changed in the future.
+
+
+Unmanaged memory
+================
+
+hb_xgrab() function family is responsible for unmanaged memory management.
+
+void *hb_xgrab( ULONG ulBytes ) allocates a certain amount of memory;
+if HB_FM_STATISTICS compilation flag is active (which is the default), a failure
+in memory allocation will cause an unrecoverable error and will terminate immediately
+the applicatio.
+
+void hb_xfree( void *data ) frees the memory allocated with hb_xgrab(). If HB_FM_STATISTICS are enabled, passing data that has not been allocated with hb_xgrab
+will cause a critical error and close the applciation
+
+void *hb_xrealloc( void *data, ULONG ulBytes ) resizes the allocated memory;
+if sucessful, the new memory location where the data is relocated is returned, on
+failure, the function causes a critical error and the application is terminated.
+
+XHarbour virtual machine records the usage of xgrabbed memory, and issues a warning
+at the end of the application if the some memory has not been freed; this helps
+to track memory usage and prevent memory leaks.
+
+Even if the activity of this functions is recorded, they provide "unmanaged" memory:
+the caller is the sole responsible for allocating and de-allocating memory via this
+functions. XHarbour does not helps in keeping track of this memory, so the developer
+must always be able to determine the exact moment in which the unmanaged memory
+is not useful anymore. When this happens, the memory must be released.
+
+Unmanaged memory must have a determined lifespan: an application creates it
+only if it exactly knows when it will be destroyed. It can be in the same function
+that creates it, or in a particular moment of the program, i.e. at the end.
+
+At the moment, xgrab() can provide also memory that may be stored inside strings with
+hb_itemPutCPtr() or returned via hb_retcAdopt* function family.
+
+
+Collecatble memory
+==================
+
+Collectable memory is subject to be collected in the case of the Virtual Machine
+garbage collector detects it's not anymore used by any active item. Collectable
+memory, or item memory, must be bound to an xharbour item, i.e. a LOCAL variable,
+a MEMVAR, the return value of a function, or it will be collected, that is
+destroyed. It's possible for the developer to instruct the GC not to collect some
+of this memory allocations by "locking" it; memory used as deep item values, that are
+pointers, arrays and hashes, is automatically excluded from garbage collecting, as
+long as there is some item referencing them.
+
+Strings have a "collectable" shell, but their value is currently allocated using
+uncollectable memory, and their shell is partally holding some meaningful data, as
+the string length.
+
+There are mainly two function set that deal with collectable memory: hb_itemNew()
+and hb_itemRelease() create and destroy an item, the shell that may host a deep value
+or the flat data. hb_gcAlloc() and hb_gcFree() are meant to allocate memory for the
+values, both those values that are used in standard deep item types, as array and
+hashes, or in custom item pointers.
+
+About hb_itemNew() and hb_itemRelease(), they are mainly used by the VM itself: they
+are used in creating stack items, memvars, globals and static variablse, and there
+is very little reason for the extension library to use them; also, hb_gcAlloc() is
+primarily meant for system objects, and is useable just by extensions willing to
+provide user-defined opaque objects.
+
+
+Using items in extensions
+=========================
+
+The most interesting useage of the itemapi for the purposes of the xharbour extension
+writer, is the ability to create complex objets, work on them and eventually return
+them or a copy of them. In example, having at disposal one of the best variable
+array functions around, it's pleasureable to be able to create an array from C
+extension routines to store i.e. a set of log entries coming from the xharbour code,
+and eventually provide access to those entries to the xharbour functions.
+
+Also, a set of values retreived in the system, as the system time, may be stored in
+an xharbour array inside an extension function, and then sent to the VM or stored
+locally for later useage.
+
+With a minimum care, this is quite easy.
+
+How to create an item?
+
+Usually, you'll want to have a small quantity of memory allocated in static data or
+in the stack, that can be used as an item shell. Before changing the item content,
+it's necessary to transform it in a NIL object; random initialization value may
+cause unpredictable results, as all api fucntion that can modify an item will
+try to clean the previous existing data before. If we have a random initial item type,
+the API will be fooled. So, before using any obhect that has been statically allocated
+use:
+
+   HB_ITEM hbItem;
+   hbItem.type = HB_IT_NIL;
+
+Now we are ready to transform this item in a flat one, like i.e. a number:
+   hb_itemPutND( &hbItem, 0.5 );
+   printf( "%f\n", hb_itemGetND( &hbItem ) );
+
+When the function returns, the data is destroyed, but static and globalvariables
+holding flat items can be created the same way; at program termination they will be
+removed.
+
+It's even possible to use unmanaged memory allocations to create item shells in the
+heap, and store them somewhere:
+
+   PHB_ITEM pItem = (PHB_ITEM) hb_xgrab( sizeof( HB_ITEM ) );
+   pItem->type = HB_IT_NIL;
+
+   // use the item
+   hb_itemPutND( pItem, 0.5 );
+   printf( "%f\n", hb_itemGetND( pItem ) );
+
+   // free it
+   hb_xfree( pItem );
+
+If the object has a longer lifespan, it can be stored in a global variable acting as
+a pointer, and freed on unser request or at program termination.
+
+Things are a little more complicated for complex objects. There is practically no
+difference if the lifespan of the object shell is short: when the shell is gone, the
+value is free and will be collected as soon as possible. The problem is that
+if the shell is allocated as static memory or with unmanaged memory as per the example
+above, the GC will not find the item shell in the collectable memory pool, and so
+it will recognize the value as free, and destroy it anyway!
+
+So, there are two alternatives. If we need the item only inside a function, and we
+can loose it before the VM retunrns in control, there's no problem:
+
+   HB_ITEM hbItem;
+   hbItem.type = HB_IT_NIL;
+
+   // prepare an array with zero elements
+   hb_arrayNew( &hbItem, 0 );
+
+   .... do something ...
+
+   printf( "%d\n", hb_arrayLen( &hbItem ) );
+   /*
+      end of function; the vm takes control and the garbage collector will
+      destroy hbItem value.
+   */
+
+If we need the lifespan of our object to cross extended function boundaries, we
+need to lock the value and explicitly free it when needed; again, there's two
+way to achieve this result:
+
+   PHB_ITEM pItem = (PHB_ITEM) hb_xgrab( sizeof( HB_ITEM ) );
+   pItem->type = HB_IT_NIL;
+
+   // prepare an array with zero elements
+   hb_arrayNew( pItem, 0 );
+
+   // lock the value of the shell.
+   hb_gcLock( (void *) pItem->item.asArray.value );
+
+   // use the item
+   printf( "%d\n", hb_arrayLen( pItem ) );
+
+   ... after some functions ...
+
+   // free it
+   hb_arrayRelease( pItem );
+   hb_xfree( pItem );
+
+   // or
+   hb_gcUnlock( (void *) pItem->item.asArray.value );
+   hb_xfree( pItem );
+
+Generally, it's better to remove immediately the memory with hb_gcFree() when you
+know that you won't use it anymore. There is a special use for the latter: if you
+share the object value with internal xharbour API, you may want to remove the
+lock but not to destroy it immediately.
+
+A more elegant way to achieve the same result, including automatic decisions about
+immediate or destruction of the value, is that of using the collectable
+memory allocation for the item shell itself:
+
+   // creates a new nil collectable item shell
+   PHB_ITEM pItem = hb_itemNew( NULL );
+
+   // lock the shell itself.
+   hb_gcLock( (void *) pItem );
+
+   // prepare an array with zero elements
+   hb_arrayNew( pItem, 0 );
+
+   // use the item
+   printf( "%d\n", hb_arrayLen( pItem ) );
+
+   ... after some functions ...
+
+   // declare we are not interested in the object anymore.
+   hb_itemRelease( pItem );
+
+hb_itemRelease does two things: deletes the shell and signals the GC that the value
+may be susceptible of collection.
+
+IMPORTANT: all the items must be released before hb_vmQuit() is called, that is,
+beofre the virtual machine terminates the execution, or the last complete
+collection won't be able to reclaim the objects, and a warning will be issued.
+
+
+Returning and copiyng values
+============================
+
+Having the ability to save virtual machine items OUTSIDE the virtual machine may
+be interesting, but is just half of what we can do. Most interesting here is to
+have the ability to send this object we have synthetized to the virtual machine,
+or to save objects coming from the virtual machine for later usage.
+
+hb_itemCopy() stores an item and its value in a locally provided item; hb_itemReturn()
+moves the value from our locally provided shell to the VM return item.
+hb_itemReturnCopy() does the same, but our local shell is left unhaltered.
+
+Any of this function will act on the shell, but will left untouched the value. If
+a flat object is copyied with hb_itemCopy, a change on the original flat shell would
+not be reflected in the copy, but if a deep object is copied, both the separate shells
+share the same deep value.
+
+To create fully independent clones of the items, it's necessary to rely on the
+specific item functions, i.e. hb_arrayClone, hb_hashClone; to deep-clone a string
+it's just enough to call
+      hb_itemPutC( pNewString, hb_itemGetCPtr( pOldString ) );
+as hb_itemPutC and hb_itemGetC and their family creates always a copy of the
+passed data, as for hb_retc and family.
+
+hb_*Ptr() returns always a raw pointer, and never copy data; in example,
+hb_arrayGetItemPtr( pArray, nItem ); will give you a pointer to the nth item itself.
+hb_itemPutCPtr( pItem, cstr, nLength ) is the equivalent of hb_retc*Adopt family;
+will store an already allocated cstr.
+
+This is a common scenario where an array created in a function is then passed to
+the virtual machine via return:
+
+HB_FUNC( RETURNINGARRAY )
+{
+   // our shell must not live past the function bounds.
+   HB_ITEM hbArrRet;
+
+   hbArrRet.item = HB_IT_NIL;
+   hb_arrayNew( &hbArrRet, 3 );
+
+   //... setting some data in the array...
+   hb_itemPutC( hb_arrayGetItemPtr( &hbArrRet, 1 ), "A string copied" );
+   hb_itemPutNI( hb_arrayGetItemPtr( &hbArrRet, 2 ), 0 );
+   hb_itemPutNL( hb_arrayGetItemPtr( &hbArrRet, 3 ), TRUE );
+
+   // returning
+   hb_itemReturn( &hbArrRet );
+
+   //hb_itemReturn empties the shell; now hbArrRet is a NIL object.
+
+   // and so it can just be wiped out at function end
+}
+
+
+Now we suppose that the calling program passes an item to the extended library;
+it is necessary to store it somewhere; the extended library example also provides the
+calling program with a reference to it, or with a brand new item copied
+from the original, theese are the steps to take:
+
+   PHB_ITEM pArray == NULL;
+
+   HB_FUNC( SAVEITEM )
+   {
+      PHB_ITEM pParam = hb_param(1, HB_IT_ARRAY );
+      // error checking
+
+      if ( pArray == NULL )
+      {
+         // create the shell
+         pArray = hb_itemNew( NULL );
+
+         // prevents GC from freeing the shell and eventually the value.
+         hb_gcLock( pArray );
+      }
+
+      // option 1: just copy the shell; pArray will reflect the changes in the
+      // original, if someone makes changes,
+      hb_itemCopy( pArray, pParam );
+
+      // option 2: clone it, so the array may be altered, but we'll have our copy
+      hb_arrayClone( pParam, pArray ); // hb_arrayClone( source, dest );
+   }
+
+   HB_FUNC( RETURNITEM )
+   {
+      if ( pArray )  // important: if null, hb_itemReturn*() would cause page fault
+      {
+         hb_itemReturnCopy( pArray ); // do not destroy pArray's shell!!
+      }
+      // defaults to a NIL object return
+   }
+
+   HB_FUNC( RETURNCLONE )
+   {
+      HB_ITEM hbClone;
+
+      if ( pArray )
+      {
+         hbClone.type = HB_IT_NIL;
+         hb_arrayClone( pArray, &hbClone );
+
+         hb_itemReturn( &hbClone ); // hbClone shell may be thrown away
+      }
+   }
+
+   /** This returns the item, and removes the old setting! */
+
+   HB_FUNC( RETURN_AND_FREE )
+   {
+      if ( pArray )
+      {
+         hb_itemReturn( pArray );  // shell is emptied...
+         hb_itemRelease( pArray ); // ... but is still allocated. This destroys it.
+         pArray = NULL;
+      }
+   }
+
+
+To move library managed objects inside VM objects, we need to have parameters passed by
+reference, and use hb_itemCopy as we would use hb_itemReturnCopy(); the equivalent
+for hb_itemReturn is hb_itemForwardValue, that moves the shell contesnts in the target
+object and empties the original shell.
+
+   HB_FUNC( PUT_ITEM_IN_PARAMETER )
+   {
+      PHB_PARAM pParam = hb_param( 1, HB_IT_BYREF );
+
+      // ...error checking goes here...
+
+      if ( pArray != NULL )
+      {
+         hb_itemCopy( pParam, pArray );
+      }
+   }
+
+   HB_FUNC( PUT_ITEM_IN_PARAMETER_AND_RESET )
+   {
+      PHB_PARAM pParam = hb_param( 1, HB_IT_BYREF );
+
+      // ...error checking goes here...
+
+      if ( pArray != NULL )
+      {
+         hb_itemForwardValue( pParam, pArray );
+         hb_itemRelease( pArray );
+         pArray = NULL;
+      }
+   }
+
+NOTE: in the latter example, hb_itemCopy may have been used instead of
+hb_itemForwardValue, but hb_itemForwardValue is sensibly faster and in the case of a
+statically allocated hb_item, it spares the call to hb_itemRelease.
+
+
+
+
+                         SECTION 4: ADVANCED MEMORY USEAGE
+                          Writing your own opaque objects
+               ======================================================
+
+Probably, the most intriguing featrue of collectable memory management is the ability
+to be collected automagically when there's no more need of it. The hb_gcAlloc()
+function allows to allocate memory and to define a function that will be called
+when that memory will be collected. This allows the user to cleanly free deep memory
+that his own data structure may need, close handles, flush files and the like,
+thus obviating the need for the final Xharbour programmer to explicitly call close or
+shutdown function. Just use your extension to create new object types; when theyre not
+needed anymore, the GC will call your function, to take care of cleanups.
+
+hb_retptr() function allows to return a value created with hb_gcAlloc(), so that
+the calling xharbour program receives a HB_IT_POINTER object with custom data inside it.
+hb_parpointer( n ); returns a the value of the pointer shell given as parameter.
+
+The xharbour program cannot alter the status of the pointer object, but the user may
+provide functions to access it. Willing to a structure that stores a string and an item,
+and to handle it as an opaque pointer, it's possible to proceed this way:
+
+typedef struct tag_struct
+{
+   BYTE *szData;
+   PHB_ITEM pItem;
+} MyStryuct;
+
+
+HB_GC_FUNC( MyFinalization )
+{
+   // Cargo is always provided by HB_GC_FUNC macro
+   MyStruct *my = (MyStruct *) Cargo;
+
+   hb_xfree( my->szData );
+   hb_itemRelease( my->pItem );
+   hb_gcFree( my );
+}
+
+
+HB_FUNC( CREATEMYTYPE )
+{
+   MyStruct *my = (MyStruct *) hb_gcAlloc( sizeof( MyStruct ), MyFinalization );
+
+   my->szData = (BYTE *) hb_xgrab( 100 );
+   my->pItem = hb_itemNew( NULL );
+   hb_itemPutNI( my->pItem, 100 );
+
+   // important: GC doesn't know about this collectable item being inside another one.
+   hb_gcLock( my->pItem );
+
+   hb_retptr( my );
+}
+
+HB_FUNC( MYTYPESETSTR )
+{
+   MyStruct *my = hb_parpointer( 1 );
+   PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
+   // check parameters here
+
+   strncpy( my->szData, hb_itemGetCPtr( pString ), hb_itemGetNI( my->pItem ) );
+}
+
+HB_FUNC( MYTYPEGETSTR )
+{
+   MyStruct *my = hb_parpointer( 1 );
+   // check parameters here
+
+   /* Quite useful to copy the data; we don't want a change of the returned value
+      to alter our stored data
+   */
+   hb_retc( my->szData );
+}
+
+
+The Xharbour program will beable to call
+
+   ....
+   LOCAL pMyData
+
+   pMyData := CreateMyType()  // returns a "P" type object
+   MyTypeSetStr( pMyData, "Hello" )
+   ? MyTypeGetStr( pMyData )   // Hello
+   ....
+
+MyFinalization is called wen pMyData is no longer needed and GC detects this fact.
+
+It's also adviseable to put a unique random ULONG signature field at the beginning of the
+personalized type structure; in this way, the extension will be able to check if the
+HB_IT_POINTER passed as the parameter contains a value of the desired type, or if the
+function has been called with an HB_IT_POINTER object containing something else.
+
+

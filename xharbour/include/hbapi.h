@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.119 2004/02/18 10:50:44 andijahja Exp $
+ * $Id: hbapi.h,v 1.120 2004/02/21 04:45:19 ronpinkas Exp $
  */
 
 /*
@@ -274,7 +274,6 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
     #define hb_retnilen( iNumber, iWidth )       hb_itemPutNILen( &HB_VM_STACK.Return, (iNumber), (iWidth) )
     #define hb_retnllen( lNumber, iWidth )       hb_itemPutNLLen( &HB_VM_STACK.Return, (lNumber), (iWidth) )
     #define hb_retptr( voidPtr )                 hb_itemPutPtrGC( &HB_VM_STACK.Return, (voidPtr) )
-    #define hb_retptrfin( voidPtr, fFin )        hb_itemPutPtrFinalizer( &HB_VM_STACK.Return, (voidPtr), (fFin) )
    #ifndef HB_LONG_LONG_OFF
     #define hb_retnll( llNumber )                 hb_itemPutNLL( &HB_VM_STACK.Return, (llNumber) )
     #define hb_retnlllen( llNumber, iWidth )      hb_itemPutNLLLen( &HB_VM_STACK.Return, (llNumber), (iWidth) )
