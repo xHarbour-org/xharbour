@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallvc.bat,v 1.11 2004/02/25 08:55:13 paultucker Exp $
+rem $Id: makallvc.bat,v 1.12 2004/08/05 16:41:42 paultucker Exp $
 rem 
 
 echo creating system files
@@ -46,13 +46,6 @@ call make_vc.bat %1
 cd ..\..
 if errorlevel 1 goto end
 
-:libct
-echo libct
-cd contrib\libct
-call make_vc.bat %1
-cd ..\..
-if errorlevel 1 goto end
-
 :libmisc
 echo libmisc
 cd contrib\libmisc
@@ -94,6 +87,13 @@ if errorlevel 1 goto end
 echo rdd_ads
 cd contrib\rdd_ads
 call make_vc.bat %1
+cd ..\..
+if errorlevel 1 goto end
+
+:tp
+echo tp
+cd contrib\tp_
+if exist make_vc.bat call make_vc.bat %1
 cd ..\..
 if errorlevel 1 goto end
 

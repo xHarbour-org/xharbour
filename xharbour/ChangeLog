@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3348 2004/08/27 03:32:09 walito Exp $
+ * $Id: ChangeLog,v 1.3349 2004/08/27 05:42:13 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,6 +9,12 @@
 */
 
 2004-08-27 01:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  - source/math.c
+  - source/net.c
+  - source/pad.c
+  + source/ctmath2.c
+  + source/ctnet.c
+  + source/ctpad.c
   - contrib/libct
   - contrib/winprn
   * contrib/MakeFile

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.85 2004/08/05 16:41:42 paultucker Exp $
+# $Id: makefile.nt,v 1.86 2004/08/25 20:36:54 lf_sfnet Exp $
 #
 
 #
@@ -112,6 +112,7 @@ INCLUDE_DIR  =include
 COMMON_DIR   =source\common
 COMPILER_DIR =source\compiler
 CODEPAGE_DIR =source\codepage
+CT_DIR       =source\ct
 DEBUG_DIR    =source\debug
 LANG_DIR     =source\lang
 MACRO_DIR    =source\macro
@@ -170,6 +171,7 @@ C_FLAGS      =$(C_FLAGS) -DHB_MULTI_GT
 
 CODEPAGE_LIB     =$(LIB_DIR)\codepage.lib
 COMMON_LIB       =$(LIB_DIR)\common.lib
+CT_LIB           =$(LIB_DIR)\libct.lib
 DBFCDX_LIB       =$(LIB_DIR)\dbfcdx.lib
 DBFCDXMT_LIB     =$(LIB_DIR)\dbfcdx$(MT).lib
 DBFDBT_LIB       =$(LIB_DIR)\dbfdbt.lib
@@ -284,7 +286,8 @@ LIBLIST = \
    $(HB_GT_LIB) \
    $(TIP_LIB) \
    $(SAMPLES_LIB) \
-   $(ODBC_LIB)
+   $(ODBC_LIB) \
+   $(CT_LIB)
 
 !ifdef HB_MT
 LIBLISTMT = \
@@ -1086,6 +1089,100 @@ TIP_LIB_OBJS = \
 
 
 #
+# CT.LIB rules
+#
+
+{$(CT_DIR)}.c{$(OBJ_DIR)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+{$(CT_DIR)}.prg{$(OBJ_DIR)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+
+{$(CT_DIR)}.prg{$(OBJ_DIR)}.obj::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+   $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(CT_LIB)2
+
+#
+# Please don't reorder this list if you don't know why it's the way it is!
+#
+
+CT_LIB_OBJS = \
+   $(OBJ_DIR)\addascii.obj \
+   $(OBJ_DIR)\asciisum.obj \
+   $(OBJ_DIR)\ascpos.obj \
+   $(OBJ_DIR)\atadjust.obj \
+   $(OBJ_DIR)\atnum.obj \
+   $(OBJ_DIR)\atrepl.obj \
+   $(OBJ_DIR)\bit1.obj \
+   $(OBJ_DIR)\bit2.obj \
+   $(OBJ_DIR)\bit3.obj \
+   $(OBJ_DIR)\charevod.obj \
+   $(OBJ_DIR)\charlist.obj \
+   $(OBJ_DIR)\charmirr.obj \
+   $(OBJ_DIR)\charmix.obj \
+   $(OBJ_DIR)\charone.obj \
+   $(OBJ_DIR)\charonly.obj \
+   $(OBJ_DIR)\charop.obj \
+   $(OBJ_DIR)\charrepl.obj \
+   $(OBJ_DIR)\charsort.obj \
+   $(OBJ_DIR)\charswap.obj \
+   $(OBJ_DIR)\count.obj \
+   $(OBJ_DIR)\ctc.obj \
+   $(OBJ_DIR)\ctchksum.obj \
+   $(OBJ_DIR)\ctcrypt.obj \
+   $(OBJ_DIR)\ctmath.obj \
+   $(OBJ_DIR)\ctmath2.obj \
+   $(OBJ_DIR)\ctnet.obj \
+   $(OBJ_DIR)\ctset.obj \
+   $(OBJ_DIR)\ctstr.obj \
+   $(OBJ_DIR)\dbftools.obj \
+   $(OBJ_DIR)\disk.obj \
+   $(OBJ_DIR)\exponent.obj \
+   $(OBJ_DIR)\files.obj \
+   $(OBJ_DIR)\finan.obj \
+   $(OBJ_DIR)\ftoc.obj \
+   $(OBJ_DIR)\justify.obj \
+   $(OBJ_DIR)\keyset.obj \
+   $(OBJ_DIR)\misc1.obj \
+   $(OBJ_DIR)\num1.obj \
+   $(OBJ_DIR)\numat.obj \
+   $(OBJ_DIR)\numlohi.obj \
+   $(OBJ_DIR)\pad.obj \
+   $(OBJ_DIR)\pos1.obj \
+   $(OBJ_DIR)\pos2.obj \
+   $(OBJ_DIR)\posdiff.obj \
+   $(OBJ_DIR)\print.obj \
+   $(OBJ_DIR)\range.obj \
+   $(OBJ_DIR)\relation.obj \
+   $(OBJ_DIR)\remove.obj \
+   $(OBJ_DIR)\replace.obj \
+   $(OBJ_DIR)\screen1.obj \
+   $(OBJ_DIR)\settime.obj \
+   $(OBJ_DIR)\strdiff.obj \
+   $(OBJ_DIR)\strswap.obj \
+   $(OBJ_DIR)\tab.obj \
+   $(OBJ_DIR)\token1.obj \
+   $(OBJ_DIR)\token2.obj \
+   $(OBJ_DIR)\trig.obj \
+   $(OBJ_DIR)\wordrepl.obj \
+   $(OBJ_DIR)\wordtoch.obj \
+   \
+   $(OBJ_DIR)\blank.obj \
+   $(OBJ_DIR)\color.obj \
+   $(OBJ_DIR)\ct.obj \
+   $(OBJ_DIR)\ctmisc.obj \
+   $(OBJ_DIR)\ctwin.obj \
+   $(OBJ_DIR)\datetime.obj \
+   $(OBJ_DIR)\dattime2.obj \
+   $(OBJ_DIR)\dattime3.obj \
+   $(OBJ_DIR)\diskutil.obj \
+   $(OBJ_DIR)\invrtwin.obj \
+   $(OBJ_DIR)\numconv.obj \
+   $(OBJ_DIR)\screen2.obj \
+   $(OBJ_DIR)\time.obj \
+   $(OBJ_DIR)\util.obj
+
+#
 # ODBC.LIB rules
 #
 {$(ODBC_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
@@ -1371,6 +1468,9 @@ $(COMMON_LIB) : $(COMMON_LIB_OBJS)
 $(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
    lib /out:$@ $**
 
+$(CT_LIB) : $(CT_LIB_OBJS)
+   lib /out:$@ $**
+
 $(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
    lib /out:$@ $**
 
@@ -1484,6 +1584,7 @@ $(COMMON_LIB)2 : $(COMMON_LIB_OBJS)
 $(DEBUG_LIB)2  : $(DEBUG_LIB_OBJS)
 $(MACRO_LIB)2  : $(MACRO_LIB_OBJS)
 $(PP_LIB)2     : $(PP_LIB_OBJS)
+$(CT_LIB)2     : $(CT_LIB_OBJS)
 $(RDD_LIB)2    : $(RDD_LIB_OBJS)
 $(TIP_LIB)2    : $(TIP_LIB_OBJS)
 $(DBFCDX_LIB)2 : $(DBFCDX_LIB_OBJS)

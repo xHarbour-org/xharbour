@@ -1,10 +1,10 @@
 /*
- * $Id: strswap.c,v 1.3 2002/04/14 05:11:50 walito Exp $
+ * $Id: pad.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  */
 
 /*
  * Harbour Project source code:
- *   STRSWAP() CT3 string function
+ *   PADLEFT() and PADRIGHT() CT3 string functions
  *
  * Copyright 2001 IntTec GmbH, Neunlindenstr 32, 79106 Freiburg, Germany
  *        Author: Martin Vogel <vogel@inttec.de>
@@ -56,109 +56,94 @@
 #include "ct.h"
 
 
-/*  $DOC$
- *  $FUNCNAME$
- *      STRSWAP()
- *  $CATEGORY$
- *      CT3 string functions
- *  $ONELINER$
- *      Swap the contents of two strings
- *  $SYNTAX$
- *      STRSWAP (<[@]cString1>, <[@]cString2>) -> cString
- *  $ARGUMENTS$
- *  $RETURNS$
- *  $DESCRIPTION$
- *      TODO: add documentation
- *  $EXAMPLES$
- *  $TESTS$
- *  $STATUS$
- *      Started
- *  $COMPLIANCE$
- *      STRSWAP() is compatible with CT3's STRSWAP().
- *  $PLATFORMS$
- *      All
- *  $FILES$
- *      Source is strswap.c, library is libct.
- *  $SEEALSO$
- *  $END$
- */
+/* defines */
+#define DO_PAD_PADLEFT     0
+#define DO_PAD_PADRIGHT    1
 
-HB_FUNC (STRSWAP)
+/* helper function for the pad functions */
+static void do_pad (int iSwitch)
 {
 
-  size_t sStrLen1, sStrLen2;
-
-  /* param check */
-  if (((sStrLen1 = (size_t)hb_parclen (1)) > 0) &&
-      ((sStrLen2 = (size_t)hb_parclen (2)) > 0))
+  if (ISCHAR (1) && ISNUM (2))
   {
 
-    /* get parameters */
-    char *pcString1 = (char *)hb_parc (1);
-    char *pcString2 = (char *)hb_parc (2);
-    char *pcRet1 = NULL, *pcRet2 = NULL;
-    int iChange1, iChange2;
-    size_t sIndex, sCmpLen;
+    char *pcString = (char *)hb_parc (1);
+    size_t sStrLen = (size_t)hb_parclen (1);
+    char *pcRet, *pc;
+    LONG lRetLen;
+    size_t sRetLen;
+    char cFill;
 
-    if ((iChange1=ISBYREF(1)) != 0)
+    lRetLen = hb_parnl (2);
+    if (lRetLen <= 0)
     {
-      pcRet1 = ( char * )hb_xgrab (sStrLen1);
-      hb_xmemcpy (pcRet1, pcString1, sStrLen1);
-    }
-
-    if ((iChange2=ISBYREF(2)) != 0)
-    {
-      pcRet2 = ( char * )hb_xgrab (sStrLen2);
-      hb_xmemcpy (pcRet2, pcString2, sStrLen2);
-    }
-
-    sCmpLen = (sStrLen1 < sStrLen2 ? sStrLen1 : sStrLen2);
-    for (sIndex = 0; sIndex < sCmpLen; sIndex++)
-    {
-      char cExchange;
-
-      if (iChange1)
+      int iArgErrorMode = ct_getargerrormode();
+      if (iArgErrorMode != CT_ARGERR_IGNORE)
       {
-        cExchange = *(pcString1+sIndex);
-        *(pcRet1+sIndex) = *(pcString2+sIndex);
-        if (iChange2)
-        {
-          *(pcRet2+sIndex) = cExchange;
-        }
+        ct_error ((USHORT)iArgErrorMode, EG_ARG,
+                  (iSwitch == DO_PAD_PADLEFT ? CT_ERROR_PADLEFT : CT_ERROR_PADRIGHT),
+                  NULL,
+                  (iSwitch == DO_PAD_PADLEFT ? "PADLEFT" : "ROR_PADRIGHT"),
+                  0, EF_CANDEFAULT, 3,
+                  hb_paramError (1), hb_paramError (2),
+                  hb_paramError (3));
+      }
+      hb_retc ("");
+      return;
+    }
+    sRetLen = (size_t)lRetLen;
+
+    if (hb_parclen (3) > 0)
+      cFill = *(hb_parc (3));
+    else if (ISNUM (3))
+      cFill = hb_parnl (3) % 256;
+    else
+      cFill = 0x20;
+
+    pcRet = ( char * )hb_xgrab (sRetLen);
+
+    if (iSwitch == DO_PAD_PADLEFT)
+    {
+      if (sRetLen > sStrLen)
+      {
+        /* fill with cFill */
+        for (pc = pcRet; pc < pcRet+(sRetLen-sStrLen); pc++)
+          *pc = cFill;
+        hb_xmemcpy (pcRet+(sRetLen-sStrLen), pcString, sStrLen);
       }
       else
       {
-        *(pcRet2+sIndex) = *(pcString1+sIndex);
+        hb_xmemcpy (pcRet, pcString+(sStrLen-sRetLen), sRetLen);
+      }
+    }
+    else
+    {
+      hb_xmemcpy (pcRet, pcString, (sRetLen < sStrLen ? sRetLen : sStrLen));
+      if (sRetLen > sStrLen)
+      {
+        /* fill with cFill */
+        for (pc = pcRet+sStrLen; pc < pcRet+sRetLen; pc++)
+          *pc = cFill;
       }
     }
 
-    /* strings */
-    if (iChange1)
-    {
-      hb_storclen (pcRet1, sStrLen1, 1);
-      hb_xfree (pcRet1);
-    }
-
-    if (iChange2)
-    {
-      hb_storclen (pcRet2, sStrLen2, 2);
-      hb_xfree (pcRet2);
-    }
-
-    hb_retc ("");
-
+    hb_retclen (pcRet, sRetLen);
+    hb_xfree (pcRet);
 
   }
-  else /* ((sStrLen1 = (size_t)hb_parclen (1)) > 0) &&
-          ((sStrLen2 = (size_t)hb_parclen (2)) > 0))   */
+  else /* ISCHAR (1) && ISNUM (2) */
   {
     PHB_ITEM pSubst = NULL;
     int iArgErrorMode = ct_getargerrormode();
     if (iArgErrorMode != CT_ARGERR_IGNORE)
     {
-      pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_STRSWAP,
-                               NULL, "STRSWAP", 0, EF_CANSUBSTITUTE, 2,
-                               hb_paramError (1), hb_paramError (2));
+      pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG,
+                               (iSwitch == DO_PAD_PADLEFT ? CT_ERROR_PADLEFT : CT_ERROR_PADRIGHT),
+                               NULL,
+                               (iSwitch == DO_PAD_PADLEFT ? "PADLEFT" : "ROR_PADRIGHT"),
+                               0, EF_CANSUBSTITUTE, 3,
+                               hb_paramError (1), hb_paramError (2),
+                               hb_paramError (3));
     }
     
     if (pSubst != NULL)
@@ -179,4 +164,20 @@ HB_FUNC (STRSWAP)
 
 
 
+HB_FUNC (PADLEFT)
+{
 
+  do_pad (DO_PAD_PADLEFT);
+  return;
+
+}
+
+
+
+HB_FUNC (PADRIGHT)
+{
+
+  do_pad (DO_PAD_PADRIGHT);
+  return;
+
+}

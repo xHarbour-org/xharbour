@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2003/02/23 22:17:57 lculik Exp $
+# $Id: Makefile,v 1.2 2003/11/10 00:59:30 fsgiudice Exp $
 #
 
 ROOT = ../
@@ -10,7 +10,6 @@ DIRS=\
 	btree \
 	htmllib \
 	hbzlib \
-	libct \
 	libgt \
 	libmisc \
 	libnf \
@@ -25,7 +24,6 @@ DIRS=\
 	hgf/os2pm \
 	htmllib \
 	hbzlib \
-	libct \
 	libgt \
 	libmisc \
 	libnf \
@@ -38,7 +36,6 @@ DIRS=\
 	btree \
 	hgf/os2pm \
 	htmllib \
-	libct \
 	libgt \
 	libmisc \
 	libnf \
@@ -49,7 +46,6 @@ else
 DIRS=\
 	htmllib \
 	hbzlib \
-	libct \
 	libgt \
 	libmisc \
 	samples \

@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.4 2004/03/18 03:43:08 ronpinkas Exp $
+ * $Id: net.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  *
  * xHarbour Project source code:
  * CT3 NET functions to PC-LAN/MS-NET.

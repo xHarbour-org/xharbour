@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.59 2004/08/02 01:46:16 maurifull Exp $
+ * $Id: gtwin.c,v 1.60 2004/08/06 02:25:55 maurifull Exp $
  */
 
 /*
@@ -158,7 +158,7 @@ static HANDLE s_HOutput = INVALID_HANDLE_VALUE;
 static CONSOLE_SCREEN_BUFFER_INFO s_csbi,     /* active screen mode */
                                   s_origCsbi; /* to restore screen mode on exit */
 
-#define INPUT_BUFFER_LEN 128
+#define INPUT_BUFFER_LEN 1
 
 static DWORD        s_cNumRead;   /* Ok to use DWORD here, because this is specific... */
 static DWORD        s_cNumIndex;  /* ...to the Windows API, which defines DWORD, etc.  */
@@ -1428,12 +1428,14 @@ int HB_GT_FUNC(gt_ExtendedKeySupport())
 
 int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
-    int ch = 0, extKey = -1;
+    int ch = 0,
+        extKey = -1;
     const ClipKeyCode *clipKey = NULL;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
 
     /* First check for Ctrl+Break, which is handled by gt/gtwin.c */
+
     if( s_bBreak )
     {
        /* Reset the global Ctrl+Break flag */
@@ -1443,41 +1445,138 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
     /* Check for events only when the event buffer is exhausted. */
     else if( s_wRepeated == 0 && s_cNumRead <= s_cNumIndex )
     {
+       int altisdown = 0;
+       int altnum = 0;
+
        /* Check for keyboard input */
-       s_cNumRead = 0;
-       GetNumberOfConsoleInputEvents( s_HInput, &s_cNumRead );
-       if( s_cNumRead )
+       do
        {
-          /* Read keyboard input */
-          ReadConsoleInput(
-             s_HInput,         /* input buffer handle    */
-             s_irInBuf,        /* buffer to read into    */
-             INPUT_BUFFER_LEN, /* size of read buffer    */
-             &s_cNumRead);     /* number of records read */
-          /* Set up to process the first input event */
-          s_cNumIndex = 0;
-       }
+          s_cNumRead = 0;
+          GetNumberOfConsoleInputEvents( s_HInput, &s_cNumRead );
+          if( s_cNumRead )
+          {
+             /* Read keyboard input */
+             ReadConsoleInput(
+                s_HInput,         /* input buffer handle    */
+                s_irInBuf,        /* buffer to read into    */
+                INPUT_BUFFER_LEN, /* size of read buffer    */
+                &s_cNumRead);     /* number of records read */
+             /* Set up to process the first input event */
+             s_cNumIndex = 0;
+
+             if ( s_irInBuf[ s_cNumIndex ].EventType == KEY_EVENT )
+             {
+                unsigned short sc = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode;
+
+                if( altisdown )
+                {
+                   if( s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
+                   {
+                      /*
+                         on Keydown, it better be the alt or a numpad key,
+                         or bail
+                      */ 
+                      switch(sc)
+                      {
+                         case 0x38:
+                         case 0x47:
+                         case 0x48:
+                         case 0x49:
+                         case 0x4b:
+                         case 0x4c:
+                         case 0x4d:
+                         case 0x4f:
+                         case 0x50:
+                         case 0x51:
+                         case 0x52:
+                            break;
+
+                         default:
+                            altisdown=0;
+                            break;
+                      }
+                   }
+                   else
+                   {
+                      /* Keypad handling is done during Key up */
+
+                      unsigned short nm = 10;
+
+                      switch(sc)
+                      {
+                         case 0x38:
+                            /* Alt key ... */
+                            if ((s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState &
+                                0x04000000 ))
+                            /* ... has been released after a numpad entry */
+                            {
+                               ch = altnum & 0xff;
+                               ++s_cNumIndex;
+                            }
+                            else
+                            /* ... has been released after no numpad entry */
+                            {
+                               s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown = 1;
+                            }
+                            altisdown = altnum = 0;
+                            break;
+
+                         case 0x52: --nm;
+                         case 0x4f: --nm;
+                         case 0x50: --nm;
+                         case 0x51: --nm;
+                         case 0x4b: --nm;
+                         case 0x4c: --nm;
+                         case 0x4d: --nm;
+                         case 0x47: --nm;
+                         case 0x48: --nm;
+                         case 0x49: --nm;
+                            altnum = ((altnum * 10) & 0xff) + nm;
+                            break;
+
+                         default:
+                            altisdown=0;
+                            break;
+                      }
+                   }
+                }
+                else
+                {
+                   /* Also traps the holding of 1 alt key and pressing the other */
+                   if ( sc == 0x38 && s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
+                   {
+                      altisdown = 1;
+                   }
+                }
+             }
+          }
+       } while (altisdown);
     }
 
     /* Only process one keyboard event at a time. */
     if( s_wRepeated > 0 || s_cNumRead > s_cNumIndex )
     {
-       if( s_irInBuf[ s_cNumIndex ].EventType == KEY_EVENT )
+       if ( s_irInBuf[ s_cNumIndex ].EventType == KEY_EVENT )
        {
           /* Only process key down events */
+
           if( s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
           {
              /* Save the keyboard state and ASCII key code */
-             DWORD dwState = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState;
+             DWORD dwState;
              WORD wChar = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualKeyCode;
+
              /* Could be used in the future */
-             /* WORD wKey = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode; */
+             // WORD wKey = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode;
+
              ch = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.uChar.AsciiChar;
+             dwState = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState;
 
              if ( s_wRepeated == 0 )
              {
                 s_wRepeated = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wRepeatCount;
              }
+
              if ( s_wRepeated > 0 ) /* Might not be redundant */
              {
                 s_wRepeated--;
@@ -1541,7 +1640,8 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
              {
                 extKey = EXKEY_INS;
              }
-             else if ( wChar == 46 )
+             else if ( wChar == 46 && /* temp fix */
+              !(dwState == 32 || dwState == 160 || dwState==224 || dwState==96) )
              {
                 extKey = EXKEY_DEL;
              }
@@ -1588,56 +1688,80 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 {
                    ch = clipKey->key;
                 }
+
                 if( ch == 0 ) // for keys that are only on shift or AltGr
                 {
                    ch = clipKey->key;
                 }
              }
+          printf("\n%ld %ld %ld",extKey,wChar,ch);
           }
        }
-       else if( b_MouseEnable && eventmask & ~( INKEY_KEYBOARD | INKEY_RAW )
-                         && s_irInBuf[ s_cNumIndex ].EventType == MOUSE_EVENT )
-
+       else if( b_MouseEnable && 
+                eventmask & ~( INKEY_KEYBOARD | INKEY_RAW ) && 
+                s_irInBuf[ s_cNumIndex ].EventType == MOUSE_EVENT )
        {
 
           hb_mouse_iCol = s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwMousePosition.X;
           hb_mouse_iRow = s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwMousePosition.Y;
 
-          if( eventmask & INKEY_MOVE && s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == MOUSE_MOVED )
+          if( eventmask & INKEY_MOVE &&
+              s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == MOUSE_MOVED )
+          {
              ch = K_MOUSEMOVE;
+          }
 
-          else if( eventmask & INKEY_LDOWN && s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState &
+          else if( eventmask & INKEY_LDOWN &&
+               s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState &
                    FROM_LEFT_1ST_BUTTON_PRESSED )
           {
              if( s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == DOUBLE_CLICK )
+             {
                 ch = K_LDBLCLK;
+             }
              else
+             {
                 ch = K_LBUTTONDOWN;
+             }
 
              s_mouseLast = K_LBUTTONDOWN;
           }
-          else if( eventmask & INKEY_RDOWN && s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState &
+
+          else if( eventmask & INKEY_RDOWN &&
+                   s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState &
                    RIGHTMOST_BUTTON_PRESSED )
           {
              if( s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == DOUBLE_CLICK )
+             {
                 ch = K_RDBLCLK;
+             }
              else
+             {
                 ch = K_RBUTTONDOWN;
+             }
 
              s_mouseLast = K_RBUTTONDOWN;
           }
+
           else if( s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == 0 &&
                    s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState == 0 )
           {
              if( eventmask & INKEY_LUP && s_mouseLast == K_LBUTTONDOWN )
+             {
                 ch = K_LBUTTONUP;
+             }
              else if( eventmask & INKEY_RUP && s_mouseLast == K_RBUTTONDOWN )
+             {
                 ch = K_RBUTTONUP;
+             }
           }
        }
+
        /* Set up to process the next input event (if any) */
        if ( s_wRepeated == 0 )
+       {
           s_cNumIndex++;
+       }
     }
 
     return ch;

@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallbc.bat,v 1.10 2004/02/25 08:55:13 paultucker Exp $
+rem $Id: makallbc.bat,v 1.11 2004/08/05 16:41:42 paultucker Exp $
 rem 
 
 echo create system files
@@ -42,13 +42,6 @@ if errorlevel 1 goto end
 :internet
 echo internet
 cd contrib\internet
-call make_b32.bat %1
-cd ..\..
-if errorlevel 1 goto end
-
-:libct
-echo libct
-cd contrib\libct
 call make_b32.bat %1
 cd ..\..
 if errorlevel 1 goto end
@@ -95,6 +88,13 @@ if errorlevel 1 goto end
 echo rdd_ads
 cd contrib\rdd_ads
 call make_b32.bat %1
+cd ..\..
+if errorlevel 1 goto end
+
+:tp
+echo tp
+cd contrib\tp_
+if exist make_b32.bat call make_b32.bat %1
 cd ..\..
 if errorlevel 1 goto end
 
