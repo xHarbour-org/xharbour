@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.49 2003/09/03 12:51:36 paultucker Exp $
+ * $Id: filesys.c,v 1.50 2003/09/14 18:07:23 jonnymind Exp $
  */
 
 /*
@@ -1755,7 +1755,6 @@ void    HB_EXPORT hb_fsClose( FHANDLE hFileHandle )
 
 void    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
 {
-   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSetDevMode(%p, %hu)", hFileHandle, uiDevMode));
 
 #if defined(__BORLANDC__) || defined(__IBMCPP__) || defined(__DJGPP__) || defined(__CYGWIN__) || defined(__WATCOMC__)
@@ -2134,7 +2133,10 @@ ULONG   HB_EXPORT hb_fsWriteLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCo
 ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
 {
    HB_THREAD_STUB
-   ULONG ulPos;
+   /* Clipper compatibility: under clipper, ulPos is returned as it was
+      before; on error it is not changed. This is not thread compliant,
+      but does not cares as MT prg are required to test FError(). */
+   static ULONG ulPos = 0;
    USHORT Flags;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSeek(%p, %ld, %hu)", hFileHandle, lOffset, uiFlags));
@@ -2145,60 +2147,8 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
 
    if( lOffset < 0 && Flags == SEEK_SET )
    {
-
-   #if defined(HB_OS_OS2)
-
-      {
-         APIRET ret = DosSetFilePtr( hFileHandle, 0, SEEK_CUR, &ulPos );
-
-         if( ret != 0 )
-         {
-            ulPos = 0;
-            hb_fsSetError( ( USHORT ) ret );
-         }
-      }
-
-   #elif defined(HB_FS_FILE_IO)
-
-      /* get current offset */
-      #if defined(X__WIN32__)
-
-         // allowing async cancelation here
-         HB_TEST_CANCEL_ENABLE_ASYN
-
-         ulPos = (DWORD) SetFilePointer(  DostoWinHandle(hFileHandle), 0, NULL, FILE_CURRENT );
-
-         HB_DISABLE_ASYN_CANC
-
-         if( (DWORD) ulPos == INVALID_SET_FILE_POINTER )
-         {
-            hb_fsSetError( (USHORT) GetLastError() );
-         }
-         else
-         {
-            hb_fsSetError( 0 );
-         }
-      #else
-         errno = 0;
-
-         // allowing async cancelation here
-         HB_TEST_CANCEL_ENABLE_ASYN
-         ulPos = lseek( hFileHandle, 0, SEEK_CUR );
-         HB_DISABLE_ASYN_CANC
-         if( errno != 0 )
-         {
-            ulPos = 0;
-         }
-         hb_fsSetError( errno );
-      #endif
-
-   #else
-
-      ulPos = 0;
       hb_fsSetError( 25 ); /* 'Seek Error' */
-
-   #endif
-
+      /* Clipper compatibility: do not touch ulPos */
    }
    else
    {
@@ -2206,11 +2156,13 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
    #if defined(HB_OS_OS2)
 
       {
+         ULONG ulOld = ulPos;
          APIRET ret = DosSetFilePtr( hFileHandle, lOffset, Flags, &ulPos );
 
+         /* Clipper compatibility: on error reset lpos*/
          if( ret != 0 )
          {
-            ulPos = 0;
+            ulPos = ulOld;
          }
          hb_fsSetError(( USHORT ) ret );
       }
@@ -2234,22 +2186,25 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
 
       #else
          // allowing async cancelation here
-         errno = 0;
-         HB_TEST_CANCEL_ENABLE_ASYN
-         ulPos = lseek( hFileHandle, lOffset, Flags );
-         HB_DISABLE_ASYN_CANC
-         if( errno != 0 )
          {
-            ulPos = 0;
-         }
+            /* Clipper compatibility: do not touch ulPos */
+            ULONG ulOld = ulPos;
+            errno = 0;
+            HB_TEST_CANCEL_ENABLE_ASYN
+            ulPos = lseek( hFileHandle, lOffset, Flags );
+            HB_DISABLE_ASYN_CANC
+            if( errno != 0 )
+            {
+               ulPos = ulOld;
+            }
 
-         hb_fsSetError( errno );
+            hb_fsSetError( errno );
+         }
       #endif
 
    #else
 
-      ulPos = 0;
-      hb_fsSetError( FS_ERROR );
+      hb_fsSetError( 25 );
 
    #endif
 
@@ -2938,7 +2893,6 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
 
 USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 {
-   HB_THREAD_STUB
    USHORT uiResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsChDrv(%d)", (int) nDrive));
@@ -3017,7 +2971,6 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 
 USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
 {
-   HB_THREAD_STUB
    USHORT uiResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsIsDrv(%d)", (int) nDrive));
@@ -3083,7 +3036,6 @@ USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
 
 BOOL   HB_EXPORT  hb_fsIsDevice( FHANDLE hFileHandle )
 {
-   HB_THREAD_STUB
    BOOL bResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsIsDevice(%p)", hFileHandle));
@@ -3109,7 +3061,6 @@ BOOL   HB_EXPORT  hb_fsIsDevice( FHANDLE hFileHandle )
 
 BYTE   HB_EXPORT  hb_fsCurDrv( void )
 {
-   HB_THREAD_STUB
    USHORT uiResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDrv()"));
@@ -3166,7 +3117,6 @@ BYTE   HB_EXPORT  hb_fsCurDrv( void )
 FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
                       USHORT uiFlags, BYTE * pPaths, PHB_ITEM pError )
 {
-   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsExtOpen(%s, %s, %hu, %p, %p)", (char*) pFilename, (char*) pDefExt, uiFlags, pPaths, pError));
 
    hb_fsSetError( FS_ERROR );
@@ -3217,7 +3167,6 @@ BOOL HB_EXPORT hb_fsEof( FHANDLE hFileHandle )
 
 USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 {
-   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDirBuff(%hu)", uiDrive));
 
    HB_SYMBOL_UNUSED( uiDrive );
@@ -3363,6 +3312,9 @@ int GnuErrtoDosErr( int ErrCode )
 
 #elif defined(__GNUC__)
 {
+
+    if (ErrCode == EBADF)
+        iResult = 6 ;
 
     if (ErrCode == EMFILE)
         iResult = 4 ;
