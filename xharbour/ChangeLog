@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1552 2003/10/05 12:50:47 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1553 2003/10/05 18:55:33 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-06 00:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/gtwin/gtwin.c
+    source/rtl/gtwin/mousewin.c
+    ! Fixed problem on mLeftDown()/mRightdown()
+      This is done by reading s_mouseLast value from gtwin, inside
+      mouse_IsButtonPressed() function in mousewin.c
 
 2003-10-05 11:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.sly
@@ -29,7 +36,7 @@
   * source/vm/hvm.c
     + Added HB_EXPORT to hb_vmRegisterGlobals()
 
-2003-10-14 16:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+2003-10-04 16:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   + doc/en/operator.txt
     ! Started doc for operators
   * doc/genhtm.rsp

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.20 2003/09/04 05:31:32 andijahja Exp $
+ * $Id: gtwin.c,v 1.21 2003/09/14 09:27:23 paultucker Exp $
  */
 
 /*
@@ -164,7 +164,7 @@ static DWORD        s_cNumRead;   /* Ok to use DWORD here, because this is speci
 static DWORD        s_cNumIndex;  /* ...to the Windows API, which defines DWORD, etc.  */
 static WORD         s_wRepeated = 0;  /* number of times the event (key) was repeated */
 static INPUT_RECORD s_irInBuf[ INPUT_BUFFER_LEN ];
-static int          s_mouseLast;  /* Last mouse button to be pressed                     */
+int    s_mouseLast;  /* Last mouse button to be pressed                     */
 
 extern int hb_mouse_iCol;
 extern int hb_mouse_iRow;
@@ -1614,6 +1614,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 ch = K_LBUTTONDOWN;
 
              s_mouseLast = K_LBUTTONDOWN;
+             i_mouseLast = s_mouseLast ;
           }
           else if( eventmask & INKEY_RDOWN && s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState &
                    RIGHTMOST_BUTTON_PRESSED )
@@ -1624,6 +1625,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 ch = K_RBUTTONDOWN;
 
              s_mouseLast = K_RBUTTONDOWN;
+             i_mouseLast = s_mouseLast;
           }
           else if( s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwEventFlags == 0 &&
                    s_irInBuf[ s_cNumIndex ].Event.MouseEvent.dwButtonState == 0 )
@@ -1632,6 +1634,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                 ch = K_LBUTTONUP;
              else if( eventmask & INKEY_RUP && s_mouseLast == K_RBUTTONDOWN )
                 ch = K_RBUTTONUP;
+                i_mouseLast = ch;
           }
        }
        /* Set up to process the next input event (if any) */

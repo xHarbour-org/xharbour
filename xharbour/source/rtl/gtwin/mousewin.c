@@ -1,5 +1,5 @@
 /*
- * $Id: mousewin.c,v 1.2 2003/05/16 19:52:12 druzus Exp $
+ * $Id: mousewin.c,v 1.3 2003/05/21 09:35:37 druzus Exp $
  */
 
 /*
@@ -76,7 +76,7 @@
 
 int hb_mouse_iCol;
 int hb_mouse_iRow;
-
+extern int s_mouseLast;
 /* C callable low-level interface */
 
 void HB_GT_FUNC(mouse_Init( void ))
@@ -135,7 +135,11 @@ BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
 {
    /* TODO: */
 
-   HB_SYMBOL_UNUSED( iButton );
+//   HB_SYMBOL_UNUSED( iButton );
+     if(iButton == 0 && s_mouseLast == 1002)
+        return TRUE;
+     if(iButton == 1 && s_mouseLast == 1004)
+        return TRUE;
 
    return FALSE;
 }
