@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.986 2003/04/25 10:45:55 lculik Exp $
+ * $Id: ChangeLog,v 1.987 2003/04/25 12:40:48 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-26 01:02 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/thread.h
+  * source/vm/thread.c
+    ! Added some declaration in thread.c and function headers in
+      thread.h to fix compilation warning and errors.
+       - Work in progress here -
 
 2003-04-25 09:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tbrowse.prg

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.71 2003/04/21 17:40:52 jonnymind Exp $
+* $Id: thread.c,v 1.72 2003/04/21 18:22:52 jonnymind Exp $
 */
 
 /*
@@ -72,6 +72,7 @@
 #endif
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbapierr.h"
 #include "hbvm.h"
 #include "hbstack.h"

@@ -1,7 +1,7 @@
 # xHarbour project
 # Demo makefile for GNU MAKE in tests/ subdir
 #
-# $Id: Makefile,v 1.7 2003/01/30 00:46:25 jonnymind Exp $
+# $Id: Makefile,v 1.8 2003/03/14 11:22:32 jonnymind Exp $
 #
 # Copyright 2003 Giancarlo Niccolai
 #
@@ -32,7 +32,11 @@ ifeq ($(HB_ARCHITECTURE),linux)
    ifeq ($(HB_GT_LIB),gtQTc)
       GT_LIBS=-lgtQTc -lqt-mt -L/usr/lib/qt3/lib
    else
-      GT_LIBS=-lgtsln -lslang -lgpm
+     ifeq ($(HB_GT_LIB),gtcrs)
+       GT_LIBS=-lgtcrs -lncurses
+     else
+       GT_LIBS=-lgtsln -lslang -lgpm
+     endif
    endif
 EXE_EXT=
 else
