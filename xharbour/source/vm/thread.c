@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.10 2002/12/21 04:00:05 jonnymind Exp $
+* $Id: thread.c,v 1.11 2002/12/21 14:35:37 jonnymind Exp $
 */
 
 /*
@@ -269,16 +269,19 @@ HB_THREAD_CONTEXT *hb_getCurrentContext( void )
     }
 
     HB_CRITICAL_UNLOCK( context_monitor );
-    
-    if ( !p ) {
-        char errdat[70];
+
+    if ( !p )
+    {
+        char errdat[64];
         // TODO Error.
         sprintf( errdat, "Thread %ld has not a context", (long) id );
         hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_getCurrentContext", 0 );
         return NULL;
     }
     else
+    {
         return p;
+    }
 }
 
 void hb_threadInit( void )
@@ -292,12 +295,15 @@ void hb_threadExit( void )
 {
     while( hb_ht_context )
     {
-       #if defined(HB_OS_WIN_32)
-          Sleep( 0 );
-       #else
-          static struct timespec nanosecs = { 0, 1000 };
-          nanosleep( &nanosecs, NULL );
-       #endif
+        #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+            pthread_cancel( hb_ht_context->th_id );
+            pthread_join( th, 0 );
+            hb_destroyContextFromHandle( hb_ht_context->th_id );
+        #else
+            TerminateThread( hb_ht_context->th_h, 0);
+            WaitForSingleObject( hb_ht_context->th_h, INFINITE );
+            hb_destroyContextFromHandle( hb_ht_context->th_h );
+        #endif
     }
 
     HB_CRITICAL_DESTROY( context_monitor );

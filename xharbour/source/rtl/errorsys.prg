@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.13 2002/11/29 20:10:40 walito Exp $
+ * $Id: errorsys.prg,v 1.14 2002/12/18 13:43:56 ronpinkas Exp $
  */
 
 /*
@@ -102,7 +102,7 @@ STATIC FUNCTION DefError( oError )
         Return .F.
      Endif
 
-     cMessage := ProcName(1) + "(" + Str( ProcLine(1) ) + ") "
+     cMessage := ProcName(2) + "(" + Str( ProcLine(2) ) + ") "
      cMessage += ErrorMessage( oError )
      If !Empty( oError:osCode )
         cDOSError := "(DOS Error " + Ltrim( Str( oError:osCode ) ) + ")"
@@ -314,7 +314,7 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, "Dos Error Code: " + strvalue( oErr:oscode() ) )
         FWriteLine( nHandle, "" )
         FWriteLine( nHandle, " Trace Through" )
-        nCount := 1
+        nCount := 2
         While !Empty( Procname( ++ nCount ) )
           FWriteLine( nHandle, Padr( Procname( nCount ), 21 ) + ': ' + Padr( Procline( nCount ), 20 ) )
         Enddo
