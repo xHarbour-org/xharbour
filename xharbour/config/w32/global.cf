@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.8 2003/07/19 22:08:03 jonnymind Exp $
+# $Id: global.cf,v 1.9 2003/11/30 10:02:45 druzus Exp $
 #
 
 ifndef MK
@@ -11,6 +11,7 @@ HB_GT_LIBS=\
         gtpca \
         gtstd \
         gtwin \
+        gtwvt \
         gtnul \
 #       gtcrs \
 #       gtsln \

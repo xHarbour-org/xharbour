@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: hb-func.sh,v 1.3 2003/12/13 17:55:11 druzus Exp $
+# $Id: hb-func.sh,v 1.4 2003/12/18 10:55:31 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -41,7 +41,7 @@ mk_hbgetlibs()
 {
     if [ -z "$@" ]
     then
-        echo -n "vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 debug profiler"
+        echo -n "vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca gtwin gtwvt gtwvt gtdos gtos2 debug profiler"
     else
         echo -n "$@"
     fi

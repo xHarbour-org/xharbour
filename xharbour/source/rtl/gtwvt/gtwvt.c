@@ -74,6 +74,7 @@
 #include <winuser.h>
 #include <commctrl.h>
 #include <time.h>
+#include <ctype.h>
 
 #include "hbset.h"
 #include "hbapigt.h"
@@ -1397,7 +1398,7 @@ static BOOL hb_wvt_gtValidWindowSize(int rows, int cols, HFONT hFont)
   maxHeight = (rcWorkArea.bottom - rcWorkArea.top);
 
   hdc = GetDC(_s.hWnd);
-  hOldFont = SelectObject(hdc, hFont);
+  hOldFont = (HFONT) SelectObject(hdc, hFont);
   GetTextMetrics(hdc, &tm);
   SelectObject(hdc, hOldFont); // Put old font back
   ReleaseDC(_s.hWnd, hdc);
@@ -1425,7 +1426,7 @@ static void hb_wvt_gtResetWindowSize(HWND hWnd)
   hdc = GetDC(hWnd);
   hFont = hb_wvt_gtGetFont(_s.fontFace, _s.fontHeight, _s.fontWidth, _s.fontWeight, _s.fontQuality, _s.CodePage);
   _s.hFont = hFont ;
-  hOldFont = SelectObject(hdc, hFont);
+  hOldFont = (HFONT) SelectObject(hdc, hFont);
   if (hOldFont)
   {
     DeleteObject(hOldFont);
@@ -1550,7 +1551,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
             if (attrib != oldAttrib)
             {
               hb_wvt_gtSetColors(hdc, oldAttrib);
-              hb_wvt_gtTextOut(hdc, startCol, irow, _s.pBuffer+startIndex, len);
+              hb_wvt_gtTextOut(hdc, startCol, irow, (char const *) _s.pBuffer+startIndex, len);
               oldAttrib = attrib;
               startIndex = index;
               startCol = icol;
@@ -1562,7 +1563,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
             index++;
           }
           hb_wvt_gtSetColors(hdc, oldAttrib);
-          hb_wvt_gtTextOut(hdc, startCol, irow, _s.pBuffer+startIndex, len);
+          hb_wvt_gtTextOut(hdc, startCol, irow, (char const *) _s.pBuffer+startIndex, len);
         }
       }
       EndPaint(hWnd, &ps);
@@ -2265,7 +2266,7 @@ static HFONT hb_wvt_gtGetFont(char * pszFace, int iHeight, int iWidth, int iWeig
   else
   {
 //    hFont = GetStockObject(SYSTEM_FIXED_FONT);
-    hFont = GetStockObject(OEM_FIXED_FONT);
+    hFont = (HFONT) GetStockObject(OEM_FIXED_FONT);
   }
   return(hFont);
 

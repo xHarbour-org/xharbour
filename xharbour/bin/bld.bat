@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.29 2003/12/05 01:38:29 jonnymind Exp $
+rem $Id: bld.bat,v 1.30 2003/12/13 16:52:09 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -82,6 +82,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    echo       - gtstd (Standard streaming) (for all architectures)
    echo       - gtdos (DOS console)        (for dos architecture)
    echo       - gtwin (Win32 console)      (for w32 architecture)
+   echo       - gtwvt (Win32 win console)  (for w32 architecture)
    echo       - gtos2 (OS/2 console)       (for os2 architecture)
    echo       - gtpca (PC ANSI console)    (for all architectures)
    echo       - gtcrs (Curses console)     (for linux, w32 architectures)

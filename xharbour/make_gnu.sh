@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: make_gnu.sh,v 1.5 2003/05/16 19:40:49 druzus Exp $
+# $Id: make_gnu.sh,v 1.6 2003/06/23 17:41:15 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -84,6 +84,7 @@ if [ -z "$HB_ARCHITECTURE" ] || [ -z "$HB_COMPILER" ]; then
    echo "      - gtstd (Standard streaming) (for all architectures)"
    echo "      - gtdos (DOS console)        (for dos architecture)"
    echo "      - gtwin (Win32 console)      (for w32 architecture)"
+   echo "      - gtwvt (Win32 win console)  (for w32 architecture)"
    echo "      - gtos2 (OS/2 console)       (for os2 architecture)"
    echo "      - gtpca (PC ANSI console)    (for all architectures)"
    echo "      - gtcrs (Curses console)     (for linux, w32 architectures)"

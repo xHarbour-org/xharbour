@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.14 2003/11/30 10:02:46 druzus Exp $
+ * $Id: hbapigt.h,v 1.15 2003/11/30 12:32:29 druzus Exp $
  */
 
 /*
@@ -369,6 +369,7 @@ extern void   hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
 #define _crs   _CRS
 #define _sln   _SLN
 #define _win   _WIN
+#define _wvt   _WVT
 #define _dos   _DOS
 #define _os2   _OS2
 #define _tpl   _TPL
@@ -382,6 +383,7 @@ extern void   hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
 #define HB_GT_DRV_CRS   "crs"
 #define HB_GT_DRV_SLN   "sln"
 #define HB_GT_DRV_WIN   "win"
+#define HB_GT_DRV_WVT   "wvt"
 #define HB_GT_DRV_DOS   "dos"
 #define HB_GT_DRV_OS2   "os2"
 #define HB_GT_DRV_TPL   "tpl"

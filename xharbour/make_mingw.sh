@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: make_mingw.sh,v 1.2 2003/01/12 22:50:13 jonnymind Exp $
+# $Id: make_mingw.sh,v 1.3 2003/05/16 19:40:49 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -82,6 +82,7 @@ if [ -z "$HB_ARCHITECTURE" ] || [ -z "$HB_COMPILER" ]; then
    echo "      - gtstd (Standard streaming) (for all architectures)"
    echo "      - gtdos (DOS console)        (for dos architecture)"
    echo "      - gtwin (Win32 console)      (for w32 architecture)"
+   echo "      - gtwvt (Win32 win console)  (for w32 architecture)"
    echo "      - gtos2 (OS/2 console)       (for os2 architecture)"
    echo "      - gtpca (PC ANSI console)    (for all architectures)"
    echo "      - gtcrs (Curses console)     (for linux, w32 architectures)"

@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: !pack_src.bat,v 1.10 2003/10/15 00:21:15 ronpinkas Exp $
+rem $Id: !pack_src.bat,v 1.11 2003/10/15 00:34:15 ronpinkas Exp $
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
@@ -163,6 +163,10 @@ rem SOURCE\RTL\GTSTD
 rem SOURCE\RTL\GTWIN
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtwin/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtwin/*.c
+
+rem SOURCE\RTL\GTWVT
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtwvt/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gtwvt/*.c
 
 rem SOURCE\VM
 %hb_archbin% %hb_archopt%  %hb_filename% source/vm/Makefile
