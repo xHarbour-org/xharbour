@@ -1,9 +1,9 @@
 /*
- * $Id: diskutil.prg,v 1.2 2004/12/08 00:00:00 modalsist Exp $
+ * $Id: diskutil.prg,v 1.3 2005/01/04 23:13:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
- * LibCT (Clipper Tools) Disk, File and Directory management.
+ * LibCT Disk, File and Directory management.
  * Copyright 2004 Eduardo Fernandes <eduardo@modalsistemas.com.br>
  * www - http://www.xharbour.org
  *
@@ -323,24 +323,100 @@ Local nRet := 0
 RETURN ( nRet )
 
 
-*-------------------------------
-FUNCTION FileValid ( cFileName )
-*-------------------------------
-   LOCAL nHandle
+*------------------------------
+FUNCTION FileValid( cFileName )
+*------------------------------
+/*
+This function return the MS-DOS valid file name (8x3)
+*/
 
-   nHandle := FOpen( cFileName , FO_READWRITE )
+ Local lRet  := .T.
+ Local cName := ""
+ Local cExt  := ""
+ Local i     := 0
+ Local cInvalid := ""
+ Local nDecimalPoint := 0
+ Local nFileLen := 0
+ 
+ default cFileName to ""
 
-   IF nHandle != 0
-      FClose( nHandle )
-   ENDIF
 
-RETURN ( IIF( nHandle > 0 , .T. , .F. ) )
+ for i := 0 to 255
+    if (i>=0  .and. i<=32) .or.;
+       i=34 .or.;
+       (i>=42 .and. i<=44) .or.;
+       (i>=46 .and. i<=47) .or.;
+       (i>=58 .and. i<=63) .or.;
+       (i>=91 .and. i<=93) .or.;
+       (i>=123 .and. i<=125) .or.;
+       (i=127)
+
+       cInvalid += chr(i)
+
+    endif   
+ next
+
+ nDecimalPoint := At(".",cFileName)
+ nFileLen      := Len(cFileName)
+
+if nFileLen=0 .or. nFileLen > 12
+   lRet := .F.
+elseif nDecimalPoint > 9
+   lRet := .F.
+elseif nDecimalPoint > 0 .and. nDecimalPoint < 10
+   cName := SubStr(cFileName,1, nDecimalPoint-1 )
+   cExt  := SubStr(cFileName,nDecimalPoint+1 )
+   if empty(cName)
+      lRet := .F.
+   endif   
+elseif nDecimalPoint=0 .and. nFileLen > 8
+   lRet:=.F.
+elseif nDecimalPoint=0 .and. nFileLen < 9
+   cName := cFileName
+endif   
+
+if lRet
+ if !empty(cName)
+   if Len(cName)>8
+      lRet:=.F.
+   endif   
+ else
+    lRet:= .F.
+ endif
+
+ if lRet .and. !empty(cExt)
+   if Len(cExt)>3
+      lRet:=.F.
+   endif   
+ endif
+endif
+
+if lRet
+
+   for i := 1 to Len(cName)
+       if SubStr(cName,i,1) IN cInvalid
+          lRet := .F.
+          exit
+       endif
+   next
+
+   if lRet .and. !empty(cExt)
+    for i := 1 to Len(cExt)
+       if SubStr(cExt,i,1) IN cInvalid
+          lRet := .F.
+          exit
+       endif
+    next
+   endif
+
+endif
+
+Return (lRet)
 
 
-
-*-----------------------------
-FUNCTION FloppyType ( cDrive )
-*-----------------------------
+*----------------------------
+FUNCTION FloppyType( cDrive )
+*----------------------------
 LOCAL nTotalBytes,nFloppyType
 
    Default( @cDrive , DiskName() )
@@ -370,9 +446,9 @@ LOCAL nTotalBytes,nFloppyType
 RETURN ( nFloppyType )
 
 
-*--------------------------------------------------
-FUNCTION RenameFile ( cOldFileName , cNewFileName )
-*--------------------------------------------------
-// FileMove source is in "disk.c"
+*-------------------------------------------------
+FUNCTION RenameFile( cOldFileName , cNewFileName )
+*-------------------------------------------------
+// FileMove function source is in "xharbour/source/ct/disk.c"
 RETURN ( FileMove( cOldFileName , cNewFileName )  )
 
