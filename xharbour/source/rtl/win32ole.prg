@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.62 2005/01/30 08:29:12 ptsarenko Exp $
+ * $Id: win32ole.prg,v 1.63 2005/02/19 05:04:15 ronpinkas Exp $
  */
 
 /*
@@ -1446,6 +1446,7 @@ RETURN xRet
            hb_itemPutC( &OleClassName, sOleClassName );
 
            hb_objSendMsg( &Return, "_cClassName", 1, &OleClassName );
+           hb_itemClear( &OleClassName );
 
            hb_itemReturn( &Return );
         }
