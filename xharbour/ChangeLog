@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1977 2004/01/02 14:02:55 druzus Exp $
+ * $Id: ChangeLog,v 1.1978 2004/01/02 17:13:58 rodrigo_moreno Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-02 18:20 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_tgz.sh
+  * xharbour/xharbour.spec
+  * xharbour/bin/hb-func.sh
+    + XLIB support for gtxvt
 
 2004-01-02 15:10 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   + contrib\pgsql\Changelog  

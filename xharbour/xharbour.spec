@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.47 2003/12/23 22:52:47 druzus Exp $
+# $Id: xharbour.spec,v 1.48 2003/12/28 22:25:33 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -332,8 +332,7 @@ popd
 # check if we should rebuild tools with shared libs
 if [ "%{hb_lnkso}" = yes ]
 then
-    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm"
-
+    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11"
     for utl in hbmake hbrun hbpp hbdoc
     do
         pushd utils/${utl}

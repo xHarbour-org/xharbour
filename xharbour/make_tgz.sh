@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.23 2003/12/18 10:55:30 druzus Exp $
+# $Id: make_tgz.sh,v 1.24 2003/12/23 22:52:47 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -89,7 +89,7 @@ popd
 # check if we should rebuild tools with shared libs
 if [ "${hb_lnkso}" = yes ]
 then
-    export L_USR="-L${HB_LIB_INSTALL} -l${name} -lncurses -lslang -lgpm"
+    export L_USR="-L${HB_LIB_INSTALL} -l${name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11"
 
     for utl in hbmake hbrun hbpp hbdoc hbtest hbdict
     do

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: hb-func.sh,v 1.7 2003/12/24 19:12:23 lculik Exp $
+# $Id: hb-func.sh,v 1.8 2003/12/30 22:59:13 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -78,6 +78,7 @@ mk_hbtools()
 	HB_SYS_LIBS="${HB_SYS_LIBS} -luser32 -lwinspool -lgdi32 -lcomctl32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32"
     else
         HB_SYS_LIBS="${HB_SYS_LIBS} -lncurses -lslang -lgpm"
+        HB_SYS_LIBS="${HB_SYS_LIBS} -L/usr/X11R6/lib -lX11"
     fi
 
     cat > ${hb_tool} <<EOF
@@ -122,7 +123,7 @@ elif [ "\$*" = "mk-links" ]; then
     if [ "\${DIR}" != "\${NAME}" ]; then
         pushd "\${DIR}"
         for n in ${hb_pref}cc ${hb_pref}cmp ${hb_pref}mk ${hb_pref}lnk gharbour harbour-link; do
-	        ln -sf "\${NAME}" "\${n}"
+            ln -sf "\${NAME}" "\${n}"
         done
         popd
     fi
