@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.17 2003/09/08 16:15:49 iananderson Exp $
+ * $Id: adsfunc.c,v 1.18 2003/09/21 06:49:21 brianhays Exp $
  */
 
 /*
@@ -1468,7 +1468,7 @@ HB_FUNC( ADSDDADDTABLE )
 
 }
 
-HB_FUNC( ADSADDUSERTOGROUP )
+HB_FUNC( ADSDDADDUSERTOGROUP )
 {
    UNSIGNED32 ulRetVal;
    UNSIGNED8 *pGroup = hb_parc( 1 );
