@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.11 2004/08/27 14:43:21 paultucker Exp $
+# $Id: makefile.wc,v 1.12 2004/08/29 01:46:11 paultucker Exp $
 #
 
 #
@@ -756,7 +756,6 @@ TIP_LIB_OBJS = \
    $(OBJ_DIR)\credent.obj \
    $(OBJ_DIR)\encb64.obj \
    $(OBJ_DIR)\encoder.obj \
-   $(OBJ_DIR)\encoding
    $(OBJ_DIR)\encqp.obj \
    $(OBJ_DIR)\encurl.obj \
    $(OBJ_DIR)\ftpcln.obj \
