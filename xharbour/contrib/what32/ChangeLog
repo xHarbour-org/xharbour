@@ -22,3 +22,6 @@
      ErrorSys.Prg bug fixed
 28/07/2002 AJ Wos
      Updated What32.ch MAKELPARAM definition added 
+
+01/08/2002 AJ Wos
+     Corrected IFEMPTY() definition

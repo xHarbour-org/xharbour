@@ -73,7 +73,7 @@ GET < Var > ;
 #translate IFNUMBER( <v1>,<exp1>,<exp2> )    => IF( VALTYPE( <v1> ) == "N",<exp1>,<exp2> )
 #translate IFNUMERIC( <v1>,<exp1>,<exp2> )   => IF( VALTYPE( <v1> ) == "N",<exp1>,<exp2> )
 #translate IFOBJECT( <v1>,<exp1>,<exp2> )    => IF( VALTYPE( <v1> ) == "O",<exp1>,<exp2> )
-#translate IFEMPTY( <v1>,<exp1>,<exp2> )     => IF( VALTYPE( <v1> ) == "O",<exp1>,<exp2> )
+#translate IFEMPTY( <v1>,<exp1>,<exp2> )     => IF( EMPTY( <v1> ),<exp1>,<exp2> )
 
 
 /////////////////////////////////////
