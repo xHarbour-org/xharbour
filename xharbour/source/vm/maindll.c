@@ -1,5 +1,5 @@
 /*
- * $Id: maindll.c,v 1.4 2004/11/23 18:22:44 mauriliolongo Exp $
+ * $Id: maindll.c,v 1.5 2005/02/25 10:43:47 andijahja Exp $
  */
 
 /*
@@ -77,11 +77,7 @@ BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID
    switch( fdwReason )
    {
       case DLL_PROCESS_ATTACH:
-#if defined(__DMC__)
-           hb_vmInit( TRUE  );  /* Don't execute first linked symbol */
-#else
            hb_vmInit( FALSE );  /* Don't execute first linked symbol */
-#endif
            break;
 
       case DLL_PROCESS_DETACH:
