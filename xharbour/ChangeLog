@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1999 2004/01/06 09:45:32 paultucker Exp $
+ * $Id: ChangeLog,v 1.2000 2004/01/06 10:16:19 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-06 15:00 utc+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_GetFontInfo()
+      Returns the current font name,height,width,weight,quality.
+    + GUI primitive functions:
+      + Wvt_DrawBoxGet( nRow, nCol, nWidth )
+      + Wvt_DrawBoxRaised( nTop, nLeft, nBottom, nRight )
+      + Wvt_DrawBoxRecessed( nTop, nLeft, nBottom, nRight )
+      + Wvt_DrawBoxGroup( nTop, nLeft, nBottom, nRight )
+      + Wvt_DrawImage( nTop, nLefy, nBottom, nRight, cAnyGraphicFileName )
+      + Wvt_DrawLabel( nRow, nCol, cLabel, nAlign, nAngle, cTextColor, cBackColor, ;
+                       cFontFace, nFontHeight, nFontWidth, nFontWeight, nFontQuality, ;
+                       nCharSet, lItalic, lUnderline, lStrikeout )
+   + xharbour/tests/wvtgui.prg   
+   + xharbour/tests/bldwvt.bat   
+     * bldwvt wvtgui
+
+     /*
+        These area few GUI primitive functions and hope a lot more will come up.
+        I have handelled the focus change and restore through WVT_PAINT function 
+        to be written in the application code which executes a series of code blocks
+        whenever a WM_PAINT message is received by the window.
+
+        I propose that WVT_PAINT, or something lik that, function be part of standard GT
+        which should in turn executes all code blocks put on a stack by the user. The 
+        primary job of those code blocks will be to call GUI functions with appropriate
+        parameter. 
+
+        This concept has been shown in tests/wvtgui.prg. This window console offers
+        immense possibilities to be explored and incorporated and hope that
+        everybody will contribute to what Peter Rees has made possible.
+     */
 
 2004-01-06 04:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/compiler/hbpcode.c
