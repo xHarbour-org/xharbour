@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.15 2004/03/07 14:42:22 likewolf Exp $
+ * $Id: gtdos.c,v 1.16 2004/05/02 19:29:32 druzus Exp $
  */
 
 /*
@@ -717,7 +717,13 @@ static void hb_gt_xGetXY( USHORT cRow, USHORT cCol, BYTE * attr, BYTE * ch )
         *attr = *( p + 1 );
      }
      else
-        ScreenGetChar( (int *)ch, (int *)attr, cCol, cRow );
+     {
+        int nCh, nAttr;
+	
+        ScreenGetChar( &nCh, &nAttr, cCol, cRow );
+	*ch = nCh;
+	*attr = nAttr;
+     }
    }
 #else
    {
