@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.32 2004/11/21 21:43:37 druzus Exp $
+ * $Id: hbcomp.h,v 1.33 2005/01/02 03:31:13 guerra000 Exp $
  */
 
 /*
@@ -539,7 +539,7 @@ extern char *         hb_pp_STD_CH;
 
 extern BOOL           hb_comp_bAutoOpen;
 extern BOOL           hb_comp_bError;
-extern char           hb_comp_cInlineID;
+extern USHORT         hb_comp_cInlineID;
 
 extern INLINES        hb_comp_inlines;
 extern int            hb_comp_iLineINLINE;

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.85 2005/03/06 05:50:32 andijahja Exp $
+ * $Id: genc.c,v 1.86 2005/03/06 19:22:04 paultucker Exp $
  */
 
 /*
@@ -680,7 +680,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
       /* Generate codeblocks data
        */
-      if( hb_comp_cInlineID > '0' )
+      if( hb_comp_cInlineID )
       {
          fprintf( yyc, "#include \"hbapi.h\"\n" );
          fprintf( yyc, "#include \"hbstack.h\"\n" );

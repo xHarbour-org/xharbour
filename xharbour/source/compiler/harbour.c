@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.94 2005/03/10 23:19:38 andijahja Exp $
+ * $Id: harbour.c,v 1.95 2005/03/11 22:00:23 andijahja Exp $
  */
 
 /*
@@ -203,7 +203,7 @@ char *         hb_comp_szDeclaredFun = NULL;
 
 BOOL           hb_comp_bAutoOpen = TRUE;
 BOOL           hb_comp_bError = FALSE;
-char           hb_comp_cInlineID = '0';
+USHORT         hb_comp_cInlineID = 0;
 
 int            hb_comp_iLineINLINE = 0;
 int            hb_comp_iLinePRG;
@@ -282,6 +282,7 @@ extern int iEndDump;
 /* ************************************************************************* */
 
 int main( int argc, char * argv[] )
+
 {
    int iStatus = EXIT_SUCCESS;
    int i;
@@ -465,7 +466,8 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 
    return iResult;
 }
-#endif
+
+#endif /* _HB_DLL */
 
 #if defined(__IBMCPP__) || defined(_MSC_VER) || (defined(__BORLANDC__) && defined(__cplusplus))
 int isatty( int handle )
@@ -475,7 +477,6 @@ int isatty( int handle )
 #endif
 
 /* ------------------------------------------------------------------------- */
-
 void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on failure */
 {
    #ifdef _MSC_VER
@@ -518,7 +519,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 {
    if( pMem )
    {
-      #ifdef _MSC_VER
+      #if defined( _MSC_VER )
          HeapFree( GetProcessHeap(), 0, pMem );
       #else
          free( pMem );
@@ -5657,6 +5658,9 @@ static int hb_compProcessRSPFile( char* szRspName, int argc, char * argv[] )
             {
                hb_pp_Init();
             }
+
+            iBeginDump = 0;
+            iEndDump = 0;
 
             iStatus = hb_compCompile( szFile, argc, argv );
 

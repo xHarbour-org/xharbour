@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.59 2005/02/26 09:43:29 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.60 2005/02/27 05:51:59 ronpinkas Exp $
  */
 
 /*
@@ -1276,25 +1276,25 @@ static int hb_comp_SLX_CustomAction( int x )
             #define INLINE_DOUBLE_QUOT 2
             #define INLINE_COMMENT 3
 
-            char sBuffer[ YY_BUF_SIZE ], *pBuffer, sInlineSym[] = "HB_INLINE_0", cMode = INLINE_NORMAL;
+            char sBuffer[ YY_BUF_SIZE ], *pBuffer, cMode = INLINE_NORMAL;
+            char *sInlineSym = (char *) hb_xgrab(16);
             int iSize, iBraces = 0;
+	    char szID[6];
             PINLINE pInline;
 
             hb_comp_iLineINLINE = hb_comp_iLine;
             hb_pp_bInline = TRUE;
 
-            sInlineSym[10] = hb_comp_cInlineID++;
+	    hb_xmemset( sInlineSym, '\0', 16 );
+            hb_comp_cInlineID++;
+	    sprintf( szID, "%02d", hb_comp_cInlineID );
+	    hb_xstrcat( sInlineSym, "HB_INLINE_", szID, NULL );
 
-            switch( sInlineSym[10] )
-            {
-               case '9' + 1 :
-                  sInlineSym[10] = 'A';
-                  break;
-
-               case 'Z' + 1 :
-                  hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_TOOMANY_INLINE, NULL, NULL );
-                  break;
-            }
+	    if( hb_comp_cInlineID > 99 )
+	    {
+               hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_TOOMANY_INLINE, NULL, NULL );
+               break;
+	    }
 
             pInline = hb_compInlineAdd( hb_compIdentifierNew( sInlineSym, TRUE ) );
 
@@ -1412,6 +1412,7 @@ static int hb_comp_SLX_CustomAction( int x )
                hb_comp_iLine = hb_comp_iLineINLINE;
 
                yylval.string = hb_compIdentifierNew( sInlineSym, TRUE );
+               hb_xfree( sInlineSym ) ;
                iIdentifier++;
                DEBUG_INFO( printf( "INLINE, Primary Identifier %s Increased to: %i\n", "INLINE", iIdentifier ) );
                return IDENTIFIER + DONT_REDUCE;
