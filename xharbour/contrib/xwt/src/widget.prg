@@ -3,13 +3,15 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: widget.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: widget.prg,v 1.2 2003/04/07 15:41:06 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
 
 #include "hbclass.ch"
 #include "xwt.ch"
+
+Extern XwtEvent
 
 CLASS XWTWidget
 
@@ -60,6 +62,7 @@ METHOD New() CLASS XWTWidget
    /* By default we'll use the text as an identifier */
    ::x = 0
    ::y = 0
+
 RETURN Self
 
 
@@ -111,7 +114,7 @@ METHOD RiseEvent( oEvent ) CLASS XWTWidget
             aCall := { aList[2], aList[3], oEvent }
          ENDIF
          bRes := HB_ExecFromArray( aCall )
-         IF .not. Empty( bRes ) .and. bRes 
+         IF .not. Empty( bRes ) .and. bRes
             RETURN .T.
          ENDIF
       ENDIF
@@ -148,7 +151,7 @@ RETURN .not. bRaw
 
 
 METHOD Move( x, y ) CLASS XWTWidget
-   LOCAL bRaw := XWT_FastRiseEvent( XWT_E_MOVE, Self, {x,y} )
+   LOCAL bRaw := XWT_FastRiseEvent( XWT_E_MOVE, Self, x, y )
 
    IF .not. bRaw
       bRaw := .not. XWT_SetProperty( ::oRawWidget, XWT_PROP_POSITION, x, y )
@@ -160,7 +163,7 @@ RETURN .not. bRaw
 
 
 METHOD Resize( width, height ) CLASS XWTWidget
-   LOCAL bRaw := XWT_FastRiseEvent( XWT_E_RESIZE, Self, {width,height} )
+   LOCAL bRaw := XWT_FastRiseEvent( XWT_E_RESIZE, Self, width, height )
 
    IF .not. bRaw
       bRaw := .not. XWT_SetProperty( ::oRawWidget, XWT_PROP_SIZE, width, height )
@@ -170,11 +173,11 @@ RETURN .not. bRaw
 
 
 METHOD Reposition( x, y, width, height ) CLASS XWTWidget
-   LOCAL bRaw := XWT_FastRiseEvent( XWT_E_MOVE, Self, {x,y} )
+   LOCAL bRaw := XWT_FastRiseEvent( XWT_E_MOVE, Self, x, y )
 
    IF .not. bRaw
       XWT_SetProperty( ::oRawWidget, XWT_PROP_SIZE, width, height )
-      bRaw := XWT_FastRiseEvent( XWT_E_RESIZE, Self, {width,height} )
+      bRaw := XWT_FastRiseEvent( XWT_E_RESIZE, Self, width, height )
       IF .not. bRaw
          XWT_SetProperty( ::oRawWidget, XWT_PROP_POSITION, x, y )
          ::x := x
@@ -185,7 +188,7 @@ RETURN .not. bRaw
 
 
 METHOD SetText( cText ) CLASS XWTWidget
-   LOCAL bRaw := XWT_FastRiseEvent( XWT_E_TEXT, Self, {cText} )
+   LOCAL bRaw := XWT_FastRiseEvent( XWT_E_TEXT, Self, cText )
 
    IF .not. bRaw
       bRaw := .not. XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cText )

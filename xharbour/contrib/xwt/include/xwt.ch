@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.2 2003/04/07 10:27:44 jonnymind Exp $
+   $Id: xwt.ch,v 1.3 2003/04/07 18:20:26 jonnymind Exp $
 
    Definitions
 */
@@ -59,6 +59,9 @@
 #define XWT_PROP_HOMOGENEOUS  34 // BOOL
 #define XWT_PROP_BOX       35    // BOOL
 #define XWT_PROP_BORDER    36    // Numeric
+
+#define XWT_PROP_ATTACH    40 // Pseudo prop: {child, row, col, width, height}
+#define XWT_PROP_COLROWS   41 // width, height 
 
 #define XWT_PROP_FIXED      100 // bool
 #define XWT_PROP_MODAL      101 // bool

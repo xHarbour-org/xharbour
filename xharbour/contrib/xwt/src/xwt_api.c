@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.2 2003/04/07 10:27:45 jonnymind Exp $
+   $Id: xwt_api.c,v 1.3 2003/04/07 15:41:07 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -12,22 +12,22 @@
 #include "hbapiitm.h"
 #include "hbfast.h"
 #include "hbstack.h"
-#include "hbvm.h"   
+#include "hbvm.h"
 #include <xwt_api.h>
 #include <stdarg.h>
-   
+
 
 int xwt_rise_event( PHB_ITEM pObject, int iEventType, int argc, ... )
 {
    PHB_DYNS pExecSym;
    PHB_ITEM pEventParams, pItem;
    PHB_ITEM pEvent;
-   
-   
+
+
    PHB_BASEARRAY pBaseArray;
    int i;
    va_list ap;
-   
+
    /* Avoid sending events for widget without listeners */
    /*
    Disactivated because ::RiseEvent backpropagates the event to the owner
@@ -37,25 +37,25 @@ int xwt_rise_event( PHB_ITEM pObject, int iEventType, int argc, ... )
    {
       return FALSE;
    }
-   */   
+   */
    /* Create the array for event parameters */
    pEventParams = hb_itemNew( NULL );
    hb_arrayNew( pEventParams, argc );
    va_start(ap, argc);
-   
+
    pBaseArray = ( PHB_BASEARRAY ) pEventParams->item.asArray.value;
    for ( i = 0 ; i < argc; i ++)
    {
       hb_itemForwardValue( pBaseArray->pItems + i, va_arg(ap, PHB_ITEM) );
-   }  
+   }
    va_end( ap );
-   
+
    /* Create the event */
    pExecSym = hb_dynsymFindName( "XWTEVENT" );
    hb_vmPushSymbol( pExecSym->pSymbol );
    hb_vmPushNil();
    hb_vmDo( 0 );
-   
+
    /* The event is in the return */
    pEvent = hb_itemNew( NULL );
    hb_itemCopy( pEvent, &(HB_VM_STACK.Return) );
@@ -63,17 +63,17 @@ int xwt_rise_event( PHB_ITEM pObject, int iEventType, int argc, ... )
    pItem = hb_itemNew( NULL );
    hb_itemPutNI( pItem, iEventType );
    hb_objSendMsg( pEvent, "NEW", 3, pItem, pObject, pEventParams );
-   
 
-   /* Rise the event in pObject */ 
+
+   /* Rise the event in pObject */
    hb_objSendMsg( pObject, "RISEEVENT", 1, pEvent );
 
    /* free memory */
    hb_itemRelease( pEventParams );
    hb_itemRelease( pEvent );
    hb_itemRelease( pItem );
-   
-   if( HB_VM_STACK.Return.type == HB_IT_LOGICAL && 
+
+   if( HB_VM_STACK.Return.type == HB_IT_LOGICAL &&
          HB_VM_STACK.Return.item.asLogical.value == TRUE )
    {
       return TRUE;
@@ -88,10 +88,15 @@ HB_FUNC( XWT_FASTRISEEVENT )
    PHB_DYNS pExecSym;
    PHB_ITEM pEvent;
    PHB_ITEM pEventId, pSender, pEventParams;
-   //PHB_BASEARRAY pBaseArray;
-   
+   int nParamCount, i;
+   PHB_BASEARRAY pBaseArray;
+
+   /* Get the parameters the array for event parameters */
+   pEventId = hb_param( 1, HB_IT_NUMERIC );
+
    /* Avoid sending events for widget without listeners */
    pSender = hb_param( 2, HB_IT_OBJECT );
+
    /*
    Disactivated because ::RiseEvent backpropagates the event to the owner
    hb_objSendMsg( pSender, "AEVENTLISTENERS", 0 );
@@ -101,37 +106,46 @@ HB_FUNC( XWT_FASTRISEEVENT )
       hb_retl( FALSE );
       return;
    }*/
-      
+
+   nParamCount = hb_pcount() -2 ;
+   if ( nParamCount < 0 )
+   {
+      nParamCount = 0;
+   }
+   /* Create the array for event parameters */
+   pEventParams = hb_itemNew( NULL );
+   hb_arrayNew( pEventParams, nParamCount );
+
+   if ( nParamCount > 0 )
+   {
+      pBaseArray = ( PHB_BASEARRAY ) pEventParams->item.asArray.value;
+      for ( i = 0 ; i < nParamCount; i ++)
+      {
+         hb_itemForwardValue( pBaseArray->pItems + i, hb_param( i+3, HB_IT_ANY) );
+      }
+   }
+
    /* Create the event */
    pExecSym = hb_dynsymFindName( "XWTEVENT" );
    hb_vmPushSymbol( pExecSym->pSymbol );
    hb_vmPushNil();
    hb_vmDo( 0 );
-   
+
    /* The event is in the return */
    pEvent = hb_itemNew( NULL );
    hb_itemCopy( pEvent, &(HB_VM_STACK.Return) );
-   /* Get the parameters the array for event parameters */
-   pEventId = hb_param( 1, HB_IT_NUMERIC );   
-   pEventParams = hb_param( 3, HB_IT_ARRAY );
-   if ( pEventParams == NULL )
-   {
-      hb_objSendMsg( pEvent, "NEW", 2, pEventId, pSender );
-   }
-   else
-   {
-       hb_objSendMsg( pEvent, "NEW", 3, pEventId, pSender, pEventParams );
-   }
-   
 
-   /* Rise the event in pObject */ 
+   hb_objSendMsg( pEvent, "NEW", 3, pEventId, pSender, pEventParams );
+
+   /* Rise the event in pObject */
    //TODO: Implement here the riseevent loop
    hb_objSendMsg( pSender, "RISEEVENT", 1, pEvent );
 
    /* free memory */
    hb_itemRelease( pEvent );
+   hb_itemRelease( pEventParams );
 
-   if( HB_VM_STACK.Return.type == HB_IT_LOGICAL && 
+   if( HB_VM_STACK.Return.type == HB_IT_LOGICAL &&
          HB_VM_STACK.Return.item.asLogical.value == TRUE )
    {
       hb_retl( TRUE );

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.3 2003/04/07 15:41:07 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.4 2003/04/07 18:20:31 jonnymind Exp $
 
    Global declarations, common functions
 */
@@ -15,6 +15,7 @@
 BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 {
    GtkWidget *wSelf = GTK_WIDGET( wWidget->get_top_widget( wWidget->widget_data ));
+   GtkWidget *wMain = GTK_WIDGET( wWidget->get_main_widget( wWidget->widget_data ));
 
    switch( prop->type )
    {
@@ -138,7 +139,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             return xwt_gtk_imageLoad( wWidget, prop->value.text );
 
             case XWT_TYPE_LAYOUT: case XWT_TYPE_PANE:
-               if ( wSelf != NULL )
+               if ( wSelf != wMain )
                {
                   gtk_frame_set_label( GTK_FRAME( wSelf ), prop->value.text );
                   return TRUE;
@@ -285,6 +286,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 {
    GtkWidget *wSelf = GTK_WIDGET( wWidget->get_top_widget( wWidget->widget_data ));
+   GtkWidget *wMain = GTK_WIDGET( wWidget->get_main_widget( wWidget->widget_data ));
 
    switch( prop->type )
    {
@@ -415,7 +417,7 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 
             case XWT_TYPE_LAYOUT: case XWT_TYPE_PANE:
             {
-               if( wSelf != NULL )
+               if( wSelf != wMain )
                {
                   prop->value.text = gtk_frame_get_label( GTK_FRAME( wSelf ) );
                   return TRUE;
