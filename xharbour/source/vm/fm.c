@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.8 2002/06/12 11:53:06 ronpinkas Exp $
+ * $Id: fm.c,v 1.9 2002/07/30 16:24:43 ronpinkas Exp $
  */
 
 /*
@@ -421,7 +421,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       pSig  = (ULONG *)( ( ( unsigned char * ) pMem ) + pMemBlock->ulSize );
       if( *pSig != HB_MEMINFO_SIGNATURE )
       {
-         hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xfree(%p) Pointer Overflow '%s'", pMem, pMem );
+         hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xfree(%p) Pointer Overflow '%s'", (char *) pMem, (char*) pMem );
       }
 
       s_lMemoryConsumed -= pMemBlock->ulSize;
