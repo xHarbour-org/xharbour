@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.7 2003/05/21 09:35:36 druzus Exp $
+ * $Id: gtcrs.c,v 1.8 2003/05/22 11:48:04 druzus Exp $
  */
 
 /*
@@ -1645,7 +1645,7 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
 	    ioBase->out_transtbl[i] = ch;
 	}
     }
-    ioBase->attr_mask = ~A_BLINK;
+    ioBase->attr_mask = -1;
     if( has_colors() ) {
         /*  DOS->CURSES color maping
           DOS              -> curses
@@ -2128,12 +2128,10 @@ void HB_GT_FUNC(gt_SetBlink( BOOL bBlink ))
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetBlink(%d)", (int) bBlink));
 
     /* TODO: current implementation disables blinking/intensity */
-/*
     if ( bBlink )
         s_ioBase->attr_mask |= A_BLINK;
     else
         s_ioBase->attr_mask &= ~A_BLINK;
-*/
 }
 
 /* *********************************************************************** */
@@ -2885,6 +2883,35 @@ void HB_GT_FUNC(gt_SetInterruptKey( int iInterupt ))
 void HB_GT_FUNC(gt_SetDebugKey( int iDebug ))
 {
     set_sig_keys( s_ioBase, -1, iDebug, -1 );
+}
+
+/* *********************************************************************** */
+
+int HB_GT_FUNC(gt_Shft_Pressed())
+{
+    return ( s_ioBase->key_flag & KEY_CTRLMASK ) != 0 && 
+           ( s_ioBase->key_flag & KEY_ALTMASK ) != 0;
+}
+
+/* *********************************************************************** */
+
+int HB_GT_FUNC(gt_Ctrl_Pressed())
+{
+    return ( s_ioBase->key_flag & KEY_CTRLMASK ) != 0;
+}
+
+/* *********************************************************************** */
+
+int HB_GT_FUNC(gt_Alt_Pressed())
+{
+    return ( s_ioBase->key_flag & KEY_ALTMASK ) != 0;
+}
+
+/* *********************************************************************** */
+
+int HB_GT_FUNC(gt_Kbd_State())
+{
+    return s_ioBase->key_flag;
 }
 
 /* *********************************************************************** */

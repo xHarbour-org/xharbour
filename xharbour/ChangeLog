@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1053 2003/05/26 06:06:18 paultucker Exp $
+ * $Id: ChangeLog,v 1.1054 2003/05/26 13:26:26 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-26 15:30 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  + xharbour/source/codepage/cdpplwin.c
+  * xharbour/source/codepage/Makefile
+    + new Polish codepage PLWIN - CP1250 based
+
+  * xharbour/source/codepage/Makefile
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+  * xharbour/source/rtl/gtcrs/hb-charmap.def
+    * minor corrections
+
+  + xharbour/xhbgtmk.sh
+    + This script checks you have all tools to build xHarbour binaries
+      installed then takes current xHarbour sources from SourceForge CVS
+      and build binaries RPMs at your local host
+    To xHarbour www manger: Can you put this script somewhere on
+    www.xHarbour.org? I think many Linux users find it interesting.
 
 2003-05-26 09:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * contrib/rdd_ads/ads1.c

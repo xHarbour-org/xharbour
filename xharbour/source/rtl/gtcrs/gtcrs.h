@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.2 2003/05/17 15:55:18 druzus Exp $
+ * $Id: gtcrs.h,v 1.3 2003/05/21 09:35:36 druzus Exp $
  */
 
 /*
@@ -77,8 +77,7 @@ extern int HB_GT_FUNC(gt_chrmapinit( int *piTransTbl, char *pszTerm ));
 #define MAXFD		1024
 
 
-#define NO_IFDS		10
-#define ESC_DELAY	100
+#define ESC_DELAY	25
 #define DBLCLK_DELAY	250
 
 #define MAX_IOBASE	32

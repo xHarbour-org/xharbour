@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2003/05/16 19:52:06 druzus Exp $
+# $Id: Makefile,v 1.2 2003/05/23 09:01:12 lculik Exp $
 #
 
 ROOT = ../../
@@ -13,9 +13,10 @@ C_SOURCES=\
 	cdppl852.c    \
 	cdppliso.c    \
 	cdpplmaz.c    \
+	cdpplwin.c    \
 	cdpru866.c    \
 	cdprukoi.c    \
-        cdpsrwin.c    \
+	cdpsrwin.c    \
 	cdpruwin.c
 
 LIBNAME=codepage
