@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.48 2002/10/06 03:06:50 ronpinkas Exp $
+ * $Id: FormEdit.Prg,v 1.49 2002/10/06 03:25:11 ronpinkas Exp $
  */
 /*
  * xHarbour Project source code:
@@ -236,7 +236,6 @@ METHOD CreateControl(aRect)
       if oObj!=NIL
          oObj:SetMethod("OnMove",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj )})
          oObj:SetMethod("OnSize",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj )})
-
          oObj:SetMethod("Delete",{||oApp:MainFrame:ObjInsp:InspCombo:DelObject( oObj ), ;
                                     HB_QSELF():DelControl(), oObj:Parent:XFMControl( NIL, oObj, .T. ) } )
 
