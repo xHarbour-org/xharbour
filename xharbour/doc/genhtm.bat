@@ -1,11 +1,11 @@
 @echo off
 rem 
-rem $Id: genhtm.bat,v 1.2 2003/01/10 18:26:07 patrickmast Exp $
+rem $Id: genhtm.bat,v 1.3 2003/03/29 11:01:09 patrickmast Exp $
 rem 
 
 del htm\*.htm
-..\bin\b32\hbdoc -htm genhtm.lnk genhtm.rsp
+hbdoc -rtf xharbour.lnk xharbour.rsp
 cd htm
-echo renaming Harbour.htm to index.htm
-ren harbour.htm index.htm
+echo renaming xHarbour.htm to index.htm
+ren xharbour.htm index.htm
 cd ..
