@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: strcase.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -72,7 +72,7 @@ char * hb_strLower( char * szText, ULONG ulLen )
 
 char * hb_strLowerCopy( char * szText, ULONG ulLen )
 {
-   char *szCopy = hb_xgrab( ulLen + 1 );
+   char *szCopy = (char*) hb_xgrab( ulLen + 1 );
    ULONG i;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strLowerCopy(%s, %lu)", szText, ulLen));
@@ -87,7 +87,7 @@ char * hb_strLowerCopy( char * szText, ULONG ulLen )
 
 char * hb_strUpperCopy( char * szText, ULONG ulLen )
 {
-   char *szCopy = hb_xgrab( ulLen + 1 );
+   char *szCopy = (char*) hb_xgrab( ulLen + 1 );
    ULONG i;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strUpperCopy(%s, %lu)", szText, ulLen));
