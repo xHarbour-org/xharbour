@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.13 2004/06/09 12:50:00 likewolf Exp $
+ * $Id: tbrwtext.prg,v 1.14 2004/06/10 10:36:15 likewolf Exp $
  */
 
 /*
@@ -109,11 +109,17 @@ METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor, lLineNumbers) CLASS 
 
    ::lLineNumbers := lLineNumbers
 
+   /* A hack to enforce cursor setting in Giancarlo's HBEditor */
+   SetCursor( SC_SPECIAL1 )
+
    Super:New("", nTop, nLeft, nBottom, nRight, .F., -1)
    Super:SetColor(cColor)
 
-   /* A hack to enforce cursor setting */
+   /* A hack to enforce cursor setting in Eduardo's HBEditor */
    ::nCurrentCursor := SC_SPECIAL1
+
+   /* A hack to inhibit word-wrapping in Giancarlo's HBEditor */
+   ::lWordWrap := .F.
   
    Super:LoadFile(cFileName)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3065 2004/06/12 05:27:27 lculik Exp $
+ * $Id: ChangeLog,v 1.3066 2004/06/12 13:23:06 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-12 20:57 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/debug/tbrwtext.prg
+    ! Inhibit word-wrapping and display a cursor - fixes for the restored
+      Giancarlo's version of HBEditor.
 
 2004-06-12 15:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/xharbour.spec
