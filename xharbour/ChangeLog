@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1989 2004/01/04 20:14:43 peterrees Exp $
+ * $Id: ChangeLog,v 1.1990 2004/01/04 23:15:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-01-04 21:45 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * contrib/libct/net.c
+    ! code formated and optimized
+                                                                           
 2004-01-04 15:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * contrib/libct/net.c
     ! Fixed few places where low level c worker was using hb_retl(...) instead of return,
