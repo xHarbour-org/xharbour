@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.144 2002/12/31 00:58:55 ronpinkas Exp $
+ * $Id: hvm.c,v 1.145 2002/12/31 02:10:23 ronpinkas Exp $
  */
 
 /*
@@ -862,8 +862,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             hb_vmDo( uiParams );
 
-            hb_itemForwardValue( ( * HB_VM_STACK.pPos ), &(HB_VM_STACK.Return) );
+            // Thread Safety.
             hb_stackPush();
+            hb_itemForwardValue( *( HB_VM_STACK.pPos - 1 ), &(HB_VM_STACK.Return) );
 
             w += 3;
             break;
@@ -888,8 +889,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             hb_vmDo( uiParams );
 
-            hb_itemForwardValue( ( * HB_VM_STACK.pPos ), &(HB_VM_STACK.Return) );
             hb_stackPush();
+            hb_itemForwardValue( *( HB_VM_STACK.pPos - 1 ), &(HB_VM_STACK.Return) );
 
             w += 2;
             break;
@@ -973,8 +974,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               hb_itemForwardValue( ( * HB_VM_STACK.pPos ), &(HB_VM_STACK.Return) );
+               // Thread Safety.
                hb_stackPush();
+               hb_itemForwardValue( *( HB_VM_STACK.pPos - 1 ), &(HB_VM_STACK.Return) );
             }
 
             break;
@@ -998,8 +1000,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               hb_itemForwardValue( ( * HB_VM_STACK.pPos ), &(HB_VM_STACK.Return) );
+               // Thread Safety.
                hb_stackPush();
+               hb_itemForwardValue( *( HB_VM_STACK.pPos - 1 ), &(HB_VM_STACK.Return) );
             }
 
             break;
