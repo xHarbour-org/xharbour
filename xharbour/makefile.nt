@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.112 2004/12/08 01:25:13 peterrees Exp $
+# $Id: makefile.nt,v 1.113 2004/12/10 03:09:48 mlombardo Exp $
 #
 
 #
@@ -1210,6 +1210,7 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\screen2.obj \
    $(OBJ_DIR)$(MT)\screen3.obj \
    $(OBJ_DIR)$(MT)\scrmark.obj \
+   $(OBJ_DIR)$(MT)\setkeys.obj \
    $(OBJ_DIR)$(MT)\spread.obj \
    $(OBJ_DIR)$(MT)\untext.obj \
    $(OBJ_DIR)$(MT)\util.obj

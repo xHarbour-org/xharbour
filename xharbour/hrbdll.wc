@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.26 2004/12/03 22:00:21 aleytys Exp $
+# $Id: hrbdll.wc,v 1.27 2004/12/08 01:24:57 peterrees Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -550,6 +550,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\numconv.obj \
   $(OBJ_DIR)\screen2.obj \
   $(OBJ_DIR)\screen3.obj \
+  $(OBJ_DIR)\setkeys.obj \
   $(OBJ_DIR)\scrmark.obj \
   $(OBJ_DIR)\spread.obj \
   $(OBJ_DIR)\untext.obj \
@@ -2385,6 +2386,12 @@ $(OBJ_DIR)\screen3.c : $(CT_DIR)\screen3.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\screen3.obj : $(OBJ_DIR)\screen3.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\setkeys.c : $(CT_DIR)\setkeys.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\setkeys.obj : $(OBJ_DIR)\setkeys.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\scrmark.c : $(CT_DIR)\scrmark.prg

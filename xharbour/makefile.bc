@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.127 2004/12/08 01:24:57 peterrees Exp $
+# $Id: makefile.bc,v 1.128 2004/12/10 03:09:47 mlombardo Exp $
 #
 
 #
@@ -974,6 +974,7 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\numconv.obj \
    $(CT_OBJ_DIR)\screen2.obj \
    $(CT_OBJ_DIR)\screen3.obj \
+   $(CT_OBJ_DIR)\setkeys.obj \
    $(CT_OBJ_DIR)\scrmark.obj \
    $(CT_OBJ_DIR)\spread.obj \
    $(CT_OBJ_DIR)\untext.obj \

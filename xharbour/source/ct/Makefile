@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.13 2004/12/08 14:09:16 aleytys Exp $
+# $Id: Makefile,v 1.14 2004/12/10 03:10:24 mlombardo Exp $
 #
 
 ROOT = ../../
@@ -92,6 +92,7 @@ PRG_SOURCES= \
    numconv.prg \
    screen2.prg \
    screen3.prg \
+   setkeys.prg \
    scrmark.prg \
    spread.prg \
    untext.prg \

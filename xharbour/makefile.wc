@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.31 2004/12/08 01:25:13 peterrees Exp $
+# $Id: makefile.wc,v 1.32 2004/12/10 03:09:49 mlombardo Exp $
 #
 
 #
@@ -868,6 +868,7 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\screen2.obj \
    $(CT_OBJ_DIR)\screen3.obj \
    $(CT_OBJ_DIR)\scrmark.obj \
+   $(CT_OBJ_DIR)\setkeys.prg \
    $(CT_OBJ_DIR)\spread.obj \
    $(CT_OBJ_DIR)\untext.obj \
    $(CT_OBJ_DIR)\util.obj
@@ -3128,8 +3129,11 @@ $(CT_OBJ_DIR)\fcopy.c : $(CT_DIR)\fcopy.prg
 $(CT_OBJ_DIR)\fcopy.obj : $(CT_OBJ_DIR)\fcopy.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
-$(CT_OBJ_DIR)\getsecrt.c : $(CT_DIR)\getinfo.prg
+$(CT_OBJ_DIR)\getinfo.c : $(CT_DIR)\getinfo.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(CT_OBJ_DIR)\getinfo.obj : $(CT_OBJ_DIR)\getinfo.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(CT_OBJ_DIR)\getsecrt.c : $(CT_DIR)\getsecrt.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
@@ -3171,6 +3175,12 @@ $(CT_OBJ_DIR)\scrmark.c : $(CT_DIR)\scrmark.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(CT_OBJ_DIR)\scrmark.obj : $(CT_OBJ_DIR)\scrmark.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(CT_OBJ_DIR)\setkeys.c : $(CT_DIR)\setkeys.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(CT_OBJ_DIR)\setkeys.obj : $(CT_OBJ_DIR)\setkeys.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(CT_OBJ_DIR)\spread.c : $(CT_DIR)\spread.prg
