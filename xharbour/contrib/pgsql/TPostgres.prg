@@ -86,12 +86,19 @@ ENDCLASS
 
 
 METHOD New( cHost, cDatabase, cUser, cPass, nPort, Schema ) CLASS TPQserver
+    Local res
     DEFAULT nPort TO 5432
     
     ::pDB := PQconnect(cDatabase, cHost, cUser, cPass, nPort)
     
     if ! Empty(Schema) 
         ::SetSchema(Schema)
+    else        
+        res := PQexec( ::pDB, 'SELECT current_schema()' )        
+        if PQresultStatus(res) == PGRES_TUPLES_OK
+            ::Schema := PQgetvalue( res, 1, 1 )
+        endif
+        PQclear(res)
     endif                
 
 RETURN self
