@@ -60,6 +60,7 @@
 #include "item.api"
 
 
+
 HB_FUNC( P_INITPORTSPEED ) {
 
    DCB dcb;
@@ -114,6 +115,23 @@ HB_FUNC( P_READPORT ) {
    }
 }
 
+
+
+HB_FUNC( P_WRITEPORT ) {
+
+   DWORD nWritten = 0;
+   BOOL  bRet;
+   OVERLAPPED Overlapped = {0};
+
+   bRet = WriteFile( (HANDLE) hb_parnl( 1 ), hb_parcx( 2 ), hb_parclen( 2 ), &nWritten, &Overlapped );
+
+   if ( bRet ) {
+      hb_retnl( nWritten );
+   } else {
+      // Put GetLastError() here, or better a second byref param?
+      hb_retnl( -1 );
+   }
+}
 
 
 

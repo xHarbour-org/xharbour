@@ -1,5 +1,5 @@
 /*
- * $Id: telepath.prg,v 1.4 2004/08/16 14:49:43 mauriliolongo Exp $
+ * $Id: telepath.prg,v 1.5 2004/08/25 08:49:06 mauriliolongo Exp $
  */
 
 /*
@@ -63,22 +63,44 @@
 #include "fileio.ch"
 #include "telepath.ch"
 
-/*
-#pragma begindump
-   #include "hbapi.h"
-   #include <sys/ioctl.h>
-   #include <unistd.h>
-   #include <sys/stat.h>
-   #include <fcntl.h>
-#pragma enddump
-*/
-
-/*
-#xtranslate DEFAULT <a> to <b> => <a> := iif( valtype( <a> ) == "U", <b>, <a> )
-*/
 
 
-STATIC aPorts     // Array with port info
+STATIC   aPorts               // Array with port info
+STATIC   nErrorCode := 0      // Error code from last operation, 0 if no error
+
+
+
+
+function tp_baud( nPort, nNewBaud )
+
+   local nRes
+
+   default nNewBaud to 0
+
+   if ! isport( nPort ) .OR. Empty( aPorts[ nPort, TPFP_NAME ] )
+      return TE_NOPORT
+   endif
+
+   if ! isopenport( nPort )
+      return 0
+   endif
+
+   if nNewBaud > 0
+      if ( nRes := p_InitPortSpeed( aPorts[ nPort, TPFP_HANDLE ] ,;
+                                    nNewBaud,;
+                                    aPorts[ nPort, TPFP_DBITS  ] ,;
+                                    aPorts[ nPort, TPFP_PARITY ] ,;
+                                    aPorts[ nPort, TPFP_SBITS  ] ) ) == 0
+
+         aPorts[ nPort, TPFP_BAUD ] := nNewBaud
+
+
+      else
+         // set error code
+      endif
+   endif
+
+return aPorts[ nPort, TPFP_BAUD ]
 
 
 
@@ -111,13 +133,6 @@ function tp_delay( nTime )
    endif
 
    ThreadSleep( nTime * 1000 )
-
-   /* HB_INLINE(nseconds)
-    {
-       double nseconds = hb_parnd(1);
-
-       usleep( nseconds * 1000000 );
-   }*/
 
 return nil
 
@@ -399,19 +414,59 @@ return cRet
 
 
 function tp_send( nPort, cString, nTimeout )
-   local x
+
+   local nWritten, nTotWritten, nDone
+   local cLocString                 // a copy of cString to be able to change it
+
+   default cString to "", nTimeout to 0
 
    if ! isopenport( nPort )
-      return 1
-   endif
-
-   // timeout is ignored... oh well
-
-   if Len( cString ) < 1
       return 0
    endif
 
-return fWrite( aPorts[ nPort, TPFP_HANDLE ], cString )
+   if Empty( cString )
+      return 0
+   else
+      cLocString := cString
+   endif
+
+   nDone := Seconds() + iif( nTimeout >= 0, nTimeout+1, 0)
+   nWritten := nTotWritten := 0
+
+   while Len( cLocString ) > 0 .AND. nTotWritten < Len( cString ) .AND. ;
+         ( nTimeout < 0 .OR. Seconds() < nDone )
+
+      nWritten := p_WritePort( aPorts[ nPort, TPFP_HANDLE ], cLocString )
+
+      if nWritten < Len( cString ) .AND. nWritten >= 0
+
+         nTotWritten += nWritten
+
+         if ! tp_idle()
+            HB_IDLESTATE()
+         else
+            exit
+         endif
+
+         // Send remaining part of string
+         cLocString := SubStr( cLocString, nWritten + 1)
+
+      else     // nWritten < 0, error occurred
+         exit
+      endif
+
+   enddo
+
+return nTotWritten
+
+
+
+function tp_sendsub( nPort, cString, nStart, nLength, nTimeout )
+
+   default nStart to 1, nLength to Len( cString )
+
+return tp_send( nPort, SubStr( cString, nStart, nLength ), nTimeout )
+
 
 
 /* TODO: does not return if cDelim is not found but input buffer > than nMaxLen */
@@ -537,7 +592,6 @@ return nil
 function tp_crc16( cString )
 
 return p_CRC16(cString)
-
 
 
 /*
