@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.52 2003/06/22 05:34:29 ronpinkas Exp $
+ * $Id: tget.prg,v 1.53 2003/07/23 21:38:11 andijahja Exp $
  */
 
 /*
@@ -159,7 +159,7 @@ CLASS Get
 
    DATA cPicMask, cPicFunc, nMaxLen, lEdit, lDecRev, lPicComplex
    DATA nDispLen, nDispPos, nOldPos, lCleanZero, cDelimit, nMaxEdit
-   DATA lMinusPrinted
+   DATA lMinusPrinted, lDispLen
 
    METHOD DeleteAll()
    METHOD IsEditable( nPos )
@@ -244,6 +244,8 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::cPicMask := SubStr( cPicture, nAt + 1 )
       endif
 
+      AnalyzePicture( @::cPicFunc )
+
       if "D" IN ::cPicFunc
 
          ::cPicMask := Set( _SET_DATEFORMAT )
@@ -266,8 +268,13 @@ METHOD ParsePict( cPicture ) CLASS Get
          next
          if Val(cNum) > 0
             ::nDispLen := Val(cNum)
+            ::lDispLen := .t.
+         else
+            ::lDispLen := .f.
          endif
          ::cPicFunc := SubStr( ::cPicFunc, 1, nAt - 1 ) + SubStr( ::cPicFunc, nFor )
+      else
+         ::lDispLen := .f.
       endif
 
       if "Z" IN ::cPicFunc
@@ -284,6 +291,7 @@ METHOD ParsePict( cPicture ) CLASS Get
       ::cPicFunc   := ""
       ::cPicMask   := cPicture
       ::lCleanZero := .f.
+      ::lDispLen   := .f.
    endif
 
    if ::type == "D"
@@ -512,7 +520,7 @@ METHOD SetFocus() CLASS Get
    endif
 
    IF lWasNil .and. ::buffer != NIL
-      IF ::nDispLen == NIL
+      IF ::nDispLen == NIL .or. !::lDispLen
          ::nDispLen := ::nMaxLen
       ENDIF
 
@@ -1256,7 +1264,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
    ::nMaxLen  := Len( cBuffer )
    ::nMaxEdit := ::nMaxLen
-   if ::nDispLen == NIL
+   if ::nDispLen == NIL .or. !::lDispLen
       ::nDispLen := ::nMaxLen
    endif
 
@@ -1567,7 +1575,7 @@ METHOD Picture( cPicture ) CLASS Get
 //      ::buffer  := ::PutMask( )
 //      ::nMaxLen := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
 
-      if ::nDispLen == NIL
+      if ::nDispLen == NIL .or. !::lDispLen
          ::nDispLen := ::nMaxLen
       endif
 
@@ -1683,4 +1691,20 @@ STATIC FUNCTION IsBadDate( cBuffer, cPicFunc )
    Next
 
  return .f.
+
+static procedure AnalyzePicture( cPicture )
+   Local cChar, lS := .f.
+
+   For each cChar in Substr( cPicture, 2 )
+      do case
+      case cChar == "S"
+         lS := .t.
+      case cChar $ "!()L0ABCDEKRXZ"
+         lS := .f.
+      case cChar $ "0123456789" .and. lS
+      other
+         cPicture := Left( cPicture, HB_EnumIndex() )
+      endcase
+   Next
+Return
 
