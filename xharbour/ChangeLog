@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1797 2003/11/30 10:23:08 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1798 2003/11/30 10:25:05 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,64 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-30 13:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/config/dos/watcom.cf
+  * xharbour/config/w32/watcom.cf
+    * warning level a little bit increased
+
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * some small changes to avoids increased warnings in Open Watcom
+
+  * xharbour/include/hbsetup.h
+    + two new macros HB_EXTERN_BEGIN and HB_EXTERN_END
+
+  * xharbour/include/classes.h
+  * xharbour/include/hbapi.h
+  * xharbour/include/hbapicdp.h
+  * xharbour/include/hbapierr.h
+  * xharbour/include/hbapifs.h
+  * xharbour/include/hbapigt.h
+  * xharbour/include/hbapiitm.h
+  * xharbour/include/hbapilng.h
+  * xharbour/include/hbapirdd.h
+  * xharbour/include/hbcomp.h
+  * xharbour/include/hbdate.h
+  * xharbour/include/hbdbf.h
+  * xharbour/include/hbdbferr.h
+  * xharbour/include/hbdbsort.h
+  * xharbour/include/hberrors.h
+  * xharbour/include/hbexprop.h
+  * xharbour/include/hbfast.h
+  * xharbour/include/hbhash.h
+  * xharbour/include/hbinit.h
+  * xharbour/include/hbmacro.h
+  * xharbour/include/hbmath.h
+  * xharbour/include/hbpp.h
+  * xharbour/include/hbrddcdx.h
+  * xharbour/include/hbrdddbf.h
+  * xharbour/include/hbrdddbt.h
+  * xharbour/include/hbrdddel.h
+  * xharbour/include/hbrddfpt.h
+  * xharbour/include/hbrddntx.h
+  * xharbour/include/hbrddsdf.h
+  * xharbour/include/hbrddwrk.h
+  * xharbour/include/hbset.h
+  * xharbour/include/hbstack.h
+  * xharbour/include/hbtrace.h
+  * xharbour/include/hbvm.h
+  * xharbour/include/hbvmpub.h
+  * xharbour/contrib/hbzlib/include/hbzip.h
+  * xharbour/contrib/hbzlib/include/hbzip2.h
+  * xharbour/source/vm/estack.c
+  * xharbour/source/vm/extend.c
+  * xharbour/source/vm/fastitem.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/macro.c
+    * changed two use HB_EXTERN_{BEGIN,END} macros
 
 2003-11-30 11:28 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/macro.c

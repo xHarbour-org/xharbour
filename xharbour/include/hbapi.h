@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.99 2003/11/26 22:19:40 jonnymind Exp $
+ * $Id: hbapi.h,v 1.100 2003/11/26 23:01:21 jonnymind Exp $
  */
 
 /*
@@ -60,9 +60,7 @@
 
 #include "hbvmpub.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 #define HB_MAX_MACRO_ARGS   16
 #define HB_MAX_WITH_OBJECTS 16
@@ -596,8 +594,6 @@ BOOL hb_execFromArray( PHB_ITEM pFirst );
  /* LONGLONG support */
 
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_APIEXT_H_ */

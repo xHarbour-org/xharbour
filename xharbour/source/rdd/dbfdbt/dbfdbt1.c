@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.3 2003/09/15 16:39:26 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.4 2003/10/01 17:41:47 paultucker Exp $
  */
 
 /*
@@ -269,11 +269,15 @@ HB_INIT_SYMBOLS_END( dbfdbt1__InitSymbols )
  */
 static BOOL hb_dbtFileLockEx( DBTAREAP pArea )
 {
-   BOOL bRet;
+   BOOL fRet;
 
-   while ( ! ( bRet = hb_fsLock( pArea->hMemoFile, DBT_LOCKPOS, DBT_LOCKSIZE,
-                                 FL_LOCK | FLX_EXCLUSIVE | FLX_WAIT ) ) );
-   return bRet;
+	 do
+	 {
+			fRet = hb_fsLock( pArea->hMemoFile, DBT_LOCKPOS, DBT_LOCKSIZE,
+                        FL_LOCK | FLX_EXCLUSIVE | FLX_WAIT );
+	 } while ( !fRet );
+
+	 return fRet;
 }
 
 /*
@@ -281,11 +285,15 @@ static BOOL hb_dbtFileLockEx( DBTAREAP pArea )
  */
 static BOOL hb_dbtFileLockSh( DBTAREAP pArea )
 {
-   BOOL bRet;
+   BOOL fRet;
 
-   while ( ! ( bRet = hb_fsLock( pArea->hMemoFile, DBT_LOCKPOS, DBT_LOCKSIZE,
-                                 FL_LOCK | FLX_SHARED | FLX_WAIT ) ) );
-   return bRet;
+	 do
+	 {
+			fRet = hb_fsLock( pArea->hMemoFile, DBT_LOCKPOS, DBT_LOCKSIZE,
+                        FL_LOCK | FLX_SHARED | FLX_WAIT );
+	 } while ( !fRet );
+
+   return fRet;
 }
 
 /*

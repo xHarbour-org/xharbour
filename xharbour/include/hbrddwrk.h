@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddwrk.h,v 1.1.1.1 2001/12/21 10:47:25 ronpinkas Exp $
+ * $Id: hbrddwrk.h,v 1.2 2003/07/23 12:35:57 druzus Exp $
  */
 
 /*
@@ -55,9 +55,7 @@
 
 #include "hbapirdd.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 /*
  * -- METHODS --
@@ -162,8 +160,6 @@ extern ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock );
 
 #define hb_waWhoCares                      ( DBENTRYP_SVP ) hb_waUnsupported
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_RDDWRK_H_ */

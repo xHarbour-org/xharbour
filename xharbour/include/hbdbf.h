@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbf.h,v 1.3 2003/05/31 22:26:54 lculik Exp $
+ * $Id: hbdbf.h,v 1.4 2003/06/03 23:35:01 lculik Exp $
  */
 
 /*
@@ -61,9 +61,7 @@
    #pragma pack(1)
 #endif
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 /* DBF header */
 
@@ -101,9 +99,7 @@ typedef struct _DBFFIELD
 
 typedef DBFFIELD * LPDBFFIELD;
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #if defined(__EMX__) && ! defined(__RSXNT__)
    #pragma pack()

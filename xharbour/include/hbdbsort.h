@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbsort.h,v 1.3 2003/09/08 12:56:52 druzus Exp $
+ * $Id: hbdbsort.h,v 1.4 2003/11/10 11:49:48 druzus Exp $
  */
 
 /*
@@ -56,9 +56,7 @@
 #define HB_EXTERNAL_RDDDBF_USE
 #include "hbrdddbf.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 /*
  *  DBQUICKSORT
@@ -91,8 +89,6 @@ extern void hb_dbQSortExit( LPDBQUICKSORT pQuickSort );
 extern BOOL hb_dbQSortAdvance( LPDBQUICKSORT pQuickSort, USHORT uiCount );
 extern void hb_dbQSortComplete( LPDBQUICKSORT pQuickSort );
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_DBSORT_H_ */

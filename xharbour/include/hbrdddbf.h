@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.8 2003/11/22 03:02:21 ronpinkas Exp $
+ * $Id: hbrdddbf.h,v 1.9 2003/11/23 19:34:54 druzus Exp $
  */
 
 /*
@@ -60,10 +60,7 @@
 #include "hbapicdp.h"
 #endif
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
-
+HB_EXTERN_BEGIN
 
 /* DBF default file extensions */
 #define DBF_TABLEEXT                      ".dbf"
@@ -287,8 +284,6 @@ extern ERRCODE HB_EXPORT hb_dbfGetEGcode( ERRCODE errCode );
 extern BOOL HB_EXPORT hb_dbfLockExtFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, ULONG *pPoolPos );
 extern BOOL HB_EXPORT hb_dbfLockExtGetData( BYTE bScheme, ULONG *ulPos, ULONG *ulPool );
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_RDDDBF_H_ */

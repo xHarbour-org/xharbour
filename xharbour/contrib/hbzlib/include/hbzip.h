@@ -1,5 +1,5 @@
 /*
- * $Id: hbzip.h,v 1.1 2002/06/30 19:48:56 lculik Exp $
+ * $Id: hbzip.h,v 1.1 2003/09/12 20:12:35 paultucker Exp $
  */
 
 /*
@@ -61,9 +61,9 @@
 #include <hbvm.h>
 #include "zip.h"
 #include "unzip.h"
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+
+HB_EXTERN_BEGIN
+
 #define filePos 1
 #define Lenght 2
 #define Method 3
@@ -83,8 +83,7 @@ extern void hb____ChangeFileDate(char *filename,uLong dosdate,tm_unz tmu_date);
 extern int hb___MakeDir(char *szNewDirectory);
 extern int hb___GetNumberofFilestoUnzip(char *szFile);
 extern PHB_ITEM hb___GetFileNamesFromZip(char *szFile,BOOL iMode);
-#if defined(HB_EXTERN_C)
-}
-#endif
+
+HB_EXTERN_END
 
 #endif /* HB_APIEXT_H_ */

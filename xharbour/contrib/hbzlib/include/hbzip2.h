@@ -1,5 +1,5 @@
 /*
- * $Id: hbzip2.h,v 1.2 2003/11/22 21:15:26 lculik Exp $
+ * $Id: hbzip2.h,v 1.3 2003/11/23 22:17:18 lculik Exp $
  */
 
 /*
@@ -70,9 +70,9 @@
 
 #ifdef HB_EXTERN_C
 #include <ziparchive.h>
-extern "C" {
 #endif
 
+HB_EXTERN_BEGIN
 
 #define filePos 1
 #define Lenght 2
@@ -135,7 +135,6 @@ extern BOOL     hb_SaveZipFileFromMemory(char *szFile);
 extern BOOL     hb_CreateZipInMemory(char *szFileToCompress,char *szFile);
 */
 extern void hb_SetZipReadOnly(BOOL bRead);
-#ifdef HB_EXTERN_C
-}
-#endif
+
+HB_EXTERN_END
 #endif /* HB_APIEXT_H_ */

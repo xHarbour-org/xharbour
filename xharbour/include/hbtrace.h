@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.h,v 1.11 2003/05/29 23:04:12 paultucker Exp $
+ * $Id: hbtrace.h,v 1.12 2003/09/03 12:51:36 paultucker Exp $
  */
 
 /*
@@ -55,9 +55,7 @@
 
 #include "hbdefs.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 extern void hb_traceInit( void );
 extern void hb_traceExit( void );
@@ -228,8 +226,6 @@ extern int  hb_tracelevel( int new_level );
 extern int  hb_tr_level( void );
 extern void hb_tr_trace( char * fmt, ... );
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_TRACE_H_ */

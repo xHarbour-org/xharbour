@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.13 2003/10/07 22:25:46 paultucker Exp $
+ * $Id: hbapigt.h,v 1.14 2003/11/30 10:02:46 druzus Exp $
  */
 
 /*
@@ -71,9 +71,7 @@
 
 #include "hbapi.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 /* NOTE: The declaration of hb_gtSetPos(), hb_gtGetPos(), hb_gtWrite(),
          hb_gtWriteAt(), hb_gtRepChar(), hb_gtBox(), hb_gtBoxS(), hb_gtBoxD() 
@@ -335,8 +333,9 @@ extern void   hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
 
 #include "hbinit.h"
 
-#if defined(__WATCOMC__) && defined(_DOS)
-#undef _DOS
+#if defined(__WATCOMC__)
+    #undef _DOS
+    #undef _WIN
 #endif
 /* These hacks are needed to force preprocessing if id/x is also a macro */
 #define _HB_GT_PREF_( id )      _HB_GT_PREF__( id )
@@ -542,8 +541,6 @@ void hb_consoleUnlock();
 
 #endif
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_APIGT_H_ */

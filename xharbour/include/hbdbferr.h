@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbdbferr.h,v 1.1 2003/09/08 12:56:52 druzus Exp $
  */
 
 /*
@@ -53,9 +53,7 @@
 #ifndef HB_DBFERR_H_
 #define HB_DBFERR_H_
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 /* DBF errors */
 #define EDBF_OPEN_DBF                              1001
@@ -73,9 +71,6 @@ extern "C" {
 /* ORDER errors */
 #define EDBF_INVALIDKEY                            1026
 
-
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_DBFERR_H_ */

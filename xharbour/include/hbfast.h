@@ -1,5 +1,5 @@
 /*
- * $Id: hbfast.h,v 1.10 2002/05/02 00:05:03 ronpinkas Exp $
+ * $Id: hbfast.h,v 1.11 2003/01/19 21:44:02 andijahja Exp $
  */
 
 /*
@@ -53,9 +53,7 @@
 
    #include "hbapi.h"
 
-   #if defined(HB_EXTERN_C)
-      extern "C" {
-   #endif
+   HB_EXTERN_BEGIN
 
     typedef struct _HB_SCANNED_ARRAYS
     {
@@ -75,7 +73,6 @@
    extern USHORT HB_EXPORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pArray, PHB_SCANNED_ARRAYS pScannedList, PHB_BASEARRAY pTopBaseArray );
    extern BYTE   HB_EXPORT hb_itemParamId( PHB_ITEM pItem );
 
-   #if defined(HB_EXTERN_C)
-      }
-   #endif
+   HB_EXTERN_END
+
 #endif

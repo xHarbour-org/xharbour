@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.6 2003/03/27 07:44:55 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.7 2003/10/10 04:19:49 ronpinkas Exp $
  */
 
 /*
@@ -55,9 +55,7 @@
 
 #include "hbapi.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 /* value types seen at language level
  */
@@ -405,8 +403,6 @@ HB_EXPR_PTR hb_compExprSetGetBlock( HB_EXPR_PTR pExpr );
 
 #endif
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif  /* HB_EXPROP_H_ */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.12 2003/10/08 13:07:24 paultucker Exp $
+ * $Id: hbvm.h,v 1.13 2003/11/22 01:41:10 ronpinkas Exp $
  */
 
 /*
@@ -55,9 +55,7 @@
 
 #include "hbapi.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 /* Harbour virtual machine init/exit functions */
 extern void HB_EXPORT hb_vmInit( BOOL bStartMainProc );
@@ -106,8 +104,6 @@ HB_EXPORT extern void    hb_vmPushDate( long lDate );   /* pushes a long date on
 HB_EXPORT extern void    hb_vmPushSymbol( PHB_SYMB pSym ); /* pushes a function pointer onto the stack */
 HB_EXPORT extern void    hb_vmPushPointer( void * ); /* push an item of HB_IT_POINTER type */
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_VM_H_ */

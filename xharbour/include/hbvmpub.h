@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.21 2003/11/26 13:43:15 jonnymind Exp $
+ * $Id: hbvmpub.h,v 1.22 2003/11/26 21:58:35 jonnymind Exp $
  */
 
 /*
@@ -59,9 +59,7 @@
 
 #include "hbdefs.h"
 
-   #if defined(HB_EXTERN_C)
-      extern "C" {
-   #endif
+    HB_EXTERN_BEGIN
 
     struct _HB_DYNS;
     struct _SYMBOLS;
@@ -318,8 +316,6 @@
 
     extern void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
 
-    #if defined(HB_EXTERN_C)
-       }
-    #endif
+    HB_EXTERN_END
 
 #endif /* HB_VMPUB_H_ */

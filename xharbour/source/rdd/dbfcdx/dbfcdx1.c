@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.87 2003/11/24 23:51:29 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.88 2003/11/26 09:55:08 druzus Exp $
  */
 
 /*
@@ -404,7 +404,8 @@ static void hb_cdxMakeSortTab( CDXAREAP pArea )
    if ( pArea->cdPage && pArea->cdPage->lSort && !pArea->bCdxSortTab )
    {
       int i, j, l;
-      BYTE * pbSort, b;
+      BYTE * pbSort;
+			BYTE b;
 
       pArea->bCdxSortTab = ( BYTE * ) hb_xgrab( 256 );
       pbSort = ( BYTE * ) hb_xgrab( 256 );
@@ -951,7 +952,7 @@ static ULONG hb_cdxIndexGetAvailPage( LPCDXINDEX pIndex, BOOL bHeader )
       else
       {
          if ( hb_fsSeek( hFile, ulPos, FS_SET ) != ulPos ||
-              hb_fsRead( hFile, (BYTE *) &byBuf, 4 ) != 4 )
+              hb_fsRead( hFile, (BYTE *) byBuf, 4 ) != 4 )
             hb_errInternal( EDBF_READ, "Read index page failed.", "", "" );
          pIndex->freePage = HB_GET_LE_ULONG( byBuf );
 #ifdef HB_CDX_DBGUPDT
@@ -2834,7 +2835,7 @@ static int hb_cdxPageKeyIntBalance( LPCDXPAGE pPage, int iChildRet )
       {
          iMax = ( iKeys + iNeedKeys - 1 ) / iNeedKeys;
          iMin = HB_MAX( iKeys / iNeedKeys, 1 );
-         for ( i = iBlncKeys - 1; i > 1 && 
+         for ( i = iBlncKeys - 1; i > 1 &&
                   childs[i]->iKeys >= iMin && childs[i]->iKeys <= iMax; i-- )
          {
             iKeys -= childs[i]->iKeys;
@@ -6929,7 +6930,7 @@ static BOOL hb_cdxSortSwapGetNextKey( LPSORTINFO pSort, LONG * pKeyRec, BYTE * p
             pPage->nBytesLeft += pPage->nBufLeft;
             hb_fsSeek( pSort->hTempFile, pPage->nFileOffset + pPage->pageLen - pPage->nBytesLeft, SEEK_SET );
             pPage->nBufLeft = (USHORT) ( ( pPage->nBytesLeft < sizeof(pPage->page) ) ? pPage->nBytesLeft : sizeof(pPage->page) );
-            if ( hb_fsRead( pSort->hTempFile, (BYTE *) &(pPage->page), pPage->nBufLeft ) != pPage->nBufLeft )
+            if ( hb_fsRead( pSort->hTempFile, (BYTE *) (pPage->page), pPage->nBufLeft ) != pPage->nBufLeft )
                hb_errInternal( HB_EI_ERRUNRECOV, "hb_cdxTagDoIndex: Read error reading temporary index file", "hb_cdxTagDoIndex", NULL );
             pPage->nBytesLeft -= pPage->nBufLeft;
             pPage->nCurPos = 0;
@@ -6967,7 +6968,7 @@ static int hb_cdxSortSwapBuildIndex( LPSORTINFO pSort )
       pPage = pSort->pSwapPage + nPage;
       pPage->nFileOffset = hb_fsSeek( pSort->hTempFile, 0, SEEK_CUR );
       pPage->nBufLeft = 2 * sizeof(char) + sizeof(USHORT) + 2 * sizeof(ULONG);
-      if ( hb_fsRead( pSort->hTempFile, (BYTE *) &(pPage->page), pPage->nBufLeft ) != pPage->nBufLeft )
+      if ( hb_fsRead( pSort->hTempFile, (BYTE *) (pPage->page), pPage->nBufLeft ) != pPage->nBufLeft )
          hb_errInternal( HB_EI_ERRUNRECOV, "hb_cdxTagDoIndex: Read error reading temporary index file", "hb_cdxTagDoIndex", NULL );
       ptr = pPage->page;
       memcpy( pPage->mark, ptr, 2 );
@@ -6986,7 +6987,7 @@ static int hb_cdxSortSwapBuildIndex( LPSORTINFO pSort )
       pPage->keysLeft   = pPage->keyCount;
 
       pPage->nBufLeft = (USHORT) ( ( pPage->nBytesLeft < sizeof(pPage->page) ) ? pPage->nBytesLeft : sizeof(pPage->page) );
-      if ( hb_fsRead( pSort->hTempFile, (BYTE *) &(pPage->page), pPage->nBufLeft ) != pPage->nBufLeft )
+      if ( hb_fsRead( pSort->hTempFile, (BYTE *) (pPage->page), pPage->nBufLeft ) != pPage->nBufLeft )
          hb_errInternal( HB_EI_ERRUNRECOV, "hb_cdxTagDoIndex: Read error reading tempmrary index file", "hb_cdxTagDoIndex", NULL );
       pPage->nBytesLeft -= pPage->nBufLeft;
       pPage->nCurPos = 0;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.14 2003/09/24 01:20:34 druzus Exp $
+ * $Id: hbsetup.h,v 1.15 2003/09/24 02:51:49 druzus Exp $
  */
 
 /*
@@ -365,6 +365,11 @@
 
 #if defined(__cplusplus) && !defined(__IBMCPP__)
    #define HB_EXTERN_C
+   #define HB_EXTERN_BEGIN    extern "C" {
+   #define HB_EXTERN_END      }
+#else
+   #define HB_EXTERN_BEGIN
+   #define HB_EXTERN_END
 #endif
 
 #endif /* HB_SETUP_H_ */

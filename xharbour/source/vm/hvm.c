@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.287 2003/11/26 19:43:26 jonnymind Exp $
+ * $Id: hvm.c,v 1.288 2003/11/30 10:02:47 druzus Exp $
  */
 
 /*
@@ -108,16 +108,12 @@
 
 //JC1: macro and codeblock parameters are handled in thread stack
 #ifndef HB_THREAD_SUPPORT
-   #ifdef HB_EXTERN_C
-   extern "C" {
-   #endif
+   HB_EXTERN_BEGIN
    int hb_vm_aiExtraParams[HB_MAX_MACRO_ARGS], hb_vm_iExtraParamsIndex = 0;
    PHB_SYMB hb_vm_apExtraParamsSymbol[HB_MAX_MACRO_ARGS];
    int hb_vm_aiExtraElements[HB_MAX_MACRO_ARGS], hb_vm_iExtraElementsIndex = 0, hb_vm_iExtraElements = 0;
    int hb_vm_iExtraIndex;
-   #ifdef HB_EXTERN_C
-   }
-   #endif
+   HB_EXTERN_END
 #endif
 
 /* Mouse Disabling */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.4 2003/05/14 08:44:23 jonnymind Exp $
+ * $Id: hbapierr.h,v 1.5 2003/05/25 17:03:18 jonnymind Exp $
  */
 
 /*
@@ -56,9 +56,7 @@
 #include "hbapi.h"
 #include "error.ch"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 /* Error codes (returned from hb_errLaunch()) */
 
@@ -191,8 +189,6 @@ typedef struct HB_ERROR_INFO_
 /*  set/get current error handler */
 extern HB_ERROR_INFO_PTR HB_EXPORT hb_errorHandler( HB_ERROR_INFO_PTR pNewHandler );
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_APIERR_H_ */

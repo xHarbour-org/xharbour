@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.24 2003/11/22 03:02:21 ronpinkas Exp $
+ * $Id: hbrddcdx.h,v 1.25 2003/11/23 19:34:54 druzus Exp $
  */
 
 /*
@@ -62,10 +62,7 @@
 #define HB_EXTERNAL_RDDDBF_USE
 #include "hbrdddbf.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
-
+HB_EXTERN_BEGIN
 
 /* CDX constants and defaults */
 #define CDX_INDEXEXT                              ".cdx"
@@ -537,8 +534,6 @@ static ERRCODE hb_cdxSetScope( CDXAREAP pArea, LPDBORDSCOPEINFO sInfo );
 
 //#define hb_cdxSwapBytes( n )  HB_SWAP_ULONG( n );
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_RDDCDX_H_ */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmacro.h,v 1.3 2002/12/04 06:24:06 ronpinkas Exp $
+ * $Id: hbmacro.h,v 1.4 2003/11/30 10:23:12 jonnymind Exp $
  */
 
 /*
@@ -74,9 +74,7 @@
 #include "hbpcode.h"
 #include "hbmacro.ch"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 /* flags for compilation process
  */
@@ -164,8 +162,6 @@ extern int hb_vm_iExtraIndex;
 extern PHB_SYMB hb_vm_apExtraParamsSymbol[HB_MAX_MACRO_ARGS];
 #endif
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_MACRO_H_ */

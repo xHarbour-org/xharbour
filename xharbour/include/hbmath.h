@@ -1,5 +1,5 @@
 /*
- * $Id: hbmath.h,v 1.3 2003/06/26 01:29:14 ronpinkas Exp $
+ * $Id: hbmath.h,v 1.4 2003/07/24 01:55:58 jonnymind Exp $
  */
 
 /*
@@ -62,9 +62,7 @@
 #include <math.h>
 #endif
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 #ifndef HB_NO_MATH_HANDLER
    #if defined(__WATCOMC__)
@@ -129,8 +127,6 @@ extern double hb_random_num( void );
 /* include defines from math.ch */
 #include <math.ch>
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_MATH_H_ */

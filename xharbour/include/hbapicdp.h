@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.4 2003/06/19 02:44:49 druzus Exp $
+ * $Id: hbapicdp.h,v 1.5 2003/08/18 12:13:46 druzus Exp $
  */
 
 /*
@@ -59,6 +59,8 @@
 #include "hbapi.h"
 #include "hbinit.h"
 
+HB_EXTERN_BEGIN
+
 /* This hack is needed to force preprocessing if id is also a macro */
 #define HB_CODEPAGE_REQUEST( id )           HB_CODEPAGE_REQUEST_( id )
 #define HB_CODEPAGE_REQUEST_( id )          extern HB_FUNC( HB_CODEPAGE_##id ); \
@@ -102,6 +104,8 @@ extern void HB_EXPORT hb_cdpTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE );
 extern void HB_EXPORT hb_cdpnTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE, unsigned int );
 extern int HB_EXPORT hb_cdpcmp( char*, char*, ULONG, PHB_CODEPAGE, ULONG* );
 extern int HB_EXPORT hb_cdpchrcmp( char, char, PHB_CODEPAGE );
+
+HB_EXTERN_END
 
 #endif /* HB_APICDP_H_ */
 

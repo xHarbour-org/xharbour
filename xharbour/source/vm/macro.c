@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.29 2003/11/30 10:02:48 druzus Exp $
+ * $Id: macro.c,v 1.30 2003/11/30 10:23:12 jonnymind Exp $
  */
 
 /*
@@ -67,16 +67,12 @@
 /* TODO: remove these externals */
 //JC1: halfway though :-)
 #ifndef HB_THREAD_SUPPORT
-   #ifdef HB_EXTERN_C
-   extern "C" {
-   #endif
+   HB_EXTERN_BEGIN
    extern int hb_vm_aiExtraParams[HB_MAX_MACRO_ARGS], hb_vm_iExtraParamsIndex;
    extern int hb_vm_aiExtraElements[HB_MAX_MACRO_ARGS], hb_vm_iExtraElementsIndex;
    extern int hb_vm_iExtraIndex;
    extern PHB_SYMB hb_vm_apExtraParamsSymbol[HB_MAX_MACRO_ARGS];
-   #ifdef HB_EXTERN_C
-   }
-   #endif
+   HB_EXTERN_END
 #endif
 
 /* .and. & .or. expressions shortcuts - the expression optimiser needs

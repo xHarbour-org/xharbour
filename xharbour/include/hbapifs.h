@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.21 2003/08/27 10:29:14 jonnymind Exp $
+ * $Id: hbapifs.h,v 1.22 2003/09/14 18:07:23 jonnymind Exp $
  */
 
 /*
@@ -56,9 +56,7 @@
 #include "hbapi.h"
 #include "fileio.ch"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 #define FS_ERROR F_ERROR
 
@@ -216,8 +214,6 @@ extern BYTE      HB_EXPORT * hb_filecase ( char * ); /* Convert string to enviro
 extern int GnuErrtoDosErr( int ErrCode );
 
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_APIFS_H_ */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.18 2003/05/24 00:29:09 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.19 2003/06/18 08:57:01 ronpinkas Exp $
  */
 
 /*
@@ -75,9 +75,7 @@
 /* JC1: test for macro accessing the stack */
 #include "thread.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 struct hb_class_method;
 
@@ -148,8 +146,6 @@ extern void    hb_stackPush( void );       /* pushes an item on to the stack */
 extern void    hb_stackPop( void );        /* pops an item from the stack */
 extern void    hb_stackInit( void );       /* initializes the stack */
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_STACK_H_ */

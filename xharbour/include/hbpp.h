@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.4 2003/06/20 17:32:41 jonnymind Exp $
+ * $Id: hbpp.h,v 1.5 2003/07/23 12:35:57 druzus Exp $
  */
 
 /*
@@ -58,9 +58,7 @@
 #include "hberrors.h"
 #include "hbver.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 struct _DEFINES;
 typedef struct _DEFINES
@@ -144,9 +142,7 @@ extern void hb_pp_ParsePragma( char * szline );
 #define STATE_QUOTE4    11  /* escaped quote */
 /* END */
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_PP_H_ */
 

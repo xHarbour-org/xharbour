@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.20 2003/07/24 20:53:45 andijahja Exp $
+ * $Id: hbcomp.h,v 1.21 2003/10/06 21:31:34 ronpinkas Exp $
  */
 
 /*
@@ -66,9 +66,7 @@
 #include "hbpcode.h"
 #include "hbhash.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 /* compiler related declarations */
 
@@ -575,9 +573,7 @@ extern short          hb_comp_iGlobals;
   #define HB_COMP_ISSUPPORTED(flag)    ( hb_comp_Supported & (flag) )
 #endif
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_COMP_H_ */
 

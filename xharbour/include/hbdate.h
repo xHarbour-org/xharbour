@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.h,v 1.2 2002/10/27 14:41:37 lculik Exp $
+ * $Id: hbdate.h,v 1.3 2003/01/19 21:44:02 andijahja Exp $
  */
 
 /*
@@ -55,9 +55,7 @@
 
 #include "hbsetup.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 extern double   HB_EXPORT hb_dateSeconds( void );
 extern void     HB_EXPORT hb_dateToday( long * plYear, long * plMonth, long * plDay );
@@ -73,8 +71,6 @@ extern void     HB_EXPORT hb_dateStrGet( const char * szDate, long * plYear, lon
 extern char     HB_EXPORT * hb_dateDecStr( char * szDate, long lJulian );
 extern long     HB_EXPORT hb_dateEncStr( char * szDate );
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_DATE_H_ */

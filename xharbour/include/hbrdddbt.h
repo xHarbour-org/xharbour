@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbt.h,v 1.4 2003/11/20 23:47:36 druzus Exp $
+ * $Id: hbrdddbt.h,v 1.5 2003/11/22 03:33:57 ronpinkas Exp $
  */
 
 /*
@@ -63,9 +63,7 @@
 #define HB_EXTERNAL_RDDDBF_USE
 #include "hbrdddbf.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 /* MEMO constants and defaults */
 #define DBT_MEMOEXT                             ".dbt"
@@ -190,9 +188,6 @@ static ERRCODE hb_dbtWriteDBHeader( DBTAREAP pArea );
 #define hb_dbtExists                               NULL
 #define hb_dbtWhoCares                             NULL
 
-
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_RDDDBT */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.23 2003/11/26 13:43:15 jonnymind Exp $
+ * $Id: hbapiitm.h,v 1.24 2003/11/26 21:58:35 jonnymind Exp $
  */
 
 /*
@@ -55,9 +55,7 @@
 
 #include "hbapi.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 #define HB_EVAL_PARAM_MAX_ 9
 
@@ -141,8 +139,6 @@ extern PHB_ITEM HB_EXPORT hb_itemValToStr ( PHB_ITEM pItem ); /* Convert any sca
 extern char     HB_EXPORT * hb_itemPadConv  ( PHB_ITEM pItem, char * buffer, ULONG * pulSize );
 extern void     HB_EXPORT hb_itemSwap     ( PHB_ITEM pItem1, PHB_ITEM pItem2 );
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_APIITM_H_ */

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.9 2003/11/11 20:20:52 ronpinkas Exp $
+ * $Id: classes.h,v 1.10 2003/11/12 23:33:55 ronpinkas Exp $
  */
 
 /*
@@ -53,9 +53,7 @@
 #ifndef HB_CLASSES_H_
 #define HB_CLASSES_H_
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 typedef struct hb_class_method
 {
@@ -99,7 +97,5 @@ extern HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
 
 void * hb_mthRequested( void );
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.29 2003/11/26 13:43:15 jonnymind Exp $
+ * $Id: extend.c,v 1.30 2003/11/26 21:58:35 jonnymind Exp $
  */
 
 /*
@@ -83,9 +83,7 @@
 /* NOTE: iParam = -1 can be used to access the return value. */
 /* NOTE: iParam = 0 can be used to access the SELF object. */
 
-#ifdef HB_EXTERN_C
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask )
 {
@@ -1132,6 +1130,4 @@ void HB_EXPORT hb_retnlllen( LONGLONG llNumber, int iWidth)
 }
 #endif
 
-#ifdef HB_EXTERN_C
-}
-#endif
+HB_EXTERN_END

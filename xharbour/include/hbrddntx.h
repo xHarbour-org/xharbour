@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.15 2003/11/15 23:33:16 druzus Exp $
+ * $Id: hbrddntx.h,v 1.16 2003/11/20 23:47:36 druzus Exp $
  */
 
 /*
@@ -59,10 +59,7 @@
 #include "hbapicdp.h"
 #endif
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
-
+HB_EXTERN_BEGIN
 
 /* DBFNTX default extensions */
 #define NTX_MEMOEXT                               ".dbt"
@@ -427,8 +424,6 @@ static ERRCODE ntxSetScope( NTXAREAP pArea, LPDBORDSCOPEINFO sInfo );
 #define ntxExists                NULL
 #define ntxWhoCares              NULL
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_RDDNTX_H_ */

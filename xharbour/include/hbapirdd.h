@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.12 2003/09/08 12:56:52 druzus Exp $
+ * $Id: hbapirdd.h,v 1.13 2003/10/13 00:03:46 druzus Exp $
  */
 
 /*
@@ -57,9 +57,7 @@
 #include "dbinfo.ch"   /* Constants for SELF_ORDINFO, SELF_INFO(), SELF_RECINFO() */
 #include "dbstruct.ch" /* Constants for SELF_FIELDINFO() */
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 #define HARBOUR_MAX_RDD_DRIVERNAME_LENGTH       32
 #define HARBOUR_MAX_RDD_ALIAS_LENGTH            32
@@ -1061,8 +1059,6 @@ extern ERRCODE HB_EXPORT hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data
 USHORT hb_rddFieldIndex( AREAP pArea, char * szName );
 ERRCODE hb_rddGetTempAlias( char * szAliasTmp );
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_APIRDD_H_ */

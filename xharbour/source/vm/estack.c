@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.51 2003/11/07 18:04:59 ronpinkas Exp $
+ * $Id: estack.c,v 1.52 2003/11/09 23:16:39 jonnymind Exp $
  */
 
 /*
@@ -64,9 +64,8 @@
 #include "hbfast.h"
 #include "hbapierr.h"
 
-#ifdef HB_EXTERN_C
-extern "C" {
-#endif
+
+HB_EXTERN_BEGIN
 
 /* ------------------------------- */
 
@@ -586,6 +585,4 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
 }
 #endif
 
-#ifdef HB_EXTERN_C
-}
-#endif
+HB_EXTERN_END

@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.6 2003/05/26 05:58:55 paultucker Exp $
+ * $Id: hbinit.h,v 1.7 2003/06/23 18:50:57 ronpinkas Exp $
  */
 
 /*
@@ -55,9 +55,7 @@
 
 #include "hbsetup.h"
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics symbols initialization */
 
@@ -215,8 +213,6 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
 
 #endif
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_INIT_H_ */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapilng.h,v 1.4 2003/01/19 21:44:01 andijahja Exp $
+ * $Id: hbapilng.h,v 1.5 2003/06/17 22:10:22 druzus Exp $
  */
 
 /*
@@ -59,9 +59,7 @@
 
 #include "hblang.ch" /* Base values for the unified language item table */
 
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
+HB_EXTERN_BEGIN
 
 /* This hack is needed to force preprocessing if id is also a macro */
 #define HB_LANG_REQUEST( id )           HB_LANG_REQUEST_( id )
@@ -97,9 +95,7 @@ extern char   HB_EXPORT * hb_langName             ( void );
 
 extern char    HB_EXPORT * hb_langDGetErrorDesc    ( ULONG ulIndex );
 
-#if defined(HB_EXTERN_C)
-}
-#endif
+HB_EXTERN_END
 
 #endif /* HB_APILNG_H_ */
 
