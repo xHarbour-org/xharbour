@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.48 2003/12/15 02:35:37 jonnymind Exp $
+ * $Id: memvars.c,v 1.49 2003/12/19 07:30:01 ronpinkas Exp $
  */
 
 /*
@@ -66,6 +66,9 @@
  *   hb_memvarReleasePublic()
  *   hb_memvarReleasePublicWorker()
  *
+ * Copyright 2004 Peter Rees <peter@rees.co.nz>
+ *    HB_FUNC( __MVSYMBOLINFO )
+ *    static HB_DYNS_FUNC( hb_GetSymbolInfo )
  * See doc/license.txt for licensing terms.
  *
  */
@@ -2286,4 +2289,33 @@ HB_EXPORT PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar )
    {
       return NULL;
    }
+}
+
+static HB_DYNS_FUNC( hb_GetSymbolInfo )
+{
+  HB_THREAD_STUB
+  if( pDynSymbol->hMemvar )
+  {
+    PHB_ITEM pArray   = ( ( PHB_ITEM ) Cargo );
+    PHB_ITEM pItem = &s_globalTable[ pDynSymbol->hMemvar ].item;
+    PHB_ITEM pSubItems = hb_itemArrayNew( 2 );
+    PHB_ITEM pName = hb_itemPutC( NULL,pDynSymbol->pSymbol->szName);
+    PHB_ITEM pValue = hb_itemNew(NULL);
+    hb_itemCopy(pValue,pItem );
+    hb_arraySet( pSubItems , 1 , pName ) ;
+    hb_arraySet( pSubItems , 2 , pValue) ;
+    hb_arrayAdd( pArray , pSubItems);
+    hb_itemRelease( pName ) ;
+    hb_itemRelease( pValue ) ;
+    hb_itemRelease( pSubItems );
+  }
+  return TRUE;
+}
+
+HB_FUNC( __MVSYMBOLINFO )
+{
+  HB_THREAD_STUB
+  PHB_ITEM pArray = hb_itemArrayNew( 0 );
+  hb_dynsymEval( hb_GetSymbolInfo, ( void * ) pArray );
+  hb_itemRelease( hb_itemReturn( pArray) );
 }
