@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.5 2003/05/21 09:35:35 druzus Exp $
+ * $Id: gtcgi.c,v 1.6 2003/06/30 17:08:57 ronpinkas Exp $
  */
 
 /*
@@ -81,8 +81,8 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
    s_iRow = 0;
    s_iCol = 0;
-   s_uiMaxRow = 32767;
-   s_uiMaxCol = 32767;
+   s_uiMaxRow = 25;
+   s_uiMaxCol = 80;
    s_uiCursorStyle = SC_NORMAL;
    s_bBlink = FALSE;
 

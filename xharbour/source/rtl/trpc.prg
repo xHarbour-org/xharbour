@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.19 2003/04/19 04:56:52 jonnymind Exp $
+ * $Id: trpc.prg,v 1.20 2003/04/22 13:46:10 jonnymind Exp $
  */
 
 /*
@@ -83,6 +83,8 @@
 
 
    TCP requests:
+
+   As UDP +
 
    20 - Function call
      <LEN8> - raw data length
@@ -491,6 +493,7 @@ METHOD Run() CLASS tRPCServeCon
    LOCAL lBreak := .F.
    LOCAL aData
    LOCAL nSafeStatus
+   LOCAL cRes
 
 
    DO WHILE InetErrorCode( ::skRemote ) == 0 .and. .not. lBreak
@@ -506,6 +509,11 @@ METHOD Run() CLASS tRPCServeCon
       MutexUnlock( ::mtxBusy )
 
       DO CASE
+
+         /* Check for TCP server scan */
+         CASE cCode == "XHBR00"
+            InetSendAll( ::skRemote, ;
+               "XHBR10"+ HB_Serialize( ::oServer:cServerName ) )
 
          /* Read autorization request */
          CASE cCode == "XHBR90"
@@ -1230,6 +1238,7 @@ CLASS tRPCService
    /* UDP services */
    METHOD UdpListen()
    METHOD UDPParseRequest()
+   METHOD UDPInterpretRequest( cData, nPacketLen, cRes )
 
    /* Utility */
    METHOD AuthorizeChallenge( cUserid, cPassword )
@@ -1364,9 +1373,11 @@ METHOD Stop() CLASS tRPCService
 
    InetClose( ::skServer )
    // closing the socket will make their infinite loops to terminate.
+   StopThread( ::thAccept)
    JoinThread( ::thAccept )
    IF ::thUDP > 0
       InetClose( ::skUdp )
+      StopThread( ::thUdp)
       JoinThread( ::thUdp )
    ENDIF
 
@@ -1426,12 +1437,21 @@ METHOD UDPListen( ) CLASS tRPCService
    ENDDO
 RETURN .T.
 
-
 METHOD UDPParseRequest( cData, nPacketLen ) CLASS tRPCService
+   LOCAL cToSend
+
+   IF ::UDPInterpretRequest( cData, nPacketLen, @cToSend )
+       InetDGramSend( ::skUdp, ;
+         InetAddress( ::skUdp ), InetPort( ::skUdp ), cToSend )
+       RETURN .T.
+   ENDIF
+RETURN .F.
+
+METHOD UDPInterpretRequest( cData, nPacketLen, cRes ) CLASS tRPCService
    LOCAL cCode, cMatch, cNumber, cSerial
    LOCAL oFunc
 
-   IF nPacketLen <= 6
+   IF nPacketLen < 6
       RETURN .F.
    ENDIF
 
@@ -1447,12 +1467,10 @@ METHOD UDPParseRequest( cData, nPacketLen ) CLASS tRPCService
          IF nPacketLen > 6
             cMatch := HB_Deserialize( Substr( cData, 7 ) )
             IF HB_RegexMatch( cMatch, ::cServerName )
-               InetDGramSend( ::skUdp, InetAddress( ::skUdp ), InetPort( ::skUdp ), ;
-                  "XHBR10"+ HB_Serialize( ::cServerName ) )
+              cRes := "XHBR10"+ HB_Serialize( ::cServerName )
             ENDIF
          ELSE
-            InetDGramSend( ::skUdp, InetAddress( ::skUdp ), InetPort( ::skUdp ), ;
-               "XHBR10"+ HB_Serialize( ::cServerName ) )
+            cRes := "XHBR10"+ HB_Serialize( ::cServerName )
          ENDIF
 
       /* XRB01 - Function scan */
@@ -1478,9 +1496,8 @@ METHOD UDPParseRequest( cData, nPacketLen ) CLASS tRPCService
 
             FOR EACH oFunc IN ::aFunctions
                IF HB_RegexMatch( cMatch, oFunc:cName ) .and. cNumber <= oFunc:cSerial
-                  InetDGramSend(::skUdp, InetAddress( ::skUdp ), InetPort( ::skUdp ), ;
-                     "XHBR11" + HB_Serialize(::cServerName ) + ;
-                     HB_Serialize( ofunc:Describe()))
+                  cRes := "XHBR11" + HB_Serialize(::cServerName ) + ;
+                     HB_Serialize( ofunc:Describe())
                ENDIF
             NEXT
          ENDIF

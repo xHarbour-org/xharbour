@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1501 2003/09/23 04:52:32 paultucker Exp $
+ * $Id: ChangeLog,v 1.1502 2003/09/23 09:33:43 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-09-23 11:20 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+2003-09-23 17:16 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+   * source/rtl/hbsrlraw.c
+     ! Fixed negative numbers serliaziation in LONGLONG context
+
+   * source/rtl/trpc.prg
+   * source/rtl/trpccli.prg
+      + Added CheckServer() method to access some server data with a
+        tcp connection, when is not available a UDP channel
+
+   * source/rtl/gtcgi/gtcgi.c
+     ! Maximum row & cols are now set to 25/80; this makes BOX command
+       and error reporting possible ( gtcgi went out of memory on error
+       reporting before).
+
+   * tests/rpcclient.prg
+   * tests/rpcserver.prg
+     ! Some tests more
+
+2003-09-23 11:20 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * bin/bld_solib.sh
     ! Changed with respect to the new dbf* libraries.
 
@@ -70,7 +88,7 @@
     * Check for !Empty(::type) @ 308 since Type can be NIL if no Picture.
     * This may not be the 'correct' fix, but solves the problem.
 
-2003-09-18 16:40 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+2003-09-18 16:40 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/hvm.c
   * source/vm/thread.c
     ! Waiting for threads to terminate before quitting.
@@ -80,7 +98,7 @@
 
 
 
-2003-09-18 15:45 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+2003-09-18 15:45 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * tests/Makefile
     ! added gtcgi to compilation if user selects HB_GT_LIB=gtcgi
 
@@ -96,7 +114,7 @@
   * xharbour/xharbour.spec
     ! fixes for buggy RPM - automatic _topdir detection
 
-2003-09-17 08:50 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+2003-09-17 08:50 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/filesys.c
     ! fixed error (set to 0) in fsCreate if creation is sucessful.
     ! little change in fsClose.

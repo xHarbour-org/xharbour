@@ -1,6 +1,6 @@
 ************************************************************
 * rpcserver.prg
-* $Id: rpcserver.prg,v 1.6 2003/04/16 22:08:13 jonnymind Exp $
+* $Id: rpcserver.prg,v 1.7 2003/04/17 21:22:23 jonnymind Exp $
 * Test for tRpcServer and tRpcFunction class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -39,7 +39,10 @@ PROCEDURE Main()
    @4,10 SAY "Press any key to stop"
    Inkey(0) // we have nothing more to do here.
    //ThreadSleep( 60000 )
+   @20,10 SAY "Terminating"
    oSv:Stop()
+   @21,10 SAY "QUIT"
+   @22,10
 RETURN
 
 FUNCTION CheckSum( cData, oClient )

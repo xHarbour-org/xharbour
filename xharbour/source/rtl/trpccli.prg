@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.20 2003/04/22 13:46:10 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.21 2003/05/26 16:38:10 jonnymind Exp $
  */
 
 /*
@@ -92,6 +92,7 @@ CLASS tRPCClient
    METHOD StopScan()
 
    /* Function call */
+   METHOD CheckServer()    //Checks if a server is ready on tcp
    METHOD SetLoopMode( nMethod, xData, nEnd, nStep )
    METHOD Call()  // variable parameters
    METHOD CallAgain()            INLINE ::TCPAccept()
@@ -278,6 +279,34 @@ METHOD ScanServers(cName) CLASS tRPCClient
 
 RETURN .F.
 
+METHOD CheckServer( cRemote )
+   LOCAL cData, skRemote, nLen, cData2
+
+   cData := "XHBR00"
+   IF cRemote == NIL
+      cRemote := ::cNetwork
+   ENDIF
+   skRemote := InetConnect( cRemote, ::nTcpPort )
+   IF InetErrorCode( skRemote ) == 0
+      InetSetTimeout(skRemote, 10000)
+      InetSendAll( skRemote, cData )
+      cData := space(256)
+      InetRecvAll( skRemote, @cData, 6+9 )
+      IF InetErrorCode( skRemote ) == 0
+         cData2 := Space(256)
+         nLen := HB_GetLen8( substr( cData, 8, 8 ) )
+         nLen := InetRecvAll( skRemote, @cData2, nLen )
+         IF InetErrorCode( skRemote ) == 0
+            InetDestroy( skRemote )
+            cData := Substr( cData + cData2, 7 )
+            cData2 := HB_Deserialize( cData )
+            ::aServers := { {InetAddress( skRemote ), cData2} }
+            RETURN .T.
+         ENDIF
+      ENDIF
+   ENDIF
+   InetDestroy( skRemote )
+RETURN .F.
 
 METHOD ScanFunctions(cFunc, cSerial ) CLASS tRPCClient
    // do not allow asynchronous mode without timeout
@@ -513,11 +542,10 @@ METHOD ManageChallenge() CLASS tRPCClient
 
    cData := HB_Decrypt( cData, ::cCryptKey )
    nChallenge := HB_Checksum( cData )
-
    InetSendAll( ::skTCP, "XHBR95" + HB_CreateLen8( nChallenge ) )
-   IF InetErrorCode( ::skTCP ) != 0
-      RETURN .F.
-   ENDIF
+   //IF InetErrorCode( ::skTCP ) != 0
+   //   RETURN .F.
+   //ENDIF
 
    cCode := Space( 8 )
    InetRecvAll( ::skTCP, @cCode )
@@ -1038,7 +1066,7 @@ METHOD GetServerAddress( xId ) CLASS tRpcClient
    IF ValType( xID ) == "A"
       cData := xId[1]
    ELSE
-      IF Len( ::aFunctions ) > 0
+      IF .not. Empty( ::aFunctions )
          cData := ::aFunctions[xId][1]
       ELSE
          cData := ::aServers[xId][1]

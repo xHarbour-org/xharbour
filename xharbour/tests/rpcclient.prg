@@ -1,6 +1,6 @@
 ************************************************************
 * rpcclient.prg
-* $Id: rpcclient.prg,v 1.9 2003/04/19 04:56:52 jonnymind Exp $
+* $Id: rpcclient.prg,v 1.10 2003/04/22 13:46:10 jonnymind Exp $
 * Test for tRpcClient class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -98,6 +98,10 @@ PROCEDURE Main( cNetwork )
 
    nRow ++
    @nRow, 5 SAY "Connecting with " + oRpc:GetServerName(1)
+   nRow ++
+
+   // verifies this is a real server
+   @nRow, 10 SAY "Checked server: " + ValToPrg(oRpc:CheckServer(oRpc:GetServerAddress(1)) )
    nRow ++
 
    // Demo server has a fairly symple authorization scheme ;-)

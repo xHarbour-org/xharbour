@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.16 2003/07/24 01:55:58 jonnymind Exp $
+ * $Id: hbsrlraw.c,v 1.17 2003/09/03 12:51:36 paultucker Exp $
  */
 
 /*
@@ -80,14 +80,22 @@ HB_FUNC( HB_CREATELEN8 )
 
    if( ISNUM(1) )
    {
+      #ifndef HB_LONG_LONG_OFF
+      ULONGLONG uRet = (ULONGLONG) hb_parnll(1 );
+      #else
       ULONG uRet = (ULONG) hb_parnl( 1 );
+      #endif
       hb_createlen8( ret, uRet );
       hb_retclen( ( char *) ret, 8 );
    }
    else if( ISCHAR(1) )
    {
       PHB_ITEM pItem = hb_param(1, HB_IT_STRING);
+      #ifndef HB_LONG_LONG_OFF
+      ULONGLONG uRet = (ULONGLONG) hb_parnll( 2 );
+      #else
       ULONG uRet = (ULONG) hb_parnl( 2 );
+      #endif
       if( pItem->item.asString.length >= 8)
       {
          hb_createlen8( ( BYTE *) pItem->item.asString.value, uRet );
