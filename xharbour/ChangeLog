@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.515 2002/12/06 08:02:33 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.516 2002/12/06 17:36:33 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-06 18:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+  * source/macro/macrob.c
+  * source/compiler/exproptb.c
+    * Excluded compile time optimization of strings '=' comparison because it's R/T dependant on SET EXCACT.
 
 2002-12-06 09:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/exproptb.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.38 2002/12/04 06:24:06 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.39 2002/12/06 17:37:31 ronpinkas Exp $
  */
 
 /*
@@ -3266,25 +3266,49 @@ static HB_EXPR_FUNC( hb_compExprUseEqual )
          break;
       case HB_EA_PUSH_PCODE:
          {
-            /* '=' used in an expression -> compare values
-             */
-            /* Try to optimize expression - we could not optimize in HB_EA_REDUCE
+            /*
+             * '=' used in an expression -> compare values.
+             * Try to optimize expression - we could not optimize in HB_EA_REDUCE
              * because it was not decided yet if it is assigment or comparision
              */
-            // Now optimize as an EQ comparison.
-            pSelf->ExprType = HB_EO_EQ;
-            pSelf = HB_EXPR_USE( pSelf, HB_EA_REDUCE );
 
-            // Might have been optimized in hb_compExprReduceEQ() check type...
-            if( pSelf->ExprType == HB_EO_EQUAL || pSelf->ExprType == HB_EO_EQ )
+            /*
+             * Don't send strings to hb_compReduceEQ() because the
+             * result of '=' depends on SET EXACT setting then it
+             * cannot be optimized except the case when NULL string
+             * are compared since the result is always TRUE regardless
+             * of EXACT setting.
+             */
+            if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_STRING && pSelf->value.asOperator.pLeft->ExprType == HB_ET_STRING )
             {
-               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
-               HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
-               HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_EQUAL );
+                if( ( pSelf->value.asOperator.pLeft->ulLength | pSelf->value.asOperator.pRight->ulLength ) == 0 )
+                {
+                   HB_EXPR_PCODE1( hb_compGenPushLogical, TRUE ); /* NOTE: COMPATIBILITY: Clipper doesn't optimize this */
+                }
+                else
+                {
+                   HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+                   HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+                   HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_EQUAL );
+                }
             }
             else
             {
-               HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+               // Now optimize as an EQ comparison.
+               pSelf->ExprType = HB_EO_EQ;
+               pSelf = HB_EXPR_USE( pSelf, HB_EA_REDUCE );
+
+               // Might have been optimized in hb_compExprReduceEQ() check type...
+               if( pSelf->ExprType == HB_EO_EQUAL || pSelf->ExprType == HB_EO_EQ )
+               {
+                  HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+                  HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+                  HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_EQUAL );
+               }
+               else
+               {
+                  HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+               }
             }
          }
          break;
