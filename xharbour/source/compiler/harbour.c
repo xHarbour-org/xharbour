@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.45 2003/06/23 14:04:15 andijahja Exp $
+ * $Id: harbour.c,v 1.46 2003/06/26 12:37:08 druzus Exp $
  */
 
 /*
@@ -1248,7 +1248,7 @@ static void hb_compDeclaredInit( void )
    _DECL s_071 = { "DBSTRUCT"        , 'A', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_070};
    _DECL s_072 = { "DBUNLOCK"        , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_071};
    _DECL s_073 = { "DBUNLOCKALL"     , '-', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_072};
-   _DECL s_074 = { "DBUSEAREA"       , '-', 6 , (BYTE*)"\xa6\x9d""C\x9d\xa6\xa6"                              , {NULL}   , NULL , &s_073};
+   _DECL s_074 = { "DBUSEAREA"       , '-', 7 , (BYTE*)"\xa6\x9d""C\x9d\xa6\xa6\x9d"                          , {NULL}   , NULL , &s_073};
    _DECL s_075 = { "DELETED"         , 'L', 0 , (BYTE*)NULL                                                   , {NULL}   , NULL , &s_074};
    _DECL s_076 = { "DESCEND"         , ' ', 1 , (BYTE*)" "                                                    , {NULL}   , NULL , &s_075};
    _DECL s_077 = { "DEVOUT"          , '-', 2 , (BYTE*)" \x9d"                                                , {NULL}   , NULL , &s_076};
