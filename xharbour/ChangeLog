@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1269 2003/07/19 22:10:54 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1270 2003/07/19 22:12:31 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-20 19:50 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/fm.c
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+  * source/vm/thread.c
+    ! AT LAST I have fixed xgrab/xfree/stack sequence at initialization
+      and closing of the VM. This allows threads to use hb_xgrab family
+      function instad of malloc/free to setup their private stacks.
+      The fact of using malloc before caused also an internal error in
+      hb_xrealloc when stack had to be expanded in an hb_stackPush()
+      operations, if statistics were on.
+      This also reduces the need of the SAFE_ALLOC mutex, and confines
+      it to fm.c, reducing greatly the risk of cross lockings.
+
 
 2003-07-20 00:01 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * config/w32/global.cf

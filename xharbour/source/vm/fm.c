@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.35 2003/07/13 22:26:17 jonnymind Exp $
+ * $Id: fm.c,v 1.36 2003/07/19 22:08:05 jonnymind Exp $
  */
 
 /*
@@ -62,9 +62,22 @@
  *    hb_xquery()
  *    MEMORY()
  *
+ * Copyright 2003 Giancarlo Niccolai <giancarlo@niccolai.ws>
+ *    Threadsafing of MT startup and closing sequences
+ *
  * See doc/license.txt for licensing terms.
  *
  */
+
+/*
+* JC1:
+* In MT system, the stack of the virtual machine may not be ready
+* to accept hb_x* request of accessing the stack to store data about
+* memory consumption.
+* For this reason, an IFDEF marked with a  *** comment has been added
+* to make sure that the stack is currently able to accept the requests
+* from FM.
+*/
 
 #define HB_OS_WIN_32_USED
 #define HB_THREAD_OPTIMIZE_STACK
@@ -186,7 +199,11 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    else
    {
 
-      if( HB_VM_STACK.pItems && ( HB_VM_STACK.pBase != HB_VM_STACK.pItems ) )
+      if(
+         #ifdef HB_THREAD_SUPPORT  /*** Se JC1: notes at begin */
+            hb_ht_stack == &hb_stack &&
+         #endif
+         HB_VM_STACK.pItems && ( HB_VM_STACK.pBase != HB_VM_STACK.pItems ) )
       {
           /* PRG line number */
          ( ( PHB_MEMINFO ) pMem )->uiProcLine = (*(HB_VM_STACK.pBase))->item.asSymbol.lineno;
@@ -302,7 +319,11 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    else
    {
       HB_THREAD_STUB
-      if( HB_VM_STACK.pItems && ( HB_VM_STACK.pBase != HB_VM_STACK.pItems ) )
+      if(
+         #ifdef HB_THREAD_SUPPORT  /*** Se JC1: notes at begin */
+            hb_ht_stack == &hb_stack &&
+         #endif
+         HB_VM_STACK.pItems && ( HB_VM_STACK.pBase != HB_VM_STACK.pItems ) )
       {
          /* PRG line number */
          ( ( PHB_MEMINFO ) pMem )->uiProcLine = (*(HB_VM_STACK.pBase))->item.asSymbol.lineno;
@@ -732,11 +753,6 @@ ULONG hb_xquery( USHORT uiMode )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xquery(%hu)", uiMode));
 
-/*
-#ifndef HB_SAFE_ALLOC
-   HB_CRITICAL_LOCK( hb_allocMutex );
-#ifndef HB_SAFE_ALLOC
-*/
    /* TODO: Return the correct values instead of 9999 [vszakats] */
 
    switch( uiMode )
@@ -910,11 +926,37 @@ ULONG hb_xquery( USHORT uiMode )
       break;
 
    case HB_MEM_STACKITEMS: /* Harbour extension (Total items allocated for the stack)      */
-      ulResult = HB_VM_STACK.wItems;
+      #ifdef HB_THREAD_SUPPORT  /*** Se JC1: notes at begin */
+         if ( hb_ht_stack == &hb_stack )
+         {
+      #endif
+
+         ulResult = HB_VM_STACK.wItems;
+
+      #ifdef HB_THREAD_SUPPORT
+         }
+         else
+         {
+            ulResult = 0;
+         }
+      #endif
       break;
 
    case HB_MEM_STACK:      /* Harbour extension (Total memory size used by the stack [bytes]) */
-      ulResult = HB_VM_STACK.wItems * sizeof( HB_ITEM );
+      #ifdef HB_THREAD_SUPPORT  /*** Se JC1: notes at begin */
+         if ( hb_ht_stack == &hb_stack )
+         {
+      #endif
+
+         ulResult = HB_VM_STACK.wItems * sizeof( HB_ITEM );
+
+      #ifdef HB_THREAD_SUPPORT
+         }
+         else
+         {
+            ulResult = 0;
+         }
+      #endif
       break;
 
    case HB_MEM_STACK_TOP : /* Harbour extension (Total items currently on the stack)      */
@@ -924,12 +966,6 @@ ULONG hb_xquery( USHORT uiMode )
    default:
       ulResult = 0;
    }
-
-/*
-#ifndef HB_SAFE_ALLOC
-   HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
-*/
 
    return ulResult;
 }

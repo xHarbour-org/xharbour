@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.22 2003/07/16 13:46:55 andijahja Exp $
+ * $Id: memvars.c,v 1.23 2003/07/19 22:08:05 jonnymind Exp $
  */
 
 /*
@@ -172,17 +172,8 @@ void hb_memvarsInit( HB_STACK *pStack )
 {
    // we MUST use malloc instead of hb_xgrab, as destruction sequence of main
    // thread is different.
-   #ifndef HB_SAFE_ALLOC
-      HB_CRITICAL_LOCK( hb_allocMutex );
-   #endif
-
-   pStack->globalTable = ( HB_VALUE_PTR ) malloc( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );
-   pStack->privateStack = ( PHB_DYNS * ) malloc( sizeof( PHB_DYNS ) * TABLE_INITHB_VALUE );
-
-   #ifndef HB_SAFE_ALLOC
-      HB_CRITICAL_UNLOCK( hb_allocMutex );
-   #endif
-
+   pStack->globalTable = ( HB_VALUE_PTR ) hb_xgrab( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );
+   pStack->privateStack = ( PHB_DYNS * ) hb_xgrab( sizeof( PHB_DYNS ) * TABLE_INITHB_VALUE );
    pStack->globalTableSize = TABLE_INITHB_VALUE;
    pStack->globalFreeCnt   = 0;
    pStack->globalFirstFree = pStack->globalLastFree = 1;
@@ -226,19 +217,11 @@ void hb_memvarsRelease( HB_STACK *pStack )
 
 void hb_memvarsFree( HB_STACK *pStack )
 {
-   #ifndef HB_SAFE_ALLOC
-      HB_CRITICAL_LOCK( hb_allocMutex );
-   #endif
-
    if( pStack->globalTable )
-      free( pStack->globalTable );
+      hb_xfree( pStack->globalTable );
 
    if( pStack->privateStack )
-      free( pStack->privateStack );
-
-   #ifndef HB_SAFE_ALLOC
-      HB_CRITICAL_UNLOCK( hb_allocMutex );
-   #endif
+      hb_xfree( pStack->privateStack );
 }
 
 #endif

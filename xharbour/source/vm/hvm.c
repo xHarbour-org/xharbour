@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.238 2003/07/17 01:52:50 andijahja Exp $
+ * $Id: hvm.c,v 1.239 2003/07/19 22:08:05 jonnymind Exp $
  */
 
 /*
@@ -648,6 +648,9 @@ void HB_EXPORT hb_vmQuit( void )
 
    hb_stackFree();
    //printf( "After hbStackFree\n" );
+#else
+   hb_threadExit();
+   //printf( "After thread exit\n" );
 #endif
 
    //printf( "After stackFree\n" );
@@ -662,11 +665,6 @@ void HB_EXPORT hb_vmQuit( void )
 
    hb_traceExit();
    //printf( "After traceExit\n" );
-
-#ifdef HB_THREAD_SUPPORT
-    hb_threadExit();
-    //printf( "After thread exit\n" );
-#endif
 
    exit( s_byErrorLevel );
 }

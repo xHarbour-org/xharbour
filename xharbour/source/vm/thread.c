@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.89 2003/07/18 18:06:49 jonnymind Exp $
+* $Id: thread.c,v 1.90 2003/07/19 22:08:05 jonnymind Exp $
 */
 
 /*
@@ -62,8 +62,6 @@
 #if defined( HB_OS_DARWIN )
    #include <stdlib.h>
    #include <unistd.h>    /* We need usleep() in Darwin */
-#else
-   #include <malloc.h>
 #endif
 
 #if defined(__GNUC__) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
@@ -192,7 +190,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
 
    tc->next = NULL;
 
-   tc->pItems = ( HB_ITEM_PTR * ) malloc( sizeof( HB_ITEM_PTR ) * STACK_THREADHB_ITEMS );
+   tc->pItems = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) * STACK_THREADHB_ITEMS );
    tc->pBase  = tc->pItems;
    tc->pPos   = tc->pItems;     /* points to the first stack item */
    tc->wItems = STACK_THREADHB_ITEMS;
@@ -216,14 +214,14 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
       tc->bCanCancel = FALSE;
       /*
       tc->iCleanCount = 0;
-      tc->pCleanUp = (HB_CLEANUP_FUNC *) malloc( sizeof( HB_CLEANUP_FUNC ) * HB_MAX_CLEANUPS );
-      tc->pCleanUpParam = (void **) malloc( sizeof( void *) * HB_MAX_CLEANUPS );
+      tc->pCleanUp = (HB_CLEANUP_FUNC *) hb_xgrab( sizeof( HB_CLEANUP_FUNC ) * HB_MAX_CLEANUPS );
+      tc->pCleanUpParam = (void **) hb_xgrab( sizeof( void *) * HB_MAX_CLEANUPS );
       */
    #endif
 
    for( i = 0; i < tc->wItems; i++ )
    {
-      tc->pItems[ i ] = (HB_ITEM *) malloc( sizeof( HB_ITEM ) );
+      tc->pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
    }
    ( * (tc->pPos) )->type = HB_IT_NIL;
 
@@ -289,16 +287,8 @@ HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
 {
    HB_STACK *tc;
 
-#ifndef HB_SAFE_ALLOC
-   HB_CRITICAL_LOCK( hb_allocMutex );
-#endif
-
-   tc = (HB_STACK *) malloc( sizeof( HB_STACK));
+   tc = (HB_STACK *) hb_xgrab( sizeof( HB_STACK));
    hb_threadSetupStack( tc, th );
-
-#ifndef HB_SAFE_ALLOC
-   HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
 
    return tc;
 }
@@ -437,20 +427,16 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    }
 
    /* Free each element of the stack */
-   #ifndef HB_SAFE_ALLOC
-      HB_CRITICAL_LOCK( hb_allocMutex );
-   #endif
-
    for( i = 0; i < pStack->wItems; i++ )
    {
-      free( pStack->pItems[ i ] );
+      hb_xfree( pStack->pItems[ i ] );
    }
    /* Free the stack */
 
-   free( pStack->pItems );
+   hb_xfree( pStack->pItems );
 
    // releases this thread's memvars
-   
+
    if( pStack != &hb_stack )
    {
       if ( pStack->aTryCatchHandlerStack &&  pStack->aTryCatchHandlerStack->type != HB_IT_NIL )
@@ -461,7 +447,7 @@ void hb_threadDestroyStack( HB_STACK *pStack )
       hb_memvarsRelease( pStack );
    }
    hb_memvarsFree( pStack );
-   
+
    /*
    #ifdef HB_OS_WIN_32
    free( pStack->pCleanUp );
@@ -472,12 +458,8 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    // Free only if we are not destroing the main stack
    if ( pStack != &hb_stack )
    {
-      free( pStack );
+      hb_xfree( pStack );
    }
-   #ifndef HB_SAFE_ALLOC
-      HB_CRITICAL_UNLOCK( hb_allocMutex );
-   #endif
-
 }
 
 HB_STACK *hb_threadGetStack( HB_THREAD_T id )
@@ -1863,7 +1845,7 @@ void hb_threadInit( void )
 
    last_stack = NULL;
    hb_main_thread_id = HB_CURRENT_THREAD();
-   hb_ht_stack = &hb_stack;
+
    hb_ht_mutex = NULL;
 
    /* Idle fence is true by default */
@@ -1874,13 +1856,17 @@ void hb_threadInit( void )
       HB_CRITICAL_INIT( hb_cancelMutex );
 
       hb_dwCurrentStack = TlsAlloc();
-      TlsSetValue( hb_dwCurrentStack, (void *)hb_ht_stack );
+      TlsSetValue( hb_dwCurrentStack, (void *)&hb_stack );
       HB_SHARED_INIT( hb_idleQueueRes, 0 );
    #else
       pthread_key_create( &hb_pkCurrentStack, NULL );
-      pthread_setspecific( hb_pkCurrentStack, (void *)hb_ht_stack );
+      pthread_setspecific( hb_pkCurrentStack, (void *)&hb_stack );
    #endif
-   
+
+   /* signal we are ready for hb_xgrab (but not yet able to store mem stats*/
+   hb_stack.pItems = NULL; // frist this, temporarily disabling collection
+   hb_ht_stack = &hb_stack; // then this, preparing the head stack
+
    hb_threadSetupStack( &hb_stack, HB_CURRENT_THREAD() );
 
 }
@@ -1890,10 +1876,8 @@ void hb_threadExit( void )
    hb_threadKillAll();
    hb_threadWaitAll();
 
-   // the main stack is now destroyed by hb_stack_exit
-   
-   hb_threadDestroyStack( hb_ht_stack );
-   hb_ht_stack = NULL;
+   hb_ht_stack = NULL; //signal we are not ready anymore to collect vm stats
+   hb_threadDestroyStack( &hb_stack );
 
    /* Destroyng all shell locks mutexes */
    HB_SHARED_DESTROY( hb_runningStacks );
