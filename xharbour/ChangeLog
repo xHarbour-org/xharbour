@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.107 2002/03/15 02:31:07 walito Exp $
+ * $Id: ChangeLog,v 1.108 2002/03/15 04:24:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-15 07:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp_harb.ch
+    * Replaced few hb_itemFromBase() with direct code.
+    * Replaced few hb_retclen()+hb_xfree() to hb_rectclen_buffer() when compiled with Harbour as oppose to xHarbour.
 
 2002-03-14 20:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/garbage.c

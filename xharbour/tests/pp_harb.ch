@@ -659,7 +659,7 @@ HB_FUNC( EXTRACTLEADINGWS )
 
    if( i > 0 )
    {
-      if( HB_IS_BYREF( hb_stackItemFromBase( 1 ) ) )
+      if( HB_IS_BYREF( * ( hb_stack.pBase + 1 + 1 ) ) )
       {
          hb_itemPutCPtr( pLine, hb_strdup( pLine->item.asString.value + i ), iLen - i );
       }
@@ -668,17 +668,16 @@ HB_FUNC( EXTRACTLEADINGWS )
    pTmp = ( char * ) hb_xgrab( i + 1 );
    memset( pTmp, ' ', i );
 
-   if( HB_IS_BYREF( hb_stackItemFromBase( 2 ) ) )
+   if( HB_IS_BYREF( * ( hb_stack.pBase + 2 + 1 ) ) )
    {
-      PHB_ITEM pWS = hb_itemUnRef( hb_stackItemFromBase( 2 ) );
+      PHB_ITEM pWS = hb_itemUnRef( * ( hb_stack.pBase + 2 + 1 ) );
       hb_itemPutCL( pWS, pTmp, i );
    }
 
    #ifdef __XHARBOUR__
       hb_retclenAdopt( pTmp, i );
    #else
-      hb_retclen( pTmp, i );
-      hb_xfree( pTmp );
+      hb_retclen_buffer( pTmp, i );
    #endif
 }
 
@@ -710,14 +709,14 @@ HB_FUNC( DROPTRAILINGWS )
       pString[i] = '\0';
    }
 
-   if( HB_IS_BYREF( hb_stackItemFromBase( 1 ) ) )
+   if( HB_IS_BYREF( * ( hb_stack.pBase + 1 + 1 ) ) )
    {
       hb_itemPutCL( pLine, pString, i );
    }
 
-   if( HB_IS_BYREF( hb_stackItemFromBase( 2 ) ) )
+   if( HB_IS_BYREF( * ( hb_stack.pBase + 2 + 1 ) ) )
    {
-      PHB_ITEM pWS = hb_itemUnRef( hb_stackItemFromBase( 2 ) );
+      PHB_ITEM pWS = hb_itemUnRef( * ( hb_stack.pBase + 2 + 1 ) );
       char *pTmp = ( char * ) hb_xgrab( iLen - i + 1 );
 
       memset( pTmp, ' ', iLen - i );
@@ -727,8 +726,7 @@ HB_FUNC( DROPTRAILINGWS )
    #ifdef __XHARBOUR__
       hb_retclenAdopt( pString, i );
    #else
-      hb_retclen( pString, i );
-      hb_xfree( pString );
+      hb_retclen_buffer( pString, i );
    #endif
 }
 
@@ -760,7 +758,7 @@ HB_FUNC( DROPEXTRATRAILINGWS )
       pString[i] = '\0';
    }
 
-   if( HB_IS_BYREF( hb_stackItemFromBase( 1 ) ) )
+   if( HB_IS_BYREF( * ( hb_stack.pBase + 1 + 1 ) ) )
    {
       hb_itemPutCL( pLine, pString, i );
    }
@@ -768,8 +766,7 @@ HB_FUNC( DROPEXTRATRAILINGWS )
    #ifdef __XHARBOUR__
       hb_retclenAdopt( pString, i );
    #else
-      hb_retclen( pString, i );
-      hb_xfree( pString );
+      hb_retclen_buffer( pString, i );
    #endif
 }
 
