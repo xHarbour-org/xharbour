@@ -116,9 +116,10 @@ FUNCTION Main
             :SetPanelText( 0, "What32 API StatusBar" )
             :SetPanelText( 2, "Enjoy" )
          END
+         :Add( 'ObjTree', ObjTree():New( oApp:MainFrame ) )
+         :Add( 'ObjInsp', ObjInspect():New( oApp:MainFrame ) )
+         :SetFocus()
       END
-      :CreateForm( 'ObjTree', ObjTree():New( oApp ) )
-      :CreateForm( 'ObjInsp', ObjInspect():New( oApp ) )
       :Run()
   END
 RETURN( nil)
@@ -146,8 +147,10 @@ CLASS ObjTree FROM TForm
                                 ::top     := 125,;
                                 ::width   := 200,;
                                 ::height  := 150,;
-                                ::Style   := WS_POPUP + WS_CAPTION + WS_VISIBLE + DS_MODALFRAME,;
+                                ::Style   := WS_POPUP + WS_CAPTION + WS_VISIBLE + WS_THICKFRAME,;
+                                ::ExStyle := WS_EX_CLIENTEDGE ,;
                                 super:new( oParent )
+   METHOD OnCloseQuery() INLINE 0
 ENDCLASS
 
 //----------------------------------------------------------------------------------------------
@@ -158,9 +161,21 @@ CLASS ObjInspect FROM TForm
                                 ::top     := 275,;
                                 ::width   := 200,;
                                 ::height  := 250,;
-                                ::Style   := WS_POPUP + WS_CAPTION + WS_VISIBLE + DS_MODALFRAME,;
+                                ::Style   := WS_POPUP + WS_CAPTION + WS_VISIBLE + WS_THICKFRAME,;
+                                ::ExStyle := WS_EX_CLIENTEDGE ,;
                                 super:new( oParent )
+   METHOD OnCloseQuery() INLINE 0
+   METHOD OnCreate()
+   METHOD OnSize(n,x,y)  INLINE ::InspTabs:Move(,,x,y,.t.),nil
 ENDCLASS
+
+METHOD OnCreate() CLASS ObjInspect
+  local aRect := ::ClientRect()
+  ::Add( 'InspTabs', TTabControl():New( self, 555,  0,  0, aRect[3], aRect[4]) )
+  ::InspTabs:AddTab( "Properties",'Test' )
+  ::InspTabs:AddTab( "Events" )
+  ::InspTabs:Configure()
+return( super:OnCreate() )
 
 //----------------------------------------------------------------------------------------------
 
