@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3762 2005/01/22 11:31:50 druzus Exp $
+ * $Id: ChangeLog,v 1.3763 2005/01/22 15:21:01 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-01-22 16:50 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * xharbour/include/Makefile
+    * removed wvtwin.ch
+	 
 2005-01-22 16:15 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/source/rtl/gtwvt/Makefile
   * xharbour/source/rtl/gtwvt/gtwvt.c

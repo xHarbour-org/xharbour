@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.19 2004/08/29 00:26:22 druzus Exp $
+# $Id: Makefile,v 1.20 2004/08/29 18:30:29 lf_sfnet Exp $
 #
 
 ROOT = ../
@@ -114,7 +114,6 @@ PRG_HEADERS=\
 	math.ch      \
 	tbrowse.ch   \
 	tip.ch       \
-	wvtwin.ch    \
 	ct.ch        \
 	ctvideo.ch   \
 	ctwin.ch     \
