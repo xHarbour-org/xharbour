@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.164 2004/09/04 18:59:08 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.165 2004/09/10 17:32:47 druzus Exp $
  */
 
 /*
@@ -743,7 +743,7 @@ void hb_pp_Init( void )
       while ( *pSrc && *pSrc != ' ' )
       {
          if ( *pSrc == '_' || ( *pSrc >= 'A' && *pSrc <= 'Z' )
-                           || ( *pSrc >= 'a' && *pSrc <= 'a' )
+                           || ( *pSrc >= 'a' && *pSrc <= 'z' )
                            || ( *pSrc >= '0' && *pSrc <= '9' ) )
          {
             *pDst++ = *pSrc;
