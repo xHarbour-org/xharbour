@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.73 2005/01/12 16:36:00 druzus Exp $
+# $Id: xharbour.spec,v 1.74 2005/01/15 11:12:03 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -54,7 +54,7 @@
 
 %define name     xharbour
 %define dname    xHarbour
-%define version  0.99.3
+%define version  0.99.4
 %define releasen 0
 %define hb_pref  xhb
 %define hb_arch  export HB_ARCHITECTURE=linux

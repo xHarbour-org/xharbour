@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3981 2005/03/30 20:49:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3982 2005/03/30 21:24:30 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-03-31 04:10 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
+  * xharbour.spec
+    ! updated version number
+  
 2005-03-31 04:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * utils/xbscript/xbscript.prg
     ! change starting procedure to 'PROCEDURE MAIN()' instead of uncommon
