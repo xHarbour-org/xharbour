@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2631 2004/03/23 02:12:56 andijahja Exp $
+ * $Id: ChangeLog,v 1.2632 2004/03/23 12:42:57 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-23 23:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/tbrowse.prg
+    * Assign methods revisited. Now all assign methods are returning their correct values.
+      Thanks Luis Krause Mantilla.
+
 2004-03-23 19:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
    * source/rtl/console.c
      ! type cast

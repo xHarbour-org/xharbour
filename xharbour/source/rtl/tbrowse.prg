@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.60 2004/03/21 16:48:01 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.61 2004/03/21 17:00:34 vouchcac Exp $
  */
 
 /*
@@ -146,9 +146,9 @@ CLASS TBrowse
    ASSIGN border( cBorder )   INLINE ::SetBorder( cBorder )
    ACCESS colorSpec           INLINE ::cColorSpec   // Color table for the TBrowse display
    ASSIGN colorSpec(cColor)   INLINE ::cColorSpec := if( empty( cColor ), ::cColorSpec, cColor ),  ;
-                                         ::lConfigured := .f., ::aColorSpec := Color2Array( ::cColorSpec )
+                                     ::lConfigured := .f., ::aColorSpec := Color2Array( ::cColorSpec ), ::cColorSpec
    ACCESS colPos              INLINE ::nColPos
-   ASSIGN colPos(nColPos)     INLINE ::nColPos    := ncolPos, ::lConfigured := .f.
+   ASSIGN colPos(nColPos)     INLINE ::nColPos    := ncolPos, ::lConfigured := .f., ::nColPos
 
    ACCESS nBottom             INLINE ::nwBottom +  iif(::cBorder=="",0,1)
    ASSIGN nBottom( nBottom )  INLINE ::nwBottom := nBottom - iif(::cBorder=="",0,1), ::lConfigured := .f.
@@ -160,14 +160,14 @@ CLASS TBrowse
    ASSIGN nTop( nTop )        INLINE ::nwTop    := nTop    + iif(::cBorder=="",0,1), ::lConfigured := .f.
 
    ACCESS colSep  INLINE ::cColSep        // Column separator character
-   ASSIGN colSep( cColSep )   INLINE ::cColSep  := cColSep,  ::lConfigured := .f.
+   ASSIGN colSep( cColSep )   INLINE ::cColSep  := cColSep,  ::lConfigured := .f., ::cColSep
    ACCESS footSep INLINE ::cFootSep       // Footing separator character
-   ASSIGN footSep( cFootSep ) INLINE ::cFootSep := cFootSep, ::lConfigured := .f.
+   ASSIGN footSep( cFootSep ) INLINE ::cFootSep := cFootSep, ::lConfigured := .f., ::cFootSep
    ACCESS headSep INLINE ::cHeadSep       // Head separator character
-   ASSIGN headSep( cHeadSep ) INLINE ::cHeadSep := cHeadSep, ::lConfigured := .f.
+   ASSIGN headSep( cHeadSep ) INLINE ::cHeadSep := cHeadSep, ::lConfigured := .f., ::cHeadSep
 
    ACCESS freeze INLINE ::nFrozenCols     // Number of columns to freeze/frozen
-   ASSIGN freeze( nHowMany )  INLINE ::SetFrozenCols( nHowMany, .t. ), ::lConfigured := .f.
+   ASSIGN freeze( nHowMany )  INLINE ::SetFrozenCols( nHowMany, .t. ), ::lConfigured := .f., ::nFrozenCols
 
    METHOD New( nTop, nLeft, nBottom, nRight )  // Constructor
    METHOD Down()                          // Moves the cursor down one row
@@ -202,6 +202,7 @@ CLASS TBrowse
    METHOD Invalidate()                    // Forces entire redraw during next stabilization
    METHOD RefreshAll()                    // Causes all data to be recalculated during the next stabilize
    METHOD RefreshCurrent() INLINE;        // Causes the current row to be refilled and repainted on next stabilize
+          If( ! Empty( ::aRedraw ), ::aRedraw[ ::RowPos ] := .T., Nil ), ;
           ::aRedraw[ ::RowPos ] := .T., ::stable := .F., Self
    METHOD Stabilize()                     // Performs incremental stabilization
 
