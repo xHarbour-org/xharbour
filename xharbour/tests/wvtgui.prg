@@ -106,12 +106,12 @@ PROCEDURE Main()
    
    //  Load All Image Files
    //
-   WvtPictures( 'Vouch1.bmp'  , SLOT_IMAGE_VOUCH  )
-   WvtPictures( 'V_Browse.Ico', SLOT_IMAGE_BROWSE )
-   WvtPictures( 'vr_1.ico'    , SLOT_IMAGE_VR     )
-   WvtPictures( 'v_notes.ico' , SLOT_IMAGE_NOTES  )
-   WvtPictures( 'v_tools.ico' , SLOT_IMAGE_TOOLS  )
-   WvtPictures( 'v_help.ico'  , SLOT_IMAGE_HELP   )
+   WvtPictures( SLOT_IMAGE_VOUCH  , 'Vouch1.bmp'   )
+   WvtPictures( SLOT_IMAGE_BROWSE , 'V_Browse.Ico' )
+   WvtPictures( SLOT_IMAGE_VR     , 'vr_1.ico'     )
+   WvtPictures( SLOT_IMAGE_NOTES  , 'v_notes.ico'  )
+   WvtPictures( SLOT_IMAGE_TOOLS  , 'v_tools.ico'  )
+   WvtPictures( SLOT_IMAGE_HELP   , 'v_help.ico'   )
    
    SET DATE BRITISH
 
@@ -911,7 +911,7 @@ RETURN Wvt_SetPopupMenu( hPop_[ nID ] )
 
 //-------------------------------------------------------------------//
 
-FUNCTION WvtPictures( cFilePic, nSlot )
+FUNCTION WvtPictures( nSlot,cFilePic )
 
 	if nSlot <> nil .and. nSlot <= 20 .and. file( cFilePic )
 		if pic_[ nSlot ] <> cFilePic

@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.18 2004/04/25 07:17:34 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.19 2004/04/27 15:16:55 vouchcac Exp $
  */
 
 /*
@@ -114,6 +114,8 @@
 #define WVT_DEFAULT_COLS      80
 
 #define WVT_PICTURES_MAX      20
+#define WVT_FONTS_MAX         20
+#define WVT_PENS_MAX          20
 
 //-------------------------------------------------------------------//
 
@@ -200,6 +202,9 @@ typedef struct global_data
   int       colStop;                   // Holds nRight  of last WM_PAINT rectangle
   HMENU     hPopup;                    // Handle of context menu invokable with right click
   IPicture  *iPicture[ WVT_PICTURES_MAX ]; // Array to hold the Picture Streams to avoid recurring loading and unloading
+  HDC       hCompDC;                   // Compatible DC to _s.hdc
+  HFONT     hUserFonts[ WVT_FONTS_MAX ] ;  // User defined font handles
+  HPEN      hUserPens[ WVT_PENS_MAX ]; // User defined pens
 
 } GLOBAL_DATA;
 
