@@ -273,6 +273,26 @@ HB_FUNC ( FTPCOMMAND )
 
 //---------------------------------------------------------------------//
 /*
+typedef struct _WIN32_FIND_DATAA {
+    DWORD dwFileAttributes;
+    FILETIME ftCreationTime;
+    FILETIME ftLastAccessTime;
+    FILETIME ftLastWriteTime;
+    DWORD nFileSizeHigh;
+    DWORD nFileSizeLow;
+    DWORD dwReserved0;
+    DWORD dwReserved1;
+    CHAR   cFileName[ MAX_PATH ];
+    CHAR   cAlternateFileName[ 14 ];
+#ifdef _MAC
+    DWORD dwFileType;
+    DWORD dwCreatorType;
+    WORD  wFinderFlags;
+#endif
+} WIN32_FIND_DATAA, *PWIN32_FIND_DATAA, *LPWIN32_FIND_DATAA;
+*/
+
+/*
    HINTERNET FtpFindFirstFile(
        IN HINTERNET hConnect,
        IN LPCTSTR   lpszSearchFile,
@@ -282,19 +302,34 @@ HB_FUNC ( FTPCOMMAND )
    );
 */
 //
-//   Fills the structure which have to be resolved
+//   aDirInfo := array( 3 )
+//   hFind := FtpFindFirstFile( hInternet, '*.*', @aDirInfo )
+//
+//   ? aDirInfo[ 1 ]  // File Name
+//   ? aDirInfo[ 2 ]  // File attribute in numeric, 16 for directory, 128 for file
+//   ? aDirInfo[ 3 ]  // File size in bytes
 //
 HB_FUNC ( FTPFINDFIRSTFILE )
 {
 	HINTERNET hInternet              = ( HINTERNET ) hb_parnl( 1 ) ;
 	LPCTSTR   lpszSearchFile         = ISNIL( 2 ) ? TEXT ("*.*") : hb_parc( 2 ) ;
-	LPWIN32_FIND_DATA lpFindFileData ;
+	WIN32_FIND_DATA lpFindFileData ;
 	DWORD     dwFlags                = ISNIL( 4 ) ? INTERNET_FLAG_NEED_FILE : hb_parnl( 4 ) ;
 	DWORD_PTR dwContext              = ISNIL( 5 ) ? NULL : hb_parnl( 5 ) ;
-	
-	hb_retnl( ( ULONG ) FtpFindFirstFile( hInternet, lpszSearchFile, 
-			                       lpFindFileData, dwFlags, dwContext ) ) ;
-	
+   HINTERNET hResult ; 	
+
+   hResult = FtpFindFirstFile( hInternet, lpszSearchFile, 
+			                            &lpFindFileData, dwFlags, dwContext ) ;
+        
+   if ( hResult )
+      if ( ISBYREF( 3 ) )   	   
+      {
+			hb_storc ( lpFindFileData.cFileName        , 3, 1 ) ;
+			hb_stornl( lpFindFileData.dwFileAttributes , 3, 2 ) ;
+			hb_stornl( lpFindFileData.nFileSizeLow     , 3, 3 ) ;
+		}
+		
+	hb_retnl( ( ULONG ) hResult ) ;
 }
 
 //---------------------------------------------------------------------//
@@ -305,14 +340,35 @@ HB_FUNC ( FTPFINDFIRSTFILE )
    );
 */
 //
-//    FtpFindNextFile( hFile, @aFileInfo )
+//   aDirInfo := array( 3 )
+//
+//   hFind := FtpFindFirstFile( hInternet, '*.*', @aDirInfo )
+//   if hFind <> 0
+//      do while InternetFindNextFile( hFind, @aDirInfo )
+//         ? aDirInfo[ 1 ]  // File Name
+//         ? aDirInfo[ 2 ]  // File attribute in numeric, 16 for directory, 128 for file
+//         ? aDirInfo[ 3 ]  // File size in bytes
+//      enddo
+//   endif
+//
 //
 HB_FUNC ( INTERNETFINDNEXTFILE )
 {
 	HINTERNET       hFind       = ( HINTERNET ) hb_parnl( 1 ) ;
-	WIN32_FIND_DATA lpDirInfo ;
+	WIN32_FIND_DATA lpFindFileData ;
 	
-	hb_retl( InternetFindNextFile( hFind, &lpDirInfo ) ) ;
+   if ( InternetFindNextFile( hFind, &lpFindFileData ) ) 
+      {   
+         hb_retl( TRUE );
+         if ( ISBYREF( 2 ) )
+         {
+				hb_storc ( lpFindFileData.cFileName        , 2, 1 ) ;
+				hb_stornl( lpFindFileData.dwFileAttributes , 2, 2 ) ;
+				hb_stornl( lpFindFileData.nFileSizeLow     , 2, 3 ) ;
+   		}
+      }
+   else
+      hb_retl(FALSE) ;
 	
 }
 

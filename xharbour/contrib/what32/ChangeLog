@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.27 2002/10/04 02:45:14 what32 Exp $
+ * $Id: ChangeLog,v 1.28 2002/10/06 05:00:24 andy_wos Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-06 18:00 UCT+0530 Pritpal Bedi <vouch32@vouchcac.com>
+   * _WinINet.c
+     * FtpFindFirstFile()
+     * InternetFindNextFile()
+       Now these functions return the directory info in an array
+       of three elements, viz, cFileName, nDirOrFile, nSizeInBytes.
 
 2002-10-06 15:02 UCT+1000 AJ Wos <andrwos@aust1.net>
    * _WinIni.c
