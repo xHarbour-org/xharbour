@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.17 2003/11/10 00:59:32 fsgiudice Exp $
+ * $Id: objfunc.prg,v 1.18 2004/01/31 08:24:26 ronpinkas Exp $
  */
 
 /*
@@ -331,12 +331,12 @@ FUNCTION __ObjSetValueList( oObject, aData )
 
 RETURN oObject
 
-FUNCTION __objAddMethod( oObject, cSymbol, nFuncPtr )
+FUNCTION __objAddMethod( oObject, cSymbol, pFuncPtr )
 
-   IF !ISOBJECT( oObject ) .OR. !ISCHARACTER( cSymbol ) .OR. !ISNUMBER( nFuncPtr )
+   IF !ISOBJECT( oObject ) .OR. !ISCHARACTER( cSymbol ) .OR. !ISPOINTER( pFuncPtr )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ELSEIF !__objHasMsg( oObject, cSymbol )
-      __clsAddMsg( oObject:ClassH, cSymbol, nFuncPtr, HB_OO_MSG_METHOD, NIL, 1 )
+      __clsAddMsg( oObject:ClassH, cSymbol, pFuncPtr, HB_OO_MSG_METHOD, NIL, 1 )
    ENDIF
 
 RETURN oObject
@@ -386,12 +386,12 @@ FUNCTION __objAddAccessAssign( oObject, cSymbol, bInLine )
 
 RETURN oObject
 
-FUNCTION __objModMethod( oObject, cSymbol, nFuncPtr )
+FUNCTION __objModMethod( oObject, cSymbol, pFuncPtr )
 
-   IF !ISOBJECT( oObject ) .OR. !ISCHARACTER( cSymbol ) .OR. !ISNUMBER( nFuncPtr )
+   IF !ISOBJECT( oObject ) .OR. !ISCHARACTER( cSymbol ) .OR. !ISPOINTER( pFuncPtr )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
    ELSEIF __objHasMethod( oObject, cSymbol )
-      __clsModMsg( oObject, cSymbol, nFuncPtr )
+      __clsModMsg( oObject, cSymbol, pFuncPtr )
    ENDIF
 
 RETURN oObject
@@ -422,7 +422,7 @@ RETURN __objDelMethod( oObject, cSymbol )              // Same story
 
 FUNCTION __objSetMethod( oObject, cMsg, FuncOrBlock, nScope )
 
-   IF ! ISOBJECT( oObject ) .OR. ! ISCHARACTER( cMsg ) .OR. ( ! ISBLOCK( FuncOrBlock ) .AND. ! ISNUMBER( FuncOrBlock ) )
+   IF ! ISOBJECT( oObject ) .OR. ! ISCHARACTER( cMsg ) .OR. ( ! ISBLOCK( FuncOrBlock ) .AND. ! ISPOINTER( FuncOrBlock ) )
       __errRT_BASE( EG_ARG, 3101, NIL, ProcName() )
    ENDIF
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3197 2004/07/22 21:21:08 peterrees Exp $
+ * $Id: ChangeLog,v 1.3198 2004/07/22 21:55:55 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-22 18:42 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/common.ch
+    + Added missing #xtranslate ISPOINTER( <xValue> )   => ( HB_ISPOINTER( <xValue> ) )
+  * source/rtl/objfunc.prg
+    ! Corrected multiple instances of code that was expecting Function Pointers to be NUMERIC type instead of POINTER.
+
 2004-07-23 09:56 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /contrib/libct/fcopy.prg
     - FILECOPY( cSource, cDest ) fixed so that cDest is not overwritten if cSource cannot be opened

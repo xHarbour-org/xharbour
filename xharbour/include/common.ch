@@ -1,5 +1,5 @@
 /*
- * $Id: common.ch,v 1.4 2003/11/12 11:28:49 toninhofwi Exp $
+ * $Id: common.ch,v 1.5 2003/12/21 03:24:32 walito Exp $
  */
 
 /*
@@ -70,6 +70,7 @@
 #xtranslate ISMEMO( <xValue> )      => ( HB_ISMEMO( <xValue> ) )
 #xtranslate ISNUMBER( <xValue> )    => ( HB_ISNUMERIC( <xValue> ) )
 #xtranslate ISOBJECT( <xValue> )    => ( HB_ISOBJECT( <xValue> ) )
+#xtranslate ISPOINTER( <xValue> )   => ( HB_ISPOINTER( <xValue> ) )
 
 #xtranslate VALTYPE( <Expr> ) == "A" => ( HB_ISARRAY( <Expr> ) )
 #xtranslate VALTYPE( <Expr> ) == "B" => ( HB_ISBLOCK( <Expr> ) )
