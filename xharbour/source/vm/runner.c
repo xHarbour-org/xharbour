@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.23 2004/03/31 09:19:55 andijahja Exp $
+ * $Id: runner.c,v 1.24 2004/04/09 18:52:08 ronpinkas Exp $
  */
 
 /*
@@ -134,8 +134,8 @@ PHRB_BODY hb_hrbLoad( char* szHrb );
 void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] );
 void hb_hrbUnLoad( PHRB_BODY pHrbBody );
 static ULONG     hb_hrbFindSymbol( char * szName, PHB_DYNF pDynFunc, ULONG ulLoaded );
-void      hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address );
-void      hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset, void * Address, ULONG ulNext );
+void hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address );
+void hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset, void * Address, ULONG ulNext );
 
 static FHANDLE   hb_hrbFileOpen( char * szFileName );
 static void      hb_hrbFileRead( FHANDLE file, char * szFileName, char * cBuffer, int iSize, int iCount );
@@ -837,7 +837,7 @@ HB_EXPORT PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode )
 }
 
 /* Patch an address of the dynamic function */
-static void hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address )
+void hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_hrbAsmPatch(%p, %lu, %p)", pCode, ulOffset, Address));
 
@@ -856,7 +856,7 @@ static void hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address )
 
 
 /* Intel specific ?? Patch an address relative to the next instruction */
-static void hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset, void * Address, ULONG ulNext )
+void hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset, void * Address, ULONG ulNext )
 {
    ULONG ulBase;
    ULONG ulRelative;
