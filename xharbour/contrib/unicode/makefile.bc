@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.1 2004/01/14 06:17:25 andijahja Exp $
+# $Id: makefile.bc,v 1.2 2004/01/17 22:01:02 andijahja Exp $
 #
 
 # makefile for Borland C/C++ 32 bits
@@ -21,7 +21,8 @@ $(LIB_DIR)\hbcc.lib :   \
    $(OBJ_DIR)\hbcrc16.obj \
    $(OBJ_DIR)\hbcrc32.obj \
    $(OBJ_DIR)\hbcrpt32.obj \
-   $(OBJ_DIR)\hbcrpt128.obj
+   $(OBJ_DIR)\hbcrpt128.obj \
+   $(OBJ_DIR)\hbencode.obj
 
 $(OBJ_DIR)\hbcc.c        : hbcc.prg
 $(OBJ_DIR)\hbcc.obj      : $(OBJ_DIR)\hbcc.c
@@ -34,6 +35,7 @@ $(OBJ_DIR)\hbcrc16.obj   : hbcrc16.c
 $(OBJ_DIR)\hbcrc32.obj   : hbcrc32.c
 $(OBJ_DIR)\hbcrpt32.obj  : hbcrpt32.c
 $(OBJ_DIR)\hbcrpt128.obj : hbcrpt128.c
+$(OBJ_DIR)\hbencode.obj  : hbencode.c
 
 .c.obj:
   bcc32 $(CLIBFLAGS) $(C_USR) -c -O2 -DWIN32 -I$(INCLUDE_DIR) -o$@ $<

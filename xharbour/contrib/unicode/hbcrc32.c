@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrc32.c,v 1.1 2004/01/14 13:59:52 andijahja Exp $
+ * $Id: hbcrc32.c,v 1.1 2004/01/14 06:14:03 andijahja Exp $
  */
 
 /*
@@ -115,40 +115,56 @@ static ULONG crc32tbl[256]={
 
 ULONG hbcc_crc32(BYTE *buf,ULONG len,ULONG crc)
 {
-	ULONG i=0;
-	crc^=CRC32INIT;
-	while( i<len ) {
-		crc=crc32tbl[(crc^buf[i++])&0xff]^(crc>>8);
-	}
-	return CRC32INIT^crc;
+   ULONG i=0;
+
+   crc^=CRC32INIT;
+
+   while( i<len )
+   {
+      crc=crc32tbl[(crc^buf[i++])&0xff]^(crc>>8);
+   }
+
+   return CRC32INIT^crc;
 }
 
-HB_FUNC(HB_CRC32) {
-	PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
-	ULONG srclen,crc;
-	BYTE *srcstr;
-	BYTE *dststr=(BYTE*) "\0\0\0\0";
-	if (phbstr) {
-		srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-		srclen=hb_itemGetCLen(phbstr);
-		crc=hbcc_crc32(srcstr,srclen,0l);
-		dststr[0]=(BYTE )(0xFF&(crc>>24));
-		dststr[1]=(BYTE )(0xFF&(crc>>16));
-		dststr[2]=(BYTE )(0xFF&(crc>>8));
-		dststr[3]=(BYTE )(0xFF&crc);
-	}
-	hb_retclen((char *) dststr,4);
+HB_FUNC(HB_CRC32)
+{
+   PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
+   ULONG srclen,crc;
+   BYTE *srcstr;
+   BYTE *dststr=(BYTE*) "\0\0\0\0";
+
+   if (phbstr)
+   {
+      srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
+      srclen=hb_itemGetCLen(phbstr);
+      crc=hbcc_crc32(srcstr,srclen,0l);
+      dststr[0]=(BYTE )(0xFF&(crc>>24));
+      dststr[1]=(BYTE )(0xFF&(crc>>16));
+      dststr[2]=(BYTE )(0xFF&(crc>>8));
+      dststr[3]=(BYTE )(0xFF&crc);
+   }
+
+   hb_retclen((char *) dststr,4);
 }
 
-HB_FUNC(HB_NCRC32) {
-	PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
-	ULONG srclen,crc=0;
-	BYTE *srcstr;
-	if (phbstr) {
-		if (hb_pcount()>1) crc=hb_parnl(2);
-		srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-		srclen=hb_itemGetCLen(phbstr);
-		crc=hbcc_crc32(srcstr,srclen,crc);
-	}
-	hb_retnl(crc);
+HB_FUNC(HB_NCRC32)
+{
+   PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
+   ULONG srclen,crc=0;
+   BYTE *srcstr;
+
+   if (phbstr)
+   {
+      if (hb_pcount()>1)
+      {
+         crc=hb_parnl(2);
+      }
+
+      srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
+      srclen=hb_itemGetCLen(phbstr);
+      crc=hbcc_crc32(srcstr,srclen,crc);
+   }
+
+   hb_retnl(crc);
 }

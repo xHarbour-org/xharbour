@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex.c,v 1.1 2004/01/14 13:59:52 andijahja Exp $
+ * $Id: hbhex.c,v 1.1 2004/01/14 06:14:03 andijahja Exp $
  */
 
 /*
@@ -75,39 +75,62 @@ HB_HXTONL(c) -> n
 
 HB_FUNC(HB_NLTOHX)
 {
-	BYTE *dststr;
-	if (hb_pcount()) {
-		dststr=(BYTE *) hb_xgrab(9);
-		sprintf((char *) dststr,"%lX",hb_parnl(1));
-		hb_retc((char *) dststr);
-		hb_xfree(dststr);
-	}
-	else hb_retc("");
+   BYTE *dststr;
+
+   if (hb_pcount())
+   {
+      dststr=(BYTE *) hb_xgrab(9);
+      sprintf((char *) dststr,"%lX",hb_parnl(1));
+      hb_retc((char *) dststr);
+      hb_xfree(dststr);
+   }
+   else
+   {
+      hb_retc("");
+   }
 }
 
 HB_FUNC(HB_NLTOH8)
 {
-	int i;
-	BYTE *dststr;
-	if (hb_pcount()) {
-		dststr=(BYTE *) hb_xgrab(9);
-		sprintf((char *) dststr,"%08lX",hb_parnl(1));
-		for (i=0;i<8;i++) if (dststr[i]==' ') dststr[i]='0';
-		hb_retclen((char *) dststr,8);
-		hb_xfree(dststr);
-	}
-	else hb_retc("");
+   int i;
+   BYTE *dststr;
+
+   if (hb_pcount())
+   {
+      dststr=(BYTE *) hb_xgrab(9);
+      sprintf((char *) dststr,"%08lX",hb_parnl(1));
+
+      for (i=0;i<8;i++)
+      {
+         if (dststr[i]==' ')
+         {
+            dststr[i]='0';
+         }
+      }
+
+      hb_retclen((char *) dststr,8);
+      hb_xfree(dststr);
+   }
+   else
+   {
+      hb_retc("");
+   }
 }
 
 HB_FUNC(HB_HXTONL)
 {
-	PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
-	ULONG val=0l;
-	BYTE *srcstr;
-	if (phbstr) {
-		srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-		sscanf((char *) srcstr,"%lX",&val);
-		hb_retnl(val);
-	}
-	else hb_retnl(0);
+   PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
+   ULONG val=0l;
+   BYTE *srcstr;
+
+   if (phbstr)
+   {
+      srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
+      sscanf((char *) srcstr,"%lX",&val);
+      hb_retnl(val);
+   }
+   else
+   {
+      hb_retnl(0);
+   }
 }

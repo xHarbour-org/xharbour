@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrc16.c,v 1.1 2004/01/14 13:59:52 andijahja Exp $
+ * $Id: hbcrc16.c,v 1.1 2004/01/14 06:14:03 andijahja Exp $
  */
 
 /*
@@ -117,40 +117,56 @@ static USHORT crc16tbl[256]={
 
 USHORT crc16(BYTE *buf,ULONG len,USHORT crc)
 {
-	ULONG i=0;
-	crc^=CRC16INIT;
-	while( i<len ) {
-		crc=crc16tbl[(crc^buf[i++])&0xff]^(crc>>8);
-	}
-	return CRC16INIT^crc;
+   ULONG i=0;
+
+   crc^=CRC16INIT;
+
+   while( i<len )
+   {
+      crc=crc16tbl[(crc^buf[i++])&0xff]^(crc>>8);
+   }
+
+   return CRC16INIT^crc;
 }
 
-HB_FUNC(HB_CRC16) {
-	PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
-	ULONG srclen;
-	USHORT crc;
-	BYTE *srcstr;
-	BYTE *dststr=(BYTE *) "\0\0";
-	if (phbstr) {
-		srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-		srclen=hb_itemGetCLen(phbstr);
-		crc=crc16(srcstr,srclen,0);
-		dststr[0]=(BYTE) 0xFF&(crc>>8);
-		dststr[1]=(BYTE) 0xFF&crc;
-	}
-	hb_retclen((char*) dststr,2);
+HB_FUNC(HB_CRC16)
+{
+   PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
+   ULONG srclen;
+   USHORT crc;
+   BYTE *srcstr;
+   BYTE *dststr=(BYTE *) "\0\0";
+
+   if (phbstr)
+   {
+      srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
+      srclen=hb_itemGetCLen(phbstr);
+      crc=crc16(srcstr,srclen,0);
+      dststr[0]=(BYTE) 0xFF&(crc>>8);
+      dststr[1]=(BYTE) 0xFF&crc;
+   }
+
+   hb_retclen((char*) dststr,2);
 }
 
-HB_FUNC(HB_NCRC16) {
-	PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
-	ULONG srclen;
-	USHORT crc=0;
-	BYTE *srcstr;
-	if (phbstr) {
-		if (hb_pcount()>1) crc=hb_parni(2);
-		srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-		srclen=hb_itemGetCLen(phbstr);
-		crc=crc16(srcstr,srclen,crc);
-	}
-	hb_retni(crc);
+HB_FUNC(HB_NCRC16)
+{
+   PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
+   ULONG srclen;
+   USHORT crc=0;
+   BYTE *srcstr;
+
+   if (phbstr)
+   {
+      if (hb_pcount()>1)
+      {
+         crc=hb_parni(2);
+      }
+
+      srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
+      srclen=hb_itemGetCLen(phbstr);
+      crc=crc16(srcstr,srclen,crc);
+   }
+
+   hb_retni(crc);
 }

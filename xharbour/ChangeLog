@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2201 2004/02/01 22:52:03 likewolf Exp $
+ * $Id: ChangeLog,v 1.2202 2004/02/01 23:40:33 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,50 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-02 17:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * tests/videotst.prg
+    ! fix typo : SET GTMODE INLINE => SET GTMODE TO INLINE
+
+  * tests/xhbwav.prg
+  * tests/xhbmidi.prg
+    ! fixes on return values and some simplification
+
+  + tests/sample.wav
+  + tests/xhbwav.prg
+    ! Sample program to play wav file with gtalleg
+
+  + tests/sample.pcx
+  + tests/xhbpic.prg
+    ! Sample program to view graphic files with gtalleg while playing sound
+
+  + tests/xhbenc.prg
+    + test program for file encoding
+
+  + contrib/unicode/hbencode.c
+    + added the following file encoding functions:
+      + UUENCODE_FILE()
+      + UUENCODE_FILE_BY_CHUNK()
+      + B64ENCODE_FILE()
+      + B64ENCODE_FILE_BY_CHUNK()
+      + YYENCODE_FILE()
+      + YYENCODE_FILE_BY_CHUNK()
+
+  * contrib/unicode/make_b32.bat
+  * contrib/unicode/makefile.bc
+  * contrib/unicode/makefile.vc
+    + add hbencode.obj file dependency
+
+  * contrib/unicode/hbc7.c
+  * contrib/unicode/hbcc.prg
+  * contrib/unicode/hbcrc16.c
+  * contrib/unicode/hbcrc32.c
+  * contrib/unicode/hbcrpt32.c
+  * contrib/unicode/hbcrpt128.c
+  * contrib/unicode/hbcu.c
+  * contrib/unicode/hbcx.c
+  * contrib/unicode/hbcy.c
+  * contrib/unicode/hbhex.c
+    ! source code re-formatting
 
 
 2004-02-02 00:39 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>

@@ -1,5 +1,5 @@
 /*
- * $Id: videotst.prg,v 1.1.1.1 2001/12/21 10:46:34 ronpinkas Exp $
+ * $Id: videotst.prg,v 1.2 2004/01/28 16:42:19 jonnymind Exp $
  */
 * VIDEOTST.PRG
 *
@@ -26,7 +26,7 @@ FUNCTION MAIN()
              { 50, 80, " 50 x 80 " },;
              { 60, 80, " 60 x 80 " } }
 
- SET GTMODE INLINE
+ SET GTMODE TO INLINE
  
  DO WHILE (nMode != 0)
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcc.prg,v 1.1 2004/01/14 06:15:37 andijahja Exp $
+ * $Id: hbcc.prg,v 1.2 2004/01/19 22:00:50 andijahja Exp $
  */
 
 /*
@@ -169,14 +169,14 @@ HB_B64DECODE(b64_string) -> string
 #define UTF7START '+'
 
 typedef struct int_hb_csinfo {
-	BYTE name[48];
-	BYTE leads[MAX_CHARSIZE];
-	BYTE chsz;
-	BYTE defchar[2];
-	BYTE ltc2u;
-	BYTE reserved;
-	BYTE *tc2u;
-	BYTE *tu2c;
+        BYTE name[48];
+        BYTE leads[MAX_CHARSIZE];
+        BYTE chsz;
+        BYTE defchar[2];
+        BYTE ltc2u;
+        BYTE reserved;
+        BYTE *tc2u;
+        BYTE *tu2c;
 } HB_CSINFO;
 
 //Common static variables
@@ -203,773 +203,1243 @@ static ULONG uni2uni(BYTE *,ULONG,BYTE *);
 
 static HB_FUNC( HB_INT_CSINIT )
 {
-	ULONG i;
-	LastError=HB_CSERR_OK;
-	pcs=NULL;
-	lcs=0;
-	wspchars=(BYTE*) strchr((char*)trchars,'\n');
-	cspath=(BYTE*) hb_getenv("HBCSPATH");
-	if (cspath==NULL) {
-		cspath=(BYTE *) hb_xgrab(3);
-		cspath[0]='.';
-		cspath[1]=OS_PATH_DELIMITER;
-		cspath[2]='\0';
-	}
-	if (cspath[0]=='\0') {
-		cspath=(BYTE *) hb_xrealloc(cspath,3);
-		cspath[0]='.';
-		cspath[1]=OS_PATH_DELIMITER;
-		cspath[2]='\0';
-	}
-	i=strlen((char*) cspath);
-	if (cspath[i-1]!=OS_PATH_DELIMITER) {
-		cspath=(BYTE *) hb_xrealloc(cspath,i+2);
-		cspath[i]=OS_PATH_DELIMITER;
-		cspath[i+1]='\0';
-	}
+   ULONG i;
+
+   LastError=HB_CSERR_OK;
+   pcs=NULL;
+   lcs=0;
+   wspchars=(BYTE*) strchr((char*)trchars,'\n');
+   cspath=(BYTE*) hb_getenv("HBCSPATH");
+
+   if (cspath==NULL)
+   {
+      cspath=(BYTE *) hb_xgrab(3);
+      cspath[0]='.';
+      cspath[1]=OS_PATH_DELIMITER;
+      cspath[2]='\0';
+   }
+
+   if (cspath[0]=='\0')
+   {
+      cspath=(BYTE *) hb_xrealloc(cspath,3);
+      cspath[0]='.';
+      cspath[1]=OS_PATH_DELIMITER;
+      cspath[2]='\0';
+   }
+
+   i=strlen((char*) cspath);
+
+   if (cspath[i-1]!=OS_PATH_DELIMITER)
+   {
+      cspath=(BYTE *) hb_xrealloc(cspath,i+2);
+      cspath[i]=OS_PATH_DELIMITER;
+      cspath[i+1]='\0';
+   }
 }
 
 static HB_FUNC( HB_INT_CSEXIT )
 {
-	ULONG i;
-	for (i=lcs;i;i--) {
-		if (pcs[i-1]->tu2c) hb_xfree(pcs[i-1]->tu2c);
-		if (pcs[i-1]->tc2u) hb_xfree(pcs[i-1]->tc2u);
-		if (pcs[i-1]) hb_xfree(pcs[i-1]);
-	}
-	LastError=HB_CSERR_OK;
-	if (pcs) hb_xfree(pcs);
-	pcs=(HB_CSINFO **) NULL;
-	lcs=0;
-	if (cspath) hb_xfree(cspath);
-	cspath=NULL;
-	return;
+   ULONG i;
+
+   for (i=lcs;i;i--)
+   {
+      if (pcs[i-1]->tu2c)
+      {
+         hb_xfree(pcs[i-1]->tu2c);
+      }
+
+      if (pcs[i-1]->tc2u)
+      {
+         hb_xfree(pcs[i-1]->tc2u);
+      }
+
+      if (pcs[i-1])
+      {
+         hb_xfree(pcs[i-1]);
+      }
+   }
+
+   LastError=HB_CSERR_OK;
+
+   if (pcs)
+   {
+      hb_xfree(pcs);
+   }
+
+   pcs=(HB_CSINFO **) NULL;
+   lcs=0;
+
+   if (cspath)
+   {
+      hb_xfree(cspath);
+   }
+
+   cspath=NULL;
+
+   return;
 }
 
 HB_FUNC( HB_CSGETERROR )
 {
-	hb_retnl(LastError);
+   hb_retnl(LastError);
 }
 
 HB_FUNC( HB_CSREG )
 {
-	ULONG i,j;
-	BYTE c;
-	BYTE *filepath, *csname;
-	FHANDLE hf;
-	if (ISCHAR(1)) {
-		if (lcs==HB_CSPRESET) {
-			LastError=HB_CSERR_LIMIT;
-			hb_retnl(HB_CSINVALID);
-			return;
-		}
-		csname=(BYTE*)hb_parc(1);
-		filepath=(BYTE *) hb_xgrab(_POSIX_PATH_MAX);
-		strcpy((char *) filepath,(char *) cspath);
-		strcat((char *) filepath,(char *) csname);
-		strcat((char *) filepath,(char *) HB_CSFEXT);
-		if (hb_spFile(filepath,NULL)==FALSE) {
-			hb_xfree(filepath);
-			LastError=HB_CSERR_BADCS;
-			hb_retnl(HB_CSINVALID);
-			return;
-		}
-		hf=hb_fsOpen(filepath,FO_READ|FO_DENYNONE);
-		if (hf<0) {
-			hb_xfree(filepath);
-			LastError=HB_CSERR_ERROR;
-			hb_retnl(HB_CSINVALID);
-			return;
-		}
-		lcs++;
-		if (pcs) pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs*sizeof(HB_CSINFO *));
-		else pcs=(HB_CSINFO **) hb_xgrab(lcs*sizeof(HB_CSINFO *));
-		pcs[lcs-1]=(HB_CSINFO *) hb_xgrab(sizeof(HB_CSINFO));
-		i=hb_fsRead(hf,pcs[lcs-1]->name,CSINFO_MAXNAME);
-		if (i<CSINFO_MAXNAME) {
-			hb_xfree(filepath);
-			lcs--;
-			hb_xfree(pcs[lcs]);
-			pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs);
-			LastError=HB_CSERR_BADCS;
-			hb_retnl(HB_CSINVALID);
-			return;
-		}
-		filepath=(BYTE *) hb_xrealloc(filepath,CSINFO_HEADSZ - CSINFO_MAXNAME);
-		i=hb_fsRead(hf,filepath,CSINFO_HEADSZ - CSINFO_MAXNAME);
-		if (i<(CSINFO_HEADSZ - CSINFO_MAXNAME)) {
-			hb_xfree(filepath);
-			lcs--;
-			hb_xfree(pcs[lcs]);
-			pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs);
-			LastError=HB_CSERR_BADCS;
-			hb_retnl(HB_CSINVALID);
-			return;
-		}
-		pcs[lcs-1]->chsz=filepath[CSINFO_OFFCHSZ - CSINFO_MAXNAME];
-		pcs[lcs-1]->defchar[0]=filepath[CSINFO_OFFDEFC - CSINFO_MAXNAME];
-		pcs[lcs-1]->defchar[1]=filepath[CSINFO_OFFDEFC - CSINFO_MAXNAME +1];
-		pcs[lcs-1]->ltc2u=filepath[CSINFO_OFFTBSZ - CSINFO_MAXNAME];
-		j=0;
-		for (i=0;i<CSINFO_MAXLEAD;i++) {
-			if (filepath[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME]&&filepath[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME+1]) {
-				for (c=filepath[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME];c<=filepath[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME+1];c++) pcs[lcs-1]->leads[j++]=c;
-			}
-		}
-		hb_xfree(filepath); // bugfix 200401190646GMT+3
-		j=(2*MAX_CHARSIZE)*pcs[lcs-1]->ltc2u;
-		pcs[lcs-1]->tc2u=(BYTE *) hb_xgrab(j);
-		i=hb_fsReadLarge(hf,pcs[lcs-1]->tc2u,j);
-		if (i<j) {
-			hb_xfree(pcs[lcs-1]->tc2u);
-			hb_xfree(filepath);
-			lcs--;
-			hb_xfree(pcs[lcs]);
-			pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs);
-			LastError=HB_CSERR_BADCS;
-			hb_retnl(HB_CSINVALID);
-			return;
-		}
-		j=MAX_WCHARSIZE*pcs[lcs-1]->chsz;
-		pcs[lcs-1]->tu2c=(BYTE *) hb_xgrab(j);
-		i=hb_fsReadLarge(hf,pcs[lcs-1]->tu2c,j);
-		if (i<j) {
-			hb_xfree(pcs[lcs-1]->tu2c);
-			hb_xfree(pcs[lcs-1]->tc2u);
-			hb_xfree(filepath);
-			lcs--;
-			hb_xfree(pcs[lcs]);
-			pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs);
-			LastError=HB_CSERR_BADCS;
-			hb_retnl(HB_CSINVALID);
-			return;
-		}
-		LastError=HB_CSERR_OK;
-		hb_retnl(lcs);
-	}
-	else {
-		LastError=HB_CSERR_BADARG;
-		hb_retnl(HB_CSINVALID);
-	}
+   ULONG i,j;
+   BYTE c;
+   BYTE *filepath, *csname;
+   FHANDLE hf;
+
+   if (ISCHAR(1))
+   {
+      if (lcs==HB_CSPRESET)
+      {
+         LastError=HB_CSERR_LIMIT;
+         hb_retnl(HB_CSINVALID);
+         return;
+      }
+
+      csname=(BYTE*)hb_parc(1);
+      filepath=(BYTE *) hb_xgrab(_POSIX_PATH_MAX);
+      strcpy((char *) filepath,(char *) cspath);
+      strcat((char *) filepath,(char *) csname);
+      strcat((char *) filepath,(char *) HB_CSFEXT);
+
+      if (hb_spFile(filepath,NULL)==FALSE)
+      {
+         hb_xfree(filepath);
+         LastError=HB_CSERR_BADCS;
+         hb_retnl(HB_CSINVALID);
+         return;
+      }
+
+      hf=hb_fsOpen(filepath,FO_READ|FO_DENYNONE);
+
+      if (hf<0)
+      {
+         hb_xfree(filepath);
+         LastError=HB_CSERR_ERROR;
+         hb_retnl(HB_CSINVALID);
+         return;
+      }
+
+      lcs++;
+
+      if (pcs)
+      {
+         pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs*sizeof(HB_CSINFO *));
+      }
+      else
+      {
+         pcs=(HB_CSINFO **) hb_xgrab(lcs*sizeof(HB_CSINFO *));
+      }
+
+      pcs[lcs-1]=(HB_CSINFO *) hb_xgrab(sizeof(HB_CSINFO));
+      i=hb_fsRead(hf,pcs[lcs-1]->name,CSINFO_MAXNAME);
+
+      if (i<CSINFO_MAXNAME)
+      {
+         hb_xfree(filepath);
+         lcs--;
+         hb_xfree(pcs[lcs]);
+         pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs);
+         LastError=HB_CSERR_BADCS;
+         hb_retnl(HB_CSINVALID);
+         return;
+      }
+
+      filepath=(BYTE *) hb_xrealloc(filepath,CSINFO_HEADSZ - CSINFO_MAXNAME);
+      i=hb_fsRead(hf,filepath,CSINFO_HEADSZ - CSINFO_MAXNAME);
+
+      if (i<(CSINFO_HEADSZ - CSINFO_MAXNAME))
+      {
+         hb_xfree(filepath);
+         lcs--;
+         hb_xfree(pcs[lcs]);
+         pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs);
+         LastError=HB_CSERR_BADCS;
+         hb_retnl(HB_CSINVALID);
+         return;
+      }
+
+      pcs[lcs-1]->chsz=filepath[CSINFO_OFFCHSZ - CSINFO_MAXNAME];
+      pcs[lcs-1]->defchar[0]=filepath[CSINFO_OFFDEFC - CSINFO_MAXNAME];
+      pcs[lcs-1]->defchar[1]=filepath[CSINFO_OFFDEFC - CSINFO_MAXNAME +1];
+      pcs[lcs-1]->ltc2u=filepath[CSINFO_OFFTBSZ - CSINFO_MAXNAME];
+      j=0;
+
+      for (i=0;i<CSINFO_MAXLEAD;i++)
+      {
+         if (filepath[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME]&&filepath[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME+1])
+         {
+            for (c=filepath[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME];c<=filepath[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME+1];c++)
+            {
+               pcs[lcs-1]->leads[j++]=c;
+            }
+         }
+      }
+
+      hb_xfree(filepath); // bugfix 200401190646GMT+3
+      j=(2*MAX_CHARSIZE)*pcs[lcs-1]->ltc2u;
+      pcs[lcs-1]->tc2u=(BYTE *) hb_xgrab(j);
+      i=hb_fsReadLarge(hf,pcs[lcs-1]->tc2u,j);
+
+      if (i<j)
+      {
+         hb_xfree(pcs[lcs-1]->tc2u);
+         hb_xfree(filepath);
+         lcs--;
+         hb_xfree(pcs[lcs]);
+         pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs);
+         LastError=HB_CSERR_BADCS;
+         hb_retnl(HB_CSINVALID);
+         return;
+      }
+
+      j=MAX_WCHARSIZE*pcs[lcs-1]->chsz;
+      pcs[lcs-1]->tu2c=(BYTE *) hb_xgrab(j);
+      i=hb_fsReadLarge(hf,pcs[lcs-1]->tu2c,j);
+
+      if (i<j)
+      {
+         hb_xfree(pcs[lcs-1]->tu2c);
+         hb_xfree(pcs[lcs-1]->tc2u);
+         hb_xfree(filepath);
+         lcs--;
+         hb_xfree(pcs[lcs]);
+         pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs);
+         LastError=HB_CSERR_BADCS;
+         hb_retnl(HB_CSINVALID);
+         return;
+      }
+      LastError=HB_CSERR_OK;
+      hb_retnl(lcs);
+   }
+   else
+   {
+      LastError=HB_CSERR_BADARG;
+      hb_retnl(HB_CSINVALID);
+   }
 }
 
 HB_FUNC( HB_CSUNREG )
 {
-	ULONG i;
-	BYTE *csname;
-	if (ISCHAR(1)) {
-		csname=(BYTE*) hb_parc(1);
-		for (i=0;i<lcs;i++) {
-			if (strcmp((char*)pcs[i]->name,(char*)csname)==0) break;
-		}
-		if (i==lcs) {
-			LastError=HB_CSERR_BADCS;
-			hb_retl(FALSE);
-			return;
-		}
-	}
-	else if (ISNUM(1)) {
-		i=hb_parnl(1);
-		if (i>HB_CSPRESET) {
-			LastError=HB_CSERR_BADCS;
-			hb_retl(FALSE);
-			return;
-		}
-		else i--;
-		if (i>lcs) {
-			LastError=HB_CSERR_BADCS;
-			hb_retl(FALSE);
-			return;
-		}
-	}
-	else {
-		LastError=HB_CSERR_BADARG;
-		hb_retl(FALSE);
-		return;
-	}
-	hb_xfree(pcs[i]->tu2c);
-	hb_xfree(pcs[i]->tc2u);
-	hb_xfree(pcs[i]);
-	i++;
-	for (;i<lcs;i++) {
-		pcs[i-1]=pcs[i];
-	}
-	lcs--;
-	pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs*sizeof(HB_CSINFO *));
-	hb_retl(TRUE);
+   ULONG i;
+   BYTE *csname;
+
+   if (ISCHAR(1))
+   {
+      csname=(BYTE*) hb_parc(1);
+
+      for (i=0;i<lcs;i++)
+      {
+         if (strcmp((char*)pcs[i]->name,(char*)csname)==0)
+         {
+            break;
+         }
+      }
+
+      if (i==lcs)
+      {
+         LastError=HB_CSERR_BADCS;
+         hb_retl(FALSE);
+         return;
+      }
+   }
+   else if (ISNUM(1))
+   {
+      i=hb_parnl(1);
+
+      if (i>HB_CSPRESET)
+      {
+         LastError=HB_CSERR_BADCS;
+         hb_retl(FALSE);
+         return;
+      }
+      else
+      {
+         i--;
+      }
+
+      if (i>lcs)
+      {
+         LastError=HB_CSERR_BADCS;
+         hb_retl(FALSE);
+         return;
+      }
+   }
+   else
+   {
+      LastError=HB_CSERR_BADARG;
+      hb_retl(FALSE);
+      return;
+   }
+
+   hb_xfree(pcs[i]->tu2c);
+   hb_xfree(pcs[i]->tc2u);
+   hb_xfree(pcs[i]);
+   i++;
+
+   for (;i<lcs;i++)
+   {
+      pcs[i-1]=pcs[i];
+   }
+   lcs--;
+
+   pcs=(HB_CSINFO **) hb_xrealloc(pcs,lcs*sizeof(HB_CSINFO *));
+   hb_retl(TRUE);
 }
 
 HB_FUNC( HB_CSOPENED )
 {
-	ULONG i;
-	BYTE *csname;
-	if (ISCHAR(1)) {
-		csname=(BYTE*)hb_parc(1);
-		LastError=HB_CSERR_BADCS;
-		for (i=0;i<lcs;i++) {
-			if (strcmp((char*)csname,(char*)pcs[i]->name)==0) {
-				LastError=HB_CSERR_OK;
-				hb_retnl(i+1);
-			}
-		}
-		if (i==lcs) {
-			if ((hb_stricmp((char*)csname,"UNICODE")==0) || (hb_stricmp((char*)csname,"UCS2")==0) || (hb_stricmp((char*)csname,"UCS2LE")==0)) {
-				LastError=HB_CSERR_OK;
-				hb_retnl(HB_CSUCS2LE);
-			}
-			else if (hb_stricmp((char*)csname,"UCS2BE")==0) {
-				LastError=HB_CSERR_OK;
-				hb_retnl(HB_CSUCS2BE);
-			}
-			else if ((hb_stricmp((char*)csname,"UTF8")==0) || (hb_stricmp((char*)csname,"UTF-8"))==0) {
-				LastError=HB_CSERR_OK;
-				hb_retnl(HB_CSUTF8);
-                        }
-			else if ((hb_stricmp((char*)csname,"UTF7")==0) || (hb_stricmp((char*)csname,"UTF-7"))==0) {
-				LastError=HB_CSERR_OK;
-				hb_retnl(HB_CSUTF7);
-                        }
-			else {
-				LastError=HB_CSERR_BADCS;
-				hb_retnl(HB_CSINVALID);
-			}
-		}
-		hb_xfree(csname);
-	}
-	else {
-		LastError=HB_CSERR_BADARG;
-		hb_retnl(HB_CSINVALID);
-	}
+   ULONG i;
+   BYTE *csname;
+
+   if (ISCHAR(1))
+   {
+      csname=(BYTE*)hb_parc(1);
+      LastError=HB_CSERR_BADCS;
+
+      for (i=0;i<lcs;i++)
+      {
+         if (strcmp((char*)csname,(char*)pcs[i]->name)==0)
+         {
+            LastError=HB_CSERR_OK;
+            hb_retnl(i+1);
+         }
+      }
+
+      if (i==lcs)
+      {
+         if ((hb_stricmp((char*)csname,"UNICODE")==0) || (hb_stricmp((char*)csname,"UCS2")==0) || (hb_stricmp((char*)csname,"UCS2LE")==0))
+         {
+            LastError=HB_CSERR_OK;
+            hb_retnl(HB_CSUCS2LE);
+         }
+         else if (hb_stricmp((char*)csname,"UCS2BE")==0)
+         {
+            LastError=HB_CSERR_OK;
+            hb_retnl(HB_CSUCS2BE);
+         }
+         else if ((hb_stricmp((char*)csname,"UTF8")==0) || (hb_stricmp((char*)csname,"UTF-8"))==0)
+         {
+            LastError=HB_CSERR_OK;
+            hb_retnl(HB_CSUTF8);
+         }
+         else if ((hb_stricmp((char*)csname,"UTF7")==0) || (hb_stricmp((char*)csname,"UTF-7"))==0)
+         {
+            LastError=HB_CSERR_OK;
+            hb_retnl(HB_CSUTF7);
+         }
+         else
+         {
+            LastError=HB_CSERR_BADCS;
+            hb_retnl(HB_CSINVALID);
+         }
+      }
+      hb_xfree(csname);
+   }
+   else
+   {
+      LastError=HB_CSERR_BADARG;
+      hb_retnl(HB_CSINVALID);
+   }
 }
 
 HB_FUNC( HB_CSAVAIL )
 {
-	BYTE *filepath;
-	BOOL x;
-	if (ISCHAR(1)) {
-		filepath=(BYTE *) hb_xgrab(_POSIX_PATH_MAX);
-		strcpy((char*)filepath,(char*)cspath);
-		strcat((char*)filepath,hb_parc(1));
-		strcat((char*)filepath,HB_CSFEXT);
-		x=hb_spFile(filepath,NULL);
-		hb_xfree(filepath);
-		if (x) LastError=HB_CSERR_OK;
-		else LastError=HB_CSERR_BADCS;
-		hb_retl(x);
-	}
-	else {
-		LastError=HB_CSERR_BADARG;
-        	hb_retl(FALSE);
-        }
+   BYTE *filepath;
+   BOOL x;
+
+   if (ISCHAR(1))
+   {
+      filepath=(BYTE *) hb_xgrab(_POSIX_PATH_MAX);
+      strcpy((char*)filepath,(char*)cspath);
+      strcat((char*)filepath,hb_parc(1));
+      strcat((char*)filepath,HB_CSFEXT);
+      x=hb_spFile(filepath,NULL);
+      hb_xfree(filepath);
+
+      if (x)
+      {
+         LastError=HB_CSERR_OK;
+      }
+      else
+      {
+         LastError=HB_CSERR_BADCS;
+      }
+
+      hb_retl(x);
+   }
+   else
+   {
+      LastError=HB_CSERR_BADARG;
+      hb_retl(FALSE);
+   }
 }
 
 HB_FUNC( HB_CSLIST )
 {
-	ULONG i;
-	BYTE *cslist;
-	LastError=HB_CSERR_OK;
-	cslist=(BYTE *) hb_xgrab(1);
-	cslist[0]='\0';
-	for (i=0;i<lcs;i++) {
-		cslist=(BYTE *) hb_xrealloc(cslist,strlen((char*)cslist)+strlen((char*)pcs[i]->name)+2);
-		strcat((char*) cslist,(char*)",");
-		strcat((char*) cslist,(char*)pcs[i]->name);
-	}
-	hb_retc((char*)(cslist+1));
-	hb_xfree(cslist);
-	return;
+   ULONG i;
+   BYTE *cslist;
+
+   LastError=HB_CSERR_OK;
+   cslist=(BYTE *) hb_xgrab(1);
+   cslist[0]='\0';
+
+   for (i=0;i<lcs;i++)
+   {
+      cslist=(BYTE *) hb_xrealloc(cslist,strlen((char*)cslist)+strlen((char*)pcs[i]->name)+2);
+      strcat((char*) cslist,(char*)",");
+      strcat((char*) cslist,(char*)pcs[i]->name);
+   }
+
+   hb_retc((char*)(cslist+1));
+   hb_xfree(cslist);
 }
 
 HB_FUNC( HB_CSTOCS )
 {
-	ULONG h1,h2,srclen,dstlen,intlen,x=0;
-	BYTE *srcstr, *dststr, *intstr;
-	PHB_ITEM pstr = hb_param( 1, HB_IT_STRING );
-	if (hb_pcount()<3) {
-		LastError=HB_CSERR_BADARG;
-		hb_retc("");
-		return;
-	}
-	h1=hb_parnl(2);
-	h2=hb_parnl(3);
-	if ((pstr && h1 && h2)==FALSE) {
-		LastError=HB_CSERR_BADARG;
-		hb_retc("");
-		return;
-	}
-	srcstr=(BYTE*) hb_itemGetCPtr(pstr);
-	srclen=hb_itemGetCLen(pstr);
-	LastError=HB_CSERR_OK;
-	if (srclen==0) {
-		hb_retc("");
-		return;
-	}
-	if (h1==h2) {
-		hb_retclen((char*) srcstr,srclen);
-		return;
-	}
-	if (h1==HB_CSUCS2BE) {
-		intlen=srclen;
-		intstr=srcstr;
-	}
-	else if (h1==HB_CSUCS2LE) {
-		x|=1;
-		intstr=(BYTE *) hb_xgrab(srclen);
-		intlen=uni2uni(srcstr,srclen,intstr);
-	}
-	else if (h1==HB_CSUTF8) {
-		x|=1;
-		intlen=ut82uni(srcstr,srclen,NULL);
-		intstr=(BYTE *) hb_xgrab(intlen);
-		ut82uni(srcstr,srclen,intstr);
-	}
-	else if (h1==HB_CSUTF7) {
-		x|=1;
-		intlen=ut72uni(srcstr,srclen,NULL);
-		intstr=(BYTE *) hb_xgrab(intlen);
-		ut72uni(srcstr,srclen,intstr);
-	}
-	else if (h1<=lcs) {
-		x|=1;
-		h1--;
-		intlen=chr2uni(h1,srcstr,srclen,NULL);
-		intstr=(BYTE *) hb_xgrab(intlen);
-		chr2uni(h1,srcstr,srclen,intstr);
-	}
-	else { //bad cs
-		LastError=HB_CSERR_BADCS;
-	}
-	if (LastError==HB_CSERR_OK) {
-		if (h2==HB_CSUCS2BE) {
-			dstlen=intlen;
-			dststr=intstr;
-		}
-		else if (h2==HB_CSUCS2LE) {
-			x|=2;
-			dststr=(BYTE *) hb_xgrab(intlen);
-			dstlen=uni2uni(intstr,intlen,dststr);
-		}
-		else if (h2==HB_CSUTF8) {
-			x|=2;
-			dstlen=uni2ut8(intstr,intlen,NULL);
-			dststr=(BYTE *) hb_xgrab(dstlen);
-			uni2ut8(intstr,intlen,dststr);
-		}
-		else if (h2==HB_CSUTF7) {
-			x|=2;
-			dstlen=uni2ut7(intstr,intlen,NULL);
-			dststr=(BYTE *) hb_xgrab(dstlen);
-			uni2ut7(intstr,intlen,dststr);
-		}
-		else if (h2<=lcs) {
-			x|=2;
-			h2--;
-			dstlen=uni2chr(h2,intstr,intlen,NULL);
-			dststr=(BYTE *) hb_xgrab(dstlen);
-			uni2chr(h2,intstr,intlen,dststr);
-		}
-		else { //bad cs
-			LastError=HB_CSERR_BADCS;
-		}
-	}
-	else {
-		hb_retc("");
-	}
-	if (LastError==HB_CSERR_OK) {
-		hb_retclen((char*) dststr,dstlen);
-	}
-	else {
-		hb_retc("");
-	}
-	if (x&1) hb_xfree(intstr);
-	if (x&2) hb_xfree(dststr);
+   ULONG h1,h2,srclen,dstlen,intlen,x=0;
+   BYTE *srcstr, *dststr, *intstr;
+   PHB_ITEM pstr = hb_param( 1, HB_IT_STRING );
+
+   if (hb_pcount()<3)
+   {
+      LastError=HB_CSERR_BADARG;
+      hb_retc("");
+      return;
+   }
+
+   h1=hb_parnl(2);
+   h2=hb_parnl(3);
+
+   if ((pstr && h1 && h2)==FALSE)
+   {
+      LastError=HB_CSERR_BADARG;
+      hb_retc("");
+      return;
+   }
+
+   srcstr=(BYTE*) hb_itemGetCPtr(pstr);
+   srclen=hb_itemGetCLen(pstr);
+   LastError=HB_CSERR_OK;
+
+   if (srclen==0)
+   {
+      hb_retc("");
+      return;
+   }
+
+   if (h1==h2)
+   {
+      hb_retclen((char*) srcstr,srclen);
+      return;
+   }
+
+   if (h1==HB_CSUCS2BE)
+   {
+      intlen=srclen;
+      intstr=srcstr;
+   }
+   else if (h1==HB_CSUCS2LE)
+   {
+     x|=1;
+     intstr=(BYTE *) hb_xgrab(srclen);
+     intlen=uni2uni(srcstr,srclen,intstr);
+   }
+   else if (h1==HB_CSUTF8)
+   {
+      x|=1;
+      intlen=ut82uni(srcstr,srclen,NULL);
+      intstr=(BYTE *) hb_xgrab(intlen);
+      ut82uni(srcstr,srclen,intstr);
+   }
+   else if (h1==HB_CSUTF7)
+   {
+      x|=1;
+      intlen=ut72uni(srcstr,srclen,NULL);
+      intstr=(BYTE *) hb_xgrab(intlen);
+      ut72uni(srcstr,srclen,intstr);
+   }
+   else if (h1<=lcs)
+   {
+      x|=1;
+      h1--;
+      intlen=chr2uni(h1,srcstr,srclen,NULL);
+      intstr=(BYTE *) hb_xgrab(intlen);
+      chr2uni(h1,srcstr,srclen,intstr);
+   }
+   else
+   { //bad cs
+      LastError=HB_CSERR_BADCS;
+   }
+
+   if (LastError==HB_CSERR_OK)
+   {
+      if (h2==HB_CSUCS2BE)
+      {
+         dstlen=intlen;
+         dststr=intstr;
+      }
+      else if (h2==HB_CSUCS2LE)
+      {
+         x|=2;
+         dststr=(BYTE *) hb_xgrab(intlen);
+         dstlen=uni2uni(intstr,intlen,dststr);
+      }
+      else if (h2==HB_CSUTF8)
+      {
+         x|=2;
+         dstlen=uni2ut8(intstr,intlen,NULL);
+         dststr=(BYTE *) hb_xgrab(dstlen);
+         uni2ut8(intstr,intlen,dststr);
+      }
+      else if (h2==HB_CSUTF7)
+      {
+         x|=2;
+         dstlen=uni2ut7(intstr,intlen,NULL);
+         dststr=(BYTE *) hb_xgrab(dstlen);
+         uni2ut7(intstr,intlen,dststr);
+      }
+      else if (h2<=lcs)
+      {
+         x|=2;
+         h2--;
+         dstlen=uni2chr(h2,intstr,intlen,NULL);
+         dststr=(BYTE *) hb_xgrab(dstlen);
+         uni2chr(h2,intstr,intlen,dststr);
+      }
+      else
+      { //bad cs
+         LastError=HB_CSERR_BADCS;
+      }
+   }
+   else
+   {
+      hb_retc("");
+   }
+
+   if (LastError==HB_CSERR_OK)
+   {
+      hb_retclen((char*) dststr,dstlen);
+   }
+   else
+   {
+      hb_retc("");
+   }
+
+   if (x&1)
+   {
+      hb_xfree(intstr);
+   }
+
+   if (x&2)
+   {
+      hb_xfree(dststr);
+   }
 }
 
 HB_FUNC(HB_B64ENCODE)
 {
-	PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
-	ULONG srclen,dstlen,i,n,k;
-	BYTE *srcstr,*dststr;
-	if (phbstr) {
-		srcstr=(BYTE*) hb_itemGetCPtr(phbstr);
-		srclen=hb_itemGetCLen(phbstr);
-		i=b64enc(srcstr,srclen,NULL);
-		k=i&3;
-		if (k==2) i+=2;
-		else if (k==3) i++;
-		else if (k==1) {
-			hb_retc("");
-			return;
-		}
-		dstlen=n=i+(i/B64_LINELEN)*2; //In RFC CRLF's are standard
-		dststr=(BYTE *) hb_xgrab(dstlen);
-		b64enc(srcstr,srclen,dststr);
-		if (k) dststr[i-1]=B64_PADCH;
-		if (k==2) dststr[i-2]=B64_PADCH;
-		while (i && n) {
-			if (i%B64_LINELEN==0) {
-				dststr[--n]='\n';
-				dststr[--n]='\r';
-			}
-			dststr[--n]=dststr[--i];
-		}
-		hb_retclen((char*)dststr,dstlen);
-		hb_xfree(dststr);
-	}
-	else hb_retc("");
+   PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
+   ULONG srclen,dstlen,i,n,k;
+   BYTE *srcstr,*dststr;
+
+   if (phbstr)
+   {
+      srcstr=(BYTE*) hb_itemGetCPtr(phbstr);
+      srclen=hb_itemGetCLen(phbstr);
+      i=b64enc(srcstr,srclen,NULL);
+      k=i&3;
+
+      if (k==2)
+      {
+         i+=2;
+      }
+      else if (k==3)
+      {
+         i++;
+      }
+      else if (k==1)
+      {
+         hb_retc("");
+         return;
+      }
+
+      dstlen=n=i+(i/B64_LINELEN)*2; //In RFC CRLF's are standard
+      dststr=(BYTE *) hb_xgrab(dstlen);
+      b64enc(srcstr,srclen,dststr);
+
+      if (k)
+      {
+         dststr[i-1]=B64_PADCH;
+      }
+
+      if (k==2)
+      {
+         dststr[i-2]=B64_PADCH;
+      }
+
+      while (i && n)
+      {
+         if (i%B64_LINELEN==0)
+         {
+            dststr[--n]='\n';
+            dststr[--n]='\r';
+         }
+         dststr[--n]=dststr[--i];
+      }
+
+      hb_retclen((char*)dststr,dstlen);
+      hb_xfree(dststr);
+   }
+   else
+   {
+      hb_retc("");
+   }
 }
 
 HB_FUNC(HB_B64DECODE)
 {
-	PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
-	ULONG srclen,dstlen,tmplen=0,i=0;
-	BYTE *srcstr,*dststr,*tmpstr;
-	if (phbstr) {
-		srcstr=(BYTE *)hb_itemGetCPtr(phbstr);
-		srclen=hb_itemGetCLen(phbstr);
-		tmpstr=(BYTE *) hb_xgrab(srclen);
-		while (i<srclen) {
-			if (strchr((char*)wspchars,srcstr[i])!=NULL) i++;
-			else if (b64invalid(srcstr[i])) break;
-			else tmpstr[tmplen++]=srcstr[i++];
-		}
-		dstlen=b64dec(tmpstr,tmplen,NULL);
-		dststr=(BYTE *) hb_xgrab(dstlen);
-		b64dec(tmpstr,tmplen,dststr);
-		hb_retclen((char*)dststr,dstlen);
-		hb_xfree(tmpstr);
-		hb_xfree(dststr);
-	}
-	else hb_retc("");
+   PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
+   ULONG srclen,dstlen,tmplen=0,i=0;
+   BYTE *srcstr,*dststr,*tmpstr;
+
+   if (phbstr)
+   {
+      srcstr=(BYTE *)hb_itemGetCPtr(phbstr);
+      srclen=hb_itemGetCLen(phbstr);
+      tmpstr=(BYTE *) hb_xgrab(srclen);
+
+      while (i<srclen)
+      {
+         if (strchr((char*)wspchars,srcstr[i])!=NULL)
+         {
+            i++;
+         }
+         else if (b64invalid(srcstr[i]))
+         {
+            break;
+         }
+         else
+         {
+            tmpstr[tmplen++]=srcstr[i++];
+         }
+      }
+
+      dstlen=b64dec(tmpstr,tmplen,NULL);
+      dststr=(BYTE *) hb_xgrab(dstlen);
+      b64dec(tmpstr,tmplen,dststr);
+      hb_retclen((char*)dststr,dstlen);
+      hb_xfree(tmpstr);
+      hb_xfree(dststr);
+   }
+   else
+   {
+      hb_retc("");
+   }
 }
 
 //internal funcs
 
 static BOOL b64invalid(BYTE c)
 {
-	return (strchr((char*)base64a,c)==NULL) || (c=='\0');
+   return (strchr((char*)base64a,c)==NULL) || (c=='\0');
 }
 
 static ULONG b64enc(BYTE *srcstr, ULONG srclen, BYTE *dststr)
 {
-	ULONG dstlen,i;
+   ULONG dstlen,i;
 
-	if (dststr) {
-		dstlen=0;
-		i=0;
-		while (i<srclen) {
-			dststr[dstlen++]=base64a[(srcstr[i]&0xFC)>>2];
-			if (++i==srclen) {
-				dststr[dstlen++]=base64a[(srcstr[i-1]&0x03)<<4];
-				break;
-			}
-			dststr[dstlen++]=base64a[((srcstr[i-1]&0x03)<<4)|((srcstr[i]&0xF0)>>4)];
-			if (++i==srclen) {
-				dststr[dstlen++]=base64a[(srcstr[i-1]&0x0F)<<2];
-				break;
-			}
-			dststr[dstlen++]=base64a[((srcstr[i-1]&0x0F)<<2)|((srcstr[i]&0xC0)>>6)];
-			dststr[dstlen++]=base64a[srcstr[i]&0x3F];
-			if (++i==srclen) break;
-		}
-	}
-	else dstlen=(srclen/3)*4+(srclen%3?(srclen%3+1):0);
-	return dstlen;
+   if (dststr)
+   {
+      dstlen=0;
+      i=0;
+      while (i<srclen)
+      {
+         dststr[dstlen++]=base64a[(srcstr[i]&0xFC)>>2];
+
+         if (++i==srclen)
+         {
+            dststr[dstlen++]=base64a[(srcstr[i-1]&0x03)<<4];
+            break;
+         }
+
+         dststr[dstlen++]=base64a[((srcstr[i-1]&0x03)<<4)|((srcstr[i]&0xF0)>>4)];
+
+         if (++i==srclen)
+         {
+            dststr[dstlen++]=base64a[(srcstr[i-1]&0x0F)<<2];
+            break;
+         }
+
+         dststr[dstlen++]=base64a[((srcstr[i-1]&0x0F)<<2)|((srcstr[i]&0xC0)>>6)];
+         dststr[dstlen++]=base64a[srcstr[i]&0x3F];
+
+         if (++i==srclen)
+         {
+            break;
+         }
+      }
+   }
+   else
+   {
+      dstlen=(srclen/3)*4+(srclen%3?(srclen%3+1):0);
+   }
+
+   return dstlen;
 }
 
 static ULONG b64dec(BYTE *srcstr, ULONG srclen, BYTE *dststr)
 {
-	ULONG dstlen=0,i;
-	BYTE *dummy;
-	BYTE tmp[4];
-	i=0;
-	while(i<srclen) {
-		dummy=(BYTE*)strchr((char*)base64a,srcstr[i++]);
-		if (dummy==NULL) break;
-		tmp[0]=(BYTE) (dummy-base64a);
-		if (i==srclen) break;
-		dummy=(BYTE*)strchr((char*)base64a,srcstr[i++]);
-		if (dummy==NULL) break;
-		tmp[1]=(BYTE) (dummy-base64a);
-		if (dststr) dststr[dstlen++]=(BYTE) (tmp[0]<<2)|((tmp[1]&'\060')>>4);
-		else dstlen++;
-		if (i==srclen) break;
-		dummy=(BYTE*)strchr((char*)base64a,srcstr[i++]);
-		if (dummy==NULL) break;
-		tmp[2]=(BYTE) (dummy-base64a);
-		if (dststr) dststr[dstlen++]=(BYTE) ((tmp[1]&'\017')<<4)|((tmp[2]&'\074')>>2);
-		else dstlen++;
-		if (i==srclen) break;
-		dummy=(BYTE*)strchr((char*)base64a,srcstr[i++]);
-		if (dummy==NULL) break;
-		tmp[3]=(BYTE) (dummy-base64a);
-		if (dststr) dststr[dstlen++]=(BYTE) ((tmp[2]&'\003')<<6)|tmp[3];
-		else dstlen++;
-	}
-	return dstlen;
+   ULONG dstlen=0,i;
+   BYTE *dummy;
+   BYTE tmp[4];
+
+   i=0;
+
+   while(i<srclen)
+   {
+      dummy=(BYTE*)strchr((char*)base64a,srcstr[i++]);
+
+      if (dummy==NULL)
+      {
+         break;
+      }
+
+      tmp[0]=(BYTE) (dummy-base64a);
+
+      if (i==srclen)
+      {
+         break;
+      }
+
+      dummy=(BYTE*)strchr((char*)base64a,srcstr[i++]);
+
+      if (dummy==NULL)
+      {
+         break;
+      }
+
+      tmp[1]=(BYTE) (dummy-base64a);
+
+      if (dststr)
+      {
+         dststr[dstlen++]=(BYTE) (tmp[0]<<2)|((tmp[1]&'\060')>>4);
+      }
+      else
+      {
+         dstlen++;
+      }
+
+      if (i==srclen)
+      {
+         break;
+      }
+
+      dummy=(BYTE*)strchr((char*)base64a,srcstr[i++]);
+
+      if (dummy==NULL)
+      {
+         break;
+      }
+
+      tmp[2]=(BYTE) (dummy-base64a);
+
+      if (dststr)
+      {
+         dststr[dstlen++]=(BYTE) ((tmp[1]&'\017')<<4)|((tmp[2]&'\074')>>2);
+      }
+      else
+      {
+         dstlen++;
+      }
+
+      if (i==srclen)
+      {
+         break;
+      }
+
+      dummy=(BYTE*)strchr((char*)base64a,srcstr[i++]);
+
+      if (dummy==NULL)
+      {
+         break;
+      }
+
+      tmp[3]=(BYTE) (dummy-base64a);
+
+      if (dststr)
+      {
+         dststr[dstlen++]=(BYTE) ((tmp[2]&'\003')<<6)|tmp[3];
+      }
+      else
+      {
+         dstlen++;
+      }
+   }
+
+   return dstlen;
 }
 
 static ULONG uni2uni(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 {
-	ULONG i;
-	for(i=0;i<(srclen-1);) {
-		dststr[i]=srcstr[i+1];
-		dststr[i+1]=srcstr[i];
-		i+=2;
-	}
-	return i;
+   ULONG i;
+
+   for(i=0;i<(srclen-1);)
+   {
+      dststr[i]=srcstr[i+1];
+      dststr[i+1]=srcstr[i];
+      i+=2;
+   }
+
+   return i;
 }
 
 static ULONG chr2uni(ULONG h,BYTE *chrstr,ULONG chrlen,BYTE *unistr)
 {
-	ULONG i=0,c,n,unilen=0;
-	BYTE *x;
-	while (i<chrlen) {
-		if (pcs[h]->chsz==1) {
-			n=1;
-			c=chrstr[i];
-		}
-		else {
-			x=(BYTE*) strchr((char*)pcs[h]->leads,chrstr[i]);
-			if (x) {
-				n=2;
-				c=(x+1 - pcs[h]->leads) * MAX_CHARSIZE + chrstr[i+1];
-			}
-			else {
-				n=1;
-				c=chrstr[i];
-			}
-		}
-		if (unistr) {
-			unistr[unilen]=pcs[h]->tc2u[2*c+1];
-			unistr[unilen+1]=pcs[h]->tc2u[2*c];
-		}
-		i+=n;
-		unilen+=2;
-	}
-	return unilen;
+   ULONG i=0,c,n,unilen=0;
+   BYTE *x;
+
+   while (i<chrlen)
+   {
+      if (pcs[h]->chsz==1)
+      {
+         n=1;
+         c=chrstr[i];
+      }
+      else
+      {
+         x=(BYTE*) strchr((char*)pcs[h]->leads,chrstr[i]);
+
+         if (x)
+         {
+            n=2;
+            c=(x+1 - pcs[h]->leads) * MAX_CHARSIZE + chrstr[i+1];
+         }
+         else
+         {
+            n=1;
+            c=chrstr[i];
+         }
+      }
+
+      if (unistr)
+      {
+         unistr[unilen]=pcs[h]->tc2u[2*c+1];
+         unistr[unilen+1]=pcs[h]->tc2u[2*c];
+      }
+
+      i+=n;
+      unilen+=2;
+   }
+
+   return unilen;
 }
 
 static ULONG uni2chr(ULONG h,BYTE *unistr,ULONG unilen,BYTE *chrstr)
 {
-	ULONG i=0,c,n,chrlen=0;
-	while (i<unilen-1) {
-		c=((((ULONG) unistr[i]) << 8) | (ULONG) unistr[i+1]) * ((ULONG) pcs[h]->chsz);
-		if (pcs[h]->chsz==1) n=1;
-		else {
-			if (pcs[h]->tu2c[c+1]) n=2;
-			else n=1;
-		}
-		if (chrstr) {
-			chrstr[chrlen]=pcs[h]->tu2c[c];
-			if (n>1) chrstr[chrlen+1]=pcs[h]->tu2c[c+1];
-		}
-		chrlen+=n;
-		i+=2;
-	}
-	return chrlen;
+   ULONG i=0,c,n,chrlen=0;
+
+   while (i<unilen-1)
+   {
+      c=((((ULONG) unistr[i]) << 8) | (ULONG) unistr[i+1]) * ((ULONG) pcs[h]->chsz);
+
+      if (pcs[h]->chsz==1)
+      {
+         n=1;
+      }
+      else
+      {
+         if (pcs[h]->tu2c[c+1])
+         {
+            n=2;
+         }
+         else
+         {
+            n=1;
+         }
+      }
+
+      if (chrstr)
+      {
+         chrstr[chrlen]=pcs[h]->tu2c[c];
+
+         if (n>1)
+         {
+            chrstr[chrlen+1]=pcs[h]->tu2c[c+1];
+         }
+      }
+
+      chrlen+=n;
+      i+=2;
+   }
+
+   return chrlen;
 }
 
 static ULONG ut82uni(BYTE *utfstr,ULONG utflen,BYTE *unistr)
 {
-	ULONG i,n,unilen=0;
+   ULONG i,n,unilen=0;
 
-        for (i=0;i<utflen;) {
-		if (utfstr[i] & 0x80) {
-			if (utfstr[i] & 0x40) {
-				if (utfstr[i] & 0x20) n=3; //0x800-0xFFFF,3
-				else n=2;                  //0x80-0x7FF,2
-			}
-			else n=0;
-		}
-		else n=1;                          //0x00-0x7F,1
-		if (i+n>utflen) { //incomplete
-			if (unistr) {
-				unistr[unilen++]='\0';
-				unistr[unilen++]='?';
-			}
-			else unilen+=2;
-			return unilen;
-		}
-		if (unistr) {
-			switch(n) {
-			case 0: //wrong utf-8 char
-				unistr[unilen++]='\0';
-				unistr[unilen++]='?';
-				break;
-			case 1:
-				unistr[unilen++]='\0';
-				unistr[unilen++]=utfstr[i];
-				break;
-			case 2:
-				unistr[unilen++]=(utfstr[i] & '\034') >> 2;
-				unistr[unilen++]=(utfstr[i+1]&'\077') | ((utfstr[i]&'\003')<<6);
-				break;
-			case 3:
-				unistr[unilen++]=((utfstr[i]&'\017')<<4) | ((utfstr[i+1]&'\074')>>2);
-				unistr[unilen++]=((utfstr[i+1]&'\003')<<6) | (utfstr[i+2]&'\077');
-				break;
-			}
-		}
-		else unilen+=2;
-		i+=n;
-	}
-	return unilen;
+   for (i=0;i<utflen;)
+   {
+      if (utfstr[i] & 0x80)
+      {
+         if (utfstr[i] & 0x40)
+         {
+            if (utfstr[i] & 0x20)
+            {
+               n=3; //0x800-0xFFFF,3
+            }
+            else
+            {
+               n=2; //0x80-0x7FF,2
+            }
+         }
+         else
+         {
+            n=0;
+         }
+      }
+      else
+      {
+         n=1;                          //0x00-0x7F,1
+      }
+
+      if (i+n>utflen)
+      { //incomplete
+         if (unistr)
+         {
+            unistr[unilen++]='\0';
+            unistr[unilen++]='?';
+         }
+         else
+         {
+            unilen+=2;
+         }
+
+         return unilen;
+      }
+
+      if (unistr)
+      {
+         switch(n)
+         {
+         case 0: //wrong utf-8 char
+            unistr[unilen++]='\0';
+            unistr[unilen++]='?';
+            break;
+
+         case 1:
+            unistr[unilen++]='\0';
+            unistr[unilen++]=utfstr[i];
+            break;
+
+         case 2:
+            unistr[unilen++]=(utfstr[i] & '\034') >> 2;
+            unistr[unilen++]=(utfstr[i+1]&'\077') | ((utfstr[i]&'\003')<<6);
+            break;
+
+         case 3:
+            unistr[unilen++]=((utfstr[i]&'\017')<<4) | ((utfstr[i+1]&'\074')>>2);
+            unistr[unilen++]=((utfstr[i+1]&'\003')<<6) | (utfstr[i+2]&'\077');
+            break;
+         }
+      }
+      else
+      {
+         unilen+=2;
+      }
+
+      i+=n;
+   }
+
+   return unilen;
 }
 
 static ULONG uni2ut8(BYTE *unistr,ULONG unilen,BYTE *utfstr)
 {
-	ULONG i,n,utflen=0;
-	for (i=0;i<(unilen-1);) {
-		if ((unistr[i] | (unistr[i+1]&'\200'))=='\0') n=1; //0x00-0x7F
-		else if (unistr[i]<'\010') n=2; //0x80-0x7ff
-		else n=3; //0x0800-0xffff
-		if (utfstr) {
-			switch (n) {
-			case 1:
-				utfstr[utflen++]=unistr[i+1];
-				break;
-			case 2:
-				utfstr[utflen++]='\300'|(('\007'&unistr[i])<<2)|('\003'&(unistr[i+1]>>6));
-				utfstr[utflen++]='\200'|('\077'&unistr[i+1]);
-				break;
-			case 3:
-				utfstr[utflen++]='\340'|('\017'&(unistr[i]>>4));
-				utfstr[utflen++]='\200'|(('\017'&unistr[i])<<2)|('\003'&(unistr[i+1]>>6));
-				utfstr[utflen++]='\200'|('\077'&unistr[i+1]);
-				break;
-			}
-		}
-		else utflen+=n;
-		i+=2;
-	}
-	return utflen;
+   ULONG i,n,utflen=0;
+
+   for (i=0;i<(unilen-1);)
+   {
+      if ((unistr[i] | (unistr[i+1]&'\200'))=='\0')
+      {
+         n=1; //0x00-0x7F
+      }
+      else if (unistr[i]<'\010')
+      {
+         n=2; //0x80-0x7ff
+      }
+      else
+      {
+         n=3; //0x0800-0xffff
+      }
+
+      if (utfstr)
+      {
+         switch (n)
+         {
+         case 1:
+            utfstr[utflen++]=unistr[i+1];
+            break;
+
+         case 2:
+            utfstr[utflen++]='\300'|(('\007'&unistr[i])<<2)|('\003'&(unistr[i+1]>>6));
+            utfstr[utflen++]='\200'|('\077'&unistr[i+1]);
+            break;
+
+         case 3:
+            utfstr[utflen++]='\340'|('\017'&(unistr[i]>>4));
+            utfstr[utflen++]='\200'|(('\017'&unistr[i])<<2)|('\003'&(unistr[i+1]>>6));
+            utfstr[utflen++]='\200'|('\077'&unistr[i+1]);
+            break;
+         }
+      }
+      else
+      {
+         utflen+=n;
+      }
+
+      i+=2;
+   }
+
+   return utflen;
 }
 
 static ULONG ut72uni(BYTE *utfstr,ULONG utflen,BYTE *unistr)
 {
-	ULONG i,j,unilen=0,state=0;
-	BYTE *dummy,c;
-	for (i=0;i<utflen;i++) {
-		if (state==1) {
-			if (b64invalid(utfstr[i])) {
-				state=0;
-				if ((utfstr[i]=='-') && (utfstr[i-1]=='+')) c='+';
-				else c=utfstr[i];
-				j=b64dec(dummy,i-(dummy-utfstr),NULL);
-				if (unistr) b64dec(dummy,i-(dummy-utfstr),unistr+unilen);
-				unilen+=j;
-				if (c!='-') {
-					if (unistr) {
-						unistr[unilen++]='\0';
-						unistr[unilen++]=c;
-					}
-					else unilen+=2;
-				}
-			}
-		}
-		else if (utfstr[i]==UTF7START) {
-			dummy=utfstr+(i+1);
-			state=1;
-		}
-		else {
-			if (unistr) {
-				unistr[unilen++]='\0';
-				unistr[unilen++]=utfstr[i];
-			}
-			else unilen+=2;
-		}
-	}
-	if (state==1) {
-		j=b64dec(dummy,utflen-(dummy-utfstr),NULL);
-		if (unistr) b64dec(dummy,utflen-(dummy-utfstr),unistr+unilen);
-		unilen+=j;
-	}
-	return unilen;
+   ULONG i,j,unilen=0,state=0;
+   BYTE *dummy,c;
+
+   for (i=0;i<utflen;i++)
+   {
+      if (state==1)
+      {
+         if (b64invalid(utfstr[i]))
+         {
+            state=0;
+
+            if ((utfstr[i]=='-') && (utfstr[i-1]=='+'))
+            {
+               c='+';
+            }
+            else
+            {
+               c=utfstr[i];
+            }
+
+            j=b64dec(dummy,i-(dummy-utfstr),NULL);
+
+            if (unistr)
+            {
+               b64dec(dummy,i-(dummy-utfstr),unistr+unilen);
+            }
+
+            unilen+=j;
+
+            if (c!='-')
+            {
+               if (unistr)
+               {
+                  unistr[unilen++]='\0';
+                  unistr[unilen++]=c;
+               }
+               else
+               {
+                  unilen+=2;
+               }
+            }
+         }
+      }
+      else if (utfstr[i]==UTF7START)
+      {
+         dummy=utfstr+(i+1);
+         state=1;
+      }
+      else
+      {
+         if (unistr)
+         {
+            unistr[unilen++]='\0';
+            unistr[unilen++]=utfstr[i];
+         }
+         else
+         {
+            unilen+=2;
+         }
+      }
+   }
+
+   if (state==1)
+   {
+      j=b64dec(dummy,utflen-(dummy-utfstr),NULL);
+
+      if (unistr)
+      {
+         b64dec(dummy,utflen-(dummy-utfstr),unistr+unilen);
+      }
+
+      unilen+=j;
+   }
+
+   return unilen;
 }
 
 static ULONG uni2ut7(BYTE *unistr,ULONG unilen,BYTE *utfstr)
 {
-	ULONG i,j,utflen=0,state=0;
-	BYTE *dummy;
-	for (i=0;i<unilen-1;i+=2) {
-		if ((unistr[i]=='\0') && (unistr[i+1]=='+')) {
-			if (state==1) {
-				j=b64enc(dummy,i-(dummy-unistr),NULL);
-				if (utfstr) {
-					utfstr[utflen++]='+';
-					b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
-					utflen+=j;
-					utfstr[utflen++]='-';
-				}
-				else utflen+=j+2;
-			}
-			if (utfstr) {
-				utfstr[utflen++]='+';
-				utfstr[utflen++]='-';
-			}
-			else utflen+=2;
-			state=0;
-		}
-		else if ((unistr[i]=='\0') && (unistr[i+1]=='-')) {
-			if (state==1) {
-				j=b64enc(dummy,i-(dummy-unistr),NULL);
-				if (utfstr) {
-					utfstr[utflen++]='+';
-					b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
-					utflen+=j;
-					utfstr[utflen++]='-';
-				}
-				else utflen+=j+2;
-			}
-			if (utfstr) utfstr[utflen++]='-';
-			else utflen++;
-			state=0;
-		}
-		else if ((unistr[i]=='\0') && (strchr((char*)base64a,unistr[i+1])!=NULL) && (unistr[i+1]!=0)) {
-			if (state==1) {
-				j=b64enc(dummy,i-(dummy-unistr),NULL);
-				if (utfstr) {
-					utfstr[utflen++]='+';
-					b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
-					utflen+=j;
-					utfstr[utflen++]='-';
-				}
-				else utflen+=j+2;
-			}
-			if (utfstr) utfstr[utflen++]=unistr[i+1];
-			else utflen++;
-			state=0;
-		}
-		else if ((unistr[i]=='\0') && (strchr((char*)trchars,unistr[i+1])!=NULL) && (unistr[i+1]!=0)) {
-			if (state==1) {
-				j=b64enc(dummy,i-(dummy-unistr),NULL);
-				if (utfstr) {
-					utfstr[utflen++]='+';
-					b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
-					utflen+=j;
-				}
-				else utflen+=j+1;
-			}
-			if (utfstr) utfstr[utflen++]=unistr[i+1];
-			else utflen++;
-			state=0;
-		}
-		else if (state==0) {
-			dummy=unistr+i;
-			state=1;
-		}
-	}
-	if (state==1) {
-		j=b64enc(dummy,unilen-(dummy-unistr),NULL);
-		if (utfstr) {
-			utfstr[utflen++]='+';
-			b64enc(dummy,unilen-(dummy-unistr),utfstr+utflen);
-			utflen+=j;
-		}
-		else utflen+=j+1;
-	}
-	return utflen;
+   ULONG i,j,utflen=0,state=0;
+   BYTE *dummy;
+
+   for (i=0;i<unilen-1;i+=2)
+   {
+      if ((unistr[i]=='\0') && (unistr[i+1]=='+'))
+      {
+         if (state==1)
+         {
+            j=b64enc(dummy,i-(dummy-unistr),NULL);
+
+            if (utfstr)
+            {
+               utfstr[utflen++]='+';
+               b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
+               utflen+=j;
+               utfstr[utflen++]='-';
+            }
+            else
+            {
+               utflen+=j+2;
+            }
+         }
+
+         if (utfstr)
+         {
+            utfstr[utflen++]='+';
+            utfstr[utflen++]='-';
+         }
+         else
+         {
+            utflen+=2;
+         }
+
+         state=0;
+      }
+      else if ((unistr[i]=='\0') && (unistr[i+1]=='-'))
+      {
+         if (state==1)
+         {
+            j=b64enc(dummy,i-(dummy-unistr),NULL);
+
+            if (utfstr)
+            {
+               utfstr[utflen++]='+';
+               b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
+               utflen+=j;
+               utfstr[utflen++]='-';
+            }
+            else
+            {
+               utflen+=j+2;
+            }
+         }
+
+         if (utfstr)
+         {
+            utfstr[utflen++]='-';
+         }
+         else
+         {
+            utflen++;
+         }
+
+         state=0;
+      }
+      else if ((unistr[i]=='\0') && (strchr((char*)base64a,unistr[i+1])!=NULL) && (unistr[i+1]!=0))
+      {
+         if (state==1)
+         {
+            j=b64enc(dummy,i-(dummy-unistr),NULL);
+
+            if (utfstr)
+            {
+               utfstr[utflen++]='+';
+               b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
+               utflen+=j;
+               utfstr[utflen++]='-';
+            }
+            else
+            {
+               utflen+=j+2;
+            }
+         }
+
+         if (utfstr)
+         {
+            utfstr[utflen++]=unistr[i+1];
+         }
+         else
+         {
+            utflen++;
+         }
+
+         state=0;
+      }
+      else if ((unistr[i]=='\0') && (strchr((char*)trchars,unistr[i+1])!=NULL) && (unistr[i+1]!=0))
+      {
+         if (state==1)
+         {
+            j=b64enc(dummy,i-(dummy-unistr),NULL);
+
+            if (utfstr)
+            {
+               utfstr[utflen++]='+';
+               b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
+               utflen+=j;
+            }
+            else
+            {
+               utflen+=j+1;
+            }
+         }
+
+         if (utfstr)
+         {
+            utfstr[utflen++]=unistr[i+1];
+         }
+         else
+         {
+            utflen++;
+         }
+
+         state=0;
+      }
+      else if (state==0)
+      {
+         dummy=unistr+i;
+         state=1;
+      }
+   }
+
+   if (state==1)
+   {
+      j=b64enc(dummy,unilen-(dummy-unistr),NULL);
+
+      if (utfstr)
+      {
+         utfstr[utflen++]='+';
+         b64enc(dummy,unilen-(dummy-unistr),utfstr+utflen);
+         utflen+=j;
+      }
+      else
+      {
+         utflen+=j+1;
+      }
+   }
+
+   return utflen;
 }
 
 #pragma ENDDUMP
@@ -983,4 +1453,3 @@ INIT Procedure HB_CSINIT()
 Exit Procedure HB_CSEXIT()
    HB_INT_CSEXIT()
    Return
-

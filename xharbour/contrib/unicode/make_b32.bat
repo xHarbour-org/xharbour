@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.1 2004/01/14 06:18:05 andijahja Exp $
+rem $Id: make_b32.bat,v 1.2 2004/01/17 22:01:02 andijahja Exp $
 rem
 
 if "%1" == "clean" goto CLEAN
@@ -35,6 +35,7 @@ if "%1" == "CLEAN" goto CLEAN
    if exist ..\..\obj\b32\hbcrc32.obj   del ..\..\obj\b32\hbcrc32.obj
    if exist ..\..\obj\b32\hbcrpt32.obj  del ..\..\obj\b32\hbcrpt32.obj
    if exist ..\..\obj\b32\hbcrpt128.obj del ..\..\obj\b32\hbcrpt128.obj
+   if exist ..\..\obj\b32\hbencode.obj  del ..\..\obj\b32\hbencode.obj
 
    goto EXIT
 

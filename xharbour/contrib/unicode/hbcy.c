@@ -1,5 +1,5 @@
 /*
- * $Id: hbcy.c,v 1.1 2004/01/14 13:59:52 andijahja Exp $
+ * $Id: hbcy.c,v 1.1 2004/01/14 06:14:03 andijahja Exp $
  */
 
 /*
@@ -82,92 +82,139 @@ static ULONG yye2str(BYTE *,ULONG,BYTE *);
 
 HB_FUNC(HB_YYENCODE)
 {
-	PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
-	ULONG srclen,dstlen;
-	BYTE *srcstr,*dststr;
-	if ((hb_pcount()<2) || ((yy_len=hb_parnl(2))==0)) yy_len=128;
-	if (phbstr) {
-		srcstr=(BYTE *)hb_itemGetCPtr(phbstr);
-		srclen=hb_itemGetCLen(phbstr);
-		dstlen=str2yye(srcstr,srclen,NULL);
-		dststr=(BYTE *) hb_xgrab(dstlen);
-		str2yye(srcstr,srclen,dststr);
-		hb_retclen((char *) dststr,dstlen);
-		hb_xfree(dststr);
-	}
-	else hb_retc("");
+   PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
+   ULONG srclen,dstlen;
+   BYTE *srcstr,*dststr;
+
+   if ((hb_pcount()<2) || ((yy_len=hb_parnl(2))==0))
+   {
+      yy_len=128;
+   }
+
+   if (phbstr)
+   {
+      srcstr=(BYTE *)hb_itemGetCPtr(phbstr);
+      srclen=hb_itemGetCLen(phbstr);
+      dstlen=str2yye(srcstr,srclen,NULL);
+      dststr=(BYTE *) hb_xgrab(dstlen);
+      str2yye(srcstr,srclen,dststr);
+      hb_retclen((char *) dststr,dstlen);
+      hb_xfree(dststr);
+   }
+   else
+   {
+      hb_retc("");
+   }
 }
 
 HB_FUNC(HB_YYDECODE)
 {
-	PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
-	ULONG srclen,dstlen;
-	BYTE *srcstr,*dststr;
-	if (phbstr) {
-		srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
-		srclen=hb_itemGetCLen(phbstr);
-		dstlen=yye2str(srcstr,srclen,NULL);
-		dststr=(BYTE *) hb_xgrab(dstlen);
-		yye2str(srcstr,srclen,dststr);
-		hb_retclen((char*) dststr,dstlen);
-		hb_xfree(dststr);
-	}
-	else hb_retc("");
+   PHB_ITEM phbstr=hb_param(1,HB_IT_STRING);
+   ULONG srclen,dstlen;
+   BYTE *srcstr,*dststr;
+
+   if (phbstr)
+   {
+      srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
+      srclen=hb_itemGetCLen(phbstr);
+      dstlen=yye2str(srcstr,srclen,NULL);
+      dststr=(BYTE *) hb_xgrab(dstlen);
+      yye2str(srcstr,srclen,dststr);
+      hb_retclen((char*) dststr,dstlen);
+      hb_xfree(dststr);
+   }
+   else
+      hb_retc("");
 }
 
 static ULONG str2yye(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 {
-	ULONG i,x,dstlen=0,l=0;
-	for (i=0;i<srclen;i++) {
-		l++;
-		x=0xFF & (0x2A + (ULONG) srcstr[i]);
-		if (strchr((char *) yy_tomask,x)) {
-			if (dststr) {
-				dststr[dstlen++]='=';
-				if ((l++)%yy_len==0) {
-					l=1;
-					if (OS_EOL_LEN==2) dststr[dstlen++]='\r';
-					dststr[dstlen++]='\n';
-				}
-				dststr[dstlen++]=(BYTE) (x+0x40);
-			}
-			else {
-				if ((l++)%yy_len==0) {
-					l=1;
-					dstlen+=OS_EOL_LEN;
-				}
-				dstlen+=2;
-			}
-		}
-		else {
-			if (dststr) dststr[dstlen++]=(BYTE) x;
-			else dstlen++;
-		}
-		if (l%yy_len==0) {
-			l=0;
-			if (dststr) {
-				if (OS_EOL_LEN==2) dststr[dstlen++]='\r';
-				dststr[dstlen++]='\n';
-			}
-			else dstlen+=OS_EOL_LEN;
-		}
-	}
-	return dstlen;
+   ULONG i,x,dstlen=0,l=0;
+
+   for (i=0;i<srclen;i++)
+   {
+      l++;
+      x=0xFF & (0x2A + (ULONG) srcstr[i]);
+
+      if (strchr((char *) yy_tomask,x))
+      {
+         if (dststr)
+         {
+            dststr[dstlen++]='=';
+
+            if ((l++)%yy_len==0)
+            {
+               l=1;
+
+               if (OS_EOL_LEN==2)
+                  dststr[dstlen++]='\r';
+
+               dststr[dstlen++]='\n';
+            }
+
+            dststr[dstlen++]=(BYTE) (x+0x40);
+         }
+         else
+         {
+            if ((l++)%yy_len==0)
+            {
+               l=1;
+               dstlen+=OS_EOL_LEN;
+            }
+            dstlen+=2;
+         }
+      }
+      else
+      {
+         if (dststr)
+            dststr[dstlen++]=(BYTE) x;
+         else
+            dstlen++;
+      }
+
+      if (l%yy_len==0)
+      {
+         l=0;
+
+         if (dststr)
+         {
+            if (OS_EOL_LEN==2)
+               dststr[dstlen++]='\r';
+
+            dststr[dstlen++]='\n';
+         }
+         else
+            dstlen+=OS_EOL_LEN;
+      }
+   }
+   return dstlen;
 }
 
 static ULONG yye2str(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 {
-	ULONG i,dstlen=0;
-	int s=0;
-	for (i=0;i<srclen;i++) {
-		if (strchr((char *) yy_tomask,srcstr[i])) {
-			if (srcstr[i]=='=') s=1;
-			continue;
-		}
-		if ((s==1) && strchr((char *) yy_tomask,srcstr[i]-0x40)==NULL) break;
-		if (dststr) dststr[dstlen++]=(BYTE) (0xFF&((int) srcstr[i]+0xD6-s*0x40));
-		else dstlen++;
-		s=0;
-	}
-	return dstlen;
+   ULONG i,dstlen=0;
+   int s=0;
+
+   for (i=0;i<srclen;i++)
+   {
+      if (strchr((char *) yy_tomask,srcstr[i]))
+      {
+         if (srcstr[i]=='=')
+            s=1;
+
+         continue;
+      }
+
+      if ((s==1) && strchr((char *) yy_tomask,srcstr[i]-0x40)==NULL)
+         break;
+
+      if (dststr)
+         dststr[dstlen++]=(BYTE) (0xFF&((int) srcstr[i]+0xD6-s*0x40));
+      else
+         dstlen++;
+
+      s=0;
+   }
+
+   return dstlen;
 }
