@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.57 2004/01/11 14:03:39 andijahja Exp $
+ * $Id: genc.c,v 1.58 2004/01/21 06:34:12 andijahja Exp $
  */
 
 /*
@@ -76,7 +76,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
    PINLINE pInline = hb_comp_inlines.pFirst;
    PVAR pGlobal, pDelete;
    short iLocalGlobals = 0, iGlobals = 0;
-   int i, ulLen = strlen(hb_comp_FileAsSymbol);
 
    BOOL bIsPublicFunction ;
    BOOL bIsInitFunction   ;
@@ -133,8 +132,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
       fflush( stdout );
    }
 
-   for( i = 0; i < ulLen; i++ )
-      hb_comp_FileAsSymbol[ i ] = toupper( (unsigned char) hb_comp_FileAsSymbol[ i ] );
+   hb_strupr( hb_comp_FileAsSymbol );
 
    while( ( pTmp = strchr( hb_comp_FileAsSymbol, ' ' ) ) != NULL )
    {
