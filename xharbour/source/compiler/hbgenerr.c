@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.2 2002/02/16 02:29:32 ronpinkas Exp $
+ * $Id: hbgenerr.c,v 1.3 2002/03/14 19:14:16 ronpinkas Exp $
  */
 
 /*
@@ -84,7 +84,8 @@ char * hb_comp_szErrors[] =
    "Unterminated inline block in function: \'%s\'",
    "Too many inline blocks %s",
    "Inline C requires C output generation, use -gc[n]",
-   "Missing ENDTEXT"
+   "Missing ENDTEXT",
+   "Optimized local [%s] out of range, after offseting %s PARAMTERS."
 };
 
 /* Table with parse warnings */

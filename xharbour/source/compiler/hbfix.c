@@ -1,5 +1,5 @@
 /*
- * $Id: hbfix.c,v 1.6 2002/03/09 19:09:43 ronpinkas Exp $
+ * $Id: hbfix.c,v 1.7 2002/03/10 18:41:54 ronpinkas Exp $
  */
 
 /*
@@ -248,11 +248,82 @@ static HB_FIX_FUNC( hb_p_staticname )
    return (USHORT) (lPCodePos - ulStart + 1) ;
 }
 
+static HB_FIX_FUNC( hb_p_localnearaddint )
+{
+   BYTE cVarId = pFunc->pCode[ lPCodePos + 1 ];
+   USHORT wNewId;
+
+   HB_SYMBOL_UNUSED( cargo );
+
+   if( pFunc->wParamCount )
+   {
+      if( ( wNewId = cVarId + pFunc->wParamCount ) < 256 )
+      {
+         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) wNewId;
+      }
+      else
+      {
+        // After fixing this variable cannot be accessed using near code
+        char sTemp[16];
+
+        sprintf( (char *) sTemp, "%i", pFunc->wParamCount );
+        hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARADDINT", (const char *) sTemp );
+      }
+   }
+
+   return (USHORT) 4;
+}
+
+static HB_FIX_FUNC( hb_p_localnearsetint )
+{
+   BYTE cVarId = pFunc->pCode[ lPCodePos + 1 ];
+   USHORT wNewId;
+
+   HB_SYMBOL_UNUSED( cargo );
+
+   if( pFunc->wParamCount )
+   {
+      if( ( wNewId = cVarId + pFunc->wParamCount ) < 256 )
+      {
+         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) wNewId;
+      }
+      else
+      {
+         // After fixing this variable cannot be accessed using near code
+         char sTemp[16];
+
+         sprintf( (char *) sTemp, "%i", pFunc->wParamCount );
+         hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARSETINT", sTemp );
+      }
+   }
+
+   return (USHORT) 4;
+}
+
 static HB_FIX_FUNC( hb_p_localnearsetstr )
 {
+   BYTE cVarId = pFunc->pCode[ lPCodePos + 1 ];
+   USHORT wNewId;
+
    HB_SYMBOL_UNUSED( cargo );
-   return 4 + pFunc->pCode[ lPCodePos + 2 ] +
-              pFunc->pCode[ lPCodePos + 3 ] * 256;
+
+   if( pFunc->wParamCount )
+   {
+      if( ( wNewId = cVarId + pFunc->wParamCount ) < 256 )
+      {
+         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) wNewId;
+      }
+      else
+      {
+        // After fixing this variable cannot be accessed using near code
+        char sTemp[16];
+
+        sprintf( (char *) sTemp, "%i", pFunc->wParamCount );
+        hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE, "HB_P_LOCALNEARADDINT", (const char *) sTemp );
+      }
+   }
+
+   return 4 + pFunc->pCode[ lPCodePos + 2 ] + pFunc->pCode[ lPCodePos + 3 ] * 256;
 }
 
 /* NOTE: The  order of functions have to match the order of opcodes
@@ -387,8 +458,8 @@ static HB_FIX_FUNC_PTR s_fixlocals_table[] =
    NULL,                       /* HB_P_ONE,                  */
    NULL,                       /* HB_P_MACROLIST,            */
    NULL,                       /* HB_P_MACROLISTEND,         */
-   NULL,                       /* HB_P_LOCALNEARADDINT,      */
-   NULL,                       /* HB_P_LOCALNEARSETINT,      */
+   hb_p_localnearaddint,       /* HB_P_LOCALNEARADDINT,      */
+   hb_p_localnearsetint,       /* HB_P_LOCALNEARSETINT,      */
    hb_p_localnearsetstr,       /* HB_P_LOCALNEARSETSTR,      */
    NULL,                       /* HB_P_ADDINT,               */
    NULL,                       /* HB_P_LEFT,                 */
