@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.22 2003/11/23 01:21:00 likewolf Exp $
+ * $Id: tgetlist.prg,v 1.24 2004/02/20 13:50:35 jonnymind Exp $
  */
 
 /*
@@ -1518,7 +1518,7 @@ METHOD TBApplyKey( oGet, oTB, nKey, oMenu, oGetMsg ) CLASS HBGETLIST
       elseif (nButton := oTB:HitTest( nMouseRow, nMouseColumn ) ) == HTNOWHERE // Changed test:
          if ::HitTest(  nMouseRow, nMouseColumn, oGetMsg ) != 0
             oGet:ExitState := GE_MOUSEHIT
-            ::nLastExitStat := GE_MOUSEHIT
+            ::nLastExitState := GE_MOUSEHIT
          else
             oGet:ExitState := GE_NOEXIT
 
