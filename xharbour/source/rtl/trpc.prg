@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: trpc.prg,v 1.1 2003/02/16 00:00:17 jonnymind Exp $
  */
 
 /*
@@ -686,7 +686,7 @@ METHOD UDPParseRequest( cData, nPacketLen ) CLASS tRPCService
             FOR EACH oFunc IN ::aFunctions
                IF HB_RegexMatch( cMatch, oFunc:cName ) .and. cNumber <= oFunc:cSerial
                   InetDGramSend(::skUdp, InetAddress( ::skUdp ), InetPort( ::skUdp ), ;
-                     "XHBR11" + HB_Serialize(::cServerName ) +;
+                     "XHBR11" + HB_Serialize(::cServerName ) + ;
                      HB_Serialize( ofunc:Describe()))
                ENDIF
             NEXT

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: trpccli.prg,v 1.1 2003/02/16 00:00:17 jonnymind Exp $
  */
 
 /*
@@ -54,6 +54,8 @@
 #include "hbclass.ch"
 
 CLASS tRPCClient
+   CLASSDATA lInit INIT InetInit()
+
    DATA nStatus
    DATA cServer
 
@@ -112,6 +114,9 @@ CLASS tRPCClient
 
    METHOD Disconnect()
    METHOD Destroy()
+   
+   /* Utility functions */
+   METHOD GetFunctionName( oId )
 
    /* event handlers */
    METHOD OnScanComplete()
@@ -408,6 +413,7 @@ METHOD TCPAccept() CLASS tRPCClient
    LOCAL cCode
 
    cCode := Space(6)
+   ::nTCPTimeBegin := INT( Seconds() * 1000 )
 
    DO WHILE .T.
       IF InetRecvAll( ::skTCP, @cCode, 6 ) < 0
@@ -422,14 +428,13 @@ METHOD TCPAccept() CLASS tRPCClient
          nTime := Int( Seconds() * 1000 )
          // a little tollerance must be added for double roundings
          // in the double INT() functions
-         IF nTime - ::nUDPTimeBegin >= ::nUdpTimeout - 5
+         IF nTime - ::nTCPTimeBegin >= ::nTCPTimeout - 5
             EXIT
          ENDIF
       ENDIF
    ENDDO
 
-   IF InetErrorCode( ::skTCP ) > 0
-      MutexLock( ::mtxBusy )
+   IF InetErrorCode( ::skTCP ) != 0
       ::nStatus := 0
       InetDestroy( ::skTCP )
       ::skTCP := NIL
@@ -457,7 +462,7 @@ METHOD TCPParse( cCode ) CLASS tRPCClient
          IF InetRecvAll( ::skTCP, @cDataLen ) == Len( cDataLen )
             nDataLen := HB_GetLen8( cDataLen )
             cData := Space( nDataLen )
-            IF InetRecvAll( ::skTCP, @cData ) == Len( cData )
+            IF InetRecvAll( ::skTCP, @cData, nDataLen ) == nDataLen
                ::oResult := HB_Deserialize( cData )
                ::OnFunctionReturn( ::oResult )
             ENDIF
@@ -525,6 +530,22 @@ METHOD TCPParse( cCode ) CLASS tRPCClient
 
 RETURN lContinue
 
+/***********************************
+* Utility functions
+************************************/
+METHOD GetFunctionName( oData ) CLASS tRpcClient
+   LOCAL cData, nPos
+
+   IF ValType( oData ) == "N"
+      cData := ::aFunctions[oData][3]
+   ELSE
+      cData := oData
+   ENDIF
+
+   nPos := At( "[", cData )
+   cData := Substr( cData, 1, nPos-1 )
+RETURN cData
+
 
 /***********************************
 * Event handlers
@@ -543,7 +564,7 @@ METHOD OnScanServersProgress( aLoc ) CLASS tRPCClient
 RETURN .T.
 
 METHOD OnScanFunctionsProgress( aLoc ) CLASS tRPCClient
-   IF ::bOnScanServersProgress != NIL
+   IF ::bOnScanFunctionsProgress != NIL
       RETURN Eval( ::bOnScanFunctionsProgress, aLoc )
    ENDIF
 RETURN .T.
