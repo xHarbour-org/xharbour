@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.30 2003/01/10 05:23:29 horacioroldan Exp $
+ * $Id: dbfntx1.c,v 1.31 2003/03/07 13:32:15 jonnymind Exp $
  */
 
 /*
@@ -2493,7 +2493,7 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
                pszTempName = (char*) hb_xgrab( _POSIX_PATH_MAX );
                // sortInfo.tempHandle = hb_fsCreateTemp( NULL, NULL, FC_NORMAL, pszTempName );
                #ifdef HB_OS_LINUX
-               strcopy(pszTempName, "sort-tmp.XXXXXX" );
+               strcpy(pszTempName, "sort-tmp.XXXXXX" );
                #endif
                while( --nAttemptLeft )
                {
