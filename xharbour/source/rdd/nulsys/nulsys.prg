@@ -1,5 +1,5 @@
 /*
- * $Id: nulsys.prg,v 1.2 2003/03/19 08:50:11 ronpinkas Exp $
+ * $Id: nulsys.prg,v 1.3 2003/06/06 16:32:16 ronpinkas Exp $
  */
 
 /*
@@ -60,6 +60,9 @@ return
 
 FUNCTION NetErr()
 RETURN .F.
+
+FUNCTION FieldPos()
+RETURN 0
 
 #pragma BEGINDUMP
 
