@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.144 2004/07/29 21:16:24 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.145 2004/08/02 12:37:14 druzus Exp $
  */
 
 /*
@@ -4403,10 +4403,13 @@ static void hb_cdxIndexDelTag( LPCDXINDEX pIndex, char * szTagName )
             hb_cdxTagOpen( pTag );
             pPage = pTag->RootPage;
             hb_cdxTagClose( pTag );
-            if ( pPage )
-               hb_cdxIndexFreePages( pPage );
+            if ( ! pIndex->fShared )
+            {
+               if ( pPage )
+                  hb_cdxIndexFreePages( pPage );
+               hb_cdxIndexPutAvailPage( pIndex, pTag->TagBlock, TRUE );
+            }
             pTag->TagChanged = FALSE;
-            hb_cdxIndexPutAvailPage( pIndex, pTag->TagBlock, TRUE );
          }
       }
       *pTagPtr = pTag->pNext;
@@ -6880,7 +6883,7 @@ static ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
       if ( pTag )
       {
          pIndex = pTag->pIndex;
-         if ( !pIndex->fShared && !pIndex->fReadonly )
+         if ( /* !pIndex->fShared && */ !pIndex->fReadonly )
          {
             hb_cdxIndexLockWrite( pIndex );
             hb_cdxIndexDelTag( pIndex, pTag->szName );
@@ -7129,8 +7132,8 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
          {
             LPCDXINDEX pIndex;
             uiTag = 0;
-            pIndex = pOrderInfo->atomBagName ? pArea->lpIndexes :
-                         hb_cdxFindBag( pArea, hb_itemGetCPtr( pOrderInfo->atomBagName ) );
+            pIndex = pOrderInfo->atomBagName == NULL ? pArea->lpIndexes :
+                        hb_cdxFindBag( pArea, hb_itemGetCPtr( pOrderInfo->atomBagName ) );
             if ( pIndex )
             {
                pTag = pIndex->TagList;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3254 2004/08/02 12:37:11 druzus Exp $
+ * $Id: ChangeLog,v 1.3255 2004/08/02 16:55:00 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-02 20:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+   ! fixed DBOI_ORDERCOUNT I broke in my last commit
+   + allow ORDDESTROY() to work in shared mode but in such
+     case the space allocated by order is not freed for future
+     reuse. Clipper 5.3 DBFCDX never frees used space used by
+     tag in ORDDESTROY() xHarbour does in exclusive mode.
 
 2004-08-02 19:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbdefs.h
