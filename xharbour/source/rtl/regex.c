@@ -57,6 +57,12 @@ restrictions:
  *
  */
 
+/*
+ * 2003-Feb-3 Giancarlo Niccolai added the wrappers
+ *
+ *    HB_FUNC( HB_REGEX* )
+ *
+ */
 #include "hbapi.h"
 
 /* Begin of maketables.c */
@@ -6415,6 +6421,7 @@ HB_FUNC( HB_REGEX )
    #endif
 
    regex_t re;
+   regex_t *pReg;
    regmatch_t aMatches[REGEX_MAX_GROUPS];
    int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
    int i;
@@ -6423,6 +6430,7 @@ HB_FUNC( HB_REGEX )
    PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
    PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
+   PHB_ITEM pNewLine = hb_param( 3, HB_IT_LOGICAL );
 
    if( pRegEx == NULL || pString == NULL )
    {
@@ -6432,34 +6440,89 @@ HB_FUNC( HB_REGEX )
       return;
    }
 
+   /* now check if it is a precompiled regex */
+   if ( memcmp( pRegEx->item.asString.value, "$$$", 3 ) == 0 )
+   {
+      pReg = (regex_t *) ( pRegEx->item.asString.value + 3);
+      aMatches[0].rm_eo = pRegEx->item.asString.length - 3;
+   }
+   else
+   {
+      if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == FALSE )
+      {
+         CFlags |= REG_ICASE;
+      }
+      if( pNewLine != NULL && pNewLine->item.asLogical.value == TRUE )
+      {
+         CFlags |= REG_NEWLINE;
+      }
+      if( regcomp( &re, pRegEx->item.asString.value, CFlags ) != 0 )
+      {
+         hb_ret();
+         return;
+      }
+      pReg = &re;
+      aMatches[0].rm_eo = pRegEx->item.asString.length;
+   }
+
+   aMatches[0].rm_so = 0;
+   if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
+   {
+      aRet = hb_itemArrayNew( 0 );
+      i = 0;
+      while ( aMatches[i].rm_eo > 0 )
+      {
+         pMatch = hb_itemPutCL( NULL, pString->item.asString.value + aMatches[i].rm_so,
+            aMatches[i].rm_eo - aMatches[i].rm_so );
+         hb_arrayAdd( aRet, pMatch );
+         hb_itemRelease( pMatch );
+         i++;
+      }
+
+      hb_itemRelease( hb_itemReturn( aRet ) );
+      return;
+   }
+
+   hb_ret();
+}
+
+
+HB_FUNC( HB_REGEXCOMP )
+{
+   regex_t re;
+   char *cRegex;
+   int CFlags = REG_EXTENDED;
+
+   PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pCaseSensitive = hb_param( 2, HB_IT_LOGICAL );
+   PHB_ITEM pNewLine = hb_param( 3, HB_IT_LOGICAL );
+
+   if( pRegEx == NULL )
+   {
+      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_REGEXCOMP", 1, pArgs );
+      hb_itemRelease( pArgs );
+      return;
+   }
+
    if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == FALSE )
    {
       CFlags |= REG_ICASE;
    }
+   if( pNewLine != NULL && pNewLine->item.asLogical.value == TRUE )
+   {
+      CFlags |= REG_NEWLINE;
+   }
 
    if( regcomp( &re, pRegEx->item.asString.value, CFlags ) == 0 )
    {
-
-      aMatches[0].rm_so = 0;
-      aMatches[0].rm_eo = pRegEx->item.asString.length;
-
-      if( regexec( &re, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
-      {
-         aRet = hb_itemArrayNew( 0 );
-         i = 0;
-         while ( aMatches[i].rm_eo > 0 )
-         {
-            pMatch = hb_itemPutCL( NULL, pString->item.asString.value + aMatches[i].rm_so,
-                aMatches[i].rm_eo - aMatches[i].rm_so );
-            hb_arrayAdd( aRet, pMatch );
-            hb_itemRelease( pMatch );
-            i++;
-         }
-
-         hb_itemRelease( hb_itemReturn( aRet ) );
-         return;
-      }
+      cRegex = (char *) hb_xgrab( sizeof( re ) + 3 );
+      memcpy( cRegex, "$$$", 3 );
+      memcpy( cRegex + 3, &re, sizeof( re ) );
+      hb_retclenAdoptRaw( cRegex, sizeof( re ) + 3 );
    }
-
-   hb_ret();
+   else
+   {
+      hb_ret();
+   }
 }
