@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:43:52 ronpinkas Exp $
+# $Id: Makefile,v 1.2 2002/01/29 08:00:24 ronpinkas Exp $
 #
 
 HB_LEX := SIMPLEX
@@ -41,7 +41,7 @@ endif
 C_SOURCES=\
 	cmdcheck.c \
 	genc.c \
-   gencobj.c \
+	gencobj.c \
 	genhrb.c \
 	genjava.c \
 	genobj32.c \

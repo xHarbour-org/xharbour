@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.4 2003/06/27 20:57:58 druzus Exp $
+# $Id: make_tgz.sh,v 1.5 2003/07/23 12:35:56 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -38,7 +38,7 @@ popd
 
 # install
 if [ -z "$TMPDIR" ]; then TMPDIR="/tmp"; fi
-HB_INST_PREF="$TMPDIR/xHarbour.bin.$$"
+HB_INST_PREF="$TMPDIR/xHarbour.bin.$USER.$$"
 rm -fR "${HB_INST_PREF}"
 
 _DEFAULT_BIN_DIR=$HB_BIN_INSTALL
@@ -155,14 +155,15 @@ while [ \$n -lt \${#P[@]} ]; do
 	    elif [ -n "\${d}" ]; then
 		FILEOUT="\${d}"; p="-o\${d%.*}"
 	    fi ;;
-	-static)    HB_STATIC="yes" ;;
-	-shared)    HB_STATIC="no" ;;
-	-mt)        HB_MT="MT" ;;
-	-gt*)       HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
-	-fmstat)    HB_FM_REQ="STAT" ;;
-	-nofmstat)  HB_FM_REQ="NOSTAT" ;;
-	-*)         p="\${v}" ;;
-	*)          [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
+	-static)     HB_STATIC="yes" ;;
+	-fullstatic) HB_STATIC="full" ;;
+	-shared)     HB_STATIC="no" ;;
+	-mt)         HB_MT="MT" ;;
+	-gt*)        HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
+	-fmstat)     HB_FM_REQ="STAT" ;;
+	-nofmstat)   HB_FM_REQ="NOSTAT" ;;
+	-*)          p="\${v}" ;;
+	*)           [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
     esac
     [ -n "\$p" ] && PP[\$n]="\$p"
     n=\$[\$n + 1]
@@ -195,6 +196,11 @@ export PATH="\${HB_BIN_INSTALL}:\${PATH}"
 
 HB_PATHS="-I\${HB_INC_INSTALL}"
 GCC_PATHS="\${HB_PATHS} -L\${HB_LIB_INSTALL}"
+LINK_OPT=""
+if [ "\${HB_STATIC}" = "full" ]; then
+    LINK_OPT="\${LINK_OPT} -static"
+    HB_STATIC="yes"
+fi
 
 HARBOUR_LIBS=""
 if [ "\${HB_STATIC}" = "yes" ]; then
@@ -229,9 +235,9 @@ hb_link()
 {
     if [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_FM_REQ}" ]; then
 	hb_lnk_request > \${_TMP_FILE_} && \\
-	gcc "\$@" "\${_TMP_FILE_}" \${GCC_PATHS} \${SYSTEM_LIBS} \${HARBOUR_LIBS} -o "\${FOUTE}"
+	gcc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     else
-	gcc "\$@" \${GCC_PATHS} \${SYSTEM_LIBS} \${HARBOUR_LIBS} -o "\${FOUTE}"
+	gcc "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     fi
 }
 

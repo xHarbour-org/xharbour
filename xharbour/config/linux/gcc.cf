@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.11 2003/04/13 11:35:46 jonnymind Exp $
+# $Id: gcc.cf,v 1.12 2003/05/16 19:52:04 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -72,8 +72,6 @@ ifeq ($(HB_MULTI_GT),yes)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
 LINKLIBS += -lgtnul
 endif
-endif
-
 # HB_SCREEN_LIB: empty, or one of ncurses, slang
 ifeq ($(HB_GT_LIB),gtcrs)
 HB_SCREEN_LIB:=ncurses
@@ -82,18 +80,18 @@ ifeq ($(HB_GT_LIB),gtsln)
 HB_SCREEN_LIB:=slang
 endif
 endif
-
 ifneq ($(HB_SCREEN_LIB),)
 LINKLIBS += -l$(HB_SCREEN_LIB)
 endif
-
 # HB_GPM_MOUSE: use gpm mouse driver
 ifeq ($(HB_GPM_MOUSE),yes)
 LINKLIBS += -lgpm
 endif
+endif
 
 #it never hurts if MT is enabled.
-ifeq ($(HB_MT),MT)
+#ifeq ($(HB_MT),MT) - hurts because it force linking with this lib, try ldd
+ifeq ($(findstring vmmt,$(LIBS)),vmmt)
 LINKLIBS += -lpthread
 endif
 

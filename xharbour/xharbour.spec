@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.16 2003/07/23 16:37:09 druzus Exp $
+# $Id: xharbour.spec,v 1.17 2003/07/23 22:09:30 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -327,14 +327,15 @@ while [ \$n -lt \${#P[@]} ]; do
 	    elif [ -n "\${d}" ]; then
 		FILEOUT="\${d}"; p="-o\${d%.*}"
 	    fi ;;
-	-static)    HB_STATIC="yes" ;;
-	-shared)    HB_STATIC="no" ;;
-	-mt)        HB_MT="MT" ;;
-	-gt*)       HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
-	-fmstat)    HB_FM_REQ="STAT" ;;
-	-nofmstat)  HB_FM_REQ="NOSTAT" ;;
-	-*)         p="\${v}" ;;
-	*)          [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
+	-static)     HB_STATIC="yes" ;;
+	-fullstatic) HB_STATIC="full" ;;
+	-shared)     HB_STATIC="no" ;;
+	-mt)         HB_MT="MT" ;;
+	-gt*)        HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
+	-fmstat)     HB_FM_REQ="STAT" ;;
+	-nofmstat)   HB_FM_REQ="NOSTAT" ;;
+	-*)          p="\${v}" ;;
+	*)           [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
     esac
     [ -n "\$p" ] && PP[\$n]="\$p"
     n=\$[\$n + 1]
@@ -367,6 +368,11 @@ export PATH="\${HB_BIN_INSTALL}:\${PATH}"
 
 HB_PATHS="-I\${HB_INC_INSTALL}"
 GCC_PATHS="\${HB_PATHS} -L\${HB_LIB_INSTALL}"
+LINK_OPT=""
+if [ "\${HB_STATIC}" = "full" ]; then
+    LINK_OPT="\${LINK_OPT} -static"
+    HB_STATIC="yes"
+fi
 
 HARBOUR_LIBS=""
 if [ "\${HB_STATIC}" = "yes" ]; then
@@ -401,9 +407,9 @@ hb_link()
 {
     if [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_FM_REQ}" ]; then
 	hb_lnk_request > \${_TMP_FILE_} && \\
-	gcc "\$@" "\${_TMP_FILE_}" \${GCC_PATHS} \${SYSTEM_LIBS} \${HARBOUR_LIBS} -o "\${FOUTE}"
+	gcc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     else
-	gcc "\$@" \${GCC_PATHS} \${SYSTEM_LIBS} \${HARBOUR_LIBS} -o "\${FOUTE}"
+	gcc "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     fi
 }
 
@@ -543,7 +549,8 @@ equivalent of cl.bat from CA-Clipper distribution.
 
 all this scripts accept command line switches:
 -o<outputfilename>      # output file name
--static                 # link with static libs
+-static                 # link with static %{dname} libs
+-fullstatic             # link with all static libs
 -shared                 # link with shared libs (default)
 -mt                     # link with multi-thread libs
 -gt<hbgt>               # link with <hbgt> GT driver, can be repeated to

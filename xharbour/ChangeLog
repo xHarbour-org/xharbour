@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1310 2003/07/30 20:45:39 andijahja Exp $
+ * $Id: ChangeLog,v 1.1311 2003/07/31 12:50:59 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-31 20:42 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_tgz.sh
+  * xharbour/xharbour.spec
+    + new option -fullstatic added to xhblnk and xhbmk.
+      It allows to create full static binaries without and shared
+      libs (even system ones) which can be installed on any system
+
+  * xharbour/config/linux/gcc.cf
+    * link with -lpthread only if vmmt libs is used - before all
+      binaries (no MT too) where linked with pthread (see ldd)
+
+  * xharbour/source/rtl/gtnul/Makefile
+  * xharbour/source/rtl/gtnul/gtnul.c
+    * force linking with HB_GT_LIB
 
 2003-07-31 14:43 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/debug/Makefile
