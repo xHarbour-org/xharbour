@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.613 2003/01/11 11:57:40 patrickmast Exp $
+ * $Id: ChangeLog,v 1.614 2003/01/11 20:53:51 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-11 10:52 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+  * source/pp/pptable.c
+    ! fixed while support for rddads
+  * include/hbrddcdx.h
+  * source/rdd/dbfcdx/dbfcdx2.h
+  * source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed internal counter that may produce a GPF
+    + added support for Unique indexes
+    + added support for Custom Indexes
+    * work in progress: support for temporary indexes
+    + added functions hb_cdxFindBag, hb_cdxEvalKey
 
 2003-01-11 19:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
