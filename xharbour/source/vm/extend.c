@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.37 2004/02/14 21:01:18 andijahja Exp $
+ * $Id: extend.c,v 1.38 2004/02/15 22:49:05 ronpinkas Exp $
  */
 
 /*
@@ -905,11 +905,12 @@ void HB_EXPORT hb_storc( char * szText, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         PHB_ITEM pItemNew = hb_itemPutC( NULL, szText );
+         HB_ITEM ItemNew;
+         ItemNew.type = HB_IT_NIL;
+         hb_itemPutC( &ItemNew, szText );
          va_start( va, iParam );
-         hb_arraySet( pItem, va_arg( va, ULONG ), pItemNew );
+         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
          va_end( va );
-         hb_itemRelease( pItemNew );
       }
       else if( bByRef || iParam == -1 )
       {
@@ -935,11 +936,12 @@ void HB_EXPORT hb_storclen( char * szText, ULONG ulLen, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         PHB_ITEM pItemNew = hb_itemPutCL( NULL, szText, ulLen );
+         HB_ITEM ItemNew;
+         ItemNew.type = HB_IT_NIL;
+         hb_itemPutCL( &ItemNew, szText, ulLen );
          va_start( va, iParam );
-         hb_arraySet( pItem, va_arg( va, ULONG ), pItemNew );
+         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
          va_end( va );
-         hb_itemRelease( pItemNew );
       }
       else if( bByRef || iParam == -1 )
       {
@@ -967,11 +969,12 @@ void HB_EXPORT hb_stords( char * szDate, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         PHB_ITEM pItemNew = hb_itemPutDS( NULL, szDate );
+         HB_ITEM ItemNew;
+         ItemNew.type = HB_IT_NIL;
+         hb_itemPutDS( &ItemNew, szDate );
          va_start( va, iParam );
-         hb_arraySet( pItem, va_arg( va, ULONG ), pItemNew );
+         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
          va_end( va );
-         hb_itemRelease( pItemNew );
       }
       else if( bByRef || iParam == -1 )
       {
@@ -997,11 +1000,12 @@ void HB_EXPORT hb_storl( int iLogical, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         PHB_ITEM pItemNew = hb_itemPutL( NULL, iLogical ? TRUE : FALSE );
+         HB_ITEM ItemNew;
+         ItemNew.type = HB_IT_NIL;
+         hb_itemPutL( &ItemNew, iLogical ? TRUE : FALSE );
          va_start( va, iParam );
-         hb_arraySet( pItem, va_arg( va, ULONG ), pItemNew );
+         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
          va_end( va );
-         hb_itemRelease( pItemNew );
       }
       else if( bByRef || iParam == -1 )
       {
@@ -1027,11 +1031,12 @@ void HB_EXPORT hb_storni( int iValue, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         PHB_ITEM pItemNew = hb_itemPutNI( NULL, iValue );
+         HB_ITEM ItemNew;
+         ItemNew.type = HB_IT_NIL;
+         hb_itemPutNI( &ItemNew, iValue );
          va_start( va, iParam );
-         hb_arraySet( pItem, va_arg( va, ULONG ), pItemNew );
+         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
          va_end( va );
-         hb_itemRelease( pItemNew );
       }
       else if( bByRef || iParam == -1 )
       {
@@ -1057,11 +1062,12 @@ void HB_EXPORT hb_stornl( LONG lValue, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         PHB_ITEM pItemNew = hb_itemPutNL( NULL, lValue );
+         HB_ITEM ItemNew;
+         ItemNew.type = HB_IT_NIL;
+         hb_itemPutNL( &ItemNew, lValue );
          va_start( va, iParam );
-         hb_arraySet( pItem, va_arg( va, ULONG ), pItemNew );
+         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
          va_end( va );
-         hb_itemRelease( pItemNew );
       }
       else if( bByRef || iParam == -1 )
       {
@@ -1087,11 +1093,12 @@ void HB_EXPORT hb_stornd( double dNumber, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         PHB_ITEM pItemNew = hb_itemPutND( NULL, dNumber );
+         HB_ITEM ItemNew;
+         ItemNew.type = HB_IT_NIL;
+         hb_itemPutND( &ItemNew, dNumber );
          va_start( va, iParam );
-         hb_arraySet( pItem, va_arg( va, ULONG ), pItemNew );
+         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
          va_end( va );
-         hb_itemRelease( pItemNew );
       }
       else if( bByRef || iParam == -1 )
       {
@@ -1119,11 +1126,12 @@ void HB_EXPORT hb_stornll( LONGLONG llNumber, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         PHB_ITEM pItemNew = hb_itemPutNLL( NULL, llNumber );
+         HB_ITEM ItemNew;
+         ItemNew.type = HB_IT_NIL;
+         hb_itemPutNLL( &ItemNew, llNumber );
          va_start( va, iParam );
-         hb_arraySet( pItem, va_arg( va, ULONG ), pItemNew );
+         hb_arraySetForward( pItem, va_arg( va, ULONG ), &ItemNew );
          va_end( va );
-         hb_itemRelease( pItemNew );
       }
       else if( bByRef || iParam == -1 )
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.26 2004/01/16 00:36:42 ronpinkas Exp $
+ * $Id: transfrm.c,v 1.27 2004/02/23 08:31:57 andijahja Exp $
  */
 
 /*
@@ -492,9 +492,9 @@ HB_FUNC( TRANSFORM )
          char     cPic;
          char     szPicDate[ 11 ];
 
-         PHB_ITEM pNumber;
-         PHB_ITEM pWidth;
-         PHB_ITEM pDec;
+         HB_ITEM Number;
+         HB_ITEM Width;
+         HB_ITEM Dec;
 
          BOOL     bFound = FALSE;
          BOOL     bInit  = FALSE;
@@ -561,16 +561,15 @@ HB_FUNC( TRANSFORM )
             iWidth = iOrigWidth;                       /* Push original width      */
             iDec = iOrigDec;                           /* Push original decimals   */
          }
-         pNumber = hb_itemPutNDLen( NULL, dPush, -1, iDec );
 
-         pWidth = hb_itemPutNI( NULL, iWidth + ( ( ulPicLen || iDec == 0 ) ? 0 : ( iDec + 1 ) ) );
-         pDec = hb_itemPutNI( NULL, iDec );
+         Number.type = HB_IT_NIL;
+         Width.type = HB_IT_NIL;
+         Dec.type = HB_IT_NIL;
 
-         szStr = hb_itemStr( pNumber, pWidth, pDec );
-
-         hb_itemRelease( pNumber );
-         hb_itemRelease( pWidth );
-         hb_itemRelease( pDec );
+         szStr = hb_itemStr(
+            hb_itemPutNDLen( &Number, dPush, -1, iDec ),
+            hb_itemPutNI( &Width, iWidth + ( ( ulPicLen || iDec == 0 ) ? 0 : ( iDec + 1 ) ) ),
+            hb_itemPutNI( &Dec, iDec ));
 
          if( szStr )
          {

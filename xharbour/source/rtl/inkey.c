@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.20 2004/02/15 15:58:02 jonnymind Exp $
+ * $Id: inkey.c,v 1.21 2004/02/23 00:07:56 peterrees Exp $
  */
 
 /*
@@ -382,14 +382,19 @@ HB_FUNC( INKEY )
     bContinue = iKey && s_inKeyBlockAfter ;
     if ( bContinue )
     {
-      PHB_ITEM pKey = hb_itemPutNI( NULL, iKey );
-      PHB_ITEM pReturn = hb_vmEvalBlockV( s_inKeyBlockAfter, 1, pKey );
+      HB_ITEM Key;
+      PHB_ITEM pReturn;
+
+      Key.type = HB_IT_NIL;
+      hb_itemPutNI( &Key, iKey );
+      pReturn = hb_vmEvalBlockV( s_inKeyBlockAfter, 1, &Key );
+
       // set iKey from return value of EvalBlock()
       iKey = hb_itemGetNI( pReturn );
       hb_setInkeyLast( iKey ) ; // Set LASTKEY()
       // if iKey = 0 then we continue as iKey was handled in hb_vmEvalBlock( s_inKeyBlockAfter )
       bContinue = (BOOL) !iKey ;
-      hb_itemRelease( pKey );
+      hb_itemClear( &Key );
     }
   }
   hb_retni(iKey);
