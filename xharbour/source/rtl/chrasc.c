@@ -1,5 +1,5 @@
 /*
- * $Id: chrasc.c,v 1.3 2002/04/18 05:33:51 ronpinkas Exp $
+ * $Id: chrasc.c,v 1.4 2002/04/18 17:10:38 ronpinkas Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #include "hbapierr.h"
 #include "hbstack.h"
 
-extern unsigned char hb_vm_acAscii[256][2];
+extern char *hb_vm_acAscii[256];
 
 /* converts an ASCII code to a character value */
 HB_FUNC( CHR )
@@ -84,11 +84,11 @@ HB_FUNC( CHR )
       }
 
       /* Believe it or not, clipper does this! */
-      hb_stack.Return.item.asString.value   = (char *) hb_vm_acAscii[ hb_parnl( 1 ) % 256 ];
-      hb_stack.Return.item.asString.length  = 1;
-      hb_stack.Return.item.asString.bStatic = TRUE;
-      hb_stack.Return.item.asString.bChar   = FALSE;
-      hb_stack.Return.type = HB_IT_STRING;
+      ( &hb_stack.Return )->item.asString.value   = hb_vm_acAscii[ (unsigned char) hb_parnl( 1 ) ];
+      ( &hb_stack.Return )->item.asString.length  = 1;
+      ( &hb_stack.Return )->item.asString.bStatic = TRUE;
+      ( &hb_stack.Return )->item.asString.bChar   = FALSE;
+      ( &hb_stack.Return )->type = HB_IT_STRING;
    }
    else
    {

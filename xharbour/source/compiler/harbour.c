@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.8 2002/03/17 00:50:02 ronpinkas Exp $
+ * $Id: harbour.c,v 1.9 2002/04/21 01:39:17 ronpinkas Exp $
  */
 
 /*
@@ -1212,7 +1212,7 @@ void hb_compDeclaredInit( void )
 
   /*       Name     Ret  # of Prams  Param Types   Ret Class  Param Classes  Next
    ---------------  ---  ----------  --------------------  ---------  -------------  --------------- */
-   _DECL s_ERROR_01    = { "ARGS" , 'A', 0 , (BYTE*)NULL , NULL     , NULL , NULL    };
+   _DECL s_ERROR_01    = { "ARGS"         , 'A', 0 , (BYTE*)NULL , NULL     , NULL , NULL    };
    _DECL s_ERROR_02    = { "CANDEFAULT"   , 'B', 0 , (BYTE*)NULL , NULL     , NULL , &s_ERROR_01     };
    _DECL s_ERROR_03    = { "CANRETRY"     , 'B', 0 , (BYTE*)NULL , NULL     , NULL , &s_ERROR_02     };
    _DECL s_ERROR_04    = { "CANSUBSTITUTE", 'B', 0 , (BYTE*)NULL , NULL     , NULL , &s_ERROR_03     };

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.26 2002/04/17 20:36:19 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.27 2002/04/18 00:56:51 ronpinkas Exp $
  */
 
 /*
@@ -63,7 +63,7 @@
 
 extern char *hb_vm_sNull;
 
-extern unsigned char hb_vm_acAscii[256][2];
+extern char *hb_vm_acAscii[256];
 
 /* Forward decalarations. */
 void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
@@ -258,7 +258,7 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
    else if( szText[1] == '\0' )
    {
       pItem->item.asString.length  = 1;
-      pItem->item.asString.value   = (char *) ( hb_vm_acAscii[ (int) ( szText[0] ) ] );
+      pItem->item.asString.value   = hb_vm_acAscii[ (unsigned char) ( szText[0] ) ];
       pItem->item.asString.bStatic = TRUE;
    }
    else
@@ -301,7 +301,7 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
    else if( ulLen == 1 )
    {
       pItem->item.asString.length  = 1;
-      pItem->item.asString.value   = (char *) ( hb_vm_acAscii[ (int) ( szText[0] ) ] );
+      pItem->item.asString.value   = hb_vm_acAscii[ (unsigned char) ( szText[0] ) ];
       pItem->item.asString.bStatic = TRUE;
    }
    else
