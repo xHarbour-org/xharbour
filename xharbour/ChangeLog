@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1334 2003/08/07 20:23:32 druzus Exp $
+ * $Id: ChangeLog,v 1.1335 2003/08/09 18:49:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-09 22:18 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/xharbour.spec
+    * removed ${RPM_OPT_FLAGS} from C_USR
+      '-pipe' breaks building proces on RH9 when user doesn't install
+      old slang-devel
+  * xharbour/make_tgz.sh
+    ! fixes for RH9 and shared lib names
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/hb-charmap.def
+    ! small fixes in HB_SETDISPCP()
+
+  + xharbour/tests/dspcolor.prg
+  + xharbour/tests/keycodes.prg
+    + two short programs for GT testing - test colors and inkey codes
 
 2003-08-09 11:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/simplex.c

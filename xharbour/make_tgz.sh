@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.9 2003/08/05 16:37:31 druzus Exp $
+# $Id: make_tgz.sh,v 1.10 2003/08/05 20:59:12 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -10,7 +10,6 @@
 # See doc/license.txt for licensing terms.
 # ---------------------------------------------------------------
 
-Rel="$Release$"
 name="xharbour"
 hb_ver="0.82.0"
 hb_lnkso="yes"
@@ -33,6 +32,7 @@ umask 022
 make clean
 make
 pushd contrib/libct
+    make clean
     make
 popd
 
@@ -103,12 +103,15 @@ do
 	;;
     esac
 done
-$HB_BIN_INSTALL/hb-mkslib lib${name}.so $LIBS
-[ $HB_MT != "MT" ] || $HB_BIN_INSTALL/hb-mkslib lib${name}mt.so $LIBSMT
-cd ..
-for l in lib${name}.so lib${name}mt.so
+$HB_BIN_INSTALL/hb-mkslib lib${name}-${hb_ver}.so $LIBS
+[ $HB_MT != "MT" ] || $HB_BIN_INSTALL/hb-mkslib lib${name}mt-${hb_ver}.so $LIBSMT
+for l in lib${name}-${hb_ver}.so lib${name}mt-${hb_ver}.so
 do
-    [ -f ${name}/$l ] && ln -s ${name}/$l $l
+    if [ -f $l ]
+    then
+        ll=${l%-${hb_ver}.so}.so
+        ln -s $l $ll && ln -s ${name}/$l $HB_INST_PREF/usr/lib/$ll
+    fi
 done
 #export LD_LIBRARY_PATH="$HB_LIB_INSTALL:$LD_LIBRARY_PATH"
 popd

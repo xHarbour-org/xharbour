@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.23 2003/08/05 20:59:12 druzus Exp $
+# $Id: xharbour.spec,v 1.24 2003/08/06 13:50:21 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -29,7 +29,7 @@
 %define hb_libs  vm pp rtl rdd dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca odbc ct debug profiler
 
 %define hb_cc    export HB_COMPILER=gcc
-%define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O3 $RPM_OPT_FLAGS"
+%define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 %define hb_arch  export HB_ARCHITECTURE=linux
 %define hb_cmt   export HB_MT=%{hb_mt}
 %define hb_cgt   export HB_GT_LIB=gt%{hb_gt}
@@ -193,6 +193,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %build
 %{hb_env}
+
 make
 
 # build CT lib
@@ -209,6 +210,7 @@ popd
 # Install harbour itself.
 
 %{hb_env}
+
 _DEFAULT_INC_DIR=$HB_INC_INSTALL
 export HB_BIN_INSTALL=$RPM_BUILD_ROOT/$HB_BIN_INSTALL
 export HB_INC_INSTALL=$RPM_BUILD_ROOT/$HB_INC_INSTALL
@@ -568,6 +570,9 @@ then
     done
 fi
 
+# remove unused files
+rm -f ${HB_BIN_INSTALL}/hbdoc ${HB_BIN_INSTALL}/hbtest
+
 # Create a README file for people using this RPM.
 cat > doc/%{readme} <<EOF
 This RPM distribution of %{dname} includes extra commands to make compiling
@@ -749,6 +754,9 @@ rm -rf $RPM_BUILD_ROOT
 ######################################################################
 
 %changelog
+* Sat Aug 09 2003 Przemyslaw Czerpak <druzus@polbox.com>
+- removed ${RPM_OPT_FLAGS} from C_USR
+
 * Wed Jul 23 2003 Przemyslaw Czerpak <druzus@polbox.com>
 - fixed file (user and group) owner for RPMs builded from non root account
 - shared lib names changed from xharbour{mt,}.so to

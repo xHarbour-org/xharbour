@@ -1,5 +1,5 @@
 #
-# $Id: hb-charmap.def,v 1.4 2003/05/26 13:32:49 druzus Exp $
+# $Id: hb-charmap.def,v 1.5 2003/05/27 14:02:08 druzus Exp $
 #
 
 #=============================================================================
@@ -51,12 +51,24 @@
 :linux|fslinux|console|vt100|vt102|vt320 = Linux system console and VT terms
     0-31:       '.'     1
      127:       '.'     1
+    16:         '+'     5	# ACS_RARROW
+    17:         ','     5	# ACS_LARROW
+    30:         '-'     5	# ACS_UARROW
+    31:		'.'     5	# ACS_DARROW
 
 # 128-255:       *       2
 # @acsc          # include acsc section
 # @maz2iso       # include maz2iso section
 
-:xterm|xterm-color|rxvt = xterm terms
+:tterm = Teraterm modified terminal
+    0-31:       '.'     1
+    127:        '.'     1
+    16:         '>'     1
+    17:         '<'     1
+    30:         '^'     1
+    31:		'v'     1
+
+:xterm|xterm-color|rxvt|teraterm = xterm terms
     0-31:       '.'     1
     127:        '.'     1
  @acsc          # include acsc section

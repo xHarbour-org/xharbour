@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.21 2003/07/23 12:35:57 druzus Exp $
+ * $Id: gtcrs.c,v 1.22 2003/07/25 21:27:30 druzus Exp $
  */
 
 /*
@@ -3133,24 +3133,28 @@ void HB_GT_FUNC(gt_SetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL bBox ))
     {
         PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
                      cdpHost = hb_cdpFind( pszHostCDP );
-        if ( cdpTerm && cdpHost &&
-             cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
+        if ( cdpTerm && cdpHost )
         {
-            char * pszHostLetters = hb_xgrab( cdpHost->nChars * 2 + 1 );
-            char * pszTermLetters = hb_xgrab( cdpTerm->nChars * 2 + 1 );
+            if ( cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
+            {
+                char * pszHostLetters = hb_xgrab( cdpHost->nChars * 2 + 1 );
+                char * pszTermLetters = hb_xgrab( cdpTerm->nChars * 2 + 1 );
 
-            strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars + 1 );
-            strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars + 1 );
-            strncpy( pszTermLetters, cdpTerm->CharsUpper, cdpTerm->nChars + 1 );
-            strncat( pszTermLetters, cdpTerm->CharsLower, cdpTerm->nChars + 1 );
+                strncpy( pszHostLetters, cdpHost->CharsUpper, cdpHost->nChars + 1 );
+                strncat( pszHostLetters, cdpHost->CharsLower, cdpHost->nChars + 1 );
+                strncpy( pszTermLetters, cdpTerm->CharsUpper, cdpTerm->nChars + 1 );
+                strncat( pszTermLetters, cdpTerm->CharsLower, cdpTerm->nChars + 1 );
 
-            setDispTrans( s_ioBase, (unsigned char *) pszHostLetters,
-                                    (unsigned char *) pszTermLetters,
-				    bBox ? 1 : 0 );
+                setDispTrans( s_ioBase, (unsigned char *) pszHostLetters,
+                                        (unsigned char *) pszTermLetters,
+                                        bBox ? 1 : 0 );
 
-            hb_xfree( pszHostLetters );
-            hb_xfree( pszTermLetters );
-	}
+                hb_xfree( pszHostLetters );
+                hb_xfree( pszTermLetters );
+            }
+            else
+                setDispTrans( s_ioBase, "", "", bBox ? 1 : 0 );
+        }
     }
 #else
     HB_SYMBOL_UNUSED( pszTermCDP );
