@@ -47,7 +47,7 @@ ENDCLASS
 
 METHOD SetBrowserData(oObj) CLASS ObjInspect
    local n,c
-   ::Browser:source := ACLONE(oObj:PropList)
+   ::Browser:source := oObj:RetrieveData()
    ASort( ::Browser:source,,, {|x,y| x[1] < y[1] } )
    aeval(::Browser:source,{|a|a[2]:=__objSendMsg( oObj, a[1] )} )
    ::Browser:RefreshAll()

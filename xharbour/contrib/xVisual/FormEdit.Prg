@@ -247,7 +247,7 @@ METHOD CreateSub()
    ::Parent:ObjInsp:InspCombo:SetCurSel(::Parent:ObjInsp:InspCombo:GetCount()-1)
    
    ::Parent:ObjTree:Tree:Add( ::PropName )
-   
+
    xRet := super:OnCreate()
 
    ::oMask:=oCtrlMask():New( self )
