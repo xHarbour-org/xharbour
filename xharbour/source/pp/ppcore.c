@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.66 2003/05/07 02:21:55 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.67 2003/05/07 23:47:32 ronpinkas Exp $
  */
 
 /*
@@ -3437,7 +3437,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
    int kolmarkers;
    int lennew, i;
    char lastchar = '0';
-   char *ptr, *ptr2, *ptrOut = ptro;
+   char *ptr, *ptr2, *ptrOut = ptro, *pPrevSquare = NULL;
 
    HB_TRACE(HB_TR_DEBUG, ("SearnRep(%s, %s, %i, %s, %p)", exppatt, expreal, lenreal, ptro, lenres));
 
@@ -3475,6 +3475,20 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
             printf( "   Repeat: %i Previous Square: '%s'\n", s_Repeate, ptr );
          #endif
 
+         // Ron Pinkas added 2003-05-09
+         if( pPrevSquare == NULL )
+         {
+            pPrevSquare = ptr;
+         }
+
+         if( pPrevSquare != ptr )
+         {
+            pPrevSquare = ptr;
+            bDontInstanciate = FALSE;
+            lastchar = '0';
+         }
+         // END - Ron Pinkas added 2003-05-09
+
          if( s_Repeate )
          {
             s_aIsRepeate[ s_Repeate - 1 ]++;
@@ -3498,7 +3512,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
          }
 
          #ifdef DEBUG_MARKERS
-            printf( "Markers: %i\n", kolmarkers );
+            printf( "Repeate: %i Len: %i Markers: %i Last: %i Current: %i\n", s_Repeate, lenreal, kolmarkers, lastchar, *(ptrOut + ifou + 2) );
          #endif
 
          if( s_Repeate && lenreal && kolmarkers && lastchar != '0' && *(ptrOut + ifou + 2) == '0' )
