@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.208 2003/06/17 14:22:22 ronpinkas Exp $
+ * $Id: hvm.c,v 1.209 2003/06/18 08:57:02 ronpinkas Exp $
  */
 
 /*
@@ -6562,7 +6562,7 @@ PSYMBOLS hb_vmFindModule( PHB_SYMB pSymbols )
 {
    PSYMBOLS pLastSymbols = s_pSymbols;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmFindModule(%p)", pModuleSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmFindModule(%p)", pSymbols));
 
    do
    {
