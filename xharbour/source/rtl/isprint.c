@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.8 2002/07/04 00:30:46 lculik Exp $
+ * $Id: isprint.c,v 1.9 2002/07/06 02:34:21 lculik Exp $
  */
 
 /*
@@ -426,13 +426,13 @@ static BOOL DPGetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize)
 HB_FUNC(GETPRINTERS)
 {
     PHB_ITEM pArrayPrinter= hb_itemArrayNew( 0 );
-    char *buffer;
+    unsigned char *buffer;
     unsigned long needed=0,returned,a;
     BOOL res;
     DWORD err;
     err=0;
-    buffer=(char*)malloc(MAX_PRINTERS * sizeof(PRINTER_INFO_5));
-    res=FALSE;      
+    buffer=(unsigned char*)malloc(MAX_PRINTERS * sizeof(PRINTER_INFO_5));
+    res=FALSE;
 
     res=EnumPrinters(PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL |PRINTER_ENUM_CONNECTIONS,NULL,5,buffer,MAX_PRINTERS*sizeof(PRINTER_INFO_5),&needed,&returned);
     if(!res)
@@ -440,11 +440,11 @@ HB_FUNC(GETPRINTERS)
             hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
             }
           else {
-               buffer=(char*)realloc(buffer,0);
-               buffer=(char*)malloc(needed);
+               buffer=(unsigned char*)realloc(buffer,0);
+               buffer=(unsigned char*)malloc(needed);
                res=EnumPrinters(PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL| PRINTER_ENUM_CONNECTIONS,NULL,5,buffer,needed,&needed,&returned);
                }
-    if(!res)          
+    if(!res)
             hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
    for (a=0; a<returned; a++){
         PHB_ITEM pSubItems= hb_itemArrayNew( 2 );
