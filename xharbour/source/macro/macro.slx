@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.4 2002/12/08 02:20:26 ronpinkas Exp $
+ * $Id: macro.slx,v 1.5 2003/01/15 02:16:52 mlombardo Exp $
  */
 
 /*
@@ -216,12 +216,14 @@ LANGUAGE_RULES_ARE {
       	else if( x == MACROTEXT ) \
            printf( "   MACROTEXT = \"%s\"\n", pYYLVAL->string  ); \
       	else if( x == NUM_LONG ) \
-           printf( "   INTEGER = %il\n", pYYLVAL->valLong.lNumber  ); \
+           printf( "   INTEGER = %li\n", pYYLVAL->valLong.lNumber  ); \
       	else if( x == NUM_DOUBLE ) \
            printf( "   DOUBLE = %f\n", pYYLVAL->valDouble.dNumber  ); \
       	else if( x < 256 ) \
            if( x == '\n' || x == ';' ) \
               printf( "                  NEW LINE %i\n", hb_comp_iLine - 1  ); \
+           else if( iRet == -1 ) \
+              printf( "!!!<EOF>\n" ); \
            else \
               printf( "   DELIMITER = \"%c\"\n", x  ); \
       	else \

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.22 2003/01/07 10:48:18 likewolf Exp $
+ * $Id: harbour.slx,v 1.23 2003/01/08 03:16:43 ronpinkas Exp $
  */
 
 /*
@@ -558,7 +558,7 @@ int hb_comp_SLX_InterceptAction( int iRet )
      else if( iRet == MACROVAR )    { printf( "   MACROVAR = \"%s\"\n", yylval.string  ); }
      else if( iRet == MACROTEXT )   { printf( "   MACROTEXT = \"%s\"\n", yylval.string  ); }
      else if( iRet == NUM_INTEGER ) { printf( "   INTEGER = %i\n", yylval.valInteger.iNumber  ); }
-     else if( iRet == NUM_LONG )    { printf( "   INTEGER = %il\n", yylval.valLong.lNumber  ); }
+     else if( iRet == NUM_LONG )    { printf( "   INTEGER = %li\n", yylval.valLong.lNumber  ); }
      else if( iRet == NUM_DOUBLE )  { printf( "   DOUBLE = %f\n", yylval.valDouble.dNumber  ); }
      else if( iRet < 256 )
      {
@@ -585,7 +585,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    yytext = szToken;
    yyleng = (int) iTokenLen;
 
-   if( ( *yytext > 64 && *yytext < 91 ) || *yytext == '&' || *yytext == '_' )
+   if( ( *yytext >= 'A' && *yytext <= 'Z' ) || *yytext == '&' || *yytext == '_' )
    {
       /* Macro. */
       if( ( tmpPtr = strrchr( yytext, '&' ) ) != NULL ) /* Right Search. */
