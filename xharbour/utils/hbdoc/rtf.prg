@@ -1,12 +1,12 @@
 /*
- * $Id: rtf.prg,v 1.1.1.1 2001/12/21 10:45:39 ronpinkas Exp $
+ * $Id: rtf.prg,v 1.2 2003/08/02 18:09:53 lculik Exp $
  */
 
 /*
  * Harbour Project source code:
  * RTF Documentation Support Code For HBDOC
  *
- * Copyright 2000 Luiz Rafael Culik <Culik@sl.conex.net>
+ * Copyright 2000-2003 Luiz Rafael Culik <culikr@uol.com.br>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -229,13 +229,16 @@ METHOD WriteTitle( cTitle, cTopic, cOne ,cCat) CLASS TRTF
    cTemp := StrTran( cTemp, " ","_")
 
    Aadd( ::aIdh, {"IDH_" + cTemp,::lastid++})
-
    cWrite := CRLF + ;
              '  {#{\footnote \pard\fs20 {' + "IDH_" + cTemp + ' }}}' + CRLF + ;
              '  {${\footnote \pard\fs20 {' + ALLTRIM( cTopic ) + ' }}}' + CRLF + ;
              '  {K{\footnote \pard\fs20 {' + UPPERLOWER(ALLTRIM( cTopic ))+";" + UPPERLOWER(ALLTRIM( cCat ))+ ' }}}' + CRLF + ;
-             '  {A{\footnote \pard\fs20 {' + UPPERLOWER(ALLTRIM( cTopic )) +' }}}' + CRLF + ;
+             '  {A{\footnote{A} ' + UPPERLOWER(ALLTRIM( cTopic )) +' }}' + CRLF + ;
               CRLF
+
+
+
+   /*'{\f6' + CRLF + ;*/
              /*" ; " + UPPERLOWER(cCat) +" , " +UPPERLOWER(ALLTRIM( strtran(cTopic,"()","" )))+ */
    aadd(aWww,{cTopic,"IDH_"+cTemp,cCat})
    nPos := ascan(aResult,{|a| UPPER(a) == UPPER(cCat)})
@@ -318,14 +321,14 @@ Local nSize:=Len(aLink)
 if nSize >2
 For nPos:=1 to nSize
     if nPos==nSize
-        cItem+= aLink[nPos]
+        cItem+= UPPERLOWER(aLink[nPos])
     else
-        cItem+= aLink[nPos]
+        cItem+= UPPERLOWER(aLink[nPos])
         cItem+=";"
     endif
 next
 cItem:=Alltrim(cItem)
-   FWRITE( Self:nHandle, '\par \pard\cf1\fs20       \{button , ALink('+cItem + ', 2) \}{\f6\uldb Related Topic }'+'{\v\f6 %!ALink(" '+cItem + '", 2) }'+ CRLF )
+   FWRITE( Self:nHandle, '\par \pard\cf1\fs20       \{button , ALink('+UPPER(cItem) + ', 2) \}{\f6\uldb Related Topic }'+'{\v\f6 %!ALink(" '+cItem + '", 2) }'+ CRLF )
 else
 For nPos:=1 to nSize
     FWRITE( Self:nHandle, '\par \pard\cf1\fs20       {\f6\uldb '+aLink[nPos] +' }{\v\f6 !KLink(" '+UPPERLOWER(aLink[nPos]) + '", 2) }'+ CRLF )
