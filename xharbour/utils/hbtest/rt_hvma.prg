@@ -1,5 +1,5 @@
 /*
- * $Id: rt_hvma.prg,v 1.5 2001/05/15 13:02:07 vszakats Exp $
+ * $Id: rt_hvma.prg,v 1.1.1.1 2001/12/21 10:44:44 ronpinkas Exp $
  */
 
 /*
@@ -69,7 +69,7 @@ FUNCTION Main_HVMA()
    TEST_LINE( scString + NIL                  , "E BASE 1081 Argument error + A:2:C:HELLO;U:NIL F:S" )
    TEST_LINE( scString - NIL                  , "E BASE 1082 Argument error - A:2:C:HELLO;U:NIL F:S" )
 
-   TEST_LINE( 1 + NIL                         , "E BASE 1081 Argument error + A:2:N:1;U:NIL F:S" )
+   TEST_LINE( 1 + NIL                         , "E BASE 1081 Argument error + A:2:U:NIL;N:1 F:S")
    TEST_LINE( 1 - NIL                         , "E BASE 1082 Argument error - A:2:N:1;U:NIL F:S" )
 
    TEST_LINE( "A" - "B"                       , "AB"                               )
@@ -78,15 +78,15 @@ FUNCTION Main_HVMA()
    TEST_LINE( "A  " - " B"                    , "A B  "                            )
    TEST_LINE( "   " - "B "                    , "B    "                            )
 
-   TEST_LINE( 1 / 0                           , "E BASE 1340 Zero divisor / A:2:N:1;N:0 F:S"     )
+   TEST_LINE( 1 / 0                           , "E BASE 1340 Zero divisor / A:2:U:NIL;U:NIL F:S")
    TEST_LINE( 1 / NIL                         , "E BASE 1084 Argument error / A:2:N:1;U:NIL F:S" )
    TEST_LINE( 1 * NIL                         , "E BASE 1083 Argument error * A:2:N:1;U:NIL F:S" )
    TEST_LINE( 1 ** NIL                        , "E BASE 1088 Argument error ^ A:2:N:1;U:NIL F:S" )
    TEST_LINE( 1 ^ NIL                         , "E BASE 1088 Argument error ^ A:2:N:1;U:NIL F:S" )
-   TEST_LINE( 1 % 0                           , "E BASE 1341 Zero divisor % A:2:N:1;N:0 F:S"     )
+   TEST_LINE( 1 % 0                           , "E BASE 1341 Zero divisor % A:2:U:NIL;U:NIL F:S")
    TEST_LINE( 1 % NIL                         , "E BASE 1085 Argument error % A:2:N:1;U:NIL F:S" )
 
-   TEST_LINE( Str( 1 / 0   )                  , "E BASE 1340 Zero divisor / A:2:N:1;N:0 F:S" )
+   TEST_LINE( Str( 1 / 0   )                  , "E BASE 1340 Zero divisor / A:2:U:NIL;U:NIL F:S")
    TEST_LINE( Str( 2 / 4   )                  , "         0.50"                    )
    TEST_LINE( Str( 4 / 2   )                  , "         2"                       )
    TEST_LINE( Str( 4 / 2.0 )                  , "         2.00"                    )
@@ -102,7 +102,7 @@ FUNCTION Main_HVMA()
    TEST_LINE( Str( 2 - 4   )                  , "        -2"                       )
    TEST_LINE( Str( 4 - 2.0 )                  , "         2.0"                     )
    TEST_LINE( Str( 2 - 0.5 )                  , "         1.5"                     )
-   TEST_LINE( Str( 1 % 0   )                  , "E BASE 1341 Zero divisor % A:2:N:1;N:0 F:S" )
+   TEST_LINE( Str( 1 % 0   )                  , "E BASE 1341 Zero divisor % A:2:U:NIL;U:NIL F:S")
    TEST_LINE( Str( 2 % 4   )                  , "         2"                       )
    TEST_LINE( Str( 4 % 2   )                  , "         0"                       )
    TEST_LINE( Str( 4 % 2.0 )                  , "         0.00"                    )
@@ -111,14 +111,14 @@ FUNCTION Main_HVMA()
    TEST_LINE( Str(  3 %  3 )                   , "         0"                      )
    TEST_LINE( Str(  3 %  2 )                   , "         1"                      )
    TEST_LINE( Str(  3 %  1 )                   , "         0"                      )
-   TEST_LINE( Str(  3 %  0 )                   , "E BASE 1341 Zero divisor % A:2:N:3;N:0 F:S" )
+   TEST_LINE( Str(  3 %  0 )                   , "E BASE 1341 Zero divisor % A:2:U:NIL;U:NIL F:S")
    TEST_LINE( Str(  3 % -1 )                   , "         0"                      )
    TEST_LINE( Str(  3 % -2 )                   , "         1"                      )
    TEST_LINE( Str(  3 % -3 )                   , "         0"                      )
    TEST_LINE( Str( -3 %  3 )                   , "         0"                      )
    TEST_LINE( Str( -3 %  2 )                   , "        -1"                      )
    TEST_LINE( Str( -3 %  1 )                   , "         0"                      )
-   TEST_LINE( Str( -3 %  0 )                   , "E BASE 1341 Zero divisor % A:2:N:-3;N:0 F:S" )
+   TEST_LINE( Str( -3 %  0 )                   , "E BASE 1341 Zero divisor % A:2:U:NIL;U:NIL F:S")
    TEST_LINE( Str( -3 % -1 )                   , "         0"                      )
    TEST_LINE( Str( -3 % -2 )                   , "        -1"                      )
    TEST_LINE( Str( -3 % -3 )                   , "         0"                      )
@@ -336,8 +336,8 @@ FUNCTION Main_HVMA()
    TEST_LINE( saArray[ 0 ]                    , "E BASE 1132 Bound error array access "           )
    TEST_LINE( saArray[ 0 ] := 1               , "E BASE 1133 Bound error array assign "           )
 #endif
-   TEST_LINE( saArray[ 1000 ]                 , "E BASE 1132 Bound error array access "           )
-   TEST_LINE( saArray[ 1000 ] := 1            , "E BASE 1133 Bound error array assign "           )
+   TEST_LINE( saArray[ 1000 ]                 , "E BASE 1132 Bound error array access A:2:A:{.[1].};N:1000 ")
+   TEST_LINE( saArray[ 1000 ] := 1            , "E BASE 1133 Bound error array assign A:1:N:1000 ")
 #ifndef __HARBOUR__
    // this error is reported at compile time
    TEST_LINE( saArray[ -1 ]                   , "E BASE 1132 Bound error array access "           )
@@ -350,15 +350,15 @@ FUNCTION Main_HVMA()
 
    TEST_LINE( ("NOTHERE")->NOFIELD            , "E BASE 1002 Alias does not exist NOTHERE F:R"    )
    TEST_LINE( (mcString)->NOFIELD             , "E BASE 1002 Alias does not exist HELLO F:R"      )
-   TEST_Line( ({})->NOFIELD                   , "E BASE 1065 Argument error & A:2:A:{.[0].};C:NOFIELD F:S" )
-   TEST_LINE( ({|| NIL })->NOFIELD            , "E BASE 1065 Argument error & A:2:B:{||...};C:NOFIELD F:S" )
-   TEST_LINE( (.T.)->NOFIELD                  , "E BASE 1065 Argument error & A:2:L:.T.;C:NOFIELD F:S"     )
-   TEST_LINE( (.F.)->NOFIELD                  , "E BASE 1065 Argument error & A:2:L:.F.;C:NOFIELD F:S"     )
-   TEST_LINE( (NIL)->NOFIELD                  , "E BASE 1065 Argument error & A:2:U:NIL;C:NOFIELD F:S"     )
+   TEST_Line( ({})->NOFIELD                   , "E BASE 1065 Argument error & A:1:A:{.[0].} F:S")
+   TEST_LINE( ({|| NIL })->NOFIELD            , "E BASE 1065 Argument error & A:1:B:{||...} F:S")
+   TEST_LINE( (.T.)->NOFIELD                  , "E BASE 1065 Argument error & A:1:L:.T. F:S")
+   TEST_LINE( (.F.)->NOFIELD                  , "E BASE 1065 Argument error & A:1:L:.F. F:S")
+   TEST_LINE( (NIL)->NOFIELD                  , "E BASE 1065 Argument error & A:1:U:NIL F:S")
    TEST_LINE( (2)->NOFIELD                    , "E BASE 1003 Variable does not exist NOFIELD F:R" )
    TEST_LINE( (2.5)->NOFIELD                  , "E BASE 1003 Variable does not exist NOFIELD F:R" )
-   TEST_LINE( (HB_SToD(""))->NOFIELD          , "E BASE 1065 Argument error & A:2:D:        ;C:NOFIELD F:S"     )
-   TEST_LINE( (ErrorNew())->NOFIELD           , "E BASE 1065 Argument error & A:2:O:ERROR Object;C:NOFIELD F:S" )
+   TEST_LINE( (HB_SToD(""))->NOFIELD          , "E BASE 1065 Argument error & A:1:D:         F:S")
+   TEST_LINE( (ErrorNew())->NOFIELD           , "E BASE 1065 Argument error & A:1:O:ERROR Object F:S")
 
 #ifndef __XPP__
    TEST_LINE( ("NOTHERE")->(Eof())            , .T.                                               )
@@ -400,8 +400,8 @@ FUNCTION Main_HVMA()
    TEST_LINE( 200->(HB_SToD(""))              , HB_SToD("        ")                               )
    TEST_LINE( 200->(ErrorNew())               , "ERROR Object"                                    )
 
-   TEST_LINE( soObject:hello                  , "E BASE 1004 No exported method HELLO A:1:O:ERROR Object F:S"       )
-   TEST_LINE( soObject:hello := 1             , "E BASE 1005 No exported variable HELLO A:2:O:ERROR Object;N:1 F:S" )
+   TEST_LINE( soObject:hello                  , "E BASE 1004 Class: 'ERROR' has no exported method HELLO A:0: F:S" )
+   TEST_LINE( soObject:hello := 1             , "E BASE 1005 Class: 'ERROR' has no property HELLO A:1:N:1 F:S"     )
 
    /* LEN() */
 
@@ -416,7 +416,7 @@ FUNCTION Main_HVMA()
    TEST_LINE( Len( w_TEST->TYPE_M_E )         , 0                                      )
    TEST_LINE( Len( saArray )                  , 1                                      )
 #ifdef __HARBOUR__
-   TEST_LINE( Len( ErrorNew() )               , 14                                     )
+   TEST_LINE( Len( ErrorNew() )               , 17                                     )
    TEST_LINE( Len( Space( 1000000 ) )         , 1000000                                )
 #else
    TEST_LINE( Len( ErrorNew() )               , 7                                      )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.21 2003/06/29 04:42:33 andijahja Exp $
+ * $Id: hbpcode.c,v 1.22 2003/06/29 07:25:38 andijahja Exp $
  */
 
 /*
@@ -432,8 +432,6 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
    USHORT ipCodeCount = 0;
    USHORT ipCodeUsed = 0;
    PCODELIST pCodeCurrent = NULL;
-   PCODELIST pCodeLast = NULL;
-   PCODELIST pCodeTemp = NULL;
 
    /* Make sure that table is correct */
    assert( sizeof( s_pcode_len ) == HB_P_LAST_PCODE );
@@ -446,7 +444,7 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
       {
          if( bWriteList )
          {
-            pCodeLast = (PCODELIST) hb_xgrab( sizeof( PCODELIST ) );
+            PCODELIST pCodeLast = (PCODELIST) hb_xgrab( sizeof( PCODELIST ) );
 
             if( pCodeFirst )
             {
@@ -481,7 +479,7 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
 
    if( bWriteList )
    {
-      pCodeTemp = pCodeFirst;
+      PCODELIST pCodeTemp = pCodeFirst;
       while( pCodeTemp )
       {
          ipCodeCount ++;

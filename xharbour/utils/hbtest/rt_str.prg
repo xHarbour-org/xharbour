@@ -1,5 +1,5 @@
 /*
- * $Id: rt_str.prg,v 1.1.1.1 2001/12/21 10:44:52 ronpinkas Exp $
+ * $Id: rt_str.prg,v 1.2 2003/05/30 06:49:33 ronpinkas Exp $
  */
 
 /*
@@ -272,8 +272,8 @@ FUNCTION Main_STR()
 
 /* These lines will cause CA-Cl*pper 5.2e to trash memory and later crash, it was fixed in 5.3 */
 #ifndef __CLIPPER__
-   TEST_LINE( AllTrim( NIL )                  , "E BASE 2022 Argument error ALLTRIM F:S" ) /* CA-Cl*pper 5.2e/5.3 is not giving the same result for this one. */
-   TEST_LINE( AllTrim( 100 )                  , "E BASE 2022 Argument error ALLTRIM F:S" ) /* CA-Cl*pper 5.2e/5.3 is not giving the same result for this one. */
+   TEST_LINE( AllTrim( NIL )                  , "E BASE 2022 Argument error ALLTRIM A:1:U:NIL F:S" )
+   TEST_LINE( AllTrim( 100 )                  , "E BASE 2022 Argument error ALLTRIM A:1:N:100 F:S" )
 #endif
 #ifdef __HARBOUR__
    TEST_LINE( AllTrim(@scString)              , "HELLO"          ) /* CA-Cl*pper bug, it will terminate the program on this line. */
@@ -372,11 +372,11 @@ FUNCTION Main_STR()
          This bug is fixed in CA-Clipper 5.3 [vszakats] */
 #ifndef __CLIPPER__
 #ifndef __XPP__
-   TEST_LINE( StrTran()                       , "E BASE 1126 Argument error STRTRAN F:S" ) /* CA-Cl*pper bug, it will exit on this */
-   TEST_LINE( StrTran( NIL )                  , "E BASE 1126 Argument error STRTRAN F:S" ) /* CA-Cl*pper bug, it will exit on this */
-   TEST_LINE( StrTran( 100 )                  , "E BASE 1126 Argument error STRTRAN F:S" ) /* CA-Cl*pper bug, it will exit on this */
+   TEST_LINE( StrTran()                       , "E BASE 1126 Argument error STRTRAN A:3:U:NIL;U:NIL;U:NIL F:S" )
+   TEST_LINE( StrTran( NIL )                  , "E BASE 1126 Argument error STRTRAN A:3:U:NIL;U:NIL;U:NIL F:S" )
+   TEST_LINE( StrTran( 100 )                  , "E BASE 1126 Argument error STRTRAN A:3:N:100;U:NIL;U:NIL F:S" )
 #endif
-   TEST_LINE( StrTran( "AA", 1 )              , "E BASE 1126 Argument error STRTRAN F:S" ) /* CA-Cl*pper bug, it will exit on this */
+   TEST_LINE( StrTran( "AA", 1 )              , "E BASE 1126 Argument error STRTRAN A:3:C:AA;N:1;U:NIL F:S")
 #endif
    TEST_LINE( StrTran( "AA", "A" )            , "" )
    TEST_LINE( StrTran( "AA", "A", "1" )       , "11" )
@@ -503,7 +503,7 @@ FUNCTION Main_STR()
 
    TEST_LINE( SubStr(100     , 0, -1)         , "E BASE 1110 Argument error SUBSTR A:3:N:100;N:0;N:-1 F:S"   )
    TEST_LINE( SubStr("abcdef", 1, "a")        , "E BASE 1110 Argument error SUBSTR A:3:C:abcdef;N:1;C:a F:S" )
-   TEST_LINE( SubStr("abcdef", "a")           , "E BASE 1110 Argument error SUBSTR A:2:C:abcdef;C:a F:S"     )
+   TEST_LINE( SubStr("abcdef", "a")           , "E BASE 1110 Argument error SUBSTR A:3:C:abcdef;C:a;U:NIL F:S")
    TEST_LINE( SubStr("abcdef", "a", 1)        , "E BASE 1110 Argument error SUBSTR A:3:C:abcdef;C:a;N:1 F:S" )
    TEST_LINE( SubStr("abcdef", 0, -1)         , ""               )
    TEST_LINE( SubStr("abcdef", 0, 0)          , ""               )

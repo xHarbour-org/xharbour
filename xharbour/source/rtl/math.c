@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.5 2002/09/06 10:47:44 andijahja Exp $
+ * $Id: math.c,v 1.6 2003/06/06 17:47:27 mbirdyg Exp $
  */
 
 /*
@@ -360,7 +360,7 @@ static HB_MATH_HANDLERPROC s_mathHandlerProc = hb_matherr; /* TODO: make this th
 HB_MATH_HANDLERPROC hb_mathSetHandler (HB_MATH_HANDLERPROC handlerproc)
 {
   HB_MATH_HANDLERPROC oldHandlerProc;
-  
+
   HB_TRACE (HB_TR_DEBUG, ("hb_mathSetHandler (%p)", handlerproc));
   
   oldHandlerProc = s_mathHandlerProc;
@@ -406,7 +406,7 @@ static int hb_matherrblock (HB_MATH_EXCEPTION * pexc)
     pArg2 = hb_itemPutND (NULL, pexc->arg2);
     pRetval = hb_itemPutNDLen (NULL, pexc->retval, pexc->retvalwidth, pexc->retvaldec);
     pHandled = hb_itemPutL (NULL, pexc->handled);
-    
+
     pArray = hb_itemArrayNew (2);
     hb_itemArrayPut (pArray, 1, pRetval);
     hb_itemArrayPut (pArray, 2, pHandled);
@@ -553,7 +553,8 @@ HB_FUNC (MATHERRORBLOCK)  /* ([<nNewErrorBlock>]) -> <nOldErrorBlock> */
 
 HB_FUNC (EXP)
 {
-  if (ISNUM (1))
+//if (ISNUM (1))
+  if ( hb_param( 1, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) != NULL )
   {
     HB_MATH_EXCEPTION hb_exc;
     double dResult;
@@ -598,7 +599,8 @@ HB_FUNC (EXP)
 HB_FUNC (LOG)
 {
 
-  if (ISNUM (1))
+//if (ISNUM (1))
+  if ( hb_param( 1, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) != NULL )
   {
     HB_MATH_EXCEPTION hb_exc;
     double dResult;
@@ -646,7 +648,8 @@ HB_FUNC (LOG)
 
 HB_FUNC (SQRT)
 {
-  if (ISNUM (1))
+//if (ISNUM (1))
+  if ( hb_param( 1, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) != NULL )
   {
     HB_MATH_EXCEPTION hb_exc;
     double dResult;
@@ -656,7 +659,7 @@ HB_FUNC (SQRT)
 
     if (hb_mathIsMathErr())
     {
-      /* the C-RTL provides a kind of matherr() mechanism */ 
+      /* the C-RTL provides a kind of matherr() mechanism */
       int iLastError = hb_mathGetLastError (&hb_exc);
       if (iLastError != HB_MATH_ERR_NONE)
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: mod.c,v 1.9 2001/04/12 18:24:41 dholm Exp $
+ * $Id: mod.c,v 1.1.1.1 2001/12/21 10:41:52 ronpinkas Exp $
  */
 
 /*
@@ -66,9 +66,10 @@
 
 HB_FUNC( MOD )
 {
-   PHB_ITEM pNumber = hb_param( 1, HB_IT_NUMERIC );
+   PHB_ITEM pNumber  = hb_param( 1, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE );
+   PHB_ITEM pNumber2 = hb_param( 2, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE );
 
-   if( pNumber && ISNUM( 2 ) )
+   if( pNumber && pNumber2 )
    {
       double dNumber = hb_itemGetND( pNumber );
       double dBase = hb_parnd( 2 ); /* dBase! Cool! */

@@ -1,5 +1,5 @@
 /*
- * $Id: space.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: space.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -59,10 +59,9 @@
 
 HB_FUNC( SPACE )
 {
-   if( ISNUM( 1 ) )
+   if ( hb_param( 1, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) != NULL )
    {
       long lLen = hb_parnl( 1 );
-
       if( lLen > 0 )
       {
          char * szResult = ( char * ) hb_xgrab( lLen + 1 );

@@ -1,5 +1,5 @@
 /*
- * $Id: rt_misc.prg,v 1.9 2001/09/10 22:04:29 vszakats Exp $
+ * $Id: rt_misc.prg,v 1.1.1.1 2001/12/21 10:44:57 ronpinkas Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ FUNCTION Main_MISC()
    TEST_LINE( Len( oError )                   , 7                         )
 #endif
 #ifdef __HARBOUR__
-   TEST_LINE( Len( oError )                   , 14                        )
+   TEST_LINE( Len( oError )                   , 17                        )
 #endif
 
    /* "Samples" function tests (AMPM(), DAYS(), ELAPTIME(), ... ) */
@@ -200,14 +200,14 @@ FUNCTION Main_MISC()
    TEST_LINE( TFORNEXT( NIL, NIL, NIL )       , "E BASE 1075 Argument error > A:2:U:NIL;U:NIL F:S" )
    TEST_LINE( TFORNEXT( .F., .T.,   1 )       , "E BASE 1081 Argument error + A:2:L:.F.;N:1 F:S"   )
    TEST_LINE( TFORNEXT( .F., .T.,  -1 )       , .F.                                       )
-   TEST_LINE( TFORNEXT( .F., .T., .F. )       , "E BASE 1073 Argument error < A:2:L:.F.;N:0 F:S" )
+   TEST_LINE( TFORNEXT( .F., .T., .F. )       , "E BASE 1073 Argument error < A:1:L:.F. F:S")
    TEST_LINE( TFORNEXT( .T., .F.,   1 )       , .T.                                       )
    TEST_LINE( TFORNEXT( .T., .F.,  -1 )       , "E BASE 1081 Argument error + A:2:L:.T.;N:-1 F:S" )
-   TEST_LINE( TFORNEXT( .T., .F., .T. )       , "E BASE 1073 Argument error < A:2:L:.T.;N:0 F:S"  )
+   TEST_LINE( TFORNEXT( .T., .F., .T. )       , "E BASE 1073 Argument error < A:1:L:.T. F:S")
    TEST_LINE( TFORNEXT( 100, 101,   1 )       , 102                                       )
    TEST_LINE( TFORNEXT( 101, 100,  -1 )       , 99                                        )
-   TEST_LINE( TFORNEXT( "A", "A", "A" )       , "E BASE 1073 Argument error < A:2:C:A;N:0 F:S"     )
-   TEST_LINE( TFORNEXT( "A", "B", "A" )       , "E BASE 1073 Argument error < A:2:C:A;N:0 F:S"     )
+   TEST_LINE( TFORNEXT( "A", "A", "A" )       , "E BASE 1073 Argument error < A:1:C:AA F:S")
+   TEST_LINE( TFORNEXT( "A", "B", "A" )       , "E BASE 1073 Argument error < A:1:C:AA F:S")
    TEST_LINE( TFORNEXT( "B", "A", "A" )       , "E BASE 1073 Argument error < A:2:C:A;N:0 F:S"     )
    TEST_LINE( TFORNEXT( NIL, NIL, NIL )       , "E BASE 1075 Argument error > A:2:U:NIL;U:NIL F:S" )
 
@@ -234,9 +234,8 @@ FUNCTION Main_MISC()
    TEST_LINE( TFORNEXTXF(  10,  1,  4 )       , "F-9999T10S10R10"                                                                )
 
    /* EVAL(), :EVAL(), :EVAL */
-
-   TEST_LINE( Eval( NIL )                     , "E BASE 1004 No exported method EVAL A:1:U:NIL F:S" )
-   TEST_LINE( Eval( 1 )                       , "E BASE 1004 No exported method EVAL A:1:N:1 F:S"   )
+   TEST_LINE( Eval( NIL )                     , "E BASE 1004 Class: 'NIL' has no exported method EVAL A:0: F:S")
+   TEST_LINE( Eval( 1 )                       ,  "E BASE 1004 Class: 'NUMERIC' has no exported method EVAL A:0: F:S")
 #ifdef __HARBOUR__
    TEST_LINE( Eval( @sbBlock )                , NIL                                       ) /* Bug in CA-Cl*pper, it will return: "E BASE 1004 No exported method EVAL F:S" */
 #endif
@@ -247,23 +246,23 @@ FUNCTION Main_MISC()
 #ifndef __HARBOUR__
    TEST_LINE( suNIL:Eval()                    , "E BASE 1004 No exported method EVAL A:1:U:NIL F:S" )
 #endif
-   TEST_LINE( scString:Eval()                 , "E BASE 1004 No exported method EVAL A:1:C:HELLO F:S"    )
-   TEST_LINE( snIntP:Eval()                   , "E BASE 1004 No exported method EVAL A:1:N:10 F:S"       )
-   TEST_LINE( sdDateE:Eval()                  , "E BASE 1004 No exported method EVAL A:1:D:         F:S" )
-   TEST_LINE( slFalse:Eval()                  , "E BASE 1004 No exported method EVAL A:1:L:.F. F:S"      )
+   TEST_LINE( scString:Eval()                 , "E BASE 1004 Class: 'CHARACTER' has no exported method EVAL A:0: F:S")
+   TEST_LINE( snIntP:Eval()                   , "E BASE 1004 Class: 'NUMERIC' has no exported method EVAL A:0: F:S")
+   TEST_LINE( sdDateE:Eval()                  , "E BASE 1004 Class: 'DATE' has no exported method EVAL A:0: F:S")
+   TEST_LINE( slFalse:Eval()                  , "E BASE 1004 Class: 'LOGICAL' has no exported method EVAL A:0: F:S")
    TEST_LINE( sbBlock:Eval()                  , NIL                                       )
-   TEST_LINE( saArray:Eval()                  , "E BASE 1004 No exported method EVAL A:1:A:{.[1].} F:S"      )
-   TEST_LINE( soObject:Eval()                 , "E BASE 1004 No exported method EVAL A:1:O:ERROR Object F:S" )
+   TEST_LINE( saArray:Eval()                  , "E BASE 1004 Class: 'ARRAY' has no exported method EVAL A:0: F:S")
+   TEST_LINE( soObject:Eval()                 , "E BASE 1004 No exported method EVAL A:0: F:S")
 #ifndef __HARBOUR__
    TEST_LINE( suNIL:Eval                      , "E BASE 1004 No exported method EVAL A:1:U:NIL F:S" )
 #endif
-   TEST_LINE( scString:Eval                   , "E BASE 1004 No exported method EVAL A:1:C:HELLO F:S"    )
-   TEST_LINE( snIntP:Eval                     , "E BASE 1004 No exported method EVAL A:1:N:10 F:S"       )
-   TEST_LINE( sdDateE:Eval                    , "E BASE 1004 No exported method EVAL A:1:D:         F:S" )
-   TEST_LINE( slFalse:Eval                    , "E BASE 1004 No exported method EVAL A:1:L:.F. F:S"      )
+   TEST_LINE( scString:Eval                   , "E BASE 1004 Class: 'CHARACTER' has no exported method EVAL A:0: F:S")
+   TEST_LINE( snIntP:Eval                     , "E BASE 1004 Class: 'NUMERIC' has no exported method EVAL A:0: F:S")
+   TEST_LINE( sdDateE:Eval                    , "E BASE 1004 Class: 'DATE' has no exported method EVAL A:0: F:S" )
+   TEST_LINE( slFalse:Eval                    , "E BASE 1004 Class: 'LOGICAL' has no exported method EVAL A:0: F:S")
    TEST_LINE( sbBlock:Eval                    , NIL                                       )
-   TEST_LINE( saArray:Eval                    , "E BASE 1004 No exported method EVAL A:1:A:{.[1].} F:S"      )
-   TEST_LINE( soObject:Eval                   , "E BASE 1004 No exported method EVAL A:1:O:ERROR Object F:S" )
+   TEST_LINE( saArray:Eval                    , "E BASE 1004 Class: 'ARRAY' has no exported method EVAL A:0: F:S" )
+   TEST_LINE( soObject:Eval                   , "E BASE 1004 No exported method EVAL A:0: F:S")
 
    /* HB_STOD() */
 
@@ -512,10 +511,10 @@ FUNCTION Main_MISC()
             to hide different path handling, since Harbour is platform
             independent. */
 
-   TEST_LINE( __CopyFile("$$COPYFR.TMP")                 , "E BASE 2010 Argument error __COPYFILE A:1:C:$$COPYFR.TMP " )
+   TEST_LINE( __CopyFile("$$COPYFR.TMP")                 , "E BASE 2010 Argument error __COPYFILE A:2:C:$$COPYFR.TMP;U:NIL " )
    TEST_LINE( __CopyFile("$$COPYFR.TMP", "$$COPYTO.TMP") , NIL                                        )
-   TEST_LINE( __CopyFile("NOT_HERE.$$$", "$$COPYTO.TMP") , "E BASE 2012 Open error NOT_HERE.$$$ F:DR" )
-   TEST_LINE( __CopyFile("$$COPYFR.TMP", "*INVALID*.")   , "E BASE 2012 Create error *INVALID*. F:DR" )
+   TEST_LINE( __CopyFile("NOT_HERE.$$$", "$$COPYTO.TMP") , "E BASE 2012 Open error NOT_HERE.$$$ A:0: F:DR")
+   TEST_LINE( __CopyFile("$$COPYFR.TMP", "*INVALID*.")   , "E BASE 2012 Create error *INVALID*. A:0: F:DR")
 
    FErase("$$COPYFR.TMP")
    FErase("$$COPYTO.TMP")

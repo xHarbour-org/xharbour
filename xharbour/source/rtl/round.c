@@ -1,5 +1,5 @@
 /*
- * $Id: round.c,v 1.2 2002/10/16 01:18:31 ronpinkas Exp $
+ * $Id: round.c,v 1.3 2002/10/17 00:48:07 ronpinkas Exp $
  */
 
 /*
@@ -69,7 +69,7 @@
 
 HB_FUNC( INT )
 {
-   PHB_ITEM pNumber = hb_param( 1, HB_IT_NUMERIC );
+   PHB_ITEM pNumber = hb_param( 1, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE );
 
    if( pNumber )
    {

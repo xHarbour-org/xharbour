@@ -1,5 +1,5 @@
 /*
- * $Id: substr.c,v 1.1.1.1 2001/12/21 10:42:07 ronpinkas Exp $
+ * $Id: substr.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
  */
 
 /*
@@ -59,8 +59,9 @@
 HB_FUNC( SUBSTR )
 {
    PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pNumber = hb_param( 2, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE );
 
-   if( pText && ISNUM( 2 ) )
+   if( pText && pNumber )
    {
       long lPos = hb_parnl( 2 );
 
@@ -81,7 +82,8 @@ HB_FUNC( SUBSTR )
 
          if( hb_pcount() >= 3 )
          {
-            if( ISNUM( 3 ) )
+            PHB_ITEM pNumber2 = hb_param( 3, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE );
+            if( pNumber2 )
             {
                lLen = hb_parnl( 3 );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: abs.c,v 1.8 2001/04/12 18:24:41 dholm Exp $
+ * $Id: abs.c,v 1.1.1.1 2001/12/21 10:41:09 ronpinkas Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 
 HB_FUNC( ABS )
 {
-   PHB_ITEM pNumber = hb_param( 1, HB_IT_NUMERIC );
+   PHB_ITEM pNumber = hb_param( 1, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE );
 
    if( pNumber )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: strzero.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: strzero.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -60,7 +60,7 @@ HB_FUNC( STRZERO )
    if( hb_pcount() >= 1 && hb_pcount() <= 3 )
    {
       BOOL bValid;
-      PHB_ITEM pNumber = hb_param( 1, HB_IT_NUMERIC );
+      PHB_ITEM pNumber = hb_param( 1, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE );
       PHB_ITEM pWidth  = NULL;
       PHB_ITEM pDec    = NULL;
 
@@ -70,14 +70,14 @@ HB_FUNC( STRZERO )
 
          if( hb_pcount() >= 2 )
          {
-            pWidth = hb_param( 2, HB_IT_NUMERIC );
+            pWidth = hb_param( 2, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE );
             if( !pWidth )
                bValid = FALSE;
          }
 
          if( hb_pcount() >= 3 )
          {
-            pDec = hb_param( 3, HB_IT_NUMERIC );
+            pDec = hb_param( 3, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE );
             if( !pDec )
                bValid = FALSE;
          }

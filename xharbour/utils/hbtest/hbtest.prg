@@ -1,5 +1,5 @@
 /*
- * $Id: hbtest.prg,v 1.1.1.1 2001/12/21 10:44:58 ronpinkas Exp $
+ * $Id: hbtest.prg,v 1.2 2003/07/06 15:14:07 lculik Exp $
  */
 
 /*
@@ -171,16 +171,16 @@ STATIC FUNCTION Main_LAST()
 
    TEST_LINE( MEMVARBLOCK( "mcString" )           , "{||...}"                                         )
 #ifndef __XPP__
-   TEST_LINE( __MRestore()                        , "E BASE 2007 Argument error __MRESTORE "          )
+   TEST_LINE( __MRestore()                        , "E BASE 2007 Argument error __MRESTORE A:2:U:NIL;U:NIL ")
 #endif
    TEST_LINE( MEMVARBLOCK( "mcString" )           , "{||...}"                                         )
 #ifndef __XPP__
-   TEST_LINE( __MSave()                           , "E BASE 2008 Argument error __MSAVE "             )
-   TEST_LINE( __MRestore( "$NOTHERE.MEM", .F. )   , "E BASE 2005 Open error $NOTHERE.MEM F:DR"        )
+   TEST_LINE( __MSave()                           , "E BASE 2008 Argument error __MSAVE A:3:U:NIL;U:NIL;U:NIL ")
+   TEST_LINE( __MRestore( "$NOTHERE.MEM", .F. )   , "E BASE 2005 Open error $NOTHERE.MEM A:2:C:$NOTHERE.MEM;L:.F. F:DR")
 #endif
    TEST_LINE( MEMVARBLOCK( "mcString" )           , NIL                                               )
 #ifndef __XPP__
-   TEST_LINE( __MSave( "*BADNAM*.MEM", "*", .T. ) , "E BASE 2006 Create error *BADNAM*.MEM F:DR"      )
+   TEST_LINE( __MSave( "*BADNAM*.MEM", "*", .T. ) , "E BASE 2006 Create error *BADNAM*.MEM A:3:C:*BADNAM*.MEM;C:*;L:.T. F:DR")
 #endif
 
    RETURN NIL

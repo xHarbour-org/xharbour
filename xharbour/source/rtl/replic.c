@@ -1,5 +1,5 @@
 /*
- * $Id: replic.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: replic.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -59,7 +59,9 @@
 
 HB_FUNC( REPLICATE )
 {
-   if( ISCHAR( 1 ) && ISNUM( 2 ) )
+   PHB_ITEM pNumber = hb_param( 2, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE );
+
+   if( ISCHAR( 1 ) && pNumber )
    {
       long lTimes = hb_parnl( 2 );
 

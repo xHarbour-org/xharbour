@@ -1,5 +1,5 @@
 /*
- * $Id: left.c,v 1.5 2002/12/19 18:15:34 ronpinkas Exp $
+ * $Id: left.c,v 1.6 2003/01/05 06:50:36 ronpinkas Exp $
  */
 
 /*
@@ -58,8 +58,9 @@
 HB_FUNC( LEFT )
 {
    PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pNumber = hb_param( 2, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE );
 
-   if( pText && ISNUM( 2 ) )
+   if( pText && pNumber )
    {
       char *sLeft, *sString = pText->item.asString.value;
       long lLeft = hb_parnl( 2 );

@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.7 2003/01/05 06:50:36 ronpinkas Exp $
+ * $Id: str.c,v 1.8 2003/01/05 20:20:02 ronpinkas Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 HB_FUNC( STR )
 {
    BOOL bValid;
-   PHB_ITEM pNumber = hb_param( 1, HB_IT_NUMERIC );
+   PHB_ITEM pNumber = hb_param( 1, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE );
    PHB_ITEM pWidth  = NULL;
    PHB_ITEM pDec    = NULL;
 
@@ -68,7 +68,7 @@ HB_FUNC( STR )
 
       if( hb_pcount() >= 2 )
       {
-         if( ISNUM( 2 ) )
+         if ( hb_param( 2, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) )
          {
             pWidth = hb_param( 2, HB_IT_NUMERIC );
          }
@@ -80,7 +80,7 @@ HB_FUNC( STR )
 
       if( hb_pcount() >= 3 )
       {
-         if( ISNUM( 3 ) )
+         if ( hb_param( 3, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) )
          {
             pDec = hb_param( 3, HB_IT_NUMERIC );
          }

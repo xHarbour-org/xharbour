@@ -1,5 +1,5 @@
 /*
- * $Id: strtran.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: strtran.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -81,7 +81,7 @@ HB_FUNC( STRTRAN )
             char * szReplace;
             ULONG ulStart;
 
-            ulStart = ( ISNUM( 4 ) ? hb_parnl( 4 ) : 1 );
+            ulStart = ( hb_param( 4, HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) ? hb_parnl( 4 ) : 1 );
 
             if( !ulStart )
             {
