@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.32 2003/02/12 03:31:03 paultucker Exp $
+# $Id: makefile.vc,v 1.33 2003/02/15 22:19:57 paultucker Exp $
 #
 
 #
@@ -26,8 +26,6 @@
 #                      Note that this will require the pdflib contrib.
 #       HB_GT_LIB    - To override the default GT driver
 #                      (search for HB_GT_LIBS for a list of values)
-#       HB_LEX       - If set to SIMPLEX, an alternate lexer will be
-#                      used instead of the Flex based one.
 #       PRG_USR      - Extra Harbour compiler options
 #                      (GNU make compatible envvar)
 #
@@ -100,17 +98,12 @@ HBMAKE_DIR   = utils\hbmake
 HBPDF_DIR   = contrib\pdflib
 !endif
 
-!if ( "$(HB_LEX)"=="SIMPLEX" )
-# don't indent definitions
-CFLAGS = $(CFLAGS) -DSIMPLEX
-!endif
-
 #
 # C compiler definition and C flags. These should never have to change.
 #
 
 AS             = ML
-CFLAGS         = -G6 -Ox -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 $(C_USR) $(CFLAGS)
+CFLAGS         = -G6 -Ox -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 $(C_USR) -DSIMPLEX $(CFLAGS)
 CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
 HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
 LDFLAGS        = $(LDFLAGS)
@@ -407,6 +400,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\tpopup.obj \
    $(OBJ_DIR)\traceprg.obj \
    $(OBJ_DIR)\treport.obj \
+   $(OBJ_DIR)\trpc.obj \
+   $(OBJ_DIR)\trpccli.prg \
    $(OBJ_DIR)\ttable.obj \
    $(OBJ_DIR)\ttextlin.obj \
    $(OBJ_DIR)\ttopbar.obj \
@@ -470,15 +465,9 @@ MACRO_LIB_OBJS = \
    $(OBJ_DIR)\macrob.obj \
    $(OBJ_DIR)\macroc.obj
 
-!if ( "$(HB_LEX)"=="SIMPLEX" )
 MACRO_LIB_OBJS = \
    $(MACRO_LIB_OBJS) \
    $(OBJ_DIR)\macroslx.obj
-!else
-MACRO_LIB_OBJS = \
-   $(MACRO_LIB_OBJS) \
-   $(OBJ_DIR)\macrol.obj
-!endif
 
 #
 # RDD.LIB rules
@@ -901,8 +890,6 @@ $(HBMAKE_EXE) : \
 # HARBOUR.EXE rules
 #
 
-!if ( "$(HB_LEX)"=="SIMPLEX" )
-
 $(HARBOUR_EXE) : \
    $(COMPILER_DIR)\harbour.c \
    $(OBJ_DIR)\harboury.c \
@@ -925,33 +912,6 @@ $(HARBOUR_EXE) : \
    -$(ECHO) > $(OBJ_DIR)\unistd.h
    $(CC) $(CFLAGS) -I$(OBJ_DIR) -Fo$(OBJ_DIR)\ -W3 $** -o $(HARBOUR_EXE) /link $(LDFLAGS) $(PP_LIB) $(COMMON_LIB)
    -$(DEL) $(OBJ_DIR)\unistd.h
-
-!else
-
-$(HARBOUR_EXE) : \
-   $(COMPILER_DIR)\harbour.c \
-   $(OBJ_DIR)\harboury.c \
-   $(OBJ_DIR)\harbourl.c \
-   $(COMPILER_DIR)\cmdcheck.c \
-   $(COMPILER_DIR)\hbusage.c \
-   $(COMPILER_DIR)\hbident.c \
-   $(COMPILER_DIR)\hbpcode.c \
-   $(COMPILER_DIR)\hbfix.c \
-   $(COMPILER_DIR)\hbfunchk.c \
-   $(COMPILER_DIR)\hbgenerr.c \
-   $(COMPILER_DIR)\genobj32.c \
-   $(COMPILER_DIR)\genc.c \
-   $(COMPILER_DIR)\gencobj.c \
-   $(COMPILER_DIR)\genhrb.c \
-   $(COMPILER_DIR)\genjava.c \
-   $(COMPILER_DIR)\expropta.c \
-   $(COMPILER_DIR)\exproptb.c \
-   $(COMPILER_DIR)\exproptc.c
-   -$(ECHO) > $(OBJ_DIR)\unistd.h
-   $(CC) $(CFLAGS) -I$(OBJ_DIR) -Fo$(OBJ_DIR)\ -W3 $** -o $(HARBOUR_EXE) /link $(LDFLAGS) $(PP_LIB) $(COMMON_LIB)
-   -$(DEL) $(OBJ_DIR)\unistd.h
-
-!endif
 
 #
 # Library dependencies and build rules
@@ -1009,58 +969,23 @@ $(GTDOS_LIB) : $(GTDOS_LIB_OBJS)
 # HARBOUR.EXE dependencies
 #
 
-!if ( "$(HB_LEX)"=="SIMPLEX" )
-
 $(OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.sly
    bison -d --no-line -o$@ $**
 
 $(OBJ_DIR)\hbslex.obj : $(COMPILER_DIR)\hbslex.c
    $(CC) $(CLIBFLAGS) -I$(OBJ_DIR) -W3 -Fo$@ $**
 
-!else
-
-$(OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.y
-   bison -d --no-line -o$(OBJ_DIR)\harboury.c $(COMPILER_DIR)\harbour.y
-
-$(OBJ_DIR)\harbourl.c : $(COMPILER_DIR)\harbour.l
-   flex -i -8 -o$(OBJ_DIR)\harbourl.c $(COMPILER_DIR)\harbour.l
-
-!endif
-
 #
 # MACRO.LIB dependencies
 #
 
-!if ( "$(HB_LEX)"=="SIMPLEX" )
-
 $(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
    bison -p hb_comp -d --no-line $** -o$@
 
-!else
-
-$(OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
-   bison -d --no-line -p hb_comp -o$(OBJ_DIR)\macroy.c $(MACRO_DIR)\macro.y
-
-$(OBJ_DIR)\macrol.c : $(OBJ_DIR)\macroy.c $(MACRO_DIR)\macro.l
-   flex -i -8 -Phb_comp -o$(OBJ_DIR)\macrol.c $(MACRO_DIR)\macro.l
-
-!endif
-
 $(OBJ_DIR)\macroy.obj : $(OBJ_DIR)\macroy.c
    $(CC) $(CLIBFLAGS) -W3 -Fo$@  $**
-
-!if ( "$(HB_LEX)"=="SIMPLEX" )
 
 $(OBJ_DIR)\macroslx.obj : $(MACRO_DIR)\macroslx.c
    -$(ECHO) > $(OBJ_DIR)\unistd.h
    $(CC) $(CLIBFLAGS) -I$(OBJ_DIR) -W3 -Fo$@ $**
    -$(DEL) $(OBJ_DIR)\unistd.h
-
-!else
-
-$(OBJ_DIR)\macrol.obj : $(OBJ_DIR)\macrol.c
-   -$(ECHO) > $(OBJ_DIR)\unistd.h
-   $(CC) $(CLIBFLAGS) -I$(OBJ_DIR) -W3 -Fo$@ $**
-   -$(DEL) $(OBJ_DIR)\unistd.h
-
-!endif

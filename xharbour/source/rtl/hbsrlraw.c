@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.2 2003/02/15 22:26:49 paultucker Exp $
+ * $Id: hbsrlraw.c,v 1.3 2003/02/16 00:00:14 jonnymind Exp $
  */
 
 /*
@@ -78,7 +78,7 @@ HB_FUNC( HB_CREATELEN8 )
    {
       ULONG uRet = (ULONG) hb_parnl( 1 );
       hb_createlen8( ret, uRet );
-      hb_retclen( ret, 8 );
+      hb_retclen( ( char *) ret, 8 );
    }
    else if( ISCHAR(1) )
    {
@@ -86,7 +86,7 @@ HB_FUNC( HB_CREATELEN8 )
       ULONG uRet = (ULONG) hb_parnl( 2 );
       if( pItem->item.asString.length >= 8)
       {
-         hb_createlen8( pItem->item.asString.value, uRet );
+         hb_createlen8( ( BYTE *) pItem->item.asString.value, uRet );
       }
    }
 
@@ -300,7 +300,7 @@ ULONG hb_serialNextRaw( char *cBuf )
 
       case 'A':
          ulData = ulNext = 9;
-         ulCount = hb_getlen8( cBuf + 1 );
+         ulCount = hb_getlen8( ( char *) (cBuf + 1) );
 
          while ( ulCount > 0 )
          {
@@ -346,7 +346,7 @@ HB_FUNC( HB_DESERIALBEGIN )
    cBuf = (BYTE *) hb_xgrab( pItem->item.asString.length + 8 );
    hb_createlen8( cBuf, 9 );
    memcpy( cBuf+8, pItem->item.asString.value, pItem->item.asString.length );
-   hb_retclenAdoptRaw( cBuf, 8 + pItem->item.asString.length );
+   hb_retclenAdoptRaw( cBuf, ( BYTE *) (8 + pItem->item.asString.length ) );
 
 }
 
@@ -360,5 +360,5 @@ HB_FUNC( HB_DESERIALRESET )
       hb_ret();
       return;
    }
-   hb_createlen8( pItem->item.asString.value, 9 );
+   hb_createlen8( ( BYTE *) pItem->item.asString.value, 9 );
 }
