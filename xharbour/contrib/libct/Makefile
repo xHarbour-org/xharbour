@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2003/06/15 13:11:58 druzus Exp $
+# $Id: Makefile,v 1.5 2003/06/17 00:54:33 druzus Exp $
 #
 
 ROOT = ../../
@@ -36,6 +36,7 @@ C_SOURCES = \
 	ctstr.c \
 	ctchksum.c \
 	ctcrypt.c \
+	dbftools.c \
 	exponent.c \
 	files.c \
 	finan.c \

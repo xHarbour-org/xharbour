@@ -1,12 +1,11 @@
 #
-# $Id: Makefile,v 1.1 2003/04/14 16:09:11 lculik Exp $
+# $Id: Makefile,v 1.2 2003/06/06 00:56:55 lculik Exp $
 #
 
 ROOT = ../../
 
 C_SOURCES=\
 	dates2.c \
-	dbftools.c \
 	hb_f.c \
 	mathx.c \
 	strfmt.c \
