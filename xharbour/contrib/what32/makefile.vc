@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.5 2002/11/06 05:11:01 paultucker Exp $
+# $Id: makefile.vc,v 1.6 2003/02/12 02:16:39 paultucker Exp $
 #
 
 # File:     makefile.vc
@@ -33,7 +33,7 @@ MK_FLAGS = $(MAKEFLAGS: =)
 
 #-- HARBOUR COMPILER ----
 hbc      =$(HBR_DIR)\BIN\harbour
-hbcflags =-n -w -es2 -i$(WH_DIR)\include;$(HBR_DIR)\include
+hbcflags =-n -w -es2 -q0 -i$(WH_DIR)\include;$(HBR_DIR)\include
 
 #-- C COMPILER ----------
 CC       =cl
