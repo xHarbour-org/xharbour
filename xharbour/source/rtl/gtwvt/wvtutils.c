@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.4 2004/06/06 11:33:21 lf_sfnet Exp $
+ * $Id: wvtutils.c,v 1.5 2004/06/10 21:43:19 peterrees Exp $
  */
 
 /*
@@ -780,6 +780,11 @@ HB_FUNC( WVT_SETMENUKEYEVENT )
   }
 
   hb_retni( hb_wvt_gtSetMenuKeyEvent( iEvent ) ) ;
+}
+
+HB_FUNC( WVT_DRAWMENUBAR )
+{
+  DrawMenuBar( _s->hWnd ) ;
 }
 
 //-------------------------------------------------------------------//
