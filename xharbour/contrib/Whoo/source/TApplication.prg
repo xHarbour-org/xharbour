@@ -1,5 +1,5 @@
-
-// WHOO.LIB
+// Augusto Infante
+// Whoo.lib
 
 
 GLOBAL oAppl

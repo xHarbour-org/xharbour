@@ -1,5 +1,5 @@
-
-// WHOO.LIB
+// Augusto Infante
+// Whoo.lib
 
 #Include "windows.ch"
 #Include "statbar.ch"

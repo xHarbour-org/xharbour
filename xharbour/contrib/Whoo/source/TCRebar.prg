@@ -1,5 +1,5 @@
-
-// WHOO.LIB
+// Augusto Infante - Andrew Wos
+// Whoo.lib
 
 #Include "windows.ch"
 #include "hbclass.ch"

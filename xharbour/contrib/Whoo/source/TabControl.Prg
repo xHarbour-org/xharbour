@@ -1,3 +1,6 @@
+// Augusto Infante
+// Whoo.lib
+
 #Include "windows.ch"
 #include "hbclass.ch"
 #Include 'debug.ch'

@@ -1,5 +1,5 @@
-
-// WHOO.LIB
+// Augusto Infante - Andrew Wos
+// Whoo.lib
 
 #define TPM_LEFTBUTTON        0
 #define TPM_CENTERALIGN       4
