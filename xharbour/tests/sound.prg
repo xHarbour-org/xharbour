@@ -1,10 +1,15 @@
 /*
- * $Id: sound.prg,v 1.1 1999/10/04 18:46:31 vszel Exp $
+ * $Id: sound.prg,v 1.1.1.1 2001/12/21 10:46:26 ronpinkas Exp $
  */
 
 function main()
 local start := seconds(), stop
    qout( "start   ", start )
+/*
+   According to the Clipper NG, the duration in ticks is truncated to the
+   interger portion  ... Depending on the platform, xHarbour allows a finer
+   resolution, but the minimum is 1 tick (for compatibility)
+ */
    tone( 440, 9.1 )
    tone( 880, 9.1 )
    tone( 440, 9.1 )
