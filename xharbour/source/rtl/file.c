@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.5 2003/03/05 23:56:16 jonnymind Exp $
+ * $Id: file.c,v 1.6 2003/03/07 11:32:03 jonnymind Exp $
  */
 
 /*
@@ -52,7 +52,6 @@
 
 #include "hbapi.h"
 #include "hbapifs.h"
-
 BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
 {
    PHB_FFIND ffind;
@@ -61,6 +60,16 @@ BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
 
    if( ( ffind = hb_fsFindFirst( ( char * ) pFilename, HB_FA_ALL ) ) != NULL )
    {
+	
+	#ifdef HB_OS_LINUX
+	   if (( ffind->attr & HB_FA_DIRECTORY ) == 16 )
+		{
+         hb_fsFindClose( ffind );	
+         hb_xfree(pFilename);
+         hb_fsSetError( 0 );	
+		   return FALSE;
+		}
+	#endif		
       hb_fsFindClose( ffind );
       hb_xfree(pFilename);
       hb_fsSetError( 0 );

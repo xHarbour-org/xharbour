@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1846 2003/12/11 05:09:24 andijahja Exp $
+ * $Id: ChangeLog,v 1.1847 2003/12/11 09:02:00 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-11 08:30 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * source/rtl/file.c
+    ! Fixed clipper behavior on File function.
+	   On clipper file(Directory) return false while in linux was returning true
+		 
 2003-12-11 16:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/filesys.c
     * translate EBADF as 6 for MSVC for Clipper compatibility.
