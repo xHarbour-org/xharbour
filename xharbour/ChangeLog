@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1908 2003/12/20 03:13:49 maurifull Exp $
+ * $Id: ChangeLog,v 1.1909 2003/12/20 10:57:26 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-20 12:08 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rtl/net.c
+    * added a trick to fix NETNAME() with OpenWatcom 1.1 DOS
+    a better solution is welcome
 
 2003-12-20 11:30 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/vm/cmdarg.c

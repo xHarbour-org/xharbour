@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.5 2003/11/16 00:13:24 likewolf Exp $
+ * $Id: net.c,v 1.6 2003/11/16 00:58:33 likewolf Exp $
  */
 
 /*
@@ -116,6 +116,12 @@ HB_FUNC( NETNAME )
 
          hb_retcAdopt( pszValue );
       }
+   #elif defined(__WATCOMC__)
+
+         char * pszValue; 
+         pszValue = hb_getenv( "COMPUTERNAME" );
+         
+         hb_retcAdopt( pszValue );
    #else
       {
          char szValue[ 16 ];
