@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.30 2004/03/24 08:02:06 brianhays Exp $
+ * $Id: adsfunc.c,v 1.31 2004/03/26 21:57:01 ronpinkas Exp $
  */
 
 /*
@@ -1757,9 +1757,9 @@ HB_FUNC( ADSGETNUMACTIVELINKS )         // requires 6.2 !
 HB_FUNC( ADSDDADDTABLE )
 {
    UNSIGNED32 ulRetVal;
-   UNSIGNED8 *pTableName     = hb_parcx( 1 );
-   UNSIGNED8 *pTableFileName = hb_parcx( 2 );
-   UNSIGNED8 *pTableIndexFileName = hb_parcx( 3 );
+   UNSIGNED8 *pTableName     = (UNSIGNED8 *) hb_parcx( 1 );
+   UNSIGNED8 *pTableFileName = (UNSIGNED8 *) hb_parcx( 2 );
+   UNSIGNED8 *pTableIndexFileName = (UNSIGNED8 *) hb_parcx( 3 );
 
    ulRetVal= AdsDDAddTable( adsConnectHandle, pTableName, pTableFileName, adsFileType, adsCharType, pTableIndexFileName, NULL);
 
@@ -1777,8 +1777,8 @@ HB_FUNC( ADSDDADDTABLE )
 HB_FUNC( ADSDDADDUSERTOGROUP )
 {
    UNSIGNED32 ulRetVal;
-   UNSIGNED8 *pGroup = hb_parcx( 1 );
-   UNSIGNED8 *pName  = hb_parcx( 2 );
+   UNSIGNED8 *pGroup = (UNSIGNED8 *) hb_parcx( 1 );
+   UNSIGNED8 *pName  = (UNSIGNED8 *) hb_parcx( 2 );
 
    ulRetVal = AdsDDAddUserToGroup( adsConnectHandle,
                                    pGroup,
@@ -1810,10 +1810,10 @@ HB_FUNC( ADSCONNECT60 )
 {
 
    UNSIGNED32 ulRetVal ;
-   UNSIGNED8  *pucServerPath = hb_parcx( 1 );
+   UNSIGNED8  *pucServerPath = (UNSIGNED8  *) hb_parcx( 1 );
    UNSIGNED16 usServerTypes  = hb_parnl( 2 );
-   UNSIGNED8  *pucUserName   = ISCHAR( 3 ) ? hb_parcx( 3 ) : NULL ;
-   UNSIGNED8  *pucPassword   = ISCHAR( 4 ) ? hb_parcx( 4 ) : NULL ;
+   UNSIGNED8  *pucUserName   = ISCHAR( 3 ) ? (UNSIGNED8  *) hb_parcx( 3 ) : NULL ;
+   UNSIGNED8  *pucPassword   = ISCHAR( 4 ) ? (UNSIGNED8  *) hb_parcx( 4 ) : NULL ;
    UNSIGNED32 ulOptions      = ISNUM( 5 ) ? hb_parnl( 5 ) : ADS_DEFAULT ;
 
    ulRetVal = AdsConnect60( pucServerPath,
@@ -1837,9 +1837,9 @@ HB_FUNC( ADSCONNECT60 )
 HB_FUNC( ADSDDCREATE )
 {
    UNSIGNED32 ulRetVal;
-   UNSIGNED8  *pucDictionaryPath = hb_parcx( 1 ) ;
+   UNSIGNED8  *pucDictionaryPath = (UNSIGNED8  *) hb_parcx( 1 ) ;
    UNSIGNED16 usEncrypt          = ISNUM(2) ? hb_parnl( 0 ) : 0 ;
-   UNSIGNED8  *pucDescription    = ISCHAR( 3 ) ? hb_parcx( 3 ) : NULL ;
+   UNSIGNED8  *pucDescription    = ISCHAR( 3 ) ? (UNSIGNED8  *) hb_parcx( 3 ) : NULL ;
 
    ulRetVal = AdsDDCreate( ( UNSIGNED8 *)pucDictionaryPath,
                            usEncrypt,
@@ -1861,10 +1861,10 @@ HB_FUNC( ADSDDCREATE )
 HB_FUNC( ADSDDCREATEUSER )
 {
     UNSIGNED32 ulRetVal;
-    UNSIGNED8 *pucGroupName     = ISCHAR(1) ? hb_parcx(1) : NULL;
-    UNSIGNED8 *pucUserName      = ISCHAR(2) ? hb_parcx(2) : NULL;
-    UNSIGNED8 *pucPassword      = ISCHAR(3) ? hb_parcx(3) : NULL;
-    UNSIGNED8 *pucDescription   = ISCHAR(4) ? hb_parcx(4) : NULL;
+    UNSIGNED8 *pucGroupName     = ISCHAR(1) ? (UNSIGNED8 *) hb_parcx(1) : NULL;
+    UNSIGNED8 *pucUserName      = ISCHAR(2) ? (UNSIGNED8 *) hb_parcx(2) : NULL;
+    UNSIGNED8 *pucPassword      = ISCHAR(3) ? (UNSIGNED8 *) hb_parcx(3) : NULL;
+    UNSIGNED8 *pucDescription   = ISCHAR(4) ? (UNSIGNED8 *) hb_parcx(4) : NULL;
  	ulRetVal=AdsDDCreateUser(adsConnectHandle, pucGroupName,
  	                         pucUserName, pucPassword, pucDescription );
     hb_retl( ulRetVal == AE_SUCCESS);
@@ -1923,8 +1923,8 @@ HB_FUNC( ADSDDGETDATABASEPROPERTY )
 HB_FUNC( ADSDDSETDATABASEPROPERTY )
 {
 
-   char * szProperty;
-   UNSIGNED16 ulLength;
+   // char * szProperty;
+   // UNSIGNED16 ulLength;
    UNSIGNED32 ulRetVal;
    UNSIGNED16 ulBuffer;
    UNSIGNED16 ulProperty = ( UNSIGNED16 ) hb_parni( 1 );
@@ -1974,9 +1974,9 @@ UNSIGNED32 ENTRYPOINT AdsDDGetUserProperty( ADSHANDLE  hObject,
 HB_FUNC( ADSDDGETUSERPROPERTY )
 {
    UNSIGNED32 ulRetVal;
-   UNSIGNED8  *pucUserName      = hb_parcx(1);
-   UNSIGNED16 usPropertyID  	= hb_parni(2);
-   UNSIGNED8  *pvProperty       = hb_parcx(3);
+   UNSIGNED8  *pucUserName      = (UNSIGNED8  *) hb_parcx(1);
+   UNSIGNED16 usPropertyID      = hb_parni(2);
+   UNSIGNED8  *pvProperty       = (UNSIGNED8  *) hb_parcx(3);
    UNSIGNED16 usPropertyLen     = hb_parni(4);
    ulRetVal = AdsDDGetUserProperty( adsConnectHandle, pucUserName, usPropertyID,
                                     pvProperty, &usPropertyLen );
@@ -2000,13 +2000,13 @@ HB_FUNC( ADSTESTLOGIN )
 {
 
    UNSIGNED32 ulRetVal ;
-   UNSIGNED8  *pucServerPath = hb_parcx( 1 );
+   UNSIGNED8  *pucServerPath = (UNSIGNED8  *) hb_parcx( 1 );
    UNSIGNED16 usServerTypes  = hb_parnl( 2 );
-   UNSIGNED8  *pucUserName   = ISCHAR( 3 ) ? hb_parcx( 3 ) : NULL ;
-   UNSIGNED8  *pucPassword   = ISCHAR( 4 ) ? hb_parcx( 4 ) : NULL ;
+   UNSIGNED8  *pucUserName   = ISCHAR( 3 ) ? (UNSIGNED8  *) hb_parcx( 3 ) : NULL ;
+   UNSIGNED8  *pucPassword   = ISCHAR( 4 ) ? (UNSIGNED8  *) hb_parcx( 4 ) : NULL ;
    UNSIGNED32 ulOptions      = ISNUM( 5 ) ? hb_parnl( 5 ) : ADS_DEFAULT ;
    UNSIGNED16 usPropertyID   = ISNUM( 6 ) ? hb_parni( 6 ) : 0;
-   UNSIGNED8  *pvProperty    = ISCHAR( 7 ) ? hb_parcx( 7 ) : NULL ;
+   UNSIGNED8  *pvProperty    = ISCHAR( 7 ) ? (UNSIGNED8  *) hb_parcx( 7 ) : NULL ;
    UNSIGNED16 usPropertyLen  = ISNUM( 8 ) ? hb_parni( 8 ) : 0;
    ADSHANDLE  adsTestHandle;
 
@@ -2046,10 +2046,10 @@ HB_FUNC( ADSRESTRUCTURETABLE )
    //adsFileType ADS_DEFAULT, ADS_ADT, ADS_NTX and ADS_CDX
 
    UNSIGNED32 ulRetVal;
-   UNSIGNED8 *pTableName      = hb_parcx( 1 );
-   UNSIGNED8 *pucAddFields    = hb_parcx( 2 );
-   UNSIGNED8 *pucDeleteFields = hb_parcx( 3 );
-   UNSIGNED8 *pucChangeFields = hb_parcx( 4 );
+   UNSIGNED8 *pTableName      = (UNSIGNED8 *) hb_parcx( 1 );
+   UNSIGNED8 *pucAddFields    = (UNSIGNED8 *) hb_parcx( 2 );
+   UNSIGNED8 *pucDeleteFields = (UNSIGNED8 *) hb_parcx( 3 );
+   UNSIGNED8 *pucChangeFields = (UNSIGNED8 *) hb_parcx( 4 );
 
 
    ulRetVal =  AdsRestructureTable( adsConnectHandle, pTableName, NULL,

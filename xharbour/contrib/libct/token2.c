@@ -1,5 +1,5 @@
 /*
- * $Id: token2.c,v 1.2 2001/11/01 17:19:26 mbirdyg Exp $
+ * $Id: token2.c,v 1.1 2003/03/04 21:04:54 lculik Exp $
  */
 
 /*
@@ -108,17 +108,19 @@ static TOKEN_ENVIRONMENT sTokEnvNew (void)
 /* add a tokenizing position to a token environment                     */
 /* -------------------------------------------------------------------- */
 
-static int sTokEnvAddPos (TOKEN_ENVIRONMENT env, TOKEN_POSITION *pPos)
+static int sTokEnvAddPos (TOKEN_ENVIRONMENT *penv, TOKEN_POSITION *pPos)
 {
 
   size_t index;
+  TOKEN_ENVIRONMENT env = *penv;
 
   /* new memory needed ? */
   if (env[0].sStartPos == env[0].sEndPos)
   {
-    env = (TOKEN_ENVIRONMENT)hb_xrealloc (env,
+    *penv = (TOKEN_ENVIRONMENT)hb_xrealloc (env,
                                           sizeof (TOKEN_POSITION)*
                                           (2+env[0].sEndPos+TOKEN_ENVIRONMENT_STEP));
+    env = *penv;
     if (env == NULL)
     {
       return (0);
@@ -470,7 +472,7 @@ HB_FUNC (TOKENINIT)
         sTokenPosition.sEndPos = pc-pcString;
       }
 
-      if (!sTokEnvAddPos (sTokenEnvironment, &sTokenPosition))
+      if (!sTokEnvAddPos (&sTokenEnvironment, &sTokenPosition))
       {
         int iArgErrorMode = ct_getargerrormode();
         if (iArgErrorMode != CT_ARGERR_IGNORE)
