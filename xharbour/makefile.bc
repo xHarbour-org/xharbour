@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.28 2003/01/27 04:46:00 walito Exp $
+# $Id: makefile.bc,v 1.29 2003/01/30 00:02:46 jonnymind Exp $
 #
 
 #
@@ -1564,6 +1564,10 @@ $(RTL_OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hardcr.obj : $(RTL_DIR)\hardcr.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
+
+$(RTL_OBJ_DIR)\hbrandom.obj : $(RTL_DIR)\hbrandom.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 

@@ -1,6 +1,26 @@
+# xHarbour project
+# Demo makefile for GNU MAKE in tests/ subdir
+#
+# $Id$
+#
+# Copyright 2003 Giancarlo Niccolai
+#
+# To create a binary file from a single .prg, just
+# launch 
+#    make <target_file>
+#
+# where <target_file> is the name of the binary file
+# to be generated. Examples:
+# 
+#    make test  --->to compile and link test from test.prg
+#    make test.exe ---> under windows
+#
+# Remember to set HB_MT=MT if you want to compile
+# programs using Multithreading aware libs
+#
 
 ifeq ($(HB_MT),MT)
-MTLIBS= -lvmmt -lrtlmt -lrddmt -lrtlmt -lvmmt -ldbfntxmt -ldbfcdxmt 
+MTLIBS= -lvmmt -lrtlmt -lrddmt -lrtlmt -lvmmt -ldbfntxmt -ldbfcdxmt
 ifeq ($(HB_ARCHITECTURE),linux)
 MTLIBS+=-lpthread
 endif
@@ -9,7 +29,11 @@ else
 endif
 
 ifeq ($(HB_ARCHITECTURE),linux)
-GT_LIBS=-lgtsln -lslang -lgpm 
+   ifeq ($(HB_GT_LIB),gtQTc)
+      GT_LIBS=-lgtQTc -lqt-mt -L/usr/lib/qt3/lib
+   else
+      GT_LIBS=-lgtsln -lslang -lgpm
+   endif
 EXE_EXT=
 else
   ifeq ($(HB_ARCHITECTURE),darwin)
@@ -31,11 +55,11 @@ endif
 %.c: %.prg
 	harbour -I$(HB_INC_INSTALL) $(PRG_USR) -n $<
 %.o: %.c
-		gcc -I$(HB_INC_INSTALL) -c -o $@ $< 
-	
+		gcc -I$(HB_INC_INSTALL) -c -o $@ $<
+
 
 %$(EXE_EXT): %.o
 	gcc -o $@ $< $(C_USR) -I$(HB_INC_INSTALL) -L$(HB_LIB_INSTALL) \
 		-ldebug $(MTLIBS) -lmacro  -lpp  -llang  -lcommon\
 		$(GT_LIBS) -lm\
-   
+

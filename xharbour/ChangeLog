@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.658 2003/01/29 21:35:59 lculik Exp $
+ * $Id: ChangeLog,v 1.659 2003/01/30 00:32:08 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,51 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-30 01:41 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * makefile.bc
+  * makefile.nt
+  * makefile.vc
+  * source/rtl/Makefile
+  * source/rtl/hbrandom.c
+    + Added HB_Random() func:
+      HB_Random()--> nVar ( 0 <= nVar <= 1 )
+      HB_Random( nCeil )--> nVar ( 0 <= nVar <= nCeil )
+      ( or if nCeil < 0:  nCeil <= nVar <= 0 )
+      HB_Random( nFloor, nCeil )--> nVar ( nFloor <= nVar <= nCeil )
+      ( the smaller var is taken as floor).
+
+  * tests/random.prg
+    + Added a demo of the random function
+
+  * source/rtl/gtQTc/filenew.xpm
+  * source/rtl/gtQTc/fileopen.xpm
+  * source/rtl/gtQTc/filesave.xpm
+  * source/rtl/gtQTc/gtQTc.cpp
+  * source/rtl/gtQTc/gtQTc.h
+  * source/rtl/gtQTc/mouseQTc.c
+  * source/rtl/gtQTc/qtconsole.cpp
+  * source/rtl/gtQTc/qtconsole.h
+  * source/rtl/gtQTc/qtconsoledoc.cpp
+  * source/rtl/gtQTc/qtconsoledoc.h
+  * source/rtl/gtQTc/qtconsoleview.cpp
+  * source/rtl/gtQTc/qtconsoleview.h
+    + Added gtQTc: a frame buffer (terminal emulator) in a window
+      using GPL QT libraries. This is HIGLY experimental and in
+      the first developement phases. I need the help of the whole
+      community (at least the linux part) here.
+
+  * config/linux/global.cf
+    + added experimental support for gtQTc that is compiled only
+      on linux, if HB_GT_LIB=gtQTc (respect case!)
+
+  * tests/Makefile
+    ! Makefile has now a comment and it is capable to compile examples
+      in gtQT mode if needed.
+
+  * tests/qttest.prg
+    + Added a test of a gtQTc complaint application.
+
 2003-01-29 22:35 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/gtsln/mousesln.c
     ! Some changes to work properly on xTerm and Remote terminals(Thanks for Marek for Some Help)

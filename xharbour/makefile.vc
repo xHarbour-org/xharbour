@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.28 2003/01/05 06:50:33 ronpinkas Exp $
+# $Id: makefile.vc,v 1.29 2003/01/27 04:46:00 walito Exp $
 #
 
 #
@@ -269,6 +269,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\gtapiu.obj \
    $(OBJ_DIR)\gx.obj \
    $(OBJ_DIR)\hardcr.obj \
+   $(OBJ_DIR)\hbrandom.obj \
    $(OBJ_DIR)\idle.obj \
    $(OBJ_DIR)\inkey.obj \
    $(OBJ_DIR)\is.obj \
