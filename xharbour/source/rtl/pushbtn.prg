@@ -1,5 +1,5 @@
 /*
- * $Id: pushbtn.prg,v 1.4 2003/02/20 15:51:09 lculik Exp $
+ * $Id: pushbtn.prg,v 1.5 2003/02/20 17:24:35 lculik Exp $
  */
 
 /*
@@ -345,12 +345,12 @@ FUNCTION _PUSHBUTT_( cCaption, cMessage, cColor, bFBlock, bSBlock, cStyle )
    oPushButton := Pushbutton( Row(), Col(), cCaption )
 
    IF ( !( ISNIL( oPushButton ) ) )
-      oPushButton:Caption   := IIF(( cCaption != Nil, cCaption, )
-      oPushButton:ColorSpec := IIF(( cColor != Nil, cColor, )
-      oPushButton:Message   := IIF(( cMessage != Nil, cMessage, )
-      oPushButton:Style     := IIF(( cStyle != Nil, cStyle, )
-      oPushButton:fBlock    := IIF(( bFBlock != Nil, bFBlock, )
-      oPushButton:sBlock    := IIF(( bSBlock != Nil, bSBlock, )
+      oPushButton:Caption   := IIF( cCaption != Nil, cCaption, )
+      oPushButton:ColorSpec := IIF( cColor != Nil, cColor, )
+      oPushButton:Message   := IIF( cMessage != Nil, cMessage, )
+      oPushButton:Style     := IIF( cStyle != Nil, cStyle, )
+      oPushButton:fBlock    := IIF( bFBlock != Nil, bFBlock, )
+      oPushButton:sBlock    := IIF( bSBlock != Nil, bSBlock, )
    ENDIF
 
 RETURN oPushButton
