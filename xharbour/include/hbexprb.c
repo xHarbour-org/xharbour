@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.21 2002/05/14 16:43:52 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.22 2002/05/16 20:06:27 ronpinkas Exp $
  */
 
 /*
@@ -1039,7 +1039,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             {
                if( pSelf->value.asList.pIndex->ExprType == HB_ET_FUNCALL &&
                    pSelf->value.asList.pIndex->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME &&
-                   strncmp( pSelf->value.asList.pIndex->value.asFunCall.pFunName->value.asSymbol, "LEN", 3 ) == 0 )
+                   strcmp( pSelf->value.asList.pIndex->value.asFunCall.pFunName->value.asSymbol, "LEN" ) == 0 )
 
                {
                   USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asList.pIndex->value.asFunCall.pParms );
@@ -1049,7 +1049,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                      if( pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_VARIABLE ||
                          pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_VARREF )
                      {
-                        // No need to use strncmp() because all identifiers share their values.
+                        // No need to use strcmp() because all identifiers share their values.
                         if( pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->value.asSymbol ==
                             pSelf->value.asList.pExprList->value.asSymbol )
                         {
@@ -1095,7 +1095,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             {
                if( pSelf->value.asList.pIndex->ExprType == HB_ET_FUNCALL &&
                    pSelf->value.asList.pIndex->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME &&
-                   strncmp( pSelf->value.asList.pIndex->value.asFunCall.pFunName->value.asSymbol, "LEN", 3 ) == 0 )
+                   strcmp( pSelf->value.asList.pIndex->value.asFunCall.pFunName->value.asSymbol, "LEN" ) == 0 )
 
                {
                   USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asList.pIndex->value.asFunCall.pParms );
@@ -1105,7 +1105,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                      if( pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_VARIABLE ||
                          pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_VARREF )
                      {
-                        // No need to use strncmp() because all identifiers share their values.
+                        // No need to use strcmp() because all identifiers share their values.
                         if( pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->value.asSymbol ==
                             pSelf->value.asList.pExprList->value.asSymbol )
                         {
@@ -1354,7 +1354,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
             // SubStr( Str, n, 1 ) => Str[n]
             if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME )
             {
-               if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBSTR", 6 ) == 0 )
+               if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBSTR" ) == 0 )
                {
                   USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
 
@@ -1373,7 +1373,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   }
                }
                // Right( Str, 1 ) => Str[-1]
-               else if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGHT", 5 ) == 0 )
+               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGHT" ) == 0 )
                {
                   USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
 
@@ -1392,7 +1392,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   }
                }
                // aTail( Array ) => Array[-1]
-               else if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "ATAIL", 5 ) == 0 )
+               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "ATAIL" ) == 0 )
                {
                   USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
 
@@ -1428,47 +1428,44 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
          #else
 
-            BYTE   bPcode = 0;
-
-            if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "LEFT", 4 ) == 0 )
+            if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME )
             {
-               bPcode = HB_P_LEFT;
-            }
-            else if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGH", 4 ) == 0 )
-            {
-               bPcode = HB_P_RIGHT;
-            }
+               BYTE   bPcode = 0;
 
-            if( bPcode )
-            {
-               usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
-
-               if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+               if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "LEFT" ) == 0 )
                {
-                  --usCount;
+                  bPcode = HB_P_LEFT;
+               }
+               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGHT" ) == 0 )
+               {
+                  bPcode = HB_P_RIGHT;
                }
 
-               if( usCount == 2 )
+               if( bPcode )
                {
-                  HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
-                  HB_EXPR_PTR pLen    = pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext;
+                  usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
 
-                  if( pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG &&
-                      pLen->value.asNum.lVal >= 0 && pLen->value.asNum.lVal <= 65535 )
+                  if( usCount == 2 )
                   {
-                     if( pString->ExprType == HB_ET_VARREF )
+                     HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
+                     HB_EXPR_PTR pLen    = pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext;
+
+                     if( pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG &&
+                         pLen->value.asNum.lVal >= 0 && pLen->value.asNum.lVal <= 65535 )
                      {
-                        pString->ExprType = HB_ET_VARIABLE ;
+                        if( pString->ExprType == HB_ET_VARREF )
+                        {
+                           pString->ExprType = HB_ET_VARIABLE ;
+                        }
+                        HB_EXPR_USE( pString, HB_EA_PUSH_PCODE );
+
+                        hb_compGenPCode3( bPcode, HB_LOBYTE( pLen->value.asNum.lVal ), HB_HIBYTE( pLen->value.asNum.lVal ), (BOOL) 0 );
+
+                        break;
                      }
-                     HB_EXPR_USE( pString, HB_EA_PUSH_PCODE );
-
-                     hb_compGenPCode3( bPcode, HB_LOBYTE( pLen->value.asNum.lVal ), HB_HIBYTE( pLen->value.asNum.lVal ), (BOOL) 0 );
-
-                     break;
                   }
                }
             }
-
          #endif
 
             HB_EXPR_USE( pSelf->value.asFunCall.pFunName, HB_EA_PUSH_PCODE );
@@ -1480,8 +1477,12 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                 * no WITH keyword)
                 */
                usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
+
                if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+               {
                   --usCount;
+               }
+
                if( usCount )
                {
                   if( HB_SUPPORT_XBASE )
@@ -1502,12 +1503,18 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                }
             }
             else
+            {
                usCount = 0;
+            }
 
             if( usCount > 255 )
+            {
                HB_EXPR_GENPCODE3( hb_compGenPCode3, HB_P_FUNCTION, HB_LOBYTE( usCount ), HB_HIBYTE( usCount ), ( BOOL ) 1 );
+            }
             else
+            {
                HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_FUNCTIONSHORT, ( BYTE ) usCount, ( BOOL ) 1 );
+            }
          }
          break;
 
@@ -1525,35 +1532,22 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
          #else
 
-            if( strncmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "LEFT", 4 ) == 0 )
+            if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME )
             {
-               usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
-
-               if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+               if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "AT" ) == 0 ||
+                   strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "LEFT" ) == 0 ||
+                   strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGHT" ) == 0 ||
+                   strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBSTR" ) == 0 )
                {
-                  --usCount;
-               }
-
-               if( usCount == 2 )
-               {
-
-                  //HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
-                  HB_EXPR_PTR pLen    = pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext;
-
-                  if( pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG &&
-                      pLen->value.asNum.lVal >= 0 && pLen->value.asNum.lVal <= 65535 )
-                  {
-                     /* Nothing to do really!
-                     HB_EXPR_USE( pString, HB_EA_PUSH_PCODE );
-
-                     hb_compGenPCode3( HB_P_LEFT, HB_LOBYTE( pLen->value.asNum.lVal ), HB_HIBYTE( pLen->value.asNum.lVal ), (BOOL) 0 );
-                     */
-                     break;
-                  }
+                  /* Functions with no side effect as statements! Nothing to do really!
+                  */
+                  hb_compWarnMeaningless( pSelf );
+                  break;
                }
             }
 
          #endif
+
             HB_EXPR_USE( pSelf->value.asFunCall.pFunName, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
 

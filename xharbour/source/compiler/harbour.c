@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.12 2002/05/08 20:28:13 ronpinkas Exp $
+ * $Id: harbour.c,v 1.13 2002/05/09 07:25:33 ronpinkas Exp $
  */
 
 /*
@@ -46,7 +46,55 @@
  *
  */
 
-#include <malloc.h>     /* required for allocating and freeing memory */
+/*
+   Very odd bug with realloc() under MSVC 6 SP5 - Even more strange an Access Violation error
+   on malloc() call sizeof( HB_HASH_ITEM ) (line 52 of hbhash.c) discovered when compiling
+   PP -dMINIGUI, line 2290 of MiniGUI which is:
+
+      Function IsWindowDefined ( FormName )
+
+   harbour.slx line 661:
+
+     yylval.string = hb_compIdentifierNew( yytext, TRUE ); //yytext = "ISWINDOWDEFINED"
+
+   hb_compIdentifierNew line 52 in hbident.c:
+
+      hb_hashTableAdd( s_comp_Identifiers, (void *)szIdent );
+
+   hb_hashTableAdd line 193:
+
+      pItem->next = hb_hashItemNew( ulKey, pValue );
+
+   hb_hashItemNew line 57:
+
+      HB_HASH_ITEM_PTR pItem = (HB_HASH_ITEM_PTR) hb_xgrab( sizeof( HB_HASH_ITEM ) );
+
+   Causes Access Violation Error (memory could not be "written").
+
+   I have replaced hb_xgrab() with direct malloc() call and verified that was the last
+   line to be executed before the GPF (actually broke the line in 2).
+
+   The realloc bug was discoved when compiling MiniGUI.prg line 2486:
+
+     next i
+
+   The realloc() bug is on:
+
+      hb_comp_functions.pLast->pJumps = ( ULONG * ) hb_xrealloc( hb_comp_functions.pLast->pJumps,
+      sizeof( ULONG ) * hb_comp_functions.pLast->iJumps );
+
+   Where hb_comp_functions.pLast->iJumps is 5 - increasing hb_comp_functions.pLast->pJumps from 16
+   to 20 bytes - I verified that hb_comp_functions.pLast->pJumps is valid pointer and was NOT
+   deallocated!
+
+   Also found an MS article describing a bug in realloc() to do with reallocation of small blocks.
+*/
+
+#ifdef _MSC_VER
+   #include <windows.h>
+#else
+   #include <malloc.h>     /* required for allocating and freeing memory */
+#endif
 
 #include "hbcomp.h"
 #include "hbhash.h"
@@ -279,13 +327,17 @@ int isatty( int handle )
 
 void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on failure */
 {
-   void * pMem = malloc( ulSize );
+   #ifdef _MSC_VER
+      void * pMem = HeapAlloc( GetProcessHeap(), 0, ulSize );
+   #else
+      void * pMem = malloc( ulSize );
+   #endif
 
    if( ! pMem )
    {
       char szSize[ 32 ];
 
-      sprintf( szSize, "%li", ulSize );
+      sprintf( szSize, "%ld", ulSize );
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMALLOC, szSize, NULL );
    }
 
@@ -294,12 +346,17 @@ void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on fail
 
 void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 {
-   void * pResult = realloc( pMem, ulSize );
+   #ifdef _MSC_VER
+      void * pResult = HeapReAlloc( GetProcessHeap(), 0, pMem, ulSize );
+   #else
+      void * pResult = realloc( pMem, ulSize );
+   #endif
+
    if( ! pResult )
    {
       char szSize[ 32 ];
 
-      sprintf( szSize, "%li", ulSize );
+      sprintf( szSize, "err# %i %p %lu", errno, pMem, ulSize );
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMREALLOC, szSize, NULL );
    }
 
@@ -309,9 +366,17 @@ void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 void hb_xfree( void * pMem )            /* frees fixed memory */
 {
    if( pMem )
-      free( pMem );
+   {
+      #ifdef _MSC_VER
+         HeapFree( GetProcessHeap(), 0, pMem );
+      #else
+         free( pMem );
+      #endif
+   }
    else
+   {
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMFREE, NULL, NULL );
+   }
 }
 
 void hb_conOutErr( char * pStr, ULONG ulLen )
@@ -2155,6 +2220,7 @@ static void hb_compPrepareOptimize()
    if( hb_comp_functions.pLast->pJumps )
    {
       hb_comp_functions.pLast->pJumps = ( ULONG * ) hb_xrealloc( hb_comp_functions.pLast->pJumps, sizeof( ULONG ) * hb_comp_functions.pLast->iJumps );
+
       hb_comp_functions.pLast->pJumps[ hb_comp_functions.pLast->iJumps - 1 ] = ( ULONG ) ( hb_comp_functions.pLast->lPCodePos - 4 );
    }
    else

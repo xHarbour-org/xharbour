@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.5 2002/04/17 21:19:56 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.6 2002/04/21 01:39:17 ronpinkas Exp $
  */
 
 /*
@@ -696,7 +696,9 @@ HB_EXPR_PTR hb_compExprGenStatement( HB_EXPR_PTR pExpr )
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprGenStatement(%i)", pExpr->ExprType));
 
    pExpr = HB_EXPR_USE( pExpr, HB_EA_REDUCE );
+
    HB_EXPR_USE( pExpr, HB_EA_STATEMENT );
+
    return pExpr;
 }
 

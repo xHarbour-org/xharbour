@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.71 2002/05/16 02:28:38 ronpinkas Exp $
+ * $Id: hvm.c,v 1.72 2002/05/16 02:33:31 ronpinkas Exp $
  */
 
 /*
@@ -5420,7 +5420,7 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pModuleSymbols));
 
    va_start( ap, pModuleSymbols );
-      uiModuleSymbols = va_arg( ap, USHORT );
+      uiModuleSymbols = (USHORT) va_arg( ap, int );
       sModule = va_arg( ap, char * );
 
       if( sModule )

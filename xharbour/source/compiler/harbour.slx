@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.5 2002/04/22 23:09:58 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.6 2002/04/26 06:52:49 ronpinkas Exp $
  */
 
 /*
@@ -550,31 +550,25 @@ int hb_comp_SLX_InterceptAction( int iRet, char *sToken )
    }
 
    #ifdef SHOW_LEX_TOKENS
-      if( iRet == IDENTIFIER )
-         printf( "   IDENTIFIER = \"%s\"\n", yylval.string  );
-      else if( iRet == LITERAL )
-         printf( "   LITERAL = \"%s\"\n", yylval.string  );
-      else if( iRet == MACROVAR )
-         printf( "   MACROVAR = \"%s\"\n", yylval.string  );
-      else if( iRet == MACROTEXT )
-         printf( "   MACROTEXT = \"%s\"\n", yylval.string  );
-      else if( iRet == NUM_INTEGER )
-         printf( "   INTEGER = %i\n", yylval.valInteger.iNumber  );
-      else if( iRet == NUM_LONG )
-         printf( "   INTEGER = %il\n", yylval.valLong.lNumber  );
-      else if( iRet == NUM_DOUBLE )
-         printf( "   DOUBLE = %f\n", yylval.valDouble.dNumber  );
+     //if( hb_comp_iLine > 2489 && hb_comp_iLine < 2493 )
+     {
+     if( iRet == IDENTIFIER )       { printf( "   IDENTIFIER = \"%s\"\n", yylval.string  ); }
+     else if( iRet == LITERAL )     { printf( "   LITERAL = \"%s\"\n", yylval.string  ); }
+     else if( iRet == MACROVAR )    { printf( "   MACROVAR = \"%s\"\n", yylval.string  ); }
+     else if( iRet == MACROTEXT )   { printf( "   MACROTEXT = \"%s\"\n", yylval.string  ); }
+     else if( iRet == NUM_INTEGER ) { printf( "   INTEGER = %i\n", yylval.valInteger.iNumber  ); }
+     else if( iRet == NUM_LONG )    { printf( "   INTEGER = %il\n", yylval.valLong.lNumber  ); }
+     else if( iRet == NUM_DOUBLE )  { printf( "   DOUBLE = %f\n", yylval.valDouble.dNumber  ); }
      else if( iRet < 256 )
      {
-        if( iRet == '\n' || iRet == ';' )
-           printf( "***NEW LINE %i\n", hb_comp_iLine - 1  );
-        else if( iRet == -1 )
-           printf( "!!!<EOF>\n" );
-        else
-           printf( "   DELIMITER = \"%c\"\n", iRet  );
+        if( iRet == '\n' || iRet == ';' ) { printf( "***NEW LINE %i\n", hb_comp_iLine - 1  ); }
+        else if( iRet == -1 )             { printf( "!!!<EOF>\n" ); }
+        else                              { printf( "   DELIMITER = \"%c\"\n", iRet  ); }
      }
-     else
-        printf( "   TOKEN = %i\n", iRet  );
+     else                           { printf( "   TOKEN = %i\n", iRet  ); }
+
+     fflush( stdout );
+     }
    #endif
 
    return iRet;
@@ -676,19 +670,6 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       yylval.string = (char*) hb_xgrab( TOKEN_SIZE );
       yylval.string[0] = 0;
 
-      /* Commented 2001-08-29 - Not really needed!
-      if( iTexts < NUMERALS_PER_LINE )
-      {
-         aTexts[iTexts++] = yylval.string;
-      }
-      else
-      {
-         printf( "Error SLX0002 Too many numerals in line: %i\n", hb_comp_iLine - 1 );
-         hb_comp_iErrorCount++;
-         iTexts = 0;
-      }
-      */
-
       /* Hex Number */
       if( yytext[0] == '0' && yytext[1] == 'X' )
       {
@@ -760,6 +741,9 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    }
 
    DEBUG_INFO( printf(  "Element \"%s\" is %i\n", szToken, iRet ) );
+
+   //if( hb_comp_iLine > 2488 && hb_comp_iLine < 2493 ) { printf( "\nElement %s is %i\n", szToken, iRet ); fflush( stdout ); }
+
    return iRet;
 }
 
@@ -1276,13 +1260,18 @@ int hb_comp_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, BOOL *ptr_bIg
 
 int yy_lex_input( char *buffer, int iBufferSize )
 {
+   //int iLen;
+
    HB_SYMBOL_UNUSED( iBufferSize );
 
-   if( ( hb_comp_iLine % 100 ) == 0 && hb_comp_bQuiet == FALSE )
+   //if( ( hb_comp_iLine % 100 ) == 0 && hb_comp_bQuiet == FALSE )
    {
-      printf( "\r%i", hb_comp_iLine );
+      printf( "\r %i", hb_comp_iLine );
       fflush( stdout );
    }
+
+   //iLen = hb_pp_Internal( hb_comp_bPPO ? hb_comp_yyppo : NULL, buffer );
+   //return iLen;
 
    return hb_pp_Internal( hb_comp_bPPO ? hb_comp_yyppo : NULL, buffer );
 }

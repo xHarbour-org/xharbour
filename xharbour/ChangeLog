@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.220 2002/05/16 02:28:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.221 2002/05/16 20:06:26 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-18 01:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    * Corrected typo in #define hb_itemArrayPut
+
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * source/compiler/expropta.c
+  * source/compiler/exproptb.c
+  * source/compiler/exproptc.c
+    ! Fixed possible GPF when Function Call is a macro.
+    + Added warning on meaningless function call for At() Left() Right() and SubStr()
+      if used as a statement line.
+
+  * source/compiler/simplex.c
+  * source/compiler/harbour.slx
+    * Minor formatting.
+
+  * source/compiler/harbour.c
+    * Changed hb_xgrab() hb_xrealloc() and hb_xfree() to use Heap*() under MSVC.
+      /* This solves strange GPFs - details documented in top of file. */
+
+  * source/compiler/harbour.sly
+    * Minor optimization and formatting.
+
+  * source/vm/hvm.c
+    * Changed parameter to va_arg() from USHORT to int to correct compiler warning.
 
 2002-05-16 13:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c
