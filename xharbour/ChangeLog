@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.371 2002/09/03 00:34:20 lculik Exp $
+ * $Id: ChangeLog,v 1.372 2002/09/04 03:11:18 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-05 18:46 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * include/hbrddcdx.h
+   * source/rdd/dbfcdx/dbfcdx1.c
+   * source/rdd/dbfcdx/dbfcdx1.h
+   * source/rdd/dbfcdx/dbfcdx2.h
+     + added support for creating big indexes
+     hb_cdxSortSwapSavePage, hb_cdxSortSwapFillPage,
+     hb_cdxSortSwapRecurseDict, hb_cdxSortSwapSendWord
+     hb_cdxSortSwapBuildIndex, hb_cdxSortSwapGetNextKey;
+     + added hb_cdxKeyValCompare
+     ! fixed hb_cdxKeyGetItem for numeric keys
+     ! fixed hb_cdxTagExtNodeWrite
+     ! renamed some structs because td was confused
+
 2002-09-04 12:05 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
    * source/rtl/teditot.prg
      ! fixed line splitting when a character is deleted from a line and there is a
