@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4 2002/09/06 15:42:47 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5 2002/09/06 20:04:09 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -111,7 +111,11 @@
       Fixed GetEnvironmentStrings()
       Added FreeEnvironmentStrings() to _WinMisc.c
       Corrected CreateDirectory() in _WinDir.c
+08/09/2002 AJ Wos
+      Corrected return value from SHBrowseForFolder() to return NIL if
+      the dialog is cancelled. (_WinCDlg.c)
 
+    
 
 
 

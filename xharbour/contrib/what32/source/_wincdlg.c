@@ -270,8 +270,11 @@ HB_FUNC( SHBROWSEFORFOLDER )
    BrowseInfo.lpfn = NULL; 
    BrowseInfo.lParam = 0; 
    pidlBrowse = SHBrowseForFolder(&BrowseInfo); 
-   SHGetPathFromIDList(pidlBrowse,lpBuffer);
-   hb_retc(lpBuffer);
+   if ( pidlBrowse )
+   {
+     SHGetPathFromIDList(pidlBrowse,lpBuffer);
+     hb_retc(lpBuffer);
+   }
    hb_xfree( lpBuffer);
 } 
 
