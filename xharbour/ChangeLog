@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1270 2003/07/19 22:12:31 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1271 2003/07/20 17:50:00 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-20 21:57 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/thread.h
+  * source/vm/hvm.c
+  * source/vm/thread.c
+    ! Detangled also the FM sequence that tells that some memory is not
+      unused; under MT, conOut used the thread's stack. Now the main
+      thread stack is kept valid up to the end of the program, even if
+      the items are deleted before fm checks for them bein still alive.
 
 2003-07-20 19:50 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/fm.c

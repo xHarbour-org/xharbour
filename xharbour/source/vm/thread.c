@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.90 2003/07/19 22:08:05 jonnymind Exp $
+* $Id: thread.c,v 1.91 2003/07/20 17:50:03 jonnymind Exp $
 */
 
 /*
@@ -1879,6 +1879,16 @@ void hb_threadExit( void )
    hb_ht_stack = NULL; //signal we are not ready anymore to collect vm stats
    hb_threadDestroyStack( &hb_stack );
 
+   // the main stack still exists, but we must signal it has not items anymore
+   hb_stack.pItems = NULL;
+   hb_stack.wItems = 0;
+}
+
+void hb_threadCloseHandles( void )
+{
+   // Now we destroy the things that makes MT stack to exist,
+   // so, after this one the VM must really quit
+   
    /* Destroyng all shell locks mutexes */
    HB_SHARED_DESTROY( hb_runningStacks );
    HB_CRITICAL_DESTROY( hb_mutexMutex );
