@@ -1,0 +1,655 @@
+
+
+                             XHARBOUR HASH API
+                            -------------------
+
+
+        Giancarlo Niccolai <antispam (at) niccolai /dot/ ws>
+
+
+
+
+STATUS OF THIS DOCUMENT
+=======================
+
+This document is pretty complete, and will change marginally.
+
+
+
+XHARBOUR HASH SYSTEM
+====================
+
+In the past, clipper (and then xharbour) users felt the need to have what
+is called "hash" or "associative array" and that is nowdays provided at
+language level by all the most modern languages: perl, php, python, ruby,
+name it. An associative array is an array that bounds a value (that can
+be of any variable type allowed by the language) to a key (that may be of
+any "orderable" or "distinguishable" variable) in a 1:1 relationship.
+
+An extension has been recently added to add the HASH type as one of the basic
+xharbour type. In other words, hashes are now a rightful type of xharbour.
+They are individuated by the "H" variable type.
+
+There are many philosophies about internal hash management; we have used
+a "ordered insertion, dicotomic search" strategy. More about this will be
+explained in a separate "technical" section.
+
+Hashes, like arrays, can be managed with both a specific API and by language
+constructs. We'll see them in a while.
+
+
+
+
+HASH AWARE PROGRAMMING CONVENTIONS
+==================================
+
+Extending the existing set of conventions, a hash variable should be
+named after the "H" scheme: hList, hEntry, hEmployee etc.
+
+This may clash with file handles, that are often referred with a leading
+"h" even if they are of numeric (n) type, but the context in which hashes
+and files handles are used is so different that confusion should never
+arise.
+
+
+
+XHARBOUR HASH LANGUAGE CONSTRUCTS
+=================================
+
+
+Hash declarator
+---------------
+
+To build an hash, the construct { (kexp) => (vexp) } has been introduced.
+Kexp is a key expression, that is an expression which evalutes to an orderable
+type. Currently, type useable for keys are:
+
+- Numeric (non floating point)
+- Date
+- String
+
+   --------------------------------------------------------------------------
+   * NOTE: strings can contain any character except Chr( 0 ). This limitation
+     may be removed in future, if there is a need for that.
+
+   * NOTE: strings keys are case-sensitive, that is 'KEY' is different from
+     'key'. This can be turned on or off on a per-hash basis with
+     HSetCaseMatch( hHash, .F. ) api call.
+   --------------------------------------------------------------------------
+
+Value expressions may be any Xharbour type, including objects, arrays and
+hashes.
+
+Hash elements may be separated by a comma, like array elements, so that you
+can obtain sequences like { k1 => v1, k2 => v2, ... kn => vn }. Empty hashes
+can be created with the token {=>}.
+
+Examples:
+
+   LOCAL hHash := {=>}   // Builds an empty hash
+   LOCAL hAnother := { 'key a' => 'first value', 12 => { 'a', 'b', 'c'} }
+
+   ---------------------------------------------------------------------
+   * NOTE: Up to date, { => } construct was used by TAssociativeArray()
+     pseudo object declaration. Most of the TAssociativeArray() system
+     has been emulated in hashes, so older program should not need to
+     use it, but if you find any incompatibility in using older program,
+     the inclusion of "assocarr.ch" file will remap {=>} to an
+     associative array class.
+   ----------------------------------------------------------------------
+
+
+Hash accessor
+-------------
+
+The [] is the hash accessor, so that hHash[ xKey ] evalutes to xValue. The
+accessor may be used to retreive an already existing value, to substitute
+an old one or to create a new pair of key/values; this is determined by the
+access context.
+
+If the context is an "assignment", that is when you want to assign something
+to the hash, it is legal both access to existing and unexisting keys. Accessing
+existing keys for assignment will cause the old value to be replaced with the
+new one, while accessing unexisting ones will create a new pair of key/value.
+
+Example:
+
+   // creating an empty hash
+   LOCAL hHash := {=>}
+
+   // Populating the hash:
+   hHash[ 'first key' ]  := 'first value'
+   hHash[ 'second key' ] := 'second value'
+   hHash[ 'third key' ]  := 'third value'
+
+   // Changing the second value:
+   hHash[ 'second key' ] := 'NEW second value'
+
+
+In evaluation context, that is just using the hash value, the key
+must exists before access. Trying to access it with an unexisting
+key rises a BOUND ERROR, like tring to access an array with an index
+out of bounds.
+
+Example:
+
+   // Creating a populated hash
+   LOCAL hHash := { 1 => 12, 8=>3 }
+
+   ? hHash[ 8 ]  // will succeed
+   ? hHash[ 4 ]  // will fail
+
+You can intercept an unexisting key by putting the access in a
+BEGIN/END SEQUENCE block (or a TRY/CATCH block), by using
+the HHasKey() API function or by using the IN operator,
+that we'll see later.
+
+
+
+Relationship operators
+----------------------
+
+Hashes provide the strict equality and difference operators: '==' and '<>'
+(aliased to both '!=' or '#').
+
+An hash is considered to another ONLY IF the two hashes are just reference
+to the same underlying object. Element-by-Element check is never done, so
+it is possible that two hashes having the same keys and values are considered
+non equal.
+
+Example:
+
+   LOCAL hVal1 := { 1 => 12, 8=>3 }
+   LOCAL hVal2 := { 1 => 12, 8=>3 }
+   LOCAL hVal3 := hVal1
+
+   ? hVal1 == hVal2  // .F.
+   ? hVal1 == hVal3  // .T.
+
+Difference operator is implemented as the inverse of strict equal.
+
+   ----------------------------------------------------------------------
+   * NOTE: If request is high enough, we may implement a non strict
+     equality that checks the hashes element by element.
+   ----------------------------------------------------------------------
+
+
+Math operators
+--------------
+
+Hashes have two powerful set operators: '+' and '-'. The plus operator may
+be used only if both the terms of the sum are hashes; the effect is that
+of creating a third hash that has keys and values from both terms of the
+sum; if a key is contained in both the first and the second terms, then the
+resulting value is the one of the second term.
+
+Example:
+
+   LOCAL hVal1 := { 'a' => 12, 'b' => 3 }
+   LOCAL hVal2 := { 'b' => 5 , 'c' => 8 }
+
+   hVal3 := hVal1 + hVal2
+   ? hVal3  // results in { 'a' => 12, 'b' => 5, 'c' => 8 }
+
+   ----------------------------------------------------------------------
+   * NOTE: The correct way to obtain this output is using
+       ? ValToPrg( hVal3 )
+     Here and below ValToPrg is omitted for brevity.
+
+   * NOTE: As you can see '+' operator for hashes has not the commutative
+     property. h1 + h2 is different from h2 + h1.
+   ----------------------------------------------------------------------
+
+Difference operator creates a new hash with all elements from the first term
+except the ones which have a key that is found in the second term. If the
+second term is an hash, all the element keys found in that are removed from
+the new hash; if it an array, the eliminated keys are its element; if it is
+a single item, only that key is removed, if found.
+
+Example:
+
+   LOCAL hVal1 := { 'a' => 12, 'b' => 3, 'c' => 2, 'd' => 4 }
+
+   ? hVal1 - {'c'=>'a value', 'b'=>0} // res: { 'a'=> 12, 'd'=> 4 }
+   ? hVal1 - { 'c', 'a' }             // res: { 'b'=> 3, 'd'=> 4 }
+   ? hVal1 - 'c'                      // res: { 'a' => 12, 'b'=> 3, 'd'=> 4 }
+
+In either case, if the second term, or an element of it, or a key of it is
+not found in the first term, that term is ignored. If the second term is
+a single item that is not a key of the first term, the whole first term
+is copied:
+
+   ? hVal1 - 15              // res: { 'a' => 12, 'b'=> 3, 'c'=> 2 'd'=> 4 }
+
+
+
+The 'IN' Operator
+-----------------
+
+To check if an hash has a key or a key/value pair use the IN operator.
+IN returns .T. if the first term is a key of the hash following it, or
+if the first term is an hash of one item, if the pair in it is found
+in the hash.
+
+Example:
+
+   LOCAL hVal1 := { 'a' => 12, 'b' => 3, 'c' => 2, 'd' => 4 }
+
+   ? ( 'b' IN hVal1 )                     // result: .T.
+   ? ( 12 IN hVal1 )                      // result: .F.
+   ? ( { 'a'=> 12 } IN hVal1 )            // result: .T.
+
+   ----------------------------------------------------------------------
+   * NOTE: use () when using IN in a '?' statement, as the Preprocessor
+     expands it and may get confused.
+
+   * NOTE: IN operator respects key case sensitivity match that you may
+     set with HSetCaseMatch(), but value matches will be always case
+     sensitive.
+   ----------------------------------------------------------------------
+
+To check cleanly if a key is in an hash before retreiving its value and
+do some work on it you can safely do things like
+
+   IF 'myKey' IN hVal1 .and. hVal1[ 'myKey' ] == 'some value'
+      ...
+   ENDIF
+
+   ----------------------------------------------------------------------
+   * NOTE: if efficiency is at stake, there is an API function that
+     retreives the position of the given key, or zero if not found,
+     and another one that retreives a values at that position. So,
+     you may want to use HGetKeyPos() and HGetValueAt() to do just
+     one scan in the array.
+   ----------------------------------------------------------------------
+
+
+
+XHARBOUR RTL COMPATIBILTY FOR HASHES
+====================================
+
+The realtime library is currently hash compliant:
+
+- ValType() returns "H" if applied on a hash
+- Len() returns the size of the hash (the count of elements stored in it).
+- Empty returns .T. on an empty hash, and .F. if the hash has one or more
+  elements
+- ValToPrg() returns a string in canonical hash representation {x => y,..}
+- CStr returns an empty string (as for arrays).
+- HB_Serialize and family correctly serialize hashes.
+
+
+
+
+
+XHARBOUR OBJECT MESSAGE COMPATIBILITY
+=====================================
+
+To make programs that used TAssociativeArray() compatible with new hashes,
+a basic compatibility layer has been developed. Hashes can incercept
+certain "object messages" invoked with the colon (:) operator.
+
+It is possible to access string keys by using the hHash:cKey notation.
+The message name, that is, the string after the ':' operator, is
+uppercased and then matched against the hash keys. It is useful, but
+not necessary, to turn off case sensitivty matches for hashes that are
+intended to be used in this way; otherwise, it is important to remember
+that keys after the ':' are inserted and searched UPPERCASED.
+
+This is a typical usage of the colon operator:
+
+   LOCAL hHash := { 1 => 10, 2 => 20 }
+
+   hHash:NewKey := 'newval'
+   ? hHash:NewKey             // newval
+
+   hHash:NewKey := 15
+   ? hHash:NewKey             // 15
+
+   ? hHash['NEWKEY' ]         // 15
+   HSetCaseMatch( hHash, .F.)
+   ? hHash[ 'newkey' ]        // 15
+
+   ? hHash:unexisting         // BOUND ERROR
+
+
+A program written using only the ':' operator has not to care about
+hash case match mode.
+
+The colon operator has fuor special messages that mimics the
+TAssociativeArray() syntax. This messages can only be used to
+retreive their values:
+
+- Keys: creates an array that contains all the keys in the hash
+- Values: creates an array that contains all the values in the hash
+- ClassName: returns "HASH"
+- ClassH: returns 0
+
+You can't use this messages as keys with the colon operator, but they
+can still be accessed with the hash api or with the accessor ([]).
+
+
+
+
+
+XHARBOUR HASH API
+=================
+
+Hash api is composed of many useful functions, that you may use alternatively
+to the language constructs. They also provide some functionality that is not
+found in them.
+
+Hash functions begin with "H" and remind somehow array functions.
+
+
+
+BASIC API
+=========
+
+
+FUNCTION Hash( key1, val1, ... keyN, valN ) --> hNewHash
+--------------------------------------------------------
+
+This function creates a new hash that may be empty if it is called without
+parameters or may have a set of key/value pairs. If called with an odd number
+of parameters, or if some key is not of an orderable type, this function
+returns null.
+
+The { => } construct is internally expanded to a call to this function, so
+they are equivalent at runtime.
+
+   ----------------------------------------------------------------------
+   * NOTE: Calling this function with a given set of pairs is more
+     efficient than creating an empty hash and then populating it with
+     data, as it requires only one VM function call.
+   ----------------------------------------------------------------------
+
+
+
+PROCEDURE HSet( hHash, xKey, xValue )
+-------------------------------------
+
+Set the xKey key in hHash to xValue. If xKey is not present, it is added.
+If xKey is not of an orderable type, an error is risen.
+
+This procedure is slighly less efficient than the [] construct.
+
+   ----------------------------------------------------------------------
+   * NOTE: HAdd is not provided now, as it may be implemented later with
+     a semantic that only allows a certain kind of FAST pre-ordered key
+     addition.
+   ----------------------------------------------------------------------
+
+
+FUNCTION HGet( hHash, xKey ) --> xValue
+---------------------------------------
+
+Returns value bound to xKey if it is found in hHash; if xKey is not
+present, a BOUND ERROR is risen.
+
+
+
+FUNCTION HHasKey( hHash, xKey ) --> lValue
+------------------------------------------
+
+Returns true if xKey in the hash, false the key is not present. This
+function is slighly more efficient than HGetPos( hHash, xKey ) == 0
+
+
+
+PROCEDURE HDel( hHash, xKey )
+-----------------------------
+
+Remove a pair of xKey/value if it is in the hash. If not, a BOUND ERROR
+is risen. It is slighly more efficient than '-' operator on a single
+value, but '-' on an array or on a hash is more efficient than a loop
+on HDel.
+
+   ----------------------------------------------------------------------
+   * NOTE: Deleting a key is the only way to change a key in a hash. If
+     the value must be preserved, first it is necessary to retreive
+     the value, then remove the key and finally add the new key with the
+     old value.
+   ----------------------------------------------------------------------
+
+
+
+POSITION ORIENTED API
+=====================
+
+This functions are useful for hash traversal, beginning from the first
+element up to the last. Also, they allow higher efficiency in search
+for a key and/or repeated operations on a value.
+
+
+FUNCTION HGetPos( hHash, xKey ) --> nPos
+----------------------------------------
+
+Returns the position of xKey in the hash, or 0 if the key is not present.
+Use this in combination with HGetValueAt() for faster operations.
+
+
+FUNCTION HGetValueAt( hHash, nPos ) --> xValue
+----------------------------------------------
+
+Returns the value that is at a given position in the hash. Changing the
+returned value hasn't any effect on the original one; to alter the value
+stored in the hash use HSetValueAt(). If the position is zero or below,
+or it is higher than Len( hHash ) a BOUND ERROR is risen.
+
+
+FUNCTION HGetKeyAt( hHash, nPos ) --> xKey
+------------------------------------------
+
+Returns the key that is at a given position in the hash. Keys are ordered
+from the lower to the higest one, and cannot be moved or changed.
+If the position is zero or below, or it is higher than Len( hHash ) a
+BOUND ERROR is risen.
+
+
+FUNCTION HGetPairAt( hHash, nPos ) --> aPair
+--------------------------------------------
+
+Returns the key/value pair that is at a given position in the hash.
+The pair is returned as a two element array and the items returned
+are copies of the original ones.
+
+
+PROCEDURE HSetValueAt( hHash, nPos, xValue )
+--------------------------------------------
+
+Changes the value at a given position. If the position is zero or below,
+or it is higher than Len( hHash ) a BOUND ERROR is risen.
+
+
+PROCEDURE HDelAt( hHash, nPos )
+-------------------------------
+
+Deletes the key/value pair at a given position. Lenght of the hash is
+reduced by one.
+
+If the position is zero or below or it is higher than Len( hHash ),
+or if the hash is empty, a BOUND ERROR is risen.
+
+
+
+
+ADVANCED API
+============
+
+Advanced api has a set of powerful functions that do many interesting
+things...
+
+
+FUNCTION HGetKeys( hHash ) --> aKeys
+------------------------------------
+
+Returns an array containing a copy of every key in the hash. The array
+has the same ordering as the keys in hHash, so that aKeys[ n ] is the
+same as HGetKeyAt( hHash, n ).
+
+
+FUNCTION HGetValues( hHash ) --> aValues
+----------------------------------------
+
+Returns an array containing a copy of every value in the hash. The array
+has the same ordering as the values in hHash, so that aValues[ n ] is the
+same as HGetValueAt( hHash, n ).
+
+
+FUNCTION HCopy( hSource, hDest, [nFrom], [nCount], [xMode] ) --> hDest
+-------------------------------------------------------------------
+
+The content of hSource is merged into hDest, in a way that is determined
+by xMode. If nFrom and/or nCount are given, they select a range of key/value
+pair positions in hSource that will be used to be placed in hDest; if
+not, the whole hSource is used.
+
+xMode selects the way the copy is done. IF it is a number, it can be
+any of the following:
+
+* 0: normal merge (default if not given). If a key in hSource is not
+     present in hDest, then it is added with its value. If the key is
+     already present, hDest value is changed into the one from hSource.
+* 1: Xor merge. If the key in hSource is also found in hDest, then the
+     key is removed from hDest, else it is added to it.
+* 2: And Merge. All the elements are in hDest that have akey not found in
+     hSource are removed. The value of elements hSource is copied into the
+     elements of hDest having the same keys, but other elements of hSource
+     are not copied.
+* 3: Not merge. Elements in hDest whose key are found in hSource are
+     removed, the others are untouched. Is the same as '-' hash operator.
+
+xMode may also be a codeblock, that allows to merge the two arrays in a
+more sophisticated fashon. The codeblock is provided with the key, the
+value and the item position in source for each element of hSource, and
+it should evaluate to .T. if the value is to be merged into the
+destionation, or to .F. if the element is to be ignored. Merge is then
+done in normal mode, adding the pair if the key is not present, or changing
+the value if it is present.
+
+   ----------------------------------------------------------------------
+   * NOTE: If you need more sophiscated fashon of mergin, always return
+     .F. from the codeblock and change hDest directly from within that.
+   ----------------------------------------------------------------------
+
+The returned value is just hDest, so that hCopy can be used in evaluation
+processes.
+
+   ----------------------------------------------------------------------
+   * NOTE: HCopy does not returns a new copy of the hDest hash, but
+     alters it. So, if you need to save the original one, create a copy
+     with HClone() first.
+   ----------------------------------------------------------------------
+
+
+FUNCTION HMerge( hDest, hSource, [xMode] ) --> hDest
+----------------------------------------------------
+
+It is a shortcut for HCopy( hSource, hDest, 1, Len(hSource), xMode ).
+Notice the inversion of hDest and hSource parameters with respect
+to HCopy
+
+
+FUNCTION HClone( hSource ) --> hDest
+------------------------------------
+
+Creates a new copy of hSource, and copies also all its items. Be careful
+not to have any element of hSource referenced to hSource itself.
+
+
+PROCEDURE HEval( hSource, bCode, [nStart], [nCount] )
+-----------------------------------------------------
+
+Passes each element of hSource to codeblock bCode. BCode is provided with
+three parameters: the key, the value and the position of the current
+element in hSource.
+
+If nStart is provided, the elements before nStart are skipped. If nCount
+is provided, only the first nCount elements (eventually starting from
+nStart ) are considered.
+
+   ----------------------------------------------------------------------
+   * NOTE: Do not remove elements from hSource while scanning, or some
+     elements in hSource may be skipped.
+   ----------------------------------------------------------------------
+
+
+FUNCTION HScan( hSource, xCode, [nStart], [nCount], [bExact] ) --> nPos
+-----------------------------------------------------------------------
+
+Searches for xCode among the values of hSource (keys are ignored).
+If that value is found, the position of that element is returned.
+
+If nStart is provided, the elements before nStart are skipped. If nCount
+is provided, only the first nCount elements (eventually starting from
+nStart ) are considered.
+
+If bExact is provided and xCode is a string, then EXACT string match
+mode is set ON or OFF according with bExact (defaluts to .T.).
+
+A codeblock may be also provided as xCode, in which case HScan passes
+each element of hSource to codeblock, until it evalutes to .T.
+When this happends, the function returns the position where this
+has happened. If the whole hash (or the interval described by
+nStart and nCount, if given) is traversed without success, 0 is
+returned. BExact is ignored in this case.
+
+XCode is provided with three parameters: the key, the value and the
+position of the current element in hSource.
+
+   ----------------------------------------------------------------------
+   * NOTE: Do not remove elements from hSource while scanning, or some
+     elements in hSource may be skipped.
+   ----------------------------------------------------------------------
+
+
+
+
+HASH SETTING API
+================
+
+The functions in this sections modify the behavior of the hashes, or
+act on the hashes as a whole.
+
+
+FUNCTION HSetCaseMatch( hHash, lMode ) --> hHash
+------------------------------------------------
+
+Sets case sensitivity of a hash. By default, strings are matced in a
+case sensitivity manner. If lMode is false, key are ordered and searched
+in case insensitive mode. In example, 'Hbold' key would be placed after
+a 'hAGAIN'.
+
+Since key ordering is sensible to this setting, it is important
+to add string keys only after HSetCaseMatch() has been called,
+if the default case sensitivity has to be changed. More important than
+this, once an hash has set to case insensitive matches AND some keys
+have been added, never turn it back to sensitive mode, or some keys
+may be lost, and ordering may be inconsistent.
+
+This funtion returns hHash so it is possible to use it in fast
+XTRANSLATE macros to create directly insensitive arrays
+
+   ----------------------------------------------------------------------
+   * NOTE: This funtion returns hHash so it is possible to use it in fast
+     XTRANSLATE macros to create directly insensitive arrays
+
+      #xtranslate ihash() => HSetCaseMatch( Hash(), .F. )
+   ----------------------------------------------------------------------
+
+
+PROCEDURE HAllocate( hHash, nDimension )
+----------------------------------------
+
+Preallocates nDimension hash items, or reduces a pre-allocated size.
+If you have already an idea of how many items are going to be added
+at the hash, then HAllocate may be useful to reduce the time needed
+to allocate memory and grow it. Also, if a big deal of items are
+preallocated with this function and then you find that you don't
+need them, you can call HAllocate with a small size (i.e. 1); this
+will shrink the allocated space to the minimum needed to store the
+hash.
+
+
+EOD

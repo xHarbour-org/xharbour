@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.8 2003/11/14 16:36:04 jonnymind Exp $
+ * $Id: hash.c,v 1.9 2003/11/15 16:55:17 jonnymind Exp $
  */
 
 /*
@@ -638,10 +638,10 @@ PHB_ITEM HB_EXPORT hb_hashClone( PHB_ITEM pSrcHash )
 
 
 void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
-      ULONG ulStart, ULONG ulEnd, PHB_ITEM pBlock )
+      ULONG ulStart, ULONG ulCount, PHB_ITEM pBlock )
 {
    int mode = 0;
-   ULONG ulCount;
+   ULONG ulElem;
    PHB_ITEM pKey, pValue;
    ULONG ulPos;
 
@@ -667,8 +667,8 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
       pKey = pSource->item.asHash.value->pKeys;
       pValue = pSource->item.asHash.value->pValues;
 
-      for ( ulCount = ulStart - 1; ulCount < ulEnd;
-            ulCount ++, pKey++, pValue++ )
+      for ( ulElem = ulStart - 1; ulElem < ulStart-1+ulCount;
+            ulElem ++, pKey++, pValue++ )
       {
          switch( mode )
          {
@@ -699,7 +699,7 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
                hb_vmPush( pBlock );
                hb_vmPush( pKey );
                hb_vmPush( pValue );
-               hb_vmPushNumber( ( double ) ( ulStart + 1 ), 0 );
+               hb_vmPushNumber( ( double ) ( ulElem + 1 ), 0 );
                hb_vmSend( 3 );
                if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) &&
                      HB_VM_STACK.Return.item.asLogical.value )
@@ -712,26 +712,26 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
    else // AND mode; we must remove elements in PDEST that are not in pSource
    {
       ULONG ulDestLen = hb_hashLen( pDest );
-      ulCount = 0;
-      while ( ulCount < ulDestLen )
+      ulElem = 0;
+      while ( ulElem < ulDestLen )
       {
-         PHB_ITEM pKeyDest = pDest->item.asHash.value->pKeys + ulCount;
+         PHB_ITEM pKeyDest = pDest->item.asHash.value->pKeys + ulElem;
 
          if ( ! hb_hashScan( pSource, pKeyDest, &ulPos ) )
          {
-            hb_hashRemove( pDest, ulCount + 1);
+            hb_hashRemove( pDest, ulElem + 1);
             ulDestLen--;
          }
          else {
-            if ( ulPos < ulStart || ulPos > ulEnd ) {
-               hb_hashRemove( pDest, ulCount +1 );
+            if ( ulPos < ulStart || ulPos > ulCount+ ulStart ) {
+               hb_hashRemove( pDest, ulElem +1 );
                ulDestLen--;
 
             }
             else {
-               hb_hashSet( pDest, ulCount,
+               hb_hashSet( pDest, ulElem+1,
                pSource->item.asHash.value->pValues + (ulPos-1) );
-               ulCount++;
+               ulElem++;
             }
          }
       }
@@ -1310,7 +1310,7 @@ HB_FUNC( HGETVALUES )
 }
 
 /***********************************************************
-* HClone and HMerge
+* Filling, scanning and evaluating
 ************************************************************/
 
 HB_FUNC( HFILL )
@@ -1417,7 +1417,7 @@ HB_FUNC( HCOPY )
    PHB_ITEM pStart = hb_param( 3, HB_IT_NUMERIC );
    PHB_ITEM pEnd = hb_param( 4, HB_IT_NUMERIC );
    PHB_ITEM pBlock = hb_param( 5, HB_IT_BLOCK | HB_IT_LOGICAL );
-   ULONG ulStart, ulEnd, ulLen;
+   ULONG ulStart, ulCount, ulLen;
 
    if ( pSource == NULL || pDest == NULL )
    {
@@ -1425,34 +1425,15 @@ HB_FUNC( HCOPY )
       hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ));
    }
 
-   ulLen = hb_hashLen( pSource);
+   ulLen   = hb_hashLen(pSource);
    ulStart = pStart == NULL ? 1 : hb_itemGetNL( pStart );
-   ulEnd = pEnd == NULL ? ulLen : hb_itemGetNL( pEnd );
+   ulCount = pEnd   == NULL ? ulLen - ulStart + 1 : hb_itemGetNL( pEnd );
 
-   if ( ulStart < 1 )
+   if ( ulStart < 1 ||  ulCount <= 0 || ulStart + ulCount > ulLen)
    {
-      ulStart = 1;
    }
 
-   if ( ulStart > ulLen )
-   {
-      ulStart = ulLen;
-   }
-
-   if ( ulEnd < ulStart )
-   {
-      ulEnd = ulStart;
-   }
-
-   if ( ulEnd > ulLen )
-   {
-      ulEnd = ulLen;
-   }
-
-   if ( (long) ( ulEnd - ulStart )  >= 0 )
-   {
-      hb_hashMerge( pDest, pSource, ulStart, ulEnd, pBlock );
-   }
+   hb_hashMerge( pDest, pSource, ulStart, ulCount, pBlock );
 
    /* return a reference to the hash */
    hb_itemCopy( &(HB_VM_STACK.Return), pDest );
@@ -1495,6 +1476,8 @@ HB_FUNC( HSETCASEMATCH )
          hb_paramError( 1 ), hb_paramError( 2 ));
    }
 
+   /* return a reference to the hash */
+   hb_itemCopy( &(HB_VM_STACK.Return), pHash );
 }
 
 HB_FUNC( HALLOCATE )
