@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2876 2004/05/05 10:10:23 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.2877 2004/05/06 19:06:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-05-07 11:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/vm/cmdarg.c
+  * source/vm/mainwin.c
+    - Move global variables from mainwin -> cmdarg
+    + added hb_SetWinMainParameters()
+
+    Changes required to allow linking to harbour.dll
+
+  * source/rtl/inkey.c
+    - Fix Warning 'bContinue' is assigned a value that is never used
 
 2004-05-06 12:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
