@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.46 2003/08/27 10:30:09 jonnymind Exp $
+ * $Id: filesys.c,v 1.47 2003/08/27 12:07:31 jonnymind Exp $
  */
 
 /*
@@ -846,7 +846,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
          dup2( hNull, 2 );
       }
 
-      command = hb_xgrab( strlen(pFilename) + 2 );
+      command = ( char * )hb_xgrab( strlen(pFilename) + 2 );
       size = s_parametrize( command, pFilename );
       argv = s_argvize( command, size );
       argv[size] = 0;
