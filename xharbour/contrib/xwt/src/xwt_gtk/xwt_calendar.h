@@ -3,7 +3,7 @@
 
    (C) 2004 Luiz Rafael Culik
 
-   $Id: xwt_gtk_calendar.c,v 1.1 2004/01/25 02:42:00 lculik Exp $
+   $Id: xwt_calendar.h,v 1.2 2004/01/26 13:52:21 lculik Exp $
 
    GTK interface - calendar widget
 */
@@ -61,7 +61,8 @@ struct _GtkXwtCalendarSelectionDialogClass
 
 /* XwtCalendarSelectionDialog */ 
 GType      gtk_XwtCalendar_selection_dialog_get_type (void) G_GNUC_CONST;
-GtkWidget* gtk_XwtCalendar_selection_dialog_new      (void); 
+GtkWidget* gtk_XwtCalendar_selection_dialog_new      (char * title); 
+void       gtk_XwtCalendar_GetDate( GtkXwtCalendarSelectionDialog *p, long *year,long *month,long *day);
 
 
 #ifdef __cplusplus

@@ -3,7 +3,7 @@
 
    (C) 2004 Luiz Rafael Culik
 
-   $Id: xwt_gtk_calendar.c,v 1.1 2004/01/25 02:42:00 lculik Exp $
+   $Id: xwt_calendar.c,v 1.2 2004/01/26 13:52:21 lculik Exp $
 
    GTK Calendar widget  
 */
@@ -123,13 +123,24 @@ gtk_XwtCalendar_selection_dialog_init (GtkXwtCalendarSelectionDialog *XwtCalenda
 }
 
 GtkWidget*
-gtk_XwtCalendar_selection_dialog_new (void)
+gtk_XwtCalendar_selection_dialog_new (char * title)
 {
   GtkXwtCalendarSelectionDialog *XwtCalendarseldiag;
   
   XwtCalendarseldiag = g_object_new (GTK_TYPE_XWTCALENDAR_SELECTION_DIALOG, NULL);
-//  gtk_window_set_title (GTK_WINDOW (XwtCalendarseldiag), title);
+  gtk_window_set_title (GTK_WINDOW (XwtCalendarseldiag), title);
   gtk_window_set_resizable (GTK_WINDOW (XwtCalendarseldiag), FALSE);
   
   return GTK_WIDGET (XwtCalendarseldiag);
 }
+
+void gtk_XwtCalendar_GetDate( GtkXwtCalendarSelectionDialog *p, long *year,long *month,long *day)
+{
+   guint y,m,d;
+   gtk_calendar_get_date( GTK_CALENDAR(p->calendar),&y,&m,&d);
+   *year = y;
+   *month = m;
+   *day = d;
+   TraceLog(NULL,"data vinda do controle %i%i%i\n",y,m,d);
+   TraceLog(NULL,"data ajustada no controle %p%p%p\n",year,month,day);
+ }

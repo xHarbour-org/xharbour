@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwtcmd.ch,v 1.8 2003/11/08 00:45:55 jonnymind Exp $
+   $Id: xwtcmd.ch,v 1.9 2004/01/26 13:52:21 lculik Exp $
 
    Definitions
 */
@@ -11,6 +11,7 @@
 
 #ifndef __XTWCMD_CH__
 #define __XTWCMD_CH__
+#include "xwt.ch"
 
 #xcommand DEFINE PANE <oPane> [ <lHasBox: BOX >];
 	  [ TITLE <cTitle>] [ OF <oParent> ];
@@ -44,8 +45,9 @@
 #xcommand DEFINE TEXTBOX [ <oTextBox> ] [ VAR <cText> ] [MOVE <x>,<y>] [ OF <oParent> ];
           => [ <oTextBox> := ] XWTTextBox():New( <cText>, <x>, <y>, <oParent> )
 
-#xcommand @ <x>,<y> TEXTBOX [ <oTextBox> ] [ VAR <cText> ] [ OF <oParent> ];
+#xcommand @ <x>,<y> TEXTBOX [ <oTextBox> ] [ VAR <cText> ] [ OF <oParent> ] ;
           => [ <oTextBox> := ] XWTTextBox():New( <cText>, <x>, <y>, <oParent> )
+
 
 // Checkbox ---------------------------------------------------------------------------
 #xcommand DEFINE CHECKBOX [<oCheck>] [TEXT <cText>] [ VAR <lStatus>];

@@ -3,7 +3,7 @@
 
    (C) 2004 Luiz Rafael Culik
 
-   $Id: xwt_gtk_calendar.c,v 1.1 2004/01/25 02:42:00 lculik Exp $
+   $Id: xwt_gtk_calendar.c,v 1.2 2004/01/26 13:52:21 lculik Exp $
 
    GTK interface - File Selection Box 
 */
@@ -210,7 +210,7 @@ BOOL xwt_gtk_createCalendarModal( PXWT_WIDGET xwtData )
 
    xwtCalendarW = (PXWT_GTK_MODAL) hb_xgrab( sizeof( XWT_GTK_MODAL ) );
 
-   filew = gtk_XwtCalendar_selection_dialog_new();
+   filew = gtk_XwtCalendar_selection_dialog_new("");
    // this widget is NOT displayed by default
    #if __GNUC__ <3
    xwtCalendarW->a.main_widget = filew;

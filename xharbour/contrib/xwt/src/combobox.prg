@@ -3,7 +3,7 @@
 
    (C) 2004 Luiz Rafael Culik
 
-   $Id: checkbox.prg,v 1.5 2003/08/31 19:02:19 xthefull Exp $
+   $Id: combobox.prg,v 1.1 2004/01/26 13:52:21 lculik Exp $
 
    Widget class - basic widget & event management
 */
@@ -23,12 +23,17 @@ Local bRes,bVis := .T.
    ::Super:New()
    ::nWidgetType := XWT_TYPE_COMBOBOX
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_COMBOBOX )
+   
    IF ValType( aItems )  == "A"
    ::aItems :=  aItems
       XWT_SetProperty(::oRawWidget,XWT_PROP_SETCOMBOITEMS,aItems)
    ENDIF  
+   
+   IF .not. Empty( cText )
+      XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cText )
+   ENDIF
 
-   bRes := XWT_SetProperty( ::oRawWidget, XWT_VIS_NORMAL, bVis )
+   
    IF ValType( nX ) == "N" .and. ValType( nY ) == "N"
       ::Move( nX, nY )
    ENDIF
@@ -43,6 +48,7 @@ METHOD GetiTem() CLASS XWTComboBox
    LOCAL cItem
 
    IF XWT_GetProperty( ::oRawWidget, XWT_PROP_TEXT, @cItem )
+   tracelog(cItem)
       RETURN cItem
    ENDIF
 

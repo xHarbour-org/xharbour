@@ -4,7 +4,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.27 2004/01/25 02:41:59 lculik Exp $
+   $Id: xwt_gtk.c,v 1.28 2004/01/26 13:52:21 lculik Exp $
 
    Global declarations, common functions
 
@@ -206,7 +206,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_PROGRESSBAR:
                gtk_progress_bar_set_text(GTK_PROGRESS_BAR (wSelf), prop->value.text );
                return TRUE;
-
+   
 
             case XWT_TYPE_GRID: case XWT_TYPE_LAYOUT: case XWT_TYPE_PANE:
                if ( wSelf != wMain )
@@ -939,6 +939,10 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             case XWT_TYPE_TEXTBOX:
                prop->value.text = gtk_entry_get_text (GTK_ENTRY(wMain) );
             return TRUE;
+	    
+	    case XWT_TYPE_COMBOBOX:
+    	       prop->value.text= gtk_entry_get_text (GTK_ENTRY( GTK_COMBO(wSelf)->entry ));
+	    return TRUE;
 
             case XWT_TYPE_MENU:
             return FALSE;
@@ -1090,18 +1094,20 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       case XWT_PROP_GETDATEMODAL:        
          if ( ! (( PXWT_GTK_MODAL ) wWidget->widget_data)->canceled )
          {
-            gtk_calendar_get_date (GTK_CALENDAR( GTK_XWTCALENDAR_SELECTION_DIALOG(wSelf)->calendar ),&prop->date.year, &prop->date.month, &prop->date.day);
+	    gtk_XwtCalendar_GetDate( GTK_XWTCALENDAR_SELECTION_DIALOG(wSelf),&prop->year, &prop->month, &prop->day);
+	    TraceLog(NULL,"%i,%i,%i",prop->year, prop->month, prop->day);
+
          }
          else
          {
-            prop->date.year = 1900;
-            prop->date.month = 01;
-            prop->date.day = 01;
+            prop->year = 1900;
+            prop->month = 01;
+            prop->day = 01;
          }
          return TRUE;
 
       case XWT_PROP_GETDATE:        
-            gtk_calendar_get_date (GTK_CALENDAR( wSelf ),&prop->date.year, &prop->date.month, &prop->date.day);
+            gtk_calendar_get_date (GTK_CALENDAR( wSelf ),&prop->year, &prop->month, &prop->day);
          return TRUE;
 
       case XWT_PROP_STATUS:
@@ -1112,6 +1118,7 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             return TRUE;
          }
       return FALSE;
+      
       
 
       case XWT_PROP_BOX:

@@ -4,7 +4,7 @@
 * Giancarlo Niccolai et al.:
 * (PLZ. add your copyright...)
 *
-* $Id: xwt_test.prg,v 1.24 2003/10/09 23:18:34 jonnymind Exp $
+* $Id: xwt_test.prg,v 1.25 2004/01/26 13:52:21 lculik Exp $
 *
 
 
@@ -23,7 +23,7 @@ PROCEDURE MAIN()
    LOCAL oGrid
    Local oCalen
    LOCAL oList, oCheck, aInputs, oInput, oRadioPanel,oCombo
-   Local cData
+   Local cData,cCombo
    Local aItems := {"Luiz","Ron","Gian","Marcelo","Patrick"}
 
    XwtInit()
@@ -61,7 +61,7 @@ PROCEDURE MAIN()
    /* A couple of Textboxes in a pane, inside a scrollable */
    DEFINE PANE oPane BOX TITLE "A Fixed Pane" OF oVLay
 
-   @ 10,10 TEXTBOX oTextBox VAR "A Text" OF oPane
+   @ 10,10 TEXTBOX oTextBox VAR "A Text" OF oPane 
    oTextbox:AddEventListener(XWT_E_UPDATED, @BoxModified())
 
    @ 10,40  TEXTBOX oOtherBox VAR "Another box" OF oPane
@@ -123,8 +123,9 @@ PROCEDURE MAIN()
    oRadioPanel:add( XWTRadioButton():New( "Option 3" ,"Sans",7,"#111210","#222222","#A38103","#A38103") )
 
    oVLay2:Add( oRadioPanel )
-   @ 50,2 COMBO oCombo items aItems
-   oVlay2:add(oCombo)
+   @ 50,2 COMBO oCombo VAR cCombo of oVlay2 items aItems 
+      oCombo:AddEventListener(XWT_E_UPDATED, @ComboModified())
+//   oVlay2:add(oCombo)
    
    /***** A list **********/
    oList := XWTTreeList():New(;
@@ -225,11 +226,21 @@ FUNCTION FileEvent( oEvent )
 RETURN .F.
 
 FUNCTION BoxModified( oEvent )
+tracelog('Em BoxModified( oEvent )')
+tracelog( oEvent:oSender:getText())
+
 ?  "Text entered in box: ", oEvent:oSender:getText()
    oEvent:oSender:SetText( "Reset" )
    oOtherBox:SetFocus()
 RETURN .F.
 
+FUNCTION ComboModified( oEvent )
+tracelog('Em ComboModified( oEvent )')
+tracelog( oEvent:oSender:getItem())
+?  "Text entered in box: ", oEvent:oSender:getItem()
+//   oEvent:oSender:SetText( "Reset" )
+   oOtherBox:SetFocus()
+RETURN .F.
 
 FUNCTION BoxModified1( oEvent )
 ?  "Text entered in box: ", oEvent:oSender:getdate()
