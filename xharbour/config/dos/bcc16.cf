@@ -1,5 +1,5 @@
 # 
-# $Id: bcc16.cf,v 1.3 2002/01/21 23:42:31 ronpinkas Exp $
+# $Id: bcc16.cf,v 1.4 2003/05/16 19:52:03 druzus Exp $
 #
 # The Harbour Project
 # GNU MAKE file for Borland C/C++ 3.x, 4.x, 5.0x
@@ -24,7 +24,7 @@ endif
 CC = bcc
 CC_IN = -c
 CC_OUT = -o
-CPPFLAGS = -I$($(HB_ARCHITECTURE)_$(HB_COMPILER)_GRANDP) -I$(_HB_INC_COMPILE)
+CPPFLAGS = -I$($(HB_ARCHITECTURE)_$(HB_COMPILER)_GRANDP) -I$(_HB_INC_COMPILE) -Iinclude
 CFLAGS = -i48 -O2 -mh -d
 
 #Note: The empty line below HAVE TO exist!

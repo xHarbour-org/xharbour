@@ -1,5 +1,5 @@
 #
-# $Id: rsx32.cf,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
+# $Id: rsx32.cf,v 1.3 2003/05/16 19:52:04 druzus Exp $
 #
 # GNU Make file for RSXNT for DOS target
 
@@ -13,7 +13,7 @@ LIB_EXT = .a
 CC = gcc
 CC_IN = -c
 CC_OUT = -o
-CPPFLAGS = -I. -I$(HB_INC_COMPILE) -Zrsx32
+CPPFLAGS = -I. -I$(HB_INC_COMPILE) -Iinclude -Zrsx32
 CFLAGS = -Wall
 
 LD = gcc

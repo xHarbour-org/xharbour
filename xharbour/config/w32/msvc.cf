@@ -1,5 +1,5 @@
 #
-# $Id: msvc.cf,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
+# $Id: msvc.cf,v 1.3 2003/05/16 19:52:05 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -12,7 +12,7 @@ LIB_EXT = .lib
 CC = cl.exe
 CC_IN = -c
 CC_OUT = -Fo
-CPPFLAGS = -I. -I$(HB_INC_COMPILE)
+CPPFLAGS = -I. -I$(HB_INC_COMPILE) -Iinclude
 CFLAGS = -W0 -Zi  # -W4 for max warnings
 
 LD = cl.exe

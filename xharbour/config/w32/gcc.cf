@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.9 2003/09/14 14:43:30 jonnymind Exp $
+# $Id: gcc.cf,v 1.10 2003/09/14 15:30:26 jonnymind Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -12,7 +12,7 @@ LIB_EXT = .a
 CC = gcc
 CC_IN = -c
 CC_OUT = -o
-CPPFLAGS = -I. -I$(HB_INC_COMPILE)
+CPPFLAGS = -I. -I$(HB_INC_COMPILE) -Iinclude
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS = -Wall -DSIMPLEX
 else
