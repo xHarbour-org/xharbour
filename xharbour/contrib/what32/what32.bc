@@ -49,7 +49,7 @@ $(BCB)\BIN\bcc32 $(CFLAG1) $(CFLAG2) -o$* $**
 $(BCB)\BIN\bcc32 -I$(BHC)\include $(CFLAG1) $(CFLAG2) -o$* $**
  
 .prg.obj:
-$(BHC)\bin\harbour -n -go -I$(BHC)\include $(HARBOURFLAGS) -I$(FWH)\include -o$* $**
+$(BHC)\bin\harbour -n -go /p -I$(BHC)\include $(HARBOURFLAGS) -Iinclude -o$* $**
  
 .rc.res:
 $(BCB)\BIN\brcc32 $(RFLAGS) $<

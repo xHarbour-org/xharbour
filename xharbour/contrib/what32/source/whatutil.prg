@@ -1,14 +1,14 @@
 
 //Clipper-like Alert function
 
-#Include "WINDOWS.CH"
+#Include "..\include\WINDOWS.CH"
 #Include "What32.ch"
 #DEFINE SHOWDEBUG
 #Include 'debug.ch'
 
-#Include 'wintypes.ch'
-#Include 'cstruct.ch'
-//#Define CTYPE_BOOL 5
+#Include '..\include\wintypes.ch'
+#Include '..\include\cstruct.ch'
+#Define CTYPE_BOOL 5
 
 //#DEFINE NTRIM( n ) AllTrim( str( n ) )
 
