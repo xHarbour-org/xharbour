@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.51 2004/09/13 11:12:03 lf_sfnet Exp $
+/* $Id: teditor.prg,v 1.54 2004/11/30 21:59:05 ath1 Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.51 2004/09/13 11:12:03 lf_sfnet Exp $
+/* $Id: teditor.prg,v 1.54 2004/11/30 21:59:05 ath1 Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -2034,7 +2034,7 @@ METHOD BrowseText( nPassedKey, lHandleOneKey ) CLASS HBEditor
 
    enddo
 
-return
+return nil
 
 //-------------------------------------------------------------------//
 

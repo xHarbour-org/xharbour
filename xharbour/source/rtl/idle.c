@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.16 2004/04/28 18:30:40 druzus Exp $
+ * $Id: idle.c,v 1.17 2004/12/01 00:51:58 peterrees Exp $
  */
 
 /*
@@ -95,7 +95,7 @@ static USHORT s_uiIdleTask = 0;
 /* number of tasks in the list */
 static USHORT s_uiIdleMaxTask = 0;
 
-#ifdef HB_THREAD_SUPPORT || defined(HB_OS_UNIX)
+#if defined(HB_THREAD_SUPPORT) || defined(HB_OS_UNIX)
    #define HB_IDLE_MSEC_DEFAULT 10
 #else
    #if defined(HB_OS_WIN_32) || defined(__CYGWIN__)

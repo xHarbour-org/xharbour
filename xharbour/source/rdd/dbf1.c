@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.96 2004/11/22 21:12:08 druzus Exp $
+ * $Id: dbf1.c,v 1.97 2004/12/01 00:17:02 peterrees Exp $
  */
 
 /*
@@ -2090,8 +2090,8 @@ static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType
             if ( uiInfoType == DBRI_RAWRECORD || uiInfoType == DBRI_RAWDATA )
             {
                uiLength = pArea->uiRecordLen;
-               pResult = hb_xgrab( uiLength + 1 ) ;  // Allow final '\0' placed by hb_itemPutCPtr
-                                                     // Assume xgrab ok - no memory checking
+               pResult = (BYTE *) hb_xgrab( uiLength + 1 ) ;  // Allow final '\0' placed by hb_itemPutCPtr
+                                                              // Assume xgrab ok - no memory checking
                memcpy( pResult, pArea->pRecord, uiLength ) ;
             }
             else
@@ -2114,11 +2114,11 @@ static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType
                      {
                         if ( pResult )
                         {
-                           pResult = hb_xrealloc( pResult, uiLength+ 1 + uiFieldLen ) ; // Assume xgrab ok - no memory checking
+                           pResult = (BYTE *) hb_xrealloc( pResult, uiLength+ 1 + uiFieldLen ) ; // Assume xgrab ok - no memory checking
                         }
                         else
                         {
-                           pResult = hb_xgrab( uiFieldLen + 1 ) ;  // Assume xgrab ok - no memory checking
+                           pResult = (BYTE *) hb_xgrab( uiFieldLen + 1 ) ;  // Assume xgrab ok - no memory checking
                         }
                         memcpy( pResult + uiLength, itItem.item.asString.value, uiFieldLen );
                         uiLength += uiFieldLen;
@@ -2127,7 +2127,7 @@ static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType
                }
             }
             hb_itemClear( &itItem );
-            hb_itemPutCPtr( pInfo, pResult, uiLength ) ;
+            hb_itemPutCPtr( pInfo, (char *) pResult, uiLength ) ;
 
             if( ulPrevRec != 0 )
             {
