@@ -1,5 +1,5 @@
 /*
- * $Id: oemansi.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: oemansi.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ HB_FUNC( HB_ANSITOOEM )
       hb_retclenAdopt( pszDst, ulLen );
    }
 #else
-      hb_itemReturn( pString );
+      hb_itemCopy( &hb_stack.Return, pString );
 #endif
    else
       hb_retc( "" );
@@ -97,7 +97,7 @@ HB_FUNC( HB_OEMTOANSI )
       hb_retclenAdopt( pszDst, ulLen );
    }
 #else
-      hb_itemReturn( pString );
+      hb_itemCopy( &hb_stack.Return, pString );
 #endif
    else
       hb_retc( "" );

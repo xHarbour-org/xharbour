@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.5 2002/01/21 09:11:57 ronpinkas Exp $
+ * $Id: memvars.c,v 1.6 2002/01/21 23:42:31 ronpinkas Exp $
  */
 
 /*
@@ -72,6 +72,8 @@
 #include "hbapifs.h" /* for __MVSAVE()/__MVRESTORE() */
 #include "hbdate.h" /* for __MVSAVE()/__MVRESTORE() */
 #include "hbcomp.h" /* for VS_* macros */
+#include "hbstack.h"
+
 #include "error.ch"
 #include "hbmemvar.ch"
 
@@ -1220,7 +1222,7 @@ HB_FUNC( __MVDBGINFO )
              */
          }
 
-         hb_itemReturn( pValue );
+         hb_itemCopy( &hb_stack.Return, pValue );
          /* pValue points directly to the item structure used by this variable
           * this item cannot be released
           */
@@ -1348,7 +1350,7 @@ HB_FUNC( __MVPUT )
          hb_memvarCreateFromDynSymbol( hb_dynsymGet( pName->item.asString.value ), VS_PRIVATE, pValue );
       }
 
-      hb_itemReturn( pValue );
+      hb_itemCopy( &hb_stack.Return, pValue );
    }
    else
    {
@@ -1366,7 +1368,7 @@ HB_FUNC( __MVPUT )
          hb_itemRelease( pRetValue );
       }
 
-      hb_itemReturn( pValue );
+      hb_itemCopy( &hb_stack.Return, pValue );
    }
 }
 

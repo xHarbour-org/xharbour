@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.89 2002/01/06 09:17:59 vszakats Exp $
+ * $Id: transfrm.c,v 1.4 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -68,6 +68,7 @@
 #include "hbapierr.h"
 #include "hbdate.h"
 #include "hbset.h"
+#include "hbstack.h"
 
 /* Picture function flags */
 #define PF_LEFT    0x0001   /* @B */
@@ -598,7 +599,7 @@ HB_FUNC( TRANSFORM )
    {
       if( HB_IS_STRING( pValue ) )
       {
-         hb_itemReturn( pValue );
+         hb_itemCopy( &hb_stack.Return, pValue );
       }
       else if( HB_IS_NUMERIC( pValue ) )
       {

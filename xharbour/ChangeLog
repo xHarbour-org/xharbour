@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.50 2002/01/26 21:13:58 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.51 2002/01/27 05:23:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-27 00:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/dbcmd.c
+  * source/rtl/oemansi.c
+  * source/rtl/setkey.c
+  * source/rtl/transfrm.c
+  * source/vm/asort.c
+  * source/vm/classes.c
+  * source/vm/debug.c
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+  * source/vm/pvalue.c
+    * Fixed wrong hb_itemReturn() calls to hb_itemCopy( &hb_stack.Return, ... )
+
+  * include/hbapi.h
+  * source/vm/arrays.c
+  * source/vm/arrayshb.c
+    * Optimized and corrected aFill()
 
 2002-01-26 21:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/errorapi.c

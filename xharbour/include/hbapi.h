@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.5 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.6 2002/01/21 09:11:56 ronpinkas Exp $
  */
 
 /*
@@ -389,7 +389,7 @@ extern double   hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves th
 extern char *   hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate ); /* retrieves the date value contained in an array element */
 extern long     hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date value contained in an array element, as a long integer */
 extern USHORT   hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the type of an array item */
-extern BOOL     hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount ); /* fill an array with a given item */
+extern          hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, long ulStart, long ulCount ); /* fill an array with a given item */
 extern ULONG    hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount ); /* scan an array for a given item, or until code-block item returns TRUE */
 extern BOOL     hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * pulCount ); /* execute a code-block for every element of an array item */
 extern BOOL     hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pulStart, ULONG * pulCount, ULONG * pulTarget ); /* copy items from one array to another */

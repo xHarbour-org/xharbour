@@ -1,5 +1,5 @@
 /*
- * $Id: setkey.c,v 1.3 2002/01/12 10:04:28 ronpinkas Exp $
+ * $Id: setkey.c,v 1.4 2002/01/17 23:20:47 ronpinkas Exp $
  */
 
 /*
@@ -61,6 +61,7 @@
 #include "hbfast.h"
 #include "hbapiitm.h"
 #include "hbapigt.h"
+#include "hbstack.h"
 
 typedef struct HB_SETKEY_
 {
@@ -194,7 +195,7 @@ HB_FUNC( SETKEY )
 
             if( pIsActiveResults == NULL || ! HB_IS_LOGICAL( pIsActiveResults ) || hb_itemGetL( pIsActiveResults ) )
 #endif
-               hb_itemReturn( sk_list_tmp->pAction );
+               hb_itemCopy( &hb_stack.Return, sk_list_tmp->pAction );
          }
       }
       else

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.8 2002/01/21 20:51:42 ronpinkas Exp $
+ * $Id: classes.c,v 1.9 2002/01/22 00:23:28 ronpinkas Exp $
  */
 
 /*
@@ -2048,7 +2048,7 @@ HB_FUNC( __SENDER )
 
    if( iLevel == 0 && oSender != NULL && oSender->type == HB_IT_OBJECT )
    {
-      hb_itemReturn( oSender );
+      hb_itemCopy( &hb_stack.Return, oSender );
    }
 }
 
@@ -2314,7 +2314,7 @@ static HARBOUR hb___msgEval( void )
 //   pObject->item.asArray.value->uiPrevCls  = pObject->item.asArray.value->uiClass; /* backup of actual handel */
 //   pObject->item.asArray.value->uiClass    = s_pMethod->uiSprClass;                /* superclass handel casting */
 //
-//   hb_itemReturn( pObject );
+//   hb_itemCopy( &hb_stack.Return, pObject );
 //}
 
 static HARBOUR hb___msgSuper( void )
@@ -2345,7 +2345,7 @@ static HARBOUR hb___msgSuper( void )
 /*
 static HARBOUR hb___msgClass( void )
 {
-   hb_itemReturn( hb_stackSelfItem() );
+   hb_itemCopy( &hb_stack.Return, hb_stackSelfItem() );
 }
 */
 
@@ -2379,7 +2379,7 @@ static HARBOUR hb___msgSetClsData( void )
       hb_arraySet( s_pClasses[ uiClass - 1 ].pClassDatas, s_pMethod->uiData, pReturn );
    }
 
-   hb_itemReturn( pReturn );
+   hb_itemCopy( &hb_stack.Return, pReturn );
 }
 
 /*
@@ -2411,7 +2411,7 @@ static HARBOUR hb___msgSetShrData( void )
       hb_arraySet( s_pClasses[ uiSprCls - 1 ].pClassDatas, s_pMethod->uiDataShared, pReturn );
    }
 
-   hb_itemReturn( pReturn );
+   hb_itemCopy( &hb_stack.Return, pReturn );
 }
 
 /*

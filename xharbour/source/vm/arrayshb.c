@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.23 2001/09/18 00:07:49 vszakats Exp $
+ * $Id: arrayshb.c,v 1.1.1.1 2001/12/21 10:41:03 ronpinkas Exp $
  */
 
 /*
@@ -120,7 +120,7 @@ HB_FUNC( AADD )
       PHB_ITEM pValue = hb_param( 2, HB_IT_ANY );
 
       if( pValue && hb_arrayAdd( pArray, pValue ) )
-         hb_itemReturn( pValue );
+         hb_itemCopy( &hb_stack.Return, pValue );
       else
          hb_errRT_BASE( EG_BOUND, 1187, NULL, "AADD", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
@@ -152,7 +152,7 @@ HB_FUNC( ASIZE )
 
       hb_arraySize( pArray, HB_MAX( lSize, 0 ) );
 
-      hb_itemReturn( pArray ); /* ASize() returns the array itself */
+      hb_itemCopy( &hb_stack.Return, pArray ); /* ASize() returns the array itself */
    }
 #ifdef HB_COMPAT_C53 /* From CA-Cl*pper 5.3a */
    else
@@ -177,7 +177,7 @@ HB_FUNC( AINS )
       if( ISNUM( 2 ) )
          hb_arrayIns( pArray, hb_parnl( 2 ) );
 
-      hb_itemReturn( pArray ); /* AIns() returns the array itself */
+      hb_itemCopy( &hb_stack.Return, pArray ); /* AIns() returns the array itself */
    }
 }
 
@@ -190,7 +190,7 @@ HB_FUNC( ADEL )
       if( ISNUM( 2 ) )
          hb_arrayDel( pArray, hb_parnl( 2 ) );
 
-      hb_itemReturn( pArray ); /* ADel() returns the array itself */
+      hb_itemCopy( &hb_stack.Return, pArray ); /* ADel() returns the array itself */
    }
 }
 
@@ -204,26 +204,64 @@ HB_FUNC( AFILL )
 
       if( pValue )
       {
-         ULONG ulStart = hb_parnl( 3 );
-         ULONG ulCount = hb_parnl( 4 );
+         long ulStart = hb_parnl( 3 );
+         long ulCount = hb_parnl( 4 );
 
-         hb_arrayFill( pArray,
-                       pValue,
-                       ISNUM( 3 ) ? &ulStart : NULL,
-                       ISNUM( 4 ) ? &ulCount : NULL );
+         /* Explicy ulCount of 0 - Nothing to do! */
+         if( ISNUM(4) && ulCount == 0 )
+         {
+            hb_itemCopy( &hb_stack.Return, pArray ); /* AFill() returns the array itself */
+            return;
+         }
+
+         if( ulStart == 0 )
+         {
+            /* Clipper allows Start to be of wrong type, or 0, and corrects it to 1. */
+            ulStart = 1;
+         }
+         else if( ulStart < 0 )
+         {
+            /* Clipper aborts if negative start. */
+            hb_itemCopy( &hb_stack.Return, pArray ); /* AFill() returns the array itself */
+            return;
+         }
+
+         if( ulCount == 0 )
+         {
+            /* Clipper allows the Count to be of wrong type, and corrects it to maximum elements. */
+            ulCount = pArray->item.asArray.value->ulLen;
+         }
+         else if( ulCount < 0 )
+         {
+            if( ulStart == 1 )
+            {
+               /* Clipper allows the Count to be negative, if start is 1, and corrects it to maximum elements. */
+               ulCount = pArray->item.asArray.value->ulLen;
+            }
+            else
+            {
+               /* Clipper aborts if negative count and start is not at 1. */
+               hb_itemCopy( &hb_stack.Return, pArray ); /* AFill() returns the array itself */
+               return;
+            }
+         }
+
+         hb_arrayFill( pArray, pValue, ulStart, ulCount );
       }
 
-      hb_itemReturn( pArray ); /* AFill() returns the array itself */
+      hb_itemCopy( &hb_stack.Return, pArray ); /* AFill() returns the array itself */
    }
    else
-#ifdef HB_C52_STRICT
-      /* NOTE: In CA-Cl*pper AFILL() is written in a manner that it will
+   {
+      #ifdef HB_C52_STRICT
+        /* NOTE: In CA-Cl*pper AFILL() is written in a manner that it will
                call AEVAL() to do the job, so the error (if any) will also be
                thrown by AEVAL().  [vszakats] */
-      hb_errRT_BASE( EG_ARG, 2017, NULL, "AEVAL", 4, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
-#else
-      hb_errRT_BASE( EG_ARG, 9999, NULL, "AFILL", 4, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
-#endif
+        hb_errRT_BASE( EG_ARG, 2017, NULL, "AEVAL", 4, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
+      #else
+        hb_errRT_BASE( EG_ARG, 9999, NULL, "AFILL", 4, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
+      #endif
+   }
 }
 
 HB_FUNC( ASCAN )
@@ -263,7 +301,7 @@ HB_FUNC( AEVAL )
                     ISNUM( 3 ) ? &ulStart : NULL,
                     ISNUM( 4 ) ? &ulCount : NULL );
 
-      hb_itemReturn( hb_stackItemFromBase( 1 ) ); /* AEval() returns the array itself */
+      hb_itemCopy( &hb_stack.Return, hb_stackItemFromBase( 1 ) ); /* AEval() returns the array itself */
    }
    else
       hb_errRT_BASE( EG_ARG, 2017, NULL, "AEVAL", 4, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
@@ -290,7 +328,7 @@ HB_FUNC( ACOPY )
                        ISNUM( 5 ) ? &ulTarget : NULL );
       }
 
-      hb_itemReturn( hb_stackItemFromBase( 2 ) ); /* ACopy() returns the target array */
+      hb_itemCopy( &hb_stack.Return, hb_stackItemFromBase( 2 ) ); /* ACopy() returns the target array */
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.3 2002/01/12 10:04:28 ronpinkas Exp $
+ * $Id: debug.c,v 1.4 2002/01/17 23:20:47 ronpinkas Exp $
  */
 
 /*
@@ -214,7 +214,7 @@ HB_FUNC( __VMVARLGET )
    while( ( iLevel-- > 0 ) && pBase != hb_stack.pItems )
       pBase = hb_stack.pItems + ( *pBase )->item.asSymbol.stackbase;
 
-   hb_itemReturn( *(pBase + 1 + hb_parni( 2 )) );
+   hb_itemCopy( &hb_stack.Return, *(pBase + 1 + hb_parni( 2 )) );
 }
 
 HB_FUNC( __VMVARLSET )

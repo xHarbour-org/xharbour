@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.7 2002/01/22 00:23:28 ronpinkas Exp $
+ * $Id: arrays.c,v 1.8 2002/01/26 21:13:58 ronpinkas Exp $
  */
 
 /*
@@ -497,40 +497,25 @@ BOOL hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
    return FALSE;
 }
 
-BOOL hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount )
+hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, long ulStart, long ulCount )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayFill(%p, %p, %p, %p)", pArray, pValue, pulStart, pulCount));
+   PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
+   ULONG ulLen = pBaseArray->ulLen;
 
-   if( HB_IS_ARRAY( pArray ) )
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayFill(%p, %p, %i, %i)", pArray, pValue, ulStart, ulCount));
+
+   if( ulStart <= ulLen )
    {
-      PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
-      ULONG ulLen = pBaseArray->ulLen;
-      ULONG ulStart;
-      ULONG ulCount;
-
-      if( pulStart && ( *pulStart >= 1 ) )
-         ulStart = *pulStart;
-      else
-         ulStart = 1;
-
-      if( ulStart <= ulLen )
+      if( ulStart + ulCount > ulLen )
       {
-         if( pulCount && ( *pulCount <= ulLen - ulStart ) )
-            ulCount = *pulCount;
-         else
-            ulCount = ulLen - ulStart + 1;
-
-         if( ulStart + ulCount > ulLen )             /* check range */
-            ulCount = ulLen - ulStart + 1;
-
-         for( ; ulCount > 0; ulCount--, ulStart++ )     /* set value items */
-            hb_itemCopy( pBaseArray->pItems + ( ulStart - 1 ), pValue );
+         ulCount = ulLen - ulStart + 1;
       }
 
-      return TRUE;
+      for( ; ulCount > 0; ulCount--, ulStart++ )
+      {
+         hb_itemCopy( pBaseArray->pItems + ( ulStart - 1 ), pValue );
+      }
    }
-   else
-      return FALSE;
 }
 
 ULONG hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount )

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.29 2002/01/26 20:16:19 ronpinkas Exp $
+ * $Id: hvm.c,v 1.30 2002/01/27 05:23:33 ronpinkas Exp $
  */
 
 /*
@@ -5061,10 +5061,7 @@ HB_FUNC( __VMVARSLEN )
  * $End$ */
 HB_FUNC( __VMVARSGET )
 {
-   /* hb_itemReturn( s_aStatics.item.asArray.value->pItems +
-                  hb_stack.iStatics + hb_parni( 1 ) - 1 ); */
-
-   hb_itemReturn( s_aStatics.item.asArray.value->pItems + hb_parni( 1 ) - 1 );
+   hb_itemCopy( &hb_stack.Return, s_aStatics.item.asArray.value->pItems + hb_parni( 1 ) - 1 );
 }
 
 /* $Doc$

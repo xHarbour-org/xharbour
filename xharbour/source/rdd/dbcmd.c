@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.187 2002/01/17 18:48:40 alkresin Exp $
+ * $Id: dbcmd.c,v 1.4 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -3129,17 +3129,29 @@ HB_FUNC( DBINFO )
       if( pType )
       {
          pInfo = hb_param( 2 , HB_IT_ANY );
-         if( !pInfo )
+
+         if( pInfo )
+         {
+            bDeleteItem = FALSE;
+         }
+         else
          {
             pInfo = hb_itemNew( NULL );
             bDeleteItem = TRUE;
          }
-         else
-            bDeleteItem = FALSE;
+
          SELF_INFO( ( AREAP ) s_pCurrArea->pArea, hb_itemGetNI( pType ), pInfo );
-         hb_itemReturn( pInfo );
+
          if( bDeleteItem )
+         {
+            hb_itemReturn( pInfo );
             hb_itemRelease( pInfo );
+         }
+         else
+         {
+            hb_itemCopy( &hb_stack.Return, pInfo );
+         }
+
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBINFOBADPARAMETER, NULL, "DBINFO" );
@@ -3206,17 +3218,29 @@ HB_FUNC( DBFIELDINFO )
           uiIndex > 0 && uiIndex <= uiFields )
       {
          pInfo = hb_param( 3 , HB_IT_ANY );
-         if( !pInfo )
+
+         if( pInfo )
+         {
+            bDeleteItem = FALSE;
+         }
+         else
          {
             pInfo = hb_itemNew( NULL );
             bDeleteItem = TRUE;
          }
-         else
-            bDeleteItem = FALSE;
+
          SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiIndex, hb_itemGetNI( pType ), pInfo );
-         hb_itemReturn( pInfo );
+
          if( bDeleteItem )
+         {
+            hb_itemReturn( pInfo );
             hb_itemRelease( pInfo );
+         }
+         else
+         {
+            hb_itemCopy( &hb_stack.Return, pInfo );
+         }
+
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBFIELDINFO" );
@@ -3237,17 +3261,29 @@ HB_FUNC( DBRECORDINFO )
       if( pType )
       {
          pInfo = hb_param( 3 , HB_IT_ANY );
-         if( !pInfo )
+
+         if( pInfo )
+         {
+            bDeleteItem = FALSE;
+         }
+         else
          {
             pInfo = hb_itemNew( NULL );
             bDeleteItem = TRUE;
          }
-         else
-            bDeleteItem = FALSE;
+
          SELF_RECINFO( ( AREAP ) s_pCurrArea->pArea, pRecNo, hb_itemGetNI( pType ), pInfo );
-         hb_itemReturn( pInfo );
+
          if( bDeleteItem )
+         {
+            hb_itemReturn( pInfo );
             hb_itemRelease( pInfo );
+         }
+         else
+         {
+            hb_itemCopy( &hb_stack.Return, pInfo );
+         }
+
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_INFOBADPARAMETER, NULL, "DBRECORDINFO" );

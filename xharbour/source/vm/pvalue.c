@@ -1,5 +1,5 @@
 /*
- * $Id: pvalue.c,v 1.8 2001/11/05 02:59:24 vszakats Exp $
+ * $Id: pvalue.c,v 1.1.1.1 2001/12/21 10:41:04 ronpinkas Exp $
  */
 
 /*
@@ -60,7 +60,11 @@ HB_FUNC( HB_PVALUE )
    PHB_ITEM *pBase = hb_stack.pItems + ( hb_stackBaseItem() )->item.asSymbol.stackbase; /* Skip function + self */
 
    if( uiParam && uiParam <= ( *pBase )->item.asSymbol.paramcnt ) /* Valid number */
-      hb_itemReturn( *( pBase + 1 + uiParam ) );
+   {
+      hb_itemCopy( &hb_stack.Return, *( pBase + 1 + uiParam ) );
+   }
    else
+   {
       hb_ret();    /* return NIL */
+   }
 }
