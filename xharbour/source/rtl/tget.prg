@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.37 2003/01/28 22:16:58 walito Exp $
+ * $Id: tget.prg,v 1.38 2003/01/30 01:01:59 lculik Exp $
  */
 
 /*
@@ -1325,7 +1325,7 @@ METHOD _Delete( lDisplay ) CLASS Get
    else
       ::BadDate := .f.
    endif
-
+   ::Changed    := .T.
    ::Assign()
 
    if lDisplay
