@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.18 2004/07/14 02:34:04 paultucker Exp $
+ * $Id: listbox.prg,v 1.19 2004/07/14 22:44:18 paultucker Exp $
  */
 
 /*
@@ -1214,8 +1214,12 @@ Function _LISTBOX_( Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, ;
 RETURN oScroll
 
 Function __CAPLENGTH( Arg1 )
-   Local Local1 := Len( Arg1 )
+   Local Local1
    Local Local2
+
+   DEFAULT Arg1 TO ""
+
+   Local1 := Len( Arg1 )
 
    IF ( Local2 := At( "&", Arg1 ) ) == 0
    ELSEIF Local2 < Local1
