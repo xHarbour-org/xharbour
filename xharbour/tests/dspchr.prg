@@ -34,7 +34,7 @@ HB_SETTERMCP( cTermCP, cHostCP, lBoxChar )
 for i := 0 to 15
     for j := 0 to 15
         x := i * 16 + j
-        ?? "  " + chr( iif( x==10, ".", x ) )
+        ?? "  " + chr( iif( x<32, 42, x ) )
     next
     ?
 next

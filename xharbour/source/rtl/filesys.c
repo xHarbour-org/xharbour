@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.37 2003/07/15 22:01:17 andijahja Exp $
+ * $Id: filesys.c,v 1.38 2003/07/18 18:06:49 jonnymind Exp $
  */
 
 /*
@@ -543,33 +543,33 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
       if( pipe( hPipeHandle ) == 0 ) {
          if( ( pid = fork() ) != -1 ) {
             if( pid != 0 ) {
-              if( bRead ) {
-             close( hPipeHandle[ 1 ] );
-             hFileHandle = hPipeHandle[ 0 ];
-          } else {
-             close( hPipeHandle[ 0 ] );
-             hFileHandle = hPipeHandle[ 1 ];
-          }
-       } else {
+               if( bRead ) {
+                  close( hPipeHandle[ 1 ] );
+                  hFileHandle = hPipeHandle[ 0 ];
+               } else {
+                  close( hPipeHandle[ 0 ] );
+                  hFileHandle = hPipeHandle[ 1 ];
+               }
+            } else {
                char *argv[4];
-          argv[0] = "sh";
+               argv[0] = "sh";
                argv[1] = "-c";
                argv[2] = ( char * ) pFilename;
                argv[3] = ( char * ) 0;
-          if( bRead ) {
-             close( hPipeHandle[ 0 ] );
-        dup2( hPipeHandle[ 1 ], 1 );
-          } else {
-             close( hPipeHandle[ 1 ] );
-             dup2( hPipeHandle[ 0 ], 0 );
-          }
+               if( bRead ) {
+                  close( hPipeHandle[ 0 ] );
+                  dup2( hPipeHandle[ 1 ], 1 );
+               } else {
+                  close( hPipeHandle[ 1 ] );
+                  dup2( hPipeHandle[ 0 ], 0 );
+               }
                execve("/bin/sh", argv, environ);
-          exit(1);
-       }
-    } else {
-       close( hPipeHandle[0] );
-       close( hPipeHandle[1] );
-    }
+               exit(1);
+            }
+         } else {
+            close( hPipeHandle[0] );
+            close( hPipeHandle[1] );
+         }
       }
       s_uiErrorLast = errno;
    }

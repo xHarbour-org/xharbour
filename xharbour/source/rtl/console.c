@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.28 2003/03/16 06:00:32 jonnymind Exp $
+ * $Id: console.c,v 1.29 2003/05/16 19:52:07 druzus Exp $
  */
 
 /*
@@ -172,9 +172,10 @@ void hb_conInit( void )
    hb_fsSetDevMode( s_iFilenoStdout, FD_BINARY );
    hb_fsSetDevMode( s_iFilenoStderr, FD_BINARY );
 #endif
-   s_bInit = TRUE;
 
    hb_gtInit( (int)s_iFilenoStdin, (int)s_iFilenoStdout, (int)s_iFilenoStderr );
+
+   s_bInit = TRUE;
 
    s_originalMaxRow = hb_gtMaxRow(); /* Save the original */
    s_originalMaxCol = hb_gtMaxCol(); /* screen size */
@@ -186,25 +187,28 @@ void hb_conRelease( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conRelease()"));
 
-   if( s_originalMaxRow != hb_gtMaxRow() || s_originalMaxCol != hb_gtMaxCol() )
+   if( s_bInit )
    {
-      /* If the program changed the screen size, restore the original */
-      hb_gtSetMode( s_originalMaxRow + 1, s_originalMaxCol + 1 );
-   }
+      if( s_originalMaxRow != hb_gtMaxRow() || s_originalMaxCol != hb_gtMaxCol() )
+      {
+         /* If the program changed the screen size, restore the original */
+         hb_gtSetMode( s_originalMaxRow + 1, s_originalMaxCol + 1 );
+      }
 #if !defined(X__WIN32__)
-   hb_fsSetDevMode( s_iFilenoStdout, FD_TEXT );
-   hb_fsSetDevMode( s_iFilenoStderr, FD_TEXT );
+      hb_fsSetDevMode( s_iFilenoStdout, FD_TEXT );
+      hb_fsSetDevMode( s_iFilenoStderr, FD_TEXT );
 #endif
-   /* The is done by the OS from now on */
-   s_szCrLf[ 0 ] = HB_CHAR_LF;
-   s_szCrLf[ 1 ] = '\0';
+      /* The is done by the OS from now on */
+      s_szCrLf[ 0 ] = HB_CHAR_LF;
+      s_szCrLf[ 1 ] = '\0';
 
-   hb_setkeyExit();  /* April White, May 6, 2000 */
-   hb_conXSaveRestRelease();
+      hb_setkeyExit();  /* April White, May 6, 2000 */
+      hb_conXSaveRestRelease();
 
-   hb_gtExit();
+      hb_gtExit();
 
-   s_bInit = FALSE;
+      s_bInit = FALSE;
+   }
 }
 
 char * hb_conNewLine( void )

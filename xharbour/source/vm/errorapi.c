@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.14 2003/07/07 02:32:58 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.15 2003/07/14 19:58:12 jonnymind Exp $
  */
 
 /*
@@ -1303,9 +1303,11 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, char * szText, char * szPar1, ch
 {
    char title[64], buffer[ 256 ];
    FILE *fpError;
+   BOOL bLang;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_errInternal(%lu, %s, %s, %s)", ulIntCode, szText, szPar1, szPar2));
 
+   bLang = ( hb_langID() != NULL );
 
    if( szText )
    {
@@ -1314,34 +1316,31 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, char * szText, char * szPar1, ch
       if( fpError )
       {
          fclose( fpError );
-            TraceLog( "error.log", szText );
+         TraceLog( "error.log", szText );
       }
    }
 
-   if( hb_langID() )
-   {
-      hb_conOutErr( hb_conNewLine(), 0 );
-      sprintf( title, ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ERRINTR ), ulIntCode );
-      hb_conOutErr( title, 0 );
-      sprintf( buffer, szText != NULL ? szText : ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ERRINTR + ulIntCode - 9000 ), szPar1, szPar2 );
-      hb_conOutErr( buffer, 0 );
-      hb_conOutErr( hb_conNewLine(), 0 );
-
-      hb_stackDispCall();
-   }
-   else
-   {
-      sprintf( title, "Unrecoverable error %lu: ", ulIntCode );
-      printf( "\n%s", title );
+   hb_conOutErr( hb_conNewLine(), 0 );
+   sprintf( title, bLang ?
+                      ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ERRINTR ) :
+                      "Unrecoverable error %lu: ", ulIntCode );
+   hb_conOutErr( title, 0 );
+   if( szText != NULL )
       sprintf( buffer, szText, szPar1, szPar2 );
-      printf( "%s\n", buffer );
-   }
+   else if (bLang)
+      sprintf( buffer, ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ERRINTR + ulIntCode - 9000 ), szPar1, szPar2 );
+   hb_conOutErr( buffer, 0 );
+   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_stackDispCall();
 
    #ifndef HB_RUN_AS_SERVICE
       #ifdef HB_OS_WIN_32
          MessageBox( NULL, buffer, title, MB_ICONSTOP );
       #endif
    #endif
+
+   /* release console settings */
+   hb_conRelease();
 
    exit( EXIT_FAILURE );
 }

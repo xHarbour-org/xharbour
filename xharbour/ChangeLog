@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1286 2003/07/23 20:58:29 andijahja Exp $
+ * $Id: ChangeLog,v 1.1287 2003/07/23 21:38:07 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-23 23:43 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/xharbour.spec
+    * force building with GPM
+
+  * xharbour/source/vm/errorapi.c
+    * hb_conRelease() to hb_errInternal() added
+
+  * xharbour/source/rtl/console.c
+  * xharbour/source/rtl/gtapi.c
+    * s_bInit now guards console/GT deinitialization
+
+  * xharbour/source/rtl/langapi.c
+    * exit(1) replace with a s_lang = NULL; hb_errInternal(...)
+      it should be save now because we check in hb_errInternal()
+      for hb_langID() != NULL before using lang api.
+
 2003-07-24 04:30 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/rtl/tget.prg
     ! Bug fix on Method HitTest as reported by Luiz.

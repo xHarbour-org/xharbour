@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.15 2003/07/23 12:35:56 druzus Exp $
+# $Id: xharbour.spec,v 1.16 2003/07/23 16:37:09 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -22,6 +22,7 @@
 %define prefix   /usr
 %define hb_pref  xhb
 %define hb_gt    crs
+%define hb_gpm   yes
 %define hb_mt    MT
 %define hb_mgt   yes
 %define hb_lnkso yes
@@ -32,11 +33,12 @@
 %define hb_arch  export HB_ARCHITECTURE="linux"
 %define hb_cmt   export HB_MT="%{hb_mt}"
 %define hb_cgt   export HB_GT_LIB="gt%{hb_gt}"
+%define hb_cgpm  export HB_GPM_MOUSE="%{hb_gpm}"
 %define hb_cmgt  export HB_MULTI_GT="%{hb_mgt}"
 %define hb_bdir  export HB_BIN_INSTALL="%{prefix}/bin/"
 %define hb_idir  export HB_INC_INSTALL="%{prefix}/include/%{name}/"
 %define hb_ldir  export HB_LIB_INSTALL="%{prefix}/lib/%{name}/"
-%define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_cmt} ; %{hb_cgt} ; %{hb_cmgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir}
+%define hb_env   %{hb_cc} ; %{hb_cflag} ; %{hb_arch} ; %{hb_cmt} ; %{hb_cgt} ; %{hb_cgpm} ; %{hb_cmgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir}
 %define hb_host  www.xharbour.org
 %define readme   README.RPM
 ######################################################################

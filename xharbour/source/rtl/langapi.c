@@ -1,5 +1,5 @@
 /*
- * $Id: langapi.c,v 1.5 2003/01/29 21:30:27 andijahja Exp $
+ * $Id: langapi.c,v 1.6 2003/06/30 17:08:57 ronpinkas Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbapilng.h"
+#include "hbapierr.h"
 
 /* Always link in the default language */
 HB_LANG_REQUEST( HB_LANG_DEFAULT );
@@ -155,9 +156,16 @@ PHB_LANG HB_EXPORT hb_langSelect( PHB_LANG lang )
    }
    else
    {
+      /*
       // Intentionally not using generic rutines which might require valid language setup.
       printf( "Internal error: invalid language selected.\n" );
       exit(1);
+
+      druzus: in hb_errInternal(...) s_lang is checked before so we only have
+              to set it to NULL to avoid recursion
+      */
+      s_lang = NULL;
+      hb_errInternal( HB_EI_ERRUNRECOV, "invalid language selected", NULL, NULL);
    }
 
    return langOld;

@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.7 2003/06/23 02:49:30 andijahja Exp $
+ * $Id: gtapi.c,v 1.8 2003/06/24 04:34:39 ronpinkas Exp $
  */
 
 /*
@@ -154,14 +154,17 @@ void hb_gtExit( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtExit()"));
 
-   s_bInit = FALSE;
+   if( s_bInit )
+   {
+      s_bInit = FALSE;
 
-   while( hb_gt_DispCount() )
-      hb_gt_DispEnd();
+      while( hb_gt_DispCount() )
+         hb_gt_DispEnd();
 
-   hb_gt_Exit();
+      hb_gt_Exit();
 
-   hb_xfree( s_pColor );
+      hb_xfree( s_pColor );
+   }
 }
 
 int hb_gtExtendedKeySupport()
