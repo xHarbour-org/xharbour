@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.37 2002/10/23 07:10:50 what32 Exp $
+ * $Id: xInspect.prg,v 1.38 2002/10/23 14:55:19 ronpinkas Exp $
  */
 
 /*
@@ -339,19 +339,19 @@ CLASS StringList FROM TPanel
 ENDCLASS
 
 METHOD OnCreate() CLASS StringList
-   local nLines
    local cText := "", cItem
 
    FOR EACH cItem IN oApp:MainFrame:ObjInsp:CurObject:Items:Text
       cText += ( cItem + CRLF )
    NEXT
 
-   cText:= Left( cText, Len( cText ) -2 )
+   //cText:= Left( cText, Len( cText ) -2 )
    SetDlgItemText( ::handle, 103, cText )
-   nLines := SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
-   SetDlgItemText( ::handle, 101, AllTrim( Str( nLines ) ) + " Lines" )
+   //nLines := SendDlgItemMessage( ::handle, 103, EM_GETLINECOUNT, 0, 0 )
+   SetDlgItemText( ::handle, 101, AllTrim( Str( Len( oApp:MainFrame:ObjInsp:CurObject:Items:Text ) ) ) + " Lines" )
 
-   TraceLog( oApp:MainFrame:ObjInsp:CurObject:Items:Text, cText )
+   TraceLog( oApp:MainFrame:ObjInsp:CurObject:Items:Text, cText, GetDlgItemText( ::handle, 103 ) )
+
 RETURN Self
 
 METHOD OnCommand( nwParam ) CLASS StringList
@@ -374,7 +374,7 @@ METHOD OnCommand( nwParam ) CLASS StringList
            oApp:MainFrame:ObjInsp:CurObject:Items:Text := {}
            FOR n := 1 TO nLines
                cText := I2Bin( 100 ) + Space( 200 )
-               SendDlgItemMessage( ::handle, 103, EM_GETLINE, n-1, cText )
+               SendDlgItemMessage( ::handle, 103, EM_GETLINE, n - 1, cText )
                cText := StrTran( cText, Chr(10), '' )
                cText := StrTran( cText, Chr(13), '' )
                oApp:MainFrame:ObjInsp:CurObject:Items:Add( AllTrim( cText ) )
