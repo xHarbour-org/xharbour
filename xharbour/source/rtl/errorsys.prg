@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.34 2004/05/21 00:02:59 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.35 2004/05/21 00:33:06 ronpinkas Exp $
  */
 
 /*
@@ -271,7 +271,7 @@ STATIC FUNCTION LogError( oerr )
         ENDIF
 
         FWriteLine( nHandle, '' )
-        FWriteLine( nHandle, Padc( ' Enviromental Information ', 79, '-' ) )
+        FWriteLine( nHandle, Padc( ' Environmental Information ', 79, '-' ) )
         FWriteLine( nHandle, '' )
         FWriteLine( nHandle, "Exact is ........: " + strvalue( Set( 1 ), .T. ) )
         FWriteLine( nHandle, "Fixed is ........: " + strvalue( Set( 2 ), .T. ) )

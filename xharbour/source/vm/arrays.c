@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.110 2004/05/04 16:24:12 mauriliolongo Exp $
+ * $Id: arrays.c,v 1.111 2004/05/18 23:07:39 walito Exp $
  */
 
 /*
@@ -91,7 +91,7 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
    //#define DEBUG_ARRAYS
 
    #ifdef DEBUG_ARRAYS
-      char szProc[64], szModule[64];
+      char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
       static int s_i = 0;
 
       if( s_i++ > 0 )
@@ -1221,7 +1221,7 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
 
              while( pOwners )
              {
-                char szProc[64], szModule[64];
+                char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
                 USHORT uiLine;
 
                 if( pOwners->pOwner != (void *) pArray )
@@ -1248,7 +1248,7 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
    }
    else
    {
-      char szProc[64], szModule[64];
+      char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
       USHORT uiLine;
 
       hb_procinfo( 0, szProc, &uiLine, szModule  );
@@ -1684,7 +1684,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       }
 
       {
-         char szProc[64], szModule[64];
+         char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
          USHORT uiLine;
 
          hb_procinfo( 0, szProc, &uiLine, szModule  );
@@ -1749,7 +1749,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       }
       else
       {
-         char szProc[64], szModule[64];
+         char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
          USHORT uiLine;
 
          hb_procinfo( 0, szProc, &uiLine, szModule  );
@@ -1817,7 +1817,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       }
       else
       {
-         char szProc[64], szModule[64];
+         char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
          USHORT uiLine;
 
          hb_procinfo( 0, szProc, &uiLine, szModule  );

@@ -856,6 +856,8 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
    LOCAL aBlocks, aCode, OpCode
    LOCAL nForEachIndex := s_nForEachIndex
 
+   //TraceLog( aProcedures[nProc][1] )
+
    IF s_nProcStack > 0
       /* Saving Privates of upper level. */
       nVars := Len( s_asPrivates )
@@ -2119,6 +2121,7 @@ FUNCTION PP_Run( cFile, aParams, sPPOExt, bBlanks )
 
    LOCAL nBaseProc := s_nProcId, sPresetModule := s_sModule, nProc
    LOCAL bErrHandler, oError
+   LOCAL aProcedures
 
    IF bBlanks == NIL
       bBlanks := .T.
@@ -2165,7 +2168,11 @@ FUNCTION PP_Run( cFile, aParams, sPPOExt, bBlanks )
          bCompile  := .F.
       ENDIF
 
-      PP_Exec( s_aProcedures, s_aInitExit, s_nProcId, aParams )
+      //UGLY hack.
+      aProcedures := s_aProcedures
+      s_aProcedures := NIL
+
+      PP_Exec( aProcedures, s_aInitExit, s_nProcId, aParams )
 
       #ifdef __CLIPPER__
          Memory(-1)
@@ -2252,66 +2259,57 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
    LOCAL nProc, sProc
    LOCAL oRecover, lSuccess
 
-   #ifdef __XHARBOUR__
-      oErr:ProcName   := PP_ProcName()
-      oErr:ProcLine   := PP_ProcLine()
-      oErr:ModuleName := s_sFile
-   #endif
-
    oRecover := oErr
-
-   IF oErr:SubCode == 1001
-      IF s_sModule != NIL
-         sProc := s_sModule + oErr:Operation
-         nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
-      ELSE
-         nProc := 0
-      ENDIF
-
-      #ifndef __XHARBOUR__
-         IF nProc == 0
-            sProc := oErr:Operation
-            nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
-         ENDIF
-      #endif
-
-      IF nProc > 0
-         s_xRet := NIL
-         IF ValType( oErr:Args ) == 'A'
-            s_aParams := oErr:Args
-         ELSE
-            s_aParams := {}
-         ENDIF
-
-         lSuccess := .T.
-
-         BEGIN SEQUENCE
-            PP_ExecProcedure( aProcedures, nProc )
-         RECOVER USING oRecover
-            lSuccess := .F.
-            oRecover:Cargo := oErr
-         END
-
-         IF lSuccess
-            RETURN s_xRet
-         ENDIF
-      ENDIF
-   ENDIF
 
    #ifdef __XHARBOUR__
       oRecover:ProcName   := PP_ProcName()
       oRecover:ProcLine   := PP_ProcLine()
       oRecover:ModuleName := s_sFile
-   #endif
+	 #else
+   		IF oErr:SubCode == 1001
+   		   IF s_sModule != NIL
+   		      sProc := s_sModule + oErr:Operation
+   		      nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
+   		   ELSE
+   		      nProc := 0
+   		   ENDIF
+
+   		   IF nProc == 0
+   		      sProc := oErr:Operation
+   		      nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
+   		   ENDIF
+
+   		   IF nProc > 0
+   		      s_xRet := NIL
+   		      IF ValType( oErr:Args ) == 'A'
+   		         s_aParams := oErr:Args
+   		      ELSE
+   		         s_aParams := {}
+   		      ENDIF
+
+   		      lSuccess := .T.
+
+   		      BEGIN SEQUENCE
+   		         PP_ExecProcedure( aProcedures, nProc )
+   		      RECOVER USING oRecover
+   		         lSuccess := .F.
+   		         oRecover:Cargo := oErr
+   		      END
+
+   		      IF lSuccess
+   		         RETURN s_xRet
+   		      ENDIF
+   		   ENDIF
+   		ENDIF
+	 #endif
 
    IF s_bExternalRecovery != NIL
-      s_xRet := Eval( s_bExternalRecovery, oRecover )
-
-      IF oRecover:SubCode == 1003 .AND. ( ValType( s_xRet ) != "L" .OR. s_xRet == .F. )
-         Break( oRecover )
+      IF oRecover:SubCode == 1001
+         TraceLog( "Resolve: " + oRecover:Operation )
+         s_xRet := Eval( s_bExternalRecovery, oRecover )
+         TraceLog( s_xRet )
+         RETURN s_xRet
       ENDIF
-
-      RETURN s_xRet
    ENDIF
 
    //TraceLog( oErr:Description )
@@ -9654,32 +9652,28 @@ RETURN xRet
 FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine )
 
    LOCAL bErrHandler, oError, xRet
-   LOCAL aProcedure
+   LOCAL aProcedure, bPreset, aPresetProcedures
 
    #ifdef __XHARBOUR__
-      LOCAL bReleaseProc
+      LOCAL nPresetDyn
    #endif
 
    IF nLine == NIL
       nLine := 0
    ENDIF
 
-   #ifdef __XHARBOUR__
-     IF s_aProcedures == aProcedures
-        bReleaseProc := .F.
-     ELSE
-        s_aProcedures := aProcedures
+	 IF aProcedures == s_aProcedures
+			bPreset := .F.
+	 ELSE
+			bPreset := .T.
 
-        bReleaseProc := .T.
-        // TODO - Change that so the DynList is saved/restored.
-        // Incase of nested execution.
-        PP_ReleaseDynProcedures()
+      aPresetProcedures := s_aProcedures
+      s_aProcedures := aProcedures
 
-        FOR EACH aProcedure IN aProcedures
-           PP_GenDynProcedure( aProcedure[1], HB_EnumIndex() )
-        NEXT
-     ENDIF
-   #endif
+      #ifdef __XHARBOUR__
+         nPresetDyn := PP_GenDynProcedures( aProcedures )
+      #endif
+	 ENDIF
 
    bErrHandler := ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures ) } )
 
@@ -9733,11 +9727,13 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine )
       Eval( bErrHandler, oError )
    END
 
-   #ifdef __XHARBOUR__
-     IF bReleaseProc
-        PP_ReleaseDynProcedures()
-     ENDIF
-   #endif
+	 IF bPreset
+      s_aProcedures := aPresetProcedures
+
+			#ifdef __XHARBOUR__
+         PP_ReleaseDynProcedures( nPresetDyn )
+      #endif
+	 ENDIF
 
    ErrorBlock( bErrHandler )
 
@@ -9749,7 +9745,11 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
 
    LOCAL nProc, nProcs, xRet
    LOCAL oError, bErrHandler := ErrorBlock()
-   LOCAL aProc
+   LOCAL aProc, bPreset, aPresetProcedures
+
+   #ifdef __XHARBOUR__
+      LOCAL nPresetDyn
+   #endif
 
    IF ValType( aParams ) == 'A'
       s_aParams := aParams
@@ -9767,17 +9767,19 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
    InitRunRules()
    InitRunResults()
 
-   s_aProcedures := aProcedures
+	 IF aProcedures == s_aProcedures
+			bPreset := .F.
 
-   #ifdef __XHARBOUR__
-      // TODO - Change that so the DynList is saved/restored.
-      // Incase of nested execution.
-      PP_ReleaseDynProcedures()
+	 ELSE
+			bPreset := .T.
 
-      FOR EACH aProc IN aProcedures
-          PP_GenDynProcedure( aProc[1], HB_EnumIndex() )
-      NEXT
-   #endif
+      aPresetProcedures := s_aProcedures
+      s_aProcedures := aProcedures
+
+      #ifdef __XHARBOUR__
+         nPresetDyn := PP_GenDynProcedures( aProcedures )
+      #endif
+	 ENDIF
 
    BEGIN SEQUENCE
       nProcs := Len( aInitExit[1] )
@@ -9797,14 +9799,24 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
          PP_ExecProcedure( aProcedures, aInitExit[2][nProc] )
       NEXT
    RECOVER USING oError
+      #ifdef __XHARBOUR__
+         PP_ReleaseDynProcedures( nPresetDyn )
+      #endif
+
+      s_aProcedures := aPresetProcedures
+
       Eval( bErrHandler, oError )
    END SEQUENCE
 
    //TraceLog( xRet )
 
-   #ifdef __XHARBOUR__
-       PP_ReleaseDynProcedures()
-   #endif
+	 IF bPreset
+      s_aProcedures := aPresetProcedures
+
+      #ifdef __XHARBOUR__
+         PP_ReleaseDynProcedures( nPresetDyn )
+      #endif
+	 ENDIF
 
 RETURN xRet
 

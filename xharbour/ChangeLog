@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3014 2004/06/03 02:38:17 kaddath Exp $
+ * $Id: ChangeLog,v 1.3015 2004/06/04 00:18:06 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-28 20:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/exproptb.c
+  * include/hbexprb.c
+    + Added Clipper compatible warning when pushing element of an undeclared Array variable.
+
+  * source/rtl/errorsys.prg
+    ! Fixed spelling typo.
+
+  * source/vm/arrays.c
+  * source/vm/hvm.c
+    ! Fixed preallocated size of szName, and szModuleName arguments to hb_procinfo().
+
+  * utils/xbscript/xbs_harb.ch
+  * utils/xbscript/xbscript.prg
+    ! Fixed 1 todo.
 
 2004-06-04 02:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/xhbgtmk.sh

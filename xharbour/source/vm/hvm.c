@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.400 2004/05/24 07:34:01 ronpinkas Exp $
+ * $Id: hvm.c,v 1.401 2004/05/30 20:44:11 ronpinkas Exp $
  */
 
 /*
@@ -8187,7 +8187,7 @@ void HB_EXPORT hb_vmRequestCancel( void )
 
    if( hb_set.HB_SET_CANCEL )
    {
-      char buffer[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 2 ];
+      char buffer[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 +  64 ]; // 64 for the Canceled at: (%i) overhead.
       int i = 1, i2;
       USHORT uLine;
 

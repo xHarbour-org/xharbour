@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.77 2004/05/24 07:34:00 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.78 2004/05/30 20:44:09 ronpinkas Exp $
  */
 
 /*
@@ -1135,6 +1135,8 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                   }
                   else
                   {
+                     hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_MEMVAR_ASSUMED, pSelf->value.asList.pExprList->value.asSymbol, NULL );
+
                      // Force MEMVAR context.
                      pSelf->value.asList.pExprList = hb_compExprNewAliasVar( hb_compExprNewAlias( hb_compIdentifierNew( "MEMVAR", TRUE ) ), pSelf->value.asList.pExprList );
                   }
