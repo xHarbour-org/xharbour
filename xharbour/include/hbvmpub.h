@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.17 2003/08/24 23:55:20 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.18 2003/11/09 23:16:39 jonnymind Exp $
  */
 
 /*
@@ -265,7 +265,8 @@
        USHORT   uiHolders;    /* number of holders of this array */
        ULONG    ulAllocated;  /* items allocated in keys and values */
        PHB_HASH_ORDER_FUNC fOrder; /* returns -1, 0 or 1 */
-       BOOL     bCase;     /* Case sensitivity */
+       BOOL     bCase;        /* Case sensitivity */
+       BOOL     bAutoAdd;  /* Signal error if key is not found on assign */
     } HB_BASEHASH, * PHB_BASEHASH, * HB_BASEHASH_PTR;
 
     /* internal structure for codeblocks */

@@ -5,7 +5,7 @@
 *
 * This is a test that demonstrates how to use hashes
 *
-* $Id: hash.prg,v 1.5 2003/11/14 16:36:04 jonnymind Exp $
+* $Id: hash.prg,v 1.6 2003/11/15 16:55:18 jonnymind Exp $
 *
 
 PROCEDURE Main()
@@ -51,6 +51,16 @@ PROCEDURE Main()
    ? "Hash is now: ", ValToPrg( hHash )
    ? "operator kval IN hash", ('Str1' IN hHash)
    ? "operator {=>} IN hash", ({ "Str8" => "String key 1" } IN hHash)
+   ? "Turning autoadd off (currently:", HGetAutoAdd( hHash ), ")"
+   HSetAutoAdd( hHash, .F. )
+   TRY
+      hHash[ 'a very new key' ] := 'a value'
+      ? "Failure (new key inserted)"
+   CATCH eError
+      ? "Success: ", eError:description
+   END
+   HSetAutoAdd( hHash, .T. )
+
    ? "Press a Key to continue"
    ?
    Inkey(0)

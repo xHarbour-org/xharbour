@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.9 2003/11/15 16:55:17 jonnymind Exp $
+ * $Id: hash.c,v 1.10 2003/11/15 20:25:51 jonnymind Exp $
  */
 
 /*
@@ -194,6 +194,7 @@ PHB_ITEM HB_EXPORT hb_hashNew( PHB_ITEM pItem ) /* creates a new hash */
    pBaseHash->pKeys = (PHB_ITEM) hb_xgrab( sizeof( HB_ITEM ) * HB_HASH_ALLOC_BLOCK );
    pBaseHash->fOrder = s_hashOrderComplex;
    pBaseHash->bCase = TRUE;
+   pBaseHash->bAutoAdd = TRUE;
 
    // ITEM TYPE MUST BE SET FOR LAST!
    pItem->item.asHash.value = pBaseHash;
@@ -231,8 +232,15 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
    // if misused. if ulPos != 0, this ulPos must always be obtained with a
    // failed scan.
 
-
    pBaseHash = pHash->item.asHash.value;
+
+   // if we are here, we are autoadding.
+   if ( ! pBaseHash->bAutoAdd )
+   {
+      hb_errRT_BASE( EG_BOUND, 1131, "Hash key not found and Auto Add turned off",
+         hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
+      return FALSE;
+   }
 
    if( pBaseHash->ulLen < ULONG_MAX )
    {
@@ -632,6 +640,7 @@ PHB_ITEM HB_EXPORT hb_hashClone( PHB_ITEM pSrcHash )
    pDestBase->ulLen = ulLen;
    pDestBase->fOrder = pSrcBase->fOrder;
    pDestBase->bCase = pSrcBase->bCase;
+   pDestBase->bAutoAdd = pSrcBase->bAutoAdd;
 
    return pDest;
 }
@@ -664,8 +673,12 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
 
    if ( mode != 1 ) // and mode is different
    {
+      BOOL bAdd = pDest->item.asHash.value->bAutoAdd;
       pKey = pSource->item.asHash.value->pKeys;
       pValue = pSource->item.asHash.value->pValues;
+
+      // temporarily enabling auto add
+      pDest->item.asHash.value->bAutoAdd = TRUE;
 
       for ( ulElem = ulStart - 1; ulElem < ulStart-1+ulCount;
             ulElem ++, pKey++, pValue++ )
@@ -708,6 +721,8 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
                }
          }
       }
+      // resetting default autoadd status
+      pDest->item.asHash.value->bAutoAdd = bAdd;
    }
    else // AND mode; we must remove elements in PDEST that are not in pSource
    {
@@ -1469,16 +1484,66 @@ HB_FUNC( HSETCASEMATCH )
    if( pHash && pValue )
    {
       pHash->item.asHash.value->bCase = hb_itemGetL( pValue );
+
+      /* return a reference to the hash */
+      hb_itemCopy( &(HB_VM_STACK.Return), pHash );
    }
    else
    {
          hb_errRT_BASE( EG_ARG, 2017, NULL, "HSETCASEMATCH", 2,
          hb_paramError( 1 ), hb_paramError( 2 ));
    }
-
-   /* return a reference to the hash */
-   hb_itemCopy( &(HB_VM_STACK.Return), pHash );
 }
+
+HB_FUNC( HGETCASEMATCH )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+
+   if( ! pHash )
+   {
+         hb_errRT_BASE( EG_ARG, 2017, NULL, "HGETCASEMATCH", 2,
+         hb_paramError( 1 ), hb_paramError( 2 ));
+   }
+   else {
+      hb_retl( pHash->item.asHash.value->bCase);
+   }
+}
+
+
+HB_FUNC( HSETAUTOADD )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   PHB_ITEM pValue = hb_param( 2, HB_IT_LOGICAL );
+
+   if( pHash && pValue )
+   {
+      pHash->item.asHash.value->bAutoAdd = hb_itemGetL( pValue );
+
+      /* return a reference to the hash */
+      hb_itemCopy( &(HB_VM_STACK.Return), pHash );
+   }
+   else
+   {
+         hb_errRT_BASE( EG_ARG, 2017, NULL, "HSETAUTOADD", 1,
+         hb_paramError( 1 ));
+   }
+}
+
+
+HB_FUNC( HGETAUTOADD )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+
+   if( ! pHash )
+   {
+         hb_errRT_BASE( EG_ARG, 2017, NULL, "HGETAUTOADD", 1,
+         hb_paramError( 1 ));
+   }
+   else {
+      hb_retl( pHash->item.asHash.value->bAutoAdd );
+   }
+}
+
 
 HB_FUNC( HALLOCATE )
 {

@@ -144,6 +144,13 @@ BEGIN/END SEQUENCE block (or a TRY/CATCH block), by using
 the HHasKey() API function or by using the IN operator,
 that we'll see later.
 
+   ----------------------------------------------------------------------
+   * NOTE: After that you have populated the hash with a set of keys that
+     you don't want to change, you can set auto adding off with
+     HSetAutoAdd( hHash, .F.); this will make xharobur to rise a BOUND
+     ERROR if the program tries to add a new key. See HSetAutoAdd for
+     more details.
+   ----------------------------------------------------------------------
 
 
 Relationship operators
@@ -637,6 +644,34 @@ XTRANSLATE macros to create directly insensitive arrays
 
       #xtranslate ihash() => HSetCaseMatch( Hash(), .F. )
    ----------------------------------------------------------------------
+
+
+FUNCTION HGetCaseMatch( hHash ) --> lStatus
+-------------------------------------------
+
+Returns the current setting of string match case sensitiveness of hHash.
+
+
+FUNCTION HSetAutoAdd( hHash, lMode ) --> hHash
+----------------------------------------------
+
+Normally, HSet and [] accessor will add a key if they can't find it
+in the existing hash. If AutoAdd is set to .F. a BOUND ERROR will be
+risen. This allows to lock hashes that represent i.e. database records
+or fixed structure data, so that they are correctly accessed and useless
+keys are not added by error.
+
+At creation, Hash() defaults auto add to true, so the hashes can be
+populated.
+
+The return value is the same hash passed as parameter, so that this
+function can be used in evaluation sequences.
+
+
+FUNCTION HGetAutoAdd( hHash ) --> lMode
+---------------------------------------
+
+Returns the current status of Auto Add flag (see HSetAutoAdd)
 
 
 PROCEDURE HAllocate( hHash, nDimension )
