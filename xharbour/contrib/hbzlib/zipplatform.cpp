@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipPlatform.cpp $
 // $Archive: /ZipArchive/ZipPlatform.cpp $
-// $Date: 02-03-23 2:12 $ $Author: Tadeusz Dracz $
+// $Date: 2003/08/20 15:03:53 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -16,10 +16,10 @@
 
 
 #include "stdafx.h"
-#include "ZipPlatform.h"
-#include "ZipFileHeader.h"
-#include "ZipException.h"
-#include "ZipAutoBuffer.h"
+#include "zipplatform.h"
+#include "zipfileheader.h"
+#include "zipexception.h"
+#include "zipautobuffer.h"
 #include <sys/stat.h>
 
 #if defined _MSC_VER && !defined __BORLANDC__ /*_MSC_VER may be defined in Borland after converting the VC project */
@@ -31,8 +31,8 @@
 #include <direct.h>
 #include <io.h>
 #include <time.h> 
-#include "ZipPathComponent.h"
-#include "ZipCompatibility.h"
+#include "zippathcomponent.h"
+#include "zipcompatibility.h"
 
 const TCHAR CZipPathComponent::m_cSeparator = _T('\\');
 

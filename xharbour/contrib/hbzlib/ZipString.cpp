@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipString.cpp $
 // $Archive: /ZipArchive/ZipString.cpp $
-// $Date: 02-01-19 18:03 $ $Author: Tadeusz Dracz $
+// $Date: 2003/08/20 15:03:51 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -14,7 +14,7 @@
 // For the licensing details see the file License.txt
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "ZipString.h"
+#include "zipstring.h"
 	
 ZIPSTRINGCOMPARE GetCZipStrCompFunc(bool bCaseSensitive, bool bCollate)
 {

@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipCentralDir.cpp $
 // $Archive: /ZipArchive/ZipCentralDir.cpp $
-// $Date: 02-04-01 3:13 $ $Author: Tadeusz Dracz $
+// $Date: 2003/08/20 15:03:52 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -16,10 +16,10 @@
 
 
 #include "stdafx.h"
-#include "ZipCentralDir.h"
-#include "ZipArchive.h"
-#include "ZipFileMapping.h"
-#include "ZipPlatform.h"
+#include "zipcentraldir.h"
+#include "ziparchive.h"
+#include "zipfilemapping.h"
+#include "zipplatform.h"
 
 
 #define CENTRALDIRSIZE	22
