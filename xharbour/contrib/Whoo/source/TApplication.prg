@@ -50,6 +50,8 @@ METHOD Initialize() CLASS Application
    ENDIF
    ::Instance := hInstance()
    InitCommonControls()
+   InitCommonControlsEx(ICC_BAR_CLASSES)
+  
    oAppl := Self
 
    RETURN(self)

@@ -144,7 +144,6 @@ CLASS MainFrame FROM TFrame
 
    METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Quitting xIDE ?', 'OnCloseQuery', MB_YESNO ) == IDYES,;
                                     PostQuitMessage(0), 0 )
-
 ENDCLASS
 
 //----------------------------------------------------------------------------------------------
@@ -152,10 +151,12 @@ ENDCLASS
 
 CLASS Splash FROM TForm
    DATA bitmap
-   METHOD New()          CONSTRUCTOR
-   METHOD OnPaint( hDC ) INLINE DrawBitmap(hDC,::bitmap),0
-   METHOD OnDestroy()    INLINE DeleteObject(::bitmap),NIL
-   METHOD OnTimer(n)     INLINE if( n==1,::Destroy(),)
+   METHOD New()           CONSTRUCTOR
+   METHOD OnPaint( hDC )  INLINE DrawBitmap(hDC,::bitmap),0
+   METHOD OnDestroy()     INLINE DeleteObject(::bitmap),NIL
+   METHOD OnTimer(n)      INLINE if( n==1,::Destroy(),)
+   METHOD OnLButtonDown() INLINE ::Destroy()
+   METHOD OnRButtonDown() INLINE ::Destroy()
 ENDCLASS
 
 METHOD New( oParent, cFile, nTimeOut ) CLASS Splash

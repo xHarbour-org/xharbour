@@ -27,6 +27,7 @@ CLASS TTabControl FROM TControl
    DATA nCurSel
    DATA Cargo
    DATA ntProc
+   DATA SendTo AS OBJECT
    METHOD New() CONSTRUCTOR
    METHOD AddTab()
    METHOD InsertTab()
@@ -90,7 +91,7 @@ METHOD New( oParent, nId, nL, nT, nW, nH, nSel ) CLASS TTabControl
    ::nCurSel := IF(nSel==NIL,1,nSel)
 
    ::Msgs    := {WM_NOTIFY,WM_CTLCOLORDLG}
-
+   ::SendTo  := oParent
 RETURN( super:new( oParent ))
 
 *-----------------------------------------------------------------------------*
@@ -98,7 +99,6 @@ RETURN( super:new( oParent ))
 METHOD CreateTabs() CLASS TTabControl
    ::ntProc := SetProcedure( ::Parent:handle,;
                {|hWnd,nMsg,nwParam,nlParam|::TabNotify( nMsg,nwParam, nlParam )},{WM_NOTIFY} )
-
 return( super:OnCreate() )
 
 *-----------------------------------------------------------------------------*
@@ -359,6 +359,8 @@ METHOD SetUnicodeFormat( lUnicode ) CLASS TTabControl
 
 CLASS TabPage FROM TPanel
    METHOD New() CONSTRUCTOR
+   METHOD OnCommand(nwParam,nlParam) INLINE ::SendCommand(nwParam,nlParam)
+   METHOD SendCommand()
 ENDCLASS
 
 METHOD New( oParent ) CLASS TabPage
@@ -369,3 +371,9 @@ METHOD New( oParent ) CLASS TabPage
    ::modal := .F.
    ::Create()
 return( self )
+
+METHOD SendCommand(nwParam,nlParam) CLASS TabPage
+   IF ::Parent:SendTo != NIL
+      ::Parent:SendTo:PostMessage( WM_COMMAND, nwParam, nlParam )
+   endif
+return(0)
