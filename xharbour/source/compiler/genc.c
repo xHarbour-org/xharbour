@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.90 2005/03/31 14:34:03 andijahja Exp $
+ * $Id: genc.c,v 1.91 2005/04/01 20:16:30 andijahja Exp $
  */
 
 /*
@@ -121,10 +121,24 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    PSSYMLIST pTemp;
    BOOL bSymFIRST = FALSE;
 
+#ifdef __XHB__
+   char szObjFileName[_POSIX_PATH_MAX];
+   hb_xmemset( szObjFileName, '\0', _POSIX_PATH_MAX );
+   if ( pFileName->szPath )
+   {
+      hb_xstrcat( szObjFileName, pFileName->szPath, pFileName->szName, ".obj", NULL );
+   }
+   else
+   {
+      hb_xstrcat( szObjFileName, pFileName->szName, ".obj", NULL );
+   }
+   pFileName->szExtension = ".c";
+#else
    if( ! pFileName->szExtension )
    {
       pFileName->szExtension = ".c";
    }
+#endif
 
    hb_fsFNameMerge( szFileName, pFileName );
 
@@ -484,13 +498,20 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                fprintf( yyc, " | HB_FS_MESSAGE" );
             }
 
+#if !defined( HB_NO_STATIC_FUNC_START )
+            if ( ( pSym->cScope & HB_FS_FIRST ) &&  ( ! hb_comp_bNoStartUp ) )
+            {
+               fprintf( yyc, " | HB_FS_FIRST" );
+               iStartupOffset = iSymOffset;
+            }
+#else
             if ( ( pSym->cScope & HB_FS_FIRST ) && !( pSym->cScope & HB_FS_STATIC ) &&  ( ! hb_comp_bNoStartUp ) && ( ! bSymFIRST ) )
             {
                fprintf( yyc, " | HB_FS_FIRST" );
                iStartupOffset = iSymOffset;
                bSymFIRST = TRUE;
             }
-
+#endif
             /* specify the function address if it is a defined function or an
                external called function */
             if( hb_compFunctionFind( pSym->szName ) ) /* is it a function defined in this module */
@@ -958,6 +979,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          printf( "Done.\n" );
       }
    }
+   else
+   {
+#if defined ( __XHB__ )
+      xccmain( szFileName, szObjFileName );
+#endif
+   }
 
    /*
     Close .p file
@@ -1332,9 +1359,11 @@ static void hb_compGenCInLineSymbol()
       if( sInline )
       {
          hb_compGenCCheckInLineStatic( sInline );
-         hb_comParseLine( sInline, FALSE );
-         pInline = pInline->pNext;
          hb_xfree( sInline );
+         sInline = hb_stripOutComments( (char*) pInline->pCode );
+         hb_comParseLine( sInline, FALSE );
+         hb_xfree( sInline );
+         pInline = pInline->pNext;
       }
    }
 }
