@@ -1,6 +1,6 @@
 rem @echo off
 rem
-rem $Id: bld.bat,v 1.5 2002/06/22 02:24:51 lculik Exp $
+rem $Id: bld.bat,v 1.6 2002/07/05 19:53:30 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -109,7 +109,10 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 
 :COMPILE
 
-   %HB_BIN_INSTALL%\harbour %1.prg -n -i%HB_INC_INSTALL% %2 %3 %HARBOURFLAGS% /p
+   %HB_BIN_INSTALL%\harbour %1.prg -n -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
+   IF NOT '%2'=='' %HB_BIN_INSTALL%\harbour %1.prg -n -i%HB_INC_INSTALL% %HARBOURFLAGS% -p -w
+   IF NOT '%2'=='' SET HB_2nd_prg=%2.c
+   IF '%2'=='' SET HB_2nd_prg=
 
 :A_DOS
 
@@ -173,7 +176,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 
    if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
 
-   if "%HB_COMPILER%" == "bcc32"   bcc32 -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c bcc640.lib common.lib  debug.lib vm.lib rtl.lib %_HB_GT_LIB%.lib lang.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib rddads.lib ace32.lib
+   if "%HB_COMPILER%" == "bcc32"   bcc32 -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% bcc640.lib common.lib  debug.lib vm.lib rtl.lib %_HB_GT_LIB%.lib lang.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib rddads.lib ace32.lib
    if "%HB_COMPILER%" == "gcc"     gcc %1.c -o%1.exe %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon
    if "%HB_COMPILER%" == "mingw32" gcc %1.c -o%1.exe %CFLAGS% -mno-cygwin -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon
    if "%HB_COMPILER%" == "rsxnt"   gcc %1.c -Zwin32 %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon

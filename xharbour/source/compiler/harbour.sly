@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.18 2002/08/31 01:30:34 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.19 2002/08/31 14:04:56 ronpinkas Exp $
  */
 
 /*
@@ -165,7 +165,7 @@ static void hb_compDebugStart( void ) { };
 };
 
 %token FUNCTION PROCEDURE IDENTIFIER RETURN NIL NUM_DOUBLE INASSIGN NUM_INTEGER NUM_LONG
-%token LOCAL STATIC IIF IF ELSE ELSEIF END ENDIF LITERAL TRUEVALUE FALSEVALUE
+%token LOCAL STATIC GLOBAL EXTERNGLOBAL IIF IF ELSE ELSEIF END ENDIF LITERAL TRUEVALUE FALSEVALUE
 %token ANNOUNCE EXTERN INIT EXIT AND OR NOT PUBLIC EQ NE1 NE2
 %token INC DEC ALIASOP DOCASE CASE OTHERWISE ENDCASE ENDDO MEMVAR
 %token WHILE LOOP END FOR NEXT TO STEP LE GE FIELD IN PARAMETERS
@@ -1449,6 +1449,8 @@ IIFInline  : IIF PareExpList3          { $$ = hb_compExprNewIIF( $2 ); }
 
 VarDefs    : LOCAL { hb_comp_iVarScope = VS_LOCAL; hb_compLinePush(); } VarList Crlf { hb_comp_cVarType = ' '; }
            | STATIC { hb_comp_iVarScope = VS_STATIC; hb_compLinePush(); } VarList Crlf { hb_comp_cVarType = ' '; }
+           | GLOBAL { hb_comp_iVarScope = VS_GLOBAL; hb_compLinePush(); } VarList Crlf { hb_comp_cVarType = ' '; }
+           | EXTERNGLOBAL { hb_comp_iVarScope = VS_EXTERNGLOBAL; hb_compLinePush(); } VarList Crlf { hb_comp_cVarType = ' '; }
            | PARAMETERS { if( hb_comp_functions.pLast->bFlags & FUN_USES_LOCAL_PARAMS )
                              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_PARAMETERS_NOT_ALLOWED, NULL, NULL );
                           else
@@ -1499,6 +1501,11 @@ VarDef     : IdentName AsType { hb_compVariableAdd( $1, hb_comp_cVarType ); }
                      hb_compStaticDefStart();   /* switch to statics pcode buffer */
                      hb_compStaticDefEnd();
                   }
+                  else if( hb_comp_iVarScope == VS_GLOBAL )
+                  {
+                     hb_compGlobalsDefStart();   /* switch to globals pcode buffer */
+                     hb_compGlobalsDefEnd();
+                  }
                   else if( hb_comp_iVarScope == VS_PUBLIC || hb_comp_iVarScope == VS_PRIVATE )
                   {
                      hb_compRTVariableAdd( hb_compExprNewRTVar( $1, NULL ), FALSE );
@@ -1514,11 +1521,22 @@ VarDef     : IdentName AsType { hb_compVariableAdd( $1, hb_comp_cVarType ); }
 		  hb_comp_cVarType = ' ';
 
                   hb_comp_iVarScope = $<iNumber>3;
+
                   if( hb_comp_iVarScope == VS_STATIC )
                   {
                      hb_compStaticDefStart();   /* switch to statics pcode buffer */
                      hb_compExprDelete( hb_compExprGenStatement( hb_compExprAssignStatic( hb_compExprNewVar( $1 ), $6 ) ) );
                      hb_compStaticDefEnd();
+                  }
+                  else if( hb_comp_iVarScope == VS_GLOBAL )
+                  {
+                     hb_compGlobalsDefStart();   /* switch to statics pcode buffer */
+                     hb_compExprDelete( hb_compExprGenStatement( hb_compExprAssign( hb_compExprNewVar( $1 ), $6 ) ) );
+                     hb_compGlobalsDefEnd();
+                  }
+                  else if( hb_comp_iVarScope == VS_EXTERNGLOBAL )
+                  {
+                     hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXTERNGLOBAL_ASSIGN, $1, NULL );
                   }
                   else if( hb_comp_iVarScope == VS_PUBLIC || hb_comp_iVarScope == VS_PRIVATE )
                   {
@@ -2509,6 +2527,30 @@ static void hb_compVariableDim( char * szName, HB_EXPR_PTR pInitValue )
      /* delete all used expressions */
      hb_compExprDelete( pAssign );
      hb_compStaticDefEnd();
+  }
+  else if( hb_comp_iVarScope == VS_GLOBAL )
+  {
+     USHORT uCount = hb_compExprListLen( pInitValue );
+     HB_EXPR_PTR pVar = hb_compExprNewVar( szName );
+     HB_EXPR_PTR pAssign;
+
+     /* create a static variable */
+     hb_compVariableAdd( szName, 'A' );
+     hb_compGlobalsDefStart();   /* switch to statics pcode buffer */
+     /* create an array */
+     hb_compExprGenPush( pInitValue );
+     hb_compGenPCode3( HB_P_ARRAYDIM, HB_LOBYTE( uCount ), HB_HIBYTE( uCount ), ( BOOL ) 1 );
+     /* check if valid initializers were used but don't generate any code */
+     pAssign = hb_compExprAssignStatic( pVar, pInitValue );
+     /* now pop an array */
+     hb_compExprGenPop( pVar );
+     /* delete all used expressions */
+     hb_compExprDelete( pAssign );
+     hb_compGlobalsDefEnd();
+  }
+  else if( hb_comp_iVarScope == VS_EXTERNGLOBAL )
+  {
+     hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXTERNGLOBAL_ASSIGN, szName, NULL );
   }
   else
   {

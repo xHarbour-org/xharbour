@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.95 2002/08/26 15:24:16 ronpinkas Exp $
+ * $Id: hvm.c,v 1.96 2002/08/31 01:30:34 ronpinkas Exp $
  */
 
 /*
@@ -269,6 +269,9 @@ HB_ITEM  hb_vm_aEnumCollection[ HB_MAX_ENUMERATIONS ];
 PHB_ITEM hb_vm_apEnumVar[ HB_MAX_ENUMERATIONS ];
 ULONG    hb_vm_awEnumIndex[ HB_MAX_ENUMERATIONS ];
 USHORT   hb_vm_wEnumCollectionCounter = 0; // Initilaized in hb_vmInit()
+
+PHB_ITEM *hb_vm_pGlobals = NULL;
+short    hb_vm_iGlobals = 0;
 
 /* 21/10/00 - maurilio.longo@libero.it
    This Exception Handler gets called in case of an abnormal termination of an harbour program and
@@ -557,6 +560,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
    LONG lOffset;
    ULONG ulLastOpcode = 0; /* opcodes profiler support */
    ULONG ulPastClock = 0;  /* opcodes profiler support */
+   short iGlobal;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p)", pCode, pSymbols));
 
@@ -567,6 +571,19 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
     */
    /* NOTE: Initialization with 0 is needed to avoid GCC -O2 warning */
    ulPrivateBase = pSymbols ? hb_memvarGetPrivatesBase() : 0;
+
+   // Unlock module globals so values can be released.
+   for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
+   {
+      if( hb_vm_pGlobals[ iGlobal ]->type == HB_IT_ARRAY )
+      {
+         hb_gcUnlock( hb_vm_pGlobals[ iGlobal ]->item.asArray.value );
+      }
+      else if( hb_vm_pGlobals[ iGlobal ]->type == HB_IT_BLOCK )
+      {
+         hb_gcUnlock( hb_vm_pGlobals[ iGlobal ]->item.asBlock.value );
+      }
+   }
 
    while( pCode[ w ] != HB_P_ENDPROC )
    {
@@ -1047,6 +1064,23 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             {
                hb_memvarSetPrivatesBase( ulPrivateBase );
             }
+
+            /*
+             * NOTE!!! Return!!!
+             */
+
+            // Lock Module Globals, so that GC will not release.
+            for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
+            {
+               if( hb_vm_pGlobals[ iGlobal ]->type == HB_IT_ARRAY )
+               {
+                  hb_gcLock( hb_vm_pGlobals[ iGlobal ]->item.asArray.value );
+               }
+               else if( hb_vm_pGlobals[ iGlobal ]->type == HB_IT_BLOCK )
+               {
+                  hb_gcLock( hb_vm_pGlobals[ iGlobal ]->item.asBlock.value );
+               }
+            }
             return;
 
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
@@ -1445,6 +1479,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             hb_rddGetFieldValue( ( * hb_stack.pPos ), pSymbols + ( USHORT ) ( pCode[ w + 1 ] + ( pCode[ w + 2 ] * 256 ) ) );
             hb_stackPush();
             w += 3;
+            break;
+
+         case HB_P_PUSHGLOBAL:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHGLOBAL") );
+            hb_vmPush( hb_vm_pGlobals[ ( signed char ) pCode[ w + 1 ] ] );
+            w += 2;
             break;
 
          case HB_P_PUSHLOCAL:
@@ -1867,6 +1907,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
             w += 3;
             break;
          }
+
+         case HB_P_POPGLOBAL:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_POPGLOBAL") );
+            hb_stackDec();
+            hb_itemForwardValue( hb_vm_pGlobals[ ( signed char ) pCode[ w + 1 ] ], *( hb_stack.pPos ) );
+            w += 2;
+            break;
 
          case HB_P_POPLOCAL:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPLOCAL") );
@@ -2342,6 +2389,19 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
       hb_memvarSetPrivatesBase( ulPrivateBase );
 
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
+
+   // Lock Module Globals, so that GC will not release.
+   for ( iGlobal = 0; iGlobal < hb_vm_iGlobals; iGlobal++ )
+   {
+      if( hb_vm_pGlobals[ iGlobal ]->type == HB_IT_ARRAY )
+      {
+         hb_gcLock( hb_vm_pGlobals[ iGlobal ]->item.asArray.value );
+      }
+      else if( hb_vm_pGlobals[ iGlobal ]->type == HB_IT_BLOCK )
+      {
+         hb_gcLock( hb_vm_pGlobals[ iGlobal ]->item.asBlock.value );
+      }
+   }
 }
 
 /* ------------------------------- */

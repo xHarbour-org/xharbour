@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.3 2002/01/19 14:15:44 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.4 2002/04/21 01:39:17 ronpinkas Exp $
  */
 
 /*
@@ -239,14 +239,16 @@ typedef  HB_PCODE_FUNC_ * HB_PCODE_FUNC_PTR;
 
 void hb_compPCodeEval( PFUNCTION, HB_PCODE_FUNC_PTR *, void * );
 
-#define VS_NONE       0
-#define VS_LOCAL      1
-#define VS_STATIC     2
-#define VS_FIELD      4
-#define VS_PARAMETER  8
-#define VS_PRIVATE    64
-#define VS_PUBLIC     128
-#define VS_MEMVAR     ( VS_PUBLIC | VS_PRIVATE )
+#define VS_NONE           0
+#define VS_LOCAL          1
+#define VS_STATIC         2
+#define VS_FIELD          4
+#define VS_PARAMETER      8
+#define VS_GLOBAL        16
+#define VS_EXTERNGLOBAL  32
+#define VS_PRIVATE       64
+#define VS_PUBLIC       128
+#define VS_MEMVAR       ( VS_PUBLIC | VS_PRIVATE )
 
 #define VU_NOT_USED    0
 #define VU_INITIALIZED 1
@@ -371,6 +373,10 @@ extern int hb_compFieldsCount( void );
 extern void hb_compStaticDefStart( void );
 extern void hb_compStaticDefEnd( void );
 
+/* Global variables */
+extern void hb_compGlobalsDefStart( void );
+extern void hb_compGlobalsDefEnd( void );
+
 extern HB_EXPR_PTR hb_compErrorStatic( char *, HB_EXPR_PTR );
 extern HB_EXPR_PTR hb_compErrorType( HB_EXPR_PTR );
 extern HB_EXPR_PTR hb_compErrorIndex( HB_EXPR_PTR );
@@ -439,6 +445,7 @@ extern char *         hb_comp_szFromClass;
 extern PCOMDECLARED   hb_comp_pLastMethod;
 extern HB_PATHNAMES * hb_comp_pIncludePath;
 extern PFUNCTION      hb_comp_pInitFunc;
+extern PFUNCTION      hb_comp_pGlobalsFunc;
 extern PHB_FNAME      hb_comp_pFileName;
 extern BOOL           hb_comp_bPPO;
 extern FILE *         hb_comp_yyppo;
@@ -502,6 +509,9 @@ extern int            hb_comp_iLineINLINE;
 extern int            hb_comp_iLinePRG;
 
 extern ULONG          hb_comp_Supported;
+
+extern PVAR           hb_comp_pGlobals;
+extern short          hb_comp_iGlobals;
 
 /* /GC command line setting types */
 #define HB_COMPGENC_COMPACT     0

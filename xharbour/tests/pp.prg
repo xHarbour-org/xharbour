@@ -5820,6 +5820,8 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    LOCAL sRuleCopy := sRule
    LOCAL nLastOptional, nPending
    LOCAL sDots
+   LOCAL nMarkerID
+
    /*
    nMarkerID
    nOPTIONAL
@@ -5952,7 +5954,8 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       ENDIF
 
       IF s1 == '<'
-         nId++
+         //nId++
+         nId := Len( aMarkers ) + 1
 
          /* Skip trailing spaces...*/
          sRule := SubStr( sRule, 2 )
@@ -5966,9 +5969,15 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                ExtractLeadingWS( @sRule )
 
                nNext := At( '*', sRule )
+
                IF nNext > 1
-                  sMarker := Left( sRule, nNext - 1 )
-                  aAdd( aMarkers, RTrim( sMarker ) )
+                  sMarker := RTrim( Left( sRule, nNext - 1 ) )
+
+                  IF ( nMarkerID := aScan( aMarkers, sMarker ) ) > 0
+                     nId := nMarkerID
+                  ELSE
+                     aAdd( aMarkers, sMarker )
+                  ENDIF
 
                   sRule := SubStr( sRule, nNext + 1 )
                   ExtractLeadingWS( @sRule )
@@ -6004,8 +6013,13 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
                nNext := At( ')', sRule )
                IF nNext > 1
-                  sMarker := Left( sRule, nNext - 1 )
-                  aAdd( aMarkers, RTrim( sMarker ) )
+                  sMarker := RTrim( Left( sRule, nNext - 1 ) )
+
+                  IF ( nMarkerID := aScan( aMarkers, sMarker ) ) > 0
+                     nId := nMarkerID
+                  ELSE
+                     aAdd( aMarkers, sMarker )
+                  ENDIF
 
                   sRule := SubStr( sRule, nNext + 1 )
                   ExtractLeadingWS( @sRule )
@@ -6041,8 +6055,13 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
                nNext := At( '!', sRule )
                IF nNext > 1
-                  sMarker := Left( sRule, nNext - 1 )
-                  aAdd( aMarkers, RTrim( sMarker ) )
+                  sMarker := RTrim( Left( sRule, nNext - 1 ) )
+
+                  IF ( nMarkerID := aScan( aMarkers, sMarker ) ) > 0
+                     nId := nMarkerID
+                  ELSE
+                     aAdd( aMarkers, sMarker )
+                  ENDIF
 
                   sRule := SubStr( sRule, nNext + 1 )
                   ExtractLeadingWS( @sRule )
@@ -6103,9 +6122,15 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
             //? "Extended: '" + sRule + "'"
             cType := 'A'
 
-            sMarker := Left( sRule, nNext - 1 )
+            sMarker := RTrim( Left( sRule, nNext - 1 ) )
             ExtractLeadingWS( @sMarker )
-            aAdd( aMarkers, sMarker )
+
+            IF ( nMarkerID := aScan( aMarkers, sMarker ) ) > 0
+               nId := nMarkerID
+            ELSE
+               aAdd( aMarkers, sMarker )
+            ENDIF
+
             sRule := sDots
 
             nNext    := 0
@@ -6118,9 +6143,14 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
             cType := ':'
 
             //? "LIST"
-            sMarker := Left( sRule, nNext - 1 )
+            sMarker := RTrim( Left( sRule, nNext - 1 ) )
             ExtractLeadingWS( @sMarker )
-            aAdd( aMarkers, sMarker )
+
+            IF ( nMarkerID := aScan( aMarkers, sMarker ) ) > 0
+               nId := nMarkerID
+            ELSE
+               aAdd( aMarkers, sMarker )
+            ENDIF
 
             sRule := SubStr( sRule, nNext + 1 )
             ExtractLeadingWS( @sRule )
@@ -6154,9 +6184,14 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
             ENDIF
 
             IF Len( aMarkers ) < nId
-               sMarker := Left( sRule, nCloseAt - 1 )
+               sMarker := RTrim( Left( sRule, nCloseAt - 1 ) )
                ExtractLeadingWS( @sMarker )
-               aAdd( aMarkers, sMarker )
+
+               IF ( nMarkerID := aScan( aMarkers, sMarker ) ) > 0
+                  nId := nMarkerID
+               ELSE
+                  aAdd( aMarkers, sMarker )
+               ENDIF
             ENDIF
 
             sRule := SubStr( sRule, nCloseAt + 1 )
@@ -6698,10 +6733,8 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
          //? "Repeatable: ", nMarker, "Root: ", nOptional
 
          IF ValType( nMarker ) == 'N'
-            nMP := aScan( aRule[2], {|aMP| aMP[1] == nMarker .OR. aMP[1] - 1000 == nMarker } )
-            IF nMP == 0
-               Alert( [ERROR! Internal logic failed! Missing marker # ] + str( nMarker, 2 ) + " [" + Str(ProcLine(),4 ) + ']' )
-            ELSE
+            nMP := 0
+            WHILE ( nMP := aScan( aRule[2], {|aMP| aMP[1] == nMarker .OR. aMP[1] - 1000 == nMarker }, nMP + 1 ) ) > 0
                WHILE aRule[2][nMP][2] < 0
                   IF aRule[2][nMP][1] >= 0
 
@@ -6721,7 +6754,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   aRule[2][nMP][1] += ( 1000 )
                   //? "Flagged:", nMP, "As:", aRule[2][nMP][1]
                ENDIF
-            ENDIF
+            ENDDO
             //WAIT
          ENDIF
       ELSEIF aRP[1] < 0

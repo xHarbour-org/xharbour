@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.13 2002/05/16 02:28:38 ronpinkas Exp $
+ * $Id: genc.c,v 1.14 2002/06/17 21:30:42 andijahja Exp $
  */
 
 /*
@@ -56,11 +56,14 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
    PCOMCLASS    pClass;
    FILE * yyc; /* file handle for C output */
    PINLINE pInline = hb_comp_inlines.pFirst;
+   PVAR pGlobal = hb_comp_pGlobals, pDelete;
+   short iGlobals;
 
    BOOL bIsPublicFunction ;
    BOOL bIsInitFunction   ;
    BOOL bIsExitFunction   ;
    BOOL bIsStaticVariable ;
+   BOOL bIsGlobalVariable ;
 
    if( ! pFileName->szExtension )
       pFileName->szExtension = ".c";
@@ -99,6 +102,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          bIsInitFunction   = ( pFunc->cScope & HB_FS_INIT ) ;
          bIsExitFunction   = ( pFunc->cScope & HB_FS_EXIT ) ;
          bIsStaticVariable = ( pFunc == hb_comp_pInitFunc ) ;
+         bIsGlobalVariable = ( pFunc == hb_comp_pGlobalsFunc ) ;
          bIsPublicFunction = ( pFunc->cScope == HB_FS_PUBLIC ) ;
 
          /* Is it a PUBLIC FUNCTION/PROCEDURE */
@@ -107,6 +111,9 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          /* Is it a STATIC$ */
          else if ( bIsStaticVariable )
             fprintf( yyc, "static HARBOUR hb_INITSTATICS( void );\n" ); /* NOTE: hb_ intentionally in lower case */
+         /* Is it a GLOBAL$ */
+         else if ( bIsGlobalVariable )
+            fprintf( yyc, "static HARBOUR hb_INITGLOBALS( void );\n" ); /* NOTE: hb_ intentionally in lower case */
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )
             fprintf( yyc, "HB_FUNC_INIT( %s );\n", pFunc->szName );
@@ -158,6 +165,14 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
             * initialize static variables
             */
             fprintf( yyc, "{ \"(_INITSTATICS)\", HB_FS_INIT | HB_FS_EXIT, hb_INITSTATICS, NULL }" ); /* NOTE: hb_ intentionally in lower case */
+         }
+         else if( pSym->szName[ 0 ] == '[' )
+         {
+            /* Since the normal function cannot be INIT and EXIT at the same time
+            * we are using these two bits to mark the special function used to
+            * initialize global variables
+            */
+            fprintf( yyc, "{ \"(_INITGLOBALS)\", HB_FS_INIT | HB_FS_EXIT, hb_INITGLOBALS, NULL }" ); /* NOTE: hb_ intentionally in lower case */
          }
          else
          {
@@ -220,6 +235,46 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
                     hb_comp_szPrefix, pFileName->szName,
                     hb_comp_szPrefix, pFileName->szName );
 
+
+      if( hb_comp_pGlobals )
+      {
+         PVAR pLastVar = hb_comp_pGlobals, pDelete;
+
+         fprintf( yyc, "\n#include \"hbapi.h\"\n\n" );
+
+         iGlobals       = 0;
+
+         while( pLastVar )
+         {
+            if( pLastVar->szAlias == NULL )
+            {
+               fprintf( yyc, "HB_ITEM %s = { 0, 0 };\n", pLastVar->szName );
+            }
+            else
+            {
+               fprintf( yyc, "extern HB_ITEM %s;\n", pLastVar->szName );
+            }
+            pLastVar = pLastVar->pNext;
+            iGlobals++;
+         }
+
+         fprintf( yyc, "\nstatic PHB_ITEM pGlobals[] = {\n" );
+
+         pLastVar = hb_comp_pGlobals;
+
+         while( pLastVar )
+         {
+            fprintf( yyc, "                                &%s%c\n", pLastVar->szName, pLastVar->pNext ? ',' : ' ' );
+
+            pLastVar = pLastVar->pNext;
+         }
+
+         fprintf( yyc, "                             };\n\n" );
+
+         fprintf( yyc, "extern PHB_ITEM *hb_vm_pGlobals;\n"
+                       "extern short hb_vm_iGlobals;\n\n" );
+      }
+
       /* Generate functions data
        */
       pFunc = hb_comp_functions.pFirst;
@@ -232,34 +287,72 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          bIsInitFunction   = ( pFunc->cScope & HB_FS_INIT ) ;
          bIsExitFunction   = ( pFunc->cScope & HB_FS_EXIT ) ;
          bIsStaticVariable = ( pFunc == hb_comp_pInitFunc ) ;
+         bIsGlobalVariable = ( pFunc == hb_comp_pGlobalsFunc ) ;
          bIsPublicFunction = ( pFunc->cScope == HB_FS_PUBLIC ) ;
 
          /* Is it a PUBLIC FUNCTION/PROCEDURE */
          if ( bIsPublicFunction )
+         {
             fprintf( yyc, "HB_FUNC( %s )", pFunc->szName );
+         }
          /* Is it STATICS$ */
          else if( bIsStaticVariable )
+         {
             fprintf( yyc, "static HARBOUR hb_INITSTATICS( void )" ); /* NOTE: hb_ intentionally in lower case */
+         }
+         /* Is it GLOBALS$ */
+         else if( bIsGlobalVariable )
+         {
+            fprintf( yyc, "static HARBOUR hb_INITGLOBALS( void )" ); /* NOTE: hb_ intentionally in lower case */
+         }
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )
+         {
             fprintf( yyc, "HB_FUNC_INIT( %s )", pFunc->szName );
+         }
          /* Is it an EXIT FUNCTION/PROCEDURE */
          else if ( bIsExitFunction )
+         {
             fprintf( yyc, "HB_FUNC_EXIT( %s )", pFunc->szName );
+         }
          /* Then it must be a STATIC FUNCTION/PROCEDURE */
          else
+         {
             fprintf( yyc, "HB_FUNC_STATIC( %s )", pFunc->szName );
+         }
 
          fprintf( yyc, "\n{\n   static const BYTE pcode[] =\n   {\n" );
 
          if( hb_comp_iGenCOutput == HB_COMPGENC_COMPACT )
+         {
             hb_compGenCCompact( pFunc, yyc );
+         }
          else
+         {
             hb_compGenCReadable( pFunc, yyc );
+         }
 
          fprintf( yyc, "   };\n\n" );
 
-         fprintf( yyc, "   hb_vmExecute( pcode, symbols );\n}\n\n" );
+         if( hb_comp_pGlobals )
+         {
+            fprintf( yyc, "   PHB_ITEM *Saved_pGlobals = hb_vm_pGlobals;\n"
+                          "   short     Saved_iGlobals = hb_vm_iGlobals;\n"
+                          "\n"
+                          "   hb_vm_pGlobals = pGlobals;\n"
+                          "   hb_vm_iGlobals = %i;\n\n", iGlobals );
+         }
+
+         fprintf( yyc, "   hb_vmExecute( pcode, symbols );\n\n" );
+
+         if( hb_comp_pGlobals )
+         {
+            fprintf( yyc, "   hb_vm_pGlobals = Saved_pGlobals;\n"
+                          "   hb_vm_iGlobals = Saved_iGlobals;\n" );
+         }
+
+         fprintf( yyc, "}\n\n" );
+
          pFunc = pFunc->pNext;
       }
 
@@ -297,7 +390,9 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
 
    pFunc = hb_comp_functions.pFirst;
    while( pFunc )
+   {
       pFunc = hb_compFunctionKill( pFunc );
+   }
 
    pFunc = hb_comp_funcalls.pFirst;
    while( pFunc )
@@ -350,10 +445,22 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
 
    pSym = hb_comp_symbols.pFirst;
    while( pSym )
+   {
       pSym = hb_compSymbolKill( pSym );
+   }
+
+   while( pGlobal )
+   {
+      pDelete = pGlobal;
+      pGlobal = pGlobal->pNext;
+      hb_xfree( pDelete->szName );
+      hb_xfree( pDelete );
+   }
 
    if( ! hb_comp_bQuiet )
+   {
       printf( "Done.\n" );
+   }
 }
 
 static HB_GENC_FUNC( hb_p_and )
@@ -2073,6 +2180,36 @@ static HB_GENC_FUNC( hb_p_endenumerate )
    return 1;
 }
 
+static HB_GENC_FUNC( hb_p_pushglobal )
+{
+   fprintf( cargo->yyc, "\tHB_P_PUSHGLOBAL, %i,",
+            pFunc->pCode[ lPCodePos + 1 ] );
+
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, (USHORT) pFunc->pCode[ lPCodePos + 1 ] )->szName );
+   }
+
+   fprintf( cargo->yyc, "\n" );
+
+   return 2;
+}
+
+static HB_GENC_FUNC( hb_p_popglobal )
+{
+   fprintf( cargo->yyc, "\tHB_P_POPGLOBAL, %i,",
+            pFunc->pCode[ lPCodePos + 1 ] );
+
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, (USHORT) pFunc->pCode[ lPCodePos + 1 ] )->szName );
+   }
+
+   fprintf( cargo->yyc, "\n" );
+
+   return 2;
+}
+
 /* NOTE: The  order of functions have to match the order of opcodes
  *       mnemonics
  */
@@ -2220,7 +2357,9 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_endwithobject,
    hb_p_foreach,
    hb_p_enumerate,
-   hb_p_endenumerate
+   hb_p_endenumerate,
+   hb_p_pushglobal,
+   hb_p_popglobal
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.376 2002/09/06 10:49:52 andijahja Exp $
+ * $Id: ChangeLog,v 1.377 2002/09/07 04:02:18 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,60 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-15 22:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbcomp.h
+  * include/hbpcode.h
+  * source/vm/hvm.c
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * source/compiler/harbour.c
+    + Added support for new HB_P_PUSHGLOBAL and HB_P_POPGLOBAL.
+
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    + Added support for new syntax:
+      GLOBAL <Var> [ := <exp> ] [,...]
+      GLOBAL <Array> \[ <length>\] [,...]
+      GLOBAL EXTERNAL <Var> [,...]
+
+  * include/hberrors.h
+  * source/compiler/hbgenerr.c
+    + Added new error messages:
+        "Misplaced Global declaration \'%s\'.",
+        "Too many Global declarations \'%s\'.",
+        "External Global declaration can not include initializer \'%s\'."
+
+  * source/vm/garbage.c
+    + Added hb_vm_pGlobals to sweep.
+
+  /*
+     NEW Global Variables are much like STATICs only much FASTER. The added benefit, is that GLOBAL variables
+     can be shared between different modules like PUBLIC variables, but with the speed and efficency of declared
+     variables. For example, file1.prg may declare:
+
+        GLOBAL MyGlobal
+
+     and File2.prg might gain access, by declaring:
+
+        GLOBAL EXTERNAL MyGlobal
+
+     both files may now utilize MyGlobal throught all of the functions of both files.
+   */
+
+  + tests/global1.prg
+  + tests/global2.prg
+    + New demo files for the new GLOBAL and GLOBAL EXTERNAL syntax and usage.
+
+  * bin/bld.bat
+    * Modified to support build of 2 files.
+
+    /* Please note -P -W are always included, so that extra parameter can be a prg name instead of compiler switch!!! */
+
+  * tests/pp.prg
+    * Fixed CompileRule to support same marker used more than once in match rule.
+
 2002-09-07 00:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * Source/rtl/tget.prg
        Added missing Caption DATA and init to ""
@@ -72,14 +126,14 @@
    * source/rtl/memoedit.prg
      ! fixed cursor positiong and shaping when calling an user function
    *Both Fixed By Maurilio Longo
-    
+
 2002-09-02 21:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
    * source/rtl/tbrowse.prg
-     !!! Reverted to previus version 
+     !!! Reverted to previus version
 
 2002-09-02 13:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
    * source/rtl/tbrowse.prg
-     *Sync with follow harbour change 
+     *Sync with follow harbour change
    * harbour/source/rtl/tbrowse.prg
      ! fixed columns' width calulation on ::SetColumnWidth( oCol ) method
 

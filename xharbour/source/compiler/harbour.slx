@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.11 2002/08/14 22:53:41 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.12 2002/08/14 22:57:23 ronpinkas Exp $
  */
 
 /*
@@ -157,7 +157,7 @@ SELF_CONTAINED_WORDS_ARE {
 
 /* KeyWords are grouped based on the next token they require. */
 #define WANTS_VAR        703 /* Wants Variable (including Macros): DO, FOR, PRIVATE, PUBLIC */
-#define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, EXTERN, FIELD, FUNCTION, LOCAL, MEMVAR, PARAMETERS, PROCEDURE, STATIC */
+#define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, EXTERN, FIELD, FUNCTION, LOCAL, GLOBAL, EXTERNGLOBAL, MEMVAR, PARAMETERS, PROCEDURE, STATIC */
 #define WANTS_EOL        705 /* Wants EOL: ELSE, END, ENDCASE, ENDDO, ENDIF, EXIT, LOOP, NEXT, OTHERWISE, RECOVER */
 #define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, RETURN, WHILE, WITHOBJ */
 #define REJECT_OP        707
@@ -232,6 +232,8 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "FOR"                 ) AS_TOKEN( HB_WANTS_VAR - FOR              ),
                          LEX_WORD( "FOR{WS}EACH"         ) AS_TOKEN( FOREACH                         ),
                          LEX_WORD( "FUNCTION"            ) AS_TOKEN( HB_WANTS_ID  - FUNCTION         ),
+                         LEX_WORD( "GLOBAL"              ) AS_TOKEN( HB_WANTS_ID  - GLOBAL           ),
+                         LEX_WORD( "GLOBAL{WS}EXTERNAL"  ) AS_TOKEN( HB_WANTS_ID  - EXTERNGLOBAL     ),
                          LEX_WORD( "IF"                  ) AS_TOKEN( HB_WANTS_EXP - IF               ),
                          LEX_WORD( "INIT{WS}FUNCTION"    ) AS_TOKEN( HB_INIT_FUNC     ),
                          LEX_WORD( "INIT{WS}PROCEDURE"   ) AS_TOKEN( HB_INIT_PROC     ),

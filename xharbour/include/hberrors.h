@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.4 2002/04/21 01:39:17 ronpinkas Exp $
+ * $Id: hberrors.h,v 1.5 2002/05/20 20:41:49 ronpinkas Exp $
  */
 
 /*
@@ -116,6 +116,9 @@ extern "C" {
 #define HB_COMP_ERR_MISSING_ENDTEXT             52
 #define HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE 53
 #define HB_COMP_ERR_UNMATCHED_WITHOBJECT        54
+#define HB_COMP_ERR_GLOBAL_MISPLACED            55
+#define HB_COMP_ERR_TOOMANY_GLOBALS             56
+#define HB_COMP_ERR_EXTERNGLOBAL_ASSIGN         57
 
 #define HB_COMP_WARN_AMBIGUOUS_VAR              1
 #define HB_COMP_WARN_MEMVAR_ASSUMED             2

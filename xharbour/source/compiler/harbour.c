@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.15 2002/05/18 11:40:31 map Exp $
+ * $Id: harbour.c,v 1.16 2002/05/20 20:41:49 ronpinkas Exp $
  */
 
 /*
@@ -148,6 +148,7 @@ PCOMDECLARED   hb_comp_pLastMethod;
 int            hb_comp_iLine;                             /* currently processed line number (globaly) */
 char *         hb_comp_szFile;                            /* File Name of last compiled line */
 PFUNCTION      hb_comp_pInitFunc;
+PFUNCTION      hb_comp_pGlobalsFunc;
 PHB_FNAME      hb_comp_pFileName = NULL;
 
 BOOL           hb_comp_bPPO = FALSE;                      /* flag indicating, is ppo output needed */
@@ -195,8 +196,11 @@ INLINES        hb_comp_inlines;
 /* various compatibility flags (-k switch) */
 ULONG          hb_comp_Supported;
 
-int hb_comp_iBaseLine;
-int hb_comp_ulLastOffsetPos;
+int            hb_comp_iBaseLine;
+int            hb_comp_ulLastOffsetPos;
+
+PVAR           hb_comp_pGlobals = NULL;
+short          hb_comp_iGlobals = 0;
 
 /* EXTERNAL statement can be placed into any place in a function - this flag is
  * used to suppress error report generation
@@ -529,6 +533,22 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
    HB_SYMBOL_UNUSED( cValueType );
 
+   if( hb_comp_iVarScope == VS_GLOBAL || hb_comp_iVarScope == VS_EXTERNGLOBAL )
+   {
+      if( (! hb_comp_bStartProc) && hb_comp_functions.iCount <= 1 )
+      {
+         if( ++hb_comp_iGlobals > 255 )
+         {
+            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_TOOMANY_GLOBALS, szVarName, NULL );
+            return;
+         }
+      }
+      else
+      {
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_GLOBAL_MISPLACED, szVarName, NULL );
+         return;
+      }
+   }
    if( ! hb_comp_bStartProc && hb_comp_functions.iCount <= 1 && hb_comp_iVarScope == VS_LOCAL )
    {
       /* Variable declaration is outside of function/procedure body.
@@ -559,9 +579,12 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
          hb_compCheckDuplVars( pFunc->pMemvars, szVarName );
    }
    else
+   {
       /* variable defined in a codeblock */
       hb_comp_iVarScope = VS_PARAMETER;
+   }
 
+   hb_compCheckDuplVars( hb_comp_pGlobals, szVarName );
    hb_compCheckDuplVars( pFunc->pLocals, szVarName );
 
    pVar = ( PVAR ) hb_xgrab( sizeof( VAR ) );
@@ -744,11 +767,13 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                   pLastVar->pNext = pVar;
                   wLocal++;
                }
+
                if( hb_comp_iVarScope == VS_PARAMETER )
                {
                   ++hb_comp_functions.pLast->wParamCount;
                   hb_comp_functions.pLast->bFlags |= FUN_USES_LOCAL_PARAMS;
                }
+
                if( hb_comp_bDebugInfo )
                {
                   BYTE * pBuffer;
@@ -801,17 +826,43 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
          case VS_FIELD:
             if( ! pFunc->pFields )
+            {
                pFunc->pFields = pVar;
+            }
             else
             {
                pLastVar = pFunc->pFields;
                while( pLastVar->pNext )
+               {
                   pLastVar = pLastVar->pNext;
+               }
                pLastVar->pNext = pVar;
+            }
+
+            break;
+
+         case VS_GLOBAL:
+         case VS_EXTERNGLOBAL:
+            if( ! hb_comp_pGlobals )
+            {
+               hb_comp_pGlobals = pVar;
+            }
+            else
+            {
+               pLastVar = hb_comp_pGlobals;
+               while( pLastVar->pNext )
+               {
+                  pLastVar = pLastVar->pNext;
+               }
+               pLastVar->pNext = pVar;
+            }
+
+            if( hb_comp_iVarScope == VS_EXTERNGLOBAL )
+            {
+               pVar->szAlias = "";
             }
             break;
       }
-
    }
 }
 
@@ -2734,6 +2785,7 @@ void hb_compGenMessageData( char * szMsg ) /* generates an underscore-symbol nam
  */
 void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value from the virtual machine stack onto a variable */
 {
+   PFUNCTION pFunc;
    int iVar;
 
    iVar = hb_compLocalGetPos( szVarName );
@@ -2748,93 +2800,119 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
           * use 2 bytes for LOCALNEAR
           */
          if( hb_comp_functions.pLast->szName )
+         {
             hb_compGenPCode3( HB_P_POPLOCALNEAR, ( BYTE ) iVar, 0, ( BOOL ) 1 );
+         }
          else
+         {
             hb_compGenPCode2( HB_P_POPLOCALNEAR, ( BYTE ) iVar, ( BOOL ) 1 );
+         }
       }
       else
+      {
          hb_compGenPCode3( HB_P_POPLOCAL, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
+      }
+
+      return;
+   }
+
+   /* Check if we are generating a pop code for static variable
+    * initialization function - if YES then we have to switch to a function
+    * where the static variable was declared
+    */
+   if( ( hb_comp_functions.pLast->cScope & ( HB_FS_INIT | HB_FS_EXIT ) ) == ( HB_FS_INIT | HB_FS_EXIT ) )
+   {
+      pFunc = hb_comp_functions.pLast->pOwner;
    }
    else
    {
-      PFUNCTION pFunc;
+      pFunc = hb_comp_functions.pLast;
+   }
 
-      /* Check if we are generating a pop code for static variable
-       * initialization function - if YES then we have to switch to a function
-       * where the static variable was declared
+   iVar = hb_compStaticGetPos( szVarName, pFunc );
+   if( iVar )
+   {
+      /* Static variable declared in current function
        */
-      if( ( hb_comp_functions.pLast->cScope & ( HB_FS_INIT | HB_FS_EXIT ) ) == ( HB_FS_INIT | HB_FS_EXIT ) )
-         pFunc = hb_comp_functions.pLast->pOwner;
-      else
-         pFunc = hb_comp_functions.pLast;
-      iVar = hb_compStaticGetPos( szVarName, pFunc );
-      if( iVar )
-      {
-         /* Static variable declared in current function
-          */
-         hb_compGenPCode3( HB_P_POPSTATIC, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
-         pFunc->bFlags |= FUN_USES_STATICS;
-      }
-      else
-      {
-         iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pLast );
-         if( iVar )
-         {
-            /* field declared in current function
-             */
-            hb_compGenFieldPCode( HB_P_POPFIELD, iVar, szVarName, hb_comp_functions.pLast );
-         }
-         else
-         {
-            iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pLast );
-            if( iVar )
-            {
-               /* Memvar variable declared in current functions
-                */
-               hb_compGenVarPCode( HB_P_POPMEMVAR, szVarName );
-            }
-            else
-            {
-               if( ! hb_comp_bStartProc )
-                  iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pFirst );
-               if( iVar )
-               {
-                  /* Global static variable
-                   */
-                  hb_compGenPCode3( HB_P_POPSTATIC, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
-                  hb_comp_functions.pLast->bFlags |= FUN_USES_STATICS;
-               }
-               else
-               {
-                  if( ! hb_comp_bStartProc )
-                     iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pFirst );
-                  if( iVar )
-                  {
-                     /* Global field declaration
-                      */
-                     hb_compGenFieldPCode( HB_P_POPFIELD, iVar, szVarName, hb_comp_functions.pFirst );
-                  }
-                  else
-                  {
-                     if( ! hb_comp_bStartProc )
-                        iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pFirst );
-                     if( iVar )
-                     {
-                        /* Global Memvar variable declaration
-                         */
-                        hb_compGenVarPCode( HB_P_POPMEMVAR, szVarName );
-                     }
-                     else
-                     {
-                        /* undeclared variable
-                         */
-                        hb_compGenVariablePCode( HB_P_POPVARIABLE, szVarName );
-                     }
-                  }
-               }
-            }
-         }
-      }
+      hb_compGenPCode3( HB_P_POPSTATIC, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
+      pFunc->bFlags |= FUN_USES_STATICS;
+
+      return;
+   }
+
+   iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
+   if( iVar )
+   {
+      hb_compGenPCode2( HB_P_POPGLOBAL, (BYTE) iVar - 1, ( BOOL ) 1 );
+
+      return;
+   }
+
+   iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pLast );
+   if( iVar )
+   {
+      /* field declared in current function
+       */
+      hb_compGenFieldPCode( HB_P_POPFIELD, iVar, szVarName, hb_comp_functions.pLast );
+
+      return;
+   }
+
+   iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pLast );
+   if( iVar )
+   {
+      /* Memvar variable declared in current functions
+       */
+      hb_compGenVarPCode( HB_P_POPMEMVAR, szVarName );
+
+      return;
+   }
+
+   if( ! hb_comp_bStartProc )
+   {
+      iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pFirst );
+   }
+
+   if( iVar )
+   {
+      /* Global static variable
+       */
+      hb_compGenPCode3( HB_P_POPSTATIC, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
+      hb_comp_functions.pLast->bFlags |= FUN_USES_STATICS;
+
+      return;
+   }
+
+   if( ! hb_comp_bStartProc )
+   {
+      iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pFirst );
+   }
+
+   if( iVar )
+   {
+      /* Global field declaration
+       */
+      hb_compGenFieldPCode( HB_P_POPFIELD, iVar, szVarName, hb_comp_functions.pFirst );
+
+      return;
+   }
+
+   if( ! hb_comp_bStartProc )
+   {
+      iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pFirst );
+   }
+
+   if( iVar )
+   {
+      /* Global Memvar variable declaration
+       */
+      hb_compGenVarPCode( HB_P_POPMEMVAR, szVarName );
+   }
+   else
+   {
+      /* undeclared variable
+       */
+      hb_compGenVariablePCode( HB_P_POPVARIABLE, szVarName );
    }
 }
 
@@ -2913,82 +2991,105 @@ void hb_compGenPushVar( char * szVarName )
           * use 2 bytes for LOCALNEAR
           */
          if( hb_comp_functions.pLast->szName )
+         {
             hb_compGenPCode3( HB_P_PUSHLOCALNEAR, ( BYTE ) iVar, 0, ( BOOL ) 1 );
+         }
          else
+         {
             hb_compGenPCode2( HB_P_PUSHLOCALNEAR, ( BYTE ) iVar, ( BOOL ) 1 );
+         }
       }
       else
+      {
          hb_compGenPCode3( HB_P_PUSHLOCAL, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
+      }
+
+      return;
+   }
+
+   iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pLast );
+   if( iVar )
+   {
+      /* Static variable declared in current function
+       */
+      hb_compGenPCode3( HB_P_PUSHSTATIC, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
+      hb_comp_functions.pLast->bFlags |= FUN_USES_STATICS;
+
+      return;
+   }
+
+   iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
+   if( iVar )
+   {
+      hb_compGenPCode2( HB_P_PUSHGLOBAL, (BYTE) iVar - 1, ( BOOL ) 1 );
+
+      return;
+   }
+
+   iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pLast );
+   if( iVar )
+   {
+      /* field declared in current function
+       */
+      hb_compGenFieldPCode( HB_P_PUSHFIELD, iVar, szVarName, hb_comp_functions.pLast );
+
+      return;
+   }
+
+   iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pLast );
+   if( iVar )
+   {
+      /* Memvar variable declared in current functions
+       */
+      hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
+
+      return;
+   }
+
+   if( ! hb_comp_bStartProc )
+   {
+      iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pFirst );
+   }
+
+   if( iVar )
+   {
+      /* Global static variable
+       */
+      hb_compGenPCode3( HB_P_PUSHSTATIC, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
+      hb_comp_functions.pLast->bFlags |= FUN_USES_STATICS;
+
+      return;
+   }
+
+   if( ! hb_comp_bStartProc )
+   {
+      iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pFirst );
+   }
+
+   if( iVar )
+   {
+      /* Global field declaration
+       */
+      hb_compGenFieldPCode( HB_P_PUSHFIELD, iVar, szVarName, hb_comp_functions.pFirst );
+
+      return;
+   }
+
+   if( ! hb_comp_bStartProc )
+   {
+      iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pFirst );
+   }
+
+   if( iVar )
+   {
+      /* Global Memvar variable declaration */
+      hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
    }
    else
    {
-      iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pLast );
-      if( iVar )
-      {
-         /* Static variable declared in current function
-          */
-         hb_compGenPCode3( HB_P_PUSHSTATIC, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
-         hb_comp_functions.pLast->bFlags |= FUN_USES_STATICS;
-      }
-      else
-      {
-         iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pLast );
-         if( iVar )
-         {
-            /* field declared in current function
-             */
-            hb_compGenFieldPCode( HB_P_PUSHFIELD, iVar, szVarName, hb_comp_functions.pLast );
-         }
-         else
-         {
-            iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pLast );
-            if( iVar )
-            {
-               /* Memvar variable declared in current functions
-                */
-               hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
-            }
-            else
-            {
-               if( ! hb_comp_bStartProc )
-                  iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pFirst );
-               if( iVar )
-               {
-                  /* Global static variable
-                   */
-                  hb_compGenPCode3( HB_P_PUSHSTATIC, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
-                  hb_comp_functions.pLast->bFlags |= FUN_USES_STATICS;
-               }
-               else
-               {
-                  if( ! hb_comp_bStartProc )
-                     iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pFirst );
-                  if( iVar )
-                  {
-                     /* Global field declaration
-                      */
-                     hb_compGenFieldPCode( HB_P_PUSHFIELD, iVar, szVarName, hb_comp_functions.pFirst );
-                  }
-                  else
-                  {
-                     if( ! hb_comp_bStartProc )
-                        iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pFirst );
-                     if( iVar )
-                     {
-                        /* Global Memvar variable declaration */
-                        hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
-                     }
-                     else
-                     {
-                        /* undeclared variable
-                         */
-                        hb_compGenVariablePCode( HB_P_PUSHVARIABLE, szVarName );
-                     }
-                  }
-               }
-            }
-         }
-      }
+      /* undeclared variable
+       */
+      hb_compGenVariablePCode( HB_P_PUSHVARIABLE, szVarName );
    }
 }
 
@@ -3002,76 +3103,94 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
       /* local variable
        */
       hb_compGenPCode3( HB_P_PUSHLOCALREF, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
+
+      return;
+   }
+
+   iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pLast );
+   if( iVar )
+   {
+      /* Static variable declared in current function
+       */
+      hb_compGenPCode3( HB_P_PUSHSTATICREF, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
+      hb_comp_functions.pLast->bFlags |= FUN_USES_STATICS;
+
+      return;
+   }
+
+   iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
+   if( iVar )
+   {
+      /* pushing Global by reference is not allowed */
+      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_REFER, szVarName, NULL );
+
+      return;
+   }
+
+   iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pLast );
+   if( iVar )
+   {
+      /* pushing fields by reference is not allowed */
+      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_REFER, szVarName, NULL );
+
+      return;
+   }
+
+   iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pLast );
+   if( iVar )
+   {
+      /* Memvar variable declared in current functions
+       */
+      hb_compGenVarPCode( HB_P_PUSHMEMVARREF, szVarName );
+
+      return;
+   }
+
+   if( ! hb_comp_bStartProc )
+   {
+      iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pFirst );
+   }
+
+   if( iVar )
+   {
+      /* Global static variable
+       */
+      hb_compGenPCode3( HB_P_PUSHSTATICREF, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
+      hb_comp_functions.pLast->bFlags |= FUN_USES_STATICS;
+
+      return ;
+   }
+
+   if( ! hb_comp_bStartProc )
+   {
+      iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pFirst );
+   }
+
+   if( iVar )
+   {
+      /* pushing fields by reference is not allowed */
+      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_REFER, szVarName, NULL );
+
+      return;
+   }
+
+   if( ! hb_comp_bStartProc )
+   {
+      iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pFirst );
+   }
+
+   if( iVar )
+   {
+      /* Global Memvar variable declaration
+       */
+      hb_compGenVarPCode( HB_P_PUSHMEMVARREF, szVarName );
    }
    else
    {
-      iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pLast );
-      if( iVar )
-      {
-         /* Static variable declared in current function
-          */
-         hb_compGenPCode3( HB_P_PUSHSTATICREF, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
-         hb_comp_functions.pLast->bFlags |= FUN_USES_STATICS;
-      }
-      else
-      {
-         iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pLast );
-         if( iVar )
-         {
-            /* pushing fields by reference is not allowed */
-            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_REFER, szVarName, NULL );
-         }
-         else
-         {
-            iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pLast );
-            if( iVar )
-            {
-               /* Memvar variable declared in current functions
-                */
-               hb_compGenVarPCode( HB_P_PUSHMEMVARREF, szVarName );
-            }
-            else
-            {
-               if( ! hb_comp_bStartProc )
-                  iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pFirst );
-               if( iVar )
-               {
-                  /* Global static variable
-                   */
-                  hb_compGenPCode3( HB_P_PUSHSTATICREF, HB_LOBYTE( iVar ), HB_HIBYTE( iVar ), ( BOOL ) 1 );
-                  hb_comp_functions.pLast->bFlags |= FUN_USES_STATICS;
-               }
-               else
-               {
-                  if( ! hb_comp_bStartProc )
-                     iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pFirst );
-                  if( iVar )
-                  {
-                     /* pushing fields by reference is not allowed */
-                     hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_REFER, szVarName, NULL );
-                  }
-                  else
-                  {
-                     if( ! hb_comp_bStartProc )
-                        iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pFirst );
-                     if( iVar )
-                     {
-                        /* Global Memvar variable declaration
-                         */
-                        hb_compGenVarPCode( HB_P_PUSHMEMVARREF, szVarName );
-                     }
-                     else
-                     {
-                        /* undeclared variable - field cannot be passed by the
-                         * reference - assume the memvar
-                         */
-                        hb_compGenVariablePCode( HB_P_PUSHMEMVARREF, szVarName );
-                     }
-                  }
-               }
-            }
-         }
-      }
+      /* undeclared variable - field cannot be passed by the
+       * reference - assume the memvar
+       */
+      hb_compGenVariablePCode( HB_P_PUSHMEMVARREF, szVarName );
    }
 }
 
@@ -3771,6 +3890,33 @@ void hb_compStaticDefEnd( void )
    ++hb_comp_iStaticCnt;
 }
 
+void hb_compGlobalsDefStart( void )
+{
+   if( ! hb_comp_pGlobalsFunc )
+   {
+      hb_comp_pGlobalsFunc = hb_compFunctionNew( hb_strdup("[_INITGLOBALS]"), HB_FS_INIT );
+      hb_comp_pGlobalsFunc->pOwner = hb_comp_functions.pLast;
+      hb_comp_pGlobalsFunc->bFlags = FUN_PROCEDURE;
+      hb_comp_pGlobalsFunc->cScope = HB_FS_INIT | HB_FS_EXIT;
+      hb_comp_functions.pLast = hb_comp_pGlobalsFunc;
+   }
+   else
+   {
+      hb_comp_pGlobalsFunc->pOwner = hb_comp_functions.pLast;
+      hb_comp_functions.pLast = hb_comp_pGlobalsFunc;
+   }
+}
+
+/*
+ * End of definition of static variable
+ * Return to previously pcoded function.
+ */
+void hb_compGlobalsDefEnd( void )
+{
+   hb_comp_functions.pLast = hb_comp_pGlobalsFunc->pOwner;
+   hb_comp_pGlobalsFunc->pOwner = NULL;
+}
+
 /*
  * Start a new fake-function that will hold pcodes for a codeblock
 */
@@ -3923,6 +4069,7 @@ static void hb_compInitVars( void )
    hb_comp_symbols.pLast    = NULL;
    hb_comp_szAnnounce       = NULL;
    hb_comp_pInitFunc        = NULL;
+   hb_comp_pGlobalsFunc     = NULL;
    hb_comp_bAnyWarning      = FALSE;
 
    hb_comp_iLine           = 1;
@@ -4104,6 +4251,70 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                hb_comp_functions.pLast = hb_comp_pInitFunc;
                hb_compGenPCode1( HB_P_ENDPROC );
                ++hb_comp_functions.iCount;
+            }
+
+            if( hb_comp_pGlobalsFunc )
+            {
+               PVAR pGlobal = hb_comp_pGlobals;
+
+               if( hb_comp_pGlobalsFunc->pCode )
+               {
+                  PCOMSYMBOL pSym;
+
+                  pSym = hb_compSymbolAdd( hb_comp_pGlobalsFunc->szName, NULL );
+                  pSym->cScope |= hb_comp_pGlobalsFunc->cScope;
+                  hb_comp_functions.pLast->pNext = hb_comp_pGlobalsFunc;
+                  hb_comp_functions.pLast = hb_comp_pGlobalsFunc;
+                  hb_compGenPCode1( HB_P_ENDPROC );
+                  ++hb_comp_functions.iCount;
+               }
+
+               // Any NON EXTERN Globals?
+               while( pGlobal )
+               {
+                  if( pGlobal->szAlias == NULL )
+                  {
+                     break;
+                  }
+
+                  pGlobal = pGlobal->pNext;
+               }
+
+               // Yes.
+               if( pGlobal )
+               {
+                  PCOMSYMBOL pSym;
+                  short iGlobal;
+                  PFUNCTION pReleaseGlobalsFunc = hb_compFunctionNew( hb_strdup( "_RELEASEGLOBALS" ), HB_FS_EXIT );
+
+                  pReleaseGlobalsFunc->pOwner = hb_comp_functions.pLast;
+                  pReleaseGlobalsFunc->bFlags = FUN_PROCEDURE;
+
+                  pSym = hb_compSymbolAdd( pReleaseGlobalsFunc->szName, NULL );
+                  pSym->cScope |= pReleaseGlobalsFunc->cScope;
+
+                  hb_comp_functions.pLast->pNext = pReleaseGlobalsFunc;
+                  hb_comp_functions.pLast = pReleaseGlobalsFunc;
+
+                  pGlobal = hb_comp_pGlobals;
+                  iGlobal = 0;
+
+                  while( pGlobal )
+                  {
+                     if( pGlobal->szAlias == NULL )
+                     {
+                        hb_compGenPCode1( HB_P_PUSHNIL );
+                        hb_compGenPCode2( HB_P_POPGLOBAL, (BYTE) iGlobal, FALSE );
+                     }
+
+                     iGlobal++;
+
+                     pGlobal = pGlobal->pNext;
+                  }
+
+                  hb_compGenPCode1( HB_P_ENDPROC );
+                  ++hb_comp_functions.iCount;
+               }
             }
 
             if( hb_comp_szAnnounce )
