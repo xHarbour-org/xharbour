@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2321 2004/02/19 04:22:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2322 2004/02/19 04:41:56 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-19 00:03 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/tbrowse.prg
+     ! Initialization in ::ForceStable counts lines going bottom.
 
 2004-02-19 01:45 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/vm/classes.c
