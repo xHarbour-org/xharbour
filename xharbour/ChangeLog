@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2149 2004/01/27 02:55:14 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.2150 2004/01/27 03:06:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-26 19:11 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapigt.h
+  * source/rtl/gtapi.c
+    * Corrected HB_EXPORT qualifier to precede complex type in function declarations/definitions
 
 2004-01-26 18:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/dynsym.c

@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.18 2004/01/25 13:18:52 jonnymind Exp $
+ * $Id: gtapi.c,v 1.19 2004/01/25 19:15:18 jonnymind Exp $
  */
 
 /*
@@ -1388,7 +1388,7 @@ void HB_EXPORT hb_gtClearGobjects( void )
    hb_gt_gobjects_end = NULL;
 }
 
-HB_GT_COLDEF* HB_EXPORT hb_gt_gcolorFromString( char *color_name )
+HB_EXPORT HB_GT_COLDEF* hb_gt_gcolorFromString( char *color_name )
 {
    int i;
 

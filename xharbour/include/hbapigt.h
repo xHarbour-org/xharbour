@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.23 2004/01/24 16:29:22 jonnymind Exp $
+ * $Id: hbapigt.h,v 1.24 2004/01/25 13:18:39 jonnymind Exp $
  */
 
 /*
@@ -613,9 +613,8 @@ extern void   hb_setkeyExit( void );
 extern void HB_EXPORT hb_gtAddGobject( HB_GT_GOBJECT *gobject );
 extern void HB_EXPORT hb_gtDestroyGobject( HB_GT_GOBJECT *gobject );
 extern void HB_EXPORT hb_gtClearGobjects( void );
-extern HB_GT_COLDEF * HB_EXPORT hb_gt_gcolorFromString( char *color_name );
-extern BOOL HB_EXPORT hb_gtGobjectInside( HB_GT_GOBJECT *gobject,
-                        int x1, int y1, int x2, int y2 );
+extern HB_EXPORT HB_GT_COLDEF * hb_gt_gcolorFromString( char *color_name );
+extern BOOL HB_EXPORT hb_gtGobjectInside( HB_GT_GOBJECT *gobject, int x1, int y1, int x2, int y2 );
 
 /* JC1: Supporting Screen Output lock also from other modules */
 #ifdef HB_THREAD_SUPPORT
