@@ -50,15 +50,17 @@ RETURN( nil)
 
 CLASS MainFrame FROM TFrame
 
-   METHOD New( oParent ) INLINE ::Caption := 'Main Form from TForm',;
+   METHOD New( oParent ) INLINE ::Caption := 'Main Form from TFrame',;
                                 super:new( oParent )
 
-   METHOD OnClose()      INLINE MessageBox( ::handle, 'OnClose','Whoo'),;
-                                PostQuitMessage(0)
+   METHOD OnCloseQuery() INLINE if( MessageBox( ::handle, 'Quitting Whoo', 'OnCloseQuery', MB_YESNO ) == IDYES,;
+                                    PostQuitMessage(0), 0 )
 
    METHOD OnCommand( nwParam, nlParam ) INLINE ::MainCommands( nwParam, nlParam )
    METHOD MainCommands()
 ENDCLASS
+
+//----------------------------------
 
 METHOD MainCommands( nwParam, nlParam ) CLASS MainFrame
    local oForm
@@ -74,11 +76,14 @@ return( 0 )
 
 CLASS SubForm1 FROM TForm
 
-   METHOD OnPaint( hDC ) INLINE DrawGrid( ::handle, hDC, 3 ),0
+   METHOD OnPaint( hDC ) INLINE ::DrawGrid( hDC, 3 ),0
    METHOD OnCreate()     INLINE ::CreateSub()  // careful handles OnCreate not OnCreation
    METHOD CreateSub()
+   METHOD DrawGrid()
 
 ENDCLASS
+
+//----------------------------------
 
 METHOD CreateSub() CLASS SubForm1
 
@@ -91,19 +96,9 @@ METHOD CreateSub() CLASS SubForm1
 
 return(0)
 
+//----------------------------------
 
-
-
-
-
-
-
-
-
-//-------------------------------------------------------------------------------------------
-
-
-FUNCTION DrawGrid(hWnd,hDC,nGran)
+METHOD DrawGrid(hDC,nGran) CLASS SubForm1
 
    local aRect,hBrush,hOldPen,hOldBrush,hPen,hBmp
 
@@ -146,7 +141,7 @@ FUNCTION DrawGrid(hWnd,hDC,nGran)
    hPen      := CreatePen( PS_NULL, 0, 0 )
    hOldBrush := SelectObject( hDC, hBrush )
    hOldPen   := SelectObject( hDC, hPen )
-   aRect     := GetClientRect( hWnd )
+   aRect     := GetClientRect( ::handle )
 
    SetTextColor( hDC, rgb( 0, 0, 0 ) )
    SetBkColor( hDC, GetSysColor( COLOR_BTNFACE ) )
@@ -156,5 +151,4 @@ FUNCTION DrawGrid(hWnd,hDC,nGran)
    DeleteObject( hBrush )
    DeleteObject( hBmp )
    DeleteObject( hPen )
-
 return(0)

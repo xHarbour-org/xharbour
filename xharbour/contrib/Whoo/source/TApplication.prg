@@ -30,15 +30,18 @@ ENDCLASS
 METHOD Initialize() CLASS Application
    local nId, cMsg
    
-   ::InstMsg := RegisterWindowMessage( GetModuleFileName() )
-
-   AllowSetForegroundWindow( -1 )
+   if !::MultiInstance
    
-   if !::MultiInstance .and. lPrevInstance
-      SendMessage( HWND_BROADCAST, ::InstMsg, 0, 0)
-      PostQuitMessage(0)
-      QUIT
-      return(0)
+      ::InstMsg := RegisterWindowMessage( GetModuleFileName() )
+      AllowSetForegroundWindow( -1 )
+      
+      if lPrevInstance
+         SendMessage( HWND_BROADCAST, ::InstMsg, 0, 0)
+         PostQuitMessage(0)
+         QUIT
+         return(0)
+      endif
+      
    endif
 
    ::Instance := hInstance()
@@ -84,17 +87,26 @@ METHOD CreateForm( cForm, oForm, oParent ) CLASS Application
 return( oForm )
 
 METHOD CreateFrame( cName, oFrame ) CLASS Application
+
    local n
+   
    if ::FrameCreated
       IF ( n := aScan( ::aForms, {|a|a[2] == NIL } ) ) > 0
          MessageBox(, 'Frame '+::aForms[1]+' is already created',MB_ICONEXCLAMATION )
          return( nil )
       endif
    endif
+   
    ::FrameCreated := .T.
+   
    __objAddData( self, cName )
+   
    oFrame := if( oFrame != NIL, oFrame:New( self ), TFrame():New( self ) )
+   
    __ObjSetValueList( self, { { cName, oFrame } } )
+   
    aAdd( ::aForms, {cName,nil} )
+   
    oFrame:Create()
+   
 return( oFrame )
