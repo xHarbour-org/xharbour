@@ -433,7 +433,7 @@ METHOD Close( cName ) CLASS HB_LogConsole
    ::lOpened := .F.
 RETURN .T.
 
-PROCEDURE Send( nStyle, cMessage, cName, nPriority )
+PROCEDURE Send( nStyle, cMessage, cName, nPriority ) CLASS HB_LogConsole
    OutStd( ::Format( nStyle, cMessage, cName, nPriority ) , HB_OsNewLine() )
 RETURN 
 
