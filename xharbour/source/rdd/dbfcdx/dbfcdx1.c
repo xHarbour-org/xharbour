@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.114 2004/03/17 02:29:01 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.115 2004/03/18 04:28:30 druzus Exp $
  */
 
 /*
@@ -8029,7 +8029,6 @@ static void hb_cdxSortAddExternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
         ~HB_GET_LE_ULONG( pSort->NodeList[ Lvl ]->cdxu.External.RecNumMask ) ) |
        Tag;
    HB_PUT_LE_ULONG( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ v ], r );
-   memcpy( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ v ], &r, 4 );
 //#endif
    k -= ( USHORT ) ( pSort->CurTag->uiLen - cd - ct );
    if( pSort->CurTag->uiLen - cd - ct > 0 )

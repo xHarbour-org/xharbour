@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.28 2004/03/02 00:28:18 druzus Exp $
+ * $Id: hbdefs.h,v 1.29 2004/03/18 04:28:30 druzus Exp $
  */
 
 /*
@@ -185,21 +185,20 @@
    #endif
 #endif
 
-#if defined( __BYTE_ORDER ) && defined( __LITTLE_ENDIAN ) && \
+/* try to detect byte order if not explicitly set */
+#if !defined( HB_PDP_ENDIAN ) && !defined( HB_BIG_ENDIAN ) && \
+    !defined( HB_LITTLE_ENDIAN ) && \
+    defined( __BYTE_ORDER ) && defined( __LITTLE_ENDIAN ) && \
     defined( __BIG_ENDIAN ) && defined( __PDP_ENDIAN )
+
 #  if __BYTE_ORDER == __LITTLE_ENDIAN
 #    define HB_LITTLE_ENDIAN
-#    undef HB_BIG_ENDIAN
-#    undef HB_PDP_ENDIAN
 #  elif __BYTE_ORDER == __BIG_ENDIAN
 #    define HB_BIG_ENDIAN
-#    undef HB_LITTLE_ENDIAN
-#    undef HB_PDP_ENDIAN
 #  elif __BYTE_ORDER == __BIG_ENDIAN
 #    define HB_PDP_ENDIAN
-#    undef HB_LITTLE_ENDIAN
-#    undef HB_BIG_ENDIAN
 #  endif
+
 #endif
 
 /* maximum length of double number in decimal representation:
