@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.17 2003/02/10 12:48:51 lculik Exp $
+ * $Id: isprint.c,v 1.18 2003/04/30 11:22:35 lculik Exp $
  */
 
 /*
@@ -579,7 +579,7 @@ HB_FUNC(GETPRINTERS)
 
     buffer = ( unsigned char * ) malloc( MAX_PRINTERS * sizeof( PRINTER_INFO_5 ) ) ;
 
-    res = EnumPrinters( PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS | PRINTER_ENUM_SHARED ,
+    res = EnumPrinters( PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS ,
           NULL ,
           5 ,
           buffer ,
@@ -597,7 +597,7 @@ HB_FUNC(GETPRINTERS)
                free(buffer) ;
                buffer = ( unsigned char * ) malloc( needed ) ;
 
-               res=EnumPrinters(PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL| PRINTER_ENUM_CONNECTIONS | PRINTER_ENUM_SHARED ,
+               res=EnumPrinters(PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL| PRINTER_ENUM_CONNECTIONS  ,
                NULL ,
                5 ,
                buffer ,
