@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-mkslib.sh,v 1.8 2004/11/26 14:33:19 likewolf Exp $
+# $Id: hb-mkslib.sh,v 1.9 2005/01/21 18:41:38 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -89,7 +89,7 @@ do
 	    d="${f##*/}"
 	    mkdir $d
 	    cd $d
-	    ar -x "${dir}/${f}" || exit 1
+	    ${CCPREFIX}ar -x "${dir}/${f}" || exit 1
 	    cd ..
 	    ;;
 	*)
@@ -103,7 +103,7 @@ cd "${OTMPDIR}"
 if [ "${SLIB_EXT}" = ".dylib" ]; then
     FULLNAME="${BASE}.${VERSION}${SLIB_EXT}"
     ld -r -o "${FULLNAME}.o" $OBJLST && \
-    gcc -dynamiclib -install_name "${BASE}.${MAJOR}${SLIB_EXT}" \
+    ${CCPREFIX}gcc -dynamiclib -install_name "${BASE}.${MAJOR}${SLIB_EXT}" \
         -compatibility_version ${MAJOR}.${MINOR} -current_version ${VERSION} \
         -flat_namespace -undefined warning -multiply_defined suppress \
         -o "${FULLNAME}" "${FULLNAME}.o" ${linker_options} && \
@@ -115,14 +115,14 @@ elif [ "${SLIB_EXT}" = ".dll" ]; then
     FULLNAME="${LIB_NAME}${SLIB_EXT}"
     SYSLIBS="-luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 -lole32"
     SYSLIBS="${SYSLIBS} -loleaut32 -luuid -lmpr -lwsock32 -lws2_32 -lmapi32"
-    gcc -shared -o "${FULLNAME}" $OBJLST ${linker_options} ${SYSLIBS} && \
+    ${CCPREFIX}gcc -shared -o "${FULLNAME}" $OBJLST ${linker_options} ${SYSLIBS} && \
         cd "${dir}" && \
         mv -f "${OTMPDIR}/${FULLNAME}" "${DSTDIR}${FULLNAME}"
 else
     #FULLNAME="${BASE}-${VERSION}${SLIB_EXT}"
     #FULLNAME="${BASE}{SLIB_EXT}.${VERSION}"
     FULLNAME="${LIB_NAME}${SLIB_EXT}"
-    gcc -shared -o "${FULLNAME}" $OBJLST ${linker_options} && \
+    ${CCPREFIX}gcc -shared -o "${FULLNAME}" $OBJLST ${linker_options} && \
         cd "${dir}" && \
         mv -f "${OTMPDIR}/${FULLNAME}" "${DSTDIR}${FULLNAME}"
 fi

@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_gnu.sh,v 1.17 2005/01/12 16:36:00 druzus Exp $
+# $Id: make_gnu.sh,v 1.18 2005/01/20 23:11:40 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -14,6 +14,8 @@
 # Copyright 1999-2001 Viktor Szakats (viktor.szakats@syenar.hu)
 # See doc/license.txt for licensing terms.
 # ---------------------------------------------------------------
+
+name="xharbour"
 
 if [ -z "$HB_ARCHITECTURE" ]; then
     if [ "$OSTYPE" = "msdosdjgpp" ]; then
@@ -79,13 +81,25 @@ fi
 # export C_USR=
 # export L_USR=
 
-if [ -z "$PREFIX" ]; then export PREFIX=/usr/local; fi
+[ -z "$HB_INSTALL_PREFIX" ] && [ -n "$PREFIX" ] && export HB_INSTALL_PREFIX="$PREFIX"
+[ -z "$HB_INSTALL_PREFIX" ] && export HB_INSTALL_PREFIX=/usr/local
 
 # Set to constant value to be consistent with the non-GNU make files.
 
-if [ -z "$HB_BIN_INSTALL" ]; then export HB_BIN_INSTALL=$PREFIX/bin/; fi
-if [ -z "$HB_LIB_INSTALL" ]; then export HB_LIB_INSTALL=$PREFIX/lib/xharbour/; fi
-if [ -z "$HB_INC_INSTALL" ]; then export HB_INC_INSTALL=$PREFIX/include/xharbour/; fi
+case "$HB_INSTALL_PREFIX" in
+    /usr|/usr/local|/opt)
+        hb_instsubdir="/$name"
+        ;;
+    *)
+        hb_instsubdir=""
+        ;;
+esac
+
+if [ -z "$HB_BIN_INSTALL" ]; then export HB_BIN_INSTALL=$HB_INSTALL_PREFIX/bin/; fi
+if [ -z "$HB_LIB_INSTALL" ]; then export HB_LIB_INSTALL=$HB_INSTALL_PREFIX/lib/$hb_instsubdir; fi
+if [ -z "$HB_INC_INSTALL" ]; then export HB_INC_INSTALL=$HB_INSTALL_PREFIX/include/$hb_instsubdir; fi
+
+
 
 if [ -z "$HB_ARCHITECTURE" ]; then
    echo "Error: HB_ARCHITECTURE is not set."

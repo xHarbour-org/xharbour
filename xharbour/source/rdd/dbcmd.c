@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.140 2005/01/11 08:44:08 druzus Exp $
+ * $Id: dbcmd.c,v 1.141 2005/01/28 03:29:31 druzus Exp $
  */
 
 /*
@@ -3861,7 +3861,7 @@ HB_FUNC( DBSETRELATION )
       dbRelations.lpaChild = pChildArea;
       dbRelations.itmCobExpr = hb_itemNew( hb_param( 2, HB_IT_BLOCK ) );
       dbRelations.abKey = hb_itemNew( hb_param( 3, HB_IT_STRING ) );
-      dbRelations.isScoped = ( hb_pcount() > 3 ) ? hb_parl( 4 ) : 0;
+      dbRelations.isScoped = ( hb_pcount() > 3 ) ? hb_parl( 4 ) : FALSE;
       dbRelations.lpdbriNext = NULL;
 
       SELF_SETREL( pArea, &dbRelations );

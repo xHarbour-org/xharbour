@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3777 2005/01/28 12:17:41 alexstrickland Exp $
+ * $Id: ChangeLog,v 1.3778 2005/01/28 14:33:39 jacekp Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-30 07:45 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/make_gnu.sh
+  * xharbour/make_tgz.sh
+  * xharbour/make_xmingw.sh
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/hb-mkslib.sh
+  * xharbour/bin/postinst.sh
+    * small modification for MinGW cross compilation
+
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/workarea.c
+    * minor modification - mostly formatting
+
+  * xharbour/source/rdd/dbf1.c
+    * do not call GOCOLD() inside CHILDSYNC() but do it in FORCEREL()
+      the modification based on CL5.3 NG. - it should also resolve the
+      problem with relations in DBFNTX reported by Budyanto.
+      Below is a note I lef in dbf1.c:
+
+   /*
+    * !!! The side effect of calling GOCOLD() inside CHILDSYNC() is
+    * evaluation of index expressions (index KEY and FOR condition)
+    * when the pArea is not the current one - it means that the
+    * used RDD has to set proper work area before eval, DBFCDX does
+    * but DBFNTX not yet - it should be changed.
+    * IMHO GOCOLD() could be safely removed from this place but I'm not
+    * sure it's Clipper compatible - I will have to check it, Druzus.
+    */
+   /*
+    * I've checked in CL5.3 Technical Reference Guide that only
+    * FORCEREL() should ensure that the work area buffer is not hot
+    * and then call RELEVAL() - I hope it describes the CL5.3 DBF* RDDs
+    * behavior so I replicate it - the GOCOLD() is moved from CHILDSYNC()
+    * to FORCEREL(), Druzus.
+    */
 
 2005-01-28 15:26 UTC+0100 Jacek Potempa (Jacek.Potempa@otc.com.pl)
   * xharbour/include/hbstack.h

@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.31 2004/12/28 06:39:20 druzus Exp $
+ * $Id: workarea.c,v 1.32 2004/12/31 11:56:06 druzus Exp $
  */
 
 /*
@@ -956,9 +956,11 @@ ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
 
          sInfo.scopeValue = pResult;
          sInfo.nScope = 0;
-         SELF_SETSCOPE( pArea, (LPDBORDSCOPEINFO) &sInfo );
+         if ( SELF_SETSCOPE( pArea, (LPDBORDSCOPEINFO) &sInfo ) == FAILURE )
+            return FAILURE;
          sInfo.nScope = 1;
-         SELF_SETSCOPE( pArea, (LPDBORDSCOPEINFO) &sInfo );
+         if ( SELF_SETSCOPE( pArea, (LPDBORDSCOPEINFO) &sInfo ) == FAILURE )
+            return FAILURE;
       }
       if( SELF_SEEK( pArea, 0, pResult, 0 ) == SUCCESS )
          return SUCCESS;

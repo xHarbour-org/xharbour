@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_xmingw.sh,v 1.2 2005/01/12 16:36:00 druzus Exp $
+# $Id: make_xmingw.sh,v 1.3 2005/01/27 11:49:15 druzus Exp $
 #
 # This script simplifies cross-compiling xHarbour for Windows from Unix systems.
 #
@@ -13,7 +13,7 @@ UNAME=`uname`
 export HB_ARCHITECTURE=w32
 export HB_COMPILER=mingw32
 
-export PREFIX=/usr/local/mingw32-xharbour
+[ -z "$HB_INSTALL_PREFIX" ] && export HB_INSTALL_PREFIX=/usr/local/mingw32-xharbour
 export C_USR="-DHOST_OS_UNIX_COMPATIBLE $C_USR"
 export PRG_USR="-D__PLATFORM__Windows -undef:__PLATFORM__UNIX -undef:__PLATFORM__$UNAME $PRG_USR"
 
@@ -51,5 +51,13 @@ fi
 
 export PATH CCPREFIX
 
-. `dirname $0`/make_gnu.sh $*
-
+case "$1" in
+    tgz|gnu)
+        ext=$1
+        shift
+        . `dirname $0`/make_${ext}.sh "$@"
+        ;;
+    *)
+        . `dirname $0`/make_gnu.sh "$@"
+        ;;
+esac

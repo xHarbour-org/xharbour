@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.40 2005/01/20 23:11:40 druzus Exp $
+# $Id: make_tgz.sh,v 1.41 2005/01/21 18:41:31 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -25,6 +25,8 @@ hb_contrib=""
 hb_sysdir="yes"
 hb_exesuf=""
 export C_USR="-DHB_FM_STATISTICS_OFF -O3"
+
+[ -z "$HB_INSTALL_PREFIX" ] && [ -n "$PREFIX" ] && export HB_INSTALL_PREFIX="$PREFIX"
 
 if [ -z "$TMPDIR" ]; then TMPDIR="/tmp"; fi
 HB_INST_PREF="$TMPDIR/$name.bin.$USER.$$"

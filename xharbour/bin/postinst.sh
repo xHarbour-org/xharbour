@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: postinst.sh,v 1.14 2005/01/11 23:53:27 likewolf Exp $
+# $Id: postinst.sh,v 1.15 2005/01/21 18:41:38 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -39,12 +39,12 @@ if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "mingw32" ] || [ "$HB_COMPIL
 then
     RANLIB=""
     MAKE=make
-    AR="ar -cr"
+    AR="${CCPREFIX}ar -cr"
     if [ "${HB_ARCHITECTURE}" = "bsd" ] || [ `uname` = "FreeBSD" ]; then
         MAKE=gmake
     elif [ "${HB_ARCHITECTURE}" = "darwin" ]; then
         # We must build an archive index on Darwin
-        AR="ar -crs"
+        AR="${CCPREFIX}ar -crs"
     fi
     if [ "${HB_ARCHITECTURE}" = "sunos" ]; then
         install -m 755 -f "${HB_BIN_INSTALL}" "${hb_root}/bin/hb-mkslib.sh"

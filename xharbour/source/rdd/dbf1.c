@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.103 2004/12/28 06:39:20 druzus Exp $
+ * $Id: dbf1.c,v 1.104 2005/01/25 10:47:50 druzus Exp $
  */
 
 /*
@@ -799,10 +799,13 @@ static ERRCODE hb_dbfGoTo( DBFAREAP pArea, ULONG ulRecNo )
    if( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-   if( pArea->lpdbPendingRel && pArea->lpdbPendingRel->isScoped )
-      SELF_FORCEREL( ( AREAP ) pArea );
-   /* Reset parent rel struct */
-   pArea->lpdbPendingRel = NULL;
+   if( pArea->lpdbPendingRel )
+   {
+      if ( pArea->lpdbPendingRel->isScoped )
+         SELF_FORCEREL( ( AREAP ) pArea );
+      else /* Reset parent rel struct */
+         pArea->lpdbPendingRel = NULL;
+   }
 
    /* Update record count */
    if( ulRecNo > pArea->ulRecCount && pArea->fShared )
@@ -973,8 +976,13 @@ static ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
    if( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-   /* Reset parent rel struct */
-   pArea->lpdbPendingRel = NULL;
+   if( pArea->lpdbPendingRel )
+   {
+      if ( pArea->lpdbPendingRel->isScoped )
+         SELF_FORCEREL( ( AREAP ) pArea );
+      else /* Reset parent rel struct */
+         pArea->lpdbPendingRel = NULL;
+   }
 
    if( pArea->fShared )
    {
@@ -2886,9 +2894,27 @@ static ERRCODE hb_dbfChildSync( DBFAREAP pArea, LPDBRELINFO pRelInfo )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfChildSync(%p, %p)", pArea, pRelInfo));
 
-   SELF_GOCOLD( ( AREAP ) pArea );
+   /*
+    * !!! The side effect of calling GOCOLD() inside CHILDSYNC() is
+    * evaluation of index expressions (index KEY and FOR condition)
+    * when the pArea is not the current one - it means that the
+    * used RDD has to set proper work area before eval, DBFCDX does
+    * but DBFNTX not yet - it should be changed.
+    * IMHO GOCOLD() could be safely removed from this place but I'm not
+    * sure it's Clipper compatible - I will have to check it, Druzus.
+    */
+   /*
+    * I've checked in CL5.3 Technical Reference Guide that only
+    * FORCEREL() should ensure that the work area buffer is not hot
+    * and then call RELEVAL() - I hope it describes the CL5.3 DBF* RDDs
+    * behavior so I replicate it - the GOCOLD() is moved from CHILDSYNC()
+    * to FORCEREL(), Druzus.
+    */
+   /* SELF_GOCOLD( ( AREAP ) pArea ); */
+
    pArea->lpdbPendingRel = pRelInfo;
-   SELF_SYNCCHILDREN( ( AREAP ) pArea );
+   if( pArea->lpdbRelations )
+      SELF_SYNCCHILDREN( ( AREAP ) pArea );
    return SUCCESS;
 }
 
@@ -2907,6 +2933,9 @@ static ERRCODE hb_dbfForceRel( DBFAREAP pArea )
 
    if( pArea->lpdbPendingRel )
    {
+      /* update buffers */
+      SELF_GOCOLD( ( AREAP ) pArea );
+
       lpdbPendingRel = pArea->lpdbPendingRel;
       pArea->lpdbPendingRel = NULL;
       uiError = SELF_RELEVAL( ( AREAP ) pArea, lpdbPendingRel );
