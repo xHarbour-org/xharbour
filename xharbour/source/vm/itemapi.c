@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.72 2004/02/10 00:36:18 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.73 2004/02/10 00:44:04 ronpinkas Exp $
  */
 
 /*
@@ -1425,6 +1425,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
             dNumber = 0.0; /* -0.0 hack */
             iDecR = iDec;
          }
+         //printf("\r\n[iDec=%d, iDecR=%d]  ", iDec, iDecR);fflush(stdout);
 
          if( iDecR >= 0 )
          {
@@ -1434,16 +1435,12 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
             }
             else
             {
-               if( iDec <=  iDecR )
+               if( iDec <= iDecR || iDecR == 0 )
                {
                   iBytes = snprintf( szResult, iSize + 1, "%*.*f", iSize, iDec, dNumber );
                }
                else
                {
-                  if( iDecR == 0 )
-                  {
-                     iDecR++;
-                  }
                   iBytes = snprintf( szResult, iSize + 1, "%*.*f%0*u", iSize-iDec+iDecR, iDecR, dNumber, iDec-iDecR, 0 );
                }
             }
@@ -1481,11 +1478,40 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
 
 #ifndef HB_LONG_LONG_OFF
          case HB_IT_LONGLONG:
+#if defined( __MINGW32__ )
+         {
+            LONGLONG llVal = pNumber->item.asLongLong.value;
+            BOOL fNeg = ( llVal < 0 );
+            char szBuf[21];
+            int i = 20;
+
+            szBuf[ i ] = '\0';
+            do
+            {
+               szBuf[ --i ] = '0' + ( char ) ( fNeg ? -( llVal % 10 ) : ( llVal % 10 ) );
+               llVal /= 10;
+            }
+            while ( llVal );
+
+            if ( fNeg )
+               szBuf[ --i ] = '-';
+
+            if ( iDec > 0 )
+               iBytes = snprintf( szResult, iSize + 1, "%*s.%0*u", iSize - iDec - 1, &szBuf[ i ], iDec, 0 );
+            else
+               iBytes = snprintf( szResult, iSize + 1, "%*s", iSize, &szBuf[ i ] );
+         }
+#elif defined( __LCC__ ) || defined( _MSC_VER )
+            if ( iDec > 0 )
+               iBytes = snprintf( szResult, iSize + 1, "%*lld.%0*u", iSize - iDec - 1, pNumber->item.asLongLong.value, iDec, 0 );
+            else
+               iBytes = snprintf( szResult, iSize + 1, "%*lld", iSize, pNumber->item.asLongLong.value );
+#else
             if ( iDec > 0 )
                iBytes = snprintf( szResult, iSize + 1, "%*Ld.%0*u", iSize - iDec - 1, pNumber->item.asLongLong.value, iDec, 0 );
             else
                iBytes = snprintf( szResult, iSize + 1, "%*Ld", iSize, pNumber->item.asLongLong.value );
-
+#endif
             break;
 #endif
 
@@ -1739,14 +1765,14 @@ char HB_EXPORT * hb_itemPadConv( PHB_ITEM pItem, char * buffer, ULONG * pulSize 
          szText = buffer;
          *pulSize = strlen( szText );
       }
-      #ifndef HB_LONG_LONG_OFF
+#ifndef HB_LONG_LONG_OFF
       else if( HB_IS_LONGLONG( pItem ) )
       {
          sprintf( buffer, "%Ld", hb_itemGetNLL( pItem ) );
          szText = buffer;
          *pulSize = strlen( szText );
       }
-      #endif
+#endif
       else
       {
          szText = NULL;

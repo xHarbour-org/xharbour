@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.10 2004/02/10 02:02:12 druzus Exp $
+ * $Id: val.c,v 1.11 2004/02/10 22:34:33 andijahja Exp $
  */
 
 /*
@@ -123,14 +123,14 @@ double HB_EXPORT hb_strVal( const char * szText, ... )
 #ifndef HB_LONG_LONG_OFF
 LONGLONG HB_EXPORT hb_strValInt( const char * szText, int * iOverflow )
 #else
-long     HB_EXPORT hb_strValInt( const char * szText, int * iOverflow )
+LONG     HB_EXPORT hb_strValInt( const char * szText, int * iOverflow )
 #endif
 {
-  #ifndef HB_LONG_LONG_OFF
+#ifndef HB_LONG_LONG_OFF
    LONGLONG lResult = 0, lPrev;
-  #else
-   long     lResult = 0, lPrev;
-  #endif
+#else
+   LONG     lResult = 0, lPrev;
+#endif
    ULONG ulPad = 0, ulLen;
    BOOL bNeg = FALSE;
 
@@ -141,12 +141,13 @@ long     HB_EXPORT hb_strValInt( const char * szText, int * iOverflow )
       ulPad++;
    }
 
-   if( szText[ulPad] == '-' || szText[ulPad] == '+' )
+   if( szText[ulPad] == '-' )
    {
-      if( szText[ulPad] == '-' )
-      {
-         bNeg = TRUE;
-      }
+      bNeg = TRUE;
+      ulPad++;
+   }
+   else if ( szText[ulPad] == '+' )
+   {
       ulPad++;
    }
 
@@ -156,9 +157,9 @@ long     HB_EXPORT hb_strValInt( const char * szText, int * iOverflow )
    {
       lPrev = lResult;
       lResult *= 10;
-      lResult += (bNeg?-(szText[ulLen]-0x30):(szText[ulLen]-0x30));
+      lResult += bNeg ? -( szText[ulLen] - '0' ) : ( szText[ulLen] - '0' );
 
-      if ( ( !bNeg && lPrev > lResult) || ( bNeg && lPrev < lResult ) )
+      if ( bNeg ? lPrev < lResult : lPrev > lResult )
       {
         // Overflow
         if( iOverflow )
@@ -185,7 +186,6 @@ HB_FUNC( VAL )
 {
    PHB_ITEM pText = hb_param( 1, HB_IT_STRING );
 
-
    if( pText )
    {
       char * szText = hb_itemGetCPtr( pText );
@@ -204,23 +204,20 @@ HB_FUNC( VAL )
 
       if( bInteger )
       {
-       #ifndef HB_LONG_LONG_OFF
+#ifndef HB_LONG_LONG_OFF
          LONGLONG lValue;
-       #else
-         long lValue;
-       #endif
+#else
+         LONG lValue;
+#endif
          int iOverflow;
 
          lValue = hb_strValInt( szText, &iOverflow );
 
-#ifndef _MSC_VER
          if( !iOverflow )
          {
             hb_retnintlen( lValue, iLen );
             return;
          }
-#endif
-
       }
 
       {
@@ -237,13 +234,11 @@ HB_FUNC( VAL )
             iWidth++;
          }
 
-#ifdef _MSC_VER
          if( iWidth == 1 && szText[ 0 ] == 0 )
          {
             iWidth = 10;
          }
-
-         if ( iLen == 1 && szText[ 0 ] == '-' )
+         else if ( iLen == 1 && szText[ 0 ] == '-' )
          {
             iWidth = 1;
          }
@@ -253,7 +248,6 @@ HB_FUNC( VAL )
             hb_retnlen( dValue, iWidth, 0 );
          }
          else
-#endif
             hb_retnlen( dValue, iWidth, iDec );
       }
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.316 2004/02/05 12:44:17 andijahja Exp $
+ * $Id: hvm.c,v 1.317 2004/02/10 13:16:18 andijahja Exp $
  */
 
 /*
@@ -6304,14 +6304,18 @@ HB_EXPORT void hb_vmPushDouble( double dNumber, int iDec )
 
 static int hb_vmCalcDoubleWidth( double dNumber, int iDec )
 {
-   char buffer[ 260 ];
+   int iSize;
 
-   sprintf( buffer, "%.*f", 0, dNumber );
-
-   if( iDec == 0 )
-      return strlen( buffer ) + 1;
+   if ( dNumber < 0 )
+   {
+      iSize = dNumber > -10 ? 2 : ( int ) log10( -dNumber ) + 2;
+   }
    else
-      return strlen( buffer );
+   {
+      iSize = dNumber < 10 ? 1 : ( int ) log10( dNumber ) + 1;
+   }
+
+   return iDec == 0 ? iSize + 1 : iSize;
 }
 
 static void hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec )
@@ -6331,7 +6335,7 @@ static void hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec )
    /* NOTE: Part of these width calculations could be moved to the compiler for
             maximum speed. */
 
-   if( dNumber >= 1000000000.0 )
+   if( iDec != HB_DEFAULT_DECIMALS && dNumber >= 1000000000.0 )
    {
       /* NOTE: If the width info is not provided by the pcode stream,
                it will be determined at runtime with a relatively slow
@@ -6342,7 +6346,7 @@ static void hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec )
       else
          ( * HB_VM_STACK.pPos )->item.asDouble.length = iWidth;
    }
-   else if( dNumber <= -1000000000.0 )
+   else if( dNumber < -999999999.0 || dNumber > 9999999999.0 )
    {
       ( * HB_VM_STACK.pPos )->item.asDouble.length = 20;
    }

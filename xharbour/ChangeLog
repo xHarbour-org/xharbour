@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2258 2004/02/10 13:16:06 andijahja Exp $
+ * $Id: ChangeLog,v 1.2259 2004/02/10 22:34:33 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,48 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-11 02:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/vm/hvm.c
+    * hb_vmCalcDoubleWidth() to not use sprintf which is slow and
+      inefficient.
+    ! fixed default double num size calculation
+
+  * xharbour/source/vm/itemapi.c
+    * fixed LONGLONG support for MINGW32 MSVC and LCC
+
+  * xharbour/source/rtl/val.c
+    * reenabled LONGLONG support in VAL for MSVC
+
+  * xharbour/utils/hbtest/rt_math.prg
+    ! LONLONG_MIN is -9223372036854775808 not -9223372036854775807
+      To your knowledge: if this test doesn't fail then it means
+      that it's not LONGLONG number but double. Proper behavior for
+      LONGLONG should be:
+         !  968 MAIN_MATH(260)  val("9223372036854775807")              
+                Result: 9223372036854775807
+              Expected: 9223372036854776000
+      We hacked in some places xHarbour libs for LONGLONG support
+      but compiler doesn't operates on LONGLONG but on DOUBLE.
+      It simply means that all number in source code never becomes
+      LONGLONG if they exceed double precision. Please try:
+         ? val( "9223372036854775807"),  9223372036854775807
+         ? val("-9223372036854775807"), -9223372036854775807
+         ? val("-9223372036854775808"), -9223372036854775808
+         ? val( "9223372036854775807") ==  9223372036854775807
+         ? val("-9223372036854775807") == -9223372036854775807
+         ? val("-9223372036854775808") == -9223372036854775808
+      The results should be differ.
+      It cause a lot of side effects. The worst ones can cause
+      strange incompatibilities with Clipper on shared access
+      to the same database when very big numbers are used.
+      It's totally out of programmer control. All Clipper logic
+      (reproduced in xHarbour) to round number to 15/16 significant
+      digits now fails.
+      I cannot say I like it. I cleaned what I could without big
+      revolution in compiler but now your move. I would like
+      to hear your opinion.
+
 2004-02-11 05:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * utils/hbtest/rt_str.prg
     - remmed line 65. It is redundant with hb_math.prg line 341.

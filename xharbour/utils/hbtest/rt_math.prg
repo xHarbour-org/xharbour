@@ -1,5 +1,5 @@
 /*
- * $Id: rt_math.prg,v 1.3 2003/12/18 21:12:44 ronpinkas Exp $
+ * $Id: rt_math.prg,v 1.4 2004/02/09 02:29:28 andijahja Exp $
  */
 
 /*
@@ -257,8 +257,8 @@ FUNCTION Main_MATH()
    TEST_LINE( Round(val("-0.12"),0)           , 0                )
    /* VAL() */
    // The followings are MIN and MAX of LONGLONG and ULONGLONG
-   TEST_LINE( val("9223372036854775807")  ,9223372036854775807  )
-   TEST_LINE( val("-9223372036854775807") ,-9223372036854775807 )
+   TEST_LINE( val( "9223372036854775807") , 9223372036854775807 )
+   TEST_LINE( val("-9223372036854775808") ,-9223372036854775808 )
    TEST_LINE( val("18446744073709551615") ,18446744073709551615 )
 
    /* INT() */
