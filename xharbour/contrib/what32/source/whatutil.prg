@@ -5,6 +5,7 @@
 #Include "What32.ch"
 #DEFINE SHOWDEBUG
 #Include 'debug.ch'
+#Include 'wingdi.ch'
 
 #Include 'wintypes.ch'
 #Include 'cstruct.ch'
@@ -735,3 +736,53 @@ aFont := {nSize, 0, nAngle, nAngle, IIF(lBold,700,0), lItalic, lUnder, .F., 1, 1
 hFont := CreateFont(aFont)
 return hFont
 
+
+FUNCTION DrawGrid(hWnd,hDC,nGran)
+local aRect,hBrush,hOldPen,hOldBrush,hPen,hBmp
+DEFAULT nGran TO 3
+DO CASE
+   CASE nGran == 1
+       hBmp:=CreateBitmap(8,8,1,1,;
+                       Chr(255)+chr(0) +;
+                       Chr(170)+chr(0) +;
+                       Chr(255)+chr(0) +;
+                       Chr(170)+chr(0) +;
+                       Chr(255)+chr(0) +;
+                       Chr(170)+chr(0) +;
+                       Chr(255)+chr(0) +;
+                       Chr(170)+chr(0) )
+   CASE nGran == 2
+        hBmp:=CreateBitmap(8,8,1,1,;
+                       Chr(255)+chr(0) +;
+                       Chr(187)+chr(0) +;
+                       Chr(255)+chr(0) +;
+                       Chr(255)+chr(0) +;
+                       Chr(255)+chr(0) +;
+                       Chr(187)+chr(0) +;
+                       Chr(255)+chr(0) +;
+                       Chr(255)+chr(0) )
+   CASE nGran == 3
+        hBmp:=CreateBitmap(8, 8, 1, 1, ;
+                       CHR(255)+CHR(0) + ;
+                       CHR(255)+CHR(0) + ;
+                       CHR(255)+CHR(0) + ;
+                       CHR(255)+CHR(0) + ;
+                       CHR(255)+CHR(0) + ;
+                       CHR(251)+CHR(0) + ;
+                       CHR(255)+CHR(0) + ;
+                       CHR(255)+CHR(0))
+ENDCASE
+hBrush := CreatePatternBrush(hBmp)
+hPen   := CreatePen(PS_NULL, 0, 0)
+hOldBrush := SelectObject(hDC, hBrush)
+hOldPen   := SelectObject(hDC, hPen)
+aRect:=GetClientRect(hWnd)
+SetTextColor(hDC,rgb(0,0,0))
+SetBkColor(hDC,GetSysColor(COLOR_BTNFACE))
+Rectangle(hDC, aRect[1], aRect[2], aRect[3], aRect[4])
+SelectObject(hDC, hOldBrush)
+SelectObject(hDC, hOldPen)
+DeleteObject(hBrush)
+DeleteObject(hBmp)
+DeleteObject(hPen)
+return(0)

@@ -1855,3 +1855,57 @@
 #endif // _WINGDI_
 #endif
 
+// flags for DrawFrameControl
+
+#define DFC_CAPTION             1
+#define DFC_MENU                2
+#define DFC_SCROLL              3
+#define DFC_BUTTON              4
+#define DFC_POPUPMENU           5
+
+#define DFCS_CAPTIONCLOSE            0
+#define DFCS_CAPTIONMIN              1
+#define DFCS_CAPTIONMAX              2
+#define DFCS_CAPTIONRESTORE          3
+#define DFCS_CAPTIONHELP             4
+
+#define DFCS_MENUARROW               0
+#define DFCS_MENUCHECK               1
+#define DFCS_MENUBULLET              2
+#define DFCS_MENUARROWRIGHT          4
+#define DFCS_SCROLLUP                0
+#define DFCS_SCROLLDOWN              1
+#define DFCS_SCROLLLEFT              2
+#define DFCS_SCROLLRIGHT             3
+#define DFCS_SCROLLCOMBOBOX          5
+#define DFCS_SCROLLSIZEGRIP          8
+#define DFCS_SCROLLSIZEGRIPRIGHT     16
+
+#define DFCS_BUTTONCHECK             0
+#define DFCS_BUTTONRADIOIMAGE        1
+#define DFCS_BUTTONRADIOMASK         2
+#define DFCS_BUTTONRADIO             4
+#define DFCS_BUTTON3STATE            8
+#define DFCS_BUTTONPUSH             16
+
+#define DFCS_INACTIVE              256
+#define DFCS_PUSHED                512
+#define DFCS_CHECKED              1024
+
+#define DFCS_TRANSPARENT          2048
+#define DFCS_HOT                  4096
+
+#define DFCS_ADJUSTRECT           8192
+#define DFCS_FLAT                16384
+#define DFCS_MONO                32768
+
+// flags for DrawCaption
+#define DC_ACTIVE                1
+#define DC_SMALLCAP              2
+#define DC_ICON                  4
+#define DC_TEXT                  8
+#define DC_INBUTTON             16
+#define DC_GRADIENT             32
+
+#define IDANI_OPEN          1
+
