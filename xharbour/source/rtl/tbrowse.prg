@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.34 2003/04/09 19:11:44 walito Exp $
+ * $Id: tbrowse.prg,v 1.35 2003/04/09 21:19:30 lculik Exp $
  */
 
 /*
@@ -1796,7 +1796,11 @@ METHOD Stabilize() CLASS TBrowse
                next
             endif
 
-            DispOut( Space( Int( Round( ( ::nVisWidth - ::nColsWidth ) / 2, 0 ) ) ), ColorSpec )
+            if ::nColumns == ::nFrozenCols
+               DispOut( Replicate( "*", ::nVisWidth - ::nColsWidth ), ColorSpec )
+            else
+               DispOut( Replicate( "*", Int( Round( ( ::nVisWidth - ::nColsWidth ) / 2, 0 ) ) ), ColorSpec )
+            endif
 
             // doesn't need to be redrawn
             //
@@ -2157,7 +2161,11 @@ METHOD ForceStabilize() CLASS TBrowse
                next
             endif
 
-            DispOut( Space( ::nVisWidth - ::nColsWidth ), ColorSpec )
+            if ::nColumns == ::nFrozenCols
+               DispOut( Replicate( "*", ::nVisWidth - ::nColsWidth ), ColorSpec )
+            else
+               DispOut( Replicate( "*", Int( Round( ( ::nVisWidth - ::nColsWidth ) / 2, 0 ) ) ), ColorSpec )
+            endif
 
             // doesn't need to be redrawn
             //
