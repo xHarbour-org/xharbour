@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.13 2003/06/19 04:55:54 ronpinkas Exp $
+ * $Id: persist.prg,v 1.14 2003/11/03 20:09:25 brianhays Exp $
  */
 
 /*
@@ -80,11 +80,11 @@ ENDCLASS
 METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
 
    EXTERN HB_RestoreBlock
-
-   LOCAL nLines := MLCount( cObjectText, 254 )
-   LOCAL nLine  := 1, cLine, cToken
+   LOCAL aLines:= ArrayFromLFString(cObjectText)
+   LOCAL nLines := LEN(aLines)
+   LOCAL nLine  := 1, cLine
    LOCAL lStart := .T., aObjects := {}, nObjectLevel := 0
-   LOCAL cTextCopy, nAt, e
+   LOCAL cTextCopy, nAt
 
    MEMVAR oObject
    PRIVATE oObject := QSelf()
@@ -93,7 +93,7 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
       lIgnoreBadIVars := .f.
    ENDIF
 
-   cLine := RTrim( MemoLine( cObjectText, 254, 1 ) )
+   cLine := RTrim(aLines[1])
 
    IF cLine == "// HBPersistent Ver 2.0"
       nLine++
@@ -101,7 +101,7 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
       cTextCopy := ""
 
       DO WHILE nLine <= nLines
-         cLine := LTrim( MemoLine( cObjectText, 254, nLine ) )
+         cLine := LTrim( aLines[nLine] )
 
          IF cLine[1] == ':'
             nAt := At( '=', cLine )
@@ -120,7 +120,7 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
    ENDIF
 
    DO WHILE nLine <= nLines
-      cLine := RTrim( LTrim( MemoLine( cObjectText, 254, nLine ) ) )
+      cLine := RTrim( LTrim( aLines[nLine] ) )
 
       IF Empty( cLine )
          nLine++
@@ -238,7 +238,7 @@ METHOD SaveToText( cObjectName ) CLASS HBPersistent
                EXIT
 
             DEFAULT
-               cObject += Space( nIndent ) + "   ::" + aPropertyAndVAlue[1] + " := " + ValToText( xValue, nIndent, Self )
+               cObject += Space( nIndent ) + "   ::" + aPropertyAndVAlue[1] + " := " + ValToText( xValue)
                cObject += HB_OsNewLine()
          END
       ENDIF
@@ -277,7 +277,7 @@ STATIC FUNCTION ArrayToText( aArray, cName, nIndent, Self )
 
          DEFAULT
             cArray += Space( nIndent ) + "   ::" + cName + "[ " + AllTrim( Str( HB_EnumIndex() ) ) + " ]" + " := " + ;
-                      ValToText( xValue, nIndent, Self ) + HB_OsNewLine()
+                      ValToText( xValue ) + HB_OsNewLine()
       END
    NEXT
 
@@ -285,7 +285,7 @@ STATIC FUNCTION ArrayToText( aArray, cName, nIndent, Self )
 
 RETURN cArray
 
-STATIC FUNCTION ValToText( xValue, nIndent, Self )
+STATIC FUNCTION ValToText( xValue )
 
    LOCAL cType := ValType( xValue )
    LOCAL cText, cQuote := '"'
@@ -304,7 +304,7 @@ STATIC FUNCTION ValToText( xValue, nIndent, Self )
          ELSE
             cText := cQuote + xValue + cQuote
          ENDIF
-
+         cText:= ReplaceCRLFInString(cText)
          EXIT
 
       CASE "N"
@@ -325,3 +325,31 @@ STATIC FUNCTION ValToText( xValue, nIndent, Self )
    END
 
 RETURN cText
+
+
+STATIC FUNCTION ReplaceCRLFInString(cText)
+  LOCAL cCR:= CHR(13), cLF:= CHR(10), cQuote
+  cQuote:= cText[1]
+  IF cCR $ cText
+    cText:= STRTRAN(cText, cCR, cQuote+"+CHR(13)+"+cQuote)
+  ENDIF
+  IF cLF $ cText
+    cText:= STRTRAN(cText, cLF, cQuote+"+CHR(10)+"+cQuote)
+  ENDIF
+  RETURN(cText)
+
+STATIC FUNCTION ArrayFromLFString(cString)
+  LOCAL cDelim:= CHR(10), nStart:=1, nStop, aResult:= {}, nLen
+  LOCAL nCnt:= 0
+  cString:= STRTRAN(cString,CHR(13)) // Get rid of CR
+  IF RIGHT(cString,1) != cDelim
+    cString+= cDelim // Add a trailing LF if last character is not one
+  ENDIF
+
+  nLen:= LEN(cString)
+
+  DO WHILE !EMPTY(nStop:= AT(cDelim, cString, nStart)) .AND. nStart<= nLen
+    AADD(aResult, SUBSTR(cString, nStart, nStop- nStart))
+    nStart:= nStop+1
+  ENDDO
+  RETURN(aResult)  
