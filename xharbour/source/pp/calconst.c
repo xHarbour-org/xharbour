@@ -1,5 +1,5 @@
 /*
- * $Id: calconst.c,v 1.00 2004/10/21 16:11:00 ronpinkas Exp $
+ * $Id: calconst.c,v 1.1 2004/10/22 02:40:35 ronpinkas Exp $
  */
 
 /*
@@ -96,7 +96,8 @@ double CalcConstant( char **pExp )
 
       if( sToken[0] != ')' )
       {
-         printf( "Error 1" );
+         *pExp -= strlen( sToken );
+         hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_INVALID_CONSTANT_EXPRESSION, *pExp, NULL );
       }
    }
    else if( sToken[0] == '!' )
