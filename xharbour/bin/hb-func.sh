@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.47 2005/02/12 19:54:02 druzus Exp $
+# $Id: hb-func.sh,v 1.48 2005/02/19 20:49:20 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -377,6 +377,8 @@ if [ "\${HB_ARCHITECTURE}" = "darwin" ]; then
     CC_OPT="-no-cpp-precomp -Wno-long-double"
 elif [ "\${HB_ARCHITECTURE}" = "sunos" ]; then
     HB_STRIP="no"
+elif [ "\${HB_ARCHITECTURE}" = "w32" ]; then
+    CC_OPT="$CC_C_USR"
 fi
 
 FOUTC="\${DIROUT}/\${FILEOUT%.*}.c"

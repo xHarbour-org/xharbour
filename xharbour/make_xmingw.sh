@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_xmingw.sh,v 1.4 2005/01/30 06:45:42 druzus Exp $
+# $Id: make_xmingw.sh,v 1.5 2005/02/19 20:48:07 likewolf Exp $
 #
 # This script simplifies cross-compiling xHarbour for Windows from Unix systems.
 #
@@ -14,8 +14,10 @@ export HB_ARCHITECTURE=w32
 export HB_COMPILER=mingw32
 
 [ -z "$HB_INSTALL_PREFIX" ] && export HB_INSTALL_PREFIX=/usr/local/mingw32-xharbour
-export C_USR="-DHOST_OS_UNIX_COMPATIBLE $C_USR"
-export PRG_USR="-D__PLATFORM__Windows -undef:__PLATFORM__UNIX -undef:__PLATFORM__$UNAME $PRG_USR"
+export CC_C_USR="-DHOST_OS_UNIX_COMPATIBLE"
+export C_USR="$CC_C_USR $C_USR"
+export CC_PRG_USR="-D__PLATFORM__Windows -undef:__PLATFORM__UNIX -undef:__PLATFORM__$UNAME"
+export PRG_USR="$CC_PRG_USR $PRG_USR"
 
 if [ -f /etc/debian-version ]; then
     MINGW_PREFIX=/usr
