@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.13 2003/05/29 22:49:00 paultucker Exp $
+ * $Id: trace.c,v 1.14 2003/05/29 22:55:01 paultucker Exp $
  */
 
 /*
@@ -50,8 +50,7 @@
  *
  */
 
-#include "hbapi.h"
-#include "hbtrace.h"
+#include "hbapifs.h"
 #include "hbapierr.h"
 
 #ifdef HB_EXTENSION
@@ -69,7 +68,7 @@ void hb_traceInit( void )
 #ifdef HB_THREAD_SUPPORT
    HB_CRITICAL_INIT( s_CriticalMutex );
 #endif
-   if( pTraceLog && pTraceLog->pSymbol->pFunPtr && hb_fsFile( "trace.log" ) )
+   if( pTraceLog && pTraceLog->pSymbol->pFunPtr && hb_fsFile( ( BYTE *) "trace.log" ) )
    {
       /* Empty the file if it exists. */
       fpTrace = fopen( "trace.log", "w" );

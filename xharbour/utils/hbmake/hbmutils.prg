@@ -372,16 +372,45 @@ RETURN cBuffer
 
 FUNCTION GetinstaledLibs( clibs, lGcc )
 
-   LOCAL aDefLib     := { 'lang' + IIF( lGcc, '.a', '.lib' ), 'vm' + IIF( lGcc, '.a', '.lib' ), 'rtl' + IIF( lGcc, '.a', '.lib' ), ;
-    'rdd' + IIF( lGcc, '.a', '.lib' ), 'macro' + IIF( lGcc, '.a', '.lib' ), 'pp' + IIF( lGcc, '.a', '.lib' ), 'dbfntx' + IIF( lGcc, '.a', '.lib' ), ;
-    'dbfcdx' + IIF( lGcc, '.a', '.lib' ), 'common' + IIF( lGcc, '.a', '.lib' ), 'gtwin' + IIF( lGcc, '.a', '.lib' ), 'debug' + IIF( lGcc, '.a', '.lib' ), ;
-    'gtpca' + IIF( lGcc, '.a', '.lib' ), 'gtdos' + IIF( lGcc, '.a', '.lib' ), 'gtsln' + IIF( lGcc, '.a', '.lib' ), 'gtstd' + IIF( lGcc, '.a', '.lib' ), ;
-    'ziparchive' + IIF( lGcc, '.a', '.lib' ), 'rddads' + IIF( lGcc, '.a', '.lib' ), 'ace32' + IIF( lGcc, '.a', '.lib' ), 'libnf' + IIF( lGcc, '.a', '.lib' ), ;
-    'libct' + IIF( lGcc, '.a', '.lib' ), 'html' + IIF( lGcc, '.a', '.lib' ), 'libgt' + IIF( lGcc, '.a', '.lib' ), 'libmisc' + IIF( lGcc, '.a', '.lib' ), ;
-    'mysql' + IIF( lGcc, '.a', '.lib' ), 'libmysql' + IIF( lGcc, '.a', '.lib' ), 'mysqlclient' + IIF( lGcc, '.a', '.lib' ), 'samples' + IIF( lGcc, '.a', '.lib' ), ;
-    'pdflib' + IIF( lGcc, '.a', '.lib' ), 'nulsys' + IIF( lGcc, '.a', '.lib' ), 'gtcgi' + IIF( lGcc, '.a', '.lib' ), 'vmmt' + IIF( lGcc, '.a', '.lib' ), ;
-    'rtlmt' + IIF( lGcc, '.a', '.lib' ), 'rddmt' + IIF( lGcc, '.a', '.lib' ), 'ppmt' + IIF( lGcc, '.a', '.lib' ), 'dbfntxmt' + IIF( lGcc, '.a', '.lib' ), ;
-    'dbfcdxmt' + IIF( lGcc, '.a', '.lib' ,'macromt' + IIF( lGcc, '.a', '.lib' ) ),'gtnul' + IIF( lGcc, '.a', '.lib' ) }
+   LOCAL aDefLib := {;
+    'lang'     + IIF( lGcc, '.a', '.lib' ),;
+    'vm'       + IIF( lGcc, '.a', '.lib' ),;
+    'rtl'      + IIF( lGcc, '.a', '.lib' ),;
+    'rdd'      + IIF( lGcc, '.a', '.lib' ),;
+    'macro'    + IIF( lGcc, '.a', '.lib' ),;
+    'pp'       + IIF( lGcc, '.a', '.lib' ),;
+    'dbfntx'   + IIF( lGcc, '.a', '.lib' ),;
+    'dbfcdx'   + IIF( lGcc, '.a', '.lib' ),;
+    'common'   + IIF( lGcc, '.a', '.lib' ),;
+    'gtwin'    + IIF( lGcc, '.a', '.lib' ),;
+    'debug'    + IIF( lGcc, '.a', '.lib' ),;
+    'gtpca'    + IIF( lGcc, '.a', '.lib' ),;
+    'gtdos'    + IIF( lGcc, '.a', '.lib' ),;
+    'gtsln'    + IIF( lGcc, '.a', '.lib' ),;
+    'gtstd'    + IIF( lGcc, '.a', '.lib' ),;
+    'ziparchive' + IIF( lGcc, '.a', '.lib' ),;
+    'rddads'   + IIF( lGcc, '.a', '.lib' ),;
+    'ace32'    + IIF( lGcc, '.a', '.lib' ),;
+    'libnf'    + IIF( lGcc, '.a', '.lib' ),;
+    'libct'    + IIF( lGcc, '.a', '.lib' ),;
+    'html'     + IIF( lGcc, '.a', '.lib' ),;
+    'libgt'    + IIF( lGcc, '.a', '.lib' ),;
+    'libmisc'  + IIF( lGcc, '.a', '.lib' ),;
+    'mysql'    + IIF( lGcc, '.a', '.lib' ),;
+    'libmysql' + IIF( lGcc, '.a', '.lib' ),;
+    'mysqlclient' + IIF( lGcc, '.a', '.lib' ),;
+    'samples'  + IIF( lGcc, '.a', '.lib' ),;
+    'pdflib'   + IIF( lGcc, '.a', '.lib' ),;
+    'nulsys'   + IIF( lGcc, '.a', '.lib' ),;
+    'gtcgi'    + IIF( lGcc, '.a', '.lib' ),;
+    'vmmt'     + IIF( lGcc, '.a', '.lib' ),;
+    'rtlmt'    + IIF( lGcc, '.a', '.lib' ),;
+    'rddmt'    + IIF( lGcc, '.a', '.lib' ),;
+    'ppmt'     + IIF( lGcc, '.a', '.lib' ),;
+    'dbfntxmt' + IIF( lGcc, '.a', '.lib' ),;
+    'dbfcdxmt' + IIF( lGcc, '.a', '.lib' ),;
+    'macromt'  + IIF( lGcc, '.a', '.lib' ),;
+    'gtnul'    + IIF( lGcc, '.a', '.lib' ) }
    LOCAL aReturnLibs := {}
    LOCAL aLibs       := DIRECTORY( clibs )
    LOCAL nPos
