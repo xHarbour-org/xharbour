@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.16 2003/08/13 00:18:00 ronpinkas Exp $
+ * $Id: ads1.c,v 1.17 2003/08/13 02:28:42 ronpinkas Exp $
  */
 
 /*
@@ -1692,7 +1692,9 @@ static ERRCODE adsNewArea( ADSAREAP pArea )
 static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
 {
    ADSHANDLE hTable = 0;
-   UNSIGNED32  ulRetVal, pulLength, ulRecCount;
+   UNSIGNED32  ulRetVal, pulLength, ulRecCount, ulLastErr=0;
+   UNSIGNED16 usLength = ADS_MAX_ERROR_LEN + 1;
+   UNSIGNED8  aucError[ ADS_MAX_ERROR_LEN + 1 ];
    USHORT uiFields = 0, uiCount;
    UNSIGNED8 szName[ ADS_MAX_FIELD_NAME + 1 ];
       /* See adsGettValue() for why we don't use pArea->uiMaxFieldNameLength here */
@@ -1722,6 +1724,8 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       pArea->hStatement = 0;
       pArea->hOrdCurrent = 0;
 
+      // When opening the file, first try with the correct settings for Advantage Data Dictionary
+      // if bDictionary was set
       if( bDictionary )
       {
          ulRetVal = AdsOpenTable  ( adsConnectHandle, pOpenInfo->abName, pOpenInfo->atomAlias,
@@ -1729,15 +1733,20 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
                   ( (pOpenInfo->fShared) ? ADS_SHARED : ADS_EXCLUSIVE ) |
                   ( (pOpenInfo->fReadonly) ? ADS_READONLY : ADS_DEFAULT ),
                    &hTable);
-      }
-      else
-      {
+             if (ulRetVal != AE_SUCCESS)
+                AdsGetLastError( &ulLastErr, aucError, &usLength );
+	  }
+
+	  // If the Advantage Data Dictionary open fails with an error indicating that this table is not
+	  // in the dictionary, OR if we are not using a ditionary at all, try the open with standard settings.
+	  // This change allows the use of a Dictionary, and non Dictionary temp files at the same time.
+      if (!bDictionary || ulLastErr==5132L)
          ulRetVal = AdsOpenTable  ( 0, pOpenInfo->abName, pOpenInfo->atomAlias,
                   pArea->iFileType, adsCharType, adsLockType, adsRights,
                   ( (pOpenInfo->fShared) ? ADS_SHARED : ADS_EXCLUSIVE ) |
                   ( (pOpenInfo->fReadonly) ? ADS_READONLY : ADS_DEFAULT ),
                    &hTable);
-      }
+
 
       if( ulRetVal != AE_SUCCESS )
       {
