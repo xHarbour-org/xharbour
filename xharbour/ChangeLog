@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3342 2004/08/25 23:49:56 kaddath Exp $
+ * $Id: ChangeLog,v 1.3343 2004/08/26 08:00:11 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-26 01:20 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+    * added error handling to adsSysName to trap errors in calls to
+      rddname() if Advantage has lost its connection.
 
 2004-08-26 01:00 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/vm/fastitem.c

@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.47 2004/07/30 16:37:32 ronpinkas Exp $
+ * $Id: ads1.c,v 1.48 2004/08/19 01:17:27 druzus Exp $
  */
 
 /*
@@ -2202,12 +2202,18 @@ static ERRCODE adsStructSize( ADSAREAP pArea, USHORT * StructSize )
 static ERRCODE adsSysName( ADSAREAP pArea, BYTE * pBuffer )
 {
    UNSIGNED16 usTableType;
+   UNSIGNED32 ulRetVal;
 
    HB_TRACE(HB_TR_DEBUG, ("adsSysName(%p, %p)", pArea, pBuffer));
 
    if( pArea->hTable )
    {
-      AdsGetTableType( pArea->hTable, &usTableType );
+      ulRetVal = AdsGetTableType( pArea->hTable, &usTableType );
+      if( ulRetVal != AE_SUCCESS )
+      {
+         TraceLog( NULL, "Error in adsSysName: %d  pArea->hTable %d\n", ulRetVal, pArea->hTable );
+         return SUCCESS;                // throwing an error here makes error logging fail so original errors are not described
+      }
    }
    else
    {
