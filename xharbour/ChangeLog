@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1064 2003/05/27 00:36:20 mlombardo Exp $
+ * $Id: ChangeLog,v 1.1065 2003/05/27 00:56:06 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-26 18:40 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+     * fixed logic for GoTo, to remove redundant code and numeric constants
+
+     * Modified adsDeleted for speed and code standards.
+       Recent fix to adsDeleted confused the RDD return value of SUCCESS
+       and the Advantage-specific return value of AE_SUCCESS, which we
+       cannot presume are the same--and certainly the error return
+       codes are totally different.
+
 2003-05-26 22:00 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
   + xharbour/xhbgtmk.sh
     * Removed Flex from list since xharbour dont require this tools

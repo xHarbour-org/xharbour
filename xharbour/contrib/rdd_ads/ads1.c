@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.9 2003/05/26 00:27:50 ronpinkas Exp $
+ * $Id: ads1.c,v 1.10 2003/05/26 13:26:31 paultucker Exp $
  */
 
 /*
@@ -491,21 +491,13 @@ static ERRCODE adsGoTo( ADSAREAP pArea, ULONG ulRecNo )
    {        /* if it was at eof, and another station or handle added a record, it needs to GoTo or AtEof stays True. */
       AdsRefreshRecord(pArea->hTable);
    }
-   else if( ulRecNo > 0  && ulRecNo <= pArea->ulRecCount && pArea->iFileType < 3 )
-   {
+   else if( ulRecNo > 0  && (pArea->iFileType==ADS_ADT || ulRecNo <= pArea->ulRecCount ) )
+   {  /*   ADTs can have a recno greater than RecCount because it recycles deleted records !!! */
       pArea->ulRecNo = ulRecNo;
       pArea->fBof = pArea->fEof = FALSE;
       ulRetVal = AdsGotoRecord( pArea->hTable, ulRecNo );
       /* hb_adsCheckBofEof( pArea );        // bh: GoTo should never do the skipfilter that may happen in hb_adsCheckBofEof */
    }
-   else if( ulRecNo > 0  && pArea->iFileType == 3  )
-   {
-      pArea->ulRecNo = ulRecNo;
-      pArea->fBof = pArea->fEof = FALSE;
-      ulRetVal = AdsGotoRecord( pArea->hTable, ulRecNo );
-      /* hb_adsCheckBofEof( pArea );        // bh: GoTo should never do the skipfilter that may happen in hb_adsCheckBofEof */
-   }
-
    else /* GoTo Phantom record */
    {
       ulRecNo = 0;
@@ -959,22 +951,18 @@ static ERRCODE adsDeleteRec( ADSAREAP pArea )
 static ERRCODE adsDeleted( ADSAREAP pArea, BOOL * pDeleted )
 {
    UNSIGNED16  bDeleted;
-   BOOL bEof;
-   ERRCODE reterr;
 
    HB_TRACE(HB_TR_DEBUG, ("adsDeleted(%p, %p)", pArea, pDeleted));
 
-   reterr = adsEof( pArea, &bEof );
-   if( ! bEof )
+   if ( pArea->fEof )
+   {
+      *pDeleted = FALSE;                /* ADS by default returns True at eof */
+   }else
    {
       AdsIsRecordDeleted  ( pArea->hTable, &bDeleted);
       *pDeleted = (BOOL) bDeleted;
    }
-   else
-   {
-      *pDeleted = FALSE;
-   }
-   return reterr;
+   return SUCCESS;
 }
 
 static ERRCODE adsFieldCount( ADSAREAP pArea, USHORT * uiFields )
@@ -1538,7 +1526,7 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_GETHEADERSIZE:
-         if( !pArea->uiHeaderLen && pArea->iFileType!=ADS_ADT )
+         if( !pArea->uiHeaderLen && pArea->iFileType != ADS_ADT )
             pArea->uiHeaderLen = 32 + pArea->uiFieldCount * 32 + 2;
          hb_itemPutNL( pItem, pArea->uiHeaderLen );
          break;
