@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.18 2004/03/30 22:47:23 druzus Exp $
+ * $Id: philes.c,v 1.19 2004/04/02 13:50:16 srobert Exp $
  */
 
 /*
@@ -58,11 +58,19 @@
 
 #include <ctype.h>
 
+#if !defined(ERROR_SHARING_VIOLATION)
+   #define ERROR_SHARING_VIOLATION 32L
+#endif
+#if !defined(ERROR_ACCESS_DENIED)
+   #define ERROR_ACCESS_DENIED 5L
+#endif
+
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbapifs.h"
 #include "hbapierr.h"
 #include "hbset.h"
+
 
 HB_FUNC( FOPEN )
 {
@@ -137,8 +145,13 @@ HB_FUNC( FWRITE )
 HB_FUNC( FERROR )
 {
 // For clipper compatibility MSC return 32 for file open in share mode !
-   #if defined(_MSC_VER)
-   hb_retni( hb_fsError() == 32 ? 5 : hb_fsError() ) ;
+   #if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__MINGW32__)
+   USHORT uError = hb_fsError();
+   if( uError == ERROR_SHARING_VIOLATION )
+   {
+      uError = ERROR_ACCESS_DENIED;
+   }
+   hb_retni( uError );
    #else
    hb_retni( hb_fsError() );
    #endif
