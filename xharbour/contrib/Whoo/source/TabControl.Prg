@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.22 2002/10/25 05:33:52 what32 Exp $
+ * $Id: TabControl.Prg,v 1.23 2002/10/27 01:29:25 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -63,6 +63,9 @@ CLASS TTabControl FROM TCustomControl
    DATA Cargo            PROTECTED
    DATA SendTo AS OBJECT PROTECTED
 
+   DATA WinClass    PROTECTED INIT WC_TABCONTROL
+   DATA ControlName PROTECTED INIT "TabControl"
+
    METHOD New() CONSTRUCTOR
    METHOD AddTab()
    METHOD InsertTab()
@@ -108,9 +111,6 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TTabControl
    ::Top       := IFNIL( nTop,    ::Top,    nTop   )
    ::width     := IFNIL( nWidth,  ::width , nWidth )
    ::Height    := IFNIL( nHeight, ::height, nHeight)
-   
-   ::WinClass    := WC_TABCONTROL
-   ::ControlName := "TabControl"
 RETURN( super:new( oParent ))
 
 *-----------------------------------------------------------------------------*

@@ -52,6 +52,9 @@ CLASS TFrame FROM TWinControl
                                  ::Style := GetWindowLong( ::handle, GWL_STYLE )
 
 //-------------------------------------------------------------------------------------------
+   DATA WinClass    PROTECTED INIT "Frame"
+   DATA ControlName PROTECTED INIT "Frame"
+
    METHOD New()
    METHOD Add()
    METHOD SetLink()
@@ -61,9 +64,6 @@ ENDCLASS
 *-----------------------------------------------------------------------------*
 
 METHOD New( oParent ) CLASS TFrame
-
-   ::WinClass    := "Frame"
-   ::ControlName := "Frame"
 
    ::WndProc   := 'FormProc'
    ::Msgs      := -1

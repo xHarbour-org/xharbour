@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.46 2002/10/28 02:19:05 what32 Exp $
+ * $Id: TForm.prg,v 1.47 2002/10/28 12:03:51 what32 Exp $
  */
 
 /*
@@ -85,6 +85,8 @@ CLASS TForm FROM TWinControl
                                 
 
 //-------------------------------------------------------------------------------------------
+   DATA WinClass    PROTECTED INIT "Form"
+   DATA ControlName PROTECTED INIT "Form"
 
    METHOD New()
    METHOD Add()
@@ -115,9 +117,6 @@ RETURN(c)
 *-----------------------------------------------------------------------------*
 
 METHOD New( oParent ) CLASS TForm
-
-   ::WinClass    := "Form"
-   ::ControlName := "Form"
 
    ::WndProc   := IFNIL(::WndProc,'FormProc',::WndProc)
    ::Msgs      := IFNIL(::Msgs,-1,::Msgs)

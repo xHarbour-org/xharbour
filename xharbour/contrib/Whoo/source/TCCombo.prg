@@ -1,5 +1,5 @@
 /*
- * $Id: TCCombo.prg,v 1.21 2002/10/23 02:19:41 what32 Exp $
+ * $Id: TCCombo.prg,v 1.22 2002/10/27 01:29:24 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -52,6 +52,9 @@ CLASS TComboBox FROM TCustomControl
    DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE,WM_COMMAND}
    DATA WndProc   PROTECTED INIT 'ControlProc'
 
+   DATA WinClass    PROTECTED INIT "combobox"
+   DATA ControlName PROTECTED INIT "ComboBox"
+
    METHOD New() CONSTRUCTOR
    METHOD AddString( cText )        INLINE ::SendMessage( CB_ADDSTRING, 0, cText)
    METHOD InsertString(cText,nLine) INLINE ::SendMessage( CB_INSERTSTRING, nLine, cText )
@@ -68,9 +71,6 @@ ENDCLASS
 *------------------------------------------------------------------------------*
 
 METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight) CLASS TComboBox
-
-   ::WinClass    := "combobox"
-   ::ControlName := "ComboBox"
 
    ::id        := nId
    ::Left      := nLeft

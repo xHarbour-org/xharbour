@@ -1,5 +1,5 @@
 /*
- * $Id: TCProgBar.prg,v 1.8 2002/10/17 09:59:15 what32 Exp $
+ * $Id: TCProgBar.prg,v 1.9 2002/10/27 01:29:24 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -58,6 +58,9 @@ CLASS TProgressBar FROM TCustomControl
    DATA ExStyle   PROTECTED INIT  0
    DATA Color     PROTECTED
 
+   DATA WinClass    PROTECTED INIT PROGRESS_CLASS
+   DATA ControlName PROTECTED INIT "ProgressBar"
+
    METHOD New() CONSTRUCTOR
    METHOD SetPosition()
    METHOD DrawText()
@@ -70,9 +73,6 @@ CLASS TProgressBar FROM TCustomControl
 ENDCLASS
 
 METHOD New( oParent, nLeft, nTop, nWidth, nHeight ) CLASS TProgressBar
-
-   ::WinClass    := PROGRESS_CLASS
-   ::ControlName := "ProgressBar"
 
    ::Left    := IFNIL( nLeft,   ::Left,   nLeft   )
    ::Top     := IFNIL( nTop,    ::Top,    nTop    )

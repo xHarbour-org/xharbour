@@ -1,5 +1,5 @@
 /*
- * $Id: TTreeview.prg,v 1.14 2002/10/27 01:29:25 what32 Exp $
+ * $Id: TTreeview.prg,v 1.15 2002/10/28 12:03:52 what32 Exp $
  */
 
 /*
@@ -59,6 +59,9 @@ CLASS TTreeView FROM TCustomControl
    DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE,WM_MOUSEMOVE}
    DATA WndProc   PROTECTED INIT 'ControlProc'
 
+   DATA WinClass    PROTECTED INIT "SysTreeView32"
+   DATA ControlName PROTECTED INIT "TreeView"
+
    METHOD New() CONSTRUCTOR
 
    METHOD Add()
@@ -80,9 +83,6 @@ ENDCLASS
 //----------------------------------------------------------------------------//
 
 METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TTreeView
-
-   ::WinClass    := "SysTreeView32"
-   ::ControlName := "TreeView"
 
    ::id        := nId
    ::Left      := IFNIL( nLeft,   ::Left,   nLeft  )

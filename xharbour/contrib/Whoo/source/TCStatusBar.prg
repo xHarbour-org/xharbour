@@ -1,5 +1,5 @@
 /*
- * $Id: TCStatusBar.prg,v 1.14 2002/10/17 09:59:15 what32 Exp $
+ * $Id: TCStatusBar.prg,v 1.15 2002/10/27 01:29:25 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -52,6 +52,9 @@ CLASS TStatusBar FROM TCustomControl
 
    DATA rect PROTECTED
 
+   DATA WinClass    PROTECTED INIT "msctls_statusbar32"
+   DATA ControlName PROTECTED INIT "StatusBar"
+
    METHOD New() CONSTRUCTOR
    METHOD Create() INLINE ::handle := CreateStatusBar( ::Style, ::Caption, ::Parent:handle, ::Id  )
    METHOD SetPanels
@@ -66,9 +69,6 @@ ENDCLASS
 *------------------------------------------------------------------------------*
 
 METHOD New( oParent, cCaption, nId ) CLASS TStatusBar
-
-   ::WinClass    := "msctls_statusbar32"
-   ::ControlName := "StatusBar"
 
    ::id        := nId
    ::Caption   := cCaption

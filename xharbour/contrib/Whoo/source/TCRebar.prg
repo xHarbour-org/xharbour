@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.21 2002/10/27 01:29:24 what32 Exp $
+ * $Id: TCRebar.prg,v 1.22 2002/10/28 12:03:51 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -60,6 +60,9 @@ CLASS TRebar FROM TCustomControl
 
    VAR nrProc     PROTECTED
 
+   DATA WinClass    PROTECTED INIT REBARCLASSNAME
+   DATA ControlName PROTECTED INIT "Rebar"
+
    METHOD New() CONSTRUCTOR
    METHOD AddBand()
    METHOD RebarProc()
@@ -118,8 +121,6 @@ METHOD RebarProc(nMsg,nwParam,nlParam) CLASS TRebar
 METHOD New( oParent ) CLASS TRebar
    InitCommonControlsEx(ICC_COOL_CLASSES)
    
-   ::WinClass    := REBARCLASSNAME
-   ::ControlName := "Rebar"
    ::Height := 20
    super:new( oParent )
    RETURN( self )

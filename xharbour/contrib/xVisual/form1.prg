@@ -22,16 +22,7 @@ CLASS TForm1 FROM TForm
       :TOP :=         96
       :WIDTH :=         80
 
-      :SetMethod( "OnClick", { || HB_QSelf():Parent:Button1Click( HB_QSelf() ) } )
    END CONTROL
-
-   // Generated only for On... Events that were specied in the Designer.
-   METHOD OnClick()
-   METHOD OnLButtonDblClk
-
-   // Methods...
-   METHOD Button1Click( Sender )
-   //...
 
 END CLASS 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TPanel.prg,v 1.12 2002/10/19 10:03:39 what32 Exp $
+ * $Id: TPanel.prg,v 1.13 2002/10/28 02:19:05 what32 Exp $
  */
 
 /*
@@ -59,6 +59,9 @@ CLASS TPanel FROM TForm
                                  ::Style := GetWindowLong( ::handle, GWL_STYLE )
 
 //-------------------------------------------------------------------------------------------
+   DATA WinClass    PROTECTED INIT "Panel"
+   DATA ControlName PROTECTED INIT "Panel"
+
    METHOD New()
 
 ENDCLASS
@@ -67,9 +70,6 @@ ENDCLASS
 
 METHOD New( oParent ) CLASS TPanel
    
-   ::WinClass    := IFNIL( ::WinClass, "Panel", ::WinClass )
-   ::ControlName := IFNIL( ::ControlName, "Panel", ::ControlName )
-
    ::WndProc   := IFNIL(::WndProc,'FormProc',::WndProc)
    ::Msgs      := IFNIL(::Msgs,-1,::Msgs)
    ::FrameWnd  := .F.

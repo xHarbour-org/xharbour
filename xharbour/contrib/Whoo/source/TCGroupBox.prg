@@ -1,5 +1,5 @@
 /*
- * $Id: TCGroupBox.prg,v 1.10 2002/10/17 09:59:15 what32 Exp $
+ * $Id: TCGroupBox.prg,v 1.11 2002/10/27 01:29:24 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -35,7 +35,7 @@
 
 CLASS TGroupBox FROM TCustomControl
 
-//   DATA Caption INIT "GroupBox"
+   DATA Caption INIT "GroupBox"
    DATA xxLeft    PROTECTED INIT 0
    DATA xxTop     PROTECTED INIT 0
    DATA xxWidth   PROTECTED INIT 185
@@ -48,6 +48,9 @@ CLASS TGroupBox FROM TCustomControl
    DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
    DATA WndProc   PROTECTED INIT 'ControlProc'
 
+   DATA WinClass    PROTECTED INIT "button"
+   DATA ControlName PROTECTED INIT "GroupBox"
+
    METHOD New() CONSTRUCTOR
 
 ENDCLASS
@@ -55,9 +58,6 @@ ENDCLASS
 *------------------------------------------------------------------------------*
 
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TGroupBox
-
-   ::WinClass    := "button"
-   ::ControlName := "GroupBox"
 
    ::Caption   := cCaption
    ::id        := nId

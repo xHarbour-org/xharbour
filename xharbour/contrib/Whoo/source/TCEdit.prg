@@ -1,5 +1,5 @@
 /*
- * $Id: TCEdit.prg,v 1.15 2002/10/17 09:59:15 what32 Exp $
+ * $Id: TCEdit.prg,v 1.16 2002/10/27 01:29:24 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -51,6 +51,9 @@ CLASS TEdit FROM TCustomControl
    DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
    DATA WndProc   PROTECTED INIT 'ControlProc'
 
+   DATA WinClass    PROTECTED INIT "edit"
+   DATA ControlName PROTECTED INIT "Edit"
+
    METHOD New() CONSTRUCTOR
    METHOD SetText( c ) INLINE SetDlgItemText( ::Parent:handle, ::id, c )
 ENDCLASS
@@ -58,9 +61,6 @@ ENDCLASS
 *------------------------------------------------------------------------------*
 
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TEdit
-
-   ::WinClass    := "edit"
-   ::ControlName := "Edit"
 
    ::Caption   := IFNIL(cCaption, ::Caption, cCaption)
    ::id        := nId

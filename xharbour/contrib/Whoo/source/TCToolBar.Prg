@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.20 2002/10/22 17:24:20 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.21 2002/10/27 01:29:25 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -100,6 +100,9 @@ CLASS TToolBar FROM TCustomControl
    DATA aMenus   PROTECTED
    VAR nImg,hBMInst,nBMId,xBtn,yBtn,xBmp,yBmp PROTECTED
 
+   DATA WinClass    PROTECTED INIT "toolbar32"
+   DATA ControlName PROTECTED INIT "ToolBar"
+
    METHOD New() CONSTRUCTOR
 
    METHOD AddButton()
@@ -126,9 +129,6 @@ ENDCLASS
 METHOD New( oParent, nId, nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp ) CLASS TToolBar
 
    InitCommonControlsEx(ICC_COOL_CLASSES)
-
-   ::WinClass    := "toolbar32"
-   ::ControlName := "ToolBar"
 
    ::Id      := nId
 
