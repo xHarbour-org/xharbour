@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.605 2003/01/10 09:45:06 jonnymind Exp $
+ * $Id: ChangeLog,v 1.606 2003/01/10 16:12:58 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,14 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-01-10 16:28 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+
+2003-01-10 18:11 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * config/w32/gcc.cf
+  * config/w32/global.cf
+  * config/w32/mingw32.cf
+    * Applying latest MT aware compilation tricks to this files
+      also. This changes are work in progress, and must be tested.
+      Also, same kind of changes must be taken into bcc32 and vc
+      specific makefiles; it should be done shortly
+
+
+2003-01-10 17:10 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * Makefile
     ! Just a formal correction in comments: they where without <TAB>
       char, decommenting them would have caused make breaking.
-  
+
   * make_gnu.sh
     + added "both" "mt" or "st" parameter (defaults to mt): it
-      can be called as 
+      can be called as
       $ . make_gnu.sh both install
 
   * config/linux/global.cf
@@ -52,7 +63,7 @@
       make server
 
   + samples/sitesvr/Makefile
-    * LIBS list must now include vmmt/rddmt/rtlmt instead if 
+    * LIBS list must now include vmmt/rddmt/rtlmt instead if
       vm/rdd/vm; this will trigger other makefiles to act
       correctly and link the correct version. This for the
       bin files linked after basic libs.

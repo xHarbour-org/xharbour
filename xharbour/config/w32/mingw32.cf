@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.2 2002/01/19 14:15:44 ronpinkas Exp $
+# $Id: mingw32.cf,v 1.3 2002/12/16 06:02:46 ronpinkas Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -26,6 +26,12 @@ LD_OUT = -o
 ifeq ($(HB_LIB_COMPILE),)
 LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
 LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+
+#Adding MT libs on need
+ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR)_mt/)
+endif
+
 else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
@@ -37,9 +43,14 @@ LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 LINKLIBS += -luser32 -lwinspool
 
 # If LIBS specifies the rdd library, add all DB drivers.
+ifeq ($(findstring rddmt,$(LIBS)),rddmt)
+LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)_mt)
+LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv)mt)
+else
 ifeq ($(findstring rdd,$(LIBS)),rdd)
 LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
 LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
+endif
 endif
 
 # Add the specified GT driver library
@@ -66,7 +77,7 @@ ifneq ($(LNK_USR_LIB),)
 LINKLIBS += $(foreach lib, $(LNK_USR_LIB), -l$(lib))
 endif
 
-LINKLIBS += -luser32 -lwinspool -lole32 -loleaut32 -luuid
+LINKLIBS += -luser32 -lwinspool -lole32 -loleaut32 -luuid -lwsock32
 
 # The -) option could be appropriate to link against libraries with
 # cyclic dependencies, but I think it is not really necessary if the
