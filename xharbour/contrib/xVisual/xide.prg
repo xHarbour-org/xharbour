@@ -104,7 +104,7 @@ FUNCTION Main
                   :StdTools:DisableAll()
                   
                   //--------- sets a QUICK access to the control
-                  oApp:MainFrame:Access( 'StdBar', :StdTools )
+                  oApp:MainFrame:SetLink( 'StdBar', :StdTools )
                END
             END
          END

@@ -15,7 +15,7 @@ CLASS TFrame FROM TWindow
    DATA Controls INIT {}
    METHOD New()
    METHOD Add()
-   METHOD Access()
+   METHOD SetLink()
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
@@ -40,14 +40,14 @@ METHOD New( oParent ) CLASS TFrame
 METHOD Add( cName, oObj ) CLASS TFrame
    
    oObj:propname := cName
-   ::Access( cName, oObj )
+   ::SetLink( cName, oObj )
    oObj:Create()
    
    return( oObj )
 
 *-----------------------------------------------------------------------------*
 
-METHOD Access( cName, oObj ) CLASS TFrame
+METHOD SetLink( cName, oObj ) CLASS TFrame
    __objAddData( self, cName )
    __ObjSetValueList( self, { { cName, oObj } } )
 return( oObj )
