@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.13 2002/12/21 19:24:44 jonnymind Exp $
+* $Id: thread.c,v 1.14 2002/12/21 22:40:43 likewolf Exp $
 */
 
 /*
@@ -398,7 +398,7 @@ HB_FUNC( STARTTHREAD )
        HB_THREAD_HANDLE th_h;
     #endif
 
-    pArgs = hb_arrayFromParams( hb_stack.pBase );
+    pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
     pPointer  = hb_arrayGetItemPtr( pArgs, 1 );
 
     /* Error Checking */
@@ -507,7 +507,7 @@ HB_FUNC( STOPTHREAD )
 
     if( ! ISNUM( 1 ) )
     {
-        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "STOPTHREAD", 1, pArgs );
         hb_itemRelease( pArgs );
 
@@ -530,7 +530,7 @@ HB_FUNC( KILLTHREAD )
 
     if( ! ISNUM( 1 ) )
     {
-        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "KILLTHREAD", 1, pArgs );
         hb_itemRelease( pArgs );
         return;
@@ -549,7 +549,7 @@ HB_FUNC( CLEARTHREAD )
 
     if( ! ISNUM( 1 ) )
     {
-        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "CLEARTHREAD", 1, pArgs );
         hb_itemRelease( pArgs );
         return;
@@ -566,7 +566,7 @@ HB_FUNC( JOINTHREAD )
 
     if( ! ISNUM( 1 ) )
     {
-        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "KILLTHREAD", 1, pArgs );
         hb_itemRelease( pArgs );
         return;
@@ -600,7 +600,7 @@ HB_FUNC( DESTROYMUTEX )
 
     if( ! ISPOINTER( 1 ) )
     {
-        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "DESTROYMUTEX", 1, pArgs );
         hb_itemRelease( pArgs );
         return;
@@ -624,7 +624,7 @@ HB_FUNC( MUTEXLOCK )
 
     if( ! ISPOINTER( 1 ) )
     {
-        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXLOCK", 1, pArgs );
         hb_itemRelease( pArgs );
         return;
@@ -651,7 +651,7 @@ HB_FUNC( MUTEXUNLOCK )
 
     if( ! ISPOINTER( 1 ) )
     {
-        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXUNLOCK", 1, pArgs );
         hb_itemRelease( pArgs );
         return;
@@ -680,7 +680,7 @@ HB_FUNC( SUBSCRIBE )
     /* Parameter error checking */
     if( ( ! ISPOINTER( 1 ) ) || ( hb_pcount() == 2 && ! ISNUM(2)) )
     {
-        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SUBSCRIBE", 1, pArgs );
         hb_itemRelease( pArgs );
         return;
@@ -754,7 +754,7 @@ HB_FUNC( SUBSCRIBENOW )
     /* Parameter error checking */
     if( ( ! ISPOINTER( 1 ) ) || ( hb_pcount() == 2 && ! ISNUM(2)) )
     {
-        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SUBSCRIBENOW", 1, pArgs );
         hb_itemRelease( pArgs );
         return;
@@ -833,7 +833,7 @@ HB_FUNC( NOTIFY )
     /* Parameter error checking */
     if( ! ISPOINTER( 1 ) )
     {
-        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "NOTIFY", 1, pArgs );
         hb_itemRelease( pArgs );
         return;
@@ -866,7 +866,7 @@ HB_FUNC( NOTIFYALL )
     /* Parameter error checking */
     if( ! ISPOINTER( 1 ) )
     {
-        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "NOTIFYALL", 1, pArgs );
         hb_itemRelease( pArgs );
         return;
@@ -895,7 +895,7 @@ HB_FUNC( THREADSLEEP )
 {
     if( ! ISNUM( 1 ) )
     {
-        PHB_ITEM pArgs = hb_arrayFromParams( hb_stack.pBase );
+        PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "THREADSLEEP", 1, pArgs );
         hb_itemRelease( pArgs );
         return;
