@@ -1,6 +1,8 @@
 *************************************************************************************
 * Clipboard test
 *
+* $Id$
+*
 * Test for clipboard functions:
 * GTSetClipboard - set the clipboard value
 * GTGetClipboard - get the current clipboard value
@@ -10,6 +12,7 @@
 * OS clipboard capabilities are used.
 *
 * (C) 2004 Giancarlo Niccolai
+*
 
 #include "inkey.ch"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.5 2004/02/01 23:09:34 jonnymind Exp $
+ * $Id: gx.c,v 1.6 2004/02/06 17:07:28 jonnymind Exp $
  */
 
 /*
@@ -187,7 +187,7 @@ HB_FUNC( GTGETCLIPBOARD )
          hb_retc("");
          return;
       }
-      szData = (char *) hb_xgrab( ulMaxLen );
+      szData = (char *) hb_xgrab( ulMaxLen+1 );
    }
 
    hb_gtGetClipboard( szData , &ulMaxLen );

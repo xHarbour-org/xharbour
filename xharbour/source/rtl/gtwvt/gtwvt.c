@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.63 2004/02/03 22:12:50 ronpinkas Exp $
+ * $Id: gtwvt.c,v 1.64 2004/02/06 17:07:30 jonnymind Exp $
  */
 
 /*
@@ -162,10 +162,6 @@ static void    hb_wvt_gtCreateObjects( void );
 static void    hb_wvt_gtKillCaret( void );
 static void    hb_wvt_gtCreateCaret( void );
 static void    hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
-
-/** CLIPBOARD MANAGEMENT (to be removed)**/
-static char *s_clipboard = NULL;
-static int s_clipsize = 0;
 
 //-------------------------------------------------------------------//
 //
@@ -3246,34 +3242,119 @@ HB_EXPORT BOOL hb_wvt_gtDrawOutline( int iTop, int iLeft, int iBottom, int iRigh
 
 void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
 {
-   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
+   HGLOBAL   hglb;
+   LPTSTR    lptstr;
+
+   if ( !IsClipboardFormatAvailable(CF_TEXT) )
    {
-      *pulMaxSize = s_clipsize;
+     *pulMaxSize = 0;
+     return;
    }
 
-   if ( *pulMaxSize != 0 )
+   if (!OpenClipboard( NULL ))
    {
-      memcpy( szData, s_clipboard, *pulMaxSize );
+     *pulMaxSize = 0;
+     return;
    }
 
+   hglb = GetClipboardData(CF_TEXT);
+   if (hglb != NULL)
+   {
+      lptstr = (LPSTR) GlobalLock(hglb);
+      if (lptstr != NULL)
+      {
+         int iLen = strlen( lptstr );
+         if ( *pulMaxSize == 0 || *pulMaxSize > iLen ) 
+         {
+            *pulMaxSize = iLen;
+         }
+         
+         // still nothing ?
+         if ( *pulMaxSize == 0 )
+         {
+            return;
+         }
+         
+         memcpy( szData, lptstr, *pulMaxSize );
+         szData[*pulMaxSize] = '\0';
+         GlobalUnlock(hglb);
+      }
+   }
+   CloseClipboard();
 }
 
 void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
 {
-   if ( s_clipboard != NULL )
+   LPTSTR  lptstrCopy;
+   HGLOBAL hglbCopy;
+   char *  cText;
+   int     nLen;
+
+   if ( !IsClipboardFormatAvailable( CF_TEXT ) )
    {
-      hb_xfree( s_clipboard );
+     return;
    }
 
-   s_clipboard = (char *) hb_xgrab( ulSize +1 );
-   memcpy( s_clipboard, szData, ulSize );
-   s_clipboard[ ulSize ] = '\0';
-   s_clipsize = ulSize;
+   if ( ! OpenClipboard( NULL ) )
+   {
+     hb_retl( FALSE );
+     return;
+   }
+   EmptyClipboard();
+
+
+   // Allocate a global memory object for the text.
+   //
+   hglbCopy = GlobalAlloc( GMEM_MOVEABLE, ( ulSize+1 ) * sizeof( TCHAR ) );
+   if ( hglbCopy == NULL )
+   {
+       CloseClipboard();
+   }
+
+   // Lock the handle and copy the text to the buffer.
+   //
+   lptstrCopy = ( LPSTR ) GlobalLock( hglbCopy );
+   memcpy( lptstrCopy, szData, ( ulSize+1 ) * sizeof( TCHAR ) );
+   lptstrCopy[ ulSize+1 ] = ( TCHAR ) 0;    // null character
+   GlobalUnlock( hglbCopy );
+
+   // Place the handle on the clipboard.
+   //
+   SetClipboardData( CF_TEXT, hglbCopy );
+
+   CloseClipboard();
 }
 
 ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 {
-   return s_clipsize;
+   HGLOBAL   hglb;
+   LPTSTR    lptstr;
+   int ret;
+
+   if ( !IsClipboardFormatAvailable(CF_TEXT) )
+   {
+     return 0;
+   }
+
+   if (!OpenClipboard( NULL ))
+   {
+     return 0;
+   }
+
+   hglb = GetClipboardData(CF_TEXT);
+   ret = 0;
+   if (hglb != NULL)
+   {
+      lptstr = (LPSTR) GlobalLock(hglb);
+      if (lptstr != NULL)
+      {
+         ret = strlen( lptstr );         
+         GlobalUnlock(hglb);
+      }
+   }
+   CloseClipboard();
+   return ret;
+
 }
 
 /* *********************************************************************** */
@@ -3283,11 +3364,6 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    HB_SYMBOL_UNUSED( bUpdate );
    HB_SYMBOL_UNUSED( iParam );
    HB_SYMBOL_UNUSED( vpParam );
-
-   if ( s_clipboard != NULL )
-   {
-      hb_xfree( s_clipboard );
-   }
 
    switch ( iMsgType )
    {
@@ -3570,30 +3646,30 @@ HB_FUNC( WVT_GETRGBCOLOR )
 
 HB_FUNC( WVT_GETCLIPBOARD )
 {
-   HGLOBAL   hglb;
-   LPTSTR    lptstr;
-
-   if ( !IsClipboardFormatAvailable(CF_TEXT) )
-   {
-     hb_ret();
-   }
-
-   if (!OpenClipboard( NULL ))
-   {
-     hb_ret();
-   }
-
-   hglb = GetClipboardData(CF_TEXT);
-   if (hglb != NULL)
-   {
-      lptstr = (LPSTR) GlobalLock(hglb);
-      if (lptstr != NULL)
-      {
-         hb_retc( lptstr );
-         GlobalUnlock(hglb);
-      }
-   }
-   CloseClipboard();
+    HGLOBAL   hglb;
+    LPTSTR    lptstr;
+ 
+    if ( !IsClipboardFormatAvailable(CF_TEXT) )
+    {
+      hb_ret();
+    }
+ 
+    if (!OpenClipboard( NULL ))
+    {
+      hb_ret();
+    }
+ 
+    hglb = GetClipboardData(CF_TEXT);
+    if (hglb != NULL)
+    {
+       lptstr = (LPSTR) GlobalLock(hglb);
+       if (lptstr != NULL)
+       {
+          hb_retc( lptstr );
+          GlobalUnlock(hglb);
+       }
+    }
+    CloseClipboard();
 }
 
 //-------------------------------------------------------------------//

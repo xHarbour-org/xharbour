@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.21 2004/02/01 23:09:34 jonnymind Exp $
+ * $Id: gtapi.c,v 1.22 2004/02/06 17:07:28 jonnymind Exp $
  */
 
 /*
@@ -1488,7 +1488,7 @@ void HB_EXPORT hb_gtPasteFromClipboard( ULONG ulSize )
       return;
    }
 
-   szData = (char *) hb_xgrab( ulClipSize );
+   szData = (char *) hb_xgrab( ulClipSize +1);
    hb_gt_GetClipboard( szData, &ulClipSize );
 
    for ( ulPos = 0; ulPos < ulClipSize; ulPos++ )
