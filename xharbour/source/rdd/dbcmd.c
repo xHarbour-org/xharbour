@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.40 2003/07/23 00:23:08 mlombardo Exp $
+ * $Id: dbcmd.c,v 1.41 2003/08/01 11:36:05 jonnymind Exp $
  */
 
 /*
@@ -102,16 +102,23 @@ static BOOL s_bNetError = FALSE;       /* Error on Networked environments */
 static LPAREANODE s_pWorkAreas = NULL; /* WorkAreas */
 
 #ifndef HB_THREAD_SUPPORT
-static USHORT s_uiCurrArea = 1;        /* Selectd area */
-static LPAREANODE s_pCurrArea = NULL;  /* Pointer to a selected and valid area */
-#define LOCK_AREA
-#define UNLOCK_AREA
+   static USHORT s_uiCurrArea = 1;        /* Selectd area */
+   static LPAREANODE s_pCurrArea = NULL;  /* Pointer to a selected and valid area */
+   #define LOCK_AREA
+   #define UNLOCK_AREA
 #else
-#define s_uiCurrArea    HB_VM_STACK.uiCurrArea
-#define s_pCurrArea     HB_VM_STACK.pCurrArea
-HB_CRITICAL_T  s_mtxWorkArea;
-#define LOCK_AREA HB_CRITICAL_LOCK( s_mtxWorkArea );
-#define UNLOCK_AREA HB_CRITICAL_UNLOCK( s_mtxWorkArea );
+   #define LOCK_AREA
+   #define UNLOCK_AREA
+   #define s_uiCurrArea    HB_VM_STACK.uiCurrArea
+   #define s_pCurrArea     HB_VM_STACK.pCurrArea
+   HB_CRITICAL_T  s_mtxWorkArea;
+   #ifdef HB_OS_WIN_32
+      #define LOCK_AREA if ( s_pWorkAreas ) HB_CRITICAL_LOCK( s_mtxWorkArea );
+      #define UNLOCK_AREA if ( s_pWorkAreas ) HB_CRITICAL_UNLOCK( s_mtxWorkArea );
+   #else
+      #define LOCK_AREA HB_CRITICAL_LOCK( s_mtxWorkArea );
+      #define UNLOCK_AREA HB_CRITICAL_UNLOCK( s_mtxWorkArea );
+   #endif
 #endif
 
 /*
@@ -287,9 +294,9 @@ static void hb_rddCloseAll( void )
    LPAREANODE pAreaNode,pCurrArea;
    HB_TRACE(HB_TR_DEBUG, ("hb_rddCloseAll()"));
 
+   LOCK_AREA
    while( isParents )
    {
-      LOCK_AREA
       pAreaNode = s_pWorkAreas;
       isParents = FALSE;
       while( pAreaNode )
@@ -316,15 +323,16 @@ static void hb_rddCloseAll( void )
       }
       if( !isParents && !isFinish )
          isParents = isFinish = TRUE;
-      UNLOCK_AREA
    }
 
    s_uiCurrArea = 1;
    s_pCurrArea = NULL;
+   s_pWorkAreas = NULL;
+   UNLOCK_AREA
+
    #ifdef HB_THREAD_SUPPORT
       HB_CRITICAL_DESTROY( s_mtxWorkArea );
    #endif
-   s_pWorkAreas = NULL;
 }
 
 /*
@@ -655,8 +663,8 @@ USHORT  HB_EXPORT hb_rddInsertAreaNode( char *szDriver )
             break;
          }
       }
+     UNLOCK_AREA
    }
-   UNLOCK_AREA
    return TRUE;
 }
 

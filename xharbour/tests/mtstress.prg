@@ -1,6 +1,6 @@
 ************************************************************
 * threadstress.prg
-* $Id: mtstress.prg,v 1.2 2003/07/15 00:57:04 jonnymind Exp $
+* $Id: mtstress.prg,v 1.3 2003/08/01 11:36:05 jonnymind Exp $
 *
 * Stresstest for thread programs
 * Stress all those feature that are thread-critical:
@@ -60,7 +60,7 @@ PROCEDURE Stress( nId, nRow )
    @nRow,5 SAY Space( 80 )
    IF File( "test.dbf" )
       Select &nId
-      USE test Alias &( "Test" + Alltrim( Str(nId)) )
+      USE test SHARED Alias &( "Test" + Alltrim( Str(nId)) )
       aData := Array(Fcount())
       aFields(aData)
       GOTO Int( HB_Random( 1, Reccount() ) )
