@@ -1,0 +1,639 @@
+/*
+ * $Id: idle.txt,v 1.1.1.1 2001/12/21 10:48:51 ronpinkas Exp $
+*/
+
+/*
+ * The following parts are Copyright of the individual authors.
+ * www - http://www.xharbour.org http://www.harbour-project.org
+ *
+ * Copyright 2003 Francesco Saverio Giudice <info@fsgiudice.com>
+ *    Documentation for Background Task functions:
+ *      HB_BACKGROUNDADD()       HB_BACKGROUNDDEL()    HB_BACKGROUNDRUN()
+ *      HB_BACKGROUNDACTIVE()    HB_BACKGROUNDTIME()   HB_BACKGROUNDRESET()
+ *      hb_backgroundAdd()       hb_backgroundDel()    hb_backgroundRun()
+ *      hb_backgroundRunSingle() hb_backgroundActive() hb_backgroundTime()
+ *      hb_backgroundReset()     hb_backgroundFind()   hb_backgroundShutDown()
+ *
+ * See doc/license.txt for licensing terms.
+ *
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      The Background tasks
+ *  $CATEGORY$
+ *      Document
+ *  $ONELINER$
+ *      Read me file for Background functions
+ *  $DESCRIPTION$
+ *      Background tasks born as an extension of idle state.
+ *      The background tasks are tasks that are performed in concurrency with
+ *      other VM (virtual machine) activities.
+ *
+ *      While idle tasks are performed, as the name says, during the idle state,
+ *      background tasks are performed during the normal activity.
+ *      As default background tasks don't run unless you explicitily run them
+ *      using HB_BACKGROUNDRUN() function or define a SET BACKGROUND TASKS ON
+ *      command or Set( _BACKGROUND_TASKS, .T. ).
+ *      The only note is that backgrounds will be stopped during idle state.
+ *      To avoid this add the function HB_BACKGROUNDRUN() (or hb_backgroundRun()
+ *      on C level) as an idle function. See HB_BACKGROUNDADD() for details.
+ *
+ *      You can define background tasks using HB_BACKGROUNDADD() that accepts,
+ *      as mandatory parameter, a code block or an array as defined in
+ *      HB_EXECFROMARRAY() function.
+ *      As additional parameters you can define a time expressed in milliseconds
+ *      after which the task will be performed and a logical value that defines
+ *      if the tasks is active or not.
+ *
+ *      Functions avalaible to manipulate background tasks are:
+ *      - HB_BACKGROUNDADD()    to add a task
+ *      - HB_BACKGROUNDDEL()    to delete a task
+ *      - HB_BACKGROUNDRUN()    to run all or one single task
+ *      - HB_BACKGROUNDACTIVE() to set if a task is active or not
+ *      - HB_BACKGROUNDTIME()   to set the time interval after the task must run
+ *      - HB_BACKGROUNDRESET()  to reset internal counter of tasks
+ *
+ *      Similar API function are avalaible at C level.
+ *
+ *  $SEEALSO$
+ *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDTIME(),HB_EXECFROMARRAY(),HB_IDLEADD(),SET BACKGROUND TASKS,Set()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_BACKGROUNDACTIVE()
+ *  $CATEGORY$
+ *      Background tasks
+ *  $ONELINER$
+ *      Set if a task is active or not.
+ *  $SYNTAX$
+ *      HB_BACKGROUNDACTIVE( <nHandle>, <lActive> ) --> lOldActive
+ *  $ARGUMENTS$
+ *      <nHandle> is the identifier of the task returned by the
+ *                HB_BACKGROUNDADD() function.
+ *
+ *      <lActive> .T. (default) if the task is active and will be executed.
+ *  $RETURNS$
+ *      <lOldActive> the last value defined
+ *  $DESCRIPTION$
+ *      HB_BACKGROUNDACTIVE() change the active state of a task.
+ *
+ *      If the task handle, as returned from HB_BACKGROUNDADD(), is valid the old
+ *      value is returned. Otherwise NIL is returned.
+ *
+ *  $EXAMPLES$
+ *      // First we define a ticker with a time of half a second
+ *      nTask := HB_BACKGROUNDADD( {|| DisplayTicker()}, 500 )
+ *      SET BACKGROUND TASKS ON
+ *      ...
+ *      // Now we stop the ticker task
+ *      nOldActive := HB_BACKGROUNDACTIVE( nTask, .F. )
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDTIME()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_BACKGROUNDADD()
+ *  $CATEGORY$
+ *      Background tasks
+ *  $ONELINER$
+ *      Adds the background task.
+ *  $SYNTAX$
+ *      HB_BACKGROUNDADD( <bAction>|<aAction>, [nMillisecs], [lActive] ) --> nHandle
+ *  $ARGUMENTS$
+ *      <bAction> is a codeblock that will be executed in background.
+ *      There are no arguments passed to this codeblock during evaluation.
+ *
+ *      <aAction> is an array that contains parameters as defined in HB_EXECFROMARRAY()
+ *
+ *      <nMillisecs> is the number of milliseconds after which the task will be executed
+ *                   default 0 which means that the task will be executed at every time
+ *
+ *      <lActive> defines if the task is active or not. Default .T.
+ *
+ *  $RETURNS$
+ *      <nHandle> The handle (an integer value) that identifies the task. This
+ *      handle can be used for deleting the task or to change other parameters.
+ *  $DESCRIPTION$
+ *      HB_BACKGROUNDADD() adds a passed codeblock or an array, as defined in
+ *      HB_EXECFROMARRAY() function, to the list of background tasks that will
+ *      be evaluated in concurrency with the main program.
+ *      There is no limit for the number of tasks.
+ *
+ *      Tasks must be activated using the command
+ *      SET BACKGROUND TASKS ON
+ *      or the Set() function
+ *      Set( _BACKGROUND_TASKS, .T. )
+ *
+ *      Tasks will run sequentially until a SET BACKGROUND TASKS OFF or an
+ *      idle state will be encountered.
+ *
+ *      To avoid an idle state stop you have to add a idle state task defining
+ *      HB_IDLEADD( {|| HB_BACKGROUNDRUN() } )
+ *  $EXAMPLES$
+ *      nTask1 := HB_BACKGROUNDADD( {|| DisplayTime()}, 1000 )
+ *      // this calls the DisplayTime() function every 1 second
+ *      nTask2 := HB_BACKGROUNDADD( { @DisplayTicker(), cText }, 500 )
+ *      // this display a ticker every 500 milliseconds passing cText as parameter
+ *      SET BACKGROUND TASKS ON
+ *      // This active background tasks
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDTIME(),HB_EXECFROMARRAY(),HB_IDLEADD()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_BACKGROUNDDEL()
+ *  $CATEGORY$
+ *      Background tasks
+ *  $ONELINER$
+ *      Removes the background task from the list of tasks.
+ *  $SYNTAX$
+ *      HB_BACKGROUNDDEL( <nHandle> ) --> xAction
+ *  $ARGUMENTS$
+ *      <nHandle> is the identifier of the task returned by the
+ *      HB_BACKGROUNDADD() function.
+ *  $RETURNS$
+ *      <xAction> NIL if invalid handle is passed or a codeblock or an array
+ *      that was passed to HB_BACKGROUNDADD() function.
+ *  $DESCRIPTION$
+ *      HB_BACKGROUNDDEL() removes the task associated with passed identifier
+ *      from the list of background tasks. The identifer should be the
+ *      value returned by the previous call of HB_BACKGROUNDADD() function.
+ *
+ *      If specified task is defined then the codeblock or an array is returned.
+ *      Otherwise the NIL value is returned.
+ *  $EXAMPLES$
+ *      nTask := HB_BACKGROUNDADD( {|| DisplayTime()}, 1000 )
+ *      ...
+ *      abAction := HB_BACKGROUNDDEL( nTask )
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDTIME(),HB_EXECFROMARRAY()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_BACKGROUNDRESET()
+ *  $CATEGORY$
+ *      Background tasks
+ *  $ONELINER$
+ *      Reset internal coounter of background tasks.
+ *  $SYNTAX$
+ *      HB_BACKGROUNDRESET()
+ *  $ARGUMENTS$
+ *      None.
+ *  $RETURNS$
+ *      Nothing.
+ *  $DESCRIPTION$
+ *      HB_BACKGROUNDRESET() reset the internal counter of task in execution to 1.
+ *
+ *  $EXAMPLES$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRUN(),HB_BACKGROUNDTIME()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_BACKGROUNDRUN()
+ *  $CATEGORY$
+ *      Background tasks
+ *  $ONELINER$
+ *      Forces run of background tasks.
+ *  $SYNTAX$
+ *      HB_BACKGROUNDRUN( [<nHandle>] )
+ *  $ARGUMENTS$
+ *      <nHandle> is the identifier of the task returned by the
+ *                HB_BACKGROUNDADD() function.
+ *  $RETURNS$
+ *      Nothing.
+ *  $DESCRIPTION$
+ *      HB_BACKGROUNDRUN() run all or a single task defined.
+ *
+ *      This function can be used to run all tasks forcely or in the idle state.
+ *      If a valid task handle, as returned from HB_BACKGROUNDADD(), is passed as
+ *      parameter HB_BACKGROUNDRUN() run only this task.
+ *
+ *      NOTE: HB_BACKGROUNDRUN( nTask ) will run a task always, also if the time
+ *            is not elapsed and even if the task is not active.
+ *
+ *  $EXAMPLES$
+ *      // First we define a ticker with a time of half a second
+ *      nTask := HB_BACKGROUNDADD( {|| DisplayTicker()}, 500 )
+ *      SET BACKGROUND TASKS ON
+ *      // We add the background tasks to the idle state
+ *      HB_IDLEADD( {|| HB_BACKGROUNDRUN() } )
+ *      ...
+ *      Inkey(0) // At this time background tasks will be run as an idle task
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDTIME(),HB_IDLEADD()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_BACKGROUNDTIME()
+ *  $CATEGORY$
+ *      Background tasks
+ *  $ONELINER$
+ *      Set milliseconds after the task will be performed.
+ *  $SYNTAX$
+ *      HB_BACKGROUNDTIME( <nHandle>, <nMillisecs> ) --> nOldMillisecs
+ *  $ARGUMENTS$
+ *      <nHandle> is the identifier of the task returned by the
+ *                HB_BACKGROUNDADD() function.
+ *
+ *      <nMillisecs> time, in milliseconds, after that the task will be executed.
+ *                If the value is 0 (default) the task will be executed at
+ *                every cycle
+ *  $RETURNS$
+ *      <nOldMillisecs> the last value defined
+ *  $DESCRIPTION$
+ *      HB_BACKGROUNDTIME() change the number of milliseconds after which the task
+ *      will be executed.
+ *      If the task handle, as returned from HB_BACKGROUNDADD(), is valid the old
+ *      value is returned. Otherwise NIL is returned.
+ *
+ *  $EXAMPLES$
+ *      // First we define a ticker with a time of half a second
+ *      nTask := HB_BACKGROUNDADD( {|| DisplayTicker()}, 500 )
+ *      SET BACKGROUND TASKS ON
+ *      ...
+ *      // Now we change the time to 1 second
+ *      nOldTime := HB_BACKGROUNDTIME( nTask, 1000 )
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      hb_backgroundActive()
+ *  $CATEGORY$
+ *      Background tasks API
+ *  $ONELINER$
+ *      Set if a task is active or not.
+ *  $SYNTAX$
+ *      BOOL hb_backgroundActive( ULONG ulID, BOOL bActive );
+ *  $ARGUMENTS$
+ *      ulID      is the identifier of the task returned by the
+ *                hb_backgroundAdd() function.
+ *
+ *      bActive   TRUE (default) if the task is active and will be executed.
+ *  $RETURNS$
+ *      the last value defined
+ *  $DESCRIPTION$
+ *      API C level function.
+ *      See HB_BACKGROUNDACTIVE() for details.
+ *  $EXAMPLES$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDACTIVE()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      hb_backgroundAdd()
+ *  $CATEGORY$
+ *      Background tasks API
+ *  $ONELINER$
+ *      Adds the background task.
+ *  $SYNTAX$
+ *      ULONG hb_backgroundAddFunc( PHB_ITEM pBlock, int nMillisec, BOOL bActive );
+ *  $ARGUMENTS$
+ *      pBlock     is a codeblock or an array that contains the task.
+ *
+ *      nMillisecs is the number of milliseconds after which the task will be executed.
+ *                 If NULL is passed the default is set to 0 which means that the task
+ *                 will be executed at every time
+ *
+ *      bActive    defines if the task is active or not.
+ *                 If NULL is passed the default is TRUE
+ *
+ *  $RETURNS$
+ *      The handle that identifies the task. This handle can be used for deleting the
+ *      task or to change other parameters.
+ *  $DESCRIPTION$
+ *      API C level function.
+ *      See HB_BACKGROUNDADD() function for details.
+ *
+ *  $EXAMPLES$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDADD(),hb_backgroundActive(),hb_backgroundDel(),hb_backgroundFind(),hb_backgroundReset(),hb_backgroundRun(),hb_backgroundRunSingle(),hb_backgroundShutDown(),hb_backgroundTime()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      hb_backgroundDel()
+ *  $CATEGORY$
+ *      Background tasks API
+ *  $ONELINER$
+ *      Removes the background task from the list of tasks.
+ *  $SYNTAX$
+ *      PHB_ITEM hb_backgroundDelFunc( ULONG ulID );
+ *  $ARGUMENTS$
+ *      ulID is the identifier of the task returned by the
+ *      hb_backgroundAdd() function.
+ *  $RETURNS$
+ *      NULL if invalid handle is passed or an item as a codeblock or an array
+ *      that was passed to hb_backgroundAdd() function.
+ *  $DESCRIPTION$
+ *      API C level function.
+ *      See HB_BACKGROUNDDEL() function for details.
+ *
+ *  $EXAMPLES$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDDEL(),hb_backgroundActive(),hb_backgroundAdd(),hb_backgroundFind(),hb_backgroundReset(),hb_backgroundRun(),hb_backgroundRunSingle(),hb_backgroundShutDown(),hb_backgroundTime()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      hb_backgroundFind()
+ *  $CATEGORY$
+ *      Background tasks API
+ *  $ONELINER$
+ *      Find a task from internal list of tasks.
+ *  $SYNTAX$
+ *      PHB_BACKGROUNDTASK hb_backgroundFind( ULONG ulID );
+ *  $ARGUMENTS$
+ *      ulID      is the identifier of the task returned by the
+ *                hb_backgroundAdd() function.
+ *  $RETURNS$
+ *      Pointer to the HB_BACKGROUNDTASK structure.
+ *  $DESCRIPTION$
+ *      API C level function.
+ *      hb_backgroundFind() return a pointer to the HB_BACKGROUNDTASK structure searched
+ *      with the ulID handle.
+ *      If the handle is not valid hb_backgroundFind() return NULL.
+ *
+ *  $EXAMPLES$
+ *    pBkgTask = hb_backgroundFind( ulID );
+ *    if ( pBkgTask )
+ *    {
+ *       PHB_ITEM pItem;
+ *       pItem = pBkgTask->pTask;
+ *
+ *       if ( HB_IS_BLOCK( pItem ) )
+ *       {
+ *          hb_vmEvalBlock( pItem );
+ *       }
+ *       else
+ *       {
+ *          hb_execFromArray( pItem );
+ *       }
+ *    }
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      hb_backgroundActive(),hb_backgroundAdd(),hb_backgroundDel(),hb_backgroundReset(),hb_backgroundRun(),hb_backgroundRunSingle(),hb_backgroundShutDown(),hb_backgroundTime()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      hb_backgroundRun()
+ *  $CATEGORY$
+ *      Background tasks API
+ *  $ONELINER$
+ *      Forces run of background tasks.
+ *  $SYNTAX$
+ *      void hb_backgroundRun( void );
+ *  $ARGUMENTS$
+ *      None.
+ *  $RETURNS$
+ *      Nothing.
+ *  $DESCRIPTION$
+ *      API C level function.
+ *      hb_backgroundRun() acts as HB_BACKGROUNDRUN() with no parameters.
+ *      See HB_BACKGROUNDRUN() for details.
+ *  $EXAMPLES$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDRUN(),hb_backgroundActive(),hb_backgroundAdd(),hb_backgroundDel(),hb_backgroundFind(),hb_backgroundReset(),hb_backgroundRunSingle(),hb_backgroundShutDown(),hb_backgroundTime()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      hb_backgroundRunSingle()
+ *  $CATEGORY$
+ *      Background tasks API
+ *  $ONELINER$
+ *      Forces run of a single background task.
+ *  $SYNTAX$
+ *      void hb_backgroundRunSingle( ULONG ulID );
+ *  $ARGUMENTS$
+ *      ulID      is the identifier of the task returned by the
+ *                hb_backgroundAdd() function.
+ *  $RETURNS$
+ *      Nothing.
+ *  $DESCRIPTION$
+ *      API C level function.
+ *      hb_backgroundRun() acts as HB_BACKGROUNDRUN() with nHandle parameter.
+ *      See HB_BACKGROUNDRUN() for details.
+ *  $EXAMPLES$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDRUN(),hb_backgroundActive(),hb_backgroundAdd(),hb_backgroundDel(),hb_backgroundFind(),hb_backgroundReset(),hb_backgroundRun(),hb_backgroundShutDown(),hb_backgroundTime()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      hb_backgroundReset()
+ *  $CATEGORY$
+ *      Background tasks API
+ *  $ONELINER$
+ *      Reset internal coounter of background tasks.
+ *  $SYNTAX$
+ *      void hb_backgroundReset( void );
+ *  $ARGUMENTS$
+ *      None.
+ *  $RETURNS$
+ *      Nothing.
+ *  $DESCRIPTION$
+ *      API C level function.
+ *      See HB_BACKGROUNDRESET() function for details.
+ *
+ *  $EXAMPLES$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDRESET(),hb_backgroundActive(),hb_backgroundAdd(),hb_backgroundDel(),hb_backgroundFind(),hb_backgroundRun(),hb_backgroundRunSingle(),hb_backgroundShutDown(),hb_backgroundTime()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      hb_backgroundShutDown()
+ *  $CATEGORY$
+ *      Background tasks API
+ *  $ONELINER$
+ *      Closes all background tasks.
+ *  $SYNTAX$
+ *      void hb_backgroundShutDown( void );
+ *  $ARGUMENTS$
+ *      None.
+ *  $RETURNS$
+ *      Nothing.
+ *  $DESCRIPTION$
+ *      API C level function.
+ *      hb_backgroundShutDown() closes all background tasks.
+ *      Normally it's used as internal function to clear all tasks before quitting.
+ *
+ *  $EXAMPLES$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      hb_backgroundActive(),hb_backgroundAdd(),hb_backgroundDel(),hb_backgroundFind(),hb_backgroundReset(),hb_backgroundRun(),hb_backgroundRunSingle(),hb_backgroundTime()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      hb_backgroundTime()
+ *  $CATEGORY$
+ *      Background tasks API
+ *  $ONELINER$
+ *      Set milliseconds after the task will be performed.
+ *  $SYNTAX$
+ *      int hb_backgroundTime( ULONG ulID, int nMillisec );
+ *  $ARGUMENTS$
+ *      ulID       is the identifier of the task returned by the
+ *                 hb_backgroundAdd() function.
+ *
+ *      nMillisecs time, in milliseconds, after that the task will be executed.
+ *                 If the value is 0 (default) the task will be executed at
+ *                 every cycle
+ *  $RETURNS$
+ *      the last value defined
+ *  $DESCRIPTION$
+ *      API C level function.
+ *      See HB_BACKGROUNDTIME() for details.
+ *
+ *  $EXAMPLES$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDTIME(),hb_backgroundActive(),hb_backgroundAdd(),hb_backgroundDel(),hb_backgroundFind(),hb_backgroundReset(),hb_backgroundRun(),hb_backgroundRunSingle(),hb_backgroundShutDown()
+ *  $END$
+ */
+
