@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.19 2002/05/06 02:52:07 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.20 2002/05/09 07:25:33 ronpinkas Exp $
  */
 
 /*
@@ -1077,11 +1077,16 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
 
       case HB_EA_POP_PCODE:
          {
+         #ifndef HB_C52_STRICT
+            BOOL bRemoveRef = FALSE;
+
             /* Force to BYREF incase it's a STRING used as an Array - Real arrays are always BYREF anyway. */
             if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARIABLE )
             {
                pSelf->value.asList.pExprList->ExprType = HB_ET_VARREF;
+               bRemoveRef = TRUE;
             }
+         #endif
 
             HB_EXPR_USE( pSelf->value.asList.pExprList, HB_EA_PUSH_PCODE );
 
@@ -1111,9 +1116,16 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                   }
                }
             }
-          #endif
+         #endif
             HB_EXPR_USE( pSelf->value.asList.pIndex, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ARRAYPOP );
+
+         #ifndef HB_C52_STRICT
+            if( bRemoveRef )
+            {
+               pSelf->value.asList.pExprList->ExprType = HB_ET_VARIABLE;
+            }
+         #endif
          }
          break;
 
