@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.359 2004/03/17 02:29:01 druzus Exp $
+ * $Id: hvm.c,v 1.360 2004/03/17 08:29:45 ronpinkas Exp $
  */
 
 /*
@@ -2758,45 +2758,26 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             USHORT uiParams;
             PHB_DYNS pDyn;
 
-            /* Pops a value from the eval stack and uses it to set
-             * a new value of a variable of unknown type.
-             */
             uiParams = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
-            /* First try if passed symbol is a name of field
-             * in a current workarea - if it is not a field (FAILURE)
-             * then try the memvar variable (it will create PRIVATE
-             * variable if this variable doesn't exist)
-             */
 
-            /* memvars.c 417 */
-            #ifdef HB_THREAD_SUPPORT
-            {
-               char *szName = (pSymbols + uiParams)->szName;
-               char szNewName[256+14];
+            /*
+               2004-03-19 Ron Pinkas
+               Test with Clipper shows that for assignment, MEMVAR context is always used even if MEMVAR
+               does NOT exists, and a FIELD with this name exists!!!
 
-               sprintf( szNewName, ":TH:%d:%s", HB_VM_STACK.th_vm_id, szName );
-               hb_dynsymLock();
-               pDyn = hb_dynsymFindName( szNewName );
-            }
-            #else
-               pDyn = ( PHB_DYNS ) (pSymbols + uiParams)->pDynSym;
-            #endif
+               Here is the Test Ueed - Clipper produced NO R/T Error - indicating MEMVAR was created.
 
-            if( pDyn && pDyn->hMemvar )
-            {
-               hb_dynsymUnlock();
-               /* If exist a memory symbol with this name use it */
-               hb_memvarSetValue( pSymbols + uiParams, ( hb_stackItemFromTop(-1) ) );
-            }
-            else
-            {
-               hb_dynsymUnlock();
-               /* Try with a field and after create a memvar */
-               if( hb_rddFieldPut( ( hb_stackItemFromTop(-1) ), pSymbols + uiParams ) == FAILURE )
-               {
-                  hb_memvarSetValue( pSymbols + uiParams, ( hb_stackItemFromTop(-1) ) );
-               }
-            }
+                 PROCEDURE Main()
+
+                    USE Test
+                    First := First
+                    CLOSE
+                    ? First
+
+                 RETURN
+            */
+
+            hb_memvarSetValue( pSymbols + uiParams, ( hb_stackItemFromTop(-1) ) );
 
             hb_stackPop();
 
@@ -4959,6 +4940,7 @@ static void hb_vmArrayPop( void )
          szMessage[0] = '_';
          szMessage[1] = '\0';
          strcat( szMessage, pIndex->item.asString.value );
+
          // Optimized - recycling the parameters.
          #if 1
             // Swap - pIndex no longer needed.
@@ -7882,7 +7864,7 @@ HB_FUNC( HB_DBG_INVOKEDEBUG )
    HB_THREAD_STUB
 
    BOOL bRequest = s_bDebugRequest;
-   
+
    if ( hb_pcount() > 0 )
    {
       s_bDebugRequest = hb_parl( 1 );
@@ -8158,6 +8140,8 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols
 
          hb_dynsymLock();
          pDynSym= hb_dynsymFind( pSymbol->szName );
+         hb_dynsymUnlock();
+
          if( pDynSym && pDynSym->pFunPtr && pSymbol->pFunPtr )
          {
             pSymbol->pFunPtr = pDynSym->pFunPtr;
@@ -8166,7 +8150,6 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols
          {
             hb_dynsymNew( pSymbol, pNewSymbols );
          }
-         hb_dynsymUnlock();
       }
    }
 }
@@ -8198,6 +8181,7 @@ HB_FUNC( HB_FUNCPTR )
 
       hb_dynsymLock();
       pDynSym = hb_dynsymFind( sSym );
+      hb_dynsymUnlock();
 
       if( pDynSym )
       {
@@ -8209,7 +8193,6 @@ HB_FUNC( HB_FUNCPTR )
       {
          hb_vmPushLong( 0 );
       }
-      hb_dynsymUnlock();
 
       /* avoid cross locking */
       hb_xfree( sSym );

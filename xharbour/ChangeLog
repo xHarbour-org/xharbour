@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2607 2004/03/19 21:25:32 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2608 2004/03/19 21:45:11 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,14 +8,31 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-03-19 16:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    ! Fixed HB_P_POPVARIABLE to always use MEMVAR Context - Clipper compatibility.
+
+   /*
+      G., While fixing the above I noticed orphan, useless MT branch, which was supposed to
+      mangle the Variable Name to reflect ThreadID, but it was not really doing anything.
+
+      There were 3 problems:
+
+      1. The retrieved pDyn was never used in subsequent code.
+      2. If the Name was not found it still requires creation of new Var with the mangled name.
+      3. This PCode appears to have been the ONLY one with such branch, there for missing in HB_P_PUSHVARIABLE and others.
+
+      So I just deleted the code, as i was not functional in any case - Please review.
+     */
+
 2004-03-19 22:53 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
   * doc/hblog.txt
     ! Fixed typos (again).
-    
+
   * xdiff.txt
     + Added HB_Service, HB_*SignalHandler(), HBLOG system
     /* (Please, look & review) */
-   
+
 2004-03-19 13:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * contrib/libct/files.c
     ! Fixed restore of current path in FileDelete() - by Sylvain
