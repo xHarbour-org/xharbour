@@ -1,5 +1,5 @@
 /*
- * $Id: ttopbar.prg,v 1.4 2001/09/10 22:04:29 vszakats Exp $
+ * $Id: ttopbar.prg,v 1.1.1.1 2001/12/21 10:42:14 ronpinkas Exp $
  */
 
 /*
@@ -138,8 +138,9 @@ static function DelItem( nPos )
    LOCAL Self  := QSelf()
 
    if nPos > 0 .and. nPos <= Len( ::aItems )
-      aDel( ::aItems, nPos )
-      aSize( ::aItems, Len( ::aItems ) - 1 )
+      aDel( ::aItems, nPos, .T. )
+//      aSize( ::aItems, Len( ::aItems ) - 1 )
+      ::itemCount--
    endif
 
 return Self
@@ -148,11 +149,11 @@ return Self
 static function GetFirst()
 
    LOCAL Self  := QSelf()
-   LOCAL n
+   LOCAL aItems
 
-   for n := 1 to ::itemCount
-      if ::aItems[ n ]:enabled
-         return n
+   FOR EACH aItems IN ::aItems
+      if aItems:enabled
+         return HB_EnumIndex()
       endif
    next
 
@@ -227,13 +228,13 @@ static function GetAccel( nKey )
    LOCAL Self  := QSelf()
    LOCAL nAt   := 0
    LOCAL cKey  := Upper( __AltToKey( nKey ) ) /* By now */
-   LOCAL n
+   LOCAL aItems
 
-   for n := 1 to ::itemCount
-      nAt := At( "&", ::aItems[ n ]:caption )
-      if nAt > 0 .and. ::aItems[ n ]:enabled .and. ;
-            Upper( SubStr( ::aItems[ n ]:caption, nAt + 1, 1 ) ) == cKey
-         return n
+   FOR EACH aItems IN ::aItems
+      nAt := At( "&", aItems:caption )
+      if nAt > 0 .and. aItems:enabled .and. ;
+            Upper( SubStr( aItems:caption, nAt + 1, 1 ) ) == cKey
+         return HB_EnumIndex()
       endif
    next
 
@@ -250,14 +251,14 @@ return 0
 static function HitTest( nRow, nCol )
 
    LOCAL Self  := QSelf()
-   LOCAL n
+   LOCAL aItems
 
    if ::row == nRow
-      for n := 1 to ::itemCount
-         if nCol >= ::aItems[ n ]:column .and. ;
-               nCol <= ::aItems[ n ]:column + Len( ::aItems[ n ]:caption ) .and. ;
-               ::aItems[ n ]:enabled
-            return n
+      FOR EACH aItems IN ::aItems
+         if nCol >= aItems:column .and. ;
+               nCol <= aItems:column + Len( aItems:caption ) .and. ;
+                       aItems:enabled
+            return HB_EnumIndex()
          endif
       next
    endif
@@ -321,11 +322,11 @@ return Self
 static function GetShortct( nKey )
 
    LOCAL Self  := QSelf()
-   LOCAL n
+   LOCAL aItems
 
-   for n := 1 to ::itemCount
-      if ::aItems[ n ]:shortcut == nKey
-         return n
+   FOR EACH aItems IN ::aItems
+      if aItems:shortcut == nKey
+         return HB_EnumIndex()
       endif
    next
 
@@ -337,7 +338,7 @@ static function Display()
    LOCAL Self  := QSelf()
    LOCAL oPopup
    LOCAL nAt
-   LOCAL n
+   LOCAL aItems
    LOCAL cPrompt
 
    LOCAL nOldRow  := Row()
@@ -349,28 +350,28 @@ static function Display()
    DispOutAt( ::row, ::left, ;
               Space( ::right - ::left + 1 ), hb_ColorIndex( ::colorSpec, CLR_STANDARD ) )
 
-   for n := 1 to ::itemCount
+   FOR EACH aItems IN ::aItems
 
-      nAt := At( "&", ::aItems[ n ]:caption )
-      cPrompt := " " + StrTran( ::aItems[ n ]:caption, "&", "" ) + " "
+      nAt := At( "&", aItems:caption )
+      cPrompt := " " + StrTran( aItems:caption, "&", "" ) + " "
 
       DispOutAt( ;
-         ::row, ::aItems[ n ]:column, ;
+         ::row, aItems:column, ;
          cPrompt, ;
          hb_ColorIndex( ::colorSpec, ;
-            iif( ::aItems[ n ]:enabled, ;
-               iif( n == ::current, CLR_ENHANCED, CLR_STANDARD ), ;
+            iif( aItems:enabled, ;
+               iif( HB_EnumIndex() == ::current, CLR_ENHANCED, CLR_STANDARD ), ;
                CLR_UNSELECTED ) ) )
 
       if nAt > 0
-         DispOutAt( ::row, ::aItems[ n ]:column + nAt, ;
-            SubStr( ::aItems[ n ]:caption, nAt + 1, 1 ), ;
+         DispOutAt( ::row, aItems:column + nAt, ;
+            SubStr( aItems:caption, nAt + 1, 1 ), ;
             hb_ColorIndex( ::colorSpec, ;
-               iif( n == ::current, CLR_BACKGROUND, CLR_BORDER ) ) )
+               iif( HB_EnumIndex() == ::current, CLR_BACKGROUND, CLR_BORDER ) ) )
       endif
 
-      if ::aItems[ n ]:isPopup()
-         ::aItems[ n ]:data:SetCoors( n, ::row + 1, ::aItems[ n ]:column )
+      if aItems:isPopup()
+         aItems:data:SetCoors( HB_EnumIndex(), ::row + 1, aItems:column )
       endif
 
    next
