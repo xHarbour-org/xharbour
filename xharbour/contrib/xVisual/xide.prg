@@ -78,20 +78,26 @@ return( super:OnCommand() )
 
 CLASS SubForm1 FROM TForm
    
-   METHOD New( oParent ) INLINE ::Caption := 'SubForm1 from TForm', ;
-                                super:New( oParent )
-                                
-   METHOD OnPaint( hDC ) INLINE ::DrawGrid( hDC, 3 ),0
-   METHOD OnCreate()     INLINE ::CreateSub()  // careful handles OnCreate not OnCreation
-//   METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Closing SubForm1', 'OnCloseQuery', MB_YESNO ) == IDYES,;
-//                                    nil, 0 )
+   METHOD New( oParent )     INLINE ::Caption := 'SubForm1 from TForm', ;
+                                    super:New( oParent )
+
+   METHOD OnPaint( hDC )     INLINE ::DrawGrid( hDC, 3 ),0
+   METHOD OnCreate()         INLINE ::CreateSub()
+
+   METHOD OnCommand(nwParam) INLINE ::SubCommands( nwParam )
 
    METHOD CreateSub()
    METHOD DrawGrid()
-
+   METHOD SubCommands()
 ENDCLASS
 
 //----------------------------------
+
+METHOD SubCommands( nwParam ) CLASS SubForm1
+   if nwParam == 500 
+      ::MsgBox( 'HI FROM TBUTTON')
+   endif
+return(0)
 
 METHOD CreateSub() CLASS SubForm1
 
@@ -110,7 +116,7 @@ METHOD CreateSub() CLASS SubForm1
    oBtn:Caption := 'Testing a Button'
    oBtn:Create()
    oBtn:SetFocus()
-return( super:OnCreate() )
+return( 0 )
 
 //----------------------------------
 
