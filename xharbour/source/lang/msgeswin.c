@@ -1,5 +1,5 @@
 /*
- * $Id: msgeswin.c,v 1.1 2003/06/17 22:10:22 druzus Exp $
+ * $Id: msgeswin.c,v 1.2 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "Español ANSI",              /* Name (in native language) */
       "ESWIN",                     /* RFC ID */
       "ANSI",                      /* Codepage */
-      "$Revision: 1.1 $ $Date: 2003/06/17 22:10:22 $",         /* Version */
+      "$Revision: 1.2 $ $Date: 2003/06/30 17:07:29 $",         /* Version */
 
       /* Month names */
 
@@ -195,7 +195,7 @@ static HB_LANG s_lang =
 
       /* Texts */
 
-      "YYYY/MM/DD",
+      "DD/MM/YYYY",
       "S",
       "N"
    }
