@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.27 2003/02/28 10:37:20 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.28 2003/02/28 18:29:00 ronpinkas Exp $
  */
 
 /*
@@ -61,7 +61,8 @@
 #undef LEX_ABBREVIATE
    #define LEX_ABBREVIATE 4
 
-#define IS_OP( x ) ( x == DEC || x == INASSIGN || x == ALIASOP || x == PLUSEQ || x == MINUSEQ || x == MULTEQ || x == DIVEQ || x == EXPEQ || x == MODEQ || x == '=' )
+#define IS_OP( x ) ( x == DEC || x == INASSIGN || x == ALIASOP || x == PLUSEQ || x == MINUSEQ || x == MULTEQ || x == DIVEQ || \
+                     x == EXPEQ || x == MODEQ || x == '=' || x == LIKE || x == MATCH || x == STEP || x == TO )
 
 static int iCloseSquare = 0, iWantsEOL, iWantsEXP, iWantsID, iWantsVAR;
 
@@ -158,11 +159,11 @@ SELF_CONTAINED_WORDS_ARE {
 #define DO_WHILE         701
 #define DO_WHILE_WITH    702
 
-/* KeyWords are grouped based on the next token they require. */
+/* KEYWORDS are grouped based on the next token they require. */
 #define WANTS_VAR        703 /* Wants Variable (including Macros): DO, FOR, PRIVATE, PUBLIC */
 #define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, CATCH, EXTERN, FIELD, FUNCTION, LOCAL, GLOBAL, EXTERNGLOBAL, MEMVAR, PARAMETERS, PROCEDURE, ENUM, STATIC */
 #define WANTS_EOL        705 /* Wants EOL: ELSE, END, ENDCASE, ENDDO, ENDIF, EXIT, LOOP, NEXT, OTHERWISE, RECOVER TRY*/
-#define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, IN, LIKE, MATCH RETURN, WHILE, WITHOBJ SWITCH */
+#define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, IN, RETURN, WHILE, WITHOBJ SWITCH */
 #define REJECT_OP        707
 
 #define HB_TEXT          708
@@ -171,6 +172,9 @@ SELF_CONTAINED_WORDS_ARE {
 #define HB_WANTS_ID      LEX_CUSTOM_ACTION - 1024
 #define HB_WANTS_EOL     LEX_CUSTOM_ACTION - 1536
 #define HB_WANTS_EXP     LEX_CUSTOM_ACTION - 2048
+
+/* WORDS can NOT use HB_WANTS_EXP, instead must use HB_AFTER_EXP. */
+#define HB_AFTER_EXP     LEX_CUSTOM_ACTION - 2560 /* LIKE, MATCH */
 
 /* When 2 identifiers are correct syntax like in class declaration, we have to temporarily store the 2nd identifier. */
 #define HB_ID_ON_HOLD    LEX_CUSTOM_ACTION -  5
@@ -197,20 +201,18 @@ SELF_CONTAINED_WORDS_ARE {
 #define _WITH_ID_SEMI    LEX_CUSTOM_ACTION - 21
 
 #define HB_IN            LEX_CUSTOM_ACTION - 22
-#define HB_STEP          LEX_CUSTOM_ACTION - 23
-#define HB_TO            LEX_CUSTOM_ACTION - 24
-#define HB_WITH          LEX_CUSTOM_ACTION - 25
+#define HB_WITH          LEX_CUSTOM_ACTION - 23
 
 /* When reservered words are used as Identifier. */
-#define HB_IDENTIFIER    LEX_CUSTOM_ACTION - 26
+#define HB_IDENTIFIER    LEX_CUSTOM_ACTION - 24
 
-#define HB_INLINE        LEX_CUSTOM_ACTION - 27
+#define HB_INLINE        LEX_CUSTOM_ACTION - 25
 
-#define HB_TEXT_BLOCK    LEX_CUSTOM_ACTION - 28
-#define HB_TEXT_LINE     LEX_CUSTOM_ACTION - 29
-#define HB_NEXT_LINE     LEX_CUSTOM_ACTION - 30
+#define HB_TEXT_BLOCK    LEX_CUSTOM_ACTION - 26
+#define HB_TEXT_LINE     LEX_CUSTOM_ACTION - 27
+#define HB_NEXT_LINE     LEX_CUSTOM_ACTION - 28
 
-#define HB_TEXT_ID       LEX_CUSTOM_ACTION - 31
+#define HB_TEXT_ID       LEX_CUSTOM_ACTION - 29
 
 #define USE_KEYWORDS
 
@@ -309,19 +311,19 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( "AS{WS}STRING"                     ) AS_TOKEN( AS_CHARACTER       + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}USUAL"                      ) AS_TOKEN( AS_CHARACTER       + DONT_REDUCE ),
                      LEX_WORD( "FIELD"                            ) AS_TOKEN( FIELD              ),
-                     LEX_WORD( "HAS"                              ) AS_TOKEN( HB_WANTS_EXP - MATCH             ),
+                     LEX_WORD( "HAS"                              ) AS_TOKEN( HB_AFTER_EXP - MATCH             ),
                      LEX_WORD( "HB_INLINE"                        ) AS_TOKEN( HB_INLINE          ),
                      LEX_WORD( "IF"                               ) AS_TOKEN( IIF                ),
                      LEX_WORD( "IIF"                              ) AS_TOKEN( IIF                ),
                      LEX_WORD( "IN"                               ) AS_TOKEN( HB_IN              ),
-                     LEX_WORD( "LIKE"                             ) AS_TOKEN( HB_WANTS_EXP - LIKE              ),
+                     LEX_WORD( "LIKE"                             ) AS_TOKEN( HB_AFTER_EXP - LIKE              ),
                      LEX_WORD( "LINE"                             ) AS_TOKEN( _LINE_             ),
                      LEX_WORD( "NIL"                              ) AS_TOKEN( NIL                + DONT_REDUCE ),
                      LEX_WORD( "OPTIONAL"                         ) AS_TOKEN( OPTIONAL           ),
                      LEX_WORD( "QSELF"                            ) AS_TOKEN( QSELF              ),
                   /* LEX_WORD( "SELF"                             ) AS_TOKEN( SELF               ), */
-                     LEX_WORD( "STEP"                             ) AS_TOKEN( HB_STEP            ),
-                     LEX_WORD( "TO"                               ) AS_TOKEN( HB_TO              ),
+                     LEX_WORD( "STEP"                             ) AS_TOKEN( HB_AFTER_EXP - STEP              ),
+                     LEX_WORD( "TO"                               ) AS_TOKEN( HB_AFTER_EXP - TO                ),
                      LEX_WORD( "WITH"                             ) AS_TOKEN( HB_WITH            ),
                      LEX_WORD( "_FIELD"                           ) AS_TOKEN( FIELD              ),
                      LEX_WORD( "_GET_"                            ) AS_TOKEN( GET                )
@@ -798,7 +800,24 @@ int hb_comp_SLX_CustomAction( int x )
 
    DEBUG_INFO( printf( "Custom Action for %i\n", x ) );
 
-   if( x < HB_WANTS_EXP )
+   if( x < HB_AFTER_EXP )
+   {
+      bIgnoreWords = FALSE;
+
+      if( iLastToken == NUM_INTEGER || iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == IDENTIFIER ||
+                          iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' || iLastToken == ']' || iLastToken == LITERAL )
+      {
+         return ( (-x) + (HB_AFTER_EXP) ) + DONT_REDUCE;
+      }
+      else
+      {
+         yylval.string = hb_compIdentifierNew( sToken, TRUE );
+         iIdentifier++;
+         DEBUG_INFO( printf( "HB_AFTER_EXP, Primary Identifier %s Increased to: %i\n", sToken, iIdentifier ) );
+         return IDENTIFIER;
+      }
+   }
+   else if( x < HB_WANTS_EXP )
    {
       bIgnoreWords = FALSE;
       iWantsEXP = (-x) + (HB_WANTS_EXP) ;
@@ -936,26 +955,14 @@ int hb_comp_SLX_CustomAction( int x )
       case HB_IN :
          bIgnoreWords = FALSE;
 
-         /*
-         if( iLastToken == IDENTIFIER )
-         {
-            return IN + DONT_REDUCE;
-         }
-         else
-         {
-            yylval.string = hb_compIdentifierNew( "IN", TRUE );
-            iIdentifier++;
-            DEBUG_INFO( printf( "HB_IN, Primary Identifier %s Increased to: %i\n", "IN", iIdentifier ) );
-            return IDENTIFIER;
-         }
-         */
-
+         // pTmp is the Begining of Line - skip white space.
          pTmp = (char *) szLexBuffer;
          while( *pTmp == ' ' || *pTmp == '\t' )
          {
             pTmp++;
          }
 
+         // FIEL[D] statmenet?
          if( toupper( pTmp[0] ) == 'F' && toupper( pTmp[1] ) == 'I' && toupper( pTmp[2] ) == 'E' && toupper( pTmp[3] ) == 'L' )
          {
             if( toupper( pTmp[4] ) == 'D' || pTmp[4] == ' ' || pTmp[4] == '\t' )
@@ -972,7 +979,7 @@ int hb_comp_SLX_CustomAction( int x )
                   return IDENTIFIER;
                }
             }
-         }
+         } // FOR statement?
          else if( toupper( pTmp[0] ) == 'F' && toupper( pTmp[1] ) == 'O' && toupper( pTmp[2] ) == 'R' )
          {
             if( pTmp[3] != ' ' && pTmp[3] != '\t' )
@@ -986,6 +993,7 @@ int hb_comp_SLX_CustomAction( int x )
                pTmp++;
             }
 
+            // FOR EACH statemenr?
             if( toupper( pTmp[0] ) == 'E' && toupper( pTmp[1] ) == 'A' && toupper( pTmp[2] ) == 'C' && toupper( pTmp[3] ) == 'H' )
             {
                if( pTmp[4] == ' ' || pTmp[4] == '\t' )
@@ -1016,39 +1024,13 @@ int hb_comp_SLX_CustomAction( int x )
               return REJECT_OP;
            }
 
-      case HB_STEP :
-         bIgnoreWords = FALSE;
-
-         if( iLastToken == NUM_INTEGER || iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == IDENTIFIER || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' || iLastToken == ']' || iLastToken == LITERAL )
-            { return STEP + DONT_REDUCE; }
-         else
-         {
-            yylval.string = hb_compIdentifierNew( "STEP", TRUE );
-            iIdentifier++;
-            DEBUG_INFO( printf( "HB_STEP, Primary Identifier %s Increased to: %i\n", "STEP", iIdentifier ) );
-            return IDENTIFIER;
-         }
-
-      case HB_TO :
-         bIgnoreWords = FALSE;
-
-         if( iLastToken == NUM_INTEGER || iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == IDENTIFIER || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' || iLastToken == ']' || iLastToken == LITERAL )
-         {
-            return TO + DONT_REDUCE;
-         }
-         else
-         {
-            yylval.string = hb_compIdentifierNew( "TO", TRUE );
-            iIdentifier++;
-            DEBUG_INFO( printf( "HB_TO, Primary Identifier %s Increased to: %i\n", "IN", iIdentifier ) );
-            return IDENTIFIER;
-         }
-
       case HB_WITH :
          bIgnoreWords = FALSE;
 
          if( iLastToken == IDENTIFIER || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' )
-            { return WITH + DONT_REDUCE; }
+         {
+            return WITH + DONT_REDUCE;
+         }
          else
          {
             yylval.string = hb_compIdentifierNew( "WITH", TRUE );

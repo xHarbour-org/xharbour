@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.789 2003/02/28 12:51:46 iananderson Exp $
+ * $Id: ChangeLog,v 1.790 2003/02/28 18:28:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-28 13:58 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.slx
+    * Added new class HB_AFTER_OP, because HB_WANTS_EXP is NOT 100% correct for WORDS.
+    - Removed HB_STEP and HB_TO, and replaced with new HB_AFTER_OP.
+    * Changed "LIKE" and "HAS" to use new HB_AFTER_OP.
+    + Added LIKE and MATCH to IS_OP() macro.
 
 2003-02-28 10:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.slx
