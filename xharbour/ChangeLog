@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1745 2003/11/21 13:33:39 lculik Exp $
+ * $Id: ChangeLog,v 1.1746 2003/11/22 01:41:08 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-21 18:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * makefile.nt
+  * makefile.vc
+    + Added /FORCE:MULTIPLE to hbrun link command.
+
+  * include/hbrddcdx.h
+  * include/hbrdddbf.h
+    + Added midding #include "hbsetup.h"
+
+  * tests/pp_harb.ch
+    + Minor revison.
 
 2003-11-21 17:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbvm.h

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.22 2003/11/15 23:33:16 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.23 2003/11/20 23:47:36 druzus Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 #ifndef HB_RDDCDX_H_
 #define HB_RDDCDX_H_
 
+#include "hbsetup.h"
 #include "hbapirdd.h"
 #include "hbdbferr.h"
 #ifndef HB_CDP_SUPPORT_OFF
@@ -115,7 +116,7 @@ extern "C" {
 #define CURKEY_ISSET(pTag)    (((pTag)->curKeyState & (CDX_CURKEY_NOTEXIST | CDX_CURKEY_UNDEF)) == 0)
 #define CURKEY_REC(pTag)      ((((pTag)->curKeyState & CDX_CURKEY_REC) != 0) ? (pTag)->curKey->rec : 0)
 #define CURKEY_VAL(pTag)      ((((pTag)->curKeyState & CDX_CURKEY_VAL) != 0) ? (pTag)->curKey->val : NULL)
-#define CURKEY_REFRESH(pTag)  
+#define CURKEY_REFRESH(pTag)
 */
 
 #define HB_CDXMAXKEY( x )     ((USHORT) ((x) > CDX_MAXKEY ? CDX_MAXKEY : (x)))
@@ -149,7 +150,7 @@ typedef struct _CDXTAGHEADER
    BYTE     forExpPos[ 2 ];   /* offset of filter expression */
    BYTE     forExpLen[ 2 ];   /* length of filter expression */
    BYTE     keyExpPos[ 2 ];   /* offset of key expression */
-   BYTE     keyExpLen[ 2 ];   /* length of key expression */                        
+   BYTE     keyExpLen[ 2 ];   /* length of key expression */
    BYTE     keyExpPool[ CDX_PAGELEN ];
 } CDXTAGHEADER;
 typedef CDXTAGHEADER * LPCDXTAGHEADER;

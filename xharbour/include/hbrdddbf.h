@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.6 2003/11/15 23:33:16 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.7 2003/11/20 23:47:36 druzus Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 #ifndef HB_RDDDBF_H_
 #define HB_RDDDBF_H_
 
+#include "hbsetup.h"
 #include "hbapirdd.h"
 #include "hbdbferr.h"
 #ifndef HB_CDP_SUPPORT_OFF

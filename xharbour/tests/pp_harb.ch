@@ -28,15 +28,15 @@
   //----------------------------------------------------------------------------//
   CLASS  TInterpreter
 
-     DATA cText
-     DATA acPPed
-     DATA cPPed
-     DATA aCompiledProcs
-     DATA aInitExit
-     DATA nProcs
+     DATA cText                INIT ""
+     DATA acPPed               INIT {}
+     DATA cPPed                INIT ""
+     DATA aCompiledProcs       INIT {}
+     DATA aInitExit            INIT { {}, {} }
+     DATA nProcs               INIT 0
      DATA aScriptHostGlobals   INIT {}
 
-     METHOD New()              INLINE ( ::nProcs := 0, ::cText := "", ::acPPed := {}, ::aCompiledProcs := {}, ::aInitExit := { {}, {} }, Self )
+     METHOD New()              INLINE ( Self )
 
      METHOD AddLine( cLine )   INLINE ( ::nProcs := 0, ::acPPed := {}, ::cText += ( cLine + Chr(10) ) )
      METHOD SetScript( cText ) INLINE ( ::nProcs := 0, ::acPPed := {}, ::cText := cText )
@@ -70,6 +70,10 @@
 
      LOCAL aParams := HB_aParams(), xRet
 
+     IF Empty( ::cText )
+        RETURN .F.
+     ENDIF
+
      IF ::nProcs == 0
         ::Compile()
      ENDIF
@@ -84,6 +88,10 @@
   METHOD Compile() CLASS  TInterpreter
 
      LOCAL nLine, nLines, sLine, nProcId := 0
+
+     IF Empty( ::cText )
+        RETURN .F.
+     ENDIF
 
      IF Len( ::acPPed ) == 0
         PP_InitStd()

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.76 2003/11/10 00:59:32 fsgiudice Exp $
+# $Id: makefile.vc,v 1.77 2003/11/16 01:56:15 ronpinkas Exp $
 #
 
 #
@@ -1021,7 +1021,7 @@ $(HBRUN_EXE) : \
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $**
    $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)$(MT)\ $(OBJ_DIR)$(MT)\hbrun.c \
                                         $(OBJ_DIR)$(MT)\external.c \
-                       -o $(HBRUN_EXE) /link $(L_DFLAGS) $(LIBLISTMT) $(LIBS2)
+                       -o $(HBRUN_EXE) /link $(L_DFLAGS) /FORCE:MULTIPLE $(LIBLISTMT) $(LIBS2)
 
 #
 # HBTEST.EXE rules
