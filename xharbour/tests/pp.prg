@@ -8409,7 +8409,7 @@ RETURN s_oSelf
 
 STATIC FUNCTION NextIdentifier( sLine, sSkipped )
 
-   LOCAL nAt, nLen := Len( sLine ), cChar, cLastChar, nStart, sIdentifier, sTmp
+   LOCAL nAt, nLen := Len( sLine ), cChar, cLastChar := '0', nStart, sIdentifier, sTmp
 
    FOR nAt := 1 TO nLen
        cChar := SubStr( sLine, nAt, 1 )
