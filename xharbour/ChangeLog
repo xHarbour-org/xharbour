@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.905 2003/04/02 02:10:35 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.906 2003/04/02 09:38:08 iananderson Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,40 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-04-02 20:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/macro/macro.y
+    * Modified hb_compchar to use yychar macro.
+
+  - source/rtl/dir.c
+    - Removed unused source.
+
+  - source/rtl/trpc.prg
+  + source/rtl/uses_mt/trpc.prg
+  - source/rtl/trpccli.prg
+  + source/rtl/uses_mt/trpccli.prg
+    -+ moved trpc.prg and trpccli.prg to new rtl/uses_mt folder since these file REQUIRE MT libraries.
+
+  - source/vm/mainlgtk.c
+  + source/vm/gtk/mainlgtk.c
+    -+ moved to new folder source/vm/gtk
+
+  - source/vm/mainpm.c
+  + source/vm/pm/mainpm.c
+    -+ moved to new folder source/vm/pm
+
+  - tests/dll55.bat
+    - Removed non used file.
+
+  * makefile.bc
+    ! Fixed to only use trpc and trpccli when building MT version of rtl.lib
+
+  /* NOTE!!! GNU Make and MSVC make must be revised accordingly!!! */
+
 2003-04-02 11:34 UTC+0100 Ian Anderson <i.anderson@procon-online.de>
   * source\rtl\gtapi.c
-    * Fixed problem of maxrow() and maxcol()  returning the wrong 
+    * Fixed problem of maxrow() and maxcol()  returning the wrong
      values afrer screen size is changed with setmode()
-    
+
 2003-04-01 16:09 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * bin/!pack_bin.bat
   * bin/!pack_src.bat

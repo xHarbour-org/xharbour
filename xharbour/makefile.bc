@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.37 2003/03/21 21:33:40 ronpinkas Exp $
+# $Id: makefile.bc,v 1.38 2003/03/29 22:48:30 lculik Exp $
 #
 
 #
@@ -149,7 +149,7 @@ HBMAKE_DIR   = utils\hbmake
 # C compiler definition and C flags. These should never have to change.
 #
 
-CFLAGS               = -I$(INCLUDE_DIR) -d $(C_USR) -5 -6 -OS -a8 -DHB_FM_STATISTICS_OFF $(CFLAGS)
+CFLAGS               = -I$(INCLUDE_DIR) -d $(C_USR) -5 -6 -O2 -a8 -DHB_FM_STATISTICS_OFF $(CFLAGS) -D__EXPORT__ -D__WIN32__
 CLIBFLAGS            = -c $(CFLAGS) $(CLIBFLAGS)
 CLIBFLAGSDEBUG       = -v $(CLIBFLAGS)
 HARBOURFLAGS         = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
@@ -438,14 +438,18 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\tpopup.obj \
    $(RTL_OBJ_DIR)\traceprg.obj \
    $(RTL_OBJ_DIR)\treport.obj \
-   $(RTL_OBJ_DIR)\trpc.obj \
-   $(RTL_OBJ_DIR)\trpccli.obj \
    $(RTL_OBJ_DIR)\ttable.obj \
    $(RTL_OBJ_DIR)\ttextlin.obj \
    $(RTL_OBJ_DIR)\ttopbar.obj \
    $(RTL_OBJ_DIR)\typefile.obj \
    $(RTL_OBJ_DIR)\wait.obj \
    $(RTL_OBJ_DIR)\win32ole.obj
+
+!if $d(HB_THREAD_SUPPORT)
+   RTL_LIB_OBJS = $(RTL_LIB_OBJS) \
+   $(RTL_OBJ_DIR)\trpc.obj \
+   $(RTL_OBJ_DIR)\trpccli.obj
+!endif
 
 #
 # LANG.LIB rules
@@ -2139,14 +2143,14 @@ $(RTL_OBJ_DIR)\treport.obj : $(RTL_OBJ_DIR)\treport.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
-$(RTL_OBJ_DIR)\trpc.c : $(RTL_DIR)\trpc.prg
+$(RTL_OBJ_DIR)\trpc.c : $(RTL_DIR)\uses_mt\trpc.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\trpc.obj : $(RTL_OBJ_DIR)\trpc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
-$(RTL_OBJ_DIR)\trpccli.c : $(RTL_DIR)\trpccli.prg
+$(RTL_OBJ_DIR)\trpccli.c : $(RTL_DIR)\uses_mt\trpccli.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\trpccli.obj : $(RTL_OBJ_DIR)\trpccli.c

@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.7 2002/12/08 02:20:26 ronpinkas Exp $
+ * $Id: macro.y,v 1.8 2003/03/04 00:11:48 ronpinkas Exp $
  */
 
 /*
@@ -280,7 +280,7 @@ Main : Expression '\n'  {
                            hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
                            hb_compExprDelete( $1, HB_MACRO_PARAM );
 
-                           if( hb_compchar == IDENTIFIER && yylval.string )
+                           if( yychar == IDENTIFIER && yylval.string )
                            {
                               hb_xfree( yylval.string );
                            }
@@ -300,7 +300,7 @@ Main : Expression '\n'  {
                               hb_compExprDelete( s_Pending[ --s_iPending ], HB_MACRO_PARAM );
                            }
 
-                           if( hb_compchar == IDENTIFIER && yylval.string )
+                           if( yychar == IDENTIFIER && yylval.string )
                            {
                               hb_xfree( yylval.string );
                            }
