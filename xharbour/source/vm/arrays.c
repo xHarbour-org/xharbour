@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.56 2003/07/13 18:15:39 walito Exp $
+ * $Id: arrays.c,v 1.57 2003/07/30 00:41:17 ronpinkas Exp $
  */
 
 /*
@@ -1158,7 +1158,7 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
       {
          PHB_ITEM pSrcItem = pSrcBaseArray->pItems + ulCount;
 
-         // Clipper clones nested array ONLY if NOT an Object!!!
+         /* Clipper clones nested array ONLY if NOT an Object!!! */
          if( pSrcItem->type == HB_IT_ARRAY && pSrcItem->item.asArray.value->uiClass == 0 )
          {
             PHB_ITEM pClone;
