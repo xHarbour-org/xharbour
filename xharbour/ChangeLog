@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.930 2003/04/09 10:47:43 jonnymind Exp $
+ * $Id: ChangeLog,v 1.931 2003/04/09 13:52:05 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-09 13:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * include/hbver.h
+    ! change build number to 80 as Ron
+    ! change ChangeLog entries
 
 2003-04-09 09:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.nt
@@ -28,7 +33,7 @@
     ! Fixed bug involving & and rewinding repeatables.
     ! Fixed excess spaces in match output.
 
-2003-04-08 17:30 UTC-03000 Luiz Rafael Culik <culikr@uol.com.br>
+2003-04-08 17:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * makefile.bc
     ! Now build RPCMT.lib
 
