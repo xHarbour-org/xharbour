@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1920 2003/12/22 02:08:32 peterrees Exp $
+ * $Id: ChangeLog,v 1.1921 2003/12/22 04:55:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -138,6 +138,10 @@
   * include/hbapi.h
   * source/vm/garbage.c
     * synched HB_EXPORT declarations.
+
+2003-12-19 13:00 UTC+0600
+  * source/rtl/teditor.prg
+    + complete rewrite of key methods, multiple bug fixes   
 
 2003-12-19 23:28 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/bkgtsks.c
