@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.92 2005/01/25 10:47:52 druzus Exp $
+ * $Id: dbfntx1.c,v 1.93 2005/01/30 21:19:24 druzus Exp $
  */
 
 /*
@@ -809,15 +809,17 @@ static BOOL hb_ntxIsRecBad( NTXAREAP pArea, LONG ulRecNo )
    BOOL lResult = FALSE;
 
    if( hb_set.HB_SET_DELETED || pArea->dbfi.itmCobExpr )
+   {
       SELF_GOTO( ( AREAP ) pArea,ulRecNo );
 
-   if( hb_set.HB_SET_DELETED )
-      SUPER_DELETED( ( AREAP ) pArea,&lResult );
+      if( hb_set.HB_SET_DELETED )
+         SUPER_DELETED( ( AREAP ) pArea,&lResult );
 
-   if( !lResult && pArea->dbfi.itmCobExpr )
-   {
-      PHB_ITEM pResult = hb_vmEvalBlock( pArea->dbfi.itmCobExpr );
-      lResult = HB_IS_LOGICAL( pResult ) && !hb_itemGetL( pResult );
+      if( !lResult && pArea->dbfi.itmCobExpr )
+      {
+         PHB_ITEM pResult = hb_vmEvalBlock( pArea->dbfi.itmCobExpr );
+         lResult = HB_IS_LOGICAL( pResult ) && !hb_itemGetL( pResult );
+      }
    }
 
    return lResult;
@@ -2472,6 +2474,7 @@ static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, SHORT* numRecinBuf,
          hb_fsReadLarge( pArea->hDataFile, readBuffer, ulBufLen );
       }
       pArea->pRecord = readBuffer + (*numRecinBuf) * pArea->uiRecordLen;
+      pArea->fValidBuffer = TRUE;
       pArea->fDeleted = ( pArea->pRecord[ 0 ] == '*' );
       pArea->ulRecNo = ulRecNo;
       (*numRecinBuf) ++;
@@ -2519,7 +2522,6 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
    SHORT numRecinBuf = -1;
    USHORT nParts = 0;
    BYTE * pRecordTmp = NULL;
-   BOOL fValidBuffer = FALSE;
    LPTAGINFO pSaveTag = pArea->lpCurTag;
 #ifndef HB_CDP_SUPPORT_OFF
    PHB_CODEPAGE cdpTmp = hb_cdp_page;
@@ -2576,8 +2578,6 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
        ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll ) )
    {
       pRecordTmp = pArea->pRecord;
-      fValidBuffer = pArea->fValidBuffer;
-      pArea->fValidBuffer = TRUE;
       numRecinBuf = 0;
    }
    else
@@ -2719,7 +2719,7 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
    if( numRecinBuf >= 0 )
    {
       pArea->pRecord = pRecordTmp;
-      pArea->fValidBuffer = fValidBuffer;
+      pArea->fValidBuffer = FALSE;
    }
    pArea->lpCurTag = pSaveTag;
 
@@ -3401,6 +3401,11 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
          }
          else
          {
+            /* The pending relation may move the record pointer so we should
+               disable them for KEY/FOR evaluation */
+            LPDBRELINFO lpdbPendingRel = pArea->lpdbPendingRel;
+            pArea->lpdbPendingRel = NULL;
+
             while( pTag )
             {
                pKey = hb_ntxKeyNew( NULL,pTag->KeyLength );
@@ -3462,6 +3467,9 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                pTag = pTag->pNext;
             }
             pArea->fNtxAppend = 0;
+
+            /* Restore disabled pending relation */
+            pArea->lpdbPendingRel = lpdbPendingRel;
          }
          pArea->lpCurTag = lpTagTmp;
       }
@@ -4258,7 +4266,6 @@ static ERRCODE ntxOrderListRebuild( NTXAREAP pArea )
 
    pTag = pArea->lpNtxTag;
    pTagTmp = pArea->lpCurTag;
-   pArea->fValidBuffer = TRUE;
    while( pTag )
    {
       hb_ntxPageFree( pTag,TRUE );

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.182 2005/02/06 20:35:38 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.183 2005/02/08 14:04:51 druzus Exp $
  */
 
 /*
@@ -738,7 +738,8 @@ static LPCDXKEY hb_cdxKeyEval( LPCDXKEY pKey, LPCDXTAG pTag, BOOL fSetWA )
    }
    else if ( HB_IS_BLOCK( pTag->pKeyItem ) )
    {
-      pKey = hb_cdxKeyPutItem( pKey, hb_vmEvalBlock( pTag->pKeyItem ), pArea->ulRecNo, pTag, FALSE, TRUE );
+      PHB_ITEM pItem = hb_vmEvalBlock( pTag->pKeyItem );
+      pKey = hb_cdxKeyPutItem( pKey, pItem, pArea->ulRecNo, pTag, FALSE, TRUE );
    }
    else
    {
@@ -3607,8 +3608,6 @@ static LPCDXTAG hb_cdxTagNew( LPCDXINDEX pIndex, char *szTagName, ULONG TagHdr )
          /* index file is corrupted */
          hb_cdxTagFree( pTag );
          pTag = NULL;
-         hb_cdxErrorRT( pIndex->pArea, EG_CORRUPTION, EDBF_CORRUPT,
-                        pIndex->szFileName, hb_fsError(), EF_CANDEFAULT );
       }
    }
    return pTag;
@@ -6224,6 +6223,7 @@ static ERRCODE hb_cdxGoCold( CDXAREAP pArea )
       LPCDXTAG pTag = pArea->lpIndexes->TagList;
       LPCDXKEY pKey = NULL;
       BOOL fAdd, fDel, fLck = FALSE;
+      LPDBRELINFO lpdbPendingRel;
 
       if ( pArea->fShared )
       {
@@ -6240,6 +6240,12 @@ static ERRCODE hb_cdxGoCold( CDXAREAP pArea )
             pArea->fCdxAppend = FALSE;
          }
       }
+
+      /* The pending relation may move the record pointer so we should
+         disable them for KEY/FOR evaluation */
+      lpdbPendingRel = pArea->lpdbPendingRel;
+      pArea->lpdbPendingRel = NULL;
+
       /* TODO:
        * There is possible race condition here but not very dangerous.
        * To avoid it we should Lock all index file before SUPER_GOCOLD
@@ -6256,6 +6262,7 @@ static ERRCODE hb_cdxGoCold( CDXAREAP pArea )
          if ( !pTag->Custom )
          {
             pKey = hb_cdxKeyEval( pKey, pTag, TRUE );
+
             if ( pTag->pForItem != NULL )
                fAdd = hb_cdxEvalCond ( pArea, pTag->pForItem, TRUE );
             else
@@ -6311,8 +6318,12 @@ static ERRCODE hb_cdxGoCold( CDXAREAP pArea )
                pTag = NULL;
          }
       }
+
       if ( pKey )
          hb_cdxKeyFree( pKey );
+
+      /* Restore disabled pending relation */
+      pArea->lpdbPendingRel = lpdbPendingRel;
    }
 
    return SUCCESS;
@@ -6564,7 +6575,7 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
    FHANDLE hFile;
    char szBaseName[ CDX_MAXTAGNAMELEN ];
    char szSpFile[ _POSIX_PATH_MAX + 1 ], szFileName[ _POSIX_PATH_MAX + 1 ];
-   LPCDXINDEX pIndex, pIndexTmp;
+   LPCDXINDEX pIndex, * pIndexPtr;
    BOOL bRetry;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxOrderListAdd(%p, %p)", pArea, pOrderInfo));
@@ -6583,10 +6594,10 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
 
    if ( pArea->lpIndexes != NULL )
    {
-      pIndexTmp = pArea->lpIndexes;
-      while ( pIndexTmp && ( hb_stricmp( szBaseName, pIndexTmp->pCompound->szName ) != 0 ) )
-         pIndexTmp = pIndexTmp->pNext;
-      if ( pIndexTmp )
+      pIndex = pArea->lpIndexes;
+      while ( pIndex && ( hb_stricmp( szBaseName, pIndex->pCompound->szName ) != 0 ) )
+         pIndex = pIndex->pNext;
+      if ( pIndex )
       {
          /*
           * index already open, do nothing
@@ -6597,7 +6608,7 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
           */
          if ( ! pArea->uiTag )
          {
-            pArea->uiTag = hb_cdxGetTagNumber( pArea, pIndexTmp->TagList );
+            pArea->uiTag = hb_cdxGetTagNumber( pArea, pIndex->TagList );
             SELF_GOTOP( ( AREAP ) pArea );
          }
          return FAILURE;
@@ -6638,21 +6649,18 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
    pIndex->fReadonly  = pArea->fReadonly;
    pIndex->szFileName = hb_strdup( szSpFile );
 
-   if ( pArea->lpIndexes == NULL )
-   {
-      pArea->lpIndexes = pIndex;
-   }
-   else
-   {
-      pIndexTmp = pArea->lpIndexes;
-      while ( pIndexTmp->pNext )
-         pIndexTmp = pIndexTmp->pNext;
-      pIndexTmp->pNext = pIndex;
-   }
+   pIndexPtr = &pArea->lpIndexes;
+   while ( *pIndexPtr != NULL )
+      pIndexPtr = &( *pIndexPtr )->pNext;
+   *pIndexPtr = pIndex;
 
    if ( ! hb_cdxIndexLoad( pIndex, szBaseName ) )
    {
       /* index file is corrupted */
+      *pIndexPtr = NULL;
+      hb_cdxIndexFree( pIndex );
+      hb_cdxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT,
+                     szSpFile, hb_fsError(), EF_CANDEFAULT );
       return FAILURE;
    }
 
@@ -7022,7 +7030,10 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
                /* What should be default? */
                /*
                hb_cdxIndexFree( pIndex );
+               hb_fsClose( hFile );
                hFile = FS_ERROR;
+               hb_cdxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT,
+                              szSpFile, hb_fsError(), EF_CANDEFAULT );
                */
                hb_cdxIndexFreeTags( pIndex );
                fNewFile = TRUE;
@@ -7572,7 +7583,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                else
                   pKey = hb_cdxKeyEval( NULL, pTag, TRUE );
                pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
-                                              hb_cdxTagKeyAdd( pTag, pKey ) );
+                                             hb_cdxTagKeyAdd( pTag, pKey ) );
                hb_cdxIndexUnLockWrite( pTag->pIndex );
                hb_cdxKeyFree( pKey );
             }
@@ -8539,6 +8550,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                iRecBuff = 0;
             }
             pArea->pRecord = pSort->pRecBuff + iRecBuff * pArea->uiRecordLen;
+            pArea->fValidBuffer = TRUE;
             pArea->ulRecNo = ulRecNo;
             pArea->fDeleted = ( pArea->pRecord[ 0 ] == '*' );
             iRecBuff++;
