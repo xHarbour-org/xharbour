@@ -54,7 +54,7 @@ METHOD SetBrowserData(oObj) CLASS ObjInspect
    ::Browser:source := __ObjGetValueList( oObj, NIL, HB_OO_CLSTP_EXPORTED )
    aSort( ::Browser:source,,, {|x,y| x[1] < y[1] } )
    aEval( ::Browser:source,{|a|a[1]:=Proper( a[1] )} )
-   ::Browser:RefreshAll()
+  ::Browser:RefreshAll()
 return(self)
 
 METHOD OnCreate() CLASS ObjInspect
@@ -102,12 +102,27 @@ METHOD OnCreate() CLASS ObjInspect
 
 return( super:OnCreate() )
 
+//----------------------------------------------------------------------------------------------
+
 METHOD SaveVar(cText) CLASS ObjInspect
-   
-   __objSendMsg( ::CurObject, "_"+::Browser:source[::Browser:RowPos][1], cText ) 
-   ::Browser:source[::Browser:RowPos][2]:= cText 
+   local cType, cVar
+   cVar := ::Browser:source[::Browser:RecPos][1]
+   cType:= valtype( __objSendMsg( ::CurObject, cVar ) )
+   view ::Browser:RecPos
+   do case
+      case cType == 'N'
+           cText:=VAL(cText)
+      case cType == 'U'
+           cText:=NIL
+      case cType == 'L'
+           cText:= IIF( cText == ".T.",.T.,.F.)
+   endcase
+   __objSendMsg( ::CurObject, "_"+cVar, cText ) 
+   ::Browser:source[::Browser:RecPos][2]:= cText 
    ::Browser:RefreshCurrent()
    ::CurObject:Update()
+   ::CurObject:SetFocus()
+   SetFocus( ::Browser:hWnd)
 return(self)
 
 //----------------------------------------------------------------------------------------------
