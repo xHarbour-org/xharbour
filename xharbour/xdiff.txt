@@ -1,5 +1,18 @@
-As it stands at this point, xHarbour offers many syntax
-extensions over Harbour and Clipper, including:
+xHarbour offers many syntax extensions over Harbour and Clipper, including:
+
+ASSOCIATE CLASS:
+----------------
+The ASSOCIATE CLASS syntax allows the xHarbour developer to replace the
+standard classes for native types with any alternative class, including
+classes dervied from the standard classes.
+
+   Syntax:
+   -------
+
+   ASSOCIATE CLASS <ClassName> WITH TYPE
+             ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NIL|NUMERIC|POINTER
+
+For sample usage please review tests\associat.prg
 
 OVERRIDE CLASS:
 ---------------
@@ -23,6 +36,7 @@ class (including native type classes) using the flowwing syntax:
    EXTEND CLASS <SomeClass> WITH METHOD <SomeFunc>
    EXTEND CLASS <SomeClass> WITH METHOD <SomeFunc>
    EXTEND CLASS <SomeClass> WITH MESSAGE <SomeMessage> METHOD <SomeFunc>
+   EXTEND CLASS <SomeClass> WITH MESSAGE <SomeMessage> INLINE <SomeCode>
 
 For sample usage please review tests\extend.prg
 
@@ -32,13 +46,14 @@ EXTENDABLE Native Types:
 
 Native xHarbour types may be extended using the following syntax:
 
-   EXTEND [TYPE] ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NUMERIC|POINTER
+   EXTEND [TYPE] ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NIL|NUMERIC|POINTER
    WITH METHOD <SomeFunc>
 
-or:
-
-   EXTEND [TYPE] ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NUMERIC|POINTER
+   EXTEND [TYPE] ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NIL|NUMERIC|POINTER
    WITH MESSAGE <SomeMessage> METHOD <SomeFunc>
+
+   EXTEND [TYPE] ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NIL|NUMERIC|POINTER
+   WITH MESSAGE <SomeMessage> INLINE <SomeCode>
 
 The above will then allow utilization of native types as OOP Objects with
 regard to the specified method[s].
@@ -54,7 +69,7 @@ NATIVE Types as OOP objects:
 
 You may usee the following syntax to anable OOP support for native types:
 
-   ENABLE TYPE CLASS ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NUMERIC|POINTER
+   ENABLE TYPE CLASS ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NIL|NUMERIC|POINTER
 
 The above will allow usage as follow:
 

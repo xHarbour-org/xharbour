@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3229 2004/07/28 22:50:00 peterrees Exp $
+ * $Id: ChangeLog,v 1.3230 2004/07/28 23:27:52 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-28 23:42 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xdiff.txt
+    * Updated to include NIL in native type related extensions.
+    + Added description for ASSOCIATE CLASS syntax.
 
 2004-07-29 01:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbapi.h
