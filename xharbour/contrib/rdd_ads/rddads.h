@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.10 2002/09/28 05:01:20 horacioroldan Exp $
+ * $Id: rddads.h,v 1.11 2002/10/14 07:19:27 brianhays Exp $
  */
 
 /*
@@ -113,6 +113,7 @@ typedef struct _ADSAREA_
    ADSHANDLE hTable;
    ADSHANDLE hOrdCurrent;
    ADSHANDLE hStatement;
+   int iFileType;                /* adt/cdx/ntx */
 } ADSAREA;
 
 typedef ADSAREA * ADSAREAP;

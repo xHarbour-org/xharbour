@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.120 2002/10/03 07:51:30 brianhays Exp $
+ * $Id: ads1.c,v 1.124 2002/12/17 18:52:51 brianhays Exp $
  */
 
 /*
@@ -69,14 +69,17 @@
 static ERRCODE adsRecCount(  ADSAREAP pArea, ULONG * pRecCount );
 static ERRCODE adsScopeInfo( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem );
 static ERRCODE adsSetScope(  ADSAREAP pArea, LPDBORDSCOPEINFO sInfo );
+static iSetListenerHandle;
 
 HB_FUNC( _ADS );
 HB_FUNC( ADS_GETFUNCTABLE );
 
-extern int adsFileType;
+extern int adsFileType;                 /* current global setting */
 extern int adsLockType;
 extern int adsRights;
 extern int adsCharType;
+extern BOOL bDictionary;
+extern ADSHANDLE adsConnectHandle;
 
 #ifdef HB_PCODE_VER
    #undef HB_PRG_PCODE_VER
@@ -101,6 +104,48 @@ HB_INIT_SYMBOLS_END( ads1__InitSymbols )
 #endif
 
 static RDDFUNCS adsSuper = { NULL };
+
+void adsSetListener_callback( HB_set_enum setting, HB_set_listener_enum when )
+{
+   HB_TRACE(HB_TR_DEBUG, ("adsSetListener_callback (%d  %d)", setting, when));
+   if ( when == HB_SET_LISTENER_AFTER )  /* we don't do anything with BEFORE calls */
+   {
+      switch ( setting )
+      {
+         case HB_SET_DATEFORMAT :
+            AdsSetDateFormat( (UNSIGNED8*) hb_set.HB_SET_DATEFORMAT );
+            break;
+         case HB_SET_DEFAULT    :
+            AdsSetDefault( (UNSIGNED8*) hb_set.HB_SET_DEFAULT );
+            break;
+         case HB_SET_DELETED    :
+            AdsShowDeleted( ! hb_set.HB_SET_DELETED );
+            break;
+         case HB_SET_EPOCH      :
+            AdsSetEpoch( hb_set.HB_SET_EPOCH );
+            break;
+         case HB_SET_EXACT      :
+            AdsSetExact( hb_set.HB_SET_EXACT );
+            break;
+         case HB_SET_PATH       :
+            AdsSetSearchPath( (UNSIGNED8*) hb_set.HB_SET_PATH );
+            break;
+
+/* Possible TODO?
+         case HB_SET_MFILEEXT   :
+            if( hb_set.HB_SET_MFILEEXT ) hb_retc( hb_set.HB_SET_MFILEEXT );
+            break;
+         case HB_SET_STRICTREAD :
+            hb_retl( hb_set.HB_SET_STRICTREAD );
+            break;
+
+*/
+      }
+   }
+
+}
+
+
 
 static void commonError( ADSAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char* filename )
 {
@@ -785,6 +830,7 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
                pFieldInfo.uiType = HB_IT_LONG;
                pFieldInfo.uiTypeExtended = ADS_DOUBLE;
                pFieldInfo.uiLen = 8;
+               pFieldInfo.uiDec = uiDec;
             }
             else
                return FAILURE;
@@ -1043,6 +1089,8 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    DOUBLE     dVal;
 
    HB_TRACE(HB_TR_DEBUG, ("adsGetValue(%p, %hu, %p)", pArea, uiIndex, pItem));
+
+   dVal = 0;
 
    if( uiIndex > pArea->uiFieldCount )
       return FAILURE;
@@ -1508,7 +1556,7 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       }
 
       case DBI_TABLEEXT:
-         hb_itemPutC( pItem, ((adsFileType==ADS_ADT) ? ".adt" : ".dbf") );
+         hb_itemPutC( pItem, ((pArea->iFileType==ADS_ADT) ? ".adt" : ".dbf") );
          break;
 
       case DBI_FULLPATH :
@@ -1531,8 +1579,8 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_MEMOEXT:
-         hb_itemPutC( pItem, ((adsFileType==ADS_ADT) ? ".adm" :
-                                (adsFileType==ADS_CDX) ? ".fpt" : ".dbt") );
+         hb_itemPutC( pItem, ((pArea->iFileType==ADS_ADT) ? ".adm" :
+                                (pArea->iFileType==ADS_CDX) ? ".fpt" : ".dbt") );
          break;
 
 /* TODO ... */
@@ -1571,7 +1619,9 @@ static ERRCODE adsNewArea( ADSAREAP pArea )
    /* Size for deleted records flag */
    pArea->uiRecordLen = 1;
 
-   pArea->uiMaxFieldNameLength = (adsFileType == ADS_ADT) ? ADS_MAX_FIELD_NAME : ADS_MAX_DBF_FIELD_NAME;
+   pArea->uiMaxFieldNameLength = (pArea->iFileType == ADS_ADT) ? ADS_MAX_FIELD_NAME : ADS_MAX_DBF_FIELD_NAME;
+   pArea->iFileType = adsFileType;
+
    return SUCCESS;
 }
 
@@ -1601,8 +1651,15 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       pArea->hStatement = 0;
       pArea->hOrdCurrent = 0;
 
-      ulRetVal = AdsOpenTable  ( 0, pOpenInfo->abName, pOpenInfo->atomAlias,
-                  adsFileType, adsCharType, adsLockType, adsRights,
+      if (bDictionary)
+         ulRetVal = AdsOpenTable  ( adsConnectHandle, pOpenInfo->abName, pOpenInfo->atomAlias,
+                  ADS_DEFAULT, adsCharType, adsLockType, adsRights,
+                  ( (pOpenInfo->fShared) ? ADS_SHARED : ADS_EXCLUSIVE ) |
+                  ( (pOpenInfo->fReadonly) ? ADS_READONLY : ADS_DEFAULT ),
+                   &hTable);
+      else
+         ulRetVal = AdsOpenTable  ( 0, pOpenInfo->abName, pOpenInfo->atomAlias,
+                  pArea->iFileType, adsCharType, adsLockType, adsRights,
                   ( (pOpenInfo->fShared) ? ADS_SHARED : ADS_EXCLUSIVE ) |
                   ( (pOpenInfo->fReadonly) ? ADS_READONLY : ADS_DEFAULT ),
                    &hTable);
@@ -1941,6 +1998,10 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
 
    HB_TRACE(HB_TR_DEBUG, ("adsOrderCreate(%p, %p)", pArea, pOrderInfo));
 
+   if( !pArea->lpdbOrdCondInfo || ( pArea->lpdbOrdCondInfo->fAll &&
+                                    !pArea->lpdbOrdCondInfo->fAdditive ) )
+      SELF_ORDLSTCLEAR( ( AREAP ) pArea );
+
    if( !pOrderInfo->abBagName || *(pOrderInfo->abBagName) == '\0' )
       ulOptions = ADS_COMPOUND;
    else
@@ -1987,6 +2048,19 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
    {
       hTableOrIndex = pArea->hTable;
    }
+   if( pArea->lpdbOrdCondInfo && pArea->lpdbOrdCondInfo->abWhile )
+   {
+      if( pucWhile[0] )
+      {
+         strcat( (char * ) pucWhile, ".AND.(");
+         strcat( (char * ) pucWhile, (char * ) pArea->lpdbOrdCondInfo->abWhile );
+         strcat( (char * ) pucWhile, ")");
+      }
+      else
+         strcat( (char * ) pucWhile, (char * ) pArea->lpdbOrdCondInfo->abWhile );
+      if ( pArea->hOrdCurrent )
+         hTableOrIndex = pArea->hOrdCurrent;
+   }
 
    if ( pArea->lpdbOrdCondInfo )
    {
@@ -2009,6 +2083,20 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       return FAILURE;
    }else
       pArea->hOrdCurrent = phIndex;
+
+   if( pArea->lpdbOrdCondInfo && !pArea->lpdbOrdCondInfo->fAll &&
+                                 !pArea->lpdbOrdCondInfo->fAdditive )
+   {
+      ADSHANDLE ahIndex[50];
+      UNSIGNED16 pusArrayLen = 50;
+
+      SELF_ORDLSTCLEAR( ( AREAP ) pArea );
+      ulRetVal = AdsOpenIndex( pArea->hTable,
+        (UNSIGNED8*) pOrderInfo->abBagName, ahIndex, &pusArrayLen );
+      if( ulRetVal != AE_SUCCESS  && ulRetVal != AE_INDEX_ALREADY_OPEN)
+          return FAILURE;
+      pArea->hOrdCurrent = ahIndex[0];
+   }
 
    return adsGoTop( pArea );
 }
@@ -2154,14 +2242,17 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
                   break;
 
                case ADS_NUMERIC:
-                  if ( adsFileType == ADS_NTX )  /* TODO: This should be a table-specific switch */
+                  if ( pArea->iFileType == ADS_NTX )
                   {
                      if ( aucBuffer[0] == '-' || aucBuffer[0] == ',')      /* negative number encoding */
                      {
                         pus16 = 0;
                         while ( pus16 < pusLen && aucBuffer[pus16] == ',') /* leading zeros were set as commas for sorting */
                            aucBuffer[pus16++] = '0';
-                        if ( aucBuffer[pus16] == '-' ) pus16++;            /* skip past the minus */
+
+                        if ( aucBuffer[pus16] == '-' )
+                           pus16++;            /* skip past the minus */
+
                         while ( pus16 < pusLen )
                            aucBuffer[pus16] = (SIGNED8) 0x5C - aucBuffer[pus16++];
 
@@ -2246,7 +2337,7 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
 
       case DBOI_BAGEXT:
          hb_itemPutC( pOrderInfo->itmResult,
-                ((adsFileType==ADS_ADT) ? ".adi" : (adsFileType==ADS_CDX) ? ".cdx" : ".ntx") );
+                ((pArea->iFileType==ADS_ADT) ? ".adi" : (pArea->iFileType==ADS_CDX) ? ".cdx" : ".ntx") );
          break;
 
       case DBOI_ORDERCOUNT:
@@ -2501,7 +2592,7 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
 static ERRCODE adsSetScope( ADSAREAP pArea, LPDBORDSCOPEINFO sInfo )
 {
    UNSIGNED16 usDataType = ADS_STRINGKEY ;
-   BOOL bTypeError ;
+   /* BOOL bTypeError ; */
    UNSIGNED8 *pucScope;
    HB_TRACE(HB_TR_DEBUG, ("adsSetScope(%p, %p)", pArea, sInfo));
 
@@ -2518,7 +2609,7 @@ static ERRCODE adsSetScope( ADSAREAP pArea, LPDBORDSCOPEINFO sInfo )
             case ADS_STRING:
                if ( sInfo->scopeValue->type == HB_IT_STRING )
                {
-                  bTypeError = FALSE;
+                  /* bTypeError = FALSE; */
                   pucScope = (UNSIGNED8*) hb_itemGetCPtr( sInfo->scopeValue );
                   AdsSetScope( pArea->hOrdCurrent, (sInfo->nScope + 1), /*ADS top/bottom are 1,2 instead of 0,1*/
                      (UNSIGNED8*) pucScope,
@@ -2531,7 +2622,7 @@ static ERRCODE adsSetScope( ADSAREAP pArea, LPDBORDSCOPEINFO sInfo )
                if ( sInfo->scopeValue->type & HB_IT_NUMERIC )
                {
                   double dTemp;
-                  bTypeError = FALSE;
+                  /* bTypeError = FALSE; */
                   dTemp = hb_itemGetND( sInfo->scopeValue );
                   usDataType = ADS_DOUBLEKEY ;
                   AdsSetScope( pArea->hOrdCurrent, (sInfo->nScope + 1), /*ADS top/bottom are 1,2 instead of 0,1*/
@@ -2545,7 +2636,7 @@ static ERRCODE adsSetScope( ADSAREAP pArea, LPDBORDSCOPEINFO sInfo )
                if ( sInfo->scopeValue->type == HB_IT_DATE )
                {
                   double dTemp;
-                  bTypeError = FALSE;
+                  /* bTypeError = FALSE; */
                   dTemp = hb_itemGetDL( sInfo->scopeValue ) ;
                   usDataType = ADS_DOUBLEKEY ;
                   AdsSetScope( pArea->hOrdCurrent, (sInfo->nScope + 1),
@@ -2743,6 +2834,9 @@ BOOL adsExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex )
 static ERRCODE adsExit( void )
 {
    AdsApplicationExit();
+   if ( iSetListenerHandle )
+      hb_setListenerRemove( iSetListenerHandle ) ;
+
    return SUCCESS;
 }
 
@@ -2857,11 +2951,14 @@ HB_FUNC( ADS_GETFUNCTABLE )
    uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
    * uiCount = RDDFUNCSCOUNT;
 
-   HB_TRACE(HB_TR_DEBUG, ("ADS_GETFUNCTABLE(%i, %p)", uiCount, pTable));
+   HB_TRACE(HB_TR_DEBUG, ("ADS_GETFUNCTABLE(%i, %p)", *uiCount, pTable));
 
    pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
    if( pTable )
+   {
+      iSetListenerHandle = hb_setListenerAdd( adsSetListener_callback );
       hb_retni( hb_rddInherit( pTable, &adsTable, &adsSuper, 0 ) );
+   }
    else
        hb_retni( FAILURE );
 }
