@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.101 2004/03/30 05:55:35 druzus Exp $
+ * $Id: dbcmd.c,v 1.102 2004/03/31 15:38:59 walito Exp $
  */
 
 /*
@@ -400,7 +400,6 @@ static int hb_rddRegister( char * szDriver, USHORT uiType )
  */
 ERRCODE HB_EXPORT hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNCS pSuperTable, BYTE * szDrvName )
 {
-   char * szSuperName;
    LPRDDNODE pRddNode;
    USHORT uiCount;
    DBENTRYP_V * pFunction, * pSubFunction;
@@ -421,11 +420,9 @@ ERRCODE HB_EXPORT hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNC
    }
    else
    {
-      szSuperName = ( char * ) hb_xgrab( uiCount + 1 );
-      hb_strncpyUpper( szSuperName, ( char * ) szDrvName, uiCount );
+      char szSuperName[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
+      hb_strncpyUpper( szSuperName, ( char * ) szDrvName, HB_MIN( uiCount, HARBOUR_MAX_RDD_DRIVERNAME_LENGTH ) );
       pRddNode = hb_rddFindNode( szSuperName, NULL );
-
-      hb_xfree( szSuperName );
 
       if( !pRddNode )
       {
@@ -1368,7 +1365,7 @@ HB_FUNC( __DBCONTINUE )
    HB_THREAD_STUB
    AREAP pArea = HB_CURRENT_WA;
 
-   if( pArea )
+   if( !pArea )
    {
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBCONTINUE" );
       return;
@@ -1394,7 +1391,7 @@ HB_FUNC( DBCREATE )
 {
    HB_THREAD_STUB
    char * szDriver;
-   char cDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH ];
+   char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
    char szAliasTmp[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
    char szFileName[ _POSIX_PATH_MAX + 1 ], szSavedFileName[ _POSIX_PATH_MAX + 1 ];
@@ -1469,8 +1466,8 @@ HB_FUNC( DBCREATE )
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
       }
 
-      hb_strncpyUpper( cDriverBuffer, hb_parcx( 3 ), uiLen );
-      szDriver = cDriverBuffer;
+      hb_strncpyUpper( szDriverBuffer, hb_parcx( 3 ), uiLen );
+      szDriver = szDriverBuffer;
    }
    else
    {
@@ -1478,9 +1475,8 @@ HB_FUNC( DBCREATE )
    }
 
    pFileName = hb_fsFNameSplit( szFileName );
-   // strncpy( szAlias, hb_parcx( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
-   szAlias[0] = '\0';
 
+   szAlias[0] = '\0';
    if( ISCHAR(5) )
    {
       strncat( szAlias, hb_parcx( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
@@ -1518,8 +1514,8 @@ HB_FUNC( DBCREATE )
       bOpen = bCurr = FALSE;
       /*
        * 0 means chose first available in hb_rddInsertAreaNode()
-       * This hack is necassary to avoid race condition in MT
-       * if we don't want to lock whole RDD subsytem, Druzus
+       * This hack is necessary to avoid race condition in MT
+       * if we don't want to lock whole RDD subsystem, Druzus
        */
       hb_rddSelectWorkAreaNumber( 0 );
    }
@@ -1610,11 +1606,11 @@ HB_FUNC( DBCREATE )
    {
       if ( !bCurr )
       {
-        /*
-         * 0 means chose first available in hb_rddInsertAreaNode()
-         * This hack is necassary to avoid race condition in MT
-         * if we don't want to lock whole RDD subsytem, Druzus
-         */
+         /*
+          * 0 means chose first available in hb_rddInsertAreaNode()
+          * This hack is necessary to avoid race condition in MT
+          * if we don't want to lock whole RDD subsystem, Druzus
+          */
          hb_rddSelectWorkAreaNumber( 0 );
       }
       bOpen = FALSE;
@@ -2370,6 +2366,13 @@ HB_FUNC( DBUSEAREA )
 
    s_bNetError = FALSE;
 
+   /* New area? */
+   if( ! hb_parl( 1 ) && HB_CURRENT_WA )
+   {
+      /* If current WorkArea is in use then close it */
+      hb_rddReleaseCurrentArea();
+   }
+
    uiLen = ( USHORT ) hb_parclen( 2 );
 
    if( ISCHAR(2) && ( uiLen > 0 ) )
@@ -2444,14 +2447,10 @@ HB_FUNC( DBUSEAREA )
    {
       /*
        * 0 means chose first available in hb_rddInsertAreaNode()
-       * This hack is necassary to avoid race condition in MT
-       * if we don't want to lock whole RDD subsytem, Druzus
+       * This hack is necessary to avoid race condition in MT
+       * if we don't want to lock whole RDD subsystem, Druzus
        */
       hb_rddSelectWorkAreaNumber( 0 );
-   }
-   else if( HB_CURRENT_WA )     /* If current WorkArea is in use then close it */
-   {
-      hb_rddReleaseCurrentArea();
    }
    /* Create a new WorkArea node */
    if( ! hb_rddInsertAreaNode( szDriver ) )
@@ -2462,8 +2461,8 @@ HB_FUNC( DBUSEAREA )
    }
    pArea = HB_CURRENT_WA;
 
-   szFileName[ 0 ] = szFileName[ _POSIX_PATH_MAX ] = '\0';
-   strncat( szFileName, hb_parcx( 3 ), _POSIX_PATH_MAX );
+   szFileName[ _POSIX_PATH_MAX ] = '\0';
+   strncpy( szFileName, hb_parcx( 3 ), _POSIX_PATH_MAX );
 
    if( ! pFileName->szExtension )
    {
@@ -3642,8 +3641,7 @@ HB_FUNC( RDDSETDEFAULT )
          hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "RDDSETDEFAULT" );
          return;
       }
-      strncpy( s_szDefDriver, szNewDriver, uiLen );
-      s_szDefDriver[ uiLen ] = '\0';
+      strcpy( s_szDefDriver, szNewDriver );
    }
 }
 
@@ -3671,7 +3669,7 @@ HB_FUNC( DBSETDRIVER )
          hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBSETDRIVER" );
          return;
       }
-      strncpy( s_szDefDriver, szNewDriver, uiLen );
+      strcpy( s_szDefDriver, szNewDriver );
    }
 }
 
@@ -4289,7 +4287,7 @@ static AREAP GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, 
    /*
     * 0 means chose first available in hb_rddInsertAreaNode()
     * This hack is necessary to avoid race condition in MT
-    * if we don't want to lock whole RDD subsytem, Druzus
+    * if we don't want to lock whole RDD subsystem, Druzus
     */
    hb_rddSelectWorkAreaNumber( 0 );
    /* create new area */
@@ -4420,8 +4418,8 @@ static AREAP GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, 
       hb_rddReleaseCurrentArea();
       /*
        * 0 means chose first available in hb_rddInsertAreaNode()
-       * This hack is necassary to avoid race condition in MT
-       * if we don't want to lock whole RDD subsytem, Druzus
+       * This hack is necessary to avoid race condition in MT
+       * if we don't want to lock whole RDD subsystem, Druzus
        */
       hb_rddSelectWorkAreaNumber( 0 );
       if ( ! hb_rddInsertAreaNode( szDriver ) )
@@ -4683,13 +4681,14 @@ HB_FUNC( DBUSEAREAD )
       hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREA" );
       return;
    }
-   szFileName[ _POSIX_PATH_MAX ] = '\0';
+
    strncpy( szFileName, hb_parcx( 3 ), _POSIX_PATH_MAX );
+   szFileName[ _POSIX_PATH_MAX ] = '\0';
 
    pFileName = hb_fsFNameSplit( szFileName );
    strncpy( szAlias, hb_parcx( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
-
    szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH ] = '\0';
+
    if( strlen( szAlias ) == 0 )
       strncpy( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
 

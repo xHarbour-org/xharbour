@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2702 2004/03/31 19:29:44 likewolf Exp $
+ * $Id: ChangeLog,v 1.2703 2004/03/31 20:13:34 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-31 23:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbcmd.c
+    ! fixed __DBCONTINUE and some unterminated strings - thanks Walter.
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed scope setting for descending orders when there was more
+      keys with the same value as scope one
+
 2004-04-01 03:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * tests/pp_harb.ch
     ! put function protoypes hb_hrbAsmCreateFun() under extern "C"
