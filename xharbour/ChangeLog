@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3524 2004/10/22 18:50:38 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3525 2004/10/22 20:36:39 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -279,7 +279,6 @@
     source/ct/Makefile
     ! updated to add getsecrt.prg
 
->>>>>>> 1.3496
 2004-10-05 19:03 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/pp/ppcore.c
     + Added few missing buffer overrun protection checks.
