@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.2 2002/01/12 10:04:27 ronpinkas Exp $
+ * $Id: hbsetup.h,v 1.3 2002/05/16 02:28:38 ronpinkas Exp $
  */
 
 /*
@@ -298,7 +298,7 @@
 #endif
 
 #ifndef HB_OS_WIN_32
-   #if defined(WINNT) || defined(_Windows) || defined(__NT__) || defined(_WIN32) || defined(_WINDOWS_) || defined(__WINDOWS_386__) || defined(__WIN32__) || defined(__CYGWIN__)
+   #if defined(WINNT) || defined(_Windows) || defined(__NT__) || defined(_WIN32) || defined(_WINDOWS_) || defined(__WINDOWS_386__) || defined(__WIN32__) || defined(_MSC_VER) || defined(__CYGWIN__)
       #define HB_OS_WIN_32
    #endif
 #endif

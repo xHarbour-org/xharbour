@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.6 2002/03/10 18:44:42 lculik Exp $
+ * $Id: hbapifs.h,v 1.7 2002/03/16 00:34:13 ronpinkas Exp $
  */
 
 /*
@@ -187,6 +187,10 @@ extern USHORT    hb_fsAttrFromRaw( ULONG raw_attr );
 extern ULONG     hb_fsAttrToRaw( USHORT uiAttr );
 extern USHORT    hb_fsAttrEncode( const char * szAttr );
 extern char *    hb_fsAttrDecode( USHORT uiAttr, char * szAttr );
+
+#ifdef HB_OS_WIN_32
+   extern int WintoDosError( unsigned long lError);
+#endif
 
 #if defined(HB_EXTERN_C)
 }
