@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipString.h $
 // $Archive: /ZipArchive_STL/ZipString.h $
-// $Date: 2003/09/12 20:12:35 $ $Author: paultucker $
+// $Date: 2003/10/19 17:52:54 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -29,7 +29,7 @@
 	system locale) or e.g. std::locale::global(std::locale("French"))
 	( to set it to a specified value); setlocale() function is not sufficient here.
 */
-
+#define _USE_OLD_RW_STL
 
 #include <string>
 #include <algorithm>
