@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2563 2004/03/12 14:06:06 patrickmast Exp $
+ * $Id: ChangeLog,v 1.2564 2004/03/12 18:19:58 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,7 @@
 
 2004-03-12 10:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/win32ole.prg
-    - Removed redundant and wrong case HB_IT_NUMERIC:
+    - Removed redundant and wrong case HB_IT_NUMERIC: (thanks to input from Mindaugas Kavaliauskas)
     + Added missing support for LONGLONG
 
 2004-03-12 15:11 UTC+0100 Patrick Mast <patrick@xHarbour.com>
