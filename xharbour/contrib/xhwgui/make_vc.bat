@@ -9,13 +9,20 @@ if not exist lib\vc md lib\vc
 
 :BUILD
 
+rem why?
+   set _Cf_=%CFLAGS%
    SET CFLAGS=-D__EXPORT__ -DHB_API_MACROS -DHB_STACK_MACROS -DHB_FM_STATISTICS_OFF
+
    nmake /Fmakefile.vc %1 %2 %3 > make_vc.log
+
+   SET CFLAGS=%_CF_%
+   SET _CF_=
+
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
 
-   copy lib\vc\*.lib ..\..\lib
+   copy lib\vc\*.lib ..\..\lib >nul
    goto EXIT
 
 :BUILD_ERR
