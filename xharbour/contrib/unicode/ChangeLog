@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6 2004/01/19 22:00:50 andijahja Exp $
+ * $Id: ChangeLog,v 1.7 2004/02/02 12:40:17 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,8 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-03 04:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * contrib/unicode/hbencode.c
+     ! optimization on YYENNCODE_FILE*() functions
+
 2004-02-02 19:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-   + contrib/unicode/hbencode.c
+   * contrib/unicode/hbencode.c
      ! corrections on YYENCODE_FILE() and YYENCODE_FILE_BY_CHUNK() functions:
        * fix wrong file size when file name supplied with path
        * change run time error codes

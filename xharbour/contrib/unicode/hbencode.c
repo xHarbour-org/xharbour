@@ -1,5 +1,5 @@
 /*
- * $Id: hbencode.c,v 1.1 2004/02/02 10:12:40 andijahja Exp $
+ * $Id: hbencode.c,v 1.2 2004/02/02 12:40:17 andijahja Exp $
  */
 
 /*
@@ -324,7 +324,6 @@ static int yEncode(FILE * fDes, char * postname, FILE * fSrc, long filelen, int 
       // This does not yet support the full crc32 for the entire file
       fprintf(fDes,"=yend size=%ld part=%d pcrc32=%08lx \r\n",filelen,part,crc_val ^ 0xFFFFFFFF);
    }
-   // if (part==lastpart) print("Last part encoded\r\n"); // Only dummy
 
    return(0);
 }
@@ -476,7 +475,7 @@ static int b64encode_file_by_chunk ( BYTE *strIn, BYTE *strOut, ULONG lines )
       return -3;
    }
 
-   sprintf( cfile, "%s%d.b64", strOut, filenumber );
+   sprintf( cfile, "%s%02d.b64", strOut, filenumber );
 
    infile = fopen( (char*) strIn, "rb");
 
@@ -533,7 +532,7 @@ static int b64encode_file_by_chunk ( BYTE *strIn, BYTE *strOut, ULONG lines )
             fclose( outfile );
             filenumber ++;
             *cfile = '\0';
-            sprintf( cfile, "%s%d.b64", strOut, filenumber );
+            sprintf( cfile, "%s%02d.b64", strOut, filenumber );
             outfile = fopen ( cfile, "wb");
 
             if ( !outfile )
@@ -649,7 +648,7 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
       return -1;
    }
 
-   sprintf( cfile, "%s%d.uue", sMask, filenumber );
+   sprintf( cfile, "%s%02d.uue", sMask, filenumber );
 
    fpOutFile = fopen ( cfile, "wb" );
 
@@ -683,7 +682,7 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
         nlinedone = -1;
         filenumber ++;
 
-        sprintf( cfile, "%s%d.uue", sMask, filenumber );
+        sprintf( cfile, "%s%02d.uue", sMask, filenumber );
 
         fpOutFile = fopen ( cfile, "wb");
 
@@ -924,7 +923,7 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
    FILE * fDes;
    FILE * fSrc;
    LONG filelen;
-   LONG nBytes;
+   LONG nBytes = 0;
    LONG nTotalEncoded = 0;
    PHB_FNAME pFileName;
    PHB_ITEM pIn   = hb_param(1,HB_IT_STRING);
@@ -934,8 +933,7 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
    char pszFileName[ _POSIX_PATH_MAX ];
    char *cMask;
    USHORT iPart = 1;
-   int iResult;
-   BOOL bFirst = FALSE;
+   int iResult = 0;
 
    if ( !pIn )
    {
@@ -945,6 +943,11 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
    if ( !pLine )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 8006, NULL, "YYENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
+
+   if ( pLine->item.asLong.value < 5 )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 8006, "Value too small", "YYENCODE_FILE_BY_CHUNK", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 
    pFileName = hb_fsFNameSplit(pIn->item.asString.value);
@@ -960,74 +963,58 @@ HB_FUNC( YYENCODE_FILE_BY_CHUNK )
       cMask = pOut->item.asString.value;
    }
 
-   sprintf( szYYEFileName, "%s%i%s", cMask, iPart,".yye" );
-
    fSrc = fopen( pIn->item.asString.value, "rb" );
 
    if ( !fSrc )
    {
+      hb_xfree( pFileName );
       hb_retni( -1 );
       return;
    }
 
-   fDes = fopen( szYYEFileName, "wb" );
-
-   if ( !fDes )
+   do
    {
-      fclose( fSrc );
-      hb_retni( -2 );
-      return;
-   }
+      nTotalEncoded += nBytes;
 
-   while ( TRUE )
-   {
-      if ( !bFirst )
+      /*
+      This (nBytes) is a rough calculation of bytes to be written based on the
+      supplied line number per chunk. YYencoded line is 130 bytes while the
+      header is 50 bytes and the footer is 50 bytes, makes it 100
+      */
+
+      nBytes = (( pLine->item.asLong.value * 130 ) + 100 );
+
+      if (( nTotalEncoded + nBytes ) > filelen )
       {
-         /*
-         This is a rough calculation of bytes to be written based on the supplied
-         line number per chunk. YYencoded line is 130 bytes while the header is
-         50 bytes and the footer is 50 bytes, makes it 100
-         */
-
-         nBytes = (( pLine->item.asLong.value * 130 ) + 100 );
-         iResult = yEncode( fDes, pszFileName, fSrc, nBytes, iPart, filelen );
-         bFirst = TRUE;
+         nBytes = filelen - nTotalEncoded;
       }
 
-      if ( iResult == 0 )
+      if ( nBytes )
       {
-         fclose( fDes );
+         sprintf( szYYEFileName, "%s%02d%s", cMask, iPart,".yye" );
+         fDes = fopen( szYYEFileName, "wb");
 
-         if ( nTotalEncoded < filelen )
+         if ( fDes )
          {
+            iResult = yEncode( fDes, pszFileName, fSrc, nBytes, iPart, filelen );
+            fclose( fDes );
+
+            if ( iResult != 0 )
+            {
+               break;
+            }
+
             iPart ++;
-            nTotalEncoded += nBytes;
-
-            nBytes = (( pLine->item.asLong.value * 130 ) + 100 );
-
-            if (( nTotalEncoded + nBytes ) > filelen )
-            {
-               nBytes = filelen - nTotalEncoded;
-            }
-
-            if ( nBytes )
-            {
-               sprintf( szYYEFileName, "%s%i%s", cMask, iPart,".yye" );
-               fDes = fopen( szYYEFileName, "wb");
-               iResult = yEncode( fDes, pszFileName, fSrc, nBytes, iPart, filelen );
-            }
-
          }
          else
          {
+            iResult = -2;
             break;
          }
       }
-      else
-      {
-         break;
-      }
-   }
+   } while ( nTotalEncoded < filelen );
+
+   fclose( fSrc );
 
    hb_retni( iResult ) ;
 
