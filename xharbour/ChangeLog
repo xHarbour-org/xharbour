@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.964 2003/04/18 01:54:46 lculik Exp $
+ * $Id: ChangeLog,v 1.965 2003/04/18 18:30:47 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-04-19 00:08 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/gtsln/kbsln.c
+    - Remove hard coded ^? (0x7f) == K_BS
+
 2003-04-18 20:23 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
-  * source/rtl/trpc.prg
-  * source/rtl/trpccli.prg
-    + Added some accessor to get the internet error of a connection
 
   * source/rtl/gtsln/kbsln.c
     + added support for linux X backspace standard key (^? = 0x7f)

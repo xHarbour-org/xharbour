@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.6 2002/11/20 01:34:16 lculik Exp $
+ * $Id: kbsln.c,v 1.7 2003/04/18 18:30:54 jonnymind Exp $
  */
 
 /*
@@ -404,13 +404,6 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
         return( tmp );
     }
 
-#ifdef __linux__
-   /* for Linux console xterm and rxvt*/
-   if( ch == 0x7f )
-   {
-      ch = K_BS;
-   }
-#endif
     /* standard ASCII key */
     return( ch );
 }
