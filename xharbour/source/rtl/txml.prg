@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.5 2003/07/02 10:12:38 jonnymind Exp $
+ * $Id: txml.prg,v 1.6 2003/07/04 10:34:34 jonnymind Exp $
  */
 
 /*
@@ -73,10 +73,10 @@ CLASS TXMLNode
    METHOD Unlink()                     INLINE HBXml_node_unlink( Self )
    METHOD NextInTree()
 
-   METHOD InsertBefore( oNode )        INLINE HBXml_node_insert_before( oNode, Self )
-   METHOD InsertAfter( oNode )         INLINE HBXml_node_insert_after( oNode, Self )
-   METHOD InsertBelow( oNode )         INLINE HBXml_node_insert_below( oNode, Self )
-   METHOD AddBelow( oNode )            INLINE HBXml_node_add_below( oNode, Self )
+   METHOD InsertBefore( oNode )        INLINE HBXml_node_insert_before( Self, oNode )
+   METHOD InsertAfter( oNode )         INLINE HBXml_node_insert_after( Self, oNode )
+   METHOD InsertBelow( oNode )         INLINE HBXml_node_insert_below( Self, oNode )
+   METHOD AddBelow( oNode )            INLINE HBXml_node_add_below( Self, oNode )
 
    METHOD GetAttribute( cAttrib )
    METHOD SetAttribute( cAttrib, cValue )
