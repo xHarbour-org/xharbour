@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.76 2004/12/19 14:00:00 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.76 2004/12/19 11:33:52 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -354,8 +354,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msggl.obj \
   $(OBJ_DIR)\msghe862.obj \
   $(OBJ_DIR)\msghewin.obj \
-  $(OBJ_DIR)\msghr852.obj \
   $(OBJ_DIR)\msghr1250.obj \
+  $(OBJ_DIR)\msghr852.obj \
   $(OBJ_DIR)\msghriso.obj \
   $(OBJ_DIR)\msghu852.obj \
   $(OBJ_DIR)\msghucwi.obj \
@@ -383,8 +383,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msgua866.obj \
   $(OBJ_DIR)\msguakoi.obj \
   $(OBJ_DIR)\msguawin.obj \
-  $(OBJ_DIR)\msgzhgb.obj \
   $(OBJ_DIR)\msgzhb5.obj \
+  $(OBJ_DIR)\msgzhgb.obj \
   $(OBJ_DIR)\ppcomp.obj \
   $(OBJ_DIR)\ppcore.obj \
   $(OBJ_DIR)\pplib.obj \
@@ -925,16 +925,18 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\msgcskam.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgcswin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgde.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\msgdewin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgen.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\msgeo.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\msges.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\msgeswin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgeu.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\msgfr.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\msggl.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\msghe862.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msghewin.obj          + >> hdll.tmp
-  echo. $(OBJ_DIR)\msghr852.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msghr1250.obj         + >> hdll.tmp
+  echo. $(OBJ_DIR)\msghr852.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msghriso.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msghu852.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msghucwi.obj          + >> hdll.tmp
@@ -947,18 +949,23 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\msgpl852.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgpliso.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgplmaz.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\msgplwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgpt.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\msgro.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\msgru866.obj          + >> hdll.tmp
-  echo. $(OBJ_DIR)\msgruwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgrukoi.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\msgruwin.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\msgsl852.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\msgsliso.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\msgslwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgsr852.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgsriso.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\msgsrwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgua866.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msguawin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msguakoi.obj          + >> hdll.tmp
-  echo. $(OBJ_DIR)\msgzhgb.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\msgzhb5.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\msgzhgb.obj           + >> hdll.tmp
 !if $(HB_GT_LIB) == gtwvt
   echo. $(OBJ_DIR)\gtwvt.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\wvtcore.obj           + >> hdll.tmp
@@ -2149,10 +2156,10 @@ $(OBJ_DIR)\msghe862.obj : $(LANG_DIR)\msghe862.c
 $(OBJ_DIR)\msghewin.obj : $(LANG_DIR)\msghewin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\msghr852.obj : $(LANG_DIR)\msghr852.c
+$(OBJ_DIR)\msghr1250.obj : $(LANG_DIR)\msghr1250.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\msghr1250.obj : $(LANG_DIR)\msghr1250.c
+$(OBJ_DIR)\msghr852.obj : $(LANG_DIR)\msghr852.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\msghriso.obj : $(LANG_DIR)\msghriso.c
