@@ -1708,7 +1708,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   aProcedures[nProcId] := { sSymbol, {} }
                ENDIF
 
-               TraceLog( sBlock )
+               //TraceLog( sBlock )
                aAdd( aProcedures[ nProcId ][2], { 0, &( "{||" + sBlock + "}" ), nLine } )
             ENDIF
          ENDIF
