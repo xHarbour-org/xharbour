@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.3 2002/03/15 21:17:03 ronpinkas Exp $
+ * $Id: hberrors.h,v 1.4 2002/04/21 01:39:17 ronpinkas Exp $
  */
 
 /*
@@ -168,6 +168,7 @@ extern "C" {
 #define HB_PP_ERR_BAD_RULES_FILE_NAME           16
 #define HB_PP_ERR_TOO_MANY_INCLUDES             17
 #define HB_PP_ERR_BUFFER_OVERFLOW               18
+#define HB_PP_ERR_LABEL_MISSING                 19
 
 #define HB_PP_WARN_DEFINE_REDEF                 1
 #define HB_PP_WARN_NO_DIRECTIVES                2

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.224 2002/05/18 13:19:26 lculik Exp $
+ * $Id: ChangeLog,v 1.225 2002/05/20 00:03:20 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-20 13:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.c
+    + Corrected inclusion of <errno.h>
+
+  * makefile.bc
+    ! Corrected path of hbmlang.c
+
+  * include/hberrors.h
+    + Added: #define HB_PP_ERR_LABEL_MISSING                 19
+
+  * source/pp/pptable.c
+    ! Corrected representation of #define _DFSET ...
+
+  * source/pp/ppcore.c
+    ! Corrected hb_pp_ParseDefine() to compile Pseudo-Functions such that parametes are correctly expanded.
+
+  * utils/hbmake/hbmake.prg
+    ! Corrected invalid #define (used #translate format).
+
 2002-05-19 21:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
     * Fixed an minor bug
@@ -14,7 +34,7 @@
     source/rtl/tprinter.cpp
     include/tprint.hpp
     * Mijor formatting.
-    * Fixed compilation warning 
+    * Fixed compilation warning
 
 2002-05-18 10:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * makefile.bc
@@ -27,7 +47,7 @@
     * GETLANG.c is on this file now
 
 2002-05-18 13:40 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
-  * source/vm/hvm.c
+  * source/compiler/harbour.c
     * Fixed errno compilation problem under Linux
 
 2002-05-18 01:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.14 2002/05/18 13:19:29 lculik Exp $
+ * $Id: hbmake.prg,v 1.15 2002/05/20 00:03:27 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -53,22 +53,18 @@
 #include "radios.ch"
 
 #ifdef __HARBOUR__
-#include "hbgetcmt.ch"
-#define EOL hb_osnewline()
-#define CRLF hb_osnewline()
+  #include "hbgetcmt.ch"
+  #define EOL hb_osnewline()
+  #define CRLF hb_osnewline()
 #else
-#define EOL chr(13)+chr(10)
-#define hb_osnewline() chr(13)+chr(10)
-#define CRLF hb_osnewline()
-#include "hbclip.ch"
+  #define EOL chr(13)+chr(10)
+  #define hb_osnewline() chr(13)+chr(10)
+  #define CRLF hb_osnewline()
+  #include "hbclip.ch"
 #endif
 #xtranslate timetosec(<x>) => ((val(substr(<x>,1,2))*3600)+(val(substr(<x>,4,2))*60)+(val(substr(<x>,7,2))))
-
-#ifdef __HARBOUR__
-#define datediff(<x>,<y>) (<x>-<y>)
-#else
 #translate datediff(<x>,<y>) => (<x>-<y>)
-#endif
+
 /*
       Beginning Static Variables Table
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.14 2002/05/16 20:06:27 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.15 2002/05/16 20:38:34 ronpinkas Exp $
  */
 
 /*
@@ -117,7 +117,7 @@ static void   SkipOptional( char ** );
 static void   SearnRep( char *, char *, int, char *, int * );
 static int    ReplacePattern( char, char *, int, char *, int );
 static void   pp_rQuotes( char *, char * );
-static int    md_strAt( char *, int, char *, BOOL, BOOL, BOOL );
+static int    md_strAt( char *, int, char *, BOOL, BOOL, BOOL, BOOL );
 static char * PrevSquare( char * , char *, int * );
 static int    IsInStr( char, char * );
 static int    stroncpy( char *, char *, int );
@@ -131,6 +131,7 @@ static int    NextParm( char **, char * );
 static BOOL   OpenInclude( char *, HB_PATHNAMES *, PHB_FNAME, BOOL bStandardOnly, char * );
 static BOOL   IsIdentifier( char *szProspect );
 
+#define ISID( c )  ( isalpha( ( int ) c ) || ( c ) == '_' || ( c ) > 0x7E )
 #define ISNAME( c )  ( isalnum( ( int ) c ) || ( c ) == '_' || ( c ) > 0x7E )
 #define MAX_NAME     255
 #define MAX_EXP      2048
@@ -217,7 +218,8 @@ char * hb_pp_szErrors[] =
    "Can\'t open command definitions file: \'%s\'",
    "Invalid command definitions file name: \'%s\'",
    "Too many nested #includes, can\'t open: \'%s\'",
-   "Input buffer overflow"
+   "Input buffer overflow",
+   "Label missing in #define \'%s\'."
 };
 
 /* Table with warnings */
@@ -543,39 +545,90 @@ int hb_pp_ParseDirective( char * sLine )
 
 int hb_pp_ParseDefine( char * sLine )
 {
-  char defname[ MAX_NAME ], pars[ MAX_NAME ];
-  int i, npars = -1;
+  char defname[ MAX_NAME ];
+  char sParams[ 3 * 64 ]; /* 2 for each Marker + 1 for Comma/Null-Terminator. */
+  int iParams = -1;
   DEFINES * lastdef;
+  char sParam[ MAX_NAME ];
+  char sMarker[3];
 
   HB_TRACE(HB_TR_DEBUG, ("hb_pp_ParseDefine(%s)", sLine));
 
   HB_SKIPTABSPACES( sLine );
-  if( ISNAME( *sLine ) )
-    {
-      NextName( &sLine, defname );
-      if( *sLine == '(' ) /* If pseudofunction was found */
+
+  if( ISID( *sLine ) )
+  {
+     NextName( &sLine, defname );
+
+     if( *sLine == '(' ) /* If pseudofunction was found */
+     {
+        int iParamLen, iParamsLen = 0, iLen = strlen( sLine ) ;
+
+        sLine++;
+        iParams = 0;
+
+        HB_SKIPTABSPACES( sLine );
+
+        while( *sLine && *sLine != ')' )
         {
-          sLine++; i = 0;
-          npars = 0;
-          while( *sLine != '\0' && *sLine != ')')
-            {
-              if( *sLine == ',' ) npars++;
-              if( *sLine != ' ' && *sLine != '\t' ) *(pars+i++) = *sLine;
+           if( ISID( *sLine ) && ( iParamLen = NextName( &sLine, (char *) sParam ) ) > 0 )
+           {
+              char *pTmp;
+              int iPos;
+
+              iParams++;
+
+              sMarker[0] = '\2';
+              sMarker[1] = iParams;
+              sMarker[2] = '\0';
+
+              pTmp = (char *) sLine;
+
+              while( ( iPos = md_strAt( (char *) sParam, iParamLen, pTmp, TRUE, FALSE, FALSE, FALSE )) > 0 )
+              {
+                 hb_pp_Stuff( sMarker, pTmp + iPos - 1, 2, iParamLen, iLen );
+
+                 iLen = iLen + 2 - iParamLen;
+                 pTmp = pTmp + ( ( iParamLen > 2 ) ? iParamLen - 2 : 2 );
+              }
+
+              sParams[iParamsLen++] = '\2';
+              sParams[iParamsLen++] = iParams;
+              sParams[iParamsLen++] = ',';
+
+              HB_SKIPTABSPACES( sLine );
+           }
+           else
+           {
+              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_LABEL_MISSING, defname, NULL );
+           }
+
+           if( *sLine == ',' )
+           {
               sLine++;
-            }
-          if( i > 0 ) npars++;
-          *(pars+i) = '\0';
-          sLine++;
+              HB_SKIPTABSPACES( sLine );
+           }
         }
-      HB_SKIPTABSPACES(sLine);
 
-      lastdef = hb_pp_AddDefine( defname, ( *sLine == '\0' ) ? NULL : sLine );
+        if( iParams )
+        {
+           sParams[iParamsLen - 1] = '\0';
+        }
 
-      lastdef->npars = npars;
-      lastdef->pars = ( npars <= 0 ) ? NULL : hb_strdup( pars );
-    }
+        sLine++;
+     }
+
+     HB_SKIPTABSPACES(sLine);
+
+     lastdef = hb_pp_AddDefine( defname, ( *sLine == '\0' ) ? NULL : sLine );
+
+     lastdef->npars = iParams;
+     lastdef->pars = ( iParams <= 0 ) ? NULL : hb_strdup( sParams );
+  }
   else
-    hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_DEFINE_ABSENT, NULL, NULL );
+  {
+     hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_DEFINE_ABSENT, NULL, NULL );
+  }
 
   return 0;
 }
@@ -1099,7 +1152,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
      {
         ptro = sOutLine;
         ptri = sLine + isdvig;
-        ipos = md_strAt( ";", 1, ptri, TRUE, FALSE, FALSE );
+        ipos = md_strAt( ";", 1, ptri, TRUE, FALSE, FALSE, FALSE );
 
         if( ipos > 0 )
         {
@@ -1118,7 +1171,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
            }
 
            lens = strlen( sLine + isdvig );
-           hb_pp_Stuff( " ", sLine + isdvig, 0, (ipos)? ipos:lens, lens );
+           hb_pp_Stuff( " ", sLine + isdvig, 0, ipos ? ipos : lens, lens );
 
            if( ipos > 0 )
            {
@@ -1175,7 +1228,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
               ptri = sLine + isdvig;
               lenToken = strlen(stcmd->name);
 
-              while( ( ifou = md_strAt( stcmd->name, lenToken, ptri, TRUE, FALSE, FALSE )) > 0 )
+              while( ( ifou = md_strAt( stcmd->name, lenToken, ptri, TRUE, FALSE, FALSE, TRUE )) > 0 )
               {
                  ptri += ifou -1;
 
@@ -1367,7 +1420,7 @@ static int WorkDefine( char ** ptri, char * ptro, DEFINES * stdef )
            /* Ron Pinkas added 2000-11-21 */
            char *pTmp = ptr + 1;
 
-           while( *pTmp && ( *pTmp == ' ' || *pTmp == '\t' ) )
+           while( *pTmp == ' ' || *pTmp == '\t' )
            {
              pTmp++;
            }
@@ -1572,7 +1625,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
            ptrmp    = strtopti;
            ptr      = ptri;
            ipos     = NextName( &ptr, tmpname );
-           ipos     = md_strAt( tmpname, ipos, strtopti, TRUE, TRUE, TRUE );
+           ipos     = md_strAt( tmpname, ipos, strtopti, TRUE, TRUE, TRUE, TRUE );
 
            if( ipos && TestOptional( strtopti, strtopti+ipos-2 ) )
            {
@@ -1617,7 +1670,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
                 {
                    ptr  = ptri;
                    ipos = NextName( &ptr, tmpname );
-                   ipos = md_strAt( tmpname, ipos, ptrmp, TRUE, TRUE, TRUE );
+                   ipos = md_strAt( tmpname, ipos, ptrmp, TRUE, TRUE, TRUE, TRUE );
 
   HB_TRACE(HB_TR_DEBUG, ("2"));
                    if( ipos && TestOptional( ptrmp+1, ptrmp+ipos-2 ) )
@@ -1944,7 +1997,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   {
      lenreal = strincpy( expreal, ptrtemp );
 
-     if( (ipos = md_strAt( expreal, lenreal, *ptri, TRUE, TRUE, FALSE )) > 0 )
+     if( (ipos = md_strAt( expreal, lenreal, *ptri, TRUE, TRUE, FALSE, TRUE )) > 0 )
      {
         if( ptrtemp > *ptrmp )
         {
@@ -2854,7 +2907,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
       *( ptro + *lenres ) = '\0';
    }
 
-   while( ( ifou = md_strAt( exppatt, ( *( exppatt + 1 ) ) ? 2 : 1, ptrOut, FALSE, FALSE, TRUE )) > 0 ) /* ??? */
+   while( ( ifou = md_strAt( exppatt, ( *( exppatt + 1 ) ) ? 2 : 1, ptrOut, FALSE, FALSE, TRUE, FALSE )) > 0 ) /* ??? */
    {
       #ifdef DEBUG_MARKERS
          printf( "   Found: >%s< At: %i In: >%s<\n", exppatt, ifou, ptrOut );
@@ -3078,7 +3131,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
         rmlen = 0;
         do
           {
-            ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE );
+            ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE, FALSE );
             lenitem = (ifou)? ifou-1:lenreal;
             if( *expreal != '\0' )
               {
@@ -3141,7 +3194,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
         rmlen = 0;
         do
           {
-            ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE );
+            ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE, FALSE );
             lenitem = (ifou)? ifou-1:lenreal;
             if( *expreal != '\0' )
               {
@@ -3212,7 +3265,7 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
         rmlen = 0;
         do
           {
-            ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE );
+            ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE, FALSE );
             lenitem = (ifou)? ifou-1:lenreal;
             if( *expreal != '\0' )
               {
@@ -3517,17 +3570,16 @@ int hb_pp_WrStr( FILE * handl_o, char * buffer )
   return 0;
 }
 
-static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, BOOL checkPrth, BOOL bRule )
+static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, BOOL checkPrth, BOOL bRule, BOOL bUpper )
 {
   int State = STATE_NORMAL;
   long lPos = 0, lSubPos = 0;
   int kolPrth = 0, kolSquare = 0, kolFig = 0;
-  int lCase = ( *szSub == '\1' )? 0:1;
   char cLastChar = '\0';
 
-  HB_TRACE_STEALTH(HB_TR_DEBUG, ("md_strAt(%s, %d, %s, %i, %i, %i)", szSub, lSubLen, szText, checkword, checkPrth, bRule));
+  HB_TRACE_STEALTH(HB_TR_DEBUG, ("md_strAt(%s, %d, %s, %i, %i, %i)", szSub, lSubLen, szText, checkword, checkPrth, bRule, bUpper ));
 
-  //printf( "\nmd_strAt( '%s', %d, '%s', %i, %i, %i )\n", szSub, lSubLen, szText, checkword, checkPrth, bRule );
+  //printf( "\nmd_strAt( '%s', %d, '%s', %i, %i, %i )\n", szSub, lSubLen, szText, checkword, checkPrth, bRule, bUpper );
 
   while( *(szText+lPos) != '\0' && lSubPos < lSubLen )
   {
@@ -3670,7 +3722,7 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
            continue;
         }
 
-        if( ( lCase && toupper(*(szText + lPos)) == toupper(*(szSub + lSubPos)) ) || ( !lCase && *(szText + lPos) == *(szSub + lSubPos) ) )
+        if( ( bUpper && toupper(*(szText + lPos)) == toupper(*(szSub + lSubPos)) ) || ( ! bUpper && *(szText + lPos) == *(szSub + lSubPos) ) )
         {
            lSubPos++;
            cLastChar = *(szText+lPos);
@@ -3756,7 +3808,7 @@ static int IsInStr( char symb, char * s )
   return 0;
 }
 
-void hb_pp_Stuff(char *ptri, char * ptro, int len1, int len2, int lenres )
+void hb_pp_Stuff( char *ptri, char * ptro, int len1, int len2, int lenres )
 {
   char *ptr1, *ptr2;
   int i;
@@ -3764,19 +3816,32 @@ void hb_pp_Stuff(char *ptri, char * ptro, int len1, int len2, int lenres )
   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_pp_Stuff(%s, %s, %d, %d, %d)", ptri, ptro, len1, len2, lenres));
 
   if( len1 > len2 )
-    {
-      ptr1 = ptro + lenres;
-      ptr2 = ptro + lenres + len1 - len2;
-      for( i=0; i<=lenres; ptr1--,ptr2--,i++ ) *ptr2 = *ptr1;
-    }
+  {
+     ptr1 = ptro + lenres;
+     ptr2 = ptro + lenres + len1 - len2;
+
+     for( i = 0; i <= lenres; ptr1--, ptr2--, i++ )
+     {
+        *ptr2 = *ptr1;
+     }
+  }
   else
-    {
-      ptr1 = ptro + len2;
-      ptr2 = ptro + len1;
-      for( ; ptr1 <= ptro+lenres; ptr1++,ptr2++ ) *ptr2 = *ptr1;
-    }
+  {
+     ptr1 = ptro + len2;
+     ptr2 = ptro + len1;
+
+     for( ; ptr1 <= ptro + lenres; ptr1++, ptr2++ )
+     {
+        *ptr2 = *ptr1;
+     }
+  }
+
   ptr2 = ptro;
-  for( i=0; i < len1; i++ ) *ptr2++ = *(ptri+i);
+
+  for( i = 0; i < len1; i++ )
+  {
+     *ptr2++ = *( ptri + i );
+  }
 }
 
 int hb_pp_strocpy( char * ptro, char * ptri )

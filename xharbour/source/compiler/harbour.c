@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.14 2002/05/18 08:55:49 ronpinkas Exp $
+ * $Id: harbour.c,v 1.15 2002/05/18 11:40:31 map Exp $
  */
 
 /*
@@ -96,15 +96,14 @@
    #include <malloc.h>     /* required for allocating and freeing memory */
 #endif
 
+#include <errno.h>
+
 #include "hbcomp.h"
 #include "hbhash.h"
 
 #if defined(HB_OS_DOS) && defined(__BORLANDC__)
    #include <limits.h>
    extern unsigned _stklen = UINT_MAX;
-#endif
-#if defined( __GNUC__) && defined( __linux__ )
-   #include <errno.h>
 #endif
 
 static void hb_compInitVars( void );
