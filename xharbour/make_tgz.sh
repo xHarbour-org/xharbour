@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.29 2004/09/14 20:15:32 druzus Exp $
+# $Id: make_tgz.sh,v 1.30 2004/11/01 05:38:04 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -49,10 +49,11 @@ case "$HB_ARCHITECTURE" in
 esac
 
 # Select the platform-specific command names
+INSTALL=install
 MAKE=make
 TAR=tar
 case "$HB_ARCHITECTURE" in
-    darwin) TAR=gtar ;;
+    darwin) TAR=gtar INSTALL="install -c" ;;
     bsd)    MAKE=gmake ;;
 esac
 
@@ -71,7 +72,6 @@ case "$HB_ARCHITECTURE" in
     darwin)
         # Autodetect old Darwin versions and set appropriate build options
         if [ `uname -r | sed "s/\..*//g"` -lt 6 ]; then
-            export C_USR="-DHB_OS_DARWIN_5 $C_USR"
 	    export HB_NCURSES_FINK=yes
 	fi
         ;;
@@ -129,8 +129,7 @@ done
 
 mkdir -p $HB_INST_PREF/etc/harbour
 
-# Without -c, install _moves_ files on older Unices!
-install -c -m644 source/rtl/gtcrs/hb-charmap.def $HB_INST_PREF/etc/harbour/hb-charmap.def
+$INSTALL -m644 source/rtl/gtcrs/hb-charmap.def $HB_INST_PREF/etc/harbour/hb-charmap.def
 
 cat > $HB_INST_PREF/etc/harbour.cfg <<EOF
 CC=gcc

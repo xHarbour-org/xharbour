@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.56 2004/09/28 15:32:39 ronpinkas Exp $
+ * $Id: hbdefs.h,v 1.57 2004/11/01 05:38:09 likewolf Exp $
  */
 
 /*
@@ -133,6 +133,14 @@
       #define HB_DOS_INT86 int86
       #define HB_DOS_INT86X int86x
       #define HB_XREGS x
+   #endif
+
+#elif defined( HB_OS_DARWIN )
+
+   /* Detect if it is Darwin < 6.x */
+   #include <pthread.h>
+   #ifndef PTHREAD_MUTEX_RECURSIVE
+      #define HB_OS_DARWIN_5
    #endif
 
 #endif

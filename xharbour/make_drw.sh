@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_drw.sh,v 1.7 2004/10/18 10:22:04 likewolf Exp $
+# $Id: make_drw.sh,v 1.8 2004/11/01 05:38:04 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -32,7 +32,6 @@ if [ -z "$HB_INC_INSTALL" ]; then export HB_INC_INSTALL=$PREFIX/include/xharbour
 
 # Autodetect old Darwin versions and set appropriate build options
 if [ `uname -r | sed "s/\..*//g"` -lt 6 ]; then
-    export C_USR="-DHB_OS_DARWIN_5 $C_USR"
     export HB_NCURSES_FINK=yes
 fi
 
