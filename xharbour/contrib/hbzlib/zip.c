@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.8 2003/11/22 21:15:04 lculik Exp $
+ * $Id: zip.c,v 1.9 2004/02/22 00:59:03 andijahja Exp $
  */
 
 /*
@@ -157,6 +157,16 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
 
       if( ISCHAR( 2 ) )
       {
+         PHB_ITEM pUpdate = hb_param( 10, HB_IT_ANY );
+         HB_ITEM pProgress;
+
+         pProgress.type = HB_IT_NIL ;
+
+         if( pUpdate )
+         {
+            hb_itemCopy( &pProgress, pUpdate );
+         }
+
          bRet = hb_CmpTdSpanStd( hb___CheckFile( szFile ),
                                  hb_parc( 2 ),
                                  ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
@@ -166,10 +176,20 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
                                  ISNUM( 7 ) ? hb_parni( 7 ) : 0,
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                                  ISLOG( 9 ) ? hb_parl( 9 ) : 0,
-                                 hb_itemParam( 10 ) );
+                                 &pProgress );
       }
       else if( ISARRAY( 2 ) )
       {
+         PHB_ITEM pUpdate = hb_param( 10, HB_IT_ANY );
+         HB_ITEM pProgress;
+
+         pProgress.type = HB_IT_NIL ;
+
+         if( pUpdate )
+         {
+            hb_itemCopy( &pProgress, pUpdate );
+         }
+
          bRet = hb_CmpTdSpan( hb___CheckFile( szFile ),
                               hb_param( 2, HB_IT_ARRAY ),
                               ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
@@ -179,7 +199,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
                               ISNUM( 7 ) ? hb_parni( 7 ) : 0,
                               ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                               ISLOG( 9 ) ? hb_parl( 9 ) : 0,
-                              hb_itemParam( 10 ) );
+                              &pProgress );
       }
    }
 
@@ -197,6 +217,16 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
 
       if( ISCHAR( 2 ) )
       {
+         PHB_ITEM pUpdate = hb_param( 9, HB_IT_ANY );
+         HB_ITEM pProgress;
+
+         pProgress.type = HB_IT_NIL ;
+
+         if( pUpdate )
+         {
+            hb_itemCopy( &pProgress, pUpdate );
+         }
+
          bRet = hb_CmpPkSpanStd( hb___CheckFile( szFile ),
                                  hb_parc( 2 ),
                                  ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
@@ -205,10 +235,20 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
                                  ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
                                  ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
-                                 hb_itemParam( 9 ) );
+                                 &pProgress );
       }
       else if( ISARRAY( 2 ) )
       {
+         PHB_ITEM pUpdate = hb_param( 9, HB_IT_ANY );
+         HB_ITEM pProgress;
+
+         pProgress.type = HB_IT_NIL ;
+
+         if( pUpdate )
+         {
+            hb_itemCopy( &pProgress, pUpdate );
+         }
+
          bRet = hb_CmpPkSpan( hb___CheckFile( szFile ),
                               hb_param( 2, HB_IT_ARRAY ),
                               ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
@@ -217,7 +257,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
                               ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
                               ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                               ISLOG( 8 ) ? hb_parl( 8 ) : 0,
-                              hb_itemParam( 9 ) );
+                              &pProgress );
       }
    }
 
@@ -235,32 +275,62 @@ HB_FUNC( HB_UNZIPFILE )
 
       if( ISCHAR( 6 ) )
       {
+         PHB_ITEM pUpdate = hb_param( 7, HB_IT_ANY );
+         HB_ITEM pProgress;
+
+         pProgress.type = HB_IT_NIL ;
+
+         if( pUpdate )
+         {
+            hb_itemCopy( &pProgress, pUpdate );
+         }
+
          bRet = hb_UnzipOne( hb___CheckFile( szFile ),
                              hb_param( 2, HB_IT_BLOCK ),
                              ISLOG( 3 ) ? hb_parl( 3 ) : 0,
                              ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
                              ISCHAR( 5 ) ? hb_parc( 5 ) : ".\\",
                              hb_parc( 6 ),
-                             hb_itemParam( 7 ) );
+                             &pProgress);
       }
       else if( ISARRAY( 6 ) )
       {
+         PHB_ITEM pUpdate = hb_param( 7, HB_IT_ANY );
+         HB_ITEM pProgress;
+
+         pProgress.type = HB_IT_NIL ;
+
+         if( pUpdate )
+         {
+            hb_itemCopy( &pProgress, pUpdate );
+         }
+
          bRet = hb_UnzipSel( hb___CheckFile( szFile ),
                              hb_param( 2, HB_IT_BLOCK ),
                              ISLOG( 3 ) ? hb_parl( 3 ) : 0,
                              ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
                              ISCHAR( 5 ) ? hb_parc( 5 ) : ".\\",
                              hb_param( 6, HB_IT_ARRAY ),
-                             hb_itemParam( 7 ) );
+                             &pProgress );
       }
       else
       {
+         PHB_ITEM pUpdate = hb_param( 7, HB_IT_ANY );
+         HB_ITEM pProgress;
+
+         pProgress.type = HB_IT_NIL ;
+
+         if( pUpdate )
+         {
+            hb_itemCopy( &pProgress, pUpdate );
+         }
+
          bRet = hb_UnzipAll( hb___CheckFile( szFile ),
                              hb_param( 2, HB_IT_BLOCK ),
                              ISLOG( 3 ) ? hb_parl( 3 ) : 0,
                              ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
                              ISCHAR( 5 ) ? hb_parc( 5 ) : ".\\",
-                             hb_itemParam( 7 ) );
+                             &pProgress);
       }
    }
 
@@ -332,23 +402,43 @@ HB_FUNC( HB_UNZIPFILEINDEX )
 
       if( ISNUM( 6 ) )
       {
+         PHB_ITEM pUpdate = hb_param( 7, HB_IT_ANY );
+         HB_ITEM pProgress;
+
+         pProgress.type = HB_IT_NIL ;
+
+         if( pUpdate )
+         {
+            hb_itemCopy( &pProgress, pUpdate );
+         }
+
          bRet = hb_UnzipOneIndex( hb___CheckFile( szFile ),
                                   hb_param( 2, HB_IT_BLOCK ),
                                   ISLOG( 3 ) ? hb_parl( 3 ) : 0,
                                   ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
                                   hb_parc( 5 ),
                                   hb_parni( 6 ),
-                                  hb_itemParam( 7 ) );
+                                  &pProgress );
       }
       else if( ISARRAY( 6 ) )
       {
+         PHB_ITEM pUpdate = hb_param( 7, HB_IT_ANY );
+         HB_ITEM pProgress;
+
+         pProgress.type = HB_IT_NIL ;
+
+         if( pUpdate )
+         {
+            hb_itemCopy( &pProgress, pUpdate );
+         }
+
          bRet = hb_UnzipSelIndex( hb___CheckFile( szFile ),
                                   hb_param( 2, HB_IT_BLOCK ),
                                   ISLOG( 3 ) ? hb_parl( 3 ) : 0,
                                   ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
                                   hb_parc( 5 ),
                                   hb_param( 6, HB_IT_ARRAY ),
-                                  hb_itemParam( 7 ) );
+                                  &pProgress );
       }
    }
 

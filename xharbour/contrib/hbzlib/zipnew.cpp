@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.9 2004/02/14 16:37:52 lculik Exp $
+ * $Id: zipnew.cpp,v 1.10 2004/02/14 22:49:58 lculik Exp $
  */
 
 /*
@@ -204,11 +204,6 @@ int hb_CmpPkSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
    if ( pChangeDiskBlock )
    {
       hb_itemRelease( pChangeDiskBlock );
-   }
-
-   if ( pProgressInfo )
-   {
-      hb_itemRelease( pProgressInfo);
    }
 
    return ( int ) bReturn;
@@ -637,11 +632,6 @@ int hb_CmpPkSpanStd( char *szFile, char *szFiletoCompress, int iCompLevel, PHB_I
       hb_itemRelease( pChangeDiskBlock );
    }
 
-   if ( pProgressInfo )
-   {
-      hb_itemRelease( pProgressInfo );
-   }
-
    return ( int ) bReturn;
 }
 
@@ -799,11 +789,6 @@ int hb_UnzipAll( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
       }
    }
 
-
-   if ( pProgressInfo )
-   {
-      hb_itemRelease( pProgressInfo );
-   }
    if (szPath)
    {
       hb_fsChDir((BYTE*)szPath);
@@ -928,11 +913,6 @@ int hb_UnzipOne( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
    if ( pChangeDiskBlock )
    {
       hb_itemRelease( pChangeDiskBlock );
-   }
-
-   if ( pProgressInfo )
-   {
-      hb_itemRelease( pProgressInfo );
    }
 
    if (szPath)
@@ -1187,11 +1167,6 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
       hb_itemRelease( pChangeDiskBlock );
    }
 
-   if ( pProgressInfo )
-   {
-      hb_itemRelease( pProgressInfo );
-   }
-
    szZip.Close();
 
    if (szPath)
@@ -1379,11 +1354,6 @@ int hb_UnzipOneIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
       hb_itemRelease( pChangeDiskBlock );
    }
 
-   if ( pProgressInfo )
-   {
-      hb_itemRelease( pProgressInfo );
-   }
-
    return ( int ) iReturn;
 }
 
@@ -1479,11 +1449,6 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
    if ( pChangeDiskBlock )
    {
       hb_itemRelease( pChangeDiskBlock );
-   }
-
-   if ( pProgressInfo )
-   {
-      hb_itemRelease( pProgressInfo );
    }
 
    szZip.Close( );
