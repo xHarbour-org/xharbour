@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1741 2003/11/20 01:18:55 andijahja Exp $
+ * $Id: ChangeLog,v 1.1742 2003/11/20 23:47:34 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-20 17:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/inkey.c
+    * Reverted last correction to __Keyboard() - Clipper reset the typeahead buffer even if argument is invalid.
+    * Commented out reset of s_inkeyLast from hb_inkeyReset() and added initialization to 0 on definition.
 
 2003-11-21 00:50 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/makefile.bc

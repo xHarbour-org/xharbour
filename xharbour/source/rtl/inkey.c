@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.10 2003/11/20 01:18:58 andijahja Exp $
+ * $Id: inkey.c,v 1.11 2003/11/20 23:47:36 druzus Exp $
  */
 
 /*
@@ -85,7 +85,7 @@
 static int *  s_inkeyBuffer = 0; /* Harbour keyboard buffer (empty if head == tail)     */
 static int    s_inkeyHead;       /* Harbour keyboard buffer head pointer (next insert)  */
 static int    s_inkeyTail;       /* Harbour keyboard buffer tail pointer (next extract) */
-static int    s_inkeyLast;       /* Last key extracted from Harbour keyboard buffer     */
+static int    s_inkeyLast = 0;       /* Last key extracted from Harbour keyboard buffer     */
 static BOOL   s_inkeyPoll;       /* Flag to override no polling when TYPEAHEAD is 0     */
 static int    s_inkeyForce;      /* Variable to hold keyboard input when TYPEAHEAD is 0 */
 
@@ -303,7 +303,7 @@ void hb_inkeyReset( BOOL allocate )     /* Reset the keyboard buffer */
       and the polling override flag */
    s_inkeyHead = 0;
    s_inkeyTail = 0;
-   s_inkeyLast = 0;
+   //s_inkeyLast = 0;
    s_inkeyPoll = FALSE;
    s_inkeyForce = 0;
 
@@ -344,12 +344,12 @@ HB_FUNC( INKEY )
 HB_FUNC( __KEYBOARD )
 {
 
+   /* Clear the typeahead buffer without reallocating the keyboard buffer */
+   hb_inkeyReset( FALSE );
+
    if( ISCHAR( 1 ) )
    {
       ULONG size = hb_parclen( 1 );
-
-      /* Clear the typeahead buffer without reallocating the keyboard buffer */
-      hb_inkeyReset( FALSE );
 
       if( size != 0 )
       {
