@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: postinst.sh,v 1.8 2004/06/12 13:23:09 druzus Exp $
+# $Id: postinst.sh,v 1.9 2004/09/14 20:15:37 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -42,6 +42,12 @@ then
     else
         MAKE=make
     fi
+    if [ "${HB_ARCHITECTURE}" == "darwin" ]; then
+        # We must build an archive index on Darwin
+        AR="ar -crs"
+    else
+        AR="ar -cr"
+    fi
     if [ "${HB_ARCHITECTURE}" != "dos" ]; then
         install -m755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
     fi
@@ -53,11 +59,11 @@ then
     C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/}
     rm -f fm.o
     ${MAKE} -r fm.o
-    ar -cr ${HB_LIB_INSTALL}/libfm.a fm.o
+    ${AR} ${HB_LIB_INSTALL}/libfm.a fm.o
     rm -f fm.o
     if [ "${HB_MT}" = "MT" ]; then
         ${MAKE} -r fm.o 'HB_LIBCOMP_MT=YES'
-        ar -cr ${HB_LIB_INSTALL}/libfmmt.a fm.o
+        ${AR} ${HB_LIB_INSTALL}/libfmmt.a fm.o
         rm -f fm.o
     fi
     )

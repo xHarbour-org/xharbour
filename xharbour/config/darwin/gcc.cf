@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.11 2004/05/30 20:37:17 likewolf Exp $
+# $Id: gcc.cf,v 1.12 2004/09/08 00:17:10 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -12,21 +12,29 @@ LIB_EXT = .a
 CC = $(CCACHE) gcc
 CC_IN = -c
 CC_OUT = -o
-CPPFLAGS = -fsigned-char -no-cpp-precomp -I. -I$(TOP)include -I$(HB_INC_COMPILE)
-CFLAGS = -Wall -W
+
+# -no-cpp-precomp prevents from using buggy precompiled headers
+CPPFLAGS = -no-cpp-precomp -I. -I$(TOP)include -I$(HB_INC_COMPILE)
+
+# -fno-common enables building .dylib files
+CFLAGS = -fno-common -fsigned-char -Wall -W
+
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
 endif
 CFLAGS += -DHB_OS_BSD -DHB_OS_DARWIN
-CFLAGS += -DHB_BIG_ENDIAN -DHB_NO_RECURSIVE_MUTEXES
+CFLAGS += -DHB_BIG_ENDIAN
+
+# The following needs to be enabled for old Darwin versions, e.g. 5.2.2
+# CFLAGS += -DHB_NO_RECURSIVE_MUTEXES
 
 ifeq ($(HB_LIBCOMP_MT),)
-#always add thread support if not compiling a lib and using vmmt
+# always add thread support if not compiling a lib and using vmmt
 ifeq ($(findstring vmmt,$(LIBS)),vmmt)
 CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE -pthread
 endif
 else
-#Add thread support to lib compilation only if compiling a _mt lib
+# Add thread support to lib compilation only if compiling a _mt lib
 ifeq ($(HB_LIBCOMP_MT),YES)
 CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE
 HB_MT_FLAGS = -DHB_THREAD_SUPPORT
@@ -46,7 +54,7 @@ ifeq ($(HB_LIB_COMPILE),)
 LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
 LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
 
-#Adding MT libs on need
+# Adding MT libs on need
 ifeq ($(findstring vmmt,$(LIBS)),vmmt)
 LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(patsubst %mt,%,$(lib))/$(ARCH_DIR)_mt)
 endif
@@ -71,14 +79,14 @@ LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfntx/$(ARCH)_mt
 LINKLIBS += -ldbfntxmt
 endif
 
-#DBFDBT and DBFFTP are not MTzed
+# DBFDBT and DBFFPT are not MTzed
 ifeq ($(findstring dbfdbt,$(HB_DB_DRIVERS)),dbfdbt)
 LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfdbt/$(ARCH)
 LINKLIBS += -ldbfdbt
 endif
-ifeq ($(findstring dbfftp,$(HB_DB_DRIVERS)),dbfftp)
-LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfftp/$(ARCH)
-LINKLIBS += -ldbfftp
+ifeq ($(findstring dbffpt,$(HB_DB_DRIVERS)),dbffpt)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbffpt/$(ARCH)
+LINKLIBS += -ldbffpt
 endif
 
 else

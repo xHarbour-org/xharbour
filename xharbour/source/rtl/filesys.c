@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.121 2004/09/08 00:17:11 druzus Exp $
+ * $Id: filesys.c,v 1.122 2004/09/16 17:32:08 druzus Exp $
  */
 
 /*
@@ -119,7 +119,12 @@
    #include <signal.h>
    #include <sys/types.h>
    #include <sys/wait.h>
-   extern char **environ;
+   #if !defined( HB_OS_DARWIN )
+      extern char **environ;
+   #else
+      #include <crt_externs.h>
+      #define environ (*_NSGetEnviron())
+   #endif
 #endif
 
 #if defined(__BORLANDC__) || defined(__IBMCPP__) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__WATCOMC__)

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.93 2004/07/31 23:28:07 lculik Exp $
+* $Id: thread.h,v 1.94 2004/08/04 04:28:38 ronpinkas Exp $
 */
 
 /*
@@ -267,14 +267,23 @@ extern PPVOID hb_dwCurrentStack;
    #define HB_THREAD_T                 pthread_t
 
 #ifndef HB_NO_RECURSIVE_MUTEXES
+
    #define HB_CRITICAL_T               pthread_mutex_t
+
+#ifdef HB_OS_DARWIN
+   /* Darwin 7.0.0 has only pthread_mutexattr_settype() */
+   #define pthread_mutexattr_setkind_np pthread_mutexattr_settype
+#else
    /* ODD: this definition is missing on some linux headers;
       we should remove it when this bug is fixed */
    int pthread_mutexattr_setkind_np( pthread_mutexattr_t * attr, int kind );
+#endif
+
    /* Some Unices (e.g., FreeBSD 4.8) don't have this define: */
    #ifdef HB_OS_BSD
       #define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
    #endif
+
    #define HB_CRITICAL_INIT( x )       \
       {\
          pthread_mutexattr_t attr;\
@@ -287,7 +296,9 @@ extern PPVOID hb_dwCurrentStack;
    #define HB_CRITICAL_LOCK( x )       pthread_mutex_lock( &(x) )
    #define HB_CRITICAL_UNLOCK( x )     pthread_mutex_unlock( &(x) )
    #define HB_CRITICAL_TRYLOCK( x )    ( pthread_mutex_trylock( &(x) ) != EBUSY )
+
 #else
+
    /* Some Unices (e.g., Darwin 5.2.2) don't have recursive mutexes;
     * we have to implement them manually. -- Ph.K. */
    typedef struct
@@ -337,6 +348,7 @@ extern PPVOID hb_dwCurrentStack;
 	: ( ( pthread_mutex_trylock( &((x).lock) ) != EBUSY ) \
 	    ? ( (x).owner = pthread_self(), (x).count = 1, TRUE ) \
 	    : FALSE ) )
+
 #endif
 
    #define HB_MUTEX_T                  HB_CRITICAL_T

@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.h,v 1.7 2004/06/04 00:18:10 druzus Exp $
+ * $Id: gtsln.h,v 1.8 2004/06/09 15:51:04 druzus Exp $
  */
 
 /*
@@ -57,7 +57,11 @@
 /* This definition has to be placed before #include "hbapigt.h" */
 #define HB_GT_NAME	SLN
 
+#ifdef HB_OS_DARWIN
+#define REAL_UNIX_SYSTEM /* this is for slang.h to include some defs */
+#endif
 #include <slang.h>
+
 #include "hbapigt.h"
 #include "hbapifs.h"
 #include "inkey.ch"

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.420 2004/09/12 15:37:32 lf_sfnet Exp $
+ * $Id: hvm.c,v 1.421 2004/09/13 06:42:59 druzus Exp $
  */
 
 /*
@@ -519,7 +519,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    hb_cmdargProcessVM();
 
    #ifndef HB_NO_PROFILER
-      HB_TRACE( HB_TR_INFO, ("porfiler" ) );
+      HB_TRACE( HB_TR_INFO, ("profiler" ) );
       /* Initialize opcodes profiler support arrays */
       {
          ULONG ul;

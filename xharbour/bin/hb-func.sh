@@ -1,13 +1,13 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.29 2004/09/21 03:47:56 lculik Exp $
+# $Id: hb-func.sh,v 1.30 2004/09/21 22:31:11 druzus Exp $
 #
 
 # ---------------------------------------------------------------
 # Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
 # small set of functions used by xHarbour scripts
-# warnig: some bash extensions are used
+# warning: some bash extensions are used
 #
 # See doc/license.txt for licensing terms.
 # ---------------------------------------------------------------
@@ -247,6 +247,9 @@ LINK_OPT=""
 
 HB_GPM_LIB=""
 if [ -f "\${HB_LIB_INSTALL}/libgtsln.a" ]; then
+    if [ "\${HB_ARCHITECTURE}" = "darwin" ]; then
+        SYSTEM_LIBS="\${SYSTEM_LIBS} -L/sw/lib"
+    fi
     SYSTEM_LIBS="\${SYSTEM_LIBS} -l${HB_SLN_LIB:-slang}"
     [ "\${HB_GPM_MOUSE}" = "yes" ] && HB_GPM_LIB="gpm"
 fi
@@ -289,8 +292,13 @@ if [ "\${HB_STATIC}" = "yes" ]; then
     libs="${hb_libs} ${hb_libsc}"
 else
     l="${name}"
-    [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.so" ] && l="\${l}mt"
-    [ -f "\${HB_LIB_INSTALL}/lib\${l}.so" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+    if [ "\${HB_ARCHITECTURE}" = "darwin" ]; then
+        ext="dylib"
+    else
+        ext="so"
+    fi
+    [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.\${ext}" ] && l="\${l}mt"
+    [ -f "\${HB_LIB_INSTALL}/lib\${l}.\${ext}" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
     libs="gtalleg hbodbc debug profiler ${hb_libsc}"
 fi
 for l in \${libs}
@@ -465,15 +473,29 @@ mk_hblibso()
                 ;;
         esac
     done
-    echo "Making lib${name}-${hb_ver}.so..."
-    $HB_BIN_INSTALL/hb-mkslib lib${name}-${hb_ver}.so $LIBS
-    [ "$HB_MT" != "MT" ] || $HB_BIN_INSTALL/hb-mkslib lib${name}mt-${hb_ver}.so $LIBSMT
-    for l in lib${name}-${hb_ver}.so lib${name}mt-${hb_ver}.so
+    if [ "${HB_ARCHITECTURE}" = "darwin" ]; then
+        full_lib_name="lib${name}.${hb_ver}.dylib"
+        full_lib_name_mt="lib${name}mt.${hb_ver}.dylib"
+    else
+        full_lib_name="lib${name}-${hb_ver}.so"
+        full_lib_name_mt="lib${name}mt-${hb_ver}.so"
+    fi
+    echo "Making ${full_lib_name}..."
+    $HB_BIN_INSTALL/hb-mkslib ${full_lib_name} $LIBS
+    if [ "$HB_MT" = "MT" ]; then
+        echo "Making ${full_lib_name_mt}..."
+        $HB_BIN_INSTALL/hb-mkslib ${full_lib_name_mt} $LIBSMT
+    fi
+    for l in ${full_lib_name} ${full_lib_name_mt}
     do
         if [ -f $l ]
         then
-            ll=${l%-${hb_ver}.so}.so
-            ln -sf $l $ll
+            if [ "${HB_ARCHITECTURE}" = "darwin" ]; then
+                ll=${l%.${hb_ver}.dylib}.dylib
+            else
+                ll=${l%-${hb_ver}.so}.so
+                ln -sf $l $ll
+            fi
             case $HB_LIB_INSTALL in
                 */usr/lib/*|*/usr/local/lib/*)
                     ln -sf ${name}/$l ../$ll

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3498 2004/10/14 22:42:03 druzus Exp $
+ * $Id: ChangeLog,v 1.3499 2004/10/14 23:47:00 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -46,6 +46,10 @@
     makefile.nt
     source/ct/Makefile
     ! updated to add getsecrt.prg
+
+2004-09-02 10:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+   * source/tip/base64x.c
+     ! Changed non-standard #include "malloc.h" to #include <stdlib.h>
 
 2004-10-05 19:03 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/pp/ppcore.c

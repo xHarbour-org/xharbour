@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: make_drw.sh,v 1.5 2003/11/26 20:16:03 likewolf Exp $
+# $Id: make_drw.sh,v 1.6 2004/05/30 20:37:15 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -19,7 +19,7 @@ export HB_COMPILER=gcc
 export HB_GPM_MOUSE=no
 export HB_MT=MT
 export HB_MULTI_GT=no
-export PREFIX=/usr/local
+if [ -z "$PREFIX" ]; then export PREFIX=/usr/local; fi
 
 if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtstd; fi
 

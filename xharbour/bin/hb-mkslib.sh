@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: hb-mkslib.sh,v 1.2 2003/05/17 15:55:18 druzus Exp $
+# $Id: hb-mkslib.sh,v 1.3 2003/06/27 20:58:02 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -71,9 +71,24 @@ rm -f "${HB_SO_LIB}"
 cd "${OTMPDIR}"
 
 base=`basename "${HB_SO_LIB}"`
-gcc -shared -o "${base}" $OBJLST && \
-    cd "${dir}" && \
-    mv -f "${OTMPDIR}/${base}" "${HB_SO_LIB}"
+if [ `uname` = "Darwin" ]; then
+    short=`echo ${base} | sed "s/\(.*\)-${version}.*/\1/g"`
+    version=`echo ${base} | sed "s/[^0-9]*\([0-9.]*\)/\1/g;s/\.$//g"`
+    major=`echo ${version} | sed "s/^\([0-9]*\).*/\1/g"`
+    minor=`echo ${version} | sed "s/^[0-9]*\.\([0-9]*\).*/\1/g"`
+    gcc -dynamiclib -install_name "${dir}/${short}.${major}.dylib" \
+        -compatibility_version ${major}.${minor} -current_version ${version} \
+        -fno-common -o "${short}.${version}.dylib" $OBJLST && \
+        cd "${dir}" && \
+        mv -f "${OTMPDIR}/${short}.${version}.dylib" `dirname "${HB_SO_LIB}"`/${short}.${version}.dylib && \
+        rm -f "${short}.${major}.dylib" "${short}.dylib" && \
+        ln -s "${short}.${version}.dylib" "${short}.${major}.dylib" && \
+        ln -s "${short}.${version}.dylib" "${short}.dylib"
+else
+    gcc -shared -o "${base}" $OBJLST && \
+        cd "${dir}" && \
+        mv -f "${OTMPDIR}/${base}" "${HB_SO_LIB}"
+fi
 
 stat="$?"
 cleanup
