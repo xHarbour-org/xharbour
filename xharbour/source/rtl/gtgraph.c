@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.3 2004/01/18 20:48:52 jonnymind Exp $
+ * $Id: gtgraph.c,v 1.1 2004/01/24 16:29:40 jonnymind Exp $
  */
 
 /*
@@ -94,7 +94,7 @@ HB_FUNC( GTPOINT )
 
       if ( color != NULL )
       {
-         gobj = hb_xgrab( sizeof( HB_GT_GOBJECT ) );
+         gobj = (HB_GT_GOBJECT *) hb_xgrab( sizeof( HB_GT_GOBJECT ) );
          gobj->type = GTO_POINT;
          gobj->color = *color;
          gobj->x = hb_itemGetNI( pX );
@@ -127,7 +127,7 @@ HB_FUNC( GTLINE )
 
       if ( color )
       {
-         gobj = hb_xgrab( sizeof( HB_GT_GOBJECT ) );
+         gobj = (HB_GT_GOBJECT *) hb_xgrab( sizeof( HB_GT_GOBJECT ) );
          gobj->type = GTO_LINE;
          gobj->color = *color;
          gobj->x = hb_itemGetNI( pX1 );
@@ -160,7 +160,7 @@ HB_FUNC( GTSQUARE )
 
       if ( color )
       {
-         gobj = hb_xgrab( sizeof( HB_GT_GOBJECT ) );
+         gobj = (HB_GT_GOBJECT *) hb_xgrab( sizeof( HB_GT_GOBJECT ) );
          gobj->type = GTO_SQUARE;
          gobj->color = *color;
          gobj->x = hb_itemGetNI( pX );
@@ -193,7 +193,7 @@ HB_FUNC( GTRECTANGLE )
 
       if ( color )
       {
-         gobj = hb_xgrab( sizeof( HB_GT_GOBJECT ) );
+         gobj = (HB_GT_GOBJECT *) hb_xgrab( sizeof( HB_GT_GOBJECT ) );
          gobj->type = GTO_RECTANGLE;
          gobj->color = *color;
          gobj->x = hb_itemGetNI( pX );
@@ -227,7 +227,7 @@ HB_FUNC( GTCIRCLE )
 
       if ( color )
       {
-         gobj = hb_xgrab( sizeof( HB_GT_GOBJECT ) );
+         gobj = (HB_GT_GOBJECT *) hb_xgrab( sizeof( HB_GT_GOBJECT ) );
          gobj->type = GTO_CIRCLE;
          gobj->color = *color;
          gobj->x = hb_itemGetNI( pX );
@@ -260,7 +260,7 @@ HB_FUNC( GTDISK )
 
       if ( color )
       {
-         gobj = hb_xgrab( sizeof( HB_GT_GOBJECT ) );
+         gobj = (HB_GT_GOBJECT *) hb_xgrab( sizeof( HB_GT_GOBJECT ) );
          gobj->type = GTO_DISK;
          gobj->color = *color;
          gobj->x = hb_itemGetNI( pX );
@@ -292,13 +292,13 @@ HB_FUNC( GTTEXT )
 
       if ( color )
       {
-         gobj = hb_xgrab( sizeof( HB_GT_GOBJECT ) );
+         gobj = (HB_GT_GOBJECT *) hb_xgrab( sizeof( HB_GT_GOBJECT ) );
          gobj->type = GTO_TEXT;
          gobj->color = *color;
          gobj->x = hb_itemGetNI( pX );
          gobj->y = hb_itemGetNI( pY );
-         gobj->data_len = hb_itemGetCLen( pText );
-         gobj->data = hb_xgrab( gobj->data_len );
+         gobj->data_len = (USHORT) hb_itemGetCLen( pText );
+         gobj->data = (char*) hb_xgrab( gobj->data_len );
          memcpy( gobj->data, hb_itemGetCPtr( pText ), gobj->data_len );
          hb_gtAddGobject( gobj );
       }
