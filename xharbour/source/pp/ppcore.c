@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.182 2004/10/25 17:30:05 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.183 2004/10/26 01:30:40 ronpinkas Exp $
  */
 
 /*
@@ -940,7 +940,7 @@ int hb_pp_ParseDirective( char * sLine )
      {
         hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_DIRECTIVE_ELSE, NULL, NULL );
      }
-     else if( hb_pp_nCondCompile == 1 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 2 ] > 0 )
+     else if( ( hb_pp_nCondCompile == 1 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 2 ] > 0 ) && hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] >= 0 )
      {
         hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = 1 - hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ];
 
