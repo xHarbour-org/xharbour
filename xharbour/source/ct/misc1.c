@@ -1,5 +1,5 @@
 /*
- *  $Id: misc1.c,v 1.2 2004/03/18 03:43:08 ronpinkas Exp $
+ *  $Id: misc1.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  */
 
 /*
@@ -69,6 +69,11 @@ HB_FUNC( XTOC )
     hb_retc( hb_parcx( 1 ));
   }
 
+  else if (ISDATE( 1 ))
+  {
+    hb_retc( hb_pards( 1 ));
+  }
+
   else if (ISNUM( 1 ))
   {
     xConvert.value = hb_parnd( 1 );
@@ -82,11 +87,6 @@ HB_FUNC( XTOC )
     else
       pcString[0] = 0x54;
     hb_retclen( pcString, 1 );
-  }
-
-  else if (ISDATE( 1 ))
-  {
-    hb_retc( hb_pards( 1 ));
   }
 
   else
