@@ -1,5 +1,5 @@
 /*
-* $Id: gtQTc.cpp,v 1.1 2003/01/30 00:46:25 jonnymind Exp $
+* $Id: gtQTc.cpp,v 1.2 2003/02/02 02:08:10 jonnymind Exp $
 */
 
 /*
@@ -603,21 +603,30 @@ void hb_gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod )
 	HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetPos(%hd, %hd, %hd)", iRow, iCol, iMethod));
 	HB_SYMBOL_UNUSED( iMethod );
 	qtcapp->getDoc()->gotoXY( iCol, iRow );
-	//qtapp->processEvents();
 }
 
 /* TODO*/
 static void hb_gt_SetCursorSize( char start, char end )
 {
 	HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetCursorSize(%d, %d)", (int) start, (int) end));
+   if ( start > 14 || end > 14 )
+      qtcapp->getDoc()->cursor( false );
+   else
+      qtcapp->getDoc()->cursor( true );
 }
 
 /* TODO*/
 static void hb_gt_GetCursorSize( char * start, char *end )
 {
 	HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetCursorSize(%p, %p)", start, end));
-	*start =60;
-	*end = 7;
+   if ( qtcapp->getDoc()->cursor() ) {
+      *start =6;
+      *end = 7;
+   }
+   else {
+      *start =32;
+      *end = 32;
+   }
 }
 
 USHORT hb_gt_GetCursorStyle( void )

@@ -51,7 +51,7 @@ class QTconsoleDoc : public QObject
   void clearScr( unsigned char attrib, int top, int left, int width, int heigth );
   bool scroll(int top, int left, int bottom, int right, char attr,
       int vert, int horiz );
-    
+
 
     // todo, make it private
     char * buffer;
@@ -92,13 +92,24 @@ class QTconsoleDoc : public QObject
 
   int getCursX() { return cursX; }
   int getCursY() { return cursY; }
+  bool cursor() { return _cursor; }
+  void cursor( bool set ) { _cursor = set; }
 
   void gotoXY( int x, int y )
   {
-	  cursX = x;
-	  cursY = y;
-	  setModified();
-   }
+     if ( _cursor ) {
+         cursor( false );
+         rectChanging( QRect(cursX, cursY, 1 , 1 ) );
+         setModified();
+         cursX = x;
+         cursY = y;
+         cursor( true );
+     }
+     else {
+         cursX = x;
+         cursY = y;
+     }
+  }
   /** Adds a rectangle to the current modify area, that will be notified when the
 changes are comited to the views with setModified( true ) or endChanging() */
   void rectChanging( QRect r );
@@ -128,10 +139,11 @@ changes are comited to the views with setModified( true ) or endChanging() */
   /** This variables contains the screen buffer, organized as a normal screen buffer.
  */
 private: // Private attributes
-  /** Colums width of the document */
-  int _cols;
-  /** Rows used insde the document */
-  int _rows;
+   /** Colums width of the document */
+   int _cols;
+   /** Rows used insde the document */
+   int _rows;
+   bool _cursor;
 	void setModified( bool t=true ) {
 		// ignore calls in multi line change statements
 		if ( _changing ) return;

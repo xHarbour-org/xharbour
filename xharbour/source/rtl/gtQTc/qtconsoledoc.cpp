@@ -304,7 +304,23 @@ bool QTconsoleDoc::scroll(int top, int left, int bottom, int right, char attr,
       clearScr( attr, left, top, width, height );
       return true;
    }
-   return false;
+
+   char *data = new char [ width * height * 2];
+   getMem(left, top, data, width, height );
+   startChanging();
+   clearScr( attr, left, top, width, height );
+   // select starting point
+   height -= abs(vert);
+   char * data1 = data;
+   if ( vert > 0 ) data1 += vert * width * 2;
+   else top += -vert;
+
+   // for the moment, orizontal scrolling is not implemented
+   setMem( left,top , data1, width, height );
+   endChanging();
+   delete data;
+
+   return true;
 }
 
 /** Writes a "teletype" character, acting as a console */

@@ -51,7 +51,7 @@ protected:
   QSize calcSizeOfChars( int cols, int rows);
 
 	/** Size of a character */
-	inline int cellWidth( char ch = 'Z' ) {
+	inline int cellWidth( char ch = ' ' ) {
 	  return _fmetric->width( QChar ( ch ) )+1;
 	}
 	/** Size of a character */
