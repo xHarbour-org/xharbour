@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.2 2002/02/21 06:31:26 walito Exp $
+ * $Id: tgetlist.prg,v 1.3 2002/03/15 02:27:52 walito Exp $
  */
 
 /*
@@ -155,6 +155,10 @@ METHOD Reader() CLASS HBGetList
             oGet:ExitState := GE_ENTER
          endif
 
+         if oGet:buffer == NIL
+            oGet:ExitState := GE_ENTER
+         endif
+
          while oGet:exitState == GE_NOEXIT
             ::GetApplyKey( Inkey( 0 ) )
          end
@@ -291,6 +295,7 @@ METHOD GetPreValidate() CLASS HBGetList
    local lUpdated, lWhen := .t.
 
    if oGet:PreBlock != NIL
+      oGet:type := ValType( oGet:VarGet() )
       lUpdated := ::lUpdated
       lWhen := Eval( oGet:PreBlock, oGet )
       oGet:Display()

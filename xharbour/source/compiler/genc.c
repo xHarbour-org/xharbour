@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.7 2002/03/09 19:09:43 ronpinkas Exp $
+ * $Id: genc.c,v 1.8 2002/03/10 18:41:54 ronpinkas Exp $
  */
 
 /*
@@ -766,8 +766,7 @@ static HB_GENC_FUNC( hb_p_line )
 
    if( cargo->bVerbose )
    {
-      hb_comp_iBaseLine = pFunc->pCode[ lPCodePos + 1 ] + pFunc->pCode[ lPCodePos + 2 ] * 256;
-      fprintf( cargo->yyc, "\t/* %i */", hb_comp_iBaseLine );
+      fprintf( cargo->yyc, "\t/* %i */", pFunc->pCode[ lPCodePos + 1 ] + pFunc->pCode[ lPCodePos + 2 ] * 256 );
    }
 
    fprintf( cargo->yyc, "\n" );
@@ -1981,8 +1980,7 @@ static HB_GENC_FUNC( hb_p_lineoffset )
 
    if( cargo->bVerbose )
    {
-      hb_comp_iBaseLine += pFunc->pCode[ lPCodePos + 1 ];
-      fprintf( cargo->yyc, "\t/* %i */", hb_comp_iBaseLine  );
+      fprintf( cargo->yyc, "\t/* %i */", hb_comp_iBaseLine + pFunc->pCode[ lPCodePos + 1 ] );
    }
    fprintf( cargo->yyc, "\n" );
 

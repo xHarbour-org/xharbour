@@ -34,6 +34,7 @@ PROCEDURE Main()
       ? Eval( bBlock[i] )
    NEXT
 
+   // Late!
    FOR i = 1 TO 3
       M->Macro := "Var" + Str( i, 1 )
       bBlock[i] := {|| &(Macro) }

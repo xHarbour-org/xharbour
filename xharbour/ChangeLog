@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.114 2002/03/16 01:27:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.115 2002/03/16 22:42:06 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-16 18:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/genc.c
+    ! Minor corretion to line number in verbose comments.
+
+  * source/compiler/harbour.sly
+    ! Fixed minor bug with GetA and MACROTEXT (due to recent optimization of MACROTEXT)
+      - Added new MacroText to encapsulate the optimization and make available in one more context.
+
+    + Implemented few TODOs - Allowing xHarbour to compile:
+      @ x,y GET &xMacro.Suffix -> Clipper complain -> Error C2081  Macro of declared symbol: '&CMACRO.1' (if cMacro is declared)
+      @ x,y GET &( xMacro ) -> Clipper complain -> Error C2047  GET contains complex macro.
+      @ x,y GET &( xMacro )[...] -> Clipper complain -> Error C2047  GET contains complex macro.
+
+  * source/rtl/tget.prg
+  * source/rtl/tgetlist.prg
+    ! Fixed few compatibility problems:
+      - Clipper is not erroring if Get value is Array or Block - it simply skips the Get.
+      - Clipper skips a GET if the value of the get is NIL or "" (or Array or Block).
+      - Clipper will correctly re-display and will allow editing of a var which was previosly NIL, or "", or Array, or Block
+        once the value is reset to editable value.
+
+  * tests/testget.prg
+    + Added #ifdef __HARBOUR__ to protect sample code which Clipper can't compile.
+
+  * tests/tstblock.prg
+    + Added 1 comment.
 
 2002-03-16 19:31 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
    * source/rdd/dbfcdx/dbfcdx1.c

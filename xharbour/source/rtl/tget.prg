@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.4 2002/02/21 06:26:43 walito Exp $
+ * $Id: tget.prg,v 1.5 2002/03/15 02:25:56 walito Exp $
  */
 
 /*
@@ -320,7 +320,7 @@ METHOD Display( lForced ) CLASS Get
       endif
    endif
 
-   if lForced .or. ( ::nDispPos != ::nOldPos )
+   if ::buffer != NIL .and. ( lForced .or. ( ::nDispPos != ::nOldPos ) )
       DispOutAt( ::Row, ::Col,;
                  Substr( ::buffer, ::nDispPos, ::nDispLen ), ;
                  hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ) )
@@ -394,15 +394,18 @@ return Self
 
 METHOD SetFocus() CLASS Get
 
+   local lWasNil := ::buffer == NIL
+
    ::hasfocus   := .t.
    ::rejected   := .f.
    ::typeout    := .f.
 
    ::Original   := ::VarGet()
+   ::type       := ValType( ::Original )
    ::buffer     := ::PutMask( ::VarGet(), .f. )
    ::changed    := .f.
    ::clear      := ( "K" $ ::cPicFunc .or. ::type == "N")
-   ::nMaxLen    := Len( ::buffer )
+   ::nMaxLen    := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
    ::pos        := 1
    ::lEdit      := .f.
 
@@ -420,7 +423,15 @@ METHOD SetFocus() CLASS Get
       ::BadDate := .f.
    endif
 
-   ::Display()
+   IF lWasNil .and. ::buffer != NIL
+      IF ::nDispLen == 0
+         ::nDispLen := ::nMaxLen
+      ENDIF
+
+      ::Display( .T. )
+   ELSE
+      ::Display()
+   ENDIF
 
 return Self
 
@@ -939,8 +950,8 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
    DEFAULT xValue TO ::VarGet()
    DEFAULT lEdit  TO ::HasFocus
 
-   if xValue == NIL
-      return ""
+   if xValue == NIL .OR. ValType( xValue ) $ "AB"
+      return NIL
    endif
 
    cBuffer := Transform( xValue, AllTrim( ::cPicFunc + " " + ::cPicMask ) )
@@ -1190,18 +1201,13 @@ METHOD Picture( cPicture ) CLASS Get
 
    if cPicture != NIL
 
-      ::nDispLen := NIL
-
       ::cPicture := cPicture
       ::ParsePict( cPicture )
 
       ::buffer  := ::PutMask( )
-      ::nMaxLen := Len( ::buffer )
+      ::nMaxLen := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
 
-      if ::nDispLen == NIL
-         ::nDispLen := ::nMaxLen
-      endif
-
+      ::nDispLen := ::nMaxLen
    endif
 
 return ::cPicture
