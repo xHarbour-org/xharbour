@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.27 2003/04/22 08:12:56 mauriliolongo Exp $
+* $Id: inet.c,v 1.28 2003/05/06 08:31:40 jonnymind Exp $
 */
 
 /*
@@ -1987,7 +1987,7 @@ HB_FUNC( INETDGRAMBIND )
    else {
       Socket->remote.sin_addr.s_addr = inet_addr( hb_parc( 2 ) );
    }
-   Socket->remote.sin_addr.s_addr = INADDR_ANY;
+
 
    if( bind( Socket->com, (struct sockaddr *) &Socket->remote, sizeof(Socket->remote) ) )
    {
