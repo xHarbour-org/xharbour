@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.55 2003/06/14 21:05:15 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.56 2003/06/20 17:32:41 jonnymind Exp $
  */
 
 /*
@@ -3156,22 +3156,25 @@ static HB_EXPR_FUNC( hb_compExprUseOr )
          }
          break;
 
-
       case HB_EA_POP_PCODE:
          break;
 
       case HB_EA_PUSH_POP:
-         if( HB_SUPPORT_HARBOUR )
+         if( hb_comp_bShortCuts )
          {
-            /* NOTE: This will not generate a runtime error if incompatible
-             * data type is used
-             */
-            HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_POP );
-            HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_POP );
+            LONG lEndPos;
+
+            HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+            lEndPos = HB_EXPR_PCODE1( hb_compGenJumpTrue, 0 );
+            HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
+            HB_EXPR_PCODE1( hb_compGenJumpHere, lEndPos );
          }
          else
          {
-            HB_EXPR_USE( pSelf, HB_EA_PUSH_PCODE );
+            HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
+            HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
          }
          break;
