@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.7 2004/01/11 14:03:39 andijahja Exp $
+ * $Id: bkgtsks.c,v 1.8 2004/03/18 23:07:32 fsgiudice Exp $
  */
 
 /*
@@ -343,7 +343,7 @@ BOOL hb_backgroundActive( ULONG ulID, BOOL bActive )
 {
    HB_THREAD_STUB
    PHB_BACKGROUNDTASK pBkgTask;
-   BOOL bOldState;
+   BOOL bOldState = FALSE;
 
    pBkgTask = hb_backgroundFind( ulID );
 
@@ -361,7 +361,7 @@ int hb_backgroundTime( ULONG ulID, int nMillisec )
 {
    HB_THREAD_STUB
    PHB_BACKGROUNDTASK pBkgTask;
-   int nOldState;
+   int nOldState = 0;
 
    pBkgTask = hb_backgroundFind( ulID );
 
@@ -448,12 +448,12 @@ HB_FUNC( HB_BACKGROUNDDEL )
 HB_FUNC( HB_BACKGROUNDACTIVE )
 {
    HB_THREAD_STUB
-   BOOL  bOldActive;
+   BOOL  bOldActive = FALSE;
 
    if ( s_pBackgroundTasks && ( hb_parinfo( 1 ) & HB_IT_NUMERIC ) )
    {
       ULONG ulID    = hb_parnl( 1 );   /* TODO: access to pointers from harbour code */
-      BOOL  bActive;
+      BOOL  bActive = TRUE;
       if ( hb_parinfo( 2 ) & HB_IT_LOGICAL )
       {
          bActive = hb_parl( 2 );
@@ -470,12 +470,12 @@ HB_FUNC( HB_BACKGROUNDACTIVE )
 HB_FUNC( HB_BACKGROUNDTIME )
 {
    HB_THREAD_STUB
-   int  nOldMillisec;
+   int  nOldMillisec = 0;
 
    if ( s_pBackgroundTasks && ( hb_parinfo( 1 ) & HB_IT_NUMERIC ) )
    {
       ULONG ulID    = hb_parnl( 1 );   /* TODO: access to pointers from harbour code */
-      int  nMillisec;
+      int  nMillisec = 1000;
       if ( hb_parinfo( 2 ) & HB_IT_NUMERIC )
       {
          nMillisec = hb_parni( 2 );
