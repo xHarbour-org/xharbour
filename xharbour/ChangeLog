@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3906 2005/03/04 19:23:26 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3907 2005/03/04 22:23:28 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-04 14:56 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
+  * source/rtl/win32ole.prg
+    ! Optimized cClassNAme in C code to use static.
+    * Changed order of Invoke, to test DISPATACH_METHOD, *before* trying DISPATCH_PROPERTYGET.
+
 2005-03-05 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/hvm.c
     + HB_FUNC( HB_MULTITHREAD ), detect MT on run time

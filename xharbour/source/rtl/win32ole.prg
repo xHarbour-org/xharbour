@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.69 2005/02/24 10:44:08 andijahja Exp $
+ * $Id: win32ole.prg,v 1.70 2005/03/03 20:29:04 ronpinkas Exp $
  */
 
 /*
@@ -121,6 +121,7 @@ RETURN TOleAuto():GetActiveObject( cString )
    static PHB_DYNS s_pSym_OleAuto;
    static PHB_DYNS s_pSym_hObj;
    static PHB_DYNS s_pSym_New;
+   static PHB_DYNS s_pSym_cClassName;
 
    static BOOL *s_OleRefFlags = NULL;
 
@@ -129,13 +130,15 @@ RETURN TOleAuto():GetActiveObject( cString )
 //----------------------------------------------------------------------------//
 
 INIT PROC HB_OLEINIT
+
    HB_INLINE()
    {
       s_nOleError = OleInitialize( NULL );
 
-      s_pSym_OleAuto = hb_dynsymFindName( "TOLEAUTO" );
-      s_pSym_New     = hb_dynsymFindName( "NEW" );
-      s_pSym_hObj    = hb_dynsymFindName( "HOBJ" );
+      s_pSym_OleAuto     = hb_dynsymFindName( "TOLEAUTO" );
+      s_pSym_New         = hb_dynsymFindName( "NEW" );
+      s_pSym_hObj        = hb_dynsymFindName( "HOBJ" );
+      s_pSym_cClassName  = hb_dynsymFindName( "CCLASSNAME" );
    }
 return
 
@@ -161,6 +164,9 @@ CLASS TOleAuto
    MESSAGE Get METHOD Invoke()
 
    METHOD Collection( xIndex, xValue ) OPERATOR "[]"
+
+   // Needed to refernce, or hb_dynsymFindName() will fail
+   METHOD ForceSymbols() INLINE ::cClassName()
 
    ERROR HANDLER OnError()
 
@@ -297,7 +303,7 @@ RETURN HB_ExecFromArray( Self, cMethod, aDel( HB_aParams(), 1, .T. ) )
 
 METHOD Collection( xIndex, xValue ) CLASS TOleAuto
 
-	 LOCAL xRet
+   LOCAL xRet
 
    //TraceLog( PCount(), xIndex, xValue )
 
@@ -305,12 +311,12 @@ METHOD Collection( xIndex, xValue ) CLASS TOleAuto
       RETURN ::Item( xIndex )
    ENDIF
 
-	 TRY
-			// ASP Collection syntax.
+   TRY
+      // ASP Collection syntax.
       xRet := ::_Item( xIndex, xValue )
-	 CATCH
-			xRet := ::SetItem( xIndex, xValue )
-	 END
+   CATCH
+      xRet := ::SetItem( xIndex, xValue )
+   END
 
 RETURN xRet
 
@@ -1305,7 +1311,7 @@ RETURN xRet
         s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                              DispID,
                                              (REFIID) &IID_NULL,
-                                             LOCALE_USER_DEFAULT,
+                                             0,
                                              DISPATCH_PROPERTYPUTREF,
                                              pDispParams,
                                              NULL,    // No return value
@@ -1323,7 +1329,7 @@ RETURN xRet
      s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                           DispID,
                                           (REFIID) &IID_NULL,
-                                          LOCALE_USER_DEFAULT,
+                                          0,
                                           DISPATCH_PROPERTYPUT,
                                           pDispParams,
                                           NULL,    // No return value
@@ -1340,24 +1346,7 @@ RETURN xRet
      s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                           DispID,
                                           (REFIID) &IID_NULL,
-                                          LOCALE_USER_DEFAULT,
-                                          DISPATCH_PROPERTYGET,
-                                          pDispParams,
-                                          &RetVal,
-                                          &excep,
-                                          &uArgErr );
-
-     if( s_nOleError == S_OK )
-     {
-        return;
-     }
-
-     memset( (LPBYTE) &excep, 0, sizeof( excep ) );
-
-     s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
-                                          DispID,
-                                          (REFIID) &IID_NULL,
-                                          LOCALE_USER_DEFAULT,
+                                          0,
                                           DISPATCH_METHOD,
                                           pDispParams,
                                           &RetVal,
@@ -1368,6 +1357,19 @@ RETURN xRet
      {
         return;
      }
+
+     //if( pDispParams->cArgs == 0 )
+     {
+        s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
+                                             DispID,
+                                             (REFIID) &IID_NULL,
+                                             0,
+                                             DISPATCH_PROPERTYGET,
+                                             pDispParams,
+                                             &RetVal,
+                                             &excep,
+                                             &uArgErr );
+     }
   }
 
   //---------------------------------------------------------------------------//
@@ -1377,7 +1379,7 @@ RETURN xRet
      DISPID DispID;
      DISPPARAMS DispParams;
 
-     //TraceLog( NULL, "Class: '%s' Message: '%s' Params %i\n", hb_objGetClsName( hb_stackSelfItem() ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, hb_pcount() );
+     //TraceLog( NULL, "Class: '%s' Message: '%s', Params: %i Arg1: %i\n", hb_objGetClsName( hb_stackSelfItem() ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, hb_pcount(), hb_parinfo(1) );
 
      hb_vmPushSymbol( s_pSym_hObj->pSymbol );
      hb_vmPush( hb_stackSelfItem() );
@@ -1390,7 +1392,7 @@ RETURN xRet
         bstrMessage = AnsiToBSTR( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1 );
         s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_USER_DEFAULT, &DispID );
         SysFreeString( bstrMessage );
-        //TraceLog( NULL, "1. ID of: '%s' -> %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1, s_nOleError );
+        //TraceLog( NULL, "1. ID of: '%s' -> %i Result: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1, DispID, s_nOleError );
      }
      else
      {
@@ -1401,9 +1403,9 @@ RETURN xRet
      {
         // Try again without removing the assign prefix (_).
         bstrMessage = AnsiToBSTR( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
-        s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_USER_DEFAULT, &DispID );
+        s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, 0, &DispID );
         SysFreeString( bstrMessage );
-        //TraceLog( NULL, "2. ID of: '%s' -> %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, s_nOleError );
+        //TraceLog( NULL, "2. ID of: '%s' -> %i Result: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, DispID, s_nOleError );
      }
 
      if( s_nOleError == S_OK )
@@ -1411,6 +1413,7 @@ RETURN xRet
         GetParams( &DispParams );
 
         VariantInit( &RetVal );
+
         OleInvoke( pDisp, DispID, &DispParams );
         //TraceLog( NULL, "OleInvoke %i\n", s_nOleError );
 
@@ -1437,6 +1440,8 @@ RETURN xRet
 
      if( s_nOleError == S_OK )
      {
+        //TraceLog( NULL, "Invoke Succeeded!\n" );
+
         if( HB_IS_OBJECT( &HB_VM_STACK.Return ) )
         {
            HB_ITEM Return;
@@ -1446,7 +1451,9 @@ RETURN xRet
            Return.type = HB_IT_NIL;
            hb_itemForwardValue( &Return, &HB_VM_STACK.Return );
 
-           hb_objSendMsg( hb_stackSelfItem(), "cClassName", 0 );
+           hb_vmPushSymbol( s_pSym_cClassName->pSymbol );
+           hb_vmPush( hb_stackSelfItem() );
+           hb_vmSend( 0 );
 
            strncpy( sOleClassName, hb_parc( - 1 ), hb_parclen( -1 ) );
            sOleClassName[ hb_parclen( -1 ) ] = ':';
@@ -1457,8 +1464,10 @@ RETURN xRet
            OleClassName.type = HB_IT_NIL;
            hb_itemPutC( &OleClassName, sOleClassName );
 
-           hb_objSendMsg( &Return, "_cClassName", 1, &OleClassName );
-           hb_itemClear( &OleClassName );
+           hb_vmPushSymbol( s_pSym_cClassName->pSymbol );
+           hb_vmPush( &Return );
+           hb_itemPushForward( &OleClassName );
+           hb_vmSend( 1 );
 
            hb_itemReturn( &Return );
         }
@@ -1468,7 +1477,11 @@ RETURN xRet
         PHB_ITEM pReturn;
         char *sDescription;
 
-        hb_objSendMsg( hb_stackSelfItem(), "cClassName", 0 );
+        //TraceLog( NULL, "Invoke Failed!\n" );
+
+        hb_vmPushSymbol( s_pSym_cClassName->pSymbol );
+        hb_vmPush( hb_stackSelfItem() );
+        hb_vmSend( 0 );
 
         if( s_nOleError == DISP_E_EXCEPTION )
         {
