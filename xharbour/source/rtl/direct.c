@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.18 2004/03/01 02:22:48 andijahja Exp $
+ * $Id: direct.c,v 1.19 2004/03/01 05:16:43 andijahja Exp $
  */
 
 /*
@@ -300,37 +300,6 @@ PHB_ITEM HB_EXPORT hb_fsDirectory( char* szSkleton, char* szAttributes, BOOL bDi
    return ( pDir );
 }
 
-static int isdot( char *szIn )
-{
-   int iSzLen = strlen( szIn );
-   int iRet = 0;
-
-   while( iSzLen )
-   {
-      if ( szIn [ iSzLen ] == '.' )
-      {
-         if ( szIn [ iSzLen - 1 ] == '\\' )
-         {
-            iRet = iSzLen;
-            break;
-         }
-         else if ( szIn [ iSzLen - 1 ] == '.' )
-         {
-            iSzLen -- ;
-            if ( szIn [ iSzLen - 1 ] == '\\' )
-            {
-              iRet = iSzLen;
-              break;
-            }
-         }
-      }
-
-      iSzLen --;
-   }
-
-   return iRet;
-}
-
 static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName )
 {
    ULONG ui, uiLen = pRecurse->item.asArray.value->ulLen;
@@ -340,7 +309,7 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
       PHB_ITEM pEntry = hb_arrayGetItemPtr( pRecurse, ui + 1 );
       char *szEntry = hb_arrayGetC( pEntry, 1 );
 
-      if ( isdot( szEntry ) == 0 )
+      if ( szEntry[ strlen( szEntry ) - 1 ] != '.' )
       {
          if ( hb_fsIsDirectory( ( BYTE * ) szEntry ) )
          {

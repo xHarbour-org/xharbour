@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2434 2004/03/01 09:36:19 paultucker Exp $
+ * $Id: ChangeLog,v 1.2435 2004/03/01 09:51:48 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-01 17:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/direct.c
+    ! minor optimization on dot checkings.
 
 2004-03-01 15:20 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/rtl/teditor.prg
@@ -22,42 +25,42 @@
     */
 
 2004-03-01 04:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-    * source/rtl/achoice.prg
-      * if an xSelect array is passed in and it's not the same length as the
-      * acItems array, then resize alSelect to match.
+  * source/rtl/achoice.prg
+    * if an xSelect array is passed in and it's not the same length as the
+    * acItems array, then resize alSelect to match.
 
 2004-03-01 12:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-   * include/hbapifs.h
-     % add second parameter to hb_fsDirectoryRecursive( char* , char* ) for
-       file mask. We must supply first parameter as "*.*" otherwise directory
-       will not be returned.
+  * include/hbapifs.h
+    % add second parameter to hb_fsDirectoryRecursive( char* , char* ) for
+      file mask. We must supply first parameter as "*.*" otherwise directory
+      will not be returned.
 
-   * source/rtl/direct.c
-     ! DIRECTORYRECURSE() now can return only files match a skleton.
-       (Previously, all files were returned )
+  * source/rtl/direct.c
+    ! DIRECTORYRECURSE() now can return only files match a skleton.
+      (Previously, all files were returned )
 
-   + tests/dirtest4.prg
-     + test program for filtered DIRECTORYRECURSE()
+  + tests/dirtest4.prg
+    + test program for filtered DIRECTORYRECURSE()
 
 2004-03-01 09:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-   * include/hbapifs.h
-     + PHB_ITEM HB_EXPORT hb_fsDirectoryRecursive( char* ) returns a multi
-       dimensional array each of which containing information of file names
-       of a given skleton.
+  * include/hbapifs.h
+    + PHB_ITEM HB_EXPORT hb_fsDirectoryRecursive( char* ) returns a multi
+      dimensional array each of which containing information of file names
+      of a given skleton.
 
-   * source/rtl/direct.c
-     + Function DIRECTORYRECURSE(), PRG Level directory function which
-       returns a multi dimensional array each of which containing information
-       of file names of a given skleton.
+  * source/rtl/direct.c
+    + Function DIRECTORYRECURSE(), PRG Level directory function which
+      returns a multi dimensional array each of which containing information
+      of file names of a given skleton.
 
-   + tests/dirtest3.prg
-     + test program for DIRECTORYRECURSE()
+  + tests/dirtest3.prg
+    + test program for DIRECTORYRECURSE()
 
-   /*
-      Example: DIRECTORYRECURSE( "C:\WINDOWS\*.*")
-      Returns array containing all files in C:\windows and its sub-folders.
-      Note: Must supply full path skleton!
-   */
+  /*
+     Example: DIRECTORYRECURSE( "C:\WINDOWS\*.*")
+     Returns array containing all files in C:\windows and its sub-folders.
+     Note: Must supply full path skleton!
+  */
 
 2004-03-01 00:33 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * doc/xharbour.rsp
