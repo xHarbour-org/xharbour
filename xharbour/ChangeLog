@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3024 2004/06/04 14:06:17 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3025 2004/06/04 14:51:05 jacekp Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-04 11:12 UTC-0800 Luis Krause Mantilla
+  * contrib/rdd_ads/ads1.c
+    * Changed bValidExpr from BOOL to UNSIGNED16 in adsIsExprValid()
+  * contrib/rdd_ads/adsfunc.c
+    * Changed bValidExpr from BOOL to UNSIGNED16 in adsSetFilter()
+    * adsGetFieldDecimals() call in adsOpen() now uses UNSIGNED16* pusDecimals
+      insted of UNSIGNED32* pulLength to match ADS docs
+    * Increment of pus16 is now done after aucBuffer[pus16] has been assigned
+      instead of inline
+
+  Above changed made per Przemek's request to avoid warnings on big endian machines
+  Under BCC 5.5.1 compiles with zero warnings.  Please report with other compilers.
 
 2004-06-04 16:42 UTC+0100 Jacek Potempa (Jacek.Potempa@otc.pl)
 

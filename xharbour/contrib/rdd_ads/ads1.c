@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.44 2004/06/01 23:59:33 kaddath Exp $
+ * $Id: ads1.c,v 1.45 2004/06/03 02:38:20 kaddath Exp $
  */
 
 /*
@@ -2006,7 +2006,7 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
    USHORT uiFields = 0, uiCount;
    UNSIGNED8 szName[ ADS_MAX_FIELD_NAME + 1 ];
       /* See adsGettValue() for why we don't use pArea->uiMaxFieldNameLength here */
-   UNSIGNED16 pusBufLen, pusType;
+   UNSIGNED16 pusBufLen, pusType, pusDecimals;
    DBFIELDINFO dbFieldInfo;
 
    //TraceLog( NULL, "Open '%s'\n", pOpenInfo->abName );
@@ -2122,8 +2122,8 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
          case ADS_TIMESTAMP:
          case ADS_AUTOINC:
             dbFieldInfo.uiType = HB_IT_LONG;
-            AdsGetFieldDecimals( pArea->hTable, szName, ( UNSIGNED16 * ) &pulLength );
-            dbFieldInfo.uiDec = ( USHORT ) pulLength;
+            AdsGetFieldDecimals( pArea->hTable, szName, &pusDecimals );
+            dbFieldInfo.uiDec = ( USHORT ) pusDecimals;
             break;
 
          case ADS_LOGICAL:
@@ -2789,7 +2789,8 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
 
                         while ( pus16 < pusLen )
                         {
-                           aucBuffer[pus16] = (SIGNED8) 0x5C - aucBuffer[pus16++];
+                           aucBuffer[pus16] = (SIGNED8) 0x5C - aucBuffer[pus16];
+                           pus16++;
                         }
                      }
 
@@ -3195,7 +3196,7 @@ static ERRCODE adsScopeInfo( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem )
 
 static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
 {
-   BOOL bValidExpr = FALSE;
+   UNSIGNED16 bValidExpr = FALSE;
    UNSIGNED16 usResolve = ADS_RESOLVE_DYNAMIC ;  /*ADS_RESOLVE_IMMEDIATE ;get this from a SETting*/
    UNSIGNED32 ulRetVal = AE_INVALID_EXPRESSION;
 
@@ -3210,9 +3211,9 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
    /* must do this first as it calls clearFilter */
    if( SUPER_SETFILTER( ( AREAP ) pArea, pFilterInfo ) == SUCCESS )
    {
-      AdsIsExprValid( pArea->hTable, (UNSIGNED8*) hb_itemGetCPtr( pFilterInfo->abFilterText), (UNSIGNED16*) &bValidExpr );
+      AdsIsExprValid( pArea->hTable, (UNSIGNED8*) hb_itemGetCPtr( pFilterInfo->abFilterText ), &bValidExpr );
 
-      if( bValidExpr )
+      if( bValidExpr != FALSE )
       {
          if( hb_set.HB_SET_OPTIMIZE )
          {

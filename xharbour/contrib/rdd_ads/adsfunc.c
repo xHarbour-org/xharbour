@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.41 2004/05/29 00:25:59 kaddath Exp $
+ * $Id: adsfunc.c,v 1.42 2004/06/03 02:38:21 kaddath Exp $
  */
 
 /*
@@ -1584,16 +1584,15 @@ HB_FUNC( ADSISINDEXED )
 HB_FUNC( ADSISEXPRVALID )               /* cExpr */
 {
    ADSAREAP pArea;
-   BOOL bValidExpr = FALSE;
+   UNSIGNED16 bValidExpr = FALSE;
 
    pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
    if( pArea && ISCHAR( 1 ) )
    {
-      AdsIsExprValid( pArea->hTable, (UNSIGNED8*) hb_parcx( 1 ),
-                      (UNSIGNED16*) &bValidExpr );
+      AdsIsExprValid( pArea->hTable, (UNSIGNED8*) hb_parcx( 1 ), &bValidExpr );
    }
 
-   hb_retl( bValidExpr );
+   hb_retl( bValidExpr != FALSE );
 }
 
 HB_FUNC( ADSGETNUMINDEXES )              /* cExpr */
