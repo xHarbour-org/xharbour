@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrypt.c,v 1.3 2003/02/24 05:55:54 jonnymind Exp $
+ * $Id: hbcrypt.c,v 1.4 2003/03/12 13:31:23 jonnymind Exp $
  */
 
 /*
@@ -252,18 +252,14 @@ void nxs_xorcode(
    unsigned char *cipher, unsigned long cipherlen,
    const unsigned char *key, unsigned short keylen )
 {
-   unsigned long pos;
-   unsigned short keypos;
+   unsigned long pos = 0l;
+   unsigned short keypos = 0;
    unsigned char c_bitrest;
 
-   for ( keypos = 0, pos = 0l; pos < cipherlen; pos ++ )
+   c_bitrest = cipher[ 0 ] >>5;
+
+   while ( pos < cipherlen )
    {
-
-      if (keypos == 0 )
-      {
-         c_bitrest = cipher[ pos ] >>5;
-      }
-
       cipher[pos] <<= 3;
 
       if (keypos == keylen-1 || pos == cipherlen -1 )
@@ -277,10 +273,12 @@ void nxs_xorcode(
 
       cipher[pos] ^= key[ keypos ];
       keypos ++;
+      pos++;
 
       if (keypos == keylen )
       {
          keypos = 0;
+         c_bitrest = cipher[ pos ] >>5;
       }
    }
 }
@@ -289,24 +287,15 @@ void nxs_xordecode(
    unsigned char *cipher, unsigned long cipherlen,
    const unsigned char *key, unsigned short keylen )
 {
-   unsigned long pos;
-   unsigned short keypos;
+   unsigned long pos = 0l;
+   unsigned short keypos = 0;
    unsigned char c_bitrest, c_bitleft;
 
-   for ( keypos = 0, pos = 0l; pos < cipherlen; pos ++ )
+   c_bitleft = ( cipher[ keylen -1 ] ^ key[ keylen -1 ])<< 5;
+
+   while ( pos < cipherlen )
    {
       cipher[pos] ^= key[ keypos ];
-
-      if (keypos == 0 )
-      {
-         // last block
-         if ( keylen > cipherlen - pos )
-         {
-            keylen = cipherlen - pos;
-         }
-
-         c_bitleft = ( cipher[ pos + keylen -1 ] ^ key[ keylen -1 ])<< 5;
-      }
 
       c_bitrest = cipher[ pos ] <<5;
       cipher[pos] >>= 3;
@@ -314,10 +303,18 @@ void nxs_xordecode(
       c_bitleft = c_bitrest;
 
       keypos ++;
+      pos ++;
 
       if (keypos == keylen )
       {
          keypos = 0;
+         // last block
+         if ( keylen > cipherlen - pos )
+         {
+            keylen = cipherlen - pos;
+         }
+
+         c_bitleft = ( cipher[ pos + keylen -1 ] ^ key[ keylen -1 ])<< 5;
       }
    }
 }
@@ -327,7 +324,7 @@ void nxs_xorcyclic(
    unsigned char *cipher, unsigned long cipherlen,
    const unsigned char *key, unsigned short keylen )
 {
-   unsigned long pos, crcpos;
+   unsigned long pos=0l, crcpos=0l;
    unsigned long crc1, crc2, crc3;
    unsigned long crc1l, crc2l, crc3l;
 
@@ -336,15 +333,12 @@ void nxs_xorcyclic(
    crc2 = adler32( 0, key + 2 , keylen-4 );
    crc3 = adler32( 0, key + 1, keylen - 2 );
 
-   for ( pos = 0, crcpos = 0; pos < cipherlen; pos++ )
-   {
-      if (crcpos == 0 )
-      {
-         crc1l = crc1 = nxs_cyclic_sequence( crc1 );
-         crc2l = crc2 = nxs_cyclic_sequence( crc2 );
-         crc3l = crc3 = nxs_cyclic_sequence( crc3 );
-      }
+   crc1l = crc1 = nxs_cyclic_sequence( crc1 );
+   crc2l = crc2 = nxs_cyclic_sequence( crc2 );
+   crc3l = crc3 = nxs_cyclic_sequence( crc3 );
 
+   while ( pos < cipherlen)
+   {
       if ( crcpos < 4 )
       {
          /* this ensures portability across platforms */
@@ -361,10 +355,14 @@ void nxs_xorcyclic(
          crc3l /= 256l;
       }
       crcpos++;
+      pos++;
 
       if (crcpos == 12 )
       {
          crcpos = 0;
+         crc1l = crc1 = nxs_cyclic_sequence( crc1 );
+         crc2l = crc2 = nxs_cyclic_sequence( crc2 );
+         crc3l = crc3 = nxs_cyclic_sequence( crc3 );
       }
    }
 }
