@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.67 2003/09/08 02:42:26 ronpinkas Exp $
+ * $Id: arrays.c,v 1.68 2003/09/10 06:07:31 ronpinkas Exp $
  */
 
 /*
@@ -1519,6 +1519,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
                hb_itemReleaseString( pItem );
             }
          }
+      #ifndef HB_ARRAY_USE_COUNTER
          else if( HB_IS_ARRAY( pItem ) )
          {
             if( pItem->item.asArray.value )
@@ -1526,6 +1527,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
                hb_arrayReleaseHolder( pItem->item.asArray.value, pItem );
             }
          }
+      #endif
 
          /* 03-07-2002 RP commented out - Needs further testing.
          else if( HB_IS_MEMVAR( pItem ) )
