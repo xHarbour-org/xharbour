@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.83 2003/11/11 20:20:54 ronpinkas Exp $
+ * $Id: classes.c,v 1.84 2003/11/11 21:24:20 ronpinkas Exp $
  */
 
 /*
@@ -3682,10 +3682,10 @@ HB_FUNC( __SETCLASSSCOPE )
  * <bOldClsAutoInit> := __SetClassAutoInit( <bNewClsAutoInit> )
  *
  * <bNewClsAutoInit> =
- *       FALSE - No auto initialization (Default)
- *       TRUE  - Auto initialize class with its default constructor
+ *       TRUE  - (Default) Auto initialize class with its default constructor
  *               If true class will be initialized calling its first constructor method
  *               i.e.: oWin := TWindow() is equivalent to oWin := TWindow():New()
+ *       FALSE - No auto initialization
  *
  */
 HB_FUNC( __SETCLASSAUTOINIT )
