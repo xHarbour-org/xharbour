@@ -82,7 +82,6 @@ CLASS TToolbar FROM TControl
    DATA abuttons
    DATA aBitmaps
    DATA hParent
-   DATA hWnd
    DATA Created
    DATA aText
    DATA hBmp
@@ -163,7 +162,7 @@ METHOD AddBitmap(hInst, nhIdBmp, nButtons) CLASS TToolBar
    tbab:nId   := nhIdBmp
    AADD(::aBitmaps,{tbab,nButtons})
    IF ::created
-     SendMessage(::hWnd,TB_ADDBITMAP,nButtons,tbab:value)
+     SendMessage(::handle,TB_ADDBITMAP,nButtons,tbab:value)
    ENDIF
 
    RETURN(1)
@@ -184,7 +183,8 @@ METHOD AddButton(nIndex, nId, nState, nStyle, ncargo, nString, cText, cToolTip )
    AADD(::aButtons,tbb)
    AADD(::aTips,cToolTip)
    IF ::Created
-     SendMessage(::hWnd,TB_ADDBUTTONS,1,tbb:value)
+     SendMessage(::handle,TB_ADDBUTTONS,1,tbb:value)
+     
    ENDIF
 
 RETURN(self)
@@ -202,7 +202,7 @@ METHOD AddMenu(nId,aMenuItems)
 METHOD addstring(cText) CLASS TToolBar
 
    IF ::created
-      SendMessage(::hWnd,TB_ADDSTRING,0,cText)
+      SendMessage(::handle,TB_ADDSTRING,0,cText)
    Else
       AADD(::aText,cText)
    Endif
