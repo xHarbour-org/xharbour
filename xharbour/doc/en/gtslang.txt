@@ -1,5 +1,5 @@
 /*
- * $Id: gtslang.txt,v 1.1.1.1 2001/12/21 10:48:18 ronpinkas Exp $
+ * $Id: gtslang.txt,v 1.2 2002/04/16 16:12:18 map Exp $
  */
 
                         Gt Slang driver
@@ -46,6 +46,7 @@ To build user programs (by using a bld.sh script from Harbour sources),
 which will use a gtsln, you need to :
     - have a Slang library and header files properly installed
     - set an environment variable HB_GT_LIB to gtsln
+    - optionally set an environment variable HB_GPM_MOUSE=yes
     - modify bld.sh by adding -lslang to a link command
 
 Generally you always need to add -lgtsln -lslang to your link libraries to
@@ -67,7 +68,7 @@ graphics characters. It also assumes national characters can be entered
 for example by pressing an ALTR key and a particular key on a keyboard to
 get a desired national character. If this is impossible on some terminals
 due to their lack of posibilities, an alternate method which uses Dead
-keys, is implemented. To be able to see and to enter national characters
+Keys, is implemented. To be able to see and to enter national characters
 one should :
 
  - have a proper font table loaded
@@ -207,21 +208,14 @@ Here is a (probably not complete) list of them :
       ALT+key, CTRL+F<n> and CTRL+<specialkeys> combinations to work at all
       although they work on a textmode Linux console. This is a very big
       problem and at least any solution should be developed to emulate this.
-      One attempt is a Dead key workaround I've implemented for national
-      characters and a Meta key to simulate Alt key. By default as a Meta
-      key I've chosen ESC key pressed once (like in most Linux programs).
+      One attempt is a Dead Key workaround I've implemented for national
+      characters and a Meta Key to simulate Alt key. By default as a Meta
+      Key I've chosen ESC key pressed once (like in most Linux programs).
 
     - abort key is CTRL+\ not CTRL+BREAK on Unixes
 
     - to get an ESC key you have to press ESC twice. This is an issue
       related to OS behavior where ESC begins a control sequence
-
-    - Out<XXX>() functions do not work well. This is caused by a design of
-      a gt layer where writing directly to stdout is done outside Slang,
-      so Slang can't maintain screen changes properly.
-
-    - redirecting Out<XXX>() to a file results in writing control chars
-      which were supposed to initialize a terminal, to that file
 
     - monochrome displaying support is currently broken
 
@@ -256,9 +250,6 @@ TODO
 ------
 
    - keyboard emulation on terminals with lack of posibilities
-   - support for mouse on Linux text console and on xterm
-     ( already done )
-   - fix a problem with redirecting output to a file or a pipe
    - find a way to inherit screen from a system at startup
      (is it possible at all ?)
    - sound support on Linux using native sound system (Alsa ?)

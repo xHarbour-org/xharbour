@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.391 2002/09/21 02:41:16 lculik Exp $
+ * $Id: ChangeLog,v 1.392 2002/09/21 05:21:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-21 13:50 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * ChangeLog
+    * Fixed ChangLog entry for my last commit
+    
+  * doc/en/gtslang.txt
+    * Synchronized with last gtsln improvements
 
 2002-09-20 22:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/arrays.c
@@ -100,6 +107,30 @@
            (like FWH) should be noticably faster after this change. I tested heavily, but will appreciate extensive
            testing, [and reports] from everyone.
    */
+
+2002-09-20 21:10 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
+  * include/hbapigt.h
+  * source/rtl/console.c
+  * source/rtl/gtapi.c
+  * source/rtl/gtcgi/gtcgi.c
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gtdos/gtdos.c
+  * source/rtl/gtos2/gtos2.c
+  * source/rtl/gtpca/gtpca.c
+  * source/rtl/gtstd/gtstd.c
+  * source/rtl/gtwin/gtwin.c
+    * Fixed long waiting problem with OutStd()/OutErr()
+      (gt layer can now track OutStd()/OutErr() usage)
+      
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gtsln/gtsln.h
+  * source/rtl/gtsln/keytrans.c
+    * Fixed problem with OutStd()/OutErr() redirected
+        to a file (MANY THANKS to Przemyslaw Czerpak 
+        for detailed information on how to do that)
+    * Fixed long waiting problem with OutStd()/OutErr()
+        (gt layer can now track OutStd()/OutErr() usage)
+    * Fixed broken logic in gtsln keyboard handling 
 
 2002-09-19 18:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
    * source/rtl/tbrowse.prg
