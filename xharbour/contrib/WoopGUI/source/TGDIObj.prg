@@ -25,7 +25,7 @@
 
 // This is a virtual class - don't use directly
 
-CLASS WG_TGDIObject FROM WG_TObject
+CLASS TGDIObject FROM TObject
 
     //CLASSDATA aoReGDI       AS ARRAY INIT {} // Array of gdi object
     DATA nHandle          AS NUMERIC       // Handle
@@ -52,12 +52,12 @@ CLASS WG_TGDIObject FROM WG_TObject
 
 ENDCLASS
 
-METHOD New() CLASS WG_TGDIObject
+METHOD New() CLASS TGDIObject
     // Nothing to do
 RETURN Self
 
 /*
-METHOD AddResource( oGDI, bEval ) CLASS WG_TGDIObject
+METHOD AddResource( oGDI, bEval ) CLASS TGDIObject
    LOCAL nPos := ::FindResource( oGDI:nResource )
 
    WG_ParamDisplay( Self, hb_aparams(), "TGDIObject" )
@@ -73,11 +73,11 @@ METHOD AddResource( oGDI, bEval ) CLASS WG_TGDIObject
 RETURN oGDI:nHandle
 */
 
-METHOD SetEvalResource( bEval ) CLASS WG_TGDIObject
+METHOD SetEvalResource( bEval ) CLASS TGDIObject
   ::bEvalResource := bEval
 RETURN Self
 
-METHOD AddResource() CLASS WG_TGDIObject
+METHOD AddResource() CLASS TGDIObject
   LOCAL nPos := ::FindResourceByEval()
 
   IF nPos > 0
@@ -89,10 +89,10 @@ METHOD AddResource() CLASS WG_TGDIObject
 
 RETURN Self
 
-METHOD FindResourceByEval() CLASS WG_TGDIObject
+METHOD FindResourceByEval() CLASS TGDIObject
 RETURN aScan( ::aoResources, ::bEvalResource )
 
-METHOD DelResource() CLASS WG_TGDIObject
+METHOD DelResource() CLASS TGDIObject
   LOCAL nPos
   ::nResources--
   IF ::nResources == 0
@@ -106,8 +106,8 @@ METHOD DelResource() CLASS WG_TGDIObject
   ENDIF
 RETURN NIL
 
-METHOD FindResource() CLASS WG_TGDIObject
+METHOD FindResource() CLASS TGDIObject
 RETURN aScan( ::aoResources, {|o| o:nHandle == ::nHandle } )
 
-METHOD ReleaseResource() CLASS WG_TGDIObject
+METHOD ReleaseResource() CLASS TGDIObject
 RETURN DeleteObject( ::nHandle )

@@ -22,7 +22,7 @@
 #include "windows.ch"
 
 // Windows definitions
-CLASS WG_T3StateButton FROM WG_TButton
+CLASS T3StateButton FROM TButton
 
     // METODI
     METHOD New()         CONSTRUCTOR
@@ -32,7 +32,7 @@ CLASS WG_T3StateButton FROM WG_TButton
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS WG_T3StateButton
+METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS T3StateButton
 
     DEFAULT lPixel TO TRUE
 
@@ -53,14 +53,14 @@ METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cSta
 RETURN Self
 
 METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip,;
-                    cStatusBar, lPixel, nID, nValue, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS WG_T3StateButton
+                    cStatusBar, lPixel, nID, nValue, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS T3StateButton
 
     ::New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, nValue )
     ::Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
 
 RETURN Self
 
-METHOD Init() CLASS WG_T3StateButton
+METHOD Init() CLASS T3StateButton
     ::SetValue( ::xValue )
     ::Super:Init()
 RETURN Self

@@ -21,7 +21,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TStatusBar FROM WG_TWindowBase
+CLASS TStatusBar FROM TWindowBase
 
     DATA oStack   AS OBJECT
     DATA aParts   AS ARRAY
@@ -43,7 +43,7 @@ CLASS WG_TStatusBar FROM WG_TWindowBase
 
 ENDCLASS
 
-METHOD New( oParent, aParts, nStyle ) CLASS WG_TStatusBar
+METHOD New( oParent, aParts, nStyle ) CLASS TStatusBar
 
     ASSIGN ::cClassName   WITH STATUSCLASSNAME
     ASSIGN ::cName        WITH ""
@@ -59,62 +59,62 @@ METHOD New( oParent, aParts, nStyle ) CLASS WG_TStatusBar
 
 RETURN Self
 
-// METHOD Create( nParts ) CLASS WG_TStatusBar
+// METHOD Create( nParts ) CLASS TStatusBar
 //     DEFAULT nParts     TO 1
 //     ::nParts       := nParts
 //     ::Super:Create()
 // RETURN WG_CreateStatusBar( ::oParent:nHandle, ::nHandle, nParts )
 
 
-METHOD Create( ) CLASS WG_TStatusBar //aParts AS ARRAY )
+METHOD Create( ) CLASS TStatusBar //aParts AS ARRAY )
     LOCAL cSizes := ""
     //ASSIGN ::aParts WITH aParts DEFAULT {-1}
 
     ::Super:Create()  // Make the window
 
-    ::oStack := WG_TStack():New()
+    ::oStack := TStack():New()
     //::SetWidths( { 200, 20, 50, 100, -1 } )
     ::SetWidths( { 200, -1, 60, 100 } )
     //::SetTooltip( "Message" )
 
 RETURN Self
 
-METHOD GetValue( nPart ) CLASS WG_TStatusBar
+METHOD GetValue( nPart ) CLASS TStatusBar
     LOCAL cString := ""
     DEFAULT nPart   TO 1
     //DEFAULT uFlags TO SBT_NOBORDERS
     ::SendMessage( SB_GETTEXT, nPart-1, @cString )
 RETURN cString
 
-METHOD PopValue() CLASS WG_TStatusBar
+METHOD PopValue() CLASS TStatusBar
     LOCAL aBar := ::oStack:Pop() // { nPart, uFlags, cString }
     //DEFAULT uFlags TO SBT_NOBORDERS
 RETURN SetStatusBar( ::nHandle, aBar[1], aBar[2], aBar[3] )
 
-METHOD PushValue( cString, nPart, uFlags ) CLASS WG_TStatusBar
+METHOD PushValue( cString, nPart, uFlags ) CLASS TStatusBar
     DEFAULT nPart  TO 1
     ::oStack:Push( { nPart, uFlags, cString } )
     //DEFAULT uFlags TO SBT_NOBORDERS
 RETURN SetStatusBar( ::nHandle, nPart, uFlags, cString )
 
-METHOD Repaint(lParam) CLASS WG_TStatusBar
+METHOD Repaint(lParam) CLASS TStatusBar
    LOCAL nWidth  := LoWord( lParam )
    LOCAL nHeight := HiWord( lParam )
    ::Move( 0,0,0,0, TRUE )
    ::SetWidths(,nWidth)
 RETURN Self
 
-METHOD SetBackgroundColor( ncBackColor, nPart ) CLASS WG_TStatusBar
+METHOD SetBackgroundColor( ncBackColor, nPart ) CLASS TStatusBar
    LOCAL nColor
    DEFAULT ncBackColor TO CLR_DEFAULT
    DEFAULT nPart       TO 1
-   ::oColor := WG_TColor():New( ncBackColor )
+   ::oColor := TColor():New( ncBackColor )
    nColor := IIF( ncBackColor == CLR_DEFAULT, CLR_DEFAULT, ::oColor:GetColor() )
 RETURN ::SendMessage( SB_SETBKCOLOR, 0, nColor )
 
 
 
-METHOD SetValue( cString, nPart, uFlags ) CLASS WG_TStatusBar
+METHOD SetValue( cString, nPart, uFlags ) CLASS TStatusBar
     DEFAULT cString TO ""
     DEFAULT nPart   TO 1
     //DEFAULT uFlags TO SBT_NOBORDERS
@@ -122,12 +122,12 @@ METHOD SetValue( cString, nPart, uFlags ) CLASS WG_TStatusBar
     ::SetToolTip( cString, nPart )
 RETURN Self
 
-METHOD SetToolTip( cString, nPart ) CLASS WG_TStatusBar
+METHOD SetToolTip( cString, nPart ) CLASS TStatusBar
     DEFAULT nPart   TO 1
     DEFAULT cString TO ::GetValue( nPart )
 RETURN ::SendMessage( SB_SETTIPTEXT, nPart-1, GetStringPtr( cString ) )
 
-METHOD SetWidths( aParts AS ARRAY, nWidth AS NUMERIC ) CLASS WG_TStatusBar
+METHOD SetWidths( aParts AS ARRAY, nWidth AS NUMERIC ) CLASS TStatusBar
     LOCAL cSizes := ""
     LOCAL nX := 0  // This is the x coordinate value that be incremented
                    // of the relative size of part
@@ -168,7 +168,7 @@ METHOD SetWidths( aParts AS ARRAY, nWidth AS NUMERIC ) CLASS WG_TStatusBar
     //AEVAL(::aParts, {|x| IIF( x == -1, nX := x, nX += x), cSizes += L2BIN( nX ) } )
 RETURN ::SendMessage( SB_SETPARTS, LEN( aParts ), cSizes )
 
-METHOD WindowProc( nMsg, wParam, lParam ) CLASS WG_TStatusBar
+METHOD WindowProc( nMsg, wParam, lParam ) CLASS TStatusBar
    LOCAL nRet := -1
    IF ValType( ::bWindowProc  ) == "B"
       // User event handler

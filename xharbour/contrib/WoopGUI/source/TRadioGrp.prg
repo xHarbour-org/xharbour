@@ -22,7 +22,7 @@
 #include "windows.ch"
 
 // Windows definitions
-CLASS WG_TRadioGroup FROM WG_TObject
+CLASS TRadioGroup FROM TObject
 
     DATA   aoItems   AS ARRAY     INIT {}
     DATA   lVertical AS LOGICAL   INIT TRUE
@@ -41,7 +41,7 @@ CLASS WG_TRadioGroup FROM WG_TObject
 ENDCLASS
 
 METHOD New( aValues AS ARRAY OF STRING, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel,;
-            lVertical, nSelected ) CLASS WG_TRadioGroup
+            lVertical, nSelected ) CLASS TRadioGroup
     LOCAL n, nHPos, nVPos
 
     DEFAULT lPixel TO TRUE
@@ -68,7 +68,7 @@ METHOD New( aValues AS ARRAY OF STRING, nRow, nCol, nWidth, nHeight, oParent, bA
            nHPos := nCol+((n-1)*(nWidth+2))
         ENDIF
 
-        ::AddItem( WG_TRadioButton():New( aValues[n], nVPos, nHPos, nWidth, nHeight, oParent, bAction, ;
+        ::AddItem( TRadioButton():New( aValues[n], nVPos, nHPos, nWidth, nHeight, oParent, bAction, ;
                                           cToolTip, cStatusBar, lPixel, IIF( n == 1, TRUE, FALSE ), ;
                                           IIF( n == nSelected, TRUE, FALSE ) ) )
     NEXT n
@@ -77,7 +77,7 @@ METHOD New( aValues AS ARRAY OF STRING, nRow, nCol, nWidth, nHeight, oParent, bA
 RETURN Self
 
 METHOD NewExtended( aValues AS ARRAY OF STRING, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, ;
-                    lVertical, nSelected, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS WG_TRadioGroup
+                    lVertical, nSelected, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TRadioGroup
     LOCAL n, nHPos, nVPos
 
     DEFAULT lPixel TO TRUE
@@ -108,7 +108,7 @@ METHOD NewExtended( aValues AS ARRAY OF STRING, nRow, nCol, nWidth, nHeight, oPa
            nHPos := nCol+((n-1)*(nWidth+2))
         ENDIF
 
-        ::AddItem( WG_TRadioButton():NewExtended( aValues[n], nVPos, nHPos, nWidth, nHeight, oParent, bAction, ;
+        ::AddItem( TRadioButton():NewExtended( aValues[n], nVPos, nHPos, nWidth, nHeight, oParent, bAction, ;
                                        cToolTip, cStatusBar, lPixel, IIF( n == 1, TRUE, FALSE ), ;
                                        IIF( n == nSelected, TRUE, FALSE ),;
                                        WG_RadioGroupValue(Self, n), oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) )
@@ -120,7 +120,7 @@ RETURN Self
 STATIC FUNCTION WG_RadioGroupValue( o, n )
 RETURN {|| o:SetValue( n ) }
 
-METHOD SetValue( nValue AS NUMERIC ) CLASS WG_TRadioGroup
+METHOD SetValue( nValue AS NUMERIC ) CLASS TRadioGroup
    ::nValue := nValue
    ::UpdateVar( nValue )
 RETURN Self

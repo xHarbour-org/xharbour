@@ -21,7 +21,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TTimer FROM WG_TObject
+CLASS TTimer FROM TObject
 
    CLASSDATA aoTimers AS ARRAY INIT {}    HIDDEN
    DATA    oOwner   AS OBJECT             HIDDEN

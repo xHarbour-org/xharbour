@@ -24,7 +24,7 @@
 #include "getexit.ch"
 
 
-CLASS WG_TPanel FROM WG_TWindow
+CLASS TPanel FROM TWindow
 
     CLASSDATA anDialogs AS ARRAY INIT {} HIDDEN    // Array of handles of dialogs
 
@@ -96,7 +96,7 @@ CLASS WG_TPanel FROM WG_TWindow
 
 ENDCLASS
 
-METHOD New( nExStyle, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lPixel, lModal ) CLASS WG_TPanel
+METHOD New( nExStyle, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lPixel, lModal ) CLASS TPanel
 
     ASSIGN ::lModal       WITH lModal               DEFAULT FALSE
     ASSIGN ::nExStyle     WITH nExStyle             DEFAULT 0 //WS_EX_CLIENTEDGE
@@ -115,8 +115,8 @@ METHOD New( nExStyle, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lPixe
     ASSIGN ::nMenu        WITH 0
     ASSIGN ::lPixel       WITH lPixel               DEFAULT FALSE
 
-    //::oFont := WG_TFont():New( "MS Sans Serif", 8 )
-    ::oFont := WG_TFont():NewExtended( -11, 0, 0, 0, 400, .F., .F.,;
+    //::oFont := TFont():New( "MS Sans Serif", 8 )
+    ::oFont := TFont():NewExtended( -11, 0, 0, 0, 400, .F., .F.,;
                        .F., 0, 1, 2, 1, 34, "MS Sans Serif" )
 
     ::Super:New( ::nExStyle, ::cClassName, ::cName, ::nStyle, ::nRow, ::nCol, ;
@@ -130,7 +130,7 @@ RETURN Self
 METHOD NewExtended( nExStyle, cTitle, nStyle, nRow, nCol, nWidth, nHeight,;
                     oMenu, oBrush, oIcon, oParent AS OBJECT, lPixel, lModal, ;
                     lvScroll, lhScroll, nClrFore, nClrBack, oCursor,;
-                    cBorder ) CLASS WG_TPanel
+                    cBorder ) CLASS TPanel
 
 
    ::New( nExStyle, cTitle, nStyle, nRow, nCol, nWidth, nHeight, oParent, lPixel, lModal )
@@ -138,7 +138,7 @@ METHOD NewExtended( nExStyle, cTitle, nStyle, nRow, nCol, nWidth, nHeight,;
 RETURN Self
 
 
-METHOD Create( GetList ) CLASS WG_TPanel
+METHOD Create( GetList ) CLASS TPanel
     //WG_ObjDisplayData( Self )
 
     // Add dialog window before create because i need to find
@@ -159,7 +159,7 @@ METHOD Create( GetList ) CLASS WG_TPanel
 
 RETURN Self
 
-METHOD EndDialog() CLASS WG_TPanel
+METHOD EndDialog() CLASS TPanel
 
   IF ::lModal
       WG_DebugTrace( "TPanel:EndDialog()", "Self", Self )
@@ -202,12 +202,12 @@ METHOD EndDialog() CLASS WG_TPanel
 
 RETURN Self
 
-METHOD GetDialogHandleArray() CLASS WG_TPanel
+METHOD GetDialogHandleArray() CLASS TPanel
 RETURN ::anDialogs
 
 //------------------------------------------------------------------------------
 
-METHOD InitGetList( GetList, nPos ) CLASS WG_TPanel
+METHOD InitGetList( GetList, nPos ) CLASS TPanel
 
    LOCAL oGetList, oSaveGetList
 
@@ -270,7 +270,7 @@ RETURN Self
 //------------------------------------------------------------------------------
 // Events
 
-METHOD OnCtlColor( wParam, lParam ) CLASS WG_TPanel
+METHOD OnCtlColor( wParam, lParam ) CLASS TPanel
    LOCAL nRet := -1
    LOCAL nHDC := wParam
    LOCAL nCtl := lParam
@@ -282,7 +282,7 @@ METHOD OnCtlColor( wParam, lParam ) CLASS WG_TPanel
 
 RETURN nRet
 
-METHOD OnDrawItem( nID, lParam ) CLASS WG_TPanel
+METHOD OnDrawItem( nID, lParam ) CLASS TPanel
    LOCAL nRet := -1
    LOCAL oWin := ::FindChildByID( nID )
    MessageBox( , "Passato da TDialog_OnDrawItem" )
@@ -292,7 +292,7 @@ METHOD OnDrawItem( nID, lParam ) CLASS WG_TPanel
 
 RETURN nRet
 
-METHOD OnInitDialog( wParam, lParam ) CLASS WG_TPanel
+METHOD OnInitDialog( wParam, lParam ) CLASS TPanel
    LOCAL nRet := -1
 
    //MessageBox(, "TDIALOG Window Proc INIT DIALOG" )
@@ -315,7 +315,7 @@ METHOD OnInitDialog( wParam, lParam ) CLASS WG_TPanel
 
 RETURN nRet
 
-METHOD OnCommand( wParam, lParam ) CLASS WG_TPanel
+METHOD OnCommand( wParam, lParam ) CLASS TPanel
    LOCAL nRet := -1
    LOCAL nEvent := HiWord( wParam )
    LOCAL nID    := LoWord( wParam )
@@ -340,7 +340,7 @@ METHOD OnCommand( wParam, lParam ) CLASS WG_TPanel
 
 RETURN nRet
 
-METHOD OnContextMenu( wParam, lParam ) CLASS WG_TPanel
+METHOD OnContextMenu( wParam, lParam ) CLASS TPanel
    LOCAL nRet := -1
    LOCAL x := LoWord( lParam )
    LOCAL y := HiWord( lParam )
@@ -354,7 +354,7 @@ METHOD OnContextMenu( wParam, lParam ) CLASS WG_TPanel
 
 RETURN nRet
 
-METHOD OnNCDestroy() CLASS WG_TPanel
+METHOD OnNCDestroy() CLASS TPanel
    WG_DebugTrace( "TPanel:OnNCDestroy() - shrink array of dialogs", "Self", Self )
    ::Super:OnNCDestroy()
    ::DelDialogWindowHandle( ::nHandle )
@@ -362,7 +362,7 @@ RETURN -1
 
 //------------------------------------------------------------------------------
 
-METHOD WindowProc( nMsg, wParam, lParam ) CLASS WG_TPanel
+METHOD WindowProc( nMsg, wParam, lParam ) CLASS TPanel
    LOCAL nRet := -1  // = TRUE
    LOCAL wmId, wmEvent, wmHandle
    LOCAL oWin
@@ -397,7 +397,7 @@ RETURN nRet
 
 
 FUNCTION WG_GetDialogArray()
-RETURN WG_TPanel():GetDialogHandleArray()
+RETURN TPanel():GetDialogHandleArray()
 
 // ----------------------------------------------------
 //
@@ -416,13 +416,13 @@ FUNCTION WG_DefDlgEvents( hWnd, nMsg, wParam, lParam )
   DO CASE
      // If wm_initdialog i assign only the handle, then other in windowproc()
      CASE nMsg == WM_INITDIALOG
-          oWin         := aTail( WG_TWindow():GetWindows() )
+          oWin         := aTail( TWindow():GetWindows() )
           oWin:nHandle := hWnd
           WG_DebugTrace( "WG_DefDlgEvents() - WM_INITDIALOG", "oWin:ClassName", oWin:ClassName )
   ENDCASE
 
   // Search window
-  oWin      := WG_TWindow():FindWindowByHandle( hwnd )
+  oWin      := TWindow():FindWindowByHandle( hwnd )
   IF oWin <> NIL
      // Call his window procedure
      nRet := oWin:WindowProc( nMsg, wParam, lParam )

@@ -21,7 +21,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TColorDatabase FROM WG_TObject
+CLASS TColorDatabase FROM TObject
 
     CLASSDATA  aColorTable AS ARRAY  HIDDEN
 
@@ -31,7 +31,7 @@ CLASS WG_TColorDatabase FROM WG_TObject
 
 ENDCLASS
 
-METHOD FindColor( cName ) CLASS WG_TColorDatabase
+METHOD FindColor( cName ) CLASS TColorDatabase
    LOCAL nPos, aColor
    ::Create()
    cName := Upper( cName )
@@ -42,7 +42,7 @@ METHOD FindColor( cName ) CLASS WG_TColorDatabase
 RETURN aColor
 
 
-METHOD Create() CLASS WG_TColorDatabase
+METHOD Create() CLASS TColorDatabase
    IF  ::aColorTable == NIL
        ::aColorTable := ;
        { ;

@@ -29,7 +29,7 @@ STATIC oMyApplication
 STATIC shInstance
 
 // Environment application definitions
-CLASS WG_TApplication FROM WG_TObject
+CLASS TApplication FROM TObject
     // Base
     PROTECTED:
     DATA cId         AS CHAR
@@ -98,7 +98,7 @@ RETURN oMyApplication
 FUNCTION WG_ApplHandle()
 RETURN oMyApplication:nHandle
 
-METHOD New( cId, cName, cIcon, cCursor, nBkColor, cIconSm, bInit, bQuit ) CLASS WG_TApplication
+METHOD New( cId, cName, cIcon, cCursor, nBkColor, cIconSm, bInit, bQuit ) CLASS TApplication
     LOCAL oWinDef
     LOCAL n, pIcon
 
@@ -131,11 +131,11 @@ METHOD New( cId, cName, cIcon, cCursor, nBkColor, cIconSm, bInit, bQuit ) CLASS 
 
 RETURN Self
 
-METHOD Create() CLASS WG_TApplication
+METHOD Create() CLASS TApplication
    LOCAL oWinDef
 
       // Define Standard Application Class Data
-      oWinDef := WG_TWindowDef():New( ,, ::nHandle )
+      oWinDef := TWindowDef():New( ,, ::nHandle )
       oWinDef:cClassName := "WoopGUIFrmClass"
 
       IF ::cIcon   <> NIL THEN oWinDef:SetIconFromFile( ::cIcon )
@@ -150,7 +150,7 @@ METHOD Create() CLASS WG_TApplication
 
 RETURN Self
 
-METHOD MainLoop() CLASS WG_TApplication
+METHOD MainLoop() CLASS TApplication
    LOCAL cMsg
 
    DO WHILE GetMessage( @cMsg, 0, 0, 0 )
@@ -190,26 +190,26 @@ RETURN oWin
 //  ::oCurrentWindow := oWnd
 //RETURN nOldWnd
 
-METHOD SetLogWrite( lWrite AS LOGICAL, cFileName AS STRING, lAppend AS LOGICAL, oWnd AS OBJECT ) CLASS WG_TApplication
+METHOD SetLogWrite( lWrite AS LOGICAL, cFileName AS STRING, lAppend AS LOGICAL, oWnd AS OBJECT ) CLASS TApplication
   ASSIGN ::lLogWrite     WITH lWrite
   ASSIGN ::cLogFileName  WITH cFileName DEFAULT "events.log"
   ASSIGN ::lLogAppend    WITH lAppend   DEFAULT FALSE
   ASSIGN ::oLogWindow    WITH oWnd
 RETURN NIL
 
-METHOD SetLogWindow( oWnd AS OBJECT ) CLASS WG_TApplication
+METHOD SetLogWindow( oWnd AS OBJECT ) CLASS TApplication
   LOCAL oOldWnd := ::oLogWindow
   ::oLogWindow := oWnd
 RETURN oOldWnd
 
-METHOD OnInit() CLASS WG_TApplication
+METHOD OnInit() CLASS TApplication
   WG_DebugTrace( "TApplication:OnInit()", "Self", Self )
   IF ValType( ::bInit ) == "B"
      Eval( ::bInit )
   ENDIF
 RETURN Self
 
-METHOD OnQuit() CLASS WG_TApplication
+METHOD OnQuit() CLASS TApplication
   WG_DebugTrace( "TApplication:OnQuit()", "Self", Self )
   IF ValType( ::bQuit ) == "B"
      Eval( ::bQuit )
@@ -224,8 +224,8 @@ RETURN NIL
 //RETURN NIL
 
 
-METHOD EventsWrite( cFrom, hWnd, cnMsg, wParam, lParam ) CLASS WG_TApplication
-    LOCAL oWinF := WG_TWindow():FindWindowByHandle( hWnd )
+METHOD EventsWrite( cFrom, hWnd, cnMsg, wParam, lParam ) CLASS TApplication
+    LOCAL oWinF := TWindow():FindWindowByHandle( hWnd )
     LOCAL cMsg, nMsg
     STATIC lHeader := TRUE
 
@@ -269,7 +269,7 @@ METHOD EventsWrite( cFrom, hWnd, cnMsg, wParam, lParam ) CLASS WG_TApplication
 
 RETURN NIL
 
-METHOD MenuEventsWrite( oItem AS OBJECT ) CLASS WG_TApplication
+METHOD MenuEventsWrite( oItem AS OBJECT ) CLASS TApplication
     // STATIC lHeader
 
     // IF lHeader == NIL
@@ -286,7 +286,7 @@ METHOD MenuEventsWrite( oItem AS OBJECT ) CLASS WG_TApplication
 
 RETURN NIL
 
-METHOD LogWrite( cText AS STRING, fname AS STRING) CLASS WG_TApplication
+METHOD LogWrite( cText AS STRING, fname AS STRING) CLASS TApplication
   LOCAL nHand
   LOCAL n
 

@@ -22,7 +22,7 @@
 #include "windows.ch"
 
 // Menu definitions
-CLASS WG_TMenuItem FROM WG_TObject
+CLASS TMenuItem FROM TObject
     // Base
     DATA nFlags
     DATA nIDItem       // nIDItem o oSubMenu
@@ -84,7 +84,7 @@ CLASS WG_TMenuItem FROM WG_TObject
     METHOD OnHilite()
 ENDCLASS
 
-METHOD New( nFlags, nIDItem, cItem, bAction, lChecked, lEnabled, lGrayed, cMsg ) CLASS WG_TMenuItem
+METHOD New( nFlags, nIDItem, cItem, bAction, lChecked, lEnabled, lGrayed, cMsg ) CLASS TMenuItem
 
     DEFAULT nFlags TO 0
     ::nFlags := MF_ENABLED + MF_STRING + nFlags
@@ -109,12 +109,12 @@ METHOD New( nFlags, nIDItem, cItem, bAction, lChecked, lEnabled, lGrayed, cMsg )
 
 RETURN Self
 
-METHOD SetID( nIDItem ) CLASS WG_TMenuItem
+METHOD SetID( nIDItem ) CLASS TMenuItem
    LOCAL nOldIDItem := ::nIDItem
    ASSIGN ::nIDItem WITH nIDItem
 RETURN nOldIDItem
 
-METHOD OnHilite( oWndParent ) CLASS WG_TMenuItem
+METHOD OnHilite( oWndParent ) CLASS TMenuItem
 
    WG_DebugTrace( "TMenuItem:OnHilite()" )
 

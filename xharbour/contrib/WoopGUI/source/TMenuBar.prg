@@ -22,14 +22,14 @@
 #include "windows.ch"
 
 // Menu definitions
-CLASS WG_TMenuBar FROM WG_TMenu
+CLASS TMenuBar FROM TMenu
 
     // METODI
     METHOD  New() CONSTRUCTOR
 
 ENDCLASS
 
-METHOD New() CLASS WG_TMenuBar
+METHOD New() CLASS TMenuBar
 
     // Azzero l'array delle voci
     ::nHandle := CreateMenu()

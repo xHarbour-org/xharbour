@@ -21,7 +21,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TStatic FROM WG_TControl
+CLASS TStatic FROM TControl
 
     METHOD New()         CONSTRUCTOR
     METHOD NewExtended() CONSTRUCTOR
@@ -32,7 +32,7 @@ CLASS WG_TStatic FROM WG_TControl
 
 ENDCLASS
 
-METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID ) CLASS WG_TStatic
+METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID ) CLASS TStatic
 
     DEFAULT lPixel TO TRUE
 
@@ -51,7 +51,7 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolT
 RETURN Self
 
 METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip,;
-                    cStatusBar, lPixel, nID, cAlign, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS WG_TStatic
+                    cStatusBar, lPixel, nID, cAlign, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TStatic
     //WG_ParamDisplay( Self, hb_aparams(), "TStatic_NewExtended" )
     ::New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, cAlign )
     ::Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
@@ -59,7 +59,7 @@ METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolT
 RETURN Self
 
 
-METHOD SetStyle( nStyle ) CLASS WG_TStatic
+METHOD SetStyle( nStyle ) CLASS TStatic
    ::nStyle := WS_VISIBLE + WS_CHILD + nStyle
 RETURN ::Super:SetStyle( ::nStyle )
 

@@ -22,14 +22,14 @@
 #include "windows.ch"
 
 // Windows definitions
-CLASS WG_TDropDownComboBox FROM WG_TComboBox
+CLASS TDropDownComboBox FROM TComboBox
 
     // METODI
     METHOD New() CONSTRUCTOR
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS WG_TDropDownComboBox
+METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS TDropDownComboBox
 
     DEFAULT lPixel TO TRUE
 

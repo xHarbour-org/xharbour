@@ -21,7 +21,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TToolTip FROM WG_TWindow
+CLASS TToolTip FROM TWindow
 
     //DATA    cValue  AS STRING INIT ""
 
@@ -31,7 +31,7 @@ CLASS WG_TToolTip FROM WG_TWindow
 
 ENDCLASS
 
-METHOD New( oParent, cText, nStyle ) CLASS WG_TToolTip
+METHOD New( oParent, cText, nStyle ) CLASS TToolTip
 
     // Impostazioni di default
     DEFAULT nStyle     TO TTS_NOPREFIX + TTS_ALWAYSTIP
@@ -54,7 +54,7 @@ METHOD New( oParent, cText, nStyle ) CLASS WG_TToolTip
 
 RETURN Self
 
-METHOD SetValue( cString AS STRING ) CLASS WG_TToolTip
+METHOD SetValue( cString AS STRING ) CLASS TToolTip
   ::cName := cString
   //::DisplayData()
 RETURN SetToolTip( ::oParent:nHandle, ::nHandle, cString )

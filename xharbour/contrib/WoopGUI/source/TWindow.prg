@@ -25,7 +25,7 @@
 
 //static nWinID
 
-CLASS WG_TWindow FROM WG_TWindowBase
+CLASS TWindow FROM TWindowBase
 
     // Base definitions for CreateWindowEx
     // DATA nExStyle      AS NUMERIC       // Extended style
@@ -255,7 +255,7 @@ CLASS WG_TWindow FROM WG_TWindowBase
 
 ENDCLASS
 
-METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, nChild, nApplication, pStruct ) CLASS WG_TWindow
+METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, nChild, nApplication, pStruct ) CLASS TWindow
 
     WG_DebugTrace( "TWindow:New()" )
     //DEFAULT nWinID TO 1000
@@ -279,10 +279,10 @@ METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oP
     ASSIGN ::nApplication WITH NULL // WG_ApplObj()
     ASSIGN ::pStruct      WITH pStruct
 
-    ::oStackColors := WG_TStack():New()
+    ::oStackColors := TStack():New()
 
-    //ASSIGN ::oBgColor     WITH WG_TSystemSetting():GetColour(COLOR_BTNFACE)
-    //ASSIGN ::oFgColor     WITH WG_TSystemSetting():GetColour(COLOR_WINDOWTEXT)
+    //ASSIGN ::oBgColor     WITH TSystemSetting():GetColour(COLOR_BTNFACE)
+    //ASSIGN ::oFgColor     WITH TSystemSetting():GetColour(COLOR_WINDOWTEXT)
 
     //IF ::nChild == NIL .AND. Left( Upper( ::cClassName ), 4 ) <> "Woop"
     //   ::nChild := nWinID++
@@ -309,17 +309,17 @@ METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oP
 
 RETURN Self
 
-// METHOD Center() CLASS WG_TWindow
+// METHOD Center() CLASS TWindow
 // RETURN CenterWindow( ::nHandle )
 
-METHOD ChangeColors( ncoFore, ncoBack ) CLASS WG_TWindow
+METHOD ChangeColors( ncoFore, ncoBack ) CLASS TWindow
    WG_DebugTrace( "TWindow:ChangeColors()" )
    IF ncoFore != NIL THEN ::SetForeGroundColor( ncoFore )
    IF ncoBack != NIL THEN ::SetBackGroundColor( ncoBack )
    ::Redraw(RDW_ERASE + RDW_INVALIDATE)
 RETURN Self
 
-METHOD OnContextMenu( wParam, lParam ) CLASS WG_TWindow
+METHOD OnContextMenu( wParam, lParam ) CLASS TWindow
    LOCAL nRet := -1
    LOCAL x := GET_X_LPARAM( lParam )
    LOCAL y := GET_Y_LPARAM( lParam )
@@ -331,13 +331,13 @@ METHOD OnContextMenu( wParam, lParam ) CLASS WG_TWindow
    ENDIF
 RETURN nRet
 
-METHOD PushColors( ncoFore, ncoBack ) CLASS WG_TWindow
+METHOD PushColors( ncoFore, ncoBack ) CLASS TWindow
    WG_DebugTrace( "TWindow:PushColors()" )
    ::oStackColors:Push( { ::GetForeGroundColor(), ::GetBackGroundColor() } )
    ::ChangeColors( ncoFore, ncoBack )
 RETURN Self
 
-METHOD PopColors() CLASS WG_TWindow
+METHOD PopColors() CLASS TWindow
    LOCAL aColors
    WG_DebugTrace( "TWindow:PopColors()" )
    IF !( ::oStackColors:Empty() )
@@ -346,7 +346,7 @@ METHOD PopColors() CLASS WG_TWindow
    ENDIF
 RETURN Self
 
-METHOD Destroy() CLASS WG_TWindow
+METHOD Destroy() CLASS TWindow
    WG_DebugTrace( "TWindow:Destroy()", "Self", Self )
    //IF __objHasMethod( Self, "DestroyControls" ) THEN ::DestroyControls()
 
@@ -378,19 +378,19 @@ METHOD Destroy() CLASS WG_TWindow
 
 RETURN NIL
 
-METHOD FindChildByID( nID ) CLASS WG_TWindow
+METHOD FindChildByID( nID ) CLASS TWindow
    LOCAL nPos := aScan( ::aoChilds, {|o| o:nID == nID } )
 RETURN IIF( nPos > 0, ::aoChilds[ nPos ], NIL )
 
-METHOD FindChildByHandle( nHandle ) CLASS WG_TWindow
+METHOD FindChildByHandle( nHandle ) CLASS TWindow
    LOCAL nPos := aScan( ::aoChilds, {|o| o:nHandle == nHandle } )
 RETURN IIF( nPos > 0, ::aoChilds[ nPos ], NIL )
 
-METHOD FindChildByName( cName ) CLASS WG_TWindow
+METHOD FindChildByName( cName ) CLASS TWindow
    LOCAL nPos := aScan( ::aoChilds, {|o| o:cName == cName } )
 RETURN IIF( nPos > 0, ::aoChilds[ nPos ], NIL )
 
-METHOD GetValue( nMaxCount AS NUMERIC) CLASS WG_TWindow
+METHOD GetValue( nMaxCount AS NUMERIC) CLASS TWindow
    LOCAL cValue := ""
    LOCAL nLen
 //   MessageBox(, "GetValue" )
@@ -406,7 +406,7 @@ RETURN cValue
 // METHOD WG_IsWindow()
 // RETURN IsWindow( ::nHandle )
 
-METHOD Move( nX, nY, nWidth, nHeight, lRepaint ) CLASS WG_TWindow
+METHOD Move( nX, nY, nWidth, nHeight, lRepaint ) CLASS TWindow
    LOCAL nRet
    DEFAULT nX      TO ::nRow
    DEFAULT nY      TO ::nCol
@@ -423,27 +423,27 @@ METHOD Move( nX, nY, nWidth, nHeight, lRepaint ) CLASS WG_TWindow
    ENDIF
 RETURN nRet
 
-// METHOD nChild( nMenu ) CLASS WG_TWindow
+// METHOD nChild( nMenu ) CLASS TWindow
 //    LOCAL nOldMenu := ::nMenu
 //    IF nMenu <> NIL
 //       ::nMenu := nMenu
 //    ENDIF
 // RETURN nOldMenu
 
-// METHOD SetExtraStyle( nExStyle ) CLASS WG_TWindow
+// METHOD SetExtraStyle( nExStyle ) CLASS TWindow
 //    ::nExStyle := nExStyle
 // RETURN SetWindowLongPtr( ::nHandle, GWL_EXSTYLE, nExStyle )
 
-// METHOD WG_SetFocus() CLASS WG_TWindow
+// METHOD WG_SetFocus() CLASS TWindow
 //    LOCAL nPrevHandleFocused
 //    nPrevHandleFocused := SetFocus( ::nHandle )
 // RETURN nPrevHandleFocused
 
-METHOD OnDestroy() CLASS WG_TWindow
+METHOD OnDestroy() CLASS TWindow
    WG_DebugTrace( "TWindow:OnDestroy()", "Self", Self )
 RETURN -1
 
-METHOD OnNCDestroy() CLASS WG_TWindow
+METHOD OnNCDestroy() CLASS TWindow
    WG_DebugTrace( "TWindow:OnNCDestroy() - shrink array", "Self", Self )
    IF ::HasChildren()
       // Windows automatically destroyes all child windows, so here we must release only
@@ -456,18 +456,18 @@ METHOD OnNCDestroy() CLASS WG_TWindow
    Self := NIL
 RETURN -1
 
-METHOD SetFont( oFont AS OBJECT, lRedraw AS LOGICAL ) CLASS WG_TWindow
+METHOD SetFont( oFont AS OBJECT, lRedraw AS LOGICAL ) CLASS TWindow
   DEFAULT lRedraw TO TRUE
   ::oFont := oFont
 RETURN SendMessage( ::nHandle, WM_SETFONT, ::oFont:nHandle, IIF( lRedraw, 1, 0 ) )
 
 METHOD SetFontByAttribute( cFontName AS STRING, nFontSize AS NUMERIC, ;
-                          lBold, lItalic, lUnderline, lStrikeOut, lRedraw ) CLASS WG_TWindow
+                          lBold, lItalic, lUnderline, lStrikeOut, lRedraw ) CLASS TWindow
   DEFAULT lRedraw TO TRUE
-  ::oFont := WG_TFont():New(cFontName, nFontSize, lItalic, lUnderline, lStrikeOut, lBold)
+  ::oFont := TFont():New(cFontName, nFontSize, lItalic, lUnderline, lStrikeOut, lBold)
 RETURN SendMessage( ::nHandle, WM_SETFONT, ::oFont:nHandle, IIF( lRedraw, 1, 0 ) )
 
-// METHOD ReParent( oP AS OBJECT ) CLASS WG_TWindow
+// METHOD ReParent( oP AS OBJECT ) CLASS TWindow
 //   LOCAL oOldParent
 //   IF oP <> NIL
 //      oOldParent := ::oParent
@@ -476,12 +476,12 @@ RETURN SendMessage( ::nHandle, WM_SETFONT, ::oFont:nHandle, IIF( lRedraw, 1, 0 )
 //   ENDIF
 // RETURN oOldParent
 
-// METHOD SetEventHandler( bWindowProc AS CODEBLOCK ) CLASS WG_TWindow
+// METHOD SetEventHandler( bWindowProc AS CODEBLOCK ) CLASS TWindow
 //   LOCAL bOldWndProc := ::bWindowProc
 //   ::bWindowProc := bWindowProc
 // RETURN bOldWndProc
 
-METHOD SetBackGroundColor( ncoBgColor ) CLASS WG_TWindow
+METHOD SetBackGroundColor( ncoBgColor ) CLASS TWindow
    LOCAL oOldColor := ::oBgColor
 
     // Check if the color is a clipper color
@@ -490,17 +490,17 @@ METHOD SetBackGroundColor( ncoBgColor ) CLASS WG_TWindow
        IF ValType( ncoBgColor ) == "O"
           ::oBgColor := ncoBgColor
        ELSE
-          ::oBgColor := WG_TColor():New( ncoBgColor )
+          ::oBgColor := TColor():New( ncoBgColor )
        ENDIF
        IF ::oBrush != NIL
           ::oBrush:DelResource()
        ENDIF
-       ::oBrush := WG_TBrush():New( ::oBgColor:GetColor() )
+       ::oBrush := TBrush():New( ::oBgColor:GetColor() )
     ENDIF
 
 RETURN oOldColor
 
-METHOD SetForeGroundColor( ncoFgColor ) CLASS WG_TWindow
+METHOD SetForeGroundColor( ncoFgColor ) CLASS TWindow
    LOCAL oOldColor := ::oFgColor
    LOCAL cFgColor, cBgColor
    LOCAL aClipColor, cClipForeColor, cClipBackColor
@@ -523,7 +523,7 @@ METHOD SetForeGroundColor( ncoFgColor ) CLASS WG_TWindow
           //              "Back = " + cStr( ncClipBackColor ) )
 
           IF !( cClipForeColor == "" )  // ForeGround Color can be not defined
-             ::oFgColor := WG_TColor():New( WG_GetClipperColor( cClipForeColor ) )
+             ::oFgColor := TColor():New( WG_GetClipperColor( cClipForeColor ) )
           ENDIF
 
           IF !( cClipBackColor == "" )  // BackGround Color can be not defined
@@ -531,41 +531,41 @@ METHOD SetForeGroundColor( ncoFgColor ) CLASS WG_TWindow
           ENDIF
 
        ELSE
-          ::oFgColor := WG_TColor():New( ncoFgColor )
+          ::oFgColor := TColor():New( ncoFgColor )
        ENDIF
 
     ENDIF
 
 RETURN oOldColor
 
-METHOD SetMenu( oMenu ) CLASS WG_TWindow
+METHOD SetMenu( oMenu ) CLASS TWindow
    ::oMenu := oMenu
    ::oMenu:SetParent( Self )  // Define parent window of menu
 RETURN SetMenu( ::nHandle, oMenu:nHandle )
 
-// METHOD SetParentByHandle( nParent AS NUMERIC ) CLASS WG_TWindow
+// METHOD SetParentByHandle( nParent AS NUMERIC ) CLASS TWindow
 //    ::oParent := WG_ApplObj():FindWindowByHandle( nParent )
 // RETURN Self
 
-// METHOD SetStyle( nStyle ) CLASS WG_TWindow
+// METHOD SetStyle( nStyle ) CLASS TWindow
 //    ::nStyle := nStyle
 // RETURN SetWindowLongPtr( ::nHandle, GWL_STYLE, nStyle )
 
-METHOD SetToolTip( cToolTip ) CLASS WG_TWindow
+METHOD SetToolTip( cToolTip ) CLASS TWindow
    LOCAL cOldToolTip
    IF ::oToolTip <> NIL
       cOldToolTip := ::oToolTip:GetValue()
       ::oToolTip:SetValue( cToolTip )
    ELSE
-      ::oToolTip := WG_TToolTip():New( Self, cToolTip )
+      ::oToolTip := TToolTip():New( Self, cToolTip )
    ENDIF
 RETURN cOldToolTip
 
-// METHOD SetValue( cTitle AS STRING) CLASS WG_TWindow
+// METHOD SetValue( cTitle AS STRING) CLASS TWindow
 //   ::cName := cTitle
 // RETURN SetWindowText( ::nHandle, cTitle )
 
-// METHOD SetWindowPos( nhWndInsertAfter, nX, nY, nWidth, nHeight, nFlags ) CLASS WG_TWindow
+// METHOD SetWindowPos( nhWndInsertAfter, nX, nY, nWidth, nHeight, nFlags ) CLASS TWindow
 //    LOCAL lOk := SetWindowPos( ::nHandle, nhWndInsertAfter, nX, nY, nWidth, nHeight, nFlags )
 //    UPDATE ::nRow    TO nX      NOT NIL
 //    UPDATE ::nCol    TO nY      NOT NIL
@@ -573,13 +573,13 @@ RETURN cOldToolTip
 //    UPDATE ::nHeight TO nHeight NOT NIL
 // RETURN lOk
 
-// METHOD Show() CLASS WG_TWindow
+// METHOD Show() CLASS TWindow
 //    ShowWindow( ::nHandle, SW_SHOW )
 //    BringWindowToTop(::nHandle)
 //    UpdateWindow( ::nHandle )
 // RETURN Self
 
-// METHOD WindowProc( nMessage, wParam, lParam ) CLASS WG_TWindow
+// METHOD WindowProc( nMessage, wParam, lParam ) CLASS TWindow
 //    LOCAL nRet := -1
 //    IF ValType( ::bWindowProc ) == "B"
 //       nRet := Eval( ::bWindowProc, ::nHandle, nMessage, wParam, lParam )
@@ -587,7 +587,7 @@ RETURN cOldToolTip
 // RETURN nRet
 
 
-METHOD WindowProc( nMsg, wParam, lParam ) CLASS WG_TWindow
+METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
    LOCAL nRet := -1  // = TRUE
    LOCAL wmId, wmEvent, wmHandle
    LOCAL oWin
@@ -739,13 +739,13 @@ FUNCTION WG_DefWndEvents( hWnd, nMsg, wParam, lParam )
 
   DO CASE
      CASE nMsg == WM_INITDIALOG
-          oWin         := aTail( WG_TWindow():GetWindows() )
+          oWin         := aTail( TWindow():GetWindows() )
           oWin:nHandle := hWnd
           //oWin:DisplayData()
   ENDCASE
 
   // Search window
-  oWin      := WG_TWindow():FindWindowByHandle( hwnd )
+  oWin      := TWindow():FindWindowByHandle( hwnd )
   IF oWin <> NIL
      //WG_DebugTrace( "WG_DefWndEvents - Call oWin:WindowProc" )
      // Call his window procedure
@@ -764,7 +764,7 @@ RETURN nRet
 
 // #include "error.ch"
 //
-// METHOD ErrorHandler() CLASS WG_TWindow
+// METHOD ErrorHandler() CLASS TWindow
 //    LOCAL oErr
 //    // Qui la gestione errori
 //    MessageBox( , "Errore: parametri"+str(PCOUNT())  )

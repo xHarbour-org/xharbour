@@ -23,7 +23,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TBrush FROM WG_TGDIObject
+CLASS TBrush FROM TGDIObject
 
     CLASSDATA aoResources AS ARRAY   INIT {} HIDDEN
 
@@ -45,19 +45,19 @@ CLASS WG_TBrush FROM WG_TGDIObject
 
 ENDCLASS
 
-METHOD New( nRGBColor ) CLASS WG_TBrush
+METHOD New( nRGBColor ) CLASS TBrush
 
-  ::oColor  := WG_TColor():New( nRGBColor )
+  ::oColor  := TColor():New( nRGBColor )
   ::SetEvalResource( {|o| o:oColor:nRGBColor == ::oColor:nRGBColor } )
   ::AddResource()
 RETURN Self
 
-METHOD CreateResource() CLASS WG_TBrush
+METHOD CreateResource() CLASS TBrush
   ::nHandle := CreateSolidBrush( ::oColor:nRGBColor )
 RETURN Self
 
 EXIT PROCEDURE __WG_TBrush_Destroy()
    // Run directly releaseresource() without use delresource() because this make a scan for each
-   WG_DebugTrace( "TBrush_Exit_Proc", "WG_TBrush():aoResources", WG_TBrush():aoResources )
-   aEval( WG_TBrush():aoResources, {|o| o:ReleaseResource() } )
+   WG_DebugTrace( "TBrush_Exit_Proc", "TBrush():aoResources", TBrush():aoResources )
+   aEval( TBrush():aoResources, {|o| o:ReleaseResource() } )
 RETURN

@@ -20,7 +20,7 @@ WG_DIR=.
 #
 WOOPGUILIB = lib\woopgui.lib
 WAPILIB    = lib\wapilib.lib
-UTILSLIB   = lib\utils.lib
+#UTILSLIB   = lib\utils.lib
 WOOPGUIRES = lib\woopgui.res
 
 WOOPGUIOBJ = tobject.obj twindowdef.obj \
@@ -45,7 +45,8 @@ WOOPGUIOBJ = tobject.obj twindowdef.obj \
              tdatetime.obj tcalendar.obj \
              txget.obj \
              tget.obj tgetlist.obj \
-             errorsys.obj
+             errorsys.obj \
+             whatutil.obj cstr.obj xget.obj char.obj arrayfunc.obj datetime.obj condeval.obj
 
 WOOPGUIRC  = woopgui.rc
 
@@ -56,7 +57,7 @@ WAPIOBJ    =  _WinDate.obj _WinGDI.obj _WinSys.obj _WinBrsh.obj \
               cmenu.obj cfont.obj \
               cdialog.obj cstatusbar.obj ctooltip.obj
 
-UTILSOBJ   = whatutil.obj cstr.obj xget.obj char.obj arrayfunc.obj datetime.obj condeval.obj
+#UTILSOBJ   = whatutil.obj cstr.obj xget.obj char.obj arrayfunc.obj datetime.obj condeval.obj
 
 
 !include $(WG_DIR)\env\makelib.b32

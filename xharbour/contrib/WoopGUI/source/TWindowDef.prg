@@ -23,7 +23,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TWindowDef FROM WG_TObject
+CLASS TWindowDef FROM TObject
 
     CLASSDATA nClassStyle    AS NUMERIC      // Specifies the class style(s)
     //CLASSDATA pWndProc       AS NUMERIC      // Pointer to the window procedure
@@ -47,7 +47,7 @@ CLASS WG_TWindowDef FROM WG_TObject
 
 ENDCLASS
 
-METHOD New( nStyle, bWindowProc, hInstance, hIcon, hCursor, hbrBackground, cMenuName, cClassName, hIconSm ) CLASS WG_TWindowDef
+METHOD New( nStyle, bWindowProc, hInstance, hIcon, hCursor, hbrBackground, cMenuName, cClassName, hIconSm ) CLASS TWindowDef
     LOCAL xVal
 
     // window defaults
@@ -66,19 +66,19 @@ METHOD New( nStyle, bWindowProc, hInstance, hIcon, hCursor, hbrBackground, cMenu
 
 RETURN Self
 
-METHOD SetCursorFromFile( cFileName ) CLASS WG_TWindowDef
+METHOD SetCursorFromFile( cFileName ) CLASS TWindowDef
    ::hCursor := WG_GetCursorFromFile( ::hInstance, cFileName )
 RETURN ::hCursor
 
-METHOD SetIconFromFile( cFileName ) CLASS WG_TWindowDef
+METHOD SetIconFromFile( cFileName ) CLASS TWindowDef
    ::hIcon := WG_GetIconFromFile( ::hInstance, cFileName )
 RETURN ::hIcon
 
-METHOD SetIconSmFromFile( cFileName ) CLASS WG_TWindowDef
+METHOD SetIconSmFromFile( cFileName ) CLASS TWindowDef
    ::hIconSm := WG_GetIconFromFile( ::hInstance, cFileName )
 RETURN ::hIconSm
 
-//METHOD WindowProc( hWnd, nMessage, wParam, lParam ) CLASS WG_TWindowDef
+//METHOD WindowProc( hWnd, nMessage, wParam, lParam ) CLASS TWindowDef
 //  LOCAL nRet := -1
 //  IF ValType( ::bWindowProc ) == "B" // ::HasEventHandler()
 //     nRet := Eval( ::bWindowProc, hWnd, nMessage, wParam, lParam )

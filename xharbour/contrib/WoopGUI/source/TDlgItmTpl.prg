@@ -22,7 +22,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TDialogItem
+CLASS TDialogItem
 
     DATA nHelpID     AS NUMERIC    INIT 0
     DATA nExStyle    AS NUMERIC    INIT 0
@@ -39,7 +39,7 @@ CLASS WG_TDialogItem
 
 ENDCLASS
 
-METHOD New( cTitle, nRow, nCol, nWidth, nHeight, cClassName, nStyle ) CLASS WG_TDialogItem
+METHOD New( cTitle, nRow, nCol, nWidth, nHeight, cClassName, nStyle ) CLASS TDialogItem
 
     ASSIGN ::nExStyle     WITH 0
     //ASSIGN ::cClassName   WITH "WoopGUIDlgClass"

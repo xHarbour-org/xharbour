@@ -21,13 +21,13 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TStaticText FROM WG_TStatic
+CLASS TStaticText FROM TStatic
 
     METHOD New() CONSTRUCTOR
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, cAlign ) CLASS WG_TStaticText
+METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, cAlign ) CLASS TStaticText
     LOCAL nAlign
 
     DEFAULT cAlign TO "LEFT"

@@ -22,7 +22,7 @@
 #include "windows.ch"
 
 // Windows definitions
-CLASS WG_TPartHandler
+CLASS TPartHandler
 
     DATA cargo    EXPORTED     // Any type, for ad-hoc use
 
@@ -51,14 +51,14 @@ CLASS WG_TPartHandler
 
 ENDCLASS
 
-METHOD New( oParent AS OBJECT, oOwner AS OBJECT ) CLASS WG_TPartHandler
+METHOD New( oParent AS OBJECT, oOwner AS OBJECT ) CLASS TPartHandler
 
     ASSIGN ::oParent WITH oParent
     ASSIGN ::oOwner  WITH oOwner
 
 RETURN Self
 
-METHOD Create( oParent AS OBJECT, oOwner AS OBJECT ) CLASS WG_TPartHandler
+METHOD Create( oParent AS OBJECT, oOwner AS OBJECT ) CLASS TPartHandler
 
     ASSIGN ::oParent WITH oParent
     ASSIGN ::oOwner  WITH oOwner
@@ -67,7 +67,7 @@ METHOD Create( oParent AS OBJECT, oOwner AS OBJECT ) CLASS WG_TPartHandler
 
 RETURN Self
 
-METHOD Configure( oParent AS OBJECT, oOwner AS OBJECT ) CLASS WG_TPartHandler
+METHOD Configure( oParent AS OBJECT, oOwner AS OBJECT ) CLASS TPartHandler
 
     IF oParent <> NIL THEN ::SetParent( oParent )
     IF oOwner <> NIL  THEN ::SetOwner( oOwner )
@@ -76,7 +76,7 @@ METHOD Configure( oParent AS OBJECT, oOwner AS OBJECT ) CLASS WG_TPartHandler
 
 RETURN Self
 
-METHOD Destroy() CLASS WG_TPartHandler
+METHOD Destroy() CLASS TPartHandler
 
     aEval( ::aoChilds, {|o| o:Destroy() } )
 
@@ -95,14 +95,14 @@ RETURN Self
 //  WOG_STAT_CREATE   The :create() method was called successfully
 //  WOG_STAT_FAILURE  The :create() method failed to obtain system resources
 //
-METHOD Status() CLASS WG_TPartHandler
+METHOD Status() CLASS TPartHandler
 RETURN ::nStatus
 
-METHOD AddChild( oChild AS OBJECT ) CLASS WG_TPartHandler
+METHOD AddChild( oChild AS OBJECT ) CLASS TPartHandler
    aAdd( ::aoChilds, oChild )
 RETURN Self
 
-METHOD ChildFromName( nID AS NUMERIC ) CLASS WG_TPartHandler
+METHOD ChildFromName( nID AS NUMERIC ) CLASS TPartHandler
    LOCAL oChild
    LOCAL nPos, n
    LOCAL aoChilds := ::aoChilds
@@ -122,7 +122,7 @@ METHOD ChildFromName( nID AS NUMERIC ) CLASS WG_TPartHandler
    ENDIF
 RETURN oChild
 
-METHOD DelChild( oChild AS OBJECT ) CLASS WG_TPartHandler
+METHOD DelChild( oChild AS OBJECT ) CLASS TPartHandler
    LOCAL nPos
    nPos := aScan( ::aoChilds, {|o| o:nNameID == oChild:nNameID } )
    IF nPos > 0
@@ -133,17 +133,17 @@ METHOD DelChild( oChild AS OBJECT ) CLASS WG_TPartHandler
    ENDIF
 RETURN Self
 
-METHOD SetName( nNewNameID AS NUMERIC ) CLASS WG_TPartHandler
+METHOD SetName( nNewNameID AS NUMERIC ) CLASS TPartHandler
   LOCAL nOldNameID := ::nNameID
   ASSIGN ::nNameID WITH nNewNameID
 RETURN nOldNameID
 
-METHOD SetOwner( oNewOwner AS OBJECT ) CLASS WG_TPartHandler
+METHOD SetOwner( oNewOwner AS OBJECT ) CLASS TPartHandler
   LOCAL oOldOwner := ::oOwner
   ASSIGN ::oOwner WITH oNewOwner
 RETURN oOldOwner
 
-METHOD SetParent( oNewParent AS OBJECT ) CLASS WG_TPartHandler
+METHOD SetParent( oNewParent AS OBJECT ) CLASS TPartHandler
   LOCAL oOldParent := ::oParent
   IF oNewParent <> NIL
      ::oParent := oNewParent

@@ -22,7 +22,7 @@
 #include "windows.ch"
 
 // Menu definitions
-CLASS WG_TMenu FROM WG_TObject
+CLASS TMenu FROM TObject
     // Base
     CLASSDATA aoMenus  AS ARRAY INIT {}
 
@@ -92,14 +92,14 @@ CLASS WG_TMenu FROM WG_TObject
 
 ENDCLASS
 
-METHOD New() CLASS WG_TMenu
+METHOD New() CLASS TMenu
 
     // Azzero l'array delle voci
     ::aoItems      := {}
 
 RETURN Self
 
-METHOD Append( oItem ) CLASS WG_TMenu
+METHOD Append( oItem ) CLASS TMenu
     LOCAL nIDItem
     LOCAL lOk
 
@@ -112,7 +112,7 @@ METHOD Append( oItem ) CLASS WG_TMenu
 
 RETURN lOk
 
-METHOD Delete( nPos )  CLASS WG_TMenu          // nPos = Specifies the menu item before
+METHOD Delete( nPos )  CLASS TMenu          // nPos = Specifies the menu item before
                                                //        which the new menu item is to be inserted
     LOCAL lOk
     LOCAL nIDItem
@@ -124,7 +124,7 @@ METHOD Delete( nPos )  CLASS WG_TMenu          // nPos = Specifies the menu item
 
 RETURN lOk
 
-METHOD DelMenu() CLASS WG_TMenu
+METHOD DelMenu() CLASS TMenu
    LOCAL nPos := ::FindMenu( ::nHandle )
    WG_DebugTrace( "TMenu:Destroy()", "Self", Self, "::nHandle", ::nHandle )
    IF nPos > 0
@@ -142,7 +142,7 @@ METHOD DelMenu() CLASS WG_TMenu
    ENDIF
 RETURN Self
 
-METHOD FindItem( nID ) CLASS WG_TMenu
+METHOD FindItem( nID ) CLASS TMenu
    LOCAL oItem
 
    oItem := WG_FindMenuItem( Self, nID )
@@ -172,7 +172,7 @@ STATIC FUNCTION WG_FindMenuItem( oMenu, nID )
 
 RETURN oItem
 
-METHOD FindItemInAllMenus( nID ) CLASS WG_TMenu
+METHOD FindItemInAllMenus( nID ) CLASS TMenu
    LOCAL oItem
    LOCAL nPos  := aScan( ::aoMenus, {|m| m:FindItem( nID ) <> NIL } )
    IF nPos > 0
@@ -180,17 +180,17 @@ METHOD FindItemInAllMenus( nID ) CLASS WG_TMenu
    ENDIF
 RETURN oItem
 
-METHOD GetItemFromMenu( oMenu, nID ) CLASS WG_TMenu
+METHOD GetItemFromMenu( oMenu, nID ) CLASS TMenu
 RETURN oMenu:FindItem( nID )
 
-METHOD FindMenu( nHandle ) CLASS WG_TMenu
+METHOD FindMenu( nHandle ) CLASS TMenu
    DEFAULT nHandle TO ::nHandle
 RETURN aScan( ::aoMenus, {|m| m:nHandle == nHandle } )
 
-METHOD GetPosition( nID ) CLASS WG_TMenu
+METHOD GetPosition( nID ) CLASS TMenu
 RETURN aScan( ::aoItems, {|m| IIF( ValType( m:nIDItem ) == "O", FALSE, m:nIDItem == nID ) } )
 
-METHOD Insert( oItem, nPos ) CLASS WG_TMenu  // nPos = Specifies the menu item before
+METHOD Insert( oItem, nPos ) CLASS TMenu  // nPos = Specifies the menu item before
                                              //        which the new menu item is to be inserted
     LOCAL lOk
     LOCAL nIDItem
@@ -217,7 +217,7 @@ METHOD Insert( oItem, nPos ) CLASS WG_TMenu  // nPos = Specifies the menu item b
     ENDIF
 RETURN lOk
 
-METHOD Modify( oItem, nPos ) CLASS WG_TMenu   // nPos = Specifies the menu item before
+METHOD Modify( oItem, nPos ) CLASS TMenu   // nPos = Specifies the menu item before
                                               //        which the new menu item is to be inserted
     LOCAL lOk
     LOCAL nIDItem
@@ -244,7 +244,7 @@ METHOD Modify( oItem, nPos ) CLASS WG_TMenu   // nPos = Specifies the menu item 
     ENDIF
 RETURN lOk
 
-METHOD ReparentChilds() CLASS WG_TMenu
+METHOD ReparentChilds() CLASS TMenu
    WG_ReparentMenuItem( Self, Self )
 RETURN Self
 
@@ -267,14 +267,14 @@ STATIC FUNCTION WG_ReparentMenuItem( oMenu, oParentMenu )
 
 RETURN NIL
 
-METHOD SetParent( oWnd AS OBJECT ) CLASS WG_TMenu
+METHOD SetParent( oWnd AS OBJECT ) CLASS TMenu
    LOCAL oOldParent := ::oParent
    IF oWnd <> NIL
       ::oParent := oWnd
    ENDIF
 RETURN oOldParent
 
-METHOD WindowProc( nMsg, wParam, lParam ) CLASS WG_TMenu
+METHOD WindowProc( nMsg, wParam, lParam ) CLASS TMenu
    LOCAL nRet := -1
    LOCAL wmId, wmEvent, wmHandle, wmFlag, wmPos
    LOCAL oMenu, oItem
@@ -387,8 +387,8 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS WG_TMenu
 RETURN nRet
 
 EXIT PROCEDURE __WG_TMenu_Destroy()
-   //MessageBox( , "Nø font = " + cStr( WG_TFont():nResources ) )
-   WG_DebugTrace( "TMenu_Exit_Proc - Destroy menu without parent window", "WG_TMenu():aoMenus", WG_TMenu():aoMenus )
+   //MessageBox( , "Nø font = " + cStr( TFont():nResources ) )
+   WG_DebugTrace( "TMenu_Exit_Proc - Destroy menu without parent window", "TMenu():aoMenus", TMenu():aoMenus )
    // Run directly releaseresource() without use delresource() because this make a scan for each
-   aEval( WG_TMenu():aoMenus, {|o| IIF( !o:HasParent(), DestroyMenu( o:nHandle ), NIL ) } )
+   aEval( TMenu():aoMenus, {|o| IIF( !o:HasParent(), DestroyMenu( o:nHandle ), NIL ) } )
 RETURN

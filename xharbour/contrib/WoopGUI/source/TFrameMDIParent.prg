@@ -22,7 +22,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TFrameMDIParent FROM WG_TFrame
+CLASS TFrameMDIParent FROM TFrame
 
     // Data of this class only
 
@@ -52,7 +52,7 @@ CLASS WG_TFrameMDIParent FROM WG_TFrame
 
 ENDCLASS
 
-METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar ) CLASS WG_TFrameMDIParent
+METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar ) CLASS TFrameMDIParent
 
     ASSIGN ::nExStyle     WITH 0 //WS_EX_MDICHILD
     ASSIGN ::cClassName   WITH "WoopGUIFrmClass"
@@ -76,7 +76,7 @@ METHOD NewExtended( cTitle, nStyle, nRow, nCol, nWidth, nHeight,;
                     oMenu, oBrush, oIcon, oParent, lStatusBar, ;
                     lvScroll, lhScroll, nClrFore, nClrBack, oCursor,;
                     cBorder, lNoSysMenu, lNoCaption,;
-                    lNoIconize, lNoMaximize, lPixel ) CLASS WG_TFrameMDIParent
+                    lNoIconize, lNoMaximize, lPixel ) CLASS TFrameMDIParent
 
    ::New( cTitle, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar )
 

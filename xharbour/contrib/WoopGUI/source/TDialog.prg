@@ -22,7 +22,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TDialog FROM WG_TPanel
+CLASS TDialog FROM TPanel
 
     DATA nMenu       AS NUMERIC INIT 0
 
@@ -48,7 +48,7 @@ CLASS WG_TDialog FROM WG_TPanel
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, lStatusBar, lPixel, lModal ) CLASS WG_TDialog
+METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, lStatusBar, lPixel, lModal ) CLASS TDialog
 
     ASSIGN ::nExStyle     WITH WS_EX_DLGMODALFRAME //+ WS_EX_CONTROLPARENT
     ASSIGN ::cName        WITH cName                DEFAULT "Dialog_1"
@@ -67,7 +67,7 @@ METHOD NewExtended( cTitle, nRow, nCol, nWidth, nHeight,;
                     oMenu, oBrush, oIcon, oParent AS OBJECT, lStatusBar, lPixel, lModal, ;
                     lvScroll, lhScroll, nClrFore, nClrBack, oCursor,;
                     cBorder, lNoSysMenu, lNoCaption,;
-                    lNoIconize, lNoMaximize, oFont, cFontName, nFontSize ) CLASS WG_TDialog
+                    lNoIconize, lNoMaximize, oFont, cFontName, nFontSize ) CLASS TDialog
 
 
    ::New( cTitle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar, lPixel, lModal )
@@ -79,27 +79,27 @@ METHOD NewExtended( cTitle, nRow, nCol, nWidth, nHeight,;
 RETURN Self
 
 
-METHOD CreateStatusBar( nParts, nStyle ) CLASS WG_TDialog
+METHOD CreateStatusBar( nParts, nStyle ) CLASS TDialog
   DEFAULT nStyle TO WS_CHILD + WS_VISIBLE + SBARS_TOOLTIPS
-  ::oStatusBar := WG_tStatusBar():New( Self, nParts, nStyle )
+  ::oStatusBar := tStatusBar():New( Self, nParts, nStyle )
 RETURN IIF( ::oStatusBar <> NIL, TRUE, FALSE )
 
-METHOD GetStatusBar() CLASS WG_TDialog
+METHOD GetStatusBar() CLASS TDialog
 RETURN ::oStatusBar
 
-METHOD PopStatusBar() CLASS WG_TDialog
+METHOD PopStatusBar() CLASS TDialog
    IF ValType( ::oStatusBar ) == "O"
       ::oStatusBar:PopValue()
    ENDIF
 RETURN Self
 
-METHOD PushStatusBar( cString, nPart, uFlags ) CLASS WG_TDialog
+METHOD PushStatusBar( cString, nPart, uFlags ) CLASS TDialog
    IF ValType( ::oStatusBar ) == "O"
       ::oStatusBar:PushValue( cString, nPart, uFlags )
    ENDIF
 RETURN Self
 
-METHOD SetStatusBar( cString, nPart, uFlags ) CLASS WG_TDialog
+METHOD SetStatusBar( cString, nPart, uFlags ) CLASS TDialog
    IF ValType( ::oStatusBar ) == "O"
       ::oStatusBar:SetValue( cString, nPart, uFlags )
    ENDIF
@@ -108,7 +108,7 @@ RETURN Self
 //------------------------------------------------------------------------------
 // Events
 
-METHOD OnInitDialog( wParam, lParam ) CLASS WG_TDialog
+METHOD OnInitDialog( wParam, lParam ) CLASS TDialog
    LOCAL nRet        := -1
    LOCAL lSetDefault := FALSE
 
@@ -143,7 +143,7 @@ METHOD OnInitDialog( wParam, lParam ) CLASS WG_TDialog
 
 RETURN nRet
 
-METHOD OnSysCommand( wParam, nXPos, nYPos ) CLASS WG_TDialog
+METHOD OnSysCommand( wParam, nXPos, nYPos ) CLASS TDialog
    LOCAL nRet := -1
 
    If wParam == SC_CLOSE
@@ -153,7 +153,7 @@ METHOD OnSysCommand( wParam, nXPos, nYPos ) CLASS WG_TDialog
 
 RETURN nRet
 
-METHOD OnNotify( wParam, lParam ) CLASS WG_TDialog
+METHOD OnNotify( wParam, lParam ) CLASS TDialog
    LOCAL nRet := -1
    // Search the control which notify the events
    LOCAL nID    := LoWord( wParam )
@@ -167,7 +167,7 @@ RETURN nRet
 
 //------------------------------------------------------------------------------
 
-METHOD WindowProc( nMsg, wParam, lParam ) CLASS WG_TDialog
+METHOD WindowProc( nMsg, wParam, lParam ) CLASS TDialog
    LOCAL nRet := -1  // = TRUE
    LOCAL wmId, wmEvent, wmHandle
    LOCAL oWin

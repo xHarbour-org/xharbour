@@ -17,7 +17,7 @@ function Main   //( hInstance, hprevInstance, cCmdLine, nCmdShow )
    SET CENTURY ON
 
    DEFINE APPLICATION oApp NAME "Sample" TITLE "Application title" ICONFILE "small.ico" ONQUIT Appl_Quit()
-   //oApp := WG_tApplication():New( "Sample", "Application title", "small.ico" )
+   //oApp := tApplication():New( "Sample", "Application title", "small.ico" )
 
    // OK - now create application instance
    APPLICATION CREATE
@@ -25,7 +25,7 @@ function Main   //( hInstance, hprevInstance, cCmdLine, nCmdShow )
 
    // Define MAIN window
    DEFINE WINDOW oWnd1 AT 10,10 SIZE 700, 500 PIXEL STATUSBAR
-   //oWnd1 := WG_TFrame():New()
+   //oWnd1 := TFrame():New()
    //oWnd1:DisplayData()
 
    #ifdef WG_DEBUG
@@ -157,7 +157,7 @@ PROCEDURE BaseDialog( oWnd1, lModal )
              TITLE "Example Modeless Dialog" ;
              OF oWnd1 STATUSBAR
    ENDIF
-   // oDlg1 := WG_tDialog():New("Example Dialog",0,0,300,550, oWnd1)
+   // oDlg1 := tDialog():New("Example Dialog",0,0,300,550, oWnd1)
    /*
    DEFINE DIALOG oDlg1 ;
           AT 0, 0 SIZE 100, 100 PIXEL ;
@@ -197,7 +197,7 @@ PROCEDURE BaseDialog( oWnd1, lModal )
    oBut1:SetContextMenu( oCM )
 
              //FONTNAME "Courier New" FONTSIZE 10
-   //oBut1 := WG_tPushButton():New( "&Show Win 1", 10, 10, ,,,"Show Window 1", "Press to show window 1" )
+   //oBut1 := tPushButton():New( "&Show Win 1", 10, 10, ,,,"Show Window 1", "Press to show window 1" )
    //oBut1:bAction   := {|| (oWnd1:Show(), oDlg1:ToTop()) }
    //oBut1:SetFontByAttribute( "Times New Roman", 11,TRUE,TRUE,TRUE,TRUE)
 
@@ -206,7 +206,7 @@ PROCEDURE BaseDialog( oWnd1, lModal )
              TOOLTIP "Hide Window 1";
              ACTION oWnd1:Hide() ;
              DEFAULT
-   //oBut2 := WG_tPushButton():New( "&Hide Win 1", 40,10,  ,,,"Hide Window 1" )
+   //oBut2 := tPushButton():New( "&Hide Win 1", 40,10,  ,,,"Hide Window 1" )
    //oBut2:bAction   := {|| oWnd1:Hide() }
 
 
@@ -215,7 +215,7 @@ PROCEDURE BaseDialog( oWnd1, lModal )
              PIXEL ;
              TOOLTIP "Minimize Window 1";
              ACTION oWnd1:Minimize()
-   //oBut3 := WG_tPushButton():New( "&Min. Win 1", 70,10,  ,,,"Minimize Window 1" )
+   //oBut3 := tPushButton():New( "&Min. Win 1", 70,10,  ,,,"Minimize Window 1" )
    //oBut3:bAction   := {|| oWnd1:Minimize() }
    */
 
@@ -223,28 +223,28 @@ PROCEDURE BaseDialog( oWnd1, lModal )
              PIXEL ;
              TOOLTIP "Minimize Window 1";
              ACTION (oWnd1:Maximize(),  oDlg1:ToTop())
-   //oBut4 := WG_tPushButton():New( "M&ax. Win 1", 100,10, ,,,"Maximize Window 1" )
+   //oBut4 := tPushButton():New( "M&ax. Win 1", 100,10, ,,,"Maximize Window 1" )
    //oBut4:bAction   := {|| (oWnd1:Maximize(),  oDlg1:ToTop()) }
 
    @ 130, 10 PUSHBUTTON "&Res. Win. 1" ;
              PIXEL ;
              TOOLTIP "Restore Window 1";
              ACTION (oWnd1:Restore(),  oDlg1:ToTop())
-   //oBut5 := WG_tPushButton():New( "&Res. Fin. 1",130,10, ,,,"Restore Window 1" )
+   //oBut5 := tPushButton():New( "&Res. Fin. 1",130,10, ,,,"Restore Window 1" )
    //oBut5:bAction   := {|| (oWnd1:Restore(),  oDlg1:ToTop()) }
 
    @ 160, 10 PUSHBUTTON "&Dis. But. 1" ;
              PIXEL ;
              TOOLTIP "Disable Button 1";
              ACTION oBut9:Disable()
-   //oBut6 := WG_tPushButton():New( "&Dis. But. 1",160,10, ,,,"Disable Button 1" )
+   //oBut6 := tPushButton():New( "&Dis. But. 1",160,10, ,,,"Disable Button 1" )
    //oBut6:bAction   := {|| oBut9:Disable() }
 
    @ 190, 10 PUSHBUTTON "&Ena. But. 1" ;
              PIXEL ;
              TOOLTIP "Enable Button 1";
              ACTION oBut9:Enable()
-   //oBut7 := WG_tPushButton():New( "&Ena. But. 1",190, 10,,,,"Enable Button 1" )
+   //oBut7 := tPushButton():New( "&Ena. But. 1",190, 10,,,,"Enable Button 1" )
    //oBut7:bAction   := {|| oBut9:Enable() }
 
    @ 220, 10 PUSHBUTTON "Get values" ;
@@ -252,7 +252,7 @@ PROCEDURE BaseDialog( oWnd1, lModal )
              TOOLTIP "Show control values";
              ACTION ShowControlValues( oDlg1 ) ;
              STATUS "Display all controls with values"
-   //oBut8 := WG_tPushButton():New( "Get values",220,10, ,,,"Show control values" )
+   //oBut8 := tPushButton():New( "Get values",220,10, ,,,"Show control values" )
    //oBut8:bAction   := {|| ShowControlValues( oDlg1 ) }
 
    @ 270, 10 CHECKBOX nVar1 PROMPT "Check Box";
@@ -260,9 +260,9 @@ PROCEDURE BaseDialog( oWnd1, lModal )
              TOOLTIP "Check Box";
              SELECTED ;
              COLOR "yellow" //BACKCOLOR "white"
-   //oBut8 := WG_tCheckBox():New( "Check Box",270,10, ,,,,"Check Box" )
-   //oBut8 := WG_tRadioButton():New( "Radio 1",300,10, ,,,,"Radio Button",,TRUE )
-   //oBut8 := WG_tRadioButton():New( "Radio 2",330,10, ,,,,"Radio Button" )
+   //oBut8 := tCheckBox():New( "Check Box",270,10, ,,,,"Check Box" )
+   //oBut8 := tRadioButton():New( "Radio 1",300,10, ,,,,"Radio Button",,TRUE )
+   //oBut8 := tRadioButton():New( "Radio 2",330,10, ,,,,"Radio Button" )
 
    @ 300, 10 RADIOGROUP nVar2 ITEMS "Radio &1","Radio &2" ;
              PIXEL ;
@@ -270,27 +270,27 @@ PROCEDURE BaseDialog( oWnd1, lModal )
              SELECT 2 ;
              COLOR "MAGENTA" ;
              FONTNAME "Verdana" FONTSIZE 9
-   //WG_tRadioGroup():New( {"Radio 1","Radio 2"},300,10, ,,,,"Radio Button",, TRUE, 2 )
+   //tRadioGroup():New( {"Radio 1","Radio 2"},300,10, ,,,,"Radio Button",, TRUE, 2 )
 
    @ 300,250 RADIOGROUP nVar3 ITEMS "Radio &3","Radio &4","Radio &5" ;
              PIXEL ;
              TOOLTIP "Radio Button Horizontal";
              SELECT 3 ;
              HORIZONTAL ;
-             FONT (WG_TFont():New( "Verdana", 8, TRUE ))
-   //WG_tRadioGroup():New( {"Radio 3","Radio 4","Radio 5"},300,250, ,,,,"Radio Button Horizontal",, FALSE )
+             FONT (TFont():New( "Verdana", 8, TRUE ))
+   //tRadioGroup():New( {"Radio 3","Radio 4","Radio 5"},300,250, ,,,,"Radio Button Horizontal",, FALSE )
 
    @ 360, 10 TRISTATEBUTTON nVar4 PROMPT "3 s&tate" ;
              PIXEL ;
              TOOLTIP "3State Button";
              COLOR "yellow" ;
              VALUE 2
-   //oBut8 := WG_t3StateButton():New( "3 state",360,10,,,,,"3State Button" )
+   //oBut8 := t3StateButton():New( "3 state",360,10,,,,,"3State Button" )
 
    @ 250,  5 GROUPBOX SIZE 120,200 PROMPT "Group Box";
              PIXEL ;
              TOOLTIP "Group Box"
-   //oBut8 := WG_tGroupBox():New( "GroupBox",250,5,120,200,,"Group Box" )
+   //oBut8 := tGroupBox():New( "GroupBox",250,5,120,200,,"Group Box" )
 
    aRows := { "One", "Two", "Three", "Four", "Five", "Six" }
 
@@ -301,7 +301,7 @@ PROCEDURE BaseDialog( oWnd1, lModal )
              COLOR "yellow"  BACKCOLOR "blue";
              VALUE 2
 
-   //oBut8 := WG_tSimpleComboBox():New( "Combo",10, 120, ,, , aRows,"Simple Combo Box" )
+   //oBut8 := tSimpleComboBox():New( "Combo",10, 120, ,, , aRows,"Simple Combo Box" )
 
    @ 110,120 DROPDOWN nVar6 ;
              ITEMS aRows ;
@@ -309,7 +309,7 @@ PROCEDURE BaseDialog( oWnd1, lModal )
              TOOLTIP "Drop Down Combo Box" ;
              COLOR "yellow" BACKCOLOR "blue" ;
              VALUE 3
-   //oBut8 := WG_tDropDownComboBox():New( "Combo",110, 120, ,,, aRows,"Drop Down Combo Box" )
+   //oBut8 := tDropDownComboBox():New( "Combo",110, 120, ,,, aRows,"Drop Down Combo Box" )
 
    @ 210,120 DROPLIST nVar7 ;
              ITEMS aRows ;
@@ -317,21 +317,21 @@ PROCEDURE BaseDialog( oWnd1, lModal )
              TOOLTIP "Drop List Combo Box" ;
              COLOR "yellow"  BACKCOLOR "blue" ;
              VALUE 4
-   //oBut8 := WG_tDropListComboBox():New( "Combo",210, 120, ,,, aRows,"Drop List Combo Box" )
+   //oBut8 := tDropListComboBox():New( "Combo",210, 120, ,,, aRows,"Drop List Combo Box" )
 
    @ 240,150 PUSHBUTTON oBut8 PROMPT "Font &Object" ;
              PIXEL ;
              TOOLTIP "Display Font Object" ;
-             ACTION oFont:=WG_TFont():New(), WG_ParamDisplay( oFont, oFont ), oFont:GetValue():DisplayData()
-   //oBut8 := WG_tPushButton():New( "Font Object",240,150, ,,,"Choose Font Dialog Window" )
-   //oBut8:bAction   := {|oW, oFont| oFont:=WG_TFont():New(), WG_ParamDisplay( oFont, oFont ), WG_ObjDisplayData( oFont:GetValue() ) }
+             ACTION oFont:=TFont():New(), WG_ParamDisplay( oFont, oFont ), oFont:GetValue():DisplayData()
+   //oBut8 := tPushButton():New( "Font Object",240,150, ,,,"Choose Font Dialog Window" )
+   //oBut8:bAction   := {|oW, oFont| oFont:=TFont():New(), WG_ParamDisplay( oFont, oFont ), WG_ObjDisplayData( oFont:GetValue() ) }
 
    @ 270,150 PUSHBUTTON oBtnF PROMPT "Choose &Font" ;
              PIXEL ;
              TOOLTIP "Choose a font from Font Dialog Window and change the font of this button" ;
-             ACTION oFont := WG_TFont():New(), oFont:Choose(),;
+             ACTION oFont := TFont():New(), oFont:Choose(),;
                     oFont:DisplayData(), iif( oFont:nHandle <> 0, oBtnF:SetFont( oFont ), NIL )
-   // oBut8 := WG_tPushButton():New( "Choose Font",270,150, ,,,"Choose Font Dialog Window" )
+   // oBut8 := tPushButton():New( "Choose Font",270,150, ,,,"Choose Font Dialog Window" )
    // oBut8:bAction   := {|oW, oFont, nFont| oFont := TFont():New(), nFont:=ChooseFont( oFont ),;
    //                                        WG_ObjDisplayData( oFont ), iif( nFont <> 0, oW:SetFont( oFont ), NIL )  }
 
@@ -352,29 +352,29 @@ PROCEDURE BaseDialog( oWnd1, lModal )
              LIMIT 200
 
 
-             //ACTION {|oW, oFont| oFont:=WG_TFont():New(), WG_ParamDisplay( oFont, oFont ), oFont:GetValue():DisplayData() }
-   //oBut9 := WG_tEdit():New( "Font Object",330,300, ,,,"Choose Font Dialog Window" )
-   //oBut9 := WG_tEdit():New( "Font Object",30,30)
-   //oBut8:bAction   := {|oW, oFont| oFont:=WG_TFont():New(), WG_ParamDisplay( oFont, oFont ), WG_ObjDisplayData( oFont:GetValue() ) }
+             //ACTION {|oW, oFont| oFont:=TFont():New(), WG_ParamDisplay( oFont, oFont ), oFont:GetValue():DisplayData() }
+   //oBut9 := tEdit():New( "Font Object",330,300, ,,,"Choose Font Dialog Window" )
+   //oBut9 := tEdit():New( "Font Object",30,30)
+   //oBut8:bAction   := {|oW, oFont| oFont:=TFont():New(), WG_ParamDisplay( oFont, oFont ), WG_ObjDisplayData( oFont:GetValue() ) }
 
    @ 330,150 LABEL "Label" ;
              PIXEL ;
              TOOLTIP "Label" ;
              COLOR "RED" // BACKCOLOR "yellow"
-   //oBut9 := WG_tStaticText():New( "Label",330,150, ,,,"Label" )
+   //oBut9 := tStaticText():New( "Label",330,150, ,,,"Label" )
 
    @ 360,150 PUSHBUTTON "Font But 1" ;
              PIXEL ;
              TOOLTIP "Display Font Object of oBut1" ;
              ACTION ( oBut1:DisplayData(), oBut1:GetFont():DisplayData() )
-   // oBut8 := WG_tPushButton():New( "Font But 1",360,150, ,,,"Choose Font Dialog Window" )
+   // oBut8 := tPushButton():New( "Font But 1",360,150, ,,,"Choose Font Dialog Window" )
    // oBut8:bAction   := {|oW| WG_ObjDisplayData( oBut1:GetFont() ) }
 
    @ 390,150 PUSHBUTTON "Derive" ;
              PIXEL ;
              TOOLTIP "Display That TButton Class derive from TWindow Class" ;
-             ACTION MessageBox(, "tBtn derive from tWind ? = " + WG_char( oBut8:IsDerivedFrom("WG_TWINDOW") ) )
-   //oBut8 := WG_tPushButton():New( "Derive",390,150, ,,,"Choose Font Dialog Window" )
+             ACTION MessageBox(, "tBtn derive from tWind ? = " + WG_char( oBut8:IsDerivedFrom("TWINDOW") ) )
+   //oBut8 := tPushButton():New( "Derive",390,150, ,,,"Choose Font Dialog Window" )
    //oBut8:bAction   := {|oW| MessageBox(, "tBtn derive from tWind ? = " + WG_char( __objDerivedFrom( oBut8, "TWINDOW") )) }
 
    @ 420,150 PUSHBUTTON "Ancestor" ;
@@ -628,7 +628,7 @@ RETURN oMenu
 STATIC FUNCTION ContextMenu( oWnd, oMenuBar )
    LOCAL oContextMenu, oItem1, oItem2
 
-   LOCAL oMenuItem //:= WG_TMenuItem():New(, 200, "Item inserted",,,, "Item inserted on the fly" )
+   LOCAL oMenuItem //:= TMenuItem():New(, 200, "Item inserted",,,, "Item inserted on the fly" )
    LOCAL oMenuItem1
    //LOCAL oPopup
 

@@ -22,7 +22,7 @@
 #include "windows.ch"
 //#include "wingdi.ch"
 
-CLASS WG_TFont FROM WG_TGDIObject
+CLASS TFont FROM TGDIObject
 
     CLASSDATA aoResources AS ARRAY   INIT {} HIDDEN
     //DATA nResources  AS NUMERIC INIT 0
@@ -57,7 +57,7 @@ CLASS WG_TFont FROM WG_TGDIObject
 
 ENDCLASS
 
-METHOD New( cFontFace AS STRING, nFontSize AS NUMERIC, lItalic, lUnderline, lStrikeOut, lBold ) CLASS WG_TFont
+METHOD New( cFontFace AS STRING, nFontSize AS NUMERIC, lItalic, lUnderline, lStrikeOut, lBold ) CLASS TFont
 
     LOCAL nHeight
     LOCAL nWidth
@@ -99,7 +99,7 @@ RETURN Self
 
 METHOD NewExtended( nHeight, nWidth, nEscapement, nOrientation, nWeight, lItalic, lUnderline,;
                     lStrikeOut, nCharSet, nOutputPrecision, nClipPrecision, nQuality, nPitchAndFamily,;
-                    cFace ) CLASS WG_TFont
+                    cFace ) CLASS TFont
     LOCAL oFont
 
     ASSIGN ::nHeight          WITH nHeight          DEFAULT 0
@@ -117,7 +117,7 @@ METHOD NewExtended( nHeight, nWidth, nEscapement, nOrientation, nWeight, lItalic
     ASSIGN ::nPitchAndFamily  WITH nPitchAndFamily  DEFAULT DEFAULT_PITCH
     ASSIGN ::cFace            WITH cFace            DEFAULT "MS Sans Serif"
 
-    ::SetEvalResource( {|o| o:ClassName        == "WG_TFONT"          .AND. ;
+    ::SetEvalResource( {|o| o:ClassName        == "TFONT"          .AND. ;
                             o:nHeight          == ::nHeight           .AND. ;
                             o:nWidth           == ::nWidth            .AND. ;
                             o:nEscapement      == ::nEscapement       .AND. ;
@@ -137,7 +137,7 @@ METHOD NewExtended( nHeight, nWidth, nEscapement, nOrientation, nWeight, lItalic
     ::AddResource()
 RETURN Self
 
-METHOD CreateResource() CLASS WG_TFont
+METHOD CreateResource() CLASS TFont
     LOCAL oFont
 
     //IF ValType( ::nHandle ) == "N"
@@ -168,27 +168,27 @@ METHOD CreateResource() CLASS WG_TFont
     //ENDIF
 RETURN Self
 
-METHOD GetValue() CLASS WG_TFont
+METHOD GetValue() CLASS TFont
   //IF ::nHandle == NIL
   //   ::Create()
   //ENDIF
 RETURN Self
 
-METHOD SetBold( lBold ) CLASS WG_TFont
+METHOD SetBold( lBold ) CLASS TFont
   DEFAULT lBold TO TRUE
   ::nWeight          := IIF( lBold, FW_NORMAL, FW_BOLD )
   ::AddResource()
 RETURN Self
 
-METHOD SetUnderlined( lUnderlined ) CLASS WG_TFont
+METHOD SetUnderlined( lUnderlined ) CLASS TFont
   DEFAULT lUnderlined TO TRUE
   ::lUnderline := lUnderlined
   ::AddResource()
 RETURN Self
 
 EXIT PROCEDURE __WG_TFont_Destroy()
-   //MessageBox( , "Nø font = " + cStr( WG_TFont():nResources ) )
-   WG_DebugTrace( "TFont_Exit_Proc", "WG_TFont():aoResources", WG_TFont():aoResources )
+   //MessageBox( , "Nø font = " + cStr( TFont():nResources ) )
+   WG_DebugTrace( "TFont_Exit_Proc", "TFont():aoResources", TFont():aoResources )
    // Run directly releaseresource() without use delresource() because this make a scan for each
-   aEval( WG_TFont():aoResources, {|o| o:ReleaseResource() } )
+   aEval( TFont():aoResources, {|o| o:ReleaseResource() } )
 RETURN

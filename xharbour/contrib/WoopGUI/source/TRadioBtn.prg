@@ -22,7 +22,7 @@
 #include "windows.ch"
 
 // Windows definitions
-CLASS WG_TRadioButton FROM WG_TButton
+CLASS TRadioButton FROM TButton
 
     DATA   lSelected     AS LOGICAL INIT FALSE
     // METODI
@@ -32,7 +32,7 @@ CLASS WG_TRadioButton FROM WG_TButton
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, lFirst, lSelected ) CLASS WG_TRadioButton
+METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, lFirst, lSelected ) CLASS TRadioButton
 
     DEFAULT lFirst    TO FALSE
     DEFAULT lPixel    TO TRUE
@@ -54,13 +54,13 @@ METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cSta
 
 RETURN Self
 
-METHOD Init() CLASS WG_TRadioButton
+METHOD Init() CLASS TRadioButton
     IF ::lSelected THEN ::SetValue( BST_CHECKED )
     ::Super:Init()
 RETURN Self
 
 METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, lFirst, lSelected,;
-                    bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS WG_TRadioButton
+                    bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TRadioButton
 
     ::New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, lFirst, lSelected )
     ::Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )

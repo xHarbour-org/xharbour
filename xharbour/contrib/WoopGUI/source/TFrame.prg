@@ -22,7 +22,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TFrame FROM WG_TWindow
+CLASS TFrame FROM TWindow
 
     // Data of this class only
     DATA oMenu        AS OBJECT HIDDEN
@@ -53,7 +53,7 @@ CLASS WG_TFrame FROM WG_TWindow
 
 ENDCLASS
 
-METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar ) CLASS WG_TFrame
+METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar ) CLASS TFrame
 
     ASSIGN ::cClassName   WITH "WoopGUIFrmClass"
     ASSIGN ::cName        WITH cName                   DEFAULT "Frame_1"
@@ -87,7 +87,7 @@ METHOD NewExtended( cTitle, nStyle, nRow, nCol, nWidth, nHeight,;
                     oMenu, oBrush, oIcon, oParent, lStatusBar, ;
                     lvScroll, lhScroll, nClrFore, nClrBack, oCursor,;
                     cBorder, lNoSysMenu, lNoCaption,;
-                    lNoIconize, lNoMaximize, lPixel ) CLASS WG_TFrame
+                    lNoIconize, lNoMaximize, lPixel ) CLASS TFrame
 
    ::New( cTitle, nStyle, nRow, nCol, nWidth, nHeight, oParent, lStatusBar )
 
@@ -97,34 +97,34 @@ METHOD NewExtended( cTitle, nStyle, nRow, nCol, nWidth, nHeight,;
 
 RETURN Self
 
-//METHOD oStatusBar( oStatusBar AS OBJECT ) CLASS WG_TFrame
+//METHOD oStatusBar( oStatusBar AS OBJECT ) CLASS TFrame
 //   LOCAL oOldSB := ::myoStatusBar
 //   IF oStatusBar <> NIL
 //      ::myoStatusBar := oStatusBar
 //   ENDIF
 //RETURN oOldSB
 
-METHOD CreateStatusBar( nParts, nStyle ) CLASS WG_TFrame
-  ::oStatusBar := WG_tStatusBar():New( Self, nParts, nStyle )
+METHOD CreateStatusBar( nParts, nStyle ) CLASS TFrame
+  ::oStatusBar := tStatusBar():New( Self, nParts, nStyle )
 RETURN IIF( ::oStatusBar <> NIL, TRUE, FALSE )
 
-METHOD GetStatusBar() CLASS WG_TFrame
+METHOD GetStatusBar() CLASS TFrame
 RETURN ::oStatusBar
 
-METHOD SetStatusBar( cString, nPart, uFlags ) CLASS WG_TFrame
+METHOD SetStatusBar( cString, nPart, uFlags ) CLASS TFrame
    IF ValType( ::oStatusBar ) == "O"
       ::oStatusBar:SetValue( cString, nPart, uFlags )
    ENDIF
 RETURN Self
 
-METHOD OnDestroy() CLASS WG_TFrame
+METHOD OnDestroy() CLASS TFrame
    LOCAL nRet := -1
    WG_DebugTrace( "TFrame:OnDestroy()", "Self", Self )
    PostQuitMessage( 0 )
    nRet := 0
 RETURN nRet
 
-METHOD WindowProc( nMsg, wParam, lParam ) CLASS WG_TFrame
+METHOD WindowProc( nMsg, wParam, lParam ) CLASS TFrame
    LOCAL nRet := -1
    IF ValType( ::bWindowProc ) == "B"
       // User event handler
@@ -153,7 +153,7 @@ RETURN nRet
 
 // reserved methods  ------------------------------------------
 
-METHOD FindMenuItem( oMenu, nID ) CLASS WG_TFrame
+METHOD FindMenuItem( oMenu, nID ) CLASS TFrame
    LOCAL oItem
    DEFAULT oMenu TO ::oMenu
    IF ValType( oMenu ) == "O"

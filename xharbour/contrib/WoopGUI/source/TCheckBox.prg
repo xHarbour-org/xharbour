@@ -22,7 +22,7 @@
 #include "windows.ch"
 
 // Windows definitions
-CLASS WG_TCheckBox FROM WG_TButton
+CLASS TCheckBox FROM TButton
     // Base
     DATA   lSelected     AS LOGICAL INIT FALSE
 
@@ -37,7 +37,7 @@ CLASS WG_TCheckBox FROM WG_TButton
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, lSelected ) CLASS WG_TCheckBox
+METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, lSelected ) CLASS TCheckBox
 
     DEFAULT lPixel TO TRUE
 
@@ -57,23 +57,23 @@ METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cSta
 RETURN Self
 
 METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip,;
-                    cStatusBar, lPixel, nID, lSelected, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS WG_TCheckBox
+                    cStatusBar, lPixel, nID, lSelected, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TCheckBox
 
     ::New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, lSelected )
     ::Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
 
 RETURN Self
 
-METHOD Init() CLASS WG_TCheckBox
+METHOD Init() CLASS TCheckBox
     IF ::lSelected THEN ::SetValue( ::lSelected )
     ::Super:Init()
 RETURN Self
 
-METHOD SetValue( lSelected ) CLASS WG_TCheckBox
+METHOD SetValue( lSelected ) CLASS TCheckBox
    ASSIGN ::lSelected WITH lSelected DEFAULT TRUE
    ::Super:SetValue( IIF( lSelected, 1, 0 ) )
    ::UpdateVar( IIF( ::xValue == 0, FALSE, TRUE ) )
 RETURN Self
 
-METHOD GetValue() CLASS WG_TCheckBox
+METHOD GetValue() CLASS TCheckBox
 RETURN IIF( ::Super:GetValue() == 0, FALSE, TRUE )

@@ -29,7 +29,7 @@
 #define SYNC_EDIT
 
 // Windows definitions
-CLASS WG_TXGet FROM WG_TEdit
+CLASS TXGet FROM TEdit
     // Base
 
     DATA oGet            AS OBJECT  HIDDEN
@@ -182,7 +182,7 @@ ENDCLASS
 //---------------------------------------------------------------------------//
 
 METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec, ;
-            nWidth, nHeight, oParent, cToolTip, cStatusBar, lPixel, nID, cValue, nLimitText, lReadOnly, lPassword, lAutoSize ) CLASS WG_TXGet
+            nWidth, nHeight, oParent, cToolTip, cStatusBar, lPixel, nID, cValue, nLimitText, lReadOnly, lPassword, lAutoSize ) CLASS TXGet
 
     ::oGet := Get():New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec )
     ::Super:New( cVarName,, nRow, nCol, nWidth, nHeight, oParent, , cToolTip, cStatusBar, lPixel, nID, cValue, nLimitText, lReadOnly, lPassword )
@@ -198,7 +198,7 @@ RETURN Self
 METHOD NewExtended( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec, ;
                     nWidth, nHeight, oParent, cToolTip,;
                     cStatusBar, lPixel, nID, cValue, nLimitText, lReadOnly, lPassword, lAutoSize, ;
-                    oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS WG_TXGet
+                    oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TXGet
 
     ::New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec, ;
             nWidth, nHeight, oParent, cToolTip, cStatusBar, lPixel, nID, cValue, nLimitText, lReadOnly, lPassword, lAutoSize )
@@ -210,13 +210,13 @@ RETURN Self
 
 //---------------------------------------------------------------------------//
 
-METHOD Init() CLASS WG_TXGet
+METHOD Init() CLASS TXGet
 
     WG_DebugTrace( "TXGet:Init()" )
 
     // Set default colors
-    //IF ::oFgColor == NIL THEN ::SetForeGroundColor( WG_TSystemSetting():GetColor(COLOR_WINDOWTEXT) )
-    //IF ::oBgColor == NIL THEN ::SetBackGroundColor( WG_TSystemSetting():GetColor(COLOR_BTNHIGHLIGHT) )
+    //IF ::oFgColor == NIL THEN ::SetForeGroundColor( TSystemSetting():GetColor(COLOR_WINDOWTEXT) )
+    //IF ::oBgColor == NIL THEN ::SetBackGroundColor( TSystemSetting():GetColor(COLOR_BTNHIGHLIGHT) )
     WG_DebugTrace( "TXGET:Init() - before ::Super:Init()", "Object", Self:ClassName + "(" + Self:cName + ")", "nHandle", ::nHandle )
 
     ::Super:Init()
@@ -241,7 +241,7 @@ RETURN Self
 
 //---------------------------------------------------------------------------//
 
-METHOD AdjustWidth() CLASS WG_TXGet
+METHOD AdjustWidth() CLASS TXGet
    LOCAL nW
    WG_DebugTrace( "TXGet:AdjustWidth()", "::oGet:nDispLen", ::oGet:nDispLen, "::oFont:nHandle", ::oFont:nHandle )
    nW := UnMapDialogRect( Replicate( "X", ::oGet:nDispLen ), ::oFont:nHandle ) [ 1 ]
@@ -253,7 +253,7 @@ RETURN Self
 
 //---------------------------------------------------------------------------//
 
-METHOD WindowProc( nMsg, wParam, lParam ) CLASS WG_TXGet
+METHOD WindowProc( nMsg, wParam, lParam ) CLASS TXGet
    LOCAL nRet := -1
    LOCAL wmId, wmEvent, wmHandle
    LOCAL oWin
@@ -284,7 +284,7 @@ RETURN nRet
 
 //---------------------------------------------------------------------------//
 
-METHOD GetApplyKey(oGet, nKey) CLASS WG_TXGet
+METHOD GetApplyKey(oGet, nKey) CLASS TXGet
    WG_DebugTrace( "TXGET:GetApplyKey()", "nKey", nKey )
    ::oParent:oGetList:oGet := oGet
    ::oParent:oGetList:GetApplyKey(nKey)
@@ -292,7 +292,7 @@ RETURN Self
 
 //---------------------------------------------------------------------------//
 
-METHOD OnCommand( wParam, lParam ) CLASS WG_TXGet
+METHOD OnCommand( wParam, lParam ) CLASS TXGet
    LOCAL nRet   := 0
    LOCAL nEvent := HiWord( wParam )
    LOCAL nID    := LoWord( wParam )
@@ -412,7 +412,7 @@ RETURN nRet
 
 //---------------------------------------------------------------------------//
 
-METHOD OnSetFocus( nHandle ) CLASS WG_TXGet
+METHOD OnSetFocus( nHandle ) CLASS TXGet
    LOCAL nRet   := -1
    LOCAL xVal, lValid
 
@@ -451,7 +451,7 @@ RETURN nRet
 
 //---------------------------------------------------------------------------//
 
-METHOD OnKillFocus( nHandle ) CLASS WG_TXGet
+METHOD OnKillFocus( nHandle ) CLASS TXGet
    LOCAL nRet   := -1
 
    LOCAL xVal, lValid
@@ -509,7 +509,7 @@ RETURN nRet
 
 //---------------------------------------------------------------------------//
 
-METHOD OnPaint() CLASS WG_TXGet
+METHOD OnPaint() CLASS TXGet
    LOCAL nRet   := -1
    WG_DebugTrace("TXGet:OnPaint()" )
    ::Display( TRUE )
@@ -522,7 +522,7 @@ RETURN nRet
 
 // Method Display modified from Get class to display under windows
 
-METHOD Display( lForced ) CLASS WG_TXGet
+METHOD Display( lForced ) CLASS TXGet
 
    //local nOldCursor := SetCursor( SC_NONE )
    WG_DebugTrace("TXGet:Display", "Called from " + PROCNAME(1) + "(" + cStr( PROCLINE(1), TRUE ) + ")" )
@@ -577,7 +577,7 @@ return Self
 
 // ------------------------------------------------------------------------ //
 
-METHOD ApplyKey(nVK, nKey) CLASS WG_TXGet
+METHOD ApplyKey(nVK, nKey) CLASS TXGet
    local   oGet  := ::oGet, hWnd := ::nHandle
    *local  nGPos := oGet:Pos
    local   aESel := ::GetSelection()
@@ -808,7 +808,7 @@ return nRet
 
 //---------------------------------------------------------------------------//
 
-METHOD OnChar( wParam, lParam ) CLASS WG_TXGet
+METHOD OnChar( wParam, lParam ) CLASS TXGet
    LOCAL nRet := -1  // = TRUE  if process message must return 0
    LOCAL nVK         := wParam
    LOCAL nStatus     := lParam
@@ -847,7 +847,7 @@ return nRet
 
 #define SHIFTED 0x8000
 
-METHOD OnKeyDown( wParam, lParam ) CLASS WG_TXGet
+METHOD OnKeyDown( wParam, lParam ) CLASS TXGet
    LOCAL nRet := -1  // = TRUE  if process message must return 0
    LOCAL nVK     := wParam
    LOCAL nStatus := lParam
@@ -988,7 +988,7 @@ return nRet
 
 //---------------------------------------------------------------------------//
 
-METHOD CallWindowProc( nMsg, wParam, lParam ) CLASS WG_TXGet
+METHOD CallWindowProc( nMsg, wParam, lParam ) CLASS TXGet
   DEFAULT nMsg   TO ::nMsg
   DEFAULT wParam TO ::nwParam
   DEFAULT lParam TO ::nlParam
@@ -996,7 +996,7 @@ RETURN CallWindowProc( ::nPreviousProc, ::nHandle, nMsg, wParam, lParam )
 
 //---------------------------------------------------------------------------//
 
-METHOD SetCaretType( lInsert ) CLASS WG_TXGet
+METHOD SetCaretType( lInsert ) CLASS TXGet
 
    Local hDC := GetDC( ::nHandle )
    local nX, nY, nWidth, nHeight, aClientRect := GetClientRect( ::nHandle )

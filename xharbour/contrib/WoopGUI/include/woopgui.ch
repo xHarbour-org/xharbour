@@ -83,7 +83,7 @@
 #command DEFINE APPLICATION [<oApp> NAME ] <cName> [TITLE <cTitle>] [ICONFILE <cIconFile>] ;
                             [CURSOR <cCursor>] [BACKCOLOR <nBackColor>] [ICONSMALLFILE <cIconSmallFile>];
                             [ONINIT <bInit>] [ONQUIT <bQuit> ] ;
-      => [<oApp> := ] WG_TApplication():New( <cName>, <cTitle>, <cIconFile>, <{bInit}>, <{bQuit}> )
+      => [<oApp> := ] TApplication():New( <cName>, <cTitle>, <cIconFile>, <{bInit}>, <{bQuit}> )
 
 #command APPLICATION ACTIVATE ;
       => WG_ApplObj():Activate()
@@ -101,7 +101,7 @@
       => WG_ApplObj():Quit()
 
 #command SET CURRENT WINDOW <oWin> ;
-      => WG_TWindow():SetCurrentWindow( <oWin> )
+      => TWindow():SetCurrentWindow( <oWin> )
 
 #command SET APPLICATION CURRENT WINDOW <oWin> ;
       => SET CURRENT WINDOW <oWin>
@@ -132,7 +132,7 @@
              [ FONT <oFont> ] ;
              [ FONTNAME <cFontName> ] ;
              [ FONTSIZE <nFontSize> ] ;
-      => <oDlg> := WG_TDialog():NewExtended( <cTitle>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => <oDlg> := TDialog():NewExtended( <cTitle>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
              <oMenu>, <oBrush>, <oIcon>, <oParent>, <.lStatusBar.>, <.lPixel.>, <.lModal.>, ;
              [<.vScroll.>], [<.hScroll.>], <nClrFore>, <nClrBack>, <oCursor>,;
              [Upper(<(border)>)], !<.NoSysMenu.>, !<.NoCaption.>,;
@@ -156,7 +156,7 @@
              [ FONT <oFont> ] ;
              [ FONTNAME <cFontName> ] ;
              [ FONTSIZE <nFontSize> ] ;
-      => <oDlg> := WG_TPanel():NewExtended( ,,, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => <oDlg> := TPanel():NewExtended( ,,, <nRow>, <nCol>, <nWidth>, <nHeight>,;
              <oMenu>, <oBrush>, <oIcon>, <oParent>, <.lPixel.>, <.lModal.>, ;
              [<.vScroll.>], [<.hScroll.>], <nClrFore>, <nClrBack>, <oCursor>,;
              [<.lBorder.>], <oFont>, <cFontName>, <nFontSize> )
@@ -193,7 +193,7 @@
              [ FONT <oFont> ] ;
              [ FONTNAME <cFontName> ] ;
              [ FONTSIZE <nFontSize> ] ;
-      => <oWnd> := WG_TFrame():NewExtended( <cTitle>, <nStyle>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => <oWnd> := TFrame():NewExtended( <cTitle>, <nStyle>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
              <oMenu>, <oBrush>, <oIcon>, <oParent>, <.lStatusBar.>, ;
              [<.vScroll.>], [<.hScroll.>], <nClrFore>, <nClrBack>, <oCursor>,;
              [Upper(<(border)>)], !<.NoSysMenu.>, !<.NoCaption.>,;
@@ -255,7 +255,7 @@
              [ ID <nID> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oBtn> := ] WG_TCheckBox():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oBtn> := ] TCheckBox():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
                                                   <oWnd>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                   <nID>, ;
                                                   <.lSelected>, LocalBlock(<lVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
@@ -273,7 +273,7 @@
              [ FONTSIZE <nFontSize> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oBtn> := ] WG_TGroupBox():NewExtended( <cLabel>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oBtn> := ] TGroupBox():NewExtended( <cLabel>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
                                                   <oWnd>, , <cToolTip>,,<.lPixel.>,;
                                                   , <oFont>, <cFontName>, <nFontSize>,,, <ncFgColor>, <ncBgColor>)
 
@@ -295,7 +295,7 @@
              [ ID <nID> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oBtn> := ] WG_TPushButton():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oBtn> := ] TPushButton():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
                                                   <oWnd>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                   <.lDefault.>, <nID>, ;
                                                   <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
@@ -319,7 +319,7 @@
              [ SELECT <nPos> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oBtn> := ] WG_TRadioGroup():NewExtended( {<cItems>}, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oBtn> := ] TRadioGroup():NewExtended( {<cItems>}, <nRow>, <nCol>, <nWidth>, <nHeight>,;
                                                   <oWnd>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                   !<.lHoriz.>, <nPos>, ;
                                                   LocalBlock(<nVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
@@ -343,7 +343,7 @@
              [ ID <nID> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oBtn> := ] WG_T3StateButton():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oBtn> := ] T3StateButton():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
                                                     <oWnd>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                     <nID>, ;
                                                     <nValue>, LocalBlock(<nVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
@@ -368,7 +368,7 @@
              [ ID <nID> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oCbx> := ] WG_TSimpleComboBox():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oCbx> := ] TSimpleComboBox():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
                                                    <oWnd>, <aItems>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                    <nID>, ;
                                                    <nValue>, LocalBlock(<nVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
@@ -393,7 +393,7 @@
              [ ID <nID> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oCbx> := ] WG_TDropDownComboBox():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oCbx> := ] TDropDownComboBox():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
                                                    <oWnd>, <aItems>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                    <nID>, ;
                                                    <nValue>, LocalBlock(<nVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
@@ -418,7 +418,7 @@
              [ ID <nID> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oCbx> := ] WG_TDropListComboBox():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oCbx> := ] TDropListComboBox():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
                                                    <oWnd>, <aItems>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                    <nID>, ;
                                                    <nValue>, LocalBlock(<nVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
@@ -437,7 +437,7 @@
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
              [ <cAlign: LEFT, CENTER, CENTERED, RIGHT> ] ;
-      => [ <oBtn> := ] WG_TStaticText():NewExtended( <cLabel>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oBtn> := ] TStaticText():NewExtended( <cLabel>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
                                                   <oWnd>, , <cToolTip>,,<.lPixel.>,;
                                                   <nID>, [<(cAlign)>],,;
                                                   <oFont>, <cFontName>, <nFontSize>,,,;
@@ -464,7 +464,7 @@
              [ BACKCOLOR <ncBgColor> ] ;
              [ <lReadOnly: READONLY> ] ;
              [ <lPassword: PASSWORD> ] ;
-      => [ <oEdt> := ] WG_TEdit():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oEdt> := ] TEdit():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
                                                    <oWnd>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                    <nID>, ;
                                                    <cValue>, <nLimit>, <.lReadOnly.>, <.lPassword.>, LocalBlock(<nVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
@@ -493,7 +493,7 @@
              [ <lVScroll: VSCROLL, VERTICAL SCROLL> ] ;
              [ <lReadOnly: READONLY> ] ;
              [ <lPassword: PASSWORD> ] ;
-      => [ <oEdt> := ] WG_TEditMultiline():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oEdt> := ] TEditMultiline():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
                                                    <oWnd>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                    <nID>, ;
                                                    <cValue>, <nLimit>, <.lReadOnly.>, <.lPassword.>, <.lHScroll.>, <.lVScroll.>, ;
@@ -518,7 +518,7 @@
              [ ID <nID> ] ;
              [ COLOR <ncFgColor> ] ;
              [ BACKCOLOR <ncBgColor> ] ;
-      => [ <oCal> := ] WG_TCalendar():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
+      => [ <oCal> := ] TCalendar():NewExtended( <cCaption>, <nRow>, <nCol>, <nWidth>, <nHeight>,;
                                                    <oWnd>, [ {|Self|<bAction> } ], <cToolTip>, <cStatusMsg>, <.lPixel.>,;
                                                    <nID>, ;
                                                    <dValue>, LocalBlock(<dVar>), <oFont>, <cFontName>, <nFontSize>, <{bWhen}>,;
@@ -749,7 +749,7 @@
                  [ <lUnderline: UNDERLINE>              ] ;    // underline attribute option
                  [ <lStrikeOut: STRIKEOUT>              ] ;    // strikeout attribute option
                  [ <lBold: BOLD>                        ] ;    // bold attribute option
-      => <oFnt> := WG_TFont():New( <cFace>, <nSize>, <.lItalic.>, <.lUnderline.>,;
+      => <oFnt> := TFont():New( <cFace>, <nSize>, <.lItalic.>, <.lUnderline.>,;
                                    <.lStrikeOut.>, <.lBold.> )
 
 #xcommand DEFINE FONT <oFnt> EXTENDED ;
@@ -767,7 +767,7 @@
                  [ QUALITY         <nQuality>           ] ;    // output quality
                  [ PITCHANDFAMILY  <nPitchAndFamily>    ] ;    // pitch and family
                  [ FACE            <cFace>              ] ;    // typeface name
-      => <oFnt> := WG_TFont():NewExtended( <nHeight>, <nWidth>, <nEscapement>, <nOrientation>, <nWeight>, <.lItalic.>, <.lUnderline.>,;
+      => <oFnt> := TFont():NewExtended( <nHeight>, <nWidth>, <nEscapement>, <nOrientation>, <nWeight>, <.lItalic.>, <.lUnderline.>,;
                     <.lStrikeOut.>, <nCharSet>, <nOutputPrecision>, <nClipPrecision>, <nQuality>, <nPitchAndFamily>,;
                     <cFace> )
 

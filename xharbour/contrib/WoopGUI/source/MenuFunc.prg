@@ -19,7 +19,7 @@
 #include "woopgui.ch"
 #include "common.ch"
 #include "windows.ch"
- 
+
 // -----------------------------------------------------
 
 //STATIC soWnd            // Parent Window Object of Menu
@@ -28,74 +28,74 @@ STATIC snID
 
 FUNCTION WG_BeginContextMenu()
    LOCAL oPopUp
-   
+
    WG_BeginMenuBar()
    oPopUp := WG_BeginMenuPopup( "__Dummymenu" )
-         
+
 RETURN oPopUp
 
 FUNCTION WG_BeginMenuBar()
    LOCAL oMenuBar
-   
+
    // Reset static values for new menu
-   soStack   := WG_TStack():New()
+   soStack   := TStack():New()
    //soWnd     := oWnd
    IF snID == NIL THEN snID := 5000  // ID automatically generated
                                      // user can define own id under 5000
-   
-   oMenuBar := WG_TMenuBar():New()
+
+   oMenuBar := TMenuBar():New()
    soStack:Push( oMenuBar )    //oMenuBar
 
 RETURN oMenuBar
 
 FUNCTION WG_BeginMenuPopup( cCaption )
    LOCAL oMenuBarItem, oMenuPopup
-   
-   oMenuBarItem := WG_TMenuItem():New(MF_POPUP, snID++, cCaption )
+
+   oMenuBarItem := TMenuItem():New(MF_POPUP, snID++, cCaption )
    soStack:Push( oMenuBarItem )  // oMenuBarItem
-   oMenuPopup := WG_TMenuPopup():New()
+   oMenuPopup := TMenuPopup():New()
    soStack:Push( oMenuPopup ) // oMenuPopup
 
 RETURN oMenuPopup
 
 FUNCTION WG_DefineMenuItem( cCaption, bAction, lChecked, nShortcut, cMsg, nId,;
 	                         lDisabled, lGrayed, bBfAction, bAfAction, lOnBuildMenu  )
-   LOCAL oMenuItem             
+   LOCAL oMenuItem
    DEFAULT lOnBuildMenu TO TRUE
-   
+
    DEFAULT nId TO snID++
-   
-   oMenuItem := WG_TMenuItem():New(, nID, cCaption, bAction, lChecked, lDisabled, lGrayed, cMsg )
+
+   oMenuItem := TMenuItem():New(, nID, cCaption, bAction, lChecked, lDisabled, lGrayed, cMsg )
    IF lOnBuildMenu THEN soStack:Tail():Append( oMenuItem ) // oMenuPopup
-   
+
 RETURN oMenuItem
 
 FUNCTION WG_DefineMenuItemSeparator( lOnBuildMenu )
-   LOCAL oMenuItem     
+   LOCAL oMenuItem
    DEFAULT lOnBuildMenu TO TRUE
-   
-   oMenuItem := WG_TMenuItem():Separator() // New( MF_SEPARATOR )
+
+   oMenuItem := TMenuItem():Separator() // New( MF_SEPARATOR )
    IF lOnBuildMenu THEN soStack:Tail():Append( oMenuItem ) // oMenuPopup
-   
+
 RETURN oMenuItem
 
 PROCEDURE WG_EndMenuPopup()
    LOCAL oMenuBarItem, oMenuPopup
-   
+
    oMenuPopup   := soStack:Pop() // oMenuPopup
    oMenuBarItem := soStack:Pop() // oMenuBarItem
    oMenuBarItem:SetID( oMenuPopup )
    soStack:Tail():Append( oMenuBarItem ) // oMenuBar
    oMenuPopup:ReparentChilds()
-   
+
 RETURN
 
 PROCEDURE WG_EndMenuBar()
    LOCAL oMenuBar
    oMenuBar := soStack:Pop() // oMenuBar
-   
+
    oMenuBar:ReparentChilds()
-   
+
    //soWnd:SetMenu( a )
 
 RETURN

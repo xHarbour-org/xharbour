@@ -72,7 +72,7 @@ FUNCTION __GET( bSetGet, cVarName, cPicture, bValid, bWhen )
       ENDIF
    ENDIF
 
-   oGet := WG_TXGet():New( Row(), Col(), bSetGet, cVarName, cPicture )
+   oGet := TXGet():New( Row(), Col(), bSetGet, cVarName, cPicture )
 
    oGet:PreBlock := bWhen
    oGet:PostBlock := bValid
@@ -102,7 +102,7 @@ FUNCTION __GETA( bGetArray, cVarName, cPicture, bValid, bWhen, aIndex )
    NEXT
    bSetGet := {|_1| iif( _1 == NIL, aGetVar[ aIndex[ nCounter ] ], aGetVar[ aIndex[ nCounter ] ] := _1 ) }
 
-   oGet := WG_TXGet():New(Row(), Col(), bSetGet, cVarName, cPicture )
+   oGet := TXGet():New(Row(), Col(), bSetGet, cVarName, cPicture )
    oGet:SubScript := aIndex
 
    oGet:PreBlock := bWhen
@@ -134,7 +134,7 @@ FUNCTION _XGET_( cVarName, bSetGet, cType, cCaption, nRow, nCol, nWidth, nHeight
       ENDIF
    ENDIF
 
-   oGet := WG_TXGet():NewExtended( nRow, nCol, bSetGet, cVarName, cPicture,, ;
+   oGet := TXGet():NewExtended( nRow, nCol, bSetGet, cVarName, cPicture,, ;
                                    nWidth, nHeight, oParent, cToolTip,;
                                    cStatusMsg, lPixel, nID, xDef, nLimit, lReadOnly, lPassword, !lNoAutoSize, ;
                                    oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
@@ -213,7 +213,7 @@ FUNCTION _XGET_( cVar, bVar, cType, cCaption, nRow, nCol, nWidth, nHeight, ;
 
    WG_DebugTrace("XGet: _XGET_ - Define TXGet():New()" )
 
-   xg := WG_TXGet():New( nRow, nCol, bVar, cVar, cPicture, ;
+   xg := TXGet():New( nRow, nCol, bVar, cVar, cPicture, ;
                          nWidth, nHeight, oParent, cToolTip,;
                          cStatusMsg, lPixel, nID, xDef, nLimit, cMsg, bHelp, bMeaning, bDisplay, ;
                          nKey, cLetter, bExit, ;
@@ -249,13 +249,13 @@ FUNCTION _XGET_( cVar, bVar, cType, cCaption, nRow, nCol, nWidth, nHeight, ;
    DO CASE
       CASE cType == "EDIT"
            WG_DebugTrace("XGet: _XGET_ - Type EDIT, Define xg:Control" )
-           xg:Control       := WG_TEdit():NewExtended( cVar, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip,;
+           xg:Control       := TEdit():NewExtended( cVar, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip,;
                                                cStatusMsg, lPixel, nID, xDef, nLimit, lReadOnly, lPassword, ;
                                                bVar, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
 
            WG_DebugTrace("XGet: _XGET_ - Type EDIT", "xg:Control", xg:Control )
            //xg:Control:DisplayData()
-           // xg:Reader        := {|| WG_TEditReader(
+           // xg:Reader        := {|| TEditReader(
    ENDCASE
 
 

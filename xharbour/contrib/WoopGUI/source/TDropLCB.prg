@@ -21,13 +21,13 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TDropListComboBox FROM WG_TComboBox
+CLASS TDropListComboBox FROM TComboBox
 
     METHOD New() CONSTRUCTOR
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS WG_TDropListComboBox
+METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS TDropListComboBox
 
     DEFAULT lPixel TO TRUE
 

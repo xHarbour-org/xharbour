@@ -23,7 +23,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TObject  // FROM HBObject
+CLASS TObject  // FROM HBObject
 
     DATA cargo                          // cargo as in Clipper
 
@@ -71,11 +71,11 @@ CLASS WG_TObject  // FROM HBObject
 
 ENDCLASS
 
-METHOD New() CLASS WG_TObject
+METHOD New() CLASS TObject
 
 RETURN Self
 
-METHOD DisplayArray( aData AS ARRAY, lMessageBox AS LOGICAL ) CLASS WG_TObject
+METHOD DisplayArray( aData AS ARRAY, lMessageBox AS LOGICAL ) CLASS TObject
    local cString := "", i
 
       DEFAULT lMessageBox TO TRUE
@@ -91,7 +91,7 @@ METHOD DisplayArray( aData AS ARRAY, lMessageBox AS LOGICAL ) CLASS WG_TObject
 
 RETURN cString
 
-METHOD DisplayData( cText AS STRING, lMessageBox AS LOGICAL ) CLASS WG_TObject
+METHOD DisplayData( cText AS STRING, lMessageBox AS LOGICAL ) CLASS TObject
    local cString := "", i, aData
    local oB := Self
 
@@ -115,7 +115,7 @@ METHOD DisplayData( cText AS STRING, lMessageBox AS LOGICAL ) CLASS WG_TObject
 
 RETURN cString
 
-METHOD DisplayMethods( cText AS STRING, lMessageBox AS LOGICAL ) CLASS WG_TObject
+METHOD DisplayMethods( cText AS STRING, lMessageBox AS LOGICAL ) CLASS TObject
    local cString := "", i, aData
    local oB := Self
 
@@ -141,7 +141,7 @@ RETURN cString
 
 //#include "error.ch"
 //
-//METHOD ErrorHandler( oErrore, x, y, z ) CLASS WG_TObject
+//METHOD ErrorHandler( oErrore, x, y, z ) CLASS TObject
 //   LOCAL oErr
 //   WG_ParamDisplay( Self, hb_aparams(), "ErrorHandler" )
 //   // Qui la gestione errori

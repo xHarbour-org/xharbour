@@ -34,7 +34,7 @@ PROCEDURE GetTest( oWnd )
           PITCHANDFAMILY    34                 ;
           FACE              "Courier New"
 
-   // oDlg:oFont := WG_TFont():NewExtended( -11, 0, 0, 0, 400, .F., .F.,;
+   // oDlg:oFont := TFont():NewExtended( -11, 0, 0, 0, 400, .F., .F.,;
    //                                       .F., 0, 1, 2, 1, 34, "Courier New" )
 
    SET CURRENT WINDOW oDlg

@@ -21,7 +21,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TSystemSetting FROM WG_TObject
+CLASS TSystemSetting FROM TObject
 
     METHOD New() CONSTRUCTOR
 
@@ -30,5 +30,5 @@ CLASS WG_TSystemSetting FROM WG_TObject
 
 ENDCLASS
 
-METHOD New() CLASS WG_TSystemSetting
+METHOD New() CLASS TSystemSetting
 RETURN Self

@@ -21,7 +21,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TDC FROM WG_TObject
+CLASS TDC FROM TObject
 
     DATA   nHWnd AS NUMERIC
     DATA   nDC   AS NUMERIC
@@ -107,6 +107,6 @@ CLASS WG_TDC FROM WG_TObject
 
 ENDCLASS
 
-METHOD New( nHWnd ) CLASS WG_TDC
+METHOD New( nHWnd ) CLASS TDC
    ASSIGN ::nHWnd WITH nHWnd
 RETURN Self

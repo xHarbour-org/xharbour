@@ -3,7 +3,7 @@
 
 if exist error.log del error.log
 
-set HB_INSTALL=c:\harbour
+set HB_INSTALL=..\..\..
 set WGUI_INSTALL=..
 set BCC_DIR=c:\bcc55
 

@@ -75,7 +75,7 @@
     { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }  ;
 }
 
-CLASS WG_TDateTime FROM WG_TObject
+CLASS TDateTime FROM TObject
 
    DATA   aDateTime  AS ARRAY INIT { 0,0,0,0,0,0,0,0 } HIDDEN
 
@@ -143,7 +143,7 @@ ENDCLASS
 
 //----------------------------------------------------------------------------//
 
-METHOD New( aDateTime ) CLASS WG_TDateTime
+METHOD New( aDateTime ) CLASS TDateTime
    DEFAULT aDateTime TO GetSystemTime()
 
    IF ValType( aDateTime ) == "A"
@@ -154,7 +154,7 @@ METHOD New( aDateTime ) CLASS WG_TDateTime
 
 RETURN Self
 
-METHOD GetDate( aDateTime ) CLASS WG_TDateTime
+METHOD GetDate( aDateTime ) CLASS TDateTime
    LOCAL dDate
    DEFAULT aDateTime TO ::aDateTime
    //::DisplayArray( aDateTime )
@@ -168,16 +168,16 @@ METHOD GetDate( aDateTime ) CLASS WG_TDateTime
 
 RETURN dDate
 
-METHOD GetDayOfYear() CLASS WG_TDateTime
+METHOD GetDayOfYear() CLASS TDateTime
    LOCAL dDate := hb_Stod( Str( ::aDateTime[ DATETIME_YEAR  ], 4 ) + "0101" )
 RETURN ::GetDate() - dDate + 1
 
-METHOD GetDayOfMonth() CLASS WG_TDateTime
+METHOD GetDayOfMonth() CLASS TDateTime
    LOCAL dDate := hb_Stod( StrZero( ::aDateTime[ DATETIME_YEAR  ], 4 ) + ;
                         StrZero( ::aDateTime[ DATETIME_MONTH ], 2 ) + "01" )
 RETURN ::GetDate() - dDate + 1
 
-METHOD GetTime( aDateTime ) CLASS WG_TDateTime
+METHOD GetTime( aDateTime ) CLASS TDateTime
    LOCAL cTime
 
    DEFAULT aDateTime TO ::aDateTime
@@ -187,7 +187,7 @@ METHOD GetTime( aDateTime ) CLASS WG_TDateTime
 
 RETURN cTime
 
-METHOD GetNumberOfDaysInMonth( nMonth, nYear ) CLASS WG_TDateTime
+METHOD GetNumberOfDaysInMonth( nMonth, nYear ) CLASS TDateTime
     IF ( nMonth == ::Invalid_Month .OR. nMonth == NIL )
         nMonth := ::GetMonth()
     ENDIF
@@ -196,7 +196,7 @@ METHOD GetNumberOfDaysInMonth( nMonth, nYear ) CLASS WG_TDateTime
     ENDIF
 RETURN ARRAY_DAYSINMONTH[ IIF( ::IsLeapYear( nYear ), 1, 2 ) ][ nMonth ]
 
-METHOD GetNumberOfDaysInYear( nYear AS NUMERIC ) CLASS WG_TDateTime
+METHOD GetNumberOfDaysInYear( nYear AS NUMERIC ) CLASS TDateTime
 
     IF ( nYear == ::Invalid_Year .OR. nYear == NIL )
         // take the current year if none given
@@ -205,11 +205,11 @@ METHOD GetNumberOfDaysInYear( nYear AS NUMERIC ) CLASS WG_TDateTime
 
 RETURN IIF( ::IsLeapYear( nYear ), 366, 365 )
 
-METHOD GetSystemTime() CLASS WG_TDateTime
+METHOD GetSystemTime() CLASS TDateTime
    ::aDateTime := GetSystemTime()
 RETURN ::aDateTime
 
-METHOD IsLeapYear( nYear AS NUMERIC ) CLASS WG_TDateTime
+METHOD IsLeapYear( nYear AS NUMERIC ) CLASS TDateTime
 
     IF ( nYear == ::Invalid_Year .OR. nYear == NIL )
         nYear := ::GetYear()
@@ -222,7 +222,7 @@ METHOD IsLeapYear( nYear AS NUMERIC ) CLASS WG_TDateTime
 
 RETURN ( nYear % 4 == 0 ) .AND. ( ( nYear % 100 != 0 ) .OR. ( nYear % 400 == 0 ) )
 
-METHOD IsValid() CLASS WG_TDateTime
+METHOD IsValid() CLASS TDateTime
  // we allow for the leap seconds, although we don't use them (yet)
 RETURN ( ::GetYear() >= 1601 .AND. ::GetYear() <= 30827 ) .AND. ;
        ( ::GetMonth() >= 1 .AND. ::GetMont() <= 12 ) .AND.;
@@ -232,11 +232,11 @@ RETURN ( ::GetYear() >= 1601 .AND. ::GetYear() <= 30827 ) .AND. ;
        ( ::GetSecond() >= 0 .AND. ::GetSecond() < 60 ) .AND. ;
        ( ::GetMilliSeconds >= 0 .AND. ::GetMilliSeconds() < 1000 )
 
-METHOD SetSystemTime( aDateTime ) CLASS WG_TDateTime
+METHOD SetSystemTime( aDateTime ) CLASS TDateTime
    DEFAULT aDateTime TO ::aDateTime
 RETURN SetSystemTime( ::aDateTime )
 
-METHOD DateToDateTime( dDate ) CLASS WG_TDateTime
+METHOD DateToDateTime( dDate ) CLASS TDateTime
    DEFAULT dDate TO DATE()
    IF ValType( dDate ) == "D" .AND. dDate <> NIL
       ::aDateTime := { ;

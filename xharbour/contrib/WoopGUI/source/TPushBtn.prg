@@ -22,7 +22,7 @@
 #include "windows.ch"
 
 // Windows definitions
-CLASS WG_TPushButton FROM WG_TButton
+CLASS TPushButton FROM TButton
 
     // METODI
     METHOD New()         CONSTRUCTOR
@@ -30,7 +30,7 @@ CLASS WG_TPushButton FROM WG_TButton
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, lDefault, nID ) CLASS WG_TPushButton
+METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, lDefault, nID ) CLASS TPushButton
 
     WG_DebugTrace( "TPushButton:New()" )
 
@@ -51,7 +51,7 @@ METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cSta
 RETURN Self
 
 METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel,;
-                    lDefault, nID, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS WG_TPushButton
+                    lDefault, nID, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TPushButton
 
     WG_DebugTrace( "TPushButton:NewExtended()" )
 

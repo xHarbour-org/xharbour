@@ -22,7 +22,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TDialogTemplate
+CLASS TDialogTemplate
 
     DATA nDlgVer     AS NUMERIC INIT 1
     DATA nSignature  AS NUMERIC INIT 0xFFFF        // Extended mode
@@ -53,7 +53,7 @@ CLASS WG_TDialogTemplate
 
 ENDCLASS
 
-METHOD New( cTitle, nRow, nCol, nWidth, nHeight ) CLASS WG_TDialogTemplate
+METHOD New( cTitle, nRow, nCol, nWidth, nHeight ) CLASS TDialogTemplate
 
     ASSIGN ::nExStyle     WITH WS_EX_DLGMODALFRAME //+ WS_EX_CONTROLPARENT
     //ASSIGN ::cClassName   WITH "WoopGUIDlgClass"

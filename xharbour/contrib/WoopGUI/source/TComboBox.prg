@@ -22,7 +22,7 @@
 #include "windows.ch"
 
 // Windows definitions
-CLASS WG_TComboBox FROM WG_TControl
+CLASS TComboBox FROM TControl
     // Base
 
     DATA    nInitValue    AS NUMERIC
@@ -69,7 +69,7 @@ CLASS WG_TComboBox FROM WG_TControl
 
 ENDCLASS
 
-METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS WG_TComboBox
+METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS TComboBox
 
     DEFAULT lPixel TO TRUE
 
@@ -94,27 +94,27 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction,
 RETURN Self
 
 METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction, cToolTip,;
-                    cStatusBar, lPixel, nID, nValue, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS WG_TComboBox
+                    cStatusBar, lPixel, nID, nValue, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TComboBox
 
     ::New( cName, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue )
     ::Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor )
 
 RETURN Self
 
-METHOD Init() CLASS WG_TComboBox
+METHOD Init() CLASS TComboBox
     ::AddRows( ::xValue )
     // Set default colors
-    IF ::oFgColor == NIL THEN ::SetForeGroundColor( WG_TSystemSetting():GetColor(COLOR_WINDOWTEXT) )
-    IF ::oBgColor == NIL THEN ::SetBackGroundColor( WG_TSystemSetting():GetColor(COLOR_BTNHIGHLIGHT) )
+    IF ::oFgColor == NIL THEN ::SetForeGroundColor( TSystemSetting():GetColor(COLOR_WINDOWTEXT) )
+    IF ::oBgColor == NIL THEN ::SetBackGroundColor( TSystemSetting():GetColor(COLOR_BTNHIGHLIGHT) )
     ::Super:Init()
     IF ::nInitValue <> NIL THEN ::SetValue( ::nInitValue )
 RETURN Self
 
-METHOD AddRows( aRows ) CLASS WG_TComboBox
+METHOD AddRows( aRows ) CLASS TComboBox
     aEval( aRows, {|e| ::AddString( e ) } )
 RETURN Self
 
-METHOD OnCommand( wParam, lParam ) CLASS WG_TComboBox
+METHOD OnCommand( wParam, lParam ) CLASS TComboBox
    LOCAL nRet   := -1
    LOCAL nEvent := HiWord( wParam )
    LOCAL nID    := LoWord( wParam )

@@ -21,7 +21,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TStack FROM WG_TObject
+CLASS TStack FROM TObject
 
    DATA   aData
 
@@ -46,7 +46,7 @@ ENDCLASS
 
 //----------------------------------------------------------------------------//
 
-METHOD tDel( nPos ) CLASS WG_TStack
+METHOD tDel( nPos ) CLASS TStack
    LOCAL xValue
 
    DEFAULT nPos TO 1
@@ -61,7 +61,7 @@ METHOD tDel( nPos ) CLASS WG_TStack
 
 //----------------------------------------------------------------------------//
 
-METHOD tIns( xValue, nPos ) CLASS WG_TStack
+METHOD tIns( xValue, nPos ) CLASS TStack
 
    DEFAULT nPos TO 1
 
@@ -75,7 +75,7 @@ METHOD tIns( xValue, nPos ) CLASS WG_TStack
 
 //----------------------------------------------------------------------------//
 
-METHOD Scan( xbSearch ) CLASS WG_TStack
+METHOD Scan( xbSearch ) CLASS TStack
    LOCAL nPos
    LOCAL xValue
 
@@ -86,7 +86,7 @@ METHOD Scan( xbSearch ) CLASS WG_TStack
 
 //----------------------------------------------------------------------------//
 
-METHOD RotateUp() CLASS WG_TStack
+METHOD RotateUp() CLASS TStack
    LOCAL xValue
 
    xValue := ::Del()
@@ -96,7 +96,7 @@ METHOD RotateUp() CLASS WG_TStack
 
 //----------------------------------------------------------------------------//
 
-METHOD RotateDown() CLASS WG_TStack
+METHOD RotateDown() CLASS TStack
    LOCAL xValue
 
    xValue := ::Pop()

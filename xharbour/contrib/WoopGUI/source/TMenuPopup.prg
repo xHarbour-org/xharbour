@@ -22,14 +22,14 @@
 #include "windows.ch"
 
 // Menu definitions
-CLASS WG_TMenuPopup FROM WG_TMenu
+CLASS TMenuPopup FROM TMenu
 
     // METODI
     METHOD New() CONSTRUCTOR
 
 ENDCLASS
 
-METHOD New() CLASS WG_TMenuPopup
+METHOD New() CLASS TMenuPopup
 
     // Azzero l'array delle voci
     ::nHandle := CreatePopupMenu()

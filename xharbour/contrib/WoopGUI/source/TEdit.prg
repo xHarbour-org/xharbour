@@ -22,7 +22,7 @@
 #include "windows.ch"
 
 // Windows definitions
-CLASS WG_TEdit FROM WG_TControl
+CLASS TEdit FROM TControl
     // Base
 
     DATA   cInitValue    AS STRING
@@ -116,7 +116,7 @@ CLASS WG_TEdit FROM WG_TControl
 ENDCLASS
 
 METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, cValue, ;
-            nLimitText, lReadOnly, lPassword ) CLASS WG_TEdit
+            nLimitText, lReadOnly, lPassword ) CLASS TEdit
 
     WG_DebugTrace( "TEdit:New()" )
 
@@ -148,7 +148,7 @@ RETURN Self
 
 METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip,;
                     cStatusBar, lPixel, nID, cValue, nLimit, lReadOnly, lPassword, ;
-                    bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS WG_TEdit
+                    bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TEdit
 
     WG_DebugTrace( "TEdit:NewExtended()" )
 
@@ -157,13 +157,13 @@ METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolT
 
 RETURN Self
 
-METHOD Init() CLASS WG_TEdit
+METHOD Init() CLASS TEdit
 
     WG_DebugTrace( "TEdit:Init()" )
 
     // Set default colors
-    IF ::oFgColor == NIL THEN ::SetForeGroundColor( WG_TSystemSetting():GetColor(COLOR_WINDOWTEXT) )
-    IF ::oBgColor == NIL THEN ::SetBackGroundColor( WG_TSystemSetting():GetColor(COLOR_BTNHIGHLIGHT) )
+    IF ::oFgColor == NIL THEN ::SetForeGroundColor( TSystemSetting():GetColor(COLOR_WINDOWTEXT) )
+    IF ::oBgColor == NIL THEN ::SetBackGroundColor( TSystemSetting():GetColor(COLOR_BTNHIGHLIGHT) )
     ::Super:Init()
     IF ::nLimitText <> NIL THEN ::SetLimitText( ::nLimitText )
     IF ValType( ::bVarBlock ) == "B"
@@ -175,7 +175,7 @@ METHOD Init() CLASS WG_TEdit
 RETURN Self
 
 
-METHOD OnCommand( wParam, lParam ) CLASS WG_TEdit
+METHOD OnCommand( wParam, lParam ) CLASS TEdit
    LOCAL nRet   := -1
    LOCAL nEvent := HiWord( wParam )
    LOCAL nID    := LoWord( wParam )
@@ -218,12 +218,12 @@ METHOD OnCommand( wParam, lParam ) CLASS WG_TEdit
 
 RETURN nRet
 
-//METHOD OnSetFocus() CLASS WG_TEdit
+//METHOD OnSetFocus() CLASS TEdit
 //  //::PushColors( "W+/B" )
 //  ::Super:OnSetFocus()
 //RETURN Self
 //
-//METHOD OnKillFocus() CLASS WG_TEdit
+//METHOD OnKillFocus() CLASS TEdit
 //  //::PopColors()
 //  ::Super:OnKillFocus()
 //RETURN Self
@@ -243,7 +243,7 @@ FUNCTION WG_DefEdtEvents( hWnd, nMsg, wParam, lParam )
   WG_ApplObj():EventsWrite( "EDTS", hWnd, nMsg, wParam, lParam )
 
   // Search window
-  oWin      := WG_TWindow():FindWindowByHandle( hwnd )
+  oWin      := TWindow():FindWindowByHandle( hwnd )
   IF oWin <> NIL
      // Call his window procedure
      nRet := oWin:WindowProc( nMsg, wParam, lParam )

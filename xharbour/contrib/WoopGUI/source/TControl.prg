@@ -22,7 +22,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TControl FROM WG_TWindow
+CLASS TControl FROM TWindow
 
     DATA nHelpID     AS NUMERIC    INIT 0
 
@@ -60,12 +60,12 @@ CLASS WG_TControl FROM WG_TWindow
 ENDCLASS
 
 METHOD New( cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, ;
-            cStatusBar, lPixel, lDefault, nID ) CLASS WG_TControl
+            cStatusBar, lPixel, lDefault, nID ) CLASS TControl
 
     //WG_ParamDisplay( Self, hb_aparams(), "TControl_New" )
     WG_DebugTrace( "TControl:New()" )
 
-    ASSIGN ::oParent  WITH oParent  DEFAULT WG_TWindow():GetCurrentWindow()
+    ASSIGN ::oParent  WITH oParent  DEFAULT TWindow():GetCurrentWindow()
     ASSIGN ::cToolTip WITH cToolTip DEFAULT ""
     ASSIGN ::lDefault WITH lDefault DEFAULT FALSE
     ASSIGN ::lPixel   WITH lPixel   DEFAULT FALSE
@@ -86,13 +86,13 @@ METHOD New( cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAc
 
     ::bAction := bAction
 
-    IF !::oParent:IsDerivedFrom( "WG_TDIALOG" )
+    IF !::oParent:IsDerivedFrom( "TDIALOG" )
        ::Init()
     ENDIF
 
 RETURN Self
 
-METHOD Init() CLASS WG_TControl
+METHOD Init() CLASS TControl
    WG_DebugTrace( "TControl:Init()" )
    //::Super:Init()
    ::SetToolTip( ::cToolTip )
@@ -102,16 +102,16 @@ METHOD Init() CLASS WG_TControl
    ELSEIF ::oParent:oFont != Nil
       ::SetFont( ::oParent:oFont )
    ELSE
-      ::SetFont( WG_TFont():New( "MS Sans Serif", 8 ) )
+      ::SetFont( TFont():New( "MS Sans Serif", 8 ) )
    ENDIF
    // Set default control color
-   //IF ::oFgColor == NIL THEN ::SetForeGroundColor( WG_TSystemSetting():GetColor(COLOR_WINDOWTEXT) )
-   //IF ::oBgColor == NIL THEN ::SetBackGroundColor( WG_TSystemSetting():GetColor(COLOR_BTNFACE) )
+   //IF ::oFgColor == NIL THEN ::SetForeGroundColor( TSystemSetting():GetColor(COLOR_WINDOWTEXT) )
+   //IF ::oBgColor == NIL THEN ::SetBackGroundColor( TSystemSetting():GetColor(COLOR_BTNFACE) )
 
 RETURN Self
 
 METHOD NewExtended( cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel,;
-                    lDefault, nID, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS WG_TControl
+                    lDefault, nID, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TControl
 
     WG_DebugTrace( "TControl:NewExtended()" )
 
@@ -120,7 +120,7 @@ METHOD NewExtended( cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oPar
 
 RETURN Self
 
-METHOD Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS WG_TControl
+METHOD Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TControl
 
     WG_DebugTrace( "TControl:Extend()" )
 
@@ -147,13 +147,13 @@ METHOD Extend( bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor,
 
 RETURN Self
 
-METHOD SetValue( xValue ) CLASS WG_TControl
+METHOD SetValue( xValue ) CLASS TControl
    WG_DebugTrace( "TControl:SetValue()" )
    ::xValue := xValue
    ::UpdateVar( xValue )
 RETURN Self
 
-METHOD OnContextMenu( x, y ) CLASS WG_TControl
+METHOD OnContextMenu( x, y ) CLASS TControl
    LOCAL nRet   := -1
    WG_DebugTrace( "TControl:OnContextMenu()" )
 
@@ -163,7 +163,7 @@ METHOD OnContextMenu( x, y ) CLASS WG_TControl
 
 RETURN nRet
 
-METHOD OnCtlColor( hDC ) CLASS WG_TControl
+METHOD OnCtlColor( hDC ) CLASS TControl
    LOCAL nRet   := -1
    WG_DebugTrace( "TControl:OnCtlColor()", "Self", Self, "::oFgColor", ::oFgColor, "::oBgColor", ::oBgColor  )
 
@@ -181,12 +181,12 @@ METHOD OnCtlColor( hDC ) CLASS WG_TControl
       DO CASE
          CASE ::cClassName == "STATIC"
               SetBkMode(hDC,1)
-              ::SetBackGroundColor( WG_TSystemSetting():GetColor(COLOR_BTNFACE) )
+              ::SetBackGroundColor( TSystemSetting():GetColor(COLOR_BTNFACE) )
               SetBkColor( hDC, ::oBgColor:GetColor() )
               nRet := ::oBrush:nHandle
          CASE ::cClassName == "BUTTON"
               //SetBkMode(hDC,0)
-              //::SetBackGroundColor( WG_TSystemSetting():GetColor(COLOR_BTNFACE) )
+              //::SetBackGroundColor( TSystemSetting():GetColor(COLOR_BTNFACE) )
               //SetBkColor( hDC, ::oBgColor:GetColor() )
               //nRet := ::oBrush:nHandle
               SetBkColor( hDC, GetSysColor( COLOR_BTNFACE ) )
@@ -199,24 +199,24 @@ METHOD OnCtlColor( hDC ) CLASS WG_TControl
 
 RETURN nRet
 
-METHOD OnSetFocus() CLASS WG_TControl
+METHOD OnSetFocus() CLASS TControl
   WG_DebugTrace( "TControl:OnSetFocus()" )
   IF ::cStatusBar <> NIL THEN ::oParent:SetStatusBar( ::cStatusBar, 1 )
 RETURN Self
 
-METHOD OnKillFocus() CLASS WG_TControl
+METHOD OnKillFocus() CLASS TControl
   WG_DebugTrace( "TControl:OnKillFocus()" )
   IF ::cStatusBar <> NIL THEN ::oParent:SetStatusBar( "", 1 )
 RETURN Self
 
-//METHOD OnDrawItem( lpDrawItem ) CLASS WG_TControl
+//METHOD OnDrawItem( lpDrawItem ) CLASS TControl
 //   LOCAL nRet   := -1
 //   MessageBox( , "Passato" )
 //   WG_DrawItem( lpDrawItem, ::nHandle, ::oBgColor:GetColor(), ::oFgColor:GetColor() )
 //RETURN nRet
 
 
-//METHOD WindowProc( nMsg, wParam, lParam ) CLASS WG_TControl
+//METHOD WindowProc( nMsg, wParam, lParam ) CLASS TControl
 //   LOCAL nRet := -1
 //   LOCAL wmId, wmEvent, wmHandle
 //   LOCAL oWin

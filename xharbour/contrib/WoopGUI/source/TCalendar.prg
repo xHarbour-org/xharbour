@@ -22,7 +22,7 @@
 #include "windows.ch"
 
 // Windows definitions
-CLASS WG_TCalendar FROM WG_TControl
+CLASS TCalendar FROM TControl
     // Base
 
     DATA    nInitValue    AS NUMERIC
@@ -47,7 +47,7 @@ CLASS WG_TCalendar FROM WG_TControl
 
 ENDCLASS
 
-METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, dValue ) CLASS WG_TCalendar
+METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, dValue ) CLASS TCalendar
 
 
     //WG_ParamDisplay( Self, hb_aparams(), "TCalendar_New" )
@@ -61,7 +61,7 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolT
     ASSIGN ::nWidth      WITH nWidth     DEFAULT IIF( lPixel, 100, WG_Pixel2DialogX( 100 ) )
     ASSIGN ::nHeight     WITH nHeight    DEFAULT IIF( lPixel, 20, WG_Pixel2DialogY( 20 ) )
     ASSIGN ::xValue      WITH dValue     DEFAULT Date()
-    //::oDateTime := WG_TDateTime():New( dValue )
+    //::oDateTime := TDateTime():New( dValue )
 
     //ASSIGN ::nInitValue  WITH nValue     DEFAULT 0
 
@@ -74,7 +74,7 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolT
 RETURN Self
 
 METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip,;
-                    cStatusBar, lPixel, nID, dValue, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS WG_TCalendar
+                    cStatusBar, lPixel, nID, dValue, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TCalendar
 
     //WG_ParamDisplay( Self, hb_aparams(), "TCalendar_NewExtended" )
 
@@ -83,19 +83,19 @@ METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolT
 
 RETURN Self
 
-METHOD Init() CLASS WG_TCalendar
+METHOD Init() CLASS TCalendar
     // Set default colors
-    IF ::oFgColor == NIL THEN ::SetForeGroundColor( WG_TSystemSetting():GetColor(COLOR_WINDOWTEXT) )
-    IF ::oBgColor == NIL THEN ::SetBackGroundColor( WG_TSystemSetting():GetColor(COLOR_BTNHIGHLIGHT) )
+    IF ::oFgColor == NIL THEN ::SetForeGroundColor( TSystemSetting():GetColor(COLOR_WINDOWTEXT) )
+    IF ::oBgColor == NIL THEN ::SetBackGroundColor( TSystemSetting():GetColor(COLOR_BTNHIGHLIGHT) )
     ::Super:Init()
-    ::oDateTime := WG_TDateTime():New( ::xValue )
+    ::oDateTime := TDateTime():New( ::xValue )
     //::oDateTime:DisplayData()
     ::UpdateVar( ::GetDate() )
     //::DisplayData()
     //IF ::nInitValue <> NIL THEN ::SetValue( ::nInitValue )
 RETURN Self
 
-METHOD OnNotify( wParam, lParam ) CLASS WG_TCalendar
+METHOD OnNotify( wParam, lParam ) CLASS TCalendar
    LOCAL nRet   := -1
    LOCAL nEvent  := WG_GetNMHDRCode( lParam )
 

@@ -1,1 +1,1 @@
-!include <makefile.b32>
+!include <makefile.bc>

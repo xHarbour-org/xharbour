@@ -25,7 +25,7 @@
 
 static snWinID
 
-CLASS WG_TWindowBase FROM WG_TObject
+CLASS TWindowBase FROM TObject
 
     CLASSDATA aoWindows    AS ARRAY INIT {} HIDDEN // Array of windows (this array contains all windows, windows are controls too)
     CLASSDATA aoWinClasses AS ARRAY INIT {} HIDDEN // Array of window classes
@@ -188,9 +188,9 @@ CLASS WG_TWindowBase FROM WG_TObject
 
 ENDCLASS
 
-METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, nMenu, nApplication, pStruct ) CLASS WG_TWindowBase
+METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, nMenu, nApplication, pStruct ) CLASS TWindowBase
 
-    LOCAL oClass := WG_TWindowDef()    // Get Windows class defaults
+    LOCAL oClass := TWindowDef()    // Get Windows class defaults
 
     //WG_ParamDisplay( Self, hb_aparams(), "TWindowBase" )
 
@@ -242,7 +242,7 @@ METHOD New( nExStyle, cClassName, cName, nStyle, nRow, nCol, nWidth, nHeight, oP
 
 RETURN Self
 
-METHOD Init( lRegister, lCreate ) CLASS WG_TWindowBase
+METHOD Init( lRegister, lCreate ) CLASS TWindowBase
 
    WG_DebugTrace( "TWindowBase:Init()" )
 
@@ -259,7 +259,7 @@ METHOD Init( lRegister, lCreate ) CLASS WG_TWindowBase
 
 RETURN Self
 
-METHOD Create() CLASS WG_TWindowBase
+METHOD Create() CLASS TWindowBase
 
    WG_DebugTrace( "TWindowBase:Create() - Before creation", "Self", Self, "::cClassName", ::cClassName, "nHandle", ::nHandle )
     //WG_ObjDisplayData( Self, "TWindowBase" )
@@ -296,7 +296,7 @@ METHOD Create() CLASS WG_TWindowBase
 
 RETURN Self
 
-METHOD Register() CLASS WG_TWindowBase
+METHOD Register() CLASS TWindowBase
   LOCAL nHandle
 
   WG_DebugTrace( "TWindowBase:Register()", "::cClassName", ::cClassName )
@@ -311,32 +311,32 @@ METHOD Register() CLASS WG_TWindowBase
 RETURN nHandle
 
 
-METHOD FindWindowPos( oWin ) CLASS WG_TWindowBase
+METHOD FindWindowPos( oWin ) CLASS TWindowBase
    LOCAL nPos
    DEFAULT oWin TO Self
    nPos := aScan( ::aoWindows, {|o| o == oWin } )
 RETURN nPos
 
-METHOD FindWindowByID( nID ) CLASS WG_TWindowBase
+METHOD FindWindowByID( nID ) CLASS TWindowBase
    LOCAL nPos := aScan( ::aoWindows, {|o| o:nID == nID } )
 RETURN IIF( nPos > 0, ::aoWindows[ nPos ], NIL )
 
-METHOD FindWindowByHandle( nHandle AS NUMERIC ) CLASS WG_TWindowBase
+METHOD FindWindowByHandle( nHandle AS NUMERIC ) CLASS TWindowBase
    LOCAL nPos := aScan( ::aoWindows, {|o| o:nHandle == nHandle } )
 RETURN IIF( nPos > 0, ::aoWindows[ nPos ], NIL )
 
-METHOD FindWindowbyPos( nPos AS NUMERIC ) CLASS WG_TWindowBase
+METHOD FindWindowbyPos( nPos AS NUMERIC ) CLASS TWindowBase
   LOCAL oWin
   IF nPos > 0 .AND. nPos <= Len( ::aoWindows ) THEN oWin := ::aoWindows[ nPos ]
 RETURN oWin
 
-METHOD FindWindowByName( cName ) CLASS WG_TWindowBase
+METHOD FindWindowByName( cName ) CLASS TWindowBase
    LOCAL nPos := aScan( ::aoWindows, {|o| o:cName == cName } )
 RETURN IIF( nPos > 0, ::aoWindows[ nPos ], NIL )
 
 
 
-METHOD ReParent( oP AS OBJECT ) CLASS WG_TWindowBase
+METHOD ReParent( oP AS OBJECT ) CLASS TWindowBase
   LOCAL oOldParent
   IF oP <> NIL
      oOldParent := ::oParent
@@ -345,16 +345,16 @@ METHOD ReParent( oP AS OBJECT ) CLASS WG_TWindowBase
   ENDIF
 RETURN oOldParent
 
-METHOD SetEventHandler( bWindowProc AS CODEBLOCK ) CLASS WG_TWindowBase
+METHOD SetEventHandler( bWindowProc AS CODEBLOCK ) CLASS TWindowBase
   LOCAL bOldWndProc := ::bWindowProc
   ::bWindowProc := bWindowProc
 RETURN bOldWndProc
 
-METHOD SetParentByHandle( nParent AS NUMERIC ) CLASS WG_TWindowBase
+METHOD SetParentByHandle( nParent AS NUMERIC ) CLASS TWindowBase
    ::oParent := ::FindWindowByHandle( nParent )
 RETURN Self
 
-METHOD SetWindowPos( nhWndInsertAfter, nX, nY, nWidth, nHeight, nFlags ) CLASS WG_TWindowBase
+METHOD SetWindowPos( nhWndInsertAfter, nX, nY, nWidth, nHeight, nFlags ) CLASS TWindowBase
    LOCAL lOk := SetWindowPos( ::nHandle, nhWndInsertAfter, nX, nY, nWidth, nHeight, nFlags )
    UPDATE ::nRow    TO nX      NOT NIL
    UPDATE ::nCol    TO nY      NOT NIL
@@ -362,7 +362,7 @@ METHOD SetWindowPos( nhWndInsertAfter, nX, nY, nWidth, nHeight, nFlags ) CLASS W
    UPDATE ::nHeight TO nHeight NOT NIL
 RETURN lOk
 
-METHOD WindowProc( nMessage, wParam, lParam ) CLASS WG_TWindowBase
+METHOD WindowProc( nMessage, wParam, lParam ) CLASS TWindowBase
    LOCAL nRet := -1
    IF ValType( ::bWindowProc ) == "B"
       nRet := Eval( ::bWindowProc, ::nHandle, nMessage, wParam, lParam )
@@ -370,27 +370,27 @@ METHOD WindowProc( nMessage, wParam, lParam ) CLASS WG_TWindowBase
 RETURN nRet
 
 
-METHOD SetCursorFromFile( cFileName ) CLASS WG_TWindowBase
+METHOD SetCursorFromFile( cFileName ) CLASS TWindowBase
    ::hCursor := WG_GetCursorFromFile( ::hInstance, cFileName )
 RETURN ::hCursor
 
-METHOD SetIconFromFile( cFileName ) CLASS WG_TWindowBase
+METHOD SetIconFromFile( cFileName ) CLASS TWindowBase
    ::hIcon := WG_GetIconFromFile( ::hInstance, cFileName )
 RETURN ::hIcon
 
-METHOD SetIconSmFromFile( cFileName ) CLASS WG_TWindowBase
+METHOD SetIconSmFromFile( cFileName ) CLASS TWindowBase
    ::hIconSm := WG_GetIconFromFile( ::hInstance, cFileName )
 RETURN ::hIconSm
 
-METHOD UnRegister() CLASS WG_TWindowBase
+METHOD UnRegister() CLASS TWindowBase
 RETURN UnRegisterClass( ::cClassName, ::hInstance )
 
 
-METHOD GetCurrentWindow() CLASS WG_TWindowBase
+METHOD GetCurrentWindow() CLASS TWindowBase
   IF ValType( ::oCurrentWindow ) <> "O" THEN MessageBox(0,"Default Windows Object not defined!","Error")
 RETURN ::oCurrentWindow
 
-METHOD SetCurrentWindow( oWnd ) CLASS WG_TWindowBase
+METHOD SetCurrentWindow( oWnd ) CLASS TWindowBase
   LOCAL nOldWnd := ::oCurrentWindow
   ::oCurrentWindow := oWnd
 RETURN nOldWnd
@@ -404,7 +404,7 @@ FUNCTION WG_GetIconFromFile( hInstance, cFileName )
 RETURN nHandle
 
 EXIT PROCEDURE __WG_TWindowBase_Exit()
-   LOCAL aoWinClasses := WG_TWindowBase():aoWinClasses
-   WG_DebugTrace( "TWindowBase_Exit_Proc - Unregister Classes", "WG_TWindowBase():aoWinClasses", WG_TWindowBase():aoWinClasses )
+   LOCAL aoWinClasses := TWindowBase():aoWinClasses
+   WG_DebugTrace( "TWindowBase_Exit_Proc - Unregister Classes", "TWindowBase():aoWinClasses", TWindowBase():aoWinClasses )
    aEval( aoWinClasses, {|o| o:UnRegister() } )
 RETURN

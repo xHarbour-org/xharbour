@@ -22,7 +22,7 @@
 #include "windows.ch"
 
 // Windows definitions
-CLASS WG_TButton FROM WG_TControl
+CLASS TButton FROM TControl
     // Base
 
     // METODI
@@ -40,7 +40,7 @@ CLASS WG_TButton FROM WG_TControl
 ENDCLASS
 
 METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, ;
-            lDefault, nID ) CLASS WG_TButton
+            lDefault, nID ) CLASS TButton
 
     WG_DebugTrace( "TButton:New()" )
 
@@ -63,7 +63,7 @@ METHOD New( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolT
 RETURN Self
 
 METHOD NewExtended( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip,;
-                    cStatusBar, lPixel, lDefault, nID, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS WG_TButton
+                    cStatusBar, lPixel, lDefault, nID, bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TButton
 
     WG_DebugTrace( "TButton:NewExtended()" )
 
@@ -72,7 +72,7 @@ METHOD NewExtended( cName, nStyle, nRow, nCol, nWidth, nHeight, oParent, bAction
 
 RETURN Self
 
-METHOD OnCommand( wParam, lParam ) CLASS WG_TButton
+METHOD OnCommand( wParam, lParam ) CLASS TButton
    LOCAL nRet   := -1
    LOCAL nEvent := HiWord( wParam )
    LOCAL nID    := LoWord( wParam )
@@ -117,7 +117,7 @@ METHOD OnCommand( wParam, lParam ) CLASS WG_TButton
 RETURN nRet
 
 /*
-METHOD WindowProc( nMsg, wParam, lParam ) CLASS WG_TButton
+METHOD WindowProc( nMsg, wParam, lParam ) CLASS TButton
    LOCAL nRet := -1
    LOCAL wmId, wmEvent, wmHandle
    LOCAL oWin

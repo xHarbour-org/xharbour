@@ -17,7 +17,7 @@
 */
 // Modified from Ron Pinkas \harbour\samples\guestbk\inifiles.prg
 //
-// $Id: inifiles.prg,v 1.1.1.1 2001/12/21 10:47:11 ronpinkas Exp $
+// $Id: TIniFile.prg,v 1.1 2002/09/05 23:13:04 ronpinkas Exp $
 //
 //
 
@@ -26,7 +26,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TIniFile FROM WG_TObject
+CLASS TIniFile FROM TObject
 
    DATA cFileName              // define this class objects datas
    DATA aContents
@@ -48,7 +48,7 @@ CLASS WG_TIniFile FROM WG_TObject
 
 ENDCLASS
 
-METHOD New( cFileName ) CLASS WG_TIniFile
+METHOD New( cFileName ) CLASS TIniFile
    local lDone, hFile, cFile, cLine, cIdent, nPos
    local aCurrArray
 
@@ -123,7 +123,7 @@ METHOD New( cFileName ) CLASS WG_TIniFile
 
 return Self
 
-METHOD ReadString(cSection, cIdent, cDefault) CLASS WG_TIniFile
+METHOD ReadString(cSection, cIdent, cDefault) CLASS TIniFile
    local cResult := cDefault
    local i, j, cFind
 
@@ -152,7 +152,7 @@ METHOD ReadString(cSection, cIdent, cDefault) CLASS WG_TIniFile
    endif
 return cResult
 
-METHOD WriteString(cSection, cIdent, cString) CLASS WG_TIniFile
+METHOD WriteString(cSection, cIdent, cString) CLASS TIniFile
    local i, j, cFind
 
    if Empty(cIdent)
@@ -194,26 +194,26 @@ METHOD WriteString(cSection, cIdent, cString) CLASS WG_TIniFile
    endif
 return TRUE
 
-METHOD ReadNumber(cSection, cIdent, nDefault) CLASS WG_TIniFile
+METHOD ReadNumber(cSection, cIdent, nDefault) CLASS TIniFile
 return Val( ::ReadString(cSection, cIdent, str(nDefault)) )
 
-METHOD WriteNumber(cSection, cIdent, nNumber) CLASS WG_TIniFile
+METHOD WriteNumber(cSection, cIdent, nNumber) CLASS TIniFile
 return ::WriteString( cSection, cIdent, alltrim(str(nNumber)) )
 
-METHOD ReadDate(cSection, cIdent, dDefault) CLASS WG_TIniFile
+METHOD ReadDate(cSection, cIdent, dDefault) CLASS TIniFile
 return SToD( ::ReadString(cSection, cIdent, DToS(dDefault)) )
 
-METHOD WriteDate(cSection, cIdent, dDate) CLASS WG_TIniFile
+METHOD WriteDate(cSection, cIdent, dDate) CLASS TIniFile
 return ::WriteString( cSection, cIdent, DToS(dDate) )
 
-METHOD ReadBool(cSection, cIdent, lDefault) CLASS WG_TIniFile
+METHOD ReadBool(cSection, cIdent, lDefault) CLASS TIniFile
    local cDefault := Iif( lDefault, '.t.', '.f.' )
 return ::ReadString(cSection, cIdent, cDefault) == '.t.'
 
-METHOD WriteBool(cSection, cIdent, lBool) CLASS WG_TIniFile
+METHOD WriteBool(cSection, cIdent, lBool) CLASS TIniFile
 return ::WriteString( cSection, cIdent, Iif(lBool, '.t.', '.f.') )
 
-METHOD DeleteKey(cSection, cIdent) CLASS WG_TIniFile
+METHOD DeleteKey(cSection, cIdent) CLASS TIniFile
    local i, j
 
    cSection := lower(cSection)
@@ -228,7 +228,7 @@ METHOD DeleteKey(cSection, cIdent) CLASS WG_TIniFile
    endif
 return TRUE
 
-METHOD EraseSection(cSection) CLASS WG_TIniFile
+METHOD EraseSection(cSection) CLASS TIniFile
    local i
 
    if Empty(cSection)
@@ -246,7 +246,7 @@ METHOD EraseSection(cSection) CLASS WG_TIniFile
    endif
 return TRUE
 
-METHOD ReadSection(cSection) CLASS WG_TIniFile
+METHOD ReadSection(cSection) CLASS TIniFile
    local i, j, aSection := {}
 
    if Empty(cSection)
@@ -270,7 +270,7 @@ METHOD ReadSection(cSection) CLASS WG_TIniFile
    endif
 return aSection
 
-METHOD ReadSections() CLASS WG_TIniFile
+METHOD ReadSections() CLASS TIniFile
    local i, aSections := {}
 
    for i := 1 to Len(::aContents)
@@ -281,7 +281,7 @@ METHOD ReadSections() CLASS WG_TIniFile
    next
 return aSections
 
-METHOD UpdateFile() CLASS WG_TIniFile
+METHOD UpdateFile() CLASS TIniFile
    local i, j, hFile
 
    hFile := fcreate(::cFileName)

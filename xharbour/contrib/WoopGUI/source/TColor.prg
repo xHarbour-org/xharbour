@@ -21,7 +21,7 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TColor FROM WG_TObject
+CLASS TColor FROM TObject
 
     DATA   nRGBColor
 
@@ -38,7 +38,7 @@ CLASS WG_TColor FROM WG_TObject
     METHOD SetRGBColor( nR, nG, nB )  INLINE ::nRGBColor := RGB( nR, nG, nB )
     METHOD RGB()                      INLINE ::SetRGBColor()
     METHOD FindColor( cColor )        INLINE LOCAL aColor, ;
-                                             aColor := WG_TColorDatabase():FindColor( cColor ),;
+                                             aColor := TColorDatabase():FindColor( cColor ),;
                                              IIF( aColor <> NIL, ;
                                                   ::SetRGBColor( aColor[2], aColor[3], aColor[4] ),;
                                                   NIL ;
@@ -46,7 +46,7 @@ CLASS WG_TColor FROM WG_TObject
 
 ENDCLASS
 
-METHOD New( ncColor ) CLASS WG_TColor
+METHOD New( ncColor ) CLASS TColor
    LOCAL cClipperColor
    IF     ValType( ncColor ) == "N"  // == nRGB
           ::SetColor( ncColor )

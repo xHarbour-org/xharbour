@@ -21,13 +21,13 @@
 #include "hbclass.ch"
 #include "windows.ch"
 
-CLASS WG_TSimpleComboBox FROM WG_TComboBox
+CLASS TSimpleComboBox FROM TComboBox
 
     METHOD New() CONSTRUCTOR
 
 ENDCLASS
 
-METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS WG_TSimpleComboBox
+METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, aRows, bAction, cToolTip, cStatusBar, lPixel, nID, nValue ) CLASS TSimpleComboBox
 
     //WG_ParamDisplay( Self, hb_aparams(), "TSimpleCB" )
 

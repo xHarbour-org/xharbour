@@ -22,7 +22,7 @@
 #include "windows.ch"
 
 // Windows definitions
-CLASS WG_TEditMultiline FROM WG_TEdit
+CLASS TEditMultiline FROM TEdit
     // Base
     DATA   lHScroll      AS LOGICAL INIT FALSE
     DATA   lVScroll      AS LOGICAL INIT FALSE
@@ -35,7 +35,7 @@ CLASS WG_TEditMultiline FROM WG_TEdit
 ENDCLASS
 
 METHOD New( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip, cStatusBar, lPixel, nID, cValue, ;
-            nLimitText, lReadOnly, lPassword, lHScroll, lVScroll ) CLASS WG_TEditMultiline
+            nLimitText, lReadOnly, lPassword, lHScroll, lVScroll ) CLASS TEditMultiline
 
     WG_DebugTrace( "TEditMultiline:New()")
 
@@ -61,7 +61,7 @@ RETURN Self
 
 METHOD NewExtended( cName, nRow, nCol, nWidth, nHeight, oParent, bAction, cToolTip,;
                     cStatusBar, lPixel, nID, cValue, nLimit, lReadOnly, lPassword, lHScroll, lVScroll, ;
-                    bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS WG_TEditMultiline
+                    bVarBlock, oFont, cFontName, nFontSize, bWhen, bValid, ncFgColor, ncBgColor ) CLASS TEditMultiline
 
     WG_DebugTrace( "TEditMultiline:NewExtended()")
 
