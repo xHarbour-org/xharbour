@@ -1,5 +1,5 @@
 /*
- * $Id: hboo.ch,v 1.1.1.1 2001/12/21 10:47:28 ronpinkas Exp $
+ * $Id: hboo.ch,v 1.2 2002/01/26 21:13:58 ronpinkas Exp $
  */
 
 /*
@@ -72,6 +72,7 @@
 #define HB_MSGLISTPURE  2
 
 /* Method or Data attribute (nScope)*/
+#define HB_OO_CLSTP_PUBLISHED   0 /* Filtering scope only */
 #define HB_OO_CLSTP_EXPORTED    1 /* No comment, default */
 #define HB_OO_CLSTP_PROTECTED   2 /* Only usable from one of the object's method (even sublclassed object) */
 #define HB_OO_CLSTP_HIDDEN      4 /* Only usable from one of the object's method (and not from sublclassed one) */

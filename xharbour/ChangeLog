@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.437 2002/10/13 18:42:14 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.438 2002/10/14 18:21:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-14 16:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbclass.ch
+    + Added new HB_CLSTP_PUBLISHED
+
+  * include/hboo.ch
+    + Added support for new HB_CLSTP_PUBLISHED
+    + Added support for PUBLIC as synonym to EXPORTED.
+    + Added support for PRIVATE as synonym to HIDDEN.
+    + Added logic to detect and generate Error Message if code uses conflicting SCOPE Qualifers.
+    ! Optimized HBCLSCHOICE() - No more multiple nested IIF() in generated code.
 
 2002-10-14 11:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/arrays.c
