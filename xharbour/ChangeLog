@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1102 2003/06/06 14:46:43 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1103 2003/06/06 16:32:13 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-06-06 19:52 UTC+0200 Martin Vogel <vogel@inttec.de>
+  * source/rtl/math.c
+    ! warning of uninitialized variable fixed by initializing it	
+	
 2003-06-06 09:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rdd/nulsys/nulsys.prg
     ! Corrected warning of unused variables.

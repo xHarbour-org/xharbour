@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.4 2002/09/06 10:39:24 andijahja Exp $
+ * $Id: math.c,v 1.5 2002/09/06 10:47:44 andijahja Exp $
  */
 
 /*
@@ -312,7 +312,7 @@ int hb_matherr (HB_MATH_EXCEPTION * pexc)
   /* math exception not handled by Harbour error routine above ? */
   if (pexc->handled == 0)
   {
-    int iret;
+    int iret = 1;
     switch (mode)
     {
     case HB_MATH_ERRMODE_USER:
