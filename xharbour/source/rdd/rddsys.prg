@@ -1,5 +1,5 @@
 /*
- * $Id: rddsys.prg,v 1.1.1.1 2001/12/21 10:42:46 ronpinkas Exp $
+ * $Id: rddsys.prg,v 1.2 2003/09/02 05:41:14 ronpinkas Exp $
  */
 
 /*
@@ -57,6 +57,7 @@ ANNOUNCE RDDSYS
 PROCEDURE RddInit
 
    REQUEST DBFNTX
+   REQUEST DBFDBT
 
    /* NOTE: Using this internal version of this functions, since at this
             point the DBFNTX RDD may not be registered, depending on the

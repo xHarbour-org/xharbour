@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.12 2003/08/20 09:14:41 druzus Exp $
+# $Id: make_tgz.sh,v 1.13 2003/09/08 19:18:42 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -64,9 +64,11 @@ pushd source/vm
     make fm.o
     ar -r $HB_LIB_INSTALL/libfm.a fm.o
     rm -f fm.o
-    make fm.o 'HB_LIBCOMP_MT=YES'
-    ar -r $HB_LIB_INSTALL/libfmmt.a fm.o
-    rm -f fm.o
+    if [ $HB_MT = "MT" ]; then
+        make fm.o 'HB_LIBCOMP_MT=YES'
+        ar -r $HB_LIB_INSTALL/libfmmt.a fm.o
+        rm -f fm.o
+    fi
     C_USR=$TMP_C_USR
 popd
 

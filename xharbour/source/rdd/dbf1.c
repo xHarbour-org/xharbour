@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.38 2003/09/08 12:56:53 druzus Exp $
+ * $Id: dbf1.c,v 1.39 2003/09/10 00:29:53 ronpinkas Exp $
  */
 
 /*
@@ -2442,6 +2442,7 @@ static ERRCODE hb_dbfCreateMemFile( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       SELF_ERROR( ( AREAP ) pArea, pError );
       hb_errRelease( pError );
    }
+   pArea->fHasMemo = FALSE;
    return FAILURE;
 }
 
