@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.24 2003/11/04 09:54:50 brianhays Exp $
+ * $Id: ads1.c,v 1.25 2003/11/08 06:17:29 brianhays Exp $
  */
 
 /*
@@ -1278,7 +1278,6 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
       case HB_IT_DATE:
          {
-            UNSIGNED8 pucFormat[ 11 ];
             UNSIGNED16 pusLen = 11;
             pulLength = pArea->maxFieldLen + 1;
             // AdsGetString  returns dates in YYYYMMDD format!

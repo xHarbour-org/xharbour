@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.18 2003/09/23 15:16:21 jonnymind Exp $
+ * $Id: hbsrlraw.c,v 1.19 2003/11/10 01:48:29 jonnymind Exp $
  */
 
 /*
@@ -192,7 +192,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
    switch( pItem->type )
    {
       case HB_IT_STRING:
-         ulRet = pItem->item.asString.length + 9;
+         ulRet = (ULONG) (pItem->item.asString.length + 9);
          cRet = (BYTE *) hb_xgrab( ulRet );
          cRet[0] = (BYTE) 'C';
          hb_createlen8( cRet + 1, pItem->item.asString.length );
@@ -292,7 +292,7 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
    switch( cBuf[0] )
    {
       case 'C':
-         ulData = hb_getlen8( ( BYTE * )cBuf + 1 );
+         ulData = (ULONG) hb_getlen8( ( BYTE * )cBuf + 1 );
          if ( ulMaxlen > 0 && ulData > (ULONG) ulMaxlen )
          {
             hb_ret();
@@ -310,18 +310,18 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
       case 'N':
          if( cBuf[1] == 'I' )
          {
-            ulData = hb_getlen8( ( BYTE * )cBuf + 2 );
+            ulData = (ULONG) hb_getlen8( ( BYTE * )cBuf + 2 );
             hb_retni( (int) ulData );
          }
          else if( cBuf[1] == 'L' )
          {
-            ulData = hb_getlen8( ( BYTE * )cBuf + 2 );
+            ulData = (ULONG) hb_getlen8( ( BYTE * )cBuf + 2 );
             hb_retnl( (long) ulData );
          }
 #ifndef HB_LONG_LONG_OFF
          else if( cBuf[1] == 'X' )
          {
-            ulData = hb_getlen8( ( BYTE * )cBuf + 2 );
+            ulData = (ULONG) hb_getlen8( ( BYTE * )cBuf + 2 );
             hb_retnll( (LONGLONG) ulData );
          }
 #endif
@@ -332,7 +332,7 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
       break;
 
       case 'D':
-         ulData = hb_getlen8( (BYTE *)(cBuf + 1) );
+         ulData = (ULONG) hb_getlen8( (BYTE *)(cBuf + 1) );
          hb_retdl( ulData );
       break;
 
@@ -353,7 +353,7 @@ ULONG hb_serialNextRaw( char *cBuf )
    switch( cBuf[0] )
    {
       case 'C':
-         ulData = hb_getlen8( ( BYTE * )cBuf + 1 );
+         ulData = (ULONG) hb_getlen8( ( BYTE * )cBuf + 1 );
       return ulData + 9;
 
       case 'L':
@@ -371,7 +371,7 @@ ULONG hb_serialNextRaw( char *cBuf )
 
       case 'A':
          ulData = ulNext = 9;
-         ulCount = hb_getlen8( ( BYTE *) (cBuf + 1) );
+         ulCount = (ULONG) hb_getlen8( ( BYTE *) (cBuf + 1) );
 
          while ( ulCount > 0 )
          {
@@ -384,7 +384,7 @@ ULONG hb_serialNextRaw( char *cBuf )
 
       case 'H':
          ulData = ulNext = 9;
-         ulCount = hb_getlen8( ( BYTE *) (cBuf + 1) );
+         ulCount = (ULONG) hb_getlen8( ( BYTE *) (cBuf + 1) );
 
          while ( ulCount > 0 )
          {
@@ -400,7 +400,7 @@ ULONG hb_serialNextRaw( char *cBuf )
 
       case 'O':
          ulNext = 9;
-         ulCount = hb_getlen8( ( BYTE *) (cBuf + 1) );
+         ulCount = (ULONG) hb_getlen8( ( BYTE *) (cBuf + 1) );
          // remove class name
          ulNext += hb_serialNextRaw( ( char *) ( cBuf + 9 )  );
          ulData = ulNext;

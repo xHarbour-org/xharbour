@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.55 2003/12/17 03:53:18 ronpinkas Exp $
+ * $Id: genc.c,v 1.56 2003/12/30 11:52:45 lf_sfnet Exp $
  */
 
 /*
@@ -84,6 +84,8 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
    BOOL bCritical = FALSE;
 
    int  iSymOffset, iStartupOffset;
+
+   HB_SYMBOL_UNUSED( szSourcePath );
 
    if( ! pFileName->szExtension )
    {

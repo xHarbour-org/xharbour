@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.36 2004/01/10 11:16:07 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.37 2004/01/10 17:11:38 vouchcac Exp $
  */
 
 /*
@@ -3717,8 +3717,8 @@ HB_FUNC( WVT_SETPEN )
    COLORREF crColor;
    HPEN     hPen;
    
-   if ( ISNIL( 1 ) );
-   { 
+   if ( ISNIL( 1 ) )
+   {
       hb_retl( FALSE );
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.82 2003/12/01 23:02:27 ronpinkas Exp $
+ * $Id: arrays.c,v 1.83 2003/12/15 02:35:37 jonnymind Exp $
  */
 
 /*
@@ -889,7 +889,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
             }
             hb_vmPush( pItems + ulStart );
             hb_vmPushNumber( ( double ) ( ulStart + 1 ), 0 );
-            hb_vmSend( ulParams );
+            hb_vmSend( (USHORT) ulParams );
             if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) && HB_VM_STACK.Return.item.asLogical.value )
             {
                return ulStart + 1;                  /* arrays start from 1 */
@@ -1073,7 +1073,7 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
             }
             hb_vmPush( pItems + ulStart );
             hb_vmPushNumber( ( double ) ( ulStart + 1 ), 0 );
-            hb_vmSend( ulParams );
+            hb_vmSend( (USHORT) ulParams );
          }
       }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.48 2003/11/30 12:32:30 druzus Exp $
+ * $Id: dbf1.c,v 1.49 2003/12/12 10:16:05 druzus Exp $
  */
 
 /*
@@ -1743,7 +1743,7 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             case HB_SET_DBFLOCK_CLIP:
             case HB_SET_DBFLOCK_CL53:
             case HB_SET_DBFLOCK_VFP:
-               pArea->bLockType = bScheme;
+               pArea->bLockType = (BYTE) bScheme;
          }
       }
    }

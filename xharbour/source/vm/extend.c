@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.33 2003/12/18 21:12:44 ronpinkas Exp $
+ * $Id: extend.c,v 1.34 2004/01/10 10:45:12 ignacioortiz Exp $
  */
 
 /*
@@ -97,7 +97,6 @@ PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask )
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
       PHB_ITEM pItem = ( iParam == -1 ) ? &(HB_VM_STACK.Return) : hb_stackItemFromBase( iParam  );
-      USHORT uiType;
 
       if( pItem->type & HB_IT_BYREF )
       {

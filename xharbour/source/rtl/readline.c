@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.4 2003/12/13 17:09:48 mlombardo Exp $
+ * $Id: readline.c,v 1.5 2003/12/13 19:40:03 andijahja Exp $
  */
 
 /*
@@ -207,7 +207,7 @@ HB_FUNC( HB_FREADLINE )
    if( lSize == 0 )
       lSize = READING_BLOCK ;
 
-   pBuffer = hb_fsReadLine( hFileHandle, lSize, Term, iTermSizes, iTerms  );
+   pBuffer = hb_fsReadLine( hFileHandle, (USHORT) lSize, Term, iTermSizes, iTerms  );
 
    hb_storc( (char*) pBuffer, 2 );
    hb_xfree( pBuffer );

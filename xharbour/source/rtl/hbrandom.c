@@ -1,5 +1,5 @@
 /*
- * $Id: hbrandom.c,v 1.6 2003/10/05 12:50:54 jonnymind Exp $
+ * $Id: hbrandom.c,v 1.7 2003/10/06 12:10:01 jonnymind Exp $
  */
 
 /*
@@ -133,7 +133,7 @@ HB_FUNC( HB_RANDOMINT )
    else if( ! ISNUM(2) )
    {
       #ifndef HB_LONG_LONG_OFF
-      hb_retnll( 1 + ( dRnd * hb_parnll(1)) );
+      hb_retnll( (LONGLONG) (1 + ( dRnd * hb_parnll(1)) ));
       #else
       hb_retnl( 1 + ( dRnd * hb_parnl(1)) );
       #endif
@@ -161,7 +161,7 @@ HB_FUNC( HB_RANDOMINT )
       }
 
       #ifndef HB_LONG_LONG_OFF
-      hb_retnll( lX + ( dRnd * (lY-lX+1) ) );
+      hb_retnll( (LONGLONG) (lX + ( dRnd * (lY-lX+1) ) ));
       #else
       hb_retnl( lX + ( dRnd * (lY-lX+1) ) );
       #endif

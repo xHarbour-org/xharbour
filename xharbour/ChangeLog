@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2033 2004/01/11 02:49:32 lculik Exp $
+ * $Id: ChangeLog,v 1.2034 2004/01/11 07:32:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-11 20:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    ! remove unwanted ; in line 3721
+
+  * source/compiler/genc.c
+  * source/vm/extend.c
+  * source/vm/arrays.c
+  * source/rtl/readline.c
+  * source/rtl/hbrandom.c
+  * source/rtl/hbsrlraw.c
+  * source/rtl/bkgtsks.c
+  * source/rdd/dbf1.c
+  * contrib/rdd_ads/ads1.c
+    * code clean-up (mostly removal of unused variables) and castings
 
 2004-01-10 23:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
