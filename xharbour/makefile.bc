@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.59 2003/07/08 23:15:30 fsgiudice Exp $
+# $Id: makefile.bc,v 1.60 2003/07/09 10:50:59 andijahja Exp $
 #
 
 #
@@ -873,20 +873,23 @@ all: \
 #
 
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
-    TLIB "$(COMMON_LIB)" $(ARFLAGS) @&&!
+    IF EXIST "$(COMMON_LIB)" $(DEL) "$(COMMON_LIB)" > NUL
+    $(LINKER) "$(COMMON_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
-    TLIB "$(DBFCDX_LIB)" $(ARFLAGS) @&&!
+    IF EXIST "$(DBFCDX_LIB)" $(DEL) "$(DBFCDX_LIB)" > NUL
+    $(LINKER) "$(DBFCDX_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
 !
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
+    IF EXIST "$(DBFNTX_LIB)" $(DEL) "$(DBFNTX_LIB)" > NUL
     $(LINKER) "$(DBFNTX_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -894,6 +897,7 @@ $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
 !
 
 $(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
+    IF EXIST "$(DEBUG_LIB)" $(DEL) "$(DEBUG_LIB)" > NUL
     $(LINKER) "$(DEBUG_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -901,6 +905,7 @@ $(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
 !
 
 $(LANG_LIB) : $(LANG_LIB_OBJS)
+    IF EXIST "$(LANG_LIB)" $(DEL) "$(LANG_LIB)" > NUL
     $(LINKER) "$(LANG_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -908,6 +913,7 @@ $(LANG_LIB) : $(LANG_LIB_OBJS)
 !
 
 $(MACRO_LIB) : $(MACRO_LIB_OBJS)
+    IF EXIST "$(MACRO_LIB)" $(DEL) "$(MACRO_LIB)" > NUL
     $(LINKER) "$(MACRO_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -915,6 +921,7 @@ $(MACRO_LIB) : $(MACRO_LIB_OBJS)
 !
 
 $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
+    IF EXIST "$(NULSYS_LIB)" $(DEL) "$(NULSYS_LIB)" > NUL
     $(LINKER) "$(NULSYS_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -922,6 +929,7 @@ $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
 !
 
 $(PP_LIB) : $(PP_LIB_OBJS)
+    IF EXIST "$(PP_LIB)" $(DEL) "$(PP_LIB)" > NUL
     $(LINKER) "$(PP_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -929,6 +937,7 @@ $(PP_LIB) : $(PP_LIB_OBJS)
 !
 
 $(RDD_LIB) : $(RDD_LIB_OBJS)
+    IF EXIST "$(RDD_LIB)" $(DEL) "$(RDD_LIB)" > NUL
     $(LINKER) "$(RDD_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -936,6 +945,7 @@ $(RDD_LIB) : $(RDD_LIB_OBJS)
 !
 
 $(RTL_LIB) : $(RTL_LIB_OBJS)
+    IF EXIST "$(RTL_LIB)" $(DEL) "$(RTL_LIB)" > NUL
     $(LINKER) "$(RTL_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -943,6 +953,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
 !
 
 $(VM_LIB) : $(VM_LIB_OBJS)
+    IF EXIST "$(VM_LIB)" $(DEL) "$(VM_LIB)" > NUL
     $(LINKER) "$(VM_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -950,6 +961,7 @@ $(VM_LIB) : $(VM_LIB_OBJS)
 !
 
 $(VM_LIB_OPT_CON) : $(VM_LIB_OPT_CON_OBJS)
+    IF EXIST "$(VM_LIB_OPT_CON)" $(DEL) "$(VM_LIB_OPT_CON)" > NUL
     $(LINKER) "$(VM_LIB_OPT_CON)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -957,6 +969,7 @@ $(VM_LIB_OPT_CON) : $(VM_LIB_OPT_CON_OBJS)
 !
 
 $(VM_LIB_OPT_GUI) : $(VM_LIB_OPT_GUI_OBJS)
+    IF EXIST "$(VM_LIB_OPT_GUI)" $(DEL) "$(VM_LIB_OPT_GUI)" > NUL
     $(LINKER) "$(VM_LIB_OPT_GUI)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -964,6 +977,7 @@ $(VM_LIB_OPT_GUI) : $(VM_LIB_OPT_GUI_OBJS)
 !
 
 $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
+    IF EXIST "$(GTCGI_LIB)" $(DEL) "$(GTCGI_LIB)" > NUL
     $(LINKER) "$(GTCGI_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -971,6 +985,7 @@ $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
 !
 
 $(GTDOS_LIB) : $(GTDOS_LIB_OBJS)
+    IF EXIST "$(GTDOS_LIB)" $(DEL) "$(GTDOS_LIB)" > NUL
     $(LINKER) "$(GTDOS_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -978,6 +993,7 @@ $(GTDOS_LIB) : $(GTDOS_LIB_OBJS)
 !
 
 $(GTPCA_LIB) : $(GTPCA_LIB_OBJS)
+    IF EXIST "$(GTPCA_LIB)" $(DEL) "$(GTPCA_LIB)" > NUL
     $(LINKER) "$(GTPCA_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -985,6 +1001,7 @@ $(GTPCA_LIB) : $(GTPCA_LIB_OBJS)
 !
 
 $(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
+    IF EXIST "$(GTSTD_LIB)" $(DEL) "$(GTSTD_LIB)" > NUL
     $(LINKER) "$(GTSTD_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -992,6 +1009,7 @@ $(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
 !
 
 $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
+    IF EXIST "$(GTWIN_LIB)" $(DEL) "$(GTWIN_LIB)" > NUL
     $(LINKER) "$(GTWIN_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -999,6 +1017,7 @@ $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
 !
 
 $(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
+    IF EXIST "$(CODEPAGE_LIB)" $(DEL) "$(CODEPAGE_LIB)" > NUL
     $(LINKER) "$(CODEPAGE_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -1006,6 +1025,7 @@ $(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
 !
 
 $(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
+    IF EXIST "$(SAMPLES_LIB)" $(DEL) "$(SAMPLES_LIB)" > NUL
     $(LINKER) "$(SAMPLES_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
@@ -1013,6 +1033,7 @@ $(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
 !
 
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
+    IF EXIST "$(ODBC_LIB)" $(DEL) "$(ODBC_LIB)" > NUL
     $(LINKER) "$(ODBC_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
