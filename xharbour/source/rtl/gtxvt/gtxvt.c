@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.2 2003/12/30 10:24:44 fsgiudice Exp $
+ * $Id: gtxvt.c,v 1.3 2003/12/31 06:59:59 jonnymind Exp $
  */
 
 /*
@@ -108,6 +108,8 @@ typedef struct tag_x_wnddef
    // size in pixels
    USHORT width;
    USHORT height;
+   // Set to true during resize operations
+   BOOL bResizing;
 
    // cursor:
    int col;
@@ -350,11 +352,6 @@ static int nCountPuts=0,nCountScroll=0, nCountPaint=0, nSetFocus=0, nKillFocus=0
 #endif
 
 /******************************************************************/
-int s_cursorState = 0;
-MODIFIERS s_modifiers;
-BOOL sig_allarming = FALSE;
-
-/******************************************************************/
 
 //private
 static void    gt_hbInitStatics(void);
@@ -386,12 +383,8 @@ static void    hb_xvt_gtInvalidateChar( PXWND_DEF wnd, int left, int top, int ri
 static void    hb_xvt_gtUpdate( PXWND_DEF wnd );
 
 static void    hb_xvt_gtDrawBoxChar( PXWND_DEF wnd, int col, int row, int boxchar );
-
-static USHORT  s_uiDispCount;
-static USHORT  s_usCursorStyle;
-static USHORT  s_usOldCurStyle;
-
-static int s_iStdIn, s_iStdOut, s_iStdErr;
+static void hb_xvt_gtDisable( void );
+static void hb_xvt_gtEnable( void );
 
 static char *color_refs[] = {
    "black",
@@ -416,6 +409,16 @@ static char *color_refs[] = {
 /************************ globals ********************************/
 static PXWND_DEF s_wnd = 0;
 
+static USHORT  s_uiDispCount;
+static USHORT  s_usCursorStyle;
+static USHORT  s_usOldCurStyle;
+
+static int s_iStdIn, s_iStdOut, s_iStdErr;
+
+int s_cursorState = 0;
+MODIFIERS s_modifiers;
+BOOL sig_allarming = FALSE;
+
 /* *********************************************************************** */
 
 int s_errorHandler( Display *dpy, XErrorEvent *e )
@@ -435,8 +438,8 @@ int s_errorHandler( Display *dpy, XErrorEvent *e )
 void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))
 {
    Display *dpy;
-   struct itimerval itv;
    PHB_FNAME pFileName;
+   XSizeHints xsize;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
@@ -463,19 +466,26 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
    hb_xvt_gtSetWindowTitle( s_wnd, pFileName->szName );
    hb_xfree( pFileName );
    HB_GT_FUNC(mouse_Init());
+
    XMapWindow( s_wnd->dpy, s_wnd->window );
+   // ok, now we can inform the X manager about our new status:
+
+   //xsize.flags = PWinGravity | PBaseSize | PResizeInc | PMinSize;
+   xsize.flags = PWinGravity | PResizeInc | PMinSize;
+   xsize.win_gravity = CenterGravity;
+   xsize.width_inc = s_wnd->fontWidth;
+   xsize.height_inc = s_wnd->fontHeight;
+   xsize.min_width = s_wnd->fontWidth*6;
+   xsize.min_height = s_wnd->fontHeight*3;
+   xsize.base_width = s_wnd->width;
+   xsize.base_height = s_wnd->height;
+
+   XSetWMNormalHints(s_wnd->dpy, s_wnd->window, &xsize);
 
    /* Now we can set background cursor function */
 
    //hb_messageLoopHandler = hb_xvt_gtProcessMessages;
-   sig_allarming = FALSE;
-   signal( SIGALRM, hb_xvt_gtProcessMessages);
-   itv.it_interval.tv_sec = 0;
-   itv.it_interval.tv_usec = 25000;
-   itv.it_value = itv.it_interval;
-   setitimer( ITIMER_REAL, &itv, NULL);
-
-
+   hb_xvt_gtEnable();
 }
 
 /* *********************************************************************** */
@@ -484,7 +494,7 @@ void HB_GT_FUNC(gt_Exit( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
 
-   signal( SIGALRM, SIG_IGN );
+   hb_xvt_gtDisable();
 
    if (s_wnd)
    {
@@ -744,6 +754,35 @@ void HB_GT_FUNC(gt_PutText( USHORT top, USHORT left, USHORT bottom, USHORT right
    hb_xvt_gtInvalidateChar( s_wnd, left, top, right, bottom);
 }
 
+static void hb_xvt_gtPutTextInternal
+   ( USHORT top, USHORT left, USHORT bottom, USHORT right,
+      USHORT width,
+      BYTE * sBuffer )
+{
+   USHORT irow, icol, index, j;
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_PutText(%hu, %hu, %hu, %hu, %p)", top, left, bottom, right, sBuffer));
+
+   j = 0;
+   for (irow = top; irow <= bottom; irow++)
+   {
+      index = HB_GT_INDEXOF( s_wnd, left, irow );
+      j = irow * width*2;
+      for (icol = left; icol <= right; icol++, index++ )
+      {
+         if (index >= s_wnd->bufsize/HB_GT_CELLSIZE)
+         {
+            break;
+         }
+         else
+         {
+            s_wnd->pBuffer[index] = hb_xvt_gtTranslateChar( sBuffer[j++] );
+            s_wnd->pAttributes[index] = sBuffer[j++];
+         }
+      }
+   }
+
+   hb_xvt_gtInvalidateChar( s_wnd, left, top, right, bottom);
+}
 /* *********************************************************************** */
 
 void HB_GT_FUNC(gt_SetAttribute( USHORT rowStart, USHORT colStart, USHORT rowStop, USHORT colStop, BYTE attr ))
@@ -776,6 +815,26 @@ void hb_xvt_gtRepaintChar( PXWND_DEF wnd, int colStart, int rowStart, int colSto
    int irow;
    USHORT icol, index, startIndex, startCol, len;
    BYTE oldAttrib, attrib;
+
+   if ( rowStop >= wnd->rows )
+   {
+      rowStop = wnd->rows-1;
+   }
+
+   if ( colStop >= wnd->cols )
+   {
+      colStop = wnd->cols-1;
+   }
+
+   if ( colStart < 0 )
+   {
+      colStart = 0;
+   }
+
+   if ( rowStart < 0 )
+   {
+      rowStart = 0;
+   }
 
    for ( irow = rowStart; irow <= rowStop; irow++ )
    {
@@ -855,7 +914,6 @@ void hb_xvt_gtUpdate( PXWND_DEF wnd )
    }
 }
 /* *********************************************************************** */
-// copied from gtwin...
 
 void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE byAttr, SHORT iRows, SHORT iCols ))
 {
@@ -881,6 +939,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
       fpBuff  = ucBuff  ;
    }
 
+   s_wnd->background = byAttr;
    memset( fpBlank, ' ', iLength );
 
    iColOld = iColNew = usLeft;
@@ -919,7 +978,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
          /* Write the scrolled text to the current row */
          if( ( iRows || iCols ) && iRowPos <= usBottom && iRowPos >= usTop )
          {
-         HB_GT_FUNC(gt_PutText( iCount, iColNew, iCount, iColNew + iColSize, fpBuff ));
+            HB_GT_FUNC(gt_PutText( iCount, iColNew, iCount, iColNew + iColSize, fpBuff ));
          }
    }
    HB_GT_FUNC(gt_SetPos( usSaveRow, usSaveCol, HB_GT_SET_POS_AFTER ));
@@ -943,13 +1002,75 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
 BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
 {
    BOOL bResult= FALSE;
-
+   int oldrows, oldcols;
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", row, col));
+
+   oldrows = s_wnd->rows-1;
+   oldcols = s_wnd->cols-1;
+
+   // ignore stupid requests
+   if ( col < 1 || row < 1 ||
+        col > XVT_MAX_COLS || row > XVT_MAX_ROWS ||
+        ( col == s_wnd->rows && row == s_wnd->rows) )
+   {
+      return FALSE;
+   }
+
+
+   BYTE *memory = (BYTE *) hb_xgrab( (s_wnd->rows *s_wnd->cols+ 1) * HB_GT_CELLSIZE );
+
+   HB_GT_FUNC(gt_GetText( 0, 0, oldrows, oldcols, memory ));
+
+   hb_xvt_gtDisable();
+
    if (row<= XVT_MAX_ROWS && col<= XVT_MAX_COLS)
    {
-      // resize window anyway
-      bResult = hb_xvt_gtInitWindow(s_wnd, col, row);
+      if ( s_wnd->bResizing ) {
+         bResult = hb_xvt_gtAllocSpBuffer( s_wnd, col, row);
+         if ( bResult )
+         {
+            s_wnd->width = col * s_wnd->fontWidth;
+            s_wnd->height = row * s_wnd->fontHeight;
+         }
+      }
+      else
+      {
+         bResult = hb_xvt_gtInitWindow(s_wnd, col, row);
+      }
    }
+
+   if ( bResult )
+   {
+      s_wnd->cols = col;
+      s_wnd->rows = row;
+
+      if ( s_wnd->col >= s_wnd->cols )
+      {
+         s_wnd->col = s_wnd->cols -1;
+      }
+
+      if ( s_wnd->row >= s_wnd->rows )
+      {
+         s_wnd->row = s_wnd->rows -1;
+      }
+
+      if ( row > oldrows )
+      {
+         row = oldrows;
+      }
+      if ( col > oldcols  )
+      {
+         col = oldcols;
+      }
+      hb_xvt_gtPutTextInternal( 0, 0, row, col, oldcols+1,  memory );
+   }
+
+   hb_xfree( memory );
+
+   hb_xvt_gtInvalidateChar( s_wnd, 0, 0, s_wnd->cols, s_wnd->rows );
+   hb_xvt_gtUpdate(s_wnd);
+   hb_xvt_gtEnable();
+
    return(bResult);
 }
 
@@ -1485,6 +1606,23 @@ void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int 
 }
 
 /* *********************************************************************** */
+
+static void hb_xvt_gtDisable( void )
+{
+   signal( SIGALRM, SIG_IGN);
+}
+
+static void hb_xvt_gtEnable( void )
+{
+   struct itimerval itv;
+
+   sig_allarming = FALSE;
+   signal( SIGALRM, hb_xvt_gtProcessMessages);
+   itv.it_interval.tv_sec = 0;
+   itv.it_interval.tv_usec = 25000;
+   itv.it_value = itv.it_interval;
+   setitimer( ITIMER_REAL, &itv, NULL);
+}
 
 static BOOL hb_xvt_gtAllocSpBuffer( PXWND_DEF wnd, USHORT col, USHORT row)
 {
@@ -2129,10 +2267,11 @@ static BOOL hb_xvt_gtInitWindow( PXWND_DEF wnd, USHORT col, USHORT row)
       wnd->height = row * wnd->fontHeight;
 
       // resize the window
+      wnd->bResizing = TRUE;
       XResizeWindow( wnd->dpy, wnd->window,
          wnd->width,
          wnd->height );
-
+      wnd->bResizing = FALSE;
       return TRUE;
    }
 
@@ -2467,7 +2606,23 @@ static void hb_xvt_gtWndProc( XEvent *evt )
       }
       break;
 
+      case ConfigureNotify:
+         if ( s_wnd->bResizing )
+         {
+            break;
+         }
+
+         s_wnd->bResizing = TRUE;
+         // will silently ignore resetting to current dimensions
+         hb_gtSetMode(
+            evt->xconfigure.height/s_wnd->fontHeight,
+            evt->xconfigure.width/s_wnd->fontWidth );
+         s_wnd->bResizing = FALSE;
+
+      break;
+
    }
+
 
 }
 
@@ -2515,7 +2670,7 @@ static BYTE hb_xvt_gtUntranslateChar( HB_GT_CELLTYPE ch )
       return ch;
    }
    #else
-   if ( (ch >> 8) <= 127 )
+   if ( (0xFFFF &((ch >> 8)|(ch<<8))) <= 127 )
    {
       return ch >> 8;
    }
@@ -2587,6 +2742,7 @@ static PXWND_DEF hb_xvt_gtCreateWindow( Display *dpy )
    wnd->dpy = dpy;
    wnd->rows = XVT_DEFAULT_ROWS;
    wnd->cols = XVT_DEFAULT_COLS;
+   wnd->bResizing = FALSE;
    if (! hb_xvt_gtSetFont( wnd, "fixed", "medium", 18, NULL ) )
    {
       hb_xfree( wnd );
