@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.16 2003/02/16 02:34:53 paultucker Exp $
+# $Id: makefile.nt,v 1.17 2003/03/21 21:49:11 ronpinkas Exp $
 #
 
 #
@@ -744,7 +744,6 @@ GTWIN_LIB_OBJS = \
 #
 # Our default target
 #
-
 
 !if ( "$(MK_FLAGS:Y=)"=="A" )
 

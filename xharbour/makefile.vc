@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.36 2003/03/18 15:02:36 jonnymind Exp $
+# $Id: makefile.vc,v 1.37 2003/03/21 21:49:12 ronpinkas Exp $
 #
 
 #
@@ -62,7 +62,7 @@ DEL = del
 !endif
 
 # SimpLex is the only supported Scanner in xHarbour.
-HB_LEX = SIMPLEX
+HB_LEX       = SIMPLEX
 
 MK_FILE      = makefile.vc
 MK_FLAGS     = $(MAKEFLAGS: =)
@@ -93,20 +93,18 @@ HBMAKE_DIR   = utils\hbmake
 
 !ifdef HB_DOC_PDF
 # don't indent definitions
-# don't indent definitions
-# don't indent definitions
-HBPDF_DIR   = contrib\pdflib
+HBPDF_DIR    = contrib\pdflib
 !endif
 
 #
 # C compiler definition and C flags. These should never have to change.
 #
 
-AS             = ML
-CFLAGS         = -G6 -Ox -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 $(C_USR) -DSIMPLEX $(CFLAGS)
-CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
-HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
-LDFLAGS        = $(LDFLAGS)
+AS           = ML
+CFLAGS       = -G6 -Ox -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
+CLIBFLAGS    = -c $(CFLAGS) $(CLIBFLAGS)
+HARBOURFLAGS = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
+LDFLAGS      = $(LDFLAGS)
 
 !ifdef HB_DOC_PDF
 HARBOURFLAGS = $(HARBOURFLAGS) -dPDF
@@ -367,7 +365,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\fieldbl.obj \
    $(OBJ_DIR)\getlist.obj \
    $(OBJ_DIR)\getsys.obj \
-   $(OBJ_DIR)\hbparseini.obj \
    $(OBJ_DIR)\hbserial.obj \
    $(OBJ_DIR)\input.obj \
    $(OBJ_DIR)\listbox.obj \
@@ -784,7 +781,7 @@ $(HBRUN_EXE) : \
    $(HBRUN_DIR)\hbrun.prg \
    $(HBRUN_DIR)\external.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\  $(OBJ_DIR)\hbrun.c  $(OBJ_DIR)\external.c -o $(HBRUN_EXE) /link $(LDFLAGS) $(LIBS2)
+   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbrun.c $(OBJ_DIR)\external.c -o $(HBRUN_EXE) /link $(LDFLAGS) $(LIBS2)
 
 #
 # HBTEST.EXE rules
@@ -803,17 +800,17 @@ $(HBTEST_EXE) : \
    $(HBTEST_DIR)\rt_stra.prg \
    $(HBTEST_DIR)\rt_trans.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\  $(OBJ_DIR)\hbtest.c \
-                                   $(OBJ_DIR)\rt_array.c \
-                                   $(OBJ_DIR)\rt_date.c \
-                                   $(OBJ_DIR)\rt_file.c \
-                                   $(OBJ_DIR)\rt_hvm.c \
-                                   $(OBJ_DIR)\rt_hvma.c \
-                                   $(OBJ_DIR)\rt_math.c \
-                                   $(OBJ_DIR)\rt_misc.c \
-                                   $(OBJ_DIR)\rt_str.c \
-                                   $(OBJ_DIR)\rt_stra.c \
-                                   $(OBJ_DIR)\rt_trans.c \
+   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbtest.c \
+                                  $(OBJ_DIR)\rt_array.c \
+                                  $(OBJ_DIR)\rt_date.c \
+                                  $(OBJ_DIR)\rt_file.c \
+                                  $(OBJ_DIR)\rt_hvm.c \
+                                  $(OBJ_DIR)\rt_hvma.c \
+                                  $(OBJ_DIR)\rt_math.c \
+                                  $(OBJ_DIR)\rt_misc.c \
+                                  $(OBJ_DIR)\rt_str.c \
+                                  $(OBJ_DIR)\rt_stra.c \
+                                  $(OBJ_DIR)\rt_trans.c \
                    -o $(HBTEST_EXE) /link $(LDFLAGS) /FORCE:MULTIPLE $(LIBS) user32.lib winspool.lib ole32.lib oleaut32.lib
 
 #
@@ -839,23 +836,23 @@ $(HBDOC_EXE) : \
    $(HBDOC_DIR)\ffile1.prg \
    $(HBDOC_DIR)\ft_funcs.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\  $(OBJ_DIR)\hbdoc.c \
-                                   $(OBJ_DIR)\genchm.c \
-                                   $(OBJ_DIR)\genos2.c \
-                                   $(OBJ_DIR)\gentrf.c \
-                                   $(OBJ_DIR)\genng.c \
-                                   $(OBJ_DIR)\genhtm.c \
-                                   $(OBJ_DIR)\genrtf.c \
-                                   $(OBJ_DIR)\genhpc.c \
-                                   $(OBJ_DIR)\genasc.c \
-                                   $(OBJ_DIR)\html.c \
-                                   $(OBJ_DIR)\ng.c \
-                                   $(OBJ_DIR)\os2.c \
-                                   $(OBJ_DIR)\rtf.c \
-                                   $(OBJ_DIR)\troff.c \
-                                   $(OBJ_DIR)\fclass1.c \
-                                   $(OBJ_DIR)\ffile1.c \
-                                   $(OBJ_DIR)\ft_funcs.c \
+   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbdoc.c \
+                                  $(OBJ_DIR)\genchm.c \
+                                  $(OBJ_DIR)\genos2.c \
+                                  $(OBJ_DIR)\gentrf.c \
+                                  $(OBJ_DIR)\genng.c \
+                                  $(OBJ_DIR)\genhtm.c \
+                                  $(OBJ_DIR)\genrtf.c \
+                                  $(OBJ_DIR)\genhpc.c \
+                                  $(OBJ_DIR)\genasc.c \
+                                  $(OBJ_DIR)\html.c \
+                                  $(OBJ_DIR)\ng.c \
+                                  $(OBJ_DIR)\os2.c \
+                                  $(OBJ_DIR)\rtf.c \
+                                  $(OBJ_DIR)\troff.c \
+                                  $(OBJ_DIR)\fclass1.c \
+                                  $(OBJ_DIR)\ffile1.c \
+                                  $(OBJ_DIR)\ft_funcs.c \
                    -o $(HBDOC_EXE) /link $(LDFLAGS) /FORCE:MULTIPLE $(LIBS2)
 
 #
@@ -874,17 +871,17 @@ $(HBMAKE_EXE) : \
    $(HBMAKE_DIR)\pickfile.prg \
    $(HBMAKE_DIR)\prb_stak.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
-   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\  $(OBJ_DIR)\hbmake.c \
-                                   $(OBJ_DIR)\hbmutils.c \
-                                   $(OBJ_DIR)\radios.c \
-                                   $(OBJ_DIR)\checks.c \
-                                   $(OBJ_DIR)\fclass1.c \
-                                   $(OBJ_DIR)\ffile1.c \
-                                   $(OBJ_DIR)\ft_funcs.c \
-                                   $(OBJ_DIR)\pickarry.c \
-                                   $(OBJ_DIR)\pickfile.c \
-                                   $(OBJ_DIR)\prb_stak.c \
-                                   $(HBMAKE_DIR)\hbmlang.c \
+   $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\hbmake.c \
+                                  $(OBJ_DIR)\hbmutils.c \
+                                  $(OBJ_DIR)\radios.c \
+                                  $(OBJ_DIR)\checks.c \
+                                  $(OBJ_DIR)\fclass1.c \
+                                  $(OBJ_DIR)\ffile1.c \
+                                  $(OBJ_DIR)\ft_funcs.c \
+                                  $(OBJ_DIR)\pickarry.c \
+                                  $(OBJ_DIR)\pickfile.c \
+                                  $(OBJ_DIR)\prb_stak.c \
+                                  $(HBMAKE_DIR)\hbmlang.c \
                    -o $(HBMAKE_EXE) /link $(LDFLAGS) /FORCE:MULTIPLE $(LIBS2)
 
 #
