@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3714 2005/01/04 23:18:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3715 2005/01/05 01:43:11 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-05 02:20 UTC-300 Walter Negro <anegro-AT-overnet.com.ar>
+  * source/vm/memvars.c
+    ! Restore last state of hb_memvarsRelease() function
+  * source/vm/hvm.c
+    ! Add call to hb_collectAll() in hb_vmQuit() to release correctly detached vars 
+      in codeblocks referenced by statics vars.
+      Reported by Rafa Carmona and Antonio Linares.
 
 2005-01-04 23:20 UTC-300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/ct/diskutil.prg
