@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.6 2003/04/05 20:00:51 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.7 2003/12/22 04:55:31 ronpinkas Exp $
  */
 
 /*
@@ -300,11 +300,11 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
         hb_pp_WrStr( handl_o, sOut );
      }
 
-     *( sOut + lens++ ) = '\n';
-     *( sOut + lens ) = '\0';
-
      s_szOutLine[0] = '\0';
   }
+
+  *( sOut + lens++ ) = '\n';
+  *( sOut + lens ) = '\0';
 
   #if 0
      printf( "%d : %s\n", hb_comp_iLine, sOut );
