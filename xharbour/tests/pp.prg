@@ -325,7 +325,7 @@ STATIC s_bArrayPrefix := .F.
 
 STATIC s_sFile := "", s_sIncludeFile
 
-STATIC nRow, nCol
+STATIC s_nRow, s_nCol
 
 STATIC s_nProcId := 0, s_aProcedures := {}, s_xRet, s_nIfLevel := 0, ;
        s_aProcStack := {}, s_nProcStack := 0
@@ -584,8 +584,8 @@ STATIC s_aSwitchDefs := {}
    #endif
 
    IF sSource != NIL
-      nRow := Row()
-      nCol := Col()
+      s_nRow := Row()
+      s_nCol := Col()
 
       IF bCompile
          // Populate possible Command-line Parameters
@@ -607,12 +607,12 @@ STATIC s_aSwitchDefs := {}
          PP_PreProFile( sSource, sPPOExt )
       ENDIF
    ELSE
-      nRow := 2
-      nCol := 0
+      s_nRow := 2
+      s_nCol := 0
       RP_Dot()
    ENDIF
 
-   DevPos( nRow, nCol )
+   DevPos( s_nRow, s_nCol )
 
 RETURN
 
@@ -838,7 +838,7 @@ PROCEDURE RP_Dot()
    LOCAL aCpyCommRules, aCpyCommResults
    LOCAL aCpyTranRules, aCpyTranResults
 
-   LOCAL aKBCommands := Array( 16 ), nKBCommand := 1, nKBCommands := 1, nTemp
+   LOCAL aKBCommands := Array( 16 ), nKBCommand := 1, nTemp
 
    #ifdef FW
        Alert( [DOT mode (no filename parameter) is Not ready for GUI yet.] + CRLF + CRLF + [Please try Interpreter mode, using the -R switch...] )
@@ -872,6 +872,8 @@ PROCEDURE RP_Dot()
              " | Index: " + Space( 8 ) + " | # " + Space( 7 ) + "/" + Space( 7 ), MaxCol() + 1 )  ;
               COLOR "N/BG"
 
+   DevPos( 02, 00 )
+
    aFill( aKBCommands, sLine )
 
    SetKey(  5, { || IIF( nKBCommand >  1, sLine := aKBCommands[ --nKBCommand ], ) } )
@@ -892,9 +894,15 @@ PROCEDURE RP_Dot()
       ENDIF
 
       IF LastKey() == 27
-         EXIT
+         aKBCommands[ nKBCommand ] := Space( 256 )
+         LOOP
       ELSEIF LastKey() == 13 .OR. LastKey() == 24 .OR. LastKey() == 9
          nKBCommand++
+         IF nKBCommand > 16
+            aDel( aKBCommands, 1 )
+            aKBCommands[16] := Space( 256 )
+            nKBCommand := 16
+         ENDIF
       ELSEIF LastKey() == 5 .OR. LastKey() == 271
          nKBCommand--
       ENDIF
@@ -904,6 +912,11 @@ PROCEDURE RP_Dot()
       ExecuteLine( PP_PreProLine( RTrim( sLine ), 1, '' ) )
 
       //TraceLog( Len( aDefRules ), Len( aCommRules ), Len( aTransRules ) )
+
+      IF s_nRow == MaxRow() - 1
+         Scroll( 2, 0, MaxRow() - 1, MaxCol(), 1 )
+         s_nRow--
+      ENDIF
 
       IF s_lRunLoaded
          aDefRules     := aClone( aCpyDefRules )
@@ -939,7 +952,7 @@ STATIC PROCEDURE ExecuteLine( sPPed )
 
    @ 0,0 SAY "PP: "
    @ 0,4 SAY Pad( sPPed, 76 ) COLOR "N/R"
-   DevPos( nRow, nCol )
+   DevPos( s_nRow, s_nCol )
 
    BEGIN SEQUENCE
 
@@ -981,18 +994,20 @@ STATIC PROCEDURE ExecuteLine( sPPed )
             sSymbol = "SETDOCASE" .OR. sSymbol = "SETCASE" .OR. sSymbol = "SETOTHERWISE" .OR. sSymbol = "SETENDCASE" .OR. ;
             abIf[ nIf ]
 
+            @ 0,0 SAY "PP: "
+            @ 0,4 SAY Pad( sBlock, 76 ) COLOR "N/R"
+            DevPos( s_nRow, s_nCol )
+
+            sBlock := "{|| " + sBlock + " }"
             #ifdef __CLIPPER__
                /* Clipper Macro Compiler can't compile nested blocks! */
                CompileNestedBlocks( sBlock, @sBlock )
             #endif
 
-            @ 0,0 SAY "PP: "
-            @ 0,4 SAY Pad( sBlock, 76 ) COLOR "N/R"
-            DevPos( nRow, nCol )
+            Eval( &sBlock )
 
-            Eval( &( "{|| " + sBlock + " }" ) )
-            nRow := Row()
-            nCol := Col()
+            s_nRow := Row()
+            s_nCol := Col()
 
             #ifdef __CLIPPER__
                nBlockID := 0
@@ -1041,26 +1056,23 @@ STATIC PROCEDURE ExecuteLine( sPPed )
             sSymbol = "SETDOCASE" .OR. sSymbol = "SETCASE" .OR. sSymbol = "SETOTHERWISE" .OR. sSymbol = "SETENDCASE" .OR. ;
             abIf[ nIf ]
 
-            #ifdef __CLIPPER__
-                /* Clipper Macro Compiler can't compile nested blocks! */
-                CompileNestedBlocks( sBlock, @sBlock )
-            #endif
-
             @ 0,0 SAY "PP: "
             @ 0,4 SAY Pad( sBlock, 76 ) COLOR "N/R"
-            DevPos( nRow, nCol )
+            DevPos( s_nRow, s_nCol )
 
-            Eval( &( "{|| " + sBlock + " }" ) )
-
+            sBlock := "{|| " + sBlock + " }"
             #ifdef __CLIPPER__
-               nBlockID := 0
-               aSize( s_abBlocks, 0 )
+               /* Clipper Macro Compiler can't compile nested blocks! */
+               CompileNestedBlocks( sBlock, @sBlock )
+               //TraceLog( sBlock )
             #endif
+
+            Eval( &sBlock )
          ENDIF
       ENDIF
 
-      nRow := Row()
-      nCol := Col()
+      s_nRow := Row()
+      s_nCol := Col()
 
       @ 0,0 SAY "PP: "
       @ 0,4 SAY Pad( sPPed, 76 ) COLOR "N/R"
@@ -1077,6 +1089,11 @@ STATIC PROCEDURE ExecuteLine( sPPed )
                    COLOR "N/BG"
       ENDIF
    END SEQUENCE
+
+   #ifdef __CLIPPER__
+      nBlockID := 0
+      aSize( s_abBlocks, 0 )
+   #endif
 
 RETURN
 
@@ -2065,6 +2082,8 @@ PROCEDURE RP_Dot_Err( oErr )
       sArgs := Left( sArgs, Len( sArgs ) -2 )
    ENDIF
 
+   TraceLog( oErr:Description, sArgs, oErr:Args )
+
    Alert( [Sorry, could not execute: ] + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
 
    BREAK
@@ -2425,54 +2444,61 @@ RETURN nIf
 
    FUNCTION asBlocks( sBlock, asBlocks )
 
-      LOCAL nStart, nEnd, nPosition, sNested, nOpen, lBlock := .F.
+      LOCAL nStart := 1, nEnd := Len( sBlock ), nPosition, sNested, nOpen, ;
+            lBlock := .F., cChar
 
       IF asBlocks == NIL
          asBlocks := {}
       ENDIF
 
-      nStart := At( '{', sBlock )
-      IF nStart > 0
-         nEnd   := Len( sBlock )
+      WHILE ( nStart := nAtSkipStr( '{', sBlock, nStart ) ) > 0
          FOR nPosition := nStart + 1 TO nEnd
             IF SubStr( sBlock, nPosition, 1 ) != ' '
                EXIT
             ENDIF
          NEXT
-         IF SubStr( sBlock, nPosition, 1 ) == '|'
-            lBlock := .T.
+         IF SubStr( sBlock, nPosition, 1 ) != '|'
+            nStart++
+            LOOP
          ENDIF
 
+         nPosition++
          nOpen := 1
+
          DO WHILE nOpen > 0 .AND. nPosition <= nEnd
-            IF SubStr( sBlock, nPosition, 1 ) == '"'
+            cChar := SubStr( sBlock, nPosition, 1 )
+
+            IF cChar == '"'
                DO WHILE nPosition <= nEnd
                   nPosition++
                   IF SubStr( sBlock, nPosition, 1 ) == '"'
                      EXIT
                   ENDIF
                ENDDO
-            ELSEIF SubStr( sBlock, nPosition, 1 ) == "'"
+            ELSEIF cChar == "'"
                DO WHILE nPosition <= nEnd
                   nPosition++
                   IF SubStr( sBlock, nPosition, 1 ) == "'"
                      EXIT
                   ENDIF
                ENDDO
-            ELSEIF SubStr( sBlock, nPosition, 1 ) == '{'
+            ELSEIF cChar == '{'
                nOpen++
-            ELSEIF SubStr( sBlock, nPosition, 1 ) == '}'
+            ELSEIF cChar == '}'
                nOpen--
             ENDIF
+
             nPosition++
          ENDDO
-      ENDIF
 
-      IF lBlock
          sNested := SubStr( sBlock, nStart, ( nPosition - nStart ) )
+         //TraceLog( asBlocks, sNested )
+
          aAdd( asBlocks, sNested )
          asBlocks( SubStr( sBlock, nPosition + 1 ), asBlocks )
-      ENDIF
+
+         nStart := nPosition
+      ENDDO
 
    RETURN asBlocks
 

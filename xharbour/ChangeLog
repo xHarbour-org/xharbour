@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.361 2002/08/28 21:29:00 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.362 2002/08/29 18:10:07 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-08-29 23:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    ! Fixed CompileNestedBlock() so that blocks withing literal arrays will not be missed.
+    ! Fixed Keyboard History to not error when the buffer is full (and shift oldest command out).
+    + Added auto scrolling within the DOT prompt.
+
+  * tests/rp_dot.ch
+    + Added rule for Clipper to fix bug with @ ... GET ...
+    * Changed CLS to respect additional status line (1)
+
+  /* Thanks vic@guerra.com.mx for his extensive input, and reporting of the problems leading to the above fixes.
 
 2002-08-29 11:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/pp.prg
