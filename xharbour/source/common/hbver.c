@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.9 2004/01/16 14:45:13 paultucker Exp $
+ * $Id: hbver.c,v 1.10 2004/01/16 22:23:47 paultucker Exp $
  */
 
 /*
@@ -81,47 +81,8 @@
 #if defined(HB_OS_WIN_32)
 
    #include <ctype.h>
-   #ifndef VER_PLATFORM_WIN32_WINDOWS
-      #define VER_PLATFORM_WIN32_WINDOWS 1
-   #endif
-   #ifndef VER_PLATFORM_WIN32_CE
-      #define VER_PLATFORM_WIN32_CE 3
-   #endif
-   #ifndef VER_SUITE_PERSONAL
-      #define VER_SUITE_PERSONAL 0x200
-   #endif
-   #ifndef VER_SUITE_ENTERPRISE
-      #define VER_SUITE_ENTERPRISE 0x002
-   #endif
-   #ifndef VER_SUITE_DATACENTER
-      #define VER_SUITE_DATACENTER 0x080
-   #endif
-   #ifndef VER_SUITE_BLADE
-      #define VER_SUITE_BLADE 0x400
-   #endif
-   #ifndef VER_NT_WORKSTATION
-      #define VER_NT_WORKSTATION       0x0000001
-      #define VER_NT_DOMAIN_CONTROLLER 0x0000002
-      #define VER_NT_SERVER            0x0000003
-   #endif
-   /* For those that don't have the MS Platform SDK installed */
-   typedef struct _HBOSVERSIONINFOEX {
-     DWORD dwOSVersionInfoSize;
-     DWORD dwMajorVersion;
-     DWORD dwMinorVersion;
-     DWORD dwBuildNumber;
-     DWORD dwPlatformId;
-     #ifdef UNICODE
-     WCHAR  szCSDVersion[128];
-     #else
-     CHAR  szCSDVersion[128];
-     #endif
-     WORD  wServicePackMajor;
-     WORD  wServicePackMinor;
-     WORD  wSuiteMask;
-     BYTE  wProductType;
-     BYTE  wReserved;
-   } HBOSVERSIONINFOEX, *LPHBOSVERSIONINFOEX;
+   #include "hbwbase.h"
+
 #elif defined(HB_OS_UNIX)
 
    #include <sys/utsname.h>

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.115 2004/01/16 17:11:56 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.116 2004/01/16 21:37:43 paultucker Exp $
  */
 
 /*
@@ -88,18 +88,7 @@
 #if defined(HB_OS_WIN_32)
 
    #include <ctype.h>
-   #ifndef VER_PLATFORM_WIN32_WINDOWS
-      #define VER_PLATFORM_WIN32_WINDOWS 1
-   #endif
-   #ifndef VER_PLATFORM_WIN32_CE
-      #define VER_PLATFORM_WIN32_CE 3
-   #endif
-   #ifndef VER_SUITE_PERSONAL
-      #define VER_SUITE_PERSONAL 0x200
-   #endif
-   #ifndef VER_SUITE_BLADE
-      #define VER_SUITE_BLADE 0x400
-   #endif
+   #include "hbwbase.h"
 
 #elif defined(HB_OS_UNIX)
 
@@ -575,7 +564,7 @@ char * hb_ppPlatform( void )
                /* test for specific product on Windows NT 4.0 SP6 and later */
 
                {
-                  OSVERSIONINFOEX osVerEx;
+                  HBOSVERSIONINFOEX osVerEx; /* NOTE */
 
                   osVerEx.dwOSVersionInfoSize = sizeof( osVerEx );
 
