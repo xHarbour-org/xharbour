@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.315 2004/02/04 03:45:55 ronpinkas Exp $
+ * $Id: hvm.c,v 1.316 2004/02/05 12:44:17 andijahja Exp $
  */
 
 /*
@@ -5227,6 +5227,10 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
       case HB_IT_BLOCK:
       case HB_IT_LOGICAL:
       case HB_IT_ARRAY:
+      case HB_IT_DATE:
+         hb_rddSelectWorkAreaNumber( -1 );
+         pAlias->type = HB_IT_NIL;
+         break;
 
       case HB_IT_DOUBLE:
          /* Alias was evaluated from an expression, (nWorkArea)->field
@@ -6267,6 +6271,7 @@ static void hb_vmPushLongConst( long lNumber )
    hb_stackPush();
 }
 
+#ifndef HB_LONG_LONG_OFF
 HB_EXPORT void hb_vmPushLongLong( LONGLONG lNumber )
 {
    HB_THREAD_STUB
@@ -6278,6 +6283,7 @@ HB_EXPORT void hb_vmPushLongLong( LONGLONG lNumber )
    ( * HB_VM_STACK.pPos )->item.asLongLong.length = 20;
    hb_stackPush();
 }
+#endif
 
 HB_EXPORT void hb_vmPushDouble( double dNumber, int iDec )
 {

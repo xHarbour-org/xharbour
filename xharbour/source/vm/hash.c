@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.19 2003/12/04 09:26:55 druzus Exp $
+ * $Id: hash.c,v 1.20 2003/12/13 19:27:00 ronpinkas Exp $
  */
 
 /*
@@ -90,8 +90,14 @@ static int s_hashOrderComplex( PHB_ITEM pFirst,
          }
          else
          {
+
+#ifndef HB_LONG_LONG_OFF
             LONGLONG l1 = hb_itemGetNLL(pFirst);
             LONGLONG l2 = hb_itemGetNLL(pSecond);
+#else
+            LONG l1 = hb_itemGetNL(pFirst);
+            LONG l2 = hb_itemGetNL(pSecond);
+#endif
             if ( l1 < l2 )
             {
                return -1;
