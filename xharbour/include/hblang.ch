@@ -1,10 +1,10 @@
 /*
- * $Id: hblang.ch,v 1.1 2001/12/14 09:32:51 vszakats Exp $
+ * $Id: hblang.ch,v 1.1.1.1 2001/12/21 10:47:40 ronpinkas Exp $
  */
 
 /*
  * Harbour Project source code:
- * Header file for Class commands
+ * Header file for language API (Harbour Level)
  *
  * Copyright 2001-2002 Viktor Szakats <viktor.szakats@syenar.hu>
  * www - http://www.harbour-project.org
@@ -55,5 +55,14 @@
 
 /* Dummy define for start */
 #define HB_I_( x ) x
+
+#define HB_LANG_ITEM_BASE_ID            0
+#define HB_LANG_ITEM_BASE_MONTH         6
+#define HB_LANG_ITEM_BASE_DAY           18
+#define HB_LANG_ITEM_BASE_NATMSG        25
+#define HB_LANG_ITEM_BASE_ERRDESC       38
+#define HB_LANG_ITEM_BASE_ERRINTR       89
+#define HB_LANG_ITEM_BASE_TEXT          114
+#define HB_LANG_ITEM_MAX_               117
 
 #endif /* HB_LANG_CH_ */
