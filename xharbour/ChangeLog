@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2760 2004/04/06 01:50:52 druzus Exp $
+ * $Id: ChangeLog,v 1.2761 2004/04/06 09:58:21 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-06 16:30 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
+  * utils/hbmake/hbmake.prg
+    utils/hbmake/pickarry.prg
+    ! minor fixes to problem reported by users(especialy when editing makefiles
+  Question: Can i Add to contrib/hbzlib/zip.c the GetFileAttribute/SetFileAttibute Linux Equivalent
+   Api, with out this, hbzip on linux is broken
+
 2004-04-06 17:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/hbcomprs.c
   * source/rtl/gtwvt/gtwvt.c

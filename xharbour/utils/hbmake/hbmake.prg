@@ -1,11 +1,11 @@
 /*
- * $Id: hbmake.prg,v 1.114 2004/02/21 11:58:27 lculik Exp $
+ * $Id: hbmake.prg,v 1.115 2004/03/24 03:17:57 lculik Exp $
  */
 /*
  * Harbour Project source code:
  * hbmake.Prg Harbour make utility main file
  *
- * Copyright 2000,2001,2002,2003 Luiz Rafael Culik <culikr@uol.com.br>
+ * Copyright 2000,2001,2002,2003,2004 Luiz Rafael Culik <culikr@uol.com.br>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1233,6 +1233,8 @@ FUNC CreateMakeFile( cFile )
    Local cAllRes := ""
    Local cTemp
    LOCAL cExtraLibs :=""
+   Local cTempLibs := ""
+   Local aTempLibs 
    #IFndef __PLATFORM__Windows
        Local lHashhso := File("/usr/lib/libxharbour.so")
        LOCAL lusexhb := FILE("/usr/bin/xhb-build")
@@ -1305,7 +1307,7 @@ FUNC CreateMakeFile( cFile )
          s_nWarningLevel := oMake:cWarningLevel
          cTopFile        := PadR(oMake:cTopModule,20," ")
          cResName        := oMake:cRes
-	 s_lRecurse      := oMake:lRecurse
+         s_lRecurse      := oMake:lRecurse
       ELSE
          SetColor("W/N,N/W")
          CLS
@@ -1384,8 +1386,9 @@ FUNC CreateMakeFile( cFile )
    IF lApollo
       @  3, 40 SAY "Apollo path" GET cApolloPath PICT "@s20"
    ENDIF
-
-   cResName := PadR(alltrim(cResName)+iIF(!empty(cResName)," ","")+alltrim(cAllRes),50," ")
+   IF nO == 1
+      cResName := PadR(alltrim(cResName)+iIF(!empty(cResName)," ","")+alltrim(cAllRes),50," ")
+   ENDIF 
 
 //   @  3, 40 SAY "Obj Files Dir" GET cObjDir PICT "@s15"
 //   @  4, 1  SAY  s_aLangMessages[ 45 ] GET cAppName VALID ! Empty( cAppName )
@@ -1919,7 +1922,7 @@ FUNC CreateMakeFile( cFile )
             aSize( aLibsOut, Len( aLibsOut ) - 1 )
          ENDIF
 
-         aEval( aLibsOut, { | cLib | cLibs += " -l" + Strtran( cLib, '.a', "" )} )
+         aEval( aLibsOut, { | cLib | iif( Len(aTempLibs :=ListAsArray2( cLib, " ") )> 0 ,cLibs += SetthisLibs(AtempLibs) ,cLibs += " -l" + Strtran( cLib, '.a', "" ))} )
 
  	 nPos := aScan( aLibsOut, { | z | At( "mysql", Lower( z ) ) > 0 } )
 	 
@@ -3793,3 +3796,13 @@ RETURN .T.
 function CheckCompiler(cOs)
 
 RETURN ( ("Win32" IN cOs) .or. ("Linux" In cOs) )
+function SetthisLibs(AtempLibs)
+Local c := ""
+local n
+For each n in AtempLibs
+     c += "-l"
+     c += Strtran( n, '.a', "" )
+     c+= " "
+NEXT
+return c
+
