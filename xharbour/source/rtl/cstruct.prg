@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.31 2004/05/21 21:29:53 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.32 2004/05/21 23:52:03 ronpinkas Exp $
  */
 
 /*
@@ -625,6 +625,7 @@ RETURN QSelf()
      else
      {
         hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "C Structure:CopyTo()", 1, hb_paramError( 1 ) );
+        return;
      }
 
      pStructure = hb_stackSelfItem();
