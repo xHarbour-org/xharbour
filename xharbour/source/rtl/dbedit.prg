@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.13 2002/02/10 11:07:17 antoniolinares Exp $
+ * $Id: dbedit.prg,v 1.2 2002/03/06 03:52:09 ronpinkas Exp $
  */
 
 /*
@@ -98,7 +98,7 @@ FUNCTION dbEdit(;
    LOCAL cHeading
    LOCAL cBlock
    LOCAL bBlock
-
+   LOCAL aSubArray
    IF !Used()
       RETURN .F.
    ENDIF
@@ -127,11 +127,26 @@ FUNCTION dbEdit(;
    oBrowse:ColSep    := iif( ISCHARACTER( xColumnSeparators ), xColumnSeparators, " " + Chr( 179 ) + " " )
    oBrowse:FootSep   := iif( ISCHARACTER( xFootingSeparators ), xFootingSeparators, "" )
    oBrowse:AutoLite  := .F. /* Set to .F. just like in CA-Cl*pper. [vszakats] */
-
+   tracelog(acColumns)
    // Calculate the number of columns
 
    IF ISARRAY( acColumns )
       nColCount := Len( acColumns )
+      aSubArray:=acColumns[nColCount] // See if is an Array of Array
+
+     IF ISARRAY( aSubArray )
+        nColCount := Len( aSubArray )
+      nPos := 1
+      DO WHILE nPos <= nColCount .AND. ISCHARACTER( aSubArray[ nPos ] ) .AND. !Empty( aSubArray[ nPos ] )
+         nPos++
+      ENDDO
+      nColCount := nPos - 1
+
+      IF nColCount == 0
+         RETURN .F.
+      ENDIF
+      acColumns:=aSubArray
+      else
       nPos := 1
       DO WHILE nPos <= nColCount .AND. ISCHARACTER( acColumns[ nPos ] ) .AND. !Empty( acColumns[ nPos ] )
          nPos++
@@ -141,6 +156,8 @@ FUNCTION dbEdit(;
       IF nColCount == 0
          RETURN .F.
       ENDIF
+
+      endif
    ELSE
       nColCount := FCount()
    ENDIF
