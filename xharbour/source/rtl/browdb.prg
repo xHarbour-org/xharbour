@@ -1,5 +1,5 @@
 /*
- * $Id: browdb.prg,v 1.1.1.1 2001/12/21 10:41:12 ronpinkas Exp $
+ * $Id: browdb.prg,v 1.2 2003/04/01 22:20:29 iananderson Exp $
  */
 
 /*
@@ -56,38 +56,8 @@ FUNCTION TBrowseDB( nTop, nLeft, nBottom, nRight )
 
    LOCAL oBrowse := TBrowseNew( nTop, nLeft, nBottom, nRight )
 
-   oBrowse:SkipBlock     := { | nRecs | Skipped( nRecs ) }
+   oBrowse:SkipBlock     := { | nRecs | DBSkipper( nRecs ) }
    oBrowse:GoTopBlock    := { || dbGoTop() }
    oBrowse:GoBottomBlock := { || dbGoBottom() }
 
    RETURN oBrowse
-
-STATIC FUNCTION Skipped( nRecs )
-
-   LOCAL nSkipped := 0
-
-   IF .NOT. (Eof() .AND. Bof())
-      IF nRecs == 0
-         dbSkip( 0 )
-      ELSEIF nRecs > 0 .AND. .NOT. Eof()
-         DO WHILE nSkipped < nRecs
-            dbSkip( 1 )
-            IF Eof()
-               dbSkip( -1 )
-               EXIT
-            ENDIF
-            nSkipped++
-         ENDDO
-      ELSEIF nRecs < 0
-         DO WHILE nSkipped > nRecs
-            dbSkip( -1 )
-            IF Bof()
-               EXIT
-            ENDIF
-            nSkipped--
-         ENDDO
-      ENDIF
-   ENDIF
-
-   RETURN nSkipped
-

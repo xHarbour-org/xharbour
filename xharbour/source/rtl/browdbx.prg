@@ -1,5 +1,5 @@
 /*
- * $Id: browdbx.prg,v 1.5 2001/06/19 18:53:58 dholm Exp $
+ * $Id: browdbx.prg,v 1.1.1.1 2001/12/21 10:41:12 ronpinkas Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 /* NOTE: This function is exactly the same as Skipped() in BROWDB.PRG */
 
 #ifdef HB_COMPAT_XPP
-
+#ifdef __USE_OLD__
 FUNCTION dbSkipper( nRecs )
 
    LOCAL nSkipped := 0
@@ -88,4 +88,5 @@ FUNCTION dbSkipper( nRecs )
 
    RETURN nSkipped
 
+#endif
 #endif

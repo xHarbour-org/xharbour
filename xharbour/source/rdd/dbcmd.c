@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.30 2003/03/08 01:30:46 horacioroldan Exp $
+ * $Id: dbcmd.c,v 1.31 2003/05/10 01:46:28 ronpinkas Exp $
  */
 
 /*
@@ -4173,4 +4173,54 @@ HB_FUNC( __RDDGETTEMPALIAS )
 
    hb_rddGetTempAlias( szAliasTmp );
    hb_retc( szAliasTmp );
+}
+
+HB_FUNC( DBSKIPPER )
+{
+   if( s_pCurrArea )
+   {  long  nSkipped   = 0;
+      long  nRecs      = 1;
+      ULONG ulRecCount = 0;
+      BOOL bBEof       = TRUE;
+      if( hb_pcount() > 0 )
+         nRecs = hb_parnl( 1 ) ;
+
+      SELF_RECCOUNT( ( AREAP ) s_pCurrArea->pArea, &ulRecCount );
+      if( ulRecCount != 0 )
+      {  PHB_ITEM pRecNo  = hb_itemPutNL( NULL, 0 );
+         SELF_RECNO( ( AREAP ) s_pCurrArea->pArea, pRecNo );
+         if( nRecs == 0 )
+         {  SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 0 );
+         }
+         else if( nRecs > 0 && ( ULONG )pRecNo != ulRecCount + 1 )
+            {  while( nSkipped < nRecs )
+               { SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
+                 SELF_EOF( ( AREAP ) s_pCurrArea->pArea, &bBEof );
+                  if( bBEof )
+                  {  SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, -1 );
+                     nRecs = nSkipped ;
+                  }
+                  else
+                  {  nSkipped++ ;
+                  }
+               }
+            }
+         else if( nRecs < 0 )
+            {  while( nSkipped > nRecs )
+               { SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, -1 );
+                 SELF_BOF( ( AREAP ) s_pCurrArea->pArea, &bBEof );
+                  if( bBEof )
+                  {  nRecs = nSkipped ;
+                  }
+                  else
+                  {  nSkipped-- ;
+                  }
+               }
+            };
+         hb_itemRelease( pRecNo );
+      }
+      hb_retnl( nSkipped );
+   }
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSKIP" );
 }

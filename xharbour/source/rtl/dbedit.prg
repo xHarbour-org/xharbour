@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.5 2003/01/27 03:37:23 walito Exp $
+ * $Id: dbedit.prg,v 1.6 2003/02/06 05:17:54 walito Exp $
  */
 
 /*
@@ -124,7 +124,7 @@ FUNCTION dbEdit(;
 
    oBrowse := TBrowseDB( nTop, nLeft, nBottom, nRight )
 
-   oBrowse:SkipBlock := {| nRecs | dbEditSkipped( nRecs ) }
+   oBrowse:SkipBlock := {| nRecs | dbSkipper( nRecs ) }
    oBrowse:HeadSep   := iif( ISCHARACTER( xHeadingSeparators ), xHeadingSeparators, Chr( 205 ) + Chr( 209 ) + Chr( 205 ) )
    oBrowse:ColSep    := iif( ISCHARACTER( xColumnSeparators ), xColumnSeparators, " " + Chr( 179 ) + " " )
    oBrowse:FootSep   := iif( ISCHARACTER( xFootingSeparators ), xFootingSeparators, "" )
@@ -366,36 +366,3 @@ STATIC FUNCTION dbEditCallUser( oBrowse, xUserFunc, nKey )
    ENDIF
 
    RETURN nResult != DE_ABORT
-
-STATIC FUNCTION dbEditSkipped( nRecs )
-   LOCAL nSkipped := 0
-
-   IF LastRec() != 0
-      IF nRecs == 0
-         IF Eof()
-            dbSkip( -1 )
-            nSkipped := -1
-         ELSE
-            dbSkip( 0 )
-         ENDIF
-      ELSEIF nRecs > 0 .AND. RecNo() != LastRec() + 1
-         DO WHILE nSkipped < nRecs
-            dbSkip( 1 )
-            IF Eof()
-               dbSkip( -1 )
-               EXIT
-            ENDIF
-            nSkipped++
-         ENDDO
-      ELSEIF nRecs < 0
-         DO WHILE nSkipped > nRecs
-            dbSkip( -1 )
-            IF Bof()
-               EXIT
-            ENDIF
-            nSkipped--
-         ENDDO
-      ENDIF
-   ENDIF
-
-   RETURN nSkipped
