@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.78 2002/07/17 15:23:58 walito Exp $
+ * $Id: math.c,v 1.4 2002/09/06 10:39:24 andijahja Exp $
  */
 
 /*
@@ -624,8 +624,7 @@ HB_FUNC (LOG)
 	  case HB_MATH_ERR_SING:     /* argument to log was 0.0 */
 	  case HB_MATH_ERR_DOMAIN:   /* argument to log was < 0.0 */
 	    {
-           hb_retndlen( log( hb_parnd (1) ), 99, -1 );
-	      // hb_retndlen (-HUGE_VAL, -1, -1); /* return -infinity */
+	       hb_retndlen (-HUGE_VAL, -1, -1); /* return -infinity */
 	    }; break;
 	  default:
 	    {
