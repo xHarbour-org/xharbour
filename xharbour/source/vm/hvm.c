@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.370 2004/04/02 04:30:52 ronpinkas Exp $
+ * $Id: hvm.c,v 1.371 2004/04/03 01:51:03 ronpinkas Exp $
  */
 
 /*
@@ -8429,14 +8429,6 @@ HB_FUNC( HB_RESTOREBLOCK )
 
 HB_FUNC( HB_NOMOUSE ){}
 
-#if defined(HB_OS_WIN_32) && defined(__WATCOMC__)
-extern void HB_EXPORT hb_froceLinkMain();
-void _hb_froceLinkMain()
-{
-   hb_froceLinkMain();
-}
-#endif
-
 HB_FUNC( __VMVARSLIST )
 {
    HB_FUNCNAME(HB_DBG_VMVARSLIST)();
@@ -8456,3 +8448,11 @@ HB_FUNC( __VMVARSSET )
 {
    HB_FUNCNAME(HB_DBG_VMVARSSET)();
 }
+
+#if defined(HB_OS_WIN_32) && defined(__WATCOMC__)
+extern void HB_EXPORT hb_forceLinkMain();
+void _hb_forceLinkMain()
+{
+   hb_forceLinkMain();
+}
+#endif
