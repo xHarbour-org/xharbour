@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.14 2002/10/19 01:22:38 ronpinkas Exp $
+ * $Id: estack.c,v 1.15 2002/10/25 03:06:09 ronpinkas Exp $
  */
 
 /*
@@ -63,14 +63,62 @@
 
 /* ------------------------------- */
 
-#if !defined( STACK_INITHB_ITEMS )
-   #define STACK_INITHB_ITEMS      200
-#endif
-#if !defined( STACK_EXPANDHB_ITEMS )
-   #define STACK_EXPANDHB_ITEMS    20
-#endif
+#ifdef HB_THREAD_SUPPORT
+   #include "thread.h"
 
-HB_STACK hb_stack;
+   HB_STACK hb_stack_general;
+
+   HB_STACK *hb_getCurrentStack( void )
+   {
+      // Most common first.
+      if( hb_ht_context == NULL )
+      {
+         return &hb_stack_general;
+      }
+      else
+      {
+         //static HB_THREAD_CONTEXT *last_context = NULL;
+         HB_THREAD_CONTEXT *p;
+         HB_THREAD_T id;
+
+         #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+            id = pthread_self();
+         #else
+            id = GetCurrentThreadId();
+         #endif
+
+         /*
+         if ( last_context != NULL && last_context->th_id == id )
+         {
+            return last_context->stack;
+         }
+         */
+
+         HB_MUTEX_LOCK( &context_monitor );
+
+         p = hb_ht_context;
+         while( p && p->th_id != id )
+         {
+            p = p->next;
+         }
+
+         if( p )
+         {
+            //last_context = p;
+            HB_MUTEX_UNLOCK( &context_monitor );
+            return p->stack;
+         }
+         else
+         {
+            // TODO: Add Error Message.
+            HB_MUTEX_UNLOCK( &context_monitor );
+            return &hb_stack_general;
+         }
+      }
+   }
+#else
+   HB_STACK hb_stack;
+#endif
 
 /* ------------------------------- */
 

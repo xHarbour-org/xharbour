@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.12 2002/12/15 23:06:02 ronpinkas Exp $
+ * $Id: console.c,v 1.13 2002/12/16 06:02:47 ronpinkas Exp $
  */
 
 /*
@@ -90,9 +90,17 @@ static int    s_iFilenoStdin;
 static int    s_iFilenoStdout;
 static int    s_iFilenoStderr;
 
+#ifdef HB_THREAD_SUPPORT
+   static HB_MUTEX_T s_Mutex;
+#endif
+
 void hb_conInit( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conInit()"));
+
+   #ifdef HB_THREAD_SUPPORT
+       HB_MUTEX_INIT( &s_Mutex );
+   #endif
 
 #if defined(OS_UNIX_COMPATIBLE) && !defined(HB_EOL_CRLF)
    s_szCrLf[ 0 ] = HB_CHAR_LF;
@@ -162,6 +170,10 @@ void hb_conRelease( void )
    hb_gtExit();
 
    s_bInit = FALSE;
+
+   #ifdef HB_THREAD_SUPPORT
+       HB_MUTEX_DESTROY( &s_Mutex );
+   #endif
 }
 
 char * hb_conNewLine( void )
@@ -190,10 +202,14 @@ static void hb_conOut( USHORT uiParam, hb_out_func_typedef * pOutFunc )
    pszString = hb_itemString( hb_param( uiParam, HB_IT_ANY ), &ulLen, &bFreeReq );
 
    if ( ulLen )
+   {
       pOutFunc( pszString, ulLen );
+   }
 
    if( bFreeReq )
+   {
       hb_xfree( pszString );
+   }
 }
 
 /* Output an item to STDOUT */
@@ -202,10 +218,14 @@ void hb_conOutStd( char * pStr, ULONG ulLen )
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutStd(%s, %lu)", pStr, ulLen));
 
    if( ulLen == 0 )
+   {
       ulLen = strlen( pStr );
+   }
 
    if( s_bInit )
+   {
       hb_gtPreExt();
+   }
 
    hb_gt_OutStd( ( BYTE * ) pStr, ulLen );
 
@@ -222,10 +242,14 @@ void hb_conOutErr( char * pStr, ULONG ulLen )
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutErr(%s, %lu)", pStr, ulLen));
 
    if( ulLen == 0 )
+   {
       ulLen = strlen( pStr );
+   }
 
    if( s_bInit )
+   {
       hb_gtPreExt();
+   }
 
    hb_gt_OutErr( ( BYTE * ) pStr, ulLen );
 
@@ -242,7 +266,9 @@ void hb_conOutAlt( char * pStr, ULONG ulLen )
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutAlt(%s, %lu)", pStr, ulLen));
 
    if( hb_set.HB_SET_CONSOLE )
+   {
       hb_gtWriteCon( ( BYTE * ) pStr, ulLen );
+   }
 
    if( hb_set.HB_SET_ALTERNATE && hb_set.hb_set_althan != FS_ERROR )
    {
@@ -266,11 +292,16 @@ void hb_conOutAlt( char * pStr, ULONG ulLen )
       /* Print to printer if SET PRINTER ON and valid printer file */
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       if (!hb_set.hb_set_winprinter)
+      {
           hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
+      }
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
       else
+      {
           WriteStringtoPrint(pStr);
+      }
 #endif
+
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
       s_uiPCol += ( USHORT ) ulLen;
    }
@@ -287,17 +318,24 @@ static void hb_conOutDev( char * pStr, ULONG ulLen )
       /* Display to printer if SET DEVICE TO PRINTER and valid printer file */
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       if (!hb_set.hb_set_winprinter)
+      {
           hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
+      }
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
       else
+      {
           WriteStringtoPrint(pStr);
+      }
 #endif
+
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
       s_uiPCol += ( USHORT ) ulLen;
    }
    else
+   {
       /* Otherwise, display to console */
       hb_gtWrite( ( BYTE * ) pStr, ulLen );
+   }
 }
 
 HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
@@ -305,12 +343,26 @@ HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
    USHORT uiPCount = hb_pcount();
    USHORT uiParam;
 
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_LOCK( &s_Mutex );
+       }
+   #endif
+
    for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
    {
       hb_conOut( uiParam, hb_conOutStd );
       if( uiParam < uiPCount )
          hb_conOutStd( " ", 1 );
    }
+
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_UNLOCK( &s_Mutex );
+       }
+   #endif
 }
 
 HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
@@ -318,12 +370,26 @@ HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
    USHORT uiPCount = hb_pcount();
    USHORT uiParam;
 
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_LOCK( &s_Mutex );
+       }
+   #endif
+
    for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
    {
       hb_conOut( uiParam, hb_conOutErr );
       if( uiParam < uiPCount )
          hb_conOutErr( " ", 1 );
    }
+
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_UNLOCK( &s_Mutex );
+       }
+   #endif
 }
 
 HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or printer) and is affected by SET ALTERNATE */
@@ -331,16 +397,39 @@ HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or pri
    USHORT uiPCount = hb_pcount();
    USHORT uiParam;
 
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_LOCK( &s_Mutex );
+       }
+   #endif
+
    for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
    {
       hb_conOut( uiParam, hb_conOutAlt );
       if( uiParam < uiPCount )
+      {
          hb_conOutAlt( " ", 1 );
+      }
    }
+
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_UNLOCK( &s_Mutex );
+       }
+   #endif
 }
 
 HB_FUNC( QOUT )
 {
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_LOCK( &s_Mutex );
+       }
+   #endif
+
    hb_conOutAlt( s_szCrLf, CRLF_BUFFER_LEN - 1 );
 
    if( (hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR ) ||
@@ -366,10 +455,24 @@ HB_FUNC( QOUT )
    }
 
    HB_FUNCNAME( QQOUT )();
+
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_UNLOCK( &s_Mutex );
+       }
+   #endif
 }
 
 HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
 {
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_LOCK( &s_Mutex );
+       }
+   #endif
+
    if( (hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_printhan != FS_ERROR ) ||
        (hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_winhan != FS_ERROR ))
    {
@@ -384,16 +487,51 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
    }
 
    s_uiPRow = s_uiPCol = 0;
+
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_UNLOCK( &s_Mutex );
+       }
+   #endif
 }
 
 HB_FUNC( PROW ) /* Returns the current printer row position */
 {
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_LOCK( &s_Mutex );
+       }
+   #endif
+
    hb_retni( ( int ) s_uiPRow );
+
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_UNLOCK( &s_Mutex );
+       }
+   #endif
 }
 
 HB_FUNC( PCOL ) /* Returns the current printer row position */
 {
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_LOCK( &s_Mutex );
+       }
+   #endif
+
    hb_retni( ( int ) s_uiPCol );
+
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_UNLOCK( &s_Mutex );
+       }
+   #endif
 }
 
 static void hb_conDevPos( SHORT iRow, SHORT iCol )
@@ -414,79 +552,141 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
       if( uiProw < s_uiPRow )
       {
          if (!hb_set.hb_set_winprinter)
+         {
             hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
+         }
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
          else
+         {
             WriteStringtoPrint("\x0C\x0D");
+         }
 #endif
          s_uiPRow = s_uiPCol = 0;
       }
 
       for( uiCount = s_uiPRow; uiCount < uiProw; uiCount++ )
-        if (!hb_set.hb_set_winprinter)
-         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
+      {
+         if (!hb_set.hb_set_winprinter)
+         {
+            hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
+         }
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
-        else
-         WriteStringtoPrint(s_szCrLf);
+         else
+         {
+            WriteStringtoPrint(s_szCrLf);
+         }
 #endif
+      }
 
       if( uiProw > s_uiPRow )
+      {
          s_uiPCol = 0;
+      }
 
       uiPcol += hb_set.HB_SET_MARGIN;
 
       if( ( uiProw == s_uiPRow ) && ( uiPcol < s_uiPCol ) )
       {
-         if (!hb_set.hb_set_winprinter)   {
-             hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D", 1 );
-             s_uiPCol = 0;
-             }
+         if (!hb_set.hb_set_winprinter)
+         {
+            hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D", 1 );
+            s_uiPCol = 0;
+         }
          #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
          else
-            {
-             WriteStringtoPrint("\x0D");
-             s_uiPCol = 0;
-             }
+         {
+            WriteStringtoPrint("\x0D");
+            s_uiPCol = 0;
+         }
       #endif
-
       }
 
-
       for( uiCount = s_uiPCol; uiCount < uiPcol; uiCount++ )
-        if (!hb_set.hb_set_winprinter)
+      {
+         if (!hb_set.hb_set_winprinter)
+         {
             hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
+         }
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
-        else
+         else
+         {
             WriteStringtoPrint(" ");
+         }
 #endif
+      }
+
       s_uiPRow = uiProw;
       s_uiPCol = uiPcol;
 
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }
    else
+   {
       hb_gtSetPos( iRow, iCol );
+   }
 }
 
 /* NOTE: This should be placed after the hb_conDevPos() definition. */
 
 HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
 {
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_LOCK( &s_Mutex );
+       }
+   #endif
+
    if( ISNUM( 1 ) && ISNUM( 2 ) )
+   {
       hb_conDevPos( hb_parni( 1 ), hb_parni( 2 ) );
+   }
+
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_UNLOCK( &s_Mutex );
+       }
+   #endif
 }
 
 HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
 {
-   if( hb_pcount() == 2 && ISNUM( 1 ) && ISNUM( 2 ) )
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_LOCK( &s_Mutex );
+       }
+   #endif
+
+   if( ISNUM( 1 ) && ISNUM( 2 ) )
    {
       s_uiPRow = ( USHORT ) hb_parni( 1 );
       s_uiPCol = ( USHORT ) hb_parni( 2 );
    }
+
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_UNLOCK( &s_Mutex );
+       }
+   #endif
 }
 
 HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or printer), but is not affected by SET ALTERNATE */
 {
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_LOCK( &s_Mutex );
+       }
+   #endif
+
+   if( ISNUM( 3 ) && ISNUM( 4 ) )
+   {
+      hb_conDevPos( hb_parni( 3 ), hb_parni( 4 ) );
+   }
+
    if( ISCHAR( 2 ) )
    {
       char szOldColor[ CLR_STRLEN ];
@@ -499,7 +699,16 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
       hb_gtSetColorStr( szOldColor );
    }
    else if( hb_pcount() >= 1 )
+   {
       hb_conOut( 1, hb_conOutDev );
+   }
+
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_UNLOCK( &s_Mutex );
+       }
+   #endif
 }
 
 HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected by SET ALTERNATE */
@@ -508,6 +717,13 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
    ULONG ulLen;
    BOOL bFreeReq;
 
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_LOCK( &s_Mutex );
+       }
+   #endif
+
    if( ISCHAR( 2 ) )
    {
       char szOldColor[ CLR_STRLEN ];
@@ -533,6 +749,13 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
       if( bFreeReq )
          hb_xfree( pszString );
    }
+
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_UNLOCK( &s_Mutex );
+       }
+   #endif
 }
 
 /* Undocumented Clipper function */
@@ -544,6 +767,13 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
    char * pszString;
    ULONG ulLen;
    BOOL bFreeReq;
+
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_LOCK( &s_Mutex );
+       }
+   #endif
 
    if( ISCHAR( 4 ) )
    {
@@ -568,8 +798,17 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
       hb_gtWriteAt( hb_parni( 1 ), hb_parni( 2 ), ( BYTE * ) pszString, ulLen );
 
       if( bFreeReq )
+      {
          hb_xfree( pszString );
+      }
    }
+
+   #ifdef HB_THREAD_SUPPORT
+       if( hb_ht_context )
+       {
+          HB_MUTEX_UNLOCK( &s_Mutex );
+       }
+   #endif
 }
 
 

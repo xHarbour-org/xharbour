@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.531 2002/12/17 04:21:40 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.532 2002/12/17 16:08:37 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,54 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-18 05:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  + include/thread.h
+  + source/vm/thread.c
+    + New MT support originated by Giancarlo Niccolai [gian@niccolai.ws]
+      Revisions and additions by Ron Pinkas
+
+  * include/hbcomp.h
+    - Removed unneeded #include.
+
+  * include/hbstack.h
+    + Added support for new MT
+
+  * source/vm/estack.c
+    + Added #ifdef guarded hb_getCurrentStack() as an alternative to dirrect access to hb_stack.
+
+  * source/vm/hvm.c
+    + Added: #ifdef guarded hb_contextInit() to hb_vmInit()
+    + Added: #ifdef guarded Sleep Loop to to hb_vmQuit()
+
+  * source/pp/pptable.c
+    * Changed definitions of @ x,y SAY ... to pass Row & Col as additional paramaters to DevOut*()
+      /* This is required so that more efficent Mutex can be set for the combined operation. */
+
+  * source/rtl/console.c
+    * Added 2 optional paramaters nRow, nCol to DevOut().
+
+  * source/rtl/devoutp.prg
+    * Added 2 optional paramaters nRow, nCol to DevOutPict().
+
+  * source/rtl/tprint.c
+  * source/rtl/tprinter.c
+    * Minor corrections.
+
+  * makefile.bc
+    + Added support for thread.c
+
+  + tests/mttest.prg
+    + New test file to demonstrate new MT capability.
+
+  * source/vm/arrays.c
+    * Corrected comment.
+
+  * source/rtl/errorsys.prg
+    + Added TraceLog() just before Alert()
+
+  * source/rtl/regex.c
+    * Work in progress.
 
 2002-12-17 12:40 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/tget.prg

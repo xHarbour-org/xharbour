@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.131 2002/12/04 23:07:00 likewolf Exp $
+ * $Id: hvm.c,v 1.132 2002/12/17 04:21:42 ronpinkas Exp $
  */
 
 /*
@@ -91,6 +91,10 @@
 #include "hbset.h"
 #include "hbinkey.ch"
 #include "inkey.ch"
+
+#ifdef HB_THREAD_SUPPORT
+   #include "thread.h"
+#endif
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
@@ -333,6 +337,12 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmInit()"));
 
+    /*JC1: initialization of thread aware stack */
+    #ifdef HB_THREAD_SUPPORT
+       HB_TRACE( HB_TR_INFO, ("contextInit" ) );
+       hb_contextInit();
+    #endif
+
    /* initialize internal data structures */
    s_aStatics.type = HB_IT_NIL;
    s_byErrorLevel = 0;
@@ -489,6 +499,20 @@ void HB_EXPORT hb_vmQuit( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmQuit()"));
 
    //printf( "\nvmQuit()\n" );
+
+   #ifdef HB_THREAD_SUPPORT
+      while( hb_ht_context )
+      {
+         #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+           {
+              static struct timespec nanosecs = { 0, 1000 };
+              nanosleep( &nanosecs, NULL );
+           }
+         #elif defined(HB_OS_WIN_32)
+            Sleep( 0 );
+         #endif
+      }
+   #endif
 
    #ifdef HB_MACRO_STATEMENTS
      hb_pp_Free();

@@ -37,7 +37,7 @@ restrictions:
  *
  *     maketables.c + get.c + study.c + pcre.c + pcreposix.c
  *
- * into this self contaned regex.c
+ * into this self contained regex.c
  *
  * regex.c was modified to avoid multiple #include "internal.h"
  * in favor of single #include regex.h which is a composite of:
@@ -6346,6 +6346,13 @@ HB_FUNC( HB_ATX )
     {
         if( regcomp( &re, pRegEx->item.asString.value, CFlags ) == 0 )
         {
+           /*
+           if( (real_pcre *) (re)->top_bracket > 0 )
+           {
+              aMatches = hb_xgrabb(  (const real_pcre *) (re)->top_bracket * sizeof() )
+           }
+           */
+
            if( pStart || pEnd )
            {
               EFlags |= REG_STARTEND;
@@ -6392,4 +6399,8 @@ HB_FUNC( HB_ATX )
     }
 
     hb_ret();
+}
+
+HB_FUNC( REGCOMP )
+{
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.8 2002/05/24 13:22:52 ronpinkas Exp $
+ * $Id: pptable.c,v 1.9 2002/11/20 23:45:34 lculik Exp $
  */
 
 /*
@@ -205,9 +205,9 @@ void hb_pp_Table( void )
    static COMMANDS sC___77 = {0,"@","\1A00, \1B00 TO \1C00, \1D00 [COLOR \1E00]",
        "DispBox( \1A00, \1B00, \1C00, \1D00, 1 [, \1E00 ] )",&sC___76 };
    static COMMANDS sC___78 = {0,"@","\1A00, \1B00 SAY \1C00 [PICTURE \1D00] [COLOR \1E00]",
-       "DevPos( \1A00, \1B00 ) ; DevOutPict( \1C00, \1D00 [, \1E00] )",&sC___77 };
+       "DevOutPict( \1C00, \1D00, \1E00, \1A00, \1B00 )",&sC___77 };
    static COMMANDS sC___79 = {0,"@","\1A00, \1B00 SAY \1C00 [COLOR \1D00]",
-       "DevPos( \1A00, \1B00 ) ; DevOut( \1C00 [, \1D00] )",&sC___78 };
+       "DevOut( \1C00, \1D00, \1A00, \1B00 )",&sC___78 };
    static COMMANDS sC___80 = {0,"SET","BELL \1A20ON,OFF,&>","Set( _SET_BELL, \1A30 )",&sC___79 };
    static COMMANDS sC___81 = {0,"SET","BELL (\1A00)","Set( _SET_BELL, \1A00 )",&sC___80 };
    static COMMANDS sC___82 = {0,"SET","CONFIRM \1A20ON,OFF,&>","Set( _SET_CONFIRM, \1A30 )",&sC___81 };

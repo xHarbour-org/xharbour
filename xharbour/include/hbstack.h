@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.4 2002/10/25 00:49:14 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.5 2002/10/25 07:57:22 andijahja Exp $
  */
 
 /*
@@ -59,6 +59,13 @@
 #define HB_STACK_H_
 
 #include "hbvmpub.h"
+
+#if !defined( STACK_INITHB_ITEMS )
+   #define STACK_INITHB_ITEMS      200
+#endif
+#if !defined( STACK_EXPANDHB_ITEMS )
+   #define STACK_EXPANDHB_ITEMS    20
+#endif
 
 #if defined(HB_EXTERN_C)
 extern "C" {
@@ -121,6 +128,18 @@ extern void    hb_stackFree( void );       /* releases all memory used by the st
 extern void    hb_stackPush( void );       /* pushes an item on to the stack */
 extern void    hb_stackPop( void );        /* pops an item from the stack */
 extern void    hb_stackInit( void );       /* initializes the stack */
+
+#ifndef HB_NO_DEFAULT_THREADS
+   #define HB_THREAD_SUPPORT
+#endif
+
+/* JC1: test for macro accessing the stack */
+#if defined( HB_THREAD_SUPPORT ) && ! defined(HB_COMP_H_)
+   #include "thread.h"
+   extern HB_STACK *hb_getCurrentStack( void );
+   //#define hb_stack ( hb_ht_context ? (* hb_getCurrentStack() ) : hb_stack_general ) // Compiler disallow this optimization.
+   #define hb_stack (* hb_getCurrentStack() )
+#endif
 
 #if defined(HB_EXTERN_C)
 }

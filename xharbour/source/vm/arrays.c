@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.31 2002/11/18 14:50:05 map Exp $
+ * $Id: arrays.c,v 1.32 2002/12/16 06:02:47 ronpinkas Exp $
  */
 
 /*
@@ -394,8 +394,8 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
 
       pItem->type = HB_IT_BYREF;
 
-      pItem->item.asRefer.value = ulIndex - 1; // To offset the -1 below.
-      pItem->item.asRefer.offset = 0; // Because 0 will be translated as a STATIC in hb_itemUnref();
+      pItem->item.asRefer.value = ulIndex - 1;
+      pItem->item.asRefer.offset = 0;
       pItem->item.asRefer.BasePtr.itemsbase = &( pArray->item.asArray.value->pItems );
 
       if( pElement->type == HB_IT_STRING && ( pElement->item.asString.bStatic || *( pElement->item.asString.puiHolders ) > 1 ) )

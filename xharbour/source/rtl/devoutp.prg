@@ -1,5 +1,5 @@
-/* 
- * $Id: devoutp.prg,v 1.2 2002/04/24 03:54:42 walito Exp $
+/*
+ * $Id: devoutp.prg,v 1.3 2002/11/29 20:10:03 walito Exp $
  */
 
 /*
@@ -50,13 +50,11 @@
  *
  */
 
-PROCEDURE DevOutPict( xValue, cPicture, cColor )
+PROCEDURE DevOutPict( xValue, cPicture, cColor, nRow, nCol )
 
-   if Valtype( xValue ) IN "CMNDL"
+   IF Valtype( xValue ) IN "CMNDL"
+      DevOut( Transform( xValue, cPicture ), cColor, nRow, nCol )
+   ENDIF
 
-      DevOut( Transform( xValue, cPicture ), cColor )
-
-   endif
-
-   RETURN
+RETURN
 

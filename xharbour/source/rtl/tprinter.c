@@ -46,13 +46,14 @@
  *
  */
 
-#define HB_OS_WIN_32_USED
-
-#include "windows.h"
-
-#include "hbapi.h"
+#include "hbsetup.h"
 
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
+
+#include <windows.h>
+
+#define HB_OS_WIN_32_USED
+#include "hbapi.h"
 
 static LPTSTR MyDeviceName;
 static LPTSTR MyJobName = "RawPrint";

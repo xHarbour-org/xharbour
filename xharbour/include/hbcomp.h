@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.8 2002/11/24 17:50:36 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.9 2002/12/04 06:24:06 ronpinkas Exp $
  */
 
 /*
@@ -59,7 +59,6 @@
 #include <limits.h>
 #include <ctype.h>
 
-#include "hbapi.h"
 #include "hberrors.h"
 #include "hbpp.h"
 #include "hbver.h"

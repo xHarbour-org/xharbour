@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.16 2002/12/11 11:06:53 ronpinkas Exp $
+# $Id: makefile.bc,v 1.17 2002/12/16 06:08:03 ronpinkas Exp $
 #
 
 #
@@ -564,6 +564,7 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)\proc.obj \
    $(OBJ_DIR)\pvalue.obj \
    $(OBJ_DIR)\runner.obj \
+   $(OBJ_DIR)\thread.obj \
    \
    $(OBJ_DIR)\harbinit.obj
 
@@ -1183,6 +1184,10 @@ $(OBJ_DIR)\pvalue.obj : $(VM_DIR)\pvalue.c
    tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\runner.obj : $(VM_DIR)\runner.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\thread.obj : $(VM_DIR)\thread.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
