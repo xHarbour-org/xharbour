@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.30 2005/01/10 18:45:33 druzus Exp $
+ * $Id: hbsetup.h,v 1.31 2005/01/12 16:36:21 druzus Exp $
  */
 
 /*
@@ -321,8 +321,8 @@
    #endif
 #endif
 
-#ifdef HB_OS_DARWIN
-   #if ! defined(HB_OS_BSD)
+#ifndef HB_OS_BSD
+   #if defined( __FreeBSD__ ) || defined( __NetBSD__ ) || defined( __OpenBSD__ ) || defined( __APPLE__ )
       #define HB_OS_BSD
    #endif
 #endif
