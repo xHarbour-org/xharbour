@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.120 2004/05/26 10:34:49 lculik Exp $
+ * $Id: hbmake.prg,v 1.121 2004/05/27 20:57:07 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1442,9 +1442,9 @@ FUNC CreateMakeFile( cFile )
 
    cObjDir := Alltrim( cObjDir )
    IF "Linux" in cOs
-          cCurrentDir:='/'+CurDirx()
+          cCurrentDir:='/'+CurDir()
    ELSE
-       cCurrentDir:=CurDrive()+":\"+CurDirx()
+       cCurrentDir:=CurDrive()+":\"+CurDir()
    ENDIF
 
    IF ! Empty( cObjDir )
@@ -2025,7 +2025,7 @@ FUNC CreateMakeFile( cFile )
       ELSEIF lWhoo
          fWrite( s_nLinkHandle, "LIBFILES = whoo.lib what32.lib " + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSEIF lHwGui
-         fWrite( s_nLinkHandle, "LIBFILES = hwgui.lib procmisc.lib hwg_qhtm.lib optgui.lib " + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = hwgui.lib procmisc.lib hwg_qhtm.lib " + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSEIF lCw
          fWrite( s_nLinkHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib optgui.lib "  + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSE
