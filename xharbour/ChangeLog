@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1306 2003/07/30 02:16:48 paultucker Exp $
+ * $Id: ChangeLog,v 1.1307 2003/07/30 06:59:23 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-30 06:45 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * source/vm/arrayshb.c
+    ! More clipper compatible on ADel().
 
 2003-07-29 11:53 UTC-0800 Brian Hays <bhays@abacuslaw.com>
    * source/rtl/memoline.c
@@ -295,7 +299,7 @@
 2003-07-22 06:30 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * contrib/rdd_ads/ads1.c
   * contrib/rdd_ads/adsfunc.c
-    ! Changes in adsGetValue, adsPutValue and AdsKeyCount() for speed().
+    % Changes in adsGetValue, adsPutValue and AdsKeyCount() for speed().
       Tested with ADS Local 6.2, not tested with prior versions of ADS.
 
 2003-07-21 18:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>

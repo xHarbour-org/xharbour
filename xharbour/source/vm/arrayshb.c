@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.30 2003/07/13 22:21:26 andijahja Exp $
+ * $Id: arrayshb.c,v 1.31 2003/07/18 21:42:35 andijahja Exp $
  */
 
 /*
@@ -225,7 +225,7 @@ HB_FUNC( ADEL )
       PHB_ITEM pShrink = hb_param( 3, HB_IT_LOGICAL );
     #endif
 
-      if( ISNUM( 2 ) )
+      if( ISNUM( 2 ) && hb_parnl( 2 ) )
       {
          hb_arrayDel( pArray, hb_parnl( 2 ) );
       }
