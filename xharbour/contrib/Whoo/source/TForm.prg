@@ -28,14 +28,10 @@ METHOD New( oParent ) CLASS TForm
 return( super:New( oParent ) )
 
 
-METHOD Add( cName, oObj, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TForm
+METHOD Add( cName, oObj ) CLASS TForm
 
    __objAddData( self, cName )
-
-   oObj := oObj:New( self, cCaption, nId, nLeft, nTop, nWidth, nHeight )
-
    __ObjSetValueList( self, { { cName, oObj } } )
-
    oObj:Create()
 
 return( oObj )
