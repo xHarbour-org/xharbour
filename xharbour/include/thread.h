@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.65 2003/11/26 05:44:04 jonnymind Exp $
+* $Id: thread.h,v 1.66 2003/11/27 17:57:49 jonnymind Exp $
 */
 
 /*
@@ -69,6 +69,7 @@
 typedef void (*HB_CLEANUP_FUNC)(void *);
 #define HB_MAX_CLEANUPS  12
 #define HB_THREAD_MAX_UNIQUE_ID  32000
+#define HB_MUTEX_SIGNATURE       0xF0316913
 
 /* Maximun number of cycles that can be completed by VM without stack unlock */
 #define HB_VM_UNLOCK_PERIOD 100
@@ -107,12 +108,10 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
 
    #define HB_COND_T                   HB_WINCOND_T
    #define HB_COND_INIT( x )           hb_threadCondInit( &(x) )
-   #define HB_COND_WAIT( x, y )        hb_threadCondWait( &(x), y, INFINITE )
-   #define HB_COND_WAITTIME( x, y, t ) hb_threadCondWait( &(x), y, t )
+   #define HB_COND_WAIT( x, y )        hb_threadCondWait( &(x), &(y), INFINITE )
+   #define HB_COND_WAITTIME( x, y, t ) hb_threadCondWait( &(x), &(y), t )
    #define HB_COND_SIGNAL( x )         hb_threadCondSignal( &(x) )
    #define HB_COND_DESTROY( x )        hb_threadCondDestroy( &(x) )
-
-   typedef void ( * HB_IDLE_FUNC )( void );
 
    #define HB_CURRENT_THREAD           GetCurrentThreadId
    #define HB_SAME_THREAD(x, y)        ((x) == (y))
@@ -146,18 +145,25 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    }
 
 
+   #define HB_CLEANUP_PUSH(X,Y)
+   #define HB_CLEANUP_POP
+   #define HB_CLEANUP_POP_EXEC
+
+   /* CURRENTLY TESTING THEESE:
+
    #define HB_CLEANUP_PUSH(X,Y) {\
       HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ] = (X);\
       HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount ] = (void *)&(Y);\
       HB_VM_STACK.iCleanCount++;\
    }
-      
+
    #define HB_CLEANUP_POP (HB_VM_STACK.iCleanCount--);
 
    #define HB_CLEANUP_POP_EXEC {\
       HB_VM_STACK.iCleanCount--;\
       HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ]( HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount ]);\
    }
+   */
 
 #ifdef __cplusplus
 extern "C" {
@@ -222,8 +228,6 @@ extern "C" {
 
 #endif
 
-extern void hb_threadWaitForIdle( void );
-
 /**********************************************************/
 /*
 * Enanched stack for multithreading
@@ -265,7 +269,7 @@ typedef struct tag_HB_STACK
 
    /* Pcode releasing accounting */
    int iPcodeCount;
-   
+
    HB_THREAD_T th_id;
    /* Is this thread going to run a method? */
    BOOL bIsMethod;
@@ -361,7 +365,8 @@ typedef struct tag_HB_STACK
 /* Complex PRG LEVEL Mutex Structure                                 */
 
 typedef struct tag_HB_MUTEX_STRUCT {
-   HB_MUTEX_T mutex;
+   ULONG sign;
+   HB_CRITICAL_T mutex;
    HB_COND_T cond;
    HB_THREAD_T locker;
    USHORT lock_count;
@@ -377,7 +382,7 @@ typedef struct tag_HB_MUTEX_STRUCT {
 typedef struct tag_HB_SHARED_RESOURCE
 {
    /* mutex is used to read or write safely */
-   HB_MUTEX_T Mutex;
+   HB_CRITICAL_T Mutex;
 
    /* data that can be read or written */
    union {
@@ -395,7 +400,7 @@ typedef struct tag_HB_SHARED_RESOURCE
 
 #define HB_SHARED_INIT( pshr, data ) \
 { \
-   HB_MUTEX_INIT( pshr.Mutex );\
+   HB_CRITICAL_INIT( pshr.Mutex );\
    HB_COND_INIT( pshr.Cond ); \
    pshr.aux = 0;\
    pshr.content.asLong = data;\
@@ -403,12 +408,12 @@ typedef struct tag_HB_SHARED_RESOURCE
 
 #define HB_SHARED_DESTROY( pshr ) \
 { \
-   HB_MUTEX_DESTROY( pshr.Mutex );\
+   HB_CRITICAL_DESTROY( pshr.Mutex );\
    HB_COND_DESTROY( pshr.Cond ); \
 }
 
-#define HB_SHARED_LOCK( pshr )   HB_MUTEX_LOCK( (pshr).Mutex )
-#define HB_SHARED_UNLOCK( pshr ) HB_MUTEX_UNLOCK( (pshr).Mutex )
+#define HB_SHARED_LOCK( pshr )   HB_CRITICAL_LOCK( (pshr).Mutex )
+#define HB_SHARED_UNLOCK( pshr ) HB_CRITICAL_UNLOCK( (pshr).Mutex )
 #define HB_SHARED_SIGNAL( pshr )    HB_COND_SIGNAL( (pshr).Cond )
 #define HB_SHARED_WAIT( pshr )      HB_COND_WAIT( (pshr).Cond, (pshr).Mutex )
 
@@ -526,6 +531,7 @@ extern void hb_rawMutexForceUnlock( void *);
 extern HB_MUTEX_STRUCT *hb_threadLinkMutex( HB_MUTEX_STRUCT *mx );
 extern HB_MUTEX_STRUCT *hb_threadUnlinkMutex( HB_MUTEX_STRUCT *mx );
 extern void hb_threadTerminator( void *pData );
+extern void hb_threadWaitForIdle( void );
 
 /* External functions used by thread as helper */
 extern void hb_memvarsInit( HB_STACK * );
@@ -543,7 +549,7 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );
    BOOL hb_threadCondInit( HB_WINCOND_T *cond );
    void hb_threadCondDestroy( HB_WINCOND_T *cond );
    void hb_threadCondSignal( HB_WINCOND_T *cond );
-   BOOL hb_threadCondWait( HB_WINCOND_T *cond, HANDLE mutex , DWORD dwTimeout );
+   BOOL hb_threadCondWait( HB_WINCOND_T *cond, CRITICAL_SECTION *mutex , DWORD dwTimeout );
 
 #endif
 

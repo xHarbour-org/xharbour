@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1784 2003/11/27 13:27:19 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.1785 2003/11/27 17:57:47 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-27 21:21 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/error.ch
+    + Added internal error 9026 "Memory corruption"
+
+  * include/thread.h
+    ! Cleanups and fixups;
+      * The mutex type of PRG level mutexes are now Critical sections
+      * PRG level locks are done via resource counting condition signal
+      * Added a sign field to the Mutex type to avoid PRG going sefault
+        for having passed wrong item type.
+      + Added MutexTryLock() function.
 
 2003-11-27 19:00 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/thread.h

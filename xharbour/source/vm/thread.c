@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.123 2003/11/26 23:52:52 jonnymind Exp $
+* $Id: thread.c,v 1.124 2003/11/27 17:57:50 jonnymind Exp $
 */
 
 /*
@@ -86,13 +86,6 @@
 #endif
 
 #ifdef HB_THREAD_SUPPORT
-
-   #undef HB_CLEANUP_PUSH
-   #undef HB_CLEANUP_POP
-   #undef HB_CLEANUP_POP_EXEC
-   #define HB_CLEANUP_PUSH( x, y )
-   #define HB_CLEANUP_POP
-   #define HB_CLEANUP_POP_EXEC
 
 // FROM MEMVARS.C:
 //TODO:Move this in an appropriate file
@@ -474,7 +467,7 @@ HB_STACK *hb_threadGetStack( HB_THREAD_T id )
    return p;
 }
 
-/* to be internally used byt functions willing to know if there is a stack */
+/* to be internally used by functions willing to know if there is a stack */
 HB_STACK *hb_threadGetStackNoError( HB_THREAD_T id )
 {
    HB_STACK *p;
@@ -751,7 +744,8 @@ void hb_mutexForceUnlock( void *mtx )
    {
       Mutex->lock_count = 0;
       Mutex->locker = 0;
-      HB_MUTEX_UNLOCK( Mutex->mutex );
+      /* warn other therads that this mutex has become available */
+      HB_COND_SIGNAL( Mutex->cond );
    }
 }
 
@@ -1162,15 +1156,19 @@ HB_FUNC( JOINTHREAD )
 
 }
 
-/* JC1: Compatibility; DestroyMutex does not exists anymore */
-HB_FUNC( DESTROYMUTEX )
-{
-
-}
 
 HB_GARBAGE_FUNC( hb_threadMutexFinalize )
 {
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *)  Cargo;
+
+   if ( Mutex->sign != HB_MUTEX_SIGNATURE )
+   {
+      hb_errInternal( HB_EI_MEMCORRUPT,
+         "hb_threadMutexFinalize: Corrupted mutex item at 0x%p",
+         (char *) Mutex, NULL );
+      return;
+   }
+
 
    hb_threadUnlinkMutex( Mutex );
 
@@ -1180,7 +1178,7 @@ HB_GARBAGE_FUNC( hb_threadMutexFinalize )
    hb_gcFree( Mutex );
 }
 
-/*JC1: this will always be called when cancellation is delayed */
+
 HB_FUNC( CREATEMUTEX )
 {
    HB_THREAD_STUB
@@ -1192,6 +1190,7 @@ HB_FUNC( CREATEMUTEX )
    HB_MUTEX_INIT( mt->mutex );
    HB_COND_INIT( mt->cond );
 
+   mt->sign = HB_MUTEX_SIGNATURE;
    mt->lock_count = 0;
    mt->waiting = 0;
    mt->locker = 0;
@@ -1204,63 +1203,96 @@ HB_FUNC( CREATEMUTEX )
    hb_retptr( mt );
 }
 
+/* JC1: Compatibility; DestroyMutex does not exists anymore */
+HB_FUNC( DESTROYMUTEX )
+{
 
-/*JC1: this will always be called when cancellation is delayed */
+}
+
+
+
 HB_FUNC( MUTEXLOCK )
 {
    HB_THREAD_STUB
-   HB_MUTEX_STRUCT *Mutex;
-   PHB_ITEM pMutex = hb_param( 1, HB_IT_POINTER );
+   HB_MUTEX_STRUCT *Mutex = hb_parptr(1);
 
-   if( pMutex == NULL )
+   if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXLOCK", 1, pArgs );
-      hb_itemRelease( pArgs );
-
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXLOCK", 1, hb_paramError(0) );
       return;
    }
 
-   /* Cannot be interrupted now */
-   Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asPointer.value;
-   if( HB_SAME_THREAD(Mutex->locker,HB_CURRENT_THREAD()) )
+
+   if( HB_SAME_THREAD( Mutex->locker, HB_CURRENT_THREAD() ) )
    {
       Mutex->lock_count ++;
    }
    else
    {
       HB_STACK_UNLOCK;
-      HB_MUTEX_LOCK( Mutex->mutex );
+
+      HB_CRITICAL_LOCK( Mutex->mutex );
+      HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, Mutex->mutex );
+
+      while ( Mutex->locker != 0 )
+      {
+         HB_COND_WAIT( Mutex->cond, Mutex->mutex );
+      }
       Mutex->locker = HB_CURRENT_THREAD();
       Mutex->lock_count = 1;
+
+      HB_CLEANUP_POP;
+      HB_CRITICAL_UNLOCK( Mutex->mutex );
+
       HB_STACK_LOCK;
    }
 }
 
-/*JC1: this will always be called when cancellation is delayed */
-HB_FUNC( MUTEXUNLOCK )
+HB_FUNC( MUTEXTRYLOCK )
 {
    HB_THREAD_STUB
+   HB_MUTEX_STRUCT *Mutex = hb_parptr(1);
 
-   HB_MUTEX_STRUCT *Mutex;
-   PHB_ITEM pMutex = hb_param( 1, HB_IT_POINTER );
-
-   if( pMutex == NULL )
+   if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXUNLOCK", 1, pArgs );
-      hb_itemRelease( pArgs );
-
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXTRYLOCK", 1, hb_paramError(0) );
       return;
    }
 
-   /* Cannot be interrupted now */
+   if( HB_SAME_THREAD( Mutex->locker, HB_CURRENT_THREAD() ) )
+   {
+      Mutex->lock_count ++;
+      hb_retl( TRUE );
+   }
+   else
+   {
+      HB_CRITICAL_LOCK( Mutex->mutex );
+      if ( Mutex->locker != 0 )
+      {
+         hb_retl( FALSE );
+      }
+      else
+      {
+         Mutex->locker = HB_CURRENT_THREAD();
+         Mutex->lock_count = 1;
+         hb_retl( FALSE );
+      }
+      HB_CRITICAL_UNLOCK( Mutex->mutex );
+   }
+}
 
-   //HB_CRITICAL_LOCK( hb_mutexMutex );
-   Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asPointer.value;
 
+HB_FUNC( MUTEXUNLOCK )
+{
+   HB_MUTEX_STRUCT *Mutex = hb_parptr(1);
+
+   if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXUNLOCK", 1, hb_paramError(0) );
+      return;
+   }
+
+   HB_CRITICAL_LOCK( Mutex->mutex );
    if( HB_SAME_THREAD( Mutex->locker, HB_CURRENT_THREAD()) )
    {
       Mutex->lock_count --;
@@ -1268,77 +1300,67 @@ HB_FUNC( MUTEXUNLOCK )
       if( Mutex->lock_count == 0 )
       {
          Mutex->locker = 0;
-         HB_MUTEX_UNLOCK( Mutex->mutex );
+         HB_COND_SIGNAL( Mutex->cond );
       }
    }
-   //HB_CRITICAL_UNLOCK( hb_mutexMutex );
+   HB_CRITICAL_UNLOCK( Mutex->mutex );
 }
 
-/*JC1: this will always be called when cancellation is delayed */
-/* TODO: cleanup actions for cancellations while in COND_WAIT */
-HB_FUNC( SUBSCRIBE )
+
+/* TODO: race condition notify/notifyAll() */
+static void s_subscribeInternal( int mode )
 {
    HB_THREAD_STUB
-   int lc, iWaitRes;
-   int islocked;
+   int iWaitRes;
+   ULONG ulWaitTime;
    PHB_ITEM pNotifyVal;
 
-
-   HB_MUTEX_STRUCT *Mutex;
-   PHB_ITEM pMutex = hb_param( 1, HB_IT_POINTER );
+   HB_MUTEX_STRUCT *Mutex = hb_parptr(1);
    PHB_ITEM pStatus = hb_param( 3, HB_IT_BYREF );
 
    /* Parameter error checking */
-   if( pMutex == NULL || ( hb_pcount() == 2 && ! ISNUM(2)) )
+   if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE || hb_pcount() > 3 )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SUBSCRIBE", 1, pArgs );
-      hb_itemRelease( pArgs );
-
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SUBSCRIBE", 3,
+         hb_paramError(1), hb_paramError(2), hb_paramError(3) );
       return;
    }
 
-   Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asPointer.value;
-
-   if( HB_SAME_THREAD( Mutex->locker, HB_CURRENT_THREAD()) )
+   HB_STACK_UNLOCK;
+   HB_CRITICAL_LOCK( Mutex->mutex );
+   /* If we are subscribing now, we must flatten pre-notified data */
+   if ( mode == 1 && hb_arrayLen( Mutex->aEventObjects ) > 0 )
    {
-      islocked = 1;
-   }
-   else
-   {
-      islocked = 0;
-      HB_MUTEX_LOCK( Mutex->mutex );
+      hb_arraySize(  Mutex->aEventObjects, 0 );
    }
 
-   Mutex->locker = 0;
-   lc = Mutex->lock_count;
-   Mutex->lock_count = 0;
-
+   /* warining; does not checks if the current thread is holding the mutex */
    Mutex->waiting ++;
 
-   iWaitRes = 0; /* presuming success */
-   if( Mutex->waiting > 0 )
+   while( hb_arrayLen( Mutex->aEventObjects ) == 0 )
    {
       if ( hb_pcount() == 1 )
       {
-         HB_STACK_UNLOCK;
          HB_COND_WAIT( Mutex->cond, Mutex->mutex );
-         HB_STACK_LOCK;
+         iWaitRes = 0;  /* means success of wait */
       }
       else
       {
-         HB_STACK_UNLOCK;
-         iWaitRes = HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, hb_parnl( 2 ));
-         HB_STACK_LOCK;
-         /* On success, the notify will decrease the counter */
-         if ( iWaitRes != 0 )
+         ulWaitTime = hb_parnl(2);
+         if ( ulWaitTime > 0 )
          {
-            Mutex->waiting --;
+            iWaitRes = HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, ulWaitTime);
+         }
+         else
+         {
+            iWaitRes = 0; /* Success! */
          }
       }
    }
 
+   /* No more waiting */
+   Mutex->waiting --;
+
    if ( iWaitRes == 0 )
    {
       if ( pStatus )
@@ -1361,186 +1383,80 @@ HB_FUNC( SUBSCRIBE )
       hb_ret();
    }
 
-   // Prepare return value
-   Mutex->lock_count = lc;
-
-   if( ! islocked )
-   {
-      HB_MUTEX_UNLOCK( Mutex->mutex );
-   }
-   else
-   {
-      Mutex->locker = HB_CURRENT_THREAD();
-   }
-
+   HB_CRITICAL_UNLOCK( Mutex->mutex );
+   HB_STACK_LOCK;
 }
 
-/*JC1: this will always be called when cancellation is delayed */
-/* TODO: cleanup actions for cancellations while in COND_WAIT */
+
+HB_FUNC( SUBSCRIBE )
+{
+   s_subscribeInternal( 0 );
+}
+
+
 HB_FUNC( SUBSCRIBENOW )
 {
-   HB_THREAD_STUB
-   int lc, iWaitRes;
-   int islocked;
-   HB_MUTEX_STRUCT *Mutex;
-   PHB_ITEM pNotifyVal;
-   PHB_ITEM pMutex = hb_param( 1, HB_IT_POINTER );
-   PHB_ITEM pStatus = hb_param( 3, HB_IT_BYREF );
-
-   /* Parameter error checking */
-   if( pMutex == NULL || ( hb_pcount() == 2 && ! ISNUM(2)) )
-   {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SUBSCRIBENOW", 1, pArgs );
-      hb_itemRelease( pArgs );
-      return;
-   }
-
-   Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asPointer.value;
-
-   if( HB_SAME_THREAD( Mutex->locker, HB_CURRENT_THREAD() ) )
-   {
-      islocked = 1;
-   }
-   else
-   {
-      islocked = 0;
-      HB_MUTEX_LOCK( Mutex->mutex );
-   }
-
-   Mutex->locker = 0;
-   lc = Mutex->lock_count;
-   Mutex->lock_count = 0;
-
-   /* Destroying previous notify objects */
-   if( Mutex->waiting <= 0 )
-   {
-      hb_arraySize( Mutex->aEventObjects, 0 );
-      Mutex->waiting = 1;
-   }
-   else
-   {
-      Mutex->waiting++;
-   }
-
-   iWaitRes = 0;
-   if( hb_pcount() == 1 )
-   {
-      HB_STACK_UNLOCK;
-      HB_COND_WAIT( Mutex->cond, Mutex->mutex );
-      HB_STACK_LOCK;
-   }
-   else
-   {
-      HB_STACK_UNLOCK;
-      iWaitRes = HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, hb_parnl( 2 ) );
-      HB_STACK_LOCK;
-      /* On success, the notify will decrease the counter */
-      if ( iWaitRes != 0 )
-      {
-         Mutex->waiting --;
-      }
-   }
-
-   if ( iWaitRes == 0 )
-   {
-      if ( pStatus )
-      {
-         pStatus->type = HB_IT_LOGICAL;
-         pStatus->item.asLogical.value = 1;
-      }
-      pNotifyVal = hb_arrayGetItemPtr( Mutex->aEventObjects, 1 );
-      hb_itemReturn( pNotifyVal );
-      hb_arrayDel( Mutex->aEventObjects, 1 );
-      hb_arraySize( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects) - 1);
-   }
-   else
-   {
-      if ( pStatus )
-      {
-         pStatus->type = HB_IT_LOGICAL;
-         pStatus->item.asLogical.value = 0;
-      }
-      hb_ret();
-   }
-
-   /* Prepare return value */
-   Mutex->lock_count = lc;
-
-   if( ! islocked )
-   {
-      HB_MUTEX_UNLOCK( Mutex->mutex );
-      Mutex->locker = 0;
-   }
-   else
-   {
-      Mutex->locker = HB_CURRENT_THREAD();
-   }
-
+   s_subscribeInternal(1);
 }
 
 
 HB_FUNC( NOTIFY )
 {
-   HB_THREAD_STUB
-   HB_MUTEX_STRUCT *Mutex;
-   PHB_ITEM pMutex = hb_param( 1, HB_IT_POINTER );
+   HB_MUTEX_STRUCT *Mutex = hb_parptr(1);
    PHB_ITEM pVal = hb_param( 2, HB_IT_ANY );
 
    /* Parameter error checking */
-   if( pMutex == NULL )
+   if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "NOTIFY", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "NOTIFY", 2,
+         hb_paramError(1), hb_paramError(2) );
       return;
    }
-
-   Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asPointer.value;
 
    if ( pVal == NULL )
    {
       pVal = hb_itemNew( NULL );
    }
 
-   Mutex->waiting--;
-   hb_arrayAdd( Mutex->aEventObjects, pVal );
+   HB_CRITICAL_LOCK( Mutex->mutex );
+   hb_arrayAddForward( Mutex->aEventObjects, pVal );
    HB_COND_SIGNAL( Mutex->cond );
+   HB_CRITICAL_UNLOCK( Mutex->mutex );
 }
+
 
 HB_FUNC( NOTIFYALL )
 {
-   HB_THREAD_STUB
-   HB_MUTEX_STRUCT *Mutex;
-   int iWt;
-   PHB_ITEM pMutex = hb_param( 1, HB_IT_POINTER );
+   HB_MUTEX_STRUCT *Mutex = hb_parptr(1);
    PHB_ITEM pVal = hb_param( 2, HB_IT_ANY );
+   BOOL bClear;
+   int iWt;
 
    /* Parameter error checking */
-   if( pMutex == NULL )
+   if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
-      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "NOTIFYALL", 1, pArgs );
-      hb_itemRelease( pArgs );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "NOTIFYALL", 2,
+         hb_paramError(1), hb_paramError(2) );
       return;
    }
 
-   Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asPointer.value;
-
    if ( pVal == NULL )
    {
+      bClear = TRUE;
       pVal = hb_itemNew( NULL );
    }
 
+   HB_CRITICAL_LOCK( Mutex->mutex );
    for( iWt = 0; iWt < Mutex->waiting; iWt++ )
    {
       hb_arrayAdd( Mutex->aEventObjects, pVal );
    }
+   HB_COND_SIGNAL( Mutex->cond );
+   HB_CRITICAL_UNLOCK( Mutex->mutex );
 
-   while( Mutex->waiting > 0 )
+   if ( bClear )
    {
-      Mutex->waiting --;
-      HB_COND_SIGNAL( Mutex->cond );
+      hb_itemClear( pVal );
    }
 }
 
@@ -1632,6 +1548,8 @@ HB_EXPORT void hb_threadWaitAll()
 
 
 }
+
+
 
 HB_EXPORT void hb_threadKillAll()
 {
@@ -1923,7 +1841,7 @@ void hb_threadCondSignal( HB_WINCOND_T *cond )
 
 /** Timed wait */
 
-BOOL hb_threadCondWait( HB_WINCOND_T *cond, HANDLE mutex , DWORD dwTimeout )
+BOOL hb_threadCondWait( HB_WINCOND_T *cond, CRITICAL_SECTION *mutex , DWORD dwTimeout )
 {
    HB_THREAD_STUB
 
@@ -1933,8 +1851,8 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, HANDLE mutex , DWORD dwTimeout )
    WaitForSingleObject( cond->semBlockLock, INFINITE );
    cond->nWaitersBlocked++;
    ReleaseSemaphore( cond->semBlockLock, 1, NULL );
-   
-   HB_MUTEX_UNLOCK( mutex );
+
+   LeaveCriticalSection( mutex );
 
    HB_TEST_CANCEL_ENABLE_ASYN
    if ( WaitForSingleObject( cond->semBlockQueue, dwTimeout ) != WAIT_OBJECT_0 )
@@ -1967,7 +1885,7 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, HANDLE mutex , DWORD dwTimeout )
       ReleaseSemaphore( cond->semBlockLock,1, NULL );
    }
 
-   HB_MUTEX_LOCK( mutex );
+   EnterCriticalSection( mutex );
    return !bTimeout;
 }
 #endif // win32

@@ -1,5 +1,5 @@
 /*
- * $Id: error.ch,v 1.2 2002/01/12 10:04:27 ronpinkas Exp $
+ * $Id: error.ch,v 1.3 2003/03/27 07:44:55 ronpinkas Exp $
  */
 
 /*
@@ -135,5 +135,6 @@
 #define HB_EI_XGRABNULLSIZE     9023 /* "hb_xgrab requested to allocate zero byte" */
 #define HB_EI_XREALLOCNULLSIZE  9024 /* "hb_xrealloc requested to resize to zero byte" */
 #define HB_EI_XALLOCNULLSIZE    9025 /* "hb_xalloc requested to allocate zero byte" */
+#define HB_EI_MEMCORRUPT        9026 /* "Memory corruption detected" */
 
 #endif /* _ERROR_CH */
