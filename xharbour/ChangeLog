@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.787 2003/02/28 10:01:27 mlombardo Exp $
+ * $Id: ChangeLog,v 1.788 2003/02/28 10:37:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-28 10:30 UTC+0000 Ian Anderson <i.anderson@procon-online.de>
+  * contrib/rdd_ads/adsmgmnt.c
+    + added implementation for ADSMGGETLOCKOWNER()
 
 2003-02-28 02:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexpra.c
@@ -20,7 +24,7 @@
   * source/compiler/harbour.sly
   * source/compiler/hbfix.c
   * source/vm/hvm.c
-    + Adde support for new operators HAS and LIKE.
+    + Added support for new operators HAS and LIKE.
 
     /*
       Syntax: cExp HAS  cRegEx|CompiledRegEx => bMatch
