@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2208 2004/02/03 05:00:33 maurifull Exp $
+ * $Id: ChangeLog,v 1.2209 2004/02/03 10:41:25 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-03 13:33 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    ! gtxvt now grabs (passively) the keyboard.
+      This means that it takes precedence over Window Manager
+      keyboard mapping. The net effect of this is that CTRL colors
+      works under KDE and other heavy window managers.
 
 2004-02-02 22:40 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
  * source/rtl/filesys.c

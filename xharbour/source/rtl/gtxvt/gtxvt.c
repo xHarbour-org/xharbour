@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.22 2004/01/28 16:42:19 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.23 2004/02/01 23:40:52 jonnymind Exp $
  */
 
 /*
@@ -512,6 +512,9 @@ static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
       }
    }
    s_countPoints[1] = icount;
+
+   XGrabKey( wnd->dpy, AnyKey, AnyModifier , wnd->window, True,
+      GrabModeAsync, GrabModeAsync );
 
    if ( hb_set.HB_SET_GTMODE == 1 )
    {
