@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.87 2005/03/07 02:19:45 paultucker Exp $
+ * $Id: gtwin.c,v 1.88 2005/03/08 03:36:27 paultucker Exp $
  */
 
 /*
@@ -1082,7 +1082,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
    BOOL Ret = FALSE;
    SMALL_RECT srWin;
    COORD coBuf;
-   USHORT uiDispCount = s_uiDispCount;
+   USHORT uiDispCount = s_uiDispCount, uR, uC;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", usRows, usCols));
 
@@ -1094,23 +1094,46 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       }
 
       coBuf = GetLargestConsoleWindowSize( s_HOutput );
+
+      uR = usRows;
+      uC = usCols;
+
       if ( usRows > coBuf.Y )
+      {
          usRows = coBuf.Y;
+      }
       else
+      {
          coBuf.Y = usRows;  /* Thx to Peter Rees */
+      }
 
       if ( usCols > coBuf.X )
+      {
          usCols = coBuf.X;
+      }
       else
+      {
          coBuf.X = usCols;
+      }
 
       /* new console window size and scroll position */
       srWin.Top   = srWin.Left = 0;
       srWin.Bottom = ( SHORT ) ( usRows - 1 );
       srWin.Right  = ( SHORT ) ( usCols - 1 );
 
+      if ( usRows < _GetScreenHeight() && usCols > _GetScreenWidth() )
+      {
+         // Special case
+         HB_GT_FUNC(gt_SetMode( _GetScreenHeight(), usCols ));
+      }
+      else if ( usRows > _GetScreenHeight() && usCols < _GetScreenWidth() )
+      {
+         HB_GT_FUNC(gt_SetMode( usRows, _GetScreenWidth() ));
+      }
+
       /* if the current buffer is larger than what we want, resize the */
       /* console window first, then the buffer */
+
       if( ( DWORD ) _GetScreenWidth() * _GetScreenHeight() > ( DWORD ) usCols * usRows )
       {
          if ( SetConsoleWindowInfo( s_HOutput, TRUE, &srWin ) )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3957 2005/03/17 20:23:27 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3958 2005/03/18 05:24:27 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-18 08:05 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/gtwin/gtwin.c
+    * account for the rare case when resizing the screen buffer of having
+    * new row < old row and new col > old col, (and variations),  yet the
+    * size of the new buffer required is > size of old buffer.
+    * IAE, the resizing has to be done in 2 steps.
 
 2005-03-17 21:23 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
   * include/simplex.c
