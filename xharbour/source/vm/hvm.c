@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.240 2003/07/20 17:50:03 jonnymind Exp $
+ * $Id: hvm.c,v 1.241 2003/07/20 19:43:08 jonnymind Exp $
  */
 
 /*
@@ -610,7 +610,7 @@ void HB_EXPORT hb_vmQuit( void )
 
    if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
    {
-      hb_itemClear( &(HB_VM_STACK.Return) );   
+      hb_itemClear( &(HB_VM_STACK.Return) );
    }
    //printf "After Return\n" );
 
@@ -671,7 +671,7 @@ void HB_EXPORT hb_vmQuit( void )
    // even without pItems available, up to this moment
    hb_threadCloseHandles();
 #endif
-  
+
    exit( s_byErrorLevel );
 }
 
@@ -7108,6 +7108,12 @@ void hb_vmRequestDebug( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestCancel()"));
    s_bDebugRequest = TRUE;
+}
+
+void hb_vmRequestReset( void )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestReset()"));
+   s_uiActionRequest = 0;
 }
 
 HB_FUNC( INVOKEDEBUG )
