@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
+* $Id: hbserv.c,v 1.2 2003/11/24 16:57:26 lf_sfnet Exp $
 */
 
 /*
@@ -846,14 +846,17 @@ HB_FUNC( HB_SIGNALDESC )
    {
       case SIGSEGV: switch( iSubSig )
       {
+         #ifndef HB_OS_BSD
          case SEGV_MAPERR: hb_retc( "Segmentation fault: address not mapped to object"); return;
          case SEGV_ACCERR: hb_retc( "Segmentation fault: invalid permissions for mapped object"); return;
+         #endif
          default: hb_retc("Segmentation fault"); return;
       }
       break;
 
       case SIGILL: switch( iSubSig )
       {
+         #ifndef HB_OS_BSD
          case ILL_ILLOPC: hb_retc( "Illegal operation: illegal opcode"); return;
          case ILL_ILLOPN: hb_retc( "Illegal operation: illegal operand"); return;
          case ILL_ILLADR: hb_retc( "Illegal operation: illegal addressing mode"); return;
@@ -862,6 +865,7 @@ HB_FUNC( HB_SIGNALDESC )
          case ILL_PRVREG: hb_retc( "Illegal operation: privileged register"); return;
          case ILL_COPROC: hb_retc( "Illegal operation: coprocessor error"); return;
          case ILL_BADSTK: hb_retc( "Illegal operation: internal stack error"); return;
+         #endif
          default: hb_retc( "Illegal operation" ); return;
       }
       break;

@@ -1,5 +1,5 @@
 /*
- * $Id: seconds.c,v 1.4 2003/02/16 16:00:43 likewolf Exp $
+ * $Id: seconds.c,v 1.5 2003/05/16 19:52:08 druzus Exp $
  */
 
 /*
@@ -53,11 +53,12 @@
 #include "hbapi.h"
 
 #include <time.h>
-#if defined( HB_OS_BSD)
-   #include <sys/time.h>
-   #include <sys/times.h>
-#elif defined( OS_UNIX_COMPATIBLE )
-   #include <sys/timeb.h>
+#if defined( OS_UNIX_COMPATIBLE )
+   #if defined( HB_OS_BSD)
+      #include <sys/time.h>
+   #else
+      #include <sys/timeb.h>
+   #endif
    #include <sys/times.h>
    #include <unistd.h>
 #else

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1766 2003/11/25 08:31:01 druzus Exp $
+ * $Id: ChangeLog,v 1.1767 2003/11/26 00:05:17 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-26 06:10 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/vm/fm.c
+  * source/vm/hvm.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+    * Use stdlib.h instead of malloc.h on BSD.
+    ! Some syntax errors (non-portable missing semicolons before
+      closing braces) in harbour.sly fixed.
+  * source/rtl/hbserv.c
+  * source/rtl/seconds.c
+    * Made it compile on BSD.
 
 2003-11-26 00:58 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * contrib\Whoo\env\bccWin32.Mak

@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.54 2003/10/20 18:44:41 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.55 2003/11/01 06:00:54 ronpinkas Exp $
  */
 
 /*
@@ -33,8 +33,8 @@
  * 2) Support this syntax: nPtr := @Hello()
  */
 
-#ifdef HB_OS_DARWIN
-   #include <stdlib.h>     /* There is no malloc.h in Darwin */
+#ifdef HB_OS_BSD
+   #include <stdlib.h>     /* There is no malloc.h in Darwin, and BSD complaints, too */
 #else
    #include <malloc.h>
 #endif
@@ -347,8 +347,8 @@ StrongType : AS_NUMERIC                    { hb_comp_cVarType = 'N'; }
            | AS_LOGICAL                    { hb_comp_cVarType = 'L'; }
            | AS_BLOCK                      { hb_comp_cVarType = 'B'; }
            | AS_OBJECT                     { hb_comp_cVarType = 'O'; }
-           | AS_CLASS IdentName            { hb_comp_cVarType = 'S'; hb_comp_szFromClass = $2 }
-           | AS_ENUM IdentName             { hb_comp_cVarType = 'E'; hb_comp_szFromEnum = $2 }
+           | AS_CLASS IdentName            { hb_comp_cVarType = 'S'; hb_comp_szFromClass = $2; }
+           | AS_ENUM IdentName             { hb_comp_cVarType = 'E'; hb_comp_szFromEnum = $2; }
            | AS_VARIANT                    { hb_comp_cVarType = ' '; }
 	   | AsArray
            ;
@@ -361,8 +361,8 @@ AsArray    : AS_ARRAY                      { hb_comp_cVarType = 'A'; }
            | AS_ARRAY_ARRAY                { hb_comp_cVarType = 'a'; }
            | AS_BLOCK_ARRAY                { hb_comp_cVarType = 'b'; }
            | AS_OBJECT_ARRAY               { hb_comp_cVarType = 'o'; }
-           | AS_CLASS_ARRAY IdentName      { hb_comp_cVarType = 's'; hb_comp_szFromClass = $2 }
-           | AS_ENUM_ARRAY IdentName       { hb_comp_cVarType = 'e'; hb_comp_szFromEnum = $2 }
+           | AS_CLASS_ARRAY IdentName      { hb_comp_cVarType = 's'; hb_comp_szFromClass = $2; }
+           | AS_ENUM_ARRAY IdentName       { hb_comp_cVarType = 'e'; hb_comp_szFromEnum = $2; }
            ;
 
 ParamList  : IdentName AsType                { hb_compVariableAdd( $1, hb_comp_cVarType ); $$ = 1; }
@@ -719,7 +719,7 @@ MacroText   : MACROTEXT {
                               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_SYNTAX, sToken, NULL );
                            }
 
-                           $$ = hb_compExprNewMacro( hb_compExprNewList( pPlus ), 0, NULL )
+                           $$ = hb_compExprNewMacro( hb_compExprNewList( pPlus ), 0, NULL );
                          }
             ;
 
@@ -976,7 +976,7 @@ SimpleExpression :
            | CodeBlock                        { $$ = $1; }
            | Logical                          { $$ = $1; }
            | SelfValue                        { $$ = $1; }
-           | SelfValue    {hb_comp_cVarType = ' '} StrongType { $$ = $1; }
+           | SelfValue    {hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
            | Array                            { $$ = $1; }
            | ArrayAt                          { $$ = $1; }
            | AliasVar                         { $$ = $1; }
@@ -984,15 +984,15 @@ SimpleExpression :
            | MacroExpr                        { $$ = $1; }
            | VariableAt                       { $$ = $1; }
            | FunCall                          { $$ = $1; }
-           | FunCall      {hb_comp_cVarType = ' '} StrongType { $$ = $1; }
+           | FunCall      {hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
            | ObjectData                       { $$ = $1; }
-           | ObjectData   {hb_comp_cVarType = ' '} StrongType { $$ = $1; }
+           | ObjectData   {hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
            | ObjectMethod                     { $$ = $1; }
-           | ObjectMethod {hb_comp_cVarType = ' '} StrongType { $$ = $1; }
+           | ObjectMethod {hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
            | WithData                         { $$ = $1; }
-           | WithData                         {hb_comp_cVarType = ' '} StrongType { $$ = $1; }
+           | WithData                         {hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
            | WithMethod                       { $$ = $1; }
-           | WithMethod   {hb_comp_cVarType = ' '} StrongType { $$ = $1; }
+           | WithMethod   {hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
            | AliasExpr                        { $$ = $1; }
            | ExprAssign                       { $$ = $1; }
            | ExprOperEq                       { $$ = $1; }
@@ -1443,7 +1443,7 @@ GetAExt   : { /* Nothing*/ }
 	  | ',' GetArgList
 	  ;
 
-CodeBlock  : '{' '|' { s_bBlock = TRUE; $<asExpr>$ = hb_compExprNewCodeBlock() } BlockNoVar '|' BlockExpList '}'
+CodeBlock  : '{' '|' { s_bBlock = TRUE; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockNoVar '|' BlockExpList '}'
                      {
                        if( s_bBlockMacro )
 		       {

@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.44 2003/08/27 19:49:16 ronpinkas Exp $
+ * $Id: fm.c,v 1.45 2003/10/20 02:39:29 jonnymind Exp $
  */
 
 /*
@@ -89,8 +89,8 @@
 #define INCL_DOSPROCESS
 
 #ifndef __MPW__
-   #ifdef HB_OS_DARWIN
-      #include <stdlib.h>     /* There is no malloc.h in Darwin */
+   #ifdef HB_OS_BSD
+      #include <stdlib.h>     /* There is no malloc.h in Darwin, and BSD complaints, too */
    #else
       #include <malloc.h>
    #endif
