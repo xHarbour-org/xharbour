@@ -1,5 +1,5 @@
 /*
- * $Id: 1class.prg,v 1.1 2002/10/16 22:49:30 fsgiudice Exp $
+ * $Id: 1class.prg,v 1.2 2002/10/16 22:53:44 fsgiudice Exp $
  */
 
 //#include "windows.ch"
@@ -18,7 +18,7 @@ CLASS FirstClass
    DATA data_protected PROTECTED
    DATA data_hidden    HIDDEN
    DATA data_exported
-   DATA data_RO
+   DATA data_RO        READONLY
 
    METHOD New()    CONSTRUCTOR
    METHOD Modify()
@@ -42,6 +42,7 @@ METHOD Modify()
 RETURN Self
 
 METHOD Print()
+   ? "ClassName      = ", ::ClassName      ; view ::ClassName
    ? "data_published = ", ::data_published ; view ::data_published
    ? "data_protected = ", ::data_protected ; view ::data_protected
    ? "data_hidden    = ", ::data_hidden    ; view ::data_hidden
