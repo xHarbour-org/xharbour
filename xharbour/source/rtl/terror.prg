@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.11 2003/06/26 01:29:15 ronpinkas Exp $
+ * $Id: terror.prg,v 1.12 2004/01/27 03:06:59 ronpinkas Exp $
  */
 
 /*
@@ -63,6 +63,8 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args, ModuleName 
 
    STATIC lInErr := .F., s_oClass
    LOCAL oErr
+
+   //TraceLog( SubSystem, SubCode, Operation, Description, Args, ModuleName )
 
    // Avoid RECURSIVE Errors.
    IF lInErr

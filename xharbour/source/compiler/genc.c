@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.76 2004/05/30 20:44:10 ronpinkas Exp $
+ * $Id: genc.c,v 1.77 2004/06/29 22:14:12 ronpinkas Exp $
  */
 
 /*
@@ -3113,6 +3113,15 @@ static HB_GENC_FUNC( hb_p_largeframe )
    return 4;
 }
 
+static HB_GENC_FUNC( hb_p_pushwith )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_PUSHWITH,\n" );
+   return 1;
+}
+
 /* NOTE: The order of functions has to match the order of opcodes
  *       mnemonics
  */
@@ -3276,7 +3285,8 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_bitxor,
    hb_p_bitshiftr,
    hb_p_bitshiftl,
-   hb_p_largeframe
+   hb_p_largeframe,
+   hb_p_pushwith
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

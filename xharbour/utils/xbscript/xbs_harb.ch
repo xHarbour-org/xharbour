@@ -290,10 +290,12 @@
 
   //----------------------------------------------------------------------------//
   #ifdef __XHARBOUR__
-     EXIT PROCEDURE PP_Cleanup()
-        //TraceLog( "Exit" )
-        PP_ReleaseDynProcedures( 0 )
-     RETURN
+     #ifdef DYN
+        EXIT PROCEDURE PP_Cleanup()
+           //TraceLog( "Exit" )
+           PP_ReleaseDynProcedures( 0 )
+        RETURN
+     #endif
    #endif
 
   //----------------------------------------------------------------------------//
@@ -2495,225 +2497,226 @@
 
   //----------------------------------------------------------------------------//
 
-  #pragma BEGINDUMP
+  #ifdef DYN
+     #pragma BEGINDUMP
 
-    #ifdef __XHARBOUR__
-       #ifdef AX
-          #include <windows.h>
-       #endif
+       #ifdef __XHARBOUR__
+          #ifdef AX
+             #include <windows.h>
+          #endif
 
-       #include "hbpcode.h"
+          #include "hbpcode.h"
 
-       typedef union
-       {
-          BYTE *   pAsmData;                           /* The assembler bytes      */
-          PHB_FUNC pFunPtr;                            /* The (dynamic) harbour
-                                                          function                 */
-       } ASM_CALL, * PASM_CALL;
-
-       typedef struct
-       {
-          int iID;
-          PASM_CALL pDynFunc;
-          BYTE *pcode;
-          PHB_DYNS pDynSym;
-          PHB_FUNC pPresetFunc;
-       } DYN_PROC;
-
-       HB_EXTERN_BEGIN
-       extern PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Create a dynamic function*/
-       HB_EXTERN_END
-
-       static DYN_PROC *s_pDynList;
-       static int s_iDyn = 0;
-
-       //---------------------------------------------------------------------------//
-       HB_FUNC_STATIC( PP_GENDYNPROCEDURES )
-       {
-          PHB_ITEM pProcedures = hb_param( 1, HB_IT_ARRAY );
-          static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1;
-          int iProcedures, iProcedure, iBase = s_iDyn;
-
-          PASM_CALL pDynFunc;
-          PHB_DYNS pDynSym;
-          DYN_PROC *pDynList;
-
-          if( pProcedures )
+          typedef union
           {
-             iProcedures = (int) pProcedures->item.asArray.value->ulLen;
-          }
-          else
+             BYTE *   pAsmData;                           /* The assembler bytes      */
+             PHB_FUNC pFunPtr;                            /* The (dynamic) harbour
+                                                             function                 */
+          } ASM_CALL, * PASM_CALL;
+
+          typedef struct
           {
-             iProcedures = 0;
-          }
+             int iID;
+             PASM_CALL pDynFunc;
+             BYTE *pcode;
+             PHB_DYNS pDynSym;
+             PHB_FUNC pPresetFunc;
+          } DYN_PROC;
 
-          if( iProcedures == 0 )
+          HB_EXTERN_BEGIN
+          extern PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Create a dynamic function*/
+          HB_EXTERN_END
+
+          static DYN_PROC *s_pDynList;
+          static int s_iDyn = 0;
+
+          //---------------------------------------------------------------------------//
+          HB_FUNC_STATIC( PP_GENDYNPROCEDURES )
           {
-             TraceLog( NULL, "*** EMPTY *** PP_GENDYNPROCEDURES()\n" );
-          }
+             PHB_ITEM pProcedures = hb_param( 1, HB_IT_ARRAY );
+             static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1;
+             int iProcedures, iProcedure, iBase = s_iDyn;
 
-          //TraceLog( NULL, "PP_GenDynProcedures() %i %i\n", iBase, iProcedures );
+             PASM_CALL pDynFunc;
+             PHB_DYNS pDynSym;
+             DYN_PROC *pDynList;
 
-          if( s_iDyn )
-          {
-             pDynList = (DYN_PROC *) hb_xrealloc( s_pDynList, sizeof( DYN_PROC ) * ( iBase + iProcedures ) );
-          }
-          else
-          {
-             pDynList = (DYN_PROC *) hb_xgrab( sizeof( DYN_PROC ) * iProcedures );
-          }
-
-          for( iProcedure = 0; iProcedure < iProcedures; iProcedure++ )
-          {
-             char *sFunctionName = hb_arrayGetCPtr( pProcedures->item.asArray.value->pItems + iProcedure, 1 );
-
-             BYTE *pcode = (BYTE *) hb_xgrab( 31 );
-
-             #ifdef AX
-                TraceLog( NULL, "PP_GENDYNPROCEDURE: '%s' #%i\n", sFunctionName, iProcedure );
-             #endif
-
-             pcode[ 0] = HB_P_SFRAME;
-             pcode[ 1] = HB_LOBYTE( iLastSym );
-             pcode[ 2] = HB_HIBYTE( iLastSym );
-
-             pcode[ 3] = HB_P_PUSHNIL;
-
-             pcode[ 4] = HB_P_POPSTATIC;
-             pcode[ 5] = 28;
-             pcode[ 6] = 0;                 /* S_XRET */
-
-             pcode[ 7] = HB_P_PUSHSYMNEAR;
-             pcode[ 8] = 30;               /* HB_APARAMS */
-
-             pcode[ 9] = HB_P_PUSHNIL;
-
-             pcode[10] = HB_P_FUNCTIONSHORT;
-             pcode[11] =  0;
-
-             pcode[12] = HB_P_POPSTATIC;
-             pcode[13] = 36;
-             pcode[14] = 0;                /* S_APARAMS */
-
-             pcode[15] = HB_P_PUSHSYMNEAR;
-             pcode[16] = 32;               /* PP_EXECPROCEDURE */
-
-             pcode[17] = HB_P_PUSHNIL;
-
-             pcode[18] = HB_P_PUSHSTATIC;
-             pcode[19] = 27;
-             pcode[20] = 0;                 /* S_APROCEDURES */
-
-             pcode[21] = HB_P_PUSHINT;
-             pcode[22] = HB_LOBYTE( iProcedure + 1 );
-             pcode[23] = HB_HIBYTE( iProcedure + 1 );
-
-             pcode[24] =  HB_P_DOSHORT;
-             pcode[25] =  2;
-
-             pcode[26] = HB_P_PUSHSTATIC;
-             pcode[27] = 28;
-             pcode[28] = 0;                 /* S_XRET */
-
-             pcode[29] =  HB_P_RETVALUE;
-
-             pcode[30] = HB_P_ENDPROC;
-
-             pDynFunc = hb_hrbAsmCreateFun( symbols, pcode );
-
-             pDynSym = hb_dynsymGet( sFunctionName );
-
-             pDynList[ iBase + iProcedure ].iID         = iProcedure;
-             pDynList[ iBase + iProcedure ].pDynFunc    = pDynFunc;
-             pDynList[ iBase + iProcedure ].pcode       = pcode;
-             pDynList[ iBase + iProcedure ].pDynSym     = pDynSym;
-             pDynList[ iBase + iProcedure ].pPresetFunc = pDynSym->pSymbol->value.pFunPtr;
-
-             pDynSym->pSymbol->value.pFunPtr = pDynFunc->pFunPtr;
-          }
-
-          //hb_retptr( (void *) pDynList );
-          hb_retnl( iBase );
-
-          s_pDynList = pDynList;
-          s_iDyn += iProcedures;
-
-          //TraceLog( NULL, "Base: %i, New: %i\n", iBase, s_iDyn );
-       }
-
-       //---------------------------------------------------------------------------//
-       HB_FUNC_STATIC( PP_RELEASEDYNPROCEDURES )
-       {
-          int i, iProcedures, iBase;
-          DYN_PROC *pDynList;
-
-          PHB_ITEM pProcedures = hb_param( 1, HB_IT_ARRAY );
-          PHB_ITEM pDynProcs = hb_param( 2, HB_IT_POINTER );
-
-          if( pProcedures && pDynProcs )
-          {
-             iProcedures = pProcedures->item.asArray.value->ulLen;
-             pDynList = (DYN_PROC *) pDynProcs->item.asPointer.value;
-             iBase = 0;
-          }
-          else
-          {
-             iProcedures = s_iDyn;
-             pDynList = s_pDynList;
-             iBase = hb_parnl( 1 );
-          }
-
-          if( iProcedures == iBase )
-          {
-             return;
-          }
-
-          for( i = iProcedures - 1; i >= iBase; i-- )
-          {
-             #ifdef AX
-                TraceLog( NULL, "Release #%i ID: %i, Dyn: '%s' %p, %p, %p\n", i, pDynList[i].iID, pDynList[i].pDynSym->pSymbol->szName,
-                                pDynList[i].pDynFunc,
-                                pDynList[i].pcode,
-                                pDynList[i].pDynSym->pSymbol->value.pFunPtr );
-             #endif
-
-             if( pDynList[i].pDynSym->pSymbol->value.pFunPtr == pDynList[i].pDynFunc->pFunPtr )
+             if( pProcedures )
              {
-                pDynList[i].pDynSym->pSymbol->value.pFunPtr = pDynList[i].pPresetFunc ;
+                iProcedures = (int) pProcedures->item.asArray.value->ulLen;
              }
              else
              {
-                TraceLog( NULL, "*** FUNCTION MISMATCH ***\n" );
+                iProcedures = 0;
              }
 
-             hb_xfree( (void *) ( pDynList[i].pDynFunc->pFunPtr ) );
-             hb_xfree( (void *) ( pDynList[i].pDynFunc ) );
-             hb_xfree( (void *) ( pDynList[i].pcode ) );
-          }
+             if( iProcedures == 0 )
+             {
+                TraceLog( NULL, "*** EMPTY *** PP_GENDYNPROCEDURES()\n" );
+             }
 
-          if( iBase )
-          {
-             pDynList = (DYN_PROC *) hb_xrealloc( (void *) pDynList, sizeof( DYN_PROC ) * iBase );
-          }
-          else
-          {
-             hb_xfree( (void *) pDynList );
-          }
+             //TraceLog( NULL, "PP_GenDynProcedures() %i %i\n", iBase, iProcedures );
 
-          if( ! ( pProcedures && pDynProcs ) )
-          {
+             if( s_iDyn )
+             {
+                pDynList = (DYN_PROC *) hb_xrealloc( s_pDynList, sizeof( DYN_PROC ) * ( iBase + iProcedures ) );
+             }
+             else
+             {
+                pDynList = (DYN_PROC *) hb_xgrab( sizeof( DYN_PROC ) * iProcedures );
+             }
+
+             for( iProcedure = 0; iProcedure < iProcedures; iProcedure++ )
+             {
+                char *sFunctionName = hb_arrayGetCPtr( pProcedures->item.asArray.value->pItems + iProcedure, 1 );
+
+                BYTE *pcode = (BYTE *) hb_xgrab( 31 );
+
+                #ifdef AX
+                   TraceLog( NULL, "PP_GENDYNPROCEDURE: '%s' #%i\n", sFunctionName, iProcedure );
+                #endif
+
+                pcode[ 0] = HB_P_SFRAME;
+                pcode[ 1] = HB_LOBYTE( iLastSym );
+                pcode[ 2] = HB_HIBYTE( iLastSym );
+
+                pcode[ 3] = HB_P_PUSHNIL;
+
+                pcode[ 4] = HB_P_POPSTATIC;
+                pcode[ 5] = 28;
+                pcode[ 6] = 0;                 /* S_XRET */
+
+                pcode[ 7] = HB_P_PUSHSYMNEAR;
+                pcode[ 8] = 30;               /* HB_APARAMS */
+
+                pcode[ 9] = HB_P_PUSHNIL;
+
+                pcode[10] = HB_P_FUNCTIONSHORT;
+                pcode[11] =  0;
+
+                pcode[12] = HB_P_POPSTATIC;
+                pcode[13] = 36;
+                pcode[14] = 0;                /* S_APARAMS */
+
+                pcode[15] = HB_P_PUSHSYMNEAR;
+                pcode[16] = 32;               /* PP_EXECPROCEDURE */
+
+                pcode[17] = HB_P_PUSHNIL;
+
+                pcode[18] = HB_P_PUSHSTATIC;
+                pcode[19] = 27;
+                pcode[20] = 0;                 /* S_APROCEDURES */
+
+                pcode[21] = HB_P_PUSHINT;
+                pcode[22] = HB_LOBYTE( iProcedure + 1 );
+                pcode[23] = HB_HIBYTE( iProcedure + 1 );
+
+                pcode[24] =  HB_P_DOSHORT;
+                pcode[25] =  2;
+
+                pcode[26] = HB_P_PUSHSTATIC;
+                pcode[27] = 28;
+                pcode[28] = 0;                 /* S_XRET */
+
+                pcode[29] =  HB_P_RETVALUE;
+
+                pcode[30] = HB_P_ENDPROC;
+
+                pDynFunc = hb_hrbAsmCreateFun( symbols, pcode );
+
+                pDynSym = hb_dynsymGet( sFunctionName );
+
+                pDynList[ iBase + iProcedure ].iID         = iProcedure;
+                pDynList[ iBase + iProcedure ].pDynFunc    = pDynFunc;
+                pDynList[ iBase + iProcedure ].pcode       = pcode;
+                pDynList[ iBase + iProcedure ].pDynSym     = pDynSym;
+                pDynList[ iBase + iProcedure ].pPresetFunc = pDynSym->pSymbol->value.pFunPtr;
+
+                pDynSym->pSymbol->value.pFunPtr = pDynFunc->pFunPtr;
+             }
+
+             //hb_retptr( (void *) pDynList );
+             hb_retnl( iBase );
+
              s_pDynList = pDynList;
-             s_iDyn = iBase;
+             s_iDyn += iProcedures;
+
+             //TraceLog( NULL, "Base: %i, New: %i\n", iBase, s_iDyn );
           }
 
-          //TraceLog( NULL, "s_iDyn: %i\n", s_iDyn );
-       }
-       //---------------------------------------------------------------------------//
+          //---------------------------------------------------------------------------//
+          HB_FUNC_STATIC( PP_RELEASEDYNPROCEDURES )
+          {
+             int i, iProcedures, iBase;
+             DYN_PROC *pDynList;
 
-    #endif
+             PHB_ITEM pProcedures = hb_param( 1, HB_IT_ARRAY );
+             PHB_ITEM pDynProcs = hb_param( 2, HB_IT_POINTER );
 
-  #pragma ENDDUMP
+             if( pProcedures && pDynProcs )
+             {
+                iProcedures = pProcedures->item.asArray.value->ulLen;
+                pDynList = (DYN_PROC *) pDynProcs->item.asPointer.value;
+                iBase = 0;
+             }
+             else
+             {
+                iProcedures = s_iDyn;
+                pDynList = s_pDynList;
+                iBase = hb_parnl( 1 );
+             }
 
+             if( iProcedures == iBase )
+             {
+                return;
+             }
+
+             for( i = iProcedures - 1; i >= iBase; i-- )
+             {
+                #ifdef AX
+                   TraceLog( NULL, "Release #%i ID: %i, Dyn: '%s' %p, %p, %p\n", i, pDynList[i].iID, pDynList[i].pDynSym->pSymbol->szName,
+                                   pDynList[i].pDynFunc,
+                                   pDynList[i].pcode,
+                                   pDynList[i].pDynSym->pSymbol->value.pFunPtr );
+                #endif
+
+                if( pDynList[i].pDynSym->pSymbol->value.pFunPtr == pDynList[i].pDynFunc->pFunPtr )
+                {
+                   pDynList[i].pDynSym->pSymbol->value.pFunPtr = pDynList[i].pPresetFunc ;
+                }
+                else
+                {
+                   TraceLog( NULL, "*** FUNCTION MISMATCH ***\n" );
+                }
+
+                hb_xfree( (void *) ( pDynList[i].pDynFunc->pFunPtr ) );
+                hb_xfree( (void *) ( pDynList[i].pDynFunc ) );
+                hb_xfree( (void *) ( pDynList[i].pcode ) );
+             }
+
+             if( iBase )
+             {
+                pDynList = (DYN_PROC *) hb_xrealloc( (void *) pDynList, sizeof( DYN_PROC ) * iBase );
+             }
+             else
+             {
+                hb_xfree( (void *) pDynList );
+             }
+
+             if( ! ( pProcedures && pDynProcs ) )
+             {
+                s_pDynList = pDynList;
+                s_iDyn = iBase;
+             }
+
+             //TraceLog( NULL, "s_iDyn: %i\n", s_iDyn );
+          }
+          //---------------------------------------------------------------------------//
+
+       #endif
+
+     #pragma ENDDUMP
+  #endif
   //---------------------------------------------------------------------------//
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.30 2004/05/08 04:25:13 ronpinkas Exp $
+ * $Id: hbpcode.c,v 1.31 2004/05/30 20:44:11 ronpinkas Exp $
  */
 
 /*
@@ -209,7 +209,8 @@ static char *pCodeList[] =
     "HB_P_BITSHIFTR",             /* 155 */
     "HB_P_BITSHIFTL",             /* 156 */
     "HB_P_LARGEFRAME",            /* 157 */
-    "HB_P_LAST_PCODE"             /* 158 this defines the number of defined pcodes */
+    "HB_P_PUSHWITH",              /* 158 pushes QWith for the current procedure/method */
+    "HB_P_LAST_PCODE"             /* 159 this defines the number of defined pcodes */
 };
 
 static BYTE s_pcode_len[] = {
@@ -372,7 +373,8 @@ static BYTE s_pcode_len[] = {
    1,        /* HB_P_BITXOR,               */
    1,        /* HB_P_BITSHIFTR,            */
    1,        /* HB_P_BITSHIFTL,            */
-   4         /* HB_P_LARGEFRAME            */
+   4,        /* HB_P_LARGEFRAME            */
+   1         /* HB_P_PUSHWITH,             */
 };
 
 extern BOOL hb_comp_iGenVarList;
@@ -2091,6 +2093,12 @@ void hb_compStrongType( int iSize )
        pFunc->pStack[ pFunc->iStackIndex++ ] = 'O';
 
        /* Todo find Self's Class. */
+       break;
+
+     case HB_P_PUSHWITH :
+       pFunc->pStack[ pFunc->iStackIndex++ ] = 'O';
+
+       /* Todo find With's Class. */
        break;
 
    #if 0

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrandom.c,v 1.11 2004/03/30 22:47:23 druzus Exp $
+ * $Id: hbrandom.c,v 1.12 2004/05/24 10:31:44 jonnymind Exp $
  */
 
 /*
@@ -184,7 +184,7 @@ HB_FUNC( HB_RANDOMSEED )
 }
 
 /* Returns a double value between 0 and 1 */
-double hb_random_num()
+HB_EXPORT double hb_random_num()
 {
    double d1, d2;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.81 2004/06/16 00:07:27 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.82 2004/06/29 22:14:11 ronpinkas Exp $
  */
 
 /*
@@ -1975,8 +1975,17 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
                    break;
                }
+               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_QWITH" ) == 0 )
+               {
+                   HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
+
+                   break;
+               }
                else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_SETWITH" ) == 0 )
                {
+                   // Push the current Object if any as the RETURN Value.
+                   HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
+
                    if( usCount )
                    {
                       HB_EXPR_USE( pSelf->value.asFunCall.pParms->value.asList.pExprList, HB_EA_PUSH_PCODE );
@@ -2064,18 +2073,39 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                --usCount;
             }
 
-         #if defined( HB_MACRO_SUPPORT )
-
-            /* This optimization is not applicable in Macro Compiler. */
-
-         #else
-
             if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME )
             {
-               if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "AT" ) == 0 ||
-                   strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "LEFT" ) == 0 ||
-                   strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGHT" ) == 0 ||
-                   strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBSTR" ) == 0 )
+               if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_ENUMINDEX" ) == 0 ||
+                   strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_QWITH" ) == 0 )
+               {
+                  #if ! defined( HB_MACRO_SUPPORT )
+                     hb_compWarnMeaningless( pSelf );
+                  #endif
+
+                  break;
+               }
+               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_SETWITH" ) == 0 )
+               {
+                   if( usCount )
+                   {
+                      HB_EXPR_USE( pSelf->value.asFunCall.pParms->value.asList.pExprList, HB_EA_PUSH_PCODE );
+                      HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_WITHOBJECT );
+                   }
+                   else
+                   {
+                      HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ENDWITHOBJECT );
+                   }
+
+                   break;
+               }
+
+            #if defined( HB_MACRO_SUPPORT )
+                  /* This optimization is not applicable in Macro Compiler. */
+            #else
+               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "AT" ) == 0 ||
+                        strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "LEFT" ) == 0 ||
+                        strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGHT" ) == 0 ||
+                        strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBSTR" ) == 0 )
                {
                   /* Functions with no side effect as statements! Nothing to do really!
                   */
@@ -2093,23 +2123,8 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      break;
                   }
                }
-               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_SETWITH" ) == 0 )
-               {
-                   if( usCount )
-                   {
-                      HB_EXPR_USE( pSelf->value.asFunCall.pParms->value.asList.pExprList, HB_EA_PUSH_PCODE );
-                      HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_WITHOBJECT );
-                   }
-                   else
-                   {
-                      HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ENDWITHOBJECT );
-                   }
-
-                   break;
-               }
+            #endif
             }
-
-         #endif
 
             HB_EXPR_USE( pSelf->value.asFunCall.pFunName, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );

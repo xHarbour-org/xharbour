@@ -45,7 +45,7 @@
 #COMMAND _HB_MEMBER <x> =>
 
 #XTRANSLATE QSelf() => PP_Qself()
-#XTRANSLATE AddMethod( <MethodName>, @<!FunName!>(), <n>, <l> ) => AddInLine( <MethodName>, {|Self,p1,p2,p3,p4,p5,p6,p7,p8,p9| PP_QSelf(Self), PP_ExecMethod( <"FunName">, p1,p2,p3,p4,p5,p6,p7,p8,p9 ) }, <n>, <l> )
+#XTRANSLATE AddMethod( <MethodName>, @<!FunName!>(), <n>, <l> ) => AddInLine( <MethodName>, {|Self,p1,p2,p3,p4,p5,p6,p7,p8,p9| Eval( {|s| HB_SetWith( PP_QSelf(s) ) }, Self ), PP_ExecMethod( <"FunName">, p1,p2,p3,p4,p5,p6,p7,p8,p9 ), Eval( {|| PP_QSelf( HB_SetWith() ) } ) }, <n>, <l> )
 #TRANSLATE :: => Self:
 
 #COMMAND MEMVAR [<x,...>] =>

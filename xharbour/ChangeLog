@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3133 2004/07/02 13:00:32 paultucker Exp $
+ * $Id: ChangeLog,v 1.3134 2004/07/02 13:12:32 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,43 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-02 20:33 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbpcode.h
+  * source/compiler/hbpcode.c
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/vm/hvm.c
+    + Added new HB_P_PUSHWITH
+
+  * include/hbexprb.c
+  * source/compiler/exproptb.c
+    ! Fixed optimization of HB_SetWith() in HB_EA_PUSH_PCODE to push the preset WITH Object using new HB_P_PUSHWITH
+
+  * source/vm/hvm.c
+    - Removed no longer needed HB_FUNC( HB_QWITH )
+
+  * source/vm/classes.c
+    ! Fixed Error handling in __CLSINSTSUPER() to pass the Class Name argument
+
+  * tests/with.prg
+    + Added sample to demonstrate usage of HB_SetWith() and HB_QWith() (also from macros).
+
+  * source/rtl/hbrandom.c
+    + Added missing HB_EXPORT to hb_random_num()
+
+  * utils/xbscript/rp_run.src
+    * Corrected rule of AddMethod() translation to save/restore preset SELF Object.
+
+  * utils/xbscript/xbs_harb.ch
+  * utils/xbscript/xbscript.prg
+    ! Rewrote support for "private" STATIC variables which was badly broken.
+    ! Fixed bad typo in PP_LocalParams()
+    * Guarded dynamic procedures related code with an #ifdef DYN
+    * More __MVPut() and __MVGet() instead of macros guarded with #ifdef __HARBOUR__
+
+  * source/rtl/terror.prg
+    * Added commented TraceLog()
 
 2004-07-02 09:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.vc

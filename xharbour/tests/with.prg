@@ -1,8 +1,9 @@
 Procedure Main()
 
-   LOCAL cVar := "Hello", cVar2 := "World", GetList := {}, Counter
+   LOCAL cVar := "Hello", cVar2 := "World", Counter
    LOCAL cName, cName2, cVal, cVal2
    LOCAL cMAcro
+   MEMVAR GetList
 
    CLS
 
@@ -26,8 +27,8 @@ Procedure Main()
 
    ? cName, cVal
    ? cName2, cVal2
-
    ?
+
    ? "MACROS"
    ?
 
@@ -56,6 +57,20 @@ Procedure Main()
 
    ? cName, cVal
    ? cName2, cVal2
+   ?
+
+   ? "HB_SetWith() and HB_QWith()"
+   HB_SetWith( GetList[1] )
+     ? HB_QWith():Name
+     ? &cMacro
+   HB_SetWith( NIL )
+   ?
+
+   ? "HB_SetWith() and HB_QWith() in MACROs"
+   Eval( &( "{|| HB_SETWITH( GetList[1] ) }" ) )
+     ? HB_QWith():Name
+     ? &cMacro
+   Eval( &( "{|| HB_SetWith( NIL ) }" ) )
 
 Return
 

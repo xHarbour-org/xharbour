@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.122 2004/05/28 22:20:21 ronpinkas Exp $
+ * $Id: classes.c,v 1.123 2004/07/01 23:26:26 ronpinkas Exp $
  */
 
 /*
@@ -2638,12 +2638,11 @@ HB_FUNC( __CLSINSTSUPER )
 
    if( hb_pcount() >= 1 )
    {
-
-      char *cString = hb_parcx( 1 );
+      char *szString = hb_parcx( 1 );
       PHB_DYNS pDynSym;
 
       hb_dynsymLock();
-      pDynSym = hb_dynsymFind( cString );
+      pDynSym = hb_dynsymFind( szString );
 
       if( pDynSym )                             /* Find function            */
       {
@@ -2659,7 +2658,7 @@ HB_FUNC( __CLSINSTSUPER )
          {
             for( uiClass = 0; ! bFound && uiClass < s_uiClasses; uiClass++ )
             {                                      /* Locate the entry         */
-               if( hb_stricmp( cString , s_pClasses[ uiClass ].szName ) == 0 )
+               if( hb_stricmp( szString , s_pClasses[ uiClass ].szName ) == 0 )
                {
                   hb_retni( uiClass + 1 );               /* Entry + 1 = hb___msgClsH    */
                   bFound = TRUE;
@@ -2669,7 +2668,8 @@ HB_FUNC( __CLSINSTSUPER )
          else
          {
             hb_dynsymUnlock();
-            hb_errRT_BASE( EG_ARG, 3002, "Super class does not return an object", "__CLSINSTSUPER", 0 );
+
+            hb_errRT_BASE( EG_ARG, 3002, "Super class does not return an object", "__CLSINSTSUPER", 1, hb_param(1, HB_IT_ANY ) );
          }
       }
       else

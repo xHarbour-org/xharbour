@@ -88,7 +88,6 @@
 
       EXTERN CreateObject
       EXTERN GetActiveObject
-      EXTERN HB_QWith
 
       #ifdef SQL
          REQUEST SQLRDD
@@ -398,10 +397,10 @@ STATIC s_sFile := "", s_sIncludeFile
 STATIC s_nRow, s_nCol
 
 STATIC s_nProcId := 0, s_aProcedures := {}, s_xRet, s_nIfLevel := 0, ;
-       s_aProcStack := {}, s_nProcStack := 0
+       s_aProcStack := {}, s_nProcStack := 0, s_aProc
 
 STATIC s_asPrivates := {}, s_asPublics := {}, s_asLocals := {}, ;
-       s_asStatics := {}, s_aParams := {}
+       s_aStatics, s_aParams := {}
 
 STATIC s_sModule := "", s_aInitExit := { {}, {} }
 
@@ -748,6 +747,7 @@ PROCEDURE PP_Break( xVal )
 
 RETURN
 
+//--------------------------------------------------------------//
 
 FUNCTION PP_ExecMethod( sProcName, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
 
@@ -757,11 +757,13 @@ FUNCTION PP_ExecMethod( sProcName, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
 
    sProc := s_sModule + sProcName
    nProc := aScan( s_aProcedures, {|aProc| aProc[1] == sProc } )
+
    IF nProc == 0
       sProc := sProcName
       nProc := aScan( s_aProcedures, {|aProc| aProc[1] == sProc } )
    ENDIF
 
+   s_aParams := HB_aParams()
    #ifdef __XHARBOUR__
       s_aParams := HB_aParams()
       aDel( s_aParams, 1, .T. )
@@ -837,6 +839,10 @@ FUNCTION PP_ExecMethod( sProcName, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
 
    IF nProc > 0
       s_xRet := NIL
+      //? p1, p2, p3, p3, p4, p5, p6, p7, p8, p9
+      //? "METHOD:", sProcName, s_aParams[1], s_aParams[2], s_aParams[3]
+      //TraceLog()
+      //Inkey(0)
       PP_ExecProcedure( s_aProcedures, nProc )
    ELSE
       Eval( ErrorBlock(), ErrorNew( [PP], 1004, sProcName, [Missing Method: ], s_aParams ) )
@@ -848,17 +854,35 @@ RETURN s_xRet
 
 FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
-   LOCAL aProc := aProcedures[nProc]
-   LOCAL nBlock, nBlocks := Len( aProc[2] ), xErr
+   LOCAL nBlock, nBlocks, xErr
    LOCAL nVar, nVars
    LOCAL anRecover := {}, acRecover := {}, aSequence := {}, lRecover := .F.
    LOCAL bErrHandler
    LOCAL aBlocks, aCode, OpCode
    LOCAL nForEachIndex := s_nForEachIndex
+   LOCAL aProc := aProcedures[nProc]
+   LOCAL aPresetProc := s_aProc
 
-   //TraceLog( aProcedures[nProc][1] )
+   s_aProc := aProc
+   nBlocks := Len( aProc[2] )
+
+   //TraceLog( "DOING: " + aProc[1] )
 
    IF s_nProcStack > 0
+      /* Saving and Releasing Statics of upper level. */
+      IF s_aStatics != NIL
+         nVars := Len( s_aStatics )
+
+         FOR nVar := 1 TO nVars
+            s_aStatics[nVar][2] := M->&( s_aStatics[nVar][1] )
+            __MXRelease( s_aStatics[nVar][1] )
+            //Alert( [Released upper static: ] + s_aStatics[nVar][1] + [ in ] + s_aProcStack[s_nProcStack][1] )
+            //TraceLog( [Saved and Released upper static: ] + s_aStatics[nVar][1] + [ in ] + aProc[1], s_aStatics[nVar][2] )
+         NEXT
+
+         s_aStatics := NIL
+      ENDIF
+
       /* Saving Privates of upper level. */
       nVars := Len( s_asPrivates )
       aAdd( s_aProcStack[s_nProcStack], Array( nVars, 2 ) )
@@ -882,12 +906,35 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
       FOR nVar := 1 TO nVars
          s_aProcStack[s_nProcStack][4][nVar][1] := s_asLocals[nVar]
-         s_aProcStack[s_nProcStack][4][nVar][2] := &( s_asLocals[nVar] )
+         #ifdef __HARBOUR__
+            s_aProcStack[s_nProcStack][4][nVar][2] := __MVGet( s_asLocals[nVar] )
+         #else
+            s_aProcStack[s_nProcStack][4][nVar][2] := &( s_asLocals[nVar] )
+         #endif
          __MXRelease( s_asLocals[nVar] )
-         //Alert( [Released upper local: ] + s_asLocals[nVar] + [ in ] + s_aProcStack[s_nProcStack][1] )
+         //Alert( [Released upper local: ] + s_asLocals[nVar] + [ in ] + aProc[1] )
+         //TraceLog( [Released upper local: ] + s_asLocals[nVar] + [ in ] + aProc[1] )
       NEXT
 
       aSize( s_asLocals, 0 )
+   ENDIF
+
+   /* Reinstating Current Statics if any. */
+   IF Len( aProc ) >= 3
+      s_aStatics := aProc[3]
+      nVars := Len( s_aStatics )
+
+      FOR nVar := 1 TO nVars
+         #ifdef __HARBOUR__
+            __QQPub( s_aStatics[nVar][1] )
+            __MVPut( s_aStatics[nVar][1], s_aStatics[nVar][2] )
+            //Alert( [ReInstated static: ] + s_aStatics[nVar][1] + [ for ] + aProc[1] )
+            //TraceLog( [ReInstated static: ] + s_aStatics[nVar][1] + [ for ] + aProc[1], s_aStatics[nVar][2] )
+         #else
+            __QQPub( s_aStatics[nVar][1] )
+            &( s_aStatics[nVar][1] ) := s_aStatics[nVar][2]
+         #endif
+      NEXT
    ENDIF
 
    aAdd( s_aProcStack, { aProc[1], 0 } )
@@ -1043,16 +1090,32 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
       ELSE
 
-          Eval( bErrHandler, ErrorNew( [PP], 1005, ProcName(), [Unsupported OPCode.], { aProc, nBlock } ) )
+          Eval( bErrHandler, ErrorNew( [PP], 1005, ProcName(), [Unsupported OPCode.], { s_aProc, nBlock } ) )
 
       ENDIF
    NEXT
+
+   //TraceLog( "DONE: " + aProc[1], ValToPrg( s_aStatics ) )
 
    ErrorBlock( bErrHandler )
 
    #ifdef __XHARBOUR__
       SET( _SET_ERRORLOOP, SET( _SET_ERRORLOOP ) - 8 )
    #endif
+
+   /* Saving and Releasing Statics created by the Procedure. */
+   IF s_aStatics != NIL
+      nVars := Len( s_aStatics )
+
+      FOR nVar := 1 TO nVars
+         s_aStatics[nVar][2] := M->&( s_aStatics[nVar][1] )
+         __MXRelease( s_aStatics[nVar][1] )
+         //Alert( [Released static: ] + s_aStatics[nVar] + [ after ] + aProc[1] )
+         //TraceLog( [Released static: ] + s_aStatics[nVar][1] + [ after ] + aProc[1], s_aStatics[nVar][1] )
+      NEXT
+
+      s_aStatics := NIL
+   ENDIF
 
    /* Releasing Privates created by the Procedure */
    nVars := Len( s_asPrivates )
@@ -1074,13 +1137,38 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
    aSize( s_aProcStack, s_nProcStack )
 
    IF s_nProcStack > 0
+      s_aProc := aPresetProc
+
+      IF Len( aPresetProc ) > 2
+         s_aStatics := aPresetProc[3]
+
+         /* Reinstating Outer Statics. */
+         s_aStatics := aPresetProc[3]
+         nVars := Len( s_aStatics )
+
+         FOR nVar := 1 TO nVars
+            #ifdef __HARBOUR__
+               __QQPub( s_aStatics[nVar][1] )
+               __MVPut( s_aStatics[nVar][1], s_aStatics[nVar][2] )
+               //Alert( [ReInstated static: ] + s_aStatics[nVar][1] + [ for ] + aProc[1] )
+               //TraceLog( [ReInstated static: ] + s_aStatics[nVar][1] + [ for ] + aProc[1], s_aStatics[nVar][2] )
+            #else
+               __QQPub( s_aStatics[nVar][1] )
+               &( s_aStatics[nVar][1] ) := s_aStatics[nVar][2]
+            #endif
+         NEXT
+      ELSE
+         s_aStatics := NIL
+      ENDIF
+
       /* Restoring Privates of parrent. */
       nVars := Len( s_aProcStack[s_nProcStack][3] )
+
       FOR nVar := 1 TO nVars
          aAdd( s_asPrivates, s_aProcStack[s_nProcStack][3][nVar][1] )
          #ifdef __HARBOUR__
             __QQPub( s_aProcStack[s_nProcStack][3][nVar][1] )
-            __MVPUT( s_aProcStack[s_nProcStack][3][nVar][1], s_aProcStack[s_nProcStack][3][nVar][2] )
+            __MVPut( s_aProcStack[s_nProcStack][3][nVar][1], s_aProcStack[s_nProcStack][3][nVar][2] )
          #else
             __QQPub( s_aProcStack[s_nProcStack][3][nVar][1] )
             &( s_aProcStack[s_nProcStack][3][nVar][1] ) := s_aProcStack[s_nProcStack][3][nVar][2]
@@ -1093,7 +1181,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
          aAdd( s_asLocals, s_aProcStack[s_nProcStack][4][nVar][1] )
          #ifdef __HARBOUR__
             __QQPub( s_aProcStack[s_nProcStack][4][nVar][1] )
-            __MVPUT( s_aProcStack[s_nProcStack][4][nVar][1], s_aProcStack[s_nProcStack][4][nVar][2] )
+            __MVPut( s_aProcStack[s_nProcStack][4][nVar][1], s_aProcStack[s_nProcStack][4][nVar][2] )
          #else
             __QQPub( s_aProcStack[s_nProcStack][4][nVar][1] )
             &( s_aProcStack[s_nProcStack][4][nVar][1] ) := s_aProcStack[s_nProcStack][4][nVar][2]
@@ -1101,6 +1189,8 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
       NEXT
 
       aSize( s_aProcStack[s_nProcStack], 2 )
+   ELSE
+      s_aProc := NIL
    ENDIF
 
    s_nForEachIndex := nForEachIndex
@@ -1296,7 +1386,7 @@ STATIC PROCEDURE ExecuteLine( sPPed )
                sSymbol := SubStr( sLeft, nLen + 1 )
             ENDIF
             IF ( Type( sSymbol ) = 'U' )
-               PUBLIC &sSymbol
+               __QQPub( sSymbol )
             ENDIF
          ENDDO
 
@@ -1358,7 +1448,7 @@ STATIC PROCEDURE ExecuteLine( sPPed )
                sSymbol := SubStr( sLeft, nLen + 1 )
             ENDIF
             IF ( Type( sSymbol ) = 'U' )
-               PUBLIC &sSymbol
+               __QQPub( sSymbol )
             ENDIF
          ENDDO
 
@@ -1956,6 +2046,8 @@ PROCEDURE PP_LocalParams( aVars )
 
    LOCAL nVar, nVars := Len( aVars ), xInit, nParams
 
+   //TraceLog( ValToPrg( s_aParams ) )
+
    FOR nVar := 1 TO nVars
       IF ( nParams := Len( s_aParams ) ) > 0
          xInit := s_aParams[1]
@@ -1965,9 +2057,16 @@ PROCEDURE PP_LocalParams( aVars )
          xInit := NIL
       ENDIF
 
-      IF Type( aVars[nVar] ) = 'U'
-         __QQPUB( aVars[nVar] )
-         &( aVars[nVar] ) := xInit
+      //? nVar, aVars[nVar], xInit
+      //Inkey(0)
+
+      IF Type( "M->" + aVars[nVar] ) = 'U'
+         __QQPub( aVars[nVar] )
+         #ifdef __HARBOUR__
+            __MVPUT( aVars[nVar], xInit )
+         #else
+            &( aVars[nVar] ) := xInit
+         #endif
          aAdd( s_asLocals, aVars[nVar] )
       ELSE
          Eval( ErrorBlock(), ErrorNew( [PP], 2034, aVars[nVar], [ Declared Parameter redeclaration: ], aVars ) )
@@ -1991,9 +2090,13 @@ PROCEDURE PP_Params( aVars )
          xInit := NIL
       ENDIF
 
-      IF Type( aVars[nVar] ) = 'U'
-         __QQPUB( aVars[nVar] )
-         &( aVars[nVar] ) := xInit
+      IF Type( "M->" + aVars[nVar] ) = 'U'
+         __QQPub( aVars[nVar] )
+         #ifdef __HARBOUR__
+            __MVPut( aVars[nVar], xInit )
+         #else
+            &( aVars[nVar] ) := xInit
+         #endif
          aAdd( s_asPrivates, aVars[nVar] )
       ELSE
          Eval( ErrorBlock(), ErrorNew( [PP], 2034, aVars[nVar], [ Declared Parameter redeclaration: ], aVars ) )
@@ -2021,8 +2124,12 @@ PROCEDURE PP_Privates( aVars )
     #else
       IF aScan( s_asPrivates, {|sPrivate| sPrivate == aVars[nVar] } ) == 0
     #endif
-         __QQPUB( aVars[nVar] )
-         &( aVars[nVar] ) := &( cInit )
+         __QQPub( aVars[nVar] )
+         #ifdef __HARBOUR__
+            __MVPut( aVars[nVar], &( cInit ) )
+         #else
+            &( aVars[nVar] ) := &( cInit )
+         #endif
          aAdd( s_asPrivates, aVars[nVar] )
       ELSE
          Eval( ErrorBlock(), ErrorNew( [PP], 2016, aVars[nVar], [ Private redeclaration: ], aVars ) )
@@ -2045,9 +2152,13 @@ PROCEDURE PP_Locals( aVars )
          cInit := "NIL"
       ENDIF
 
-      IF Type( aVars[nVar] ) = 'U' .OR. Upper( aVars[nVar] ) = "GETLIST"
-         __QQPUB( aVars[nVar] )
-         &( aVars[nVar] ) := &( cInit )
+      IF Type( "M->" + aVars[nVar] ) = 'U' .OR. Upper( aVars[nVar] ) = "GETLIST"
+         __QQPub( aVars[nVar] )
+         #ifdef __HARBOUR__
+            __MVPut( aVars[nVar], &( cInit ) )
+         #else
+            &( aVars[nVar] ) := &( cInit )
+         #endif
          aAdd( s_asLocals, aVars[nVar] )
       ELSE
          Eval( ErrorBlock(), ErrorNew( [PP], 2016, aVars[nVar], [ Local redeclaration: ], aVars ) )
@@ -2074,8 +2185,12 @@ PROCEDURE PP_Publics( aVars )
     #else
       IF aScan( s_asPublics, {|sPublic| sPublic == aVars[nVar] } ) == 0
     #endif
-         __QQPUB( aVars[nVar] )
-         &( aVars[nVar] ) := &( cInit )
+         __QQPub( aVars[nVar] )
+         #ifdef __HARBOUR__
+            __MVPut( aVars[nVar], &( cInit ) )
+         #else
+            &( aVars[nVar] ) := &( cInit )
+         #endif
          aAdd( s_asPublics, aVars[nVar] )
       ELSE
          Eval( ErrorBlock(), ErrorNew( [PP], 2016, aVars[nVar], [ Public redeclaration: ], aVars ) )
@@ -2088,30 +2203,54 @@ RETURN
 
 PROCEDURE PP_Statics( aVars )
 
-   LOCAL nVar, nVars := Len( aVars ), nAt, cInit
+   LOCAL nVar, nVars := Len( aVars ), nAt, cInit, cFirstStatic
 
-   FOR nVar := 1 TO nVars
-      IF ( nAt := At( ":=", aVars[nVar] ) ) > 0
-         cInit := LTrim( SubStr( aVars[nVar], nAt + 2 ) )
-         aVars[nVar] := RTrim( Left( aVars[nVar], nAt - 1 ) )
-      ELSE
-         cInit := "NIL"
+   IF ( nAt := At( ":=", aVars[1] ) ) > 0
+      cFirstStatic := RTrim( Left( aVars[1], nAt - 1 ) )
+   ELSE
+      cFirstStatic := aVars[1]
+   ENDIF
+
+   //TraceLog( s_aProc[1], ValToPrg( s_aStatics ) )
+
+   IF s_aStatics == NIL .OR. aScan( s_aStatics, {|aStatic| aStatic[1] == cFirstStatic } ) == 0
+      IF s_aStatics == NIL
+         s_aStatics := {}
       ENDIF
 
-      IF ( Left( Type( aVars[nVar] ), 1 ) ) = 'U'
-         __QQPUB( aVars[nVar] )
-         &( aVars[nVar] ) := &( cInit )
-         aAdd( s_asStatics, aVars[nVar] )
-      ELSE
-       #ifdef __XHARBOUR__
-         IF aScan( aVars, aVars[nVar], 1, nVar - 1, .T. ) > 0
-       #else
-         IF aScan( aVars, {|sVar| sVar == aVars[nVar] }, 1, nVar - 1 ) > 0
-       #endif
-            Eval( ErrorBlock(), ErrorNew( [PP], 2016, aVars[nVar], [ Static redeclaration: ], aVars ) )
+      FOR nVar := 1 TO nVars
+         IF ( nAt := At( ":=", aVars[nVar] ) ) > 0
+            cInit := LTrim( SubStr( aVars[nVar], nAt + 2 ) )
+            aVars[nVar] := RTrim( Left( aVars[nVar], nAt - 1 ) )
+         ELSE
+            cInit := "NIL"
          ENDIF
+
+         IF Type( "M->" + aVars[nVar] ) = 'U'
+            //Alert( [Creating static: ] + aVars[nVar] + [ in ] + s_aProc[1] )
+            __QQPub( aVars[nVar] )
+            //? "'" + aVars[nVar] + "'", M->&( aVars[ nVar ] )
+         //ELSE
+            //Alert( [Already PRESENT static: ] + aVars[nVar] + [ in ] + s_aProc[1] )
+         ENDIF
+
+         #ifdef __HARBOUR__
+            __MVPut( aVars[nVar], &( cInit ) )
+         #else
+            &( aVars[nVar] ) := &( cInit )
+         #endif
+
+         aAdd( s_aStatics, { aVars[nVar], NIL } )
+      NEXT
+
+      IF s_nProcStack > 0
+         IF Len( s_aProc ) == 2
+            aSize( s_aProc, 3 )
+         ENDIF
+
+         s_aProc[ 3 ] := s_aStatics
       ENDIF
-   NEXT
+   ENDIF
 
 RETURN
 
@@ -2156,17 +2295,17 @@ FUNCTION PP_Run( cFile, aParams, sPPOExt, bBlanks )
 
       //TraceLog( cFile, s_sModule, s_aProcedures, s_aInitExit, s_nProcId, aParams )
 
-      IF s_sModule == cFile
+      //IF s_sModule == cFile
          //TraceLog( s_aProcedures, s_aInitExit, s_nProcId, aParams )
-      ELSE
+      //ELSE
          s_nProcId := 0; s_aProcedures := {}; s_aInitExit := { {}, {} }
-         s_asPrivates := {}; s_asPublics := {}; s_asLocals := {}; s_asStatics := {}; s_aParams := {}
+         s_asPrivates := {}; s_asPublics := {}; s_asLocals := {}; s_aStatics := NIL; s_aParams := {}
 
          s_sModule := cFile
          bCompile  := .T.
          PP_PreProFile( cFile, sPPOExt, bBlanks )
          bCompile  := .F.
-      ENDIF
+      //ENDIF
 
       //UGLY hack.
       aProcedures := s_aProcedures
@@ -2259,55 +2398,57 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
    LOCAL nProc, sProc
    LOCAL oRecover, lSuccess
 
+   //TraceLog( oErr:DEscription, oErr:ProcName, oErr:ProcLine )
+
    oRecover := oErr
 
    #ifdef __XHARBOUR__
       oRecover:ProcName   := PP_ProcName()
       oRecover:ProcLine   := PP_ProcLine()
       oRecover:ModuleName := s_sFile
-	 #else
-   		IF oErr:SubCode == 1001
-   		   IF s_sModule != NIL
-   		      sProc := s_sModule + oErr:Operation
-   		      nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
-   		   ELSE
-   		      nProc := 0
-   		   ENDIF
+   #endif
 
-   		   IF nProc == 0
-   		      sProc := oErr:Operation
-   		      nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
-   		   ENDIF
+   IF oErr:SubCode == 1001
+      IF s_sModule != NIL
+         sProc := s_sModule + oErr:Operation
+         nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
+      ELSE
+         nProc := 0
+      ENDIF
 
-   		   IF nProc > 0
-   		      s_xRet := NIL
-   		      IF ValType( oErr:Args ) == 'A'
-   		         s_aParams := oErr:Args
-   		      ELSE
-   		         s_aParams := {}
-   		      ENDIF
+      IF nProc == 0
+         sProc := oErr:Operation
+         nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
+      ENDIF
 
-   		      lSuccess := .T.
+      IF nProc > 0
+         s_xRet := NIL
+         IF ValType( oErr:Args ) == 'A'
+            s_aParams := oErr:Args
+         ELSE
+            s_aParams := {}
+         ENDIF
 
-   		      BEGIN SEQUENCE
-   		         PP_ExecProcedure( aProcedures, nProc )
-   		      RECOVER USING oRecover
-   		         lSuccess := .F.
-   		         oRecover:Cargo := oErr
-   		      END
+         lSuccess := .T.
 
-   		      IF lSuccess
-   		         RETURN s_xRet
-   		      ENDIF
-   		   ENDIF
-   		ENDIF
-	 #endif
+         BEGIN SEQUENCE
+            PP_ExecProcedure( aProcedures, nProc )
+         RECOVER USING oRecover
+            lSuccess := .F.
+            oRecover:Cargo := oErr
+         END
+
+         IF lSuccess
+            RETURN s_xRet
+         ENDIF
+      ENDIF
+   ENDIF
 
    IF s_bExternalRecovery != NIL
       IF oRecover:SubCode == 1001
-         TraceLog( "Resolve: " + oRecover:Operation )
+         //TraceLog( "Resolve: " + oRecover:Operation )
          s_xRet := Eval( s_bExternalRecovery, oRecover )
-         TraceLog( s_xRet )
+         //TraceLog( s_xRet )
          RETURN s_xRet
       ENDIF
    ENDIF
@@ -2655,7 +2796,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                          Eval( bErrHandler, ErrorNew( [PP], 2083, [Pre-Process], [Unterminated /* */ comment],  ) )
                       ENDIF
                       nMaxPos   := nLen - 1
-                      TraceLog( "***" )
+                      //TraceLog( "***" )
                       nPosition := 0
                       LOOP
                    ELSE
@@ -9284,7 +9425,8 @@ STATIC FUNCTION InitRunResults()
    aAdd( aTransResults, { , , { NIL }  } )
    aAdd( aTransResults, { { {   0, ':=' } }, { -1} , { NIL }  } )
    aAdd( aTransResults, { { {   0, 'PP_Qself()' } }, { -1} ,  } )
-   aAdd( aTransResults, { { {   0, 'AddInLine( ' }, {   0,   1 }, {   0, ', {|Self,p1,p2,p3,p4,p5,p6,p7,p8,p9| PP_QSelf(Self), PP_ExecMethod( ' }, {   0,   2 }, {   0, ', p1,p2,p3,p4,p5,p6,p7,p8,p9 ) }, ' }, {   0,   3 }, {   0, ', ' }, {   0,   4 }, {   0, ' )' } }, { -1,  1, -1,  3, -1,  1, -1,  1, -1} , { NIL, NIL, NIL, NIL }  } )
+   aAdd( aTransResults, { { {   0, 'AddInLine( ' }, {   0,   1 }, {   0, ', {|Self,p1,p2,p3,p4,p5,p6,p7,p8,p9| Eval( {|s| HB_SetWith( PP_QSelf(s) ) }, Self ), PP_ExecMethod( ' }, {   0,   2 }, {   0, ', p1,p2,p3,p4,p5,p6,p7,p8,p9 ), Eval( {|| PP_QSelf( HB_SetWith() ) } ) }, ' }, {   0,   3 }, {   0, ', ' }, {   0,   4 }, {   0, ' )' } }, { -1,  1, -1,  3, -1,  1, -1,  1, -1} , { NIL, NIL, NIL, NIL }  } )
+
    aAdd( aTransResults, { { {   0, 'Self:' } }, { -1} ,  } )
    aAdd( aTransResults, { { {   0, '__GET( MEMVARBLOCK(' }, {   0,   2 }, {   0, '), ' }, {   0,   2 }, {   0, ', ' }, {   0,   3 }, {   0, ', ' }, {   0,   4 }, {   0, ', ' }, {   0,   5 }, {   0, ' )' } }, { -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1} , { NIL, NIL, NIL, NIL, NIL }  } )
 
@@ -9737,7 +9879,9 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine )
    LOCAL aProcedure, bPreset, aPresetProcedures
 
    #ifdef __XHARBOUR__
-      LOCAL nPresetDyn
+      #ifdef DYN
+         LOCAL nPresetDyn
+      #endif
    #endif
 
    IF nLine == NIL
@@ -9753,7 +9897,9 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine )
       s_aProcedures := aProcedures
 
       #ifdef __XHARBOUR__
-         nPresetDyn := PP_GenDynProcedures( aProcedures )
+         #ifdef DYN
+            nPresetDyn := PP_GenDynProcedures( aProcedures )
+         #endif
       #endif
 	 ENDIF
 
@@ -9813,7 +9959,9 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine )
       s_aProcedures := aPresetProcedures
 
 			#ifdef __XHARBOUR__
-         PP_ReleaseDynProcedures( nPresetDyn )
+         #ifdef DYN
+            PP_ReleaseDynProcedures( nPresetDyn )
+         #endif
       #endif
 	 ENDIF
 
@@ -9830,7 +9978,9 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
    LOCAL aProc, bPreset, aPresetProcedures
 
    #ifdef __XHARBOUR__
-      LOCAL nPresetDyn
+      #ifdef DYN
+         LOCAL nPresetDyn
+      #endif
    #endif
 
    IF ValType( aParams ) == 'A'
@@ -9859,7 +10009,9 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
       s_aProcedures := aProcedures
 
       #ifdef __XHARBOUR__
-         nPresetDyn := PP_GenDynProcedures( aProcedures )
+         #ifdef DYN
+            nPresetDyn := PP_GenDynProcedures( aProcedures )
+         #endif
       #endif
 	 ENDIF
 
@@ -9882,7 +10034,9 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
       NEXT
    RECOVER USING oError
       #ifdef __XHARBOUR__
-         PP_ReleaseDynProcedures( nPresetDyn )
+         #ifdef DYN
+            PP_ReleaseDynProcedures( nPresetDyn )
+         #endif
       #endif
 
       s_aProcedures := aPresetProcedures
@@ -9896,7 +10050,9 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
       s_aProcedures := aPresetProcedures
 
       #ifdef __XHARBOUR__
-         PP_ReleaseDynProcedures( nPresetDyn )
+         #ifdef DYN
+            PP_ReleaseDynProcedures( nPresetDyn )
+         #endif
       #endif
 	 ENDIF
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.407 2004/06/22 19:28:25 ronpinkas Exp $
+ * $Id: hvm.c,v 1.408 2004/06/29 22:14:13 ronpinkas Exp $
  */
 
 /*
@@ -2405,6 +2405,19 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_PUSHSELF:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSELF") );
             hb_vmPush( hb_stackSelfItem() );
+            w++;
+            break;
+
+         case HB_P_PUSHWITH:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHWITH") );
+            if( hb_vm_wWithObjectCounter )
+            {
+               hb_vmPush( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter - 1 ] ) );
+            }
+            else
+            {
+                hb_vmPushNil();
+            }
             w++;
             break;
 
@@ -8671,20 +8684,6 @@ HB_FUNC( HB_FUNCPTR )
    else
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_FuncPtr", 1, hb_paramError( 1 ) );
-   }
-}
-
-HB_FUNC( HB_QWITH )
-{
-   HB_THREAD_STUB
-
-   if( hb_vm_wWithObjectCounter )
-   {
-      hb_itemCopy( &(HB_VM_STACK.Return), &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter - 1 ] ) );
-   }
-   else
-   {
-      hb_itemClear( &(HB_VM_STACK.Return) );
    }
 }
 
