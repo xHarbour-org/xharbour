@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.17 2003/06/08 08:53:21 patrickmast Exp $
+ * $Id: _winsys.c,v 1.18 2003/06/30 17:07:29 ronpinkas Exp $
  */
 
 // WHAT32
@@ -1020,48 +1020,41 @@ HB_FUNC( CLOSEHANDLE )
 }
 
 //-----------------------------------------------------------------------------
-
 /*
  BOOL ReadFile(
-  HANDLE hFile,                // handle of file to read
-  LPVOID lpBuffer,             // pointer to buffer that receives data
-  DWORD nNumberOfBytesToRead,  // number of bytes to read
-  LPDWORD lpNumberOfBytesRead, // pointer to number of bytes read
-  LPOVERLAPPED lpOverlapped    // pointer to structure for data
+  HANDLE       hFile,                 // handle of file to read
+  LPVOID       lpBuffer,              // pointer to buffer that receives data
+  DWORD        nNumberOfBytesToRead,  // number of bytes to read
+  LPDWORD      lpNumberOfBytesRead,   // pointer to number of bytes read
+  LPOVERLAPPED lpOverlapped           // pointer to structure for data
 );
-
 */
-
 HB_FUNC( READFILE )
 {
-
-   char * Buffer = ( char *) hb_xgrab( hb_parnl( 3 ) ) ;
+   char * Buffer = ( char * ) hb_xgrab( hb_parnl( 3 ) ) ;
    DWORD nRead   = 0      ;
    BOOL  bRet             ;
    OVERLAPPED *Overlapped ;
 
    if( ISCHAR( 5 ) )
-      Overlapped = ( OVERLAPPED *) hb_param( 4, HB_IT_STRING )->item.asString.value ;
+      Overlapped = ( OVERLAPPED *) hb_param( 5, HB_IT_STRING )->item.asString.value ;
 
 
    bRet = ReadFile( (HANDLE) hb_parnl( 1 ) ,
                     Buffer                 ,
                     (DWORD)  hb_parnl( 3 ) ,
                     &nRead        ,
-                    Overlapped );
+                    ISCHAR( 5 ) ? Overlapped : NULL ) ;
 
    if ( bRet )
-        hb_storclen( Buffer, nRead, 4 ) ;
+      hb_storclen( ( char * ) Buffer, nRead, 2 ) ;
 
    hb_stornl( nRead, 4 ) ;
    hb_retl( bRet ) ;
-
 }
 
 //-----------------------------------------------------------------------------
-
 /*
-
 BOOL WriteFile(
   HANDLE hFile,                    // handle to file to write to
   LPCVOID lpBuffer,                // pointer to data to write to file

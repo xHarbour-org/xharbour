@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.54 2003/06/08 08:53:21 patrickmast Exp $
+ * $Id: ChangeLog,v 1.55 2003/12/02 14:40:14 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-11 14:02 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * source/_winsys.c
+    * fixed HB_FUNC( READFILE )
+	Undetected OVERLAPPED structure ( posed problem on XP )
+	hb_storclen( ( char * ) Buffer, nSize, 2 )  // instead of 4
 
 2003-12-02 15:39 UTC+0100 Patrick Mast <patrick@winfakt.com>
   * source/_winreg.c
