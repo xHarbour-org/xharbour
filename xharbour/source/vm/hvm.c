@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.209 2003/06/18 08:57:02 ronpinkas Exp $
+ * $Id: hvm.c,v 1.210 2003/06/18 09:23:30 ronpinkas Exp $
  */
 
 /*
@@ -213,10 +213,13 @@ extern HARBOUR  hb___msgSetData( void );
 extern PCLASS   hb_clsClassesArray( void );
 extern void hb_clsSetModule( USHORT uiClass );
 
+#ifdef __PROFILER__
 BOOL hb_bProfiler = FALSE; /* profiler status is off */
-BOOL hb_bTracePrgCalls = FALSE; /* prg tracing is off */
 ULONG hb_ulOpcodesCalls[ HB_P_LAST_PCODE ]; /* array to profile opcodes calls */
 ULONG hb_ulOpcodesTime[ HB_P_LAST_PCODE ]; /* array to profile opcodes consumed time */
+#endif
+
+BOOL hb_bTracePrgCalls = FALSE; /* prg tracing is off */
 
 /* virtual machine state */
 
@@ -412,6 +415,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    /* Check for some internal switches */
    hb_cmdargProcessVM();
 
+#ifdef __PROFILER__
    /* Initialize opcodes profiler support arrays */
    {
       ULONG ul;
@@ -422,6 +426,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
          hb_ulOpcodesTime[ ul ] = 0;
       }
    }
+#endif
 
    /* Call functions that initializes static variables
     * Static variables have to be initialized before any INIT functions
@@ -4618,8 +4623,10 @@ void hb_vmDo( USHORT uiParams )
    PHB_ITEM pSelf;
    PHB_FUNC pFunc;
    BOOL     bDebugPrevState;
+#ifdef __PROFILER__
    ULONG    ulClock = 0;
    BOOL     bProfiler = hb_bProfiler; /* because profiler state may change */
+#endif
    int      iPresetBase = s_iBaseLine;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDo(%hu)", uiParams));
@@ -4638,10 +4645,12 @@ void hb_vmDo( USHORT uiParams )
       return;
    }
 
+#ifdef __PROFILER__
    if( bProfiler )
    {
       ulClock = ( ULONG ) clock();
    }
+#endif
 
    //hb_inkeyPoll();           /* Poll the console keyboard */
 
@@ -4661,10 +4670,13 @@ void hb_vmDo( USHORT uiParams )
 
       if( pFunc )
       {
+
+#ifdef __PROFILER__
          if( bProfiler && pSym->pDynSym )
          {
             pSym->pDynSym->ulRecurse++;
          }
+#endif
 
          if ( hb_bTracePrgCalls )
          {
@@ -4681,6 +4693,7 @@ void hb_vmDo( USHORT uiParams )
 
          HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
 
+#ifdef __PROFILER__
          if( bProfiler && pSym->pDynSym )
          {
             pSym->pDynSym->ulCalls++;                   /* profiler support */
@@ -4692,6 +4705,7 @@ void hb_vmDo( USHORT uiParams )
             }
             pSym->pDynSym->ulRecurse--;
          }
+#endif
       }
       else
       {
@@ -4737,9 +4751,11 @@ void hb_vmSend( USHORT uiParams )
    PHB_ITEM       pSelf;
    PHB_FUNC       pFunc = NULL;
    BOOL           bDebugPrevState;
+#ifdef __PROFILER__
    ULONG          ulClock = 0;
    void           *pMethod = NULL;
    BOOL           bProfiler = hb_bProfiler; /* because profiler state may change */
+#endif
    PHB_BASEARRAY  pSelfBase = NULL;
    BOOL           lPopSuper = FALSE;
    int            iPresetBase = s_iBaseLine;
@@ -4763,10 +4779,12 @@ void hb_vmSend( USHORT uiParams )
       uiParams += hb_vm_aiExtraParams[--hb_vm_iExtraParamsIndex];
    }
 
+#ifdef __PROFILER__
    if( bProfiler )
    {
       ulClock = ( ULONG ) clock();
    }
+#endif
 
    pItem = hb_stackNewFrame( &sStackState, uiParams );   /* procedure name */
    pSym = pItem->item.asSymbol.value;
@@ -4847,10 +4865,13 @@ void hb_vmSend( USHORT uiParams )
 
    if( pFunc )
    {
+
+#ifdef __PROFILER__
       if( bProfiler )
       {
          pMethod = hb_mthRequested();
       }
+#endif
 
       if ( hb_bTracePrgCalls )
       {
@@ -4882,10 +4903,12 @@ void hb_vmSend( USHORT uiParams )
          }
       }
 
+#ifdef __PROFILER__
       if( bProfiler )
       {
          hb_mthAddTime( pMethod, clock() - ulClock );
       }
+#endif
 
       // Constructor must ALWAYS return Self.
       if( bConstructor )
@@ -6854,6 +6877,7 @@ HB_FUNC( __VMVARGLIST )
    hb_itemRelease( pGlobals );
 }
 
+#ifdef __PROFILER__
 /* $Doc$
  * $FuncName$     __SETPROFILER( <lOnOff> ) --> <lOldValue>
  * $Description$  Turns on | off the profiler activity
@@ -6867,6 +6891,7 @@ HB_FUNC( __SETPROFILER )
 
    hb_retl( bOldValue );
 }
+#endif
 
 /* $Doc$
  * $FuncName$     __TRACEPRGCALLS( <lOnOff> ) --> <lOldValue>
@@ -7286,6 +7311,8 @@ HB_FUNC( HB_QSELF )
    hb_itemCopy( &(HB_VM_STACK.Return), *( pBase + 1 ) );
 }
 
+#ifdef __PROFILER__
+
 HB_FUNC( __OPCOUNT ) /* it returns the total amount of opcodes */
 {
    HB_THREAD_STUB
@@ -7309,6 +7336,8 @@ HB_FUNC( __OPGETPRF ) /* profiler: It returns an array with an opcode called and
       hb_stornl( hb_ulOpcodesTime[ ulOpcode ],  -1, 2 );
    }
 }
+
+#endif
 
 HB_FUNC( HB_SAVEBLOCK )
 {

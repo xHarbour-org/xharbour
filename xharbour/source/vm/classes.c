@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.63 2003/06/17 14:22:22 ronpinkas Exp $
+ * $Id: classes.c,v 1.64 2003/06/18 08:57:02 ronpinkas Exp $
  */
 
 /*
@@ -162,7 +162,9 @@
 #define BASE_METHODS   BUCKET * 20  /* Incerement unit of number of messages */
 #define HASH_KEY       ( BASE_METHODS / BUCKET )
 
+#ifdef __PROFILER__
 extern BOOL hb_bProfiler; /* profiler activity status */
+#endif
 
 static PCLASS   s_pClasses     = NULL;
 static USHORT   s_uiClasses    = 0;
@@ -1056,10 +1058,12 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc,
 
             (HB_VM_STACK.pMethod) = pMethod ;
 
+#ifdef __PROFILER__
             if( hb_bProfiler )
             {
                pMethod->ulCalls++; /* Profiler */
             }
+#endif
 
             if( bConstructor )
             {
