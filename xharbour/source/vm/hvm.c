@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.252 2003/08/24 23:55:20 ronpinkas Exp $
+ * $Id: hvm.c,v 1.253 2003/08/27 19:04:06 jonnymind Exp $
  */
 
 /*
@@ -4367,7 +4367,7 @@ static void hb_vmArrayPush( void )
         #ifdef HB_ARRAY_USE_COUNTER
          if( pArray->item.asArray.value->uiHolders > 1 )
         #else
-         if( 0 && pArray->item.asArray.value->pOwners->pNext )
+         if( pArray->item.asArray.value->pOwners->pNext )
         #endif
          {
             /* this is a temporary copy of an array - we can overwrite
