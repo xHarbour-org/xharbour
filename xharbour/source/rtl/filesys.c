@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.110 2004/06/21 17:40:42 likewolf Exp $
+ * $Id: filesys.c,v 1.111 2004/06/23 21:59:31 likewolf Exp $
  */
 
 /*
@@ -2262,7 +2262,11 @@ BOOL HB_EXPORT hb_fsRename( BYTE * pOldName, BYTE * pNewName )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsRename(%s, %s)", (char*) pOldName, (char*) pNewName));
 
+   pOldName = ( BYTE *) hb_fileNameConv( hb_strdup( ( char * )pOldName) );
+   pNewName = ( BYTE *) hb_fileNameConv( hb_strdup( ( char * )pNewName) );
+
    HB_STACK_UNLOCK
+
 
 #if defined(HB_OS_WIN_32)
 
@@ -2283,7 +2287,12 @@ BOOL HB_EXPORT hb_fsRename( BYTE * pOldName, BYTE * pNewName )
    hb_fsSetError( FS_ERROR );
 
 #endif
+
+
    HB_STACK_LOCK
+
+   hb_xfree( pOldName ) ;
+   hb_xfree( pNewName ) ;
 
    return bResult;
 }
@@ -2791,13 +2800,13 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
       else
       {
          HB_FS_SETDRIVE( uiSave, uiDummy );
-	 
+
          uiResult = (USHORT) FS_ERROR;
          hb_fsSetError( (USHORT) FS_ERROR );
       }
       HB_DISABLE_ASYN_CANC
     }
-    
+
     HB_STACK_UNLOCK
 
 #else
@@ -2850,7 +2859,7 @@ USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
       }
       HB_FS_SETDRIVE( uiSave, uiDummy );
    }
-   
+
    HB_STACK_LOCK
 
 #else

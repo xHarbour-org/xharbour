@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3167 2004/07/19 03:49:20 peterrees Exp $
+ * $Id: ChangeLog,v 1.3168 2004/07/19 16:11:48 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-07-20 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/filesys.c
+    - hb_fsRename() changed to respect SET( HB_SET_FILECASE/DIRCASE )
+       Effects FRENAME() & RENAME ... TO ...
+
 2004-07-19 12:50 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com
   * utils/hbmake/hbmutils.prg
     ! fixed mispeled lib nf name
