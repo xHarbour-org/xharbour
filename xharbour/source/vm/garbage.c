@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.11 2002/03/08 23:22:33 ronpinkas Exp $
+ * $Id: garbage.c,v 1.12 2002/03/11 22:58:40 ronpinkas Exp $
  */
 
 /*
@@ -167,7 +167,6 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
    HB_GARBAGE_PTR pAlloc;
 
    //pAlloc = HB_GARBAGE_NEW( ulSize + sizeof( HB_GARBAGE ) );
-   #if 1
    if( s_pAvailableBaseArrays && ulSize == sizeof( HB_BASEARRAY ) )
    {
       pAlloc = s_pAvailableBaseArrays;
@@ -177,7 +176,6 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
    {
       pAlloc = ( HB_GARBAGE_PTR ) hb_xgrab( ulSize + sizeof( HB_GARBAGE ) );
    }
-   #endif
 
    if( pAlloc )
    {
@@ -325,6 +323,7 @@ void * hb_gcLock( void * pBlock )
       {
          hb_gcUnlink( &s_pCurrBlock, pAlloc );
          hb_gcLink( &s_pLockedBlock, pAlloc );
+         pAlloc->used = s_uUsedFlag;
       }
       ++pAlloc->locked;
    }
@@ -454,12 +453,36 @@ void hb_gcCollectAll( void )
          pAlloc = s_pLockedBlock;
          do
          {
-            // TODO: Locked Block may be an Array or CodeBlock!!!
-
-            /* it is not very elegant method but it works well */
-            if( pAlloc->pFunc == hb_gcGripRelease )
+            // if not refrenced yet.
+            if( pAlloc->used == s_uUsedFlag )
             {
-               hb_gcItemRef( ( HB_ITEM_PTR ) ( pAlloc + 1 ) );
+               /* it is not very elegant method but it works well */
+               if( pAlloc->pFunc == hb_gcGripRelease )
+               {
+                  hb_gcItemRef( ( HB_ITEM_PTR ) ( pAlloc + 1 ) );
+               }
+               else if( pAlloc->pFunc == hb_arrayReleaseGarbage )
+               {
+                  HB_ITEM FakedItem;
+
+                  (&FakedItem)->type = HB_IT_ARRAY;
+                  (&FakedItem)->item.asArray.value = ( PHB_BASEARRAY )( pAlloc + 1 );
+
+                  hb_gcItemRef( &FakedItem );
+               }
+               else if( pAlloc->pFunc == hb_codeblockDeleteGarbage )
+               {
+                  HB_ITEM FakedItem;
+
+                  (&FakedItem)->type = HB_IT_BLOCK;
+                  (&FakedItem)->item.asBlock.value = ( PHB_CODEBLOCK )( pAlloc + 1 );
+
+                  hb_gcItemRef( &FakedItem );
+               }
+               else
+               {
+                  pAlloc->used ^= HB_GC_USED_FLAG;
+               }
             }
             pAlloc = pAlloc->pNext;
 
