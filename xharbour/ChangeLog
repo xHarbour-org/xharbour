@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2680 2004/03/30 05:27:39 guerra000 Exp $
+ * $Id: ChangeLog,v 1.2681 2004/03/30 05:55:33 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-03-30 19:08 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/gtos2/gtos2.c
+    * Completely changed the way it works, it has been broken since day one !!
+      First, all calls to VioXXX() functions should use only tileable memory, this is still broken
+      Second, since every VIO window has an offline buffer we now always write directly to this
+      buffer instead of using VioXXX() functions, this fixes the problem in First: and, as a
+      side effect, makes gtos2 to FLY, every 50ms video buffer is synced with physical screen,
+      we could achieve a little speed up here updating only the lines which have been changed
+      instead of complete buffer. Old code with VioXXX() calls is still here, I'll remove it
+      later if I don't have error reports (Is there someone still using OS/2 out there? :) )
+   ! source/debug/debugger.prg
+     ! if a source file is on a different path ::BrwText object was recreated for _every_ line of
+       code displayed
+   ! source/debug/tbrwtext.prg
+     ! instead of re-creating a ::BrwText object for every source file to show, it is a lot faster
+       to ::FileLoad() it, exported this method.
 
 2004-03-30 08:04 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
@@ -31,7 +49,7 @@
    % change internals of workarea. Now speed of aliased field access
      doesn't depend on number of open workareas. In some of my test
      it gives even 30% speedup.
-   ! fixed setting/using area in different operation. 
+   ! fixed setting/using area in different operation.
      A lot of bug fixed bug and probably new ones introduced.
      This modification has to be extensively checked. It's possible
      I broke sth. In fact I had to modify most of the functions.
@@ -43,7 +61,7 @@
    bugs. I'll be very surprised if not ;-) after such many modification
    in core RDD part.
    To all: please test it and inform me about any problems.
-   I hope that that now each of developers will use proper functions/macros 
+   I hope that that now each of developers will use proper functions/macros
    instead of hacking WA internals. If you want to do this please carefuly
    study first all dependences. There was a lot of bugs with very bad side
    effects because someone made some shortcuts and area or fields was not
@@ -101,7 +119,7 @@
     + Added support for new define HB_ARRAY_COUNTER_DEFAULT_HOLDERS (default 1)
       /*
         This allows to set an HIGHER number to experience memory impact of GC only arrays
-	and will also provide additional support for detecting Pre-Mature Release of Arrays/Objects.
+   and will also provide additional support for detecting Pre-Mature Release of Arrays/Objects.
       */
 
   * source/vm/fastitem.c

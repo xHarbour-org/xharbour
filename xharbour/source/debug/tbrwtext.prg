@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.6 2004/03/01 09:37:29 vouchcac Exp $
+ * $Id: tbrwtext.prg,v 1.7 2004/03/02 01:08:35 likewolf Exp $
  */
 
 /*
@@ -90,6 +90,8 @@ CLASS TBrwText FROM HBEditor
                                              // if lSet is .F. BreakPoint at nRow has to be removed
    METHOD   Search( cString, lCaseSensitive, nMode ) // 0 from Begining to end, 1 Forward, 2 Backwards
 
+   METHOD   LoadFile(cFileName)
+
 ENDCLASS
 
 
@@ -106,6 +108,13 @@ METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor) CLASS TBrwText
 
    Super:New("", nTop, nLeft, nBottom, nRight, .T.)
    Super:SetColor(cColor)
+
+   Super:LoadFile(cFileName)
+
+return Self
+
+
+METHOD LoadFile(cFileName) CLASS TBrwText
 
    Super:LoadFile(cFileName)
 

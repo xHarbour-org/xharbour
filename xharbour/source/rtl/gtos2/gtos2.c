@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.7 2004/02/01 23:40:50 jonnymind Exp $
+ * $Id: gtos2.c,v 1.8 2004/02/06 17:07:29 jonnymind Exp $
  */
 
 /*
@@ -86,15 +86,9 @@
 /* NOTE: User programs should never call this layer directly! */
 
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_NAME	OS2
+#define HB_GT_NAME   OS2
 
-#define INCL_BASE
-#define INCL_VIO
-#define INCL_KBD
-#define INCL_DOSMEMMGR
-#define INCL_DOSPROCESS
-#define INCL_NOPMAPI
-
+#include "hbapi.h"
 #include "hbapierr.h"
 #include "hbapigt.h"
 #include "hbapifs.h"
@@ -149,7 +143,37 @@ static USHORT s_usOldCodePage;
    use this static which contains active mode info */
 static VIOMODEINFO s_vi;
 
+/* If something has been written to screen buffer this is TRUE */
+static BOOL s_dirty = FALSE;
+
 static int s_iStdIn, s_iStdOut, s_iStdErr;
+
+
+/* Issues a screen buffer refresh when it's time to do it */
+static void refresh_buffer(ULONG time)
+{
+   static ULONG timestamp = 0;   /* Used to issue a VioShowBuffer() no more than 20 times/second */
+   ULONG millisec;
+   ULONG frequency = 50;
+
+   if (time == 0) {
+      DosQuerySysInfo(QSV_MS_COUNT, QSV_MS_COUNT, &millisec, sizeof(ULONG));
+      time = millisec;
+      /* If I'm arriving from DispEnd() I refresh only half of the times to "collect" changes */
+      frequency = 100;
+   }
+
+   /* every 50ms test if buffer has changed and if so update it */
+   if (abs(time - timestamp) >= frequency) {
+      if (s_dirty && s_uiDispCount == 1) {
+         VioShowBuf(0, s_usLVBlength, 0);
+         s_dirty = FALSE;
+      }
+      timestamp = time;
+   }
+}
+
+
 
 void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 {
@@ -165,7 +189,7 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
    s_vi.cb = sizeof( VIOMODEINFO );
    VioGetMode( &s_vi, 0 );        /* fill structure with current video mode settings */
 
-   s_uiDispCount = 0;
+   s_uiDispCount = 1;
 
    if(VioGetBuf(&s_ulLVBptr, &s_usLVBlength, 0) == NO_ERROR) {
       s_ulLVBptr = (ULONG) SELTOFLAT(s_ulLVBptr);
@@ -260,7 +284,7 @@ int hb_gt_ExtendedKeySupport()
 
 int hb_gt_ReadKey( HB_inkey_enum eventmask )
 {
-   int ch;              /* next char if any */
+   int ch;                       /* next char if any */
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
 
@@ -399,6 +423,9 @@ int hb_gt_ReadKey( HB_inkey_enum eventmask )
          ch = 349 - ch;
    }
 
+
+   refresh_buffer(s_key->time);
+
    return ch;
 }
 
@@ -433,6 +460,8 @@ void hb_gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod )
 
    HB_SYMBOL_UNUSED( iMethod );
 
+   s_dirty = TRUE;
+
    VioSetCurPos( ( USHORT ) iRow, ( USHORT ) iCol, 0 );
 }
 
@@ -462,6 +491,8 @@ SHORT hb_gt_Col( void )
 void hb_gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE attr, SHORT sVert, SHORT sHoriz )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Scroll(%hu, %hu, %hu, %hu, %d, %hd, %hd)", usTop, usLeft, usBottom, usRight, (int) attr, sVert, sHoriz));
+
+   s_dirty = TRUE;
 
    if(s_uiDispCount > 0)
    {
@@ -578,6 +609,8 @@ static void hb_gt_SetCursorSize( char start, char end, int visible )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetCursorSize(%d, %d, %d)", (int) start, (int) end, visible));
 
+   s_dirty = TRUE;
+
    vi.yStart = start;
    vi.cEnd = end;
    vi.cx = 0;
@@ -676,10 +709,7 @@ static char * hb_gt_ScreenPtr( USHORT cRow, USHORT cCol )
 }
 
 
-/* TODO: 21/08/2001 - <maurilio.longo@libero.it>
-         This function works even if a DispBegin() has been issued, but should be corrected
-         to use VioXXX calls if not
-*/
+
 static void hb_gt_xGetXY( USHORT cRow, USHORT cCol, BYTE * attr, BYTE * ch )
 {
    char * p;
@@ -696,6 +726,8 @@ static void hb_gt_xPutch( USHORT cRow, USHORT cCol, BYTE attr, BYTE ch )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_xPutch(%hu, %hu, %d, %d", cRow, cCol, (int) attr, (int) ch));
 
+   s_dirty = TRUE;
+
    if (s_uiDispCount > 0) {
       USHORT * p = (USHORT *) hb_gt_ScreenPtr( cRow, cCol );
       *p = (attr << 8) + ch;
@@ -711,8 +743,10 @@ void hb_gt_Puts( USHORT usRow, USHORT usCol, BYTE attr, BYTE * str, ULONG len )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Puts(%hu, %hu, %d, %p, %lu)", usRow, usCol, (int) attr, str, len));
 
+   s_dirty = TRUE;
+
    if (s_uiDispCount > 0) {
-      USHORT *p;
+      register USHORT *p;
       register USHORT byAttr = attr << 8;
 
       p = (USHORT *) hb_gt_ScreenPtr( usRow, usCol );
@@ -764,6 +798,8 @@ void hb_gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight
 void hb_gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE *srce )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_PutText(%hu, %hu, %hu, %hu, %p)", usTop, usLeft, usBottom, usRight, srce));
+
+   s_dirty = TRUE;
 
    if (s_uiDispCount > 0) {
       USHORT x, y;
@@ -845,8 +881,8 @@ void hb_gt_DispEnd( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispEnd()"));
 
-   if (--s_uiDispCount == 0) {
-      VioShowBuf(0, s_usLVBlength, 0);   /* refresh everything */
+   if (--s_uiDispCount == 1) {
+      refresh_buffer(0);
    }
 }
 
@@ -934,6 +970,8 @@ void hb_gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byChar, ULON
 {
    USHORT byte = (byAttr << 8) + byChar;
 
+   s_dirty = TRUE;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Replicate(%hu, %hu, %i, %i, %lu)", uiRow, uiCol, byAttr, byChar, nLength));
 
    if (s_uiDispCount > 0) {
@@ -959,9 +997,9 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right, BYTE * szBox
    SHORT Height;
    SHORT Width;
 
-   if( ( Left   >= 0 && Left   < hb_gt_GetScreenWidth()  )  || 
-       ( Right  >= 0 && Right  < hb_gt_GetScreenWidth()  )  || 
-       ( Top    >= 0 && Top    < hb_gt_GetScreenHeight() )  || 
+   if( ( Left   >= 0 && Left   < hb_gt_GetScreenWidth()  )  ||
+       ( Right  >= 0 && Right  < hb_gt_GetScreenWidth()  )  ||
+       ( Top    >= 0 && Top    < hb_gt_GetScreenHeight() )  ||
        ( Bottom >= 0 && Bottom < hb_gt_GetScreenHeight() ) )
    {
 
