@@ -1,5 +1,5 @@
 /*
- * $Id: hbmacro.h,v 1.4 2003/11/30 10:23:12 jonnymind Exp $
+ * $Id: hbmacro.h,v 1.5 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -132,21 +132,21 @@ extern void hb_compGenJumpHere( ULONG ulOffset, HB_BISON_PTR pMacro );
 extern ULONG hb_compGenJumpTrue( LONG lOffset, HB_BISON_PTR pMacro );
 extern void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_BISON_PTR pMacro );
 extern void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_BISON_PTR pMacro );
-extern void hb_compGenPushLong( long lNumber, HB_BISON_PTR pMacro );
+extern void hb_compGenPushLong( LONG lNumber, HB_BISON_PTR pMacro );
 extern void hb_compGenMessage( char * szMsgName, HB_BISON_PTR pMacro );
 extern void hb_compGenMessageData( char * szMsg, HB_BISON_PTR pMacro );
 extern void hb_compGenPopVar( char * szVarName, HB_BISON_PTR pMacro );
 extern void hb_compGenPopAliasedVar( char * szVarName,
                                      BOOL bPushAliasValue,
                                      char * szAlias,
-                                     long lWorkarea, HB_BISON_PTR pMacro );
+                                     LONG lWorkarea, HB_BISON_PTR pMacro );
 extern void hb_compGenPushVar( char * szVarName, HB_BISON_PTR pMacro );
 extern void hb_compGenPushVarRef( char * szVarName, HB_BISON_PTR pMacro );
 extern void hb_compGenPushMemVarRef( char * szVarName, HB_BISON_PTR pMacro );
 extern void hb_compGenPushAliasedVar( char * szVarName,
                                       BOOL bPushAliasValue,
                                       char * szAlias,
-                                      long lWorkarea, HB_BISON_PTR pMacro );
+                                      LONG lWorkarea, HB_BISON_PTR pMacro );
 extern void hb_compGenPushLogical( int iTrueFalse, HB_BISON_PTR pMacro );
 extern void hb_compGenPushDouble( double dNumber, BYTE bWidth, BYTE bDec, HB_BISON_PTR pMacro );
 extern void hb_compGenPushFunCall( char * szFunName, HB_BISON_PTR pMacro );

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.28 2004/01/21 13:37:59 walito Exp $
+ * $Id: hbapiitm.h,v 1.29 2004/02/09 18:00:36 druzus Exp $
  */
 
 /*
@@ -82,11 +82,11 @@ extern char     HB_EXPORT *hb_itemGetC         ( PHB_ITEM pItem );
 extern char     HB_EXPORT * hb_itemGetCPtr      ( PHB_ITEM pItem );
 extern ULONG    HB_EXPORT hb_itemGetCLen      ( PHB_ITEM pItem );
 extern char     HB_EXPORT * hb_itemGetDS        ( PHB_ITEM pItem, char * szDate );
-extern long     HB_EXPORT hb_itemGetDL        ( PHB_ITEM pItem );
+extern LONG     HB_EXPORT hb_itemGetDL        ( PHB_ITEM pItem );
 extern BOOL     HB_EXPORT hb_itemGetL         ( PHB_ITEM pItem );
 extern double   HB_EXPORT hb_itemGetND        ( PHB_ITEM pItem );
 extern int      HB_EXPORT hb_itemGetNI        ( PHB_ITEM pItem );
-extern long     HB_EXPORT hb_itemGetNL        ( PHB_ITEM pItem );
+extern LONG     HB_EXPORT hb_itemGetNL        ( PHB_ITEM pItem );
 extern void     HB_EXPORT hb_itemGetNLen      ( PHB_ITEM pItem, int * piWidth, int * piDec );
 extern void     HB_EXPORT * hb_itemGetPtr       ( PHB_ITEM pItem );
 extern PHB_ITEM HB_EXPORT hb_itemNew          ( PHB_ITEM pNull );
@@ -98,17 +98,17 @@ extern PHB_ITEM HB_EXPORT hb_itemPutCRaw      ( PHB_ITEM pItem, char * szText, U
 extern PHB_ITEM HB_EXPORT hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ulLen );
 extern PHB_ITEM HB_EXPORT hb_itemPutCL        ( PHB_ITEM pItem, char * szText, ULONG ulLen );
 extern void     HB_EXPORT hb_itemSetCMemo     ( PHB_ITEM pItem );
-extern PHB_ITEM HB_EXPORT hb_itemPutD         ( PHB_ITEM pItem, long lYear, long lMonth, long lDay );
+extern PHB_ITEM HB_EXPORT hb_itemPutD         ( PHB_ITEM pItem, LONG lYear, LONG lMonth, LONG lDay );
 extern PHB_ITEM HB_EXPORT hb_itemPutDS        ( PHB_ITEM pItem, char * szDate );
-extern PHB_ITEM HB_EXPORT hb_itemPutDL        ( PHB_ITEM pItem, long lJulian );
+extern PHB_ITEM HB_EXPORT hb_itemPutDL        ( PHB_ITEM pItem, LONG lJulian );
 extern PHB_ITEM HB_EXPORT hb_itemPutL         ( PHB_ITEM pItem, BOOL bValue );
 extern PHB_ITEM HB_EXPORT hb_itemPutND        ( PHB_ITEM pItem, double dNumber );
 extern PHB_ITEM HB_EXPORT hb_itemPutNI        ( PHB_ITEM pItem, int iNumber );
-extern PHB_ITEM HB_EXPORT hb_itemPutNL        ( PHB_ITEM pItem, long lNumber );
+extern PHB_ITEM HB_EXPORT hb_itemPutNL        ( PHB_ITEM pItem, LONG lNumber );
 extern PHB_ITEM HB_EXPORT hb_itemPutNLen      ( PHB_ITEM pItem, double dNumber, int iWidth, int iDec );
 extern PHB_ITEM HB_EXPORT hb_itemPutNDLen     ( PHB_ITEM pItem, double dNumber, int iWidth, int iDec );
 extern PHB_ITEM HB_EXPORT hb_itemPutNILen     ( PHB_ITEM pItem, int iNumber, int iWidth );
-extern PHB_ITEM HB_EXPORT hb_itemPutNLLen     ( PHB_ITEM pItem, long lNumber, int iWidth );
+extern PHB_ITEM HB_EXPORT hb_itemPutNLLen     ( PHB_ITEM pItem, LONG lNumber, int iWidth );
 extern PHB_ITEM HB_EXPORT hb_itemPutPtr       ( PHB_ITEM pItem, void * pValue );
 extern PHB_ITEM HB_EXPORT hb_itemPutPtrGC     ( PHB_ITEM pItem, void * pValue );
 extern BOOL     HB_EXPORT hb_itemRelease      ( PHB_ITEM pItem );
@@ -126,8 +126,8 @@ extern PHB_ITEM HB_EXPORT hb_itemPutNLLLen    ( PHB_ITEM pItem, LONGLONG llNumbe
 extern PHB_ITEM HB_EXPORT hb_itemPutNInt      ( PHB_ITEM pItem, LONGLONG lNumber );
 extern PHB_ITEM HB_EXPORT hb_itemPutNIntLen   ( PHB_ITEM pItem, LONGLONG lNumber, int iWidth );
 #else
-extern PHB_ITEM HB_EXPORT hb_itemPutNInt      ( PHB_ITEM pItem, long lNumber );
-extern PHB_ITEM HB_EXPORT hb_itemPutNIntLen   ( PHB_ITEM pItem, long lNumber, int iWidth );
+extern PHB_ITEM HB_EXPORT hb_itemPutNInt      ( PHB_ITEM pItem, LONG lNumber );
+extern PHB_ITEM HB_EXPORT hb_itemPutNIntLen   ( PHB_ITEM pItem, LONG lNumber, int iWidth );
 #endif
 
 /* Non Clipper compliant internal API */

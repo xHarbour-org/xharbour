@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.7 2004/01/26 14:59:46 druzus Exp $
+ * $Id: hbapicdp.h,v 1.8 2004/01/28 22:02:37 druzus Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ extern char HB_EXPORT * hb_cdpSelectID( char * );
 extern PHB_CODEPAGE HB_EXPORT hb_cdpSelect( PHB_CODEPAGE );
 extern PHB_CODEPAGE HB_EXPORT hb_cdpFind( char * );
 extern void HB_EXPORT hb_cdpTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE );
-extern void HB_EXPORT hb_cdpnTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE, unsigned int );
+extern void HB_EXPORT hb_cdpnTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE, UINT );
 extern int HB_EXPORT hb_cdpcmp( char*, char*, ULONG, PHB_CODEPAGE, ULONG* );
 extern int HB_EXPORT hb_cdpchrcmp( char, char, PHB_CODEPAGE );
 

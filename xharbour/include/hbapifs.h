@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.26 2004/01/16 11:36:50 lculik Exp $
+ * $Id: hbapifs.h,v 1.27 2004/01/17 17:50:14 lculik Exp $
  */
 
 /*
@@ -213,7 +213,7 @@ extern char      HB_EXPORT * hb_fileTrim( BYTE * szFile) ; /* Caller must free t
 extern BYTE HB_EXPORT * hb_fileNameConv(char *str) ;
 
 #ifdef HB_OS_WIN_32
-   extern int WintoDosError( unsigned long lError);
+   extern int WintoDosError( ULONG lError);
 #endif
 
 extern int GnuErrtoDosErr( int ErrCode );

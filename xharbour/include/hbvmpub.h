@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.23 2003/11/30 12:32:30 druzus Exp $
+ * $Id: hbvmpub.h,v 1.24 2004/02/13 07:13:33 ronpinkas Exp $
  */
 
 /*
@@ -121,7 +121,7 @@
 
     struct hb_struDate
     {
-       long value;
+       LONG value;
     };
 
     /* this definition signals that number of decimal places for double value
@@ -152,7 +152,7 @@
     struct hb_struLong
     {
        USHORT length;
-       long value;
+       LONG value;
     };
 
     struct hb_struMemvar

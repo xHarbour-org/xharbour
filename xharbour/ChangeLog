@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2286 2004/02/14 19:47:24 andijahja Exp $
+ * $Id: ChangeLog,v 1.2287 2004/02/14 21:01:01 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-16 05:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * include/hbapifs.h
+  * include/hbapi.h
+  * include/hbapicdp.h
+  * include/hbapiitm.h
+  * include/hbdate.h
+  * include/hbvm.h
+  * include/hbvmpub.h
+  * include/hbmacro.h
+    ! standardize typedefs according to xHarbour macros
+
 2004-02-16 04:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/arrays.c
   * source/vm/arrayshb.c
@@ -27,7 +38,6 @@
   * source/rtl/datec.c
   * source/rtl/dates.c
   * source/rtl/dateshb.c
-  * source/rtl/dir.c
   * source/rtl/diskspac.c
   * source/rtl/filesys.c
   * source/rtl/hbbitf.c
@@ -55,7 +65,6 @@
   * source/rtl/strtran.c
   * source/rtl/substr.c
   * source/rtl/win32ole.prg
-  * source/common/hbffind.c
   * source/rtl/gtwvt/gtwvt.c
     ! standardize long -> LONG
 
