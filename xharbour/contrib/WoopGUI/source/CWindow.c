@@ -203,6 +203,8 @@ HB_FUNC ( BRINGWINDOWTOTOP )
 
 // Creates an overlapped, pop-up, or child window with an extended window style.
 //
+
+/*
 HB_FUNC ( CREATEWINDOWEX )
 {
     //CLIENTCREATESTRUCT ccs;
@@ -250,7 +252,7 @@ HB_FUNC ( CREATEWINDOWEX )
 
     hb_retnl ((LONG)hwnd);
 }
-
+*/
 // Funzioni di Window
 
 /*
@@ -271,7 +273,7 @@ HB_FUNC ( ADJUSTWINDOWRECTEX )
 
 // From MiniGUI - Roberto Lopez
 //
-HB_FUNC ( CENTERWINDOW )
+HB_FUNC ( WG_CENTERWINDOW )
 {
     RECT rect;
     int w, h, x, y;
@@ -480,7 +482,7 @@ HB_FUNC ( GETWINDOWRECT )
    RECT rc;
    PHB_ITEM aMetr ;
 
-   GetWindowRect( (HWND) hb_parnl( 1 ),	&rc );
+   GetWindowRect( (HWND) hb_parnl( 1 ),   &rc );
    aMetr = Rect2Array( &rc  );
 
    _itemReturn( aMetr );
@@ -949,29 +951,29 @@ BOOL WG_WriteEvents( MSG msg )
 
 HB_FUNC ( GETACTIVEWINDOW )
 {
-	HWND hwnd;
+   HWND hwnd;
 
-	hwnd = GetActiveWindow();
+   hwnd = GetActiveWindow();
 
-	hb_retnl ( (LONG) hwnd );
+   hb_retnl ( (LONG) hwnd );
 }
 
 HB_FUNC ( SETACTIVEWINDOW )
 {
-	HWND hwnd;
+   HWND hwnd;
 
-	hwnd = (HWND) hb_parnl (1);
+   hwnd = (HWND) hb_parnl (1);
 
-	SetActiveWindow (hwnd);
+   SetActiveWindow (hwnd);
 }
 
 HB_FUNC ( REDRAWWINDOW )
 {
    RedrawWindow(
-    (HWND) hb_parnl( 1 ),	// handle of window
-    NULL,	// address of structure with update rectangle
-    NULL,	// handle of update region
-    hb_parni( 2 ) 	// array of redraw flags
+    (HWND) hb_parnl( 1 ),  // handle of window
+    NULL,   // address of structure with update rectangle
+    NULL,   // handle of update region
+    hb_parni( 2 )    // array of redraw flags
    );
 }
 

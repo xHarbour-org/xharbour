@@ -67,7 +67,7 @@ CLASS TWindow FROM TWindowBase
     DATA oMenu         AS OBJECT HIDDEN // Menu object
     DATA oContextMenu  AS OBJECT HIDDEN // Context Menu Object
 
-    DATA lPixel        AS LOGICAL INIT FALSE
+    DATA lPixel        AS LOGICAL INIT TRUE
 
     DATA oDC            AS OBJECT
     DATA oBrush         AS OBJECT
