@@ -1,5 +1,5 @@
 /*
- * $Id: pdfhbdocs.prg,v 1.1 2004/07/26 01:32:09 lculik Exp $
+ * $Id: pdfhbdocs.prg,v 1.2 2004/07/27 02:27:24 lculik Exp $
  */
 
 /*
@@ -655,7 +655,7 @@ LOCAL ulTempPos := 0
 LOCAL cText
    DEFAULT lBold TO .F.
 
-   iSize := PdfMaxBoxSize(  pText, Iif( bBold, 1, 0 ), pEnd, iRow, pStart )
+   iSize := PdfMaxBoxSize(  pText, Iif( lBold, 1, 0 ), pEnd, iRow, pStart )
 
    FOR each cText in pText
       setText(  cText, pStart[ hb_enumindex() ], iRow, iSize, pEnd[ hb_enumindex() ], lBold )
@@ -918,7 +918,7 @@ RETURN nil
 FUNCTION Pdfcomplevel( X )
 
    opdf:PdfCompLevel( x )
-   RETURN NIL
+RETURN NIL
 
    // inline c functions
 
@@ -931,8 +931,8 @@ FUNCTION Pdfcomplevel( X )
    ( ulLen >= 2 ) ? ( BYTE ) pszString[ 1 ] :0 ) ;
      //int i;
    //    i = *((short *) pszString);
-   RETURN i ;
-           }
+   return i ;
+    }
    const char szFontTable[ ] = {
    "\xfa\0\xfa\0\xfa\0\xfa\0\x4d\x01\x4d\x01\x4d\x01\x85\x01"
    "\x98\x01\x2b\x02\xa4\x01\x2b\x02\xf4\x01\xf4\x01\xf4\x01\xf4\x01"
@@ -1288,16 +1288,12 @@ FUNCTION Pdfcomplevel( X )
            Col.type = HB_IT_NIL ;
            Row.type = HB_IT_NIL ;
            hb_arrayNew( &Matrix, n1 ) ;
-           FOR ( ni = 1 
-   ni <= n1 
-   ni ++ )
+           for ( ni = 1 ;   ni <= n1 ;   ni ++ )
    {
    hb_arrayNew( &Col, n2 ) ;
-                FOR ( nj = 1 
-   nj <= n2 
-   nj ++ )
+                for ( nj = 1 ;   nj <= n2 ;   nj ++ )
    {
-   nPos := ( ni - 1 ) * n12 + ( nj - 1 ) * 2 + 1 ;
+   nPos = ( ni - 1 ) * n12 + ( nj - 1 ) * 2 + 1 ;
              y[ 0 ] = szFontTable[ nPos - 1 ] ;
              y[ 1 ] = szFontTable[ nPos ] ;
              y[ 2 ] = '\0' ;
@@ -1324,9 +1320,7 @@ FUNCTION Pdfcomplevel( X )
                                 float h = hb_parnd( 3 ) ;
                                 int row, res ;
                                 int p ;
-                                FOR ( row = 0 
-   row < h 
-   row += rowsperstrip )
+                                for ( row = 0 ;   row < h ;   row += rowsperstrip )
    {
    int height ;
            height = row + rowsperstrip > h ? h - row :rowsperstrip ;
