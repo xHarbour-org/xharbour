@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.103 2003/11/27 00:07:08 lculik Exp $
+ * $Id: hbmake.prg,v 1.104 2003/11/30 18:11:46 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1299,6 +1299,7 @@ FUNC CreateMakeFile( cFile )
          s_nWarningLevel := oMake:cWarningLevel
          cTopFile        := PadR(oMake:cTopModule,20," ")
          cResName        := oMake:cRes
+	 s_lRecurse      := oMake:lRecurse
       ELSE
          SetColor("W/N,N/W")
          CLS
