@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.39 2003/05/08 10:45:20 lculik Exp $
+ * $Id: dbfntx1.c,v 1.40 2003/05/24 00:29:10 ronpinkas Exp $
  */
 
 /*
@@ -504,12 +504,12 @@ static ULONG hb_ntxTagKeyCount( LPTAGINFO pTag )
          hb_ntxTagKeyGoTo( pTag, TOP_RECORD, NULL );
       }
       if( lRecno )
-         do
+         while( !pTag->TagEOF && hb_ntxInBottomScope( pTag, pTag->CurKeyInfo->key ) );
          {
             ulKeyCount ++;
             hb_ntxTagKeyGoTo( pTag, NEXT_RECORD, &lContinue );
          }
-         while( !pTag->TagEOF && hb_ntxInBottomScope( pTag, pTag->CurKeyInfo->key ) );
+         
 
       strcpy( pTag->CurKeyInfo->key, pKeyTmp->key );
       pTag->CurKeyInfo->Tag = pKeyTmp->Tag;
