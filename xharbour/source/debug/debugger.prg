@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.32 2004/04/18 17:28:00 likewolf Exp $
+ * $Id: debugger.prg,v 1.33 2004/04/19 09:53:53 likewolf Exp $
  */
 
 /*
@@ -1747,7 +1747,7 @@ METHOD ShowCodeLine( nProc ) CLASS TDebugger
 
       if ! empty( cPrgName )
 
-         if ( strip_path( cPrgName ) != strip_path( cPrgName ) .OR. ::oBrwText == NIL )
+         if ( strip_path( cPrgName ) != strip_path( ::cPrgName ) .OR. ::oBrwText == NIL )
 
             if ! File( cPrgName ) .and. !Empty( ::cPathForFiles )
                cPrgName := ::LocatePrgPath( cPrgName )
