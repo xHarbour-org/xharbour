@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.404 2004/06/17 12:23:19 druzus Exp $
+ * $Id: hvm.c,v 1.405 2004/06/21 19:06:25 ronpinkas Exp $
  */
 
 /*
@@ -2607,24 +2607,31 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   hb_vmPushNil();
                   hb_vmOperatorCall( pLocal, &Add, "__OPPLUS", NULL );
                }
+               else
+               {
+                  goto LocalNearAddIntError;
+               }
 
                break;
             }
             else
             {
-               HB_ITEM Add;
-               PHB_ITEM pResult;
-
-               Add.type = HB_IT_NIL;
-               hb_itemPutNI( &Add, ( int ) iAdd );
-               pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLocal, &Add );
-
-               if( pResult )
+               LocalNearAddIntError :
                {
-                  hb_itemForwardValue( pLocal, pResult );
-               }
+                  HB_ITEM Add;
+                  PHB_ITEM pResult;
 
-               break;
+                  Add.type = HB_IT_NIL;
+                  hb_itemPutNI( &Add, ( int ) iAdd );
+                  pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLocal, &Add );
+
+                  if( pResult )
+                  {
+                     hb_itemForwardValue( pLocal, pResult );
+                  }
+
+                  break;
+               }
             }
 
             pLocal->item.asDouble.value = ( double ) dNewVal;
@@ -2727,7 +2734,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             w += 3;
 
-
             if( HB_IS_NUMBER_INT( pTop ) )
             {
                #ifndef HB_LONG_LONG_OFF
@@ -2790,31 +2796,53 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                //printf( "Added: %i, Result: %i", iAdd, pTop->item.asLong.value );
                break;
             }
-            else
+            else if( HB_IS_OBJECT( pTop ) )
             {
-               HB_ITEM Add;
-               PHB_ITEM pResult;
-
-               Add.type = HB_IT_NIL;
-               hb_itemPutNI( &Add, ( int ) iAdd );
-
-               if( iAdd > 0 )
+               if( hb_objHasMsg( pTop, "__OpPlus" ) )
                {
-                  pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pTop, &Add );
+                  HB_ITEM Add;
+
+                  Add.type = HB_IT_INTEGER;
+                  Add.item.asInteger.value = iAdd;
+
+                  // hb_vmOperatorCall() will POP 2 arguments but we only have 1 argument on the Stack.
+                  hb_vmPushNil();
+                  hb_vmOperatorCall( pTop, &Add, "__OPPLUS", NULL );
                }
                else
                {
-                  (&Add)->item.asInteger.value *= -1 ;
-                  pResult = hb_errRT_BASE_Subst( EG_ARG, 1082, NULL, "-", 2, pTop, &Add );
+                  goto AddIntError;
                }
 
-               if( pResult )
+               break;
+            }
+            else
+            {
+               AddIntError :
                {
-                  hb_itemForwardValue( pTop, pResult );
-                  break;
+                  HB_ITEM Add;
+                  PHB_ITEM pResult;
+
+                  Add.type = HB_IT_NIL;
+                  hb_itemPutNI( &Add, ( int ) iAdd );
+
+                  if( iAdd > 0 )
+                  {
+                     pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pTop, &Add );
+                  }
+                  else
+                  {
+                     (&Add)->item.asInteger.value *= -1 ;
+                     pResult = hb_errRT_BASE_Subst( EG_ARG, 1082, NULL, "-", 2, pTop, &Add );
+                  }
+
+                  if( pResult )
+                  {
+                     hb_itemForwardValue( pTop, pResult );
+                     break;
+                  }
                }
             }
-
 
             pTop->item.asDouble.value = ( double ) dNewVal;
             pTop->item.asDouble.length = ( dNewVal >= 10000000000.0 || dNewVal <= -1000000000.0 ) ? 20 : 10;
