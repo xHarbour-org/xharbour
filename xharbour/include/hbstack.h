@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.20 2003/11/30 12:32:30 druzus Exp $
+ * $Id: hbstack.h,v 1.21 2003/12/19 07:30:00 ronpinkas Exp $
  */
 
 /*
@@ -141,10 +141,10 @@ extern void hb_stackOldFrame( HB_STACK_STATE * pStack );
 /* stack management functions */
 extern void    hb_stackDispLocal( void );  /* show the types of the items on the stack for debugging purposes */
 extern void    hb_stackDispCall( void );
-extern void    hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
+extern void    HB_EXPORT hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
 extern void    hb_stackFree( void );       /* releases all memory used by the stack */
-extern void    hb_stackPush( void );       /* pushes an item on to the stack */
-extern void    hb_stackPop( void );        /* pops an item from the stack */
+extern void    HB_EXPORT hb_stackPush( void );       /* pushes an item on to the stack */
+extern void    HB_EXPORT hb_stackPop( void );        /* pops an item from the stack */
 extern void    hb_stackInit( void );       /* initializes the stack */
 
 HB_EXTERN_END

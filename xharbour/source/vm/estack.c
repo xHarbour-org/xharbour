@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.61 2004/02/23 10:01:43 andijahja Exp $
+ * $Id: estack.c,v 1.62 2004/04/03 01:51:02 ronpinkas Exp $
  */
 
 /*
@@ -77,7 +77,7 @@ HB_EXPORT HB_STACK hb_GetStack( void )
 
 /* ------------------------------- */
 
-void hb_stackPop( void )
+void HB_EXPORT hb_stackPop( void )
 {
    HB_THREAD_STUB
 
@@ -98,7 +98,7 @@ void hb_stackPop( void )
    }
 }
 
-void hb_stackDec( void )
+void HB_EXPORT hb_stackDec( void )
 {
    HB_THREAD_STUB
 
@@ -110,7 +110,7 @@ void hb_stackDec( void )
    }
 }
 
-void hb_stackPush( void )
+void HB_EXPORT hb_stackPush( void )
 {
    LONG CurrIndex;   /* index of current top item */
    LONG TopIndex;    /* index of the topmost possible item */

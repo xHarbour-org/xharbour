@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.45 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: set.c,v 1.46 2004/04/08 13:26:53 druzus Exp $
  */
 
 /*
@@ -107,6 +107,11 @@ static void hb_setFreeSetPath( void )
    }
 
    sp_set_path = NULL;
+}
+
+HB_EXPORT HB_SET_STRUCT *hb_GetSetStructPtr( void )
+{
+	return &hb_set;
 }
 
 static char set_char( PHB_ITEM pItem, char oldChar )

@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.15 2004/02/15 21:58:47 ronpinkas Exp $
+ * $Id: eval.c,v 1.16 2004/02/23 08:31:57 andijahja Exp $
  */
 
 /*
@@ -78,7 +78,7 @@
 #include "hbvm.h"
 #include "classes.h"
 
-BOOL hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
+BOOL HB_EXPORT hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_evalNew(%p, %p)", pEvalInfo, pItem));
 
@@ -107,7 +107,7 @@ BOOL hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
          all, don't release the eval parameter Items explicitly to make both
          Harbour and CA-Clipper happy. [vszakats] */
 
-BOOL hb_evalPutParam( PEVALINFO pEvalInfo, PHB_ITEM pItem )
+BOOL HB_EXPORT hb_evalPutParam( PEVALINFO pEvalInfo, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_evalPutParam(%p, %p)", pEvalInfo, pItem));
 
@@ -121,7 +121,7 @@ BOOL hb_evalPutParam( PEVALINFO pEvalInfo, PHB_ITEM pItem )
       return FALSE;
 }
 
-PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
+PHB_ITEM HB_EXPORT hb_evalLaunch( PEVALINFO pEvalInfo )
 {
    HB_THREAD_STUB
 
@@ -185,7 +185,7 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
          once and only once before calling hb_evalRelease(). Harbour doesn't
          have these requirements. [vszakats] */
 
-BOOL hb_evalRelease( PEVALINFO pEvalInfo )
+BOOL HB_EXPORT hb_evalRelease( PEVALINFO pEvalInfo )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_evalRelease(%p)", pEvalInfo));
 
@@ -214,7 +214,7 @@ BOOL hb_evalRelease( PEVALINFO pEvalInfo )
          [vszakats]
 */
 
-PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
+PHB_ITEM HB_EXPORT hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
 {
    HB_THREAD_STUB
 
@@ -328,7 +328,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
          directly passed as a zero terminated string. [vszakats]
 */
 
-PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
+PHB_ITEM HB_EXPORT hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
 {
    HB_THREAD_STUB
 

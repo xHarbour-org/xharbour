@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.32 2004/02/23 19:55:27 andijahja Exp $
+ * $Id: hbapiitm.h,v 1.33 2004/03/02 00:28:18 druzus Exp $
  */
 
 /*
@@ -65,13 +65,13 @@ typedef struct
    PHB_ITEM pItems[ HB_EVAL_PARAM_MAX_ + 1 ];
 } EVALINFO, * PEVALINFO, * EVALINFO_PTR;
 
-extern PHB_ITEM hb_evalLaunch   ( PEVALINFO pEvalInfo );
-extern BOOL     hb_evalNew      ( PEVALINFO pEvalInfo, PHB_ITEM pItem );
-extern BOOL     hb_evalPutParam ( PEVALINFO pEvalInfo, PHB_ITEM pItem );
-extern BOOL     hb_evalRelease  ( PEVALINFO pEvalInfo );
+extern PHB_ITEM HB_EXPORT hb_evalLaunch   ( PEVALINFO pEvalInfo );
+extern BOOL     HB_EXPORT hb_evalNew      ( PEVALINFO pEvalInfo, PHB_ITEM pItem );
+extern BOOL     HB_EXPORT hb_evalPutParam ( PEVALINFO pEvalInfo, PHB_ITEM pItem );
+extern BOOL     HB_EXPORT hb_evalRelease  ( PEVALINFO pEvalInfo );
 
-extern PHB_ITEM hb_itemDo       ( PHB_ITEM pItem, ULONG ulPCount, ... );
-extern PHB_ITEM hb_itemDoC      ( char * szFunc, ULONG ulPCount, ... );
+extern PHB_ITEM HB_EXPORT hb_itemDo       ( PHB_ITEM pItem, ULONG ulPCount, ... );
+extern PHB_ITEM HB_EXPORT hb_itemDoC      ( char * szFunc, ULONG ulPCount, ... );
 
 extern PHB_ITEM HB_EXPORT hb_itemArrayGet     ( PHB_ITEM pArray, ULONG ulIndex );
 extern PHB_ITEM HB_EXPORT hb_itemArrayNew     ( ULONG ulLen );
