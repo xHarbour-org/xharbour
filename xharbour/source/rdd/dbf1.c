@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.92 2004/09/08 16:29:22 druzus Exp $
+ * $Id: dbf1.c,v 1.93 2004/09/21 02:52:35 druzus Exp $
  */
 
 /*
@@ -531,7 +531,7 @@ static void hb_dbfGetLockArray( DBFAREAP pArea, PHB_ITEM pItem )
    hb_arrayNew( pItem, pArea->ulNumLocksPos );
    for( ulCount = 0; ulCount < pArea->ulNumLocksPos; ulCount++ )
    {
-      hb_itemPutNL( hb_arrayGetItemPtr( pItem, ulCount ), pArea->pLocksPos[ ulCount ] );
+      hb_itemPutNL( hb_arrayGetItemPtr( pItem, ulCount + 1 ), pArea->pLocksPos[ ulCount ] );
    }
 }
 
