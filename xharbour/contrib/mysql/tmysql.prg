@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.1 2003/02/03 05:21:06 walito Exp $
+ * $Id: tmysql.prg,v 1.2 2003/02/03 21:26:53 walito Exp $
  */
 
 /*
@@ -465,6 +465,7 @@ return ::nCurRow - nOldRow
 METHOD GetRow( nRow, loRow, lSkip ) CLASS TMySQLQuery
 
    local cType, xField
+   local cDateFormat := set(4)
 
    default loRow to ::loRow
    default nRow  to ::nCurRow
@@ -535,9 +536,30 @@ METHOD GetRow( nRow, loRow, lSkip ) CLASS TMySQLQuery
                case "D"
                   if Empty(xField)
                      xField := CToD( "" )
+
+                  elseif cDateFormat = 'mm-dd-yyyy' // USA
+                     xField := ctod(substr(xField,6,2)+"-"+right(xField,2,0)+ "-" + Left(xField, 4))
+
+                  elseif  cDateFormat = 'dd/mm/yyyy' // BRITISH ou FRENCH
+                     xField :=  ctod(right(xField,2,0)+ "/"+ substr(xField,6,2)+"/"+ Left(xField, 4))
+
+                  elseif cDateFormat = 'yyyy.mm.dd' // ANSI
+                     xField := ctod(Left(xField, 4)+ "."+substr(xField,6,2)+"."+right(xField,2,0)) 
+
+                  elseif cDateFormat = 'dd.mm.yyyy' //GERMAN
+                     xField :=ctod(right(xField,2,0)+ "."+ substr(xField,6,2)+"."+ Left(xField, 4 ))
+
+                  elseif cDateFormat = 'dd-mm-yyyy'  //ITALIAN
+                     xField :=ctod(right(xField,2,0)+ "-"+ substr(xField,6,2)+"-"+ Left(xField, 4))
+
+                  elseif cDateFormat = 'yyyy/mm/dd' //JAPAN
+                     xField :=  ctod(Left(xField, 4)+ "/"+substr(xField,6,2)+"/"+right(xField,2,0)) 
+
+                  elseif cDateFormat = 'mm/dd/yyyy' // AMERICAN
+                     xField :=  ctod(substr(xField,6,2)+"/"+right(xField,2,0)+ "/" + Left(xField, 4))
                   else
-                     // MySQL Date format YYYY-MM-DD
-                     xField := SToD( Left( xField, 4 ) + substr( xField, 6, 2 ) + right( xField, 2 ) )
+                     xField := "''"
+
                   endif
                   exit
 
@@ -1473,6 +1495,8 @@ return aStruct
 static function ClipValue2SQL(Value, cType)
 
    local cValue := ""
+   local cDateFormat := set(4)
+
    Default cType to ValType( Value )
 
    switch cType
@@ -1483,8 +1507,23 @@ static function ClipValue2SQL(Value, cType)
 
       case "D"
          if !Empty( Value )
-            // MySQL dates are like YYYY-MM-DD or YYYYMMDD
-            cValue := "'" + Dtos( Value ) + "'"
+
+            if cDateFormat == 'mm-dd-yyyy' // USA
+               cValue := "'"+PadL(Month(Value), 2, "0") + '-'+ PadL(Day(Value), 2, "0") + "-" + Str(Year(Value), 4) + "'"
+            elseif  cDateFormat == 'dd/mm/yyyy' // BRITISH ou FRENCH
+               cValue := "'"+PadL(Day(Value), 2, "0") + "/" + PadL(Month(Value), 2, "0") + "/" + Str(Year(Value), 4) + "'"
+            elseif cDateFormat == 'yyyy.mm.dd' // ANSI
+               cValue := "'"+Str(Year(Value), 4)  + "." + PadL(Month(Value), 2, "0") + "." + PadL(Day(Value), 2, "0") + "'"
+            elseif cDateFormat == 'dd.mm.yyyy' //GERMAN
+               cValue := "'"+PadL(Day(Value), 2, "0") + "." + PadL(Month(Value), 2, "0") + "." + Str(Year(Value), 4) +  "'"
+            elseif cDateFormat == 'dd-mm-yyyy'  //ITALIAN
+               cValue := "'"+PadL(Day(Value), 2, "0") + "-" + PadL(Month(Value), 2, "0") + "-" + Str(Year(Value), 4)  + "'"
+            elseif cDateFormat == 'yyyy/mm/dd' //JAPAN
+               cValue := "'"+Str(Year(Value), 4)  + "/" + PadL(Month(Value), 2, "0") + "/" + PadL(Day(Value), 2, "0") + "'"
+            elseif cDateFormat == 'mm/dd/yyyy' // AMERICAN
+               cValue := "'"+Str(Year(Value), 4)     + "/" + PadL(Month(Value), 2, "0") + "/" + PadL(Day(Value), 2, "0") + "'"
+            endif
+
          else
             cValue := "''"
          endif
