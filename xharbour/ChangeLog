@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2229 2004/02/06 12:55:16 andijahja Exp $
+ * $Id: ChangeLog,v 1.2230 2004/02/06 17:06:59 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2004-02-04 13:28 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+2004-02-06 18:15 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  + tests/clipbrd.prg
+    + Added test for clipboard functions
+
+2004-02-06 18:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   M include/hbapigt.h
   M source/rtl/gtapi.c
   M source/rtl/gx.c
