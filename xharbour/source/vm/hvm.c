@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.416 2004/08/19 00:00:55 peterrees Exp $
+ * $Id: hvm.c,v 1.417 2004/08/27 03:28:58 walito Exp $
  */
 
 /*
@@ -723,6 +723,11 @@ int HB_EXPORT hb_vmQuit( void )
 #if !defined(HB_OS_DOS) && !defined(HB_OS_DARWIN)
    hb_serviceExit();
 #endif
+
+   if( hb_set.HB_SET_EOL )
+   {
+      hb_itemRelease( hb_set.HB_SET_EOL );
+   }
 
    /* release all remaining items */
    /*

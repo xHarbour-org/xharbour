@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3408 2004/09/06 14:58:57 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3409 2004/09/06 17:17:33 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-06 23:40 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * hrbdll.bc
+  * hrvdll.vc
+  * hrbdll.wc
+  * makefine.bc
+  * makefile.nt
+  * makefile.vc
+  * makefile.wc
+  * source/rtl/Makefile
+    ! Added txtline.c and removed memoline.c and mlcount.c
+  * include/hbset.h
+    ! Added SET EOL constant
+  + include/hbeol.ch
+    + New EOL police define
+  * source/pp/pptable.c
+    ! Added SET EOL support
+  + source/rtl/txtline.c
+    + EOL police contral functions
+  ! source/rtl/set.c
+    ! Added SET EOL support
+  ! source/vm/hvm.c
+    ! SET EOL cleanup
 
 2004-09-06 19:15 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/memoedit.prg

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.108 2004/08/29 01:46:11 paultucker Exp $
+# $Id: makefile.bc,v 1.109 2004/08/29 17:05:53 paultucker Exp $
 #
 
 #
@@ -414,9 +414,9 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\math.obj \
    $(RTL_OBJ_DIR)\maxrow.obj \
    $(RTL_OBJ_DIR)\memofile.obj \
-   $(RTL_OBJ_DIR)\memoline.obj \
+#   $(RTL_OBJ_DIR)\memoline.obj \
    $(RTL_OBJ_DIR)\minmax.obj \
-   $(RTL_OBJ_DIR)\mlcount.obj \
+#   $(RTL_OBJ_DIR)\mlcount.obj \
    $(RTL_OBJ_DIR)\mlpos.obj \
    $(RTL_OBJ_DIR)\mlctopos.obj \
    $(RTL_OBJ_DIR)\mpostolc.obj \
@@ -438,6 +438,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\philesx.obj \
    $(RTL_OBJ_DIR)\rat.obj \
    $(RTL_OBJ_DIR)\readline.obj \
+   $(RTL_OBJ_DIR)\txtline.obj \
    $(RTL_OBJ_DIR)\regex.obj \
    $(RTL_OBJ_DIR)\replic.obj \
    $(RTL_OBJ_DIR)\right.obj \
@@ -1945,6 +1946,9 @@ $(RTL_OBJ_DIR)\fserror.obj : $(RTL_DIR)\fserror.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\readline.obj : $(RTL_DIR)\readline.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\txtline.obj : $(RTL_DIR)\txtline.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\fkmax.obj : $(RTL_DIR)\fkmax.c

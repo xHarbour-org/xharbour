@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.52 2004/07/29 21:16:25 druzus Exp $
+ * $Id: set.c,v 1.53 2004/08/10 01:25:16 druzus Exp $
  */
 
 /*
@@ -1462,6 +1462,19 @@ HB_FUNC( SET )
          }
          break;
 
+      case HB_SET_EOL:
+         if( !hb_set.HB_SET_EOL )
+         {
+            hb_set.HB_SET_EOL = hb_itemPutC( NULL, hb_conNewLine() );
+         }
+         hb_itemReturnCopy( hb_set.HB_SET_EOL );
+         if( args > 1 )
+         {
+            hb_itemClear( hb_set.HB_SET_EOL );
+            hb_itemCopy( hb_set.HB_SET_EOL, pArg2 );
+         }
+         break;
+
       default:
          /* Return NIL if called with invalid SET specifier */
          break;
@@ -1574,8 +1587,6 @@ void hb_setInitialize( void )
 #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
    hb_set.HB_SET_DIRSEPARATOR = '/';
 #else
-//   hb_set.HB_SET_FILECASE = HB_SET_CASE_LOWER;
-//   hb_set.HB_SET_DIRCASE = HB_SET_CASE_LOWER;
    hb_set.HB_SET_DIRSEPARATOR = '\\';
 #endif
 
@@ -1587,6 +1598,8 @@ void hb_setInitialize( void )
    hb_set.HB_SET_DBFLOCKSCHEME = 0;
    hb_set.HB_SET_BACKGROUNDTASKS = FALSE;
    hb_set.HB_SET_TRIMFILENAME = FALSE;
+
+   hb_set.HB_SET_EOL = NULL;
 
    hb_set.HB_SET_WRAP = FALSE;
    hb_set.hb_set_winprinter=FALSE;

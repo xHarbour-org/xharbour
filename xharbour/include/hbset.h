@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.27 2004/07/29 21:16:24 druzus Exp $
+ * $Id: hbset.h,v 1.28 2004/08/10 01:25:14 druzus Exp $
  */
 
 /*
@@ -138,7 +138,8 @@ typedef enum
    HB_SET_BACKGROUNDTICK  = 114,
    HB_SET_PRINTERJOB      = 115,
    HB_SET_HARDCOMMIT      = 116,
-   HB_SET_FORCEOPT        = 117
+   HB_SET_FORCEOPT        = 117,
+   HB_SET_EOL             = 118
 
 } HB_set_enum;
 
@@ -221,6 +222,7 @@ typedef struct
    ULONG   HB_SET_BACKGROUNDTICK;
    BOOL    HB_SET_HARDCOMMIT;
    BOOL    HB_SET_FORCEOPT;
+   PHB_ITEM HB_SET_EOL;
 
 } HB_SET_STRUCT;
 

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.10 2004/08/27 07:53:50 paultucker Exp $
+# $Id: hrbdll.wc,v 1.11 2004/08/27 14:43:20 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -153,9 +153,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\maxrow.obj \
   $(OBJ_DIR)\memofile.obj \
   $(OBJ_DIR)\menuto.obj \
-  $(OBJ_DIR)\memoline.obj \
+  $(OBJ_DIR)\txtline.obj \
   $(OBJ_DIR)\minmax.obj \
-  $(OBJ_DIR)\mlcount.obj \
   $(OBJ_DIR)\mlctopos.obj \
   $(OBJ_DIR)\mlpos.obj \
   $(OBJ_DIR)\mpostolc.obj \

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.53 2004/05/11 16:29:51 ronpinkas Exp $
+# $Id: Makefile,v 1.54 2004/08/02 20:11:13 lf_sfnet Exp $
 #
 
 ROOT = ../../
@@ -75,9 +75,8 @@ C_SOURCES=\
         math.c       \
         maxrow.c     \
         memofile.c   \
-        memoline.c   \
+        txtline.c   \
         minmax.c     \
-        mlcount.c    \
         mlctopos.c   \
         mlpos.c      \
         mod.c        \

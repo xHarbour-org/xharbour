@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.113 2004/08/29 01:46:11 paultucker Exp $
+# $Id: makefile.vc,v 1.114 2004/08/29 17:05:57 paultucker Exp $
 #
 
 #
@@ -386,9 +386,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\math.obj \
    $(OBJ_DIR)$(MT)\maxrow.obj \
    $(OBJ_DIR)$(MT)\memofile.obj \
-   $(OBJ_DIR)$(MT)\memoline.obj \
+   $(OBJ_DIR)$(MT)\txtline.obj \
    $(OBJ_DIR)$(MT)\minmax.obj \
-   $(OBJ_DIR)$(MT)\mlcount.obj \
    $(OBJ_DIR)$(MT)\mlctopos.obj \
    $(OBJ_DIR)$(MT)\mlpos.obj \
    $(OBJ_DIR)$(MT)\mod.obj \
@@ -907,7 +906,7 @@ VM_LIB_OBJS = \
 
 DLL_MAIN_OBJS = \
    $(OBJ_DIR)$(MT)\mainstd.obj \
-   $(OBJ_DIR)$(MT)\mainwin.obj 
+   $(OBJ_DIR)$(MT)\mainwin.obj
 
 #
 # GTCGI.LIB rules

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.58 2004/08/27 14:43:20 paultucker Exp $
+# $Id: hrbdll.bc,v 1.59 2004/08/29 01:46:11 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -152,9 +152,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\maxrow.obj \
   $(OBJ_DIR)\memofile.obj \
   $(OBJ_DIR)\menuto.obj \
-  $(OBJ_DIR)\memoline.obj \
+  $(OBJ_DIR)\txtline.obj \
   $(OBJ_DIR)\minmax.obj \
-  $(OBJ_DIR)\mlcount.obj \
   $(OBJ_DIR)\mlctopos.obj \
   $(OBJ_DIR)\mlpos.obj \
   $(OBJ_DIR)\mpostolc.obj \
@@ -682,9 +681,8 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\maxrow.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\memofile.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\menuto.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\memoline.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\txtline.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\minmax.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\mlcount.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\mlctopos.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\mlpos.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\mpostolc.obj          + >> hdll.tmp
@@ -1644,7 +1642,7 @@ $(OBJ_DIR)\minmax.obj : $(RTL_DIR)\minmax.c
 $(OBJ_DIR)\memofile.obj : $(RTL_DIR)\memofile.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\memoline.obj : $(RTL_DIR)\memoline.c
+$(OBJ_DIR)\txtline.obj : $(RTL_DIR)\txtline.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\memoedit.c : $(RTL_DIR)\memoedit.prg
@@ -1669,9 +1667,6 @@ $(OBJ_DIR)\mpostolc.obj : $(RTL_DIR)\mpostolc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\mlctopos.obj : $(RTL_DIR)\mlctopos.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
-$(OBJ_DIR)\mlcount.obj : $(RTL_DIR)\mlcount.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\mlpos.obj : $(RTL_DIR)\mlpos.c
