@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.37 2003/09/10 20:45:36 ronpinkas Exp $
+ * $Id: memvars.c,v 1.38 2003/09/11 06:56:41 ronpinkas Exp $
  */
 
 /*
@@ -684,6 +684,15 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
       if( HB_IS_STRING( &pValue->item ) )
       {
          hb_itemReleaseString( &pValue->item );
+      }
+      else if( HB_IS_ARRAY( &pValue->item ) )
+      {
+         #ifndef HB_ARRAY_USE_COUNTER
+            if( pValue->item.item.asArray.value )
+            {
+               hb_arrayReleaseHolderGarbage( pValue->item.item.asArray.value, &pValue->item );
+            }
+         #endif
       }
       else if( HB_IS_COMPLEX( &pValue->item ) )
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1448 2003/09/11 13:23:28 mlombardo Exp $
+ * $Id: ChangeLog,v 1.1449 2003/09/11 14:57:46 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,11 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-11 10:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrays.c
+    + Added explicit HB_IS_MEMVAR() support to hb_arrayReleaseGarbage() utilizing hb_memvarValueDecGarbageRef()
+
+  * source/vm/memvars.c
+    + Added explict HB_IS_ARRAY() support to hb_memvarValueDecGarbageRef() utilizing hb_arrayReleaseHolderGarbage().
+
 2003-11-09 12:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   *  xharbour.spec
     * Added Conectiva to platform detection
   * make_rpm.sh
-    * Fixed when conectiva is used    
+    * Fixed when conectiva is used
 
 2003-11-03 10:15 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/vm/hbi18n.c
