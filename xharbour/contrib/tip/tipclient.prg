@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclient.prg,v 1.3 2003/11/20 15:30:25 jonnymind Exp $
+* $Id: tipclient.prg,v 1.4 2003/11/20 16:44:33 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "fileio.ch"
@@ -106,7 +106,7 @@ RETURN .T.
 
 METHOD Close() CLASS tIPClient
    IF .not. Empty( ::SocketCon )
-      RETURN InetDestroy( ::SocketCon )
+      RETURN InetClose( ::SocketCon )
    ENDIF
 RETURN -1
 

@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclientftp.prg,v 1.4 2003/11/14 12:01:41 jonnymind Exp $
+* $Id: tipclientftp.prg,v 1.5 2003/11/20 16:44:33 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -182,7 +182,6 @@ METHOD TransferStart() CLASS tIPClientFTP
 RETURN .F.
 
 METHOD Commit() CLASS tIPClientFTP
-   InetDestroy( ::SocketCon )
    ::SocketCon := ::SocketControl
    IF ::GetReply() .and. ::GetReply()
       RETURN .T.
@@ -267,10 +266,6 @@ RETURN .F.
 METHOD Port() CLASS tIPClientFTP
    LOCAL nPort := 16000
 
-   IF .not. Empty( ::SocketPortServer )
-      InetDestroy( ::SocketPortServer )
-   ENDIF
-
    ::SocketPortServer := InetCreate( ::nConnTimeout )
    DO WHILE nPort < 24000
       InetServer( nPort, ::SocketPortServer )
@@ -279,7 +274,7 @@ METHOD Port() CLASS tIPClientFTP
       ENDIF
       nPort ++
    ENDDO
-   InetDestroy( ::SocketPortServer )
+   ::SocketPortServer := NIL
 
 RETURN .F.
 
