@@ -1,10 +1,10 @@
 /*
- * $Id: set.txt,v 1.5 2004/07/23 04:23:04 lculik Exp $
+ * $Id: set.txt,v 1.6 2004/07/23 08:50:13 patrickmast Exp $
  */
 
 /*
  * The following parts are Copyright of the individual authors.
- * www - http://www.harbour-project.org
+ * www - http://www.xHarbour.org  - http://www.harbour-project.org
  *
  * Copyright 1999 David G. Holm <dholm@jsd-llc.com>
  *    Documentation for: SET(), __SETCENTURY()
@@ -29,6 +29,9 @@
  *
  * Copyright 2003 Francesco Saverio Giudice <info@fsgiudice.com>
  *    Documentation for: SET BACKGROUND TASKS and correspondent Set()
+ *
+ * Copyright 2004 Patrick Mast <patrick@xharbour.comt>
+ *    Documentation for: SET DBFLOCKSCHEME
  *
  * See doc/license.txt for licensing terms.
  *
@@ -1383,24 +1386,44 @@
  *      #define DBFLOCK_CL53       2
  *      #define DBFLOCK_VFP        3
  *  $DESCRIPTION$
- *      This command affects how a database file will be locked.
- *      The default locking scheme is 0.
+ *  This command affects how a database file will be locked.
  *
- *      The DBFLOCKSCHEME command needs to be set before opening a
- *      database file. Different locking schemes can be set for each
- *      work area, but remember that one file should never be accessed
- *      with different locks at the same time. Always use UNLOCK to
- *      release all locks before changing the locking scheme for a
- *      database file.
+ *  The default locking scheme is 0. The used locking scheme
+ *  used as the default depends on the RDD you use in your
+ *  application and operating system your application is
+ *  build for. When DBFCDX RDD is used, the default locking
+ *  scheme is DBFLOCK_VFP. For DBF, DBFFPT, DBFDBT and DBFNTX
+ *  the DBFLOCK_CLIP locking scheme is used as the default.
  *
- *      Setting the locking scheme to 1 will lock the database files
- *      like CA-Clipper 5.2 does. If you want to use CA-Clipper 5.3's
- *      locking scheme, set DBFLOCKSCHEME to 2. This will emulate shared
- *      locks using exclusive locks. Visual FoxPro's locking scheme can be
- *      set with DBFLOCKSCHEME TO 3.
+ *  Note: In the NTX header file, there is a flag which
+ *  informs that DBFLOCK_CL53 should be used.
  *
- *      Locking schemes for a open database file can be checked with
- *      dbinfo(DBI_LOCKSCHEME).
+ *  The DBFLOCKSCHEME command needs to be set before opening a
+ *  database file. Different locking schemes can be set for each
+ *  work area, but remember that one file should never be accessed
+ *  with different locks at the same time. Always use UNLOCK to
+ *  release all locks before changing the locking scheme for a
+ *  database file.
+ *
+ *  Setting the locking scheme to 1 will lock the database files
+ *  like CA-Clipper 5.2 does. If you want to use CA-Clipper 5.3's
+ *  locking scheme, set DBFLOCKSCHEME to 2. This will emulate shared
+ *  locks using exclusive locks.  Visual FoxPro's locking scheme can be
+ *  set with DBFLOCKSCHEME TO 3.
+ *
+ *  Note: The DBFLOCK_CL53 locking scheme uses the same locking scheme
+ *  as the locking scheme that COMMIX for CA-Clipper uses.
+ *
+ *  On POSIX (Linux and other *nixes) platforms SHARED locks are
+ *  used when possible in all locking schemes. So it's not necessary
+ *  to set DBFLOCK_CL53 which cannot work when 32bit file IO is used
+ *  (maximum lock offset has 31bit).
+ *
+ *  In DOS/Windows the DBFLOCK_CL53 will be probably the most efficient
+ *  for multi-user applications.
+ *
+ *  Locking schemes for a open database file can be checked with
+ *  dbinfo(DBI_LOCKSCHEME).
  *  $EXAMPLES$
  *  #define DBFLOCK_CL53       2
  *  REQUEST DBFCDX
