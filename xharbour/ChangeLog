@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.901 2003/04/01 00:42:01 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.902 2003/04/01 21:44:36 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-02 00:31 UTC+0100 Ian Anderson <i.anderson@procon-online.de>
+  * source\vm\hvm.c
+    * Corrected comment
+    
+  * source\debug\debugger.prg
+    ! fixed a number of fairly fundamental problems
+        Dispbegin() with no dispend()
+        path for sourcefiles now supported
+        warning if source files not found
+        procedure exit now returns you to the correct source file
+        guard against r/t error due to wrong array access
+        
+  * source\rtl\browdb.prg
+    * performancce enhancement, replaced calls to lastrec() with
+      cals to bod() and eof()
+      
+  * source\rtl\tbrowse.prg
+    ! guard against intermittent r/t error
 
 2003-04-01 13:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * makefile.vc
