@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.5 2002/11/06 18:57:22 lculik Exp $
+ * $Id: alert.prg,v 1.6 2002/11/09 07:49:36 ronpinkas Exp $
  */
 
 /*
@@ -43,6 +43,8 @@
 
 /* NOTE: nDelay parameter is a Harbour extension. */
 
+#define INRANGE( xLo, xVal, xHi )       ( xVal >= xLo .AND. xVal <= xHi )
+
 #ifdef HB_C52_UNDOC
 STATIC s_lNoAlert
 #endif
@@ -51,7 +53,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
    LOCAL nChoice
    LOCAL aSay, nPos, nWidth, nOpWidth, nInitRow, nInitCol, nEval
-   LOCAL nKey, aPos, nCurrent, aHotkey, aOptionsOK
+   LOCAL nKey, aPos, nCurrent, aHotkey, aOptionsOK, cEval
    LOCAL cColorHigh
 
    LOCAL nOldRow
@@ -61,7 +63,8 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
    LOCAL nOldDispCount
    LOCAL nCount
-   LOCAL nIndex, nLen, sCopy
+//   LOCAL nIndex
+   LOCAL nLen, sCopy
 
 #ifdef HB_COMPAT_C53
    LOCAL nMRow, nMCol
@@ -85,7 +88,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
 #ifdef HB_C52_STRICT
 
-   IF ! ISCHARACTER( xMessage )
+   IF !ISCHARACTER( xMessage )
       RETURN NIL
    ENDIF
 
@@ -103,35 +106,22 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
    IF ISARRAY( xMessage )
 
-      FOR nEval := 1 TO Len( xMessage )
-         IF ISCHARACTER( xMessage[ nEval ] )
-            AAdd( aSay, xMessage[ nEval ] )
+      FOR EACH cEval IN xMessage
+         IF ISCHARACTER( cEval )
+            AAdd( aSay, cEval )
          ENDIF
       NEXT
 
    ELSE
 
       DO CASE
-         CASE ValType( xMessage ) $ "CM"
-            /* Do nothing, just speed up things */
-
-         CASE ValType( xMessage ) == "N"
-            xMessage := LTrim( Str( xMessage ) )
-
-         CASE ValType( xMessage ) == "D"
-            xMessage := DToC( xMessage )
-
-         CASE ValType( xMessage ) == "L"
-            xMessage := iif( xMessage, ".T.", ".F." )
-
-         CASE ValType( xMessage ) == "O"
-            xMessage := xMessage:className + " Object"
-
-         CASE ValType( xMessage ) == "B"
-            xMessage := "{||...}"
-
-         OTHERWISE
-            xMessage := "NIL"
+      CASE ValType( xMessage ) $ "CM" /* Do nothing, just speed up things */
+      CASE ValType( xMessage ) == "N" ; xMessage := LTrim( Str( xMessage ) )
+      CASE ValType( xMessage ) == "D" ; xMessage := DToC( xMessage )
+      CASE ValType( xMessage ) == "L" ; xMessage := iif( xMessage, ".T.", ".F." )
+      CASE ValType( xMessage ) == "O" ; xMessage := xMessage:className + " Object"
+      CASE ValType( xMessage ) == "B" ; xMessage := "{||...}"
+      OTHERWISE                       ; xMessage := "NIL"
       ENDCASE
 
       DO WHILE ( nPos := At( ';', xMessage ) ) != 0
@@ -140,10 +130,9 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
       ENDDO
       AAdd( aSay, xMessage )
 
-      nIndex := 0
-
+//      nIndex := 0
       FOR EACH xMessage IN aSay
-         nIndex++
+//         nIndex++
 
          IF ( nLen := Len( xMessage ) ) > 58
             FOR nPos := 58 TO 1 STEP -1
@@ -157,12 +146,15 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
             ENDIF
 
             sCopy := xMessage
-            aSay[ nIndex ] := RTrim( Left( xMessage, nPos ) )
+//            aSay[ nIndex ] := RTrim( Left( xMessage, nPos ) )
+            aSay[ HB_EnumIndex() ] := RTrim( Left( xMessage, nPos ) )
 
-            IF Len( aSay ) == nIndex
+//            IF Len( aSay ) == nIndex
+            IF Len( aSay ) == HB_EnumIndex()
                aAdd( aSay, SubStr( sCopy, nPos + 1 ) )
             ELSE
-               aIns( aSay, nIndex + 1, SubStr( sCopy, nPos + 1 ), .T. )
+//               aIns( aSay, nIndex + 1, SubStr( sCopy, nPos + 1 ), .T. )
+               aIns( aSay, HB_EnumIndex() + 1, SubStr( sCopy, nPos + 1 ), .T. )
             ENDIF
         ENDIF
       NEXT
@@ -193,9 +185,9 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
    /* Cleanup the button array */
    aOptionsOK := {}
-   FOR nEval := 1 TO Len( aOptions )
-      IF ISCHARACTER( aOptions[ nEval ] ) .AND. !Empty( aOptions[ nEval ] )
-         AAdd( aOptionsOK, aOptions[ nEval ] )
+   FOR EACH cEval IN aOptions
+      IF ISCHARACTER( cEval ) .AND. !Empty( cEval )
+         AAdd( aOptionsOK, cEval )
       ENDIF
    NEXT
 
@@ -229,17 +221,23 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
    IF lConsole
 
-      FOR nEval := 1 TO Len( aSay )
-         OutStd( aSay[ nEval ] )
-         IF nEval < Len( aSay )
+//      nEval  := 1
+      nCount := Len( aSay )
+      FOR EACH cEval IN aSay
+         OutStd( cEval )
+//         IF nEval++ < nCount
+         IF HB_EnumIndex() < nCount
             OutStd( hb_OSNewLine() )
          ENDIF
       NEXT
 
       OutStd( " (" )
-      FOR nEval := 1 TO Len( aOptionsOK )
-         OutStd( aOptionsOK[ nEval ] )
-         IF nEval < Len( aOptionsOK )
+//      nEval  := 1
+      nCount := Len( aOptionsOK )
+      FOR EACH cEval IN aOptionsOK
+         OutStd( cEval )
+//         IF nEval++ < nCount
+         IF HB_EnumIndex() < nCount
             OutStd( ", " )
          ENDIF
       NEXT
@@ -290,17 +288,22 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
       /* draw box */
       DispBox( nInitRow, nInitCol, nInitRow + Len( aSay ) + 3, nInitCol + nWidth + 1, B_SINGLE + ' ', cColorNorm )
 
-      FOR nEval := 1 TO Len( aSay )
-         DispOutAt( nInitRow + nEval, nInitCol + 1 + Int( ( ( nWidth - Len( aSay[ nEval ] ) ) / 2 ) + .5 ), aSay[ nEval ], cColorNorm )
+//      nEval := 1
+      FOR EACH cEval IN aSay
+//         DispOutAt( nInitRow + nEval++, nInitCol + 1 + Int( ( ( nWidth - Len( cEval ) ) / 2 ) + .5 ), cEval, cColorNorm )
+         DispOutAt( nInitRow + HB_EnumIndex(), nInitCol + 1 + Int( ( ( nWidth - Len( cEval ) ) / 2 ) + .5 ), cEval, cColorNorm )
       NEXT
 
       /* choice loop */
       DO WHILE .T.
 
-         FOR nEval := 1 TO Len( aOptionsOK )
-            DispOutAt( nInitRow + Len( aSay ) + 2, aPos[ nEval ], " " + aOptionsOK[ nEval ] + " ",;
-               iif( nEval == nChoice, cColorHigh, cColorNorm ) )
+//         nEval  := 1
+         nCount := Len( aSay )
+         FOR EACH cEval IN aOptionsOK
+//            DispOutAt( nInitRow + nCount + 2, aPos[ nEval++ ], " " + cEval + " ", cColorNorm )
+            DispOutAt( nInitRow + nCount + 2, aPos[ HB_EnumIndex() ], " " + cEval + " ", cColorNorm )
          NEXT
+         DispOutAt( nInitRow + nCount + 2, aPos[ nChoice ], " " + aOptionsOK[ nChoice ] + " ", cColorHigh )
 
          nKey := Inkey( nDelay, INKEY_ALL )
 
@@ -323,17 +326,21 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
             nMRow := MRow()
             nMCol := MCol()
 
-            FOR nEval := 1 TO Len( aOptionsOK )
-               IF nMRow == nInitRow + Len( aSay ) + 2 .AND. ;
-                  nMCol >= aPos[ nEval ] .AND. nMCol <= aPos[ nEval ] + ;
-                  Len( aOptionsOK[ nEval ] ) + 2 - 1
-                  nChoice := nEval
+//            nEval  := 1
+            nChoice := 0
+            nCount  := Len( aSay )
+            FOR EACH cEval IN aOptionsOK
+               IF nMRow == nInitRow + nCount + 2 .AND. ;
+                    INRANGE( aPos[ HB_EnumIndex() ], nMCol, aPos[ HB_EnumIndex() ] + Len( cEval ) + 2 - 1 )
+//                    INRANGE( aPos[ nEval ], nMCol, aPos[ nEval ] + Len( cEval ) + 2 - 1 )
+//                  nChoice := nEval
+                  nChoice := HB_EnumIndex()
                   EXIT
                ENDIF
+//               nEval++
             NEXT
 
-            IF nChoice == nEval
-               nChoice := 0
+            IF nChoice == 0
                EXIT
             ENDIF
 
@@ -357,9 +364,9 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
             nDelay := 0
 
-         CASE aScan( aHotkey, {| x | x == Upper( Chr( nKey ) ) } ) > 0
+         CASE ( nEval:=aScan( aHotkey, {| x | x == Upper( Chr( nKey ) ) } ) ) > 0
 
-            nChoice := aScan( aHotkey, {| x | x == Upper( Chr( nKey ) ) } )
+            nChoice := nEval
             EXIT
 
          ENDCASE
