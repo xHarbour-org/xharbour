@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.2 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: hbhex2n.c,v 1.4 2004/04/03 19:41:19 mlombardo Exp $
  */
 
 /*
@@ -220,7 +220,7 @@ HB_FUNC( HB_HEXTOSTR )
    len = hb_parclen( 1 );
    nalloc = (USHORT) (len/2);
    outbuff = hb_xgrab( nalloc + 1 );
-// printf( "                           larg %i, out %i\n", len, nalloc );
+
    for( i = 0; i < nalloc; i++ )
    {
       // First byte
