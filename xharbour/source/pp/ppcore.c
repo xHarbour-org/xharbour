@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.149 2004/05/06 19:07:24 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.150 2004/05/08 05:26:06 ronpinkas Exp $
  */
 
 /*
@@ -3377,7 +3377,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
 static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxrez, int iContext )
 {
    int lens = 0;
-   char * sZnaki = "+-=><*/$.:#%!^&|";
+   char * sZnaki = "+-=><*/$.:#%!^|";
    int State;
    int StBr1 = 0, StBr2 = 0, StBr3 = 0;
    BOOL rez = FALSE;
@@ -3727,7 +3727,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                   rez = TRUE;
                }
             }
-            else if( strchr( sZnaki, **ptri ) )
+            else if( strchr( sZnaki, **ptri ) || ( **ptri == '&' && isspace( (*ptri)[1] ) ) )
             {
                /* Ron Pinkas added 2000-06-02 */
                if( **ptri == '.' && bMacro )
