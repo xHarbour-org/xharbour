@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1562 2003/10/07 22:13:55 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1563 2003/10/07 22:25:42 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-07 16:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/classes.h
+  * include/hbvm.h
+  * source/vm/classes.c
+  * source/vm/hvm.c
+    + Added missing HB_EXPORT
+
+  * tests/tstcstru.prg
+    + Added:
+      #define HB_NO_DEFAULT_API_MACROS
+      #define HB_NO_DEFAULT_STACK_MACROS
+    * Removed direct HB_VM_STACK.Return access in favor of hb_retclenAdoptRaw() EXTEND API.
+      /* Sample can now be used with DLL R/T. */
+
+  /*
+     We need to make sure that our samples do NOT "teach" direct access to HB_VM_STACK (or worse hb_stack).
+   */
 
 2003-10-07 18:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source\rtl gtapi.c

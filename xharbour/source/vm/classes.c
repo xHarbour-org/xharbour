@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.76 2003/09/07 23:12:15 ronpinkas Exp $
+ * $Id: classes.c,v 1.77 2003/09/10 06:07:31 ronpinkas Exp $
  */
 
 /*
@@ -818,7 +818,7 @@ BOOL hb_clsIsParent(  USHORT uiClass, char * szParentName )
  * Get the class name of an object
  *
  */
-char * hb_objGetClsName( PHB_ITEM pObject )
+HB_EXPORT char * hb_objGetClsName( PHB_ITEM pObject )
 {
    char * szClassName;
 
@@ -886,7 +886,7 @@ char * hb_objGetClsName( PHB_ITEM pObject )
  * of inheritance.
  *
  */
-USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
+HB_EXPORT USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
 {
    PHB_DYNS pMsg = hb_dynsymFindName( szName );
    USHORT uiClass;
@@ -951,7 +951,7 @@ USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
    return uiClass;
 }
 
-char * hb_objGetRealClsName( PHB_ITEM pObject, char * szName )
+HB_EXPORT char * hb_objGetRealClsName( PHB_ITEM pObject, char * szName )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetrealClsName(%p, %s)", pObject, szName));
 
@@ -1012,12 +1012,12 @@ char * hb_objGetRealClsName( PHB_ITEM pObject, char * szName )
  *
  * Internal function to the function pointer of a message of an object
  */
-PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
+HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
 {
   return hb_objGetMthd( (PHB_ITEM) pObject, (PHB_SYMB) pMessage, TRUE, NULL, FALSE ) ;
 }
 
-PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend )
+HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend )
 {
    USHORT uiClass;
    PHB_DYNS pMsg = pMessage->pDynSym;
@@ -1181,7 +1181,7 @@ BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
    return FALSE;
 }
 
-PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
+HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
 {
    USHORT uiClass;
    PHB_DYNS pMsg = pMessage->pDynSym;
@@ -1226,7 +1226,7 @@ PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
  *
  * <uPtr> should be read as a boolean
  */
-ULONG hb_objHasMsg( PHB_ITEM pObject, char *szString )
+HB_EXPORT ULONG hb_objHasMsg( PHB_ITEM pObject, char *szString )
 {
    PHB_DYNS pDynSym = hb_dynsymFindName( szString );
 

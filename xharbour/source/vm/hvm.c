@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.267 2003/10/06 03:35:40 ronpinkas Exp $
+ * $Id: hvm.c,v 1.268 2003/10/06 21:31:35 ronpinkas Exp $
  */
 
 /*
@@ -4868,21 +4868,6 @@ static void hb_vmArrayNew( PHB_ITEM pArray, USHORT uiDimension )
 /* Object                          */
 /* ------------------------------- */
 
-#if 0
-void hb_vmMessage( PHB_SYMB pSymMsg ) /* sends a message to an object */
-{
-   PHB_ITEM pItemMsg = hb_stackItemFromTop( -1 );
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmMessage(%p, %s)", pSymMsg, pSymMsg->szName));
-
-   hb_itemForwardValue( ( * HB_VM_STACK.pPos ), pItemMsg ); /* moves the object forward */
-   pItemMsg->type = HB_IT_SYMBOL;
-   pItemMsg->item.asSymbol.value = pSymMsg;
-   pItemMsg->item.asSymbol.stackbase = hb_stackTopOffset() - 1;
-   hb_stackPush();
-}
-#endif
-
 static void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSymbol )
 {
    /* NOTE: There is no need to test if specified symbol exists. It is checked
@@ -5087,7 +5072,7 @@ static void hb_vmSwapAlias( void )
 /* Execution                       */
 /* ------------------------------- */
 
-void hb_vmDo( USHORT uiParams )
+HB_EXPORT void hb_vmDo( USHORT uiParams )
 {
    HB_THREAD_STUB
 
@@ -5217,7 +5202,7 @@ void hb_vmDo( USHORT uiParams )
    s_iBaseLine = iPresetBase;
 }
 
-void hb_vmSend( USHORT uiParams )
+HB_EXPORT void hb_vmSend( USHORT uiParams )
 {
    HB_THREAD_STUB
 
@@ -5523,7 +5508,7 @@ static HARBOUR hb_vmDoBlock( void )
 
 /* Evaluates a passed codeblock item with no arguments passed to a codeblock
 */
-HB_ITEM_PTR hb_vmEvalBlock( HB_ITEM_PTR pBlock )
+HB_EXPORT HB_ITEM_PTR hb_vmEvalBlock( HB_ITEM_PTR pBlock )
 {
    HB_THREAD_STUB
 
@@ -5543,7 +5528,7 @@ HB_ITEM_PTR hb_vmEvalBlock( HB_ITEM_PTR pBlock )
  *for example:
  * retVal = hb_vmEvalBlockV( pBlock, 2, pParam1, pParam2 );
 */
-HB_ITEM_PTR HB_EXPORT hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ... )
+HB_EXPORT HB_ITEM_PTR HB_EXPORT hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ... )
 {
    HB_THREAD_STUB
    va_list va;
@@ -5568,7 +5553,7 @@ HB_ITEM_PTR HB_EXPORT hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ...
    return &(HB_VM_STACK.Return);
 }
 
-void hb_vmFunction( USHORT uiParams )
+HB_EXPORT void hb_vmFunction( USHORT uiParams )
 {
    HB_THREAD_STUB
 
@@ -5804,7 +5789,7 @@ static void hb_vmDebuggerShowLine( USHORT uiLine ) /* makes the debugger shows a
 /* Push                            */
 /* ------------------------------- */
 
-void hb_vmPush( PHB_ITEM pItem )
+HB_EXPORT void hb_vmPush( PHB_ITEM pItem )
 {
    HB_THREAD_STUB
 
@@ -5814,7 +5799,7 @@ void hb_vmPush( PHB_ITEM pItem )
    hb_stackPush();
 }
 
-void hb_vmPushNil( void )
+HB_EXPORT void hb_vmPushNil( void )
 {
    HB_THREAD_STUB
 
@@ -5824,7 +5809,7 @@ void hb_vmPushNil( void )
    hb_stackPush();
 }
 
-void hb_vmPushLogical( BOOL bValue )
+HB_EXPORT void hb_vmPushLogical( BOOL bValue )
 {
    HB_THREAD_STUB
 
@@ -5835,12 +5820,12 @@ void hb_vmPushLogical( BOOL bValue )
    hb_stackPush();
 }
 
-void hb_vmPushNumber( double dNumber, int iDec )
+HB_EXPORT void hb_vmPushNumber( double dNumber, int iDec )
 {
    hb_vmPushNumType( dNumber, iDec, 0, 0 );
 }
 
-void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 )
+HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumber(%lf, %d)", dNumber, iDec));
 
@@ -5864,7 +5849,7 @@ void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 )
    }
 }
 
-void hb_vmPushInteger( int iNumber )
+HB_EXPORT void hb_vmPushInteger( int iNumber )
 {
    HB_THREAD_STUB
 
@@ -5876,7 +5861,7 @@ void hb_vmPushInteger( int iNumber )
    hb_stackPush();
 }
 
-void hb_vmPushLong( long lNumber )
+HB_EXPORT void hb_vmPushLong( long lNumber )
 {
    HB_THREAD_STUB
 
@@ -5926,7 +5911,7 @@ static void hb_vmPushLongConst( long lNumber )
    hb_stackPush();
 }
 
-void hb_vmPushDouble( double dNumber, int iDec )
+HB_EXPORT void hb_vmPushDouble( double dNumber, int iDec )
 {
    HB_THREAD_STUB
 
@@ -5995,7 +5980,7 @@ static void hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec )
    hb_stackPush();
 }
 
-void hb_vmPushDate( long lDate )
+HB_EXPORT void hb_vmPushDate( long lDate )
 {
    HB_THREAD_STUB
 
@@ -6006,7 +5991,7 @@ void hb_vmPushDate( long lDate )
    hb_stackPush();
 }
 
-void hb_vmPushPointer( void * pPointer )
+HB_EXPORT void hb_vmPushPointer( void * pPointer )
 {
    HB_THREAD_STUB
 
@@ -6017,7 +6002,7 @@ void hb_vmPushPointer( void * pPointer )
    hb_stackPush();
 }
 
-void hb_vmPushString( char * szText, ULONG length )
+HB_EXPORT void hb_vmPushString( char * szText, ULONG length )
 {
    HB_THREAD_STUB
 
@@ -6042,7 +6027,7 @@ void hb_vmPushString( char * szText, ULONG length )
    HB_TRACE( HB_TR_DEBUG, ( "Pushed String %p '%s'", hb_stackItemFromTop(-1), hb_stackItemFromTop(-1)->item.asString.value ) );
 }
 
-void hb_vmPushSymbol( PHB_SYMB pSym )
+HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
 {
    HB_THREAD_STUB
 

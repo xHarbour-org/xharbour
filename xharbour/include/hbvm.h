@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.9 2003/07/22 01:54:29 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.10 2003/10/06 21:31:34 ronpinkas Exp $
  */
 
 /*
@@ -85,29 +85,26 @@ extern void    hb_vmRequestReset( void );
 
 /* Public PCode functions */
 
-/* Object */
-extern void    hb_vmMessage( PHB_SYMB pSymMsg ); /* sends a message to an object */
-
 /* Execution */
-extern void    hb_vmDo( USHORT uiParams );      /* invoke the virtual machine */
-extern void    hb_vmFunction( USHORT uiParams ); /* executes a function saving its result */
-extern void    hb_vmSend( USHORT uiParams ); /* sends a message to an object */
-extern PHB_ITEM hb_vmEvalBlock( PHB_ITEM pBlockItem ); /* executes passed codeblock with no arguments */
+HB_EXPORT extern void    hb_vmDo( USHORT uiParams );      /* invoke the virtual machine */
+HB_EXPORT extern void    hb_vmFunction( USHORT uiParams ); /* executes a function saving its result */
+HB_EXPORT extern void    hb_vmSend( USHORT uiParams ); /* sends a message to an object */
+HB_EXPORT extern PHB_ITEM hb_vmEvalBlock( PHB_ITEM pBlockItem ); /* executes passed codeblock with no arguments */
 /* executes passed codeblock with variable number of arguments */
-extern PHB_ITEM HB_EXPORT hb_vmEvalBlockV( PHB_ITEM pBlockItem, ULONG ulArgCount, ... );
+HB_EXPORT extern PHB_ITEM HB_EXPORT hb_vmEvalBlockV( PHB_ITEM pBlockItem, ULONG ulArgCount, ... );
 
 /* Push */
-extern void    hb_vmPush( PHB_ITEM pItem );     /* pushes a generic item onto the stack */
-extern void    hb_vmPushNil( void );            /* in this case it places nil at self */
-extern void    hb_vmPushNumber( double dNumber, int iDec ); /* pushes a number on to the stack and decides if it is integer, long or double */
-extern void    hb_vmPushInteger( int iNumber ); /* pushes a integer number onto the stack */
-extern void    hb_vmPushLong( long lNumber ); /* pushes a long number onto the stack */
-extern void    hb_vmPushDouble( double lNumber, int iDec ); /* pushes a double number onto the stack */
-extern void    hb_vmPushLogical( BOOL bValue );    /* pushes a logical value onto the stack */
-extern void    hb_vmPushString( char * szText, ULONG length );  /* pushes a string on to the stack */
-extern void    hb_vmPushDate( long lDate );   /* pushes a long date onto the stack */
-extern void    hb_vmPushSymbol( PHB_SYMB pSym ); /* pushes a function pointer onto the stack */
-extern void    hb_vmPushPointer( void * ); /* push an item of HB_IT_POINTER type */
+HB_EXPORT extern void    hb_vmPush( PHB_ITEM pItem );     /* pushes a generic item onto the stack */
+HB_EXPORT extern void    hb_vmPushNil( void );            /* in this case it places nil at self */
+HB_EXPORT extern void    hb_vmPushNumber( double dNumber, int iDec ); /* pushes a number on to the stack and decides if it is integer, long or double */
+HB_EXPORT extern void    hb_vmPushInteger( int iNumber ); /* pushes a integer number onto the stack */
+HB_EXPORT extern void    hb_vmPushLong( long lNumber ); /* pushes a long number onto the stack */
+HB_EXPORT extern void    hb_vmPushDouble( double lNumber, int iDec ); /* pushes a double number onto the stack */
+HB_EXPORT extern void    hb_vmPushLogical( BOOL bValue );    /* pushes a logical value onto the stack */
+HB_EXPORT extern void    hb_vmPushString( char * szText, ULONG length );  /* pushes a string on to the stack */
+HB_EXPORT extern void    hb_vmPushDate( long lDate );   /* pushes a long date onto the stack */
+HB_EXPORT extern void    hb_vmPushSymbol( PHB_SYMB pSym ); /* pushes a function pointer onto the stack */
+HB_EXPORT extern void    hb_vmPushPointer( void * ); /* push an item of HB_IT_POINTER type */
 
 #if defined(HB_EXTERN_C)
 }

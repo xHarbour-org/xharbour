@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.5 2003/06/21 07:36:04 ronpinkas Exp $
+ * $Id: classes.h,v 1.6 2003/08/15 22:17:26 ronpinkas Exp $
  */
 
 /*
@@ -95,13 +95,13 @@ PCLASS   hb_clsClassesArray( void );
 USHORT   hb_clsMaxClasses( void );
 
 
-char *   hb_objGetClsName( PHB_ITEM pObject );
-char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szName );
-USHORT   hb_objGetRealCls( PHB_ITEM pObject, char * szName );
-PHB_FUNC hb_objGetMethod( PHB_ITEM, PHB_SYMB );
-PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int bOptimized );
-PMETHOD  hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
-ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString );
+HB_EXPORT char *   hb_objGetClsName( PHB_ITEM pObject );
+HB_EXPORT char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szName );
+HB_EXPORT USHORT   hb_objGetRealCls( PHB_ITEM pObject, char * szName );
+HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM, PHB_SYMB );
+HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int bOptimized );
+HB_EXPORT PMETHOD  hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
+HB_EXPORT ULONG    hb_objHasMsg( PHB_ITEM pObject, char * szString );
 
 void *   hb_mthRequested( void );
 
