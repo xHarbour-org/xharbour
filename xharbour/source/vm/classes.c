@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.120 2004/05/09 21:13:49 druzus Exp $
+ * $Id: classes.c,v 1.121 2004/05/10 08:54:25 ronpinkas Exp $
  */
 
 /*
@@ -333,11 +333,11 @@ static void hb_clsRelease( PCLASS pClass )
      }
    }
 
-   hb_xfree( pClass->szName );
-   hb_xfree( pClass->pMethods );
-
    hb_itemRelease( pClass->pClassDatas );
    hb_itemRelease( pClass->pInlines );
+
+   hb_xfree( pClass->szName );
+   hb_xfree( pClass->pMethods );
 }
 
 

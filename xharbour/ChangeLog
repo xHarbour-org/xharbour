@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3001 2004/05/28 18:51:05 likewolf Exp $
+ * $Id: ChangeLog,v 1.3002 2004/05/28 19:13:51 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-28 15:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.sly
+    ! Fixed GPF trap related to duplicate usage of pGetVar without cloning.
+
+  * source/vm/classes.c
+    ! Fixed GPF trap related to releasing class methods before release of datas inlines
+      (which might refer back to a method)
 
 2004-05-28 12:10 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * contrib/rdd_ads/adsfunc.c

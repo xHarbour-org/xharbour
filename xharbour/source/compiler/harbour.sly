@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.67 2004/05/12 02:25:24 druzus Exp $
+ * $Id: harbour.sly,v 1.68 2004/05/24 07:34:01 ronpinkas Exp $
  */
 
 /*
@@ -1329,7 +1329,7 @@ Get        : _Get_ GetVar ','
 
 		   pIfList      = hb_compExprNewList( pIsNil );
 		   pIfList      = hb_compExprAddListExpr( pIfList, pGetVar );
-		   pIfList      = hb_compExprAddListExpr( pIfList, hb_compExprAssign( pGetVar, hb_compExprNewVar( "_1" ) ) );
+		   pIfList      = hb_compExprAddListExpr( pIfList, hb_compExprAssign( hb_compExprClone( pGetVar ), hb_compExprNewVar( "_1" ) ) );
 
 		   pIIF         = hb_compExprNewIIF( pIfList );
 
