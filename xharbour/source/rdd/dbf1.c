@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.95 2004/11/21 21:43:51 druzus Exp $
+ * $Id: dbf1.c,v 1.96 2004/11/22 21:12:08 druzus Exp $
  */
 
 /*
@@ -1848,7 +1848,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
    /* Write fields and eof mark */
    if ( hb_fsWrite( pArea->hDataFile, ( BYTE * ) pBuffer, uiSize ) != uiSize ||
-        ( pArea->bVersion == 0x30 ? 
+        ( pArea->bVersion == 0x30 ?
             hb_fsWrite( pArea->hDataFile, ( BYTE * ) "\r\032", 2 ) != 2 :
             hb_fsWrite( pArea->hDataFile, ( BYTE * ) "\r\0\032", 3 ) != 3 ) )
    {
@@ -2037,7 +2037,7 @@ static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType
       {
          BOOL bDeleted;
          ULONG ulPrevRec = 0;
-         
+
          if( pArea->lpdbPendingRel )
             SELF_FORCEREL( ( AREAP ) pArea );
 
@@ -2070,6 +2070,71 @@ static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType
       case DBRI_UPDATED:
          hb_itemPutL( pInfo, ulRecNo == pArea->ulRecNo && pArea->fRecordChanged );
          break;
+      case DBRI_RAWRECORD:
+      case DBRI_RAWMEMOS:
+      case DBRI_RAWDATA:
+         {
+            USHORT uiFields;
+            BYTE *pResult ;
+            HB_ITEM itItem = HB_ITEM_NIL ;
+            ULONG uiLength;
+            ULONG ulPrevRec = 0;
+            BOOL bDeleted;
+            if( pArea->ulRecNo != ulRecNo )
+            {
+               ulPrevRec = pArea->ulRecNo;
+               SELF_GOTO( ( AREAP ) pArea, ulRecNo );
+            }
+            SELF_DELETED( ( AREAP ) pArea, &bDeleted );  // No need to allow for == FAILURE here
+
+            if ( uiInfoType == DBRI_RAWRECORD || uiInfoType == DBRI_RAWDATA )
+            {
+               uiLength = pArea->uiRecordLen;
+               pResult = hb_xgrab( uiLength + 1 ) ;  // Allow final '\0' placed by hb_itemPutCPtr
+                                                     // Assume xgrab ok - no memory checking
+               memcpy( pResult, pArea->pRecord, uiLength ) ;
+            }
+            else
+            {
+               pResult = NULL;
+               uiLength = 0;
+            }
+
+            if ( uiInfoType == DBRI_RAWMEMOS || uiInfoType == DBRI_RAWDATA )
+            {
+               // Must start uiFields @ 1 because SELF_GETVALUE() expects it
+               for ( uiFields= 1 ; uiFields <= pArea->uiFieldCount ; uiFields++ )
+               {
+                  if ( pArea->lpFields[ uiFields - 1 ].uiType == HB_IT_MEMO )
+                  {
+                     ULONG uiFieldLen ;
+                     SELF_GETVALUE(  (AREAP ) pArea, uiFields, &itItem );
+                     uiFieldLen = itItem.item.asString.length ;
+                     if ( uiFieldLen )
+                     {
+                        if ( pResult )
+                        {
+                           pResult = hb_xrealloc( pResult, uiLength+ 1 + uiFieldLen ) ; // Assume xgrab ok - no memory checking
+                        }
+                        else
+                        {
+                           pResult = hb_xgrab( uiFieldLen + 1 ) ;  // Assume xgrab ok - no memory checking
+                        }
+                        memcpy( pResult + uiLength, itItem.item.asString.value, uiFieldLen );
+                        uiLength += uiFieldLen;
+                     }
+                  }
+               }
+            }
+            hb_itemClear( &itItem );
+            hb_itemPutCPtr( pInfo, pResult, uiLength ) ;
+
+            if( ulPrevRec != 0 )
+            {
+               SELF_GOTO( ( AREAP ) pArea, ulPrevRec );
+            }
+            break;
+         }
 
       default:
          return SUPER_RECINFO( ( AREAP ) pArea, pRecID, uiInfoType, pInfo );
@@ -3155,7 +3220,7 @@ static ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
 
    pArea->fHasMemo = ( pArea->bVersion == 0xF5 || /* FoxPro 2.x or earlier with Memo */
                        pArea->bVersion == 0x83 || /* dBase III with Memo */
-                     ( pArea->bVersion == 0x30 && 
+                     ( pArea->bVersion == 0x30 &&
                        ( dbHeader.bHasTags & 0x02 ) ) ); /* VisualFox with Memo */
 
    return SUCCESS;

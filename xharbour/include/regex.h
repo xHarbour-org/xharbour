@@ -220,6 +220,8 @@ PCRE_DL_IMPORT extern void  (*pcre_free)(void *);
 
 /* Functions */
 
+#define hb_isregexstring( x )  ( ( x->item.asString.length > 3 && memcmp( x->item.asString.value, "***", 3 ) == 0 ) )
+
 extern pcre *pcre_compile(const char *, int, const char **, int *,
               const unsigned char *);
 extern int  pcre_copy_substring(const char *, int *, int, int, char *, int);

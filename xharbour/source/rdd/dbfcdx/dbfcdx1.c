@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.167 2004/10/22 01:45:50 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.168 2004/11/21 21:43:51 druzus Exp $
  */
 
 /*
@@ -4276,7 +4276,7 @@ static void hb_cdxTagGoTop( LPCDXTAG pTag )
          pTag->CurKey->rec = 0;
          break;
       }
-      else if ( ( pTag->OptFlags & CDX_TYPE_STRUCTURE ) != 0 || 
+      else if ( ( pTag->OptFlags & CDX_TYPE_STRUCTURE ) != 0 ||
                 hb_cdxCheckRecordScope( pTag->pIndex->pArea, pTag->CurKey->rec ) )
       {
          pTag->rawKeyPos = 1;
@@ -4307,7 +4307,7 @@ static void hb_cdxTagGoBottom( LPCDXTAG pTag )
          pTag->CurKey->rec = 0;
          break;
       }
-      else if ( ( pTag->OptFlags & CDX_TYPE_STRUCTURE ) != 0 || 
+      else if ( ( pTag->OptFlags & CDX_TYPE_STRUCTURE ) != 0 ||
                 hb_cdxCheckRecordScope( pTag->pIndex->pArea, pTag->CurKey->rec ) )
       {
          if ( CURKEY_RAWCNT( pTag ) )
@@ -4346,7 +4346,7 @@ static void hb_cdxTagSkipNext( LPCDXTAG pTag )
       if ( pTag->TagEOF || pTag->CurKey->rec == 0 ||
            !hb_cdxBottomScope( pTag ) || !hb_cdxTopScope( pTag ) )
          fEof = TRUE;
-      else if ( ( pTag->OptFlags & CDX_TYPE_STRUCTURE ) != 0 || 
+      else if ( ( pTag->OptFlags & CDX_TYPE_STRUCTURE ) != 0 ||
                 hb_cdxCheckRecordScope( pTag->pIndex->pArea, pTag->CurKey->rec ) )
          break;
       hb_cdxTagKeyRead( pTag, NEXT_RECORD );
@@ -4385,7 +4385,7 @@ static void hb_cdxTagSkipPrev( LPCDXTAG pTag )
       if ( pTag->TagBOF || pTag->CurKey->rec == 0 ||
            !hb_cdxBottomScope( pTag ) || !hb_cdxTopScope( pTag ) )
          fBof = TRUE;
-      else if ( ( pTag->OptFlags & CDX_TYPE_STRUCTURE ) != 0 || 
+      else if ( ( pTag->OptFlags & CDX_TYPE_STRUCTURE ) != 0 ||
                 hb_cdxCheckRecordScope( pTag->pIndex->pArea, pTag->CurKey->rec ) )
          break;
       hb_cdxTagKeyRead( pTag, PREV_RECORD );
@@ -4704,7 +4704,7 @@ static void hb_cdxCreateFName( CDXAREAP pArea, char * szBagName,
    PHB_FNAME pFileName;
    BOOL fName = szBagName && strlen( szBagName ) > 0;
    char * szExt = NULL;
-   
+
    pFileName = hb_fsFNameSplit( fName ? szBagName : pArea->szDataFileName );
 
    if ( szBaseName )
@@ -5220,7 +5220,7 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
          {
             ULONG ulRecNo = pArea->ulRecNo;
             SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
-            if ( pArea->ulRecNo == ulRecNo || 
+            if ( pArea->ulRecNo == ulRecNo ||
                  hb_strMatchWild( (const char *) pTag->CurKey->val, szPattern ) )
             {
                fFound = TRUE;
@@ -5241,7 +5241,7 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
          {
             ULONG ulRecNo = pArea->ulRecNo;
             SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
-            if ( pArea->ulRecNo == ulRecNo || 
+            if ( pArea->ulRecNo == ulRecNo ||
                  hb_strMatchWild( (const char *) pTag->CurKey->val, szPattern ) )
             {
                fFound = TRUE;
@@ -5295,7 +5295,7 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
       return fForward ? pArea->fPositioned : !pArea->fBof;
    }
 
-   if( pRegExItm->item.asString.length > 3 && memcmp( szMask, "***", 3 ) == 0 )
+   if ( hb_isregexstring( pRegExItm ) )  // ( pRegExItm->item.asString.length > 3 && memcmp( szMask, "***", 3 ) == 0 )
    {
       pReg = (regex_t *) ( szMask + 3 );
    }
@@ -7982,7 +7982,7 @@ static LPCDXSORTINFO hb_cdxSortNew( LPCDXTAG pTag, ULONG ulRecCount )
    {
       ulMax = ulRecCount;
    }
-   
+
    do
    {
       ulSize = ulMax * ( iLen + 4 );

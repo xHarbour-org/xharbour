@@ -6363,7 +6363,7 @@ HB_FUNC( HB_ATX )
 
    if( pRegEx && pString && ulStart <= pString->item.asString.length )
    {
-      if( pRegEx->item.asString.length > 3 && memcmp( pRegEx->item.asString.value, "***", 3 ) == 0 )
+      if ( hb_isregexstring( pRegEx ) ) // ( pRegEx->item.asString.length > 3 && memcmp( pRegEx->item.asString.value, "***", 3 ) == 0 )
       {
          pReg = (regex_t *) ( pRegEx->item.asString.value + 3 );
          pReg->re_pcre = (pcre *) ( ( BYTE * ) pReg + sizeof( regex_t ) );
@@ -6481,7 +6481,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
    }
 
    /* now check if it is a precompiled regex */
-   if( pRegEx->item.asString.length > 3 && memcmp( pRegEx->item.asString.value, "***", 3 ) == 0 )
+   if ( hb_isregexstring( pRegEx ) ) //( pRegEx->item.asString.length > 3 && memcmp( pRegEx->item.asString.value, "***", 3 ) == 0 )
    {
       pReg = (regex_t *) ( pRegEx->item.asString.value + 3 );
       pReg->re_pcre = (pcre *) ( ( BYTE * ) pReg + sizeof( regex_t ) );

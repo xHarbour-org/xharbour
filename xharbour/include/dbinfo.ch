@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.6 2004/08/02 12:37:13 druzus Exp $
+ * $Id: dbinfo.ch,v 1.7 2004/08/29 00:26:22 druzus Exp $
  */
 
 /*
@@ -131,6 +131,9 @@
 #define DBRI_RECSIZE              3
 #define DBRI_RECNO                4
 #define DBRI_UPDATED              5
+#define DBRI_RAWRECORD            6
+#define DBRI_RAWMEMOS             7
+#define DBRI_RAWDATA              8
 
 /* constants for some SCOPED DBOI_* parameter */
 #define DBRMI_FUNCTION  1
