@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.21 2002/12/13 20:06:36 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.22 2003/01/07 10:48:18 likewolf Exp $
  */
 
 /*
@@ -974,8 +974,10 @@ int hb_comp_SLX_CustomAction( int x )
            if( iLastToken == 0 || iLastToken == '\n' || iLastToken == ';' ||
                iLastToken == '(' || iLastToken == '[' || iLastToken == '{' || iLastToken == '|' || iLastToken == ',' ||
                iLastToken == WANTS_ID ||
-               iLastToken == WITH || iLastToken == RETURN ||
-               IS_OP( iLastToken ) )
+               iLastToken == WITH ||
+               iLastToken == REJECT_OP ||
+               IS_OP( iLastToken )
+             )
            {
               yylval.string = hb_compIdentifierNew( "IN", TRUE );
               iIdentifier++;
@@ -1005,14 +1007,16 @@ int hb_comp_SLX_CustomAction( int x )
          bIgnoreWords = FALSE;
 
          if( iLastToken == NUM_INTEGER || iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == IDENTIFIER || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' || iLastToken == ']' || iLastToken == LITERAL )
-            { return TO + DONT_REDUCE; }
+         {
+            return TO + DONT_REDUCE;
+         }
          else
-            {
-              yylval.string = hb_compIdentifierNew( "TO", TRUE );
-              iIdentifier++;
-              DEBUG_INFO( printf( "HB_TO, Primary Identifier %s Increased to: %i\n", "IN", iIdentifier ) );
-              return IDENTIFIER;
-            }
+         {
+            yylval.string = hb_compIdentifierNew( "TO", TRUE );
+            iIdentifier++;
+            DEBUG_INFO( printf( "HB_TO, Primary Identifier %s Increased to: %i\n", "IN", iIdentifier ) );
+            return IDENTIFIER;
+         }
 
       case HB_WITH :
          bIgnoreWords = FALSE;
@@ -1025,7 +1029,7 @@ int hb_comp_SLX_CustomAction( int x )
             iIdentifier++;
             DEBUG_INFO( printf( "HB_WITH, Primary Identifier %s Increased to: %i\n", "WITH", iIdentifier ) );
             return IDENTIFIER;
-          }
+         }
 
       case _WITH_ID_CR :
          aiHold[ iHold++ ] = '\n' + DONT_REDUCE;
