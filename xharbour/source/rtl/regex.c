@@ -6469,6 +6469,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
    if( pRegEx->item.asString.length > 3 && memcmp( pRegEx->item.asString.value, "***", 3 ) == 0 )
    {
       pReg = (regex_t *) ( pRegEx->item.asString.value + 3 );
+      pReg->re_pcre = (pcre *) ( ( BYTE * ) pReg + sizeof( regex_t ) );
       aMatches[0].rm_eo = pRegEx->item.asString.length - 3;
    }
    else

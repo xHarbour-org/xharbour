@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.147 2004/08/03 11:16:18 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.148 2004/08/03 19:12:58 druzus Exp $
  */
 
 /*
@@ -5134,6 +5134,7 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
    regmatch_t aMatches[1];
    int CFlags = REG_EXTENDED, EFlags = 0;
    char *szMask = hb_itemGetCPtr( pRegExItm );
+   BOOL fFree = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxSkipRegEx(%p, %p, %i, %s)", pArea, pTag, fForward, szMask));
 
@@ -5158,6 +5159,7 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
          return FALSE;
       }
       pReg = &re;
+      fFree = TRUE;
    }
 
    if( pArea->lpdbPendingRel )
@@ -5227,6 +5229,9 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
       pArea->fBof = FALSE;
    else
       pArea->fEof = FALSE;
+
+   if( fFree )
+      regfree( pReg );
 
    return fFound;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.83 2004/06/08 06:10:22 ronpinkas Exp $
+ * $Id: memvars.c,v 1.84 2004/06/12 01:31:04 ronpinkas Exp $
  */
 
 /*
@@ -1262,6 +1262,7 @@ static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
          }
       }
    }
+   regfree( &re );
 }
 
 /* Checks if passed dynamic symbol is a variable and returns its scope
@@ -2096,6 +2097,8 @@ HB_FUNC( __MVSAVE )
          /* Walk through all visible memory variables and save each one */
          hb_dynsymEval( hb_memvarSave, ( void * ) &msc );
 
+         regfree( &msc.re );
+
          buffer[ 0 ] = '\x1A';
          hb_fsWrite( fhnd, buffer, 1 );
 
@@ -2296,6 +2299,8 @@ HB_FUNC( __MVRESTORE )
             hb_itemClear( &Name );
 
          }
+
+         regfree( &re );
 
          hb_fsClose( fhnd );
       }

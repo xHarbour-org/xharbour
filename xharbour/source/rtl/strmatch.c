@@ -1,5 +1,5 @@
 /*
- * $Id: strmatch.c,v 1.5 2004/03/21 15:55:05 druzus Exp $
+ * $Id: strmatch.c,v 1.6 2004/03/23 12:43:00 andijahja Exp $
  */
 
 /*
@@ -119,6 +119,7 @@ BOOL HB_EXPORT hb_strMatchRegExp( const char * szString, const char * szMask )
    regex_t re;
    regmatch_t aMatches[1];
    int CFlags = REG_EXTENDED, EFlags = 0;
+   BOOL fResult = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strMatchRegExp(%s, %s)", szString, szMask));
 
@@ -126,11 +127,12 @@ BOOL HB_EXPORT hb_strMatchRegExp( const char * szString, const char * szMask )
    {
       if( regexec( &re, szString, 1, aMatches, EFlags ) == 0 )
       {
-         return aMatches[0].rm_so == 0 && aMatches[0].rm_eo == (int) strlen( szString );
+         fResult = aMatches[0].rm_so == 0 && aMatches[0].rm_eo == (int) strlen( szString );
       }
+      regfree( &re );
    }
 
-   return FALSE;
+   return fResult;
 }
 
 #define HB_MAX_WILDPATTERN     256

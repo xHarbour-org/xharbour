@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.51 2004/06/13 08:41:33 lf_sfnet Exp $
+ * $Id: direct.c,v 1.52 2004/07/30 13:45:36 mauriliolongo Exp $
  */
 
 /*
@@ -273,7 +273,7 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
 static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BOOL bInit )
 {
    static regex_t re;
-   static BOOL bInitReg = FALSE;
+   static BOOL bInitReg = FALSE, fResult = FALSE;
    regmatch_t aMatches[1];
    int CFlags = REG_EXTENDED, EFlags = 0;
 
@@ -293,12 +293,16 @@ static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BO
       return FALSE;
    }
 
-   if( bInitReg && regexec( &re, szString, 1, aMatches, EFlags ) == 0 )
+   if( bInitReg )
    {
-      return aMatches[0].rm_so == 0 && aMatches[0].rm_eo == (int) strlen( szString );
+      if ( regexec( &re, szString, 1, aMatches, EFlags ) == 0 )
+      {
+         fResult = aMatches[0].rm_so == 0 && aMatches[0].rm_eo == (int) strlen( szString );
+      }
+      regfree( &re );
    }
 
-   return FALSE;
+   return fResult;
 }
 
 static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName, char* szAttributes, char* sRegEx )
