@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.42 2003/11/15 23:33:16 druzus Exp $
+ * $Id: dbf1.c,v 1.43 2003/11/20 23:47:36 druzus Exp $
  */
 
 /*
@@ -50,6 +50,7 @@
  *
  */
 
+#include "hbsetup.h"
 #include "hbapi.h"
 #include "hbinit.h"
 #include "hbvm.h"
@@ -550,6 +551,10 @@ ERRCODE hb_dbfGetEGcode( ERRCODE errCode )
    return errEGcode;
 }
 
+#if defined(HB_EXTERN_C)
+extern "C" {
+#endif
+
 /*
  * Converts memo block offset into ASCII.
  * This function is common for different MEMO implementation
@@ -676,7 +681,9 @@ BOOL hb_dbfLockExtFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, USHORT *pPoo
    return fRet;
 }
 
-
+#if defined(HB_EXTERN_C)
+}
+#endif
 
 /*
  * -- DBF METHODS --
