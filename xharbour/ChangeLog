@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3849 2005/02/20 17:30:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3849 2005/02/20 15:37:19 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-21 00:10 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/doc/whatsnew.txt
+    * Notes on latest changes by Andi Jahja
 
 2005-02-20 17:30 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * makefile.pc
@@ -197,7 +201,7 @@
 
 2005-02-16 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/win32prn.prg
-    ! reinstate	codes when __WRITE_FONT_INFO_TO_FILE__ is defined (without
+    ! reinstate   codes when __WRITE_FONT_INFO_TO_FILE__ is defined (without
       defining this, tests/testw32p.prg with PellesC crashes under WIN98)
 
 2005-02-16 03:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>

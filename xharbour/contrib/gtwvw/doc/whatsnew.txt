@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt,v 1.4 2005/01/14 04:43:01 bdj Exp $
+ * $Id: whatsnew.txt,v 1.5 2005/01/14 06:16:47 bdj Exp $
  */
 
 /*
@@ -15,6 +15,18 @@
  *
  * Budyanto Dj. <budyanto@centrin.net.id>
  */
+
+2005/02/20:
+ Changes by Andi Jahja:
+ * gtwvw.c
+   + #include <conio.h> for WATCOMC compiler
+   - PackedDibGetColorTablePtr  , unused function
+   - PackedDibGetColorTableEntry, unused function
+   - gt_xPutch, unused function
+   * hb_Inp9x, hb_Outp9x: XCC, WATCOMC, MINGW32 compiler support
+   * gt_Tone: WATCOMC, MINGW32 compiler support
+ * hbgtwvw.h:
+   * changes required by some C compilers
 
 2005/01/14
   + contrib/gtwvw/samples/cbtest1.prg
