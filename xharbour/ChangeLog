@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.839 2003/03/14 22:23:24 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.840 2003/03/15 23:27:08 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-16 06:53 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * vm/codebloc.c
+  * vm/garbage.c
+  * vm/hvm.c
+    ! Important fixes made to various part of the code to avoid potential
+      segfaults and deadlocks. The stack locking range has been increased,
+      so GC can't take over i.e. returning functions or exiting codeblocks.
+  
+  * vm/thread.c
+    ! Released stack before entering PRG mutex wait. That could cause deadlocks
+      with fence idle actived.
+  
+  * rtl/console.c
+    ! changed the order of stack/ hb_outputMutex locks
+  
+  * rtl/idle.c
+    ! removed stack unlocking/locking that were guarding the GC collection. Now
+      it is done in GC.
+      
+  + doc/xhbt_internals.txt
+    + Added documentation on the internal programming of hb threads.
+    
 2003-03-15 20:17 UTC-0300 Walter Negro <anegro@overnet.com.ar>
    * contrib/mysql/mysql.c
      + Add function SQLERRNO() to obtain number of error.

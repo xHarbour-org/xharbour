@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.26 2003/03/10 23:21:59 jonnymind Exp $
+ * $Id: console.c,v 1.27 2003/03/14 11:22:30 jonnymind Exp $
  */
 
 /*
@@ -91,8 +91,9 @@
 
    #define HB_CONSOLE_SAFE_UNLOCK \
          HB_CRITICAL_UNLOCK( hb_outputMutex );\
-         HB_STACK_LOCK;\
-         HB_CLEANUP_POP;
+         HB_CLEANUP_POP;\
+         HB_STACK_LOCK;
+
 #else
    #define HB_CONSOLE_SAFE_LOCK
    #define HB_CONSOLE_SAFE_UNLOCK

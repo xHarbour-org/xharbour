@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.180 2003/03/14 20:35:25 ronpinkas Exp $
+ * $Id: hvm.c,v 1.181 2003/03/14 22:23:29 ronpinkas Exp $
  */
 
 /*
@@ -1194,8 +1194,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /*
              * *** NOTE!!! Return!!!
              */
-            /* JC1: now we can safely test for cancellation & tell garbage we are ready*/
-            HB_STACK_UNLOCK;
             return;
 
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
@@ -2575,8 +2573,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
 
-   HB_STACK_UNLOCK;
-   //JC1: do not allow cancellation: thread cleanup procedure is under way
+   //JC1: do not allow cancellation or idle MT func: thread cleanup procedure 
+   // is under way, or another VM might return in control
 }
 
 /* ------------------------------- */

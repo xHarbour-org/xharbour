@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.20 2003/03/07 03:04:46 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.21 2003/03/07 05:32:42 ronpinkas Exp $
  */
 
 /*
@@ -363,6 +363,7 @@ void hb_codeblockEvaluate( HB_ITEM_PTR pItem )
 
    HB_VM_STACK.iStatics = pItem->item.asBlock.statics;
    hb_vmExecute( pItem->item.asBlock.value->pCode, pItem->item.asBlock.value->pSymbols, pItem->item.asBlock.value->pGlobals );
+   /* hb_vmExecute() unlocks the stack on exit */
    HB_VM_STACK.iStatics = iStatics;
 
    /*

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.37 2003/03/14 11:22:15 jonnymind Exp $
+* $Id: thread.h,v 1.38 2003/03/14 13:08:13 jonnymind Exp $
 */
 
 /*
@@ -107,7 +107,18 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #define HB_TEST_CANCEL_ENABLE_ASYN\
    {\
       HB_CRITICAL_LOCK( hb_cancelMutex );\
-      HB_VM_STACK.bCanCancel = FALSE;\
+      if ( HB_VM_STACK.bCanceled )\
+      {\
+         HB_CRITICAL_UNLOCK( hb_cancelMutex );\
+         hb_threadCancelInternal();\
+      }\
+      HB_VM_STACK.bCanCancel = TRUE;\
+      HB_CRITICAL_UNLOCK( hb_cancelMutex );\
+   }
+   
+   #define HB_TEST_CANCEL\
+   {\
+      HB_CRITICAL_LOCK( hb_cancelMutex );\
       if ( HB_VM_STACK.bCanceled )\
       {\
          HB_CRITICAL_UNLOCK( hb_cancelMutex );\
@@ -213,6 +224,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #define HB_ENABLE_ASYN_CANC
    #define HB_DISABLE_ASYN_CANC
    #define HB_TEST_CANCEL_ENABLE_ASYN
+   #define HB_TEST_CANCEL
 
    extern pthread_key_t hb_pkCurrentStack;
    #define hb_threadGetCurrentStack() ( (HB_STACK *) pthread_getspecific( hb_pkCurrentStack ) )
@@ -223,12 +235,10 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
       if( ! HB_VM_STACK.bInUse ) \
       {\
-         HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_runningStacks.Mutex );\
          while ( hb_runningStacks.aux ) \
          {\
             HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );\
          }\
-         HB_CLEANUP_POP;\
          hb_runningStacks.content.asLong++;\
          HB_VM_STACK.bInUse = TRUE;\
          HB_COND_SIGNAL( hb_runningStacks.Cond );\
@@ -532,9 +542,6 @@ extern void hb_threadTerminator( void *pData );
    #define HB_TEST_CANCEL
    #define HB_SET_SHARED( x, y, z )
    #define HB_WAIT_SHARED( x, y, z, k, m )
-   #define HB_STACK_STOP   
-   #define HB_STACK_STOP_TELLING(x, y)
-   #define HB_STACK_START  
    #define HB_STACK_LOCK  
    #define HB_STACK_UNLOCK   
    #define HB_CLEANUP_PUSH( x, y )

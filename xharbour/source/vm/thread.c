@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.65 2003/03/14 11:22:31 jonnymind Exp $
+* $Id: thread.c,v 1.66 2003/03/14 13:08:13 jonnymind Exp $
 */
 
 /*
@@ -624,6 +624,11 @@ void hb_threadTerminator( void *pData )
 {
    HB_STACK *_pStack_ = (HB_STACK *) pData;
    HB_MUTEX_STRUCT *pMtx;
+
+#ifndef HB_OS_WIN_32
+   pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL );
+#endif
+   
    HB_STACK_LOCK;
    
    HB_CRITICAL_LOCK( hb_threadStackMutex );
@@ -651,8 +656,12 @@ void hb_threadTerminator( void *pData )
    HB_CRITICAL_UNLOCK( hb_mutexMutex );
 
    hb_threadDestroyStack( _pStack_ );
-   
-   HB_SET_SHARED( hb_runningStacks, HB_COND_INC, -1 );
+
+   /* we are out of business */   
+   HB_CRITICAL_LOCK( hb_runningStacks.Mutex );
+   hb_runningStacks.content.asLong--;
+   HB_COND_SIGNAL( hb_runningStacks.Cond );
+   HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );
 }
 
 void hb_mutexForceUnlock( void *mtx )
@@ -856,8 +865,7 @@ HB_FUNC( STARTTHREAD )
       hb_itemRelease( pArgs );
       return;
    }
-
-   // We signal that we are going to start a thread
+      
    HB_CRITICAL_LOCK( hb_threadStackMutex );
    pStack = hb_threadCreateStack( 0 ); // we don't know thread ID now
 
@@ -872,10 +880,14 @@ HB_FUNC( STARTTHREAD )
       pStack->uiParams = hb_pcount();
       pStack->bIsMethod = bIsMethod;
       hb_threadFillStack( pStack, pArgs );
+      /* Forbid usage of stack before that VM takes care of it */
+      
+#if defined(HB_OS_WIN_32)
+      pStack->th_h = th_h;
+#endif
       hb_threadLinkStack( pStack );
 
 #if defined(HB_OS_WIN_32)
-      pStack->th_h = th_h;
       ResumeThread( th_h );
 #endif
 
@@ -1085,19 +1097,18 @@ HB_FUNC( MUTEXLOCK )
    }
 
    /* Cannot be interrupted now */
-   //HB_CRITICAL_LOCK( hb_mutexMutex );
    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
    if( Mutex->locker == HB_CURRENT_THREAD() )
    {
       Mutex->lock_count ++;
-      //HB_CRITICAL_UNLOCK( hb_mutexMutex );
    }
    else
    {  
-      //HB_CRITICAL_UNLOCK( hb_mutexMutex );
+      HB_STACK_UNLOCK;
       HB_MUTEX_LOCK( Mutex->mutex );
       Mutex->locker = HB_CURRENT_THREAD();
       Mutex->lock_count = 1;
+      HB_STACK_LOCK;
    }
 }
 
@@ -1541,6 +1552,7 @@ HB_FUNC( THREADIDLEFENCE )
 void hb_threadResetAux( void *ptr )
 {
    ((HB_SHARED_RESOURCE *) ptr)->aux = 0;
+   HB_COND_SIGNAL( hb_runningStacks.Cond );
 }
 
 /* hb_runningStacks mutex must be held before calling this function */
@@ -1553,7 +1565,6 @@ void hb_threadWaitForIdle( void )
       hb_runningStacks.aux = 1;
    }
 
-   HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, hb_runningStacks.Mutex );
    HB_CLEANUP_PUSH( hb_threadResetAux, hb_runningStacks );
    /* wait until the road is clear */
    while ( hb_runningStacks.content.asLong != 0 )
@@ -1562,9 +1573,7 @@ void hb_threadWaitForIdle( void )
    }
    /* blocks all threads here if not blocked before */
    hb_runningStacks.aux = 1;
-   //hb_runningStacks.content.asLong = -1;
    // no need to signal, no one must be awaken
-   HB_CLEANUP_POP;
    HB_CLEANUP_POP;
 }
 

@@ -1,0 +1,665 @@
+
+                        X H A R B O U R - Mutli Threading Model
+
+                          Technical Notes for xHB developers
+
+                                  Giancarlo Niccolai
+                                  
+                                    gian@nccolai.ws
+
+
+$Id$
+
+
+
+FOREWORDS
+=========
+
+This document is meant to explain the internals of xHBThreads subsystem, and how
+it intearacts with the pre-existing Virtual Machine.
+
+First consideration that must be clear to the readers is that the xHBThreads
+subsystem is meant to be a portable, multiplatform isomorphic system, that is
+to say, at a PRG final program level, a system that "seem" to behave equally both
+in windows and unix/posix systems.
+
+Secondly, the explanation approach that will be undertaken here will be often
+based upon signaling the differences among MS-Windows threading and posix threads,
+used for unix systems.
+
+Finally, it must be stated that this document explains the "basis" of the xHBThread
+system, including also some example of firsts implementations in critical non-vm
+elements, as the console output and the internet system. Work must be still done
+to secure other parts of the libraries (like filesystem I/O, RDD, etc.).
+
+
+Document conventions
+--------------------
+
+In this documents, areas of particular interest will be marked with the following
+signs:
+
+[TODO] This is an area where the author or the other developers have still... things
+to do ;-). It is important to state those "to do" intentions to explain where the
+developement is meant to lead.
+
+[LEFTOVERS] This is an area explaining something that has been left in the code,
+generally in form of commented areas or unused functions, both in lines of
+developement now abandoned (but still not definitely "to be discarded"), or for
+probable future developements. This areas might confuse casual readers, if not
+warned about their leftover status.
+
+[RFC] Requests for comments. While all comments are welcome, this text explicitly
+requires help and support of other developers, that are thus invited to mail a
+comment about it to the author.
+
+[SUPP] Supposing here. Being Italian, and having never lived in an english speaking
+country, I often tend to use improperly english language strucures, i.e. to state
+doubts or suppositions. I.e. I discovered that while "might" is used in Italian to
+state a "fleeble" supposition, just something like "what if...", is often used
+by english speaking person just to politely state a sure thing. To avoid
+misunderstandings, I will prepend this sign where I am just supposing. In such
+cases I will also provide an explanation on why I have a certain "impression" 
+about phenomena that I have obserbed.
+
+
+
+
+BASIC RULES OF THE SYSTEM
+=========================
+
+xHBThreads is based upon some simple rules, that are to be enforced in all the
+thread-aware or thread-sensible parts of the code. This rules are known to be
+"tread-safe" by a long literature in this field, and a well eshtablished worldwide
+practice.
+
+1) Threads are unsafe unless guarded against concurrency. The direct consequence
+of this rule in xHBThreads is that a mechanism has been setup to prevent threads
+from being interrupted, suspended or inspected in their local data, unless they
+declare that they are ready for such operations.
+
+2) Thread safety is tightly bound with private data usage. A thread that is
+declaring that it's internal data are inspectable is also declaring that its safe
+to suspend it.
+
+3) A thread can be canceled only at certain points, called "cancellation points".
+
+4) A thread must arrive to any cancellation point with internal data being safe.
+
+5) A thread holding mutexes of any kind must release them before engaging
+any cancellation point, or must properly prepare them to be automatically unlocked
+during cancelation.
+
+6) Cross locking is strictly forbidden. A thread can't lock any mutex if it's already
+owning another mutex EXCEPT if all these conditions are met:
+6.1) If the inner lock does not cross any cancelation point, or if it is present a
+cancellation pointm, if all the locks are prepared to be automatically released.
+6.2) If the inner lock is released before the outer lock.
+6.3) If there isn't any infinite wait inside the inner lock.
+6.4) If the inner and outer lock are NEVER reversed in any part of the program.
+
+7) The rule 6.4 means that mutexes must have a clean hierarcy of locking, which
+means that there are some mutexes at lower level that must never be locked
+before locking mutexes at higher level. Generally, the levels are:
+7.1) global PRG level data access mutexes
+7.2) local PRG level data access mutexes  / thread execution control mutexes
+7.3) allocation mutexes
+
+
+BASIC CONCEPTS IN IMPLEMENTATION
+================================
+
+To allow a simpler implementation of those rules, some macros have been defined.
+Most of these macros have been declared as "void" to allow compilation of the
+code both in MT mode and in ST mode, without the need to guard any section of
+the MT specific with an #ifdef HB_THREAD_SUPPORT section. Same kind of strategy
+have been adopted with regards to the different code needed for unix and windows,
+where applicable.
+
+A thread starts with its data being declared safe but with cancellation disabled.
+After initialization, and after entering the first time. In fact, the data is
+created outside the scope of inspectors, and added to their scope only after being
+safely created and filled with initialization data. Newborn threads won't change
+this fact until first entering the VM loop. At this moment, the macro HB_STACK_LOCK
+is called: this atomically declares that the stack is not available anymore for
+external inspection, because the owner thread is going to mangle with it.
+
+Here the thread is still cancelation safe, and other than this, it is granted that
+the internal data of the thread, or the stack, cannot be changed by any external
+event, and cannot be read while the thread is still delivering important changes.
+
+Before any point that can cause a long wait, or an infinite one, or in calculation
+intensive locations (not involving the stack), the macro HB_STACK_UNLOCK is called
+to signal other threads that the stack is in a consistent state, and that it won't be
+used for a certain time.
+
+Also, the stack is unlocked anyway whe the VM has done a certain amount of cylces;
+[RFC] currenty this count is fixed to 20 (by the HB_HB_VM_UNLOCK_PERIOD macro in 
+thread.h).
+
+When the thread needs back its stack, it will call HB_STACK_UNLOCK. Please, note that
+there are some mechanisms (different in windows and unix) to ensure that the thread
+is not able to lock it's stack if it's currently being inspected; we'll se them in
+a while.
+
+Also, it is necessary to be sure that the stack of a thread is consistent before to
+cancel it; so a thread must be sure to leave its stack in a clean status (unlocking
+it) before entering any cancelation point. However, the inverse is not true:
+having the stack unlocked is a necessary but not sufficient condition for a thread
+to be canceled.
+
+Finally, notice that the concept of stack locking does not involves any mutex. The
+thread having its stack locked is not holding a specific mutex if not in the moments
+that the lock/unlock are made. This is very important with regards of the rule number 6.
+
+
+
+Inspectors, Stacks and active Thread count
+------------------------------------------
+
+Those threads that are somehow interested in the status of another thread, or of
+all the other threads, are called inspectors. The latter are specifically called "idle
+inspectors", since they can operate correctly only when NO OTHER THREAD IS CURRENTLY
+HOLDING ANY LOCAL STACK. One of this idle inspector is the garbage collector.
+
+[TODO] Add idle functions hook to allow PRG level programs to declare one or more
+MT idle callbacks.
+
+Threads can access their own stack using a thread-specific memory area. This is called
+"thread key" in posix, and "Thread local storage" in windows; accessing this private
+area does not requires locks on any mutex by the propretary thread. This fact is very
+important, because if it weren't so, there would have been continuos breaking of rule
+6. I.e. a funcion might have required a lock on some mutex, and then called another
+function that had to access to the thread VM stack.
+
+Other threads willing to get a thread private HB_VM_STACK must access a linked list
+called "hb_ht_stack". The access of this list is locked, since it could be modified
+in any moment by functions that are creating a new thread or removing an old one. So,
+inspectors and "hb_ht_stack" management functions must achieve the lock on a mutex
+called hb_threadStackMutex. This is done by the function hb_threadGetStack( id ),
+where the ID is the ThreadID of the thread holding the stack that the caller is
+interested in.
+
+Idle inspectors have the need to access all the thread local stacks at once. Also,
+they could need not having other threads being concurrently running with them for
+other reason, i.e. critical access. Finally even a non inspector thread could be
+willing to know how many threads are running concurrently in that moment, i.e. for
+debugging reasons, or to prevent cpu over-usage. A new form of thread aware object
+has been introduced to manage this need, and also other needs that could be met in
+future. It is called "Shared Resource".
+
+Shared resources are objects guarded by a mutex and being capable to signal a status 
+change to the interested listeners. The structure is defined as follows:
+
+typedef struct tag_HB_SHARED_RESOURCE
+{
+   HB_CRITICAL_T Mutex;  // mutex is used to read or write safely
+   union {              // data that can be read or written
+      volatile long asLong;
+      volatile void *asPointer;
+   } content;
+   volatile unsigned int aux;
+   HB_COND_T Cond; //condition that may change
+} HB_SHARED_RESOURCE;
+
+
+The content can be a "long int" or a void pointer, being able to hold i.e. a count
+or any kind of strucutre. There is also an AUX integer, that could be used for
+any auxiliary or ancillary role, as a count for a small fixed-lenght vector held
+in the pointer.
+
+[LEFTOVER] There are various macros meant to manage shared resources, but they are
+meant for future developement. At the moment, the only use for the shared resource
+is to hold the count of the currently running threads, or the status of the idle
+inspector queue under windows.
+
+The shared resource used to count the running threads is called hb_runningStacks.
+
+
+
+
+INSIDE POSIX THREAD IMPLEMENTATION
+==================================
+
+Posix threading systems has some peculiarities that must be noted:
+- Cancellation is issued by the canceling thread to the canceled one, the second
+  one will receive the cancelation in a random moment that could possibly be
+  AFTER the thread is rescheduled and then excecuted.
+- Cancelation requests can be completely ignored, honored as soon as they arrive
+  (asynchronous cancelation) or at at cancelation points.
+- Some cancelation points can be controlled by the thread, like time waiting functions,
+  condition wait functions, and explicit test_cancel() functions.
+- Other cancelation points cannot be controled, like OS I/O (read, write, etc.)
+- Linux implementation of pthreads is -sayed- not to respect the uncontrollable
+  cancelation points (OS I/O); a workaround is suggested (and here applied, see
+  below).
+- Condition signaling is implemented by rescheduling one thread that is currently
+  waiting for a condition, and making it "runnable" again. It is also possible to
+  reschedule all the waiting threads. Indeed, it is not possible to have late 
+  subscriptions; the only thread that can be signaled are the ones that are already
+  waiting for the condition to be signaled.
+  
+This points must be notede, because they radically differ from the windows thread
+implementations. Constructs easily buildable in pthreads are impolssible to be directly
+replicated in windows threads, and vice-versa.
+
+
+The shared resource wait/signaling.
+-----------------------------------
+
+Directly from man page of pthread_cond_wait:
+       
+       A  condition  (short  for  ``condition variable'') is a synchronization
+       device that allows threads to suspend execution and relinquish the pro-
+       cessors  until  some  predicate  on shared data is satisfied. The basic
+       operations on conditions are: signal the condition (when the  predicate
+       becomes true), and wait for the condition, suspending the thread execu-
+       tion until another thread signals the condition.
+
+       A condition variable must always be associated with a mutex,  to  avoid
+       the race condition where a thread prepares to wait on a condition vari-
+       able and another thread signals the condition  just  before  the  first
+       thread actually waits on it.
+
+         .....
+         .....
+
+       Waiting until x is greater than y is performed as follows:
+
+              pthread_mutex_lock(&mut);
+              while (x <= y) {
+                      pthread_cond_wait(&cond, &mut);
+              }
+              /* operate on x and y */
+              pthread_mutex_unlock(&mut);
+
+       Modifications on x and y that may cause x  to  become  greater  than  y
+       should signal the condition if needed:
+              pthread_mutex_lock(&mut);
+              /* modify x and y */
+              if (x > y) pthread_cond_broadcast(&cond);
+              pthread_mutex_unlock(&mut);
+
+
+This is the only way to safely change a shared data among threads (variable x and y
+in the example) and test for a value to have reached a precise level. 
+
+The thing goes as follows: 1) the mutex is locked, and the thread willing to know if
+a predicate is true before to proceed can safely test for it. 2) If the predicate is 
+false, the thread put itself in wait for a better time; 3) pthread_cond_wait atomically
+releases the mutex (so other threads can operate on the variables guarded by
+the mutex) and puts the thread in wait. 4) Then, another thread can lock the variable(s),
+mangle them and notify all interested threads with pthread_cond_broadcast. 
+5) The threads will be waken up, and loop on the while. Note that on exit 
+pthread_cond_wait will achieve back the mutex before to proceed.
+If this this time the predicate evalutes to true (that is to say, if the condition
+we were waiting for is really happened), the it is possibile to 6) operate on
+the variable(s) in a protected, mutexed environment and then 7) release the mutex.
+
+Also, since pthread_cond_wait is a cancelation point, the caller must 1) be sure that
+cancelation is never issued before waiting or while waiting or 2) forbid cancelation. 
+
+The mutex released by pthread_cond_wait is safe (cancellation is honored AFTER
+releasing it), but any other cleanup action like i.e. freeing other shell-locked
+mutexes, or freeing the thread specific stack, must be "pushed" with the 
+pthread_cleanup_push() function. Those functions will be called before thread
+is terminated: thread stack cleaning is implemented this way under pthread.
+
+The implementation for the stack locking mechanism is as follows:
+
+   #define HB_STACK_LOCK \
+   {\
+      HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
+      if( ! HB_VM_STACK.bInUse ) \
+      {\
+         while ( hb_runningStacks.aux ) \
+         {\
+            HB_COND_WAIT( hb_runningStacks.Cond, hb_runningStacks.Mutex );\
+         }\
+         hb_runningStacks.content.asLong++;\
+         HB_VM_STACK.bInUse = TRUE;\
+         HB_COND_SIGNAL( hb_runningStacks.Cond );\
+      }\
+      HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
+   }
+      
+Locking the stack is done by setting HB_VM_STACK.bInUse to TRUE. Also, this code slice
+rises the number of runningStacks; both theese operations are guarded by the mutex
+associated with hb_runningStacks. The wait condition ( on hb_runningStacks.aux ) is called
+"idle fence" and is explained below.
+
+Unlocking is done by:
+
+   #define HB_STACK_UNLOCK \
+   {\
+      HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
+      if( HB_VM_STACK.bInUse ) \
+      {\
+         hb_runningStacks.content.asLong--;\
+         HB_VM_STACK.bInUse = FALSE;\
+         HB_COND_SIGNAL( hb_runningStacks.Cond );\
+      }\
+      HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
+   } 
+
+As can be noticed, the status change in the stack usage is done only if the stack
+is in the opposite state. Stack lock and unlock are non-recursive operations. This
+ensures that the calling program is always in control of what status is a stack in:
+after a stack lock, the stack will be locked, and after an unlock it will be unlocked.
+
+
+The Idle Fence
+--------------
+
+The idle fence is a systems that:
+
+1) Is risen just before an idle routine enters in control, or soon after it.
+2) Forbids the threads to lock their stack, making them to wait for the
+   fence to be lowered.
+   
+The fence allows an idle routine to be sure that no other thread will be able to
+access the stack in an exclusive way, blocking all other threads from proceding
+after the STACK_LOCK step. 
+
+An idle routine can rise the fence before waiting for the fact of being the only
+thread left running. This makes all the other non-idle threads to block after
+having released their stacks, and just before being able to reacquire it.
+In this way, the idle routine will take control as soon as possible, or as soon as
+all the other threads have unlocked their stacks.
+
+It is possible also not to rise the fence when the idle routine is invoked. In this
+case, the routine will wait for all the treads to be idle; this can happen pretty
+rarely in a normal situation, but it can often happen when all the treads (or a
+great part of them) are sure to engage long waits, like i.e. user input or internet
+connections. In those situations, it is better to wait for all the thread to be really
+idle and then proceed with the idle inspector; this will save CPU time as the inspector
+will be activated only when there is really nothing to do for a certain time.
+
+Any way, the fence MUST be risen before the idle routine begins to mangle with other
+threads internal stacks, to avoid the risk of concurrent access to the data.
+
+A variable called hb_bIdleFence is provided for this reason. If it's true (default),
+the idle fence will be rise as soon as an idle routine is invoked. This variable
+can be safely read or set while holding the hb_runninStacks mutex.
+
+
+Cleanup Procedure
+-----------------
+
+A cleanup procedure is automatically called at thread termination, both if the thread
+is canceled in a cancelation point or if the thread regularily terminates.
+The procedure take cares of:
+
+1) Freeing all PRG level mutexes. PRG mutexes are held in a linked list, and a cancelation
+   will cause them to be freed "safely" before the thread terminates.
+2) Locking the stack, cleaning it and removing it from the stack structure.
+
+It is necessary to make sure that no thread is holding a system level mutex at cancelation
+points, or that those mutexes are freed automatically using the cleanup push functions.
+
+[LEFTOVER] Three macros are provided for that: HB_CLEANUP_PUSH, HB_CLEANUP_POP and
+HB_CLEANUP_POP_EXEC. Currently, I didn't feel the need of using them except for
+thread termination and console.c (where they are encapsulated in another macro),
+so it is also possible that a direct pthrea_cleanup* family call could be used.
+
+[LEFTOVER] A couple of functions (hb_threadRawMutexUnlock and hb_threadMutexUnlock) are
+provided specifically to be used as cleanup functions, unlocking raw OS mutexes or PRG
+mutexes respectively. Currently, the latter is never used.
+
+
+Data sets
+---------
+
+The relationship between group of variables and mutexes guarding them are called "data sets".
+In the POSIX implementation, they are currently the following:
+
+- hb_runningStacks.mutex: other than the idle fence (aux field) and active stacks count 
+  (content.asLong), this variable guards the bInUse field of the thread-aware VM stack, 
+  that states if a stack is currently used by the owning thread or not.
+
+- hb_threadStackMutex: this mutex regulates access to the linked list holding all the
+  stacks (hb_ht_stack).
+  
+- hb_mutexMutex: this mutex regulates access to the list of PRG level mutexes, that must
+  be scanned at thread termination for unclean mutexes. 
+  
+- hb_garbageAllocMutex: used to have single thread access to the pool of recycled data
+  or to the garbage collection facilities that are provided by the GC.
+  
+- hb_allocMutex: used to provide single thread access to the memory statisctics in fm.c,
+  and also to exclude concurrent access to malloc() and free(), that are thread unsafe
+  on most systems.
+  
+
+
+
+  
+
+INSIDE WINDOWS THREAD IMPLEMENTATION
+====================================
+
+We'll treat windows threading by difference with respect of the POSIX model. Main 
+differences that are to be noted are the followings:
+
+- Cancellation can only be done by a canceling thready by removing a target thread from
+  the execution queue, thus preventing the target thread from ever being rescheduled, and
+  stopping it immediately if running in a mutliprocessor environment.
+  In other words, we have true realtime cancelations, that leave even the OS stack unclean.
+- There isn't a OS specific mechanism to screen from cancelation, (except a "rights" 
+  management that is not applicable for our needs).  
+- Condition signaling is implemented by "rising" a variable status, and "automatically"
+  resetting it when a thread receives the notification. Also, manual reset is available
+  (the status stays UP until explicitly lowered). In other words, late subscription is
+  both available and enforced.
+  [RFC] I haven't tried it out, considering that a little heavy and willing to implement
+  a more windows-oriented mechanism, but probably a ResetEvent( var ), followed by a
+  WaitForSingleObject( var ) can simulate the pthread signaling scheme.
+- There isn't any "condition broadcasting" mechanism. The only way to emulate it is to
+  have a condition be manually reset after the last waiting thread has been resumed, and
+  being sure not to put in wait any thread in the meanwhile, but this is a tricky thing 
+  to do.
+  
+
+Kind Cancelation
+----------------
+
+A deferred cancelation scheme (like the one used in posix) can be easily implemented in
+windows by having a variable stating if a thread has been requested to be canceled. This
+variable can be periodically checked, and if it is set, the thread calls it's cleanup
+routine(s) and quits by its own initiative.
+
+[RFC] Anyway, there is no way to cleanly wake up an infinite wait function, like a cond
+wait or a file I/O read, and then test for cancelation. The only thing that can interrupt
+such a function is an explicit TerminateThread issued from another thread. 
+
+To allow a killer thread to know if a target is currently engaged in a possibly infinite
+waiting function, a variable called bCanCancel is provided in the local stack of every
+thread. A thread will set it whenever it thinks that an asyncrhonous, not kind cancelation
+can be issue without (too much) danger. In this case, the killer will have to call the
+cleanup functions for the killed thread.
+
+PRG level mutexes are now implemented with windows Semaphores because this kind of object
+are the only one that can be locked and unlocked by different threads, so the killer is
+able to unlock the PRG mutexes locked by the killed.
+
+[RFC] The problem is that neither the internal OS function are 100% thread safe. I.e., 
+a function engaged in an endless wait, like a fread(), could have some memory allocated
+BEFORE the lower OS layer wait, and even if the HB VM is completely "clean" at the moment,
+there could be an OS generated memory leak (this notice is from MSDN documentation).
+
+[LEFTOVER] A working cleanup pushing/popping mechanism were used before, but I have managed
+doing all without the need of it, i.e. by having only one cleanup functions that is able to
+clean memory and unlock PRG mutexes. Any way, the macros and windows specific push/pop
+functions are still there in the case we need them back before completing the porting.
+
+For the above reason (OS might leave memory leaks), I have differentiated the StopThread and
+the KillThread PRG functions. The first issues a kind cancelation, while the second issues
+a kind cancelation normally, and terminates the thread if the bCanCancel member of the
+target stack is set. The latter function should be used 1) if the programmer knows that
+the function used by the OS layer are threadsafe or 2) in programs or moments where small
+memory leacks are forgivable, i.e. in small client programs that are going to run for a small
+time or while the program is terminating.
+
+
+
+Kind Cancelation implementation
+-------------------------------
+
+Three macros have been added to make easier access to the kind cancelation facilities:
+
+#define HB_ENABLE_ASYN_CANC       HB_THREAD_GUARD( hb_cancelMutex, HB_VM_STACK.bCanCancel = TRUE )
+#define HB_DISABLE_ASYN_CANC      HB_THREAD_GUARD( hb_cancelMutex, HB_VM_STACK.bCanCancel = FALSE ) 
+
+#define HB_TEST_CANCEL_ENABLE_ASYN\
+   {\
+      HB_CRITICAL_LOCK( hb_cancelMutex );\
+      if ( HB_VM_STACK.bCanceled )\
+      {\
+         HB_CRITICAL_UNLOCK( hb_cancelMutex );\
+         hb_threadCancelInternal();\
+      }\
+      HB_VM_STACK.bCanCancel = TRUE;\
+      HB_CRITICAL_UNLOCK( hb_cancelMutex );\
+   }
+
+
+First two macros are just a code to change the bCanCancel value, guarding that change with
+a mutex (that is also locked by the killer threads). The latter macro is used for both
+checking if the thread has been requested kindly to terminate, and then state that from
+that point on the thread can be terminated asincrhonously. This macros are intended to
+be used this way:
+
+HB_TEST_CANCEL_ENABLE_ASYN;
+WaitingForALongTimeInWindowsOS( .. );
+HB_DISABLE_ASYN_CANC;
+
+[LEFTOVER] HB_ENABLE_ASYN_CANC should not be used ( always use HB_TEST_CANCEL_ENABLE_ASYN), 
+while  [TODO] HB_TEST_CANCEL has never been used, but should be used whenever there is a
+pthread cancelation point, like i.e. thead sleeps.
+
+
+
+Idle inspectors implementation
+------------------------------
+
+The joint effects of the different condition signaling scheme and of the more rigid mutex 
+locking scheme (in windows is possible to kill a thread that is waiting for a mutex, while
+this is forbidden in posix), forced to adopt a different implementation for stack locking
+and idle functions. Also, this implementation results to be more efficient in windows, using
+the native objects schemes:
+
+   #define HB_STACK_LOCK \
+   {\
+      HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
+      if( ! HB_VM_STACK.bInUse ) \
+      {\
+         hb_runningStacks.content.asLong++;\
+         HB_VM_STACK.bInUse = TRUE;\
+      }\
+      HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
+   }
+
+   #define HB_STACK_UNLOCK \
+   {\
+      HB_CRITICAL_LOCK( hb_runningStacks.Mutex );\
+      if( HB_VM_STACK.bInUse ) \
+      {\
+         HB_VM_STACK.bInUse = FALSE;\
+         if ( --hb_runningStacks.content.asLong == 0)\
+         {\
+            hb_threadCallIdle();\
+         }\
+      }\
+      HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );\
+   }
+
+As it can bee seen, nothing is signaled when the runningStacks content is changed,
+but when the count reaches 0, the idle rouitines are called. A procedure called
+hb_threadSubscribeIdle() is given to be used by procedures willing to be called
+when there is no other thread running.
+
+Notice that the idle call is made during stack unlock of the last therad currently
+running (currently having stack in use), and being the mutex locked, this forbids
+other thrads from regaining the lock on the stack.
+
+[SUPP] This scheme is fairly unsafe under posix, as posix mutexes are tought as
+"small, critical section guards". POSIX mutex should not cross function calls.
+
+Idle functions are enqueued by hb_threadSubscribeIdle and then called in turn
+all at once.
+
+[TODO] Currently, there is no fence guard in windows implementation. It seems
+that this fact is not particularily heavy, as the locking schemes are often
+causing  hb_runningStacks.content.asLong to be 0; also, under posix this 
+condition is necessary, but not sufficient to start the Idle inspectors, 
+while under windows the idle inspectors are called as soon as the stack
+holding threads count reaches 0. Any way, having a fence guard is safer
+in all the situations, and will be probably implemented also on windows.
+
+
+Data sets
+---------
+
+Other than POSIX thraed data sets, window porting needs:
+
+- hb_cancelMutex: to regulate kind cancelation requests; it locks bCanCancel and
+  bCanceled field of the HB_VM_STACK.
+  
+- hb_idleQueueRes: to regulate access to the idle queue. It is a shared resource
+  holding the linked list of queued idle functions.
+  
+
+  
+
+WHAT IS HAPPENING IN HVM.C
+==========================
+
+Stack is unlocked, but cancellation is not allowed, up to hb_vmExecute() main loop 
+start. Then the stack is locked, and eventually unlocked only
+- if the VM is returning (exiting from hb_vmExecute() )
+- if the VM has completed a number of loops equal to HB_VM_UNLOCK_PERIOD (currently 20)
+
+Lock is reacquired at the intrance in a new VM execution, or soon after the periodic unlock.
+iCount local variable is used to determine if the lock must be released and re-achieved.
+
+Pelase, notice that locking an already locked stack has no effect, so if a hb_vmExecute() 
+calls recursively itself (e.g. via an hb_vmDo() ), the stack is locked from before the call
+to the next unlock.
+
+If the VM calls another function (with hb_vmDo, hb_vmSend or hb_codeblockEval), then the 
+called hb_vmExecute() will unlock the stack on exit. For this reason, those functions must
+relock the stack as soon as the hb_vmExecute returns. Notice also that, since relocking a
+stack has no effect, this does not cause any problem if hb_vmDo() functions and alike ones
+are going to call a function that WON'T free the stack on exit.
+
+
+
+
+
+WHAT IS HAPPENING IN CONSOLE.C
+==============================
+
+Console is an interesting example of threadsafing of older code, and some words about it must 
+be told, also because some aspects of that implementaution have not been completely decided.
+
+First of all, notice that all the output in console can be a cancelation point if directed 
+to a device. So, the mutex that is used to coordinate output (hb_outputMutex) must be guarded
+using a pthread cleanup function. Also, since a stream could easily be a network based file
+or a standard stream, I/O can cause infinite waits, so it is fairly unwise to turn off
+cancelation just to spare hb_outputMutex.
+
+Under windows, it is almost sure that console output is going to be used to write to the screen,
+and that it will never generate an infinite wait; for this reason, it seems pretty useless
+to port cleanup functions. Also, for the same reason, asyncronous cancelation is never
+allowed.
+
+
+
+
+
+WHAT IS HAPPENING IN GARBAGE.C
+==============================
+
+Garbage collector (hb_gcCollectAll() ) is an idle inspector. For this reason, it must implement
+Idle inspector semantics.
+

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.52 2003/03/14 13:08:13 jonnymind Exp $
+ * $Id: garbage.c,v 1.53 2003/03/14 13:54:55 jonnymind Exp $
  */
 
 /*
@@ -526,13 +526,15 @@ void hb_gcCollectAll()
             return;
          }
       #else
-         HB_STACK_UNLOCK;
          HB_CRITICAL_LOCK( hb_runningStacks.Mutex );
          if ( s_bCollecting == TRUE || s_pCurrBlock == 0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
          {
-            HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );
+            HB_CRITICAL_UNLOCK( hb_runningStacks.Mutex );     
             return;
          }
+         hb_runningStacks.content.asLong--;
+         HB_VM_STACK.bInUse = FALSE;
+         HB_COND_SIGNAL( hb_runningStacks.Cond );
          s_bCollecting = TRUE;
 
          hb_threadWaitForIdle();
@@ -553,6 +555,8 @@ void hb_gcCollectAll()
       }
    #endif
 
+   /* Prevents startThread from being executed */
+   HB_CRITICAL_LOCK( hb_threadStackMutex );
 
    /* By hypotesis, only one thread will be granted the right to be here;
    so cheching for consistency of s_pCurrBlock further is useless.*/
@@ -717,8 +721,6 @@ void hb_gcCollectAll()
    }
    while ( s_pCurrBlock && ( pAlloc != s_pCurrBlock ) );
 
-   s_bCollecting = FALSE;
-
    s_pCurrBlock = pAlloc;
 
    /* Step 4 - flip flag */
@@ -731,11 +733,16 @@ void hb_gcCollectAll()
    /* Put itself back on machine execution count */
 
    /* Unblocks all threads */
+   HB_CRITICAL_UNLOCK( hb_threadStackMutex );
+   
    #if defined( HB_THREAD_SUPPORT ) && ! defined( HB_OS_WIN_32 )
       hb_runningStacks.aux = 0;
       // this will also signal the changed situation.
       HB_STACK_LOCK
    #endif
+   
+   /* Step 6: garbage requests will be now allowed again. */
+   s_bCollecting = FALSE;
 }
 
 /* JC1: THREAD UNSAFE
