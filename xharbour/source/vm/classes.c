@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.116 2004/04/09 18:52:08 ronpinkas Exp $
+ * $Id: classes.c,v 1.117 2004/04/28 18:31:15 druzus Exp $
  */
 
 /*
@@ -2990,6 +2990,8 @@ static HARBOUR hb___msgClsFullSel( void )
    HB_ITEM Return;
    USHORT nParam = hb_parni( 1 ), uiScope = hb_parni( 2 );
 
+   Return.type = HB_IT_NIL;
+
    if( ( ! uiClass ) && HB_IS_BYREF( pSelf ) )
    {
       PHB_ITEM pItemRef = hb_itemUnRef( pSelf ); // Is it possible?
@@ -3072,6 +3074,8 @@ static HARBOUR hb___msgClsSel( void )
    HB_ITEM Return ;
    USHORT nParam = hb_parni( 1 ), uiScope = hb_parni( 2 );
 
+   Return.type = HB_IT_NIL;
+
    if( ( ! uiClass ) && HB_IS_BYREF( pSelf ) )
    {
       PHB_ITEM pItemRef = hb_itemUnRef( pSelf ); // Is it possible?
@@ -3089,7 +3093,6 @@ static HARBOUR hb___msgClsSel( void )
       USHORT uiPos = 0;
       USHORT uiAt;
 
-      Return.type = HB_IT_NIL;
       hb_arrayNew( &Return, pClass->uiMethods );
                                                 /* Create a transfer array  */
       for( uiAt = 0; uiAt < uiLimit; uiAt++ )
