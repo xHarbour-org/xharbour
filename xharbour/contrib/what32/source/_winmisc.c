@@ -505,13 +505,12 @@ HB_FUNC( CREATEMUTEX )
 {
    SECURITY_ATTRIBUTES *sa;
 
-   if (ISCHAR(2))
-       sa = (SECURITY_ATTRIBUTES *) hb_param(1, HB_IT_STRING)->item.asString.value;
+   if( ISCHAR(1) )
+   {
+       sa = (SECURITY_ATTRIBUTES *) hb_param( 1, HB_IT_STRING )->item.asString.value;
+   }
 
-   hb_retnl( (ULONG) CreateMutex( ISNIL( 1 ) ? NULL : sa,
-                                  hb_parnl( 2 )         ,
-                                  hb_parc( 3 ) ) );
-
+   hb_retnl( (ULONG) CreateMutex( ISNIL( 1 ) ? NULL : sa, hb_parnl( 2 ), hb_parc( 3 ) ) );
 }
 
 //----------------------------------------------------------------------------

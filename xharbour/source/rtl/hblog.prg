@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.13 2003/10/20 02:39:29 jonnymind Exp $
+* $Id: hblog.prg,v 1.14 2003/11/27 17:57:50 jonnymind Exp $
 */
 
 /*
@@ -69,7 +69,7 @@ PROCEDURE HB_InitStandardLog( ... )
 
    StdLogger := HB_Logger():New()
    #ifdef HB_THREAD_SUPPORT
-      StdLogMutex := CreateMutex()
+      StdLogMutex := HB_CreateMutex()
    #endif
 
    FOR nCount := 1 TO PCount()

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1836 2003/12/09 00:50:24 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1837 2003/12/09 02:46:59 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-08 18:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/hblog.prg
+  * source/rtl/hblognet.prg
+  * source/rtl/trpc.prg
+  * source/rtl/trpccli.prg
+  * source/vm/thread.c
+    * Renamed CreateMutex() to HB_CreateMutex() to avoid conflict with Win api wrappers, and preserve namespace.
+
+  * contrib/Whoo/source/TApplication.prg
+  * contrib/what32/source/_winmisc.c
+    * Corrected typo.
 
 2003-12-08 23:37 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/dbedit.prg

@@ -1,5 +1,5 @@
 /*
-* $Id: hblognet.prg,v 1.2 2003/11/27 17:57:50 jonnymind Exp $
+* $Id: hblognet.prg,v 1.3 2003/11/28 16:10:50 jonnymind Exp $
 */
 
 /*
@@ -249,7 +249,7 @@ METHOD Open( cName ) CLASS HB_LogInetPort
    ENDIF
 
 #ifdef HB_THREAD_SUPPORT
-   ::mtxBusy := CreateMutex()
+   ::mtxBusy := HB_CreateMutex()
    ::nThread := StartThread( Self, "AcceptCon" )
 #else
    // If we have not threads, we have to sync accept incoming connection

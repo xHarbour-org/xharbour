@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.23 2003/11/28 16:10:50 jonnymind Exp $
+ * $Id: trpc.prg,v 1.24 2003/12/07 13:35:02 jonnymind Exp $
  */
 
 /*
@@ -432,7 +432,7 @@ ENDCLASS
 METHOD New( oParent, skIn ) CLASS tRPCServeCon
    ::oServer := oParent
    ::skRemote := skIn
-   ::mtxBusy := CreateMutex()
+   ::mtxBusy := HB_CreateMutex()
    ::bEncrypted := .F.
    ::nAuthLevel := 0
    ::nChallengeCRC := -1
@@ -833,7 +833,7 @@ METHOD RecvFunction( bComp, bMode ) CLASS tRPCServeCon
    IF InetRecvAll( ::skRemote, @cData ) != nComp
       RETURN NIL
    ENDIF
-   
+
    /* Eventually decrypt it */
    IF ::bEncrypted
       cData := ::Decrypt( cData )
@@ -1190,7 +1190,7 @@ CLASS tRPCService
    DATA thAccept INIT 0
    DATA thUdp INIT 0
    DATA aServing INIT {}
-   DATA mtxBusy INIT CreateMutex()
+   DATA mtxBusy INIT HB_CreateMutex()
 
    DATA skUdp
    DATA skServer
@@ -1427,7 +1427,7 @@ METHOD UDPListen( ) CLASS tRPCService
 
    DO WHILE .T.
       nPacketLen := InetDGramRecv( ::skUdp, @cData, 1000 )
-      IF InetStatus( ::skUdp ) < 0 
+      IF InetStatus( ::skUdp ) < 0
          EXIT
       ENDIF
       ::UDPParseRequest( cData, nPacketLen )

@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.53 2003/03/07 14:11:47 what32 Exp $
+ * $Id: TApplication.prg,v 1.54 2003/05/28 03:09:43 paultucker Exp $
  */
 /*
  * xHarbour Project source code:
@@ -84,9 +84,10 @@ METHOD Initialize() CLASS Application
 
    LOCAL nId, cMsg
 
-   IF !::MultiInstance
+   IF ! ::MultiInstance
       ::InstMsg := RegisterWindowMessage( GetModuleFileName() )
       AllowSetForegroundWindow( -1 )
+
       IF lPrevInstance
          SendMessage( HWND_BROADCAST, ::InstMsg, 0, 0)
          PostQuitMessage(0)

@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.24 2003/11/28 16:10:50 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.25 2003/12/07 13:35:02 jonnymind Exp $
  */
 
 /*
@@ -132,7 +132,7 @@ HIDDEN:
    CLASSDATA lInit INIT InetInit()
 
    #ifdef HB_THREAD_SUPPORT
-      DATA mtxBusy INIT CreateMutex()
+      DATA mtxBusy INIT HB_CreateMutex()
    #endif
 
    DATA nStatus

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.139 2003/12/07 00:10:07 jonnymind Exp $
+* $Id: thread.c,v 1.140 2003/12/07 13:35:02 jonnymind Exp $
 */
 
 /*
@@ -1896,7 +1896,7 @@ HB_GARBAGE_FUNC( hb_threadMutexFinalize )
 /*
    Create a new mutex (marking it disposeable by the GC)
 */
-HB_FUNC( CREATEMUTEX )
+HB_FUNC( HB_CREATEMUTEX )
 {
 #if defined(HB_API_MACROS)
    HB_THREAD_STUB
