@@ -1,5 +1,5 @@
 /*
- * $Id: pragma.c,v 1.2 2001/12/21 22:00:49 ronpinkas Exp $
+ * $Id: pragma.c,v 1.3 2002/12/18 16:34:12 ronpinkas Exp $
  */
 
 /*
@@ -286,7 +286,9 @@ void hb_pp_ParsePragma( char * szLine )
          if( hb_comp_iExitLevel != HB_EXITLEVEL_DEFAULT   &&
              hb_comp_iExitLevel != HB_EXITLEVEL_SETEXIT   &&
              hb_comp_iExitLevel != HB_EXITLEVEL_DELTARGET )
+         {
             hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_PRAGMA_BAD_VALUE, NULL, NULL );
+         }
          DebugPragma( szLine, hb_comp_iExitLevel, FALSE );
       }
       else if( memcmp( szLine, "DYNAMICMEMVAR", PRAGMAS_LEN ) == 0 )
@@ -335,9 +337,13 @@ static BOOL IsOnOffSwitch( char * pszStr, BOOL bValue )
    int iPos = strlen( pszStr ) - 1;
 
    if( pszStr[ iPos ] == '+' )
+   {
       bValue = TRUE;
+   }
    else if( pszStr[ iPos ] == '-' )
+   {
       bValue = FALSE;
+   }
 
    return bValue;
 }
@@ -348,7 +354,9 @@ static BOOL StringToBool( char * pszStr, BOOL bValue )
    char * pos = strchr( pszStr, '=' );
 
    if( ! pos )
+   {
       pos = strchr( pszStr, '(' );
+   }
 
    if( pos )
    {
@@ -357,9 +365,13 @@ static BOOL StringToBool( char * pszStr, BOOL bValue )
       HB_SKIPTABSPACES( pos );
 
       if( memcmp( pos, "ON", 2 ) == 0 )
+      {
          bValue = TRUE;
+      }
       else if( memcmp( pos, "OFF", 3 ) == 0 )
+      {
          bValue = FALSE;
+      }
    }
 
    return bValue;
@@ -371,7 +383,9 @@ static int StringToInt( char * pszStr, int iValue )
    char * pos = strchr( pszStr, '=' );
 
    if( ! pos )
+   {
       pos = strchr( pszStr, '(' );
+   }
 
    if( pos )
    {
@@ -380,7 +394,9 @@ static int StringToInt( char * pszStr, int iValue )
       HB_SKIPTABSPACES( pos );
 
       if( *pos >= '0' && *pos <= '9' )
+      {
          iValue = *pos - '0';
+      }
    }
 
    return iValue;
@@ -392,8 +408,12 @@ static void DebugPragma( char * pszStr, int iValue, BOOL bValue )
    if( s_bTracePragma )
    {
       if( iValue >= 0 )
+      {
          printf( "#pragma set to %i \'%s\'\n", iValue, pszStr );
+      }
       else
+      {
          printf( "#pragma set to %s \'%s\'\n", bValue ? "ON" : "OFF", pszStr );
+      }
    }
 }

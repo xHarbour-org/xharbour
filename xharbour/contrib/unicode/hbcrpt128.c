@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrpt128.c,v 1.3 2004/02/02 10:12:40 andijahja Exp $
+ * $Id: hbcrpt128.c,v 1.4 2004/02/24 14:15:39 andijahja Exp $
  */
 
 /*
@@ -90,7 +90,7 @@ static void int_decrypt(BYTE *,ULONG);
 ULONG hbcc_crc32(BYTE *,ULONG,ULONG);
 
 static ULONG tbl[512];
-static ULONG tmpKey[4];
+// static ULONG tmpKey[4];
 
 HB_FUNC(MKCRYPTKEY) //(cPass) -> ckey(32)
 {

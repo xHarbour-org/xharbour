@@ -1,5 +1,5 @@
 /*
- * $Id: hbc7.c,v 1.3 2004/02/02 10:12:32 andijahja Exp $
+ * $Id: hbc7.c,v 1.4 2004/02/24 14:15:39 andijahja Exp $
  */
 
 /*
@@ -212,7 +212,7 @@ static BOOL isdigit(BYTE c,ULONG r)
    }
 }
 
-ULONG str2ue7(BYTE *srcstr,ULONG srclen,BYTE *dststr)
+static ULONG str2ue7(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 {
    ULONG i,dstlen=0;
 

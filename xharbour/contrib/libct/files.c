@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.20 2004/03/18 03:43:08 ronpinkas Exp $
+ * $Id: files.c,v 1.21 2004/03/19 21:25:33 ronpinkas Exp $
  */
 
 /*
@@ -138,6 +138,7 @@
    #define FA_VOLCOMP      32768   /* M */
 #endif
 
+#if 0
 static USHORT osToHarbourMask(  USHORT usMask  )
 {
    USHORT usRetMask;
@@ -184,6 +185,7 @@ static USHORT osToHarbourMask(  USHORT usMask  )
 
    return usRetMask;
 }
+#endif
 
 #if defined( _MSC_VER )
    #if !defined( DIRECTORY )

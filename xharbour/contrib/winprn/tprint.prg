@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.12 2004/03/07 21:42:51 andijahja Exp $
+ * $Id: tprint.prg,v 1.13 2004/03/25 21:22:53 peterrees Exp $
  */
 
 /*
@@ -699,7 +699,7 @@ HB_FUNC_STATIC( SETMAPMODE )
   }
   hb_retnl( Result) ;
 }
-
+#if 0
 HB_FUNC_STATIC( SETTEXTCHARACTEREXTRA )
 {
   LONG Result = 0 ;
@@ -731,6 +731,7 @@ HB_FUNC_STATIC( DELETEOBJECT )
   }
   hb_retnl(0) ;
 }
+#endif
 
 HB_FUNC( MULDIV )
 {

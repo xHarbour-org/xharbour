@@ -1,5 +1,5 @@
 /*
- * $Id: n2color.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
+ * $Id: n2color.c,v 1.2 2004/01/23 09:55:11 andijahja Exp $
  */
 
 /*
@@ -46,8 +46,9 @@
  */
 
 #include "hbapi.h"
-
+#if 0
 static void _ftI2Color( int iColor, char * cColor );
+#endif
 static int _ftGetColorStr( int iColor, char * cColor );
 
 HB_FUNC(FT_N2COLOR )
@@ -80,8 +81,8 @@ HB_FUNC(FT_N2COLOR )
 //              *cColor -  pointer to the color string
 // Returns   :  void (string is modified directly)
 // 컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-
-void _ftI2Color( int iColor, char * cColor )
+#if 0
+static void _ftI2Color( int iColor, char * cColor )
 {
    unsigned int iBack, iFore, i = 0;
 
@@ -130,7 +131,7 @@ void _ftI2Color( int iColor, char * cColor )
 
    return ;
 }
-
+#endif
 
 
 // 컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
@@ -141,7 +142,7 @@ void _ftI2Color( int iColor, char * cColor )
 // Returns   :  length of added color string
 // 컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 
-int _ftGetColorStr( int iColor, char * cColor )
+static int _ftGetColorStr( int iColor, char * cColor )
 {
     int iLen = 0;
 

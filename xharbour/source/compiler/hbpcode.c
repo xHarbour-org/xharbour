@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.26 2004/04/03 01:51:02 ronpinkas Exp $
+ * $Id: hbpcode.c,v 1.27 2004/04/05 00:16:03 andijahja Exp $
  */
 
 /*
@@ -404,14 +404,16 @@ static PCODELIST hb_compPCodeList( PCODELIST pCodeCurrent, char* pCodeName )
    }
    return pCodeCurrent;
 }
-
+#if 0
 static PVAR hb_compPrivateFind( char * szPrivateName )
 {
    PFUNCTION pFunc = hb_comp_functions.pLast;
    PVAR pPrivate = NULL;
 
    if( pFunc )
+   {
       pPrivate = pFunc->pPrivates;
+   }
 
    while ( pPrivate )
    {
@@ -424,6 +426,7 @@ static PVAR hb_compPrivateFind( char * szPrivateName )
    }
    return NULL;
 }
+#endif
 
 void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * cargo, BOOL bWriteList )
 {
@@ -950,9 +953,13 @@ void hb_compStrongType( int iSize )
                 if( pFunc->pStackFunctions[ pFunc->iStackFunctions - 1 ] == NULL )
                 {
                    if( pSym->szName[0] == '_' )
+                   {
                       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_MESSAGE_NOT_FOUND, &( pSym->szName[1] ), pFunc->pStackClasses[ pFunc->iStackClasses - 1 ]->szName );
+                   }
                    else
+                   {
                       hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_MESSAGE_NOT_FOUND, pSym->szName, pFunc->pStackClasses[ pFunc->iStackClasses - 1 ]->szName );
+                   }
                 }
              }
           }

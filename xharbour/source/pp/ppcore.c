@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.143 2004/03/21 21:19:05 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.144 2004/04/03 00:27:03 druzus Exp $
  */
 
 /*
@@ -723,7 +723,9 @@ void hb_pp_Init( void )
    s_prevchar = 'A';
 
    if( !hb_pp_aCondCompile )
-       hb_pp_aCondCompile = ( int * ) hb_xgrab( sizeof( int ) * 5 );
+   {
+      hb_pp_aCondCompile = ( int * ) hb_xgrab( sizeof( int ) * 5 );
+   }
 
    hb_pp_nCondCompile = 0;
 
@@ -811,106 +813,149 @@ int hb_pp_ParseDirective( char * sLine )
   HB_SKIPTABSPACES(sLine);
 
   if( i == 4 && memcmp( sDirective, "ELSE", 4 ) == 0 )
-    {     /* ---  #else  --- */
-      if( hb_pp_nCondCompile == 0 )
+  {     /* ---  #else  --- */
+     if( hb_pp_nCondCompile == 0 )
+     {
         hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_DIRECTIVE_ELSE, NULL, NULL );
-      else if( hb_pp_nCondCompile == 1 || hb_pp_aCondCompile[hb_pp_nCondCompile-2] )
+     }
+     else if( hb_pp_nCondCompile == 1 || hb_pp_aCondCompile[hb_pp_nCondCompile-2] )
+     {
         hb_pp_aCondCompile[hb_pp_nCondCompile-1] = 1 - hb_pp_aCondCompile[hb_pp_nCondCompile-1];
-    }
+     }
+  }
 
   else if( i >= 4 && i <= 5 && memcmp( sDirective, "ENDIF", i ) == 0 )
-    {     /* --- #endif  --- */
-      if( hb_pp_nCondCompile == 0 )
-        hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_DIRECTIVE_ENDIF, NULL, NULL );
-      else hb_pp_nCondCompile--;
+  {     /* --- #endif  --- */
+    if( hb_pp_nCondCompile == 0 )
+    {
+       hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_DIRECTIVE_ENDIF, NULL, NULL );
     }
+    else
+    {
+       hb_pp_nCondCompile--;
+    }
+  }
 
   else if( i >= 4 && i <= 5 && memcmp( sDirective, "IFDEF", i ) == 0 )
-    ParseIfdef( sLine, TRUE ); /* --- #ifdef  --- */
+  {
+     ParseIfdef( sLine, TRUE ); /* --- #ifdef  --- */
+  }
 
   else if( i >= 4 && i <= 6 && memcmp( sDirective, "IFNDEF", i ) == 0 )
-    ParseIfdef( sLine, FALSE ); /* --- #ifndef  --- */
+  {
+     ParseIfdef( sLine, FALSE ); /* --- #ifndef  --- */
+  }
 
   else if( hb_pp_nCondCompile==0 || hb_pp_aCondCompile[hb_pp_nCondCompile-1])
-    {
-      if( i >= 4 && i <= 7 && memcmp( sDirective, "INCLUDE", i ) == 0 )
-        {    /* --- #include --- */
-          char cDelimChar;
+  {
+    if( i >= 4 && i <= 7 && memcmp( sDirective, "INCLUDE", i ) == 0 )
+      {    /* --- #include --- */
+        char cDelimChar;
 
-          if( *sLine != '\"' && *sLine != '\'' && *sLine != '<' )
-            hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_NAME, NULL, NULL );
-
-          cDelimChar = *sLine;
-          if( cDelimChar == '<' )
-            cDelimChar = '>';
-          else if( cDelimChar == '`' )
-            cDelimChar = '\'';
-
-          sLine++; i = 0;
-          while( *(sLine+i) != '\0' && *(sLine+i) != cDelimChar ) i++;
-          if( *(sLine+i) != cDelimChar )
-            hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_NAME, NULL, NULL );
-          *(sLine+i) = '\0';
-
-          if( ! OpenInclude( sLine, hb_comp_pIncludePath, hb_comp_pFileName, ( cDelimChar == '>' ), szInclude ) )
-          {
-            if( errno == 0 || errno == EMFILE )
-            {
-              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_TOO_MANY_INCLUDES, sLine, NULL );
-            }
-            else
-            {
-            #if defined(__CYGWIN__) || defined(__IBMCPP__) || defined(__LCC__)
-              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, "" );
-            #else
-              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, strerror( errno ) );
-            #endif
-            }
-          }
+        if( *sLine != '\"' && *sLine != '\'' && *sLine != '<' )
+        {
+           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_NAME, NULL, NULL );
         }
 
-      else if( i >= 4 && i <= 6 && memcmp( sDirective, "DEFINE", i ) == 0 )
-        hb_pp_ParseDefine( sLine );   /* --- #define  --- */
+        cDelimChar = *sLine;
+        if( cDelimChar == '<' )
+        {
+           cDelimChar = '>';
+        }
+        else if( cDelimChar == '`' )
+        {
+           cDelimChar = '\'';
+        }
 
-      else if( i >= 4 && i <= 5 && memcmp( sDirective, "UNDEF", i ) == 0 )
-        ParseUndef( sLine );    /* --- #undef  --- */
+        sLine++; i = 0;
+        while( *(sLine+i) != '\0' && *(sLine+i) != cDelimChar ) i++;
+        if( *(sLine+i) != cDelimChar )
+        {
+           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_NAME, NULL, NULL );
+        }
+        *(sLine+i) = '\0';
 
-      else if( (i >= 4 && i <= 7 && memcmp( sDirective, "COMMAND", i ) == 0) ||
-               (i >= 4 && i <= 8 && memcmp( sDirective, "XCOMMAND", i ) == 0) )
-                                /* --- #command  --- */
-        ParseCommand( sLine, sDirective[0] == 'X' ? TRUE : FALSE, TRUE, FALSE );
+        if( ! OpenInclude( sLine, hb_comp_pIncludePath, hb_comp_pFileName, ( cDelimChar == '>' ), szInclude ) )
+        {
+          if( errno == 0 || errno == EMFILE )
+          {
+            hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_TOO_MANY_INCLUDES, sLine, NULL );
+          }
+          else
+          {
+          #if defined(__CYGWIN__) || defined(__IBMCPP__) || defined(__LCC__)
+            hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, "" );
+          #else
+            hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, strerror( errno ) );
+          #endif
+          }
+        }
+      }
 
-      else if( (i >= 4 && i <= 9 && memcmp( sDirective, "UNCOMMAND", i ) == 0) ||
-               (i >= 4 && i <= 10 && memcmp( sDirective, "XUNCOMMAND", i ) == 0) )
-                                /* --- #uncommand  --- */
-        ParseCommand( sLine, sDirective[0] == 'X' ? TRUE : FALSE, TRUE, TRUE );
-
-      else if( (i >= 4 && i <= 9 && memcmp( sDirective, "TRANSLATE", i ) == 0) ||
-               (i >= 4 && i <= 10 && memcmp( sDirective, "XTRANSLATE", i ) == 0) )
-                                /* --- #translate  --- */
-        ParseCommand( sLine, sDirective[0] == 'X' ? TRUE : FALSE, FALSE, FALSE );
-
-      else if( (i >= 4 && i <= 11 && memcmp( sDirective, "UNTRANSLATE", i ) == 0) ||
-               (i >= 4 && i <= 12 && memcmp( sDirective, "XUNTRANSLATE", i ) == 0) )
-                                /* --- #untranslate  --- */
-        ParseCommand( sLine, sDirective[0] == 'X' ? TRUE : FALSE, FALSE, TRUE );
-
-      else if( i >= 4 && i <= 6 && memcmp( sDirective, "STDOUT", i ) == 0 )
-        printf( "%s\n", sLine ); /* --- #stdout  --- */
-
-      else if( i >= 4 && i <= 5 && memcmp( sDirective, "ERROR", i ) == 0 )
-        /* --- #error  --- */
-        hb_compGenError( hb_pp_szErrors, 'E', HB_PP_ERR_EXPLICIT, sLine, NULL );
-
-      else if( i == 4 && memcmp( sDirective, "LINE", 4 ) == 0 )
-        return -1;
-
-      else if( i == 6 && memcmp( sDirective, "PRAGMA", 6 ) == 0 )
-        hb_pp_ParsePragma( sLine );   /* --- #pragma  --- */
-
-      else
-        hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_DIRECTIVE, sDirective, NULL );
+    else if( i >= 4 && i <= 6 && memcmp( sDirective, "DEFINE", i ) == 0 )
+    {
+       hb_pp_ParseDefine( sLine );   /* --- #define  --- */
     }
+
+    else if( i >= 4 && i <= 5 && memcmp( sDirective, "UNDEF", i ) == 0 )
+    {
+       ParseUndef( sLine );    /* --- #undef  --- */
+    }
+
+    else if( (i >= 4 && i <= 7 && memcmp( sDirective, "COMMAND", i ) == 0) ||
+             (i >= 4 && i <= 8 && memcmp( sDirective, "XCOMMAND", i ) == 0) )
+    {
+                              /* --- #command  --- */
+       ParseCommand( sLine, sDirective[0] == 'X' ? TRUE : FALSE, TRUE, FALSE );
+    }
+
+    else if( (i >= 4 && i <= 9 && memcmp( sDirective, "UNCOMMAND", i ) == 0) ||
+             (i >= 4 && i <= 10 && memcmp( sDirective, "XUNCOMMAND", i ) == 0) )
+    {
+                              /* --- #uncommand  --- */
+       ParseCommand( sLine, sDirective[0] == 'X' ? TRUE : FALSE, TRUE, TRUE );
+    }
+
+    else if( (i >= 4 && i <= 9 && memcmp( sDirective, "TRANSLATE", i ) == 0) ||
+             (i >= 4 && i <= 10 && memcmp( sDirective, "XTRANSLATE", i ) == 0) )
+    {
+                              /* --- #translate  --- */
+       ParseCommand( sLine, sDirective[0] == 'X' ? TRUE : FALSE, FALSE, FALSE );
+    }
+
+    else if( (i >= 4 && i <= 11 && memcmp( sDirective, "UNTRANSLATE", i ) == 0) ||
+             (i >= 4 && i <= 12 && memcmp( sDirective, "XUNTRANSLATE", i ) == 0) )
+    {
+                              /* --- #untranslate  --- */
+       ParseCommand( sLine, sDirective[0] == 'X' ? TRUE : FALSE, FALSE, TRUE );
+    }
+
+    else if( i >= 4 && i <= 6 && memcmp( sDirective, "STDOUT", i ) == 0 )
+    {
+       printf( "%s\n", sLine ); /* --- #stdout  --- */
+    }
+
+    else if( i >= 4 && i <= 5 && memcmp( sDirective, "ERROR", i ) == 0 )
+    {
+       /* --- #error  --- */
+       hb_compGenError( hb_pp_szErrors, 'E', HB_PP_ERR_EXPLICIT, sLine, NULL );
+    }
+
+    else if( i == 4 && memcmp( sDirective, "LINE", 4 ) == 0 )
+    {
+       return -1;
+    }
+
+    else if( i == 6 && memcmp( sDirective, "PRAGMA", 6 ) == 0 )
+    {
+       hb_pp_ParsePragma( sLine );   /* --- #pragma  --- */
+    }
+
+    else
+    {
+       hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_DIRECTIVE, sDirective, NULL );
+    }
+  }
   return 0;
 }
 
@@ -1099,24 +1144,36 @@ static int ParseIfdef( char * sLine, int usl )
   HB_TRACE(HB_TR_DEBUG, ("ParseIfdef(%s, %d)", sLine, usl));
 
   if( hb_pp_nCondCompile==0 || hb_pp_aCondCompile[hb_pp_nCondCompile-1])
-    {
-      NextWord( &sLine, defname, FALSE );
-      if( *defname == '\0' )
+  {
+     NextWord( &sLine, defname, FALSE );
+     if( *defname == '\0' )
+     {
         hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_DEFINE_ABSENT, NULL, NULL );
-    }
+     }
+  }
+
   if( hb_pp_nCondCompile == s_maxCondCompile )
-    {
+  {
       s_maxCondCompile += 5;
       hb_pp_aCondCompile = (int*)hb_xrealloc( hb_pp_aCondCompile, sizeof( int ) * s_maxCondCompile );
-    }
+  }
+
   if( hb_pp_nCondCompile==0 || hb_pp_aCondCompile[hb_pp_nCondCompile-1])
-    {
+  {
       if( ( (stdef = DefSearch(defname,NULL)) != NULL && usl )
-           || ( stdef == NULL && !usl ) ) hb_pp_aCondCompile[hb_pp_nCondCompile] = 1;
-      else hb_pp_aCondCompile[hb_pp_nCondCompile] = 0;
-    }
+           || ( stdef == NULL && !usl ) )
+      {
+         hb_pp_aCondCompile[hb_pp_nCondCompile] = 1;
+      }
+      else
+      {
+         hb_pp_aCondCompile[hb_pp_nCondCompile] = 0;
+      }
+  }
   else
-    hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 0;
+  {
+     hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 0;
+  }
 
   hb_pp_nCondCompile++;
 
@@ -1131,20 +1188,23 @@ static DEFINES * DefSearch( char * defname, BOOL * isNew )
   HB_TRACE(HB_TR_DEBUG, ("DefSearch(%s)", defname));
 
   while( stdef != NULL )
+  {
+    kol++;
+    if( stdef->name != NULL )
     {
-      kol++;
-      if( stdef->name != NULL )
-        {
-          for( j=0; *(stdef->name+j) == *(defname+j) &&
-                  *(stdef->name+j) != '\0'; j++ );
-          if( *(stdef->name+j) == *(defname+j) )
-            {
-              if( isNew ) *isNew = ( s_kolAddDefs >= kol );
-              return stdef;
-            }
-        }
-      stdef = stdef->last;
+       for( j=0; *(stdef->name+j) == *(defname+j) &&
+               *(stdef->name+j) != '\0'; j++ );
+       if( *(stdef->name+j) == *(defname+j) )
+       {
+          if( isNew )
+          {
+             *isNew = ( s_kolAddDefs >= kol );
+          }
+          return stdef;
+       }
     }
+    stdef = stdef->last;
+  }
   return NULL;
 }
 
@@ -1164,7 +1224,9 @@ static COMMANDS * ComSearch( char * cmdname, COMMANDS * stcmdStart )
       if( (*(stcmd->name+j)==toupper(*(cmdname+j))) ||
            ( !stcmd->com_or_xcom && j >= 4 && *(stcmd->name+j)!='\0'
              && *(cmdname+j) == '\0' ) )
-        break;
+      {
+         break;
+      }
 
       stcmd = stcmd->last;
    }
@@ -1180,16 +1242,18 @@ static COMMANDS * TraSearch( char * cmdname, COMMANDS * sttraStart )
   HB_TRACE(HB_TR_DEBUG, ("TraSearch(%s, %p)", cmdname, sttraStart));
 
   while( sttra != NULL )
-    {
-      for( j=0; *(sttra->name+j)==toupper(*(cmdname+j)) &&
-              *(sttra->name+j)!='\0' &&
-              ((sttra->com_or_xcom)? 1:(j<4 || ISNAME(*(cmdname+j+1)))); j++ );
-      if( *(sttra->name+j)==toupper(*(cmdname+j)) ||
-           ( !sttra->com_or_xcom && j >= 4 &&
-             *(sttra->name+j)!='\0' && *(cmdname+j) == '\0' ) )
+  {
+     for( j=0; *(sttra->name+j)==toupper(*(cmdname+j)) &&
+             *(sttra->name+j)!='\0' &&
+             ((sttra->com_or_xcom)? 1:(j<4 || ISNAME(*(cmdname+j+1)))); j++ );
+     if( *(sttra->name+j)==toupper(*(cmdname+j)) ||
+          ( !sttra->com_or_xcom && j >= 4 &&
+            *(sttra->name+j)!='\0' && *(cmdname+j) == '\0' ) )
+     {
         break;
-      sttra = sttra->last;
-    }
+     }
+     sttra = sttra->last;
+  }
   return sttra;
 }
 
@@ -4352,7 +4416,9 @@ static void SkipOptional( char ** ptri )
      case '\1':
        (*ptri) += 3;
        if( *(*ptri-1) == '2' )
+       {
          while( **ptri != '>' ) (*ptri)++;
+       }
        break;
      }
      (*ptri)++;
@@ -5004,48 +5070,52 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
 
   case '4':  /* Blockify result marker  */
     if( !lenreal )
-      hb_pp_Stuff( expreal, ptro, lenreal, 4, lenres );
+    {
+       hb_pp_Stuff( expreal, ptro, lenreal, 4, lenres );
+    }
     else if( patttype == '1' )          /* list match marker */
-      {
-        hb_pp_Stuff( "", ptro, 0, 4, lenres );
-        lenres -= 4;
-        rmlen = 0;
-        do
+    {
+       hb_pp_Stuff( "", ptro, 0, 4, lenres );
+       lenres -= 4;
+       rmlen = 0;
+       do
+       {
+          ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE, FALSE );
+          lenitem = (ifou)? ifou-1:lenreal;
+          if( *expreal != '\0' )
           {
-            ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE, FALSE );
-            lenitem = (ifou)? ifou-1:lenreal;
-            if( *expreal != '\0' )
-              {
-                i = (ifou)? 5:4;
-                hb_pp_Stuff( "{||},", ptro, i, 0, lenres );
-                hb_pp_Stuff( expreal, ptro+3, lenitem, 0, lenres+i );
-                ptro += i + lenitem;
-                rmlen += i + lenitem;
-              }
-            expreal += ifou;
-            lenreal -= ifou;
+             i = (ifou)? 5:4;
+             hb_pp_Stuff( "{||},", ptro, i, 0, lenres );
+             hb_pp_Stuff( expreal, ptro+3, lenitem, 0, lenres+i );
+             ptro += i + lenitem;
+             rmlen += i + lenitem;
           }
-        while( ifou > 0 );
-      }
+          expreal += ifou;
+          lenreal -= ifou;
+       }
+       while( ifou > 0 );
+    }
     else if( lenreal && *expreal == '{' )
-      {
-        hb_pp_Stuff( expreal, ptro, lenreal, 4, lenres );
-      }
+    {
+       hb_pp_Stuff( expreal, ptro, lenreal, 4, lenres );
+    }
     else
-      {
-        hb_pp_Stuff( "{||}", ptro, 4, 4, lenres );
-        hb_pp_Stuff( expreal, ptro+3, lenreal, 0, lenres );
-        rmlen = lenreal + 4;
-      }
+    {
+       hb_pp_Stuff( "{||}", ptro, 4, 4, lenres );
+       hb_pp_Stuff( expreal, ptro+3, lenreal, 0, lenres );
+       rmlen = lenreal + 4;
+    }
     break;
   case '5':  /* Logify result marker  */
     rmlen = 3;
     if( !lenreal )
-      {
-        hb_pp_Stuff( ".F.", ptro, 3, 4, lenres );
-      }
+    {
+       hb_pp_Stuff( ".F.", ptro, 3, 4, lenres );
+    }
     else
-      hb_pp_Stuff( ".T.", ptro, 3, 4, lenres );
+    {
+       hb_pp_Stuff( ".T.", ptro, 3, 4, lenres );
+    }
     break;
   case '6':  /* Ommit result marker  */
     rmlen = 0;

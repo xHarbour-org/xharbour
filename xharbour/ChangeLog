@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2748 2004/04/05 00:28:19 andijahja Exp $
+ * $Id: ChangeLog,v 1.2749 2004/04/05 02:29:29 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-05 17:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/hbpcode.c
+    - remmed: unused hb_compPrivateFind()
+  * contrib/libct/files.c
+    - remmed: unused osToHarbourMask()
+  * source/rtl/gtwvt/gtwvt.v
+    - remmed: unused hb_wvt_gtValidWindowSize()
+  * contrib/libnf/n2color.c
+    - remmed: unused _ftI2Color()
+    ! fix inconsistent linkage : _ftGetColorStr()
+  * contrib/unicode/hbc7.c
+    ! fix inconsistent linkage : str2ue7()
+  * contrib/unicode/hbcrpt128.c
+    - removed unused variable: tmpKey
+  * contrib/winprn/tprint.prg
+    - remmed unused fucntions:
+      DELETEOBJECT(),SELECTOBJECT(),SETTEXTCHARACTEREXTRA()
+
+  * source/pp/pragma.c
+  * source/pp/ppcore.c
+    % code formatting, mainly change tabs->spaces and put singe-liner into {}
 
 2004-04-05 04:38 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/makefile.bc
