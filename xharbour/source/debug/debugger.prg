@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.14 2003/07/31 12:51:01 druzus Exp $
+ * $Id: debugger.prg,v 1.15 2003/11/23 01:21:00 likewolf Exp $
  */
 
 /*
@@ -215,7 +215,7 @@ CLASS TDebugger
    DATA   aBreakPoints, aCallStack, aColors
    DATA   aLastCommands, nCommand, oGetListCommand
    DATA   lAnimate, lEnd, lGo, lTrace, lCaseSensitive, lMonoDisplay, lSortVars
-   DATA   cSearchString, cPathForFiles, cSettingsFileName
+   DATA   cSearchString, cPathForFiles, cSettingsFileName, aPathDirs
    DATA   nTabWidth, nSpeed
    DATA   lShowPublics, lShowPrivates, lShowStatics, lShowLocals, lAll
    DATA   lShowCallStack
@@ -280,6 +280,7 @@ CLASS TDebugger
    METHOD ShowHelp( nTopic )
    METHOD ShowVars()
    METHOD RedisplayBreakpoints()
+   METHOD LocatePrgPath( cPrgName )
    METHOD Sort() INLINE ASort( ::aVars,,, {|x,y| x[1] < y[1] } ),;
                         ::lSortVars := .t.,;
                         iif( ::oBrwVars != nil, ::oBrwVars:RefreshAll(), nil ),;
@@ -338,9 +339,7 @@ METHOD New() CLASS TDebugger
    // default the search path for files to the current directory
    // that way if the source is in the same directory it will still be found even if the application
    // changes the current directory with the SET DEFAULT command
-   /* ::cPathForFiles     := CURDRIVE() + ':\' + CURDIR() + '\' */
-   ::cPathForFiles     := CURDRIVE() + HB_OSDRIVESEPARATOR() + ;
-                          HB_OSPATHSEPARATOR() + CURDIR() + HB_OSPATHSEPARATOR()
+   ::cPathForFiles     := getenv( "PATH" )
    ::nTabWidth         := 4
    ::nSpeed            := 0
    ::lShowCallStack    := .f.
@@ -1499,12 +1498,10 @@ METHOD ShowCodeLine( nLine, cPrgName ) CLASS TDebugger
       endif
         
       if cPrgName != ::cPrgName
-         ::cPrgName := cPrgName
          if ! File( cPrgName ) .and. ! Empty( ::cPathForFiles )
-            if File( ::cPathForFiles + cPrgName )
-               cPrgName = ::cPathForFiles + cPrgName
-            endif
+            cPrgName := ::LocatePrgPath( cPrgName )
          endif
+         ::cPrgName := cPrgName
          ::oBrwText := nil
          ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
                       ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, cPrgName,;
@@ -1522,7 +1519,7 @@ return nil
 METHOD Open() CLASS TDebugger
 
    local cFileName := ::InputBox( "Please enter the filename", Space( 30 ) )
-   if (cFileName != ::cPrgName .OR. valtype(::cPrgName)=='U')
+  if (cFileName != ::cPrgName .OR. valtype(::cPrgName)=='U')
       ::cPrgName := cFileName
       ::oBrwText := nil
       ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
@@ -2186,6 +2183,35 @@ METHOD SearchLine() CLASS TDebugger
 
 return nil
 
+METHOD LocatePrgPath( cPrgName ) CLASS TDebugger
+
+   local i
+   local iMax
+   local aPaths
+   local cRetPrgName
+   local cSep
+   
+   if empty( ::aPathDirs )
+      ::aPathDirs := PathToArray( ::cPathForFiles )
+   endif
+
+   cSep := HB_OsPathSeparator()
+
+   aPaths := ::aPathDirs
+
+   iMax := len( aPaths )
+
+   for i := 1 to iMax
+       cRetPrgName := aPaths[i] + cSep + cPrgName
+       if file( cRetPrgName )
+          exit
+       else
+          cRetPrgName := nil
+       endif
+   next i
+
+   return cRetPrgName
+
 function __DbgColors()
 
 return iif( ! s_oDebugger:lMonoDisplay, s_oDebugger:aColors,;
@@ -2284,3 +2310,25 @@ static function DoCommand( o,cCommand )
    next
 
 Return cResult
+
+
+static function PathToArray( cList )
+
+   local nPos
+   local aList := {}
+   local cSep
+
+   cSep := HB_OsPathListSeparator()
+
+   if ( cList <> NIL )
+
+      do while ( nPos := at( cSep, cList ) ) <> 0
+         aadd( aList, substr( cList, 1, nPos - 1 ) )        // Add a new element
+         cList := substr( cList, nPos + 1 )
+      enddo
+
+      aadd( aList, cList )              // Add final element
+
+   endif
+
+return aList 
