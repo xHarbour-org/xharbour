@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.4 2002/10/10 02:51:46 what32 Exp $
+ * $Id: TCStatic.prg,v 1.12 2002/10/11 03:53:16 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -35,7 +35,7 @@
 
 CLASS TStatic FROM TControl
 
-   DATA Caption INIT  "StaticText"
+//   DATA Caption INIT  "StaticText"
    DATA Left    INIT   0
    DATA Top     INIT   0
    DATA Width   INIT  80

@@ -1,5 +1,5 @@
 /*
- * $Id: TCProgBar.prg,v 1.4 2002/10/11 22:37:36 what32 Exp $
+ * $Id: TCProgBar.prg,v 1.5 2002/10/12 09:40:53 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -35,7 +35,7 @@
 
 CLASS TProgressBar FROM TControl
 
-   DATA Caption  INIT   ""
+//   DATA Caption  INIT   ""
    DATA Left     INIT    0
    DATA Top      INIT    0
    DATA Width    INIT  160

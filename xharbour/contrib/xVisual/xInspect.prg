@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.27 2002/10/11 22:37:39 what32 Exp $
+ * $Id: xInspect.prg,v 1.28 2002/10/12 19:58:13 what32 Exp $
  */
 
 /*
@@ -148,23 +148,26 @@ METHOD SaveVar(cText,nKey) CLASS ObjInspect
 
    if __objSendMsg( ::CurObject, cVar ) != cText
       __objSendMsg( ::CurObject, "_"+cVar, cText )
-
+      
       ::Browser:source[::Browser:RecPos][2]:= cText
       ::Browser:RefreshCurrent()
-      ::CurObject:Update()
+//      ::CurObject:Update()
+
       ::CurObject:SetFocus()
       SetFocus( ::Browser:hWnd)
 
+
+//------------------------------------- XFM UPDATE ---------------------------------------
       IF ::CurObject:ClassName == "TFORMEDIT"
          ::CurObject:XFMRoot()
       ELSE
          ::CurObject:Parent:XFMControl( , ::CurObject, .F. )
       ENDIF
+//----------------------------------------------------------------------------------------
 
    endif
 
    IF nKey==VK_UP .OR. nKey==VK_DOWN
-      ::Browser:RefreshCurrent()
       PostMessage( ::Browser:hWnd, WM_KEYDOWN, nKey, 0 )
       PostMessage( ::Browser:hWnd, WM_LBUTTONDBLCLK, 0, 0 )
       ::Browser:RefreshAll()
