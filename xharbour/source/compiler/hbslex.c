@@ -1,5 +1,5 @@
 /*
- * $Id: hbslex.c,v 1.6 2005/01/09 01:41:00 ronpinkas Exp $
+ * $Id: hbslex.c,v 1.7 2005/01/11 23:53:44 likewolf Exp $
  */
 
 #include "hbcomp.h"
@@ -17,6 +17,10 @@
 
 #define YY_BUF_SIZE HB_PP_STR_SIZE
 
-#define SLX_RULES "../source/compiler/harbour.slx"
+#if ( defined(__XCC__) || defined(__LCC__) )
+   #define SLX_RULES "source/compiler/harbour.slx"
+#else
+   #define SLX_RULES "../source/compiler/harbour.slx"
+#endif
 
 #include "simplex.c"
