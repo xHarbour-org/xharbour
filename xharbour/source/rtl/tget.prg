@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.86 2004/07/24 00:30:29 guerra000 Exp $
+ * $Id: tget.prg,v 1.87 2004/08/05 15:20:53 kaddath Exp $
  */
 
 /*
@@ -77,6 +77,7 @@ CLASS Get
    // Exported
 
    DATA BadDate
+   DATA Block
    DATA Buffer
    DATA Cargo
    DATA Changed
@@ -107,19 +108,18 @@ CLASS Get
    DATA CapCol
    #endif
 
-   DATA cColorSpec   PROTECTED   // Used only for METHOD ColorSpec
-   DATA cPicture     PROTECTED   // Used only for METHOD Picture
-   DATA Block
-
    METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec )
 
    METHOD Assign()
-#ifdef HB_COMPAT_XPP
+   #ifdef HB_COMPAT_XPP
    MESSAGE _Assign METHOD Assign()
-#endif
-   METHOD HitTest(mrow,mcol)
-   METHOD ColorSpec( cColorSpec ) SETGET  // Replace to DATA ColorSpec
-   METHOD Picture( cPicture )     SETGET  // Replace to DATA Picture
+   #endif
+
+   ACCESS ColorSpec                 INLINE ::cColorSpec
+   ASSIGN ColorSpec( cColorSpec )   INLINE ::SetColorSpec( cColorSpec )
+   ACCESS Picture                   INLINE ::cPicture
+   ASSIGN Picture( cPicture )       INLINE ::SetPicture( cPicture )
+
    METHOD Display( lForced )
    METHOD ColorDisp( cColorSpec ) INLINE ::ColorSpec := cColorSpec, ::Display(), Self
    METHOD KillFocus()
@@ -128,14 +128,14 @@ CLASS Get
    METHOD Undo()
    METHOD UnTransform( cBuffer )
    METHOD UpdateBuffer() INLINE  if( ::hasfocus, ( ::buffer := ::PutMask( ::VarGet() ), ::Display() ), ), Self
-
    METHOD VarGet()
    METHOD VarPut(xValue, lReFormat)
 
    METHOD End()
-#ifdef HB_COMPAT_XPP
+   #ifdef HB_COMPAT_XPP
    MESSAGE _End METHOD End()
-#endif
+   #endif
+
    METHOD Home()
    MESSAGE Left() METHOD _Left()
    MESSAGE Right() METHOD _Right()
@@ -154,7 +154,21 @@ CLASS Get
    METHOD Insert( cChar )
    METHOD OverStrike( cChar )
 
-   // Protected
+   #ifdef HB_COMPAT_C53
+   METHOD HitTest(mrow, mcol)
+   #endif
+
+
+   PROTECTED:           /*  P R O T E C T E D  */
+
+   DATA cColorSpec            // Used only for METHOD ColorSpec
+   DATA cPicture              // Used only for METHOD Picture
+
+   METHOD SetColorSpec( cColorSpec )
+   METHOD SetPicture( cPicture )
+
+
+   HIDDEN:              /*  H I D D E N  */
 
    DATA cPicMask, cPicFunc, nMaxLen, lEdit, lDecRev, lPicComplex
    DATA nDispLen, nDispPos, nOldPos, lCleanZero, cDelimit, nMaxEdit
@@ -361,6 +375,9 @@ METHOD ParsePict( cPicture ) CLASS Get
       if ::type == "N"
          ::decpos := At( iif( ::lDecRev .or. "E" IN ::cPicFunc, ",", "." ), ;
                      Transform( 1, if( Empty( ::cPicFunc ), "", ::cPicFunc + " " ) + ::cPicMask ) )
+         if ::decpos == 0
+            ::decpos := iif( ::buffer == NIL, NIL, Len( ::buffer ) + 1 )
+         endif
       else
          ::decpos := NIL
 
@@ -475,6 +492,7 @@ METHOD End() CLASS Get
             exit
          endif
       next
+      ::TypeOut := .f.
       ::Clear := .f.
       ::Display( .f. )
    endif
@@ -487,6 +505,7 @@ METHOD Home() CLASS Get
 
    if ::HasFocus
       ::Pos := ::FirstEditable( )
+      ::TypeOut := .f.
       ::Clear := .f.
       ::Display( .f. )
    endif
@@ -549,6 +568,9 @@ METHOD SetFocus() CLASS Get
 
       if ::type == "N"
          ::decpos := At( iif( ::lDecRev .or. "E" IN ::cPicFunc, ",", "." ), ::buffer )
+         if ::decpos == 0
+            ::decpos := iif( ::buffer == NIL, NIL, Len( ::buffer ) + 1 )
+         endif
          ::minus := ( xVarGet < 0 )
       else
          ::decpos := NIL
@@ -1094,6 +1116,7 @@ METHOD ToDecPos() CLASS Get
       ::DeleteAll()
    endif
 
+   ::TypeOut := .f.
    ::Clear  := .f.
    ::lEdit  := .t.
    ::buffer := ::PutMask( ::UnTransform(), .f. )
@@ -1597,7 +1620,7 @@ return Self
   // QUESTIONS, is realy necessary this method? the ::colorspec generated was
   not clipper 5.x compatible, and also was not respecting SET INTENSITY
 */
-METHOD ColorSpec( cColorSpec ) CLASS Get
+METHOD SetColorSpec( cColorSpec ) CLASS Get
 
 //   local cClrUnSel, cClrEnh
 
@@ -1628,7 +1651,7 @@ return ::cColorSpec
  * several tasks to adjust the internal data of the object.
  */
 
-METHOD Picture( cPicture ) CLASS Get
+METHOD SetPicture( cPicture ) CLASS Get
 
    if cPicture != NIL
 
@@ -1653,6 +1676,7 @@ return ::cPicture
 
 //---------------------------------------------------------------------------//
 
+#ifdef HB_COMPAT_C53
 METHOD HitTest( mRow, mCol ) CLASS GET
 
     IF ( Valtype( ::Control ) == "O" )
@@ -1672,6 +1696,7 @@ METHOD HitTest( mRow, mCol ) CLASS GET
     ENDIF
 
 return HTNOWHERE
+#endif
 
 //---------------------------------------------------------------------------//
 
