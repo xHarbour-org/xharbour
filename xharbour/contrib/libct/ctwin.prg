@@ -4,14 +4,14 @@
 *   write by Adam Lubszczyk    alubszcz@rsw.pl                     *
 ********************************************************************
 /*
- * $Id: ctwin.prg,v 1.4 2003/08/27 08:58:20 druzus Exp $
+ * $Id: ctwin.prg,v 1.5 2004/01/29 17:28:45 lculik Exp $
  */
 
 /*
  * Harbour Project source code:
  *   CT3 Windows Like functions
  *     Copyright 2002-2003 Adam Lubszczyk <alubszcz@rsw.pl>
- *	 
+ *
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -58,23 +58,23 @@
 #include "hbclass.ch"
 #include "set.ch"
 
-STATIC ctw_WINDOWS := {}
-STATIC ctw_CURRENT := 0
-STATIC ctw_STOS    := {}
-STATIC ctw_0ROW    := 0
-STATIC ctw_0COL    := 0
+STATIC ctw_WINDOWS      := {}
+STATIC ctw_CURRENT      := 0
+STATIC ctw_STOS         := {}
+STATIC ctw_0ROW         := 0
+STATIC ctw_0COL         := 0
 STATIC ctw_0COLOR
 STATIC ctw_0CURSOR
-STATIC ctw_BOARDT  := 0
-STATIC ctw_BOARDL  := 0
-STATIC ctw_BOARDB  := 0
-STATIC ctw_BOARDR  := 0
-STATIC ctw_MODET   := .F.
-STATIC ctw_MODEL   := .F.
-STATIC ctw_MODEB   := .F.
-STATIC ctw_MODER   := .F.
-STATIC ctw_CANMOVE := .T.
-STATIC ctw_SHADOWATTR := -1
+STATIC ctw_BOARDT       := 0
+STATIC ctw_BOARDL       := 0
+STATIC ctw_BOARDB       := 0
+STATIC ctw_BOARDR       := 0
+STATIC ctw_MODET        := .F.
+STATIC ctw_MODEL        := .F.
+STATIC ctw_MODEB        := .F.
+STATIC ctw_MODER        := .F.
+STATIC ctw_CANMOVE      := .T.
+STATIC ctw_SHADOWATTR   := -1
 STATIC ctw_WBOX_Type := {;
             "ÉÍ»º¼ÍÈº ",;   // 0      WB_DOUBLE_CLEAR
             "ÚÄ¿³ÙÄÀ³ ",;   // 1      WB_SINGLE_CLEAR
@@ -94,9 +94,52 @@ STATIC ctw_WBOX_Type := {;
             "ÛÛÛÛÛÛÛÛ" }   // 15      WB_FULL
 
 
-********************************************************************
-********************************************************************
-********************************************************************
+*********************************************
+* Function....: ctw_memoedit(cString, nTop, nLeft, nBottom, nRight, lEditMode, cUserFunction, ;
+*                  nLineLength, nTabSize, nTextBufferRow, nTextBufferColumn, nWindowRow, nWindowColumn)
+* Author......: Tony Bretado
+* Date Created: 06/23/2004      12:47PM
+*********************************************
+Function ctw_memoedit(cString, nTop, nLeft, nBottom, nRight, lEditMode, cUserFunction, ;
+   nLineLength, nTabSize, nTextBufferRow, nTextBufferColumn, nWindowRow, nWindowColumn)
+   local cRet := ''
+
+   IF ctw_CURRENT == 0
+      cRet := memoedit(cString, nTop, nLeft, nBottom, nRight, lEditMode, cUserFunction, ;
+                nLineLength, nTabSize, nTextBufferRow, nTextBufferColumn, nWindowRow, nWindowColumn)
+   ELSE
+      cRet := ctw_WINDOWS[ctw_CURRENT]:memoedit(cString, nTop, nLeft, nBottom, nRight, lEditMode, cUserFunction, ;
+                nLineLength, nTabSize, nTextBufferRow, nTextBufferColumn, nWindowRow, nWindowColumn)
+   ENDIF
+
+   return cRet
+
+*********************************************
+* Function....: CTW_SaveScreen( nT, nL, nB, nR)
+* Author......: Tony Bretado
+* Date Created: 8/27/03             2:33PM
+*********************************************
+FUNCTION ctw_SAVESCREEN( nT, nL, nB, nR)
+ LOCAL cRet
+ IF ctw_CURRENT == 0
+   cRet := SaveScreen( nT, nL, nB, nR)
+ ELSE
+   cRet := ctw_WINDOWS[ctw_CURRENT]:SaveScreen( nT, nL, nB, nR)
+ ENDIF
+RETURN cRet
+*********************************************
+* Function....: CTW_RestScreen( nT, nL, nB, nR, cScr)
+* Author......: Tony Bretado
+* Date Created: 8/27/03             2:33PM
+*********************************************
+FUNCTION ctw_RESTSCREEN( nT, nL, nB, nR, cScr)
+ IF ctw_CURRENT == 0
+   RESTSCREEN( nT, nL, nB, nR, cScr)
+ ELSE
+   cRet := ctw_WINDOWS[ctw_CURRENT]:RestScreen( nT, nL, nB, nR, cScr)
+ ENDIF
+RETURN Nil
+********************************************
 FUNCTION ctw_SCROLL(nT,nL,nB,nR,nV,nH)
  IF ctw_CURRENT == 0
    SCROLL(nT,nL,nB,nR,nV,nH)
@@ -124,21 +167,21 @@ FUNCTION ctw_ROW()
  ENDIF
 RETURN nRet
 ********************************************
-FUNCTION ctw_MAXCOL()
+FUNCTION ctw_MAXCOL( lMode)
  LOCAL nRet
  IF ctw_CURRENT == 0
    nRet := MAXCOL()
  ELSE
-   nRet := ctw_WINDOWS[ctw_CURRENT]:MaxCol()
+   nRet := ctw_WINDOWS[ctw_CURRENT]:MaxCol( lMode)
  ENDIF
 RETURN nRet
 ********************************************
-FUNCTION ctw_MAXROW()
+FUNCTION ctw_MAXROW( lMode)
  LOCAL nRet
  IF ctw_CURRENT == 0
    nRet := MAXROW()
  ELSE
-   nRet := ctw_WINDOWS[ctw_CURRENT]:MaxRow()
+   nRet := ctw_WINDOWS[ctw_CURRENT]:MaxRow( lMode)
  ENDIF
 RETURN nRet
 ********************************************
@@ -399,10 +442,12 @@ FUNCTION WOPEN(nTop,nLeft,nBottom,nRight,lCls)
   ENDIF
   AADD(ctw_STOS,nNum)
   ctw_CURRENT := nNum
-  IF lCls
+  IF lCls .or. valtype(ctw_SHADOWATTR) == 'C'
     ctw_WINDOWS[nNum]:Scroll()
     ctw_WINDOWS[nNum]:SetPos(0,0)
   ENDIF
+  oWin:WinShadow()
+
 RETURN nNum
 
 ********************************************************************
@@ -702,8 +747,8 @@ CLASS TctWIN
  METHOD DevPos(nT,nL)
  METHOD Row()
  METHOD Col()
- METHOD MaxRow()
- METHOD MaxCol()
+ METHOD MaxRow( lMode)
+ METHOD MaxCol( lMode)
  METHOD Scroll(nT,nL,nB,nR,nV,nH)
  METHOD DispOut(xVal,xColor)
  METHOD DispOutAT(nT,nL,xVal,xColor)
@@ -722,8 +767,187 @@ CLASS TctWIN
  METHOD Free()
  METHOD AChoice(nT,nL,nB,nR,aMenu,aSel,cUser,nInit,nWRow)
  METHOD TBrowse(nT,nL,nB,nR,lDB)
+ METHOD SaveScreen( nT, nL, nB, nR)
+ METHOD RestScreen( nT, nL, nB, nR, cScr)
+ METHOD MemoEdit(cString, nTop, nLeft, nBottom, nRight, lEditMode, cUserFunction, ;
+            nLineLength, nTabSize, nTextBufferRow, nTextBufferColumn, nWindowRow, nWindowColumn)
+ METHOD WinShadow()
+ METHOD ColorShadow()
 ENDCLASS
 
+*********************************************
+* Method......: WinShadow()
+* Author......: Tony Bretado
+* Date Created: 8/27/03             2:33PM
+*********************************************
+method WinShadow() CLASS TctWIN
+   local nRows := min(ctw_BOARDB - ::PosB, 1)
+   local nCols := min(ctw_BOARDR - ::PosR, 2)
+
+   If valtype(ctw_SHADOWATTR) == 'C'
+      If nRows > 0
+         ::ColorShadow(::PosB + nRows, ::PosL + 2, ::PosB + nRows, ::PosR, ctw_SHADOWATTR)
+      Endif
+
+      If nCols > 0
+         ::ColorShadow(::posT + 1, ::posR + 1, ::posB + nRows, ::PosR + nCols, ctw_SHADOWATTR)
+      Endif
+   Endif
+   return
+
+*********************************************************************
+* Method......: ColorShadow( nTop, nLeft, nBottom, nRight, xAtt)
+* Author......: Tony Bretado
+* Date Created: 08/26/2003      4:14PM
+* NOTES.......: Temporary Fix!
+*********************************************************************
+Method ColorShadow( nTop, nLeft, nBottom, nRight, xAtt) CLASS TctWin
+   local cScr  := savescreen( nTop, nLeft, nBottom, nRight)
+   local cOdd  := CharOdd( cScr)
+   local cEven := CharEven( cScr)
+   local xAtt2 := chr(colorton('n/n'))
+   local cBuff := ''
+   local n     := 0
+
+   // change colors from String to Numeric
+   xAtt     := chr( colorton( alltrim( xAtt)))
+
+   // Replace an specific Attribute?
+   For n := 1 to len(cEven)
+      If substr(cEven, n , 1) $ (xAtt + xAtt2)
+         cBuff += xAtt2
+
+      Else
+         cBuff += xAtt
+
+      Endif
+   Next
+
+   // Mix with Text
+   cScr := CharMix( cOdd, cBuff)
+
+   // Output to screen
+   restscreen( nTop, nLeft, nBottom, nRight, cScr)
+
+   return Nil
+
+*********************************************************************
+* Method......: MemoEdit(cString, nTop, nLeft, nBottom, nRight, lEditMode, cUserFunction, ;
+*                  nLineLength, nTabSize, nTextBufferRow, nTextBufferColumn, nWindowRow, nWindowColumn)
+* Author......: Tony Bretado
+* Date Created: 06/23/2004        1:06PM
+*********************************************************************
+method MemoEdit(cString, nTop, nLeft, nBottom, nRight, lEditMode, cUserFunction, ;
+         nLineLength, nTabSize, nTextBufferRow, nTextBufferColumn, nWindowRow, nWindowColumn) CLASS TctWIN
+   local cRet
+
+   // Top
+   If nTop == Nil
+      nTop := ctw_WINDOWS[ctw_CURRENT]:UsedT
+   Else
+      nTop += ctw_WINDOWS[ctw_CURRENT]:UsedT
+   EndIF
+
+   // Left
+   If nLeft == Nil
+      nLeft := ctw_WINDOWS[ctw_CURRENT]:UsedL
+   Else
+      nLeft += ctw_WINDOWS[ctw_CURRENT]:UsedL
+   EndIF
+
+   // Bottom
+   If nBottom == Nil
+      nBottom := ctw_WINDOWS[ctw_CURRENT]:UsedB
+   Else
+      nBottom += ctw_WINDOWS[ctw_CURRENT]:UsedT
+   EndIF
+
+   // Right
+   If nRight == Nil
+      nRight := ctw_WINDOWS[ctw_CURRENT]:UsedR
+   Else
+      nRight += ctw_WINDOWS[ctw_CURRENT]:UsedL
+   EndIF
+
+   cRet := memoedit(cString, nTop, nLeft, nBottom, nRight, lEditMode, cUserFunction, ;
+             nLineLength, nTabSize, nTextBufferRow, nTextBufferColumn, nWindowRow, nWindowColumn)
+
+   return cRet
+*********************************************
+* Method......: SaveScreen( nT, nL, nB, nR)
+* Author......: Tony Bretado
+* Date Created: 8/27/03             2:33PM
+*********************************************
+method SaveScreen( nT, nL, nB, nR) CLASS TctWIN
+   local cRet
+
+   // Top
+   If nT == Nil
+      nT := ctw_WINDOWS[ctw_CURRENT]:UsedT
+   Else
+      nT += ctw_WINDOWS[ctw_CURRENT]:UsedT
+   EndIF
+
+   // Left
+   If nL == Nil
+      nL := ctw_WINDOWS[ctw_CURRENT]:UsedL
+   Else
+      nL += ctw_WINDOWS[ctw_CURRENT]:UsedL
+   EndIF
+
+   // Bottom
+   If nB == Nil
+      nB := ctw_WINDOWS[ctw_CURRENT]:UsedB
+   Else
+      nB += ctw_WINDOWS[ctw_CURRENT]:UsedT
+   EndIF
+
+   // Right
+   If nR == Nil
+      nR := ctw_WINDOWS[ctw_CURRENT]:UsedR
+   Else
+      nR += ctw_WINDOWS[ctw_CURRENT]:UsedL
+   EndIF
+
+   cRet := SaveScreen( nT, nL, nB, nR)
+
+   return cRet
+*********************************************
+* Method......: RestScreen( nT, nL, nB, nR, cScr)
+* Author......: Tony Bretado
+* Date Created: 8/27/03                2:38PM
+*********************************************
+method RestScreen( nT, nL, nB, nR, cScr) CLASS TctWIN
+   // Top
+   If nT == Nil
+      nT := ctw_WINDOWS[ctw_CURRENT]:UsedT
+   Else
+      nT += ctw_WINDOWS[ctw_CURRENT]:UsedT
+   EndIF
+
+   // Left
+   If nL == Nil
+      nL := ctw_WINDOWS[ctw_CURRENT]:UsedL
+   Else
+      nL += ctw_WINDOWS[ctw_CURRENT]:UsedL
+   EndIF
+
+   // Bottom
+   If nB == Nil
+      nB := ctw_WINDOWS[ctw_CURRENT]:UsedB
+   Else
+      nB += ctw_WINDOWS[ctw_CURRENT]:UsedT
+   EndIF
+
+   // Right
+   If nR == Nil
+      nR := ctw_WINDOWS[ctw_CURRENT]:UsedR
+   Else
+      nR += ctw_WINDOWS[ctw_CURRENT]:UsedL
+   EndIF
+
+   RestScreen( nT, nL, nB, nR, cScr)
+   return Nil
 *********************************************
 METHOD TBrowse(nT,nL,nB,nR,lDB) CLASS TctWIN
    IF lDB == NIL
@@ -921,8 +1145,7 @@ METHOD New(nT,nL,nB,nR) CLASS TctWIN
  ::UsedB := nB
  ::UsedR := nR
  ::SaveBG()
- ::cBackground := SAVESCREEN(nT,nL,nB,nR)
- ::cSaveData := ::cBackground
+ ::SaveFG()
  ::nRow := nT
  ::nCol := nL
  ::nCursor := SETCURSOR()
@@ -995,7 +1218,7 @@ METHOD DevOutPict(xVal,cPict,xColor) CLASS TctWIN
 RETURN NIL
 *************
 METHOD Save() CLASS TctWIN
-  ::cSaveData := SAVESCREEN(::PosT ,::PosL ,::PosB ,::PosR )
+  ::saveFG()
   ::nRow := ROW()
   ::nCol := COL()
   ::nCursor := SETCURSOR()
@@ -1003,7 +1226,7 @@ METHOD Save() CLASS TctWIN
 RETURN NIL
 ****
 METHOD SaveBG() CLASS TctWIN
-  ::cBackground:=SAVESCREEN(::PosT ,::PosL ,::PosB ,::PosR)
+  ::cBackground:=SAVESCREEN(::PosT ,::PosL ,::PosB+1 ,::PosR+2)   // Includes Shadow's area!
 RETURN NIL
 ****
 METHOD SaveFG() CLASS TctWIN
@@ -1012,7 +1235,7 @@ RETURN NIL
 ****
 METHOD RestoreBG() CLASS TctWIN
   DISPBEGIN()
-  RESTSCREEN(::PosT ,::PosL ,::PosB ,::PosR ,::cBackground)
+  RESTSCREEN(::PosT ,::PosL ,::PosB+1 ,::PosR+2 ,::cBackground)   // Includes Shadow's area!
   DISPEND()
 RETURN NIL
 ****
@@ -1025,6 +1248,7 @@ RETURN NIL
 METHOD Restore() CLASS TctWIN
   DISPBEGIN()
   RESTSCREEN(::PosT ,::PosL ,::PosB ,::PosR ,::cSaveData)
+  ::WinShadow()
   SETPOS(::nRow , ::nCol)
   SETCURSOR(::nCursor)
   SETCOLOR(::cColor)
@@ -1182,13 +1406,23 @@ METHOD Col() CLASS TctWIN
 
 RETURN COL() - ::UsedL
 **************
-METHOD MaxRow() CLASS TctWIN
+METHOD MaxRow( lMode) CLASS TctWIN
+   local nRet  := maxrow() // Default
 
-RETURN ::UsedB - ::UsedT
+   If lMode == Nil .or. !lMode
+      nRet := ::UsedB - ::UsedT
+   EndIF
+
+RETURN nRet
 ***************
-METHOD MaxCol() CLASS TctWIN
+METHOD MaxCol( lMode) CLASS TctWIN
+   local nRet  := maxcol() // Default
 
-RETURN ::UsedR - ::UsedL
+   If lMode == Nil .or. !lMode
+      nRet := ::UsedR - ::UsedL
+   EndIF
+
+RETURN nRet
 ***************
 METHOD Scroll(nT,nL,nB,nR,nV,nH) CLASS TctWIN
  LOCAL mr:=MAXROW() + 1

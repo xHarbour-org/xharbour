@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3119 2004/06/30 10:04:47 likewolf Exp $
+ * $Id: ChangeLog,v 1.3120 2004/06/30 15:02:33 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-30 11:39 UTC-0800 Tony Bretado <jabrecer@yahoo.com>
+  * contrib/libct/ctwin.prg
+    * wOpen()
+	+ now handle shadows
+    + ctw_memoedit()
+    + CTW_SaveScreen()
+    + CTW_RestScreen()
+    * ctw_MAXCOL(lMode)
+	+ added parameter lMode for CA-TOOLS compatibility
+    * ctw_MAXROW(lMode)
+	+ added parameter lMode for CA-TOOLS compatibility
+    * METHOD MaxRow( lMode)
+    * METHOD MaxCol( lMode)
+    * METHOD Restore()
+	+ now handle shadows
+    + METHOD SaveScreen()
+    + METHOD RestScreen()
+    + METHOD MemoEdit()
+    + METHOD WinShadow()     // shadow system
+    + METHOD ColorShadow()   // shadow system
+  * contrib/libct/include/ctwin.ch
+    * MAXCOL(
+	- remove second parenthesis for CA-TOOLS compatibility
+    * MAXROW(
+	- remove second parenthesis for CA-TOOLS compatibility
+    + MEMOEDIT(
+    + RESTSCREEN(
+    + SAVESCREEN(
 
 2004-06-30 09:52 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   + ./ChangeLog.020
