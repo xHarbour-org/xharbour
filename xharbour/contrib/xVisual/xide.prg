@@ -13,16 +13,16 @@ FUNCTION Main
 
    WITH OBJECT oApp
 
-      WITH OBJECT ( :CreateForm( 'MainForm', mainForm() ) )
+      WITH OBJECT :CreateForm( 'MainForm', mainForm() )
 
          :SetBkBrush( COLOR_APPWORKSPACE+1 )
 
          :WindowMenu := TMenu():New()
 
-         WITH OBJECT ( :WindowMenu )
+         WITH OBJECT :WindowMenu
             :AddPopup('popup 1')
 
-            WITH OBJECT (:Popup)
+            WITH OBJECT :Popup
                :AddItem( 'item 100', 100, {||MessageBox(,'HI FROM THE MAIN CLASS')})
                :AddItem( 'item 101', 101)
                :AddItem( 'item 102', 102)
@@ -31,7 +31,7 @@ FUNCTION Main
 
             :AddPopup('popup 2')
 
-            WITH OBJECT ( :Popup )
+            WITH OBJECT  :Popup
                :AddItem( 'item 200', 200, {||oApp:MainForm:Maximize(), oApp:CreateForm( 'SubForm1', SubForm1(),oApp:MainForm ) } )
                :AddItem( 'item 201', 201)
                :AddItem( 'item 202', 202)

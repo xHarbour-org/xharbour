@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.12 2002/08/14 22:57:23 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.13 2002/09/16 05:34:02 ronpinkas Exp $
  */
 
 /*
@@ -233,7 +233,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "FOR{WS}EACH"         ) AS_TOKEN( FOREACH                         ),
                          LEX_WORD( "FUNCTION"            ) AS_TOKEN( HB_WANTS_ID  - FUNCTION         ),
                          LEX_WORD( "GLOBAL"              ) AS_TOKEN( HB_WANTS_ID  - GLOBAL           ),
-                         LEX_WORD( "GLOBAL{WS}EXTERNAL"  ) AS_TOKEN( HB_WANTS_ID  - EXTERNGLOBAL     ),
+                         LEX_WORD( "GLOBAL{WS}EXTERNAL"  ) AS_TOKEN( EXTERNGLOBAL     ),
                          LEX_WORD( "IF"                  ) AS_TOKEN( HB_WANTS_EXP - IF               ),
                          LEX_WORD( "INIT{WS}FUNCTION"    ) AS_TOKEN( HB_INIT_FUNC     ),
                          LEX_WORD( "INIT{WS}PROCEDURE"   ) AS_TOKEN( HB_INIT_PROC     ),
@@ -254,7 +254,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "STATIC{WS}PROCEDURE" ) AS_TOKEN( HB_STATIC_PROC   ),
                          LEX_WORD( "TEXT"                ) AS_TOKEN( HB_TEXT          ),
                          LEX_WORD( "WHILE"               ) AS_TOKEN( HB_WANTS_EXP - WHILE            ),
-                         LEX_WORD( "WITH{WS}OBJECT"      ) AS_TOKEN( HB_WANTS_EXP - WITHOBJ          ),
+                         LEX_WORD( "WITH{WS}OBJECT"      ) AS_TOKEN( WITHOBJ          ),
                          LEX_WORD( "_HB_CLASS"           ) AS_TOKEN( DECLARE_CLASS    ),
                          LEX_WORD( "_HB_MEMBER"          ) AS_TOKEN( DECLARE_MEMBER   ),
                          LEX_WORD( "_PROCREQ_"           ) AS_TOKEN( PROCREQ          )
@@ -359,7 +359,7 @@ LANGUAGE_RULES_ARE {
                  /* IF_SEQUENCE_IS( REJECT_OP      , '('         , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( REJECT_OP      , '['         , 0      , 0          ) PASS_THROUGH(), DONT uncomment!!!*/
                     IF_SEQUENCE_IS( REJECT_OP      , '='         , 0      , 0          ) PASS_THROUGH(),
-                    IF_SEQUENCE_IS( REJECT_OP      , ':'         , 0      , 0          ) PASS_THROUGH(),
+                 /* IF_SEQUENCE_IS( REJECT_OP      , ':'         , 0      , 0          ) PASS_THROUGH(), */
                     IF_SEQUENCE_IS( REJECT_OP      , 0           , 0      , 0          ) REDUCE_TO( WANTS_EXP + DONT_REDUCE , 0             ),
 
                     IF_SEQUENCE_IS( REJECT_OP      , OPTIONAL     , 0      , 0         ) REDUCE_TO( WANTS_EXP + DONT_REDUCE , HB_IDENTIFIER ),
