@@ -1,5 +1,5 @@
 /*
- * $Id: dates.c,v 1.6 2004/08/06 12:05:22 druzus Exp $
+ * $Id: dates.c,v 1.7 2004/09/10 10:02:35 mlombardo Exp $
  */
 
 /*
@@ -169,7 +169,7 @@ void HB_EXPORT hb_dateStrGet( const char * szDate, LONG * plYear, LONG * plMonth
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateStrGet(%s, %p, %p, %p)", szDate, plYear, plMonth, plDay));
 
-   if( szDate && szDate[ 8 ] == '\0' )
+   if( szDate )
    {
       /* Date string has correct length, so attempt to convert */
       *plYear  = ( ( USHORT ) ( szDate[ 0 ] - '0' ) * 1000 ) +
@@ -431,7 +431,7 @@ void HB_EXPORT hb_dateToday( LONG * plYear, LONG * plMonth, LONG * plDay )
 #endif
 }
 
-/* NOTE: The passed buffer must be at least 9 chars LONG */
+/* NOTE: The passed buffer must be at least 9 chars long */
 
 void HB_EXPORT hb_dateTimeStr( char * pszTime )
 {
