@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.869 2003/03/23 13:33:29 jonnymind Exp $
+ * $Id: ChangeLog,v 1.870 2003/03/25 02:35:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-25 16:34 UTC+0100 Martin Vogel <vogel@inttec.de>
+  * contrib/libct/dattime2.prg
+    * bug fix in function addmonth()
+  + contrib/libct/tests/Makefile
+    + Makefile for libct test programs 
+	
 2003-03-24 18:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapi.h
   * source/vm/dynsym.c

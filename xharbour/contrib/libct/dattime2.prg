@@ -1,5 +1,5 @@
 /*
- * $Id: dattime2.prg,v 1.1 2003/01/19 23:31:45 mbirdyg Exp $
+ * $Id: dattime2.prg,v 1.1 2003/03/04 21:04:28 lculik Exp $
  */
 
 /*
@@ -105,6 +105,7 @@ local nDay
 // local nOldday
 local nMonth
 local nYear
+local nLDOM
 
 //   if nmth > 70 
 //      return ctod ("  /  /    ")
@@ -151,6 +152,11 @@ local nYear
 	 nMonth -= 12
 	 nYear++
       enddo
+   endif
+
+   // correction for different end of months
+   if nDay > (nLDOM := lastdayom (nMonth))
+     nDay := nLDOM
    endif
 
    ddate := stod (strzero (nYear, 4) + strzero (nMonth, 2) + strzero (nDay, 2))
