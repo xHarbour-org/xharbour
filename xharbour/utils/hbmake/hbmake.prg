@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.99 2003/11/09 19:55:20 lculik Exp $
+ * $Id: hbmake.prg,v 1.100 2003/11/09 20:15:42 ronpinkas Exp $
  */
 /*
  * Harbour Project source code:
@@ -1839,7 +1839,7 @@ cResname += cAllRes
       ELSEIF lCw
          fWrite( s_nLinkHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib optgui.lib "  + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSE
-         fWrite( s_nLinkHandle, "LIBFILES = optcon" + IIF( ! lMt, "", "mt" ) + ".lib " + .lib + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = optcon" + IIF( ! lMt, "", "mt" ) + ".lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ENDIF
 
    ELSEIF s_lGcc
