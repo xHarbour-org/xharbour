@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: checkbox.prg,v 1.1 2003/04/21 06:56:33 jonnymind Exp $
+   $Id: checkbox.prg,v 1.2 2003/05/11 15:14:43 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
@@ -17,7 +17,7 @@ CLASS XWTCheckbox FROM XWTWidget
    METHOD GetStatus()
 ENDCLASS
 
-METHOD New( cText, bStatus, nX, nY ) CLASS XWTCheckbox
+METHOD New( cText, bStatus, nX, nY, oParent  ) CLASS XWTCheckbox
    ::Super:New()
    ::nWidgetType := XWT_TYPE_CHECKBOX
    ::oRawWidget := XWT_Create( Self, XWT_TYPE_CHECKBOX )
@@ -30,6 +30,11 @@ METHOD New( cText, bStatus, nX, nY ) CLASS XWTCheckbox
    IF ValType( nX ) == "N" .and. ValType( nY ) == "N"
       ::Move( nX, nY )
    ENDIF
+
+   IF oParent != NIL
+      oParent:Add( Self )
+   ENDIF
+
 RETURN Self
 
 METHOD SetStatus( bStatus ) CLASS XWTCheckbox

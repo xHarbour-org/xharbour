@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: textbox.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: textbox.prg,v 1.2 2003/05/11 15:14:43 jonnymind Exp $
 
    Text box Control. 
 */
@@ -18,7 +18,7 @@ CLASS XWTTextBox FROM XWTWidget
    DATA bVisible
    DATA nCursorPos
    
-   METHOD New( cText )
+   METHOD New( cText, x, y, oParent )
 /*
    METHOD SetEditable( bEdit )
    METHOD SetVisibility( bVisibility )
@@ -26,9 +26,9 @@ CLASS XWTTextBox FROM XWTWidget
    METHOD SetCursorPos( nPos )
 */
 
-ENDCLASS   
+ENDCLASS
 
-METHOD New( cText, x, y ) CLASS XWTTextBox
+METHOD New( cText, x, y, oParent ) CLASS XWTTextBox
    ::Super:New( cText )
    ::nWidgetType := XWT_TYPE_TEXTBOX
    // sooner or later I will want to add event management for labels,
@@ -41,12 +41,16 @@ METHOD New( cText, x, y ) CLASS XWTTextBox
    IF ValType( x ) == "N" .and. ValType( y ) == "N"
       ::Move( x, y )
    ENDIF
-   
+
    ::bVisible := .T.
    ::bEditable := .T.
    ::nCursorPos := 1
    ::nSelStart := 0
    ::nSelEnd := 0
+
+   IF oParent != NIL
+      oParent:Add( Self )
+   ENDIF
    
 RETURN Self
 

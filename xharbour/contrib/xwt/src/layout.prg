@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: layout.prg,v 1.5 2003/05/11 15:14:43 jonnymind Exp $
+   $Id: layout.prg,v 1.6 2003/07/20 20:47:05 xthefull Exp $
 
    Pane class. Each widget is arranged below the
    previous one.
@@ -39,7 +39,8 @@ METHOD New( nMode, nWidth, nHeight, iPadding, iBorder, oParent ) CLASS XWTLayout
    IF !Empty( iBorder )
       ::SetBorder( iBorder )
    ENDIF
-   
+
+
    IF oParent != NIL
       oParent:Add( Self )
    ENDIF

@@ -10,7 +10,7 @@ PROCEDURE MAIN()
    LOCAL oMenuSec, oTextbox, oLabel, oViewPort, oPane
    LOCAL oImg, oHlay, oVLay, oVlay2, oFrame, oSplit
    LOCAL oGrid, obtnStatus
-   LOCAL oList
+   LOCAL oList, oCheck
 
    XwtInit()
 
@@ -30,48 +30,44 @@ PROCEDURE MAIN()
    oVLay2:SetPadding( 5 )
    oVLay2:SetBorder( 2 )
    */
-   
+
    oSplit := XwtSplitter():New( XWT_LM_HORIZ, oVLay, oVLay2 )
    oSplit:SetShrinkFirst( .F. )
 
    oWindow:Add( oSplit )
 
-   /*** Text And Button ***/
-   oButton := XwtButton():New( "Hello" )
-   oButton:AddListener( @DumpEvent() )
-   oLabel := XwtLabel():New( "Text: " )
-
    // inside an horiz. layout
-   oHLay := XwtLayout():New( XWT_LM_HORIZ )
+   DEFINE LAYOUT oHLay  MODE XWT_LM_HORIZ
 
-   oHLay:Add( oLabel )
+   /*** Text And Button ***/
+   DEFINE LABEL oLabel TEXT "Text: " OF oHlay
+
    oHLay:SetFill( .T. )
    oHLay:SetExpand( .T. )
-   oHLay:Add( oButton )
-   oHLay:SetBox( .T., "Horiz Box" )
+
+   DEFINE BUTTON oButton TEXT "Hello" OF oHLay
+   oButton:AddListener( @DumpEvent() )
+
+   oHLay:SetBox( .T.,"Horiz Box" )
 
    oVlay:Add( oHLay )
 
    /* A couple of Textboxes in a pane, inside a scrollable */
-   // oPane := XwtPane():New()
-   DEFINE PANE oPane OF oVLay
+   DEFINE PANE oPane BOX TITLE "A Fixed Pane" OF oVLay
 
-   oTextbox := XwtTextbox():New("A text", 10, 10 )
+   @ 10,10 TEXTBOX oTextBox VAR "A Text" OF oPane
    oTextbox:AddEventListener(XWT_E_UPDATED, @BoxModified())
-   oPane:Add( oTextbox  )
-   oOtherBox := XwtTextbox():New("Another box", 10, 40 )
-   oPane:Add( oOtherBox )
-   oPane:SetBox( .T.,"A fixed pane" )
-   oPane:Add( XWTCheckbox():New("Ckbox 1", .T., 10,75 ) )
-   oPane:Add( XWTCheckbox():New("Ckbox 2", .T., 110,75 ) )
-   oPane:Add( XWTToggleButton():New("Button Toggle 1", .T., 10,105 ) )
-   oPane:Add( XWTToggleButton():New("Button Toggle 2", .F., 120,105 ) )
+
+   @ 10,40  TEXTBOX oOtherBox VAR "Another box" OF oPane
+   @ 10,75  CHECKBOX        TEXT "CkBox 1" VAR .T. OF oPane
+   @ 110,75 CHECKBOX oCheck TEXT "CkBox 2" VAR .F. OF oPane
+   @ 010,105 TOGGLEBUTTON   TEXT "Button Toggle 1" VAR .T. OF oPane
+   @ 120,105 TOGGLEBUTTON   TEXT "Button Toggle 2" VAR .F. OF oPane
+
    // add a button to query the status.
-   oButton := XwtButton():New( "Click to Query pane status" )
-   oButton:move( 10, 135 )
+   @10,135 BUTTON oButton TEXT "Click to Query pane status"  OF oPane
    oButton:AddEventListener( XWT_E_CLICKED, @PaneStatus() )
-   oPane:Add( oButton )
-   //oVLay:Add( oPane )
+
 
    /* A beautiful GRID */
 

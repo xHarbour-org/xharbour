@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.20 2003/07/05 22:31:40 xthefull Exp $
+ * $Id: Changelog,v 1.21 2003/07/20 20:45:19 xthefull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-07-21 20:12 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
+  * src/button.prg
+  * src/togglebutton.prg
+  * src/checkbox.prg
+  * src/label.prg
+  * src/textbox.prg
+    + Added passed news parameters and support of parent widget
+
+  * test/xwt_test.prg
+    + Used news commands
+
+  * /include/xwt.ch
+    + New commands preprocesador :
+      +DEFINE BUTTON <...>       and @x,y BUTTON <...>
+      +DEFINE TOGGLEBUTTON <...> and @x,y TOGGLEBUTTON <...>
+      +DEFINE LABEL <...>        and @x,y LABEL <...>
+      +DEFINE CHECKBOX <...>     and @x,y CHECLKBOX <...>
+      +DEFINE TEXTBOX <...>      and @x,y TEXTBOX <...>
+
 2003-07-20 22:45 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
-  * src/pane
-  * src/layout
+  * src/pane.prg
+  * src/layout.prg
     + Added passed news parameters and support of parent widget
 
   * test/xwt_test.prg
