@@ -1656,6 +1656,18 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
 }
 //-------------------------------------------------------------------//
 
+static int hb_wvt_key_ansi_to_oem( int c )
+{
+   char pszAnsi[1];
+   char pszOem[1];
+
+   sprintf( pszAnsi, "%c", c );
+   CharToOemBuff( ( LPCSTR ) pszAnsi, ( LPTSTR ) pszOem, 1 );
+   c = (BYTE) * pszOem;
+   
+   return c;
+}
+
 static void hb_wvt_gtInitGui( void )
 {
   _s.iGuiWidth  = _s.COLS * _s.PTEXTSIZE.x ;
@@ -2158,6 +2170,10 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
               hb_wvt_gtAddCharToInputQueue( K_ESC );
               break;
             default:
+              if( _s.CodePage == OEM_CHARSET ) 
+              {
+                 c = hb_wvt_key_ansi_to_oem( c );
+              }
               hb_wvt_gtAddCharToInputQueue( c );
               break;
           }
@@ -2956,11 +2972,11 @@ static void gt_hbInitStatics( void )
   // THEESE are the default font parameters, if not changed by user
   _s.PTEXTSIZE.x      = 8;
   _s.PTEXTSIZE.y      = 12;
-  _s.fontHeight       = 12;
-  _s.fontWidth        = 8;
+  _s.fontHeight       = 20;
+  _s.fontWidth        = 10;
   _s.fontWeight       = FW_NORMAL;
   _s.fontQuality      = DEFAULT_QUALITY;
-  strcpy( _s.fontFace,"Terminal" );
+  strcpy( _s.fontFace,"Courier New" );
 
   _s.LastMenuEvent    = 0;
   _s.MenuKeyEvent     = 1024;
@@ -2999,7 +3015,7 @@ static void gt_hbInitStatics( void )
      _s.hDlgModeless[ iIndex ]        = NULL;
      _s.pSymDlgProcModeless[ iIndex ] = NULL;
      _s.pFunc[ iIndex ]               = NULL;
-     _s.iType[ iIndex ]               = NULL;
+     _s.iType[ iIndex ]               = (int) NULL;
   }
   _s.bGui             = FALSE;
 }
@@ -3629,7 +3645,8 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
 {
    HGLOBAL hglb;
    LPTSTR  lptstr;
-
+   LPTSTR  lptstrOem;
+   
    if ( ! IsClipboardFormatAvailable( CF_TEXT ) )
    {
      *pulMaxSize = 0;
@@ -3660,9 +3677,21 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
          {
             return;
          }
+         
+         if( _s.CodePage == OEM_CHARSET )
+         {
+            lptstrOem = ( BYTE* ) hb_xgrab( *pulMaxSize );
+            CharToOemBuff( ( LPCSTR ) lptstr, ( LPTSTR ) lptstrOem, *pulMaxSize );
+            memcpy( szData, lptstrOem, *pulMaxSize );
+            hb_xfree( lptstrOem );
+         }
+         else
+         {
+            memcpy( szData, lptstr, *pulMaxSize );
+         }
 
-         memcpy( szData, lptstr, *pulMaxSize );
          szData[ *pulMaxSize ] = '\0';
+
          GlobalUnlock( hglb );
       }
    }
@@ -3674,6 +3703,7 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
 void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
 {
    LPTSTR  lptstrCopy;
+   LPTSTR  lptstrAnsi;
    HGLOBAL hglbCopy;
 
 /*  This poses problems when some other application copies a bitmap on the
@@ -3685,6 +3715,7 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
      return;
    }
 */
+
    if ( ! OpenClipboard( NULL ) )
    {
      return;
@@ -3703,9 +3734,21 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
    // Lock the handle and copy the text to the buffer.
    //
    lptstrCopy = ( LPSTR ) GlobalLock( hglbCopy );
-   memcpy( lptstrCopy, szData, ( ulSize+1 ) * sizeof( TCHAR ) );
 
+   if( _s.CodePage == OEM_CHARSET )
+   {
+      lptstrAnsi = ( BYTE* ) hb_xgrab( ulSize+1 );
+      OemToCharBuff( ( LPCSTR ) szData, ( LPTSTR ) lptstrAnsi, ulSize + 1 );
+      memcpy( lptstrCopy, lptstrAnsi, ( ulSize+1 ) * sizeof( TCHAR ) );      
+      hb_xfree( lptstrAnsi );
+   }
+   else
+   {
+      memcpy( lptstrCopy, szData, ( ulSize+1 ) * sizeof( TCHAR ) );      
+   }   
+   
    lptstrCopy[ ulSize+1 ] = ( TCHAR ) 0;    // null character
+
    GlobalUnlock( hglbCopy );
 
    // Place the handle on the clipboard.
@@ -3759,6 +3802,21 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
       case GTI_ISGRAPHIC:
          return ( int ) TRUE;
 
+      case GTI_MOUSESTATUS:
+         iOldValue = ( int ) b_MouseEnable;
+         if ( bUpdate )
+         {
+            b_MouseEnable = iParam;
+         }
+         return iOldValue;
+
+      case GTI_FONTNAME:
+         if ( bUpdate )
+         {
+            strcpy( _s.fontFace, (char *) vpParam );           
+         }
+         return ( int ) TRUE;
+         
       case GTI_FONTSIZE:
          iOldValue = ( int ) _s.PTEXTSIZE.y;
          if ( bUpdate )
@@ -4219,7 +4277,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
    PHB_ITEM pFunc = NULL;
    PHB_DYNS pDynSym;
 
-   iType = NULL;
+   iType = (int) NULL;
 
    for ( iIndex = 0; iIndex < WVT_DLGML_MAX; iIndex++ )
    {
@@ -4307,7 +4365,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
          _s.hDlgModeless[ iIndex ] = NULL;
          _s.pSymDlgProcModeless[ iIndex ] = NULL;
          _s.pFunc[ iIndex ] = NULL;
-         _s.iType[ iIndex ] = NULL;
+         _s.iType[ iIndex ] = (int) NULL;
          bReturn = FALSE;
       }
       break;

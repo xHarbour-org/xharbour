@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.25 2004/05/07 14:48:39 lculik Exp $
+ * $Id: tgetlist.prg,v 1.26 2004/08/19 00:04:10 peterrees Exp $
  */
 
 /*
@@ -282,6 +282,7 @@ METHOD GetApplyKey( nKey, oMenu, oGetMsg, lDelEnd ) CLASS HBGetList
    local nMouseRow, nMouseColumn
    local nButton
    local nHotItem
+   local cToPaste, nI, nLen
 
    if ! ( ( bKeyBlock := Setkey( nKey ) ) == NIL )
       if ::GetDoSetKey( bKeyBlock )
@@ -311,6 +312,7 @@ METHOD GetApplyKey( nKey, oMenu, oGetMsg, lDelEnd ) CLASS HBGetList
 METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
 
    local cKey, bKeyBlock, oGet := ::oGet
+   local cToPaste, nI, nLen
 
    if ! ( ( bKeyBlock := Setkey( nKey ) ) == NIL )
       ::GetDoSetKey( bKeyBlock )
@@ -483,6 +485,27 @@ METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
 
       case K_CTRL_BS
          oGet:DelWordLeft()
+         exit
+
+   #ifdef HB_NEW_KCTRL
+
+      case K_CTRL_C
+         oGet:Assign()
+         GTSETCLIPBOARD( CStr( oGet:VarGet() ) )
+         exit
+
+      case K_CTRL_X
+         oGet:Assign()
+         GTSETCLIPBOARD( CStr( oGet:VarGet() ) )
+         oGet:DelEnd()
+         exit
+
+      case K_CTRL_V
+         cToPaste := GTGETCLIPBOARD()
+         nLen := len( cToPaste )
+         for nI := 1 to nLen
+            oGet:Insert( cToPaste[ nI ] )
+         next nI
          exit
 
       Default

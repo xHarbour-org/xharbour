@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.27 2004/09/06 14:59:03 mauriliolongo Exp $
+ * $Id: memoedit.prg,v 1.28 2004/09/06 17:17:37 mauriliolongo Exp $
  */
 
 /*
@@ -112,7 +112,12 @@ METHOD Edit() CLASS TMemoEditor
    // NOTE: K_ALT_W is not compatible with clipper exit memo and save key, but I cannot discriminate
    //       K_CTRL_W and K_CTRL_END from harbour code.
    //
-   local aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_V, K_ALT_W, K_ESC }
+   #ifdef HB_NEW_KCTRL
+      local aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_ALT_W, K_ESC }
+   #else
+      local aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_V, K_ALT_W, K_ESC }
+   #endif
+
    local bKeyBlock
 
    // If I have an user function I need to trap configurable keys and ask to
@@ -197,8 +202,7 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
    #ifdef HB_NEW_KCTRL
    // I Have to add the value of K_CTRL_x when HB_NEW_KCTRL is not defined since those values cause
    // infinite loop
-   static aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T, K_CTRL_U ,;
-                              10,       11,       12,       14,       15,       16,       17,       20,       21 }
+   static aUnHandledKeys := { 10,       11,       12,       14,       15,       16,       17,       20,       21 }
    #else
    static aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T, K_CTRL_U }
    #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3426 2004/09/13 06:42:55 druzus Exp $
+ * $Id: ChangeLog,v 1.3427 2004/09/13 07:38:43 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-13 13:05 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * xharbour/source/rtl/memoedit.prg
+    * if HB_NEW_KCTRL, K_CTRL_V is not a configurable key
+  * xharbour/source/rtl/teditor.prg
+  * xharbour/source/rtl/tgetlist.prg
+    * added methods DelText() and AddText()
+    * if HB_NEW_KCTRL, K_CTRL_C, K_CTRL_X, K_CTRLV are used for
+    * copy/cut/paste to the clipboard
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * now default font is "Courier New" height 20 width 10
+    * when OEM_CHARSET is used:
+      * inkeys char are converted from ansi to oem
+      * gt_GetClipboard converts from ansi to oem
+      * gt_SetClipboard converts from oem to ansi
+    this allows to copy and paste to and from other windows apps
+    when OEM_CHARSET is used
+    * added GTI_MOUSESTATUS set/get to gt_info
+    * added GTI_FONTNAME set to gt_info
+    * added some casts
 
 2004-09-13 09:33 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * xharbour/config/os2/gcc.cf

@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.49 2004/09/01 17:21:17 lf_sfnet Exp $
+/* $Id: teditor.prg,v 1.50 2004/09/02 08:01:51 mauriliolongo Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.49 2004/09/01 17:21:17 lf_sfnet Exp $
+/* $Id: teditor.prg,v 1.50 2004/09/02 08:01:51 mauriliolongo Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -166,6 +166,8 @@ CLASS HBEditor
    METHOD  GotoCol( nCol )                                  // Put line nCol at cursor position
    METHOD  GotoPos( nRow, nCol, lForceRefresh )
    METHOD  GetText()                                        // Returns aText as a string ( for MemoEdit() )
+   METHOD  DelText()                                        // Clear aText
+   METHOD  AddText( cString )                               // Add text at the cursor
    METHOD  GetTextIndex()                                   // Return current cursor position in text.
 
    METHOD  RefreshWindow()                                  // Redraw a window
@@ -583,6 +585,23 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
             case K_MWBACKWARD
                ::K_Mouse( nKey )
                exit
+
+         #ifdef HB_NEW_KCTRL
+
+            case K_CTRL_C
+               GTSETCLIPBOARD( ::GetText() )
+               exit 
+
+            case K_CTRL_X
+               GTSETCLIPBOARD( ::GetText() )
+               ::DelText()
+               exit 
+
+            case K_CTRL_V
+               ::AddText( GTGETCLIPBOARD() )
+               exit 
+
+         #endif
 
             case K_ALT_W
             case K_CTRL_W
@@ -1707,6 +1726,40 @@ METHOD GetText() CLASS HBEditor
    cString += ::aText[ ::naTextLen ]:cText
 
 return cString
+
+METHOD DelText() CLASS HBEditor
+
+   ::Gotop()
+
+   ::aText := {}
+   ::naTextLen := 0
+
+   AAdd( ::aText, HBTextLine():New() )
+   ::naTextLen++
+
+   ::lDirty := .T.
+
+   ::RefreshWindow()
+
+return Self
+
+METHOD AddText( cString ) CLASS HBEditor
+
+   LOCAL aTmpText := Text2Array( cString, iif( ::lWordWrap, ::nNumCols, nil ) )
+   LOCAL nLines := Len( aTmpText )
+   LOCAL i
+   LOCAL nAtRow := ::nRow
+
+   for i := 1 to nLines
+      aadd( ::aText, aTmpText[ i ] )
+      ::naTextLen++
+   next
+
+   ::lDirty := .T.
+
+   ::RefreshWindow()
+
+return Self
 
 METHOD GetTextIndex() CLASS HBEditor
    LOCAL nPos := 0
