@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.8 2003/04/18 23:34:15 lculik Exp $
+# $Id: hrbdll.vc,v 1.9 2003/05/27 20:41:29 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -404,6 +404,7 @@ HARBOUR_DLL_OBJS = \
 # debug
 #
   $(OBJ_DIR)\dbgmenu.obj \
+  $(OBJ_DIR)\dbghelp.obj \
   $(OBJ_DIR)\dbgtmenu.obj \
   $(OBJ_DIR)\dbgtmitm.obj \
   $(OBJ_DIR)\dbgtwin.obj \

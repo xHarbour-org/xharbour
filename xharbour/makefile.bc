@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.47 2003/05/23 09:00:31 lculik Exp $
+# $Id: makefile.bc,v 1.48 2003/05/27 03:46:27 ronpinkas Exp $
 #
 
 #
@@ -93,6 +93,7 @@ LIB_DIR = lib\b32
    NTX_OBJ_DIR   = $(OBJ_DIR)\mt
    CDX_OBJ_DIR   = $(OBJ_DIR)\mt
    PP_OBJ_DIR    = $(OBJ_DIR)\mt
+   SAM_OBJ_DIR   = $(OBJ_DIR)\mt
 !else
    VM_OBJ_DIR    = $(OBJ_DIR)
    RTL_OBJ_DIR   = $(OBJ_DIR)
@@ -101,6 +102,7 @@ LIB_DIR = lib\b32
    NTX_OBJ_DIR   = $(OBJ_DIR)
    CDX_OBJ_DIR   = $(OBJ_DIR)
    PP_OBJ_DIR    = $(OBJ_DIR)
+   SAM_OBJ_DIR   = $(OBJ_DIR)
 !endif
 
 # This is needed, otherwise the libs may overflow when
@@ -221,6 +223,7 @@ ODBC_STLIB   = $(ODBC_LIB)
    DBFCDX_LIB = $(LIB_DIR)\dbfcdxmt.lib
    PP_LIB     = $(LIB_DIR)\ppmt.lib
    ODBC_LIB   = $(LIB_DIR)\hbodbcmt.lib
+   SAMPLES_LIB = $(LIB_DIR)\samplesmt.lib
 !endif
 
 GTCGI_LIB    = $(LIB_DIR)\gtcgi.lib
@@ -596,6 +599,7 @@ DEBUG_LIB_OBJS = \
    $(OBJ_DIR)\dbgtmitm.obj \
    $(OBJ_DIR)\dbgtwin.obj \
    $(OBJ_DIR)\debugger.obj \
+   $(OBJ_DIR)\dbghelp.obj \
    $(OBJ_DIR)\dbgtarr.obj \
    $(OBJ_DIR)\dbgtobj.obj \
    $(OBJ_DIR)\tbrwtext.obj \
@@ -820,14 +824,14 @@ HBMAKE_EXE_OBJS = \
    $(OBJ_DIR)\hbmlang.obj
 
 SAMPLES_LIB_OBJS =  \
-   $(OBJ_DIR)\environ.obj \
-   $(OBJ_DIR)\date.obj   \
-   $(OBJ_DIR)\dbf.obj    \
-   $(OBJ_DIR)\gauge.obj  \
-   $(OBJ_DIR)\num.obj    \
-   $(OBJ_DIR)\stack.obj   \
-   $(OBJ_DIR)\status.obj \
-   $(OBJ_DIR)\time.obj
+   $(SAM_OBJ_DIR)\environ.obj \
+   $(SAM_OBJ_DIR)\date.obj   \
+   $(SAM_OBJ_DIR)\dbf.obj    \
+   $(SAM_OBJ_DIR)\gauge.obj  \
+   $(SAM_OBJ_DIR)\num.obj    \
+   $(SAM_OBJ_DIR)\stack.obj   \
+   $(SAM_OBJ_DIR)\status.obj \
+   $(SAM_OBJ_DIR)\time.obj
 
    ODBC_LIB_OBJS =       \
       $(OBJ_DIR)\odbc.obj \
@@ -2550,6 +2554,13 @@ $(OBJ_DIR)\debugger.obj : $(OBJ_DIR)\debugger.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(DEBUG_LIB) $(ARFLAGS) -+$@,,
 
+$(OBJ_DIR)\dbghelp.c : $(DEBUG_DIR)\dbghelp.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\dbghelp.obj : $(OBJ_DIR)\dbghelp.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(DEBUG_LIB) $(ARFLAGS) -+$@,,
+
 $(OBJ_DIR)\tbrwtext.c : $(DEBUG_DIR)\tbrwtext.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
@@ -2694,35 +2705,35 @@ $(OBJ_DIR)\cdprukoi.obj : $(CODEPAGE_DIR)\cdprukoi.c
 # SAMPLES.LIB dependencies
 #
 
-$(OBJ_DIR)\environ.obj : $(SAMPLES_DIR)\environ.c
+$(SAM_OBJ_DIR)\environ.obj : $(SAMPLES_DIR)\environ.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
    tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\date.obj : $(SAMPLES_DIR)\date.c
+$(SAM_OBJ_DIR)\date.obj : $(SAMPLES_DIR)\date.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
    tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\dbf.obj : $(SAMPLES_DIR)\dbf.c
+$(SAM_OBJ_DIR)\dbf.obj : $(SAMPLES_DIR)\dbf.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
    tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\gauge.obj : $(SAMPLES_DIR)\gauge.c
+$(SAM_OBJ_DIR)\gauge.obj : $(SAMPLES_DIR)\gauge.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
    tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\num.obj : $(SAMPLES_DIR)\num.c
+$(SAM_OBJ_DIR)\num.obj : $(SAMPLES_DIR)\num.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
    tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\stack.obj : $(SAMPLES_DIR)\stack.c
+$(SAM_OBJ_DIR)\stack.obj : $(SAMPLES_DIR)\stack.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
    tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\status.obj : $(SAMPLES_DIR)\status.c
+$(SAM_OBJ_DIR)\status.obj : $(SAMPLES_DIR)\status.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
    tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\time.obj : $(SAMPLES_DIR)\time.c
+$(SAM_OBJ_DIR)\time.obj : $(SAMPLES_DIR)\time.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
    tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.14 2003/05/25 22:23:22 lculik Exp $
+# $Id: hrbdll.bc,v 1.15 2003/06/01 22:31:44 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -349,6 +349,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbgtmitm.obj \
   $(OBJ_DIR)\dbgtwin.obj \
   $(OBJ_DIR)\debugger.obj \
+  $(OBJ_DIR)\dbghelp.obj \
   $(OBJ_DIR)\dbgtarr.obj \
   $(OBJ_DIR)\dbgtobj.obj \
   $(OBJ_DIR)\tbrwtext.obj \
@@ -405,7 +406,11 @@ $(HARBOUR_DLL)  : \
 # ³ HARBOUR_DLL linking ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßß
+<<<<<<< hrbdll.bc
+  echo. $(OBJ_DIR)\abs.obj               + >> hdll.tmp
+=======
   echo. $(OBJ_DIR)\abs.obj               + > hdll.tmp
+>>>>>>> 1.15
   echo. $(OBJ_DIR)\accept.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\ampm.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\at.obj                + >> hdll.tmp
@@ -684,6 +689,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\dbgtmitm.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgtwin.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\debugger.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\dbghelp.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgtarr.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgtobj.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\tbrwtext.obj          + >> hdll.tmp
@@ -1842,6 +1848,9 @@ $(OBJ_DIR)\traceprg.c : $(RTL_DIR)\traceprg.prg
 
 $(OBJ_DIR)\traceprg.obj : $(OBJ_DIR)\traceprg.c
    $(CC) $(CLIBFLAGS) -o$@ $**
+<<<<<<< hrbdll.bc
+
+=======
 
 $(OBJ_DIR)\cdpesdos.obj : $(CODEPAGE_DIR)\cdpesdos.c
    $(CC) $(CLIBFLAGS) -o$@ $**
@@ -1922,3 +1931,4 @@ $(RTL_OBJ_DIR)\hbcrc32.obj : $(RTL_DIR)\hbcrc32.c
 $(RTL_OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+>>>>>>> 1.15
