@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1736 2003/11/17 10:58:47 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.1737 2003/11/17 17:33:11 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-18 01:50 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * vm\eval.c
+    * changed HB_ExecFromArray() to support this new syntax with optional params
+      HB_ExecFromArray( "Func" )
+      HB_ExecFromArray( "Func", aParams )
+      HB_ExecFromArray( @Func() )
+      HB_ExecFromArray( @Func(), aParams )
+      HB_ExecFromArray( bCode )
+      HB_ExecFromArray( bCode, aParams )
+      HB_ExecFromArray( oObject, @Method() )
+      HB_ExecFromArray( oObject, "Method" )
+      HB_ExecFromArray( oObject, @Method(), aArray )
+      HB_ExecFromArray( oObject, "Method", aArray )
+      HB_ExecFromArray( aArray )
+
+  * tests\exec.prg
+    + added new tests without params
 
 2003-11-17 09:32 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/pp.prg

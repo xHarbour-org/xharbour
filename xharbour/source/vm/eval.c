@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.10 2003/09/07 23:12:15 ronpinkas Exp $
+ * $Id: eval.c,v 1.11 2003/11/11 20:20:55 ronpinkas Exp $
  */
 
 /*
@@ -420,6 +420,20 @@ void hb_evalBlock( PHB_ITEM pCodeBlock, ... )
 * HB_ExecFromArray( aArray ) // aArray = { @Func(),...} or any other format
 * HB_ExecFromArray( @Func(), aArray )
 * HB_ExecFromArray( oObject, @Method(), aArray )
+*
+* 18/11/2003 - FSG - changed to support this new syntax with optional params
+*
+* HB_ExecFromArray( "Func" )
+* HB_ExecFromArray( "Func", aParams )
+* HB_ExecFromArray( @Func() )
+* HB_ExecFromArray( @Func(), aParams )
+* HB_ExecFromArray( bCode )
+* HB_ExecFromArray( bCode, aParams )
+* HB_ExecFromArray( oObject, @Method() )
+* HB_ExecFromArray( oObject, "Method" )
+* HB_ExecFromArray( oObject, @Method(), aArray )
+* HB_ExecFromArray( oObject, "Method", aArray )
+* HB_ExecFromArray( aArray )
 */
 
 HB_FUNC( HB_EXECFROMARRAY )
@@ -434,7 +448,22 @@ HB_FUNC( HB_EXECFROMARRAY )
    ULONG ulLen, ulStart = 1;
    UINT uiPcount = hb_pcount();
 
-   if( HB_IS_OBJECT( pFirst ) && uiPcount == 3)
+   if( HB_IS_OBJECT( pFirst ) && uiPcount == 2)  /* hb_ExecFromArray( oObject, cMessage | pMessage )  */
+   {
+      pSelf = pFirst;
+      pString = hb_param( 2, HB_IT_ANY );
+
+      if( pString->type == HB_IT_STRING )
+      {
+         pFunc = (PHB_FUNC) hb_objHasMsg( pSelf, pString->item.asString.value );
+      }
+      else if( pString->type == HB_IT_LONG )
+      {
+         pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+      }
+      pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
+   }
+   else if( HB_IS_OBJECT( pFirst ) && uiPcount == 3) /* hb_ExecFromArray( oObject, cMessage | pMessage, { params,... } )  */
    {
       pSelf = pFirst;
       pString = hb_param( 2, HB_IT_ANY );
@@ -450,19 +479,35 @@ HB_FUNC( HB_EXECFROMARRAY )
       pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
       pArgs = hb_param( 3, HB_IT_ARRAY );
    }
-   else if( pFirst->type == HB_IT_STRING && uiPcount == 2)
+   else if( pFirst->type == HB_IT_STRING && uiPcount == 1) /* hb_ExecFromArray( cFunc )  */
+   {
+      pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pFirst ) );
+   }
+   else if( pFirst->type == HB_IT_STRING && uiPcount == 2) /* hb_ExecFromArray( cFunc, { params,... } )  */
    {
       pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pFirst ) );
       pArgs = hb_param( 2, HB_IT_ARRAY );
    }
-   else if( pFirst->type == HB_IT_LONG && uiPcount == 2)
+   else if( pFirst->type == HB_IT_LONG && uiPcount == 1)   /* hb_ExecFromArray( pFunc )  */
+   {
+      pFunc = (PHB_FUNC) hb_itemGetNL( pFirst );
+      pExecSym = hb_dynsymFindFromFunction( pFunc );
+   }
+   else if( pFirst->type == HB_IT_LONG && uiPcount == 2)   /* hb_ExecFromArray( pFunc, { params,... } )  */
    {
       pFunc = (PHB_FUNC) hb_itemGetNL( pFirst );
       pExecSym = hb_dynsymFindFromFunction( pFunc );
       // prepare stack to launch the function
       pArgs = hb_param( 2, HB_IT_ARRAY );
    }
-   else if ( HB_IS_BLOCK( pFirst ) && uiPcount == 2)
+   else if ( HB_IS_BLOCK( pFirst ) && uiPcount == 1)       /* hb_ExecFromArray( bCode )  */
+   {
+      hb_vmPushSymbol( &hb_symEval );
+      hb_vmPush( pFirst );
+      hb_vmFunction( 0 );
+      return;
+   }
+   else if ( HB_IS_BLOCK( pFirst ) && uiPcount == 2)      /* hb_ExecFromArray( bCode, { params,... } )  */
    {
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pFirst );
@@ -476,7 +521,7 @@ HB_FUNC( HB_EXECFROMARRAY )
       hb_vmFunction( ( USHORT ) ulLen );
       return;
    }
-   else if( HB_IS_ARRAY( pFirst ) )
+   else if( HB_IS_ARRAY( pFirst ) )                       /* hb_ExecFromArray( aArray )  */
    {
       pString = hb_arrayGetItemPtr( pFirst, 1 );
       pArgs = pFirst;
@@ -521,7 +566,7 @@ HB_FUNC( HB_EXECFROMARRAY )
       }
    }
 
-   if( pExecSym == NULL || pArgs == NULL)
+   if( pExecSym == NULL /*|| pArgs == NULL*/)
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_ExecFromArray", 3, hb_paramError( 1 ),
             hb_paramError( 2 ), hb_paramError(3) );
@@ -538,7 +583,14 @@ HB_FUNC( HB_EXECFROMARRAY )
       hb_vmPushNil();
    }
 
-   ulLen = hb_arrayLen( pArgs );
+   if ( !( pArgs == NULL ) )
+   {
+      ulLen = hb_arrayLen( pArgs );
+   }
+   else
+   {
+      ulLen = 0;
+   }
 
    // pushing the contents of the array
    for( i = ulStart; i <= ulLen; i ++ )

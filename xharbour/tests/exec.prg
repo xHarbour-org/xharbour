@@ -1,14 +1,15 @@
 ***********************************************************
 * exec.prg
-* $Id: exec.prg,v 1.2 2003/02/19 10:16:32 jonnymind Exp $
+* $Id: exec.prg,v 1.3 2003/08/14 23:49:47 jonnymind Exp $
 *
-* Test for indirect execution of functions and methods 
+* Test for indirect execution of functions and methods
 * using arrays as parameter lists
 *
 * Giancarlo Niccolai
 *
 
 #include "hbclass.ch"
+#include "common.ch"
 
 PROCEDURE MAIN()
    LOCAL oTest, Mthd
@@ -19,15 +20,19 @@ PROCEDURE MAIN()
 
    @3,15 SAY "X H A R B O U R - Exec function from array test"
 
+   hb_execFromArray( @MyFunc() )
    hb_execFromArray( @MyFunc(), {6,5, "Function call 1" } )
    /* Using indirect function name notation */
+   hb_execFromArray( "MyFunc" )
    hb_execFromArray( "MyFunc", {7,5, "Function call 2" } )
    hb_execFromArray( @MyFunc(), {8,5, "Function call 3" } )
 
    oTest := Test():New()
+   hb_execFromArray( oTest, "Hello" )
    hb_execFromArray( oTest, "Hello", {10,5, "Method call 1" } )
 
    Mthd := HB_ObjMsgPtr( oTest, "Hello" )
+   hb_execFromArray( oTest, Mthd )
    hb_execFromArray( oTest, Mthd, {11,5, "Method call 2 (using prebuilt msg pointer)" } )
 
    //Test of complete calls in arrays
@@ -57,7 +62,9 @@ PROCEDURE MAIN()
 
    aData[3]++
    HB_ExecFromArray( {|a,b,c| MyFunc( a,b,c) }, {aData[3], 5,;
-         "Direct call through a codeblock"} );
+         "Direct call through a codeblock"} )
+
+   HB_ExecFromArray( {|a,b,c| MyFunc( a,b,c) } )
 
 
    hb_execFromArray( @MyProc(), {} )
@@ -65,6 +72,9 @@ PROCEDURE MAIN()
 RETURN
 
 FUNCTION MyFunc( nRow, nCol, cText )
+   DEFAULT nRow  TO Row()
+   DEFAULT nCol  TO Col()
+   DEFAULT cText TO "Test"
    @nRow, nCol SAY cText
 RETURN (nRow * nCol)
 
@@ -80,6 +90,9 @@ CLASS Test
 ENDCLASS
 
 METHOD Hello( nRow, nCol, cText )
+   DEFAULT nRow  TO Row()
+   DEFAULT nCol  TO Col()
+   DEFAULT cText TO "Test"
    @nRow, nCol SAY "(FROM METHOD) " + cText
 RETURN (nRow * nCol)
 
