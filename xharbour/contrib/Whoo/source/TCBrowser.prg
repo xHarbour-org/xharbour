@@ -1,5 +1,5 @@
 /*
- * $Id: TCBrowser.prg,v 1.2 2003/02/19 02:45:01 augusto Exp $
+ * $Id: TCBrowser.prg,v 1.27 2003/03/07 15:17:17 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -40,9 +40,9 @@
 #Include "wingdi.ch"
 #include "debug.ch"
 
-#define AC_SRC_OVER      0 
-#define AC_SRC_ALPHA     1 
-#define AC_SRC_NO_ALPHA  2 
+#define AC_SRC_OVER      0
+#define AC_SRC_ALPHA     1
+#define AC_SRC_NO_ALPHA  2
 
 pragma pack(4)
 
@@ -57,23 +57,23 @@ typedef struct _BLENDFUNCTION {;
 }BLENDFUNCTION;
 
 typedef struct tagSCROLLINFO {;  // si
-    UINT cbSize; 
-    UINT fMask; 
-    int  nMin; 
-    int  nMax; 
-    UINT nPage; 
-    int  nPos; 
-    int  nTrackPos; 
+    UINT cbSize;
+    UINT fMask;
+    int  nMin;
+    int  nMax;
+    UINT nPage;
+    int  nPos;
+    int  nTrackPos;
 } SCROLLINFO
 
 typedef struct _HDITEM {;
-    UINT    mask; 
-    int     cxy; 
-    LPTSTR  pszText; 
-    HBITMAP hbm; 
-    int     cchTextMax; 
-    int     fmt; 
-    LPARAM  lParam; 
+    UINT    mask;
+    int     cxy;
+    LPTSTR  pszText;
+    HBITMAP hbm;
+    int     cchTextMax;
+    int     fmt;
+    LPARAM  lParam;
     int     iImage;
     int     iOrder;
 } HDITEM
@@ -112,7 +112,7 @@ CLASS TWBrowse FROM TWinControl
    DATA hWndHeader         EXPORTED // handle to the header window
    DATA aRect              EXPORTED // browse window client rectangle
    DATA Configured         EXPORTED // internal subclassing flag
-   DATA ImageList          EXPORTED 
+   DATA ImageList          EXPORTED
 
    // tbd
 
@@ -124,18 +124,18 @@ CLASS TWBrowse FROM TWinControl
    DATA HeadHeight         EXPORTED // header height
    DATA ItemHeight         EXPORTED // height of a single data item
    DATA wantHeading        EXPORTED //
-   DATA wantResize         EXPORTED 
-   DATA wantHScroll        EXPORTED 
-   DATA wantVScroll        EXPORTED 
-   DATA wantHiliteAll      EXPORTED 
-   DATA wantRowSep         EXPORTED 
-   DATA wantColSep         EXPORTED 
-   DATA wantNotify         EXPORTED 
-   DATA wantNubs           EXPORTED 
-   DATA wantDrawFocus      EXPORTED 
-   DATA wantUseSysColors   EXPORTED 
-   DATA wantEnterKey       EXPORTED 
-   DATA wantAutoHilite     EXPORTED 
+   DATA wantResize         EXPORTED
+   DATA wantHScroll        EXPORTED
+   DATA wantVScroll        EXPORTED
+   DATA wantHiliteAll      EXPORTED
+   DATA wantRowSep         EXPORTED
+   DATA wantColSep         EXPORTED
+   DATA wantNotify         EXPORTED
+   DATA wantNubs           EXPORTED
+   DATA wantDrawFocus      EXPORTED
+   DATA wantUseSysColors   EXPORTED
+   DATA wantEnterKey       EXPORTED
+   DATA wantAutoHilite     EXPORTED
    //
 
    DATA si                 EXPORTED // scrollinfo
@@ -143,13 +143,13 @@ CLASS TWBrowse FROM TWinControl
    DATA ColWidths          EXPORTED // array of cumulative column widths (starting from 0)
    DATA Columns            EXPORTED // array of column objects
    DATA aData              EXPORTED // data buffer - containg all columns text data for all displayed rows
-   DATA aFgColors          EXPORTED 
-   DATA aBgColors          EXPORTED 
+   DATA aFgColors          EXPORTED
+   DATA aBgColors          EXPORTED
 
    DATA RowPos             EXPORTED // row number in the data display window
    DATA ColPos             EXPORTED // current column position
    DATA Hilited            EXPORTED // hilite flag
-   DATA Frozen             EXPORTED 
+   DATA Frozen             EXPORTED
 
    DATA RowCountVisible    EXPORTED // all rows incl. the partially visible row
    DATA RowCountUsable     EXPORTED // fully visible rows only
@@ -161,68 +161,68 @@ CLASS TWBrowse FROM TWinControl
    DATA lResizing          EXPORTED // busy resizing a column logical flag
    DATA lMoving            EXPORTED // busy moving a column logical flag
 
-   DATA xvScroll           EXPORTED 
-   DATA xhScroll           EXPORTED 
-   DATA SepColor           EXPORTED 
-   DATA HeadFgColor        EXPORTED 
-   DATA HeadBgColor        EXPORTED 
-   DATA HeadFont           EXPORTED 
-   DATA FgColor            EXPORTED 
-   DATA BgColor            EXPORTED 
-   DATA Font               EXPORTED 
-   DATA HiliteColor        EXPORTED 
-   DATA HiliteBgColor      EXPORTED 
-   DATA HiliteNoFocus      EXPORTED 
-   DATA LinePen            EXPORTED 
-   DATA HeadText           EXPORTED 
-   DATA HeadAlign          EXPORTED 
-   DATA HeadBmps           EXPORTED 
-   DATA HeadBmpAlign       EXPORTED 
+   DATA xvScroll           EXPORTED
+   DATA xhScroll           EXPORTED
+   DATA SepColor           EXPORTED
+   DATA HeadFgColor        EXPORTED
+   DATA HeadBgColor        EXPORTED
+   DATA HeadFont           EXPORTED
+   DATA FgColor            EXPORTED
+   DATA BgColor            EXPORTED
+   DATA Font               EXPORTED
+   DATA HiliteColor        EXPORTED
+   DATA HiliteBgColor      EXPORTED
+   DATA HiliteNoFocus      EXPORTED
+   DATA LinePen            EXPORTED
+   DATA HeadText           EXPORTED
+   DATA HeadAlign          EXPORTED
+   DATA HeadBmps           EXPORTED
+   DATA HeadBmpAlign       EXPORTED
 
-   DATA ColBgColors        EXPORTED 
-   DATA ColFgColors        EXPORTED 
-   DATA ColAlign           EXPORTED 
-   DATA ColVAlign          EXPORTED 
-   DATA ColFonts           EXPORTED 
-   DATA ColBmps            EXPORTED 
-   DATA ColBmpAlign        EXPORTED 
-   DATA ColOffset          EXPORTED 
-   DATA ColStyle           EXPORTED 
+   DATA ColBgColors        EXPORTED
+   DATA ColFgColors        EXPORTED
+   DATA ColAlign           EXPORTED
+   DATA ColVAlign          EXPORTED
+   DATA ColFonts           EXPORTED
+   DATA ColBmps            EXPORTED
+   DATA ColBmpAlign        EXPORTED
+   DATA ColOffset          EXPORTED
+   DATA ColStyle           EXPORTED
 
-   DATA objs              EXPORTED 
+   DATA objs              EXPORTED
 
-   DATA vScrollEx          EXPORTED 
+   DATA vScrollEx          EXPORTED
 
    DATA Source             EXPORTED
-   DATA ArrayMode          EXPORTED 
-   DATA Element            EXPORTED 
-   DATA RecPos             EXPORTED 
-   DATA RecCount           EXPORTED 
-   DATA HitTop             EXPORTED 
-   DATA HitBottom          EXPORTED 
+   DATA ArrayMode          EXPORTED
+   DATA Element            EXPORTED
+   DATA RecPos             EXPORTED
+   DATA RecCount           EXPORTED
+   DATA HitTop             EXPORTED
+   DATA HitBottom          EXPORTED
 
-   DATA bSeekChar          EXPORTED 
-   DATA bGoToPos           EXPORTED 
-   DATA bGoTop             EXPORTED 
-   DATA bGoBottom          EXPORTED 
-   DATA bSkip              EXPORTED 
-   DATA bRecNo             EXPORTED 
-   DATA bSetLogPos         EXPORTED 
-   DATA bOnChangeBlock     EXPORTED 
-   DATA bOnClick           EXPORTED 
-   DATA bOnDblClick        EXPORTED 
+   DATA bSeekChar          EXPORTED
+   DATA bGoToPos           EXPORTED
+   DATA bGoTop             EXPORTED
+   DATA bGoBottom          EXPORTED
+   DATA bSkip              EXPORTED
+   DATA bRecNo             EXPORTED
+   DATA bSetLogPos         EXPORTED
+   DATA bOnChangeBlock     EXPORTED
+   DATA bOnClick           EXPORTED
+   DATA bOnDblClick        EXPORTED
 
-   DATA bOnKey             EXPORTED 
-   DATA bOnChar            EXPORTED 
-   DATA bKillBlock         EXPORTED 
+   DATA bOnKey             EXPORTED
+   DATA bOnChar            EXPORTED
+   DATA bKillBlock         EXPORTED
 
-   DATA xTrack             EXPORTED 
-   DATA xTrackOffset       EXPORTED 
-   DATA xTrackColumn       EXPORTED 
+   DATA xTrack             EXPORTED
+   DATA xTrackOffset       EXPORTED
+   DATA xTrackColumn       EXPORTED
    DATA xDragColumn        EXPORTED INIT 0
    DATA aDragRect          EXPORTED
-   
-   
+
+
    METHOD AddColumn()
    METHOD InsColumn()
    METHOD DelColumn()
@@ -307,8 +307,8 @@ CLASS TWBrowse FROM TWinControl
 
    METHOD GetItemRect()
    METHOD GetItemText()
-   METHOD Create() 
-   METHOD CreateWnd() 
+   METHOD Create()
+   METHOD CreateWnd()
 
    METHOD WMMessage()
 //   METHOD OnCustomDraw()
@@ -431,7 +431,7 @@ return( Self )
 METHOD CreateWnd() CLASS TWBrowse
 
    ::ArrayMode := .F.
-   
+
    DO CASE
       CASE ValType( ::Source ) == "A"
          ::ArrayMode := .T.
@@ -440,7 +440,7 @@ METHOD CreateWnd() CLASS TWBrowse
          ::Source := ALIAS()
 
    ENDCASE
-   
+
    IF ::ArrayMode
       ::Element   := 1
       ::RecPos    := ::Element
@@ -491,7 +491,7 @@ METHOD CreateWnd() CLASS TWBrowse
                                IF( ::HitTop, ::RecPos := 1,),;
                                IF( ::HitBottom, ::RecPos := ::RecCount,) }
 
-      ::bGoTop :={|| ( ::Source )->( dbgotop() ),;
+      ::bGoTop := {|| ( ::Source )->( dbgotop() ),;
                      ::HitTop    := ( ::source )->( Bof() ),;
                      ::HitBottom := ( ::Source )->( Eof() ),;
                      ::RecCount  := ( ::Source )->( RecCount() ),;
@@ -499,7 +499,7 @@ METHOD CreateWnd() CLASS TWBrowse
                      IF( ::HitTop, ::RecPos := 1,),;
                      IF( ::HitBottom, ::RecPos := ::RecCount,) }
 
-      ::bGoBottom :={|n| ( ::Source )->( dbgobottom() ),;
+      ::bGoBottom := {|n| ( ::Source )->( dbgobottom() ),;
                      ::HitTop    :=(::Source)->(bof()),;
                      ::HitBottom :=(::source)->(EOF()),;
                      ::RecCount  :=(::Source)->(RecCount()),;
@@ -507,7 +507,7 @@ METHOD CreateWnd() CLASS TWBrowse
                      IF(::HitTop,::RecPos:=1,),;
                      IF(::HitBottom,::RecPos:=::RecCount,)}
 
-      ::bSkip :={|n| (::Source)->(dbSkip(n)),;
+      ::bSkip := {|n| (::Source)->(dbSkip(n)),;
                  ::RecPos+=n,;
                  ::HitTop:=(::Source)->(bof()),;
                  ::HitBottom:=(::Source)->(eof()),;
@@ -516,7 +516,7 @@ METHOD CreateWnd() CLASS TWBrowse
                  IF(::HitBottom,::RecPos:=::RecCount,)}
       ::bRecNo :={| | (::Source)->(RecNo())}
    ENDIF
-   
+
    ::Super:CreateWnd()
    IF ::Font == NIL
       ::Font := SendMessage( ::Parent:Handle, WM_GETFONT, 0, 0 )
@@ -525,9 +525,9 @@ METHOD CreateWnd() CLASS TWBrowse
       ::Font := GetMessageFont()
    ENDIF
    SendMessage( ::Fhandle, WM_SETFONT, ::Font, 0 )
-   
+
    ::Configure()
-   
+
 RETURN Self
 
 //---------------------------------------------------------------------------------------------
@@ -1175,7 +1175,7 @@ METHOD OnCustomDraw( nlParam ) CLASS TWBrowse
    cd:Pointer( nlParam )
    DO CASE
       CASE cd:dwDrawStage == CDDS_PREPAINT
-           RETURN CDRF_NOTIFYITEMDRAW   
+           RETURN CDRF_NOTIFYITEMDRAW
 
       CASE cd:dwDrawStage == CDDS_ITEMPREPAINT
            SetBkColor( cd:hDC, RGB(255,255,0) )

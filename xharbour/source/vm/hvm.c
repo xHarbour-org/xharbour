@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.228 2003/07/06 19:32:50 lculik Exp $
+ * $Id: hvm.c,v 1.229 2003/07/07 03:30:49 lculik Exp $
  */
 
 /*
@@ -5651,10 +5651,11 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    /* store the number of expected parameters
     */
    ( * HB_VM_STACK.pPos )->item.asBlock.paramcnt = HB_PCODE_MKUSHORT( &( pCode[ 3 ] ) );
+
    /* store the line number where the codeblock was defined
     */
-
    ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName;
+   ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
 
    if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
    {
@@ -5665,8 +5666,6 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    {
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = NULL;
    }
-
-   ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
 
    ( * HB_VM_STACK.pPos )->item.asBlock.value->uLen = HB_PCODE_MKUSHORT( &( pCode[ 1 ] ) ) - ( 7 + uiLocals * 2 );
 
@@ -5699,26 +5698,22 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    /* store the number of expected parameters
     */
    ( * HB_VM_STACK.pPos )->item.asBlock.paramcnt = 0;
+
    /* store the line number where the codeblock was defined
     */
+   ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName;
+   ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
+
    if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
    {
-      ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = (char *) hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 1 );
-      strcpy( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, hb_objGetRealClsName( *( HB_VM_STACK.pBase + 1 ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName ) );
-      strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ":" );
-      strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
-
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->uiHolders++;
    }
    else
    {
-      ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName;
-
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = NULL;
    }
 
-   ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
    ( * HB_VM_STACK.pPos )->item.asBlock.value->uLen = pCode[ 1 ] - 2;
 
    hb_stackPush();
