@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3113 2004/06/28 18:09:59 paultucker Exp $
+ * $Id: ChangeLog,v 1.3114 2004/06/29 03:58:24 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-29 15:13 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/compiler/genc.c
+    ! Fixed GPG trap in verbose mode of hb_p_localnearaddint
+    * Corrected verbose mode for hb_p_localnearaddint, hb_p_localnearasetint and hb_p_localnearsetstr
+    * Replaced short wVar with int iVar as per performance suggestion by Przemek
+    * Some formating and cleanup.
+
+  * source/rtl/readline.c
+    % Optimized to use hb_storclenAdopt()
+
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * source/compiler/exproptb.c
+  * source/compiler/exproptc.c
+    * Expanded range for LOCALNEARSETINT LOCALNEARSETSTR and LOCALNEARADDINT to 0-255 because optimization never applies to detached locals.
+  * source/vm/hvm.c
+    * Changed casting of LOCAL # in LOCALNEARSETINT LOCALNEARSETSTR and LOCALNEARADDINT to (unsigned char)
+
+  * source/rtl/errorsys.prg
+    * Corrected spelling typo
 
 2004-06-28 22:27 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * include/hbapigt.h

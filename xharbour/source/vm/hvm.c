@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.406 2004/06/21 19:34:23 ronpinkas Exp $
+ * $Id: hvm.c,v 1.407 2004/06/22 19:28:25 ronpinkas Exp $
  */
 
 /*
@@ -2505,14 +2505,14 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_PUSHLOCALNEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLOCALNEAR") );
-            hb_vmPushLocal( ( signed char ) pCode[ w + 1 ] );
+            hb_vmPushLocal( (signed char ) pCode[ w + 1 ] );
             w += 2;  /* only first two bytes are used */
             break;
 
          case HB_P_LOCALNEARADDINT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARADDINT") );
          {
-            PHB_ITEM pLocal = hb_stackItemFromBase( pCode[ w + 1 ] );
+            PHB_ITEM pLocal = hb_stackItemFromBase( (unsigned char) pCode[ w + 1 ] );
             short iAdd = HB_PCODE_MKSHORT( &( pCode[ w + 2 ] ) );
             #ifndef HB_LONG_LONG_OFF
                long double dNewVal;
@@ -2649,7 +2649,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_LOCALNEARSETINT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETINT") );
          {
-            PHB_ITEM pLocal = hb_stackItemFromBase( (signed char) pCode[ w + 1 ] );
+            PHB_ITEM pLocal = hb_stackItemFromBase( (unsigned char) pCode[ w + 1 ] );
             int iNewVal = HB_PCODE_MKSHORT( &( pCode[ w + 2 ] ) );
 
             if( HB_IS_BYREF( pLocal ) )
@@ -2686,7 +2686,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_LOCALNEARSETSTR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETSTR") );
          {
-            PHB_ITEM pLocal = hb_stackItemFromBase( pCode[ w + 1 ] );
+            PHB_ITEM pLocal = hb_stackItemFromBase( (unsigned char) pCode[ w + 1 ] );
             USHORT uiSize = HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) );
 
             if( HB_IS_BYREF( pLocal ) )
@@ -3135,7 +3135,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_POPLOCALNEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPLOCALNEAR") );
-            hb_vmPopLocal( ( signed char ) pCode[ w + 1 ] );
+            hb_vmPopLocal( (signed char) pCode[ w + 1 ] );
             w += 2;  /* only first two bytes are used */
             break;
 

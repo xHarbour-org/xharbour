@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.36 2004/06/04 03:27:50 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.37 2004/06/17 07:07:48 guerra000 Exp $
  */
 
 /*
@@ -561,7 +561,7 @@ HB_FUNC( SETUNHANDLEDEXCEPTIONFILTER )
 {
    LPTOP_LEVEL_EXCEPTION_FILTER pDefaultHandler;
 
-   s_xHbFunc = (PHB_FUNC) hb_parnl( 1 );
+   s_xHbFunc = (PHB_FUNC) hb_parptr( 1 );
 
    pDefaultHandler = SetUnhandledExceptionFilter( PRGUnhandledExceptionFilter );
    //TraceLog( NULL, "Default: %p\n", pDefaultHandler );

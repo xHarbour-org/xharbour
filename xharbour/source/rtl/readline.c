@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.9 2004/03/05 21:46:35 andijahja Exp $
+ * $Id: readline.c,v 1.10 2004/04/01 22:00:42 druzus Exp $
  */
 
 /*
@@ -61,27 +61,27 @@
 
 #define READING_BLOCK      512
 
-BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT uiBuffLen, char ** Term, int * iTermSizes, USHORT iTerms, BOOL * bFound, BOOL * bEOF  )
+BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT *puiBuffLen, char ** Term, int * iTermSizes, USHORT iTerms, BOOL * bFound, BOOL *bEOF  )
 {
    USHORT uiPosTerm = 0, iPos, uiPosition;
    USHORT nTries, uiSize;
    LONG lRead = 0, lOffset;
    BYTE * pBuff;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLine(%p, %hu, %p, %p, %hu, %i, %i)", hFileHandle, uiBuffLen, Term, iTermSizes, iTerms, *bFound, *bEOF ));
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLine(%p, %hu, %p, %p, %hu, %i, %i)", hFileHandle, *puiBuffLen, Term, iTermSizes, iTerms, *bFound, *bEOF ));
 
    *bFound  = 0;
    *bEOF    = 0;
    nTries   = 0;
    lOffset  = 0;
-   uiSize   = uiBuffLen;
+   uiSize   = *puiBuffLen;
 
-   if (uiBuffLen < 10)
+   if( *puiBuffLen < 10 )
    {
-      uiBuffLen = READING_BLOCK;
+      *puiBuffLen = READING_BLOCK;
    }
 
-   pBuff = (BYTE*) hb_xgrab( uiBuffLen );
+   pBuff = (BYTE*) hb_xgrab( *puiBuffLen );
 
    do
    {
@@ -91,7 +91,7 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT uiBuffLen, char ** Term, int *
       if(nTries>0)
       {
          /* pBuff can be enlarged to hold the line as needed.. */
-         uiSize = (uiBuffLen*(nTries+1))+1;
+         uiSize = ( *puiBuffLen * (nTries + 1 ) ) + 1;
          pBuff = (BYTE *) hb_xrealloc( pBuff, uiSize );
          lOffset += lRead;
       }
@@ -111,6 +111,7 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT uiBuffLen, char ** Term, int *
                if( pBuff[lOffset+iPos] == Term[uiPosTerm][iTermSizes[uiPosTerm]-1] && (iTermSizes[uiPosTerm]-1) <= (iPos+lOffset) )
                {
                   *bFound = 1;
+
                   for(uiPosition=0; uiPosition < (iTermSizes[uiPosTerm]-1); uiPosition++)
                   {
                      if(Term[uiPosTerm][uiPosition] != pBuff[ lOffset+(iPos-iTermSizes[uiPosTerm])+uiPosition+1 ])
@@ -119,43 +120,53 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT uiBuffLen, char ** Term, int *
                         break;
                      }
                   }
-                  if(*bFound)
+
+                  if( *bFound )
                   {
                      break;
                   }
                }
             }
+
             if(*bFound)
             {
                break;
             }
          }
-         if(*bFound)
+
+         if( *bFound )
          {
-            pBuff[lOffset+iPos-iTermSizes[uiPosTerm]+1] = '\0';
+            *puiBuffLen = lOffset + iPos - iTermSizes[ uiPosTerm ] + 1;
+
+            pBuff[ *puiBuffLen ] = '\0';
+
             /* Set handle pointer in the end of the line */
             hb_fsSeek( hFileHandle, (((lRead-((LONG)iPos)))*-1)+1, FS_RELATIVE );
+
             return( pBuff );
          }
       }
       else
       {
-         if(!*bFound)
+         if( !*bFound )
          {
-            if (nTries==0)
+            if( nTries == 0 )
             {
                pBuff[0] = '\0';
             }
             else
             {
-               pBuff[lOffset+lRead-1] = '\0';
+               pBuff[ lOffset + lRead - 1] = '\0';
             }
+
             *bEOF = 1;
          }
       }
+
       nTries++;
    }
    while ((!*bFound) && lRead > 0 );
+
    return( pBuff );
 }
 
@@ -169,15 +180,13 @@ HB_FUNC( HB_FREADLINE )
    char ** Term;
    BYTE * pBuffer;
    int * iTermSizes;
-   LONG lSize = hb_parnl(4);
+   USHORT uSize = (USHORT) hb_parni(4);
    USHORT i, iTerms;
    BOOL bFound, bEOF;
 
-   if( (!ISBYREF( 2 )) || (!ISNUM( 1 )) )
+   if( ( !ISBYREF( 2 ) ) || ( !ISNUM( 1 ) ) )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "FREADLINE", 4,
-         hb_paramError(1), hb_paramError(2),
-         hb_paramError(3), hb_paramError(4) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "FREADLINE", 4, hb_paramError(1), hb_paramError(2), hb_paramError(3), hb_paramError(4) );
       return;
    }
 
@@ -226,15 +235,16 @@ HB_FUNC( HB_FREADLINE )
       iTermSizes[0] = 2;
    }
 
-   if( lSize == 0 )
+   if( uSize == 0 )
    {
-      lSize = READING_BLOCK ;
+      uSize = READING_BLOCK ;
    }
 
-   pBuffer = hb_fsReadLine( hFileHandle, (USHORT) lSize, Term, iTermSizes, iTerms, &bFound, &bEOF  );
+   pBuffer = hb_fsReadLine( hFileHandle, &uSize, Term, iTermSizes, iTerms, &bFound, &bEOF  );
 
-   hb_storc( (char*) pBuffer, 2 );
-   hb_xfree( pBuffer );
+   //TraceLog( NULL, "Len: %i, >%s<\n", uSize, pBuffer );
+
+   hb_storclenAdopt( (char*) pBuffer, uSize, 2 );
    hb_retnl( bEOF ? -1 : 0 );
    hb_xfree( Term );
    hb_xfree( iTermSizes );
