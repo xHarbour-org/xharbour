@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.6 2002/01/21 23:42:31 ronpinkas Exp $
+ * $Id: memvars.c,v 1.7 2002/01/27 09:01:57 ronpinkas Exp $
  */
 
 /*
@@ -861,7 +861,7 @@ int hb_memvarScope( char * szVarName, ULONG ulLength )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarScope(%s, %lu)", szVarName, ulLength));
 
-   szName = ( char * ) hb_xgrab( ulLength );
+   szName = ( char * ) hb_xalloc( ulLength );
    if( szName )
    {
       PHB_DYNS pDynVar;
