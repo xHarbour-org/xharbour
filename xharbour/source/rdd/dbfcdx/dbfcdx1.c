@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.112 2004/03/16 14:39:23 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.114 2004/03/17 02:29:01 druzus Exp $
  */
 
 /*
@@ -6957,7 +6957,6 @@ static void hb_cdxSortAddExternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
                                    LPCDXKEYINFO Value );
 static void hb_cdxSortAddInternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG Link,
                                    LPCDXKEYINFO Value );
-#define hb_cdxSwapBytes( n )  HB_SWAP_ULONG( n );
 /* ######################################################################### */
 
 static LPCDXKEYINFO hb_cdxSortKeyNew( void )
@@ -7492,6 +7491,24 @@ static LPSORTINFO hb_cdxSortNew( LPCDXTAG pTag, BOOL bUnique )
    return pSort;
 }
 
+static void hb_cdxSortPageWrite( LPCDXINDEX pIndex, ULONG ulPos, LPCDXDATA pPage )
+{
+/* it's a temporary hack */
+#ifdef HB_BIG_ENDIAN
+   pPage->Node_Atr = HB_SWAP_USHORT( pPage->Node_Atr );
+   pPage->Rght_Ptr = HB_SWAP_ULONG ( pPage->Rght_Ptr );
+   pPage->Left_Ptr = HB_SWAP_ULONG ( pPage->Left_Ptr );
+   pPage->Entry_Ct = HB_SWAP_USHORT( pPage->Entry_Ct );
+#endif
+   hb_cdxIndexPageWrite( pIndex, ulPos, (BYTE *) pPage, sizeof( CDXDATA ) );
+#ifdef HB_BIG_ENDIAN
+   pPage->Node_Atr = HB_SWAP_USHORT( pPage->Node_Atr );
+   pPage->Rght_Ptr = HB_SWAP_ULONG ( pPage->Rght_Ptr );
+   pPage->Left_Ptr = HB_SWAP_ULONG ( pPage->Left_Ptr );
+   pPage->Entry_Ct = HB_SWAP_USHORT( pPage->Entry_Ct );
+#endif
+}
+
 static void hb_cdxSortFree( LPSORTINFO pSort )
 {
    USHORT usCount;
@@ -7503,16 +7520,15 @@ static void hb_cdxSortFree( LPSORTINFO pSort )
       if( pSort->NodeList[ usCount ] != NULL )
       {
          pa = pSort->NodeList[ usCount ]->Rght_Ptr;
-         pSort->NodeList[ usCount ]->Rght_Ptr = -1;
+         pSort->NodeList[ usCount ]->Rght_Ptr = CDX_DUMMYNODE;
          if( pSort->NodeList[ usCount ]->Entry_Ct > 0 )
          {
             if( pSort->NodeList[ usCount + 1 ] == NULL )
             {
                pSort->CurTag->RootBlock = pa;
-               pSort->NodeList[ usCount ]->Node_Atr++;
+               pSort->NodeList[ usCount ]->Node_Atr |= CDX_NODE_ROOT;
             }
-            hb_cdxIndexPageWrite( pSort->CurTag->pIndex, pa, (BYTE *) pSort->NodeList[ usCount ],
-                                  sizeof( CDXDATA ) );
+            hb_cdxSortPageWrite( pSort->CurTag->pIndex, pa, pSort->NodeList[ usCount ] );
             if( pSort->NodeList[ usCount + 1 ] != NULL )
                hb_cdxSortAddToNode( pSort, ( USHORT ) ( usCount + 1 ), pa,
                                     pSort->LastTag, pSort->KeyWork );
@@ -7914,7 +7930,7 @@ static void hb_cdxSortAddToNode( LPSORTINFO pSort, USHORT Lvl, LONG Tag,
                                  LONG Link, LPCDXKEYINFO Value )
 {
    USHORT i, bitcnt;
-   LONG sr;
+   LONG sr, mask;
 
    if( pSort->NodeList[ Lvl ] == NULL )
    {
@@ -7927,16 +7943,15 @@ static void hb_cdxSortAddToNode( LPSORTINFO pSort, USHORT Lvl, LONG Tag,
          for( bitcnt = 0; i; bitcnt++, i >>= 1 );
          pSort->NodeList[ 0 ]->cdxu.External.ShortBytes = 3;
          pSort->NodeList[ 0 ]->cdxu.External.RecNumBits = 24 - bitcnt * 2;
-         pSort->NodeList[ 0 ]->cdxu.External.RecNumMask =
-            HB_CDXBITMASK( pSort->NodeList[ 0 ]->cdxu.External.RecNumBits );
-         while( sr > pSort->NodeList[ 0 ]->cdxu.External.RecNumMask )
+         mask = HB_CDXBITMASK( pSort->NodeList[ 0 ]->cdxu.External.RecNumBits );
+         while ( sr > mask )
          {
             pSort->NodeList[ 0 ]->cdxu.External.ShortBytes++;
             pSort->NodeList[ 0 ]->cdxu.External.RecNumBits += 8;
-            pSort->NodeList[ 0 ]->cdxu.External.RecNumMask =
-               ( pSort->NodeList[ 0 ]->cdxu.External.RecNumMask << 8 ) | 0xFF;
+            mask = mask << 8 | 0xFF;
          }
-         pSort->NodeList[ 0 ]->cdxu.External.FreeSpace = CDX_EXTERNAL_SPACE;
+         HB_PUT_LE_ULONG( pSort->NodeList[ 0 ]->cdxu.External.RecNumMask, mask );
+         HB_PUT_LE_USHORT( pSort->NodeList[ 0 ]->cdxu.External.FreeSpace, CDX_EXTERNAL_SPACE );
          pSort->NodeList[ 0 ]->cdxu.External.DupCntBits =
             pSort->NodeList[ 0 ]->cdxu.External.TrlCntBits = (BYTE) bitcnt;
          pSort->NodeList[ 0 ]->cdxu.External.DupCntMask =
@@ -7944,9 +7959,9 @@ static void hb_cdxSortAddToNode( LPSORTINFO pSort, USHORT Lvl, LONG Tag,
          pSort->NodeList[ 0 ]->cdxu.External.TrlCntMask =
             (BYTE) HB_CDXBITMASK( pSort->NodeList[ 0 ]->cdxu.External.TrlCntBits );
       }
-      pSort->NodeList[ Lvl ]->Left_Ptr = -1;
+      pSort->NodeList[ Lvl ]->Left_Ptr = CDX_DUMMYNODE;
       pSort->NodeList[ Lvl ]->Rght_Ptr = hb_cdxIndexGetAvailPage( pSort->CurTag->pIndex, FALSE );
-      pSort->NodeList[ Lvl ]->Node_Atr = ( Lvl == 0 ) ? 2 : 0;
+      pSort->NodeList[ Lvl ]->Node_Atr = ( Lvl == 0 ) ? CDX_NODE_LEAF : CDX_NODE_BRANCH;
    }
    if( Lvl == 0 )
       hb_cdxSortAddExternal( pSort, Lvl, Tag, Link, Value );
@@ -7957,20 +7972,15 @@ static void hb_cdxSortAddToNode( LPSORTINFO pSort, USHORT Lvl, LONG Tag,
 static void hb_cdxSortAddExternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG Link,
                                    LPCDXKEYINFO Value )
 {
-   USHORT k, ct, cd, v;
-   LONG pa;
-#ifndef HB_LONG_LONG_OFF
-   ULONGLONG rr;
-#else
-   LONG r;
-   USHORT c;
-#endif
+   USHORT k, ct, cd, v, c;
+   LONG pa, r;
 
    if( pSort->NodeList[ Lvl ]->Entry_Ct == 0 )
    {
       memset( pSort->NodeList[ Lvl ]->cdxu.External.ExtData, 0,
               sizeof( pSort->NodeList[ Lvl ]->cdxu.External.ExtData ) );
-      pSort->NodeList[ Lvl ]->cdxu.External.FreeSpace = CDX_EXTERNAL_SPACE;
+      HB_PUT_LE_USHORT( pSort->NodeList[ Lvl ]->cdxu.External.FreeSpace, CDX_EXTERNAL_SPACE );
+
       hb_cdxSortKeyPut( pSort->LastKey, (BYTE*) "", 0, 0, ( pSort->CurTag->uiType == 'C' ) );
    }
    ct = ( USHORT ) ( pSort->CurTag->uiLen - Value->length );
@@ -7993,11 +8003,14 @@ static void hb_cdxSortAddExternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
 #endif
    v = ( USHORT ) ( pSort->NodeList[ Lvl ]->Entry_Ct *
        pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes );
-   k = ( USHORT ) ( pSort->NodeList[ Lvl ]->cdxu.External.FreeSpace + v );
-   pSort->NodeList[ Lvl ]->cdxu.External.FreeSpace -=
-      ( USHORT ) ( pSort->CurTag->uiLen +
-      pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes - cd - ct );
+   k = HB_GET_LE_USHORT( pSort->NodeList[ Lvl ]->cdxu.External.FreeSpace );
+   HB_PUT_LE_USHORT( pSort->NodeList[ Lvl ]->cdxu.External.FreeSpace,
+                     k - ( USHORT ) ( pSort->CurTag->uiLen +
+                     pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes -
+                     cd - ct ) );
+   k += v;
    /* RECMASK */
+/*
 #ifndef HB_LONG_LONG_OFF
    rr = ( (ULONGLONG) ct << ( ( pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes * 8 ) -
                                 pSort->NodeList[ Lvl ]->cdxu.External.TrlCntBits ) ) |
@@ -8007,22 +8020,24 @@ static void hb_cdxSortAddExternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
         Tag;
    memcpy( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ v ], &rr, pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes );
 #else
+*/
    c = ( USHORT ) ( ( ct << ( 16 - pSort->NodeList[ Lvl ]->cdxu.External.TrlCntBits ) ) |
        ( cd << ( 16 - pSort->NodeList[ Lvl ]->cdxu.External.TrlCntBits -
                       pSort->NodeList[ Lvl ]->cdxu.External.DupCntBits ) ) );
-   memcpy( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ v + pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes - 2 ], &c, 2 );
-   memcpy( &r, &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ v ], 4 );
-   r &= ~pSort->NodeList[ Lvl ]->cdxu.External.RecNumMask;
-   r |= Tag;
+   HB_PUT_LE_USHORT( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ v + pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes - 2 ], c );
+   r = ( HB_GET_LE_ULONG( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ v ] ) &
+        ~HB_GET_LE_ULONG( pSort->NodeList[ Lvl ]->cdxu.External.RecNumMask ) ) |
+       Tag;
+   HB_PUT_LE_ULONG( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ v ], r );
    memcpy( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ v ], &r, 4 );
-#endif
+//#endif
    k -= ( USHORT ) ( pSort->CurTag->uiLen - cd - ct );
    if( pSort->CurTag->uiLen - cd - ct > 0 )
       memcpy( &pSort->NodeList[ Lvl ]->cdxu.External.ExtData[ k ],
               Value->Value + cd,
               pSort->CurTag->uiLen - cd - ct );
    pSort->NodeList[ Lvl ]->Entry_Ct++;
-   if( pSort->NodeList[ Lvl ]->cdxu.External.FreeSpace <
+   if( HB_GET_LE_USHORT( pSort->NodeList[ Lvl ]->cdxu.External.FreeSpace ) <
        ( pSort->CurTag->uiLen +
          pSort->NodeList[ Lvl ]->cdxu.External.ShortBytes ) * 1 ) /* 2 only if count after the key was added */
    {
@@ -8032,10 +8047,9 @@ static void hb_cdxSortAddExternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
       if( pSort->KeyCnt < pSort->TotalWordCount )
          pSort->NodeList[ Lvl ]->Rght_Ptr = hb_cdxIndexGetAvailPage( pSort->CurTag->pIndex, FALSE );
       else
-         pSort->NodeList[ Lvl ]->Rght_Ptr = -1;
-      pSort->NodeList[ Lvl ]->Node_Atr = 2;
-      hb_cdxIndexPageWrite( pSort->CurTag->pIndex, pa, (BYTE *) pSort->NodeList[ Lvl ],
-                            sizeof( CDXDATA ) );
+         pSort->NodeList[ Lvl ]->Rght_Ptr = CDX_DUMMYNODE;
+      pSort->NodeList[ Lvl ]->Node_Atr = CDX_NODE_LEAF;
+      hb_cdxSortPageWrite( pSort->CurTag->pIndex, pa, pSort->NodeList[ Lvl ] );
       pSort->NodeList[ Lvl ]->Left_Ptr = pa;
       hb_cdxSortAddToNode( pSort, ( USHORT ) ( Lvl + 1 ), pa, Link, Value );
       pSort->NodeList[ Lvl ]->Entry_Ct = 0;
@@ -8046,7 +8060,7 @@ static void hb_cdxSortAddInternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
                                    LPCDXKEYINFO Value )
 {
    USHORT v;
-   LONG r, pa;
+   LONG pa;
 
    if( pSort->NodeList[ Lvl ]->Entry_Ct == 0 )
       memset( pSort->NodeList[ Lvl ]->cdxu.Internal.IntData,
@@ -8057,10 +8071,8 @@ static void hb_cdxSortAddInternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
    memcpy( &pSort->NodeList[ Lvl ]->cdxu.Internal.IntData[ v ],
            Value->Value, Value->length );
    v += pSort->CurTag->uiLen;
-   r = hb_cdxSwapBytes( Link );
-   memcpy( &pSort->NodeList[ Lvl ]->cdxu.Internal.IntData[ v ], &r, 4 );
-   r = hb_cdxSwapBytes( Tag );
-   memcpy( &pSort->NodeList[ Lvl ]->cdxu.Internal.IntData[ v + 4 ], &r, 4 );
+   HB_PUT_BE_ULONG( &pSort->NodeList[ Lvl ]->cdxu.Internal.IntData[ v ], Link );
+   HB_PUT_BE_ULONG( &pSort->NodeList[ Lvl ]->cdxu.Internal.IntData[ v + 4 ], Tag );
    pSort->NodeList[ Lvl ]->Entry_Ct++;
    if( pSort->NodeList[ Lvl ]->Entry_Ct >= pSort->CurTag->MaxKeys )
    {
@@ -8068,10 +8080,9 @@ static void hb_cdxSortAddInternal( LPSORTINFO pSort, USHORT Lvl, LONG Tag, LONG 
       if( !pSort->Closing )
          pSort->NodeList[ Lvl ]->Rght_Ptr = hb_cdxIndexGetAvailPage( pSort->CurTag->pIndex, FALSE );
       else
-         pSort->NodeList[ Lvl ]->Rght_Ptr = -1;
-      pSort->NodeList[ Lvl ]->Node_Atr = 0;
-      hb_cdxIndexPageWrite( pSort->CurTag->pIndex, pa, (BYTE *) pSort->NodeList[ Lvl ],
-                            sizeof( CDXDATA ) );
+         pSort->NodeList[ Lvl ]->Rght_Ptr = CDX_DUMMYNODE;
+      pSort->NodeList[ Lvl ]->Node_Atr = CDX_NODE_BRANCH;
+      hb_cdxSortPageWrite( pSort->CurTag->pIndex, pa, pSort->NodeList[ Lvl ] );
       pSort->NodeList[ Lvl ]->Left_Ptr = pa;
       hb_cdxSortAddToNode( pSort, ( USHORT ) ( Lvl + 1 ), pa, Link, Value );
       pSort->NodeList[ Lvl ]->Entry_Ct = 0;

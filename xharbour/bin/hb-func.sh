@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: hb-func.sh,v 1.14 2004/03/02 17:31:28 druzus Exp $
+# $Id: hb-func.sh,v 1.15 2004/03/02 22:42:05 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -13,10 +13,10 @@
 
 get_hbplatform()
 {
-   local id
+    local id
 
-   # please add your distro suffix if it not belong to the one recognized below
-   # and remember that order checking can be important
+    # please add your distro suffix if it not belong to the one recognized below
+    # and remember that order checking can be important
 
     [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$rel"|tr -d "."`
     [ "${id}" = "" ] && id=`rel=$(rpm -q --queryformat='.%{VERSION}' redhat-release 2>/dev/null) && echo "rh$rel"|tr -d "."`
@@ -65,9 +65,9 @@ mk_hbtools()
     hb_pref="${4-xhb}"
 
     if [ "${HB_ARCHITECTURE}" = "dos" ]; then
-	hb_tool="$1/${hb_pref}-bld"
+        hb_tool="$1/${hb_pref}-bld"
     else
-	hb_tool="$1/${hb_pref}-build"
+        hb_tool="$1/${hb_pref}-build"
     fi
     hb_libs=`mk_hbgetlibs "$2"`
     hb_libsc=`mk_hbgetlibsctb "$3"`
@@ -78,18 +78,19 @@ mk_hbtools()
     [ -z "${_DEFAULT_LIB_DIR}" ] && _DEFAULT_LIB_DIR="${HB_LIB_INSTALL}"
 
     HB_SYS_LIBS="-lm"
+    HB_CRS_LIB=""
+    HB_SLN_LIB=""
     if [ "${HB_COMPILER}" = "mingw32" ]; then
-	HB_SYS_LIBS="${HB_SYS_LIBS} -luser32 -lwinspool -lgdi32 -lcomctl32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32"
+        HB_SYS_LIBS="${HB_SYS_LIBS} -luser32 -lwinspool -lgdi32 -lcomctl32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32"
     elif [ "${HB_COMPILER}" = "djgpp" ]; then
-	HB_SYS_LIBS="${HB_SYS_LIBS}"
+        HB_SYS_LIBS="${HB_SYS_LIBS}"
     else
-	if [ "${HB_NCURSES_194}" = "yes" ]; then
-            HB_SYS_LIBS="${HB_SYS_LIBS} -lncur194"
-	else
-            HB_SYS_LIBS="${HB_SYS_LIBS} -lncurses"
-	fi
-        HB_SYS_LIBS="${HB_SYS_LIBS} -lslang -lgpm"
-        HB_SYS_LIBS="${HB_SYS_LIBS} -L/usr/X11R6/lib -lX11"
+        if [ "${HB_NCURSES_194}" = "yes" ]; then
+            HB_CRS_LIB="ncur194"
+        else
+            HB_CRS_LIB="ncurses"
+        fi
+        HB_SLN_LIB="slang"
     fi
 
     cat > ${hb_tool} <<EOF
@@ -150,6 +151,8 @@ HB_STATIC="no"
 HB_MT=""
 HB_GT="${HB_GT_LIB#gt}"
 HB_MG="${HB_MULTI_GT}"
+
+HB_GPM_MOUSE="${HB_GPM_MOUSE}"
 
 HB_GT_REQ=""
 HB_FM_REQ=""
@@ -228,10 +231,27 @@ export PATH="\${HB_BIN_INSTALL}:\${PATH}"
 HB_PATHS="-I\${HB_INC_INSTALL}"
 GCC_PATHS="\${HB_PATHS} -L\${HB_LIB_INSTALL}"
 LINK_OPT=""
+
+HB_GPM_LIB=""
+if [ -f "\${HB_LIB_INSTALL}/libgtsln.a" ]; then
+    SYSTEM_LIBS="\${SYSTEM_LIBS} -l${HB_SLN_LIB:-slang}"
+    [ "\${HB_GPM_MOUSE}" = "yes" ] && HB_GPM_LIB="gpm"
+fi
+if [ -f "\${HB_LIB_INSTALL}/libgtcrs.a" ]; then
+    SYSTEM_LIBS="\${SYSTEM_LIBS} -l${HB_CRS_LIB:-ncurses}"
+    [ "\${HB_GPM_MOUSE}" = "yes" ] && HB_GPM_LIB="gpm"
+fi
+if [ -f "\${HB_LIB_INSTALL}/libgtxvt.a" ]; then
+    SYSTEM_LIBS="\${SYSTEM_LIBS} -L/usr/X11R6/lib -lX11"
+fi
+[ -n "\${HB_GPM_LIB}" ] && SYSTEM_LIBS="\${SYSTEM_LIBS} -l\${HB_GPM_LIB}"
+
 if [ "\${HB_STATIC}" = "full" ]; then
+    if [ "\${HB_STATIC}" = "full" ]; then
+        SYSTEM_LIBS="\${SYSTEM_LIBS} -ldl"
+    fi
     LINK_OPT="\${LINK_OPT} -static"
     HB_STATIC="yes"
-    SYSTEM_LIBS="\${SYSTEM_LIBS} -ldl"
 fi
 
 HB_LNK_REQ=""

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.27 2004/02/12 19:19:12 druzus Exp $
+ * $Id: hbdefs.h,v 1.28 2004/03/02 00:28:18 druzus Exp $
  */
 
 /*
@@ -185,6 +185,23 @@
    #endif
 #endif
 
+#if defined( __BYTE_ORDER ) && defined( __LITTLE_ENDIAN ) && \
+    defined( __BIG_ENDIAN ) && defined( __PDP_ENDIAN )
+#  if __BYTE_ORDER == __LITTLE_ENDIAN
+#    define HB_LITTLE_ENDIAN
+#    undef HB_BIG_ENDIAN
+#    undef HB_PDP_ENDIAN
+#  elif __BYTE_ORDER == __BIG_ENDIAN
+#    define HB_BIG_ENDIAN
+#    undef HB_LITTLE_ENDIAN
+#    undef HB_PDP_ENDIAN
+#  elif __BYTE_ORDER == __BIG_ENDIAN
+#    define HB_PDP_ENDIAN
+#    undef HB_LITTLE_ENDIAN
+#    undef HB_BIG_ENDIAN
+#  endif
+#endif
+
 /* maximum length of double number in decimal representation:
    log10(2^1024) ~ 308.25 */
 #define HB_MAX_DOUBLE_LENGTH 320
@@ -214,9 +231,9 @@
                                               ( ( ( ULONG ) ( w ) & 0x00FF0000L ) >>  8 ) | \
                                               ( ( ( ULONG ) ( w ) & 0xFF000000L ) >> 24 ) ) )
 
-#if defined(HB_PDP_ENDIAN)
+#if defined( HB_PDP_ENDIAN )
    #error PDP-Endian support unimplemented. If you have such machine do it yourself.
-#elif !defined(HB_BIG_ENDIAN)
+#elif !defined( HB_BIG_ENDIAN )
    /* We use Little-Endian here */
 
    #define HB_GET_LE_USHORT( p )    ( *( USHORT * )( p ) )

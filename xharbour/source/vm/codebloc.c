@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.38 2003/11/06 06:46:18 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.39 2003/11/10 22:28:37 ronpinkas Exp $
  */
 
 /*
@@ -80,6 +80,14 @@ extern short hb_vm_iGlobals;
  *       must use HB_PCODE_MKUSHORT( pLocalPosTable++ ) to handle
  *       little-endian platform-indepent pcode on big-endian machines.
  *
+ * Yet another note ;-):
+ *       HB_PCODE_MK*(), HB_{GET,PUT}_{LE,BE}_*() and HB_*_{FROM,TO}_LE()
+ *       as many others are macros which may use more then once given
+ *       parameters - you cannot use and {pre/post}{inc/dec}rementation
+ *       in parameters. Changing them to function (or pseudo function) will
+ *       reduce performance in many cases (but in some when poor compiler
+ *       is used can give faster codes), Druzus
+ *
  */
 HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
             USHORT uiLocals,
@@ -123,7 +131,8 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
          /*
           * Swap the current value of local variable with the reference to this value.
           */
-         pLocal = hb_stackItemFromBase( HB_PCODE_MKUSHORT( pLocalPosTable++ ) );
+         pLocal = hb_stackItemFromBase( HB_PCODE_MKUSHORT( pLocalPosTable ) );
+         pLocalPosTable++;
 
          if( ! HB_IS_MEMVAR( pLocal ) )
          {

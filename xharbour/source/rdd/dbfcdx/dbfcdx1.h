@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.h,v 1.13 2003/12/24 10:21:34 ronpinkas Exp $
+ * $Id: dbfcdx1.h,v 1.14 2004/03/15 12:45:26 druzus Exp $
  */
 
 /*
@@ -75,8 +75,8 @@
 
 typedef struct
 {
-   USHORT FreeSpace;
-   LONG   RecNumMask;
+   BYTE   FreeSpace[2];
+   BYTE   RecNumMask[4];
    BYTE   DupCntMask;
    BYTE   TrlCntMask;
    BYTE   RecNumBits;

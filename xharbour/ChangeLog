@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2593 2004/03/18 02:12:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2594 2004/03/18 03:27:42 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,35 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-03-18 05:35 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/vm/codebloc.c
+    ! fixed buggy use of HB_PCODE_MKUSHORT()
+      HB_PCODE_MK*(), HB_{GET,PUT}_{LE,BE}_*() and HB_*_{FROM,TO}_LE()
+      as many others are macros which may use more then once given
+      parameters - you cannot use and {pre/post}{inc/dec}rementation
+      in parameters. Changing them to function (or pseudo function) will
+      reduce performance in many cases (but in some when poor compiler
+      is used can give faster codes)
+
+  * xharbour/include/hbdefs.h
+    + auto detection byte order (little/big/pdp endian) in Linux+GCC
+      and other GNU compatible platforms
+
+  + xharbour/tests/bldtest/Makefile
+  + xharbour/tests/bldtest/endian.c
+    + simple C program to check if xHarbour can be compiled on
+      used machine / system / C compiler
+
+  * xharbour/bin/hb-func.sh
+    * xhb* scripts modified to work in systems where there is no slang
+      and/or ncurses at all
+
+  * xharbour/include/hbrddcdx.h
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.h
+    ! some fixes in index create procedure for big endian machine support
+      They are rather hacks not real solution but we are at code freeze
+      so it's not a time to rewrite it. I'll do that in the future.
 
 2004-03-17 19:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapi.h

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.27 2004/01/26 14:59:46 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.28 2004/03/15 12:45:25 druzus Exp $
  */
 
 /*
@@ -531,8 +531,6 @@ static ERRCODE hb_cdxSetScope( CDXAREAP pArea, LPDBORDSCOPEINFO sInfo );
 #define hb_cdxDrop                                 NULL
 #define hb_cdxExists                               NULL
 #define hb_cdxWhoCares                             NULL
-
-//#define hb_cdxSwapBytes( n )  HB_SWAP_ULONG( n );
 
 HB_EXTERN_END
 
