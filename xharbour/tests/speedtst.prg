@@ -1,5 +1,5 @@
 /*
- * $Log$
+ * $Id$
  */
 
 #define ARR_LEN 16
@@ -87,7 +87,7 @@ t:=secondscpu()
 for i:=1 to N_LOOPS
 next
 tn:=secondscpu()-t
-? "empty loops overhead =",tn
+? "empty loops overhead =", tn
 #ifdef REAL_TIME
   ? "real time -> seconds()"
 #else
