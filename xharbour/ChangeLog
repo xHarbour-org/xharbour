@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3485 2004/10/01 20:55:07 paultucker Exp $
+ * $Id: ChangeLog,v 1.3486 2004/10/03 02:10:40 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-04 08:41 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/rtl/at.c
+    ! Corrected handling of 3rd and 4th arguments to support negative values.
+  + tests/testat.prg
+    + Test cases for At() function.
 
 2004-10-03 03:55 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

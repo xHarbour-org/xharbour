@@ -1,5 +1,5 @@
 /*
- * $Id: at.c,v 1.7 2004/07/01 04:09:06 ronpinkas Exp $
+ * $Id: at.c,v 1.8 2004/07/01 14:45:32 paultucker Exp $
  */
 
 /*
@@ -86,40 +86,47 @@
 
        if( pText && pSub )
        {
-          ULONG ulLength = pText->item.asString.length;
-          ULONG ulStart = pStart ? (ULONG) hb_itemGetNL( pStart ) : 1;
-          ULONG ulEnd = pEnd ? (ULONG) hb_itemGetNL( pEnd ) : ulLength;
+          LONG lStart = pStart ? hb_itemGetNL( pStart ) : 1;
+          LONG lEnd = pEnd ? hb_itemGetNL( pEnd ) : pText->item.asString.length;
           ULONG ulPos;
 
-          // SANITIZATION
-          // JC1: Don't know if it is clipper compliant, but anyway something
-          // about that must be done.
-          if ( ulStart < 1 )
+          if( lStart < 0 )
           {
-             ulStart = 1;
+             lStart += pText->item.asString.length;
+
+             if( lStart < 0 )
+             {
+                lStart = 0;
+             }
+          }
+          else if( lStart )
+          {
+             lStart--;
+          }
+
+          if( lEnd < 0 )
+          {
+             lEnd += pText->item.asString.length + 1;
+          }
+
+          if( lEnd > pText->item.asString.length )
+          {
+             lEnd = pText->item.asString.length;
           }
 
           // Stop searching if starting past beyond end.
-          if ( ulStart > ulEnd || ulStart > ulLength )
+          if( lStart >= lEnd )
           {
+             //TraceLog( NULL, "Start: %i End: %i\n", lStart, lEnd );
              hb_retnl( 0 );
              return;
           }
 
-          if ( ulEnd < ulStart )
-          {
-             ulEnd = ulStart;
-          }
+          //TraceLog( NULL, "Search >%s< for >%s< from %i to %i\n", pText->item.asString.value, pSub->item.asString.value, lStart, lEnd );
 
-          if ( ulEnd > ulLength )
-          {
-             ulEnd = ulLength;
-          }
-          // END OF SANITIZATION
+          ulPos = hb_strAt( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value + lStart, lEnd - lStart );
 
-          ulPos = hb_strAt( pSub->item.asString.value, pSub->item.asString.length, pText->item.asString.value + ulStart - 1, ulEnd - ulStart + 1 );
-
-          hb_retnl( ulPos ? ulPos + ( ulStart - 1 ) : 0 );
+          hb_retnl( ulPos ? ulPos + lStart : 0 );
        }
        else
        {
