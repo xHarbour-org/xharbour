@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3784 2005/01/31 19:17:35 patrickmast Exp $
+ * $Id: ChangeLog,v 1.3785 2005/01/31 19:42:09 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-01 15:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/vm/memvars.c
+    ! fixed error reported in hb_vmQuit() when MT program exits, f.e.
+         procedure main()
+            memvar x
+            private x := 10
+         return
+      Walter you forgot to revert your modification from:
+      2005-01-04 02:20 UTC-300 for MT mode (only for ST) and this was
+      the source of problem.
+
+    ! fixed error when more then one :TH: prefix for memvars was added
+      in MT programs. f.e.
+         proc main()
+            memvar x
+            private x := 10
+            ? __MVEXIST('x')
+            ? __MVGET('x')
+         return
+      It's a hack not a real solution - IMHO the whole MT memvars
+      should be rewritten to use the handlers initialized at startup
+      (they are as fast as early with bindings) like in ST mode
+      instead of late bindings at execution time, add direct memvar
+      inheritance by child threads with copy on change, etc.
+
+    ! fixed memory leak in code like:
+         procedure main()
+            memvar x
+            private x:=1
+            release all
+         return
+      Ron why was in hb_memvarReleaseWithMask() the following code:
+         s_globalTable[ pDynVar->hMemvar ].counter = 0;
+      ???
 
 2005-01-31 20:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbf1.c

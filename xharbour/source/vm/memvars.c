@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.94 2005/01/05 05:23:29 walito Exp $
+ * $Id: memvars.c,v 1.95 2005/01/10 18:45:42 druzus Exp $
  */
 
 /*
@@ -119,16 +119,24 @@ static HB_VALUE_PTR s_globalTable = NULL;
 
 PHB_DYNS s_memvarThGetName( char * szName, HB_STACK *pstack )
 {
-   char szNewName[270];
-   sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
-   return hb_dynsymGet( szNewName );
+   if ( strncmp( szName, ":TH:", 4 ) )
+   {
+      char szNewName[270];
+      sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
+      return hb_dynsymGet( szNewName );
+   }
+   return hb_dynsymGet( szName );
 }
 
 PHB_DYNS s_memvarThFindName( char * szName, HB_STACK *pstack )
 {
-   char szNewName[270];
-   sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
-   return hb_dynsymFindName( szNewName );
+   if ( strncmp( szName, ":TH:", 4 ) )
+   {
+      char szNewName[270];
+      sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
+      return hb_dynsymFindName( szNewName );
+   }
+   return hb_dynsymFindName( szName );
 }
 
 #endif
@@ -251,7 +259,7 @@ void hb_memvarsRelease( HB_STACK *pStack )
    {
       while( --ulCnt )
       {
-         /*if( --( pStack->globalTable[ ulCnt ].counter ) == 0 )*/
+         if( --( pStack->globalTable[ ulCnt ].counter ) == 0 )
          {
             if( pStack->globalTable[ ulCnt ].hPrevMemvar == ( HB_HANDLE ) -1 )
             {
@@ -268,9 +276,9 @@ void hb_memvarsRelease( HB_STACK *pStack )
             {
                pStack->globalTable[ ulCnt ].pVarItem->type = HB_IT_NIL;
             }
+            hb_xfree( pStack->globalTable[ ulCnt ].pVarItem );
+            pStack->globalTable[ ulCnt ].counter = 0;
          }
-         pStack->globalTable[ ulCnt ].counter = 0;
-         hb_xfree( pStack->globalTable[ ulCnt ].pVarItem );
       }
 
       hb_xfree( pStack->globalTable );
@@ -1193,7 +1201,9 @@ static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
          {
             if( regexec( &re, pDynVar->pSymbol->szName, 1, aMatches, 0 ) == 0 )
             {
+               /* Wrong to reset - private may be used again in this procedure and counter maybecome negative!
                s_globalTable[ pDynVar->hMemvar ].counter = 0;
+               */
 
                if( HB_IS_COMPLEX( pRef ) )
                {
@@ -1207,7 +1217,9 @@ static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
          }
          else if( regexec( &re, pDynVar->pSymbol->szName, 1, aMatches, 0 ) )
          {
+            /* Wrong to reset - private may be used again in this procedure and counter maybecome negative!
             s_globalTable[ pDynVar->hMemvar ].counter = 0;
+            */
 
             if( HB_IS_COMPLEX( pRef ) )
             {
@@ -1458,11 +1470,8 @@ static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR pName )
       if( ulLen )
       {
          #ifdef HB_THREAD_SUPPORT
-            char szNewName[270];
             HB_THREAD_STUB;
-
-            sprintf( szNewName, ":TH:%d:%s", HB_VM_STACK.th_vm_id, pName->item.asString.value );
-            pDynSym = hb_dynsymFindName( szNewName );
+            pDynSym = s_memvarThFindName( pName->item.asString.value, &HB_VM_STACK );
          #else
             pDynSym = hb_dynsymFindName( pName->item.asString.value );
          #endif
