@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.29 2004/03/11 13:43:29 andijahja Exp $
+ * $Id: transfrm.c,v 1.30 2004/03/11 13:54:23 andijahja Exp $
  */
 
 /*
@@ -221,28 +221,35 @@ HB_FUNC( TRANSFORM )
          BOOL bAnyPic = FALSE;
          BOOL bFound  = FALSE;
 
-#if 0
          /* ================================================================= */
          /* HACKS !                                                           */
          /* To solve Transform ( "1234567890", "@9" )                         */
          /* ================================================================= */
-         if ( szPic[0] == '9' && strlen( szPic ) - 1 <  ulExpLen )
+         if ( szPic[0] == '9' )
          {
             ULONG ii;
 
-            szPicNew = (char*) hb_xgrab( ulExpLen + 1 );
-
-            hb_xmemset( szPicNew, '\0', ulExpLen + 1 );
-
-            for ( ii = 0; ii < ulExpLen; ii ++ )
+            if ( strchr( szPic , 'D' ) == NULL )
             {
-               szPicNew[ ii ] = '9';
-            }
+               szPicNew = (char*) hb_xgrab( ulExpLen + 1 );
 
-            szPic = szPicNew;
-            ulPicLen = strlen( szPic );
+               hb_xmemset( szPicNew, '\0', ulExpLen + 1 );
+
+               for ( ii = 0; ii < ulExpLen; ii ++ )
+               {
+                  szPicNew[ ii ] = '9';
+               }
+
+               szPic = szPicNew;
+               ulPicLen = strlen( szPic );
+            }
+            else
+            {
+               uiPicFlags |= PF_DATE;
+               uiPicFlags |= PF_NUMDATE;
+            }
          }
-#endif
+
          /* Grab enough */
          /* Support date function for strings */
          if( ( uiPicFlags & PF_DATE ) ||
@@ -531,28 +538,41 @@ HB_FUNC( TRANSFORM )
 
          dValue = hb_itemGetND( pValue );
          hb_itemGetNLen( pValue, &iOrigWidth, &iOrigDec );
-#if 0
+
          /* ================================================================= */
          /* HACKS !                                                           */
          /* To solve Transform ( 1234567890, "@9" )                           */
          /* ================================================================= */
-         if ( szPic[0] == '9' && (int) strlen( szPic ) - 1 < iOrigWidth )
+         if ( pPic->item.asString.value[0] == '@' && pPic->item.asString.value[1] == '9' &&
+              (int) (pPic->item.asString.length - 1) < iOrigWidth )
          {
-            int ii;
+            int ii, ulExpLen = pPic->item.asString.length;
 
-            szPicNew = (char*) hb_xgrab( iOrigWidth + 1 );
+            szPic = pPic->item.asString.value;
 
-            hb_xmemset( szPicNew, '\0', iOrigWidth + 1 );
-
-            for ( ii = 0; ii < iOrigWidth; ii ++ )
+            if ( strchr( szPic , 'D' ) == NULL )
             {
-               szPicNew[ ii ] = '9';
-            }
+               szPicNew = (char*) hb_xgrab( ulExpLen + 1 );
 
-            szPic = szPicNew;
-            ulPicLen = strlen( szPic );
+               hb_xmemset( szPicNew, '\0', ulExpLen + 1 );
+
+               szPic[0] = '@';
+
+               for ( ii = 1; ii < ulExpLen; ii ++ )
+               {
+                  szPicNew[ ii ] = '9';
+               }
+
+               szPic = szPicNew;
+               ulPicLen = strlen( szPic );
+            }
+            else
+            {
+               uiPicFlags |= PF_DATE;
+               uiPicFlags |= PF_NUMDATE;
+            }
          }
-#endif
+
          /* Support date function for numbers */
          if( uiPicFlags & PF_DATE )
          {

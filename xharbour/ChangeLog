@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2574 2004/03/15 16:58:23 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2575 2004/03/15 22:37:42 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-16 07:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/transfrm.c
+    ! re-introduce hacks to handle conversion of string/numbers to numeric
+      format eg. transform( "1234567890", "@9"), transform( 1234567890, "@9")
+      where the length of format is less than that of the passed value.
 
 2004-03-15 14:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rdd/dbfcdx/dbfcdx1.c
