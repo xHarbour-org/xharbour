@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.7 2004/06/11 14:02:30 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.8 2004/07/01 13:18:38 vouchcac Exp $
  */
 
 /*
@@ -185,7 +185,7 @@ HB_FUNC( WVT_CHOOSECOLOR )
    cc.hwndOwner     = _s->hWnd ;
    cc.rgbResult     = ISNIL( 1 ) ?  0 : ( COLORREF ) hb_parnl( 1 ) ;
    cc.lpCustColors  = crCustClr ;
-   cc.Flags         = ( WORD ) ( ISNIL( 3 ) ? CC_ANYCOLOR | CC_RGBINIT : hb_parnl( 3 ) );
+   cc.Flags         = ( WORD ) ( ISNIL( 3 ) ? CC_ANYCOLOR | CC_RGBINIT | CC_FULLOPEN | CC_SHOWHELP : hb_parnl( 3 ) );
 
    if ( ChooseColor( &cc ) )
    {
@@ -264,23 +264,74 @@ HB_FUNC( WVT_SETTOOLTIP )
 
 //-------------------------------------------------------------------//
 
+HB_FUNC( WVT_SETTOOLTIPTEXT )
+{
+   TOOLINFO ti;
+
+   ti.cbSize = sizeof( TOOLINFO );
+   ti.hwnd   = _s->hWnd;
+   ti.uId    = 100000;
+
+   if ( SendMessage( _s->hWndTT, TTM_GETTOOLINFO, 0, ( LPARAM ) &ti ) )
+   {
+      ti.lpszText = hb_parcx( 1 );
+      SendMessage( _s->hWndTT, TTM_UPDATETIPTEXT, 0, ( LPARAM ) &ti );
+   }
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_SETTOOLTIPMARGIN )
+{
+   RECT rc;
+
+   rc.left   = hb_parni( 2 );
+   rc.top    = hb_parni( 1 );
+   rc.right  = hb_parni( 4 );
+   rc.bottom = hb_parni( 3 );
+
+   SendMessage( _s->hWndTT, TTM_SETMARGIN, 0, ( LPARAM ) &rc );
+}
+
+//-------------------------------------------------------------------//
+
 HB_FUNC( WVT_SETTOOLTIPWIDTH )
 {
-   SendMessage( _s->hWndTT, TTM_SETMAXTIPWIDTH, 0, ( LPARAM ) ( int ) hb_parni( 1 ) );
+   int iTipWidth = SendMessage( _s->hWndTT, TTM_GETMAXTIPWIDTH, 0, 0 );
+
+   if ( ISNUM( 1 ) )
+   {
+      SendMessage( _s->hWndTT, TTM_SETMAXTIPWIDTH, 0, ( LPARAM ) ( int ) hb_parni( 1 ) );
+   }
+
+   hb_retni( iTipWidth );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_SETTOOLTIPBKCOLOR )
 {
-   SendMessage( _s->hWndTT, TTM_SETTIPBKCOLOR, ( WPARAM ) ( COLORREF ) hb_parnl( 1 ), 0 );
+   COLORREF cr = SendMessage( _s->hWndTT, TTM_GETTIPBKCOLOR, 0, 0 );
+
+   if ( ISNUM( 1 ) )
+   {
+      SendMessage( _s->hWndTT, TTM_SETTIPBKCOLOR, ( WPARAM ) ( COLORREF ) hb_parnl( 1 ), 0 );
+   }
+   hb_retnl( ( COLORREF ) cr );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_SETTOOLTIPTEXTCOLOR )
 {
-   SendMessage( _s->hWndTT, TTM_SETTIPTEXTCOLOR, ( WPARAM ) ( COLORREF ) hb_parnl( 1 ), 0 );
+   COLORREF cr = SendMessage( _s->hWndTT, TTM_GETTIPTEXTCOLOR, 0, 0 );
+
+   if ( ISNUM( 1 ) )
+   {
+      SendMessage( _s->hWndTT, TTM_SETTIPTEXTCOLOR, ( WPARAM ) ( COLORREF ) hb_parnl( 1 ), 0 );
+   }
+
+   hb_retnl( ( COLORREF ) cr );
 }
 
 //-------------------------------------------------------------------//
@@ -1099,3 +1150,23 @@ HB_FUNC( WVT_GETMENU )
 
 //-------------------------------------------------------------------//
 
+HB_FUNC( WVT_SHOWWINDOW )
+{
+   ShowWindow( _s->hWnd, hb_parni( 1 ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_UPDATEWINDOW )
+{
+   UpdateWindow( _s->hWnd );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_DELETEOBJECT )
+{
+   hb_retl( DeleteObject( ( HANDLE ) hb_parnl( 1 ) ) );
+}
+
+//-------------------------------------------------------------------//

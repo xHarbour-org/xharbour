@@ -1,5 +1,5 @@
 /*
- * $Id: wvtclass.prg,v 1.1 2004/07/01 13:18:38 vouchcac Exp $
+ * $Id: wvtclass.prg,v 1.2 2004/07/15 03:22:01 vouchcac Exp $
  */
 
 /*
@@ -2517,7 +2517,7 @@ if ::nBarType == WVT_SCROLLBAR_VERT
    elseif ::nCurrent == ::nTotal
       nCurUnit := ::nScrollUnits
    endif
-   nNewPos     := ::nSTop  + nCurUnit
+   nNewPos     := ::nSTop + nCurUnit
 
    if nNewPos < ::nSTop
       nNewPos := ::nSTop
@@ -2530,7 +2530,7 @@ else
       nCurUnit := ::nCurrent * int( ::nScrollUnits / ::nTotal )
    else
       nRecPerUnit := ::nTotal / ::nScrollUnits
-        nCurUnit    := int( ::nCurrent / nRecPerUnit )
+      nCurUnit    := int( ::nCurrent / nRecPerUnit )
    endif
 
    if ::nCurrent == 1

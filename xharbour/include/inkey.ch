@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.ch,v 1.9 2004/06/06 18:33:23 bdj Exp $
+ * $Id: inkey.ch,v 1.10 2004/06/09 06:22:14 bdj Exp $
  */
 
 /*
@@ -87,9 +87,10 @@
 #define K_MMMIDDLEDOWN          1013   // Mouse Move Middle Down
 #define K_MWFORWARD             1014   // Mouse Wheel Forward
 #define K_MWBACKWARD            1015   // Mouse Wheel Backward
+#define K_NCMOUSEMOVE           1016   // Non-Client Area Mouse Movement
 
 #define K_MINMOUSE              1001
-#define K_MAXMOUSE              1015
+#define K_MAXMOUSE              1016
 
 /* Cursor movement keys */
 

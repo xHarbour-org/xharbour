@@ -155,6 +155,7 @@ PROCEDURE Main( cDSN )
 
    Wvt_SetFont( 'Courier New', 18, 0, 0 )
    Wvt_SetMouseMove( .t. )
+   Wvt_ShowWindow( SW_RESTORE )
 
    //  Force mouse pointer right below the xHarbour label
    //

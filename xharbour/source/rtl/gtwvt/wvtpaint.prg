@@ -1,5 +1,5 @@
 /*
- * $Id: wvtpaint.prg,v 1.1 2004/07/01 13:18:38 vouchcac Exp $
+ * $Id: wvtpaint.prg,v 1.2 2004/07/15 03:22:01 vouchcac Exp $
  */
 
 /*
@@ -105,8 +105,8 @@ if ( nBlocks := len( aBlocks ) ) > 0
                nRight := b:aColumnsSep[ len( b:aColumnsSep ) ]
                if !( tlbr_[ 1 ] <= aBlocks[ i,3,4 ] .and. ; // top   < bottom
                      tlbr_[ 3 ] >= aBlocks[ i,3,2 ] .and. ; // bootm > top
-                     tlbr_[ 2 ] <= nRight           .and. ; // left  < right
-                     tlbr_[ 4 ] >= nLeft                  ) // right > left
+                     tlbr_[ 2 ] <= nRight + 1       .and. ; // left  < right
+                     tlbr_[ 4 ] >= nLeft  - 1             ) // right > left
                   lExe := .f.
                endif
             endif

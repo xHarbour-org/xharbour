@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.112 2004/06/17 22:14:39 ronpinkas Exp $
+ * $Id: gtwvt.c,v 1.113 2004/07/15 03:22:01 vouchcac Exp $
  */
 
 /*
@@ -191,6 +191,7 @@ static void    hb_wvt_gtKillCaret( void );
 static void    hb_wvt_gtCreateCaret( void );
 static void    hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 static void    hb_wvt_gtCreateToolTipWindow( void );
+static void    hb_wvt_gtPaintRect( int iLeft, int iTop, int iRight, int iBottom );
 
 //-------------------------------------------------------------------//
 //
@@ -1712,6 +1713,86 @@ static void s_wvt_paintGraphicObjects( HDC hdc, RECT *updateRect )
 
 //-------------------------------------------------------------------//
 
+static void hb_wvt_gtPaintRect( int iLeft, int iTop, int iRight, int iBottom )
+{
+      PAINTSTRUCT ps;
+      HDC         hdc = _s.hdc;
+      USHORT      irow;
+      RECT        updateRect, rcRect;
+
+      updateRect.left   = iLeft;
+      updateRect.top    = iTop;
+      updateRect.right  = iRight;
+      updateRect.bottom = iBottom;
+
+//      hdc = BeginPaint( _s.hWnd, &ps );
+      SelectObject( hdc, _s.hFont );
+
+      if ( _s.pBuffer != NULL && _s.pAttributes != NULL )
+      {
+        rcRect   = hb_wvt_gtGetColRowFromXYRect( updateRect );
+        _s.rowStart = max( 0      , rcRect.top      );
+        _s.rowStop  = min( _s.ROWS, rcRect.bottom   );
+        _s.colStart = max( 0      , rcRect.left     );
+        _s.colStop  = min( _s.COLS, rcRect.right    );
+
+        for ( irow = _s.rowStart; irow < _s.rowStop; irow++ )
+        {
+          USHORT icol, index, startIndex, startCol, len;
+          BYTE   oldAttrib, attrib;
+
+          icol       = _s.colStart;
+          index      = hb_wvt_gtGetIndexForTextBuffer( icol, irow );
+          startIndex = index;
+          startCol   = icol;
+          len        = 0;
+          oldAttrib  = *( _s.pAttributes+index );
+
+          while ( icol < _s.colStop )
+          {
+            if ( index >= _s.BUFFERSIZE )
+            {
+              break;
+            }
+            attrib = *( _s.pAttributes+index );
+            if ( attrib != oldAttrib )
+            {
+              hb_wvt_gtSetColors( hdc, oldAttrib );
+              hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer+startIndex, len );
+              oldAttrib  = attrib;
+              startIndex = index;
+              startCol   = icol;
+              len        = 0;
+            }
+            icol++;
+            len++;
+            index++;
+          }
+          hb_wvt_gtSetColors( hdc, oldAttrib );
+          hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer+startIndex, len );
+        }
+        _s.rowStop -= 1;
+        _s.colStop -= 1;
+      }
+/*
+      if ( hb_gt_gobjects != NULL )
+      {
+         s_wvt_paintGraphicObjects( hdc, &updateRect );
+      }
+*/
+//      EndPaint( _s.hWnd, &ps );
+
+      if ( _s.pSymWVT_PAINT )
+      {
+         hb_vmPushSymbol( _s.pSymWVT_PAINT->pSymbol );
+         hb_vmPushNil();
+         hb_vmDo( 0 );
+         hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+      }
+}
+
+//-------------------------------------------------------------------//
+
 static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
   static BOOL bIgnoreWM_SYSCHAR = FALSE ;
@@ -1756,20 +1837,14 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       if ( _s.pBuffer != NULL && _s.pAttributes != NULL )
       {
         // need to account for truncation in conversion
-         // i.e. redraw any 'cell' partially covered...
-        rcRect   = hb_wvt_gtGetColRowFromXYRect( updateRect );
+        // i.e. redraw any 'cell' partially covered...
+        rcRect = hb_wvt_gtGetColRowFromXYRect( updateRect );
 
-        _s.rowStart = max( 0      , rcRect.top-1    );
-        _s.rowStop  = min( _s.ROWS, rcRect.bottom+1 );
-        _s.colStart = max( 0      , rcRect.left -1  );
-        _s.colStop  = min( _s.COLS, rcRect.right+1  );
+        _s.rowStart = max( 0      , rcRect.top    - 0 );
+        _s.rowStop  = min( _s.ROWS, rcRect.bottom + 1 );
+        _s.colStart = max( 0      , rcRect.left   - 0 );
+        _s.colStop  = min( _s.COLS, rcRect.right  + 1 );
 
-/*
-        _s.rowStart = max( 0      , rcRect.top      );
-        _s.rowStop  = min( _s.ROWS, rcRect.bottom   );
-        _s.colStart = max( 0      , rcRect.left     );
-        _s.colStop  = min( _s.COLS, rcRect.right    );
-*/
         for ( irow = _s.rowStart; irow < _s.rowStop; irow++ )
         {
           USHORT icol, index, startIndex, startCol, len;
@@ -1780,7 +1855,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           startIndex = index;
           startCol   = icol;
           len        = 0;
-          oldAttrib  = *( _s.pAttributes+index );
+          oldAttrib  = *( _s.pAttributes + index );
 
           /* attribute may change mid line...
           * so buffer up text with same attrib, and output it
@@ -1792,11 +1867,11 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
             {
               break;
             }
-            attrib = *( _s.pAttributes+index );
+            attrib = *( _s.pAttributes + index );
             if ( attrib != oldAttrib )
             {
               hb_wvt_gtSetColors( hdc, oldAttrib );
-              hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer+startIndex, len );
+              hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer + startIndex, len );
               oldAttrib  = attrib;
               startIndex = index;
               startCol   = icol;
@@ -1807,11 +1882,11 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
             index++;
           }
           hb_wvt_gtSetColors( hdc, oldAttrib );
-          hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer+startIndex, len );
+          hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer + startIndex, len );
         }
         //  Update for real values for Wvt_GetPaintRect()
-//        _s.rowStop  -= 1;
-//        _s.colStop  -= 1;
+        _s.rowStop  -= 1;
+        _s.colStop  -= 1;
       }
 
       if ( hb_gt_gobjects != NULL )
@@ -2249,6 +2324,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
     case WM_MBUTTONDBLCLK:
     case WM_MOUSEMOVE:
     case WM_MOUSEWHEEL:
+    case WM_NCMOUSEMOVE:
     {
        hb_wvt_gtMouseEvent( hWnd, message, wParam, lParam );
        return( 0 );
@@ -2319,9 +2395,19 @@ static HWND hb_wvt_gtCreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                   TEXT( "XHARBOUR_WVT" ), MB_ICONERROR );
   }
 
-  ShowWindow( hWnd, iCmdShow );
 
+  // If you wish to show window the way you want
+  // compile gtwvt.c with -D__WIN_NOSHOW_STARTUP__
+  // If so compiled, then you need to issue Wvt_ShowWindow( SW_RESTORE )
+  // Somewhere in your code.
+  //
+  #if defined( __WIN_NOSHOW_STARTUP__ )
+     iCmdShow = SW_HIDE;
+  #endif
+
+  ShowWindow( hWnd, iCmdShow );
   UpdateWindow( hWnd );
+
   return( hWnd ) ;
 }
 
@@ -2636,13 +2722,12 @@ static BOOL hb_wvt_gtTextOut( HDC hdc,  USHORT col, USHORT row, LPCTSTR lpString
   long nFontCX = _s.PTEXTSIZE.x;
   long nFontCY = _s.PTEXTSIZE.y;
 
-
   if ( cbString > _s.COLS ) // make sure string is not too long
   {
     cbString = _s.COLS;
   }
   xy = hb_wvt_gtGetXYFromColRow( col, row );
-  SetRect(&rClip, xy.x, xy.y, xy.x+cbString*nFontCX, xy.y+nFontCY);
+  SetRect( &rClip, xy.x, xy.y, xy.x + cbString * nFontCX, xy.y + nFontCY );
   if ( _s.FixedFont )
   {
     Result = ExtTextOut( hdc, xy.x, xy.y, ETO_CLIPPED|ETO_OPAQUE, &rClip, lpString,cbString, NULL );
@@ -2650,7 +2735,7 @@ static BOOL hb_wvt_gtTextOut( HDC hdc,  USHORT col, USHORT row, LPCTSTR lpString
   }
   else
   {
-    Result = ExtTextOut( hdc, xy.x, xy.y, ETO_CLIPPED|ETO_OPAQUE, &rClip, lpString,cbString, _s.FixedSize );
+    Result = ExtTextOut( hdc, xy.x, xy.y, ETO_CLIPPED|ETO_OPAQUE, &rClip, lpString, cbString, _s.FixedSize );
 //    Result = ExtTextOut( hdc, xy.x, xy.y, 0, NULL, lpString, cbString, _s.FixedSize ) ;
   }
   return( Result ) ;
@@ -2693,11 +2778,12 @@ static void hb_wvt_gtSetInvalidRect( USHORT left, USHORT top, USHORT right, USHO
 
     // check for wrapping
     //
-    rect.left = min( rect.left, rect.right );
-    rect.top  = min( rect.top, rect.bottom );
+    rect.left   = min( rect.left, rect.right );
+    rect.top    = min( rect.top, rect.bottom );
 
     rect.right  = max( rect.left, rect.right );
     rect.bottom = max( rect.top, rect.bottom );
+
     if ( _s.RectInvalid.left < 0 )
     {
       memcpy( &_s.RectInvalid, &rect, sizeof( RECT ) );
@@ -2720,9 +2806,12 @@ static void hv_wvt_gtDoInvalidateRect( void )
 {
   if ( HB_GT_FUNC( gt_DispCount() ) <= 0 && ( _s.RectInvalid.left != -1 ) )
   {
-    InvalidateRect( _s.hWnd, &_s.RectInvalid, TRUE );
+     // InvalidateRect( _s.hWnd, &_s.RectInvalid, TRUE );
+    InvalidateRect( _s.hWnd, &_s.RectInvalid, FALSE );
     _s.RectInvalid.left = -1 ;
     hb_wvt_gtProcessMessages();
+
+    // hb_wvt_gtPaintRect( _s.RectInvalid.left, _s.RectInvalid.top, _s.RectInvalid.right, _s.RectInvalid.bottom );
   }
 }
 
@@ -2999,7 +3088,7 @@ static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
   }
   else
   {
-    if ( message == WM_MOUSEMOVE )
+    if ( message == WM_MOUSEMOVE || message == WM_NCMOUSEMOVE )
     {
       if ( ! _s.MouseMove )
       {
@@ -3099,6 +3188,12 @@ static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
            keyCode = K_MWBACKWARD;
         }
         break;
+
+      case WM_NCMOUSEMOVE:
+         {
+            keyCode = K_NCMOUSEMOVE;
+         }
+         break;
     }
 
     if ( _s.pSymWVT_MOUSE && keyCode != 0 )
