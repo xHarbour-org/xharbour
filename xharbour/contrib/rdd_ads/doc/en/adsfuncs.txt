@@ -1,5 +1,5 @@
 /*
- * $Id: adsfuncs.txt,v 1.4 2003/11/04 09:54:50 brianhays Exp $
+ * $Id: adsfuncs.txt,v 1.5 2003/11/08 06:17:29 brianhays Exp $
  */
 
 /*
@@ -577,17 +577,15 @@
  *         ADS_RESPECTFILTERS   Respect filters and scopes
  *         ADS_IGNOREFILTERS    Ignore filters and scopes
  *         ADS_RESPECTSCOPES    Respect scopes only
-        </table>
+ *      </table>
  *  $RETURNS$
  *      <nKeyNo>   The logical key number of the current record in the given index.
  *  $DESCRIPTION$
  *      See ACE.HLP for full details about the Advantage Database Server.</par>
  *      Wrapper for AdsGetKeyNum. </par>
-        This function may be slow on a large database with
-        ADS_RESPECTFILTERS set because it walks through the keys to get the
-        current position.  Compare to ADSGetRelKeyPos().
- *  $EXAMPLES$
- *  $TESTS$
+ *      This function may be slow on a large database with
+ *      ADS_RESPECTFILTERS set because it walks through the keys to get the
+ *      current position.  Compare to ADSGetRelKeyPos().
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
@@ -716,7 +714,6 @@
  *      DLLs doing all the indexing. So to do progress meters
  *      you need to implement this.
  *  $EXAMPLES$
- *       <table>
  *       FUNCTION Main()
  *          ...
  *          AdsRegCallBack( {|nPercent| outputstuff(nPercent)}  )
@@ -731,7 +728,6 @@
  *          ? "output stuff", nPercent
  *       RETURN inkey() == 27
  *       /*  If press ESC, returns .T. to abort.   */
- *      </table>
  *  $STATUS$
  *      R
  *  $COMPLIANCE$

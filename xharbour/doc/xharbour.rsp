@@ -136,5 +136,10 @@ en\indirect.txt
 ..\contrib\libct\dbftools.c
 ..\contrib\libct\time.prg
 ..\contrib\libct\setlast.c
+..\contrib\libct\settime.c
+..\contrib\libct\diskutil.prg
+..\contrib\libct\util.prg
+..\contrib\libct\disk.c
+..\contrib\libct\dattime3.prg
 ..\contrib\rdd_ads\doc\en\readme.txt
 ..\contrib\rdd_ads\doc\en\adsfuncs.txt
