@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1987 2004/01/04 13:19:25 lculik Exp $
+ * $Id: ChangeLog,v 1.1988 2004/01/04 16:39:01 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-05 09:12 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+   + remove if (attr!=' ') test from hb_wvt_gtSetColors()
 
 2004-01-04 11:37 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gtwin/gtwin.c
@@ -19,7 +22,7 @@
   * contrib/libct/Makefile.bc
     contrib/libct/Makefile.vc
     contrib/libct/Makefile
-    ! updated makefiles to include net.c 
+    ! updated makefiles to include net.c
 
 2004-01-03 20:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * makefile.nt
