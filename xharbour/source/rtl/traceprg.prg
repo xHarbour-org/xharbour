@@ -1,5 +1,5 @@
 /*
- * $Id: traceprg.prg,v 1.11 2003/11/10 00:59:32 fsgiudice Exp $
+ * $Id: traceprg.prg,v 1.12 2003/11/12 14:19:01 jonnymind Exp $
  */
 
 /*
@@ -63,6 +63,10 @@ FUNCTION TraceLog( ... )
       RETURN .T.
    ENDIF
 
+   /* File() and FOpen()/FCreate() make different assumptions rgdg path,
+      so we have to make sure cFile contains path to avoid ambiguity */
+   cFile := cWithPath( cFile )
+
    IF File( cFile )
       FileHandle := FOpen( cFile, 1 )
    ELSE
@@ -97,3 +101,8 @@ RETURN .T.
 //--------------------------------------------------------------//
 
 
+static function cWithPath(cFilename)
+/* Ensure cFilename contains path. If it doesn't, add current directory to the front of it */
+   local cPath
+   hb_fnamesplit(cFilename, @cPath)
+return iif(empty(cPath), "." + hb_ospathseparator(), "") + cFilename
