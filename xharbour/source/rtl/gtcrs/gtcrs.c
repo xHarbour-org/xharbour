@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.6 2003/05/19 12:46:26 druzus Exp $
+ * $Id: gtcrs.c,v 1.7 2003/05/21 09:35:36 druzus Exp $
  */
 
 /*
@@ -176,6 +176,7 @@ typedef struct InOutBase {
     chtype std_chmap[256];
     chtype box_chmap[256];
     chtype attr_map[256];
+    chtype attr_mask;
 } InOutBase;
 
 static InOutBase *s_ioBase = NULL;
@@ -1644,7 +1645,7 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
 	    ioBase->out_transtbl[i] = ch;
 	}
     }
-
+    ioBase->attr_mask = ~A_BLINK;
     if( has_colors() ) {
         /*  DOS->CURSES color maping
           DOS              -> curses
@@ -2117,7 +2118,7 @@ BOOL HB_GT_FUNC(gt_GetBlink( void ))
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetBlink()"));
 
     /* TODO: current implementation disables blinking/intensity */
-    return FALSE;
+    return ( s_ioBase->attr_mask & A_BLINK ) ? TRUE : FALSE;
 }
 
 /* *********************************************************************** */
@@ -2127,7 +2128,12 @@ void HB_GT_FUNC(gt_SetBlink( BOOL bBlink ))
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetBlink(%d)", (int) bBlink));
 
     /* TODO: current implementation disables blinking/intensity */
-    HB_SYMBOL_UNUSED( bBlink );
+/*
+    if ( bBlink )
+        s_ioBase->attr_mask |= A_BLINK;
+    else
+        s_ioBase->attr_mask &= ~A_BLINK;
+*/
 }
 
 /* *********************************************************************** */
@@ -2298,7 +2304,7 @@ void HB_GT_FUNC(gt_PutText( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT
 
 void HB_GT_FUNC(gt_SetAttribute( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr ))
 {
-    int newAttr = s_ioBase->attr_map[ byAttr ];
+    int newAttr = s_ioBase->attr_map[ byAttr ] & s_ioBase->attr_mask;
     int dx;
     chtype c;
 
@@ -2329,7 +2335,7 @@ void HB_GT_FUNC(gt_Puts( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE * pbyStr,
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_Puts(%hu, %hu, %d, %p, %lu)", uiRow, uiCol, (int) byAttr, pbyStr, ulLen));
 
-    attr = s_ioBase->attr_map[ byAttr ];
+    attr = s_ioBase->attr_map[ byAttr ] & s_ioBase->attr_mask;
     wmove( s_ioBase->stdscr, uiRow, uiCol );
 
     for( i = 0; i < ulLen; ++i )
@@ -2347,7 +2353,8 @@ void HB_GT_FUNC(gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byCh
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_Replicate(%hu, %hu, %i, %i, %lu)", uiRow, uiCol, byAttr, byChar, ulLen));
 
-    ch = s_ioBase->box_chmap[ byChar ] | s_ioBase->attr_map[ byAttr ];
+    ch = s_ioBase->box_chmap[ byChar ] | 
+         ( s_ioBase->attr_map[ byAttr ] & s_ioBase->attr_mask );
     wmove( s_ioBase->stdscr, uiRow, uiCol );
 
     while( ulLen-- )
@@ -2456,7 +2463,7 @@ USHORT HB_GT_FUNC(gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
         }
 
 	/* get color attribute */
-	chAttr = s_ioBase->attr_map[ byAttr ];
+	chAttr = s_ioBase->attr_map[ byAttr ] & s_ioBase->attr_mask;
 
         /* Draw the box or line as specified */
         Height = Bottom - Top + 1;
@@ -2610,7 +2617,8 @@ USHORT HB_GT_FUNC(gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar,
 	    uCols = Left - Right + 1;
 	}
 
-	ch = s_ioBase->box_chmap[ byChar ] | s_ioBase->attr_map[ byAttr ];
+	ch = s_ioBase->box_chmap[ byChar ] | 
+	     ( s_ioBase->attr_map[ byAttr ] & s_ioBase->attr_mask );
 	while( uCols-- )
             waddch( s_ioBase->stdscr, ch );
 
@@ -2656,7 +2664,8 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, 
             Bottom = Top;
         }
 
-	ch = s_ioBase->box_chmap[ byChar ] | s_ioBase->attr_map[ byAttr ];
+	ch = s_ioBase->box_chmap[ byChar ] |
+	     ( s_ioBase->attr_map[ byAttr ] & s_ioBase->attr_mask );
 
         while( uRow <= Bottom )
             mvwaddch( s_ioBase->stdscr, uRow++, Col, ch );

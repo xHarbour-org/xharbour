@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: chrmap.c,v 1.1 2003/05/16 19:52:09 druzus Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ static int get_val(char **buf)
 
     if ((*buf)[0] == '\'' && (*buf)[1] != '\0' && (*buf)[2] == '\'')
     {
-	n = (*buf)[1];
+	n = (*buf)[1] & 0xff;
 	*buf+=3;
     }
     else if ((*buf)[0] == '0' && ((*buf)[1] == 'x' || (*buf)[1] == 'X') )
@@ -103,7 +103,7 @@ static int get_val(char **buf)
 static int parse_line(char *buf, int *from, int *to, char *op, int *val, int *mod)
 {
     char *s;
-    int ret = 0;
+    int ret = 0, ina = 0;
 
     s = buf;
     while ( *s != '\0' )
@@ -114,7 +114,9 @@ static int parse_line(char *buf, int *from, int *to, char *op, int *val, int *mo
 		*s = ' ';
 		break;
 	    case '\'':
-		++s;
+		ina ^= 1;
+		if( ina )
+		    ++s;
 		break;
 	    case '\n':
 	    case '\r':
@@ -312,7 +314,7 @@ int main(int argc, char **argv)
 {
     int piTransTbl[256], i;
     
-    if ( HB_GT_FUNC(gt_chrmapinit( piTransTbl )) == -1 )
+    if ( HB_GT_FUNC(gt_chrmapinit( piTransTbl, NULL )) == -1 )
     {
 	printf("cannot init charmap.\n");
 	exit(1);

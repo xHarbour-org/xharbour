@@ -1,5 +1,5 @@
 #
-# $Id$
+# $Id: hb-charmap.def,v 1.2 2003/05/17 15:55:18 druzus Exp $
 #
 
 #=============================================================================
@@ -42,6 +42,7 @@
 #-----------------------------------------------------------------------------
 :linux|fslinux|console|vt100|vt102|vt320 = Linux system console and VT terms
     0-31:       42      3
+
 # display semigraphics chars as ACSC ones
     16:         '+'     5	# ACS_RARROW
     17:         ','     5	# ACS_LARROW
