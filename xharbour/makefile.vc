@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.103 2004/07/01 13:18:35 vouchcac Exp $
+# $Id: makefile.vc,v 1.104 2004/07/02 13:00:59 paultucker Exp $
 #
 
 #
@@ -980,10 +980,10 @@ GTWIN_LIB_OBJS = \
 {$(RTL_DIR)\gtwvt}.c{$(OBJ_DIR)}.obj:
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
-{$(RTL_DIR)\gtwvt}.prg{$(OBJ_DIR)}.c::
+{$(RTL_DIR)\gtwvt}.prg{$(OBJ_DIR)}.c:
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
 
-{$(RTL_DIR)\gtwvt}.prg{$(OBJ_DIR)}.obj::
+{$(RTL_DIR)\gtwvt}.prg{$(OBJ_DIR)}.obj:
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $*.c
 
