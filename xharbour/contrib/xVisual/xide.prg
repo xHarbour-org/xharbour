@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.137 2002/12/31 08:17:13 what32 Exp $
+ * $Id: xide.prg,v 1.138 2003/01/09 08:22:46 what32 Exp $
  */
 
 /*
@@ -110,18 +110,14 @@ METHOD MainMenu() CLASS MainForm
    LOCAL oItem, oSubItem, oMenu
 
    oMenu := TMainMenu():Create( Self )
-   oMenu:GetHandle()
 
       oItem := TMenuItem():Create( oMenu )
       oItem:Caption := "File"
-      oItem:AppendTo( oMenu )
+      oItem:AppendTo( oMenu:Handle )
    
-         oSubItem := TMenuItem():Create( oItem )
-         oSubItem:Caption := "New"
-         oItem:Add( oSubItem )
-
-      oMenu:Items:Add( oItem )
-   
+         oSubItem := TMenuItem():Create( oMenu )
+         oSubItem:Caption := "Exit"
+         oSubItem:AppendTo( oItem:Handle )
 
    ::SetMenu( oMenu )
 /*
@@ -131,14 +127,10 @@ METHOD MainMenu() CLASS MainForm
 /*
    oMenuItem := TMenuItem():Create( oPopup )
    oMenuItem:Caption := "Editor"
-//   oMenuItem:Command := 101
-//   oMenuItem:OnClick := {||Application:CreateForm( TFormEdit(), @FormEdit ) }
    oMenuItem:AppendTo( oPopup:Handle )
 
    oMenuItem := TMenuItem():Create( oPopup )
    oMenuItem:Caption := "Open"
-//   oMenuItem:Command := 102
-//   oMenuItem:OnClick := {|| OpenProject():Create() }
    oMenuItem:AppendTo( oPopup:Handle )
 
    oMenuItem := TMenuItem():Create( Self )
@@ -147,20 +139,8 @@ METHOD MainMenu() CLASS MainForm
 
    oMenuItem := TMenuItem():Create( oPopup )
    oMenuItem:Caption := "Exit"
-//   oMenuItem:Command := 200
-//   oMenuItem:OnClick := {||MainForm:PostMessage( WM_SYSCOMMAND, SC_CLOSE )}
    oMenuItem:AppendTo( oPopup:Handle )
 
-   //With Object ::WindowMenu
-   //   :AddPopup('&Test')
-   //   With Object :Popup
-   //      :AddItem( 'Editor', 101, {||Application:CreateForm( @FormEdit, TFormEdit(), MainForm ) } )
-   //      :AddItem( 'Open', 102, {|| OpenProject():Create() } )
-   //      :AddSeparator()
-   //      :AddItem( 'Exit'  , 200, {||MainForm:PostMessage(WM_SYSCOMMAND,SC_CLOSE)} )
-   //   end
-   //end
-   //::SetWindowMenu()
 */
 RETURN Self
 

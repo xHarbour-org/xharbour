@@ -96,7 +96,7 @@ typedef struct {;
     LPARAM  lParam;
     int     iImage;
     int     iOrder;
-} HDITEM, FAR * LPHDITEM
+} HDITEM
 
 typedef struct { ;
     RECT    *prc;

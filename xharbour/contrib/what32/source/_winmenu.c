@@ -339,14 +339,11 @@ HB_FUNC( GETMENUITEMINFO )
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI SetMenuItemInfoA( IN HMENU, IN UINT, IN BOOL, IN LPCMENUITEMINFOA );
 
-/*
+
 
 HB_FUNC( SETMENUITEMINFO )
 {
-   LPCMENUITEMINFOA lpcmenuitemInfoa ;
-
-   // Your code goes here
-
+   LPCMENUITEMINFOA lpcmenuitemInfoa =(LPCMENUITEMINFOA) hb_param( 4, HB_IT_STRING )->item.asString.value;
    hb_retl( SetMenuItemInfo( (HMENU) hb_parnl( 1 ),
                              (UINT) hb_parni( 2 ) ,
                              hb_parl( 3 )         ,
@@ -354,7 +351,7 @@ HB_FUNC( SETMENUITEMINFO )
                            ) ) ;
 }
 
-*/
+
 
 
 //-----------------------------------------------------------------------------

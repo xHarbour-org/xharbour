@@ -1875,23 +1875,23 @@
 // end_r_commctrl
 
 #define LVM_SETUNICODEFORMAT     CCM_SETUNICODEFORMAT
-#define ListView_SetUnicodeFormat(hwnd, fUnicode)  \
+//#define ListView_SetUnicodeFormat(hwnd, fUnicode)  \
 
 
 #define LVM_GETUNICODEFORMAT     CCM_GETUNICODEFORMAT
-#define ListView_GetUnicodeFormat(hwnd)  \
+//#define ListView_GetUnicodeFormat(hwnd)  \
 
 
 #define LVM_GETBKCOLOR          (LVM_FIRST + 0)
-#define ListView_GetBkColor(hwnd)  \
+//#define ListView_GetBkColor(hwnd)  \
 
 
 #define LVM_SETBKCOLOR          (LVM_FIRST + 1)
-#define ListView_SetBkColor(hwnd, clrBk) \
+//#define ListView_SetBkColor(hwnd, clrBk) \
 
 
 #define LVM_GETIMAGELIST        (LVM_FIRST + 2)
-#define ListView_GetImageList(hwnd, iImageList) \
+//#define ListView_GetImageList(hwnd, iImageList) \
 
 
 #define LVSIL_NORMAL            0
@@ -1899,11 +1899,11 @@
 #define LVSIL_STATE             2
 
 #define LVM_SETIMAGELIST        (LVM_FIRST + 3)
-#define ListView_SetImageList(hwnd, himl, iImageList) \
+//#define ListView_SetImageList(hwnd, himl, iImageList) \
 
 
 #define LVM_GETITEMCOUNT        (LVM_FIRST + 4)
-#define ListView_GetItemCount(hwnd) \
+//#define ListView_GetItemCount(hwnd) \
 
 
 #define LVIF_TEXT                    1
@@ -1964,7 +1964,7 @@
 #define LVM_GETITEM             LVM_GETITEMA
 #endif
 
-#define ListView_GetItem(hwnd, pitem) \
+//#define ListView_GetItem(hwnd, pitem) \
 
 
 #define LVM_SETITEMA            (LVM_FIRST + 6)
@@ -1975,7 +1975,7 @@
 #define LVM_SETITEM             LVM_SETITEMA
 #endif
 
-#define ListView_SetItem(hwnd, pitem) \
+//#define ListView_SetItem(hwnd, pitem) \
 
 
 #define LVM_INSERTITEMA         (LVM_FIRST + 7)
@@ -1985,23 +1985,23 @@
 #else
 #define LVM_INSERTITEM          LVM_INSERTITEMA
 #endif
-#define ListView_InsertItem(hwnd, pitem)   \
+//#define ListView_InsertItem(hwnd, pitem)   \
 
 
 #define LVM_DELETEITEM          (LVM_FIRST + 8)
-#define ListView_DeleteItem(hwnd, i) \
+//#define ListView_DeleteItem(hwnd, i) \
 
 
 #define LVM_DELETEALLITEMS      (LVM_FIRST + 9)
-#define ListView_DeleteAllItems(hwnd) \
+//#define ListView_DeleteAllItems(hwnd) \
 
 
 #define LVM_GETCALLBACKMASK     (LVM_FIRST + 10)
-#define ListView_GetCallbackMask(hwnd) \
+//#define ListView_GetCallbackMask(hwnd) \
 
 
 #define LVM_SETCALLBACKMASK     (LVM_FIRST + 11)
-#define ListView_SetCallbackMask(hwnd, mask) \
+//#define ListView_SetCallbackMask(hwnd, mask) \
 
 
 #define LVNI_ALL                     0
@@ -2017,7 +2017,7 @@
 
 
 #define LVM_GETNEXTITEM         (LVM_FIRST + 12)
-#define ListView_GetNextItem(hwnd, i, flags) \
+//#define ListView_GetNextItem(hwnd, i, flags) \
 
 
 #define LVFI_PARAM                   1
@@ -2046,7 +2046,7 @@
 #define  LVM_FINDITEM           LVM_FINDITEMA
 #endif
 
-#define ListView_FindItem(hwnd, iStart, plvfi) \
+//#define ListView_FindItem(hwnd, iStart, plvfi) \
 
 
 #define LVIR_BOUNDS             0
@@ -2056,15 +2056,15 @@
 
 
 #define LVM_GETITEMRECT         (LVM_FIRST + 14)
-#define ListView_GetItemRect(hwnd, i, prc, code) \
+//#define ListView_GetItemRect(hwnd, i, prc, code) \
 
 
 #define LVM_SETITEMPOSITION     (LVM_FIRST + 15)
-#define ListView_SetItemPosition(hwndLV, i, x, y) \
+//#define ListView_SetItemPosition(hwndLV, i, x, y) \
 
 
 #define LVM_GETITEMPOSITION     (LVM_FIRST + 16)
-#define ListView_GetItemPosition(hwndLV, i, ppt) \
+//#define ListView_GetItemPosition(hwndLV, i, ppt) \
 
 
 #define LVM_GETSTRINGWIDTHA     (LVM_FIRST + 17)
@@ -2075,7 +2075,7 @@
 #define  LVM_GETSTRINGWIDTH     LVM_GETSTRINGWIDTHA
 #endif
 
-#define ListView_GetStringWidth(hwndLV, psz) \
+//#define ListView_GetStringWidth(hwndLV, psz) \
 
 
 #define LVHT_NOWHERE                 1
@@ -2095,19 +2095,19 @@
 
 
 #define LVM_HITTEST             (LVM_FIRST + 18)
-#define ListView_HitTest(hwndLV, pinfo) \
+//#define ListView_HitTest(hwndLV, pinfo) \
 
 
 #define LVM_ENSUREVISIBLE       (LVM_FIRST + 19)
-#define ListView_EnsureVisible(hwndLV, i, fPartialOK) \
+//#define ListView_EnsureVisible(hwndLV, i, fPartialOK) \
 
 
 #define LVM_SCROLL              (LVM_FIRST + 20)
-#define ListView_Scroll(hwndLV, dx, dy) \
+//#define ListView_Scroll(hwndLV, dx, dy) \
 
 
 #define LVM_REDRAWITEMS         (LVM_FIRST + 21)
-#define ListView_RedrawItems(hwndLV, iFirst, iLast) \
+//#define ListView_RedrawItems(hwndLV, iFirst, iLast) \
 
 
 #define LVA_DEFAULT                  0
@@ -2116,7 +2116,7 @@
 #define LVA_SNAPTOGRID               5
 
 #define LVM_ARRANGE             (LVM_FIRST + 22)
-#define ListView_Arrange(hwndLV, code) \
+//#define ListView_Arrange(hwndLV, code) \
 
 
 #define LVM_EDITLABELA          (LVM_FIRST + 23)
@@ -2127,11 +2127,11 @@
 #define LVM_EDITLABEL           LVM_EDITLABELA
 #endif
 
-#define ListView_EditLabel(hwndLV, i) \
+//#define ListView_EditLabel(hwndLV, i) \
 
 
 #define LVM_GETEDITCONTROL      (LVM_FIRST + 24)
-#define ListView_GetEditControl(hwndLV) \
+//#define ListView_GetEditControl(hwndLV) \
 
 
 #define LV_COLUMNA      LVCOLUMNA
@@ -2178,7 +2178,7 @@
 #define  LVM_GETCOLUMN          LVM_GETCOLUMNA
 #endif
 
-#define ListView_GetColumn(hwnd, iCol, pcol) \
+//#define ListView_GetColumn(hwnd, iCol, pcol) \
 
 
 #define LVM_SETCOLUMNA          (LVM_FIRST + 26)
@@ -2189,73 +2189,73 @@
 #define  LVM_SETCOLUMN          LVM_SETCOLUMNA
 #endif
 
-#define ListView_SetColumn(hwnd, iCol, pcol) \
+//#define ListView_SetColumn(hwnd, iCol, pcol) \
 
 
 #define LVM_INSERTCOLUMNA       (LVM_FIRST + 27)
 #define LVM_INSERTCOLUMNW       (LVM_FIRST + 97)
 
-#define ListView_InsertColumn(hwnd, iCol, pcol) \
+//#define ListView_InsertColumn(hwnd, iCol, pcol) \
 
 
 #define LVM_DELETECOLUMN        (LVM_FIRST + 28)
-#define ListView_DeleteColumn(hwnd, iCol) \
+//#define ListView_DeleteColumn(hwnd, iCol) \
 
 
 #define LVM_GETCOLUMNWIDTH      (LVM_FIRST + 29)
-#define ListView_GetColumnWidth(hwnd, iCol) \
+//#define ListView_GetColumnWidth(hwnd, iCol) \
 
 
 #define LVSCW_AUTOSIZE              -1
 #define LVSCW_AUTOSIZE_USEHEADER    -2
 #define LVM_SETCOLUMNWIDTH          (LVM_FIRST + 30)
 
-#define ListView_SetColumnWidth(hwnd, iCol, cx) \
+//#define ListView_SetColumnWidth(hwnd, iCol, cx) \
 
 
 #define LVM_GETHEADER               (LVM_FIRST + 31)
-#define ListView_GetHeader(hwnd)\
+//#define ListView_GetHeader(hwnd)\
 
 #define LVM_CREATEDRAGIMAGE     (LVM_FIRST + 33)
-#define ListView_CreateDragImage(hwnd, i, lpptUpLeft) \
+//#define ListView_CreateDragImage(hwnd, i, lpptUpLeft) \
 
 #define LVM_GETVIEWRECT         (LVM_FIRST + 34)
-#define ListView_GetViewRect(hwnd, prc) \
+//#define ListView_GetViewRect(hwnd, prc) \
 
 #define LVM_GETTEXTCOLOR        (LVM_FIRST + 35)
-#define ListView_GetTextColor(hwnd)  \
+//#define ListView_GetTextColor(hwnd)  \
 
 #define LVM_SETTEXTCOLOR        (LVM_FIRST + 36)
-#define ListView_SetTextColor(hwnd, clrText) \
+//#define ListView_SetTextColor(hwnd, clrText) \
 
 #define LVM_GETTEXTBKCOLOR      (LVM_FIRST + 37)
-#define ListView_GetTextBkColor(hwnd)  \
+//#define ListView_GetTextBkColor(hwnd)  \
 
 #define LVM_SETTEXTBKCOLOR      (LVM_FIRST + 38)
-#define ListView_SetTextBkColor(hwnd, clrTextBk) \
+//#define ListView_SetTextBkColor(hwnd, clrTextBk) \
 
 #define LVM_GETTOPINDEX         (LVM_FIRST + 39)
-#define ListView_GetTopIndex(hwndLV) \
+//#define ListView_GetTopIndex(hwndLV) \
 
 #define LVM_GETCOUNTPERPAGE     (LVM_FIRST + 40)
-#define ListView_GetCountPerPage(hwndLV) \
+//#define ListView_GetCountPerPage(hwndLV) \
 
 #define LVM_GETORIGIN           (LVM_FIRST + 41)
-#define ListView_GetOrigin(hwndLV, ppt) \
+//#define ListView_GetOrigin(hwndLV, ppt) \
 
 #define LVM_UPDATE              (LVM_FIRST + 42)
-#define ListView_Update(hwndLV, i) \
+//#define ListView_Update(hwndLV, i) \
 
 #define LVM_SETITEMSTATE        (LVM_FIRST + 43)
-#define ListView_SetItemState(hwndLV, i, data, mask) \
+//#define ListView_SetItemState(hwndLV, i, data, mask) \
 
-#define ListView_SetCheckState(hwndLV, i, fCheck) \
+//#define ListView_SetCheckState(hwndLV, i, fCheck) \
 
 #define LVM_GETITEMSTATE        (LVM_FIRST + 44)
-#define ListView_GetItemState(hwndLV, i, mask) \
+//#define ListView_GetItemState(hwndLV, i, mask) \
 
 
-#define ListView_GetCheckState(hwndLV, i) \
+//#define ListView_GetCheckState(hwndLV, i) \
 
 #define LVM_GETITEMTEXTA        (LVM_FIRST + 45)
 #define LVM_GETITEMTEXTW        (LVM_FIRST + 115)
@@ -2266,7 +2266,7 @@
 #define  LVM_GETITEMTEXT        LVM_GETITEMTEXTA
 #endif
 
-#define ListView_GetItemText(hwndLV, i, iSubItem_, pszText_, cchTextMax_) \
+//#define ListView_GetItemText(hwndLV, i, iSubItem_, pszText_, cchTextMax_) \
 
 
 #define LVM_SETITEMTEXTA        (LVM_FIRST + 46)
@@ -2278,7 +2278,7 @@
 #define  LVM_SETITEMTEXT        LVM_SETITEMTEXTA
 #endif
 
-#define ListView_SetItemText(hwndLV, i, iSubItem_, pszText_) \
+//#define ListView_SetItemText(hwndLV, i, iSubItem_, pszText_) \
 
 
 // these flags only apply to LVS_OWNERDATA listviews in report or list mode
@@ -2286,26 +2286,26 @@
 #define LVSICF_NOSCROLL                  2
 
 #define LVM_SETITEMCOUNT        (LVM_FIRST + 47)
-#define ListView_SetItemCount(hwndLV, cItems) \
+//#define ListView_SetItemCount(hwndLV, cItems) \
 
 
-#define ListView_SetItemCountEx(hwndLV, cItems, dwFlags) \
+//#define ListView_SetItemCountEx(hwndLV, cItems, dwFlags) \
 
 
 #define LVM_SORTITEMS           (LVM_FIRST + 48)
-#define ListView_SortItems(hwndLV, _pfnCompare, _lPrm) \
+//#define ListView_SortItems(hwndLV, _pfnCompare, _lPrm) \
 
 
 #define LVM_SETITEMPOSITION32   (LVM_FIRST + 49)
-#define ListView_SetItemPosition32(hwndLV, i, x0, y0) \
+//#define ListView_SetItemPosition32(hwndLV, i, x0, y0) \
 
 
 #define LVM_GETSELECTEDCOUNT    (LVM_FIRST + 50)
-#define ListView_GetSelectedCount(hwndLV) \
+//#define ListView_GetSelectedCount(hwndLV) \
 
 
 #define LVM_GETITEMSPACING      (LVM_FIRST + 51)
-#define ListView_GetItemSpacing(hwndLV, fSmall) \
+//#define ListView_GetItemSpacing(hwndLV, fSmall) \
 
 
 #define LVM_GETISEARCHSTRINGA   (LVM_FIRST + 52)
@@ -2317,22 +2317,22 @@
 #define LVM_GETISEARCHSTRING    LVM_GETISEARCHSTRINGA
 #endif
 
-#define ListView_GetISearchString(hwndLV, lpsz) \
+//#define ListView_GetISearchString(hwndLV, lpsz) \
 
 
 #define LVM_SETICONSPACING      (LVM_FIRST + 53)
 // -1 for cx and cy means we'll use the default (system settings)
 // 0 for cx or cy means use the current setting (allows you to change just one param)
-#define ListView_SetIconSpacing(hwndLV, cx, cy) \
+//#define ListView_SetIconSpacing(hwndLV, cx, cy) \
 
 
 #define LVM_SETEXTENDEDLISTVIEWSTYLE (LVM_FIRST + 54)   // optional wParam == mask
-#define ListView_SetExtendedListViewStyle(hwndLV, dw)\
+//#define ListView_SetExtendedListViewStyle(hwndLV, dw)\
 
-#define ListView_SetExtendedListViewStyleEx(hwndLV, dwMask, dw)\
+//#define ListView_SetExtendedListViewStyleEx(hwndLV, dwMask, dw)\
 
 #define LVM_GETEXTENDEDLISTVIEWSTYLE (LVM_FIRST + 55)
-#define ListView_GetExtendedListViewStyle(hwndLV)\
+//#define ListView_GetExtendedListViewStyle(hwndLV)\
 
 
 #define LVS_EX_GRIDLINES                 1
@@ -2353,79 +2353,79 @@
 #define LVS_EX_LABELTIP              16384 // listview unfolds partly hidden labels if it does not have infotip text
 
 #define LVM_GETSUBITEMRECT      (LVM_FIRST + 56)
-#define ListView_GetSubItemRect(hwnd, iItem, iSubItem, code, prc) \
+//#define ListView_GetSubItemRect(hwnd, iItem, iSubItem, code, prc) \
 
 
 #define LVM_SUBITEMHITTEST      (LVM_FIRST + 57)
-#define ListView_SubItemHitTest(hwnd, plvhti) \
+//#define ListView_SubItemHitTest(hwnd, plvhti) \
 
 
 #define LVM_SETCOLUMNORDERARRAY (LVM_FIRST + 58)
-#define ListView_SetColumnOrderArray(hwnd, iCount, pi) \
+//#define ListView_SetColumnOrderArray(hwnd, iCount, pi) \
 
 
 #define LVM_GETCOLUMNORDERARRAY (LVM_FIRST + 59)
-#define ListView_GetColumnOrderArray(hwnd, iCount, pi) \
+//#define ListView_GetColumnOrderArray(hwnd, iCount, pi) \
 
 
 #define LVM_SETHOTITEM  (LVM_FIRST + 60)
-#define ListView_SetHotItem(hwnd, i) \
+//#define ListView_SetHotItem(hwnd, i) \
 
 
 #define LVM_GETHOTITEM  (LVM_FIRST + 61)
-#define ListView_GetHotItem(hwnd) \
+//#define ListView_GetHotItem(hwnd) \
 
 
 #define LVM_SETHOTCURSOR  (LVM_FIRST + 62)
-#define ListView_SetHotCursor(hwnd, hcur) \
+//#define ListView_SetHotCursor(hwnd, hcur) \
 
 
 #define LVM_GETHOTCURSOR  (LVM_FIRST + 63)
-#define ListView_GetHotCursor(hwnd) \
+//#define ListView_GetHotCursor(hwnd) \
 
 
 #define LVM_APPROXIMATEVIEWRECT (LVM_FIRST + 64)
-#define ListView_ApproximateViewRect(hwnd, iWidth, iHeight, iCount) \
+//#define ListView_ApproximateViewRect(hwnd, iWidth, iHeight, iCount) \
 
 #define LV_MAX_WORKAREAS         16
 #define LVM_SETWORKAREAS         (LVM_FIRST + 65)
-#define ListView_SetWorkAreas(hwnd, nWorkAreas, prc) \
+//#define ListView_SetWorkAreas(hwnd, nWorkAreas, prc) \
 
 
 #define LVM_GETWORKAREAS        (LVM_FIRST + 70)
-#define ListView_GetWorkAreas(hwnd, nWorkAreas, prc) \
+//#define ListView_GetWorkAreas(hwnd, nWorkAreas, prc) \
 
 
 #define LVM_GETNUMBEROFWORKAREAS  (LVM_FIRST + 73)
-#define ListView_GetNumberOfWorkAreas(hwnd, pnWorkAreas) \
+//#define ListView_GetNumberOfWorkAreas(hwnd, pnWorkAreas) \
 
 
 #define LVM_GETSELECTIONMARK    (LVM_FIRST + 66)
-#define ListView_GetSelectionMark(hwnd) \
+//#define ListView_GetSelectionMark(hwnd) \
 
 
 #define LVM_SETSELECTIONMARK    (LVM_FIRST + 67)
-#define ListView_SetSelectionMark(hwnd, i) \
+//#define ListView_SetSelectionMark(hwnd, i) \
 
 
 #define LVM_SETHOVERTIME        (LVM_FIRST + 71)
-#define ListView_SetHoverTime(hwndLV, dwHoverTimeMs)\
+//#define ListView_SetHoverTime(hwndLV, dwHoverTimeMs)\
 
 
 #define LVM_GETHOVERTIME        (LVM_FIRST + 72)
-#define ListView_GetHoverTime(hwndLV)\
+//#define ListView_GetHoverTime(hwndLV)\
 
 
 #define LVM_SETTOOLTIPS       (LVM_FIRST + 74)
-#define ListView_SetToolTips(hwndLV, hwndNewHwnd)\
+//#define ListView_SetToolTips(hwndLV, hwndNewHwnd)\
 
 
 #define LVM_GETTOOLTIPS       (LVM_FIRST + 78)
-#define ListView_GetToolTips(hwndLV)\
+//#define ListView_GetToolTips(hwndLV)\
 
 
 #define LVM_SORTITEMSEX          (LVM_FIRST + 81)
-#define ListView_SortItemsEx(hwndLV, _pfnCompare, _lPrm) \
+//#define ListView_SortItemsEx(hwndLV, _pfnCompare, _lPrm) \
 
 
                   // LVBKIF_*
@@ -2460,10 +2460,10 @@
 #endif
 
 
-#define ListView_SetBkImage(hwnd, plvbki) \
+//#define ListView_SetBkImage(hwnd, plvbki) \
 
 
-#define ListView_GetBkImage(hwnd, plvbki) \
+//#define ListView_GetBkImage(hwnd, plvbki) \
 
 #define LPNM_LISTVIEW   LPNMLISTVIEW
 #define NM_LISTVIEW     NMLISTVIEW
