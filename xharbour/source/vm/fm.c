@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.13 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: fm.c,v 1.14 2002/12/26 02:48:47 jonnymind Exp $
  */
 
 /*
@@ -345,13 +345,14 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 {
 #ifdef HB_FM_STATISTICS
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_lock( &hb_internal_monitor );
-#endif
 
    PHB_MEMINFO pMemBlock;
    ULONG ulMemSize;
    ULONG *pSig;
+
+#ifdef HB_THREAD_SUPPORT
+   hb_LWRM_lock( &hb_internal_monitor );
+#endif
 
    HB_TRACE_STEALTH(HB_TR_INFO, ("hb_xrealloc(%p, %lu)", pMem, ulSize));
 
