@@ -1,5 +1,5 @@
 /*
- * $Id: fserror.c,v 1.7 2004/04/08 10:25:34 andijahja Exp $
+ * $Id: fserror.c,v 1.8 2004/04/08 21:48:44 andijahja Exp $
  */
 
 /*
@@ -144,7 +144,7 @@ static int hb_errnoToDosError( int ErrCode )
 }
 #endif
 
-#if defined(HB_WIN32_IO)
+#if defined(HB_WIN32_IO) || defined(HB_OS_WIN_32)
 static int hb_WinToDosError( ULONG ulError )
 {
    int iResult;
@@ -226,7 +226,7 @@ void  HB_EXPORT hb_fsSetIOError( BOOL fResult, USHORT uiOperation )
    }
    else
    {
-#if defined(HB_WIN32_IO)
+#if defined(HB_WIN32_IO) || defined(HB_OS_WIN_32)
       s_uiOsErrorLast = GetLastError();
       s_uiErrorLast = hb_WinToDosError( s_uiOsErrorLast );
 #elif defined(_MSC_VER)
