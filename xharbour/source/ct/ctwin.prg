@@ -4,7 +4,7 @@
 *   write by Adam Lubszczyk    alubszcz@rsw.pl                     *
 ********************************************************************
 /*
- * $Id: ctwin.prg,v 1.1 2004/09/06 01:30:00 oh1 Exp $
+ * $Id: ctwin.prg,v 1.2 2004/09/05 23:32:31 oh1 Exp $
  */
 
 /*
@@ -301,9 +301,7 @@ FUNCTION ctw_QOUT(...)
     IF ctw_CURRENT == 0
        QOUT()
     ELSE
-       ctw_WINDOWS[ctw_CURRENT]:QOut()                               // +oh1
-//       ctw_WINDOWS[ctw_CURRENT]:ct__CR()                           // -oh1
-//       ctw_WINDOWS[ctw_CURRENT]:ct__LF()                           // -oh1
+       ctw_WINDOWS[ctw_CURRENT]:QOut()
     ENDIF
 //    DISPEND()
     RETURN NIL
@@ -519,7 +517,7 @@ FUNCTION WLASTROW(lCen)
   xW := ctw_WINDOWS[ctw_CURRENT]:PosB - ctw_WINDOWS[ctw_CURRENT]:PosT
 RETURN INT((ctw_BOARDB - ctw_BOARDT - xW ) / 2) + xW
 *********************************
-FUNCTION WNUM
+FUNCTION WNUM()
 
 RETURN LEN(ctw_WINDOWS)
 *********************************
@@ -1061,93 +1059,87 @@ METHOD QQout(xVal) CLASS TctWIN
  LOCAL pp
  LOCAL nRest := ::UsedR - COL() + 1
  LOCAL cCode
- LOCAL lDev                                                            // +oh1
+ LOCAL lDev
 
- IF SET(_SET_PRINTER)                      // jesli takze PRINTER      // +oh1
-    lDev := SET(_SET_DEVICE , "PRINTER")   // tylko PRINTER            // +oh1
-    DEVOUT(cVal)                                                       // +oh1
-    SET(_SET_DEVICE, lDev)                 // przywrocenie SET DEVICE  // +oh1
- ENDIF                                                                 // +oh1
-
- IF SET(_SET_CONSOLE)                      // jesli takze CONSOLE      // +oh1
-    lDev := SET(_SET_DEVICE , "SCREEN")    // tylko SCREEN             // +oh1
- IF pCR == 0 .and. pLF == 0
-    pp := 0
- ELSEIF pCR == 0 .or. pLF == 0
-    pp := MAX(pCR,pLF)
- ELSE
-    pp := MIN(pCR,pLF)
+ IF SET(_SET_PRINTER)                      // jesli takze PRINTER
+    lDev := SET(_SET_DEVICE , "PRINTER")   // tylko PRINTER
+    DEVOUT(cVal)
+    SET(_SET_DEVICE, lDev)                 // przywrocenie SET DEVICE
  ENDIF
 
- DO WHILE nLen > 0
-   IF pp == 0
-      IF nLen > nRest
-        ::DEVOUT(LEFT(cVal,nRest))                               // +oh1
-//         QQOUT(LEFT(cVal,nRest))                               // -h1
-         ::ct__CR()
-         ::ct__LF()
-         cVal := SUBSTR(cVal,nRest +1)
+ IF SET(_SET_CONSOLE)                      // jesli takze CONSOLE
+    lDev := SET(_SET_DEVICE , "SCREEN")    // tylko SCREEN
+    IF pCR == 0 .and. pLF == 0
+       pp := 0
+    ELSEIF pCR == 0 .or. pLF == 0
+       pp := MAX(pCR,pLF)
+    ELSE
+       pp := MIN(pCR,pLF)
+    ENDIF
+
+    DO WHILE nLen > 0
+      IF pp == 0
+         IF nLen > nRest
+           ::DEVOUT(LEFT(cVal,nRest))
+            ::ct__CR()
+            ::ct__LF()
+            cVal := SUBSTR(cVal,nRest +1)
+            nLen := LEN(cVal)
+            nRest := ::UsedR - ::UsedL + 1
+         ELSE
+            ::DEVOUT(cVal)
+           nLen := 0
+         ENDIF  //nLen > nRest
+      ELSE //pp == 0
+         ::DEVOUT(SUBSTR(cVal,1,pp-1))
+         cCode := SUBSTR(cVal,pp,1)
+         cVal := SUBSTR(cVal,pp+1)
+         IF cCode == cCR
+            ::ct__CR()
+         ELSE
+            ::ct__LF()
+         ENDIF //cCode == cCR
          nLen := LEN(cVal)
-         nRest := ::UsedR - ::UsedL + 1
-      ELSE
-           ::DEVOUT(cVal)                                            // +oh1
-//        QQOUT(cVal)                                                // -oh1
-        nLen := 0
-      ENDIF  //nLen > nRest
-   ELSE //pp == 0
-         ::DEVOUT(SUBSTR(cVal,1,pp-1))                               // +oh1
-//      ::QQout(SUBSTR(cVal,1,pp-1))    //rekurencja :)              // -oh1
-      cCode := SUBSTR(cVal,pp,1)
-      cVal := SUBSTR(cVal,pp+1)
-      IF cCode == cCR
-         ::ct__CR()
-      ELSE
-         ::ct__LF()
-      ENDIF //cCode == cCR
-      nLen := LEN(cVal)
-      pCR := AT( cCR ,cVal)
-      pLF := AT( cLF ,cVal)
-      IF pCR == 0 .and. pLF == 0
-         pp := 0
-      ELSEIF pCR == 0 .or. pLF == 0
-         pp := MAX(pCR,pLF)
-      ELSE
-         pp := MIN(pCR,pLF)
-      ENDIF
-      nRest := ::UsedR - COL() + 1
-   ENDIF  //pp == 0
- ENDDO    //nLen > 0
-    SET(_SET_DEVICE, lDev)                 //przywrocenie SET DEVICE   // +oh1
- ENDIF                                                                 // +oh1
+         pCR := AT( cCR ,cVal)
+         pLF := AT( cLF ,cVal)
+         IF pCR == 0 .and. pLF == 0
+            pp := 0
+         ELSEIF pCR == 0 .or. pLF == 0
+            pp := MAX(pCR,pLF)
+         ELSE
+            pp := MIN(pCR,pLF)
+         ENDIF
+         nRest := ::UsedR - COL() + 1
+      ENDIF  //pp == 0
+    ENDDO    //nLen > 0
+    SET(_SET_DEVICE, lDev)
+ ENDIF
 
 RETURN NIL
 **************
 METHOD Qout(xVal) CLASS TctWIN
- LOCAL lDev                                                            // +oh1
+ LOCAL lDev
 
- IF SET(_SET_PRINTER)                      //jesli takze PRINTER       // +oh1
-    lDev := SET(_SET_DEVICE , "PRINTER")   //tylko PRINTER             // +oh1
-    DEVOUT( HB_OSNewLine() )                                           // +oh1
-    SETPRC(PROW()+1,0)                                                 // +oh1
-    IF xVal!=NIL                                                       // +oh1
-       DEVOUT(xVal)                                                    // +oh1
-    ENDIF                                                              // +oh1
-    SET(_SET_DEVICE, lDev)               // przywrocenie SET DEVICE    // +oh1
- ENDIF                                                                 // +oh1
+ IF SET(_SET_PRINTER)                      //jesli takze PRINTER
+    lDev := SET(_SET_DEVICE , "PRINTER")   //tylko PRINTER
+    DEVOUT( HB_OSNewLine() )
+    SETPRC(PROW()+1,0)
+    IF xVal!=NIL
+       DEVOUT(xVal)
+    ENDIF
+    SET(_SET_DEVICE, lDev)               // przywrocenie SET DEVICE
+ ENDIF
 
- IF SET(_SET_CONSOLE)                    // jesli tak§e CONSOLE        // +oh1
-  lDev := SET(_SET_DEVICE , "SCREEN")    // tylko SCREEN               // +oh1
-  ::ct__CR()                                                           // +oh1
-  ::ct__LF()                                                           // +oh1
-  IF xVal!=NIL                                                         // +oh1
-    ::DEVOUT(xVal)                                                     // +oh1
-  ENDIF                                                                // +oh1
-  SET(_SET_DEVICE, lDev)                 // przywrocenie SET DEVICE    // +oh1
- ENDIF                                                                 // +oh1
+ IF SET(_SET_CONSOLE)                    // jesli tak§e CONSOLE
+  lDev := SET(_SET_DEVICE , "SCREEN")    // tylko SCREEN
+  ::ct__CR()
+  ::ct__LF()
+  IF xVal!=NIL
+    ::DEVOUT(xVal)
+  ENDIF
+  SET(_SET_DEVICE, lDev)                 // przywrocenie SET DEVICE
+ ENDIF
 
-//  ::ct__CR()                                                         // -oh1
-//  ::ct__LF()                                                         // -oh1
-//  ::QQout(xVal)                                                      // -oh1
 RETURN NIL
 ****************
 METHOD New(nT,nL,nB,nR) CLASS TctWIN
@@ -1242,21 +1234,12 @@ METHOD DispOutAT(nT,nL,xVal,xColor) CLASS TctWIN
 RETURN NIL
 ***********
 METHOD DevOut(xVal,xColor) CLASS TctWIN
- IF SET(_SET_DEVICE) == "PRINTER"           //jesli PRINTER            // +oh1
-    DEVOUT(xVal,xColor)                     //standardowy out          // +oh1
- ELSE                                                                  // +oh1
-    ::DispOut(xVal,xColor)                  //wlasny ::xxx()           // +oh1
- ENDIF                                                                 // +oh1
+ IF SET(_SET_DEVICE) == "PRINTER"           //jesli PRINTER
+    DEVOUT(xVal,xColor)                     //standardowy out
+ ELSE
+    ::DispOut(xVal,xColor)                  //wlasny ::xxx()
+ ENDIF
 
-// LOCAL lDev                                                          // -oh1
-// IF SET(_SET_PRINTER)                      //jesli takze PRINTER     // -oh1
-//    lDev := SET(_SET_DEVICE , "PRINTER")   //tylko PRINTER           // -oh1
-//    DEVOUT(xVal,xColor)                     //standardowy out        // -oh1
-//    SET(_SET_DEVICE, lDev)                 //przywrocenie SET DEVICE // -oh1
-// ENDIF                                                               // -oh1
-// IF SET(_SET_CONSOLE)                    //ježli tak§e CONSOLE       // -oh1
-//    ::DispOut(xVal,xColor)             //wlasny ::xxx()              // -oh1
-// ENDIF                                                               // -oh1
 RETURN NIL
 ************
 METHOD DevOutPict(xVal,cPict,xColor) CLASS TctWIN
@@ -1412,31 +1395,23 @@ METHOD WFormat(nT,nL,nB,nR) CLASS TctWIN
 RETURN NIL
 ***********
 METHOD DevPos(nT,nL) CLASS TctWIN
- IF SET(_SET_DEVICE ) == "PRINTER"      // jesli PRINTER             // +oh1
-    DEVPOS(nT,nL)                       // standardowy out           // +oh1
- ELSE                                                                // +oh1
-    ::SetPos(nT,nL)                     // wlasny ::SetPos()         // +oh1
- ENDIF                                                               // +oh1
+ IF SET(_SET_DEVICE ) == "PRINTER"      // jesli PRINTER
+    DEVPOS(nT,nL)                       // standardowy out
+ ELSE
+    ::SetPos(nT,nL)                     // wlasny ::SetPos()
+ ENDIF
 
-// IF SET(_SET_PRINTER )                   //jesli PRINTER ON          // -oh1
-//    DEVPOS(nT,nL)                        //standardowy out           // -oh1
-// ENDIF                                                               // -oh1
-// IF SET(_SET_CONSOLE)                    //jesli ma bys na console   // -oh1
-//    ::SetPos(nT,nL)                     //wlasny ::SetPos()          // -oh1
-// ENDIF                                                               // -oh1
 RETURN NIL
 ************
 METHOD SetPos(nT,nL) CLASS TctWIN
 LOCAL nTop, nLeft
 
-// nTop := ::UsedT + nT +1                                             // -oh1
- nTop := ::UsedT + nT                                                  // +oh1
+ nTop := ::UsedT + nT
  IF nTop < ::PosT
    nTop := ::PosT
  ELSE
    IF nTop > ::UsedB
-//      nTop := -1             //lub ???? tak aby nie bylow widac      // -oh1
-      nTop := MAXROW()+1       //????? poza ekran                      // +oh1
+      nTop := MAXROW()+1       //????? poza ekran
    ENDIF
  ENDIF
  IF nL < 0
@@ -1465,7 +1440,7 @@ METHOD MaxRow( lMode) CLASS TctWIN
    local nRet  := maxrow() // Default
 
    If lMode == Nil .or. !lMode
-      nRet := ::UsedB - ::UsedT+1
+      nRet := ::UsedB - ::UsedT
    EndIF
 
 RETURN nRet
