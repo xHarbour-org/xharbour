@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3661 2004/12/09 01:25:53 modalsist Exp $
+ * $Id: ChangeLog,v 1.3662 2004/12/09 13:41:27 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-12-09 14:45 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/vm/inet.c
+     ! hb_getHosts() needs to test a quad dotted host name on OS/2 as
+     it does on win32.
 
 2004-12-09 14:40 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/vm/arrays.c
@@ -17,7 +23,7 @@
   * utils/hbmake/hbmake.prg
   * utils/hbmake/hbmutils.prg
     + HbCT.lib was added into default libs and removed from external libs.
-    
+
   * source/ct/util.prg
     - removed WhatWin() function. This function should be replaced by
       the new OS_IsWinXXXX() functions suplied by Peter Rees.

@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.49 2004/09/26 12:36:21 jonnymind Exp $
+* $Id: inet.c,v 1.50 2004/10/22 20:37:13 likewolf Exp $
 */
 
 /*
@@ -190,7 +190,7 @@ struct hostent *hb_getHosts( char *name, HB_SOCKET_STRUCT *Socket )
    struct hostent *Host = NULL;
 
    /* let's see if name is an IP address; not necessary on linux */
-   #if defined(HB_OS_WIN_32)
+   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    ULONG ulAddr;
 
    ulAddr = inet_addr( name );
