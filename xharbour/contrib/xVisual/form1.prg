@@ -22,7 +22,16 @@ CLASS TForm1 FROM TForm
       :TOP :=         96
       :WIDTH :=         80
 
+      :SetMethod( "OnClick", { || HB_QSelf():Parent:Button1Click( HB_QSelf() ) } )
    END CONTROL
+
+   // Generated only for On... Events that were specied in the Designer.
+   METHOD OnClick()
+   METHOD OnLButtonDblClk
+
+   // Methods...
+   METHOD Button1Click( Sender )
+   //...
 
 END CLASS 
 
@@ -57,21 +66,21 @@ METHOD Button1Click( Sender /* Button1 class TButton() */ ) CLASS TForm1
       the Event (we also have :: for the container Form).
    */
    WITH OBJECT Sender
-      // Self is the container not the initiating control so:
 
-      // Using the standard WITH shortcut.
-      :Caption := "New Caption"          // Fastest.
+   // Self is the container not the initiating control so:
 
-      /*
-      // Or:
-      Sender:Caption := "New Caption"    // Still very fast.
-      // Or:
-      Self:Button1:Caption := "New Caption" // Slower, but might be needed when referring other controls on the form.
+   // Using the standard WITH shortcut.
+   :Caption := "New Caption"          // Fastest.
+   // Or:
+   Sender:Caption := "New Caption"    // Still very fast.
+   // Or:
+   Self:Button1:Caption := "New Caption" // Slower, but might be needed when referring other controls on the form.
+   :Update()
 
-      // Now self:
-      ::Caption := "My Form"     // Faster.
-      */
+   // Now self:
+   ::Caption := "My Form"     // Faster.
+   ::Update()
+
    END WITH // Sender
 
 Return Self
-

@@ -1,5 +1,5 @@
 /*
- * $Id: xPad.prg,v 1.4 2002/10/27 01:29:26 what32 Exp $
+ * $Id: xPad.prg,v 1.5 2002/10/28 22:40:32 fsgiudice Exp $
  */
 /*
  * xHarbour Project source code:
@@ -194,6 +194,7 @@ CLASS ObjEdit FROM TPanel
                                 ::top     := 100,;
                                 ::width   := 300,;
                                 ::height  := 300,;
+                                ::Name    := "ObjEdit",;
                                 ::Style   := WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+DS_MODALFRAME+WS_MAXIMIZEBOX+WS_MINIMIZEBOX+WS_THICKFRAME,;
                                 super:new( oParent )
    METHOD OnCreate()
