@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.10 2003/11/12 23:33:55 ronpinkas Exp $
+ * $Id: classes.h,v 1.11 2003/11/30 12:32:29 druzus Exp $
  */
 
 /*
@@ -84,8 +84,11 @@ typedef struct
    PHB_ITEM pClassDatas;    /* Harbour Array for ClassDatas and shared */
    PHB_ITEM pInlines;       /* Array for inline codeblocks */
    PHB_FUNC pFunError;      /* error handler for not defined messages */
+   PHB_FUNC pDestructor;    /* Destructor */
    PSYMBOLS pModuleSymbols;
 } CLASS, * PCLASS;
+
+extern HB_SYMB  hb_symDestructor;
 
 extern void     hb_clsReleaseAll( void );    /* releases all defined classes */
 extern PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction );
@@ -96,6 +99,8 @@ extern HB_EXPORT USHORT hb_clsMaxClasses( void );
 extern HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
 
 void * hb_mthRequested( void );
+
+void hb_clsFinalize( PHB_ITEM pObject );
 
 HB_EXTERN_END
 #endif

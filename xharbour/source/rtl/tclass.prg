@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.8 2003/06/24 03:35:05 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.9 2003/11/10 00:59:32 fsgiudice Exp $
  */
 
 /*
@@ -85,10 +85,8 @@ FUNCTION HBClass()
    STATIC s_hClass /* NOTE: Automatically default to NIL */
 
    IF s_hClass == NIL
-      s_hClass := __clsNew( "HBCLASS", 10, 15 )
+      s_hClass := __clsNew( "HBCLASS", 11, 17 )
       __ClsSetModule( s_hClass )
-
-/*    s_hClass := __clsNew( "HBCLASS", 11, 15 )  */
 
       __clsAddMsg( s_hClass, "New"            , @New()            , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "Create"         , @Create()         , HB_OO_MSG_METHOD )
@@ -102,36 +100,27 @@ FUNCTION HBClass()
       __clsAddMsg( s_hClass, "AddVirtual"     , @AddVirtual()     , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "Instance"       , @Instance()       , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "SetOnError"     , @SetOnError()     , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "SetDestructor"  , @SetDestructor()  , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "InitClass"      , @InitClass()      , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "ConstructorCall", @ConstructorCall(), HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "cSuper"         , {| Self | iif( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, NIL, ::acSuper[ 1 ] ) }, HB_OO_MSG_INLINE )
-      __clsAddMsg( s_hClass, "_cSuper"        , {| Self, xVal | iif( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, ( ::acSuper := { xVal } ), ::acSuper[ 1 ] := xVal ), xVal }, HB_OO_MSG_INLINE )
+      __clsAddMsg( s_hClass, "cSuper"         , {| Self | IIF( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, NIL, ::acSuper[ 1 ] ) }, HB_OO_MSG_INLINE )
+      __clsAddMsg( s_hClass, "_cSuper"        , {| Self, xVal | IIF( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, ( ::acSuper := { xVal } ), ::acSuper[ 1 ] := xVal ), xVal }, HB_OO_MSG_INLINE )
+
       __clsAddMsg( s_hClass, "hClass"         ,  1, HB_OO_MSG_PROPERTY )
-//      __clsAddMsg( s_hClass, "_hClass"        ,  1, HB_OO_MSG_DATA )
       __clsAddMsg( s_hClass, "cName"          ,  2, HB_OO_MSG_PROPERTY )
-//      __clsAddMsg( s_hClass, "_cName"         ,  2, HB_OO_MSG_DATA )
       __clsAddMsg( s_hClass, "aDatas"         ,  3, HB_OO_MSG_PROPERTY )
-//      __clsAddMsg( s_hClass, "_aDatas"        ,  3, HB_OO_MSG_DATA )
       __clsAddMsg( s_hClass, "aMethods"       ,  4, HB_OO_MSG_PROPERTY )
-//      __clsAddMsg( s_hClass, "_aMethods"      ,  4, HB_OO_MSG_DATA )
       __clsAddMsg( s_hClass, "aClsDatas"      ,  5, HB_OO_MSG_PROPERTY )
-//      __clsAddMsg( s_hClass, "_aClsDatas"     ,  5, HB_OO_MSG_DATA )
       __clsAddMsg( s_hClass, "aClsMethods"    ,  6, HB_OO_MSG_PROPERTY )
-//      __clsAddMsg( s_hClass, "_aClsMethods"   ,  6, HB_OO_MSG_DATA )
       __clsAddMsg( s_hClass, "aInlines"       ,  7, HB_OO_MSG_PROPERTY )
-//      __clsAddMsg( s_hClass, "_aInlines"      ,  7, HB_OO_MSG_DATA )
       __clsAddMsg( s_hClass, "aVirtuals"      ,  8, HB_OO_MSG_PROPERTY )
-//      __clsAddMsg( s_hClass, "_aVirtuals"     ,  8, HB_OO_MSG_DATA )
       __clsAddMsg( s_hClass, "acSuper"        ,  9, HB_OO_MSG_PROPERTY )
-//      __clsAddMsg( s_hClass, "_acSuper"       ,  9, HB_OO_MSG_DATA )
       __clsAddMsg( s_hClass, "nOnError"       , 10, HB_OO_MSG_PROPERTY )
-//      __clsAddMsg( s_hClass, "_nOnError"      , 10, HB_OO_MSG_DATA )
-  /*  __clsAddMsg( s_hClass, "class"          , 11, HB_OO_MSG_PROPERTY )
-//      __clsAddMsg( s_hClass, "_class"         , 11, HB_OO_MSG_DATA ) */
+      __clsAddMsg( s_hClass, "nDestructor"    , 11, HB_OO_MSG_PROPERTY )
 
    ENDIF
 
-   RETURN __clsInst( s_hClass )
+RETURN __clsInst( s_hClass )
 
 //----------------------------------------------------------------------------//
 
@@ -172,18 +161,18 @@ STATIC FUNCTION New( cClassName, xSuper )
          i := HB_EnumIndex()
          EXIT
       ENDIF
-//      i++
    NEXT
+
    IF i > 0
       nSuper := i - 1
-      ASize( ::acSuper, nSuper)
+      ASize( ::acSuper, nSuper )
    ENDIF
 
-   RETURN QSelf()
+RETURN QSelf()
 
 //----------------------------------------------------------------------------//
 
-STATIC PROCEDURE Create(MetaClass)
+STATIC PROCEDURE Create( MetaClass )
 
    LOCAL Self := QSelf()
    LOCAL n
@@ -196,12 +185,9 @@ STATIC PROCEDURE Create(MetaClass)
    LOCAL nExtraMsgs := Len( ::aMethods ) +  ( 2 * Len( ::aClsDatas ) ) + Len( ::aInlines ) + Len( ::aVirtuals )
    LOCAL cDato
 
-/* Self:Class := MetaClass */
-
    IF nLen == 0
       hClass := __ClsNew( ::cName, nLenDatas, nExtraMsgs )
    ELSE                                         // Multi inheritance
-//      n := 1
       FOR EACH cDato IN ::acSuper
          ahSuper[ HB_EnumIndex() ] := __clsInstSuper( Upper( cDato ) ) // Super handle available
       NEXT
@@ -221,7 +207,6 @@ STATIC PROCEDURE Create(MetaClass)
       FOR n := 2 TO nLen
          __clsAddMsg( hClass, Upper( ::acSuper[ n ] ), ++nDataBegin, HB_OO_MSG_SUPER, ahSuper[ n ], HB_OO_CLSTP_CLASS + 1 )
       NEXT
-
    ENDIF
 
    ::hClass := hClass
@@ -232,19 +217,12 @@ STATIC PROCEDURE Create(MetaClass)
        IF !( __objHasMsg( Self, cDato[ HB_OO_MTHD_SYMBOL ] ) )
           __clsAddMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ], HB_OO_MSG_METHOD, NIL, cDato[ HB_OO_MTHD_SCOPE ] )
        ENDIF
-   // do it
    NEXT
-   //
 
-   //Local message...
-
-//   n := 1
    FOR EACH cDato IN ::aDatas
       __clsAddMsg( hClass, cDato[ HB_OO_DATA_SYMBOL ]       , HB_EnumIndex() + nDataBegin, ;
                    HB_OO_MSG_PROPERTY, cDato[ HB_OO_DATA_VALUE ], cDato[ HB_OO_DATA_SCOPE ],;
                    cDato[ HB_OO_DATA_PERSISTENT ] )
-//      __clsAddMsg( hClass, "_" + cDato[ HB_OO_DATA_SYMBOL ] , HB_EnumIndex() + nDataBegin, ;
-//                   HB_OO_MSG_DATA,                          , cDato[ HB_OO_DATA_SCOPE ] )
    NEXT
 
    FOR EACH cDato IN ::aMethods
@@ -252,13 +230,9 @@ STATIC PROCEDURE Create(MetaClass)
                    cDato[ HB_OO_MTHD_PERSISTENT ] )
    NEXT
 
-//   n := 1
    FOR EACH cDato IN ::aClsDatas
       __clsAddMsg( hClass, cDato[ HB_OO_CLSD_SYMBOL ]      , HB_EnumIndex() + nClassBegin,;
                    HB_OO_MSG_CLASSPROPERTY, cDato[ HB_OO_CLSD_VALUE ], cDato[ HB_OO_CLSD_SCOPE ] )
-//      __clsAddMsg( hClass, "_" + cDato[ HB_OO_CLSD_SYMBOL ], HB_EnumIndex() + nClassBegin,;
-//                   HB_OO_MSG_CLASSDATA,                    , cDato[ HB_OO_CLSD_SCOPE ] )
-//      n++
    NEXT
 
    FOR EACH cDato IN ::aInlines
@@ -267,7 +241,6 @@ STATIC PROCEDURE Create(MetaClass)
                    cDato[ HB_OO_MTHD_PERSISTENT ] )
    NEXT
 
-//   n := 1
    FOR EACH cDato IN ::aVirtuals
       __clsAddMsg( hClass, cDato, HB_EnumIndex(), HB_OO_MSG_VIRTUAL )
    NEXT
@@ -276,14 +249,20 @@ STATIC PROCEDURE Create(MetaClass)
       __clsAddMsg( hClass, "__OnError", ::nOnError, HB_OO_MSG_ONERROR )
    ENDIF
 
-   RETURN
+   IF ::nDestructor != NIL
+      __clsAddMsg( hClass, "__Destructor", ::nDestructor, HB_OO_MSG_DESTRUCTOR )
+   ENDIF
+
+RETURN
 
 //----------------------------------------------------------------------------//
 
 STATIC FUNCTION Instance()
- LOCAL Self := QSelf()
- Local oInstance := __clsInst( ::hClass )
- /*oInstance:Class := Self:Class*/
+
+    LOCAL Self := QSelf()
+    Local oInstance := __clsInst( ::hClass )
+    /*oInstance:Class := Self:Class*/
+
 RETURN oInstance
 
 //----------------------------------------------------------------------------//
@@ -306,7 +285,7 @@ STATIC PROCEDURE AddData( cData, xInit, cType, nScope, lNoinit, lPersistent )
 
    AAdd( ::aDatas, { cData, xInit, cType, nScope, lPersistent } )
 
-   RETURN
+RETURN
 
 //----------------------------------------------------------------------------//
 
@@ -325,6 +304,7 @@ STATIC PROCEDURE AddMultiData( cType, xInit, nScope, aData, lNoInit, lPersistent
       ENDIF
 //      i++
    NEXT
+
    IF i > 0
       nParam := i - 1
       ASize( aData, nParam )
@@ -334,7 +314,7 @@ STATIC PROCEDURE AddMultiData( cType, xInit, nScope, aData, lNoInit, lPersistent
       ::AddData( cData, xInit, cType, nScope, lNoInit, lPersistent )
    NEXT
 
-   RETURN
+RETURN
 
 //----------------------------------------------------------------------------//
 
@@ -355,7 +335,7 @@ STATIC PROCEDURE AddClassData( cData, xInit, cType, nScope, lNoInit )
 
    AAdd( ::aClsDatas, { cData, xInit, cType, nScope } )
 
-   RETURN
+RETURN
 
 //----------------------------------------------------------------------------//
 
@@ -374,6 +354,7 @@ STATIC PROCEDURE AddMultiClsData( cType, xInit, nScope, aData, lNoInit )
       ENDIF
 //      i++
    NEXT
+
    IF i > 0
       nParam := i - 1
       ASize( aData, nParam )
@@ -383,7 +364,7 @@ STATIC PROCEDURE AddMultiClsData( cType, xInit, nScope, aData, lNoInit )
       ::AddClassData( cData, xInit, cType, nScope, lNoInit )
    NEXT
 
-   RETURN
+RETURN
 
 //----------------------------------------------------------------------------//
 
@@ -398,7 +379,7 @@ STATIC PROCEDURE AddInline( cMethod, bCode, nScope, lPersistent )
 
    AAdd( ::aInlines, { cMethod, bCode, nScope, lPersistent } )
 
-   RETURN
+RETURN
 
 //----------------------------------------------------------------------------//
 
@@ -413,7 +394,7 @@ STATIC PROCEDURE AddMethod( cMethod, nFuncPtr, nScope, lPersistent )
 
    AAdd( ::aMethods, { cMethod, nFuncPtr, nScope, lPersistent } )
 
-   RETURN
+RETURN
 
 //----------------------------------------------------------------------------//
 
@@ -428,7 +409,7 @@ STATIC PROCEDURE AddClsMethod( cMethod, nFuncPtr, nScope )
 
    AAdd( ::aClsMethods, { cMethod, nFuncPtr, nScope } )
 
-   RETURN
+RETURN
 
 //----------------------------------------------------------------------------//
 STATIC PROCEDURE AddVirtual( cMethod )
@@ -442,7 +423,7 @@ STATIC PROCEDURE AddVirtual( cMethod )
 
    AAdd( ::aVirtuals, cMethod )
 
-   RETURN
+RETURN
 
 //----------------------------------------------------------------------------//
 
@@ -452,7 +433,18 @@ STATIC PROCEDURE SetOnError( nFuncPtr )
 
    ::nOnError := nFuncPtr
 
-   RETURN
+RETURN
+
+
+//----------------------------------------------------------------------------//
+
+STATIC PROCEDURE SetDestructor( nFuncPtr )
+
+   LOCAL Self := QSelf()
+
+   ::nDestructor := nFuncPtr
+
+RETURN
 
 //----------------------------------------------------------------------------//
 
@@ -460,7 +452,7 @@ STATIC FUNCTION InitClass()
 
    LOCAL Self := QSelf()
 
-   RETURN Self
+RETURN Self
 
 //----------------------------------------------------------------------------//
 
@@ -510,7 +502,8 @@ STATIC FUNCTION ConstructorCall( oClass, aParams )
      ENDIF
 
    ENDIF
-   RETURN Self
+
+RETURN Self
 
 //----------------------------------------------------------------------------//
 
@@ -524,6 +517,8 @@ FUNCTION __ClassNew( cName, nDatas )
 
 RETURN hClass
 
+//----------------------------------------------------------------------------//
+
 FUNCTION __ClassAdd( hClass, cProperty, cFunction )
 
    cProperty := Upper( cProperty )
@@ -534,7 +529,11 @@ FUNCTION __ClassAdd( hClass, cProperty, cFunction )
 
 RETURN __ClsAddMsg( hClass, cProperty, HB_FuncPtr( cFunction ), HB_OO_MSG_METHOD )
 
+//----------------------------------------------------------------------------//
+
 FUNCTION __ClassIns( hClass )
 
 RETURN __ClsInst( hClass )
+
+//----------------------------------------------------------------------------//
 

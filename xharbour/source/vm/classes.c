@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.102 2004/02/25 12:57:55 toninhofwi Exp $
+ * $Id: classes.c,v 1.103 2004/03/01 22:58:11 ronpinkas Exp $
  */
 
 /*
@@ -178,6 +178,8 @@ static PHB_DYNS s_msgClsParent = NULL;
 static BOOL     s_bClsScope    = TRUE;
 static BOOL     s_bClsAutoInit = TRUE;
 /* static PHB_DYNS s_msgClass     = NULL; */
+
+HB_SYMB  hb_symDestructor = { "__Destructor", HB_FS_PUBLIC, NULL, NULL };
 
 /* All functions contained in classes.c */
 
@@ -1103,22 +1105,29 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
    }
 
    if( pMsg == s_msgClassName )
+   {
       return hb___msgClsName;
-
+   }
    else if( pMsg == s_msgClassH )
+   {
       return hb___msgClsH;
-
+   }
    else if( pMsg == s_msgClassSel )
+   {
       return hb___msgClsSel;
-
+   }
    else if( pMsg == s_msgClassFullSel )
+   {
       return hb___msgClsFullSel;
-
+   }
    else if( pMsg == s_msgEval )
+   {
       return hb___msgEval;
-
+   }
    else if( pMsg == s_msgClsParent )
+   {
       return hb___msgClsParent;
+   }
 
 /* else if( pMsg == s_msgClass )
       return hb___msgClass;       */
@@ -1128,7 +1137,9 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
       PCLASS pClass  = s_pClasses + ( uiClass - 1 );
 
       if( lAllowErrFunc && pClass->pFunError )
+      {
          return pClass->pFunError;
+      }
    }
 
    return NULL;
@@ -1563,6 +1574,10 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, LONG lID_or_FuncPointer_or_B
             pClass->pFunError = ( PHB_FUNC ) lID_or_FuncPointer_or_BlockPointer;
             break;
 
+         case HB_OO_MSG_DESTRUCTOR:
+            pClass->pDestructor = ( PHB_FUNC ) lID_or_FuncPointer_or_BlockPointer;
+            break;
+
          default:
             hb_errInternal( HB_EI_CLSINVMETHOD, NULL, "__clsAddMsg", NULL );
             break;
@@ -1762,6 +1777,7 @@ HB_FUNC( __CLSNEW )
             pNewCls->pMethods = ( PMETHOD ) hb_xgrab( ulSize );
             memset( pNewCls->pMethods, 0, ulSize );
             pNewCls->pFunError = pSprCls->pFunError;
+            pNewCls->pDestructor = pSprCls->pDestructor;
 
             /* CLASS DATA Not Shared ( new array, new value ) */
             pNewCls->pClassDatas  = hb_arrayClone( pSprCls->pClassDatas, NULL );
@@ -1942,6 +1958,7 @@ HB_FUNC( __CLSNEW )
       pNewCls->pClassDatas    = hb_itemArrayNew( 0 );
       pNewCls->pInlines       = hb_itemArrayNew( 0 );
       pNewCls->pFunError      = NULL;
+      pNewCls->pDestructor    = NULL;
    }
 
    HB_TRACE( HB_TR_DEBUG, ( "Finalized: '%s' Known: %i Key: %i\n", pNewCls->szName, uiKnownMethods, pNewCls->uiHashKey ) );
@@ -3458,6 +3475,42 @@ void hb_mthAddTime( PMETHOD pMethod, ULONG ulClockTicks )
    #endif
 }
 
+void hb_clsFinalize( PHB_ITEM pObject )
+{
+   SHORT uiClass;
+
+   if( HB_IS_OBJECT( pObject ) )
+   {
+      uiClass = pObject->item.asArray.value->uiClass;
+   }
+   else
+   {
+      // TODO Error!
+      return;
+   }
+
+   if( uiClass && uiClass <= s_uiClasses )
+   {
+      PCLASS pClass  = s_pClasses + ( uiClass - 1 );
+
+      if( pClass->pDestructor )
+      {
+         PHB_FUNC pDestructor = pClass->pDestructor;
+
+         // Avoid repeating calls.
+         pClass->pDestructor = NULL;
+
+         hb_symDestructor.pFunPtr = pDestructor;
+
+         hb_vmPushSymbol( &hb_symDestructor );
+         hb_vmPush( pObject ); // Do NOT Forward!!!
+         hb_vmSend( 0 );
+
+         pClass->pDestructor = pDestructor;
+      }
+   }
+}
+
 /* __ClsGetProperties( nClassHandle ) --> aPropertiesNames
  * Notice that this function works quite similar to __CLASSSEL()
  * except that just returns the name of the datas and methods
@@ -3753,5 +3806,3 @@ HB_FUNC( __SETCLASSAUTOINIT )
 
    hb_retl( bOldClsAutoInit );
 }
-
-

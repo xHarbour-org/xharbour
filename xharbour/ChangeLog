@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2465 2004/03/03 07:29:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2466 2004/03/03 08:19:54 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,37 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-03 03:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/classes.h
+    + Added member pDestructor to CLASS structure
+    + Added void hb_clsFinalize( PHB_ITEM pObject );
+    + Added extern HB_SYMB  hb_symDestructor;
+
+  * source/vm/classes.c
+    + Added HB_SYMB  hb_symDestructor;
+    + Added void hb_clsFinalize( PHB_ITEM pObject );
+      + Added support for Detructors
+
+  * source/vm/arrays.c
+    + Added call to hb_clsFinalize() from hb_arrayReleaseBase() and hb_arrayReleaseGarbage()
+
+  * source/rtl/dumpvar.prg
+  * include/hboo.ch
+    * Changed unused HB_OO_MSG_CLSMTHD with new HB_OO_MSG_DESTRUCTOR as 7
+
+  * include/hbclass.ch
+    + Added support for new syntax: DESTRUCTOR <MethodName>
+
+  * source/rtl/tclass.prg
+    + Added Data :nDestructor and Method :SetDestructor()
+
+  * source/vm/hvm.c
+    * Revised hb_vmQuit() cleanup sequence to guarantee execution of Desructors
+
+  + tests/destruct.prg
+    + New sample to demonstrate Object Destructors.
+
 2004-03-03 15:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * contrib/winprn/tprint.prg
     % recycled HB_ITEM usage

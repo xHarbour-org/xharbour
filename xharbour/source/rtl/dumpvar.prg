@@ -1,5 +1,5 @@
 /*
- * $Id: dumpvar.prg,v 1.3 2003/11/14 23:17:31 ronpinkas Exp $
+ * $Id: dumpvar.prg,v 1.4 2004/01/03 20:51:47 fsgiudice Exp $
  */
 
 /*
@@ -283,8 +283,8 @@ STATIC FUNCTION DecodeType( nType AS NUMERIC )
           cString += "Super"
      CASE nType == HB_OO_MSG_ONERROR     // 6
           cString += "OnError"
-     CASE nType == HB_OO_MSG_CLSMTHD     // 7 /* for the future */
-          cString += "ClMth"
+     CASE nType == HB_OO_MSG_DESTRUCTOR  // 7
+          cString += "Destructor"
      CASE nType == HB_OO_PROPERTY        // 8
           cString += "Property"
      CASE nType == HB_OO_MSG_PROPERTY    // 9

@@ -1,5 +1,5 @@
 /*
- * $Id: hboo.ch,v 1.4 2003/03/25 02:36:11 ronpinkas Exp $
+ * $Id: hboo.ch,v 1.5 2003/11/10 00:59:32 fsgiudice Exp $
  */
 
 /*
@@ -92,7 +92,7 @@
 #define HB_OO_MSG_VIRTUAL       4
 #define HB_OO_MSG_SUPER         5
 #define HB_OO_MSG_ONERROR       6
-#define HB_OO_MSG_CLSMTHD       7 /* for the future */
+#define HB_OO_MSG_DESTRUCTOR    7
 
 #define HB_OO_PROPERTY          8
 #define HB_OO_MSG_PROPERTY      HB_OO_MSG_DATA      + HB_OO_PROPERTY // Auto management of DATA.

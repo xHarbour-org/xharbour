@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.89 2004/02/25 15:10:50 lculik Exp $
+ * $Id: arrays.c,v 1.90 2004/02/29 07:28:25 ronpinkas Exp $
  */
 
 /*
@@ -75,6 +75,7 @@
 #include "hbapilng.h"
 #include "hbvm.h"
 #include "hbstack.h"
+#include "classes.h"
 
 extern char *hb_vm_acAscii[256];
 
@@ -1111,6 +1112,16 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
       return;
    }
 
+   if( pBaseArray->uiClass )
+   {
+      HB_ITEM FakedObject;
+
+      FakedObject.type = HB_IT_ARRAY;
+      FakedObject.item.asArray.value = pBaseArray;
+
+      hb_clsFinalize( &FakedObject );
+   }
+
    /* Release object tree as needed */
    if( pBaseArray->puiClsTree )
    {
@@ -1618,6 +1629,16 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    #endif
 
    HB_TRACE( HB_TR_INFO, ( "hb_arrayReleaseGarbage( %p )", pBaseArray ) );
+
+   if( pBaseArray->uiClass )
+   {
+      HB_ITEM FakedObject;
+
+      FakedObject.type = HB_IT_ARRAY;
+      FakedObject.item.asArray.value = pBaseArray;
+
+      hb_clsFinalize( &FakedObject );
+   }
 
    //TraceLog( NULL, "hb_arrayReleaseGarbage( %p )\n", pBaseArray );
 

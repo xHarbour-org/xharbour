@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.343 2004/03/02 18:15:09 ronpinkas Exp $
+ * $Id: hvm.c,v 1.344 2004/03/03 03:31:18 mlombardo Exp $
  */
 
 /*
@@ -743,6 +743,38 @@ int HB_EXPORT hb_vmQuit( void )
    hb_seriviceExit();
 #endif
 
+   /* release all remaining items */
+   hb_stackRemove( 0 );
+   //printf("After Stack\n" );
+
+   if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
+   {
+      hb_itemClear( &(HB_VM_STACK.Return) );
+   }
+   //printf("After Return\n" );
+
+   if( s_aGlobals.type == HB_IT_ARRAY )
+   {
+      // Because GLOBALS items are of type HB_IT_REF (see hb_vmRegisterGlobals())!
+      hb_arrayFill( &s_aGlobals, ( *HB_VM_STACK.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
+      //TraceLog( NULL, "Releasing s_aGlobals: %p\n", &s_aGlobals );
+      hb_arrayRelease( &s_aGlobals );
+      //TraceLog( NULL, "   Released s_aGlobals: %p\n", &s_aGlobals );
+   }
+   //printf("\nAfter Globals\n" );
+
+   // To allow Class Destructors after all other cleanup, but before it's TOO late. - Don't MOVE!!!
+   hb_gcCollectAll( TRUE );
+
+   // Static can NOT be released prior to hb_gcCollectAll() above because Destrcutor might trigger DBG code that uses them.
+   if( s_aStatics.type == HB_IT_ARRAY )
+   {
+      HB_TRACE(HB_TR_DEBUG, ("Releasing s_aStatics: %p\n", &s_aStatics) );
+      hb_arrayRelease( &s_aStatics );
+      HB_TRACE(HB_TR_DEBUG, ("   Released s_aStatics: %p\n", &s_aStatics) );
+   }
+   //printf("\nAfter Statics\n" );
+
    hb_errExit();
    //printf("After Err\n" );
 
@@ -766,36 +798,6 @@ int HB_EXPORT hb_vmQuit( void )
    //printf("After Cdp\n" );
 #endif
 
-   /* release all remaining items */
-#ifndef HB_THREAD_SUPPORT
-   hb_stackRemove( 0 );
-   //printf("After Stack\n" );
-#endif
-
-   if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
-   {
-      hb_itemClear( &(HB_VM_STACK.Return) );
-   }
-   //printf("After Return\n" );
-
-   if( s_aStatics.type == HB_IT_ARRAY )
-   {
-      HB_TRACE(HB_TR_DEBUG, ("Releasing s_aStatics: %p\n", &s_aStatics) );
-      hb_arrayRelease( &s_aStatics );
-      HB_TRACE(HB_TR_DEBUG, ("   Released s_aStatics: %p\n", &s_aStatics) );
-   }
-   //printf("\nAfter Statics\n" );
-
-   if( s_aGlobals.type == HB_IT_ARRAY )
-   {
-      // Because GLOBALS items are of type HB_IT_REF (see hb_vmRegisterGlobals())!
-      hb_arrayFill( &s_aGlobals, ( *HB_VM_STACK.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
-      //TraceLog( NULL, "Releasing s_aGlobals: %p\n", &s_aGlobals );
-      hb_arrayRelease( &s_aGlobals );
-      //TraceLog( NULL, "   Released s_aGlobals: %p\n", &s_aGlobals );
-   }
-   //printf("\nAfter Globals\n" );
-
 #ifndef HB_THREAD_SUPPORT
    hb_memvarsRelease();    /* clear all PUBLIC variables */
 #else
@@ -804,6 +806,7 @@ int HB_EXPORT hb_vmQuit( void )
    //printf("After Memvar\n" );
 
    hb_stackFree();
+
    //printf("After hbStackFree\n" );
 #ifdef HB_THREAD_SUPPORT
    hb_threadExit();
@@ -5664,60 +5667,67 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    {
       //TraceLog( NULL, "Object: '%s' Message: '%s'\n", hb_objGetClsName( pSelf ), pSym->szName );
 
-      pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE );
-
-      if( uiParams == 1 && pFunc == hb___msgGetData )
+      if( pSym == &hb_symDestructor )
       {
-         pFunc = hb___msgSetData;
+         pFunc = pSym->pFunPtr;
       }
-
-      lPopSuper = FALSE;
-      pSelfBase = pSelf->item.asArray.value;
-
-      if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
+      else
       {
-         PHB_ITEM pRealSelf;
-         USHORT nPos;
-         USHORT uiClass;
+         pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE );
 
-         //printf( "\n VmSend Method: %s \n", pSym->szName );
-         uiClass = pSelfBase->uiClass;
-         pItem->item.asSymbol.uiSuperClass = uiClass;
-
-         pRealSelf = hb_itemNew( NULL ) ;
-
-         //TraceLog( NULL, "pRealSelf %p pItems %p\n", pRealSelf, pSelfBase->pItems );
-
-         if( pSelfBase )
+         if( uiParams == 1 && pFunc == hb___msgGetData )
          {
-            hb_itemCopy( pRealSelf, pSelfBase->pItems ) ;  // hb_arrayGetItemPtr(pSelf,1) ;
-         }
-         else
-         {
-            //TraceLog( NULL, "OOPS!!! Object: '%s' Message: '%s' Len: %i\n", hb_objGetClsName( pSelf ), pSym->szName, pSelfBase->ulLen );
-            hb_errInternal( HB_EI_ERRUNRECOV, "Faked super object has no datas (missing real self)!", NULL, NULL );
+            pFunc = hb___msgSetData;
          }
 
-         /* and take back the good pSelfBase */
-         pSelfBase = pRealSelf->item.asArray.value;
+         lPopSuper = FALSE;
+         pSelfBase = pSelf->item.asArray.value;
 
-         /* Now I should exchnage it with the current stacked value */
-         hb_itemSwap( pSelf, pRealSelf );
-         hb_itemRelease( pRealSelf ) ; /* and release the fake one */
-
-         /* Push current SuperClass handle */
-         lPopSuper = TRUE ;
-
-         if( ! pSelf->item.asArray.value->puiClsTree )
+         if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
          {
-            pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
-            pSelf->item.asArray.value->puiClsTree[0]=0;
-         }
+            PHB_ITEM pRealSelf;
+            USHORT nPos;
+            USHORT uiClass;
 
-         nPos = pSelfBase->puiClsTree[0] + 1;
-         pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos+1) ) ;
-         pSelfBase->puiClsTree[0] = nPos ;
-         pSelfBase->puiClsTree[ nPos ] = uiClass;
+            //printf( "\n VmSend Method: %s \n", pSym->szName );
+            uiClass = pSelfBase->uiClass;
+            pItem->item.asSymbol.uiSuperClass = uiClass;
+
+            pRealSelf = hb_itemNew( NULL ) ;
+
+            //TraceLog( NULL, "pRealSelf %p pItems %p\n", pRealSelf, pSelfBase->pItems );
+
+            if( pSelfBase )
+            {
+               hb_itemCopy( pRealSelf, pSelfBase->pItems ) ;  // hb_arrayGetItemPtr(pSelf,1) ;
+            }
+            else
+            {
+               //TraceLog( NULL, "OOPS!!! Object: '%s' Message: '%s' Len: %i\n", hb_objGetClsName( pSelf ), pSym->szName, pSelfBase->ulLen );
+               hb_errInternal( HB_EI_ERRUNRECOV, "Faked super object has no datas (missing real self)!", NULL, NULL );
+            }
+
+            /* and take back the good pSelfBase */
+            pSelfBase = pRealSelf->item.asArray.value;
+
+            /* Now I should exchnage it with the current stacked value */
+            hb_itemSwap( pSelf, pRealSelf );
+            hb_itemRelease( pRealSelf ) ; /* and release the fake one */
+
+            /* Push current SuperClass handle */
+            lPopSuper = TRUE ;
+
+            if( ! pSelf->item.asArray.value->puiClsTree )
+            {
+               pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
+               pSelf->item.asArray.value->puiClsTree[0]=0;
+            }
+
+            nPos = pSelfBase->puiClsTree[0] + 1;
+            pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos+1) ) ;
+            pSelfBase->puiClsTree[0] = nPos ;
+            pSelfBase->puiClsTree[ nPos ] = uiClass;
+         }
       }
    }
    else if ( HB_IS_HASH( pSelf ) )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.13 2004/01/28 23:55:47 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.14 2004/03/02 01:58:54 ronpinkas Exp $
  */
 
 /*
@@ -678,6 +678,11 @@ s_oClass:AddInline( <(op)>, {|Self, <cArg> | <Code> }, HBCLSCHOICE( .F., <.expor
      s_oClass:SetOnError( CLSMETH _CLASS_NAME_ <MethodName>() ) ;;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>(\[\<anyParams>])
 #endif
+
+#xcommand DESTRUCTOR <MethodName> => ;
+  _HB_MEMBER <MethodName>();;
+  s_oClass:SetDestructor( CLSMETH _CLASS_NAME_ <MethodName>() ) ;;
+ #xcommand PROCEDURE <MethodName> \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>
 
 #xtranslate END CLASS => ENDCLASS
 
