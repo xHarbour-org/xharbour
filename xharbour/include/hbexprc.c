@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.9 2003/05/28 05:42:29 ronpinkas Exp $
+ * $Id: hbexprc.c,v 1.10 2003/06/06 06:45:09 druzus Exp $
  */
 
 /*
@@ -106,7 +106,7 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
       HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
 
       /* push object */
-      if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+      if( pObj->ExprType == HB_ET_SEND )
       {
          /* Push object */
          HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
@@ -120,7 +120,7 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
       HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
 
       /* push object */
-      if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+      if( pObj->ExprType == HB_ET_SEND )
       {
          /* Push object */
          HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
@@ -131,7 +131,7 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
       }
 
       /* Do it. */
-      if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+      if( pObj->ExprType == HB_ET_SEND )
       {
          HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 0, ( BOOL ) 1 );
       }
@@ -251,9 +251,8 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
       /* Push _message for the later assignment.  */
       HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
 
-      /* Push object */
       /* push object */
-      if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+      if( pObj->ExprType == HB_ET_SEND )
       {
          /* Push object */
          HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
@@ -267,7 +266,7 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
       HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
 
       /* push object */
-      if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+      if( pObj->ExprType == HB_ET_SEND )
       {
          /* Push object */
          HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
@@ -278,7 +277,7 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
       }
 
       /* Do it.*/
-      if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+      if( pObj->ExprType == HB_ET_SEND )
       {
          HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 0, ( BOOL ) 1 );
       }
@@ -294,7 +293,7 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
       HB_EXPR_GENPCODE1( hb_compGenPCode1, bOpEq );
 
       /* Now do the assignment - call pop message with one argument */
-      if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND )
+      if( pObj->ExprType == HB_ET_SEND )
       {
          HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 1, ( BOOL ) 1 );
       }
@@ -346,10 +345,13 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
 
       /* push old value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
       /* push increment value */
       HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+
       /* add */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, bOpEq );
+
       /* pop the new value into variable and remove it from the stack */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
    }
@@ -371,30 +373,66 @@ void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
 
       /* Push _message for later use */
       HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
+
       /* Push object */
-      HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+      if( pObj->ExprType == HB_ET_SEND )
+      {
+         /* Push object */
+         HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+      }
+      else
+      {
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
+      }
 
       /* Now push current value of variable */
       HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
+
       /* Push object */
-      HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+      if( pObj->ExprType == HB_ET_SEND )
+      {
+         /* Push object */
+         HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
+      }
+      else
+      {
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
+      }
+
       /* Do it. */
-      HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 0, ( BOOL ) 1 );
+      if( pObj->ExprType == HB_ET_SEND )
+      {
+         HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 0, ( BOOL ) 1 );
+      }
+      else
+      {
+         HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDWITHSHORT, 0, ( BOOL ) 1 );
+      }
 
       /* increase/decrease operation */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, bOper );
 
       /* Now, do the assignment - call pop message with one argument - it leaves the value on the stack */
-      HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 1, ( BOOL ) 1 );
+      if( pObj->ExprType == HB_ET_SEND )
+      {
+         HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDSHORT, 1, ( BOOL ) 1 );
+      }
+      else
+      {
+         HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDWITHSHORT, 1, ( BOOL ) 1 );
+      }
    }
    else
    {
       /* Push current value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
       /* Increment */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, bOper );
+
       /* duplicate a value */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_DUPLICATE );
+
       /* pop new value and leave the duplicated copy of it on the stack */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
    }
@@ -414,8 +452,10 @@ void hb_compExprPushPostOp( HB_EXPR_PTR pSelf, BYTE bOper )
    {
       /* push current value - it will be a result of whole expression */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
       /* now increment the value */
       HB_EXPR_PCODE2( hb_compExprPushPreOp, pSelf, bOper );
+
       /* pop the value from the stack */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
    }
@@ -423,10 +463,13 @@ void hb_compExprPushPostOp( HB_EXPR_PTR pSelf, BYTE bOper )
    {
       /* Push current value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
       /* Duplicate value */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_DUPLICATE );
+
       /* Increment */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, bOper );
+
       /* pop new value from the stack */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
    }
@@ -446,6 +489,7 @@ void hb_compExprUsePreOp( HB_EXPR_PTR pSelf, BYTE bOper )
    if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_SEND || pSelf->value.asOperator.pLeft->ExprType == HB_ET_WITHSEND )
    {
       HB_EXPR_PCODE2( hb_compExprPushPreOp, pSelf, bOper );
+
       /* pop the value from the stack */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
    }
@@ -453,8 +497,10 @@ void hb_compExprUsePreOp( HB_EXPR_PTR pSelf, BYTE bOper )
    {
       /* Push current value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
       /* Increment */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, bOper );
+
       /* pop new value from the stack */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
    }
