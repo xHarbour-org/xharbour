@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.18 2002/11/24 17:50:36 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.19 2002/11/25 05:09:01 ronpinkas Exp $
  */
 
 /*
@@ -156,8 +156,8 @@ SELF_CONTAINED_WORDS_ARE {
 
 /* KeyWords are grouped based on the next token they require. */
 #define WANTS_VAR        703 /* Wants Variable (including Macros): DO, FOR, PRIVATE, PUBLIC */
-#define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, EXTERN, FIELD, FUNCTION, LOCAL, GLOBAL, EXTERNGLOBAL, MEMVAR, PARAMETERS, PROCEDURE, ENUM, STATIC */
-#define WANTS_EOL        705 /* Wants EOL: ELSE, END, ENDCASE, ENDDO, ENDIF, EXIT, LOOP, NEXT, OTHERWISE, RECOVER */
+#define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, CATCH, EXTERN, FIELD, FUNCTION, LOCAL, GLOBAL, EXTERNGLOBAL, MEMVAR, PARAMETERS, PROCEDURE, ENUM, STATIC */
+#define WANTS_EOL        705 /* Wants EOL: ELSE, END, ENDCASE, ENDDO, ENDIF, EXIT, LOOP, NEXT, OTHERWISE, RECOVER TRY*/
 #define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, IN, RETURN, WHILE, WITHOBJ */
 #define REJECT_OP        707
 
@@ -212,6 +212,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "BEGIN{WS}SEQUENCE"   ) AS_TOKEN( BEGINSEQ         ),
                          LEX_WORD( "BREAK"               ) AS_TOKEN( HB_WANTS_EXP - BREAK            ),
                          LEX_WORD( "CASE"                ) AS_TOKEN( HB_WANTS_EXP - CASE             ),
+                         LEX_WORD( "CATCH"               ) AS_TOKEN( HB_WANTS_ID  - CATCH            ),
                          LEX_WORD( "DECLARE"             ) AS_TOKEN( DECLARE          ),
                          LEX_WORD( "DO"                  ) AS_TOKEN( HB_WANTS_VAR - DO               ),
                          LEX_WORD( "DO{WS}CASE"          ) AS_TOKEN( DOCASE           ),
@@ -253,6 +254,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "STATIC{WS}FUNCTION"  ) AS_TOKEN( HB_STATIC_FUNC   ),
                          LEX_WORD( "STATIC{WS}PROCEDURE" ) AS_TOKEN( HB_STATIC_PROC   ),
                          LEX_WORD( "TEXT"                ) AS_TOKEN( HB_TEXT          ),
+                         LEX_WORD( "TRY"                 ) AS_TOKEN( HB_WANTS_EOL  - TRY             ),
                          LEX_WORD( "WHILE"               ) AS_TOKEN( HB_WANTS_EXP - WHILE            ),
                          LEX_WORD( "WITH{WS}OBJECT"      ) AS_TOKEN( WITHOBJ          ),
                          LEX_WORD( "_HB_CLASS"           ) AS_TOKEN( DECLARE_CLASS    ),

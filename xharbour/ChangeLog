@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.518 2002/12/07 23:49:15 lculik Exp $
+ * $Id: ChangeLog,v 1.519 2002/12/08 02:20:25 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-08 12:02 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    + Added support for new syntax:
+      TRY
+         ...
+         [THROW( <exp> )]
+         ...
+      [CATCH <Id>]
+      END
+
+  * source/rtl/terror.prg
+    + Added HB_SetTry() and HB_ResetTry()
+    + Added Optional Paramaters ( SubSystem, SubCode, Operation, Description, Args ) to contructor ErrorNew()
+
+  * source/vm/break.c
+    + Added new Throw( xExp )
+
+  + tests/trycatch.prg
+    + New sample to demonstrate new TRY [THROW...] [CATCH ...] END syntax.
 
 2002-12-07 18:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/macro/macro.slx

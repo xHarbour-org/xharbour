@@ -1,5 +1,5 @@
 /*
- * $Id: break.c,v 1.5 2001/06/14 21:20:43 dholm Exp $
+ * $Id: break.c,v 1.1.1.1 2001/12/21 10:40:46 ronpinkas Exp $
  */
 
 /*
@@ -59,6 +59,11 @@
          call on the pcode level, we should drop the checking. [vszakats] */
 
 HB_FUNC( BREAK )
+{
+   hb_vmRequestBreak( hb_param( 1, HB_IT_ANY ) );
+}
+
+HB_FUNC( THROW )
 {
    hb_vmRequestBreak( hb_param( 1, HB_IT_ANY ) );
 }

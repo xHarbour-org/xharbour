@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.10 2001/09/10 22:04:29 vszakats Exp $
+ * $Id: terror.prg,v 1.1.1.1 2001/12/21 10:41:59 ronpinkas Exp $
  */
 
 /*
@@ -53,14 +53,17 @@
 /* Error Class. We are keeping Clipper compatibility here, instead of using
    TError():New() style and also avoiding hungarian notation. */
 
-FUNCTION ErrorNew()
+static s_aErrHandlers := {}
+
+FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args )
 
    STATIC s_oClass
+   LOCAL oErr
 
    IF s_oClass == NIL
       s_oClass := HBClass():New( "ERROR" )
 
-      s_oClass:AddData( "Args"         , 0 )
+      s_oClass:AddData( "Args"         ,  )
       s_oClass:AddData( "CanDefault"   , .F. )
       s_oClass:AddData( "CanRetry"     , .F. )
       s_oClass:AddData( "CanSubstitute", .F. )
@@ -72,12 +75,43 @@ FUNCTION ErrorNew()
       s_oClass:AddData( "OsCode"       , 0 )
       s_oClass:AddData( "Severity"     , 0 )
       s_oClass:AddData( "SubCode"      , 0 )
-      s_oClass:AddData( "SubSystem"    , "" )
+      s_oClass:AddData( "SubSystem"    , 0 )
       s_oClass:AddData( "Tries"        , 0 )
 
       s_oClass:Create()
-
    ENDIF
 
-   RETURN s_oClass:Instance()
+   oErr := s_oClass:Instance()
+
+   IF SubSystem != NIL
+      oErr:SubSystem := SubSystem
+   ENDIF
+   IF SubCode != NIL
+      oErr:SubCode := SubCode
+   ENDIF
+   IF Operation != NIL
+      oErr:Operation := Operation
+   ENDIF
+   IF Description != NIL
+      oErr:Description := Description
+   ENDIF
+   IF Args != NIL
+      oErr:Args := Args
+   ENDIF
+
+RETURN oErr
+
+PROCEDURE HB_SetTry()
+
+   aAdd( s_aErrHandlers, ErrorBlock( {|e| Break(e) } ) )
+
+RETURN
+
+PROCEDURE HB_ResetTry()
+
+   ErrorBlock( s_aErrHandlers[-1] )
+   aSize( s_aErrHandlers, Len( s_aErrHandlers ) - 1 )
+
+RETURN
+
 

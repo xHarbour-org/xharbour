@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.28 2002/12/04 06:24:07 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.29 2002/12/04 23:06:56 likewolf Exp $
  */
 
 /*
@@ -181,6 +181,7 @@ static void hb_compDebugStart( void ) { };
 %token PROCREQ GET
 %token WITHOBJ FOREACH EPSILON
 %token ENUM
+%token TRY CATCH
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
@@ -1746,6 +1747,7 @@ ExecFlow   : IfEndif
            | ForNext
            | ForEach
            | BeginSeq
+           | Try
            ;
 
 IfEndif    : IfBegin EndIf                    { hb_compGenJumpHere( $1 ); }
@@ -2087,7 +2089,68 @@ RecoverUsing : RECOVERUSING IdentName
                   hb_compGenPCode1( HB_P_SEQRECOVER );
                   hb_compGenPopVar( $2 );
                }
-           ;
+             ;
+
+Try          : TRY
+               {
+                  ++hb_comp_wSeqCounter; $<lNumber>$ = hb_compSequenceBegin();
+
+                  hb_compExprDelete( hb_compExprGenStatement( hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( "HB_SETTRY", TRUE ) ), NULL ) ) );
+               }
+               Crlf
+               EmptyStats
+               {
+                  /* Set jump address for HB_P_SEQBEGIN opcode - this address
+                   * will be used in BREAK code if there is no RECOVER clause
+                   */
+                  hb_compGenJumpHere( $<lNumber>2 );
+                  $<lNumber>$ = hb_compSequenceEnd();
+               }
+               Catch
+               {
+                  /* Replace END address with RECOVER address in
+                   * HB_P_SEQBEGIN opcode if there is RECOVER clause
+                   */
+                  if( $<lNumber>6 )
+                  {
+                     hb_compGenJumpThere( $<lNumber>2, $<lNumber>6 );
+                  }
+               }
+               END
+               {
+                  hb_compExprDelete( hb_compExprGenStatement( hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( "HB_RESETTRY", TRUE ) ), NULL ) ) );
+
+                  /* Fix END address
+                   * There is no line number after HB_P_SEQEND in case no
+                   * RECOVER clause is used
+                   */
+                  hb_compGenJumpThere( $<lNumber>5, hb_comp_functions.pLast->lPCodePos );
+
+                  /* only if there is no CATCH clause */
+                  if( ! $<lNumber>6 )
+                  {
+                     --hb_comp_wSeqCounter;  /* CATCH is also considered as end of sequence */
+                  }
+
+                  hb_compSequenceFinish( $<lNumber>2, $<iNumber>4 );
+                  hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
+               }
+             ;
+
+Catch        : /* no recover */  { $<lNumber>$ = 0; }
+             | CatchError Crlf { $<lNumber>$ = $<lNumber>1; } EmptyStats
+             ;
+
+CatchError   : CATCH IdentName
+               {
+                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+                  $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
+                  --hb_comp_wSeqCounter;
+                  hb_compLinePush();
+                  hb_compGenPCode1( HB_P_SEQRECOVER );
+                  hb_compGenPopVar( $2 );
+               }
+             ;
 
 /* NOTE: In Clipper all variables used in DO .. WITH are passed by reference
  * however if they are part of an expression then they are passed by value
