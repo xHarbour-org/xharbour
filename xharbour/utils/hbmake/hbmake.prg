@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.105 2003/12/03 01:50:42 lculik Exp $
+ * $Id: hbmake.prg,v 1.106 2003/12/30 12:31:30 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1876,6 +1876,11 @@ FUNC CreateMakeFile( cFile )
          ENDIF
 
          aEval( aLibsOut, { | cLib | cLibs += " " + cLib } )
+	 nPos := aScan( aLibsOut, { | z | At( "mysql", Lower( z ) ) > 0 } )
+	 
+	 if nPos >0 
+	    cLibs += " mysqlclient.lib"
+	 endif 
 
          IF ! s_lMt
             cDefBccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
@@ -1894,8 +1899,16 @@ FUNC CreateMakeFile( cFile )
             aSize( aLibsOut, Len( aLibsOut ) - 1 )
          ENDIF
 
-         aEval( aLibsOut, { | cLib | cLibs += " -l" + Strtran( cLib, '.a', "" ) } )
+         aEval( aLibsOut, { | cLib | cLibs += " -l" + Strtran( cLib, '.a', "" )} )
+
+ 	 nPos := aScan( aLibsOut, { | z | At( "mysql", Lower( z ) ) > 0 } )
+	 
+	 if nPos >0 
+	    cLibs += " -lmysqlclient"
+	 endif 
+	 tracelog(cLibs)
          cExtraLibs := cLibs
+	 
          IF cOs == "Linux"
 
             IF ! s_lMt

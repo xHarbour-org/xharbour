@@ -449,7 +449,7 @@ FUNCTION Getlibs( lGcc, cDir )
                         { "Harbour Gt library - Libgt", 'nf' + IIF( lGcc, '.a', '.lib' ) }, ;
                         { "Harbour Zip library ", 'ziparchive' + IIF( lGcc, '.a', '.lib' ) + IIF( lLinux, ' stdc++.a z.a', ' ' ) }, ;
                         { "Harbour Hbole library Hbole", 'hbole' + IIF( lGcc, '.a', '.lib' ) + ' ole2' + IIF( lGcc, '.a', '.lib' ) }, ;
-                        { "Harbour Mysql library - MySql", 'mysql' + IIF( lGcc, '.a', '.lib' ) + ' libmysql' + IIF( lGcc, '.a', '.lib' ) + ' mysqlclient' + IIF( lGcc, '.a', '.lib' ) }, ;
+                        { "Harbour Mysql library - MySql", 'mysql' + IIF( lGcc, '.a', '.lib' )}, ;
                         { "Harbour Samples library - Samples", 'samples' + IIF( lGcc, '.a', '.lib' ) } }
 
    AEVAL( ainstaledlibs, { | x | AADD( aLibsDesc, { "User - " + x + " Library", x } ) } )
