@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.112 2004/05/08 22:07:09 druzus Exp $
+ * $Id: dbcmd.c,v 1.113 2004/05/10 10:38:05 mauriliolongo Exp $
  */
 
 /*
@@ -4926,16 +4926,9 @@ static char *hb_strescape( char *szInput, int lLen, char *cEsc )
 
    while ( *szChr && lCnt++ < lLen )
    {
-      if( *szChr < ' ' )
+      if( *szChr == *cEsc ) // *szChr == '\\' || *szChr == '"'  )
       {
-         *szEscape++ = ' ';
-      }
-      else
-      {
-         if( *szChr == *cEsc ) // *szChr == '\\' || *szChr == '"'  )
-         {
-            *szEscape++ = '\'';
-         }
+         *szEscape++ = '\'';
       }
       *szEscape++ = *szChr++;
    }
