@@ -1,8 +1,6 @@
-
 /*
- * $Id: radios.prg,v 1.5 2001/08/03 22:23:55 lculik Exp $
+ * $Id: radios.prg,v 1.1.1.1 2001/12/21 10:45:03 ronpinkas Exp $
  */
-
 /*
  * Harbour Project source code:
  * radios.Prg radios gets for hbmake

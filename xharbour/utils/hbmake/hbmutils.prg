@@ -1,5 +1,5 @@
 /*
- * $Id: hbmutils.prg,v 1.37 2004/12/10 00:00:00 modalsist Exp $
+ * $Id: hbmutils.prg,v 1.37 2004/12/25 00:00:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -66,7 +66,9 @@
 
 #endif
 
+*--------------------------------------------
 FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
+*--------------------------------------------
 
    LOCAL aDirs
    LOCAL aRet      := {}
@@ -100,7 +102,7 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
 
    aDirs := {}
 
-   ASORT( aStru )
+   ASort( aStru )
    nArrayLen := LEN( aStru )
 
    FOR nCounter := 1 TO nArrayLen
@@ -172,7 +174,9 @@ FUNCTION GetSourceFiles( lSubDir, lGcc, cOs )
    NEXT
 RETURN aRet
 
+*-------------------------------
 FUNCTION ExtenPrg( cExt, nType )
+*-------------------------------
 
    LOCAL aExt   := { "C", "c" }
    LOCAL nPos
@@ -208,7 +212,9 @@ FUNCTION ExtenPrg( cExt, nType )
 
 RETURN cTemp
 
+*----------------------------------------
 STATIC FUNCTION GetDirs( cPattern, lGcc )
+*----------------------------------------
 
    LOCAL aDir   := {}
    LOCAL lLinux := AT( 'linux', LOWER( OS() ) ) > 0 .OR. lGcc
@@ -221,7 +227,9 @@ STATIC FUNCTION GetDirs( cPattern, lGcc )
 
 RETURN ( aDir )
 
+*-----------------------
 FUNCTION GetHarbourDir()
+*-----------------------
 
    LOCAL cPath   := ''
    LOCAL cEnv    := GETE( "PATH" )
@@ -241,7 +249,9 @@ FUNCTION GetHarbourDir()
 
 RETURN cPath
 
+*-------------------
 FUNCTION GetBccDir()
+*-------------------
 
    LOCAL cPath   := ''
    LOCAL cEnv    := GETE( "PATH" )
@@ -261,7 +271,9 @@ FUNCTION GetBccDir()
 
 RETURN cPath
 
+*-------------------
 FUNCTION GetVccDir()
+*-------------------
 
    LOCAL cPath   := ''
    LOCAL cEnv    := GETE( "PATH" )
@@ -281,7 +293,9 @@ FUNCTION GetVccDir()
 
 RETURN cPath
 
+*----------------------------
 FUNCTION Exten( cExt, nType )
+*----------------------------
 
    LOCAL aExt    := { 'C', 'c', "CPP", "cpp" }
    LOCAL nPos
@@ -305,8 +319,9 @@ FUNCTION Exten( cExt, nType )
 
 RETURN cTemp
 
-
+*--------------------
 FUNCTION GetMakeDir()
+*--------------------
 
    LOCAL cPath := ""
    LOCAL cExe  := HB_ARGV( 0 )
@@ -317,7 +332,9 @@ FUNCTION GetMakeDir()
 
 RETURN cPath
 
+*----------------------------
 FUNCTION GetSourceDirMacros()
+*----------------------------
 
    LOCAL aDirs
    LOCAL lLinux    := AT( 'linux', LOWER( OS() ) ) > 0
@@ -341,29 +358,38 @@ FUNCTION GetSourceDirMacros()
 
 RETURN aMacros
 
+*------------------------------------
 FUNCTION HbMake_FileDate( cFileName )
+*------------------------------------
 
    LOCAL aFiles := DIRECTORY( cFileName )
 
 RETURN IIF( LEN( aFiles ) == 1, aFiles[ 1, 3 ], CTOD( '' ) )
 
+*------------------------------------
 FUNCTION HbMake_FileTime( cFileName )
+*------------------------------------
 
    LOCAL aFiles := DIRECTORY( cFileName )
 
 RETURN IIF( LEN( aFiles ) == 1, aFiles[ 1, 4 ], '' )
 
+*------------------------------
 FUNCTION TD2JUL( CTIME, DDATE )
-
+*------------------------------
 RETURN DDATE - CTOD( '01/01/1900' ) + ( PRB_INT( TTOS( CTIME ) / 100000,, 5 ) )
 
+*---------------------
 FUNCTION TTOS( CTIME )
+*---------------------
 
 RETURN ( VAL( SUBSTR( CTIME, 7, 2 ) ) ) + ;
          ( VAL( SUBSTR( CTIME, 4, 2 ) ) * 60 ) + ;
          ( VAL( SUBSTR( CTIME, 1, 2 ) ) * 3600 )
 
+*---------------------------------------------------
 FUNCTION PRB_INT( SOMENUMBER, length, NUM_DECIMALS )
+*---------------------------------------------------
 
    LOCAL NEGATIVE   := ( SOMENUMBER < 0 )
    LOCAL SOMESTRING
@@ -401,7 +427,9 @@ FUNCTION PRB_INT( SOMENUMBER, length, NUM_DECIMALS )
 
 RETURN VAL( SOMESTRING )
 
+*---------------------------
 FUNCTION Exte( cExt, nType )
+*---------------------------
 
    LOCAL aExt  := { 'prg', 'prG', 'pRg', 'Prg', 'PRg', 'PrG', 'PRG' }
    LOCAL nPos
@@ -421,7 +449,9 @@ FUNCTION Exte( cExt, nType )
 
 RETURN cTemp
 
+*-----------------------------------------------
 PROCEDURE ATTENTION( CSTRING, NLINENUM, CCOLOR )
+*-----------------------------------------------
 
    LOCAL COLDCOLOR
 
@@ -440,11 +470,15 @@ PROCEDURE ATTENTION( CSTRING, NLINENUM, CCOLOR )
 
 RETURN
 
+*--------------------
 FUNCTION c( CSTRING )
+*--------------------
 
 RETURN MAX( ( MAXCOL() / 2 ) - INT( LEN( CSTRING ) / 2 ), 0 )
 
+*----------------------
 FUNCTION ReadLN( lEof )
+*----------------------
 
    LOCAL cBuffer := ""
    cBuffer := FT_FREADLN()
@@ -455,36 +489,40 @@ FUNCTION ReadLN( lEof )
 
 RETURN cBuffer
 
+*--------------------------------------
 FUNCTION GetInstaledLibs( clibs, lGcc )
+*--------------------------------------
 
    LOCAL cSuffix := IIF( lGCC, ".a", ".lib" )
 
-   LOCAL aDefLib := { 'lang' + cSuffix, ;
-                      'vm' + cSuffix, ;
-                      'rtl' + cSuffix, ;
-                      'rdd' + cSuffix, ;
-                      'macro' + cSuffix, ;
-                      'pp' + cSuffix, ;
+   LOCAL aDefLib := { 'lang'   + cSuffix, ;
+                      'vm'     + cSuffix, ;
+                      'rtl'    + cSuffix, ;
+                      'rdd'    + cSuffix, ;
+                      'macro'  + cSuffix, ;
+                      'pp'     + cSuffix, ;
                       'dbfntx' + cSuffix, ;
                       'dbfcdx' + cSuffix, ;
+                      'dbfdbt' + cSuffix, ;
+                      'dbffpt' + cSuffix, ;
                       'common' + cSuffix, ;
-                      'gtwin' + cSuffix, ;
-                      'debug' + cSuffix, ;
-                      'gtpca' + cSuffix, ;
-                      'gtdos' + cSuffix, ;
-                      'gtsln' + cSuffix, ;
-                      'gtstd' + cSuffix, ;
+                      'gtwin'  + cSuffix, ;
+                      'debug'  + cSuffix, ;
+                      'gtpca'  + cSuffix, ;
+                      'gtdos'  + cSuffix, ;
+                      'gtsln'  + cSuffix, ;
+                      'gtstd'  + cSuffix, ;
                       'ziparchive' + cSuffix, ;
-                      'hbzip' + cSuffix, ;
+                      'hbzip'  + cSuffix, ;
                       'rddads' + cSuffix, ;
-                      'ace32' + cSuffix, ;
-                      'libnf' + cSuffix, ;
-                      'html' + cSuffix, ;
-                      'libgt' + cSuffix, ;
+                      'ace32'  + cSuffix, ;
+                      'libnf'  + cSuffix, ;
+                      'html'   + cSuffix, ;
+                      'libgt'  + cSuffix, ;
                       'libmisc' + cSuffix, ;
-                      'mysql' + cSuffix, ;
-                      'hbpg' + cSuffix, ;
-                      'libmysql' + cSuffix, ;
+                      'mysql'  + cSuffix, ;
+                      'hbpg'   + cSuffix, ;
+                      'libmysql'    + cSuffix, ;
                       'mysqlclient' + cSuffix, ;
                       'samples' + cSuffix, ;
                       'pdflib' + cSuffix, ;
@@ -498,7 +536,9 @@ FUNCTION GetInstaledLibs( clibs, lGcc )
                       'dbfcdxmt' + cSuffix, ;
                       'macromt' + cSuffix,;
                       'codepage' + cSuffix,;
-                      'gtnul' + cSuffix }
+                      'gtnul' + cSuffix,;
+                      'ct'+cSuffix,;
+                      'tip'+cSuffix }
 
    LOCAL aReturnLibs := {}
    LOCAL aLibs       := DIRECTORY( clibs )
@@ -507,50 +547,59 @@ FUNCTION GetInstaledLibs( clibs, lGcc )
    LOCAL cItem
 
    IF lGcc
-      AEVAL( aLibs, { | x, y | cItem := x[ 1 ], IIF( LEFT( cItem, 3 ) == "lib", aLibs[ y, 1 ] := SUBSTR( cItem, 4 ), ) } )
+      AEval( aLibs, { | x, y | cItem := x[1], IIF( Left( cItem, 3 ) == "lib", aLibs[ y, 1 ] := SubStr( cItem, 4 ), ) } )
    ENDIF
 
    FOR nCount := 1 TO LEN( aLibs )
 
-      cItem := LOWER( aLibs[ nCount, 1 ] )
+      cItem := Lower( aLibs[ nCount, 1 ] )
 
-      nPos := ASCAN( aDefLib, { | a | LOWER( a ) == cItem } )
+      nPos := AScan( aDefLib, { | a | Lower( a ) == cItem } )
       IF nPos == 0
-         AADD( aReturnLibs, aLibs[ nCount, 1 ] )
+         AAdd( aReturnLibs, aLibs[ nCount, 1 ] )
       ENDIF
 
    NEXT
 
 RETURN aReturnLibs
 
+*-----------------------------
 FUNCTION GetLibs( lGcc, cDir )
+*-----------------------------
 
    LOCAL lLinux        := AT( 'linux', LOWER( OS() ) ) > 0
    LOCAL cEnv          := GETENV( "HB_LIB_INSTALL" )
    LOCAL aInstaledLibs := GetInstaledLibs( IIF( ! lLinux, IIF( ! lGcc, cDir + "\*.lib", cDir + "\*.a" ),  '/usr/lib/xharbour/*.a' ), lGcc )
-   LOCAL aLibsDesc     := { { "Harbour Misc       library - Libmisc", IIF( lGcc, 'misc.a', 'libmisc.lib' ) }, ;
-                            { "Harbour Html       library - Htmllib", 'html' + IIF( lGcc, '.a', '.lib' ) }, ;
-                            { "Harbour NanFor     library - Libnf"  , IIF( lGcc, 'nf.a', 'libnf.lib' ) }, ;
-                            { "Harbour GT         library - Libgt"  , 'gt' + IIF( lGcc, '.a', '.lib' ) }, ;
-                            { "Harbour Zip        library - Hbzip"  , IIF( ISWIN(),'hbzip','ziparchive') + IIF( lGcc, '.a', '.lib' ) + IIF( lLinux, ' stdc++.a z.a', ' ' ) }, ;
-                            { "Harbour Ole        library - HbOle"  , 'hbole' + IIF( lGcc, '.a', '.lib' ) + ' ole2' + IIF( lGcc, '.a', '.lib' ) }, ;
-                            { "Harbour MySql      library - MySql"  , 'mysql' + IIF( lGcc, '.a', '.lib' )}, ;
-                            { "Harbour PostGreSql library - hbpg"   , 'libhbpg' + IIF( lGcc, '.a', '.lib' )}, ;
-                            { "Harbour Samples    library - Samples", 'samples' + IIF( lGcc, '.a', '.lib' ) }  }
-                                                                                                           
+   LOCAL cExt := iif(lGcc,".a",".lib")
 
-   AEVAL( aInstaledLibs, { | x | AADD( aLibsDesc, { "User - " + padr(x,12) + " Library", x } ) } )
+
+   LOCAL aLibsDesc     := { { "xHarbour Misc       lib - "+iif( lGcc, "misc.a", "libmisc.lib" ) , iif( lGcc, 'misc.a', 'libmisc.lib' ) },;
+                            { "xHarbour Html       lib - html" + cExt                           , 'html' +cExt },;
+                            { "xHarbour NanFor     lib - "+iif( lGcc, "nf.a", "libnf.lib" )     , iif( lGcc, 'nf.a', 'libnf.lib' ) },;
+                            { "xHarbour GT         lib - gt"+cExt                               , 'gt' + cExt },;
+                            { "xHarbour Zip        lib - "+iif( IsWin(),"hbzip","ziparchive")+cExt  , IIF( ISWIN(),'hbzip','ziparchive') + cExt + iif( lLinux, ' stdc++.a z.a', ' ' ) },;
+                            { "xHarbour Ole        lib - hbole"+ cExt                           , 'hbole' + cExt + ' ole2' + cExt },;
+                            { "xHarbour MySql      lib - mysql"+ cExt                           , 'mysql' + cExt },;
+                            { "xHarbour PostGreSql lib - libhbpg"+cExt                          , 'libhbpg' + cExt },;
+                            { "xHarbour Samples    lib - samples"+cExt                          , 'samples' + cExt }  }
+
+
+   AEVAL( aInstaledLibs, { | x | AAdd( aLibsDesc, { padr("xHarbour contrib",20)+"lib - " + padr(x,15), x } ) } )
 
 RETURN aLibsDesc
 
+*-----------------------------------------
 FUNCTION DIR_MULTI( cFileMaskList, cAttr )
+*-----------------------------------------
 
    LOCAL aList := listasarray2( cFileMaskList, "|" )
    AEVAL( aList, { | tmp, tmp1 | aList[ tmp1 ] := DIRECTORY( tmp, cAttr ) } )
 
 RETURN ArrayAJoin( alist )
 
+*----------------------------
 FUNCTION ArrayAJoin( aArray )
+*----------------------------
 
    LOCAL tmp
    LOCAL nLenArray := LEN( aArray )
@@ -571,7 +620,9 @@ FUNCTION ArrayAJoin( aArray )
    NEXT
 RETURN aArray[ 1 ]
 
+*-----------------------------------------
 FUNCTION ListAsArray2( cList, cDelimiter )
+*-----------------------------------------
 
    LOCAL nPos
    LOCAL aList  := {}              // Define an empty array
@@ -589,7 +640,10 @@ FUNCTION ListAsArray2( cList, cDelimiter )
    //
 RETURN aList        // Return the array
 
+*--------------------
 FUNCTION CreateLink()
+*--------------------
+
     LOCAL nHandle := FCreate("hbtemp.c")
     
     FWrite( nHandle, '#include "hbapi.h"' + HB_OsNewLine())
@@ -603,6 +657,9 @@ FUNCTION CreateLink()
 
 RETURN NIL
 
+*----------------------
 STATIC FUNCTION ISWIN()
+*-----------------------
 RETURN "WINDOWS" IN Upper( OS() )
-*+ EOF: HBMUTILS.PRG
+
+// EOF: HBMUTILS.PRG

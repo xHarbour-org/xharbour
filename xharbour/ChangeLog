@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3693 2004/12/25 12:09:06 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3695 2004/12/25 21:50:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2004-12-25 18:17 UTC+0100 Patrick Mast <patrick@xHarbour.com> 
+2004-12-25 21:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br> 
+  * utils/hbmake/tmake.prg
+  * utils/hbmake/radios.prg
+  * utils/hbmake/hbmake.prg
+  * utils/hbmake/pickarry.prg
+  * utils/hbmake/hbmutils.prg
+    Changed to remember marked external libs.
+
+
+2004-12-25 18:17 UTC+0100 Patrick Mast <patrick@xHarbour.com>
   + Added Croatien code page 437 (DOS) on bhalf of Vladimir Miholic.
 
 2004-12-25 14:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>

@@ -1,5 +1,5 @@
 /*
- * $Id: tmake.prg,v 1. 2004/09/18 00:00:00 modalsist Exp $
+ * $Id: tmake.prg,v 2.0 2004/12/24 00:00:00 modalsist Exp $
  */
 
 /*
@@ -65,6 +65,7 @@ Data  aBuildOrder    Init  {}
 Data  aCommands      Init  {}
 Data  aMacros        Init  {}
 Data  aPrgs          Init  {}
+Data  aExtLibs       Init  {}
 Data  aCs            Init  {}
 Data  aObjs          Init  {}
 Data  aObjsc         Init  {}
@@ -152,6 +153,7 @@ method Reset() class THbmake
    ::aCommands      :=  {}
    ::aMacros        :=  {}
    ::aPrgs          :=  {}
+   ::aExtLibs       :=  {}
    ::aCs            :=  {}
    ::aObjs          :=  {}
    ::aObjsc         :=  {}
@@ -300,11 +302,11 @@ Method WriteMakeFile() CLASS THBMAKE
         IF !Empty( ::aMacros[ x, 2 ] )
 
             cItem := ::aMacros[ x, 2 ]
-            nPos  := Ascan( ::aPrgs, { | z | hb_FNAMESPLIT( z, @cPath, @cTest, @cExt, @cDrive ), cpath == citem } )
+            nPos  := AScan( ::aPrgs, { | z | hb_FNAMESPLIT( z, @cPath, @cTest, @cExt, @cDrive ), cpath == citem } )
 
             IF nPos > 0
 
-                Aeval( ::aPrgs, { | a, b | hb_FNAMESPLIT( a, @cPath, @cTest, @cExt, @cDrive ), If( cPath == citem, ::aPrgs[ b ] := Strtran( a, cpath, "$(" + ::aMacros[ x, 1 ] + ')\' ), ) } )
+                AEval( ::aPrgs, { | a, b | hb_FNAMESPLIT( a, @cPath, @cTest, @cExt, @cDrive ), If( cPath == citem, ::aPrgs[ b ] := Strtran( a, cpath, "$(" + ::aMacros[ x, 1 ] + ')\' ), ) } )
 
                 IF !::aMacros[ x, 3 ]
 
@@ -358,6 +360,22 @@ Method WriteMakeFile() CLASS THBMAKE
 
             ENDIF
 
+
+            nPos := AScan( ::aExtLibs, { | z | hb_FNAMESPLIT( z, @cPath, @cTest, @cExt, @cDrive ), cpath == citem } )
+
+            IF nPos > 0
+
+                IF !::aMacros[ x, 3 ]
+
+                    AEval( ::aExtLibs, { | a, b | hb_FNAMESPLIT( a, @cPath, @cTest, @cExt, @cDrive ), If( cPath == citem, ::aExtLibs[ b ] := Strtran( a, cpath, "$(" + ::aMacros[ x, 1 ] + If( ::lGcc, ")/", ')\' ) ), ) } )
+                    Fwrite( ::nLinkHandle, ::aMacros[ x, 1 ] + ' = ' + Left( ::aMacros[ x, 2 ], Len( ::aMacros[ x, 2 ] ) - 1 ) + " " + CRLF )
+                    ::aMacros[ x, 3 ] := .t.
+
+                ENDIF
+
+            ENDIF
+
+
         ENDIF
 
     NEXT
@@ -391,61 +409,60 @@ Method WriteMakeFile() CLASS THBMAKE
     cExt := Substr( cExt, 2 )
 
 
-        nWriteFiles := 0
-        Fwrite( ::nLinkHandle, "OBJFILES =" )
+    nWriteFiles := 0
+    Fwrite( ::nLinkHandle, "OBJFILES =" )
 
-        IF Len( ::aObjs ) < 1
+    IF Len( ::aObjs ) < 1
 
-            Fwrite( ::nLinkHandle, + " $(OB) " + CRLF )
+       Fwrite( ::nLinkHandle, + " $(OB) " + CRLF )
 
-        ELSE
+    ELSE
                                                                                                                                                                 
-            Aeval( ::aObjs, {   | x, i | nWriteFiles ++, If( ( i <> Len( ::aObjs ) /*.and. x <> ::cTopFile */), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+       Aeval( ::aObjs, {   | x, i | nWriteFiles ++, If( ( i <> Len( ::aObjs ) /*.and. x <> ::cTopFile */), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
 
-        ENDIF
+    ENDIF
 
-        nWriteFiles := 0
-        Fwrite( ::nLinkHandle, "PRGFILES =" )
+    nWriteFiles := 0
+    Fwrite( ::nLinkHandle, "PRGFILES =" )
 
-        IF Len( ::aPrgs ) < 1
+    IF Len( ::aPrgs ) < 1
 
-            Fwrite( ::nLinkHandle, + " $(PS)" + CRLF )
+       Fwrite( ::nLinkHandle, + " $(PS)" + CRLF )
 
-        ELSE
+    ELSE
 
-            Aeval( ::aPrgs, { | x, i | nWriteFiles ++, If( i <> Len( ::aPrgs ), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(PS) " + CRLF ) ) } )
+       Aeval( ::aPrgs, { | x, i | nWriteFiles ++, If( i <> Len( ::aPrgs ), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(PS) " + CRLF ) ) } )
 
-        ENDIF
+    ENDIF
 
-        nWriteFiles := 0
-        Fwrite( ::nLinkHandle, "OBJCFILES =" )
+    nWriteFiles := 0
+    Fwrite( ::nLinkHandle, "OBJCFILES =" )
 
-        IF Len( ::aObjsc ) < 1
+    IF Len( ::aObjsc ) < 1
 
-            Fwrite( ::nLinkHandle, + " $(OB) " + CRLF )
+       Fwrite( ::nLinkHandle, + " $(OB) " + CRLF )
 
-        ELSE
+    ELSE
 
-            Aeval( ::aObjsc, { | x, i | nWriteFiles ++, If( i <> Len( ::aObjsc ), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+       Aeval( ::aObjsc, { | x, i | nWriteFiles ++, If( i <> Len( ::aObjsc ), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
 
-        ENDIF
+    ENDIF
 
-        nWriteFiles := 0
-        Fwrite( ::nLinkHandle, "CFILES =" )
+    nWriteFiles := 0
+    Fwrite( ::nLinkHandle, "CFILES =" )
 
-        IF Len( ::aCs ) < 1
+    IF Len( ::aCs ) < 1
 
-            Fwrite( ::nLinkHandle, + " $(CF)" + CRLF )
+       Fwrite( ::nLinkHandle, + " $(CF)" + CRLF )
 
-        ELSE
+    ELSE
 
-            Aeval( ::aCs, { | x, i | nWriteFiles ++, If( i <> Len( ::aCs ), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+       Aeval( ::aCs, { | x, i | nWriteFiles ++, If( i <> Len( ::aCs ), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
 
-        ENDIF
-
+    ENDIF
     
     
-    aeval(::aRes,{|cItem| cResName += cItem+" "})
+    AEval(::aRes,{|cItem| cResName += cItem+" "})
     CResName :=lower(CResName ) 
     Fwrite( ::nLinkHandle, "RESFILES = "+ CResName  + CRLF )
     Fwrite( ::nLinkHandle, "RESDEPEN = "+ strtran(CResName,".rc",".res")  + CRLF )
@@ -552,6 +569,19 @@ Method WriteMakeFile() CLASS THBMAKE
             Fwrite( ::nLinkHandle, "LIBFILES = " + cDefgccLibs + CRLF )
 
         ENDIF
+
+    ENDIF
+
+    nWriteFiles := 0
+    Fwrite( ::nLinkHandle, "EXTLIBFILES =" )
+
+    IF Len( ::aExtLibs ) < 1
+
+       Fwrite( ::nLinkHandle, CRLF )
+
+    ELSE
+
+       AEval( ::aExtLibs, { | x, i | nWriteFiles ++, Fwrite( ::nLinkHandle, " " + Alltrim( x ) + CRLF ) } )
 
     ENDIF
 
@@ -813,74 +843,89 @@ Local x
     ENDIF
 
 
-        Fwrite( ::nLinkHandle, "OBJFILES =" )
-        nWriteFiles := 0
+    Fwrite( ::nLinkHandle, "OBJFILES =" )
+    nWriteFiles := 0
 
-        IF Len( ::aObjs ) < 1
+    IF Len( ::aObjs ) < 1
 
-            Fwrite( ::nLinkHandle, + " $(OB) " + CRLF )
+       Fwrite( ::nLinkHandle, + " $(OB) " + CRLF )
 
-        ELSE
+    ELSE
 
-            Aeval( ::aObjs, { | x, i | nWriteFiles ++, If( i <> Len( ::aObjs ), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+       AEval( ::aObjs, { | x, i | nWriteFiles ++, If( i <> Len( ::aObjs ), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
 
-        ENDIF
-
-        Fwrite( ::nLinkHandle, "PRGFILES =" )
-        nWriteFiles := 0
-
-        IF Len( ::aPrgs ) < 1
-
-            Fwrite( ::nLinkHandle, + " $(PS)" + CRLF )
-
-        ELSE
-
-            Aeval( ::aPrgs, { | x, i | nWriteFiles ++, If( i <> Len( ::aPrgs ), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(PS) " + CRLF ) ) } )
-
-        ENDIF
-
-        nWriteFiles := 0
-
-        IF Len( ::aObjsc ) > 0
-
-            Fwrite( ::nLinkHandle, "OBJCFILES =" )
-
-            IF Len( ::aObjsc ) < 1
-
-                Fwrite( ::nLinkHandle, + " $(OB) " + CRLF )
-
-            ELSE
-
-                Aeval( ::aObjsc, { | x, i | nWriteFiles ++, If( i <> Len( ::aObjsc ), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
-
-            ENDIF
-
-        ENDIF
-
-        nWriteFiles := 0
-
-        IF Len( ::aCs ) > 0
-
-            Fwrite( ::nLinkHandle, "CFILES =" )
-
-            IF Len( ::aCs ) < 1
-
-                Fwrite( ::nLinkHandle, + " $(CF)" + CRLF )
-
-            ELSE
-
-                Aeval( ::aCs, { | x, i | nWriteFiles ++, If( i <> Len( ::aCs ), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
-
-            ENDIF
-
-        ENDIF
+    ENDIF
 
 
+    Fwrite( ::nLinkHandle, "PRGFILES =" )
+    nWriteFiles := 0
 
-    Fwrite( ::nLinkHandle, "RESFILES =" + CRLF )
-    Fwrite( ::nLinkHandle, "RESDEPEN = $(RESFILES)" + CRLF )
-    Fwrite( ::nLinkHandle, "DEFFILE = " + CRLF )
-    Fwrite( ::nLinkHandle, "HARBOURFLAGS = " + cDefHarOpts + CRLF )
+    IF Len( ::aPrgs ) < 1
+
+       Fwrite( ::nLinkHandle, + " $(PS)" + CRLF )
+
+    ELSE
+
+       AEval( ::aPrgs, { | x, i | nWriteFiles ++, If( i <> Len( ::aPrgs ), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(PS) " + CRLF ) ) } )
+
+    ENDIF
+
+    nWriteFiles := 0
+
+
+    IF Len( ::aObjsc ) > 0
+
+       Fwrite( ::nLinkHandle, "OBJCFILES =" )
+
+       IF Len( ::aObjsc ) < 1
+
+          Fwrite( ::nLinkHandle, + " $(OB) " + CRLF )
+
+       ELSE
+
+          AEval( ::aObjsc, { | x, i | nWriteFiles ++, If( i <> Len( ::aObjsc ), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+
+       ENDIF
+
+   ENDIF
+
+   nWriteFiles := 0
+
+   IF Len( ::aCs ) > 0
+
+      Fwrite( ::nLinkHandle, "CFILES =" )
+
+      IF Len( ::aCs ) < 1
+
+         Fwrite( ::nLinkHandle, + " $(CF)" + CRLF )
+
+      ELSE
+
+         AEval( ::aCs, { | x, i | nWriteFiles ++, If( i <> Len( ::aCs ), Fwrite( ::nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( ::nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+      ENDIF
+
+
+  ENDIF
+
+
+  nWriteFiles := 0
+  Fwrite( ::nLinkHandle, "EXTLIBFILES =" )
+
+  IF Len( ::aExtLibs ) < 1
+
+     Fwrite( ::nLinkHandle, CRLF )
+
+  ELSE
+
+     AEval( ::aExtLibs, { | x, i | nWriteFiles ++, Fwrite( ::nLinkHandle, " " + Alltrim( x ) + CRLF ) } )
+
+  ENDIF
+
+
+  Fwrite( ::nLinkHandle, "RESFILES =" + CRLF )
+  Fwrite( ::nLinkHandle, "RESDEPEN = $(RESFILES)" + CRLF )
+  Fwrite( ::nLinkHandle, "DEFFILE = " + CRLF )
+  Fwrite( ::nLinkHandle, "HARBOURFLAGS = " + cDefHarOpts + CRLF )
 
     IF ::lBcc
 
@@ -937,7 +982,7 @@ Local x
 
     Fwrite( ::nLinkHandle, " " + CRLF )
     Fwrite( ::nLinkHandle, "#COMMANDS" + CRLF )
-    Aeval( ::aCommands, { | xItem | Fwrite( ::nLinkHandle, xitem[ 1 ] + CRLF ), Fwrite( ::nLinkHandle, xitem[ 2 ] + CRLF ), Fwrite( ::nLinkHandle, " " + CRLF ) } )
+    AEval( ::aCommands, { | xItem | Fwrite( ::nLinkHandle, xitem[ 1 ] + CRLF ), Fwrite( ::nLinkHandle, xitem[ 2 ] + CRLF ), Fwrite( ::nLinkHandle, " " + CRLF ) } )
 
     IF ::lBcc
 
@@ -978,7 +1023,9 @@ Local x
         Fwrite( ::nLinkHandle, "!" + CRLF )
 
     ENDIF
-   fClose( ::nLinkHandle)
+
+   FClose( ::nLinkHandle)
+
 RETURN nil
 
 Method ReadMakefile(cFile) //class thbmake
@@ -1206,7 +1253,6 @@ tracelog(aTemp[ 1 ], atemp[ 2 ])
                     ::aPrgs     := Listasarray2( ::replacemacros( atemp[ 2 ] ), " " )
                     lExtended := .T.
 
-
                 ENDIF
 
                 IF aTemp[ 1 ] == "PRGFILE"
@@ -1242,6 +1288,11 @@ tracelog(aTemp[ 1 ], atemp[ 2 ])
                     ENDIF
 
                 ENDIF
+
+                IF aTemp[ 1 ] == "EXTLIBFILES"
+                   ::aExtLibs  := Listasarray2( ::replacemacros( atemp[ 2 ] ), " " )
+                ENDIF
+
 
                 IF atemp[ 1 ] == "RESFILES"
 
