@@ -3343,11 +3343,19 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                aIns( aPendingLines, nPosition )
                aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
 
+               IF Left( sLine, 1 ) == '#'
+                  aAdd( asOutLines, aPendingLines[ nPosition ] )
+               ENDIF
+
                //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPendingLines]
                sLine := LTrim( SubStr( sLine, nNewLineAt + 1 ) )
             ENDDO
 
             IF nPosition == 0
+               IF Left( sLine, 1 ) == '#'
+                  aAdd( asOutLines, sLine )
+               ENDIF
+
                sLine := sLeft + sPassed + sLine
             ELSE
                IF ! Empty( sLine )
@@ -3405,7 +3413,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
 
                IF Left( aPendingLines[ nPosition ], 1 ) == '#'
-                  FWrite( hPP, aPendingLines[ nPosition ] + ';' )
+                  aAdd( asOutLines, aPendingLines[ nPosition ] )
                ENDIF
 
                //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPendingLines]
@@ -3414,7 +3422,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
             IF nPosition == 0
                IF Left( sLine, 1 ) == '#'
-                  FWrite( hPP, sLine + ';' )
+                  aAdd( asOutLines, sLine )
                ENDIF
 
                sLine := sLeft + sPassed + sLine
@@ -3471,7 +3479,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
 
             IF Left( aPendingLines[ nPosition ], 1 ) == '#'
-               FWrite( hPP, aPendingLines[ nPosition ] + ';' )
+               aAdd( asOutLines, aPendingLines[ nPosition ] )
             ENDIF
 
             //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPosition]
@@ -3480,7 +3488,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
          IF nPosition == 0
             IF Left( sLine, 1 ) == '#'
-               FWrite( hPP, sLine + ';' )
+               aAdd( asOutLines, sLine )
             ENDIF
 
             sLine := sLeft + sLine

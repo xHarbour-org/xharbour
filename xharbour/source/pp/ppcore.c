@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.28 2002/09/21 05:21:07 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.29 2002/09/24 03:26:12 ronpinkas Exp $
  */
 
 /*
@@ -1429,9 +1429,9 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
                     {
                        memcpy( sLine, sOutLine, i+1);
                     }
-                 }
 
-                 rezCom = 1;
+                    rezCom = 1;
+                 }
               }
               else if( ipos > 0 )
               {
