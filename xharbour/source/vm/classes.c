@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.47 2003/03/27 11:48:17 ronpinkas Exp $
+ * $Id: classes.c,v 1.48 2003/03/27 22:55:14 ronpinkas Exp $
  */
 
 /*
@@ -183,6 +183,7 @@ BOOL     hb_clsIsParent( USHORT uiClass, char * szParentName );
 static void     hb_clsDictRealloc( PCLASS pClass );
 static void     hb_clsRelease( PCLASS );
        void     hb_clsReleaseAll( void );
+       BOOL     hb_clsHasMsg( USHORT uiClass, char *szMsg );
 
        char *   hb_objGetClsName( PHB_ITEM pObject );
        char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szName );
@@ -520,12 +521,25 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
          {
             char *szCallerMessage = (*pBase)->item.asSymbol.value->szName;
 
-            #ifdef DEBUG_SCOPE
-               printf( "Object: %s, Caller: %s CallerMessage: %s, CallerMessageClass: %s\n", ( s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ) )->szName, ( s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 ) )->szName, szCallerMessage, hb_objGetRealClsName( pCaller, szCallerMessage ) );
+            #if 1//def DEBUG_SCOPE
+               printf( "Object: %s, Message: %s, RealClass: %s, Caller: %s, CallerMessage: %s, CallerMessageClass: %s\n",
+                       ( s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ) )->szName,
+                       pMethod->pMessage->pSymbol->szName,
+                       hb_objGetRealClsName( pObject, pMethod->pMessage->pSymbol->szName ),
+                       ( s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 ) )->szName,
+                       szCallerMessage,
+                       hb_objGetRealClsName( pCaller, szCallerMessage ) );
             #endif
 
             // It's possible that the Caller Message is a Super Messge, and Super is also where this Derived  Method is defined.
             if( hb_objGetRealCls( pObject, pMethod->pMessage->pSymbol->szName ) == hb_objGetRealCls( pCaller, szCallerMessage ) )
+            {
+               return TRUE;
+            }
+
+            // It's possible that caller Method is Derived from a Class which also implements the Message we now validate.
+            // This means the validated Message IS avialable within the scope of the Methods that calls this Message.
+            if( hb_clsHasMsg( hb_objGetRealCls( pCaller, szCallerMessage ), pMethod->pMessage->pSymbol->szName ) )
             {
                return TRUE;
             }
@@ -964,6 +978,38 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc,
    }
 
    return NULL;
+}
+
+BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
+{
+   PHB_DYNS pMsg = hb_dynsymFindName( szMsg );
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_clsHasMsg(%i, %s)", uiClass, szMsg));
+
+   if( uiClass && uiClass <= s_uiClasses )
+   {
+      PCLASS pClass  = s_pClasses + ( uiClass - 1 );
+      USHORT uiAt    = ( USHORT ) ( MsgToNum( pMsg->pSymbol->szName, pClass->uiHashKey ) * BUCKET );
+      USHORT uiMask  = ( USHORT ) ( pClass->uiHashKey * BUCKET );
+      USHORT uiLimit = ( USHORT ) ( uiAt ? ( uiAt - 1 ) : ( uiMask - 1 ) );
+
+      while( uiAt != uiLimit )
+      {
+         if( pClass->pMethods[ uiAt ].pMessage == pMsg )
+         {
+            return TRUE;
+         }
+
+         uiAt++;
+
+         if( uiAt == uiMask )
+         {
+            uiAt = 0;
+         }
+      }
+   }
+
+   return FALSE;
 }
 
 PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )

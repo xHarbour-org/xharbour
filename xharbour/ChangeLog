@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.891 2003/03/29 17:37:54 paultucker Exp $
+ * $Id: ChangeLog,v 1.892 2003/03/29 19:16:34 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-29 12:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/classes.c
+    + Added BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
+    ! Fixed hb_clsValidScope() to allow a a Caller Method to access a Message that is
+      avialable within the scope of the Super Class where the CAller Method is implemented.
 
 2003-03-29 14:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * contrib\libct\makefile.vc
