@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.72 2003/06/07 19:34:59 lculik Exp $
+ * $Id: hbmake.prg,v 1.73 2003/06/08 22:12:55 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -252,11 +252,11 @@ FUNCTION ParseMakeFile( cFile )
    LOCAL lDjgpp      := "GNU C" in HB_COMPILER()
    LOCAL x :=1
 
-   IF lDjgpp
-      s_lBcc    := .F.
-      s_lGcc    := .T.
-      s_lVcc    := .F.
-   ENDIF 
+//   IF lDjgpp
+//      s_lBcc    := .F.
+//      s_lGcc    := .T.
+//      s_lVcc    := .F.
+//   ENDIF 
 
    tracelog( lDjgpp )
    s_nHandle := FT_FUSE( cFile )
