@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.73 2003/11/20 23:47:34 druzus Exp $
+# $Id: makefile.bc,v 1.74 2003/11/24 15:15:22 lf_sfnet Exp $
 #
 
 #
@@ -173,7 +173,7 @@ HVM_GUI_OBJ_FLAGS    = $(CLIBFLAGS) -DSIMPLEX -DHB_GUI
 HVM_GUI_MT_OBJ_FLAGS = $(CLIBFLAGS) -DSIMPLEX -DHB_THREAD_SUPPORT -DHB_GUI
 
 !if $d(HB_THREAD_SUPPORT)
-   CLIBFLAGS = -DHB_THREAD_SUPPORT $(CLIBFLAGS)
+   CLIBFLAGS = -tWM -DHB_THREAD_SUPPORT $(CLIBFLAGS)
 !endif
 
 !if $(HB_LEX) == SIMPLEX
@@ -2688,6 +2688,9 @@ $(HBPP_EXE) : \
 $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
 
    $(ECHO) $(CFLAGS) > make.tmp
+!if $d(HB_THREAD_SUPPORT)
+   $(ECHO) -tWM > make.tmp
+!endif
    $(ECHO) -e$(HBRUN_EXE) >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbrun.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\external.obj >> make.tmp

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.129 2003/11/28 21:21:07 jonnymind Exp $
+* $Id: thread.c,v 1.130 2003/12/03 13:01:26 mauriliolongo Exp $
 */
 
 /*
@@ -73,6 +73,7 @@
 
 #ifdef HB_OS_WIN_32
    #include <windows.h>
+   #include <process.h>
 #endif
 
 #ifdef HB_OS_WIN_32
@@ -721,7 +722,8 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
    be calleed, and calls it.
 */
 #ifdef HB_OS_WIN_32
-   DWORD WINAPI hb_create_a_thread( LPVOID Cargo )
+//   DWORD WINAPI hb_create_a_thread( LPVOID Cargo )
+   unsigned __stdcall hb_create_a_thread( void * Cargo )
 #else
    void *hb_create_a_thread( void *Cargo )
 #endif
@@ -807,7 +809,11 @@ void hb_threadCancelInternal( )
    // the stack must have been destroyed by the last cleanup function
 
    hb_threadTerminator( &HB_VM_STACK );
+/*   #ifndef __BORLANDC__
    ExitThread( 0 );
+   #else*/
+   _endthreadex( 0 );
+//   #endif
 }
 
 /***
@@ -1331,7 +1337,11 @@ HB_FUNC( STARTTHREAD )
    HB_CRITICAL_LOCK( hb_threadStackMutex );
 
 #if defined(HB_OS_WIN_32)
-   if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (void *) pStack , CREATE_SUSPENDED, &th_id ) ) != NULL )
+/*   #ifndef __BORLANDC__
+      if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (void *) pStack , CREATE_SUSPENDED, &th_id ) ) != NULL )
+   #else*/
+      if( ( th_h = (HANDLE)_beginthreadex( NULL, 0, hb_create_a_thread, (void *) pStack, CREATE_SUSPENDED, &th_id) ) != 0L )
+//   #endif
 #else
    pStack->th_vm_id = 0;
    if( pthread_create( &th_id, NULL, hb_create_a_thread, (void *) pStack ) == 0 )

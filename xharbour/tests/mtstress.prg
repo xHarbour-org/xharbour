@@ -1,6 +1,6 @@
 ************************************************************
 * threadstress.prg
-* $Id: mtstress.prg,v 1.9 2003/11/26 23:52:54 jonnymind Exp $
+* $Id: mtstress.prg,v 1.10 2003/11/27 00:40:31 jonnymind Exp $
 *
 * Stresstest for thread programs
 * Stress all those feature that are thread-critical:
@@ -64,7 +64,6 @@ PROCEDURE Stress( nId, nRow )
    cRndVal := "ABCDEFGHILMNOPQRSTUVZ"
 
    // Step 40: database test
-#ifdef TESTING
    @nRow,5 SAY Space( 80 )
    IF File( "test.dbf" )
       Select &nId
@@ -91,7 +90,6 @@ PROCEDURE Stress( nId, nRow )
       NEXT
       USE
    ENDIF
-#endif
    //Step 1: foreach test
 
    @nRow,5 SAY Space( 80 )

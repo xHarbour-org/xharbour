@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1817 2003/12/03 23:26:45 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.1818 2003/12/04 09:26:52 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-04 14:37 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/thread.c
+  * bin/bld.bat
+  * makefile.bc
+    ! Changed CreateThread to _beginthreadex() for all Windows compilations.
+    ! Updated borlandc compiler to link with LIBCMT instead of LIBC under MT
+      PLEASE: update other compilers compilation/link flags accordingly
+
+  * tests/mtstress.prg
+    ! re-enabled dbf test part; all developers are invited to test it.
 
 2003-12-04 10:25 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/config/w32/install.cf

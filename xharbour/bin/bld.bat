@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.26 2003/11/23 19:34:53 druzus Exp $
+rem $Id: bld.bat,v 1.27 2003/12/02 11:46:58 lf_sfnet Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -214,9 +214,11 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 
    if "%HB_DLL%" == "" set HB_LIBLIST=common.lib debug.lib vm%HB_MT%.lib rtl%HB_MT%.lib %_HB_GT_LIB%.lib lang.lib rdd%HB_MT%.lib macro%HB_MT%.lib pp%HB_MT%.lib dbfdbt%HB_MT%.lib dbffpt%HB_MT%.lib dbfntx%HB_MT%.lib dbfcdx%HB_MT%.lib samples.lib hbzip.lib %ADS_LIBS%
    if not "%HB_DLL%" == "" set HB_LIBLIST=harbour.lib %_HB_GT_LIB%.lib samples.lib hbzip.lib vm.lib %ADS_LIBS%
+   
+   if not "%HB_MT%" == "" SET BC_MT_FLAG=-tWM   
 
-   if "%HB_COMPILER%" == "bcc32"   if exist ..\lib\bcc640.lib bcc32 -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% bcc640.lib %HB_LIBLIST%
-   if "%HB_COMPILER%" == "bcc32"   if not exist ..\lib\bcc640.lib bcc32 -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% %HB_LIBLIST%
+   if "%HB_COMPILER%" == "bcc32"   if exist ..\lib\bcc640.lib bcc32 %BC_MT_FLAG% -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% bcc640.lib %HB_LIBLIST%
+   if "%HB_COMPILER%" == "bcc32"   if not exist ..\lib\bcc640.lib bcc32 %BC_MT_FLAG% -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% %HB_LIBLIST%
    if "%HB_COMPILER%" == "gcc"     gcc %1.c -o%1.exe %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfdbt -ldbffpt -ldbfntx -ldbfcdx -lcommon
    if "%HB_COMPILER%" == "mingw32" gcc %1.c -o%1.exe %CFLAGS% -mno-cygwin %HB_INC_TEMP% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %HB_LIB_TEMP% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd%HB_MT% -lrtl%HB_MT% -lvm%HB_MT% -lmacro -lpp%HB_MT% -ldbfdbt%HB_MT% -ldbffpt%HB_MT% -ldbfntx%HB_MT% -ldbfcdx%HB_MT% -lcommon -luser32 -lwinspool -lole32 -loleaut32 -luuid
    if "%HB_COMPILER%" == "rsxnt"   gcc %1.c -Zwin32 %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfdbt -ldbffpt -ldbfntx -ldbfcdx -lcommon
