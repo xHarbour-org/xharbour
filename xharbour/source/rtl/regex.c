@@ -6666,6 +6666,7 @@ HB_EXPORT int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase )
 
          case '?':
             strncpy( sRegEx + iLenResult, ".?", 2 );
+            iLenResult += 2;
             break;
 
          case '.':

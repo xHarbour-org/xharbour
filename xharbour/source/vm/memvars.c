@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.61 2004/02/25 15:10:59 lculik Exp $
+ * $Id: memvars.c,v 1.62 2004/02/25 15:32:50 lculik Exp $
  */
 
 /*
@@ -146,6 +146,8 @@ static void hb_memvarCreateFromDynSymbol( PHB_DYNS, BYTE, PHB_ITEM );
 static void hb_memvarAddPrivate( PHB_DYNS );
 static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR );
 void hb_memvarReleasePublic( PHB_ITEM pMemVar );
+
+extern int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
 
 #ifndef HB_THREAD_SUPPORT
 void hb_memvarsInit( void )
@@ -1162,14 +1164,14 @@ static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
  * procedure only.
  * The scope of released variables are specified using passed name's mask
  */
-static void hb_memvarReleaseWithMask( char *szMask, BOOL bInclude )
+static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
 {
    HB_THREAD_STUB
 
    ULONG ulBase = s_privateStackCnt;
    PHB_DYNS pDynVar;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_memvarReleaseWithMask(%s, %d)", szMask, (int) bInclude));
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarReleaseWithMask(%s, %d)", sRegEx, (int) bInclude));
 
    while( ulBase > s_privateStackBase )
    {
@@ -1187,7 +1189,7 @@ static void hb_memvarReleaseWithMask( char *szMask, BOOL bInclude )
 
          if( bInclude )
          {
-            if( ( szMask[ 0 ] == '*') || hb_strMatchRegExp( pDynVar->pSymbol->szName, szMask ) )
+            if( hb_strMatchRegExp( pDynVar->pSymbol->szName, sRegEx ) )
             {
                if( HB_IS_COMPLEX( pRef ) )
                {
@@ -1199,7 +1201,7 @@ static void hb_memvarReleaseWithMask( char *szMask, BOOL bInclude )
                }
             }
          }
-         else if( ! hb_strMatchRegExp( pDynVar->pSymbol->szName, szMask ) )
+         else if( ! hb_strMatchRegExp( pDynVar->pSymbol->szName, sRegEx ) )
          {
             if( HB_IS_COMPLEX( pRef ) )
             {
@@ -1602,6 +1604,9 @@ HB_FUNC( __MVRELEASE )
 {
    HB_THREAD_STUB
 
+   // Arbitary value which should be big enough.
+   char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
+
    int iCount = hb_pcount();
 
    if( iCount )
@@ -1626,7 +1631,9 @@ HB_FUNC( __MVRELEASE )
             bIncludeVar = TRUE;   /* delete all memvar variables */
          }
 
-         hb_memvarReleaseWithMask( pMask->item.asString.value, bIncludeVar );
+         Wild2RegEx( (char *) (pMask->item.asString.value), (char *) sRegEx, FALSE );
+
+         hb_memvarReleaseWithMask( sRegEx, bIncludeVar );
       }
    }
 }
@@ -1885,6 +1892,8 @@ typedef struct
    BOOL bIncludeMask;
    BYTE * buffer;
    FHANDLE fhnd;
+   // Arbitary value which should be big enough.
+   char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
 } MEMVARSAVE_CARGO;
 
 /* saves a variable to a mem file already open */
@@ -1896,6 +1905,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
    BOOL bIncludeMask = ( ( MEMVARSAVE_CARGO * ) Cargo )->bIncludeMask;
    BYTE * buffer     = ( ( MEMVARSAVE_CARGO * ) Cargo )->buffer;
    FHANDLE fhnd      = ( ( MEMVARSAVE_CARGO * ) Cargo )->fhnd;
+   char * sRegEx     = ( ( MEMVARSAVE_CARGO * ) Cargo )->sRegEx;
 
    /* NOTE: Harbour name lengths are not limited, but the .MEM file
             structure is not flexible enough to allow for it.
@@ -1903,7 +1913,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
 
    if( pDynSymbol->hMemvar )
    {
-      BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_strMatchRegExp( pDynSymbol->pSymbol->szName, pszMask ) );
+      BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_strMatchRegExp( pDynSymbol->pSymbol->szName, sRegEx ) );
 
       PHB_ITEM pItem;
 
@@ -2022,6 +2032,7 @@ HB_FUNC( __MVSAVE )
          msc.bIncludeMask = hb_parl( 3 );
          msc.buffer       = buffer;
          msc.fhnd         = fhnd;
+         Wild2RegEx( (char *) (msc.pszMask), (char *) (msc.sRegEx), FALSE );
 
          /* Walk through all visible memory variables and save each one */
 
@@ -2089,7 +2100,9 @@ HB_FUNC( __MVRESTORE )
          USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 2005, NULL, szFileName, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 2, hb_paramError( 1 ), hb_paramError( 2 ) );
 
          if( uiAction == E_DEFAULT || uiAction == E_BREAK )
+         {
             break;
+         }
       }
 
       if( fhnd != FS_ERROR )
@@ -2097,6 +2110,11 @@ HB_FUNC( __MVRESTORE )
          char * pszMask = ISCHAR( 3 ) ? hb_parc( 3 ) : "*";
          BOOL bIncludeMask = ISCHAR( 4 ) ? hb_parl( 4 ) : TRUE;
          BYTE buffer[ HB_MEM_REC_LEN ];
+
+         // Arbitary value which should be big enough.
+         char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
+
+         Wild2RegEx( (char *) pszMask, (char *) sRegEx, FALSE );
 
          while( hb_fsRead( fhnd, buffer, HB_MEM_REC_LEN ) == HB_MEM_REC_LEN )
          {
@@ -2116,7 +2134,9 @@ HB_FUNC( __MVRESTORE )
                   pbyString = ( BYTE * ) hb_xgrab( uiWidth );
 
                   if( hb_fsRead( fhnd, pbyString, uiWidth ) == uiWidth )
+                  {
                      pItem = hb_itemPutCL( NULL, ( char * ) pbyString, uiWidth - 1 );
+                  }
 
                   hb_xfree( pbyString );
 
@@ -2128,7 +2148,9 @@ HB_FUNC( __MVRESTORE )
                   BYTE pbyNumber[ HB_MEM_NUM_LEN ];
 
                   if( hb_fsRead( fhnd, pbyNumber, HB_MEM_NUM_LEN ) == HB_MEM_NUM_LEN )
+                  {
                      pItem = hb_itemPutNLen( NULL, * ( double * ) &pbyNumber, uiWidth - ( uiDec ? ( uiDec + 1 ) : 0 ), uiDec );
+                  }
 
                   break;
                }
@@ -2138,7 +2160,9 @@ HB_FUNC( __MVRESTORE )
                   BYTE pbyNumber[ HB_MEM_NUM_LEN ];
 
                   if( hb_fsRead( fhnd, pbyNumber, HB_MEM_NUM_LEN ) == HB_MEM_NUM_LEN )
+                  {
                      pItem = hb_itemPutDL( NULL, ( LONG ) ( * ( double * ) &pbyNumber ) );
+                  }
 
                   break;
                }
@@ -2158,7 +2182,7 @@ HB_FUNC( __MVRESTORE )
 
             if( pItem )
             {
-               BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_strMatchRegExp( pName->item.asString.value, pszMask ) );
+               BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_strMatchRegExp( pName->item.asString.value, sRegEx ) );
 
                /* Process it if it matches the passed mask */
                if( bIncludeMask ? bMatch : ! bMatch )

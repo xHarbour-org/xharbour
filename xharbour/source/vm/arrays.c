@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.91 2004/03/03 11:41:22 ronpinkas Exp $
+ * $Id: arrays.c,v 1.92 2004/03/04 09:31:09 ronpinkas Exp $
  */
 
 /*
@@ -1125,7 +1125,14 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
       #else
          hb_arrayRegisterHolder( pBaseArray, (void *) &FakedObject );
       #endif
+
       hb_clsFinalize( &FakedObject );
+
+      #ifdef HB_ARRAY_USE_COUNTER
+         FakedObject.item.asArray.value->uiHolders = 0;
+      #else
+         hb_arrayReleaseHolder( pBaseArray, (void *) &FakedObject );
+      #endif
    }
 
    /* Release object tree as needed */

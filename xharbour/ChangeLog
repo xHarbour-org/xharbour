@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2488 2004/03/04 21:51:50 andijahja Exp $
+ * $Id: ChangeLog,v 1.2489 2004/03/04 22:30:06 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-04 21:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/regex.c
+    ! Fixed typo in Wild2RegEx() related to '?'
+
+  * source/vm/arrays.c
+    ! Fixed memory leak related to Owners and hb_clsFinalize()
+
+  * source/vm/memvars.c
+    + Added logic to utilize Wild2RegEx() sincehb_strMatchRegExp() now expect real RegEx.
+
 2004-03-05 05:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/direct.c
     % Ref my previous changes. I commited the wrong file :(.
