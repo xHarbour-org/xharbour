@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.26 2001/12/15 19:20:59 andijahja Exp $
+ * $Id: harbour.sly,v 1.3 2002/01/19 14:15:44 ronpinkas Exp $
  */
 
 /*
@@ -538,7 +538,111 @@ MacroVar    : MACROVAR        { $$ = hb_compExprNewMacro( NULL, '&', $1 );
                                    s_bBlockMacro = TRUE;
 				}
                               }
-            | MACROTEXT       { $$ = hb_compExprNewMacro( NULL, 0, $1 ); }
+            | MACROTEXT       {
+                                /* Original code before optimization!
+                                $$ = hb_compExprNewMacro( NULL, 0, $1 );
+                                */
+
+                                HB_EXPR_PTR pPlus = NULL, pLeft = NULL, pRight;
+                                char *pPosition = $1, *pStart, *sToken;
+                                BOOL bVar;
+
+                                if( *pPosition == '&' )
+                                {
+                                   bVar = TRUE;
+                                   pPosition++;
+                                }
+                                else
+                                {
+                                   bVar = FALSE;
+                                }
+
+                                pStart = pPosition;
+
+                                while( *pPosition )
+                                {
+                                   if( *pPosition == '&' )
+                                   {
+                                      *pPosition = '\0';
+                                      sToken = hb_compIdentifierNew( pStart, TRUE );
+                                      //printf( "\n%s: '%s'\n", bVar ? "Var" : "String", sToken );
+
+                                      if( pPlus )
+                                      {
+                                         pRight = ( bVar ? hb_compExprNewVar( sToken ) : hb_compExprNewString( sToken ) );
+                                         pPlus  = hb_compExprSetOperand( hb_compExprNewPlus( pPlus ), pRight );
+                                      }
+                                      else if( pLeft )
+                                      {
+                                         pRight = ( bVar ? hb_compExprNewVar( sToken ) : hb_compExprNewString( sToken ) );
+                                         pPlus  = hb_compExprSetOperand( hb_compExprNewPlus( pLeft ), pRight );
+                                      }
+                                      else
+                                      {
+                                         pLeft = ( bVar ? hb_compExprNewVar( sToken ) : hb_compExprNewString( sToken ) );
+                                      }
+
+                                      bVar = TRUE;
+                                      pPosition++;
+                                      pStart = pPosition;
+                                      continue;
+                                   }
+                                   else if( *pPosition == '.' )
+                                   {
+                                      if( ! bVar )
+                                      {
+                                         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_SYNTAX, pPosition, NULL );
+                                      }
+
+                                      *pPosition = '\0';
+                                      sToken = hb_compIdentifierNew( pStart, TRUE );
+                                      //printf( "\n%s: '%s'\n", bVar ? "Var" : "String", sToken );
+
+                                      if( pPlus )
+                                      {
+                                         pRight = ( bVar ? hb_compExprNewVar( sToken ) : hb_compExprNewString( sToken ) );
+                                         pPlus  = hb_compExprSetOperand( hb_compExprNewPlus( pPlus ), pRight );
+                                      }
+                                      else if( pLeft )
+                                      {
+                                         pRight = ( bVar ? hb_compExprNewVar( sToken ) : hb_compExprNewString( sToken ) );
+                                         pPlus  = hb_compExprSetOperand( hb_compExprNewPlus( pLeft ), pRight );
+                                      }
+                                      else
+                                      {
+                                         pLeft = ( bVar ? hb_compExprNewVar( sToken ) : hb_compExprNewString( sToken ) );
+                                      }
+
+                                      bVar = FALSE;
+                                      pPosition++;
+                                      pStart = pPosition;
+                                      continue;
+                                   }
+
+                                   pPosition++;
+                                }
+
+                                sToken = hb_compIdentifierNew( pStart, TRUE );
+                                //printf( "\nLast - %s: '%s'\n\n\n", bVar ? "Var" : "String", sToken );
+
+                                if( pPlus )
+                                {
+                                   pRight = ( bVar ? hb_compExprNewVar( sToken ) : hb_compExprNewString( sToken ) );
+                                   pPlus  = hb_compExprSetOperand( hb_compExprNewPlus( pPlus ), pRight );
+                                }
+                                else if( pLeft )
+                                {
+                                   pRight = ( bVar ? hb_compExprNewVar( sToken ) : hb_compExprNewString( sToken ) );
+                                   pPlus  = hb_compExprSetOperand( hb_compExprNewPlus( pLeft ), pRight );
+                                }
+                                else
+                                {
+                                   pPlus = ( bVar ? hb_compExprNewVar( sToken ) : hb_compExprNewString( sToken ) );
+                                   hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_SYNTAX, sToken, NULL );
+                                }
+
+                                $$ = hb_compExprNewMacro( hb_compExprNewList( pPlus ), 0, NULL )
+                              }
 	    ;
 
 MacroVarAlias  : MacroVar ALIASOP   { $$ = $1; }

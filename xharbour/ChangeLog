@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.61 2002/01/30 04:10:04 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.62 2002/01/30 19:02:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-30 15:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  + tests/rp_dot.ch
+    + Added missing file.
+
+  * source/compiler/harbour.sly
+    * Optimized MACROTEXT
+
+    /* xHarbour now support complex macros referencing declared symbols, where Clipper produces an error:
+
+          LOCAL cMacro  := "mVar"
+
+          PRIVATE mVar1 := "I'm mVar"
+
+          ? &cMacro.1
+
+       Complex macros will now work faster, due to compile time optimization.
+
+     */
 
 2002-01-30 11:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c
