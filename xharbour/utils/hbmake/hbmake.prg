@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.39 2001/12/22 10:14:33 lculik Exp $
+ * $Id: hbmake.prg,v 1.44 2001/12/29 20:56:11 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -110,10 +110,16 @@ Static aDir
 *+
 Function main( cFile, p1, p2, p3, p4, p5, p6 )
 
-Local nPos
+Local nPos, aFile := {}
 Local aDef := {}
 Local cOs:=OS()
 Local allParam
+
+If Pcount() == 0
+   ShowHelp()
+   Return NIL
+Endif
+
 //__traceprgcalls(.t.)
 //Local oProfile := HBProfile():new()
 //   __setProfiler( .T. )
@@ -126,13 +132,33 @@ Default p3 To ""
 Default p4 To ""
 Default p5 To ""
 Default p6 To ""
+
 if at("OS/2",cOs)>0
     lGcc:=.t.
     lLinux:=.t.
     lBcc:=.f.
 endif
+
+Allparam:=ConvertParams(@cFile, aFile, p1, p2, p3, p4, p5, p6)
+
+if len( aFile ) > 1
+   ? "File defined more than once"
+   Return NIL
+endif
+if len( aFile ) > 0
+   cFile := aFile[1]
+else
+   cFile := ""
+endif
+
+If empty(cFile) .and. !lEditMode
+   ? "File not Found"
+   Return Nil
+Endif
+
+/*
 allParam:=p1 + p2 +p3+p4 + p5 +p6
-Allparam:=ConvertParams(AllParam) 
+Allparam:=ConvertParams(AllParam)
 If Pcount() == 0
    ShowHelp()
    Return NIL
@@ -141,10 +167,12 @@ If cFile == NIL .and. !lEditMode
    ? "File not Found"
    Return Nil
 Endif
+*/
+
 If Pcount() >= 1
    ProcessParameters(AllParam)
 Endif
-//if !file(cfile) 
+//if !file(cfile)
 //   return nil
 //endif
 if lEditMode
@@ -198,6 +226,7 @@ Local aTemp1    := {}
 Local cCfg :=""
 Local lCfgFound := .F.
 Local aTempCFiles := {}
+local lLinux:=at('linux',lower(os()))>0
 nHandle := FT_FUSE( cFile )
 If nHandle < 0
    Return nil
@@ -316,7 +345,7 @@ While !leof
   If lbuildSec
      szProject:=cTemp
      aBuildOrder := listasarray2( ctemp, ":" )
-     // ? cTemp
+
      if !llibrary
    
      SetBuild()
@@ -341,6 +370,8 @@ Enddo
          BuildBorCfgFile()
       elseif lVcc
          BuildMSCCfgFile()
+     elseif lGcc .and.  !lLinux
+         BuildGccCfgFile()
       endif
 endif
 
@@ -552,7 +583,7 @@ Next
 if !lLinux
 Fclose( nLinkhandle )
 Endif
-outstd(cLinkComm)
+
 Return nil
 
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
@@ -574,6 +605,7 @@ Local cErrText:=""
 Local aOrder := listasarray2( aBuildOrder[ 2 ], " " )
 Local lEnd:=.f.
 Local xItem
+Local lLinux:=at('linux',lower(os()))>0
 For nCount := 1 To Len( aOrder )
    if !lExtended
    
@@ -600,6 +632,7 @@ For nCount := 1 To Len( aOrder )
 
           cComm += " > test.out"
             outstd(cComm)
+            outstd(hb_osnewline())
             ! ( cComm )
                   cErrText := memoread( 'test.out' )
                   lEnd := 'C2006' $ cErrText .or. 'No code generated' $ cErrText
@@ -647,11 +680,17 @@ For nCount := 1 To Len( aOrder )
 
 
          If nPos > 0
-            cComm := Strtran( cComm, "o$*", "o" + aObjs[ nPos ] )
+               if llinux
+                  cComm := Strtran( cComm, "o$*", "o" + aObjs[ nPos ] )
+               else
+                  cComm := Strtran( cComm, "o$*", "o" + strtran(aObjs[ nPos ],'/','\') )
+               endif
+            
             cComm := Strtran( cComm, "$**", acs[ nFiles ] )
             outstd( " ")
-            // ? cComm
+
             outstd(cComm)
+                        outstd(hb_osnewline())
             ! ( cComm )
             ccomm := cold
          Endif
@@ -680,10 +719,17 @@ else /****** Extended mode *****/
          nPos := Ascan( aObjsc, { | x | x:=substr(x,rat(if(lgcc,'/','\'),x)+1),Left( x, At( ".", x ) ) == Left( xitem, At( ".", xitem ) ) } )
          
             If nPos > 0
-               cComm := Strtran( cComm, "o$*", "o" + aobjsc[ nPos ] )
+
+               if llinux
+                  cComm := Strtran( cComm, "o$*", "o" + aobjsc[ nPos ] )
+               else
+                  cComm := Strtran( cComm, "o$*", "o" + strtran(aobjsc[ nPos ],'/','\') )
+               endif
+
                cComm := Strtran( cComm, "$**", acs[ nFiles ] )
                cComm += " > test.out"
                outstd(cComm)
+                           outstd(hb_osnewline())
                ! ( cComm )
                   cErrText := memoread( 'test.out' )
                   lEnd := 'Error' $ cErrText 
@@ -724,12 +770,17 @@ endif
          nPos := ascan( aobjs, { | x | x:=substr(x,rat(if(lgcc,'/','\'),x)+1), Left( x, At( ".", x ) ) == Left( xItem, At( ".", xitem ) ) } )
          
             If nPos > 0
-               cComm := Strtran( cComm, "o$*", "o" + aObjs[ nPos ] )
+               if llinux
+                  cComm := Strtran( cComm, "o$*", "o" + aObjs[ nPos ] )
+               else
+                  cComm := Strtran( cComm, "o$*", "o" + strtran(aObjs[ nPos ],'/','\') )
+               endif
                cComm := Strtran( cComm, "$**", aprgs[ nFiles ] )
                cComm += " > test.out"
                outstd( " ")
-               // ? cComm
+
                outstd(cComm)
+               outstd(hb_osnewline())
                ! ( cComm )
                 cErrText := memoread( 'test.out' )
                lEnd := 'C2006' $ cErrText .or. 'No code generated' $ cErrText
@@ -817,30 +868,15 @@ Outstd( "HBMAKE Version ", Version(), "CopyRight (c) 2000-2001 The Harbour Proje
 Outstd( "" + CRLF )
 Outstd( "Macros:" + CRLF )
 aeval(aMacros,{|xItem| Outstd( "     " + xItem[ 1 ] + " = " + xItem[ 2 ] + CRLF )})
-/*
-For nPos := 1 To Len( aMacros )
-   Outstd( "     " + aMacros[ nPos, 1 ] + " = " + aMacros[ nPos, 2 ] + CRLF )
-Next*/
 Outstd( "Implicit Rules:" + CRLF )
 aeval(aCommands,{|xItem|  Outstd( "     " + xItem[ 1 ] + hb_osnewline() + "        " + xItem[ 2 ] + CRLF )})
-/*
-For nPos := 1 To Len( aCommands )
-   Outstd( "     " + aCommands[ nPos, 1 ] + hb_osnewline() + "        " + aCommands[ nPos, 2 ] + CRLF )
-Next
-*/
 Outstd( "" + CRLF )
 Outstd( "Targets:" )
 Outstd( "    " + szProject + ":" + CRLF )
 Outstd( "        " + "Flags :" + CRLF )
 Outstd( "        " + "Dependents :" )
 aeval(acs,{|xItem|   Outstd( xitem + " ")})
-/*For nPos := 1 To Len( aCs )
-   Outstd( acs[ nPos ] + " ")
-Next*/
 aeval(aobjs,{|xItem|   Outstd( xitem + " ")})
-/*For nPos := 1 To Len( aobjs )
-   Outstd( aobjs[ nPos ]  + " ")
-Next*/
 Outstd( " " + CRLF )
 Outstd( "        commands:" + aBuildOrder[ Len( aBuildOrder )  ] )
 Outstd( " " + CRLF )
@@ -886,10 +922,10 @@ Local lGenppo      := .f.
 Local getlist      := {}
 Local cTopFile     := ""
 Local cDefBccLibs  := "lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib common.lib gtwin.lib"
-Local cDefGccLibs  := "-lvm -lrtl -lgtstd -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
+Local cDefGccLibs  := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
 Local cgcclibsos2  := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
 Local cDeflibGccLibs := "-lvm -lrtl -lgtstd -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lm"
-
+local cLibs := ""
 local citem:=""
 Local cExt:=""
 Local cDrive:=""
@@ -897,6 +933,10 @@ local cPath:=""
 Local cTest:=""
 Local cUserdef:=space(40)
 Local cUserInclude:=space(40)
+Local aLibs,aLibsin:={},aLibsout:={}
+local lExternalLib:=.f.
+Local cOldLib:=""
+Local cHtmlLib:=""
 
 nLinkHandle := Fcreate( cFile )
 WriteMakeFileHeader()
@@ -931,6 +971,7 @@ ATTENTION( "Harbour Options", 5 )
 @  8, 40 Get lCompMod checkbox caption  "compile module only"
 @  9,  1 Say "User Defines " get cUserDef pict "@s15"
 @  9, 40 Say "User include Path" get cUserInclude pict "@s15"
+@  10,1  get lExternalLib checkbox caption "Use External Libs" 
 Read
 if !empty(cUserDef)
       cDefHarOpts+= " -D"+alltrim(cUserDef) +" "
@@ -950,12 +991,12 @@ if !empty(cobjDir)
    endif
 endif
 amacros:=GetSourceDirMacros(lGcc,cos)
-if lGcc
+if lLinux
 cObjDir:=alltrim(cObjDir)
 if !empty(cObjDir)
 cObjDir+='/'
 endif
-cTest:=upper(cObjDir)+'/'
+cTest:=cObjDir+'/'
 else
 cObjDir:=alltrim(cObjDir)
 if !empty(cObjDir)
@@ -1062,7 +1103,13 @@ Else
       cTopFile:=pickafile(ain)
     endif
 Endif
-
+if lExternalLib
+    aLibs:=Getlibs( lgcc ,GetMakeDir()+'\lib')
+    attention( 'Spacebar to select, Enter to continue process', 22 )
+    aeval(aLibs,{|x|aadd(aLibsin,x[1])})
+    aeval(aLibs,{|x|aadd(aLibsout,x[2])})
+    pickarry( 10, 15, 19, 64, aLibsIn, aLibsOut )
+endif
 aeval(aout,{|xItem| if( at('.c',xItem)>0 .or. at('.C',xItem)>0,aadd(aoutc,xitem),)})
 aeval(aoutc,{|x,z| citem:=x,z:=ascan(aout,{|t| t=citem}), if(z>0,asize(adel(aout,z),len(aout)-1),)})
 
@@ -1235,6 +1282,38 @@ Fwrite( nLinkHandle, "RESDEPEN = $(RESFILES)" + CRLF )
 if lRddads
     cDefBccLibs+=" rddads.lib ace32.lib"
 endif
+    if Len(alibsout)>0 .and. lExternalLib
+        if lvcc .or. lbcc
+            cOldLib:=cDefBccLibs
+            nPos:=ascan(aLibsout,{|z| at("html",lower(z))>0 } )
+            if npos>0
+                cHtmlLib+=aLibsout[npos]               
+                adel(alibsout,nPos)
+                asize(alibsout,len(alibsout)-1)
+            endif
+            aeval(alibsout,{ |cLib| cLibs+=" "+cLib})
+            cDefBccLibs:=cHtmlLib+" "+cOldLib+" "+cLibs
+        endif
+        if lGcc
+           nPos:=ascan(aLibsout,{|z| at("html",lower(z))>0 } )
+           if npos>0
+                cHtmlLib+="-l"+strtran(aLibsout[npos],'.a',"")
+                adel(alibsout,nPos)
+                asize(alibsout,len(alibsout)-1)
+           endif
+                aeval(alibsout,{ |cLib| cLibs+=" -l"+strtran(cLib,'.a',"")})
+                if  cOs=="Linux"                   
+                    cOldLib:= " "+cDeflibGccLibs
+                    cDeflibGccLibs:=cHtmlLib+" "+cOldLib+" "+cLibs
+                elseif cOs=="OS/2"
+                    cOldLib:= " "+cgcclibsos2
+                    cgcclibsos2:=cHtmlLib+" "+cOldLib+" "+cLibs
+                else
+                    cOldLib:= " "+cDefGccLibs
+                    cDefGccLibs:=cHtmlLib+" "+cOldLib+" "+cLibs
+                endif
+            endif
+    ENDIF
 if lBcc .or. lVcc
     If lFwh
         Fwrite( nLinkHandle, "LIBFILES = $(FWH)\lib\fiveh.lib $(FWH)\lib\fivehc.lib " + cDefBccLibs + CRLF )
@@ -1386,6 +1465,7 @@ if !lextended
                cComm := Strtran( cComm, "o$*", "o" + aCs[ nPos ] )
                cComm := Strtran( cComm, "$**", aPrgs[ nFiles ] )
                outstd(cComm)
+               outstd(hb_osnewline())
                ! ( cComm )
                   cErrText := memoread( 'test.out' )
                   lEnd := 'C2006' $ cErrText .or. 'No code generated' $ cErrText
@@ -1429,8 +1509,9 @@ if !lextended
             cComm := Strtran( cComm, "o$*", "o" + aObjs[ nPos ] )
             cComm := Strtran( cComm, "$**", aCtocompile[ nFiles ] )
             outstd( " ")
-            // ? cComm
+
             outstd(cComm)
+                        outstd(hb_osnewline())
             ! ( cComm )
             ccomm := cold
          Endif
@@ -1458,6 +1539,7 @@ else /**************Extended mode ******/////
                cComm := Strtran( cComm, "$**", acs[ nFiles ] )
                cComm += " > test.out"
             outstd(cComm)
+                        outstd(hb_osnewline())
                ! ( cComm )
                   cErrText := memoread( 'test.out' )
                   lEnd := 'Error' $ cErrText 
@@ -1497,10 +1579,9 @@ else /**************Extended mode ******/////
                cComm := Strtran( cComm, "o$*", "o" + aObjs[ nPos ] )
                cComm := Strtran( cComm, "$**", aprgs[ nFiles ] )
                cComm += " > test.out"
-               outstd( " ")
-
-                ? cComm
+               outstd( " ")              
                   outstd(cComm)
+            outstd(hb_osnewline())
                ! ( cComm )
                 cErrText := memoread( 'test.out' )
                lEnd := 'C2006' $ cErrText .or. 'No code generated' $ cErrText
@@ -2024,7 +2105,7 @@ Fclose( nLinkhandle )
 if lLinux 
 cLinkComm += " || rm -f " +cLib
 endif
-outstd(cLinkComm)
+
 
 Return nil
 
@@ -2140,6 +2221,22 @@ If !file(GetMakeDir()  +'\bin\harbour.cfg')
    Fclose(nCfg)
 Endif
 return Nil
+function BuildGccCfgFile()
+Local nCfg
+local cDir:=GetMakeDir()
+local cBhc:=alltrim(strtran(replacemacros('$(BHC)'),'\','/'))
+cDir:=strtran(cDir,'/','\')
+  
+
+If !file(cdir+'\bin\harbour.cfg')
+   nCfg:=FCREATE( cdir+'\bin\harbour.cfg')
+   fwrite(nCfg,"CC=gcc"+CRLF)
+   fWrite(nCfg,"CFLAGS= -c " +Replacemacros( "-I"+cBhc+"/include $(C_USR)  -L"+cBhc+"/lib")+CRLF)
+   Fwrite(nCfg,"VERBOSE=NO"+CRLF)
+   Fwrite(nCfg,"DELTMP=YES"+CRLF)
+   Fclose(nCfg)
+Endif
+return Nil
 
 Function findHarbourcfg(cCfg)
 Local cPath AS STRING := ''
@@ -2151,7 +2248,6 @@ Local nPos
 if !lLinux .or. lOs2
    cEnv:= Gete( "PATH" )+";"+curdir()
    aEnv   := listasarray2( cEnv, ";" )
-
 
    For nPos := 1 To Len( aEnv )
       If File( aenv[ nPos ] + '\harbour.cfg' )
@@ -2171,7 +2267,9 @@ else
    endif
 endif
 cCfg:=cPath
+?' findHarbourcfg',ccfg,lfound
 Return lFound
+
 function TestforPrg(cFile)
 Local aFiles AS ARRAY :={}
 Local cPath AS STRING :=''
@@ -2219,7 +2317,74 @@ else
     Next
 endif
 Return cPath
-Function ConvertParams(cParam) 
+
+Function ConvertParams(cFile, aFile, p1, p2, p3, p4, p5, p6)
+
+   LOCAL cParam := ""
+
+   if !empty( cFile )
+     if left( cFile, 1) $ "- /"
+       cParam += cFile
+     else
+       cFile := cFile
+       aadd( aFile, cFile )
+     endif
+   endif
+
+   if !empty( p1 )
+     if left( p1, 1) $ "- /"
+       cParam += p1
+     else
+       cFile := p1
+       aadd( aFile, cFile )
+     endif
+   endif
+
+   if !empty( p2 )
+     if left( p2, 1) $ "- /"
+       cParam += p2
+     else
+       cFile := p2
+       aadd( aFile, cFile )
+     endif
+   endif
+
+   if !empty( p3 )
+     if left( p3, 1) $ "- /"
+       cParam += p3
+     else
+       cFile := p3
+       aadd( aFile, cFile )
+     endif
+   endif
+
+   if !empty( p4 )
+     if left( p4, 1) $ "- /"
+       cParam += p4
+     else
+       cFile := p4
+       aadd( aFile, cFile )
+     endif
+   endif
+
+   if !empty( p5 )
+     if left( p5, 1) $ "- /"
+       cParam += p5
+     else
+       cFile := p5
+       aadd( aFile, cFile )
+     endif
+   endif
+
+   if !empty( p6 )
+     if left( p6, 1) $ "- /"
+       cParam += p6
+     else
+       cFile := p6
+       aadd( aFile, cFile )
+     endif
+   endif
+
    cParam:=strtran(cParam,"/","-")
    cParam:=strtran(cParam,"-elx","-ELX")
    cParam:=strtran(cParam,"-el","-ELX")
@@ -2234,6 +2399,25 @@ Function ConvertParams(cParam)
    cParam:=strtran(cParam,"-f","-F")
    cParam:=strtran(cParam,"-r","-R")
 return cParam
+
+/*
+Function ConvertParams(cParam)
+   cParam:=strtran(cParam,"/","-")
+   cParam:=strtran(cParam,"-elx","-ELX")
+   cParam:=strtran(cParam,"-el","-ELX")
+   cParam:=strtran(cParam,"-ex","-EX")
+   cParam:=strtran(cParam,"-e","-EX")
+   cParam:=strtran(cParam,"-i","-I")
+   cParam:=strtran(cParam,"-p","-P")
+   cParam:=strtran(cParam,"-b","-B")
+   cParam:=strtran(cParam,"-gl","-GL")
+   cParam:=strtran(cParam,"-g","-G")
+   cParam:=strtran(cParam,"-v","-V")
+   cParam:=strtran(cParam,"-f","-F")
+   cParam:=strtran(cParam,"-r","-R")
+return cParam
+*/
+
 Function ShowHelp()
    Local cOs:=OS()
    ?? "Harbour Make Utility"

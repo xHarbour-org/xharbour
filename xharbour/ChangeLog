@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6 2001/12/30 01:21:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.7 2001/12/30 03:28:58 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2001-12-31 08:25 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
+   * utils/hbmake/hbmake.prg
+     * Sinc with harbour.Also command line are free now. ie hbmake -ex ola.bc
 
 2001-12-29 19:26 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/include/hbfast.h
