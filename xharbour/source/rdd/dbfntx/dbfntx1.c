@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.73 2004/02/20 22:33:58 ronpinkas Exp $
+ * $Id: dbfntx1.c,v 1.74 2004/02/23 08:31:56 andijahja Exp $
  */
 
 /*
@@ -854,7 +854,7 @@ static void hb_ntxGetCurrentKey( LPTAGINFO pTag, LPKEYINFO pKey )
 static BOOL hb_ntxTagGoToNextKey( LPTAGINFO pTag, BOOL lContinue )
 {
    BOOL lCurrrentKey = FALSE;
-   LPPAGEINFO pPage, pChildPage;
+   LPPAGEINFO pPage = NULL, pChildPage;
    LPNTXITEM p;
 
    // pTag->blockNext = 0; pTag->keyNext = 0;
@@ -868,7 +868,7 @@ static BOOL hb_ntxTagGoToNextKey( LPTAGINFO pTag, BOOL lContinue )
              ( KEYITEM( pPage, pPage->CurKey ) )->page ) ) )
         lCurrrentKey = TRUE;
       else
-        hb_ntxPageRelease( pTag,pPage );
+        hb_ntxPageRelease( pTag, pPage );
    }
 
    if( !lCurrrentKey )
@@ -955,7 +955,7 @@ static BOOL hb_ntxTagGoToNextKey( LPTAGINFO pTag, BOOL lContinue )
 static BOOL hb_ntxTagGoToPrevKey( LPTAGINFO pTag, BOOL lContinue )
 {
    BOOL lCurrrentKey = FALSE;
-   LPPAGEINFO pPage, pChildPage;
+   LPPAGEINFO pPage = NULL, pChildPage;
 
    // pTag->blockPrev = 0; pTag->keyPrev = 0;
    if( pTag->CurKeyInfo->Tag && ((ULONG)pTag->CurKeyInfo->Xtra) == pTag->Owner->Owner->ulRecNo )
@@ -1371,7 +1371,7 @@ static void hb_ntxPageFree( LPTAGINFO pTag, BOOL lFull )
 
 static LPPAGEINFO hb_ntxPageNew( LPTAGINFO pTag )
 {
-   LPPAGEINFO pPage;
+   LPPAGEINFO pPage = NULL;
 
    if( pTag->Owner->NextAvail > 0 )
    {
@@ -2173,7 +2173,11 @@ static BOOL hb_ntxGetSortedKey( LPTAGINFO pTag, LPNTXSORTINFO pSortInfo, LPSORTI
 {
    char *key1, *key2;
    short int nPage, iPage;
-   int result;
+   int result = 0; /* TODO: It's something wrong here, result was
+                      not initialized. I forced initialization
+                      but this code should be cleaned. Alex please do
+                      that. Best regards, Przemek.
+                    */
    BOOL fDescend = !pTag->AscendKey;
    USHORT itemLength = sizeof( ULONG ) + pTag->KeyLength;
    LPSORTITEM pKey = *ppKey;
@@ -2313,7 +2317,7 @@ static void hb_ntxBufferSave( LPTAGINFO pTag, LPNTXSORTINFO pSortInfo )
    /* printf( "\nhb_ntxBufferSave - 1 ( maxKeys=%d )",maxKeys ); */
    if( pSortInfo->nSwappages > 1 )
    {
-      BOOL  lKeys;
+      BOOL  lKeys = FALSE;
       LPSORTITEM pKeyRoot = (LPSORTITEM) hb_xgrab( pSortInfo->itemLength );
       USHORT pageItemLength = sizeof( ULONG ) + pTag->KeyLength;
       USHORT maxKeysSwapPage = 512/pageItemLength, nRead;
@@ -2426,9 +2430,9 @@ static void hb_ntxBufferSave( LPTAGINFO pTag, LPNTXSORTINFO pSortInfo )
       pTag->RootBlock = 1024;
 }
 
-static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, USHORT* numRecinBuf, LPDBORDERCONDINFO lpdbOrdCondInfo, ULONG ulRecNo )
+static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, SHORT* numRecinBuf, LPDBORDERCONDINFO lpdbOrdCondInfo, ULONG ulRecNo )
 {
-   if( (!lpdbOrdCondInfo || lpdbOrdCondInfo->fAll ) && !pArea->lpdbRelations )
+   if( *numRecinBuf >= 0 )
    {
       if( *numRecinBuf == 10 )
          *numRecinBuf = 0;
@@ -2451,7 +2455,6 @@ static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, USHORT* numRecinBuf
          return FALSE;
       if( lpdbOrdCondInfo->lRecno )
       {
-         SELF_GOTO( ( AREAP ) pArea, (ULONG)lpdbOrdCondInfo->lRecno );
          lpdbOrdCondInfo->lNextCount = -1;
          return TRUE;
       }
@@ -2469,7 +2472,7 @@ static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, USHORT* numRecinBuf
 
       return TRUE;
    }
-      return TRUE;
+   return TRUE;
 }
 
 /* DJGPP can sprintf a float that is almost 320 digits long */
@@ -2489,9 +2492,11 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
    BOOL bWhileOk;
    NTXSORTINFO sortInfo;
    BYTE* readBuffer;
-   USHORT numRecinBuf = 0, nParts = 0;
-   BYTE * pRecordTmp;
-   BOOL fValidBuffer;
+   SHORT numRecinBuf = -1;
+   USHORT nParts = 0;
+   BYTE * pRecordTmp = NULL;
+   BOOL fValidBuffer = FALSE;
+   LPTAGINFO pSaveTag = pArea->lpCurTag;
 #ifndef HB_CDP_SUPPORT_OFF
    PHB_CODEPAGE cdpTmp = s_cdpage;
    s_cdpage = pArea->cdPage;
@@ -2509,9 +2514,9 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
    sortInfo.pKey1 = sortInfo.pKey2 = sortInfo.pKeyFirst = sortInfo.pKeyTemp = NULL;
    if( pArea->lpdbOrdCondInfo && pArea->lpdbOrdCondInfo->fCustom )
       ulRecCount = 0;
+   ulRecMax = ulRecCount;
    if( ulRecCount )
    {
-      ulRecMax = ulRecCount;
       sortInfo.sortBuffer = (BYTE*) hb_xalloc( ulRecCount * sortInfo.itemLength );
       if( !sortInfo.sortBuffer )
       {
@@ -2543,15 +2548,48 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
    else
       sortInfo.sortBuffer = NULL;
 
-   if(( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll )  && !pArea->lpdbRelations )
+   if( !hb_set.HB_SET_STRICTREAD && !pArea->lpdbRelations &&
+       ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll ) )
    {
       pRecordTmp = pArea->pRecord;
       fValidBuffer = pArea->fValidBuffer;
       pArea->fValidBuffer = TRUE;
+      numRecinBuf = 0;
    }
-   else if( pArea->lpdbRelations || pArea->lpdbOrdCondInfo->fUseCurrent )
+   else
    {
-      SELF_GOTOP( ( AREAP ) pArea );
+      if ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll )
+      {
+         pArea->lpCurTag = NULL;
+         SELF_GOTOP( ( AREAP ) pArea );
+      }
+      else if ( pArea->lpdbOrdCondInfo->lRecno )
+      {
+         SELF_GOTO( ( AREAP ) pArea, pArea->lpdbOrdCondInfo->lRecno );
+      }
+      else if ( pArea->lpdbOrdCondInfo->fUseCurrent )
+      {
+         if ( pArea->lpdbOrdCondInfo->lStartRecno )
+         {
+            SELF_GOTO( ( AREAP ) pArea, pArea->lpdbOrdCondInfo->lStartRecno );
+         }
+         else
+         {
+            SELF_GOTOP( ( AREAP ) pArea );
+         }
+      }
+      else if ( pArea->lpdbOrdCondInfo->fRest || pArea->lpdbOrdCondInfo->lNextCount )
+      {
+         if ( pArea->lpdbOrdCondInfo->lStartRecno )
+         {
+            SELF_GOTO( ( AREAP ) pArea, pArea->lpdbOrdCondInfo->lStartRecno );
+         }
+      }
+      else
+      {
+         pArea->lpCurTag = NULL;
+         SELF_GOTOP( ( AREAP ) pArea );
+      }
    }
 
    bWhileOk = TRUE;
@@ -2653,8 +2691,6 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
       }
       if( pArea->lpdbOrdCondInfo )
       {
-         if( !pArea->lpdbOrdCondInfo->fAll )
-            SELF_SKIP( ( AREAP ) pArea, 1 );
          if( pArea->lpdbOrdCondInfo->lStep )
          {
             lStep ++;
@@ -2666,18 +2702,21 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
             hb_vmPushSymbol( &hb_symEval );
             hb_vmPush( pArea->lpdbOrdCondInfo->itmCobEval );
             hb_vmSend( 0 );
+            if( ! hb_itemGetL( &(HB_VM_STACK.Return) ) )
+               break;
          }
       }
-      else if( pArea->lpdbRelations )
+      if( numRecinBuf < 0 )
          SELF_SKIP( ( AREAP ) pArea, 1 );
-
    }
    hb_ntxSortKeyEnd( pTag, &sortInfo );
-   if(( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll ) && !pArea->lpdbRelations )
+   if( numRecinBuf >= 0 )
    {
       pArea->pRecord = pRecordTmp;
       pArea->fValidBuffer = fValidBuffer;
    }
+   pArea->lpCurTag = pSaveTag;
+
    if( sortInfo.nSwappages )
       sortInfo.nSwappages = nParts - 1;
 
