@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.424 2004/11/21 21:44:27 druzus Exp $
+ * $Id: hvm.c,v 1.425 2004/12/02 03:26:36 druzus Exp $
  */
 
 /*
@@ -6744,7 +6744,7 @@ HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType
    }
 }
 
-HB_EXPORT void hb_vmPushNumInt( HB_LONG lNumber )
+static void hb_vmPushNumInt( HB_LONG lNumber )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumType(%Ld, %i, %i)", lNumber ));
 
@@ -7215,7 +7215,7 @@ static void hb_vmPushAliasedField( PHB_SYMB pSym )
    /*
     This was added for Clipper compatibility
    */
-   if( ( pAlias->type == HB_IT_ARRAY ) || ( pAlias->type == HB_IT_HASH ) || 
+   if( ( pAlias->type == HB_IT_ARRAY ) || ( pAlias->type == HB_IT_HASH ) ||
        ( pAlias->type == HB_IT_LOGICAL ) || ( pAlias->type == HB_IT_NIL ) ||
        ( pAlias->type == HB_IT_BLOCK ) || ( pAlias->type == HB_IT_DATE ) )
    {

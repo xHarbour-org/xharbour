@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3649 2004/12/01 20:03:33 peterrees Exp $
+ * $Id: ChangeLog,v 1.3650 2004/12/02 03:26:15 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-03 09:14 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xharbour/source/vm/hvm.c
+    * Corrected definition of hb_vmPushNumInt() to match declaration
 
 2004-12-02 04:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/hb-func.sh
@@ -23,7 +27,7 @@
       which need control over such methods
 
   * xharbour/source/rtl/gtapi.c
-    ! fixed the problem caused by incompatibilities between 
+    ! fixed the problem caused by incompatibilities between
       screen functions in CT for Window 0 - it works a little bit
       differ
 
