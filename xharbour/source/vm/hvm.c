@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.52 2002/04/17 02:58:21 ronpinkas Exp $
+ * $Id: hvm.c,v 1.53 2002/04/17 20:36:19 ronpinkas Exp $
  */
 
 /*
@@ -3384,15 +3384,17 @@ static void hb_vmArrayPop( void )
    {
       long lIndex = (long) ulIndex;
 
-      if( lIndex < 0 )
+      if( lIndex > 0 )
+      {
+         lIndex--;
+      }
+      else if( lIndex < 0 )
       {
          lIndex += pArray->item.asString.length;
       }
 
       if( lIndex > 0 && lIndex <= pArray->item.asString.length )
       {
-         lIndex--;
-
          pArray = pArray->pOrigin;
 
          if( pArray->item.asString.bStatic || *( pArray->item.asString.puiHolders ) > 1 )
