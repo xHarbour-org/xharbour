@@ -471,7 +471,7 @@ METHOD OnLButtonDown( wParam, x, y )
 
    ::mousedown:=.T.
    SetCapture(::Handle)
-
+view wParam
    RETURN(NIL)
 
 *-----------------------------------------------------------------------------*
@@ -616,17 +616,16 @@ METHOD OnLButtonUp( wParam, x, y )
             RectScreenToClient(::Handle,aRect)
             IF !empty(IntersectRect( aRect, ::aEditRect ))
                aAdd(::aSelected,{hChild, aclone(aRect),0,0,{},{}}) // handle,rect,anchorX,anchorY,aHot
-            ENDIF
-         NEXT
-      ENDIF
-   ENDIF
+            endif
+         next
+      endif
+   endif
 
    InvalidateRect(::Handle,,.F.)
    RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_UPDATENOW+RDW_ALLCHILDREN)
    ReleaseCapture()
    ::BringToTop()
    ::SetFocus()
-
    RETURN(NIL)
 
 *-----------------------------------------------------------------------------*
