@@ -1,0 +1,84 @@
+               XWT2
+               Tech notes
+               
+
+               Giancarlo Niccolai
+               
+               
+
+Generic Widget events:
+-click       
+   Parameters: ( nX, nY, lShift, lCtrl, lAlt )
+   
+-double-click
+   Parameters: ( nX, nY, lShift, lCtrl, lAlt )
+
+-right-click
+   Parameters: ( nX, nY, lShift, lCtrl, lAlt )
+
+-middle-click
+   Parameters: ( nX, nY, lShift, lCtrl, lAlt )
+
+-fuorth-click
+   Parameters: ( nX, nY, lShift, lCtrl, lAlt )
+
+-fifth-click
+   Parameters: ( nX, nY, lShift, lCtrl, lAlt )
+
+-enter
+   Parameters: ( nX, nY )
+
+-leave
+   Parameters: ( nX, nY )
+
+-gotfocus
+   Parameters: none
+   
+-lostfocus
+   Parameters: none
+
+-key-press
+   sString, nKeycode, nScancode, lShift, lCtrl, lAlt, lCaps
+   
+-key-release
+   cString, nKeycode, nScancode, lShift, lCtrl, lAlt, lCaps
+   
+- motion
+   nX, nY
+   
+PROPERTIES:
+   fgcolor  (String/colorref)
+   bgcolor  (String/colorref)
+   textcolor (String/colorref)
+   sensibility (Logical) 
+   visibility  (String: normal, hidden)
+   x           (int)
+   y           (int) 
+   width       (int)
+   height      (int)  
+   id          (int)
+
+Text widget events
+-changed or "user_defined"
+   nId, cText
+-updated
+   nId, cText
+   
+   Properties:
+      -text (string)
+      -event (string:16)
+      
+
+Button widget event:
+- clicked or "user_defined" 
+   nId
+- pressed 
+   nId
+- released
+   nId
+   
+   Properties:
+      -text (string)
+      -event (string:16)
+   
+   
