@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.108 2004/04/14 10:32:14 druzus Exp $
+ * $Id: arrays.c,v 1.109 2004/04/28 18:31:12 druzus Exp $
  */
 
 /*
@@ -1120,7 +1120,7 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
       #ifdef HB_ARRAY_USE_COUNTER
          FakedObject.item.asArray.value->ulHolders = 0;
       #else
-	     // Avoid infinite recursion - we know this is the only pOwner
+        // Avoid infinite recursion - we know this is the only pOwner
          //hb_arrayReleaseHolder( pBaseArray, (void *) &FakedObject );
          hb_xfree( (void *) pBaseArray->pOwners );
          pBaseArray->pOwners = NULL;
@@ -1550,7 +1550,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       {
          HB_TRACE( HB_TR_INFO, ( "Array Item %p type:%i", pItem, pItem->type ) );
 
-		 // All other complex types will be released directly by the GC.
+       // All other complex types will be released directly by the GC.
          if( pItem->type == HB_IT_STRING )
          {
             hb_itemClear( pItem );
@@ -1559,7 +1559,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
          ++pItem;
       }
 
-      HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pItems ) );
+      HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pBaseArray->pItems ) );
       hb_xfree( pBaseArray->pItems );
       pBaseArray->pItems = NULL;
       pBaseArray->ulLen = 4171717171U; //Intentionally - debugging flag indicating array was released by GC.

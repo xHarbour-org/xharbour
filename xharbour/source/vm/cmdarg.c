@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.9 2003/12/20 10:57:27 lf_sfnet Exp $
+ * $Id: cmdarg.c,v 1.10 2004/03/18 04:05:27 ronpinkas Exp $
  */
 
 /*
@@ -319,17 +319,28 @@ void hb_cmdargProcessVM( void )
       hb_verBuildInfo();
    }
 
-   #if defined(HB_OS_DOS) && defined(__WATCOMC__)
-
    int iHandles;
-
    iHandles = hb_cmdargNum( "F" );
 
    if ( iHandles > 20 )
    {
+      #if defined(HB_OS_DOS) && defined(__WATCOMC__)
       _grow_handles( iHandles );
+
+      #elif defined(HB_OS_OS2) //&& defined(__INNOTEK_LIBC__)
+      /* 28/04/2004 - <maurilio.longo@libero.it>
+         A standard OS/2 program has 20 file handles available upon startup. If xHarbour is compiled with
+         Innotek GCC we need to increase this number while using EMX/GCC this numeber is increased by EMX
+         runtime with EMXOPT=-hNNN environment variable
+         04/05/2004 -
+         From Innotek forum I've come to know that this is a bug of current Innotek libc.dll, next one will
+         not need this and will increase available file handles when needed, that said, this change is "needed"
+         to support //F: clipper envar switch
+      */
+      DosSetMaxFH( (ULONG) iHandles );
+      #endif
    }
-   #endif
+
 
    hb_traceInit();
 }
