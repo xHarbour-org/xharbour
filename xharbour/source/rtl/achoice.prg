@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.12 2003/01/27 03:37:23 walito Exp $
+ * $Id: achoice.prg,v 1.13 2003/05/12 04:50:58 walito Exp $
  */
 
 /*
@@ -193,11 +193,15 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
                DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
                Scroll( nTop, nLeft, nBottom, nRight, ( nNewPos - ( nAtTop + nNumRows - 1 ) ) )
                nAtTop := nNewPos
-               nPos   := Max( nPos, nAtTop + nNumRows - 1 )
-               DO WHILE nPos > nNewPos
-                  DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-                  nPos --
-               ENDDO
+               if nNumRows > 1
+                  nPos   := Max( nPos, nAtTop + nNumRows - 1 )
+                  DO WHILE nPos > nNewPos
+                     DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
+                     nPos --
+                  ENDDO
+               else
+                  nPos--
+               endif
                DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
                DispEnd()
             ENDIF
@@ -336,6 +340,8 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
             IF nAtTop > Max( 1, nPos - nNumRows + 1 )
                nAtTop := Max( 1, nPos - nNumRows + 1 )
                DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
+            ELSE
+               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
             ENDIF
          ELSE
             IF INRANGE( nAtTop, nFrstItem, nAtTop + nNumRows - 1 )
@@ -371,6 +377,8 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
             IF nAtTop < Min( nPos, Max( 1, nItems - nNumRows + 1 ) )
                nAtTop := Min( nPos, Max( 1, nItems - nNumRows + 1 ) )
                DispPage( acItems, alSelect, nTop, nLeft, nRight, nNumRows, nPos, nAtTop, nItems, bSelect )
+            ELSE
+               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .T., nNumCols )
             ENDIF
          ELSE
             IF INRANGE( nAtTop, nLastItem, nAtTop + nNumRows - 1 )
