@@ -1,5 +1,5 @@
 /*
- * $Id: binnum.c,v 1.12 2000/07/16 11:40:51 vszel Exp $
+ * $Id: binnum.c,v 1.1.1.1 2001/12/21 10:41:11 ronpinkas Exp $
  */
 
 /*
@@ -70,20 +70,32 @@ HB_FUNC( BIN2I )
 
 HB_FUNC( BIN2L )
 {
-   PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pBin = hb_param( 1, HB_IT_STRING );
 
-   if( pItem )
+   if( pBin )
    {
-      char * pszString = hb_itemGetCPtr( pItem );
-      ULONG ulLen = hb_itemGetCLen( pItem );
+      //char * pszString = hb_itemGetCPtr( pItem );
+      //ULONG ulLen = hb_itemGetCLen( pItem );
 
+      // Seems more efficent to me, but NOT sure if has any pltaform dependant issues.
+      if( pBin->item.asString.length > 3 )
+      {
+         hb_retnl( *(long *) ( pBin->item.asString.value ) );
+         
+         return;
+      }
+         
+
+      /*
       hb_retnl( HB_MKLONG( ( ulLen >= 1 ) ? ( BYTE ) pszString[ 0 ] : 0,
                            ( ulLen >= 2 ) ? ( BYTE ) pszString[ 1 ] : 0,
                            ( ulLen >= 3 ) ? ( BYTE ) pszString[ 2 ] : 0,
                            ( ulLen >= 4 ) ? ( BYTE ) pszString[ 3 ] : 0 ) );
+      */                     
    }
-   else
-      hb_retnl( 0 );
+   
+   
+   hb_retnl( 0 );
 }
 
 HB_FUNC( I2BIN )

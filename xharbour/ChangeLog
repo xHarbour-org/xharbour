@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.505 2002/11/25 05:08:53 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.506 2002/11/27 04:05:33 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-29 00:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/binnum.c
+    ! Minor optimization.
+  * source/rdd/dbcmd.c
+    ! Fixed __dbLocate NOT respecting WHILE clause.
+    * Formatting.  
 
 2002-11-27 02:00 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source\rdd\workarea.c

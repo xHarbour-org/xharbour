@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.18 2002/10/13 18:06:30 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.19 2002/10/27 14:41:37 lculik Exp $
  */
 
 /*
@@ -1476,125 +1476,269 @@ HB_FUNC( __DBLOCATE )
    pRecord  = hb_param( 4, HB_IT_NUMERIC );
    pRest    = hb_param( 5, HB_IT_LOGICAL );
    pNewRest = NULL;
+   
    if( pWhile )
    {
       pNewRest = hb_itemPutL( NULL, TRUE );
       pScopeInfo.fRest = pNewRest;
    }
+   
    if( !pFor )
+   {
       pNewFor = hb_itemPutL( NULL, TRUE );
+   }
    else
+   {
       pNewFor = hb_itemNew( pFor );
+   }
+   
    pScopeInfo.itmCobFor = pNewFor;
+   
    if( !pRest )
    {
       pNewRest = hb_itemPutL( pNewRest, FALSE );
       pScopeInfo.fRest = pNewRest;
    }
+   
    SELF_SETLOCATE( ( AREAP ) s_pCurrArea->pArea, &pScopeInfo );
+   
    ( ( AREAP ) s_pCurrArea->pArea )->fFound = FALSE;
+   
    if( pRecord )
    {
       SELF_GOTOID( ( AREAP ) s_pCurrArea->pArea, pRecord );
+      
       if( ( ( AREAP ) s_pCurrArea->pArea )->fEof )
+      {
          goto ExitLocate ;
+      }
+      
       if( hb_itemType( pWhile ) == HB_IT_BLOCK )
+      {
          bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
+      }   
       else
+      {
          bWhile = TRUE;
+      }
+      
       if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
       {
          bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
+         
          ( ( AREAP ) s_pCurrArea->pArea )->fFound = ( bWhile && bFor );
       }
       else
+      {
          ( ( AREAP ) s_pCurrArea->pArea )->fFound = ( bWhile && hb_itemGetL( pNewFor ) );
+      }
+   }
+   else if( pWhile )
+   {
+      if( hb_itemType( pWhile ) == HB_IT_BLOCK )
+      {
+         bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
+      }
+      else
+      {
+         bWhile = TRUE;
+      }
+      
+      if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
+      {
+         bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
+      }   
+      else
+      {
+         bFor = hb_itemGetL( pNewFor );
+      }
+      
+      while( !( ( AREAP ) s_pCurrArea->pArea )->fEof && lNext-- > 0 && bWhile && !bFor )
+      {
+         SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
+         
+         if( ( ( AREAP ) s_pCurrArea->pArea )->fEof  )
+         {
+            bFor = FALSE;
+         }
+         else
+         {
+            if( hb_itemType( pWhile ) == HB_IT_BLOCK )
+            {
+               bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
+            }
+            else
+            {
+               bWhile = TRUE;
+            }
+            
+            if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
+            {
+               bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
+            }
+            else
+            {
+               bFor = hb_itemGetL( pNewFor );
+            }
+         }
+      }
+      
+      ( ( AREAP ) s_pCurrArea->pArea )->fFound = bFor;
    }
    else if( pNext )
    {
       lNext = hb_parnl( 3 );
+      
       if( ( ( AREAP ) s_pCurrArea->pArea )->fEof || lNext <= 0 )
+      {
          goto ExitLocate ;
+      }
+      
       if( hb_itemType( pWhile ) == HB_IT_BLOCK )
+      {
          bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
+      }
       else
+      {
          bWhile = TRUE;
+      }
+      
       if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
+      {
          bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
+      }
       else
+      {
          bFor = hb_itemGetL( pNewFor );
+      }
+      
       while( !( ( AREAP ) s_pCurrArea->pArea )->fEof && lNext-- > 0 && bWhile && !bFor )
       {
          SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
+         
          if( ( ( AREAP ) s_pCurrArea->pArea )->fEof  )
+         {
             bFor = FALSE;
+         }
          else
          {
             if( hb_itemType( pWhile ) == HB_IT_BLOCK )
+            {
                bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
+            }
             else
+            {
                bWhile = TRUE;
+            }
+            
             if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
+            {
                bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
+            }
             else
+            {
                bFor = hb_itemGetL( pNewFor );
+            }
          }
       }
+      
       ( ( AREAP ) s_pCurrArea->pArea )->fFound = bFor;
    }
    else if( hb_itemGetL( pRest ) )
    {
       if( ( ( AREAP ) s_pCurrArea->pArea )->fEof )
+      {
          goto ExitLocate ;
+      }
       if( hb_itemType( pWhile ) == HB_IT_BLOCK )
+      {
          bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
+      }
       else
+      {
          bWhile = TRUE;
+      }
+      
       if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
+      {
          bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
+      }
       else
+      {
          bFor = hb_itemGetL( pNewFor );
+      }
+      
       while( !( ( AREAP ) s_pCurrArea->pArea )->fEof && bWhile && !bFor )
       {
          SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
+         
          if( ( ( AREAP ) s_pCurrArea->pArea )->fEof  )
+         {
             bFor = FALSE;
+         }
          else
          {
             if( hb_itemType( pWhile ) == HB_IT_BLOCK )
+            {
                bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
+            }
             else
+            {
                bWhile = TRUE;
+            }
+            
             if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
+            {
                bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
+            }
             else
+            {
                bFor = hb_itemGetL( pNewFor );
+            }   
          }
       }
+      
       ( ( AREAP ) s_pCurrArea->pArea )->fFound = bFor;
    }
    else
    {
       SELF_GOTOP( ( AREAP ) s_pCurrArea->pArea );
+      
       if( ( ( AREAP ) s_pCurrArea->pArea )->fEof )
+      {
          goto ExitLocate ;
+      }
+      
       if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
+      {
          bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
+      }
       else
+      {
          bFor = hb_itemGetL( pNewFor );
+      }
+      
       while( !( ( AREAP ) s_pCurrArea->pArea )->fEof && !bFor )
       {
          SELF_SKIP( ( AREAP ) s_pCurrArea->pArea, 1 );
+         
          if( ( ( AREAP ) s_pCurrArea->pArea )->fEof  )
+         {
             bFor = FALSE;
+         }
          else
          {
             if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
+            {
                bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
+            }
             else
+            {
                bFor = hb_itemGetL( pNewFor );
+            }
          }
       }
+      
       ( ( AREAP ) s_pCurrArea->pArea )->fFound = bFor;
    }
 
