@@ -484,9 +484,9 @@ METHOD OnLButtonDown( wParam, x, y )
                aRect:=aClone(aWRect)
                RectScreenToClient(::Handle,aRect)
                aEval(::aSelected,{|a| ShowWindow(a[SEL_HANDLE],SW_HIDE),;
-               RedrawWindow(::Parent:Handle,aRect,,RDW_INVALIDATE+RDW_ERASENOW+RDW_ALLCHILDREN),;
+               RedrawWindow(::Parent:Handle,aRect,,RDW_INVALIDATE+RDW_UPDATENOW+RDW_ALLCHILDREN),;
                ShowWindow(a[SEL_HANDLE],SW_SHOW)  })
-               ::aSelected:={{hChild,aclone(aRect),x-aRect[1],y-aRect[2],{},{}}}   // handle,rect,anchorX,anchorY,aHot
+               ::aSelected:={{hChild,aclone(aRect),x-aRect[1],y-aRect[2],{},aclone(aRect)}}   // handle,rect,anchorX,anchorY,aHot
             ENDIF
             IF Len(::aSelected)==1 .and. (nPos:=aScan(::aSelected[1,SEL_HOTAREAS],{|a| ptInRect(a[1],{x,y})})) > 0 // <= aHot
                ::nClick:=::aSelected[1,SEL_HOTAREAS,nPos,2]
@@ -516,7 +516,7 @@ METHOD OnLButtonDown( wParam, x, y )
          aRect:=aClone(aWRect)
          RectScreenToClient(::Handle,aRect)
          aEval(::aSelected,{|a| ShowWindow(a[SEL_HANDLE],SW_HIDE),;
-                RedrawWindow(::Parent:Handle,aRect,,RDW_INVALIDATE+RDW_ERASENOW+RDW_ALLCHILDREN),;
+                RedrawWindow(::Parent:Handle,aRect,,RDW_INVALIDATE+RDW_UPDATENOW+RDW_ALLCHILDREN),;
                 ShowWindow(a[SEL_HANDLE],SW_SHOW)  })
       NEXT
 
@@ -528,8 +528,8 @@ METHOD OnLButtonDown( wParam, x, y )
       ::aClickPt:={x,y}
    ENDIF
 
-   InvalidateRect(::Handle,,.F.)
-   RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_ERASENOW+RDW_ALLCHILDREN)
+ //  InvalidateRect(::Handle,,.F.)
+ //  RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_ERASENOW+RDW_ALLCHILDREN)
 
    hDC:=GetDC(::Handle)
    SetTextColor(hDC,RGB(255,255,128))
@@ -567,6 +567,7 @@ METHOD OnMouseMove( aParam,x,y)
       hDC:=GetDC(::Handle)
       SetTextColor(hDC,RGB(255,255,128))
       SetBkColor(hDC,RGB(0,0,128))
+      // old
       IF len(::aSelected) > 1
          FOR EACH a In ::aSelected
             DrawFocusRect(hDC,a[SEL_NEWRECT])
@@ -574,7 +575,7 @@ METHOD OnMouseMove( aParam,x,y)
       ELSE
         DrawFocusRect(hDC,::aEditRect)
       ENDIF
-
+      //new
       IF len(::aSelected) > 1
          ::MoveCtrl(::Handle,aPt)
          FOR EACH a In ::aSelected
@@ -632,22 +633,33 @@ METHOD OnLButtonUp( wParam, x, y )
    LOCAL a
    LOCAL oObj
 
-   if !::mousedown // if dragged pressed from different window
+   IF !::mousedown // if dragged pressed from different window
       RETURN(NIL)
-   endif
+   ENDIF
 
    IF ::creating
       ::cursor:=NIL
    ENDIF
 
    ::mousedown:=.F.
+   hDC:=GetDC(::Handle)
 
-   If ::moving
+   IF ::moving .OR. ::sizing
+      IF len(::aSelected) > 1
+         FOR EACH a In ::aSelected
+            DrawFocusRect(hDC,a[SEL_NEWRECT])
+         NEXT
+      ELSE
+        DrawFocusRect(hDC,::aEditRect)
+      ENDIF
+   ENDIF
+
+   IF ::moving
       ::moving:=.F.
-   Endif
-   if ::sizing
-      ::sizing:=.T.
-   endif
+   ENDIF
+   IF ::sizing
+      ::sizing:=.F.
+   ENDIF
    ::MoveCtrl( ,aPt)
    FOR EACH a IN ::aSelected
       ShowWindow(a[SEL_HANDLE],SW_HIDE)
@@ -664,10 +676,7 @@ METHOD OnLButtonUp( wParam, x, y )
    IF ::selecting
       ::selecting:=.F.
       WinSetCursor(LoadCursor(,IDC_ARROW))
-
-      hDC:=GetDC(::Handle)
       DrawFocusRect(hDC,::aEditRect)
-      ReleaseDc(::Handle,hDC)
 
       IF ::creating
          ::creating:=.F.
@@ -693,13 +702,16 @@ METHOD OnLButtonUp( wParam, x, y )
             RectScreenToClient(::Handle,aRect)
             IF !empty(IntersectRect( aRect, ::aEditRect ))
                aAdd(::aSelected,{hChild, aclone(aRect),0,0,{},{}}) // handle,rect,anchorX,anchorY,aHot
-            endif
-         next
-      endif
-   endif
+            ENDIF
+         NEXT
+      ENDIF
+      InvalidateRect(::Handle,,.F.)
+   ENDIF
+   ReleaseDc(::Handle,hDC)
 
-   InvalidateRect(::Handle,,.F.)
-   RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_UPDATENOW+RDW_ALLCHILDREN)
+
+  // InvalidateRect(::Handle,,.F.)
+  // RedrawWindow(::Parent:Handle,GetClientRect(::Parent:Handle),,RDW_INVALIDATE+RDW_UPDATENOW+RDW_ALLCHILDREN)
    ReleaseCapture()
    ::BringToTop()
    ::SetFocus()
