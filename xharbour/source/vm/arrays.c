@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.112 2004/06/04 03:27:50 ronpinkas Exp $
+ * $Id: arrays.c,v 1.113 2004/11/21 21:44:25 druzus Exp $
  */
 
 /*
@@ -1207,7 +1207,7 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
          if( pItem->type == HB_IT_ARRAY && pItem->item.asArray.value == pBaseArray )
          {
             HB_TRACE( HB_TR_DEBUG, ("Warning! Nested Release (Cyclic) %p %p", pItem, pItem->item.asArray.value ) );
-            TraceLog( NULL, "Warning! Nested Release (Cyclic) %p %p\n", pItem, pItem->item.asArray.value );
+            // TraceLog( NULL, "Warning! Nested Release (Cyclic) %p %p\n", pItem, pItem->item.asArray.value );
          }
          else if( HB_IS_COMPLEX( pItem ) )
          {
@@ -1249,15 +1249,15 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
 
              while( pOwners )
              {
-                char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
-                USHORT uiLine;
+                //char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
+                //USHORT uiLine;
 
                 if( pOwners->pOwner != (void *) pArray )
                 {
-                   hb_procinfo( 0, szProc, &uiLine, szModule  );
-                   TraceLog( NULL, "Warning! (1) Residual owner %p of array %p [%s->%s(%i)]\n",
-                                   pOwners, pArray->item.asArray.value,
-                                   szModule, szProc, uiLine );
+                   //hb_procinfo( 0, szProc, &uiLine, szModule  );
+                   //TraceLog( NULL, "Warning! (1) Residual owner %p of array %p [%s->%s(%i)]\n",
+                   //                pOwners, pArray->item.asArray.value,
+                   //                szModule, szProc, uiLine );
                 }
 
                 pOwners = pOwners->pNext;
@@ -1276,11 +1276,11 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
    }
    else
    {
-      char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
-      USHORT uiLine;
+      //char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
+      //USHORT uiLine;
 
-      hb_procinfo( 0, szProc, &uiLine, szModule  );
-      TraceLog( NULL, "Warning! not an array %p [%s->%s(%i)]\n", pArray, szModule, szProc, uiLine );
+      // hb_procinfo( 0, szProc, &uiLine, szModule  );
+      // TraceLog( NULL, "Warning! not an array %p [%s->%s(%i)]\n", pArray, szModule, szProc, uiLine );
       return FALSE;
    }
 }
@@ -1621,7 +1621,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
                }
                else
                {
-                  TraceLog( NULL, "Warning! (4) Invalid Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
+                  // TraceLog( NULL, "Warning! (4) Invalid Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
                }
             }
             else if( ((HB_CODEBLOCK_PTR) (pOwners->pOwner))->pSelfBase == pBaseArray )
@@ -1641,7 +1641,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
                }
                else
                {
-                  TraceLog( NULL, "Warning! (4-2) Invalid Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
+                  // TraceLog( NULL, "Warning! (4-2) Invalid Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
                }
 
             }
@@ -1650,7 +1650,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
             }
             else
             {
-               TraceLog( NULL, "Warning! (5) Invalid Residual owner %p type: %i\n", pOwners->pOwner, ((PHB_ITEM) (pOwners->pOwner))->type );
+               // TraceLog( NULL, "Warning! (5) Invalid Residual owner %p type: %i\n", pOwners->pOwner, ((PHB_ITEM) (pOwners->pOwner))->type );
             }
 
             pFree = pOwners;
@@ -1712,12 +1712,12 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       }
 
       {
-         char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
-         USHORT uiLine;
+         //char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
+         //USHORT uiLine;
 
-         hb_procinfo( 0, szProc, &uiLine, szModule  );
-         TraceLog( NULL, "Warning! Could not locate old owner %p of array %p [%s->%s(%i)] Stack: %p\n",
-                         pOldHolder, pBaseArray, szModule, szProc, uiLine, hb_stackItemFromTop(1) );
+         // hb_procinfo( 0, szProc, &uiLine, szModule  );
+         // TraceLog( NULL, "Warning! Could not locate old owner %p of array %p [%s->%s(%i)] Stack: %p\n",
+         //                pOldHolder, pBaseArray, szModule, szProc, uiLine, hb_stackItemFromTop(1) );
       }
 
       hb_arrayRegisterHolder( pBaseArray, pNewHolder );
@@ -1777,11 +1777,11 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       }
       else
       {
-         char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
-         USHORT uiLine;
+         //char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
+         //USHORT uiLine;
 
-         hb_procinfo( 0, szProc, &uiLine, szModule  );
-         TraceLog( NULL, "Warning! Could not locate owner %p of array %p [%s->%s(%i)]\n", pHolder, pBaseArray, szModule, szProc, uiLine );
+         // hb_procinfo( 0, szProc, &uiLine, szModule  );
+         // TraceLog( NULL, "Warning! Could not locate owner %p of array %p [%s->%s(%i)]\n", pHolder, pBaseArray, szModule, szProc, uiLine );
       }
 
       //TraceLog( NULL, "DONE hb_arrayReleaseHolder( %p, %p )\n", pBaseArray, pHolder );
@@ -1845,11 +1845,11 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       }
       else
       {
-         char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
-         USHORT uiLine;
+         //char szProc[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ], szModule[ _POSIX_PATH_MAX + 1 ];
+         //USHORT uiLine;
 
-         hb_procinfo( 0, szProc, &uiLine, szModule  );
-         TraceLog( NULL, "Warning! Could not locate owner %p of garbage array %p [%s->%s(%i)]\n", pHolder, pBaseArray, szModule, szProc, uiLine );
+         // hb_procinfo( 0, szProc, &uiLine, szModule  );
+         // TraceLog( NULL, "Warning! Could not locate owner %p of garbage array %p [%s->%s(%i)]\n", pHolder, pBaseArray, szModule, szProc, uiLine );
       }
 
       //TraceLog( NULL, "DONE hb_arrayReleaseHolder( %p, %p )\n", pBaseArray, pHolder );
