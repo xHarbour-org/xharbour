@@ -2,7 +2,7 @@
 #define FORM_A4 9
 
 FUNCTION Main()
-  LOCAL nPrn:=1, oP:= TPRINT():New()
+  LOCAL nPrn:=1
   LOCAL aPrn:= GetPrinters()
   DO WHILE !EMPTY(nPrn)
     CLS
