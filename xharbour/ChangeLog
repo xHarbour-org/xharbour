@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2406 2004/02/25 17:59:59 walito Exp $
+ * $Id: ChangeLog,v 1.2407 2004/02/25 21:38:04 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-26 17:25 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * contrib/mysql/tmysql.prg
+    - METHOD Append( oRow ) CLASS TMySQLTable - remove return .T. inside WITH OBJECT
+        fixes "Invalid pointer" GPF trap
 
 2004-02-25 18:45 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
   * source/rdd/dbcmd.c

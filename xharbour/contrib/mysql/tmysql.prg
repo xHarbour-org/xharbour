@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.12 2003/12/21 02:56:15 walito Exp $
+ * $Id: tmysql.prg,v 1.13 2004/02/15 20:14:03 peterrees Exp $
  */
 
  /*
@@ -908,7 +908,7 @@ return !::lError
 METHOD Append( oRow ) CLASS TMySQLTable
 
    local cInsertQuery := "INSERT INTO " + ::cTable + " ("
-   local xValue
+   local xValue, lResult:= .F.
 
            // default Current row
    if oRow == nil
@@ -941,7 +941,7 @@ METHOD Append( oRow ) CLASS TMySQLTable
                for each xValue in ::aOldValue
                   xValue := ::fieldget( HB_EnumIndex() )
                next
-               return .T.
+               lResult:= .T.
             else
                ::lError := .T.
             endif
@@ -974,7 +974,7 @@ METHOD Append( oRow ) CLASS TMySQLTable
 // alert( cInsertQuery )
 
             if sqlQuery( ::nSocket, cInsertQuery ) == 0
-               return .T.
+               lResult:= .T.
             else
                ::lError := .T.
             endif
@@ -982,7 +982,7 @@ METHOD Append( oRow ) CLASS TMySQLTable
          endif
       END  // WITH
    Endif
-return .F.
+return lResult
 
 
 METHOD GetBlankRow( loRow ) CLASS TMySQLTable
