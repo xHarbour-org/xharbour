@@ -10,13 +10,13 @@ HARBOURLIB   = $(HRB_DIR)\lib\
 
 $(CAEXE) : $(OBJDIR)\$(PRGFILE).obj \
            $(OBJDIR)\mainwin.obj \
-           $(HARBOURLIB)\harbour.lib
+           $(HARBOURLIB)\hbdll_bc.lib
 
    echo $(OBJDIR)\$(PRGFILE).obj + > b32.bc
    echo $(OBJDIR)\mainwin.obj + >> b32.bc
    echo $(BCC_DIR)\lib\c0w32.obj, + >> b32.bc
    echo $(CAEXE),, + >> b32.bc
-   echo $(HARBOURLIB)\harbour.lib + >> b32.bc
+   echo $(HARBOURLIB)\hbdll_bc.lib + >> b32.bc
    echo $(BCC_DIR)\lib\cw32.lib + >> b32.bc
    echo $(BCC_DIR)\lib\import32.lib, >> b32.bc
    @$(ILINK_EXE) -ap -Tpe -Gn @b32.bc
