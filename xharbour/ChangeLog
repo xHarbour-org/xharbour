@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3262 2004/08/03 04:55:13 kaddath Exp $
+ * $Id: ChangeLog,v 1.3263 2004/08/03 10:36:03 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-03 13:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+   ! fixed DBOI_ORDERCOUNT again - this time I tested it,
+     sorry for troubles
 
 2004-08-03 06:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * hrbdll.vc

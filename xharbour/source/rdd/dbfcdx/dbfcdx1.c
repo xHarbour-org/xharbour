@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.145 2004/08/02 12:37:14 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.146 2004/08/02 18:26:08 druzus Exp $
  */
 
 /*
@@ -7131,22 +7131,19 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
       case DBOI_ORDERCOUNT:
          {
             LPCDXINDEX pIndex;
+            char *pszBag = hb_itemGetCLen( pOrderInfo->atomBagName ) > 0 ?
+                              hb_itemGetCPtr( pOrderInfo->atomBagName ) : NULL;
             uiTag = 0;
-            pIndex = pOrderInfo->atomBagName == NULL ? pArea->lpIndexes :
-                        hb_cdxFindBag( pArea, hb_itemGetCPtr( pOrderInfo->atomBagName ) );
-            if ( pIndex )
+            pIndex = pszBag ? hb_cdxFindBag( pArea, pszBag ) : pArea->lpIndexes;
+            while ( pIndex )
             {
                pTag = pIndex->TagList;
                while ( pTag )
                {
                   uiTag++;
                   pTag = pTag->pNext;
-                  if ( pTag == NULL && pOrderInfo->atomBagName == NULL && 
-                       pTag->pIndex->pNext != NULL )
-                  {
-                     pTag = pTag->pIndex->pNext->TagList;
-                  }
                }
+               pIndex = pszBag ? NULL : pIndex->pNext;
             }
             pOrderInfo->itmResult = hb_itemPutNI( pOrderInfo->itmResult, uiTag );
             break;
