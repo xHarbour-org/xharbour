@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.39 2001/11/06 23:18:04 vszakats Exp $
+ * $Id: hbapigt.h,v 1.1.1.1 2001/12/21 10:47:31 ronpinkas Exp $
  */
 
 /*
@@ -191,7 +191,10 @@ extern void   hb_gtTone( double dFrequency, double dDuration );
 extern USHORT hb_gtWrite( BYTE * pbyStr, ULONG ulLen );
 extern USHORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pbyStr, ULONG ulLen );
 extern USHORT hb_gtWriteCon( BYTE * pbyStr, ULONG ulLen );
+extern int    hb_gtCurrentColor( void );
 extern char * hb_gtVersion( void );
+#define hb_gtOutStd( pbyStr, ulLen ) hb_gt_OutStd( pbyStr, ulLen )
+#define hb_gtOutErr( pbyStr, ulLen ) hb_gt_OutErr( pbyStr, ulLen )
 
 /* Undocumented CA-Clipper 5.x GT API calls */
 
@@ -256,6 +259,9 @@ extern void   hb_gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod );
 extern void   hb_gt_Tone( double dFrequency, double dDuration );
 extern char * hb_gt_Version( void );
 extern USHORT hb_gt_VertLine( SHORT uiCol, SHORT uiTop, SHORT uiBottom, BYTE byChar, BYTE byAttr );
+
+extern void   hb_gt_OutStd( BYTE * pbyStr, ULONG ulLen );
+extern void   hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen );
 
 /* Keyboard related declarations */
 
