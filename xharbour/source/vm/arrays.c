@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.55 2003/07/07 03:30:49 lculik Exp $
+ * $Id: arrays.c,v 1.56 2003/07/13 18:15:39 walito Exp $
  */
 
 /*
@@ -1152,26 +1152,26 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
       pDstBaseArray = pDstArray->item.asArray.value;
       pDstBaseArray->uiClass = pSrcBaseArray->uiClass;
 
-      /*-----------------12/20/2001 7:05PM----------------
-       * TODO: Is this correct? was taken form __objClone()
-       * --------------------------------------------------*/
       pDstBaseArray->puiClsTree = NULL;
 
       for( ulCount = 0; ulCount < ulSrcLen; ulCount++ )
       {
          PHB_ITEM pSrcItem = pSrcBaseArray->pItems + ulCount;
 
-         if( pSrcItem->type == HB_IT_ARRAY )
+         // Clipper clones nested array ONLY if NOT an Object!!!
+         if( pSrcItem->type == HB_IT_ARRAY && pSrcItem->item.asArray.value->uiClass == 0 )
          {
             PHB_ITEM pClone;
 
             /* Broken down like this to avoid redundant comparisons. */
             pCloned = pClonedList;
+
             if( pCloned->pSrcBaseArray == pSrcItem->item.asArray.value )
             {
                pClone = pCloned->pDest;
                goto DontClone;
             }
+
             while( pCloned->pNext )
             {
                pCloned = pCloned->pNext;
@@ -1182,6 +1182,7 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
                   goto DontClone;
                }
             }
+
             if( pCloned->pSrcBaseArray == pSrcItem->item.asArray.value )
             {
                pClone = pCloned->pDest;
@@ -1435,7 +1436,7 @@ LONGLONG HB_EXPORT hb_arrayGetNLL( PHB_ITEM pArray, ULONG ulIndex )
    {
       llRet = 0;
    }
-   
+
    return llRet;
 }
 
