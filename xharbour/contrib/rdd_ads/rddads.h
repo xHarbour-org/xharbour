@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.5 2004/02/16 00:39:26 brianhays Exp $
+ * $Id: rddads.h,v 1.6 2004/03/26 21:57:01 ronpinkas Exp $
  */
 
 /*
@@ -50,7 +50,9 @@
  *
  */
 
+#ifndef ADS_REQUIRE_VERSION
 #define ADS_REQUIRE_VERSION 6
+#endif
 
 #include "hbapirdd.h"
 #include "ace.h"
