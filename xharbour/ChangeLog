@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.917 2003/04/05 21:06:25 paultucker Exp $
+ * $Id: ChangeLog,v 1.918 2003/04/05 22:19:16 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-04-05 15:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Minor fix to getExpReal().
+
 2003-04-05 19:15 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   ! source/rtl/Makefile
     ! minor fix
-     
+
 2003-04-05 16:55 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/pp/ppcore.c
     * added a cast for msvc.

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.54 2003/04/05 20:00:52 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.55 2003/04/05 21:06:28 paultucker Exp $
  */
 
 /*
@@ -1793,7 +1793,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
         {
            if( ipos > 0 )
            {
-              *( sLine + isdvig+ ipos - 1 ) = ';';
+              *( sLine + isdvig + ipos - 1 ) = ';';
               //printf( "Restored: >%s<\n", sLine );
            }
         }
@@ -1840,14 +1840,15 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 
               if( stcmd )
               {
-                 #if 0
-                    if( ptri != ptrb )
-                    {
-                       printf( "ASSERT FAILED! >%s< != >%s<\n", ptri, ptrb );
-                       ptri = ptrb;
-                    }
-                 #endif
                  goto NextCommand;
+              }
+              else
+              {
+                 if( ipos > 0 )
+                 {
+                    *( ptri + ipos - 1 ) = ';';
+                    //printf( "Restored: >%s<\n", sLine );
+                 }
               }
            }
         }
@@ -2481,6 +2482,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   {
      // Stopper for the expression.
      lenreal = strincpy( expreal, ptrtemp );
+     //printf( "Len: %i\n", lenreal );
 
      if( (ipos = md_strAt( expreal, lenreal, *ptri, TRUE, TRUE, FALSE, TRUE )) > 0 )
      {
@@ -2707,6 +2709,11 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
    //printf( "getExpReal( '%s', '%s', %d, %d, %d )\n", expreal, *ptri, prlist, maxrez, bStrict );
 
    HB_SKIPTABSPACES( *ptri );
+
+   if( strchr( "}]),=*/^%", **ptri ) || ( strchr( ":-+", **ptri ) && *( ( *ptri) + 1 ) == '=' ) )
+   {
+      return 0;
+   }
 
    State = ( **ptri=='\'' || **ptri=='\"' || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;
 
