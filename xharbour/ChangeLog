@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1246 2003/07/14 12:33:48 andijahja Exp $
+ * $Id: ChangeLog,v 1.1247 2003/07/14 19:18:44 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-14 18:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/achoice.prg
+    ! Fix display problem when the len of achoice is only one line.
+      nTop == nBottom.
+      Reported by Jeremias Luna.
 
 2003-07-14 21:15 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * include/thread.h
