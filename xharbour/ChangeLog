@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2715 2004/04/02 04:30:47 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2716 2004/04/02 10:42:42 srobert Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-02 13:12 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
+  * source/rtl/gtxvt/gtxvt.c
+    ! Keypad was not working; fixed
+    ! XGrabKey() was used to grab K_CTRL and K_ALT keys to work,
+      but it prevented some compose/alternative keycodes to be
+      correctly parsed by the server. Temporarily removed (in
+      search for a better solution).
 
 2004-04-02 05:30 UTC-0500 Sylvain Robert <s.robert/at/videotron.ca>
   * source/rtl/filesys.c

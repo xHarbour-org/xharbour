@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.30 2004/02/20 13:45:33 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.31 2004/04/01 11:45:01 druzus Exp $
  */
 
 /*
@@ -521,7 +521,8 @@ static void xvt_InitDisplay( PXVT_BUFFER buf, PXVT_STATUS status )
    }
    s_countPoints[1] = icount;
 
-   XGrabKey( wnd->dpy, AnyKey, AnyModifier , wnd->window, True,
+   XGrabKey( wnd->dpy, AnyKey, ControlMask | Mod1Mask , wnd->window,
+      False,
       GrabModeAsync, GrabModeAsync );
 
    if ( hb_set.HB_SET_GTMODE == 1 )
@@ -774,6 +775,7 @@ static BOOL xvt_bufferDeqeueKey( PXVT_BUFFER buf, int *c )
    HB_SYMBOL_UNUSED( buf );
 
    *c = 0;
+
    FD_ZERO(&keySet);
    FD_SET(streamChr[0], &keySet );
 
@@ -2226,8 +2228,12 @@ static void xvt_windowSetColors( PXWND_DEF wnd, BYTE attr )
 static void xvt_eventKeyProcess( PXVT_BUFFER buffer, XKeyEvent *evt)
 {
    unsigned char buf[5];
-   KeySym out = XLookupKeysym( evt, 0 );
+   KeySym out;
    int ikey = 0;
+   XComposeStatus compose;
+
+   XLookupString( evt , buf, 5, &out, &compose );
+   //printf( "BUF: %s\n", buf );
 
    switch( out )
    {
@@ -2240,7 +2246,7 @@ static void xvt_eventKeyProcess( PXVT_BUFFER buffer, XKeyEvent *evt)
          s_modifiers.bCtrl = TRUE;
       return;
 
-      case XK_Meta_L: case XK_Alt_L:
+      case XK_Alt_L:
          s_modifiers.bAlt = TRUE;
       return;
 
@@ -2272,6 +2278,9 @@ static void xvt_eventKeyProcess( PXVT_BUFFER buffer, XKeyEvent *evt)
          break;
       case XK_Page_Down: case XK_KP_Page_Down:
          ikey =  K_PGDN ;
+         break;
+      case XK_KP_Enter:
+         ikey =  K_ENTER ;
          break;
 
       // Special cursor operations
@@ -2370,26 +2379,28 @@ static void xvt_eventKeyProcess( PXVT_BUFFER buffer, XKeyEvent *evt)
       return;
    }
 
-   // We have not found it. Obtain a string.
-
-   if ( XLookupString( evt , buf, 5, &out, NULL ) )
+   // if it is a ? we can have still one special CLIPPER character
+   if ( *buf == '?' && buf[1] == 0 && s_modifiers.bCtrl )
    {
-      // if it is a ? we can have still one special CLIPPER character
-      if ( *buf == '?' && buf[1] == 0 && s_modifiers.bCtrl )
+      xvt_bufferQueueKey( buffer, K_CTRL_QUESTION );
+   }
+   else
+   {
+      if ( (s_modifiers.bCtrl && *buf <=26 && buf[1] == 0) ||
+            (! s_modifiers.bCtrl && ! s_modifiers.bAlt ) )
       {
-         xvt_bufferQueueKey( buffer, K_CTRL_QUESTION );
-      }
-      else
-      {
-         if ( (s_modifiers.bCtrl && *buf <=26 ) ||
-               (! s_modifiers.bCtrl && ! s_modifiers.bAlt ) )
+         // ready for UTF input!!!
+         if ( (out >= XK_KP_0 && out <= XK_KP_9) || out == XK_KP_Decimal )
          {
-            // ready for UTF input!!!
+            xvt_bufferQueueKey( buffer, *buf );
+         }
+         else
+         {
             xvt_bufferQueueKey( buffer, *buf + (buf[1] << 8) );
          }
-         else {
-            xvt_bufferQueueKey( buffer, xvt_keyTranslate( *buf ) );
-         }
+      }
+      else {
+         xvt_bufferQueueKey( buffer, xvt_keyTranslate( *buf + (buf[1] << 8) ) );
       }
    }
 }
@@ -2429,7 +2440,7 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
                s_modifiers.bCtrl = FALSE;
             return;
 
-            case XK_Meta_L: case XK_Alt_L:
+            case XK_Alt_L:
                s_modifiers.bAlt = FALSE;
             return;
 
@@ -2438,6 +2449,10 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
             return;
          }
       }
+      break;
+
+      case MappingNotify:
+         XRefreshKeyboardMapping( &evt->xmapping );
       break;
 
       case MotionNotify:
@@ -4294,7 +4309,7 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
    // wait until the feedback is done
    xvt_appProcess( XVT_ICM_SETSELECTION );
 
-   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
+   if ( *pulMaxSize == 0 || (unsigned) (s_clipsize) < *pulMaxSize )
    {
       *pulMaxSize = s_clipsize;
    }
