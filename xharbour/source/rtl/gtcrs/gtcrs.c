@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.22 2003/07/25 21:27:30 druzus Exp $
+ * $Id: gtcrs.c,v 1.23 2003/08/09 20:45:24 druzus Exp $
  */
 
 /*
@@ -1302,7 +1302,7 @@ static void init_keys(InOutBase *ioBase)
       addKeyMap( ioBase, EXKEY_HOME  , "\033[H" );
       addKeyMap( ioBase, EXKEY_HOME  , "\033[1~" );
       addKeyMap( ioBase, EXKEY_END   , "\033[4~" );
-      addKeyMap( ioBase, EXKEY_DEL   , "\177" );
+      addKeyMap( ioBase, EXKEY_BS    , "\177" );
 
       addKeyMap( ioBase, EXKEY_F1    , "\033[11~" );        // kf1
       addKeyMap( ioBase, EXKEY_F2    , "\033[12~" );        // kf2
