@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.12 2003/06/09 17:49:05 ronpinkas Exp $
+ * $Id: hbrddcdx.h,v 1.13 2003/08/21 16:49:37 druzus Exp $
  */
 
 /*
@@ -213,6 +213,8 @@ typedef CDXINDEX * LPCDXINDEX;
 #elif defined(__WATCOMC__)
    #pragma pack(push, 1);
 #elif defined(__cplusplus)
+   #pragma pack(1)
+#elif defined(_MSC_VER)
    #pragma pack(1)
 #endif
 

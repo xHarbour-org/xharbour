@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.h,v 1.1 2003/02/16 17:23:07 horacioroldan Exp $
+ * $Id: dbfcdx1.h,v 1.7 2003/06/09 17:49:05 ronpinkas Exp $
  */
 
 /*
@@ -89,6 +89,8 @@
 #elif defined(__WATCOMC__)
    #pragma pack(push, 1);
 #elif defined(__cplusplus)
+   #pragma pack(1)
+#elif defined(_MSC_VER)
    #pragma pack(1)
 #endif
 
