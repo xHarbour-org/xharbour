@@ -1608,7 +1608,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           hb_vmPushLong( ( LONG ) wParam  );
           hb_vmPushLong( ( LONG ) lParam  );
           hb_vmDo( 4 );
-          hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+          hb_itemGetNL( ( PHB_ITEM ) &hb_stack.Return );
         }
       }
       else
@@ -1642,7 +1642,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           hb_vmPushNil();
           hb_vmPushLong( ( LONG ) hWnd    );
           hb_vmDo( 1 );
-          hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+          hb_itemGetNL( ( PHB_ITEM ) &hb_stack.Return );
         }
       }
       else
@@ -1665,7 +1665,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         hb_vmPushNil();
         hb_vmPushLong( ( LONG ) hWnd );
         hb_vmDo( 1 );
-        hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+        hb_itemGetNL( ( PHB_ITEM ) &hb_stack.Return );
       }
       return( 0 );
     }
@@ -3439,8 +3439,8 @@ HB_FUNC( WVT_PROCESSMESSAGES )
 HB_FUNC( WVT_GETTITLE )
 {
   unsigned char ucText[1024];
-  hb_wvt_gtGetWindowTitle(ucText, 1023);
-  hb_retc(ucText) ;
+  hb_wvt_gtGetWindowTitle( (char*) ucText, 1023);
+  hb_retc((char*) ucText) ;
 }
 
 

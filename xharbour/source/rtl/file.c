@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.8 2004/01/07 11:58:46 jonnymind Exp $
+ * $Id: file.c,v 1.9 2004/01/14 13:05:13 lculik Exp $
  */
 
 /*
@@ -62,11 +62,12 @@ BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
 {
    PHB_FFIND ffind;
    BOOL bResult = FALSE;
-   char * szFile = pFilename;
+   char * szFile = (char*) pFilename;
    #ifdef HB_OS_LINUX
       ULONG ulPos;
       szFile = (char * ) hb_xgrab( 255 );
-      ulPos =  hb_strRTrimLen( pFilename, strlen( pFilename ), FALSE );
+      ulPos =  hb_strRTrimLen( pFilename, strlen( pFilename ),
+ FALSE );
       pFilename = hb_strLTrim( pFilename, &ulPos );
       strncpy( szFile, pFilename, ulPos );
       szFile[ulPos]  = '\0';
