@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.24 2002/06/16 02:06:16 lculik Exp $
+ * $Id: hbmake.prg,v 1.25 2002/06/22 02:27:14 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -91,7 +91,7 @@ STATIC aObjsc        := {}
 STATIC lEof          := .F.
 STATIC aRes          := {}
 STATIC nLinkHandle
-STATIC cLinker       := "makefile.tmp"
+STATIC cLinker       := "makefile.lnk"
 STATIC cLinkcomm     := ''
 STATIC lBcc          := .T.
 STATIC lGcc          := .F.

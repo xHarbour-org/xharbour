@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.290 2002/06/25 12:47:51 lculik Exp $
+ * $Id: ChangeLog,v 1.291 2002/06/25 16:00:46 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-06-29 00:02 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/set.c
+    ! Fixed Minor Bug that was preventing the use of the printer Again
+    when Using  Set(24,"win:"xxx)
+ * utils/hbmake/hbmake.prg
+    ! Changed temporary file name from makefile.tmp makefile.lnk
+  *Sync Xharbour with this last changes of Harbour(With date)
+2002-06-28 10:43 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+  * source/rdd/dbfntx/dbfntx1.c
+    ! Bug fixed in hb_ntxPageSplit() - the created page was not released.
+    
+2002-06-27 15:25 UTC-0400 David G. Holm <dholm@jsd-llc.com>
+  * source/rtl/gtsln/gtsln.c
+    ! HRBNATIONCHARS fix provided by Niko Mikkila <nm@phnet.fi>
+
+2002-06-27 22:30 UTC+0300 Alexander Kresin <alex@belacy.belgorod.su>
+  * source/rdd/workarea.c
+    ! Bug fixed in hb_waSetRel(), reported by Richard  Chidiak
+
+2002-06-26 18:41 UTC+0100 Ignacio Ortiz <ignacio@fivetech.com>
+  * source/rtl/tget.prg
+    !Fixed minus property value, did not work correctly
+
 
 2002-06-25 09:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.slx

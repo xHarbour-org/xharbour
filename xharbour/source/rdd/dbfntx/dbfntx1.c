@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.20 2002/06/25 00:49:18 lculik Exp $
+ * $Id: dbfntx1.c,v 1.135 2002/06/28 06:33:29 alkresin Exp $
  */
 
 /*
@@ -130,7 +130,6 @@
 
 HB_FUNC( _DBFNTX );
 HB_FUNC( DBFNTX_GETFUNCTABLE );
-
 #ifdef HB_PCODE_VER
    #undef HB_PRG_PCODE_VER
    #define HB_PRG_PCODE_VER HB_PCODE_VER
@@ -1759,6 +1758,7 @@ static LPKEYINFO hb_ntxPageSplit( LPTAGINFO pTag, LPPAGEINFO pPage, LPKEYINFO pK
    }
    pNewPage->uiKeys = iHalf;
    pPage->Changed = pNewPage->Changed = TRUE;
+   hb_ntxPageRelease( pTag,pNewPage );
    return pKeyNew;
 }
 

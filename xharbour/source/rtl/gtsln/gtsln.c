@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.2 2002/03/31 22:50:53 map Exp $
+ * $Id: gtsln.c,v 1.33 2002/06/27 19:25:32 dholm Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 
 /* *********************************************************************** */
 
-#include "gtsln.h"
+#include <slang.h>
 
 /* missing defines in previous versions of Slang - this can not work ! */
 #if SLANG_VERSION < 10400
@@ -81,9 +81,13 @@
 #endif
 #endif
 
-//#include <unistd.h>
+#include <unistd.h>
 #include <signal.h>
 #include <time.h>
+
+#include "hbapi.h"
+#include "hbapigt.h"
+#include "inkey.ch"
 
 /* *********************************************************************** */
 
@@ -93,9 +97,6 @@
 /* to convert DeadKey+letter to national character */
 extern unsigned char s_convKDeadKeys[];
 extern int hb_gt_Init_Terminal( int phase );
-
-/* standard output */
-/* static int s_iFilenoStdout; */
 
 /* to convert characters displayed */
 static void hb_gt_build_conv_tabs();
@@ -112,9 +113,14 @@ unsigned char *hb_NationCharsEnvName = "HRBNATIONCHARS";
 
 static USHORT s_uiDispCount = 0;
 static SHORT s_sCursorStyle = SC_NORMAL;
+static BOOL s_linuxConsole = FALSE;
+static BOOL s_underXTerm = FALSE;
 
 /* indicate if we are currently running a command from system */
 static BOOL s_bSuspended = FALSE;
+
+/* standard output */
+static int s_iFilenoStdout;
 
 /* to convert high characters (mostly graphics, nation and control chars) */
 static SLsmg_Char_Type s_convHighChars[ 256 ];
@@ -166,7 +172,7 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
-   /* s_iFilenoStdout = iFilenoStdout; */
+   s_iFilenoStdout = iFilenoStdout;
    s_uiDispCount = 0;
 
    /* read a terminal descripion from a terminfo database */
@@ -199,6 +205,22 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
             /* turn on a cursor visibility */
             if( SLtt_set_cursor_visibility( 1 ) == -1 )
                s_sCursorStyle = SC_UNAVAIL;
+
+            /* an uncertain way to check if we run under linux console */
+            {
+               char * tmp = hb_getenv( "TERM" );
+               s_linuxConsole = tmp && tmp[ 0 ] != '\0' && ( strncmp( tmp, "linux", 5 ) == 0 );
+               if( tmp )
+                  hb_xfree( ( void * ) tmp );
+            }
+
+            /* an uncertain way to check if we run under xterm */
+            {
+               char * tmp = hb_getenv( "TERM" );
+               s_underXTerm = tmp && tmp[ 0 ] != '\0' && ( strncmp( tmp, "xterm", 5 ) == 0 );
+               if( tmp )
+                  hb_xfree( ( void * ) tmp );
+            }
 
             /* NOTE: this driver is implemented in a way that it is
                imposible to get intensity/blinking background mode.
@@ -246,17 +268,9 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 
 void hb_gt_Exit( void )
 {
+   char *escstr;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
-
-   /* restore a standard bell frequency and duration */
-   if( hb_gt_UnderLinuxConsole )
-   {
-      char *escstr;
-
-      escstr = "\033[10]";  SLtt_write_string( escstr );
-      escstr = "\033[11]";  SLtt_write_string( escstr );
-      SLtt_flush_output();
-   }
 
    hb_mouse_Exit();
 
@@ -267,6 +281,15 @@ void hb_gt_Exit( void )
    SLsmg_refresh();
    SLsmg_reset_smg();
    SLang_reset_tty();
+
+   /* restore a standard bell frequency and duration */
+   if( s_linuxConsole )
+   {
+      escstr = "\033[10]";
+      write( s_iFilenoStdout, escstr, strlen( escstr ) );
+      escstr = "\033[11]";
+      write( s_iFilenoStdout, escstr, strlen( escstr ) );
+   }
 }
 
 /* *********************************************************************** */
@@ -317,12 +340,7 @@ void hb_gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod )
    /* SLtt_goto_rc( iRow, iCol ); */
 
    if( s_uiDispCount == 0 )
-   {
       SLsmg_refresh();
-#ifdef HAVE_GPM_H
-      hb_mouse_FixTrash();
-#endif
-   }
 }
 
 /* *********************************************************************** */
@@ -420,7 +438,7 @@ void hb_gt_SetCursorStyle( USHORT uiStyle )
 
 #ifdef __linux__
       /* NOTE: cursor apearence works only under linux console */
-      if( hb_gt_UnderLinuxConsole )
+      if( s_linuxConsole )
       {
          switch( uiStyle )
          {
@@ -744,7 +762,7 @@ void hb_gt_Tone( double dFrequency, double dDuration )
    dFrequency = HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 );
    /* dDuration = dDuration * 1000.0 / 18.2; */ /* clocks */
 
-   if( hb_gt_UnderLinuxConsole )
+   if( s_linuxConsole )
    {
       snprintf( escstr, 63, "\033[10;%hd]", ( int )dFrequency );
       SLtt_write_string( escstr );
@@ -755,7 +773,7 @@ void hb_gt_Tone( double dFrequency, double dDuration )
 
    SLtt_beep();
 
-   if( hb_gt_UnderLinuxConsole )
+   if( s_linuxConsole )
    {
       /* NOTE : the code below is adapted from gtdos.c/hb_gt_Tone() */
 
@@ -1106,7 +1124,7 @@ BOOL hb_gt_PostExt()
 static void hb_gt_build_conv_tabs()
 {
    int i, fg, bg, len;
-   unsigned char * p, ch;
+   unsigned char * p, * env, ch;
    SLsmg_Char_Type SLch;
 
    /* COMPATIBILITY: Slang uses bit 0x8000 as an alternate
@@ -1202,7 +1220,7 @@ static void hb_gt_build_conv_tabs()
    }
 
    /* QUESTION: do we have double, single-double, ... frames under xterm ? */
-   if( hb_gt_UnderXterm )
+   if( s_underXTerm )
    {
       /* frames of all Clipper type are _B_SINBLE under xterm */
       s_convHighChars[ 205 ] = s_convHighChars[ 196 ];
@@ -1228,11 +1246,12 @@ static void hb_gt_build_conv_tabs()
 
    /* init national chars */
 
-   p = hb_getenv( hb_NationCharsEnvName );
+   env = hb_getenv( hb_NationCharsEnvName );
+   p = env;
 
    if( p && p[ 0 ] != '\0' )
    {
-      unsigned char Pos, Msk, * s = p;
+      unsigned char Pos, Msk;
 
       len = strlen( p );
 
@@ -1258,7 +1277,6 @@ static void hb_gt_build_conv_tabs()
          s_IsNationChar[ Pos ] |= Msk;
          ++p;
       }
-      p = s;
 /*
       for( i=0; i <= ( ( int ) s_convKDeadKeys[ 0 ] ) * 2; i++ )
          fprintf( stderr, "%3d %c\r\n", i, s_convKDeadKeys[ i ] );
@@ -1266,8 +1284,8 @@ static void hb_gt_build_conv_tabs()
 */
    }
 
-   if( p )
-      hb_xfree( ( void * ) p );
+   if( env )
+      hb_xfree( ( void * ) env );
 }
 
 /* *********************************************************************** */

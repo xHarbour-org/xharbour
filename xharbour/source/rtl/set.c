@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.9 2002/04/29 19:21:37 lculik Exp $
+ * $Id: set.c,v 1.10 2002/05/03 07:38:45 ronpinkas Exp $
  */
 
 /*
@@ -185,6 +185,7 @@ static void close_binarywin( FHANDLE handle )
          user file error value */
       USHORT user_ferror = hb_fsError();
       CloseWinPrinter();
+
       hb_fsSetError( user_ferror );
    }
 }
@@ -765,6 +766,7 @@ HB_FUNC( SET )
             else{
                hb_set.hb_set_winprinter=FALSE;
                close_binarywin(hb_set.hb_set_winhan);
+               hb_set.hb_set_winhan=FS_ERROR;
                }
 #endif
             /* Just Open an New File if is not an Printer Name Or an

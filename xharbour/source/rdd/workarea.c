@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.27 2002/05/01 14:13:32 horacioroldan Exp $
+ * $Id: workarea.c,v 1.28 2002/06/27 18:25:19 alkresin Exp $
  */
 
 /*
@@ -849,7 +849,7 @@ ERRCODE hb_waSetRel( AREAP pArea, LPDBRELINFO lpdbRelInf )
    lpdbRelations->abKey = lpdbRelInf->abKey;
    lpdbRelations->lpdbriNext = lpdbRelInf->lpdbriNext;
 
-   hb_waChildStart( lpdbRelInf->lpaChild,lpdbRelInf );
+   SELF_CHILDSTART( ( AREAP ) lpdbRelInf->lpaChild,lpdbRelations );
 
    return SUCCESS;
 }
