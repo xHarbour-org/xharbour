@@ -1,5 +1,5 @@
 /*
- * $Id: xPad.prg,v 1.3 2002/10/23 07:14:28 what32 Exp $
+ * $Id: xPad.prg,v 1.4 2002/10/27 01:29:26 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -143,48 +143,48 @@ Static aGlobals:={}
 #Include 'cstruct.ch'
 
 
-static aUserKeys:={;
-{112,.f.,.f.,{|o,w| w:=o:getword(),;
-MessageBox(o:hWnd,"No help available yet","xide"),.t.}},; // F1
-{112,.f.,.t.,{|o,w| w:=o:getword(),;
-MessageBox(o:hWnd,"No help available yet","xide"),.t.}},; // Ctrl-F1
-{113,.f.,.f.,{|o| if(o:isBlockOn,(o:toupper(),.f.),.t.)}},;  // F2
-{114,.f.,.f.,{|o| if(o:isBlockOn,(o:tolower(),.f.),.t.)}},;  // F3
-{ 77,.f.,.t.,{|o| o:findmatch()}},;                          // Ctrl-M
-{ 89,.f.,.t.,{|o| o:delline(o:line),.f.}},;             // Ctrl-Y
-{ 46,.f.,.t.,{|o| o:delrest(),.T.}},;                        // Ctrl-Del
-{ 76,.f.,.t.,{|o| o:mark:=if(o:mark==0,o:line,0),.f.}},;                     // Ctrl-L
-{ 71,.f.,.t.,{|o| o:gotoline(o:mark),o:Stable}},;            // Ctrl-G
-{ 68,.f.,.t.,{|o| o:dupline(),o:Stable}},;                   // Ctrl-D
-{ 46,.t.,.f.,{|o| o:deltext(),o:Stable}},;   // not working  // Shft-Del
-{109,.f.,.t.,{|o| if(o:lInSummary,.T.,(o:collapse(),.f.))}},;                       // Ctrl "-"
-{107,.f.,.t.,{|o,i| if(o:lInSummary,(o:expand(),.F.),.f.)}},;                    // Ctrl "+"
-{ 83,.f.,.t.,{|o| o:home(.T.),o:settext('*'+replicate('-',78)+'*'+CRLF,1,1)}},;  // Ctrl-S
-{ 85,.f.,.t.,{|o| o:undelline(),o:Stable}};                                      // Ctrl-U
+static aUserKeys:=;
+{ ;
+   {112,.f.,.f.,{|o| o:ShowHelp() } },;  // F1
+   {112,.f.,.t.,{|o| o:ShowHelp() } },;  // Ctrl-F1
+   {113,.f.,.f.,{|o| if(o:isBlockOn,(o:toupper(),.f.),.t.)}},;    // F2
+   {114,.f.,.f.,{|o| if(o:isBlockOn,(o:tolower(),.f.),.t.)}},;    // F3
+   { 77,.f.,.t.,{|o| o:findmatch()}},;                            // Ctrl-M
+   { 89,.f.,.t.,{|o| o:delline(o:line),.f.}},;                    // Ctrl-Y
+   { 46,.f.,.t.,{|o| o:delrest(),.T.}},;                          // Ctrl-Del
+   { 76,.f.,.t.,{|o| o:mark:=if(o:mark==0,o:line,0),.f.}},;       // Ctrl-L
+   { 71,.f.,.t.,{|o| o:gotoline(o:mark),o:Stable}},;              // Ctrl-G
+   { 68,.f.,.t.,{|o| o:dupline(),o:Stable}},;                     // Ctrl-D
+   { 46,.t.,.f.,{|o| o:deltext(),o:Stable}},;                     // not working  // Shft-Del
+   {109,.f.,.t.,{|o| if(o:lInSummary,.T.,(o:collapse(),.f.))}},;                       // Ctrl "-"
+   {107,.f.,.t.,{|o,i| if(o:lInSummary,(o:expand(),.F.),.f.)}},;                    // Ctrl "+"
+   { 83,.f.,.t.,{|o| o:home(.T.),o:settext('*'+replicate('-',78)+'*'+CRLF,1,1)}},;  // Ctrl-S
+   { 85,.f.,.t.,{|o| o:undelline(),o:Stable}};                                      // Ctrl-U
 }
+
 pragma pack(4)
 typedef struct tagTEXTMETRIC {;
-    LONG tmHeight; 
-    LONG tmAscent; 
-    LONG tmDescent; 
-    LONG tmInternalLeading; 
-    LONG tmExternalLeading; 
-    LONG tmAveCharWidth; 
-    LONG tmMaxCharWidth; 
-    LONG tmWeight; 
-    LONG tmOverhang; 
-    LONG tmDigitizedAspectX; 
-    LONG tmDigitizedAspectY; 
-    BCHAR tmFirstChar; 
-    BCHAR tmLastChar; 
-    BCHAR tmDefaultChar; 
-    BCHAR tmBreakChar; 
-    BYTE tmItalic; 
-    BYTE tmUnderlined; 
-    BYTE tmStruckOut; 
-    BYTE tmPitchAndFamily; 
-    BYTE tmCharSet; 
-} TEXTMETRIC; 
+    LONG tmHeight;
+    LONG tmAscent;
+    LONG tmDescent;
+    LONG tmInternalLeading;
+    LONG tmExternalLeading;
+    LONG tmAveCharWidth;
+    LONG tmMaxCharWidth;
+    LONG tmWeight;
+    LONG tmOverhang;
+    LONG tmDigitizedAspectX;
+    LONG tmDigitizedAspectY;
+    BCHAR tmFirstChar;
+    BCHAR tmLastChar;
+    BCHAR tmDefaultChar;
+    BCHAR tmBreakChar;
+    BYTE tmItalic;
+    BYTE tmUnderlined;
+    BYTE tmStruckOut;
+    BYTE tmPitchAndFamily;
+    BYTE tmCharSet;
+} TEXTMETRIC;
 
 //---------------------------------------------------------------------------------------------
 CLASS ObjEdit FROM TPanel
@@ -305,95 +305,96 @@ Class oedit
 
   Method New CONSTRUCTOR
   Method SetCaret
-//  Method Read    
-//  Method Save    
-  Method Backup  
-  Method Up      
-  Method Down    
-  Method Left    
-  Method Right   
-  Method Home    
-  Method PageUp  
+//  Method Read
+//  Method Save
+  Method Backup
+  Method Up
+  Method Down
+  Method Left
+  Method Right
+  Method Home
+  Method PageUp
   Method PageDown
-  Method GoTop   
+  Method GoTop
   Method GoBottom
-  Method PageTop 
+  Method PageTop
   Method PageBottom
-  Method PanLeft   
-  Method PanRight  
-  Method ScrollUp  
+  Method PanLeft
+  Method PanRight
+  Method ScrollUp
   Method ScrollDown
-  Method GoTop     
-  Method GoBottom  
-  Method GoToLine  
-  Method GoToCol   
-  Method FindMatch 
-//  Method Find      
-//  Method Replace   
-  Method OnChar    
-  Method OnKey     
-  Method OnKeyUp   
-  Method OnReturn  
-  Method OnDel     
+  Method GoTop
+  Method GoBottom
+  Method GoToLine
+  Method GoToCol
+  Method FindMatch
+//  Method Find
+//  Method Replace
+  Method OnChar
+  Method OnKey
+  Method OnKeyUp
+  Method OnReturn
+  Method OnDel
   Method OnBackSpace
-  Method OnTab      
-  Method OnIns      
+  Method OnTab
+  Method OnIns
   Method OnMouseDown
-  Method OnMouseUp  
+  Method OnMouseUp
   Method OnMouseMove
-  Method OnVScroll  
-  Method OnHScroll  
-  Method OnCaps     
-  Method OnBlockKey 
-  Method GetIndent  
-  Method BlockOn    
-  Method BlockOff   
+  Method OnVScroll
+  Method OnHScroll
+  Method OnCaps
+  Method OnBlockKey
+  Method GetIndent
+  Method BlockOn
+  Method BlockOff
   Method isBlockVisible
-//  Method BlockGet    
-//  Method BlockDel    
-  Method BlockGetLen 
-  Method ChooseFont  
-  Method SetFont     
-  Method InsLine     
-  Method DelLine     
-  Method DupLine     
-  Method UnDelLine   
-  Method GetWord     
-  Method DelRest     
-//  Method WordLeft    
-//  Method WordRight   
-//  Method DelWord     
-  Method Cut         
-  Method Copy        
-  Method Paste       
-  Method SelectAll   
-  Method GetTextLen  
-  Method GetText     
-  Method SetText     
-  Method DelText     
-  Method ToUpper     
-  Method ToLower     
-  Method Configure     
-  Method RefreshAll    
+//  Method BlockGet
+//  Method BlockDel
+  Method BlockGetLen
+  Method ChooseFont
+  Method SetFont
+  Method InsLine
+  Method DelLine
+  Method DupLine
+  Method UnDelLine
+  Method GetWord
+  Method DelRest
+//  Method WordLeft
+//  Method WordRight
+//  Method DelWord
+  Method Cut
+  Method Copy
+  Method Paste
+  Method SelectAll
+  Method GetTextLen
+  Method GetText
+  Method SetText
+  Method DelText
+  Method ToUpper
+  Method ToLower
+  Method Configure
+  Method RefreshAll
   Method RefreshCurrent
-  Method Paint         
-  Method DrawLine      
-  Method UpdateScroll  
-  Method Subclass      
-  Method EditorProc    
-  Method Kill          
-//  Method TestRemStatus 
-  Method GetComments   
-//  Method UpdateComment 
-  Method Collapse      
-  Method Expand        
+  Method Paint
+  Method DrawLine
+  Method UpdateScroll
+  Method Subclass
+  Method EditorProc
+  Method Kill
+//  Method TestRemStatus
+  Method GetComments
+//  Method UpdateComment
+  Method Collapse
+  Method Expand
   Method ReadFile
   Method SaveFile
   METHOD FindText
   METHOD ReplaceText
 //  Method xsettext
   Method updatecomments
-  Method End     
+  Method End
+  Method ShowHelp
 EndClass
 
 *-----------------------------------------------------------------------------*
@@ -3219,6 +3220,36 @@ METHOD kill()
 
 *-----------------------------------------------------------------------------*
 
+METHOD ShowHelp()
+
+  LOCAL w := ::GetWord()
+  LOCAL cMsgHelp := ""
+
+  cMsgHelp += "F1\tThis Help\n"
+  cMsgHelp += "Ctrl-F1\tContext Help\n"
+  cMsgHelp += "F2\tto Upper Case\n"
+  cMsgHelp += "F3\tto Lower Case\n"
+  cMsgHelp += "Ctrl-M\tFind Next\n"
+  cMsgHelp += "Ctrl-Y\tDelete Line\n"
+  cMsgHelp += "Ctrl-Del\tDelete Rest of Line\n"
+  cMsgHelp += "Ctrl-L\tMark/UnMark current Line\n"
+  cMsgHelp += "Ctrl-G\tGoTo Line\n"
+  cMsgHelp += "Ctrl-D\tDuplicate current Line\n"
+  cMsgHelp += "Shift-Del\tDelete Selected Text (Not Working)\n"
+  cMsgHelp += "Ctrl-'-'\tCollapse Text\n"
+  cMsgHelp += "Ctrl-'+'\tExpand Text\n"
+  cMsgHelp += "Ctrl-S\tWrite a separator line\n"
+  cMsgHelp += "Ctrl-U\tUndelete line\n"
+
+  cMsgHelp := StrTran( cMsgHelp, "\t", Chr(9) )
+  cMsgHelp := StrTran( cMsgHelp, "\n", Chr(13)+Chr(10) )
+
+  MessageBox( ::hWnd, cMsgHelp, "xIde - PAD Keys Help" )
+
+  Return TRUE
+
+*-----------------------------------------------------------------------------*
+
 
 /*
 *-----------------------------------------------------------------------------*
@@ -3467,7 +3498,7 @@ Function readafile(cFileName,aText,nTabSpace) // atext must be by reference
 
       asize(aText,nElems)
       nStart:=1
-        
+
       // put current buffer into array
       Do While .T.
 
@@ -3676,6 +3707,6 @@ Static Function getword(cText,lHonorSpacing)
                   cText:=SubStr(cText,nPos)
                   Return(cWord)
 
-function atn( cStr1, cStr2, nVal ) 
+function atn( cStr1, cStr2, nVal )
 return(at(cStr1,cStr2,nVal))
 
