@@ -1,5 +1,5 @@
 /*
- * $Id: range.c,v 1.1 2003/03/04 21:04:48 lculik Exp $
+ * $Id: range.c,v 1.2 2004/06/18 21:13:03 likewolf Exp $
  */
 
 /*
@@ -303,8 +303,11 @@ HB_FUNC (RANGEREPL)
       hb_storclen (pcRet, sStrLen, 3);
     }
 
-    if (iNoRef)
+    if (iNoRef && ISBYREF( 3 ))
     {
+      /* Contrary to the official documentation, RANGREPL() returns NIL instead of .F.
+       * in this situation. If the string is not passed by reference, it returns the
+       * string regardless of iNoRef. */
       hb_ret();
     }
     else
