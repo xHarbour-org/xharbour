@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.25 2004/01/27 03:11:46 ronpinkas Exp $
+ * $Id: hbapigt.h,v 1.26 2004/02/01 23:09:34 jonnymind Exp $
  */
 
 /*
@@ -412,7 +412,7 @@ extern void   hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
    GT DRIVER request to api to update the status: USER made something on the
    window that request immediate attention of the GT system.
 */
-extern void hb_gt_hasChanged( int status );
+extern HB_EXPORT void hb_gt_hasChanged( int status );
 
 /* Gt to driver communication */
 /*

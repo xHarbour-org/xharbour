@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2204 2004/02/02 14:45:39 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2205 2004/02/02 15:50:19 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-02 11:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapigt.h
+    + Added missing HB_EXPORT to hb_gt_hasChanged()
 
 2004-02-02 16:49 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * /contrib/winprn/Makefile
@@ -145,7 +149,7 @@
     * reordered
   * contrib/libct/util.prg
     * correct typo
-   
+
 2004-02-01 09:40 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   + contrib/libct/settime.c
   + contrib/libct/diskutil.prg
