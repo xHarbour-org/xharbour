@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.894 2003/03/29 20:54:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.895 2003/03/29 21:23:15 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-29 13:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/classes.c
+    * Removed BOOL bNoParent from hb_clsHasMsg() and replace it with logic to validate the scope of the message.
 
 2003-03-29 18:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * include/hbgetcmt.ch

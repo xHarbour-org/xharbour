@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.49 2003/03/29 20:35:09 ronpinkas Exp $
+ * $Id: classes.c,v 1.50 2003/03/29 20:54:29 ronpinkas Exp $
  */
 
 /*
@@ -183,7 +183,7 @@ BOOL     hb_clsIsParent( USHORT uiClass, char * szParentName );
 static void     hb_clsDictRealloc( PCLASS pClass );
 static void     hb_clsRelease( PCLASS );
        void     hb_clsReleaseAll( void );
-       BOOL     hb_clsHasMsg( USHORT uiClass, char *szMsg, BOOL bNoParent );
+       BOOL     hb_clsHasMsg( USHORT uiClass, char *szMsg );
 
        char *   hb_objGetClsName( PHB_ITEM pObject );
        char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szName );
@@ -539,7 +539,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
 
             // It's possible that caller Method is Derived from a Class which also implements the Message we now validate.
             // This means the validated Message IS avialable within the scope of the Methods that calls this Message.
-            if( hb_clsHasMsg( hb_objGetRealCls( pCaller, szCallerMessage ), pMethod->pMessage->pSymbol->szName, TRUE ) )
+            if( hb_clsHasMsg( hb_objGetRealCls( pCaller, szCallerMessage ), pMethod->pMessage->pSymbol->szName ) )
             {
                return TRUE;
             }
@@ -980,7 +980,7 @@ PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc,
    return NULL;
 }
 
-BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg, BOOL bNoSuper )
+BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
 {
    PHB_DYNS pMsg = hb_dynsymFindName( szMsg );
 
@@ -997,14 +997,25 @@ BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg, BOOL bNoSuper )
       {
          if( pClass->pMethods[ uiAt ].pMessage == pMsg )
          {
-            if( bNoSuper && (pClass->pMethods + uiAt)->uiScope & HB_OO_CLSTP_SUPER )
+            if( (pClass->pMethods + uiAt)->uiScope & HB_OO_CLSTP_SUPER )
             {
-               return FALSE;
+               if( (pClass->pMethods + uiAt)->uiScope & HB_OO_CLSTP_HIDDEN )
+               {
+                  return FALSE;
+               }
+
+               if( (pClass->pMethods + uiAt)->uiScope & HB_OO_CLSTP_READONLY )
+               {
+                  if( (pClass->pMethods + uiAt)->uiScope && HB_OO_CLSTP_PROTECTED )
+                  {
+                     return FALSE;
+                  }
+               }
             }
-            else
-            {
-               return TRUE;
-            }
+
+            //printf( "EXISTs Message: %s in Class %s\n", szMsg, pClass->szName );
+
+            return TRUE;
          }
 
          uiAt++;
