@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.49 2004/04/03 00:27:02 druzus Exp $
+ * $Id: harbour.slx,v 1.50 2004/05/08 04:25:13 ronpinkas Exp $
  */
 
 /*
@@ -978,38 +978,38 @@ static int hb_comp_SLX_CustomAction( int x )
          return IDENTIFIER;
 
       case HB_CHK_BLOCK :
-         if( s_sLastBlock == NULL )
-         {
-            pTmp = (char *) s_szBuffer;
+         pTmp = (char *) s_szBuffer;
 
-            /* Skip White Space. */
-            while( *pTmp == ' ' || *pTmp == '\t' )
+         /* Skip White Space. */
+         while( isspace( *pTmp ) )
+         {
+            pTmp++;
+         }
+
+         if( *pTmp == '|' )
+         {
+            unsigned int iBrackets = 1;
+            char cTmp;
+            BOOL bMacro = FALSE;
+
+            *pTmp = '\\';
+
+            pTmp++;
+
+            while( *pTmp  )
             {
+               if( *pTmp == '|' )
+               {
+                  *pTmp = '\\';
+                  pTmp++;
+                  break;
+               }
+
                pTmp++;
             }
 
-            if( *pTmp == '|' )
+            if( s_sLastBlock == NULL )
             {
-               unsigned int iBrackets = 1;
-               char cTmp;
-               BOOL bMacro = FALSE;
-
-               *pTmp = '\\';
-
-               pTmp++;
-
-               while( *pTmp  )
-               {
-                  if( *pTmp == '|' )
-                  {
-                     *pTmp = '\\';
-                     pTmp++;
-                     break;
-                  }
-
-                  pTmp++;
-               }
-
                while( *pTmp )
                {
                   if( *pTmp == '}' )
@@ -1044,6 +1044,7 @@ static int hb_comp_SLX_CustomAction( int x )
                }
             }
          }
+
          return '{' + DONT_REDUCE;
 
       case HB_LIT_ACT :
@@ -1492,12 +1493,34 @@ int yy_lex_input( char *buffer, int iBufferSize )
 
 char * hb_comp_SLX_LastBlock( BOOL bReset )
 {
-   if( bReset && s_sLastBlock )
+   if( bReset )
    {
-      /*
-      hb_xfree( s_sLastBlock );
-      */
       s_sLastBlock = NULL;
+   }
+   else
+   {
+      char *pTmp = (char *) s_sLastBlock + 1;
+
+      /* Skip White Space. */
+      while( isspace( *pTmp ) )
+      {
+         pTmp++;
+      }
+
+      *pTmp = '|';
+
+      pTmp++;
+
+      while( *pTmp  )
+      {
+         if( *pTmp == '\\' )
+         {
+            *pTmp = '|';
+            break;
+         }
+
+         pTmp++;
+      }
    }
 
    return s_sLastBlock;

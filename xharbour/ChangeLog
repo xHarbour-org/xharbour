@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2894 2004/05/08 13:41:52 andijahja Exp $
+ * $Id: ChangeLog,v 1.2896 2004/05/08 16:32:53 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-08 10:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.slx
+    + Added logic to restore '\\' to '|' in hb_comp_SLX_LastBlock()
+      when Block contains Macro, but more then just the Macro,
+      and thus created as Macro from string representation.
+
+  * source/compiler/harbour.sly
+    ! Fixed support for nested Codeblocks where one or more of the blocks includes a Macro.
 
 2004-05-08 20:30 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/debug/dbgbrwsr.prg

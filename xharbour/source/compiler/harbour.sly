@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.63 2004/03/31 13:52:23 likewolf Exp $
+ * $Id: harbour.sly,v 1.64 2004/05/08 04:25:13 ronpinkas Exp $
  */
 
 /*
@@ -128,7 +128,8 @@ static HB_RTVAR_PTR hb_comp_rtvars = NULL;
 static BOOL bTrancuateBaseArray = FALSE;
 static HB_EXPR_PTR pGetArgList = NULL, pBaseArrayName = NULL, pGetVarArray;
 
-static BOOL s_bBlock = FALSE, s_bBlockMacro = FALSE, s_bBlockDeclared = FALSE, s_bSetGet;
+static int s_iBlock = 0;
+static BOOL s_bBlockMacro = FALSE, s_bBlockDeclared = FALSE, s_bSetGet;
 static HB_EXPR_PTR pBlockSimple;
 
 static int s_iLastControlLine = 0, s_iControlLevel = 0;
@@ -605,7 +606,7 @@ ArrayAtAlias : ArrayAt ALIASOP      { $$ = $1; }
  */
 Variable    : IdentName         {
                                   $$ = hb_compExprNewVar( $1 );
-                                  if( s_bBlock )
+                                  if( s_iBlock )
 				  {
                                      s_bBlockDeclared = ( s_bBlockDeclared ||
                                                           hb_compLocalGetPos( $1 ) ||
@@ -622,7 +623,7 @@ VarAlias    : IdentName ALIASOP      { $$ = hb_compExprNewAlias( $1 ); }
 /* Macro variables
  */
 MacroVar    : MACROVAR        { $$ = hb_compExprNewMacro( NULL, '&', $1 );
-                                if( s_bBlock )
+                                if( s_iBlock )
 				{
                                    s_bBlockDeclared = ( s_bBlockDeclared ||
                                                         hb_compLocalGetPos( $1 ) ||
@@ -1473,7 +1474,7 @@ GetAExt   : { /* Nothing*/ }
 	  | ',' GetArgList
 	  ;
 
-CodeBlock  : '{' CBMARKER { s_bBlock = TRUE; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockNoVar CBMARKER BlockExpList '}'
+CodeBlock  : '{' CBMARKER { s_iBlock++; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockNoVar CBMARKER BlockExpList '}'
                      {
                        if( s_bBlockMacro )
 		       {
@@ -1501,11 +1502,14 @@ CodeBlock  : '{' CBMARKER { s_bBlock = TRUE; $<asExpr>$ = hb_compExprNewCodeBloc
 		       {
                           $$ = $<asExpr>3;
                        }
-		       hb_comp_SLX_LastBlock( TRUE );
-		       s_bBlock = FALSE; s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
+
+                       if( --s_iBlock == 0 )
+                       {
+                          hb_comp_SLX_LastBlock( TRUE ); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
+                       }
 		     }
 
-           | '{' CBMARKER { s_bBlock = TRUE; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockVarList CBMARKER BlockExpList '}'
+           | '{' CBMARKER { s_iBlock++; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockVarList CBMARKER BlockExpList '}'
                      {
                        if( s_bBlockMacro )
 		       {
@@ -1533,8 +1537,11 @@ CodeBlock  : '{' CBMARKER { s_bBlock = TRUE; $<asExpr>$ = hb_compExprNewCodeBloc
 		       {
                           $$ = $<asExpr>3;
                        }
-		       hb_comp_SLX_LastBlock( TRUE );
-		       s_bBlock = FALSE; s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
+
+                       if( --s_iBlock == 0 )
+                       {
+                          hb_comp_SLX_LastBlock( TRUE ); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
+                       }
 		     }
            ;
 
