@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.135 2004/03/08 00:25:30 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.136 2004/03/08 01:25:54 ronpinkas Exp $
  */
 
 /*
@@ -5792,6 +5792,11 @@ static int strotrim( char * stroka, int iContext )
         {
            // Hack - 1st phase, do not attempt to determine [] context.
            if( iContext == 1 )
+           {
+              // Same as STATE_NORMAL but more clear.
+              State = STATE_BRACKET;
+           }
+           else if( iContext == 2 && lens == 0 )
            {
               // Same as STATE_NORMAL but more clear.
               State = STATE_BRACKET;
