@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.13 2002/11/27 04:05:57 mlombardo Exp $
+ * $Id: workarea.c,v 1.14 2002/12/28 12:11:57 horacioroldan Exp $
  */
 
 /*
@@ -418,8 +418,6 @@ ERRCODE hb_waFieldName( AREAP pArea, USHORT uiIndex, void * szName )
    /*
    strncpy( ( char * ) szName, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName,
             HARBOUR_MAX_RDD_FIELDNAME_LENGTH );
-   strncpy( ( char * ) szName, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName,
-            pArea->uiMaxFieldNameLength );
    */
    ((char *) szName)[0] = '\0';
    strncat( ( char * ) szName, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName,
@@ -450,7 +448,8 @@ ERRCODE hb_waAlias( AREAP pArea, BYTE * szAlias )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_waAlias(%p, %p)", pArea, szAlias));
 
-   strncpy( ( char * ) szAlias, ( ( PHB_DYNS ) pArea->atomAlias )->pSymbol->szName,
+   szAlias[0] = '\0';
+   strncat( ( char * ) szAlias, ( ( PHB_DYNS ) pArea->atomAlias )->pSymbol->szName,
             HARBOUR_MAX_RDD_ALIAS_LENGTH );
    return SUCCESS;
 }
@@ -576,6 +575,8 @@ ERRCODE hb_waOrderCondition( AREAP pArea, LPDBORDERCONDINFO param )
    {
       if( pArea->lpdbOrdCondInfo->abFor )
          hb_xfree( pArea->lpdbOrdCondInfo->abFor );
+      if( pArea->lpdbOrdCondInfo->abWhile )
+         hb_xfree( pArea->lpdbOrdCondInfo->abWhile );
       if( pArea->lpdbOrdCondInfo->itmCobFor )
       {
          hb_itemRelease( pArea->lpdbOrdCondInfo->itmCobFor );

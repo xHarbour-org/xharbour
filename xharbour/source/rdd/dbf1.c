@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.18 2002/09/19 03:57:46 horacioroldan Exp $
+ * $Id: dbf1.c,v 1.19 2002/09/21 16:32:36 ronpinkas Exp $
  */
 
 /*
@@ -1956,7 +1956,7 @@ ERRCODE hb_dbfSysName( DBFAREAP pArea, BYTE * pBuffer )
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfSysName(%p, %p)", pArea, pBuffer));
    HB_SYMBOL_UNUSED( pArea );
 
-   strncpy( ( char * ) pBuffer, "DBF", HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
+   strncpy( ( char * ) pBuffer, "DBF", 4 );
    return SUCCESS;
 }
 

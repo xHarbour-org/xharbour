@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.22 2002/12/28 12:10:37 horacioroldan Exp $
+ * $Id: dbcmd.c,v 1.23 2002/12/28 12:39:21 patrickmast Exp $
  */
 
 /*
@@ -357,7 +357,7 @@ static int hb_rddRegister( char * szDriver, USHORT uiType )
    memset( pRddNewNode, 0, sizeof( RDDNODE ) );
 
    /* Fill the new RDD node */
-   strncpy( pRddNewNode->szName, szDriver, HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
+   strncat( pRddNewNode->szName, szDriver, HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
    pRddNewNode->uiType = uiType;
 
    /* Call <szDriver>_GETFUNCTABLE() */
@@ -594,7 +594,7 @@ USHORT  HB_EXPORT hb_rddInsertAreaNode( char *szDriver )
 /*
  * Find a field.
  */
-static USHORT hb_rddFieldIndex( AREAP pArea, char * szName )
+USHORT hb_rddFieldIndex( AREAP pArea, char * szName )
 {
    USHORT uiCount;
    LPFIELD pField;
@@ -932,6 +932,8 @@ void  HB_EXPORT hb_rddShutDown( void )
    hb_rddCloseAll();
    if( s_szDefDriver )
       hb_xfree( s_szDefDriver );
+
+   s_szDefDriver = NULL;
 
    while( s_pRddList )
    {
@@ -1293,10 +1295,14 @@ HB_FUNC( DBCREATE )
       szDriver = s_szDefDriver;
 
    pFileName = hb_fsFNameSplit( szFileName );
-   strncpy( szAlias, hb_parc( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+   // strncpy( szAlias, hb_parc( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+   szAlias[0] = '\0';
+   if( ISCHAR(5) )
+      strncat( szAlias, hb_parc( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+
    uiLen = strlen( szAlias );
    if( uiLen == 0 )
-      strncpy( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
+      strncat( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
    else if( uiLen == 1 )
    {
       /* Alias with a single letter. Only are valid 'L' and > 'M' */
@@ -1311,12 +1317,17 @@ HB_FUNC( DBCREATE )
    /* Create a new WorkArea node */
    if( !hb_rddInsertAreaNode( szDriver ) )
    {
+      hb_xfree( pFileName );
       hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
       return;
    }
 
    szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
-   strncpy( szFileName, hb_parc( 1 ), _POSIX_PATH_MAX );
+   // strncpy( szFileName, hb_parc( 1 ), _POSIX_PATH_MAX );
+   szFileName[0] = '\0';
+   if( ISCHAR(1) )
+      strncat( szFileName, hb_parc( 1 ), _POSIX_PATH_MAX );
+
    if( !pFileName->szExtension )
    {
       pFileExt = hb_itemPutC( NULL, "" );
@@ -2081,6 +2092,8 @@ HB_FUNC( DBUSEAREA )
    char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
 
+   szDriverBuffer[0] = '\0';
+
    s_bNetError = FALSE;
 
    /* New area? */
@@ -2091,7 +2104,7 @@ HB_FUNC( DBUSEAREA )
 
    hb_rddCheck();
    uiLen = ( USHORT ) hb_parclen( 2 );
-   if( uiLen > 0 )
+   if( ISCHAR(2) && ( uiLen > 0 ) )
    {
       if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
@@ -2103,16 +2116,20 @@ HB_FUNC( DBUSEAREA )
       szDriver = s_szDefDriver;
 
    szFileName = hb_parc( 3 );
-   if( strlen( szFileName ) == 0 )
+   if( ! ISCHAR(3) || ( strlen( szFileName ) == 0 ) )
    {
       hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREA" );
       return;
    }
 
    pFileName = hb_fsFNameSplit( szFileName );
-   strncpy( szAlias, hb_parc( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+
+   szAlias[0] = '\0';
+   if( ISCHAR(4) )
+      strncat( szAlias, hb_parc( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
    if( strlen( szAlias ) == 0 )
-      strncpy( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
+      strncat( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
+
    uiLen = strlen( szAlias );
    if( szAlias[ 0 ] >= '0' && szAlias[ 0 ] <= '9' )
    {
@@ -2134,12 +2151,15 @@ HB_FUNC( DBUSEAREA )
    /* Create a new WorkArea node */
    if( !hb_rddInsertAreaNode( szDriver ) )
    {
+      hb_xfree( pFileName );
       hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBUSEAREA" );
       return;
    }
 
    szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
-   strncpy( szFileName, hb_parc( 3 ), _POSIX_PATH_MAX );
+   szFileName[0] = '\0';
+   strncat( szFileName, hb_parc( 3 ), _POSIX_PATH_MAX );
+
    if( !pFileName->szExtension )
    {
       pFileExt = hb_itemPutC( NULL, "" );
@@ -2477,14 +2497,22 @@ HB_FUNC( ORDCONDSET )
    {
       lpdbOrdCondInfo = ( LPDBORDERCONDINFO ) hb_xgrab( sizeof( DBORDERCONDINFO ) );
       szFor = hb_parc( 1 );
-      ulLen = strlen( szFor );
-      if( ulLen )
+      /* ulLen = strlen( szFor ); */
+      if( ISCHAR(1) && ( ( ulLen = strlen( szFor ) ) == 0 ) )
       {
          lpdbOrdCondInfo->abFor = ( BYTE * ) hb_xgrab( ulLen + 1 );
          strcpy( ( char * ) lpdbOrdCondInfo->abFor, szFor );
       }
       else
          lpdbOrdCondInfo->abFor = NULL;
+
+      if( ISCHAR( 17 ) && ( ulLen = hb_parclen( 17 ) ) > 0 )
+      {
+         lpdbOrdCondInfo->abWhile = ( BYTE * ) hb_xgrab( ulLen + 1 );
+         strcpy( ( char * ) lpdbOrdCondInfo->abWhile, hb_parc( 17 ) );
+      }
+      else
+         lpdbOrdCondInfo->abWhile = NULL;
 
       pItem = hb_param( 2, HB_IT_BLOCK );
       if( pItem )
@@ -2550,8 +2578,8 @@ HB_FUNC( ORDCREATE )
       dbOrderInfo.abBagName = ( BYTE * ) hb_parc( 1 );
       dbOrderInfo.atomBagName = ( BYTE * ) hb_parc( 2 );
       dbOrderInfo.abExpr = hb_param( 3, HB_IT_STRING );
-      if( ( ( strlen( ( char * ) dbOrderInfo.abBagName ) == 0 ) &&
-            ( strlen( ( char * ) dbOrderInfo.atomBagName ) == 0 ) ) ||
+      if( ( ( dbOrderInfo.abBagName == NULL || strlen( ( char * ) dbOrderInfo.abBagName ) == 0 ) &&
+            ( dbOrderInfo.atomBagName == NULL || strlen( ( char * ) dbOrderInfo.atomBagName ) == 0 ) ) ||
           !dbOrderInfo.abExpr )
       {
          hb_errRT_DBCMD( EG_ARG, EDBCMD_REL_BADPARAMETER, NULL, "ORDCREATE" );
@@ -3046,7 +3074,7 @@ HB_FUNC( __RDDSETDEFAULT )
 HB_FUNC( RDDSETDEFAULT )
 {
    USHORT uiLen;
-   char szNewDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH ];
+   char szNewDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
 
    hb_rddCheck();
    hb_retc( s_szDefDriver );
@@ -3073,7 +3101,7 @@ HB_FUNC( RDDSETDEFAULT )
 HB_FUNC( DBSETDRIVER )
 {
    USHORT uiLen;
-   char szNewDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH ];
+   char szNewDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1];
 
    hb_rddCheck();
    hb_retc( s_szDefDriver );
@@ -3518,6 +3546,8 @@ HB_FUNC( DBFILEGET )
    char szFileName[ _POSIX_PATH_MAX + 1 ];
    USHORT uiFields, uiIndex;
 
+   szFileName[0] = '\0';
+
    if( s_pCurrArea )
    {
       uiIndex = hb_parni( 1 );
@@ -3527,7 +3557,7 @@ HB_FUNC( DBFILEGET )
           SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields ) == SUCCESS &&
           uiIndex > 0 && uiIndex <= uiFields )
       {
-         strncpy( szFileName, hb_itemGetCPtr( pFileName ), _POSIX_PATH_MAX );
+         strncat( szFileName, hb_itemGetCPtr( pFileName ), _POSIX_PATH_MAX );
          hb_retl( SELF_GETVALUEFILE( ( AREAP ) s_pCurrArea->pArea, uiIndex, szFileName,
                                      hb_itemGetNI( pMode ) ) );
          return;
@@ -3546,6 +3576,8 @@ HB_FUNC( DBFILEPUT )
    char szFileName[ _POSIX_PATH_MAX + 1 ];
    USHORT uiFields, uiIndex;
 
+   szFileName[0] = '\0';
+
    if( s_pCurrArea )
    {
       uiIndex = hb_parni( 1 );
@@ -3554,7 +3586,7 @@ HB_FUNC( DBFILEPUT )
           SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields ) == SUCCESS &&
           uiIndex > 0 && uiIndex <= uiFields )
       {
-         strncpy( szFileName, hb_itemGetCPtr( pFileName ), _POSIX_PATH_MAX );
+         strncat( szFileName, hb_itemGetCPtr( pFileName ), _POSIX_PATH_MAX );
          hb_retl( SELF_PUTVALUEFILE( ( AREAP ) s_pCurrArea->pArea, uiIndex, szFileName ) );
          return;
       }
@@ -3579,6 +3611,7 @@ HB_FUNC( DBDROP )
     szDriver = hb_parc( 2 );
   else
     szDriver = s_szDefDriver;
+
   pRDDNode = hb_rddFindNode( szDriver, &uiRddID );  // find the RDD
 
   if ( !pRDDNode )
@@ -3602,6 +3635,7 @@ HB_FUNC( DBEXISTS )
     szDriver = hb_parc( 3 );
   else
     szDriver = s_szDefDriver;
+
   pRDDNode = hb_rddFindNode( szDriver, &uiRddID );  // find the RDD
 
   if ( !pRDDNode )
@@ -3651,6 +3685,19 @@ static BOOL IsFieldIn( char * fieldName, PHB_ITEM pFields )
   return FALSE;
 }
 
+static void AddField( PHB_ITEM pFieldArray, PHB_ITEM pItem, PHB_ITEM pData, USHORT uiCount )
+{
+    hb_arrayNew( pItem, 4 );
+    SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_NAME, pData );
+    hb_arraySet( pItem, 1, pData );
+    SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_TYPE, pData );
+    hb_arraySet( pItem, 2, pData );
+    SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_LEN, pData );
+    hb_arraySet( pItem, 3, pData );
+    SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_DEC, pData );
+    hb_arraySet( pItem, 4, pData );
+    hb_arrayAdd( pFieldArray, pItem );
+}
 /*   create a new AREANODE and open its Area
    If the file exists it will be deleted & a new one created
 */
@@ -3706,21 +3753,30 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
     hb_arrayNew( pFieldArray, 0 );
     pData = hb_itemNew( NULL );
     pItem = hb_itemNew( NULL );
-    for( uiCount = 1; uiCount <= uiFields; uiCount++ )
+    if( pFields )
     {
-      if ( !pFields || IsFieldIn( (( PHB_DYNS )((( AREAP )s_pCurrArea->pArea)->lpFields + (uiCount-1))->sym )->pSymbol->szName,  pFields ))
-      {
-        hb_arrayNew( pItem, 4 );
-        SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_NAME, pData );
-        hb_arraySet( pItem, 1, pData );
-        SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_TYPE, pData );
-        hb_arraySet( pItem, 2, pData );
-        SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_LEN, pData );
-        hb_arraySet( pItem, 3, pData );
-        SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_DEC, pData );
-        hb_arraySet( pItem, 4, pData );
-        hb_arrayAdd( pFieldArray, pItem );
-      }
+       USHORT i;
+       char *ptr;
+
+       uiFields = ( USHORT ) hb_arrayLen( pFields );
+       for ( i=0; i<uiFields; i++ )
+       {
+          PHB_ITEM pField = pFields->item.asArray.value->pItems + i;
+          ptr = strrchr( (char *)pField->item.asString.value,'>' );
+          if( ptr && ptr > (char *)pField->item.asString.value && *(ptr-1)=='-' )
+             ptr ++;
+          else
+             ptr = (char *)pField->item.asString.value;
+          if( ( uiCount = hb_rddFieldIndex( (AREAP) s_pCurrArea->pArea,
+                           hb_strUpper( ptr,strlen(ptr)) ) ) != 0 )
+             AddField( pFieldArray, pItem, pData, uiCount );
+       }
+    }
+    else
+    {
+       for( uiCount = 1; uiCount <= uiFields; uiCount++ )
+         /*if ( !pFields || IsFieldIn( (( PHB_DYNS )((( AREAP )s_pCurrArea->pArea)->lpFields + (uiCount-1))->sym )->pSymbol->szName,  pFields )) */
+          AddField( pFieldArray, pItem, pData, uiCount );
     }
     hb_itemRelease( pItem );
     hb_itemRelease( pData );
