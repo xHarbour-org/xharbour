@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.127 2004/02/14 01:29:41 andijahja Exp $
+ * $Id: ppcore.c,v 1.128 2004/02/15 21:58:46 ronpinkas Exp $
  */
 
 /*
@@ -5898,7 +5898,7 @@ static int NextWord( char ** sSource, char * sDest, BOOL lLower )
 static int NextName( char ** sSource, char * sDest )
 {
   /* Ron Pinkas added 2000-11-08 */
-  char cLastChar = '\32', *pString = NULL, *pTmp;
+  char cLastChar = ( s_bArray ? 'a' : ' ' ), *pString = NULL, *pTmp;
   /* END - Ron Pinkas added 2000-11-08 */
 
   int lenName = 0, State = STATE_NORMAL;
@@ -5908,7 +5908,6 @@ static int NextName( char ** sSource, char * sDest )
   HB_TRACE_STEALTH(HB_TR_DEBUG, ("NextName(%p, %s)", sSource, sDest));
 
   //#define DEBUG_NAME
-
   #ifdef DEBUG_NAME
      printf( "NextName() In: >%s<\n", *sSource );
   #endif
@@ -6056,7 +6055,7 @@ static int NextName( char ** sSource, char * sDest )
      /* Ron Pinkas added 2000-11-08 */
      else if( **sSource == '[' )
      {
-        if( s_bArray == FALSE && strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) )
+        if( strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) )
         {
            /* Ron Pinkas added 2000-11-08 */
            pString = *sSource;
