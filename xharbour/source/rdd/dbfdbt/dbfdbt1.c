@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.8 2004/03/25 12:13:14 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.9 2004/04/28 18:28:40 druzus Exp $
  */
 
 /*
@@ -738,8 +738,8 @@ static ERRCODE hb_dbtReadDBHeader( DBTAREAP pArea )
 
    if( SUPER_READDBHEADER( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
-
-   pArea->fHasMemo = ( pArea->bVersion == 0x83 );
+// Set in SUPER() now 3/05/2004
+//   pArea->fHasMemo = ( pArea->bVersion == 0x83 );
 
    return SUCCESS;
 }
@@ -752,8 +752,9 @@ static ERRCODE hb_dbtWriteDBHeader( DBTAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbtWriteDBHeader(%p)", pArea));
 
-   if ( pArea->fHasMemo )
+   if ( pArea->fHasMemo && pArea->bVersion != 0x30 )
+   {
       pArea->bVersion = 0x83;
-
+   }
    return SUPER_WRITEDBHEADER( ( AREAP ) pArea );
 }

@@ -274,13 +274,13 @@ static BOOL hb_fptFileLockEx( FPTAREAP pArea )
 {
    BOOL fRet;
 
-   do
-   {
-      fRet = hb_fsLock( pArea->hMemoFile, FPT_LOCKPOS, FPT_LOCKSIZE,
+	 do
+	 {
+			fRet = hb_fsLock( pArea->hMemoFile, FPT_LOCKPOS, FPT_LOCKSIZE,
                         FL_LOCK | FLX_EXCLUSIVE | FLX_WAIT );
-   } while ( !fRet );
+	 } while ( !fRet );
 
-   return fRet;
+	 return fRet;
 }
 
 /*
@@ -290,11 +290,11 @@ static BOOL hb_fptFileLockSh( FPTAREAP pArea )
 {
    BOOL fRet;
 
-   do
-   {
-      fRet = hb_fsLock( pArea->hMemoFile, FPT_LOCKPOS, FPT_LOCKSIZE,
+	 do
+	 {
+			fRet = hb_fsLock( pArea->hMemoFile, FPT_LOCKPOS, FPT_LOCKSIZE,
                         FL_LOCK | FLX_SHARED | FLX_WAIT );
-   } while ( !fRet );
+	 } while ( !fRet );
 
    return fRet;
 }
@@ -2151,7 +2151,8 @@ static ERRCODE hb_fptReadDBHeader( FPTAREAP pArea )
    if( SUPER_READDBHEADER( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-   pArea->fHasMemo = ( pArea->bVersion == 0xF5 );
+// Set in SUPER() now 3/05/2004
+//   pArea->fHasMemo = ( pArea->bVersion == 0xF5 );
 
    return SUCCESS;
 }
@@ -2164,8 +2165,9 @@ static ERRCODE hb_fptWriteDBHeader( FPTAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_fptWriteDBHeader(%p)", pArea));
 
-   if ( pArea->fHasMemo )
+   if ( pArea->fHasMemo && pArea->bVersion != 0x30 )
+   {
       pArea->bVersion = 0xF5;
-
+   }
    return SUPER_WRITEDBHEADER( ( AREAP ) pArea );
 }

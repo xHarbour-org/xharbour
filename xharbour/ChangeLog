@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2866 2004/05/03 13:02:53 lculik Exp $
+ * $Id: ChangeLog,v 1.2867 2004/05/03 17:29:13 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-04 12:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rdd/dbf1.c
+  * source/rdd/dbfdbt\dbfdbt1.c
+  * source/rdd/dbffpt\dbffpt1.c
+    - Changes to correctly support Creating, Reading & Writing Visual Foxpro
+      0x30 type DBF files.
+      Note: Only basic Clipper field types ( C/D/N/M/L ) are supported ( ATM )
+  * source/rdd/dbf1.c
+    + HB_FUNC( DBSETDBFVERSION )
+      Function to allow setting default DBF creation type to VFP 0x30
+      Valid options are 0x30 and 0x03 ONLY ( Default DBF type is 0x03 as it always has been )
+
+      I have extensively tested these changes and have not encountered any problems
+      Please report any problems found ASAP so they can be corrected before release
+      of Beta-1
 
 2004-05-03 19:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
@@ -27,7 +43,7 @@
     utils/hbmake/hbmutils.prg
     ! fixed to problem reported by bill robertson
   ! utils/hbmake/pickarry.prg
-    ! Formated 
+    ! Formated
 
 2004-05-03 13:25 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   + xharbour/rtl/gtwvt/ChangeLog
