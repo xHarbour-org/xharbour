@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.56 2003/04/05 23:47:31 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.57 2003/04/06 05:47:40 ronpinkas Exp $
  */
 
 /*
@@ -2483,7 +2483,8 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   {
      // Stopper for the expression.
      lenreal = strincpy( expreal, ptrtemp );
-     //printf( "Len: %i\n", lenreal );
+
+     //printf( "Stoper: >%.*s<\n", lenreal, expreal );
 
      if( (ipos = md_strAt( expreal, lenreal, *ptri, TRUE, TRUE, FALSE, TRUE )) > 0 )
      {
@@ -3406,7 +3407,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
    static char expnew[ MAX_EXP ];
 
    int ifou, isdvig = 0;
-   BOOL rezs, bFound = FALSE;
+   BOOL rezs, bFound = FALSE, bDontInstanciate = FALSE;
    int kolmarkers;
    int lennew, i;
    char lastchar = '0';
@@ -3433,7 +3434,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
    while( ( ifou = md_strAt( exppatt, ( *( exppatt + 1 ) ) ? 2 : 1, ptrOut, FALSE, FALSE, TRUE, FALSE )) > 0 ) /* ??? */
    {
       #ifdef DEBUG_MARKERS
-         printf( "   Found: >%s< At: %i In: >%s<\n", exppatt, ifou, ptrOut );
+         printf( "   Found: >%s< At: %i In: >%s< MarkerCount: %i\n", exppatt, ifou, ptrOut, (ptrOut + ifou)[2] - '0' );
       #endif
 
       bFound = TRUE;
@@ -3504,7 +3505,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
                   lennew = ptr2-ptr-1;
 
-                  // Flagging all Markers in Repeatable group as Instanciated.
+                  // Flagging the instanciated Marker in Repeatable group as Instanciated.
                   for( i=0; i < lennew; i++ )
                   {
                      if( ptr[i] == '\1' )
@@ -3538,11 +3539,16 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                      }
                   }
 
-                  if( cMarkerCount <= cGroupCount )
+                  // (ptrOut + ifou)[2] - '0' signify a NON repeatable forced early instanciation so no need to instanciate again for this marker.
+                  if( cMarkerCount <= cGroupCount || bDontInstanciate )
                   {
                       #ifdef DEBUG_MARKERS
                          printf( "   Already instanciated %i times with %i values\n", cGroupCount - '0', cMarkerCount - '0' );
                       #endif
+
+                      bDontInstanciate = TRUE;
+                      isdvig += ifou - 1;
+                      rezs = TRUE;
                       goto Instanciated;
                   }
 
@@ -3639,41 +3645,61 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                      // Maybe the group was instanciated already and since this is Non Repeatable we don't need to instanciate again.
                      if( ! rezs )
                      {
-                        // Flagging all markers in Repeatable group as Instanciated.
+                        // Flagging all markers (EXCEPT the non repeatable that we'll be instanciated) in Repeatable group as Instanciated.
                         for( i = 0; i < lennew; i++ )
                         {
                            if( ptr[i] == '\1' )
                            {
-                              ptr[ i + 3 ]++;// = '1';
+                              if( ptr[i + 1] != exppatt[1] )
+                              {
+                                 ptr[ i + 3 ]++;// = '1';
 
-                              #ifdef DEBUG_MARKERS
-                                 printf( "   Marked %s as instanciated\n", ptr + i );
-                              #endif
-
-                              break;
+                                #ifdef DEBUG_MARKERS
+                                   printf( "   Marked %s as instanciated\n", ptr + i );
+                                #endif
+                              }
                            }
                         }
+
+                        // *** EITHER *** this block OR the #if 0 below!!!
+                        #if 1
+                            while( (i = hb_strAt( exppatt, 2, ptr + 1, lennew )) > 0 )
+                            {
+                               #ifdef DEBUG_MARKERS
+                                  printf( "   Expand: '%s' at %i\n", exppatt, i );
+                               #endif
+
+                               lennew += ReplacePattern( exppatt[2], expreal, lenreal, ptr + 1 + i - 1, lennew );
+                            }
+
+                            //printf( "   Replaced Non Repeatable into Residual Group '%s'\n", ptr );
+                        #endif
 
                         memcpy( expnew, ptr+1, lennew );
                         *(expnew + lennew++) = ' ';
                         *(expnew + lennew) = '\0';
 
-                        while( (i = hb_strAt( exppatt, 2, expnew, lennew )) > 0 )
-                        {
-                           #ifdef DEBUG_MARKERS
-                              printf( "   Expand: '%s' at %i\n", exppatt, i );
-                           #endif
+                        #if 0
+                            while( (i = hb_strAt( exppatt, 2, expnew, lennew )) > 0 )
+                            {
+                               #ifdef DEBUG_MARKERS
+                                  printf( "   Expand: '%s' at %i\n", exppatt, i );
+                               #endif
 
-                           lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew+i-1, lennew );
-                        }
+                               lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew+i-1, lennew );
+                            }
+                        #endif
 
                         hb_pp_Stuff( expnew, ptr, lennew, 0, *lenres-(ptr-ptro)+1 );
                         *lenres += lennew;
+
                         isdvig = ptr - ptro + (ptr2-ptr-1) + lennew;
 
                         #ifdef DEBUG_MARKERS
                            printf( "   Instanciated Repeatable Group: %s with Non Repeatable %s\n", expnew, expreal );
                         #endif
+
+                        bDontInstanciate = TRUE;
                      }
                   }
 
@@ -3708,6 +3734,12 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
          #ifdef DEBUG_MARKERS
             printf( "   2\n" );
          #endif
+
+         if( ( ptrOut + ifou )[2] - '0' )
+         {
+            bDontInstanciate = TRUE;
+            //printf( "Expnading place holder, and flaged for NO instanciation." );
+         }
 
          *lenres += ReplacePattern( exppatt[2], expreal, lenreal, ptrOut + ifou - 1, *lenres-isdvig-ifou+1 );
          isdvig += ifou - 1;
@@ -4571,7 +4603,7 @@ static BOOL truncmp( char ** ptro, char ** ptri, BOOL lTrunc )
 
   while( **ptri && **ptro )
   {
-     if( strchr( "({:=+-*/", **ptri ) )
+     if( strchr( "({:=+-*/<>$^%#!", **ptri ) )
      {
         while( **ptro == ' ' || **ptro == '\t' )
         {
@@ -4591,11 +4623,34 @@ static BOOL truncmp( char ** ptro, char ** ptri, BOOL lTrunc )
   co = *(*ptro-1);
   ci = **ptri;
 
-  //printf( ">>>Input: '%s', MP: '%s', co: %c, ci: %c\n", *ptro, *ptri, co, ci );
-
   if( ( ( ci == ' ' || ci == ',' || ci == '[' || ci == ']' || ci == '\1' || ci == '\0' ) &&
-        ( ( !ISNAME(**ptro) && ISNAME(co) ) || ( !ISNAME(co) ) ) ) )
+        ( ( ! ISNAME( **ptro ) && ISNAME( co ) ) || ( ! ISNAME( co ) ) ) ) )
   {
+     /*
+      * Reject the token if it ends with first char of a Bi-Char.
+      */
+
+     // Bi Chars: "\:=\==\!=\>=\<=\+=\-=\*=\/=\^=\%=\"
+     if( strchr( ":=!><+-*/^%", co ) && **ptro == '=' )
+     {
+        //printf( ">>>Rejected: '%s', MP: '%s', co: '%c', ci: '%c'\n", *ptro, *ptri, co, ci );
+        return TRUE;
+     }
+     // BI-Chars: "\++\--\**\"
+     else if( strchr( "+-*", co ) && **ptro == co )
+     {
+        //printf( ">>>Rejected: '%s', MP: '%s', co: '%c', ci: '%c'\n", *ptro, *ptri, co, ci );
+        return TRUE;
+     }
+     // BI-Chars: "\->\<>\"
+     else if( strchr( "->", co ) && **ptro == '>' )
+     {
+        //printf( ">>>Rejected: '%s', MP: '%s', co: '%c', ci: '%c'\n", *ptro, *ptri, co, ci );
+        return TRUE;
+     }
+
+     //printf( ">>>Accepted: '%s', MP: '%s', co: '%c', ci: '%c'\n", *ptro, *ptri, co, ci );
+
      return FALSE;
   }
   else if( lTrunc && *ptro-ptrb >= 4 && ISNAME(ci) && !ISNAME(**ptro) && ISNAME(co) )
@@ -4605,11 +4660,11 @@ static BOOL truncmp( char ** ptro, char ** ptri, BOOL lTrunc )
         (*ptri)++;
       }
 
+      printf( ">>>Accepted: '%s', MP: '%s', co: '%c', ci: '%c'\n", *ptro, *ptri, co, ci );
       return FALSE;
   }
 
-  //printf( ">>>TRUE Input: '%s', MP: '%s', co: %c, ci: %c\n", *ptro, *ptri, co, ci );
-
+  //printf( ">>>Rejected: '%s', MP: '%s', co: '%c', ci: '%c'\n", *ptro, *ptri, co, ci );
   return TRUE;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.1.1.1 2001/12/21 10:44:59 ronpinkas Exp $
+ * $Id: hbpp.c,v 1.2 2002/12/04 23:07:10 likewolf Exp $
  */
 
 /*
@@ -76,7 +76,7 @@
 extern int hb_pp_ParseDefine( char * );
 
 static void AddSearchPath( char * szPath, HB_PATHNAMES * * pSearchList );
-static void OutTable( DEFINES * endDefine, COMMANDS * endCommand );
+static void OutTable( DEFINES * endDefine, COMMANDS * endCommand, COMMANDS *endTranslate );
 static BOOL hb_pp_fopen( char * szFileName );
 
 static char s_szLine[ HB_PP_STR_SIZE ];
@@ -111,8 +111,8 @@ int main( int argc, char * argv[] )
   int iArg = 1;
   BOOL bOutTable = FALSE;
   BOOL bOutNew = FALSE;
-  DEFINES * stdef;
-  COMMANDS * stcmd;
+  DEFINES *stdef;
+  COMMANDS *stcmd, *sttra;
 
   HB_TRACE(HB_TR_DEBUG, ("main(%d, %p)", argc, argv));
 
@@ -123,17 +123,19 @@ int main( int argc, char * argv[] )
   hb_pp_Table();
   stdef = hb_pp_topDefine;
   stcmd = hb_pp_topCommand;
+  sttra = hb_pp_topTranslate;
+
   hb_pp_Init();
 
   while( iArg < argc )
-    {
+  {
       if( HB_ISOPTSEP(argv[ iArg ][ 0 ]))
-        {
+      {
           switch( argv[ iArg ][ 1 ] )
-            {
+          {
             case 'd':
             case 'D':   /* defines a #define from the command line */
-              {
+            {
                  char *szDefText = hb_strdup( argv[iArg] + 2 ), *pAssign, *sDefLine;
                  unsigned int i = 0;
 
@@ -160,41 +162,50 @@ int main( int argc, char * argv[] )
                  }
 
                  hb_xfree( szDefText );
-              }
-              break;
+            }
+            break;
+
             case 'i':
             case 'I':
               AddSearchPath( argv[ iArg ]+2, &hb_comp_pIncludePath );
               break;
+
             case 'o':
             case 'O':
               bOutTable = TRUE;
               break;
+
             case 'n':
             case 'N':
               bOutNew = TRUE;
               break;
+
             case 'w':
             case 'W':
               s_iWarnings = 1;
               if( argv[ iArg ][ 2 ] )
-                {  /*there is -w<0,1,2,3> probably */
+              {  /*there is -w<0,1,2,3> probably */
                   s_iWarnings = argv[ iArg ][ 2 ] - '0';
                   if( s_iWarnings < 0 || s_iWarnings > 3 )
                     printf( "\nInvalid command line option: %s\n", argv[ iArg ] );
-                }
+              }
               break;
+
             default:
               printf( "\nInvalid command line option: %s\n", &argv[ iArg ][ 1 ] );
               break;
-            }
-        }
-      else  hb_comp_pFileName = hb_fsFNameSplit( argv[ iArg ] );
+          }
+      }
+      else
+      {
+          hb_comp_pFileName = hb_fsFNameSplit( argv[ iArg ] );
+      }
+
       iArg++;
-    }
+  }
 
   if( hb_comp_pFileName )
-    {
+  {
       if( ! hb_comp_pFileName->szExtension )
         hb_comp_pFileName->szExtension =".prg";
 
@@ -207,9 +218,9 @@ int main( int argc, char * argv[] )
         }
 
       printf( "\nParsing file %s\n", szFileName );
-    }
+  }
   else
-    {
+  {
       printf( "\nSyntax:  %s <file[.prg]> [options]"
               "\n"
               "\nOptions:  /d<id>[=<val>]   #define <id>"
@@ -221,10 +232,12 @@ int main( int argc, char * argv[] )
               , argv[ 0 ] );
 
       if( bOutTable )
-        OutTable( NULL, NULL );
+      {
+         OutTable( NULL, NULL, NULL );
+      }
 
       return 1;
-    }
+  }
 
   hb_comp_pFileName->szExtension = ".ppo";
   hb_fsFNameMerge( szPpoName, hb_comp_pFileName );
@@ -263,16 +276,20 @@ int main( int argc, char * argv[] )
   fclose( handl_o );
 
   if( bOutTable )
-    OutTable( NULL, NULL );
+  {
+     OutTable( NULL, NULL, NULL );
+  }
   else if( bOutNew )
-    OutTable( stdef, stcmd );
+  {
+     OutTable( stdef, stcmd, sttra );
+  }
 
   printf( "\nOk" );
 
   return 0;
 }
 
-static void OutTable( DEFINES * endDefine, COMMANDS * endCommand )
+static void OutTable( DEFINES * endDefine, COMMANDS * endCommand, COMMANDS * endTranslate )
 {
   FILE *handl_o;
   int ipos, len_mpatt = 0, len_value;
@@ -283,147 +300,218 @@ static void OutTable( DEFINES * endDefine, COMMANDS * endCommand )
   HB_TRACE(HB_TR_DEBUG, ("OutTable(%p, %p)", endDefine, endCommand));
 
   while( stdef1 != endDefine )
-    {
-      stdef3 = stdef1->last;
-      stdef1->last = stdef2;
-      stdef2 = stdef1;
-      stdef1 = stdef3;
-    }
+  {
+     stdef3 = stdef1->last;
+     stdef1->last = stdef2;
+     stdef2 = stdef1;
+     stdef1 = stdef3;
+  }
+
   while( stcmd1 != endCommand )
-    {
-      stcmd3 = stcmd1->last;
-      stcmd1->last = stcmd2;
-      stcmd2 = stcmd1;
-      stcmd1 = stcmd3;
-    }
+  {
+     stcmd3 = stcmd1->last;
+     stcmd1->last = stcmd2;
+     stcmd2 = stcmd1;
+     stcmd1 = stcmd3;
+  }
 
   if( ( handl_o = fopen( "hbpp.out", "wt" ) ) == NULL )
-    {
+  {
       printf( "\nCan't open hbpp.out\n" );
       return;
-    }
+  }
 
   num = 1;
   while( stdef2 != NULL )
-    {
+  {
       fprintf( handl_o, "\n   static DEFINES sD___%i = ", num );
       fprintf( handl_o, "{\"%s\",", stdef2->name );
+
       if( stdef2->pars )
+      {
         fprintf( handl_o, "\"%s\",", stdef2->pars );
+      }
       else
+      {
         fprintf( handl_o, "NULL," );
+      }
+
       fprintf( handl_o, "%d,", stdef2->npars );
+
       if( stdef2->value )
+      {
         fprintf( handl_o, "\"%s\"", stdef2->value );
+      }
       else
+      {
         fprintf( handl_o, "NULL" );
+      }
+
       if( num == 1 )
+      {
         fprintf( handl_o, ", NULL };" );
+      }
       else
+      {
         fprintf( handl_o, ", &sD___%i };", num - 1 );
+      }
+
       stdef2 = stdef2->last;
       num++;
-    }
+  }
+
   fprintf( handl_o, "\n   DEFINES * hb_pp_topDefine = " );
+
   if( num == 1 )
+  {
     fprintf( handl_o, "NULL;" );
+  }
   else
+  {
     fprintf( handl_o, " = &sD___%i;\n", num - 1 );
+  }
 
   num = 1;
   while( stcmd2 != NULL )
-    {
+  {
       fprintf( handl_o, "\n   static COMMANDS sC___%i = ", num );
       fprintf( handl_o, "{%d,\"%s\",", stcmd2->com_or_xcom, stcmd2->name );
+
       if( stcmd2->mpatt != NULL )
-        {
+      {
           len_mpatt = hb_pp_strocpy( s_szLine, stcmd2->mpatt );
           while( ( ipos = hb_strAt( "\1", 1, s_szLine, len_mpatt ) ) > 0 )
-            {
+          {
               hb_pp_Stuff( "\\1", s_szLine + ipos - 1, 2, 1, len_mpatt );
               len_mpatt++;
-            }
+          }
+
           fprintf( handl_o, "\"%s\",", s_szLine );
-        }
+      }
       else
-        fprintf( handl_o, "NULL," );
+      {
+         fprintf( handl_o, "NULL," );
+      }
+
       if( stcmd2->value != NULL )
-        {
+      {
           len_value = hb_pp_strocpy( s_szLine, stcmd2->value );
           while( ( ipos = hb_strAt( "\1", 1, s_szLine, len_value ) ) > 0 )
-            {
+          {
               hb_pp_Stuff( "\\1", s_szLine + ipos - 1, 2, 1, len_value );
               len_value++;
-            }
+          }
+
           if( len_mpatt + len_value > 80 )
+          {
             fprintf( handl_o, "\n       " );
+          }
+
           fprintf( handl_o, "\"%s\"", s_szLine );
-        }
-      else fprintf( handl_o, "NULL" );
-      if( num == 1 )
-        fprintf( handl_o, ",NULL };" );
+      }
       else
+      {
+         fprintf( handl_o, "NULL" );
+      }
+
+      if( num == 1 )
+      {
+        fprintf( handl_o, ",NULL };" );
+      }
+      else
+      {
         fprintf( handl_o, ",&sC___%i };", num - 1 );
+      }
+
       stcmd2 = stcmd2->last;
       num++;
-    }
+  }
+
   fprintf( handl_o, "\n   COMMANDS * hb_pp_topCommand = " );
+
   if( num == 1 )
+  {
     fprintf( handl_o, "NULL;" );
+  }
   else
+  {
     fprintf( handl_o, " = &sC___%i;\n", num - 1 );
+  }
 
   stcmd1 = hb_pp_topTranslate;
   stcmd2 = NULL;
-  while( stcmd1 != NULL )
-    {
+  while( stcmd1 != endTranslate )
+  {
       stcmd3 = stcmd1->last;
       stcmd1->last = stcmd2;
       stcmd2 = stcmd1;
       stcmd1 = stcmd3;
-    }
+  }
+
   num = 1;
   while( stcmd2 != NULL )
-    {
-      fprintf( handl_o, "\n   static COMMANDS sC___%i = ", num );
+  {
+      fprintf( handl_o, "\n   static COMMANDS sT___%i = ", num );
       fprintf( handl_o, "{%d,\"%s\",", stcmd2->com_or_xcom, stcmd2->name );
       if( stcmd2->mpatt != NULL )
-        {
+      {
           len_mpatt = hb_pp_strocpy( s_szLine, stcmd2->mpatt );
           while( ( ipos = hb_strAt( "\1", 1, s_szLine, len_mpatt ) ) > 0 )
-            {
+          {
               hb_pp_Stuff( "\\1", s_szLine + ipos - 1, 2, 1, len_mpatt );
               len_mpatt++;
-            }
+          }
           fprintf( handl_o, "\"%s\",", s_szLine );
-        }
+      }
       else
+      {
         fprintf( handl_o, "NULL," );
+      }
+
       if( stcmd2->value != NULL )
-        {
+      {
           len_value = hb_pp_strocpy( s_szLine, stcmd2->value );
           while( ( ipos = hb_strAt( "\1", 1, s_szLine, len_value ) ) > 0 )
-            {
+          {
               hb_pp_Stuff( "\\1", s_szLine + ipos - 1, 2, 1, len_value );
               len_value++;
-            }
+          }
+
           if( len_mpatt + len_value > 80 )
+          {
             fprintf( handl_o, "\n       " );
+          }
+
           fprintf( handl_o, "\"%s\"", s_szLine );
-        }
-      else fprintf( handl_o, "NULL" );
-      if( num == 1 )
-        fprintf( handl_o, ",NULL };" );
+      }
       else
-        fprintf( handl_o, ",&sC___%i };", num - 1 );
+      {
+         fprintf( handl_o, "NULL" );
+      }
+
+      if( num == 1 )
+      {
+        fprintf( handl_o, ",NULL };" );
+      }
+      else
+      {
+        fprintf( handl_o, ",&sT___%i };", num - 1 );
+      }
+
       stcmd2 = stcmd2->last;
       num++;
-    }
+  }
+
   fprintf( handl_o, "\n   COMMANDS * hb_pp_topTranslate = " );
+
   if( num == 1 )
+  {
     fprintf( handl_o, "NULL;" );
+  }
   else
-    fprintf( handl_o, " = &sT___%i;", num );
+  {
+    fprintf( handl_o, "&sT___%i;", num - 1 );
+  }
 
   fclose( handl_o );
 }

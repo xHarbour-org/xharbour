@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.920 2003/04/06 05:47:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.921 2003/04/07 02:00:24 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-06 23:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed truncmp() to respect Bi-Chars.
+    ! Fixed SearnRep() instanciation logic for non repeatbles.
+
+  * source/pp/pptable.c
+    + Added support for _GET_() with 2-4 params.
+
+  * source/vm/initsymb.c
+    * Reinstated default Symbols.
+
+  * utils/hbpp/hbpp.c
+    ! Fixed supports of #translates generation.
 
 2003-04-07 09:00:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * CVS files are tagged as Build80

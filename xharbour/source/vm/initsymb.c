@@ -1,5 +1,5 @@
 /*
- * $Id: initsymb.c,v 1.2 2002/05/16 02:28:38 ronpinkas Exp $
+ * $Id: initsymb.c,v 1.3 2003/01/05 06:50:36 ronpinkas Exp $
  */
 
 /*
@@ -50,7 +50,7 @@
  *
  */
 
-#if 0 // Why should we force inclusion of teh RTL Symbols???
+#if 0 // Why should we force inclusion of the RTL Symbols???
 
 #include "hbapi.h"
 #include "hbvm.h"
