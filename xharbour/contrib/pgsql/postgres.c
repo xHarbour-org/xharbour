@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.15 2004/09/29 22:34:23 rodrigo_moreno Exp $
+ * $Id: postgres.c,v 1.16 2004/09/29 22:38:43 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -399,6 +399,22 @@ HB_FUNC(PQRESULTSTATUS)
     if (hb_parinfo(1))
         hb_retni(PQresultStatus(( PGresult * ) hb_parptr(1) ));
 }
+
+
+HB_FUNC(PQCMDSTATUS)
+{
+    if (hb_parinfo(1))
+        hb_retc(PQcmdStatus( (PGresult *) hb_parptr(1) ));
+}
+
+
+HB_FUNC(PQCMDTUPLES)
+{
+    if (hb_parinfo(1))
+        hb_retc(PQcmdTuples( (PGresult *) hb_parptr(1) ));
+}
+
+
 
 /* Asynchronous functions 
  * ----------------------

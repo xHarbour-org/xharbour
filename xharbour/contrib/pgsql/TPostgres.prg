@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.28 2004/10/14 13:06:07 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.29 2004/12/11 12:39:20 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -446,6 +446,7 @@ CLASS TPQQuery
     DATA     aKeys              
     DATA     TableName
     DATA     Schema
+    DATA     rows     INIT 0
 
     METHOD   New( pDB, cQuery, lallCols, cSchema, res )
     METHOD   Destroy()          
@@ -784,9 +785,11 @@ METHOD Delete(oRow) CLASS TPQquery
             if PQresultstatus(res) != PGRES_COMMAND_OK            
                 ::lError := .T.
                 ::cError := PQresultErrormessage(res)       
+                ::rows   := 0
             else             
                 ::lError := .F.
                 ::cError := ''
+                ::rows   := val(PQcmdTuples(res))
             endif                
             PQclear(res)
         end            
@@ -834,9 +837,11 @@ METHOD Append( oRow ) CLASS TPQquery
             if PQresultstatus(res) != PGRES_COMMAND_OK            
                 ::lError := .T.
                 ::cError := PQresultErrormessage(res)       
+                ::rows   := 0
             else             
                 ::lError := .F.
                 ::cError := ''
+                ::rows   := val(PQcmdTuples(res))
             endif                
 
             PQclear(res)
@@ -895,9 +900,11 @@ METHOD Update(oRow) CLASS TPQquery
             if PQresultstatus(res) != PGRES_COMMAND_OK            
                 ::lError := .T.
                 ::cError := PQresultErrormessage(res)       
+                ::rows   := 0
             else             
                 ::lError := .F.
                 ::cError := ''
+                ::rows   := val(PQcmdTuples(res))
             endif                
 
             PQclear(res)
