@@ -283,21 +283,21 @@ MAPDIALOGRECT(nDlg,@aSrc)
 
 HB_FUNC( MAPDIALOGRECT )
 {
-   LPRECT lpRect ; 
+   RECT lpRect ; 
    PHB_ITEM pArray;
    if (ISARRAY(2) )
       {
       pArray=hb_param( 2, HB_IT_ARRAY ) ;
-      lpRect->left   = hb_arrayGetNL( pArray , 1 );
-      lpRect->top    = hb_arrayGetNL( pArray , 2 );
-      lpRect->right  = hb_arrayGetNL( pArray , 3 );
-      lpRect->bottom = hb_arrayGetNL( pArray , 4 );
+      lpRect.left   = hb_arrayGetNL( pArray , 1 );
+      lpRect.top    = hb_arrayGetNL( pArray , 2 );
+      lpRect.right  = hb_arrayGetNL( pArray , 3 );
+      lpRect.bottom = hb_arrayGetNL( pArray , 4 );
    
-      hb_retl( MapDialogRect( (HWND) hb_parnl( 1 ), lpRect ) ) ;
-      hb_stornl( lpRect->left   , 2 , 1 ) ;
-      hb_stornl( lpRect->top    , 2 , 2 ) ;
-      hb_stornl( lpRect->right  , 2 , 3 ) ;
-      hb_stornl( lpRect->bottom , 2 , 4 ) ;
+      hb_retl( MapDialogRect( (HWND) hb_parnl( 1 ), &lpRect ) ) ;
+      hb_stornl( lpRect.left   , 2 , 1 ) ;
+      hb_stornl( lpRect.top    , 2 , 2 ) ;
+      hb_stornl( lpRect.right  , 2 , 3 ) ;
+      hb_stornl( lpRect.bottom , 2 , 4 ) ;
    }
    else
       hb_retl(FALSE);

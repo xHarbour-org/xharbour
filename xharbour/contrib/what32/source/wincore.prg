@@ -1160,7 +1160,7 @@ HB_FUNC (GETWNDPROC )
       hb_retnl( (ULONG) __WndProc ) ;
       return ;
 
-    otherwise:
+    default:
       hb_retnl( (ULONG) 0 ) ;
       return ;
     

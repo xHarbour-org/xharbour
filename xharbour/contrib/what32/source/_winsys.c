@@ -770,10 +770,10 @@ HB_FUNC( SETCOMPUTERNAMEEX )
 
 HB_FUNC( GETUSERNAME )
 {
-   LPDWORD nSize    ;
+   DWORD nSize    ;
    char *szUser = hb_parc( 1 );
 
-   hb_retl( GetUserNameA( szUser, nSize ) ) ;
+   hb_retl( GetUserNameA( szUser, &nSize ) ) ;
    hb_storc( szUser , 1 ) ;
    hb_stornl( ( LONG ) nSize , 2 ) ;
 }
@@ -792,7 +792,7 @@ HB_FUNC( GETVERSIONEX )
    OSVERSIONINFOEX osvi;
    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-   bGetVer = GetVersionEx( (OSVERSIONINFOEX*) &osvi );
+   bGetVer = GetVersionEx( (OSVERSIONINFO*) &osvi );
 
    hb_storclen( (char*) &osvi, sizeof(OSVERSIONINFOEX), 1 );
    hb_retl( bGetVer );

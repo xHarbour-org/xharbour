@@ -1060,11 +1060,11 @@ HB_FUNC( GETWINDOWINFO )
 
 HB_FUNC( GETTITLEBARINFO )
 {
-   PTITLEBARINFO pti  ;
+   TITLEBARINFO pti  ;
 
-     if ( GetTitleBarInfo( (HWND) hb_parnl( 1 ), pti ) )
+     if ( GetTitleBarInfo( (HWND) hb_parnl( 1 ), &pti ) )
 
-         hb_retclen( (char *) pti, sizeof(TITLEBARINFO) );
+         hb_retclen( (char *) &pti, sizeof(TITLEBARINFO) );
 }
 
 #endif

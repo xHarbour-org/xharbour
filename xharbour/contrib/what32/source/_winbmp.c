@@ -252,7 +252,7 @@ HB_FUNC( CREATEDIBITMAP )
 HB_FUNC( CREATEDIBSECTION )
 {
    BITMAPINFO *bmi  = (BITMAPINFO *) hb_param( 2, HB_IT_STRING)->item.asString.value ;
-   VOID **ppBits ;
+   VOID **ppBits = (VOID **) 0;
 
    hb_retnl( (LONG) CreateDIBSection( (HDC) hb_parnl( 1 )   ,
                                       bmi                  ,

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.4 2002/11/05 06:30:30 paultucker Exp $
+# $Id: makefile.vc,v 1.5 2002/11/06 05:11:01 paultucker Exp $
 #
 
 # File:     makefile.vc
@@ -14,10 +14,19 @@
 HBR_DIR =..\..
 WH_DIR  =.
 OBJ_DIR =obj\vc
+LIB_DIR  =lib\vc
 OUTDIR  =build
 SRCDIR  =source
-LIBDIR  =lib\vc
 
+
+!ifndef ECHO
+# don't indent definitions
+ECHO = echo.
+!endif
+!ifndef DEL
+# You might need to set 'ECHO=echo.' - but don't set 'DEL=del.' !!!
+DEL = del
+!endif
 
 MK_FILE  = makefile.vc
 MK_FLAGS = $(MAKEFLAGS: =)
@@ -28,7 +37,7 @@ hbcflags =-n -w -es2 -i$(WH_DIR)\include;$(HBR_DIR)\include
 
 #-- C COMPILER ----------
 CC       =cl
-CFLAGS   =-TP -W3 -Ox -GA -nologo -c -DHB_API_MACROS -DHB_STACK_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF -I$(WH_DIR)\include -I$(HBR_DIR)\include
+CFLAGS   =-TP -W3 -Ox -GA -nologo -c -DHB_API_MACROS -DHB_OS_WIN_32 -DHB_FM_STATISTICS_OFF -I$(WH_DIR)\include -I$(HBR_DIR)\include
 
 #-- RESOURCE COMPILER ---
 rc       =rc
@@ -39,7 +48,7 @@ rcflags  =-r
 .c.obj:
  $(CC) $(CFLAGS) -Fo$(OBJ_DIR)\ $<
 
-WHAT32LIB= $(LIBDIR)\what32.lib
+WHAT32LIB= $(LIB_DIR)\what32.lib
 
 LIBLIST  = $(WHAT32LIB)
 

@@ -79,10 +79,10 @@ HB_FUNC( HEADER_DELETEITEM  )
 
 HB_FUNC( HEADER_GETITEM )
 {
-   HDITEM *hdi ;
-   BOOL lRet = Header_GetItem( (HWND) hb_parnl(1), hb_parni(2), hdi ) ;
+   HDITEM hdi ;
+   BOOL lRet = Header_GetItem( (HWND) hb_parnl(1), hb_parni(2), &hdi ) ;
    if ( lRet )
-       hb_retclen( (char*) hdi, sizeof(HDITEM) ) ;
+       hb_retclen( (char*) &hdi, sizeof(HDITEM) ) ;
       //hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) hdi, sizeof( HDITEM ) );
 
 }

@@ -156,7 +156,6 @@ HB_FUNC( GETCLIPBOARDFORMATNAME )
 {
    int nRet ;
    char cName[128] ;
-   int cchMaxCount ;
 
    nRet = GetClipboardFormatName( (UINT) hb_parni(1), cName, 127 ) ;
 

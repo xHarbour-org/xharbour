@@ -55,7 +55,7 @@ HB_FUNC ( LISTVIEWNOTIFY )
    case LVN_GETDISPINFO:
       {
       LV_DISPINFO *lpdi = (LV_DISPINFO *)lParam;
-      TCHAR szString[MAX_PATH];
+      // TCHAR szString[MAX_PATH];
       if(lpdi->item.iSubItem)
          {
          if(lpdi->item.mask & LVIF_TEXT)

@@ -324,7 +324,7 @@ HB_FUNC( GETMENUITEMINFO )
    hb_retl( GetMenuItemInfo( (HMENU) hb_parnl( 1 ),
                              (UINT) hb_parni( 2 ) ,
                              hb_parl( 3 )         ,
-                             lpcmenuitemInfoa      
+                             ( struct tagMENUITEMINFOA * ) lpcmenuitemInfoa
                            ) ) ;
 }
 

@@ -50,12 +50,12 @@ HB_FUNC( DRAGQUERYFILE )
 
 HB_FUNC( DRAGQUERYPOINT )
 {
-   LPPOINT lpPoInt ;
+   POINT lpPoInt ;
    BOOL lRet ;  
-   lRet = DragQueryPoint( (HDROP) hb_parnl( 1 ), lpPoInt )  ;
+   lRet = DragQueryPoint( (HDROP) hb_parnl( 1 ),(LPPOINT) &lpPoInt )  ;
    if (ISBYREF( 2 ) ){
-      hb_stornl(2,lpPoInt->x,1);
-      hb_stornl(2,lpPoInt->y,2);
+      hb_stornl(2,lpPoInt.x,1);
+      hb_stornl(2,lpPoInt.y,2);
    }  
    hb_retl( lRet ) ;
 

@@ -8,6 +8,8 @@
 
 #define _WIN32_WINNT   0x0400
 
+#define _WINSOCKAPI_  // Prevents inclusion of Winsock.h in Windows.h
+
 #include <shlobj.h>
 #include <windows.h>
 #include <commctrl.h>
@@ -242,13 +244,13 @@ HB_FUNC( RECVFROM )
    int  iAddrLen = (ISNIL(6) ? (ISNIL(5) ? 0 : hb_parclen(5) ) : hb_parni(6));
    int  iRet;
 
-   hb_retni(( int ) recvfrom( (SOCKET) hb_parnl( 1 )  ,
+   iRet = ( int ) recvfrom( (SOCKET) hb_parnl( 1 )  ,
                               buf         ,
                               iBuffLen,
                               hb_parni( 4 ),
                               ( struct sockaddr *)from  ,
                               &iAddrLen
-                             ) ) ;
+                              ) ;
 
    if ( iRet && ISBYREF( 2 ) )
       hb_storclen( buf, iRet, 2 );
@@ -346,7 +348,7 @@ HB_FUNC( SENDTO )
 
 HB_FUNC( SETSOCKOPT )
 {
-   SOCKET s       ;
+//   SOCKET s       ;
    INT    optval  = hb_parni(5) ;
 
    hb_retni( (int ) setsockopt( (SOCKET) hb_parnl( 1 ) ,
@@ -461,12 +463,12 @@ HB_FUNC( GETPROTOBYNAME )
 
 HB_FUNC( WSASTARTUP )
 {
-   WSADATA *WSAData  ;
+   WSADATA WSAData  ;
 
-   hb_retni( (int ) WSAStartup( hb_parni( 1 ), WSAData ) ) ;
+   hb_retni( (int ) WSAStartup( hb_parni( 1 ), &WSAData ) ) ;
 
    if ( ISBYREF( 2 ) )
-     hb_storclen( ( char * ) WSAData, sizeof( WSADATA ), 2 );
+     hb_storclen( ( char * ) &WSAData, sizeof( WSADATA ), 2 );
 }
 
 
@@ -795,7 +797,7 @@ int _stdcall _WSACondFunc( LPWSABUF lpCallerId,  LPWSABUF lpCallerData, LPQOS lp
 
 HB_FUNC( WSAACCEPT )
 {
-   SOCKET          s              ;
+//   SOCKET          s              ;
    struct sockaddr addr           ;
    INT           addrlen  = ISBYREF( 2 ) ? 0 : sizeof(addr)  ;
    SOCKET sRet ;

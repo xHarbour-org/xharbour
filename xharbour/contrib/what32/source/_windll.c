@@ -252,7 +252,6 @@ HB_FUNC ( CALLDLL )
     int iArgCnt = iParams - 3;
     int iReturn = ISNIL( 4 ) ? 0 : hb_parni( 4 );
     int Flags;
-    float  FltParms[15];
     double DblParms[15];
     DYNAPARM   Parm[15];
     HINSTANCE  hInst = (HINSTANCE) hb_parnl( 1 );

@@ -252,12 +252,12 @@ HB_FUNC ( FTPCOMMAND )
    DWORD     dwFlags         = ISNIL( 3 ) ? FTP_TRANSFER_TYPE_BINARY : hb_parnl( 3 ) ;
    LPCTSTR   lpszCommand     = hb_parc( 4 ) ;
    DWORD_PTR dwContext       = ISNIL( 5 ) ? NULL : hb_parnl( 5 ) ;
-   HINTERNET *phFtpCommand ;
+   HINTERNET phFtpCommand ;
    
    BOOL      bRet ;
    
    bRet = FtpCommand( hInternet, fExpectResponse, dwFlags, lpszCommand,
-                      dwContext, phFtpCommand ) ;
+                      dwContext, &phFtpCommand ) ;
                       
    hb_retl( bRet ) ;
 

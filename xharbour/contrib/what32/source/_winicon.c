@@ -202,14 +202,14 @@ HB_FUNC( COPYICON )
 
 HB_FUNC( GETICONINFO )
 {
-   ICONINFO *ii;
+   ICONINFO ii;
 
-   hb_retl( GetIconInfo( (HICON) hb_parnl( 1 ), ii ) ) ;
+   hb_retl( GetIconInfo( (HICON) hb_parnl( 1 ), &ii ) ) ;
 
    // verify !!
    // assign into structure
 
-   hb_storclen( (char *) ii, sizeof( ICONINFO ), 2 );
+   hb_storclen( (char *) &ii, sizeof( ICONINFO ), 2 );
 
 }
 
@@ -230,17 +230,18 @@ HB_FUNC( DUPLICATEICON )
 
 HB_FUNC( EXTRACTASSOCIATEDICON )
 {
-   LPWORD lpiIcon  ;
+   WORD lpiIcon  ;
    HICON  hiRet ;
-   *lpiIcon = (WORD) hb_parni( 2 );
+
+   lpiIcon = (WORD) hb_parni( 2 );
 
    hiRet = ExtractAssociatedIcon( ( ISNIL( 1 ) ? GetModuleHandle(NULL) : (HINSTANCE) hb_parnl( 1 ) ) ,
                                              (LPSTR) hb_parc( 2 )     ,
-                                             lpiIcon
+                                             &lpiIcon
                                 ) ;
 
    if ( hiRet )
-      hb_storni( *lpiIcon, 2 );
+      hb_storni( lpiIcon, 2 );
 
    hb_retnl( (LONG) hiRet );
 

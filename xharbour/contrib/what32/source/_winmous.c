@@ -259,11 +259,11 @@ HB_FUNC( SETSYSTEMCURSOR )
 #if (WINVER >= 0x0500)
 HB_FUNC( GETCURSORINFO )
 {
-   PCURSORINFO pci ;
+   CURSORINFO pci ;
 
-   if ( GetCursorInfo( pci ) )
+   if ( GetCursorInfo( &pci ) )
 
-      hb_retclen( (char *) pci, sizeof( CURSORINFO ) ) ;
+      hb_retclen( (char *) &pci, sizeof( CURSORINFO ) ) ;
 
 }
 
