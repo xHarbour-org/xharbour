@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.9 2002/05/08 20:07:07 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.10 2002/05/09 05:45:49 ronpinkas Exp $
  */
 
 /*
@@ -234,7 +234,7 @@ STATIC FUNCTION LogError( oerr )
      LOCAL nBytes
      LOCAL nMemCount
 
-     Alert( 'An error occured, Information will be ;written to error.log' )
+     //Alert( 'An error occured, Information will be ;written to error.log' )
 
      nHandle := Fcreate( cLogFile, FC_NORMAL )
 

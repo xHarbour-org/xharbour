@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.12 2002/04/26 23:27:10 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.13 2002/05/04 02:05:29 ronpinkas Exp $
  */
 
 /*
@@ -227,11 +227,10 @@ char * hb_pp_szWarnings[] =
    "1No directives in command definitions file"
 };
 
-//#define HB_ECHO_TRACE_HB_TR_DEBUG(x)    HB_ECHO_CREATE(HB_TR_DEBUG, x)
-//#define HB_ECHO_STEALTH_HB_TR_DEBUG(x)  HB_ECHO_STEALTH(HB_TR_DEBUG, x)
-
 void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
 {
+   static COMMANDS sC___IIF = { 0, "IF", "(\1A00,\1B00,\1C00 )", "IIF(\1A00,\1B00,\1C00 )", NULL };
+
    HB_TRACE(HB_TR_DEBUG, ("hb_pp_SetRules()"));
 
    if( hb_pp_STD_CH )
@@ -324,7 +323,9 @@ void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
       else
       {
          if( ! hb_comp_bQuiet )
+         {
             printf( "Standard command definitions excluded.\n" );
+         }
 
          hb_pp_Init();
       }
@@ -334,6 +335,9 @@ void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
       hb_pp_Table();
       hb_pp_Init();
    }
+
+   sC___IIF.last = hb_pp_topCommand;
+   hb_pp_topCommand = &sC___IIF;
 }
 
 void hb_pp_Free( void )
