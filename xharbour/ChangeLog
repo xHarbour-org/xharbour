@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1454 2003/09/12 02:26:58 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1455 2003/09/12 15:28:37 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-11 18:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * contrib/hbzlib
+    * zip.c
+    * Makefile
+    * zipcomp.cpp
+    * ziparchive.cpp
+    * zipmemfile.cpp
+    * zipnew.cpp
+    * makefile.vc
+    * makefile.bc
+    * make_b32.bat
+    * make_vc.bat
+    ! changes all around for msvc support and to correct certain error
+    ! conditions
+
+   *   *   * output file is now hbzip.lib
+
+  - contrib/hbzlib/zlib
+    * the essential contents of this directory are now in source/rtl/hbcompress.c
+    * the licence file will be updated.
+  + contrib/hbzlib/include
+    ! *.h has been moved into this directory
+  * makallvc.bat
+    + hbzlib
+  + tests\testzip.prg
+    * cheesy Zip archive tester.
+    * this is stil WIP.
+  * bin/bld.bat
+    + add samples.lib
 
 2003-09-12 08:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/source/vm/proc.c

@@ -1,7 +1,7 @@
 @echo off
 
 rem 
-rem $Id: makallvc.bat,v 1.2 2003/05/27 06:08:25 paultucker Exp $
+rem $Id: makallvc.bat,v 1.3 2003/05/28 03:06:29 paultucker Exp $
 rem 
 
 call make_vc %1
@@ -11,6 +11,13 @@ call dll_vc %1
 if errorlevel 1 goto end
 
 :start
+echo ZipArchive
+cd contrib\hbzlib
+call make_vc.bat %1
+cd ..\..
+if errorlevel 1 goto end
+
+:htmllib
 echo htmllib
 cd contrib\htmllib
 call make_vc.bat %1

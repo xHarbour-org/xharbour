@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.68 2003/09/09 02:07:54 paultucker Exp $
+# $Id: makefile.bc,v 1.2 2003/09/12 20:12:33 paultucker Exp $
 #
 
 #
@@ -44,9 +44,9 @@ BOptsAt_ziparddll = $(BLocalOptsAtC32_ziparddll)
 # Dependency List
 #
 Dep_zipar = \
-   ziparchive.lib
+   hbzip.lib
 
-ziparchive : BccW32.cfg $(Dep_zipar)
+hbzip : BccW32.cfg $(Dep_zipar)
   echo MakeNode
 
 Dep_ziparddll = \
@@ -70,7 +70,7 @@ Dep_ziparddll = \
 	zipstorage.obj \
 	ZipString.obj
 
-ziparchive.lib : $(Dep_ziparddll)
+hbzip.lib : $(Dep_ziparddll)
   $(TLIB) $< $(IDE_BFLAGS) /P64  $(BOptsAt_ziparddll) @&&|
 -+stdafx.obj &
 -+zip.obj &

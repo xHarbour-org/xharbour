@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.68 2003/09/09 02:07:54 paultucker Exp $
+# $Id: makefile.vc,v 1.2 2003/09/12 20:12:33 paultucker Exp $
 #
 
 !IF "$(OS)" == "Windows_NT"
@@ -11,7 +11,7 @@ NULL=nul
 OUTDIR=lib\vc
 INTDIR=obj\vc
 
-ALL : "$(OUTDIR)\ziparchive.lib"
+ALL : "$(OUTDIR)\hbzip.lib"
 
 CLEAN :
 	-@erase "$(INTDIR)\stdafx.obj"
@@ -34,7 +34,7 @@ CLEAN :
 	-@erase "$(INTDIR)\zipstorage.obj"
 	-@erase "$(INTDIR)\ZipString.obj"
 	-@erase "$(INTDIR)\vc60.idb"
-	-@erase "$(OUTDIR)\ziparchive.lib"
+	-@erase "$(OUTDIR)\hbzip.lib"
 
 "$(OUTDIR)" :
     @if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -43,11 +43,9 @@ CLEAN :
     @if not exist "$(INTDIR)/$(NULL)" mkdir "$(INTDIR)"
 
 CPP=cl.exe
-#CPP_PROJ=/nologo /TP /GB /ML /W3 /GX -Ogtyb2 /I "..\..\include" /Iinclude\
-
-CPP_PROJ=/nologo /TP /GB /MLd /W3 /GX -Od /Zi /I "..\..\include" /Iinclude\
+CPP_PROJ=/nologo /TP /GB /ML /W3 /GX -Ogtyb2 /I "..\..\include" /Iinclude\
          /DWIN32 /DNDEBUG /D_MBCS /D_LIB\
-         /Fp"$(INTDIR)\ziparchive.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\"\
+         /Fp"$(INTDIR)\hbzip.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\"\
          /FD /c
 
 .c{$(INTDIR)}.obj::
@@ -81,7 +79,7 @@ CPP_PROJ=/nologo /TP /GB /MLd /W3 /GX -Od /Zi /I "..\..\include" /Iinclude\
 <<
 
 LIB32=link.exe -lib
-LIB32_FLAGS=/nologo /out:"$(OUTDIR)\ziparchive.lib"
+LIB32_FLAGS=/nologo /out:"$(OUTDIR)\hbzip.lib"
 LIB32_OBJS= \
 	"$(INTDIR)\stdafx.obj" \
 	"$(INTDIR)\zip.obj" \
@@ -103,7 +101,7 @@ LIB32_OBJS= \
 	"$(INTDIR)\zipstorage.obj" \
 	"$(INTDIR)\ZipString.obj"
 
-"$(OUTDIR)\ziparchive.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
+"$(OUTDIR)\hbzip.lib" : "$(OUTDIR)" $(DEF_FILE) $(LIB32_OBJS)
     $(LIB32) @<<
   $(LIB32_FLAGS) $(DEF_FLAGS) $(LIB32_OBJS)
 <<
