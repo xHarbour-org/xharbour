@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.16 2005/03/04 17:18:33 druzus Exp $
+ * $Id: hbinit.h,v 1.17 2005/03/06 19:24:46 paultucker Exp $
  */
 
 /*
@@ -64,16 +64,19 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static HB_SYMB symbols[] = {
 
-   #define HB_INIT_SYMBOLS_END( func ) }; \
+   #define HB_INIT_SYMBOLS_END( func ) \
+      }; \
       void func( void ) \
       { \
          hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER ); \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
-      func( void ) {
+      func( void ) \
+      {
 
-   #define HB_CALL_ON_STARTUP_END( func ) }
+   #define HB_CALL_ON_STARTUP_END( func ) \
+      }
 
 #elif defined(__GNUC__)
 
@@ -84,16 +87,56 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static HB_SYMB symbols[] = {
 
-   #define HB_INIT_SYMBOLS_END( func )  }; \
+   #define HB_INIT_SYMBOLS_END( func ) \
+      }; \
       static void __attribute__ ((constructor)) func( void ) \
       { \
          hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER ); \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
-      static void __attribute__ ((constructor)) func( void ) {
+      static void __attribute__ ((constructor)) func( void ) \
+      {
 
-   #define HB_CALL_ON_STARTUP_END( func ) }
+   #define HB_CALL_ON_STARTUP_END( func ) \
+      }
+
+#elif defined(HB_MSC_STARTUP) || ( defined( _MSC_VER ) && !defined( HB_STATIC_STARTUP ) )
+
+   /* In order to maintain compatibility with other products, MSVC should
+      always use this startup.  If you know that you can use HB_STATIC_STARTUP
+      below, then all you need to do is define HB_STATIC STARTUP to the
+      compiler.
+   */
+
+   #if !defined(HB_MSC_STARTUP)
+      #define HB_MSC_STARTUP
+   #endif
+
+   typedef int (* HB_$INITSYM)( void );
+
+   #define HB_INIT_SYMBOLS_BEGIN( func ) \
+      static HB_SYMB symbols[] = {
+
+   #define HB_INIT_SYMBOLS_END( func ) \
+      }; \
+      static int func( void ) \
+      { \
+         hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER ); \
+         return 0; \
+      }
+
+   #define HB_CALL_ON_STARTUP_BEGIN( func ) \
+      static int func( void ) \
+      {
+
+   #define HB_CALL_ON_STARTUP_END( func ) \
+         return 0; \
+      }
+
+   /*  After each '_END' symbol, additional 'hooks' are required See the C
+       output of a generated prg for example
+   */
 
 #elif defined(HB_STATIC_STARTUP) || defined(__cplusplus)
 
@@ -104,7 +147,8 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static HB_SYMB symbols[] = {
 
-   #define HB_INIT_SYMBOLS_END( func ) }; \
+   #define HB_INIT_SYMBOLS_END( func ) \
+      }; \
       static int func( void ) \
       { \
          hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER ); \
@@ -113,7 +157,8 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
       static int hb_vm_auto_##func = func();
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
-      static int func( void ) {
+      static int func( void ) \
+      {
 
    /* this allows any macros to be preprocessed first
       so that token pasting is handled correctly */
@@ -121,7 +166,8 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
           _HB_CALL_ON_STARTUP_END( func )
 
    #define _HB_CALL_ON_STARTUP_END( func ) \
-      return 0; } \
+         return 0; \
+      } \
       static int static_int_##func = func();
 
 #elif defined(HB_PRAGMA_STARTUP) || \
@@ -138,49 +184,19 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static HB_SYMB symbols[] = {
 
-   #define HB_INIT_SYMBOLS_END( func )  }; \
+   #define HB_INIT_SYMBOLS_END( func ) \
+      }; \
       static void func( void ) \
       { \
          hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER ); \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
-      static void func( void ) {
-
-   #define HB_CALL_ON_STARTUP_END( func ) }
-
-#elif defined(HB_MSC_STARTUP) || defined(_MSC_VER)
-
-   /* This section is used for MSC in C mode. C++ mode will
-      use HB_STATIC_STARTUP above.
-   */
-
-   #if !defined(HB_MSC_STARTUP)
-      #define HB_MSC_STARTUP
-   #endif
-
-   typedef int (* HB_$INITSYM)( void );
-
-   #define HB_INIT_SYMBOLS_BEGIN( func ) \
-      static HB_SYMB symbols[] = {
-
-   #define HB_INIT_SYMBOLS_END( func ) }; \
-      static int func( void ) \
-      { \
-         hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER ); \
-         return 0; \
-      }
-
-   #define HB_CALL_ON_STARTUP_BEGIN( func ) \
-      static int func( void ) {
+      static void func( void ) \
+      {
 
    #define HB_CALL_ON_STARTUP_END( func ) \
-         return 0; \
       }
-
-   /*  After each '_END' simbol, additional 'hooks' are required See the C
-       output of a generated prg for example
-   */
 
 #else
    #error Unknown initialization method.

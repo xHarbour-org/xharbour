@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.125 2005/03/09 13:11:11 paultucker Exp $
+# $Id: makefile.nt,v 1.126 2005/03/10 03:54:56 paultucker Exp $
 #
 
 #
@@ -140,7 +140,7 @@ HBPDF_DIR    =contrib\pdflib
 #
  
 AS           =ML
-C_FLAGSNMT   =-Ogt2yb1p -FD -GA -GB -Gs -TP -W3 -nologo -I$(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DHB_STATIC_STARTUP -DSIMPLEX $(C_USR) $(CFLAGS)
+C_FLAGSNMT   =-Ogt2yb1p -FD -GA -GB -Gs -TP -W3 -nologo -I$(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
 C_FLAGS      =$(HB_MT) $(C_FLAGSNMT)
 CLIBFLAGSNMT =-c $(C_FLAGSNMT) $(CLIBFLAGS)
 CLIBFLAGS    =-c $(C_FLAGS) $(CLIBFLAGS)
