@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.6 2003/06/15 13:11:56 druzus Exp $
+# $Id: make_rpm.sh,v 1.7 2003/09/11 14:57:48 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -15,8 +15,13 @@ test_reqrpm()
     rpm -q "$1" &> /dev/null
 }
 
+BUGGY_RPM=""
+if [ -f /etc/conectiva-release ]; then
+    BUGGY_RPM="yes"
+fi
+
 TOINST_LST=""
-for i in gcc binutils bash bison ncurses ncurses-devel slang-devel gpm-devel 
+for i in gcc binutils bash bison ncurses ncurses-devel gpm-devel 
 do
     test_reqrpm "$i" || TOINST_LST="${TOINST_LST} $i"
 done
@@ -42,11 +47,11 @@ then
 		     ${RPMDIR}/BUILD ${RPMDIR}/SPECS
 	    echo "%_topdir ${RPMDIR}" > ${HOME}/.rpmmacros
 	fi
-	if [ -f /etc/conectiva-release ]; then
-	   cp ${hb_filename}  /usr/src/rpm/SOURCES
-	   rpm -ba xharbour.spec
-	
-	elif which rpmbuild &>/dev/null
+	if [ "${BUGGY_RPM}" = "yes" ]
+	then
+	    export GZIP="-c"
+	fi
+	if which rpmbuild &>/dev/null
 	then
 	    rpmbuild -ta ${hb_filename} --rmsource
 	else

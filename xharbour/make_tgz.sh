@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.14 2003/09/10 21:35:45 druzus Exp $
+# $Id: make_tgz.sh,v 1.15 2003/09/11 09:34:26 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -12,8 +12,12 @@
 
 # please add your distro suffix if it not belong to the one recognized below
 # and remember that order checking can be important
-hb_platform=`rel=$(rpm -q --queryformat='.%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$rel"|tr -d "."`
+hb_platform=""
+
+[ "${hb_platform}" = "" ] && hb_platform=`rel=$(rpm -q --queryformat='.%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$rel"|tr -d "."`
 [ "${hb_platform}" = "" ] && hb_platform=`rel=$(rpm -q --queryformat='.%{VERSION}' redhat-release 2>/dev/null) && echo "rh$rel"|tr -d "."`
+[ "${hb_platform}" = "" ] && hb_platform=`rel=$(rpm -q --queryformat='.%{VERSION}' conectiva-release 2>/dev/null) && echo "rh$rel"|tr -d "."`
+[ "${hb_platform}" = "" ] && hb_platform=`[ -f /etc/pld-release ] && cat /etc/pld-release|sed -e '/1/ !d' -e 's/[^0-9]//g' -e 's/^/pld/`
 
 [ "${hb_platform}" = "" ] || hb_platform="-${hb_platform}"
 

@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.30 2003/09/11 09:34:26 druzus Exp $
+# $Id: xharbour.spec,v 1.31 2003/09/11 14:57:48 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -19,10 +19,13 @@
 
 %define platform %(release=$(rpm -q --queryformat='.%{VERSION}' mandrake-release 2>/dev/null) && echo "mdk$release"|tr -d ".")
 %if "%{platform}" == ""
-  %define platform %(release=$(rpm -q --queryformat='.%{VERSION}' redhat-release 2>/dev/null) && echo "rh$release"|tr -d ".")
-  %if "%{platform}" == ""  
-  %define platform %(release=$(rpm -q --queryformat='.%{VERSION}' conectiva-release 2>/dev/null) && echo "cl$release"|tr -d ".")
-  %endif
+%define platform %(release=$(rpm -q --queryformat='.%{VERSION}' redhat-release 2>/dev/null) && echo "rh$release"|tr -d ".")
+%if "%{platform}" == ""  
+%define platform %(release=$(rpm -q --queryformat='.%{VERSION}' conectiva-release 2>/dev/null) && echo "cl$release"|tr -d ".")
+%if "%{platform}" == ""  
+%define platform %([ -f /etc/pld-release ] && cat /etc/pld-release|sed -e '/1/ !d' -e 's/[^0-9]//g' -e 's/^/pld/)
+%endif
+%endif
 %endif
 
 %define name     xharbour

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: xhbgtmk.sh,v 1.4 2003/06/15 13:11:56 druzus Exp $
+# $Id: xhbgtmk.sh,v 1.5 2003/06/15 13:36:36 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -23,7 +23,7 @@ test_reqrpm()
 }
 
 TOINST_LST=""
-for i in cvs gcc binutils bash bison ncurses ncurses-devel slang-devel gpm-devel
+for i in cvs gcc binutils bash bison ncurses ncurses-devel gpm-devel
 do
     test_reqrpm "$i" || TOINST_LST="${TOINST_LST} $i"
 done

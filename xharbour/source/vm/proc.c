@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.13 2003/08/24 23:55:20 ronpinkas Exp $
+ * $Id: proc.c,v 1.14 2003/09/10 06:07:33 ronpinkas Exp $
  */
 
 /*
@@ -185,7 +185,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
          }
          else
          {
-            strcat( szName, ( *pBase )->item.asSymbol.value->szName );
+            strncpy( szName, ( *pBase )->item.asSymbol.value->szName, HB_SYMBOL_NAME_LEN + 1 );
          }
       }
 
