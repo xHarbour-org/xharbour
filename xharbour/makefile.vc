@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.117 2004/09/30 14:15:50 mlombardo Exp $
+# $Id: makefile.vc,v 1.118 2004/10/01 20:55:10 paultucker Exp $
 #
 
 #
@@ -1145,6 +1145,7 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dattime3.obj \
    $(OBJ_DIR)$(MT)\diskutil.obj \
    $(OBJ_DIR)$(MT)\fcopy.obj \
+   $(OBJ_DIR)$(MT)\getsecrt.obj \
    $(OBJ_DIR)$(MT)\invrtwin.obj \
    $(OBJ_DIR)$(MT)\numconv.obj \
    $(OBJ_DIR)$(MT)\screen2.obj \

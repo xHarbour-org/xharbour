@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.111 2004/09/19 03:58:59 kaddath Exp $
+# $Id: makefile.bc,v 1.112 2004/09/30 14:15:49 mlombardo Exp $
 #
 
 #
@@ -949,6 +949,7 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\dattime3.obj \
    $(CT_OBJ_DIR)\diskutil.obj \
    $(CT_OBJ_DIR)\fcopy.obj \
+   $(CT_OBJ_DIR)\getsecrt.obj \
    $(CT_OBJ_DIR)\invrtwin.obj \
    $(CT_OBJ_DIR)\numconv.obj \
    $(CT_OBJ_DIR)\screen2.obj \
@@ -3372,6 +3373,12 @@ $(CT_OBJ_DIR)\fcopy.c : $(CT_DIR)\fcopy.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(CT_OBJ_DIR)\fcopy.obj : $(CT_OBJ_DIR)\fcopy.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(CT_OBJ_DIR)\getsecrt.c : $(CT_DIR)\getsecrt.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(CT_OBJ_DIR)\getsecrt.obj : $(CT_OBJ_DIR)\getsecrt.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(CT_OBJ_DIR)\invrtwin.c : $(CT_DIR)\invrtwin.prg
