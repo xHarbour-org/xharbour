@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.131 2004/09/30 02:09:27 guerra000 Exp $
+ * $Id: dbcmd.c,v 1.132 2004/10/01 01:56:57 druzus Exp $
  */
 
 /*
@@ -2433,7 +2433,7 @@ HB_FUNC( DBUSEAREA )
    if( szAlias[ 0 ] >= '0' && szAlias[ 0 ] <= '9' )
    {
       hb_xfree( pFileName );
-      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBUSEAREA" );
+      hb_errRT_DBCMD( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias );
       return;
    }
 
@@ -2443,7 +2443,7 @@ HB_FUNC( DBUSEAREA )
       if( toupper( szAlias[ 0 ] ) < 'N' && toupper( szAlias[ 0 ] ) != 'L' )
       {
          hb_xfree( pFileName );
-         hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBUSEAREA" );
+         hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
          return;
       }
    }
@@ -2452,7 +2452,7 @@ HB_FUNC( DBUSEAREA )
    if( hb_rddSelect( szAlias ) )
    {
       hb_xfree( pFileName );
-      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBUSEAREA" );
+      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
       return;
    }
 
@@ -4753,17 +4753,26 @@ HB_FUNC( DBUSEAREAD )
    uiLen = strlen( szAlias );
    if( szAlias[ 0 ] >= '0' && szAlias[ 0 ] <= '9' )
    {
-      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBUSEAREA" );
+      hb_errRT_DBCMD( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias );
       return;
    }
+
    if( uiLen == 1 )
    {
       /* Alias with a single letter. Only are valid 'L' and > 'M' */
       if( toupper( szAlias[ 0 ] ) < 'N' && toupper( szAlias[ 0 ] ) != 'L' )
       {
-         hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBUSEAREA" );
+         hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
          return;
       }
+   }
+
+   // Verify if the alias is already in use
+   if( hb_rddSelect( szAlias ) )
+   {
+      hb_xfree( pFileName );
+      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
+      return;
    }
 
    /* Create a new WorkArea node */

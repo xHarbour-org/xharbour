@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.18 2004/08/24 20:45:25 peterrees Exp $
+ * $Id: hbapirdd.h,v 1.19 2004/09/13 13:16:39 druzus Exp $
  */
 
 /*
@@ -95,6 +95,7 @@ extern void    HB_EXPORT hb_rddReleaseCurrentArea( void );
 #define EDBCMD_USE_BADPARAMETER           1005
 #define EDBCMD_REL_BADPARAMETER           1006
 #define EDBCMD_FIELDNAME_BADPARAMETER     1009
+#define EDBCMD_BADALIAS                   1010
 #define EDBCMD_DUPALIAS                   1011
 #define EDBCMD_DBCMDBADPARAMETER          1014
 #define EDBCMD_BADPARAMETER               1015

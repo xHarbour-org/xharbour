@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3574 2004/11/02 14:39:54 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3575 2004/11/02 19:21:51 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-02 14:33 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rdd/dbcmd.c
+    ! Fixed error description in DBUSEAREA to report the problematic
+      alias. Reported by Enrico Maria Giordano and solution suggested
+      by Ugo Garombo.
+    ! Fixed error report of a numeric-starting alias from "duplicated
+      alias" to "invalid characters in alias".
+  * include/hbapirdd.h
+    + Added definition of EDBCMD_BADALIAS to 1010.
 
 2004-11-02 13:16 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/achoice.prg
