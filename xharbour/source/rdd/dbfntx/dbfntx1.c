@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.60 2003/09/03 00:34:01 ronpinkas Exp $
+ * $Id: dbfntx1.c,v 1.61 2003/09/08 12:56:53 druzus Exp $
  */
 
 /*
@@ -3057,10 +3057,22 @@ static ERRCODE ntxGoBottom( NTXAREAP pArea )
 
      pTag = pArea->lpCurTag;
      if( pTag->bottomScope )
+     {
         ntxSeek( pArea, 1, pTag->bottomScope, 1 );
+        if (! pArea->fEof )
+        {
+           SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
+        }
+     }
      else
+     {
         hb_ntxTagKeyGoTo( pTag, BTTM_RECORD, NULL );
-     SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
+        SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
+     }
+   }
+   {
+      ERRCODE errCode = SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
+      return errCode;
    }
    return SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
 }
@@ -3109,7 +3121,7 @@ static ERRCODE ntxGoTop( NTXAREAP pArea )
 
 static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLast )
 {
-   ERRCODE  retvalue;
+   ERRCODE  retvalue = 0xFFFF;
    BOOL     result;
    HB_TRACE(HB_TR_DEBUG, ("ntxSeek(%p, %d, %p, %d)", pArea, bSoftSeek, pKey, bFindLast));
 
@@ -3184,7 +3196,6 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
         pArea->fEof = pArea->fBof = FALSE;
         hb_IncString( pKey2->key,keylen );
         lRecnoLast = hb_ntxTagKeyFind( pTag, pKey2, keylen, &result );
-        hb_ntxKeyFree( pKey2 );
         if( lRecnoLast > 0 )
         {
            BOOL lContinue = FALSE;
@@ -3195,16 +3206,13 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
               hb_ntxTagKeyGoTo( pTag, PREV_RECORD, &lContinue );
            while( hb_ntxIsRecBad( pArea, pTag->CurKeyInfo->Xtra ) );
            retvalue = SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
-           pArea->fFound = TRUE;
-           return retvalue;
         }
         else
         {
            hb_ntxTagKeyGoTo( pTag, BTTM_RECORD, NULL );
            retvalue = SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
-           pArea->fFound = TRUE;
-           return retvalue;
         }
+        pArea->fFound = TRUE;
      }
      if( pArea->fShared && !pTag->Memory )
      {
@@ -3212,23 +3220,32 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
         hb_fsLock( pArea->lpCurTag->Owner->DiskFile, NTX_LOCK_OFFSET, 1, FL_UNLOCK );
         pArea->lpCurTag->Owner->Locked = FALSE;
      }
-     pArea->fEof = pTag->TagEOF;
-     pArea->fBof = pTag->TagBOF;
+     if( retvalue == 0xFFFF )
+     {
+        pArea->fEof = pTag->TagEOF;
+        pArea->fBof = pTag->TagBOF;
+        if ( lRecno > 0 && result )
+        {
+           retvalue = SELF_GOTO( ( AREAP ) pArea, lRecno );
+           pArea->fFound = TRUE;
+        }
+        else
+        {
+           pArea->fFound = FALSE;
+           if ( lRecno > 0 && !result && bSoftSeek && !pTag->TagEOF )
+           {
+              retvalue = SELF_GOTO( ( AREAP ) pArea, lRecno );
+           }
+        }
+     }
+     if( retvalue == 0xFFFF ||
+         !hb_ntxInTopScope( pTag, pTag->CurKeyInfo->key ) ||
+         !hb_ntxInBottomScope( pTag, pTag->CurKeyInfo->key ) )
+     {
+        retvalue = hb_ntxGoEof( pArea );
+     }
      hb_ntxKeyFree( pKey2 );
-     if ( lRecno > 0 && result )
-     {
-        retvalue = SELF_GOTO( ( AREAP ) pArea, lRecno );
-        pArea->fFound = TRUE;
-        return retvalue;
-     }
-     else
-     {
-       pArea->fFound = FALSE;
-       if ( lRecno > 0 && !result && bSoftSeek && !pTag->TagEOF )
-         return SELF_GOTO( ( AREAP ) pArea, lRecno );
-       else
-          return hb_ntxGoEof( pArea );
-     }
+     return retvalue;
    }
 }
 
@@ -3290,19 +3307,24 @@ static ERRCODE ntxSkipRaw( NTXAREAP pArea, LONG lToSkip )
        while ( !pTag->TagBOF && lToSkip++ < 0 )
        {
          hb_ntxTagKeyGoTo( pTag, PREV_RECORD, &lContinue );
-         if( !hb_ntxInTopScope( pTag, pTag->CurKeyInfo->key ) )
+         if ( !pTag->TagBOF )
          {
-            ntxSeek( pArea, 1, pTag->topScope, 0 );
-            pTag->TagBOF = TRUE;
-         }
-         else if( !hb_ntxInBottomScope( pTag, pTag->CurKeyInfo->key ) )
-         {
-            ntxSeek( pArea, 1, pTag->bottomScope, 1 );
+            if( !hb_ntxInTopScope( pTag, pTag->CurKeyInfo->key ) )
+            {
+               ntxSeek( pArea, 1, pTag->topScope, 0 );
+               pTag->TagBOF = TRUE;
+            }
+            else if( !hb_ntxInBottomScope( pTag, pTag->CurKeyInfo->key ) )
+            {
+               ntxSeek( pArea, 1, pTag->bottomScope, 1 );
+            }
          }
        }
        pArea->ulRecNo = ulRecNo;
        if ( !pTag->TagBOF )
+       {
          SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
+       }
        else
        {
          pTag->TagBOF = FALSE;

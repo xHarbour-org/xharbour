@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.64 2003/09/08 12:56:53 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.65 2003/09/08 19:18:45 druzus Exp $
  */
 
 /*
@@ -5979,7 +5979,9 @@ ERRCODE hb_cdxGoBottom( CDXAREAP pArea )
       {
          hb_cdxSeek( pArea, 1, pTag->bottomScope, 1 );
          if (! pArea->fEof )
+         {
             SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Tag );
+         }
       }
       else
       {
@@ -6234,34 +6236,33 @@ ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFindLas
       else
       {
          hb_cdxKeyFree( pKey2 );
+         if ( pTag->uiType == 'C' && pKey->item.asString.length == 0 )
+         {
+            retvalue = SELF_GOTOP( (AREAP) pArea);
+            pArea->fFound = TRUE;
+         }
+         else
+         {
+            pArea->fFound = FALSE;
 
-			if ( pTag->uiType == 'C' && pKey->item.asString.length == 0 )
-			{
-				retvalue = SELF_GOTOP( (AREAP) pArea);
-				pArea->fFound = TRUE;
-			}
-			else
-			{
-        		pArea->fFound = FALSE;
-
-	          if( bSoftSeek && !pTag->TagEOF )
-	          {
-      	      retvalue = SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Tag );
-	            if( retvalue != FAILURE )
-	               if ( hb_set.HB_SET_DELETED || pArea->dbfi.itmCobExpr != NULL )
-	               {
-	                  if( bFindLast )
-	                     retvalue = SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
-	                  else
-	                     retvalue = SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
-	               }
-	          }
-             else
-        		 {
-           		retvalue = hb_cdxGoEof( pArea );
-	          }
-   	   }
-		}
+            if( bSoftSeek && !pTag->TagEOF )
+            {
+               retvalue = SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Tag );
+               if( retvalue != FAILURE )
+                  if ( hb_set.HB_SET_DELETED || pArea->dbfi.itmCobExpr != NULL )
+                  {
+                     if( bFindLast )
+                        retvalue = SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
+                     else
+                        retvalue = SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
+                  }
+            }
+            else
+            {
+               retvalue = hb_cdxGoEof( pArea );
+            }
+         }
+      }
       if( !hb_cdxTopScope( pTag, pTag->CurKeyInfo ) ||
           !hb_cdxBottomScope( pTag, pTag->CurKeyInfo ) )
          hb_cdxGoEof( pArea );
@@ -6308,7 +6309,8 @@ ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip )
             while( !pTag->TagEOF && lToSkip-- > 0 )
             {
                hb_cdxTagKeyRead( pTag, NEXT_RECORD );
-               if ( !pTag->TagEOF ) {
+               if ( !pTag->TagEOF )
+               {
                   if( !hb_cdxTopScope( pTag, pTag->CurKeyInfo ) )
                      hb_cdxSeek( pArea, 1, pTag->topScope, 0 );
                   else if( !hb_cdxBottomScope( pTag, pTag->CurKeyInfo ) )
@@ -6335,19 +6337,24 @@ ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip )
          while( !pTag->TagBOF && lToSkip++ < 0 )
          {
             hb_cdxTagKeyRead( pTag, PREV_RECORD );
-            if ( !pTag->TagBOF ) {
+            if ( !pTag->TagBOF )
+            {
                if( !hb_cdxTopScope( pTag, pTag->CurKeyInfo ) )
                {
                   hb_cdxSeek( pArea, 1, pTag->topScope, 0 );
                   pTag->TagBOF = TRUE;
                }
                else if( !hb_cdxBottomScope( pTag, pTag->CurKeyInfo ) )
+               {
                   hb_cdxSeek( pArea, 1, pTag->bottomScope, 1 );
+               }
             }
          }
 
          if( !pTag->TagBOF )
+         {
             SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Tag );
+         }
          else
          {
             pTag->TagBOF = FALSE;

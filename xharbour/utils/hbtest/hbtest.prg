@@ -1,5 +1,5 @@
 /*
- * $Id: hbtest.prg,v 1.2 2003/07/06 15:14:07 lculik Exp $
+ * $Id: hbtest.prg,v 1.3 2003/07/13 22:21:26 andijahja Exp $
  */
 
 /*
@@ -97,6 +97,7 @@ STATIC s_nEndTime
 
 #ifdef __HARBOUR__
    REQUEST HB_LANG_EN
+   REQUEST DBFDBT
 #endif
 
 FUNCTION Main( cPar1, cPar2 )
