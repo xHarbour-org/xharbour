@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.75 2003/06/21 02:03:07 lculik Exp $
+ * $Id: hbmake.prg,v 1.76 2003/06/27 13:47:05 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1164,6 +1164,8 @@ FUNC CreateMakeFile( cFile )
    Local nO
    Local lNew := .F.
    LOCAL oMake
+   Local cAllRes := ""
+   Local cTemp
    
    IF  File( cFile )
       nO := Alert( "The makefile " + cFile +" Exist ",{ "Create new" , "Edit" } )
@@ -1177,6 +1179,11 @@ FUNC CreateMakeFile( cFile )
          oMake:cMakefile:=cFile
          oMake:ReadMakefile(cFile)
          frename(cFile,cfile+".old")
+         IF LEN(oMake:aRes) >0
+           FOR EACH cTemp in oMake:aRes
+             cAllRes += cTemp+ " "
+           NEXT
+         ENDIF
 
          lAutomemvar  := oMake:lAutomemvar
          lvarismemvar := oMake:lvarismemvar
@@ -1222,7 +1229,7 @@ FUNC CreateMakeFile( cFile )
    @ 2,1 Say s_aLangMessages[ 48 ]
    @ 2,16,6,26 get cRdd ListBox { "None","RddAds","Mediator","Apollo"}  WHEN Cos == "Win32" .or. Cos == "Linux" DROPDOWN message s_aLangMessages[ 52 ]
    @ 2,30 Get s_lCompress CheckBox  caption s_aLangMessages[ 53 ] style "[o ]" message s_aLangMessages[ 54 ]
-   @ 2,55 Get lUseXharbourDll CheckBox caption "use Xharbour.dll/Xharbour.so" style "[o ]" WHEN Cos == "Win32" .or. Cos == "Linux" message s_aLangMessages[ 55 ]
+   @ 2,55 Get lUseXharbourDll CheckBox caption "use Xharbour[.dll|.so]" style "[o ]" WHEN Cos == "Win32" .or. Cos == "Linux" message s_aLangMessages[ 55 ]
    @  3, 1 SAY "Obj Files Dir" GET cObjDir PICT "@s15" //MENSSAGE s_aLangMessages[ 56 ]
    @  4, 1  SAY  s_aLangMessages[ 45 ] GET cAppName VALID ! Empty( cAppName )
    if nO == 1
