@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.3 2003/07/13 18:11:57 walito Exp $
+ * $Id: hbffind.c,v 1.4 2003/09/06 22:24:35 lculik Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.3 2003/07/13 18:11:57 walito Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.4 2003/09/06 22:24:35 lculik Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -193,7 +193,7 @@ int WintoDosError( unsigned long lError)
    return iReturn;
 }
 
-FILETIME GetOldesFile(char * szPath)
+FILETIME GetOldesFile( const char * szPath)
 {
    WIN32_FIND_DATA  Lastff32;
    HANDLE hLastFind;
@@ -210,8 +210,8 @@ FILETIME GetOldesFile(char * szPath)
    hLastFind = FindFirstFile( szf,&Lastff32 );
 
   if ( hLastFind != INVALID_HANDLE_VALUE )
-  {      
-     do 
+  {
+     do
       {
       if (Lastff32.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
              if(CompareFileTime(  &ftLastWriteTime,&Lastff32.ftLastWriteTime ) ==1 )
@@ -263,7 +263,7 @@ USHORT HB_EXPORT hb_fsAttrFromRaw( ULONG raw_attr )
    if( raw_attr & FILE_ATTRIBUTE_READONLY )  uiAttr |= HB_FA_READONLY;
    if( raw_attr & FILE_ATTRIBUTE_SYSTEM )    uiAttr |= HB_FA_SYSTEM;
    if( raw_attr & FILE_ATTRIBUTE_NORMAL )    uiAttr |= HB_FA_NORMAL;
-   if( raw_attr & 0x00000008 )                   uiAttr |= HB_FA_LABEL;    
+   if( raw_attr & 0x00000008 )                   uiAttr |= HB_FA_LABEL;
 
 #ifdef HB_EXTENSION
    /* Note that FILE_ATTRIBUTE_NORMAL is not needed
@@ -597,7 +597,7 @@ static void hb_fsFindFill( PHB_FFIND ffind )
          lHour  = 0;
          lMin   = 0;
          lSec   = 0;
-      }    
+      }
    }
 
 #elif defined(HB_OS_UNIX)
@@ -628,7 +628,7 @@ static void hb_fsFindFill( PHB_FFIND ffind )
       lHour  = ft->tm_hour;
       lMin   = ft->tm_min;
       lSec   = ft->tm_sec;
-     
+
    }
 
 #elif defined(HB_OS_MAC)
