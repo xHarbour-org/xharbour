@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2766 2004/04/07 03:09:57 andijahja Exp $
+ * $Id: ChangeLog,v 1.2767 2004/04/07 03:32:41 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-07 15:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/tbrowse.prg
+    * Incorporated changes in ::RedrawHeaders() suggested by Ath, thanks.
+      I could not see any change to all of my browsers as I never use oCol:HeadSep
+      instance variable. Budyanto, can you check if it is correct!
+
 2004-04-07 10:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * dll_w32.bat
   * hrbdll.wc
