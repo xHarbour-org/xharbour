@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.28 2003/01/06 12:40:55 horacioroldan Exp $
+ * $Id: dbfntx1.c,v 1.29 2003/01/07 15:36:53 jonnymind Exp $
  */
 
 /*
@@ -563,6 +563,8 @@ static ERRCODE hb_ntxGoEof( NTXAREAP pArea )
       pArea->fBof = lpCurTag->TagBOF = FALSE;
    pArea->fEof = lpCurTag->TagEOF = TRUE;
    pArea->lpCurTag = lpCurTag;
+   pArea->lpCurTag->CurKeyInfo->Tag = 0;
+   pArea->lpCurTag->CurKeyInfo->Xtra = 0;
    return retvalue;
 }
 
