@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.20 2003/07/06 17:15:40 lculik Exp $
+ * $Id: hbapiitm.h,v 1.21 2003/07/07 03:28:15 lculik Exp $
  */
 
 /*
@@ -118,13 +118,13 @@ extern PHB_ITEM HB_EXPORT hb_itemReturn       ( PHB_ITEM pItem );
 extern PHB_ITEM HB_EXPORT hb_itemReturnCopy   ( PHB_ITEM pItem );
 extern ULONG    HB_EXPORT hb_itemSize         ( PHB_ITEM pItem );
 extern USHORT   HB_EXPORT hb_itemType         ( PHB_ITEM pItem );
-extern char     HB_EXPORT * hb_itemTypeStr      ( PHB_ITEM pItem );
+extern char     HB_EXPORT * hb_itemTypeStr    ( PHB_ITEM pItem );
 
 /* LONGLONG supports */
-#ifndef HB_LONG_DOUBLE_OFF
-extern LONGLONG   HB_EXPORT hb_itemGetNLL        ( PHB_ITEM pItem );
-extern PHB_ITEM      HB_EXPORT hb_itemPutNLL        ( PHB_ITEM pItem, LONGLONG dNumber );
-extern PHB_ITEM      HB_EXPORT hb_itemPutNLLLen     ( PHB_ITEM pItem, LONGLONG dNumber, int iWidth);
+#ifndef HB_LONG_LONG_OFF
+extern LONGLONG HB_EXPORT hb_itemGetNLL       ( PHB_ITEM pItem );
+extern PHB_ITEM HB_EXPORT hb_itemPutNLL       ( PHB_ITEM pItem, LONGLONG llNumber );
+extern PHB_ITEM HB_EXPORT hb_itemPutNLLLen    ( PHB_ITEM pItem, LONGLONG llNumber, int iWidth);
 #endif
 
 /* Non Clipper compliant internal API */

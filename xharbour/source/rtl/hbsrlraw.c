@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.11 2003/05/17 18:04:28 jonnymind Exp $
+ * $Id: hbsrlraw.c,v 1.12 2003/07/10 12:50:41 jonnymind Exp $
  */
 
 /*
@@ -190,7 +190,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
          hb_createlen8( cRet + 2, pItem->item.asLong.value );
       break;
       
-#ifndef HB_LONG_DOUBLE_OFF
+#ifndef HB_LONG_LONG_OFF
       case HB_IT_LONGLONG:
          ulRet = 10;
          cRet = (BYTE *) hb_xgrab( ulRet );
@@ -199,7 +199,6 @@ HB_FUNC( HB_SERIALIZESIMPLE )
          hb_createlen8( cRet + 2, pItem->item.asLongLong.value );
       break;
 #endif
-
 
       case HB_IT_DOUBLE:
          ulRet = 2 + sizeof( double );
@@ -294,7 +293,7 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
             ulData = hb_getlen8( ( BYTE * )cBuf + 2 );
             hb_retnl( (long) ulData );
          }
-#ifndef HB_LONG_DOUBLE_OFF
+#ifndef HB_LONG_LONG_OFF
          else if( cBuf[1] == 'X' )
          {
             ulData = hb_getlen8( ( BYTE * )cBuf + 2 );

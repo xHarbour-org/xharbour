@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.72 2003/07/07 03:28:15 lculik Exp $
+ * $Id: hbapi.h,v 1.73 2003/07/10 12:50:41 jonnymind Exp $
  */
 
 /*
@@ -216,7 +216,7 @@ extern PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask ); /* retrieve a gener
 extern PHB_ITEM HB_EXPORT hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
 extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 
-#ifndef HB_LONG_DOUBLE_OFF
+#ifndef HB_LONG_LONG_OFF
 extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric parameter as a double */
 #endif
 
@@ -263,10 +263,9 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
     #define hb_retnilen( iNumber, iWidth )       hb_itemPutNILen( &HB_VM_STACK.Return, (iNumber), (iWidth) )
     #define hb_retnllen( lNumber, iWidth )       hb_itemPutNLLen( &HB_VM_STACK.Return, (lNumber), (iWidth) )
     #define hb_retptr( voidPtr )                 hb_itemPutPtrGC( &HB_VM_STACK.Return, (voidPtr) )
-   #ifndef HB_LONG_DOUBLE_OFF
-    #define hb_retnll( dNumber )                  hb_itemPutNLL( &HB_VM_STACK.Return, (dNumber) )
-    #define hb_retnlllen( dNumber, iWidth, iDec ) hb_itemPutNLLLen( &HB_VM_STACK.Return, (dNumber), (iWidth), (iDec) )
-
+   #ifndef HB_LONG_LONG_OFF
+    #define hb_retnll( llNumber )                 hb_itemPutNLL( &HB_VM_STACK.Return, (llNumber) )
+    #define hb_retnlllen( llNumber, iWidth )      hb_itemPutNLLLen( &HB_VM_STACK.Return, (llNumber), (iWidth) )
    #endif
 
 #else
@@ -299,10 +298,9 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
     extern void  HB_EXPORT  hb_retnllen( long lNumber, int iWidth ); /* returns a long number, with specific width */
     extern void  HB_EXPORT  hb_reta( ULONG ulLen );  /* returns an array with a specific length */
     extern void  HB_EXPORT  hb_retptr( void *voidPtr ); /* returns a pointer to an allocated memory, collected by GC */
-   #ifndef HB_LONG_DOUBLE_OFF
-   extern void  HB_EXPORT  hb_retnll( LONGLONG dNumber ); /* returns a double */
-   extern void  HB_EXPORT  hb_retnlllen( LONGLONG dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
-
+   #ifndef HB_LONG_LONG_OFF
+    extern void  HB_EXPORT  hb_retnll( LONGLONG llNumber ); /* returns a long long int */
+    extern void  HB_EXPORT  hb_retnlllen( LONGLONG llNumber, int iWidth ); /* returns a long long int, with specific width */
    #endif
 #endif
 
@@ -315,8 +313,8 @@ extern void  HB_EXPORT  hb_stornl( long lValue, int iParam, ... ); /* stores a l
 extern void  HB_EXPORT  hb_stornd( double dValue, int iParam, ... ); /* stores a double on a variable by reference */
 extern void  HB_EXPORT  hb_stornll(LONGLONG dValue, int iParam, ... ); /* stores a double on a variable by reference */
 
-#ifndef HB_LONG_DOUBLE_OFF
-extern void  HB_EXPORT  hb_stornll( LONGLONG dValue, int iParam, ... ); /* stores a double on a variable by reference */
+#ifndef HB_LONG_LONG_OFF
+extern void  HB_EXPORT  hb_stornll( LONGLONG llValue, int iParam, ... ); /* stores a long long int on a variable by reference */
 #endif
 extern void    HB_EXPORT hb_xinit( void );                         /* Initialize fixed memory subsystem */
 extern void    HB_EXPORT hb_xexit( void );                         /* Deinitialize fixed memory subsystem */
@@ -375,8 +373,8 @@ extern PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen ); /* Creates and retu
 extern PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase ); /* Creates and returns an Array of Generic Parameters for specified base symbol. */
 extern PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase ); /* Creates and returns GC-LOCKED an Array of Generic Parameters for specified base symbol. */
 
-#ifndef HB_LONG_DOUBLE_OFF
-extern LONGLONG   HB_EXPORT hb_arrayGetNLL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the double value contained on an array element */
+#ifndef HB_LONG_LONG_OFF
+extern LONGLONG HB_EXPORT hb_arrayGetNLL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the long long int value contained on an array element */
 #endif
 
 /* string management */

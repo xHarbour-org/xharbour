@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.14 2003/07/06 17:15:40 lculik Exp $
+ * $Id: hbvmpub.h,v 1.15 2003/07/07 03:28:15 lculik Exp $
  */
 
 /*
@@ -187,12 +187,12 @@
        PHB_SYMB value;
     };
 
-   #ifndef HB_LONG_DOUBLE_OFF
-   struct hb_struLongLong
-   {
-      USHORT length;
-      LONGLONG value;
-   };
+#ifndef HB_LONG_LONG_OFF
+    struct hb_struLongLong
+    {
+       USHORT length;
+       LONGLONG value;
+    };
 #endif
 
     /* items hold at the virtual machine stack */
@@ -205,9 +205,9 @@
           struct hb_struBlock   asBlock;
           struct hb_struDate    asDate;
           struct hb_struDouble  asDouble;
-          #ifndef HB_LONG_DOUBLE_OFF
+       #ifndef HB_LONG_LONG_OFF
           struct hb_struLongLong asLongLong;
-          #endif
+       #endif
           struct hb_struInteger asInteger;
           struct hb_struLogical asLogical;
           struct hb_struLong    asLong;

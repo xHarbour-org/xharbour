@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.1 2003/03/21 21:33:47 ronpinkas Exp $
+ * $Id: hbffind.c,v 1.2 2003/07/05 17:40:42 lculik Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.1 2003/03/21 21:33:47 ronpinkas Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.2 2003/07/05 17:40:42 lculik Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -204,7 +204,6 @@ USHORT HB_EXPORT hb_fsAttrFromRaw( ULONG raw_attr )
 
 #if defined(HB_OS_DOS)
 
-   uiAttr = 0;
    if( raw_attr & FA_ARCH )   uiAttr |= HB_FA_ARCHIVE;
    if( raw_attr & FA_HIDDEN ) uiAttr |= HB_FA_HIDDEN;
    if( raw_attr & FA_RDONLY ) uiAttr |= HB_FA_READONLY;
@@ -214,7 +213,6 @@ USHORT HB_EXPORT hb_fsAttrFromRaw( ULONG raw_attr )
 
 #elif defined(HB_OS_OS2)
 
-   uiAttr = 0;
    if( raw_attr & FILE_ARCHIVED )  uiAttr |= HB_FA_ARCHIVE;
    if( raw_attr & FILE_DIRECTORY ) uiAttr |= HB_FA_DIRECTORY;
    if( raw_attr & FILE_HIDDEN )    uiAttr |= HB_FA_HIDDEN;
@@ -223,7 +221,6 @@ USHORT HB_EXPORT hb_fsAttrFromRaw( ULONG raw_attr )
 
 #elif defined(HB_OS_WIN_32)
 
-   uiAttr = 0;
    if( raw_attr & FILE_ATTRIBUTE_ARCHIVE )   uiAttr |= HB_FA_ARCHIVE;
    if( raw_attr & FILE_ATTRIBUTE_DIRECTORY ) uiAttr |= HB_FA_DIRECTORY;
    if( raw_attr & FILE_ATTRIBUTE_HIDDEN )    uiAttr |= HB_FA_HIDDEN;
@@ -248,7 +245,6 @@ USHORT HB_EXPORT hb_fsAttrFromRaw( ULONG raw_attr )
 
 #elif defined(HB_OS_UNIX)
 
-   uiAttr = 0;
    if( S_ISREG( raw_attr ) )  uiAttr |= HB_FA_ARCHIVE;
    if( S_ISDIR( raw_attr ) )  uiAttr |= HB_FA_DIRECTORY;
    if( S_ISLNK( raw_attr ) )  uiAttr |= HB_FA_REPARSE;
@@ -260,7 +256,6 @@ USHORT HB_EXPORT hb_fsAttrFromRaw( ULONG raw_attr )
 #else
 
    HB_SYMBOL_UNUSED( raw_attr );
-   uiAttr = 0;
 
 #endif
 
@@ -523,11 +518,11 @@ static void hb_fsFindFill( PHB_FFIND ffind )
       }
       else
       {
-       #ifndef HB_LONG_DOUBLE_OFF
-       ffind->size = ( info->pFindFileData.nFileSizeHigh * MAXDWORD ) + info->pFindFileData.nFileSizeLow;
-       #else
-       ffind->size = info->pFindFileData.nFileSizeLow;
-       #endif
+      #ifndef HB_LONG_LONG_OFF
+         ffind->size = ( info->pFindFileData.nFileSizeHigh * MAXDWORD ) + info->pFindFileData.nFileSizeLow;
+      #else
+         ffind->size = info->pFindFileData.nFileSizeLow;
+      #endif
       }
 
       raw_attr = ( USHORT ) info->pFindFileData.dwFileAttributes;

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.229 2003/07/07 03:30:49 lculik Exp $
+ * $Id: hvm.c,v 1.230 2003/07/07 18:41:25 ronpinkas Exp $
  */
 
 /*
@@ -1934,13 +1934,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                dNewVal = pLocal->item.asDouble.value + iAdd;
             }
-            #ifndef HB_LONG_DOUBLE_OFF
+            #ifndef HB_LONG_LONG_OFF
             else if( pLocal->type & HB_IT_LONGLONG )
             {
                dNewVal = pLocal->item.asLongLong.value + iAdd;
             }
             #endif
-
             else if( HB_IS_DATE( pLocal ) )
             {
                pLocal->item.asDate.value += iAdd;
@@ -2064,10 +2063,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                dNewVal = pTop->item.asDouble.value + iAdd;
             }
-            #ifndef HB_LONG_DOUBLE_OFF
+            #ifndef HB_LONG_LONG_OFF
             else if( pTop->type & HB_IT_LONGLONG )
             {
-               dNewVal = pTop->item.asDouble.value + iAdd;
+               dNewVal = pTop->item.asLongLong.value + iAdd;
             }
             #endif
             else if( HB_IS_DATE( pTop ) )
@@ -2893,11 +2892,10 @@ static void hb_vmNegate( void )
       /* NOTE: Yes, -999999999.0 is right instead of -1000000000.0 [vszakats] */
       pItem->item.asDouble.length = ( pItem->item.asDouble.value >= 10000000000.0 || pItem->item.asDouble.value <= -999999999.0 ) ? 20 : 10;
    }
-#ifndef HB_LONG_DOUBLE_OFF
+#ifndef HB_LONG_LONG_OFF
    else if( HB_IS_LONGLONG( pItem ) )
    {
-      pItem->item.asDouble.value = -pItem->item.asLongLong.value;
-      /* NOTE: Yes, -999999999.0 is right instead of -1000000000.0 [vszakats] */
+      pItem->item.asLongLong.value = -pItem->item.asLongLong.value;
       pItem->item.asLongLong.length = 20 ;
    }
 #endif
@@ -4012,7 +4010,7 @@ static void hb_vmArrayPush( void )
    {
       lIndex = ( long ) pIndex->item.asDouble.value;
    }
-#ifndef HB_LONG_DOUBLE_OFF
+#ifndef HB_LONG_LONG_OFF
    else if( HB_IS_LONGLONG( pIndex ) )
    {
       lIndex = ( long ) pIndex->item.asLongLong.value;
@@ -4228,7 +4226,7 @@ static void hb_vmArrayPop( void )
    {
       lIndex = ( long ) pIndex->item.asDouble.value;
    }
-#ifndef HB_LONG_DOUBLE_OFF
+#ifndef HB_LONG_LONG_OFF
    else if( HB_IS_LONGLONG( pIndex ) )
    {
       lIndex = ( long ) pIndex->item.asLongLong.value;
@@ -4343,7 +4341,7 @@ static void hb_vmArrayPop( void )
          {
             bNewChar = (BYTE) pValue->item.asLong.value;
          }
-         #ifndef HB_LONG_DOUBLE_OFF
+         #ifndef HB_LONG_LONG_OFF
          else if( pValue->type == HB_IT_LONGLONG )
          {
             bNewChar = (BYTE) pValue->item.asLongLong.value;
@@ -4477,7 +4475,7 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
       case HB_IT_DOUBLE:
          ulElements = ( ULONG ) pDim->item.asDouble.value;
          break;
-      #ifndef HB_LONG_DOUBLE_OFF
+      #ifndef HB_LONG_LONG_OFF
       case HB_IT_LONGLONG:
          ulElements = ( ULONG ) pDim->item.asLongLong.value;
          break;
@@ -4609,7 +4607,7 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
       case HB_IT_LONG:
          /* Alias was evaluated from an expression, (nWorkArea)->field
           */
-         hb_rddSelectWorkAreaNumber( pAlias->item.asLong.value );
+         hb_rddSelectWorkAreaNumber( ( int ) pAlias->item.asLong.value );
          pAlias->type = HB_IT_NIL;
          break;
 
@@ -4619,7 +4617,7 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
          hb_rddSelectWorkAreaNumber( ( int ) pAlias->item.asDouble.value );
          pAlias->type = HB_IT_NIL;
          break;
-      #ifndef HB_LONG_DOUBLE_OFF
+      #ifndef HB_LONG_LONG_OFF
       case HB_IT_LONGLONG:
          /* Alias was evaluated from an expression, (nWorkArea)->field
           */
@@ -6139,7 +6137,7 @@ static double hb_vmPopNumber( void )
          dNumber = pItem->item.asDouble.value;
          break;
 
-      #ifndef HB_LONG_DOUBLE_OFF
+      #ifndef HB_LONG_LONG_OFF
       case HB_IT_LONGLONG:
          dNumber = (double) pItem->item.asLongLong.value;
          break;
@@ -6194,9 +6192,10 @@ static double hb_vmPopDouble( int * piDec )
          dNumber = pItem->item.asDouble.value;
          *piDec = pItem->item.asDouble.decimal;
          break;
-      #ifndef HB_LONG_DOUBLE_OFF
+
+      #ifndef HB_LONG_LONG_OFF
       case HB_IT_LONGLONG:
-         dNumber = pItem->item.asLongLong.value;
+         dNumber = ( double ) pItem->item.asLongLong.value;
          *piDec = 0;
          break;
       #endif

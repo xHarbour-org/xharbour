@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.22 2003/07/06 17:18:44 lculik Exp $
+ * $Id: extend.c,v 1.23 2003/07/07 03:30:49 lculik Exp $
  */
 
 /*
@@ -375,6 +375,12 @@ int  HB_EXPORT hb_parl( int iParam, ... )
       {
          return pItem->item.asDouble.value != 0.0 ? 1 : 0;
       }
+#ifndef HB_LONG_LONG_OFF
+      else if( HB_IS_LONGLONG( pItem ) )
+      {
+         return pItem->item.asLongLong.value != 0 ? 1 : 0;
+      }
+#endif
       else if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
@@ -422,6 +428,12 @@ double  HB_EXPORT hb_parnd( int iParam, ... )
       {
          return ( double ) pItem->item.asLogical.value;
       }
+#ifndef HB_LONG_LONG_OFF
+      else if( HB_IS_LONGLONG( pItem ) )
+      {
+         return ( double ) pItem->item.asLongLong.value;
+      }
+#endif
       else if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
@@ -469,6 +481,12 @@ int  HB_EXPORT hb_parni( int iParam, ... )
       {
          return ( int ) pItem->item.asLogical.value;
       }
+#ifndef HB_LONG_LONG_OFF
+      else if( HB_IS_LONGLONG( pItem ) )
+      {
+         return ( int ) pItem->item.asLongLong.value;
+      }
+#endif
       else if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
@@ -520,6 +538,12 @@ long  HB_EXPORT hb_parnl( int iParam, ... )
       {
          return ( long ) pItem->item.asLogical.value;
       }
+#ifndef HB_LONG_LONG_OFF
+      else if( HB_IS_LONGLONG( pItem ) )
+      {
+         return ( long ) pItem->item.asLongLong.value;
+      }
+#endif
       else if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
@@ -533,7 +557,7 @@ long  HB_EXPORT hb_parnl( int iParam, ... )
       }
    }
 
-   return 0;
+   return 0l;
 }
 
 /* NEW function - to retrieve a pointer from a harbour level */
@@ -568,6 +592,12 @@ void *hb_parptr( int iParam, ... )
       {
          return ( void * )pItem->item.asLogical.value;
       }
+#ifndef HB_LONG_LONG_OFF
+      else if( HB_IS_LONGLONG( pItem ) )
+      {
+         return ( void * ) pItem->item.asLongLong.value;
+      }
+#endif
       else if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
@@ -1001,10 +1031,12 @@ void HB_EXPORT hb_stornd( double dNumber, int iParam, ... )
       }
    }
 }
-#ifndef HB_LONG_DOUBLE_OFF
-void HB_EXPORT hb_stornll( LONGLONG dNumber, int iParam, ... )
+
+#ifndef HB_LONG_LONG_OFF
+
+void HB_EXPORT hb_stornll( LONGLONG llNumber, int iParam, ... )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_stornll(%lf, %d, ...)", dNumber, iParam));
+   HB_TRACE(HB_TR_DEBUG, ("hb_stornll(%Li, %d, ...)", llNumber, iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -1019,7 +1051,7 @@ void HB_EXPORT hb_stornll( LONGLONG dNumber, int iParam, ... )
       if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
-         PHB_ITEM pItemNew = hb_itemPutNLL( NULL, dNumber );
+         PHB_ITEM pItemNew = hb_itemPutNLL( NULL, llNumber );
          va_start( va, iParam );
          hb_arraySet( pItem, va_arg( va, ULONG ), pItemNew );
          va_end( va );
@@ -1027,7 +1059,7 @@ void HB_EXPORT hb_stornll( LONGLONG dNumber, int iParam, ... )
       }
       else if( bByRef || iParam == -1 )
       {
-        hb_itemPutNLL( pItem, dNumber );
+        hb_itemPutNLL( pItem, llNumber );
       }
    }
 }
@@ -1068,6 +1100,10 @@ LONGLONG  HB_EXPORT hb_parnll( int iParam, ... )
       {
          return ( LONGLONG ) pItem->item.asLogical.value;
       }
+      else if( HB_IS_DATE( pItem ) )
+      {
+         return ( LONGLONG ) pItem->item.asDate.value;
+      }
       else if( HB_IS_ARRAY( pItem ) )
       {
          va_list va;
@@ -1081,14 +1117,14 @@ LONGLONG  HB_EXPORT hb_parnll( int iParam, ... )
       }
    }
 
-   return 0;
+   return 0l;
 }
 
 #undef hb_retnlllen
-void HB_EXPORT hb_retnlllen( LONGLONG dNumber, int iWidth)
+void HB_EXPORT hb_retnlllen( LONGLONG llNumber, int iWidth)
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_retnlllen(%lf, %d, %d)", dNumber, iWidth));
+   HB_TRACE(HB_TR_DEBUG, ("hb_retnlllen(%Li, %d)", llNumber, iWidth));
 
-   hb_itemPutNLLLen( &(HB_VM_STACK.Return), dNumber, iWidth);
+   hb_itemPutNLLLen( &(HB_VM_STACK.Return), llNumber, iWidth);
 }
 #endif
