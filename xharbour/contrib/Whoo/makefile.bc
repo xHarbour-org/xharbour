@@ -18,7 +18,8 @@ WHOOOBJ    = TObject.obj TPersistent.obj TComponent.obj TControl.obj \
              TCButton.obj TCEdit.obj TCCheck.obj TCCombo.obj TCRadio.obj \
              TCStatic.obj TFrame.obj TPanel.obj TCListBox.obj TCStatusBar.obj \
              TCRebar.obj TCToolBar.obj TabControl.obj TCGroupBox.obj TSplash.obj \
-             TTreeView.obj TTVItem.obj TCBrowser.obj TCProgBar.obj
+             TTreeView.obj TTVItem.obj TCBrowser.obj TCProgBar.obj \
+             THintWindow.obj
 
 !include $(WHO_DIR)\env\makelib.b32
 
