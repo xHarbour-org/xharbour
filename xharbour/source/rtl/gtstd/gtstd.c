@@ -1,5 +1,5 @@
  /*
- * $Id: gtstd.c,v 1.10 2004/02/01 23:40:51 jonnymind Exp $
+ * $Id: gtstd.c,v 1.11 2004/02/07 20:40:30 andijahja Exp $
  */
 
 /*
@@ -94,6 +94,9 @@ static USHORT s_uiDispCount;
 static BYTE * s_szCrLf;
 static ULONG  s_ulCrLf;
 
+static char *s_clipboard = NULL;
+static ULONG s_clipsize = 0;
+
 #if defined( OS_UNIX_COMPATIBLE )
    static struct termios startup_attributes;
 #endif
@@ -162,6 +165,11 @@ void HB_GT_FUNC(gt_Exit( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
 
+   if ( s_clipboard !=  NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
+   
 #if ! defined( HB_UNIX_GT_DAEMON )
 
    HB_GT_FUNC(mouse_Exit());
@@ -816,21 +824,35 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
 
 void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
 {
-   HB_SYMBOL_UNUSED( szData );
-   HB_SYMBOL_UNUSED( pulMaxSize );
+   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
+   {
+      *pulMaxSize = s_clipsize;
+   }
+
+   if ( *pulMaxSize != 0 )
+   {
+      memcpy( szData, s_clipboard, *pulMaxSize );
+   }
+
 }
 
 void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
 {
-   HB_SYMBOL_UNUSED( szData );
-   HB_SYMBOL_UNUSED( ulSize );
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
+
+   s_clipboard = (char *) hb_xgrab( ulSize +1 );
+   memcpy( s_clipboard, szData, ulSize );
+   s_clipboard[ ulSize ] = '\0';
+   s_clipsize = ulSize;
 }
 
 ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 {
-   return 0;
+   return s_clipsize;
 }
-
 
 /* *********************************************************************** */
 
