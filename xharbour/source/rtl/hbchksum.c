@@ -1,13 +1,14 @@
 /*
- * $Id: len.c,v 1.4 2003/11/23 03:13:54 jonnymind Exp $
+ * $Id: hbchecksum.c,v 1.3 2003/09/15 02:38:37 paultucker Exp $
  */
 
 /*
- * Harbour Project source code:
- * LEN() function
+ * xHarbour Project source code:
+ * Fast and reliable checksum function
  *
- * Copyright 1999 Antonio Linares <alinares@fivetech.com>
- * www - http://www.harbour-project.org
+ * Copyright 2003 Giancarlo Niccolai <giancarlo@niccolai.ws>
+ * www - http://www.xharbour.org
+ * SEE ALSO COPYRIGHT NOTICE FOR ADLER32 BELOW.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,46 +51,80 @@
  *
  */
 
+/* This file includes code slices from adler32.c for advanced CRC
+ * Holder of copyright for this code is:
+ *
+ * Copyright (C) 1995-2002 Mark Adler
+ *
+ * ZLIB (containing adler32 code) can be found at:
+ * http://www.gzip.org/zlib/
+ */
+
+#include "hbcomprs.h"
 #include "hbapi.h"
-#include "hashapi.h"
-#include "hbapierr.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
+#include "hbstack.h"
+#include "hbdefs.h"
+#include "hbvm.h"
+#include "hbapierr.h"
 
-HB_FUNC( LEN )
+/* ========================================================================= */
+
+#define BASE 65521L /* largest prime smaller than 65536 */
+#define NMAX 5552
+/* NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1 */
+
+#define DO1(buf,i)  {s1 += buf[i]; s2 += s1;}
+#define DO2(buf,i)  DO1(buf,i); DO1(buf,i+1);
+#define DO4(buf,i)  DO2(buf,i); DO2(buf,i+2);
+#define DO8(buf,i)  DO4(buf,i); DO4(buf,i+4);
+#define DO16(buf)   DO8(buf,0); DO8(buf,8);
+
+ULONG HB_EXPORT adler32( ULONG adler, const BYTE *buf, UINT len)
 {
-   PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
+   ULONG s1 = adler & 0xffff;
+   ULONG s2 = (adler >> 16) & 0xffff;
+   int k;
 
-   /* NOTE: Double safety to ensure that a parameter was really passed,
-            compiler checks this, but a direct hb_vmDo() call
-            may not do so. [vszakats] */
+   if (buf == NULL) return 1L;
 
-   if( pItem )
+   while (len > 0) {
+      k = len < NMAX ? len : NMAX;
+      len -= k;
+      while (k >= 16) {
+            DO16(buf);
+      buf += 16;
+            k -= 16;
+      }
+      if (k != 0) do {
+            s1 += *buf++;
+      s2 += s1;
+      } while (--k);
+      s1 %= BASE;
+      s2 %= BASE;
+   }
+   return (s2 << 16) | s1;
+}
+
+
+HB_FUNC( HB_CHECKSUM )
+{
+   PHB_ITEM pString = hb_param( 1, HB_IT_STRING );
+   ULONG ulSum = 0;
+
+   if(pString == NULL)
    {
-      if( HB_IS_STRING( pItem ) )
-      {
-         // hb_retnl( hb_itemGetCLen( pItem ) );
-         /* hb_itemGetCLen() previously checked if pItem is a string.
-            this is an unnecessary redundancy */
-         hb_retnl( pItem->item.asString.length );
-         return;
-      }
-      else if( HB_IS_HASH( pItem ) )
-      {
-         // hb_retnl( hb_itemGetCLen( pItem ) );
-         /* hb_itemGetCLen() previously checked if pItem is a string.
-            this is an unnecessary redundancy */
-         hb_retnl( hb_hashLen(pItem) );
-         return;
-      }
-      else if( HB_IS_ARRAY( pItem ) )
-      {
-         // hb_retnl( hb_arrayLen( pItem ) );
-         /* hb_arrayLen() previously checked if pItem is an array.
-            this is an unnecessary redundancy */
-         hb_retnl( pItem->item.asArray.value->ulLen );
-         return;
-      }
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "Must be a string", 1, hb_param(1, HB_IT_ANY) );
+      return;
    }
 
-   hb_errRT_BASE_SubstR( EG_ARG, 1111, NULL, "LEN", 1, hb_paramError( 1 ) );
+   if( ISNUM(2) )
+   {
+      ulSum = (ULONG) hb_parnl( 2 );
+   }
+
+   hb_retnd( (long) 
+      adler32( ulSum, ( const BYTE *) pString->item.asString.value, pString->item.asString.length ) );
 }
+

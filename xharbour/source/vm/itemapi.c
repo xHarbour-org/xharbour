@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.53 2003/11/09 23:16:40 jonnymind Exp $
+ * $Id: itemapi.c,v 1.54 2003/11/12 17:53:01 ronpinkas Exp $
  */
 
 /*
@@ -93,7 +93,7 @@
 #include "hbdate.h"
 #include "hbset.h"
 #include "hbmath.h"
-#include "hbhashapi.h"
+#include "hashapi.h"
 
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"

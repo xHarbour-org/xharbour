@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbcrc32.c,v 1.4 2003/05/26 05:58:54 paultucker Exp $
+ * $Id: hbcrc32.c,v 1.5 2003/09/15 02:38:37 paultucker Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
  * http://www.gzip.org/zlib/
  */
 
-#include "hbcompress.h"
+#include "hbcomprs.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbfast.h"

@@ -1,13 +1,14 @@
 /*
- * $Id: len.c,v 1.4 2003/11/23 03:13:54 jonnymind Exp $
+ * $Id: hbcompress.ch,v 1.1 2003/02/12 01:13:04 jonnymind Exp $
  */
 
 /*
- * Harbour Project source code:
- * LEN() function
+ * xHarbour Project source code:
+ * Compression related functions
  *
- * Copyright 1999 Antonio Linares <alinares@fivetech.com>
- * www - http://www.harbour-project.org
+ * Copyright 2003 Giancarlo Niccolai <giancarlo@niccolai.ws>
+ * www - http://www.xharbour.org
+ * SEE ALSO COPYRIGHT NOTICE FOR ZLIB BELOW.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,46 +51,38 @@
  *
  */
 
-#include "hbapi.h"
-#include "hashapi.h"
-#include "hbapierr.h"
-#include "hbapiitm.h"
+/* This file is based upon ZLIB source code, whose copyright holder is:
+ *
+ * Copyright (C) 1995-2002 Jean-loup Gailly.
+ *
+ * Also, this file includes code slices from adler32.c for advanced CRC
+ * Holder of copyright for this code is:
+ *
+ * Copyright (C) 1995-2002 Mark Adler
+ *
+ * ZLIB (containing adler32 code) can be found at:
+ * http://www.gzip.org/zlib/
+ */
 
-HB_FUNC( LEN )
-{
-   PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
+#ifndef HB_COMPRESS_CH
+#define HB_COMPRESS_CH
 
-   /* NOTE: Double safety to ensure that a parameter was really passed,
-            compiler checks this, but a direct hb_vmDo() call
-            may not do so. [vszakats] */
+#define HB_Z_OK            0
+#define HB_Z_STREAM_END    1
+#define HB_Z_NEED_DICT     2
+#define HB_Z_ERRNO        (-1)
+#define HB_Z_STREAM_ERROR (-2)
+#define HB_Z_DATA_ERROR   (-3)
+#define HB_Z_MEM_ERROR    (-4)
+#define HB_Z_BUF_ERROR    (-5)
+#define HB_Z_VERSION_ERROR (-6)
+/* Return codes for the compression/decompression functions. Negative
+ * values are errors, positive values are used for special but normal events.
+ */
 
-   if( pItem )
-   {
-      if( HB_IS_STRING( pItem ) )
-      {
-         // hb_retnl( hb_itemGetCLen( pItem ) );
-         /* hb_itemGetCLen() previously checked if pItem is a string.
-            this is an unnecessary redundancy */
-         hb_retnl( pItem->item.asString.length );
-         return;
-      }
-      else if( HB_IS_HASH( pItem ) )
-      {
-         // hb_retnl( hb_itemGetCLen( pItem ) );
-         /* hb_itemGetCLen() previously checked if pItem is a string.
-            this is an unnecessary redundancy */
-         hb_retnl( hb_hashLen(pItem) );
-         return;
-      }
-      else if( HB_IS_ARRAY( pItem ) )
-      {
-         // hb_retnl( hb_arrayLen( pItem ) );
-         /* hb_arrayLen() previously checked if pItem is an array.
-            this is an unnecessary redundancy */
-         hb_retnl( pItem->item.asArray.value->ulLen );
-         return;
-      }
-   }
+#define HB_Z_NO_COMPRESSION         0
+#define HB_Z_BEST_SPEED             1
+#define HB_Z_BEST_COMPRESSION       9
+#define HB_Z_DEFAULT_COMPRESSION  (-1)
 
-   hb_errRT_BASE_SubstR( EG_ARG, 1111, NULL, "LEN", 1, hb_paramError( 1 ) );
-}
+#endif

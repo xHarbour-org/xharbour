@@ -1,13 +1,13 @@
 /*
- * $Id: len.c,v 1.4 2003/11/23 03:13:54 jonnymind Exp $
+ * $Id: hbhextonum.c,v 1.2 2003/11/07 18:20:54 jonnymind Exp $
  */
 
 /*
- * Harbour Project source code:
- * LEN() function
+ * xHarbour Project source code:
+ * Symbolic hexadecimal signature for transfer and visualization
  *
- * Copyright 1999 Antonio Linares <alinares@fivetech.com>
- * www - http://www.harbour-project.org
+ * Copyright 2003 Giancarlo Niccolai <giancarlo@niccolai.ws>
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,45 +51,100 @@
  */
 
 #include "hbapi.h"
-#include "hashapi.h"
-#include "hbapierr.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
+#include "hbstack.h"
+#include "hbdefs.h"
+#include "hbvm.h"
+#include "hbapierr.h"
 
-HB_FUNC( LEN )
+
+HB_FUNC( HB_NUMTOHEX )
 {
-   PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
+   ULONG ulNum;
+   int iCipher;
+   char ret[32];
+   char tmp[32];
+   int len = 0, len1 = 0;
 
-   /* NOTE: Double safety to ensure that a parameter was really passed,
-            compiler checks this, but a direct hb_vmDo() call
-            may not do so. [vszakats] */
-
-   if( pItem )
+   if( ISNUM(1) )
    {
-      if( HB_IS_STRING( pItem ) )
-      {
-         // hb_retnl( hb_itemGetCLen( pItem ) );
-         /* hb_itemGetCLen() previously checked if pItem is a string.
-            this is an unnecessary redundancy */
-         hb_retnl( pItem->item.asString.length );
-         return;
-      }
-      else if( HB_IS_HASH( pItem ) )
-      {
-         // hb_retnl( hb_itemGetCLen( pItem ) );
-         /* hb_itemGetCLen() previously checked if pItem is a string.
-            this is an unnecessary redundancy */
-         hb_retnl( hb_hashLen(pItem) );
-         return;
-      }
-      else if( HB_IS_ARRAY( pItem ) )
-      {
-         // hb_retnl( hb_arrayLen( pItem ) );
-         /* hb_arrayLen() previously checked if pItem is an array.
-            this is an unnecessary redundancy */
-         hb_retnl( pItem->item.asArray.value->ulLen );
-         return;
-      }
+      ulNum = (ULONG) hb_parnl( 1 );
+   }
+   else if ( ISPOINTER( 1 ) )
+   {
+      ulNum = (ULONG) hb_parptr( 1 );
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_NUMTOHEX", 1, hb_param(1,HB_IT_ANY) );
+      return;
    }
 
-   hb_errRT_BASE_SubstR( EG_ARG, 1111, NULL, "LEN", 1, hb_paramError( 1 ) );
+
+   while ( ulNum > 0 )
+   {
+      iCipher = ulNum % 16;
+      if ( iCipher < 10 )
+      {
+         tmp[ len++ ] = '0' + iCipher;
+      }
+      else
+      {
+         tmp[ len++ ] = 'A' + (iCipher - 10 );
+      }
+      ulNum >>=4;
+
+   }
+
+   while ( len > 0 )
+   {
+      ret[len1++] = tmp[ --len ];
+   }
+   ret[len1] = '\0';
+
+   hb_retc( ret );
 }
+
+
+HB_FUNC( HB_HEXTONUM )
+{
+   ULONG ulNum = 0;
+   char *cHex, c;
+   ULONG ulCipher;
+
+   if( ! ISCHAR(1) )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_HEXTONUM", 1, hb_param(1,HB_IT_ANY) );
+      return;
+   }
+   cHex = hb_parc( 1 );
+
+   while ( *cHex )
+   {
+      c = *cHex;
+      ulNum <<= 4;
+      if ( c >= '0' && c <= '9' )
+      {
+         ulCipher = (ULONG) ( c - '0' );
+      }
+      else if ( c >= 'A' && c <= 'F' )
+      {
+         ulCipher = (ULONG) ( c - 'A' )+10;
+      }
+      else if ( c >= 'a' && c <= 'f' )
+      {
+         ulCipher = (ULONG) ( c - 'a' )+10;
+      }
+      else
+      {
+         ulNum = 0;
+         break;
+      }
+      ulNum += ulCipher;
+      cHex++;
+   }
+
+   hb_retnl( (long) ulNum  );
+}
+

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.59 2003/10/19 00:17:36 jonnymind Exp $
+ * $Id: garbage.c,v 1.60 2003/11/09 23:16:39 jonnymind Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 #include "hbfast.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
-#include "hbhashapi.h"
+#include "hashapi.h"
 #include "hbapierr.h"
 #include "hbvm.h"
 #include "error.ch"

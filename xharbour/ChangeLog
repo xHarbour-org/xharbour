@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1759 2003/11/23 22:33:32 andijahja Exp $
+ * $Id: ChangeLog,v 1.1760 2003/11/23 23:36:51 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-24 15:45 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini@tin.it>
+  * include/hbhashapi.h renamed to hashapi.h
+  * include/hbservice.ch renamed to hbserv.ch 
+  * include/hbcompress.ch renamed to hbcomprs.ch 
+  * include/Makefile modified
+  * source/rtl/hbbitfield.c renamed to hbbif.c
+  * source/rtl/hbloginet.c renamed to hblognet.c
+  * source/rtl/hbreadini.prg renamed to hbini.prg
+  * source/rtl/hbservice.c renamed to hbserv.c
+  * source/rtl/hboutdebug.c renamed to hboutdbg.c
+  * source/rtl/hbchecksum.c renamed to hbchksum.c
+  * source/rtl/hbhextonum.c renamed to hbhex2n.c
+  * source/rtl/hbcompress.c renamed to hbcomprs.c
+  * source/rtl/Makefile modified
+  * source/rtl/* and source/vm/* modified to use new file names
+  * makefile.bc updated
+  * makefile.vc updated
+  * makefile.nt updated
+  % I can't test them please check %
+
 2003-11-23 21:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * contrib/hbzlib/include/hbzip2.h
     ! added missed prototype to make MSVC happy

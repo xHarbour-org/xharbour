@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.51 2003/10/01 17:41:47 paultucker Exp $
+ * $Id: fastitem.c,v 1.52 2003/11/09 23:16:39 jonnymind Exp $
  */
 
 /*
@@ -62,7 +62,7 @@
 #include "hbapierr.h"
 #include "hbdate.h"
 #include "hbset.h"
-#include "hbhashapi.h"
+#include "hashapi.h"
 
 extern char *hb_vm_sNull;
 extern char *hb_vm_acAscii[256];

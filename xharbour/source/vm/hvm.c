@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.281 2003/11/22 04:34:47 ronpinkas Exp $
+ * $Id: hvm.c,v 1.282 2003/11/23 03:13:54 jonnymind Exp $
  */
 
 /*
@@ -100,7 +100,7 @@
 #include "classes.h"
 
 #include "hbi18n.h"
-#include "hbhashapi.h"
+#include "hashapi.h"
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"

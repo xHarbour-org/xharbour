@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.55 2003/11/16 02:13:02 ronpinkas Exp $
+# $Id: makefile.nt,v 1.56 2003/11/22 03:02:17 ronpinkas Exp $
 #
 
 #
@@ -371,16 +371,16 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\gtapiu.obj \
    $(OBJ_DIR)$(MT)\gx.obj \
    $(OBJ_DIR)$(MT)\hardcr.obj \
-   $(OBJ_DIR)$(MT)\hbbitfield.obj \
-   $(OBJ_DIR)$(MT)\hbchecksum.obj \
-   $(OBJ_DIR)$(MT)\hbcompress.obj \
+   $(OBJ_DIR)$(MT)\hbbitf.obj \
+   $(OBJ_DIR)$(MT)\hbchksum.obj \
+   $(OBJ_DIR)$(MT)\hbcomprs.obj \
    $(OBJ_DIR)$(MT)\hbcrc32.obj \
    $(OBJ_DIR)$(MT)\hbcrypt.obj \
    $(OBJ_DIR)$(MT)\hbffind.obj \
-   $(OBJ_DIR)$(MT)\hbhextonum.obj \
-   $(OBJ_DIR)$(MT)\hboutdebug.obj \
+   $(OBJ_DIR)$(MT)\hbhex2n.obj \
+   $(OBJ_DIR)$(MT)\hboutdbg.obj \
    $(OBJ_DIR)$(MT)\hbrandom.obj \
-   $(OBJ_DIR)$(MT)\hbservice.obj \
+   $(OBJ_DIR)$(MT)\hbserv.obj \
    $(OBJ_DIR)$(MT)\hbsrlraw.obj \
    $(OBJ_DIR)$(MT)\hbsyslog.obj \
    $(OBJ_DIR)$(MT)\hbxml.obj \
@@ -485,8 +485,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\getlist.obj \
    $(OBJ_DIR)$(MT)\getsys.obj \
    $(OBJ_DIR)$(MT)\hblog.obj \
-   $(OBJ_DIR)$(MT)\hbloginet.obj \
-   $(OBJ_DIR)$(MT)\hbreadini.obj \
+   $(OBJ_DIR)$(MT)\hblognet.obj \
+   $(OBJ_DIR)$(MT)\hbini.obj \
    $(OBJ_DIR)$(MT)\hbserial.obj \
    $(OBJ_DIR)$(MT)\input.obj \
    $(OBJ_DIR)$(MT)\listbox.obj \

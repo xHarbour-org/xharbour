@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.72 2003/11/16 01:56:15 ronpinkas Exp $
+# $Id: makefile.bc,v 1.73 2003/11/20 23:47:34 druzus Exp $
 #
 
 #
@@ -344,18 +344,18 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\gtapiu.obj \
    $(RTL_OBJ_DIR)\gx.obj \
    $(RTL_OBJ_DIR)\hardcr.obj \
-   $(RTL_OBJ_DIR)\hbbitfield.obj \
-   $(RTL_OBJ_DIR)\hbchecksum.obj \
-   $(RTL_OBJ_DIR)\hbcompress.obj \
+   $(RTL_OBJ_DIR)\hbbitf.obj \
+   $(RTL_OBJ_DIR)\hbchksum.obj \
+   $(RTL_OBJ_DIR)\hbcomprs.obj \
    $(RTL_OBJ_DIR)\hbcrc32.obj \
    $(RTL_OBJ_DIR)\hbcrypt.obj \
    $(RTL_OBJ_DIR)\hbffind.obj \
-   $(RTL_OBJ_DIR)\hbhextonum.obj \
+   $(RTL_OBJ_DIR)\hbhex2n.obj \
    $(RTL_OBJ_DIR)\hblog.obj \
-   $(RTL_OBJ_DIR)\hbloginet.obj \
-   $(RTL_OBJ_DIR)\hboutdebug.obj \
+   $(RTL_OBJ_DIR)\hblognet.obj \
+   $(RTL_OBJ_DIR)\hboutdbg.obj \
    $(RTL_OBJ_DIR)\hbrandom.obj \
-   $(RTL_OBJ_DIR)\hbservice.obj \
+   $(RTL_OBJ_DIR)\hbserv.obj \
    $(RTL_OBJ_DIR)\hbsrlraw.obj \
    $(RTL_OBJ_DIR)\hbsyslog.obj \
    $(RTL_OBJ_DIR)\hbxml.obj \
@@ -459,7 +459,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\fieldbl.obj \
    $(RTL_OBJ_DIR)\getlist.obj \
    $(RTL_OBJ_DIR)\getsys.obj \
-   $(RTL_OBJ_DIR)\hbreadini.obj \
+   $(RTL_OBJ_DIR)\hbini.obj \
    $(RTL_OBJ_DIR)\hbserial.obj \
    $(RTL_OBJ_DIR)\input.obj \
    $(RTL_OBJ_DIR)\listbox.obj \
@@ -1713,13 +1713,13 @@ $(RTL_OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
 $(RTL_OBJ_DIR)\hardcr.obj : $(RTL_DIR)\hardcr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(RTL_OBJ_DIR)\hbbitfield.obj : $(RTL_DIR)\hbbitfield.c
+$(RTL_OBJ_DIR)\hbbitf.obj : $(RTL_DIR)\hbbitf.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(RTL_OBJ_DIR)\hbcompress.obj : $(RTL_DIR)\hbcompress.c
+$(RTL_OBJ_DIR)\hbcomprs.obj : $(RTL_DIR)\hbcomprs.c
    $(CC) $(CLIBFLAGS) -DZLIB_DLL;WIN32 -o$@ $**
 
-$(RTL_OBJ_DIR)\hbchecksum.obj : $(RTL_DIR)\hbchecksum.c
+$(RTL_OBJ_DIR)\hbchksum.obj : $(RTL_DIR)\hbchksum.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\hbcrc32.obj : $(RTL_DIR)\hbcrc32.c
@@ -1731,7 +1731,7 @@ $(RTL_OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
 $(RTL_OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(RTL_OBJ_DIR)\hboutdebug.obj : $(RTL_DIR)\hboutdebug.c
+$(RTL_OBJ_DIR)\hboutdbg.obj : $(RTL_DIR)\hboutdbg.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\hblog.c : $(RTL_DIR)\hblog.prg
@@ -1740,22 +1740,22 @@ $(RTL_OBJ_DIR)\hblog.c : $(RTL_DIR)\hblog.prg
 $(RTL_OBJ_DIR)\hblog.obj : $(RTL_OBJ_DIR)\hblog.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(RTL_OBJ_DIR)\hbloginet.c : $(RTL_DIR)\hbloginet.prg
+$(RTL_OBJ_DIR)\hblognet.c : $(RTL_DIR)\hblognet.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(RTL_OBJ_DIR)\hbloginet.obj : $(RTL_OBJ_DIR)\hbloginet.c
+$(RTL_OBJ_DIR)\hblognet.obj : $(RTL_OBJ_DIR)\hblognet.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(RTL_OBJ_DIR)\hbhextonum.obj : $(RTL_DIR)\hbhextonum.c
+$(RTL_OBJ_DIR)\hbhex2n.obj : $(RTL_DIR)\hbhex2n.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\hbrandom.obj : $(RTL_DIR)\hbrandom.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(RTL_OBJ_DIR)\hbreadini.c : $(RTL_DIR)\hbreadini.prg
+$(RTL_OBJ_DIR)\hbini.c : $(RTL_DIR)\hbini.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(RTL_OBJ_DIR)\hbreadini.obj : $(RTL_OBJ_DIR)\hbreadini.c
+$(RTL_OBJ_DIR)\hbini.obj : $(RTL_OBJ_DIR)\hbini.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\hbserial.c : $(RTL_DIR)\hbserial.prg
@@ -1764,7 +1764,7 @@ $(RTL_OBJ_DIR)\hbserial.c : $(RTL_DIR)\hbserial.prg
 $(RTL_OBJ_DIR)\hbserial.obj : $(RTL_OBJ_DIR)\hbserial.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(RTL_OBJ_DIR)\hbservice.obj : $(RTL_DIR)\hbservice.c
+$(RTL_OBJ_DIR)\hbserv.obj : $(RTL_DIR)\hbserv.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\hbsrlraw.obj : $(RTL_DIR)\hbsrlraw.c

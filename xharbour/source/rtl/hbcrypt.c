@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrypt.c,v 1.9 2003/08/20 17:29:36 toninhofwi Exp $
+ * $Id: hbcrypt.c,v 1.10 2003/09/15 02:38:37 paultucker Exp $
  */
 
 /*
@@ -73,7 +73,7 @@
 #include "hbvm.h"
 #include "hbapierr.h"
 #include "hbnxs.h"
-#include "hbcompress.h"
+#include "hbcomprs.h"
 
 #define BASE 65521L /* largest prime smaller than 65536 */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.11 2003/09/26 08:22:44 jonnymind Exp $
+ * $Id: hbxml.c,v 1.12 2003/11/21 13:03:29 jonnymind Exp $
  */
 
 /*
@@ -81,7 +81,7 @@
 #include "hbapifs.h"
 
 #include "hbxml.h"
-#include "hbhashapi.h"
+#include "hashapi.h"
 
 // just a shortcut
 static void hbxml_set_doc_status( PHB_ITEM doc, int status, int error )

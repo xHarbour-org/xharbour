@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.12 2003/11/21 13:03:29 jonnymind Exp $
+ * $Id: hash.c,v 1.13 2003/11/23 03:13:54 jonnymind Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #include "hbvm.h"
 #include "hbvmpub.h"
 #include "hbstack.h"
-#include "hbhashapi.h"
+#include "hashapi.h"
 
 /******************************************************
 * Utility functions

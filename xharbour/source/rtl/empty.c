@@ -1,5 +1,5 @@
 /*
- * $Id: empty.c,v 1.3 2003/07/10 15:20:00 jonnymind Exp $
+ * $Id: empty.c,v 1.4 2003/11/14 19:46:20 jonnymind Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
-#include "hbhashapi.h"
+#include "hashapi.h"
 
 HB_FUNC( EMPTY )
 {
