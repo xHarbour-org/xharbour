@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.20 2004/03/21 12:01:26 likewolf Exp $
+ * $Id: hbffind.c,v 1.21 2004/03/30 22:47:23 druzus Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.20 2004/03/21 12:01:26 likewolf Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.21 2004/03/30 22:47:23 druzus Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -191,7 +191,8 @@ int WintoDosError( ULONG lError)
       break;
 
    default:
-         iReturn=0;
+//      iReturn=0;
+      iReturn = ( int ) lError ;
       break;
       }
 
