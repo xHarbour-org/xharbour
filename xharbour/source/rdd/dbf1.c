@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.17 2002/09/01 03:43:28 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.18 2002/09/19 03:57:46 horacioroldan Exp $
  */
 
 /*
@@ -581,7 +581,7 @@ static void hb_dbfWriteMemo( DBFAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULON
    ULONG ulNewBlock, ulNextBlock;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfWriteMemo(%p, %lu, %p, %lu, %p)", pArea, ulBlock, pItem,
-                           ulLen, ulNewBlock));
+                           ulLen, ulStoredBlock));
 
    memset( pBlock, 0x1A, DBT_BLOCKSIZE );
    bNewBlock = !( ulBlock && ulLen < DBT_BLOCKSIZE - 1 );
