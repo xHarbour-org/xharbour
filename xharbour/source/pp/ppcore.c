@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.37 2002/12/23 00:14:22 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.38 2003/01/23 03:25:12 ronpinkas Exp $
  */
 
 /*
@@ -4245,7 +4245,7 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
            {
               kolFig--;
            }
-           else if( szText[lPos] == '.' && ( szSub[0] != '.' || szSub[1] == '\0' ) )
+           else if( szText[lPos] == '.' && ( szSub[0] != '.' || lSubLen == 1 ) )
            {
               if( toupper( szText[lPos + 1] ) == 'T' && szText[lPos + 2] == '.' )
               {
@@ -4277,11 +4277,17 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
               }
               else
               {
-                 lPos++;
+                 if( szSub[0] != '.' )
+                 {
+                    lPos++;
+                 }
               }
 
-              lSubPos = 0;
-              continue;
+              if( szSub[0] != '.' )
+              {
+                 lSubPos == 0;
+                 continue;
+              }
            }
         }
 
