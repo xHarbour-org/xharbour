@@ -11,7 +11,7 @@
 #include "debug.ch"
 
 GLOBAL EXTERNAL hThisInstance
-
+GLOBAL EXTERNAL oApp
 //----------------------------------------------------------------------------//
 
  CLASS TFormEdit FROM TForm
@@ -184,7 +184,9 @@ METHOD CreateControl(aRect)
          ::oMask:Cursor:=NIL
 
       ENDCASE
-
+      if oObj!=NIL
+         oApp:MainFrame:ObjInsp:InspCombo:AddString(oObj:propname+chr(9)+oObj:ClassName())
+      endif
    ENDIF
    ::Parent:StdBar:CheckButton( 100, .T. )
 

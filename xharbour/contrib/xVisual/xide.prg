@@ -7,7 +7,7 @@
 #Include "toolbar.ch"
 #Include "winlview.ch"
 
-static oApp
+GLOBAL oApp
 
 //-------------------------------------------------------------------------------------------
 
@@ -178,20 +178,19 @@ CLASS ObjInspect FROM TForm
    // disallow window from being closed
    METHOD OnCloseQuery() INLINE 0
    METHOD OnCreate()
-   METHOD OnSize(n,x,y)  INLINE  ::GetObj("InspCombo"):Move(,,x,,.t.),;
+   METHOD OnSize(n,x,y)  INLINE  ::GetObj("InspCombo"):Move(,,x,21,.t.),;
                                  ::GetObj("InspTabs"):Move(,25,x,y-25,.t.),nil
 ENDCLASS
 
 METHOD OnCreate() CLASS ObjInspect
   local aRect := ::ClientRect()
-  ::Add( 'InspCombo',TComboBox():New( self, 100, 0, 0, aRect[3], 100 ) )
-  ::InspCombo:Dir( 16384, '*.*')
+  ::Add( 'InspCombo',TComboBox():New( self, 100, 0, 0, aRect[3], 100,.t. ) )
   
   ::Add( 'InspTabs', TTabControl():New( self, 101,  0,  25, aRect[3], aRect[4]-25) )
   ::InspTabs:AddTab( "Properties")
   ::InspTabs:AddTab( "Events", TabPage():New( ::InspTabs, "Events") )
   ::InspTabs:Configure()
-  
+
 return( super:OnCreate() )
 
 //----------------------------------------------------------------------------------------------
