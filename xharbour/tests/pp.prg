@@ -6200,7 +6200,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       HB_AtX( "(^|[^\\])= *>", sRule, , @nNext, @nTokenLen )
    #else
       nNext := 0
-      DO WHILE ( nNext := At( "=>", sRule, nNext + 1 ) ) > 0
+      DO WHILE ( nNext := nAtSkipStr( "=>", sRule, nNext + 1 ) ) > 0
          IF ! SubStr( sRule, nNext - 1, 1 ) == '\'
             EXIT
          ENDIF
@@ -6724,37 +6724,37 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
    DO WHILE ! ( sResult == '' )
       nOffset := 0
-      nOptionalAt := At( '[', sResult )
+      nOptionalAt := nAtSkipStr( '[', sResult )
       WHILE nOPtionalAt > 1 .AND. SubStr( sResult, nOptionalAt - 1, 1 ) == '\'
          nOffset := nOptionalAt
-         nOptionalAt := At( '[', sResult, nOffset + 1 )
+         nOptionalAt := nAtSkipStr( '[', sResult, nOffset + 1 )
       ENDDO
 
       nOffset := 0
       IF nOptionalAt == 0
-         nMarkerAt := At( '<', sResult )
+         nMarkerAt := nAtSkipStr( '<', sResult )
          WHILE nMarkerAt > 0
             IF nMarkerAt > 1 .AND. SubStr( sResult, nMarkerAt - 1, 1 ) == '\'
                nOffset   := nMarkerAt
-               nMarkerAt := At( '<', sResult, nOffset + 1 )
+               nMarkerAt := nAtSkipStr( '<', sResult, nOffset + 1 )
                //TraceLog( sResult, nOffset, nMarkerAt )
             ELSEIF nMarkerAt > 0 .AND. SubStr( sResult, nMarkerAt + 1, 1 ) $ ">=" // ignore <= and <>
                nOffset   := nMarkerAt + 1
-               nMarkerAt := At( '<', sResult, nOffset + 1 )
+               nMarkerAt := nAtSkipStr( '<', sResult, nOffset + 1 )
             ELSE
                EXIT
             ENDIF
          ENDDO
       ELSE
-         nMarkerAt := At( '<', sResult )
+         nMarkerAt := nAtSkipStr( '<', sResult )
          WHILE nMarkerAt > 0
             IF nMarkerAt > 1 .AND. nMarkerAt < nOptionalAt .AND. SubStr( sResult, nMarkerAt - 1, 1 ) == '\'
                nOffset   := nMarkerAt
-               nMarkerAt := At( '<', sResult, nOffset + 1 )
+               nMarkerAt := nAtSkipStr( '<', sResult, nOffset + 1 )
                //TraceLog( sResult, nOffset, nMarkerAt )
             ELSEIF nMarkerAt > 0 .AND. nMarkerAt < nOptionalAt .AND. SubStr( sResult, nMarkerAt + 1, 1 ) $ ">=" // ignore <= and <>
                nOffset   := nMarkerAt + 1
-               nMarkerAt := At( '<', sResult, nOffset + 1 )
+               nMarkerAt := nAtSkipStr( '<', sResult, nOffset + 1 )
             ELSE
                EXIT
             ENDIF
@@ -6769,9 +6769,9 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
          ELSE
             TraceLog( "Warning, no markers in repeatable group: " + SubStr( sResult, nOptionalAt ) )
 
-            nCloseOptionalAt := At( ']', sResult, nOptionalAt )
+            nCloseOptionalAt := nAtSkipStr( ']', sResult, nOptionalAt )
             WHILE nCloseOptionalAt > 1 .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
-               nCloseOptionalAt := At( ']', sResult, nCloseOptionalAt + 1 )
+               nCloseOptionalAt := nAtSkipStr( ']', sResult, nCloseOptionalAt + 1 )
             ENDDO
 
             IF nCloseOptionalAt > 0
@@ -6792,9 +6792,9 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       ELSE
          nOffset := 0
          IF nAt == 0
-            nCloseOptionalAt := At( ']', sResult )
+            nCloseOptionalAt := nAtSkipStr( ']', sResult )
             WHILE nCloseOptionalAt > 1 .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
-               nCloseOptionalAt := At( ']', sResult, nCloseOptionalAt + 1 )
+               nCloseOptionalAt := nAtSkipStr( ']', sResult, nCloseOptionalAt + 1 )
             ENDDO
 
             IF nCloseOptionalAt == 0
@@ -6803,9 +6803,9 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                BREAK
             ENDIF
          ELSE
-            nCloseOptionalAt := At( ']', sResult )
+            nCloseOptionalAt := nAtSkipStr( ']', sResult )
             WHILE nCloseOptionalAt > 1 .AND. nCloseOptionalAt <= nAt .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
-               nCloseOptionalAt := At( ']', sResult, nCloseOptionalAt + 1 )
+               nCloseOptionalAt := nAtSkipStr( ']', sResult, nCloseOptionalAt + 1 )
             ENDDO
 
             IF nCloseOptionalAt > 0

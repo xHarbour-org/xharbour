@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.89 2003/10/26 20:14:18 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.90 2003/10/28 08:23:44 ronpinkas Exp $
  */
 
 /*
@@ -1333,6 +1333,28 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 
   while( *(mpatt+i) != '\0' )
   {
+     if( mpatt[i] == '"' )
+     {
+        while( mpatt[ ++i ] != '"' )
+        {
+           //Skip.
+        }
+
+        i++;
+        continue;
+     }
+
+     if( mpatt[i] == '\'' )
+     {
+        while( mpatt[ ++i ] != '\'' )
+        {
+           //Skip.
+        }
+
+        i++;
+        continue;
+     }
+
      if( *(mpatt+i) == '[' && ( i == 0 || *(mpatt+i-1) != '\\' ) )
      {
         uiOpenBrackets++;
@@ -1591,6 +1613,28 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 
   while( rpatt[i] != '\0' )
   {
+     if( rpatt[i] == '"' )
+     {
+        while( rpatt[ ++i ] != '"' )
+        {
+           //Skip.
+        }
+
+        i++;
+        continue;
+     }
+
+     if( rpatt[i] == '\'' )
+     {
+        while( rpatt[ ++i ] != '\'' )
+        {
+           //Skip.
+        }
+
+        i++;
+        continue;
+     }
+
      if( rpatt[i] == '[' && ( i == 0 || rpatt[ i - 1 ] != '\\' ) )
      {
         uiOpenBrackets++;
