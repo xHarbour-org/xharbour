@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.17 2003/09/15 04:09:10 paultucker Exp $
+# $Id: hrbdll.vc,v 1.18 2003/09/23 21:36:51 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -454,8 +454,15 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cdpplwin.obj \
   $(OBJ_DIR)\cdpru866.obj \
   $(OBJ_DIR)\cdpruwin.obj \
-  $(OBJ_DIR)\cdprukoi.obj
-
+  $(OBJ_DIR)\cdprukoi.obj \
+#
+# pplib
+#
+  $(OBJ_DIR)\ppcomp.obj  \
+  $(OBJ_DIR)\ppcore.obj  \
+  $(OBJ_DIR)\pplib.obj   \
+  $(OBJ_DIR)\pptable.obj \
+  $(OBJ_DIR)\pragma.obj
 
 # ÚÄÄÄÄÄÄÄÄÄÄ¿
 # ³ project  ³Û
@@ -1746,4 +1753,19 @@ $(OBJ_DIR)\hbsyslog.obj : $(RTL_DIR)\hbsyslog.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\hboutdebug.obj : $(RTL_DIR)\hboutdebug.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\ppcomp.obj : $(PP_DIR)\ppcomp.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\pplib.obj : $(RTL_DIR)\pplib.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\pragma.obj : $(PP_DIR)\pragma.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
