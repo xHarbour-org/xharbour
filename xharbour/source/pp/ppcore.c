@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.194 2005/02/26 15:16:49 andijahja Exp $
+ * $Id: ppcore.c,v 1.195 2005/02/27 05:52:00 ronpinkas Exp $
  */
 
 /*
@@ -4023,7 +4023,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
          case STATE_ID:
          case STATE_ID_END:
          {
-            // Operator IN may be followed by a literal string.
+            // Operator IN
             if( lens && isspace( *(*ptri - 1) ) && toupper( **ptri ) == 'I' && toupper( *(*ptri + 1) ) == 'N' && isspace( *(*ptri + 2) ) )
             {
                if( expreal )
@@ -4041,7 +4041,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                // Fake continuation.
                continue;
             }
-            // Operator HAS may be followed by a literal string.
+            // Operator HAS
             else if( lens && isspace( *(*ptri - 1) ) && toupper( **ptri ) == 'H' && toupper( *(*ptri + 1) ) == 'A' && toupper( *(*ptri + 2) ) == 'S' && isspace( *(*ptri + 3) ) )
             {
                if( expreal )
@@ -4056,9 +4056,11 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
                // Fake continuation.
                cLastChar = '$';
+               State = STATE_EXPRES;
+
                continue;
             }
-            // Operator LIKE may be followed by a literal string.
+            // Operator LIKE
             else if( lens && isspace( *(*ptri - 1) ) && toupper( **ptri ) == 'L' && toupper( *(*ptri + 1) ) == 'I' && toupper( *(*ptri + 2) ) == 'K' && toupper( *(*ptri + 3) ) == 'E' && isspace( *(*ptri + 4) ) )
             {
                if( expreal )
@@ -4074,6 +4076,8 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
                // Fake continuation.
                cLastChar = '$';
+               State = STATE_EXPRES;
+
                continue;
             }
             else if( ( ( ISNAME(**ptri) || **ptri=='\\' || ( **ptri == '&' && isspace( (BYTE) (*ptri)[1] ) == FALSE ) ) && State == STATE_ID_END ) || **ptri == ',' )
