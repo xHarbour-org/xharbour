@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3274 2004/08/04 23:50:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3275 2004/08/05 00:51:06 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-05 02:20 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * xdiff.txt
+    * 2 tiny typos.
 
 2004-08-04 19:46 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/tbrowse.prg
@@ -48,7 +52,7 @@
   * source/compiler/harbour.slx
     * Revised IS_OP() macro to support all operators.
   * xdiff.txt
-    * Mindor corrections.
+    * Minor corrections.
 
 2004-08-04 16:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
