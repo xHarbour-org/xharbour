@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2881 2004/05/07 12:16:09 likewolf Exp $
+ * $Id: ChangeLog,v 1.2882 2004/05/07 12:45:51 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-07 12:00 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
+  * source/rtl/tgetlist.prg
+    ! minor fix on envar when using get with tbrowse( ::nLastExitStat to ::nLastExitState )
 
 2004-05-07 16:45 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/debug/debugger.prg
