@@ -1,5 +1,5 @@
 /*
- * $Id: set.txt,v 1.12 2000/06/01 02:31:26 lculik Exp $
+ * $Id: set.txt,v 1.1.1.1 2001/12/21 10:49:05 ronpinkas Exp $
  */
 
 /*
@@ -407,7 +407,27 @@
  *                   When enabled, lightbar menus can be navigated from the
  *                   last position to the first and from the first position
  *                   to the last. When disabled, which is the default, there
- *                   is a hard stop at the first and last positions.        
+ *                   is a hard stop at the first and last positions.
+ * 
+ *              _SET_FILECASE    <0|1|2>
+ *                   This Set control how the file will be acessed on disk.
+ *                   If 0 is Specified, Mixed case letters is allowed
+ *                   If 1 is Speficied, Lower case letter is used, also, convert
+ *                   all letters to lower case. This is the default setting
+ *                   If 2 is Speficied, Upper case letter is used, also, convert
+ *                   all letters to Upper case. 
+ *
+ *              _SET_DIRCASE    <0|1|2>
+ *                   This Set control how the directory name will be acessed on disk.
+ *                   If 0 is Specified, Mixed case letters is allowed
+ *                   If 1 is Speficied, Lower case letter is used, also, convert
+ *                   all letters to lower case. This is the default setting
+ *                   If 2 is Speficied, Upper case letter is used, also, convert
+ *                   all letters to Upper case. 
+ *
+ *              _SET_DIRSEPARATOR    <'\' | '/'>
+ *                   This Set control the path separator to be used, default is
+ *                   Dos style separator  "\"
  * $RETURNS$
  *      SET() The current or previous setting
  * $FILES$

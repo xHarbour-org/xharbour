@@ -1,0 +1,49 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      TRY
+ *  $CATEGORY$
+ *      XHarbour Extension command
+ *  $ONELINER$
+ *      C Style Error Block 
+ *  $SYNTAX$
+ *      TRY
+ *        ...
+ *      [THROW( <Exp> )]
+ *        ...
+ *      CATCH <Id>
+ *        ...
+ *      END
+ *       
+ *  $ARGUMENTS$
+ *      <Exp> An Error Block
+ *
+ *      <Id>  Indentifier of the error      
+ *  $RETURNS$
+ *      Nil
+ *  $DESCRIPTION$
+ *      The above is very similiar to Clipper BEGIN SEQ, BREAK(), RECOVER USING, END,
+ *      but is more inline with more "modern" languages, and dismisses the need to
+ *      worry about Error codeblock.
+ *  $EXAMPLES$
+ *      LOCAL e
+ *
+ *      TRY
+ *      ? "start"
+ *
+ *      Throw( ErrorNew( "MySys", 1001, "MyOperation", "My Description", { "MyArg" } ) )
+ *
+ *      ? "Success"
+ *      CATCH e
+ *      ? "Caught", e:SubSystem, e:SubCode, e:Operation, e:Description, ValToPrg( e:Args )
+ *      END
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      Xharbour extension Command
+ *  $PLATFORMS$
+ *      All 
+ *  $SEEALSO$
+ *      SWITCH
+ *  $END$
+ */
+

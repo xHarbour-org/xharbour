@@ -1,0 +1,76 @@
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SWITCH
+ *  $CATEGORY$
+ *      XHarbour Extension command
+ *  $ONELINER$
+ *      C Style Based Do Case
+ *  $SYNTAX$
+ *      SWITCH <Exp>
+ *      CASE <Constant>
+ *        ...
+ *      [EXIT]
+ *
+ *      [More Cases ...]
+ *
+ *      [DEFAULT]
+ *        ...
+ *      END
+ *  $ARGUMENTS$
+ *      <Exp> Expression to switch
+ *      <Constant> An constant Value      
+ *  $RETURNS$
+ *      Nil or the value evaluated inside the case block 
+ *  $DESCRIPTION$
+ *      This syntax is modeled after the C 'switch' flow control. It offers
+ *      great speed benefit [30-300%] over DO CASE flow control, but is
+ *      restricted to comparing only constants.
+ *
+ *      Constants maybe: Integers, Longs, or Single Character
+ *      Strings [much like in C]
+ *
+ *      WARNING: Those NOT familiar with the C switch flow control, should understand
+ *      that unlike DO CASE, you MUST explicitly use the EXIT statement or else
+ *      logic will FALL THROUGH to the NEXT CASE, until stopped at a BREAK, or
+ *      or END statements.
+ *
+ *      At first this might seem VERY ODD, but it provides great flexibility
+ *      exactly like the C model.
+ *  $EXAMPLES$
+ *      LOCAL cVar := 'F', cResult
+ *      LOCAL Counter
+ *      LOCAL nStart
+ * 
+ *      nStart := Seconds()
+ *      FOR Counter := 1 TO LOOPS_COUNT
+ *      SWITCH cVar
+ *        CASE 'A'
+ *        CASE 'B'
+ *        CASE 'C'
+ *        CASE 'D'
+ *          cResult := "A-D"
+ *          EXIT
+ *
+ *        CASE 'E'
+ *        CASE 'F'
+ *        CASE 'G'
+ *        CASE 'H'
+ *          cResult := "E-H"
+ *          EXIT
+ *
+ *        DEFAULT
+ *          cResult := "Other"
+ *     END
+ *  NEXT
+ *  ? "SWITCH Time:", Seconds() - nStart, "Result:", cResult
+ *
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      Xharbour extension Command
+ *  $PLATFORMS$
+ *      All
+ *  $SEEALSO$
+ *      Try
+ *  $END$
+ */

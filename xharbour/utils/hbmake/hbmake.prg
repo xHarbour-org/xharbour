@@ -1,5 +1,6 @@
+
 /*
- * $Id: hbmake.prg,v 1.39 2003/01/12 19:47:58 lculik Exp $
+ * $Id: hbmake.prg,v 1.40 2003/01/12 20:28:47 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1230,10 +1231,10 @@ FUNC crtmakfile( cFile )
     LOCAL cDefGccLibs    := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
     LOCAL cgcclibsos2    := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon"
     LOCAL cDeflibGccLibs := "-lvm -lrtl -lgtsln -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lslang -lgpm -lpthread -lm"
-    LOCAL cDefBccLibsmt    := "bcc640.lib lang.lib vmmt.lib rtlmt.lib rddmt.lib macro.lib pp.lib dbfntxmt.lib dbfcdxmt.lib common.lib gtwin.lib"
-    LOCAL cDefGccLibsmt    := "-lvmmt -lrtlmt -lgtdos -llang -lrddmt -lrtlmt -lvmmt -lmacro -lpp -ldbfntxmt -ldbfcdxmt -lcommon"
-    LOCAL cgcclibsos2mt    := "-lvmmt -lrtlmt -lgtos2 -llang -lrddmt -lrtlmt -lvmmt -lmacro -lpp -ldbfntxmt -ldbfcdxmt -lcommon"
-    LOCAL cDeflibGccLibsmt := "-lvmmt -lrtlmt -lgtsln -llang -lrddmt -lrtlmt -lvmmt -lmacro -lpp -ldbfntxmt -ldbfcdxmt -lcommon -lslang -lgpm -lpthread -lm"
+    LOCAL cDefBccLibsmt    := "bcc640.lib lang.lib vmmt.lib rtlmt.lib rddmt.lib macro.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib common.lib gtwin.lib"
+    LOCAL cDefGccLibsmt    := "-lvmmt -lrtlmt -lgtdos -llang -lrddmt -lrtlmt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon"
+    LOCAL cgcclibsos2mt    := "-lvmmt -lrtlmt -lgtos2 -llang -lrddmt -lrtlmt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon"
+    LOCAL cDeflibGccLibsmt := "-lvmmt -lrtlmt -lgtsln -llang -lrddmt -lrtlmt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lslang -lgpm -lpthread -lm"
 
     LOCAL cLibs          := ""
     LOCAL citem          := ""
