@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1491 2003/09/18 13:45:31 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1492 2003/09/18 14:40:05 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-18 15:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/tget.prg
+    * Check for !Empty(::type) @ 308 since Type can be NIL if no Picture.
+    * This may not be the 'correct' fix, but solves the problem.
 
 2003-09-18 16:40 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/hvm.c

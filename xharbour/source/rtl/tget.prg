@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.56 2003/09/15 03:29:23 walito Exp $
+ * $Id: tget.prg,v 1.57 2003/09/15 15:40:12 ronpinkas Exp $
  */
 
 /*
@@ -305,7 +305,7 @@ METHOD ParsePict( cPicture ) CLASS Get
 
    // Generate default picture mask if not specified
 
-   if Empty( ::cPicMask )
+   if Empty( ::cPicMask ) .and. !Empty( ::type )
 
       Switch ::type
       case "D"
@@ -329,9 +329,7 @@ METHOD ParsePict( cPicture ) CLASS Get
             ::cPicMask := Replicate( '9', Len( cNum ) )
          endif
          exit
-
       end
-
    endif
 
    // Comprobar si tiene caracteres embebidos no modificables en la plantilla
