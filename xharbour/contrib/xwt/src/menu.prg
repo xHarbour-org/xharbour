@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: menu.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: menu.prg,v 1.2 2003/05/11 15:14:43 jonnymind Exp $
 
    Menu class
 */
@@ -12,10 +12,10 @@
 
 CLASS XWTMenu FROM XWTContainer
    
-   METHOD New( cStr )
+   METHOD New( cStr, oParent )
 ENDCLASS
 
-METHOD New( cStr ) CLASS XWTMenu
+METHOD New( cStr , oParent ) CLASS XWTMenu
    ::Super:New()
    // Self is not needed here
    ::nWidgetType := XWT_TYPE_MENU
@@ -23,6 +23,10 @@ METHOD New( cStr ) CLASS XWTMenu
 
    IF .not. Empty( cStr )
       XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cStr )
+   ENDIF
+
+   IF oParent != NIL
+      oParent:Add( Self )
    ENDIF
 
 RETURN Self

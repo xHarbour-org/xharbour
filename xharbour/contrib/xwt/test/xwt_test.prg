@@ -22,19 +22,10 @@ PROCEDURE MAIN()
    DEFINE LAYOUT oVLay  MODE XWT_LM_VERT PADDING 5 BORDER 2
    DEFINE LAYOUT oVLay2 MODE XWT_LM_VERT PADDING 5 BORDER 2
 
-   /* oVLay := XwtLayout():New( XWT_LM_VERT )
-   oVLay:SetPadding( 5 )
-   oVLay:SetBorder( 2 )
+   DEFINE SPLITTER oSplit MODE XWT_LM_HORIZ FIRSTWIDGET oVLay SECONDWIDGET oVLay2 OF oWindow
 
-   oVLay2 := XwtLayout():New( XWT_LM_VERT )
-   oVLay2:SetPadding( 5 )
-   oVLay2:SetBorder( 2 )
-   */
-
-   oSplit := XwtSplitter():New( XWT_LM_HORIZ, oVLay, oVLay2 )
    oSplit:SetShrinkFirst( .F. )
 
-   oWindow:Add( oSplit )
 
    // inside an horiz. layout
    DEFINE LAYOUT oHLay  MODE XWT_LM_HORIZ
@@ -73,7 +64,7 @@ PROCEDURE MAIN()
 
    oGrid := XwtGrid():New(2,3)
 
-   oLabel := XwtLabel():New("Field label")
+   DEFINE LABEL oLabel TEXT "Field label"
 
    oGrid:setPadding( 2, 10 )
    oGrid:SetFill( .T. )
@@ -90,9 +81,8 @@ PROCEDURE MAIN()
    oVLay2:Add( oGrid )
 
    /*** IMAGE ***/
-   oImg := XwtImage():New( "icon.png" )
-   oImg:SetSensible()
-   oVLay2:add( oImg )
+   DEFINE IMAGE oImg FILE "icon.png" OF oVLay2
+   //oImg:SetSensible()  // TODO: ANTES que oParent:Add( Self ), sino warning de GTK+
 
    /*** An input mask ***/
    aInputs := {;
@@ -126,26 +116,24 @@ PROCEDURE MAIN()
          )
    oList:SetColumnEditable( 0 )
    oVLay:Add( oList )
+
    /***** MENU design *****/
-   oMenu := XwtMenu():New( "File" )
 
-   oMenuItem := XwtMenuItem():New( "Op_en", 1 , @FileEvent())
-   oMenuItem:SetIcon( "valley.png" )
+   MENU oMenu PROMPT "File"
+        MENUITEM oMenuItem PROMPT "Op_en" ICON "valley.png" ACTION @FileEvent() OF oMenu
+        MENUITEM PROMPT "Close" ACTION @FileEvent() OF oMenu
+        MENUITEM PROMPT "QUIT"  ACTION @FileEvent() OF oMenu
 
-   oMenu:Add( oMenuItem )
-   oMenu:Add( XwtMenuItem():New( "Close", 2 , @FileEvent()))
-   oMenu:Add( XwtMenuItem():New( "QUIT", 3 , @FileEvent()))
+        MENU oMenuSec PROMPT "SubMenu" OF oMenu
+             MENUITEM PROMPT "Opt1" ID 10 ACTION @FileEvent() OF oMenuSec
+             MENUITEM PROMPT "Opt2" ID 11 ACTION @FileEvent() OF oMenuSec
 
-   oMenuSec := XwtMenu():New( "Submenu" )
-   oMenuSec:Add( XwtMenuItem():New( "Opt1", 10 , @FileEvent()))
-   oMenuSec:Add( XwtMenuItem():New( "Opt2", 11 , @FileEvent()))
-   oMenu:Add( oMenuSec )
-
-   oMenuHelp := XwtMenu():New( "Help" )
-   oMenuHelp:Add( XwtMenuItem():New( "About", 5 , @FileEvent()) )
-   oMenuHelp:Add( XwtMenuItem():New( "Help", 6 , @FileEvent()) )
-
+   MENU oMenuHelp PROMPT "Help"
+        MENUITEM PROMPT "About" ACTION @FileEvent() OF oMenuHelp
+        MENUITEM PROMPT "Help"  ACTION @FileEvent() OF oMenuHelp
+   
    oWindow:SetMenuBar( { oMenu, oMenuHelp } )
+
    /*** Showing window ***/
    oWindow:Resize( 200, 200 )
    oWindow:Show()
@@ -158,7 +146,7 @@ PROCEDURE MAIN()
    //oButton:Destroy()  // the button might or might not be deteached from window
    oWindow:Destroy()
 
-RETURN 
+RETURN
 
 
 

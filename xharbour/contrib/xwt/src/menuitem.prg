@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: menuitem.prg,v 1.2 2003/04/08 18:21:47 jonnymind Exp $
+   $Id: menuitem.prg,v 1.3 2003/05/11 15:14:43 jonnymind Exp $
 
    Menuitem class.
 */
@@ -13,15 +13,22 @@
 CLASS XWTMenuItem FROM XWTWidget
    DATA aCallback
    DATA nId
-   
+   CLASSDATA nAutoId INIT 1
+
    METHOD New( cStr, nId, oCalled, oMethod )
    METHOD SetIcon( cFileName )
 
 ENDCLASS
 
-METHOD New( cStr, nId, oCalled, oMethod ) CLASS XWTMenuItem
+METHOD New( cStr, nId, oCalled, oMethod, cIcon, oMenu ) CLASS XWTMenuItem
    ::Super:New()
-   ::nId := nId
+
+   IF nId != NIL
+      ::nId := nId
+   ELSE
+      ::nId := ::nAutoId++
+   ENDIF
+
    ::nWidgetType := XWT_TYPE_MENUITEM
    IF .not. Empty( oCalled )
       ::AddEventListener( XWT_E_CLICKED, oCalled, oMethod )
@@ -30,6 +37,14 @@ METHOD New( cStr, nId, oCalled, oMethod ) CLASS XWTMenuItem
 
    IF .not. Empty( cStr )
       XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cStr )
+   ENDIF
+
+   IF cIcon != NIL
+      ::SetIcon( cIcon )
+   ENDIF
+
+   IF oMenu != NIL
+      oMenu:Add( Self )
    ENDIF
 
 RETURN Self

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.15 2003/07/20 20:47:33 xthefull Exp $
+   $Id: xwt.ch,v 1.16 2003/07/21 18:04:32 xthefull Exp $
 
    Definitions
 */
@@ -215,5 +215,22 @@
 #xcommand @ <x>,<y> TOGGLEBUTTON [<oToggle>] [TEXT <cText>] [ VAR <lStatus>] [ OF <oParent> ];
                   => [<oToggle> := ] XWTToggleButton():New( <cText>,<lStatus>,<x>,<y>,<oParent> )
 
+// Splitter --------------------------------------------------------------------------------
+#xcommand DEFINE SPLITTER  [<oSplitter>] [ MODE <nMode> ][ FIRSTWIDGET <oFirstWidget> ][SECONDWIDGET <oSecondWidget>];
+                           [ SIZE <nSizeX>,<nSizeY> ] [ OF <oParent> ];
+ => [ <oSplitter> := ] XWTSplitter():New( <nMode>, <oFirstWidget>, <oSecondWidget>, <nSizeX>, <nSizeY>, <oParent> )
+
+
+// Image -------------------------------------------------------------------------------------
+#xcommand DEFINE IMAGE [ <oImg> ] [FILE <cFile> ] [ OF <oParent> ];
+                 => [ <oImg> := ] XWTImage():New( <cFile>,<oParent>)
+
+// Menus ----------------------------------------------------------------------------------------
+#xcommand MENU <oMenu> [ PROMPT < cPrompt> ] [ OF <oParent> ] ;
+          => <oMenu> := XWTMenu():New( <cPrompt>, <oParent> )
+
+#xcommand MENUITEM [<oMenuItem>] [ PROMPT <cPrompt> ] [ ID <nId>] [ICON <cIcon>];
+                               [ ACTION <pAction> ] [ METHOD <oMethod> ][ OF <oMenu> ];
+          => [<oMenuItem> := ] XWTMenuItem():New( <cPrompt>, <nId>, <pAction>, <oMethod>, <cIcon>, <oMenu> )
 
 #endif

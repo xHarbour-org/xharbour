@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.21 2003/07/20 20:45:19 xthefull Exp $
+ * $Id: Changelog,v 1.22 2003/07/21 18:14:35 xthefull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-07-22 18:03 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
+  * src/image.prg
+  * src/menu.prg
+  * src/menuitem.prg
+    + Implementation nId automatic or manual.
+  * src/splitter.prg
+  * src/togglebutton.prg
+    + Added passed new parameters and support of parent WidGet
+
+  * test/xwt_test.prg
+    + Used news commands
+
+* /include/xwt.ch
+    + New commands preprocesador :
+      +DEFINE IMAGE <...>
+      +DEFINE SPLITTER <...>
+      +MENU <oMenu> PROMPT <cPrompt> OF <oMenu>
+      +MENUITEM <oMenuItem> ... OF <oMenu>
+      
 2003-07-21 20:12 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
   * src/button.prg
   * src/togglebutton.prg
