@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1005 2003/05/07 20:08:12 walito Exp $
+ * $Id: ChangeLog,v 1.1006 2003/05/07 20:32:25 iananderson Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-05-07 16:463 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Commented 1 leftover debug printf()
+
 2003-05-07 22:27 UTC+0100 Ian Anderson <i.anderson@procon-online.de>
   * source/rtl/memoedit.prg
-    ! added K_F2 to K_F12 to list of unhandled keys to prevent infinite 
-      which gave stack overflow when function key pressed and not mapped. 
+    ! added K_F2 to K_F12 to list of unhandled keys to prevent infinite
+      which gave stack overflow when function key pressed and not mapped.
     * Removed kludge which set lastkey incorrectly.
-    
+
 2003-05-07 17:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tget.prg
     ! Fix minor bug in SetFocus().

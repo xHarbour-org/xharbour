@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.65 2003/05/06 03:56:45 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.66 2003/05/07 02:21:55 ronpinkas Exp $
  */
 
 /*
@@ -5138,7 +5138,7 @@ static int NextName( char ** sSource, char * sDest )
            /* Ron Pinkas added 2000-11-08 */
            pString = *sSource;
            State = STATE_QUOTE3;
-           printf( "String: >%s< After: '%c' (%i)\n", pString, cLastChar, cLastChar );
+           //printf( "String: >%s< After: '%c' (%i)\n", pString, cLastChar, cLastChar );
         }
      }
      /* END - Ron Pinkas added 2000-11-08 */
