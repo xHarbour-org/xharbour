@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.44 2004/04/27 22:04:11 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.45 2004/04/28 22:24:52 ronpinkas Exp $
  */
 
 /*
@@ -56,8 +56,6 @@
 #include "hbapiitm.h"
 #include "hbvm.h"
 #include "hbstack.h"
-
-extern void hb_memvarReleaseDetached( HB_HANDLE hValue );
 
 /*
 JC1: they are not needed anymore, it seems: all their reference are
@@ -298,8 +296,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
          while( ui )
          {
             //TraceLog( NULL, "Release Detached %i\n", ui );
-            //hb_memvarValueDecRef( pCBlock->pLocals[ ui ].item.asMemvar.value );
-            hb_memvarReleaseDetached( pCBlock->pLocals[ ui ].item.asMemvar.value );
+            hb_memvarValueDecRef( pCBlock->pLocals[ ui ].item.asMemvar.value );
             //TraceLog( NULL, "DONE Release Detached %i\n", ui );
 
 			ui--;

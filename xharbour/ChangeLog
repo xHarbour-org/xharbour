@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2854 2004/04/30 12:26:24 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2855 2004/04/30 15:24:44 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-30 09:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * source/vm/itemapi.c
+     * Formatting.
+
+   * source/vm/codebloc.c
+   * source/vm/memvars.c
+     - Removed recently added hb_memvarReleaseDetached() and logic to reset Detached Local Flag.
+       /* Flag is reset on creation of new memver. Pramature Reset caused GC to use the item in sweep scan.*/
 
 2004-04-30 17:15 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rtl/gtwvt/gtwvt.c
@@ -20,7 +29,7 @@
     + #define WVT_PENS_MAX   20
     + HFONT hUserFonts[ WVT_FONTS_MAX ]
     + HPEN  hUserPens[ WVT_PENS_MAX ]
-      Array to hold user defined fonts and pens. The objects thus held are 
+      Array to hold user defined fonts and pens. The objects thus held are
       released automatically when application terminates.
 
   * xharbour/source/rtl/gtwvt/gtwvt.c
@@ -31,18 +40,18 @@
     * hb_wvt_gtRenderPicture()
       A big bug fixed which was causing Resource leak which was crashing the  application
       on OS which had low resource profiles such as Win9x family.
-  
+
     + Wvt_LoadFont( nSlot, cFontFace, nHeight, nWidth, nWeight, lItalic, ;
                     lUnderline, lStrikeout,nCharSet, nQuality, nEscapement )
-      Creates the font with requested attributes and stores the handle 
+      Creates the font with requested attributes and stores the handle
       in _s.hUserFont[ iSlot ( nSlot - 1 ) ]
 
     + Wvt_LoadPen( nSlot, nStyle, nThick, nRGBColor )
       As above.
- 
+
     + Wvt_DrawLabelEx(  nRow, nCol, cLabel, nAlign, nTextColor, nBkColor, nSlot )
-      Just like Wvt_DrawLabel() but with reduced parameters substituting <nSlot> 
-      for all parameters related with font used. This way the need to recreate 
+      Just like Wvt_DrawLabel() but with reduced parameters substituting <nSlot>
+      for all parameters related with font used. This way the need to recreate
       the same font over and over is eliminated.
 
     + Wvt_DrawLineEx( nTop, nLeft, nBottom, nRight, nOrient, nFormat, nAlign, nSlotPen )

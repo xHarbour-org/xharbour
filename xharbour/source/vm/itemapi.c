@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.98 2004/04/28 22:49:56 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.99 2004/04/28 22:52:06 ronpinkas Exp $
  */
 
 /*
@@ -1838,13 +1838,19 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
                else
                {
                   if( n > -1 )
+                  {
                      size = n + 1;
+                  }
                   else
+                  {
                      size *= 2;
+                  }
+
                   buffer = ( char * ) hb_xrealloc( buffer, size );
                }
             }
             while( bFail );
+
             * ulLen = strlen( buffer );
             * bFreeReq = TRUE;
          }
