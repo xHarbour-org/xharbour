@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3383 2004/08/31 15:40:22 paultucker Exp $
+ * $Id: ChangeLog,v 1.3385 2004/08/31 22:46:53 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-31 22:47 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+   * Changelog,v 1.3385
+   * xharbour/make_b32.bat
+     * Added hbctmt.lib and hbtipmt.lib to delete lib list when "clean"
+       parameter is called.
 
 2004-09-01 03:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbrddfpt.h
