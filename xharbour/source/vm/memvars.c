@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.77 2004/04/23 22:52:23 ronpinkas Exp $
+ * $Id: memvars.c,v 1.78 2004/04/24 11:52:22 lf_sfnet Exp $
  */
 
 /*
@@ -187,11 +187,13 @@ void hb_memvarsRelease( void )
 
    ulCnt = s_globalLastFree;
 
+   //TraceLog( NULL, "memvarsRelease()\n" );
+
    if( s_globalTable )
    {
       while( --ulCnt )
       {
-         if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
+         //if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
          {
             if( HB_IS_COMPLEX( &s_globalTable[ ulCnt ].item ) )
             {
@@ -247,7 +249,7 @@ void hb_memvarsRelease( HB_STACK *pStack )
    {
       while( --ulCnt )
       {
-         if( pStack->globalTable[ ulCnt ].counter && pStack->globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
+         //if( pStack->globalTable[ ulCnt ].counter && pStack->globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
          {
             if( HB_IS_COMPLEX( &pStack->globalTable[ ulCnt ].item ) )
             {
@@ -618,14 +620,24 @@ void hb_memvarValueDecRef( HB_HANDLE hValue )
          }
 
          #ifndef HB_THREAD_SUPPORT
-         hb_memvarRecycle( hValue );
+            hb_memvarRecycle( hValue );
          #else
-         hb_memvarRecycleMT( hValue, &HB_VM_STACK );
+            hb_memvarRecycleMT( hValue, &HB_VM_STACK );
          #endif
 
          HB_TRACE(HB_TR_INFO, ("Memvar item (%i) deleted", hValue));
       }
    }
+}
+
+void hb_memvarReleaseDetached( HB_HANDLE hValue )
+{
+   HB_THREAD_STUB
+
+   hb_memvarValueDecRef( hValue );
+
+   // Reset Detach Local flag!
+   ( s_globalTable + hValue )->hPrevMemvar = 0;
 }
 
 #ifdef HB_THREAD_SUPPORT
@@ -711,6 +723,9 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
 
    	     HB_TRACE(HB_TR_INFO, ("Memvar item (%i) deleted", hValue));
    	  }
+
+      // Reset Detached Local flag!
+      pValue->hPrevMemvar = 0;
    }
 }
 
@@ -2276,8 +2291,7 @@ void hb_memvarsIsMemvarRef( void *pData )
          /* do not check detached variables - for these variables only
           * references from the eval stack are meaningfull for the GC
          */
-         if( pStack->globalTable[ ulCnt ].counter &&
-            pStack->globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE )-1 )
+         if( pStack->globalTable[ ulCnt ].counter && pStack->globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
          {
             hb_gcItemRef( &(pStack->globalTable[ ulCnt ].item) );
          }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2838 2004/04/27 15:25:46 kaddath Exp $
+ * $Id: ChangeLog,v 1.2839 2004/04/27 16:10:47 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-27 15:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/memvars.c
+    ! Fixed hb_memvarValueDecGarbageRef() to reset the Detached Local Flag (called only from codebloc.c)
+    + Added void hb_memvarReleaseDetached( HB_HANDLE hValue ) which calls hb_memvarValueDecRef()
+      but also resets the Detached Local Flag (called only from codebloc.c)
+
+    - Commented if() condition related to Detached Locals in hb_memvarsRelease[MT]()
+      /* IF we get new GPF reports I will need to restore it and provide additional fix,
+         but I don't belive it is very likely. */
+
+  * source/vm/codebloc.c
+    ! Fixed hb_codeblockDelete() to call hb_memvarReleaseDetached() instead of hb_memvarValueDecRef()
 
 2004-04-26 20:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/include/hbgtwvt.h
@@ -19,14 +32,14 @@
     + hb_wvt_gtRenderPicture()
     + Wvt_LoadPicture( cImageFile, nSlot )
     + Wvt_DrawPicture( nTop, nLeft, nBottom, nRight, aAdjPixels )
-      hb_wvt_gtDrawImage() code is broken in two section, 1) to load image, 
+      hb_wvt_gtDrawImage() code is broken in two section, 1) to load image,
       and 2) render image. The image thus loaded is retained in _s.iPicture[ iSlot ]
       array slot and rendered when required.
 
     * Wvt_DrawImage()
-    * Wvt_DrawButton() 
+    * Wvt_DrawButton()
       Now both these functions accept <cImage/nImageSlot> as its respective parameter.
-  
+
   * xharbour/tests/wvtgui.prg
     Updated to demonstrate the mechanism achieved with above functions.
 
