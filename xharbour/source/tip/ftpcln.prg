@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
+ * $Id: ftpcln.prg,v 1.2 2005/01/20 08:28:07 brianhays Exp $
  */
 
 /*
@@ -88,6 +88,7 @@ CLASS tIPClientFTP FROM tIPClient
    METHOD Stor()
    METHOD Quit()
    METHOD ScanLength()
+   METHOD ReadAuxPort()
 
 ENDCLASS
 
@@ -211,19 +212,28 @@ RETURN .T.
 
 
 METHOD TransferStart() CLASS tIPClientFTP
+   LOCAL skt
    ::SocketControl := ::SocketCon
 
    IF ::bUsePasv
-      ::SocketCon := InetConnectIP( ::cDataServer, ::nDataPort )
-      InetSetTimeout( ::SocketCon, ::nConnTimeout )
+      skt := InetConnectIP( ::cDataServer, ::nDataPort )
+      IF skt != NIL .and. InetErrorCode( skt ) == 0
+         // Get the start message from the control connection
+         IF .not. ::GetReply()
+            InetClose( skt )
+            RETURN .F.
+         ENDIF
+
+         InetSetTimeout( skt, ::nConnTimeout )
+         ::SocketCon := skt
+      ENDIF
    /*ELSE
       ::SocketCon := InetAccept( ::SocketPortServer )*/
    ENDIF
 
-   IF InetErrorCode( ::SocketCon ) == 0
-      RETURN .T.
-   ENDIF
-RETURN .F.
+RETURN .T.
+
+
 
 METHOD Commit() CLASS tIPClientFTP
    InetClose( ::SocketCon )
@@ -236,10 +246,10 @@ METHOD Commit() CLASS tIPClientFTP
    IF ::cReply[1] == "5"
       RETURN .F.
    ENDIF
-
+/*
    IF ::GetReply() .and. ::cReply[1] != "5"
       RETURN .T.
-   ENDIF
+   ENDIF*/
 RETURN .F.
 
 
@@ -261,13 +271,29 @@ METHOD List() CLASS tIPClientFTP
 */
    InetSendAll( ::SocketCon, "LIST" + ::cCRLF )
    cStr := ::ReadAuxPort()
-   IF ::GetReply()
-      IF .not. ::GetReply()
-         RETURN NIL
-      ENDIF
-   ENDIF
+
 RETURN cStr
 
+METHOD ReadAuxPort() CLASS tIPClientFTP
+   LOCAL cRet, cList := ""
+
+   IF .not. ::TransferStart()
+      RETURN NIL
+   END
+
+   cRet := ::super:Read( 512 )
+   WHILE cRet != NIL .and. len( cRet ) > 0
+      cList += cRet
+      cRet := ::super:Read( 512 )
+   END
+
+   InetClose( ::SocketCon )
+   ::SocketCon := ::SocketControl
+   IF ::GetReply()
+      RETURN cList
+   ENDIF
+
+RETURN NIL
 
 METHOD Retr( cFile ) CLASS tIPClientFTP
    LOCAL nTimeout
@@ -280,16 +306,9 @@ METHOD Retr( cFile ) CLASS tIPClientFTP
    ENDIF
 
    InetSendAll( ::SocketCon, "RETR " + cFile+ ::cCRLF )
-   nTimeout := InetGetTimeout( ::SocketCon )
-   InetSetTimeout( ::SocketCon, 100 )
-   // have we got a timeout? then the server is waiting for us on the
-   // other line...
-   IF .not. ::GetReply() .and. InetErrorCode( ::SocketCon ) == -1
-      InetSetTimeout( ::SocketCon, nTimeout )
-      ::TransferStart()
+   IF ::TransferStart()
       RETURN .T.
    ENDIF
-   InetSetTimeout( ::SocketCon, nTimeout )
 RETURN .F.
 
 
@@ -304,16 +323,11 @@ METHOD Stor( cFile ) CLASS tIPClientFTP
    ENDIF
 
    InetSendAll( ::SocketCon, "STOR " + cFile+ ::cCRLF )
-   nTimeout := InetGetTimeout( ::SocketCon )
-   InetSetTimeout( ::SocketCon, 100 )
-   // have we got a timeout? then the server is waiting for us on the
-   // other line...
-   IF .not. ::GetReply() .and. InetErrorCode( ::SocketCon ) == -1
+   IF ::GetReply()
       InetSetTimeout( ::SocketCon, nTimeout )
       ::TransferStart()
       RETURN .T.
    ENDIF
-   InetSetTimeout( ::SocketCon, nTimeout )
 RETURN .F.
 
 /*
