@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: !pack_src.bat,v 1.1 2002/04/24 23:52:18 ronpinkas Exp $
+rem $Id: !pack_src.bat,v 1.2 2002/05/21 17:15:55 ronpinkas Exp $
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
@@ -32,9 +32,18 @@ rem ROOT
 rem BIN
 %hb_archbin% %hb_archopt%  %hb_filename% bin/*.bat
 
+rem CONFIG
+%hb_archbin% %hb_archopt%  %hb_filename% config/*.cf
+%hb_archbin% %hb_archopt%  %hb_filename% config/bsd/*.cf
+%hb_archbin% %hb_archopt%  %hb_filename% config/dos/*.cf
+%hb_archbin% %hb_archopt%  %hb_filename% config/linux/*.cf
+%hb_archbin% %hb_archopt%  %hb_filename% config/os2/*.cf
+%hb_archbin% %hb_archopt%  %hb_filename% config/w32/*.cf
+
 rem DOC
-%hb_archbin% %hb_archoptr% %hb_filename% doc/*.txt doc/en/*.txt
-%hb_archbin% %hb_archoptr% %hb_filename% doc/*.txt doc/es/*.txt
+%hb_archbin% %hb_archoptr% %hb_filename% doc/*.txt
+%hb_archbin% %hb_archoptr% %hb_filename% doc/en/*.txt
+%hb_archbin% %hb_archoptr% %hb_filename% doc/es/*.txt
 
 rem INCLUDE
 %hb_archbin% %hb_archopt%  %hb_filename% include/Makefile
