@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.43 2003/11/20 23:47:36 druzus Exp $
+ * $Id: dbf1.c,v 1.44 2003/11/22 03:33:57 ronpinkas Exp $
  */
 
 /*
@@ -493,6 +493,10 @@ static void hb_dbfGetLockArray( DBFAREAP pArea, PHB_ITEM pItem )
    hb_itemRelease( pRecNo );
 }
 
+#if defined(HB_EXTERN_C)
+extern "C" {
+#endif
+
 /*
  * Converts EDBF_* error code into EG_* one.
  * This function is common for different DBF based RDD implementation
@@ -550,10 +554,6 @@ ERRCODE hb_dbfGetEGcode( ERRCODE errCode )
 
    return errEGcode;
 }
-
-#if defined(HB_EXTERN_C)
-extern "C" {
-#endif
 
 /*
  * Converts memo block offset into ASCII.
