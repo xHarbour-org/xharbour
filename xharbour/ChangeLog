@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3772 2005/01/26 21:46:22 druzus Exp $
+ * $Id: ChangeLog,v 1.3773 2005/01/27 11:49:10 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-27 08:28 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbclass.ch
+    * Corrected spelling of 'PERSISTENT' in EXTEND and OVERRIDE sysntax
 
 2005-01-27 12:50 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/make_xmingw.sh
