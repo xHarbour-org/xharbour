@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-mkslib.sh,v 1.4 2004/10/18 10:22:24 likewolf Exp $
+# $Id: hb-mkslib.sh,v 1.5 2004/11/01 05:38:08 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -117,4 +117,3 @@ stat="$?"
 [ $stat != 0 ] && cd "${dir}" && rm -f "${DSTDIR}${FULLNAME}"
 cleanup
 exit "${stat}"
-

@@ -1,5 +1,5 @@
 /*
- * $Id: calconst.c,v 1.5 2004/10/27 16:54:19 ronpinkas Exp $
+ * $Id: calconst.c,v 1.6 2004/10/27 17:21:31 ronpinkas Exp $
  */
 
 /*
@@ -337,7 +337,7 @@ char * NextTokenInConstant( char **pExp )
 
       (*pExp) += 3;
    }
-   else if( isdigit( (*pExp)[0] ) )
+   else if( isdigit( ( BYTE ) (*pExp)[0] ) )
    {
       int i = 0;
 
@@ -350,7 +350,7 @@ char * NextTokenInConstant( char **pExp )
          i = 2;
 
          // Hex
-         while( i < 31 && isxdigit( (*pExp)[0] ) )
+         while( i < 31 && isxdigit( ( BYTE ) (*pExp)[0] ) )
          {
             sToken[i++] = (*pExp)[0];
             (*pExp)++;
@@ -365,7 +365,7 @@ char * NextTokenInConstant( char **pExp )
       {
          sToken[i++] = (*pExp)[0];
          (*pExp)++;
-      } while( i < 31 && isdigit( (*pExp)[0] ) );
+      } while( i < 31 && isdigit( ( BYTE ) (*pExp)[0] ) );
 
       // Decimals
       if( i < 31 && (*pExp)[0] == '.' )
@@ -373,7 +373,7 @@ char * NextTokenInConstant( char **pExp )
          sToken[i++] = (*pExp)[0];
          (*pExp)++;
 
-         while( i < 31 && isdigit( (*pExp)[0] ) )
+         while( i < 31 && isdigit( ( BYTE ) (*pExp)[0] ) )
          {
             sToken[i++] = (*pExp)[0];
             (*pExp)++;
@@ -382,7 +382,7 @@ char * NextTokenInConstant( char **pExp )
 
       sToken[i] = '\0';
    }
-   else if( isalpha( (*pExp)[0] ) || (*pExp)[0] == '_' )
+   else if( isalpha( ( BYTE ) (*pExp)[0] ) || (*pExp)[0] == '_' )
    {
       int i = 0;
 
@@ -390,7 +390,7 @@ char * NextTokenInConstant( char **pExp )
       {
          sToken[i++] = (*pExp)[0];
          (*pExp)++;
-      } while( isalnum( (*pExp)[0] ) || (*pExp)[0] == '_' );
+      } while( isalnum( ( BYTE ) (*pExp)[0] ) || (*pExp)[0] == '_' );
    }
 
    if(

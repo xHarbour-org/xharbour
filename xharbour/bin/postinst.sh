@@ -1,11 +1,11 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: postinst.sh,v 1.10 2004/10/18 10:22:24 likewolf Exp $
+# $Id: postinst.sh,v 1.11 2004/11/01 05:38:08 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
-# Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
+# Copyright 2003 Przemyslaw Czerpak <druzus@priv.onet.pl>
 # simple script run after xHarbour make install to finish install
 # process
 #
@@ -37,20 +37,20 @@ fi
 
 if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "mingw32" ] || [ "$HB_COMPILER" = "djgpp" ]
 then
-    if [ "${HB_ARCHITECTURE}" == "bsd" ]; then
+    RANLIB=""
+    MAKE=make
+    AR="ar -cr"
+    if [ "${HB_ARCHITECTURE}" = "bsd" ]; then
         MAKE=gmake
-    else
-        MAKE=make
-    fi
-    if [ "${HB_ARCHITECTURE}" == "darwin" ]; then
+    elif [ "${HB_ARCHITECTURE}" = "darwin" ]; then
         # We must build an archive index on Darwin
         AR="ar -crs"
-    else
-        AR="ar -cr"
     fi
-    if [ "${HB_ARCHITECTURE}" != "dos" ]; then
-	# Without -c some OSes _move_ the file instead of copying it!
-        install -c -m755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
+    if [ "${HB_ARCHITECTURE}" = "sunos" ]; then
+        install -m 755 -f "${HB_BIN_INSTALL}" "${hb_root}/bin/hb-mkslib.sh"
+    elif [ "${HB_ARCHITECTURE}" != "dos" ]; then
+        # Without -c some OSes _move_ the file instead of copying it!
+        install -c -m 755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
     fi
     mk_hbtools "${HB_BIN_INSTALL}" "$@"
     [ "$HB_COMPILER" = "gcc" ] && mk_hblibso "${hb_root}"
@@ -61,10 +61,12 @@ then
     rm -f fm.o
     ${MAKE} -r fm.o
     ${AR} ${HB_LIB_INSTALL}/libfm.a fm.o
+    [ -n "${RANLIB}" ] && ${HB_LIB_INSTALL}/libfm.a
     rm -f fm.o
     if [ "${HB_MT}" = "MT" ]; then
         ${MAKE} -r fm.o 'HB_LIBCOMP_MT=YES'
         ${AR} ${HB_LIB_INSTALL}/libfmmt.a fm.o
+        [ -n "${RANLIB}" ] && ${HB_LIB_INSTALL}/libfmmt.a
         rm -f fm.o
     fi
     )
