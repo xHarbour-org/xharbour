@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.70 2003/09/10 07:21:23 ronpinkas Exp $
+ * $Id: arrays.c,v 1.71 2003/09/10 17:18:19 ronpinkas Exp $
  */
 
 /*
@@ -1535,12 +1535,12 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
          }
       #endif
 
-         /* 03-07-2002 RP commented out - Needs further testing.
+         // 03-07-2002 RP commented out - Needs further testing.
          else if( HB_IS_MEMVAR( pItem ) )
          {
             hb_memvarValueDecRef( pItem->item.asMemvar.value );
          }
-         */
+
          ++pItem;
       }
 
