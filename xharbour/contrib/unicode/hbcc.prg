@@ -1,5 +1,5 @@
 /*
- * $Id: hbcc.prg,v 1.1 2004/01/14 13:59:52 andijahja Exp $
+ * $Id: hbcc.prg,v 1.1 2004/01/14 06:15:37 andijahja Exp $
  */
 
 /*
@@ -131,7 +131,6 @@ HB_B64DECODE(b64_string) -> string
    Returns:
       decoded string
 */
-
 #pragma BEGINDUMP
 
 #include "hbapi.h"
@@ -196,7 +195,7 @@ static ULONG uni2ut7(BYTE *,ULONG,BYTE *);
 static ULONG ut72uni(BYTE *,ULONG,BYTE *);
 static ULONG ut82uni(BYTE *,ULONG,BYTE *);
 static ULONG uni2ut8(BYTE *,ULONG,BYTE *);
-static ULONG uni2chr(ULONG,BYTE *,ULONG,BYTE *); 
+static ULONG uni2chr(ULONG,BYTE *,ULONG,BYTE *);
 static ULONG chr2uni(ULONG,BYTE *,ULONG,BYTE *);
 static ULONG uni2uni(BYTE *,ULONG,BYTE *);
 
@@ -244,6 +243,7 @@ static HB_FUNC( HB_INT_CSEXIT )
 	lcs=0;
 	if (cspath) hb_xfree(cspath);
 	cspath=NULL;
+	return;
 }
 
 HB_FUNC( HB_CSGETERROR )
@@ -268,11 +268,7 @@ HB_FUNC( HB_CSREG )
 		strcpy((char *) filepath,(char *) cspath);
 		strcat((char *) filepath,(char *) csname);
 		strcat((char *) filepath,(char *) HB_CSFEXT);
-#ifdef __XHARBOUR__
 		if (hb_spFile(filepath,NULL)==FALSE) {
-#else
-		if (hb_spFile(filepath)==FALSE) {
-#endif
 			hb_xfree(filepath);
 			LastError=HB_CSERR_BADCS;
 			hb_retnl(HB_CSINVALID);
@@ -320,6 +316,7 @@ HB_FUNC( HB_CSREG )
 				for (c=filepath[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME];c<=filepath[2*i+CSINFO_OFFLEAD-CSINFO_MAXNAME+1];c++) pcs[lcs-1]->leads[j++]=c;
 			}
 		}
+		hb_xfree(filepath); // bugfix 200401190646GMT+3
 		j=(2*MAX_CHARSIZE)*pcs[lcs-1]->ltc2u;
 		pcs[lcs-1]->tc2u=(BYTE *) hb_xgrab(j);
 		i=hb_fsReadLarge(hf,pcs[lcs-1]->tc2u,j);
@@ -454,11 +451,7 @@ HB_FUNC( HB_CSAVAIL )
 		strcpy((char*)filepath,(char*)cspath);
 		strcat((char*)filepath,hb_parc(1));
 		strcat((char*)filepath,HB_CSFEXT);
-#ifdef __XHARBOUR__
 		x=hb_spFile(filepath,NULL);
-#else
-		x=hb_spFile(filepath);
-#endif
 		hb_xfree(filepath);
 		if (x) LastError=HB_CSERR_OK;
 		else LastError=HB_CSERR_BADCS;
@@ -484,6 +477,7 @@ HB_FUNC( HB_CSLIST )
 	}
 	hb_retc((char*)(cslist+1));
 	hb_xfree(cslist);
+	return;
 }
 
 HB_FUNC( HB_CSTOCS )
@@ -659,6 +653,7 @@ static BOOL b64invalid(BYTE c)
 static ULONG b64enc(BYTE *srcstr, ULONG srclen, BYTE *dststr)
 {
 	ULONG dstlen,i;
+
 	if (dststr) {
 		dstlen=0;
 		i=0;
@@ -771,13 +766,14 @@ static ULONG uni2chr(ULONG h,BYTE *unistr,ULONG unilen,BYTE *chrstr)
 		}
 		chrlen+=n;
 		i+=2;
-	}	
+	}
 	return chrlen;
 }
 
 static ULONG ut82uni(BYTE *utfstr,ULONG utflen,BYTE *unistr)
 {
 	ULONG i,n,unilen=0;
+
         for (i=0;i<utflen;) {
 		if (utfstr[i] & 0x80) {
 			if (utfstr[i] & 0x40) {
@@ -905,7 +901,7 @@ static ULONG uni2ut7(BYTE *unistr,ULONG unilen,BYTE *utfstr)
 					b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
 					utflen+=j;
 					utfstr[utflen++]='-';
-				}	
+				}
 				else utflen+=j+2;
 			}
 			if (utfstr) {
@@ -923,7 +919,7 @@ static ULONG uni2ut7(BYTE *unistr,ULONG unilen,BYTE *utfstr)
 					b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
 					utflen+=j;
 					utfstr[utflen++]='-';
-				}	
+				}
 				else utflen+=j+2;
 			}
 			if (utfstr) utfstr[utflen++]='-';
@@ -952,7 +948,7 @@ static ULONG uni2ut7(BYTE *unistr,ULONG unilen,BYTE *utfstr)
 					utfstr[utflen++]='+';
 					b64enc(dummy,i-(dummy-unistr),utfstr+utflen);
 					utflen+=j;
-				}	
+				}
 				else utflen+=j+1;
 			}
 			if (utfstr) utfstr[utflen++]=unistr[i+1];
@@ -970,7 +966,7 @@ static ULONG uni2ut7(BYTE *unistr,ULONG unilen,BYTE *utfstr)
 			utfstr[utflen++]='+';
 			b64enc(dummy,unilen-(dummy-unistr),utfstr+utflen);
 			utflen+=j;
-		}	
+		}
 		else utflen+=j+1;
 	}
 	return utflen;
@@ -987,3 +983,4 @@ INIT Procedure HB_CSINIT()
 Exit Procedure HB_CSEXIT()
    HB_INT_CSEXIT()
    Return
+

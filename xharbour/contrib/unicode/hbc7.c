@@ -1,5 +1,5 @@
 /*
- * $Id: hbc7.c,v 1.1 2004/01/14 13:59:52 andijahja Exp $
+ * $Id: hbc7.c,v 1.1 2004/01/14 06:14:03 andijahja Exp $
  */
 
 /*
@@ -121,12 +121,13 @@ HB_FUNC(HB_URLENCODE)
 		srcstr=(BYTE*) hb_itemGetCPtr(phbstr);
 		srclen=hb_itemGetCLen(phbstr);
 		dstlen=str2ue7(srcstr,srclen,NULL);
-		dststr=(BYTE *) hb_xgrab(dstlen);
+		dststr=(BYTE *) hb_xgrab(dstlen+1);
 		str2ue7(srcstr,srclen,dststr);
 		hb_retclen((char *) dststr,dstlen);
 		hb_xfree(dststr);
 	}
 	else hb_retc("");
+	return;
 }
 
 HB_FUNC(HB_QPENCODE)
@@ -138,12 +139,13 @@ HB_FUNC(HB_QPENCODE)
 		srcstr=(BYTE *) hb_itemGetCPtr(phbstr);
 		srclen=hb_itemGetCLen(phbstr);
 		dstlen=str2qp7(srcstr,srclen,NULL);
-		dststr=(BYTE *) hb_xgrab(dstlen);
+		dststr=(BYTE *) hb_xgrab(dstlen+1);
 		str2qp7(srcstr,srclen,dststr);
 		hb_retclen((char *) dststr,dstlen);
 		hb_xfree(dststr);
 	}
 	else hb_retc("");
+	return;
 }
 
 HB_FUNC(HB_URLDECODE)
@@ -161,6 +163,7 @@ HB_FUNC(HB_URLDECODE)
 		hb_xfree(dststr);
 	}
 	else hb_retc("");
+	return;
 }
 
 HB_FUNC(HB_QPDECODE)
@@ -178,6 +181,7 @@ HB_FUNC(HB_QPDECODE)
 		hb_xfree(dststr);
 	}
 	else hb_retc("");
+	return;
 }
 
 //internal
@@ -195,7 +199,7 @@ static BOOL isdigit(BYTE c,ULONG r)
 	}
 }
 
-static ULONG str2ue7(BYTE *srcstr,ULONG srclen,BYTE *dststr)
+ULONG str2ue7(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 {
 	ULONG i,dstlen=0;
 	for (i=0;i<srclen;i++) {
@@ -322,4 +326,5 @@ static ULONG qp72str(BYTE *srcstr,ULONG srclen,BYTE *dststr)
 	}
 	return dstlen;
 }
+
 
