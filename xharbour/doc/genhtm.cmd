@@ -1,11 +1,9 @@
 @echo off
 rem 
-rem $Id: genhtm.cmd,v 1.2 2000/04/30 07:10:48 lculik Exp $
+rem $Id: genhtm.cmd,v 1.1.1.1 2001/12/21 10:48:09 ronpinkas Exp $
 rem 
 
-hbdoc -htm genwww.lnk genwww.rsp
+..\bin\b32\hbdoc -htm genhtm.lnk genhtm.rsp
 cd htm
 echo renaming Harbour.htm to index.htm
 ren harbour.htm index.htm
-del genwww.lnk
-ren genwww.old genwww.lnk
