@@ -1,5 +1,5 @@
 /*
- * $Id: thread.c,v 1.0 2002/10/25 03:06:09 ronpinkas Exp $
+ * $Id: thread.c,v 1.1 2002/12/18 13:43:57 ronpinkas Exp $
  */
 
 /*
@@ -347,7 +347,7 @@ HB_FUNC( STARTTHREAD )
 #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
    if( pthread_create( &thid, NULL, hb_create_a_thread, (void * ) pt ) == 0 );
 #else
-   if( CreateThread( NULL, 0, hb_create_a_thread, (LPVOID) pt, 0, &thid ) );
+   if( CreateThread( NULL, 0, hb_create_a_thread, (LPVOID) pt, 0, &thid ) )
 #endif
    {
       // Wait for the actual creation.
