@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-02-16 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/win32prn.prg
+    ! reinstate	codes when __WRITE_FONT_INFO_TO_FILE__ is defined (without
+      defining this, tests/testw32p.prg with PellesC crashes under WIN98)
+
 2005-02-16 03:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/odbc/odbc.c
     ! define SQLLEN if not defined to enable compilation under standard MSVC 6.0 (Win98)
