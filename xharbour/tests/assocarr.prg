@@ -1,21 +1,20 @@
 PROCEDURE Main()
 
-    LOCAL MyAssocArray := TAssociativeArray()
+    LOCAL MyAssocArray1 := TAssociativeArray()
+    LOCAL MyAssocArray2 := TAssociativeArray()
 
-    MyAssocArray[ "Name" ] := "John"
-    MyAssocArray[ "Age" ]  := 33
+    MyAssocArray1[ "Name" ] := "John"
+    MyAssocArray1[ "Age" ]  := 33
 
-    ? MyAssocArray[ "Name" ]
-    ? MyAssocArray[ "Age" ]
+    ? MyAssocArray1[ "Name" ]
+    ? MyAssocArray1[ "Age" ]
 
-    MyAssocArray := TAssociativeArray()
+    MyAssocArray2:Street := "123 Some St."
+    MyAssocArray2:City := "Los Angeles"
 
-    MyAssocArray:Street := "123 Some St."
-    MyAssocArray:City := "Los Angeles"
+    ? MyAssocArray2:Street
+    ? MyAssocArray2:City
 
-    ? MyAssocArray:Street
-    ? MyAssocArray:City
-
-    ? MyAssocArray[ "NotDefinedYet" ]
+    ? MyAssocArray2[ "Name" ] // Error! - Does not exist in THIS Object.
 
 RETURN
