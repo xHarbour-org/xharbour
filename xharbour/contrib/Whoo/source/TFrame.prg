@@ -38,18 +38,21 @@
 CLASS TFrame FROM TWinControl
    DATA WindowMenu   EXPORTED
    DATA Modal        EXPORTED INIT .F.
-   DATA biSystemMenu EXPORTED INIT .T.
-   DATA biMinimize   EXPORTED INIT .T.
-   DATA biMaximize   EXPORTED INIT .T.
 
+//-------------------------------------------------------------------------------------------
+   ACCESS biSystemMenu    INLINE AND( ::Style, WS_SYSMENU ) # 0
    ASSIGN biSystemMenu(l) INLINE ::SetStyle(WS_SYSMENU,l),;
                                  ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
 
+   ACCESS biMinimize      INLINE AND( ::Style, WS_MAXIMIZEBOX ) # 0
    ASSIGN biMinimize(l)   INLINE ::SetStyle(WS_MAXIMIZEBOX,l),;
-                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
+                                 ::Style := GetWindowLong( ::handle, GWL_STYLE )
 
+   ACCESS biMaximize      INLINE AND( ::Style, WS_MINIMIZEBOX ) # 0
    ASSIGN biMaximize(l)   INLINE ::SetStyle(WS_MINIMIZEBOX,l),;
-                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
+                                 ::Style := GetWindowLong( ::handle, GWL_STYLE )
+
+//-------------------------------------------------------------------------------------------
    METHOD New()
    METHOD Add()
    METHOD SetLink()

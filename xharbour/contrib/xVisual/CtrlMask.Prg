@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.20 2002/10/17 17:16:46 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.21 2002/10/18 20:12:20 what32 Exp $
  */
 
 /*
@@ -102,7 +102,7 @@ CLASS oCtrlMask FROM TWinControl
    DATA aEditRect
    DATA aClickPt
    DATA Cursor
-
+   DATA lHintActive INIT .T.
    METHOD New() CONSTRUCTOR
    METHOD OnGetDlgCode()
    METHOD OnRButtonDown()
@@ -488,12 +488,13 @@ METHOD OnLButtonDown( wParam, x, y )
                ShowWindow(a[SEL_HANDLE],SW_SHOW)  })
                ::aSelected:={{hChild,aclone(aRect),x-aRect[1],y-aRect[2],{},aclone(aRect)}}   // handle,rect,anchorX,anchorY,aHot
             ENDIF
-            view "activated"
+            ::HintWindow:Activate(1)
+            ::lHintActive := .T.
             IF Len(::aSelected)==1 .and. (nPos:=aScan(::aSelected[1,SEL_HOTAREAS],{|a| ptInRect(a[1],{x,y})})) > 0 // <= aHot
                ::nClick:=::aSelected[1,SEL_HOTAREAS,nPos,2]
                WinSetCursor(LoadCursor(,::aSelected[1,SEL_HOTAREAS,nPos,3]))
                ::sizing:=.T.
-            ELSE
+              ELSE
                ::nClick:=HTCAPTION
                WinSetCursor(LoadCursor(hThisInstance,"FIST"))
                FOR EACH a IN ::aSelected
@@ -607,23 +608,20 @@ METHOD OnMouseMove( aParam,x,y)
                ENDIF
                lFound:=.T.
                oObj:=::Parent:ChildFromHandle(hChild)
-               oObj:HintWindow:SetInitial(3000)
-               if oLastObj != NIL
-                  if oLastObj:handle != oObj:handle
-                     oLastObj:HintWindow:TrackHint(0)
-                  endif
-                  oObj:HintWindow:TrackHint(1)
-               ENDIF
-               oObj:HintWindow:SetTitle(2,"Class: "+oObj:Classname())
-               oObj:HintWindow:SetText("Object: "+oObj:propname)
-               oLastObj := oObj
+               IF oLastObj==NIL.OR.hChild!=oLastObj:handle.OR.::lHintActive
+                  ::HintWindow:Activate(1)
+                  ::HintWindow:SetTitle(2,"Class: "+oObj:Classname())
+                  ::HintWindow:SetText("Object: "+oObj:propname)
+                  ::lHintActive := .F.
+                  oLastObj:=oObj
+               endif
+               
                EXIT
             ENDIF
          NEXT
          IF !lFound
-            if oLastObj != NIL
-               oLastObj:HintWindow:TrackHint(0)
-            ENDIF
+            oLastObj:=NIL
+            ::HintWindow:Activate(0)
             WinSetCursor(LoadCursor(,IDC_ARROW))
          ENDIF
       ELSE
@@ -668,6 +666,7 @@ METHOD OnLButtonUp( wParam, x, y )
       ELSE
         DrawFocusRect(hDC,::aEditRect)
       ENDIF
+      ::HintWindow:Activate(0)
    ENDIF
 
    IF ::moving
@@ -694,6 +693,7 @@ METHOD OnLButtonUp( wParam, x, y )
    NEXT
 
    IF ::selecting
+
       ::selecting:=.F.
       WinSetCursor(LoadCursor(,IDC_ARROW))
       DrawFocusRect(hDC,::aEditRect)
@@ -716,6 +716,7 @@ METHOD OnLButtonUp( wParam, x, y )
          ENDIF
 
       ELSE
+
          FOR EACH hChild IN ::aSiblings
             aWRect:=GetWindowRect(hChild)
             aRect:=aClone(aWRect)
@@ -809,12 +810,11 @@ METHOD MoveCtrl(hWnd,aPt)
               Max(aPt[1],::aClickPt[1]),Max(aPt[2],::aClickPt[2])}
 
    ENDIF
-   if len(::aSelected)>0
-      if (oObj:=::Parent:ChildFromHandle(::aSelected[1][SEL_HANDLE]))!=NIL
-         oObj:HintWindow:SetTitle(0,"")
-         oObj:HintWindow:SetText(alltrim(str(aRect[1]))+","+alltrim(str(aRect[2]))+"         "+alltrim(str(aRect[3]))+","+alltrim(str(aRect[4])))
-      ENDIF
-   ENDIF
+   if ::moving.or.::sizing
+      ::HintWindow:SetTitle(0,"")
+      ::HintWindow:SetText(alltrim(str(aRect[1]))+","+alltrim(str(aRect[2]))+"  "+alltrim(str(aRect[3]))+","+alltrim(str(aRect[4])))
+   endif
+
    ::aEditRect:=aRect
 
 

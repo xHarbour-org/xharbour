@@ -1,1 +1,1 @@
-bld_b32 xide xInspect xTree formedit ctrlmask
+bld_b32 xide xInspect xTree formedit ctrlmask xPad

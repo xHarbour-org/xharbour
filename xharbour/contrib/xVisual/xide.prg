@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.90 2002/10/16 21:24:41 fsgiudice Exp $
+ * $Id: xide.prg,v 1.91 2002/10/18 23:37:00 what32 Exp $
  */
 
 /*
@@ -225,23 +225,4 @@ return(self)
 
 
 //----------------------------------------------------------------------------------------------
-
-CLASS ObjEdit FROM TForm
-   METHOD New( oParent ) INLINE ::Caption := 'xIde Quick Editor',;
-                                ::left    := 100,;
-                                ::top     := 100,;
-                                ::width   := 300,;
-                                ::height  := 300,;
-                                ::ExStyle := WS_EX_TOOLWINDOW,;
-                                super:new( oParent )
-   METHOD OnCreate()
-   METHOD OnSize(n,x,y)  INLINE ::QuickEdit:Move(,,x,y,.t.),nil
-ENDCLASS
-
-METHOD OnCreate() CLASS ObjEdit
-   local aRect := ::ClientRect()
-   ::Add('QuickEdit', TEdit():New( self, "", 101,  0,0, aRect[3], aRect[4] ),.F. )
-   ::QuickEdit:Style := WS_CHILD+WS_VISIBLE+ES_MULTILINE+WS_BORDER+WS_VSCROLL+WS_HSCROLL+ES_AUTOVSCROLL+ES_AUTOHSCROLL+WS_TABSTOP
-   ::QuickEdit:create()
-return(nil)
 

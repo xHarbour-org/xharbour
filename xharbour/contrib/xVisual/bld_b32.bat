@@ -34,6 +34,11 @@ IF ERRORLEVEL 1 type comp.log
 IF ERRORLEVEL 1 PAUSE
 if errorlevel 1 goto exit
 
+IF NOT '%6'=='' %HB_INSTALL%\bin\harbour %6 -es2 -p -n -w -i%HB_INSTALL%\include;%WHAT32%\include > comp.log
+IF ERRORLEVEL 1 type comp.log
+IF ERRORLEVEL 1 PAUSE
+if errorlevel 1 goto exit
+
 IF EXIST %1.rc %BCC_DIR%\BIN\brc32 -r %1
 if errorlevel 1 goto exit
 
@@ -44,6 +49,8 @@ echo -c %2.c >> b32.bc
 IF NOT '%3'=='' echo -c %3.c >> b32.bc
 IF NOT '%4'=='' echo -c %4.c >> b32.bc
 IF NOT '%5'=='' echo -c %5.c >> b32.bc
+IF NOT '%6'=='' echo -c %6.c >> b32.bc
+echo -c edcolor.c >> b32.bc
 %BCC_DIR%\BIN\bcc32 @b32.bc
 if errorlevel 1 goto exit
 
@@ -53,6 +60,8 @@ echo %2.obj + >> b32.bc
 IF NOT '%3'=='' echo %3.obj + >> b32.bc
 IF NOT '%4'=='' echo %4.obj + >> b32.bc
 IF NOT '%5'=='' echo %5.obj + >> b32.bc
+IF NOT '%6'=='' echo %6.obj + >> b32.bc
+echo edcolor.obj + >> b32.bc
 echo , + >> b32.bc
 echo %1.exe, + >> b32.bc
 echo %1.map, + >> b32.bc
@@ -88,10 +97,14 @@ ECHO Linking...
 if errorlevel 1 goto exit
 
 del *.tds
-del *.c
 del *.map
 del *.obj
-
+del %1.c
+del %2.c
+del %3.c
+del %4.c
+del %5.c
+del %6.c
 del comp.log
 
 if exist %1.exe %1

@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.64 2002/10/17 17:16:46 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.65 2002/10/18 20:12:20 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -212,7 +212,7 @@ METHOD CreateControl(aRect)
       DO CASE
       CASE ::CtrlName=="Button"
          oObj:=::Add(cName, TButton():New(   self, cName, 500,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
-         TraceLog( oObj:Name )
+//         TraceLog( oObj:Name )
       CASE ::CtrlName=="Edit"
          oObj:=::Add(cName, TEdit():New(     self, cName, 501,  aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="Label"
@@ -272,10 +272,6 @@ METHOD CreateControl(aRect)
          oApp:MainFrame:ObjInsp:InspCombo:SetCurSel(oApp:MainFrame:ObjInsp:InspCombo:GetCount()-1)
          ::Parent:ObjTree:Tree:Add( oObj:PropName,1, oObj:handle )
          ::Parent:ObjTree:Tree:Expand()
-
-         oObj:Hint:=oObj:propname
-         oObj:HintWindow:SetMaxTipWidth(10)
-
       endif
    ENDIF
    ::Parent:StdBar:CheckButton( 150, .T. )
@@ -343,6 +339,8 @@ METHOD CreateSub()
    ::oMask:BringToTop()
    ::oMask:SetFocus()
 
+   ::oMask:Hint:=""
+   ::oMask:HintWindow:SetMaxTipWidth(10)
    RETURN( xRet )
 
 *------------------------------------------------------------------------------
@@ -521,7 +519,7 @@ METHOD XFMReflect() CLASS TFormEdit
       cText += ( cLine + CRLF )
    NEXT
 
-   oApp:MainFrame:ObjEdit:QuickEdit:SetText( cText )
+   oApp:MainFrame:ObjEdit:SourceEdit:SetText( cText )
 
 RETURN Self
 
