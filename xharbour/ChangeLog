@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.238 2002/05/22 21:44:41 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.239 2002/05/23 00:33:32 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-22 18:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrayshb.c
+    + Added support for an optional 4th paramater to aIns() as a logical flag to Auo Extend the Array Size
+      to allow for aIns() to add an Element without losing the last Array Element Value.
+      /* The functionality of aIns was so un-natural, that I actually forgot it discards last element.
+         - Now it's under our control. */
+
+  * source/rtl/alert.prg
+    * Revised to use 4th paramater to aIns().
+
+  * include/hbver.h
+    * Updated ChangeLog entries
+      /* :-) .AND. :-( */
 
 2002-05-22 17:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/alert.prg

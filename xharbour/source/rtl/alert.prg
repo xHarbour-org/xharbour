@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.1.1.1 2001/12/21 10:41:11 ronpinkas Exp $
+ * $Id: alert.prg,v 1.2 2002/05/23 00:33:33 ronpinkas Exp $
  */
 
 /*
@@ -146,7 +146,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
             IF Len( aSay ) == nIndex
                aAdd( aSay, SubStr( xMessage, nPos + 1 ) )
             ELSE
-               aIns( aSay, nIndex + 1, SubStr( xMessage, nPos + 1 ) )
+               aIns( aSay, nIndex + 1, SubStr( xMessage, nPos + 1 ), .T. )
             ENDIF
         ENDIF
       NEXT

@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.5 2002/03/06 06:21:14 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.6 2002/05/23 00:33:33 ronpinkas Exp $
  */
 
 /*
@@ -181,6 +181,15 @@ HB_FUNC( AINS )
 
    if( pArray )
    {
+    #ifndef HB_C52_STRICT
+      PHB_ITEM pExtend = hb_param( 4, HB_IT_LOGICAL );
+
+      if( pExtend && pExtend->item.asLogical.value )
+      {
+         hb_arraySize( pArray, pArray->item.asArray.value->ulLen + 1 );
+      }
+    #endif
+
       if( ISNUM( 2 ) )
       {
          hb_arrayIns( pArray, hb_parnl( 2 ) );
