@@ -34,6 +34,10 @@
 #if defined(__MINGW32__) || defined(__WATCOMC__) || defined(_MSC_VER)
    #include <ole2.h>
    #include <ocidl.h>
+
+   #if defined(_MSC_VER)
+      #include <olectl.h>
+   #endif
 #else
    #include <olectl.h>
 #endif
