@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2863 2004/05/02 19:29:19 druzus Exp $
+ * $Id: ChangeLog,v 1.2864 2004/05/02 21:48:51 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-03 13:25 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  + xharbour/rtl/gtwvt/ChangeLog
+    Added WVT specific ChangeLog entries compiled from CVS root ChangeLog
+    files. If possible, please make the WVT specific entries in above
+    file also. If not, I will ever try to keep it uptodate.
 
 2004-05-02 23:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/pgsql/postgres.c
