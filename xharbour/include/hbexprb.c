@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.85 2004/10/29 01:28:59 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.86 2004/11/21 21:43:37 druzus Exp $
  */
 
 /*
@@ -1636,7 +1636,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         else
                         {
                            pReduced->value.asString.string = ( char * ) HB_XGRAB( 2 );
-                           pReduced->value.asString.string[ 0 ] = ( pArg->value.asNum.lVal % 256 );
+                           pReduced->value.asString.string[ 0 ] = ( char ) ( pArg->value.asNum.lVal % 256 );
                            pReduced->value.asString.string[ 1 ] = '\0';
                            pReduced->value.asString.dealloc = TRUE;
                            pReduced->ulLength = 1;
@@ -1837,16 +1837,16 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
                            //printf( "String: '%s', Start: %i, Len: %i\n", pString->value.asString.string, pStart->value.asNum.lVal, pLen->value.asNum.lVal );
 
-                           sSubStr = (char *) hb_xgrab( pLen->value.asNum.lVal + 1 );
+                           sSubStr = (char *) hb_xgrab( ( ULONG ) pLen->value.asNum.lVal + 1 );
 
-                           memcpy( sSubStr, pString->value.asString.string + pStart->value.asNum.lVal - 1, pLen->value.asNum.lVal );
+                           memcpy( sSubStr, pString->value.asString.string + pStart->value.asNum.lVal - 1, ( ULONG ) pLen->value.asNum.lVal );
                            sSubStr[ pLen->value.asNum.lVal ] = '\0';
 
                            pReduced = hb_compExprNew( HB_ET_STRING );
                            pReduced->ValType = HB_EV_STRING;
 
                            pReduced->value.asString.string = sSubStr;
-                           pReduced->ulLength = pLen->value.asNum.lVal;
+                           pReduced->ulLength = ( ULONG ) pLen->value.asNum.lVal;
                            pReduced->value.asString.dealloc = TRUE;
 
                            // Delete the pre-optimization components.
@@ -1873,7 +1873,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                               if( hb_compLocalGetPos( pString->value.asSymbol ) == 0 &&
                                   hb_compStaticGetPos( pString->value.asSymbol, hb_comp_functions.pLast ) == 0 &&
                                   hb_compVariableGetPos( hb_comp_pGlobals, pString->value.asSymbol ) == 0 &&
-                                  ( hb_comp_bStartProc == TRUE || hb_compStaticGetPos( pString->value.asSymbol, hb_comp_functions.pFirst ) == 0 ) )
+                                  ( hb_comp_bStartProc || hb_compStaticGetPos( pString->value.asSymbol, hb_comp_functions.pFirst ) == 0 ) )
                               {
                                  // do NOT optimize NON declared var, because Array optimization will force MEMVAR context!
                                  goto PostOptimization;
@@ -2266,7 +2266,7 @@ static HB_EXPR_FUNC( hb_compExprUseAliasVar )
                 * NOTE: only integer (LONG) values are allowed
                 */
                if( pAlias->value.asNum.NumType == HB_ET_LONG )
-                  HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, TRUE, NULL, pAlias->value.asNum.lVal );
+                  HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, TRUE, NULL, ( LONG ) pAlias->value.asNum.lVal );
                else
                   hb_compErrorAlias( pAlias );
             }
@@ -2321,7 +2321,7 @@ static HB_EXPR_FUNC( hb_compExprUseAliasVar )
                 * NOTE: only integer (LONG) values are allowed
                 */
                if( pAlias->value.asNum.NumType == HB_ET_LONG )
-                  HB_EXPR_PCODE4( hb_compGenPopAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, TRUE, NULL, pAlias->value.asNum.lVal );
+                  HB_EXPR_PCODE4( hb_compGenPopAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, TRUE, NULL, ( LONG ) pAlias->value.asNum.lVal );
                else
                   hb_compErrorAlias( pAlias );
             }

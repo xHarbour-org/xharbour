@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.30 2004/11/14 21:52:30 druzus Exp $
+ * $Id: dbffpt1.c,v 1.31 2004/11/21 21:43:54 druzus Exp $
  */
 
 /*
@@ -1119,7 +1119,7 @@ static ERRCODE hb_fptReadSixItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBuf
             break;
 
          case FPTIT_SIX_LOG:
-            hb_itemPutL( pItem, (&(*pbMemoBuf)[6]) != 0 );
+            hb_itemPutL( pItem, HB_GET_LE_UINT16( &(*pbMemoBuf)[6] ) != 0 );
             break;
 
          case FPTIT_SIX_CHAR:
@@ -1631,13 +1631,13 @@ static ULONG hb_fptStoreSixItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
 
       case HB_IT_DATE:
          HB_PUT_LE_UINT16( &(*bBufPtr)[0], FPTIT_SIX_LDATE );
-         HB_PUT_LE_UINT32(  &(*bBufPtr)[6], pItem->item.asDate.value );
+         HB_PUT_LE_UINT32( &(*bBufPtr)[6], pItem->item.asDate.value );
          *bBufPtr += SIX_ITEM_BUFSIZE;
          break;
 
       case HB_IT_LOGICAL:
          HB_PUT_LE_UINT16( &(*bBufPtr)[0], FPTIT_SIX_LOG );
-         *(BOOL*) ( &(*bBufPtr)[6] ) = pItem->item.asLogical.value;
+         (*bBufPtr)[6] = pItem->item.asLogical.value ? 1 : 0;
          *bBufPtr += SIX_ITEM_BUFSIZE;
          break;
 
