@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.179 2004/12/01 00:52:21 peterrees Exp $
+* $Id: thread.c,v 1.180 2004/12/12 06:45:55 walito Exp $
 */
 
 /*
@@ -2323,7 +2323,11 @@ HB_FUNC( HB_MUTEXTIMEOUTLOCK )
 #endif
 
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
-   DWORD dwTimeOut = (DWORD) hb_parnl(2);
+#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+   DWORD dwTimeOut = (DWORD) hb_parni(2);
+#else
+   int dwTimeOut = hb_parni(2);
+#endif
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE || dwTimeOut < 0 )
    {
@@ -2345,7 +2349,7 @@ HB_FUNC( HB_MUTEXTIMEOUTLOCK )
       HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, Mutex->mutex );
 
       HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, dwTimeOut );
-      
+
       if ( Mutex->locker != 0 )
       {
          bLock = FALSE;
