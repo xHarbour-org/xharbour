@@ -1,5 +1,5 @@
 /*
- * $Id: setkey.c,v 1.6 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: setkey.c,v 1.7 2003/01/05 06:50:36 ronpinkas Exp $
  */
 
 /*
@@ -116,6 +116,9 @@ static void sk_add( BOOL bReturn, SHORT iKeyCode, PHB_ITEM pAction, PHB_ITEM pIs
    {
       PHB_SETKEY sk_list_tmp, sk_list_end;
 
+      // Verify to allow only codeblock in pIsActive
+      pIsActive = ( pIsActive && HB_IS_BLOCK( pIsActive ) ) ? pIsActive : NULL;
+
       sk_list_tmp = sk_findkey( iKeyCode, &sk_list_end );
       if( sk_list_tmp == NULL )
       {
@@ -193,7 +196,11 @@ HB_FUNC( SETKEY )
 #if defined( HB_EXTENSION )
             PHB_ITEM pIsActiveResults = sk_list_tmp->pIsActive ? hb_vmEvalBlockV( sk_list_tmp->pIsActive, 1, pKeyCode ) : NULL;
 
-            if( pIsActiveResults == NULL || ! HB_IS_LOGICAL( pIsActiveResults ) || hb_itemGetL( pIsActiveResults ) )
+            if( pIsActiveResults && HB_IS_LOGICAL( pIsActiveResults ) && ! hb_itemGetL( pIsActiveResults ) )
+            {
+               hb_ret();
+            }
+            else
 #endif
                hb_itemReturnCopy( sk_list_tmp->pAction );
          }

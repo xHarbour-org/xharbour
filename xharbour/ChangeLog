@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3825 2005/02/15 22:01:44 andijahja Exp $
+ * $Id: ChangeLog,v 1.3826 2005/02/15 22:46:31 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-15 18:29 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/setkey.c
+    ! Fixed to return NIL when "pIsActive" is false.
+    ! Fixed to validate for allow only codeblocks in "pIsActive" option.
+
 2005-02-16 05:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/winos.prg
     ! correction on my recent changes on function OS_ISWTSCLIENT().
