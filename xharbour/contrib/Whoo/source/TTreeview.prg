@@ -46,7 +46,7 @@ METHOD New( oParent, nId, nTop, nLeft, nWidth, nHeight ) CLASS TTreeView
    ::Items  := {}
    ::lRegister := .F.
    ::lControl  := .T.
-   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY,WM_NOTIFY}, ::Msgs )
+   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY,WM_NOTIFY,WM_SIZE,WM_MOVE}, ::Msgs )
    ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
    ::Caption   := ""
    ::ExStyle   := OR(WS_EX_CLIENTEDGE,::ExStyle)

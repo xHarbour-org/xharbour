@@ -46,7 +46,7 @@ METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TListBox
    ::id        := nId
    ::lRegister := .F.
    ::lControl  := .T.
-   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY}, ::Msgs )
+   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY,WM_SIZE,WM_MOVE}, ::Msgs )
    ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
    ::Left      := nLeft
    ::Top       := nTop

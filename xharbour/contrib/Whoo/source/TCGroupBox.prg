@@ -21,7 +21,7 @@ METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TGroupB
    ::id        := nId
    ::lRegister := .F.
    ::lControl  := .T.
-   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY}, ::Msgs )
+   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY,WM_SIZE,WM_MOVE}, ::Msgs )
    ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
    ::Caption   := cCaption
    ::Left      := nLeft

@@ -187,7 +187,8 @@ METHOD CreateControl(aRect)
 
       ENDCASE
       if oObj!=NIL
-         oObj:SetMethod("OnMove",{||::Parent:ObjInsp:SetBrowserData( oObj )})
+         oObj:SetMethod("OnMove",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj )})
+         oObj:SetMethod("OnSize",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj )})
 
          oApp:MainFrame:ObjInsp:InspCombo:AddString(oObj:propname+chr(9)+oObj:ClassName(),oObj)
          oApp:MainFrame:ObjInsp:InspCombo:SetCurSel(oApp:MainFrame:ObjInsp:InspCombo:GetCount()-1)

@@ -33,7 +33,7 @@ METHOD New( oParent, cCaption, nId ) CLASS TStatusBar
    ::id        := nId
    ::lRegister := .F.
    ::lControl  := .T.
-   ::Msgs      := IFNIL( ::Msgs, {WM_SIZE}, ::Msgs )
+   ::Msgs      := IFNIL( ::Msgs, {WM_DESTROY,WM_SIZE,WM_MOVE}, ::Msgs )
    ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
    ::Caption   := cCaption
    ::Left      := 0
