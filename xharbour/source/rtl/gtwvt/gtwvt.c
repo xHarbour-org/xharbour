@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.31 2004/01/07 20:06:57 ronpinkas Exp $
+ * $Id: gtwvt.c,v 1.32 2004/01/07 23:26:19 peterrees Exp $
  */
 
 /*
@@ -3000,6 +3000,8 @@ BOOL HB_EXPORT hb_wvt_gtDrawImage( int x1, int y1, int wd, int ht, char * image 
   return( bResult );
 }
 
+//-------------------------------------------------------------------//
+
 HB_EXPORT GLOBAL_DATA * hb_wvt_gtGetGlobalData( void )
 {
    return &_s;
@@ -3172,7 +3174,7 @@ HB_FUNC( WVT_SETMOUSEMOVE )
 {
    if ( ISNIL( 1 ) )
    {
-      hb_retl( FALSE );
+      hb_retl( _s.MouseMove );
    }
    else
    {
@@ -3406,6 +3408,53 @@ HB_FUNC( WVT_DRAWBOXGROUP )
 
 
    SelectObject( _s.hdc, _s.penWhite );
+
+   MoveToEx( _s.hdc, iRight + 1, iTop, NULL );   // Right Outer
+   LineTo( _s.hdc, iRight + 1, iBottom + 1 );
+
+   MoveToEx( _s.hdc, iLeft -1, iBottom + 1, NULL );  // Bottom Outer
+   LineTo( _s.hdc, iRight + 1, iBottom + 1);
+
+   MoveToEx( _s.hdc, iLeft, iTop, NULL );            // Left Inner
+   LineTo( _s.hdc, iLeft, iBottom );
+
+   MoveToEx( _s.hdc, iLeft, iTop, NULL );            // Top Inner
+   LineTo( _s.hdc, iRight, iTop );
+
+   hb_retl( TRUE );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_DRAWBOXGROUPRAISED )
+{
+   POINT xy;
+   int   iTop, iLeft, iBottom, iRight;
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
+   iTop    = xy.y - 1;
+   iLeft   = xy.x - 1;
+
+   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 4 ) + 1, hb_parni( 3 ) + 1 );
+   iBottom = xy.y;
+   iRight  = xy.x;
+
+
+   SelectObject( _s.hdc, _s.penWhite );
+
+   MoveToEx( _s.hdc, iRight, iTop, NULL );          // Right Inner
+   LineTo( _s.hdc, iRight, iBottom );
+
+   MoveToEx( _s.hdc, iLeft, iBottom, NULL );        // Bottom Inner
+   LineTo( _s.hdc, iRight, iBottom );
+
+   MoveToEx( _s.hdc, iLeft - 1, iTop - 1, NULL );   // Left Outer
+   LineTo( _s.hdc, iLeft - 1, iBottom + 1 );
+
+   MoveToEx( _s.hdc, iLeft - 1, iTop - 1, NULL );   // Top Outer
+   LineTo( _s.hdc, iRight + 1, iTop - 1 );
+
+   SelectObject( _s.hdc, _s.penDarkGray );
 
    MoveToEx( _s.hdc, iRight + 1, iTop, NULL );   // Right Outer
    LineTo( _s.hdc, iRight + 1, iBottom + 1 );

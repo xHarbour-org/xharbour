@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2017 2004/01/07 23:27:02 peterrees Exp $
+ * $Id: ChangeLog,v 1.2018 2004/01/07 23:39:58 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-08 14:15 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_DrawBoxGroupRaised( nTop, nLeft, nBottom, nRight )
+    ! Wvt_SetMouseMove( lSetMove ) 
+      Now the function returns the previous state of mouse movement set flag.
 
 2004-01-07 15:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/tget.prg

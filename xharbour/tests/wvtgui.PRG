@@ -141,7 +141,7 @@ local aGetsParam := ;
 aadd( aBlocks, {|| Wvt_SetFont( 'Courier New', 24 ) } )
 aadd( aBlocks, {|| Wvt_SetIcon( 'DIA_EXCL.ico' ) } )
 aadd( aBlocks, {|| Wvt_SetTitle( 'Vouch Gets 2' ) } )
-aadd( aBlocks, {|| Wvt_DrawBoxGroup( 5, 6, 19, 72 ) } )
+aadd( aBlocks, {|| Wvt_DrawBoxGroupRaised( 5, 6, 19, 72 ) } )
 aadd( aBlocks, {|| aeval( box_, {|o_| Wvt_DrawBoxGet( o_[ 1 ], o_[ 2 ], o_[ 3 ] ) } ) } )
 
 aLastPaint := Wvt_SetBlocks( aBlocks ) 
