@@ -3706,22 +3706,22 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
 
                   /* Current level */
                   nOptional := aMP[2]
-                  IF Len( asRevert ) >= Abs( nOptional )
-                     asRevert[ Abs( nOptional ) ] := NIL
-                  ENDIF
-
                   IF nOptional < 0
                      nOptional := Abs( nOptional )
                   ENDIF
 
-                  WHILE nMatch > 1
-                     nMatch--
-                     IF /*aRules[nRule][2][nMatch][2] >= 0 .AND.*/ Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
-                        EXIT
-                     ENDIF
-                  ENDDO
-                  IF nMatch == 0 .OR. ( /*aRules[nRule][2][nMatch][2] >= 0 .AND.*/ Abs( aRules[nRule][2][nMatch][2] ) < nOPtional )
-                     nMatch++
+                  IF Len( asRevert ) >= nOptional
+                     asRevert[ nOptional ] := NIL
+                  ENDIF
+
+                  // Now rewind.
+                  IF aRules[nRule][2][nMatch][2] < 0
+                     WHILE nMatch > 1
+                        nMatch--
+                        IF aRules[nRule][2][nMatch][2] == nOPtional
+                           EXIT
+                        ENDIF
+                     ENDDO
                   ENDIF
 
                   nOptional := 0
@@ -3777,6 +3777,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                ? "NO MATCH:", nMatch, "of", nMatches, sAnchor, sToken, nMarkerId, xMarker, nOptional, aMP[2]
             ENDIF
 
+            // Optional
             IF aMP[2] <> 0
                /* Revert. */
                IF nOptional <> 0 .AND. aMP[2] < 0 .AND. asRevert[Abs(nOptional)] != NIL
@@ -3808,6 +3809,26 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                /* Optional (last) didn't match - Rule can still match. */
                IF nMatch == nMatches
                   IF bStatement .AND. ! Empty( sWorkLine )
+                     /* Top of nested optional. */
+                     IF aMP[2] > 1
+                        /* Upper level optional should be accepted - rewind to top of parent group. */
+                        nOptional--
+                        WHILE nMatch > 1
+                           nMatch--
+                           IF aRules[nRule][2][nMatch][2] == nOPtional
+                              EXIT
+                           ENDIF
+                        ENDDO
+
+                        nOptional := 0
+
+                        IF bDbgMatch
+                           ? "Nested last optional, Rewinded to:", nMatch
+                        ENDIF
+
+                        LOOP
+                     ENDIF
+
                      bNext := .T.
 
                      IF bDbgMatch
@@ -3828,29 +3849,26 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   ENDIF
                   RETURN nRule
                ELSE
-                  /* Nested optional, maybe last in its group. */
+                  /* Top of Nested optional, maybe last in its parrent group. */
                   IF aMP[2] > 1
-                     nTemp := aMP[2]
                      /* Skip dependents and nested optionals, if any. */
+                     nTemp := aMP[2]
                      nMatch++
-                     WHILE nMatch < nMatches .AND. ( ( aRules[nRule][2][nMatch][2] < 0 .AND. Abs( aRules[nRule][2][nMatch][2] ) == nTemp ).OR. aRules[nRule][2][nMatch][2] > nTemp )
+                     WHILE nMatch <= nMatches .AND. Abs( aRules[nRule][2][nMatch][2] ) >= nTemp
                         nMatch++
                      ENDDO
-                     nMatch--
 
-                     IF aRules[nRule][2][nMatch + 1][2] > 0 .AND. aRules[nRule][2][nMatch + 1][2] < nTemp
+                     // End of rule or reached end of parrent group.
+                     IF nMatch > nMatches .OR. aRules[nRule][2][nMatch][2] >= 0 .OR. nTemp + aRules[nRule][2][nMatch][2] >= 2
                         /* Upper level optional should be accepted - rewind to top of parent group. */
                         nOptional--
-
                         WHILE nMatch > 1
                            nMatch--
-                           IF aRules[nRule][2][nMatch][2] == 0 .OR. ( aRules[nRule][2][nMatch][2] > 0 .AND. aRules[nRule][2][nMatch][2] < nOPtional )
+                           IF aRules[nRule][2][nMatch][2] == nOPtional
                               EXIT
                            ENDIF
                         ENDDO
-                        IF nMatch == 0 .OR. ( aRules[nRule][2][nMatch][2] == 0 .OR. ( aRules[nRule][2][nMatch][2] > 0 .AND. aRules[nRule][2][nMatch][2] < nOptional ) )
-                           nMatch++
-                        ENDIF
+                        nMatch++
 
                         nOptional := 0
 
@@ -3859,6 +3877,15 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                         ENDIF
 
                         LOOP
+                     ELSEIF aRules[nRule][2][nMatch][2] < 0
+                        // More optionals of the upper level - try to continue matching.
+                        IF bDbgMatch
+                           ? "Resuming optionals of upper group at match:", nMatch
+                        ENDIF
+
+                        LOOP
+                     ELSE
+                        // Will proceed below (skip to next group) ...
                      ENDIF
 
                   ENDIF
@@ -3880,7 +3907,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   // We should NOT consider this a failure, continue matching...
                   IF bRepeatableMatched
                      IF bDbgMatch
-                        ? "Repeatable Matched - Skipped to", nMatch, "of", nMatches, aMP[2], aMP[3], nOptional
+                        ? "Repeatable previously Matched - Skipped to", nMatch, "of", nMatches, aMP[2], aMP[3], nOptional
                      ENDIF
 
                      nOptional := aMP[2]
