@@ -28,7 +28,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.30 2004/04/20 09:28:45 likewolf Exp $
+/* $Id: teditor.prg,v 1.31 2004/04/20 18:09:47 vouchcac Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -122,7 +122,7 @@ CLASS HBEditor
    DATA  nNumCols       INIT 1      // How many columns / rows can be displayed inside editor window
    DATA  nNumRows       INIT 1
 
-   DATA  lInsert        INIT .T.    // Is editor in Insert mode or in Overstrike one?
+   DATA  lInsert        INIT .F.    // Is editor in Insert mode or in Overstrike one? Default : Overstrike - Clipper
    DATA  nTabWidth      INIT 5      // Size of Tab chars
    DATA  lEditAllow     INIT .T.    // Are changes to text allowed?
    DATA  lSaved         INIT .F.    // True if user exited editor with K_CTRL_W
@@ -149,7 +149,7 @@ CLASS HBEditor
    METHOD  InsertLine( cLine, lSoftCR, nRow )               // Insert a line of text at a defined row
    METHOD  RemoveLine( nRow )                               // Remove a line of text
    METHOD  GetLine( nRow )                                  // Return line n of text
-   METHOD  LineLen( nRow ) INLINE Len( ::aText[ nRow ]:cText )  // Return text length of line n
+   METHOD  LineLen( nRow ) INLINE if( nRow <= ::naTextLen, Len( ::aText[ nRow ]:cText ), 0 )  // Return text length of line n
    METHOD  SplitLine( nRow )                                // If a line of text is longer than nWordWrapCol divides it into multiple lines
    METHOD  GotoLine( nRow )                                 // Put line nRow at cursor position
    METHOD  GotoCol( nCol )                                  // Put line nCol at cursor position
@@ -202,6 +202,7 @@ CLASS HBEditor
    METHOD  K_Bs()
    METHOD  K_Tab()
    METHOD  K_Mouse()
+   METHOD  K_Esc()
 
 ENDCLASS
 
@@ -266,12 +267,7 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
 
    // set correct insert state
    if ::lEditAllow
-      ::InsertState( ::lInsert )
-      if ::lInsert
-           SetCursor( 2 )      // change style for insert/overwrite modes
-      else
-      SetCursor( 3 )
-      endif
+      ::InsertState( ReadInsert() )
    endif
 
    // No need to save
@@ -303,9 +299,13 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
    IF ::nFirstRow >  ::naTextLen
       ::nFirstRow := ::naTextLen
    ENDIF
-
+/*
    IF ::nFirstCol >  ::LineLen( ::nFirstRow ) + 1
       ::nFirstCol := ::LineLen( ::nFirstRow ) + 1
+   ENDIF
+*/
+   IF ::nFirstCol >  ::LineLen( ::nRow ) + 1
+      ::nFirstCol := ::LineLen( ::nRow ) + 1
    ENDIF
 
    // Set cursor position; also initializes phisical to virtual mapping
@@ -380,8 +380,8 @@ METHOD RefreshWindow() CLASS HBEditor
 
    // CLEAR THE WHOLE WINDOW!!! previous version wished to spare some output, but
    // This breaks individual line coloring, so I restored the old version with
-   // a small optimization. -- Ph.Krylov   
-   // CLEAR THE WHOLE WINDOW!!! previous version wished to spare some output, but 
+   // a small optimization. -- Ph.Krylov
+   // CLEAR THE WHOLE WINDOW!!! previous version wished to spare some output, but
    // C is faster than a VM loop!!
    //
    ScrollFixed( ::nTop, ::nLeft, ::nBottom, ::nRight )
@@ -645,9 +645,12 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                exit
 
             case K_ESC
+               ::K_Esc()
+/*
                ::lSaved    := .F.
                ::lExitEdit := .T.
                SetCursor( ::nOrigCursor )   // restore original cursor saved at startup
+*/
                exit
 
             case K_RETURN
@@ -733,9 +736,9 @@ Return Self
 //-------------------------------------------------------------------//
 
 METHOD Bottom() CLASS HBEditor
-   LOCAL nRowTo := min( ::nFirstRow + ::nNumRows-1, ::naTextLengt)
+   LOCAL nRowTo := min( ::nFirstRow + ::nNumRows-1, ::naTextLength )
 
-   ::GotoLine( nRowTo , ::nLineLenght( nRowTo ) + 1 )
+   ::GotoLine( nRowTo )  // , ::nLineLenght( nRowTo ) + 1 )
 
 RETURN Self
 
@@ -743,7 +746,7 @@ RETURN Self
 
 METHOD GoBottom() CLASS HBEditor
 
-   ::GotoPos( ::naTextLen, ::LineLen( ::naTextLen ) + 1 )
+   ::GotoPos( ::naTextLen, ::LineLen( ::naTextLen ) + 1, .T. )
 
 Return Self
 
@@ -753,6 +756,7 @@ METHOD Up() CLASS HBEditor
 
    IF ::nRow > 1
       ::GotoLine( ::nRow - 1 )
+      //::GotoPos( ::nRow - 1, ::nCol )
    ENDIF
 
 Return Self
@@ -780,7 +784,7 @@ RETURN Self
 
 METHOD Top() CLASS HBEditor
 
-   ::GotoPos( ::nFirstRow, ::LineLen( ::nFirstRow ) )
+   ::GotoPos( ::nFirstRow, 1, .T. )
 
 RETURN Self
 
@@ -847,6 +851,7 @@ RETURN Self
 METHOD End() CLASS HBEditor
 
    ::GotoCol( ::LineLen( ::nRow ) + 1 )
+   //::GotoPos( ::nRow, ::LineLen( ::nRow ) + 1 )
 
 Return Self
 
@@ -911,7 +916,7 @@ METHOD K_Mouse( nKey ) CLASS HBEditor
       if ( nRow >= ::nTop .and. nRow <= ::nRight )
          if nCol >= ::nLeft .and. nCol <= ::nRight
             if ( ::nRow + ( nJump := nRow - ::nPhysRow ) ) <= ::naTextLen
-               ::GoToPos( max( 1, ::nRow + nJump ), max( 1, ::nCol + ( nCol - ::nPhysCol ) ), .t. )
+               ::GotoPos( max( 1, ::nRow + nJump ), max( 1, ::nCol + ( nCol - ::nPhysCol ) ), .t. )
             endif
          endif
       endif
@@ -928,7 +933,7 @@ RETURN Self
 
 //-------------------------------------------------------------------//
 //
-//                   Keystroke Handelling
+//                      Keystroke Handelling
 //
 //-------------------------------------------------------------------//
 
@@ -1034,6 +1039,7 @@ RETURN Self
 
 METHOD K_Del() CLASS HBEditor
    LOCAL lMerge := .F.
+   LOCAL nCurRow, nCurCol
 
    IF ::nCol > ::LineLen( ::nRow ) .and. ::nRow < ::naTextLen
       // eventually pad.
@@ -1062,6 +1068,9 @@ METHOD K_Del() CLASS HBEditor
 
    // have we to merge with the next line?
    IF lMerge
+      nCurRow := ::nRow
+      nCurCol := ::nCol
+
       // copy the other line
       ::aText[ ::nRow ]:cText += ::aText[ ::nRow + 1 ]:cText
       // copy its softcr setting
@@ -1070,6 +1079,9 @@ METHOD K_Del() CLASS HBEditor
       ::RemoveLine( ::nRow + 1 )
       // and finally split it
       ::SplitLine( ::nRow )
+
+      ::GotoPos( nCurRow, nCurCol, .T. )
+
       ::RefreshWindow()
    ENDIF
 
@@ -1125,14 +1137,17 @@ METHOD K_Tab() CLASS HBEditor
 //-------------------------------------------------------------------//
 
 METHOD K_Return() CLASS HBEditor
-   LOCAL lHardCR := .f.
 
    IF ::lEditAllow
       ::lDirty := .T.
 
       IF ::lInsert
          IF ::nRow == ::naTextLen
-            ::AddLine( "", .F. )
+            if ::nCol > ::LineLen( ::nRow )
+               ::AddLine( "", .F. )
+            else
+               ::InsertLine( Substr( ::aText[ ::nRow ]:cText, ::nCol ), .F., ::nRow )
+            endif
          ELSEIF ::aText[ ::nRow ]:lSoftCR
             ::aText[ ::nRow + 1 ]:cText := Substr( ::aText[ ::nRow ]:cText, ::nCol ) +" "+ ::aText[ ::nRow + 1 ]:cText
             ::SplitLine( ::nRow + 1 )
@@ -1140,7 +1155,6 @@ METHOD K_Return() CLASS HBEditor
             ::InsertLine( Substr( ::aText[ ::nRow ]:cText, ::nCol ), .F., ::nRow + 1 )
          ENDIF
          ::aText[ ::nRow ]:cText := Left( ::aText[ ::nRow ]:cText, ::nCol - 1 )
-         ::aText[ ::nRow ]:lSoftCR := .f.   /////////
 
       ELSEIF ::nRow == ::naTextLen
          ::AddLine( "", .F. )
@@ -1158,6 +1172,38 @@ METHOD K_Return() CLASS HBEditor
    ENDIF
 
 RETURN Self
+
+//-------------------------------------------------------------------//
+
+METHOD K_Esc() CLASS HBEditor()
+   LOCAL cScreenMsg, nCurRow, nCurCol
+
+   // Added message "Abort Edit? Y/N" like Clipper.
+   //
+   ::lExitEdit := .T.
+
+   if ::lDirty
+      if set( _SET_SCOREBOARD )
+         nCurCol    := ::Col()
+         nCurRow    := ::Row()
+         cScreenMsg := SaveScreen( 0,60,0,77 )
+
+         @ 0,60 say '(Abort Edit? Y/N)'
+         inkey( 0 )
+         RestScreen( 0, 60, 0, 77, cScreenMsg )
+         SetPos( nCurRow,nCurCol )
+
+         if lastkey() == asc( "n" ) .or. lastkey() == asc( "N" )
+            ::lExitEdit := .F.
+         endif
+      endif
+   endif
+
+   if ::lExitEdit
+      SetCursor( ::nOrigCursor )   // restore original cursor saved at startup
+   endif
+
+Return Self
 
 //-------------------------------------------------------------------//
 //
@@ -1217,9 +1263,9 @@ return Self
 //-------------------------------------------------------------------//
 
 METHOD GotoLine( nRow ) CLASS HBEditor
+   LOCAL lRefresh := .f.
 
    IF nRow <= ::naTextLen .AND. nRow > 0
-
       // Clipper Reformats the paragraph if there is some unexpected movement
       //
       if ( ::lWordWrap )
@@ -1233,11 +1279,11 @@ METHOD GotoLine( nRow ) CLASS HBEditor
       //
       IF nRow < ::nFirstRow
          ::nFirstRow := nRow
-         ::RefreshWindow()
+         lRefresh := .t.
 
       ELSEIF nRow - ::nFirstRow >= ::nNumRows
          ::nFirstRow := Max( 1, nRow - ::nNumRows + 1 )
-         ::RefreshWindow()
+         lRefresh := .t.
 
       ENDIF
 
@@ -1251,9 +1297,23 @@ METHOD GotoLine( nRow ) CLASS HBEditor
          endif
       endif
 
-      IF ::nCol > ::LineLen( nRow ) + 1
-         ::nCol := ::LineLen( nRow ) + 1
-      ENDIF
+      if !( ::lWordWrap )
+         if ::nCol > ::LineLen( nRow ) + 1
+            ::nCol := ::LineLen( nRow ) + 1
+         endif
+      endif
+      if ::nCol < ::nFirstCol
+         ::nFirstCol := ::nCol
+         lRefresh := .t.
+      endif
+      if ::nCol < ::nNumCols
+         ::nFirstCol := 1
+         lRefresh := .t.
+      endif
+
+      if lRefresh
+         ::RefreshWindow()
+      endif
 
       ::SetPos( ::nTop + nRow - ::nFirstRow, ::nLeft + ::nCol - ::nFirstCol )
    ENDIF
@@ -1266,15 +1326,17 @@ METHOD GotoCol( nCol ) CLASS HBEditor
 
    IF nCol >= 1
       if ( ::lWordWrap )
-         /*
+///////////////////////////////////////////////// CHECK AGAIN
          IF nCol > ::LineLen( ::nRow ) + 1
             nCol := ::LineLen( ::nRow ) + 1
          ENDIF
-         */
       endif
+
+      ::nCol := nCol
 
       // I need to move cursor if is past requested line number and if requested line is
       // inside first screen of text otherwise ::nFirstRow would be wrong
+      //
       if nCol < ::nFirstCol
          ::nFirstCol := nCol
          ::RefreshWindow()
@@ -1285,7 +1347,7 @@ METHOD GotoCol( nCol ) CLASS HBEditor
 
       ENDIF
 
-      ::nCol := nCol
+//      ::nCol := nCol
       ::SetPos( ::Row(), ::nLeft + nCol - ::nFirstCol )
    ENDIF
 
@@ -1572,9 +1634,9 @@ METHOD InsertState( lInsState ) CLASS HBEditor
       ::lInsert := lInsState
       SET( _SET_INSERT, lInsState )
       if ::lInsert
-         Setcursor( 2 )
+         Setcursor( 1 )
       else
-      Setcursor( 3 )
+      Setcursor( 2 )
       endif
    ENDIF
 
