@@ -1,16 +1,14 @@
 #
-# $Id: Makefile,v 1.7 2004/01/26 14:59:46 druzus Exp $
+# $Id: Makefile,v 1.8 2004/09/19 03:59:20 kaddath Exp $
 #
 
 ROOT = ../../
 
 C_SOURCES=\
       cdpesdos.c    \
-      cdpesmwin.c   \
       cdpeswin.c    \
       cdpgedos.c    \
       cdpgewin.c    \
-      cdphr1250.c   \
       cdphr852.c    \
       cdpltwin.c    \
       cdppl852.c    \
@@ -36,6 +34,11 @@ C_SOURCES=\
       uc8859_2.c    \
       uckoi8.c      \
       ucmaz.c       \
+
+# temporary hack for 8.3 file name length in DOS
+ifneq ($(HB_ARCHITECTURE),dos)
+C_SOURCES += cdpesmwin.c cdphr1250.c
+endif
 
 LIBNAME=codepage
 

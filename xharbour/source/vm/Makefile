@@ -1,22 +1,22 @@
 #
-# $Id: Makefile,v 1.16 2004/08/22 17:20:13 lf_sfnet Exp $
+# $Id: Makefile,v 1.17 2004/10/20 19:36:59 druzus Exp $
 #
 
 ROOT = ../../
 
 ifeq ($(HB_ARCHITECTURE),w32)
-	C_MAIN := mainstd.c mainwin.c
+      C_MAIN := mainstd.c mainwin.c
    ifeq ($(HB_COMPILER),mingw32)
-	ifeq ($(HB_MULTI_GT),yes)
-		C_MAIN := mainwin.c
-	endif
-	endif
+      ifeq ($(HB_MULTI_GT),yes)
+            C_MAIN := mainwin.c
+      endif
+   endif
 else
-	ifeq ($(HB_ARCHITECTURE),os2)
-		C_MAIN := mainstd.c 
-	else
-		C_MAIN := main.c
-	endif
+      ifeq ($(HB_ARCHITECTURE),os2)
+            C_MAIN := mainstd.c 
+      else
+            C_MAIN := main.c
+      endif
 endif
 
 C_SOURCES=\
@@ -66,7 +66,7 @@ endif
 LIBNAME=vm
 
 DIRS=\
-	mainstd \
+	mainstd     \
 	optcon 	\
 	optgui	\
 
