@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.99 2004/11/30 13:49:49 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.100 2004/12/01 10:43:26 mauriliolongo Exp $
  */
 
 /*
@@ -1728,6 +1728,15 @@ METHOD ColorRect( aRect, aRectColor ) CLASS TBrowse
 
    ::stable := .F.
    ::ForceStable()
+
+   // If the cursor is located inside the colored area,
+   // draws it as unselected (with the :colorRect colors).
+   If ::lRect .AND. ! Empty( ::aRedraw )
+      If ::colPos >= ::aRect[ 2 ] .and. ::colPos <= ::aRect[ 4 ] .and. ;
+         ::rowPos >= ::aRect[ 1 ] .and. ::rowPos <= ::aRect[ 3 ]
+         ::DispCell( ::rowPos, ::colPos, 1 )
+      endif
+   endif
 
 Return Self
 
