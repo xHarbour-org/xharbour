@@ -1633,7 +1633,12 @@ HB_FUNC( __DBPACK )
             hb_arraySet( ( ( AREAP ) s_pCurrArea->pArea )->valResult, 2, pEvery );
       }
       else
-         hb_itemClear( ( ( AREAP ) s_pCurrArea->pArea )->valResult );
+      {
+         if ( ( ( AREAP ) s_pCurrArea->pArea )->valResult )
+            hb_itemClear( ( ( AREAP ) s_pCurrArea->pArea )->valResult );
+         else
+            ( ( AREAP ) s_pCurrArea->pArea )->valResult = hb_itemNew( NULL );
+      }
       SELF_PACK( ( AREAP ) s_pCurrArea->pArea );
       if( pBlock )
          hb_itemClear( ( ( AREAP ) s_pCurrArea->pArea )->valResult );
