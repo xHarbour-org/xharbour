@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.5 2003/02/15 02:05:02 lculik Exp $
+ * $Id: tmysql.prg,v 1.6 2003/02/18 01:25:58 lculik Exp $
  */
 
 /*
@@ -58,6 +58,13 @@
      * Added more info on Alert message for Unknown type
      * Modified ClipValue2SQL() to process empty strings
  */
+
+ /*
+ 2002-02-18 07:30 UTC+0100 Srdjan Dragojlovic <digikv@yahoo.com>
+   * contrib/mysql/tmysql
+     + Bug in GOTO Method
+ */
+
 
 #include "hbclass.ch"
 #include "common.ch"

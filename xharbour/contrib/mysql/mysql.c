@@ -1,5 +1,5 @@
 /*
- * $Id: mysql.c,v 1.1 2003/02/03 05:19:18 walito Exp $
+ * $Id: mysql.c,v 1.2 2003/02/06 05:20:46 walito Exp $
  */
 
 /*
@@ -91,9 +91,10 @@ HB_FUNC(SQLCONNECT) // MYSQL *mysql_real_connect(MYSQL*, char * host, char * use
 #if MYSQL_VERSION_ID > 32200
       /* from 3.22.x of MySQL there is a new parameter in mysql_real_connect() call, that is char * db
          which is not used here */
-      if ( (mysql = mysql_init((MYSQL*) 0)) )
+       mysql = mysql_init((MYSQL*) 0)       ;
 
-   {
+      if ( ( mysql != NULL) )
+      {
         if( mysql_real_connect( mysql, szHost, szUser, szPass, 0, MYSQL_PORT, NULL, 0) )
         _retnl((long) mysql);
       else
