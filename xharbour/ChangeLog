@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3124 2004/06/30 22:50:40 marcosgambeta Exp $
+ * $Id: ChangeLog,v 1.3125 2004/07/01 04:08:41 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,46 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-01 19:00 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  + xharbour/source/rtl/gtwvt/wvtclass.prg
+  + xharbour/source/rtl/gtwvt/wvtpaint.prg
+    + Wvt*Classes framework and GUI objects paint protocol.
+
+  * xharbour/source/rtl/gtwvt/wvtcore.c
+  * xharbour/source/rtl/gtwvt/wvtutils.c
+    + Addition of few more GUI primitives. Function's logical placement.    
+
+  * xharbour/tests/wvtgui.prg
+  + xharbour/tests/v_calend.bmp
+  + xharbour/tests/v_clclt.bmp
+  + xharbour/tests/v_index.bmp
+  + xharbour/tests/v_lock.bmp
+  + xharbour/tests/v_new.bmp
+  + xharbour/tests/v_notes1.bmp
+  + xharbour/tests/v_selct1.bmp
+  + xharbour/tests/dia_excl.ico  
+    ! Demonstration of Wvt*Classes accompanying required files.
+
+  * xharbour/makefile.bc
+  * xharbour/makefile.vc
+  * xharbour/makefile.nt
+  * xharbour/makefile.wc
+    ! Updated to include new files.
+      Though I have done it for all compilers, but I am sure about makefile.bc.
+      Please correct them if I am wrong somewhere.    
+
+  /*  
+      Wvt*Classes are merged with GTWVT subsytem. User can opt for pure console,
+      hibrid console or pure GUI dialogs. He/she can mix all approaches in a 
+      single application. 
+
+      I have laid down the framework. Hope everybody will help decide its flow,
+      class framework, layout, etc.
+
+      The prime point of concern is ReadModal() which I could not do properly. Hope
+      someone from you more adept to PP will cure it.
+  */
 
 2004-06-30 21:07 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/pp/ppcore.c
