@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2951 2004/05/18 12:15:18 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2952 2004/05/18 14:08:27 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-05-18 08:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/thread.c
+  * source/vm/hvm.c
+    + Added logic to free Sequence management linked list when app/thread terminates.
+
 2004-05-18 11:00 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * contrib/hbzlib/zip.c
     ! fixed some warnings under linux
-    
+
 2004-05-18 14:10 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rtl/gtwvt/Makefile
     * added wvtcore.c and wvtutils.c

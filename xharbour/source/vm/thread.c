@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.171 2004/05/17 01:51:05 ronpinkas Exp $
+* $Id: thread.c,v 1.172 2004/05/17 14:21:01 mauriliolongo Exp $
 */
 
 /*
@@ -550,6 +550,15 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    // Free only if we are not destroing the main stack
    if ( pStack != &hb_stack )
    {
+      while( pStack->pSequence )
+      {
+         PHB_SEQUENCE pFree = pStack->pSequence;
+
+         pStack->pSequence = pStack->pSequence->pPrev;
+
+         hb_xfree( (void *) pFree );
+      }
+
       hb_xfree( pStack );
    }
 }

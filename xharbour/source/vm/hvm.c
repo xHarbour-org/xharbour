@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.397 2004/05/17 00:42:52 ronpinkas Exp $
+ * $Id: hvm.c,v 1.398 2004/05/17 01:51:05 ronpinkas Exp $
  */
 
 /*
@@ -831,6 +831,15 @@ int HB_EXPORT hb_vmQuit( void )
       hb_gcReleaseAll();
    }
    //printf("After GC\n" );
+
+   while( hb_vm_pSequence )
+   {
+      PHB_SEQUENCE pFree = hb_vm_pSequence;
+
+      hb_vm_pSequence = hb_vm_pSequence->pPrev;
+
+      hb_xfree( (void *) pFree );
+   }
 
    hb_xexit();
    //printf("After xexit\n" );
