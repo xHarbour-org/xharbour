@@ -1,5 +1,5 @@
 /*
- * $Id: pragma.c,v 1.4 2004/04/05 10:03:20 andijahja Exp $
+ * $Id: pragma.c,v 1.5 2004/11/03 21:20:06 ronpinkas Exp $
  */
 
 /*
@@ -67,9 +67,7 @@ static BOOL s_bTracePragma = FALSE;
 /* Size of abreviated pragma commands */
 #define PRAGMAS_LEN       8
 
-#if defined(__WATCOMC__)
-  extern BOOL hb_pp_bInline;
-#endif
+extern BOOL hb_pp_bInline;
 
 /* TODO:  Add support for:
           RequestLib    /R
@@ -189,10 +187,7 @@ void hb_pp_ParsePragma( char * szLine, BOOL bValidCode )
       {
          char sBuffer[ HB_PP_STR_SIZE ], *pBuffer, sDirective[8] ;
          int iSize;
-#ifndef __WATCOMC__
-         extern BOOL hb_pp_bInline;
-#endif
-         PINLINE pInline;
+         PINLINE pInline = NULL;
 
          hb_pp_bInline = TRUE;
 

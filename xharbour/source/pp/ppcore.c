@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.185 2004/11/03 21:20:06 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.186 2004/11/04 07:46:42 lf_sfnet Exp $
  */
 
 /*
@@ -217,10 +217,8 @@ static char s_sToken[2048];
 
 static char *s_pTerminator;
 
-#if defined(__WATCOMC__)
 extern BOOL hb_pp_bInline;
 extern int hb_pp_LastOutLine;
-#endif
 
 int *hb_pp_aiLastIf = NULL, *hb_pp_aiOuterIfLevel = NULL;
 
@@ -821,9 +819,6 @@ int hb_pp_ParseDirective( char * sLine )
   char szInclude[ _POSIX_PATH_MAX ];
   int i;
   char szExpandedLine[ HB_PP_STR_SIZE ];
-  #ifndef __WATCOMC__
-  extern BOOL hb_pp_bInline;
-  #endif
 
   HB_TRACE(HB_TR_DEBUG, ("hb_pp_ParseDirective(%s)", sLine));
 
@@ -5670,9 +5665,6 @@ static void pp_rQuotes( char * expreal, char * sQuotes )
 
 int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, char * sBuffer, int * lenBuffer, int * iBuffer, int State )
 {
-#ifndef __WATCOMC__
-  extern BOOL hb_pp_bInline;
-#endif
   int readed = 0;
   char cha, cLast = '\0', symbLast = '\0';
   BOOL bOK = TRUE;
@@ -5919,9 +5911,6 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
 
 int hb_pp_WrStr( FILE * handl_o, char * buffer )
 {
-#ifndef __WATCOMC__
-  extern int hb_pp_LastOutLine;
-#endif
   int lens = strlen(buffer);
 
   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_pp_WrStr(%p, >%s<)", handl_o, buffer ));
