@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.11 2002/06/14 03:24:17 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.12 2002/06/14 18:00:10 ronpinkas Exp $
  */
 
 /*
@@ -555,7 +555,7 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned char cAlign )
 
       if( uiOffset )
       {
-         unsigned char cPad = min( cSize, cAlign );
+         unsigned char cPad = ( ( cSize < cAlign ) ? cSize : cAlign );
 
          if( ( cShift = ( uiOffset % cPad ) ) > 0 )
          {
@@ -767,7 +767,7 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
 
          if( uiOffset )
          {
-            unsigned char cPad = min( cSize, cAlign );
+            unsigned char cPad = ( ( cSize < cAlign ) ? cSize : cAlign );
 
             if( ( cShift = ( uiOffset % cPad ) ) > 0 )
             {
@@ -987,7 +987,7 @@ HB_FUNC( HB_STRUCTURETOARRAY )
 
          if( uiOffset )
          {
-            unsigned char cPad = min( cSize, cAlign );
+            unsigned char cPad = ( ( cSize < cAlign ) ? cSize : cAlign );
 
             if( ( cShift = ( uiOffset % cPad ) ) > 0 )
             {

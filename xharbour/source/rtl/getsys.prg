@@ -1,5 +1,5 @@
 /*
- * $Id: getsys.prg,v 1.4 2002/06/07 15:12:55 walito Exp $
+ * $Id: getsys.prg,v 1.5 2002/06/14 17:27:38 walito Exp $
  */
 
 /*
@@ -229,7 +229,7 @@ FUNCTION GetPostValidate( oGet )
       IF oGet != NIL
          oGetList:oGet := oGet
       ENDIF
-      
+
       RETURN oGetList:GetPostValidate()
    ENDIF
 
@@ -335,7 +335,7 @@ FUNCTION RangeCheck( oGet, xDummy, xLow, xHigh )
    ENDIF
 
    IF Set( _SET_SCOREBOARD )
-      
+
       cMessage := Left( NationMsg( _GET_RANGE_FROM ) + LTrim( Transform( xLow, "" ) ) + ;
                         NationMsg( _GET_RANGE_TO ) + LTrim( Transform( xHigh, "" ) ), MaxCol() )
 
@@ -358,7 +358,7 @@ FUNCTION RangeCheck( oGet, xDummy, xLow, xHigh )
 #ifdef HB_COMPAT_C53
 
 PROCEDURE GUIReader( oGet, oGetlist, a, b )
- 
+
    oGetlist:GuiReader( oGet, oGetList, a, b )
 
    RETURN
@@ -378,7 +378,7 @@ PROCEDURE TBApplyKey( oGet, oTB, GetList, nKey,  aMsg )
       ENDIF
       oGetList:Tbapplykey( oGet, oTB, GetList, nKey, aMsg )
    ENDIF
-   RETURN 
+   RETURN
 
 PROCEDURE GuiApplyKey(oGet,nKey)
    LOCAL oGetList := __GetListActive()
@@ -412,7 +412,7 @@ FUNCTION GuiGetPostValidate( oGet,oGui )
       IF oGet != NIL
          oGetList:oGet := oGet
       ENDIF
-      
+
       RETURN oGetList:GuiGetPostValidate(oGui)
    ENDIF
 
@@ -424,15 +424,15 @@ FUNCTION HitTest( aGetList, MouseRow, MouseCol, aMsg ) // Removed STATIC
 
    IF oGetList != NIL
       RETURN oGetlist:Hittest( aGetList, MouseRow, MouseCol, aMsg ) // Removed STATIC
-   ELSE
-      RETURN 0
    ENDIF
+
+   RETURN 0
 
 /***
 *
 *  Accelerator( <aGetList>, <nKey>, <aMsg> ) --> 0
 *
-*  Identify the Accelerator key 
+*  Identify the Accelerator key
 *
 ***/
 FUNCTION Accelerator( aGetList, nKey, aMsg ) // Removed STATIC
@@ -440,8 +440,8 @@ FUNCTION Accelerator( aGetList, nKey, aMsg ) // Removed STATIC
 
    IF oGetList != NIL
       RETURN oGetlist:Accelerator( aGetList, nKey, aMsg ) // Removed STATIC
-   ELSE
-      RETURN 0
    ENDIF
+
+   RETURN 0
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.271 2002/06/14 17:43:28 walito Exp $
+ * $Id: ChangeLog,v 1.272 2002/06/14 18:00:06 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-14 11:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/getsys.prg
+    ! Fixed 2 warings about RETURN.
+
+  * source/vm/arrayshb.c
+    * Replaced min() with ( x < y ? ) syntax.
 
 2002-06-14 11:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/arrayshb.c
