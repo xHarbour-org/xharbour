@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3669 2004/12/11 04:20:14 paultucker Exp $
+ * $Id: ChangeLog,v 1.3670 2004/12/12 06:03:52 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-12 03:40 UTC-300 Walter Negro <anegro-AT-overnet.com.ar>
+  * source/vm/hash.c
+    ! Fixed incorrect comparison in hb_hashPreallocate
+    ! Fixed parameters calling to error functions.
+  * source/vm/thread.c
+    + Add function HB_MUTEXTIMEOUTLOCK.
+       This funcion try to lock a mutex with timeout, if success return .T.,
+        if timeout occurrr return .F. 
 
 2004-12-11 22:00 UTC-0800 Brian Hays <bhays@abacuslaw.com>
   * contrib/rdd_ads/ads1.c
