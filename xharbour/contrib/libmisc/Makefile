@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2001/12/26 21:21:08 dholm Exp $
+# $Id: Makefile,v 1.1 2003/04/14 16:09:11 lculik Exp $
 #
 
 ROOT = ../../
@@ -21,6 +21,10 @@ PRG_SOURCES=\
 	twirler.prg \
 
 LIBNAME=misc
+
+ifneq ($(HB_ARCHITECTURE),dos)
+MT_LIBNAME=miscmt
+endif
 
 DIRS=tests
 
