@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2505 2004/03/06 02:32:35 andijahja Exp $
+ * $Id: ChangeLog,v 1.2506 2004/03/06 02:42:03 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-06 11:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/inet.c
+    ! pass proper argument to error handler in INETGETHOST() and INETGETALIAS()
 
 2004-03-06 03:50 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   - xharbour/tests/rddtest/mktst.bat

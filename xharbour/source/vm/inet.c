@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.40 2004/02/14 01:29:45 andijahja Exp $
+* $Id: inet.c,v 1.41 2004/02/14 21:01:19 andijahja Exp $
 */
 
 /*
@@ -1405,9 +1405,12 @@ HB_FUNC( INETGETHOSTS )
 
    if( pHost == NULL )
    {
+      /*
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETHOSTS", 1, pArgs );
       hb_itemRelease( pArgs );
+      */
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETHOSTS", 1, hb_paramError(1) );
       return;
    }
 
@@ -1449,9 +1452,12 @@ HB_FUNC( INETGETALIAS )
 
    if( pHost == NULL )
    {
+      /*
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETHOSTS", 1, pArgs );
       hb_itemRelease( pArgs );
+      */
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETGETALIAS", 1, hb_paramError(1) );
       return;
    }
 
