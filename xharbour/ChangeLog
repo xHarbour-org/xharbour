@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.299 2002/07/05 19:53:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.300 2002/07/06 02:36:14 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-07-07 14:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/transfrm.c
+    ! Fix with numeric values and pictures with spaces and pictures with
+      severals dot.
+      The return values are compliant with Clipper.
+      eg: Transform( 1234, "9 999" )
+      eg: Transform( 123.123456, "999.99.99.99" )
 
 2002-07-05 23:35 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/isprint.c
