@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.80 2003/12/21 23:35:26 fsgiudice Exp $
+# $Id: makefile.bc,v 1.81 2004/01/25 15:07:12 jonnymind Exp $
 #
 
 #
@@ -339,7 +339,6 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\file.obj \
    $(RTL_OBJ_DIR)\filehb.obj \
    $(RTL_OBJ_DIR)\filesys.obj \
-   $(RTL_OBJ_DIR)\readline.obj \
    $(RTL_OBJ_DIR)\fkmax.obj \
    $(RTL_OBJ_DIR)\fnsplit.obj \
    $(RTL_OBJ_DIR)\fssize.obj \
@@ -358,8 +357,6 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hbcrypt.obj \
    $(RTL_OBJ_DIR)\hbffind.obj \
    $(RTL_OBJ_DIR)\hbhex2n.obj \
-   $(RTL_OBJ_DIR)\hblog.obj \
-   $(RTL_OBJ_DIR)\hblognet.obj \
    $(RTL_OBJ_DIR)\hboutdbg.obj \
    $(RTL_OBJ_DIR)\hbrandom.obj \
    $(RTL_OBJ_DIR)\hbserv.obj \
@@ -400,6 +397,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\philes53.obj \
    $(RTL_OBJ_DIR)\philesx.obj \
    $(RTL_OBJ_DIR)\rat.obj \
+   $(RTL_OBJ_DIR)\readline.obj \
    $(RTL_OBJ_DIR)\regex.obj \
    $(RTL_OBJ_DIR)\replic.obj \
    $(RTL_OBJ_DIR)\right.obj \
@@ -467,6 +465,8 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\getlist.obj \
    $(RTL_OBJ_DIR)\getsys.obj \
    $(RTL_OBJ_DIR)\hbini.obj \
+   $(RTL_OBJ_DIR)\hblog.obj \
+   $(RTL_OBJ_DIR)\hblognet.obj \
    $(RTL_OBJ_DIR)\hbserial.obj \
    $(RTL_OBJ_DIR)\input.obj \
    $(RTL_OBJ_DIR)\listbox.obj \

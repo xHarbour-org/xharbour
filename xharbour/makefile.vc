@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.83 2004/01/04 04:26:24 ronpinkas Exp $
+# $Id: makefile.vc,v 1.84 2004/01/18 13:04:24 paultucker Exp $
 #
 
 #
@@ -121,7 +121,7 @@ HARBOURFLAGS =-i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
 LFLAGS       =/MACHINE:IX86 /SUBSYSTEM:CONSOLE $(LFLAGS)
 L_DFLAGSNMT  =$(LFLAGS) /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT $(LDFLAGS)
 !ifdef HB_MT
-L_DFLAGS     =$(LFLAGS) /NODEFAULTLIB:LIBC /NODEFAULTLIB:LIBCPMT $(LDFLAGS)
+L_DFLAGS     =$(LFLAGS) /NODEFAULTLIB:LIBC /NODEFAULTLIB:LIBCP /NODEFAULTLIB:LIBCPMT $(LDFLAGS)
 !else
 L_DFLAGS     =$(L_DFLAGSNMT)
 !endif
@@ -337,6 +337,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\gt.obj \
    $(OBJ_DIR)$(MT)\gtapi.obj \
    $(OBJ_DIR)$(MT)\gtapiu.obj \
+   $(OBJ_DIR)$(MT)\gtgraph.obj \
    $(OBJ_DIR)$(MT)\gx.obj \
    $(OBJ_DIR)$(MT)\hardcr.obj \
    $(OBJ_DIR)$(MT)\hbbitf.obj \
@@ -453,9 +454,9 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\fieldbl.obj \
    $(OBJ_DIR)$(MT)\getlist.obj \
    $(OBJ_DIR)$(MT)\getsys.obj \
+   $(OBJ_DIR)$(MT)\hbini.obj \
    $(OBJ_DIR)$(MT)\hblog.obj \
    $(OBJ_DIR)$(MT)\hblognet.obj \
-   $(OBJ_DIR)$(MT)\hbini.obj \
    $(OBJ_DIR)$(MT)\hbserial.obj \
    $(OBJ_DIR)$(MT)\input.obj \
    $(OBJ_DIR)$(MT)\listbox.obj \
@@ -524,6 +525,7 @@ LANG_LIB_OBJS = \
    $(OBJ_DIR)\msghe862.obj \
    $(OBJ_DIR)\msghewin.obj \
    $(OBJ_DIR)\msghr852.obj \
+   $(OBJ_DIR)\msghr1250.obj \
    $(OBJ_DIR)\msghriso.obj \
    $(OBJ_DIR)\msghu852.obj \
    $(OBJ_DIR)\msghucwi.obj \
@@ -532,7 +534,7 @@ LANG_LIB_OBJS = \
    $(OBJ_DIR)\msgis850.obj \
    $(OBJ_DIR)\msgit.obj \
    $(OBJ_DIR)\msgko.obj \
-   $(OBJ_DIR)\msltwin.obj \
+   $(OBJ_DIR)\msgltwin.obj \
    $(OBJ_DIR)\msgpl852.obj \
    $(OBJ_DIR)\msgpliso.obj \
    $(OBJ_DIR)\msgplmaz.obj \
@@ -1147,7 +1149,6 @@ $(HBMAKE_EXE) : \
                                       $(HBMAKE_DIR)\hbmlang.c \
                       -o $(HBMAKE_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB)
 
-
 #
 # HARBOUR.EXE rules
 #
@@ -1208,7 +1209,7 @@ $(VMMT_LIB_OPT_CON): $(VM_LIB_OPT_CON_OBJS)
    lib /out:$@ $**
 
 $(VMMT_LIB_OPT_GUI): $(VM_LIB_OPT_GUI_OBJS)
-   lib /out:$@ $**
+   lib /out:$@ /SUBSYSTEM:WINDOWS $**
 
 $(MACROMT_LIB) : $(MACRO_LIB_OBJS)
    lib /out:$@ $**
@@ -1264,7 +1265,7 @@ $(VM_LIB_OPT_CON): $(VM_LIB_OPT_CON_OBJS)
    lib /out:$@ $**
 
 $(VM_LIB_OPT_GUI): $(VM_LIB_OPT_GUI_OBJS)
-   lib /out:$@ $**
+   lib /out:$@ /SUBSYSTEM:WINDOWS $**
 
 $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
    lib /out:$@ $**

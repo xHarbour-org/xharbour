@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.57 2004/01/23 14:53:24 andijahja Exp $
+ * $Id: gtwvt.c,v 1.58 2004/01/25 15:08:16 jonnymind Exp $
  */
 
 /*
@@ -1524,9 +1524,9 @@ static void s_wvt_paintGraphicObjects( HDC hdc, RECT *updateRect )
          color = RGB( pObj->color.usRed >> 8, pObj->color.usGreen >> 8, 
                pObj->color.usBlue >> 8);
          hPen = CreatePen( PS_SOLID, 1, color );
-         hOldPen = SelectObject( hdc, hPen ); 
-         hBrush = CreateSolidBrush( color );
-         hOldBrush = SelectObject( hdc, hBrush );
+         hOldPen = (HPEN) SelectObject( hdc, hPen ); 
+         hBrush = (HBRUSH) CreateSolidBrush( color );
+         hOldBrush = (HBRUSH) SelectObject( hdc, hBrush );
          
          switch( pObj->type )
          {
