@@ -38,9 +38,10 @@ GLOBAL hThisInstance
 
 INIT PROCEDURE _CheckMultiInst
    
-   lPrevInstance:=(empty(CreateMutex( , .T., GetModuleFileName())) ;
-                   .or. (GetLastError() > 0) )
 
+   lPrevInstance:=(empty(CreateMutex( , .T., strtran(GetModuleFileName(),'\','_') )) ;
+                   .or. (GetLastError() > 0) )
+                   
    hThisInstance:=_getinstance()
    
    RETURN
