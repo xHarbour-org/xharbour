@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.1.1.1 2001/12/21 10:43:43 ronpinkas Exp $
+ * $Id: tbrwtext.prg,v 1.2 2002/12/01 04:00:26 walito Exp $
  */
 
 /*
@@ -191,7 +191,7 @@ METHOD LineColor(nRow) CLASS TBrwText
    local cColor, lHilited, lBreak
 
    lHilited := (nRow == ::nActiveLine)
-   lBreak := nRow IN ::aBreakPoints
+   lBreak := AScan(::aBreakPoints, nRow) > 0
 
    if lHilited .AND. lBreak
       cColor := hb_ColorIndex(::cColorSpec, CLR_HIBKPT)
@@ -212,17 +212,18 @@ return cColor
 
 METHOD ToggleBreakPoint(nRow, lSet) CLASS TBrwText
 
-//   local nAt := AScan(::aBreakPoints, nRow)
+   local nAt := AScan(::aBreakPoints, nRow)
 
    if lSet
       // add it only if not present
-      if !( nRow IN ::aBreakPoints )
+      if nAt == 0
          AAdd(::aBreakPoints, nRow)
       endif
 
    else
-      if nRow IN ::aBreakPoints
-         ADel( ::aBreakPoints, AScan(::aBreakPoints, nRow), .t. )
+      if nAt <> 0
+         ADel( ::aBreakPoints, nAt )
+         ASize( ::aBreakPoints, Len( ::aBreakPoints ) - 1 )
       endif
 
    endif
@@ -259,7 +260,7 @@ METHOD Search( cString, lCaseSensitive, nMode ) CLASS TBrwText
    end case
 
    for nFor := nFrom to nTo Step nStep
-      if cString IN iif( lCaseSensitive, ::GetLine( nFor ), Upper( ::GetLine( nFor ) ) )
+      if cString $ iif( lCaseSensitive, ::GetLine( nFor ), Upper( ::GetLine( nFor ) ) )
          lFound := .t.
          ::GotoLine( nFor )
          exit
