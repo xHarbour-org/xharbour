@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.188 2002/04/30 04:40:56 walito Exp $
+ * $Id: ChangeLog,v 1.189 2002/04/30 06:12:13 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-01 01:41 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
+   * include/hbrddcdx.h
+   * source/rdd/dbfcdx/dbfcdx1.c
+   * source/rdd/dbfcdx/dbfcdx1.h
+   * source/rdd/dbfcdx/dbfcdx2.h
+     + multiple CDXs support for:
+       hb_cdxOrderListAdd, hb_cdxOrderListFocus, hb_cdxGoCold,
+       hb_cdxGoHot, hb_cdxGetTagByNumber, hb_cdxGetActiveTag,
+       DBOI_ORDERCOUNT, DBOI_UNIQUE, ordName, ordBagName.
+     ! fixed a bug in: gotop, gobbotom, skip
+     + begin of hb_cdxZap
+     + added support for: DBOI_ISCOND, DBOI_ISDESC, DBOI_FILEHANDLE
+     + added index locking routines
+     ! fixed some structures definitions for gcc/vc/...
+     ! fixed autopen bug on Linux
+     ! fixed recno() while indexing
+     ! fixed sharing flags in index creation
+     ! fixed tag order after index creation
+     + added function hb_cdxReorderTagList
+     + added dummies handlers for DBOI_KEYADD, DBOI_KEYDELETE.
 
 2002-04-29 23:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
