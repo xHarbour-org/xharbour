@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.24 2002/10/25 05:33:57 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.25 2002/10/25 07:13:46 what32 Exp $
  */
 
 /*
@@ -118,7 +118,7 @@ CLASS oCtrlMask FROM TWinControl
    METHOD Refresh()
    METHOD SelectCtrl()
    METHOD DeSelectCtrl()
-
+   METHOD OnUserMsg()
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
@@ -460,6 +460,15 @@ METHOD Refresh()
 *-----------------------------------------------------------------------------*
 
 // client area coordinates
+METHOD OnUserMsg( nMsg, nwParam, nlParam)
+   IF nMsg == WM_USER + 1
+      UpdateWindow( ::handle )
+      ::HintWindow:SetTitle(0,"")
+      ::HintWindow:SetText(alltrim(str(::aEditRect[1]))+","+alltrim(str(::aEditRect[2]))+"  "+;
+                           alltrim(str(::aEditRect[3]-::aEditRect[1]))+","+alltrim(str(::aEditRect[4]-::aEditRect[2])))
+      UpdateWindow( ::Parent:handle )
+   ENDIF
+return(0)
 
 METHOD OnLButtonDown( wParam, x, y )
 
@@ -488,7 +497,7 @@ METHOD OnLButtonDown( wParam, x, y )
                ShowWindow(a[SEL_HANDLE],SW_SHOW)  })
                ::aSelected:={{hChild,aclone(aRect),x-aRect[1],y-aRect[2],{},aclone(aRect)}}   // handle,rect,anchorX,anchorY,aHot
             ENDIF
-            
+
             ::HintWindow:Activate(1)
             ::HintWindow:TrackHint(1)
             
@@ -571,12 +580,6 @@ METHOD OnMouseMove( aParam,x,y)
    
    IF ::mousedown
 
-      if ::moving.or.::sizing
-
-//         ::HintWindow:SetTitle(0,"")
-//         ::HintWindow:SetText(alltrim(str(::aEditRect[1]))+","+alltrim(str(::aEditRect[2]))+"  "+;
-//                              alltrim(str(::aEditRect[3]-::aEditRect[1]))+","+alltrim(str(::aEditRect[4]-::aEditRect[2])))
-      endif
       hDC:=GetDC(::Handle)
       SetTextColor(hDC,RGB(255,255,128))
       SetBkColor(hDC,RGB(0,0,128))
@@ -600,7 +603,9 @@ METHOD OnMouseMove( aParam,x,y)
       ENDIF
 
       ReleaseDc(::Handle,hDC)
-      
+
+      ::PostMessage( WM_USER+1 )
+
    ELSE
       IF Empty(::Cursor)
          ClientToScreen(::Handle,aPt)
@@ -640,7 +645,7 @@ METHOD OnMouseMove( aParam,x,y)
       ENDIF
    ENDIF
 
-   RETURN(NIL)
+   RETURN(nil)
 
 
 *-----------------------------------------------------------------------------*
