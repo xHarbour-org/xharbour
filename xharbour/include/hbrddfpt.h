@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.5 2003/11/22 03:33:57 ronpinkas Exp $
+ * $Id: hbrddfpt.h,v 1.6 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -119,7 +119,9 @@ HB_EXTERN_BEGIN
 #define FPTIT_FLEXAR_FALSE 0x1A
 #define FPTIT_FLEXAR_DATE  0x0E
 #define FPTIT_FLEXAR_BYTE  0x12
+#define FPTIT_FLEXAR_BYTE2 0x1D
 #define FPTIT_FLEXAR_SHORT 0x13
+#define FPTIT_FLEXAR_SHORT2 0x1E
 #define FPTIT_FLEXAR_LONG  0x20
 #define FPTIT_FLEXAR_DBL   0x0F
 #define FPTIT_FLEXAR_STR   0x07

@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.9 2004/01/23 14:59:58 andijahja Exp $
+ * $Id: dbffpt1.c,v 1.10 2004/02/20 22:33:58 ronpinkas Exp $
  */
 
 /*
@@ -1071,11 +1071,33 @@ static ERRCODE hb_fptReadFlexItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBu
             errCode = EDBF_CORRUPT;
          }
          break;
+      case FPTIT_FLEXAR_BYTE2:
+         if ( bBufEnd - (*pbMemoBuf) >= 3 )
+         {
+            hb_itemPutNI( pItem, ( BYTE ) **pbMemoBuf );
+            *pbMemoBuf += 3;
+         }
+         else
+         {
+            errCode = EDBF_CORRUPT;
+         }
+         break;
       case FPTIT_FLEXAR_SHORT:
          if ( bBufEnd - (*pbMemoBuf) >= 3 )
          {
             hb_itemPutNI( pItem, (SHORT) HB_GET_LE_USHORT( *pbMemoBuf ) );
             *pbMemoBuf += 3;
+         }
+         else
+         {
+            errCode = EDBF_CORRUPT;
+         }
+         break;
+      case FPTIT_FLEXAR_SHORT2:
+         if ( bBufEnd - (*pbMemoBuf) >= 4 )
+         {
+            hb_itemPutNI( pItem, (SHORT) HB_GET_LE_USHORT( *pbMemoBuf ) );
+            *pbMemoBuf += 4;
          }
          else
          {
