@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.7 2004/04/04 08:56:20 lf_sfnet Exp $
+ * $Id: hbhex2n.c,v 1.8 2004/04/04 12:35:14 mlombardo Exp $
  */
 
 /*
@@ -148,8 +148,6 @@ HB_FUNC( HB_HEXTONUM )
    hb_retnl( (LONG) ulNum  );
 }
 
-#ifndef __WATCOMC__ 
-#ifndef __MINGW32__
 HB_FUNC( HB_STRTOHEX )
 {
    char *outbuff;
@@ -276,5 +274,3 @@ HB_FUNC( HB_HEXTOSTR )
    outbuff[nalloc] = '\0';
    hb_retclen( outbuff, nalloc );
 }
-#endif
-#endif
