@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.10 2003/11/05 09:52:27 lculik Exp $
+# $Id: makefile.bc,v 1.11 2003/11/25 08:31:12 druzus Exp $
 #
 
 #
@@ -125,6 +125,7 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\keyset.obj \
    $(OBJ_DIR)\math.obj \
    $(OBJ_DIR)\misc1.obj \
+   $(OBJ_DIR)\net.obj \
    $(OBJ_DIR)\num1.obj \
    $(OBJ_DIR)\numat.obj \
    $(OBJ_DIR)\pad.obj \
@@ -321,6 +322,10 @@ $(OBJ_DIR)\math.obj : $(TOOLS_DIR)\math.c
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\misc1.obj : $(TOOLS_DIR)\misc1.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\net.obj : $(TOOLS_DIR)\net.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
