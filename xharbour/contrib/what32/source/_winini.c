@@ -1,0 +1,257 @@
+
+
+// INI file interface
+
+/*
+ * What32 Project source code:
+ * Windows Profile functions (Windows .ini rounines)
+ *
+ * Copyright 2001-2002 Luiz Rafael Culik<culikr@uol.com.br>
+ * www - http://www.harbour-project.org
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this software; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+ *
+ * As a special exception, the Harbour Project gives permission for
+ * additional uses of the text contained in its release of Harbour.
+ *
+ * The exception is that, if you link the Harbour libraries with other
+ * files to produce an executable, this does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * Your use of that executable is in no way restricted on account of
+ * linking the Harbour library code into it.
+ *
+ * This exception does not however invalidate any other reasons why
+ * the executable file might be covered by the GNU General Public License.
+ *
+ * This exception applies only to the code released by the Harbour
+ * Project under the name Harbour.  If you copy code from other
+ * Harbour Project or Free Software Foundation releases into a copy of
+ * Harbour, as the General Public License permits, the exception does
+ * not apply to the code that you add in this way.  To avoid misleading
+ * anyone as to the status of such modified files, you must delete
+ * this exception notice from them.
+ *
+ * If you write modifications of your own for Harbour, it is your choice
+ * whether to permit this exception to apply to your modifications.
+ * If you do not wish that, delete this exception notice.
+ *
+ */
+
+#define HB_OS_WIN_32_USED
+#define _WIN32_WINNT   0x0400
+
+//#include <shlobj.h>
+#include <windows.h>
+//#include <commctrl.h>
+#include "hbapi.h"
+#include "tchar.h"
+//#include "hbstack.h"
+//#include "hbapiitm.h"
+
+
+//-----------------------------------------------------------------------------
+HB_FUNC (GETPROFILESTRING )
+{
+   TCHAR bBuffer[ 1024 ] = { 0 };
+   DWORD dwLen ;
+   char * lpSection = hb_parc( 1 );
+   char * lpEntry = ISCHAR(2) ? hb_parc( 2 ) : NULL ;
+   char * lpDefault = hb_parc ( 3 );
+   dwLen = GetProfileString( lpSection , lpEntry ,lpDefault , bBuffer, sizeof( bBuffer ) );
+   if( dwLen )
+     hb_retclen( ( char * ) bBuffer, dwLen );
+   else
+      hb_retc( lpDefault );
+}
+
+//-----------------------------------------------------------------------------
+HB_FUNC (GETPRIVATEPROFILESTRING )
+{
+   TCHAR bBuffer[ 1024 ] = { 0 };
+   DWORD dwLen ;
+   char * lpSection = hb_parc( 1 );
+   char * lpEntry = ISCHAR(2) ? hb_parc( 2 ) : NULL ;
+   char * lpDefault = hb_parc( 3 );
+   char * lpFileName = hb_parc( 4 );
+   dwLen = GetPrivateProfileString( lpSection , lpEntry ,lpDefault , bBuffer, sizeof( bBuffer ) , lpFileName);
+   if( dwLen )
+     hb_retclen( ( char * ) bBuffer, dwLen );
+   else
+      hb_retc( lpDefault );
+}
+
+//-----------------------------------------------------------------------------
+HB_FUNC( WRITEPROFILESTRING )
+{
+   char * lpSection = hb_parc( 1 );
+   char * lpEntry = ISCHAR(2) ? hb_parc( 2 ) : NULL ;
+   char * lpData = ISCHAR(3) ? hb_parc( 3 ) : NULL ;
+
+   if ( WriteProfileString( lpSection , lpEntry , lpData) )
+      hb_retl( TRUE ) ;
+   else
+      hb_retl(FALSE);
+}
+
+//-----------------------------------------------------------------------------
+HB_FUNC( WRITEPRIVATEPROFILESTRING )
+{
+   char * lpSection = hb_parc( 1 );
+   char * lpEntry = ISCHAR(2) ? hb_parc( 2 ) : NULL ;
+   char * lpData = ISCHAR(3) ? hb_parc( 3 ) : NULL ;
+   char * lpFileName= hb_parc( 4 );
+
+   if ( WritePrivateProfileString( lpSection , lpEntry , lpData , lpFileName ) )
+      hb_retl( TRUE ) ;
+   else
+      hb_retl(FALSE);
+}
+
+
+//-----------------------------------------------------------------------------
+// WINBASEAPI UINT WINAPI GetPrivateProfileInt( IN LPCSTR lpAppName, IN LPCSTR lpKeyName, IN INT nDefault, IN LPCSTR lpFileName );
+
+
+HB_FUNC( GETPRIVATEPROFILEINT )
+{
+   hb_retni( GetPrivateProfileIntA( (LPCSTR) hb_parc( 1 ),
+                                    (LPCSTR) hb_parc( 2 ),
+                                    hb_parni( 3 )        ,
+                                    (LPCSTR) hb_parc( 4 )
+                                    ) ) ;
+}
+
+
+//-----------------------------------------------------------------------------
+// WINBASEAPI UINT WINAPI GetProfileInt( IN LPCSTR lpAppName, IN LPCSTR lpKeyName, IN INT nDefault );
+
+
+HB_FUNC( GETPROFILEINT )
+{
+   hb_retni( GetProfileIntA( (LPCSTR) hb_parc( 1 ),
+                             (LPCSTR) hb_parc( 2 ),
+                             hb_parni( 3 )        
+                             ) ) ;
+}
+
+//-----------------------------------------------------------------------------
+// WINBASEAPI DWORD WINAPI GetProfileSection( IN LPCSTR lpAppName, OUT LPSTR lpReturnedString, IN DWORD nSize );
+
+/*
+HB_FUNC( GETPROFILESECTION )
+{
+   hb_retnl( (LONG) GetProfileSectionA( (LPCSTR) hb_parc( 1 ),
+                                        (LPSTR) hb_parc( 2 ) ,
+                                        (DWORD) hb_parnl( 3 )
+                                        ) ) ;
+}
+*/
+
+//-----------------------------------------------------------------------------
+// WINBASEAPI BOOL WINAPI WriteProfileSection( IN LPCSTR lpAppName, IN LPCSTR lpString );
+
+
+HB_FUNC( WRITEPROFILESECTION )
+{
+   hb_retl( WriteProfileSectionA( (LPCSTR) hb_parc( 1 ), (LPCSTR) hb_parc( 2 ) ) ) ;
+}
+
+/*
+//-----------------------------------------------------------------------------
+// WINBASEAPI DWORD WINAPI GetPrivateProfileSection( IN LPCSTR lpAppName, OUT LPSTR lpReturnedString, IN DWORD nSize, IN LPCSTR lpFileName );
+
+
+HB_FUNC( GETPRIVATEPROFILESECTION )
+{
+   hb_retnl( (LONG) GetPrivateProfileSectionA( (LPCSTR) hb_parc( 1 ),
+                                               (LPSTR) hb_parc( 2 ) ,
+                                               (DWORD) hb_parnl( 3 ),
+                                               (LPCSTR) hb_parc( 4 )
+                                               ) ) ;
+}
+
+*/
+//-----------------------------------------------------------------------------
+// WINBASEAPI BOOL WINAPI WritePrivateProfileSectionA( IN LPCSTR lpAppName, IN LPCSTR lpString, IN LPCSTR lpFileName );
+
+
+HB_FUNC( WRITEPRIVATEPROFILESECTION )
+{
+   hb_retl( WritePrivateProfileSectionA( (LPCSTR) hb_parc( 1 ),
+                                         (LPCSTR) hb_parc( 2 ),
+                                         (LPCSTR) hb_parc( 3 )
+                                         ) ) ;
+}
+
+/*
+//-----------------------------------------------------------------------------
+// WINBASEAPI DWORD WINAPI GetPrivateProfileSectionNamesA( OUT LPSTR lpszReturnBuffer, IN DWORD nSize, IN LPCSTR lpFileName );
+
+
+HB_FUNC( GETPRIVATEPROFILESECTIONNAMES )
+{
+   hb_retnl( (LONG) GetPrivateProfileSectionNames( (LPSTR) hb_parc( 1 ) ,
+                                                    (DWORD) hb_parnl( 2 ),
+                                                    (LPCSTR) hb_parc( 3 )
+                                                    ) ) ;
+}
+*/
+//-----------------------------------------------------------------------------
+// WINBASEAPI BOOL WINAPI GetPrivateProfileStruct( IN LPCSTR lpszSection, IN LPCSTR lpszKey, OUT LPVOID lpStruct, IN UINT uSizeStruct, IN LPCSTR szFile );
+
+/*
+
+HB_FUNC( GETPRIVATEPROFILESTRUCT )
+{
+   LPVOID lpStruct    ;
+
+   // Your code goes here
+
+   hb_retl( GetPrivateProfileStructA( (LPCSTR) hb_parc( 1 ),
+                                      (LPCSTR) hb_parc( 2 ),
+                                      lpStruct             ,
+                                      (UINT) hb_parni( 4 ) ,
+                                      (LPCSTR) hb_parc( 5 )
+                                      ) ) ;
+}
+
+*/
+
+//-----------------------------------------------------------------------------
+// WINBASEAPI BOOL WINAPI WritePrivateProfileStruct( IN LPCSTR lpszSection, IN LPCSTR lpszKey, IN LPVOID lpStruct, IN UINT uSizeStruct, IN LPCSTR szFile );
+
+/*
+
+HB_FUNC( WRITEPRIVATEPROFILESTRUCT )
+{
+   LPVOID lpStruct    ;
+
+   // Your code goes here
+
+   hb_retl( WritePrivateProfileStructA( (LPCSTR) hb_parc( 1 ),
+                                        (LPCSTR) hb_parc( 2 ),
+                                        lpStruct             ,
+                                        (UINT) hb_parni( 4 ) ,
+                                        (LPCSTR) hb_parc( 5 )
+                                        ) ) ;
+}
+
+*/
+
+
+
+
+
