@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.20 2004/07/20 20:46:09 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.21 2004/07/29 23:55:59 ronpinkas Exp $
  */
 
 /*
@@ -392,7 +392,7 @@ FUNCTION ValToPrgExp( xVal, aObjs )
          ENDIF
    END
 
-   TraceLog( cRet )
+//   TraceLog( cRet )
 
 RETURN cRet
 //--------------------------------------------------------------//

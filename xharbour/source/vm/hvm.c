@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.414 2004/08/17 19:32:52 ronpinkas Exp $
+ * $Id: hvm.c,v 1.415 2004/08/17 20:59:53 ronpinkas Exp $
  */
 
 /*
@@ -126,6 +126,7 @@
 #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
    /* Mouse Disabling */
    extern BOOL b_MouseEnable;
+
 
    extern void Win32_OleInitialize( void );
    extern void Win32_OleUnInitialize( void );
@@ -529,7 +530,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    //printf( "Before InitRdd\n" );
    hb_vmDoInitRdd();  // Initialize DBFCDX and DBFNTX if linked.
 
-   #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
+   #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) ) && !defined(HB_NO_WIN32_OLE)
       HB_TRACE( HB_TR_INFO, ("InitOle" ) );
       Win32_OleInitialize();
    #endif
@@ -788,7 +789,7 @@ int HB_EXPORT hb_vmQuit( void )
    }
    //printf("\nAfter Statics\n" );
 
-   #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
+   #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) ) && !defined(HB_NO_WIN32_OLE)
       HB_TRACE( HB_TR_INFO, ("Quit Ole" ) );
       Win32_OleUnInitialize();
    #endif

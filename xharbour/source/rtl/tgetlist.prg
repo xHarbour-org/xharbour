@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.24 2004/02/20 13:50:35 jonnymind Exp $
+ * $Id: tgetlist.prg,v 1.25 2004/05/07 14:48:39 lculik Exp $
  */
 
 /*
@@ -318,7 +318,7 @@ METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
    endif
 
 #endif
-   
+
    DEFAULT lDelEnd TO .F.
 
    Switch nKey
@@ -1042,10 +1042,10 @@ METHOD GUIApplyKey(  oGUI, nKey, oMenu, oGetMsg ) CLASS HBGetList
       nKey := 0
 
    endif
-   tracelog(oGUI:ClassName )
+   //tracelog(oGUI:ClassName )
    if nKey == 0
    elseif ( oTheClass := oGUI:ClassName() ) == "HBRADIOGROUP"
-   tracelog( nKey )
+   //tracelog( nKey )
       if nKey == K_UP
          oGUI:PrevItem()
          nKey := 0

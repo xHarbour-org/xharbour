@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3315 2004/08/17 19:32:47 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3316 2004/08/18 19:15:25 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-08-19 12:01 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/vm/hvm.c
+    - added "&& !defined(HB_NO_WIN32_OLE)" so win32ole.prg can be excluded from linking
+  * /source/rtl/tgetlist.prg
+  * /source/rtl/cstr.prg
+    - comment out calls to TRACELOG()
 
 2004-08-18 15:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/compiler/harbour.c
