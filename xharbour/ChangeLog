@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3097 2004/06/21 01:20:01 modalsist Exp $
+ * $Id: ChangeLog,v 1.3098 2004/06/21 17:40:12 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-06-21 12:04 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * xharbour/source/vm/hvm.c
+    + Added support for __OpInc __OpDec and __OpPlus to HB_P_LOCALNEARADDINT
+  * include/hbver.h
+    * Refreshed.
+
 2004-06-21 21:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/rtl/filesys.prg
     ! Fixed hb_fsIsDrv() and hb_fsChDrv() on DJGPP.
 
 2004-06-20 22:12 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
   * contrib/libct/dattime3.prg
-    ! Fixed showtime() function to show time newly after be disabled by calling showTime() 
+    ! Fixed showtime() function to show time newly after be disabled by calling showTime()
       without parameters. Bug reported by JoteR.
 
 2004-06-19 12:30 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>

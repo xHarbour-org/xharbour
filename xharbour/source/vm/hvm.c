@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.403 2004/06/10 02:55:26 ronpinkas Exp $
+ * $Id: hvm.c,v 1.404 2004/06/17 12:23:19 druzus Exp $
  */
 
 /*
@@ -2585,6 +2585,30 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             else if( HB_IS_DOUBLE( pLocal ) )
             {
                dNewVal = pLocal->item.asDouble.value + iAdd;
+            }
+            else if( HB_IS_OBJECT( pLocal ) )
+            {
+               if( iAdd == 1 && hb_objHasMsg( pLocal, "__OpInc" ) )
+               {
+                  hb_vmOperatorCallUnary( pLocal, "__OPINC" );
+               }
+               else if( iAdd == -1 && hb_objHasMsg( pLocal, "__OpDec" ) )
+               {
+                  hb_vmOperatorCallUnary( pLocal, "__OPDEC" );
+               }
+               else if( hb_objHasMsg( pLocal, "__OpPlus" ) )
+               {
+                  HB_ITEM Add;
+
+                  Add.type = HB_IT_INTEGER;
+                  Add.item.asInteger.value = iAdd;
+
+                  // hb_vmOperatorCall() will POP 2 arguments but we only have 1 argument on the Stack.
+                  hb_vmPushNil();
+                  hb_vmOperatorCall( pLocal, &Add, "__OPPLUS", NULL );
+               }
+
+               break;
             }
             else
             {
