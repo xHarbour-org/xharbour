@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.170 2004/05/16 23:54:12 ronpinkas Exp $
+* $Id: thread.c,v 1.171 2004/05/17 01:51:05 ronpinkas Exp $
 */
 
 /*
@@ -1193,8 +1193,9 @@ int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec
    return pthread_cond_timedwait( cond, mutex, &timeout );
 }
 
-#else
+#endif
 
+#ifdef HB_OS_WIN_32
 /***************************************************
  Posix like condition variable for WIN32
  Based on the Terekhov - Thomas algorithm version 9
@@ -1209,26 +1210,13 @@ BOOL hb_threadCondInit( HB_WINCOND_T *cond )
    cond->nWaitersBlocked = 0;
    cond->nWaitersToUnblock = 0;
 
-   #ifdef HB_OS_WIN_32
    InitializeCriticalSection( &(cond->mtxUnblockLock) );
-   #else
-   DosCreateMutexSem(NULL, &(cond->mtxUnblockLock), 0L, FALSE);
-   #endif
-
    cond->semBlockLock = NULL;
    cond->semBlockQueue = NULL;
 
-   #ifdef HB_OS_WIN_32
    cond->semBlockLock = CreateSemaphore( NULL, 1, 20000000, NULL);
-   #else
-   DosCreateEventSem(NULL, (PHEV) &(cond->semBlockLock), DCE_POSTONE, TRUE);     // unnamed, private, Posted, when posted frees only ONE waiting thread
-   #endif
    if ( cond->semBlockLock != NULL ) {
-      #ifdef HB_OS_WIN_32
       cond->semBlockQueue = CreateSemaphore( NULL, 0, 20000000, NULL );
-      #else
-      DosCreateEventSem(NULL, (PHEV) &(cond->semBlockQueue), 0L, FALSE);   // unnamed, private, Reset, every thread blocks here
-      #endif
       if ( cond->semBlockQueue == NULL )
       {
           return FALSE;
@@ -1240,33 +1228,22 @@ BOOL hb_threadCondInit( HB_WINCOND_T *cond )
    return TRUE;
 }
 
+
 /*
    Destroys the condition variable.
 */
 void hb_threadCondDestroy( HB_WINCOND_T *cond )
 {
-   #ifdef HB_OS_WIN_32
    DeleteCriticalSection( &(cond->mtxUnblockLock) );
-   #else
-   DosCloseMutexSem( cond->mtxUnblockLock );
-   #endif
-
    if ( cond->semBlockLock != NULL ) {
-      #ifdef HB_OS_WIN_32
       CloseHandle( cond->semBlockLock );
-      #else
-      DosCloseEventSem( cond->semBlockLock );
-      #endif
    }
    if ( cond->semBlockQueue != NULL )
    {
-      #ifdef HB_OS_WIN_32
       CloseHandle( cond->semBlockQueue );
-      #else
-      DosCloseEventSem( cond->semBlockQueue );
-      #endif
    }
 }
+
 
 /*
    Issues a signal, that is, wake ALL the threads who are waiting NOW
@@ -1275,23 +1252,12 @@ void hb_threadCondDestroy( HB_WINCOND_T *cond )
 void hb_threadCondSignal( HB_WINCOND_T *cond )
 {
    register int nSignalsToIssue;
-   #ifdef HB_OS_OS2
-   ULONG ulPostCount;
-   #endif
 
-   #ifdef HB_OS_WIN_32
    EnterCriticalSection( &(cond->mtxUnblockLock) );
-   #else
-   DosRequestMutexSem( cond->mtxUnblockLock, SEM_INDEFINITE_WAIT );
-   #endif
 
    if ( cond->nWaitersToUnblock ) {
       if ( ! cond->nWaitersBlocked ) {        // NO-OP
-         #ifdef HB_OS_WIN_32
          LeaveCriticalSection( &cond->mtxUnblockLock );
-         #else
-         DosReleaseMutexSem( cond->mtxUnblockLock );
-         #endif
          return;
       }
       nSignalsToIssue = cond->nWaitersBlocked;
@@ -1299,11 +1265,7 @@ void hb_threadCondSignal( HB_WINCOND_T *cond )
       cond->nWaitersBlocked = 0;
    }
    else if ( cond->nWaitersBlocked > cond->nWaitersGone ) { // HARMLESS RACE CONDITION!
-      #ifdef HB_OS_WIN_32
       WaitForSingleObject( cond->semBlockLock, INFINITE );
-      #else
-      DosWaitEventSem( cond->semBlockLock, SEM_INDEFINITE_WAIT );
-      #endif
       if ( cond->nWaitersGone ) {
          cond->nWaitersBlocked -= cond->nWaitersGone;
          cond->nWaitersGone = 0;
@@ -1312,24 +1274,12 @@ void hb_threadCondSignal( HB_WINCOND_T *cond )
       cond->nWaitersBlocked = 0;
    }
    else { // NO-OP
-      #ifdef HB_OS_WIN_32
       LeaveCriticalSection( &(cond->mtxUnblockLock) );
-      #else
-      DosReleaseMutexSem( cond->mtxUnblockLock );
-      #endif
       return;
    }
 
-   #ifdef HB_OS_WIN_32
    LeaveCriticalSection( &(cond->mtxUnblockLock) );
    ReleaseSemaphore( cond->semBlockQueue,nSignalsToIssue, NULL );
-   #else
-   DosReleaseMutexSem( cond->mtxUnblockLock );
-   DosEnterCritSec();   // stop thread switching
-   DosPostEventSem( cond->semBlockQueue );      // Free _all_ waiting threads
-   DosResetEventSem( cond->semBlockQueue, &ulPostCount );   // Stop next ones wainting on this semaphore
-   DosExitCritSec();
-   #endif
 }
 
 
@@ -1344,25 +1294,13 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, CRITICAL_SECTION *mutex ,
    register int nSignalsWasLeft;
    register int bTimeout;
 
-   #ifdef HB_OS_WIN_32
    WaitForSingleObject( cond->semBlockLock, INFINITE );
    cond->nWaitersBlocked++;
    ReleaseSemaphore( cond->semBlockLock, 1, NULL );
    LeaveCriticalSection( mutex );
 
-   #else
-   DosWaitEventSem( cond->semBlockLock, SEM_INDEFINITE_WAIT );
-   cond->nWaitersBlocked++;
-   DosPostEventSem( cond->semBlockLock );
-   DosReleaseMutexSem( *mutex );
-   #endif
-
    HB_TEST_CANCEL_ENABLE_ASYN
-   #ifdef HB_OS_WIN_32
    if ( WaitForSingleObject( cond->semBlockQueue, dwTimeout ) != WAIT_OBJECT_0 )
-   #else
-   if ( DosWaitEventSem( cond->semBlockQueue, dwTimeout ) != NO_ERROR )
-   #endif
    {
       bTimeout = 1;
    }
@@ -1372,11 +1310,7 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, CRITICAL_SECTION *mutex ,
    }
    HB_DISABLE_ASYN_CANC
 
-   #ifdef HB_OS_WIN_32
    EnterCriticalSection( &cond->mtxUnblockLock );
-   #else
-   DosRequestMutexSem( cond->mtxUnblockLock, SEM_INDEFINITE_WAIT );
-   #endif
 
    if ( (nSignalsWasLeft = cond->nWaitersToUnblock) != 0)
    {
@@ -1384,42 +1318,54 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, CRITICAL_SECTION *mutex ,
    }
    else if ( ++cond->nWaitersGone == 2000000000L )
    {
-      #ifdef HB_OS_WIN_32
       WaitForSingleObject( cond->semBlockLock, INFINITE );
       cond->nWaitersBlocked -= cond->nWaitersGone;
       ReleaseSemaphore( cond->semBlockLock, 1, NULL );
       cond->nWaitersGone = 0;
-      #else
-      DosWaitEventSem( cond->semBlockLock, SEM_INDEFINITE_WAIT );
-      cond->nWaitersBlocked -= cond->nWaitersGone;
-      DosPostEventSem( cond->semBlockLock );
-      cond->nWaitersGone = 0;
-      #endif
    }
-   #ifdef HB_OS_WIN_32
    LeaveCriticalSection( &(cond->mtxUnblockLock) );
-   #else
-   DosReleaseMutexSem( cond->mtxUnblockLock );
-   #endif
 
    if ( nSignalsWasLeft == 1 )
    {
-      #ifdef HB_OS_WIN_32
       ReleaseSemaphore( cond->semBlockLock,1, NULL );
-      #else
-      DosPostEventSem( cond->semBlockLock );
-      #endif
    }
 
-   #ifdef HB_OS_WIN_32
    EnterCriticalSection( mutex );
-   #else
-   DosRequestMutexSem( *mutex, SEM_INDEFINITE_WAIT );
-   #endif
-
    return !bTimeout;
 }
 #endif // win32
+
+
+#ifdef HB_OS_OS2
+/*
+   Wait for a signal to be issued (at maximum for a given time or INFINITE)
+*/
+BOOL hb_threadCondWait( HB_COND_T *cond, CRITICAL_SECTION *mutex ,
+      DWORD dwTimeout )
+{
+   HB_THREAD_STUB
+   register int bTimeout;
+
+   HB_TEST_CANCEL_ENABLE_ASYN
+
+   DosReleaseMutexSem(*mutex);
+
+   if ( DosWaitEventSem( *cond, dwTimeout ) != NO_ERROR )
+   {
+      bTimeout = 1;
+   }
+   else
+   {
+      bTimeout = 0;
+   }
+   HB_DISABLE_ASYN_CANC
+
+   DosRequestMutexSem( *mutex, SEM_INDEFINITE_WAIT );
+   return !bTimeout;
+}
+#endif // OS/2
+
+
 
 
 

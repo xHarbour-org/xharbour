@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.85 2004/05/16 23:54:11 ronpinkas Exp $
+* $Id: thread.h,v 1.86 2004/05/17 01:51:04 ronpinkas Exp $
 */
 
 /*
@@ -170,22 +170,15 @@ extern DWORD hb_dwCurrentStack;
    #define hb_threadGetCurrentStack() ( (HB_STACK *) TlsGetValue( hb_dwCurrentStack ) )
 
 
-/* 10/05/2004 - <maurilio.longo@libero.it
+/* 10/05/2004 - <maurilio.longo@libero.it>
    Built and tested with Innotek GCC for OS/2
 */
 #elif defined(HB_OS_OS2)
 
    #define  CRITICAL_SECTION  HMTX
 
-   typedef struct tag_HB_WINCOND_T
-   {
-      HEV semBlockLock;
-      HEV semBlockQueue;
-      CRITICAL_SECTION mtxUnblockLock;
-      int nWaitersGone;
-      int nWaitersBlocked;
-      int nWaitersToUnblock;
-   } HB_WINCOND_T, *PHB_WINCOND_T;
+   #define HB_COND_T                   HEV
+   #define PHB_COND_T                  PHEV
 
    #define DWORD                       ULONG
    #define HB_THREAD_T                 TID
@@ -203,12 +196,19 @@ extern DWORD hb_dwCurrentStack;
    #define HB_MUTEX_LOCK( x )          HB_CRITICAL_LOCK( x )
    #define HB_MUTEX_UNLOCK( x )        HB_CRITICAL_UNLOCK( x )
 
-   #define HB_COND_T                   HB_WINCOND_T
-   #define HB_COND_INIT( x )           hb_threadCondInit( &(x) )
+   #define HB_COND_INIT( x )           (DosCreateEventSem(NULL, (PHEV) &(x), DCE_AUTORESET, FALSE) == NO_ERROR)
+
    #define HB_COND_WAIT( x, y )        hb_threadCondWait( &(x), &(y), SEM_INDEFINITE_WAIT )
    #define HB_COND_WAITTIME( x, y, t ) hb_threadCondWait( &(x), &(y), t )
-   #define HB_COND_SIGNAL( x )         hb_threadCondSignal( &(x) )
-   #define HB_COND_DESTROY( x )        hb_threadCondDestroy( &(x) )
+
+   #define HB_COND_SIGNAL( x )         DosPostEventSem( x )
+
+   #define HB_COND_DESTROY( x ) {\
+      if (DosCloseEventSem( x ) == ERROR_SEM_BUSY) {\
+         DosPostEventSem( x );\
+         DosCloseEventSem( x );\
+      }\
+   }
 
    #define HB_CURRENT_THREAD           _gettid
    #define HB_SAME_THREAD(x, y)        ((x) == (y))
@@ -689,11 +689,14 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );
 void hb_threadCancelInternal( void );
 
 /* Win 32 specific functions */
-#if defined(HB_OS_WIN_32) || defined (HB_OS_OS2)
+#if defined(HB_OS_WIN_32)
    BOOL hb_threadCondInit( HB_WINCOND_T *cond );
    void hb_threadCondDestroy( HB_WINCOND_T *cond );
    void hb_threadCondSignal( HB_WINCOND_T *cond );
    BOOL hb_threadCondWait( HB_WINCOND_T *cond, CRITICAL_SECTION *mutex , DWORD dwTimeout );
+
+#elif defined(HB_OS_OS2)
+   BOOL hb_threadCondWait( HB_COND_T *cond, CRITICAL_SECTION *mutex , DWORD dwTimeout );
 
 #endif
 

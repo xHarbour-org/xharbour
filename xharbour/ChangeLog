@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2945 2004/05/17 09:51:05 likewolf Exp $
+ * $Id: ChangeLog,v 1.2946 2004/05/17 11:22:10 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-17 16:15 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * include/thread.h
+   * source/vm/thread.c
+     * simplified OS/2 thread support. doesn't use Terekhov algorithm anymore, solved all
+       identified problems up to now. Talks with Giancarlo Niccolai let me suppose there still could
+       be something to do, we will see... :)
+   * utils/hbtest/rt_ccall.prg
+     ! fixed to compile when HB_LONG_LONG_OFF is defined. Fix provided by Przemyslaw Czerpak.
 
 2004-05-17 15:20 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/debug/debugger.prg

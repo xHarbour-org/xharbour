@@ -1,5 +1,5 @@
 /*
- * $Id: rt_ccall.prg,v 1.3 2004/03/02 18:15:10 ronpinkas Exp $
+ * $Id: rt_ccall.prg,v 1.4 2004/05/09 23:40:06 druzus Exp $
  */
 
 /*
@@ -57,7 +57,6 @@
 
 PROCEDURE Main_CCall()
 
-#ifndef HB_LONG_LONG_OFF
    TEST_LINE( STR(VMCALL_01(),,,.T.)   , "5000000000" )
    TEST_LINE( STR(VMCALL_02(),,,.T.)   , "5000000000" )
    TEST_LINE( STR(VMCALL_03(),,,.T.)   , "5000000000" )
@@ -90,23 +89,39 @@ PROCEDURE Main_CCall()
    HB_FUNC( EXTEND_01 )
    {
       PHB_ITEM pArray = hb_param( 2, HB_IT_ARRAY );
-      hb_stornll( hb_arrayGetNLL( pArray, 1 ), 1, -1 );
+      #ifndef HB_LONG_LONG_OFF
+         hb_stornll( hb_arrayGetNLL( pArray, 1 ), 1, -1 );
+      #else
+         hb_stornd( hb_arrayGetND( pArray, 1 ), 1, -1 );
+      #endif
    }
 
    HB_FUNC( EXTEND_02 )
    {
+   #ifndef HB_LONG_LONG_OFF
       hb_stornll( HB_LL(5000000000), 1, -1 );
+   #else
+      hb_stornd( 5000000000.0, 1, -1 );
+   #endif
    }
 
    HB_FUNC( EXTEND_03 )
    {
+   #ifndef HB_LONG_LONG_OFF
       hb_retnll( hb_parnll(1) );
+   #else
+      hb_retnd( hb_parnd(1) );
+   #endif
    }
 
    HB_FUNC( EXTEND_04 )
    {
+   #ifndef HB_LONG_LONG_OFF
       hb_retnlllen( hb_parnll(1), 20 );
+   #else
+      hb_retndlen( hb_parnd(1), 20, 0 );
+   #endif
    }
    #PRAGMA ENDDUMP
 
-#endif
+
