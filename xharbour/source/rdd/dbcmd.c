@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.96 2004/03/18 03:57:29 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.97 2004/03/20 03:14:53 ronpinkas Exp $
  */
 
 /*
@@ -5455,7 +5455,7 @@ HB_FUNC( __DBDELIM )
          }
 
          // Doing things now
-         hb_Dbf2Text( pWhile, pFor, pFields, cDelim, handle, cSeparator, lCount );
+         hb_Dbf2Text( pWhile, pFor, pFields, cDelim, handle, ( BYTE *)cSeparator, lCount );
 
          hb_fsClose( handle );
       }
