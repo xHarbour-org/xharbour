@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3122 2004/06/30 21:37:11 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3123 2004/06/30 21:59:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-30 19:51 UTC-0300 Marcos Antonio Gambeta <marcosgambeta@uol.com.br>
+  * source/rdd/dbcmd.c
+    ! Fixed: COPY TO and APPEND FROM don't retain deleted status. The function
+      rddMoveRecords was changed to delete new record if the original record
+      is deleted.
 
 2004-06-30 15:00 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * contrib/libct/ctwin.prg

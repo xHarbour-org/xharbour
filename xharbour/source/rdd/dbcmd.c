@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.120 2004/06/04 14:51:07 jacekp Exp $
+ * $Id: dbcmd.c,v 1.121 2004/06/09 10:09:46 lf_sfnet Exp $
  */
 
 /*
@@ -4506,6 +4506,7 @@ static ERRCODE rddMoveRecords( char *cAreaFrom, char *cAreaTo, PHB_ITEM pFields,
    AREAP      pAreaFrom, pAreaTo, pAreaRelease = NULL;
    USHORT     uiCurrAreaSaved = hb_rddGetCurrentWorkAreaNumber();
    AREAP      pCurrArea = HB_CURRENT_WA;
+   BOOL       bDeleted = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("rddMoveRecords(%s, %s, %p, %p, %p, %d, %lu, %d, %s )",
             cAreaFrom, cAreaTo, pFields, pFor, pWhile, lNext, lRec, bRest, cDriver));
@@ -4576,6 +4577,11 @@ static ERRCODE rddMoveRecords( char *cAreaFrom, char *cAreaTo, PHB_ITEM pFields,
       {
          hb_rddSelectWorkAreaNumber( pAreaTo->uiArea );
          SELF_APPEND( pAreaTo, FALSE );      /*put a new one on TO Area*/
+         SELF_DELETED( pAreaFrom, &bDeleted );
+         if ( bDeleted ) /* is original record deleted ? */
+         {
+         	SELF_DELETE( pAreaTo ); /* delete the new record */
+         }
          rddMoveFields( pAreaFrom, pAreaTo, pFields ); /*move the data*/
          hb_rddSelectWorkAreaNumber( pAreaFrom->uiArea );
       }
