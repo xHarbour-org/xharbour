@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_w32.bat,v 1.15 2004/03/05 08:27:07 mlombardo Exp $
+rem $Id: make_w32.bat,v 1.1 2004/04/06 21:11:34 andijahja Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -89,8 +89,10 @@ rem   if exist lib\*.lib     del lib\*.lib
    if exist lib\gtstd.lib      del lib\gtstd.lib
    if exist lib\gtwin.lib      del lib\gtwin.lib
    if exist lib\gtwvt.lib      del lib\gtwvt.lib
+   if exist lib\hbct.lib       del lib\hbct.lib
    if exist lib\hbodbc.lib     del lib\hbodbc.lib
    if exist lib\hbodbcmt.lib   del lib\hbodbcmt.lib
+   if exist lib\hbtip.lib      del lib\hbtip.lib
    if exist lib\lang.lib       del lib\lang.lib
    if exist lib\macro.lib      del lib\macro.lib
    if exist lib\macromt.lib    del lib\macromt.lib
