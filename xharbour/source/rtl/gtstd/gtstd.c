@@ -1,5 +1,5 @@
  /*
- * $Id: gtstd.c,v 1.9 2003/09/04 05:31:32 andijahja Exp $
+ * $Id: gtstd.c,v 1.10 2004/02/01 23:40:51 jonnymind Exp $
  */
 
 /*
@@ -813,6 +813,24 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    // DEFAULT: there's something wrong if we are here.
    return -1;
 }
+
+void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
+{
+   HB_SYMBOL_UNUSED( szData );
+   HB_SYMBOL_UNUSED( pulMaxSize );
+}
+
+void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
+{
+   HB_SYMBOL_UNUSED( szData );
+   HB_SYMBOL_UNUSED( ulSize );
+}
+
+ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
+{
+   return 0;
+}
+
 
 /* *********************************************************************** */
 
