@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.7 2002/05/18 08:55:49 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.8 2002/05/22 15:24:55 ronpinkas Exp $
  */
 
 /*
@@ -360,14 +360,15 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
       else if( ( strcmp( "EVAL", pName->value.asSymbol ) == 0 ) && iCount )
       {
          /* Optimize Eval( bBlock, [ArgList] ) to: bBlock:Eval( [ArgList] ) */
-         #if defined( HB_MACRO_SUPPORT )
-            // Will be freed by hb_compExprUseSend() (when MACRO).
-            char *szMsg = hb_strdup( "EVAL" );
+         pExpr = hb_compExprNewMethodCall( hb_compExprNewSend( pParms->value.asList.pExprList, pName->value.asSymbol ), hb_compExprNewArgList( pParms->value.asList.pExprList->pNext ) );
 
-            return hb_compExprNewMethodCall( hb_compExprNewSend( pParms->value.asList.pExprList, szMsg ), hb_compExprNewArgList( pParms->value.asList.pExprList->pNext ) );
-         #else
-            return hb_compExprNewMethodCall( hb_compExprNewSend( pParms->value.asList.pExprList, "EVAL" ), hb_compExprNewArgList( pParms->value.asList.pExprList->pNext ) );
-         #endif
+         /* Not using:
+               HB_EXPR_PCODE1( hb_compExprDelete, pParms );
+               HB_EXPR_PCODE1( hb_compExprDelete, pName );
+            because we adopt their content - release container only!
+         */
+         HB_XFREE( pParms );
+         HB_XFREE( pName );
       }
       else if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_XBASE ) &&
           (( strcmp( "__DBLIST", pName->value.asSymbol ) == 0 ) && iCount >= 10) )
@@ -457,7 +458,6 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
          }
       }
    }
-
    else if( pName->ExprType == HB_ET_MACRO )
    {
       /* Signal that macro compiler have to generate a pcode that will

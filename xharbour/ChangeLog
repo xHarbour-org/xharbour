@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.233 2002/05/22 03:07:14 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.234 2002/05/22 15:24:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2002-05-221 08:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+2002-05-22 09:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexpra.c
+    ! Fixed unreleased memory resulting from optimization of EVAL().
+
+2002-05-22 08:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexpra.c
   * include/hbexprb.c
     ! Fixed GPF on Eval() when compiled by MACRO
