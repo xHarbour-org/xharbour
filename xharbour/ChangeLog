@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2401 2004/02/25 12:57:53 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.2402 2004/02/25 14:29:54 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,8 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-25 12:40 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * source/vm/arrays.c
+  * source/vm/debug.c
+  * source/vm/fastitem.c
+  * source/vm/fm.c
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+    !minor fix due my last changes
+  
 2004-02-25 21:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-  * contrib/hbzlib/zip.c
+contrib/hbzlib/zip.c
   * contrib/hbzlib/zipcomp.cpp
   * contrib/hbzlib/zipnew.cpp
     % more optimization using HB_ITEM
@@ -20,7 +29,7 @@
   * source/vm/classes.c
     ! Fixed compiling errors when using array owners management.
 
-2004-02-25 09:43 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+
    * include/hbvmpub.h
      in structure struString changes
      USHORT *piuHolders  to ULONG  *puiHolders
