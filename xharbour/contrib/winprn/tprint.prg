@@ -756,9 +756,9 @@ static HB_FUNC( CREATEFONT )
   DWORD dwCharSet   = (DWORD) hb_parl(9) ;
   iWeight = iWeight > 0 ? iWeight : FW_NORMAL ;
   iHeight = -MulDiv(iHeight, GetDeviceCaps(hDC, LOGPIXELSY), 72);
-  if (iDiv > 0 )
+  if (iDiv )
   {
-    iWidth = MulDiv(iMul, GetDeviceCaps(hDC,LOGPIXELSX), iDiv) ;
+    iWidth = MulDiv(abs(iMul), GetDeviceCaps(hDC,LOGPIXELSX), abs(iDiv)) ;
   }
   else
   {
