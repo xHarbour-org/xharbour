@@ -1,16 +1,14 @@
+/* $Id$ */
 /*
- * $Id: spread.prg,v 1.1 2004/11/29 22:11:31 ptsarenko Exp $
+ * Unit test for CT function EXPAND()
+ * compare results when compiled with Clipper vs xHarbour
  */
-
 /*
- * xHarbour Project source code:
- *   CT3 string functions:
- *
- * EXPAND(), CHARSPREAD()
- * Copyright 2004 Pavel Tsarenko <tpe2.mail.ru>
- * www - http://www.xharbour.org
- *
- * Philip Chee <> 2005 bugfixes to EXPAND()
+ * Harbour Project source code:
+ *   CT3 Test EXPAND() function
+ *   (C) Philip Chee 2005 <philip@aleytys.pc.my>
+ *   
+ * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,66 +51,44 @@
  *
  */
 
-#include "common.ch"
+FUNCTION MAIN()
+#include "inkey.ch"
+  local rv := 0
+  local cRuler := "+++++++++1+++++++++2"
+  cls
+  SetPos( 0, 0 )
+  @ row()     ,  0 say "Begin EXPAND() Test"
+  @ row() +  1, 30 say cRuler
+  @ row() +  1,  0 say 'Expand( "123456" )'
+  @ row()     , 30 say  Expand( "123456" )
+  @ row() +  1,  0 say 'Expand( "123456", 2 )'
+  @ row()     , 30 say  Expand( "123456", 2 )
+  @ row() +  1,  0 say 'Expand( "123456", "." )'
+  @ row()     , 30 say  Expand( "123456", "." )
+  @ row() +  1,  0 say 'Expand( "123456", 2, "." )'
+  @ row()     , 30 say  Expand( "123456", 2, "." )
+  @ row() +  1,  0 say 'Expand( "123456", 2, "&%" )'
+  @ row()     , 30 say  Expand( "123456", 2, "&%" )
+  @ row() +  1,  0 say 'Expand( "123456", , "." )'
+  @ row()     , 30 say  Expand( "123456", , "." )
+  @ row() +  1,  0 say 'Expand( "123456", , 88 )'
+  @ row()     , 30 say  Expand( "123456", , 88 )
+  @ row() +  1,  0 say 'Expand( "123456", ,  9 )'
+  @ row()     , 30 say  Expand( "123456", ,  9 )
+  @ row() +  1,  0 say 'Expand( "123456", , 301 )'
+  @ row()     , 30 say  Expand( "123456", , 301 )
+  @ row() +  1,  0 say 'Expand( "123456", , 302 )'
+  @ row()     , 30 say  Expand( "123456", , 302 )
+  @ row() +  1,  0 say 'Expand( "123456", , 303 )'
+  @ row()     , 30 say  Expand( "123456", , 303 )
+  @ row() +  1,  0 say 'Expand( "123456", , 558 )'
+  @ row()     , 30 say  Expand( "123456", , 558 )
 
-Function Expand(cStr, nLength, xChar)
-Local cResult, cChar, ser
-Local nCount
+  @ row() +  1,  0 say 'Expand(  123456 , 1, "x" )'
+  @ row()     , 30 say  '['+Expand(  123456 , 1, "x" )+']'
+  @ row() +  1,  0 say 'Expand( "1"     , 1, "Z" )'
+  @ row()     , 30 say  Expand( "1"     , 1, "Z" )
+  @ row() + 2 ,  0 say "End of EXPAND() Test"
 
-DEFAULT nLength TO 1
-
-if ISCHARACTER(nlength)
-   nCount := 1
-   XChar := LEFT(nLength,1)
-else
-   nCount := nLength
-endif
-
-if xChar == nil
-   cChar := ' '
-elseif ISNUMBER(xChar)
-   cChar := Chr(xChar)
-elseif ISCHARACTER(xChar)
-   cChar := LEFT(xChar,1)
-else
-   cChar := ' '
-endif
-
-if ISCHARACTER(cStr)
-   if len(cStr) > 1
-      cResult := cStr[1]
-      for ser := 2 to len(cStr)
-         cResult += REPLICATE(cChar,nCount) + cStr[ser]
-      next
-   else
-      cResult := cStr
-   endif
-else
-   cResult := ''
-endif
-
-Return cResult
-
-Function CharSpread(cStr, nLength, xChar)
-Local cResult := cStr, cChar
-Local nTokens, ser, nAt, nAt2, nCount
-
-if ISCHARACTER(cStr) .and. ISNUMBER(nLength)
-
-   cChar := if(ISNUMBER(xChar), Chr(xChar), xChar)
-
-   if nLength > len(cStr) .and. (nTokens := NumToken(cStr, cChar)) > 0
-      nLength -= len(cStr)
-      nCount := Int(nLength / (nTokens - 1))
-      nAt := AtToken(cStr, cChar, 2)
-      cResult := Left(cStr, nAt - 1)
-      for ser := 2 to nTokens
-         nAt2 := if(ser==nTokens, len(cStr)+1, AtToken(cStr, cChar, ser+1))
-         cResult += Repl(cChar, if(ser==nTokens, nLength, nCount)) + ;
-                    Substr(cStr, nAt, nAt2 - nAt)
-         nLength -= nCount
-         nAt := nAt2
-      next
-   endif
-endif
-Return cResult
+  inkey(10)
+return rv
