@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.13 2003/04/13 13:20:05 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.14 2003/04/16 22:08:13 jonnymind Exp $
  */
 
 /*
@@ -52,23 +52,12 @@
  */
 
 #include "hbclass.ch"
+#include "hbrpc.ch"
 
 CLASS tRPCClient
-   CLASSDATA lInit INIT InetInit()
-
-   DATA nStatus
-   DATA cServer
-
-   DATA cNetwork
-   DATA nUdpPort
-   DATA nTcpPort
-
-   DATA skUdp
-   DATA skTcp
 
    DATA aServers
    DATA aFunctions
-   DATA oResult
 
    /* asyncrhonous mode */
    DATA lAsyncMode
@@ -85,58 +74,95 @@ CLASS tRPCClient
    /* block to be called at function failure */
    DATA bOnFunctionFail
 
-   DATA nUdpTimeout   INIT 0
-   DATA nUdpTimeBegin INIT 0
-   DATA thUdpAccept   INIT -1
 
-   DATA nTcpTimeout   INIT 0
-   DATA nTcpTimeBegin INIT 0
-   DATA thTcpAccept   INIT -1
+   METHOD New( cNetwork ) CONSTRUCTOR
+   METHOD Destroy()
 
-#ifdef HB_THREAD_SUPPORT
-   DATA mtxBusy INIT CreateMutex()
-#endif
+   /* Connection */
+   METHOD Connect( cServer, cUserId, cPassword )
+   METHOD Disconnect()
 
-   DATA oResult
+   /* Network scan functions */
+   METHOD ScanServers( cName, nTime )
+   METHOD ScanFunctions( cName, cSerial, nTime )
+   METHOD ScanAgain()            INLINE ::UDPAccept()
+   METHOD StopScan()
+
+   /* Function call */
+   METHOD SetLoopMode( nMethod, xData, nEnd, nStep )
+   METHOD Call()  // variable parameters
+   METHOD CallAgain()            INLINE ::TCPAccept()
+
+
+   /* Accessors */
+   METHOD SetEncryption( cKey )
+   METHOD GetStatus()               INLINE ::nStatus
+   METHOD SetTimeout( nTime )       INLINE ::nTimeout := nTime
+   METHOD GetTimenout()             INLINE ::nTimeout
+   METHOD GetResult()               INLINE ::oResult
+   METHOD FoundServers()            INLINE Len( ::aServers ) != 0
+   METHOD FoundFunctions()          INLINE Len( ::aFunctions ) != 0
+   /* Used to retreive data from scans */
+   METHOD GetFunctionName( xId )
+   METHOD GetServerName( xId )
+   METHOD GetServerAddress( xId )
+
+HIDDEN:
+   // Automatic initialization of inet support
+   CLASSDATA lInit INIT InetInit()
+
+   #ifdef HB_THREAD_SUPPORT
+      DATA mtxBusy INIT CreateMutex()
+   #endif
+
+   DATA nStatus
+
+   /* Network data */
+   DATA cServer
+   DATA cNetwork
+   DATA nUdpPort
+   DATA nTcpPort
+   DATA skUdp
+   DATA skTcp
+
+   /* Timeout system */
+   DATA nTimeout        INIT -1
+
+   DATA nUdpTimeBegin   INIT 0
+   DATA thUdpAccept     INIT -1
+
+   DATA nTcpTimeBegin   INIT 0
+   DATA thTcpAccept     INIT -1
+
+   /* XHB RPC Loop system */
+   DATA nLoopMode
+   DATA aLoopData
+   DATA nLoopStart
+   DATA nLoopEnd
+   DATA nLoopStep
 
    /* Encryption data */
    DATA bEncrypted
    DATA cCryptKey
 
-   METHOD New( cNetwork ) CONSTRUCTOR
-   METHOD ScanServers( cName, nTime )
-   METHOD ScanFunctions( cName, cSerial, nTime )
-   METHOD StartScan()
-   METHOD StopScan()
+   /* Last connection result */
+   DATA oResult
 
-   METHOD UDPAccept()
-   METHOD UDPParse( cData, nLen )
-
-   METHOD TCPAccept()
-   METHOD TCPParse( cData )
-
-   METHOD SetEncryption( cKey )
-   METHOD Connect( cServer, cUserId, cPassword, nTimeout )
-
-   METHOD Call( cFucntion, aParams, nTimeout )
-   METHOD CallLoop( cFucntion, nBegin, nEnd, nStep, aParams, nTimeout )
-   METHOD CallLoopSummary( cFucntion, nBegin, nEnd, nStep, aParams, nTimeout )
-   METHOD CallLoopEnd( cFucntion, nBegin, nEnd, nStep, aParams, nTimeout )
-   METHOD CallForEach( cFucntion, aElements, aParams, nTimeout )
-   METHOD CallForEachSummary( cFucntion, aElements, aParams, nTimeout )
-   METHOD CallForEachEnd( cFucntion, aElements, aParams, nTimeout )
-
-   METHOD CallMode( cFucntion, aParams, nTimeout, nMode, aElems )
-
-   METHOD Disconnect()
-   METHOD Destroy()
-
-   /* Utility functions */
-   METHOD GetFunctionName( oId )
+   /* Encryption system */
    METHOD Encrypt( cData )
    METHOD Decrypt( cData )
    METHOD BuildChallengePwd( cPassword )
    METHOD ManageChallenge()
+
+   /* Network negotiation system */
+   METHOD StartScan()
+   METHOD UDPAccept()
+   METHOD UDPParse( cData, nLen )
+   METHOD TCPAccept()
+   METHOD TCPParse( cData )
+
+   /* internal network send call */
+   METHOD SendCall(cFunction,aParams )
 
    /* event handlers */
    METHOD OnScanComplete()
@@ -146,17 +172,17 @@ CLASS tRPCClient
    METHOD OnFunctionFail( nReason, cReason )
    METHOD OnFunctionReturn( oReturn )
    METHOD OnFunctionProgress( nProgress, oData )
-   METHOD SendCall(cFunction,aParams )
 
 ENDCLASS
 
 
 METHOD New( cNetwork ) CLASS tRPCClient
-   ::nStatus := 0 // not connected
+   ::nStatus := RPC_STATUS_NONE // not connected
    ::cServer := NIL // no server
 
    ::nUdpPort := 1139
    ::nTcpPort := 1140
+   ::nTimeOut := -1
 
    ::skTcp := InetCreate()
    ::skUdp := InetDGram( .T. )
@@ -166,6 +192,7 @@ METHOD New( cNetwork ) CLASS tRPCClient
    ::cNetwork := cNetwork
    ::bEncrypted := .F.
 
+   ::nLoopMode := RPC_LOOP_NONE
 RETURN Self
 
 
@@ -201,13 +228,18 @@ RETURN .T.
 
 
 METHOD SetEncryption( cKey )
-   ::bEncrypted := .T.
-   ::cCryptKey := cKey
+   IF .not. Empty( cKey )
+      ::bEncrypted := .T.
+      ::cCryptKey := cKey
+   ELSE
+      ::bEncrypted := .F.
+   ENDIF
 RETURN .T.
 
-METHOD ScanServers(cName, nTime ) CLASS tRPCClient
+
+METHOD ScanServers(cName) CLASS tRPCClient
    // do not allow asynchronous mode without timeout
-   IF .not. ::lAsyncMode .and. ( nTime == NIL .or. nTime <= 0 )
+   IF .not. ::lAsyncMode .and. ( ::nTimeout == NIL .or. ::nTimeOut <= 0 )
       RETURN .F.
    ENDIF
 
@@ -220,17 +252,20 @@ METHOD ScanServers(cName, nTime ) CLASS tRPCClient
    #endif
 
    InetDGramSend( ::skUDP, ::cNetwork , ::nUdpPort, "XHBR00" + HB_Serialize( cName ) )
-   ::StartScan( nTime )
+   ::StartScan()
 
 RETURN .F.
 
 
-METHOD ScanFunctions(cFunc, cSerial, nTime ) CLASS tRPCClient
+METHOD ScanFunctions(cFunc, cSerial ) CLASS tRPCClient
    // do not allow asynchronous mode without timeout
-   IF .not. ::lAsyncMode .and. ( nTime == NIL .or. nTime <= 0 )
+   IF .not. ::lAsyncMode .and. ( ::nTimeOut == NIL .or. ::nTimeOut <= 0 )
       RETURN .F.
    ENDIF
 
+   IF cSerial == NIL
+      cSerial := "00000000.0"
+   ENDIF
 #ifdef HB_THREAD_SUPPORT
    MutexLock( ::mtxBusy )
    ::aFunctions = {}
@@ -241,12 +276,12 @@ METHOD ScanFunctions(cFunc, cSerial, nTime ) CLASS tRPCClient
 
    InetDGramSend( ::skUDP, ::cNetwork, ::nUdpPort,;
          "XHBR01" + HB_Serialize( cFunc ) + HB_Serialize( cSerial ))
-   ::StartScan( nTime )
+   ::StartScan()
 
 RETURN .F.
 
 
-METHOD StartScan( nTime )
+METHOD StartScan()
    // We don't accept sync call without timeout
 
    IF ::lAsyncMode
@@ -254,25 +289,21 @@ METHOD StartScan( nTime )
       ::StopScan()
    ENDIF
 
-   // Now let's reset timeout counters
-   IF nTime != NIL
-      ::nUDPTimeout := nTime
-   ELSE
-      ::nUDPTimeout := -1
-   ENDIF
-
+   ::nTimeout := ::nTimeOut
    ::nUDPTimeBegin := INT( Seconds() * 1000 )
 
    // in async mode, just launch the listener
+   #ifdef HB_THREAD_SUPPORT
    IF ::lAsyncMode
-      #ifdef HB_THREAD_SUPPORT
-         MutexLock( ::mtxBusy )
-            ::thUdpAccept := StartThread( Self, "UDPAccept" )
-         MutexUnlock( ::mtxBusy )
-      #endif
+      MutexLock( ::mtxBusy )
+         ::thUdpAccept := StartThread( Self, "UDPAccept" )
+      MutexUnlock( ::mtxBusy )
    ELSE
       ::UDPAccept()
    ENDIF
+   #else
+      ::UDPAccept()
+   #endif
 
 RETURN .T.
 
@@ -282,8 +313,8 @@ METHOD UDPAccept() CLASS tRPCClient
 
    cData := Space( 1400 )
    // set default socket timeout
-   IF ::nUDPTimeout >= 0
-      InetSetTimeout( ::skUDP, ::nUDPTimeout )
+   IF ::nTimeout >= 0
+      InetSetTimeout( ::skUDP, ::nTimeout )
    ELSE
       InetClearTimeout( ::skUdp )
    ENDIF
@@ -304,11 +335,11 @@ METHOD UDPAccept() CLASS tRPCClient
          ENDIF
       #endif
 
-      IF ::nUDPTimeout >= 0
+      IF ::nTimeout >= 0
          nTime := Int( Seconds() * 1000 )
          // a little tollerance must be added for double roundings
          // in the double INT() functions
-         IF nTime - ::nUDPTimeBegin >= ::nUdpTimeout - 5
+         IF nTime - ::nUDPTimeBegin >= ::nTimeout - 5
             EXIT
          ENDIF
       ENDIF
@@ -383,20 +414,17 @@ METHOD StopScan() CLASS tRPCClient
       MutexUnlock( ::mtxBusy )
    ENDIF
 #else
-   IF ::thUDPAccept > 0
-      ::thUDPAccept := -1
-      ::OnScanComplete()
-   ENDIF
+  ::OnScanComplete()
 #endif
 RETURN .T.
 
 
-METHOD Connect( cServer, cUserId, cPassword, nTimeout ) CLASS tRPCClient
+METHOD Connect( cServer, cUserId, cPassword ) CLASS tRPCClient
    LOCAL cAuth, cReply := Space(8)
 
-   ::nStatus := 1 // connecting
-   IF .not. Empty( nTimeout )
-      ::skTcp := InetCreate( nTimeout )
+   ::nStatus := RPC_STATUS_CONNECTING // connecting
+   IF .not. Empty( ::nTimeout )
+      ::skTcp := InetCreate( ::nTimeout )
    ELSE
       ::skTcp := InetCreate( )
    ENDIF
@@ -404,7 +432,7 @@ METHOD Connect( cServer, cUserId, cPassword, nTimeout ) CLASS tRPCClient
    InetConnect( cServer, ::nTcpPort, ::skTcp  )
 
    IF InetErrorCode( ::skTcp ) == 0
-      ::nStatus := 2 // Connected
+      ::nStatus := RPC_STATUS_CONNECTED // Connected
       IF ::bEncrypted
          cAuth := ::BuildChallengePwd( cPassword )
          cAuth := cUserId + ":" + cAuth
@@ -413,12 +441,12 @@ METHOD Connect( cServer, cUserId, cPassword, nTimeout ) CLASS tRPCClient
          cAuth := cUserId + ":" + cPassword
          InetSendAll( ::skTcp, "XHBR90" + HB_CreateLen8( Len( cAuth ) ) + cAuth )
       ENDIF
-      
+
       IF InetErrorCode( ::skTcp ) == 0
          IF .not. ::bEncrypted
             InetRecvAll( ::skTcp, @cReply )
             IF InetErrorCode( ::skTcp ) == 0 .and. cReply == "XHBR91OK"
-               ::nStatus := 3 // Logged in
+               ::nStatus := RPC_STATUS_LOGGED // Logged in
                RETURN .T.
             ENDIF
          ELSE
@@ -430,7 +458,7 @@ METHOD Connect( cServer, cUserId, cPassword, nTimeout ) CLASS tRPCClient
 
    InetDestroy( ::skTcp )
    ::skTcp := NIL
-   ::nStatus := 0
+   ::nStatus := RPC_STATUS_NONE
 RETURN .F.
 
 
@@ -492,18 +520,18 @@ METHOD ManageChallenge() CLASS tRPCClient
       RETURN .F.
    ENDIF
    /* SUCCESS! */
-   ::nStatus := 3
+   ::nStatus := RPC_STATUS_LOGGED
 
 RETURN .T.
 
 
 METHOD Disconnect() CLASS tRPCClient
 
-   IF ::nStatus >= 3
+   IF ::nStatus >= RPC_STATUS_LOGGED
       #ifdef HB_THREAD_SUPPORT
          MutexLock( ::mtxBusy )
       #endif
-      ::nStatus :=  0
+      ::nStatus :=  RPC_STATUS_NONE
       InetSendAll( ::skTcp, "XHBR92" )
       InetDestroy( ::skTcp )
       #ifdef HB_THREAD_SUPPORT
@@ -514,145 +542,143 @@ METHOD Disconnect() CLASS tRPCClient
 
 RETURN .F.
 
-METHOD Call( cFunction, aParams, nTime ) CLASS tRPCClient
-RETURN ::CallMode( cFunction, aParams, nTime, 0 , NIL )
-
-METHOD CallLoop( cFunction, nStart, nEnd, nStep, aParams, nTime ) CLASS tRPCClient
-RETURN ::CallMode( cFunction, aParams, nTime, 1 , { nStart, nEnd, nStep } )
-
-METHOD CallLoopSummary( cFunction, nStart, nEnd, nStep, aParams, nTime ) CLASS tRPCClient
-RETURN ::CallMode( cFunction, aParams, nTime, 2 , { nStart, nEnd, nStep } )
-
-METHOD CallLoopEnd( cFunction, nStart, nEnd, nStep, aParams, nTime ) CLASS tRPCClient
-RETURN ::CallMode( cFunction, aParams, nTime, 3 , { nStart, nEnd, nStep } )
-
-METHOD CallForeach( cFunction, aElems, aParams, nTime ) CLASS tRPCClient
-RETURN ::CallMode( cFunction, aParams, nTime, 4 , aElems )
-
-METHOD CallForeachSummary( cFunction, aElems, aParams, nTime ) CLASS tRPCClient
-RETURN ::CallMode( cFunction, aParams, nTime, 5 , aElems )
-
-METHOD CallForeachEnd( cFunction, aElems, aParams, nTime ) CLASS tRPCClient
-RETURN ::CallMode( cFunction, aParams, nTime, 6 , aElems )
 
 
-METHOD CallMode( cFunction, aParams, nTime, nMode, aElems ) CLASS tRPCClient
-   LOCAL oRet
-   // do not allow asynchronous mode without timeout
-   IF .not. ::lAsyncMode .and. ( nTime == NIL .or. nTime <= 0 )
+METHOD SetLoopMode( nMethod, xData, nEnd, nStep ) CLASS tRPCClient
+
+   IF nMethod == RPC_LOOP_NONE
+      ::nLoopMode := RPC_LOOP_NONE
+      ::aLoopData := NIL
+      RETURN .T.
+   ENDIF
+
+   IF ValType( xData ) == "A"
+      ::aLoopData := xData
+   ELSE
+      IF ValType( xData ) == "NI"
+         // this is to allow garbage collecting
+         ::aLoopData := NIL
+         ::nLoopStart := xData
+         ::nLoopEnd := nEnd
+         IF ValType( nStep ) == "NI"
+            ::nLoopStep := nStep
+         ELSE
+            ::nLoopStep := 1
+         ENDIF
+      ELSE
+         RETURN .F.
+      ENDIF
+   ENDIF
+
+   ::nLoopMode := nMethod
+
+RETURN .T.
+
+
+METHOD Call( ... ) CLASS tRPCClient
+   LOCAL oCalling, xParam
+   LOCAL cFunction, aParams
+   LOCAL nCount
+
+   IF Pcount() == 0
       RETURN NIL
    ENDIF
 
+
+   // do not allow asynchronous mode without timeout
+   IF .not. ::lAsyncMode .and. ( ::nTimeOut == NIL .or. ::nTimeOut <= 0 )
+      RETURN NIL
+   ENDIF
+
+   ::oResult := NIL
+
+   oCalling := HB_PValue( 1 )
+   IF ValType( oCalling ) == "A"
+      cFunction := oCalling[1]
+      ADel( oCalling, 1 )
+      ASize( oCalling, Len( oCalling ) -1 )
+      aParams := oCalling
+   ELSE
+      cFunction := oCalling
+      aParams := Array( Pcount() -1 )
+      FOR nCount := 2 TO Pcount()
+         aParams[nCount - 1] :=  HB_PValue( nCount )
+      NEXT
+   ENDIF
+
+   // The real call
    #ifdef HB_THREAD_SUPPORT
       MutexLock( ::mtxBusy )
       // already active or not already connected
-      IF ::thTcpAccept > 0 .or. ::skTCP == NIL .or. ::nStatus < 3
+      IF ::thTcpAccept > 0 .or. ::skTCP == NIL .or. ::nStatus < RPC_STATUS_LOGGED
          MutexUnlock( ::mtxBusy )
          RETURN NIL
       ENDIF
    #else
-      IF ::thTcpAccept > 0 .or. ::skTCP == NIL .or. ::nStatus < 3
+      IF ::skTCP == NIL .or. ::nStatus < RPC_STATUS_LOGGED
          RETURN NIL
       ENDIF
    #endif
 
-   ::oResult := NIL
-   ::nStatus := 4 // waiting for a reply
+   ::nStatus := RPC_STATUS_WAITING // waiting for a reply
+
    // send the call through the socket
-   IF .not. ::SendCall( cFunction, aParams, nMode, aElems )
+   IF .not. ::SendCall( cFunction, aParams )
       RETURN .F.
    ENDIF
 
-   IF .not. Empty( nTime ) .and. nTime >= 0
-      ::nTCPTimeout := nTime
-      InetSetTimeout( ::skTCP, ::nTCPTimeout )
-   ELSE
-      ::nTCPTimeout := -1
-      InetClearTimeout( ::skUdp )
-   ENDIF
-
-   // in async mode, just launch the listener
+      // in async mode, just launch the listener
    #ifdef HB_THREAD_SUPPORT
       IF ::lAsyncMode
+         MutexLock( ::mtxBusy )
          ::thTCPAccept := StartThread( Self, "TCPAccept" )
          MutexUnlock( ::mtxBusy )
       ELSE
-         MutexUnlock( ::mtxBusy )
          ::TCPAccept()
-         MutexLock( ::mtxBusy )
-         // Has something bad happened in the meanwhile?
-         IF ::nStatus > 3
-            oRet := ::oResult
-            ::nStatus := 3 // reply complete
-         ENDIF
-         MutexUnlock( ::mtxBusy )
       ENDIF
    #else
       ::TCPAccept()
-      // Has something bad happened in the meanwhile?
-      IF ::nStatus > 3
-         oRet := ::oResult
-         ::nStatus := 3 // reply complete
-      ENDIF
    #endif
-RETURN oRet
+
+RETURN ::oResult
 
 
-METHOD SendCall( cFunction, aParams, nMode, aElems ) CLASS tRPCClient
-   LOCAL cData, nLen
+METHOD SendCall( cFunction, aParams ) CLASS tRPCClient
+   LOCAL cData := "", nLen
    LOCAL nReq, cType
 
-   SWITCH nMode
-      CASE 0
+   SWITCH ::nLoopMode
+      CASE RPC_LOOP_NONE
          nReq = 0
          cType = ""
-         cData := ""
       EXIT
 
-      CASE 1
+      CASE RPC_LOOP_ALLDATA
          nReq = 2
          cType = "A"
-         cData = HB_Serialize( aElems[1] ) + HB_Serialize( aElems[2] ) +;
-                HB_Serialize( aElems[3] )
       EXIT
 
-      CASE 2
+      CASE RPC_LOOP_SUMMARY
          nReq = 2
          cType = "C"
-         cData = HB_Serialize( aElems[1] ) + HB_Serialize( aElems[2] ) +;
-                HB_Serialize( aElems[3] )
       EXIT
 
-      CASE 3
+      CASE RPC_LOOP_CONFIRMATION
          nReq = 2
          cType = "E"
-         cData := HB_Serialize( aElems[1] ) + HB_Serialize( aElems[2] ) +;
-                HB_Serialize( aElems[3] )
-      EXIT
-
-      CASE 4
-         nReq = 4
-         cType = "A"
-         cData = ""
-      EXIT
-
-      CASE 5
-         nReq = 4
-         cType = "C"
-         cData = ""
-      EXIT
-
-      CASE 6
-         nReq = 4
-         cType = "E"
-         cData = ""
       EXIT
    END
 
+   IF ::aLoopData == NIL .and. ::nLoopMode > RPC_LOOP_NONE
+      cData := HB_Serialize( ::nLoopStart ) + HB_Serialize( ::nLoopEnd ) +;
+         HB_Serialize( ::nLoopStep )
+   ENDIF
+
    cData +=  HB_Serialize( cFunction ) + HB_Serialize( aParams )
 
-   IF nMode >= 4
-      cData += HB_Serialize( aElems )
+   IF ::aLoopData != NIL
+      cData += HB_Serialize( ::aLoopData )
+      nReq += 2
    ENDIF
 
    nLen := Len( cData )
@@ -671,8 +697,15 @@ RETURN ( InetErrorCode( ::skTCP ) == 0 )
 
 
 METHOD TCPAccept() CLASS tRPCClient
-   LOCAL nTime
+   LOCAL nTime := 0
    LOCAL cCode
+
+   // set default socket timeout
+   IF ::nTimeout >= 0
+      InetSetTimeout( ::skTCP, ::nTimeout )
+   ELSE
+      InetClearTimeout( ::skTCP )
+   ENDIF
 
    cCode := Space(6)
    ::nTCPTimeBegin := INT( Seconds() * 1000 )
@@ -686,11 +719,11 @@ METHOD TCPAccept() CLASS tRPCClient
          EXIT
       ENDIF
 
-      IF ::nTCPTimeout >= 0
+      IF ::nTimeout >= 0
          nTime := Int( Seconds() * 1000 )
          // a little tollerance must be added for double roundings
          // in the double INT() functions
-         IF nTime - ::nTCPTimeBegin >= ::nTCPTimeout - 5
+         IF nTime - ::nTCPTimeBegin >= ::nTimeout - 5
             EXIT
          ENDIF
       ENDIF
@@ -699,14 +732,24 @@ METHOD TCPAccept() CLASS tRPCClient
    #ifdef HB_THREAD_SUPPORT
    MutexLock( ::mtxBusy )
    #endif
-   IF InetErrorCode( ::skTCP ) != 0
-      ::nStatus := 0
-      InetDestroy( ::skTCP )
-      ::skTCP := NIL
+
+   // TIMED OUT?
+   // Then the call() will return NIL, with status still WAITING
+   IF InetErrorCode( ::skTCP ) != -1 .and.;
+                   nTime - ::nTCPTimeBegin < ::nTimeout - 5
+
+      IF InetErrorCode( ::skTCP ) != 0
+         ::nStatus := RPC_STATUS_ERROR
+         InetDestroy( ::skTCP )
+         ::skTCP := NIL
+      ELSE
+         // Receival completed
+         ::nStatus := RPC_STATUS_LOGGED
+         // signal that this thread is no longer active.
+         ::thTcpAccept := -1
+      ENDIF
    ENDIF
 
-   // signal that this thread is no longer active.
-   ::thTcpAccept := -1
    #ifdef HB_THREAD_SUPPORT
    MutexUnlock( ::mtxBusy )
    #endif
@@ -816,17 +859,48 @@ RETURN lContinue
 /***********************************
 * Utility functions
 ************************************/
-METHOD GetFunctionName( oData ) CLASS tRpcClient
+METHOD GetFunctionName( xId ) CLASS tRpcClient
    LOCAL cData, nPos
 
-   IF ValType( oData ) == "N"
-      cData := ::aFunctions[oData][3]
+   IF ValType( xID ) == "A"
+      cData := xId[3]
    ELSE
-      cData := oData
+      cData := ::aFunctions[xId][3]
    ENDIF
 
    nPos := At( "(", cData )
    cData := Substr( cData, 1, nPos-1 )
+RETURN cData
+
+
+METHOD GetServerName( xId ) CLASS tRpcClient
+   LOCAL cData
+
+   IF ValType( xID ) == "A"
+      cData := xId[2]
+   ELSE
+      IF Len( ::aFunctions ) > 0
+         cData := ::aFunctions[xId][2]
+      ELSE
+         cData := ::aServers[xId][2]
+      ENDIF
+   ENDIF
+RETURN cData
+
+
+METHOD GetServerAddress( xId ) CLASS tRpcClient
+   LOCAL cData, nPos
+
+   IF ValType( xID ) == "A"
+      cData := xId[1]
+   ELSE
+      IF Len( ::aFunctions ) > 0
+         cData := ::aFunctions[xId][1]
+      ELSE
+         cData := ::aServers[xId][1]
+      ENDIF
+   ENDIF
+
 RETURN cData
 
 

@@ -1,6 +1,6 @@
 ************************************************************
 * rpcserver.prg
-* $Id: rpcserver.prg,v 1.5 2003/02/24 05:55:55 jonnymind Exp $
+* $Id: rpcserver.prg,v 1.6 2003/04/16 22:08:13 jonnymind Exp $
 * Test for tRpcServer and tRpcFunction class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -21,11 +21,9 @@ PROCEDURE Main()
    CLEAR SCREEN
    @1,15 SAY "X H A R B O U R - Remote Procedure Call server test."
 
-   oProc := tRPCFunction():New( "Checksum(C:0)-->C:10", "20030201.A", 1, @CheckSum() )
-
    oSv := tRPCService():New()
    oSv:cServerName := "CksumTest"
-   oSv:Add( oProc )
+   oSv:Add( "Checksum(C:0)-->C:10", "20030201.A", 1, @CheckSum() )
    oSv:bOnServerScan := {|x| Scans( x ) }
    oSv:bOnFunctionScan := {|x| Scanf( x ) }
    oSv:bOnFunctionError := {|x,y,z| FuncError( x, y, z ) }

@@ -1,6 +1,6 @@
 ************************************************************
 * rpcclientst.prg
-* $Id$
+* $Id: rpcclientst.prg,v 1.1 2003/04/13 13:20:06 jonnymind Exp $
 * Test for tRpcClient class
 *
 * SINGLE THREAD MODE
@@ -18,9 +18,9 @@
 *
 * Giancarlo Niccolai
 *
+#include "hbrpc.ch"
 
 GLOBAL nRow
-GLOBAL lComplete
 
 PROCEDURE Main( cNetwork )
    LOCAL oRpc, aElem, cFname
@@ -46,7 +46,8 @@ PROCEDURE Main( cNetwork )
    //we'll give 2,5 secs time to the servers to present themselves
    // since asyncrhonous mode is off by default, you HAVE to provide a
    // finite timeout.
-   oRpc:ScanServers( ".*", 2500 )
+   oRpc:SetTimeout( 2500 )
+   oRpc:ScanServers( ".*" )
 
    // display found servers
    FOR EACH aElem in oRpc:aServers
@@ -59,35 +60,24 @@ PROCEDURE Main( cNetwork )
       nRow ++
    NEXT
 
-   // activating asynchronous mode
-   //oRpc:lAsyncMode := .T.
-
    // events can be caught also by overloading members, but you can also
    // use codeblocks
    oRpc:bOnScanFunctionsProgress := {|x| FoundFunction( x ) }
-   oRpc:bOnScanComplete := { || ScanComplete() }
-   lComplete := .F.
-
    nRow ++
    @nRow, 5 SAY "Scanning for functions called Check* (any version, async mode)"
    nRow ++
 
-   // now a timeout is optional, and we could even use a oRpc:StopScan() from
-   // a control thread
-   oRpc:ScanFunctions( "Check.*", "00000000.0", 2500 )
-
+   // We'll use a shorter timeout to check for incoming replies to
+   // our function scan query
    nPos := 10
-   /*
-   DO WHILE .not. lComplete
+   oRpc:SetTimeout( 250 )
+   oRpc:ScanFunctions( "Check.*", "00000000.0" )
+   DO WHILE nPos < 20
       @nRow, nPos SAY "."
       nPos++
-      //ThreadSleep( 250 )
+      oRpc:ScanAgain()
    ENDDO
-   */
-   // turning sync mode back on for simplicity reasons
-   //oRpc:lAsyncMode := .F.
 
-   // please, note that callback functions are called also in sync mode
    IF Empty( oRpc:aFunctions )
       nRow++
       @nRow, 5 SAY "No server found. Terminating (press a key)"
@@ -96,19 +86,21 @@ PROCEDURE Main( cNetwork )
    ENDIF
 
    nRow ++
-   @nRow, 5 SAY "Connecting with " + oRpc:aFunctions[1][2]
+   @nRow, 5 SAY "Connecting with " + oRpc:GetServerName( 1 )
    nRow ++
    // Demo server has a fairly symple authorization scheme ;-)
    // remember to use the address, not the logical rpc name of the server
    oRpc:SetEncryption( "A nice key to be used by servers" )
-   IF oRpc:Connect( oRpc:aFunctions[1][1], "Giancarlo", "Niccolai", 2500 )
+   // again waiting a longer time
+   oRpc:SetTimeout( 2500 )
+   IF oRpc:Connect( oRpc:GetServerAddress( 1 ), "Giancarlo", "Niccolai" )
       @nRow, 10 SAY "Connection established"
       nRow ++
       cFname = oRpc:GetFunctionName( 1 )
       @nRow, 10 SAY "Calling Function " + cFname
       nRow++
 
-      oResult := oRpc:Call( cFname, {"asdfasdfwefasdfawerasdf"}, 2500 )
+      oResult := oRpc:Call( cFname, "asdfasdfwefasdfawerasdf" )
 
       IF Empty( oResult )
          @nRow, 10 SAY "Function call failed"
@@ -121,8 +113,8 @@ PROCEDURE Main( cNetwork )
       nRow++
 
       // test of loop
-
-      oResult := oRpc:CallForeachSummary( cFname, { "abc", "123", "xyz", "456"}, { "$." }, 2500 )
+      oRpc:SetLoopMode( RPC_LOOP_SUMMARY, { "abc", "123", "xyz", "456" } )
+      oResult := oRpc:Call( cFname, "$." )
       IF .not. Empty ( oResult )
          nPos := 45
          @nRow, 10 SAY "Results for abc, 123, xyz, 456: "
@@ -137,10 +129,9 @@ PROCEDURE Main( cNetwork )
       nRow++
 
       // tryng again asyncrhonous mode, and now autmoatic compression feature
-      //oRpc:lAsyncMode := .T.
-      lComplete := .F.
       // again, notice that this handler are called also if the mode is sync,
       // but they are almost essential in async mode.
+      oRpc:lAsyncMode := .t.
       oRpc:bOnFunctionProgress := {|x,y| Progress( x, y ) }
       oRpc:bOnFunctionReturn := { |x| FuncComplete( x ) }
       oRpc:bOnFunctionFail := { |x| FuncHadFailed( x ) }
@@ -156,24 +147,23 @@ PROCEDURE Main( cNetwork )
       @nRow, 5 SAY "Async/compressed call test (expecting result: " + AllTrim( Str(nSum))+")"
       nRow ++
 
-
-      oResult := oRpc:Call( cFname, { cBase }, 150000 )
-      nPos := 28
-      /*
+      // again, setting the timer to lower wait for interactive incremental calls
+      oRpc:SetLoopMode( RPC_LOOP_NONE )
+      oRpc:SetTimeout( 250 )
       @nRow, 20 SAY "Waiting"
-      DO WHILE .not. lComplete
+      nPos := 28
+      oResult := oRpc:Call( cFname, cBase )
+      DO WHILE oRpc:GetStatus() == RPC_STATUS_WAITING
          @nRow, nPos SAY "."
          nPos++
-         //ThreadSleep( 100 )
-         IF nPos > 120
+         IF nPos > 70
             nRow++
             @nRow,10 say "Async test failed"
-            lComplete := .T.
          ENDIF
+         oRpc:CallAgain()
       ENDDO
-      */
    ELSE
-      @nRow, 10 SAY "Can't Connect with  " + oRpc:aFunctions[1][2]
+      @nRow, 10 SAY "Can't Connect with  " + oRpc:GetServerName( 1 )
       nRow++
    ENDIF
 
@@ -191,14 +181,6 @@ FUNCTION FoundFunction( aElem )
    // returning .F. would terminate the search
 RETURN .T.
 
-/* Called when a scan (server or function) has been completed */
-FUNCTION ScanComplete()
-   lComplete := .T.
-   @nRow, 10 SAY "Scan function complete"
-   nRow ++
-RETURN .T.
-
-
 /* Called when the Remote Procedures signals a significant progress. Also called when
    server starts the RPC (with oData == NIL and nProgressInd == 0 ) */
 FUNCTION Progress( nProgressInd, oData )
@@ -213,7 +195,6 @@ RETURN .T.
 /* Called when function is complete */
 FUNCTION FuncComplete( oResult  )
       // oResult can be anything, but we know our test function returns just a string
-      lComplete := .T.
       nRow++
       @nRow, 10 SAY "Function complete, result: " + oResult
       nRow++
@@ -223,6 +204,6 @@ RETURN .T.
 FUNCTION FuncHadFailed( cDesc  )
       lComplete := .T.
       nRow++
-      @nRow, 10 SAY "Function FAILED internally! " 
+      @nRow, 10 SAY "Function FAILED internally! "
       nRow++
 RETURN .T.

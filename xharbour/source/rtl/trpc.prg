@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.14 2003/04/16 08:37:45 jonnymind Exp $
+ * $Id: trpc.prg,v 1.15 2003/04/16 22:08:12 jonnymind Exp $
  */
 
 /*
@@ -212,7 +212,7 @@ CLASS tRPCFunction
 
    DATA aCall
 
-   CLASSDATA cPattern INIT HB_RegexComp( "^C:[0-9]{1,6}$|^A$|^O$|^D$|^N:[0-9]{1,2}(,[0-9]{1,2})?$")
+   CLASSDATA cPattern INIT HB_RegexComp( "^C:[0-9]{1,6}$|^A$|^O$|^D$|^N$|^NI$")
 
    METHOD New( cFname, cSerial, cFret, aParams, nAuthLevel, oExec, oMethod ) CONSTRUCTOR
    METHOD SetCallable( oExecSymbol, oMethod )
@@ -240,13 +240,17 @@ METHOD New( cFname, cSerial, nAuthLevel, oExec, oMeth ) CLASS tRPCFunction
    ::cReturn := IIF( Len( aFuncDef ) == 4, aFuncDef[4], aFuncDef[5] )
 
    // analyze parameter list
-   aParams := HB_RegexSplit( ",", cParam )
-   ::aParameters := {}
-   FOR EACH cParam IN aParams
-      cParam := AllTrim( Upper(cParam) )
-      ::CheckParam( cParam )
-      AAdd( ::aParameters, cParam )
-   NEXT
+   IF Trim( cParam ) != ""
+      aParams := HB_RegexSplit( ",", cParam )
+      ::aParameters := {}
+      FOR EACH cParam IN aParams
+         cParam := AllTrim( Upper(cParam) )
+         ::CheckParam( cParam )
+         AAdd( ::aParameters, cParam )
+      NEXT
+   ELSE
+      ::aParameters := {}
+   ENDIF
 
    // Analyze function definition return
    ::CheckParam( ::cReturn )
@@ -375,15 +379,6 @@ CLASS tRPCServeCon
    /* Allow progress ?*/
    DATA bAllowProgress
 
-   /* Is this connection encrypted? */
-   DATA bEncrypted
-
-   /* crc for challenge handshake */
-   DATA nChallengeCRC
-   /* Temporary supposed user in challenge */
-   DATA cChallengeUserid
-   DATA cCryptKey
-
    METHOD New( oCaller, skRemote ) CONSTRUCTOR
    METHOD Destroy()
 
@@ -393,6 +388,16 @@ CLASS tRPCServeCon
    METHOD Run()
 
    /* Utilty */
+HIDDEN:
+   /* Is this connection encrypted? */
+   DATA bEncrypted
+
+   /* crc for challenge handshake */
+   DATA nChallengeCRC
+   /* Temporary supposed user in challenge */
+   DATA cChallengeUserid
+   DATA cCryptKey
+
    METHOD RecvAuth( lEncrypt )
    METHOD RecvChallenge()
    METHOD RecvFunction( bComp, bMode )
@@ -1049,7 +1054,7 @@ CLASS tRPCService
    DATA bConnection
 
    /* Function management */
-   METHOD Add( oFunction )
+   METHOD Add( xFunction, cVersion, nId, oExec, oMethod )
    METHOD Run( cName, aParams )
    METHOD Describe( cName )
    METHOD Find( cName )
@@ -1094,12 +1099,19 @@ METHOD New() class tRPCService
 RETURN Self
 
 
-METHOD Add( oFunction )
+METHOD Add( xFunction, cVersion, nLevel, oExec, oMethod )
    LOCAL nElem, lRet := .F.
+   LOCAL oFunction
+
+   IF ValType( xFunction ) == "C"
+      oFunction := TRpcFunction():New( xFunction, cVersion, nLevel, oExec, oMethod )
+   ELSE
+      oFunction := xFunction
+   ENDIF
 
    MutexLock( ::mtxBusy )
    nElem := AScan( ::aFunctions, {|x| oFunction:cName == x:cName})
-   IF nElem == 0g
+   IF nElem == 0
       Aadd( ::aFunctions  , oFunction )
       lRet := .T.
    ENDIF

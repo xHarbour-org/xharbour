@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.959 2003/04/16 22:08:05 jonnymind Exp $
+ * $Id: ChangeLog,v 1.960 2003/04/17 09:27:46 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-04-17 23:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/trpccli.prg
+    % Simplification of RPC system on client side. Now a remote procedure
+      can be called with an array in HB_ExecFromArray() format (only
+      function name as first element though), or with a standard list
+      of parameters.
+    % Rationalization of class and shielding of internal variables
+    % Add of some sensible accessors and utility methods
+
+  * source/rtl/trpc.prg
+    % TRpcServer:Add() can accept now a TRpcFunction parameter or
+      a parameter list from which a new TRpcFunction is built
+
+  * tests/rpcclient.prg
+  * tests/rpcclientst.prg
+  * tests/rpcserver.prg
+    % Changed to make useable with new RPC classes syntax
+
 
 2003-04-17 05:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.nt

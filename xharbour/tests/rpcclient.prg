@@ -1,6 +1,6 @@
 ************************************************************
 * rpcclient.prg
-* $Id: rpcclient.prg,v 1.6 2003/02/26 06:14:00 jonnymind Exp $
+* $Id: rpcclient.prg,v 1.7 2003/03/16 07:28:31 jonnymind Exp $
 * Test for tRpcClient class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -18,6 +18,8 @@
 *
 * Giancarlo Niccolai
 *
+
+#include "hbrpc.ch"
 
 GLOBAL nRow
 GLOBAL lComplete
@@ -46,7 +48,8 @@ PROCEDURE Main( cNetwork )
    //we'll give 2,5 secs time to the servers to present themselves
    // since asyncrhonous mode is off by default, you HAVE to provide a
    // finite timeout.
-   oRpc:ScanServers( ".*", 2500 )
+   oRpc:SetTimeout( 2500 )
+   oRpc:ScanServers( ".*" )
 
    // display found servers
    FOR EACH aElem in oRpc:aServers
@@ -74,7 +77,7 @@ PROCEDURE Main( cNetwork )
 
    // now a timeout is optional, and we could even use a oRpc:StopScan() from
    // a control thread
-   oRpc:ScanFunctions( "Check.*", "00000000.0", 2500 )
+   oRpc:ScanFunctions( "Check.*", "00000000.0" )
 
    nPos := 10
    DO WHILE .not. lComplete
@@ -94,19 +97,20 @@ PROCEDURE Main( cNetwork )
    ENDIF
 
    nRow ++
-   @nRow, 5 SAY "Connecting with " + oRpc:aFunctions[1][2]
+   @nRow, 5 SAY "Connecting with " + oRpc:GetServerName(1)
    nRow ++
+
    // Demo server has a fairly symple authorization scheme ;-)
    // remember to use the address, not the logical rpc name of the server
    oRpc:SetEncryption( "A nice key to be used by servers" )
-   IF oRpc:Connect( oRpc:aFunctions[1][1], "Giancarlo", "Niccolai", 2500 )
+   IF oRpc:Connect( oRpc:GetServerAddress(1) , "Giancarlo", "Niccolai" )
       @nRow, 10 SAY "Connection established"
       nRow ++
       cFname = oRpc:GetFunctionName( 1 )
       @nRow, 10 SAY "Calling Function " + cFname
       nRow++
 
-      oResult := oRpc:Call( cFname, {"asdfasdfwefasdfawerasdf"}, 2500 )
+      oResult := oRpc:Call( cFname, "asdfasdfwefasdfawerasdf" )
 
       IF Empty( oResult )
          @nRow, 10 SAY "Function call failed"
@@ -119,8 +123,8 @@ PROCEDURE Main( cNetwork )
       nRow++
 
       // test of loop
-
-      oResult := oRpc:CallForeachSummary( cFname, { "abc", "123", "xyz", "456"}, { "$." }, 2500 )
+      oRpc:SetLoopMode( RPC_LOOP_SUMMARY, { "abc", "123", "xyz", "456" } )
+      oResult := oRpc:Call( cFname, "$." )
       IF .not. Empty ( oResult )
          nPos := 45
          @nRow, 10 SAY "Results for abc, 123, xyz, 456: "
@@ -132,6 +136,8 @@ PROCEDURE Main( cNetwork )
          @nRow, 10 SAY "Test Failed"
       ENDIF
 
+      // Resetting loop mode
+      oRpc:SetLoopMode( RPC_LOOP_NONE )
       nRow++
 
       // tryng again asyncrhonous mode, and now autmoatic compression feature
@@ -156,7 +162,7 @@ PROCEDURE Main( cNetwork )
 
       // do not give timeout this time, it is not necessary: you can call "disconnect"
       // asyncrhonously
-      oResult := oRpc:Call( cFname, { cBase } )
+      oResult := oRpc:Call( cFname, cBase )
       nPos := 28
       @nRow, 20 SAY "Waiting"
       DO WHILE .not. lComplete
@@ -171,7 +177,7 @@ PROCEDURE Main( cNetwork )
       ENDDO
 
    ELSE
-      @nRow, 10 SAY "Can't Connect with  " + oRpc:aFunctions[1][2]
+      @nRow, 10 SAY "Can't Connect with  " + oRpc:GetServerName( 1 )
       nRow++
    ENDIF
 
