@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.16 2002/04/21 01:39:17 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.17 2002/04/22 23:09:58 ronpinkas Exp $
  */
 
 /*
@@ -301,6 +301,11 @@ extern PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask ); /* retrieve a gener
 extern PHB_ITEM HB_EXPORT hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
 extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 
+#define hb_retc_buffer( szText )                   hb_retcAdopt( szText )
+#define hb_retclen_buffer( szText, ulLen )         hb_retclenAdopt( szText, ulLen )
+#define hb_retc_const( szText )                    hb_retcStatic( szText )
+#define hb_itemArrayPut ( pArray, ulIndex, pItem ) ( hb_arraySet( pArray, ulIndex, pItem ), pArray )
+
 #ifdef HB_API_MACROS
 
 #include "hbapiitm.h"
@@ -311,7 +316,11 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 #define hb_ret()                             hb_itemClear( &hb_stack.Return )
 #define hb_reta( ulLen )                     hb_arrayNew( &hb_stack.Return, ulLen )
 #define hb_retc( szText )                    hb_itemPutC( &hb_stack.Return, szText )
+#define hb_retcAdopt( szText )               hb_itemPutCPtr( &hb_stack.Return, szText, strlen( szText ) )
+#define hb_retcStatic( szText )              hb_itemPutCConst( &hb_stack.Return, szText )
 #define hb_retclen( szText, ulLen )          hb_itemPutCL( &hb_stack.Return, szText, ulLen )
+#define hb_retclenAdopt( szText, ulLen )     hb_itemPutCPtr( &hb_stack.Return, szText, ulLen )
+#define hb_retclenStatic( szText, ulLen )    hb_itemPutCLConst( &hb_stack.Return, szText )
 #define hb_retds( szDate )                   hb_itemPutDS( &hb_stack.Return, szDate )
 #define hb_retd( lYear, lMonth, lDay )       hb_itemPutD( &hb_stack.Return, lYear, lMonth, lDay )
 #define hb_retdl( lJulian )                  hb_itemPutDL( &hb_stack.Return, lJulian )

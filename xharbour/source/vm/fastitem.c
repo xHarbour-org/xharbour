@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.27 2002/04/18 00:56:51 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.28 2002/04/23 05:01:41 ronpinkas Exp $
  */
 
 /*
@@ -254,18 +254,21 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
       pItem->item.asString.length  = 0;
       pItem->item.asString.value   = hb_vm_sNull;
       pItem->item.asString.bStatic = TRUE;
+      pItem->item.asString.bChar   = FALSE;
    }
    else if( szText[1] == '\0' )
    {
       pItem->item.asString.length  = 1;
       pItem->item.asString.value   = hb_vm_acAscii[ (unsigned char) ( szText[0] ) ];
       pItem->item.asString.bStatic = TRUE;
+      pItem->item.asString.bChar   = TRUE;
    }
    else
    {
       pItem->item.asString.puiHolders      = (USHORT*) hb_xgrab( sizeof( USHORT ) );
       *( pItem->item.asString.puiHolders ) = 1;
       pItem->item.asString.bStatic         = FALSE;
+      pItem->item.asString.bChar           = FALSE;
       pItem->item.asString.length          = strlen( szText );
       pItem->item.asString.value           = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
       strcpy( pItem->item.asString.value, szText );
@@ -297,18 +300,21 @@ PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
       pItem->item.asString.length  = 0;
       pItem->item.asString.value   = hb_vm_sNull;
       pItem->item.asString.bStatic = TRUE;
+      pItem->item.asString.bChar   = FALSE;
    }
    else if( ulLen == 1 )
    {
       pItem->item.asString.length  = 1;
       pItem->item.asString.value   = hb_vm_acAscii[ (unsigned char) ( szText[0] ) ];
       pItem->item.asString.bStatic = TRUE;
+      pItem->item.asString.bChar   = TRUE;
    }
    else
    {
       pItem->item.asString.puiHolders      = (USHORT*) hb_xgrab( sizeof( USHORT ) );
       *( pItem->item.asString.puiHolders ) = 1;
       pItem->item.asString.bStatic         = FALSE;
+      pItem->item.asString.bChar           = FALSE;
       pItem->item.asString.length          = ulLen;
       pItem->item.asString.value           = ( char * ) hb_xgrab( ulLen + 1 );
       hb_xmemcpy( pItem->item.asString.value, szText, ulLen );
@@ -338,8 +344,63 @@ PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
    pItem->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
    *( pItem->item.asString.puiHolders ) = 1;
    pItem->item.asString.bStatic = FALSE;
-   pItem->item.asString.length = ulLen;
-   pItem->item.asString.value = szText;
+   pItem->item.asString.bChar   = FALSE;
+   pItem->item.asString.length  = ulLen;
+   pItem->item.asString.value   = szText;
+   pItem->item.asString.value[ ulLen ] = '\0';
+
+   return pItem;
+}
+
+PHB_ITEM hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
+{
+   ULONG ulLen = strlen( szText );
+
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s)", pItem, szText) );
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_STRING;
+   pItem->item.asString.bStatic = TRUE;
+   pItem->item.asString.bChar   = FALSE;
+   pItem->item.asString.length  = ulLen;
+   pItem->item.asString.value   = szText;
+   pItem->item.asString.value[ ulLen ] = '\0';
+
+   return pItem;
+}
+
+PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLen )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCLStatic(%p, %s, %lu)", pItem, szText, ulLen));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_STRING;
+   pItem->item.asString.bStatic = TRUE;
+   pItem->item.asString.bChar   = FALSE;
+   pItem->item.asString.length  = ulLen;
+   pItem->item.asString.value   = szText;
    pItem->item.asString.value[ ulLen ] = '\0';
 
    return pItem;
@@ -431,13 +492,14 @@ void hb_itemPushStaticString( char * szText, ULONG length )
    pTop->item.asString.value   = szText;
    pTop->item.asString.bStatic = TRUE;
    pTop->item.asString.bChar   = FALSE;
+   pTop->item.asString.bChar   = FALSE;
 
    hb_stackPush();
 }
 
 void hb_retcAdopt( char * szText )
 {
-   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcAdopt(%s) %p", &hb_stack.Return, szText ) );
+   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcAdopt(%s)", szText ) );
 
    if( ( &hb_stack.Return )->type )
    {
@@ -455,15 +517,16 @@ void hb_retcAdopt( char * szText )
    ( &hb_stack.Return )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
    *( ( &hb_stack.Return )->item.asString.puiHolders ) = 1;
    ( &hb_stack.Return )->item.asString.bStatic = FALSE;
-   ( &hb_stack.Return )->item.asString.value = szText;
-   ( &hb_stack.Return )->item.asString.length = strlen( szText );
+   ( &hb_stack.Return )->item.asString.bChar   = FALSE;
+   ( &hb_stack.Return )->item.asString.value   = szText;
+   ( &hb_stack.Return )->item.asString.length  = strlen( szText );
 }
 
 void hb_retclenAdopt( char * szText, ULONG ulLen )
 {
    szText[ulLen] = '\0';
 
-   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( %p, %lu ) %p \"%s\"", szText, ulLen, &hb_stack.Return, szText ) );
+   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
 
    if( ( &hb_stack.Return )->type )
    {
@@ -481,8 +544,55 @@ void hb_retclenAdopt( char * szText, ULONG ulLen )
    ( &hb_stack.Return )->item.asString.puiHolders = (USHORT*) hb_xgrab( sizeof( USHORT ) );
    *( ( &hb_stack.Return )->item.asString.puiHolders ) = 1;
    ( &hb_stack.Return )->item.asString.bStatic = FALSE;
-   ( &hb_stack.Return )->item.asString.value = szText;
-   ( &hb_stack.Return )->item.asString.length = ulLen;
+   ( &hb_stack.Return )->item.asString.bChar   = FALSE;
+   ( &hb_stack.Return )->item.asString.value   = szText;
+   ( &hb_stack.Return )->item.asString.length  = ulLen;
+}
+
+void hb_retcStatic( char * szText )
+{
+   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcStatic(%s)", szText ) );
+
+   if( ( &hb_stack.Return )->type )
+   {
+      if( HB_IS_STRING( &hb_stack.Return ) )
+      {
+         hb_itemReleaseString( &hb_stack.Return );
+      }
+      else
+      {
+         hb_itemFastClear( &hb_stack.Return );
+      }
+   }
+
+   ( &hb_stack.Return )->type = HB_IT_STRING;
+   ( &hb_stack.Return )->item.asString.bStatic = TRUE;
+   ( &hb_stack.Return )->item.asString.bChar   = TRUE;
+   ( &hb_stack.Return )->item.asString.value   = szText;
+   ( &hb_stack.Return )->item.asString.length  = strlen( szText );
+}
+
+void hb_retclenStatic( char * szText, ULONG ulLen )
+{
+   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcStatic(%s)", szText ) );
+
+   if( ( &hb_stack.Return )->type )
+   {
+      if( HB_IS_STRING( &hb_stack.Return ) )
+      {
+         hb_itemReleaseString( &hb_stack.Return );
+      }
+      else
+      {
+         hb_itemFastClear( &hb_stack.Return );
+      }
+   }
+
+   ( &hb_stack.Return )->type = HB_IT_STRING;
+   ( &hb_stack.Return )->item.asString.bStatic = TRUE;
+   ( &hb_stack.Return )->item.asString.bChar   = TRUE;
+   ( &hb_stack.Return )->item.asString.value   = szText;
+   ( &hb_stack.Return )->item.asString.length  = ulLen;
 }
 
 HB_FUNC( ARRAYCYCLICCOUNT )

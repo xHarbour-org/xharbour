@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.3 2002/01/21 09:11:56 ronpinkas Exp $
+ * $Id: extend.c,v 1.4 2002/03/22 15:07:54 map Exp $
  */
 
 /*
@@ -512,8 +512,6 @@ int  HB_EXPORT hb_parinfo( int iParam )
    }
 }
 
-#ifndef HB_API_MACROS
-
 int  HB_EXPORT hb_pcount( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_pcount()"));
@@ -640,8 +638,6 @@ void hb_retptr( void *voidPtr )
 {
    hb_itemPutPtrGC( &hb_stack.Return, voidPtr );
 }
-
-#endif
 
 void HB_EXPORT hb_storc( char * szText, int iParam, ... )
 {

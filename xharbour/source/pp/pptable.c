@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.3 2002/01/31 05:08:31 ronpinkas Exp $
+ * $Id: pptable.c,v 1.4 2002/03/10 18:34:37 lculik Exp $
  */
 
 /*
@@ -416,8 +416,10 @@ void hb_pp_Table( void )
    static COMMANDS sC___241 = {0,"SET","OPTIMIZE \1A20ON,OFF,&>","Set( _SET_OPTIMIZE, \1A30 )",&sC___240 };
    static COMMANDS sC___242 = {0,"SET","OPTIMIZE (\1A00)","Set( _SET_OPTIMIZE, \1A00 )",&sC___241 };
    static COMMANDS sC___243 = {0,"SET","TRACE \1A20ON,OFF,&>","Set( _SET_TRACE, \1A30 )",&sC___242 };
+   static COMMANDS sC___244 = {0,"SET","AUTOPEN \1A20 ON,OFF,&>","Set(_SET_AUTOPEN,\1A30 )",&sC___243 };
+   static COMMANDS sC___245 = {0,"SET","AUTOPEN (\1A00)","Set(_SET_AUTOPEN,\1A00 )",&sC___244 };
 
    hb_pp_topDefine = &sD___53;
-   hb_pp_topCommand = &sC___243;
+   hb_pp_topCommand = &sC___245;
    hb_pp_topTranslate = NULL;
 }

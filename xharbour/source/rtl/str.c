@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.8 2001/04/12 18:56:29 dholm Exp $
+ * $Id: str.c,v 1.1.1.1 2001/12/21 10:42:05 ronpinkas Exp $
  */
 
 /*
@@ -67,20 +67,32 @@ HB_FUNC( STR )
 
       if( hb_pcount() >= 2 )
       {
-         pWidth = hb_param( 2, HB_IT_NUMERIC );
-         if( !pWidth )
+         if( ISNUM( 2 ) )
+         {
+            pWidth = hb_param( 2, HB_IT_NUMERIC );
+         }
+         else if( ! ISNIL( 2 ) )
+         {
             bValid = FALSE;
+         }
       }
 
       if( hb_pcount() >= 3 )
       {
-         pDec = hb_param( 3, HB_IT_NUMERIC );
-         if( !pDec )
+         if( ISNUM( 3 ) )
+         {
+            pDec = hb_param( 3, HB_IT_NUMERIC );
+         }
+         else if( ! ISNIL( 3 ) )
+         {
             bValid = FALSE;
+         }
       }
    }
    else
+   {
       bValid = FALSE;
+   }
 
    if( bValid )
    {
@@ -88,13 +100,15 @@ HB_FUNC( STR )
 
       if( szResult )
       {
-         hb_retc( szResult );
-         hb_xfree( szResult );
+         hb_retcAdopt( szResult );
       }
       else
-         hb_retc( "" );
+      {
+         hb_retc( NULL );
+      }
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "STR", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
+   }
 }
-

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.177 2002/04/28 01:34:22 lculik Exp $
+ * $Id: ChangeLog,v 1.178 2002/04/28 02:49:15 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-27 20:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    + Added Harbour compatibility wrappers:
+        #define hb_retc_buffer( szText )                   hb_retcAdopt( szText )
+        #define hb_retclen_buffer( szText, ulLen )         hb_retclenAdopt( szText, ulLen )
+        #define hb_retc_const( szText )                    hb_retcStatic( szText )
+        #define hb_itemArrayPut ( pArray, ulIndex, pItem ) ( hb_arraySet( pArray, ulIndex, pItem ), pArray )
+
+    * Added -DHB_API_MACROS support for some missing hb_ret*().
+
+  * include/hbfast.h
+  * source/vm/fastitem.c
+    + Added:
+        PHB_ITEM hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
+        PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLen )
+        void     hb_retcStatic( char * szText )
+        void     hb_retclenStatic( char * szText, ULONG ulLen )
+
+  * source/pp/pptable.c
+    + Added support for:
+        #command SET AUTOPEN <x:ON,OFF,&>       => Set( _SET_AUTOPEN, <(x)> )
+        #command SET AUTOPEN (<x>)              => Set( _SET_AUTOPEN, <x> )
+
+  * source/rtl/str.c
+    * Clipper compatibility improved.
+
+  * source/vm/extend.c
+    * All retc* functions are included regardless of -DHB_API_MACROS
 
 2002-04-27 23:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/teditor.prg
@@ -20,7 +49,7 @@
       Each Array element is {"Printer Name"," Printer Port"} Where Printer Name
       is the Name that apear on the printers folder, and Printer port, what port
       this printer use
-      
+
 2002-04-27 17:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/dbedit.prg
     *Fix an bug on dbedit function that was Generating an Recursive call to DBEDIT()
