@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.15 2002/09/16 05:34:01 ronpinkas Exp $
+ * $Id: genc.c,v 1.16 2002/09/16 18:17:29 ronpinkas Exp $
  */
 
 /*
@@ -453,7 +453,6 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
    {
       pDelete = pGlobal;
       pGlobal = pGlobal->pNext;
-      hb_xfree( pDelete->szName );
       hb_xfree( pDelete );
    }
 
