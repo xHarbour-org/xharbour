@@ -165,18 +165,3 @@ METHOD MainStatusBar() CLASS MainFrame
 return(self)
 
 //----------------------------------------------------------------------------------------------
-
-CLASS ObjTree FROM TForm
-   METHOD New( oParent ) INLINE ::Caption := 'Object Tree',;
-                                ::left    := 0,;
-                                ::top     := 125,;
-                                ::width   := 200,;
-                                ::height  := 150,;
-                                ::ExStyle := /*WS_EX_CLIENTEDGE + */WS_EX_TOOLWINDOW ,;
-                                super:new( oParent )
-   // disallow window from being closed
-   METHOD OnCloseQuery() INLINE 0
-ENDCLASS
-
-//----------------------------------------------------------------------------------------------
-

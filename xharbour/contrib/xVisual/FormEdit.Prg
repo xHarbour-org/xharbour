@@ -241,7 +241,7 @@ METHOD CreateSub()
 
    ::Parent:StdBar:EnableAll()
    
-   ::Parent:ObjInsp:InspCombo:AddString(::Name+chr(9)+::ClassName(),self)
+   ::Parent:ObjInsp:InspCombo:AddString(::PropName+chr(9)+::ClassName(),self)
    ::Parent:ObjInsp:InspCombo:SetCurSel(::Parent:ObjInsp:InspCombo:GetCount()-1)
 
    xRet := super:OnCreate()
