@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: xwt.ch,v 1.2 2003/04/07 10:27:44 jonnymind Exp $
 
    Definitions
 */
@@ -118,7 +118,7 @@
 #define XWT_TYPE_FRAME    2
 #define XWT_TYPE_PANE     3
 #define XWT_TYPE_LAYOUT   4
-#define XWT_TYPE_GRIDPANE 6
+#define XWT_TYPE_GRID     6
 
 #define XWT_TYPE_BUTTON   10
 #define XWT_TYPE_LABEL    20

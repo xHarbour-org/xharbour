@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: container.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: container.prg,v 1.2 2003/04/07 15:41:05 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
@@ -22,6 +22,14 @@ CLASS XWTContainer FROM XWTWidget
    METHOD Hide()
    
    METHOD Destroy()
+
+   METHOD SetBox( bHasBox, cBoxTitle )
+   METHOD HasBox()
+
+   METHOD SetBorder( iBorder )
+   METHOD GetBorder()
+
+
 
 ENDCLASS
 
@@ -94,3 +102,35 @@ METHOD Destroy() CLASS XWTContainer
    NEXT
    
 RETURN ::Super:Destroy()
+
+METHOD SetBox( bHasBox, cBoxTitle ) CLASS XWTContainer
+
+   IF XWT_SetProperty( ::oRawWidget, XWT_PROP_BOX, bHasBox )
+      IF .not. Empty( cBoxTitle )
+         RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_TEXT, cBoxTitle )
+      ENDIF
+      RETURN .T.
+   ENDIF
+RETURN .F.
+
+
+METHOD HasBox() CLASS XWTContainer
+   LOCAL bBox
+
+   IF XWT_GetProperty( ::oRawWidget, XWT_PROP_BOX, @bBox )
+      RETURN bBox
+   ENDIF
+RETURN .F.
+
+
+METHOD SetBorder( iBorder ) CLASS XWTContainer
+RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_BORDER, iBorder )
+
+
+METHOD GetBorder() CLASS XWTContainer
+   LOCAL iBorder
+
+   IF XWT_GetProperty( ::oRawWidget, XWT_PROP_BORDER, @iBorder )
+      RETURN iBorder
+   ENDIF
+RETURN -1

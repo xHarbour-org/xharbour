@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.2 2003/04/07 10:27:45 jonnymind Exp $
+   $Id: xwt_gtk.h,v 1.3 2003/04/07 15:41:07 jonnymind Exp $
 
    GTK interface
 */
@@ -52,29 +52,30 @@ typedef struct tag_xwt_gtk_image
    PHB_BASEARRAY owner;
 } XWT_GTK_IMAGE, *PXWT_GTK_IMAGE;
 
-
-typedef struct tag_xwt_gtk_layout
+typedef struct tag_xwt_gtk_container
 {
+   GtkWidget *frame;
+   GtkWidget *container; // main widget
+   // We should not need an owner; leaving it here for future reference
+   // (Maybe option list boxes?)
+   PHB_BASEARRAY owner;
+
+} XWT_GTK_CONTAINER, *PXWT_GTK_CONTAINER;
+
+
+typedef struct tag_xwt_gtk_laycontainer
+{
+   XWT_GTK_CONTAINER;
    int iMode;
    BOOL bFill;
    BOOL bExpand;
-   int iPadding;
+} XWT_GTK_LAYCONTAINER, *PXWT_GTK_LAYCONTAINER;
 
-   GtkWidget *frame;
-   GtkWidget *layout; // it will be an HBox or a Vbox depending on iMode;
-   // We should not need an owner; leaving it here for future reference
-   // (Maybe option list boxes?)
-   PHB_BASEARRAY owner;
-} XWT_GTK_LAYOUT, *PXWT_GTK_LAYOUT;
-
-typedef struct tag_xwt_gtk_pane
+typedef struct tag_xwt_gtk_layout
 {
-   GtkWidget *frame;
-   GtkWidget *pane; // main widget
-   // We should not need an owner; leaving it here for future reference
-   // (Maybe option list boxes?)
-   PHB_BASEARRAY owner;
-} XWT_GTK_PANE, *PXWT_GTK_PANE;
+   XWT_GTK_LAYCONTAINER;
+   int iPadding;
+} XWT_GTK_LAYOUT, *PXWT_GTK_LAYOUT;
 
 PXWT_WIDGET xwt_gtk_createButton( PHB_ITEM pSelf );
 PXWT_WIDGET xwt_gtk_createFrameWindow( PHB_ITEM pSelf );
@@ -94,11 +95,12 @@ BOOL xwt_gtk_imageLoad( PXWT_WIDGET xwtData, const char *fname );
 BOOL xwt_gtk_image_setSensible( PXWT_WIDGET wSelf );
 
 BOOL xwt_gtk_layout_create_with_mode( PXWT_WIDGET wWidget, int mode );
-BOOL xwt_gtk_layout_set_box( PXWT_WIDGET wWidget );
-BOOL xwt_gtk_layout_reset_box( PXWT_WIDGET wWidget );
 
-BOOL xwt_gtk_pane_set_box( PXWT_WIDGET wWidget );
-BOOL xwt_gtk_pane_reset_box( PXWT_WIDGET wWidget );
+BOOL xwt_gtk_container_set_box( PXWT_WIDGET wWidget );
+BOOL xwt_gtk_container_reset_box( PXWT_WIDGET wWidget );
+
+void *container_get_mainwidget( void *data );
+void *container_get_topwidget( void *data );
 
 /*** Putting a widget in a frame ****/
 GtkWidget *xwt_gtk_enframe( GtkWidget *framed );

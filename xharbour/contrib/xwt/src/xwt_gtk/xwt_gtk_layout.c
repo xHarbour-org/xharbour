@@ -3,31 +3,13 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_layout.c,v 1.1 2003/04/07 10:27:45 jonnymind Exp $
+   $Id: xwt_gtk_layout.c,v 1.2 2003/04/07 15:41:08 jonnymind Exp $
 
    Layout - Horizontal or vertical layout manager
 */
 #include "hbapi.h"
 #include <xwt_api.h>
 #include <xwt_gtk.h>
-
-static void *layout_get_mainwidget( void *data )
-{
-   PXWT_GTK_LAYOUT lay = (PXWT_GTK_LAYOUT) data;
-   return lay->layout;
-}
-
-static void *layout_get_topwidget( void *data )
-{
-   PXWT_GTK_LAYOUT lay = (PXWT_GTK_LAYOUT) data;
-   if ( lay->frame != NULL)
-   {
-      return lay->frame;
-   }
-
-   return lay->layout;
-}
-
 
 PXWT_WIDGET xwt_gtk_createLayout( PHB_ITEM pSelf )
 {
@@ -39,7 +21,7 @@ PXWT_WIDGET xwt_gtk_createLayout( PHB_ITEM pSelf )
    gtkLayout = ( PXWT_GTK_LAYOUT ) hb_xgrab( sizeof( XWT_GTK_LAYOUT ) );
    gtkLayout->iMode = -1; // still undefined
    gtkLayout->frame = NULL; // no frame for now
-   gtkLayout->layout = NULL; // still not available
+   gtkLayout->container = NULL; // still not available
    gtkLayout->owner = pSelf->item.asArray.value;
 
    gtkLayout->iPadding = 0;
@@ -52,8 +34,8 @@ PXWT_WIDGET xwt_gtk_createLayout( PHB_ITEM pSelf )
    // no widget for now.
    xwtData->widget_data = (void *) gtkLayout;
    xwtData->destructor = hb_xfree;
-   xwtData->get_main_widget = layout_get_mainwidget;
-   xwtData->get_top_widget = layout_get_topwidget;
+   xwtData->get_main_widget = container_get_mainwidget;
+   xwtData->get_top_widget = container_get_topwidget;
 
    return xwtData;
 }
@@ -71,45 +53,14 @@ BOOL xwt_gtk_layout_create_with_mode( PXWT_WIDGET wWidget, int mode  )
    lay->iMode = mode;
    if ( mode == XWT_LM_HORIZ )
    {
-      lay->layout = gtk_hbox_new( FALSE, 0 );
+      lay->container = gtk_hbox_new( FALSE, 0 );
    }
    else
    {
-      lay->layout = gtk_vbox_new( FALSE, 0 );
+      lay->container = gtk_vbox_new( FALSE, 0 );
    }
 
-   gtk_widget_show( lay->layout );
+   gtk_widget_show( lay->container );
 
    return TRUE;
  }
-
-BOOL xwt_gtk_layout_set_box( PXWT_WIDGET wWidget )
-{
-   PXWT_GTK_LAYOUT lay = ( PXWT_GTK_LAYOUT ) wWidget->widget_data;
-
-   //Have we already a box?
-   if ( lay->frame != NULL )
-   {
-      return FALSE;
-   }
-
-   lay->frame = xwt_gtk_enframe( lay->layout );
-   return TRUE;
-}
-
-
-BOOL xwt_gtk_layout_reset_box( PXWT_WIDGET wWidget )
-{
-   PXWT_GTK_LAYOUT lay = (PXWT_GTK_LAYOUT ) wWidget->widget_data;
-
-   //if we haven't a box...
-   if ( lay->frame == NULL )
-   {
-      return FALSE;
-   }
-
-   xwt_gtk_deframe( lay->frame, lay->layout );
-   lay->frame = NULL;
-   return TRUE;
-}
-

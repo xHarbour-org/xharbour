@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.2 2003/04/07 10:27:36 jonnymind Exp $
+ * $Id: Changelog,v 1.3 2003/04/07 15:40:29 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2003-04-07 20:25 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * src/xwt_gtk/xwt_gtk.h
+  + src/xwt_gtk/xwt_gtk_container.c
+  + src/laycontainer.prg
+    + layout and panes have been subclassed with a laycontainer class
+      that implements some abstract behaviors common to all layout
+      like containers (resizing ability over child widgets).
+
+  * src/container.prg
+  * src/layout.prg
+  * src/pane.prg
+  * src/xwt_gtk/xwt_gtk.c
+  * src/xwt_gtk/xwt_gtk_layout.c
+  * src/xwt_gtk/xwt_gtk_pane.c
+    ! Moved some of the function and the methods of this files
+      into the xwt_gtk_container.c and laycontainer.prg
+
+  * include/xwt.ch
+  + src/grid.prg
+  - src/gridpane.prg
+    + Name of XwtGridPane widget has been changed to XwtGrid
 
 2003-04-07 17:46 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * src/layout.prg
@@ -25,7 +47,7 @@
 
   * test/xwt_test.prg
     + Added test for vertical, horizontal, and fixed layouts
-    
+
 
 2003-04-07 12:28 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   - src/hpane.prg

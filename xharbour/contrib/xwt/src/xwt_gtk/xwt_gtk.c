@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.2 2003/04/07 10:27:45 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.3 2003/04/07 15:41:07 jonnymind Exp $
 
    Global declarations, common functions
 */
@@ -265,30 +265,16 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       return FALSE;
 
       case XWT_PROP_BOX:
-         switch( wWidget->type )
-         {
-            case XWT_TYPE_LAYOUT:
-               if ( prop->value.setting )
-               {
-                  return xwt_gtk_layout_set_box( wWidget );
-               }
-               else
-               {
-                  return xwt_gtk_layout_reset_box( wWidget );
-               }
-            break;
-
-            case XWT_TYPE_PANE:
-               if ( prop->value.setting )
-               {
-                  return xwt_gtk_pane_set_box( wWidget );
-               }
-               else
-               {
-                  return xwt_gtk_pane_reset_box( wWidget );
-               }
-            break;
-         }
+         if( wWidget->type == XWT_TYPE_PANE || wWidget->type == XWT_TYPE_LAYOUT )
+            if ( prop->value.setting )
+            {
+               return xwt_gtk_container_set_box( wWidget );
+            }
+            else
+            {
+               return xwt_gtk_container_reset_box( wWidget );
+            }
+         break;
       return FALSE;
    }
 
@@ -647,48 +633,5 @@ gboolean xwt_idle_function( gpointer data )
 void *xwt_gtk_get_topwidget_neuter( void *data )
 {
    return data;
-}
-
-
-GtkWidget *xwt_gtk_enframe( GtkWidget *framed )
-{
-   GtkWidget *parent;
-   GtkWidget *frame;
-
-   frame = gtk_frame_new( NULL );
-   parent = gtk_widget_get_parent( framed );
-
-   //Moving the new frame to the old parent if necessary
-   if ( parent != NULL )
-   {
-      g_object_ref( framed );
-      gtk_container_remove( GTK_CONTAINER( parent ) , framed );
-      gtk_container_add( GTK_CONTAINER( parent ), frame );
-   }
-   gtk_container_add( GTK_CONTAINER( frame ), framed );
-   if ( parent != NULL )
-   {
-      g_object_unref( framed );
-   }
-   gtk_widget_show( frame );
-
-   return frame;
-}
-
-
-void xwt_gtk_deframe( GtkWidget *frame, GtkWidget *framed )
-{
-   GtkWidget *parent;
-   parent = gtk_widget_get_parent( frame );
-
-   g_object_ref( framed );
-   gtk_container_remove( GTK_CONTAINER( frame ), framed );
-
-   if ( parent != NULL )
-   {
-      gtk_container_remove( GTK_CONTAINER( parent ) , frame );
-      gtk_container_add( GTK_CONTAINER( parent ), framed );
-   }
-   gtk_widget_destroy( frame );
 }
 
