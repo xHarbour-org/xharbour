@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.27 2004/08/26 13:25:14 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.28 2004/10/14 13:06:07 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -945,7 +945,7 @@ METHOD FieldGet( nField, nRow ) CLASS TPQquery
                 tmp := strtran( tmp, 'mm', substr(result, 6, 2) )
                 tmp := strtran( tmp, 'yyyy', left(result, 4) )
 
-                cDateFmt := Set(_SET_DATEFORMAT, 'yyy-mm-dd')
+                cDateFmt := Set(_SET_DATEFORMAT, 'yyyy-mm-dd')
                 result := CtoD(tmp)
                 Set(_SET_DATEFORMAT, cDateFmt)
             else
