@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.900 2003/03/31 16:29:28 lculik Exp $
+ * $Id: ChangeLog,v 1.901 2003/04/01 00:42:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-01 13:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * makefile.vc
+    * Corrected minor typo in comment.
+
+  * makefile.nt
+    * Added support for samples.lib and hbodbc.lib
+
+  * source/odbc/odbc.c
+    * Added missing type casts needed by MSVC.
 
 2003-03-31 16:41 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c

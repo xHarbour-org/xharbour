@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.38 2003/03/29 17:09:55 paultucker Exp $
+# $Id: makefile.vc,v 1.39 2003/03/29 22:48:30 lculik Exp $
 #
 
 #
@@ -197,7 +197,7 @@ LIBLIST = \
    $(VM_LIB) \
    $(HB_GT_LIB) \
    $(SAMPLES_LIB) \
-   $(ODBC_LIB) 
+   $(ODBC_LIB)
 
 
 #
@@ -713,7 +713,7 @@ GTWIN_LIB_OBJS = \
    $(OBJ_DIR)\mousewin.obj
 
 #
-# SAMPLEX.LIB rules
+# SAMPLES.LIB rules
 #
 {$(SAMPLES_DIR)}.c{$(OBJ_DIR)}.obj:
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<

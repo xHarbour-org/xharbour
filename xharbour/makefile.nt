@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.17 2003/03/21 21:49:11 ronpinkas Exp $
+# $Id: makefile.nt,v 1.18 2003/03/29 17:09:55 paultucker Exp $
 #
 
 #
@@ -113,6 +113,8 @@ HBTEST_DIR   = utils\hbtest
 HBDOC_DIR    = utils\hbdoc
 HBPP_DIR     = utils\hbpp
 HBMAKE_DIR   = utils\hbmake
+ODBC_DIR     = source\odbc
+SAMPLES_DIR  = source\clipsamp
 
 !ifdef HB_DOC_PDF
 # don't indent definitions
@@ -148,6 +150,8 @@ PP_LIB       = $(LIB_DIR)\pp.lib
 RDD_LIB      = $(LIB_DIR)\rdd.lib
 RTL_LIB      = $(LIB_DIR)\rtl.lib
 VM_LIB       = $(LIB_DIR)\vm.lib
+ODBC_LIB     = $(LIB_DIR)\hbodbc.lib
+SAMPLES_LIB  = $(LIB_DIR)\samples.lib
 
 GTCGI_LIB    = $(LIB_DIR)\gtcgi.lib
 GTDOS_LIB    = $(LIB_DIR)\gtdos.lib
@@ -214,7 +218,9 @@ LIBLIST = \
    $(DBFNTX_LIB) \
    $(NULSYS_LIB) \
    $(VM_LIB) \
-   $(HB_GT_LIB)
+   $(HB_GT_LIB) \
+   $(SAMPLES_LIB) \
+   $(ODBC_LIB)
 
 #
 # macro.lib needs to be listed twice
@@ -742,6 +748,36 @@ GTWIN_LIB_OBJS = \
    $(OBJ_DIR)\mousewin.obj
 
 #
+# SAMPLE.LIB rules
+#
+{$(SAMPLES_DIR)}.c{$(OBJ_DIR)}.obj:
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+SAMPLES_LIB_OBJS =  \
+   $(OBJ_DIR)\environ.obj \
+   $(OBJ_DIR)\date.obj   \
+   $(OBJ_DIR)\dbf.obj    \
+   $(OBJ_DIR)\gauge.obj  \
+   $(OBJ_DIR)\num.obj    \
+   $(OBJ_DIR)\stack.obj   \
+   $(OBJ_DIR)\status.obj \
+   $(OBJ_DIR)\time.obj
+
+#
+# ODBC.LIB rules
+#
+{$(ODBC_DIR)}.c{$(OBJ_DIR)}.obj:
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+{$(ODBC_DIR)}.prg{$(OBJ_DIR)}.obj:
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $*.c
+
+ODBC_LIB_OBJS =       \
+      $(OBJ_DIR)\odbc.obj \
+      $(OBJ_DIR)\todbc.obj
+
+#
 # Our default target
 #
 
@@ -762,6 +798,8 @@ all: \
    $(DBFNTX_LIB) \
    $(DBFCDX_LIB) \
    $(HB_GT_LIBS) \
+   $(SAMPLES_LIB) \
+   $(ODBC_LIB) \
    $(HBRUN_EXE) \
    $(HBPP_EXE) \
    $(HBTEST_EXE) \
@@ -786,6 +824,8 @@ all: \
    $(DBFNTX_LIB) \
    $(DBFCDX_LIB) \
    $(HB_GT_LIBS) \
+   $(SAMPLES_LIB) \
+   $(ODBC_LIB) \
    $(HBRUN_EXE) \
    $(HBPP_EXE) \
    $(HBTEST_EXE) \
@@ -997,6 +1037,12 @@ $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
    lib /out:$@ $**
 
 $(GTDOS_LIB) : $(GTDOS_LIB_OBJS)
+   lib /out:$@ $**
+
+$(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
+   lib /out:$@ $**
+
+$(ODBC_LIB) : $(ODBC_LIB_OBJS)
    lib /out:$@ $**
 
 #
