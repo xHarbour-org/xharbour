@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbchecksum.c,v 1.1 2003/02/23 20:13:38 jonnymind Exp $
+ * $Id: hbcrc32.c,v 1.1 2003/05/20 00:33:40 lculik Exp $
  */
 
 /*
@@ -70,7 +70,7 @@
 #include "hbapierr.h"
 
 #define local static
-
+#define Z_NULL 0
 #ifdef DYNAMIC_CRC_TABLE
 
 static int crc_table_empty = 1;
@@ -186,7 +186,7 @@ static const ULONG crc_table[256] = {
 /* =========================================================================
  * This function can be used by asm versions of crc32()
  */
-const ULONG * ZEXPORT get_crc_table()
+const ULONG * get_crc_table()
 {
 #ifdef DYNAMIC_CRC_TABLE
   if (crc_table_empty) make_crc_table();
@@ -201,7 +201,7 @@ const ULONG * ZEXPORT get_crc_table()
 #define DO8(buf)  DO4(buf); DO4(buf);
 
 /* ========================================================================= */
-ULONG HB_EXPORT crc32( ULONG adler, const BYTE *buf, UINT len){
+ULONG HB_EXPORT crc32( ULONG crc, const BYTE *buf, UINT len){
     if (buf == Z_NULL) return 0L;
 #ifdef DYNAMIC_CRC_TABLE
     if (crc_table_empty)
