@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.66 2004/11/21 21:44:27 druzus Exp $
+ * $Id: fm.c,v 1.67 2004/12/28 06:39:24 druzus Exp $
  */
 
 /*
@@ -92,6 +92,11 @@
 #ifndef HB_FM_STATISTICS
 #  undef HB_PARANOID_MEM_CHECK
 #endif
+
+#if defined(__EXPORT__) && !defined(HB_FM_WIN32_ALLOC)
+   #define HB_FM_WIN32_ALLOC
+#endif
+
 #ifndef HB_OS_WIN_32
 #  undef HB_FM_WIN32_ALLOC
 #endif

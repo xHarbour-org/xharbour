@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3866 2005/02/24 15:31:54 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3867 2005/02/25 10:43:39 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-02-25 08:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/vm/fm.c
+    ! define HB_FM_WIN32_ALLOC when building DLL. This ensures consistent
+      memory management because programs will use the system's one.
+      Now, for a test case, I have tested thoroughly the interchangeability
+      among Borland's harbour.dll and MSVC's one. Without defining this one,
+      hb_xgrab always fail in allocating memory when a BCC program access
+      MSVC DLL and vice versa. Now the symptom has gone.
+      Please test with a complex program (xbscript.prg will do), before and
+      after this change. The benefit is obvious. Note : in order to have the
+      interchangeability, we have to compile MSVC DLL with additional
+      HB_FUNC_NO_DECORATION flag, else DLL will have mangled symbols which
+      are impossible to access from BCC programs.
+
 2005-02-25 17:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * hrbdll.pc
     * /NOENTRY flag caused DLL not working. Removed.
