@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.142 2005/01/30 06:45:45 druzus Exp $
+ * $Id: dbcmd.c,v 1.143 2005/02/24 10:44:04 andijahja Exp $
  */
 
 /*
@@ -94,9 +94,7 @@ HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_DBCMD )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_vm_SymbolInit_DBCMD
-#elif defined(__DMC__)
-   static int hb_vm_auto_SymbolInit_DBCMD = hb_vm_SymbolInit_DBCMD();
-#elif defined(_MSC_VER)
+#elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
       #pragma comment( linker, "/Merge:.CRT=.data" )
