@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2947 2004/05/17 14:20:18 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.2948 2004/05/17 21:31:23 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-17 23:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed Blockify to NOT process an already CodeBlock <exp>.
+
+    /*
+       Clipper does NOT Blockify list of <exp,...> if FIRST exp is a CodeBlock.
+       I believe this is a BUG, but the situation itslef is very odd, and this may
+       very well have been a known issue that was not worth addressing. So I did not
+       address it either.
+    */
 
 2004-05-17 23:30 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
    * source/rtl/teditor.prg

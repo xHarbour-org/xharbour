@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.150 2004/05/08 05:26:06 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.151 2004/05/09 11:00:46 ronpinkas Exp $
  */
 
 /*
@@ -5067,29 +5067,69 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
     }
     else if( patttype == '1' )          /* list match marker */
     {
+       /*
+         2005-05-17 Ron Pinkas
+         Clipper only checks the FIRST item in the list - I belive this to be a BUG, but...
+        */
+       if( *expreal == '{' )
+       {
+          char *pTmp = expreal + 1;
+
+          while( isspace( *pTmp ) )
+          {
+             pTmp++;
+          }
+
+          if( *pTmp == '|' )
+          {
+             hb_pp_Stuff( expreal, ptro, lenreal, 4, lenres );
+             break;
+          }
+       }
+
        hb_pp_Stuff( "", ptro, 0, 4, lenres );
        lenres -= 4;
        rmlen = 0;
+
        do
        {
           ifou = md_strAt( ",", 1, expreal, FALSE, TRUE, FALSE, FALSE );
-          lenitem = (ifou)? ifou-1:lenreal;
+          lenitem = (ifou)? ifou - 1 : lenreal;
+
           if( *expreal != '\0' )
           {
-             i = (ifou)? 5:4;
+             i = (ifou) ? 5 : 4;
              hb_pp_Stuff( "{||},", ptro, i, 0, lenres );
-             hb_pp_Stuff( expreal, ptro+3, lenitem, 0, lenres+i );
+             hb_pp_Stuff( expreal, ptro + 3, lenitem, 0, lenres + i );
              ptro += i + lenitem;
              rmlen += i + lenitem;
           }
+
           expreal += ifou;
           lenreal -= ifou;
        }
        while( ifou > 0 );
     }
-    else if( lenreal && *expreal == '{' )
+    else if( *expreal == '{' )
     {
-       hb_pp_Stuff( expreal, ptro, lenreal, 4, lenres );
+       char *pTmp = expreal + 1;
+
+       while( isspace( *pTmp ) )
+       {
+          pTmp++;
+       }
+
+       // 2005-05-17 Ron Pinkas: Clipper does NOT blockify if <exp> is *already* a Codeblock!
+       if( *pTmp == '|' )
+       {
+          hb_pp_Stuff( expreal, ptro, lenreal, 4, lenres );
+       }
+       else
+       {
+          hb_pp_Stuff( "{||}", ptro, 4, 4, lenres );
+          hb_pp_Stuff( expreal, ptro+3, lenreal, 0, lenres );
+          rmlen = lenreal + 4;
+       }
     }
     else
     {
@@ -5097,7 +5137,9 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
        hb_pp_Stuff( expreal, ptro+3, lenreal, 0, lenres );
        rmlen = lenreal + 4;
     }
+
     break;
+
   case '5':  /* Logify result marker  */
     rmlen = 3;
     if( !lenreal )
