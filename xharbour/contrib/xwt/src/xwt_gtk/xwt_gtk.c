@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.9 2003/04/17 23:42:17 lculik Exp $
+   $Id: xwt_gtk.c,v 1.10 2003/04/18 13:28:50 jonnymind Exp $
 
    Global declarations, common functions
 */
@@ -109,6 +109,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 
             case XWT_TYPE_BUTTON:
             case XWT_TYPE_RADIOBUTTON:
+            case XWT_TYPE_CHECKBOX:
                gtk_button_set_label (GTK_BUTTON(wSelf), prop->value.text );
             return TRUE;
 
@@ -363,6 +364,14 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
       return FALSE;
 
+      case XWT_PROP_STATUS:
+         if ( wWidget->type == XWT_TYPE_CHECKBOX || wWidget->type == XWT_TYPE_RADIOBUTTON)
+         {
+            gtk_toggle_button_set_active( GTK_BUTTON( wSelf ), (gboolean) prop->value.setting );
+            return TRUE;
+         }
+      return FALSE;
+
       case XWT_PROP_RADIOGROUP:
          if ( wWidget->type == XWT_TYPE_RADIOBUTTON)
          {
@@ -491,6 +500,7 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 
             case XWT_TYPE_BUTTON:
             case XWT_TYPE_RADIOBUTTON:
+            case XWT_TYPE_CHECKBOX:
                prop->value.text = gtk_button_get_label (GTK_BUTTON(wSelf) );
             return TRUE;
 
@@ -616,6 +626,13 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
          return TRUE;
 
+      case XWT_PROP_STATUS:
+         if ( wWidget->type == XWT_TYPE_CHECKBOX || wWidget->type == XWT_TYPE_RADIOBUTTON)
+         {
+            prop->value.setting = (gboolean) gtk_toggle_button_get_active( GTK_BUTTON( wSelf ) );
+            return TRUE;
+         }
+      return FALSE;
 
       case XWT_PROP_BOX:
          if( wWidget->type == XWT_TYPE_LAYOUT ||  wWidget->type == XWT_TYPE_PANE || wWidget->type == XWT_TYPE_GRID )
@@ -654,6 +671,7 @@ PXWT_WIDGET xwt_drv_create(  PHB_ITEM pSelf, int type )
       case XWT_TYPE_GRID:  return xwt_gtk_createGrid( pSelf );
       case XWT_TYPE_VIEWPORT:  return xwt_gtk_createViewPort( pSelf );
       case XWT_TYPE_RADIOBUTTON:  return xwt_gtk_createRadioButton( pSelf );
+      case XWT_TYPE_CHECKBOX:  return xwt_gtk_createCheckbox( pSelf );
       case XWT_TYPE_FILESEL:  return xwt_gtk_createFileSelection( pSelf );
 
    }

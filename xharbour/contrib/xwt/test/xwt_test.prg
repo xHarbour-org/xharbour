@@ -3,6 +3,7 @@
 GLOBAL oFileSel
 GLOBAL oOtherBox
 
+#xcommand ? <data,...> => OutStd( <data>, HB_OSNewLine() )
 
 PROCEDURE MAIN()
    LOCAL oWindow, oButton, oMenuItem, oMenu, oMenuHelp
@@ -48,10 +49,13 @@ PROCEDURE MAIN()
    oOtherBox := XwtTextbox():New("Another box", 10, 40 )
    oPane:Add( oOtherBox )
    oPane:SetBox( .T.,"A fixed pane" )
+   oPane:Add( XWTCheckbox():New("Ckbox 1", .T., 10,75 ) )
+   oPane:Add( XWTCheckbox():New("Ckbox 2", .T., 110,75 ) )
    oVLay:Add( oPane )
 
    /* A beautiful GRID */
    oGrid := XwtGrid():New(2,3)
+   
    oLabel := XwtLabel():New("Field label")
 
    oGrid:setPadding( 2, 10 )
@@ -133,17 +137,17 @@ RETURN
 
 
 FUNCTION WindowReceive( oEvent )
-OutStd( "Received event at top level ", oEvent:nType, " from ", oEvent:oSender:GetText(), HB_OSNewLine())
+?  "Received event at top level ", oEvent:nType, " from ", oEvent:oSender:GetText()
 RETURN .F.
 
 FUNCTION DumpEvent( oEvent )
-OutStd( "Event type: ", oEvent:nType, " from ", oEvent:oSender:GetText(), HB_OSNewLine())
-OutStd(  Len ( oEvent:aParams ), HB_OSNewLine())
+?  "Event type: ", oEvent:nType, " from ", oEvent:oSender:GetText()
+?   Len ( oEvent:aParams )
    IF Len ( oEvent:aParams ) == 1
-OutStd( "Parameter ", oEvent:aParams[1], HB_OSNewLine())
+?  "Parameter ", oEvent:aParams[1]
    ELSE
       IF Len( oEvent:aParams ) == 2
-OutStd( "Parameters ", oEvent:aParams[1], " ", oEvent:aParams[2], HB_OSNewLine())
+?  "Parameters ", oEvent:aParams[1], " ", oEvent:aParams[2]
       ENDIF
    ENDIF
    IF oEvent:nType == XWT_E_CLICKED
@@ -158,7 +162,7 @@ FUNCTION FileEvent( oEvent )
    //Filesel can't be local!
    //Local oFileSel
 
-OutStd( "Menu activated: ", oEvent:oSender:nId, HB_OSNewLine())
+?  "Menu activated: ", oEvent:oSender:nId
    IF oEvent:oSender:nId == 1
       oFileSel := XWTFileSel():New( "Open file" )
       oFileSel:SetFile( "test.file" )
@@ -166,15 +170,15 @@ OutStd( "Menu activated: ", oEvent:oSender:nId, HB_OSNewLine())
       // Notice: after a "do_modal", the object will not exist anymore
       cFileName := oFileSel:DoModal()
       IF cFileName == ""
-OutStd( "Canceled!", HB_OSNewLine())
+?  "Canceled!"
       ELSE
-OutStd( "FILENAME: ", cFileName, HB_OSNewLine())
+?  "FILENAME: ", cFileName
       ENDIF
    ENDIF
 RETURN .F.
 
 FUNCTION BoxModified( oEvent )
-OutStd( "Text entered in box: ", oEvent:oSender:getText(), HB_OSNewLine())
+?  "Text entered in box: ", oEvent:oSender:getText()
    oEvent:oSender:SetText( "Reset" )
    oOtherBox:SetFocus()
 RETURN .F.
@@ -182,11 +186,11 @@ RETURN .F.
 
 FUNCTION InputChanged( oEvent )
    Local aField
-OutStd( "Input has been set:", HB_OSNewLine())
+?  "Input has been set:"
 
    FOR EACH aField IN oEvent:oSender:aInputFields
-OutStd( aField[1], ": ", aField[2], HB_OSNewLine())
+?  aField[1], ": ", aField[2]
    NEXT
 
-OutStd( "", HB_OSNewLine())
+?  ""
 RETURN

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.7 2003/04/14 22:35:07 jonnymind Exp $
+   $Id: xwt.ch,v 1.8 2003/04/17 23:42:17 lculik Exp $
 
    Definitions
 */
@@ -143,6 +143,8 @@
 
 #define XWT_TYPE_BUTTON   10
 #define XWT_TYPE_RADIOBUTTON   11
+#define XWT_TYPE_CHECKBOX 12
+
 #define XWT_TYPE_LABEL    20
 #define XWT_TYPE_MENU     30
 #define XWT_TYPE_MENUITEM 31
