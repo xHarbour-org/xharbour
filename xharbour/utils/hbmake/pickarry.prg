@@ -91,6 +91,7 @@ if Len(ADefault) >0
       IN_ARRAY[ x ]  := stuff( IN_ARRAY[ x ], 2, 1, if( lIsChecked, ' ', 'û' ) )
    tracelog('"'+IN_ARRAY[ X ]+'"')
       OUT_ARRAY[ x ] := stuff( OUT_ARRAY[ x ], 1, 1, if( lIsChecked, ' ', 'û' ) )
+SOMEITEMS ++
    else
       cItem:=substr(cItem,rat('\',cItem)-1)
 tracelog(citem)
@@ -98,8 +99,9 @@ tracelog(citem)
 tracelog(x)
       if x != 0
       IN_ARRAY[ x ]  := stuff( IN_ARRAY[ x ], 2, 1, if( lIsChecked, ' ', 'û' ) )
-   tracelog('"'+IN_ARRAY[ X ]+'"')
+      tracelog('"'+IN_ARRAY[ X ]+'"')
       OUT_ARRAY[ x ] := stuff( OUT_ARRAY[ x ], 1, 1, if( lIsChecked, ' ', 'û' ) )
+SOMEITEMS ++
        endif
     endif
    next   
