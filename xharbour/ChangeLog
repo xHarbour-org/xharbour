@@ -9,7 +9,7 @@
 */
 
 
-2003-02-16 01:00 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
+2003-02-16 01:00 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/hbserial.prg
   * source/rtl/hbsrlraw.c
     + Added HB_DeserialBegin() and HB_DeserialNext() for easier
@@ -78,7 +78,7 @@
      % Renamed Function ADSROLLBACKTRANSACTION() to ROLLBACK() Per request
      + ADSDDCREATE() and ADSCONNECT60() function added to ADS 6.0 compile Section
 
-2003-02-14 18:10 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
+2003-02-14 18:10 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/Makefile
   + source/rtl/hbserial.prg
   + source/rtl/hbsrlraw.c
@@ -115,7 +115,7 @@
   * source/rdd/dbfcdx/dbfcdx1.c
     ! Fixed hb_cdxOrderListFocus() to not change the Found() status
 
-2003-02-13 02:20 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
+2003-02-13 02:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   ! source/rdd/Makefile
     ! RDD was not compiling in MT mode (mingw)
 
@@ -161,7 +161,7 @@
       Replace For n:=1 to Len(Array) with FOR EACH info IN Array when Possible
       Source Code Totally Reformated
 
-2003-02-12 12:20 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
+2003-02-12 12:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   ! config/linux/gcc.cf
   ! config/w32/mingw32.cf
     ! fixed making of samples directory (I wonder how this has
@@ -170,7 +170,7 @@
     - Removed pthread from libs; now pthread is added by the makefiles
       on need.
 
-2003-02-12 11:35 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
+2003-02-12 11:35 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/hbcompress.c
     ! Strings created on the fly are now returned with
       retcAdoptRaw, and thus they don't issue any warning on
@@ -263,7 +263,7 @@
    * contrib/what32/make_vc.bat 
      ! Now compiles with MSVC
 
-2003-02-12 02:10 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
+2003-02-12 02:10 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/Makefile
   + source/rtl/hbcompress.c
     + Added compression routines based on a xharbour rearrangement
@@ -404,12 +404,12 @@
     * Fixed declarations in body compile error.
     * Minorformating and optimization.
 
-2003-02-07 15:50 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
+2003-02-07 15:50 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/inkey.c
     ! Keyboard chr( 0 ) was hanging the next inkey() instead of cleaning
       the input buffer. Now it is fixed.
 
-2003-02-07 11:30 UTC+0100 Giancarlo Niccoai <gian@niccolai.ws>
+2003-02-07 11:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * include/inet.h
     ! Fixed a misinclude that appeared in redhat 6.0
 
