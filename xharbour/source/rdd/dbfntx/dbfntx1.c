@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.46 2003/06/19 02:44:49 druzus Exp $
+ * $Id: dbfntx1.c,v 1.47 2003/06/21 02:03:07 lculik Exp $
  */
 
 /*
@@ -2461,7 +2461,7 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
    pArea = pIndex->Owner;
 
 #ifndef HB_CDP_SUPPORT_OFF
-   s_cdpage = (NTXAREAP) pArea->cdPage;
+   s_cdpage = pArea->cdPage;
 #endif
 
    pTag = pIndex->CompoundTag;
