@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.27 2001/06/04 21:46:23 dholm Exp $
+ * $Id: ppcomp.c,v 1.1.1.1 2001/12/21 10:43:16 ronpinkas Exp $
  */
 
 /*
@@ -244,9 +244,6 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
   if( hb_comp_iLineINLINE && hb_pp_bInline == 0 )
   {
      hb_comp_iLine = hb_comp_iLinePRG + ( hb_comp_iLine - hb_comp_iLineINLINE );
-     #ifndef SIMPLEX
-        hb_comp_iLine++;
-     #endif
      hb_comp_iLineINLINE = 0;
   }
 
