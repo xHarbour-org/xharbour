@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.133 2004/04/03 01:51:01 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.134 2004/04/03 11:47:11 jonnymind Exp $
  */
 
 /*
@@ -633,6 +633,7 @@ extern PHB_ITEM hb_idleDelFunc( ULONG ulID ); /* Deletes a prevuiously added cod
 
 typedef struct HB_BACKGROUNDTASK_
 {
+   ULONG    ulTaskID;     /* task identifier */
    PHB_ITEM pTask;        /* pointer to the task item */
    double   dSeconds;     /* internal - last time this task has gone */
    int      millisec;     /* milliseconds after this task must run */

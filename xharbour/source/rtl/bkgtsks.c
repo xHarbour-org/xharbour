@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.8 2004/03/18 23:07:32 fsgiudice Exp $
+ * $Id: bkgtsks.c,v 1.9 2004/04/02 01:35:20 fsgiudice Exp $
  */
 
 /*
@@ -115,6 +115,7 @@ ULONG hb_backgroundAddFunc( PHB_ITEM pBlock, int nMillisec, BOOL bActive )
 
    pBkgTask = ( PHB_BACKGROUNDTASK ) hb_xgrab( sizeof( HB_BACKGROUNDTASK ) );
 
+   pBkgTask->ulTaskID = ( pBkgTask->ulTaskID == NULL ? (ULONG) 1 : ++pBkgTask->ulTaskID );
    pBkgTask->pTask    = hb_itemNew( pBlock );
    pBkgTask->dSeconds = hb_secondsCPU( 3 );
    pBkgTask->millisec = nMillisec;
@@ -134,14 +135,16 @@ ULONG hb_backgroundAddFunc( PHB_ITEM pBlock, int nMillisec, BOOL bActive )
    /* return a pointer as a handle to this Background task
    */
 
-   if ( HB_IS_ARRAY( pBlock ) )
-   {
-      return ( ULONG ) pBlock->item.asArray.value;    /* TODO: access to pointers from harbour code */
-   }
-   else
-   {
-      return ( ULONG ) pBlock->item.asBlock.value;    /* TODO: access to pointers from harbour code */
-   }
+   return pBkgTask->ulTaskID;
+
+   //if ( HB_IS_ARRAY( pBlock ) )
+   //{
+   //   return ( ULONG ) pBlock->item.asArray.value;    /* TODO: access to pointers from harbour code */
+   //}
+   //else
+   //{
+   //   return ( ULONG ) pBlock->item.asBlock.value;    /* TODO: access to pointers from harbour code */
+   //}
 
 }
 
@@ -271,11 +274,12 @@ PHB_ITEM hb_backgroundDelFunc( ULONG ulID )
       pBkgTask = s_pBackgroundTasks[ iTask ];
       pItem = pBkgTask->pTask;
 
-      if( ( pItem->type == HB_IT_BLOCK &&
-            ulID == ( ULONG ) pItem->item.asBlock.value ) ||
-          ( pItem->type == HB_IT_ARRAY &&
-            ulID == ( ULONG ) pItem->item.asArray.value ) )
+      //if( ( pItem->type == HB_IT_BLOCK &&
+      //      ulID == ( ULONG ) pItem->item.asBlock.value ) ||
+      //    ( pItem->type == HB_IT_ARRAY &&
+      //      ulID == ( ULONG ) pItem->item.asArray.value ) )
 
+      if( ulID == pBkgTask->ulTaskID )
       {
          --s_uiBackgroundMaxTask;
          hb_itemRelease( pItem );
@@ -285,7 +289,7 @@ PHB_ITEM hb_backgroundDelFunc( ULONG ulID )
          {
             if( iTask != s_uiBackgroundMaxTask )
             {
-               memcpy( &s_pBackgroundTasks[ iTask ], &s_pBackgroundTasks[ iTask + 1 ],
+               memmove( &s_pBackgroundTasks[ iTask ], &s_pBackgroundTasks[ iTask + 1 ],
                         sizeof( HB_BACKGROUNDTASK ) * ( s_uiBackgroundMaxTask - iTask ) );
             }
             s_pBackgroundTasks = ( PHB_BACKGROUNDTASK * ) hb_xrealloc( s_pBackgroundTasks, sizeof( HB_BACKGROUNDTASK ) * s_uiBackgroundMaxTask );
@@ -316,14 +320,16 @@ PHB_BACKGROUNDTASK hb_backgroundFind( ULONG ulID )
       iTask = 0;
       while( iTask < s_uiBackgroundMaxTask )
       {
-         PHB_ITEM pItem;
+         //PHB_ITEM pItem;
          pBkgTask = s_pBackgroundTasks[ iTask ];
-         pItem = pBkgTask->pTask;
+         //pItem = pBkgTask->pTask;
 
-         if( ( pItem->type == HB_IT_BLOCK &&
-               ulID == ( ULONG ) pItem->item.asBlock.value ) ||
-             ( pItem->type == HB_IT_ARRAY &&
-               ulID == ( ULONG ) pItem->item.asArray.value ) )
+         //if( ( pItem->type == HB_IT_BLOCK &&
+         //      ulID == ( ULONG ) pItem->item.asBlock.value ) ||
+         //    ( pItem->type == HB_IT_ARRAY &&
+         //      ulID == ( ULONG ) pItem->item.asArray.value ) )
+
+         if( ulID == pBkgTask->ulTaskID )
          {
              return pBkgTask;
          }
