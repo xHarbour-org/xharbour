@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.23 2003/07/13 22:21:25 andijahja Exp $
+ * $Id: hbpcode.c,v 1.24 2003/12/04 09:26:54 druzus Exp $
  */
 
 /*
@@ -367,7 +367,7 @@ extern BOOL hb_comp_iGenVarList;
 extern FILE *hb_comp_pCodeList;
 static PCODELIST pCodeFirst = NULL;
 
-static PCODELIST hb_compPCodeList( PCODELIST pCodeCurrent, PCODELIST pCodeLast, char* pCodeName )
+static PCODELIST hb_compPCodeList( PCODELIST pCodeCurrent, char* pCodeName )
 {
    PCODELIST pCheck = pCodeFirst;
    BOOL bFound = FALSE;
@@ -388,6 +388,8 @@ static PCODELIST hb_compPCodeList( PCODELIST pCodeCurrent, PCODELIST pCodeLast, 
 
    if ( ! bFound )
    {
+      PCODELIST pCodeLast = (PCODELIST) hb_xgrab( sizeof( CODELIST ) );
+
       pCodeLast->szName = pCodeName;
       pCodeLast->iUsed = 1;
       pCodeLast->pNext = NULL;
@@ -444,16 +446,11 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
       {
          if( bWriteList )
          {
-            PCODELIST pCodeLast = (PCODELIST) hb_xgrab( sizeof( PCODELIST ) );
+            pCodeCurrent = hb_compPCodeList( pCodeCurrent, pCodeList[opcode] );
 
-            if( pCodeFirst )
+            if( !pCodeFirst )
             {
-               pCodeCurrent = hb_compPCodeList( pCodeCurrent, pCodeLast, pCodeList [ opcode ] );
-            }
-            else
-            {
-               pCodeFirst = hb_compPCodeList( pCodeCurrent, pCodeLast, pCodeList [ opcode ] );
-               pCodeCurrent = pCodeFirst;
+               pCodeFirst = pCodeCurrent;
             }
          }
 
@@ -468,7 +465,7 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
                usSkip = pCall( pFunc, ulPos, cargo );
 
          }
-         ulPos += usSkip;
+         ulPos += (ULONG) usSkip;
       }
       else
       {
@@ -479,25 +476,19 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
 
    if( bWriteList )
    {
-      PCODELIST pCodeTemp = pCodeFirst;
+      PCODELIST pCodeTemp;
+
+      pCodeTemp = pCodeFirst;
       while( pCodeTemp )
       {
          ipCodeCount ++;
          ipCodeUsed += pCodeTemp->iUsed ;
          fprintf( hb_comp_pCodeList, "%s=%i\n", pCodeTemp->szName, pCodeTemp->iUsed );
          pCodeTemp = pCodeTemp->pNext;
+         hb_xfree( ( void * ) pCodeFirst );
+         pCodeFirst = pCodeTemp;
       }
       fprintf( hb_comp_pCodeList, "TYPES=%i\nCALLS=%i\n\n", ipCodeCount, ipCodeUsed );
-
-      pCodeTemp = pCodeFirst;
-      while( pCodeTemp )
-      {
-          pCodeFirst = pCodeTemp->pNext;
-          hb_xfree( ( void * ) pCodeTemp );
-          pCodeTemp = pCodeFirst;
-      }
-
-      pCodeFirst = NULL;
    }
 }
 
