@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.ch,v 1.7 2002/06/21 19:18:27 ronpinkas Exp $
+ * $Id: cstruct.ch,v 1.8 2002/07/23 07:22:34 ronpinkas Exp $
  */
 
 /*
@@ -85,8 +85,9 @@
    // Exclude from C compilation
    #ifdef _SET_CH
       #command C STRUCTURE <!stru!> [ALIGN <align> ] => ;
-               INIT PROCEDURE __INIT_<stru>; __ActiveStructure( #<stru>, <align> ) ; ;
-               #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ) ; ;
+               #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ); ;
+               INIT PROCEDURE __INIT_<stru>; ;
+                  __ActiveStructure( #<stru>, <align> )
 
       // <elem> instead of <!elem!> to allow ElemName[n] syntax.
       #command MEMBER <elem> IS <type> => HB_Member( #<elem>, <type> )
@@ -106,7 +107,12 @@
       #command MEMBER <!elem!> AS <!stru!> => ;
                HB_Member( #<elem>, HB_CStructureId( #<stru>, .F. ) )
 
-      #command END C STRUCTURE [<!stru!>] => ; __ActiveStructure( NIL ); RETURN
+      #command END C STRUCTURE [<!stru!>] => ; ;
+                  __ActiveStructure( NIL ); ;
+               RETURN
+
+      #command IMPORT C STRUCTURE <!stru!> => ;
+               #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} );
 
       //----------------------------- C Syntax support ---------------------------------//
       /* NOTES:

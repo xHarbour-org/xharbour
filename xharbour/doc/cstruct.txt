@@ -38,26 +38,26 @@ Syntax:
        // This is DETACHED - Note AS clause.
        Member pNext    AS MyStructure
      END C STRUCTURE
- 
+
 
    Usage:
    ------
 
    <lValue> IS <strucName>
 
-     Example: 
+     Example:
      --------
        LOCAL oStructure IS MyStructure
 
    <lValue> IS <strucName> := {...}
 
-     Example: 
+     Example:
      --------
        LOCAL oStructure IS MyStructure := { "Tom", 10, 35, 1.10, { { 65, 0 }, 10000 } }
 
    <lValue> IS <strucName> INIT|FROM {...}
 
-     Example: 
+     Example:
      --------
        LOCAL oStructure IS MyStructure INIT { "Tom", 10, 35, 1.10, { { 65, 0 }, 10000 } }
 
@@ -65,10 +65,19 @@ Syntax:
 
    <strucObj>:<memberName>
 
-     Example: 
+     Example:
      --------
        oStructure:pNext IS MyStructure
 
+
+   Usage in other PRG files:
+   -------------------------
+
+   IMPORT C STRUCTURE <strucName>
+
+     Example:
+     --------
+       IMPORT C STRUCTURE MyStructure
 
 Properties:
 -----------
@@ -90,7 +99,7 @@ Methods:
    Buffer( [New] )    -> Optionally SET the InternalBuffer to a new image, which will automatically
                          call the DeValue() Method to reflect the change in Member Properties.
 
-                         Return a copy of the InternalBuffer.
+                      -> Return a copy of the InternalBuffer.
 
    Value              -> Return a newly calculated C Structure Image and record it into InternalBuffer.
 
@@ -105,8 +114,15 @@ Methods:
 
    Init( aValues )    -> Initializes the structure with the values supplied in the [optionaly nested]
                          aValues array.
- 
+
                       -> Return refernce to the initialized stracture object.
+
+
+   Pointer( [nNew] )  -> Optionally SET the InternalBuffer to a new image (pointed to by nNew), which will
+                         automatically call the Buffer() Method (and thus DeValue()) to reflect the change
+                         in Member Properties.
+
+                      -> Return the Pointer address of the InternalBuffer.
 
 
 PRG Support Functions:
@@ -116,7 +132,7 @@ PRG Support Functions:
 
                                                      Return refernce to the Definitions Array of the Structure.
 
-  HB_MemberDefinition( cMember, CType )           -> PP Syntax Support. Adds the Memebr Definition to the 
+  HB_MemberDefinition( cMember, CType )           -> PP Syntax Support. Adds the Memebr Definition to the
                                                      Current Structure.
 
   HB_CStructureID( cStructure )                   -> Returns the ID of a given Structure by LITERAL Name.
