@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.116 2004/07/30 13:45:36 mauriliolongo Exp $
+ * $Id: filesys.c,v 1.117 2004/08/26 16:05:03 mauriliolongo Exp $
  */
 
 /*
@@ -180,10 +180,24 @@
    #include <sys\wait.h>
 #endif
 
+/* 27/08/2004 - <maurilio.longo@libero.it>
+                HB_FS_GETDRIVE() should return a number in the range 0..25 ('A'..'Z')
+                HB_FS_SETDRIVE() should accept a number inside same range.
+
+                If a particular platform/compiler returns/accepts different ranges of
+                values, simply define a branch for that platform.
+
+                NOTE: There is not an implicit "current disk", ALWAYS use
+
+                        my_func( hb_fsCurDrv(), ...)
+
+                      to refer to current disk
+*/
 
 #if defined( __DJGPP__ )
    #define HB_FS_GETDRIVE(n) ( n = getdisk() )
    #define HB_FS_SETDRIVE(n) ( setdisk( n ) )
+
 #elif defined( __WATCOMC__ )
    #define HB_FS_GETDRIVE(n) ( _dos_getdrive( &( n ) ), --( n ) )
    #define HB_FS_SETDRIVE(n) \
@@ -191,9 +205,15 @@
       UINT uiDummy; \
       _dos_setdrive( ( n ) + 1, &uiDummy ); \
    }
+
+#elif defined(HB_OS_OS2)
+   #define HB_FS_GETDRIVE(n) ( n = _getdrive() - 65 )
+   #define HB_FS_SETDRIVE(n) ( _chdrive( ( n ) + 65 ) )
+
 #else
    #define HB_FS_GETDRIVE(n) ( ( ( n = _getdrive() ) < 65 ) ? --( n ) : ( (n) -= 65 ) )
    #define HB_FS_SETDRIVE(n) ( _chdrive( ( n ) + 1 ) )
+
 #endif
 
 #ifndef O_BINARY
@@ -2679,7 +2699,7 @@ BOOL HB_EXPORT    hb_fsRmDir( BYTE * pDirname )
 }
 
 /* NOTE: This is not thread safe function, it's there for compatibility. */
-/* NOTE: 0 = current drive, 1 = A, 2 = B, 3 = C, etc. */
+/* NOTE: 0 = A, 1 = B, 2 = C, etc. */
 
 BYTE HB_EXPORT * hb_fsCurDir( USHORT uiDrive )
 {
@@ -2693,7 +2713,7 @@ BYTE HB_EXPORT * hb_fsCurDir( USHORT uiDrive )
 }
 
 /* NOTE: Thread safe version of hb_fsCurDir() */
-/* NOTE: 0 = current drive, 1 = A, 2 = B, 3 = C, etc. */
+/* NOTE: 0 = A, 1 = B, 2 = C, etc. */
 
 USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 {
@@ -2716,7 +2736,7 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
 
 #elif defined(HB_OS_OS2)
 
-   fResult = ( _getcwd1( (char *) pbyBuffer, uiDrive == 0 ?  0 : 'A' + uiDrive - 1 ) == 0 );
+   fResult = ( _getcwd1( (char *) pbyBuffer, uiDrive + 'A' ) == 0 );
    hb_fsSetIOError( fResult, 0 );
 
 #elif defined(HAVE_POSIX_IO)
@@ -2928,6 +2948,8 @@ BYTE   HB_EXPORT  hb_fsCurDrv( void )
 
 #endif
 
+   /* 27/08/04 - <maurilio.longo@libero.it>
+                 This is wrong, IMHO, should set 0 if HB_FS_GETDRIVE() returned something */
    hb_fsSetError( FS_ERROR );
    return ( BYTE ) uiResult; /* Return the drive number, base 0. */
 }
@@ -3021,6 +3043,10 @@ USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulL
    HB_DISABLE_ASYN_CANC
    HB_STACK_LOCK
 }
+
+#elif defined(HB_OS_OS2)
+
+   hb_fsSetIOError( ( _getcwd1( (char *) pbyBuffer, uiDrive + 'A' ) != 0 ), 0 );
 
 #elif defined(HAVE_POSIX_IO)
 

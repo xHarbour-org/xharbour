@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.21 2004/05/10 15:19:47 mlombardo Exp $
+ * $Id: dbedit.prg,v 1.22 2004/07/21 22:09:22 maurifull Exp $
  */
 
 /*
@@ -240,10 +240,10 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
       Case DE_REFRESH
         oTBR:refreshAll()
         oTBR:invalidate()
-	Exit
+   Exit
       Case DE_CONT
         oTBR:refreshCurrent()
-	Exit
+   Exit
     End
     oTBR:forceStable()
 //    oTBR:refreshCurrent()
@@ -328,11 +328,13 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
       Case K_CTRL_RIGHT
         oTBR:panRight()
         Exit
+      #ifdef HB_COMPAT_C53
       // EXTENSION: Move columns inside dbedit :)
       Case K_CTRL_UP
       Case K_CTRL_DOWN
         _MoveCol(oTBR, nKey)
         Exit
+      #endif
       Default
        // got a key exception
        oTBR:refreshCurrent()
@@ -354,6 +356,7 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs
   SetCursor(nCrs)
 Return .T.
 
+#ifdef HB_COMPAT_C53
 Static Function _MoveCol(oTBR, nKey)
 Local oTB1, oTB2
 
@@ -373,6 +376,7 @@ Local oTB1, oTB2
     oTBR:invalidate()
   End
 Return Nil
+#endif
 
 Static Function _DoUserFunc(bFun, nMode, nColPos, oTBR)
 Local nRet, nRec := RecNo()

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3357 2004/08/27 12:15:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3357 2004/08/27 15:29:24 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-08-27 17:47 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/dbedit.prg
+     ! put some extensions inside HB_COMPAT_C53
+   * source/rtl/filesys.c
+   * source/rtl/philes.c
+   * source/ct/disk.c
+     ! Fixed (or better, reverted/uniformed) handling of disk "name" (IDs).
+       Inside xharbour rtl/vm disks are numbers from 0 to 25 and thers in not
+       a value (number) which means "default disk".
+       Default disk is ALWAYS the return value of a call to hb_fsCurDrv().
+
+     /* NOTE: I've tested that all calls from code inside xharbour source tree
+              to hb_fsDir/DirBuff/DirEx/DirBuffEx/ChDrv/IsDrv() do not
+              pass a 0 value to say current disk but explicitly call
+              hb_fsCurDrv().
+              This was already correctly done in most places.
+              I DID NOT test code inside contrib/ and tests/ so such code could
+              require to be changed/corrected.
+      */
+
 
 2004-08-27 12:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
    * makefile.bc
@@ -44,11 +66,11 @@
      + source/ct/fcopy.prg
 
 2004-08-27 09:20 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
-	* source/ct/fcopy.prg
-	  + readded to ct lib with standard xharbour copyright disclaimer and
-	    original one which made this file public domain.
-	* source/ct/Makefile
-	  + added fcopy.prg
+   * source/ct/fcopy.prg
+     + readded to ct lib with standard xharbour copyright disclaimer and
+       original one which made this file public domain.
+   * source/ct/Makefile
+     + added fcopy.prg
    * /makefile.bc
      + added fcopy.prg
 

@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.23 2004/05/17 02:40:06 guerra000 Exp $
+ * $Id: philes.c,v 1.24 2004/05/17 04:30:30 guerra000 Exp $
  */
 
 /*
@@ -255,7 +255,7 @@ HB_FUNC( CURDIR )
    BYTE * pbyBuffer = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
 
    hb_fsCurDirBuff( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-      ( USHORT )( toupper( *hb_parcx( 1 ) ) - 'A' + 1 ) : 0, pbyBuffer, _POSIX_PATH_MAX + 1 );
+      ( USHORT )( toupper( *hb_parcx( 1 ) ) - 'A' ) : hb_fsCurDrv(), pbyBuffer, _POSIX_PATH_MAX + 1 );
 
    hb_retcAdopt( ( char * ) pbyBuffer );
 
@@ -282,7 +282,7 @@ HB_FUNC( CURDIRX )
    USHORT uiErrorOld = hb_fsError();
    BYTE * pbyBuffer = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
    hb_fsCurDirBuffEx( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-      ( USHORT )( toupper( *hb_parcx( 1 ) ) - 'A' + 1 ) : 0, pbyBuffer, _POSIX_PATH_MAX + 1 );
+      ( USHORT )( toupper( *hb_parcx( 1 ) ) - 'A' ) : hb_fsCurDrv(), pbyBuffer, _POSIX_PATH_MAX + 1 );
    hb_retcAdopt( ( char * ) pbyBuffer );
 
    hb_fsSetError( uiErrorOld );
