@@ -25,14 +25,14 @@ CLASS ObjInspect FROM TForm
                                 ::top     := 275,;
                                 ::width   := 200,;
                                 ::height  := 297,;
-                                ::ExStyle := /*WS_EX_CLIENTEDGE + */WS_EX_TOOLWINDOW ,;
+                                ::ExStyle := WS_EX_TOOLWINDOW ,;
                                 super:new( oParent )
    // disallow window from being closed
    METHOD OnCloseQuery() INLINE 0
    METHOD OnCreate()
    METHOD OnSize(n,x,y)  INLINE  ::GetObj("InspCombo"):Move(,,x,21,.t.),;
                                  ::GetObj("InspTabs"):Move(,25,x,y-25,.t.),;
-                                 ::InspTabs:Properties:IBrowser:Move(,,;
+                                 MoveWindow(::browser:hWnd, 0, 0,;
                                                       ::InspTabs:Properties:ClientRect()[3],;
                                                       ::InspTabs:Properties:ClientRect()[4],.t.),;
                                  nil
@@ -55,14 +55,10 @@ METHOD OnCreate() CLASS ObjInspect
   ::InspTabs:AddTab( "Events", TabPage():New( ::InspTabs, "Events") )
   ::InspTabs:Configure()
 
-  ::InspTabs:Properties:Add( 'IBrowser', TListBox():New(  ::InspTabs:Properties, 103,  0, 0,;
-                                                          ::InspTabs:Properties:ClientRect()[3],;
-                                                          ::InspTabs:Properties:ClientRect()[4] ),.f. )
-  ::InspTabs:Properties:IBrowser:Style := WS_CHILD+WS_VISIBLE+LBS_NOTIFY+WS_BORDER+LBS_OWNERDRAWVARIABLE+LBS_NOINTEGRALHEIGHT
-  ::InspTabs:Properties:IBrowser:Create()
-
-
-  oBrowse:=whBrowse():Init( aProp,::InspTabs:Properties:IBrowser:handle)
+  oBrowse:=whBrowse():Init( aProp )
+  oBrowse:Create( ::InspTabs:Properties:handle,  0, 0,;
+                                                 ::InspTabs:Properties:ClientRect()[3],;
+                                                 ::InspTabs:Properties:ClientRect()[4],,WS_EX_CLIENTEDGE )
   oBrowse:wantHScroll:=.F.
   oCol1:=whColumn():Init( 'Property', {|oCol,oB,n| asString(oB:source[n,1]) } ,DT_LEFT,94)
   oCol2:=whColumn():INIT( 'Value'   , {|oCol,oB,n| asString(oB:source[n,2]) } ,DT_LEFT,70)
