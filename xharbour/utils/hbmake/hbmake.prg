@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.29 2002/07/13 22:53:10 lculik Exp $
+ * $Id: hbmake.prg,v 1.30 2002/08/08 00:03:13 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -3187,7 +3187,7 @@ FUNCTION BuildGccCfgFileL()
 
         nCfg := Fcreate( '/etc/harbour.cfg' )
         Fwrite( nCfg, "CC=gcc" + CRLF )
-        Fwrite( nCfg, "CFLAGS= -c -I/usr/include/harbour" + CRLF )
+        Fwrite( nCfg, "CFLAGS= -c -I/usr/include/xharbour" + CRLF )
         Fwrite( nCfg, "VERBOSE=YES" + CRLF )
         Fwrite( nCfg, "DELTMP=YES" + CRLF )
         Fclose( nCfg )

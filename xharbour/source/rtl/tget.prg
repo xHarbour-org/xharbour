@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.22 2002/07/14 16:38:50 walito Exp $
+ * $Id: tget.prg,v 1.23 2002/07/17 12:10:10 walito Exp $
  */
 
 /*
@@ -1269,6 +1269,7 @@ METHOD DeleteAll() CLASS Get
       ::minus  := .f.
    case ::type == "D"
       xValue := CToD( "" )
+      ::BadDate := .f.
    case ::type == "L"
       xValue := .f.
    endcase

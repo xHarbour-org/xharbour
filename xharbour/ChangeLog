@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.364 2002/08/31 01:30:32 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.365 2002/08/31 14:04:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-08-30 11:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/tget.prg
+    ! fix for DeleteAll() method when Variable is Date type Reported by Charles Kwon
+  * utils/hbmake/hbmake.prg
+    ! fix for path when generating /etc/harbour.cfg on linux
+  % source/rtl/dbdelim.prg 
+    ! Sync with the follow change on harbour
+      2002-08-30 18:05 UTC-0400 David G. Holm <dholm@jsd-llc.com>
+      * source/rtl/dbdelim.prg
 
 2002-08-31 07:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.sly
