@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.55 2004/09/16 21:27:04 peterrees Exp $
+ * $Id: set.c,v 1.56 2004/09/16 21:34:57 peterrees Exp $
  */
 
 /*
@@ -394,7 +394,7 @@ static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_s
             else
 #endif
             {
-               handle = hb_fsCreate( ( BYTE * ) szPrnFile, FC_NORMAL );
+               handle = hb_fsCreateEx( ( BYTE * ) szPrnFile, FC_NORMAL, FO_DENYNONE );
             }
          }
       }
