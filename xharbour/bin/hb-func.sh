@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: hb-func.sh,v 1.2 2003/12/12 10:16:05 druzus Exp $
+# $Id: hb-func.sh,v 1.3 2003/12/13 17:55:11 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -75,7 +75,7 @@ mk_hbtools()
 
     HB_SYS_LIBS="-lm"
     if [ "${HB_COMPILER}" = "mingw32" ]; then
-        HB_SYS_LIBS="${HB_SYS_LIBS} -luser32 -lwinspool -lole32 -loleaut32 -luuid"
+        HB_SYS_LIBS="${HB_SYS_LIBS} -luser32 -lwinspool -lole32 -loleaut32 -luuid -lwsock32 -lws2_32"
     else
         HB_SYS_LIBS="${HB_SYS_LIBS} -lncurses -lslang -lgpm"
     fi
@@ -83,12 +83,18 @@ mk_hbtools()
     cat > ${hb_tool} <<EOF
 #!/bin/sh
 #
-# Warning! it's a bash script not sh, /bin/sh is used for MSys compatibility
+# Warning! it's a bash script not a pure sh,
+# /bin/sh is used for MSys compatibility
 #
+# ---------------------------------------------------------------
 # Copyright 2003 Przemyslaw Czerpak <druzus@polbox.com>
+# simple script to build binaries .tgz from xHarbour sources
+#
+# See doc/license.txt for licensing terms.
+# ---------------------------------------------------------------
 #
 
-if [ \$# == 0 ]; then
+if [ \$# = 0 ]; then
     echo "syntax: \$0 [<options,...>] <file>[.prg|.o]
 
 \"${hb_pref}cc\", \"${hb_pref}cmp\", \"${hb_pref}lnk\" and \"${hb_pref}mk\" parameters:
@@ -110,7 +116,7 @@ if [ \$# == 0 ]; then
                         # in first linked object module (link)
 "
     exit 1
-elif [ "\$*" == "mk-links" ]; then
+elif [ "\$*" = "mk-links" ]; then
     DIR="\${0%/*}"
     NAME="\${0##*/}"
     if [ "\${DIR}" != "\${NAME}" ]; then
@@ -219,7 +225,7 @@ else
 fi
 for l in \${libs}
 do
-    if [ "\${HB_MG}" = "yes" ] || [ "\${l#gt}" = "\${l}" ] || [ "\${l}" == "gt\${HB_GT_STAT}" ]; then
+    if [ "\${HB_MG}" = "yes" ] || [ "\${l#gt}" = "\${l}" ] || [ "\${l}" = "gt\${HB_GT_STAT}" ]; then
         [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
         [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
     fi
@@ -370,7 +376,7 @@ mk_hblibso()
                 fi
                 if [ "${HB_MULTI_GT}" = "yes" ] || \
                    [ "${l#gt}" = "${l}" ] || \
-                   [ "${l}" == "${HB_GT_LIB}" ]
+                   [ "${l}" = "${HB_GT_LIB}" ]
                 then
                     if [ -f $ls ]
                     then

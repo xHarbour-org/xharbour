@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: postinst.sh,v 1.1 2003/12/07 19:36:18 druzus Exp $
+# $Id: postinst.sh,v 1.2 2003/12/12 10:16:05 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -26,7 +26,12 @@ then
 fi
 
 hb_root=`dirname "$0"`
-hb_root=`dirname "${hb_root}"`
+if [ "${hb_root}" = "." ]
+then
+    hb_root=".."
+else
+    hb_root=`dirname "${hb_root}"`
+fi
 . ${hb_root}/bin/hb-func.sh
 
 if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "mingw32" ]

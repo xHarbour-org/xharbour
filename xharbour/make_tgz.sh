@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.21 2003/12/07 19:36:17 druzus Exp $
+# $Id: make_tgz.sh,v 1.22 2003/12/12 10:16:02 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -117,8 +117,7 @@ read ASK
 if [ "\${ASK}" != "y" ] && [ "\${ASK}" != "Y" ]; then
     exit 1
 fi
-(sed -e '1,/^HB_INST_EOF\$/ d' \$0 | gzip -cd | tar xvf - -C /) && \
-ldconfig
+(sed -e '1,/^HB_INST_EOF\$/ d' \$0 | gzip -cd | tar xvf - -C /) && ldconfig
 exit \$?
 HB_INST_EOF
 EOF

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1889 2003/12/18 00:42:05 andijahja Exp $
+ * $Id: ChangeLog,v 1.1890 2003/12/18 02:41:14 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-18 11:52 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_tgz.sh
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/postinst.sh
+  * xharbour/config/linux/gcc.cf
+  * xharbour/config/w32/mingw32.cf
+    * small fixes and formating
+
 2003-12-18 07:41 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/itemapi.c
     * remove un-needed routine to copy double number to a string which

@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.11 2003/11/12 17:39:49 lculik Exp $
+# $Id: mingw32.cf,v 1.12 2003/11/12 17:44:08 lculik Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -12,7 +12,7 @@ LIB_EXT = .a
 CC = gcc
 CC_IN = -c
 CC_OUT = -o
-CPPFLAGS = -I. -I$(HB_INC_COMPILE) -Iinclude -mno-cygwin
+CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE) -Iinclude -mno-cygwin
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS = -Wall -DSIMPLEX
 else
