@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.14 2002/12/18 13:43:56 ronpinkas Exp $
+ * $Id: console.c,v 1.15 2002/12/20 01:26:08 jonnymind Exp $
  */
 
 /*
@@ -91,7 +91,7 @@ static int    s_iFilenoStdout;
 static int    s_iFilenoStderr;
 
 #ifdef HB_THREAD_SUPPORT
-   static HB_MUTEX_T s_Mutex;
+   static HB_CRITICAL_T s_Mutex;
 #endif
 
 void hb_conInit( void )
@@ -99,7 +99,7 @@ void hb_conInit( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_conInit()"));
 
    #ifdef HB_THREAD_SUPPORT
-       HB_MUTEX_INIT( s_Mutex );
+       HB_CRITICAL_INIT( s_Mutex );
    #endif
 
 #if defined(OS_UNIX_COMPATIBLE) && !defined(HB_EOL_CRLF)
@@ -172,7 +172,7 @@ void hb_conRelease( void )
    s_bInit = FALSE;
 
    #ifdef HB_THREAD_SUPPORT
-       HB_MUTEX_DESTROY( &s_Mutex );
+       HB_CRITICAL_DESTROY( s_Mutex );
    #endif
 }
 
@@ -346,7 +346,7 @@ HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_LOCK( &s_Mutex );
+          HB_CRITICAL_LOCK( s_Mutex );
        }
    #endif
 
@@ -360,7 +360,7 @@ HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_UNLOCK( &s_Mutex );
+          HB_CRITICAL_UNLOCK( s_Mutex );
        }
    #endif
 }
@@ -373,7 +373,7 @@ HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_LOCK( &s_Mutex );
+          HB_CRITICAL_LOCK( s_Mutex );
        }
    #endif
 
@@ -387,7 +387,7 @@ HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_UNLOCK( &s_Mutex );
+          HB_CRITICAL_UNLOCK( s_Mutex );
        }
    #endif
 }
@@ -400,7 +400,7 @@ HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or pri
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_LOCK( &s_Mutex );
+          HB_CRITICAL_LOCK( s_Mutex );
        }
    #endif
 
@@ -416,7 +416,7 @@ HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or pri
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_UNLOCK( &s_Mutex );
+          HB_CRITICAL_UNLOCK( s_Mutex );
        }
    #endif
 }
@@ -426,7 +426,7 @@ HB_FUNC( QOUT )
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_LOCK( &s_Mutex );
+          HB_CRITICAL_LOCK( s_Mutex );
        }
    #endif
 
@@ -459,7 +459,7 @@ HB_FUNC( QOUT )
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_UNLOCK( &s_Mutex );
+          HB_CRITICAL_UNLOCK( s_Mutex );
        }
    #endif
 }
@@ -469,7 +469,7 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_LOCK( &s_Mutex );
+          HB_CRITICAL_LOCK( s_Mutex );
        }
    #endif
 
@@ -491,7 +491,7 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_UNLOCK( &s_Mutex );
+          HB_CRITICAL_UNLOCK( s_Mutex );
        }
    #endif
 }
@@ -501,7 +501,7 @@ HB_FUNC( PROW ) /* Returns the current printer row position */
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_LOCK( &s_Mutex );
+          HB_CRITICAL_LOCK( s_Mutex );
        }
    #endif
 
@@ -510,7 +510,7 @@ HB_FUNC( PROW ) /* Returns the current printer row position */
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_UNLOCK( &s_Mutex );
+          HB_CRITICAL_UNLOCK( s_Mutex );
        }
    #endif
 }
@@ -520,7 +520,7 @@ HB_FUNC( PCOL ) /* Returns the current printer row position */
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_LOCK( &s_Mutex );
+          HB_CRITICAL_LOCK( s_Mutex );
        }
    #endif
 
@@ -529,7 +529,7 @@ HB_FUNC( PCOL ) /* Returns the current printer row position */
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_UNLOCK( &s_Mutex );
+          HB_CRITICAL_UNLOCK( s_Mutex );
        }
    #endif
 }
@@ -633,7 +633,7 @@ HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_LOCK( &s_Mutex );
+          HB_CRITICAL_LOCK( s_Mutex );
        }
    #endif
 
@@ -645,7 +645,7 @@ HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_UNLOCK( &s_Mutex );
+          HB_CRITICAL_UNLOCK( s_Mutex );
        }
    #endif
 }
@@ -655,7 +655,7 @@ HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_LOCK( &s_Mutex );
+          HB_CRITICAL_LOCK( s_Mutex );
        }
    #endif
 
@@ -668,7 +668,7 @@ HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_UNLOCK( &s_Mutex );
+          HB_CRITICAL_UNLOCK( s_Mutex );
        }
    #endif
 }
@@ -678,7 +678,7 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_LOCK( &s_Mutex );
+          HB_CRITICAL_LOCK( s_Mutex );
        }
    #endif
 
@@ -706,7 +706,7 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_UNLOCK( &s_Mutex );
+          HB_CRITICAL_UNLOCK( s_Mutex );
        }
    #endif
 }
@@ -720,7 +720,7 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_LOCK( &s_Mutex );
+          HB_CRITICAL_LOCK( s_Mutex );
        }
    #endif
 
@@ -753,7 +753,7 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_UNLOCK( &s_Mutex );
+          HB_CRITICAL_UNLOCK( s_Mutex );
        }
    #endif
 }
@@ -771,7 +771,7 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_LOCK( &s_Mutex );
+          HB_CRITICAL_LOCK( s_Mutex );
        }
    #endif
 
@@ -806,7 +806,7 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
    #ifdef HB_THREAD_SUPPORT
        if( hb_ht_context )
        {
-          HB_MUTEX_UNLOCK( &s_Mutex );
+          HB_CRITICAL_UNLOCK( s_Mutex );
        }
    #endif
 }

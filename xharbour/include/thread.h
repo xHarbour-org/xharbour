@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.5 2002/12/20 01:43:19 jonnymind Exp $
+* $Id: thread.h,v 1.6 2002/12/20 08:39:42 ronpinkas Exp $
 */
 
 /*
@@ -83,8 +83,8 @@
 
    #define HB_COND_T                   HANDLE
    #define HB_COND_INIT( x )           x = CreateEvent( NULL, TRUE, FALSE, NULL )
-   #define HB_COND_WAIT( x, y )        SignalObjectAndWait( y, x, INFINITE, FALSE )
-   #define HB_COND_WAITTIME( x, y, t ) SignalObjectAndWait( y, x, t *1000, FALSE )
+   #define HB_COND_WAIT( x, y )        //SignalObjectAndWait( y, x, INFINITE, FALSE )
+   #define HB_COND_WAITTIME( x, y, t ) //SignalObjectAndWait( y, x, t *1000, FALSE )
    #define HB_COND_SIGNAL( x )         SetEvent( x )
    #define HB_COND_DESTROY( x )        CloseHandle( x )
 
