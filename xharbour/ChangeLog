@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2537 2004/03/10 03:12:17 andijahja Exp $
+ * $Id: ChangeLog,v 1.2538 2004/03/10 03:25:09 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-10 00:10 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rdd/dbcmd.c
+    ! Verification in DBUSEAREA() if the same alias is used, before
+      the RDD does.
+
 2004-03-10 16:35 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * contrib/winprn/testprn.prg
     - trap error condition if no printers installed

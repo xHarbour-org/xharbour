@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.85 2004/03/05 15:43:46 lculik Exp $
+ * $Id: dbcmd.c,v 1.86 2004/03/07 21:42:51 andijahja Exp $
  */
 
 /*
@@ -2444,6 +2444,14 @@ HB_FUNC( DBUSEAREA )
          hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBUSEAREA" );
          return;
       }
+   }
+
+   // Verify if the alias is already in use
+   if( hb_rddSelect( szAlias ) )
+   {
+      hb_xfree( pFileName );
+      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBUSEAREA" );
+      return;
    }
 
    /* Create a new WorkArea node */
