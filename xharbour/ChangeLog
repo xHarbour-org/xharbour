@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.629 2003/01/15 20:23:24 jonnymind Exp $
+ * $Id: ChangeLog,v 1.630 2003/01/16 01:30:33 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-16 12:40 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * include/thread.h
+    * #ifdef for void compile in non-multithreading compilations.
+  * source/compiler/harbour.c
+    * Initialization of Unions in gcc requires brakets.
+    * Update of quantity and type of parameters of some functions.
+  * source/compiler/hbusage.c
+    * another serious omission ;-)
+
+2002-01-16 13:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/file.c
+    * hb_fsFile() support for FILE() function.
+      Set FERROR() to 0 this is the behavior of Cl*pper.
+  * source/rtl/filesys.c
+    * Set DOS compatible errors to errno var for gcc compilers.
+  * source/rtl/tbrowse.prg
+  * source/rtl/tget.prg
+    % Minor optimization and code cleaning
+
+2002-01-16 13:55 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * utils/hbtest/rt_file.prg
+    * update values of FERROR() in call to FILE()
+  * utils/hbtest/rt_math.prg
+    * update rounded values in floating point operations.
 
 2003-01-15 17:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbcomp.h
