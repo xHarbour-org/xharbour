@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.96 2004/11/23 18:22:42 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.97 2004/11/24 10:34:29 mauriliolongo Exp $
  */
 
 /*
@@ -108,14 +108,22 @@
 #define o_lColSep        13   // Should column separator be drawn
 #define o_ScrColPos      14   // Temporary column position on screen
 
-#define TBC_CLR_STANDARD  1
-#define TBC_CLR_ENHANCED  2
-#define TBC_CLR_HEADING   3
-#define TBC_CLR_FOOTING   4
+
+/* 25/11/2004 - <maurilio.longo@libero.it>
+   TBC_ are CLR_ constants increased by one to be used as indexes inside columns color arrays
+   HEADING and FOOTING have to be colored like STANDARD colors, clipper does it, and could simply
+   be removed
+*/
+#define TBC_CLR_STANDARD  ( CLR_STANDARD + 1 )
+#define TBC_CLR_ENHANCED  ( CLR_ENHANCED + 1 )
+#define TBC_CLR_HEADING   TBC_CLR_STANDARD
+#define TBC_CLR_FOOTING   TBC_CLR_STANDARD
 
 
-// 23/11/2004 - <maurilio.longo@libero.it> Inlined to be somewhat faster
-#define  ColorToDisp( aColor, nColor )    iif( Len( aColor ) >= nColor, aColor[ nColor ], { 1, 2, 1, 1 }[ nColor ] )
+/* 23/11/2004 - <maurilio.longo@libero.it> Inlined to be somewhat faster
+   25/11/2004 - <maurilio.longo@libero.it> Since there are only two colors, this makes every day less sense to me...
+*/
+#define  ColorToDisp( aColor, nColor )    iif( Len( aColor ) >= nColor, aColor[ nColor ], { 1, 2 }[ nColor ] )
 
 //-------------------------------------------------------------------//
 
@@ -1517,7 +1525,7 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
 
          ::WriteMLineText( ::aColsInfo[ n, o_Heading ], ;
                            ::aColsInfo[ n, o_Width ], .T., ;
-                           hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aColsInfo[ n,o_Obj ]:DefColor, TBC_CLR_HEADING ) - 1 ) )
+                           hb_ColorIndex( ::cColorSpec,  ColorToDisp( ::aColsInfo[ n,o_Obj ]:DefColor, TBC_CLR_HEADING ) - 1 ) )
       next
    endif
 
@@ -2274,6 +2282,19 @@ METHOD PosCursor() CLASS TBrowse
 
       nCol := ::aColsInfo[ ::nColPos, o_ScrColPos ]
 
+      Switch ::aColsInfo[ ::nColPos, o_Type ]
+      case "N"
+         if ::aColsInfo[ ::nColPos, o_Obj ]:Width == NIL
+            nCol += ::aColsInfo[ ::nColPos, o_Width ] - ::aColsInfo[ ::nColPos, o_WidthCell ]
+         endif
+         exit
+
+      case "L"
+         // Always centered inside column
+         nCol += Round( ( ::aColsInfo[ ::nColPos, o_Width ] - ::aColsInfo[ ::nColPos, o_WidthCell ] ) / 2, 0 )
+         exit
+      end
+
       SetPos( nRow, nCol )
 
       #ifdef HB_COMPAT_C53
@@ -2300,9 +2321,9 @@ METHOD DeHilite() CLASS TBrowse
 
       SetPos( nRow, nCol )
 
-      if ::lRect .and.;
-         ::aRect[ 1 ] <= nRow .and. ::aRect[ 3 ] >= nRow .and.;
-         ::aRect[ 2 ] <= nCol .and. ::aRect[ 4 ] >= nCol
+      if ::lRect .AND.;
+         ::RowPos >= ::aRect[ 1 ] .AND. ::nColPos >= ::aRect[ 2 ] .AND.;
+         ::RowPos <= ::aRect[ 3 ] .AND. ::nColPos <= ::aRect[ 4 ]
 
          cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aRectColor, TBC_CLR_STANDARD ) - 1 )
 
@@ -2399,10 +2420,15 @@ METHOD DispCell( nRow, nColumn, nColor ) CLASS TBrowse
          cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, TBC_CLR_STANDARD ) - 1 )
 
       else
-         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ( ::aHighCellColor := Eval( oCol:ColorBlock, ftmp ) ), nColor ) - 1 )
+         // If colorblock returns an empty array and DefColor exists clipper uses defcolor
+         ::aHighCellColor := Eval( oCol:ColorBlock, ftmp )
+         if Empty( ::aHighCellColor ) .AND. Valtype( oCol:DefColor ) == "A"
+            ::aHighCellColor := oCol:DefColor
+         endif
+         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aHighCellColor, nColor ) - 1 )
          cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aHighCellColor, TBC_CLR_STANDARD ) - 1 )
-
       endif
+
    endif
 
    Switch aColsInfo[ o_Type ]
@@ -2845,18 +2871,6 @@ static function LenVal( xVal, cType, cPict )
    end
 
    Return nLen
-
-//-------------------------------------------------------------------//
-
-/* inlined at the top
-static function ColorToDisp( aColor, nColor )
-
-   if Len( aColor ) >= nColor
-      return aColor[ nColor ]
-   endif
-
-   Return { 1, 2, 1, 1 }[ nColor ]
-*/
 
 //-------------------------------------------------------------------//
 

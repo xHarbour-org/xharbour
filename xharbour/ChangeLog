@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3625 2004/11/25 04:48:00 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3626 2004/11/25 05:11:07 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-25 16:15 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/tbrowse.prg
+    ! Fixed ::PosCursor() to keep track of centered/right-justified
+      columns. Fixed ::Dehilite(), had the same error of ::Hilite()
+      previously fixed.
+      Fixed coloring of columns when a column's colorblock returns
+      an empty array and then fixed coloring of header/footers
+      which should use CLR_STANDARD (as per clipper docs) and as
+      a sample on news.xharbour.org shows when compiled under clipper.
 
 2004-11-24 23:07 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/gtalleg/gtalleg.c
