@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.63 2004/02/06 12:55:17 andijahja Exp $
+ * $Id: genc.c,v 1.64 2004/02/07 03:07:15 andijahja Exp $
  */
 
 /*
@@ -458,7 +458,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* ge
       }
 
       fprintf( yyc, "\nHB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n"
-                    "#if defined(HB_STATIC_STARTUP)\n"
+                    "#if defined(HB_PRAGMA_STARTUP)\n"
                     "   #pragma startup hb_vm_SymbolInit_%s%s\n"
                     "#elif defined(_MSC_VER)\n"
                     "   #if _MSC_VER >= 1010\n"
@@ -471,10 +471,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* ge
                     "   #endif\n"
                     "   static HB_$INITSYM hb_vm_auto_SymbolInit_%s%s = hb_vm_SymbolInit_%s%s;\n"
                     "   #pragma data_seg()\n"
-                    "#elif ! defined(__GNUC__)\n"
-                    "   #pragma startup hb_vm_SymbolInit_%s%s\n"
                     "#endif\n\n",
-                    hb_comp_szPrefix, hb_comp_FileAsSymbol,
                     hb_comp_szPrefix, hb_comp_FileAsSymbol,
                     hb_comp_szPrefix, hb_comp_FileAsSymbol,
                     hb_comp_szPrefix, hb_comp_FileAsSymbol,
@@ -488,23 +485,19 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* ge
          fprintf( yyc, "   hb_vmExplicitStartup( symbols + %i );\n", iStartupOffset );
          fprintf( yyc, "}\n" );
 
-         fprintf( yyc, "#if defined(HB_STATIC_STARTUP)\n" );
+         fprintf( yyc, "#if defined(HB_PRAGMA_STARTUP)\n" );
          fprintf( yyc, "   #pragma startup hb_InitExplicitStartup\n" );
          fprintf( yyc, "#elif defined(_MSC_VER)\n" );
          fprintf( yyc, "   static HB_$INITSYM hb_auto_InitExplicitStartup = hb_InitExplicitStartup;\n" );
-         fprintf( yyc, "#elif ! defined(__GNUC__)\n" );
-         fprintf( yyc, "   #pragma startup hb_InitExplicitStartup\n" );
          fprintf( yyc, "#endif\n\n" );
       }
 
       if( bCritical )
       {
-         fprintf( yyc, "#if defined(HB_STATIC_STARTUP)\n" );
+         fprintf( yyc, "#if defined(HB_PRAGMA_STARTUP)\n" );
          fprintf( yyc, "   #pragma startup hb_InitCritical%s\n", hb_comp_FileAsSymbol );
          fprintf( yyc, "#elif defined(_MSC_VER)\n" );
          fprintf( yyc, "   static HB_$INITSYM hb_auto_InitCritical = hb_InitCritical%s;\n", hb_comp_FileAsSymbol );
-         fprintf( yyc, "#elif ! defined(__GNUC__)\n" );
-         fprintf( yyc, "   #pragma startup hb_InitCritical%s\n", hb_comp_FileAsSymbol );
          fprintf( yyc, "#endif\n\n" );
       }
 
