@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2261 2004/02/11 10:54:49 lculik Exp $
+ * $Id: ChangeLog,v 1.2262 2004/02/11 15:09:11 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-11 17:06 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * makefile.bc
+  * makefile.vc
+    + Added compilation of filestat.c (plz. someone check under VC)
+
+  * source/rtl/filestat.c
+    ! Fixed Windows and "unknown system" compilation
+    ! Declared INVALID_FILE_ATTRIBUTES if not present (BORLANDC 
+      headers/free version lacks it).
+  
+  * source/rtl/dateshb.c
+    ! TimeOfDay() Returns 00:00:00 if seconds == 0; check to see how
+      is done on hb_pcount() instead of hb_parni()
 
 2004-02-11 16:11 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/Makefile

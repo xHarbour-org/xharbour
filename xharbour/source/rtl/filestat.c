@@ -1,5 +1,5 @@
 /*
- * $Id: fssize.c,v 1.2 2003/11/11 20:20:54 ronpinkas Exp $
+ * $Id: filestat.c,v 1.1 2004/02/11 15:09:45 jonnymind Exp $
  */
 
 /*
@@ -8,7 +8,7 @@
  *
  * Copyright 2004 Giancarlo Niccolai <gc -at- niccolai [dot] ws>
  *
- * www - http://www.xharbour.it
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,6 +63,11 @@
    #include <time.h>
    #include <sys/types.h>
    #include <sys/stat.h>
+#elif defined( HB_OS_WIN_32 )
+   #include <windows.h>
+   #if defined(__BORLANDC__) && ! defined( INVALID_FILE_ATTRIBUTES )
+      #define INVALID_FILE_ATTRIBUTES ((DWORD)(-1))
+   #endif
 #endif
 
 BOOL hb_fsFileStats(
@@ -201,7 +206,8 @@ BOOL hb_fsFileStats(
       return FALSE;
    }
 
-   #elif defined( HB_OS_WIN32 )
+   #elif defined( HB_OS_WIN_32 )
+   DWORD dwAttribs;
    WIN32_FIND_DATA ffind;
    HANDLE hFind;
    FILETIME filetime;
@@ -215,11 +221,10 @@ BOOL hb_fsFileStats(
       return FALSE;
    }
 
-   uiAttr = hb_fsAttrFromRaw( dwAttribs );
-   hb_fsAttrDecode( uiAttr, pszAttr );
+   hb_fsAttrDecode( hb_fsAttrFromRaw( dwAttribs ), pszAttr );
 
    /* If file existed, do a findfirst */
-   hFind = FindFirst( pszFileName, &find );
+   hFind = FindFirstFile( pszFileName, &ffind );
    if ( hFind == INVALID_HANDLE_VALUE )
    {
       return FALSE;
@@ -254,7 +259,7 @@ BOOL hb_fsFileStats(
       *lcDate = hb_dateEncode( 0, 0, 0 );
       *lcTime = 0;
    }
-   return true;
+   return TRUE;
 
    #else
    PHB_FFIND findinfo;
@@ -265,14 +270,15 @@ BOOL hb_fsFileStats(
       return FALSE;
    }
 
+   hb_fsAttrDecode( findinfo->attr, pszAttr );
    *llSize = findinfo->size;
    *lcDate = findinfo->lDate;
-   *lcTime = (pFind->szTime[0] - '0') * 36000 +
-             (pFind->szTime[1] - '0') * 3600 +
-             (pFind->szTime[3] - '0') * 600 +
-             (pFind->szTime[4] - '0') * 60 +
-             (pFind->szTime[6] - '0') * 10 +
-             (pFind->szTime[7] - '0');
+   *lcTime = (findinfo->szTime[0] - '0') * 36000 +
+             (findinfo->szTime[1] - '0') * 3600 +
+             (findinfo->szTime[3] - '0') * 600 +
+             (findinfo->szTime[4] - '0') * 60 +
+             (findinfo->szTime[6] - '0') * 10 +
+             (findinfo->szTime[7] - '0');
    *lmDate = hb_dateEncode( 0, 0, 0 );
    *lmTime = 0;
 

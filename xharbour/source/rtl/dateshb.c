@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.3 2003/09/13 20:42:32 walito Exp $
+ * $Id: dateshb.c,v 1.4 2004/02/11 15:09:45 jonnymind Exp $
  */
 
 /*
@@ -294,7 +294,7 @@ HB_FUNC( TIMEOFDAY )
    char szResult[ 9 ];
    int iSeconds = hb_parni(1);
 
-   if ( iSeconds <= 0 )
+   if ( hb_pcount() == 0 )
    {
       hb_dateTimeStr( szResult );
    }
