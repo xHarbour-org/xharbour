@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3357 2004/08/27 15:29:24 modalsist Exp $
+ * $Id: ChangeLog,v 1.3359 2004/08/27 21:42:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-08-27 21:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+   * utils/hbmake.prg
+     ! Bound error fixed.
+     ! Now ParseMakeFile() function return true/false if makefile was
+       successfull openned. At this way if an error occur the hbmake
+       will be closed without generate a runtime error.
+     ! Minor stetical fixes.
 
 2004-08-27 17:47 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/dbedit.prg
