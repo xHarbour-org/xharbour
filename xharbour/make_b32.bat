@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.13 2003/07/26 08:01:36 brianhays Exp $
+rem $Id: make_b32.bat,v 1.14 2003/09/25 23:29:55 paultucker Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -58,7 +58,48 @@ if "%1" == "CLEAN" goto CLEAN
    if exist bin\b32\*.tds del bin\b32\*.tds
    if exist bin\b32\*.map del bin\b32\*.map
 
-   if exist lib\*.lib     del lib\*.lib
+rem   if exist lib\*.lib     del lib\*.lib
+
+   if exist lib\codepage.lib   del lib\codepage.lib
+   if exist lib\common.lib     del lib\common.lib
+   if exist lib\dbfcdx.lib     del lib\dbfcdx.lib
+   if exist lib\dbfcdxmt.lib   del lib\dbfcdxmt.lib
+   if exist lib\dbfdbt.lib     del lib\dbfdbt.lib
+   if exist lib\dbfdbtmt.lib   del lib\dbfdbtmt.lib
+   if exist lib\dbffpt.lib     del lib\dbffpt.lib
+   if exist lib\dbffptmt.lib   del lib\dbffptmt.lib
+   if exist lib\dbfntx.lib     del lib\dbfntx.lib
+   if exist lib\dbfntxmt.lib   del lib\dbfntxmt.lib
+   if exist lib\debug.lib      del lib\debug.lib
+   if exist lib\gtcgi.lib      del lib\gtcgi.lib
+   if exist lib\gtnul.lib      del lib\gtnul.lib
+   if exist lib\gtpca.lib      del lib\gtpca.lib
+   if exist lib\gtstd.lib      del lib\gtstd.lib
+   if exist lib\gtwin.lib      del lib\gtwin.lib
+   if exist lib\gtwvt.lib      del lib\gtwvt.lib
+   if exist lib\hbodbc.lib     del lib\hbodbc.lib
+   if exist lib\hbodbcmt.lib   del lib\hbodbcmt.lib
+   if exist lib\lang.lib       del lib\lang.lib
+   if exist lib\macro.lib      del lib\macro.lib
+   if exist lib\macromt.lib    del lib\macromt.lib
+   if exist lib\nulsys.lib     del lib\nulsys.lib
+   if exist lib\optcon.lib     del lib\optcon.lib
+   if exist lib\optconmt.lib   del lib\optconmt.lib
+   if exist lib\optgui.lib     del lib\optgui.lib
+   if exist lib\optguimt.lib   del lib\optguimt.lib
+   if exist lib\pp.lib         del lib\pp.lib
+   if exist lib\ppmt.lib       del lib\ppmt.lib
+   if exist lib\rdd.lib        del lib\rdd.lib
+   if exist lib\rddmt.lib      del lib\rddmt.lib
+   if exist lib\rtl.lib        del lib\rtl.lib
+   if exist lib\rtlmt.lib      del lib\rtlmt.lib
+   if exist lib\samples.lib    del lib\samples.lib
+   if exist lib\samplesmt.lib  del lib\samplesmt.lib
+   if exist lib\vm.lib         del lib\vm.lib
+   if exist lib\vmmt.lib       del lib\vmmt.lib
+
+   if exist lib\*.dll     del lib\*.dll
+
    if exist lib\*.bak     del lib\*.bak
    if exist lib\*.obj     del lib\*.obj
    if exist lib\b32\bcc640.lib copy lib\b32\bcc640.lib lib >nul
