@@ -1,5 +1,5 @@
 /*
- * $Id: teditor.prg,v 1.9 2003/01/27 03:40:53 walito Exp $
+ * $Id: teditor.prg,v 1.10 2003/05/07 20:05:53 walito Exp $
  */
 
 /*
@@ -464,12 +464,20 @@ METHOD GotoLine(nRow) CLASS HBEditor
       else
          // I need to move cursor if is past requested line number and if requested line is
          // inside first screen of text otherwise ::nFirstRow would be wrong
+         if ::nFirstRow > 1
          if nRow < ::nNumRows .AND. (::nTop + nRow) < ::Row()
             ::SetPos(::nTop + nRow, ::Col())
+            endif
+         else
+            if nRow <= ::nNumRows
+               ::SetPos(::nTop + nRow - 1, ::Col())
+            endif
          endif
 
          ::nRow := nRow
+         if ! ( ::nFirstRow == 1 .and. nRow <= ::nNumRows )
          ::nFirstRow := Max(1, nRow - (::Row() - ::nTop))
+         endif
 
          ::RefreshWindow()
       endif
@@ -577,6 +585,7 @@ METHOD RefreshWindow() CLASS HBEditor
    LOCAL i
    LOCAL nOCol
    LOCAL nORow
+   LOCAL cOldColor
    LOCAL nOCur
 
    nOCol := ::Col()
@@ -589,7 +598,9 @@ METHOD RefreshWindow() CLASS HBEditor
 
    // Clear rest of editor window (needed when deleting lines of text)
    if ::naTextLen < ::nNumRows
+      cOldColor = SetColor( ::cColorSpec )
       Scroll(::nTop + ::naTextLen, ::nLeft, ::nBottom, ::nRight)
+      SetColor( cOldColor )
    endif
 
    SetCursor(nOCur)

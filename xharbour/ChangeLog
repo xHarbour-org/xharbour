@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1107 2003/06/08 08:53:10 patrickmast Exp $
+ * $Id: ChangeLog,v 1.1108 2003/06/09 17:49:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-09 17:40 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
+  * makefile.nt
+    makefile.bc
+    makefile.vc
+    hrbdll.vc
+    hrbdll.bc
+    source/debug/Makefile
+  ! updated to include dbghelp.prg module (borrow from harbour)
+  + dbghelp.prg
+    * module with help file for debugger
+  * source/debug/debugger.prg
+    source/debug/dbgtarr.prg
+    source/debug/dbftobj.prg
+    * Sync with last changes on harbour ( changes on harbour bellow)
+    + CallStack navigation support.
+    ! Improved variables editing.
+    ! several fixes when debugging arrays
+  * source/rtl/teditor.prg
+    * Minor fix (borrow from Harbour/ Description bellow )
+    The source code viewer does not leave a different block color when
+    scrolling.
+
+    The source code is displayed from the first line (Clipper compatibility).
 
 2003-06-09 10:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbrddcdx.h
