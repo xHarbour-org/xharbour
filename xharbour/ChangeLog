@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2071 2004/01/15 22:31:28 peterrees Exp $
+ * $Id: ChangeLog,v 1.2072 2004/01/16 00:36:42 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-16 09:40 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  * source/rtl/file.c
+    ! hb_fsFile fix changed to use hb_Filetrim
+  * source/rtl/filesys.c
+    ! hb_fsOpen() and hb_fsCreate()
+    + Added hb_Filetrim() function
+  * source/rtl/set.c
+    ! Added support to _SET_TRIMFILENAME (this set when enable (default is false),
+    remove trailing blanks on the right of filename */
+  * include/hbapifs.h
+    ! added hb_Filetrim() prototype
+  * include/hbset.h
+    ! added SET_TRIMFILENAME member to hb_set
+  * include/set.ch
+    ! added _SET_TRIMFILENAME s 112
+  * utils/hbmake/hbmake.prg
+    ! minor fix when request mysql usage on windows(was liking mysqlclient.lib insted od libmysql.lib)
+  * utils/hbmake/tmake.prg
+    !added gtwvt to members for later makefile edit
+
 
 2004-01-15 16:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/transfrm.c
