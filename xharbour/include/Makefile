@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.7 2003/02/23 20:13:38 jonnymind Exp $
+# $Id: Makefile,v 1.8 2003/05/28 11:55:08 druzus Exp $
 #
 
 ROOT = ../
@@ -84,6 +84,12 @@ PRG_HEADERS=\
 	simpleio.ch  \
 	std.ch       \
 	ttable.ch    \
+	classex.ch   \
+	cstruct.ch   \
+	hbrpc.ch     \
+	hbxml.ch     \
+	math.ch      \
+	tbrowse.ch   \
 
 API_HEADERS=\
 	error.api    \

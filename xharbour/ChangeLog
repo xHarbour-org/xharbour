@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1184 2003/06/24 11:32:34 andijahja Exp $
+ * $Id: ChangeLog,v 1.1185 2003/06/24 18:10:44 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-24 21:50 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/Makefile
+    + added some missing headers:
+      classex.ch, cstruct.ch, hbrpc.ch, hbxml.ch, math.ch, tbrowse.ch
+    To developpers: If you add some headers which should be used by
+    xharbour users please remember to update the Makefile in include
+    directory.
 
 2003-06-24 14:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.vc
