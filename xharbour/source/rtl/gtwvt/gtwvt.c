@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.25 2004/01/07 06:37:00 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.26 2004/01/07 14:14:52 lf_sfnet Exp $
  */
 
 /*
@@ -3545,10 +3545,8 @@ HB_FUNC( WVT_DRAWLABEL )
    POINT    xy;
    HFONT    hFont, oldFont;
    LOGFONT  logfont;
-   int      iAlign, oldTextAlign;
+   int      oldTextAlign;
    COLORREF oldBkColor, oldTextColor;
-
-   xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
 
    logfont.lfEscapement     = ( ISNIL(  5 ) ? 0 : ( hb_parni( 5 ) * 10 ) );
    logfont.lfOrientation    = 0;
@@ -3569,12 +3567,10 @@ HB_FUNC( WVT_DRAWLABEL )
    hFont = CreateFontIndirect( &logfont );
    if ( hFont )
    {
+      xy           = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
       oldBkColor   = SetBkColor( _s.hdc, ISNIL( 7 ) ? _s.background : ( COLORREF ) hb_parnl( 7 ) );
       oldTextColor = SetTextColor( _s.hdc, ISNIL( 6 ) ? _s.foreground : ( COLORREF ) hb_parnl( 6 ) );
-
-      iAlign       = ( ISNIL( 4 ) ? TA_LEFT : hb_parni( 4 ) );
-      oldTextAlign = SetTextAlign( _s.hdc, iAlign );
-
+      oldTextAlign = SetTextAlign( _s.hdc, ( ISNIL( 4 ) ? TA_LEFT : hb_parni( 4 ) ) );
       oldFont      = (HFONT) SelectObject( _s.hdc, hFont );
 
       //  Ground is Ready, Drat the Text
@@ -3586,14 +3582,8 @@ HB_FUNC( WVT_DRAWLABEL )
       SelectObject( _s.hdc, oldFont );
       DeleteObject( hFont );
       SetTextAlign( _s.hdc, oldTextAlign );
-      if ( ! ISNIL( 7 ) )
-      {
-         SetBkColor( _s.hdc, oldBkColor );
-      }
-      if ( ! ISNIL ( 6 ) )
-      {
-         SetTextColor( _s.hdc, oldTextColor );
-      }
+      SetBkColor( _s.hdc, oldBkColor );
+      SetTextColor( _s.hdc, oldTextColor );
 
       hb_retl( TRUE );
    }
