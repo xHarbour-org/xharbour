@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.43 2003/06/05 17:19:39 lculik Exp $
+ * $Id: dbfntx1.c,v 1.44 2003/06/15 20:16:57 lculik Exp $
  */
 
 /*
@@ -511,7 +511,7 @@ static ULONG hb_ntxTagKeyCount( LPTAGINFO pTag )
             ulKeyCount ++;
             hb_ntxTagKeyGoTo( pTag, NEXT_RECORD, &lContinue );
          }
-         
+
 
       strcpy( pTag->CurKeyInfo->key, pKeyTmp->key );
       pTag->CurKeyInfo->Tag = pKeyTmp->Tag;
@@ -4063,7 +4063,10 @@ static ERRCODE ntxOrderListFocus( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
       }
    }
 
+   bFound = pArea->fFound;
    SUPER_SKIPRAW( ( AREAP ) pArea, 0);
+   pArea->fFound = bFound;
+
    return SUCCESS;
 }
 
