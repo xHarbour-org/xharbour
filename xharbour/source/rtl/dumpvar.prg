@@ -1,5 +1,5 @@
 /*
- * $Id: dumpvar.prg,v 1.1 2003/11/10 01:14:50 fsgiudice Exp $
+ * $Id: dumpvar.prg,v 1.2 2003/11/12 21:51:32 fsgiudice Exp $
  */
 
 /*
@@ -199,7 +199,7 @@ STATIC FUNCTION DShowHash( hVar, lRecursive, nIndent )
      cString += Space( nIndent ) + "{" + CRLF
      FOR EACH xKey IN aKeys
          xVal := hVar[ xKey ]
-         cString += Space( nIndent ) + " ["+ LTrim( AsString( xKey ) ) + "] :> " + AsString( xVal ) + ", " + CRLF
+         cString += Space( nIndent ) + " ["+ LTrim( AsString( xKey ) ) + "] => " + AsString( xVal ) + ", " + CRLF
          IF lRecursive .AND. ValType( xVal ) $ "AOH"
             cString := SubStr( cString, 1, Len( cString )-4 ) + CRLF
             cString += hb_DumpVar( xVal,, lRecursive, nIndent+3 )

@@ -9,7 +9,7 @@
 *
 * (C) 2003 Francesco Saverio Giudice
 *
-* $Id: tstclsdbg.prg,v 1.1 2003/11/10 00:59:32 fsgiudice Exp $
+* $Id: tstclsdbg.prg,v 1.2 2003/11/12 21:51:32 fsgiudice Exp $
 *
 
 #include "common.ch"
@@ -50,15 +50,15 @@ PROCEDURE Main( cNoWait )
   b['Var5'] := ErrorNew()  // An object
   b['var6'] := {}          // An empty array
   b['var7'] := { "Test 1" => "an associative array nested" } // Another associative array
-  b['var8'] := { "Test 2" :> "an hash nested" }
+  b['var8'] := { "Test 2" => "an hash nested" }
 
   //---------------------------
 
   h['Hash1'] := "Giudice"
   h[1]       := "Frank"
-  h[Date()]  := { "10" :> "a hash of hash" }
+  h[Date()]  := { "10" => "a hash of hash" }
   h['']      := "Hash with null key (empty string)"
-  h[2]       := { :> }   // another hash of an empty hash
+  h[2]       := { => }   // another hash of an empty hash
 
   //---------------------------
 

@@ -6,7 +6,7 @@
 * This test demonstrates limits and advantages of
 * hashes.
 *
-* $Id: hashmass.prg,v 1.2 2003/11/10 00:06:29 jonnymind Exp $
+* $Id: hashmass.prg,v 1.3 2003/11/12 13:49:14 jonnymind Exp $
 *
 
 PROCEDURE Main()
@@ -22,7 +22,7 @@ PROCEDURE Main()
    @nRow++,0 SAY PadC(" Giancarlo Niccolai ", MaxCol() )
 
    @nRow++,5 SAY "Insertion without Preallocation"
-   hHash := {:>}
+   hHash := {=>}
    nSecs := Seconds()
    FOR i := 1 TO 10000
       IF I % 500 == 0
