@@ -22,6 +22,38 @@
 #include   'common.ch'
 
 //-------------------------------------------------------------------//
+//
+//   Wvt_SetObjects() array structure
+//
+#define WVT_OBJ_TYPE           1
+#define WVT_OBJ_ID             2
+#define WVT_OBJ_ROW            3
+#define WVT_OBJ_COL            4
+#define WVT_OBJ_ROWTO          5
+#define WVT_OBJ_COLTO          6
+#define WVT_OBJ_ONDISP         7
+#define WVT_OBJ_ONMOUSEOVER    8
+#define WVT_OBJ_ONBUTTONDOWN   9
+#define WVT_OBJ_ONBUTTONUP    10
+#define WVT_OBJ_TOOLTIP       11
+#define WVT_OBJ_STATE         12
+#define WVT_OBJ_DUMMY         13
+
+#define WVT_OBJ_VRBLS         13
+
+//   WVT_OBJ_TYPE  Constants
+//
+#define OBJ_TYPE_BUTTON        1
+
+//   WVT_OBJ_STATE
+//
+#define OBJ_STATE_HIDE         0
+#define OBJ_STATE_DISP         1
+#define OBJ_STATE_MOUSEOVER    2 
+#define OBJ_STATE_BUTTONDOWN   3
+#define OBJ_STATE_BUTTONUP     4
+
+//-------------------------------------------------------------------//
 PROCEDURE Main()
 
    LOCAL aLastPaint, clr, scr
@@ -43,15 +75,18 @@ PROCEDURE Main()
    LOCAL kf4     := SetKey( K_F4, {|| Wvt_WindowExpand( -1 ) } )
    LOCAL kf5     := SetKey( K_F5, {|| VouBrowse() } )
 	LOCAL nMaxRows:= MaxRow()
-
+   LOCAL nBtnRow := nMaxRows - 2
    LOCAL cLabel  := 'xHarbour simulated GUI.'
-
+   LOCAL aObjects:= Wvt_SetObjects( {} )
+   LOCAL aObj    := {}
+      
    SET DATE BRITISH
 
    get_1 := ctod( '04/01/04' )
 
    Wvt_SetFont( 'Courier New', 18 )
-
+   Wvt_SetMouseMove( .t. )
+   
    aAdd( aBlocks, {|| Wvt_SetIcon( 'vr_1.ico' ) } )
    aAdd( aBlocks, {|| Wvt_SetTitle( 'Vouch' ) } )
    aAdd( aBlocks, {|| Wvt_DrawLabel( 1,40, cLabel,6,, rgb(255,255,255), rgb(198,198,198), 'Arial', 26, , , , , .t., .t. ) } )
@@ -62,10 +97,32 @@ PROCEDURE Main()
    aAdd( aBlocks, {|| Wvt_DrawImage( 8,62,12,69, 'vouch1.bmp' ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxRecessed( 7, 48, 13, 55 ) } )
    aAdd( aBlocks, {|| aEval( GetList, {|oGet| Wvt_DrawBoxGet( oGet:Row, oGet:Col, Len( Transform( oGet:VarGet(), oGet:Picture ) ) ) } ) } )
-   aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nMaxRows-2, 4, nMaxRows-2, 18 ) } )
-   aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nMaxRows-2,20, nMaxRows-2, 30 ) } )
-   aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nMaxRows-2,32, nMaxRows-2, 42 ) } )
-   aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nMaxRows-2,44, nMaxRows-2, 54 ) } )
+  
+   aAdd( aBlocks, {|| Wvt_DrawButton( nBtnRow,16,nBtnRow+1,19,'Expand','v_notes.ico' ) } )
+   aAdd( aBlocks, {|| Wvt_DrawButton( nBtnRow,21,nBtnRow+1,24,'Shrink',              , 0, rgb( 100,22,241 ), rgb( 0,100,0 ) ) } )         
+   aAdd( aBlocks, {|| Wvt_DrawButton( nBtnRow,26,nBtnRow+1,29,'Tools'    ,'v_tools.ico' , 2 ) } )
+   aAdd( aBlocks, {|| Wvt_DrawButton( nBtnRow,31,nBtnRow+1,34,'Help'     ,'v_help.ico', 3 ) } )   
+   
+   aAdd( aBlocks, {|| Wvt_DrawButton( nBtnRow+1,36,nBtnRow+1,41,'Data',, 0, rgb( 100,22,241 ), rgb( 198,198,198 ) ) } )         
+
+   Wvt_SetObjects( { OBJ_TYPE_BUTTON, 1,  nBtnRow, 6,nBtnRow+1, 9, ;
+       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,'vouch1.bmp',2  ) },;
+       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,'vouch1.bmp',0  ) },;
+       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,'vouch1.bmp',1  ) },;
+       {|| Wvt_DrawButton( nBtnRow, 6,nBtnRow+1, 9,  ,'vouch1.bmp',2  ), ;
+              eval( SetKey( K_F2 ) ) } ;
+                    } )
+
+   Wvt_SetObjects( { OBJ_TYPE_BUTTON, 2,  nBtnRow,11,nBtnRow+1,14, ;
+       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,'v_browse.ico', 2 ) },;
+       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,'v_browse.ico', 0 ) },;
+       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,'v_browse.ico', 1 ) },;
+       {|| Wvt_DrawButton( nBtnRow,11,nBtnRow+1,14,  ,'v_browse.ico', 2 )  ,;
+              eval( SetKey( K_F5 ) ) },;
+                    } )
+                     
+   aAdd( aBlocks, {|| Wvt_Mouse( -1000001 ) } )
+
 
    aLastPaint := Wvt_SetBlocks( aBlocks )
 
@@ -77,10 +134,6 @@ PROCEDURE Main()
    SetColor( 'N/W,N/GR*,,,N/W*' )
 
    @ nMaxRows  , 0 SAY PadC( 'xHarbour + WVT Console GUI Screen',80 ) COLOR 'R+/W'
-   @ nMaxRows-2, 4 say ' F2 New Screen ' COLOR 'N/W'
-   @ nMaxRows-2,20 say ' F3 Expand '     COLOR 'N/W'
-   @ nMaxRows-2,32 say ' F4 Shrink '     COLOR 'N/W'
-	@ nMaxRows-2,44 say ' F5 Browse '     COLOR 'N/W'
 
    @  6, nColGet SAY '< Date >'
    @  9, nColGet SAY '<' + PadC( 'Name', 33 ) + '>'
@@ -99,6 +152,7 @@ PROCEDURE Main()
    //  Restore Environment
    //
    Wvt_setBlocks( aLastPaint )
+   Wvt_SetObjects( aObjects )
    SetColor( clr )
    RestScreen( 0,0,maxrow(),maxcol(), scr )
    SetKey( K_F2, kf2 )
@@ -131,7 +185,8 @@ PROCEDURE GuiGets_1()
    LOCAL cLabel     := 'VOUCH, that GROWS with you'
    LOCAL aPalette   := Wvt_GetPalette()
    LOCAL aNewPalette:= aclone( aPalette )
-
+   LOCAL aObjects   := Wvt_SetObjects( {} )
+   
    // Change the values of pallatte arbitrarily though yu can fine tune
    // these values with realistic values.
    //
@@ -149,7 +204,15 @@ PROCEDURE GuiGets_1()
    aAdd( aBlocks, {|| Wvt_DrawRectangle( 11, 50, 13, 58 ) } )
    aAdd( aBlocks, {|| Wvt_DrawBoxGroupRaised( 5, 6, 19, 72 ) } )
    aAdd( aBlocks, {|| aEval( GetList, {|oGet| Wvt_DrawBoxGet( oGet:Row, oGet:Col, Len( Transform( oGet:VarGet(), oGet:Picture ) ) ) } ) } )
-
+   
+   aAdd( aBlocks, {|| Wvt_DrawButton( 21, 6,22, 9,'New'   ,'vouch1.bmp' ) } )
+   aAdd( aBlocks, {|| Wvt_DrawButton( 21,11,22,14,'Browse','vouch1.bmp', 1, rgb( 255,255,255 ) ) } )
+   aAdd( aBlocks, {|| Wvt_DrawButton( 21,16,22,19, ,'vouch1.bmp' ) } )
+   aAdd( aBlocks, {|| Wvt_DrawButton( 21,21,22,24,'Data',, 0, rgb( 100,22,241 ), rgb( 198,198,198 ) ) } )         
+   aAdd( aBlocks, {|| Wvt_DrawButton( 21,26,22,29,'Flat','vr_1.ico',2 ) } )
+   aAdd( aBlocks, {|| Wvt_DrawButton( 21,31,22,34,'Outline','vr_1.ico',3 ) } )   
+   aAdd( aBlocks, {|| Wvt_DrawButton( 22,36,22,41,'Data',, 0, rgb( 100,22,241 ), rgb( 198,198,198 ) ) } )         
+         
    aLastPaint := Wvt_SetBlocks( aBlocks )
    scr        := SaveScreen( 0,0,maxrow(),maxcol() )
    clr        := SetColor( 'N/W' )
@@ -176,6 +239,7 @@ PROCEDURE GuiGets_1()
 
    // Restore Environment
    //
+   Wvt_SetObjects( aObjects )
    Wvt_setBlocks( aLastPaint )
    Wvt_SetPalette( aPalette )
    SetColor( clr )
@@ -187,7 +251,7 @@ RETURN
 //      Wvt_Paint() must be a FUNCTION in your application
 //      as it is called when Window gets WM_PAINT message.
 //-------------------------------------------------------------------//
-FUNCTION Wvt_Paint( hWnd, msg, wParam, lParam )
+FUNCTION Wvt_Paint( hWnd, msg, wParam, lParam, nTop, nLeft, nBottom, nRight )
 
    LOCAL aBlocks := Wvt_SetBlocks()
 
@@ -227,6 +291,82 @@ FUNCTION Wvt_KillFocus( hWnd )
 
 RETURN nil
 //-------------------------------------------------------------------//
+//
+//      Wvt_Mouse() must be present if you want to catch and fire
+//      mouse call back outside of the inkey() loop.
+//
+//-------------------------------------------------------------------//
+FUNCTION Wvt_Mouse( nKey, nRow, nCol )
+
+	LOCAL i, nLen, aObjects := Wvt_SetObjects()
+   LOCAL nObj
+   
+   STATIC nLastObj := 0
+   
+	if ( nLen := len( aObjects ) ) == 0
+		return nil
+	endif
+	
+	if nKey == -1000001
+		for nObj :=	1 to nLen
+			DO CASE
+			CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_DISP
+				eval( aObjects[ nObj, WVT_OBJ_ONDISP ] )
+			CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_MOUSEOVER	
+				eval( aObjects[ nObj, WVT_OBJ_ONMOUSEOVER ] )
+			CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_BUTTONDOWN
+				eval( aObjects[ nObj, WVT_OBJ_ONBUTTONDOWN ] )
+			CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_BUTTONUP
+				eval( aObjects[ nObj, WVT_OBJ_ONDISP ] )
+			CASE aObjects[ nObj, WVT_OBJ_STATE ] == OBJ_STATE_HIDE
+
+			ENDCASE
+		next
+		return nil
+	endif
+
+   nObj := ascan( aObjects, {|e_| e_[ WVT_OBJ_ROW   ] <= nRow .and. ;
+                                  e_[ WVT_OBJ_ROWTO ] >= nRow .and. ;
+                                  e_[ WVT_OBJ_COL   ] <= nCol .and. ;
+                                  e_[ WVT_OBJ_COLTO ] >= nCol } )
+	if nObj == 0
+		if nLastObj > 0
+		   aObjects[ nLastObj, WVT_OBJ_STATE ] := OBJ_STATE_DISP
+			eval( aObjects[ nLastObj, WVT_OBJ_ONDISP ] )
+			nLastObj := 0
+		endif
+	   return nil
+	endif
+
+   if nLastObj <> nObj
+      nLastObj := nObj
+	endif
+		   
+	DO CASE
+	CASE nKey == K_MOUSEMOVE
+		if aObjects[ nLastObj, WVT_OBJ_STATE ] <> OBJ_STATE_MOUSEOVER
+  			aObjects[ nLastObj, WVT_OBJ_STATE ] := OBJ_STATE_MOUSEOVER
+			if aObjects[ nObj, WVT_OBJ_ONMOUSEOVER ] <> nil
+				eval( aObjects[ nObj, WVT_OBJ_ONMOUSEOVER ] )
+			endif
+		endif
+			
+	CASE nKey == K_LBUTTONDOWN
+  		aObjects[ nLastObj, WVT_OBJ_STATE ] := OBJ_STATE_BUTTONDOWN
+  		if aObjects[ nObj, WVT_OBJ_ONBUTTONDOWN ] <> nil
+  			eval( aObjects[ nObj, WVT_OBJ_ONBUTTONDOWN ] )
+   	endif
+			
+	CASE nKey == K_LBUTTONUP
+  		aObjects[ nLastObj, WVT_OBJ_STATE ] := OBJ_STATE_DISP
+  		if aObjects[ nObj, WVT_OBJ_ONBUTTONUP ] <> nil
+  			eval( aObjects[ nObj, WVT_OBJ_ONBUTTONUP ] )
+   	endif
+	
+	ENDCASE
+   
+RETURN nil
+//-------------------------------------------------------------------//
 //  Wvt_SetBlocks() is a get/set FUNCTION to be used by Wvt_Paint()
 //-------------------------------------------------------------------//
 FUNCTION Wvt_SetBlocks( a_ )
@@ -242,6 +382,33 @@ FUNCTION Wvt_SetBlocks( a_ )
 
 RETURN o
 
+//-------------------------------------------------------------------//
+//  Wvt_SetObjects() is a get/set FUNCTION to be used by Wvt_Mouse()
+//-------------------------------------------------------------------//
+FUNCTION Wvt_SetObjects( aObject )
+
+   LOCAL oObjects
+   STATIC aObjects := {}
+   
+   oObjects := aclone( aObjects )
+   
+   if aObject <> nil
+      if empty( aObject )
+      	aObjects := {}
+      else
+         if valtype( aObject[ 1 ] ) == 'A'
+				aeval( aObject, {|e_| aadd( aObjects, e_ ) } )
+         else
+	         aSize( aObject, WVT_OBJ_VRBLS )
+
+	         DEFAULT aObject[ WVT_OBJ_STATE ] TO OBJ_STATE_DISP
+
+		   	aadd( aObjects, aObject )
+		   endif	
+	   endif	
+   endif
+
+RETURN oObjects
 //-------------------------------------------------------------------//
 FUNCTION Wvt_WindowExpand( nUnits )
 
@@ -291,7 +458,8 @@ FUNCTION VouBrowse()
 	LOCAL nCol    := col()
    LOCAL cColor  := SetColor( 'N/W*,N/GR*,,,N/W* ' )
 	LOCAL cScr    := SaveScreen( 0,0,maxrow(),maxcol() )
-
+   LOCAL aObjects:= Wvt_SetObjects( {} )
+   
 	STATIC nStyle := 0
 
 	USE 'TEST' NEW
@@ -394,7 +562,8 @@ FUNCTION VouBrowse()
 
 	Wvt_SetPen( 0 )
    Wvt_setBlocks( aLastPaint )
-
+	Wvt_SetObjects( aObjects )
+	
    DevPos( nRow, nCol )
    SetColor( cColor )
    SetCursor( nCursor )
@@ -456,6 +625,6 @@ RETURN lMoved
 //-------------------------------------------------------------------//
 STATIC FUNCTION VouBlockField( i )
 
-RETURN  { || fieldget( i ) }
+RETURN  {|| fieldget( i ) }
 //-------------------------------------------------------------------//
 
