@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.7 2002/01/21 09:11:56 ronpinkas Exp $
+ * $Id: classes.c,v 1.8 2002/01/21 20:51:42 ronpinkas Exp $
  */
 
 /*
@@ -2083,7 +2083,7 @@ HB_FUNC( __EVAL )
       for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
          hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
 
-      hb_vmDo( ( USHORT ) uiPCount );     /* Self is also an argument */
+      hb_vmSend( ( USHORT ) uiPCount );     /* Self is also an argument */
    }
    else
       hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, NULL, "EVAL", 0 );
@@ -2273,7 +2273,7 @@ static HARBOUR hb___msgEvalInline( void )
       hb_vmPush( hb_stackItemFromBase( uiParam ) );
    }
 
-   hb_vmDo( ( USHORT ) (uiPCount + 1 ) );     /* Self is also an argument */
+   hb_vmSend( ( USHORT ) (uiPCount + 1 ) );     /* Self is also an argument */
 
    hb_codeblockDelete( &block );              /* Release block            */
 }
@@ -2296,7 +2296,7 @@ static HARBOUR hb___msgEval( void )
       for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
          hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
 
-      hb_vmDo( ( USHORT ) uiPCount );                       /* Self is also an argument */
+      hb_vmSend( ( USHORT ) uiPCount );                       /* Self is also an argument */
    }
    else
       hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, NULL, "EVAL", 0 );

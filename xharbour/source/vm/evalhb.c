@@ -1,5 +1,5 @@
 /*
- * $Id: evalhb.c,v 1.1 2001/12/05 11:36:33 vszakats Exp $
+ * $Id: evalhb.c,v 1.1.1.1 2001/12/21 10:41:04 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,9 @@ HB_FUNC( EVAL )
       USHORT uiParam;
 
       hb_vmPushSymbol( &hb_symEval );
+
       hb_vmPush( pItem );
+
       /* NOTE: hb_param() function cannot be used for parameter access
        * because we need to pass the references too.
        * hb_param() is dereferencing the passed parameters
@@ -76,7 +78,7 @@ HB_FUNC( EVAL )
          hb_vmPush( hb_stackItemFromBase( uiParam ) );
       }
 
-      hb_vmDo( uiPCount - 1 );
+      hb_vmSend( uiPCount - 1 );
    }
    else
    {

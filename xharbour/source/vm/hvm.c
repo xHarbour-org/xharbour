@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.17 2002/01/21 20:51:42 ronpinkas Exp $
+ * $Id: hvm.c,v 1.18 2002/01/21 23:42:31 ronpinkas Exp $
  */
 
 /*
@@ -3107,7 +3107,7 @@ static void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSy
    hb_vmPush( pObjItem );                             /* Push object              */
    hb_vmPush( pMsgItem );                             /* Push argument            */
 
-   hb_vmDo( 1 );
+   hb_vmSend( 1 );
 
    /* pop passed arguments - only one here */
    hb_stackPop();               /* pMsgItem */
@@ -3144,7 +3144,7 @@ static void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol )
    hb_vmPush( &ItemMsg );
    hb_vmPush( pObjItem );                             /* Push object */
 
-   hb_vmDo( 0 );
+   hb_vmSend( 0 );
 
    /* Pop passed argument.
     * NOTE: for performance reason we don't pop it and we don't push the
@@ -3277,10 +3277,9 @@ void hb_vmDo( USHORT uiParams )
    HB_STACK_STATE sStackState;
    PHB_ITEM pSelf;
    PHB_FUNC pFunc;
-   BOOL bDebugPrevState;
-   ULONG ulClock = 0;
-   void * pMethod = NULL;
-   BOOL bProfiler = hb_bProfiler; /* because profiler state may change */
+   BOOL     bDebugPrevState;
+   ULONG    ulClock = 0;
+   BOOL     bProfiler = hb_bProfiler; /* because profiler state may change */
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDo(%hu)", uiParams));
 
@@ -3309,115 +3308,7 @@ void hb_vmDo( USHORT uiParams )
    s_bDebugging = FALSE;
    HB_TRACE( HB_TR_INFO, ( "Symbol: '%s'", pSym->szName ) );
 
-   if( ! HB_IS_NIL( pSelf ) ) /* are we sending a message ? */
-   {
-      BOOL lPopSuper = FALSE;
-      PHB_BASEARRAY pSelfBase = NULL;
-
-      if( pSym == &( hb_symEval ) && HB_IS_BLOCK( pSelf ) )
-      {
-         pFunc = pSym->pFunPtr;                 /* __EVAL method = function */
-      }
-      else
-      {
-         pFunc = hb_objGetMethod( pSelf, pSym );
-
-         if( HB_IS_OBJECT( pSelf ) )               /* Object passed            */
-         {
-            pSelfBase = pSelf->item.asArray.value;
-
-            if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
-            {
-              PHB_ITEM pRealSelf;
-              USHORT nPos;
-              USHORT uiClass;
-
-              /*
-              printf( "\n VmDo Method: %s \n", pSym->szName );
-              */
-              uiClass=pSelfBase->uiClass;
-
-              pRealSelf = hb_itemNew( NULL ) ;
-              hb_itemCopy( pRealSelf, pSelf->item.asArray.value->pItems );  // hb_arrayGetItemPtr(pSelf,1) ;
-
-              /* and take back the good pSelfBase */
-              pSelfBase = pRealSelf->item.asArray.value;
-
-              /* Now I should exchnage it with the current stacked value */
-              hb_itemSwap( pSelf, pRealSelf );
-              hb_itemRelease( pRealSelf ) ; /* and release the fake one */
-
-              /* Push current SuperClass handle */
-              lPopSuper = TRUE ;
-
-              if ( ! pSelf->item.asArray.value->puiClsTree)
-              {
-                 pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
-                 pSelf->item.asArray.value->puiClsTree[0]=0;
-              }
-
-              nPos = pSelfBase->puiClsTree[0] + 1;
-              pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * ( nPos + 1 ) );
-
-              pSelfBase->puiClsTree[0] = nPos ;
-              pSelfBase->puiClsTree[ nPos ] = uiClass;
-            }
-         }
-      }
-
-      if( pFunc )
-      {
-         if( bProfiler )
-         {
-            pMethod = hb_mthRequested();
-         }
-
-         if ( hb_bTracePrgCalls )
-         {
-            HB_TRACE(HB_TR_ALWAYS, ("Calling: %s", pSym->szName));
-         }
-
-         pFunc();
-
-         if (lPopSuper && pSelfBase->puiClsTree)
-         {
-
-           USHORT nPos=pSelfBase->puiClsTree[0]-1;
-           /* POP SuperClass handle */
-
-           if( nPos )
-           {
-              pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos + 1) );
-              pSelfBase->puiClsTree[0]=nPos;
-           }
-           else
-           {
-              hb_xfree(pSelfBase->puiClsTree);
-              pSelfBase->puiClsTree = NULL ;
-           }
-         }
-
-         if( bProfiler )
-         {
-            hb_mthAddTime( pMethod, clock() - ulClock );
-         }
-      }
-      else if( pSym->szName[ 0 ] == '_' )
-      {
-         PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
-
-         hb_errRT_BASE_SubstR( EG_NOVARMETHOD, 1005, NULL, pSym->szName + 1, 1, pArgsArray );
-         hb_itemRelease( pArgsArray );
-      }
-      else
-      {
-         PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
-
-         hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, NULL, pSym->szName, 1, pArgsArray );
-         hb_itemRelease( pArgsArray );
-      }
-   }
-   else /* it is a function */
+   if( HB_IS_NIL( pSelf ) ) /* are we sending a message ? */
    {
       pFunc = pSym->pFunPtr;
 
@@ -3457,6 +3348,11 @@ void hb_vmDo( USHORT uiParams )
          hb_errRT_BASE_SubstR( EG_NOFUNC, 1001, NULL, pSym->szName, 1, pArgsArray );
          hb_itemRelease( pArgsArray );
       }
+   }
+   else
+   {
+      printf( "\nERROR, hb_vmDo() called to execute '%s' with a non NIL self value.\n", pSym->szName );
+      exit(1);
    }
 
    HB_TRACE(HB_TR_DEBUG, ("DONE hb_vmDo(%hu)", uiParams));
@@ -3684,7 +3580,7 @@ HB_ITEM_PTR hb_vmEvalBlock( HB_ITEM_PTR pBlock )
 
    hb_vmPushSymbol( &hb_symEval );
    hb_vmPush( pBlock );
-   hb_vmDo( 0 );
+   hb_vmSend( 0 );
    return &hb_stack.Return;
 }
 
@@ -3715,7 +3611,7 @@ HB_ITEM_PTR hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ... )
 
    /* take care here, possible loss of data long to short ... */
    /* added an explicit casting here for VC++ JFL */
-   hb_vmDo( (USHORT) ulArgCount );
+   hb_vmSend( (USHORT) ulArgCount );
 
    return &hb_stack.Return;
 }

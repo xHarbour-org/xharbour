@@ -1,5 +1,5 @@
 /*
- * $Id: xhelp.c,v 1.7 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: xhelp.c,v 1.1.1.1 2001/12/21 10:42:19 ronpinkas Exp $
  */
 
 /*
@@ -66,9 +66,14 @@ HB_FUNC( __XHELP )
 
       hb_vmPushSymbol( pDynSym->pSymbol );
       hb_vmPushNil();
+
       for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
+      {
          hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
+      }
+
       hb_vmDo( uiPCount );
+
 /*
       hb_vmPushSymbol( pDynSym->pSymbol );
       hb_vmPushNil();

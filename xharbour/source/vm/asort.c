@@ -1,5 +1,5 @@
 /*
- * $Id: asort.c,v 1.3 2002/01/17 23:20:47 ronpinkas Exp $
+ * $Id: asort.c,v 1.4 2002/01/21 09:11:56 ronpinkas Exp $
  */
 
 /*
@@ -134,7 +134,7 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
             hb_vmPush( pBlock );
             hb_vmPush( pItems + i );
             hb_vmPush( &pivot );
-            hb_vmDo( 2 );
+            hb_vmSend( 2 );
 
             if( ( HB_IS_LOGICAL( &hb_stack.Return ) ? hb_stack.Return.item.asLogical.value : hb_itemIsLess( pItems + i, &pivot ) ) )
                i++;
@@ -148,7 +148,7 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
             hb_vmPush( pBlock );
             hb_vmPush( &pivot );
             hb_vmPush( pItems + j );
-            hb_vmDo( 2 );
+            hb_vmSend( 2 );
 
             if( ( HB_IS_LOGICAL( &hb_stack.Return ) ? hb_stack.Return.item.asLogical.value : hb_itemIsLess( &pivot, pItems + j ) ) )
                j--;

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.91 2002/01/21 07:08:26 alkresin Exp $
+ * $Id: dbfntx1.c,v 1.5 2002/01/21 23:42:31 ronpinkas Exp $
  */
 
 /*
@@ -198,7 +198,7 @@ static BOOL checkLogicalExpr( PHB_ITEM pForItem, PHB_ITEM pItem )
    {
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pForItem );
-      hb_vmDo( 0 );
+      hb_vmSend( 0 );
       hb_itemCopy( pItem, &hb_stack.Return );
    }
    else
@@ -404,7 +404,7 @@ static void hb_ntxGetCurrentKey( LPTAGINFO pTag, LPKEYINFO pKey )
    {
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pTag->pKeyItem );
-      hb_vmDo( 0 );
+      hb_vmSend( 0 );
       switch( hb_itemType( &hb_stack.Return ) )
       {
          case HB_IT_STRING:
@@ -1793,7 +1793,7 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
          {
             hb_vmPushSymbol( &hb_symEval );
             hb_vmPush( pTag->pKeyItem );
-            hb_vmDo( 0 );
+            hb_vmSend( 0 );
             hb_itemCopy( pItem, &hb_stack.Return );
          }
          else
@@ -1849,7 +1849,7 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
          {
             hb_vmPushSymbol( &hb_symEval );
             hb_vmPush( pArea->lpdbOrdCondInfo->itmCobEval );
-            hb_vmDo( 0 );
+            hb_vmSend( 0 );
          }
       }
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.38 2001/09/08 15:41:24 rglab Exp $
+ * $Id: macro.c,v 1.1.1.1 2001/12/21 10:41:03 ronpinkas Exp $
  */
 
 /*
@@ -756,19 +756,26 @@ void hb_macroPushSymbol( HB_ITEM_PTR pItem )
          HB_DYNS_PTR pDynSym =  hb_dynsymGet( szString );
 
          hb_stackPop();    /* remove compiled string */
+
          /* NOTE: checking for valid function name (valid pointer) is done
           * in hb_vmDo()
           */
          hb_vmPushSymbol( pDynSym->pSymbol );  /* push compiled symbol instead of a string */
 
          if( bNewBuffer )
+         {
             hb_xfree( szString );   /* free space allocated in hb_macroTextSubst */
+         }
       }
       else
       {
          hb_stackPop();    /* remove compiled string */
+
          if( bNewBuffer )
+         {
             hb_xfree( szString );   /* free space allocated in hb_macroTextSubst */
+         }
+
          hb_macroSyntaxError( NULL );
       }
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.101 2002/01/11 10:22:39 lculik Exp $
+ * $Id: dbf1.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -1960,7 +1960,7 @@ ERRCODE hb_dbfPack( DBFAREAP pArea )
             ulEvery = 0;
             hb_vmPushSymbol( &hb_symEval );
             hb_vmPush( pBlock );
-            hb_vmDo( 0 );
+            hb_vmSend( 0 );
          }
       }
 
@@ -1983,7 +1983,7 @@ ERRCODE hb_dbfPack( DBFAREAP pArea )
    {
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pBlock );
-      hb_vmDo( 0 );
+      hb_vmSend( 0 );
    }
 
    pArea->ulRecCount = ulRecOut;

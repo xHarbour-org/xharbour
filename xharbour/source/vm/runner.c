@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.2 2002/01/12 10:04:28 ronpinkas Exp $
+ * $Id: runner.c,v 1.3 2002/01/17 23:20:48 ronpinkas Exp $
  */
 
 /*
@@ -281,9 +281,13 @@ HB_FUNC( __HRBRUN )
                {
                   hb_vmPushSymbol( pSymRead + ul );
                   hb_vmPushNil();
+
+                                                         /* Push other cmdline params*/
                   for( i = 0; i < ( hb_pcount() - 1 ); i++ )
+                  {
                      hb_vmPush( hb_param( i + 2, HB_IT_ANY ) );
-                                                  /* Push other cmdline params*/
+                  }
+
                   hb_vmDo( hb_pcount() - 1 );            /* Run init function        */
                }
             }
@@ -293,8 +297,12 @@ HB_FUNC( __HRBRUN )
             {
                 hb_vmPushSymbol( &( pSymRead[ ulSymStart ] ) );
                 hb_vmPushNil();
+
                 for( i = 0; i < ( hb_pcount() - 1 ); i++ )
-                hb_vmPush( hb_param( i + 2, HB_IT_ANY ) );    /* Push other cmdline params*/
+                {
+                   hb_vmPush( hb_param( i + 2, HB_IT_ANY ) ); /* Push other cmdline params*/
+                }
+
                 hb_vmDo( hb_pcount() - 1 );                   /* Run the thing !!!        */
 
                 pRetVal = hb_itemNew( NULL );

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.86 2002/01/19 21:16:32 horacioroldan Exp $
+ * $Id: dbfcdx1.c,v 1.5 2002/01/21 23:42:31 ronpinkas Exp $
  */
 
 /*
@@ -1772,7 +1772,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
             {
                hb_vmPushSymbol( &hb_symEval );
                hb_vmPush( pTag->pForItem );
-               hb_vmDo( 0 );
+               hb_vmSend( 0 );
                hb_itemCopy( pItem, &hb_stack.Return );
             }
             else
@@ -1794,7 +1794,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
 
                hb_vmPushSymbol( &hb_symEval );
                hb_vmPush( pTag->pKeyItem );
-               hb_vmDo( 0 );
+               hb_vmSend( 0 );
                hb_itemCopy( pItem, &hb_stack.Return );
             }
             else
@@ -4757,7 +4757,7 @@ ERRCODE hb_cdxGoTo( CDXAREAP pArea, ULONG ulRecNo )
       {
           hb_vmPushSymbol( &hb_symEval );
           hb_vmPush( pTag->pKeyItem );
-          hb_vmDo( 0 );
+          hb_vmSend( 0 );
           hb_cdxKeyPutItem( pKey, &hb_stack.Return );
       }
       else
@@ -4854,7 +4854,7 @@ ERRCODE hb_cdxGoHot( CDXAREAP pArea )
          {
             hb_vmPushSymbol( &hb_symEval );
             hb_vmPush( pTag->pKeyItem );
-            hb_vmDo( 0 );
+            hb_vmSend( 0 );
             hb_cdxKeyPutItem( pKey, &hb_stack.Return );
          }
          else
@@ -4904,7 +4904,7 @@ ERRCODE hb_cdxGoCold( CDXAREAP pArea )
                {
                   hb_vmPushSymbol( &hb_symEval );
                   hb_vmPush( pTag->pForItem );
-                  hb_vmDo( 0 );
+                  hb_vmSend( 0 );
                   bForOk = hb_itemGetL( &hb_stack.Return );
                }
                else
@@ -4924,7 +4924,7 @@ ERRCODE hb_cdxGoCold( CDXAREAP pArea )
             {
                 hb_vmPushSymbol( &hb_symEval );
                 hb_vmPush( pTag->pKeyItem );
-                hb_vmDo( 0 );
+                hb_vmSend( 0 );
                 hb_cdxKeyPutItem( pKey, &hb_stack.Return );
             }
             else

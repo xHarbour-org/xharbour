@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.3 2002/01/12 10:04:28 ronpinkas Exp $
+ * $Id: eval.c,v 1.4 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -125,8 +125,12 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
       {
          hb_vmPushSymbol( hb_dynsymFindName( hb_itemGetCPtr( pEvalInfo->pItems[ 0 ] ) )->pSymbol );
          hb_vmPushNil();
+
          while( uiParam <= pEvalInfo->paramCount )
+         {
             hb_vmPush( pEvalInfo->pItems[ uiParam++ ] );
+         }
+
          hb_vmDo( pEvalInfo->paramCount );
 
          pResult = hb_itemNew( NULL );
@@ -136,9 +140,13 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
       {
          hb_vmPushSymbol( &hb_symEval );
          hb_vmPush( pEvalInfo->pItems[ 0 ] );
+
          while( uiParam <= pEvalInfo->paramCount )
+         {
             hb_vmPush( pEvalInfo->pItems[ uiParam++ ] );
-         hb_vmDo( pEvalInfo->paramCount );
+         }
+
+         hb_vmSend( pEvalInfo->paramCount );
 
          pResult = hb_itemNew( NULL );
          hb_itemForwardValue( pResult, &hb_stack.Return );
@@ -210,11 +218,17 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
             va_list va;
 
             va_start( va, ulPCount );
+
             hb_vmPushSymbol( pDynSym->pSymbol );
             hb_vmPushNil();
+
             for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
+            {
                hb_vmPush( va_arg( va, PHB_ITEM ) );
+            }
+
             hb_vmDo( ( unsigned short ) ulPCount );
+
             va_end( va );
 
             pResult = hb_itemNew( NULL );
@@ -235,7 +249,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
          hb_vmPush( pItem );
          for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
             hb_vmPush( va_arg( va, PHB_ITEM ) );
-         hb_vmDo( ( unsigned short ) ulPCount );
+         hb_vmSend( ( unsigned short ) ulPCount );
          va_end( va );
 
          pResult = hb_itemNew( NULL );
@@ -247,11 +261,17 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
          va_list va;
 
          va_start( va, ulPCount );
+
          hb_vmPushSymbol( pItem->item.asSymbol.value );
          hb_vmPushNil();
+
          for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
+         {
             hb_vmPush( va_arg( va, PHB_ITEM ) );
+         }
+
          hb_vmDo( ( unsigned short ) ulPCount );
+
          va_end( va );
 
          pResult = hb_itemNew( NULL );
@@ -293,13 +313,17 @@ PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
          va_list va;
 
          va_start( va, ulPCount );
+
          hb_vmPushSymbol( pDynSym->pSymbol );
          hb_vmPushNil();
+
          for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
          {
             hb_vmPush( va_arg( va, PHB_ITEM ) );
          }
+
          hb_vmDo( ( unsigned short ) ulPCount );
+
          va_end( va );
 
          pResult = hb_itemNew( NULL );
