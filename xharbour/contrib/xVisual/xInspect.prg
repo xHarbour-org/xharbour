@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.24 2002/10/09 08:49:17 what32 Exp $
+ * $Id: xInspect.prg,v 1.25 2002/10/11 03:10:38 what32 Exp $
  */
 
 /*
@@ -117,7 +117,7 @@ METHOD OnCreate() CLASS ObjInspect
 
 //------------------------------------------------------------------------ sets the browser
   aHeads:= { { "Property", 85,},;
-             { "Value",    81, {|cText,o,nwParam|::SaveVar(cText,nwParam)} }   }
+             { "Value",    81, {|cText,o,nKey|::SaveVar(cText,nKey)} }   }
 
   aProp := { {"",""} }  // initial data
 
@@ -133,7 +133,7 @@ return( super:OnCreate() )
 
 //----------------------------------------------------------------------------------------------
 
-METHOD SaveVar(cText,nwParam) CLASS ObjInspect
+METHOD SaveVar(cText,nKey) CLASS ObjInspect
    local cType, cVar
    cVar := ::Browser:source[::Browser:RecPos][1]
    cType:= valtype( __objSendMsg( ::CurObject, cVar ) )
@@ -162,9 +162,9 @@ METHOD SaveVar(cText,nwParam) CLASS ObjInspect
 
    endif
 
-   IF nwParam==VK_UP .OR. nwParam==VK_DOWN
+   IF nKey==VK_UP .OR. nKey==VK_DOWN
       ::Browser:RefreshCurrent()
-      PostMessage( ::Browser:hWnd, WM_KEYDOWN, nwParam, 0 )
+      PostMessage( ::Browser:hWnd, WM_KEYDOWN, nKey, 0 )
       PostMessage( ::Browser:hWnd, WM_LBUTTONDBLCLK, 0, 0 )
       ::Browser:RefreshAll()
    ENDIF
