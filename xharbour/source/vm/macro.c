@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.27 2003/08/20 05:01:49 ronpinkas Exp $
+ * $Id: macro.c,v 1.28 2003/08/20 23:17:38 ronpinkas Exp $
  */
 
 /*
@@ -62,6 +62,21 @@
 
 #ifdef HB_MACRO_STATEMENTS
   #include "hbpp.h"
+#endif
+
+/* TODO: remove these externals */
+//JC1: halfway though :-)
+#ifndef HB_THREAD_SUPPORT
+   #ifdef HB_EXTERN_C
+   extern "C" {
+   #endif
+   extern int hb_vm_aiExtraParams[HB_MAX_MACRO_ARGS], hb_vm_iExtraParamsIndex;
+   extern int hb_vm_aiExtraElements[HB_MAX_MACRO_ARGS], hb_vm_iExtraElementsIndex;
+   extern int hb_vm_iExtraIndex;
+   extern PHB_SYMB hb_vm_apExtraParamsSymbol[HB_MAX_MACRO_ARGS];
+   #ifdef HB_EXTERN_C
+   }
+   #endif
 #endif
 
 /* .and. & .or. expressions shortcuts - the expression optimiser needs
@@ -487,14 +502,6 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
  */
 void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
 {
-   /* TODO: remove these externals */
-   //JC1: halfway though :-)
-   #ifndef HB_THREAD_SUPPORT
-   extern int hb_vm_aiExtraParams[HB_MAX_MACRO_ARGS], hb_vm_iExtraParamsIndex;
-   extern int hb_vm_aiExtraElements[HB_MAX_MACRO_ARGS], hb_vm_iExtraElementsIndex;
-   extern int hb_vm_iExtraIndex;
-   extern PHB_SYMB hb_vm_apExtraParamsSymbol[HB_MAX_MACRO_ARGS];
-   #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_macroGetValue(%p)", pItem));
 

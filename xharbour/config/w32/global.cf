@@ -1,6 +1,8 @@
 #
-# $Id: global.cf,v 1.7 2003/05/16 19:52:05 druzus Exp $
+# $Id: global.cf,v 1.8 2003/07/19 22:08:03 jonnymind Exp $
 #
+
+ifndef MK
 
 all : first
 
@@ -44,26 +46,14 @@ MD = md
 RANLIB = ranlib
 
 dirbase::
-	-if not exist $(HB_ARCHITECTURE) $(MD) $(HB_ARCHITECTURE)
-	-if not exist $(ARCH_DOS)        $(MD) $(ARCH_DOS)
+	-@for %d in ($(HB_ARCHITECTURE) $(ARCH_DOS)) do if not exist %d\nul $(MD) %d
 
 dirbase_mt::
-	-if not exist $(HB_ARCHITECTURE) $(MD) $(HB_ARCHITECTURE)
-	-if not exist $(ARCH_DOS)_mt     $(MD) $(ARCH_DOS)_mt
+	-@for %d in ($(HB_ARCHITECTURE) $(ARCH_DOS)_mt) do if not exist %d\nul $(MD) %d
 
 clean::
-	-for %f in ($(ARCH_DOS)\*.*) do $(RM) %f
-	-for %%f in ($(ARCH_DOS)\*.*) do $(RM) %%f
-	-for %f in ($(ARCH_DOS)_mt\*.*) do $(RM) %f
-	-for %%f in ($(ARCH_DOS)_mt\*.*) do $(RM) %%f
-	-if exist *.bak $(RM) *.bak
-	-if exist *.obj $(RM) *.obj
-	-if exist core $(RM) core
-	-if exist *.o $(RM) *.o
-	-if exist *.tds $(RM) *.tds
-	-$(RD) $(ARCH_DOS)
-	-$(RD) $(ARCH_DOS)_mt
-	-$(RD) $(HB_ARCHITECTURE)
+	-@for %f in ($(ARCH_DOS)\*.* $(ARCH_DOS)_mt\*.* *.bak *.obj *.o *.tds) do $(RM) %f
+	-@for %d in ($(ARCH_DOS) $(ARCH_DOS)_mt $(HB_ARCHITECTURE)) do if exist %d\nul $(RD) %d
 else  # bash
 
 ARCH_DIR = $(ARCH)
@@ -90,4 +80,5 @@ dirbase_mt::
 clean::
 	-$(RD) $(ARCH)
 	-$(RD) $(ARCH)_mt
+endif
 endif

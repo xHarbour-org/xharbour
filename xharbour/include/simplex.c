@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.4 2003/09/30 20:35:07 ronpinkas Exp $
+ * $Id: simplex.c,v 1.5 2003/11/11 20:20:53 ronpinkas Exp $
  */
 
 /*
@@ -1605,6 +1605,10 @@ static int rulecmp( const void * pLeft, const void * pRight )
    while( iLeftRule[i] == iRightRule[i] )
    {
       i++;
+      if ( i >= LEX_RULE_SIZE )
+      {
+         return 0;
+      }
    }
 
    if( iLeftRule[i] < iRightRule[i] )

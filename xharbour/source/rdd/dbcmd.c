@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.59 2003/11/10 12:24:57 druzus Exp $
+ * $Id: dbcmd.c,v 1.60 2003/11/27 00:39:01 lculik Exp $
  */
 
 /*
@@ -2759,7 +2759,8 @@ HB_FUNC( LOCK )
    dbLockInfo.fResult = FALSE;
    if( s_pCurrArea )
    {
-      dbLockInfo.uiMethod = DBLM_FILE;
+      dbLockInfo.itmRecID = NULL;
+      dbLockInfo.uiMethod = DBLM_EXCLUSIVE;
       SELF_LOCK( ( AREAP ) s_pCurrArea->pArea, &dbLockInfo );
    }
    else

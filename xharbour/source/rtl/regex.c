@@ -891,8 +891,16 @@ sense. However, it calls memory allocation and free functions via the two
 indirections below, which are can be changed by the caller, but are shared
 between all threads. */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void *(*pcre_malloc)(size_t) = malloc;
 void  (*pcre_free)(void *) = free;
+
+#ifdef __cplusplus
+}
+#endif
 
 
 

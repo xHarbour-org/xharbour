@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.41 2003/11/24 10:25:10 druzus Exp $
+# $Id: xharbour.spec,v 1.42 2003/11/24 20:08:03 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -652,7 +652,7 @@ rm -f ${HB_BIN_INSTALL}/hbdoc ${HB_BIN_INSTALL}/hbtest
 # Create a README file for people using this RPM.
 cat > doc/%{readme} <<EOF
 This RPM distribution of %{dname} includes extra commands to make compiling
-and linking with harbour a little easier. There are compiler and linker
+and linking with %{dname} a little easier. There are compiler and linker
 wrappers called "%{hb_pref}cc", "%{hb_pref}cmp", "%{hb_pref}lnk" and "%{hb_pref}mk".
 
 "%{hb_pref}cc" is a wrapper to the harbour compiler only. It only sets environment
@@ -815,23 +815,13 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{prefix}/lib/%{name}
 %{prefix}/lib/%{name}/libcodepage.a
 %{prefix}/lib/%{name}/libcommon.a
-%{prefix}/lib/%{name}/libdbfcdx*.a
-%{prefix}/lib/%{name}/libdbfdbt.a
-%{prefix}/lib/%{name}/libdbffpt.a
-%{prefix}/lib/%{name}/libdbfntx*.a
+%{prefix}/lib/%{name}/libdb*.a
 %{prefix}/lib/%{name}/libdebug.a
-%{prefix}/lib/%{name}/libfm.a
-%{prefix}/lib/%{name}/libfmmt.a
-%{prefix}/lib/%{name}/libgtcgi.a
-%{prefix}/lib/%{name}/libgtcrs.a
-%{prefix}/lib/%{name}/libgtnul.a
-%{prefix}/lib/%{name}/libgtpca.a
-%{prefix}/lib/%{name}/libgtsln.a
-%{prefix}/lib/%{name}/libgtstd.a
+%{prefix}/lib/%{name}/libfm*.a
+%{prefix}/lib/%{name}/libgt*.a
 %{?_with_odbc: %{prefix}/lib/%{name}/libhbodbc.a}
 %{prefix}/lib/%{name}/liblang.a
-%{prefix}/lib/%{name}/libmacro.a
-%{prefix}/lib/%{name}/libmacromt.a
+%{prefix}/lib/%{name}/libmacro*.a
 %{prefix}/lib/%{name}/libnulsys*.a
 %{prefix}/lib/%{name}/libpp*.a
 %{prefix}/lib/%{name}/librdd*.a

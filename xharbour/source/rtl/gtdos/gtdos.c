@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.6 2003/05/16 19:52:09 druzus Exp $
+ * $Id: gtdos.c,v 1.7 2003/05/21 09:35:36 druzus Exp $
  */
 
 /*
@@ -997,7 +997,7 @@ void hb_gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight,
    *  with C++ compilers
    */
    SHORT usRow, usCol;
-   int uiSize;   /* gtRectSize returns int */
+   UINT uiSize;   /* gtRectSize returns int */
    int iLength = ( usRight - usLeft ) + 1;
    int iCount, iColOld, iColNew, iColSize;
 

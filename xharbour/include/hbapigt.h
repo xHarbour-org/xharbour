@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.12 2003/10/02 20:34:36 paultucker Exp $
+ * $Id: hbapigt.h,v 1.13 2003/10/07 22:25:46 paultucker Exp $
  */
 
 /*
@@ -335,6 +335,9 @@ extern void   hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
 
 #include "hbinit.h"
 
+#if defined(__WATCOMC__) && defined(_DOS)
+#undef _DOS
+#endif
 /* These hacks are needed to force preprocessing if id/x is also a macro */
 #define _HB_GT_PREF_( id )      _HB_GT_PREF__( id )
 #define _HB_GT_PREF__( id )     _##id

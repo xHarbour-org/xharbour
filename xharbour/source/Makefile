@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2003/03/29 22:41:38 lculik Exp $
+# $Id: Makefile,v 1.3 2003/05/16 19:52:06 druzus Exp $
 #
 
 ROOT = ../
@@ -11,12 +11,12 @@ ifeq ($(HB_COMPILER),bcc16)
 # is necessary to use the DJGPP Harbour compiler.
 
 DIRS=\
-	codepage \
 	common \
 	pp \
 	rtl \
 	vm \
 	macro \
+	codepage \
 	lang \
 	rdd \
 	debug \
@@ -24,13 +24,13 @@ DIRS=\
 else
 
 DIRS=\
-	codepage \
 	common \
 	pp \
 	compiler \
 	rtl \
 	vm \
 	macro \
+	codepage \
 	lang \
 	rdd \
 	debug \

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1794 2003/11/29 00:55:10 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1795 2003/11/29 02:26:41 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,47 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-30 11:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbcmd.c
+    ! fix in LOCK - now it works like RLOCK not FLOCK
+
+  * xharbour/xharbour.spec
+    ! small fix for system which cannot build some GT
+
+  * xharbour/source/Makefile
+    * the order of builds little bit changed - build first libs necessary
+      for xHarbour compiler)
+
+  * xharbour/config/dos/global.cf
+  * xharbour/config/dos/watcom.cf
+  * xharbour/include/hbapigt.h
+    * changes for Open Watcom support and some make speed improvement
+
+  * xharbour/include/simplex.c
+    ! fix small bug for this qsort implementation which can call in
+      sort function with the same arguments fe. Open Watcom
+
+  * xharbour/source/rtl/regex.c
+    ! fix for C++ compilation
+
+  * xharbour/source/rtl/gtdos/gtdos.c
+    ! small casting fix
+
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/macro.c
+    ! extern "C" added for some declarations which breaks compilation
+      in C++ mode if C++ use different ABI then C
+
+  * xharbour/config/w32/global.cf
+    ! small fix for Open Watcom compilation
+
+  * xharbour/config/w32/watcom.cf
+    ! clean up
+
+Now xHarbour can be build using Open Watcom in CPP mode. I test it with
+DOS in DOSEMU but it should work with Windows, too with small modification
+for main function.
 
 2003-11-29 03:39 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/hash.c

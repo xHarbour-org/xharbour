@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.286 2003/11/26 06:29:36 jonnymind Exp $
+ * $Id: hvm.c,v 1.287 2003/11/26 19:43:26 jonnymind Exp $
  */
 
 /*
@@ -104,6 +104,20 @@
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
+#endif
+
+//JC1: macro and codeblock parameters are handled in thread stack
+#ifndef HB_THREAD_SUPPORT
+   #ifdef HB_EXTERN_C
+   extern "C" {
+   #endif
+   int hb_vm_aiExtraParams[HB_MAX_MACRO_ARGS], hb_vm_iExtraParamsIndex = 0;
+   PHB_SYMB hb_vm_apExtraParamsSymbol[HB_MAX_MACRO_ARGS];
+   int hb_vm_aiExtraElements[HB_MAX_MACRO_ARGS], hb_vm_iExtraElementsIndex = 0, hb_vm_iExtraElements = 0;
+   int hb_vm_iExtraIndex;
+   #ifdef HB_EXTERN_C
+   }
+   #endif
 #endif
 
 /* Mouse Disabling */
@@ -256,15 +270,6 @@ static BOOL     s_bDebuggerIsWorking; /* to know when __DBGENTRY is beeing invok
 #define  HB_RECOVER_BASE      -2
 #define  HB_RECOVER_ADDRESS   -3
 #define  HB_RECOVER_VALUE     -4
-
-//JC1: macro and codeblock parameters are handled in thread stack
-#ifndef HB_THREAD_SUPPORT
-   int hb_vm_aiExtraParams[HB_MAX_MACRO_ARGS], hb_vm_iExtraParamsIndex = 0;
-   PHB_SYMB hb_vm_apExtraParamsSymbol[HB_MAX_MACRO_ARGS];
-   int hb_vm_aiExtraElements[HB_MAX_MACRO_ARGS], hb_vm_iExtraElementsIndex = 0, hb_vm_iExtraElements = 0;
-   int hb_vm_iExtraIndex;
-
-#endif
 
 
 char *hb_vm_sNull = "";
