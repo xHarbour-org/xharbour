@@ -9,6 +9,8 @@ PROCEDURE Main()
 
   CLEAR SCREEN
 
+  nStart := Seconds()
+
   // 1st param is the Startup Function, 2nd. is Self if 1st param is a Method or NIL otherwise,
   // rest are paramaters to be passed to the Function/Method.
   StartThread ( @MyThreadFunc(), 2, "1st Thread:",     0,  5000 )
@@ -45,7 +47,9 @@ PROCEDURE MyThreadFunc( nRow, cName, nStart, nMax )
   LOCAL i
 
   FOR i := nStart TO nMax
-     @ nRow, 10 SAY cName + Str( i )
+     //@ nRow, 10 SAY cName + Str( i )
+     // Atomic operation
+     DispOutAt(nRow, 10, cName + Str( i ))
   NEXT
 
 RETURN
@@ -58,7 +62,9 @@ METHOD Count( nRow, cName, nStart, nMax ) CLASS MyClass
   LOCAL i
 
   FOR i := nStart TO nMax
-     @ nRow, 10 SAY cName + Str( i )
+     //@ nRow, 10 SAY cName + Str( i )
+     // Atomic operation
+     DispOutAt(nRow, 10, cName + Str( i ))
   NEXT
 
 RETURN NIL

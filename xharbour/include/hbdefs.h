@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.41 2004/05/09 23:40:04 druzus Exp $
+ * $Id: hbdefs.h,v 1.42 2004/05/10 00:17:13 ronpinkas Exp $
  */
 
 /*
@@ -116,8 +116,6 @@
    #define INCL_DOSMISC
 
    #include <os2.h>
-   #undef INT
-   #undef UINT
    #define HB_DONT_DEFINE_BASIC_TYPES
 
 #elif defined( HB_OS_DOS )
@@ -190,7 +188,10 @@
 #endif /* HB_DONT_DEFINE_BASIC_TYPES */
 
 #ifndef HB_LONG_LONG_OFF
-   #if !defined(_WINNT_H)
+
+   /* 10/05/2004 - <maurilio.longo@libero.it>
+      In my opinion this should be moved up where we define basic types */
+   #if ! defined(_WINNT_H) && ! defined(HB_DONT_DEFINE_BASIC_TYPES)
       #if !defined(LONGLONG)
          #if defined(__GNUC__)
             typedef long long LONGLONG;
@@ -591,6 +592,5 @@ typedef BYTE HB_ATTR;
 
 #define HB_CHAR_SOFT1           ( ( char ) 141 )
 #define HB_CHAR_SOFT2           ( ( char ) HB_CHAR_LF )
-
 
 #endif /* HB_DEFS_H_ */

@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.15 2004/04/05 20:29:02 fsgiudice Exp $
+ * $Id: bkgtsks.c,v 1.16 2004/04/06 01:50:54 druzus Exp $
  */
 
 /*
@@ -58,9 +58,6 @@
  *
  */
 
-/* NOTE: For OS/2. Must be ahead of any and all #include statements */
-#define INCL_DOSPROCESS
-#define INCL_NOPMAPI
 #define HB_OS_WIN_32_USED
 
 #define HB_THREAD_OPTIMIZE_STACK

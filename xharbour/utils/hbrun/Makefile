@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.7 2000/04/25 01:38:22 vszel Exp $
+# $Id: Makefile,v 1.1.1.1 2001/12/21 10:44:58 ronpinkas Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -14,6 +14,12 @@ PRG_SOURCES=\
 
 PRG_MAIN=hbrun.prg
 
+ifeq ($(HB_ARCHITECTURE),OS2)
+SOCK = socket 
+else
+SOCK = 
+endif
+
 LIBS=\
 	debug \
 	vm \
@@ -25,5 +31,7 @@ LIBS=\
 	macro \
 	pp \
 	common \
+	$(SOCK) \
+
 
 include $(TOP)$(ROOT)config/bin.cf

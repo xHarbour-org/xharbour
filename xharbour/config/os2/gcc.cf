@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.4 2003/12/03 13:01:19 mauriliolongo Exp $
+# $Id: gcc.cf,v 1.5 2004/05/04 16:04:46 mauriliolongo Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -73,10 +73,14 @@ LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 ifeq ($(findstring rddmt,$(LIBS)),rddmt)
 LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)_mt)
 LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv)mt)
+# add a last round of rtl/vm to solve positional interdependencies (at the moment hbrun requires this)
+LINKLIBS += -lrtlmt -lvmmt 
 else
 ifeq ($(findstring rdd,$(LIBS)),rdd)
 LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
 LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
+# add a last round of rtl/vm to solve positional interdependencies (at the moment hbrun requires this)
+LINKLIBS += -lrtl -lvm 
 endif
 endif
 
@@ -95,6 +99,7 @@ LINKLIBS += -l$(HB_GT_LIB)
 endif
 endif
 endif
+
 
 #LINKLIBS += -Wl,-)
 # statical linking with GCC 3.2.2 libc as not require its presence on user system

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.111 2004/05/07 15:33:31 lf_sfnet Exp $
+ * $Id: dbcmd.c,v 1.112 2004/05/08 22:07:09 druzus Exp $
  */
 
 /*
@@ -129,7 +129,7 @@ static BOOL s_bNetError = FALSE;       /* Error on Networked environments */
    #define s_uiCurrArea    HB_VM_STACK.uiCurrArea
    #define s_pCurrArea     HB_VM_STACK.pCurrArea
    HB_CRITICAL_T  s_mtxWorkArea;
-   #ifdef HB_OS_WIN_32
+   #if defined (HB_OS_WIN_32) || defined(HB_OS_OS2)
       static BOOL s_fMtLockInit = FALSE;
       #define LOCK_AREA          if ( s_fMtLockInit ) HB_CRITICAL_LOCK( s_mtxWorkArea );
       #define UNLOCK_AREA        if ( s_fMtLockInit ) HB_CRITICAL_UNLOCK( s_mtxWorkArea );
@@ -4916,33 +4916,33 @@ static char *hb_strescape( char *szInput, int lLen, char *cEsc )
    char  * szReturn = NULL;
 
    szReturn = szEscape = ( char * ) hb_xgrab( lLen * 2 + 4 );
-   
+
    while( lLen && HB_ISSPACE( szInput[ lLen - 1 ] ) )
-   {   
+   {
       lLen--;
    }
-   
+
    szChr = szInput;
-   
+
    while ( *szChr && lCnt++ < lLen )
    {
       if( *szChr < ' ' )
       {
          *szEscape++ = ' ';
       }
-      else 
-      {   
+      else
+      {
          if( *szChr == *cEsc ) // *szChr == '\\' || *szChr == '"'  )
          {
             *szEscape++ = '\'';
          }
-      }   
+      }
       *szEscape++ = *szChr++;
    }
    *szEscape = '\0';
-   
+
    return szReturn;
-} 
+}
 
 // Export field values to text file
 static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
@@ -4991,12 +4991,12 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
       case HB_IT_DOUBLE:
       {
          char *szResult = hb_itemStr( pValue, NULL, NULL );
-   
+
          if ( szResult )
          {
             ULONG ulLen = strlen( szResult );
             char * szTrimmed = hb_strLTrim( szResult, &ulLen );
-      
+
             hb_fsWriteLarge( handle, (BYTE*) szTrimmed, strlen( szTrimmed ) );
             hb_xfree( szResult );
          }
@@ -5407,7 +5407,7 @@ static BOOL hb_ExportSqlVar( int handle, PHB_ITEM pValue, char *cDelim )
             strcpy( szSqlDate, "0100-01-01" );
          }
          else
-         { 
+         {
             sprintf( szSqlDate, "%c%c%c%c-%c%c-%c%c", szDate[0],szDate[1],szDate[2],szDate[3],szDate[4],szDate[5],szDate[6],szDate[7] );
          }
          szSqlDate[ 10 ] = '\0';
@@ -5436,12 +5436,12 @@ static BOOL hb_ExportSqlVar( int handle, PHB_ITEM pValue, char *cDelim )
       case HB_IT_DOUBLE:
       {
          char *szResult = hb_itemStr( pValue, NULL, NULL );
-   
+
          if ( szResult )
          {
             ULONG ulLen = strlen( szResult );
             char * szTrimmed = hb_strLTrim( szResult, &ulLen );
-      
+
             hb_fsWriteLarge( handle, (BYTE*) szTrimmed, strlen( szTrimmed ) );
             hb_xfree( szResult );
          }
@@ -5499,7 +5499,7 @@ static void hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
    }
 
    hb_fsWriteLarge( handle, (BYTE*) cHeader, strlen( cHeader ) );
-      
+
    SELF_FIELDCOUNT( pArea, &uiFields );
 
    Tmp.type = HB_IT_NIL;
@@ -5526,9 +5526,9 @@ static void hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
          hb_fsWriteLarge( handle, (BYTE*) szInsert, strlen( szInsert ) );
 
          sprintf( szRecNo, "%ld,", ++lRecNo );
-         
+
          hb_fsWriteLarge( handle, (BYTE*) szRecNo, strlen( szRecNo ) );
-         
+
          // User does not request fields, copy all fields
          if ( bNoFieldPassed )
          {
@@ -5601,7 +5601,7 @@ static void hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
 
    hb_xfree( szInsert );
    hb_xfree( szRecNo );
-   
+
 }
 
 HB_FUNC( __DBSQL )

@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.60 2004/04/08 13:26:54 druzus Exp $
+ * $Id: fm.c,v 1.61 2004/04/14 10:32:14 druzus Exp $
  */
 
 /*
@@ -81,12 +81,6 @@
 
 #define HB_OS_WIN_32_USED
 #define HB_THREAD_OPTIMIZE_STACK
-
-/* NOTE: For OS/2. Must be ahead of any and all #include statements */
-#define INCL_BASE
-#define INCL_DOSMISC
-#define INCL_DOSERRORS
-#define INCL_DOSPROCESS
 
 #ifndef __MPW__
    #ifdef HB_OS_BSD

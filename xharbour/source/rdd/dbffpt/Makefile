@@ -1,5 +1,5 @@
 #
-# $Id$
+# $Id: Makefile,v 1.1 2003/09/08 12:56:53 druzus Exp $
 #
 
 ROOT = ../../../
@@ -9,6 +9,10 @@ C_SOURCES=\
 
 PRG_SOURCES=\
 	dbffpt0.prg \
+
+ifeq ($(HB_MT),MT)
+   MT_LIBNAME=dbffptmt
+endif
 
 LIBNAME=dbffpt
 

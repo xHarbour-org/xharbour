@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2910 2004/05/10 01:47:48 likewolf Exp $
+ * $Id: ChangeLog,v 1.2911 2004/05/10 08:54:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,55 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-05-10 12:30 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+
+   * xharbour/config/os2/gcc.cf
+     ! add rtl after all rdd lib to resolve all symbols on hbrun building
+   * xharbour/include/hbdefs.h
+     ! LONGLONG/ULONGLONG defines did not respect HB_DONT_DEFINE_BASIC_TYPES define
+   * xharbour/include/thread.h
+     + added OS/2 support
+   * xharbour/source/rdd/dbcmd.c
+     + added || defined(HB_OS_OS2) to multithreaded support
+   * xharbour/source/rdd/dbfcdx/Makefile
+   * xharbour/source/rdd/dbfdbt/Makefile
+   * xharbour/source/rdd/dbffpt/Makefile
+     + added mt libname when building an MT version of xHarbour
+   * xharbour/source/rtl/bkgtsks.c
+     - removed an INC_xxx macro not needed
+   * xharbour/source/rtl/console.c
+     + added || defined(HB_OS_OS2) to multithreaded support
+   * xharbour/source/rtl/hbserv.c
+     - removed an INC_xxx macro not needed
+   * xharbour/source/vm/fm.c
+     - removed an INC_xxx macro not needed
+   * xharbour/source/vm/thread.c
+     + added OS/2 support
+   * xharbour/tests/Makefile
+     ! fixed mt libnames
+     + added OS/2 support
+   * xharbour/tests/mttest.prg
+     ! @ x,y SAY is not atomic, so text gets everywhere on screen, using DispOutAt() fixes this issue
+   * xharbour/utils/hbrun/Makefile
+     + added socket lib to OS/2 build
+
+   /* NOTE: This is a big commit to add multithreading support to OS/2 build of xHarbour
+
+            Multithreading works ok now, mttest and mtstress (under tests\) work nicely
+
+            As of today it is _required_ at least fixpack 29 for Warp 3 and fixpack 4 for Warp 4 to be able
+            to run a MT build of xHarbour on OS/2 (this shouldn't be such a big of a issue)
+
+            OS/2 MT support follows WIN32 one as close as possible, I want to thank Giancarlo Niccolai
+            for his support and for the help he gave me several times while I was trying to make MT run on OS/2
+
+            I hope I did not break anything, but, since we're approaching beta 1, I really wanted to have MT
+            support here to let those few still using OS/2 to be able to test it.
+
+            PS. I want to "dedicate" this last weekend of efforts to my "folletta" Maria <laviadellaseta@hotmail.com> ;)
+   */
 
 2004-05-10 01:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c

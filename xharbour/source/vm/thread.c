@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.167 2004/05/02 21:48:53 druzus Exp $
+* $Id: thread.c,v 1.168 2004/05/09 21:13:49 druzus Exp $
 */
 
 /*
@@ -72,18 +72,23 @@
 #include "hbstack.h"
 #include "classes.h"
 
+#if defined(HB_OS_OS2)
+   #include <stdlib.h>
+#endif
+
+
 #ifdef HB_OS_WIN_32
    #include <windows.h>
    #include <process.h>
 #endif
 
-#ifdef HB_OS_WIN_32
+#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
     #define extern
 #endif
 
 #include "thread.h"
 
-#ifdef HB_OS_WIN_32
+#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    #undef extern
 #endif
 
@@ -116,8 +121,10 @@ HB_THREAD_T hb_main_thread_id;
 static HB_CRITICAL_T s_thread_unique_id_mutex;
 static UINT s_thread_unique_id;
 
-#ifdef HB_OS_WIN_32
+#if defined(HB_OS_WIN_32)
    HB_EXPORT DWORD hb_dwCurrentStack;
+#elif defined(HB_OS_OS2)
+   HB_EXPORT PPVOID hb_dwCurrentStack;
 #else
    pthread_key_t hb_pkCurrentStack;
 #endif
@@ -170,7 +177,7 @@ void hb_threadInit( void )
    /* Idle fence is true by default */
    hb_bIdleFence = TRUE;
 
-   #ifdef HB_OS_WIN_32
+   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
       HB_CRITICAL_INIT( hb_cancelMutex );
    #endif
 
@@ -179,6 +186,11 @@ void hb_threadInit( void )
       #ifdef HB_OS_WIN_32
          hb_dwCurrentStack = TlsAlloc();
          TlsSetValue( hb_dwCurrentStack, (void *)&hb_stack );
+
+      #elif defined(HB_OS_OS2)
+         DosAllocThreadLocalMemory(1, (PULONG *) &hb_dwCurrentStack);
+         *hb_dwCurrentStack = (PVOID) &hb_stack;
+
       #else
          pthread_key_create( &hb_pkCurrentStack, NULL );
          pthread_setspecific( hb_pkCurrentStack, (void *)&hb_stack );
@@ -211,13 +223,15 @@ void hb_threadCloseHandles( void )
    HB_CRITICAL_DESTROY( hb_dynsymMutex );
    HB_COND_DESTROY(hb_threadStackCond);
 
-   #ifdef HB_OS_WIN_32
+   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
       HB_CRITICAL_DESTROY( hb_cancelMutex );
    #endif
 
    #if !defined( HB_THREAD_TLS_KEYWORD )
       #ifdef HB_OS_WIN_32
          TlsFree( hb_dwCurrentStack );
+      #elif defined(HB_OS_OS2)
+         DosFreeThreadLocalMemory((PULONG) &hb_dwCurrentStack);
       #else
          pthread_key_delete( hb_pkCurrentStack );
       #endif
@@ -280,7 +294,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->th_id = th;
    tc->uiIdleInspect = 0;
    /* In unix, is the thread that sets up its data. */
-   #ifdef HB_OS_WIN_32
+   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    tc->th_vm_id = hb_threadUniqueId();
    #endif
 
@@ -314,15 +328,16 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->uiBackgroundMaxTask = 0;
    tc->ulBackgroundID = 0;
 
-   #ifdef HB_OS_WIN_32
+   #if defined(HB_OS_WIN_32)
       tc->th_h = NULL;
+   #endif
+   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
       tc->bCanceled = FALSE;
       tc->bCanCancel = FALSE;
 
       tc->iCleanCount = 0;
       tc->pCleanUp = (HB_CLEANUP_FUNC *) hb_xgrab( sizeof( HB_CLEANUP_FUNC ) * HB_MAX_CLEANUPS );
       tc->pCleanUpParam = (void **) hb_xgrab( sizeof( void *) * HB_MAX_CLEANUPS );
-
    #endif
 
    for( i = 0; i < tc->wItems; i++ )
@@ -525,7 +540,7 @@ void hb_threadDestroyStack( HB_STACK *pStack )
       hb_xfree( pStack->hMemvars );
 */
 
-   #ifdef HB_OS_WIN_32
+   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
       hb_xfree( pStack->pCleanUp );
       hb_xfree( pStack->pCleanUpParam );
    #endif
@@ -784,12 +799,16 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
 
    /* Sets the cancellation handler so small delays in
    cancellation do not cause segfault or memory leaks */
-   #ifdef HB_OS_WIN_32
+   #if defined(HB_OS_WIN_32)
       #ifdef HB_THREAD_TLS_KEYWORD
          hb_thread_stack = _pStack_;
       #else
          TlsSetValue( hb_dwCurrentStack, ( void * ) _pStack_ );
       #endif
+
+   #elif defined(HB_OS_OS2)
+      *hb_dwCurrentStack = (void *) _pStack_;
+
    #else
       /* The fist that arrives among father and child will set up
          the stack id. */
@@ -827,7 +846,7 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
       hb_vmDo( HB_VM_STACK.uiParams - 1 );
    }
 
-   #ifdef HB_OS_WIN_32
+   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
       hb_threadCancelInternal(); // never returns
       return 0;
    #else
@@ -847,7 +866,7 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
    killer; It must be used by the target thread to cancel itself.
 */
 
-#ifdef HB_OS_WIN_32
+#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
 void hb_threadCancelInternal( )
 {
    HB_THREAD_STUB
@@ -869,7 +888,11 @@ void hb_threadCancelInternal( )
 /*   #ifndef __BORLANDC__
    ExitThread( 0 );
    #else*/
+   #ifdef HB_OS_OS2
+   _endthread();
+   #else
    _endthreadex( 0 );
+   #endif
 /*  #endif */
 }
 
@@ -896,7 +919,11 @@ void hb_threadCancel( HB_STACK *pStack )
    HB_CRITICAL_UNLOCK( hb_cancelMutex );
    */
 
+   #ifdef HB_OS_OS2
+   DosKillThread( pStack->th_id );
+   #else
    TerminateThread( pStack->th_h, 0 );
+   #endif
    HB_DISABLE_ASYN_CANC;
    HB_CRITICAL_UNLOCK( hb_cancelMutex );
 
@@ -922,21 +949,26 @@ void hb_threadTerminator( void *pData )
 {
    HB_MUTEX_STRUCT *pMtx;
 
-#ifdef HB_OS_WIN_32
+#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    HB_STACK *_pStack_ = (HB_STACK *) pData;
 #else
    HB_STACK *_pStack_ = pthread_getspecific( hb_pkCurrentStack );
    HB_SYMBOL_UNUSED( pData );
 #endif
 
-#ifndef HB_OS_WIN_32
+
+#if ! defined(HB_OS_WIN_32) && ! defined(HB_OS_OS2)
    pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL );
 #endif
 
    HB_STACK_LOCK;
 
-   #ifdef HB_OS_WIN_32
+   #if defined(HB_OS_WIN_32)
       CloseHandle( _pStack_->th_h );
+
+   #elif defined(HB_OS_OS2)
+      /* nothing to do */
+
    #else
       pthread_detach( HB_CURRENT_THREAD() );
    #endif
@@ -1024,7 +1056,7 @@ HB_EXPORT void hb_threadKillAll()
          pStack = pStack->next;
          continue;
       }
-      #ifndef HB_OS_WIN_32
+      #if ! defined(HB_OS_WIN_32) && ! defined(HB_OS_OS2)
          // Allows the target thread to cleanup if and when needed.
          pthread_cancel( pStack->th_id );
       #else
@@ -1039,8 +1071,12 @@ HB_EXPORT void hb_threadKillAll()
             /* This is a subset of terminateThread: as this routine is
                an idle inspector, many of the cares in terminateThread may
                NOT be applied. */
+            #ifdef HB_OS_OS2
+            DosKillThread( pStack->th_id );
+            #else
             TerminateThread( pStack->th_h, 0 );
             CloseHandle( pStack->th_h );
+            #endif
 
             pMtx = hb_ht_mutex;
             while( pMtx != NULL )
@@ -1142,7 +1178,7 @@ void hb_threadIdleEnd( void )
    Condition variables needs a special handling to be omomorphic on
    variuous systems.
 */
-#ifndef HB_OS_WIN_32
+#if ! defined(HB_OS_WIN_32) && ! defined(HB_OS_OS2)
 
 int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec )
 {
@@ -1171,13 +1207,26 @@ BOOL hb_threadCondInit( HB_WINCOND_T *cond )
    cond->nWaitersBlocked = 0;
    cond->nWaitersToUnblock = 0;
 
+   #ifdef HB_OS_WIN_32
    InitializeCriticalSection( &(cond->mtxUnblockLock) );
+   #else
+   DosCreateMutexSem(NULL, &(cond->mtxUnblockLock), 0L, FALSE);
+   #endif
+
    cond->semBlockLock = NULL;
    cond->semBlockQueue = NULL;
 
+   #ifdef HB_OS_WIN_32
    cond->semBlockLock = CreateSemaphore( NULL, 1, 20000000, NULL);
+   #else
+   DosCreateEventSem(NULL, (PHEV) &(cond->semBlockLock), DCE_POSTONE, TRUE);     // unnamed, private, Posted, when posted frees only ONE waiting thread
+   #endif
    if ( cond->semBlockLock != NULL ) {
+      #ifdef HB_OS_WIN_32
       cond->semBlockQueue = CreateSemaphore( NULL, 0, 20000000, NULL );
+      #else
+      DosCreateEventSem(NULL, (PHEV) &(cond->semBlockQueue), 0L, FALSE);   // unnamed, private, Reset, every thread blocks here
+      #endif
       if ( cond->semBlockQueue == NULL )
       {
           return FALSE;
@@ -1194,13 +1243,26 @@ BOOL hb_threadCondInit( HB_WINCOND_T *cond )
 */
 void hb_threadCondDestroy( HB_WINCOND_T *cond )
 {
+   #ifdef HB_OS_WIN_32
    DeleteCriticalSection( &(cond->mtxUnblockLock) );
+   #else
+   DosCloseMutexSem( cond->mtxUnblockLock );
+   #endif
+
    if ( cond->semBlockLock != NULL ) {
+      #ifdef HB_OS_WIN_32
       CloseHandle( cond->semBlockLock );
+      #else
+      DosCloseEventSem( cond->semBlockLock );
+      #endif
    }
    if ( cond->semBlockQueue != NULL )
    {
+      #ifdef HB_OS_WIN_32
       CloseHandle( cond->semBlockQueue );
+      #else
+      DosCloseEventSem( cond->semBlockQueue );
+      #endif
    }
 }
 
@@ -1211,12 +1273,23 @@ void hb_threadCondDestroy( HB_WINCOND_T *cond )
 void hb_threadCondSignal( HB_WINCOND_T *cond )
 {
    register int nSignalsToIssue;
+   #ifdef HB_OS_OS2
+   ULONG ulPostCount;
+   #endif
 
+   #ifdef HB_OS_WIN_32
    EnterCriticalSection( &(cond->mtxUnblockLock) );
+   #else
+   DosRequestMutexSem( cond->mtxUnblockLock, SEM_INDEFINITE_WAIT );
+   #endif
 
    if ( cond->nWaitersToUnblock ) {
       if ( ! cond->nWaitersBlocked ) {        // NO-OP
+         #ifdef HB_OS_WIN_32
          LeaveCriticalSection( &cond->mtxUnblockLock );
+         #else
+         DosReleaseMutexSem( cond->mtxUnblockLock );
+         #endif
          return;
       }
       nSignalsToIssue = cond->nWaitersBlocked;
@@ -1224,7 +1297,11 @@ void hb_threadCondSignal( HB_WINCOND_T *cond )
       cond->nWaitersBlocked = 0;
    }
    else if ( cond->nWaitersBlocked > cond->nWaitersGone ) { // HARMLESS RACE CONDITION!
+      #ifdef HB_OS_WIN_32
       WaitForSingleObject( cond->semBlockLock, INFINITE );
+      #else
+      DosWaitEventSem( cond->semBlockLock, SEM_INDEFINITE_WAIT );
+      #endif
       if ( cond->nWaitersGone ) {
          cond->nWaitersBlocked -= cond->nWaitersGone;
          cond->nWaitersGone = 0;
@@ -1233,11 +1310,24 @@ void hb_threadCondSignal( HB_WINCOND_T *cond )
       cond->nWaitersBlocked = 0;
    }
    else { // NO-OP
+      #ifdef HB_OS_WIN_32
       LeaveCriticalSection( &(cond->mtxUnblockLock) );
+      #else
+      DosReleaseMutexSem( cond->mtxUnblockLock );
+      #endif
       return;
    }
+
+   #ifdef HB_OS_WIN_32
    LeaveCriticalSection( &(cond->mtxUnblockLock) );
    ReleaseSemaphore( cond->semBlockQueue,nSignalsToIssue, NULL );
+   #else
+   DosReleaseMutexSem( cond->mtxUnblockLock );
+   DosEnterCritSec();   // stop thread switching
+   DosPostEventSem( cond->semBlockQueue );      // Free _all_ waiting threads
+   DosResetEventSem( cond->semBlockQueue, &ulPostCount );   // Stop next ones wainting on this semaphore
+   DosExitCritSec();
+   #endif
 }
 
 
@@ -1252,14 +1342,25 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, CRITICAL_SECTION *mutex ,
    register int nSignalsWasLeft;
    register int bTimeout;
 
+   #ifdef HB_OS_WIN_32
    WaitForSingleObject( cond->semBlockLock, INFINITE );
    cond->nWaitersBlocked++;
    ReleaseSemaphore( cond->semBlockLock, 1, NULL );
-
    LeaveCriticalSection( mutex );
 
+   #else
+   DosWaitEventSem( cond->semBlockLock, SEM_INDEFINITE_WAIT );
+   cond->nWaitersBlocked++;
+   DosPostEventSem( cond->semBlockLock );
+   DosReleaseMutexSem( *mutex );
+   #endif
+
    HB_TEST_CANCEL_ENABLE_ASYN
+   #ifdef HB_OS_WIN_32
    if ( WaitForSingleObject( cond->semBlockQueue, dwTimeout ) != WAIT_OBJECT_0 )
+   #else
+   if ( DosWaitEventSem( cond->semBlockQueue, dwTimeout ) != NO_ERROR )
+   #endif
    {
       bTimeout = 1;
    }
@@ -1269,7 +1370,11 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, CRITICAL_SECTION *mutex ,
    }
    HB_DISABLE_ASYN_CANC
 
+   #ifdef HB_OS_WIN_32
    EnterCriticalSection( &cond->mtxUnblockLock );
+   #else
+   DosRequestMutexSem( cond->mtxUnblockLock, SEM_INDEFINITE_WAIT );
+   #endif
 
    if ( (nSignalsWasLeft = cond->nWaitersToUnblock) != 0)
    {
@@ -1277,19 +1382,39 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, CRITICAL_SECTION *mutex ,
    }
    else if ( ++cond->nWaitersGone == 2000000000L )
    {
+      #ifdef HB_OS_WIN_32
       WaitForSingleObject( cond->semBlockLock, INFINITE );
       cond->nWaitersBlocked -= cond->nWaitersGone;
       ReleaseSemaphore( cond->semBlockLock, 1, NULL );
       cond->nWaitersGone = 0;
+      #else
+      DosWaitEventSem( cond->semBlockLock, SEM_INDEFINITE_WAIT );
+      cond->nWaitersBlocked -= cond->nWaitersGone;
+      DosPostEventSem( cond->semBlockLock );
+      cond->nWaitersGone = 0;
+      #endif
    }
+   #ifdef HB_OS_WIN_32
    LeaveCriticalSection( &(cond->mtxUnblockLock) );
+   #else
+   DosReleaseMutexSem( cond->mtxUnblockLock );
+   #endif
 
    if ( nSignalsWasLeft == 1 )
    {
+      #ifdef HB_OS_WIN_32
       ReleaseSemaphore( cond->semBlockLock,1, NULL );
+      #else
+      DosPostEventSem( cond->semBlockLock );
+      #endif
    }
 
+   #ifdef HB_OS_WIN_32
    EnterCriticalSection( mutex );
+   #else
+   DosRequestMutexSem( *mutex, SEM_INDEFINITE_WAIT );
+   #endif
+
    return !bTimeout;
 }
 #endif // win32
@@ -1462,8 +1587,10 @@ HB_FUNC( STARTTHREAD )
 /*   #ifndef __BORLANDC__
       if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (void *) pStack , CREATE_SUSPENDED, &th_id ) ) != NULL )
    #else*/
-      if( ( th_h = (HANDLE)_beginthreadex( NULL, 0, hb_create_a_thread, (void *) pStack, CREATE_SUSPENDED, (UINT *) &th_id) ) != 0L )
+   if( ( th_h = (HANDLE)_beginthreadex( NULL, 0, hb_create_a_thread, (void *) pStack, CREATE_SUSPENDED, (UINT *) &th_id) ) != 0L )
 //   #endif
+#elif defined(HB_OS_OS2)
+   if ((th_id = _beginthread( (void *) hb_create_a_thread, NULL, 128 * 1024, (void *) pStack)) >= 0)
 #else
    if( pthread_create( &th_id, NULL, hb_create_a_thread, (void *) pStack ) == 0 )
 #endif
@@ -1477,7 +1604,6 @@ HB_FUNC( STARTTHREAD )
       pStack->th_h = th_h;
       ResumeThread( th_h );
 #endif
-
       pThread->threadId = th_id;
       pThread->bReady = TRUE;
       pThread->pStack = pStack;
@@ -1529,7 +1655,11 @@ HB_FUNC( STOPTHREAD )
       HB_CRITICAL_UNLOCK( hb_cancelMutex );
 
       HB_TEST_CANCEL_ENABLE_ASYN;
+      #ifdef HB_OS_WIN_32
       WaitForSingleObject( pThread->pStack->th_h, INFINITE );
+      #else
+      DosWaitThread( &pThread->pStack->th_id, DCWW_WAIT );
+      #endif
       HB_DISABLE_ASYN_CANC;
    #endif
 
@@ -1543,7 +1673,7 @@ HB_FUNC( STOPTHREAD )
 */
 HB_FUNC( KILLTHREAD )
 {
-#ifdef HB_OS_WIN_32
+#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    HB_THREAD_STUB
 #endif
 
@@ -1608,7 +1738,7 @@ HB_FUNC( JOINTHREAD )
 
    HB_STACK_UNLOCK;
 
-   #if ! defined( HB_OS_WIN_32 )
+   #if ! defined( HB_OS_WIN_32 ) && ! defined(HB_OS_OS2)
       if( pthread_join( pThread->threadId, NULL ) != 0 )
       {
          HB_STACK_LOCK;
@@ -1616,7 +1746,11 @@ HB_FUNC( JOINTHREAD )
          return;
       }
    #else
+      #ifdef HB_OS_WIN_32
       WaitForSingleObject( pThread->pStack->th_h, INFINITE );
+      #else
+      DosWaitThread( &pThread->pStack->th_id, DCWW_WAIT );
+      #endif
    #endif
 
    HB_STACK_LOCK;
@@ -2342,6 +2476,12 @@ void hb_threadSleep( int millisec )
 
    #if defined( HB_OS_DARWIN ) || defined(__DJGPP__)
       usleep( millisec * 1000 );
+
+   #elif defined(HB_OS_OS2)
+      HB_TEST_CANCEL_ENABLE_ASYN;
+      DosSleep(millisec);
+      HB_DISABLE_ASYN_CANC;
+
    #elif defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
       {
          struct timespec ts, trem;
@@ -2352,8 +2492,7 @@ void hb_threadSleep( int millisec )
             ts = trem;
          }
       }
-   #elif defined(HB_OS_OS2)
-      DosSleep( millisec );
+
    #elif defined(HB_OS_WIN_32)
       HB_TEST_CANCEL_ENABLE_ASYN;
       Sleep( millisec );

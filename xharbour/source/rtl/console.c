@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.46 2004/03/24 11:49:05 andijahja Exp $
+ * $Id: console.c,v 1.47 2004/04/05 02:29:31 druzus Exp $
  */
 /*
  * Harbour Project source code:
@@ -438,7 +438,7 @@ HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or pri
 
 HB_FUNC( QOUT )
 {
-#ifdef HB_OS_WIN_32
+#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    HB_THREAD_STUB
 #endif
 
@@ -465,7 +465,7 @@ HB_FUNC( QOUT )
 
 HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
 {
-#ifdef HB_OS_WIN_32
+#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    HB_THREAD_STUB
 #endif
 
@@ -533,7 +533,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
 
 HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
 {
-#ifdef HB_OS_WIN_32
+#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    HB_THREAD_STUB
 #endif
    HB_CONSOLE_SAFE_LOCK
@@ -546,7 +546,7 @@ HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
 
 HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
 {
-#ifdef HB_OS_WIN_32
+#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    HB_THREAD_STUB
 #endif
 

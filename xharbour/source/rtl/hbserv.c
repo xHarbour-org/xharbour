@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.18 2004/04/28 18:30:30 druzus Exp $
+* $Id: hbserv.c,v 1.19 2004/04/30 19:42:23 druzus Exp $
 */
 
 /*
@@ -569,7 +569,7 @@ static void s_serviceSetHBSig( void )
 #if defined( HB_OS_UNIX ) || defined(HARBOUR_GCC_OS2)
    struct sigaction act;
 
-   #ifdef HB_THREAD_SUPPORT
+   #if defined(HB_THREAD_SUPPORT) && ! defined(HB_OS_OS2)
       sigset_t blockall;
       //set signal mask
       sigemptyset( &blockall );
@@ -682,7 +682,7 @@ static int s_translateSignal( UINT sig, UINT subsig )
    return HB_SIGNAL_UNKNOWN;
 }
 
-/** 
+/**
 * Initializes signal handler system
 */
 
@@ -691,19 +691,19 @@ static void s_signalHandlersInit()
    #if defined( HB_THREAD_SUPPORT ) && ( defined( HB_OS_UNIX ) || defined( HB_OS_UNIX_COMPATIBLE ) )
       pthread_t res;
       HB_STACK *pStack;
-      
+
       s_serviceSetHBSig();
-      
+
       pStack = hb_threadCreateStack( 0 );
       pthread_create( &res, NULL, s_signalListener, pStack );
    #else
       s_serviceSetHBSig();
    #endif
-   
+
    #if defined( HB_THREAD_SUPPORT )
       HB_CRITICAL_INIT( s_ServiceMutex );
    #endif
-   
+
    sp_hooks = hb_itemNew( NULL );
    hb_arrayNew( sp_hooks, 0 );
    hb_gcLock( sp_hooks );
@@ -748,7 +748,7 @@ HB_FUNC( HB_STARTSERVICE )
             hb_vmRequestQuit();
             return;
          }
-         #ifdef HB_THREAD_SUPPORT         
+         #ifdef HB_THREAD_SUPPORT
          pthread_setspecific( hb_pkCurrentStack, (void *) &hb_stack );
          #endif
       }
@@ -769,7 +769,7 @@ HB_FUNC( HB_STARTSERVICE )
    // Initialize only if the service has not yet been initialized
    if ( sp_hooks == NULL )
    {
-      s_signalHandlersInit(); 
+      s_signalHandlersInit();
    }
 }
 
@@ -789,7 +789,7 @@ BOOL HB_EXPORT hb_isService()
 */
 
 void HB_EXPORT hb_serviceExit()
-{   
+{
    if( sp_hooks != NULL )
    {
       /* reset default signal handling */
@@ -822,7 +822,7 @@ HB_FUNC( HB_SERVICELOOP )
 #ifdef HB_OS_WIN_32
    MSG msg;
    /* This is just here to trigger our internal hook routine, if the
-      final application does not any message handling. 
+      final application does not any message handling.
    */
    if ( ! PeekMessage(&msg, NULL, WM_QUIT, WM_QUIT, PM_REMOVE) )
    {

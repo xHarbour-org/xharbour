@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.82 2004/03/30 05:55:35 druzus Exp $
+* $Id: thread.h,v 1.83 2004/04/04 23:38:00 fsgiudice Exp $
 */
 
 /*
@@ -48,6 +48,7 @@
 * If you do not wish that, delete this exception notice.
 *
 */
+
 
 #ifndef HB_THREAD_H_
 #define HB_THREAD_H_
@@ -161,11 +162,110 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
 #ifdef __cplusplus
 extern "C" {
 #endif
-   extern DWORD hb_dwCurrentStack;
+extern DWORD hb_dwCurrentStack;
 #ifdef __cplusplus
 }
 #endif
+
    #define hb_threadGetCurrentStack() ( (HB_STACK *) TlsGetValue( hb_dwCurrentStack ) )
+
+
+/* 10/05/2004 - <maurilio.longo@libero.it
+   Built and tested with Innotek GCC for OS/2
+*/
+#elif defined(HB_OS_OS2)
+
+   #define  CRITICAL_SECTION  HMTX
+
+   typedef struct tag_HB_WINCOND_T
+   {
+      HEV semBlockLock;
+      HEV semBlockQueue;
+      CRITICAL_SECTION mtxUnblockLock;
+      int nWaitersGone;
+      int nWaitersBlocked;
+      int nWaitersToUnblock;
+   } HB_WINCOND_T, *PHB_WINCOND_T;
+
+   #define DWORD                       ULONG
+   #define HB_THREAD_T                 TID
+
+   #define HB_CRITICAL_T               HMTX
+   #define HB_CRITICAL_INIT( x )       DosCreateMutexSem(NULL, &(x), 0L, FALSE)      // Creates a private, unnamed, unowned sem
+   #define HB_CRITICAL_DESTROY( x )    DosCloseMutexSem( x )
+   #define HB_CRITICAL_LOCK( x )       DosRequestMutexSem( x, SEM_INDEFINITE_WAIT )
+   #define HB_CRITICAL_UNLOCK( x )     DosReleaseMutexSem( x )
+   #define HB_CRITICAL_TRYLOCK( x )    (DosRequestMutexSem( x, SEM_IMMEDIATE_RETURN ) == NO_ERROR)
+
+   #define HB_MUTEX_T                  HMTX
+   #define HB_MUTEX_INIT( x )          HB_CRITICAL_INIT( x )
+   #define HB_MUTEX_DESTROY( x )       HB_CRITICAL_DESTROY( x )
+   #define HB_MUTEX_LOCK( x )          HB_CRITICAL_LOCK( x )
+   #define HB_MUTEX_UNLOCK( x )        HB_CRITICAL_UNLOCK( x )
+
+   #define HB_COND_T                   HB_WINCOND_T
+   #define HB_COND_INIT( x )           hb_threadCondInit( &(x) )
+   #define HB_COND_WAIT( x, y )        hb_threadCondWait( &(x), &(y), SEM_INDEFINITE_WAIT )
+   #define HB_COND_WAITTIME( x, y, t ) hb_threadCondWait( &(x), &(y), t )
+   #define HB_COND_SIGNAL( x )         hb_threadCondSignal( &(x) )
+   #define HB_COND_DESTROY( x )        hb_threadCondDestroy( &(x) )
+
+   #define HB_CURRENT_THREAD           _gettid
+   #define HB_SAME_THREAD(x, y)        ((x) == (y))
+
+   /* Guard for cancellation requets */
+   extern HB_CRITICAL_T hb_cancelMutex;
+
+   #define HB_ENABLE_ASYN_CANC       HB_THREAD_GUARD( hb_cancelMutex, HB_VM_STACK.bCanCancel = TRUE )
+   #define HB_DISABLE_ASYN_CANC      HB_THREAD_GUARD( hb_cancelMutex, HB_VM_STACK.bCanCancel = FALSE )
+   #define HB_TEST_CANCEL_ENABLE_ASYN\
+   {\
+      HB_CRITICAL_LOCK( hb_cancelMutex );\
+      if ( HB_VM_STACK.bCanceled )\
+      {\
+         HB_CRITICAL_UNLOCK( hb_cancelMutex );\
+         hb_threadCancelInternal();\
+      }\
+      HB_VM_STACK.bCanCancel = TRUE;\
+      HB_CRITICAL_UNLOCK( hb_cancelMutex );\
+   }
+
+   #define HB_TEST_CANCEL\
+   {\
+      HB_CRITICAL_LOCK( hb_cancelMutex );\
+      if ( HB_VM_STACK.bCanceled )\
+      {\
+         HB_CRITICAL_UNLOCK( hb_cancelMutex );\
+         hb_threadCancelInternal();\
+      }\
+      HB_CRITICAL_UNLOCK( hb_cancelMutex );\
+   }
+
+
+   #define HB_CLEANUP_PUSH(X,Y) {\
+      HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ] = (X);\
+      HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount ] = (void *)&(Y);\
+      HB_VM_STACK.iCleanCount++;\
+   }
+
+   #define HB_CLEANUP_POP (HB_VM_STACK.iCleanCount--);
+
+   #define HB_CLEANUP_POP_EXEC {\
+      HB_VM_STACK.iCleanCount--;\
+      HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ]( HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount ]);\
+   }
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern PPVOID hb_dwCurrentStack;
+#ifdef __cplusplus
+}
+#endif
+
+   #define  hb_threadGetCurrentStack() ( (HB_STACK *) *hb_dwCurrentStack )
+
 #else
 
    #include <pthread.h>
@@ -331,8 +431,10 @@ typedef struct tag_HB_STACK
    USHORT uiBackgroundMaxTask;
    ULONG  ulBackgroundID;
 
-#ifdef HB_OS_WIN_32
+#if defined(HB_OS_WIN_32)
    HANDLE th_h;
+#endif
+#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    BOOL bCanceled; /* set when there is a cancel request and bInUse is true */
    BOOL bCanCancel;
    /* Windows cleanup functions */
@@ -584,14 +686,13 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );
 void hb_threadCancelInternal( void );
 
 /* Win 32 specific functions */
-#ifdef HB_OS_WIN_32
+#if defined(HB_OS_WIN_32) || defined (HB_OS_OS2)
    BOOL hb_threadCondInit( HB_WINCOND_T *cond );
    void hb_threadCondDestroy( HB_WINCOND_T *cond );
    void hb_threadCondSignal( HB_WINCOND_T *cond );
    BOOL hb_threadCondWait( HB_WINCOND_T *cond, CRITICAL_SECTION *mutex , DWORD dwTimeout );
 
 #endif
-
 
 
 /******************************************************/
