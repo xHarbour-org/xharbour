@@ -1,5 +1,5 @@
 /*
- * $Id: empty.c,v 1.5 2003/11/24 15:15:25 lf_sfnet Exp $
+ * $Id: empty.c,v 1.6 2004/01/12 22:51:41 paultucker Exp $
  */
 
 /*
@@ -61,42 +61,42 @@ HB_FUNC( EMPTY )
    switch( hb_itemType( pItem ) & ~HB_IT_BYREF )
    {
       case HB_IT_ARRAY:
-         hb_retl( hb_arrayLen( pItem ) == 0 );
+         hb_retl( pItem->item.asArray.value->ulLen == 0 );
          break;
 
       case HB_IT_STRING:
       case HB_IT_MEMO:
-         hb_retl( hb_strEmpty( hb_itemGetCPtr( pItem ), hb_itemGetCLen( pItem ) ) );
+         hb_retl( hb_strEmpty( pItem->item.asString.value, pItem->item.asString.length ) );
          break;
 
       case HB_IT_INTEGER:
-         hb_retl( hb_itemGetNI( pItem ) == 0 );
+         hb_retl( pItem->item.asInteger.value == 0 );
          break;
 
       case HB_IT_LONG:
-         hb_retl( hb_itemGetNL( pItem ) == 0l );
+         hb_retl( pItem->item.asLong.value == 0l );
          break;
 
 #ifndef HB_LONG_LONG_OFF
       case HB_IT_LONGLONG:
-         hb_retl( hb_itemGetNLL( pItem ) == (LONGLONG) 0 );
+         hb_retl( pItem->item.asLongLong.value == (LONGLONG) 0 );
          break;
 #endif
 
       case HB_IT_DOUBLE:
-         hb_retl( hb_itemGetND( pItem ) == 0.0 );
+         hb_retl( pItem->item.asDouble.value == 0.0 );
          break;
 
       case HB_IT_DATE:
-         hb_retl( hb_itemGetDL( pItem ) == 0 );
+         hb_retl( pItem->item.asDate.value == 0 );
          break;
 
       case HB_IT_POINTER:
-         hb_retl( hb_itemGetPtr( pItem ) == NULL );
+         hb_retl( pItem->item.asPointer.value == NULL );
          break;
 
       case HB_IT_LOGICAL:
-         hb_retl( ! hb_itemGetL( pItem ) );
+         hb_retl( ! pItem->item.asLogical.value );
          break;
 
       case HB_IT_BLOCK:
@@ -104,7 +104,7 @@ HB_FUNC( EMPTY )
          break;
 
       case HB_IT_HASH:
-         hb_retl( hb_hashLen( pItem )  == 0 );
+         hb_retl( pItem->item.asHash.value->ulTotalLen == 0 );
          break;
 
       default:
@@ -112,4 +112,3 @@ HB_FUNC( EMPTY )
          break;
    }
 }
-

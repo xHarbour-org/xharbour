@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2370 2004/02/22 12:15:53 andijahja Exp $
+ * $Id: ChangeLog,v 1.2371 2004/02/22 16:56:25 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-23 03:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * include/hbapi.h
+  * source/common/hbstr.c
+    + char *hb_xstrcat( char*, const char*, ...) -> concatenates multiple
+      strings into a single result.
+
+  + tests/xstrcat.prg
+    * test program for hb_xstrcat()
+
+  * source/rtl/len.c
+  * source/rtl/empty.c
+    % Optimization by directly using member of PHB_ITEM
+
+  * source/rtl/is.c
+    + PRG level wrappers for some macros:
+      * ISALNUM()
+      * ISCNTRL()
+      * ISGRAPH()
+      * ISPRINT()
+      * ISPUNCT()
+      * ISSPACE()
+      * ISXDIGIT()
+      * ISASCII()
+      /*
+        Full description is in program body
+      */
 
 2004-02-22 18:01 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
   + doc/howtoext.txt

@@ -1,5 +1,5 @@
 /*
- * $Id: len.c,v 1.4 2003/11/23 03:13:54 jonnymind Exp $
+ * $Id: len.c,v 1.5 2003/11/24 15:15:25 lf_sfnet Exp $
  */
 
 /*
@@ -78,7 +78,7 @@ HB_FUNC( LEN )
          // hb_retnl( hb_itemGetCLen( pItem ) );
          /* hb_itemGetCLen() previously checked if pItem is a string.
             this is an unnecessary redundancy */
-         hb_retnl( hb_hashLen(pItem) );
+         hb_retnl( pItem->item.asHash.value->ulTotalLen );
          return;
       }
       else if( HB_IS_ARRAY( pItem ) )

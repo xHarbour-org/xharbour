@@ -274,6 +274,7 @@ extern LONGLONG   HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric 
     #define hb_retnilen( iNumber, iWidth )       hb_itemPutNILen( &HB_VM_STACK.Return, (iNumber), (iWidth) )
     #define hb_retnllen( lNumber, iWidth )       hb_itemPutNLLen( &HB_VM_STACK.Return, (lNumber), (iWidth) )
     #define hb_retptr( voidPtr )                 hb_itemPutPtrGC( &HB_VM_STACK.Return, (voidPtr) )
+    #define hb_retptrfin( voidPtr, fFin )        hb_itemPutPtrFinalizer( &HB_VM_STACK.Return, (voidPtr), (fFin) )
    #ifndef HB_LONG_LONG_OFF
     #define hb_retnll( llNumber )                 hb_itemPutNLL( &HB_VM_STACK.Return, (llNumber) )
     #define hb_retnlllen( llNumber, iWidth )      hb_itemPutNLLLen( &HB_VM_STACK.Return, (llNumber), (iWidth) )
@@ -421,6 +422,7 @@ extern int      HB_EXPORT hb_stricmp( const char * s1, const char * s2 ); /* com
 extern int      HB_EXPORT hb_strnicmp( const char * s1, const char * s2, ULONG ulLen ); /* compare two string without regards to case, limited by length */
 extern char     HB_EXPORT * hb_strupr( char * pszText ); /* convert a string in-place to upper-case */
 extern char     HB_EXPORT * hb_strdup( const char * pszText ); /* returns a pointer to a newly allocated copy of the source string */
+extern char     HB_EXPORT * hb_xstrcat ( char *dest, const char *src, ... ); /* Concatenates multiple strings into a single result */
 extern BOOL     HB_EXPORT hb_strMatchRegExp( const char * szString, const char * szMask ); /* compare two strings using a regular expression pattern */
 extern BOOL     HB_EXPORT hb_strEmpty( const char * szText, ULONG ulLen ); /* returns whether a string contains only white space */
 extern void     HB_EXPORT hb_strDescend( char * szStringTo, const char * szStringFrom, ULONG ulLen ); /* copy a string to a buffer, inverting each character */
