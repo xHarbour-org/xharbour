@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.20 2003/08/26 15:08:51 jonnymind Exp $
+ * $Id: hbapifs.h,v 1.21 2003/08/27 10:29:14 jonnymind Exp $
  */
 
 /*
@@ -122,6 +122,7 @@ extern BYTE     HB_EXPORT hb_fsCurDrv     ( void ); /* retrieve current drive nu
 extern BOOL     HB_EXPORT hb_fsDelete     ( BYTE * pszFileName ); /* delete a file */
 extern BOOL     HB_EXPORT hb_fsEof        ( FHANDLE hFileHandle ); /* determine if an open file is position at end-of-file */
 extern USHORT   HB_EXPORT hb_fsError      ( void ); /* retrieve file system error */
+extern USHORT   HB_EXPORT hb_fsOsError    ( void ); /* retrieve system dependant file system error */
 extern BOOL     HB_EXPORT hb_fsFile       ( BYTE * pszFileName ); /* determine if a file exists */
 extern ULONG    HB_EXPORT hb_fsFSize      ( BYTE * pszFileName, BOOL bUseDirEntry ); /* determine the size of a file */
 extern FHANDLE  HB_EXPORT hb_fsExtOpen    ( BYTE * pszFileName, BYTE * pDefExt,

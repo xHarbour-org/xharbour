@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.40 2003/09/12 02:09:34 jonnymind Exp $
+ * $Id: memvars.c,v 1.41 2003/09/12 02:26:59 jonnymind Exp $
  */
 
 /*
@@ -115,20 +115,18 @@ static HB_VALUE_PTR s_globalTable = NULL;
 PHB_DYNS s_memvarThGetName( char * szName, HB_STACK *pstack )
 {
    PHB_DYNS dyn;
-   char *szNewName = (char *) hb_xgrab( strlen(szName) + 14 );
+   char szNewName[270];
    sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
    dyn = hb_dynsymGet( szNewName );
-   hb_xfree( szNewName );
    return dyn;
 }
 
 PHB_DYNS s_memvarThFindName( char * szName, HB_STACK *pstack )
 {
    PHB_DYNS dyn;
-   char *szNewName = (char *) hb_xgrab( strlen( szName) + 14 );
+   char szNewName[270];
    sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
    dyn = hb_dynsymFindName( szNewName );
-   hb_xfree( szNewName );
    return dyn;
 }
 

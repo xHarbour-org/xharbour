@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.57 2003/08/27 19:04:06 jonnymind Exp $
+* $Id: thread.h,v 1.58 2003/09/10 06:07:30 ronpinkas Exp $
 */
 
 /*
@@ -357,7 +357,8 @@ typedef struct tag_HB_STACK
 
 
    /* FS api error system */
-   UINT uiErrorLast;
+   USHORT uiErrorLast;
+   USHORT uiOsErrorLast;
 
    /* Dynsym thread-specific table */
    UINT uiClosestDynSym;

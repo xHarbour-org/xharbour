@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1470 2003/09/14 15:23:44 paultucker Exp $
+ * $Id: ChangeLog,v 1.1466 2003/09/14 09:27:08 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,28 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-09-14 17:30 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
-  * config/w32/gcc.cf
-    ! Need winspool library for manage printers, or tprinter.c won't link.
+2003-09-14 20:10 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+   * include/hbapifs.h
+   * include/thread.h
+   * source/vm/thread.c
+   * source/vm/memvars.c
+     + Added hb_fsOsError() that return os-specific error code;
+       now fsError and fsSetError() are meant to set dos-based
+       error code.
+       TODO: Abstract error code; error messages; harbour interfaces
+       to low level hb_fsOsError function.
 
-2003-09-14 11:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-  * tests/testzip.prg
-    * minor changes
+   * source/vm/memvars.c
+     ! using now fixed memory allocation to create thread specific names for
+       memvars
 
-2003-09-14 11:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-  * contrib/hbzlib/makefile.bc
-    * correct usage of bccw32.cfg
-  * contrib/hbzlib/zipplatform.cpp
-    * cast on -1 test
-
-2003-09-14 16:40 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
-  * config/w32/gcc.cf
-    ! AR rule was taken from mingw32 rule; would not work under command
-      shell (that is supposed tu run gcc.cf; sh shell will run mingw.cf).
-
-2003-09-14 09:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-  * contrib/hbzlib/makefile.bc
-    * create files in obj and lib dirs (again...)
 
 2003-09-14 04:55 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * test/testzip.prg
