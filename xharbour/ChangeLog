@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2955 2004/05/18 23:09:05 walito Exp $
+ * $Id: ChangeLog,v 1.2956 2004/05/19 07:25:36 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-20 11:50 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * include/set.ch
+    + #define _SET_PRINTERJOB 115
+  * include/hbset.h
+    + HB_SET_PRINTERJOB      = 115
+  * source/pp/pptable.c
+    Added support for
+      _SET_PRINTERJOB
+  * source/rtl/set.c
+    + enabled support for setting print job name ( case HB_SET_PRINTERJOB : )
 
 2004-05-19 00:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapi.h
