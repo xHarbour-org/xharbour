@@ -2209,8 +2209,6 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
    LOCAL nProc, sProc
    LOCAL oRecover, lSuccess
 
-   TraceLog()
-
    oErr:ProcName   := PP_ProcName()
    oErr:ProcLine   := PP_ProcLine()
    oErr:ModuleName := s_sFile
@@ -2269,6 +2267,7 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
       RETURN s_xRet
    ENDIF
 
+   //TraceLog()
    Break( oRecover )
 
 RETURN NIL // Unreacable code
