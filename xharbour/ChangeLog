@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2835 2004/04/26 13:01:35 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2836 2004/04/26 15:45:08 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-26 12:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/dynsym.c
+    * Fixed minor bug where wrong source module would be associated with a given symbol.
 
 2004-04-26 17:40 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/odbc/odbc.c
@@ -73,12 +77,12 @@
       Returns handle to the newly created popup menu. The menu thus created can be populated
       with prompts and submenus through Wvt_AppendMenu().
 
-    + Wvt_SetPopupMenu() 
-      Returns or sets the context menu available through K_RBUTTONDN (See Below). In no menu 
+    + Wvt_SetPopupMenu()
+      Returns or sets the context menu available through K_RBUTTONDN (See Below). In no menu
       handle is passed, NULL is assigned to _s.hPopup.
 
     * hb_wvt_gtMouseEvent()
-      case WM_RBUTTONUP:  
+      case WM_RBUTTONUP:
         if ( _s.hPopup )
         {
            GetCursorPos( &xy );
@@ -94,9 +98,9 @@
           keyCode = K_RBUTTONUP;
           break;
         }
-       
+
       Adjusted to invoke the popup menu set through Wvt_SetPopupMenu(), and if found NULL, the event
-      is passed to the user to process. The LONG value returned by TrackPopupMenu() which is the third 
+      is passed to the user to process. The LONG value returned by TrackPopupMenu() which is the third
       parameter passed with Wvt_AppendMenu(), when a prompted is clicked, is posted to keyboard buffer
       which can be retrieved with Inkey() function.
 
@@ -106,7 +110,7 @@
   * xharbour/tests/wvtgui.prg
     Updated to demonstrate the usage of Context menu with each screen available in the application.
     Just right-click anywhere on the screen and select an option.
- 
+
   + include/wvtwin.ch
     To hold the Gtwvt specific constants:
     1) Constants to define Button Formats - Wvt_DrawButton().
@@ -121,12 +125,12 @@
     Function Main()
     local hPopup := Wvt_SetPopupMenu() // Clears the slot and returns back any previous assigned menu.
     local hMenu, nKey
-    
+
     hMenu := DefinePopup()
     Wvt_SetPopupMenu( hMenu )
 
-    // During the execution of this code K_RBUTTONUP will invoke the Popup and will post the keycode 
-    // assigened to the menu prompt. 
+    // During the execution of this code K_RBUTTONUP will invoke the Popup and will post the keycode
+    // assigened to the menu prompt.
 
     nKey := inkey( 0, INKEY_ALL )
     if nKey == 299301
@@ -140,7 +144,7 @@
 
     Static Function DefinePopup()
     Local hMenu, hMenu1
-    
+
     hMenu := Wvt_CreatePopupMenu()
     Wvt_AppendMenu( hMenu, MF_ENABLED + MF_PROMPT, 299301, 'Do Something' )
 
@@ -149,7 +153,7 @@
     //-----------------------//
 
     /*
-    This way we can simulate any inkey code we desire and can act according to that.    
+    This way we can simulate any inkey code we desire and can act according to that.
     */
 
 2004-04-24 15:14 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>

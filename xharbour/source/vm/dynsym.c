@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.15 2004/03/18 04:05:27 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.16 2004/03/25 23:49:27 ronpinkas Exp $
  */
 
 /*
@@ -140,7 +140,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
          }
       }
 
-      if( pSymbol->pDynSym == (PHB_DYNS) 1 )
+      if( pSymbol->pDynSym == (PHB_DYNS) 1 && pDynSym->pModuleSymbols == NULL )
       {
          pDynSym->pModuleSymbols = pModuleSymbols;
          //printf( "Symbol: '%s' Module: '%s'\n", pSymbol->szName, pModuleSymbols->szModuleName );
