@@ -1,5 +1,5 @@
 /*
- * $Id: hbfunchk.c,v 1.3 2003/08/20 04:55:22 ronpinkas Exp $
+ * $Id: hbfunchk.c,v 1.4 2004/02/09 12:11:30 andijahja Exp $
  */
 
 /*
@@ -122,14 +122,18 @@ void hb_compFunCallCheck( char * szFuncCall, int iArgs )
    {
       iCmp = strncmp( szFuncCall, f[ i ].cFuncName, 4 );
       if( iCmp == 0 )
+      {
          iCmp = strncmp( szFuncCall, f[ i ].cFuncName, strlen( szFuncCall ) );
+      }
       if( iCmp == 0 )
       {
          iPos = i;
          break;
       }
       else
+      {
          ++i;
+      }
    }
 
    if( iPos >= 0 && ( f[ iPos ].iMinParam != -1 ) )
@@ -138,14 +142,21 @@ void hb_compFunCallCheck( char * szFuncCall, int iArgs )
       {
         if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_HARBOUR ) )
         {
+
          char szMsg[ 40 ];
 
          if( f[ iPos ].iMaxParam == -1 )
+         {
             sprintf( szMsg, "\nPassed: %i, expected: at least %i", iArgs, f[ iPos ].iMinParam );
+         }
          else if( f[ iPos ].iMinParam == f[ iPos ].iMaxParam )
+         {
             sprintf( szMsg, "\nPassed: %i, expected: %i", iArgs, f[ iPos ].iMinParam );
+         }
          else
+         {
             sprintf( szMsg, "\nPassed: %i, expected: %i - %i", iArgs, f[ iPos ].iMinParam, f[ iPos ].iMaxParam );
+         }
 
          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CHECKING_ARGS, szFuncCall, szMsg );
        }

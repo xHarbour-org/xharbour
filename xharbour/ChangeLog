@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2745 2004/04/04 22:52:39 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2746 2004/04/04 23:37:59 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-05 07:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/hbxml.c
+    ! fix inconsistent function declarations
 
+  * source/compiler/hbfunchk.c
+  * source/compiler/cmdcheck.c
+  * source/compiler/hbgenerr.c
+  * source/compiler/hbpcode.c
+    ! code formatting, mainly replace tabs -> spaces, put single-liner
+      into {} per xHarbour coding convention.
 
 2004-04-05 01:43 UTC+0200 Francesco Saverio Giudice <info / at / fsgiudice.com>
   * source/include/thread.h

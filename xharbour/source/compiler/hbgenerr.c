@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.16 2004/03/24 08:08:30 andijahja Exp $
+ * $Id: hbgenerr.c,v 1.17 2004/03/28 15:12:02 likewolf Exp $
  */
 
 /*
@@ -179,7 +179,9 @@ void hb_compGenWarning( char * szWarnings[], char cPrefix, int iWarning, const c
    if( ( szText[ 0 ] - '0' ) <= hb_comp_iWarnings )
    {
       if( hb_comp_files.pLast && hb_comp_files.pLast->szFileName )
+      {
          printf( "\r%s(%i) ", hb_comp_files.pLast->szFileName, iLine );
+      }
 
       printf( "Warning %c%04i  ", cPrefix, iWarning );
       printf( szText + 1, szWarning1, szWarning2 );

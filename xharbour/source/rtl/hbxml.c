@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.23 2004/04/02 23:18:01 jonnymind Exp $
+ * $Id: hbxml.c,v 1.24 2004/04/04 22:52:42 jonnymind Exp $
  */
 
 /*
@@ -428,7 +428,7 @@ static MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHB_ITEM
    return MXML_STATUS_OK;
 }
 
-MXML_STATUS mxml_attribute_write( MXML_OUTPUT *out, PHBXML_ATTRIBUTE pAttr, int style )
+static MXML_STATUS mxml_attribute_write( MXML_OUTPUT *out, PHBXML_ATTRIBUTE pAttr, int style )
 {
    char *name = pAttr->pName->item.asString.value;
 
@@ -495,7 +495,7 @@ static PHB_ITEM mxml_node_new( PHB_ITEM pDoc )
 *
 */
 
-void mxml_node_unlink( PHB_ITEM pNode )
+static void mxml_node_unlink( PHB_ITEM pNode )
 {
    HB_ITEM pPrev, pNext, pParent, pNil;
 
@@ -546,7 +546,7 @@ HB_FUNC( HBXML_NODE_UNLINK )
 }
 /****************************************************************/
 
-void mxml_node_insert_before( PHB_ITEM pTg, PHB_ITEM pNode )
+static void mxml_node_insert_before( PHB_ITEM pTg, PHB_ITEM pNode )
 {
    HB_ITEM parent;
 
@@ -584,7 +584,7 @@ HB_FUNC( HBXML_NODE_INSERT_BEFORE )
 }
 
 
-void mxml_node_insert_after( PHB_ITEM pTg, PHB_ITEM pNode )
+static void mxml_node_insert_after( PHB_ITEM pTg, PHB_ITEM pNode )
 {
    // Move tg->next into node->next
    hb_objSendMsg( pTg, "ONEXT", 0 );
@@ -611,7 +611,7 @@ HB_FUNC( HBXML_NODE_INSERT_AFTER )
 * tg and its former children. Former children of pNode are discarded
 */
 
-void mxml_node_insert_below( PHB_ITEM pTg, PHB_ITEM pNode )
+static void mxml_node_insert_below( PHB_ITEM pTg, PHB_ITEM pNode )
 {
    HB_ITEM child;
 
@@ -642,7 +642,7 @@ HB_FUNC( HBXML_NODE_INSERT_BELOW )
 * Adds a node to the bottom of the children list of tg.
 */
 
-void mxml_node_add_below( PHB_ITEM pTg, PHB_ITEM pNode )
+static void mxml_node_add_below( PHB_ITEM pTg, PHB_ITEM pNode )
 {
    HB_ITEM child;
 
@@ -686,7 +686,7 @@ HB_FUNC( HBXML_NODE_ADD_BELOW )
 * this clone is "floating" out of the tree hierarcy.
 */
 
-PHB_ITEM mxml_node_clone( PHB_ITEM pTg )
+static PHB_ITEM mxml_node_clone( PHB_ITEM pTg )
 {
    /* Node is not from a real document, so is right to leave nBeginLine at 0 */
    PHB_ITEM pNode = mxml_node_new( NULL );
@@ -725,7 +725,7 @@ HB_FUNC( HBXML_NODE_CLONE )
 * this clone is "floating" out of the tree hierarcy.
 */
 
-PHB_ITEM mxml_node_clone_tree( PHB_ITEM pTg )
+static PHB_ITEM mxml_node_clone_tree( PHB_ITEM pTg )
 {
    PHB_ITEM pClone = mxml_node_clone( pTg );
    HB_ITEM node;
