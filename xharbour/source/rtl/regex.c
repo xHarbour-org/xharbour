@@ -6441,16 +6441,21 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       pString = hb_param( 2, HB_IT_STRING );
    }
 
-   if( pRegEx == NULL || pString == NULL )
+   if( pRegEx == NULL || pString == NULL ||
+         ( pRegEx != NULL && pRegEx->type != HB_IT_STRING) ||
+         ( pString != NULL && pString->type != HB_IT_STRING)
+   )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameter count/type", NULL,
-         4, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ),
-          hb_param( 3, HB_IT_ANY ), hb_param( 4, HB_IT_ANY ));
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameters",
+         "Regex subsystem",
+         4, pRegEx, pString,
+          hb_paramError( 3 ), hb_paramError( 4 ));
       return FALSE;
    }
 
    /* now check if it is a precompiled regex */
-   if ( memcmp( pRegEx->item.asString.value, "$$$", 3 ) == 0 )
+   if ( pRegEx->item.asString.length > 3 &&
+      memcmp( pRegEx->item.asString.value, "$$$", 3 ) == 0 )
    {
       pReg = (regex_t *) ( pRegEx->item.asString.value + 3);
       aMatches[0].rm_eo = pRegEx->item.asString.length - 3;
