@@ -1,10 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipStorage.cpp $
 // $Archive: /ZipArchive/ZipStorage.cpp $
-// $Date: 2002/10/13 01:53:46 $ $Author: lculik $
+// $Date: 03-01-09 10:30 $ $Author: Tadeusz Dracz $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
-// is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)
+// is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -15,10 +15,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "zipstorage.h"
-#include "ziparchive.h"
+#include "ZipStorage.h"
+#include "ZipArchive.h"
 // #include "ZipPathComponent.h"
-#include "zipplatform.h"
+#include "ZipPlatform.h"
 
 //////////////////////////////////////////////////////////////////////
 // disk spanning objectives:
@@ -238,7 +238,7 @@ CZipString CZipStorage::GetTdVolumeName(bool bLast, LPCTSTR lpszZipName) const
 	CZipPathComponent zpc(szFilePath);
 	CZipString szExt;
 	if (bLast)
-		szExt = _T("zip");
+		szExt = m_szSpanExtension;
 	else
 		szExt.Format(_T("%.3d"), m_iCurrentDisk);
 	zpc.SetExtension(szExt);
@@ -328,12 +328,15 @@ void CZipStorage::UpdateSpanMode(WORD uLastDisk)
 	if (uLastDisk)
 	{
 		// disk spanning detected
-
+		CZipString szFilePath = m_pFile->GetFilePath();
 		if (m_iSpanMode == suggestedAuto)
-			m_iSpanMode = ZipPlatform::IsDriveRemovable(m_pFile->GetFilePath()) ? 
+			m_iSpanMode = ZipPlatform::IsDriveRemovable(szFilePath) ? 
 				pkzipSpan : tdSpan;
 		else
+		{
+			ASSERT(m_iSpanMode == suggestedTd);
 			m_iSpanMode = tdSpan;
+		}
 
 		if (m_iSpanMode == pkzipSpan)
 		{
@@ -342,7 +345,8 @@ void CZipStorage::UpdateSpanMode(WORD uLastDisk)
 		}
 		else /*if (m_iSpanMode == tdSpan)*/
 			m_iTdSpanData = uLastDisk; // disk with .zip extension ( the last one)
-			
+		CZipPathComponent zpc(szFilePath);
+		m_szSpanExtension = zpc.GetFileExt();
 		m_pWriteBuffer.Release(); // no need for this in this case
 	}
 	else 

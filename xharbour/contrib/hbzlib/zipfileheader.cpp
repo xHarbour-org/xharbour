@@ -1,10 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipFileHeader.cpp $
 // $Archive: /ZipArchive_STL/ZipFileHeader.cpp $
-// $Date: 2002/10/13 01:53:46 $ $Author: lculik $
+// $Date: 02-04-01 2:15 $ $Author: Tadeusz Dracz $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
-// is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)
+// is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,11 +16,11 @@
 
 
 #include "stdafx.h"
-#include "zipfileheader.h"
-#include "zipautobuffer.h"
-#include "ziparchive.h"
-#include "zipplatform.h"
-#include "zipcompatibility.h"
+#include "ZipFileHeader.h"
+#include "ZipAutoBuffer.h"
+#include "ZipArchive.h"
+#include "ZipPlatform.h"
+#include "ZipCompatibility.h"
 #include <time.h>
 
 #define FILEHEADERSIZE	46
@@ -155,9 +155,10 @@ bool CZipFileHeader::ReadLocal(CZipStorage *pStorage, WORD& iLocExtrFieldSize)
 	
 	WORD uFileNameSize = GetFileNameSize();
 	WORD uTemp; 
-	memcpy(&uTemp, buf+6, 2); 
-	if (( (uTemp & 0xf) != (m_uFlag & 0xf))	
-		||(memcmp(buf + 8, &m_uMethod, 2) != 0)
+	memcpy(&uTemp, buf+6, 2); // give the priority to the local flag
+	if ((uTemp & 0xf) != (m_uFlag & 0xf))
+		m_uFlag = uTemp;
+	if ((memcmp(buf + 8, &m_uMethod, 2) != 0)
 		|| (m_uMethod && (m_uMethod != Z_DEFLATED))
 		|| (memcmp(buf + 26, &uFileNameSize, 2) != 0))
 		return false;

@@ -1,10 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipPlatform.cpp $
 // $Archive: /ZipArchive/ZipPlatform.cpp $
-// $Date: 2002/10/13 01:53:46 $ $Author: lculik $
+// $Date: 02-03-23 2:12 $ $Author: Tadeusz Dracz $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
-// is Copyright 2000-2002 by Tadeusz Dracz (http://www.artpol-software.com/)
+// is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -16,10 +16,10 @@
 
 
 #include "stdafx.h"
-#include "zipplatform.h"
-#include "zipfileheader.h"
-#include "zipexception.h"
-#include "zipautobuffer.h"
+#include "ZipPlatform.h"
+#include "ZipFileHeader.h"
+#include "ZipException.h"
+#include "ZipAutoBuffer.h"
 #include <sys/stat.h>
 
 #if defined _MSC_VER && !defined __BORLANDC__ /*_MSC_VER may be defined in Borland after converting the VC project */
