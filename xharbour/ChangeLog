@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.486 2002/11/12 17:24:12 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.487 2002/11/13 04:37:14 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,18 +9,18 @@
 */
 
 2002-11-13 01:07 UTC-0300 Walter Negro <anegro@overnet.com.ar>
-  * achoice.prg
-  * alert.prg
-  * dbsdf.prg
-  * menuto.prg
-  * persist.prg
-  * profiler.prg
-  * radiogrp.prg
-  * tclass.prg
-  * tgetlist.prg
-  * tlabel.prg
-  * tpopup.prg
-  * treport.prg
+  * source/rtl/achoice.prg
+  * source/rtl/alert.prg
+  * source/rtl/dbsdf.prg
+  * source/rtl/menuto.prg
+  * source/rtl/persist.prg
+  * source/rtl/profiler.prg
+  * source/rtl/radiogrp.prg
+  * source/rtl/tclass.prg
+  * source/rtl/tgetlist.prg
+  * source/rtl/tlabel.prg
+  * source/rtl/tpopup.prg
+  * source/rtl/treport.prg
     * Optimization of code, using FOR EACH and HB_EnumIndex()
 
 2002-11-12 09:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
