@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.8 2003/12/22 23:56:26 andijahja Exp $
+ * $Id: gtwvt.c,v 1.9 2003/12/23 03:11:04 peterrees Exp $
  */
 
 /*
@@ -90,29 +90,30 @@
 #include "inkey.ch"
 #include "error.ch"
 
-#define WVT_CHAR_QUEUE_SIZE 128
-#define WVT_CHAR_BUFFER 1024
-#define WVT_MAX_ROWS 256
-#define WVT_MAX_COLS 256
-#define WVT_DEFAULT_ROWS 25
-#define WVT_DEFAULT_COLS 80
+#define WVT_CHAR_QUEUE_SIZE  128
+#define WVT_CHAR_BUFFER     1024
+#define WVT_MAX_ROWS         256
+#define WVT_MAX_COLS         256
+#define WVT_DEFAULT_ROWS      25
+#define WVT_DEFAULT_COLS      80
 
-#define BLACK RGB(0x0,0x0,0x0)
-#define BLUE RGB(0x0,0x0,0xC0)
-#define GREEN RGB(0x0,0xC0,0x0)
-#define CYAN RGB(0x0,0xC0,0xC0)
-#define RED RGB(0xC0,0x0,0x0)
-#define MAGENTA RGB(0xC0,0x0,0xC0)
-#define BROWN RGB(0xC0,0xC0,0x0)
-#define WHITE RGB(0xF0,0xF0,0xF0)
-#define LIGHT_GRAY RGB(0xA0,0xA0,0xA0)
-#define BRIGHT_BLUE RGB(0x0,0x0,0xFF)
-#define BRIGHT_GREEN RGB(0x0,0xFF,0x0)
-#define BRIGHT_CYAN RGB(0x0,0xFF,0xFF)
-#define BRIGHT_RED RGB(0xFF,0x0,0x0)
-#define BRIGHT_MAGENTA RGB(0xFF,0x0,0xFF)
-#define YELLOW RGB(0xFF,0xFF,0x0)
-#define BRIGHT_WHITE RGB(0xFF,0xFF,0xFF)
+#define BLACK          RGB( 0x0 ,0x0 ,0x0  )
+#define BLUE           RGB( 0x0 ,0x0 ,0xC0 )
+#define GREEN          RGB( 0x0 ,0xC0,0x0  )
+#define CYAN           RGB( 0x0 ,0xC0,0xC0 )
+#define RED            RGB( 0xC0,0x0 ,0x0  )
+#define MAGENTA        RGB( 0xC0,0x0 ,0xC0 )
+#define BROWN          RGB( 0xC0,0xC0,0x0  )
+//#define WHITE          RGB( 0xF0,0xF0,0xF0 )
+#define WHITE          RGB( 0xC6,0xC6,0xC6 )
+#define LIGHT_GRAY     RGB( 0xA0,0xA0,0xA0 )
+#define BRIGHT_BLUE    RGB( 0x0 ,0x0 ,0xFF )
+#define BRIGHT_GREEN   RGB( 0x0 ,0xFF,0x0  )
+#define BRIGHT_CYAN    RGB( 0x0 ,0xFF,0xFF )
+#define BRIGHT_RED     RGB( 0xFF,0x0 ,0x0  )
+#define BRIGHT_MAGENTA RGB( 0xFF,0x0 ,0xFF )
+#define YELLOW         RGB( 0xFF,0xFF,0x0  )
+#define BRIGHT_WHITE   RGB( 0xFF,0xFF,0xFF )
 
 #define WM_MY_UPDATE_CARET (WM_USER+0x0101)
 
@@ -122,44 +123,44 @@ static TCHAR szAppName[] = TEXT("xHarbour WVT");
 typedef struct global_data
 {
 
-  POINT PTEXTSIZE;              // size of the fixed width font
-  BOOL  FixedFont;              // TRUE if current font is a fixed font
-  int   FixedSize[WVT_MAX_COLS];// buffer for ExtTextOut() to emulate fixed pitch when Proportional font selected
-  USHORT ROWS;                  // number of displayable rows in window
-  USHORT COLS;                  // number of displayable columns in window
-  COLORREF foreground;          // forground colour
-  COLORREF background;          // background colour
+  POINT     PTEXTSIZE;                 // size of the fixed width font
+  BOOL      FixedFont;                 // TRUE if current font is a fixed font
+  int       FixedSize[WVT_MAX_COLS];   // buffer for ExtTextOut() to emulate fixed pitch when Proportional font selected
+  USHORT    ROWS;                      // number of displayable rows in window
+  USHORT    COLS;                      // number of displayable columns in window  
+  COLORREF  foreground;                // forground colour
+  COLORREF  background;                // background colour
 
-  USHORT BUFFERSIZE;            // size of the screen text buffer
-  BYTE byAttributes[WVT_MAX_ROWS * WVT_MAX_COLS]; // buffer with the attributes
-  BYTE byBuffer[WVT_MAX_ROWS * WVT_MAX_COLS];     // buffer with the text to be displayed on the screen
-  BYTE *pAttributes;            // pointer to buffer
-  BYTE *pBuffer;                //   "     "    "
-  POINT caretPos;               // the current caret position
-  BOOL CaretExist;              // TRUE if a caret has been created
-  int CaretSize;
-  POINT mousePos;               // the last mousedown position
-  HWND hWnd;                    // the window handle
-  int Keys[WVT_CHAR_QUEUE_SIZE];    // Array to hold the characters & events
-  int keyPointerIn;             // Offset into key array for character to be placed
-  int keyPointerOut;            // Offset into key array of next character to read
-  BOOL displayCaret;            // flag to indicate if caret is on
-  RECT RectInvalid;             // Invalid rectangle if DISPBEGIN() active
-  HFONT hFont;
-  int fontHeight;               // requested font height
-  int fontWidth ;               // requested font width
-  int fontWeight;               // Bold level
-  int fontQuality;
-  char fontFace[LF_FACESIZE];   // requested font face name LF_FACESIZE #defined in wingdi.h
-  int closeEvent;             // command to return (in ReadKey) on close
-  int shutdownEvent;          // command to return (in ReadKey) on shutdown
-  int LastMenuEvent;          // Last menu item selected
-  int MenuKeyEvent;             // User definable event number for windows menu command
-  BOOL CentreWindow;            // True if window is to be Reset into centre of window
-  int CodePage;                 // Code page to use for display characters
-  BOOL Win9X;                   // Flag to say if running on Win9X not NT/2000/XP
-  BOOL AltF4Close;              // Can use Alt+F4 to close application
-  BOOL InvalidateWindow;        // Flag for controlling whether to use ScrollWindowEx()
+  USHORT    BUFFERSIZE;                // size of the screen text buffer
+  BYTE      byAttributes[WVT_MAX_ROWS * WVT_MAX_COLS]; // buffer with the attributes
+  BYTE      byBuffer[WVT_MAX_ROWS * WVT_MAX_COLS];     // buffer with the text to be displayed on the screen
+  BYTE      *pAttributes;              // pointer to buffer
+  BYTE      *pBuffer;                  //   "     "    "
+  POINT     caretPos;                  // the current caret position
+  BOOL      CaretExist;                // TRUE if a caret has been created
+  int       CaretSize;
+  POINT     mousePos;                  // the last mousedown position
+  HWND      hWnd;                      // the window handle
+  int       Keys[WVT_CHAR_QUEUE_SIZE]; // Array to hold the characters & events
+  int       keyPointerIn;              // Offset into key array for character to be placed
+  int       keyPointerOut;             // Offset into key array of next character to read
+  BOOL      displayCaret;              // flag to indicate if caret is on
+  RECT      RectInvalid;               // Invalid rectangle if DISPBEGIN() active
+  HFONT     hFont;
+  int       fontHeight;                // requested font height
+  int       fontWidth ;                // requested font width
+  int       fontWeight;                // Bold level
+  int       fontQuality;
+  char      fontFace[LF_FACESIZE];     // requested font face name LF_FACESIZE #defined in wingdi.h
+  int       closeEvent;                // command to return (in ReadKey) on close
+  int       shutdownEvent;             // command to return (in ReadKey) on shutdown
+  int       LastMenuEvent;             // Last menu item selected
+  int       MenuKeyEvent;              // User definable event number for windows menu command
+  BOOL      CentreWindow;              // True if window is to be Reset into centre of window
+  int       CodePage;                  // Code page to use for display characters
+  BOOL      Win9X;                     // Flag to say if running on Win9X not NT/2000/XP
+  BOOL      AltF4Close;                // Can use Alt+F4 to close application
+  BOOL      InvalidateWindow;          // Flag for controlling whether to use ScrollWindowEx()
 } GLOBAL_DATA;
 
 static GLOBAL_DATA _s;
@@ -200,65 +201,65 @@ static int _Alt_Num[] = {
   };
 
 //private
-static void gt_hbInitStatics(void);
-static HWND hb_wvt_gtCreateWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow);
-static BOOL hb_wvt_gtInitWindow(HWND hWnd, USHORT col, USHORT row);
-static void hb_wvt_gtResetWindowSize(HWND hWnd);
+static void    gt_hbInitStatics(void);
+static HWND    hb_wvt_gtCreateWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow);
+static BOOL    hb_wvt_gtInitWindow(HWND hWnd, USHORT col, USHORT row);
+static void    hb_wvt_gtResetWindowSize(HWND hWnd);
 static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-static BOOL hb_wvt_gtAllocSpBuffer(USHORT col, USHORT row);
-static DWORD hb_wvt_gtProcessMessages(void);
-static BOOL hb_wvt_gtValidWindowSize(int rows, int cols, HFONT hFont);
+static BOOL    hb_wvt_gtAllocSpBuffer(USHORT col, USHORT row);
+static DWORD   hb_wvt_gtProcessMessages(void);
+static BOOL    hb_wvt_gtValidWindowSize(int rows, int cols, HFONT hFont);
 
 
-static void hb_wvt_gtSetCaretOn(BOOL bOn);
-static BOOL hb_wvt_gtSetCaretPos(void);
-static void hb_wvt_gtValidateCaret(void);
+static void    hb_wvt_gtSetCaretOn(BOOL bOn);
+static BOOL    hb_wvt_gtSetCaretPos(void);
+static void    hb_wvt_gtValidateCaret(void);
 
-static USHORT hb_wvt_gtGetMouseX (void);
-static USHORT hb_wvt_gtGetMouseY (void);
-static void hb_wvt_gtSetMouseX (USHORT ix);
-static void hb_wvt_gtSetMouseY (USHORT iy);
+static USHORT  hb_wvt_gtGetMouseX (void);
+static USHORT  hb_wvt_gtGetMouseY (void);
+static void    hb_wvt_gtSetMouseX (USHORT ix);
+static void    hb_wvt_gtSetMouseY (USHORT iy);
 
-static BOOL hb_wvt_gtGetCharFromInputQueue (int * c);
-static void hb_wvt_gtAddCharToInputQueue (int data);
-static void hb_wvt_gtTranslateKey(int key, int shiftkey, int altkey, int controlkey);
+static BOOL    hb_wvt_gtGetCharFromInputQueue (int * c);
+static void    hb_wvt_gtAddCharToInputQueue (int data);
+static void    hb_wvt_gtTranslateKey(int key, int shiftkey, int altkey, int controlkey);
 
-static void hb_wvt_gtSetInvalidRect(USHORT left, USHORT top, USHORT right, USHORT bottom);
-static void hv_wvt_gtDoInvalidateRect(void);
+static void    hb_wvt_gtSetInvalidRect(USHORT left, USHORT top, USHORT right, USHORT bottom);
+static void    hv_wvt_gtDoInvalidateRect(void);
 
-static void hb_wvt_gtHandleMenuSelection(int);
-static int hb_wvt_gtGetCloseEvent(void);
-static int hb_wvt_gtGetShutdownEvent(void);
+static void    hb_wvt_gtHandleMenuSelection(int);
+static int     hb_wvt_gtGetCloseEvent(void);
+static int     hb_wvt_gtGetShutdownEvent(void);
 
-static POINT hb_wvt_gtGetColRowFromXY( USHORT x, USHORT y);
-static RECT hb_wvt_gtGetColRowFromXYRect( RECT xy);
-static POINT hb_wvt_gtGetColRowForTextBuffer(USHORT index);
-static POINT hb_wvt_gtGetXYFromColRow( USHORT col, USHORT row);
-static void hb_wvt_gtValidateCol(void);
-static void hb_wvt_gtValidateRow(void);
+static POINT   hb_wvt_gtGetColRowFromXY( USHORT x, USHORT y);
+static RECT    hb_wvt_gtGetColRowFromXYRect( RECT xy);
+static POINT   hb_wvt_gtGetColRowForTextBuffer(USHORT index);
+static POINT   hb_wvt_gtGetXYFromColRow( USHORT col, USHORT row);
+static void    hb_wvt_gtValidateCol(void);
+static void    hb_wvt_gtValidateRow(void);
 
-static USHORT hb_wvt_gtCalcPixelHeight(void);
-static USHORT hb_wvt_gtCalcPixelWidth(void);
-static BOOL hb_wvt_gtSetColors(HDC hdc, BYTE attr);
-static HFONT hb_wvt_gtGetFont(char * pszFace, int iHeight, int iWidth, int iWeight, int iQuality, int iCodePage);
+static USHORT  hb_wvt_gtCalcPixelHeight(void);
+static USHORT  hb_wvt_gtCalcPixelWidth(void);
+static BOOL    hb_wvt_gtSetColors(HDC hdc, BYTE attr);
+static HFONT   hb_wvt_gtGetFont(char * pszFace, int iHeight, int iWidth, int iWeight, int iQuality, int iCodePage);
 
-static BOOL hb_wvt_gtTextOut(HDC hdc, USHORT col, USHORT row, LPCTSTR lpString,  USHORT cbString  );
-static void hb_wvt_gtSetStringInTextBuffer(USHORT col, USHORT row, BYTE attr, BYTE *sBuffer, USHORT length);
-static USHORT hb_wvt_gtGetIndexForTextBuffer(USHORT col, USHORT row);
-static RECT hb_wvt_gtGetXYFromColRowRect( RECT colrow);
-static RECT hb_wvt_gtGetColRowFromXYRect( RECT xy);
+static BOOL    hb_wvt_gtTextOut(HDC hdc, USHORT col, USHORT row, LPCTSTR lpString,  USHORT cbString  );
+static void    hb_wvt_gtSetStringInTextBuffer(USHORT col, USHORT row, BYTE attr, BYTE *sBuffer, USHORT length);
+static USHORT  hb_wvt_gtGetIndexForTextBuffer(USHORT col, USHORT row);
+static RECT    hb_wvt_gtGetXYFromColRowRect( RECT colrow);
+static RECT    hb_wvt_gtGetColRowFromXYRect( RECT xy);
 
 // mouse initialization was made in cmdarg.c
-extern BOOL b_MouseEnable;
+extern BOOL    b_MouseEnable;
 
 // set in mainwin.c
-extern HANDLE hb_hInstance;
-extern HANDLE hb_hPrevInstance;
-extern int hb_iCmdShow;
+extern HANDLE  hb_hInstance;
+extern HANDLE  hb_hPrevInstance;
+extern int     hb_iCmdShow;
 
-static USHORT s_uiDispCount;
-static USHORT s_usCursorStyle;
-static USHORT s_usOldCurStyle;
+static USHORT  s_uiDispCount;
+static USHORT  s_usCursorStyle;
+static USHORT  s_usOldCurStyle;
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
 
@@ -1915,7 +1916,7 @@ static HWND hb_wvt_gtCreateWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
   }
 
   hWnd = CreateWindow(szAppName,                          //classname
-     TEXT("XHARBOUR_WVT"),                                     //window name
+     TEXT("XHARBOUR_WVT"),                                //window name
      WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX,  //style
      0,                                                   //x
      0,                                                   //y
@@ -1986,10 +1987,10 @@ static RECT hb_wvt_gtGetColRowFromXYRect( RECT xy)
 {
   RECT colrow;
 
-  colrow.left = (xy.left/_s.PTEXTSIZE.x);
-  colrow.top = (xy.top/_s.PTEXTSIZE.y);
-  colrow.right = (xy.right/_s.PTEXTSIZE.x);
-  colrow.bottom = (xy.bottom/_s.PTEXTSIZE.y);
+  colrow.left   = ( xy.left/_s.PTEXTSIZE.x   );
+  colrow.top    = ( xy.top/_s.PTEXTSIZE.y    );
+  colrow.right  = ( xy.right/_s.PTEXTSIZE.x  );
+  colrow.bottom = ( xy.bottom/_s.PTEXTSIZE.y );
 
   return(colrow);
 }
@@ -2004,10 +2005,10 @@ static RECT hb_wvt_gtGetXYFromColRowRect( RECT colrow)
 {
   RECT xy;
 
-  xy.left = (colrow.left) * _s.PTEXTSIZE.x;
-  xy.top = (colrow.top) * _s.PTEXTSIZE.y;
-  xy.right = (colrow.right+1) * _s.PTEXTSIZE.x;
-  xy.bottom = (colrow.bottom+1) * _s.PTEXTSIZE.y;
+  xy.left   = ( colrow.left     ) * _s.PTEXTSIZE.x;
+  xy.top    = ( colrow.top      ) * _s.PTEXTSIZE.y;
+  xy.right  = ( colrow.right+1  ) * _s.PTEXTSIZE.x;
+  xy.bottom = ( colrow.bottom+1 ) * _s.PTEXTSIZE.y;
 
 
   return(xy);
@@ -2178,9 +2179,9 @@ static void hb_wvt_gtSetInvalidRect(USHORT left, USHORT top, USHORT right, USHOR
   RECT rect;
   if (_s.InvalidateWindow)
   {
-    rect.left = left;
-    rect.top = top;
-    rect.right = right;
+    rect.left   = left;
+    rect.top    = top;
+    rect.right  = right;
     rect.bottom = bottom;
     rect = hb_wvt_gtGetXYFromColRowRect(rect);
 
@@ -2196,9 +2197,9 @@ static void hb_wvt_gtSetInvalidRect(USHORT left, USHORT top, USHORT right, USHOR
     }
     else
     {
-      _s.RectInvalid.left = min(_s.RectInvalid.left, rect.left);
-      _s.RectInvalid.top = min(_s.RectInvalid.top, rect.top);
-      _s.RectInvalid.right = max(_s.RectInvalid.right, rect.right);
+      _s.RectInvalid.left   = min(_s.RectInvalid.left, rect.left    );
+      _s.RectInvalid.top    = min(_s.RectInvalid.top, rect.top      );
+      _s.RectInvalid.right  = max(_s.RectInvalid.right, rect.right  );
       _s.RectInvalid.bottom = max(_s.RectInvalid.bottom, rect.bottom);
     }
     hv_wvt_gtDoInvalidateRect() ;
@@ -2253,20 +2254,23 @@ static HFONT hb_wvt_gtGetFont(char * pszFace, int iHeight, int iWidth, int iWeig
   if ( iHeight > 0)
   {
     LOGFONT logfont;
-    logfont.lfEscapement = 0;
-    logfont.lfOrientation = 0;
-    logfont.lfWeight = iWeight ;
-    logfont.lfItalic = 0;
-    logfont.lfUnderline = 0;
-    logfont.lfStrikeOut = 0;
-    logfont.lfCharSet = iCodePage;// OEM_CHARSET;
-    logfont.lfOutPrecision = 0;
-    logfont.lfClipPrecision = 0;
-    logfont.lfQuality = iQuality; // DEFAULT_QUALITY, DRAFT_QUALITY or PROOF_QUALITY
+
+    logfont.lfEscapement     = 0;
+    logfont.lfOrientation    = 0;
+    logfont.lfWeight         = iWeight ;
+    logfont.lfItalic         = 0;
+    logfont.lfUnderline      = 0;
+    logfont.lfStrikeOut      = 0;
+    logfont.lfCharSet        = iCodePage;             // OEM_CHARSET;
+    logfont.lfOutPrecision   = 0;
+    logfont.lfClipPrecision  = 0;
+    logfont.lfQuality        = iQuality;              // DEFAULT_QUALITY, DRAFT_QUALITY or PROOF_QUALITY
     logfont.lfPitchAndFamily = FIXED_PITCH+FF_MODERN; // all mapping depends on fixed width fonts!
-    logfont.lfHeight = iHeight;
-    logfont.lfWidth =  iWidth;
+    logfont.lfHeight         = iHeight;
+    logfont.lfWidth          = iWidth;
+
     strcpy(logfont.lfFaceName,pszFace);
+
     hFont = CreateFontIndirect(&logfont);
   }
   else
@@ -2281,43 +2285,44 @@ static HFONT hb_wvt_gtGetFont(char * pszFace, int iHeight, int iWidth, int iWeig
 static void gt_hbInitStatics(void)
 {
   OSVERSIONINFO osvi ;
-  _s.PTEXTSIZE.x = 0;
-  _s.PTEXTSIZE.y = 0;
-  _s.ROWS = WVT_DEFAULT_ROWS;
-  _s.COLS = WVT_DEFAULT_COLS;
-  _s.foreground = WHITE;
-  _s.background = BLACK;
-  _s.BUFFERSIZE = 0;
-  _s.pAttributes = NULL;
-  _s.pBuffer = NULL;
-  _s.caretPos.x = 0;
-  _s.caretPos.y = 0;
-  _s.CaretExist = FALSE;
-  _s.CaretSize  = 4;
-  _s.mousePos.x = 0;
-  _s.mousePos.y = 0;
-  _s.hWnd = NULL;
-  _s.keyPointerIn= 1;
-  _s.keyPointerOut=0;
-  _s.displayCaret = TRUE;
+
+  _s.PTEXTSIZE.x      = 0;
+  _s.PTEXTSIZE.y      = 0;
+  _s.ROWS             = WVT_DEFAULT_ROWS;
+  _s.COLS             = WVT_DEFAULT_COLS;
+  _s.foreground       = WHITE;
+  _s.background       = BLACK;
+  _s.BUFFERSIZE       = 0;
+  _s.pAttributes      = NULL;
+  _s.pBuffer          = NULL;
+  _s.caretPos.x       = 0;
+  _s.caretPos.y       = 0;
+  _s.CaretExist       = FALSE;
+  _s.CaretSize        = 4;
+  _s.mousePos.x       = 0;
+  _s.mousePos.y       = 0;
+  _s.hWnd             = NULL;
+  _s.keyPointerIn     = 1;
+  _s.keyPointerOut    = 0;
+  _s.displayCaret     = TRUE;
   _s.RectInvalid.left = -1 ;
-  _s.fontHeight = 0;
-  _s.fontWidth  = 0;
-  _s.fontWeight = 0;
-  _s.fontQuality = DEFAULT_QUALITY;
+  _s.fontHeight       = 0;
+  _s.fontWidth        = 0;
+  _s.fontWeight       = 0;
+  _s.fontQuality      = DEFAULT_QUALITY;
   strcpy(_s.fontFace,"Terminal");
-  _s.closeEvent =  0;
-  _s.shutdownEvent =  0;
-  _s.LastMenuEvent = 0;
-  _s.MenuKeyEvent    = 1024;
-  _s.CentreWindow = TRUE; // Default is to always display window in centre of screen
-  _s.CodePage     = GetACP() ;  // Set code page to default system
+  _s.closeEvent       =  0;
+  _s.shutdownEvent    =  0;
+  _s.LastMenuEvent    = 0;
+  _s.MenuKeyEvent     = 1024;
+  _s.CentreWindow     = TRUE;       // Default is to always display window in centre of screen
+  _s.CodePage         = GetACP() ;  // Set code page to default system
 
   osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
   GetVersionEx (&osvi);
-  _s.Win9X   = (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS);
-  _s.AltF4Close = FALSE;
-  _s.InvalidateWindow= TRUE;
+  _s.Win9X            = (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS);
+  _s.AltF4Close       = FALSE;
+  _s.InvalidateWindow = TRUE;
 }
 
 /*

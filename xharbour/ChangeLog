@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1934 2003/12/23 03:12:49 peterrees Exp $
+ * $Id: ChangeLog,v 1.1935 2003/12/23 06:40:27 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-23 21:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+   * source/rtl/gtwvt/gtwvt.c
+     * #define WHITE RGB( 0xC6, 0xC6, oxC6 )
+       White color more near to terminal screen.
+     * Formatting to make it more tangible to new comers.
 
 2003-12-22 22:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * source/rdd/dbcmd.c
