@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3412 2004/09/06 20:01:01 druzus Exp $
+ * $Id: ChangeLog,v 1.3413 2004/09/08 00:17:04 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-07 19:49 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/rtl/hbini.prg
+    + Added support for 3rd optional param <cSpliters> to HB_ReadIni().
+
+  /*
+     Giancarlo, I did it that way to not break possible existing code,
+     but I have no clue why ':' is also used as a spliter instead of just '='?
+   */
 
 2004-09-08 01:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/gtos2/gtos2.c
@@ -33,7 +42,7 @@
   * xharbour/source/rtl/gtwin/gtwin.c
   * xharbour/source/rtl/gtwvt/gtwvt.c
   * xharbour/source/rtl/gtxvt/gtxvt.c
-   + added parameter int iType integer to hb_gtVersion() / 
+   + added parameter int iType integer to hb_gtVersion() /
      HB_GT_FUNC(gt_Version()) / HB_GT_VERSION() - when iType is 0 then
      short version WIN / WVT / CRS / SLN / OS2 / STD / ... is returned
      when nonzero then full previous name - it was necessary for clear

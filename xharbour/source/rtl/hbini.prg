@@ -1,5 +1,5 @@
 /*
-* $Id: hbini.prg,v 1.4 2004/03/05 23:30:08 jonnymind Exp $
+* $Id: hbini.prg,v 1.5 2004/03/06 11:35:26 jonnymind Exp $
 */
 
 /*
@@ -90,16 +90,14 @@ PROCEDURE HB_SetIniComment( cLc, cHlc )
 RETURN
 
 
-FUNCTION HB_ReadIni( cFileSpec, bKeyCaseSens )
+FUNCTION HB_ReadIni( cFileSpec, bKeyCaseSens, cSpliters )
    LOCAL hIni := Hash()
 
    hIni[ "MAIN" ] := Hash()
 
-RETURN HB_ReadIni2( hIni, cFileSpec, bKeyCaseSens )
+RETURN HB_ReadIni2( hIni, cFileSpec, bKeyCaseSens, cSpliters )
 
-
-
-STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens )
+STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens, cSpliters )
    LOCAL aFiles
    LOCAL cFile, nLen
    LOCAL aKeyVal, hCurrentSection
@@ -128,6 +126,10 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens )
    // Default case sensitiveness for keys
    IF bKeyCaseSens == NIL
       bKeyCaseSens := .T.
+   ENDIF
+
+   IF cSpliters == NIL
+      cSpliters := "=|:"
    ENDIF
 
    /* we'll read the whole file, then we'll break it in lines. */
@@ -224,7 +226,7 @@ STATIC FUNCTION HB_ReadIni2( aIni, cFileSpec, bKeyCaseSens )
 
       //Is it a valid key?
 
-      aKeyVal := HB_RegexSplit( "=|:", cLine,,,2 )
+      aKeyVal := HB_RegexSplit( cSpliters, cLine,,,2 )
       IF Len( aKeyVal ) == 1
          //TODO: Signal error
          cLine := ""
