@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.18 2004/11/25 01:54:13 guerra000 Exp $
+ * $Id: gtpca.c,v 1.19 2005/01/10 18:45:37 druzus Exp $
  */
 
 /*
@@ -888,6 +888,8 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
+#elif defined(__DMC__)
+   static int hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_();
 #elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )

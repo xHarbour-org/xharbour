@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.9 2005/02/19 05:04:15 ronpinkas Exp $
+ * $Id: hbapierr.h,v 1.10 2005/02/21 06:15:25 ronpinkas Exp $
  */
 
 /*
@@ -171,6 +171,7 @@ extern PHB_ITEM HB_EXPORT hb_errRT_BASE_Subst     ( ULONG ulGenCode, ULONG ulSub
 extern void     HB_EXPORT hb_errRT_BASE_SubstR    ( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, ULONG ulArgCount, ... );
 extern USHORT   HB_EXPORT hb_errRT_TERM           ( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, USHORT uiOSCode, USHORT uiFlags );
 extern USHORT   HB_EXPORT hb_errRT_DBCMD          ( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation );
+extern USHORT   HB_EXPORT hb_errRT_DBCMD_Ext( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation, USHORT uiFlags );
 extern USHORT   HB_EXPORT hb_errRT_TOOLS          ( ULONG ulGenCode, ULONG ulSubCode, char * szDescription, char * szOperation );
 
 extern void     HB_EXPORT hb_errInternal          ( ULONG ulIntCode, char * szText, char * szPar1, char * szPar2 );

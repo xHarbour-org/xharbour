@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.19 2004/10/22 11:26:43 paultucker Exp $
+ * $Id: gtcgi.c,v 1.20 2004/11/25 01:54:12 guerra000 Exp $
  */
 
 /*
@@ -813,6 +813,8 @@ HB_CALL_ON_STARTUP_END( _hb_startup_gt_Init_ )
 
 #if defined( HB_PRAGMA_STARTUP )
    #pragma startup _hb_startup_gt_Init_
+#elif defined(__DMC__)
+   static int hb_vm_auto__hb_startup_gt_Init_ = _hb_startup_gt_Init_();
 #elif defined(_MSC_VER)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )

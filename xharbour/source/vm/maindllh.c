@@ -1,5 +1,5 @@
 /*
- * $Id: maindllh.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: maindllh.c,v 1.3 2004/04/02 22:38:32 andijahja Exp $
  */
 
 /*
@@ -62,7 +62,11 @@
 
 #if defined(HB_OS_WIN_32)
 HB_EXTERN_BEGIN
+#if ( defined(__DMC__) || defined(__POCC__) )
+BOOL HB_EXPORT WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+#else
 BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+#endif
 {
    HB_TRACE( HB_TR_DEBUG, ("DllEntryPoint(%p, %p, %d)", hInstance, fdwReason,
              pvReserved ) );

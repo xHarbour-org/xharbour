@@ -1,5 +1,5 @@
 /*
- * $Id: at.c,v 1.10 2004/10/14 17:51:03 druzus Exp $
+ * $Id: at.c,v 1.11 2004/11/21 21:44:17 druzus Exp $
  */
 
 /*
@@ -140,7 +140,7 @@ ULONG HB_EXPORT hb_AtSkipStrings( const char * szSub, ULONG ulSubLen, const char
 {
    char cLastChar = ' ';
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_strAtSkipStrings(%s, %lu, %s, %lu)", szSub, ulSubLen, szText, ulLen));
+   HB_TRACE(HB_TR_DEBUG, ("hb_AtSkipStrings(%s, %lu, %s, %lu)", szSub, ulSubLen, szText, ulLen));
 
    if( ulSubLen > 0 && ulLen >= ulSubLen )
    {

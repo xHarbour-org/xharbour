@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.20 2005/01/09 06:08:24 likewolf Exp $
+ * $Id: hbver.c,v 1.21 2005/02/24 10:44:03 andijahja Exp $
  */
 
 /*
@@ -464,8 +464,8 @@ char * hb_verCompiler( void )
 #elif defined(__DMC__)
 
    szName = __DMC_VERSION_STRING__ ;
-   iVerMajor = __DMC__ / 100;
-   iVerMinor = __DMC__ % 100;
+   iVerMajor = __DMC__ >> 8;
+   iVerMinor = ( __DMC__ - 1 & 0xFF ) >> 4;
 
 #elif defined(_MSC_VER)
 
@@ -569,7 +569,11 @@ char * hb_verCompiler( void )
       }
       else
       {
-         sprintf( pszCompiler, "%s %hd.%hd", szName, iVerMajor, iVerMinor );
+	 #if defined(__DMC__)
+            sprintf( pszCompiler, "%s", szName );
+	 #else
+            sprintf( pszCompiler, "%s %hd.%hd", szName, iVerMajor, iVerMinor );
+	 #endif
       }
    else
       strcpy( pszCompiler, "(unknown)" );

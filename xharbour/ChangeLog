@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3865 2005/02/24 14:19:08 andijahja Exp $
+ * $Id: ChangeLog,v 1.3866 2005/02/24 15:31:54 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-02-25 17:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * hrbdll.pc
+    * /NOENTRY flag caused DLL not working. Removed.
+
+  * source/vm/maindllp.c
+  * source/vm/maindllh.c
+  * source/vm/maindll.c
+    * some compilers want DllMain as entry point
+
+  * source/common/hbver.c
+    * small tweak on version number of __DMC__
+
+  * source/rtl/gtcgi/gtcgi.c
+  * source/rtl/gtpca/gtpca.c
+    * changes in startup function for __DMC__
+
+  * include/hbapierr.h
+    + function declaration of hb_errRT_DBCMD_Ext
+
+  * source/rtl/at.c
+  * include/hbapi.h
+    ! hb_strAtSkipStrings -> hb_AtSkipStrings
 
 2005-02-24 16:30 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/source/vm/optcon/Makefile

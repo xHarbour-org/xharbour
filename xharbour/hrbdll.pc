@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: hrbdll.pc,v 1.1 2005/02/19 11:22:29 andijahja Exp $
+# $Id: hrbdll.pc,v 1.2 2005/02/22 04:35:32 paultucker Exp $
 # makefile for creating Harbour.dll with PellesC compiler
 #
 
@@ -24,7 +24,7 @@ INCLUDE_DIR  = $(XHARBOUR_ROOT)\INCLUDE
 HARBOURFLAGS = -i$(INCLUDE_DIR) -n1 -q0 -w -es2 -gc0 -d_NO_GFX_TRANSLATES_
 CFLAGS       = /Ze /I"$(INCLUDE_DIR)" /I"$(POCCMAIN)\INCLUDE" /I"$(POCCMAIN)\INCLUDE\WIN" /I"$(POCCMAIN)\INCLUDE\MSVC" /D"HB_STATIC_STARTUP" /c
 CFLAGS       = /Op /Go $(CFLAGS) /D"HB_OS_WIN_32" /D"__WIN32__" /D"WIN32" /D"_NO_GFX_TRANSLATES_" /D"__EXPORT__"
-LINKFLAGS    = /DLL /LIBPATH:$(POLIB_DIR) /LIBPATH:$(POLIB_DIR)\WIN /MACHINE:IX86 /OPT:WIN98 /SUBSYSTEM:CONSOLE /NOENTRY
+LINKFLAGS    = /DLL /LIBPATH:$(POLIB_DIR) /LIBPATH:$(POLIB_DIR)\WIN /MACHINE:IX86 /OPT:WIN98 /SUBSYSTEM:CONSOLE
 
 HARBOUR_CMD = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 CC_CMD      = $(CC) $(CFLAGS) /Fo$@ $**

@@ -1,5 +1,5 @@
 /*
- * $Id: maindll.c,v 1.3 2003/11/22 01:41:10 ronpinkas Exp $
+ * $Id: maindll.c,v 1.4 2004/11/23 18:22:44 mauriliolongo Exp $
  */
 
 /*
@@ -61,8 +61,11 @@
 #include "hbapiitm.h"
 
 #if defined(HB_OS_WIN_32)
-
+#if defined(__DMC__) || defined(__POCC__)
+BOOL HB_EXPORT WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+#else
 BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
+#endif
 {
    HB_TRACE( HB_TR_DEBUG, ("DllEntryPoint(%p, %p, %d)", hInstance, fdwReason,
              pvReserved ) );
@@ -74,7 +77,11 @@ BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID
    switch( fdwReason )
    {
       case DLL_PROCESS_ATTACH:
+#if defined(__DMC__)
+           hb_vmInit( TRUE  );  /* Don't execute first linked symbol */
+#else
            hb_vmInit( FALSE );  /* Don't execute first linked symbol */
+#endif
            break;
 
       case DLL_PROCESS_DETACH:
@@ -119,5 +126,4 @@ APIENTRY unsigned long _DLL_InitTerm (unsigned long mod_handle, unsigned long fl
       return 0;
     }
 }
-
 #endif

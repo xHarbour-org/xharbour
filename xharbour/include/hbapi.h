@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.151 2004/12/28 06:39:18 druzus Exp $
+ * $Id: hbapi.h,v 1.152 2004/12/31 11:55:49 druzus Exp $
  */
 
 /*
@@ -719,7 +719,7 @@ BOOL hb_execFromArray( PHB_ITEM pFirst );
 #endif
 
 /* PP Functions */
-ULONG HB_EXPORT hb_strAtSkipStrings( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen );
+ULONG HB_EXPORT hb_AtSkipStrings( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen );
 
 /* Misc */
 char HB_EXPORT *hb_strLowerCopy( char * szText, ULONG ulLen );
