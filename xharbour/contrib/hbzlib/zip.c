@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.34 2004/03/29 14:32:24 srobert Exp $
+ * $Id: zip.c,v 1.35 2004/04/12 03:35:52 lculik Exp $
  */
 
 /*
@@ -76,6 +76,13 @@ static HB_ITEM FileAttribs;
 
 extern int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
 
+#if defined(HB_OS_LINUX)
+
+extern int GetFileAttributes( char *szEntry );
+extern void SetFileAttributes( char * szEntry,ULONG ulAttr);
+#endif
+
+
 static void ResetAttribs()
 {
    ULONG ulAtt, ulZipLen = FileToZip.item.asArray.value->ulLen;
@@ -86,7 +93,7 @@ static void ResetAttribs()
    {
      szFile = hb_arrayGetC( &FileToZip, ulAtt + 1 );
      iAttr  = hb_arrayGetNI( &FileAttribs, ulAtt + 1 );
-     SetFileAttributes( szFile, iAttr );
+     SetFileAttributes( szFile, iAttr  );
      hb_xfree( szFile );
    }
 
@@ -185,7 +192,7 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
          int ui;
 
          WildFile.type = HB_IT_NIL;
-         hb_fsDirectory( &WildFile, pExclude->item.asString.value,NULL,NULL,TRUE);
+         hb_fsDirectory( &WildFile, pExclude->item.asString.value,NULL,0,TRUE);
          uiLen = WildFile.item.asArray.value->ulLen;
 
          for ( ui = 0 ; ui < uiLen; ui ++ )
@@ -235,7 +242,7 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
                int uiW, uiWLen;
                char *szEntry;
 
-               hb_fsDirectory(&WildFile,szExclude,NULL,NULL,TRUE);
+               hb_fsDirectory(&WildFile,szExclude,NULL,0,TRUE);
                uiWLen = WildFile.item.asArray.value->ulLen;
 
                for ( uiW = 0; uiW < uiWLen; uiW ++ )
@@ -309,7 +316,7 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir )
                               OS_PATH_DELIMITER_STRING, szTemp, NULL );
             }
 
-            hb_fsDirectory(&WildFile,szArrEntry,NULL,NULL,TRUE);
+            hb_fsDirectory(&WildFile,szArrEntry,NULL,0,TRUE);
             ulLen = WildFile.item.asArray.value->ulLen;
 
             for ( ul = 0; ul < ulLen ; ul ++ )
@@ -323,7 +330,7 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir )
                   hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szEntry ) );
                   hb_arrayAddForward( &FileAttribs, hb_itemPutNI( &Temp, GetFileAttributes( szEntry ) ) );
                   hb_itemClear( &Temp );
-                  SetFileAttributes( szEntry, FA_ARCH );
+                  SetFileAttributes( szEntry, 0777 );
                }
 
                hb_xfree( szEntry );
@@ -336,7 +343,7 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir )
             hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szArrEntry ) );
             hb_arrayAddForward( &FileAttribs, hb_itemPutNI( &Temp, GetFileAttributes( szArrEntry ) ) );
             hb_itemClear( &Temp );
-            SetFileAttributes( szArrEntry, FA_ARCH );
+            SetFileAttributes( szArrEntry, 0777 );
          }
 
          hb_xfree( szArrEntry );
