@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.17 2004/04/26 09:32:06 andijahja Exp $
+ * $Id: tprint.prg,v 1.18 2004/05/07 02:55:28 peterrees Exp $
  */
 
 /*
@@ -899,7 +899,7 @@ HB_FUNC_STATIC( DRAWBITMAP ) {
   }
 
   SetStretchBltMode (hDC, COLORONCOLOR) ;
-  hb_retl(StretchDIBits (hDC,(int) hb_parnl(3),(int) hb_parnl(4),(int) (hb_parnl(5)-hb_parnl(3)+1), (int) (hb_parnl(6)-hb_parnl(4)+1), 0, 0, cxDib, cyDib, pBits, pbmi, DIB_RGB_COLORS, SRCCOPY)!= GDI_ERROR) ;
+  hb_retl(StretchDIBits(hDC,(int) hb_parnl(3),(int) hb_parnl(4),(int) hb_parnl(5), (int) hb_parnl(6) , 0, 0, cxDib, cyDib, pBits, pbmi, DIB_RGB_COLORS, SRCCOPY)!= GDI_ERROR) ;
 }
 
 static int CALLBACK FontEnumCallBack(LOGFONT *lplf, TEXTMETRIC *lpntm, DWORD FontType, LPVOID pArray )

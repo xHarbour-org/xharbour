@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3134 2004/07/02 13:12:32 paultucker Exp $
+ * $Id: ChangeLog,v 1.3135 2004/07/03 03:34:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-07-06 08:55 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * contrib/winprn/tprint.prg
+    - fix HB_FUNC_STATIC( DRAWBITMAP ) so StretchDIBits() uses correct co-ords passed
 
 2004-07-02 20:33 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/hbpcode.h
