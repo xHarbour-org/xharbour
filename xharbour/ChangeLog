@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2736 2004/04/03 19:41:14 mlombardo Exp $
+ * $Id: ChangeLog,v 1.2737 2004/04/03 21:13:51 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-03 16:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/fastitem.c
+    ! Fixed typo in hb_itemCopy() and hb_itemClearMT()
+    + Added logic to detect and generate an error on premature string release.
+
 2004-04-04 04:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/hbusage.c
   * source/compiler/harbour.c

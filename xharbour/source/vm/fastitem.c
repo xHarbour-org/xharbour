@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.65 2004/04/03 01:51:03 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.66 2004/04/03 03:28:12 ronpinkas Exp $
  */
 
 /*
@@ -149,25 +149,26 @@ void HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem )
 
    if( pItem->item.asString.bStatic == FALSE )
    {
+      if( *( pItem->item.asString.puiHolders ) == 0 )
+      {
+         hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature String Release detected: '%s'", pItem->item.asString.value, NULL );
+      }
+
       if( --*( pItem->item.asString.puiHolders ) == 0  )
       {
-         if( pItem->item.asString.value == NULL )
-         {
-            hb_errInternal( HB_EI_ITEMBADSTRING, "Invalid String value detected in hb_itemReleaseString()", NULL, NULL );
-         }
-
          HB_TRACE_STEALTH( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.puiHolders ) );
          hb_xfree( pItem->item.asString.puiHolders );
+         //pItem->item.asString.puiHolders = NULL;
+
          HB_TRACE_STEALTH( HB_TR_DEBUG, ( "Will FREE %p", pItem->item.asString.value ) );
          hb_xfree( pItem->item.asString.value );
+         //pItem->item.asString.value = NULL;
       }
    }
 
    //pItem->item.asString.bStatic = FALSE;
    //pItem->type = HB_IT_NIL;
-   pItem->item.asString.value = NULL;
    //pItem->item.asString.length = 0;
-
 }
 
 void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
@@ -253,22 +254,25 @@ void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemClearMT(%p) type: %i", pItem, pItem->type ) );
 
-   if( pItem->type & HB_IT_MEMVAR )
+   if( pItem->type & HB_IT_STRING )
+   {
+      hb_itemReleaseString( pItem );
+
+      pItem->type = HB_IT_NIL;
+
+      return;
+   }
+   else if( pItem->type & HB_IT_MEMVAR )
    {
       hb_memvarValueDecRefMT( pItem->item.asMemvar.value, pStack );
+
       pItem->type = HB_IT_NIL;
+
       return;
    }
 
    switch( pItem->type )
    {
-      case HB_IT_STRING :
-      {
-         hb_itemReleaseString( pItem );
-
-         break;
-      }
-
       case HB_IT_ARRAY :
       {
          #ifdef HB_ARRAY_USE_COUNTER
@@ -383,7 +387,16 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
-   if( pSource->type & HB_IT_MEMVAR ) // intentionally & instead of ==
+   if( pSource->type & HB_IT_STRING )
+   {
+      if( pSource->item.asString.bStatic == FALSE )
+      {
+         ++*( pSource->item.asString.puiHolders );
+      }
+
+      return;
+   }
+   else if( pSource->type & HB_IT_MEMVAR ) // intentionally & instead of ==
    {
       hb_memvarValueIncRef( pSource->item.asMemvar.value );
       return;
@@ -391,16 +404,6 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 
    switch( pSource->type )
    {
-      case HB_IT_STRING :
-      {
-         if( pSource->item.asString.bStatic == FALSE )
-         {
-            ++*( pSource->item.asString.puiHolders );
-         }
-
-         break;
-      }
-
       case HB_IT_ARRAY :
       {
          #ifdef HB_ARRAY_USE_COUNTER
