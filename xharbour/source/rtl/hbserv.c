@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.10 2004/02/26 04:56:55 mlombardo Exp $
+* $Id: hbserv.c,v 1.11 2004/02/27 22:04:47 andijahja Exp $
 */
 
 /*
@@ -81,7 +81,7 @@
 ***************************************************/
 
 static void s_serviceSetHBSig( void );
-//static void s_serviceSetDflSig( void );
+static void s_serviceSetDflSig( void );
 
 static PHB_ITEM sp_hooks = NULL;
 static BOOL bSignalEnabled = TRUE;
@@ -197,6 +197,9 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
          // forbid a re-call
          hb_execFromArray( pExecArray );
 
+         hb_itemRelease( pExecArray );
+         hb_itemRelease( pRet );
+         
          pRet = &HB_VM_STACK.Return;
          switch( hb_itemGetNI( pRet ) )
          {
@@ -209,16 +212,28 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
                bSignalEnabled = FALSE;
                HB_CRITICAL_UNLOCK( s_ServiceMutex );
                //TODO: A service cleanup routine
-               exit(1);
-               //hb_vmRequestQuit();
-               return;
+               hb_vmRequestQuit();
+               #ifndef HB_THREAD_SUPPORT
+                  hb_vmQuit();
+                  exit(0);
+               #else
+                  /* Allow signals to go through pthreads */   
+                  s_serviceSetDflSig(); 
+                  /* NOTICE: should be pthread_exit(0), but a bug in linuxthread prevents it:
+                     calling pthread exit from a signal handler will cause infinite wait for
+                     restart signal. 
+                     This solution is rude, while the other would allow clean VM termination...
+                     but it works.
+                  */
+                  exit(0);
+               #endif
          }
       }
       ulPos--;
    }
 
    bSignalEnabled = TRUE;
-   //s_serviceSetHBSig();
+   /*s_serviceSetHBSig();*/
 
    /* TODO
    if ( uiSig != HB_SIGNAL_UNKNOWN )
@@ -238,20 +253,17 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
    to fix as soon as thread support is ready on OS/2
 */
 #if defined(HB_THREAD_SUPPORT) && ! defined(HB_OS_OS2)
-void *s_signalListener( void *v )
+void *s_signalListener( void *my_stack )
 {
    static BOOL bFirst = TRUE;
    sigset_t passall;
    siginfo_t sinfo;
-   HB_STACK *mystack;
+   HB_STACK *pStack = (HB_STACK*) my_stack;
 
-   HB_SYMBOL_UNUSED( v );
-
-   pthread_setspecific( hb_pkCurrentStack, &hb_stack );
-   mystack = hb_threadCreateStack( pthread_self() );
-   pthread_setspecific( hb_pkCurrentStack, mystack );
+   pthread_setspecific( hb_pkCurrentStack, my_stack );
+   pStack->th_id = HB_CURRENT_THREAD();
+   hb_threadLinkStack( pStack );
    HB_STACK_LOCK;
-   hb_threadLinkStack( mystack );
 
    // and now accepts all signals
    sigemptyset( &passall );
@@ -268,7 +280,7 @@ void *s_signalListener( void *v )
    sigaddset( &passall, SIGUSR2 );
    sigaddset( &passall, SIGHUP );
 
-   pthread_cleanup_push( hb_threadTerminator, mystack );
+   pthread_cleanup_push( hb_threadTerminator, my_stack );
    pthread_setcanceltype( PTHREAD_CANCEL_DEFERRED, NULL );
    pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL );
 
@@ -401,13 +413,14 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
          hb_arraySet( pExecArray, 1, hb_arrayGetItemPtr( pFunction, 2 ) );
          hb_itemPutNI( hb_arrayGetItemPtr( pExecArray, 2), uiSig );
 
-         // the third parameter is an array:
-         //1: low-level signal
-         //2: low-level subsignal
-         //3: low-level system error
-         //4: address that rised the signal
-         //5: process id of the signal riser
-         //6: UID of the riser
+         /* the third parameter is an array:
+         * 1: low-level signal
+         * 2: low-level subsignal
+         * 3: low-level system error
+         * 4: address that rised the signal
+         * 5: process id of the signal riser
+         * 6: UID of the riser
+         */
 
          pRet = hb_itemNew( NULL );
          hb_arrayNew( pRet, 6 );
@@ -437,6 +450,9 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
          // forbid a re-call
          hb_execFromArray( pExecArray );
 
+         hb_itemRelease( pExecArray );
+         hb_itemRelease( pRet );
+
          pRet = &HB_VM_STACK.Return;
          switch( hb_itemGetNI( pRet ) )
          {
@@ -448,8 +464,14 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
             case HB_SERVICE_QUIT:
                bSignalEnabled = FALSE;
                HB_CRITICAL_UNLOCK( s_ServiceMutex );
-               //TODO: A service cleanup routine
-               exit(1);
+               hb_vmRequestQuit();
+               #ifndef HB_THREAD_SUPPORT
+                  hb_vmQuit();
+                  exit(0);
+               #else
+                  hb_threadCancelInternal();
+               #endif
+
          }
       }
       ulPos--;
@@ -541,6 +563,8 @@ BOOL WINAPI s_ConsoleHandlerRoutine( DWORD dwCtrlType )
 
 static void s_serviceSetHBSig( void )
 {
+   struct sigaction act;
+
 #if defined( HB_OS_UNIX ) || defined(HARBOUR_GCC_OS2)
    #ifdef HB_THREAD_SUPPORT
       sigset_t blockall;
@@ -558,37 +582,34 @@ static void s_serviceSetHBSig( void )
       sigaddset( &blockall, SIGHUP );
 
       pthread_sigmask( SIG_SETMASK, &blockall, NULL );
-   #else
-      struct sigaction act;
-
-      #ifdef HARBOUR_GCC_OS2
-      act.sa_handler = s_signalHandler;
-      #else
-      // using more descriptive sa_action instead of sa_handler
-      act.sa_handler = NULL; // if act.sa.. is a union, we just clean this
-      act.sa_sigaction = s_signalHandler; // this is what matters
-      // block al signals, we don't want to be interrupted.
-      //sigfillset( &act.sa_mask );
-      #endif
-
-      #ifdef HARBOUR_GCC_OS2
-      act.sa_flags = SA_NOCLDSTOP;
-      #else
-      act.sa_flags = SA_NOCLDSTOP | SA_SIGINFO;
-      #endif
-
-      sigaction( SIGHUP, &act, NULL );
-      sigaction( SIGQUIT, &act, NULL );
-      sigaction( SIGILL, &act, NULL );
-      sigaction( SIGABRT, &act, NULL );
-      sigaction( SIGFPE, &act, NULL );
-      sigaction( SIGSEGV, &act, NULL );
-      sigaction( SIGTERM, &act, NULL );
-      sigaction( SIGUSR1, &act, NULL );
-      sigaction( SIGUSR2, &act, NULL );
-
-
    #endif
+
+   #ifdef HARBOUR_GCC_OS2
+   act.sa_handler = s_signalHandler;
+   #else
+   // using more descriptive sa_action instead of sa_handler
+   act.sa_handler = NULL; // if act.sa.. is a union, we just clean this
+   act.sa_sigaction = s_signalHandler; // this is what matters
+   // block al signals, we don't want to be interrupted.
+   //sigfillset( &act.sa_mask );
+   #endif
+
+   #ifdef HARBOUR_GCC_OS2
+   act.sa_flags = SA_NOCLDSTOP;
+   #else
+   act.sa_flags = SA_NOCLDSTOP | SA_SIGINFO;
+   #endif
+
+   sigaction( SIGHUP, &act, NULL );
+   sigaction( SIGQUIT, &act, NULL );
+   sigaction( SIGILL, &act, NULL );
+   sigaction( SIGABRT, &act, NULL );
+   sigaction( SIGFPE, &act, NULL );
+   sigaction( SIGSEGV, &act, NULL );
+   sigaction( SIGTERM, &act, NULL );
+   sigaction( SIGUSR1, &act, NULL );
+   sigaction( SIGUSR2, &act, NULL );
+
    // IGNORE pipe
    signal( SIGPIPE, SIG_IGN );
 #endif
@@ -609,7 +630,7 @@ static void s_serviceSetHBSig( void )
 // Reset the signal handlers to the default OS value
 //
 
-/*
+
 static void s_serviceSetDflSig( void )
 {
 #ifdef HB_OS_UNIX
@@ -636,7 +657,7 @@ static void s_serviceSetDflSig( void )
    SetConsoleCtrlHandler( s_ConsoleHandlerRoutine, FALSE );
 #endif
 }
-*/
+
 
 //---------------------------------------------------
 // This translates a signal into abstract HB_SIGNAL
@@ -658,6 +679,32 @@ static int s_translateSignal( UINT sig, UINT subsig )
    return HB_SIGNAL_UNKNOWN;
 }
 
+/** 
+* Initializes signal handler system
+*/
+
+static void s_signalHandlersInit()
+{
+   #if defined( HB_THREAD_SUPPORT ) && ( defined( HB_OS_UNIX ) || defined( HB_OS_UNIX_COMPATIBLE ) )
+      pthread_t res;
+      HB_STACK *pStack;
+      
+      s_serviceSetHBSig();
+      
+      pStack = hb_threadCreateStack( 0 );
+      pthread_create( &res, NULL, s_signalListener, pStack );
+   #else
+      s_serviceSetHBSig();
+   #endif
+   
+   #if defined( HB_THREAD_SUPPORT )
+      HB_CRITICAL_INIT( s_ServiceMutex );
+   #endif
+   
+   sp_hooks = hb_itemNew( NULL );
+   hb_arrayNew( sp_hooks, 0 );
+   hb_gcLock( sp_hooks );
+}
 
 /*****************************************************************************
 * HB_*Service routines
@@ -674,7 +721,8 @@ static int s_translateSignal( UINT sig, UINT subsig )
 HB_FUNC( HB_STARTSERVICE )
 {
    #ifdef HB_THREAD_SUPPORT
-   if ( hb_threadCountStacks() > 1 )
+   int iCount = hb_threadCountStacks();
+   if ( iCount > 2 || ( sp_hooks == NULL && iCount > 1 ) )
    {
       //TODO: Right error code here
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Service must be started before starting threads", NULL,
@@ -694,29 +742,15 @@ HB_FUNC( HB_STARTSERVICE )
 
          if( pid != 0 )
          {
-            exit(0);
+            hb_vmRequestQuit();
+            return;
          }
-
-         #ifdef HB_THREAD_SUPPORT
+         #ifdef HB_THREAD_SUPPORT         
          pthread_setspecific( hb_pkCurrentStack, (void *) &hb_stack );
          #endif
       }
-
-      #ifdef HB_THREAD_SUPPORT
-      {
-         pthread_t res;
-
-         s_serviceSetHBSig();
-         pthread_create( &res, NULL, s_signalListener, NULL );
-      }
-      #else
-         s_serviceSetHBSig();
-      #endif
-
    }
    #endif
-
-
 
    // let's begin
    sb_isService = TRUE;
@@ -727,19 +761,12 @@ HB_FUNC( HB_STARTSERVICE )
    {
       FreeConsole();
    }
-   s_serviceSetHBSig();
    #endif
 
    // Initialize only if the service has not yet been initialized
    if ( sp_hooks == NULL )
    {
-      #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_INIT( s_ServiceMutex );
-      #endif
-
-      sp_hooks = hb_itemNew( NULL );
-      hb_arrayNew( sp_hooks, 0 );
-      hb_gcLock( sp_hooks );
+      s_signalHandlersInit(); 
    }
 }
 
@@ -759,12 +786,15 @@ BOOL HB_EXPORT hb_isService()
 */
 
 void HB_EXPORT hb_seriviceExit()
-{
-   if( !sp_hooks == NULL )
+{   
+   if( sp_hooks != NULL )
    {
+      /* reset default signal handling */
+      s_serviceSetDflSig();
       hb_itemRelease( sp_hooks );
    }
 }
+
 
 /**
 * Returns true if the current program is a service, that is if HB_StartService() has
@@ -788,8 +818,9 @@ HB_FUNC( HB_SERVICELOOP )
 {
 #ifdef HB_OS_WIN_32
    MSG msg;
-   //this is just here to trigger our internal hook routine, if the
-   //final application does not any message handling.
+   /* This is just here to trigger our internal hook routine, if the
+      final application does not any message handling. 
+   */
    if ( ! PeekMessage(&msg, NULL, WM_QUIT, WM_QUIT, PM_REMOVE) )
    {
       PeekMessage( &msg, NULL, WM_USER, WM_USER+3, PM_REMOVE );
@@ -819,15 +850,10 @@ HB_FUNC( HB_PUSHSIGNALHANDLER )
    hb_itemPutNI( hb_arrayGetItemPtr( pHandEntry, 1), iMask );
    hb_arraySet( pHandEntry, 2, pFunc );
 
-   // if the hook is not initialized, initialize it
+   /* if the hook is not initialized, initialize it */
    if ( sp_hooks == NULL )
    {
-      #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_INIT( s_ServiceMutex );
-      #endif
-      sp_hooks = hb_itemNew( NULL );
-      hb_arrayNew( sp_hooks, 0 );
-      hb_gcLock( sp_hooks );
+      s_signalHandlersInit();
    }
 
    HB_CRITICAL_LOCK( s_ServiceMutex );

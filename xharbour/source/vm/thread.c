@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.158 2004/02/23 08:31:57 andijahja Exp $
+* $Id: thread.c,v 1.159 2004/03/05 22:37:58 ronpinkas Exp $
 */
 
 /*
@@ -866,7 +866,7 @@ void hb_threadCancelInternal( )
    ExitThread( 0 );
    #else*/
    _endthreadex( 0 );
-//   #endif
+/*  #endif */
 }
 
 /***
@@ -900,6 +900,13 @@ void hb_threadCancel( HB_STACK *pStack )
 
 }
 
+#else
+void hb_threadCancelInternal( )
+{
+   HB_THREAD_STUB
+   hb_threadTerminator( &HB_VM_STACK );
+   pthread_exit(0);
+}
 #endif
 
 /*

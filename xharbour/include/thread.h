@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.79 2003/12/27 02:57:13 fsgiudice Exp $
+* $Id: thread.h,v 1.80 2004/01/27 03:06:59 ronpinkas Exp $
 */
 
 /*
@@ -587,10 +587,11 @@ extern void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack );
 /* Used by dynsym thread specific system */
 void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );
 
+/* A thread willingly terminating itself */   
+void hb_threadCancelInternal( void );
+
 /* Win 32 specific functions */
 #ifdef HB_OS_WIN_32
-   void hb_threadCancelInternal( void );
-
    BOOL hb_threadCondInit( HB_WINCOND_T *cond );
    void hb_threadCondDestroy( HB_WINCOND_T *cond );
    void hb_threadCondSignal( HB_WINCOND_T *cond );

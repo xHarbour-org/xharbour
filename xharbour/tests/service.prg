@@ -14,39 +14,52 @@
 *      HB_StartService( .T. )
 * only if you are using gtcgi
 *
-* Call with cMode == "debug" to create a segfault at count 0
+* Call with "debug" to create a segfault at count 0
+* Call with "bkg" to put in background
 *
 * (C) 2003 Giancarlo Niccolai
 *
-* $Id: service.prg,v 1.8 2004/02/09 19:23:22 mlombardo Exp $
+* $Id: service.prg,v 1.9 2004/02/26 04:56:56 mlombardo Exp $
 *
 
 #include "hbserv.ch"
 #include "hblog.ch"
-GLOBAL bWait, bDebugMode
+#include "common.ch"
+GLOBAL bWait, lDebugMode
 
 
-PROCEDURE Main( cMode )
-   LOCAL nTime := 10, nStart
+PROCEDURE Main( cParam1, cParam2 )
+   LOCAL nTime := 10, nStart, lBkg
 
    // put it on a file: windows console could be detached!
    INIT LOG ON CONSOLE();
    FILE(HB_LOG_ALL, "service.log", 10, 10)
 
-   IF cMode != NIL .and. cMode == "debug"
-      bDebugMode := .T.
+   DEFAULT cParam1 to ""
+   DEFAULT cParam2 to ""
+   IF Upper( cParam1 ) == "DEBUG" .or. Upper( cParam2 ) == "DEBUG"
+      lDebugMode := .T.
    ELSE
-      bDebugMode := .F.
+      lDebugMode := .F.
+   ENDIF
+
+   IF Upper( cParam1 ) == "BKG" .or. Upper( cParam2 ) == "BKG"
+      lBkg := .T.
+   ELSE
+      lBkg := .F.
    ENDIF
 
    bWait := .T.
+   
+
+   // If the program is a service,
+   // it's advisable to start detached service before pushing handles.
+   HB_StartService( lBkg )
+   
    HB_PushSignalHandler( HB_SIGNAL_ALL, "Handle" )
    // a newer push will override previous ones
    HB_PushSignalHandler( HB_SIGNAL_FAULT + HB_SIGNAL_MATHERR, @SignalFault())
-
-   //Service can be started before or after pushing handler.
-   HB_StartService( .F. )
-
+   
 
 #ifdef HB_THREAD_SUPPORT
    StartThread( @waiter() )
@@ -84,14 +97,20 @@ Function Handle( nSignal, aParams )
 RETURN HB_SERVICE_HANDLED
 
 PROCEDURE Waiter()
-   LOCAL nCount := 3
+   LOCAL nCount 
+   
+   IF lDebugMode
+      nCount := 3
+   ELSE
+      nCount := 10
+   ENDIF
 
    WHILE bWait
       ThreadSleep( 1000 )
       ? str(nCount,3)
       // create a segfault after a while..
       IF nCount == 0
-         IF bDebugMode
+         IF lDebugMode
             HB_ServiceGenerateFault()
             // notice, under linux the segfault address is not the program
             // address that caused the fault, but is the address of the
