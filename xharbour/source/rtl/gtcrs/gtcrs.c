@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.49 2004/10/24 09:33:59 oh1 Exp $
+ * $Id: gtcrs.c,v 1.50 2004/11/21 21:44:20 druzus Exp $
  */
 
 /*
@@ -317,7 +317,7 @@ static const ClipKeyCode extdKeyTab[NO_EXTDKEYS] = {
    {K_PGUP,      K_ALT_PGUP,   K_CTRL_PGUP, K_SH_PGUP}, /*  20 */
    {K_PGDN,      K_ALT_PGDN,   K_CTRL_PGDN, K_SH_PGDN}, /*  21 */
 
-   {K_BS,          K_ALT_BS,           127,         0}, /*  22 */
+   {K_BS,          K_ALT_BS,           127,   K_SH_BS}, /*  22 */
    {K_TAB,        K_ALT_TAB,    K_CTRL_TAB,  K_SH_TAB}, /*  23 */
    {K_ESC,        K_ALT_ESC,         K_ESC,         0}, /*  24 */
 
@@ -1477,6 +1477,29 @@ static void init_keys(InOutBase *ioBase)
 
       addKeyMap( ioBase, EXKEY_TAB   |KEY_CTRLMASK|KEY_ALTMASK, "\033[Z" );
 
+      /* key added for gnome-terminal and teraterm */
+      
+      addKeyMap( ioBase, EXKEY_ENTER |KEY_CTRLMASK, "\033[7;5~" ); 
+      addKeyMap( ioBase, EXKEY_DEL   |KEY_CTRLMASK, "\033[3;5~" );
+      addKeyMap( ioBase, EXKEY_TAB   |KEY_CTRLMASK, "\033[8;5~" );
+
+      addKeyMap( ioBase, EXKEY_UP    |KEY_CTRLMASK|KEY_ALTMASK, "\033[6A" );
+      addKeyMap( ioBase, EXKEY_DOWN  |KEY_CTRLMASK|KEY_ALTMASK, "\033[6B" );
+      addKeyMap( ioBase, EXKEY_RIGHT |KEY_CTRLMASK|KEY_ALTMASK, "\033[6C" );
+      addKeyMap( ioBase, EXKEY_LEFT  |KEY_CTRLMASK|KEY_ALTMASK, "\033[6D" );
+      addKeyMap( ioBase, EXKEY_CENTER|KEY_CTRLMASK|KEY_ALTMASK, "\033[6E" );
+      addKeyMap( ioBase, EXKEY_END   |KEY_CTRLMASK|KEY_ALTMASK, "\033[6F" );
+      addKeyMap( ioBase, EXKEY_HOME  |KEY_CTRLMASK|KEY_ALTMASK, "\033[6H" );
+      addKeyMap( ioBase, EXKEY_ENTER |KEY_CTRLMASK|KEY_ALTMASK, "\033[7;6~" );
+      addKeyMap( ioBase, EXKEY_INS   |KEY_CTRLMASK|KEY_ALTMASK, "\033[2;6~" );
+      addKeyMap( ioBase, EXKEY_DEL   |KEY_CTRLMASK|KEY_ALTMASK, "\033[3;6~" );
+      addKeyMap( ioBase, EXKEY_PGUP  |KEY_CTRLMASK|KEY_ALTMASK, "\033[5;6~" );
+      addKeyMap( ioBase, EXKEY_PGDN  |KEY_CTRLMASK|KEY_ALTMASK, "\033[6;6~" );
+      
+      addKeyMap( ioBase, EXKEY_BS    |KEY_CTRLMASK|KEY_ALTMASK, "\033[W" );
+
+      /* end of added */
+      
    } else if( ioBase->terminal_type == TERM_LINUX ) {
 
       addKeyMap( ioBase, EXKEY_F1 , "\033[[A"  );        /* kf1  */

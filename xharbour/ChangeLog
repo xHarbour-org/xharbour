@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3622 2004/11/24 10:00:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3622 2004/11/24 12:01:03 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-24 19:30 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * source/rtl/gtcrs/gtcrs.c
+    * added definition for K_SH_BS
+    * added some key definitions for gnome-terminal and teraterm
+  * source/rtl/gtwvt/gtwvt.c
+    * added definition of gt_ProcessMessages
 
 2004-11-24 10:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/ct/settime.c

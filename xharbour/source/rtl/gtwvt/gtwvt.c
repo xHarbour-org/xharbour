@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.135 2004/10/24 09:43:45 oh1 Exp $
+ * $Id: gtwvt.c,v 1.136 2004/11/23 17:04:23 lf_sfnet Exp $
  */
 
 /*
@@ -3809,6 +3809,13 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
    }
    CloseClipboard();
    return ret;
+}
+
+//-------------------------------------------------------------------//
+
+void HB_GT_FUNC( gt_ProcessMessages( void ) )
+{
+  hb_wvt_gtProcessMessages();
 }
 
 //-------------------------------------------------------------------//
