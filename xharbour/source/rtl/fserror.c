@@ -1,5 +1,5 @@
 /*
- * $Id: fserror.c,v 1.8 2004/04/08 21:48:44 andijahja Exp $
+ * $Id: fserror.c,v 1.9 2004/04/29 13:00:27 srobert Exp $
  */
 
 /*
@@ -227,7 +227,7 @@ void  HB_EXPORT hb_fsSetIOError( BOOL fResult, USHORT uiOperation )
    else
    {
 #if defined(HB_WIN32_IO) || defined(HB_OS_WIN_32)
-      s_uiOsErrorLast = GetLastError();
+      s_uiOsErrorLast = (USHORT) GetLastError();
       s_uiErrorLast = hb_WinToDosError( s_uiOsErrorLast );
 #elif defined(_MSC_VER)
       #ifdef __XCC__

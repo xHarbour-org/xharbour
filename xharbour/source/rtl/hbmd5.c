@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbmd5.c,v 1.1 2004/04/25 11:26:14 andijahja Exp $
  */
 
 /*
@@ -262,8 +262,8 @@ void hbcc_md5(BYTE *ucData,ULONG ulLen, BYTE *ucDigest)
    /* process additional block(s) */
    for (i=0;i<4;i++)
    {
-      buf[off+i]=(BYTE) 0xFF&(l2>>(i<<3));
-      buf[off+i+4]=(BYTE) 0xFF&(l1>>(i<<3));
+      buf[off+i]=(BYTE) (0xFF&(l2>>(i<<3)));
+      buf[off+i+4]=(BYTE) (0xFF&(l1>>(i<<3)));
    }
    memcpy(md5.buf,buf,64);
    hb_md5go(&md5);
@@ -277,7 +277,7 @@ void hbcc_md5(BYTE *ucData,ULONG ulLen, BYTE *ucDigest)
    {
       for (n=0;n<4;n++)
       {
-         ucDigest[(i<<2)+n]=(BYTE) 0xFF&(md5.accum[i]>>(n<<3));
+         ucDigest[(i<<2)+n]=(BYTE) (0xFF&(md5.accum[i]>>(n<<3)));
       }
    }
    return;

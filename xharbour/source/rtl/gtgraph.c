@@ -1,5 +1,5 @@
 /*
- * $Id: gtgraph.c,v 1.6 2004/02/23 08:31:57 andijahja Exp $
+ * $Id: gtgraph.c,v 1.7 2004/05/09 23:40:05 druzus Exp $
  */
 
 /*
@@ -72,15 +72,19 @@ static HB_GT_GCOLOR *s_paramToColor( PHB_ITEM pColor, char *funcname )
    else if ( HB_IS_LONGLONG( pColor ) )
    {
       ULONGLONG col  = (ULONGLONG) hb_itemGetNLL( pColor );
+      lcolor.usAlpha = (USHORT) ( (col & HB_LL(0xFFFF000000000000)) >> 48 );
+      lcolor.usRed   = (USHORT) ( (col & HB_LL(0x0000FFFF00000000)) >> 32 );
+      lcolor.usGreen = (USHORT) ( (col & HB_LL(0x00000000FFFF0000)) >> 16 );
+      lcolor.usBlue  = (USHORT) ( (col & HB_LL(0x000000000000FFFF)) );
 #else
    else if ( HB_IS_LONG( pColor ) )
    {
       ULONG col  = (ULONG) hb_itemGetNL( pColor );
+      lcolor.usAlpha = 0xFF;
+      lcolor.usRed   = (BYTE)(col);
+      lcolor.usGreen = (BYTE)(((USHORT)(col)) >> 8);
+      lcolor.usBlue  = (BYTE)((col)>>16);
 #endif
-      lcolor.usAlpha = ( (col & HB_LL(0xFFFF000000000000)) >> 48 );
-      lcolor.usRed   = ( (col & HB_LL(0x0000FFFF00000000)) >> 32 );
-      lcolor.usGreen = ( (col & HB_LL(0x00000000FFFF0000)) >> 16 );
-      lcolor.usBlue  = ( (col & HB_LL(0x000000000000FFFF)) );
       return &lcolor;
    }
    else

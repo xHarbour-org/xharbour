@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.10 2004/04/28 18:30:30 druzus Exp $
+ * $Id: hbhex2n.c,v 1.11 2004/08/01 19:22:16 mlombardo Exp $
  */
 
 /*
@@ -93,7 +93,7 @@ HB_FUNC( HB_NUMTOHEX )
    ret[--len] = '\0';
    while ( ulNum > 0 )
    {
-      iCipher = ulNum & 0x0f;
+      iCipher = (int) (ulNum & 0x0f);
       if ( iCipher < 10 )
       {
          ret[ --len ] = '0' + iCipher;
