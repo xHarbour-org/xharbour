@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.17 2004/02/27 22:04:47 andijahja Exp $
+ * $Id: direct.c,v 1.18 2004/03/01 02:22:48 andijahja Exp $
  */
 
 /*
@@ -115,6 +115,8 @@
 
 #include "directry.ch"
 
+extern char *hb_vm_acAscii[256];
+
 #if defined( HB_OS_UNIX )
    #define HB_DIR_ALL_FILES_MASK        "*"
 #else
@@ -194,11 +196,11 @@ PHB_ITEM HB_EXPORT hb_fsDirectory( char* szSkleton, char* szAttributes, BOOL bDi
       szDirSpec = (BYTE *) HB_DIR_ALL_FILES_MASK;
    }
 
+   cCurDsk = hb_fsCurDrv() ;
+   pCurDir = hb_fsCurDir( cCurDsk ) ;
+
    if ( bDirOnly || bFullPath )
    {
-      cCurDsk = hb_fsCurDrv() ;
-      pCurDir = hb_fsCurDir( cCurDsk ) ;
-
       if ( (fDirSpec = hb_fsFNameSplit( (char*) szDirSpec )) !=NULL )
       {
          if( fDirSpec->szDrive )
@@ -282,11 +284,8 @@ PHB_ITEM HB_EXPORT hb_fsDirectory( char* szSkleton, char* szAttributes, BOOL bDi
 
    }
 
-   if ( bDirOnly || bFullPath )
-   {
-      hb_fsChDrv( (BYTE ) cCurDsk );
-      hb_fsChDir( pCurDir );
-   }
+   hb_fsChDrv( (BYTE ) cCurDsk );
+   hb_fsChDir( pCurDir );
 
    if ( fDirSpec != NULL )
    {
@@ -332,7 +331,7 @@ static int isdot( char *szIn )
    return iRet;
 }
 
-static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult )
+static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName )
 {
    ULONG ui, uiLen = pRecurse->item.asArray.value->ulLen;
 
@@ -347,13 +346,16 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult )
          {
             char *szSubdir = hb_xstrcpy(NULL,szEntry,"\\*.*",NULL);
             PHB_ITEM pSubDir = hb_fsDirectory( szSubdir, "D", FALSE, TRUE );
-            hb_fsDirectoryCrawler( pSubDir, pResult );
+            hb_fsDirectoryCrawler( pSubDir, pResult, szFName );
             hb_xfree( szSubdir );
             hb_itemRelease( pSubDir );
          }
          else
          {
-            hb_arrayAddForward( pResult, pEntry );
+            if( hb_strMatchRegExp( (const char *) szEntry, (const char *) szFName ) )
+            {
+               hb_arrayAddForward( pResult, pEntry );
+            }
          }
       }
 
@@ -361,22 +363,72 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult )
    }
 }
 
-PHB_ITEM HB_EXPORT hb_fsDirectoryRecursive( char* szSkleton )
+PHB_ITEM HB_EXPORT hb_fsDirectoryRecursive( char *szSkleton, char *szFName )
 {
    PHB_ITEM pDir = hb_fsDirectory( szSkleton, "D", FALSE, TRUE );
    PHB_ITEM pResult = hb_itemNew(NULL);
    hb_arrayNew( pResult, 0 );
-   hb_fsDirectoryCrawler( pDir, pResult );
+   hb_fsDirectoryCrawler( pDir, pResult, szFName );
    hb_itemRelease( pDir );
    return pResult;
 }
 
 HB_FUNC( DIRECTORYRECURSE )
 {
-   if ( ISCHAR(1) )
+   PHB_ITEM pDirSpec = hb_param( 1, HB_IT_STRING );
+   char *szRecurse;
+   char szDrive[1];
+   PHB_FNAME fDirSpec;
+   PHB_ITEM pDir;
+   char *szFName;
+   BOOL bAddDrive = TRUE;
+   char cCurDsk = hb_fsCurDrv() ;
+   BYTE *pCurDir = hb_fsCurDir( cCurDsk ) ;
+
+   if ( pDirSpec )
    {
-      PHB_ITEM pDir = hb_fsDirectoryRecursive( hb_parc(1) );
+      if ( (fDirSpec = hb_fsFNameSplit( pDirSpec->item.asString.value)) !=NULL )
+      {
+         if( fDirSpec->szDrive == NULL )
+         {
+            szDrive[ 0 ] = ( ( char ) hb_fsCurDrv() ) + 'A';
+            fDirSpec->szDrive = hb_vm_acAscii[szDrive[0]];
+         }
+         else
+         {
+            bAddDrive = FALSE;
+         }
+
+         if( fDirSpec->szPath == NULL )
+         {
+            fDirSpec->szPath = (char*) pCurDir ;
+         }
+
+         szRecurse = bAddDrive ? hb_xstrcpy( NULL,fDirSpec->szDrive,":\\",fDirSpec->szPath,"\\*.*",NULL):
+                     hb_xstrcpy( NULL,fDirSpec->szPath,"*.*",NULL);
+
+         szFName = hb_xstrcpy( NULL,fDirSpec->szName,fDirSpec->szExtension,NULL);
+
+      }
+
+      pDir = hb_fsDirectoryRecursive( szRecurse, szFName );
+
       hb_itemRelease( hb_itemReturn( pDir ) );
+
+      if( fDirSpec )
+      {
+         hb_xfree( fDirSpec );
+      }
+
+      if( szFName )
+      {
+         hb_xfree( szFName );
+      }
+
+      if( szRecurse )
+      {
+         hb_xfree( szRecurse );
+      }
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2431 2004/02/29 23:31:38 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.2432 2004/03/01 02:22:47 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-01 12:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * include/hbapifs.h
+     % add second parameter to hb_fsDirectoryRecursive( char* , char* ) for
+       file mask. We must supply first parameter as "*.*" otherwise directory
+       will not be returned.
+
+   * source/rtl/direct.c
+     ! DIRECTORYRECURSE() now can return only files match a skleton.
+       (Previously, all files were returned )
+
+   + tests/dirtest4.prg
+     + test program for filtered DIRECTORYRECURSE()
+
 2004-03-01 09:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
    * include/hbapifs.h
      + PHB_ITEM HB_EXPORT hb_fsDirectoryRecursive( char* ) returns a multi
