@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.13 2004/03/29 21:22:53 srobert Exp $
+ * $Id: str.c,v 1.14 2004/03/29 21:53:05 srobert Exp $
  */
 
 /*
@@ -149,40 +149,3 @@ HB_FUNC( STR )
       hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "STR", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
    }
 }
-
-HB_FUNC( HB_POINTER2STRING )
-{
-   PHB_ITEM pPointer = hb_param( 1, HB_IT_NUMERIC );
-   PHB_ITEM pLen     = hb_param( 2, HB_IT_NUMERIC );
-
-   if( pPointer )
-   {
-      if( pLen )
-      {
-         hb_retclenAdoptRawStatic( (char *) hb_itemGetNL( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
-      }
-      else
-      {
-         hb_retcAdoptStatic( (char *) hb_itemGetNL( pPointer ) );
-      }
-   }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_Pointer2String", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-   }
-}
-
-HB_FUNC( HB_STRING2POINTER )
-{
-   PHB_ITEM pString = hb_param( 1, HB_IT_STRING );
-
-   if( pString )
-   {
-      hb_retnl( (LONG) pString->item.asString.value );
-   }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_String2Pointer", 1, hb_paramError( 1 ) );
-   }
-}
-

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.104 2004/05/05 10:10:35 mauriliolongo Exp $
+ * $Id: filesys.c,v 1.105 2004/05/07 02:56:11 peterrees Exp $
  */
 
 /*
@@ -1276,6 +1276,7 @@ ret_close_1:
    HB_SYMBOL_UNUSED( fhStdout );
    HB_SYMBOL_UNUSED( fhStderr );
    HB_SYMBOL_UNUSED( bBackground );
+   HB_SYMBOL_UNUSED( ProcessID );
 
    hb_fsSetError( FS_ERROR );
 
@@ -2145,7 +2146,7 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
       }
       if ( ulPos == (ULONG) -1 )
       {
-         ulPos = lseek( hFileHandle, 0, SEEK_CUR );
+         ulPos = lseek( hFileHandle, 0L, SEEK_CUR );
          if ( ulPos == (ULONG) -1 )
          {
             ulPos = 0;
@@ -2342,12 +2343,12 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
    }
 #elif defined(_MSC_VER)
    {
-      ULONG ulOldPos = hb_fsSeek( hFileHandle, 0, FS_RELATIVE );
+      ULONG ulOldPos = lseek( hFileHandle, 0L, SEEK_CUR );
 
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
 
-      hb_fsSeek( hFileHandle, ulStart, FS_SET );
+      lseek( hFileHandle, ulStart, SEEK_SET );
       switch( uiMode & FL_MASK )
       {
          case FL_LOCK:
@@ -2362,17 +2363,17 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
             bResult = FALSE;
       }
       hb_fsSetIOError( bResult, 0 );
-      hb_fsSeek( hFileHandle, ulOldPos, FS_SET );
+      lseek( hFileHandle, ulOldPos, SEEK_SET );
       HB_DISABLE_ASYN_CANC
    }
 #elif defined(__MINGW32__)
    {
-      ULONG ulOldPos = hb_fsSeek( hFileHandle, 0, FS_RELATIVE );
+      ULONG ulOldPos = lseek( hFileHandle, 0L, SEEK_CUR );
 
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
 
-      hb_fsSeek( hFileHandle, ulStart, FS_SET );
+      lseek( hFileHandle, ulStart, SEEK_SET );
       switch( uiMode & FL_MASK )
       {
          case FL_LOCK:
@@ -2387,7 +2388,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
             bResult = FALSE;
       }
       hb_fsSetIOError( bResult, 0 );
-      hb_fsSeek( hFileHandle, ulOldPos, FS_SET );
+      lseek( hFileHandle, ulOldPos, SEEK_SET );
       HB_DISABLE_ASYN_CANC
    }
 #elif defined(__GNUC__) && defined(HB_OS_UNIX)

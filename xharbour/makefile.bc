@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.91 2004/04/05 02:29:29 druzus Exp $
+# $Id: makefile.bc,v 1.92 2004/04/25 11:26:01 andijahja Exp $
 #
 
 #
@@ -443,6 +443,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\space.obj \
    $(RTL_OBJ_DIR)\spfiles.obj \
    $(RTL_OBJ_DIR)\str.obj \
+   $(RTL_OBJ_DIR)\str2ptr.obj \
    $(RTL_OBJ_DIR)\strcase.obj \
    $(RTL_OBJ_DIR)\strdel.obj \
    $(RTL_OBJ_DIR)\strings.obj \
@@ -2153,6 +2154,9 @@ $(RTL_OBJ_DIR)\spfiles.obj : $(RTL_DIR)\spfiles.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\str.obj : $(RTL_DIR)\str.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\str2ptr.obj : $(RTL_DIR)\str2ptr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\strcase.obj : $(RTL_DIR)\strcase.c

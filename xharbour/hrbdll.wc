@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.3 2004/04/08 10:25:33 andijahja Exp $
+# $Id: hrbdll.wc,v 1.4 2004/04/25 11:26:01 andijahja Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -200,6 +200,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\space.obj \
   $(OBJ_DIR)\spfiles.obj \
   $(OBJ_DIR)\str.obj \
+  $(OBJ_DIR)\str2ptr.obj \
   $(OBJ_DIR)\strcase.obj \
   $(OBJ_DIR)\strdel.obj \
   $(OBJ_DIR)\strings.obj \
@@ -1298,6 +1299,9 @@ $(OBJ_DIR)\spfiles.obj : $(RTL_DIR)\spfiles.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\str.obj : $(RTL_DIR)\str.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\str2ptr.obj : $(RTL_DIR)\str2ptr.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\strcase.obj : $(RTL_DIR)\strcase.c

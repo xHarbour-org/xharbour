@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.47 2004/04/27 15:25:47 kaddath Exp $
+# $Id: hrbdll.bc,v 1.48 2004/04/27 22:33:29 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -199,6 +199,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\space.obj \
   $(OBJ_DIR)\spfiles.obj \
   $(OBJ_DIR)\str.obj \
+  $(OBJ_DIR)\str2ptr.obj \
   $(OBJ_DIR)\strcase.obj \
   $(OBJ_DIR)\strdel.obj \
   $(OBJ_DIR)\strings.obj \
@@ -626,6 +627,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\space.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\spfiles.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\str.obj               + >> hdll.tmp
+  echo. $(OBJ_DIR)\str2ptr.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\strcase.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\strdel.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\strings.obj           + >> hdll.tmp
@@ -1662,6 +1664,9 @@ $(OBJ_DIR)\spfiles.obj : $(RTL_DIR)\spfiles.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\str.obj : $(RTL_DIR)\str.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\str2ptr.obj : $(RTL_DIR)\str2ptr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\strcase.obj : $(RTL_DIR)\strcase.c

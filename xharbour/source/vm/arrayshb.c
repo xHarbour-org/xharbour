@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.43 2004/03/28 15:12:02 likewolf Exp $
+ * $Id: arrayshb.c,v 1.44 2004/04/28 18:31:14 druzus Exp $
  */
 
 /*
@@ -1089,7 +1089,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, UINT uiAlign, UINT * puiS
          case CTYPE_UNSIGNED_SHORT_PTR : // unsigned short *
             if( ( pBaseVar->pItems + ulIndex  )->type )
             {
-               *( (void **) ( Buffer + uiOffset ) ) = (void *) hb_itemGetNL( pBaseVar->pItems + ulIndex  );
+               *( (void **) ( Buffer + uiOffset ) ) = hb_itemGetPtr( pBaseVar->pItems + ulIndex  );
             }
             else
             {
@@ -1150,7 +1150,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, UINT uiAlign, UINT * puiS
          case CTYPE_UNSIGNED_INT_PTR : // unsigned int *
             if( ( pBaseVar->pItems + ulIndex  )->type )
             {
-               *( (void **) ( Buffer + uiOffset ) ) = (void *) hb_itemGetNL( pBaseVar->pItems + ulIndex  );
+               *( (void **) ( Buffer + uiOffset ) ) = hb_itemGetPtr( pBaseVar->pItems + ulIndex  );
             }
             else
             {
@@ -1210,7 +1210,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, UINT uiAlign, UINT * puiS
          case CTYPE_UNSIGNED_LONG_PTR : // unsigned LONG *
             if( ( pBaseVar->pItems + ulIndex  )->type )
             {
-               *( (void **) ( Buffer + uiOffset ) ) = (void *) hb_itemGetNL( pBaseVar->pItems + ulIndex  );
+               *( (void **) ( Buffer + uiOffset ) ) = hb_itemGetPtr( pBaseVar->pItems + ulIndex  );
             }
             else
             {
@@ -1232,7 +1232,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, UINT uiAlign, UINT * puiS
          case CTYPE_FLOAT_PTR : // float *
             if( ( pBaseVar->pItems + ulIndex  )->type )
             {
-               *( (void **) ( Buffer + uiOffset ) ) = (void *) hb_itemGetNL( pBaseVar->pItems + ulIndex  );
+               *( (void **) ( Buffer + uiOffset ) ) = hb_itemGetPtr( pBaseVar->pItems + ulIndex  );
             }
             else
             {
@@ -1255,7 +1255,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, UINT uiAlign, UINT * puiS
          case CTYPE_VOID_PTR : // void *
             if( ( pBaseVar->pItems + ulIndex  )->type )
             {
-               *( (void **) ( Buffer + uiOffset ) ) = (void *) hb_itemGetNL( pBaseVar->pItems + ulIndex  );
+               *( (void **) ( Buffer + uiOffset ) ) = hb_itemGetPtr( pBaseVar->pItems + ulIndex  );
             }
             else
             {
@@ -1508,7 +1508,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, UINT uiAlign, BOOL bAdop
 
          case CTYPE_SHORT_PTR : // short *
          case CTYPE_UNSIGNED_SHORT_PTR : // unsigned short *
-            hb_itemPutNL( pBaseVar->pItems + ulIndex , (LONG) (void *) ( Buffer + uiOffset ) );
+            hb_itemPutPtr( pBaseVar->pItems + ulIndex , (void *) ( Buffer + uiOffset ) );
             break;
 
          case CTYPE_INT : // int
@@ -1521,7 +1521,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, UINT uiAlign, BOOL bAdop
 
          case CTYPE_INT_PTR : // int *
          case CTYPE_UNSIGNED_INT_PTR : // unsigned int *
-            hb_itemPutNL( pBaseVar->pItems + ulIndex , (LONG) (void *) ( Buffer + uiOffset ) );
+            hb_itemPutPtr( pBaseVar->pItems + ulIndex , (void *) ( Buffer + uiOffset ) );
             break;
 
          case CTYPE_LONG : // LONG
@@ -1534,7 +1534,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, UINT uiAlign, BOOL bAdop
 
          case CTYPE_LONG_PTR : // LONG *
          case CTYPE_UNSIGNED_LONG_PTR : // unsigned LONG *
-            hb_itemPutNL( pBaseVar->pItems + ulIndex , (LONG) (void *) ( Buffer + uiOffset ) );
+            hb_itemPutPtr( pBaseVar->pItems + ulIndex , (void *) ( Buffer + uiOffset ) );
             break;
 
          case CTYPE_FLOAT : // float
@@ -1542,7 +1542,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, UINT uiAlign, BOOL bAdop
             break;
 
          case CTYPE_FLOAT_PTR : // float *
-            hb_itemPutNL( pBaseVar->pItems + ulIndex , (LONG) (void *) ( Buffer + uiOffset ) );
+            hb_itemPutPtr( pBaseVar->pItems + ulIndex , (void *) ( Buffer + uiOffset ) );
             break;
 
          case CTYPE_DOUBLE : // double
@@ -1551,7 +1551,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, UINT uiAlign, BOOL bAdop
 
          case CTYPE_DOUBLE_PTR : // double *
          case CTYPE_VOID_PTR : // void *
-            hb_itemPutNL( pBaseVar->pItems + ulIndex , (LONG) (void *) ( Buffer + uiOffset ) );
+            hb_itemPutPtr( pBaseVar->pItems + ulIndex , (void *) ( Buffer + uiOffset ) );
             break;
 
          default:

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2905 2004/05/09 20:51:14 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2906 2004/05/09 21:13:36 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,52 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-10 01:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/str.c
+    - moved HB_POINTER2STRING and HB_STRING2POINTER to separate
+      file str2ptr.c
+  + xharbour/source/rtl/str2ptr.c
+    + HB_POINTER2STRING and HB_STRING2POINTER from str.c changed
+      to operate on HB_IT_POINTER instead of HB_IT_LONG
+
+  * xharbour/hrbdll.bc
+  * xharbour/hrbdll.vc
+  * xharbour/hrbdll.wc
+  * xharbour/makefile.bc
+  * xharbour/makefile.nt
+  * xharbour/makefile.vc
+  * xharbour/makefile.wc
+  * xharbour/source/rtl/Makefile
+    * added str2ptr.c
+
+  * xharbour/source/vm/arrayshb.c
+    * changed to operate on HB_IT_POINTER instead of HB_IT_LONG
+
+  * xharbour/source/vm/runner.c
+    * use HB_PCODE_MK* macros
+    * changed to operate on HB_IT_POINTER instead of HB_IT_LONG
+      still prgFunction and hb_hrbAsm*() functions are for IA32
+      machines only and not portable (implemented) to any other
+
+  * xharbour/include/hbdefs.h
+    + new macro HB_LL to resolve the problem with MSC which doesn't
+      support LL suffix for LONGLONG numeric constant. This suffix
+      is necessary for some compilers - without it they cut the
+      number to LONG
+
+  * xharbour/source/rtl/gtgraph.c
+  * xharbour/utils/hbtest/rt_ccall.prg
+    * use HB_LL macro
+
+  * xharbour/source/compiler/harbour.c
+    * commented out unused function hb_compVarFind()
+
+  * xharbour/source/rtl/filesys.c
+    * fixed hb_fsLock for MSC and MINGW caused by hack in hb_fsSeek and
+      32bit offset - personally I think we should move this hack to FSEEK
+      (if it's necessary at all - it emulates DOS not Clipper behavior)
+      so RDD will be able to operate on 4GB files with 32 bit API.
 
 2004-05-09 23:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/vm/classes.c

@@ -1,5 +1,5 @@
 /*
- * $Id: gtgraph.c,v 1.5 2004/02/13 09:22:47 andijahja Exp $
+ * $Id: gtgraph.c,v 1.6 2004/02/23 08:31:57 andijahja Exp $
  */
 
 /*
@@ -77,10 +77,10 @@ static HB_GT_GCOLOR *s_paramToColor( PHB_ITEM pColor, char *funcname )
    {
       ULONG col  = (ULONG) hb_itemGetNL( pColor );
 #endif
-      lcolor.usAlpha = ( (col & 0xFFFF000000000000) >> 48 );
-      lcolor.usRed   = ( (col & 0x0000FFFF00000000) >> 32 );
-      lcolor.usGreen = ( (col & 0x00000000FFFF0000) >> 16 );
-      lcolor.usBlue  = ( (col & 0x000000000000FFFF) );
+      lcolor.usAlpha = ( (col & HB_LL(0xFFFF000000000000)) >> 48 );
+      lcolor.usRed   = ( (col & HB_LL(0x0000FFFF00000000)) >> 32 );
+      lcolor.usGreen = ( (col & HB_LL(0x00000000FFFF0000)) >> 16 );
+      lcolor.usBlue  = ( (col & HB_LL(0x000000000000FFFF)) );
       return &lcolor;
    }
    else

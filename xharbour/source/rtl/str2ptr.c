@@ -1,13 +1,13 @@
 /*
- * $Id: rt_ccall.prg,v 1.3 2004/03/02 18:15:10 ronpinkas Exp $
+ * $Id$
  */
 
 /*
  * Harbour Project source code:
- * Regression tests for the runtime library ( C-Calls )
+ * HB_POINTER2STRING(), HB_STRING2POINTER() functions
  *
- * Copyright 2004 Andi Jahja <xharbour@cbn.net.id>
- * www - http://www.harbour-project.org
+ * Copyright 2004 Ron Pinkas <ronpinkas@profit-master.com>
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,63 +50,44 @@
  *
  */
 
-#include "rt_main.ch"
+#include "hbapi.h"
+#include "hbapiitm.h"
+#include "hbapierr.h"
+#include "hbfast.h"
 
-/* Don't change the position of this #include. */
-#include "rt_vars.ch"
+HB_FUNC( HB_POINTER2STRING )
+{
+   PHB_ITEM pPointer = hb_param( 1, HB_IT_POINTER );
+   PHB_ITEM pLen     = hb_param( 2, HB_IT_NUMERIC );
 
-PROCEDURE Main_CCall()
-
-#ifndef HB_LONG_LONG_OFF
-   TEST_LINE( STR(VMCALL_01(),,,.T.)   , "5000000000" )
-   TEST_LINE( STR(VMCALL_02(),,,.T.)   , "5000000000" )
-   TEST_LINE( STR(VMCALL_03(),,,.T.)   , "5000000000" )
-   TEST_LINE( STR(VMCALL_04(),,,.T.)   , "5000000000" )
-
-   FUNCTION VMCALL_01()
-
-   LOCAL n
-   EXTEND_01( @N, { 5000000000 } )
-   RETURN n
-
-   FUNCTION VMCALL_02()
-
-   LOCAL n
-   Extend_02( @n )
-   RETURN n
-
-   FUNCTION VMCALL_03()
-   RETURN Extend_03(5000000000)
-
-   FUNCTION VMCALL_04()
-   RETURN Extend_04(5000000000)
-
-/* Don't change the position of this #include. */
-#include "rt_init.ch"
-
-   #PRAGMA BEGINDUMP
-   #include "hbapi.h"
-
-   HB_FUNC( EXTEND_01 )
+   if( pPointer )
    {
-      PHB_ITEM pArray = hb_param( 2, HB_IT_ARRAY );
-      hb_stornll( hb_arrayGetNLL( pArray, 1 ), 1, -1 );
+      if( pLen )
+      {
+         hb_retclenAdoptRawStatic( (char *) hb_itemGetPtr( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
+      }
+      else
+      {
+         hb_retcAdoptStatic( (char *) hb_itemGetPtr( pPointer ) );
+      }
    }
-
-   HB_FUNC( EXTEND_02 )
+   else
    {
-      hb_stornll( HB_LL(5000000000), 1, -1 );
+      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_Pointer2String", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
+}
 
-   HB_FUNC( EXTEND_03 )
+HB_FUNC( HB_STRING2POINTER )
+{
+   PHB_ITEM pString = hb_param( 1, HB_IT_STRING );
+
+   if( pString )
    {
-      hb_retnll( hb_parnll(1) );
+      hb_retptr( ( void * ) pString->item.asString.value );
    }
-
-   HB_FUNC( EXTEND_04 )
+   else
    {
-      hb_retnlllen( hb_parnll(1), 20 );
+      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_String2Pointer", 1, hb_paramError( 1 ) );
    }
-   #PRAGMA ENDDUMP
+}
 
-#endif

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.77 2004/04/05 00:21:39 andijahja Exp $
+ * $Id: harbour.c,v 1.78 2004/05/08 04:25:13 ronpinkas Exp $
  */
 
 /*
@@ -3716,6 +3716,8 @@ void hb_compGenPushMemVarRef( char * szVarName ) /* generates the pcode to push 
    hb_compGenVarPCode( HB_P_PUSHMEMVARREF, szVarName );
 }
 
+/* commented out because it's not used currently
+
 static BOOL hb_compVarFind( char * szVarName )
 {
    PFUNCTION pFunc = hb_comp_functions.pFirst;
@@ -3731,6 +3733,7 @@ static BOOL hb_compVarFind( char * szVarName )
 
    return FALSE;
 }
+*/
 
  /* generates the pcode to push an aliased variable value to the virtual
   * machine stack
