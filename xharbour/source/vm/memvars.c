@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.81 2004/04/29 16:52:58 ronpinkas Exp $
+ * $Id: memvars.c,v 1.82 2004/04/30 16:11:04 ronpinkas Exp $
  */
 
 /*
@@ -200,7 +200,7 @@ void hb_memvarsRelease( void )
             }
          #endif
 
-         if( --( s_globalTable[ ulCnt ].counter ) == 0 ) //&& s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
+         if( --( s_globalTable[ ulCnt ].counter ) == 0 && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
          {
             if( HB_IS_COMPLEX( &s_globalTable[ ulCnt ].item ) )
             {
@@ -248,7 +248,7 @@ void hb_memvarsRelease( HB_STACK *pStack )
 {
    ULONG ulCnt;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_memvarsClear(%p)", pStack));
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarsRelease(%p)", pStack));
 
    ulCnt = pStack->globalLastFree;
 
@@ -256,7 +256,7 @@ void hb_memvarsRelease( HB_STACK *pStack )
    {
       while( --ulCnt )
       {
-         if( --( pStack->globalTable[ ulCnt ].counter ) == 0 ) //&& pStack->globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
+         if( --( pStack->globalTable[ ulCnt ].counter ) == 0 && pStack->globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE ) -1 )
          {
             if( HB_IS_COMPLEX( &pStack->globalTable[ ulCnt ].item ) )
             {

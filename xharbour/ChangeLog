@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3037 2004/06/06 22:46:32 likewolf Exp $
+ * $Id: ChangeLog,v 1.3038 2004/06/07 04:37:47 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-07 23:09 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/memvars.c
+    ! Fixed GPF Trap by reinstating conditional release of Detached Locals in hb_memvarsRelease()
 
 2004-06-07 11:40 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * include/hbsetup.ch
