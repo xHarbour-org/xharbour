@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3898 2005/03/02 14:23:19 andijahja Exp $
+ * $Id: ChangeLog,v 1.3899 2005/03/02 17:39:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-03-03 03:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * makefile.bc
+    ! _remove_ misleading creation of hbodbcmt.lib. hbodbcmt.lib _was_
+      actually hbodbc.lib because it seems it cannot be compiled with MT
+      under BCC. hbodbcmt.lib in previous makefile is really an unfunny
+      trick (!). :-(
+
+  * make_b32.bat
+    ! dllmain.lib not erased in clean build
 
 2005-03-02 09:35 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
   * makefile.bc

@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.20 2004/12/18 00:36:07 modalsist Exp $
+rem $Id: make_b32.bat,v 1.21 2005/03/02 02:11:58 andijahja Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -62,6 +62,7 @@ if "%1" == "CLEAN" goto CLEAN
    if exist bin\hbtest.exe     del bin\hbtest.exe
    if exist bin\xbscript.exe   del bin\xbscript.exe
 
+   if exist lib\dllmain.lib    del lib\dllmain.lib
    if exist lib\codepage.lib   del lib\codepage.lib
    if exist lib\common.lib     del lib\common.lib
    if exist lib\dbfcdx.lib     del lib\dbfcdx.lib
