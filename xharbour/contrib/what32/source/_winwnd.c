@@ -1306,3 +1306,23 @@ HB_FUNC ( LOCKWINDOWUPDATE )
    hb_retl( LockWindowUpdate( (HWND) hb_parnl( 1 ) ) );
 }
 
+
+
+HB_FUNC ( FLASHWINDOW )
+{
+   FlashWindow( (HWND) hb_parnl( 1 ), hb_parni( 2 ) ) );
+}
+
+/*
+FUNCTION Flash(hWnd,nTimes)
+
+   LOCAL n
+   DEFAULT nTimes TO 10
+   For n := 1 To nTimes
+       FlashWindow(hWnd,1)
+       Sleep(500)
+   Next
+   FlashWindow(hWnd,0)
+
+RETURN(nil)
+*/
