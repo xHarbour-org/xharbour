@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.241 2002/05/23 16:59:54 walito Exp $
+ * $Id: ChangeLog,v 1.242 2002/05/23 20:12:04 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -906,7 +906,6 @@
 
     * Bug fixed, reported by Marek Horodyski.
 
->>>>>>> 1.157
 2002-04-17 02:15 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/filesys.c
     * convert_create_flags() now Set File mask on linux to 777
