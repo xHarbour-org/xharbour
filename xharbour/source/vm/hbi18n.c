@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.9 2003/08/18 17:38:51 jonnymind Exp $
+ * $Id: hbi18n.c,v 1.10 2003/08/28 01:35:31 jonnymind Exp $
  */
 
 /*
@@ -88,7 +88,7 @@ static char s_base_language_name[HB_I18N_NAMELEN];
 * Find an I18N string in the current table,
 * or returns the parameter untraslated (lower level)
 */
-PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable )
+PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable, ULONG * ulIndex )
 {
    ULONG ulLower = 1;
    ULONG ulHigher = hb_arrayLen( pTable );
@@ -105,6 +105,7 @@ PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable )
 
       if ( iRes == 0 )
       {
+         * ulIndex = ulPoint;
          return hb_arrayGetItemPtr( pRow, 2 );
       }
       else {
@@ -121,6 +122,7 @@ PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable )
 
             if ( strcmp( hb_arrayGetCPtr( pRow, 1), cInt ) == 0 )
             {
+               * ulIndex = ulHigher;
                return hb_arrayGetItemPtr( pRow, 2 );
             }
             break;
@@ -621,6 +623,7 @@ HB_FUNC( I18N ) // we get a license over HB_ naming convention for this
 {
    PHB_ITEM pStr = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pRet;
+   ULONG ulIndex;
 
    if ( pStr == NULL )
    {
@@ -635,7 +638,7 @@ HB_FUNC( I18N ) // we get a license over HB_ naming convention for this
       return;
    }
 
-   if ( (pRet = hb_i18n_scan_table( pStr, s_i18n_table ))->type == HB_IT_NIL )
+   if ( (pRet = hb_i18n_scan_table( pStr, s_i18n_table, &ulIndex ))->type == HB_IT_NIL )
    {
       hb_itemReturn( pStr );
    }
@@ -818,6 +821,8 @@ HB_FUNC( HB_HFIND )
    PHB_ITEM pHash = hb_param( 1, HB_IT_ARRAY );
    PHB_ITEM pKey = hb_param( 2, HB_IT_STRING );
    PHB_ITEM pRet;
+   PHB_ITEM pIndex;
+   ULONG ulIndex =0;
 
    if ( pHash == NULL || pKey == NULL )
    {
@@ -825,7 +830,13 @@ HB_FUNC( HB_HFIND )
          2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 
-   pRet = hb_i18n_scan_table( pKey, pHash );
+   pRet = hb_i18n_scan_table( pKey, pHash, &ulIndex );
+
+   if (hb_pcount() >= 3 && ISBYREF( 3 ))
+   {
+      pIndex = hb_param( 3, HB_IT_ANY );
+      hb_itemPutNL( pIndex, ulIndex );
+   }
 
    // The key scan returns the same pKey if not found
    if ( pRet != pKey )

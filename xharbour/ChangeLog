@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1446 2003/09/11 12:08:25 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1447 2003/09/11 13:12:03 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-03 10:15 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/vm/hbi18n.c
+    + Added optional parameter to HB_HFIND to retrieve the hash table index
+      by reference: HB_HFIND( <aHash>, <cKey>, [<@nIndex>] )
 
 2003-09-11 15:12 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
    * utils/Makefile
