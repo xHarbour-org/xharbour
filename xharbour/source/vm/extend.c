@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.13 2003/02/12 19:26:16 map Exp $
+ * $Id: extend.c,v 1.14 2003/02/26 05:36:10 jonnymind Exp $
  */
 
 /*
@@ -629,9 +629,7 @@ void  HB_EXPORT hb_reta( ULONG ulLen )  /* undocumented hb_reta() */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_reta(%lu)", ulLen));
 
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
    hb_arrayNew( &(HB_VM_STACK.Return), ulLen );
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 }
 
 #undef hb_retc

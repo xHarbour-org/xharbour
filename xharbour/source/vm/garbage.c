@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.46 2003/02/26 14:38:38 jonnymind Exp $
+ * $Id: garbage.c,v 1.47 2003/03/02 15:22:31 jonnymind Exp $
  */
 
 /*
@@ -49,6 +49,8 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#define HB_THREAD_OPTIMIZE_STACK
 
 #include "hbapi.h"
 #include "hbfast.h"
@@ -109,18 +111,6 @@ static ULONG s_uAllocated = 0;
 #else
    #define HB_GARBAGE_NEW( ulSize )   ( HB_GARBAGE_PTR )hb_xgrab( ulSize )
    #define HB_GARBAGE_FREE( pAlloc )    hb_xfree( (void *)(pAlloc) )
-#endif
-
-#ifdef HB_THREAD_SUPPORT
-   //HB_FORBID_MUTEX hb_gcCollectionForbid;
-   HB_CRITICAL_T hb_garbageMutex;
-   
-   /* Mutex to access safely the "used flag" that is swapped at each scan */
-   
-   /* Mutex to access safely garbage allocation strategy */
-   /* JC1: signal that GC is being used now */
-   //static BOOL s_bGarbageAtWork = FALSE;
-   //static HB_CRITICAL_T s_GawMutex;
 #endif
 
 /* Forward declaration.*/
@@ -423,8 +413,6 @@ void *hb_gcUnlock( void *pBlock )
 * JC1: hb_gcItemRef is thread unsafe, and MUST stay this way because
 * it can ONLY be called form within a GC process. The GC process is
 * made by one thread at a time by definition.
-* Don't ever call hb_gcItemRef() from outside an IsItemRef() function,
-* or else call it locked against hb_garbageMutex;
 */
 void hb_gcItemRef( HB_ITEM_PTR pItem )
 {
@@ -511,16 +499,19 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 
 void hb_gcCollect( void )
 {
+   HB_THREAD_STUB
+   
    /* TODO: decrease the amount of time spend collecting */
-   HB_CONTEXT_UNLOCK;
+   HB_STACK_UNLOCK;
    hb_gcCollectAll();
-   HB_CONTEXT_LOCK;
+   HB_STACK_LOCK;
 }
 
 /* Check all memory blocks if they can be released
 */
 void hb_gcCollectAll( void )
 {
+   HB_THREAD_STUB
    HB_GARBAGE_PTR pAlloc, pDelete;
    #ifdef HB_THREAD_SUPPORT
    BOOL bWait = FALSE;
@@ -535,11 +526,11 @@ void hb_gcCollectAll( void )
          bWait = TRUE;
       }
       /* Working in single thread mode */
-      HB_CONTEXT_STOP_TELLING( s_bCollecting, TRUE );
+      HB_STACK_STOP_TELLING( s_bCollecting, TRUE );
       if ( bWait )
       {
          s_bCollecting = FALSE;
-         HB_CONTEXT_START;
+         HB_STACK_START;
          return;
       }  
    #else
@@ -549,15 +540,13 @@ void hb_gcCollectAll( void )
       }
    #endif
 
-   
-
 
    /* Even if not locked, a read only non-critical variable here
    should not be a problem */
    if( s_pCurrBlock==0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
    {
       s_bCollecting = FALSE;
-      HB_SET_SHARED( hb_runningContexts, HB_COND_SET, 0 );
+      HB_SET_SHARED( hb_runningStacks, HB_COND_SET, 0 );
       return;
    }
 
@@ -739,7 +728,7 @@ void hb_gcCollectAll( void )
 
    /* Step 5: release all the locks on the scanned objects */      
    /* Put itself back on machine execution count */
-   HB_CONTEXT_START;
+   HB_STACK_START;
    
 }
 
@@ -865,12 +854,14 @@ HB_FUNC( HB_GCSTEP )
 */
 HB_FUNC( HB_GCALL )
 {
+   HB_THREAD_STUB
+   
    if( hb_parl( 1 ) )
    {
       s_uAllocated = HB_GC_COLLECTION_JUSTIFIED;
    }
-   HB_CONTEXT_UNLOCK;
+   HB_STACK_UNLOCK;
    hb_gcCollectAll();
-   HB_CONTEXT_LOCK;
+   HB_STACK_LOCK;
 
 }

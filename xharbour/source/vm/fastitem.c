@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.43 2003/02/24 23:52:19 jonnymind Exp $
+ * $Id: fastitem.c,v 1.44 2003/02/26 05:36:10 jonnymind Exp $
  */
 
 /*
@@ -53,6 +53,8 @@
  *
  */
 
+#define HB_THREAD_OPTIMIZE_STACK
+
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbstack.h"
@@ -70,6 +72,8 @@ void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
 
 void HB_EXPORT hb_itemPushForward( PHB_ITEM pItem )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemPushForward(%p)", pItem ) );
 
    hb_itemForwardValue( hb_stackTopItem(), pItem );
@@ -109,6 +113,8 @@ void HB_EXPORT hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
 
 PHB_ITEM HB_EXPORT hb_itemReturn( PHB_ITEM pItem )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturn(%p)", pItem ) );
 
    if( pItem )
@@ -121,6 +127,8 @@ PHB_ITEM HB_EXPORT hb_itemReturn( PHB_ITEM pItem )
 
 PHB_ITEM HB_EXPORT hb_itemReturnCopy( PHB_ITEM pItem )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturn(%p)", pItem ) );
 
    if( pItem )
@@ -134,8 +142,6 @@ PHB_ITEM HB_EXPORT hb_itemReturnCopy( PHB_ITEM pItem )
 void HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemReleaseString(%p), '%s'", pItem, pItem->item.asString.value ) );
-
-   
 
    if( pItem->item.asString.bStatic == FALSE )
    {
@@ -563,6 +569,8 @@ void HB_EXPORT hb_itemFastClear( PHB_ITEM pItem )
 
 void HB_EXPORT hb_itemPushStaticString( char * szText, ULONG length )
 {
+   HB_THREAD_STUB
+   
    PHB_ITEM pTop = hb_stackTopItem();
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ( "hb_itemPushStaticString( \"%s\", %lu ) %p %p", szText, length, pTop, szText ) );
@@ -580,6 +588,8 @@ void HB_EXPORT hb_itemPushStaticString( char * szText, ULONG length )
 #undef hb_retcAdopt
 void HB_EXPORT hb_retcAdopt( char * szText )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcAdopt(%s)", szText ) );
 
    
@@ -608,6 +618,8 @@ void HB_EXPORT hb_retcAdopt( char * szText )
 #undef hb_retclenAdopt
 void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
 {
+   HB_THREAD_STUB
+   
    szText[ulLen] = '\0';
 
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
@@ -637,6 +649,8 @@ void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
 #undef hb_retclenAdoptRaw
 void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
 
    
@@ -664,8 +678,9 @@ void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
 #undef hb_retclenAdoptRawStatic
 void HB_EXPORT hb_retclenAdoptRawStatic( char * szText, ULONG ulLen )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
-
    
    if( ( &(HB_VM_STACK.Return) )->type )
    {
@@ -691,6 +706,8 @@ void HB_EXPORT hb_retclenAdoptRawStatic( char * szText, ULONG ulLen )
 #undef hb_retcAdoptStatic
 void HB_EXPORT hb_retcAdoptStatic( char * szText )
 {
+   HB_THREAD_STUB
+   
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcAdoptStatic(%s)", szText ) );
 
    
@@ -716,9 +733,9 @@ void HB_EXPORT hb_retcAdoptStatic( char * szText )
 #undef hb_retclenAdoptStatic
 void HB_EXPORT hb_retclenAdoptStatic( char * szText, ULONG ulLen )
 {
-   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdoptStatic(%s)", szText ) );
-
+   HB_THREAD_STUB
    
+   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdoptStatic(%s)", szText ) );
 
    if( ( &(HB_VM_STACK.Return) )->type )
    {
@@ -741,6 +758,8 @@ void HB_EXPORT hb_retclenAdoptStatic( char * szText, ULONG ulLen )
 
 HB_FUNC( ARRAYCYCLICCOUNT )
 {
+   HB_THREAD_STUB
+   
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
 
    if( pArray )
@@ -889,6 +908,8 @@ USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pScanBaseArray, PHB_SCANNED_
 
 BYTE HB_EXPORT hb_itemParamId( PHB_ITEM pItem )
 {
+   HB_THREAD_STUB
+   
    PHB_ITEM *pBase = HB_VM_STACK.pBase + 1;
    PHB_ITEM *pTop;
    BYTE iId = 1;

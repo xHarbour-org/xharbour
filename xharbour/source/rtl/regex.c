@@ -64,6 +64,7 @@ restrictions:
  *
  */
 #include "hbapi.h"
+#include "hbapierr.h"
 
 /* Begin of maketables.c */
 

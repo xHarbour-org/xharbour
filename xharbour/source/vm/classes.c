@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.40 2003/03/07 05:32:42 ronpinkas Exp $
+ * $Id: classes.c,v 1.41 2003/03/07 08:14:11 ronpinkas Exp $
  */
 
 /*
@@ -138,7 +138,7 @@
  */
 
 /*JC1: say we are going to optimze MT stack */
-#define HB_THREAD_OPTMIZE_STACK
+#define HB_THREAD_OPTIMIZE_STACK
 
 #include <math.h>
 

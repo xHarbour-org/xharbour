@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.27 2003/02/24 06:30:16 jonnymind Exp $
+ * $Id: estack.c,v 1.28 2003/03/02 15:22:31 jonnymind Exp $
  */
 
 /*
@@ -51,7 +51,7 @@
  */
 
 /*JC1: say we are going to optimze MT stack */
-#define HB_THREAD_OPTMIZE_STACK
+#define HB_THREAD_OPTIMIZE_STACK
 
 #if defined(HB_INCLUDE_WINEXCHANDLER)
    #define HB_OS_WIN_32_USED
@@ -69,7 +69,6 @@
 #ifndef HB_THREAD_SUPPORT
    HB_STACK hb_stack;
 #endif
-
 
 /* ------------------------------- */
 
@@ -168,7 +167,7 @@ void hb_stackPush( void )
 
 void hb_stackInit( void )
 {
-
+   /* IN MT, we are taking care of it elsewhere */
    #ifndef HB_THREAD_SUPPORT
       LONG i;
       HB_TRACE(HB_TR_DEBUG, ("hb_stackInit()"));
@@ -184,10 +183,6 @@ void hb_stackInit( void )
       }
 
       ( * hb_stack.pPos )->type = HB_IT_NIL;
-   #else
-      /* Since we need a context also for the main thread, here we are! */      
-      HB_TRACE(HB_TR_DEBUG, ("hb_stackInit()"));
-      hb_threadLinkContext( hb_threadCreateContext( HB_CURRENT_THREAD() ) );
    #endif
 }
 

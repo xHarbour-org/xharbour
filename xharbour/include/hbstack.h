@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.14 2003/02/22 05:54:57 jonnymind Exp $
+ * $Id: hbstack.h,v 1.15 2003/03/02 15:22:30 jonnymind Exp $
  */
 
 /*
@@ -72,6 +72,9 @@
    #define STACK_EXPANDHB_ITEMS    20
 #endif
 
+/* JC1: test for macro accessing the stack */
+#include "thread.h"
+
 #if defined(HB_EXTERN_C)
 extern "C" {
 #endif
@@ -79,6 +82,7 @@ extern "C" {
 struct hb_class_method;
 
 /* stack managed by the virtual machine */
+#ifndef HB_THREAD_SUPPORT
 typedef struct
 {
    PHB_ITEM * pItems;       /* pointer to the stack items */
@@ -94,9 +98,8 @@ typedef struct
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
   
 } HB_STACK;
+#endif
 
-/* JC1: test for macro accessing the stack */
-#include "thread.h"
 
 #ifndef HB_NO_DEFAULT_STACK_MACROS
     #define HB_STACK_MACROS

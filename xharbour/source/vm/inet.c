@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.17 2003/02/21 15:40:59 jonnymind Exp $
+* $Id: inet.c,v 1.18 2003/03/02 15:22:31 jonnymind Exp $
 */
 
 /*
@@ -596,7 +596,7 @@ HB_FUNC( INETRECV )
       hb_itemRelease( pArgs );
       return;
    }
-   HB_CONTEXT_UNLOCK;
+   HB_STACK_UNLOCK;
 
    Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
 
@@ -628,7 +628,7 @@ HB_FUNC( INETRECV )
    {
       HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
       hb_retni( 0 );
-      HB_CONTEXT_LOCK;
+      HB_STACK_LOCK;
       return;
    }
 
@@ -641,7 +641,7 @@ HB_FUNC( INETRECV )
       HB_SOCKET_SET_ERROR( Socket );
    }
    hb_retni( iLen );
-   HB_CONTEXT_LOCK;
+   HB_STACK_LOCK;
 }
 
 HB_FUNC( INETRECVALL )
@@ -684,7 +684,7 @@ HB_FUNC( INETRECVALL )
    iReceived = 0;
    HB_SOCKET_ZERO_ERROR( Socket );
 
-   HB_CONTEXT_UNLOCK;
+   HB_STACK_UNLOCK;
    
    do
    {
@@ -702,7 +702,7 @@ HB_FUNC( INETRECVALL )
       {
          HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
          hb_retni( iReceived );
-         HB_CONTEXT_LOCK;
+         HB_STACK_LOCK;
          return;
       }
 
@@ -725,7 +725,7 @@ HB_FUNC( INETRECVALL )
       HB_SOCKET_SET_ERROR( Socket );
       hb_retni( -1 );
    }
-   HB_CONTEXT_UNLOCK;   
+   HB_STACK_UNLOCK;   
 }
 
 
@@ -777,7 +777,7 @@ HB_FUNC( INETRECVLINE )
    Buffer = (char *) hb_xgrab( iBufferSize );
    iAllocated = iBufferSize;
 
-   HB_CONTEXT_UNLOCK;
+   HB_STACK_UNLOCK;
    do
    {
       if( iPos == iAllocated - 1 )
@@ -861,7 +861,7 @@ HB_FUNC( INETRECVLINE )
       }
    }
    
-   HB_CONTEXT_LOCK;
+   HB_STACK_LOCK;
 }
 
 
@@ -930,7 +930,7 @@ HB_FUNC( INETRECVENDBLOCK )
    Buffer = (char *) hb_xgrab( iBufferSize );
    iAllocated = iBufferSize;
 
-   HB_CONTEXT_UNLOCK;
+   HB_STACK_UNLOCK;
    
    do
    {
@@ -1023,7 +1023,7 @@ HB_FUNC( INETRECVENDBLOCK )
          hb_retc( NULL );
       }
    }
-   HB_CONTEXT_LOCK;
+   HB_STACK_LOCK;
 }
 
 
@@ -1211,9 +1211,9 @@ HB_FUNC( INETGETHOSTS )
       return;
    }
 
-   HB_CONTEXT_UNLOCK;
+   HB_STACK_UNLOCK;
    Host = hb_getHosts( pHost->item.asString.value, NULL );
-   HB_CONTEXT_LOCK;
+   HB_STACK_LOCK;
 
    aHosts = hb_itemArrayNew( 0 );
 
@@ -1424,7 +1424,7 @@ HB_FUNC( INETACCEPT )
 
    HB_SOCKET_ZERO_ERROR( Socket );
 
-   HB_CONTEXT_UNLOCK;
+   HB_STACK_UNLOCK;
    /* Connection incoming */
    if( hb_selectReadSocket( Socket ) )
    {
@@ -1447,7 +1447,7 @@ HB_FUNC( INETACCEPT )
       HB_SOCKET_SET_ERROR2( NewSocket, -1, "Timeout" );
    }
    
-   HB_CONTEXT_LOCK;
+   HB_STACK_LOCK;
    
    if( NewSocket->com == -1 )
    {
@@ -1520,9 +1520,9 @@ HB_FUNC( INETCONNECT )
    Socket->remote.sin_port= iPort;
    Socket->remote.sin_addr.s_addr = (*(unsigned int *)Host->h_addr_list[0]);
 
-   HB_CONTEXT_UNLOCK;
+   HB_STACK_UNLOCK;
    hb_socketConnect( Socket );
-   HB_CONTEXT_LOCK;
+   HB_STACK_LOCK;
 
 ret:
    if ( pSocket == NULL )
@@ -1581,9 +1581,9 @@ HB_FUNC( INETCONNECTIP )
    Socket->remote.sin_port= iPort;
    Socket->remote.sin_addr.s_addr = inet_addr( pHost->item.asString.value );
 
-   HB_CONTEXT_UNLOCK;
+   HB_STACK_UNLOCK;
    hb_socketConnect( Socket );
-   HB_CONTEXT_LOCK;
+   HB_STACK_LOCK;
 
 ret:
    if ( pSocket == NULL )
@@ -1796,7 +1796,7 @@ HB_FUNC( INETDGRAMRECV )
 
    HB_SOCKET_ZERO_ERROR( Socket );
 
-   HB_CONTEXT_UNLOCK;
+   HB_STACK_UNLOCK;
    iLen = -2;
    if( hb_selectReadSocket( Socket ) )
    {
@@ -1804,7 +1804,7 @@ HB_FUNC( INETDGRAMRECV )
             (struct sockaddr *) &Socket->remote, &iDtLen );
    }
 
-   HB_CONTEXT_LOCK;
+   HB_STACK_LOCK;
    
    if( iLen == -2 )
    {

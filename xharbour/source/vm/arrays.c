@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.47 2003/02/22 05:54:57 jonnymind Exp $
+ * $Id: arrays.c,v 1.48 2003/02/26 05:36:09 jonnymind Exp $
  */
 
 /*
@@ -1362,7 +1362,6 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromStack(%iu)", uiLen));
 
    /* JC1: prevent being interrupted/killed and prevents GC from taking pBaseArray*/
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
    pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
    pArray->item.asArray.value = pBaseArray;
    pArray->type = HB_IT_ARRAY;
@@ -1388,8 +1387,6 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
       hb_itemCopy( pBaseArray->pItems + uiPos, hb_stackItemFromTop( uiPos - uiLen ) );
    }
    
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-
    return pArray;
 }
 
@@ -1398,8 +1395,6 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    PHB_ITEM pArray;
    PHB_BASEARRAY pBaseArray;
    USHORT uiPos, uiPCount;
-
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
 
    pArray = hb_itemNew( NULL );
    uiPCount = (*pBase)->item.asSymbol.paramcnt;
@@ -1441,7 +1436,6 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
 
    pArray->item.asArray.value = pBaseArray;
 
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
    /*Notice: the thread could still be killed HERE, causing a memory leak */
    
    return pArray;
@@ -1454,8 +1448,6 @@ PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase )
    USHORT uiPos, uiPCount;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
-
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
 
    pArray = hb_itemNew( NULL );
    uiPCount = (*pBase)->item.asSymbol.paramcnt;
@@ -1497,7 +1489,6 @@ PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase )
    }
 
    pArray->item.asArray.value = pBaseArray;
-   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
    /*Notice: the thread could still be killed HERE, causing a memory leak */
    return pArray;
@@ -1509,8 +1500,6 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) Cargo;
 
    HB_TRACE( HB_TR_INFO, ( "hb_arrayReleaseGarbage( %p )", pBaseArray ) );
-
-   //HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    /* Release object tree as needed */
    if( pBaseArray->puiClsTree )

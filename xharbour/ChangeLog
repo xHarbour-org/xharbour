@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.814 2003/03/07 23:31:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.815 2003/03/08 01:48:28 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,31 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-08 03:10 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/hbstack.h
+  * include/thread.h
+  * source/vm/thread.c
+    % HB context has been removed. On Multithreading, stack 
+      is incorporating the whole context data now.
+    ! Partially ported MT new architecture to windows. Now MTGC and
+      MTTest are working without fail. There are still some issue to
+      fix, though.
+
+  * source/vm/arrays.c
+  * source/vm/classes.c
+  * source/vm/estack.c
+  * source/vm/extend.c
+  * source/vm/fastitem.c
+  * source/vm/fm.c
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+  * source/vm/inet.c
+  * source/rtl/idle.c
+    ! MT STACK Optimization was missing due to a mistyping in #define
+ 
+  * source/rtl/regex.c
+    ! regex was not compiling under linux.
+  
 2003-03-07 22:30 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
   * include/hbapirdd.h
   * source/rdd/dbcmd.c

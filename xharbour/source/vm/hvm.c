@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.173 2003/03/07 05:59:46 ronpinkas Exp $
+ * $Id: hvm.c,v 1.174 2003/03/07 06:06:34 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,7 @@
  */
 
 /*JC1: say we are going to optimze MT stack */
-#define HB_THREAD_OPTMIZE_STACK
+#define HB_THREAD_OPTIMIZE_STACK
 
 #ifndef __MPW__
    #ifdef HB_OS_DARWIN
@@ -333,7 +333,6 @@ void hb_vmDoInitRdd( void )
 /* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
-   HB_THREAD_STUB
 
    #if defined(HB_OS_OS2)
       EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
@@ -502,9 +501,6 @@ void HB_EXPORT hb_vmQuit( void )
 
    //printf( "\nvmQuit()\n" );
 
-   #ifdef HB_THREAD_SUPPORT
-       hb_threadExit();
-   #endif
    //printf( "After Thread\n" );
 
    #ifdef HB_MACRO_STATEMENTS
@@ -574,7 +570,10 @@ void HB_EXPORT hb_vmQuit( void )
    hb_memvarsFree();    /* free memory allocated for memvars table */
    //printf( "After memvarsFree\n" );
 
+#ifndef HB_THREAD_SUPPORT
    hb_stackFree();
+#endif
+
    //printf( "After stackFree\n" );
 
    /* hb_dynsymLog(); */
@@ -587,6 +586,10 @@ void HB_EXPORT hb_vmQuit( void )
 
    hb_traceExit();
    //printf( "After traceExit\n" );
+
+#ifdef HB_THREAD_SUPPORT
+   hb_threadExit();
+#endif
 
    exit( s_byErrorLevel );
 }
@@ -662,10 +665,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       }
 #endif
       /* JC1: we can proceed here only if not in garbage collecting */
-#ifdef HB_THREAD_SUPPORT
+#if defined(HB_THREAD_SUPPORT)
       if ( iCount == 0 )
       {
-         HB_CONTEXT_LOCK;
+         HB_STACK_LOCK;
       }
       iCount++;
 #endif
@@ -1180,7 +1183,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              * *** NOTE!!! Return!!!
              */
             /* JC1: now we can safely test for cancellation & tell garbage we are ready*/
-            HB_CONTEXT_UNLOCK;
+            HB_STACK_UNLOCK;
             return;
 
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
@@ -2460,15 +2463,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_errInternal( HB_EI_VMBADOPCODE, NULL, NULL, NULL );
             break;
       }
-      /* JC1: now we can safely test for cancellation & tell garbage we are ready*/
-      #ifdef HB_THREAD_SUPPORT
-         if ( iCount == 20 )
-         {
-            HB_CONTEXT_UNLOCK;
-            iCount = 0;
-         }
-      //printf( "Count: %d\r\n", hb_runningContexts.content.asLong );
-      #endif
 
       if( s_uiActionRequest )
       {
@@ -2494,22 +2488,41 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                 */
                s_uiActionRequest = 0;
             }
-            else
+            else 
+            {
+               HB_STACK_UNLOCK;
                break;
+            }
          }
          else if( s_uiActionRequest & HB_QUIT_REQUESTED )
+         {
+            HB_STACK_UNLOCK;
             break;
+         }
          else if( s_uiActionRequest & HB_ENDPROC_REQUESTED )
          {
             /* request to stop current procedure was issued
              * (from macro evaluation)
              */
             s_uiActionRequest = 0;
+            HB_STACK_UNLOCK;
             break;
          }
       }
+      /* JC1: now we can safely test for cancellation & tell garbage we are ready*/
+      #if defined(HB_THREAD_SUPPORT)
+         if ( iCount == 20 )
+         {
+            HB_STACK_UNLOCK;
+            iCount = 0;
+         }
+      //printf( "Count: %d\r\n", hb_runningContexts.content.asLong );
+      #endif
    }
 
+   /* No cancellation here */
+   HB_STACK_LOCK;
+   
    HB_TRACE(HB_TR_DEBUG, ("DONE hb_vmExecute(%p, %p)", pCode, pSymbols));
 
    if( pSymbols )
@@ -2533,7 +2546,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    }
 
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
-
+   
+   HB_STACK_UNLOCK;
 }
 
 /* ------------------------------- */
@@ -5884,6 +5898,7 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module sym
    if( s_fmInit )
    {
       s_fmInit = FALSE;
+      /* JC1: xinit initializes also thread, which initializes the main stack */
       hb_xinit();
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.6 2002/12/29 08:32:41 ronpinkas Exp $
+ * $Id: idle.c,v 1.7 2003/03/02 15:22:30 jonnymind Exp $
  */
 
 /*
@@ -170,9 +170,9 @@ void hb_idleState( void )
       if( hb_vm_bCollectGarbage )
       {
          hb_vm_bCollectGarbage = FALSE;
-         HB_CONTEXT_UNLOCK;
+         HB_STACK_UNLOCK;
          hb_gcCollectAll();
-         HB_CONTEXT_LOCK;
+         HB_STACK_LOCK;
          s_bIamIdle = FALSE;
          return;
       }
