@@ -9,7 +9,7 @@ PROCEDURE Main()
     aaSalary[ "Hourly" ] := 12.00
     aaSalary[ "Tax" ]  := 30.00
 
-    // Litral Syntax.
+    // Literal Syntax.
     aaContact  := { "First" => "John", "Last" => "Doe", "Phone" => "555-1212" }
 
     // OOP Syntax:
