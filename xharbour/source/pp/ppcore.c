@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.13 2002/05/04 02:05:29 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.14 2002/05/16 20:06:27 ronpinkas Exp $
  */
 
 /*
@@ -229,7 +229,7 @@ char * hb_pp_szWarnings[] =
 
 void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
 {
-   static COMMANDS sC___IIF = { 0, "IF", "(\1A00,\1B00,\1C00 )", "IIF(\1A00,\1B00,\1C00 )", NULL };
+   static COMMANDS sC___IIF = { 0, "IF", "([\1A00],[\1B00],[\1C00] )", "IIF(\1A00,\1B00,\1C00 )", NULL };
 
    HB_TRACE(HB_TR_DEBUG, ("hb_pp_SetRules()"));
 
