@@ -130,6 +130,7 @@ METHOD OnMenuCommand(oItem)
    CASE oItem:Text=="TabControl"
       oObj := ::Add(cName, TTabControl():New( self,     508, 50, 50, 200, 200 ) )
       oObj:AddTab( "Tab1")
+      oObj:configure()
    ENDCASE
 
   RETURN(NIL)

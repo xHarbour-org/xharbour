@@ -89,9 +89,12 @@ METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp,nPos)
    rbBand:fMask      := IFNIL(nMask,RBBIM_TEXT+RBBIM_STYLE +RBBIM_CHILDSIZE+RBBIM_SIZE+RBBIM_CHILD,nMask)
    rbBand:fStyle     := IFNIL(nStyle,RBBS_GRIPPERALWAYS+RBBS_NOVERT,nStyle)
    rbBand:hwndChild  := IFNIL(hChild,0,hChild)
+   
    rbBand:cxMinChild := IFNIL(cxMin,aRect[3]-aRect[1],cxMin)
    rbBand:cyMinChild := IFNIL(cyMin,aRect[4]-aRect[2],cyMin)
+   
    rbBand:cx         := IFNIL(cx,GetClientRect(::Parent:handle)[3],cx)
+   
    rbBand:lpText     := IFNIL(cText,"Test",cText)
    rbBand:hbmBack    := IFNIL(hBmp,0,hBmp)
 

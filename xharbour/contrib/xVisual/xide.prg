@@ -14,8 +14,8 @@ static oApp
 //-------------------------------------------------------------------------------------------
 
 FUNCTION Main
-   local oTool, oRebar
-   LOCAL hImg,hBmp
+   local oTool, oRebar, n
+   LOCAL hImg1,hImg2,hBmp,aStdTab
    
    oApp := Application():Initialize()
    WITH OBJECT oApp
@@ -23,6 +23,7 @@ FUNCTION Main
       WITH OBJECT :CreateFrame( 'MainFrame', MainFrame() )
          :WindowMenu := TMenu():New()
          :SetStyle( WS_THICKFRAME, .F. )
+         :SetStyle( WS_MAXIMIZEBOX, .F. )
          WITH OBJECT :WindowMenu
             :AddPopup('&Test')
 
@@ -52,17 +53,9 @@ FUNCTION Main
          :WindowMenu:Gray( 109 )
          :WindowMenu:Gray( 110 )
 
-//----------------------------------------------------------------------------------------------
-//   IMAGELIST CLASS UNDER CONSTRUCTION
-//----------------------------------------------------------------------------------------------
-
-         hImg := ImageList_Create( 20, 20, ILC_COLORDDB+ILC_MASK )
-         hBmp := LoadImage( hInstance(), "XMAKE", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
-         ImageList_AddMasked( hImg, hBmp, RGB( 0, 255, 255 ) )
-
          WITH OBJECT :Add('Rebar', TRebar():New( oApp:MainFrame ) )
-            WITH OBJECT :Add( 'Tools', TToolBar():New( oApp:MainFrame:Rebar, 444, 14, , , 26, 26, 20, 20 ) )
-               :AddButton( 0, 500,,,,  ,,'New Project' )
+            WITH OBJECT :Add( 'Tools', TToolBar():New( oApp:MainFrame:Rebar, 444, 15, , , 26, 26, 20, 20 ) )
+               :AddButton( 0, 10,,,,  ,,'New Project' )
                :AddButton( 1, 11,,,,  ,,'Open Project' )
                :AddButton( 2, 12,,,,  ,,'Properties' )
                :AddButton( 3, 13,,,,  ,,'Build Application' )
@@ -76,24 +69,54 @@ FUNCTION Main
                :AddButton(11, 21,,,,  ,,'Compile to PPO' )
                :AddButton(12, 22,,,,  ,,'View' )
                :AddButton(14, 23,,,,  ,,'Files')
-               SendMessage( :handle, TB_SETIMAGELIST, 0, hImg )
+
+               // ----------------------------------------------------   set imagelist
+               hImg1:= ImageList_Create( 20, 20, ILC_COLORDDB+ILC_MASK )
+               hBmp := LoadImage( hInstance(), "XMAKE", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
+               ImageList_AddMasked( hImg1, hBmp, RGB( 0, 255, 255 ) )
+               DeleteObject(hBmp)
+               SendMessage( :handle, TB_SETIMAGELIST, 0, hImg1 )
+               //---------------------------------------------------------------------
             END
             :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT + RBBS_BREAK , :Tools:handle, 110, 26, 150 , "", NIL )
 
             WITH OBJECT :Add( 'Tabs', TTabControl():New( oApp:MainFrame:Rebar, 445,  0,  0,  0,  0) )
-               :AddTab( "Standard")
-               :AddTab( "Aditional")
-               :AddTab( "Win32")
-               :AddTab( "System")
-               :AddTab( "Internet")
-               :AddTab( "Dialogs")
-               :AddTab( "Win 3.1")
-               :AddTab( "Samples")
-               :AddTab( "Activex")
-               :Configure()
+               :AddTab( "Standard" )
+               :AddTab( "Aditional" )
+               :AddTab( "Win32" )
+               :AddTab( "System" )
+               :AddTab( "Internet" )
+               :AddTab( "Dialogs" )
+               :AddTab( "Win 3.1" )
+               :AddTab( "Samples" )
+               :AddTab( "Activex" )
             END
-            :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT + RBBS_BREAK, :Tabs:handle, 650, 65, , "", NIL )
+            :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT + RBBS_BREAK, :Tabs:handle, 650, 60, , "", NIL )
+            :Tabs:Configure()
+            
+            WITH OBJECT :Tabs:Tabs[1]
+               WITH OBJECT :Add( 'TabBand', TRebar():New( oApp:MainFrame:Rebar:Tabs:Tabs[1] ) )
+                  :SetStyle( WS_BORDER, .F. )
+                  WITH OBJECT :Add( 'TabTools', TToolBar():New( oApp:MainFrame:Rebar:Tabs:Tabs[1]:TabBand, 444, 14, , , 26, 26, 20, 20 ) )
 
+                     aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
+                                  'CheckBox', 'RadioButton', 'Listbox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
+                                  'RadioGroup', 'Panel', 'ActionList' }
+                     for n:=0 to 16
+                         :AddButton(n,100+n,,TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP,,,,aStdTab[n+1] )
+                     next
+                     
+                     // ----------------------------------------------------   set imagelist
+                     hImg2:= ImageList_Create( 28, 28, ILC_COLORDDB+ILC_MASK )
+                     hBmp := LoadImage( hInstance(), "STDTAB", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
+                     ImageList_AddMasked( hImg2, hBmp, RGB( 0, 255, 255 ) )
+                     DeleteObject(hBmp)
+                     SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
+                     //---------------------------------------------------------------------
+                  END
+                  :AddBand( NIL, RBBS_NOVERT, :TabTools:handle, 100, 34,  , "", NIL )
+               END
+            END
          END
          
          WITH OBJECT :Add('Status',  TStatusBar():New( oApp:MainFrame, 'StatusBar', 1001 ) ) 

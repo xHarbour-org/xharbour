@@ -26,7 +26,7 @@ CLASS TTabControl FROM TControl
    DATA Procs AS ARRAY HIDDEN
    DATA nCurSel
    DATA Cargo
-
+   DATA ntProc
    METHOD New() CONSTRUCTOR
    METHOD AddTab()
    METHOD InsertTab()
@@ -59,8 +59,9 @@ CLASS TTabControl FROM TControl
    METHOD SetPadding()
    METHOD SetToolTips()
    METHOD SetUnicodeFormat()
-   METHOD OnNotify( nwParam, nlParam ) INLINE ::TabNotify( nwParam, nlParam )
    METHOD TabNotify()
+   METHOD OnCreate() INLINE ::CreateTabs()
+   METHOD CreateTabs()
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
@@ -89,42 +90,33 @@ METHOD New( oParent, nId, nL, nT, nW, nH, nSel ) CLASS TTabControl
    ::nCurSel := IF(nSel==NIL,1,nSel)
 
    ::Msgs    := {WM_NOTIFY,WM_CTLCOLORDLG}
-   
+
 RETURN( super:new( oParent ))
 
 *-----------------------------------------------------------------------------*
 
-FUNCTION _TempPageProc(nMsg)
-   IF nMsg==WM_CTLCOLORDLG
-      return(GetStockObject(NULL_BRUSH))
-   END
+METHOD CreateTabs() CLASS TTabControl
+   ::ntProc := SetProcedure( ::Parent:handle,;
+               {|hWnd,nMsg,nwParam,nlParam|::TabNotify( nMsg,nwParam, nlParam )},{WM_NOTIFY} )
 
-   RETURN(0)
+return( super:OnCreate() )
 
 *-----------------------------------------------------------------------------*
 
-METHOD TabNotify( nwParam, nlParam ) CLASS TTabControl
-
-   LOCAL tnhdr
-
-   LOCAL n,nSel
-   LOCAL lVisible
-   LOCAL lEnabled
-   LOCAL nLen
-
+METHOD TabNotify( nMsg,nwParam, nlParam ) CLASS TTabControl
+   LOCAL nSel
    nSel:=TabCtrl_GetCurSel( ::handle )+1
    IF ::nCursel <> nSel
-      ShowWindow(::Tabs[::nCurSel], SW_HIDE)
+      ShowWindow(::Tabs[::nCurSel]:handle, SW_HIDE)
       ::nCurSel:=nSel
-      ShowWindow(::Tabs[::nCurSel], SW_SHOW)
+      ShowWindow(::Tabs[::nCurSel]:handle, SW_SHOW)
    endif
-
-   Return( super:OnNotify() )
+   return(CallWindowProc( ::ntProc, ::parent:handle,nMsg,nwParam, nlParam ))
 
 *-----------------------------------------------------------------------------*
 
 METHOD AddTab(cText,cRes,bProc,nImgPos) CLASS TTabControl
-LOCAL hTab
+   LOCAL hTab
    if (hTab:=TabCtrl_AddItem(::handle,cText,nImgPos)) > -1
       AADD(::Dlgs,cRes)
       AADD(::Tabs,NIL )
@@ -157,8 +149,8 @@ METHOD DeleteTab(nPos) CLASS TTabControl
       ENDIF
       TabCtrl_DeleteItem(nPos-1)
       ADel(::Dlgs,nPos,.t.)
-      if isWindow(::Tabs[nPos])
-         DestroyWindow(::Tabs[nPos])
+      if isWindow(::Tabs[nPos]:handle)
+         DestroyWindow(::Tabs[nPos]:handle)
       endif
       ADel(::Tabs,nPos,.t.)
       ADEL(::Procs,nPos,.T.)
@@ -192,31 +184,22 @@ METHOD Configure() CLASS TTabControl
    ENDIF
 
    aPt:={acRect[1],acRect[2]}
-   ClientToScreen(::handle   ,aPt)
-   ScreenToClient(::Parent:handle,aPt)
    acRect[1]:=aPt[1]
    acRect[2]:=aPt[2]
 
    FOR i:=1 TO LEN(::Dlgs)
-      IF ::Dlgs[i] != NIL .AND. EMPTY(::Tabs[i])
+      IF /*::Dlgs[i] != NIL .AND.*/ EMPTY(::Tabs[i])
 
-       //  bBlock:=IF(valtype(::Procs[i])== "B", ::Procs[i], {|| _TempPageProc()} )
+         ::Tabs[i]:=TabPage():New( self )
+         MoveWindow(::Tabs[i]:handle,acRect[1],acRect[2]+acRect[4],aTab[3]-6,aTab[4]-acRect[2]-acRect[4]-4,.T.)
 
-         hCtrl:=CreatePage(::Dlgs[i],::Parent:handle,::Procs, i )
-         ::Tabs[i]:=hCtrl
-         MoveWindow(hCtrl,acRect[1]+4,acRect[2]+acRect[4]+4,aTab[3]-8,aTab[4]-acRect[2]-acRect[4]-1,.F.)
          IF i<>::nCurSel
-            ShowWindow(hCtrl,SW_HIDE)
+            ShowWindow(::Tabs[i]:handle,SW_HIDE)
          endif
       endif
    next
 
    RETURN(self)
-
-*-----------------------------------------------------------------------------*
-Static Function CreatePage(acRes,hParent,aProcs, i)
-   Local bBlock:=IF(valtype( aProcs[i])== "B", aProcs[i], {|nMsg| _TempPageProc(nMsg)} )
-   RETURN CreateDialog( , acRes, hParent, bBlock )
 
 *-----------------------------------------------------------------------------*
 METHOD AdjustRect(lDisplay,aRect) CLASS TTabControl
@@ -372,3 +355,17 @@ METHOD SetUnicodeFormat( lUnicode ) CLASS TTabControl
    RETURN TabCtrl_SetUnicodeFormat( ::handle, lUnicode )
 
 *-----------------------------------------------------------------------------*
+
+
+CLASS TabPage FROM TPanel
+   METHOD New() CONSTRUCTOR
+ENDCLASS
+
+METHOD New( oParent ) CLASS TabPage
+   super:new( oParent )
+   ::width := 10
+   ::height:= 10
+   ::style := WS_CHILD + WS_VISIBLE
+   ::modal := .F.
+   ::Create()
+return( self )
