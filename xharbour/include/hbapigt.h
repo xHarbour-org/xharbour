@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.2 2002/09/20 19:11:38 map Exp $
+ * $Id: hbapigt.h,v 1.3 2002/10/22 02:11:47 paultucker Exp $
  */
 
 /*
@@ -319,6 +319,14 @@ extern void   hb_setkeyExit( void );
 /* Private interface listed below. these are common to all platforms */
 
 /* none as of yet */
+
+/* JC1: Supporting Screen Output lock also from other modules */
+#ifdef HB_THREAD_SUPPORT
+
+void hb_consoleLock();
+void hb_consoleUnlock();
+
+#endif
 
 #if defined(HB_EXTERN_C)
 }
