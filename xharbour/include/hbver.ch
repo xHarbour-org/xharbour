@@ -1,12 +1,12 @@
 /*
- * $Id: hbver.h,v 1.52 2004/11/16 01:16:44 ronpinkas Exp $
+ * $Id$
  */
 
 /*
  * Harbour Project source code:
  * Header file for version information
  *
- * Copyright 1999 David G. Holm <dholm@jsd-llc.com>
+ * Copyright 2005 Andi Jahja <xharbour@cbn.net.id>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,25 +50,45 @@
  *
  */
 
-#ifndef HB_VER_H_
-#define HB_VER_H_
+#ifndef HB_VER_CH_
+#define HB_VER_CH_
 
-#define HB_VER_LEX "SimpLex"
-#define HB_VER_MAJOR    0       /* Major version number */
-#define HB_VER_MINOR    99      /* Minor version number */
-#define HB_VER_REVISION 3       /* Revision number */
+#define _HB_VER_MAJOR                1  /* int   */
+#define _HB_VER_MINOR                2  /* int   */
+#define _HB_VER_REVISION             3  /* int   */
+#define _HB_VER_LEX                  4  /* char  */
+#define _HB_VER_AS_STRING            5  /* char  */
+#define _HB_PCODE_VER                6  /* int   */
+#define _HB_VER_COMPILER             7  /* char  */
+#define _HB_VER_PLATFORM             8  /* char  */
+#define _HB_VER_BUILD_DATE           9  /* char  */
+#define _HB_VER_BUILD_TIME          10  /* char  */
+#define _HB_VER_LENTRY              11  /* char  */
+#define _HB_VER_CHLCVS              12  /* char  */
+#define _HB_VER_C_USR               13  /* char  */
+#define _HB_VER_L_USR               14  /* char  */
+#define _HB_VER_PRG_USR             15  /* char  */
+#define _HB_EXTENSION               16  /* bool  */
+#define _HB_C52_UNDOC               17  /* bool  */
+#define _HB_C52_STRICT              18  /* bool  */
+#define _HB_COMPAT_C53              19  /* bool  */
+#define _HB_COMPAT_XPP              20  /* bool  */
+#define _HB_COMPAT_VO               21  /* bool  */
+#define _HB_COMPAT_FLAGSHIP         22  /* bool  */
+#define _HB_COMPAT_FOXPRO           23  /* bool  */
+#define _HB_COMPAT_DBASE            24  /* bool  */
+#define _HB_HARBOUR_OBJ_GENERATION  25  /* bool  */
+#define _HB_HARBOUR_STRICT_ANSI_C   26  /* bool  */
+#define _HB_CPLUSPLUS               27  /* bool  */
+#define _HB_HARBOUR_YYDEBUG         28  /* bool  */
+#define _HB_SYMBOL_NAME_LEN         29  /* int   */
+#define _HB_MULTITHREAD             30  /* bool  */
+#define _HB_VM_OPTIMIZATION         31  /* int   */
+#define _HB_LANG_ID                 32  /* char  */
+#define _HB_ARRAY_MODE              33  /* int   */
+#define _HB_CREDITS                 34  /* array */
+#define _HB_VER_LAST                35  /* last  */
 
-/* TOFIX: Ideally these should be generated dynamically, until
-          then, they should be updated by the builder. [vszakats] */
+/* #include "hb_ver.ch" */
 
-
-#define HB_VER_LENTRY   "2004-11-15 17:11 UTC-0800 Ron Pinkas <ron at xharbour.com>"
-#define HB_VER_CHLCVS   "ChangeLog,v 1.3603"
-#define HB_VER_C_USR    ""
-#define HB_VER_L_USR    ""
-#define HB_VER_PRG_USR  ""
-
-#include "hbver.ch"
-/* #include "hb_ver_.h" */
-
-#endif /* HB_VER_H_ */
+#endif /* HB_VER_CH_ */

@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.6 2004/09/05 22:52:39 peterrees Exp $
+ * $Id: version.c,v 1.7 2004/12/08 01:01:08 peterrees Exp $
  */
 
 /*
@@ -63,8 +63,14 @@
 
 #include "hbapi.h"
 #include "hbfast.h"
+#include "hbinit.h"
+#include "hbapilng.h"
+#include "hbver.h"
 
 extern char * hb_verPCode( void );
+extern void hb_ParseLine( PHB_ITEM pReturn, char * szText, int iDelimiter, int * iWord );
+extern char *hb_credits( void );
+extern int hb_arrayMode( void );
 
 HB_FUNC( OS )
 {
@@ -89,3 +95,131 @@ HB_FUNC( HB_PCODEVER )
    char * pszPCodeVersion = hb_verPCode();
    hb_retcAdopt( pszPCodeVersion );
 }
+
+HB_FUNC( HB_BUILDDATE )
+{
+   char *szBldDate = hb_builddate() ;
+   hb_retcAdopt( szBldDate );
+}
+
+HB_FUNC( HB_BUILDINFO )
+{
+   PHB_ITEM pQuery = hb_param( 1, HB_IT_INTEGER );
+   HB_ITEM hbInfo;
+   HB_ITEM Return;
+   int iWords = 0;
+   int ui;
+   HB_ITEM Temp;
+   char * pszBuildInfo = hb_verBuildInfo( FALSE );
+
+   ( &hbInfo )->type = HB_IT_NIL;
+   ( &Return )->type = HB_IT_NIL;
+   ( &Temp   )->type = HB_IT_NIL;
+
+   hb_arrayNew( &hbInfo, 0 );
+
+   hb_ParseLine( &hbInfo, pszBuildInfo, '\t', &iWords );
+   hb_xfree( pszBuildInfo );
+
+   hb_arrayNew( &Return, iWords );
+
+   for ( ui=0; ui<iWords; ui++ )
+   {
+      char * szInfo = hb_arrayGetC( &hbInfo, ui + 1 );
+      int iLen = strlen( szInfo );
+
+      if( hb_strnicmp( szInfo, "yes", 3 ) == 0 )
+      {
+         hb_arraySetForward( &Return, ui + 1, hb_itemPutL( &Temp, TRUE ) );
+      }
+      else if( hb_strnicmp( szInfo, "no", 2 ) == 0 )
+      {
+         hb_arraySetForward( &Return, ui + 1, hb_itemPutL( &Temp, FALSE ) );
+      }
+      else if ( iLen > 5 && ( szInfo[iLen-1] == ')' && szInfo[iLen-2] == 'm' && szInfo[iLen-3] == 'u' && szInfo[iLen-4] == 'n' && szInfo[iLen-5] == '(') )
+      {
+         szInfo[ iLen - 5 ] = 0;
+         hb_arraySetForward( &Return, ui + 1, hb_itemPutNI( &Temp, atoi( szInfo ) ) );
+      }
+      else
+      {
+         hb_arraySetForward( &Return, ui + 1, hb_itemPutC( &Temp, szInfo ) );
+      }
+
+      hb_xfree( szInfo );
+   }
+
+   // add info on MT and VM Optimization
+   {
+      PHB_ITEM pMT = hb_itemDoC( "HB_MULTITHREAD", 0, NULL, NULL );
+      BOOL lMT = pMT->item.asLogical.value;
+      PHB_ITEM pOpt = hb_itemDoC( "HB_VMMODE", 0, NULL, NULL );
+      int iOpt = pOpt->item.asInteger.value;
+
+      hb_arrayAddForward( &Return, hb_itemPutL( &Temp, lMT ) );
+      hb_arrayAddForward( &Return, hb_itemPutNI( &Temp, iOpt ) );
+
+      hb_itemRelease( pMT );
+      hb_itemRelease( pOpt );
+   }
+
+   // Default Language
+   hb_arrayAddForward( &Return, hb_itemPutC( &Temp, hb_langID() ) );
+
+   // Array Mode, 0 = Counter, 1 = Owner
+   hb_arrayAddForward( &Return, hb_itemPutNI( &Temp, hb_arrayMode() ) );
+
+   // Contributors
+   {
+      HB_ITEM Credits;
+      char *szCredits = hb_credits();
+
+      ( &Credits )->type = HB_IT_NIL;
+      hb_arrayNew( &Credits, 0 );
+      hb_ParseLine( &Credits, szCredits, '\n', &iWords );
+      hb_arrayAddForward( &Return, &Credits );
+   }
+
+   if( pQuery )
+   {
+      int iQuery = pQuery->item.asInteger.value;
+
+      if( iQuery < _HB_VER_LAST )
+      {
+         HB_ITEM Query;
+	 ( &Query )->type = HB_IT_NIL;
+         hb_arrayGet( &Return, iQuery, &Query );
+         hb_itemReturn( &Query );
+      }
+   }
+   else
+   {
+      hb_itemReturn( &Return );
+   }
+
+   hb_itemClear( &hbInfo );
+
+}
+
+#define __PRG_SOURCE__ __FILE__
+HB_FUNC_EXTERN( HB_VMMODE );
+HB_FUNC_EXTERN( HB_MULTITHREAD );
+#undef HB_PRG_PCODE_VER
+#define HB_PRG_PCODE_VER HB_PCODE_VER
+HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_HBVER )
+{ "HB_VMMODE", HB_FS_PUBLIC, {HB_FUNCNAME( HB_VMMODE )}, NULL },
+{ "HB_MULTITHREAD", HB_FS_PUBLIC, {HB_FUNCNAME( HB_MULTITHREAD )}, NULL }
+HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_HBVER )
+
+#if defined(HB_PRAGMA_STARTUP)
+   #pragma startup hb_vm_SymbolInit_HBVER
+#elif defined(HB_MSC_STARTUP)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM hb_vm_auto_SymbolInit_HBVER = hb_vm_SymbolInit_HBVER;
+   #pragma data_seg()
+#endif

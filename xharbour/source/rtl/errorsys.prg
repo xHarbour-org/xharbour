@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.43 2005/03/06 23:43:20 andijahja Exp $
+ * $Id: errorsys.prg,v 1.44 2005/03/07 10:17:28 andijahja Exp $
  */
 
 /*
@@ -595,16 +595,4 @@ HB_FUNC( SETUNHANDLEDEXCEPTIONFILTER )
 #pragma ENDDUMP
 
 #endif
-
-#pragma BEGINDUMP
-
-#include "hbapi.h"
-
-HB_FUNC( HB_BUILDDATE )
-{
-   char *szBldDate = hb_builddate() ;
-   hb_retcAdopt( szBldDate );
-}
-
-#pragma ENDDUMP
 *+ EOF: ERRORSYS.PRG

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.91 2004/11/21 21:43:44 druzus Exp $
+ * $Id: harbour.c,v 1.92 2005/01/02 03:37:14 guerra000 Exp $
  */
 
 /*
@@ -282,6 +282,7 @@ int main( int argc, char * argv[] )
    int iStatus = EXIT_SUCCESS;
    int i;
    BOOL bAnyFiles;
+   char *szBuildInfo;
 
    hb_comp_pOutPath = NULL;
 
@@ -305,7 +306,8 @@ int main( int argc, char * argv[] )
    if( hb_comp_bBuildInfo )
    {
       printf( "\n" );
-      hb_verBuildInfo();
+      szBuildInfo = hb_verBuildInfo( TRUE );
+      hb_xfree( szBuildInfo );
       return iStatus;
    }
 
@@ -519,11 +521,13 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
    }
 }
 
+#if 0
 ULONG hb_xquery( USHORT uiMode )
 {
    HB_SYMBOL_UNUSED( uiMode );
    return 0;
 }
+#endif
 
 void hb_conOutErr( char * pStr, ULONG ulLen )
 {

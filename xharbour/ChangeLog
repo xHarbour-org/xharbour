@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3921 2005/03/08 17:46:27 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3922 2005/03/09 02:41:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-03-09 12:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  + include/hbver.ch
+    ! defines for xHarbour build info
+
+  * include/hbver.h
+    + include hbver.ch
+
+  * source/rtl/errorsys.prg
+    - move HB_BUILDDATE to source/version.c
+
+  * source/common/hbver.c
+    + char *hb_credits( void ), list of developers
+
+  * source/rtl/version.c
+    + HB_BUILDINFO(), PRG level function for xHarbour build info
+
+  * source/vm/arrays.c
+  * source/vm/cmdarg.c
+  * source/compiler/harbour.c
+    ! neccessary modifications for build info
+
+  + tests/bldinfo.prg
+    ! test program for HB_BUILDINFO
 
 2005-03-08 17:49 UTC-0800 Ron Pinkas <Ron@xHarbour.com>
    * source/rtl/cstruct.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.25 2005/03/06 03:49:30 andijahja Exp $
+ * $Id: hbver.c,v 1.26 2005/03/06 20:53:50 andijahja Exp $
  */
 
 /*
@@ -86,6 +86,9 @@
    #include <sys/utsname.h>
 
 #endif
+
+char *hb_credits( void );
+static void hb_conOutErr_ ( char * szText, ULONG ulLen, BOOL bOut );
 
 #include <time.h>
 
@@ -645,209 +648,269 @@ char * hb_verPCode( void )
 
 }
 
-void hb_verBuildInfo( void )
+char *hb_verBuildInfo( BOOL bOut )
 {
-   hb_conOutErr( "Harbour Build Info", 0 );
-   hb_conOutErr( hb_conNewLine(), 0 );
-   hb_conOutErr( "---------------------------", 0 );
-   hb_conOutErr( hb_conNewLine(), 0 );
+   char *szBuildInfo = (char*) hb_xgrab(1024);  // Should be enough IMO
+
+   hb_xmemset( szBuildInfo, '\0', 1024 );
+
+   hb_conOutErr_( "Harbour Build Info", 0, bOut );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+   hb_conOutErr_( "---------------------------", 0, bOut );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+
+   {
+      char szLen[ 6 ];
+      sprintf( szLen, "%d", HB_VER_MAJOR );
+      hb_xstrcat( szBuildInfo, szLen, "(num)", "\t", NULL );
+      sprintf( szLen, "%d", HB_VER_MINOR );
+      hb_xstrcat( szBuildInfo, szLen, "(num)", "\t", NULL );
+      sprintf( szLen, "%d", HB_VER_REVISION);
+      hb_xstrcat( szBuildInfo, szLen, "(num)", "\t", NULL );
+      hb_xstrcat( szBuildInfo, HB_VER_LEX, "\t", NULL );
+   }
 
    {
       char * pszVersion = hb_verHarbour();
-      hb_conOutErr( "Version: ", 0 );
-      hb_conOutErr( pszVersion, 0 );
-      hb_conOutErr( hb_conNewLine(), 0 );
+      hb_conOutErr_( "Version: ", 0, bOut );
+      hb_conOutErr_( pszVersion, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_xstrcat( szBuildInfo, pszVersion, "\t", NULL );
       hb_xfree( pszVersion );
    }
 
    {
       char * pszVersion = hb_verPCode();
-      hb_conOutErr( pszVersion, 0 );
-      hb_conOutErr( hb_conNewLine(), 0 );
+      char szPCode[3];
+      sprintf( szPCode, "%d", HB_PCODE_VER );
+      hb_conOutErr_( pszVersion, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_xstrcat( szBuildInfo, szPCode, "(num)", "\t", NULL );
       hb_xfree( pszVersion );
    }
 
    {
       char * pszVersion = hb_verCompiler();
-      hb_conOutErr( "Compiler: ", 0 );
-      hb_conOutErr( pszVersion, 0 );
-      hb_conOutErr( hb_conNewLine(), 0 );
+      hb_conOutErr_( "Compiler: ", 0, bOut );
+      hb_conOutErr_( pszVersion, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_xstrcat( szBuildInfo, pszVersion, "\t", NULL );
       hb_xfree( pszVersion );
    }
 
    {
       char * pszVersion = hb_verPlatform();
-      hb_conOutErr( "Platform: ", 0 );
-      hb_conOutErr( pszVersion, 0 );
-      hb_conOutErr( hb_conNewLine(), 0 );
+      hb_conOutErr_( "Platform: ", 0, bOut );
+      hb_conOutErr_( pszVersion, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
+      hb_xstrcat( szBuildInfo, pszVersion, "\t", NULL );
       hb_xfree( pszVersion );
    }
 
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "Built on: ", 0 );
-   hb_conOutErr( __DATE__, 0 );
-   hb_conOutErr( " ", 0 );
-   hb_conOutErr( __TIME__, 0 );
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( "Built on: ", 0, bOut );
+   hb_conOutErr_( __DATE__, 0, bOut );
+   hb_xstrcat( szBuildInfo, __DATE__, "\t", NULL );
+   hb_conOutErr_( " ", 0, bOut );
+   hb_conOutErr_( __TIME__, 0, bOut );
+   hb_xstrcat( szBuildInfo, __TIME__, "\t", NULL );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "Last ChangeLog entry: ", 0 );
-   hb_conOutErr( HB_VER_LENTRY, 0 );
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( "Last ChangeLog entry: ", 0, bOut );
+   hb_conOutErr_( HB_VER_LENTRY, 0, bOut );
+   hb_xstrcat( szBuildInfo, HB_VER_LENTRY, "\t", NULL );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "ChangeLog CVS version: ", 0 );
-   hb_conOutErr( HB_VER_CHLCVS, 0 );
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( "ChangeLog CVS version: ", 0, bOut );
+   hb_conOutErr_( HB_VER_CHLCVS, 0, bOut );
+   hb_xstrcat( szBuildInfo, HB_VER_CHLCVS, "\t", NULL );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
    if( strlen( HB_VER_C_USR ) )
    {
-      hb_conOutErr( "Harbour compiler switches: ", 0 );
-      hb_conOutErr( HB_VER_C_USR, 0 );
-      hb_conOutErr( hb_conNewLine(), 0 );
+      hb_conOutErr_( "Harbour compiler switches: ", 0, bOut );
+      hb_conOutErr_( HB_VER_C_USR, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
    }
+   hb_xstrcat( szBuildInfo, HB_VER_C_USR, "\t", NULL );
 
    if( strlen( HB_VER_L_USR ) )
    {
-      hb_conOutErr( "C compiler switches: ", 0 );
-      hb_conOutErr( HB_VER_L_USR, 0 );
-      hb_conOutErr( hb_conNewLine(), 0 );
+      hb_conOutErr_( "C compiler switches: ", 0, bOut );
+      hb_conOutErr_( HB_VER_L_USR, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
    }
+   hb_xstrcat( szBuildInfo, HB_VER_L_USR, "\t", NULL );
 
    if( strlen( HB_VER_PRG_USR ) )
    {
-      hb_conOutErr( "Linker switches: ", 0 );
-      hb_conOutErr( HB_VER_PRG_USR, 0 );
-      hb_conOutErr( hb_conNewLine(), 0 );
+      hb_conOutErr_( "Linker switches: ", 0, bOut );
+      hb_conOutErr_( HB_VER_PRG_USR, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
    }
+   hb_xstrcat( szBuildInfo, HB_VER_PRG_USR, "\t", NULL );
 
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "Harbour extensions: ", 0 );
+   hb_conOutErr_( "Harbour extensions: ", 0, bOut );
 #if defined( HB_EXTENSION )
-   hb_conOutErr( "Yes", 0 );
+   hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
+   hb_conOutErr_( "Yes", 0, bOut );
 #else
-   hb_conOutErr( "No", 0 );
+   hb_conOutErr_( "No", 0, bOut );
+   hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "CA-Clipper 5.2e undocumented: ", 0 );
+   hb_conOutErr_( "CA-Clipper 5.2e undocumented: ", 0, bOut );
 #if defined( HB_C52_UNDOC )
-   hb_conOutErr( "Yes", 0 );
+   hb_conOutErr_( "Yes", 0, bOut );
+   hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr( "No", 0 );
+   hb_conOutErr_( "No", 0, bOut );
+   hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "CA-Clipper 5.2e strict compatibility: ", 0 );
+   hb_conOutErr_( "CA-Clipper 5.2e strict compatibility: ", 0, bOut );
 #if defined( HB_C52_STRICT )
-   hb_conOutErr( "Yes", 0 );
+   hb_conOutErr_( "Yes", 0, bOut );
+   hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr( "No", 0 );
+   hb_conOutErr_( "No", 0, bOut );
+   hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "CA-Clipper 5.3x compatible extensions: ", 0 );
+   hb_conOutErr_( "CA-Clipper 5.3x compatible extensions: ", 0, bOut );
 #if defined( HB_COMPAT_C53 )
-   hb_conOutErr( "Yes", 0 );
+   hb_conOutErr_( "Yes", 0, bOut );
+   hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr( "No", 0 );
+   hb_conOutErr_( "No", 0, bOut );
+   hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "Alaska Xbase++ compatible extensions: ", 0 );
+   hb_conOutErr_( "Alaska Xbase++ compatible extensions: ", 0, bOut );
 #if defined( HB_COMPAT_XPP )
-   hb_conOutErr( "Yes", 0 );
+   hb_conOutErr_( "Yes", 0, bOut );
+   hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr( "No", 0 );
+   hb_conOutErr_( "No", 0, bOut );
+   hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "CA-Visual Objects compatible extensions: ", 0 );
+   hb_conOutErr_( "CA-Visual Objects compatible extensions: ", 0, bOut );
 #if defined( HB_COMPAT_VO )
-   hb_conOutErr( "Yes", 0 );
+   hb_conOutErr_( "Yes", 0, bOut );
+   hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr( "No", 0 );
+   hb_conOutErr_( "No", 0, bOut );
+   hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "Multisoft Flagship compatible extensions: ", 0 );
+   hb_conOutErr_( "Multisoft Flagship compatible extensions: ", 0, bOut );
 #if defined( HB_COMPAT_FLAGSHIP )
-   hb_conOutErr( "Yes", 0 );
+   hb_conOutErr_( "Yes", 0, bOut );
+   hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr( "No", 0 );
+   hb_conOutErr_( "No", 0, bOut );
+   hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "Microsoft FoxPro compatible extensions: ", 0 );
+   hb_conOutErr_( "Microsoft FoxPro compatible extensions: ", 0, bOut );
 #if defined( HB_COMPAT_FOXPRO )
-   hb_conOutErr( "Yes", 0 );
+   hb_conOutErr_( "Yes", 0, bOut );
+   hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr( "No", 0 );
+   hb_conOutErr_( "No", 0, bOut );
+   hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "dBase compatible extensions: ", 0 );
+   hb_conOutErr_( "dBase compatible extensions: ", 0, bOut );
 #if defined( HB_COMPAT_DBASE )
-   hb_conOutErr( "Yes", 0 );
+   hb_conOutErr_( "Yes", 0, bOut );
+   hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr( "No", 0 );
+   hb_conOutErr_( "No", 0, bOut );
+   hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "Object file generation support: ", 0 );
+   hb_conOutErr_( "Object file generation support: ", 0, bOut );
 #if defined( HARBOUR_OBJ_GENERATION ) || defined( HB_BACK_END )
-   hb_conOutErr( "Yes", 0 );
+   hb_conOutErr_( "Yes", 0, bOut );
+   hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr( "No", 0 );
+   hb_conOutErr_( "No", 0, bOut );
+   hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "ANSI C usage: ", 0 );
+   hb_conOutErr_( "ANSI C usage: ", 0, bOut );
 #if defined( HARBOUR_STRICT_ANSI_C )
-   hb_conOutErr( "Strict", 0 );
+   hb_conOutErr_( "Strict", 0, bOut );
+   hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr( "Non strict", 0 );
+   hb_conOutErr_( "Non strict", 0, bOut );
+   hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "C++ mode: ", 0 );
+   hb_conOutErr_( "C++ mode: ", 0, bOut );
 #if defined(__cplusplus)
-   hb_conOutErr( "On", 0 );
+   hb_conOutErr_( "On", 0, bOut );
+   hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr( "Off", 0 );
+   hb_conOutErr_( "Off", 0, bOut );
+   hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "Compiler YACC debug mode: ", 0 );
+   hb_conOutErr_( "Compiler YACC debug mode: ", 0, bOut );
 #if defined( HARBOUR_YYDEBUG )
-   hb_conOutErr( "On", 0 );
+   hb_conOutErr_( "On", 0, bOut );
+   hb_xstrcat( szBuildInfo, "yes", "\t", NULL );
 #else
-   hb_conOutErr( "Off", 0 );
+   hb_conOutErr_( "Off", 0, bOut );
+   hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
 #if 0
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
-   hb_conOutErr( "Memory tracing and statistics: ", 0 );
-   hb_conOutErr( hb_xquery( HB_MEM_USEDMAX ) != 0 ? "On" : "Off", 0 );
+   hb_conOutErr_( "Memory tracing and statistics: ", 0, bOut );
+   hb_conOutErr_( hb_xquery( HB_MEM_USEDMAX ) != 0 ? "On" : "Off", 0, bOut );
 #endif
 /*
 #if defined( HB_FM_STATISTICS )
-   hb_conOutErr( "On", 0 );
+   hb_conOutErr_( "On", 0, bOut );
 #else
-   hb_conOutErr( "Off", 0 );
+   hb_conOutErr_( "Off", 0, bOut );
 #endif
 */
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
    {
       char buffer[ 64 ];
+      char szLen[ 3 ];
+      sprintf( szLen, "%d", HB_SYMBOL_NAME_LEN );
       sprintf( buffer, "Maximum symbol name length: %i", HB_SYMBOL_NAME_LEN );
-      hb_conOutErr( buffer, 0 );
-      hb_conOutErr( hb_conNewLine(), 0 );
+      hb_xstrcat( szBuildInfo, szLen, "(num)", NULL );
+      hb_conOutErr_( buffer, 0, bOut );
+      hb_conOutErr_( hb_conNewLine(), 0, bOut );
    }
 
-   hb_conOutErr( "---------------------------", 0 );
-   hb_conOutErr( hb_conNewLine(), 0 );
+   hb_conOutErr_( "---------------------------", 0, bOut );
+   hb_conOutErr_( hb_conNewLine(), 0, bOut );
+
+   return szBuildInfo;
+
 }
 
 char * hb_builddate()
@@ -857,4 +920,93 @@ char * hb_builddate()
    hb_xstrcat( sz_Date,  __DATE__," ", __TIME__, NULL );
 
    return  sz_Date;
+}
+
+static void hb_conOutErr_ ( char * szText, ULONG ulLen, BOOL bOut )
+{
+   if( bOut )
+   {
+      hb_conOutErr( szText, ulLen );
+   }
+}
+
+char *hb_credits()
+{
+   char *szCredits =
+          "Alejandro de Garate <alex_degarate@hotmail.com>\n"
+          "Alex Shashkov <alex_shashkov@users.sourceforge.net>\n"
+          "Alex Strickland <sscc@mweb.co.za>\n"
+          "Alexander S. Kresin <alex@belacy.belgorod.su>\n"
+          "Andi Jahja <xharbour@cbn.net.id>\n"
+          "Andy Wos <andrwos@bigpond.com>\n"
+          "Antonio Carlos Pantaglione <toninho@fwi.com.br>\n"
+          "Antonio Linares <alinares@fivetech.com>\n"
+          "April White <awhite@user.rose.com>\n"
+          "Ath <Ath@ath.nl>\n"
+          "Augusto Infante <august@winbuilt.com>\n"
+          "Bil Simser <bsimser@home.com>\n"
+          "Brian Hays <bhays@abacuslaw.com>\n"
+          "Bruno Cantero <bruno@issnet.net>\n"
+          "Budyanto Djajapermana <budyanto@centrin.net.id>\n"
+          "Charles Kwon <Charles@fivetech.net>\n"
+          "Chen Kedem <niki@actcom.co.il>\n"
+          "Dave Pearson <davep@davep.org>\n"
+          "David G. Holm <dholm@jsd-llc.com>\n"
+          "Davor Siklic <siki@msoft.cz>\n"
+          "Dmitry V. Korzhov <dk@april26.spb.ru>\n"
+          "Eddie Runia <eddie@runia.com>\n"
+          "Eduardo Fernandes <modalsist@yahoo.com.br>\n"
+          "Enrico Maria Giordano <e.m.giordano@emagsoftware.it>\n"
+          "Felipe G. Coury <fcoury@creation.com.br>\n"
+          "Francesco Saverio Giudice <info@fsgiudice.com>\n"
+          "Giancarlo Niccolai <gc@niccolai.ws>\n"
+          "Gonzalo A. Diethelm <gonzalo.diethelm@iname.com>\n"
+          "Henryk Olkowski <oh1@op.pl>\n"
+          "Horacio D. Roldan Kasimatis <harbour_ar@yahoo.com.ar>\n"
+          "Ian Anderson <i.anderson@procon-online.de>\n"
+          "Ignacio Ortiz de Zuniga <ignacio@fivetech.com>\n"
+          "Jacek Potempa <Jacek.Potempa@otc.com.pl>\n"
+          "Janica Lubos <janica@fornax.elf.stuba.sk>\n"
+          "Jean-Francois Lefebvre (mafact) <jfl@mafact.com>\n"
+          "Jose F. Gimenez <jfgimenez@wanadoo.es>\n"
+          "Jose Lalin <dezac@corevia.com>\n"
+          "Leslee Griffith <les.griffith@vantagesystems.ca>\n"
+          "Lorenzo Fiorini <lorenzo_fiorini@teamwork.it>\n"
+          "Luis Krause Mantilla <lkrausem@shaw.ca>\n"
+          "Luiz Rafael Culik <culik@sl.conex.net>\n"
+          "Manuel Ruiz <mrt@joca.es>\n"
+          "Marcelo Lombardo <lombardo@uol.com.br>\n"
+          "Marcos Antonio Gambeta <marcosgambeta@yahoo.com.br>\n"
+          "Marek Paliwoda <paliwoda@inetia.pl>\n"
+          "Martin Vogel <vogel@inttec.de>\n"
+          "Matteo Baccan <baccan@isanet.it>\n"
+          "Matthew Hamilton <mhamilton@bunge.com.au>\n"
+          "Mauricio Abre <maurifull@datafull.com>\n"
+          "Maurilio Longo <maurilio.longo@libero.it>\n"
+          "Mighty-Siil <siil@usa.net>\n"
+          "Mindaugas Kavaliauskas <dbtopas@dbtopas.lt>\n"
+          "Nicolas del Pozo <niko@geroa.com>\n"
+          "Patrick Mast <patrick@xHarbour.com>\n"
+          "Paul Tucker <ptucker@sympatico.ca>\n"
+          "Pavel Tsarenko <tpe2@mail.ru>\n"
+          "Peter Rees <peter@rees.co.nz>\n"
+          "Peter Townsend <cephas@tpgi.com.au>\n"
+          "Phil Barnett <philb@iag.net>\n"
+          "Phil Krylov <phil@newstar.rinet.ru>\n"
+          "Philip Chee <philip@aleytys.pc.my>\n"
+          "Pritpal Bedi <pritpal@vouchcac.com>\n"
+          "Przemyslaw Czerpak <druzus@polbox.com>\n"
+          "Rodrigo Moreno <rodrigo_moreno@users.sourceforge.net>\n"
+          "Ron Pinkas <ron@profit-master.com>\n"
+          "Ryszard Glab <rglab@imid.med.pl>\n"
+          "Sylvain Robert <s.robert@videotron.ca>\n"
+          "Tim Stone <timstone@mstrlink.com>\n"
+          "Tommi Rouvali <tommi@rouvali.com>\n"
+          "Tony Bretado <jabrecer@users.sourceforge.net>\n"
+          "Vicente Guerra <vicente@guerra.com.mx>\n"
+          "Viktor Szakats <viktor.szakats@syenar.hu>\n"
+          "Vladimir Kazimirchik <v_kazimirchik@yahoo.com>\n"
+          "Walter Negro <anegro@overnet.com.ar>";
+
+  return szCredits;
 }
