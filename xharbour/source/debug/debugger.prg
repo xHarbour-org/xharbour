@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.34 2004/04/20 12:48:12 likewolf Exp $
+ * $Id: debugger.prg,v 1.35 2004/04/21 01:18:16 likewolf Exp $
  */
 
 /*
@@ -3228,8 +3228,10 @@ static function PathToArray( cList )
    local nPos
    local aList := {}
    local cSep
+   local cDirSep
 
    cSep := HB_OsPathListSeparator()
+   cDirSep := HB_OsPathDelimiters()
 
    if ( cList <> NIL )
 
@@ -3240,6 +3242,7 @@ static function PathToArray( cList )
 
       aadd( aList, cList )              // Add final element
 
+      AEval(aList, {|x, i| if( x[-1] $ cDirSep,  aList[ i ] := Left( x, Len( x ) - 1 ), ) } )
    endif
 
 return aList
