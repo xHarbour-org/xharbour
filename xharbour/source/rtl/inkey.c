@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.32 2004/04/20 09:45:03 likewolf Exp $
+ * $Id: inkey.c,v 1.33 2004/04/21 07:51:08 bdj Exp $
  */
 
 /*
@@ -462,7 +462,7 @@ HB_FUNC( __KEYBOARD )
          BYTE * fPtr = ( BYTE * ) hb_parcx( 1 );
 
          /* It might be just a request to clear the buffer */
-         /* bdj: comment out 'if', it disables __keyboard(chr(0))
+         /* bdj: comment out 'if', it disables __keyboard(chr(0)) */
          // if( *fPtr )
          {
             BYTE * pString     = ( BYTE * ) hb_xgrab( size + 1 );
