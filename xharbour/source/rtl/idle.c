@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.4 2002/12/04 23:06:58 likewolf Exp $
+ * $Id: idle.c,v 1.5 2002/12/26 02:48:47 jonnymind Exp $
  */
 
 /*
@@ -165,9 +165,7 @@ void hb_idleState( void )
       if( hb_vm_bCollectGarbage )
       {
          hb_vm_bCollectGarbage = FALSE;
-/* #ifndef HB_THREAD_SUPPORT */
          hb_gcCollectAll();
-/* #endif */
          s_bIamIdle = FALSE;
          return;
       }
@@ -194,9 +192,6 @@ void hb_idleState( void )
 
       s_bIamIdle = FALSE;
    }
-#ifdef HB_THREAD_SUPPORT
-   hb_LWRM_unlock( &hb_internal_monitor );
-#endif
 }
 
 void hb_idleReset( void )

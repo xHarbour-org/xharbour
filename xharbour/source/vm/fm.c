@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.15 2002/12/27 23:08:32 jonnymind Exp $
+ * $Id: fm.c,v 1.16 2002/12/28 05:43:47 ronpinkas Exp $
  */
 
 /*
@@ -137,7 +137,7 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &hb_internal_monitor );
+         hb_threadLock( &hb_internal_monitor );
       }
    #endif
 
@@ -220,7 +220,7 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &hb_internal_monitor );
+         hb_threadUnlock( &hb_internal_monitor );
       }
    #endif
 
@@ -252,7 +252,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &hb_internal_monitor );
+         hb_threadLock( &hb_internal_monitor );
       }
    #endif
 
@@ -335,7 +335,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &hb_internal_monitor );
+         hb_threadUnlock( &hb_internal_monitor );
       }
    #endif
 
@@ -368,7 +368,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &hb_internal_monitor );
+         hb_threadLock( &hb_internal_monitor );
       }
    #endif
 
@@ -418,7 +418,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &hb_internal_monitor );
+         hb_threadUnlock( &hb_internal_monitor );
       }
    #endif
 
@@ -453,7 +453,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &hb_internal_monitor );
+         hb_threadLock( &hb_internal_monitor );
       }
    #endif
 
@@ -466,6 +466,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 
       if( pMemBlock->ulSignature != HB_MEMINFO_SIGNATURE )
       {
+         printf( "hb_xfree() Invalid Pointer %p %s", (char *) pMem, (char *) pMem );
          hb_errInternal( HB_EI_XFREEINV, "hb_xfree() Invalid Pointer %p %s", (char *) pMem, (char *) pMem );
       }
 
@@ -507,7 +508,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &hb_internal_monitor );
+         hb_threadUnlock( &hb_internal_monitor );
       }
    #endif
 
@@ -675,7 +676,7 @@ ULONG hb_xquery( USHORT uiMode )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &hb_internal_monitor );
+         hb_threadLock( &hb_internal_monitor );
       }
    #endif
 
@@ -870,7 +871,7 @@ ULONG hb_xquery( USHORT uiMode )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &hb_internal_monitor );
+         hb_threadUnlock( &hb_internal_monitor );
       }
    #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.33 2002/12/18 13:43:57 ronpinkas Exp $
+ * $Id: arrays.c,v 1.34 2002/12/19 18:15:35 ronpinkas Exp $
  */
 
 /*
@@ -85,6 +85,8 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayNew(%p, %lu)", pItem, ulLen));
 
+   //printf( "Got: %p For: %p\n", pBaseArray, pItem );
+
    if( HB_IS_COMPLEX( pItem ) )
    {
       hb_itemClear( pItem );
@@ -105,9 +107,6 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
    pBaseArray->uiClass    = 0;
    pBaseArray->uiPrevCls  = 0;
    pBaseArray->puiClsTree = NULL;
-   #if 0
-   pBaseArray->uiExtRef   = 0;
-   #endif
 
    for( ulPos = 0; ulPos < ulLen; ulPos++ )
    {
@@ -1082,6 +1081,8 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
    PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
    USHORT uiPos;
 
+   //printf( "Got: %p\n", pBaseArray );
+
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromStack(%iu)", uiLen));
 
    pArray->type = HB_IT_ARRAY;
@@ -1119,6 +1120,8 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    USHORT uiPos, uiPCount = (*pBase)->item.asSymbol.paramcnt;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
+
+   //printf( "Got: %p\n", pBaseArray );
 
    pArray->type = HB_IT_ARRAY;
 

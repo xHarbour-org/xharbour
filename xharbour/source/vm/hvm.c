@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.135 2002/12/20 08:39:43 ronpinkas Exp $
+ * $Id: hvm.c,v 1.136 2002/12/23 00:14:22 ronpinkas Exp $
  */
 
 /*
@@ -94,6 +94,10 @@
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
+#endif
+
+#ifdef HB_THREAD_SUPPORT
+   extern HB_CRITICAL_T hb_gcCollectionMutex;
 #endif
 
 /* DEBUG only*/
@@ -335,6 +339,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
     /*JC1: initialization of thread aware stack */
     #ifdef HB_THREAD_SUPPORT
+       HB_CRITICAL_INIT( hb_gcCollectionMutex );
        HB_TRACE( HB_TR_INFO, ("contextInit" ) );
        hb_threadInit();
     #endif
@@ -498,7 +503,9 @@ void HB_EXPORT hb_vmQuit( void )
 
    #ifdef HB_THREAD_SUPPORT
        hb_threadExit();
+       HB_CRITICAL_DESTROY( hb_gcCollectionMutex );
    #endif
+   //printf( "After Thread\n" );
 
    #ifdef HB_MACRO_STATEMENTS
      hb_pp_Free();
@@ -539,15 +546,21 @@ void HB_EXPORT hb_vmQuit( void )
 
    if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
    {
-      hb_itemClear( &(HB_VM_STACK.Return) );
+      hb_itemClear( &(hb_stack.Return) );
    }
    //printf( "After Return\n" );
 
-   hb_arrayRelease( &s_aStatics );
+   if( s_aStatics.type == HB_IT_ARRAY )
+   {
+      hb_arrayRelease( &s_aStatics );
+   }
    //printf( "\nAfter Statics\n" );
 
-   hb_arrayFill( &s_aGlobals, ( *HB_VM_STACK.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
-   hb_arrayRelease( &s_aGlobals );
+   if( s_aGlobals.type == HB_IT_ARRAY )
+   {
+      hb_arrayFill( &s_aGlobals, ( *HB_VM_STACK.pPos ), 1, s_aGlobals.item.asArray.value->ulLen );
+      hb_arrayRelease( &s_aGlobals );
+   }
    //printf( "\nAfter Globals\n" );
 
    hb_memvarsRelease();    /* clear all PUBLIC variables */
@@ -564,7 +577,7 @@ void HB_EXPORT hb_vmQuit( void )
    hb_stackFree();
    //printf( "After stackFree\n" );
 
-/* hb_dynsymLog(); */
+   /* hb_dynsymLog(); */
 
    hb_xexit();
    //printf( "After xexit\n" );
@@ -3826,6 +3839,10 @@ static void hb_vmArrayDim( USHORT uiDimensions ) /* generates an uiDimensions Ar
 
    itArray.type = HB_IT_NIL;
 
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_LOCK( hb_gcCollectionMutex );
+   #endif
+
    hb_vmArrayNew( &itArray, uiDimensions );
 
    while( uiDimensions-- )
@@ -3835,6 +3852,10 @@ static void hb_vmArrayDim( USHORT uiDimensions ) /* generates an uiDimensions Ar
 
    hb_itemForwardValue( ( * HB_VM_STACK.pPos ), &itArray );
    hb_stackPush();
+
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+   #endif
 }
 
 static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array and fills it from the stack values */
@@ -3843,6 +3864,10 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
    ULONG ulPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayGen(%lu)", ulElements));
+
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_LOCK( hb_gcCollectionMutex );
+   #endif
 
    itArray.type = HB_IT_NIL;
    hb_arrayNew( &itArray, ulElements );
@@ -3868,6 +3893,10 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
       hb_itemForwardValue( ( * HB_VM_STACK.pPos ), &itArray );
       hb_stackPush();
    }
+
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+   #endif
 }
 
 /* This function creates an array item using 'uiDimension' as an index
@@ -3879,6 +3908,8 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
    HB_ITEM_PTR pDim;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayNew(%p, %hu)", pArray, uiDimension));
+
+   // HB_CRITICAL_LOCK() - Protected an ENTRY POINT hb_vmArrayDim()!
 
    pDim = hb_stackItemFromTop( - uiDimension );
 
@@ -3914,7 +3945,9 @@ static void hb_vmArrayNew( HB_ITEM_PTR pArray, USHORT uiDimension )
       /* call self recursively to create next dimensions
        */
       while( ulElements )
+      {
          hb_vmArrayNew( hb_arrayGetItemPtr( pArray, ulElements-- ), uiDimension );
+      }
    }
 }
 
@@ -4955,6 +4988,10 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_BLOCK;
 
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_LOCK( hb_gcCollectionMutex );
+   #endif
+
    uiLocals = pCode[ 5 ] + ( pCode[ 6 ] * 256 );
    ( * HB_VM_STACK.pPos )->item.asBlock.value =
          hb_codeblockNew( pCode + 7 + uiLocals * 2, /* pcode buffer         */
@@ -4972,6 +5009,10 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
     */
    ( * HB_VM_STACK.pPos )->item.asBlock.lineno = hb_stackBaseItem()->item.asSymbol.lineno;
    hb_stackPush();
+
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+   #endif
 }
 
 /* +0    -> HB_P_PUSHBLOCKSHORT
@@ -4985,6 +5026,10 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushBlockShort(%p, %p)", pCode, pSymbols));
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_BLOCK;
+
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_LOCK( hb_gcCollectionMutex );
+   #endif
 
    ( * HB_VM_STACK.pPos )->item.asBlock.value =
          hb_codeblockNew( pCode + 2,                /* pcode buffer         */
@@ -5002,6 +5047,10 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
     */
    ( * HB_VM_STACK.pPos )->item.asBlock.lineno = hb_stackBaseItem()->item.asSymbol.lineno;
    hb_stackPush();
+
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+   #endif
 }
 
 /* +0    -> HB_P_MPUSHBLOCK
@@ -5994,6 +6043,30 @@ HB_FUNC( __VMVARSSET )
 /* The garbage collector interface */
 /* ------------------------------------------------------------------------ */
 
+/* Mark all locals as used so they will not be released by the
+ * garbage collector
+ */
+void hb_vmIsLocalRef( void )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmIsLocalRef()"));
+
+   if( hb_stack.pPos > hb_stack.pItems )
+   {
+      /* the eval stack is not cleared yet */
+      HB_ITEM_PTR * pItem = hb_stack.pPos - 1;
+
+      while( pItem != hb_stack.pItems )
+      {
+         if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
+         {
+            hb_gcItemRef( *pItem );
+         }
+
+         --pItem;
+      }
+   }
+}
+
 /* Mark all statics as used so they will not be released by the
  * garbage collector
  */
@@ -6029,7 +6102,7 @@ void hb_vmIsGlobalRef( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmIsGlobalRef()"));
 
-   /* statics are stored as an item of array type */
+   /* Globals are stored as an item of array type */
    hb_gcItemRef( &s_aGlobals );
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.26 2002/12/26 02:48:47 jonnymind Exp $
+ * $Id: garbage.c,v 1.27 2002/12/28 05:43:47 ronpinkas Exp $
  */
 
 /*
@@ -58,18 +58,7 @@
 #include "hbvm.h"
 #include "error.ch"
 
-/* holder of memory block information */
-/* NOTE: USHORT is used intentionally to fill up the structure to
- * full 16 bytes (on 16/32 bit environment)
- */
-typedef struct HB_GARBAGE_
-{
-   struct HB_GARBAGE_ *pNext;  /* next memory block */
-   struct HB_GARBAGE_ *pPrev;  /* previous memory block */
-   HB_GARBAGE_FUNC_PTR pFunc;  /* cleanup function called before memory releasing */
-   USHORT locked;              /* locking counter */
-   USHORT used;                /* used/unused block */
-} HB_GARBAGE, *HB_GARBAGE_PTR;
+#define HB_GC_COLLECTION_JUSTIFIED 32
 
 /* status of memory block */
 #define HB_GC_UNLOCKED     0
@@ -105,6 +94,8 @@ static BOOL s_bReleaseAll = FALSE;
  */
 static USHORT s_uUsedFlag = HB_GC_USED_FLAG;
 
+static ULONG s_uAllocated = 0;
+
 #ifdef GC_RECYCLE
    #define HB_GARBAGE_FREE( pAlloc )  ( pAlloc->pFunc == hb_gcGripRelease ? \
                                         ( hb_gcLink( &s_pAvailableItems, pAlloc ) ) \
@@ -118,6 +109,10 @@ static USHORT s_uUsedFlag = HB_GC_USED_FLAG;
 #else
    #define HB_GARBAGE_NEW( ulSize )   ( HB_GARBAGE_PTR )hb_xgrab( ulSize )
    #define HB_GARBAGE_FREE( pAlloc )    hb_xfree( (void *)(pAlloc) )
+#endif
+
+#ifdef HB_THREAD_SUPPORT
+   HB_CRITICAL_T hb_gcCollectionMutex;
 #endif
 
 /* Forward declaration.*/
@@ -164,9 +159,21 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
    HB_GARBAGE_PTR pAlloc;
 
    #ifdef HB_THREAD_SUPPORT
+      /*
+      HB_GARBAGE_PTR *pContextList;
+
+      if( hb_ht_context == NULL || hb_stackGetCurrentStack() == &hb_stack )
+      {
+         pContextList = &s_pCurrBlock;
+      }
+      else
+      {
+         pContextList = &( hb_threadGetCurrentContext()->GCList );
+      }
+      */
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &hb_internal_monitor );
+         hb_threadLock( &hb_internal_monitor );
       }
    #endif
 
@@ -186,7 +193,11 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 
    if( pAlloc )
    {
+      s_uAllocated++;
+
+      //hb_gcLink( pContextList, pAlloc );
       hb_gcLink( &s_pCurrBlock, pAlloc );
+
       pAlloc->pFunc  = pCleanupFunc;
       pAlloc->locked = 0;
       pAlloc->used   = s_uUsedFlag;
@@ -196,7 +207,7 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
       #ifdef HB_THREAD_SUPPORT
          if( hb_ht_context )
          {
-            hb_LWRM_unlock( &hb_internal_monitor );
+            hb_threadUnlock( &hb_internal_monitor );
          }
       #endif
 
@@ -207,27 +218,38 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
       #ifdef HB_THREAD_SUPPORT
          if( hb_ht_context )
          {
-            hb_LWRM_unlock( &hb_internal_monitor );
+            hb_threadUnlock( &hb_internal_monitor );
          }
       #endif
 
       return NULL;
    }
-
 }
 
 /* release a memory block allocated with hb_gcAlloc() */
 void hb_gcFree( void *pBlock )
 {
-
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p)", pBlock ) );
-
    #ifdef HB_THREAD_SUPPORT
+      /*
+      HB_GARBAGE_PTR *pContextList;
+
+      if( hb_ht_context == NULL || hb_stackGetCurrentStack() == &hb_stack )
+      {
+         pContextList = &s_pCurrBlock;
+      }
+      else
+      {
+         pContextList = &( hb_threadGetCurrentContext()->GCList );
+      }
+      */
+
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &hb_internal_monitor );
+         hb_threadLock( &hb_internal_monitor );
       }
    #endif
+
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p)", pBlock ) );
 
    if( s_bReleaseAll )
    {
@@ -236,7 +258,7 @@ void hb_gcFree( void *pBlock )
       #ifdef HB_THREAD_SUPPORT
          if( hb_ht_context )
          {
-            hb_LWRM_unlock( &hb_internal_monitor );
+            hb_threadUnlock( &hb_internal_monitor );
          }
       #endif
 
@@ -259,7 +281,11 @@ void hb_gcFree( void *pBlock )
          // Might already be marked for deletion.
          if( ! ( pAlloc->used & HB_GC_DELETE ) )
          {
+            s_uAllocated--;
+
+            //hb_gcUnlink( pContextList, pAlloc );
             hb_gcUnlink( &s_pCurrBlock, pAlloc );
+
             HB_GARBAGE_FREE( pAlloc );
          }
       }
@@ -272,7 +298,7 @@ void hb_gcFree( void *pBlock )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &hb_internal_monitor );
+         hb_threadUnlock( &hb_internal_monitor );
       }
    #endif
 }
@@ -292,7 +318,7 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &hb_internal_monitor );
+         hb_threadLock( &hb_internal_monitor );
       }
    #endif
 
@@ -315,6 +341,7 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
       HB_ITEM_PTR pItem = ( HB_ITEM_PTR )( pAlloc + 1 );
 
       hb_gcLink( &s_pLockedBlock, pAlloc );
+
       pAlloc->pFunc  = hb_gcGripRelease;
       pAlloc->locked = 1;
       pAlloc->used   = s_uUsedFlag;
@@ -333,7 +360,7 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
       #ifdef HB_THREAD_SUPPORT
          if( hb_ht_context )
          {
-            hb_LWRM_unlock( &hb_internal_monitor );
+            hb_threadUnlock( &hb_internal_monitor );
          }
       #endif
 
@@ -344,7 +371,7 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
       #ifdef HB_THREAD_SUPPORT
          if( hb_ht_context )
          {
-             hb_LWRM_unlock( &hb_internal_monitor );
+             hb_threadUnlock( &hb_internal_monitor );
          }
       #endif
 
@@ -354,14 +381,14 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
 
 void hb_gcGripDrop( HB_ITEM_PTR pItem )
 {
-   HB_TRACE( HB_TR_DEBUG, ( "hb_gcGripDrop(%p)", pItem ) );
-
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &hb_internal_monitor );
+         hb_threadLock( &hb_internal_monitor );
       }
    #endif
+
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gcGripDrop(%p)", pItem ) );
 
    if( s_bReleaseAll )
    {
@@ -370,7 +397,7 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
       #ifdef HB_THREAD_SUPPORT
          if( hb_ht_context )
          {
-            hb_LWRM_unlock( &hb_internal_monitor );
+            hb_threadUnlock( &hb_internal_monitor );
          }
       #endif
 
@@ -393,16 +420,16 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
       }
 
       hb_gcUnlink( &s_pLockedBlock, pAlloc );
+
       HB_GARBAGE_FREE( pAlloc );
    }
 
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &hb_internal_monitor );
+         hb_threadUnlock( &hb_internal_monitor );
       }
    #endif
-
 }
 
 /* Lock a memory pointer so it will not be released if stored
@@ -411,9 +438,22 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 void * hb_gcLock( void * pBlock )
 {
    #ifdef HB_THREAD_SUPPORT
+      /*
+      HB_GARBAGE_PTR *pContextList;
+
+      if( hb_ht_context == NULL || hb_stackGetCurrentStack() == &hb_stack )
+      {
+         pContextList = &s_pCurrBlock;
+      }
+      else
+      {
+         pContextList = &( hb_threadGetCurrentContext()->GCList );
+      }
+      */
+
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &hb_internal_monitor );
+         hb_threadLock( &hb_internal_monitor );
       }
    #endif
 
@@ -424,8 +464,11 @@ void * hb_gcLock( void * pBlock )
 
       if( ! pAlloc->locked )
       {
+         //hb_gcUnlink( pContextList, pAlloc );
          hb_gcUnlink( &s_pCurrBlock, pAlloc );
+
          hb_gcLink( &s_pLockedBlock, pAlloc );
+
          pAlloc->used = s_uUsedFlag;
       }
       ++pAlloc->locked;
@@ -434,7 +477,7 @@ void * hb_gcLock( void * pBlock )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &hb_internal_monitor );
+         hb_threadUnlock( &hb_internal_monitor );
       }
    #endif
 
@@ -447,9 +490,22 @@ void * hb_gcLock( void * pBlock )
 void *hb_gcUnlock( void *pBlock )
 {
    #ifdef HB_THREAD_SUPPORT
+      /*
+      HB_GARBAGE_PTR *pContextList;
+
+      if( hb_ht_context == NULL || hb_stackGetCurrentStack() == &hb_stack )
+      {
+         pContextList = &s_pCurrBlock;
+      }
+      else
+      {
+         pContextList = &( hb_threadGetCurrentContext()->GCList );
+      }
+      */
+
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &hb_internal_monitor );
+         hb_threadLock( &hb_internal_monitor );
       }
    #endif
 
@@ -463,7 +519,10 @@ void *hb_gcUnlock( void *pBlock )
          if( --pAlloc->locked == 0 )
          {
             hb_gcUnlink( &s_pLockedBlock, pAlloc );
+
+            //hb_gcLink( pContextList, pAlloc );
             hb_gcLink( &s_pCurrBlock, pAlloc );
+
             pAlloc->used = s_uUsedFlag;
          }
       }
@@ -472,7 +531,7 @@ void *hb_gcUnlock( void *pBlock )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &hb_internal_monitor );
+         hb_threadUnlock( &hb_internal_monitor );
       }
    #endif
 
@@ -486,7 +545,7 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &hb_internal_monitor );
+         hb_threadLock( &hb_internal_monitor );
       }
    #endif
 
@@ -571,7 +630,7 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &hb_internal_monitor );
+         hb_threadUnlock( &hb_internal_monitor );
       }
    #endif
 }
@@ -586,13 +645,18 @@ void hb_gcCollect( void )
 */
 void hb_gcCollectAll( void )
 {
-   //extern PHB_ITEM **hb_vm_pGlobals;
-   //extern short    hb_vm_iGlobals;
+   if( s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
+   {
+      return;
+   }
+
+   //printf(  "Collecting...\n" );
 
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &hb_internal_monitor );
+         HB_CRITICAL_LOCK( hb_gcCollectionMutex );
+         hb_threadLock( &hb_internal_monitor );
       }
    #endif
 
@@ -603,6 +667,7 @@ void hb_gcCollectAll( void )
       HB_GARBAGE_PTR pAlloc, pDelete;
 
       s_bCollecting = TRUE;
+      s_uAllocated = 0;
 
       /* Step 1 - mark */
       /* All blocks are already marked because we are flipping
@@ -611,25 +676,32 @@ void hb_gcCollectAll( void )
 
       HB_TRACE( HB_TR_INFO, ( "Sweep Scan" ) );
 
+      //printf( "Sweep Scan\n" );
+
       /* Step 2 - sweep */
       /* check all known places for blocks they are referring */
-      hb_vmIsLocalRef();
-      //printf( "After LocalRef\r\n" );
+      #ifdef HB_THREAD_SUPPORT
+         hb_threadIsLocalRef();
+      #else
+         hb_vmIsLocalRef();
+      #endif
+
+      //printf( "After LocalRef\n" );
 
       hb_vmIsStaticRef();
-      //printf( "After StaticRef\r\n" );
+      //printf( "After StaticRef\n" );
 
       hb_vmIsGlobalRef();
-      //printf( "After Globals\r\n" );
+      //printf( "After Globals\n" );
 
       hb_memvarsIsMemvarRef();
-      //printf( "After MemvarRef\r\n" );
+      //printf( "After MemvarRef\n" );
 
       hb_gcItemRef( &(HB_VM_STACK.Return) );
-      //printf( "After ReturnRef\r\n" );
+      //printf( "After ReturnRef\n" );
 
       hb_clsIsClassRef();
-      //printf( "After ClassRef\r\n" );
+      //printf( "After ClassRef\n" );
 
       HB_TRACE( HB_TR_INFO, ( "Locked Scan" ) );
 
@@ -680,6 +752,8 @@ void hb_gcCollectAll( void )
          {
            /* Mark for deletion. */
            s_pCurrBlock->used |= HB_GC_DELETE;
+
+           //printf( "Marked, %p Item: %p\n", s_pCurrBlock, s_pCurrBlock + 1 );
 
            /* call the cleanup function. */
            if( s_pCurrBlock->pFunc )
@@ -755,9 +829,12 @@ void hb_gcCollectAll( void )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &hb_internal_monitor );
+         HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+         hb_threadUnlock( &hb_internal_monitor );
       }
    #endif
+
+   //printf( "Done Collecting...\n" );
 }
 
 void hb_gcReleaseAll( void )
@@ -767,7 +844,7 @@ void hb_gcReleaseAll( void )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &hb_internal_monitor );
+         hb_threadLock( &hb_internal_monitor );
       }
    #endif
 
@@ -857,7 +934,7 @@ void hb_gcReleaseAll( void )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &hb_internal_monitor );
+         hb_threadUnlock( &hb_internal_monitor );
       }
    #endif
 }
@@ -874,5 +951,10 @@ HB_FUNC( HB_GCSTEP )
 */
 HB_FUNC( HB_GCALL )
 {
+   if( hb_parl( 1 ) )
+   {
+      s_uAllocated = HB_GC_COLLECTION_JUSTIFIED;
+   }
+
    hb_gcCollectAll();
 }

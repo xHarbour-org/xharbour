@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.49 2002/12/23 02:47:27 jonnymind Exp $
+ * $Id: hbapi.h,v 1.50 2002/12/28 05:43:47 ronpinkas Exp $
  */
 
 /*
@@ -151,9 +151,22 @@ typedef USHORT ERRCODE;
 extern HB_SYMB  hb_symEval;
 
 /* garbage collector */
+/* holder of memory block information */
+/* NOTE: USHORT is used intentionally to fill up the structure to
+ * full 16 bytes (on 16/32 bit environment)
+ */
 #define HB_GARBAGE_FUNC( hbfunc )   void hbfunc( void * Cargo ) /* callback function for cleaning garbage memory pointer */
 typedef HB_GARBAGE_FUNC( HB_GARBAGE_FUNC_ );
 typedef HB_GARBAGE_FUNC_ * HB_GARBAGE_FUNC_PTR;
+
+typedef struct HB_GARBAGE_
+{
+   struct HB_GARBAGE_ *pNext;  /* next memory block */
+   struct HB_GARBAGE_ *pPrev;  /* previous memory block */
+   HB_GARBAGE_FUNC_PTR pFunc;  /* cleanup function called before memory releasing */
+   USHORT locked;              /* locking counter */
+   USHORT used;                /* used/unused block */
+} HB_GARBAGE, *HB_GARBAGE_PTR;
 
 extern HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pItem );
 extern void   hb_gcGripDrop( HB_ITEM_PTR pItem );
@@ -168,6 +181,7 @@ extern void   hb_gcReleaseAll( void ); /* release all memory blocks unconditiona
 extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers passed memory block pointer */
 extern void   HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
 extern void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as used */
+extern void   hb_threadIsLocalRef( void ); /* thread.c - mark all local variables as used */
 extern void   hb_vmIsStaticRef( void ); /* hvm.c - mark all static variables as used */
 extern void   hb_vmIsGlobalRef( void ); /* hvm.c - mark all global variables as used */
 extern void   hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals ); /* hvm.c - Register module globals into s_aGlobals */
@@ -204,29 +218,6 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
       #define HB_API_MACROS
    #endif
 #endif
-
-extern HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pItem );
-extern void   hb_gcGripDrop( HB_ITEM_PTR pItem );
-
-extern void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pFunc ); /* allocates a memory controlled by the garbage collector */
-extern void   hb_gcFree( void *pAlloc ); /* deallocates a memory allocated by the garbage collector */
-extern void * hb_gcLock( void *pAlloc ); /* do not release passed memory block */
-extern void * hb_gcUnlock( void *pAlloc ); /* passed block is allowed to be released */
-extern void   hb_gcCollect( void ); /* checks if a single memory block can be released */
-extern void   hb_gcCollectAll( void ); /* checks if all memory blocks can be released */
-extern void   hb_gcReleaseAll( void ); /* release all memory blocks unconditionally */
-extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers passed memory block pointer */
-extern void   HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
-extern void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as used */
-extern void   hb_vmIsStaticRef( void ); /* hvm.c - mark all static variables as used */
-extern void   hb_vmIsGlobalRef( void ); /* hvm.c - mark all global variables as used */
-extern void   hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals ); /* hvm.c - Register module globals into s_aGlobals */
-
-extern void   hb_vmGlobalUnlock( PHB_ITEM pGlobal ); /* hvm.c - Calls hb_gcUnlock(...) when needed. */
-extern void   hb_memvarsIsMemvarRef( void ); /* memvars.c - mark all memvar variables as used */
-extern void   hb_clsIsClassRef( void ); /* classes.c - mark all class internals as used */
-extern HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage ); /* clear a codeblock before releasing by the GC */
-extern HB_GARBAGE_FUNC( hb_arrayReleaseGarbage ); /* clear an array before releasing by the GC */
 
 #ifdef HB_API_MACROS
    #include "hbapiitm.h"

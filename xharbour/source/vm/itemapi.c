@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.29 2002/12/15 23:06:03 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.30 2002/12/19 18:15:36 ronpinkas Exp $
  */
 
 /*
@@ -157,7 +157,9 @@ BOOL HB_EXPORT hb_itemRelease( PHB_ITEM pItem )
       return TRUE;
    }
    else
+   {
       return FALSE;
+   }
 }
 
 PHB_ITEM HB_EXPORT hb_itemArrayNew( ULONG ulLen )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.554 2002/12/28 05:43:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.555 2002/12/28 16:12:58 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-29 00:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/thread.h
+  * include/hbapi.h
+  * source/vm/thread.c
+    + Added hb_threadIsLocalRef( void )
+
+  * include/hbstack.h
+    + Added #define STACK_THREADHB_ITEMS 100
+
+  * source/rtl/console.c
+  * source/rtl/errorapi.c
+  * source/rtl/idle.c
+  * source/rtl/inet.c
+  * source/vm/arrays.c
+  * source/vm/estack.c
+  * source/vm/fm.c
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+    * Corrected naming convention for new thread functions.
+
+  * source/vm/garbage.c
+    * Added optional logical paramater lForceCollection to HB_GCALL() to force collection even if GC statistcs do not justify collection.
+    ! GC is now Thread Safe and much optimized. xHarbour applications should be significantly faster.
 
 2002-12-28 09:05 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
    * source/rdd/dbfcdx/dbfcdx1.c

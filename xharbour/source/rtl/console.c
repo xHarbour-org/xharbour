@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.19 2002/12/26 02:48:47 jonnymind Exp $
+ * $Id: console.c,v 1.20 2002/12/28 05:43:47 ronpinkas Exp $
  */
 
 /*
@@ -347,7 +347,7 @@ HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &s_ConsoleMutex );
+         hb_threadLock( &s_ConsoleMutex );
       }
    #endif
 
@@ -361,7 +361,7 @@ HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &s_ConsoleMutex );
+         hb_threadUnlock( &s_ConsoleMutex );
       }
    #endif
 }
@@ -374,7 +374,7 @@ HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &s_ConsoleMutex );
+         hb_threadLock( &s_ConsoleMutex );
       }
    #endif
 
@@ -388,7 +388,7 @@ HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &s_ConsoleMutex );
+         hb_threadUnlock( &s_ConsoleMutex );
       }
    #endif
 }
@@ -401,7 +401,7 @@ HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or pri
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &s_ConsoleMutex );
+         hb_threadLock( &s_ConsoleMutex );
       }
    #endif
 
@@ -417,7 +417,7 @@ HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or pri
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &s_ConsoleMutex );
+         hb_threadUnlock( &s_ConsoleMutex );
       }
    #endif
 }
@@ -427,7 +427,7 @@ HB_FUNC( QOUT )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &s_ConsoleMutex );
+         hb_threadLock( &s_ConsoleMutex );
       }
    #endif
 
@@ -460,7 +460,7 @@ HB_FUNC( QOUT )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &s_ConsoleMutex );
+         hb_threadUnlock( &s_ConsoleMutex );
       }
    #endif
 }
@@ -470,7 +470,7 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &s_ConsoleMutex );
+         hb_threadLock( &s_ConsoleMutex );
       }
    #endif
 
@@ -492,7 +492,7 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &s_ConsoleMutex );
+         hb_threadUnlock( &s_ConsoleMutex );
       }
    #endif
 }
@@ -606,7 +606,7 @@ HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &s_ConsoleMutex );
+         hb_threadLock( &s_ConsoleMutex );
       }
    #endif
 
@@ -618,7 +618,7 @@ HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &s_ConsoleMutex );
+         hb_threadUnlock( &s_ConsoleMutex );
       }
    #endif
 }
@@ -628,7 +628,7 @@ HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &s_ConsoleMutex );
+         hb_threadLock( &s_ConsoleMutex );
       }
    #endif
 
@@ -641,7 +641,7 @@ HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &s_ConsoleMutex );
+         hb_threadUnlock( &s_ConsoleMutex );
       }
    #endif
 }
@@ -651,7 +651,7 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &s_ConsoleMutex );
+         hb_threadLock( &s_ConsoleMutex );
       }
    #endif
 
@@ -679,7 +679,7 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &s_ConsoleMutex );
+         hb_threadUnlock( &s_ConsoleMutex );
       }
    #endif
 }
@@ -693,7 +693,7 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &s_ConsoleMutex );
+         hb_threadLock( &s_ConsoleMutex );
       }
    #endif
 
@@ -726,7 +726,7 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &s_ConsoleMutex );
+         hb_threadUnlock( &s_ConsoleMutex );
       }
    #endif
 }
@@ -744,7 +744,7 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &s_ConsoleMutex );
+         hb_threadLock( &s_ConsoleMutex );
       }
    #endif
 
@@ -779,7 +779,7 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &s_ConsoleMutex );
+         hb_threadUnlock( &s_ConsoleMutex );
       }
    #endif
 }
@@ -789,7 +789,7 @@ HB_FUNC( HBCONSOLELOCK )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_lock( &s_ConsoleMutex );
+         hb_threadLock( &s_ConsoleMutex );
       }
    #endif
 }
@@ -799,7 +799,7 @@ HB_FUNC( HBCONSOLEUNLOCK )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_LWRM_unlock( &s_ConsoleMutex );
+         hb_threadUnlock( &s_ConsoleMutex );
       }
    #endif
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.8 2002/12/22 06:53:59 walito Exp $
+ * $Id: hbstack.h,v 1.9 2002/12/27 22:34:37 jonnymind Exp $
  */
 
 /*
@@ -63,6 +63,9 @@
 #if !defined( STACK_INITHB_ITEMS )
    #define STACK_INITHB_ITEMS      200
 #endif
+#if !defined( STACK_THREADHB_ITEMS )
+   #define STACK_THREADHB_ITEMS    100
+#endif
 #if !defined( STACK_EXPANDHB_ITEMS )
    #define STACK_EXPANDHB_ITEMS    20
 #endif
@@ -91,10 +94,10 @@ typedef struct
 /* JC1: test for macro accessing the stack */
 #if defined( HB_THREAD_SUPPORT )
    #include "thread.h"
-   extern HB_STACK *hb_getCurrentStack( void );
+   extern HB_STACK *hb_stackGetCurrentStack( void );
 
-   //#define HB_VM_STACK ( hb_ht_context ? (* hb_getCurrentStack() ) : hb_stack ) // Compiler disallow this optimization.
-   #define HB_VM_STACK (* hb_getCurrentStack() )
+   //#define HB_VM_STACK ( hb_ht_context ? (* hb_stackGetCurrentStack() ) : hb_stack ) // Compiler disallow this optimization.
+   #define HB_VM_STACK (* hb_stackGetCurrentStack() )
 #else
    #define HB_VM_STACK hb_stack
 #endif

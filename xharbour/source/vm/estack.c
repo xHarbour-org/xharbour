@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.20 2002/12/23 00:14:22 ronpinkas Exp $
+ * $Id: estack.c,v 1.21 2002/12/27 22:34:37 jonnymind Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ HB_STACK hb_stack;
 #ifdef HB_THREAD_SUPPORT
    #include "thread.h"
 
-HB_STACK *hb_getCurrentStack( void )
+HB_STACK *hb_stackGetCurrentStack( void )
 {
    // Most common first.
    if( hb_ht_context == NULL )
@@ -90,7 +90,7 @@ HB_STACK *hb_getCurrentStack( void )
       }
       */
 
-      HB_CRITICAL_LOCK( context_monitor );
+      HB_CRITICAL_LOCK( hb_threadContextMutex );
 
       p = hb_ht_context;
       while( p && p->th_id != id )
@@ -101,13 +101,12 @@ HB_STACK *hb_getCurrentStack( void )
       if( p )
       {
          //last_context = p;
-         HB_CRITICAL_UNLOCK( context_monitor );
+         HB_CRITICAL_UNLOCK( hb_threadContextMutex );
          return p->stack;
       }
       else
       {
-         // TODO: Add Error Message.
-         HB_CRITICAL_UNLOCK( context_monitor );
+         HB_CRITICAL_UNLOCK( hb_threadContextMutex );
          return &hb_stack;
       }
    }
@@ -151,10 +150,12 @@ void hb_stackFree( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_stackFree()"));
 
    i = HB_VM_STACK.wItems - 1;
+
    while( i >= 0 )
    {
       hb_xfree( HB_VM_STACK.pItems[ i-- ] );
    }
+
    hb_xfree( HB_VM_STACK.pItems );
 }
 
@@ -223,8 +224,7 @@ void hb_stackRemove( LONG lUntilPos )
 {
    HB_ITEM_PTR * pEnd = HB_VM_STACK.pItems + lUntilPos;
 
-   // Optimized to directly accessing hb_stack instead of HB_VM_STACK
-   while( hb_stack.pPos > pEnd )
+   while( HB_VM_STACK.pPos > pEnd )
    {
       hb_stackPop();
    }
@@ -427,31 +427,6 @@ void hb_stackDispCall( void )
 
       hb_conOutErr( buffer, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
-   }
-}
-
-/* ------------------------------------------------------------------------ */
-/* The garbage collector interface */
-/* ------------------------------------------------------------------------ */
-
-/* Mark all locals as used so they will not be released by the
- * garbage collector
- */
-void hb_vmIsLocalRef( void )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmIsLocalRef()"));
-
-   if( HB_VM_STACK.pPos > HB_VM_STACK.pItems )
-   {
-      /* the eval stack is not cleared yet */
-      HB_ITEM_PTR * pItem = HB_VM_STACK.pPos - 1;
-
-      while( pItem != HB_VM_STACK.pItems )
-      {
-         if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
-            hb_gcItemRef( *pItem );
-         --pItem;
-      }
    }
 }
 
