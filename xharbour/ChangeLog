@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2486 2004/03/04 18:03:12 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.2487 2004/03/04 21:49:44 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-05 04:55 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/hbffind.c
+    ! minor fix to be more Clipper compatible when Directory( "C:", "V" )
+
+  * source/rtl/direct.c
+    ! make sure label attribute is stripped-out in second loop when argument
+      "V" is passed during Directory() operation.
+    % more optimization on regex compiling by using proprietary static function
 
 2004-03-05 10:57 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * contrib/mysql/mysql.c

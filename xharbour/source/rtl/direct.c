@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.36 2004/03/04 08:50:04 ronpinkas Exp $
+ * $Id: direct.c,v 1.37 2004/03/04 09:12:29 paultucker Exp $
  */
 
 /*
@@ -99,6 +99,7 @@
 #include "hbapifs.h"
 #include "hbapiitm.h"
 #include "hbfast.h"
+#include "regex.h"
 
 #include "directry.ch"
 
@@ -179,7 +180,7 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
 
 void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath )
 {
-   USHORT    uiMask, uiMask1;
+   USHORT    uiMask, uiMaskNoLabel;
    BYTE      *szDirSpec;
 
 /*
@@ -209,7 +210,7 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
           | HB_FA_ENCRYPTED
           | HB_FA_VOLCOMP;
 
-   uiMask1 = uiMask;
+   uiMaskNoLabel = uiMask;
 
    hb_arrayNew( pDir, 0 );
 
@@ -258,8 +259,9 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
 
    if ( uiMask == HB_FA_LABEL )
    {
-      uiMask1 |= hb_fsAttrEncode( szAttributes );
-      hb_fsGrabDirectory( pDir, (const char*) szDirSpec, uiMask1, fDirSpec, bFullPath, bDirOnly );
+      uiMaskNoLabel |= hb_fsAttrEncode( szAttributes );
+      uiMaskNoLabel &= ~HB_FA_LABEL;
+      hb_fsGrabDirectory( pDir, (const char*) szDirSpec, uiMaskNoLabel, fDirSpec, bFullPath, bDirOnly );
    }
 
    if ( fDirSpec != NULL )
@@ -271,6 +273,37 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
    {
       hb_xfree( szDirSpec );
    }
+}
+
+static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BOOL bInit )
+{
+   static regex_t re;
+   static BOOL bInitReg = FALSE;
+   regmatch_t aMatches[1];
+   int CFlags = REG_EXTENDED, EFlags = 0;
+
+   if ( bInit || !bInitReg )
+   {
+      /* compile only once here */
+      if( regcomp( &re, szMask, CFlags ) == 0 )
+      {
+         bInitReg = TRUE;
+      }
+   }
+
+   if( !szString && !szMask )
+   {
+      /* resetting initialization flag */
+      bInitReg = FALSE;
+      return FALSE;
+   }
+
+   if( bInitReg && regexec( &re, szString, 1, aMatches, EFlags ) == 0 )
+   {
+      return aMatches[0].rm_so == 0 && aMatches[0].rm_eo == strlen( szString );
+   }
+
+   return FALSE;
 }
 
 static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName, char* szAttributes, char* sRegEx )
@@ -295,7 +328,6 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
             hb_fsDirectoryCrawler( &SubDir, pResult, szFName, szAttributes, sRegEx );
 
             hb_xfree( szSubdir );
-            hb_itemClear( &SubDir );
          }
          else
          {
@@ -310,7 +342,7 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
                sFileName++;
             }
 
-            if( hb_strMatchRegExp( (const char *) sFileName, (const char *) sRegEx ) )
+            if( hb_strMatchRegExpDir( (const char *) sFileName, (const char *) sRegEx, ui == 0 ) )
             {
                hb_arrayAddForward( pResult, pEntry );
             }
@@ -350,7 +382,8 @@ void HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char 
    hb_arrayNew( pResult, 0 );
    hb_fsDirectoryCrawler( &Dir, pResult, szFName, szAttributes, sRegEx );
 
-   hb_itemClear( &Dir );
+   /* reset regex for next loop */
+   hb_strMatchRegExpDir( NULL, NULL, FALSE );
 
    if( pCurDir )
    {
@@ -374,11 +407,11 @@ HB_FUNC( DIRECTORYRECURSE )
    PHB_ITEM pDirSpec = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pAttribute = hb_param( 2, HB_IT_STRING );
    BOOL bMatchCase = hb_parl( 3 );
-   char *szRecurse;
+   char *szRecurse = NULL;
    char szDrive[1];
    PHB_FNAME fDirSpec;
    HB_ITEM Dir;
-   char *szFName;
+   char *szFName = NULL;
    BOOL bAddDrive = TRUE;
    char *szAttributes;
 
@@ -407,7 +440,7 @@ HB_FUNC( DIRECTORYRECURSE )
       {
          if( fDirSpec->szDrive == NULL )
          {
-            szDrive[ 0 ] = ( ( char ) hb_fsCurDrv() ) + 'A';
+            szDrive[ 0 ] = ( char ) ( hb_fsCurDrv() + 'A' );
             fDirSpec->szDrive = hb_vm_acAscii[szDrive[0]];
          }
          else
@@ -422,7 +455,7 @@ HB_FUNC( DIRECTORYRECURSE )
 
          if( bAddDrive )
          {
-            szRecurse =  hb_xstrcpy( NULL, fDirSpec->szDrive, ":\\", fDirSpec->szPath, "\\", HB_DIR_ALL_FILES_MASK, NULL );
+            szRecurse = hb_xstrcpy( NULL, fDirSpec->szDrive, ":\\", fDirSpec->szPath, "\\", HB_DIR_ALL_FILES_MASK, NULL );
          }
          else
          {

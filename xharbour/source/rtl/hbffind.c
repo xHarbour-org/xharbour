@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.17 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: hbffind.c,v 1.18 2004/03/03 19:41:27 andijahja Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.17 2004/02/14 21:01:17 andijahja Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.18 2004/03/03 19:41:27 andijahja Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -226,11 +226,7 @@ FILETIME GetOldesFile( const char * szPath)
    return ftLastWriteTime;
 }
 
-
-
 #endif
-
-
 
 /* ------------------------------------------------------------- */
 
@@ -739,14 +735,20 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
     {
       DWORD dwSysFlags;
       char szPath[ 4 ]  = {0};
-      strncpy( szPath, pszFileName, 3);
+      strncpy( szPath, pszFileName, 3 );
       info->hFindFile = INVALID_HANDLE_VALUE;
 
-      if (GetVolumeInformation( szPath, info->szVolInfo, MAX_PATH, NULL, NULL, &dwSysFlags, NULL, 0 ) )
+      if ( szPath[2] != OS_PATH_DELIMITER && szPath[2] == NULL )
+      {
+         // 2004-03-05 Clipper compatibility for Directory( "C:", "V" )
+         szPath[2] = OS_PATH_DELIMITER;
+      }
+
+      if ( GetVolumeInformation( szPath, info->szVolInfo, MAX_PATH, NULL, NULL, &dwSysFlags, NULL, 0 ) )
       {
         info->fFileTime = GetOldesFile( szPath );
         bFound = TRUE;
-        info->dwAttr    = ( DWORD ) hb_fsAttrToRaw( uiAttr );
+        info->dwAttr = ( DWORD ) hb_fsAttrToRaw( uiAttr );
       }
       else
       {
@@ -756,8 +758,8 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
     else
     {
       char *pFileName ;
-      int iNameLen = strlen(pszFileName) ;
-      pFileName = (char *) hb_xgrab( iNameLen+4 ) ; // Allow room to add "*.*"
+      int iNameLen = strlen( pszFileName ) ;
+      pFileName = (char *) hb_xgrab( iNameLen + 4 ) ; // Allow room to add "*.*"
       info->hFindFile = INVALID_HANDLE_VALUE;
       bFound = FALSE ;
       if ( pFileName )
