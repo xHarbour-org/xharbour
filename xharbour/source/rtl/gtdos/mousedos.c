@@ -1,5 +1,5 @@
 /*
- * $Id: mousedos.c,v 1.1.1.1 2001/12/21 10:42:40 ronpinkas Exp $
+ * $Id: mousedos.c,v 1.2 2003/05/16 19:52:09 druzus Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
  */
 
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_FNPREF(x) dos ## x
+#define HB_GT_NAME	DOS
 
 #include "hbapigt.h"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.5 2003/01/27 04:22:37 walito Exp $
+ * $Id: hbapigt.h,v 1.6 2003/05/16 19:52:06 druzus Exp $
  */
 
 /*
@@ -323,25 +323,66 @@ extern void   hb_mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
 /* for compilation with multi GT drivers
    User can choose GT on runtime by //GT:<gtname> switch [druzus] */
 
-#if defined(HB_MULTI_GT) && defined(HB_GT_FNPREF)
-#  define HB_GT_FUNC(x) HB_GT_FNPREF(_hb_ ## x)
-#else
-#  undef HB_MULTI_GT
-#  define HB_GT_FUNC(x) hb_ ## x
+#if ! defined(HB_GT_NAME)
+#undef HB_MULTI_GT
+#define HB_GT_FUNC(x)   HB_GT_FUNC_(x)
+#define HB_GT_FUNC_(x)  hb_##x
 #endif
 
 #ifdef HB_MULTI_GT
 
 #include "hbinit.h"
 
-/* This hack is needed to force preprocessing if id is also a macro */
-#define HB_GT_REQUEST( id )           HB_GT_REQUEST_( id )
-#define HB_GT_REQUEST_( id )          extern HB_FUNC( HB_GT_##id ); \
-                                      void hb_gt_ForceLink( void ) \
-                                      { \
-                                         HB_FUNCNAME( HB_GT_##id )(); \
-                                      }
-#define HB_GT_ANNOUNCE( id )          HB_FUNC( HB_GT_##id ) {}
+/* These hacks are needed to force preprocessing if id/x is also a macro */
+#define _HB_GT_PREF_( id )      _HB_GT_PREF__( id )
+#define _HB_GT_PREF__( id )     _##id
+
+#define HB_GT_FUNC( x )         HB_GT_FUNC_( x, _HB_GT_PREF_( HB_GT_NAME ) )
+#define HB_GT_FUNC_( x, id )    HB_GT_FUNC__( x, id )
+#define HB_GT_FUNC__( x, id )   hb##id##_##x
+
+#define HB_GT_DRVNAME( id )           HB_GT_DRVNAME_( _HB_GT_PREF_( id ) )
+#define HB_GT_DRVNAME_( id )          HB_GT_DRVNAME__( id )
+#define HB_GT_DRVNAME__( id )         HB_GT_DRV##id
+
+#define HB_GT_REQUEST( id )     HB_GT_REQUEST_( _HB_GT_PREF_( id ) )
+#define HB_GT_REQUEST_( id )    HB_GT_REQUEST__( id )
+#define HB_GT_REQUEST__( id )   extern HB_FUNC( HB_GT##id ); \
+                                void hb_gt_ForceLink( void ) \
+                                { \
+                                   HB_FUNCNAME( HB_GT##id )(); \
+                                }
+
+#define HB_GT_ANNOUNCE( id )    HB_GT_ANNOUNCE_( _HB_GT_PREF_( id ) )
+#define HB_GT_ANNOUNCE_( id )   HB_GT_ANNOUNCE__( id )
+#define HB_GT_ANNOUNCE__( id )  HB_FUNC( HB_GT##id ) {}
+
+/* conver lower case sufixes to upper */
+#define _nul   _NUL
+#define _std   _STD
+#define _cgi   _CGI
+#define _pca   _PCA
+#define _crs   _CRS
+#define _sln   _SLN
+#define _win   _WIN
+#define _dos   _DOS
+#define _os2   _OS2
+#define _tpl   _TPL
+#define _QTc   _QTC
+
+/* names of GT */
+#define HB_GT_DRV_NUL   "nul"
+#define HB_GT_DRV_STD   "std"
+#define HB_GT_DRV_CGI   "cgi"
+#define HB_GT_DRV_PCA   "pca"
+#define HB_GT_DRV_CRS   "crs"
+#define HB_GT_DRV_SLN   "sln"
+#define HB_GT_DRV_WIN   "win"
+#define HB_GT_DRV_DOS   "dos"
+#define HB_GT_DRV_OS2   "os2"
+#define HB_GT_DRV_TPL   "tpl"
+#define HB_GT_DRV_QTC   "QTc"
+
 
 typedef struct _HB_GT_FUNCS
 {

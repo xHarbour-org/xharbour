@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.h,v 1.4 2002/09/20 19:18:18 map Exp $
+ * $Id: gtsln.h,v 1.5 2003/05/16 19:52:11 druzus Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 /* *********************************************************************** */
 
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_FNPREF(x) sln ## x
+#define HB_GT_NAME	SLN
 
 #include <slang.h>
 #include "hbapigt.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.4 2002/10/22 02:11:47 paultucker Exp $
+ * $Id: gtos2.c,v 1.5 2003/05/16 19:52:09 druzus Exp $
  */
 
 /*
@@ -86,7 +86,7 @@
 /* NOTE: User programs should never call this layer directly! */
 
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_FNPREF(x) os2 ## x
+#define HB_GT_NAME	OS2
 
 #define INCL_BASE
 #define INCL_VIO

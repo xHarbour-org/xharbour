@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1035 2003/05/19 18:44:10 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1036 2003/05/20 00:33:38 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-21 11:45 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  ! xharbour/source/rtl/gtcrs/gtcrs.c
+    ! bug fixed - removed OPOST flag from terminal device - curses
+    use NL to optimization of screen output.
+
+  * xharbour/source/rtl/gtnul/Makefile
+  * xharbour/source/rtl/gtnul/gtnul.c
+    * new flags -DHB_GT_LIB=$(HB_GT_LIB:gt%=%) and
+    -DHB_DEFAULT_GT=$(HB_DEFAULT_GT:gt%=%) which allow to set the
+    default GT which has to be linked with apps. It should makes
+    static linking easier.
+
+  * xharbour/include/hbapigt.h
+  * xharbour/source/rtl/gtQTc/gtQTc.cpp
+  * xharbour/source/rtl/gtQTc/mouseQTc.c
+  * xharbour/source/rtl/gt_tpl/gt_tpl.c
+  * xharbour/source/rtl/gt_tpl/mousetpl.c
+  * xharbour/source/rtl/gtcgi/gtcgi.c
+  * xharbour/source/rtl/gtcgi/mousecgi.c
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+  * xharbour/source/rtl/gtdos/gtdos.c
+  * xharbour/source/rtl/gtdos/mousedos.c
+  * xharbour/source/rtl/gtos2/gtos2.c
+  * xharbour/source/rtl/gtos2/mouseos2.c
+  * xharbour/source/rtl/gtpca/gtpca.c
+  * xharbour/source/rtl/gtpca/mousepca.c
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtsln/gtsln.h
+  * xharbour/source/rtl/gtstd/gtstd.c
+  * xharbour/source/rtl/gtstd/mousestd.c
+  * xharbour/source/rtl/gtwin/gtwin.c
+  * xharbour/source/rtl/gtwin/mousewin.c
+    * changes to make HB_GT_REQUEST(id) case insensitive because
+      HB_GT_LIB is lower case but .prg 'REQUEST HB_GT_<ID>' upper.
 
 2003-05-19 21:15 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
   + source/rtl/hbcrc32.c
@@ -16,7 +52,6 @@
    makefile.nt
    source/rtl/Makefile
      * Added new Dep
-
 
 2003-05-19 11:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c

@@ -1,5 +1,5 @@
 /*
- * $Id: mousetpl.c,v 1.1.1.1 2001/12/21 10:42:24 ronpinkas Exp $
+ * $Id: mousetpl.c,v 1.2 2003/05/16 19:52:08 druzus Exp $
  */
 
 /*
@@ -51,7 +51,7 @@
  */
 
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_FNPREF(x) tpl ## x
+#define HB_GT_NAME	TPL
 
 #include "hbapigt.h"
 

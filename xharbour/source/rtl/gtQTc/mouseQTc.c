@@ -1,5 +1,5 @@
 /*
- * $Id: mouseQTc.c,v 1.1 2003/01/30 00:46:25 jonnymind Exp $
+ * $Id: mouseQTc.c,v 1.2 2003/05/16 19:52:08 druzus Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
          any kind of mouse support. [vszakats] */
 
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_FNPREF(x) QTc ## x
+#define HB_GT_NAME	QTC
 
 #include "hbapigt.h"
 

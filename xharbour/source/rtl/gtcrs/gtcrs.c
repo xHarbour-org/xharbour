@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.5 2003/05/16 19:52:09 druzus Exp $
+ * $Id: gtcrs.c,v 1.6 2003/05/19 12:46:26 druzus Exp $
  */
 
 /*
@@ -1575,7 +1575,7 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
 	ioBase->curr_TIO.c_cflag |= CS8 | CREAD;
 	ioBase->curr_TIO.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
 	ioBase->curr_TIO.c_oflag &= ~OPOST;
-	ioBase->curr_TIO.c_oflag |= ONLCR | OPOST;
+	/* ioBase->curr_TIO.c_oflag |= ONLCR | OPOST; */
 
 	memset(ioBase->curr_TIO.c_cc, 0, NCCS);
     }
@@ -2995,15 +2995,16 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 
 /* ********************************************************************** */
 
-static HB_GT_INIT gtInit = {"crs", HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit)};
+static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ), 
+                             HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
-HB_GT_ANNOUNCE( CRS );
+HB_GT_ANNOUNCE( HB_GT_NAME );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_gt_Init_CRS )
+HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
    hb_gtRegister( &gtInit );
-HB_CALL_ON_STARTUP_END( hb_gt_Init_CRS )
+HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
 #if ! defined(__GNUC__) && ! defined(_MSC_VER)
-   #pragma startup hb_gt_Init_CRS
+   #pragma startup HB_GT_FUNC(_gt_Init_)
 #endif
 
 #endif  /* HB_MULTI_GT */

@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.1 2003/05/16 19:52:09 druzus Exp $
+ * $Id: gtnul.c,v 1.2 2003/05/17 18:25:01 druzus Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 
 #define HB_MULTI_GT
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_FNPREF(x) nul ## x
+#define HB_GT_NAME	NUL
 
 #include "hbapigt.h"
 #include "hbapifs.h"
@@ -71,12 +71,14 @@
 */
 
 #define HB_GT_MAX_ 16
+static char * s_initGT = HB_GT_DRVNAME( HB_GT_NAME );
 
-static char * s_initGT = "nul";
 #if defined(HB_DEFAULT_GT)
-   static char * s_defaultGT = HB_DEFAULT_GT;
+   static char * s_defaultGT = HB_GT_DRVNAME( HB_DEFAULT_GT );
+   HB_GT_REQUEST( HB_DEFAULT_GT );
 #elif defined(HB_GT_LIB)
-   static char * s_defaultGT = HB_GT_LIB;
+   static char * s_defaultGT = HB_GT_DRVNAME( HB_GT_LIB );
+   HB_GT_REQUEST( HB_GT_LIB );
 #elif defined(HB_OS_LINUX)
    static char * s_defaultGT = "crs";
 #elif defined(HB_OS_WIN_32)
@@ -998,15 +1000,16 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 
 /* ********************************************************************** */
 
-static HB_GT_INIT gtInit = {"nul", HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit)};
+static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ), 
+                             HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
-HB_GT_ANNOUNCE( NUL );
+HB_GT_ANNOUNCE( HB_GT_NAME );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_gt_Init_NUL )
+HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
    hb_gtRegister( &gtInit );
-HB_CALL_ON_STARTUP_END( hb_gt_Init_NUL )
+HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
 #if ! defined(__GNUC__) && ! defined(_MSC_VER)
-   #pragma startup hb_gt_Init_NUL
+   #pragma startup HB_GT_FUNC(_gt_Init_)
 #endif
 
 #endif  /* HB_MULTI_GT */

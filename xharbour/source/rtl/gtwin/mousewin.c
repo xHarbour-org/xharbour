@@ -1,5 +1,5 @@
 /*
- * $Id: mousewin.c,v 1.1.1.1 2001/12/21 10:42:25 ronpinkas Exp $
+ * $Id: mousewin.c,v 1.2 2003/05/16 19:52:12 druzus Exp $
  */
 
 /*
@@ -51,7 +51,7 @@
  */
 
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_FNPREF(x) win ## x
+#define HB_GT_NAME	WIN
 
 #define HB_OS_WIN_32_USED
 

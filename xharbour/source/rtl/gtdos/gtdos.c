@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.5 2002/11/13 15:37:05 walito Exp $
+ * $Id: gtdos.c,v 1.6 2003/05/16 19:52:09 druzus Exp $
  */
 
 /*
@@ -86,7 +86,7 @@
 /* NOTE: User programs should never call this layer directly! */
 
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_FNPREF(x) dos ## x
+#define HB_GT_NAME	DOS
 
 #include "hbapi.h"
 #include "hbapigt.h"

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: gtcrs.h,v 1.2 2003/05/17 15:55:18 druzus Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 /* *********************************************************************** */
 
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_FNPREF(x) crs ## x
+#define HB_GT_NAME	CRS
 
 #include "hbapigt.h"
 #include "inkey.ch"
@@ -78,7 +78,7 @@ extern int HB_GT_FUNC(gt_chrmapinit( int *piTransTbl, char *pszTerm ));
 
 
 #define NO_IFDS		10
-#define ESC_DELAY	300
+#define ESC_DELAY	100
 #define DBLCLK_DELAY	250
 
 #define MAX_IOBASE	32

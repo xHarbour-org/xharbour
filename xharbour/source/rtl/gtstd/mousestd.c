@@ -1,5 +1,5 @@
 /*
- * $Id: mousestd.c,v 1.1.1.1 2001/12/21 10:42:28 ronpinkas Exp $
+ * $Id: mousestd.c,v 1.2 2003/05/16 19:52:12 druzus Exp $
  */
 
 /*
@@ -51,7 +51,7 @@
  */
 
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_FNPREF(x) std ## x
+#define HB_GT_NAME	STD
 
 #include "hbapigt.h"
 

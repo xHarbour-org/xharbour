@@ -1,5 +1,5 @@
 /*
- * $Id: gtpca.c,v 1.3 2002/09/27 20:51:49 map Exp $
+ * $Id: gtpca.c,v 1.4 2003/05/16 19:52:10 druzus Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 /* NOTE: User programs should never call this layer directly! */
 
 /* This definition has to be placed before #include "hbapigt.h" */
-#define HB_GT_FNPREF(x) pca ## x
+#define HB_GT_NAME	PCA
 
 #if defined(__GNUC__) && ! defined(__MINGW32__)
    #include <unistd.h>
@@ -758,15 +758,16 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 
 /* ********************************************************************** */
 
-static HB_GT_INIT gtInit = {"pca", HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit)};
+static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ), 
+                             HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
-HB_GT_ANNOUNCE( PCA );
+HB_GT_ANNOUNCE( HB_GT_NAME );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_gt_Init_PCA )
+HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
    hb_gtRegister( &gtInit );
-HB_CALL_ON_STARTUP_END( hb_gt_Init_PCA )
+HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
 #if ! defined(__GNUC__) && ! defined(_MSC_VER)
-   #pragma startup hb_gt_Init_PCA
+   #pragma startup HB_GT_FUNC(_gt_Init_)
 #endif
 
 #endif  /* HB_MULTI_GT */
