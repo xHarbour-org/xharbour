@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.4 2002/10/15 03:18:00 andijahja Exp $
+ * $Id: hbver.c,v 1.5 2003/06/26 12:37:08 druzus Exp $
  */
 
 /*
@@ -600,7 +600,7 @@ void hb_verBuildInfo( void )
    hb_conOutErr( hb_conNewLine(), 0 );
 
    hb_conOutErr( "Object file generation support: ", 0 );
-#if defined( HARBOUR_OBJ_GENERATION )
+#if defined( HARBOUR_OBJ_GENERATION ) || defined( HB_BACK_END )
    hb_conOutErr( "Yes", 0 );
 #else
    hb_conOutErr( "No", 0 );

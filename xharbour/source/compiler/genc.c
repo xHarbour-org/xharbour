@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.44 2003/06/23 18:50:58 ronpinkas Exp $
+ * $Id: genc.c,v 1.45 2003/06/23 21:20:35 ronpinkas Exp $
  */
 
 /*
@@ -374,7 +374,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
 
       if( bCritical )
       {
-         fprintf( yyc, "#if defined(_MSC_VER)\n" );
+         fprintf( yyc, "#if defined(HB_STATIC_STARTUP)\n" );
+         fprintf( yyc, "   #pragma startup hb_InitCritical%s\n", pFileName->szName );
+         fprintf( yyc, "#elif defined(_MSC_VER)\n" );
          fprintf( yyc, "   static HB_$INITSYM hb_auto_InitCritical = hb_InitCritical%s;\n", pFileName->szName );
          fprintf( yyc, "#elif ! defined(__GNUC__)\n" );
          fprintf( yyc, "   #pragma startup hb_InitCritical%s\n", pFileName->szName );
@@ -418,7 +420,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
       pFunc = hb_comp_functions.pFirst;
 
       if( ! hb_comp_bStartProc )
+      {
          pFunc = pFunc->pNext; /* No implicit starting procedure */
+      }
 
       while( pFunc )
       {
@@ -607,9 +611,16 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
       hb_xfree( pDelete );
    }
 
-   if( ! hb_comp_bQuiet )
+   #ifndef HB_BACK_END
+      #define HB_BACK_END 0
+   #endif
+
+   if( HB_BACK_END == 0 )
    {
-      printf( "Done.\n" );
+      if( ! hb_comp_bQuiet )
+      {
+         printf( "Done.\n" );
+      }
    }
 }
 

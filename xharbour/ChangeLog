@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1191 2003/06/26 12:37:06 druzus Exp $
+ * $Id: ChangeLog,v 1.1192 2003/06/26 17:44:19 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-26 21:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/genc.c
+    * Minor fix to HB_STATIC_STARTUP support and added HB_BACK_END support.
+
+  * source/common/hbver.c
+    * HB_BACK_END support.
+
+  * source/rdd/dbfntx/dbfntx1.c
+    * Minor warning fixed.
+
+  * source/vm/errorapi.c
+    ! Fixed serious GPF trap.
+      /*
+         Note I found it when it seems that:
+
+           hb_langDGetItem( HB_LANG_ITEM_BASE_ERRDESC + ulGenCode )
+
+         returns NULL when ulGenCode was: EG_NOVAR.
+
+         I don't no if this is a reproducable issue or not, but it seems we need to check hb_langDGetItem().
+      */
+
 2003-06-26 14:40 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * All files RETagged with Build Xharbour-0.81
 

@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.10 2003/06/17 14:22:22 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.11 2003/06/18 08:57:02 ronpinkas Exp $
  */
 
 /*
@@ -496,10 +496,14 @@ PHB_ITEM HB_EXPORT hb_errPutDescription( PHB_ITEM pError, char * szDescription )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutDescription(%p, %s)", pError, szDescription));
 
-   hb_vmPushSymbol( hb_dynsymGet( "_DESCRIPTION" )->pSymbol );
-   hb_vmPush( pError );
-   hb_vmPushString( szDescription, strlen( szDescription ) );
-   hb_vmSend( 1 );
+   if( szDescription )
+   {
+      hb_vmPushSymbol( hb_dynsymGet( "_DESCRIPTION" )->pSymbol );
+      hb_vmPush( pError );
+      hb_vmPushString( szDescription, strlen( szDescription ) );
+
+      hb_vmSend( 1 );
+   }
 
    return pError;
 }

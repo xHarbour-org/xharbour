@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.48 2003/06/21 02:34:07 lculik Exp $
+ * $Id: dbfntx1.c,v 1.49 2003/06/26 01:29:15 ronpinkas Exp $
  */
 
 /*
@@ -2342,7 +2342,7 @@ static void hb_ntxBufferSave( LPTAGINFO pTag, LPNTXSORTINFO pSortInfo )
    {
       while( pKey )
       {
-         for( i = 0; ( i < maxKeys  || numKey == pSortInfo->ulKeyCount-1 ) && pKey > 0; i++, numKey++, pKey = pKey->pNext )
+         for( i = 0; ( i < maxKeys  || numKey == pSortInfo->ulKeyCount-1 ) && pKey; i++, numKey++, pKey = pKey->pNext )
          {
             /* printf( "\nhb_ntxBufferSave - 2 ( i=%d maxKeys=%d )",i,maxKeys ); */
             item = (NTXITEM *)( buffer + itemlist->item_offset[i] );
