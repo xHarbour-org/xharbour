@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.76 2003/07/19 22:08:05 jonnymind Exp $
+ * $Id: hbapi.h,v 1.77 2003/07/23 12:35:57 druzus Exp $
  */
 
 /*
@@ -556,6 +556,9 @@ extern BOOL hb_execFromArray( PHB_ITEM pCallableArray );
 /* environment variables access */
 /* WARNING: This returned pointer must be freed if not NULL using hb_xfree( ( void * ) ptr ); */
 extern char * hb_getenv( const char * name );
+
+/* JC1: Indirect execution */
+BOOL hb_execFromArray( PHB_ITEM pFirst );
 
 /* Version tracking related things */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1346 2003/08/13 23:51:01 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1347 2003/08/14 08:44:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-15 01:46 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/eval.c
+  * source/vm/hvm.c
+    ! removed EXEC, HB_EXECFROMARRAY and hb_execFromArray() functions from
+    hvm.c and moved themo to eval.c
+    + Added indirect execution of codeblocks in HB_EXECFROMARRAY and
+      hb_execFromArray()
+    % Added MT optimization in eval.c functions
+
+  * doc/en/indirect.txt
+    + Added documentation for Indirect execution
+
+  * include/hbapi.h
+    + Added prototype of hb_execFromArray() to be used from C API.
+
+  * tests/exec.prg
+    + Added tests for codeblock indirect calling.
+
+  * source/vm/memvars.c
+    ! removed a useless HB_THREAD_STUB that caused a warning
+
 
 2003-08-14 01:43 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c

@@ -1,6 +1,6 @@
 ***********************************************************
 * exec.prg
-* $Id: exec.prg,v 1.1 2003/02/18 23:54:57 jonnymind Exp $
+* $Id: exec.prg,v 1.2 2003/02/19 10:16:32 jonnymind Exp $
 *
 * Test for indirect execution of functions and methods 
 * using arrays as parameter lists
@@ -48,8 +48,17 @@ PROCEDURE MAIN()
    aData[3] ++
    aData[5] := "Method call through array 2"
    nRes := hb_execFromArray( aData )
-
    @aData[3]+1, 5 SAY "Check for return value: " + Ltrim( Str( nRes ) )
+
+   aData[3]+=2
+   aData[1] := {|ignore,a,b,c| MyFunc(a,b,c) }
+   aData[5] := "Call through a codeblock"
+   hb_execFromArray( aData )
+
+   aData[3]++
+   HB_ExecFromArray( {|a,b,c| MyFunc( a,b,c) }, {aData[3], 5,;
+         "Direct call through a codeblock"} );
+
 
    hb_execFromArray( @MyProc(), {} )
 
@@ -60,7 +69,7 @@ FUNCTION MyFunc( nRow, nCol, cText )
 RETURN (nRow * nCol)
 
 PROCEDURE MyProc()
-   @20, 15 SAY "Test complete - press any key"
+   @22, 15 SAY "Test complete - press any key"
    Inkey(0)
    CLEAR SCREEN
 RETURN

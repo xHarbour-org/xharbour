@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.25 2003/07/27 14:59:01 jonnymind Exp $
+ * $Id: memvars.c,v 1.26 2003/07/27 20:15:12 jonnymind Exp $
  */
 
 /*
@@ -1972,8 +1972,6 @@ void hb_memvarsIsMemvarRef( void )
 
 HB_HANDLE hb_memvarGetVarHandle( char *szName )
 {
-   HB_THREAD_STUB
-
    PHB_DYNS pDyn;
 
    if( ( pDyn = hb_dynsymFindName( szName ) ) != NULL )
