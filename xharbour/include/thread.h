@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.95 2004/10/18 10:22:25 likewolf Exp $
+* $Id: thread.h,v 1.96 2004/11/01 05:38:09 likewolf Exp $
 */
 
 /*
@@ -683,7 +683,7 @@ typedef struct tag_HB_SHARED_RESOURCE
 
    #if __GNUC__ >= 3 || defined( __BORLANDC__ )
       extern HB_STACK __thread *hb_thread_stack;
-   #elif defined( _MSVC_VER )
+   #elif defined( _MSC_VER )
       extern HB_STACK __declspec(thread) *hb_thread_stack;
    #else
       #error "This platform does not support __thread keyword; undefine HB_THREAD_TLS_KEYWORD & recompile"
