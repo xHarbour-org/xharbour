@@ -1,6 +1,6 @@
 ************************************************************
 * rpcserver.prg
-* $Id: rpcserver.prg,v 1.4 2003/02/24 01:58:11 jonnymind Exp $
+* $Id: rpcserver.prg,v 1.5 2003/02/24 05:55:55 jonnymind Exp $
 * Test for tRpcServer and tRpcFunction class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -21,17 +21,14 @@ PROCEDURE Main()
    CLEAR SCREEN
    @1,15 SAY "X H A R B O U R - Remote Procedure Call server test."
 
-   // creating the procedure: we use a new class
-   // serial is today: 20030215
-   // return is c:10
-   // Param list is just a neverending C:0
-   // Auth level is 1 (anyone that has logged in)
-   oProc := tRPCFunctionTest():New( "Checksum","20030215.A", "C:10", { "C:0" }, 1  )
+   oProc := tRPCFunction():New( "Checksum(C:0)-->C:10", "20030201.A", 1, @CheckSum() )
+
    oSv := tRPCService():New()
    oSv:cServerName := "CksumTest"
    oSv:Add( oProc )
    oSv:bOnServerScan := {|x| Scans( x ) }
    oSv:bOnFunctionScan := {|x| Scanf( x ) }
+   oSv:bOnFunctionError := {|x,y,z| FuncError( x, y, z ) }
    oSv:bOnClientConnect := {|x| Connecting( x ) }
    oSv:bOnClientLogin := {|x| Entering( x ) }
    oSv:bOnClientLogout := {|x| Exiting( x ) }
@@ -47,30 +44,18 @@ PROCEDURE Main()
    oSv:Stop()
 RETURN
 
-
-CLASS tRpcFunctionTest from tRpcFunction
-   // You just need to overrun the RUN method
-   Method Run( aParams, oClient )
-   // the socket is needed only if you want to give a progress indicator
-ENDCLASS
-
-
-METHOD Run( aParams, oClient ) class tRpcFunctionTest
+FUNCTION CheckSum( cData, oClient )
    LOCAL nSum, i
 
    // signal that function is starting (not necessary, just for test)
    oClient:SendProgress( 0 )
 
-   IF .not. ::CheckTypes( aParams )
-      RETURN NIL
-   ENDIF
-
    nSum := 0
-   FOR i := 1 to Len( aParams[1] )
-      nSum += asc(aParams[1][i])
+   FOR i := 1 to Len( cData )
+      nSum += asc(cData[i])
       // signal a progress each 50 characters
       IF i % 50 == 0
-         oClient:SendProgress( i / Len( aParams[1] ) * 100, Str(nSum, 10 ) )
+         oClient:SendProgress( i / Len( cData ) * 100, Str(nSum, 10 ) )
          // simulate some burdensome operation
          ThreadSleep( 200 )
       ENDIF
@@ -107,5 +92,10 @@ PROCEDURE Terminating( oClient )
    ENDIF
 RETURN .T.
 
+PROCEDURE FuncError( oServer, cFunc, nError )
+   ? "ERROR in function call: ", nError, cFunc
+RETURN
+
 PROCEDURE HaveEncryptionKey( cUserId )
 RETURN "A nice key to be used by servers"
+

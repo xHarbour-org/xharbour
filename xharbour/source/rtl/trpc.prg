@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.13 2003/04/13 23:55:26 jonnymind Exp $
+ * $Id: trpc.prg,v 1.14 2003/04/16 08:37:45 jonnymind Exp $
  */
 
 /*
@@ -206,54 +206,112 @@ CLASS tRPCFunction
    DATA cReturn
    DATA cSerial
    DATA nAuthLevel
-   DATA bGetRawParams
+
+   DATA oExecutable
+   DATA oMethod
+
+   DATA aCall
 
    CLASSDATA cPattern INIT HB_RegexComp( "^C:[0-9]{1,6}$|^A$|^O$|^D$|^N:[0-9]{1,2}(,[0-9]{1,2})?$")
 
-   METHOD New( cFname, cSerial, cFret, aParams, nAuthLevel, bGetRawParams ) CONSTRUCTOR
+   METHOD New( cFname, cSerial, cFret, aParams, nAuthLevel, oExec, oMethod ) CONSTRUCTOR
+   METHOD SetCallable( oExecSymbol, oMethod )
    METHOD CheckTypes( aParams )
    METHOD CheckParam( cParam )
    METHOD Describe()
-   METHOD Run( aParams, oClient ) VIRTUAL
+   METHOD Run( aParams, oClient )
 ENDCLASS
 
 
-METHOD New( cFname, cSerial, cFret, aParams, nAuthLevel, bGetRaw ) CLASS tRPCFunction
+METHOD New( cFname, cSerial, nAuthLevel, oExec, oMeth ) CLASS tRPCFunction
    LOCAL cParam
+   LOCAL cFret, aParams, aFuncDef
 
-   ::cName := cFname
-   ::cReturn := cFret
-   ::CheckParam( ::cReturn )
-   IF .not. HB_RegexMatch( "[0-9]{8}\..", cSerial )
-      Alert( "Serial value not valid" )
+   // Analyze the function definition
+   aFuncDef := HB_Regex( "^([a-zA-Z0-9_-]+)\(([^)]*)\) *(-->)? *(.*)$", cFname )
+   IF Empty( aFuncDef )
+      Alert( "Invalid function defintion" )
+      ErrorLevel( 1 )
       QUIT
    ENDIF
 
+   ::cName := aFuncDef[2]
+   cParam := aFuncDef[3]
+   ::cReturn := IIF( Len( aFuncDef ) == 4, aFuncDef[4], aFuncDef[5] )
+
+   // analyze parameter list
+   aParams := HB_RegexSplit( ",", cParam )
+   ::aParameters := {}
+   FOR EACH cParam IN aParams
+      cParam := AllTrim( Upper(cParam) )
+      ::CheckParam( cParam )
+      AAdd( ::aParameters, cParam )
+   NEXT
+
+   // Analyze function definition return
+   ::CheckParam( ::cReturn )
+
+   // Analyze function serial number
+   IF .not. HB_RegexMatch( "[0-9]{8}\..", cSerial )
+      Alert( "Serial value not valid" )
+      ErrorLevel( 1 )
+      QUIT
+   ENDIF
+
+   // analyze function authorization level
    IF nAuthLevel < 1
       Alert( "Authorization level must be at least 1" )
+      ErrorLevel( 1 )
       QUIT
    ENDIF
 
    ::cSerial := cSerial
    ::nAuthLevel := nAuthLevel
-   ::aParameters := {}
-   FOR EACH cParam IN aParams
-      ::CheckParam( cParam )
-      AAdd( ::aParameters, cParam )
-   NEXT
 
-   IF bGetRaw != NIL
-      ::bGetRawParams := bGetRaw
-   ELSE
-      ::bGetRawParams := .T.
+   // Set now Executable object if given
+   IF oExec != NIL
+      ::SetCallable( oExec, oMeth )
    ENDIF
 
 RETURN Self
 
 
+METHOD SetCallable( oExec, oMeth ) CLASS tRPCFunction
+   // If the callable is an object, we need to store the method
+   IF ValType( oExec ) == "O"
+      ::aCall := Array( Len( ::aParameters ) + 3 )
+      ::aCall[2] := oMeth
+   ELSE
+      ::aCall := Array( Len( ::aParameters ) + 2 )
+   ENDIF
+
+   ::aCall[1] := oExec
+
+RETURN .T.
+
+METHOD Run( aParams, oClient ) CLASS tRPCFunction
+   LOCAL nStart, nCount, xRet
+
+   IF .not. ::CheckTypes( aParams )
+      RETURN NIL
+   ENDIF
+
+   nStart := IIF( ValType( ::aCall[1] ) == "O", 3, 2 )
+
+   FOR nCount := 1 TO Len( aParams )
+      ::aCall[ nStart ] := aParams[ nCount ]
+      nStart ++
+   NEXT
+
+   ::aCall[ nStart ] := oClient
+
+   xRet := HB_ExecFromArray( ::aCall )
+RETURN xRet
+
+
 METHOD CheckParam( cParam ) CLASS tRPCFunction
    IF .not. HB_RegexMatch( ::cPattern, cParam )
-      Alert("tRPCFunction:CheckParam() wrong parameter specification:" + cParam )
+      Alert("tRPCFunction:CheckParam() wrong parameter specification: " + cParam )
       QUIT
    ENDIF
 RETURN .T.
@@ -280,13 +338,19 @@ RETURN .T.
 
 
 METHOD Describe() CLASS tRPCFunction
-   LOCAL cRet := ::cName +"[" + ::cSerial + "]/" + ::cReturn
-   LOCAL cVar
+   LOCAL cRet := ::cName + "("
+   LOCAL nCount
 
-   FOR EACH cVar IN ::aParameters
-      cRet += "," + cVar
-   NEXT
-RETURN cRet
+   IF Len( ::aParameters ) > 0
+      FOR nCount := 1 TO Len( ::aParameters ) -1
+         cRet += ::aParameters[nCount] + ","
+      NEXT
+      cRet += ::aParameters[ -1 ]
+   ENDIF
+
+   cRet += ")-->" + ::cReturn
+
+RETURN cRet+"/" + ::cSerial
 
 
 /***********************************************************
@@ -296,7 +360,7 @@ RETURN cRet
 CLASS tRPCServeCon
    /* back reference to the parent to get callback blocks */
    DATA oServer
-   
+
    /* Socket, mutex and thread */
    DATA skRemote
    DATA mtxBusy
@@ -733,16 +797,16 @@ METHOD LaunchFunction( cFuncName, aParams, nMode, aDesc ) CLASS tRPCServeCon
    oFunc := ::oServer:Find( cFuncName )
    IF Empty(oFunc)
       // signal error
-      ::oServer:OnFunctionError( Self,00 )
+      ::oServer:OnFunctionError( Self, cFuncName, 00 )
       InetSendAll( ::skRemote, "XHBR4000" )
       // request socket closing
       RETURN .F.
    ENDIF
-   
+
    // check for level
    IF oFunc:nAuthLevel > ::nAuthLevel
       // signal error
-      ::oServer:OnFunctionError( Self,01 )
+      ::oServer:OnFunctionError( Self, cFuncName, 01 )
       InetSendAll( ::skRemote, "XHBR4001" )
       // request socket closing
       RETURN .F.
@@ -751,7 +815,7 @@ METHOD LaunchFunction( cFuncName, aParams, nMode, aDesc ) CLASS tRPCServeCon
    //check for parameters
    IF Empty( aParams ) .or. .not. oFunc:CheckTypes( aParams )
       // signal error
-      ::oServer:OnFunctionError( Self,02 )
+      ::oServer:OnFunctionError( Self, cFuncName,02 )
       InetSendAll( ::skRemote, "XHBR4002" )
       // request socket closing
       RETURN .F.
@@ -866,14 +930,14 @@ METHOD LaunchFunction( cFuncName, aParams, nMode, aDesc ) CLASS tRPCServeCon
          ENDCASE
    ENDCASE
 // Default return
-RETURN ::SendResult( oRet )
+RETURN ::SendResult( oRet, cFuncName )
 
 
-METHOD SendResult( oRet )
+METHOD SendResult( oRet, cFuncName )
    LOCAL cData, cOrigLen, cCompLen
 
    IF oRet == NIL
-      ::oServer:OnFunctionError( Self, 10 )
+      ::oServer:OnFunctionError( Self, cFuncName, 10 )
       InetSendAll( ::skRemote, "XHBR4010" )
       RETURN .F.
    ELSE
@@ -1017,7 +1081,7 @@ CLASS tRPCService
    METHOD OnClientLogin( oClient )
    METHOD OnClientRequest( oClient, nRequest, cData )
    METHOD OnFunctionProgress( oClient, nProgress, aData )
-   METHOD OnFunctionError( oClient, nError )
+   METHOD OnFunctionError( oClient, cFuncName, nError )
    METHOD OnFunctionReturn( oClient, aData )
    METHOD OnClientLogout( oClient )
    METHOD OnClientTerminate( oClient )
@@ -1346,9 +1410,9 @@ METHOD OnFunctionProgress( oClient, nProgress, aData ) CLASS tRPCService
    ENDIF
 RETURN .T.
 
-METHOD OnFunctionError( oClient, nError ) CLASS tRPCService
+METHOD OnFunctionError( oClient, cFunction, nError ) CLASS tRPCService
    IF ::bOnFunctionError != NIL
-      RETURN Eval( ::bOnFunctionError, nError )
+      RETURN Eval( ::bOnFunctionError, oClient, cFunction, nError )
    ENDIF
 RETURN .T.
 

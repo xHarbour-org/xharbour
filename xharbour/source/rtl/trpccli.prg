@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.12 2003/04/13 12:35:17 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.13 2003/04/13 13:20:05 jonnymind Exp $
  */
 
 /*
@@ -825,7 +825,7 @@ METHOD GetFunctionName( oData ) CLASS tRpcClient
       cData := oData
    ENDIF
 
-   nPos := At( "[", cData )
+   nPos := At( "(", cData )
    cData := Substr( cData, 1, nPos-1 )
 RETURN cData
 

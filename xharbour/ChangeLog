@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.957 2003/04/16 08:37:10 jonnymind Exp $
+ * $Id: ChangeLog,v 1.958 2003/04/16 10:15:17 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-17 00:05 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/trpc.prg
+  * source/rtl/trpccli.prg
+    % The RPC Syntax has been highly simplified on server side,
+      Now the RPC function needs not to have been derived by
+      the tRPCFunction class, but is just an executable object
+      called by a HB_ExecFromArray() call. Also, while previous
+      model required a special parameter decoding to be carried
+      by RPC Function, in current model you can register any
+      function, method or codeblock to be executed by the RPC
+      server, with normal XHarbour parameter conventions.
+      Finally, RPC function definitions (useful to send over
+      internet what functions you have and what do they do)
+      are now identical to canonical syntax defs in clipper,
+      like i.e. MyFunc( C:10, A, NI ) --> L
+
+  * tests/rpcserver.prg
+    ! Server thest has been updated to reflect this change
+
 
 2003-04-16 12:14 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/filesys.c
