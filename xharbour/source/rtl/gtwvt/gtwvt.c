@@ -1,4 +1,8 @@
 /*
+ * $Id: gtwvt.c,v 1.3 2003/12/11 09:26:55 peterrees Exp $
+ */
+
+/*
  * Harbour Project source code:
  * Video subsystem for Win32 using GUI windows instead of Console
  *     Copyright 2003 Peter Rees <peter@rees.co.nz>
