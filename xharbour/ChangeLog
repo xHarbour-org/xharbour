@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.83 2002/02/19 18:57:44 walito Exp $
+ * $Id: ChangeLog,v 1.84 2002/02/21 06:36:05 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-01 11:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    + Added logic to SearnRep() to allow optional marker *not* utilized in the result rule to be repeatable.
+    * Some formatting.
+
+  * tests\pp.prg
+    + Added PP_ModuleName()
+
+  * tests\pp_harb.ch
+    + Added PP_ModuleName( "_TINTERPRETER_" ) to Method Compile to set the default module name.
 
 2002-02-21 06:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tget.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.4 2002/02/16 02:29:32 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.5 2002/02/16 03:49:18 ronpinkas Exp $
  */
 
 /*
@@ -1538,159 +1538,278 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
   s_numBrackets = 0;
   HB_SKIPTABSPACES( ptri );
-  if( ptrmp == NULL ) { if( *ptri != '\0' ) return -1; }
+
+  if( ptrmp == NULL )
+  {
+     if( *ptri != '\0' )
+     {
+        return -1;
+     }
+  }
   else
-    while( *ptri != '\0' && !endTranslation )
-      {
+  {
+     while( *ptri != '\0' && !endTranslation )
+     {
         HB_SKIPTABSPACES( ptrmp );
+
         if( *ptrmp == '[' && !s_numBrackets && !strtopti )
-          strtopti = ptrmp;
-        if( !s_numBrackets && strtopti && strtptri != ptri &&
-           ( ISNAME( *ptri ) || *ptri=='&' ) )
-          {
-            strtptri = ptri;
-            ptrmp = strtopti;
-            ptr = ptri;
-            ipos = NextName( &ptr, tmpname );
-            ipos = md_strAt( tmpname, ipos, strtopti, TRUE, TRUE, TRUE );
-            if( ipos && TestOptional( strtopti, strtopti+ipos-2 ) )
+        {
+           strtopti = ptrmp;
+        }
+
+        if( !s_numBrackets && strtopti && strtptri != ptri && ( ISNAME( *ptri ) || *ptri=='&' ) )
+        {
+           strtptri = ptri;
+           ptrmp    = strtopti;
+           ptr      = ptri;
+           ipos     = NextName( &ptr, tmpname );
+           ipos     = md_strAt( tmpname, ipos, strtopti, TRUE, TRUE, TRUE );
+
+           if( ipos && TestOptional( strtopti, strtopti+ipos-2 ) )
+           {
+              ptr = strtopti+ipos-2;
+              ptr = PrevSquare( ptr, strtopti, NULL );
+
+              if( ptr )
               {
-                ptr = strtopti+ipos-2;
-                ptr = PrevSquare( ptr, strtopti, NULL );
-                if( ptr )
-                    ptrmp = ptr;
+                 ptrmp = ptr;
               }
-          }
-        switch( *ptrmp ) {
+           }
+        }
+
+        switch( *ptrmp )
+        {
         case '[':
-          if( !s_numBrackets ) isWordInside = 0;
+          if( !s_numBrackets )
+          {
+             isWordInside = 0;
+          }
+
           s_numBrackets++;
           s_aIsRepeate[ s_Repeate ] = 0;
           lastopti[s_Repeate++] = ptrmp;
           ptrmp++;
+
           if( !CheckOptional( ptrmp, ptri, ptro, lenres, com_or_tra, com_or_xcom ) )
-            SkipOptional( &ptrmp );
+          {
+             SkipOptional( &ptrmp );
+          }
+
           break;
+
         case ']':
           if( s_Repeate )
-            {
-              s_Repeate--;
-              if( s_aIsRepeate[ s_Repeate ] )
+          {
+             s_Repeate--;
+
+             if( s_aIsRepeate[ s_Repeate ] )
+             {
+                if( ISNAME(*ptri) )
                 {
-                  if( ISNAME(*ptri) )
-                    {
-                      ptr = ptri;
-                      ipos = NextName( &ptr, tmpname );
-                      ipos = md_strAt( tmpname, ipos, ptrmp, TRUE, TRUE, TRUE );
-                      if( ipos && TestOptional( ptrmp+1, ptrmp+ipos-2 ) )
-                        {
-                         ptr = PrevSquare( ptrmp+ipos-2, ptrmp+1, NULL );
-                         if( !ptr || CheckOptional( ptrmp+1, ptri, ptro, lenres, com_or_tra, com_or_xcom ) )
-                           {
-                             ptrmp = lastopti[s_Repeate];
-                             ptrmp++;
-                             s_Repeate++;
-                             SkipOptional( &ptrmp );
-                             s_numBrackets++;
-                             ptrmp++;
-                             strtptri = ptri;
-                            }
-                            else
-                               ptrmp = lastopti[s_Repeate];
-                        }
-                      else
+                   ptr  = ptri;
+                   ipos = NextName( &ptr, tmpname );
+                   ipos = md_strAt( tmpname, ipos, ptrmp, TRUE, TRUE, TRUE );
+
+                   if( ipos && TestOptional( ptrmp+1, ptrmp+ipos-2 ) )
+                   {
+                      ptr = PrevSquare( ptrmp+ipos-2, ptrmp+1, NULL );
+
+                      if( !ptr || CheckOptional( ptrmp+1, ptri, ptro, lenres, com_or_tra, com_or_xcom ) )
+                      {
                          ptrmp = lastopti[s_Repeate];
-                    }
-                  else
-                    ptrmp = lastopti[s_Repeate];
+                         ptrmp++;
+                         s_Repeate++;
+                         SkipOptional( &ptrmp );
+                         s_numBrackets++;
+                         ptrmp++;
+                         strtptri = ptri;
+                      }
+                      else
+                      {
+                         ptrmp = lastopti[s_Repeate];
+                      }
+                   }
+                   else
+                   {
+                      ptrmp = lastopti[s_Repeate];
+                   }
                 }
-              else
+                else
                 {
-                 if( !isWordInside ) strtopti = NULL;
-                 ptrmp++;
+                   ptrmp = lastopti[s_Repeate];
                 }
-              s_numBrackets--;
-            }
+             }
+             else
+             {
+                if( !isWordInside )
+                {
+                   strtopti = NULL;
+                }
+
+                ptrmp++;
+             }
+
+             s_numBrackets--;
+          }
           else
-            {
-             if( !isWordInside ) strtopti = NULL;
+          {
+             if( !isWordInside )
+             {
+                strtopti = NULL;
+             }
              s_numBrackets--; ptrmp++;
-            }
+          }
+
           break;
+
         case ',':
-          if( s_numBrackets == 1 ) isWordInside = 1;
-          if( !s_numBrackets ) strtopti = NULL;
-          if( *ptri == ',' ) { ptrmp++; ptri++; }
+          if( s_numBrackets == 1 )
+          {
+             isWordInside = 1;
+          }
+
+          if( !s_numBrackets )
+          {
+             strtopti = NULL;
+          }
+
+          if( *ptri == ',' )
+          {
+             ptrmp++; ptri++;
+          }
           else
-            {
-              if( s_numBrackets )
-                {
-                  SkipOptional( &ptrmp );
-                }
-              else return -1;
-            }
+          {
+             if( s_numBrackets )
+             {
+                SkipOptional( &ptrmp );
+             }
+             else
+             {
+                return -1;
+             }
+          }
+
           break;
+
         case '\1':  /*  Match marker */
-          if( !s_numBrackets ) strtopti = NULL;
-          if( s_numBrackets == 1 && *(ptrmp+2) == '2' ) isWordInside = 1; /*  restricted match marker  */
-          if( !WorkMarkers( &ptrmp, &ptri, ptro, lenres, com_or_xcom ) )
-            {
-              if( s_numBrackets )
-                {
-                  SkipOptional( &ptrmp );
-                }
-              else return -1;
-            }
+          if( !s_numBrackets )
+          {
+             strtopti = NULL;
+          }
+
+          if( s_numBrackets == 1 && *(ptrmp+2) == '2' )
+          {
+             isWordInside = 1; /*  restricted match marker  */
+          }
+
+          //printf( "\nCommandStuff->WorkMarkers\n" );
+
+          if( ! WorkMarkers( &ptrmp, &ptri, ptro, lenres, com_or_xcom ) )
+          {
+             if( s_numBrackets )
+             {
+                SkipOptional( &ptrmp );
+             }
+             else
+             {
+                return -1;
+             }
+          }
+
           break;
+
         case '\0':
           if( com_or_tra )
-            return -1;
-          else endTranslation = TRUE;
+          {
+             return -1;
+          }
+          else
+          {
+             endTranslation = TRUE;
+          }
+
           break;
+
         default:    /*   Key word    */
-          if( s_numBrackets == 1 ) isWordInside = 1;
-          if( !s_numBrackets ) strtopti = NULL;
+          if( s_numBrackets == 1 )
+          {
+             isWordInside = 1;
+          }
+
+          if( !s_numBrackets )
+          {
+             strtopti = NULL;
+          }
+
           ptr = ptri;
+
           if( *ptri == ',' || truncmp( &ptri, &ptrmp, !com_or_xcom ) )
-            {
-              ptri = ptr;
-              if( s_numBrackets )
-                {
-                  SkipOptional( &ptrmp );
-                }
-              else return -1;
-            }
+          {
+             ptri = ptr;
+
+             if( s_numBrackets )
+             {
+                SkipOptional( &ptrmp );
+             }
+             else
+             {
+                return -1;
+             }
+          }
         }
+
         HB_SKIPTABSPACES( ptri );
-      };
+     }
+  }
 
   if( *ptrmp != '\0' )
-    {
-      if( s_Repeate ) { s_Repeate = 0; ptrmp = lastopti[0]; }
-      s_numBrackets = 0;
-      do
-        {
-          HB_SKIPTABSPACES( ptrmp );
-          if( *ptrmp != '\0' )
-            switch( *ptrmp ) {
-            case '[':
-              ptrmp++;
-              SkipOptional( &ptrmp );
-              ptrmp++;
-              break;
-            case ']': ptrmp++; break;
-            default:
-              return -1;
-            }
-        }
-      while( *ptrmp != '\0' );
-    }
+  {
+     if( s_Repeate )
+     {
+        s_Repeate = 0;
+        ptrmp = lastopti[0];
+     }
 
-  SearnRep( "\1","",0,ptro,lenres);
+     s_numBrackets = 0;
+
+     do
+     {
+        HB_SKIPTABSPACES( ptrmp );
+
+        if( *ptrmp != '\0' )
+        {
+           switch( *ptrmp )
+           {
+              case '[':
+                ptrmp++;
+                SkipOptional( &ptrmp );
+                ptrmp++;
+                break;
+
+              case ']':
+                ptrmp++;
+                break;
+
+              default:
+                return -1;
+           }
+        }
+     }
+     while( *ptrmp != '\0' );
+  }
+
+  SearnRep( "\1", "", 0, ptro, lenres );
   *(ptro + *lenres) = '\0';
   *lenres = RemoveSlash( ptro );   /* Removing '\' from result string */
 
-  if( com_or_tra ) return 1; else return (ptri-inputLine);
+  if( com_or_tra )
+  {
+      return 1;
+  }
+  else
+  {
+     return ptri - inputLine;
+  }
 }
 
 static int RemoveSlash( char * stroka )
@@ -2492,107 +2611,148 @@ static BOOL TestOptional( char *ptr1, char *ptr2 )
 
 static BOOL CheckOptional( char * ptrmp, char * ptri, char * ptro, int * lenres, BOOL com_or_tra, BOOL com_or_xcom )
 {
-  int save_numBr = s_numBrackets, save_Repeate = s_Repeate;
-  BOOL endTranslation = FALSE;
-  BOOL bResult = TRUE;
-  char * lastInputptr[ 5 ];
-  char * lastopti[ 3 ], *ptr;
+   int save_numBr = s_numBrackets, save_Repeate = s_Repeate;
+   BOOL endTranslation = FALSE;
+   BOOL bResult = TRUE;
+   char * lastInputptr[ 5 ];
+   char * lastopti[ 3 ], *ptr;
 
-  HB_SYMBOL_UNUSED( com_or_tra );
+   HB_SYMBOL_UNUSED( com_or_tra );
 
-  HB_TRACE(HB_TR_DEBUG, ("CheckOptional(%s, %s, %s, %p, %d, %d)", ptrmp, ptri, ptro, lenres, com_or_tra, com_or_xcom));
+   HB_TRACE(HB_TR_DEBUG, ("CheckOptional(%s, %s, %s, %p, %d, %d)", ptrmp, ptri, ptro, lenres, com_or_tra, com_or_xcom));
 
-  s_bReplacePat = FALSE;
-  lastInputptr[s_Repeate] = ptri;
-  while( *ptri != '\0' && !endTranslation && bResult )
-    {
+   s_bReplacePat = FALSE;
+   lastInputptr[s_Repeate] = ptri;
+
+   while( *ptri != '\0' && !endTranslation && bResult )
+   {
       HB_SKIPTABSPACES( ptrmp );
-      switch( *ptrmp ) {
-      case '[':
-        s_numBrackets++;
-        s_aIsRepeate[ s_Repeate ] = 0;
-        lastInputptr[s_Repeate] = ptri;
-        lastopti[s_Repeate++] = ptrmp;
-        ptrmp++;
-        break;
-      case ']':
-        if( s_numBrackets == save_numBr )
-          endTranslation = TRUE;
-        else
-          {
-            if( s_Repeate )
+
+      switch( *ptrmp )
+      {
+         case '[' :
+           s_numBrackets++;
+           s_aIsRepeate[ s_Repeate ] = 0;
+           lastInputptr[s_Repeate] = ptri;
+           lastopti[s_Repeate++] = ptrmp;
+           ptrmp++;
+           break;
+
+         case ']' :
+           if( s_numBrackets == save_numBr )
+           {
+              endTranslation = TRUE;
+           }
+           else
+           {
+              if( s_Repeate )
               {
-                s_Repeate--;
-                ptrmp = lastopti[s_Repeate];
+                 s_Repeate--;
+                 ptrmp = lastopti[s_Repeate];
               }
-            else ptrmp++;
-            s_numBrackets--;
-          }
-        break;
-      case ',':
-        if( *ptri == ',' ) { ptrmp++; ptri++; }
-        else
-          {
-            if( s_numBrackets - save_numBr > 0 )
+              else
               {
-                SkipOptional( &ptrmp );
-                ptri = lastInputptr[s_Repeate];
+                 ptrmp++;
               }
-            else bResult = FALSE;
-          }
-        break;
-      case '\1':  /*  Match marker */
-        if( !WorkMarkers( &ptrmp, &ptri, ptro, lenres, com_or_xcom ) )
-          {
-            if( s_numBrackets - save_numBr > 0 )
-              {
-                SkipOptional( &ptrmp );
-                ptri = lastInputptr[s_Repeate];
-              }
-            else bResult = FALSE;
-          }
-        break;
-      case '\0':
-        bResult = FALSE;
-      default:    /*   Key word    */
-        ptr = ptri;
-        if( *ptri == ',' || truncmp( &ptri, &ptrmp, !com_or_xcom ) )
-          {
-            ptri = ptr;
-            if( s_numBrackets - save_numBr > 0 )
-              {
-                SkipOptional( &ptrmp );
-                ptri = lastInputptr[s_Repeate];
-              }
-            else bResult = FALSE;
-          }
-      }
-      HB_SKIPTABSPACES( ptri );
-    };
-  if( *ptri == '\0' )
-    {
-      do
-        {
-          HB_SKIPTABSPACES( ptrmp );
-          if( *ptrmp == '[' )
-            {
+
+              s_numBrackets--;
+           }
+
+           break;
+
+         case ',' :
+           if( *ptri == ',' )
+           {
               ptrmp++;
-              SkipOptional( &ptrmp );
-            }
-          else if( *ptrmp == ']' )
+              ptri++;
+           }
+           else
+           {
+              if( s_numBrackets - save_numBr > 0 )
+              {
+                 SkipOptional( &ptrmp );
+                 ptri = lastInputptr[s_Repeate];
+              }
+              else
+              {
+                 bResult = FALSE;
+              }
+           }
+
+           break;
+
+         case '\1' :  /*  Match marker */
+           //printf( "\nCheckOptional->WorkMarkers\n" );
+
+           if( ! WorkMarkers( &ptrmp, &ptri, ptro, lenres, com_or_xcom ) )
+           {
+              if( s_numBrackets - save_numBr > 0 )
+              {
+                  SkipOptional( &ptrmp );
+                  ptri = lastInputptr[s_Repeate];
+              }
+              else
+              {
+                 bResult = FALSE;
+              }
+           }
+
+           break;
+
+         case '\0':
+           bResult = FALSE;
+
+         default:    /*   Key word    */
+           ptr = ptri;
+
+           if( *ptri == ',' || truncmp( &ptri, &ptrmp, !com_or_xcom ) )
+           {
+              ptri = ptr;
+
+              if( s_numBrackets - save_numBr > 0 )
+              {
+                 SkipOptional( &ptrmp );
+                 ptri = lastInputptr[s_Repeate];
+              }
+              else
+              {
+                 bResult = FALSE;
+              }
+           }
+      }
+
+      HB_SKIPTABSPACES( ptri );
+   }
+
+   if( *ptri == '\0' )
+   {
+      do
+      {
+         HB_SKIPTABSPACES( ptrmp );
+
+         if( *ptrmp == '[' )
+         {
+            ptrmp++;
+            SkipOptional( &ptrmp );
+         }
+         else if( *ptrmp == ']' )
+         {
             break;
-          else
-            {
-              bResult = 0;
-              break;
-            }
-        }
+         }
+         else
+         {
+            bResult = 0;
+            break;
+         }
+      }
       while( 1 );
-    }
-  s_Repeate = save_Repeate;
-  s_numBrackets = save_numBr;
-  s_bReplacePat = TRUE;
-  return bResult;
+   }
+
+   s_Repeate = save_Repeate;
+   s_numBrackets = save_numBr;
+   s_bReplacePat = TRUE;
+
+   return bResult;
 }
 
 static void SkipOptional( char ** ptri )
@@ -2623,110 +2783,149 @@ static void SkipOptional( char ** ptri )
 
 static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, int * lenres )
 {
-  static char expnew[ MAX_EXP ];
+   static char expnew[ MAX_EXP ];
 
-  int ifou, isdvig = 0;
-  BOOL rezs;
-  int kolmarkers;
-  int lennew, i;
-  char lastchar = '0';
-  char *ptr, *ptr2, *ptrOut = ptro;
+   int ifou, isdvig = 0;
+   BOOL rezs, bFound = FALSE;
+   int kolmarkers;
+   int lennew, i;
+   char lastchar = '0';
+   char *ptr, *ptr2, *ptrOut = ptro;
 
-  HB_TRACE(HB_TR_DEBUG, ("SearnRep(%s, %s, %d, %s, %p)", exppatt, expreal, lenreal, ptro, lenres));
+   HB_TRACE(HB_TR_DEBUG, ("SearnRep(%s, %s, %i, %s, %p)", exppatt, expreal, lenreal, ptro, lenres));
 
-  if( *(exppatt+1) == '\0' ) *( ptro + *lenres ) = '\0';
-  while( (ifou = md_strAt( exppatt, (*(exppatt+1))? 2:1, ptrOut, FALSE, FALSE, TRUE )) > 0 ) /* ??? */
-    {
-      /*
-      printf( "Found: >%s< At: %i In: >%s<\n", exppatt, ifou, ptrOut );
-      */
+   //printf( "Replace '%s' with '%s' Len: %i, in '%s'\n", exppatt, expreal, lenreal, ptro );
 
+   if( *( exppatt + 1 ) == '\0' )
+   {
+      *( ptro + *lenres ) = '\0';
+   }
+
+   while( ( ifou = md_strAt( exppatt, ( *( exppatt + 1 ) ) ? 2 : 1, ptrOut, FALSE, FALSE, TRUE )) > 0 ) /* ??? */
+   {
+      //printf( "Found: >%s< At: %i In: >%s<\n", exppatt, ifou, ptrOut );
+
+      bFound = TRUE;
       rezs = FALSE;
       ptr = ptrOut + ifou - 2;
       kolmarkers = 0;
       ptr = PrevSquare( ptr, ptrOut, &kolmarkers );
+
       if( ptr )
-        {
-          if( s_Repeate ) s_aIsRepeate[ s_Repeate - 1 ]++;
-          if( !s_bReplacePat ) return;
-          ptr2 = ptrOut + ifou + 3;
-          while( *ptr2 != ']' || *(ptr2-1) == '\\' )
+      {
+         if( s_Repeate )
+         {
+            s_aIsRepeate[ s_Repeate - 1 ]++;
+         }
+
+         if( !s_bReplacePat )
+         {
+            return;
+         }
+
+         ptr2 = ptrOut + ifou + 3;
+
+         while( *ptr2 != ']' || *(ptr2-1) == '\\' )
+         {
+            if( *ptr2 == '\1' )
             {
-              if( *ptr2 == '\1' ) kolmarkers++;
-              ptr2++;
+               kolmarkers++;
             }
 
-          if( s_Repeate && lenreal && kolmarkers && lastchar != '0' &&
-               *(ptrOut + ifou + 2) == '0' )
-            {
-              isdvig += ifou;
-              rezs = TRUE;
-            }
-          else
-            {
-              if( lenreal == 0 )
-                {
-                  if( s_numBrackets >= 2 )
-                    {
-                      isdvig += ifou;
-                      continue;
-                    }
-                  else
-                    {
-                      hb_pp_Stuff( "", ptr, 0, ptr2-ptr+1, *lenres-(ptr-ptro) );
-                      *lenres -= ptr2-ptr+1;
-                      isdvig = ptr - ptro;
-                      rezs = TRUE;
-                    }
-                }
-              else
-                {
-                  lennew = ptr2-ptr-1;
+            ptr2++;
+         }
 
-                  memcpy( expnew, ptr+1, lennew );
-                  *(expnew + lennew++) = ' ';
-                  *(expnew + lennew) = '\0';
-                  while( (i = hb_strAt( exppatt, 2, expnew, lennew )) > 0 )
-                    lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew+i-1, lennew );
-                  if( kolmarkers )
-                    {
-                      s_groupchar = (char) ( (unsigned int)s_groupchar + 1 );
-                      for( i=0; i<lennew; i++ )
-                        if( *(expnew+i) == '\1' )
-                          {
-                            *(expnew+i+3) = s_groupchar;
-                            i += 4;
-                          }
-                    }
-                  hb_pp_Stuff( expnew, ptr, lennew, 0, *lenres-(ptr-ptro)+1 );
-                  *lenres += lennew;
-                  isdvig = ptr - ptro + (ptr2-ptr-1) + lennew;
-                  rezs = TRUE;
-                }
-            }
-        }
-      if( !rezs && s_bReplacePat )
-        {
-          if( *(ptrOut + ifou + 2) != '0' && *(exppatt+1) )
+         if( s_Repeate && lenreal && kolmarkers && lastchar != '0' && *(ptrOut + ifou + 2) == '0' )
+         {
+            isdvig += ifou;
+            rezs = TRUE;
+         }
+         else
+         {
+            if( lenreal == 0 )
             {
-              if( lastchar == '0' ) lastchar = *(ptrOut + ifou + 2);
-              if( lastchar != *(ptrOut + ifou + 2) )
-                {
-                  isdvig += ifou + 3;
-                  ptrOut = ptro + isdvig;
+               if( s_numBrackets >= 2 )
+               {
+                  isdvig += ifou;
                   continue;
-                }
+               }
+               else
+               {
+                  hb_pp_Stuff( "", ptr, 0, ptr2-ptr+1, *lenres-(ptr-ptro) );
+                  *lenres -= ptr2-ptr+1;
+                  isdvig = ptr - ptro;
+                  rezs = TRUE;
+               }
             }
-          *lenres += ReplacePattern( exppatt[2], expreal, lenreal,
-                                     ptrOut + ifou - 1, *lenres-isdvig-ifou+1 );
-          isdvig += ifou - 1;
-        }
-      else if( !s_bReplacePat ) isdvig += ifou;
+            else
+            {
+               lennew = ptr2-ptr-1;
+
+               memcpy( expnew, ptr+1, lennew );
+               *(expnew + lennew++) = ' ';
+               *(expnew + lennew) = '\0';
+
+               while( (i = hb_strAt( exppatt, 2, expnew, lennew )) > 0 )
+               {
+                  lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew+i-1, lennew );
+               }
+
+               if( kolmarkers )
+               {
+                  s_groupchar = (char) ( (unsigned int)s_groupchar + 1 );
+
+                  for( i=0; i<lennew; i++ )
+                  {
+                     if( *(expnew+i) == '\1' )
+                     {
+                         *(expnew+i+3) = s_groupchar;
+                         i += 4;
+                     }
+                  }
+               }
+
+               hb_pp_Stuff( expnew, ptr, lennew, 0, *lenres-(ptr-ptro)+1 );
+               *lenres += lennew;
+               isdvig = ptr - ptro + (ptr2-ptr-1) + lennew;
+               rezs = TRUE;
+            }
+         }
+      }
+
+      if( !rezs && s_bReplacePat )
+      {
+         if( *(ptrOut + ifou + 2) != '0' && *(exppatt+1) )
+         {
+            if( lastchar == '0' )
+            {
+               lastchar = *(ptrOut + ifou + 2);
+            }
+
+            if( lastchar != *(ptrOut + ifou + 2) )
+            {
+               isdvig += ifou + 3;
+               ptrOut = ptro + isdvig;
+               continue;
+            }
+         }
+
+         *lenres += ReplacePattern( exppatt[2], expreal, lenreal, ptrOut + ifou - 1, *lenres-isdvig-ifou+1 );
+         isdvig += ifou - 1;
+      }
+      else if( !s_bReplacePat )
+      {
+         isdvig += ifou;
+      }
+
       ptrOut = ptro + isdvig;
-    }
-    /*
-    printf( "No: >%s< In: >%s<\n", exppatt, ptrOut );
-    */
+   }
+
+   if( !bFound && s_Repeate )
+   {
+      s_aIsRepeate[ s_Repeate - 1 ]++;
+   }
+
+   //printf( "Replaced '%s' with '%s' => >%s<\n\n", exppatt, expreal, ptrOut );
 }
 
 static int ReplacePattern( char patttype, char * expreal, int lenreal, char * ptro, int lenres )

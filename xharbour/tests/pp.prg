@@ -1728,7 +1728,9 @@ PROCEDURE PP_Statics( aVars )
          &( aVars[nVar] ) := &( cInit )
          aAdd( s_asStatics, aVars[nVar] )
       ELSE
-         Alert( [Type: ] + Type( aVars[nVar] ) + [Static redeclaration: '] + aVars[nVar] )
+         IF aScan( aVars, aVars[nVar], 1, nVar - 1 ) > 0
+            Alert( [Type: ] + Type( aVars[nVar] ) + [ Static redeclaration: '] + aVars[nVar] )
+         ENDIF
       ENDIF
    NEXT
 
@@ -7945,6 +7947,18 @@ FUNCTION nAtSkipStr( sFind, sLine, nStart )
     NEXT
 
 RETURN 0
+
+//--------------------------------------------------------------//
+
+FUNCTION PP_ModuleName( sNewModule )
+
+   LOCAL sModule := s_sModule
+
+   IF PCount() > 0
+      s_sModule := sNewModule
+   ENDIF
+
+RETURN sModule
 
 //--------------------------------------------------------------//
 

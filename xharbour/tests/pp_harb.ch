@@ -82,6 +82,8 @@ METHOD Compile()
    IF Len( ::aCompiledProcs ) == 0
       ErrorBlock( {|oErr| RP_Comp_Err( oErr, ::acPPed[nLine], nLine ) } )
 
+      PP_ModuleName( "_TINTERPRETER_" )
+
       nLines := Len( ::acPPed )
       FOR nLine := 1 TO nLines
          PP_CompileLine( ::acPPed[nLine], nLine, ::aCompiledProcs, ::aInitExit, @nProcId )
