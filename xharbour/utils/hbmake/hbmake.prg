@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.106 2003/12/30 12:31:30 lculik Exp $
+ * $Id: hbmake.prg,v 1.107 2004/01/05 02:57:37 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1207,6 +1207,9 @@ FUNC CreateMakeFile( cFile )
    LOCAL aLibs
    LOCAL aLibsIn      := {}
    LOCAL aLibsOut     := {}
+   Local cGt := ""
+   Local lGtWvt       := .F.
+   Local lXwt       := .F.
 
    LOCAL cOldLib      := ""
    LOCAL cHtmlLib     := ""
@@ -1235,7 +1238,7 @@ FUNC CreateMakeFile( cFile )
        LOCAL lusexhb := .F.
    #ENDIF
 
-   IF nLenaSrc == 0
+   IF nLenaSrc == 0 .and. !s_lRecurse
       IF s_nLang=1 // PT-BR
          Alert("NÆo h  nenhum prg na pasta "+curdir())
       ELSEIF s_nLang=3 // Spanish
@@ -1328,7 +1331,7 @@ FUNC CreateMakeFile( cFile )
 // @ 01,64 GET lFwh checkbox caption "Use FWH"          WHEN Cos == "Win32" style "[o ]"
 // @ 02,64 GET lcw checkbox caption "Use C4W"           WHEN Cos == "Win32" style "[o ]"
 // @ 04,64 GET lMiniGui checkbox caption "Use Minigui"  WHEN Cos == "Win32" style "[o ]"
-   @ 01,60,08,78 Get cGui ListBox { "None","FWH","MiniGui","What32","Whoo","C4W","HWGUI"}  DROPDOWN state OsSpec(getlist,3,@cGui) When CheckCompiler(cOs) message s_aLangMessages[ 51 ]
+   @ 01,60,08,78 Get cGui ListBox { "None","Xwt","Gtwvt","FWH","MiniGui","What32","Whoo","C4W","HWGUI"}  DROPDOWN state OsSpec(getlist,3,@cGui) When CheckCompiler(cOs) message s_aLangMessages[ 51 ]
 // @ 02,01 GET lRddads checkbox caption "Use RddAds"    WHEN Cos == "Win32" .OR. Cos == "Linux" style "[o ]"
    @ 02,01 Say s_aLangMessages[ 48 ]
    @ 02,16,06,26 get cRdd ListBox { "None","RddAds","Mediator","Apollo"}  WHEN Cos == "Win32" .or. Cos == "Linux" DROPDOWN message s_aLangMessages[ 52 ]
@@ -1354,6 +1357,8 @@ FUNC CreateMakeFile( cFile )
    lApollo   := "Apollo"   IN cRdd
    lHwGui    := "HWGUI"    IN cGui
    lWhoo     := "Whoo"     IN cGui
+   lGtWvt    := "Gtwvt"    IN cGui
+   lXwt      := "Xwt"    IN cGui
 
    IF lUseXharbourDll
       cDefLibGccLibs   := cHARso
@@ -1963,6 +1968,8 @@ FUNC CreateMakeFile( cFile )
    ENDIF
 
    IF s_lBcc .OR. s_lVcc
+
+
       IF lFwh
 
          IF s_lXfwh
@@ -1980,7 +1987,11 @@ FUNC CreateMakeFile( cFile )
       ELSEIF lCw
          fWrite( s_nLinkHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib optgui.lib "  + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSE
-         fWrite( s_nLinkHandle, "LIBFILES = optcon" + IIF( ! s_lMt, "", "mt" ) + ".lib " + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+       if lGtwvt
+         cDefBccLibs := strtran(cDefBccLibs,"gtwin","gtwvt")
+         cDefBccLibsMt := strtran(cDefBccLibsMt,"gtwin","gtwvt")
+      endif
+         fWrite( s_nLinkHandle, "LIBFILES = " + iif( lgtWvt,"optgui","optcon") + IIF( ! s_lMt, "", "mt" ) + ".lib " + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ENDIF
 
    ELSEIF s_lGcc
@@ -2003,11 +2014,11 @@ FUNC CreateMakeFile( cFile )
       fWrite( s_nLinkHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include" + IIF( s_lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
 
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
-      fWrite( s_nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib -Gn -M -m -s -Tpe" + IIF( lFWH, " -aa", IIF( lMiniGui .or. lWhoo , " -aa", IIF( lHwgui, " -aa"," -ap" ) ) ) + IIF( lMinigui, " -L$(MINIGUI)\lib",IIF( lFwh, " -L$(FWH)\lib",IIF( lHwgui, " -L$(HWGUI)\lib","" ))) + CRLF )
+      fWrite( s_nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib -Gn -M -m -s -Tpe" + IIF( lFWH, " -aa", IIF( lMiniGui .or. lWhoo , " -aa", IIF( lHwgui .or. lgtWvt, " -aa"," -ap" ) ) ) + IIF( lMinigui, " -L$(MINIGUI)\lib",IIF( lFwh, " -L$(FWH)\lib",IIF( lHwgui, " -L$(HWGUI)\lib","" ))) + CRLF )
       fWrite( s_nLinkHandle, "IFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LINKER = ilink32" + CRLF )
       fWrite( s_nLinkHandle, " " + CRLF )
-      fWrite( s_nLinkHandle, "ALLOBJ = " + IIF( ( lWhoo .OR. lFwh .OR. lMinigui .OR. lHwgui ), "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + ;
+      fWrite( s_nLinkHandle, "ALLOBJ = " + IIF( ( lWhoo .OR. lFwh .OR. lMinigui .OR. lHwgui .or. lgtWvt ), "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + ;
                + CRLF )
       fWrite( s_nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
       fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) import32.lib " + IIF( s_lMt,"cw32.lib", "cw32.lib" )+ CRLF )
@@ -2025,10 +2036,10 @@ FUNC CreateMakeFile( cFile )
       fWrite( s_nLinkHandle, "ALLLIB = $(LIBFILES) comdlg32.lib shell32.lib user32.lib gdi32.lib" + CRLF )
    ELSEIF s_lGcc
       fWrite( s_nLinkHandle, "CFLAG1 = " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude ),"")        + IIF(  "Linux" IN cOs, "-I/usr/include/xharbour", " -I$(BHC)/include" ) + " -c -Wall" + IIF( s_lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
-      fWrite( s_nLinkHandle, "CFLAG2 = " + IIF(  "Linux" IN cOs, "-L$(HB_LIB_INSTALL)", " -L$(BHC)/lib" ) + CRLF )
+      fWrite( s_nLinkHandle, "CFLAG2 = " + IIF(  "Linux" IN cOs, "-L$(HB_LIB_INSTALL)", " -L$(BHC)/lib" ) + iif(lXwt,,"") + CRLF )
 
       fWrite( s_nLinkHandle, "RFLAGS = " + CRLF )
-      fWrite( s_nLinkHandle, "LFLAGS =" + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + "-gtcrs", "$(CFLAG2)") + CRLF )
+      fWrite( s_nLinkHandle, "LFLAGS =" + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + if(lXwt,"-gtcgi " , "-gtcrs "), "$(CFLAG2)") + iif(lXwt,"`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt","") + CRLF )
       fWrite( s_nLinkHandle, "IFLAGS = " + CRLF )
       fWrite( s_nLinkHandle, "LINKER = "+ IIF(lusexhb,"xhblnk","gcc") + CRLF )
       fWrite( s_nLinkHandle, " " + CRLF )
