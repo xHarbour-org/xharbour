@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.139 2004/12/31 11:56:05 druzus Exp $
+ * $Id: dbcmd.c,v 1.140 2005/01/11 08:44:08 druzus Exp $
  */
 
 /*
@@ -3150,6 +3150,27 @@ HB_FUNC( ORDKEYGOTO )
       pOrderInfo.itmNewVal = hb_param( 1 , HB_IT_NUMERIC );
       pOrderInfo.itmResult = hb_itemPutL( NULL, FALSE );
       SELF_ORDINFO( pArea, DBOI_POSITION, &pOrderInfo );
+      hb_itemReturn( pOrderInfo.itmResult );
+      hb_itemRelease( pOrderInfo.itmResult );
+   }
+   else
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDKEYGOTO" );
+}
+
+HB_FUNC( ORDFINDREC )
+{
+   HB_THREAD_STUB
+   DBORDERINFO pOrderInfo;
+   AREAP pArea = HB_CURRENT_WA;
+
+   if( pArea )
+   {
+      pOrderInfo.itmOrder = NULL;
+      pOrderInfo.atomBagName = NULL;
+      pOrderInfo.itmNewVal = hb_param( 1 , HB_IT_NUMERIC );
+      pOrderInfo.itmResult = hb_itemPutL( NULL, FALSE );
+      SELF_ORDINFO( pArea, hb_parl( 2 ) ? DBOI_FINDRECCONT : 
+                                          DBOI_FINDREC, &pOrderInfo );
       hb_itemReturn( pOrderInfo.itmResult );
       hb_itemRelease( pOrderInfo.itmResult );
    }

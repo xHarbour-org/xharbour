@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.177 2005/01/23 11:23:33 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.178 2005/01/25 10:47:50 druzus Exp $
  */
 
 /*
@@ -4220,7 +4220,7 @@ static BOOL hb_cdxTagKeyAdd( LPCDXTAG pTag, LPCDXKEY pKey )
    hb_cdxTagOpen( pTag );
    if ( hb_cdxPageSeekKey( pTag->RootPage, pKey,
                            pTag->UniqueKey ? CDX_IGNORE_REC_NUM : pKey->rec,
-                           TRUE ) != 0 )
+                           TRUE ) != 0 || pTag->Custom )
    {
       hb_cdxPageKeyInsert( pTag->RootPage, pKey );
       pTag->curKeyState &= ~( CDX_CURKEY_RAWPOS | CDX_CURKEY_LOGPOS |
@@ -5748,6 +5748,50 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
    return retval;
 }
 
+/*
+ * DBOI_FINDREC find a specific record in the tag - it's useful for
+ * custom indexes when the same record can be stored more then once
+ * or when the use index key is unknown
+ */
+static BOOL hb_cdxDBOIFindRec( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulRecNo, BOOL fCont )
+{
+   BOOL fFound = FALSE;
+
+   if ( pTag && ulRecNo )
+   {
+      if( fCont && pArea->lpdbPendingRel && pArea->lpdbPendingRel->isScoped )
+         SELF_FORCEREL( ( AREAP ) pArea );
+
+      hb_cdxIndexLockRead( pTag->pIndex );
+      if ( fCont )
+      {
+         if ( ! hb_cdxCurKeyRefresh( pArea, pTag ) )
+            ulRecNo = 0;
+         else
+            hb_cdxTagSkipNext( pTag );
+      }
+      else
+      {
+         hb_cdxTagGoTop( pTag );
+      }
+      if ( ulRecNo )
+      {
+         while ( !pTag->TagBOF && !pTag->TagEOF && hb_cdxBottomScope( pTag ) )
+         {
+            if ( pTag->CurKey->rec == ulRecNo )
+            {
+               fFound = TRUE;
+               break;
+            }
+            hb_cdxTagSkipNext( pTag );
+         }
+      }
+      hb_cdxIndexUnLockRead( pTag->pIndex );
+   }
+   SELF_GOTO( ( AREAP ) pArea, fFound ? ulRecNo : 0 );
+   return fFound;
+}
+
 static void hb_cdxClearLogPosInfo( CDXAREAP pArea )
 {
    LPCDXINDEX pIndex = pArea->lpIndexes;
@@ -7091,6 +7135,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
       case DBOI_LOCKOFFSET:
       case DBOI_HPLOCKING:
       case DBOI_KEYSINCLUDED:
+      case DBOI_EVALSTEP:
          break;
       default:
          if ( pOrderInfo->itmOrder )
@@ -7156,9 +7201,9 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
       case DBOI_POSITION:
          if ( pOrderInfo->itmNewVal && HB_IS_NUMERIC( pOrderInfo->itmNewVal ) )
          {
-             pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
-                  hb_cdxDBOIKeyGoto( pArea, pTag,
-                              hb_itemGetNL( pOrderInfo->itmNewVal ), TRUE ) == SUCCESS );
+            pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
+               hb_cdxDBOIKeyGoto( pArea, pTag,
+                  hb_itemGetNL( pOrderInfo->itmNewVal ), TRUE ) == SUCCESS );
          }
          else
             pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult,
@@ -7179,6 +7224,18 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
       case DBOI_KEYCOUNTRAW:
          pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult,
                                     hb_cdxDBOIKeyCount( pArea, pTag, FALSE ) );
+         break;
+
+      case DBOI_FINDREC:
+         pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
+                  hb_cdxDBOIFindRec( pArea, pTag,
+                              hb_itemGetNL( pOrderInfo->itmNewVal ), FALSE ) );
+         break;
+
+      case DBOI_FINDRECCONT:
+         pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
+                  hb_cdxDBOIFindRec( pArea, pTag, 
+                              hb_itemGetNL( pOrderInfo->itmNewVal ), TRUE ) );
          break;
 
       case DBOI_SKIPUNIQUE:
@@ -7279,7 +7336,12 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
       case DBOI_KEYSINCLUDED:
          pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult,
-                                               pArea->pSort ? pArea->pSort->ulTotKeys : 0 );
+                          pArea->pSort ? pArea->pSort->ulTotKeys : 0 );
+         break;
+
+      case DBOI_EVALSTEP:
+         pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult,
+                  pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->lStep : 0 );
          break;
 
       case DBOI_ORDERCOUNT:
@@ -8469,8 +8531,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
          {
             if ( pArea->lpdbOrdCondInfo->lStep )
             {
-               lStep ++;
-               if ( lStep == pArea->lpdbOrdCondInfo->lStep )
+               if ( ++lStep == pArea->lpdbOrdCondInfo->lStep )
                   lStep = 0;
             }
             if ( lStep == 0 )

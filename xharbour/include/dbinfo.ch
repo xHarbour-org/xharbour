@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.7 2004/08/29 00:26:22 druzus Exp $
+ * $Id: dbinfo.ch,v 1.8 2004/12/01 00:15:41 peterrees Exp $
  */
 
 /*
@@ -118,7 +118,9 @@
 #define DBOI_SKIPWILD            104  /* skip while while comparison with given pattern with wildcards doesn't return TRUE */
 #define DBOI_SKIPWILDBACK        105  /* skip backward while comparison with given pattern with wildcards doesn't return TRUE */
 #define DBOI_SCOPEEVAL           106  /* skip through index evaluating given C function */
-
+#define DBOI_FINDREC             107  /* find given record in a Tag beginning from TOP */
+#define DBOI_FINDRECCONT         108  /* find given record in a Tag beginning from current position */
+#define DBOI_EVALSTEP            109  /* eval step (EVERY) used in index command */
 
 /* Return values for DBOI_OPTLEVEL */
 #define DBOI_OPTIMIZED_NONE       0

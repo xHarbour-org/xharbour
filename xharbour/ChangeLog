@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3775 2005/01/27 23:30:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3775 2005/01/28 01:32:42 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,8 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-01-28 04:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/dbinfo.ch
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    + added ordFindRec(<nRecno>[,<lCont>]) which works like
+      Sx_FindRec() in SIX3
+    + added DBOI_EVALSTEP to retrieve information about EVERY value
+      for EVAL code block in index command (step of EVAL block) so
+      dbOrderInfo(DBOI_EVALSTEP) works like Sx_Step() in SIX3
+
 2005-01-27 23:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
-  * utils\hbmakee/hbmake.prg
+  * utils/hbmakee/hbmake.prg
     ! Minor fix to not show the prg list for selection if an unique prg
       is in the folder.
 
