@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2928 2004/05/12 12:21:34 likewolf Exp $
+ * $Id: ChangeLog,v 1.2929 2004/05/12 12:29:39 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-12 16:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * include/hbdefs.h
+    * Added #if ( ! defined( __MINGW32__ ) ) for UINT_16MAX
+  * source/rdd/dbf1.c
+    + Added #if defined( __MINGW32__ ) for include <stdint.h>
 
 2004-05-12 16:20 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * contrib/libct/screen2.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.79 2004/05/12 02:25:25 druzus Exp $
+ * $Id: dbf1.c,v 1.80 2004/05/12 04:32:54 ronpinkas Exp $
  */
 
 /*
@@ -71,7 +71,7 @@
 extern PHB_CODEPAGE s_cdpage;
 #endif
 
-#if defined( __XCC__ )
+#if defined( __XCC__ ) || defined( __MINGW32__ )
    #include <stdint.h>
 #endif
 
