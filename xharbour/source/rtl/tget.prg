@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.55 2003/09/13 20:37:30 walito Exp $
+ * $Id: tget.prg,v 1.56 2003/09/15 03:29:23 walito Exp $
  */
 
 /*
@@ -379,8 +379,8 @@ METHOD Display( lForced ) CLASS Get
    DEFAULT lForced TO .t.
 
    IF ::buffer == NIL
-      xVar      := ::VarGet() // In VarGet() is setting ::xVarGet needed to 
-                              // ::Picture. 
+      xVar      := ::VarGet() // In VarGet() is setting ::xVarGet needed to
+                              // ::Picture.
       ::Picture := ::cPicture
       xBuffer   := ::PutMask( xVar, .f. )
    ELSE
@@ -589,7 +589,12 @@ return xValue
 
 METHOD VarGet() CLASS Get
 
-return ( ::xVarGet := IIF( ValType( ::bBlock ) == 'B', Eval( ::bBlock ), NIL ) )
+  LOCAL xVarGet := IIF( ValType( ::bBlock ) == 'B', Eval( ::bBlock ), NIL )
+
+  ::xVarGet := xVarGet
+  ::Type    := ValType( xVarGet )
+
+RETURN xVarGet
 
 //---------------------------------------------------------------------------//
 
