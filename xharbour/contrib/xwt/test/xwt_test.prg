@@ -1,5 +1,6 @@
 #include "xwt.ch"
 
+GLOBAL oFileSel
 GLOBAL oOtherBox
 
 PROCEDURE MAIN()
@@ -135,7 +136,15 @@ FUNCTION WindowReceive( oEvent )
 RETURN .F.
 
 FUNCTION DumpEvent( oEvent )
-   ? "Event type: ", oEvent:nType
+   ? "Event type: ", oEvent:nType, " from ", oEvent:oSender:GetText()
+   ?  Len ( oEvent:aParams )
+   IF Len ( oEvent:aParams ) == 1
+      ? "Parameter ", oEvent:aParams[1]
+   ELSE
+      IF Len( oEvent:aParams ) == 2
+         ? "Parameters ", oEvent:aParams[1], " ", oEvent:aParams[2]
+      ENDIF
+   ENDIF
    IF oEvent:nType == XWT_E_CLICKED
       IF XWT_MsgBox( "Are you really, really, sure?", ;
          XWT_MSGBOX_YES + XWT_MSGBOX_NO, XWT_MSGBOX_QUESTION) == XWT_MSGBOX_YES
@@ -145,7 +154,16 @@ FUNCTION DumpEvent( oEvent )
 RETURN .F.
 
 FUNCTION FileEvent( oEvent )
+   //Filesel can't be local!
+   //Local oFileSel
+
    ? "Menu activated: ", oEvent:oSender:nId
+   IF oEvent:oSender:nId == 1
+      oFileSel := XWTFileSel():New( "Open file" )
+      // Todo: modal diaog function call
+      // now we must provide a callback:
+      oFileSel:AddEventListener( XWT_E_UPDATED, @DumpEvent() )
+   ENDIF
 RETURN .F.
 
 FUNCTION BoxModified( oEvent )

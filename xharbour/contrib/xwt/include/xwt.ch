@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.5 2003/04/08 18:21:20 jonnymind Exp $
+   $Id: xwt.ch,v 1.6 2003/04/12 23:47:15 jonnymind Exp $
 
    Definitions
 */
@@ -77,6 +77,8 @@
 #define XWT_PROP_STATUS    70 // Integer or bool, depending on widget
 #define XWT_PROP_RADIOGROUP    71 // Pointer
 
+#define XWT_PROP_FILEMASK  80
+
 #define XWT_PROP_FIXED      100 // bool
 #define XWT_PROP_MODAL      101 // bool
 #define XWT_PROP_VISIBILITY 102 // int (see widget visibility)
@@ -140,15 +142,11 @@
 
 #define XWT_TYPE_BUTTON   10
 #define XWT_TYPE_RADIOBUTTON   11
-
 #define XWT_TYPE_LABEL    20
-
 #define XWT_TYPE_MENU     30
-
 #define XWT_TYPE_MENUITEM 31
-
 #define XWT_TYPE_TEXTBOX  40
-
 #define XWT_TYPE_IMAGE    50
+#define XWT_TYPE_FILESEL  60
 
 #endif

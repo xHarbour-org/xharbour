@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.6 2003/04/08 18:21:48 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.7 2003/04/12 23:47:15 jonnymind Exp $
 
    Global declarations, common functions
 */
@@ -639,6 +639,8 @@ PXWT_WIDGET xwt_drv_create(  PHB_ITEM pSelf, int type )
       case XWT_TYPE_GRID:  return xwt_gtk_createGrid( pSelf );
       case XWT_TYPE_VIEWPORT:  return xwt_gtk_createViewPort( pSelf );
       case XWT_TYPE_RADIOBUTTON:  return xwt_gtk_createRadioButton( pSelf );
+      case XWT_TYPE_FILESEL:  return xwt_gtk_createFileSelection( pSelf );
+
    }
    return FALSE;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.6 2003/04/08 18:35:23 jonnymind Exp $
+ * $Id: Changelog,v 1.7 2003/04/12 23:47:02 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-15 00:35 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  + src/filesel.prg
+  + src/xwt_gtk/xwt_gtk_fileselct.c
+    + Started developement of file selection widget.
+      ( created by Luiz Culik )
+
+  * include/xwt.ch
+  * src/xwt_api.c
+  * src/xwt_gtk/xwt_gtk.c
+  * src/xwt_gtk/xwt_gtk.h
+    + Added support for file selection widget
+
+  * test/xwt_test.prg
+    + Added test for file selection widget.
+
 
 2003-04-13 01:40 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   ! src/event.prg
@@ -30,7 +46,7 @@
       scrollbars are automatically added on need.
 
   * src/widget.prg
-    + Added support for preventing event propagation to parents using
+    + Added support for preventing ev ent propagation to parents using
       ::bEventsToParent boolean member. If false, events are not
       propagated. By default, this member is true, but it can be changed
       depending on widgets and situations.
