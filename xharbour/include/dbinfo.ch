@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.3 2004/03/15 12:45:25 druzus Exp $
+ * $Id: dbinfo.ch,v 1.4 2004/03/16 14:39:22 druzus Exp $
  */
 
 /*
@@ -117,6 +117,7 @@
 #define DBOI_SKIPREGEXBACK       103  /* skip backward while regular expression on index key doesn't return TRUE */
 #define DBOI_SKIPWILD            104  /* skip while while comparison with given pattern with wildcards doesn't return TRUE */
 #define DBOI_SKIPWILDBACK        105  /* skip backward while comparison with given pattern with wildcards doesn't return TRUE */
+#define DBOI_SCOPEEVAL           106  /* skip through index evaluating given C function */
 
 
 /* Return values for DBOI_OPTLEVEL */
@@ -131,6 +132,13 @@
 #define DBRI_RECNO                4
 #define DBRI_UPDATED              5
 
+/* constants for some SCOPED DBOI_* parameter */
+#define DBRMI_FUNCTION  1
+#define DBRMI_PARAM     2
+#define DBRMI_LOVAL     3
+#define DBRMI_HIVAL     4
+#define DBRMI_RESULT    5
+#define DBRMI_SIZE      5
 
 /* constants for dbInfo()  */
 #define DBI_ISDBF                 1  /* Does this RDD support DBFs? */

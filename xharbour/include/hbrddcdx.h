@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.31 2004/04/28 18:22:07 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.32 2004/05/20 13:53:32 druzus Exp $
  */
 
 /*
@@ -146,6 +146,8 @@ HB_EXTERN_BEGIN
 #define CDX_TYPE_COMPACT       0x20    /* FoxPro */
 #define CDX_TYPE_COMPOUND      0x40    /* FoxPro */
 #define CDX_TYPE_STRUCTURE     0x80    /* FoxPro */
+
+typedef void ( * HB_EVALSCOPE_FUNC )( ULONG, BYTE *, ULONG, void * );
 
 /* CDX index node strucutres */
 /* Compact Index Header Record */
@@ -566,7 +568,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 static ERRCODE hb_cdxClearFilter( CDXAREAP pArea );
 #define hb_cdxClearLocate                          NULL
 static ERRCODE hb_cdxClearScope( CDXAREAP pArea );
-#define hb_cdxCountScope                           NULL
+static ERRCODE hb_cdxCountScope( CDXAREAP pArea, void * pPtr, LONG * plRec );
 #define hb_cdxFilterText                           NULL
 static ERRCODE hb_cdxScopeInfo( CDXAREAP pArea, USHORT nScope, PHB_ITEM pItem );
 static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo );

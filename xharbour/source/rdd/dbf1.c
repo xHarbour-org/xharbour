@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.82 2004/05/20 21:30:06 druzus Exp $
+ * $Id: dbf1.c,v 1.83 2004/07/22 08:28:17 druzus Exp $
  */
 
 /*
@@ -1959,11 +1959,13 @@ static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfRecInfo(%p, %p, %hu, %p)", pArea, pRecID, uiInfoType, pInfo));
 
-   if( pArea->lpdbPendingRel )
-      SELF_FORCEREL( ( AREAP ) pArea );
 
    if( ulRecNo == 0 )
+   {
+      if( pArea->lpdbPendingRel )
+         SELF_FORCEREL( ( AREAP ) pArea );
       ulRecNo = pArea->ulRecNo;
+   }
 
    switch( uiInfoType )
    {
@@ -1972,6 +1974,9 @@ static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType
          BOOL bDeleted;
          ULONG ulPrevRec = 0;
          
+         if( pArea->lpdbPendingRel )
+            SELF_FORCEREL( ( AREAP ) pArea );
+
          if( pArea->ulRecNo != ulRecNo )
          {
             ulPrevRec = pArea->ulRecNo;

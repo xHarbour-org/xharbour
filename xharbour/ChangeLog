@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3218 2004/07/27 07:37:43 paultucker Exp $
+ * $Id: ChangeLog,v 1.3219 2004/07/27 09:58:31 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-27 15:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/hb-func.sh
+  * xharbour/config/global.cf
+    * added HB_DB_DRVEXT env var which may containt additional DB drivers
+
+  * xharbour/include/dbinfo.ch
+    + DBOI_SCOPEEVAL new DBOI method which allow evaluate C function
+      against index keys
+    + DBRMI_* constants for DBOI_SCOPEEVAL
+
+  * xharbour/include/hbapirdd.h
+    * formatting
+
+  * xharbour/include/hbrddcdx.h
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    + DBOI_SCOPEEVAL implemented
+
+  * xharbour/source/rdd/dbf1.c
+    * do not resolve pending relations when it's not necessary
 
 2004-07-27 11:53 UTC+0100 Patrick Mast <patrick@xHarbour.com>
   * doc/en/set.txt
