@@ -1,5 +1,5 @@
 /*
- * $Id: strings.c,v 1.110 2001/09/10 22:04:29 vszakats Exp $
+ * $Id: strings.c,v 1.1.1.1 2001/12/21 10:41:50 ronpinkas Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 
 #include "hbapi.h"
 
-BOOL hb_strEmpty( const char * szText, ULONG ulLen )
+HB_EXPORT BOOL hb_strEmpty( const char * szText, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strEmpty(%s, %lu)", szText, ulLen));
 
@@ -69,7 +69,7 @@ BOOL hb_strEmpty( const char * szText, ULONG ulLen )
    return TRUE;
 }
 
-int hb_strnicmp( const char * s1, const char * s2, ULONG count )
+HB_EXPORT int hb_strnicmp( const char * s1, const char * s2, ULONG count )
 {
    int rc = 0;
    ULONG l1;

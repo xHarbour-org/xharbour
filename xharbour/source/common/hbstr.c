@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.6 2004/02/22 20:37:40 andijahja Exp $
+ * $Id: hbstr.c,v 1.7 2004/02/22 22:16:22 andijahja Exp $
  */
 
 /*
@@ -124,7 +124,7 @@ char HB_EXPORT * hb_strdup( const char * pszText )
    return pszDup;
 }
 
-int hb_stricmp( const char * s1, const char * s2 )
+HB_EXPORT int hb_stricmp( const char * s1, const char * s2 )
 {
    int rc = 0;
    ULONG l1;

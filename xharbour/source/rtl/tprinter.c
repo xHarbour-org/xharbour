@@ -190,11 +190,11 @@ BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize, LPTSTR
 
             if ( bSubStr )
             {
-               bFound = ( strnicmp( pPrinterEnum->pPortName , pPortName, strlen( pPortName ) ) == 0 );
+               bFound = ( hb_strnicmp( pPrinterEnum->pPortName , pPortName, strlen( pPortName ) ) == 0 );
             }
             else
             {
-               bFound = ( stricmp( pPrinterEnum->pPortName , pPortName ) == 0 );
+               bFound = ( hb_stricmp( pPrinterEnum->pPortName , pPortName ) == 0 );
             }
             if ( bFound )
             {
