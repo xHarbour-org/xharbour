@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.442 2002/10/15 05:02:56 walito Exp $
+ * $Id: ChangeLog,v 1.443 2002/10/15 19:09:45 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,16 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-10-15 12:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/version.c
+    * Renamed HB_PCODE() to HB_PCODEVER()
+    + Added missing extern declaration.
+
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+    - Removed unused variables assignments.
+
 2002-10-15 15:00 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
   * source/vm/hvm.c
-    ! Fixed eternal loop when error 1003 is issued and errorsys creates 
+    ! Fixed eternal loop when error 1003 is issued and errorsys creates
       the undefined sysmbol and returns ES_RETRY
   * source/vm/memvars.c
     ! __MVPUT : fixed symbol name trailing spaces problem
     ! __MVSCOPE : fixed symbol name trailing spaces problem
-    ! hb_memvarFindSymbol() : speed improved and fixed symbol name trailing 
+    ! hb_memvarFindSymbol() : speed improved and fixed symbol name trailing
                               spaces problem
-    ! hb_memvarScope() : speed improved, fixed symbol name trailing 
+    ! hb_memvarScope() : speed improved, fixed symbol name trailing
                          spaces problem and removed the second parameter
   * source/vm/macro.c
     ! hb_compMemvarCheck() - hb_memvarScope call parameter adjusted

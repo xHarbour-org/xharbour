@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: version.c,v 1.4 2002/10/15 03:19:12 andijahja Exp $
  */
 
 /*
@@ -64,6 +64,8 @@
 #include "hbapi.h"
 #include "hbfast.h"
 
+extern char * hb_verPCode( void );
+
 HB_FUNC( OS )
 {
    char * pszPlatform = hb_verPlatform();
@@ -82,7 +84,7 @@ HB_FUNC( VERSION )
    hb_retcAdopt( pszVersion );
 }
 
-HB_FUNC( HB_PCODE )
+HB_FUNC( HB_PCODEVER )
 {
    char * pszPCodeVersion = hb_verPCode();
    hb_retcAdopt( pszPCodeVersion );

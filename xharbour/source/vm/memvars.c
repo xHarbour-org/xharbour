@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.16 2002/09/21 05:21:07 ronpinkas Exp $
+ * $Id: memvars.c,v 1.17 2002/10/15 17:02:42 mlombardo Exp $
  */
 
 /*
@@ -882,7 +882,7 @@ static int hb_memvarScopeGet( PHB_DYNS pDynVar )
  */
 int hb_memvarScope( char * szVarName )
 {
-   int iMemvar = HB_MV_ERROR;
+   int iMemvar;
    PHB_DYNS pDynVar;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarScope(%s)", szVarName));
