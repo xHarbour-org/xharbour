@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.63 2005/02/19 05:04:15 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.64 2005/02/19 05:16:37 ronpinkas Exp $
  */
 
 /*
@@ -413,7 +413,7 @@ RETURN xRet
   {
      VARIANTARG * pArgs = NULL;
      PHB_ITEM uParam;
-     int n, nArgs, nArg, nParam;
+     int n, nArgs, nArg;
      BSTR wString;
      BOOL bByRef;
 
@@ -432,7 +432,6 @@ RETURN xRet
         {
            // Pramateres processed in reveresed order.
            nArg = nArgs - n;
-           nParam = nArgs - n;
 
            //printf( "N: %i Arg: %i Type: %i ByRef: %i\n", n, nArg, hb_stackItemFromBase( nArg  )->type, bByRef );
 
@@ -442,11 +441,11 @@ RETURN xRet
 
            if( ( bByRef = HB_IS_BYREF( hb_stackItemFromBase( nArg ) ) ) != 0 )
            {
-              s_OleRefFlags[ nArg ] == 'Y';
+              s_OleRefFlags[ nArg ] = 'Y';
            }
            else
            {
-              s_OleRefFlags[ nArg ] == 'N';
+              s_OleRefFlags[ nArg ] = 'N';
            }
 
            aPrgParams[ n ] = uParam;
@@ -969,7 +968,7 @@ RETURN xRet
 
   //---------------------------------------------------------------------------//
 
-  HB_FUNC( CREATEOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
+  HB_FUNC_STATIC( CREATEOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
   {
      BSTR wCLSID;
      IID ClassID, iid;
@@ -1018,7 +1017,8 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-  HB_FUNC( GETOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
+
+  HB_FUNC_STATIC( GETOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
   {
      BSTR wCLSID;
      IID ClassID, iid;
@@ -1088,7 +1088,7 @@ RETURN xRet
 
   //---------------------------------------------------------------------------//
 
-  HB_FUNC( OLESHOWEXCEPTION )
+  HB_FUNC_STATIC( OLESHOWEXCEPTION )
   {
      if( (LONG) s_nOleError == DISP_E_EXCEPTION )
      {
@@ -1104,7 +1104,7 @@ RETURN xRet
 
   //---------------------------------------------------------------------------//
 
-  HB_FUNC( OLEEXCEPTIONSOURCE )
+  HB_FUNC_STATIC( OLEEXCEPTIONSOURCE )
   {
      if( (LONG) s_nOleError == DISP_E_EXCEPTION )
      {
@@ -1117,7 +1117,7 @@ RETURN xRet
 
   //---------------------------------------------------------------------------//
 
-  HB_FUNC( OLEEXCEPTIONDESCRIPTION )
+  HB_FUNC_STATIC( OLEEXCEPTIONDESCRIPTION )
   {
      if( (LONG) s_nOleError == DISP_E_EXCEPTION )
      {
@@ -1130,7 +1130,7 @@ RETURN xRet
 
   //---------------------------------------------------------------------------//
 
-  void OleSetProperty( void )
+  static void OleSetProperty( void )
   {
      IDispatch * pDisp;
      BSTR wMember;
@@ -1198,7 +1198,7 @@ RETURN xRet
      }
   }
 
-  void OleInvoke( void )
+  static void OleInvoke( void )
   {
      IDispatch * pDisp;
      BSTR wMember;
@@ -1265,14 +1265,14 @@ RETURN xRet
 
   //---------------------------------------------------------------------------//
 
-  HB_FUNC( OLEERROR )
+  HB_FUNC_STATIC( OLEERROR )
   {
      hb_retnl( (LONG) s_nOleError );
   }
 
   //---------------------------------------------------------------------------//
 
-  char * Ole2TxtError( void )
+  static char * Ole2TxtError( void )
   {
      switch( (LONG) s_nOleError )
      {
@@ -1352,7 +1352,7 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-  HB_FUNC( OLE2TXTERROR )
+  HB_FUNC_STATIC( OLE2TXTERROR )
   {
      hb_retc( Ole2TxtError() );
   }
@@ -1404,7 +1404,7 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-  HB_FUNC( TOLEAUTO_ONERROR )
+  HB_FUNC_STATIC( TOLEAUTO_ONERROR )
   {
      //TraceLog( NULL, "Class: '%s' Message: '%s' Params %i\n", hb_objGetClsName( hb_stackSelfItem() ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, hb_pcount() );
 
