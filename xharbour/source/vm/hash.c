@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.23 2004/02/21 04:45:20 ronpinkas Exp $
+ * $Id: hash.c,v 1.24 2004/02/21 05:04:46 ronpinkas Exp $
  */
 
 /*
@@ -2053,31 +2053,33 @@ HB_FUNC( HDELAT )
 ***************************************************************/
 HB_FUNC( HGETKEYS )
 {
-   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH ), pKeys;
 
    if ( pHash == NULL  )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL,
-         "HGETKEYS", 1, hb_paramError(1) );
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HGETKEYS", 1, hb_paramError(1) );
       return;
    }
 
-   hb_itemForwardValue( &HB_VM_STACK.Return, hb_hashGetKeys( pHash )  );
+   pKeys = hb_hashGetKeys( pHash );
+   hb_itemForwardValue( &HB_VM_STACK.Return, pKeys );
+   hb_itemRelease( pKeys );
 }
 
 
 HB_FUNC( HGETVALUES )
 {
-   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH ), pValues;
 
    if ( pHash == NULL  )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL,
-         "HGETVALUES", 1, hb_paramError(1) );
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HGETVALUES", 1, hb_paramError(1) );
       return;
    }
 
-   hb_itemForwardValue( &HB_VM_STACK.Return, hb_hashGetValues( pHash )  );
+   pValues = hb_hashGetValues( pHash );
+   hb_itemForwardValue( &HB_VM_STACK.Return, pValues );
+   hb_itemRelease( pValues );
 }
 
 /***********************************************************
