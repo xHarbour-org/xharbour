@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.19 2003/06/10 23:46:18 ronpinkas Exp $
+ * $Id: pptable.c,v 1.20 2003/06/18 08:57:02 ronpinkas Exp $
  */
 
 /*
@@ -438,7 +438,7 @@ void hb_pp_Table( void )
    static COMMANDS sC___251 = {0,"SET","DIRSEPARATOR ( \1A00 )","Set(_SET_DIRSEPARATOR, \1A00 )",&sC___250 };
    static COMMANDS sC___252 = {0,"THROW","\1A00","Eval(ErrorBlock(),\1A00 )",&sC___251 };
 
-   static COMMANDS sT___01 = {0,"{","\1A00 => \1B00 [,\1C00 => \1D00] }", "TAssociativeArray({ { \1A00,\1B00 } [,{ \1C00,\1D00 } ] } )",NULL };
+   static COMMANDS sT___01 = {0,"{","\1A00 => \1B00 [,\1C00 => \1D00] }", "( HB_SetWith( TAssociativeArray({ { \1A00,\1B00 } [,{ \1C00,\1D00 } ] } ) ), __ClsSetModule( HB_QWith():ClassH ), HB_SetWith() ) ",NULL };
    static COMMANDS sT___02 = {0,"_GET_","(\1A00,\1B00 )","_GET_(\1A00,\1B00,NIL,NIL,NIL )",&sT___01 };
    static COMMANDS sT___03 = {0,"_GET_","(\1A00,\1B00,\1C00 )","_GET_(\1A00,\1B00,\1C00,NIL,NIL )",&sT___02 };
    static COMMANDS sT___04 = {0,"_GET_","(\1A00,\1B00,\1C00,\1D00 )","_GET_(\1A00,\1B00,\1C00,\1D00,NIL )",&sT___03 };

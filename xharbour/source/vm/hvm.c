@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.218 2003/06/22 22:29:16 andijahja Exp $
+ * $Id: hvm.c,v 1.219 2003/06/23 20:31:39 jonnymind Exp $
  */
 
 /*
@@ -7279,7 +7279,24 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
 HB_FUNC( HB_QWITH )
 {
    HB_THREAD_STUB
+
    hb_itemCopy( &(HB_VM_STACK.Return), &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter - 1 ] ) );
+}
+
+HB_FUNC( HB_SETWITH )
+{
+   HB_THREAD_STUB
+
+   if( hb_pcount() == 0 )
+   {
+      hb_itemForwardValue( &(HB_VM_STACK.Return), &( hb_vm_aWithObject[ --hb_vm_wWithObjectCounter ] ) );
+   }
+   else
+   {
+      PHB_ITEM pWith = hb_param( 1, HB_IT_OBJECT );
+
+      hb_itemForwardValue( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter++ ] ), pWith );
+   }
 }
 
 HB_FUNC( HB_QSELF )

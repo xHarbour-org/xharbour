@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.6 2003/02/19 02:25:34 fsgiudice Exp $
+ * $Id: tclass.prg,v 1.7 2003/03/25 02:36:12 ronpinkas Exp $
  */
 
 /*
@@ -86,6 +86,8 @@ FUNCTION HBClass()
 
    IF s_hClass == NIL
       s_hClass := __clsNew( "HBCLASS", 10, 15 )
+      __ClsSetModule( s_hClass )
+
 /*    s_hClass := __clsNew( "HBCLASS", 11, 15 )  */
 
       __clsAddMsg( s_hClass, "New"            , @New()            , HB_OO_MSG_METHOD )
@@ -476,9 +478,13 @@ STATIC FUNCTION ConstructorCall( oClass, aParams )
 
 FUNCTION __ClassNew( cName, nDatas )
 
+    LOCAL hClass := __ClsNew( cName, nDatas )
+
+    __ClsSetModule( hClass )
+
     s_nDataId := 0
 
-RETURN __ClsNew( cName, nDatas )
+RETURN hClass
 
 FUNCTION __ClassAdd( hClass, cProperty, cFunction )
 

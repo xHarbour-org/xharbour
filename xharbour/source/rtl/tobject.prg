@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.6 2003/03/09 22:55:01 ronpinkas Exp $
+ * $Id: tobject.prg,v 1.7 2003/03/25 02:36:12 ronpinkas Exp $
  */
 
 /*
@@ -181,7 +181,7 @@ RETURN __errRT_SBASE( EG_NOMETHOD, nCode, cDesc, cClass + ":" + cMsg )
 FUNCTION TAssociativeArray( aInit )
 
    LOCAL hClass
-   LOCAL  aMember, nSeq := 1
+   LOCAL aMember, nSeq := 1
    LOCAL aKeys := {}
 
    // Intentionally creating NEW Class for every instance - Don't change!

@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.ch,v 1.8 2002/07/23 07:22:34 ronpinkas Exp $
+ * $Id: cstruct.ch,v 1.9 2002/07/24 18:41:31 ronpinkas Exp $
  */
 
 /*
@@ -108,7 +108,7 @@
                HB_Member( #<elem>, HB_CStructureId( #<stru>, .F. ) )
 
       #command END C STRUCTURE [<!stru!>] => ; ;
-                  __ActiveStructure( NIL ); ;
+                  __ClsSetModule( __ActiveStructure() ); ;
                RETURN
 
       #command IMPORT C STRUCTURE <!stru!> => ;
@@ -128,6 +128,7 @@
                 #translate IS <stru> \[ \<x: :=, INIT, FROM> { \<initlist,...> } ] => := HB_CStructure( #<stru> ):Init( {\<initlist>} ) ; ;
                 INIT PROCEDURE __INIT_<stru>; ;
                    HB_CStructureCSyntax( #<stru>, {[#<elem>,]}, <(tag)>, <"synon">, __PACK ); ;
+                   __ClsSetModule( __ActiveStructure() ); ;
                 RETURN
 
       #xcommand pragma pack( <pack> ) => #undef __PACK; #define __PACK <pack>

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1178 2003/06/24 00:41:03 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1179 2003/06/24 02:17:20 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-06-23 20:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/cstruct.ch
+  * source/rtl/cstruct.prg
+    % Optimized classes creation.
+    + Added logic to set the correct module where the structures where created.
+
+  * source/vm/hvm.c
+    + Added HB_SetWith( [oNewWith] )
+      /* This function is the expression equivalent of WITH OBJEC <oNewWith> when a paramater is supplied
+         and it's the equivalent of END WITH when no paramater is supplied (in that case it returns that
+         poped WITH object.
+
+         This alloews for an elegant  simulation of a temp var in PP translation where before you'd be
+         forced to create a memvar like __1 to store some intermdeiate value for later use in the
+         translation. This way is much faster, and avoids possible namespace issues.
+       */
+
+  * source/pp/pptable.c
+    + Added logic to set the correct module where LITERAL AssociativeArray was created in appropriate
+      #translate, using new HB_SetWith().
+
+  * source/rtl/tclass.prg
+    + Added logic to set the correct module where the HBClass meta class was created.
+
+  * source/rtl/tobject.prg
+    * Minor formating.
 
 2003-06-24 03:41 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * tests/i18ntest.prg
