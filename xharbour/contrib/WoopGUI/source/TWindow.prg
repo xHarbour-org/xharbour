@@ -74,7 +74,8 @@ CLASS TWindow FROM TWindowBase
     DATA oFgColor       AS OBJECT
 
     DATA oStackColors   AS OBJECT
-
+    DATA hDC
+    DATA cPaint
     //DATA oBrushFocus    AS OBJECT
     //DATA oBgColorFocus  AS OBJECT
     //DATA oFgColorFocus  AS OBJECT
@@ -188,7 +189,14 @@ CLASS TWindow FROM TWindowBase
     METHOD OnMove()                         VIRTUAL // FSG - to be implemented
     METHOD OnNCDestroy()                    //VIRTUAL // FSG - to be implemented
     METHOD OnNotify()                       VIRTUAL // FSG - to be implemented
-    METHOD OnPaint()                        VIRTUAL // FSG - to be implemented
+
+//    METHOD OnPaint()                        VIRTUAL // FSG - to be implemented
+
+   METHOD OnPaint()                 ;
+          INLINE ;
+            ::hDC := BeginPaint(::nHandle, ::cPaint),     ;
+            ::Paint(), EndPaint(::nHandle, ::cPaint), 0
+
     METHOD OnHScroll()                      VIRTUAL // FSG - to be implemented
     METHOD OnSetFocus()                     VIRTUAL // FSG - to be implemented
     METHOD OnSize()                         VIRTUAL // FSG - to be implemented
