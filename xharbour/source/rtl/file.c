@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.11 2004/01/16 11:41:20 lculik Exp $
+ * $Id: file.c,v 1.12 2004/01/17 17:52:59 lculik Exp $
  */
 
 /*
@@ -63,7 +63,7 @@ BOOL HB_EXPORT hb_fsFile( BYTE * pFilename )
 {
    PHB_FFIND ffind;
    BOOL bResult = FALSE;
-   char * szFile ;
+   // char * szFile ;
 
    pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
 
