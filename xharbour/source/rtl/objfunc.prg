@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.1.1.1 2001/12/21 10:41:54 ronpinkas Exp $
+ * $Id: objfunc.prg,v 1.2 2002/10/04 18:24:25 ronpinkas Exp $
  */
 
 /*
@@ -188,7 +188,8 @@ FUNCTION __objAddInline( oObject, cSymbol, bInline )
 
 RETURN oObject
 
-FUNCTION __objAddData( oObject, cSymbol )
+FUNCTION __objAddData( oObject, cSymbol, nScope )
+
    LOCAL nSeq, hClass
 
    IF !ISOBJECT( oObject ) .OR. !ISCHARACTER( cSymbol )
@@ -196,8 +197,13 @@ FUNCTION __objAddData( oObject, cSymbol )
    ELSEIF !__objHasMsg( oObject, cSymbol ) .AND. !__objHasMsg( oObject, "_" + cSymbol )
       hClass := oObject:ClassH
       nSeq   := __cls_IncData( hClass )         // Allocate new Seq#
-      __clsAddMsg( hClass,       cSymbol, nSeq, HB_OO_MSG_DATA, NIL, 1 )
-      __clsAddMsg( hClass, "_" + cSymbol, nSeq, HB_OO_MSG_DATA, NIL, 1 )
+
+      IF nScope == NIL
+         nScope := HB_OO_CLSTP_EXPORTED
+      ENDIF
+
+      __clsAddMsg( hClass,       cSymbol, nSeq, HB_OO_MSG_DATA, NIL, nScope )
+      __clsAddMsg( hClass, "_" + cSymbol, nSeq, HB_OO_MSG_DATA, NIL, nScope )
    ENDIF
 
 RETURN oObject
