@@ -22,7 +22,7 @@ $Id: hblog.txt,v 1.2 2003/08/02 18:08:27 lculik Exp $
  *      STATUS OF THE LIBRARY
  *      =====================
  *      
- *      HBDoc is a part of xharbour RTL library; currently, it is functionally
+ *      HBLog is a part of xharbour RTL library; currently, it is functionally
  *      complete and actively tested.    
  *      
  *      HBLOG concepts
