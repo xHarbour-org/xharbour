@@ -494,7 +494,7 @@ HB_FUNC( ADSKEYNO )
    PHB_ITEM   pFilterOption = hb_param( 3, HB_IT_NUMERIC );
 
    /* if arg 1 or 3 is bad, toss error */
-   if ( ( pxOrder != NULL && !HB_IS_STRING( pxOrder ) && !HB_IS_NUMBER( pxOrder ) && !HB_IS_NIL( pxOrder )  ) ||
+   if ( ( pxOrder != NULL && !HB_IS_STRING( pxOrder ) && !HB_IS_NUMBER( pxOrder ) && !HB_IS_NIL( pxOrder ) ) ||
         ( pFilterOption != NULL && !HB_IS_NUMBER( pFilterOption ) ) )
    {
       hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSKEYNO" );
@@ -510,7 +510,7 @@ HB_FUNC( ADSKEYNO )
       }
 
       /* get an Index Handle */
-      if( pxOrder == NULL || HB_IS_NIL( pxOrder ) )             /* didn't pass it in; use current */
+      if( pxOrder == NULL || HB_IS_NIL( pxOrder ) )        /* didn't pass it in; use current */
       {
          hIndex = pArea->hOrdCurrent;
       }
@@ -522,7 +522,7 @@ HB_FUNC( ADSKEYNO )
             AdsGetIndexHandleByOrder( pArea->hTable, ordNum, &hIndex );
          }
       }
-      else         /* must be number or nil since checked above */
+      else                              /* must be String since checked above */
       {
          if( pxOrder->item.asString.length == 0 )          /* passed "" */
          {
@@ -568,13 +568,8 @@ HB_FUNC( ADSKEYCOUNT )
    /* 2nd parameter: unsupported Bag Name. */
    PHB_ITEM   pFilterOption = hb_param( 3, HB_IT_NUMERIC );
 
-   if ( pxOrder != NULL && HB_IS_NIL( pxOrder ) )
-   {
-      pxOrder = NULL;                   // simplifies arg checks below
-   }
-
    /* if arg 1 or 3 is bad, toss error */
-   if ( ( pxOrder != NULL && !HB_IS_STRING( pxOrder ) && !HB_IS_NUMBER( pxOrder )  ) ||
+   if ( ( pxOrder != NULL && !HB_IS_STRING( pxOrder ) && !HB_IS_NUMBER( pxOrder ) && !HB_IS_NIL( pxOrder ) ) ||
         ( pFilterOption != NULL && !HB_IS_NUMBER( pFilterOption ) ) )
    {
       hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSKEYCOUNT" );
@@ -589,7 +584,7 @@ HB_FUNC( ADSKEYCOUNT )
          usFilterOption = hb_itemGetNI( pFilterOption );
       }
       /* get an Index Handle */
-      if( pxOrder == NULL )             /* didn't pass it in; use current */
+      if( pxOrder == NULL || HB_IS_NIL( pxOrder ) )        /* didn't pass it in; use current */
       {
          hIndex = pArea->hOrdCurrent;
       }
@@ -601,7 +596,7 @@ HB_FUNC( ADSKEYCOUNT )
             AdsGetIndexHandleByOrder( pArea->hTable, ordNum, &hIndex );
          }
       }
-      else         /* must be String since checked above */
+      else                              /* must be String since checked above */
       {
          if( pxOrder->item.asString.length == 0 )          /* passed "" */
          {
