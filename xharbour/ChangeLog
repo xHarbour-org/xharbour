@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2557 2004/03/11 10:01:23 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2558 2004/03/11 13:43:27 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-11 21:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/transfrm.c
+    ! remove recent hack, it is very destructive :-(
+
 2004-03-11 20:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/transfrm.c
     ! add hacks to handle conversion of string/numbers to numeric formats
