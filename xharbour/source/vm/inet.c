@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.11 2003/01/31 18:39:27 jonnymind Exp $
+* $Id: inet.c,v 1.12 2003/02/03 06:49:06 jonnymind Exp $
 */
 
 /*
@@ -78,6 +78,7 @@ int hb_selectReadSocket( HB_SOCKET_STRUCT *Socket )
 
    FD_ZERO( &set );
    FD_SET(Socket->com, &set);
+
 
    if ( Socket->timeout == -1 )
    {
@@ -571,7 +572,7 @@ HB_FUNC( INETRECV )
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_BYREF ); // hb_param() calls hb_itemUnref()!
 
    char *Buffer;
-   int iLen;
+   int iLen, iMaxLen;
    HB_SOCKET_STRUCT *Socket;
 
    if( pSocket == NULL || pBuffer == NULL )
@@ -586,13 +587,13 @@ HB_FUNC( INETRECV )
 
    if( ISNIL( 3 ) )
    {
-      iLen = pBuffer->item.asString.length;
+      iMaxLen = pBuffer->item.asString.length;
    }
    else
    {
-      iLen = hb_parni( 3 );
+      iMaxLen = hb_parni( 3 );
 
-      if( (signed int) pBuffer->item.asString.length < iLen )
+      if( (signed int) pBuffer->item.asString.length < iMaxLen )
       {
          /* Should we issue a runtime error? */
          HB_SOCKET_SET_ERROR2( Socket, -1, "Passed buffer is smaller than specified requested length!" );
@@ -604,22 +605,26 @@ HB_FUNC( INETRECV )
    Buffer = pBuffer->item.asString.value;
 
    HB_SOCKET_ZERO_ERROR( Socket );
-
    if( hb_selectReadSocket( Socket ) )
    {
-      iLen = recv( Socket->com, Buffer, iLen, MSG_NOSIGNAL | MSG_WAITALL );
-      if ( iLen <= 0 )
-      {
-         HB_SOCKET_SET_ERROR( Socket );
-      }
-      hb_retni( iLen );
+      iLen = recv( Socket->com, Buffer, iMaxLen, MSG_NOSIGNAL  );
    }
    else
    {
       HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
       hb_retni( 0 );
+      return;
    }
 
+   if ( iLen == 0 )
+   {
+      HB_SOCKET_SET_ERROR2( Socket, -2, "Connection closed" );
+   }
+   if ( iLen < 0 )
+   {
+      HB_SOCKET_SET_ERROR( Socket );
+   }
+   hb_retni( iLen );
 }
 
 HB_FUNC( INETRECVALL )
@@ -652,16 +657,14 @@ HB_FUNC( INETRECVALL )
       if( (int) ( pBuffer->item.asString.length ) < iMax )
       {
          /* Should we issue a runtime error? */
-         HB_SOCKET_SET_ERROR2( Socket, -1, "Passed buffer is smaller than specified requested length!" );
+         HB_SOCKET_SET_ERROR2( Socket, -1, "Passed buffer is smaller than specified requested length" );
          hb_retni( -1 );
          return;
       }
    }
 
    Buffer = pBuffer->item.asString.value;
-
    iReceived = 0;
-
    HB_SOCKET_ZERO_ERROR( Socket );
 
    do
@@ -674,7 +677,7 @@ HB_FUNC( INETRECVALL )
          iLen = recv( Socket->com, Buffer + iReceived, iBufferLen, MSG_NOSIGNAL );
          if( iLen > 0 )
          {
-               iReceived += iLen;
+            iReceived += iLen;
          }
       }
       else
@@ -689,8 +692,13 @@ HB_FUNC( INETRECVALL )
 
    Socket->count = iReceived;
 
-   if ( iLen >= 0 )
+   if ( iLen > 0 )
    {
+      hb_retni( iReceived );
+   }
+   else if( iLen == 0 )
+   {
+      HB_SOCKET_SET_ERROR2( Socket, -2, "Connection closed" )
       hb_retni( iReceived );
    }
    else
@@ -1747,7 +1755,7 @@ HB_FUNC( INETDGRAMRECV )
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
 
    char *Buffer;
-   int iLen;
+   int iLen,iMaxLen;
 
    #if defined(HB_OS_WIN_32)
       int iDtLen;
@@ -1770,33 +1778,43 @@ HB_FUNC( INETDGRAMRECV )
 
    if ( ISNUM( 3 ) )
    {
-      iLen = hb_parni( 3 );
+      iMaxLen = hb_parni( 3 );
    }
    else
    {
-      iLen = pBuffer->item.asString.length;
+      iMaxLen = pBuffer->item.asString.length;
    }
 
    HB_SOCKET_ZERO_ERROR( Socket );
 
-   Socket->count = 0;
+   iLen = -2;
    if( hb_selectReadSocket( Socket ) )
    {
-      Socket->count = recvfrom( Socket->com, Buffer, iLen, 0,
+      iLen = recvfrom( Socket->com, Buffer, iLen, 0,
             (struct sockaddr *) &Socket->remote, &iDtLen );
    }
 
-   hb_retni( Socket->count );
-
-   if( Socket->count == 0 )
+   if( iLen == -2 )
    {
       HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" );
-   }
-   else if( Socket->count < 0 )
-   {
       Socket->count = 0;
-      HB_SOCKET_SET_ERROR( Socket );
+      iLen = -1;
    }
+   else if( iLen == 0 )
+   {
+      HB_SOCKET_SET_ERROR2( Socket, -2, "Connection closed" );
+      Socket->count = 0;
+   }
+   else if( iLen < 0 )
+   {
+      HB_SOCKET_SET_ERROR( Socket );
+      Socket->count = 0;
+   }
+   else
+   {
+      Socket->count = iLen;
+   }
+   hb_retni( iLen );
 }
 
 

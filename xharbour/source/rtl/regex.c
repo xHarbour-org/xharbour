@@ -6374,6 +6374,7 @@ HB_FUNC( HB_ATX )
            {
               ulLen = aMatches[0].rm_eo - aMatches[0].rm_so;
 
+
               if( hb_pcount() > 3 )
               {
                  hb_stornl( aMatches[0].rm_so + 1, 4 );
@@ -6403,4 +6404,62 @@ HB_FUNC( HB_ATX )
 
 HB_FUNC( REGCOMP )
 {
+}
+
+/* Giancarlo niccoali added perl like subgroup matching */
+#include "hbapierr.h"
+HB_FUNC( HB_REGEX )
+{
+   #ifndef REGEX_MAX_GROUPS
+   #define REGEX_MAX_GROUPS 16
+   #endif
+
+   regex_t re;
+   regmatch_t aMatches[REGEX_MAX_GROUPS];
+   int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
+   int i;
+   PHB_ITEM aRet, pMatch; /* Array where the matched groups will be returned */
+
+   PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
+   PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
+
+   if( pRegEx == NULL || pString == NULL )
+   {
+      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_REGEX", 1, pArgs );
+      hb_itemRelease( pArgs );
+      return;
+   }
+
+   if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == FALSE )
+   {
+      CFlags |= REG_ICASE;
+   }
+
+   if( regcomp( &re, pRegEx->item.asString.value, CFlags ) == 0 )
+   {
+
+      aMatches[0].rm_so = 0;
+      aMatches[0].rm_eo = pRegEx->item.asString.length;
+
+      if( regexec( &re, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
+      {
+         aRet = hb_itemArrayNew( 0 );
+         i = 0;
+         while ( aMatches[i].rm_eo > 0 )
+         {
+            pMatch = hb_itemPutCL( NULL, pString->item.asString.value + aMatches[i].rm_so,
+                aMatches[i].rm_eo - aMatches[i].rm_so );
+            hb_arrayAdd( aRet, pMatch );
+            hb_itemRelease( pMatch );
+            i++;
+         }
+
+         hb_itemRelease( hb_itemReturn( aRet ) );
+         return;
+      }
+   }
+
+   hb_ret();
 }

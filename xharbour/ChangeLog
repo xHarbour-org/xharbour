@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.680 2003/02/03 14:21:49 walito Exp $
+ * $Id: ChangeLog,v 1.681 2003/02/03 18:35:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-03 07:50 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/inet.c
+    * More optimizations and tests in timeout control
+
+  * source/rtl/regex.c
+    * Added HB_Regex( cRegex, cString, [, bCase] )--> ARRAY. On failure, it 
+      returns  NIL, while on success it returns an array of successful 
+      matches.
+      The first element is the whole match found, while the others
+      (2 to end) are the subgroups matches. Eg:
+      HB_Regex( "a(.)c", "a string abc here" ) would return
+      { "abc", "b" }.
+      Match is case insensitive by default, unless you specify .T. as third 
+      parameter.
+      
+      This is an experimental grammar and will probably be changed in the 
+      future.
 
 2003-02-03 10:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c
