@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.23 2003/07/22 16:04:09 xthefull Exp $
+ * $Id: Changelog,v 1.24 2003/07/23 15:58:02 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-08-25 17:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * src/xwt_gtk/xwt_gtk_image.c
+  * src/xwt_gtk/xwt_gtk_layout.c
+  * src/xwt_gtk/xwt_gtk_viewport.c
+  * src/xwt_gtk/xwt_gtk_window.c
+    ! minor fix
+
 2003-07-23 12:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   + include/xwtcmd.ch
     * Removed commands from xtw.ch and created this new one
