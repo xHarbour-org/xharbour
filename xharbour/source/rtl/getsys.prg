@@ -1,5 +1,5 @@
 /*
- * $Id: getsys.prg,v 1.7 2002/06/21 20:34:54 walito Exp $
+ * $Id: getsys.prg,v 1.8 2003/01/12 04:42:58 what32 Exp $
  */
 
 /*
@@ -348,17 +348,20 @@ FUNCTION RangeCheck( oGet, xDummy, xLow, xHigh )
       cMessage := Left( NationMsg( _GET_RANGE_FROM ) + LTrim( Transform( xLow, "" ) ) + ;
                         NationMsg( _GET_RANGE_TO ) + LTrim( Transform( xHigh, "" ) ), MaxCol() )
 
+      HBConsoleLock()
       nOldRow := Row()
       nOldCol := Col()
 
       DispOutAt( SCORE_ROW, Min( 60, MaxCol() - Len( cMessage ) ), cMessage )
       SetPos( nOldRow, nOldCol )
+      HBConsoleUnlock()
 
-      DO WHILE NextKey() == 0
-      ENDDO
+      Inkey( 0 )
 
+      HBConsoleLock()
       DispOutAt( SCORE_ROW, Min( 60, MaxCol() - Len( cMessage ) ), Space( Len( cMessage ) ) )
       SetPos( nOldRow, nOldCol )
+      HBConsoleUnlock()
 
    ENDIF
 

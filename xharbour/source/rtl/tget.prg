@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.32 2002/11/29 20:14:44 walito Exp $
+ * $Id: tget.prg,v 1.33 2002/12/17 16:04:51 walito Exp $
  */
 
 /*
@@ -359,6 +359,8 @@ METHOD Display( lForced ) CLASS Get
 
    DEFAULT lForced TO .t.
 
+   HBConsoleLock()
+
    if !::lMinusPrinted .and. !Empty( ::DecPos ) .and. ::minus .and. substr( xBuffer, ::DecPos-1, 1 ) == "0"
       xBuffer := substr( xBuffer, 1, ::DecPos-2 ) + "-." + substr( xBuffer, ::DecPos+1 )
    endif
@@ -388,6 +390,8 @@ METHOD Display( lForced ) CLASS Get
    endif
 
    SetCursor( nOldCursor )
+   
+   HBConsoleUnlock()
 
 return Self
 

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.19 2002/12/31 07:15:41 jonnymind Exp $
+* $Id: thread.h,v 1.20 2003/01/02 03:31:02 jonnymind Exp $
 */
 
 /*
@@ -69,7 +69,6 @@
 
 #if defined(HB_OS_WIN_32)
    #define HB_THREAD_T                 DWORD
-   #define HB_THREAD_HANDLE            HANDLE
 
    #define HB_CRITICAL_T               CRITICAL_SECTION
    #define HB_CRITICAL_INIT( x )       InitializeCriticalSection( &(x) )
@@ -89,16 +88,14 @@
    void hb_SignalObjectAndWait( HB_COND_T hToSignal, HB_MUTEX_T hToWaitFor, DWORD dwMillisec, BOOL bUnused );
 
    #define HB_COND_WAIT( x, y )        hb_SignalObjectAndWait( y, x, INFINITE, FALSE )
-   #define HB_COND_WAITTIME( x, y, t ) hb_SignalObjectAndWait( y, x, t *1000, FALSE )
+   #define HB_COND_WAITTIME( x, y, t ) hb_SignalObjectAndWait( y, x, t, FALSE )
    #define HB_COND_SIGNAL( x )         PulseEvent( x )
    #define HB_COND_DESTROY( x )        CloseHandle( x )
 
    #define HB_CURRENT_THREAD           GetCurrentThreadId
-   #define HB_CURRENT_THREAD_HANDLE    GetCurrentThread
 #else
     #include <pthread.h>
     #define HB_THREAD_T                 pthread_t
-    #define HB_THREAD_HANDLE            pthread_t
 
     #define HB_MUTEX_T                  pthread_mutex_t
     #define HB_MUTEX_INIT( x )          pthread_mutex_init( &(x), NULL )
@@ -123,44 +120,44 @@
         {\
             struct timeval now;\
             struct timespec timeout;\
-            gettimeofday(&now, 0);\
-            timeout.tv_sec = now.tv_sec + t /1000;\
-            timeout.tv_nsec = now.tv_usec * 1000 + (t % 1000) * 1000000 ;\
+            gettimeofday( &now, NULL );\
+            timeout.tv_sec = now.tv_sec + (t / 1000);\
+            timeout.tv_nsec = (now.tv_usec + ( (t % 1000) * 1000 ) )* 1000   ;\
             pthread_cond_timedwait( &(x), &(y), &timeout );\
         }
     #define HB_COND_SIGNAL( x )         pthread_cond_signal( &(x) )
     #define HB_COND_DESTROY( x )        pthread_cond_destroy( &(x) )
 
     #define HB_CURRENT_THREAD           pthread_self
-    #define HB_CURRENT_THREAD_HANDLE    pthread_self
 
 /* Thread support is only for linux and windows now */
 #endif
 
 /* Complex Mutex Structure*/
 typedef struct {
-    HB_MUTEX_T mutex;
-    HB_COND_T cond;
-    HB_THREAD_HANDLE locker;
-	USHORT lock_count;
-	int waiting;
-	PHB_ITEM event_object;
+   HB_MUTEX_T mutex;
+   HB_COND_T cond;
+   HB_THREAD_T locker;
+   USHORT lock_count;
+   int waiting;
+   PHB_ITEM event_object;
 } HB_MUTEX_STRUCT;
 
 /* Context */
 typedef struct tag_HB_THREAD_CONTEXT
 {
     HB_THREAD_T th_id;
-#if defined(HB_OS_WIN_32)
-    HB_THREAD_HANDLE th_h;
-#endif
     HB_STACK *stack;
     void *Cargo;
     HB_GARBAGE_FUNC_PTR pDestructor;
+#ifdef HB_OS_WIN_32
+    HANDLE th_h;
+#endif
     //HB_GARBAGE_PTR GCList;
     struct tag_HB_THREAD_CONTEXT *next;
 } HB_THREAD_CONTEXT;
 
+extern HB_THREAD_CONTEXT *last_context;
 /* Parameters passed for thread creation */
 typedef struct tag_HB_THREAD_PARAM
 {
@@ -184,15 +181,14 @@ typedef struct tag_HB_LWR_MUTEX
 } HB_LWR_MUTEX;
 
 
-extern HB_STACK hb_stack_general;
 extern HB_THREAD_CONTEXT *hb_ht_context;
+extern HB_THREAD_T hb_main_thread_id;
 
-extern void hb_threadCreateContext( void );
-extern void hb_threadDestroyContext( void );
-extern void hb_threadDestroyContextFromHandle( HB_THREAD_HANDLE th_h );
+extern HB_THREAD_CONTEXT *hb_threadCreateContext( HB_THREAD_T th_id );
+extern void hb_threadDestroyContext( HB_THREAD_T th_id );
+extern HB_THREAD_CONTEXT *hb_threadGetContext( HB_THREAD_T th_id );
 extern void hb_threadInit( void );
 extern void hb_threadExit( void );
-extern HB_THREAD_CONTEXT *hb_threadGetCurrentContext( void );
 
 /* LWRM management */
 
@@ -214,7 +210,6 @@ extern void hb_threadUnlock( HB_LWR_MUTEX *m );
             }
 
     #define HB_CRITICAL_DESTROY( x )    HB_MUTEX_DESTROY( x.Critical )
-//TraceLog( NULL, "+LOCK Thread: %i Mutex: %s File: %s[%i]\n", pthread_self(), #x, __FILE__, __LINE__ );
 
     #define HB_CRITICAL_LOCK( lpMutex )  \
          { \
@@ -230,6 +225,7 @@ extern void hb_threadUnlock( HB_LWR_MUTEX *m );
             }\
          }
 
+//      TraceLog( NULL, "+UNLOCK Thread: %i Mutex: %s File: %s[%i]\n", pthread_self(), #lpMutex, __FILE__, __LINE__ );
     #define HB_CRITICAL_UNLOCK( lpMutex ) \
          {\
             if ( lpMutex.Locker == HB_CURRENT_THREAD() )\

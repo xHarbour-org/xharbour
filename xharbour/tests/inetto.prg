@@ -50,10 +50,10 @@ PROCEDURE Main( cAddress, nPort, nTimeout )
    MutexCnt := CreateMutex()
 
    /* Now starting the control thread */
-   CtlThreadID := StartThread ( @CheckTime(), nTimeout )
+   CtlThreadID := StartThread ( @ControlThread(), nTimeout )
 
    /* Now we can start how many services threads we want */
-   StartThread ( @Connect(), cAddress, nPort )
+   StartThread ( @Connect(), cAddress, nPort, nTimeout )
 
    nDots := 0
    WHILE .T.
@@ -72,16 +72,21 @@ PROCEDURE Main( cAddress, nPort, nTimeout )
    // 1: connection established or error while connecting
 
    DO CASE
+      CASE aCntSockets[1][3] == -2
+         @8, 10 say "Server name not resolved before timeout."
+
       CASE aCntSockets[1][3] == -1
          @8, 10 say "Connection not established before timeout."
 
       CASE aCntSockets[1][3] == 1
          @8, 10 say "Connection ESTABLISHED. Timeout aborted."
-         // this is just not to exit programs before all threads are stopped.
 
       CASE aCntSockets[1][3] == 2
          @8, 10 say "Connection REJECTED. Timeout aborted."
-         // this is just not to exit programs before all threads are stopped.
+
+      CASE aCntSockets[1][3] == 3
+         @8, 10 say "Server name not found."
+
    ENDCASE
 
    StopThread( CtlThreadID )
@@ -94,9 +99,20 @@ PROCEDURE Main( cAddress, nPort, nTimeout )
 
 RETURN
 
-FUNCTION Connect( cAddress, nPort )
+
+/********************************************
+* This function handles async connecton
+* It uses another async thread to search the
+* server name
+*/
+
+FUNCTION Connect( cAddress, nPort, nTimeout )
    LOCAL aServiceData
    LOCAL Socket
+   LOCAL MutexDone
+   LOCAL thSearcher
+   LOCAL aServer
+   LOCAL nPos
 
    /* We create now a vaild service data, without the socket */
    aServiceData := { InetCreate(), ThreadGetCurrent(), 0 , Seconds() }
@@ -107,8 +123,35 @@ FUNCTION Connect( cAddress, nPort )
    AAdd( aCntSockets, aServiceData )
    MutexUnlock( MutexCnt )
 
+   /* request to get the inet address of the server asynchronously */
+   MutexDone := CreateMutex()
+   thSearcher := StartThread( @SearchForServer(), cAddress, MutexDone )
+
+   /* we'll wait 1/2 of the timeout */
+   aServer := Subscribe( MutexDone, 500 * nTimeout )
+   /*And if we have not found an answer, we return failure */
+   MutexLock( MutexCnt )
+
+   IF aServer == NIL
+      aServiceData[3] := -2 /* timed out */
+      MutexUnlock( MutexCnt )
+      /* Kill that thread, but without waiting for it to be done*/
+      KillThread( thSearcher )
+      RETURN
+   ENDIF
+
+   /* But the resolver could also return a failure */
+   IF Len( aServer ) == 0
+      aServiceData[3] := 3 /* Name not found */
+      MutexUnlock( MutexCnt )
+      RETURN
+   ENDIF
+
+   MutexUnlock( MutexCnt )
+
    /* now we can be interrupted */
-   InetConnect( cAddress, nPort, aServiceData[1] )
+
+   InetConnectIP( aServer[1], nPort, aServiceData[1] )
 
    /* now we need to be not interrupted */
    MutexLock( MutexCnt )
@@ -125,7 +168,14 @@ FUNCTION Connect( cAddress, nPort )
 
 RETURN NIL
 
-FUNCTION CheckTime( nTimeout )
+
+/********************************************
+* This is the control thread, that ensures that
+* the threads have not reached a dead point
+* or a too long blocking condition.
+*/
+
+FUNCTION ControlThread( nTimeout )
    LOCAL aTicket
 
    DO WHILE .T.
@@ -135,7 +185,7 @@ FUNCTION CheckTime( nTimeout )
 
          /* If status is still connecting ... */
          IF aTicket[ 3 ] == 0 .and. aTicket[ 4 ] + nTimeout < Seconds()
-            //KillThread( aTicket[ 2 ] )
+            StopThread( aTicket[ 2 ] )
             aTicket[ 3 ] := -1
             InetDestroy( aTicket[1] )
          ENDIF
@@ -153,3 +203,14 @@ FUNCTION CheckTime( nTimeout )
 RETURN NIL
 
 
+/********************************************
+* This function scans asynchronously internet
+* for a server name
+*/
+
+FUNCTION SearchForServer( cName, MutexDone )
+   LOCAL aServer
+
+   aServer := InetGetHosts( cName )
+   Notify( MutexDone, aServer )
+RETURN

@@ -1,6 +1,6 @@
 ***************************************************
 * X harbour Inet demo client program
-* $Id$
+* $Id: client.prg,v 1.9 2003/01/14 02:40:40 jonnymind Exp $
 *
 * Giancarlo Niccolai
 *
@@ -50,7 +50,10 @@ PROCEDURE Main( cAddress, cPort )
 
    DO WHILE InetErrorCode( Socket ) == 0
       cText := Space( 60 )
+      HBConsoleLock()
       @ 7, 2 SAY "Send to server: " GET cText
+      HBConsoleUnlock()
+      
       READ
       InetSend( Socket, Trim( cText ) + chr(13) + chr( 10 ) )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.21 2002/12/27 22:34:37 jonnymind Exp $
+ * $Id: estack.c,v 1.22 2002/12/29 08:32:41 ronpinkas Exp $
  */
 
 /*
@@ -71,44 +71,13 @@ HB_STACK hb_stack;
 HB_STACK *hb_stackGetCurrentStack( void )
 {
    // Most common first.
-   if( hb_ht_context == NULL )
+   if( hb_ht_context == NULL || HB_CURRENT_THREAD() == hb_main_thread_id )
    {
       return &hb_stack;
    }
    else
    {
-      //static HB_THREAD_CONTEXT *last_context = NULL;
-      HB_THREAD_CONTEXT *p;
-      HB_THREAD_T id;
-
-      id = HB_CURRENT_THREAD();
-
-      /*
-      if ( last_context != NULL && last_context->th_id == id )
-      {
-         return last_context->stack;
-      }
-      */
-
-      HB_CRITICAL_LOCK( hb_threadContextMutex );
-
-      p = hb_ht_context;
-      while( p && p->th_id != id )
-      {
-         p = p->next;
-      }
-
-      if( p )
-      {
-         //last_context = p;
-         HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-         return p->stack;
-      }
-      else
-      {
-         HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-         return &hb_stack;
-      }
+      return hb_threadGetContext( HB_CURRENT_THREAD() )->stack;
    }
 }
 #endif

@@ -40,7 +40,8 @@ PROCEDURE Main()
    StopThread( MonitorHandle, Mutex )
    WaitforThreads()
    DestroyMutex( Mutex )
-   @ 14, 10 SAY 'Program over     '
+   @ 14, 10 SAY 'Program over - press a key    '
+   Inkey( 0 )
 
    @ 24, 00
 

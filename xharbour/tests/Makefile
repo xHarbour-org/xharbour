@@ -14,7 +14,7 @@ EXE_EXT=.exe
 endif
 
 %.c: %.prg
-	harbour -n $<
+	harbour -I$(HB_INC_INSTALL) -n $<
 %.o: %.c
 		gcc -I$(HB_INC_INSTALL) -c -o $@ $< 
 	

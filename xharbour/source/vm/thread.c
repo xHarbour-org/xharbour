@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.33 2003/01/13 01:14:22 jonnymind Exp $
+* $Id: thread.c,v 1.34 2003/01/13 10:47:17 jonnymind Exp $
 */
 
 /*
@@ -77,15 +77,16 @@
 HB_THREAD_CONTEXT *hb_ht_context;
 HB_CRITICAL_T hb_threadContextMutex;
 HB_THREAD_CONTEXT *last_context;
+HB_THREAD_T hb_main_thread_id;
 
-void hb_threadCreateContext( void )
+HB_THREAD_CONTEXT *hb_threadCreateContext( HB_THREAD_T th )
 {
    HB_THREAD_CONTEXT *p;
    HB_THREAD_CONTEXT *tc;
    int i;
 
    tc = (HB_THREAD_CONTEXT *) malloc( sizeof( HB_THREAD_CONTEXT));
-   tc->th_id = HB_CURRENT_THREAD();
+   tc->th_id = th;
 
    tc->stack       = ( HB_STACK *) malloc( sizeof( HB_STACK ) );
    tc->Cargo       = NULL;
@@ -126,83 +127,11 @@ void hb_threadCreateContext( void )
    }
 
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
+   return tc;
 }
 
-void hb_threadDestroyContext( void )
-{
-   HB_THREAD_CONTEXT *p, *prev;
-   HB_THREAD_T id;
-   int i;
 
-   if( hb_ht_context == NULL )
-   {
-      return;
-   }
-
-   id = HB_CURRENT_THREAD();
-
-   HB_CRITICAL_LOCK( hb_threadContextMutex );
-
-   p = hb_ht_context;
-   prev = NULL;
-
-   while( p && p->th_id != id )
-   {
-      prev = p;
-      p = p->next;
-   }
-
-   if( p )
-   {
-      //printf( "Destroying: %p\n", p );
-
-      /* unlink the stack */
-      if( prev )
-      {
-            prev->next = p->next;
-      }
-      else
-      {
-            hb_ht_context = p->next;
-      }
-
-      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-
-      /* Free each element of the stack */
-      for( i = 0; i < p->stack->wItems; ++i )
-      {
-            if( HB_IS_COMPLEX( p->stack->pItems[ i ] ) )
-            {
-               hb_itemClear( p->stack->pItems[ i ] );
-            }
-
-            free( p->stack->pItems[ i ] );
-      }
-
-      /* Free the stack */
-      free( p->stack->pItems );
-      free( p->stack );
-
-      // Call destructor
-      if( p->pDestructor )
-      {
-         p->pDestructor( (void *) p );
-      }
-
-      /* Free the context */
-      free( p );
-   }
-   else
-   {
-      char errdat[60];
-
-      HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-      sprintf( errdat, "Context not found for Thread %ld",  (long) id );
-      hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadDestroyContext", 0 );
-   }
-}
-
-void hb_threadDestroyContextFromHandle( HB_THREAD_HANDLE th_h )
+void hb_threadDestroyContext( HB_THREAD_T th_id )
 {
    HB_THREAD_CONTEXT *p, *prev;
    int i;
@@ -217,19 +146,11 @@ void hb_threadDestroyContextFromHandle( HB_THREAD_HANDLE th_h )
    p = hb_ht_context;
    prev = NULL;
 
-   #ifdef HB_OS_WIN_32
-      while ( p && p->th_h != th_h )
-      {
-            prev = p;
-            p = p->next;
-      }
-   #else
-      while ( p && p->th_id != th_h )
-      {
-            prev = p;
-            p = p->next;
-      }
-   #endif
+   while ( p && p->th_id != th_id )
+   {
+         prev = p;
+         p = p->next;
+   }
 
    if( p )
    {
@@ -275,17 +196,16 @@ void hb_threadDestroyContextFromHandle( HB_THREAD_HANDLE th_h )
    {
       char errdat[70];
       HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-      sprintf( errdat, "Context not found for Thread %ld",  (long) th_h );
-      hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadDestroyContextFromHandle", 0 );
+      sprintf( errdat, "Context not found for Thread %ld",  (long) th_id );
+      hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadDestroyContext", 0 );
    }
 }
 
-HB_THREAD_CONTEXT *hb_threadGetCurrentContext( void )
+HB_THREAD_CONTEXT *hb_threadGetContext( HB_THREAD_T id )
 {
    HB_THREAD_CONTEXT *p;
-   HB_THREAD_T id;
 
-   id = HB_CURRENT_THREAD();
+   //printf( "Requested context for %ld\r\n", id);
    if( last_context && last_context->th_id == id )
    {
       return last_context;
@@ -315,6 +235,7 @@ HB_THREAD_CONTEXT *hb_threadGetCurrentContext( void )
    }
    else
    {
+      //printf( "Found context %p;%ld\r\n", p, p->th_id);
       return p;
    }
 
@@ -325,23 +246,26 @@ void hb_threadInit( void )
    hb_ht_context = NULL;
    HB_CRITICAL_INIT( hb_threadContextMutex );
    last_context = NULL;
+   hb_main_thread_id = HB_CURRENT_THREAD();
 }
 
 void hb_threadExit( void )
 {
+
+   HB_CRITICAL_LOCK( hb_threadContextMutex );
    while( hb_ht_context )
    {
       #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
-            pthread_cancel( hb_ht_context->th_id );
-            pthread_join( hb_ht_context->th_id, 0 );
-            hb_threadDestroyContextFromHandle( hb_ht_context->th_id );
+         pthread_cancel( hb_ht_context->th_id );
+         pthread_join( hb_ht_context->th_id, 0 );
       #else
-            TerminateThread( hb_ht_context->th_h, 0);
-            WaitForSingleObject( hb_ht_context->th_h, INFINITE );
-            CloseHandle( hb_ht_context->th_h );
-            hb_threadDestroyContextFromHandle( hb_ht_context->th_h );
+         TerminateThread( hb_ht_context->th_h, 0);
+         WaitForSingleObject( hb_ht_context->th_h, INFINITE );
+         CloseHandle( hb_ht_context->th_h );
       #endif
+      hb_threadDestroyContext( hb_ht_context->th_id );
    }
+   HB_CRITICAL_UNLOCK( hb_threadContextMutex );
 
    HB_CRITICAL_DESTROY( hb_threadContextMutex );
 }
@@ -365,7 +289,15 @@ hb_create_a_thread(
    HB_THREAD_PARAM *pt = (HB_THREAD_PARAM *) Cargo;
    PHB_ITEM pPointer = hb_arrayGetItemPtr( pt->pArgs, 1 );
 
-   hb_threadCreateContext();
+   #ifndef HB_OS_WIN_32
+      /* Under windows, the context is created by the caller */
+      hb_threadCreateContext( HB_CURRENT_THREAD() );
+      //printf( "Created context %p: %ld (%ld)\r\n", test, test->th_id, HB_CURRENT_THREAD() );
+
+      /* now that the context has been created,
+         it is safe to set async cancellation mode */
+      pthread_setcanceltype( PTHREAD_CANCEL_ASYNCHRONOUS , NULL );
+   #endif
 
    if( HB_IS_SYMBOL( pPointer ) )
    {
@@ -407,7 +339,7 @@ hb_create_a_thread(
 
    hb_itemRelease( pt->pArgs );
    free( pt );
-   hb_threadDestroyContext();
+   hb_threadDestroyContext( HB_CURRENT_THREAD() );
 
    #ifdef HB_OS_WIN_32
       return 0;
@@ -421,8 +353,6 @@ void hb_threadIsLocalRef( void )
    HB_THREAD_CONTEXT *pContext = hb_ht_context;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmIsLocalRef()"));
-
-   //printf( "IsLocal\n" );
 
    HB_CRITICAL_LOCK( hb_threadContextMutex );
 
@@ -458,8 +388,6 @@ void hb_threadIsLocalRef( void )
    }
 
    HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-
-   //printf( "Done IsLocal\n" );
 }
 
 HB_FUNC( STARTTHREAD )
@@ -471,10 +399,9 @@ HB_FUNC( STARTTHREAD )
    PHB_DYNS pExecSym;
    PHB_FUNC pFunc;
    BOOL bIsMethod = FALSE;
-
-   #ifdef HB_OS_WIN_32
-      HB_THREAD_HANDLE th_h;
-   #endif
+#ifdef HB_OS_WIN_32
+   HANDLE th_h;
+#endif
 
    pArgs = hb_arrayFromParamsLocked( HB_VM_STACK.pBase );
    pPointer  = hb_arrayGetItemPtr( pArgs, 1 );
@@ -570,59 +497,37 @@ HB_FUNC( STARTTHREAD )
    pt->bIsMethod = bIsMethod;
 
 #if defined(HB_OS_WIN_32)
-   if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (LPVOID) pt, 0, &th_id ) ) != NULL )
+   /* creates a thread, but don't start it */
+   if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (LPVOID) pt, CREATE_SUSPENDED, &th_id ) ) != NULL )
+   {
+      HB_THREAD_CONTEXT *context = hb_threadCreateContext( th_id );
+      context->th_h = th_h;
+      /* now the thread can start */
+      ResumeThread( th_h );
+      hb_retnl( (long) th_id );
+   }
 #else
    if( pthread_create( &th_id, NULL, hb_create_a_thread, (void * ) pt ) == 0 )
-#endif
    {
-      HB_THREAD_CONTEXT *p;
-
-      /*
-         * We must wait for the context to be created because we MUST record
-         * into it the Thread HANDLE in Windows. We can't use GetCurrentThread()
-         * because it return is a pseudo handle which will NOT match with the
-         * true th_h, we just created an returning to caller!!!
-         */
-      do
-      {
-            #if defined(HB_OS_WIN_32)
-               Sleep( 0 );
-            #elif defined(HB_OS_DARWIN)
-               usleep( 1 );
-            #else
-               static struct timespec nanosecs = { 0, 1000 };
-               nanosleep( &nanosecs, NULL );
-            #endif
-
-            HB_CRITICAL_LOCK( hb_threadContextMutex );
-
-            p = hb_ht_context;
-            while( p && p->th_id != th_id )
-            {
-               p = p->next;
-            }
-
-            HB_CRITICAL_UNLOCK( hb_threadContextMutex );
-
-      } while( p == NULL );
-
-      #if defined(HB_OS_WIN_32)
-            // Now, we can record the true Handle into the context.
-            p->th_h = th_h;
-            hb_retnl( (long) th_h );
-      #else
-            hb_retnl( (long) th_id );
-      #endif
+      hb_retnl( (long) th_id );
+   }
+#endif
+   else
+   {
+      hb_retnl( -1 );
    }
 }
 
 HB_FUNC( STOPTHREAD )
 {
    HB_MUTEX_STRUCT *Mutex;
-   HB_THREAD_HANDLE th;
+   HB_THREAD_T th;
    PHB_ITEM pMutex;
+#ifdef HB_OS_WIN_32
+   HB_THREAD_CONTEXT *context;
+#endif
 
-   th = (HB_THREAD_HANDLE) hb_parnl( 1 );
+   th = (HB_THREAD_T) hb_parnl( 1 );
    pMutex = hb_param( 2, HB_IT_STRING );
 
 
@@ -649,7 +554,11 @@ HB_FUNC( STOPTHREAD )
       }
       pthread_join( th, 0 );
    #else
-      TerminateThread( th, 0);
+
+      context = hb_threadGetContext( th );
+      /* TODO: error checking here */
+
+      TerminateThread( context->th_h, 0);
       /* Notify mutex before to join */
       if( pMutex != NULL )
       {
@@ -660,16 +569,19 @@ HB_FUNC( STOPTHREAD )
                Mutex->waiting--;
          }
       }
-      WaitForSingleObject( th, INFINITE );
-      CloseHandle( th );
+      WaitForSingleObject( context->th_h, INFINITE );
+      CloseHandle( context->th_h );
    #endif
 
-   hb_threadDestroyContextFromHandle( th );
+   hb_threadDestroyContext( th );
 }
 
 HB_FUNC( KILLTHREAD )
 {
-   HB_THREAD_HANDLE th = (HB_THREAD_HANDLE) hb_parnl( 1 );
+   HB_THREAD_T th = (HB_THREAD_T) hb_parnl( 1 );
+#ifdef HB_OS_WIN_32
+   HB_THREAD_CONTEXT *context;
+#endif
 
    if( ! ISNUM( 1 ) )
    {
@@ -682,14 +594,15 @@ HB_FUNC( KILLTHREAD )
    #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
       pthread_cancel( th );
    #else
-      TerminateThread( th, 0);
-      CloseHandle( th );
+      context = hb_threadGetContext( th );
+      TerminateThread( context->th_h, 0);
+      CloseHandle( context->th_h );
    #endif
 }
 
 HB_FUNC( CLEARTHREAD )
 {
-   HB_THREAD_HANDLE th;
+   HB_THREAD_T th;
 
    if( ! ISNUM( 1 ) )
    {
@@ -699,14 +612,17 @@ HB_FUNC( CLEARTHREAD )
       return;
    }
 
-   th = (HB_THREAD_HANDLE) hb_parnl( 1 );
+   th = (HB_THREAD_T) hb_parnl( 1 );
 
-   hb_threadDestroyContextFromHandle( th );
+   hb_threadDestroyContext( th );
 }
 
 HB_FUNC( JOINTHREAD )
 {
-   HB_THREAD_HANDLE  th;
+   HB_THREAD_T  th;
+#ifdef HB_OS_WIN_32
+   HB_THREAD_CONTEXT *context;
+#endif
 
    if( ! ISNUM( 1 ) )
    {
@@ -716,12 +632,13 @@ HB_FUNC( JOINTHREAD )
       return;
    }
 
-   th = (HB_THREAD_HANDLE) hb_parnl( 1 );
+   th = (HB_THREAD_T) hb_parnl( 1 );
 
    #if ! defined( HB_OS_WIN_32 )
       pthread_join( th, 0 );
    #else
-      WaitForSingleObject( th, INFINITE );
+      context = hb_threadGetContext( th );
+      WaitForSingleObject( context->th_h, INFINITE );
    #endif
 }
 
@@ -779,7 +696,7 @@ HB_FUNC( MUTEXLOCK )
 
    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
 
-   if( Mutex->locker == HB_CURRENT_THREAD_HANDLE() )
+   if( Mutex->locker == HB_CURRENT_THREAD() )
    {
       Mutex->lock_count ++;
    }
@@ -787,7 +704,7 @@ HB_FUNC( MUTEXLOCK )
    {
       HB_MUTEX_LOCK( Mutex->mutex );
 
-      Mutex->locker = HB_CURRENT_THREAD_HANDLE();
+      Mutex->locker = HB_CURRENT_THREAD();
       Mutex->lock_count = 1;
    }
 }
@@ -807,7 +724,7 @@ HB_FUNC( MUTEXUNLOCK )
 
    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
 
-   if( Mutex->locker == HB_CURRENT_THREAD_HANDLE() )
+   if( Mutex->locker == HB_CURRENT_THREAD() )
    {
       Mutex->lock_count --;
 
@@ -838,7 +755,7 @@ HB_FUNC( SUBSCRIBE )
 
    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
 
-   if( Mutex->locker != HB_CURRENT_THREAD_HANDLE() )
+   if( Mutex->locker != HB_CURRENT_THREAD() )
    {
       islocked = 0;
       HB_MUTEX_LOCK( Mutex->mutex );
@@ -851,6 +768,12 @@ HB_FUNC( SUBSCRIBE )
    Mutex->locker = 0;
    lc = Mutex->lock_count;
    Mutex->lock_count = 0;
+   
+   /* destroy an old signaled objec, but not incoming objects */
+   if ( Mutex->waiting >= 0 )
+   {
+      Mutex->event_object = NULL;
+   }
 
    Mutex->waiting ++;
 
@@ -882,7 +805,7 @@ HB_FUNC( SUBSCRIBE )
    }
    else
    {
-      Mutex->locker = HB_CURRENT_THREAD_HANDLE();
+      Mutex->locker = HB_CURRENT_THREAD();
    }
 
    if( Mutex->event_object )
@@ -913,7 +836,7 @@ HB_FUNC( SUBSCRIBENOW )
 
    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
 
-   if( Mutex->locker != HB_CURRENT_THREAD_HANDLE() )
+   if( Mutex->locker != HB_CURRENT_THREAD() )
    {
       islocked = 0;
       HB_MUTEX_LOCK( Mutex->mutex );
@@ -964,7 +887,7 @@ HB_FUNC( SUBSCRIBENOW )
    }
    else
    {
-      Mutex->locker = HB_CURRENT_THREAD_HANDLE();
+      Mutex->locker = HB_CURRENT_THREAD();
    }
 
    if( Mutex->event_object )
@@ -1070,7 +993,7 @@ HB_FUNC( THREADSLEEP )
 
 HB_FUNC( THREADGETCURRENT )
 {
-   hb_retnl( (long) HB_CURRENT_THREAD_HANDLE() );
+   hb_retnl( (long) HB_CURRENT_THREAD() );
 }
 
 HB_FUNC( WAITFORTHREADS )
@@ -1078,7 +1001,7 @@ HB_FUNC( WAITFORTHREADS )
    while( hb_ht_context )
    {
       #if defined(HB_OS_WIN_32)
-         Sleep( 0 );
+         Sleep( 1 );
       #elif defined(HB_OS_DARWIN)
          usleep( 1 );
       #else

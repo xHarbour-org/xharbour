@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.6 2003/01/12 22:50:21 jonnymind Exp $
+* $Id: inet.c,v 1.7 2003/01/14 02:40:39 jonnymind Exp $
 */
 
 /*
@@ -133,15 +133,15 @@ int hb_selectWriteExceptSocket( HB_SOCKET_STRUCT *Socket )
       select(Socket->com + 1, NULL, &set, &eset, &tv);
    }
 
-   if( FD_ISSET( Socket->com, &set ) )
-   {
-      return 1;
-   }
    if( FD_ISSET( Socket->com, &eset) )
    {
       return 2;
    }
 
+   if( FD_ISSET( Socket->com, &set ) )
+   {
+      return 1;
+   }
    return 0;
 }
 
@@ -149,7 +149,7 @@ int hb_selectWriteExceptSocket( HB_SOCKET_STRUCT *Socket )
 struct hostent *hb_getHosts( char *name, HB_SOCKET_STRUCT *Socket )
 {
    struct hostent *Host = NULL;
-   
+
    /* let's see if name is an IP address; not necessary on linux */
    #if defined(HB_OS_WIN_32)
    unsigned long ulAddr;
@@ -223,11 +223,11 @@ int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
    hb_socketSetNonBlocking( Socket );
 
    iErr1 = connect( Socket->com, (struct sockaddr *) &Socket->remote, sizeof(Socket->remote) );
-   if( iErr1 == -1 )
+   if( iErr1 != 0 )
    {
 
    #if defined(HB_OS_WIN_32)
-      if( WSAGetLastError() == WSAEWOULDBLOCK )
+      if( WSAGetLastError() != WSAEWOULDBLOCK )
    #else
       if( errno != EINPROGRESS )
    #endif
@@ -242,11 +242,11 @@ int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
          iErr1 = hb_selectWriteExceptSocket( Socket );
          if ( iErr1 == 2 )
          {
-            HB_SOCKET_SET_ERROR( Socket );
+            HB_SOCKET_SET_ERROR2( Socket, 2, "Connection failed" );
          }
          else if ( iErr1 == 1 )
          {
-            /* Success! Nothing to do */
+            /* success */
          }
          #else
 
@@ -271,7 +271,6 @@ int hb_socketConnect( HB_SOCKET_STRUCT *Socket )
             }
             /* Success! */
          }
-
          #endif
          /* Timed out */
          else {
@@ -1175,13 +1174,13 @@ HB_FUNC( INETGETHOSTS )
 
    Host = hb_getHosts( pHost->item.asString.value, NULL );
 
+   aHosts = hb_itemArrayNew( 0 );
+   
    if( Host == NULL )
    {
-      hb_ret();
+      hb_itemRelease( hb_itemReturn( aHosts ) );
       return;
    }
-
-   aHosts = hb_itemArrayNew( 0 );
 
    cHosts = Host->h_addr_list;
    while( *cHosts ) {
@@ -1213,13 +1212,13 @@ HB_FUNC( INETGETALIAS )
 
    Host = hb_getHosts( pHost->item.asString.value, NULL );
 
+   aHosts = hb_itemArrayNew( 0 );
+
    if( Host == NULL )
    {
-      hb_ret();
+      hb_itemRelease( hb_itemReturn( aHosts ) );
       return;
    }
-
-   aHosts = hb_itemArrayNew( 0 );
 
    cHosts = Host->h_aliases;
    while( *cHosts ) {
@@ -1231,7 +1230,6 @@ HB_FUNC( INETGETALIAS )
    }
 
    hb_itemRelease( hb_itemReturn( aHosts ) );
-
 }
 
 
@@ -1323,6 +1321,7 @@ HB_FUNC( INETSERVER )
 }
 
 
+#if 0
 #ifdef HB_THREAD_SUPPORT
 HB_GARBAGE_FUNC( acceptBlockingDestructor )
 {
@@ -1347,7 +1346,7 @@ HB_GARBAGE_FUNC( acceptBlockingDestructor )
    }
 }
 #endif
-
+#endif
 
 HB_FUNC( INETACCEPT )
 {
