@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.59 2003/08/25 21:22:00 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.60 2003/08/26 16:43:04 druzus Exp $
  */
 
 /*
@@ -6689,7 +6689,7 @@ HB_FUNC( DBFCDX_GETFUNCTABLE )
 
    HB_TRACE(HB_TR_DEBUG, ("DBFCDX_GETFUNCTABLE(%i, %p)", uiCount, pTable));
 
-   if ( sizeof(CDXDATA) != CDX_PAGELEN )
+   if ( sizeof(CDXDATA) != CDX_PAGELEN || sizeof(CDXTAGHEADER) != 2 * CDX_PAGELEN )
    {
       hb_cdxErrInternal( "This code cannot be compiled without one byte alignment." );
    }
