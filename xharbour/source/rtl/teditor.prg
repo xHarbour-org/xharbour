@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.52 2004/11/14 21:40:55 likewolf Exp $
+/* $Id: teditor.prg,v 1.51 2004/09/13 11:12:03 lf_sfnet Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.52 2004/11/14 21:40:55 likewolf Exp $
+/* $Id: teditor.prg,v 1.51 2004/09/13 11:12:03 lf_sfnet Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -557,10 +557,10 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
    //  [ ::lDirty := .T. ] marks memoedit() return as "file change made."
 
-   if ! ::lEditAllow
-      ::BrowseText( nPassedKey )
-
-   else
+*   if ! ::lEditAllow    // disabled for Clipper compatibility, by Ath
+*      BrowseText( Self,nPassedKey )
+*
+*   else
       // If user pressed an exiting key ( K_ESC or K_ALT_W ) or I've received a key to handle and then exit
       while ! ::lExitEdit .AND. ! lSingleKeyProcess
 
@@ -594,16 +594,16 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
             case K_CTRL_C
                GTSETCLIPBOARD( ::GetText() )
-               exit
+               exit 
 
             case K_CTRL_X
                GTSETCLIPBOARD( ::GetText() )
                ::DelText()
-               exit
+               exit 
 
             case K_CTRL_V
                ::AddText( GTGETCLIPBOARD() )
-               exit
+               exit 
 
          #endif
 
@@ -617,6 +617,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                exit
 
             case K_CTRL_Y
+            if ::lEditAllow  // Clipper compatibility
                ::lDirty := .T.
 
                if ::naTextLen > 1 .AND. ::nRow < ::naTextLen
@@ -630,6 +631,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                   ::Home()
                   ::RefreshLine()
                endif
+            endif
                exit
 
             case K_DOWN
@@ -702,15 +704,21 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                exit
 
             case K_DEL
+            if ::lEditAllow  // Clipper compatibility
                ::K_Del()
+            endif
                exit
 
             case K_TAB
+            if ::lEditAllow  // Clipper compatibility
                ::K_Tab()
+            endif
                exit
 
             case K_BS
+            if ::lEditAllow  // Clipper compatibility
                ::K_Bs()
+            endif
                exit
 
             case K_CTRL_BS         // block chr( 127 ), a printable character in windows
@@ -726,7 +734,9 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
             */
             default      // many modifications were beeded to avoid array errors with text entry and line wraps
                if nKey >= K_SPACE .AND. nKey < 256
+               if ::lEditAllow  // Clipper compatibility
                   ::K_Ascii( nKey )
+               endif
                else
                   // NOTE: if you call ::Edit() with a key that is passed to ::KeyboardHook() and then
                   // ::KeyboardHook() calls ::Edit() with the same key you end up with an endless loop
@@ -734,7 +744,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                endif
          end
       enddo   // finish edit key processing
-   endif
+*   endif  // Clipper compatibility, END
 
 return Self
 
@@ -769,9 +779,9 @@ METHOD PageDown() CLASS HBEditor
    IF nJump < ::nNumRows
       ::Bottom()
    ELSE
-      ::nFirstRow += nJump
-      ::nRow      += nJump
-      ::RefreshWindow()
+   ::nFirstRow += nJump
+   ::nRow      += nJump
+   ::RefreshWindow()
    ENDIF
    // ::GotoLine( min( ::nRow + ::nNumRows - 1, ::naTextLen ) )
 
@@ -780,7 +790,7 @@ Return Self
 //-------------------------------------------------------------------//
 
 METHOD Bottom() CLASS HBEditor
-   LOCAL nRowTo := min( ::nFirstRow + ::nNumRows - 1, ::naTextLen )
+   LOCAL nRowTo := min( ::nFirstRow + ::nNumRows-1, ::naTextLen )
 
    ::GotoLine( nRowTo )  // , ::nLineLength( nRowTo ) + 1 )
 

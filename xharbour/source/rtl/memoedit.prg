@@ -123,7 +123,7 @@ METHOD Edit() CLASS TMemoEditor
    // If I have an user function I need to trap configurable keys and ask to
    // user function if handle them the standard way or not
    //
-   if ::lEditAllow .AND. ISCHARACTER( ::xUserFunction )
+   if ISCHARACTER( ::xUserFunction )  // Removed '::lEditAllow' condition, Ath 2004-05-25, again 2004-11-30
 
       while ! ::lExitEdit
 
@@ -136,6 +136,20 @@ METHOD Edit() CLASS TMemoEditor
 
          nKey := Inkey( 0 )
 
+		 //	For Clipper compatibility:
+         //  Ath 2004-05-25: All keys should be processed by the UDF before internal processing continues
+
+         nUserKey := ::xDo( iif( ::lDirty, ME_UNKEYX, ME_UNKEY ) )
+
+         if nUserkey <> nil
+            ::HandleUserKey( nKey, @nUserKey )       // Optionally delete nHandleKey content if NOT used, Ath 2004-05-25
+
+            if nUserkey = nil
+               super:Edit( nKey )
+            endif
+
+         else
+            // Evaluate SetKey settings *after* the user-function is called, just like Clipper, Ath 2004-05-25
          if ( bKeyBlock := Setkey( nKey ) ) <> NIL
             Eval( bKeyBlock, ::ProcName, ::ProcLine, ReadVar() )
             Loop
@@ -151,47 +165,49 @@ METHOD Edit() CLASS TMemoEditor
             super:Edit( nKey )
 
          endif
+         endif
 
       enddo
 
-   elseif ::lEditAllow
+   else  // if ::lEditAllow
       // If There is not a user function enter standard HBEditor
       // ::Edit() method which is able to handle everything
       super:Edit( nKey )
 
-   else
-      // Edit not allowed, so I scroll text area instead of moving cursor
-      while ! ::lExitEdit
-
-         if NextKey() == 0
-            ::IdleHook()
-         endif
-
-         nKey := InKey( 0 )
-
-         switch nKey
-         case K_UP
-            if ::nFirstRow > 1
-               ::nFirstRow--
-               ::nRow--
-               ::RefreshWindow()
-            endif
-            exit
-
-         case K_DOWN
-            if ::nFirstRow < ::naTextLen
-               ::nFirstRow++
-               ::nRow++
-               ::RefreshWindow()
-            endif
-            exit
-
-         default
-            // Just handle this key and then return
-            super:BrowseText( nKey, .T. )
-         end
-
-      enddo
+// Clipper compatibility: removed
+//   else
+//      // Edit not allowed, so I scroll text area instead of moving cursor
+//      while ! ::lExitEdit
+//
+//         if NextKey() == 0
+//            ::IdleHook()
+//         endif
+//
+//         nKey := InKey( 0 )
+//
+//         switch nKey
+//         case K_UP
+//            if ::nFirstRow > 1
+//               ::nFirstRow--
+//               ::nRow--
+//               ::RefreshWindow()
+//            endif
+//            exit
+//
+//         case K_DOWN
+//            if ::nFirstRow < ::naTextLen
+//               ::nFirstRow++
+//               ::nRow++
+//               ::RefreshWindow()
+//            endif
+//            exit
+//
+//         default
+//            // Just handle this key and then return
+//            super:BrowseText( nKey, .T. )
+//         end
+//
+//      enddo
 
    endif
 

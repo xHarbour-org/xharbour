@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3641 2004/11/30 22:00:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3641 2004/11/30 20:19:46 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-30 22:00 UTC+0100 Ath <Ath at ath doge nl>
+  * source/rtl/memoedit.prg
+  * source/rtl/teditor.prg
+    ! fixed for being Clipper-compatible in read/only mode
+      (again) Hope ppl leave compatibility in place...
+      UDF should be called in r/o mode as well
 
 2004-11-30 22:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * makefile.wc
