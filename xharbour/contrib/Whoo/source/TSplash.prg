@@ -1,4 +1,8 @@
 /*
+ * $Id: xTree.prg,v 1.4 2002/10/10 02:51:46 what32 Exp $
+ */
+
+/*
  * xHarbour Project source code:
  *
  * Whoo.lib Splash Window CLASS
