@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.128 2002/11/13 02:14:01 what32 Exp $
+ * $Id: xide.prg,v 1.129 2002/11/14 07:59:28 what32 Exp $
  */
 
 /*
@@ -69,7 +69,7 @@ FUNCTION Main
          :MainStatusBar()
 
          // add the object windows
-         ObjTree    := ObjTree():Create( MainForm )
+//         ObjTree    := ObjTree():Create( MainForm )
 //         ObjInspect := ObjInspect():Create( MainForm )
 //         ObjEdit    := ObjEdit():Create( MainForm )
          // focus to main Frame
@@ -150,20 +150,22 @@ return(self)
 
 METHOD MainToolBar() CLASS MainForm
 
-   LOCAL n, oTool, oSplash
+   LOCAL n, oTool, oSplash, oPage
    LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab, oTb, oCB
 
    oCB := TCoolBar():Create( MainForm )
    oCB:SetParent( MainForm )
+   oCB:HandleNeeded()
    
     // add the xmake toolbar
    WITH OBJECT TToolBar():Create( MainForm )
       :SetParent( MainForm )
+      :HandleNeeded()
       
       oTb := ToolButton():Create( ::ToolBar1 )
       oTb:Hint := "New Project"
       oTb:OnClick := {|| Application:CreateForm( TFormEdit(), @FormEdit ) }
-
+      
       ToolButton():Create( ::ToolBar1 ):Hint := "Open Project"
       ToolButton():Create( ::ToolBar1 ):Hint := "Properties"
       ToolButton():Create( ::ToolBar1 ):Hint := "Build Application"
@@ -188,31 +190,33 @@ METHOD MainToolBar() CLASS MainForm
       SendMessage( :handle, TB_SETIMAGELIST, 0, hImg1 )
       //---------------------------------------------------------------------
    END
-//   ::CoolBar1:CreateHandle()
-   oCB:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , 0/*::ToolBar1:handle*/, 200, 52, 200, "", NIL )
+   oCB:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolBar1:handle, 200, 52, 200, "", NIL )
 
    // add the TabControl on the Rebarband
 
-/*
-
-
    WITH OBJECT ToolTabs():Create( MainForm )
-      
-      :AddTab( "StdTab", TabPage():Create( MainForm:ToolTabs ) )
-      :StdTab:Caption := "Standard"
+      :SetParent( MainForm )
+      :HandleNeeded()
+      oCB:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , :Handle, 550, 56, , "", NIL )
 
-      :AddTab( "Win32", TabPage():Create( MainForm:ToolTabs ) )
-      :Win32:Caption := "Win32"
-
-      :AddTab( "Additional" )
-      :AddTab( "System" )
-      :AddTab( "Internet" )
-      :AddTab( "Dialogs" )
-      :AddTab( "Samples" )
-      :AddTab( "Activex" )
+      oPage := TabPage():Create( MainForm:ToolTabs )
+      oPage:SetParent( MainForm:ToolTabs )
+      oPage:Name    := "StdTab"
+      oPage:Caption := "Standard"
       
+      oPage := TabPage():Create( MainForm:ToolTabs )
+      oPage:SetParent( MainForm:ToolTabs )
+      oPage:Name    := "Win32"
+      oPage:Caption := "Win32"
+
+//      :AddTab( "Additional" )
+//      :AddTab( "System" )
+//      :AddTab( "Internet" )
+//      :AddTab( "Dialogs" )
+//      :AddTab( "Samples" )
+//      :AddTab( "Activex" )
    END
-   ::CoolBar1:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT , ::ToolTabs:handle, 550, 56, , "", NIL )
+
 
 
    // sets the controls toolbar on the TabControl
@@ -220,7 +224,11 @@ METHOD MainToolBar() CLASS MainForm
       TCoolBar():Create( MainForm:ToolTabs:StdTab )
       :CoolBar1:SetStyle( WS_BORDER, .F. )
       With Object StdTools():Create( MainForm:ToolTabs:StdTab )
+         :SetParent( MainForm:ToolTabs:StdTab )
+         :HandleNeeded()
+         
          :SetStyle( TBSTYLE_CHECKGROUP )
+         Application:ProcessMessages()
 
          aStdTab := { '', 'Frames', 'MainMenu', 'PopupMenu', 'Label', 'Edit', 'Memo', 'Button', ;
                           'CheckBox', 'RadioButton', 'ListBox', 'ComboBox', 'ScrollBar', 'GroupBox', ;
@@ -245,6 +253,7 @@ METHOD MainToolBar() CLASS MainForm
       :CoolBar1:AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
       :StdTools:Disable()
    End
+
 
 //----------------------------------------------------------------------------------------------
    With Object ::ToolTabs:Win32
@@ -283,7 +292,8 @@ METHOD MainToolBar() CLASS MainForm
 
    ::ToolTabs:Win32:WinTools:Name := "Win32Bar"
    ::SetLink( ::ToolTabs:Win32:WinTools )
-*/
+
+
 return(self)
 
 //----------------------------------------------------------------------------------------------

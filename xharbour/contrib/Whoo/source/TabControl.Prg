@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.33 2002/11/13 02:13:57 what32 Exp $
+ * $Id: TabControl.Prg,v 1.34 2002/11/14 07:59:26 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -36,16 +36,31 @@
 #Include "what32.ch"
 #include "error.ch"
 
-// move that structure to WinStruc.ch
 GLOBAL EXTERNAL Application
 
+pragma pack(4)
+
+typedef struct tagTCITEM {;
+    UINT mask;
+    DWORD dwState;
+    DWORD dwStateMask;
+    LPTSTR pszText;
+    int cchTextMax;
+    int iImage;
+    LPARAM lParam;
+} TCITEM
+
+
+// move that structure to WinStruc.ch
+
 IMPORT C STRUCTURE NMHDR
+IMPORT C STRUCTURE RECT
 
 *-----------------------------------------------------------------------------*
 
 CLASS TTabControl FROM TCustomControl
 
-   DATA Caption   PROTECTED INIT ""
+   DATA FCaption PROTECTED INIT ""
    
    DATA FLeft    PROTECTED INIT    0
    DATA FTop     PROTECTED INIT    0
@@ -54,7 +69,7 @@ CLASS TTabControl FROM TCustomControl
 
    DATA CurSel  INIT    1
 
-   DATA Style     PROTECTED INIT  WS_CHILD + WS_VISIBLE + WS_TABSTOP
+   DATA Style     PROTECTED INIT  WS_CHILD + WS_VISIBLE + WS_CLIPSIBLINGS
    DATA ExStyle   PROTECTED INIT  0
 
    DATA lRegister PROTECTED INIT .F.
@@ -107,18 +122,22 @@ ENDCLASS
 *-----------------------------------------------------------------------------*
 
 METHOD Notify( hdr ) CLASS TTabControl
+
    LOCAL nSel
-   nSel:=TabCtrl_GetCurSel( ::handle )+1
+
+   nSel := TabCtrl_GetCurSel( ::FHandle ) + 1
    IF ::Cursel <> nSel
-      ShowWindow( ::Controls[::CurSel]:handle, SW_HIDE )
+      ShowWindow( ::Controls[::CurSel]:FHandle, SW_HIDE )
       ::CurSel := nSel
-      ShowWindow( ::Controls[::CurSel]:handle, SW_SHOW )
-   endif
-   return(nil)
+      ShowWindow( ::Controls[::CurSel]:FHandle, SW_SHOW )
+   ENDIF
+
+RETURN NIL
 
 *-----------------------------------------------------------------------------*
 
 METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
+/*
    LOCAL hTab, cRes
    local hClass, nSeq
    
@@ -148,19 +167,20 @@ METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
    IF Len( ::Controls ) > 1
       oPage:Hide()
    ENDIF
+*/
 
-   RETURN(hTab)
+RETURN 0
 
 *-----------------------------------------------------------------------------*
 
-METHOD InsertTab(nPos,cText,cRes,bProc) CLASS TTabControl
+METHOD InsertTab(cText, nPos, nImg) CLASS TTabControl
 
    if TabCtrl_InsertItem(::handle,cText,nPos) > -1
       aIns(::Controls,nPos,NIL,.T.)
       RETURN(.T.)
    ENDIF
 
-   return(.F.)
+return(.F.)
 
 *-----------------------------------------------------------------------------*
 
@@ -407,32 +427,74 @@ return(nil)
 CLASS TabPage FROM TPanel
    DATA ImageIndex
    METHOD Create() CONSTRUCTOR
-   METHOD WMCommand()
+//   METHOD WMCommand()
+   METHOD CreateWnd()
+//   METHOD WMCtlColor() INLINE GetStockObject( NULL_BRUSH )
 ENDCLASS
 
-METHOD Create( oParent ) CLASS TabPage
+METHOD Create( oOwner ) CLASS TabPage
 
-   ::FLeft    := 0
-   ::FTop     := 0
-   ::FWidth   := 10
-   ::FHeight  := 10
-   ::style    := WS_CHILD + WS_VISIBLE
-   ::ExStyle  := WS_EX_TRANSPARENT
-   ::modal    := .F.
-   ::resname  := NIL
-   ::ImageIndex := 0
-   ::Parent := oParent
+   ::Super:Create( oOwner )
    
-   ::Super:Create( oParent )
-
-   Application:ProcessMessages()
-   ::Update()
+   ::FLeft      := 0
+   ::FTop       := 0
+   ::FWidth     := 10
+   ::FHeight    := 10
+   ::Style      := WS_CHILD + WS_VISIBLE
+   ::modal      := .F.
+   ::resname    := NIL
+   ::ImageIndex := -1
    
-return( Self )
+RETURN Self
 
+/*
 METHOD WMCommand(nwParam,nlParam) CLASS TabPage
    IF ::Parent:SendTo != NIL
       RETURN(::Parent:SendTo:SendMessage( WM_COMMAND, nwParam, nlParam ))
    ENDIF
 return(0)
+*/
 
+METHOD CreateWnd() CLASS TabPage
+
+   LOCAL hTab, aRect, tci, rc
+   
+   tci IS TCITEM
+   
+   tci:mask    := TCIF_IMAGE + TCIF_TEXT
+   tci:pszText := ::Caption
+   tci:iImage  := ::ImageIndex
+   
+   IF SendMessage( ::FParent:Handle, TCM_INSERTITEM,  Len( ::FParent:Controls ), tci:value ) > -1
+
+//   IF ( hTab := TabCtrl_AddItem( ::FParent:Handle, ::Caption, ::ImageIndex ) ) > -1
+
+      AADD( ::FParent:Controls, Self )
+
+      __objAddData( ::FParent, ::Name, HB_OO_CLSTP_PROTECTED )
+      __ObjSetValueList( ::FParent, { { ::Name, Self } } )
+
+   ENDIF
+
+   rc IS RECT
+   
+   rc:Left  := ::FParent:FLeft
+   rc:Top   := ::FParent:FTop
+   rc:Right := ::FParent:FWidth
+   rc:Bottom:= ::FParent:FHeight
+   SendMessage( ::FParent:Handle, TCM_ADJUSTRECT, 0, rc:value )
+   
+   rc:DeValue()
+   
+   ::FLeft    := 2
+   ::FTop     := rc:Top
+   ::FWidth   := rc:Right - 2
+   ::FHeight  := rc:Bottom - rc:Top
+
+   ::Super:CreateWnd()
+
+   IF Len( ::FParent:Controls ) > 1
+      ::Hide()
+   ENDIF
+
+RETURN Self

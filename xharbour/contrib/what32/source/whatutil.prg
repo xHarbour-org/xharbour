@@ -778,12 +778,14 @@ return hFont
 
 FUNCTION GetMessageFont() // retrieves the current font used in MessageBox
 
-   local cBuff, n
-   local ncm IS NONCLIENTMETRICS
+   LOCAL cBuff, n
+   LOCAL ncm IS NONCLIENTMETRICS
+   
    ncm:cbSize := ncm:sizeof()
    cBuff := ncm:value
+
    SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm:sizeof(), @cBuff, 0 )
    ncm:Buffer( cBuff )
    
-Return( CreateFontIndirect( ncm:lfMessageFont:value ) )
+RETURN CreateFontIndirect( ncm:lfMessageFont:value )
 

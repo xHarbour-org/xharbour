@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.27 2002/11/11 18:43:29 what32 Exp $
+ * $Id: TCRebar.prg,v 1.28 2002/11/14 07:59:26 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -112,7 +112,7 @@ METHOD CoolBarProc(nMsg,nwParam,nlParam) CLASS TCoolBar
 
 METHOD CreateWnd() CLASS TCoolBar
    ::Super:CreateWnd()
-
+   
    ::nrProc := SetProcedure( ::Parent:FHandle,{|hWnd, nMsg,nwParam,nlParam|;
                             ::CoolBarProc(nMsg,nwParam,nlParam)}, WM_SIZE )
    ::CoolBarProc( WM_SIZE,0,0)
@@ -138,8 +138,8 @@ METHOD addband(nMask,nStyle,hChild,cxMin,cyMin,cx,cText,hBmp,nPos)
    
    rbBand:cx         := IFNIL(cx,GetClientRect(::Parent:handle)[3],cx)
    
-   rbBand:lpText     := IFNIL(cText,"Test",cText)
-   rbBand:hbmBack    := IFNIL(hBmp,0,hBmp)
+   rbBand:lpText     := IFNIL( cText, "Test", cText)
+   rbBand:hbmBack    := IFNIL( hBmp, 0, hBmp)
 
    nBand := ::SendMessage( RB_INSERTBAND, -1, rbBand:value )
 

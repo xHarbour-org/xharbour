@@ -1,5 +1,5 @@
 /*
- * $Id: TPanel.prg,v 1.15 2002/11/07 20:05:56 what32 Exp $
+ * $Id: TPanel.prg,v 1.16 2002/11/13 00:45:50 what32 Exp $
  */
 
 /*
@@ -40,10 +40,10 @@
 
 CLASS TPanel FROM TForm
    
-   DATA Left   INIT  0
-   DATA Top    INIT  0
-   DATA Width  INIT 10
-   DATA Height INIT 10
+   DATA FLeft   INIT  0
+   DATA FTop    INIT  0
+   DATA FWidth  INIT 10
+   DATA FHeight INIT 10
 
 //-------------------------------------------------------------------------------------------
    ACCESS biSystemMenu    INLINE AND( ::Style, WS_SYSMENU ) # 0
@@ -68,9 +68,9 @@ ENDCLASS
 
 *-----------------------------------------------------------------------------*
 
-METHOD Create( oParent ) CLASS TPanel
+METHOD Create( oOwner ) CLASS TPanel
    
-   ::Super:Create( oParent )
+   ::Super:Create( oOwner )
 
    ::WndProc   := IFNIL(::WndProc,'FormProc',::WndProc)
    ::Msgs      := IFNIL(::Msgs,-1,::Msgs)

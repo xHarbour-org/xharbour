@@ -107,6 +107,6 @@ del %5.c
 del %6.c
 del comp.log
 
-if exist %1.exe %1
+If exist %1.exe %1
 
 :exit

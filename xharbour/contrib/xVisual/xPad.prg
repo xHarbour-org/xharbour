@@ -1,5 +1,5 @@
 /*
- * $Id: xPad.prg,v 1.10 2002/11/08 03:24:32 what32 Exp $
+ * $Id: xPad.prg,v 1.11 2002/11/14 07:59:28 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -197,9 +197,9 @@ CLASS ObjEdit FROM TForm
 ENDCLASS
 
 //---------------------------------------------------------------------------------------------
-METHOD Create( oParent ) CLASS ObjEdit
+METHOD Create( oOwner ) CLASS ObjEdit
 
-   ::Super:Create( oParent )
+   ::Super:Create( oOwner )
 
    ::FCaption := 'Source Editor'
    ::Fleft    := 100
@@ -209,8 +209,10 @@ METHOD Create( oParent ) CLASS ObjEdit
    ::Name     := "ObjEdit"
    ::Style    := WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+DS_MODALFRAME+WS_MAXIMIZEBOX+WS_MINIMIZEBOX+WS_THICKFRAME
    
-   ::CreateHandle()
-   
+   ::SetParent( oOwner )
+   ::HandleNeeded()
+
+   // special edit control not fixed yet
    ::SourceEdit := oEdit():New( ::FHandle )
    ResetProcedure( ::FHandle )
    ::SourceEdit:configure()

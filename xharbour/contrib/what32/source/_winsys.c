@@ -161,22 +161,35 @@ HB_FUNC( MULDIV )
 
 HB_FUNC( SYSTEMPARAMETERSINFO )
 {
-   VOID *pvParam = (char * ) hb_param( 3, HB_IT_STRING )->item.asString.value;  // can be just about anything
-                                                                                // be careful, refer to docs.
-   if ( SystemParametersInfo( (UINT) hb_parni( 1 )             ,
-                                  (UINT) hb_parni( 2 )         ,
-                                  ISNIL( 3 ) ? NULL : pvParam  ,
-                                  (UINT) hb_parni( 4 )
-                            ) ) 
+   char *cText;
+   PHB_ITEM pBuffer = hb_param( 3, HB_IT_STRING );
+
+   if( pBuffer )
    {
-      if ( ! ISNIL( 3 ) )
-         hb_storclen( ( char *) pvParam, hb_parclen( 3 ), 3 ) ;
-      
-      hb_retl( TRUE ) ; 
+      cText = (char*) hb_xgrab( pBuffer->item.asString.length + 1 );
+      hb_xmemcpy( cText, pBuffer->item.asString.value, pBuffer->item.asString.length + 1 );
    }
    else
-      hb_retl( FALSE ) ;
-
+   {
+      hb_retl( FALSE );
+      return;
+   }
+                                                                                
+   if( SystemParametersInfo( (UINT) hb_parni( 1 ),
+                             (UINT) hb_parni( 2 ),
+                             cText,
+                             (UINT) hb_parni( 4 ) ) ) 
+   {
+      if( ISBYREF( 3 ) )
+      {
+        hb_itemPutCRaw( pBuffer, cText, pBuffer->item.asString.length );
+        hb_retl( TRUE );
+     }   
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
 }
 
 
@@ -1092,16 +1105,16 @@ HB_FUNC ( FILETIMETOSYSTEMTIME )
 {
    FILETIME   *FileTime  = ( FILETIME *) hb_param( 1, HB_IT_STRING )->item.asString.value ;
    SYSTEMTIME SystemTime ;
-	
+   
    if ( FileTimeToSystemTime( FileTime, &SystemTime ) )
    {
       hb_retl( TRUE ) ;
       
-	   if ( ISBYREF( 2 ) )
-	   {
-	      hb_storclen( ( char * ) &SystemTime , sizeof( SYSTEMTIME ), 2 ) ; 
-	   }
-	}      
+      if ( ISBYREF( 2 ) )
+      {
+         hb_storclen( ( char * ) &SystemTime , sizeof( SYSTEMTIME ), 2 ) ; 
+      }
+   }      
    else
       hb_retl( FALSE ) ;
 }

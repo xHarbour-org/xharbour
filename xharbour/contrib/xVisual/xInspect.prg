@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.65 2002/11/13 00:45:53 what32 Exp $
+ * $Id: xInspect.prg,v 1.66 2002/11/14 07:59:28 what32 Exp $
  */
 
 /*
@@ -115,9 +115,12 @@ METHOD Create( oParent ) CLASS ObjInspect
    ::FHeight  := 297
    ::ExStyle  := WS_EX_TOOLWINDOW
 
+   ::HandleNeeded()
+
    // ComboBox   
    ::Combo := ComboInsp():Create( self )
    ::Combo:SetParent( Self )
+
    ::Combo:FWidth := ::FWidth - 8
    ::Combo:Style  := WS_CHILD + WS_VISIBLE + WS_BORDER + WS_TABSTOP + CBS_DROPDOWNLIST + WS_VSCROLL + CBS_HASSTRINGS + CBS_OWNERDRAWFIXED
    ::Combo:SetItemHeight( -1, 15 )
@@ -130,13 +133,17 @@ METHOD Create( oParent ) CLASS ObjInspect
    InspTabs:FTop   := 25
    InspTabs:FWidth := ::FWidth - 8
    InspTabs:FHeight:= ::FHeight - 50
+   
+   InspTabs:HandleNeeded()
+
    InspTabs:AddTab( "Properties", TabPage():Create( InspTabs ) )
    InspTabs:AddTab( "Events", TabPage():Create( InspTabs ) )
 
-   InspTabs:Configure()
+
+//   InspTabs:Configure()
    
    // Browser
-   ::Browser:=InspectBrowser():Create( InspTabs:Properties )
+//   ::Browser:=InspectBrowser():Create( InspTabs:Properties )
 return( Self )
 
 //----------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.31 2002/11/12 01:55:27 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.32 2002/11/14 07:59:26 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -154,23 +154,17 @@ METHOD Create( oParent ) CLASS TToolBar
 
    ::Super:Create( oParent )
    
-   ::Parent  := oParent
    ::Id      := 0
-
    ::nImg    := 0
-
    ::hBMInst := NIL
    ::nBMId   := NIL
    ::xBtn    := 26
    ::yBtn    := 26
    ::xBmp    := 20
    ::yBmp    := 20
-
    ::Created := .F.
    ::aBitmaps:={}
    ::aMenus  :={}
-
-   ::CreateHandle()
 
    RETURN( Self )
 

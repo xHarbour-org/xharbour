@@ -49,7 +49,7 @@ HB_FUNC (TABCTRL_INSERTITEM)
 {
    TC_ITEM item; 
    item.mask = TCIF_TEXT | TCIF_IMAGE; 
-   item.iImage = -1; 
+   item.iImage = ISNIL(4) ? -1 : (LONG) hb_parnl(4); 
    item.pszText = (LPSTR) hb_parc(2);
    hb_retni( TabCtrl_InsertItem( (HWND) hb_parnl(1), (INT) hb_parni(3), &item) );
 }

@@ -62,13 +62,13 @@ HB_FUNC ( POSTQUITMESSAGE )
 HB_FUNC ( POSTMESSAGE )
 {
 
-  char *cText ;
+   char *cText ;
 
-  if (ISBYREF(4)) {
-     //cText = hb_strdup( hb_parc(4) ) ;
-     cText = (char*) hb_xgrab( hb_parcsiz(4) );
-     hb_xmemcpy( cText, hb_parc(4), hb_parcsiz(4) );
-  }
+   if (ISBYREF(4))
+   {
+      cText = (char*) hb_xgrab( hb_parcsiz(4) );
+      hb_xmemcpy( cText, hb_parc(4), hb_parcsiz(4) );
+   }
 
 
    hb_retnl( (LONG) PostMessage( (HWND) hb_parnl( 1 ), (UINT) hb_parni( 2 ),
@@ -78,21 +78,11 @@ HB_FUNC ( POSTMESSAGE )
             );
 
 
-  if (ISBYREF( 4 ))
+   if( ISBYREF( 4 ) )
    {
       hb_storclen( cText, hb_parcsiz(4), 4 ) ;
       hb_xfree( cText );
    }
-
-
-/*
-   hb_retnl( (LONG) PostMessage((HWND) hb_parnl( 1 ), (UINT) hb_parni( 2 ),
-                                (ISNIL(3) ? 0 : (WPARAM) hb_parnl( 3 ))   ,
-                                (ISNIL(4) ? 0 : (hb_parinfo(4)==HB_IT_STRING ? (LPARAM) (LPSTR) hb_parc(4) : (LPARAM) hb_parnl( 4 )))
-                               )
-           );
-*/
-
 }
 
 //-----------------------------------------------------------------------------
@@ -100,43 +90,27 @@ HB_FUNC ( POSTMESSAGE )
 HB_FUNC ( SENDMESSAGE )
 {
 
-  char *cText ;
+   char *cText ;
 
 
-  if (ISBYREF(4)) {
-     //cText = hb_strdup( hb_parc(4) ) ;
-     cText = (char*) hb_xgrab( hb_parcsiz(4) );
-     hb_xmemcpy( cText, hb_parc(4), hb_parcsiz(4) );
-  }
-
+   if( ISBYREF(4) )
+   {
+      cText = (char*) hb_xgrab( hb_parcsiz(4) );
+      hb_xmemcpy( cText, hb_parc(4), hb_parcsiz(4) );
+   }
 
    hb_retnl( (ULONG) SendMessage( (HWND) hb_parnl( 1 ), (UINT) hb_parni( 2 ),
-                                (ISNIL(3) ? 0 : (WPARAM) hb_parnl( 3 ))   ,
-                                (ISNIL(4) ? 0 : ( ISBYREF(4)? (LPARAM) (LPSTR) cText : ( ISCHAR(4) ? (LPARAM)(LPSTR) hb_parc(4) : (LPARAM) hb_parnl( 4 ))))
-                               )
-            );
+                                  (ISNIL(3) ? 0 : (WPARAM) hb_parnl( 3 ))   ,
+                                  (ISNIL(4) ? 0 : ( ISBYREF(4)? (LPARAM) (LPSTR) cText : ( ISCHAR(4) ? (LPARAM)(LPSTR) hb_parc(4) : (LPARAM) hb_parnl( 4 ))))
+                                )
+           );
 
 
-  if (ISBYREF( 4 ))
+   if (ISBYREF( 4 ))
    {
       hb_storclen( cText, hb_parcsiz(4), 4 ) ;
       hb_xfree( cText );
    }
-
-
-
-
- /*
-
-  hb_retnl( (LONG) SendMessage( (HWND) hb_parnl( 1 ), (UINT) hb_parni( 2 ),
-                                (ISNIL(3) ? 0 : (WPARAM) hb_parnl( 3 ))   ,
-                                (ISNIL(4) ? 0 : (hb_parinfo(4)==HB_IT_STRING ? (LPARAM) (LPSTR) hb_parc(4) : (LPARAM) hb_parnl( 4 )))
-                               )
-            );
-
-
- */
-
 }
 
 
