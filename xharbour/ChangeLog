@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1888 2003/12/17 23:55:12 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1889 2003/12/18 00:42:05 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -21,6 +21,11 @@
 
   * source/vm/estack.c
     * Minor formatting.
+
+2003-12-17 15:40 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tobject.prg
+    % Optimize and reformatted code.
+    %! Fix and optimize TAssociativeArray_GetKeyPos().
 
 2003-12-16 19:52 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/genc.c
