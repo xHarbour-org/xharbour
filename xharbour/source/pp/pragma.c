@@ -1,5 +1,5 @@
 /*
- * $Id: pragma.c,v 1.7 2004/11/21 21:43:49 druzus Exp $
+ * $Id: pragma.c,v 1.8 2005/01/02 03:37:14 guerra000 Exp $
  */
 
 /*
@@ -72,6 +72,9 @@ extern BOOL hb_pp_bInline;
 /* TODO:  Add support for:
           RequestLib    /R
 */
+
+extern int iBeginDump;
+extern int iEndDump;
 
 void hb_pp_ParsePragma( char * szLine, BOOL bValidCode )
 {
@@ -191,6 +194,8 @@ void hb_pp_ParsePragma( char * szLine, BOOL bValidCode )
 
          hb_pp_bInline = TRUE;
 
+	 iBeginDump ++;
+
          if( bValidCode )
          {
             if( hb_comp_bPPO )
@@ -240,6 +245,7 @@ void hb_pp_ParsePragma( char * szLine, BOOL bValidCode )
             hb_strncpyUpper( sDirective, pBuffer, 7 );
             if( memcmp( sDirective, "ENDDUMP", 7 ) == 0 )
             {
+               iEndDump ++;
                hb_pp_bInline = FALSE;
                return;
             }

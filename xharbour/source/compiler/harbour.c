@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.92 2005/01/02 03:37:14 guerra000 Exp $
+ * $Id: harbour.c,v 1.93 2005/03/09 05:35:24 andijahja Exp $
  */
 
 /*
@@ -275,6 +275,10 @@ FILE *hb_comp_VariableList = NULL;
 BOOL hb_comp_bTracePP = FALSE;
 FILE *hb_comp_PPTrace = NULL;
 
+/* Counter for Matching BEGINDUMP and ENDDUMP */
+extern int iBeginDump;
+extern int iEndDump;
+
 /* ************************************************************************* */
 
 int main( int argc, char * argv[] )
@@ -351,7 +355,12 @@ int main( int argc, char * argv[] )
                hb_pp_Init();
             }
 
+	    /* Reset BEGINDUMP and ENDDUMP Counters */
+            iBeginDump = 0;
+            iEndDump = 0;
+
             iStatus = hb_compCompile( argv[ i ], argc, argv );
+
          }
 
          if( ! bAnyFiles )
@@ -4904,6 +4913,8 @@ static void hb_compInitVars( void )
 
 static void hb_compGenOutput( int iLanguage, char *szSourceExtension )
 {
+
+
    switch( iLanguage )
    {
       case LANG_C:
@@ -5073,6 +5084,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
          }
       }
 
+
       if( iStatus == EXIT_SUCCESS )
       {
          /* Add /D command line or envvar defines */
@@ -5080,6 +5092,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
          /* Initialize support variables */
          hb_compInitVars();
+
 
          if( hb_compInclude( szFileName, NULL ) )
          {
@@ -5134,6 +5147,13 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                   fclose( hb_comp_PPTrace );
                   hb_comp_PPTrace = NULL;
                }
+            }
+
+            if ( iBeginDump != iEndDump )
+            {
+               hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_UNBALANCE_PRAGMAS, szPrg, NULL );
+               iStatus = EXIT_FAILURE;
+               return iStatus;
             }
 
             /* Saving main file. */
@@ -5218,6 +5238,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                   pSym->cScope = HB_FS_INIT | HB_FS_EXIT ;
                }
             }
+
 
             if( hb_comp_szAnnounce )
             {
@@ -5353,6 +5374,8 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADFILENAME, szPrg, NULL );
       iStatus = EXIT_FAILURE;
    }
+
+
    /* have we got i18n file ? */
    if ( hb_comp_HILfile != NULL )
    {

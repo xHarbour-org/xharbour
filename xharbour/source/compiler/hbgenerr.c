@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.18 2004/04/05 00:16:03 andijahja Exp $
+ * $Id: hbgenerr.c,v 1.19 2004/10/20 03:14:40 ronpinkas Exp $
  */
 
 /*
@@ -94,7 +94,8 @@ char * hb_comp_szErrors[] =
    "Invalid SWITCH Constant \'%s\'.",
 /* 60 */   "Cannot write HIL table to \'%s\'.",
    "Illegal character \'%s\'.",
-   "Can't create preprocessed tracing file: \'%s\'"
+   "Can't create preprocessed tracing file: \'%s\'",
+   "Unbalance PRAGMA BEGINDUMP and PRAGMA ENDDUMP"
 };
 
 /* Table with parse warnings */

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.198 2005/03/09 00:51:32 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.199 2005/03/09 21:19:56 ronpinkas Exp $
  */
 
 /*
@@ -221,6 +221,10 @@ extern BOOL hb_pp_bInline;
 extern int hb_pp_LastOutLine;
 
 int *hb_pp_aiLastIf = NULL, *hb_pp_aiOuterIfLevel = NULL;
+
+/* Counter for Matching BEGINDUMP and ENDDUMP */
+int iBeginDump = 0;
+int iEndDump = 0;
 
 /* Table with parse errors */
 char * hb_pp_szErrors[] =
