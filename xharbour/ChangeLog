@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3990 2005/03/31 17:18:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3990 2005/03/31 20:21:58 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-03-31 19:57 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/teditor.prg
+    ! Fixed cursor position when it changes but no refresh needed.
+
 2005-03-31 17:17 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * xharbour/utils/hbmake.prg
     * Changed to version 1.143.
   * xharbour/utils/pickarry.prg
     ! Fixed a bug that was duplicating lines after select one prg in list
       with fews prgs.
-
 
 2005-04-01 02:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   + source/compiler/xharbour.prg

@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.58 2005/02/16 17:22:01 guerra000 Exp $
+/* $Id: teditor.prg,v 1.59 2005/02/17 19:14:28 guerra000 Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.58 2005/02/16 17:22:01 guerra000 Exp $
+/* $Id: teditor.prg,v 1.59 2005/02/17 19:14:28 guerra000 Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -1456,8 +1456,8 @@ METHOD GotoPos( nRow, nCol, lRefresh ) CLASS HBEditor
 
    IF lRefresh
       ::RefreshWindow()
-      ::SetPos( ::nTop + nRow - ::nFirstRow, ::nLeft + nCol - ::nFirstCol )
    ENDIF
+   ::SetPos( ::nTop + nRow - ::nFirstRow, ::nLeft + nCol - ::nFirstCol )
 
 RETURN Self
 
