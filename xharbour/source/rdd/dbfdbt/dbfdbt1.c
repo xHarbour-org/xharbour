@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.5 2003/11/30 12:32:30 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.6 2004/02/20 22:33:58 ronpinkas Exp $
  */
 
 /*
@@ -393,7 +393,7 @@ static void hb_dbtWriteMemo( DBTAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULON
    hb_cdpTranslate( pItem->item.asString.value, s_cdpage, pArea->cdPage );
 #endif
    /* Write memo data and eof mark */
-   hb_fsWriteLarge( pArea->hMemoFile, ( BYTE * ) hb_itemGetCPtr( pItem ), ulLen );
+   hb_fsWriteLarge( pArea->hMemoFile, ( BYTE * ) pItem->item.asString.value, ulLen );
    hb_fsWrite( pArea->hMemoFile, pBlock, ( DBT_BLOCKSIZE - ( USHORT ) ( ulLen % DBT_BLOCKSIZE ) ) );
 #ifndef HB_CDP_SUPPORT_OFF
    hb_cdpTranslate( pItem->item.asString.value, pArea->cdPage, s_cdpage );
@@ -418,7 +418,7 @@ static BOOL hb_dbtPutMemo( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbtPutMemo(%p, %hu, %p)", pArea, uiIndex, pItem));
 
-   ulLen = hb_itemGetCLen( pItem );
+   ulLen = pItem->item.asString.length;
    if( ulLen > 0 )
    {
       ulBlock = hb_dbfGetMemoBlock( ( DBFAREAP ) pArea, uiIndex );

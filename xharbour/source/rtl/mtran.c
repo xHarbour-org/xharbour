@@ -1,5 +1,5 @@
 /*
- * $Id: mtran.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: mtran.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -94,12 +94,12 @@ HB_FUNC( MEMOTRAN )
 
    if( pString )
    {
-      char * pszResult = ( char * ) hb_xgrab( hb_itemGetCLen( pString ) + 1 );
+      char * pszResult = ( char * ) hb_xgrab( pString->item.asString.length + 1 );
       char cHardcr = ISCHAR( 2 ) ? *hb_parc( 2 ) : ';';
       char cSoftcr = ISCHAR( 3 ) ? *hb_parc( 3 ) : ' ';
       ULONG ulResultLen;
 
-      hb_strMemotran( pszResult, &ulResultLen, hb_itemGetCPtr( pString ), hb_itemGetCLen( pString ), cHardcr, cSoftcr );
+      hb_strMemotran( pszResult, &ulResultLen, pString->item.asString.value, pString->item.asString.length, cHardcr, cSoftcr );
       hb_retclenAdopt( pszResult, ulResultLen );
    }
    else

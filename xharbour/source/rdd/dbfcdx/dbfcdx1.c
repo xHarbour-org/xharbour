@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.103 2004/02/20 22:33:57 ronpinkas Exp $
+ * $Id: dbfcdx1.c,v 1.104 2004/02/23 08:31:55 andijahja Exp $
  */
 
 /*
@@ -629,7 +629,7 @@ static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LP
          len = 8;
          break;
       case HB_IT_DATE:
-         d = (double) hb_itemGetDL( pItem );
+         d = (double) pItem->item.asDate.value;
          HB_DBL2ORD( &d, ptr );
          len = 8;
          break;
@@ -7832,7 +7832,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                   break;
 
                case HB_IT_DATE:
-                  d = (double) hb_itemGetDL( pItem );
+                  d = (double) pItem->item.asDate.value;
                   HB_DBL2ORD( &d, &cTemp[0] );
                   hb_cdxSortInsertWord( pSort, pArea->ulRecNo, (char *) cTemp, 8 );
                   break;

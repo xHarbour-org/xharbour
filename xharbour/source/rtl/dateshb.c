@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.5 2004/02/11 16:07:56 jonnymind Exp $
+ * $Id: dateshb.c,v 1.6 2004/02/14 21:01:16 andijahja Exp $
  */
 
 /*
@@ -235,7 +235,7 @@ HB_FUNC( YEAR )
    {
       LONG lYear, lMonth, lDay;
 
-      hb_dateDecode( hb_itemGetDL( pDate ), &lYear, &lMonth, &lDay );
+      hb_dateDecode( pDate->item.asDate.value, &lYear, &lMonth, &lDay );
 
       hb_retnllen( lYear, 5 );
    }
@@ -253,7 +253,7 @@ HB_FUNC( MONTH )
    {
       LONG lYear, lMonth, lDay;
 
-      hb_dateDecode( hb_itemGetDL( pDate ), &lYear, &lMonth, &lDay );
+      hb_dateDecode( pDate->item.asDate.value, &lYear, &lMonth, &lDay );
 
       hb_retnllen( lMonth, 3 );
    }
@@ -271,7 +271,7 @@ HB_FUNC( DAY )
    {
       LONG lYear, lMonth, lDay;
 
-      hb_dateDecode( hb_itemGetDL( pDate ), &lYear, &lMonth, &lDay );
+      hb_dateDecode( pDate->item.asDate.value, &lYear, &lMonth, &lDay );
 
       hb_retnllen( lDay, 3 );
    }
@@ -322,7 +322,7 @@ HB_FUNC( DOW )
 
    if( pDate )
    {
-      LONG lDate = hb_itemGetDL( pDate );
+      LONG lDate = pDate->item.asDate.value;
 
       if( lDate )
       {

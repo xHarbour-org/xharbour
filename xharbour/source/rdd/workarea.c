@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.17 2003/08/11 23:03:16 druzus Exp $
+ * $Id: workarea.c,v 1.18 2003/08/11 23:19:37 druzus Exp $
  */
 
 /*
@@ -906,7 +906,7 @@ ERRCODE hb_waRelText( AREAP pArea, USHORT uiRelNo, void * pExpr )
    {
       if ( uiIndex++ == uiRelNo )
       {
-         strcpy(pBuf, hb_itemGetCPtr( lpdbRelations->abKey) );
+         strcpy(pBuf, lpdbRelations->abKey->item.asString.value );
          break;
          /* TODO: Verify buffer size is big enough ?? */
       }

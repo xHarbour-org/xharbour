@@ -1,5 +1,5 @@
 /*
- * $Id: descend.c,v 1.4 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: descend.c,v 1.5 2004/02/23 08:31:56 andijahja Exp $
  */
 
 /*
@@ -87,7 +87,7 @@ HB_FUNC( DESCEND )
             hb_retc( "" );
       }
       else if( HB_IS_DATE( pItem ) )
-         hb_retnl( 5231808 - hb_itemGetDL( pItem ) );
+         hb_retnl( 5231808 - pItem->item.asDate.value );
       else if( HB_IS_NUMERIC( pItem ) )
          hb_retnd( -1 * hb_itemGetND( pItem ) );
       else if( HB_IS_LOGICAL( pItem ) )

@@ -1,5 +1,5 @@
 /*
- * $Id: minmax.c,v 1.3 2002/10/17 00:48:07 ronpinkas Exp $
+ * $Id: minmax.c,v 1.4 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -65,7 +65,7 @@ HB_FUNC( MAX )
    {
       char szDate[ 9 ];
 
-      hb_retds( hb_itemGetDL( p1 ) >= hb_itemGetDL( p2 ) ? hb_pardsbuff( szDate, 1 ) : hb_pardsbuff( szDate, 2 ) );
+      hb_retds( p1->item.asDate.value >= p2->item.asDate.value ? hb_pardsbuff( szDate, 1 ) : hb_pardsbuff( szDate, 2 ) );
    }
    else if( ( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) ) && ( ( ! ( HB_IS_DATE( p1 ) ) || ( ! HB_IS_DATE( p2 ) ) ) ) )
    {
@@ -124,7 +124,7 @@ HB_FUNC( MIN )
    {
       char szDate[ 9 ];
 
-      hb_retds( hb_itemGetDL( p1 ) <= hb_itemGetDL( p2 ) ? hb_pardsbuff( szDate, 1 ) : hb_pardsbuff( szDate, 2 ) );
+      hb_retds( p1->item.asDate.value <= p2->item.asDate.value ? hb_pardsbuff( szDate, 1 ) : hb_pardsbuff( szDate, 2 ) );
    }
    else if( ( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) ) && ( ( ! ( HB_IS_DATE( p1 ) ) || ( ! HB_IS_DATE( p2 ) ) ) ) )
    {

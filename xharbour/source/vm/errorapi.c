@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.35 2004/02/20 22:34:00 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.36 2004/02/21 08:58:25 jonnymind Exp $
  */
 
 /*
@@ -569,7 +569,7 @@ char HB_EXPORT * hb_errGetDescription( PHB_ITEM pError )
    hb_vmPush( pError );
    hb_vmSend( 0 );
 
-   return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
+   return HB_VM_STACK.Return.item.asString.value;
 }
 
 PHB_ITEM HB_EXPORT hb_errPutDescription( PHB_ITEM pError, char * szDescription )
@@ -602,7 +602,7 @@ char HB_EXPORT * hb_errGetFileName( PHB_ITEM pError )
    hb_vmPush( pError );
    hb_vmSend( 0 );
 
-   return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
+   return HB_VM_STACK.Return.item.asString.value;
 }
 
 PHB_ITEM HB_EXPORT hb_errPutFileName( PHB_ITEM pError, char * szFileName )
@@ -670,7 +670,7 @@ char HB_EXPORT * hb_errGetOperation( PHB_ITEM pError )
    hb_vmPush( pError );
    hb_vmSend( 0 );
 
-   return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
+   return HB_VM_STACK.Return.item.asString.value;
 }
 
 PHB_ITEM HB_EXPORT hb_errPutOperation( PHB_ITEM pError, char * szOperation )
@@ -786,7 +786,7 @@ char HB_EXPORT * hb_errGetSubSystem( PHB_ITEM pError )
    hb_vmPush( pError );
    hb_vmSend( 0 );
 
-   return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
+   return HB_VM_STACK.Return.item.asString.value ;
 }
 
 PHB_ITEM HB_EXPORT hb_errPutSubSystem( PHB_ITEM pError, char * szSubSystem )
@@ -815,7 +815,7 @@ char HB_EXPORT * hb_errGetProcName( PHB_ITEM pError )
    hb_vmPush( pError );
    hb_vmSend( 0 );
 
-   return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
+   return HB_VM_STACK.Return.item.asString.value ;
 }
 
 PHB_ITEM HB_EXPORT hb_errPutProcName( PHB_ITEM pError, char * szProcName )

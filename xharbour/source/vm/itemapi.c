@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.80 2004/02/22 12:15:57 andijahja Exp $
+ * $Id: itemapi.c,v 1.81 2004/02/23 04:03:27 andijahja Exp $
  */
 
 /*
@@ -1684,8 +1684,8 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
    {
       case HB_IT_STRING:
       case HB_IT_MEMO:
-         buffer = hb_itemGetCPtr( pItem );
-         * ulLen = hb_itemGetCLen( pItem );
+         buffer = pItem->item.asString.value;
+         * ulLen = pItem->item.asString.length;
          * bFreeReq = FALSE;
          break;
 

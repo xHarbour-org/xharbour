@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.86 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: arrays.c,v 1.87 2004/02/23 08:31:57 andijahja Exp $
  */
 
 /*
@@ -534,7 +534,7 @@ LONG HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      lData = hb_itemGetDL( pArray->item.asArray.value->pItems + ulIndex - 1 );
+      lData = ( pArray->item.asArray.value->pItems + ulIndex - 1 )->item.asDate.value;
    }
    else
    {
@@ -918,13 +918,13 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       }
       else if( HB_IS_DATE( pValue ) ) // Must precede HB_IS_NUMERIC()
       {
-         LONG lValue = hb_itemGetDL( pValue );
+         LONG lValue = pValue->item.asDate.value;
 
          for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
          {
             PHB_ITEM pItem = pItems + ulStart;
 
-            if( HB_IS_DATE( pItem ) && hb_itemGetDL( pItem ) == lValue )
+            if( HB_IS_DATE( pItem ) && pItem->item.asDate.value == lValue )
             {
                return ulStart + 1;
             }

@@ -1,5 +1,5 @@
 /*
- * $Id: memofile.c,v 1.6 2004/02/20 17:16:29 ronpinkas Exp $
+ * $Id: memofile.c,v 1.7 2004/02/20 17:17:42 ronpinkas Exp $
  */
 
 /*
@@ -65,7 +65,7 @@ HB_FUNC( MEMOREAD )
 
    if( pFileName )
    {
-      FHANDLE fhnd = hb_fsOpen( ( BYTE * ) hb_itemGetCPtr( pFileName ), FO_READ | FO_SHARED | FO_PRIVATE );
+      FHANDLE fhnd = hb_fsOpen( ( BYTE * ) pFileName->item.asString.value, FO_READ | FO_SHARED | FO_PRIVATE );
 
       if( fhnd != FS_ERROR )
       {
@@ -124,13 +124,13 @@ HB_FUNC( MEMOWRIT )
 
    if( pFileName && pString )
    {
-      FHANDLE fhnd = hb_fsCreate( ( BYTE * ) hb_itemGetCPtr( pFileName ), FC_NORMAL );
+      FHANDLE fhnd = hb_fsCreate( ( BYTE * ) pFileName->item.asString.value, FC_NORMAL );
 
       if( fhnd != FS_ERROR )
       {
-         ULONG ulSize = hb_itemGetCLen( pString );
+         ULONG ulSize = pString->item.asString.length;
 
-         bRetVal = ( hb_fsWriteLarge( fhnd, ( BYTE * ) hb_itemGetCPtr( pString ), ulSize ) == ulSize );
+         bRetVal = ( hb_fsWriteLarge( fhnd, ( BYTE * ) pString->item.asString.value, ulSize ) == ulSize );
 
          /* NOTE: CA-Clipper will add the EOF even if the write failed. [vszakats] */
          /* NOTE: CA-Clipper will not return .F. when the EOF could not be written. [vszakats] */

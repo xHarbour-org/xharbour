@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.59 2004/02/20 00:22:41 ronpinkas Exp $
+ * $Id: estack.c,v 1.60 2004/02/22 07:36:18 jonnymind Exp $
  */
 
 /*
@@ -467,7 +467,7 @@ void hb_stackDispLocal( void )
             break;
 
          case HB_IT_STRING:
-            printf( HB_I_("STRING = \"%s\" "), hb_itemGetCPtr( *pBase ) );
+            printf( HB_I_("STRING = \"%s\" "), ( *pBase )->item.asString.value );
             break;
 
          case HB_IT_SYMBOL:

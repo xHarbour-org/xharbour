@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.14 2004/02/21 08:58:25 jonnymind Exp $
+ * $Id: hbi18n.c,v 1.15 2004/02/22 06:54:26 jonnymind Exp $
  */
 
 /*
@@ -465,7 +465,7 @@ HB_FUNC( HB_I18NLOADTABLE )
 
    if ( HB_IS_STRING( pParam ) )
    {
-      handle = hb_fsOpen( ( BYTE * ) hb_itemGetCPtr( pParam ), FO_READ );
+      handle = hb_fsOpen( ( BYTE * ) pParam->item.asString.value, FO_READ );
    }
    else
    {
@@ -538,7 +538,7 @@ HB_FUNC( HB_I18NSORTTABLE )
    for( i = 2; i <= hb_arrayLen( pTable ) ; i ++ )
    {
       pTemp = hb_arrayGetItemPtr( pTable, i );
-      key = hb_itemGetCPtr( pTemp );
+      key = pTemp->item.asString.value;
       pos = 1;
       while( pos < i )
       {
@@ -586,7 +586,7 @@ HB_FUNC( HB_I18NSAVETABLE )
    if ( HB_IS_STRING( pParam ) )
    {
 
-      handle = hb_fsCreate( (BYTE *) hb_itemGetCPtr( pParam ), FC_NORMAL );
+      handle = hb_fsCreate( (BYTE *) pParam->item.asString.value, FC_NORMAL );
 
       // an opening failure will cause following operations to fail
       if ( handle < 0 ) {
@@ -686,7 +686,7 @@ HB_FUNC( HB_I18NSETLANGUAGE )
       return;
    }
 
-   language = hb_itemGetCPtr( pStr );
+   language = pStr->item.asString.value;
 
    if ( strcmp( s_base_language, language ) == 0 )
    {

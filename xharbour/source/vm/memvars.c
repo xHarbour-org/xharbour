@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.58 2004/02/21 08:58:26 jonnymind Exp $
+ * $Id: memvars.c,v 1.59 2004/02/23 08:31:57 andijahja Exp $
  */
 
 /*
@@ -1934,7 +1934,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
          }
          else if( HB_IS_DATE( pItem ) )
          {
-            double dNumber = ( double ) hb_itemGetDL( pItem );
+            double dNumber = ( double ) pItem->item.asDate.value;
 
             buffer[ 11 ] = 'D' + 128;
             buffer[ 16 ] = 1;

@@ -1,5 +1,5 @@
 /*
- * $Id: cgiread.c,v 1.1 2004/01/14 06:14:03 andijahja Exp $
+ * $Id: cgiread.c,v 1.1 2004/01/17 22:12:23 andijahja Exp $
  */
 
 /*
@@ -110,10 +110,10 @@ HB_FUNC(CGIWRITE)
 
 #ifdef HB_OS_WIN_32
    if (phbstr)
-      WriteFile(GetStdHandle(STD_OUTPUT_HANDLE),hb_itemGetCPtr(phbstr),hb_itemGetCLen(phbstr),&len,NULL);
+      WriteFile(GetStdHandle(STD_OUTPUT_HANDLE),phbstr->item.asString.value,phbstr->item.asString.length,&len,NULL);
 #else
    if (phbstr)
-      fwrite(hb_itemGetCPtr(phbstr),sizeof(char),hb_itemGetCLen(phbstr),stdout);
+      fwrite(phbstr->item.asString.value,sizeof(char),phbstr->item.asString.length,stdout);
 #endif
 }
 
