@@ -1,5 +1,5 @@
 /*
- * $Id: hbcc.prg,v 1.3 2004/02/02 10:12:40 andijahja Exp $
+ * $Id: hbcc.prg,v 1.4 2004/02/06 12:55:17 andijahja Exp $
  */
 
 /*
@@ -1543,47 +1543,50 @@ HB_FUNC( B64DECODE_FILE )
          return;
       }
 
-      while ( hbcc_file_read ( inFile, string ) )
+      if ( !bOutFile )
       {
-         if ( string )
+         while ( hbcc_file_read ( inFile, string ) )
          {
-            if ( strstr ( string ,"Content-Transfer-Encoding: base64" ) != NULL )
-               break;
-
-            if ( !bOutFile )
+            if ( string )
             {
-               if ( poutFile )
+               if ( strstr ( string ,"Content-Transfer-Encoding: base64" ) != NULL )
+                  break;
+
+               if ( !bOutFile )
                {
-                  outFile = fopen( poutFile->item.asString.value, "wb" );
-
-                  if ( !outFile )
+                  if ( poutFile )
                   {
-                    break;
-                  }
-
-                  bOutFile = TRUE;
-               }
-               else
-               {
-                  if ( strstr ( string ,"Content-Type: application/octet-stream; name=" ) != NULL )
-                  {
-                     szFile = string + 46;
-                     szFile[strlen(szFile)-1] = '\0';
-                  }
-
-                  if( szFile )
-                  {
-                     outFile = fopen( szFile, "wb" );
+                     outFile = fopen( poutFile->item.asString.value, "wb" );
 
                      if ( !outFile )
                      {
-                        break;
+                       break;
                      }
 
                      bOutFile = TRUE;
                   }
+                  else
+                  {
+                     if ( strstr ( string ,"Content-Type: application/octet-stream; name=" ) != NULL )
+                     {
+                        szFile = string + 46;
+                        szFile[strlen(szFile)-1] = '\0';
+                     }
+
+                     if( szFile )
+                     {
+                        outFile = fopen( szFile, "wb" );
+
+                        if ( !outFile )
+                        {
+                           break;
+                        }
+
+                        bOutFile = TRUE;
+                     }
+                  }
+                  continue;
                }
-               continue;
             }
          }
       }
