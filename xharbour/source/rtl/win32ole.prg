@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.12 2002/07/17 04:36:40 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.13 2002/08/05 18:04:23 ronpinkas Exp $
  */
 
 /*
@@ -1185,7 +1185,9 @@ RETURN uObj
      BSTR wCLSID;
      IID ClassID, iid;
      LPIID riid = (LPIID) &IID_IDispatch;
-     IDispatch * pDisp = NULL;
+     IDispatch *pDisp = NULL;
+     IUnknown *pUnk = NULL;
+     LPOLESTR pOleStr = NULL;
 
      s_nOleError = S_OK;
 
@@ -1201,6 +1203,9 @@ RETURN uObj
         {
            s_nOleError = CLSIDFromProgID( wCLSID, (LPCLSID) &ClassID );
         }
+
+        //s_nOleError = ProgIDFromCLSID( &ClassID, &pOleStr );
+        //wprintf( L"Result %i ProgID: '%s'\n", s_nOleError, pOleStr );
 
         hb_xfree( wCLSID );
 
@@ -1222,14 +1227,11 @@ RETURN uObj
 
         if ( s_nOleError == S_OK )
         {
-           IClassFactory *pCF = NULL;
-
-           s_nOleError = CoGetClassObject( &ClassID, CLSCTX_SERVER, NULL, &IID_IClassFactory, (LPVOID FAR *) &pCF );
+           s_nOleError = GetActiveObject( &ClassID, NULL, &pUnk );
 
            if ( s_nOleError == S_OK )
            {
-              s_nOleError = pCF->lpVtbl->CreateInstance( pCF, NULL, riid, (void **) &pDisp );
-              pCF->lpVtbl->Release( pCF );
+              s_nOleError = pUnk->lpVtbl->QueryInterface( pUnk, riid, (void **) &pDisp );
            }
         }
      }
@@ -1420,7 +1422,7 @@ RETURN uObj
 
      if( s_nOleError == S_OK )
      {
-        s_nOleError = pUnk -> lpVtbl -> QueryInterface( pUnk, (const struct _GUID *const) &iid, (void **) &ppvObject );
+        s_nOleError = pUnk ->lpVtbl->QueryInterface( pUnk, (const struct _GUID *const) &iid, (void **) &ppvObject );
      }
 
      hb_retnl( ( LONG ) ppvObject );

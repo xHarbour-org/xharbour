@@ -19,7 +19,11 @@ STATIC PROCEDURE Excel()
 
    LOCAL oExcel, oAS
 
-   oExcel := CreateObject( "Excel.Application" )
+   oExcel := GetObject( "Excel.Application" )
+
+   IF Ole2TxtError() != "S_OK"
+      oExcel := CreateObject( "Excel.Application" )
+   ENDIF
 
    IF Ole2TxtError() != "S_OK"
       Alert( "ERROR! Excel not avialable." )
@@ -68,6 +72,10 @@ STATIC PROCEDURE MsWord()
    oWord := GetObject( "Word.Application" )
 
    IF Ole2TxtError() != "S_OK"
+      oWord := CreateObject( "Word.Application" )
+   ENDIF
+
+   IF Ole2TxtError() != "S_OK"
       Alert( "ERROR! Word not avialable." )
       RETURN
    ENDIF
@@ -92,7 +100,11 @@ STATIC PROCEDURE IEXPLORER()
 
    LOCAL oIE
 
-   oIE := CreateObject( "InternetExplorer.Application" )
+   oIE := GetObject( "InternetExplorer.Application" )
+
+   IF Ole2TxtError() != "S_OK"
+      oIE := CreateObject( "InternetExplorer.Application" )
+   ENDIF
 
    IF Ole2TxtError() != "S_OK"
       Alert( "ERROR! IExplorer not avialable." )
@@ -111,14 +123,16 @@ STATIC PROCEDURE OUTLOOK()
 
    LOCAL oOL, oList, oMail, i
 
-   oOL := CreateObject( "Outlook.Application.9" )
+   oOL := GetObject( "Outlook.Application" )
+
+   IF Ole2TxtError() != "S_OK"
+      oOL := CreateObject( "Outlook.Application" )
+   ENDIF
 
    IF Ole2TxtError() != "S_OK"
       Alert( "ERROR! Outlook not avialable." )
       RETURN
    ENDIF
-
-   oMail := oOL:CreateItem( 0 )  // olMailItem
 
    oList := oOL:CreateItem( 7 )  // olDistributionListItem
    oList:DLName := "Distribution List"
