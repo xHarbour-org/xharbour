@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.118 2003/11/26 05:44:04 jonnymind Exp $
+* $Id: thread.c,v 1.119 2003/11/26 13:43:15 jonnymind Exp $
 */
 
 /*
@@ -171,7 +171,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->Return.type = HB_IT_NIL;
    tc->bInUse = FALSE;
    tc->iPcodeCount = 0;
-   
+
    tc->errorHandler = NULL;
    tc->errorBlock = hb_itemNew( NULL );
    tc->aTryCatchHandlerStack = hb_itemNew( NULL );
@@ -179,7 +179,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    /* VM requests and recover sequence */
    tc->uiActionRequest = 0;
    tc->lRecoverBase = 0;
-   
+
    hb_arrayNew( tc->aTryCatchHandlerStack, 0 );
    hb_gcLock(  tc->aTryCatchHandlerStack );
    tc->iLaunchCount = 0;
@@ -189,11 +189,11 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
       tc->th_h = NULL;
       tc->bCanceled = FALSE;
       tc->bCanCancel = FALSE;
-      
+
       tc->iCleanCount = 0;
       tc->pCleanUp = (HB_CLEANUP_FUNC *) hb_xgrab( sizeof( HB_CLEANUP_FUNC ) * HB_MAX_CLEANUPS );
       tc->pCleanUpParam = (void **) hb_xgrab( sizeof( void *) * HB_MAX_CLEANUPS );
-      
+
    #endif
 
    for( i = 0; i < tc->wItems; i++ )
@@ -428,12 +428,12 @@ void hb_threadDestroyStack( HB_STACK *pStack )
       hb_xfree( pStack->hMemvars );
 */
 
-   
+
    #ifdef HB_OS_WIN_32
    hb_xfree( pStack->pCleanUp );
    hb_xfree( pStack->pCleanUpParam );
    #endif
-   
+
 
    // Free only if we are not destroing the main stack
    if ( pStack != &hb_stack )
@@ -787,7 +787,7 @@ void hb_rawMutexForceUnlock( void * mtx )
 #endif
 
    HB_STACK_LOCK
-   
+
    // call errorsys() to initialize errorblock
    pExecSym = hb_dynsymFind( "ERRORSYS" );
 
@@ -1229,6 +1229,35 @@ HB_FUNC( MUTEXLOCK )
       HB_STACK_LOCK;
    }
 }
+
+ /*JC1: this will always be called when cancellation is delayed */
+ HB_FUNC( DESTROYMUTEX )
+ {
+    HB_THREAD_STUB
+
+    HB_MUTEX_STRUCT *Mutex;
+    PHB_ITEM pMutex = hb_param( 1, HB_IT_POINTER );
+
+    if( pMutex == NULL )
+    {
+       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+
+       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "DESTROYMUTEX", 1, pArgs );
+       hb_itemRelease( pArgs );
+
+       return;
+    }
+
+    Mutex = (HB_MUTEX_STRUCT *)  pMutex->item.asPointer.value;
+
+    hb_threadUnlinkMutex( Mutex );
+
+    HB_MUTEX_DESTROY( Mutex->mutex );
+    HB_COND_DESTROY( Mutex->cond );
+    hb_arrayRelease( Mutex->aEventObjects );
+    hb_itemClear( pMutex );
+    hb_xfree( Mutex );
+ }
 
 /*JC1: this will always be called when cancellation is delayed */
 HB_FUNC( MUTEXUNLOCK )
