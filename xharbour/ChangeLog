@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2842 2004/04/28 09:59:12 brianhays Exp $
+ * $Id: ChangeLog,v 1.2843 2004/04/28 14:26:02 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-28 08:01 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * source/rdd/dbfntx/dbfntx1.c
+    ! Changed error code returned by ntxSeek() to 1201 (was 1020)
+       so it returns same error code as Clipper
 
 2004-04-28 16:20 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
   * source/rtl/teditor.prg

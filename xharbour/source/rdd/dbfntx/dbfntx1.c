@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.78 2004/03/25 12:13:14 druzus Exp $
+ * $Id: dbfntx1.c,v 1.79 2004/04/01 01:01:12 druzus Exp $
  */
 
 /*
@@ -3169,7 +3169,7 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
       return FAILURE;
    if ( ! pArea->lpCurTag )
    {
-     commonError( pArea, EG_NOORDER, 1020, NULL, EF_CANDEFAULT );
+     commonError( pArea, EG_NOORDER, 1201, NULL, EF_CANDEFAULT );
      return FAILURE;
    }
    else
