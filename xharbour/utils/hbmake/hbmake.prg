@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.123 2004/06/17 20:17:24 modalsist Exp $
+ * $Id: hbmake.prg,v 1.123 2004/06/17 23:33:43 modalsist Exp $
  */
 /*
  * Harbour Project source code:
@@ -1239,7 +1239,7 @@ FUNC CreateMakeFile( cFile )
    LOCAL cExtraLibs :=""
    Local cTempLibs := ""
    Local aTempLibs 
-   #IFndef __PLATFORM__Windows
+   #ifndef __PLATFORM__Windows
        Local lHashhso := File("/usr/lib/libxharbour.so")
        LOCAL lusexhb := FILE("/usr/bin/xhb-build")
 
@@ -1340,10 +1340,10 @@ FUNC CreateMakeFile( cFile )
 // @ 01,64 GET lFwh checkbox caption "Use FWH"          WHEN Cos == "Win32" style "[o ]"
 // @ 02,64 GET lcw checkbox caption "Use C4W"           WHEN Cos == "Win32" style "[o ]"
 // @ 04,64 GET lMiniGui checkbox caption "Use Minigui"  WHEN Cos == "Win32" style "[o ]"
-   @ 01,60,08,78 Get cGui ListBox { "None","Xwt","Gtwvt","FWH","MiniGui","What32","Whoo","C4W","HWGUI"}  DROPDOWN state OsSpec(getlist,3,@cGui) When CheckCompiler(cOs) message s_aLangMessages[ 51 ]
+   @ 01,60,10,78 Get cGui ListBox { "None","Xwt","Gtwvt","FWH","MiniGui","What32","Whoo","C4W","HWGUI"}  DROPDOWN state OsSpec(getlist,3,@cGui) When CheckCompiler(cOs) message s_aLangMessages[ 51 ]
 // @ 02,01 GET lRddads checkbox caption "Use RddAds"    WHEN Cos == "Win32" .OR. Cos == "Linux" style "[o ]"
    @ 02,01 Say s_aLangMessages[ 48 ]
-   @ 02,16,06,26 get cRdd ListBox { "None","RddAds","Mediator","Apollo"}  WHEN Cos == "Win32" .or. Cos == "Linux" DROPDOWN message s_aLangMessages[ 52 ]
+   @ 02,16,08,26 get cRdd ListBox { "None","RddAds","Mediator","Apollo"}  WHEN Cos == "Win32" .or. Cos == "Linux" DROPDOWN message s_aLangMessages[ 52 ]
    @ 02,30 Get s_lCompress CheckBox  caption s_aLangMessages[ 53 ] style "[o ]" message s_aLangMessages[ 54 ]
    @ 02,53 Get lUseXharbourDll CheckBox caption "use Xharbour[.dll|.so]" style "[o ]" WHEN Cos == "Win32" .or. Cos == "Linux" message s_aLangMessages[ 55 ]
    @ 03,01 SAY "Obj Files Dir" GET cObjDir PICT "@s15" message s_aLangMessages[ 56 ]
@@ -1363,9 +1363,9 @@ FUNC CreateMakeFile( cFile )
       ENDIF
 
    ENDIF
- if  s_lasdll
- lUseXharbourDll:= .t.
- endif
+   if  s_lasdll
+      lUseXharbourDll:= .t.
+   endif
    lFwh      := "FWH"      IN cGui
    lMiniGui  := "MiniGui"  IN cGui
    lRddAds   := "RddAds"   IN cRdd
@@ -3623,11 +3623,11 @@ FUNCTION BuildLangArray( cLang )
       aAdd( aLang, "Executable file name" )
       aAdd( aLang, "Warning Level /w" )
       aadd( aLang, "Enter Select|Arrow Change Selection|Spacebar Open Box")
-      aadd( aLang, "3rd Partie Rdd")
+      aadd( aLang, "3rd Party Rdd")
       aadd( aLang, "What OS you Use")
       aadd( aLang, "What C compiler  you has")
       aadd( aLang, "This app use Graphical libraries")
-      aadd( aLang, "Do you use 3rd Parties Rdd")
+      aadd( aLang, "Do you use 3rd Party Rdd")
       aAdd( aLang, "Compress this app")
       aAdd( aLang, "Compress the app after Linked(use upx)")
       aAdd( aLang, "Your app will be linked to user harbour.dll")
