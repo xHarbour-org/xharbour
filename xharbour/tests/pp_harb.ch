@@ -60,7 +60,7 @@
 
      #ifdef WIN
        METHOD ScriptSiteAddGlobal( cName, pDisp )
-       METHOD ScriptSiteAutomateGlobals()
+       //METHOD ScriptSiteAutomateGlobals()
      #endif
 
   ENDCLASS
@@ -88,7 +88,7 @@
      IF Len( ::acPPed ) == 0
         PP_InitStd()
         PP_LoadRun()
-        ::cPPed          := PP_PreProText( ::cText, ::acPPed )
+        ::cPPed          := PP_PreProText( ::cText, ::acPPed, .T., .F. )
         ::aCompiledProcs := {}
         ::aInitExit      := { {}, {} }
      ENDIF
@@ -124,10 +124,13 @@
        __QQPub( cName )
        __MVPUT( cName, oGlobal )
 
+       //TraceLog( cName, pDisp, oGlobal, Type( cName ) )
+
     RETURN Self
 
     //----------------------------------------------------------------------------//
 
+    /*
     METHOD ScriptSiteAutomateGlobals() CLASS  TInterpreter
 
        LOCAL aGlobals := ::aScriptHostGlobals
@@ -142,6 +145,7 @@
        NEXT
 
     RETURN .T.
+    */
 
   #endif
 

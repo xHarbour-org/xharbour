@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1644 2003/11/02 02:57:45 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.1645 2003/11/02 04:29:52 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-01 20:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * tests/pp.prg
+    * Minor correction to handling of ~
+    * Added bAutCompile optional param to PP_PreProText()
+
+  * tests/pp_harb.ch
+    * Added .F. for bAutoCompile in call to PP_PreProTExt()
+    * Commented out non used ScriptSiteAutomateGlobals()
 
 2003-02-11 05:30 UTC+1000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * utils/hbdict/hbdict.prg

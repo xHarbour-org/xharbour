@@ -64,6 +64,8 @@
       #define __WITH_
       #define __STRING_INDEX__
 
+      REQUEST ErrorSys
+
       EXTERN CreateObject
       EXTERN GetActiveObject
    #endif
@@ -1192,7 +1194,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
    ExtractLeadingWS( @sPPed )
    DropTrailingWS( @sPPed )
 
-   //TraceLog( sPPed, nLine )
+   //TraceLog( s_sModule, sPPed, nLine )
 
    BEGIN SEQUENCE
 
@@ -7202,9 +7204,9 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       ENDIF
 
       IF ValType( aRP[2] ) == 'C'
-         aRP[2] := StrTran( aRP[2], '\\', '~' )
+         aRP[2] := StrTran( aRP[2], '\\', '' )
          aRP[2] := StrTran( aRP[2], '\', '' )
-         aRP[2] := StrTran( aRP[2], '~', '\' )
+         aRP[2] := StrTran( aRP[2], '', '\' )
          //? "RP #", Counter, aRP[1], '"' + aRP[2] + '"'
       ELSE
          //? "RP #", Counter, aRP[1], aRP[2]
@@ -9110,8 +9112,8 @@ STATIC FUNCTION InitRunResults()
    aAdd( aCommResults, { { {   0, 'PP__CASE ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__OTHERWISE' } }, { -1} ,  } )
    aAdd( aCommResults, { { {   0, 'PP__ENDCASE ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )
-   aAdd( aCommResults, { { {   0, 'PP__FOR ' }, {   0,   1 }, {   0, ':=' }, {   0,   2 }, {   0, '\TO\' }, {   0,   3 }, {   0, '\STEP\' }, {   0,   4 } }, { -1,  1, -1,  1, -1,  1, -1,  1} , { NIL, NIL, NIL, NIL }  } )
-   aAdd( aCommResults, { { {   0, 'PP__FOR ' }, {   0,   1 }, {   0, ':=' }, {   0,   2 }, {   0, '\TO\' }, {   0,   3 }, {   0, '\STEP\' }, {   0,   4 } }, { -1,  1, -1,  1, -1,  1, -1,  1} , { NIL, NIL, NIL, NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP__FOR ' }, {   0,   1 }, {   0, ':=' }, {   0,   2 }, {   0, '~TO~' }, {   0,   3 }, {   0, '~STEP~' }, {   0,   4 } }, { -1,  1, -1,  1, -1,  1, -1,  1} , { NIL, NIL, NIL, NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP__FOR ' }, {   0,   1 }, {   0, ':=' }, {   0,   2 }, {   0, '~TO~' }, {   0,   3 }, {   0, '~STEP~' }, {   0,   4 } }, { -1,  1, -1,  1, -1,  1, -1,  1} , { NIL, NIL, NIL, NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__LOOP ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__EXIT ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__NEXT ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )
@@ -9224,7 +9226,7 @@ PROCEDURE PP_RunInit( aProcedures, aInitExit, nLine )
 RETURN
 
 //--------------------------------------------------------------//
-FUNCTION PP_PreProText( sLines, asLines, bBlanks )
+FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile )
 
    LOCAL nOpen, nClose, sTemp := "", nLine, nLines
 
@@ -9234,6 +9236,12 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks )
 
    IF bBlanks == NIL
       bBlanks := .T.
+   ENDIF
+
+   IF bAutoCompile == NIL
+      bAutoCompile := bCompile
+   ELSE
+      bCompile := bAutoCompile
    ENDIF
 
    IF asLines == NIL
