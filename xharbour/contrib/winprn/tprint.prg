@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.2 2004/01/21 04:10:32 peterrees Exp $
+ * $Id: tprint.prg,v 1.3 2004/01/21 19:57:52 peterrees Exp $
  */
 
 /*
@@ -195,10 +195,7 @@ METHOD New(cPrinter) CLASS TPRINT
 
 METHOD Create() CLASS TPRINT
   LOCAL Result:= .F.
-  IF ::Printing                             // Finish current print job
-    ::EndDoc()
-    ::hPrinterDc:= 0
-  ENDIF
+  ::Destroy()                            // Finish current print job if any
   IF !EMPTY(::hPrinterDC:= CreateDC(::PrinterName))
 
     // Set Form Type
@@ -232,13 +229,10 @@ METHOD Create() CLASS TPRINT
   ENDIF
   RETURN(Result)
 
-METHOD SetDefaultFont()
-  RETURN(::SetFont("Courier New",12,{1, 10}, 0, .F., .F., 0))
-
 METHOD Destroy() CLASS TPRINT
   IF !EMPTY(::hPrinterDc)
     IF ::Printing
-      ::EndDoc(.T.)
+      ::EndDoc()
     ENDIF
     ::hPrinterDC:= DeleteDC(::hPrinterDC)
   ENDIF
@@ -340,6 +334,9 @@ METHOD SetFont(cFontName, nPointSize, nWidth, nBold, lUnderline, lItalic, nCharS
   ENDIF
   ::FontName:= GetPrinterFontName(::hPrinterDC)  // Get the font name that Windows actually used
   RETURN(::SetFontOk)
+
+METHOD SetDefaultFont()
+  RETURN(::SetFont("Courier New",12,{1, 10}, 0, .F., .F., 0))
 
 METHOD Bold(nWeight) CLASS TPRINT
   LOCAL Result:= ::fBold
