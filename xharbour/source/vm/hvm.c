@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.272 2003/10/19 00:17:36 jonnymind Exp $
+ * $Id: hvm.c,v 1.273 2003/11/09 20:15:41 ronpinkas Exp $
  */
 
 /*
@@ -100,6 +100,7 @@
 #include "classes.h"
 
 #include "hbi18n.h"
+#include "hbhashapi.h"
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
@@ -4394,6 +4395,24 @@ static void hb_vmArrayPush( void )
    pIndex = hb_stackItemFromTop( -1 );
    pArray = hb_stackItemFromTop( -2 );
 
+   if( HB_IS_HASH( pArray ) && HB_IS_ORDERABLE( pIndex ) )
+   {
+      ULONG ulPos;
+      HB_ITEM hbElem;
+
+      if (! hb_hashScan(pArray, pIndex, &ulPos ) )
+      {
+         hb_errRT_BASE( EG_BOUND, 1132, NULL,
+               hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+         return;
+      }
+
+      hb_hashGet( pArray, ulPos, &hbElem );
+      hb_stackPop();
+      hb_itemForwardValue( hb_stackItemFromTop( -1 ), &hbElem );
+      return;
+   }
+
    if( HB_IS_INTEGER( pIndex ) )
    {
       lIndex = ( long ) pIndex->item.asInteger.value;
@@ -4413,25 +4432,28 @@ static void hb_vmArrayPush( void )
    }
 #endif
  #ifndef HB_C52_STRICT
-   else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
+   else if( HB_IS_STRING( pIndex ) )
    {
-      lIndex = ( long ) pIndex->item.asString.value[0];
-      bStrIndex = TRUE;
-   }
-   else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
-   {
-      hb_vmPushSymbol( hb_dynsymGetCase( pIndex->item.asString.value )->pSymbol );
-      hb_itemPushForward( pArray );
+      if( pIndex->item.asString.length == 1 )
+      {
+         lIndex = ( long ) pIndex->item.asString.value[0];
+         bStrIndex = TRUE;
+      }
+      else if( HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
+      {
+         hb_vmPushSymbol( hb_dynsymGetCase( pIndex->item.asString.value )->pSymbol );
+         hb_itemPushForward( pArray );
 
-      hb_vmSend( 0 );
+         hb_vmSend( 0 );
 
-      // Pop pIndex.
-      hb_stackPop();
+         // Pop pIndex.
+         hb_stackPop();
 
-      // Recycle pArray.
-      hb_itemForwardValue( pArray, &(HB_VM_STACK.Return ) );
+         // Recycle pArray.
+         hb_itemForwardValue( pArray, &(HB_VM_STACK.Return ) );
 
-      return;
+         return;
+      }
    }
  #endif
    else
@@ -4614,6 +4636,15 @@ static void hb_vmArrayPop( void )
       pArray = hb_itemUnRef( pArray );
    }
 
+   if( HB_IS_HASH( pArray ) && HB_IS_ORDERABLE( pIndex ) )
+   {
+      hb_hashAdd( pArray, ULONG_MAX, pIndex, pValue );
+      hb_stackPop();
+      hb_stackPop();
+      hb_stackPop();
+      return;
+   }
+
    if( HB_IS_INTEGER( pIndex ) )
    {
       lIndex = ( long ) pIndex->item.asInteger.value;
@@ -4633,51 +4664,54 @@ static void hb_vmArrayPop( void )
    }
 #endif
  #ifndef HB_C52_STRICT
-   else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
+   else if( HB_IS_STRING( pIndex ) )
    {
-      lIndex = ( long ) pIndex->item.asString.value[0];
-   }
-   else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
-   {
-      char szMessage[ HB_SYMBOL_NAME_LEN ];
+      if( pIndex->item.asString.length == 1 )
+      {
+         lIndex = ( long ) pIndex->item.asString.value[0];
+      }
+      else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
+      {
+         char szMessage[ HB_SYMBOL_NAME_LEN ];
 
-      szMessage[0] = '_';
-      szMessage[1] = '\0';
-      strcat( szMessage, pIndex->item.asString.value );
-      // Optimized - recycling the paramaters.
-      #if 1
-         // Swap - pIndex no longer needed.
-         hb_itemForwardValue( pIndex, pValue );
+         szMessage[0] = '_';
+         szMessage[1] = '\0';
+         strcat( szMessage, pIndex->item.asString.value );
+         // Optimized - recycling the paramaters.
+         #if 1
+            // Swap - pIndex no longer needed.
+            hb_itemForwardValue( pIndex, pValue );
 
-         // Recicle pValue as Message.
-         pValue->type = HB_IT_SYMBOL;
-         pValue->item.asSymbol.value = hb_dynsymGetCase( szMessage )->pSymbol;
-         pValue->item.asSymbol.stackbase = HB_VM_STACK.pPos - 3 - HB_VM_STACK.pItems;
+            // Recicle pValue as Message.
+            pValue->type = HB_IT_SYMBOL;
+            pValue->item.asSymbol.value = hb_dynsymGetCase( szMessage )->pSymbol;
+            pValue->item.asSymbol.stackbase = HB_VM_STACK.pPos - 3 - HB_VM_STACK.pItems;
 
-         if( HB_IS_BYREF( hb_stackItemFromTop( -2 ) ) )
+            if( HB_IS_BYREF( hb_stackItemFromTop( -2 ) ) )
+            {
+               hb_itemCopy( hb_stackItemFromTop( -2 ), pArray );
+            }
+
+            hb_vmSend( 1 );
+         #else
+            hb_vmPushSymbol( hb_dynsymGetCase( szMessage )->pSymbol );
+            hb_vmPush( pArray );
+            hb_vmPush( pValue );
+
+            hb_vmSend( 1 );
+
+            hb_stackPop();
+            hb_stackPop();
+            hb_stackPop();
+         #endif
+
+         if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
          {
-            hb_itemCopy( hb_stackItemFromTop( -2 ), pArray );
+            hb_itemClear( &(HB_VM_STACK.Return) );
          }
 
-         hb_vmSend( 1 );
-      #else
-         hb_vmPushSymbol( hb_dynsymGetCase( szMessage )->pSymbol );
-         hb_vmPush( pArray );
-         hb_vmPush( pValue );
-
-         hb_vmSend( 1 );
-
-         hb_stackPop();
-         hb_stackPop();
-         hb_stackPop();
-      #endif
-
-      if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
-      {
-         hb_itemClear( &(HB_VM_STACK.Return) );
+         return;
       }
-
-      return;
    }
  #endif
    else

@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.3 2002/04/17 20:36:19 ronpinkas Exp $
+ * $Id: valtype.c,v 1.4 2003/10/24 04:40:37 walito Exp $
  */
 
 /*
@@ -154,5 +154,10 @@ HB_FUNC( HB_ISBLOCK )
 HB_FUNC( HB_ISPOINTER )
 {
   hb_retl( ISPOINTER( 1 ) );
+}
+
+HB_FUNC( HB_ISHASH )
+{
+  hb_retl( ISHASH( 1 ) );
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.58 2003/10/18 14:13:33 jonnymind Exp $
+ * $Id: garbage.c,v 1.59 2003/10/19 00:17:36 jonnymind Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
 #include "hbfast.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
+#include "hbhashapi.h"
 #include "hbapierr.h"
 #include "hbvm.h"
 #include "error.ch"
@@ -472,6 +473,38 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
       }
 
    }
+   else if( HB_IS_HASH( pItem ) )
+   {
+      HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asHash.value;
+
+      //printf( "Array %p\n", pItem->item.asArray.value );
+      --pAlloc;
+
+      /* Check this array only if it was not checked yet */
+      if( pAlloc->used == s_uUsedFlag )
+      {
+         ULONG ulSize = pItem->item.asHash.value->ulLen;
+         /* mark this block as used so it will be no re-checked from
+          * other references
+          */
+         pAlloc->used ^= HB_GC_USED_FLAG;
+
+         /* mark also all array elements */
+         if( ulSize > 0 )
+         {
+            PHB_ITEM pKey = pItem->item.asHash.value->pKeys;
+            PHB_ITEM pValue = pItem->item.asHash.value->pValues;
+
+            while( ulSize )
+            {
+               //printf( "Item %p\n", pItem );
+               hb_gcItemRef( pKey++ );
+               hb_gcItemRef( pValue++ );
+               --ulSize;
+            }
+         }
+      }
+   }
    else if( HB_IS_BLOCK( pItem ) )
    {
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asBlock.value;
@@ -619,6 +652,15 @@ void hb_gcCollectAll()
 
             (&FakedItem)->type = HB_IT_ARRAY;
             (&FakedItem)->item.asArray.value = ( PHB_BASEARRAY )( pAlloc + 1 );
+
+            hb_gcItemRef( &FakedItem );
+         }
+         else if( pAlloc->pFunc == hb_hashReleaseGarbage )
+         {
+            HB_ITEM FakedItem;
+
+            (&FakedItem)->type = HB_IT_HASH;
+            (&FakedItem)->item.asHash.value = ( PHB_BASEHASH )( pAlloc + 1 );
 
             hb_gcItemRef( &FakedItem );
          }

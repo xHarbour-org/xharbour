@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1675 2003/11/09 20:15:33 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1676 2003/11/09 21:32:32 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-10 00:20 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbvmpub.h
+  * include/hbapi.h
+  + include/hbhashapi.h
+  + source/vm/hash.c
+    + Added HB_IT_HASH, a new type of 'associative array' whose key can
+      be any other item that can be ordered (strings, numbers and dates
+      atm).
+
+  * makefile.bc
+  * source/vm/Makefile
+  * source/vm/arrays.c
+  * source/vm/estack.c
+  * source/vm/fastitem.c
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+  * source/vm/thread.c
+  * source/rtl/len.c
+  * source/rtl/valtype.c
+  * source/rtl/cstr.prg
+    + Adaptations to the management of hashes.
+
+  * source/pp/pptable.c
+    + Added {:} and { x:y} macros to create Hash()
+
+  + test/hashmass.prg
+  + test/hash.prg
+    + Added test for hashes
 
 2003-11-09 13:31 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexprb.c

@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.13 2003/06/06 14:46:50 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.14 2003/11/07 18:20:53 jonnymind Exp $
  */
 
 /*
@@ -96,6 +96,9 @@ FUNCTION CStr( xExp )
 
       CASE 'P'
          RETURN HB_NumToHex( xExp )
+
+      CASE 'H'
+         RETURN "{ Hash of " +  LTrim( Str( Len( xExp ) ) ) + " Items }"
 
       DEFAULT
          RETURN "Type: " + cType
@@ -197,6 +200,24 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
          RETURN cRet
 
+      CASE 'H'
+         IF Len( xVal ) == 0
+            RETURN "{:}"
+         ELSE
+            cRet := "{ "
+
+            FOR aVar := 1 TO Len( xVal )
+               cRet += LTrim( ValToPrg( HGetKeyAt( xVal, aVar) )) +": " + ;
+                       LTrim(ValToPrg( HGetValueAt( xVal, aVar ) )) + ", "
+            NEXT
+
+            /* we no for sure xVal isn't empty, and a last ',' is here */
+            cRet[ -2 ] := ' '
+            cRet[ -1 ] := '}'
+
+            RETURN cRet
+         ENDIF
+
       CASE 'B'
          RETURN ValToPrgExp( xVal )
 
@@ -297,6 +318,24 @@ FUNCTION ValToPrgExp( xVal, aObjs )
          cRet[ -1 ] := '}'
 
          RETURN cRet
+
+      CASE 'H'
+         IF Len( xVal ) == 0
+            RETURN "{:}"
+         ELSE
+            cRet := "{ "
+
+            FOR aVar := 1 TO Len( xVal )
+               cRet += LTrim( ValToPrg( HGetKeyAt( xVal, aVar) )) +": " + ;
+                       LTrim(ValToPrg( HGetValueAt( xVal, aVar ) )) + ", "
+            NEXT
+
+            /* we no for sure xVal isn't empty, and a last ',' is here */
+            cRet[ -2 ] := ' '
+            cRet[ -1 ] := '}'
+
+            RETURN cRet
+         ENDIF
 
       CASE 'B'
          cRet := "HB_RestoreBlock( {"

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.11 2003/10/11 13:26:28 lculik Exp $
+# $Id: Makefile,v 1.12 2003/10/11 15:40:09 lculik Exp $
 #
 
 ROOT = ../../
@@ -33,6 +33,7 @@ C_SOURCES=\
 	extend.c     \
 	fm.c         \
 	garbage.c    \
+	hash.c       \
 	hbi18n.c     \
 	hvm.c        \
 	inet.c       \

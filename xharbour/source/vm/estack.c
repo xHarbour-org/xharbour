@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.50 2003/11/07 10:03:11 jonnymind Exp $
+ * $Id: estack.c,v 1.51 2003/11/07 18:04:59 ronpinkas Exp $
  */
 
 /*
@@ -428,6 +428,10 @@ void hb_stackDispLocal( void )
                printf( HB_I_("OBJECT = %s "), hb_objGetClsName( *pBase ) );
             else
                printf( HB_I_("ARRAY ") );
+            break;
+
+         case HB_IT_HASH:
+               printf( HB_I_("HASH ") );
             break;
 
          case HB_IT_BLOCK:

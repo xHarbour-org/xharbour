@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: widget.prg,v 1.5 2003/05/11 15:14:43 jonnymind Exp $
+   $Id: widget.prg,v 1.6 2003/08/31 19:02:19 xthefull Exp $
 
    Widget class - basic widget & event management
 */
@@ -252,17 +252,14 @@ METHOD IsSensible() CLASS XWTWidget
 
 RETURN bSense
 
-METHOD SetColor( cColor, nTypeColor ) CLASS XWTWidget
+METHOD SetColor( cColor ) CLASS XWTWidget
    LOCAL cColorText  := ""
-   Local aColor
-   Local c
 
-   IF Empty(  nTypeColor )
+   IF Empty( nTypeColor )
       nTypeColor := XWT_PROP_FGCOLOR
    ENDIF
 
    IF "," in cColor // is an RGB String so Convert
-
       aColor := HB_aTokens( cColor ,",")
       cColorText := "#"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.16 2003/07/13 18:10:00 walito Exp $
+ * $Id: hbvmpub.h,v 1.17 2003/08/24 23:55:20 ronpinkas Exp $
  */
 
 /*
@@ -48,6 +48,10 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  *
+ */
+
+/*
+ * Hash support added by Giancarlo Niccolai
  */
 
 #ifndef HB_VMPUB_H_
@@ -102,6 +106,12 @@
     struct hb_struArray
     {
        struct _HB_BASEARRAY * value;
+    };
+
+    /* Internal structures that holds data */
+    struct hb_struHash
+    {
+       struct _HB_BASEHASH *value;
     };
 
     struct hb_struBlock
@@ -216,6 +226,7 @@
           struct hb_struRefer   asRefer;
           struct hb_struString  asString;
           struct hb_struSymbol  asSymbol;
+          struct hb_struHash    asHash;
        } item;
     } HB_ITEM, * PHB_ITEM, * HB_ITEM_PTR;
 
@@ -239,6 +250,23 @@
           PHB_ARRAY_HOLDER pOwners;
        #endif
     } HB_BASEARRAY, * PHB_BASEARRAY, * HB_BASEARRAY_PTR;
+
+    /* Hash utility functions */
+    #define HB_HASH_ORDER_FUNC_( hbfunc )\
+      int hbfunc( PHB_ITEM, PHB_ITEM, BOOL )
+    typedef HB_HASH_ORDER_FUNC_( HB_HASH_ORDER_FUNC );
+    typedef HB_HASH_ORDER_FUNC *PHB_HASH_ORDER_FUNC;
+
+    typedef struct _HB_BASEHASH
+    {
+       PHB_ITEM pKeys;
+       PHB_ITEM pValues;      /* pointer to the array items */
+       ULONG    ulLen;        /* number of items in the array */
+       USHORT   uiHolders;    /* number of holders of this array */
+       ULONG    ulAllocated;  /* items allocated in keys and values */
+       PHB_HASH_ORDER_FUNC fOrder; /* returns -1, 0 or 1 */
+       BOOL     bCase;     /* Case sensitivity */
+    } HB_BASEHASH, * PHB_BASEHASH, * HB_BASEHASH_PTR;
 
     /* internal structure for codeblocks */
     typedef struct _HB_CODEBLOCK

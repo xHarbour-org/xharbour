@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.89 2003/11/07 11:45:41 jonnymind Exp $
+ * $Id: hbapi.h,v 1.90 2003/11/08 00:14:23 jonnymind Exp $
  */
 
 /*
@@ -72,6 +72,7 @@ extern "C" {
 #define HB_IT_NIL       ( ( USHORT ) 0x0000 )
 #define HB_IT_POINTER   ( ( USHORT ) 0x0001 )
 #define HB_IT_INTEGER   ( ( USHORT ) 0x0002 )
+#define HB_IT_HASH      ( ( USHORT ) 0x0004 )
 #define HB_IT_LONG      ( ( USHORT ) 0x0008 )
 #define HB_IT_DOUBLE    ( ( USHORT ) 0x0010 )
 #define HB_IT_DATE      ( ( USHORT ) 0x0020 )
@@ -109,8 +110,9 @@ extern "C" {
 #define HB_IS_SYMBOL( p )  HB_IS_OF_TYPE( p, HB_IT_SYMBOL )
 #define HB_IS_MEMVAR( p )  HB_IS_OF_TYPE( p, HB_IT_MEMVAR )
 #define HB_IS_POINTER( p ) HB_IS_OF_TYPE( p, HB_IT_POINTER )
-
-#define HB_IS_COMPLEX( p )  ( ( p )->type  && ( HB_IS_STRING( p ) || HB_IS_BLOCK( p ) || HB_IS_ARRAY( p ) || HB_IS_MEMVAR( p ) ) )
+#define HB_IS_HASH( p )    HB_IS_OF_TYPE( p, HB_IT_HASH )
+#define HB_IS_ORDERABLE( p )    (( p )->type  && (( p )->type & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) ) )
+#define HB_IS_COMPLEX( p )  ( ( p )->type  && ( HB_IS_STRING( p ) || HB_IS_BLOCK( p ) || HB_IS_ARRAY( p ) || HB_IS_MEMVAR( p ) || HB_IS_HASH( p )) )
 #define HB_IS_SIMPLE( p ) ( ! HB_IS_COMPLEX( p ) )
 
 #define ISNIL( n )         ( hb_param( n, HB_IT_ANY ) == NULL || HB_IS_NIL( hb_param( n, HB_IT_ANY ) ) ) /* NOTE: Intentionally using a different method */
@@ -124,6 +126,7 @@ extern "C" {
 #define ISOBJECT( n )      ( ISARRAY( n ) && hb_param( n, HB_IT_ARRAY )->item.asArray.value->uiClass != 0 )
 #define ISBLOCK( n )       ( hb_param( n, HB_IT_BLOCK ) != NULL ) /* Not available in CA-Cl*pper. */
 #define ISPOINTER( n )     ( hb_param( n, HB_IT_POINTER ) != NULL ) /* Not available in CA-Cl*pper. */
+#define ISHASH( n )        ( hb_param( n, HB_IT_HASH ) != NULL ) /* Not available in CA-Cl*pper. */
 
 #define HB_ITEM_LOCK( pItem )   ( (pItem)->type == HB_IT_ARRAY ? hb_gcLock( (pItem)->item.asArray.value ) : \
                                   (pItem)->type == HB_IT_BLOCK ? hb_gcLock( (pItem)->item.asBlock.value ) : NULL )

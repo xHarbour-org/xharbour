@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.50 2003/09/10 06:07:32 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.51 2003/10/01 17:41:47 paultucker Exp $
  */
 
 /*
@@ -62,6 +62,7 @@
 #include "hbapierr.h"
 #include "hbdate.h"
 #include "hbset.h"
+#include "hbhashapi.h"
 
 extern char *hb_vm_sNull;
 extern char *hb_vm_acAscii[256];
@@ -190,6 +191,14 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
          hb_arrayReleaseHolder( pItem->item.asArray.value, (void *) pItem );
       #endif
    }
+   else if( HB_IS_HASH( pItem ) && pItem->item.asHash.value )
+   {
+      if( --( ( pItem->item.asHash.value )->uiHolders ) == 0 )
+      {
+         hb_hashRelease( pItem );
+      }
+
+   }
    else if( HB_IS_BLOCK( pItem ) )
    {
       hb_codeblockDelete( pItem );
@@ -226,6 +235,13 @@ void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
       #else
          hb_arrayReleaseHolder( pItem->item.asArray.value, (void *) pItem );
       #endif
+   }
+   else if( HB_IS_HASH( pItem ) && pItem->item.asHash.value )
+   {
+      if( --( ( pItem->item.asHash.value )->uiHolders ) == 0 )
+      {
+         hb_hashRelease( pItem );
+      }
    }
    else if( HB_IS_BLOCK( pItem ) )
    {
@@ -309,6 +325,10 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       #else
           hb_arrayRegisterHolder( pDest->item.asArray.value, (void *) pDest );
       #endif
+   }
+   else if( HB_IS_HASH( pSource ) )
+   {
+      ( pSource->item.asHash.value )->uiHolders++;
    }
    else if( HB_IS_BLOCK( pSource ) )
    {
@@ -589,7 +609,6 @@ PHB_ITEM HB_EXPORT hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
    pItem->item.asPointer.value = pValue;
    pItem->item.asPointer.collect = TRUE;
 
-
    return pItem;
 }
 
@@ -609,6 +628,13 @@ void HB_EXPORT hb_itemFastClear( PHB_ITEM pItem )
       #else
          hb_arrayReleaseHolder( pItem->item.asArray.value, (void *) pItem );
       #endif
+   }
+   else if( HB_IS_HASH( pItem ) && pItem->item.asHash.value )
+   {
+      if( --( ( pItem->item.asHash.value )->uiHolders ) <= 0 )
+      {
+         hb_hashRelease( pItem );
+      }
    }
    else if( HB_IS_BLOCK( pItem ) )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.78 2003/09/11 17:27:08 ronpinkas Exp $
+ * $Id: arrays.c,v 1.79 2003/09/13 19:14:30 ronpinkas Exp $
  */
 
 /*
@@ -785,12 +785,23 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayScan(%p, %p, %p, %p)", pArray, pValue, pulStart, pulCount, bExact));
 
-   if( HB_IS_ARRAY( pArray ) )
+   if( HB_IS_ARRAY( pArray ) || HB_IS_HASH( pArray ) )
    {
-      PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
-      ULONG ulLen = pBaseArray->ulLen;
+
+      PHB_ITEM pItems;
+      ULONG ulLen;
       ULONG ulStart;
       ULONG ulCount;
+
+      if ( HB_IS_ARRAY( pArray ) )
+      {
+         pItems = pArray->item.asArray.value->pItems;
+         ulLen = pArray->item.asArray.value->ulLen;
+      }
+      else {
+         pItems = pArray->item.asHash.value->pValues;
+         ulLen = pArray->item.asHash.value->ulLen;
+      }
 
       if( pulStart && ( *pulStart >= 1 ) )
       {
@@ -822,13 +833,19 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 
          if( HB_IS_BLOCK( pValue ) )
          {
+            ULONG ulParams = HB_IS_HASH( pArray ) ? 3 : 2;
+
             for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
             {
                hb_vmPushSymbol( &hb_symEval );
                hb_vmPush( pValue );
-               hb_vmPush( pBaseArray->pItems + ulStart );
+               if ( ulParams == 3)
+               {
+                  hb_vmPush( pArray->item.asHash.value->pKeys + ulStart );
+               }
+               hb_vmPush( pItems + ulStart );
                hb_vmPushNumber( ( double ) ( ulStart + 1 ), 0 );
-               hb_vmSend( 2 );
+               hb_vmSend( ulParams );
 
                if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) && HB_VM_STACK.Return.item.asLogical.value )
                {
@@ -840,7 +857,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
          {
             for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
             {
-               PHB_ITEM pItem = pBaseArray->pItems + ulStart;
+               PHB_ITEM pItem = pItems + ulStart;
 
                /* NOTE: The order of the pItem and pValue parameters passed to
                         hb_itemStrCmp() is significant, please don't change it. [vszakats] */
@@ -856,7 +873,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 
             for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
             {
-               PHB_ITEM pItem = pBaseArray->pItems + ulStart;
+               PHB_ITEM pItem = pItems + ulStart;
 
                if( HB_IS_DATE( pItem ) && hb_itemGetDL( pItem ) == lValue )
                {
@@ -870,7 +887,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 
             for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
             {
-               PHB_ITEM pItem = pBaseArray->pItems + ulStart;
+               PHB_ITEM pItem = pItems + ulStart;
 
                 HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %d", pItem, dValue ) );
 
@@ -886,7 +903,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 
             for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
             {
-               PHB_ITEM pItem = pBaseArray->pItems + ulStart;
+               PHB_ITEM pItem = pItems + ulStart;
 
                if( HB_IS_LOGICAL( pItem ) && hb_itemGetL( pItem ) == bValue )
                {
@@ -898,7 +915,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
          {
             for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
             {
-               if( HB_IS_NIL( pBaseArray->pItems + ulStart ) )
+               if( HB_IS_NIL( pItems + ulStart ) )
                {
                   return ulStart + 1;
                }
@@ -914,12 +931,27 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayEval(%p, %p, %p, %p)", pArray, bBlock, pulStart, pulCount));
 
-   if( HB_IS_ARRAY( pArray ) && HB_IS_BLOCK( bBlock ) )
+   if(( HB_IS_ARRAY( pArray )|| HB_IS_HASH(pArray) ) && HB_IS_BLOCK( bBlock ))
    {
-      PHB_BASEARRAY pBaseArray = pArray->item.asArray.value;
-      ULONG ulLen = pBaseArray->ulLen;
+      PHB_ITEM pItems, pKeys;
+      ULONG ulLen;
       ULONG ulStart;
       ULONG ulCount;
+      ULONG ulParams;
+
+      if ( HB_IS_ARRAY(pArray) )
+      {
+         pItems = pArray->item.asArray.value->pItems;
+         ulLen = pArray->item.asArray.value->ulLen;
+         ulParams = 2;
+      }
+      else
+      {
+         pKeys = pArray->item.asHash.value->pKeys;
+         pItems = pArray->item.asHash.value->pValues;
+         ulLen = pArray->item.asHash.value->ulLen;
+         ulParams = 3;
+      }
 
       if( pulStart && ( *pulStart >= 1 ) )
       {
@@ -948,13 +980,15 @@ BOOL HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart,
 
          for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
          {
-            PHB_ITEM pItem = pBaseArray->pItems + ulStart;
-
             hb_vmPushSymbol( &hb_symEval );
             hb_vmPush( bBlock );
-            hb_vmPush( pItem );
+            if ( ulParams == 3 )
+            {
+               hb_vmPush( pKeys + ulStart );
+            }
+            hb_vmPush( pItems + ulStart );
             hb_vmPushNumber( ( double ) ( ulStart + 1 ), 0 );
-            hb_vmSend( 2 );
+            hb_vmSend( ulParams );
          }
       }
 

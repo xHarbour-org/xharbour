@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.51 2003/10/06 03:35:40 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.52 2003/11/07 18:20:54 jonnymind Exp $
  */
 
 /*
@@ -93,6 +93,8 @@
 #include "hbdate.h"
 #include "hbset.h"
 #include "hbmath.h"
+#include "hbhashapi.h"
+
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
 extern PHB_CODEPAGE s_cdpage;
@@ -1028,6 +1030,9 @@ ULONG HB_EXPORT hb_itemSize( PHB_ITEM pItem )
 
             return hb_arrayLen( pItem );
 
+         case HB_IT_HASH:
+            return hb_hashLen( pItem );
+
          case HB_IT_STRING:
 
             return pItem->item.asString.length;
@@ -1087,6 +1092,9 @@ char HB_EXPORT * hb_itemTypeStr( PHB_ITEM pItem )
 
       case HB_IT_POINTER:
          return "P";
+
+      case HB_IT_HASH:
+         return "H";
    }
 
    return "U";

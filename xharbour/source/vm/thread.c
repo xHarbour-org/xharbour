@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.112 2003/10/19 00:17:36 jonnymind Exp $
+* $Id: thread.c,v 1.113 2003/10/19 00:57:54 jonnymind Exp $
 */
 
 /*
@@ -48,9 +48,6 @@
 * whether to permit this exception to apply to your modifications.
 * if you do not wish that, delete this exception notice.
 *
-* hb_itemClear() and hb_itemCopy() are derivative work of original code
-* in the Harbour Project http://harbour-project.org (source/vm/itemapi.c)
-* Copyright of Antonio Linares <alinares@fivetech.com>
 *
 */
 
