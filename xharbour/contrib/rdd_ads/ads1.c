@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.48 2004/08/19 01:17:27 druzus Exp $
+ * $Id: ads1.c,v 1.49 2004/08/26 08:20:12 brianhays Exp $
  */
 
 /*
@@ -561,6 +561,7 @@ static ERRCODE adsGoTo( ADSAREAP pArea, ULONG ulRecNo )
    if( pArea->ulRecNo == ulRecNo && ulRecNo > 0 && !pArea->fEof )  /* just refresh current record */
    {        /* if it was at eof, and another station or handle added a record, it needs to GoTo or AtEof stays True. */
       AdsRefreshRecord( pArea->hTable );
+      pArea->fBof = FALSE;
    }
    else if( ulRecNo > 0  && ( pArea->iFileType == ADS_ADT || ulRecNo <= pArea->ulRecCount ) )
    {  /*   ADTs can have a recno greater than RecCount because it recycles deleted records !!! */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3351 2004/08/27 05:49:52 paultucker Exp $
+ * $Id: ChangeLog,v 1.3352 2004/08/27 05:54:06 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-27 00:20 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+    * fixed adsGoTo to set bof = FALSE when doing dbgoto() to
+      a  valid record.
+  Reported by Marek
 
 2004-08-27 01:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   - source/ct/math.c
