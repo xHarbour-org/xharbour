@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.236 2003/07/16 02:07:28 andijahja Exp $
+ * $Id: hvm.c,v 1.237 2003/07/16 11:12:43 andijahja Exp $
  */
 
 /*
@@ -3974,6 +3974,10 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
    double dEnd;
    double dCurrent;
 
+   BOOL lEnd;
+   BOOL lCurrent;
+   BOOL lLogicalPassed = FALSE;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmForTest()"));
 
    while( ! HB_IS_NUMERIC( hb_stackItemFromTop( -1 ) ) )
@@ -3994,7 +3998,7 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
 
    dStep = hb_vmPopNumber();
 
-   while( ! HB_IS_NUMERIC( hb_stackItemFromTop( -1 ) ) )
+   while( ( ! HB_IS_NUMERIC( hb_stackItemFromTop( -1 ) ) ) && ( ! HB_IS_LOGICAL( hb_stackItemFromTop( -1 ) ) ) )
    {
       PHB_ITEM pItem1 = hb_stackItemFromTop( -1 );
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1073, NULL, "<", 1, pItem1 );
@@ -4010,9 +4014,15 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
          return;
    }
 
-   dEnd = hb_vmPopNumber();
+   if ( hb_stackItemFromTop( -1 )->type == HB_IT_LOGICAL )
+   {
+      lEnd = hb_vmPopLogical();
+      lLogicalPassed = TRUE;
+   }
+   else
+      dEnd = hb_vmPopNumber();
 
-   while( ! HB_IS_NUMERIC( hb_stackItemFromTop( -1 ) ) )
+   while( ( ! HB_IS_NUMERIC( hb_stackItemFromTop( -1 ) ) ) && ( ! HB_IS_LOGICAL( hb_stackItemFromTop( -1 ) ) ) )
    {
       PHB_ITEM pItem1 = hb_stackItemFromTop( -1 );
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1073, NULL, "<", 1, pItem1 );
@@ -4028,15 +4038,37 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
          return;
    }
 
-   dCurrent = hb_vmPopNumber();
-
-   if( dStep >= 0 )          /* Positive loop. Use LESS */
+   if ( hb_stackItemFromTop( -1 )->type == HB_IT_LOGICAL )
    {
-      hb_vmPushLogical( dCurrent <= dEnd );
+      lCurrent = hb_vmPopLogical();
    }
-   else if( dStep < 0 )      /* Negative loop. Use GREATER */
+   else
    {
-      hb_vmPushLogical( dCurrent >= dEnd );
+      lLogicalPassed = FALSE;
+      dCurrent = hb_vmPopNumber();
+   }
+
+   if( lLogicalPassed )
+   {
+      if( dStep >= 0 )           /* Positive loop. Use LESS */
+      {
+         hb_vmPushLogical( lCurrent <= lEnd );
+      }
+      else if( dStep < 0 )      /* Negative loop. Use GREATER */
+      {
+         hb_vmPushLogical( lCurrent >= lEnd );
+      }
+   }
+   else
+   {
+      if( dStep >= 0 )          /* Positive loop. Use LESS */
+      {
+         hb_vmPushLogical( dCurrent <= dEnd );
+      }
+      else if( dStep < 0 )      /* Negative loop. Use GREATER */
+      {
+         hb_vmPushLogical( dCurrent >= dEnd );
+      }
    }
 }
 
