@@ -1310,7 +1310,7 @@ HB_FUNC ( LOCKWINDOWUPDATE )
 
 HB_FUNC ( FLASHWINDOW )
 {
-   FlashWindow( (HWND) hb_parnl( 1 ), hb_parni( 2 ) ) );
+   FlashWindow( (HWND) hb_parnl( 1 ), hb_parni( 2 ) );
 }
 
 /*
