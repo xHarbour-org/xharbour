@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.23 2002/12/28 12:39:21 patrickmast Exp $
+ * $Id: dbcmd.c,v 1.24 2003/01/06 12:39:26 horacioroldan Exp $
  */
 
 /*
@@ -2498,7 +2498,7 @@ HB_FUNC( ORDCONDSET )
       lpdbOrdCondInfo = ( LPDBORDERCONDINFO ) hb_xgrab( sizeof( DBORDERCONDINFO ) );
       szFor = hb_parc( 1 );
       /* ulLen = strlen( szFor ); */
-      if( ISCHAR(1) && ( ( ulLen = strlen( szFor ) ) == 0 ) )
+      if( ISCHAR(1) && ( ( ulLen = strlen( szFor ) ) > 0 ) )
       {
          lpdbOrdCondInfo->abFor = ( BYTE * ) hb_xgrab( ulLen + 1 );
          strcpy( ( char * ) lpdbOrdCondInfo->abFor, szFor );
