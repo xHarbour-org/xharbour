@@ -1,6 +1,6 @@
 #
 # Rules for making a generic xharbour library or program
-# $Id: Rules.make,v 1.8 2004/03/23 10:00:31 mauriliolongo Exp $
+# $Id: Rules.make,v 1.9 2004/05/04 14:45:06 mauriliolongo Exp $
 #
 # (C) Giancarlo Niccolai 2003
 #
@@ -26,16 +26,31 @@ CFLAGS += -Wall -I.:$(HB_INCLUDE)
 
 #libraries for binary building
 
+ifeq  ($(HB_MULTI_GT),yes)
 ifeq ($(HB_MT),MT)
-MTLIBS= -lvmmt -lrtlmt -lrddmt -lrtlmt -lvmmt -ldbfntxmt -ldbfcdx -ldbfdbt
-ifeq ($(HB_ARCHITECTURE),linux)
-MTLIBS+=-lpthread
+   MTLIBS= -lxharbourmt
+   ifeq ($(HB_ARCHITECTURE),linux)
+     MTLIBS+=-lpthread
+   endif
+else
+  MTLIBS= -lxharbour
 endif
+
+else
+ifeq ($(HB_MT),MT)
+   MTLIBS= -lvmmt -lrtlmt -lrddmt -lrtlmt -lvmmt -ldbfntxmt -ldbfcdx -ldbfdbt
+   ifeq ($(HB_ARCHITECTURE),linux)
+      MTLIBS+=-lpthread
+   endif
 else
   MTLIBS= -lvm -lrtl -lrdd -lrtl -lvm  -ldbfntx -ldbfcdx -ldbfdbt
 endif
+endif
 
 ifeq ($(HB_ARCHITECTURE),linux)
+   ifeq ($(HB_MULTI_GT),yes)
+      GT_LIBS=-L/usr/X11/lib -lncurses -lgpm -lslang -lX11
+   else
    ifeq ($(HB_GT_LIB),)
       GT_LIBS=-lgtcrs -lncurses -lgpm
    endif
@@ -48,7 +63,7 @@ ifeq ($(HB_ARCHITECTURE),linux)
    ifeq ($(HB_GT_LIB),gtcgi)
       GT_LIBS=-lgtcgi
    endif
-
+   endif
 EXE_EXT=
 
 else

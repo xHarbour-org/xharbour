@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.7 2003/12/01 00:20:11 jonnymind Exp $
+# $Id: Makefile,v 1.8 2003/12/02 04:08:16 jonnymind Exp $
 #
 
 all:
@@ -10,6 +10,7 @@ all:
 	make -f Makefile.timetest
 	make -f Makefile.testmail
 	make -f Makefile.testmmail
+	make -f Makefile.mimetest
 
 clean:
 	make -f Makefile.tiptest clean
@@ -19,4 +20,6 @@ clean:
 	make -f Makefile.timetest clean
 	make -f Makefile.testmail clean
 	make -f Makefile.testmmail clean
+	make -f Makefile.mimetest clean
 
+.PHONY: clean
