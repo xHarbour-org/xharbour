@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.20 2003/06/30 17:08:57 ronpinkas Exp $
+ * $Id: gtcrs.c,v 1.21 2003/07/23 12:35:57 druzus Exp $
  */
 
 /*
@@ -1680,7 +1680,7 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
 {
     InOutBase *ioBase;
     int bg, fg;
-    unsigned int i;
+    unsigned int i, n;
     char buf[256], *ptr, *crsterm = NULL;
 
     ioBase = hb_xgrab(sizeof(*ioBase));
@@ -1814,14 +1814,30 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
                                           COLOR_WHITE };
 
         start_color();
+/*
         for( bg = 0; bg < COLORS; bg++ )
             for( fg = 0; fg < COLORS; fg++ )
-                init_pair( bg * COLORS + fg, color_map[ fg ], color_map[ bg ] );
-
+	    {
+		i = bg * COLORS + fg;
+		if( i == 0 )
+		    i = 7;
+		else if( i == 7 )
+		    i = 0;
+                init_pair( i, color_map[ fg ], color_map[ bg ] );
+	    }
+*/
         for( i = 0; i < 256; i++  ) {
             bg = ( i >> 4 ) & 0x07;         /* extract background color bits 4-6 */
             fg = ( i & 0x07 );              /* extract forground color bits 0-2 */
-            ioBase->attr_map[ i ] = COLOR_PAIR( (bg * COLORS + fg) );
+	    n = bg * 8 + fg;
+	    /* n = bg * COLORS + fg */
+	    if( n == 0 )
+		n = 7;
+	    else if( n == 7 )
+		n = 0;
+	    if( (i & 0x88) == 0 )
+		init_pair( n, color_map[ fg ], color_map[ bg ] );
+            ioBase->attr_map[ i ] = COLOR_PAIR( n );
             if( i & 0x08 )                  /* highlight forground bit 3 */
                 ioBase->attr_map[ i ] |= A_BOLD;
             if( i & 0x80 )                  /* blink/highlight background bit 7 */
@@ -2091,7 +2107,8 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 #endif
 	set_signals();
 	ioBase = create_ioBase( NULL, iFilenoStdin, iFilenoStdout, iFilenoStderr, -1 );
-	add_new_ioBase( ioBase );
+	if ( ioBase )
+	    add_new_ioBase( ioBase );
     }
     if ( !s_ioBase )
     {

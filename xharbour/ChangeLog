@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1295 2003/07/24 20:53:43 andijahja Exp $
+ * $Id: ChangeLog,v 1.1296 2003/07/25 01:57:57 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-25 22:18 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/gtcrs/gtcrs.c
+    ! fixed GPF when user set in HB_TERM or TERM unexisting terminal
 
 2003-07-25 3:51 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rtl/filesys.c
