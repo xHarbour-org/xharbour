@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3749 2005/01/15 17:40:12 bdj Exp $
+ * $Id: ChangeLog,v 1.3750 2005/01/15 18:57:49 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-17 04:24 UTC+0000 Philip Chee <philip@aleytys.pc.my>
+  * source/ct/spread.prg
+    * EXPAND(): bugfix second parameter was ignored
+    * EXPAND(): compatibility fixes to make it more like CAToolsIII
+  * source/ct/Makefile
+    * changed datetime.prg to datetime.c to make it consistent with the other
+      makefiles
+  + tests/cttest/expandts.prg
+    + Unit test for CT3 EXPAND() function
+  * tests/cttest/Makefile
+    * Added expandts.prg
+    * changed spaces to tabs on some lines to make the file consistent
 
 2005-01-15 20:00 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * config/linux/gcc.cf
