@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.22 2004/09/01 01:13:59 druzus Exp $
+ * $Id: dbffpt1.c,v 1.23 2004/09/03 02:31:00 peterrees Exp $
  */
 
 /*
@@ -283,17 +283,17 @@ static BOOL hb_fptReadLock( FPTAREAP pArea, ULONG uiIndex, ULONG *pulOffset )
 {
    BOOL fRet= TRUE ;
 #ifndef HB_FPT_NO_READLOCK
-   if (  pArea->fShared && !pArea->fFLocked )  // and we are not open EXCLUSIVE or FILELOCKED
+   if ( pArea->fShared && !pArea->fFLocked )  // and we are not open EXCLUSIVE or FILELOCKED
    {
-     *pulOffset = pArea->uiMemoBlockSize *  hb_dbfGetMemoBlock( (DBFAREAP) pArea, uiIndex - 1 ) ;
-     if ( *pulOffset )    // There is something in the memo so lock it
-     {
-       do
-       {
-          fRet = hb_fsLock( pArea->hMemoFile, *pulOffset, pArea->uiMemoBlockSize,
-                            FL_LOCK | FLX_SHARED | FLX_WAIT );
-       } while ( !fRet );
-     }
+      *pulOffset = pArea->uiMemoBlockSize *  hb_dbfGetMemoBlock( (DBFAREAP) pArea, uiIndex - 1 ) ;
+      if ( *pulOffset )    // There is something in the memo so lock it
+      {
+         do
+         {
+            fRet = hb_fsLock( pArea->hMemoFile, *pulOffset, pArea->uiMemoBlockSize,
+                              FL_LOCK | FLX_SHARED | FLX_WAIT );
+         } while ( !fRet );
+      }
    }
    else
 #endif
@@ -1185,7 +1185,17 @@ static ERRCODE hb_fptReadFlexItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBu
             errCode = EDBF_CORRUPT;
          }
          break;
-      case FPTIT_FLEXAR_BYTE1:
+      case FPTIT_FLEXAR_CHAR:
+         if ( bBufEnd - (*pbMemoBuf) >= 2 )
+         {
+            hb_itemPutNI( pItem, (signed char) **pbMemoBuf );
+            *pbMemoBuf += 2;
+         }
+         else
+         {
+            errCode = EDBF_CORRUPT;
+         }
+         break;
       case FPTIT_FLEXAR_BYTE:
          if ( bBufEnd - (*pbMemoBuf) >= 2 )
          {
@@ -1211,7 +1221,20 @@ static ERRCODE hb_fptReadFlexItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBu
       case FPTIT_FLEXAR_SHORT:
          if ( bBufEnd - (*pbMemoBuf) >= 3 )
          {
-            hb_itemPutNI( pItem, (SHORT) HB_GET_LE_UINT16( *pbMemoBuf ) );
+            hb_itemPutNILen( pItem, (SHORT) HB_GET_LE_UINT16( *pbMemoBuf ),
+                             (*pbMemoBuf)[2] );
+            *pbMemoBuf += 3;
+         }
+         else
+         {
+            errCode = EDBF_CORRUPT;
+         }
+         break;
+      case FPTIT_FLEXAR_USHORT:
+         if ( bBufEnd - (*pbMemoBuf) >= 3 )
+         {
+            hb_itemPutNIntLen( pItem, (USHORT) HB_GET_LE_UINT16( *pbMemoBuf ),
+                               (*pbMemoBuf)[2] );
             *pbMemoBuf += 3;
          }
          else
@@ -1231,9 +1254,32 @@ static ERRCODE hb_fptReadFlexItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBu
          }
          break;
       case FPTIT_FLEXAR_LONG:
+         if ( bBufEnd - (*pbMemoBuf) >= 5 )
+         {
+            hb_itemPutNLLen( pItem, (LONG) HB_GET_LE_UINT32( *pbMemoBuf ),
+                             (*pbMemoBuf)[4] );
+            *pbMemoBuf += 5;
+         }
+         else
+         {
+            errCode = EDBF_CORRUPT;
+         }
+         break;
+      case FPTIT_FLEXAR_LONG2:
          if ( bBufEnd - (*pbMemoBuf) >= 6 )
          {
             hb_itemPutNL( pItem, (LONG) HB_GET_LE_UINT32( *pbMemoBuf ) );
+            *pbMemoBuf += 6;
+         }
+         else
+         {
+            errCode = EDBF_CORRUPT;
+         }
+         break;
+      case FPTIT_FLEXAR_ULONG:
+         if ( bBufEnd - (*pbMemoBuf) >= 6 )
+         {
+            hb_itemPutNInt( pItem, HB_GET_LE_UINT32( *pbMemoBuf ) );
             *pbMemoBuf += 6;
          }
          else
@@ -1395,8 +1441,14 @@ static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             case FPTIT_FLEX_SHORT:
                hb_itemPutNI( pItem, (SHORT) HB_GET_LE_UINT16( pBuffer ) );
                break;
+            case FPTIT_FLEX_USHORT:
+               hb_itemPutNInt( pItem, HB_GET_LE_UINT16( pBuffer ) );
+               break;
             case FPTIT_FLEX_LONG:
                hb_itemPutNL( pItem, (LONG) HB_GET_LE_UINT32( pBuffer ) );
+               break;
+            case FPTIT_FLEX_ULONG:
+               hb_itemPutNInt( pItem, HB_GET_LE_UINT32( pBuffer ) );
                break;
             case FPTIT_FLEX_DOUBLE:
                hb_itemPutND( pItem, HB_GET_LE_DOUBLE( pBuffer ) );
@@ -1647,7 +1699,7 @@ static void hb_fptStoreFlexItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
          *(*bBufPtr)++ = FPTIT_FLEXAR_SHORT;
          HB_PUT_LE_UINT16( *bBufPtr, pItem->item.asInteger.value );
          *bBufPtr += 2;
-         *(*bBufPtr)++ = '\0';
+         *(*bBufPtr)++ = (BYTE) pItem->item.asInteger.length;
          break;
       case HB_IT_LONG:
          *(*bBufPtr)++ = FPTIT_FLEXAR_LONG;
@@ -1882,47 +1934,6 @@ static ERRCODE hb_fptPutMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 /* FPT METHODS */
 
 /*
- * Obtain the length of a field value.
- * ( DBENTRYP_SVL )   hb_fptGetVarLen
- */
-static ERRCODE hb_fptGetVarLen( FPTAREAP pArea, USHORT uiIndex, ULONG * pLength )
-{
-   BOOL bDeleted;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_fptGetVarLen(%p, %hu, %p)", pArea, uiIndex, pLength));
-
-   /* Force read record */
-   if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
-      return FAILURE;
-
-   if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
-       pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
-   {
-#if defined( HB_FPT_USE_READLOCK )
-      ULONG ulOffset;
-      if ( hb_fptReadLock( pArea, uiIndex, &ulOffset ) )
-#else
-      if( hb_fptFileLockSh( pArea, TRUE ) )
-#endif
-      {
-         * pLength = hb_fptGetMemoLen( pArea, uiIndex - 1 );
-#if defined( HB_FPT_USE_READLOCK )
-         hb_fptReadUnLock( pArea, ulOffset ) ;
-#else
-         hb_fptFileUnLock( pArea );
-#endif
-      }
-      else
-      {
-         * pLength = 0;
-      }
-      return SUCCESS;
-   }
-
-   return SUPER_GETVARLEN( ( AREAP ) pArea, uiIndex, pLength );
-}
-
-/*
  * Open a data store in the WorkArea.
  * ( DBENTRYP_VP )    hb_fptOpen            : NULL
  */
@@ -1954,6 +1965,70 @@ static ERRCODE hb_fptSysName( FPTAREAP pArea, BYTE * pBuffer )
 }
 
 /*
+ * Obtain the length of a field value.
+ * ( DBENTRYP_SVL )   hb_fptGetVarLen
+ */
+static ERRCODE hb_fptGetVarLen( FPTAREAP pArea, USHORT uiIndex, ULONG * pLength )
+{
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fptGetVarLen(%p, %hu, %p)", pArea, uiIndex, pLength));
+
+   if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
+       pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
+   {
+      HB_ITEM recItm = HB_ITEM_NIL, resultItm = HB_ITEM_NIL;
+      BOOL bLocked;
+      ERRCODE uiError = SUCCESS;
+#if defined( HB_FPT_USE_READLOCK )
+      ULONG ulOffset;
+#endif
+
+      if ( pArea->fShared && !pArea->fFLocked && !pArea->fRecordChanged )
+      {
+         if ( SELF_RECINFO( ( AREAP ) pArea, &recItm, DBRI_LOCKED, &resultItm ) == FAILURE )
+            return FAILURE;
+         bLocked = hb_itemGetL( &resultItm );
+      }
+      else
+         bLocked = TRUE;
+
+#if defined( HB_FPT_USE_READLOCK )
+      if ( bLocked || hb_fptReadLock( pArea, uiIndex, &ulOffset ) )
+#else
+      if ( bLocked || hb_fptFileLockSh( pArea, TRUE ) )
+#endif
+      {
+#ifdef HB_FPT_SAFE
+         /* Force read record? */
+         if ( !bLocked )
+            pArea->fValidBuffer = FALSE;
+#endif
+         /* update any pending relations and reread record if necessary */
+         uiError = SELF_DELETED( ( AREAP ) pArea, &bLocked );
+         if ( uiError == SUCCESS )
+            * pLength = hb_fptGetMemoLen( pArea, uiIndex - 1 );
+
+         if ( !bLocked )
+         {
+#if defined( HB_FPT_USE_READLOCK )
+            hb_fptReadUnLock( pArea, ulOffset ) ;
+#else
+            hb_fptFileUnLock( pArea );
+#endif
+         }
+      }
+      else
+      {
+         * pLength = 0;
+         uiError = FAILURE;
+      }
+      return uiError;
+   }
+
+   return SUPER_GETVARLEN( ( AREAP ) pArea, uiIndex, pLength );
+}
+
+/*
  * Obtain the current value of a field.
  * ( DBENTRYP_SI )    hb_fptGetValue
  */
@@ -1971,7 +2046,7 @@ static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 #if defined( HB_FPT_USE_READLOCK )
       ULONG ulOffset;
 #endif
-      if( pArea->fShared && !pArea->fFLocked && !pArea->fRecordChanged )
+      if ( pArea->fShared && !pArea->fFLocked && !pArea->fRecordChanged )
       {
          if ( SELF_RECINFO( ( AREAP ) pArea, &recItm, DBRI_LOCKED, &resultItm ) == FAILURE )
             return FAILURE;
@@ -1981,29 +2056,28 @@ static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          bLocked = TRUE;
 
 #if defined( HB_FPT_USE_READLOCK )
-      uiError = SELF_DELETED( ( AREAP ) pArea, &bLocked );
-      if ( uiError == SUCCESS && hb_fptReadLock( pArea, uiIndex, &ulOffset ) )
-      {
+      if ( bLocked || hb_fptReadLock( pArea, uiIndex, &ulOffset ) )
 #else
-      if( hb_fptFileLockSh( pArea, TRUE ) )
+      if ( bLocked || hb_fptFileLockSh( pArea, TRUE ) )
+#endif
       {
-
 #ifdef HB_FPT_SAFE
          /* Force read record? */
          if ( !bLocked )
             pArea->fValidBuffer = FALSE;
 #endif
-         uiError = SELF_DELETED( ( AREAP ) pArea, &bLocked );
-
-         if ( uiError == SUCCESS )
-#endif
          /* update any pending relations and reread record if necessary */
+         uiError = SELF_DELETED( ( AREAP ) pArea, &bLocked );
+         if ( uiError == SUCCESS )
             uiError = hb_fptGetMemo( pArea, uiIndex - 1, pItem );
+         if ( !bLocked )
+         {
 #if defined( HB_FPT_USE_READLOCK )
-         hb_fptReadUnLock( pArea, ulOffset ) ;
+            hb_fptReadUnLock( pArea, ulOffset ) ;
 #else
-         hb_fptFileUnLock( pArea );
+            hb_fptFileUnLock( pArea );
 #endif
+         }
       }
       else
       {

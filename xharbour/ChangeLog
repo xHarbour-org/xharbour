@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3394 2004/09/03 02:32:59 peterrees Exp $
+ * $Id: ChangeLog,v 1.3395 2004/09/03 07:01:04 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-03 10:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbrddfpt.h
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+   + added some new types for flex arrays - it seems to be never
+     ending process - some technical docs please!!!
+   * small fix in hb_fptGetValue() when HB_FPT_USE_READLOCK enabled
+   * do not lock memo file for reading when the database/record is
+     locked it will improve the speed for some operations.
 
 2004-09-03 00:00 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/rtl/regex.c
