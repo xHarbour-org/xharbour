@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.21 2002/09/27 02:43:49 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.22 2002/10/20 02:09:53 ronpinkas Exp $
  */
 
 /*
@@ -943,7 +943,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_DOUBLE )
             {
-               *( (short *) ( Buffer + uiOffset ) ) = (unsigned short) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
+               *( (unsigned short *) ( Buffer + uiOffset ) ) = (unsigned short) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
             {
@@ -1015,7 +1015,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
          case CTYPE_INT : // int
             if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_INTEGER )
             {
-               *( (int *) ( Buffer + uiOffset ) ) = ( pBaseVar->pItems + ulIndex  )->item.asInteger.value;
+               *( (int *) ( Buffer + uiOffset ) ) = (int) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_LONG )
             {
@@ -1129,7 +1129,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_DOUBLE )
             {
-               *( (int *) ( Buffer + uiOffset ) ) = (long) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
+               *( (long *) ( Buffer + uiOffset ) ) = (long) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
             {
