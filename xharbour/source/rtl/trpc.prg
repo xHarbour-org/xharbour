@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.4 2003/02/19 20:20:30 jonnymind Exp $
+ * $Id: trpc.prg,v 1.5 2003/02/23 20:13:39 jonnymind Exp $
  */
 
 /*
@@ -57,7 +57,8 @@
    NOTES:
    All packets begin with the string "XHBR??" where ?? are 2 readable characters
    containing the packet type. In the protocol, a field in "" means a serialized
-   string. A field in {} means a serialized array.
+   string. A field in {} means a serialized array. A field in '' means a literal
+   set of bytes (characters).
 
    Serialized strings: 4 chars lenght in network order, and then the string.
    Function serial numbers: "AAAAMMDD.C", where c is a developer defined character.
@@ -172,13 +173,22 @@
    90 - LOGIN
       <LEN8> + USERID:PASSWORD
    91 - LOGIN STATUS
-      "OK"
-      "NO"
+      'OK'
+      'NO'
    92 - GOODBYE
 
    93 - Encripted login
       <LEN8> Total length
-      +Symbolic id, '|', ENCRYPTED(USERID:PASSWORD)
+      'USERID:ENCRYPTED( Random data + PASSWORD:pwd: + Random data)'
+
+   94 - Challenge
+      <LEN8> Total length
+      'ENCRYPT(CHALLENGE DATA)'
+
+   95 - Challenge reply
+      <NUM8> - the CRC32 checksum of challenge.
+
+
 */
 
 #include "hbclass.ch"
@@ -284,6 +294,7 @@ RETURN cRet
 CLASS tRPCServeCon
    /* back reference to the parent to get callback blocks */
    DATA oServer
+   
    /* Socket, mutex and thread */
    DATA skRemote
    DATA mtxBusy
@@ -292,15 +303,20 @@ CLASS tRPCServeCon
    /* Assigned authorization level */
    DATA nAuthLevel
 
-   /* Encription mode */
-   DATA nEncMode INIT 0
-   DATA cXScramblerKey
-
    /* User ID */
    DATA cUserId
 
    /* Allow progress ?*/
    DATA bAllowProgress
+
+   /* Is this connection encrypted? */
+   DATA bEncrypted
+
+   /* crc for challenge handshake */
+   DATA nChallengeCRC
+   /* Temporary supposed user in challenge */
+   DATA cChallengeUserid
+   DATA cCryptKey
 
    METHOD New( oCaller, skRemote ) CONSTRUCTOR
    METHOD Destroy()
@@ -308,14 +324,16 @@ CLASS tRPCServeCon
    /* Managing async */
    METHOD Start()
    METHOD Stop()
-   METHOD Run( lEncrypt )
+   METHOD Run()
 
    /* Utilty */
    METHOD RecvAuth( lEncrypt )
+   METHOD RecvChallenge()
    METHOD RecvFunction( bComp, bMode )
    METHOD FuncCall( cData )
    METHOD FuncLoopCall( cData, cMode )
    METHOD FuncForeachCall( cData, cMode )
+   METHOD LaunchChallenge( cUserid, cPassword )
    METHOD LaunchFunction( cFuncName, aParms, nMode, aItems )
    METHOD SendResult( oRet )
    METHOD SendProgress( nProgress, aData )
@@ -330,6 +348,9 @@ METHOD New( oParent, skIn ) CLASS tRPCServeCon
    ::oServer := oParent
    ::skRemote := skIn
    ::mtxBusy := CreateMutex()
+   ::bEncrypted := .F.
+   ::nAuthLevel := 0
+   ::nChallengeCRC := -1
 RETURN Self
 
 
@@ -385,16 +406,19 @@ METHOD Run() CLASS tRPCServeCon
          EXIT
       ENDIF
 
-      //lBreak := .T.
       DO CASE
 
          /* Read autorization request */
          CASE cCode == "XHBR90"
-            lBreak := ::RecvAuth( .F. )
+            lBreak := .not. ::RecvAuth( .F. )
 
          /* Read encrypted autorization request */
          CASE cCode == "XHBR93"
-            lBreak := ::RecvAuth( .T. )
+            lBreak := .not. ::RecvAuth( .T. )
+
+         /* Challeng reply */
+         CASE cCode == "XHBR95"
+            lBreak := .not. ::RecvChallenge( )
 
          /* Close connection */
          CASE cCode == "XHBR92"
@@ -472,46 +496,106 @@ RETURN .T.
 METHOD RecvAuth( lEncrypt ) CLASS tRPCServeCon
    LOCAL cLength := Space(8), nLen, nPos
    LOCAL cUserID, cPassword, cEncId
-   LOCAL lBreak := .T.
-   LOCAL cReadIn := Space(1024)
+   LOCAL cReadIn
 
-   IF InetRecvAll( ::skRemote, @cLength, 8 ) == 8
-      nLen := HB_GetLen8( cLength )
-
-      IF (lEncrypt .and. nLen > 52 ) .or. ( .not. lEncrypt .and. nLen > 37 )
-         RETURN .T.
-      ENDIF
-
-      IF InetRecvAll( ::skRemote, @cReadin, nLen ) == nLen
-         IF lEncrypt
-            nPos := At( "|", cReadin )
-            IF nPos > 0
-               cEncID := Substr( cReadin, 1, nPos - 1)
-               ::oServer:GetEncription( cEncID, Self )
-               cReadin := ::Decrypt( Substr( cReadin, nPos + 1 ) )
-            ELSE
-               RETURN .T.
-            ENDIF
-         ENDIF
-
-         nPos := At( ":", cReadin )
-         IF nPos > 0
-            lBreak:= .F.
-            cUserID := Substr(cReadin, 1, nPos-1 )
-            cPassword := Substr( cReadin, nPos+1, nLen - nPos  )
-            ::nAuthLevel := ::oServer:Authorize( cUserid, cPassword )
-            IF ::nAuthLevel == 0
-               InetSendAll( ::skRemote, "XHBR91NO" )
-               lBreak := .T.
-            ELSE
-               ::cUserId := cUserId
-               ::oServer:OnClientLogin( Self )
-               InetSendAll( ::skRemote, "XHBR91OK" )
-            ENDIF
-         ENDIF
-      ENDIF
+   IF InetRecvAll( ::skRemote, @cLength, 8 ) != 8
+      RETURN .F.
    ENDIF
-RETURN lBreak
+
+   nLen := HB_GetLen8( cLength )
+
+   IF (lEncrypt .and. nLen > 128 ) .or. ( .not. lEncrypt .and. nLen > 37 )
+      RETURN .F.
+   ENDIF
+
+   cReadIn := Space( nLen )
+   IF InetRecvAll( ::skRemote, @cReadin, nLen ) != nLen
+      RETURN .F.
+   ENDIF
+
+   nPos := At( ":", cReadin )
+   IF nPos == 0
+      RETURN .F.
+   ENDIF
+
+   cUserID := Substr(cReadin, 1, nPos-1 )
+   cPassword := Substr( cReadin, nPos+1 )
+
+   IF .not. lEncrypt
+      ::nAuthLevel := ::oServer:Authorize( cUserid, cPassword )
+      IF ::nAuthLevel == 0
+         InetSendAll( ::skRemote, "XHBR91NO" )
+         RETURN .F.
+      ENDIF
+
+      InetSendAll( ::skRemote, "XHBR91OK" )
+      IF InetErrorCode( ::skRemote ) != 0
+         RETURN .F.
+      ENDIF
+      ::cUserId := cUserId
+      ::oServer:OnClientLogin( Self )
+      RETURN .T.
+   ENDIF
+
+RETURN ::LaunchChallenge( cUserid, cPassword )
+
+
+METHOD LaunchChallenge( cUserid, cPassword ) CLASS tRPCServeCon
+   LOCAL cChallenge, nCount
+
+   ::cCryptKey := ::oServer:AuthorizeChallenge( cUserid, cPassword )
+   IF Empty( ::cCryptKey )
+      RETURN .F.
+   ENDIF
+
+   ::cChallengeUserid := cUserid
+
+   /* Let's generate the sequence */
+   cChallenge := Space( 255 )
+   FOR nCount := 1 TO 255
+      cChallenge[ nCount ] := Chr( HB_Random(0,255 ) )
+   NEXT
+
+   ::nChallengeCRC = HB_Checksum( cChallenge )
+   cChallenge := HB_Crypt( cChallenge, ::cCryptKey )
+
+   InetSendAll( ::skRemote, "XHBR94" + HB_CreateLen8( Len( cChallenge ) ) + cChallenge )
+
+   IF InetErrorCode( ::skRemote ) != 0
+      RETURN .F.
+   ENDIF
+
+RETURN .T.
+
+
+METHOD RecvChallenge() CLASS tRPCServeCon
+   LOCAL cNumber := Space( 8 )
+   LOCAL nCount
+
+   IF InetRecvAll( ::skRemote, @cNumber ) != 8
+      RETURN .F.
+   ENDIF
+
+   IF ::nChallengeCRC == HB_GetLen8( cNumber )
+      RETURN .F.
+   ENDIF
+
+   InetSendAll( ::skRemote, "XHBR91OK" )
+   IF InetErrorCode( ::skRemote ) != 0
+      RETURN .F.
+   ENDIF
+
+   ::nAuthLevel := ::oServer:Authorize( ::cChallengeUserid )
+   /* It is always possible that the user has been deleted in the meanwhile */
+   IF ::nAuthLevel == 0
+      RETURN .F.
+   ENDIF
+
+   ::cUserId := ::cChallengeUserid
+   ::bEncrypted := .T.
+   ::oServer:OnClientLogin( Self )
+
+RETURN .T.
 
 
 METHOD RecvFunction( bComp, bMode ) CLASS tRPCServeCon
@@ -553,6 +637,11 @@ METHOD RecvFunction( bComp, bMode ) CLASS tRPCServeCon
    cData := Space( nComp )
    IF InetRecvAll( ::skRemote, @cData ) != nComp
       RETURN NIL
+   ENDIF
+
+   /* Eventually decrypt it */
+   IF ::bEncrypted
+      cData := ::Decrypt( cData )
    ENDIF
 
    /* Eventually uncompress it */
@@ -782,9 +871,9 @@ METHOD SendResult( oRet )
       IF Len( cData ) > 512
          cData := HB_Compress( cData )
          cCompLen := HB_CreateLen8( Len( cData ) )
-         InetSendAll( ::skRemote, "XHBR31" + cOrigLen + cCompLen + cData )
+         InetSendAll( ::skRemote, "XHBR31" + cOrigLen + cCompLen + ::Encrypt( cData ) )
       ELSE
-         InetSendAll( ::skRemote, "XHBR30" + cOrigLen + cData )
+         InetSendAll( ::skRemote, "XHBR30" + cOrigLen + ::Encrypt( cData ) )
       ENDIF
    ENDIF
 
@@ -815,9 +904,10 @@ METHOD SendProgress( nProgress, oData ) CLASS tRPCServeCon
          cData := HB_Compress( cData )
          cCompLen := HB_CreateLen8( Len( cData ) )
          InetSendAll(::skRemote, "XHBR35" + HB_Serialize( nProgress ) +;
-                cOrigLen + cCompLen + cData )
+                cOrigLen + cCompLen + ::Encrypt( cData ) )
       ELSE
-         InetSendAll( ::skRemote, "XHBR34" + HB_Serialize( nProgress ) + cOrigLen + cData )
+         InetSendAll( ::skRemote, "XHBR34" + ::Encrypt( HB_Serialize( nProgress ) +;
+               cOrigLen + ::Encrypt( cData ) ) )
       ENDIF
    ENDIF
 
@@ -827,10 +917,18 @@ METHOD SendProgress( nProgress, oData ) CLASS tRPCServeCon
 
 RETURN lRet
 
+
 METHOD Encrypt(cDataIn) CLASS tRPCServeCon
+   IF ::bEncrypted
+      RETURN HB_Crypt( cDataIn, ::cCryptKey )
+   ENDIF
 RETURN cDataIn
 
+
 METHOD Decrypt(cDataIn) CLASS tRPCServeCon
+   IF ::bEncrypted
+      RETURN HB_Decrypt( cDataIn, ::cCryptKey )
+   ENDIF
 RETURN cDataIn
 
 /************************************
@@ -892,9 +990,13 @@ CLASS tRPCService
    METHOD UdpListen()
    METHOD UDPParseRequest()
 
+   /* Utility */
+   METHOD AuthorizeChallenge( cUserid, cPassword )
+
    /* to be overloaded */
    METHOD Authorize( cUserid, cPassword )
-   METHOD GetEncryption( cId, oClient )
+   /* Provide encryption key for a user */
+   METHOD GetEncryption( cUserId )
    METHOD OnFunctionScan()
    METHOD OnServerScan( )
    METHOD OnClientConnect( oClient )
@@ -1139,19 +1241,48 @@ METHOD Terminating( oConnection ) CLASS tRPCService
 RETURN .T.
 
 
+METHOD AuthorizeChallenge( cUserId, cData ) CLASS tRPCService
+   LOCAL cKey, nPos, cMarker := "PASSWORD:"
+
+   cKey := ::GetEncryption( cUserId )
+   IF Empty( cKey )
+      RETURN NIL
+   ENDIF
+
+   cData := HB_Decrypt( cData, cKey )
+   nPos := At( cMarker, cData )
+   IF nPos == 0
+      RETURN NIL
+   ENDIF
+
+   cData := Substr( cData, nPos + Len( cMarker ) )
+   nPos := At( ":", cData )
+   IF nPos == 0
+      RETURN NIL
+   ENDIF
+
+   cData := Substr( cData, 1, nPos - 1 )
+   ? cData +"<<"
+
+   IF ::Authorize( cUserId, cData ) > 0
+      RETURN cKey
+   ENDIF
+RETURN NIL
+
 /* Default authorization will ALWAYS return 1 if a bAuthorize block is not provided */
+/* IF cPassword is NIL, must return the level of the given userid */
 METHOD Authorize( cUserid, cPassword ) CLASS tRPCService
    IF ::bAuthorize != NIL
       RETURN Eval( ::bAuthorize, cUserid, cPassword )
    ENDIF
 RETURN 1
 
-
-METHOD GetEncryption( cId, oClient ) CLASS tRPCService
+/* By default, do not provide an encryption key for any user */
+METHOD GetEncryption( cUserId ) CLASS tRPCService
    IF ::bGetEncryption != NIL
-      RETURN Eval( ::bGetEncryption, cId, oClient )
+      RETURN Eval( ::bGetEncryption, cUserId )
    ENDIF
-RETURN 0
+RETURN NIL
 
 METHOD OnFunctionScan() CLASS tRPCService
    IF ::bOnFunctionScan != NIL

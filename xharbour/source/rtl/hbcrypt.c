@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbcrypt.c,v 1.1 2003/02/23 20:13:39 jonnymind Exp $
  */
 
 /*
@@ -327,8 +327,8 @@ void nxs_xorcyclic(
 
    /* Build the cyclic key seed */
    crc1 = adler32( 0, key, keylen - 2 );
-   crc2 = adler32( 0, key + 2 , keylen );
-   crc3 = adler32( 0, key + 1, keylen - 1 );
+   crc2 = adler32( 0, key + 2 , keylen-4 );
+   crc3 = adler32( 0, key + 1, keylen - 2 );
 
    for ( pos = 0, crcpos = 0; pos < cipherlen; pos++ )
    {

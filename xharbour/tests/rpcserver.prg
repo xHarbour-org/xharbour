@@ -1,6 +1,6 @@
 ************************************************************
 * rpcserver.prg
-* $Id: rpcserver.prg,v 1.2 2003/02/16 14:06:21 jonnymind Exp $
+* $Id: rpcserver.prg,v 1.3 2003/02/19 20:20:33 jonnymind Exp $
 * Test for tRpcServer and tRpcFunction class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -36,12 +36,14 @@ PROCEDURE Main()
    oSv:bOnClientLogin := {|x| Entering( x ) }
    oSv:bOnClientLogout := {|x| Exiting( x ) }
    oSv:bOnClientTerminate := {|x| Terminating( x ) }
+   oSv:bGetEncryption := {|x| HaveEncryptionKey( x ) }
 
    // server is starting
    oSv:Start( .T. )
    @3,10 SAY "Waiting for connection"
    @4,10 SAY "Press any key to stop"
-   Inkey(0) // we have nothing more to do here.
+   //Inkey(0) // we have nothing more to do here.
+   ThreadSleep( 60000 )
    oSv:Stop()
 RETURN
 
@@ -98,5 +100,12 @@ PROCEDURE Exiting( oClient )
 RETURN .T.
 
 PROCEDURE Terminating( oClient )
-   @13, 10 say "Client " + oClient:cUserID  + " has terminated operations         "
+   IF .not. Empty( oClient:cUserID )
+      @13, 10 say "Client " + oClient:cUserID  + " has terminated operations         "
+   ELSE
+      @13, 10 say "A client failed authentication                              "
+   ENDIF
 RETURN .T.
+
+PROCEDURE HaveEncryptionKey( cUserId )
+RETURN "A nice key to be used by servers"
