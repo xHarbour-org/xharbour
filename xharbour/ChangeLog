@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.511 2002/12/04 23:06:14 likewolf Exp $
+ * $Id: ChangeLog,v 1.512 2002/12/05 01:19:09 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-05 17:50 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+
+  * now tbrowse support:
+
+    * support nTop,nLeft,nRigth,nBottom increase/decrease dynamically
+      with automatic adjustment of the width of the columns.
+
+    + add support for Border with dynamic change.
+    * add support for change dynamic in ColorSpec.
+
+    * Automatic adjust of header/footer if there is not place to show one
+      line at least.
+
+    + Generate TBROWSE error for incorrect coordinates.
+
+    * Complete support for dynamic add, del, insert and change (set)
+      column with automatic adjustment of the width of the columns.
+
+    * Complete support for dynamic change of freeze columns.
+
+    * Change in code for increase of speed, written mostly by Pritpal Bedi
+
+  all these changes were made, tested, criticized and mutually corrected
+  by Pritpal Bedi and Walter Negro.
 
 2002-12-04 17:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/binnum.c
