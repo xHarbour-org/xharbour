@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3685 2004/12/19 11:33:51 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3686 2004/12/19 19:47:45 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-20 10:32 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/gtos2/gtos2.c
+     ! inside dispend() decrease dispbegin() count only if it has not
+       already reached zero.
 
 2004-12-19 11:45 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * hrbdll.bc

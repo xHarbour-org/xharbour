@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.21 2004/11/02 14:40:04 mauriliolongo Exp $
+ * $Id: gtos2.c,v 1.22 2004/11/25 05:11:58 guerra000 Exp $
  */
 
 /*
@@ -924,7 +924,11 @@ void HB_GT_FUNC(gt_DispEnd( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispEnd()"));
 
-   if (--s_uiDispCount == 1) {
+   if ( s_uiDispCount > 1 ) {
+        --s_uiDispCount;
+   }
+
+   if (s_uiDispCount == 1) {
       refresh_buffer( 0, 0, s_usLVBlength );
    }
 }
@@ -1328,7 +1332,7 @@ void HB_GT_FUNC( gt_ProcessMessages( void ) )
 {
    return;
 }
-   
+
 /* *********************************************************************** */
 
 void HB_GT_FUNC( gt_SetDispCP( char *pszTermCDP, char *pszHostCDP, BOOL bBox ) )
