@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.34 2003/03/12 13:31:23 jonnymind Exp $
+* $Id: thread.h,v 1.35 2003/03/13 02:43:13 jonnymind Exp $
 */
 
 /*
@@ -183,6 +183,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
          pthread_mutexattr_destroy( &attr );\
       }
    
+   #define HB_MUTEX_T                  pthread_mutex_t
    #define HB_CRITICAL_DESTROY( x )    pthread_mutex_destroy( &(x) )
    #define HB_CRITICAL_LOCK( x )       pthread_mutex_lock( &(x) )
    #define HB_CRITICAL_UNLOCK( x )     pthread_mutex_unlock( &(x) )
