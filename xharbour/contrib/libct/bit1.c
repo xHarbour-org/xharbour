@@ -1,5 +1,5 @@
 /*
- * $Id: bit1.c,v 1.1 2003/03/04 21:04:03 lculik Exp $
+ * $Id: bit1.c,v 1.2 2003/09/08 12:56:52 druzus Exp $
  */
 
 /*
@@ -56,16 +56,16 @@
  */
 
 
+#include "hbapi.h"
 #include "ct.h"
-#include "clipdefs.h"
 
-static WORD __hex2int( char *cNum1, int iLenHex );
-static WORD __getparam( int iParam );
-static WORD __numand( WORD wNum1, WORD wNum2 );
-static WORD __numor ( WORD wNum1, WORD wNum2 );
-static WORD __numxor( WORD wNum1, WORD wNum2 );
-static WORD __numnot( WORD wNum1, WORD wNum2 );
-static long __numfun( int iPCount, WORD (*operation)(WORD wNum1, WORD wNum2));
+static USHORT __hex2int( char *cNum1, int iLenHex );
+static USHORT __getparam( int iParam );
+static USHORT __numand( USHORT wNum1, USHORT wNum2 );
+static USHORT __numor ( USHORT wNum1, USHORT wNum2 );
+static USHORT __numxor( USHORT wNum1, USHORT wNum2 );
+static USHORT __numnot( USHORT wNum1, USHORT wNum2 );
+static long __numfun( int iPCount, USHORT (*operation)(USHORT wNum1, USHORT wNum2));
 
 
 /*  $DOC$
@@ -103,7 +103,7 @@ HB_FUNC( NUMAND )
 
   iPCount = hb_pcount();
 
-  hb_retnl( __numfun( iPCount, (WORD (*)(WORD wNum1, WORD wNum2))(__numand) ) );
+  hb_retnl( __numfun( iPCount, (USHORT (*)(USHORT wNum1, USHORT wNum2))(__numand) ) );
 }
 
 
@@ -142,7 +142,7 @@ HB_FUNC( NUMOR )
 
   iPCount = hb_pcount();
 
-  hb_retnl( __numfun( iPCount, (WORD (*)(WORD wNum1, WORD wNum2))(__numor) ) );
+  hb_retnl( __numfun( iPCount, (USHORT (*)(USHORT wNum1, USHORT wNum2))(__numor) ) );
 }
 
 
@@ -182,7 +182,7 @@ HB_FUNC( NUMXOR )
 
   iPCount = 2;
 
-  hb_retnl( __numfun( iPCount, (WORD (*)(WORD wNum1, WORD wNum2))(__numxor) ) );
+  hb_retnl( __numfun( iPCount, (USHORT (*)(USHORT wNum1, USHORT wNum2))(__numxor) ) );
 }
 
 
@@ -222,7 +222,7 @@ HB_FUNC( NUMNOT )
 
   iPCount = 1;
 
-  hb_retnl( __numfun( iPCount, (WORD (*)(WORD wNum1, WORD wNum2))(__numnot) ) );
+  hb_retnl( __numfun( iPCount, (USHORT (*)(USHORT wNum1, USHORT wNum2))(__numnot) ) );
 }
 
 
@@ -381,11 +381,11 @@ HB_FUNC ( HEX2NUM )
 }
 */
 
-static WORD __hex2int( char *cNum1, int iLenHex )
+static USHORT __hex2int( char *cNum1, int iLenHex )
 {
   int  i;
   int  iNum;
-  WORD uiHexNum = 0;
+  USHORT uiHexNum = 0;
 
 
   i = ( iLenHex - 1 );
@@ -399,53 +399,53 @@ static WORD __hex2int( char *cNum1, int iLenHex )
      if ((iNum < 0) || (iNum > 0x0F))
        break;
      
-     uiHexNum += (WORD) iNum * (1 << (4 * ( iLenHex - i - 1 )));
+     uiHexNum += (USHORT) iNum * (1 << (4 * ( iLenHex - i - 1 )));
      i--;
   }
   return uiHexNum;
 }
 
 
-static WORD __getparam( int iParam )
+static USHORT __getparam( int iParam )
 {
 
   if ( ISCHAR( iParam ) )
      return  __hex2int( hb_parc( iParam ), hb_parclen( iParam ) );
   else
-     return (WORD) hb_parnl( iParam );
+     return (USHORT) hb_parnl( iParam );
 
 }
 
 
-static WORD __numand( WORD uiNum1, WORD uiNum2 )
+static USHORT __numand( USHORT uiNum1, USHORT uiNum2 )
 {
     return uiNum1 & uiNum2;
 }
 
 
-static WORD __numor( WORD uiNum1, WORD uiNum2 )
+static USHORT __numor( USHORT uiNum1, USHORT uiNum2 )
 {
     return uiNum1 | uiNum2;
 }
 
 
-static WORD __numxor( WORD uiNum1, WORD uiNum2 )
+static USHORT __numxor( USHORT uiNum1, USHORT uiNum2 )
 {
     return uiNum1 ^ uiNum2;
 }
 
 
-static WORD __numnot( WORD uiNum1, WORD uiNum2 )
+static USHORT __numnot( USHORT uiNum1, USHORT uiNum2 )
 {
     HB_SYMBOL_UNUSED (uiNum2);
     return ~uiNum1;
 }
 
 
-static long __numfun( int iPCount, WORD (*operation)(WORD wNum1, WORD wNum2))
+static long __numfun( int iPCount, USHORT (*operation)(USHORT wNum1, USHORT wNum2))
 {
-  WORD uiNumOp = 0;
-  WORD uiNum1, uiNum2;
+  USHORT uiNumOp = 0;
+  USHORT uiNum1, uiNum2;
   int  iFor;
 
   if ( ISNUM(1) || ISCHAR(1) )

@@ -1,5 +1,5 @@
 /*
- * $Id: bit3.c,v 1.1 2003/03/04 21:04:04 lculik Exp $
+ * $Id: bit3.c,v 1.2 2003/09/08 12:56:52 druzus Exp $
  */
 
 /*
@@ -56,8 +56,12 @@
  */
 
 
+#include "hbapi.h"
 #include "ct.h"
-#include "clipdefs.h"
+
+typedef BOOL * BOOLP;
+typedef LONG * LONGP;
+typedef USHORT * USHORTP;
 
 static long __hex2long( char *cNum1, int iLenHex );
 static long __getparam( int iParam );
