@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3385 2004/08/31 22:46:53 druzus Exp $
+ * $Id: ChangeLog,v 1.3385 2004/09/01 02:01:18 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-01 11:11 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/memoedit.prg
+     ! fixed handling of SetKey() block, wrong parameters were passed to
+       key codeblock. From a message on xharbour newsgroup.
 
 2004-08-31 22:47 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
    * Changelog,v 1.3385
@@ -42,7 +47,7 @@
     Commented out IsClipBoardFormatAvailable() because of a peculiar
     problem where if some other application copied some bitmap on
     the clipboard, xharbour application then ceased all clipboard
-    operations. The only way to come out of this situation was to 
+    operations. The only way to come out of this situation was to
     copy some text on the clipboard by some other application.
     Thanks Gale for pointing out this anomaly.
 
