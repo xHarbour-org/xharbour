@@ -1,7 +1,6 @@
 /*
- * $Id: console.c,v 1.29 2003/05/16 19:52:07 druzus Exp $
+ * $Id: console.c,v 1.30 2003/07/23 22:09:30 druzus Exp $
  */
-
 /*
  * Harbour Project source code:
  * The Console API
@@ -302,9 +301,9 @@ void hb_conOutErr( char * pStr, ULONG ulLen )
 
 /* Output an item to the screen and/or printer and/or alternate */
 void hb_conOutAlt( char * pStr, ULONG ulLen )
-{   
+{
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutAlt(%s, %lu)", pStr, ulLen));
-   
+
    if( hb_set.HB_SET_CONSOLE )
    {
       hb_gtWriteCon( ( BYTE * ) pStr, ulLen );
@@ -326,22 +325,10 @@ void hb_conOutAlt( char * pStr, ULONG ulLen )
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }
 
-   if( ( hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR ) ||
-       ( hb_set.HB_SET_PRINTER &&  hb_set.hb_set_winhan != FS_ERROR ) )
-   {
+   if( ( hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR )) {
       /* Print to printer if SET PRINTER ON and valid printer file */
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      if (!hb_set.hb_set_winprinter)
-      {
-          hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
-      }
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
-      else
-      {
-          WriteStringtoPrint(pStr);
-      }
-#endif
-
+      hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
       s_uiPCol += ( USHORT ) ulLen;
    }
@@ -349,25 +336,13 @@ void hb_conOutAlt( char * pStr, ULONG ulLen )
 
 /* Output an item to the screen and/or printer */
 static void hb_conOutDev( char * pStr, ULONG ulLen )
-{   
+{
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutDev(%s, %lu)", pStr, ulLen));
 
-   if( (hb_set.hb_set_printhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 ) ||
-       ( hb_set.hb_set_winhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 ) )
-   {
+   if( (hb_set.hb_set_printhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 ) ) {
       /* Display to printer if SET DEVICE TO PRINTER and valid printer file */
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      if (!hb_set.hb_set_winprinter)
-      {
-          hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
-      }
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
-      else
-      {
-          WriteStringtoPrint(pStr);
-      }
-#endif
-
+      hb_fsWriteLarge( hb_set.hb_set_printhan, ( BYTE * ) pStr, ulLen );
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
       s_uiPCol += ( USHORT ) ulLen;
    }
@@ -381,50 +356,50 @@ static void hb_conOutDev( char * pStr, ULONG ulLen )
 HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
 {
    HB_THREAD_STUB
-   
+
    USHORT uiPCount = hb_pcount();
    USHORT uiParam;
 
    HB_CONSOLE_SAFE_LOCK
-      
+
    for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
    {
       hb_conOut( uiParam, hb_conOutStd );
       if( uiParam < uiPCount )
          hb_conOutStd( " ", 1 );
    }
-   
+
    HB_CONSOLE_SAFE_UNLOCK
 }
 
 HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
 {
    HB_THREAD_STUB
-   
+
    USHORT uiPCount = hb_pcount();
    USHORT uiParam;
 
    HB_CONSOLE_SAFE_LOCK
-   
+
    for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
    {
       hb_conOut( uiParam, hb_conOutErr );
       if( uiParam < uiPCount )
          hb_conOutErr( " ", 1 );
    }
-   
+
    HB_CONSOLE_SAFE_UNLOCK
 }
 
 HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or printer) and is affected by SET ALTERNATE */
 {
    HB_THREAD_STUB
-   
+
    USHORT uiPCount = hb_pcount();
    USHORT uiParam;
 
    HB_CONSOLE_SAFE_LOCK
-   
+
    for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
    {
       hb_conOut( uiParam, hb_conOutAlt );
@@ -433,61 +408,44 @@ HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or pri
          hb_conOutAlt( " ", 1 );
       }
    }
-   
+
    HB_CONSOLE_SAFE_UNLOCK
 }
 
 HB_FUNC( QOUT )
 {
    HB_THREAD_STUB
-      
+
    hb_conOutAlt( s_szCrLf, CRLF_BUFFER_LEN - 1 );
 
    HB_CONSOLE_SAFE_LOCK
-   
-   if( (hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR ) ||
-   (hb_set.HB_SET_PRINTER && hb_set.hb_set_winhan != FS_ERROR ))
-   {
+
+   if( (hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR )) {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       USHORT uiCount;
 
       s_uiPRow++;
 
       uiCount = s_uiPCol = hb_set.HB_SET_MARGIN;
-      if (!hb_set.hb_set_winprinter)
-          while( uiCount-- > 0 )
-             hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
-      else
-          while( uiCount-- > 0 )
-            WriteStringtoPrint(" ");
-#endif
-
-
+      while( uiCount-- > 0 )
+        hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }
-   
+
    HB_CONSOLE_SAFE_UNLOCK
-   
+
    HB_FUNCNAME( QQOUT )();
 }
 
 HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
 {
    HB_THREAD_STUB
-   
+
    HB_CONSOLE_SAFE_LOCK
-   
-   if( (hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_printhan != FS_ERROR ) ||
-       (hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_winhan != FS_ERROR ))
-   {
+
+   if( (hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_printhan != FS_ERROR )) {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      if (!hb_set.hb_set_winprinter)
-          hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
-      else
-          WinPrinterEject();
-#endif
+      hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }
 
@@ -511,50 +469,27 @@ HB_FUNC( PCOL ) /* Returns the current printer row position */
 static void hb_conDevPos( SHORT iRow, SHORT iCol )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_conDevPos(%hd, %hd)", iRow, iCol));
 
    /* Position printer if SET DEVICE TO PRINTER and valid printer file
       otherwise position console */
-   
+
    HB_CONSOLE_SAFE_LOCK
 
-   if( (hb_set.hb_set_printhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 ) ||
-       (hb_set.hb_set_winhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 ))
-   {
+   if( (hb_set.hb_set_printhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 )){
       USHORT uiCount;
       USHORT uiProw = ( USHORT ) iRow;
       USHORT uiPcol = ( USHORT ) iCol;
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
 
-      if( uiProw < s_uiPRow )
-      {
-         if (!hb_set.hb_set_winprinter)
-         {
-            hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
-         }
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
-         else
-         {
-            WriteStringtoPrint("\x0C\x0D");
-         }
-#endif
+      if( uiProw < s_uiPRow ) {
+         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
          s_uiPRow = s_uiPCol = 0;
       }
 
-      for( uiCount = s_uiPRow; uiCount < uiProw; uiCount++ )
-      {
-         if (!hb_set.hb_set_winprinter)
-         {
-            hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
-         }
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
-         else
-         {
-            WriteStringtoPrint(s_szCrLf);
-         }
-#endif
-      }
+      for( uiCount = s_uiPRow; uiCount < uiProw; uiCount++ ) {
+        hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
 
       if( uiProw > s_uiPRow )
       {
@@ -563,34 +498,13 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
 
       uiPcol += hb_set.HB_SET_MARGIN;
 
-      if( ( uiProw == s_uiPRow ) && ( uiPcol < s_uiPCol ) )
-      {
-         if (!hb_set.hb_set_winprinter)
-         {
-            hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D", 1 );
-            s_uiPCol = 0;
-         }
-         #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
-         else
-         {
-            WriteStringtoPrint("\x0D");
-            s_uiPCol = 0;
-         }
-      #endif
+      if( ( uiProw == s_uiPRow ) && ( uiPcol < s_uiPCol ) ) {
+        hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D", 1 );
+        s_uiPCol = 0;
       }
 
       for( uiCount = s_uiPCol; uiCount < uiPcol; uiCount++ )
-      {
-         if (!hb_set.hb_set_winprinter)
-         {
-            hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
-         }
-#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
-         else
-         {
-            WriteStringtoPrint(" ");
-         }
-#endif
+        hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
       }
 
       s_uiPRow = uiProw;
@@ -602,7 +516,7 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
    {
       hb_gtSetPos( iRow, iCol );
    }
-   
+
    HB_CONSOLE_SAFE_UNLOCK
 }
 
@@ -619,7 +533,7 @@ HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
 HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
 {
    HB_THREAD_STUB
-   
+
    HB_CONSOLE_SAFE_LOCK
    if( ISNUM( 1 ) && ISNUM( 2 ) )
    {
@@ -632,9 +546,9 @@ HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
 HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or printer), but is not affected by SET ALTERNATE */
 {
    HB_THREAD_STUB
-   
+
    HB_CONSOLE_SAFE_LOCK
-   
+
    if( ISNUM( 3 ) && ISNUM( 4 ) )
    {
       hb_conDevPos( hb_parni( 3 ), hb_parni( 4 ) );
@@ -661,13 +575,13 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
 HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected by SET ALTERNATE */
 {
    HB_THREAD_STUB
-   
+
    char * pszString = NULL;
    ULONG ulLen;
    BOOL bFreeReq = FALSE;
 
    HB_CONSOLE_SAFE_LOCK
-   
+
    if( ISCHAR( 2 ) )
    {
       char szOldColor[ CLR_STRLEN ];
@@ -684,12 +598,12 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
    else if( hb_pcount() >= 1 )
    {
       pszString = hb_itemString( hb_param( 1, HB_IT_ANY ), &ulLen, &bFreeReq );
-   
+
       hb_gtWrite( ( BYTE * ) pszString, ulLen );
-   
+
    }
    HB_CONSOLE_SAFE_UNLOCK
-   
+
    if( bFreeReq )
    {
       hb_xfree( pszString );
@@ -704,13 +618,13 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
 HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position, but is not affected by SET ALTERNATE */
 {
    HB_THREAD_STUB
-   
+
    char * pszString = NULL;
    ULONG ulLen;
    BOOL bFreeReq = FALSE;
 
    HB_CONSOLE_SAFE_LOCK
-   
+
    if( ISCHAR( 4 ) )
    {
       char szOldColor[ CLR_STRLEN ];
@@ -729,11 +643,11 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
       pszString = hb_itemString( hb_param( 3, HB_IT_ANY ), &ulLen, &bFreeReq );
 
       hb_gtWriteAt( hb_parni( 1 ), hb_parni( 2 ), ( BYTE * ) pszString, ulLen );
-   
+
    }
-   
+
    HB_CONSOLE_SAFE_UNLOCK
-   
+
    if( bFreeReq )
    {
       hb_xfree( pszString );
@@ -741,7 +655,7 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
 
 }
 
-/* JC1: WARNING: This must not be used if thread is subject to async cancellation 
+/* JC1: WARNING: This must not be used if thread is subject to async cancellation
 * Well... they should not be used at all.*/
 
 HB_FUNC( HBCONSOLELOCK )

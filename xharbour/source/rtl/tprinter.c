@@ -55,157 +55,63 @@
 #define HB_OS_WIN_32_USED
 #include "hbapi.h"
 
-static LPTSTR MyDeviceName;
-static LPTSTR MyJobName = "RawPrint";
-
-static BOOL IsOpenDevice = FALSE;
-static BOOL IsOpenPage = FALSE;
-
-BOOL THarbourPrinter_OpenDevice( void );
-BOOL THarbourPrinter_CloseDevice( void );
-BOOL THarbourPrinter_WriteString(LPCSTR Text);
-BOOL THarbourPrinter_NewPage( void );
-void THarbourPrinter_SetDevice(LPTSTR szDevice);
-void THarbourPrinter_SetJobName(LPTSTR szJobName);
 BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
 BOOL hb_GetPrinterNameByPort(LPTSTR pPrinterName, LPDWORD pdwBufferSize,LPTSTR pPortName);
-HANDLE THarbourPrinter_hPrinter( void );
-
-static HANDLE hPrinter;
-
-HANDLE THarbourPrinter_hPrinter( void )
-{
-    return hPrinter;
-}
-
-void THarbourPrinter_SetDevice( LPTSTR szDevice )
-{
-   MyDeviceName = szDevice;
-   IsOpenDevice = FALSE;
-}
-
-void THarbourPrinter_SetJobName( LPTSTR szJobName )
-{
-   MyJobName = szJobName;
-}
-
-BOOL THarbourPrinter_OpenDevice(  void )
-{
-   DOC_INFO_1 doc_info = { 0 };
-   BOOL Result = TRUE;
-
-   if( ! OpenPrinter( MyDeviceName , &hPrinter , NULL ) )
-   {
-      Result = FALSE;
-   }
-   else
-   {
-      doc_info.pDocName = MyJobName;
-      doc_info.pOutputFile = NULL;
-      doc_info.pDatatype = "RAW";
-
-      if ( !StartDocPrinter( hPrinter ,1 , ( LPBYTE ) &doc_info ) )
-      {
-         ClosePrinter( hPrinter );
-         Result = FALSE;
-      }
-      else
-      {
-         IsOpenDevice = TRUE;
-         THarbourPrinter_NewPage();
-      }
-   }
-
-   return Result;
-}
-
-BOOL THarbourPrinter_CloseDevice()
-{
-    BOOL Result ;
-
-    if ( IsOpenDevice )
-    {
-        if ( IsOpenPage )
-        {
-            if ( EndPagePrinter( hPrinter ) )
-            {
-               THarbourPrinter_WriteString( " " );
-            }
-        }
-    }
-
-    if ( ! EndDocPrinter( hPrinter ) )
-    {
-        Result = FALSE;
-    }
-    else
-    {
-        if ( ! ClosePrinter( hPrinter ) )
-        {
-            Result = FALSE;
-        }
-        else
-        {
-            Result = TRUE;
-            IsOpenDevice = FALSE;
-        }
-    }
-
-    return Result;
-}
-
-BOOL THarbourPrinter_WriteString( LPCSTR Text )
-{
-    DWORD WrittenChars;
-    DWORD dwNumByte;
-    BOOL  Result = FALSE;
-
-    if( IsOpenDevice )
-    {
-        dwNumByte = lstrlen( ( LPCTSTR ) Text );
-        Result = TRUE;
-
-        if( ! WritePrinter( hPrinter, ( void* )  Text , dwNumByte , &WrittenChars ) )
-        {
-            Result = FALSE;
-        }
-    }
-
-    return Result;
-}
-
-BOOL THarbourPrinter_NewPage()
-{
-   BOOL Result;
-
-   if( IsOpenDevice )
-   {
-      if ( IsOpenPage )
-      {
-         if ( EndPagePrinter( hPrinter ) )
-         {
-            THarbourPrinter_WriteString( "\f\n" ) ;
-         }
-      }
-   }
-
-   if ( !StartPagePrinter( hPrinter ) )
-   {
-      Result = FALSE;
-   }
-   else
-   {
-      IsOpenPage = TRUE;
-      Result=TRUE;
-   }
-
-   return Result;
-}
 
 #define MAXBUFFERSIZE 255
 
-BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
-{
+static BOOL isWinNt(void) {
+  OSVERSIONINFO osvi ;
+  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+  GetVersionEx (&osvi);
+  return(osvi.dwPlatformId == VER_PLATFORM_WIN32_NT); // && osvi.dwMajorVersion >= 4);
+}
+
+BOOL hb_PrinterExists(LPTSTR pPrinterName) {
+  BOOL Result = FALSE ;
+  DWORD Flags = PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS;
+  PRINTER_INFO_4 *buffer4, *pPrinterEnum4;
+  HANDLE hPrinter ;
+  unsigned long needed = 0 , returned=0, a;
+  HB_TRACE(HB_TR_DEBUG, ("hb_PrinterExists(%s)", pPrinterName));
+  if (!strchr( pPrinterName, OS_PATH_LIST_SEPARATOR ) &&
+     (hb_strnicmp(pPrinterName,"lpt1",4)!=0) &&
+     (hb_strnicmp(pPrinterName,"lpt2",4)!=0) &&
+     (hb_strnicmp(pPrinterName,"lpt3",4)!=0) &&
+     (hb_strnicmp(pPrinterName,"lpt4",4)!=0) &&
+     (hb_strnicmp(pPrinterName,"lpt5",4)!=0) &&
+     (hb_strnicmp(pPrinterName,"lpt6",4)!=0) &&
+     (hb_strnicmp(pPrinterName,"com1",4)!=0) &&
+     (hb_strnicmp(pPrinterName,"com2",4)!=0) &&
+     (hb_strnicmp(pPrinterName,"com3",4)!=0) &&
+     (hb_strnicmp(pPrinterName,"com4",4)!=0) &&
+     (hb_strnicmp(pPrinterName,"con",3)!=0)) {  // Don't bother with test if '\' in string
+    if (isWinNt()) {  // Use EnumPrinter() here because much faster than OpenPrinter()
+      EnumPrinters(Flags,NULL,4,(LPBYTE) NULL,0,&needed,&returned) ;
+      if (needed > 0) {
+        pPrinterEnum4 = buffer4 = ( PRINTER_INFO_4 * ) hb_xgrab( needed ) ;
+        if (EnumPrinters(Flags,NULL,4,(LPBYTE)  pPrinterEnum4,needed,&needed,&returned))
+          for ( a = 0 ; !Result && a < returned ; a++, pPrinterEnum4++)
+            Result= (strcmp((const char *) pPrinterName, (const char *) pPrinterEnum4->pPrinterName)==0) ;
+        hb_xfree(buffer4) ;
+      }
+    }
+    else if ( OpenPrinter( (char *) pPrinterName, &hPrinter, NULL)) {
+        ClosePrinter(hPrinter);
+        Result = TRUE ;
+    }
+  }
+  return Result ;
+}
+
+HB_FUNC( PRINTEREXISTS ) {
+  BOOL Result = FALSE ;
+  if ISCHAR(1)
+    Result = hb_PrinterExists(hb_parc(1)) ;
+  hb_retl(Result) ;
+}
+
+BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize ) {
    BOOL Result= FALSE ;
    TCHAR cBuffer[ MAXBUFFERSIZE ];
    DWORD nSize ;
@@ -242,7 +148,7 @@ BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize,LPTSTR 
   unsigned long needed, returned, a;
   PRINTER_INFO_5 *pPrinterEnum,*buffer;
 
-  HB_TRACE(HB_TR_DEBUG, "hb_GetPrinterNameByPort()");
+  HB_TRACE(HB_TR_DEBUG, ("hb_GetPrinterNameByPort(%s,%s)",pPrinterName, pPortName));
 
   EnumPrinters( PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS ,NULL,5,( LPBYTE ) NULL, 0, &needed,&returned ) ;
   if (needed>0) {
@@ -325,12 +231,6 @@ HB_FUNC( PRINTFILERAW )  {
   }
   hb_retnl(Result) ;
 }
-static BOOL isWinNt(void) {
-  OSVERSIONINFO osvi ;
-  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-  GetVersionEx (&osvi);
-  return(osvi.dwPlatformId == VER_PLATFORM_WIN32_NT); // && osvi.dwMajorVersion >= 4);
-}
 
 HB_FUNC(GETPRINTERS) {
   HANDLE hPrinter ;
@@ -344,7 +244,7 @@ HB_FUNC(GETPRINTERS) {
   PHB_ITEM pArrayPrinter = hb_itemArrayNew( 0 );
 
   buffer = NULL ;
-  HB_TRACE(HB_TR_DEBUG, "GETPRINTERS()");
+  HB_TRACE(HB_TR_DEBUG, ("GETPRINTERS()"));
 
   if (ISLOG(1))
     bPrinterNamesOnly = !hb_parl(1) ;
