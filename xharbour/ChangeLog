@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3872 2005/02/26 02:11:14 andijahja Exp $
+ * $Id: ChangeLog,v 1.3873 2005/02/26 09:43:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-02-26 20:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/common/hbver.c
+  * source/pp/ppcore.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/vm/arrayshb.c
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+  * source/rdd/dbf1.c
+    * change the following single-liner constructs:
+      for (...);    -> for (...) {}
+      while (...);  -> while (...) {}
 
 2005-02-26 01:42 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/simplex.c
