@@ -1,5 +1,5 @@
 /*
- * $Id: maindll.c,v 1.6 2005/02/26 02:12:22 andijahja Exp $
+ * $Id: maindll.c,v 1.7 2005/02/26 20:42:01 andijahja Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbapiitm.h"
 
 #if defined(HB_OS_WIN_32)
-#if defined(__DMC__) || defined(__POCC__)
+#if defined(HB_DLL_REQUIRED_DLLMAIN)
 BOOL HB_EXPORT WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ("DllMain(%p, %p, %d)", hInstance, fdwReason,

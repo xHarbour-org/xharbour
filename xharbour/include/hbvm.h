@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.22 2004/05/17 01:51:04 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.23 2004/11/21 21:43:39 druzus Exp $
  */
 
 /*
@@ -122,6 +122,12 @@ HB_EXPORT extern void hb_vmProcessSymbols( PHB_SYMB pSymbols, ... );
 HB_EXPORT extern void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 );
 HB_EXPORT extern PSYMBOLS * hb_vmSymbols( void );
 HB_EXPORT extern void hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols );
+
+#if ( defined(__DMC__) || defined(__POCC__) )
+   #if !defined(HB_DLL_REQUIRED_DLLMAIN)
+      #define HB_DLL_REQUIRED_DLLMAIN
+   #endif
+#endif
 
 HB_EXTERN_END
 
