@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.22 2004/07/06 04:35:16 marcosgambeta Exp $
+ * $Id: _winsys.c,v 1.23 2004/07/14 11:21:05 vouchcac Exp $
  */
 
 //-------------------------------------------------------------------//
@@ -453,54 +453,38 @@ HB_FUNC( SETERRORMODE )
 
 //-------------------------------------------------------------------//
 
-HB_FUNC( OEMTOANSI )
-{
-   int iLen = strlen( hb_parcx( 1 ) );
-   char * buffer = ( char* ) hb_xgrab( iLen + 1 );
-
-   OemToChar( hb_parcx( 1 ), buffer );
-   hb_retc( buffer );
-
-   hb_xfree( buffer );
-}
-
-//-------------------------------------------------------------------//
-
-HB_FUNC( ANSITOOEM )
-{
-   int iLen = strlen( hb_parcx( 1 ) );
-   char * buffer = ( char* ) hb_xgrab( iLen + 1 );
-
-   CharToOem( hb_parcx( 1 ), buffer );
-   hb_retc( buffer );
-
-   hb_xfree( buffer );
-}
-
-//-------------------------------------------------------------------//
-
 HB_FUNC( OEMTOCHAR )
 {
-   int iLen = strlen( hb_parcx( 1 ) );
+   int iLen = hb_parclen( 1 );
    char * buffer = ( char* ) hb_xgrab( iLen + 1 );
 
-   OemToChar( hb_parcx( 1 ), buffer );
-   hb_retc( buffer );
-
-   hb_xfree( buffer );
+   OemToCharBuff( hb_parcx( 1 ), buffer, iLen );
+   hb_retclenAdopt( buffer, iLen );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( CHARTOOEM )
 {
-   int iLen = strlen( hb_parcx( 1 ) );
+   int iLen = hb_parclen( 1 );
    char * buffer = ( char* ) hb_xgrab( iLen + 1 );
 
-   CharToOem( hb_parcx( 1 ), buffer );
-   hb_retc( buffer );
+   CharToOemBuff( hb_parcx( 1 ), buffer, iLen );
+   hb_retclenAdopt( buffer, iLen );
+}
 
-   hb_xfree( buffer );
+//-------------------------------------------------------------------//
+
+HB_FUNC( OEMTOANSI )
+{
+HB_FUNCNAME( OEMTOCHAR )();
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( ANSITOOEM )
+{
+HB_FUNCNAME( CHARTOOEM )();
 }
 
 //-------------------------------------------------------------------//

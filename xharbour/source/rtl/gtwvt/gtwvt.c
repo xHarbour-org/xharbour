@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.111 2004/06/12 18:55:08 bdj Exp $
+ * $Id: gtwvt.c,v 1.112 2004/06/17 22:14:39 ronpinkas Exp $
  */
 
 /*
@@ -1756,7 +1756,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       if ( _s.pBuffer != NULL && _s.pAttributes != NULL )
       {
         // need to account for truncation in conversion
-        // i.e. redraw any 'cell' partially covered...
+         // i.e. redraw any 'cell' partially covered...
         rcRect   = hb_wvt_gtGetColRowFromXYRect( updateRect );
 
         _s.rowStart = max( 0      , rcRect.top-1    );
@@ -1764,6 +1764,12 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         _s.colStart = max( 0      , rcRect.left -1  );
         _s.colStop  = min( _s.COLS, rcRect.right+1  );
 
+/*
+        _s.rowStart = max( 0      , rcRect.top      );
+        _s.rowStop  = min( _s.ROWS, rcRect.bottom   );
+        _s.colStart = max( 0      , rcRect.left     );
+        _s.colStop  = min( _s.COLS, rcRect.right    );
+*/
         for ( irow = _s.rowStart; irow < _s.rowStop; irow++ )
         {
           USHORT icol, index, startIndex, startCol, len;
@@ -1803,6 +1809,9 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           hb_wvt_gtSetColors( hdc, oldAttrib );
           hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer+startIndex, len );
         }
+        //  Update for real values for Wvt_GetPaintRect()
+//        _s.rowStop  -= 1;
+//        _s.colStop  -= 1;
       }
 
       if ( hb_gt_gobjects != NULL )
@@ -2699,7 +2708,8 @@ static void hb_wvt_gtSetInvalidRect( USHORT left, USHORT top, USHORT right, USHO
       _s.RectInvalid.top    = min( _s.RectInvalid.top   , rect.top    );
       _s.RectInvalid.right  = max( _s.RectInvalid.right , rect.right  );
       _s.RectInvalid.bottom = max( _s.RectInvalid.bottom, rect.bottom );
-    }
+   }
+
     hv_wvt_gtDoInvalidateRect() ;
   }
 }
@@ -2925,7 +2935,6 @@ static void hb_wvt_gtSetStringInTextBuffer( USHORT col, USHORT row, BYTE attr, B
 {
   POINT end;
   USHORT index;
-
 
   // determine the index and put the string into the TextBuffer
   //

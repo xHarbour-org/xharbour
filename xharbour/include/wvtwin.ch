@@ -145,6 +145,7 @@
 #define DLG_OBJ_SCROLLBAR            15
 #define DLG_OBJ_BANNER               16
 #define DLG_OBJ_TEXTBOX              17
+#define DLG_OBJ_PROGRESSBAR          18
 
 //-------------------------------------------------------------------//
 

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtclass.prg,v 1.0 2004/07/01 17:40:00 vouchcac Exp $
+ * $Id: wvtclass.prg,v 1.1 2004/07/01 13:18:38 vouchcac Exp $
  */
 
 /*
@@ -88,8 +88,6 @@
 
 #define K_SBTHUMBTRACKVERT      1059
 #define K_SBTHUMBTRACKHORZ      1060
-
-#define DLG_OBJ_PROGRESSBAR       15
 
 //-------------------------------------------------------------------//
 //
@@ -330,7 +328,7 @@ RETURN nil
 METHOD Event() CLASS wvtDialog
 LOCAL  nKey
 
-if ( nKey := inkey( , INKEY_ALL ) ) == 0
+if ( nKey := inkey( 0.1, INKEY_ALL ) ) == 0
    if Wvt_IsLButtonPressed()
 
       nKey := K_LBUTTONPRESSED
@@ -346,7 +344,7 @@ METHOD Execute() CLASS wvtDialog
 
 if ::nObjects == 0
    do while .t.
-      if inkey() == K_ESC
+      if inkey( 0.1 ) == K_ESC
          exit
       endif
    enddo
@@ -2128,7 +2126,7 @@ RETURN .t.
 METHOD LeftUp() CLASS WvtPushButton
 
 Wvt_DrawToolButtonState( ::nTop, ::nLeft, ::nBottom, ::nRight, {0,0,0,0}, 1 )
-Eval( ::bOnLeftUp )
+::Eval( ::bOnLeftUp )
 
 RETURN .t.
 
@@ -2212,7 +2210,7 @@ bPaint := {|| Wvt_DrawBoxGet( ::aGetList[ nIndex,1 ], ::aGetList[ nIndex,2 ], nL
 
 aadd( ::aPaint, { bPaint,;
             { WVT_BLOCK_GETS, ::aGetList[ nIndex,1 ]-1, ::aGetList[ nIndex,2 ]-1, ;
-                  ::aGetList[ nIndex,1 ],  ::aGetList[ nIndex,2 ]+nLen } } )
+                  ::aGetList[ nIndex,1 ]-1,  ::aGetList[ nIndex,2 ]+nLen } } )
 
 RETURN Self
 

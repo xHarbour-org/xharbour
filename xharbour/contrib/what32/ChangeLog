@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.62 2004/07/08 07:38:22 marcosgambeta Exp $
+ * $Id: ChangeLog,v 1.63 2004/07/14 11:20:58 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-07-15 08:45 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * source/_winsys.c
+    ! OemToChar()
+    ! CharToOem()
+    ! OemToAnsi()
+    ! AnsiToOem()
+      Changed the memroy protocol as per advice from Przem, Mindaugus, Vic 
+      and compiled by Paul. Thanks to all of them.
+ 
 2004-07-14 16:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * source/_winsys.c
     + OemToChar()

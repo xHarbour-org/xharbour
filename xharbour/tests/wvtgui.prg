@@ -24,6 +24,15 @@
 #include   'common.ch'
 #include   'wvtwin.ch'
 
+#ifdef __SQL__
+   #include 'SqlRdd.ch'
+
+   REQUEST SqlRdd
+   REQUEST Sr_ODBC
+#endif
+
+REQUEST DbfCdx
+
 //-------------------------------------------------------------------//
 //
 //   WvtSetObjects() array structure
@@ -88,12 +97,20 @@
 
 //-------------------------------------------------------------------//
 
+MEMVAR cCdxExp
+
+//-------------------------------------------------------------------//
+
 static wvtScreen := {}
 static pic_:= { , , , , , , , , , , , , , , , , , , , }
 static keys_:= { , , , , , , , , , , , , , , , , , , , }
 
+#ifdef __XCC__
+static paint_:= { { '', {} } }
+#endif
+
 //-------------------------------------------------------------------//
-PROCEDURE Main()
+PROCEDURE Main( cDSN )
 
    LOCAL aLastPaint, clr, scr, bWhen, bValid
    LOCAL dDate   := ctod( '' )
@@ -116,8 +133,22 @@ PROCEDURE Main()
    LOCAL aObj    := {}
    LOCAL hPopup  := Wvt_SetPopupMenu()
    LOCAL oMenu   := CreateMainMenu()
+   LOCAL nConxn
 
    SET DATE BRITISH
+
+   #ifdef __SQL__
+      cDsn   := 'DSN=vouch;UID=sa;PWD=vouch;'
+
+      nConxn := Sr_AddConnection( CONNECT_ODBC, cDSN )
+      if nConxn < 0
+         alert( 'You requested for Sql Server which is not available!' )
+         return .f.
+      endif
+
+      SR_SetCollation( 'Latin1_General_BIN' )
+      SR_SetFastOpen( .f. )
+   #endif
 
    WvtSetKeys( .t. )
    Popups( 1 )
@@ -597,13 +628,54 @@ FUNCTION WvtMyBrowse()
    LOCAL cScr    := SaveScreen( 0,0,maxrow(),maxcol() )
    LOCAL aObjects:= WvtSetObjects( {} )
    LOCAL hPopup  := Wvt_SetPopupMenu()
+   LOCAL stru_:={}, cDbfFile, cSqlFile, cFileIndex, cFileDbf
 
    STATIC nStyle := 0
 
-   USE 'TEST' NEW
+   #ifdef __SQL__
+      cDbfFile := 'TEST.DBF'
+      cSqlFile := 'TEST_DBF'
+
+      if !( SR_ExistTable( cSqlFile ) )
+         USE ( cDbfFile ) NEW VIA 'DBFCDX'
+         if NetError()
+            ?  'Error in using local file'
+            inkey( 0 )
+            return nil
+         endif
+         Stru_:= DbStruct()
+         DbCloseArea()
+
+         DbCreate( cSqlFile, Stru_, 'SQLRDD' )
+         USE ( cSqlFile ) NEW VIA 'SQLRDD'
+
+         APPEND FROM ( cDbfFile ) VIA 'DBFCDX'
+         DbCloseArea()
+      endif
+      cRDD       := 'SQLRDD'
+      cFileDbf   := 'TEST_DBF'
+      cFileIndex := 'TEST_Z01'
+   #else
+      cRDD       := 'DBFCDX'
+      cFileDbf   := 'TEST.DBF'
+      cFileIndex := 'TEST.Z01'
+   #endif
+
+   USE ( cFileDbf ) NEW SHARED VIA ( cRDD )
    if NetErr()
       return nil
    endif
+   if fLock()
+      INDEX ON FIRST TAG '001' TO ( cFileIndex )
+      INDEX ON LAST  TAG '002' TO ( cFileIndex )
+      INDEX ON CITY  TAG '003' TO ( cFileIndex )
+      dbUnlock()
+   endif
+   SET INDEX TO
+   SET INDEX TO ( cFileIndex )
+   SET ORDER TO 1
+   DbGoTo( 50 )
+
    info_:= DbStruct()
 
    Popups( 2 )
@@ -649,6 +721,16 @@ FUNCTION WvtMyBrowse()
       nKey = InKey( 0 )
 
       BrwHandleKey( oBrowse, nKey, @lEnd )
+
+      if nKey == K_F2
+         nIndex := IndexOrd()
+         nIndex++
+         if nIndex > 3
+            nIndex := 1
+         endif
+         Set Order To ( nIndex )
+         oBrowse:RefreshAll()
+      endif
    end
 
    Wvt_SetPen( 0 )
@@ -1593,5 +1675,164 @@ STATIC FUNCTION ExeProgressBar( oPBar, oPBar3 )
    oPBar3:DeActivate()
 RETURN NIL
 
+//-------------------------------------------------------------------//
+#ifdef __XCC__
+//-------------------------------------------------------------------//
+
+function WvtPaintObjects()
+LOCAL i, lExe, nLeft, nRight, b, tlbr_, aBlocks, nBlocks
+
+aBlocks := WvtSetPaint()
+
+if ( nBlocks := len( aBlocks ) ) > 0
+   tlbr_:= Wvt_GetPaintRect()
+
+   for i := 1 to nBlocks
+      lExe := .t.
+
+      if aBlocks[ i,3 ] <> nil .and. !empty( aBlocks[ i,3 ] )
+         //  Check parameters against tlbr_ depending upon the
+         //  type of object and attributes contained in aAttr
+         //
+         do case
+         case aBlocks[ i,3,1 ] == WVT_BLOCK_GRID_V
+            b := aBlocks[ i,3,6 ]
+            if len( b:aColumnsSep ) == 0
+               lExe := .f.
+            else
+               nLeft  := b:aColumnsSep[ 1 ]
+               nRight := b:aColumnsSep[ len( b:aColumnsSep ) ]
+               if !( tlbr_[ 1 ] <= aBlocks[ i,3,4 ] .and. ; // top   < bottom
+                     tlbr_[ 3 ] >= aBlocks[ i,3,2 ] .and. ; // bootm > top
+                     tlbr_[ 2 ] <= nRight           .and. ; // left  < right
+                     tlbr_[ 4 ] >= nLeft                  ) // right > left
+                  lExe := .f.
+               endif
+            endif
+
+         otherwise
+            // If refreshing rectangle's top is less than objects' bottom
+            // and left is less than objects' right
+            //
+            if !( tlbr_[ 1 ] <= aBlocks[ i,3,4 ] .and. ; // top   < bottom
+                  tlbr_[ 3 ] >= aBlocks[ i,3,2 ] .and. ; // bootm > top
+                  tlbr_[ 2 ] <= aBlocks[ i,3,5 ] .and. ; // left  < right
+                  tlbr_[ 4 ] >= aBlocks[ i,3,3 ] )       // right > left
+               lExe := .f.
+            endif
+
+         endcase
+      endif
+
+      if lExe
+         eval( aBlocks[ i,2 ] )
+      endif
+   next
+endif
+
+return ( 0 )
+
+//-------------------------------------------------------------------//
+
+function WvtSetPaint( a_ )
+local o
+static s := {}
+
+o := s
+
+if a_ <> nil
+   s := a_
+endif
+
+return o
+
+//-------------------------------------------------------------------//
+
+function SetPaint( cID, nAction, xData, aAttr )
+local n, n1, oldData
+
+if xData <> nil
+   if ( n := ascan( paint_, { |e_| e_[ 1 ] == cID } ) ) > 0
+      if ( n1 := ascan( paint_[ n,2 ], {|e_| e_[ 1 ] == nAction } ) ) > 0
+         oldData := paint_[ n,2,n1,2 ]
+         paint_[ n,2,n1,2 ] := xData
+         paint_[ n,2,n1,3 ] := aAttr
+      else
+         aadd( paint_[ n,2 ], { nAction,xData,aAttr } )
+      endif
+   else
+      aadd( paint_, { cID, {} } )
+      n := len( paint_ )
+      aadd( paint_[ n,2 ], { nAction, xData, aAttr } )
+   endif
+endif
+
+return oldData
+
+//-------------------------------------------------------------------//
+
+function GetPaint( cID )
+local n
+
+if ( n := ascan( paint_, { |e_| e_[ 1 ] == cID } ) ) > 0
+   return paint_[ n,2 ]
+endif
+
+return {}
+
+//-------------------------------------------------------------------//
+
+function DelPaint( cID, nAction )
+local xData, n1, n
+
+if ( n := ascan( paint_, { |e_| e_[ 1 ] == cID } ) ) > 0
+   if ( n1 := ascan( paint_[ n,2 ], {|e_| e_[ 1 ] == nAction } ) ) > 0
+      xData := paint_[ n,2,n1,2 ]
+      paint_[ n,2,n1,2 ] := {|| .t. }
+   endif
+endif
+
+return xData
+
+//-------------------------------------------------------------------//
+
+function PurgePaint( cID,lDummy )
+local n, aPaint
+
+DEFAULT lDummy TO .f.
+
+if ( n := ascan( paint_, { |e_| e_[ 1 ] == cID } ) ) > 0
+   aPaint := paint_[ n ]
+   ADel( paint_, n )
+   aSize( paint_, len( paint_ ) - 1 )
+endif
+
+if lDummy
+   WvtSetPaint( {} )
+endif
+
+return ( aPaint )
+
+//-------------------------------------------------------------------//
+
+function InsertPaint( cID, aPaint, lSet )
+local n
+
+DEFAULT lSet TO .f.
+
+if ( n := ascan( paint_, { |e_| e_[ 1 ] == cID } ) ) > 0
+   paint_[ n ] := aPaint
+else
+   aadd( paint_, aPaint )
+endif
+
+if lSet
+   WvtSetPaint( aPaint )
+endif
+
+return nil
+
+//-------------------------------------------------------------------//
+#endif
 //-------------------------------------------------------------------//
 

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtpaint.prg.prg,v 1.0 2004/07/01 17:40:00 vouchcac Exp $
+ * $Id: wvtpaint.prg,v 1.1 2004/07/01 13:18:38 vouchcac Exp $
  */
 
 /*
@@ -111,6 +111,14 @@ if ( nBlocks := len( aBlocks ) ) > 0
                endif
             endif
 
+         case aBlocks[ i,3,1 ] == WVT_BLOCK_GETS
+            if !( tlbr_[ 1 ] <= aBlocks[ i,3,4 ] .and. ; // top   < bott
+                  tlbr_[ 3 ] >= aBlocks[ i,3,2 ] .and. ; // bootm > top
+                  tlbr_[ 2 ] <= aBlocks[ i,3,5 ] .and. ; // left  < righ
+                  tlbr_[ 4 ] >= aBlocks[ i,3,3 ]       ) // right > left
+               lExe := .f.
+            endif
+
          otherwise
             // If refreshing rectangle's top is less than objects' bottom
             // and left is less than objects' right
@@ -118,7 +126,7 @@ if ( nBlocks := len( aBlocks ) ) > 0
             if !( tlbr_[ 1 ] <= aBlocks[ i,3,4 ] .and. ; // top   < bottom
                   tlbr_[ 3 ] >= aBlocks[ i,3,2 ] .and. ; // bootm > top
                   tlbr_[ 2 ] <= aBlocks[ i,3,5 ] .and. ; // left  < right
-                  tlbr_[ 4 ] >= aBlocks[ i,3,3 ] )       // right > left
+                  tlbr_[ 4 ] >= aBlocks[ i,3,3 ]       ) // right > left
                lExe := .f.
             endif
 
