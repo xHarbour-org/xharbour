@@ -2,7 +2,7 @@
 rem ***********************************************************
 rem * bldtest.bat
 rem *
-rem * $Id: bldtest.bat,v 1.3 2003/11/10 21:33:19 fsgiudice Exp $
+rem * $Id: bldtest.bat,v 1.4 2004/01/08 23:47:31 ronpinkas Exp $
 rem *
 rem * Batch file to build test programs in ST or MT environment
 rem *
@@ -132,3 +132,4 @@ set HB_MT=%OLDENVMT%
 set HB_GT_LIB=%OLDENVGT%
 set CFLAGS=%OLDENVC%
 set OLDENVMT=
+set BLDDEFAULT=
