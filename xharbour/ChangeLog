@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2495 2004/03/05 11:48:57 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.2496 2004/03/05 13:26:01 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-05 22:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/math.c
+    ! TABS -> spaces
+    % out usage hb_itemNew(NULL)
+
+  * source/rtl/win32ole.prg
+    ! change hb_stack.Return with macro (HB_VM_STACK).Return
+
 2004-03-05 20:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/extend.c
   * source/rtl/inkey.c

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.42 2004/03/02 04:46:55 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.43 2004/03/02 05:17:18 ronpinkas Exp $
  */
 
 /*
@@ -1145,7 +1145,7 @@ RETURN uObj
                       hb_vmPushNil();
                       hb_vmDo( 0 );
 
-                      hb_itemForwardValue( &OleAuto, &hb_stack.Return );
+                      hb_itemForwardValue( &OleAuto, &(HB_VM_STACK).Return );
                    }
 
                    if( s_pSym_New && OleAuto.type )
@@ -1156,7 +1156,7 @@ RETURN uObj
                       hb_vmPushLong( ( LONG ) dParams->rgvarg[ n ].n1.n2.n3.pdispVal );
                       hb_vmSend( 1 );
 
-                      hb_itemForwardValue( aPrgParams[ n ], &hb_stack.Return );
+                      hb_itemForwardValue( aPrgParams[ n ], &(HB_VM_STACK).Return );
                    }
                    // Can't CLEAR this Variant
                    continue;
@@ -1259,7 +1259,7 @@ RETURN uObj
              hb_vmPushNil();
              hb_vmDo( 0 );
 
-             hb_itemForwardValue( &OleAuto, &hb_stack.Return );
+             hb_itemForwardValue( &OleAuto, &(HB_VM_STACK).Return );
           }
 
           if( s_pSym_New && OleAuto.type )

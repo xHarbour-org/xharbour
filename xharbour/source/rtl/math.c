@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.11 2004/03/02 00:28:18 druzus Exp $
+ * $Id: math.c,v 1.12 2004/03/03 21:45:22 likewolf Exp $
  */
 
 /*
@@ -149,38 +149,38 @@ int matherr (struct exception * err)
    {
       case DOMAIN:
       {
-	s_hb_exc.type = HB_MATH_ERR_DOMAIN;
-	s_hb_exc.error = "Argument not in domain of function";
+        s_hb_exc.type = HB_MATH_ERR_DOMAIN;
+        s_hb_exc.error = "Argument not in domain of function";
       }; break;
       case SING:
       {
-	s_hb_exc.type = HB_MATH_ERR_SING;
-	s_hb_exc.error = "Calculation results in singularity";
+        s_hb_exc.type = HB_MATH_ERR_SING;
+        s_hb_exc.error = "Calculation results in singularity";
       }; break;
       case OVERFLOW:
       {
-	s_hb_exc.type = HB_MATH_ERR_OVERFLOW;
-	s_hb_exc.error = "Calculation result too large to represent";
+        s_hb_exc.type = HB_MATH_ERR_OVERFLOW;
+        s_hb_exc.error = "Calculation result too large to represent";
       }; break;
       case UNDERFLOW:
       {
-	s_hb_exc.type = HB_MATH_ERR_UNDERFLOW;
-	s_hb_exc.error = "Calculation result too small to represent";
+        s_hb_exc.type = HB_MATH_ERR_UNDERFLOW;
+        s_hb_exc.error = "Calculation result too small to represent";
       }; break;
       case TLOSS:
       {
-	s_hb_exc.type = HB_MATH_ERR_TLOSS;
-	s_hb_exc.error = "Total loss of significant digits";
+        s_hb_exc.type = HB_MATH_ERR_TLOSS;
+        s_hb_exc.error = "Total loss of significant digits";
       }; break;
       case PLOSS:
       {
-	s_hb_exc.type = HB_MATH_ERR_PLOSS;
-	s_hb_exc.error = "Partial loss of significant digits";
+        s_hb_exc.type = HB_MATH_ERR_PLOSS;
+        s_hb_exc.error = "Partial loss of significant digits";
       }; break;
       default:
       {
-	s_hb_exc.type = HB_MATH_ERR_UNKNOWN;
-	s_hb_exc.error = "Unknown math error";
+        s_hb_exc.type = HB_MATH_ERR_UNKNOWN;
+        s_hb_exc.error = "Unknown math error";
       }; break;
    }
 
@@ -311,10 +311,10 @@ HB_FUNC (MATHERRMODE)  /* ([<nNewMode>]) -> <nOldMode> */
   {
     int iNewMode = hb_parni (1);
     if ((iNewMode == HB_MATH_ERRMODE_DEFAULT) ||
-	(iNewMode == HB_MATH_ERRMODE_CDEFAULT) ||
-	(iNewMode == HB_MATH_ERRMODE_USER) ||
-	(iNewMode == HB_MATH_ERRMODE_USERDEFAULT) ||
-	(iNewMode == HB_MATH_ERRMODE_USERCDEFAULT))
+        (iNewMode == HB_MATH_ERRMODE_CDEFAULT) ||
+        (iNewMode == HB_MATH_ERRMODE_USER) ||
+        (iNewMode == HB_MATH_ERRMODE_USERDEFAULT) ||
+        (iNewMode == HB_MATH_ERRMODE_USERCDEFAULT))
     {
       hb_mathSetErrMode (iNewMode);
     }
@@ -342,17 +342,23 @@ int hb_matherr (HB_MATH_EXCEPTION * pexc)
   {
 
     PHB_ITEM pMatherrResult;
-    PHB_ITEM pArg1 = hb_itemPutND (NULL, pexc->arg1);
-    PHB_ITEM pArg2 = hb_itemPutND (NULL, pexc->arg2);
-    PHB_ITEM pArray;
     PHB_ITEM pError;
+
+    HB_ITEM Arg1, Arg2, Array;
+
+    Arg1.type = HB_IT_NIL;
+    Arg2.type = HB_IT_NIL;
+    Array.type = HB_IT_NIL;
+
+    hb_itemPutND (&Arg1, pexc->arg1);
+    hb_itemPutND (&Arg2, pexc->arg2);
 
     /* create an array with the two double arguments */
     /* NOTE: Unfortunately, we cannot decide whether one or two parameters have been used when the
        math function has been called, so we always take two */
-    pArray = hb_itemArrayNew (2);
-    hb_itemArrayPut (pArray, 1, pArg1);
-    hb_itemArrayPut (pArray, 2, pArg2);
+    hb_arrayNew ( &Array, 2 );
+    hb_arraySetForward ( &Array, 1, &Arg1 );
+    hb_arraySetForward ( &Array, 2, &Arg2 );
 
     /* create an error object */
     /* NOTE: In case of HB_MATH_ERRMODE_USER[C]DEFAULT, I am setting both EF_CANSUBSTITUTE and EF_CANDEFAULT to .T. here.
@@ -360,17 +366,17 @@ int hb_matherr (HB_MATH_EXCEPTION * pexc)
        The error handler can either substitute the errorneous value (by returning a numeric value) or choose the
        default error handling (by returning .F., as usual) [martin vogel]*/
     pError = hb_errRT_New_Subst (ES_ERROR, "MATH", EG_NUMERR, pexc->type,
-				 pexc->error, pexc->funcname, 0, EF_CANSUBSTITUTE |
-				 (mode == HB_MATH_ERRMODE_USER ? 0: EF_CANDEFAULT));
+                                 pexc->error, pexc->funcname, 0, EF_CANSUBSTITUTE |
+                                 (mode == HB_MATH_ERRMODE_USER ? 0: EF_CANDEFAULT));
 
     /* Assign the new array to the object data item. */
     hb_vmPushSymbol (hb_dynsymGet ("_ARGS")->pSymbol);
     hb_vmPush (pError);
-    hb_vmPush (pArray);
+    hb_vmPush (&Array);
     hb_vmDo (1);
 
     /* Release the Array. */
-    hb_itemRelease (pArray);
+    hb_itemClear (&Array);
 
     /* launch error codeblock */
     pMatherrResult = hb_errLaunchSubst (pError);
@@ -384,8 +390,6 @@ int hb_matherr (HB_MATH_EXCEPTION * pexc)
     }
 
     hb_itemRelease (pMatherrResult);
-    hb_itemRelease (pArg1);
-    hb_itemRelease (pArg2);
   }
 
   /* math exception not handled by Harbour error routine above ? */
@@ -396,24 +400,24 @@ int hb_matherr (HB_MATH_EXCEPTION * pexc)
     {
     case HB_MATH_ERRMODE_USER:
       {
-	/* user failed to handle the math exception, so quit the app [yes, that's the meaning of this mode !!] */
-	iret = 0;
-	hb_vmRequestQuit();
+        /* user failed to handle the math exception, so quit the app [yes, that's the meaning of this mode !!] */
+        iret = 0;
+        hb_vmRequestQuit();
       }; break;
 
     case HB_MATH_ERRMODE_DEFAULT:
     case HB_MATH_ERRMODE_USERDEFAULT:
       {
-	/* return 1 to suppress C RTL error msgs, but leave error handling to the calling Harbour routine */
-	iret = 1;
+        /* return 1 to suppress C RTL error msgs, but leave error handling to the calling Harbour routine */
+        iret = 1;
       }; break;
 
     case HB_MATH_ERRMODE_CDEFAULT:
     case HB_MATH_ERRMODE_USERCDEFAULT:
       {
-	/* use the correction value supplied in pexc->retval */
-	pexc->handled = 1;
-	iret = 1;
+        /* use the correction value supplied in pexc->retval */
+        pexc->handled = 1;
+        iret = 1;
       }; break;
     }
     return (iret);
@@ -456,11 +460,11 @@ HB_MATH_HANDLERPROC hb_mathGetHandler (void)
   return ((HB_MATH_HANDLERPROC)s_mathHandlerProc);
 }
 
-
 /*
  * ************************************************************
  * Harbour Math functions Part IV:
- * example of hb_mathSet/GetHandler: add a new math handler that calls a given codeblock for every math error
+ * example of hb_mathSet/GetHandler: add a new math handler that
+ * calls a given codeblock for every math error
  * ************************************************************
  */
 
@@ -475,20 +479,29 @@ static int hb_matherrblock (HB_MATH_EXCEPTION * pexc)
 
   if (spMathErrorBlock != NULL)
   {
-    PHB_ITEM pArray, pRet;
-    PHB_ITEM pType, pFuncname, pError, pArg1, pArg2, pRetval, pHandled;
+    PHB_ITEM pRet;
+    HB_ITEM pArray, pType, pFuncname, pError, pArg1, pArg2, pRetval, pHandled;
 
-    pType = hb_itemPutNI (NULL, pexc->type);
-    pFuncname = hb_itemPutC (NULL, pexc->funcname);
-    pError = hb_itemPutC (NULL, pexc->error);
-    pArg1 = hb_itemPutND (NULL, pexc->arg1);
-    pArg2 = hb_itemPutND (NULL, pexc->arg2);
-    pRetval = hb_itemPutNDLen (NULL, pexc->retval, pexc->retvalwidth, pexc->retvaldec);
-    pHandled = hb_itemPutL (NULL, pexc->handled);
+    pArray.type = HB_IT_NIL;
+    pType.type = HB_IT_NIL;
+    pFuncname.type = HB_IT_NIL;
+    pError.type = HB_IT_NIL;
+    pArg1.type = HB_IT_NIL;
+    pArg2.type = HB_IT_NIL;
+    pRetval.type = HB_IT_NIL;
+    pHandled.type = HB_IT_NIL;
 
-    pArray = hb_itemArrayNew (2);
-    hb_itemArrayPut (pArray, 1, pRetval);
-    hb_itemArrayPut (pArray, 2, pHandled);
+    hb_itemPutNI    (&pType    , pexc->type);
+    hb_itemPutC     (&pFuncname, pexc->funcname);
+    hb_itemPutC     (&pError   , pexc->error);
+    hb_itemPutND    (&pArg1    , pexc->arg1);
+    hb_itemPutND    (&pArg2    , pexc->arg2);
+    hb_itemPutNDLen (&pRetval  , pexc->retval, pexc->retvalwidth, pexc->retvaldec);
+    hb_itemPutL     (&pHandled , pexc->handled);
+
+    hb_arrayNew (&pArray,2);
+    hb_arraySetForward (&pArray, 1, &pRetval);
+    hb_arraySetForward (&pArray, 2, &pHandled);
 
     /* launch error codeblock that can
        a) change the members of the array = {dRetval, lHandled} to set the return value of the math C RTL routine and
@@ -497,13 +510,13 @@ static int hb_matherrblock (HB_MATH_EXCEPTION * pexc)
        NOTE that these values are only used if lHandled was .F. and is set to .T. within the codeblock */
     pRet = hb_itemDo (spMathErrorBlock, 6, pType, pFuncname, pError, pArg1, pArg2, pArray);
 
-    hb_itemRelease (pType);
-    hb_itemRelease (pFuncname);
-    hb_itemRelease (pError);
-    hb_itemRelease (pArg1);
-    hb_itemRelease (pArg2);
-    hb_itemRelease (pRetval);
-    hb_itemRelease (pHandled);
+    hb_itemClear( &pType );
+    hb_itemClear( &pFuncname );
+    hb_itemClear( &pError );
+    hb_itemClear( &pArg1 );
+    hb_itemClear( &pArg2 );
+    hb_itemClear( &pRetval );
+    hb_itemClear( &pHandled );
 
     if (pexc->handled)
     {
@@ -513,41 +526,43 @@ static int hb_matherrblock (HB_MATH_EXCEPTION * pexc)
     else
     {
       /* exception handled by codeblock ? */
-      pHandled = hb_itemArrayGet (pArray, 2);
-      if (pHandled != NULL)
+      // pHandled = hb_itemArrayGet (pArray, 2);
+      hb_arrayGet( &pArray, 2, &pHandled );
+      if (&pHandled != NULL)
       {
-	pexc->handled = hb_itemGetL (pHandled);
-	hb_itemRelease (pHandled);
+        pexc->handled = hb_itemGetL (&pHandled);
+        hb_itemClear (&pHandled);
       }
 
       if (pexc->handled)
       {
-	/* YES ! */
-	/* extract retval for math routine and matherr() */
-	pRetval = hb_itemArrayGet (pArray, 1);
-	if (pRetval != NULL)
-	{
-	  pexc->retval = hb_itemGetND (pRetval);
-	  hb_itemGetNLen (pRetval, &(pexc->retvalwidth), &(pexc->retvaldec));
-	  hb_itemRelease (pRetval);
-	}
-	if ((pRet != NULL) && HB_IS_NUMERIC (pRet))
-	{
-	  retval = hb_itemGetNI (pRet); /* block may also return 0 to force C math lib warnings */
-	  hb_itemRelease (pRet);
-	}
-	else
-	{
-	  retval = 1; /* default return value to suppress C math lib warnings */
-	}
+        /* YES ! */
+        /* extract retval for math routine and matherr() */
+        // pRetval = hb_itemArrayGet (pArray, 1);
+        hb_arrayGet( &pArray, 1, &pRetval );
+        if (&pRetval != NULL)
+        {
+          pexc->retval = hb_itemGetND (&pRetval);
+          hb_itemGetNLen (&pRetval, &(pexc->retvalwidth), &(pexc->retvaldec));
+          hb_itemClear (&pRetval);
+        }
+        if ((pRet != NULL) && HB_IS_NUMERIC (pRet))
+        {
+          retval = hb_itemGetNI (pRet); /* block may also return 0 to force C math lib warnings */
+          hb_itemRelease (pRet);
+        }
+        else
+        {
+          retval = 1; /* default return value to suppress C math lib warnings */
+        }
       }
       else
       {
-	/* NO ! */
-	retval = 1;
+        /* NO ! */
+        retval = 1;
       }
     }
-    hb_itemRelease (pArray);
+    hb_itemClear (&pArray);
   }
   else
   {
@@ -593,7 +608,7 @@ HB_FUNC (MATHERRORBLOCK)  /* ([<nNewErrorBlock>]) -> <nOldErrorBlock> */
     ( &oldMathError )->type = HB_IT_NIL;
     hb_itemCopy (&oldMathError, spMathErrorBlock);
     hb_itemReturn (&oldMathError);
-    hb_itemClear (&oldMathError);
+    // hb_itemClear (&oldMathError);
   }
 
   if (hb_pcount() > 0)
@@ -604,7 +619,7 @@ HB_FUNC (MATHERRORBLOCK)  /* ([<nNewErrorBlock>]) -> <nOldErrorBlock> */
     {
       if (spMathErrorBlock == NULL)
       {
-	spMathErrorBlock = hb_itemNew (NULL);
+        spMathErrorBlock = hb_itemNew (NULL);
       }
       hb_itemCopy (spMathErrorBlock, pNewErrorBlock);
     }
@@ -613,15 +628,14 @@ HB_FUNC (MATHERRORBLOCK)  /* ([<nNewErrorBlock>]) -> <nOldErrorBlock> */
       /* a parameter other than a block has been passed -> delete error handler ! */
       if (spMathErrorBlock != NULL)
       {
-	hb_itemRelease (spMathErrorBlock);
-	spMathErrorBlock = NULL;
+        hb_itemRelease (spMathErrorBlock);
+        spMathErrorBlock = NULL;
       }
     }
   }
 
   return;
 }
-
 
 /*
  * ************************************************************
@@ -650,23 +664,23 @@ HB_FUNC (EXP)
       int iLastError = hb_mathGetLastError (&hb_exc);
       if (iLastError != HB_MATH_ERR_NONE)
       {
-	if (hb_exc.handled)
-	{
-	  hb_retndlen (hb_exc.retval, hb_exc.retvalwidth, hb_exc.retvaldec);
-	}
-	else
-	{
-	  /* math exception is up to the Harbour function, so do this as Clipper compatible as possible */
-	  if (iLastError == HB_MATH_ERR_OVERFLOW)
-	  {
-	    hb_retndlen (HUGE_VAL, -1, -1);
-	  }
-	  else
-	  {
-	    hb_retnd (0.0);
-	  }
-	}
-	return;
+        if (hb_exc.handled)
+        {
+          hb_retndlen (hb_exc.retval, hb_exc.retvalwidth, hb_exc.retvaldec);
+        }
+        else
+        {
+          /* math exception is up to the Harbour function, so do this as Clipper compatible as possible */
+          if (iLastError == HB_MATH_ERR_OVERFLOW)
+          {
+            hb_retndlen (HUGE_VAL, -1, -1);
+          }
+          else
+          {
+            hb_retnd (0.0);
+          }
+        }
+        return;
       }
     }
     hb_retnd (dResult);
@@ -676,7 +690,6 @@ HB_FUNC (EXP)
       hb_errRT_BASE_SubstR (EG_ARG, 1096, NULL, "EXP", 1, hb_paramError (1));
    }
 }
-
 
 HB_FUNC (LOG)
 {
@@ -699,27 +712,27 @@ HB_FUNC (LOG)
       int iLastError = hb_mathGetLastError (&hb_exc);
       if (iLastError != HB_MATH_ERR_NONE)
       {
-	if (hb_exc.handled)
-	{
-	  hb_retndlen (hb_exc.retval, hb_exc.retvalwidth, hb_exc.retvaldec);
-	}
-	else
-	{
-	  /* math exception is up to the Harbour function, so do this as Clipper compatible as possible */
-	  switch (iLastError)
-	  {
-	  case HB_MATH_ERR_SING:     /* argument to log was 0.0 */
-	  case HB_MATH_ERR_DOMAIN:   /* argument to log was < 0.0 */
-	    {
-	       hb_retndlen (-HUGE_VAL, -1, -1); /* return -infinity */
-	    }; break;
-	  default:
-	    {
-	      hb_retnd (0.0);
-	    }
-	  }
-	}
-	return;
+        if (hb_exc.handled)
+        {
+          hb_retndlen (hb_exc.retval, hb_exc.retvalwidth, hb_exc.retvaldec);
+        }
+        else
+        {
+          /* math exception is up to the Harbour function, so do this as Clipper compatible as possible */
+          switch (iLastError)
+          {
+          case HB_MATH_ERR_SING:     /* argument to log was 0.0 */
+          case HB_MATH_ERR_DOMAIN:   /* argument to log was < 0.0 */
+            {
+               hb_retndlen (-HUGE_VAL, -1, -1); /* return -infinity */
+            }; break;
+          default:
+            {
+              hb_retnd (0.0);
+            }
+          }
+        }
+        return;
       }
     }
     hb_retnd (dResult);
@@ -729,7 +742,6 @@ HB_FUNC (LOG)
       hb_errRT_BASE_SubstR (EG_ARG, 1095, NULL, "LOG", 1, hb_paramError (1));
    }
 }
-
 
 HB_FUNC (SQRT)
 {
@@ -770,4 +782,3 @@ HB_FUNC (SQRT)
      hb_errRT_BASE_SubstR (EG_ARG, 1097, NULL, "SQRT", 1, hb_paramError (1));
   }
 }
-
