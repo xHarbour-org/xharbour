@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.73 2005/03/15 18:02:53 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.74 2005/03/20 21:39:56 ronpinkas Exp $
  */
 
 /*
@@ -393,7 +393,7 @@ RETURN xRet
   static BSTR AnsiToSysString( LPSTR cString )
   {
      BSTR bstrString;
-     int nConvertedLen = MultiByteToWideChar( CP_ACP, 0, cString, -1, NULL, NULL ) -1;
+     int nConvertedLen = MultiByteToWideChar( CP_ACP, 0, cString, -1, NULL, 0 ) -1;
 
      bstrString = SysAllocStringLen( NULL, nConvertedLen );
 
