@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.20 2002/03/06 04:56:32 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.21 2002/03/06 06:49:42 ronpinkas Exp $
  */
 
 /*
@@ -324,6 +324,52 @@ PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
    pItem->item.asString.length = ulLen;
    pItem->item.asString.value = szText;
    pItem->item.asString.value[ ulLen ] = '\0';
+
+   return pItem;
+}
+
+PHB_ITEM hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutPtr(%p, %p)", pItem, pValue));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_POINTER;
+   pItem->item.asPointer.value = pValue;
+   pItem->item.asPointer.collect = FALSE;
+
+   return pItem;
+}
+
+PHB_ITEM hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutPtr(%p, %p)", pItem, pValue));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_POINTER;
+   pItem->item.asPointer.value = pValue;
+   pItem->item.asPointer.collect = TRUE;
 
    return pItem;
 }
