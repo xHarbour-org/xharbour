@@ -388,6 +388,8 @@ STATIC s_sPending
 STATIC s_lTrying := .F.
 STATIC s_lReturnRequested
 
+#define EXTERNAL_RECOVERY
+
 #ifdef EXTERNAL_RECOVERY
    STATIC s_bExternalRecovery
 #endif

@@ -25,10 +25,6 @@
 
   #include "hbclass.ch"
 
-  #ifdef AX
-     #define EXTERNAL_RECOVERY
-  #endif
-
   //----------------------------------------------------------------------------//
   CLASS  TInterpreter
 
@@ -54,7 +50,7 @@
         METHOD IsProcedure( cName )
         METHOD EvalExpression()
 
-        #ifdef EXTERNAL_RECOVERY
+        #ifdef AX
            METHOD RecoverSiteGlobals( oErr )
         #endif
      #endif
@@ -84,7 +80,7 @@
      LOCAL aParams := HB_aParams(), xRet
      LOCAL bErrHandler
 
-     #ifdef EXTERNAL_RECOVERY
+     #ifdef AX
         LOCAL bRecoveryBlock
      #endif
 
@@ -105,7 +101,7 @@
 
      IF ::nProcs > 0
         BEGIN SEQUENCE
-           #ifdef EXTERNAL_RECOVERY
+           #ifdef AX
               IF Len( ::aScriptHostGlobals ) > 0
                  bRecoveryBlock := PP_RecoveryBlock( {|oErr| Self:RecoverSiteGlobals( oErr ) } )
               ENDIF
@@ -115,7 +111,7 @@
            // xRet will be returned below.
         END SEQUENCE
 
-        #ifdef EXTERNAL_RECOVERY
+        #ifdef AX
            IF Len( ::aScriptHostGlobals ) > 0
               PP_RecoveryBlock( bRecoveryBlock )
            ENDIF
@@ -140,11 +136,11 @@
 
      LOCAL bErrHandler := ErrorBlock( {|e| Break(e) } ), xRet
 
-     #ifdef EXTERNAL_RECOVERY
+     #ifdef AX
         LOCAL bRecoveryBlock
      #endif
 
-     #ifdef EXTERNAL_RECOVERY
+     #ifdef AX
         IF Len( ::aScriptHostGlobals ) > 0
            bRecoveryBlock := PP_RecoveryBlock( {|oErr| Self:RecoverSiteGlobals( oErr ) } )
         ENDIF
@@ -161,7 +157,7 @@
         // xRet will be returned below.
      END SEQUENCE
 
-     #ifdef EXTERNAL_RECOVERY
+     #ifdef AX
         IF Len( ::aScriptHostGlobals ) > 0
            PP_RecoveryBlock( bRecoveryBlock )
         ENDIF
@@ -172,7 +168,7 @@
   RETURN xRet
 
   //----------------------------------------------------------------------------//
-  #ifdef EXTERNAL_RECOVERY
+  #ifdef AX
      METHOD RecoverSiteGlobals( oErr )
 
          LOCAL Global, xRet
