@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2219 2004/02/04 00:51:35 andijahja Exp $
+ * $Id: ChangeLog,v 1.2220 2004/02/04 01:12:00 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-03 17:16 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/win32ole.prg
+    ! Fixed GPF trap in DblToDate()
+
 2004-02-04 08:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
    * source/rdd/dbcmd.c
      ! overlooked to remove hb_xfree( szFileName ) on function DBUSEAREA()

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.37 2004/01/04 03:57:38 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.38 2004/02/03 00:43:25 ronpinkas Exp $
  */
 
 /*
@@ -135,7 +135,7 @@ RETURN TOleAuto():GetActiveObject( cString )
       s_nOleError = OleInitialize( NULL );
 
       s_pSym_OleAuto = hb_dynsymFindName( "TOLEAUTO" );
-      s_pSym_New     = hb_dynsymFindName( "NEW" );      
+      s_pSym_New     = hb_dynsymFindName( "NEW" );
       s_pSym_hObj    = hb_dynsymFindName( "HOBJ" );;
    }
 
@@ -852,7 +852,7 @@ RETURN uObj
 
   static LPSTR DblToDate( double nDate )
   {
-     static char *cDate = "00000000";
+     static char cDate[9] = "00000000";
 
      hb_dateDecStr( cDate, (long) nDate + 0x0024d9abL );
 
