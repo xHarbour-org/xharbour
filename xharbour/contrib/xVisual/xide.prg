@@ -40,52 +40,47 @@ FUNCTION Main
 
             END
          END
-
          :SetWindowMenu()
-      END
 
 //----------------------------------------------------------------------------------------------
 //   UNDER CONSTRUCTION
 //----------------------------------------------------------------------------------------------
 
-      hImg := ImageList_Create( 20, 20, ILC_COLORDDB+ILC_MASK )
-      hBmp := LoadImage( hInstance(), "XMAKE", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
-      ImageList_AddMasked( hImg, hBmp, RGB( 0, 255, 255 ) )
+         hImg := ImageList_Create( 20, 20, ILC_COLORDDB+ILC_MASK )
+         hBmp := LoadImage( hInstance(), "XMAKE", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
+         ImageList_AddMasked( hImg, hBmp, RGB( 0, 255, 255 ) )
 
-      :MainFrame:Add('Rebar', TRebar():New( :MainFrame ) )
-      
-      
-      :MainFrame:Rebar:Add( 'Tools', TToolBar():New( :MainFrame:Rebar, 444, 14, , , 32, 32, 24, 24 ) )
-      :MainFrame:Rebar:Tools:AddButton( 0, 500,,,,  ,,'New Project' )
-      :MainFrame:Rebar:Tools:AddButton( 1, 11,,,,  ,,'Open Project' )
-      :MainFrame:Rebar:Tools:AddButton( 2, 12,,,,  ,,'Properties' )
-      :MainFrame:Rebar:Tools:AddButton( 3, 13,,,,  ,,'Build Application' )
-      :MainFrame:Rebar:Tools:AddButton( 4, 14,,,,  ,,'Build and Launch Application' )
-      :MainFrame:Rebar:Tools:AddButton( 5, 15,,,,  ,,'Re-Build Application' )
-      :MainFrame:Rebar:Tools:AddButton( 6, 16,,,,  ,,'Re-Build and Launch Application' )
-      :MainFrame:Rebar:Tools:AddButton( 7, 17,,,,  ,,'Launch Application' )
-      :MainFrame:Rebar:Tools:AddButton( 8, 18,,,,  ,,'Compile Single Source' )
-      :MainFrame:Rebar:Tools:AddButton( 9, 19,,,,  ,,'Compile All Sources' )
-      :MainFrame:Rebar:Tools:AddButton(10, 20,,,,  ,,'Link Only' )
-      :MainFrame:Rebar:Tools:AddButton(11, 21,,,,  ,,'Compile to PPO' )
-      :MainFrame:Rebar:Tools:AddButton(12, 22,,,,  ,,'View' )
-      :MainFrame:Rebar:Tools:AddButton(14, 23,,,,  ,,'Files')
-
-      SendMessage( :MainFrame:Rebar:Tools:handle, TB_SETIMAGELIST, 0, hImg )
-      SendMessage( :MainFrame:Rebar:Tools:handle, TB_SETBUTTONSIZE, 0, MAKELONG( 26, 26 ) )
-
-      :MainFrame:Rebar:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT + RBBS_BREAK , :MainFrame:Rebar:Tools:handle, 110, 26, 150 , "", NIL )
-
-//------------------------------------
-
-      :MainFrame:Add('Status',  TStatusBar():New( :MainFrame, 'StatusBar', 1001 ) ) 
-      :MainFrame:Status:SetPanels( { 150,380,480,580,-1 } )
-      :MainFrame:Status:SetPanelText( 0, "What32 API StatusBar" )
-      :MainFrame:Status:SetPanelText( 2, "Enjoy" )
+         WITH OBJECT :Add('Rebar', TRebar():New( oApp:MainFrame ) )
+            WITH OBJECT :Add( 'Tools', TToolBar():New( oApp:MainFrame:Rebar, 444, 14, , , 32, 32, 24, 24 ) )
+               :AddButton( 0, 500,,,,  ,,'New Project' )
+               :AddButton( 1, 11,,,,  ,,'Open Project' )
+               :AddButton( 2, 12,,,,  ,,'Properties' )
+               :AddButton( 3, 13,,,,  ,,'Build Application' )
+               :AddButton( 4, 14,,,,  ,,'Build and Launch Application' )
+               :AddButton( 5, 15,,,,  ,,'Re-Build Application' )
+               :AddButton( 6, 16,,,,  ,,'Re-Build and Launch Application' )
+               :AddButton( 7, 17,,,,  ,,'Launch Application' )
+               :AddButton( 8, 18,,,,  ,,'Compile Single Source' )
+               :AddButton( 9, 19,,,,  ,,'Compile All Sources' )
+               :AddButton(10, 20,,,,  ,,'Link Only' )
+               :AddButton(11, 21,,,,  ,,'Compile to PPO' )
+               :AddButton(12, 22,,,,  ,,'View' )
+               :AddButton(14, 23,,,,  ,,'Files')
+               SendMessage( :handle, TB_SETIMAGELIST, 0, hImg )
+               SendMessage( :handle, TB_SETBUTTONSIZE, 0, MAKELONG( 26, 26 ) )
+            END
+            :AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT + RBBS_BREAK , :Tools:handle, 110, 26, 150 , "", NIL )
+         END
+         
+         WITH OBJECT :Add('Status',  TStatusBar():New( oApp:MainFrame, 'StatusBar', 1001 ) ) 
+            :SetPanels( { 150,380,480,580,-1 } )
+            :SetPanelText( 0, "What32 API StatusBar" )
+            :SetPanelText( 2, "Enjoy" )
+         END
+      END
 
       :Run()
   END
-
 RETURN( nil)
 
 //----------------------------------------------------------------------------------------------
