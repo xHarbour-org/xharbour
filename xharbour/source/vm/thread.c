@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.173 2004/05/18 15:05:45 ronpinkas Exp $
+* $Id: thread.c,v 1.174 2004/05/28 18:51:22 likewolf Exp $
 */
 
 /*
@@ -125,6 +125,7 @@ static UINT s_thread_unique_id;
    HB_EXPORT DWORD hb_dwCurrentStack;
 #elif defined(HB_OS_OS2)
    HB_EXPORT PPVOID hb_dwCurrentStack;
+   HB_EXPORT HEV  hb_hevWakeUpAll; /* posted to wake up all threads waiting somewhere on an INDEFINITE wait */
 #else
    pthread_key_t hb_pkCurrentStack;
 #endif
@@ -154,6 +155,11 @@ BOOL hb_bIdleFence;
 
 void hb_threadInit( void )
 {
+   #ifdef HB_OS_OS2
+   /* It is ahead of all initializations since every condition requires it */
+   DosCreateEventSem(NULL, (PHEV) &hb_hevWakeUpAll, 0L, FALSE);
+   #endif
+
    HB_CRITICAL_INIT( hb_allocMutex );
    HB_CRITICAL_INIT( hb_garbageAllocMutex );
    HB_CRITICAL_INIT( hb_macroMutex );
@@ -232,8 +238,11 @@ void hb_threadCloseHandles( void )
    #if !defined( HB_THREAD_TLS_KEYWORD )
       #ifdef HB_OS_WIN_32
          TlsFree( hb_dwCurrentStack );
+
       #elif defined(HB_OS_OS2)
          DosFreeThreadLocalMemory((PULONG) &hb_dwCurrentStack);
+         DosCloseEventSem(hb_hevWakeUpAll);
+
       #else
          pthread_key_delete( hb_pkCurrentStack );
       #endif
@@ -1350,20 +1359,78 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, CRITICAL_SECTION *mutex ,
 
 
 #ifdef HB_OS_OS2
-/*
-   Wait for a signal to be issued (at maximum for a given time or INFINITE)
+
+/* Condition management for OS/2 - <maurilio.longo@libero.it>
+
+   Here I use two different systems to prevent zombie processes.
+   - Conditions use a MuxWait semaphore, that is a semaphore which is made up of other semaphores
+     and "returns" when any of the semaphores which make it up gets posted. This way I can
+     wake up all threads waiting on a semaphore posting a single, global, wake-up-all semaphore
+   - Mutexes do a "polling" wait, that is, instead of waiting forever on a mutex request there is a "short"
+     wait followed by a test on the same semaphore used by conditions to be awaken when needed; if this
+     semaphore has been posted, mutexes are not requested (or are released as soon as they are owned) any more
+     I do know that this wastes a few cpu cycles, but I do prefer this to an unkillable process.
 */
+
+BOOL hb_threadCondInit( HB_COND_T *cond )
+{
+   HEV CondSem;
+   SEMRECORD apsr[2];
+   APIRET rc;
+
+   if ( (rc = DosCreateEventSem(NULL, (PHEV) &CondSem, 0L, FALSE)) == NO_ERROR) {
+
+      apsr[0].hsemCur = (HSEM) CondSem;
+      apsr[0].ulUser = 1;
+      apsr[1].hsemCur = (HSEM) hb_hevWakeUpAll;
+      apsr[1].ulUser = 2;
+
+      if ( (rc = DosCreateMuxWaitSem( NULL, (PHMUX) cond, 2L, (PSEMRECORD) apsr, DCMW_WAIT_ANY)) != NO_ERROR) {
+         //printf("DosCreateMuxWaitSem rc = %u\r\n", rc);
+         // raise runtime error
+         return FALSE;
+      }
+
+   } else {
+      //printf("DosCreateEventSem rc = %u\r\n", rc);
+      // raise runtime error
+      return FALSE;
+   }
+
+   return TRUE;
+}
+
+
+
+void hb_threadCondDestroy( HB_COND_T *cond )
+{
+   SEMRECORD apsr[2];
+   ULONG ulSemCount = 2, pflAttr;
+
+   DosQueryMuxWaitSem(*cond, &ulSemCount, (PSEMRECORD) apsr, &pflAttr);
+
+   if ( DosCloseEventSem( (HEV) apsr[0].hsemCur ) == ERROR_SEM_BUSY ) {
+      DosPostEventSem( (HEV) apsr[0].hsemCur );
+      DosCloseEventSem( (HEV) apsr[0].hsemCur );
+   }
+
+   DosCloseMuxWaitSem( *cond );
+}
+
+
+
 BOOL hb_threadCondWait( HB_COND_T *cond, CRITICAL_SECTION *mutex ,
       DWORD dwTimeout )
 {
    HB_THREAD_STUB
    register int bTimeout;
+   ULONG ulPostedSem;
 
    HB_TEST_CANCEL_ENABLE_ASYN
 
-   DosReleaseMutexSem(*mutex);
+   DosReleaseMutexSem( *mutex );
 
-   if ( DosWaitEventSem( *cond, dwTimeout ) != NO_ERROR )
+   if ( DosWaitMuxWaitSem( *cond, dwTimeout, &ulPostedSem ) != NO_ERROR )
    {
       bTimeout = 1;
    }
@@ -1371,11 +1438,63 @@ BOOL hb_threadCondWait( HB_COND_T *cond, CRITICAL_SECTION *mutex ,
    {
       bTimeout = 0;
    }
+
    HB_DISABLE_ASYN_CANC
 
-   DosRequestMutexSem( *mutex, SEM_INDEFINITE_WAIT );
+   if ( ulPostedSem == 1 ) {
+      hb_threadMtxPoll( *mutex );
+   }
+
    return !bTimeout;
 }
+
+
+void hb_threadCondSignal( HB_COND_T *cond )
+{
+   ULONG ulPostCount;
+   SEMRECORD apsr[2];
+   ULONG ulSemCount = 2, pflAttr;
+   APIRET rc;
+
+   rc = DosQueryMuxWaitSem(*cond, &ulSemCount, (PSEMRECORD) apsr, &pflAttr);
+   if (rc != NO_ERROR) {
+      //printf("DosQueryMuxWaitSem() rc %u count %u\r\n", rc, ulSemCount);
+      // raise runtime error
+   }
+
+   DosPostEventSem( (HEV) apsr[0].hsemCur );
+   DosResetEventSem( (HEV) apsr[0].hsemCur, &ulPostCount );
+
+}
+
+/*
+   This is an hack to prevent that a thread, blocked on a mutex wait, makes
+   a program unkillable. This is a limit of OS/2, not all system calls can
+   be interrupted. So, I wait for a certain amount of time on a mutex request
+   then, If I didn't get ownership, I test to see if program is dieing, if so I release
+   mutex (if I hold it) and then stop acquiring it.
+
+*/
+void hb_threadMtxPoll( HB_CRITICAL_T mtx )
+{
+   APIRET   rc;
+   ULONG    ulPostCount;
+
+   do {
+
+      rc = DosRequestMutexSem( mtx, 2000 );
+      DosQueryEventSem(hb_hevWakeUpAll, &ulPostCount);
+
+      if ( ulPostCount != 0 ) {
+         if ( rc == NO_ERROR ) {
+            DosReleaseMutexSem( mtx );
+         }
+      }
+
+   } while ( ulPostCount == 0 && rc != NO_ERROR );
+}
+
+
 #endif // OS/2
 
 

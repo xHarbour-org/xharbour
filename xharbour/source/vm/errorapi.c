@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.45 2004/04/16 04:41:38 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.46 2004/05/27 22:44:13 mlombardo Exp $
  */
 
 /*
@@ -109,6 +109,11 @@ static PHB_DYNS s_pDynErrorNew;
    #define s_errorBlock        (HB_VM_STACK.errorBlock)
    #define s_iLaunchCount      (HB_VM_STACK.iLaunchCount)
    #define s_uiErrorDOS        (HB_VM_STACK.uiErrorDOS)
+
+   #ifdef HB_OS_OS2
+      #include "thread.h"
+   #endif
+
 #endif
 
 extern HB_SET_STRUCT hb_set;
@@ -232,8 +237,8 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_errNew()"));
 
    if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym &&
-	   (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 &&
-	   (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
+      (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 &&
+      (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
    {
       szModuleName = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName;
    }
@@ -1504,6 +1509,7 @@ USHORT HB_EXPORT hb_errRT_TOOLS( ULONG ulGenCode, ULONG ulSubCode, char * szDesc
    return uiAction;
 }
 
+
 /* NOTE: Use as minimal calls from here, as possible.
          Don't allocate memory from this function. [vszakats] */
 
@@ -1564,6 +1570,15 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, char * szText, char * szPar1, ch
        *pGPF = 0;
        *(--pGPF) = 0;
    }
+
+   #if defined( HB_THREAD_SUPPORT ) && defined( HB_OS_OS2 )
+      /* Post all threads waiting on an indefinite wait */
+      DosPostEventSem(hb_hevWakeUpAll);
+      /* Let's give them some time to wake up */
+      DosSleep(5000);
+      /* Stop VM, I cannot call exit() here or I end up with a zombie process */
+      hb_vmQuit();
+   #endif
 
    exit( EXIT_FAILURE );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3020 2004/06/04 09:40:19 likewolf Exp $
+ * $Id: ChangeLog,v 1.3021 2004/06/04 10:03:41 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-04 15:25 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * include/thread.h
+   * source/vm/thread.c
+   * source/vm/errorapi.c
+     * Changed again to overcome an OS/2 shortcoming, that is a thread blocked on a
+       semaphore cannot be killed.
+       As a side effect with these changes there is no more need to have a
+       particular fixpack on.
 
 2004-06-04 14:00 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/debug/debugger.prg

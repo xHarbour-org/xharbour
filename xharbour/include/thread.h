@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.89 2004/05/28 18:51:21 likewolf Exp $
+* $Id: thread.h,v 1.90 2004/05/30 20:37:18 likewolf Exp $
 */
 
 /*
@@ -176,10 +176,10 @@ extern DWORD hb_dwCurrentStack;
 */
 #elif defined(HB_OS_OS2)
 
-   #define  CRITICAL_SECTION  HMTX
+   #define CRITICAL_SECTION            HMTX
 
-   #define HB_COND_T                   HEV
-   #define PHB_COND_T                  PHEV
+   #define HB_COND_T                   HMUX
+   #define PHB_COND_T                  PHMUX
 
    #define DWORD                       ULONG
    #define HB_THREAD_T                 TID
@@ -187,7 +187,7 @@ extern DWORD hb_dwCurrentStack;
    #define HB_CRITICAL_T               HMTX
    #define HB_CRITICAL_INIT( x )       DosCreateMutexSem(NULL, &(x), 0L, FALSE)      // Creates a private, unnamed, unowned sem
    #define HB_CRITICAL_DESTROY( x )    DosCloseMutexSem( x )
-   #define HB_CRITICAL_LOCK( x )       DosRequestMutexSem( x, SEM_INDEFINITE_WAIT )
+   #define HB_CRITICAL_LOCK( x )       hb_threadMtxPoll( x )
    #define HB_CRITICAL_UNLOCK( x )     DosReleaseMutexSem( x )
    #define HB_CRITICAL_TRYLOCK( x )    (DosRequestMutexSem( x, SEM_IMMEDIATE_RETURN ) == NO_ERROR)
 
@@ -197,19 +197,11 @@ extern DWORD hb_dwCurrentStack;
    #define HB_MUTEX_LOCK( x )          HB_CRITICAL_LOCK( x )
    #define HB_MUTEX_UNLOCK( x )        HB_CRITICAL_UNLOCK( x )
 
-   #define HB_COND_INIT( x )           (DosCreateEventSem(NULL, (PHEV) &(x), DCE_AUTORESET, FALSE) == NO_ERROR)
-
+   #define HB_COND_INIT( x )           hb_threadCondInit( &(x) )
    #define HB_COND_WAIT( x, y )        hb_threadCondWait( &(x), &(y), SEM_INDEFINITE_WAIT )
    #define HB_COND_WAITTIME( x, y, t ) hb_threadCondWait( &(x), &(y), t )
-
-   #define HB_COND_SIGNAL( x )         DosPostEventSem( x )
-
-   #define HB_COND_DESTROY( x ) {\
-      if (DosCloseEventSem( x ) == ERROR_SEM_BUSY) {\
-         DosPostEventSem( x );\
-         DosCloseEventSem( x );\
-      }\
-   }
+   #define HB_COND_SIGNAL( x )         hb_threadCondSignal( &(x) )
+   #define HB_COND_DESTROY( x )        hb_threadCondDestroy( &(x) )
 
    #define HB_CURRENT_THREAD           _gettid
    #define HB_SAME_THREAD(x, y)        ((x) == (y))
@@ -702,6 +694,9 @@ extern HB_CRITICAL_T hb_dynsymMutex;
 #define hb_dynsymLock()      HB_CRITICAL_LOCK( hb_dynsymMutex )
 #define hb_dynsymUnlock()    HB_CRITICAL_UNLOCK( hb_dynsymMutex )
 
+#ifdef HB_OS_OS2
+extern HEV  hb_hevWakeUpAll; /* Semaphore posted to wake up all threads waiting somewhere on an INDEFINITE wait */
+#endif
 
 /* count of running stacks */
 extern HB_SHARED_RESOURCE hb_runningStacks;
@@ -761,8 +756,11 @@ void hb_threadCancelInternal( void );
    BOOL hb_threadCondWait( HB_WINCOND_T *cond, CRITICAL_SECTION *mutex , DWORD dwTimeout );
 
 #elif defined(HB_OS_OS2)
+   BOOL hb_threadCondInit( HB_COND_T *cond );
+   void hb_threadCondDestroy( HB_COND_T *cond );
+   void hb_threadCondSignal( HB_COND_T *cond );
    BOOL hb_threadCondWait( HB_COND_T *cond, CRITICAL_SECTION *mutex , DWORD dwTimeout );
-
+   void hb_threadMtxPoll( HB_CRITICAL_T mtx );
 #endif
 
 /******************************************************/
