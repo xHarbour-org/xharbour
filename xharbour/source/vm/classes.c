@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.70 2003/06/23 07:24:02 ronpinkas Exp $
+ * $Id: classes.c,v 1.71 2003/06/30 17:08:58 ronpinkas Exp $
  */
 
 /*
@@ -3180,6 +3180,9 @@ void hb_mthAddTime( PMETHOD pMethod, ULONG ulClockTicks )
       {
          pMethod->ulTime += ulClockTicks;
       }
+   #else
+      HB_SYMBOL_UNUSED( pMethod );
+      HB_SYMBOL_UNUSED( ulClockTicks );
    #endif
 }
 
