@@ -10,7 +10,7 @@
 CC     = gcc
 RM     = rm -f
 
-USR_FLAGS    = -mtune=pentium -D__WINDOWS__ -DWIN32 -DHB_OS_WIN_32
+USR_FLAGS    = -mtune=pentium -D__WIN32__
 INC_DIR      = $(HARBOUR_DIR)/include
 HARBOUR_EXE  = $(BIN_DIR)/harbour.exe
 HARBOURFLAGS = -i$(INC_DIR) -n1 -q0 -w -es2 -gc0
@@ -20,6 +20,7 @@ CC_CMD       = $(CC) $(CFLAGS) -o $@ $^
 
 RTL_DIR      = $(HARBOUR_DIR)/source/rtl
 VM_DIR       = $(HARBOUR_DIR)/source/vm
+COMPILER_DIR = $(HARBOUR_DIR)/source/compiler
 COMMON_DIR   = $(HARBOUR_DIR)/source/common
 PP_DIR       = $(HARBOUR_DIR)/source/pp
 CODEPAGE_DIR = $(HARBOUR_DIR)/source/codepage
@@ -39,6 +40,7 @@ XBSCRIPT_DIR = $(HARBOUR_DIR)/utils/xbscript
 HARBOUR_DLL  = $(BIN_DIR)/harbour.dll
 HRBDLL_LIB   = $(LIB_DIR)/libharbour.a
 HRBDLL_DEF   = $(LIB_DIR)/harbour.def
+XHARBOUR_EXE = $(BIN_DIR)/xharbourdll.exe
 HBTEST_EXE   = $(BIN_DIR)/hbtestdll.exe
 HBRUN_EXE    = $(BIN_DIR)/hbrundll.exe
 HBDOC_EXE    = $(BIN_DIR)/hbdocdll.exe
@@ -57,7 +59,8 @@ ALL: \
    $(HBTEST_EXE) \
    $(HBMAKE_EXE) \
    $(HBRUN_EXE) \
-   $(XBSCRIPT_EXE)
+   $(XBSCRIPT_EXE) \
+   $(XHARBOUR_EXE)
 
 DLL_OBJECTS = \
    $(OBJ_DIR)/abs.o \
@@ -146,8 +149,6 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/philes53.o \
    $(OBJ_DIR)/philesx.o \
    $(OBJ_DIR)/rat.o \
-   $(OBJ_DIR)/readexit.o \
-   $(OBJ_DIR)/readins.o \
    $(OBJ_DIR)/readline.o \
    $(OBJ_DIR)/regex.o \
    $(OBJ_DIR)/replic.o \
@@ -159,6 +160,8 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/scroll.o \
    $(OBJ_DIR)/seconds.o \
    $(OBJ_DIR)/set.o \
+   $(OBJ_DIR)/readexit.o \
+   $(OBJ_DIR)/readins.o \
    $(OBJ_DIR)/setcolor.o \
    $(OBJ_DIR)/setcurs.o \
    $(OBJ_DIR)/setkey.o \
@@ -782,12 +785,6 @@ $(OBJ_DIR)/filesys.o : $(RTL_DIR)/filesys.c
 $(OBJ_DIR)/fserror.o : $(RTL_DIR)/fserror.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/readexit.o : $(RTL_DIR)/readexit.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/readins.o : $(RTL_DIR)/readins.c
-	$(CC_CMD)
-
 $(OBJ_DIR)/readline.o : $(RTL_DIR)/readline.c
 	$(CC_CMD)
 
@@ -1116,6 +1113,12 @@ $(OBJ_DIR)/seconds.o : $(RTL_DIR)/seconds.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/set.o : $(RTL_DIR)/set.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/readexit.o : $(RTL_DIR)/readexit.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/readins.o : $(RTL_DIR)/readins.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/setcolor.o : $(RTL_DIR)/setcolor.c
@@ -2798,3 +2801,21 @@ $(OBJ_DIR)/xbscript.c : $(XBSCRIPT_DIR)/xbscript.prg
 
 $(OBJ_DIR)/xbscript.o : $(OBJ_DIR)/xbscript.c
 	$(CC) $(CFLAGS) -I$(XBSCRIPT_DIR) -o $@ $^
+
+
+#-------------------------------------------------------------------------------
+# xharbourdll.exe
+#-------------------------------------------------------------------------------
+
+XHARBOUR_EXE_OBJS = \
+   $(OBJ_DIR)/mainwin.o \
+   $(OBJ_DIR)/xharbour.o
+
+$(XHARBOUR_EXE) : $(XHARBOUR_EXE_OBJS) $(LIB_TO_LINK)
+	$(CC) -WAll -o$(XHARBOUR_EXE) $(XHARBOUR_EXE_OBJS) -mno-cygwin $(MINGW_LIBRARY) -lxharbour
+
+$(OBJ_DIR)/xharbour.c : $(COMPILER_DIR)/xharbour.prg
+	$(HARBOUR_EXE) $(HARBOURFLAGS) -d__WIN32__ -o$@ $^
+
+$(OBJ_DIR)/xharbour.o : $(OBJ_DIR)/xharbour.c
+	$(CC) $(CFLAGS) -DHB_NO_DEFAULT_API_MACROS -DHB_NO_DEFAULT_STACK_MACROS -o $@ $^

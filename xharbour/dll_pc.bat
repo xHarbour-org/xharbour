@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: dll_pc.bat,v 1.1 2005/02/19 11:22:29 andijahja Exp $
+rem $Id: dll_pc.bat,v 1.2 2005/03/03 14:16:44 andijahja Exp $
 rem
 rem Batch File For Building xHarbour DLL with PellesC under Windows
 rem
@@ -22,7 +22,7 @@ rem Our BISON BIN Directory
 @set BISONDIR=F:\Bison\bin
 
 rem SET xHarbour Working Root Directory Here
-SET XHARBOUR_ROOT=d:\xharbour
+SET XHARBOUR_ROOT=C:\xharbour
 
 rem Set up our environment for output files here
 rem Let them be like that
@@ -68,17 +68,20 @@ if exist %BIN_DIR%\hbmakedll.lib      del %BIN_DIR%\hbmakedll.lib
 if exist %BIN_DIR%\hbrundll.lib       del %BIN_DIR%\hbrundll.lib
 if exist %BIN_DIR%\hbtestdll.lib      del %BIN_DIR%\hbtestdll.lib
 if exist %BIN_DIR%\xbscriptdll.lib    del %BIN_DIR%\xbscriptdll.lib
+if exist %BIN_DIR%\xharbourdll.lib    del %BIN_DIR%\xharbourdll.lib
 
 if exist %BIN_DIR%\hbdocdll.exe       del %BIN_DIR%\hbdocdll.exe
 if exist %BIN_DIR%\hbmakedll.exe      del %BIN_DIR%\hbmakedll.exe
 if exist %BIN_DIR%\hbrundll.exe       del %BIN_DIR%\hbrundll.exe
 if exist %BIN_DIR%\hbtestdll.exe      del %BIN_DIR%\hbtestdll.exe
+if exist %BIN_DIR%\xharbourdll.exe    del %BIN_DIR%\xharbourdll.exe
 if exist %BIN_DIR%\xbscriptdll.exe    del %BIN_DIR%\xbscriptdll.exe
 
 if exist %BIN_DIR%\hbdocdll.exp       del %BIN_DIR%\hbdocdll.exp
 if exist %BIN_DIR%\hbmakedll.exp      del %BIN_DIR%\hbmakedll.exp
 if exist %BIN_DIR%\hbrundll.exp       del %BIN_DIR%\hbrundll.exp
 if exist %BIN_DIR%\hbtestdll.exp      del %BIN_DIR%\hbtestdll.exp
+if exist %BIN_DIR%\xharbourdll.exp    del %BIN_DIR%\xharbourdll.exp
 if exist %BIN_DIR%\xbscriptdll.exp    del %BIN_DIR%\xbscriptdll.exp
 
 if exist %OBJ_DIR%\*.c                del %OBJ_DIR%\*.c

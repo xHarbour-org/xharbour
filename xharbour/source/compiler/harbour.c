@@ -288,9 +288,63 @@ extern int iEndDump;
 
 #define MAX_MEM_COMMAND_LINE 10240
 
+#if defined(__WIN32__) && defined(HB_EXEMEM_USED)
+
+/*
+This is to enable to export compiler functionalities as DLL
+Refer to source/compiler/xharbour.prg for sample of accessing from PRG function
+*/
+
+#include <windows.h>
+
+#undef HB_EXPORT
+
+#if defined( __cplusplus)
+   #define __EXTC__ extern "C"
+#else
+   #define __EXTC__
+#endif
+
+#if defined( __RSXNT__ )
+   /* RSXNT does not support any type of export keyword.
+      Exported (i.e., public) names can be obtained via
+      the emxexp utility and the output can be used for
+      input to a module definition file. See emxdev.doc
+      in the RSXNT doc/ directory for more information. */
+   #define HB_EXPORT
+
+#elif defined( __GNUC__ )
+   #define HB_EXPORT __attribute__ (( dllexport ))
+
+#elif defined( __BORLANDC__ )
+   #define HB_EXPORT _declspec( dllexport ) WINAPI
+
+#elif defined( __WATCOMC__ ) || defined( __POCC__ )
+   #define HB_EXPORT __declspec( dllexport ) WINAPI
+
+#elif defined( ASANLM ) || defined( ASANT )
+   #define HB_EXPORT
+
+#elif defined( WIN32 )
+   #define HB_EXPORT _declspec( dllexport ) WINAPI
+
+#else
+   #define HB_EXPORT
+#endif
+
+#if defined( HB_CREATE_DLL )
+__EXTC__ int HB_EXPORT hrbmain( int argc, char * argv[] )
+#else
+int main( int argc, char * argv[] )
+#endif
+
+#else
+
 /* ************************************************************************* */
 
 int main( int argc, char * argv[] )
+
+#endif
 {
    int iStatus = EXIT_SUCCESS;
    int i;
@@ -414,7 +468,7 @@ int main( int argc, char * argv[] )
    return iStatus;
 }
 
-#if defined(HB_OS_WIN_32) && !defined(__WATCOMC__)
+#if defined(HB_OS_WIN_32) && !defined(__WATCOMC__) && !defined(HB_CREATE_DLL)
 #include <windows.h>
 
 int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */

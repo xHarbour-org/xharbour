@@ -50,6 +50,7 @@ HBTEST_DIR        = utils\hbtest
 # neccesarily did on static libraries
 
 OBJ_DIR           = obj\dll\vc
+EXE_OBJ_DIR       = obj\dll\vc\bin
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ include directory ³Û
@@ -68,6 +69,10 @@ INCLUDE_DIR  = include
 LIB_DIR         = lib\vc
 HARBOUR_LIB     = $(LIB_DIR)\harbour.lib
 HARBOUR_DLL     = $(BIN_DIR)\harbour.dll
+XHARBOUR_LIB    = $(LIB_DIR)\xharbour.lib
+XHARBOUR_DLL    = $(BIN_DIR)\xharbour.dll
+XHARBOUR_EXE    = $(BIN_DIR)\xharbour.exe
+XHARBOURDLL_EXE = $(BIN_DIR)\xharbourdll.exe
 HBRUNDLL_EXE    = $(BIN_DIR)\hbrundll.exe
 HBTESTDLL_EXE   = $(BIN_DIR)\hbtestdll.exe
 HBMAKEDLL_EXE   = $(BIN_DIR)\hbmakedll.exe
@@ -85,11 +90,13 @@ XBSCRIPTDLL_EXE = $(BIN_DIR)\xbscriptdll.exe
 # Make sure to define __EXPORT__ or we cannot access xHarbour functions
 # from DLL
 
-HARBOURFLAGS  = /D__EXPORT__ /i$(INCLUDE_DIR) /n /q0 /w /es2 /n1
+HARBOURFLAGS  = /D__EXPORT__ /i$(INCLUDE_DIR) /q0 /w /es2 /n1
 CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /MT /FD /G6 /Ogt2yb1p /Gs /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32 /D__WIN32__
 MAINFLAGS     = -i$(INCLUDE_DIR) -n  -q0 -w -es2 -gc0
 HARBOUR_CMD   = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 CC_CMD        = $(CC) $(CLIBFLAGS) /Fo$@ $**
+CLIBFLAGSDLL  = /DHB_FM_STATISTICS_OFF /MT /FD /G6 /Ogt2yb1p /Gs /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32 /D__WIN32__
+CC_CMD_DLL    = $(CC) $(CLIBFLAGSDLL) /DHB_EXEMEM_USED /Fo$@ $**
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³  HARBOUR_DLL rules  ³Û
@@ -101,7 +108,53 @@ ALL: $(HARBOUR_DLL) \
      $(HBRUNDLL_EXE) \
      $(HBTESTDLL_EXE) \
      $(HBMAKEDLL_EXE) \
-     $(XBSCRIPTDLL_EXE)
+     $(XBSCRIPTDLL_EXE) \
+     $(XHARBOUR_DLL) \
+     $(XHARBOUR_EXE) \
+     $(XHARBOURDLL_EXE)
+
+XHARBOUR_EXE_OBJS = \
+   $(EXE_OBJ_DIR)\xharbour.obj
+
+XHARBOURDLL_EXE_OBJS = \
+   $(EXE_OBJ_DIR)\xharbourdll.obj
+
+XHARBOUR_DLL_OBJS = \
+   $(EXE_OBJ_DIR)\harbour.obj \
+   $(EXE_OBJ_DIR)\harboury.obj \
+   $(EXE_OBJ_DIR)\cmdcheck.obj \
+   $(EXE_OBJ_DIR)\hbusage.obj \
+   $(EXE_OBJ_DIR)\hbident.obj \
+   $(EXE_OBJ_DIR)\hbgenerr.obj \
+   $(EXE_OBJ_DIR)\hbpcode.obj \
+   $(EXE_OBJ_DIR)\hbfix.obj \
+   $(EXE_OBJ_DIR)\genc.obj \
+   $(EXE_OBJ_DIR)\gencobj.obj \
+   $(EXE_OBJ_DIR)\genobj32.obj \
+   $(EXE_OBJ_DIR)\genjava.obj \
+   $(EXE_OBJ_DIR)\genhrb.obj \
+   $(EXE_OBJ_DIR)\expropta.obj \
+   $(EXE_OBJ_DIR)\exproptb.obj \
+   $(EXE_OBJ_DIR)\exproptc.obj \
+   $(EXE_OBJ_DIR)\hbfunchk.obj \
+   $(EXE_OBJ_DIR)\hbslex.obj \
+   $(EXE_OBJ_DIR)\calconst.obj \
+   $(EXE_OBJ_DIR)\maindllh.obj \
+   \
+   $(EXE_OBJ_DIR)\ppcore.obj \
+   $(EXE_OBJ_DIR)\ppcomp.obj \
+   $(EXE_OBJ_DIR)\pptable.obj \
+   $(EXE_OBJ_DIR)\pragma.obj \
+   \
+   $(EXE_OBJ_DIR)\hbfhnd.obj \
+   $(EXE_OBJ_DIR)\hbfsapi.obj \
+   $(EXE_OBJ_DIR)\hbgete.obj \
+   $(EXE_OBJ_DIR)\hbhash.obj \
+   $(EXE_OBJ_DIR)\hbstr.obj \
+   $(EXE_OBJ_DIR)\hbver.obj \
+   $(EXE_OBJ_DIR)\expropt1.obj \
+   $(EXE_OBJ_DIR)\expropt2.obj \
+   $(EXE_OBJ_DIR)\reserved.obj
 
 XBSCRIPTDLL_EXE_OBJS = \
    $(OBJ_DIR)\xbscript.obj
@@ -247,8 +300,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\philes53.obj \
   $(OBJ_DIR)\philesx.obj \
   $(OBJ_DIR)\rat.obj \
-  $(OBJ_DIR)\readexit.obj \
-  $(OBJ_DIR)\readins.obj \
   $(OBJ_DIR)\readline.obj \
   $(OBJ_DIR)\regex.obj \
   $(OBJ_DIR)\replic.obj \
@@ -260,6 +311,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\scroll.obj \
   $(OBJ_DIR)\seconds.obj \
   $(OBJ_DIR)\set.obj \
+  $(OBJ_DIR)\readexit.obj \
+  $(OBJ_DIR)\readins.obj \
   $(OBJ_DIR)\setcolor.obj \
   $(OBJ_DIR)\setcurs.obj \
   $(OBJ_DIR)\setkey.obj \
@@ -720,20 +773,41 @@ HARBOUR_DLL_OBJS = \
 # ÀÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßß
 
-all: \
-   $(HARBOUR_DLL)
-
 CLEAN:
-   -@if exist $(HBRUNDLL_EXE)     del $(HBRUNDLL_EXE) >nul
-   -@if exist $(HBTESTDLL_EXE)    del $(HBTESTDLL_EXE) >nul
-   -@if exist $(HBMAKEDLL_EXE)    del $(HBMAKEDLL_EXE) >nul
-   -@if exist $(HBDOCDLL_EXE)     del $(HBDOCDLL_EXE) >nul
-   -@if exist $(XBSCRIPTDLL_EXE)  del $(XBSCRIPTDLL_EXE) >nul
+   -@if exist $(BIN_DIR)\hbdocdll.exp del $(BIN_DIR)\hbdocdll.exp >nul
+   -@if exist $(BIN_DIR)\hbdocdll.lib del $(BIN_DIR)\hbdocdll.lib >nul
+   -@if exist $(BIN_DIR)\hbmakedll.exp del $(BIN_DIR)\hbmakedll.exp >nul
+   -@if exist $(BIN_DIR)\hbmakedll.lib del $(BIN_DIR)\hbmakedll.lib >nul
+   -@if exist $(BIN_DIR)\hbrundll.exp del $(BIN_DIR)\hbrundll.exp >nul
+   -@if exist $(BIN_DIR)\hbrundll.lib del $(BIN_DIR)\hbrundll.lib >nul
+   -@if exist $(BIN_DIR)\hbtestdll.exp del $(BIN_DIR)\hbtestdll.exp >nul
+   -@if exist $(BIN_DIR)\hbtestdll.lib del $(BIN_DIR)\hbtestdll.lib >nul
+   -@if exist $(BIN_DIR)\xbscriptdll.exp del $(BIN_DIR)\xbscriptdll.exp >nul
+   -@if exist $(BIN_DIR)\xbscriptdll.lib del $(BIN_DIR)\xbscriptdll.lib >nul
+   -@if exist $(BIN_DIR)\xharbour.exp del $(BIN_DIR)\xharbour.exp >nul
+   -@if exist $(BIN_DIR)\xharbour.lib del $(BIN_DIR)\xharbour.lib >nul
+   -@if exist $(BIN_DIR)\xharbourdll.exp del $(BIN_DIR)\xharbourdll.exp >nul
+   -@if exist $(BIN_DIR)\xharbourdll.lib del $(BIN_DIR)\xharbourdll.lib >nul
+   -@if exist $(HBRUNDLL_EXE) del $(HBRUNDLL_EXE) >nul
+   -@if exist $(HBTESTDLL_EXE) del $(HBTESTDLL_EXE) >nul
+   -@if exist $(HBMAKEDLL_EXE) del $(HBMAKEDLL_EXE) >nul
+   -@if exist $(HBDOCDLL_EXE) del $(HBDOCDLL_EXE) >nul
+   -@if exist $(XBSCRIPTDLL_EXE) del $(XBSCRIPTDLL_EXE) >nul
    -@if exist $(HARBOUR_DLL) del $(HARBOUR_DLL) >nul
-   -@if exist $(LIB_DIR)\harbour.exp del $(LIB_DIR)\harbour.exp >nul
+   -@if exist $(XHARBOUR_EXE) del $(XHARBOUR_EXE) >nul
+   -@if exist $(XHARBOURDLL_EXE) del $(XHARBOURDLL_EXE) >nul
+   -@if exist $(XHARBOUR_DLL) del $(XHARBOUR_DLL) >nul
+   -@if exist $(XHARBOUR_LIB) del $(XHARBOUR_LIB) >nul
+   -@if exist $(LIB_DIR)\harbour.exp  del $(LIB_DIR)\harbour.exp >nul
+   -@if exist $(LIB_DIR)\xharbour.exp del $(LIB_DIR)\xharbour.exp >nul
    -@if exist $(OBJ_DIR)\*.obj del $(OBJ_DIR)\*.obj >nul
    -@if exist $(OBJ_DIR)\*.c del $(OBJ_DIR)\*.c >nul
    -@if exist $(OBJ_DIR)\*.h del $(OBJ_DIR)\*.h >nul
+   -@if exist $(OBJ_DIR)\bin\*.obj del $(OBJ_DIR)\bin\*.obj >nul
+   -@if exist $(OBJ_DIR)\bin\*.c del $(OBJ_DIR)\bin\*.c >nul
+   -@if exist $(OBJ_DIR)\bin\*.h del $(OBJ_DIR)\bin\*.h >nul
+   -@if exist $(OBJ_DIR)\*.output del $(OBJ_DIR)\*.output >nul
+   -@if exist $(OBJ_DIR)\bin\*.output del $(OBJ_DIR)\bin\*.output >nul
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ HARBOUR_DLL linking ³Û
@@ -1469,12 +1543,6 @@ $(OBJ_DIR)\readvar.c : $(RTL_DIR)\readvar.prg
 $(OBJ_DIR)\readvar.obj : $(OBJ_DIR)\readvar.c
    $(CC_CMD)
 
-$(OBJ_DIR)\readexit.obj : $(RTL_DIR)\readexit.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\readins.obj : $(RTL_DIR)\readins.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\readline.obj : $(RTL_DIR)\readline.c
    $(CC_CMD)
 
@@ -1506,6 +1574,12 @@ $(OBJ_DIR)\seconds.obj : $(RTL_DIR)\seconds.c
    $(CC_CMD)
 
 $(OBJ_DIR)\set.obj : $(RTL_DIR)\set.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\readexit.obj : $(RTL_DIR)\readexit.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\readins.obj : $(RTL_DIR)\readins.c
    $(CC_CMD)
 
 $(OBJ_DIR)\setcolor.obj : $(RTL_DIR)\setcolor.c
@@ -2878,4 +2952,178 @@ $(OBJ_DIR)\hbrun.c : $(HBRUN_DIR)\hbrun.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
 
 $(OBJ_DIR)\hbrun.obj : $(OBJ_DIR)\hbrun.c
+   $(CC_CMD)
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ XHARBOUR.DLL dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(XHARBOUR_DLL) : $(XHARBOUR_DLL_OBJS)
+   LINK /OUT:$(XHARBOUR_DLL) \
+        /DLL \
+        /IMPLIB:LIB\vc\xharbour.lib \
+        /NOLOGO \
+        /DEFAULTLIB:user32.lib advapi32.lib gdi32.lib libcmt.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib mpr.lib\
+        /SUBSYSTEM:WINDOWS \
+        /OPT:WIN98 \
+        $(XHARBOUR_DLL_OBJS)
+
+$(EXE_OBJ_DIR)\harbour.obj : $(COMPILER_DIR)\harbour.c
+   $(CC) $(CLIBFLAGSDLL) /DHB_EXEMEM_USED /DHB_CREATE_DLL /Fo$@ $**
+
+$(EXE_OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.sly
+   bison -v -d $** -o$@
+
+$(EXE_OBJ_DIR)\harboury.obj : $(EXE_OBJ_DIR)\harboury.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\hbslex.obj : $(COMPILER_DIR)\hbslex.c
+   $(CC) $(CLIBFLAGSDLL) /DHB_EXEMEM_USED /I$(EXE_OBJ_DIR) /Fo$@ $**
+
+$(EXE_OBJ_DIR)\cmdcheck.obj : $(COMPILER_DIR)\cmdcheck.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\hbusage.obj : $(COMPILER_DIR)\hbusage.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\hbident.obj : $(COMPILER_DIR)\hbident.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\hbgenerr.obj : $(COMPILER_DIR)\hbgenerr.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\hbpcode.obj : $(COMPILER_DIR)\hbpcode.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\hbfix.obj : $(COMPILER_DIR)\hbfix.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\genc.obj : $(COMPILER_DIR)\genc.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\gencobj.obj : $(COMPILER_DIR)\gencobj.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\genobj32.obj : $(COMPILER_DIR)\genobj32.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\genjava.obj : $(COMPILER_DIR)\genjava.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\genhrb.obj : $(COMPILER_DIR)\genhrb.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\expropta.obj : $(COMPILER_DIR)\expropta.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\exproptb.obj : $(COMPILER_DIR)\exproptb.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\exproptc.obj : $(COMPILER_DIR)\exproptc.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\hbfunchk.obj : $(COMPILER_DIR)\hbfunchk.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\calconst.obj : $(COMPILER_DIR)\calconst.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\maindllh.obj : $(VM_DIR)\maindllh.c
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
+
+$(EXE_OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\ppcomp.obj : $(PP_DIR)\ppcomp.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\pplib.obj : $(RTL_DIR)\pplib.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\pragma.obj : $(PP_DIR)\pragma.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\hbfhnd.obj : $(COMMON_DIR)\hbfhnd.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\hbfsapi.obj : $(COMMON_DIR)\hbfsapi.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\hbgete.obj : $(COMMON_DIR)\hbgete.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\hbhash.obj : $(COMMON_DIR)\hbhash.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\hbstr.obj : $(COMMON_DIR)\hbstr.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\hbtrace.obj : $(COMMON_DIR)\hbtrace.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\hbver.obj : $(COMMON_DIR)\hbver.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\expropt1.obj : $(COMMON_DIR)\expropt1.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\expropt2.obj : $(COMMON_DIR)\expropt2.c
+   $(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)\reserved.obj : $(COMMON_DIR)\reserved.c
+   $(CC_CMD_DLL)
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ XHARBOURDLL.EXE dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(XHARBOURDLL_EXE) : $(XHARBOURDLL_EXE_OBJS) $(HARBOUR_LIB) $(XHARBOUR_LIB)
+   echo. $(OBJ_DIR)\mainstd.obj  > make.tmp
+   echo. $(EXE_OBJ_DIR)\xharbourdll.obj >> make.tmp
+   echo. $(XHARBOUR_LIB) >> make.tmp
+   echo. $(HARBOUR_LIB) >> make.tmp
+   LINK @make.tmp /nologo /out:$(XHARBOURDLL_EXE) /subsystem:console
+
+$(EXE_OBJ_DIR)\xharbourdll.c : $(COMPILER_DIR)\xharbour.prg
+   $(HARBOUR_EXE) $(MAINFLAGS) -d__WIN32__ $** -o$@
+
+$(EXE_OBJ_DIR)\xharbourdll.obj : $(EXE_OBJ_DIR)\xharbourdll.c
+   $(CC) $(CLIBFLAGS) /D"HB_NO_DEFAULT_API_MACROS" /D"HB_NO_DEFAULT_STACK_MACROS" /Fo$@ $**
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ XHARBOUR.EXE dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(XHARBOUR_EXE) : $(XHARBOUR_EXE_OBJS) $(XHARBOUR_LIB)
+   echo. $(EXE_OBJ_DIR)\xharbour.obj > make.tmp
+   echo. $(XHARBOUR_LIB) >> make.tmp
+   echo. $(LIB_DIR)\codepage.lib >> make.tmp
+   echo. $(LIB_DIR)\common.lib >> make.tmp
+   echo. $(LIB_DIR)\dbfcdx.lib >> make.tmp
+   echo. $(LIB_DIR)\dbfdbt.lib >> make.tmp
+   echo. $(LIB_DIR)\dbffpt.lib >> make.tmp
+   echo. $(LIB_DIR)\dbfntx.lib >> make.tmp
+   echo. $(LIB_DIR)\debug.lib >> make.tmp
+   echo. $(LIB_DIR)\lang.lib >> make.tmp
+   echo. $(LIB_DIR)\macro.lib >> make.tmp
+   echo. $(LIB_DIR)\pp.lib >> make.tmp
+   echo. $(LIB_DIR)\rdd.lib >> make.tmp
+   echo. $(LIB_DIR)\rtl.lib >> make.tmp
+   echo. $(LIB_DIR)\vm.lib >> make.tmp
+   echo. $(LIB_DIR)\gtwin.lib >> make.tmp
+   echo. user32.lib gdi32.lib winspool.lib >> make.tmp
+   LINK @make.tmp /nologo /out:$(XHARBOUR_EXE) \
+      /subsystem:console /DEFAULTLIB:libcmt.lib \
+      /NODEFAULTLIB:libc.lib /FORCE:MULTIPLE /INCLUDE:__matherr
+
+$(EXE_OBJ_DIR)\xharbour.c : $(COMPILER_DIR)\xharbour.prg
+   $(HARBOUR_EXE) $(MAINFLAGS) -d__WIN32__ $** -o$@
+
+$(EXE_OBJ_DIR)\xharbour.obj : $(EXE_OBJ_DIR)\xharbour.c
    $(CC_CMD)

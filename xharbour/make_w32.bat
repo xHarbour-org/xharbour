@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_w32.bat,v 1.2 2004/08/29 01:52:44 paultucker Exp $
+rem $Id: make_w32.bat,v 1.3 2004/08/29 17:05:58 paultucker Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -16,14 +16,22 @@ SET _LIB=%LIB%
 SET _PATH=%PATH%
 SET _INCLUDE=%INCLUDE%
 rem Please set up WatCom Directives accordingly
-SET PATH=e:\wc\rel2\BINNT;e:\wc\rel2\BINW;%_PATH%
-SET LIB=e:\wc\rel2\LIB386;e:\wc\rel2\LIB386\NT;%_LIB%
-SET WATCOM=e:\wc
-SET EDPATH=e:\wc\rel2\EDDAT
-SET INCLUDE=e:\wc\rel2\H;e:\wc\rel2\H\NT
+
+SET PATH=F:\watcom\BINNT;F:\watcom\BINW;F:\BISON\BIN;%_PATH%
+SET WATCOM=F:\watcom
+SET EDPATH=F:\watcom\EDDAT
+SET INCLUDE=F:\watcom\H;F:\watcom\H\NT
+SET LIB=F:\watcom\lib386;F:\watcom\lib386\nt;%_LIB%
+
+REM SET PATH=e:\wc\rel2\BINNT;e:\wc\rel2\BINW;%_PATH%
+REM SET LIB=e:\wc\rel2\LIB386;e:\wc\rel2\LIB386\NT;%_LIB%
+REM SET WATCOM=e:\wc
+REM SET EDPATH=e:\wc\rel2\EDDAT
+REM SET INCLUDE=e:\wc\rel2\H;e:\wc\rel2\H\NT
 
 if not exist obj md obj
 if not exist obj\w32 md obj\w32
+if not exist obj\w32\bin md obj\w32\bin
 if not exist obj\w32\mt md obj\w32\mt
 
 rem added optimize subdir for optimized library
@@ -47,9 +55,11 @@ if "%1" == "CLEAN" goto CLEAN
 :BUILD
 
    SET HB_MT=
-   wmake -h -ms -f makefile.wc %1 %2 %3 > make_w32.log
-   wmake -h -ms HB_THREAD_SUPPORT=1 -f makefile.wc %2 %3 >> make_w32.log
 
+   wmake -h -ms -f makefile.wc %1 %2 %3 > make_w32.log
+   if errorlevel 1 goto BUILD_ERR
+
+   wmake -h -ms HB_THREAD_SUPPORT=1 -f makefile.wc %2 %3 >> make_w32.log
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
@@ -72,6 +82,7 @@ if "%1" == "CLEAN" goto CLEAN
 
 rem   if exist lib\*.lib     del lib\*.lib
 
+   if exist lib\xharbour.lib   del lib\xharbour.lib
    if exist lib\codepage.lib   del lib\codepage.lib
    if exist lib\common.lib     del lib\common.lib
    if exist lib\dbfcdx.lib     del lib\dbfcdx.lib
@@ -125,6 +136,10 @@ rem   if exist lib\*.lib     del lib\*.lib
    if exist obj\w32\*.obj del obj\w32\*.obj
    if exist obj\w32\*.c   del obj\w32\*.c
    if exist obj\w32\*.h   del obj\w32\*.h
+
+   if exist obj\w32\bin\*.obj del obj\w32\bin\*.obj
+   if exist obj\w32\bin\*.c   del obj\w32\bin\*.c
+   if exist obj\w32\bin\*.h   del obj\w32\bin\*.h
 
    if exist obj\w32\mt\*.obj del obj\w32\mt\*.obj
    if exist obj\w32\mt\*.c   del obj\w32\mt\*.c

@@ -1,6 +1,6 @@
 @ECHO OFF
 rem
-rem $Id: make_pc.bat,v 1.2 2005/02/20 13:00:00 ptsarenko Exp $
+rem $Id: make_pc.bat,v 1.2 2005/02/20 11:18:06 ptsarenko Exp $
 rem
 rem Batch File For Building xHarbour with PellesC
 rem
@@ -9,7 +9,7 @@ rem
 rem  *************** WARNING WARNING WARNING WARNING WARNING *******************
 rem  PellesC POMAKE.EXE is buggy. It will crash if used.
 rem  ERROR: POMAKE: error: Internal error (Stack overflow).
-rem  This is true until version: Pelles Make Utility, Version 3.00.4
+rem  This is true until version: Pelles Make Utility, Version 3.00.5
 rem  Please use other's compiler make utility
 rem  This batch file is tested using Borland CPP make.exe
 rem  *************** WARNING WARNING WARNING WARNING WARNING *******************
@@ -17,7 +17,7 @@ rem
 
 rem ONLY Modify the following These envars please
 SET POCCMAIN=f:\pellesc
-SET XHARBOUR_ROOT=d:\xharbour
+SET XHARBOUR_ROOT=C:\xharbour
 SET MAKEEXE=f:\borland\bcc55\bin\make.exe
 REM SET MAKEEXE=%POCCMAIN%\BIN\POMAKE.EXE
 SET BISONPATH=F:\bison\bin
@@ -45,6 +45,7 @@ if not exist %OBJ_DIR%\html            md %OBJ_DIR%\html
 if not exist %OBJ_DIR%\ct              md %OBJ_DIR%\ct
 if not exist %OBJ_DIR%\mt              md %OBJ_DIR%\mt
 if not exist %OBJ_DIR%\opt             md %OBJ_DIR%\opt
+if not exist %OBJ_DIR%\bin             md %OBJ_DIR%\bin
 if not exist %OBJ_DIR%\opt\console     md %OBJ_DIR%\opt\console
 if not exist %OBJ_DIR%\opt\gui         md %OBJ_DIR%\opt\gui
 if not exist %OBJ_DIR%\mt\opt          md %OBJ_DIR%\mt\opt
@@ -71,10 +72,15 @@ if not exist %OBJ_DIR%\mt\ct           md %OBJ_DIR%\mt\ct
 :BUILD_ERR
 
    goto EXIT
+   notepad make_pc.log
 
 :CLEAN
 
    if exist %BIN_DIR%\harbour.exe          del %BIN_DIR%\harbour.exe
+   if exist %BIN_DIR%\harbour.exp          del %BIN_DIR%\harbour.exp
+   if exist %BIN_DIR%\xharbour.exp         del %BIN_DIR%\xharbour.exp
+   if exist %BIN_DIR%\xharbour.exe         del %BIN_DIR%\xharbour.exe
+   if exist %BIN_DIR%\xharbour.dll         del %BIN_DIR%\xharbour.dll
    if exist %BIN_DIR%\hbdoc.exe            del %BIN_DIR%\hbdoc.exe
    if exist %BIN_DIR%\hbmake.exe           del %BIN_DIR%\hbmake.exe
    if exist %BIN_DIR%\hbpp.exe             del %BIN_DIR%\hbpp.exe
@@ -116,6 +122,9 @@ if not exist %OBJ_DIR%\mt\ct           md %OBJ_DIR%\mt\ct
    if exist %LIB_DIR%\optguimt.lib         del %LIB_DIR%\optguimt.lib
    if exist %LIB_DIR%\pp.lib               del %LIB_DIR%\pp.lib
    if exist %LIB_DIR%\ppmt.lib             del %LIB_DIR%\ppmt.lib
+   if exist %LIB_DIR%\ct.lib               del %LIB_DIR%\ct.lib
+   if exist %LIB_DIR%\ctmt.lib             del %LIB_DIR%\ctmt.lib
+   if exist %LIB_DIR%\codepage.lib         del %LIB_DIR%\codepage.lib
    if exist %LIB_DIR%\rdd.lib              del %LIB_DIR%\rdd.lib
    if exist %LIB_DIR%\rddads.lib           del %LIB_DIR%\rddads.lib
    if exist %LIB_DIR%\rddadsmt.lib         del %LIB_DIR%\rddadsmt.lib
@@ -129,6 +138,7 @@ if not exist %OBJ_DIR%\mt\ct           md %OBJ_DIR%\mt\ct
    if exist %LIB_DIR%\unicode.lib          del %LIB_DIR%\unicode.lib
    if exist %LIB_DIR%\unicodemt.lib        del %LIB_DIR%\unicodemt.lib
    if exist %LIB_DIR%\hbodbc.lib           del %LIB_DIR%\hbodbc.lib
+   if exist %LIB_DIR%\xharbour.lib         del %LIB_DIR%\xharbour.lib
    if exist %LIB_DIR%\hbodbcmt.lib         del %LIB_DIR%\hbodbcmt.lib
    if exist %LIB_DIR%\vm.lib               del %LIB_DIR%\vm.lib
    if exist %LIB_DIR%\vmmt.lib             del %LIB_DIR%\vmmt.lib

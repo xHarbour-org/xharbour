@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3987 2005/03/31 16:23:32 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3988 2005/03/31 18:41:50 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,44 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-04-01 02:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  + source/compiler/xharbour.prg
+    * PRG level compiler program using xharbour.dll
+
+  * source/compiler/harbour.c
+    * minor changes to make it possible to create compiler functionalities
+      in DLL format
+
+  * make_w32.bat
+  * makefile.wc
+  * dll_w32.bat
+  * hrbdll.wc
+
+  * make_b32.bat
+  * makefile.bc
+  * dll_b32.bat
+  * hrbdll.bc
+
+  * make_gc.bat
+  * makefile.gc
+  * dll_gc.bat
+  * hrbdll.gc
+
+  * make_dc.bat
+  * makefile.dc
+  * dll_dc.bat
+  * hrbdll.dc
+
+  * make_pc.bat
+  * makefile.pc
+  * dll_pc.bat
+  * hrbdll.pc
+
+  * dll_vc.bat
+  * hrbdll.vc
+    + creation of xharbour.dll, xHarbour compiler in DLL format
+    + creation of xharbour.exe, PRG level xHarbour compiler
+    + creation of xharbourdll.exe, PRG level xHarbour compiler
 
 2005-03-31 12:31 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * ./hrbdll.bc

@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: dll_dc.bat,v 1.1 2005/02/26 02:11:24 andijahja Exp $
+rem $Id: dll_dc.bat,v 1.2 2005/03/03 14:16:44 andijahja Exp $
 rem
 rem Batch File For Building xHarbour DLL with DigitalMars C/C++ under Windows
 rem
@@ -27,7 +27,7 @@ rem Our BISON BIN Directory
 @set BISONDIR=F:\Bison\bin
 
 rem SET xHarbour Working Root Directory Here
-SET XHARBOUR_ROOT=d:\xhrb
+SET XHARBOUR_ROOT=C:\XHARBOUR
 
 rem Set up our environment for output files here
 rem Let them be like that
@@ -66,6 +66,7 @@ if not exist %OBJ_DIR%  md %OBJ_DIR%
 if exist %LIB_DIR%\harbour.lib        del %LIB_DIR%\harbour.lib
 if exist %BIN_DIR%\harbour.dll        del %BIN_DIR%\harbour.dll
 if exist %BIN_DIR%\hbmakedll.exe      del %BIN_DIR%\hbmakedll.exe
+if exist %BIN_DIR%\xharbourdll.exe    del %BIN_DIR%\xharbourdll.exe
 if exist %BIN_DIR%\hbdocdll.exe       del %BIN_DIR%\hbdocdll.exe
 if exist %BIN_DIR%\hbrundll.exe       del %BIN_DIR%\hbrundll.exe
 if exist %BIN_DIR%\hbtestdll.exe      del %BIN_DIR%\hbtestdll.exe
@@ -75,6 +76,7 @@ if exist %OBJ_DIR%\*.c                del %OBJ_DIR%\*.c
 if exist %OBJ_DIR%\*.obj              del %OBJ_DIR%\*.obj
 if exist %OBJ_DIR%\*.h                del %OBJ_DIR%\*.h
 if exist %OBJ_DIR%\*.output           del %OBJ_DIR%\*.output
+if exist dmcdll.def                   del dmcdll.def
    goto EXIT
 
 :EXIT

@@ -77,7 +77,9 @@ CC_CMD      = $(CC) $(CLIBFLAGS) -fo$@ $**
 
 HARBOUR_DLL     = $(BIN_DIR)\harbour.dll
 HARBOUR_LIB     = $(LIB_DIR)\harbour.lib
+XHARBOUR_LIB    = $(LIB_DIR)\xharbour.lib
 HBRUNDLL_EXE    = $(BIN_DIR)\hbrundll.exe
+XHARBOURDLL_EXE = $(BIN_DIR)\xharbourdll.exe
 HBTESTDLL_EXE   = $(BIN_DIR)\hbtestdll.exe
 HBMAKEDLL_EXE   = $(BIN_DIR)\hbmakedll.exe
 HBDOCDLL_EXE    = $(BIN_DIR)\hbdocdll.exe
@@ -93,62 +95,64 @@ ALL: $(HARBOUR_DLL) \
      $(HBRUNDLL_EXE) \
      $(HBTESTDLL_EXE) \
      $(HBMAKEDLL_EXE) \
-     $(XBSCRIPTDLL_EXE)
+     $(XBSCRIPTDLL_EXE) \
+     $(HARBOUR_DLL) \
+     $(XHARBOURDLL_EXE)
 
 XBSCRIPTDLL_EXE_OBJS = \
-   $(OBJ_DIR)\xbscript.obj
+  $(OBJ_DIR)\xbscript.obj
 
 HBRUNDLL_EXE_OBJS = \
-   $(OBJ_DIR)\hbrun.obj
+  $(OBJ_DIR)\hbrun.obj
 
 HBDOCDLL_EXE_OBJS = \
-   $(OBJ_DIR)\mainstd.obj \
-   $(OBJ_DIR)\hbdoc.obj \
-   $(OBJ_DIR)\genasc.obj \
-   $(OBJ_DIR)\teeasc.obj \
-   $(OBJ_DIR)\genhpc.obj \
-   $(OBJ_DIR)\genhtm.obj \
-   $(OBJ_DIR)\genchm.obj \
-   $(OBJ_DIR)\genng.obj \
-   $(OBJ_DIR)\genos2.obj \
-   $(OBJ_DIR)\genrtf.obj \
-   $(OBJ_DIR)\gentrf.obj \
-   $(OBJ_DIR)\html.obj \
-   $(OBJ_DIR)\ng.obj \
-   $(OBJ_DIR)\os2.obj \
-   $(OBJ_DIR)\rtf.obj \
-   $(OBJ_DIR)\troff.obj \
-   $(OBJ_DIR)\fclass1.obj \
-   $(OBJ_DIR)\ffile1.obj \
-   $(OBJ_DIR)\ft_funcs.obj
+  $(OBJ_DIR)\mainstd.obj \
+  $(OBJ_DIR)\hbdoc.obj \
+  $(OBJ_DIR)\genasc.obj \
+  $(OBJ_DIR)\teeasc.obj \
+  $(OBJ_DIR)\genhpc.obj \
+  $(OBJ_DIR)\genhtm.obj \
+  $(OBJ_DIR)\genchm.obj \
+  $(OBJ_DIR)\genng.obj \
+  $(OBJ_DIR)\genos2.obj \
+  $(OBJ_DIR)\genrtf.obj \
+  $(OBJ_DIR)\gentrf.obj \
+  $(OBJ_DIR)\html.obj \
+  $(OBJ_DIR)\ng.obj \
+  $(OBJ_DIR)\os2.obj \
+  $(OBJ_DIR)\rtf.obj \
+  $(OBJ_DIR)\troff.obj \
+  $(OBJ_DIR)\fclass1.obj \
+  $(OBJ_DIR)\ffile1.obj \
+  $(OBJ_DIR)\ft_funcs.obj
 
 HBMAKEDLL_EXE_OBJS = \
-   $(OBJ_DIR)\hbmake.obj \
-   $(OBJ_DIR)\tmake.obj \
-   $(OBJ_DIR)\hbmutils.obj \
-   $(OBJ_DIR)\checks.obj \
-   $(OBJ_DIR)\pickarry.obj \
-   $(OBJ_DIR)\pickfile.obj \
-   $(OBJ_DIR)\prb_stak.obj \
-   $(OBJ_DIR)\radios.obj \
-   $(OBJ_DIR)\fclass1.obj \
-   $(OBJ_DIR)\ffile1.obj \
-   $(OBJ_DIR)\ft_funcs.obj \
-   $(OBJ_DIR)\hbmlang.obj
+  $(OBJ_DIR)\hbmake.obj \
+  $(OBJ_DIR)\tmake.obj \
+  $(OBJ_DIR)\hbmutils.obj \
+  $(OBJ_DIR)\checks.obj \
+  $(OBJ_DIR)\pickarry.obj \
+  $(OBJ_DIR)\pickfile.obj \
+  $(OBJ_DIR)\prb_stak.obj \
+  $(OBJ_DIR)\radios.obj \
+  $(OBJ_DIR)\fclass1.obj \
+  $(OBJ_DIR)\ffile1.obj \
+  $(OBJ_DIR)\ft_funcs.obj \
+  $(OBJ_DIR)\hbmlang.obj
 
 HBTESTDLL_EXE_OBJS = \
-   $(OBJ_DIR)\hbtest.obj \
-   $(OBJ_DIR)\rt_hvm.obj \
-   $(OBJ_DIR)\rt_hvma.obj \
-   $(OBJ_DIR)\rt_math.obj \
-   $(OBJ_DIR)\rt_date.obj \
-   $(OBJ_DIR)\rt_str.obj \
-   $(OBJ_DIR)\rt_stra.obj \
-   $(OBJ_DIR)\rt_trans.obj \
-   $(OBJ_DIR)\rt_array.obj \
-   $(OBJ_DIR)\rt_file.obj \
-   $(OBJ_DIR)\rt_misc.obj \
-   $(OBJ_DIR)\rt_ccall.obj
+  $(OBJ_DIR)\hbtest.obj \
+  $(OBJ_DIR)\rt_hvm.obj \
+  $(OBJ_DIR)\rt_hvma.obj \
+  $(OBJ_DIR)\rt_math.obj \
+  $(OBJ_DIR)\rt_date.obj \
+  $(OBJ_DIR)\rt_str.obj \
+  $(OBJ_DIR)\rt_stra.obj \
+  $(OBJ_DIR)\rt_trans.obj \
+  $(OBJ_DIR)\rt_array.obj \
+  $(OBJ_DIR)\rt_file.obj \
+  $(OBJ_DIR)\rt_misc.obj \
+  $(OBJ_DIR)\rt_ccall.obj
 
 HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\abs.obj \
@@ -265,6 +269,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\scrollbr.obj \
   $(OBJ_DIR)\seconds.obj \
   $(OBJ_DIR)\set.obj \
+  $(OBJ_DIR)\readexit.obj \
+  $(OBJ_DIR)\readins.obj \
   $(OBJ_DIR)\setcolor.obj \
   $(OBJ_DIR)\setcurs.obj \
   $(OBJ_DIR)\setkey.obj \
@@ -323,8 +329,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\memvarbl.obj \
   $(OBJ_DIR)\mssgline.obj \
   $(OBJ_DIR)\objfunc.obj \
-  $(OBJ_DIR)\readexit.obj \
-  $(OBJ_DIR)\readins.obj \
   $(OBJ_DIR)\readkey.obj \
   $(OBJ_DIR)\readline.obj \
   $(OBJ_DIR)\readvar.obj \
@@ -666,10 +670,14 @@ HARBOUR_DLL_OBJS = \
 # ÀÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßß
 
-all: \
-   $(HARBOUR_DLL)
-
 CLEAN:
+
+   -@if exist $(HBRUNDLL_EXE) del $(HBRUNDLL_EXE) >nul
+   -@if exist $(XHARBOURDLL_EXE) del $(XHARBOURDLL_EXE) >nul
+   -@if exist $(HBTESTDLL_EXE) del $(HBTESTDLL_EXE) >nul
+   -@if exist $(HBMAKEDLL_EXE) del $(HBMAKEDLL_EXE) >nul
+   -@if exist $(HBDOCDLL_EXE) del $(HBDOCDLL_EXE) >nul
+   -@if exist $(XBSCRIPTDLL_EXE) del $(XBSCRIPTDLL_EXE) >nul
    -@if exist $(HARBOUR_DLL) del $(HARBOUR_DLL) >nul
    -@if exist $(HARBOUR_LIB) del $(HARBOUR_LIB) >nul
    -@if exist $(LIB_DIR)\harbour.map del $(LIB_DIR)\harbour.map >nul
@@ -1433,12 +1441,6 @@ $(OBJ_DIR)\radiogrp.obj : $(OBJ_DIR)\radiogrp.c
 $(OBJ_DIR)\rat.obj : $(RTL_DIR)\rat.c
    $(CC_CMD)
 
-$(OBJ_DIR)\readexit.obj : $(RTL_DIR)\readexit.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\readins.obj : $(RTL_DIR)\readins.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\readkey.c : $(RTL_DIR)\readkey.prg
    $(HARBOUR_CMD)
 
@@ -1482,6 +1484,12 @@ $(OBJ_DIR)\seconds.obj : $(RTL_DIR)\seconds.c
    $(CC_CMD)
 
 $(OBJ_DIR)\set.obj : $(RTL_DIR)\set.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\readins.obj : $(RTL_DIR)\readins.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\readexit.obj : $(RTL_DIR)\readexit.c
    $(CC_CMD)
 
 $(OBJ_DIR)\setcolor.obj : $(RTL_DIR)\setcolor.c
@@ -2945,3 +2953,22 @@ $(OBJ_DIR)\hbrun.c : $(HBRUN_DIR)\hbrun.prg
 
 $(OBJ_DIR)\hbrun.obj : $(OBJ_DIR)\hbrun.c
    $(CC_CMD)
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ XHARBOURDLL.EXE dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(XHARBOURDLL_EXE) : $(OBJ_DIR)\xharbour.obj $(HARBOUR_LIB)
+   echo. $(OBJ_DIR)\mainstd.obj > make.tmp
+   echo. $(OBJ_DIR)\xharbour.obj >> make.tmp
+   echo. $(XHARBOUR_LIB) >> make.tmp
+   echo. $(HARBOUR_LIB) >> make.tmp
+   echo. uuid.lib >> make.tmp
+   LINK386 @make.tmp /nologo /out:$(XHARBOURDLL_EXE) /subsystem:console
+
+$(OBJ_DIR)\xharbour.c : $(COMPILER_DIR)\xharbour.prg
+   $(HARBOUR_EXE) $(MAINFLAGS) -d__WIN32__ $** -o$@
+
+$(OBJ_DIR)\xharbour.obj : $(OBJ_DIR)\xharbour.c
+   $(CC) $(CFLAGS) -dHB_NO_DEFAULT_API_MACROS -dHB_NO_DEFAULT_STACK_MACROS -fo$@ $**

@@ -1,15 +1,27 @@
 @ECHO OFF
 rem
-rem $Id: make_pc.bat,v 1.2 2005/02/20 11:18:06 ptsarenko Exp $
+rem $Id: make_dc.bat,v 1.1 2005/02/24 10:43:55 andijahja Exp $
 rem
 rem Batch File For Building xHarbour with DigitalMars C/C++ Compiler
 rem
 
 rem ONLY Modify the following These envars please
-SET DMCMAIN=C:\DM
-SET XHARBOUR_ROOT=d:\xhrb
-SET MAKEEXE=C:\DM\BIN\MAKE.EXE
-SET BISONPATH=C:\bison\bin
+@if not exist xdmcdll.def goto CREATE_DEF
+GOTO BEGIN_CFG
+
+:CREATE_DEF
+
+ECHO LIBRARY "xharbour.dll" > xdmcdll.def
+ECHO EXETYPE NT >> xdmcdll.def
+ECHO SUBSYSTEM CONSOLE >> xdmcdll.def
+ECHO CODE SHARED EXECUTE >> xdmcdll.def
+ECHO DATA WRITE >> xdmcdll.def
+
+:BEGIN_CFG
+SET DMCMAIN=F:\DM
+SET XHARBOUR_ROOT=C:\XHARBOUR
+SET MAKEEXE=F:\DM\BIN\MAKE.EXE
+SET BISONPATH=F:\bison\bin
 
 REM Let the next ENVARS be like that
 SET OBJ_DIR=obj\dmc
@@ -34,6 +46,7 @@ if not exist %OBJ_DIR%\html            md %OBJ_DIR%\html
 if not exist %OBJ_DIR%\ct              md %OBJ_DIR%\ct
 if not exist %OBJ_DIR%\mt              md %OBJ_DIR%\mt
 if not exist %OBJ_DIR%\opt             md %OBJ_DIR%\opt
+if not exist %OBJ_DIR%\bin             md %OBJ_DIR%\bin
 if not exist %OBJ_DIR%\opt\console     md %OBJ_DIR%\opt\console
 if not exist %OBJ_DIR%\opt\gui         md %OBJ_DIR%\opt\gui
 if not exist %OBJ_DIR%\mt\opt          md %OBJ_DIR%\mt\opt
@@ -57,6 +70,7 @@ if not exist %OBJ_DIR%\mt\ct           md %OBJ_DIR%\mt\ct
    SET MTFLAGS=
    SET VM_OBJ_DIR=%OBJ_DIR%
    SET RTL_OBJ_DIR=%OBJ_DIR%
+   SET EXE_OBJ_DIR=%OBJ_DIR%\bin
    SET MACRO_OBJ_DIR=%OBJ_DIR%
    SET RDD_OBJ_DIR=%OBJ_DIR%
    SET DBT_OBJ_DIR=%OBJ_DIR%
@@ -79,7 +93,7 @@ if not exist %OBJ_DIR%\mt\ct           md %OBJ_DIR%\mt\ct
    if errorlevel 1 goto BUILD_ERR
 
    SET THREAD_MODE=mt
-   SET MTFLAGS=/DHB_THREAD_SUPPORT
+   SET MTFLAGS=-D"HB_THREAD_SUPPORT"
    SET VM_OBJ_DIR=%OBJ_DIR%\mt
    SET RTL_OBJ_DIR=%OBJ_DIR%\mt
    SET MACRO_OBJ_DIR=%OBJ_DIR%\mt
@@ -113,6 +127,8 @@ if not exist %OBJ_DIR%\mt\ct           md %OBJ_DIR%\mt\ct
 
 :CLEAN
 
+   if exist %BIN_DIR%\xharbour.exe         del %BIN_DIR%\xharbour.exe
+   if exist %BIN_DIR%\xharbour.dll         del %BIN_DIR%\xharbour.dll
    if exist %BIN_DIR%\harbour.exe          del %BIN_DIR%\harbour.exe
    if exist %BIN_DIR%\hbdoc.exe            del %BIN_DIR%\hbdoc.exe
    if exist %BIN_DIR%\hbmake.exe           del %BIN_DIR%\hbmake.exe
@@ -123,6 +139,9 @@ if not exist %OBJ_DIR%\mt\ct           md %OBJ_DIR%\mt\ct
    if exist %BIN_DIR%\xbscript.exe         del %BIN_DIR%\xbscript.exe
 
    if exist %LIB_DIR%\common.lib           del %LIB_DIR%\common.lib
+   if exist %LIB_DIR%\xharbour.lib         del %LIB_DIR%\xharbour.lib
+   if exist %LIB_DIR%\xharbour.def         del %LIB_DIR%\xharbour.def
+   if exist %LIB_DIR%\codepage.lib         del %LIB_DIR%\codepage.lib
    if exist %LIB_DIR%\dbfcdx.lib           del %LIB_DIR%\dbfcdx.lib
    if exist %LIB_DIR%\dbfcdxmt.lib         del %LIB_DIR%\dbfcdxmt.lib
    if exist %LIB_DIR%\dbfdbt.lib           del %LIB_DIR%\dbfdbt.lib
@@ -148,6 +167,8 @@ if not exist %OBJ_DIR%\mt\ct           md %OBJ_DIR%\mt\ct
    if exist %LIB_DIR%\macromt.lib          del %LIB_DIR%\macromt.lib
    if exist %LIB_DIR%\nf.lib               del %LIB_DIR%\nf.lib
    if exist %LIB_DIR%\nfmt.lib             del %LIB_DIR%\nfmt.lib
+   if exist %LIB_DIR%\ct.lib               del %LIB_DIR%\ct.lib
+   if exist %LIB_DIR%\ctmt.lib             del %LIB_DIR%\ctmt.lib
    if exist %LIB_DIR%\nulsys.lib           del %LIB_DIR%\nulsys.lib
    if exist %LIB_DIR%\optcon.lib           del %LIB_DIR%\optcon.lib
    if exist %LIB_DIR%\optconmt.lib         del %LIB_DIR%\optconmt.lib
@@ -176,6 +197,11 @@ if not exist %OBJ_DIR%\mt\ct           md %OBJ_DIR%\mt\ct
    if exist %OBJ_DIR%\*.h                  del %OBJ_DIR%\*.h
    if exist %OBJ_DIR%\*.obj                del %OBJ_DIR%\*.obj
    if exist %OBJ_DIR%\*.output             del %OBJ_DIR%\*.output
+
+   if exist %OBJ_DIR%\bin\*.c              del %OBJ_DIR%\bin\*.c
+   if exist %OBJ_DIR%\bin\*.h              del %OBJ_DIR%\bin\*.h
+   if exist %OBJ_DIR%\bin\*.obj            del %OBJ_DIR%\bin\*.obj
+   if exist %OBJ_DIR%\bin\*.output         del %OBJ_DIR%\bin\*.output
 
    if exist %OBJ_DIR%\libmisc\*.c          del %OBJ_DIR%\libmisc\*.c
    if exist %OBJ_DIR%\libmisc\*.obj        del %OBJ_DIR%\libmisc\*.obj
@@ -234,6 +260,8 @@ if not exist %OBJ_DIR%\mt\ct           md %OBJ_DIR%\mt\ct
 
    if exist %OBJ_DIR%\mt\libmisc\*.c       del %OBJ_DIR%\mt\libmisc\*.c
    if exist %OBJ_DIR%\mt\libmisc\*.obj     del %OBJ_DIR%\mt\libmisc\*.obj
+
+   if exist xdmcdll.def del xdmcdll.def
 
    goto EXIT
 

@@ -14,6 +14,10 @@ RANLIB = ranlib
 STRIP  = strip -g
 
 INC_DIR      = $(HARBOUR_DIR)/include
+XHARBOUR_DLL = $(BIN_DIR)/xharbour.dll
+XHARBOUR_LIB = $(LIB_DIR)/libxharbour.a
+XHARBOURDLL_DEF = $(LIB_DIR)/libxharbour.def
+XHARBOUR_EXE = $(BIN_DIR)/xharbour.exe
 HARBOUR_EXE  = $(BIN_DIR)/harbour.exe
 HBTEST_EXE   = $(BIN_DIR)/hbtest.exe
 HBRUN_EXE    = $(BIN_DIR)/hbrun$(THREAD_MODE).exe
@@ -50,7 +54,7 @@ NANFOR_DIR   = $(HARBOUR_DIR)/contrib/libnf
 RDDADS_DIR   = $(HARBOUR_DIR)/contrib/rdd_ads
 
 HARBOURFLAGS = -i$(INC_DIR) -n -q0 -w -es2 -gc0
-CFLAGS       = -Wall -mno-cygwin -O3 -mtune=pentium -c -I$(INC_DIR)
+CFLAGS       = -D__WIN32__ -Wall -mno-cygwin -O3 -mtune=pentium -c -I$(INC_DIR)
 
 DESIGN_OBJ_DIR  = $(OBJ_DIR)/design
 HTML_OBJ_DIR = $(OBJ_DIR)/html
@@ -82,6 +86,7 @@ ifeq ($(THREAD_MODE),mt)
    LIBMISC_OBJ_DIR = $(OBJ_DIR)/mt/libmisc
    CFLAGS += -DHB_THREAD_SUPPORT
 else
+   EXE_OBJ_DIR   = $(OBJ_DIR)/bin
    VM_OBJ_DIR    = $(OBJ_DIR)
    RTL_OBJ_DIR   = $(OBJ_DIR)
    MACRO_OBJ_DIR = $(OBJ_DIR)
@@ -183,6 +188,7 @@ endif
 
 HARBOUR_CMD = $(HARBOUR_EXE) $(HARBOURFLAGS) -o$@ $^
 CC_CMD      = $(CC) $(CFLAGS) -o $@ $^
+CC_CMD_DLL  = $(CC) $(CFLAGS) -DHB_EXEMEM_USED -mdll -o $@ $^
 
 PROJECT += \
    $(MACRO_LIB) \
@@ -222,13 +228,185 @@ ifeq ($(THREAD_MODE),)
       $(HBDOC_EXE) \
       $(HBMAKE_EXE) \
       $(HBPP_EXE) \
-      $(XBSCRIPT_EXE)
+      $(XBSCRIPT_EXE) \
+      $(XHARBOUR_DLL) \
+      $(XHARBOUR_EXE)
 endif
 
 PROJECT += \
     $(HBRUN_EXE)
 
 all: $(PROJECT)
+
+#-------------------------------------------------------------------------------
+# xharbour.exe
+#-------------------------------------------------------------------------------
+
+XHARBOUR_EXE_OBJS = \
+   $(EXE_OBJ_DIR)/xharbour.o
+
+$(XHARBOUR_EXE) : $(XHARBOUR_EXE_OBJS) $(LIB_TO_LINK)
+	$(CC) -WAll -o$(XHARBOUR_EXE) $(XHARBOUR_EXE_OBJS) -mno-cygwin $(MINGW_LIBRARY) -lxharbour
+
+$(EXE_OBJ_DIR)/xharbour.c : $(COMPILER_DIR)/xharbour.prg
+	$(HARBOUR_EXE) $(HARBOURFLAGS) -d__WIN32__ -o$@ $^
+
+$(EXE_OBJ_DIR)/xharbour.o : $(EXE_OBJ_DIR)/xharbour.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+#-------------------------------------------------------------------------------
+# xharbour.dll
+#-------------------------------------------------------------------------------
+
+XHARBOUR_DLL_OBJS = \
+   $(EXE_OBJ_DIR)/harbour.o \
+   $(EXE_OBJ_DIR)/harboury.o \
+   $(EXE_OBJ_DIR)/cmdcheck.o \
+   $(EXE_OBJ_DIR)/hbusage.o \
+   $(EXE_OBJ_DIR)/hbident.o \
+   $(EXE_OBJ_DIR)/hbgenerr.o \
+   $(EXE_OBJ_DIR)/hbpcode.o \
+   $(EXE_OBJ_DIR)/hbfix.o \
+   $(EXE_OBJ_DIR)/genc.o \
+   $(EXE_OBJ_DIR)/gencobj.o \
+   $(EXE_OBJ_DIR)/genobj32.o \
+   $(EXE_OBJ_DIR)/genjava.o \
+   $(EXE_OBJ_DIR)/genhrb.o \
+   $(EXE_OBJ_DIR)/expropta.o \
+   $(EXE_OBJ_DIR)/exproptb.o \
+   $(EXE_OBJ_DIR)/exproptc.o \
+   $(EXE_OBJ_DIR)/hbfunchk.o \
+   $(EXE_OBJ_DIR)/hbslex.o \
+   $(EXE_OBJ_DIR)/calconst.o \
+   $(EXE_OBJ_DIR)/maindllh.o \
+   \
+   $(EXE_OBJ_DIR)/ppcore.o \
+   $(EXE_OBJ_DIR)/ppcomp.o \
+   $(EXE_OBJ_DIR)/pptable.o \
+   $(EXE_OBJ_DIR)/pragma.o \
+   \
+   $(EXE_OBJ_DIR)/hbfhnd.o \
+   $(EXE_OBJ_DIR)/hbfsapi.o \
+   $(EXE_OBJ_DIR)/hbgete.o \
+   $(EXE_OBJ_DIR)/hbhash.o \
+   $(EXE_OBJ_DIR)/hbstr.o \
+   $(EXE_OBJ_DIR)/hbver.o \
+   $(EXE_OBJ_DIR)/expropt1.o \
+   $(EXE_OBJ_DIR)/expropt2.o \
+   $(EXE_OBJ_DIR)/reserved.o
+
+$(XHARBOUR_DLL) : $(XHARBOUR_DLL_OBJS)
+	$(RM) $@
+	$(CC) -s -shared -Wl,--out-implib,$(XHARBOUR_LIB),--output-def,$(XHARBOURDLL_DEF) -o $(XHARBOUR_DLL) --warn-duplicate-exports  \
+	$(XHARBOUR_DLL_OBJS) -lws2_32 -lwinmm -lgdi32 -lole32 -lwinspool -loleaut32 -luuid -lmpr
+
+$(EXE_OBJ_DIR)/harbour.o : $(COMPILER_DIR)/harbour.c
+	$(CC) $(CFLAGS) -DHB_EXEMEM_USED -DHB_CREATE_DLL -mdll -o $@ $^
+
+$(EXE_OBJ_DIR)/harboury.c : $(COMPILER_DIR)/harbour.sly
+	bison -v -p yy -d -o $@ $^
+
+$(EXE_OBJ_DIR)/harboury.o : $(EXE_OBJ_DIR)/harboury.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/hbslex.o : $(COMPILER_DIR)/hbslex.c
+	$(CC) $(CFLAGS) -DHB_EXEMEM_USED -I$(OBJ_DIR) -mdll -o $@ $^
+
+$(EXE_OBJ_DIR)/cmdcheck.o : $(COMPILER_DIR)/cmdcheck.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/hbusage.o : $(COMPILER_DIR)/hbusage.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/hbident.o : $(COMPILER_DIR)/hbident.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/hbgenerr.o : $(COMPILER_DIR)/hbgenerr.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/hbpcode.o : $(COMPILER_DIR)/hbpcode.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/hbfix.o : $(COMPILER_DIR)/hbfix.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/genc.o : $(COMPILER_DIR)/genc.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/gencobj.o : $(COMPILER_DIR)/gencobj.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/genobj32.o : $(COMPILER_DIR)/genobj32.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/genjava.o : $(COMPILER_DIR)/genjava.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/genhrb.o : $(COMPILER_DIR)/genhrb.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/expropta.o : $(COMPILER_DIR)/expropta.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/exproptb.o : $(COMPILER_DIR)/exproptb.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/exproptc.o : $(COMPILER_DIR)/exproptc.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/hbfunchk.o : $(COMPILER_DIR)/hbfunchk.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/calconst.o : $(COMPILER_DIR)/calconst.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/maindllh.o : $(VM_DIR)/maindllh.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+$(EXE_OBJ_DIR)/ppcore.o : $(PP_DIR)/ppcore.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/ppcomp.o : $(PP_DIR)/ppcomp.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/pplib.o : $(RTL_DIR)/pplib.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/pptable.o : $(PP_DIR)/pptable.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/pragma.o : $(PP_DIR)/pragma.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/hbfhnd.o : $(COMMON_DIR)/hbfhnd.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/hbfsapi.o : $(COMMON_DIR)/hbfsapi.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/hbgete.o : $(COMMON_DIR)/hbgete.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/hbhash.o : $(COMMON_DIR)/hbhash.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/hbstr.o : $(COMMON_DIR)/hbstr.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/hbtrace.o : $(COMMON_DIR)/hbtrace.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/hbver.o : $(COMMON_DIR)/hbver.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/expropt1.o : $(COMMON_DIR)/expropt1.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/expropt2.o : $(COMMON_DIR)/expropt2.c
+	$(CC_CMD_DLL)
+
+$(EXE_OBJ_DIR)/reserved.o : $(COMMON_DIR)/reserved.c
+	$(CC_CMD_DLL)
 
 #-------------------------------------------------------------------------------
 # libhbodbc.a
@@ -2499,8 +2677,6 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/philes53.o \
    $(RTL_OBJ_DIR)/philesx.o \
    $(RTL_OBJ_DIR)/rat.o \
-   $(RTL_OBJ_DIR)/readexit.o \
-   $(RTL_OBJ_DIR)/readins.o \
    $(RTL_OBJ_DIR)/readline.o \
    $(RTL_OBJ_DIR)/regex.o \
    $(RTL_OBJ_DIR)/replic.o \
@@ -2512,6 +2688,8 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/scroll.o \
    $(RTL_OBJ_DIR)/seconds.o \
    $(RTL_OBJ_DIR)/set.o \
+   $(RTL_OBJ_DIR)/readexit.o \
+   $(RTL_OBJ_DIR)/readins.o \
    $(RTL_OBJ_DIR)/setcolor.o \
    $(RTL_OBJ_DIR)/setcurs.o \
    $(RTL_OBJ_DIR)/setkey.o \
@@ -2835,12 +3013,6 @@ $(RTL_OBJ_DIR)/filesys.o : $(RTL_DIR)/filesys.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/fserror.o : $(RTL_DIR)/fserror.c
-	$(CC_CMD)
-
-$(RTL_OBJ_DIR)/readexit.o : $(RTL_DIR)/readexit.c
-	$(CC_CMD)
-
-$(RTL_OBJ_DIR)/readins.o : $(RTL_DIR)/readins.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/readline.o : $(RTL_DIR)/readline.c
@@ -3171,6 +3343,12 @@ $(RTL_OBJ_DIR)/seconds.o : $(RTL_DIR)/seconds.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/set.o : $(RTL_DIR)/set.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/readexit.o : $(RTL_DIR)/readexit.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/readins.o : $(RTL_DIR)/readins.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/setcolor.o : $(RTL_DIR)/setcolor.c

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.90 2005/03/31 06:09:30 guerra000 Exp $
+# $Id: hrbdll.bc,v 1.89 2005/03/04 19:23:37 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -15,6 +15,7 @@
 HARBOUR_EXE = bin\harbour.exe
 CC          = bcc32
 BIN_DIR	    = bin\b32
+LIB_DIR	    = lib\b32
 
 # uncomment this line if you want to build harbour with multi-gt capabilities
 #HB_MULTI_GT = yes
@@ -72,11 +73,11 @@ INCLUDE_DIR  = include
 
 
 C_USR          = -tW -DHB_FM_STATISTICS_OFF -D__WIN32__ -D__EXPORT__ -DHB_NO_PROFILER -DHB_NO_TRACE $(CFLAGS)
-CLIBFLAGS      = $(C_USR) -a8 -OS -O2 -6 -c -I$(INCLUDE_DIR) -d -w3 -DSIMPLEX
+CLIBFLAGS      = $(C_USR) -a8 -OS -O2 -6 -c -I$(INCLUDE_DIR) -d -w3
 !if $d(HB_MULTI_GT)
-CLIBFLAGS               = $(CLIBFLAGS) -DHB_MULTI_GT
+CLIBFLAGS      = $(CLIBFLAGS) -DHB_MULTI_GT
 !endif
-HARBOURFLAGS   = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /i$(INCLUDE_DIR) /q0 /w /es2 /n1 /gc0
+HARBOURFLAGS   = /D__EXPORT__ /i$(INCLUDE_DIR) /q0 /w /es2 /n1 /gc0
 MAINFLAGS      = -i$(INCLUDE_DIR) -n  -q0 -w -es2 -gc0
 
 # ÚÄÄÄÄÄÄÄÄ¿
@@ -89,9 +90,11 @@ HARBOUR_DLL     = $(BIN_DIR)\harbour.dll
 HBRUNDLL_EXE    = $(BIN_DIR)\hbrundll.exe
 HBTESTDLL_EXE   = $(BIN_DIR)\hbtestdll.exe
 HBMAKEDLL_EXE   = $(BIN_DIR)\hbmakedll.exe
+XHARBOURDLL_EXE = $(BIN_DIR)\xharbourdll.exe
 HBDOCDLL_EXE    = $(BIN_DIR)\hbdocdll.exe
 XBSCRIPTDLL_EXE = $(BIN_DIR)\xbscriptdll.exe
 HRBDLL_LIB      = $(BIN_DIR)\harbour.lib
+XHARBOUR_LIB    = $(LIB_DIR)\xharbour.lib
 
 CC_CMD  = $(CC) $(CLIBFLAGS) -o$@ $**
 HRB_CMD = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
@@ -107,7 +110,11 @@ ALL: \
   $(HBRUNDLL_EXE) \
   $(HBTESTDLL_EXE) \
   $(HBMAKEDLL_EXE) \
-  $(XBSCRIPTDLL_EXE)
+  $(XBSCRIPTDLL_EXE) \
+  $(XHARBOURDLL_EXE)
+
+XHARBOURDLL_EXE_OBJS = \
+  $(OBJ_DIR)\xharbour.obj
 
 XBSCRIPTDLL_EXE_OBJS = \
   $(OBJ_DIR)\xbscript.obj
@@ -279,6 +286,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\scrollbr.obj \
   $(OBJ_DIR)\seconds.obj \
   $(OBJ_DIR)\set.obj \
+  $(OBJ_DIR)\readexit.obj \
+  $(OBJ_DIR)\readins.obj \
   $(OBJ_DIR)\setcolor.obj \
   $(OBJ_DIR)\setcurs.obj \
   $(OBJ_DIR)\setkey.obj \
@@ -337,8 +346,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\memvarbl.obj \
   $(OBJ_DIR)\mssgline.obj \
   $(OBJ_DIR)\objfunc.obj \
-  $(OBJ_DIR)\readexit.obj \
-  $(OBJ_DIR)\readins.obj \
   $(OBJ_DIR)\readkey.obj \
   $(OBJ_DIR)\readline.obj \
   $(OBJ_DIR)\readvar.obj \
@@ -716,13 +723,24 @@ HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
 # ÀÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßß
 
-all: \
-   $(HARBOUR_DLL)
-
 CLEAN:
+
+   -@if exist $(BIN_DIR)\hbrundll.tds    del $(BIN_DIR)\hbrundll.tds
+   -@if exist $(BIN_DIR)\hbtestdll.tds   del $(BIN_DIR)\hbtestdll.tds
+   -@if exist $(BIN_DIR)\hbmakedll.tds   del $(BIN_DIR)\hbmakedll.tds
+   -@if exist $(BIN_DIR)\xharbourdll.tds del $(BIN_DIR)\xharbourdll.tds
+   -@if exist $(BIN_DIR)\hbdocdll.tds    del $(BIN_DIR)\hbdocdll.tds
+   -@if exist $(BIN_DIR)\xbscriptdll.tds del $(BIN_DIR)\xbscriptdll.tds
+   -@if exist $(HBRUNDLL_EXE)     del $(HBRUNDLL_EXE) >nul
+   -@if exist $(HBTESTDLL_EXE)    del $(HBTESTDLL_EXE) >nul
+   -@if exist $(HBMAKEDLL_EXE)    del $(HBMAKEDLL_EXE) >nul
+   -@if exist $(XHARBOURDLL_EXE)  del $(XHARBOURDLL_EXE) >nul
+   -@if exist $(HBDOCDLL_EXE)     del $(HBDOCDLL_EXE) >nul
+   -@if exist $(XBSCRIPTDLL_EXE)  del $(XBSCRIPTDLL_EXE) >nul
    -@if exist $(HARBOUR_DLL) del $(HARBOUR_DLL) >nul
-   -@if exist lib\b32\harbour.tds del lib\b32\harbour.tds >nul
-   -@if exist lib\b32\harbour.map del lib\b32\harbour.map >nul
+   -@if exist bin\b32\harbour.lib del bin\b32\harbour.lib >nul
+   -@if exist bin\b32\harbour.tds del bin\b32\harbour.tds >nul
+   -@if exist bin\b32\harbour.map del bin\b32\harbour.map >nul
    -@if exist $(OBJ_DIR)\*.obj del $(OBJ_DIR)\*.obj >nul
    -@if exist $(OBJ_DIR)\*.c del $(OBJ_DIR)\*.c >nul
    -@if exist $(OBJ_DIR)\*.h del $(OBJ_DIR)\*.h >nul
@@ -907,6 +925,8 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\scrollbr.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\seconds.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\set.obj               + >> hdll.tmp
+  echo. $(OBJ_DIR)\readexit.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\readins.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\setcolor.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\setcurs.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\setkey.obj            + >> hdll.tmp
@@ -965,8 +985,6 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\memvarbl.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\mssgline.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\objfunc.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\readexit.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\readins.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\readkey.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\readline.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\readvar.obj           + >> hdll.tmp
@@ -2003,12 +2021,6 @@ $(OBJ_DIR)\radiogrp.obj : $(OBJ_DIR)\radiogrp.c
 $(OBJ_DIR)\rat.obj : $(RTL_DIR)\rat.c
    $(CC_CMD)
 
-$(OBJ_DIR)\readexit.obj : $(RTL_DIR)\readexit.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\readins.obj : $(RTL_DIR)\readins.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\readkey.c : $(RTL_DIR)\readkey.prg
    $(HRB_CMD)
 
@@ -2052,6 +2064,12 @@ $(OBJ_DIR)\seconds.obj : $(RTL_DIR)\seconds.c
    $(CC_CMD)
 
 $(OBJ_DIR)\set.obj : $(RTL_DIR)\set.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\readexit.obj : $(RTL_DIR)\readexit.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\readins.obj : $(RTL_DIR)\readins.c
    $(CC_CMD)
 
 $(OBJ_DIR)\setcolor.obj : $(RTL_DIR)\setcolor.c
@@ -3250,7 +3268,7 @@ $(HBTESTDLL_EXE) : $(HBTESTDLL_EXE_OBJS) $(HRBDLL_LIB)
    echo. ws2_32.lib + >> make.tmp
    echo. cw32.lib + >> make.tmp
    echo. import32.lib, >> make.tmp
-   ILINK32 -ap -Tpe -Gn @make.tmp
+   ILINK32 -x -ap -Tpe -Gn @make.tmp
 
 $(OBJ_DIR)\hbtest.c : $(HBTEST_DIR)\hbtest.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
@@ -3349,7 +3367,7 @@ $(HBMAKEDLL_EXE) : $(HBMAKEDLL_EXE_OBJS) $(HRBDLL_LIB)
    echo. ws2_32.lib + >> make.tmp
    echo. cw32.lib + >> make.tmp
    echo. import32.lib, >> make.tmp
-   ILINK32 -ap -Tpe -Gn @make.tmp
+   ILINK32 -x -ap -Tpe -Gn @make.tmp
 
 $(OBJ_DIR)\hbmake.c : $(HBMAKE_DIR)\hbmake.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
@@ -3433,7 +3451,7 @@ $(HBDOCDLL_EXE) : $(HBDOCDLL_EXE_OBJS) $(HRBDLL_LIB)
    echo. ws2_32.lib + >> make.tmp
    echo. cw32.lib + >> make.tmp
    echo. import32.lib, >> make.tmp
-   ILINK32 -ap -Tpe -Gn @make.tmp
+   ILINK32 -x -ap -Tpe -Gn @make.tmp
 
 $(OBJ_DIR)\hbdoc.c : $(HBDOC_DIR)\hbdoc.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
@@ -3560,7 +3578,7 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS) $(HRBDLL_LIB)
    echo. ws2_32.lib + >> make.tmp
    echo. cw32.lib + >> make.tmp
    echo. import32.lib, >> make.tmp
-   ILINK32 -ap -Tpe -Gn @make.tmp
+   ILINK32 -x -ap -Tpe -Gn @make.tmp
 
 $(OBJ_DIR)\xbscript.c : $(XBSCRIPT_DIR)\xbscript.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
@@ -3582,10 +3600,36 @@ $(HBRUNDLL_EXE) : $(HBRUNDLL_EXE_OBJS) $(HRBDLL_LIB)
    echo. ws2_32.lib + >> make.tmp
    echo. cw32.lib + >> make.tmp
    echo. import32.lib, >> make.tmp
-   ILINK32 -ap -Tpe -Gn @make.tmp
+   ILINK32 -x -ap -Tpe -Gn @make.tmp
 
 $(OBJ_DIR)\hbrun.c : $(HBRUN_DIR)\hbrun.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
 
 $(OBJ_DIR)\hbrun.obj : $(OBJ_DIR)\hbrun.c
    $(CC_CMD)
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ XHARBOURDLL.EXE dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(XHARBOURDLL_EXE) : \
+   $(XHARBOURDLL_EXE_OBJS) \
+   $(HRBDLL_LIB)
+
+   echo. $(OBJ_DIR)\mainwin.obj + > make.tmp
+   echo. $(OBJ_DIR)\xharbour.obj + >> make.tmp
+   echo. c0w32.obj, + >> make.tmp
+   echo. $(XHARBOURDLL_EXE),, + >> make.tmp
+   echo. $(XHARBOUR_LIB) + >> make.tmp
+   echo. $(HRBDLL_LIB) + >> make.tmp
+   echo. ws2_32.lib + >> make.tmp
+   echo. cw32.lib + >> make.tmp
+   echo. import32.lib, >> make.tmp
+   ILINK32 -x -ap -Tpe -Gn @make.tmp
+
+$(OBJ_DIR)\xharbour.c : $(COMPILER_DIR)\xharbour.prg
+   $(HARBOUR_EXE) $(MAINFLAGS) -d__WIN32__ $** -o$@
+
+$(OBJ_DIR)\xharbour.obj : $(OBJ_DIR)\xharbour.c
+   $(CC) $(CLIBFLAGS) -D"HB_NO_DEFAULT_API_MACROS" -D"HB_NO_DEFAULT_STACK_MACROS" -o$@ $**

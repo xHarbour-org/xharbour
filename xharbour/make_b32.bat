@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.21 2005/03/02 02:11:58 andijahja Exp $
+rem $Id: make_b32.bat,v 1.22 2005/03/02 20:30:55 andijahja Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -13,6 +13,7 @@ rem ---------------------------------------------------------------
 
 if not exist obj md obj
 if not exist obj\b32 md obj\b32
+if not exist obj\b32\bin md obj\b32\bin
 if not exist obj\b32\mt md obj\b32\mt
 
 rem added optimize subdir for optimized library
@@ -34,8 +35,8 @@ if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
 
 :BUILD
-
-   make -l OBJ_DIR=obj\b32 -fmakefile.bc %1 %2 %3 > make_b32.log
+   make -l EXE_OBJ_DIR=obj\b32\bin OBJ_DIR=obj\b32 -fmakefile.bc %1 %2 %3 > make_b32.log
+   if errorlevel 1 goto BUILD_ERR
    make -l OBJ_DIR=obj\b32\mt -DHB_THREAD_SUPPORT -DHB_MT=mt -fmakefile.bc %2 %3 >> make_b32.log
    if errorlevel 1 goto BUILD_ERR
 
@@ -53,6 +54,8 @@ if "%1" == "CLEAN" goto CLEAN
 
 :CLEAN
 
+   if exist bin\xharbour.exe   del bin\xharbour.exe
+   if exist bin\xharbour.dll   del bin\xharbour.dll
    if exist bin\harbour.exe    del bin\harbour.exe
    if exist bin\hbdoc.exe      del bin\hbdoc.exe
    if exist bin\hbmake.exe     del bin\hbmake.exe
@@ -62,6 +65,7 @@ if "%1" == "CLEAN" goto CLEAN
    if exist bin\hbtest.exe     del bin\hbtest.exe
    if exist bin\xbscript.exe   del bin\xbscript.exe
 
+   if exist lib\xharbour.lib   del lib\xharbour.lib
    if exist lib\dllmain.lib    del lib\dllmain.lib
    if exist lib\codepage.lib   del lib\codepage.lib
    if exist lib\common.lib     del lib\common.lib
@@ -120,6 +124,7 @@ if "%1" == "CLEAN" goto CLEAN
    if exist bin\b32\*.exe del bin\b32\*.exe
    if exist bin\b32\*.tds del bin\b32\*.tds
    if exist bin\b32\*.map del bin\b32\*.map
+   if exist bin\b32\*.dll del bin\b32\*.dll
 
    if exist lib\b32\bcc640.lib copy lib\b32\bcc640.lib lib >nul
    if exist lib\b32\*.lib      del lib\b32\*.lib
@@ -134,6 +139,12 @@ if "%1" == "CLEAN" goto CLEAN
    if exist obj\b32\*.c      del obj\b32\*.c
    if exist obj\b32\*.h      del obj\b32\*.h
 
+   if exist obj\b32\bin\*.bak    del obj\b32\bin\*.bak
+   if exist obj\b32\bin\*.obj    del obj\b32\bin\*.obj
+   if exist obj\b32\bin\*.output del obj\b32\bin\*.output
+   if exist obj\b32\bin\*.c      del obj\b32\bin\*.c
+   if exist obj\b32\bin\*.h      del obj\b32\bin\*.h
+
    if exist obj\b32\mt\*.obj del obj\b32\mt\*.obj
    if exist obj\b32\mt\*.c   del obj\b32\mt\*.c
 
@@ -143,4 +154,3 @@ if "%1" == "CLEAN" goto CLEAN
    if exist obj\b32\mt\opt\gui\*.obj     del obj\b32\mt\opt\gui\*.obj
 
 :EXIT
-

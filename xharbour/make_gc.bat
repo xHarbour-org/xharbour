@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_gc.bat,v 1.4 2005/02/17 12:50:46 andijahja Exp $
+rem $Id: make_gc.bat,v 1.5 2005/02/19 11:22:29 andijahja Exp $
 rem
 rem Batch File For Building xHarbour with MinGW32 under Windows
 rem
@@ -16,7 +16,7 @@ rem Our BISON BIN Directory
 
 rem ENVAR THREE
 rem SET xHarbour Working Root Directory Here
-@set HARBOUR_DIR=d:/xharbour
+@set HARBOUR_DIR=C:/xharbour
 
 rem Set up our environment for output files here
 rem Let them be like that
@@ -37,6 +37,7 @@ if "%1" == "CLEAN" goto CLEAN
 if not exist %LIB_DIR%                 md %LIB_DIR%
 if not exist %BIN_DIR%                 md %BIN_DIR%
 if not exist %OBJ_DIR%                 md %OBJ_DIR%
+if not exist %OBJ_DIR%\bin             md %OBJ_DIR%\bin
 if not exist %OBJ_DIR%\libmisc         md %OBJ_DIR%\libmisc
 if not exist %OBJ_DIR%\rddads          md %OBJ_DIR%\rddads
 if not exist %OBJ_DIR%\unicode         md %OBJ_DIR%\unicode
@@ -74,6 +75,8 @@ if not exist %OBJ_DIR%\mt\libmisc      md %OBJ_DIR%\mt\libmisc
 
 :CLEAN
 
+if exist %BIN_DIR%\xharbour.exe       del %BIN_DIR%\xharbour.exe
+if exist %BIN_DIR%\xharbour.dll       del %BIN_DIR%\xharbour.dll
 if exist %BIN_DIR%\harbour.exe        del %BIN_DIR%\harbour.exe
 if exist %BIN_DIR%\hbdoc.exe          del %BIN_DIR%\hbdoc.exe
 if exist %BIN_DIR%\hbmake.exe         del %BIN_DIR%\hbmake.exe
@@ -84,6 +87,8 @@ if exist %BIN_DIR%\hbtest.exe         del %BIN_DIR%\hbtest.exe
 if exist %BIN_DIR%\xbscript.exe       del %BIN_DIR%\xbscript.exe
 
 if exist %LIB_DIR%\libcodepage.a      del %LIB_DIR%\libcodepage.a
+if exist %LIB_DIR%\libxharbour.a      del %LIB_DIR%\libxharbour.a
+if exist %LIB_DIR%\libxharbour.def    del %LIB_DIR%\libxharbour.def
 if exist %LIB_DIR%\libcommon.a        del %LIB_DIR%\libcommon.a
 if exist %LIB_DIR%\libct.a            del %LIB_DIR%\libct.a
 if exist %LIB_DIR%\libctmt.a          del %LIB_DIR%\libctmt.a
@@ -166,6 +171,11 @@ if exist %OBJ_DIR%\mt\*.c             del %OBJ_DIR%\mt\*.c
 if exist %OBJ_DIR%\mt\*.o             del %OBJ_DIR%\mt\*.o
 if exist %OBJ_DIR%\mt\*.h             del %OBJ_DIR%\mt\*.h
 if exist %OBJ_DIR%\mt\*.output        del %OBJ_DIR%\mt\*.output
+
+if exist %OBJ_DIR%\bin\*.c            del %OBJ_DIR%\bin\*.c
+if exist %OBJ_DIR%\bin\*.o            del %OBJ_DIR%\bin\*.o
+if exist %OBJ_DIR%\bin\*.h            del %OBJ_DIR%\bin\*.h
+if exist %OBJ_DIR%\bin\*.output       del %OBJ_DIR%\bin\*.output
 
 if exist %OBJ_DIR%\mt\ct\*.c          del %OBJ_DIR%\mt\ct\*.c
 if exist %OBJ_DIR%\mt\ct\*.o          del %OBJ_DIR%\mt\ct\*.o
