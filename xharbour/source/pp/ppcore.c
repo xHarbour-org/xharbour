@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.203 2005/03/18 21:05:33 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.204 2005/03/19 20:09:25 ronpinkas Exp $
  */
 
 /*
@@ -6271,6 +6271,10 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
            cLastChar = '[';
            lPos++;
            continue;
+        }
+        else if( *(szText+lPos) == ']' )
+        {
+           kolSquare--;
         }
         else if( *(szText+lPos) == '(' )
         {
