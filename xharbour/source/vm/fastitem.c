@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.40 2003/01/05 06:50:36 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.41 2003/01/05 20:20:02 ronpinkas Exp $
  */
 
 /*
@@ -61,6 +61,10 @@
 #include "hbdate.h"
 #include "hbset.h"
 
+#ifdef HB_THREAD_SUPPORT
+   extern HB_CRITICAL_T hb_gcCollectionMutex;
+#endif
+
 extern char *hb_vm_sNull;
 
 extern char *hb_vm_acAscii[256];
@@ -98,11 +102,13 @@ void HB_EXPORT hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
    }
 
    /* Forward. */
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
    /* Now fake clear the transferer. */
    //pSource->item.asString.bStatic = FALSE;
    pSource->type = HB_IT_NIL;
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
 
 PHB_ITEM HB_EXPORT hb_itemReturn( PHB_ITEM pItem )
@@ -133,6 +139,8 @@ void HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemReleaseString(%p), '%s'", pItem, pItem->item.asString.value ) );
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
+
    if( pItem->item.asString.bStatic == FALSE )
    {
       if( --*( pItem->item.asString.puiHolders ) == 0 )
@@ -147,11 +155,14 @@ void HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem )
    //pItem->item.asString.bStatic = FALSE;
    pItem->item.asString.value = NULL;
    //pItem->item.asString.length = 0;
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
 
 void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemClear(%p) type: %i", pItem, pItem->type ) );
+
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( HB_IS_STRING( pItem ) )
    {
@@ -177,6 +188,7 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
    }
 
    pItem->type = HB_IT_NIL;
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
 
 void HB_EXPORT hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
@@ -192,15 +204,18 @@ void HB_EXPORT hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
    hb_itemForwardValue( pItem1, &temp );
    */
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    memcpy( &temp, pItem2, sizeof( HB_ITEM ) );
    memcpy( pItem2, pItem1, sizeof( HB_ITEM ) );
    memcpy( pItem1, &temp, sizeof( HB_ITEM ) );
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
 
 void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemCopy(%p, %p)", pDest, pSource));
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( pDest == pSource )
    {
       hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemCopy()", NULL );
@@ -239,12 +254,14 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
    {
       hb_memvarValueIncRef( pSource->item.asMemvar.value );
    }
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
 
 PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, char * szText )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
@@ -280,6 +297,7 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, char * szText )
       pItem->item.asString.value           = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
       strcpy( pItem->item.asString.value, szText );
    }
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
    return pItem;
 }
@@ -287,6 +305,8 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, char * szText )
 PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
+
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( pItem )
    {
@@ -324,6 +344,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
       hb_xmemcpy( pItem->item.asString.value, szText, ulLen );
       pItem->item.asString.value[ ulLen ]  = '\0';
    }
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
    return pItem;
 }
@@ -332,6 +353,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
@@ -351,6 +373,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
    pItem->item.asString.value[ ulLen ] = '\0';
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
    return pItem;
 }
@@ -359,6 +382,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCRaw(%p, %s, %lu)", pItem, szText, ulLen));
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
@@ -377,6 +401,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
    pItem->item.asString.bStatic = FALSE;
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
    return pItem;
 }
@@ -385,6 +410,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ul
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCRawStatic(%p, %s, %lu)", pItem, szText, ulLen));
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
@@ -401,6 +427,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ul
    pItem->item.asString.bStatic = TRUE;
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
    return pItem;
 }
@@ -411,6 +438,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCStatic(%p, %s)", pItem, szText) );
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
@@ -428,6 +456,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
    pItem->item.asString.value[ ulLen ] = '\0';
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
    return pItem;
 }
@@ -436,6 +465,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLe
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCLStatic(%p, %s, %lu)", pItem, szText, ulLen));
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
@@ -453,6 +483,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLe
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
    pItem->item.asString.value[ ulLen ] = '\0';
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
    return pItem;
 }
@@ -461,6 +492,7 @@ PHB_ITEM HB_EXPORT hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutPtr(%p, %p)", pItem, pValue));
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
@@ -476,6 +508,7 @@ PHB_ITEM HB_EXPORT hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
    pItem->type = HB_IT_POINTER;
    pItem->item.asPointer.value = pValue;
    pItem->item.asPointer.collect = FALSE;
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
    return pItem;
 }
@@ -484,6 +517,7 @@ PHB_ITEM HB_EXPORT hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutPtr(%p, %p)", pItem, pValue));
 
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
    if( pItem )
    {
       if( HB_IS_COMPLEX( pItem ) )
@@ -499,6 +533,7 @@ PHB_ITEM HB_EXPORT hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
    pItem->type = HB_IT_POINTER;
    pItem->item.asPointer.value = pValue;
    pItem->item.asPointer.collect = TRUE;
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
    return pItem;
 }
@@ -507,6 +542,7 @@ void HB_EXPORT hb_itemFastClear( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ( "hb_itemFastClear(%p) Type: %i", pItem, pItem->type ) );
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {
       //printf( "\nFastClear Array %p uiHolders: %i Cyclic: %i", pItem, ( pItem->item.asArray.value )->uiHolders, hb_itemArrayCyclicCount( pItem ) );
@@ -526,6 +562,7 @@ void HB_EXPORT hb_itemFastClear( PHB_ITEM pItem )
    }
 
    pItem->type    = HB_IT_NIL;
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ( "DONE hb_itemFastClear(%p)", pItem ) );
 }
@@ -536,10 +573,12 @@ void HB_EXPORT hb_itemPushStaticString( char * szText, ULONG length )
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ( "hb_itemPushStaticString( \"%s\", %lu ) %p %p", szText, length, pTop, szText ) );
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    pTop->type = HB_IT_STRING;
    pTop->item.asString.length  = length;
    pTop->item.asString.value   = szText;
    pTop->item.asString.bStatic = TRUE;
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 
    hb_stackPush();
 }
@@ -549,6 +588,7 @@ void HB_EXPORT hb_retcAdopt( char * szText )
 {
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcAdopt(%s)", szText ) );
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( ( &(HB_VM_STACK.Return) )->type )
    {
       if( HB_IS_STRING( &(HB_VM_STACK.Return) ) )
@@ -567,6 +607,8 @@ void HB_EXPORT hb_retcAdopt( char * szText )
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length  = strlen( szText );
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+
 }
 
 #undef hb_retclenAdopt
@@ -576,6 +618,7 @@ void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
 
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( ( &(HB_VM_STACK.Return) )->type )
    {
       if( HB_IS_STRING( &(HB_VM_STACK.Return) ) )
@@ -594,6 +637,7 @@ void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length  = ulLen;
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
 
 #undef hb_retclenAdoptRaw
@@ -601,6 +645,7 @@ void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( ( &(HB_VM_STACK.Return) )->type )
    {
       if( HB_IS_STRING( &(HB_VM_STACK.Return) ) )
@@ -619,6 +664,7 @@ void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = FALSE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length  = ulLen;
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
 
 #undef hb_retclenAdoptRawStatic
@@ -626,6 +672,7 @@ void HB_EXPORT hb_retclenAdoptRawStatic( char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( ( &(HB_VM_STACK.Return) )->type )
    {
       if( HB_IS_STRING( &(HB_VM_STACK.Return) ) )
@@ -644,6 +691,7 @@ void HB_EXPORT hb_retclenAdoptRawStatic( char * szText, ULONG ulLen )
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = TRUE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length  = ulLen;
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
 
 #undef hb_retcAdoptStatic
@@ -651,6 +699,7 @@ void HB_EXPORT hb_retcAdoptStatic( char * szText )
 {
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcAdoptStatic(%s)", szText ) );
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( ( &(HB_VM_STACK.Return) )->type )
    {
       if( HB_IS_STRING( &(HB_VM_STACK.Return) ) )
@@ -667,12 +716,15 @@ void HB_EXPORT hb_retcAdoptStatic( char * szText )
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = TRUE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length  = strlen( szText );
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
 
 #undef hb_retclenAdoptStatic
 void HB_EXPORT hb_retclenAdoptStatic( char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdoptStatic(%s)", szText ) );
+
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
 
    if( ( &(HB_VM_STACK.Return) )->type )
    {
@@ -690,6 +742,7 @@ void HB_EXPORT hb_retclenAdoptStatic( char * szText, ULONG ulLen )
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = TRUE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length  = ulLen;
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
 }
 
 HB_FUNC( ARRAYCYCLICCOUNT )
@@ -846,6 +899,7 @@ BYTE HB_EXPORT hb_itemParamId( PHB_ITEM pItem )
    PHB_ITEM *pTop;
    BYTE iId = 1;
 
+   HB_CRITICAL_LOCK( hb_gcCollectionMutex );
    if( hb_stackBaseItem()->item.asSymbol.paramcnt < 256 )
    {
       pTop = pBase + hb_stackBaseItem()->item.asSymbol.paramcnt + 1;
@@ -864,6 +918,7 @@ BYTE HB_EXPORT hb_itemParamId( PHB_ITEM pItem )
      }
      pBase++;iId++;
    }
-
+   HB_CRITICAL_UNLOCK( hb_gcCollectionMutex );
+   
    return 0;
 }

@@ -1,6 +1,6 @@
 ************************************************************
 * rpcserver.prg
-* $Id: rpcserver.prg,v 1.3 2003/02/19 20:20:33 jonnymind Exp $
+* $Id: rpcserver.prg,v 1.4 2003/02/24 01:58:11 jonnymind Exp $
 * Test for tRpcServer and tRpcFunction class
 *
 * YOU NEED THREADS TO RUN THIS
@@ -42,8 +42,8 @@ PROCEDURE Main()
    oSv:Start( .T. )
    @3,10 SAY "Waiting for connection"
    @4,10 SAY "Press any key to stop"
-   //Inkey(0) // we have nothing more to do here.
-   ThreadSleep( 60000 )
+   Inkey(0) // we have nothing more to do here.
+   //ThreadSleep( 60000 )
    oSv:Stop()
 RETURN
 

@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.5 2003/02/23 20:13:39 jonnymind Exp $
+ * $Id: trpc.prg,v 1.6 2003/02/24 01:58:10 jonnymind Exp $
  */
 
 /*
@@ -576,7 +576,7 @@ METHOD RecvChallenge() CLASS tRPCServeCon
       RETURN .F.
    ENDIF
 
-   IF ::nChallengeCRC == HB_GetLen8( cNumber )
+   IF ::nChallengeCRC != HB_GetLen8( cNumber )
       RETURN .F.
    ENDIF
 
@@ -906,8 +906,8 @@ METHOD SendProgress( nProgress, oData ) CLASS tRPCServeCon
          InetSendAll(::skRemote, "XHBR35" + HB_Serialize( nProgress ) +;
                 cOrigLen + cCompLen + ::Encrypt( cData ) )
       ELSE
-         InetSendAll( ::skRemote, "XHBR34" + ::Encrypt( HB_Serialize( nProgress ) +;
-               cOrigLen + ::Encrypt( cData ) ) )
+         InetSendAll( ::skRemote, "XHBR34" + HB_Serialize( nProgress ) +;
+               cOrigLen + ::Encrypt( cData ) )
       ENDIF
    ENDIF
 
@@ -1262,7 +1262,6 @@ METHOD AuthorizeChallenge( cUserId, cData ) CLASS tRPCService
    ENDIF
 
    cData := Substr( cData, 1, nPos - 1 )
-   ? cData +"<<"
 
    IF ::Authorize( cUserId, cData ) > 0
       RETURN cKey

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrypt.c,v 1.1 2003/02/23 20:13:39 jonnymind Exp $
+ * $Id: hbcrypt.c,v 1.2 2003/02/24 01:58:10 jonnymind Exp $
  */
 
 /*
@@ -157,7 +157,7 @@ void nxs_scramble(
    nxs_make_scramble( scramble, key, keylen );
 
    /* Leave alone the last block */
-   len = ((srclen / keylen)-1) * keylen;
+   len = (srclen / keylen) * keylen;
    nxs_partial_scramble( source, cipher, scramble, len, keylen );
 
    // last pos was not done.
@@ -211,7 +211,7 @@ void nxs_unscramble(
    nxs_make_scramble( scramble, key, keylen );
 
    /* Leave alone the last block */
-   len = ((cipherlen / keylen)-1) * keylen;
+   len = (cipherlen / keylen) * keylen;
    nxs_partial_unscramble( cipher, scramble, len , keylen );
 
    keylen = cipherlen - len;

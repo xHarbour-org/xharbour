@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.6 2003/02/23 20:13:39 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.7 2003/02/24 01:58:10 jonnymind Exp $
  */
 
 /*
@@ -663,7 +663,7 @@ METHOD TCPParse( cCode ) CLASS tRPCClient
             nDataLen := HB_GetLen8( cDataLen )
             cData := Space( nDataLen )
             IF InetRecvAll( ::skTCP, @cData, nDataLen ) == nDataLen
-               ::oResult := ::Decrypt( HB_Deserialize( cData ) )
+               ::oResult := HB_Deserialize( ::Decrypt( cData ) )
                ::OnFunctionReturn( ::oResult )
             ENDIF
          ENDIF
@@ -678,7 +678,7 @@ METHOD TCPParse( cCode ) CLASS tRPCClient
                IF InetRecvAll( ::skTCP, @cData ) == nDataLen
                   cData := HB_Uncompress( nOrigLen, cData )
                   IF .not. Empty( cData )
-                     ::oResult := ::Decrypt( HB_Deserialize( cData ) )
+                     ::oResult := HB_Deserialize( ::Decrypt( cData ) )
                      ::OnFunctionReturn( ::oResult )
                   ENDIF
                ENDIF
@@ -702,7 +702,7 @@ METHOD TCPParse( cCode ) CLASS tRPCClient
                cData := Space( nDataLen )
                IF InetRecvAll( ::skTCP, @cData ) == nDataLen
                   lContinue := .T.
-                  ::OnFunctionProgress( nProgress, ::Decrypt( HB_Deserialize(cData) ) )
+                  ::OnFunctionProgress( nProgress, HB_Deserialize(::Decrypt( cData) ) )
                ENDIF
             ENDIF
          ENDIF
@@ -720,7 +720,7 @@ METHOD TCPParse( cCode ) CLASS tRPCClient
                      cData := HB_Uncompress( nOrigLen, cData )
                      IF .not. Empty( cData )
                         lContinue := .T.
-                        ::OnFunctionProgress( nProgress, ::Decrypt( HB_Deserialize(cData) ) )
+                        ::OnFunctionProgress( nProgress, HB_Deserialize( ::Decrypt( cData) ) )
                      ENDIF
                   ENDIF
                ENDIF

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.768 2003/02/24 01:58:09 jonnymind Exp $
+ * $Id: ChangeLog,v 1.769 2003/02/24 03:50:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-02-24 06:00 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/hbcrypt.c
+    ! Fixed some rare error conditions
+
+  * source/rtl/trpccli.prg
+  * source/rtl/trpc.prg
+    + Added 3way handshake Challenged login and crypted transmissions
+
+  * source/vm/estack.c
+  * source/vm/fastitem.c
+  * source/vm/itemapi.c
+    + Added many locks around for MT safety
+
+  * tests/rpcserver.prg
+    + Added test for challenge handshake of rpcclient.prg
+
 
 2003-02-23 19:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/classes.c
