@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3005 2004/05/29 21:49:23 likewolf Exp $
+ * $Id: ChangeLog,v 1.3006 2004/05/30 14:41:11 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,6 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-2004-05- 22:50 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
 
 2004-05-30 01:50 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * bin/hb-func.sh
@@ -27,7 +26,7 @@
     ! Fixed GPF trap related to releasing class methods before release of datas inlines
       (which might refer back to a method)
 
-2004-05-30  11:40 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+2004-05-30  11:40 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * makefile.bc
     makefile.vc
     makefile.nt
