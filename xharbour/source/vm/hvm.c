@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.99 2002/09/17 18:07:53 ronpinkas Exp $
+ * $Id: hvm.c,v 1.100 2002/09/17 22:28:48 ronpinkas Exp $
  */
 
 /*
@@ -5199,7 +5199,7 @@ static void hb_vmPushGlobalByRef( SHORT iGlobal )
 {
    HB_ITEM_PTR pTop = ( * hb_stack.pPos );
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushGlobalByRef(%i)", (int) iLocal));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushGlobalByRef(%i)", (int) iGlobal));
 
    pTop->type = HB_IT_BYREF;
 
