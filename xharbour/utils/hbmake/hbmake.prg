@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.51 2003/03/12 02:33:58 lculik Exp $
+ * $Id: hbmake.prg,v 1.52 2003/03/20 13:42:01 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1544,7 +1544,7 @@ FUNC CreateMakeFile( cFile )
                cOldLib        := " " + cDefLibGccLibs
                cDefLibGccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
 
-               IF "html" IN cDefLibGccLibs 
+               IF "html" IN cDefLibGccLibs
                    cDefLibGccLibs := StrTran( cDefLibGccLibs, "gtsln" , "gtcgi" )
                    cDefLibGccLibs := StrTran( cDefLibGccLibs, "slang" , "" )
                ENDIF
@@ -1590,7 +1590,7 @@ FUNC CreateMakeFile( cFile )
       ENDIF
 
    ENDIF
- 
+
    IF s_lBcc .OR. s_lVcc
       IF lFwh
 
@@ -3295,7 +3295,7 @@ FUNCTION ResetInternalVars()
    s_lOs2          := .F.
    s_lRecurse      := .F.
    s_lEditMode     := .F.
-   s_aDir
+   s_aDir          := {}
    s_aLangMessages := {}
 
 
