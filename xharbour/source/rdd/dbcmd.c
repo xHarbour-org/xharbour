@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.53 2003/10/01 17:41:47 paultucker Exp $
+ * $Id: dbcmd.c,v 1.54 2003/10/20 01:05:56 mlombardo Exp $
  */
 
 /*
@@ -3584,7 +3584,7 @@ HB_FUNC( ORDSCOPE )
 
    if( s_pCurrArea )
    {
-      if( !ISNUM( 1 ) || (!ISNIL(2) && !( ISCHAR(2) || ISNUM(2) || ISDATE(2) || ISLOG(2) )))
+      if( (!ISNUM( 1 ) && !ISNIL(1) ) || (!ISNIL(2) && !( ISCHAR(2) || ISNUM(2) || ISDATE(2) || ISLOG(2) )))
       {
          hb_errRT_DBCMD( EG_ARG, EDBCMD_REL_BADPARAMETER, NULL, "ORDSCOPE" );
          return;
