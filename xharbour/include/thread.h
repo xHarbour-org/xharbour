@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.41 2003/04/04 17:21:21 paultucker Exp $
+* $Id: thread.h,v 1.42 2003/04/08 18:19:19 jonnymind Exp $
 */
 
 /*
@@ -505,7 +505,7 @@ extern HB_THREAD_T hb_main_thread_id;
 
 extern HB_STACK *hb_threadCreateStack( HB_THREAD_T th_id );
 extern HB_STACK *hb_threadLinkStack( HB_STACK *tc );
-extern HB_STACK *hb_threadUnlinkStack( HB_THREAD_T th_id );
+extern HB_STACK *hb_threadUnlinkStack( HB_STACK *pStack );
 extern void hb_threadDestroyStack( HB_STACK *pStack );
 extern HB_STACK *hb_threadGetStack( HB_THREAD_T th_id );
 extern void hb_threadInit( void );
