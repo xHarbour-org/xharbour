@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3803 2005/02/11 18:56:22 druzus Exp $
+ * $Id: ChangeLog,v 1.3804 2005/02/11 22:13:04 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-12 02:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  - make_bsd.sh
+    Removed in favor of make_gnu.sh.
+  - make_gnu.sh
+  + make_gnu.sh
+    Removed and re-added with execution bit set.
+  * bin/hb-func.sh
+    ! Added -L/usr/local/lib for -lslang on FreeBSD.
 
 2005-02-11 14:47 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * hrbdll.bc

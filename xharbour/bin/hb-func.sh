@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.44 2005/01/21 18:41:37 druzus Exp $
+# $Id: hb-func.sh,v 1.45 2005/01/30 06:45:44 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -279,6 +279,8 @@ HB_GPM_LIB=""
 if [ -f "\${HB_LIB_INSTALL}/libgtsln.a" ]; then
     if [ "\${HB_ARCHITECTURE}" = "darwin" ]; then
         SYSTEM_LIBS="\${SYSTEM_LIBS} -L/sw/lib"
+    elif [ "\${HB_ARCHITECTURE}" = "bsd" ]; then
+        SYSTEM_LIBS="\${SYSTEM_LIBS} -L/usr/local/lib"
     fi
     SYSTEM_LIBS="\${SYSTEM_LIBS} -l${HB_SLN_LIB:-slang}"
     [ "\${HB_GPM_MOUSE}" = "yes" ] && HB_GPM_LIB="gpm"
