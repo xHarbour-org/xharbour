@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.40 2004/01/13 16:17:13 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.41 2004/01/14 12:49:20 vouchcac Exp $
  */
 
 /*
@@ -66,7 +66,6 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-
 #include "hbgtwvt.h"
 //-------------------------------------------------------------------//
 
@@ -97,14 +96,14 @@ static COLORREF _COLORS[] = {
 static int nCountPuts=0,nCountScroll=0, nCountPaint=0, nSetFocus=0, nKillFocus=0;
 #endif
 
-/*
-static int _Alt_Alpha[] = {
-  K_ALT_A, K_ALT_B, K_ALT_C, K_ALT_D, K_ALT_E, K_ALT_F, K_ALT_G, K_ALT_H,
-  K_ALT_I, K_ALT_J, K_ALT_K, K_ALT_L, K_ALT_M, K_ALT_N, K_ALT_O, K_ALT_P,
-  K_ALT_Q, K_ALT_R, K_ALT_S, K_ALT_T, K_ALT_U, K_ALT_V, K_ALT_W, K_ALT_X,
-  K_ALT_Y, K_ALT_Z
+static int K_Ctrl[] = {
+  K_CTRL_A, K_CTRL_B, K_CTRL_C, K_CTRL_D, K_CTRL_E, K_CTRL_F, K_CTRL_G, K_CTRL_H,
+  K_CTRL_I, K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_M, K_CTRL_N, K_CTRL_O, K_CTRL_P,
+  K_CTRL_Q, K_CTRL_R, K_CTRL_S, K_CTRL_T, K_CTRL_U, K_CTRL_V, K_CTRL_W, K_CTRL_X,
+  K_CTRL_Y, K_CTRL_Z
   };
 
+/*
 static int _Alt_Num[] = {
   K_ALT_0, K_ALT_1, K_ALT_2, K_ALT_3, K_ALT_4, K_ALT_5, K_ALT_6, K_ALT_7,
   K_ALT_8, K_ALT_9
@@ -1814,24 +1813,31 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       int c = ( int )wParam;
       if ( !bIgnoreWM_SYSCHAR )
       {
-        switch ( c )
+        if ( c >= 1 && c<= 26 )  // K_CTRL_A - Z
         {
-          // handle special characters
-          case VK_BACK:
-            hb_wvt_gtTranslateKey( K_BS, K_BS, K_ALT_BS, K_CTRL_BS );
-            break;
-          case VK_TAB:
-            hb_wvt_gtTranslateKey( K_TAB, K_SH_TAB, K_ALT_TAB, K_CTRL_TAB );
-            break;
-          case VK_RETURN:
-            hb_wvt_gtTranslateKey( K_RETURN, K_RETURN, K_ALT_RETURN, K_CTRL_RETURN );
-            break;
-          case VK_ESCAPE:
-            hb_wvt_gtAddCharToInputQueue( K_ESC );
-            break;
-          default:
-            hb_wvt_gtAddCharToInputQueue( c );
-            break;
+          hb_wvt_gtAddCharToInputQueue( K_Ctrl[c-1]  );
+        }
+        else
+        {
+          switch ( c )
+          {
+            // handle special characters
+            case VK_BACK:
+              hb_wvt_gtTranslateKey( K_BS, K_BS, K_ALT_BS, K_CTRL_BS );
+              break;
+            case VK_TAB:
+              hb_wvt_gtTranslateKey( K_TAB, K_SH_TAB, K_ALT_TAB, K_CTRL_TAB );
+              break;
+            case VK_RETURN:
+              hb_wvt_gtTranslateKey( K_RETURN, K_RETURN, K_ALT_RETURN, K_CTRL_RETURN );
+              break;
+            case VK_ESCAPE:
+              hb_wvt_gtAddCharToInputQueue( K_ESC );
+              break;
+            default:
+              hb_wvt_gtAddCharToInputQueue( c );
+              break;
+          }
         }
       }
       return( 0 );
@@ -2812,7 +2818,7 @@ DWORD HB_EXPORT hb_wvt_gtSetWindowIconFromFile( char *icon )
   {
     SendMessage( _s.hWnd, WM_SETICON, ICON_SMALL, ( LPARAM ) hIcon ); // Set Title Bar ICON
     SendMessage( _s.hWnd, WM_SETICON, ICON_BIG  , ( LPARAM ) hIcon ); // Set Task List Icon
-    
+
     DeleteObject( hIcon );
   }
   return( ( DWORD ) hIcon ) ;
@@ -3277,6 +3283,166 @@ HB_FUNC( WVT_GETFONTINFO )
    hb_itemReturn( info );
    hb_itemRelease( info );
 }
+
+//               Peter Rees <peter@rees.co.nz>
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_SETMENU )
+{
+  SetMenu(_s.hWnd, (HMENU) hb_parni(1)) ;
+  hb_wvt_gtResetWindow();
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_CREATEMENU )
+{
+  hb_retnl((LONG) CreateMenu()) ;
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_APPENDMENU )
+{
+  char ucBuf[256];
+  int i,iLen ;
+  LPCTSTR lpszCaption;
+  if (ISCHAR(4))
+  {
+    iLen = hb_parclen(4);
+    if (iLen> 0 && iLen < 256 )   // Translate '~' to '&'
+    {
+      lpszCaption= hb_parc(4) ;
+      for ( i=0; i< iLen ; i++ )
+      {
+        ucBuf[i] = (*lpszCaption == '~') ? '&' : *lpszCaption ;
+        lpszCaption++;
+      }
+      ucBuf[iLen]= '\0';
+      lpszCaption = ucBuf ;
+    }
+    else
+    {
+      lpszCaption = hb_parc(4) ;
+    }
+  }
+  else
+  {
+    lpszCaption = (LPCTSTR) hb_parni(4) ; // It is a
+  }
+  hb_retl(AppendMenu((HMENU) hb_parnl(1), (UINT) hb_parni(2),(UINT_PTR) hb_parni(3),(LPCTSTR) lpszCaption)) ;
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_DELETEMENU )
+{
+  hb_retl(DeleteMenu((HMENU) hb_parnl(1), (UINT) hb_parni(2),(UINT) hb_parni(3)));
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_DESTROYMENU )
+{
+  hb_retl(DestroyMenu((HMENU) hb_parnl(1)));
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_ENABLEMENUITEM )
+{
+  hb_retni(EnableMenuItem((HMENU) hb_parnl(1), (UINT) hb_parni(2),(UINT) hb_parni(3)));
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_GETLASTMENUEVENT )
+{
+  hb_retni(hb_wvt_gtGetLastMenuEvent()) ;
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_SETMENUKEYEVENT )
+{
+  int iEvent = 0;
+  if (ISNUM(1))
+  {
+    iEvent = hb_parnl(1) ;
+  }
+  hb_retni(hb_wvt_gtSetMenuKeyEvent(iEvent)) ;
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC(WVT_GETSCREENWIDTH)
+{
+  hb_retni(GetSystemMetrics(SM_CXSCREEN));
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC(WVT_GETSCREENHEIGHT)
+{
+  hb_retni(GetSystemMetrics(SM_CYSCREEN));
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_SETCLOSEEVENT )
+{
+  int iEvent = -1;
+  if (ISNUM(1))
+  {
+    iEvent = hb_parnl(1) ;
+  }
+  hb_wvt_gtSetCloseEvent(iEvent);
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_SETSHUTDOWNEVENT )
+{
+  int iEvent = -1;
+  if (ISNUM(1))
+  {
+    iEvent = hb_parnl(1) ;
+  }
+  hb_wvt_gtSetShutdownEvent(iEvent);
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_SETWINDOWCENTRE )
+{
+  hb_wvt_gtSetCentreWindow(hb_parl(1),hb_parl(2)) ;
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_SETALTF4CLOSE )
+{
+  hb_retl(hb_wvt_gtSetAltF4Close(hb_parl(1)));
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_PROCESSMESSAGES )
+{
+  hb_wvt_gtDoProcessMessages();
+  hb_retl(1);
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_GETTITLE )
+{
+  unsigned char ucText[1024];
+  hb_wvt_gtGetWindowTitle(ucText, 1023);
+  hb_retc(ucText) ;
+}
+
 
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
@@ -3801,7 +3967,7 @@ HB_FUNC( WVT_DRAWFOCUSRECT )
    xy        = hb_wvt_gtGetXYFromColRow( hb_parni( 4 ) + 1, hb_parni( 3 ) + 1 );
    rc.bottom = xy.y-1;
    rc.right  = xy.x-1;
-   
+
    hb_retl( DrawFocusRect( _s.hdc, &rc ) );
 }
 
@@ -3815,22 +3981,22 @@ HB_FUNC( WVT_DRAWGRIDHORZ )
    int   iRows  = hb_parni( 4 );
    int   i, y;
    int   iLeft, iRight;
-   
+
    iLeft  = ( hb_parni( 2 ) * _s.PTEXTSIZE.x );
 	iRight = ( ( ( hb_parni( 3 ) + 1 ) * _s.PTEXTSIZE.x ) - 1 );
-	
+
 	SelectObject( _s.hdc, _s.currentPen );
-	
+
 	for ( i = 0; i < iRows; i++ )
 	{
       y = ( ( iAtRow ) * _s.PTEXTSIZE.y );
-      
+
       MoveToEx( _s.hdc, iLeft, y, NULL );
       LineTo( _s.hdc, iRight, y );
-      
+
       iAtRow++;
 	}
-	
+
 	hb_retl( TRUE );
 }
 
@@ -3841,27 +4007,27 @@ HB_FUNC( WVT_DRAWGRIDHORZ )
 HB_FUNC( WVT_DRAWGRIDVERT )
 {
    int iTop, iBottom, x;
-   int i;  
+   int i;
    int iTabs = hb_parni( 4 );
 
 	if ( ! iTabs )
 	{
 	   hb_retl( FALSE );
 	}
-	
+
    iTop    = ( hb_parni( 1 ) * _s.PTEXTSIZE.y );
    iBottom = ( ( hb_parni( 2 ) + 1 ) * _s.PTEXTSIZE.y ) - 1;
-  
+
    SelectObject( _s.hdc, _s.currentPen );
-   
+
    for ( i = 1; i <= iTabs; i++ )
    {
       x = ( hb_parni( 3,i ) * _s.PTEXTSIZE.x );
-      
+
       MoveToEx( _s.hdc, x, iTop, NULL );
       LineTo( _s.hdc, x, iBottom );
    }
-   
+
    hb_retl( TRUE );
 }
 
