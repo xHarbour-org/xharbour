@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.21 2004/03/21 21:30:01 lculik Exp $
+   $Id: xwt_gtk.h,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
 
    GTK interface
 */
@@ -16,7 +16,7 @@
    BASE <---+---- MODAL
             |---- SPLITTER 
             |---- WND <---- FRAMEWND (*)
-            |---- MENUITEM (**)
+            |---- IDWID <--- MENUITEM (**)
             |---- ALIGN <---+---- SENSIBLE <---+---- IMAGE
                             |                  |---- LABEL
                             |
@@ -25,7 +25,6 @@
     
 (*) Collaborates with MENUITEM
 (**) Collaborates with ALIGN, LABEL and IMAGE
-(*) Collaborates with two LAYCONTAINERs
 */  
                        
 #ifndef XWT_GTK_H
@@ -65,6 +64,13 @@ typedef struct tag_xwt_gtk_modal
   BOOL canceled;
 } XWT_GTK_MODAL, *PXWT_GTK_MODAL;
 
+typedef struct tag_xwt_gtk_menu
+{
+  INHERIT( XWT_GTK_BASE );
+  GtkWidget *bar_item;
+  GtkWidget *label;
+} XWT_GTK_MENU, *PXWT_GTK_MENU;
+
 
 typedef struct tag_xwt_gtk_splitter
 {
@@ -93,6 +99,8 @@ typedef struct tag_xwt_gtk_framewnd
    GtkWidget *menu_bar;
    GtkWidget *menu_box;
    GtkWidget *status_bar;
+   guint status_context;
+   char *status_message;
 } XWT_GTK_FRAMEWND, *PXWT_GTK_FRAMEWND;
 
 
@@ -109,6 +117,8 @@ typedef struct tag_xwt_gtk_menuitem
    GtkWidget *image;
    GtkWidget *label;
    GtkWidget *align;
+   BOOL      bIsCheck;
+   BOOL      bValue;
 } XWT_GTK_MENUITEM, *PXWT_GTK_MENUITEM;
 
 
@@ -210,8 +220,6 @@ BOOL xwt_gtk_createListBox( PXWT_WIDGET xwtData );
 BOOL xwt_gtk_createProgressBar( PXWT_WIDGET xwtData );
 BOOL xwt_gtk_createColorSelection( PXWT_WIDGET xwtData );
 void xwt_gtk_ComboAddItem(PXWT_WIDGET xwtData, PHB_ITEM pComboArray );
-void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
-void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
 BOOL xwt_gtk_imageLoad( PXWT_WIDGET xwtData, const char *fname );
 void xwt_gtk_ListAddItem(PXWT_WIDGET xwtData, PHB_ITEM pComboArray );
 
@@ -280,6 +288,10 @@ BOOL xwt_gtk_window_connect( PXWT_WIDGET wWindow, PXWT_WIDGET wChild );
 BOOL xwt_gtk_window_disconnect( PXWT_WIDGET wWindow );
 
 GtkWidget *xwt_gtk_window_topwidget( PXWT_WIDGET widget );
+
+/** Frame window widget */
+void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
+void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData );
 
 /** Layout */
 BOOL xwt_gtk_createLayout( PXWT_WIDGET wSelf );

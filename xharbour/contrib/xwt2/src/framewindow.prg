@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: framewindow.prg,v 1.4 2003/10/09 23:18:33 jonnymind Exp $
+   $Id: framewindow.prg,v 1.1 2004/05/11 14:57:50 jonnymind Exp $
 
    Frame window class. A window with a menu, a central area and a statusbar
 */
@@ -40,17 +40,15 @@ METHOD SetMenuBar( aMenus ) CLASS XWTFrameWindow
       FOR EACH oMenu IN ::aMenus
          oMenu:oOwner := NIL
       NEXT
-      XWT_SetProperty( ::oRawWidget, XWT_PROP_RSTMENUBAR, aMenus )
    ENDIF
 
    ::aMenus := aMenus
+   XWT_SetProperty( ::oRawWidget, "menubar", ::aMenus )
    IF .not. Empty( ::aMenus )
       FOR EACH oMenu IN ::aMenus
          oMenu:oOwner := Self
       NEXT
-      XWT_SetProperty( ::oRawWidget, XWT_PROP_SETMENUBAR, aMenus )
    ENDIF
 
 RETURN .T.
-
 

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.31 2004/02/08 13:00:08 lculik Exp $
+   $Id: xwt_gtk.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
 
    Global declarations, common functions
 
@@ -150,14 +150,14 @@ static BOOL xwt_gtk_create( PXWT_WIDGET xwtData )
       case XWT_TYPE_LAYOUT:  return xwt_gtk_createLayout( xwtData );
       case XWT_TYPE_TEXTBOX: return xwt_gtk_createTextbox( xwtData );
       case XWT_TYPE_BUTTON:  return xwt_gtk_createButton( xwtData );
-      //case XWT_TYPE_WINDOW:  return xwt_gtk_createWindow( xwtData );
-      //case XWT_TYPE_PANE:    return xwt_gtk_createPane( xwtData );
-      /*case XWT_TYPE_MENU:    return xwt_gtk_createMenu( xwtData );
+      case XWT_TYPE_WINDOW:  return xwt_gtk_createWindow( xwtData );
+      case XWT_TYPE_MENU:    return xwt_gtk_createMenu( xwtData );
       case XWT_TYPE_MENUITEM:return xwt_gtk_createMenuItem( xwtData );
-      case XWT_TYPE_IMAGE:   return xwt_gtk_createImage( xwtData );
-      
       case XWT_TYPE_GRID:    return xwt_gtk_createGrid( xwtData );
       case XWT_TYPE_VIEWPORT:    return xwt_gtk_createViewPort( xwtData );
+      /*case XWT_TYPE_IMAGE:   return xwt_gtk_createImage( xwtData );
+      case XWT_TYPE_PANE:    return xwt_gtk_createPane( xwtData );
+      
       case XWT_TYPE_RADIOBUTTON: return xwt_gtk_createRadioButton( xwtData );
       case XWT_TYPE_CHECKBOX:    return xwt_gtk_createCheckbox( xwtData );
       case XWT_TYPE_FILESEL:     return xwt_gtk_createFileSelection( xwtData );
@@ -175,7 +175,6 @@ static BOOL xwt_gtk_create( PXWT_WIDGET xwtData )
       */
    }
    return FALSE;
-
 }
 
 
@@ -184,7 +183,7 @@ BOOL xwt_gtk_add( PXWT_WIDGET wWidget, PXWT_WIDGET wChild )
    PXWT_GTK_BASE wChildBase = (PXWT_GTK_BASE) wChild->widget_data;
    GtkWidget *gtkChild = wChildBase->top_widget( wChild );
    PXWT_GTK_BASE wParentBase = (PXWT_GTK_BASE) wWidget->widget_data;
-   GtkWidget *gtkSelf = wParentBase->top_widget( wWidget );
+   GtkWidget *gtkSelf = wParentBase->main_widget;
    
    switch( wWidget->type )
    {

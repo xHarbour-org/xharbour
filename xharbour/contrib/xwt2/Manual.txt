@@ -81,4 +81,17 @@ Button widget event:
       -text (string)
       -event (string:16)
    
+Grid widget events:
+
+   Properties:        
+      column     (int)
+      rows       (int) 
+      colpadding (int)
+      rowpadding (int)
+      shrink     (logical)
+      expand     (logical)
+      fill       (logical)
+      homogenous (logical)
+      //attach {object, row, col width height }
+      + align
    

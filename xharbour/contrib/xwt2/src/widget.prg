@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: widget.prg,v 1.9 2004/01/30 18:34:12 lculik Exp $
+   $Id: widget.prg,v 1.1 2004/05/11 14:57:50 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
@@ -25,7 +25,7 @@ CLASS XWTWidget
    /** Owner of this object */
    DATA oOwner
 
-   METHOD New( xStyle )                            CONSTRUCTOR
+   METHOD New( xStyle )         CONSTRUCTOR
    //METHOD GetPosition( x, y, width, height )
 
    METHOD Show()

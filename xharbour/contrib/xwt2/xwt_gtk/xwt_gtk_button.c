@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_button.c,v 1.3 2003/06/08 14:05:35 jonnymind Exp $
+   $Id: xwt_gtk_button.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
 
    GTK interface - management of button widget
 */
@@ -82,7 +82,7 @@ static BOOL xwt_gtk_button_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pVa
    }
    else if ( strcmp( prop, "text" ) == 0)
    {
-      szPropVal = gtk_button_get_label( GTK_BUTTON( wSelf->main_widget ));
+      szPropVal = gtk_button_get_label( GTK_BUTTON( wSelf->INH(main_widget) ));
       hb_itemPutCRawStatic( pValue, (char*)szPropVal, strlen( szPropVal ) );
    }
    else
@@ -107,7 +107,7 @@ static BOOL xwt_gtk_button_getall( PXWT_WIDGET widget, PHB_ITEM pProps )
       hb_itemPutCRawStatic( &hbValue, wSelf->szEventName, strlen(wSelf->szEventName) );
       hb_hashAddChar( pProps, "event", &hbValue );
       
-      szPropVal = gtk_button_get_label( GTK_BUTTON( wSelf->main_widget ));
+      szPropVal = gtk_button_get_label( GTK_BUTTON( wSelf->INH(main_widget) ));
       hb_itemPutCRawStatic( &hbValue, (char*)szPropVal, strlen( szPropVal ) );
       hb_hashAddChar( pProps, "text", &hbValue );
       

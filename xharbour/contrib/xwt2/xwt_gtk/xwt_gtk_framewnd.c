@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_framewnd.c,v 1.5 2003/07/23 15:58:10 lculik Exp $
+   $Id: xwt_gtk_framewnd.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
 
    GTK interface - Frame window
 */
@@ -25,26 +25,91 @@ static gboolean wnd_evt_destroy( GtkWidget *widget,  GdkEvent  *event, gpointer 
    return TRUE;
 }
 
+static BOOL xwt_gtk_frame_destroy( PXWT_WIDGET widget )
+{
+   PXWT_GTK_FRAMEWND wFrame = (PXWT_GTK_FRAMEWND) widget->widget_data;
+   if ( wFrame->status_message != NULL )
+   {
+      hb_xfree( wFrame->status_message );
+   }
+   return xwt_gtk_window_destroy( widget );
+}
+
 static BOOL xwt_gtk_frame_setprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
 {
-   // for now, just call on window getprop
-   // todo: menu, statusbar etc.
-   return xwt_gtk_window_setprop( widget, prop, pValue );   
+   BOOL ret = TRUE;
+   PXWT_GTK_FRAMEWND wFrame = (PXWT_GTK_FRAMEWND) widget->widget_data;
+   
+   if ( strcmp( prop, "menubar" ) == 0 )
+   {
+      xwt_gtk_setMenuBar( widget, pValue );
+   }
+   else if ( strcmp( prop, "statusbar" ) == 0 )
+   {   
+      if ( wFrame->status_message != NULL )
+      {
+         hb_xfree( wFrame->status_message );
+      }
+         
+      // COPY the value!
+      wFrame->status_message = hb_itemGetC( pValue );
+      gtk_statusbar_push( GTK_STATUSBAR(wFrame->status_bar), wFrame->status_context, wFrame->status_message );
+   }
+   else 
+   {
+      ret = xwt_gtk_window_setprop( widget, prop, pValue );   
+   }
+   return ret;
 }
 
 static BOOL xwt_gtk_frame_getprop( PXWT_WIDGET widget, char *prop, PHB_ITEM pValue )
 {
-   // for now, just call on window getprop
-   // todo: menu, statusbar etc.
-   return xwt_gtk_window_getprop( widget, prop, pValue );
+   BOOL ret = TRUE;
+   PXWT_GTK_FRAMEWND wFrame = (PXWT_GTK_FRAMEWND) widget->widget_data;
+   
+   if ( strcmp( prop, "statusbar" ) == 0 )
+   {
+      if ( wFrame->status_message == NULL )
+      {
+         hb_itemPutCRawStatic( pValue, "", 0 );
+      }
+      else
+      {
+         hb_itemPutC( pValue, wFrame->status_message );
+      }
+   }
+   else 
+   {
+      ret = xwt_gtk_window_getprop( widget, prop, pValue );
+   }
+   
+   return ret;
 }
 
    
 static BOOL xwt_gtk_frame_getall( PXWT_WIDGET widget, PHB_ITEM pRet )
 {
-   // for now, just call on window getprop
-   // todo: menu, statusbar etc.
-   return xwt_gtk_window_getall( widget, pRet );
+   PXWT_GTK_FRAMEWND wFrame = (PXWT_GTK_FRAMEWND) widget->widget_data;
+   HB_ITEM hbValue;
+   
+   hbValue.type = HB_IT_NIL;
+   
+   if ( xwt_gtk_window_getall( widget, pRet ) )
+   {
+      // for now, use only text
+      if ( wFrame->status_message == NULL )
+      {
+         hb_itemPutCRawStatic( &hbValue, "", 0 );
+      }
+      else
+      {
+         hb_itemPutC( &hbValue, wFrame->status_message );
+      }
+      
+      hb_hashAddChar( pRet, "statusbar", &hbValue );
+      return TRUE;
+   }
+   return FALSE;
 }
 
 BOOL xwt_gtk_createFrameWindow( PXWT_WIDGET xwtData )
@@ -82,6 +147,10 @@ BOOL xwt_gtk_createFrameWindow( PXWT_WIDGET xwtData )
    /* Create the status bar. */
    frame->status_bar = gtk_statusbar_new();
    gtk_box_pack_start(GTK_BOX(frame->vbox), frame->status_bar, FALSE, FALSE, 0 );
+   frame->status_context = gtk_statusbar_get_context_id( GTK_STATUSBAR(frame->status_bar), 
+         "Generic XWT-GTK context" );
+   frame->status_message = NULL;
+   gtk_statusbar_push( GTK_STATUSBAR(frame->status_bar), frame->status_context, "");
    gtk_widget_show(frame->status_bar);
 
    gtk_widget_show (frame->vbox);
@@ -100,7 +169,7 @@ BOOL xwt_gtk_createFrameWindow( PXWT_WIDGET xwtData )
    
 
    xwtData->widget_data = (void *) frame;
-   xwtData->destroy = xwt_gtk_window_destroy;
+   xwtData->destroy = xwt_gtk_frame_destroy;
 
    xwtData->set_property = xwt_gtk_frame_setprop;
    xwtData->set_pgroup = xwt_gtk_setpgroup;
@@ -117,9 +186,21 @@ BOOL xwt_gtk_createFrameWindow( PXWT_WIDGET xwtData )
 void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
 {
    PXWT_GTK_FRAMEWND frame;
-   PHB_BASEARRAY pBaseArray = pMenuArray->item.asArray.value;
+   GtkWidget *menu;
+   PHB_BASEARRAY pBaseArray;
    ULONG ulPos;
 
+   // eventually reset the menu bar
+   xwt_gtk_resetMenuBar( xwtData );
+   
+   if ( HB_IS_NIL( pMenuArray ) )
+   {
+      // nothing to set
+      return;
+   }
+   
+   pBaseArray = pMenuArray->item.asArray.value;
+    
    frame = (PXWT_GTK_FRAMEWND) xwtData->widget_data;
    // todo: cancelation of the old bar
 
@@ -129,24 +210,37 @@ void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
 
       hb_objSendMsg( pMenuItem, "ORAWWIDGET",0 );
       xwtData = (PXWT_WIDGET) HB_VM_STACK.Return.item.asPointer.value;
-      gtk_menu_bar_append (GTK_MENU_BAR (frame->menu_bar), frame->INH(window) );
+      menu = ((PXWT_GTK_BASE)xwtData->widget_data)->top_widget( xwtData );
+      gtk_menu_bar_append (GTK_MENU_BAR (frame->menu_bar), menu );
    }
 }
 
-void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
+void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData )
 {
    PXWT_GTK_FRAMEWND frame;
-   PHB_BASEARRAY pBaseArray = pMenuArray->item.asArray.value;
+   GtkWidget *menu;
+   PHB_BASEARRAY pBaseArray;
    ULONG ulPos;
+   PHB_ITEM pMenuArray;
 
    frame = (PXWT_GTK_FRAMEWND) xwtData->widget_data;
-   // todo: cancelation of the old bar
-
+   
+   hb_objSendMsg( xwtData->pOwner, "AMENUS", 0 );
+   pMenuArray = &(HB_VM_STACK.Return);
+   if ( ! HB_IS_ARRAY( pMenuArray ) )
+   {
+      return;
+   }
+   
+   pBaseArray = pMenuArray->item.asArray.value;
+   
    for ( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
    {
       PHB_ITEM pMenuItem = pBaseArray->pItems + ulPos;
       hb_objSendMsg( pMenuItem, "ORAWWIDGET",0 );
       xwtData = (PXWT_WIDGET) HB_VM_STACK.Return.item.asPointer.value;
-      gtk_container_remove (GTK_CONTAINER (frame->menu_bar), frame->INH(window) );        
+      menu = ((PXWT_GTK_BASE)xwtData->widget_data)->top_widget( xwtData );
+      g_object_ref( G_OBJECT( menu ) );
+      gtk_container_remove (GTK_CONTAINER (frame->menu_bar), menu );        
    }
 }

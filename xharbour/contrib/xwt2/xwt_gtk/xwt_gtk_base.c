@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_label.c,v 1.5 2003/08/27 20:09:24 xthefull Exp $
+   $Id: xwt_gtk_base.c,v 1.1 2004/05/11 15:03:29 jonnymind Exp $
 
    GTK Base widget for XWT system.
 */
@@ -135,11 +135,8 @@ static gboolean xwt_gtk_base_btn_manage(GtkWidget *widget, GdkEventButton *event
       break;
    }
    
-   xwt_rise_event( pSelf, szEvent, 5, &hb_xpos, &hb_ypos, &hb_state_shift, &hb_state_ctrl, &hb_state_alt );
+   return xwt_rise_event( pSelf, szEvent, 5, &hb_xpos, &hb_ypos, &hb_state_shift, &hb_state_ctrl, &hb_state_alt );
    
-   // all items are flat, no need to clear them.
-   
-   return FALSE; // unmanaged
 }
 
 
@@ -167,8 +164,7 @@ static gboolean xwt_gtk_base_cross(GtkWidget *widget, GdkEventCrossing *event, g
       szEvent = "leave";
    }
    
-   xwt_rise_event( pSelf, szEvent, 2, &hb_xpos, &hb_ypos );
-   return FALSE;
+   return xwt_rise_event( pSelf, szEvent, 2, &hb_xpos, &hb_ypos );
 }
 
 
@@ -187,9 +183,7 @@ static gboolean xwt_gtk_base_focus(GtkWidget *widget, GdkEventFocus *event, gpoi
       szEvent = "lost-focus";
    }
    
-   xwt_rise_event( pSelf, szEvent, 0 );
-   
-   return FALSE;
+   return xwt_rise_event( pSelf, szEvent, 0 );
 }
 
 
@@ -262,10 +256,8 @@ static gboolean xwt_gtk_base_key_manage(GtkWidget *widget, GdkEventKey *event, g
    hb_itemPutL(  &hb_state_alt, (( event->state & GDK_MOD1_MASK) == GDK_MOD1_MASK) );
    hb_itemPutL(  &hb_state_caps, (( event->state & GDK_LOCK_MASK) == GDK_LOCK_MASK) );
    
-   xwt_rise_event( pSelf, szEvent, 7, &hb_string, &hb_keyval, &hb_scancode, &hb_state_shift, 
+   return xwt_rise_event( pSelf, szEvent, 7, &hb_string, &hb_keyval, &hb_scancode, &hb_state_shift, 
                         &hb_state_ctrl, &hb_state_alt, &hb_state_caps );
-                        
-   return FALSE;
 }
 
 
@@ -281,9 +273,7 @@ static gboolean xwt_gtk_base_motion_manage(GtkWidget *widget, GdkEventMotion *ev
    hb_itemPutNI( &hb_xpos, (int) event->x );
    hb_itemPutNI( &hb_ypos, (int) event->y );
       
-   xwt_rise_event( pSelf, "motion", 2, &hb_xpos, &hb_ypos );
-                        
-   return FALSE;
+   return xwt_rise_event( pSelf, "motion", 2, &hb_xpos, &hb_ypos );
 }
 
 
