@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: gfx.ch,v 1.1 2004/08/02 01:46:12 maurifull Exp $
  *
  */
 
@@ -101,6 +101,8 @@
 
 #ifndef _NO_GFX_TRANSLATES_
 
+#ifdef __XHARBOUR__
+
 #translate GFXACQUIRESCREEN() => gfxPrimitive(GFX_ACQUIRESCREEN)
 #translate GFXRELEASESCREEN() => gfxPrimitive(GFX_RELEASESCREEN)
 #translate GFXMAKECOLOR(<nRed>, <nGreen>, <nBlue>[, <nAlpha>]) => gfxPrimitive(GFX_MAKECOLOR, <nRed>, <nGreen>, <nBlue>[, <nAlpha>])
@@ -116,6 +118,8 @@
 #translate GFXFILLEDELLIPSE(<nY>, <nX>, <nRadY>, <nRadX>, <nColor>) => gfxPrimitive(GFX_FILLEDELLIPSE, <nY>, <nX>, <nRadY>, <nRadX>, <nColor>)
 #translate GFXFLOODFILL(<nY>, <nX>, <nColor>) => gfxPrimitive(GFX_FLOODFILL, <nY>, <nX>, <nColor>)
 
-#endif
+#endif /* __XHARBOUR__*/
+
+#endif _NO_GFX_TRANSLATES_
 
 #endif  /* _GFX_CH_ */

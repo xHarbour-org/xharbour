@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3255 2004/08/02 16:55:00 druzus Exp $
+ * $Id: ChangeLog,v 1.3256 2004/08/02 18:26:03 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-02 12:16 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/gfx.ch
+    + Added explicit #ifdef __XHARBOUR__ guard around xHarbour PP directives.
+
+  * include/hbdefs.h
+    + Added xCC support related to stdint.h
 
 2004-08-02 20:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
