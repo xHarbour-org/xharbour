@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1958 2003/12/29 19:25:52 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1959 2003/12/29 21:57:33 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-29  14:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed wrong conversion of [...] to "..." when strotrim was called from CommandStuff()
+      by adding logic to reset s_bArray based on the value of the KEY of the rule.
 
 2003-12-29 22:56 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/config/dos/watcom.cf

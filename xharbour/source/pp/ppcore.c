@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.105 2003/12/17 23:55:14 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.106 2003/12/22 04:55:32 ronpinkas Exp $
  */
 
 /*
@@ -131,7 +131,7 @@ static int    WorkDefine( char **, char *, DEFINES * );    /* Replace fragment o
 static int    WorkPseudoF( char **, char *, DEFINES * );   /* Replace pseudofunction with a #defined result text */
 static int    WorkCommand( char *, char *, COMMANDS * );
 static int    WorkTranslate( char *, char *, COMMANDS *, int * );
-static int    CommandStuff( char *, char *, char *, int *, BOOL, BOOL );
+static int    CommandStuff( char *, char *, char *, int *, BOOL, BOOL, char * );
 static int    RemoveNotInstanciated( char * );
 static int    WorkMarkers( char **, char **, char *, int *, BOOL );
 static int    getExpReal( char *, char **, char, int, BOOL );
@@ -2326,7 +2326,7 @@ static int WorkCommand( char * ptri, char * ptro, COMMANDS * stcmd )
   ptrmp = stcmd->mpatt;                      /* Pointer to a match pattern */
   s_Repeate = 0;
   s_groupchar = '@';
-  rez = CommandStuff( ptrmp, ptri, ptro, &lenres, TRUE, stcmd->com_or_xcom );
+  rez = CommandStuff( ptrmp, ptri, ptro, &lenres, TRUE, stcmd->com_or_xcom, stcmd->name );
 
   if( rez >= 0 )
   {
@@ -2352,7 +2352,7 @@ static int WorkTranslate( char * ptri, char * ptro, COMMANDS * sttra, int * lens
   s_Repeate = 0;
   s_groupchar = '@';
 
-  rez = CommandStuff( ptrmp, ptri, ptro, &lenres, FALSE, sttra->com_or_xcom );
+  rez = CommandStuff( ptrmp, ptri, ptro, &lenres, FALSE, sttra->com_or_xcom, sttra->name );
 
   if( rez >= 0 )
   {
@@ -2364,7 +2364,7 @@ static int WorkTranslate( char * ptri, char * ptro, COMMANDS * sttra, int * lens
   return -1;
 }
 
-static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenres, BOOL com_or_tra, BOOL com_or_xcom )
+static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenres, BOOL com_or_tra, BOOL com_or_xcom, char *sKey )
 {
   BOOL endTranslation = FALSE;
   int ipos;
@@ -2670,6 +2670,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
   *(ptro + *lenres) = '\0';
 
   //printf( "%s\n", ptro );
+  s_bArray = ( isalnum( (int) sKey[0] ) || "])}._", sKey[0] );
   strotrim( ptro, 2 ); // Removing excess spaces.
   //printf( "%s\n", ptro );
 
@@ -5523,7 +5524,7 @@ static int strotrim( char * stroka, int iContext )
   //#define DEBUG_TRIM
 
   #ifdef DEBUG_TRIM
-     printf( "StrIn: >%s<\n", stroka );
+     printf( "StrIn: >%s< Context: %i LastChar: %c\n", stroka, iContext, cLastChar );
   #endif
 
   while( ( curc = *stroka ) != '\0' )
