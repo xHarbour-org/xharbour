@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.1 2003/12/22 01:21:36 peterrees Exp $
+ * $Id: hbgtwvt.h,v 1.2 2003/12/29 01:24:14 peterrees Exp $
  */
 
 /*
@@ -54,20 +54,21 @@
  *
  */
 
-extern void HB_EXPORT hb_wvt_gtSetCloseEvent(int iEvent);
-extern void HB_EXPORT hb_wvt_gtSetShutdownEvent(int iEvent);
-extern void HB_EXPORT hb_wvt_gtSetFont(char * fontface, int height, int width, int Bold, int Quality );
-extern void HB_EXPORT hb_wvt_gtSetWindowTitle(char * title);
-extern int HB_EXPORT hb_wvt_gtGetWindowTitle(char *title, int length);
+extern void  HB_EXPORT hb_wvt_gtSetCloseEvent(int iEvent);
+extern void  HB_EXPORT hb_wvt_gtSetShutdownEvent(int iEvent);
+extern void  HB_EXPORT hb_wvt_gtSetFont(char * fontface, int height, int width, int Bold, int Quality );
+extern void  HB_EXPORT hb_wvt_gtSetWindowTitle(char * title);
+extern int   HB_EXPORT hb_wvt_gtGetWindowTitle(char *title, int length);
 extern DWORD HB_EXPORT hb_wvt_gtSetWindowIcon(int icon);
-extern HWND HB_EXPORT hb_wvt_gtGetWindowHandle(void);
-extern void HB_EXPORT hb_wvt_gtPostMessage(int message);
-extern BOOL HB_EXPORT hb_wvt_gtSetWindowPos(int left, int top);
-extern int HB_EXPORT hb_wvt_gtGetLastMenuEvent(void);
-extern void HB_EXPORT hb_wvt_gtResetWindow(void);
-extern BOOL HB_EXPORT hb_wvt_gtSetCentreWindow(BOOL bCentre, BOOL bPaint);
-extern int HB_EXPORT hb_wvt_gtSetMenuKeyEvent(int iMenuKeyEvent);  // Set Key number to return when for windows menu selection
-extern int HB_EXPORT hb_wvt_gtSetCodePage(int iCodePage);
-extern BOOL HB_EXPORT hb_wvt_gtSetAltF4Close( BOOL bCanClose);
-extern void HB_EXPORT hb_wvt_gtDoProcessMessages(void);
-extern BOOL HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent);
+extern DWORD HB_EXPORT hb_wvt_gtSetWindowIconFromFile( char *icon );
+extern HWND  HB_EXPORT hb_wvt_gtGetWindowHandle(void);
+extern void  HB_EXPORT hb_wvt_gtPostMessage(int message);
+extern BOOL  HB_EXPORT hb_wvt_gtSetWindowPos(int left, int top);
+extern int   HB_EXPORT hb_wvt_gtGetLastMenuEvent(void);
+extern void  HB_EXPORT hb_wvt_gtResetWindow(void);
+extern BOOL  HB_EXPORT hb_wvt_gtSetCentreWindow(BOOL bCentre, BOOL bPaint);
+extern int   HB_EXPORT hb_wvt_gtSetMenuKeyEvent(int iMenuKeyEvent);  // Set Key number to return when for windows menu selection
+extern int   HB_EXPORT hb_wvt_gtSetCodePage(int iCodePage);
+extern BOOL  HB_EXPORT hb_wvt_gtSetAltF4Close( BOOL bCanClose);
+extern void  HB_EXPORT hb_wvt_gtDoProcessMessages(void);
+extern BOOL  HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent);

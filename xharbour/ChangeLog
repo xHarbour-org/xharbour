@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1978 2004/01/02 17:13:58 rodrigo_moreno Exp $
+ * $Id: ChangeLog,v 1.1979 2004/01/02 17:22:44 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-03 15:00 utc+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * More formatting for easier grasping.
+    * More color compatibility with console.
+    + hb_wvt_gtSetIconFromFile( char *icon )
+    + Added Prg level functions to exploit wvt functionality ( REQUEST these in your main() ):
+      + Wvt_SetIcon( ncIcon )
+      + Wvt_SetFont( cFontName, nHeight, nWidth, nWeight, nQuality )
+      + Wvt_SetTitle( cTitle )
+      + Wvt_SetWindowPos( nX, nY )
+      + Wvt_GetWindowHandle()
+      + Wvt_SetCodePage( nCodePage )
+      + Wvt_CenterWindow( lCenter, lPaint )
+      + Wvt_SetMouseMove( lMove )
+
+	  These functions need be implemented at GT level but is only possible
+        when someone implements them in proper way. Till then only for WVT.
+   
+        When changing the fonts I could not control the box characters. 
+        Hopefully Peter may get it done.
+
+  * xharbour/include/hbgtwvt.h
+    + Added extern hb_wvt_gtSetIconFromFile( char *icon )     
 
 2004-01-02 18:20 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/make_tgz.sh
