@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.9 2002/01/29 08:27:32 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.10 2002/01/30 19:02:41 ronpinkas Exp $
  */
 
 /*
@@ -2605,6 +2605,7 @@ static HB_EXPR_FUNC( hb_compExprUseEqual )
             pRight = pSelf->value.asOperator.pRight;
 
             if( pLeft->ExprType == pRight->ExprType )
+            {
                switch( pLeft->ExprType )
                {
                   case HB_ET_LOGICAL:
@@ -2659,8 +2660,42 @@ static HB_EXPR_FUNC( hb_compExprUseEqual )
                         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_EQUAL );
                      }
                }
+            }
             else
             {
+                /* Exp = .T. | .T. = Exp -> Exp
+                   Exp = .F. | .F. = Exp -> ! Exp */
+                if( pLeft->ExprType == HB_ET_LOGICAL )
+                {
+                   if( pLeft->value.asLogical )
+                   {
+                      hb_compExprFree( pSelf->value.asOperator.pLeft, HB_MACRO_PARAM );
+                      pSelf = pRight;
+                   }
+                   else
+                   {
+                      hb_compExprFree( pSelf->value.asOperator.pLeft, HB_MACRO_PARAM );
+                      pSelf->ExprType = HB_EO_NOT;
+                      pSelf->value.asOperator.pLeft = pSelf->value.asOperator.pRight;
+                      pSelf->value.asOperator.pRight = NULL;
+                   }
+                }
+                else if( pRight->ExprType == HB_ET_LOGICAL )
+                {
+                   if( pRight->value.asLogical )
+                   {
+                      hb_compExprFree( pSelf->value.asOperator.pRight, HB_MACRO_PARAM );
+                      pSelf = pLeft;
+                   }
+                   else
+                   {
+                      hb_compExprFree( pSelf->value.asOperator.pRight, HB_MACRO_PARAM );
+                      pSelf->ExprType = HB_EO_NOT;
+                      //pSelf->value.asOperator.pLeft = pSelf->value.asOperator.pLeft;
+                      pSelf->value.asOperator.pRight = NULL;
+                   }
+                }
+
                /* TODO: check for incompatible types
                 */
                HB_EXPR_USE( pLeft, HB_EA_PUSH_PCODE );

@@ -96,7 +96,7 @@ Syntax:
 
 #PRAGMA BEGINDUMP
 ...
-[#PRAGMA STOPDUMP]|EOF
+[#PRAGMA ENDDUMP]|EOF
 
 The transition from Harbour to C* occurs when encountering the FIRST NewLine token, at the end of the #pragme BEGINDUMP directive line. The transition from C* back to Harbour occurs when encountering the FIRST NewLine token, at the *end* of the FIRST FOUND line containing a #pragma STOPDUMP directive, or at the EOF.
 

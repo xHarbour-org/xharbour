@@ -1,5 +1,5 @@
 /*
- * $Id: expropt2.c,v 1.4 2001/06/14 21:20:43 dholm Exp $
+ * $Id: expropt2.c,v 1.1.1.1 2001/12/21 10:44:32 ronpinkas Exp $
  */
 
 /*
@@ -498,6 +498,7 @@ HB_EXPR_PTR hb_compExprReduceNE( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
    pRight = pSelf->value.asOperator.pRight;
 
    if( pLeft->ExprType == pRight->ExprType )
+   {
       switch( pLeft->ExprType )
       {
          case HB_ET_LOGICAL:
@@ -564,11 +565,43 @@ HB_EXPR_PTR hb_compExprReduceNE( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
             break;
 
       }
-   /* TODO: add checking of incompatible types
+   }
    else
    {
+      /* Exp != .T. | .T. != Exp -> ! Exp
+         Exp != .F. | .F. != Exp -> Exp */
+      if( pLeft->ExprType == HB_ET_LOGICAL )
+      {
+         if( ! pLeft->value.asLogical )
+         {
+            hb_compExprFree( pSelf->value.asOperator.pLeft, HB_MACRO_PARAM );
+            pSelf = pRight;
+         }
+         else
+         {
+            hb_compExprFree( pSelf->value.asOperator.pLeft, HB_MACRO_PARAM );
+            pSelf->ExprType = HB_EO_NOT;
+            pSelf->value.asOperator.pLeft = pSelf->value.asOperator.pRight;
+            pSelf->value.asOperator.pRight = NULL;
+         }
+      }
+      else if( pRight->ExprType == HB_ET_LOGICAL )
+      {
+         if( ! pRight->value.asLogical )
+         {
+            hb_compExprFree( pSelf->value.asOperator.pRight, HB_MACRO_PARAM );
+            pSelf = pLeft;
+         }
+         else
+         {
+            hb_compExprFree( pSelf->value.asOperator.pRight, HB_MACRO_PARAM );
+            pSelf->ExprType = HB_EO_NOT;
+            //pSelf->value.asOperator.pLeft = pSelf->value.asOperator.pLeft;
+            pSelf->value.asOperator.pRight = NULL;
+         }
+      }
    }
-   */
+
    return pSelf;
 }
 
@@ -896,11 +929,42 @@ HB_EXPR_PTR hb_compExprReduceEQ( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
             break;
       }
    }
-   /* TODO: add checking of incompatible types
    else
    {
+      /* Exp == .T. | .T. == Exp -> Exp
+         Exp == .F. | .F. == Exp -> ! Exp */
+      if( pLeft->ExprType == HB_ET_LOGICAL )
+      {
+         if( pLeft->value.asLogical )
+         {
+            hb_compExprFree( pSelf->value.asOperator.pLeft, HB_MACRO_PARAM );
+            pSelf = pRight;
+         }
+         else
+         {
+            hb_compExprFree( pSelf->value.asOperator.pLeft, HB_MACRO_PARAM );
+            pSelf->ExprType = HB_EO_NOT;
+            pSelf->value.asOperator.pLeft = pSelf->value.asOperator.pRight;
+            pSelf->value.asOperator.pRight = NULL;
+         }
+      }
+      else if( pRight->ExprType == HB_ET_LOGICAL )
+      {
+         if( pRight->value.asLogical )
+         {
+            hb_compExprFree( pSelf->value.asOperator.pRight, HB_MACRO_PARAM );
+            pSelf = pLeft;
+         }
+         else
+         {
+            hb_compExprFree( pSelf->value.asOperator.pRight, HB_MACRO_PARAM );
+            pSelf->ExprType = HB_EO_NOT;
+            //pSelf->value.asOperator.pLeft = pSelf->value.asOperator.pLeft;
+            pSelf->value.asOperator.pRight = NULL;
+         }
+      }
    }
-   */
+
    return pSelf;
 }
 

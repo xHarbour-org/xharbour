@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.149 2002/04/04 19:35:57 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.150 2002/04/06 21:25:28 map Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-14 22:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * doc/inline_c.txt
+    * Minor correction.
+
+  * include/hbapi.h
+    * Minor correction to #define hb_retptr( voidPtr )
+
+  * include/hbexprb.c
+  * source/common/expropt2.c
+    ! Optimized:
+      Exp == .T. | .T. == Exp => Exp
+      Exp = .T.  | .T. = Exp  => Exp
+      Exp != .T. | .T. != Exp => ! Exp
+      Exp == .F. | .F. == Exp => ! Exp
+      Exp = .F.  | .F. = Exp  => ! Exp
+      Exp != .F. | .F. != Exp => Exp
 
 2002-04-06 23:00 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
   * source/rtl/gtsln/Makefile

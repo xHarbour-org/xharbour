@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.11 2002/03/22 14:45:14 map Exp $
+ * $Id: hbapi.h,v 1.12 2002/03/26 05:06:58 ronpinkas Exp $
  */
 
 /*
@@ -318,7 +318,7 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 #define hb_retndlen( dNumber, iWidth, iDec ) hb_itemPutNDLen( &hb_stack.Return, dNumber, iWidth, iDec )
 #define hb_retnilen( iNumber, iWidth )       hb_itemPutNILen( &hb_stack.Return, iNumber, iWidth )
 #define hb_retnllen( lNumber, iWidth )       hb_itemPutNLLen( &hb_stack.Return, lNumber, iWidth )
-#define hb_retptr( void *voidPtr )           hb_itemPutPtrGC( &hb_stack.Return, voidPtr )
+#define hb_retptr( voidPtr )                 hb_itemPutPtrGC( &hb_stack.Return, voidPtr )
 
 #else
 
