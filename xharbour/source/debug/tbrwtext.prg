@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.8 2004/03/30 09:29:55 mauriliolongo Exp $
+ * $Id: tbrwtext.prg,v 1.9 2004/04/21 01:18:16 likewolf Exp $
  */
 
 /*
@@ -109,6 +109,8 @@ METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor) CLASS TBrwText
 
    Super:New("", nTop, nLeft, nBottom, nRight, .T.)
    Super:SetColor(cColor)
+   
+   ::lWordWrap := .F.
 
    Super:LoadFile(cFileName)
 

@@ -28,7 +28,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.31 2004/04/20 18:09:47 vouchcac Exp $
+/* $Id: teditor.prg,v 1.32 2004/04/22 07:38:17 vouchcac Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -378,17 +378,20 @@ METHOD RefreshWindow() CLASS HBEditor
 
    DispBegin()
 
-   // CLEAR THE WHOLE WINDOW!!! previous version wished to spare some output, but
    // This breaks individual line coloring, so I restored the old version with
    // a small optimization. -- Ph.Krylov
    // CLEAR THE WHOLE WINDOW!!! previous version wished to spare some output, but
    // C is faster than a VM loop!!
    //
-   ScrollFixed( ::nTop, ::nLeft, ::nBottom, ::nRight )
+   //ScrollFixed( ::nTop, ::nLeft, ::nBottom, ::nRight )
 
    for i := 0 to Min( ::nNumRows - 1, ::naTextLen - 1 )
-      DispOutAt( ::nTop + i, ::nLeft, SubStr( ::GetLine( ::nFirstRow + i ), ::nFirstCol, ::nNumCols ), ::LineColor( ::nFirstRow + i ) )
+      DispOutAt( ::nTop + i, ::nLeft, ;
+                 PadR( SubStr( ::GetLine( ::nFirstRow + i ), ::nFirstCol, ::nNumCols ), ::nNumCols ), ;
+                 ::LineColor( ::nFirstRow + i ) )
    next
+
+   ScrollFixed( ::nTop + i, ::nLeft, ::nBottom, ::nRight )
 
    DispEnd()
 
