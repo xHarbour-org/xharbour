@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.23 2004/06/04 00:18:09 druzus Exp $
+ * $Id: gtsln.c,v 1.24 2004/06/09 15:51:04 druzus Exp $
  */
 
 /*
@@ -216,6 +216,12 @@ static void hb_sln_setSingleBox( void )
 static void hb_sln_setACSCtrans( void )
 {
    unsigned char * p, ch;
+   SLsmg_Char_Type chBoard[3] = { 0, 0, 0 }, chArrow[4];
+
+   chArrow[ 0 ] = SLSMG_BUILD_CHAR( '<', 0 );
+   chArrow[ 1 ] = SLSMG_BUILD_CHAR( '>', 0 );
+   chArrow[ 2 ] = SLSMG_BUILD_CHAR( 'v', 0 );
+   chArrow[ 3 ] = SLSMG_BUILD_CHAR( '^', 0 );
 
    /* init an alternate chars table */
    if( ( p = SLtt_Graphics_Char_Pairs ) )
@@ -247,18 +253,13 @@ static void hb_sln_setACSCtrans( void )
             case SLSMG_BULLET_CHAR_TERM  :   s_outputTab[    ] = SLch; break;
 */
             case SLSMG_DIAMOND_CHAR_TERM :   s_outputTab[ 04 ] = SLch; break;
-            case SLSMG_LARROW_CHAR_TERM  :   s_outputTab[ 17 ] = 
-                                             s_outputTab[ 27 ] = SLch; break;
-            case SLSMG_RARROW_CHAR_TERM  :   s_outputTab[ 16 ] = 
-                                             s_outputTab[ 26 ] = SLch; break;
-            case SLSMG_DARROW_CHAR_TERM  :   s_outputTab[ 25 ] = 
-                                             s_outputTab[ 31 ] = SLch; break;
-            case SLSMG_UARROW_CHAR_TERM  :   s_outputTab[ 24 ] = 
-                                             s_outputTab[ 30 ] = SLch; break;
-            case SLSMG_BOARD_CHAR_TERM   :   s_outputTab[ 176 ] = SLch; break;
-            case SLSMG_CKBRD_CHAR_TERM   :   s_outputTab[ 177 ] = SLch; break;
-            case SLSMG_BLOCK_CHAR_TERM   :   s_outputTab[ 178 ] = 
-                                             s_outputTab[ 219 ] = SLch; break;
+            case SLSMG_LARROW_CHAR_TERM  :   chArrow[ 0 ] = SLch; break;
+            case SLSMG_RARROW_CHAR_TERM  :   chArrow[ 1 ] = SLch; break;
+            case SLSMG_DARROW_CHAR_TERM  :   chArrow[ 2 ] = SLch; break;
+            case SLSMG_UARROW_CHAR_TERM  :   chArrow[ 3 ] = SLch; break;
+            case SLSMG_BOARD_CHAR_TERM   :   chBoard[ 0 ] = SLch; break;
+            case SLSMG_CKBRD_CHAR_TERM   :   chBoard[ 1 ] = SLch; break;
+            case SLSMG_BLOCK_CHAR_TERM   :   chBoard[ 2 ] = SLch; break;
 #else
             case SLSMG_HLINE_CHAR   :   s_outputTab[ 196 ] = SLch; break;
             case SLSMG_VLINE_CHAR   :   s_outputTab[ 179 ] = SLch; break;
@@ -277,21 +278,35 @@ static void hb_sln_setACSCtrans( void )
             case SLSMG_BULLET_CHAR  :   s_outputTab[    ] = SLch; break;
 */
             case SLSMG_DIAMOND_CHAR :   s_outputTab[ 04 ] = SLch; break;
-            case SLSMG_LARROW_CHAR  :   s_outputTab[ 17 ] = 
-                                        s_outputTab[ 27 ] = SLch; break;
-            case SLSMG_RARROW_CHAR  :   s_outputTab[ 16 ] = 
-                                        s_outputTab[ 26 ] = SLch; break;
-            case SLSMG_DARROW_CHAR  :   s_outputTab[ 25 ] = 
-                                        s_outputTab[ 31 ] = SLch; break;
-            case SLSMG_UARROW_CHAR  :   s_outputTab[ 24 ] = 
-                                        s_outputTab[ 30 ] = SLch; break;
-            case SLSMG_BOARD_CHAR   :   s_outputTab[ 176 ] = SLch; break;
-            case SLSMG_CKBRD_CHAR   :   s_outputTab[ 177 ] = SLch; break;
-            case SLSMG_BLOCK_CHAR   :   s_outputTab[ 178 ] = 
-                                        s_outputTab[ 219 ] = SLch; break;
+            case SLSMG_LARROW_CHAR  :   chArrow[ 0 ] = SLch; break;
+            case SLSMG_RARROW_CHAR  :   chArrow[ 1 ] = SLch; break;
+            case SLSMG_DARROW_CHAR  :   chArrow[ 2 ] = SLch; break;
+            case SLSMG_UARROW_CHAR  :   chArrow[ 3 ] = SLch; break;
+            case SLSMG_BOARD_CHAR   :   chBoard[ 0 ] = SLch; break;
+            case SLSMG_CKBRD_CHAR   :   chBoard[ 1 ] = SLch; break;
+            case SLSMG_BLOCK_CHAR   :   chBoard[ 2 ] = SLch; break; 
 #endif
          }
       }
+      SLch = 0;
+      for ( i = 0; i < 3 && SLch == 0; i++ )
+         SLch = chBoard[ i ];
+      if ( SLch == 0 )
+         SLch = SLSMG_BUILD_CHAR( '#', 0 );
+      for ( i = 0; i < 3; i++ )
+      {
+         if ( chBoard[ i ] == 0 )
+            chBoard[ i ] = SLch;
+      }
+      s_outputTab[ 176 ] = chBoard[ 0 ];
+      s_outputTab[ 177 ] = chBoard[ 1 ];
+      s_outputTab[ 178 ] = chBoard[ 2 ];
+      s_outputTab[ 219 ] = chBoard[ 2 ];
+
+      s_outputTab[ 17 ] = s_outputTab[ 27 ] = chArrow[ 0 ];
+      s_outputTab[ 16 ] = s_outputTab[ 26 ] = chArrow[ 1 ];
+      s_outputTab[ 25 ] = s_outputTab[ 31 ] = chArrow[ 2 ];
+      s_outputTab[ 24 ] = s_outputTab[ 30 ] = chArrow[ 3 ];
    }
 }
 
