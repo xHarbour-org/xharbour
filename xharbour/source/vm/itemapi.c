@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.62 2004/01/21 13:44:19 walito Exp $
+ * $Id: itemapi.c,v 1.63 2004/01/21 17:24:50 ronpinkas Exp $
  */
 
 /*
@@ -822,6 +822,12 @@ PHB_ITEM HB_EXPORT hb_itemPutNLen( PHB_ITEM pItem, double dNumber, int iWidth, i
    {
       return hb_itemPutNLLen( pItem, ( long ) dNumber, iWidth );
    }
+#ifndef HB_LONG_LONG_OFF
+   else if( LONGLONG_MIN <= dNumber && dNumber <= LONGLONG_MAX )
+   {
+      hb_itemPutNLLLen( pItem, (LONGLONG) dNumber, iWidth );
+   }
+#endif
    else
    {
       return hb_itemPutNDLen( pItem, dNumber, iWidth, 0 );
@@ -920,7 +926,18 @@ PHB_ITEM HB_EXPORT hb_itemPutNLLen( PHB_ITEM pItem, long lNumber, int iWidth )
 
    if( iWidth <= 0 || iWidth > 99 )
    {
-      iWidth = 10;
+      if( lNumber >= 1000000000 )
+      {
+         iWidth = 11;
+      }
+      else if( lNumber <= -1000000000 )
+      {
+         iWidth = 20;
+      }
+      else
+      {
+         iWidth = 10;
+      }
    }
 
    pItem->type = HB_IT_LONG;

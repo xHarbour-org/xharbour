@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.306 2004/01/21 17:24:50 ronpinkas Exp $
+ * $Id: hvm.c,v 1.307 2004/01/21 22:09:44 walito Exp $
  */
 
 /*
@@ -6115,6 +6115,12 @@ HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType
    {
       hb_vmPushLong( ( long ) dNumber );
    }
+#ifndef HB_LONG_LONG_OFF
+   else if( LONGLONG_MIN <= dNumber && dNumber <= LONGLONG_MAX )
+   {
+      hb_vmPushLongLong( ( LONGLONG ) dNumber );
+   }
+#endif
    else
    {
       hb_vmPushDouble( dNumber, hb_set.HB_SET_DECIMALS );
