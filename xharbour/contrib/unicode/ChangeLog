@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3 2004/01/14 06:22:57 andijahja Exp $
+ * $Id: ChangeLog,v 1.4 2004/01/14 19:49:35 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-18 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * contrib/unicode/hbcrpt128.c
+     ! replace calls to crc32() with hbcc_crc32()
+
+   * contrib/unicode/makefile.bc
+   * contrib/unicode/makefile.vc
+   * contrib/unicode/make_b32.bat
+     ! add hbcrpt128.obj file dependency
+
 2004-01-15 02:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
    * contrib/unicode/test/cp1251.cst
    * contrib/unicode/test/cp866.cst
