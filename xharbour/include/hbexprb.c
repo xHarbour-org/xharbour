@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.58 2003/07/16 11:12:43 andijahja Exp $
+ * $Id: hbexprb.c,v 1.59 2003/07/21 22:41:06 ronpinkas Exp $
  */
 
 /*
@@ -1083,8 +1083,29 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
       case HB_EA_ARRAY_INDEX:
       case HB_EA_LVALUE:
          break;
+
       case HB_EA_PUSH_PCODE:
          {
+            if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARIABLE )
+            {
+               #if defined( HB_MACRO_SUPPORT )
+                  // Force MEMVAR context.
+                  pSelf->value.asList.pExprList = hb_compExprNewAliasVar( hb_compExprNewAlias( hb_strdup( "MEMVAR" ) ), pSelf->value.asList.pExprList );
+               #else
+                  if( hb_compLocalGetPos( pSelf->value.asList.pExprList->value.asSymbol ) ||
+                      hb_compStaticGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pLast ) ||
+                      ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pFirst ) ) )
+                  {
+                     // Declared var - do not change context.
+                  }
+                  else
+                  {
+                     // Force MEMVAR context.
+                     pSelf->value.asList.pExprList = hb_compExprNewAliasVar( hb_compExprNewAlias( hb_compIdentifierNew( "MEMVAR", TRUE ) ), pSelf->value.asList.pExprList );
+                  }
+               #endif
+            }
+
             HB_EXPR_USE( pSelf->value.asList.pExprList, HB_EA_PUSH_PCODE );
 
          #ifndef HB_C52_STRICT
