@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.14 2002/05/18 13:19:29 lculik Exp $
+ * $Id: hbmake.prg,v 1.17 2002/05/21 20:46:42 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -118,8 +118,9 @@ FUNCTION main( cFile, p1, p2, p3, p4, p5, p6 )
     LOCAL cOs      := Os()
     LOCAL allParam
     LOCAL nLang    := GETUSERLANG()
-    Local oProfile := HBProfile():new()
-   __setProfiler( .T. )
+    //Local oProfile := HBProfile():new()
+
+    //__setProfiler( .T. )
 
     IF Pcount() == 0
 
@@ -254,8 +255,8 @@ FUNCTION main( cFile, p1, p2, p3, p4, p5, p6 )
 
     Outstd( cLinkComm )
     ! ( cLinkcomm )
-         oProfile:gather()       
-         HBProfileReportToFile():new( oProfile:TimeSort() ):generate( {|o| o:nCalls > 0 } )
+    //oProfile:gather()
+    //HBProfileReportToFile():new( oProfile:TimeSort() ):generate( {|o| o:nCalls > 0 } )
 
 RETURN nil
 

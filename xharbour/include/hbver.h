@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.h,v 1.7 2002/05/21 17:15:55 ronpinkas Exp $
+ * $Id: hbver.h,v 1.8 2002/05/21 20:50:27 lculik Exp $
  */
 
 /*
@@ -61,8 +61,8 @@
 /* TOFIX: Ideally these should be generated dynamically, until
           then, they should be updated by the builder. [vszakats] */
 
-#define HB_VER_LENTRY   "2002-05-21 17:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>"
-#define HB_VER_CHLCVS   "ChangeLog,v 1.231"
+#define HB_VER_LENTRY   "2002-05-21 08:35 UTC-0800 Ron Pinkas <ron@ronpinkas.com>"
+#define HB_VER_CHLCVS   "ChangeLog,v 1.232"
 #define HB_VER_C_USR    ""
 #define HB_VER_L_USR    ""
 #define HB_VER_PRG_USR  ""
