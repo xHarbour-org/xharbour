@@ -2,7 +2,7 @@
  * xBaseScript Project source code:
  * Pre-Processor / Dot prompt environment / Script Interpreter
  *
- * Copyright 2000-2001 Ron Pinkas <ronpinkas@profit-master.com>
+ * Copyright 2000-2001 Ron Pinkas <ronpinkas@ronpinkas.com>
  * www - http://www.xBaseScript.com
  *
  * This program is free software; you can redistribute it and/or modify
