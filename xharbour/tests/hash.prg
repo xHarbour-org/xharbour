@@ -5,7 +5,7 @@
 *
 * This is a test that demonstrates how to use hashes
 *
-* $Id: hash.prg,v 1.7 2003/11/15 21:26:43 jonnymind Exp $
+* $Id: hash.prg,v 1.8 2003/11/23 03:13:54 jonnymind Exp $
 *
 
 PROCEDURE Main()
@@ -49,8 +49,7 @@ PROCEDURE Main()
 
    ? "Plus operator: ", ValToPrg( { 1=>1, 'a'=>2} + { 3=>3, 'b'=>4 } )
    hHash += { 5=> "numkey 3" }
-   ? "Plusequal operator (success if Len(hHash) == 9: ",;
-          Len(hHash), ",(", hHash[5], ")"
+   ? "Plusequal operator (success if Len(hHash) == 9: ", Len(hHash), ",(", hHash[5], ")"
    hTemp := {'a'=>1, 1=>2, 'c'=>3}
    ? "Minus hash - hash operator: ", ValToPrg( hTemp - { 1=>2, 'c'=>3} )
    ? "Minus hash - array operator: ", ValToPrg( hTemp - { 1, 'a'} )
