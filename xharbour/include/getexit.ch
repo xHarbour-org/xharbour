@@ -1,5 +1,5 @@
 /*
- * $Id: getexit.ch,v 1.2 2002/03/18 22:15:17 ronpinkas Exp $
+ * $Id: getexit.ch,v 1.3 2002/03/19 01:07:58 ronpinkas Exp $
  */
 
 /*
@@ -63,10 +63,7 @@
 #define GE_WRITE        6
 #define GE_ESCAPE       7
 #define GE_WHEN         8       /* when clause unsatisfied */
-
-#ifdef HB_COMPAT_C53
-  #define GE_SHORTCUT     9      // introduced in 5.3
-  #define GE_MOUSEHIT     10     // introduced in 5.3
-#endif
+#define GE_SHORTCUT     9      // introduced in 5.3
+#define GE_MOUSEHIT     10     // introduced in 5.3
 
 #endif /* _GETEXIT_CH */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2855 2004/04/30 15:24:44 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2856 2004/04/30 16:11:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-04-30 11:55 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * include/getexit.ch
+    - removed redundant #ifdef HB_COMPAT_C53 (it's defined in hbsetup.ch already)
 
 2004-04-30 09:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
    * source/vm/itemapi.c
