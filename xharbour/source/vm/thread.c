@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.166 2004/04/28 18:31:41 druzus Exp $
+* $Id: thread.c,v 1.167 2004/05/02 21:48:53 druzus Exp $
 */
 
 /*
@@ -1352,9 +1352,9 @@ HB_FUNC( STARTTHREAD )
    }
 
    /* Is it a function pointer? */
-   if ( pPointer->type == HB_IT_LONG )
+   if ( pPointer->type == HB_IT_POINTER )
    {
-      pFunc =  (PHB_FUNC) hb_itemGetNL( pPointer );
+      pFunc =  (PHB_FUNC) hb_itemGetPtr( pPointer );
       hb_dynsymLock();
       pExecSym = hb_dynsymFindFromFunction( pFunc );
 

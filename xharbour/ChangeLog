@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2904 2004/05/09 11:00:36 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2905 2004/05/09 20:51:14 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-09 23:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/vm/classes.c
+    * hb_clsAddMsg args changed to avoid pointer<->LONG conversions
+    ! fixed __CLSMODMSG to use hb_parptr not hb_parnl
+
+  * xharbour/source/vm/thread.c
+    ! fixed StartThread to check for HB_IT_POINTER not HB_IT_LONG
+
+  * xharbour/source/vm/hvm.c
+    * small modification for 64bit LONG support in the future.
 
 2004-05-09 13:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/simplex.c

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.118 2004/04/29 17:57:23 ronpinkas Exp $
+ * $Id: classes.c,v 1.119 2004/04/29 23:23:30 ronpinkas Exp $
  */
 
 /*
@@ -1262,7 +1262,7 @@ HB_EXPORT PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, char *szString )
 }
 
 // Worker function for HB_FUNC( __CLSADDMSG ).
-void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * lID_or_FuncPointer_or_BlockPointer, USHORT wType, USHORT uiSprClass, USHORT uiScope, BOOL bPersistent, PHB_ITEM pInit, BOOL bCheckPrefix, BOOL bCase )
+void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer, USHORT uiID, USHORT wType, USHORT uiSprClass, USHORT uiScope, BOOL bPersistent, PHB_ITEM pInit, BOOL bCheckPrefix, BOOL bCase )
 {
    if( uiClass && uiClass <= s_uiClasses )
    {
@@ -1383,7 +1383,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * lID_or_FuncPointer_or
          }
       }
 
-      if( wType == (USHORT) HB_OO_MSG_INLINE && lID_or_FuncPointer_or_BlockPointer == NULL )
+      if( wType == (USHORT) HB_OO_MSG_INLINE && pFunc_or_BlockPointer == NULL )
       {
          hb_errRT_BASE( EG_ARG, 3000, NULL, "__CLSADDMSG", 0 );
       }
@@ -1453,13 +1453,13 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * lID_or_FuncPointer_or
       switch( wType )
       {
          case HB_OO_MSG_METHOD:
-            pNewMeth->pFunction = ( PHB_FUNC ) lID_or_FuncPointer_or_BlockPointer;
+            pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
             pNewMeth->uiScope = uiScope;
             pNewMeth->uiData = 0;
             break;
 
          case HB_OO_MSG_DATA:
-            pNewMeth->uiData = ( USHORT ) lID_or_FuncPointer_or_BlockPointer;
+            pNewMeth->uiData = uiID;
             pNewMeth->uiScope = uiScope;
 
             if( bCheckPrefix && pMessage->pSymbol->szName[ 0 ] == '_' )
@@ -1491,7 +1491,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * lID_or_FuncPointer_or
             break;
 
          case HB_OO_MSG_CLASSDATA:
-            pNewMeth->uiData = ( USHORT ) lID_or_FuncPointer_or_BlockPointer;
+            pNewMeth->uiData = uiID;
             pNewMeth->uiDataShared = pNewMeth->uiData ;
 
             pNewMeth->uiScope = uiScope;
@@ -1551,7 +1551,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * lID_or_FuncPointer_or
             pNewMeth->uiData = ( USHORT ) pClass->pInlines->item.asArray.value->ulLen + 1 ;
             pNewMeth->uiScope = uiScope;
             hb_arraySize( pClass->pInlines, pNewMeth->uiData );
-            hb_arraySet( pClass->pInlines, pNewMeth->uiData, (PHB_ITEM) lID_or_FuncPointer_or_BlockPointer );
+            hb_arraySet( pClass->pInlines, pNewMeth->uiData, (PHB_ITEM) pFunc_or_BlockPointer );
             pNewMeth->pFunction = hb___msgEvalInline;
             break;
 
@@ -1560,18 +1560,18 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * lID_or_FuncPointer_or
             break;
 
          case HB_OO_MSG_SUPER:
-            pNewMeth->uiData = ( USHORT ) lID_or_FuncPointer_or_BlockPointer;
+            pNewMeth->uiData = uiID;
             pNewMeth->uiSprClass = ( USHORT ) uiSprClass; /* store the super handel */
             pNewMeth->uiScope = uiScope;
             pNewMeth->pFunction = hb___msgSuper;
             break;
 
          case HB_OO_MSG_ONERROR:
-            pClass->pFunError = ( PHB_FUNC ) lID_or_FuncPointer_or_BlockPointer;
+            pClass->pFunError = ( PHB_FUNC ) pFunc_or_BlockPointer;
             break;
 
          case HB_OO_MSG_DESTRUCTOR:
-            pClass->pDestructor = ( PHB_FUNC ) lID_or_FuncPointer_or_BlockPointer;
+            pClass->pDestructor = ( PHB_FUNC ) pFunc_or_BlockPointer;
             break;
 
          default:
@@ -1613,9 +1613,9 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * lID_or_FuncPointer_or
  */
 HB_FUNC( __CLSADDMSG )
 {
-   USHORT   uiClass, uiScope, wType, uiSprClass = 0;
+   USHORT   uiClass, uiScope, wType, uiSprClass = 0, uiID;
    char     *szMessage, szAssign[ HB_SYMBOL_NAME_LEN ];
-   void *   lID_or_FuncPointer_or_BlockPointer;
+   void *   pFunc_or_BlockPointer;
    PHB_ITEM pInit = NULL;
    BOOL     bPersistent, bCase;
 
@@ -1635,15 +1635,12 @@ HB_FUNC( __CLSADDMSG )
    szMessage = hb_parcx( 2 );
 
    // 3
-   lID_or_FuncPointer_or_BlockPointer = (void *) hb_param( 3, HB_IT_BLOCK );
-   if( lID_or_FuncPointer_or_BlockPointer == NULL )
+   pFunc_or_BlockPointer = (void *) hb_param( 3, HB_IT_BLOCK );
+   if( pFunc_or_BlockPointer == NULL )
    {
-      lID_or_FuncPointer_or_BlockPointer = hb_parptr( 3 );
-      if( lID_or_FuncPointer_or_BlockPointer == NULL )
-      {
-         lID_or_FuncPointer_or_BlockPointer = (void *) hb_parnl( 3 );
-      }
+      pFunc_or_BlockPointer = hb_parptr( 3 );
    }
+   uiID = hb_parni( 3 );
 
    // 4
    wType = ( USHORT ) hb_parni( 4 );
@@ -1671,7 +1668,7 @@ HB_FUNC( __CLSADDMSG )
       case HB_OO_MSG_CLASSPROPERTY:
          wType -= HB_OO_PROPERTY;
 
-         hb_clsAddMsg( uiClass, szMessage, lID_or_FuncPointer_or_BlockPointer, wType, 0, uiScope, bPersistent, hb_param( 5, HB_IT_ANY ), FALSE, bCase );
+         hb_clsAddMsg( uiClass, szMessage, NULL, uiID, wType, 0, uiScope, bPersistent, hb_param( 5, HB_IT_ANY ), FALSE, bCase );
 
          // Remove HB_OO_CLSTP_PUBLISHED flag if present.
          uiScope &= ~HB_OO_CLSTP_PUBLISHED;
@@ -1688,7 +1685,7 @@ HB_FUNC( __CLSADDMSG )
    }
 
    // Call worker function.
-   hb_clsAddMsg( uiClass, szMessage, lID_or_FuncPointer_or_BlockPointer, wType, uiSprClass, uiScope, bPersistent, pInit, TRUE, bCase );
+   hb_clsAddMsg( uiClass, szMessage, pFunc_or_BlockPointer, uiID, wType, uiSprClass, uiScope, bPersistent, pInit, TRUE, bCase );
 }
 
 /*
@@ -2278,7 +2275,7 @@ HB_FUNC( __CLSMODMSG )
 
                if( pBlock == NULL )
                {
-                  PHB_FUNC pFunc = (PHB_FUNC) hb_parnl( 3 );
+                  PHB_FUNC pFunc = (PHB_FUNC) hb_parptr( 3 );
 
                   if( pFunc ) // Convert to Method.
                   {
@@ -2303,7 +2300,7 @@ HB_FUNC( __CLSMODMSG )
             }
             else  /* Modify METHOD            */
             {
-               PHB_FUNC pFunc = (PHB_FUNC) hb_parnl( 3 );
+               PHB_FUNC pFunc = (PHB_FUNC) hb_parptr( 3 );
 
                if( pFunc )
                {

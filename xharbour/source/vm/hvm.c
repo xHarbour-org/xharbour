@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.390 2004/05/08 05:26:06 ronpinkas Exp $
+ * $Id: hvm.c,v 1.391 2004/05/09 05:22:48 ronpinkas Exp $
  */
 
 /*
@@ -2263,13 +2263,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             ( * HB_VM_STACK.pPos )->item.asInteger.value = HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) );
             ( * HB_VM_STACK.pPos )->item.asInteger.length = 10;
             hb_stackPush();
-            w += 3;
+            w += 1 + sizeof( SHORT );
             break;
 
          case HB_P_PUSHLONG:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLONG") );
             hb_vmPushLongConst( HB_PCODE_MKLONG( &pCode[ w + 1 ] ) );
-            w += 5;
+            w += 1 + sizeof( LONG );
             break;
 
          case HB_P_PUSHDOUBLE:
