@@ -159,8 +159,7 @@ HB_FUNC( GETDCORGEX )
 {
    POINT Point ;
    PHB_ITEM aPt;
-   PHB_ITEM temp ;  
-  
+
    if ( GetDCOrgEx( (HDC) hb_parnl( 1 ), &Point ) ) 
    {
      aPt = Point2Array(&Point);
@@ -187,7 +186,6 @@ HB_FUNC( SCROLLDC )
    RECT   lprcScroll ;
    RECT   lprcClip   ;
    RECT lprcUpdate ;
-   PHB_ITEM pSrc1,pSrc2,pDest;
    PHB_ITEM pArray=hb_param(7,HB_IT_ARRAY);
 
    if( Array2Rect(hb_param( 4, HB_IT_ARRAY ) , &lprcScroll )  && Array2Rect(hb_param( 5, HB_IT_ARRAY ) , &lprcClip ) )

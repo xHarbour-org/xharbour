@@ -53,9 +53,8 @@ HB_FUNC( SETSCROLLRANGE )
 
 HB_FUNC( GETSCROLLRANGE )
 {
-   LPINT lpMinPos ;
-   LPINT lpMaxPos ;
-   BOOL lRet ;
+   LPINT lpMinPos = 0 ;
+   LPINT lpMaxPos = 0 ;
 
    if ( GetScrollRange( (HWND) hb_parnl( 1 ), hb_parni( 2 ), lpMinPos, lpMaxPos ) )
    {

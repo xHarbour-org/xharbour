@@ -36,7 +36,6 @@ DRAWFOCUSRECT(hDc,aSrc)
 HB_FUNC( DRAWFOCUSRECT )
 {
    RECT lprc ;
-   PHB_ITEM pSrc1;
 
    if (ISARRAY(2) && Array2Rect( hb_param( 2 ,HB_IT_ARRAY ) , &lprc ) )   
       hb_retl( DrawFocusRect( (HDC) hb_parnl( 1 ), &lprc ) ) ;   
@@ -248,7 +247,7 @@ INFLATERECT(@aSrc,12,23)
 HB_FUNC( INFLATERECT )
 {
    RECT lprc ;
-   PHB_ITEM pArray=hb_param( 1, HB_IT_ARRAY ),pItem;
+   PHB_ITEM pArray=hb_param( 1, HB_IT_ARRAY );
 
    if ( Array2Rect( pArray , &lprc ))
       {

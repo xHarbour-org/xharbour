@@ -69,12 +69,12 @@ HB_FUNC ( MOVETOEX )
 
 HB_FUNC( GETCURRENTPOSITIONEX )
 {
-   POINT *pt ;
+   POINT pt ;
    PHB_ITEM aPt;
 
-   if ( GetCurrentPositionEx( (HDC) hb_parnl( 1 ), pt ) )
+   if ( GetCurrentPositionEx( (HDC) hb_parnl( 1 ), &pt ) )
    {
-       aPt = Point2Array( pt) ;
+       aPt = Point2Array( &pt) ;
        _itemReturn( aPt );
        _itemRelease( aPt );
 
@@ -117,16 +117,16 @@ HB_FUNC( SETPIXELFORMAT )
 
 HB_FUNC( DESCRIBEPIXELFORMAT )
 {
-   PIXELFORMATDESCRIPTOR *pfd ;
+   PIXELFORMATDESCRIPTOR pfd ;
    UINT nBytes = sizeof(pfd);
 
    hb_retni( DescribePixelFormat( (HDC) hb_parnl( 1 )    ,
                                   hb_parni( 2 )          ,
                                   nBytes                 ,
-                                  pfd
+                                  &pfd
                                   ) ) ;
     if ( ISBYREF(3) )
-       hb_storclen( (char*) pfd, sizeof(PIXELFORMATDESCRIPTOR), 3 ) ;
+       hb_storclen( (char*) &pfd, sizeof(PIXELFORMATDESCRIPTOR), 3 ) ;
     //hb_itemPutCRaw( &HB_VM_STACK.Return, (char *) pfd , sizeof( PIXELFORMATDESCRIPTOR ) );
 
 }

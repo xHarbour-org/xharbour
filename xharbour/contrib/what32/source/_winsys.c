@@ -503,7 +503,7 @@ HB_FUNC( LOADRESOURCE )
  
 HB_FUNC( LOADSTRING )
 {
-   USHORT iLen = ISNIL(3) ? MAX_PATH : hb_parclen( 3 );
+   ULONG iLen = ISNIL(3) ? MAX_PATH : (ULONG) hb_parclen( 3 );
    LPTSTR cText = (char*) hb_xgrab( iLen+1 );
 
    iLen = LoadString( ( ISNIL(1) ? GetModuleHandle(NULL) : (HINSTANCE) hb_parnl(1) ),
@@ -791,7 +791,9 @@ HB_FUNC( GETVERSIONEX )
    BOOL bGetVer;
    OSVERSIONINFOEX osvi;
    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+
    bGetVer = GetVersionEx( (OSVERSIONINFOEX*) &osvi );
+
    hb_storclen( (char*) &osvi, sizeof(OSVERSIONINFOEX), 1 );
    hb_retl( bGetVer );
 }

@@ -565,7 +565,7 @@ endif
 HB_FUNC( CLIENTTOSCREEN )
 {
    POINT Point ;
-   PHB_ITEM pArray,pItem;
+   PHB_ITEM pArray;
    pArray=  hb_param( 2 , HB_IT_ARRAY );
    if (Array2Point( pArray ,&Point  ) )
    {
@@ -595,8 +595,7 @@ endif
 HB_FUNC( SCREENTOCLIENT )
 {
    POINT Point ;
-   BOOL bRet;
-   PHB_ITEM pArray = hb_param( 2 , HB_IT_ARRAY ) ,pItem;
+   PHB_ITEM pArray = hb_param( 2 , HB_IT_ARRAY );
 
    if (Array2Point(pArray, &Point ) )
    {
@@ -623,7 +622,7 @@ HB_FUNC( SCREENTOCLIENT )
 HB_FUNC( MAPWINDOWPOINTS )
 {
    POINT lpPoints ;
-   PHB_ITEM pArray =hb_param( 3 , HB_IT_ARRAY ), pItem;
+   PHB_ITEM pArray =hb_param( 3 , HB_IT_ARRAY );
    Array2Point( pArray ,&lpPoints );
 
    hb_retni( MapWindowPoints( (HWND) hb_parnl( 1 ),

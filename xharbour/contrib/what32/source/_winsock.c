@@ -828,19 +828,43 @@ HB_FUNC( WSACLOSEEVENT )
 //  int  WSAConnect( IN SOCKET s, IN const struct sockaddr FAR * name, IN int namelen,
 //                   IN LPWSABUF lpCallerData, OUT LPWSABUF lpCalleeData, IN LPQOS lpSQOS, IN LPQOS lpGQOS );
 
-/*
+// syntax: WSAConnect( s, cSockAddr, [cCallerData], [@cCalleeData]
 
+/*
 HB_FUNC( WSACONNECT )
 {
-   SOCKET          s            ;
-   sockaddr struct name         ;
-   LPWSABUF        lpCallerData ;
-   LPWSABUF        lpCalleeData ;
+   sockaddr struct *name  ( sockaddr struct *) hb_param( 2, HB_IT_STRING )->item.asString.value ;
+   WSABUF          *CallerData ;
+   WSABUF          *CalleeData ;
    LPQOS           lpSQOS       ;
    LPQOS           lpGQOS       ;
+   int             iRet         ;
 
-   // Your code goes here
 
+   if( !ISNIL( 3 ) )
+   {
+     CallerData.len =
+     CallerData.buf =
+
+   }
+
+    iRet = WSAConnect( (SOCKET) hb_parnl( 1 )            ,
+                        name           ,
+                        hb_parclen( 2 ),
+                        ISNIL( 3 ) ? NULL : CallerData ,
+                        lpCalleeData ,
+                        lpSQOS       ,
+                        lpGQOS
+                       )  ;
+
+
+<<<<<<< _winsock.c
+
+
+
+   hb_retni( (int ) iRet ) ;
+
+=======
 // hb_retni( (int ) WSAConnect( (SOCKET) hb_parnl( 1 )            ,
                                                 &name        ,
                                                 hb_parni( 3 ),
@@ -849,8 +873,8 @@ HB_FUNC( WSACONNECT )
                                                 lpSQOS       ,
                                                 lpGQOS
                                               ) ) ;
+>>>>>>> 1.4
 }
-
 */
 
 
