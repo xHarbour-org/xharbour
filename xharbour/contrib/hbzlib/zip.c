@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.21 2004/03/01 22:00:38 andijahja Exp $
+ * $Id: zip.c,v 1.22 2004/03/02 00:23:54 andijahja Exp $
  */
 
 /*
@@ -450,6 +450,8 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                                  ISLOG( 9 ) ? hb_parl( 9 ) : 0,
                                  &iProgress );
+
+            ResetAttribs();
          }
 
          hb_xfree( szZipFileName );
@@ -500,6 +502,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
                                  ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                                  &iProgress );
+            ResetAttribs();
          }
 
          hb_xfree( szZipFileName );
