@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.3 2002/01/23 23:33:52 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.4 2002/02/16 02:29:32 ronpinkas Exp $
  */
 
 /*
@@ -764,6 +764,12 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra )
      /* Ron Pinkas added 2000-01-24 */
      if( ! ISNAME( *sLine ) )
      {
+        /* Ron Pinkas added 2002-02-15 */
+        if( *sLine == '[' && ipos )
+        {
+           break;
+        }
+
         if( IS_2CHAR_OPERATOR( sLine ) )
         {
            *(cmdname+ipos++) = *sLine++;
