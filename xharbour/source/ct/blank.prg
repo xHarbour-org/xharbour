@@ -1,5 +1,5 @@
 /*
- * $Id: blank.prg,v 1.2 2004/03/14 12:14:01 lculik Exp $
+ * $Id: blank.prg,v 1.2 2005/02/18 20:00:00 ptsarenko Exp $
  */
 
 /*
@@ -72,6 +72,7 @@ FUNCTION BLANK( xItem, lClean)
       xRet := 0
       EXIT
    CASE "C"
+   CASE "M"
          xRet := IIF( ! lClean ,"", Space( Len( xItem ) ) )
          EXIT
    END

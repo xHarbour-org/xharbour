@@ -1,5 +1,5 @@
 /*
- * $Id: tab.c,v 1.2 2003/09/23 21:23:56 paultucker Exp $
+ * $Id: tab.c,v 1.2 2005/02/18 20:00:00 ptsarenko Exp $
  */
 
 /*
@@ -156,6 +156,11 @@ HB_FUNC (TABEXPAND)
       {
         sTabCnt++;
       }
+    }
+    if(sTabCnt == 0)
+    {
+       hb_retclen(pcString, sStrLen);
+       return;
     }
     pcRet = (char *)hb_xgrab (sStrLen+(sTabCnt*(sTabWidth-1)));
 
@@ -352,6 +357,11 @@ HB_FUNC (TABPACK)
       iIgnore141 = 0;
     }
 
+    if ( sStrLen == 0)
+    {
+       hb_retc( "" );
+       return;
+    }
     /* estimate maximum return length by assuming that there's
        nothing to pack */
     pcRet = (char *)hb_xgrab (sStrLen);
