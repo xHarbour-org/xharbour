@@ -1,0 +1,18 @@
+
+# Global paths
+#
+HBR_DIR=..\..
+BCC_DIR=c:\bcc55
+WHO_DIR=.
+
+
+!include <env\bccwin32.mak>
+
+# library
+#
+WHOOLIB    = lib\whoo.lib
+
+WHOOOBJ    = TApplication.obj TWindow.obj TForm.obj
+
+!include $(WHO_DIR)\env\makelib.b32
+
