@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3703 2004/12/29 09:05:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.3703 2004/12/29 11:32:24 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-12-30 02:20 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * source/rtl/inkey.c
+    ! INKEY(n) should disregard and discard chr(0) from kbd buffer.
+      (Clipper compatibility issue.)
+
 2004-12-29 09:05 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   ! utils/hbmake/hbmake.prg
   ! utils/hbmake/hbmutils.prg
   ! utils/hbmake/pickarry.prg
     Fixed to respect the presence of hbct.lib and hbtip.lib if ct.lib and
-    tip.lib still not exist on xharbour/lib directory. 
+    tip.lib still not exist on xharbour/lib directory.
 
 2004-12-28 22:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * source/rtl/gtwvt/gtwvt.c
@@ -23,9 +28,9 @@
       only OEM charset is used in the win32 console apps
 
 2004-12-28 16:25 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
-	* source/rtl/run.c
-	  * added a second byref parameter which, if present, receives
-	    result of system() call
+   * source/rtl/run.c
+     * added a second byref parameter which, if present, receives
+       result of system() call
 
 2004-12-28 09:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfntx/dbfntx1.c

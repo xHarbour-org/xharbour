@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.38 2004/06/23 10:23:48 bdj Exp $
+ * $Id: inkey.c,v 1.39 2004/12/01 00:51:58 peterrees Exp $
  */
 
 /*
@@ -171,6 +171,25 @@ static int hb_inkeyFetch( void ) /* Extract the next key from the keyboard buffe
    return key;
 }
 
+
+/* Similar to hb_inkeyNext(), but this one discards chr(0).
+   Called by hb_inkey() if and only if bWait == TRUE */
+static int hb_inkeyNextNon0( HB_inkey_enum event_mask )
+{
+   int key = hb_inkeyNext( event_mask );  /* key==-99 if no char avail */
+
+   while (key == 0)
+   {
+      hb_inkeyFetch();                    /* trash key==0 */
+      key = hb_inkeyNext( event_mask );   /* key==-99 if no char avail */
+   }
+
+   return key;
+}
+
+
+/* If bWait then call hb_inkeyNextNon0() which will disregard and discard chr(0).
+   This is Clipper compatible behaviour. */
 int hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask )
 {
    int key;
@@ -188,7 +207,7 @@ int hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask )
          /* There is no point in waiting forever for no input events! */
          if( ( event_mask & ( INKEY_ALL + INKEY_RAW ) ) != 0 )
          {
-            while( hb_inkeyNext( event_mask ) == -99 ) /* bdj: was == 0 */
+            while( hb_inkeyNextNon0( event_mask ) == -99 ) /* bdj: was == 0 */
             {
                // immediately break if a VM request is pending.
                if ( hb_vmRequestQuery() != 0 )
@@ -213,12 +232,12 @@ int hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask )
          end_clock = times( &tm ) + ( clock_t ) ( dSeconds * sysconf(_SC_CLK_TCK) );
 
          /* bdj: was == 0 */
-         while( hb_inkeyNext( event_mask ) == -99 && (times( &tm ) < end_clock) )
+         while( hb_inkeyNextNon0( event_mask ) == -99 && (times( &tm ) < end_clock) )
 #else
          clock_t end_clock = clock() + ( clock_t ) ( dSeconds * CLOCKS_PER_SEC );
 
          /* bdj: was == 0 */
-         while( hb_inkeyNext( event_mask ) == -99 && clock() < end_clock )
+         while( hb_inkeyNextNon0( event_mask ) == -99 && clock() < end_clock )
 #endif
          {
             if ( hb_vmRequestQuery() != 0 )
@@ -263,6 +282,8 @@ int hb_setInkeyLast( int ch )      /* Force a value to s_inkeyLast and return pr
   bdj:
   WARNING: hb_inkeyNext() returns -99 if no key is present
            returns 0 if chr(0) is in kb buffer
+
+  See also hb_inkeyNextNon0()
 */
 int hb_inkeyNext( HB_inkey_enum event_mask )      /* Return the next key without extracting it */
 {
@@ -298,6 +319,7 @@ int hb_inkeyNext( HB_inkey_enum event_mask )      /* Return the next key without
 
    return hb_inkeyTranslate( key, event_mask );
 }
+
 
 void hb_inkeyPoll( void )     /* Poll the console keyboard to stuff the Harbour buffer */
 {
