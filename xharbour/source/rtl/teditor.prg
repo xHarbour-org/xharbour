@@ -1,5 +1,5 @@
 /*
- * $Id: teditor.prg,v 1.38 2004/05/15 22:35:32 modalsist Exp $
+ * $Id: teditor.prg,v 1.39 2004/05/17 21:31:41 lf_sfnet Exp $
  *
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
@@ -178,6 +178,12 @@
  * Fixed bug that was word wrap lines improperly in debugger. Reported by Teo Fonrouge. 
  *
  *
+ * v.1.40 - 2004/05/23     Vicente Guerra <vicente@guerra.com.mx>
+ *
+ * - Fixed K_RETURN functionality inserting bottom lines.
+ * - Fixed last row deletion when pressing BACKSPACE at the beginning of it.
+ * - ::lInsert translated from DATA to METHOD for set/get READINSERT().
+ *
  */
 
 #include "common.ch"
@@ -213,8 +219,6 @@ CLASS HBEditor
    DATA  nNumCols       INIT 1                // How many columns can be displayed inside editor window
    DATA  nNumRows       INIT 1                // How many rows can be displayed inside editor window
 
-   DATA  lInsert        INIT .F.              // Is editor in Insert mode or in Overstrike one? Default : Overstrike - Clipper
-
    DATA  nTabWidth      INIT 4                // Tab size. Default is 4 as Clipper
    DATA  cTabSpace      INIT replicate( chr(255) , 4 ) // Virtual Tab character  ("FF") that will be used to show Tab spaces.
    DATA  cTabChar       INIT chr( K_TAB )     // Real Tab character that will be used to replace virtual tab character.
@@ -246,7 +250,13 @@ CLASS HBEditor
                                               //          .F. = unscrolled
    DATA  nLeftScrollVal  INIT 8               // Amount of columns to left scroll.
    DATA  nWordWrapColLeftScroll INIT 0        // Column to word wrap in left scroll mode.
-   
+
+   // Class DATA can be faster, but since the user can change directly
+   // READINSERT(), ::lInsert must check in it.
+   // DATA  lInsert        INIT .F.              // Is editor in Insert mode or in Overstrike one? Default : Overstrike - Clipper
+   METHOD lInsert()              BLOCK { | Self | Set( _SET_INSERT ) }
+   METHOD _lInsert( lInsert )    BLOCK { | Self, lInsert | IF( ISLOGICAL( lInsert ), Set( _SET_INSERT, lInsert ), Set( _SET_INSERT ) ) }
+
    METHOD  New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabSize,;
                 nTextRow, nTextCol, nWndRow, nWndCol, lToggleKeySave )
 
@@ -378,7 +388,9 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
 
    // set correct insert state
    if ::lEditAllow
-      ::InsertState( SET( _SET_INSERT ) )
+      // Force to redraw
+      ::InsertState( ! SET( _SET_INSERT ) )
+      ::InsertState( ! SET( _SET_INSERT ) )
    endif
 
    // No need to save
@@ -1390,7 +1402,7 @@ LOCAL nNewCol
 
       ::lDirty := .T.
 
-      if ::nRow == ::naTextLen
+      if ::nRow == ::naTextLen .and. Len( ::aText[ ::nRow ]:cText ) == 0
          ::RemoveLine( ::nRow )
       endif
 
@@ -1597,7 +1609,7 @@ METHOD K_Return() CLASS HBEditor
          if ::nCol > ::LLen()
             ::AddLine( "", .F. )
          else
-            ::InsertLine( Substr( ::aText[ ::nRow ]:cText, ::nCol ), .F., ::nRow ) // HardCR
+            ::InsertLine( Substr( ::aText[ ::nRow ]:cText, ::nCol ), .F., ::nRow + 1 ) // HardCR
          endif
 
        ELSEIF ::IsSoftCR( ::nRow )
@@ -1690,7 +1702,7 @@ return Self
 //
 METHOD InsertLine( cLine, lSoftCR, nRow ) CLASS HBEditor
 
-   IF nRow >= ::naTextLen
+   IF nRow > ::naTextLen
       AAdd( ::aText, HBTextLine():New( cLine, lSoftCR ) )
    ELSE
       AIns( ::aText, nRow, HBTextLine():New( cLine, lSoftCR ), .T. )
@@ -2110,19 +2122,21 @@ Return ::nPhysRow
 METHOD InsertState( lInsState ) CLASS HBEditor
    LOCAL nCurCol,nCurRow
 
-   IF ISLOGICAL( lInsState )
+   IF ISLOGICAL( lInsState ) .and. ::lInsert != lInsState
       ::lInsert := lInsState
 
+      // Redundant, but useful if ::lInsert is used as class DATA
       SET( _SET_INSERT, lInsState )
 
-      // Please don´t change cursor size mode. 
-      // In overstrike mode the cursor size is normal or user previous defined, 
-      // like Clipper. In insert mode the cursor size is normal in Clipper, but in xHarbour 
-      // I changed to insert size. 
-      //::nCurrentCursor := iif( !::lInsert, SC_INSERT, SC_NORMAL ) 
-      ::nCurrentCursor := iif( ::lInsert, SC_INSERT, ::nOrigCursor )
-
       if SET( _SET_SCOREBOARD )
+
+         // Please don't change cursor size mode. 
+         // In overstrike mode the cursor size is normal or user previous defined, 
+         // like Clipper. In insert mode the cursor size is normal in Clipper, but in xHarbour 
+         // I changed to insert size. 
+         //::nCurrentCursor := iif( !::lInsert, SC_INSERT, SC_NORMAL ) 
+         ::nCurrentCursor := iif( ::lInsert, SC_INSERT, ::nOrigCursor )
+
          nCurCol := ::Col()
          nCurRow := ::Row()
          SetCursor( SC_NONE )
@@ -2130,18 +2144,16 @@ METHOD InsertState( lInsState ) CLASS HBEditor
          if ::lInsert
             ::cScreenArea := SaveScreen( 0,60,0,67 )
             @ 0,60 say '<insert>'
-
          else
             if !empty( ::cScreenArea )
                RestScreen( 0,60,0,67,::cScreenArea )
                ::cScreenArea := ""
             endif
-
          endif
-         SetPos( nCurRow,nCurCol )
-      endif
 
-      SetCursor( ::nCurrentCursor )
+         SetPos( nCurRow,nCurCol )
+         SetCursor( ::nCurrentCursor )
+      endif
 
    ENDIF
 
