@@ -6474,7 +6474,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       aMatches[0].rm_eo = pRegEx->item.asString.length;
    }
 
-   if( cRequest > 0 )
+   if( cRequest != 0 && cRequest != 4)
    {
       iMaxMatch = 1;
    }
@@ -6531,6 +6531,39 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             pMatch = hb_itemPutCL( NULL, str, strlen( str ) );
             hb_arrayAddForward( &(HB_VM_STACK.Return), pMatch );
          }
+         return TRUE;
+
+         case 4: // Wants Results AND positions
+         {
+            PHB_ITEM pMatch;
+            PHB_ITEM aSingleMatch;
+
+            hb_arrayNew( &(HB_VM_STACK.Return), 0 );
+
+            i = 0;
+            while ( aMatches[i].rm_eo > 0 )
+            {
+               aSingleMatch = hb_itemNew( NULL );
+               hb_arrayNew( aSingleMatch, 0 );
+
+               // Matched string
+               pMatch = hb_itemPutCL( NULL, pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
+               hb_arrayAddForward( aSingleMatch, pMatch );
+
+               // begin of match
+               pMatch = hb_itemPutNI( NULL, aMatches[i].rm_so );
+               hb_arrayAddForward( aSingleMatch, pMatch );
+
+               // End of match
+               pMatch = hb_itemPutNI( NULL, aMatches[i].rm_eo );
+               hb_arrayAddForward( aSingleMatch, pMatch );
+
+               hb_arrayAddForward( &(HB_VM_STACK.Return), aSingleMatch );
+               i++;
+            }
+            return TRUE;
+
+         }
 
          return TRUE;
       }
@@ -6552,6 +6585,12 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 HB_FUNC( HB_REGEX )
 {
    hb_regex( 0, NULL, NULL );
+}
+
+// Returns array of { Match, start, end}, { Sub-Matches, start, end}
+HB_FUNC( HB_REGEXATX )
+{
+   hb_regex( 4, NULL, NULL );
 }
 
 // Returns just .T. if match found or .F. otherwise.

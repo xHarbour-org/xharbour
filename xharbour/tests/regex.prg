@@ -1,5 +1,5 @@
 * regex.prg
-* $Id: regex.prg,v 1.2 2003/03/18 11:19:23 jonnymind Exp $
+* $Id: regex.prg,v 1.3 2003/03/18 20:30:14 jonnymind Exp $
 * Test for regular expression functions
 *
 * Giancarlo Niccolai
@@ -8,7 +8,7 @@
 PROCEDURE Main()
    LOCAL regex
    LOCAL aMatch
-   LOCAL cStr, nRow := 3, nCol
+   LOCAL cStr, nRow := 2, nCol
    LOCAL aSource := { ;
       "First date to match: 2001-3-21", ;
       "2002-12/2", ;
@@ -18,7 +18,7 @@ PROCEDURE Main()
 
    CLEAR SCREEN
 
-   @1,15 SAY "X H A R B O U R - Regular expression scan tests"
+   @0,15 SAY "X H A R B O U R - Regular expression scan tests"
    /*
    * Standard regex to get the ISO date format:
    * ([0-9]{4}): exactly fuor digits (year); it is in brackets,
@@ -83,7 +83,23 @@ PROCEDURE Main()
       nRow++
    ENDIF
 
+   cStr := "Test for RegexAtx"
+   @nRow, 5 SAY "RegexAtx test; scanning '" + cStr + "' by 'Reg(.x)'"
+   nRow++
+   aMatch := HB_RegexAtx( "Reg(.x)", cStr )
+   IF Empty( aMatch )
+      @nRow++, 10 SAY "Test failed"
+   ELSE
+      nCol := 15
+      FOR EACH cStr in aMatch
+         @nRow, nCol SAY "FOUND: '"+cStr[1] + "' Start: " + AllTrim( Str(cStr[2]) )+;
+            " End: " + Alltrim( Str( cStr[3] ) )
+         nRow++
+      NEXT
+      nRow++
+   ENDIF
+
    @nRow, 1
-   @23, 25 SAY "Press a key to continue"
+   @24, 25 SAY "Press a key to continue"
    Inkey( 0 )
 RETURN
