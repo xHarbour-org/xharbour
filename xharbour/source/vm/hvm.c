@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.273 2003/11/09 20:15:41 ronpinkas Exp $
+ * $Id: hvm.c,v 1.274 2003/11/09 23:16:39 jonnymind Exp $
  */
 
 /*
@@ -3371,6 +3371,20 @@ static void hb_vmPlus( void )
    {
       hb_vmOperatorCall( pItem1, pItem2, "__OPPLUS" );
    }
+   else if( HB_IS_HASH( pItem1 ) && HB_IS_HASH( pItem2 ) )
+   {
+      ULONG ulLen     = pItem2->item.asHash.value->ulLen;
+      HB_ITEM hbNum;
+      PHB_ITEM pResult;
+
+      pResult = hb_hashClone( pItem2 );
+      hb_itemPutNI( &hbNum, 0 ); // normal merge mode
+
+      hb_hashMerge( pResult, pItem1, 1, ulLen, &hbNum );
+      hb_stackPop();
+      hb_stackPop();
+      hb_itemPushForward( pResult );
+   }
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pItem1, pItem2 );
@@ -3466,6 +3480,57 @@ static void hb_vmMinus( void )
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpMinus" ) )
    {
       hb_vmOperatorCall( pItem1, pItem2, "__OPMINUS" );
+   }
+   else if( HB_IS_HASH( pItem1 ) && HB_IS_HASH( pItem2 ) )
+   {
+      ULONG ulLen     = pItem2->item.asHash.value->ulLen;
+      HB_ITEM hbNum;
+      PHB_ITEM pResult;
+
+      pResult = hb_hashClone( pItem1 );
+      hb_itemPutNI( &hbNum, 3 ); // NOT mode
+
+      hb_hashMerge( pResult, pItem2, 1, ulLen, &hbNum );
+      hb_stackPop();
+      hb_stackPop();
+      hb_itemPushForward( pResult );
+   }
+   else if( HB_IS_HASH( pItem1 ) && HB_IS_ARRAY( pItem2 ) )
+   {
+      ULONG ulLen = pItem2->item.asArray.value->ulLen;
+      ULONG ulPos;
+      PHB_ITEM pResult;
+      PHB_ITEM pRef = pItem2->item.asArray.value->pItems;
+
+      pResult = hb_hashNew( NULL );
+      while( ulLen > 0 )
+      {
+         if ( hb_hashScan( pItem1, pRef, &ulPos ) )
+         {
+            hb_hashAdd( pResult, ULONG_MAX, pRef,
+                  pItem1->item.asHash.value->pValues + ( ulPos - 1 ) );
+         }
+         pRef++;
+         ulLen --;
+      }
+      hb_stackPop();
+      hb_stackPop();
+      hb_itemPushForward( pResult );
+   }
+   else if( HB_IS_HASH( pItem1 ) )
+   {
+      ULONG ulPos;
+      PHB_ITEM pResult;
+
+      if ( hb_hashScan( pItem1, pItem2, &ulPos ) )
+      {
+         pResult = hb_hashClone( pItem1 );
+         hb_hashRemove( pResult, ulPos );
+      }
+
+      hb_stackPop();
+      hb_stackPop();
+      hb_itemPushForward( pResult );
    }
    else
    {
@@ -3822,6 +3887,13 @@ static void hb_vmEqual( BOOL bExact )
       hb_stackPop();
       hb_vmPushLogical( bResult );
    }
+   else if( bExact && HB_IS_HASH( pItem1 ) && HB_IS_HASH( pItem2 ) )
+   {
+      BOOL bResult = pItem1->item.asHash.value == pItem2->item.asHash.value;
+      hb_stackPop();
+      hb_stackPop();
+      hb_vmPushLogical( bResult );
+   }
    else if( pItem1->type != pItem2->type ||
             ( HB_IS_BLOCK( pItem1 ) && HB_IS_BLOCK( pItem2 ) ) ||
             ( ! bExact && HB_IS_ARRAY( pItem1 ) && HB_IS_ARRAY( pItem2 ) ) )
@@ -3902,6 +3974,13 @@ static void hb_vmNotEqual( void )
          hb_itemPushForward( pResult );
          hb_itemRelease( pResult );
       }
+   }
+   else if( HB_IS_HASH( pItem1 ) && HB_IS_HASH( pItem2 ) )
+   {
+      BOOL bResult = pItem1->item.asHash.value != pItem2->item.asHash.value;
+      hb_stackPop();
+      hb_stackPop();
+      hb_vmPushLogical( bResult );
    }
    else
    {
@@ -6327,7 +6406,7 @@ static void hb_vmPushAliasedField( PHB_SYMB pSym )
    /*
     This was added for Clipper compatibility
    */
-   if( ( pAlias->type == HB_IT_ARRAY ) || ( pAlias->type == HB_IT_LOGICAL ) || ( pAlias->type == HB_IT_NIL ) || ( pAlias->type == HB_IT_BLOCK ) )
+   if( ( pAlias->type == HB_IT_ARRAY ) || ( pAlias->type == HB_IT_HASH ) || ( pAlias->type == HB_IT_LOGICAL ) || ( pAlias->type == HB_IT_NIL ) || ( pAlias->type == HB_IT_BLOCK ) )
    {
       hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, pAlias );
    }
@@ -7483,7 +7562,7 @@ HB_FUNC( __VMVARSSET )
     {
        HB_TRACE(HB_TR_DEBUG, ("hb_vmIsLocalRef()"));
 
-       if( hb_stack.Return.type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
+       if( hb_stack.Return.type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
        {
           hb_gcItemRef( &(hb_stack.Return) );
        }
@@ -7496,7 +7575,7 @@ HB_FUNC( __VMVARSSET )
 
           while( pItem != hb_stack.pItems )
           {
-             if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
+             if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
              {
                 hb_gcItemRef( *pItem );
              }

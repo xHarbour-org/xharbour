@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.114 2003/11/09 23:16:40 jonnymind Exp $
+* $Id: thread.c,v 1.115 2003/11/11 20:20:55 ronpinkas Exp $
 */
 
 /*
@@ -865,7 +865,7 @@ void hb_threadIsLocalRef( void )
    while( pStack )
    {
 
-      if( pStack->Return.type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
+      if( pStack->Return.type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
       {
          hb_gcItemRef( &(pStack->Return) );
       }
@@ -876,7 +876,7 @@ void hb_threadIsLocalRef( void )
 
          while( pItem != pStack->pItems )
          {
-            if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_BLOCK) )
+            if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
             {
                hb_gcItemRef( *pItem );
             }

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.53 2003/09/17 07:00:39 jonnymind Exp $
+ * $Id: filesys.c,v 1.54 2003/11/11 20:20:53 ronpinkas Exp $
  */
 
 /*
@@ -528,6 +528,7 @@ BYTE HB_EXPORT * hb_filecase(char *str) {
 
 FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 {
+   HB_THREAD_STUB
    FHANDLE hFileHandle ;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsPOpen(%p, %s)", pFilename, pMode));
@@ -2898,7 +2899,9 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
 
 USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 {
+#if defined(HB_FS_DRIVE_LETTER)
    HB_THREAD_STUB
+#endif
 
    USHORT uiResult;
 
@@ -2978,7 +2981,9 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 
 USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
 {
+#if defined(HB_FS_DRIVE_LETTER)
    HB_THREAD_STUB
+#endif
 
    USHORT uiResult;
 
@@ -3176,7 +3181,9 @@ BOOL HB_EXPORT hb_fsEof( FHANDLE hFileHandle )
 
 USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 {
+#if defined(HB_OS_WIN_32)
    HB_THREAD_STUB
+#endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDirBuff(%hu)", uiDrive));
 

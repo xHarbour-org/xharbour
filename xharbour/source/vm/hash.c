@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.4 2003/11/11 20:20:55 ronpinkas Exp $
+ * $Id: hash.c,v 1.5 2003/11/11 21:24:20 ronpinkas Exp $
  */
 
 /*
@@ -687,6 +687,13 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
                }
                break;
 
+             case 3: // NOT mode
+               if ( hb_hashScan( pDest, pKey, &ulPos ) )
+               {
+                  hb_hashRemove( pDest, ulPos );
+               }
+               break;
+
             default: // codeblock mode
                hb_vmPushSymbol( &hb_symEval );
                hb_vmPush( pBlock );
@@ -1266,7 +1273,7 @@ HB_FUNC( HGETVALUES )
    pV = pHash->item.asHash.value->pValues;
    pArr = pVals->item.asArray.value->pItems;
 
-   for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pV++, pArr )
+   for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pV++, pArr++ )
    {
       hb_itemCopy( pArr, pV );
    }
@@ -1293,6 +1300,7 @@ HB_FUNC( HFILL )
    }
 
    pV = pHash->item.asHash.value->pValues;
+   ulLen = pHash->item.asHash.value->ulLen;
 
    for ( ulPos = 1 ; ulPos <= ulLen; ulPos ++, pV++ )
    {

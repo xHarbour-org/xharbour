@@ -5,11 +5,11 @@
 *
 * This is a test that demonstrates how to use hashes
 *
-* $Id: hash.prg,v 1.1 2003/11/09 23:16:40 jonnymind Exp $
+* $Id: hash.prg,v 1.2 2003/11/10 00:06:29 jonnymind Exp $
 *
 
 PROCEDURE Main()
-   LOCAL hHash
+   LOCAL hHash, hTemp
    LOCAL nSum, eError
    LOCAL xKey, xValue, hDest
 
@@ -39,6 +39,14 @@ PROCEDURE Main()
    ? "Hash value:", ValToPrg( hHash )
    ? "Empty hash value:", ValToPrg( {:>} )
    ? "String representation (should be nothing):", {:>}
+   ? "Equality of hashes (Success for .T. , .F.): ", hHash == hHash, hHash == {:>}
+   ? "Plus operator: ", ValToPrg( { 1:>1, 'a':>2} + { 3:>3, 'b':>4 } )
+   hHash += { 5:> "numkey 3" }
+   ? "Plusequal operator (success if Len(hHash) == 9: ", Len(hHash), ",(", hHash[5], ")"
+   hTemp := {'a':>1, 1:>2, 'c':>3}
+   ? "Minus hash - hash operator: ", ValToPrg( hTemp - { 1:>2, 'c':>3} )
+   ? "Minus hash - array operator: ", ValToPrg( hTemp - { 1, 'c'} )
+   ? "Minus hash - item operator: ", ValToPrg( hTemp - 1 )
    ? "Press a Key to continue"
    ?
    Inkey(0)

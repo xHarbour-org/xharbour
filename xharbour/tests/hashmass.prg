@@ -6,7 +6,7 @@
 * This test demonstrates limits and advantages of
 * hashes.
 *
-* $Id: hashmass.prg,v 1.1 2003/11/09 23:16:40 jonnymind Exp $
+* $Id: hashmass.prg,v 1.2 2003/11/10 00:06:29 jonnymind Exp $
 *
 
 PROCEDURE Main()
@@ -27,6 +27,8 @@ PROCEDURE Main()
    FOR i := 1 TO 10000
       IF I % 500 == 0
          @nRow,5 say Str(i)
+         // Test for GC usage.
+         HB_GcAll(.T.)
       ENDIF
       HSet( hHash, RandStr(5), i )
    NEXT
@@ -37,11 +39,11 @@ PROCEDURE Main()
    hHash := Hash()  // Alternative grammar
    HAllocate( hHash, 10000 )
 
-   hHash := {:>}
    nSecs := Seconds()
    FOR i := 1 TO 10000
       IF I % 500 == 0
          @nRow,5 say Str(i)
+         HB_GcAll(.T.)
       ENDIF
       HSet( hHash, RandStr(5), i )
    NEXT
@@ -53,6 +55,8 @@ PROCEDURE Main()
    FOR i := 1 TO 1000000
       IF I % 500 == 0
          @nRow,5 say Str(i)
+         // Test for GC usage.
+         HB_GcAll(.T.)
       ENDIF
       IF HGet( hHash, 'k' ) != "an element"
          @nRow++,5 SAY "    ERROR!   "
