@@ -1,5 +1,5 @@
 /*
- * $Id: scroll.c,v 1.5 2001/04/04 01:05:08 dholm Exp $
+ * $Id: scroll.c,v 1.1.1.1 2001/12/21 10:42:02 ronpinkas Exp $
  */
 
 /*
@@ -67,36 +67,52 @@ HB_FUNC( SCROLL )
 
    /* Enforce limits of (0,0) to (MAXROW(),MAXCOL()) */
 
-   iTop = hb_parni( 1 ); /* Defaults to zero on bad type */
-   if( iTop < 0 ) iTop = 0;
-   else if( iTop > iMaxRow ) iTop = iMaxRow;
-
-   iLeft = hb_parni( 2 ); /* Defaults to zero on bad type */
-   if( iLeft < 0 ) iLeft = 0;
-   else if( iLeft > iMaxCol ) iLeft = iMaxCol;
-
-   if( ISNUM( 3 ) )
+   if( hb_pcount() == 0 )
    {
-      iBottom = hb_parni( 3 );
-      if( iBottom < 0 ) iBottom = 0;
-      else if( iBottom > iMaxRow ) iBottom = iMaxRow;
-   }
-   else
+      iTop    = 0;
+      iLeft   = 0;
       iBottom = iMaxRow;
-
-   if( ISNUM( 4 ) )
-   {
-      iRight = hb_parni( 4 );
-      if( iRight < 0 ) iRight = 0;
-      else if( iRight > iMaxCol ) iRight = iMaxCol;
+      iRight  = iMaxCol;
    }
    else
-      iRight = iMaxCol;
+   {
+      iTop = hb_parni( 1 ); /* Defaults to zero on bad type */
+      if( iTop < 0 )
+      {
+         iTop = 0;
+      }
+      else if( iTop > iMaxRow )
+      {
+         iTop = iMaxRow;
+      }
 
-   hb_gtScroll( ( USHORT ) iTop, 
-                ( USHORT ) iLeft, 
-                ( USHORT ) iBottom, 
-                ( USHORT ) iRight, 
+      iLeft = hb_parni( 2 ); /* Defaults to zero on bad type */
+      if( iLeft < 0 )
+      {
+         iLeft = 0;
+      }
+      else if( iLeft > iMaxCol )
+      {
+         iLeft = iMaxCol;
+      }
+
+      iBottom = hb_parni( 3 );
+      if( iBottom < iTop )
+      {
+         return;
+      }
+
+      iRight = hb_parni( 4 );
+      if( iRight <= iLeft )
+      {
+         return;
+      }
+   }
+
+   hb_gtScroll( ( USHORT ) iTop,
+                ( USHORT ) iLeft,
+                ( USHORT ) iBottom,
+                ( USHORT ) iRight,
                 hb_parni( 5 ), /* Defaults to zero on bad type */
                 hb_parni( 6 ) ); /* Defaults to zero on bad type */
 }
