@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.38 2003/01/27 21:44:48 jonnymind Exp $
+* $Id: thread.c,v 1.39 2003/01/27 23:07:53 jonnymind Exp $
 */
 
 /*
@@ -773,8 +773,10 @@ HB_FUNC( SUBSCRIBE )
    int islocked;
    PHB_ITEM pNotifyVal;
 
+
    HB_MUTEX_STRUCT *Mutex;
    PHB_ITEM pMutex = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pStatus = hb_param( 3, HB_IT_BYREF );
 
    /* Parameter error checking */
    if( pMutex == NULL || ( hb_pcount() == 2 && ! ISNUM(2)) )
@@ -838,13 +840,23 @@ HB_FUNC( SUBSCRIBE )
 
    if ( iWaitRes == 0 )
    {
+      if ( pStatus )
+      {
+         pStatus->type = HB_IT_LOGICAL;
+         pStatus->item.asLogical.value = 1;
+      }
       pNotifyVal = hb_arrayGetItemPtr( Mutex->aEventObjects, 1 );
       hb_itemReturn( pNotifyVal );
       hb_arrayDel( Mutex->aEventObjects, 1 );
       hb_arraySize( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects) - 1);
-  }
+   }
    else
    {
+      if ( pStatus )
+      {
+         pStatus->type = HB_IT_LOGICAL;
+         pStatus->item.asLogical.value = 0;
+      }
       hb_ret();
    }
 }
@@ -856,6 +868,7 @@ HB_FUNC( SUBSCRIBENOW )
    HB_MUTEX_STRUCT *Mutex;
    PHB_ITEM pNotifyVal;
    PHB_ITEM pMutex = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pStatus = hb_param( 3, HB_IT_BYREF );
 
    /* Parameter error checking */
    if( pMutex == NULL || ( hb_pcount() == 2 && ! ISNUM(2)) )
@@ -923,6 +936,11 @@ HB_FUNC( SUBSCRIBENOW )
 
    if ( iWaitRes == 0 )
    {
+      if ( pStatus )
+      {
+         pStatus->type = HB_IT_LOGICAL;
+         pStatus->item.asLogical.value = 1;
+      }
       pNotifyVal = hb_arrayGetItemPtr( Mutex->aEventObjects, 1 );
       hb_itemReturn( pNotifyVal );
       hb_arrayDel( Mutex->aEventObjects, 1 );
@@ -930,6 +948,11 @@ HB_FUNC( SUBSCRIBENOW )
    }
    else
    {
+      if ( pStatus )
+      {
+         pStatus->type = HB_IT_LOGICAL;
+         pStatus->item.asLogical.value = 0;
+      }
       hb_ret();
    }
 }

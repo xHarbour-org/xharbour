@@ -5,7 +5,7 @@
 *
 * Contributed by Giancarlo Niccolai and Charles Kwon
 *
-* $Id$
+* $Id: inetto.prg,v 1.7 2003/01/27 21:44:49 jonnymind Exp $
 *
 
 * This array contain the socket control objects that
@@ -109,11 +109,9 @@ RETURN
 
 FUNCTION Connect( cAddress, nPort, nTimeout )
    LOCAL aServiceData
-   LOCAL Socket
-   LOCAL MutexDone
-   LOCAL thSearcher
-   LOCAL aServer
-   LOCAL nPos
+   LOCAL Socket, aServer
+   LOCAL MutexDone, thSearcher
+   LOCAL nPos, bSuccess
 
    /* We create now a vaild service data, without the socket */
    aServiceData := { InetCreate(), ThreadGetCurrent(), 0 , Seconds() }
@@ -129,11 +127,12 @@ FUNCTION Connect( cAddress, nPort, nTimeout )
    thSearcher := StartThread( @SearchForServer(), cAddress, MutexDone )
 
    /* we'll wait 1/2 of the timeout */
-   aServer := Subscribe( MutexDone, 500 * nTimeout )
+
+   aServer := Subscribe( MutexDone, 500 * nTimeout, @bSuccess )
    /*And if we have not found an answer, we return failure */
    MutexLock( MutexCnt )
 
-   IF aServer == NIL
+   IF .not. bSuccess
       aServiceData[3] := -2 /* timed out */
       MutexUnlock( MutexCnt )
       /* Kill that thread, but without waiting for it to be done*/

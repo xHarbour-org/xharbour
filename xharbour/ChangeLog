@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.665 2003/01/31 18:39:19 jonnymind Exp $
+ * $Id: ChangeLog,v 1.666 2003/01/31 19:24:45 map Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-31 20:40 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/thread.c
+    * Prototype of Subscribe() and SubscribeAll() changed. Now there
+      is an addititonal parameter returning the status in timed out
+      requests:
+      Subscribe( Mutex[, nMillisec[, @bStatus]] ) --> Any
+      On exit, bStatus will be false if timeout has expired, and true
+      if notification is issued.
+
+  * tests/mtcomplex.prg
+    * Minor style fixes
+
+  * tests/inetto.prg
+    * using the new Subscribe() grammar in timeout wait.
 
 2003-01-31 20:15 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>
   * source/rtl/gtsln/mousesln.c

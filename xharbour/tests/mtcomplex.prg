@@ -1,3 +1,16 @@
+*
+* Complex example of Multi thread usage
+*
+* Giancarlo Niccolai
+* $Id$
+*
+* Here we have a main thread counting, and some secondary
+* threads counting too (in different fashons).
+* A control thread is notified when each secondary
+* thread finishes, and some of the secondary threads
+* are killed before they are able to reach the end.
+*
+
 PROCEDURE Main()
 
    LOCAL i
@@ -6,12 +19,12 @@ PROCEDURE Main()
 
    CLS
 
-   StartThread ( @ThreadFunc(), 8, "1st. Thread:", 100, Mutex )
-   StartThread ( @ThreadFunc(), 9, "2nd. Thread:", 400, Mutex )
+   StartThread ( @ThreadFunc(), 8, "1st. Thread", 100, Mutex )
+   StartThread ( @ThreadFunc(), 9, "2nd. Thread", 400, Mutex )
 
    /* Test of the { codeblock } grammar */
    StartThread ( { | nRow, cName, nLoops, Mtx| ThreadFunc(nRow, cName, nLoops, Mtx) } ;
-         , 10, "3rd. Thread:", 600, Mutex )
+         , 10, "3rd. Thread", 600, Mutex )
 
    Thread4Handle := StartThread( @ThreadFunc(), 11, "4th. Thread", 700, Mutex )
 
@@ -21,7 +34,7 @@ PROCEDURE Main()
 
    StartThread ( @FourthMonitor(), Thread4Handle, Mutex )
 
-   FOR i := 0 TO 600
+   FOR i := 0 TO 500
       @ 12, 10 SAY 'Main Thread:' + Str( i, 4 )
 
       IF i == 100
@@ -29,10 +42,7 @@ PROCEDURE Main()
          @ 12, 27 SAY "(Killed 4th. Thread!)"
       ENDIF
 
-      // Be nice (at first).
-      IF i < 300
-         ThreadSleep( 30 )
-      ENDIF
+      ThreadSleep( 30 )
    NEXT
 
    @ 13, 10 SAY 'Cycle over, stopping Monitor     '
@@ -82,7 +92,8 @@ PROCEDURE MonitorFunc( Mutex )
          @ 3, 26 SAY "waiting ...           "
       ENDIF
 
-      ThreadSleep( 500 )
+      ThreadSleep( 1500 )
+      @ 3, 26 SAY "                          "
    ENDDO
 
 RETURN
