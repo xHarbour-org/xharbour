@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.11 2002/02/04 22:33:32 mafact Exp $
+ * $Id: classes.c,v 1.12 2002/03/08 03:57:18 ronpinkas Exp $
  */
 
 /*
@@ -1953,24 +1953,28 @@ HB_FUNC( __CLS_INCDATA )
 
 /* NOTE: Undocumented Clipper function */
 
+/* Implemented as PRG in TClass.prg for parameter compatibility with Clipper.
 HB_FUNC( __CLASSNEW )
 {
    HB_FUNCNAME( __CLSNEW )();
 }
+*/
 
 /* NOTE: Undocumented Clipper function */
-
-HB_FUNC( __CLASSINSTANCE )
+/* Implemented as PRG in TClass.prg for parameter compatibility with Clipper.
+HB_FUNC( __CLASSINS )
 {
    HB_FUNCNAME( __CLSINST )();
 }
+*/
 
 /* NOTE: Undocumented Clipper function */
-
+/* Implemented as PRG in TClass.prg for parameter compatibility with Clipper.
 HB_FUNC( __CLASSADD )
 {
    HB_FUNCNAME( __CLSADDMSG )();
 }
+*/
 
 /* NOTE: Undocumented Clipper function */
 

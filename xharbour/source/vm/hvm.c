@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.62 2002/04/23 05:19:40 ronpinkas Exp $
+ * $Id: hvm.c,v 1.63 2002/04/24 00:28:49 ronpinkas Exp $
  */
 
 /*
@@ -5798,5 +5798,34 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pModuleSymbols, USHORT uiModuleS
          else
              hb_dynsymNew( ( pModuleSymbols + ui ) );
       }
+   }
+}
+
+HB_FUNC( HB_FUNCPTR )
+{
+   PHB_ITEM pParam = hb_stackItemFromBase( 1 );
+   PHB_DYNS pDynSym;
+
+   if( HB_IS_STRING( pParam ) )
+   {
+      char *sSym = hb_strUpperCopy( pParam->item.asString.value, pParam->item.asString.length );
+
+      pDynSym = hb_dynsymFind( sSym );
+      hb_xfree( sSym );
+
+      if( pDynSym )
+      {
+         ( &hb_stack.Return )->type = HB_IT_LONG;
+         ( &hb_stack.Return )->item.asLong.value = (ULONG) pDynSym->pSymbol->pFunPtr;
+         ( &hb_stack.Return )->item.asLong.length = 10;
+      }
+      else
+      {
+         hb_vmPushLong( 0 );
+      }
+   }
+   else
+   {
+      hb_vmPushLong( 0 );
    }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.15 2002/04/21 01:39:17 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.16 2002/04/23 05:28:26 ronpinkas Exp $
  */
 
 /*
@@ -506,7 +506,7 @@ static HB_EXPR_FUNC( hb_compExprUseSelf )
       case HB_EA_REDUCE:
          break;
       case HB_EA_ARRAY_AT:
-         hb_compErrorType( pSelf );   /* QUESTION: Is this OK ? */
+         //hb_compErrorType( pSelf );   /* QUESTION: Is this OK ? */
          break;
       case HB_EA_ARRAY_INDEX:
          hb_compErrorIndex( pSelf );     /* SELF cannot be used as array index element */

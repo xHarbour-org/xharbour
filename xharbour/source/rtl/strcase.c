@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: strcase.c,v 1.4 2002/01/04 21:26:08 andijahja Exp $
  */
 
 /*
@@ -81,6 +81,7 @@ char * hb_strLowerCopy( char * szText, ULONG ulLen )
    {
       szCopy[ i ] = tolower( szText[ i ] );
    }
+   szCopy[ i ] = '\0';
 
    return szCopy;
 }
@@ -96,6 +97,7 @@ char * hb_strUpperCopy( char * szText, ULONG ulLen )
    {
       szCopy[ i ] = toupper( szText[ i ] );
    }
+   szCopy[ i ] = '\0';
 
    return szCopy;
 }

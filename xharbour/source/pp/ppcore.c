@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.8 2002/03/11 22:38:52 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.9 2002/03/11 23:54:57 ronpinkas Exp $
  */
 
 /*
@@ -2832,7 +2832,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
    while( ( ifou = md_strAt( exppatt, ( *( exppatt + 1 ) ) ? 2 : 1, ptrOut, FALSE, FALSE, TRUE )) > 0 ) /* ??? */
    {
-      //printf( "Found: >%s< At: %i In: >%s<\n", exppatt, ifou, ptrOut );
+      //printf( "   Found: >%s< At: %i In: >%s<\n", exppatt, ifou, ptrOut );
 
       bFound = TRUE;
       rezs = FALSE;
@@ -2896,6 +2896,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
                while( (i = hb_strAt( exppatt, 2, expnew, lennew )) > 0 )
                {
+                  //printf( "1\n" );
                   lennew += ReplacePattern( exppatt[2], expreal, lenreal, expnew+i-1, lennew );
                }
 
@@ -2930,7 +2931,13 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                lastchar = *(ptrOut + ifou + 2);
             }
 
-            if( lastchar != *(ptrOut + ifou + 2) )
+            //printf( "lastchar: '%c' '%c'\n", lastchar, *(ptrOut + ifou + 2) );
+
+            if( lastchar == *(ptrOut + ifou + 2) )
+            {
+               lastchar++;
+            }
+            else
             {
                isdvig += ifou + 3;
                ptrOut = ptro + isdvig;
@@ -2938,6 +2945,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
             }
          }
 
+         //printf( "2\n" );
          *lenres += ReplacePattern( exppatt[2], expreal, lenreal, ptrOut + ifou - 1, *lenres-isdvig-ifou+1 );
          isdvig += ifou - 1;
       }
@@ -2962,7 +2970,9 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
   int rmlen = lenreal, ifou, lenitem, i;
   char sQuotes[ 4 ] = "\"\",";
 
-  HB_TRACE(HB_TR_DEBUG, ("ReplacePattern(%c, %s, %d, %s, %p)", patttype, expreal, lenreal, ptro, lenres));
+  HB_TRACE(HB_TR_DEBUG, ("ReplacePattern(%c, %s, %i, %s, %i)", patttype, expreal, lenreal, ptro, lenres));
+
+  //printf( "   %c, '%s', %i, '%s', %i\n", patttype, expreal, lenreal, ptro, lenres );
 
   switch( *(ptro+2) ) {
   case '0':  /* Regular result marker  */
@@ -3159,6 +3169,9 @@ static int ReplacePattern( char patttype, char * expreal, int lenreal, char * pt
     hb_pp_Stuff( " ", ptro, 1, 4, lenres );
     break;
   }
+
+  //printf( "   '%s', '%s'\n", expreal, ptro );
+
   return rmlen - 4;
 }
 

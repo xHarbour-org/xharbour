@@ -1,11 +1,38 @@
 /*
- * $Id: ChangeLog,v 1.169 2002/04/24 23:52:17 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.170 2002/04/25 07:40:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2002-04-25 23:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    * Corrected 1 bug with regard to replacement of non repeatable marler value within repeatable group.
+
+  * include/hbexprb.c
+    * Corrected error when Self Value is used as an Array.
+
+  * source/compiler/harbour.slx
+    * Correction [] as an Index after SELF
+
+  * source/rtl/strcase.c
+    * Corrected hb_strLowerCopy() and hb_strUpperCopy() to have terminating '\0'.
+
+  * source/vm/classes.c
+    - Commented out __ClassNew(), __ClassAdd(), and __ClassIns()
+  * source/rtl/tclass.prg
+    + Added Clipper compatible __ClassNew(), __ClassAdd(), and __ClassIns()
+
+  * source/vm/hvm.c
+    + Added new PRG level function HB_FuncPtr()
+      NOTE: This is the Run-Time equivalent of @FuncName() - It allows passing function pointers at run time:
+      Sample: __ClsAddMsg( hClass, cProperty, HB_FuncPtr( cFunction ), HB_OO_MSG_METHOD )
+
+/*
+   Now code that was using Clipper undocumented class creation functions should perform correctly.
 */
 
 2002-04-25 00:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
