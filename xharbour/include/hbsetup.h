@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.13 2003/08/01 02:58:12 ronpinkas Exp $
+ * $Id: hbsetup.h,v 1.14 2003/09/24 01:20:34 druzus Exp $
  */
 
 /*
@@ -133,9 +133,9 @@
 /* ***********************************************************************
  * 
 */
-/* #ifndef HB_ARRAY_USE_COUNTER_OFF */
+#ifndef HB_ARRAY_USE_COUNTER_OFF
 #  define HB_ARRAY_USE_COUNTER
-/* #endif */
+#endif
 
 
 /* ***********************************************************************
