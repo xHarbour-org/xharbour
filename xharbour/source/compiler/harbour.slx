@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.9 2002/05/23 20:12:05 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.10 2002/06/25 16:00:47 ronpinkas Exp $
  */
 
 /*
@@ -931,7 +931,7 @@ int hb_comp_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, BOOL *ptr_bIg
 
       case HB_TO :
          *ptr_bIgnoreWords = FALSE;
-         if( iLastToken == NUM_INTEGER || iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == IDENTIFIER || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' || iLastToken == ']' )
+         if( iLastToken == NUM_INTEGER || iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == IDENTIFIER || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' || iLastToken == ']' || iLastToken == LITERAL )
             { return TO + DONT_REDUCE; }
          else
             {
