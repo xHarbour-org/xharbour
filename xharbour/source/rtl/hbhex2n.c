@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.9 2004/04/04 12:45:02 mlombardo Exp $
+ * $Id: hbhex2n.c,v 1.10 2004/04/28 18:30:30 druzus Exp $
  */
 
 /*
@@ -157,7 +157,8 @@ HB_FUNC( HB_STRTOHEX )
    char *outbuff;
    char *cStr;
    char *c;
-   USHORT i, len, iNum;
+   USHORT iNum;
+   int i, len;
    int iCipher;
 
    if( ! ISCHAR(1) )
@@ -205,6 +206,7 @@ HB_FUNC( HB_STRTOHEX )
 
    outbuff[len*2] = '\0';
    hb_retc( outbuff );
+   hb_xfree( outbuff );
 }
 
 HB_FUNC( HB_HEXTOSTR )
@@ -212,18 +214,18 @@ HB_FUNC( HB_HEXTOSTR )
    char *outbuff;
    char *cStr;
    char c;
-   USHORT i, len, nalloc;
+   int i, len, nalloc;
    int iCipher, iNum;
 
    if( ! ISCHAR(1) )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_STRTOHEX", 1, hb_param(1,HB_IT_ANY) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_HEXTOSTR", 1, hb_param(1,HB_IT_ANY) );
       return;
    }
 
    cStr = (char *) hb_parc( 1 );
-   len = hb_parclen( 1 );
-   nalloc = (USHORT) (len/2);
+   len = (int) hb_parclen( 1 );
+   nalloc = (int) (len/2);
    outbuff = (char *) hb_xgrab( nalloc + 1 );
 
    for( i = 0; i < nalloc; i++ )
@@ -277,4 +279,5 @@ HB_FUNC( HB_HEXTOSTR )
 
    outbuff[nalloc] = '\0';
    hb_retclen( outbuff, nalloc );
+   hb_xfree( outbuff );
 }
