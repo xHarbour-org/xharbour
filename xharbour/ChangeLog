@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2991 2004/05/26 14:18:41 lculik Exp $
+ * $Id: ChangeLog,v 1.2992 2004/05/27 00:26:49 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-05-26 21:30 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
+  * source/rtl/tget.prg
+    ! minor fix
+      removed colorspec method and leave an question
+      now colorspec respect set intensity as clipper( fix due bug report from Janis Peters on harbourbr list)
+
 2004-05-27 12:24 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * hrbdll.bc
     + added  -DHB_NO_PROFILER -DHB_NO_TRACE $(CFLAGS) to C_USR define

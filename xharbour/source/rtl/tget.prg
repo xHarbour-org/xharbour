@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.72 2004/03/28 05:39:06 guerra000 Exp $
+ * $Id: tget.prg,v 1.73 2004/04/21 16:38:56 kaddath Exp $
  */
 
 /*
@@ -99,6 +99,7 @@ CLASS Get
    DATA SubScript
    DATA Type
    DATA TypeOut
+   DATA ColorSpec
    #ifdef HB_COMPAT_C53
    DATA Control
    DATA Message
@@ -108,7 +109,7 @@ CLASS Get
    DATA CapCol
    #endif
 
-   DATA cColorSpec   PROTECTED   // Used only for METHOD ColorSpec
+//   DATA cColorSpec   PROTECTED    Used only for METHOD ColorSpec
    DATA cPicture     PROTECTED   // Used only for METHOD Picture
    DATA Block
 
@@ -119,7 +120,7 @@ CLASS Get
    MESSAGE _Assign METHOD Assign()
 #endif
    METHOD HitTest(mrow,mcol)
-   METHOD ColorSpec( cColorSpec ) SETGET  // Replace to DATA ColorSpec
+//   METHOD ColorSpec( cColorSpec ) SETGET  // Replace to DATA ColorSpec
    METHOD Picture( cPicture )     SETGET  // Replace to DATA Picture
    METHOD Display( lForced )
    METHOD ColorDisp( cColorSpec ) INLINE ::ColorSpec := cColorSpec, ::Display(), Self
@@ -183,7 +184,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    DEFAULT cVarName   TO ""
    DEFAULT bVarBlock  TO IIF( ValType( cVarName ) == 'C', MemvarBlock( cVarName ), NIL )
    DEFAULT cPicture   TO ""
-   DEFAULT cColorSpec TO hb_ColorIndex( SetColor(), CLR_UNSELECTED ) + "," + hb_ColorIndex( SetColor(), CLR_ENHANCED ) + "," + __guiColor( SetColor(), CLR_STANDARD + 1 ) + "," + __guiColor( SetColor(), CLR_BACKGROUND + 1 )
+   DEFAULT cColorSpec TO buildGetColor()
 
    ::HasFocus   := .f.
    ::lEdit      := .f.
@@ -386,6 +387,7 @@ METHOD Display( lForced ) CLASS Get
    LOCAL cCaption
    LOCAL cClrCap := hb_ColorIndex( ::ColorSpec, GET_CLR_CAPTION )
    LOCAL cClrAcc := hb_ColorIndex( ::ColorSpec, GET_CLR_ACCEL )
+   LOCAL lIsIntense := SET( _SET_INTENSITY)
 
    DEFAULT lForced TO .t.
 
@@ -1581,14 +1583,16 @@ return Self
  * to carry out certain actions to normalize the data.
  * The particular case is that the function receives a single color and
  * be used for GET_CLR_UNSELECTED and GET_CLR_ENHANCED.
- */
-
+ *
+  // QUESTIONS, is realy necessary this method? the ::colorspec generated was
+  not clipper 5.x compatible, and also was not respecting SET INTENSITY
+    
 METHOD ColorSpec( cColorSpec ) CLASS Get
 
    local cClrUnSel, cClrEnh
 
    if cColorSpec != NIL
-
+   
       cClrUnSel := iif( !Empty( hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ) ),;
                                 hb_ColorIndex( cColorSpec, GET_CLR_UNSELECTED ),;
                                 hb_ColorIndex( SetColor(), GET_CLR_UNSELECTED ) )
@@ -1597,12 +1601,12 @@ METHOD ColorSpec( cColorSpec ) CLASS Get
                                 hb_ColorIndex( cColorSpec, GET_CLR_ENHANCED ),;
                                 cClrUnSel )
 
-      ::cColorSpec := cClrUnSel + " , " + cClrEnh
+      ::cColorSpec := buildGetColor()
 
    endif
 
 return ::cColorSpec
-
+*/
 //---------------------------------------------------------------------------//
 
 /* The METHOD Picture and DATA cPicture allow to replace the
@@ -1743,3 +1747,34 @@ static procedure AnalyzePicture( cPicture )
    Next
 Return
 */
+
+STATIC FUNCTION BuildGetColor()
+
+   LOCAL lIntensity := SET( _SET_INTENSITY )
+   LOCAL cEndColor := "," + __guiColor( SetColor(), CLR_STANDARD + 1 ) + "," + __guiColor( SetColor(), CLR_BACKGROUND + 1 )
+   LOCAL cCur
+   LOCAL cRet := ""
+
+   cCur := hb_ColorIndex( SetColor(), CLR_UNSELECTED )
+   IF ( lIntensity)
+      cRet += cCur +","
+   ELSE
+      IF cCur == "N/W"
+         cRet += "W/N" +","
+      ELSE
+         cRet += cCur[1] + "+/" + cCur[3] +","
+      ENDIF
+   ENDIF
+
+   cCur := hb_ColorIndex( SetColor(), CLR_ENHANCED )
+   IF ( lIntensity)
+      cRet += cCur + cEndColor
+   ELSE
+      IF cCur == "N/W"
+         cRet += "W/N" + cEndColor
+      ELSE
+         cRet += cCur[1] + "+/" + cCur[3] + cEndColor
+      ENDIF
+   ENDIF
+
+RETURN cRet
