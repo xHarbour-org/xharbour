@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.5 2005/03/01 21:23:18 andijahja Exp $
+# $Id: makefile.gc,v 1.6 2005/03/02 21:59:30 andijahja Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -2499,6 +2499,8 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/philes53.o \
    $(RTL_OBJ_DIR)/philesx.o \
    $(RTL_OBJ_DIR)/rat.o \
+   $(RTL_OBJ_DIR)/readexit.o \
+   $(RTL_OBJ_DIR)/readins.o \
    $(RTL_OBJ_DIR)/readline.o \
    $(RTL_OBJ_DIR)/regex.o \
    $(RTL_OBJ_DIR)/replic.o \
@@ -2833,6 +2835,12 @@ $(RTL_OBJ_DIR)/filesys.o : $(RTL_DIR)/filesys.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/fserror.o : $(RTL_DIR)/fserror.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/readexit.o : $(RTL_DIR)/readexit.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/readins.o : $(RTL_DIR)/readins.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/readline.o : $(RTL_DIR)/readline.c

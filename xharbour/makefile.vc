@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.146 2005/03/06 19:21:35 paultucker Exp $
+# $Id: makefile.vc,v 1.147 2005/03/10 03:54:57 paultucker Exp $
 #
 
 #
@@ -410,6 +410,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\philes53.obj \
    $(OBJ_DIR)$(MT)\philesx.obj \
    $(OBJ_DIR)$(MT)\rat.obj \
+   $(OBJ_DIR)$(MT)\readexit.obj \
+   $(OBJ_DIR)$(MT)\readins.obj \
    $(OBJ_DIR)$(MT)\readline.obj \
    $(OBJ_DIR)$(MT)\regex.obj \
    $(OBJ_DIR)$(MT)\replic.obj \

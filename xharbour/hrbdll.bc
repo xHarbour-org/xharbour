@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.88 2005/03/03 14:16:44 andijahja Exp $
+# $Id: hrbdll.bc,v 1.89 2005/03/04 19:23:37 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -337,6 +337,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\memvarbl.obj \
   $(OBJ_DIR)\mssgline.obj \
   $(OBJ_DIR)\objfunc.obj \
+  $(OBJ_DIR)\readexit.obj \
+  $(OBJ_DIR)\readins.obj \
   $(OBJ_DIR)\readkey.obj \
   $(OBJ_DIR)\readline.obj \
   $(OBJ_DIR)\readvar.obj \
@@ -963,6 +965,8 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\memvarbl.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\mssgline.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\objfunc.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\readexit.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\readins.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\readkey.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\readline.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\readvar.obj           + >> hdll.tmp
@@ -1997,6 +2001,12 @@ $(OBJ_DIR)\radiogrp.obj : $(OBJ_DIR)\radiogrp.c
    $(CC_CMD)
 
 $(OBJ_DIR)\rat.obj : $(RTL_DIR)\rat.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\readexit.obj : $(OBJ_DIR)\readexit.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\readins.obj : $(OBJ_DIR)\readins.c
    $(CC_CMD)
 
 $(OBJ_DIR)\readkey.c : $(RTL_DIR)\readkey.prg

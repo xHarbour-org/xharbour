@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.gc,v 1.4 2005/03/01 21:23:17 andijahja Exp $
+# $Id: hrbdll.gc,v 1.5 2005/03/03 14:16:45 andijahja Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -146,6 +146,8 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/philes53.o \
    $(OBJ_DIR)/philesx.o \
    $(OBJ_DIR)/rat.o \
+   $(OBJ_DIR)/readexit.o \
+   $(OBJ_DIR)/readins.o \
    $(OBJ_DIR)/readline.o \
    $(OBJ_DIR)/regex.o \
    $(OBJ_DIR)/replic.o \
@@ -778,6 +780,12 @@ $(OBJ_DIR)/filesys.o : $(RTL_DIR)/filesys.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/fserror.o : $(RTL_DIR)/fserror.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/readexit.o : $(RTL_DIR)/readexit.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/readins.o : $(RTL_DIR)/readins.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/readline.o : $(RTL_DIR)/readline.c

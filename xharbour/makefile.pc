@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.pc,v 1.4 2005/02/28 10:17:28 andijahja Exp $
+# $Id: makefile.pc,v 1.5 2005/03/02 21:59:30 andijahja Exp $
 # makefile for PellesC compiler
 #
 
@@ -997,6 +997,8 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\substr.obj \
    $(RTL_OBJ_DIR)\teditorl.obj \
    $(RTL_OBJ_DIR)\tone.obj \
+   $(RTL_OBJ_DIR)\readexit.obj \
+   $(RTL_OBJ_DIR)\readins.obj \
    $(RTL_OBJ_DIR)\readline.obj \
    $(RTL_OBJ_DIR)\tprinter.obj \
    $(RTL_OBJ_DIR)\transfrm.obj \
@@ -1393,6 +1395,8 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\substr.obj   >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\teditorl.obj >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\tone.obj     >> poccrtl.rsp
+   $(ECHO) $(RTL_OBJ_DIR)\readexit.obj >> poccrtl.rsp
+   $(ECHO) $(RTL_OBJ_DIR)\readins.obj  >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\readline.obj >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\tprinter.obj >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\transfrm.obj >> poccrtl.rsp
@@ -2711,6 +2715,12 @@ $(RTL_OBJ_DIR)\tpopup.c : $(RTL_DIR)\tpopup.prg
    $(HARBOUR_CMD)
 
 $(RTL_OBJ_DIR)\tpopup.obj : $(RTL_OBJ_DIR)\tpopup.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\readexit.obj : $(RTL_DIR)\readexit.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\readins.obj : $(RTL_DIR)\readins.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\readline.obj : $(RTL_DIR)\readline.c

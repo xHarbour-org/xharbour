@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.40 2005/01/23 12:14:31 ptsarenko Exp $
+# $Id: makefile.wc,v 1.41 2005/02/11 20:51:01 guerra000 Exp $
 #
 
 #
@@ -362,6 +362,8 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\philes53.obj \
    $(RTL_OBJ_DIR)\philesx.obj \
    $(RTL_OBJ_DIR)\rat.obj \
+   $(RTL_OBJ_DIR)\readexit.obj \
+   $(RTL_OBJ_DIR)\readins.obj \
    $(RTL_OBJ_DIR)\readline.obj \
    $(RTL_OBJ_DIR)\regex.obj \
    $(RTL_OBJ_DIR)\replic.obj \
@@ -1767,6 +1769,12 @@ $(RTL_OBJ_DIR)\filesys.obj : $(RTL_DIR)\filesys.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(RTL_OBJ_DIR)\fserror.obj : $(RTL_DIR)\fserror.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(RTL_OBJ_DIR)\readexit.obj : $(RTL_DIR)\readexit.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(RTL_OBJ_DIR)\readins.obj : $(RTL_DIR)\readins.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(RTL_OBJ_DIR)\readline.obj : $(RTL_DIR)\readline.c

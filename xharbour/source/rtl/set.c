@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.60 2005/02/11 20:54:16 guerra000 Exp $
+ * $Id: set.c,v 1.61 2005/03/06 23:43:21 andijahja Exp $
  */
 
 /*
@@ -568,26 +568,6 @@ HB_FUNC( __SETCENTURY )
 
    /* Return the previous setting */
    hb_retl( old_century_setting );
-}
-
-HB_FUNC( READEXIT )
-{
-   hb_retl( hb_set.HB_SET_EXIT );
-
-   if( ISLOG( 1 ) )
-   {
-      hb_set.HB_SET_EXIT = hb_parl( 1 );
-   }
-}
-
-HB_FUNC( READINSERT )
-{
-   hb_retl( hb_set.HB_SET_INSERT );
-
-   if( ISLOG( 1 ) )
-   {
-      hb_set.HB_SET_INSERT = hb_parl( 1 );
-   }
 }
 
 HB_FUNC( SET )
