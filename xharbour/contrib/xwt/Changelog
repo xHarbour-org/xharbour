@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.36 2003/08/31 20:02:30 xthefull Exp $
+ * $Id: Changelog,v 1.37 2003/09/02 22:42:30 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,19 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-09-04 22:21 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
+  * src/xwt_gtk/xwt_gtk.c
+    ! Fixed warning from compiler gcc
+      wt_gtk.c:585: warning: passing arg 1 of `gtk_bin_get_child' from incompatible pointer type
+      Solution:  gtk_bin_get_child ( GTK_BIN(wSelf) )
+    ! Fixed warning gcc , unused variable 'i'
+  * src/xwt_gtk/xwt_gtk.h
+    ! Fixed warning the gcc from xwt_gtk.c, + added definition of xwt_gtk_createFontSelection( )
+
 2003-09-02 19:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * include/xwt.ch
     + Added new types and property
   + src/fontsel.prg
     + Added font Selection Widget
   * src/xwt_gtk/xwt_gtk.c
-    + support for Font Selection widget 
+    + support for Font Selection widget
     + minor fix to color support
   + src/xwt_gtk/xwt_gtk_fontselect.c
     * font selection base level code
   * test/xwt_test.prg
     + Added test to new font selection control
-            
+
 2003-08-31 21:49 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
   * src/framewindow.prg
     + New pass parameters for creation of menu in method New 

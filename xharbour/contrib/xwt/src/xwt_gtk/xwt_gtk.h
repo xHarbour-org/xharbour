@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.13 2003/06/08 14:05:35 jonnymind Exp $
+   $Id: xwt_gtk.h,v 1.14 2003/07/23 15:58:10 lculik Exp $
 
    GTK interface
 */
@@ -191,6 +191,7 @@ BOOL xwt_gtk_createCheckbox( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createSplitter( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createToggleButton( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createTreelist( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createFontSelection( PXWT_WIDGET wSelf );
 
 void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
 void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
