@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.3 2002/10/12 00:38:22 horacioroldan Exp $
+ * $Id: adsmgmnt.c,v 1.4 2003/02/28 09:44:10 iananderson Exp $
  */
 
 /*
@@ -108,7 +108,9 @@ HB_FUNC( ADSMGGETINSTALLINFO )
       hb_storc ( (char *) stInstallInfo.aucSerialNumber   , -1, 8 );  /* Serial number string */
    }
    else
-     hb_ret( );
+   {
+      hb_ret( );
+   }
 }
 
 HB_FUNC( ADSMGGETACTIVITYINFO )
@@ -230,7 +232,6 @@ HB_FUNC( ADSMGGETACTIVITYINFO )
 
       }
    }
-
 }
 
 HB_FUNC( ADSMGGETCOMMSTATS )
@@ -264,17 +265,22 @@ HB_FUNC( ADSMGGETCOMMSTATS )
       hb_stornl( stCommStats.ulSendToErrors    , -1, 11);  /* SendTo failed (NT only)          */
    }
    else
-     hb_ret(  );
+   {
+      hb_ret(  );
+   }
 
 }
 
 HB_FUNC( ADSMGRESETCOMMSTATS )
 {
    if ( hMgmtHandle )
+   {
       hb_retnl( AdsMgResetCommStats( hMgmtHandle ) );
+   }
    else
+   {
       hb_retnl( -1 );
-
+   }
 }
 
 HB_FUNC( ADSMGGETCONFIGINFO )
@@ -355,8 +361,9 @@ HB_FUNC( ADSMGGETCONFIGINFO )
       }
    }
    else
-     hb_ret(  );
-
+   {
+      hb_ret(  );
+   }
 }
 
 HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
@@ -372,7 +379,9 @@ HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
 // bh:  Enhancement:  Get # of tables from ADS_MGMT_ACTIVITY_INFO.stUsers instead of set size
 */
    if ( ISNUM( 2 ) )
+   {
       ulMaxUsers = (UNSIGNED16) hb_parnl( 2 );
+   }
 
    pastUserInfo = (ADS_MGMT_USER_INFO *) hb_xgrab( sizeof( ADS_MGMT_USER_INFO ) * ulMaxUsers );
       /*
@@ -400,8 +409,11 @@ HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
       {
          hb_storc ( (char *) pastUserInfo[ulCount].aucUserName , -1, ulCount+1);
       }
-   }else
+   }
+   else
+   {
       hb_reta( 0 );
+   }
 
    hb_xfree( pastUserInfo );
 
@@ -448,7 +460,9 @@ HB_FUNC( ADSMGGETLOCKOWNER )
        hb_stornl( pusLockType, -1, 5);						/* type of lock */
    }
    else
+   {
        hb_retnl ( ulRetVal );
+   }
 }
 
 /*
