@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.11 2003/12/23 21:01:40 maurifull Exp $
+ * $Id: gtxvt.c,v 1.1 2003/12/29 23:38:57 jonnymind Exp $
  */
 
 /*
@@ -2244,11 +2244,12 @@ int HB_EXPORT hb_xvt_gtGetWindowTitle(PXWND_DEF wnd, char *title, int length)
 BOOL HB_EXPORT hb_xvt_gtSetFont( PXWND_DEF wnd, char *fontFace, char *weight, int size,  char *encoding )
 {
    char fontString[150];
+   XFontStruct *xfs;
 
    snprintf( fontString, 149, "-*-%s-%s-r-normal--%d-*-*-*-*-*-%s",
       fontFace, weight, size, encoding == NULL ? "*-*" : encoding);
 
-   XFontStruct *xfs = XLoadQueryFont( wnd->dpy, fontString );
+   xfs = XLoadQueryFont( wnd->dpy, fontString );
 
    if ( xfs == NULL )
    {
