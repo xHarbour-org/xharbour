@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.17 2003/03/06 21:02:22 walito Exp $
+ * $Id: tgetlist.prg,v 1.18 2003/06/22 05:34:29 ronpinkas Exp $
  */
 
 /*
@@ -606,7 +606,7 @@ METHOD GetPostValidate() CLASS HBGetList
    endif
 
    if oGet:Changed
-      oGet:UpdateBuffer()
+      oGet:Assign()
       ::lUpdated := .t.
    endif
 
@@ -662,14 +662,13 @@ return lValid
 
 METHOD GetDoSetKey( bKeyBlock ) CLASS HBGetList
 
-   local oGet := ::oGet, lUpdated, xValue, lSetKey
+   local oGet := ::oGet, lUpdated, lSetKey
 
    if oGet:Changed
       oGet:Assign()
       ::lUpdated := .t.
    endif
 
-   xValue   := oGet:VarGet()
    lUpdated := ::lUpdated
 
    lSetKey := Eval( bKeyBlock, ::cReadProcName, ::nReadProcLine, ::ReadVar() )
@@ -677,11 +676,6 @@ METHOD GetDoSetKey( bKeyBlock ) CLASS HBGetList
    IF ( !( VALTYPE( lSetKey ) == "L" ) )
       lSetKey := .T.              // Will cause Return from ApplyKey(), C53
    ENDIF                          // no effect on C52
-
-   if ValType( xValue ) != ValType( oGet:VarGet() ) .or.;
-        oGet:VarGet() != xValue
-      oGet:VarPut( oGet:VarGet() )
-   endif
 
    ::ShowScoreboard()
    oGet:UpdateBuffer()
@@ -1274,7 +1268,7 @@ METHOD GUIPostValidate( oGUI, oGetMsg ) CLASS HBGetList
    endif
 
    if oGet:Changed
-      oGet:UpdateBuffer()
+      oGet:Assign()
       ::lUpdated := .t.
    endif
 
