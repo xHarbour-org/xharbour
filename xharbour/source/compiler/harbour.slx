@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.52 2004/05/09 02:54:29 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.53 2004/05/09 20:51:15 ronpinkas Exp $
  */
 
 /*
@@ -838,7 +838,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
             iRet = NUM_DOUBLE;
          }
       }
-      else
+      else if( isdigit( yytext[0] ) || ( yytext[0] == '.' && isdigit( yytext[1] ) ) )
       {
          yylval.valDouble.dNumber = atof( yytext );
          tmpPtr = strchr( yytext, '.' );
@@ -876,6 +876,11 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
                iRet = NUM_DOUBLE;
             }
          }
+      }
+      else
+      {
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_SYNTAX, yytext, NULL );
+         return yytext[0];
       }
 
       iRet += DONT_REDUCE;

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.15 2004/03/22 03:16:00 ronpinkas Exp $
+ * $Id: macro.slx,v 1.16 2004/04/03 00:27:03 druzus Exp $
  */
 
 /*
@@ -254,7 +254,7 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    yytext = szToken;
    yyleng = iTokenLen;
 
-   if( ( *yytext > 64 && *yytext < 91 ) || *yytext == '&' || *yytext == '_' )
+   if( ( *yytext >= 'A' && *yytext <= 'Z' ) || *yytext == '&' || *yytext == '_' )
    {
       /* Macro. */
       if( ( tmpPtr = strrchr( yytext, '&' ) ) != NULL ) /* Right Search. */
@@ -337,7 +337,7 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
        	    iRet = NUM_DOUBLE;
       	 }
       }
-      else
+      else if( isdigit( yytext[0] ) || ( yytext[0] == '.' && isdigit( yytext[1] ) ) )
       {
        	 pYYLVAL->valDouble.dNumber = atof( yytext );
       	 tmpPtr = strchr( yytext, '.' );
@@ -369,6 +369,10 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
             	iRet = NUM_DOUBLE;
             }
       	 }
+      }
+      else
+      {
+         hb_macroError( EG_SYNTAX, YYLEX_PARAM );
       }
    }
 

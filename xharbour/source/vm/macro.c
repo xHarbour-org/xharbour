@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.45 2004/05/10 13:45:51 snaiperis Exp $
+ * $Id: macro.c,v 1.46 2004/05/12 02:25:30 druzus Exp $
  */
 
 /*
@@ -169,7 +169,9 @@ static HB_ERROR_HANDLE( hb_macroErrorEvaluation )
     * release all used memory here.
     */
    if( hb_vmRequestQuery() == HB_QUIT_REQUESTED )
+   {
       hb_macroDelete( ( HB_MACRO_PTR ) ErrorInfo->Cargo );
+   }
 
    return pResult;
 }
@@ -180,13 +182,14 @@ static HB_ERROR_HANDLE( hb_macroErrorType )
 {
    HB_MACRO_PTR pMacro = ( HB_MACRO_PTR ) ErrorInfo->Cargo;
 
-   /* copy error object for later diagnostic usage */   
+   /* copy error object for later diagnostic usage */
    pMacro->pError = hb_itemNew( ErrorInfo->Error );
-   
+
    pMacro->status &= ~HB_MACRO_CONT;
    /* ignore rest of compiled code
     */
    hb_vmRequestEndProc();
+
    return NULL;      /* ignore this error */
 }
 
@@ -231,20 +234,27 @@ static void hb_macroSyntaxError( HB_MACRO_PTR pMacro )
       HB_TRACE(HB_TR_DEBUG, ("hb_macroSyntaxError.(%s)", pMacro->string));
 
       pError = pMacro->pError;
-      hb_macroDelete( pMacro );
    }
 
    if( pError )
    {
       hb_errLaunch( pError );
       hb_itemRelease( pError );
+
+      hb_macroDelete( pMacro );
    }
    else
    {
-      PHB_ITEM  pItem = hb_itemPutCL( NULL, pMacro->string, pMacro->length );
+      PHB_ITEM  pItem;
 
-      pResult = hb_errRT_BASE_Subst( EG_SYNTAX, 1449, NULL, "&", 1, pItem );
-      hb_itemRelease(pItem);
+      // Using Stack to avoid reported memory leak if the Error System will QUIT the app.
+      hb_vmPushString( pMacro->string, pMacro->length );
+
+      hb_macroDelete( pMacro );
+
+      pResult = hb_errRT_BASE_Subst( EG_SYNTAX, 1449, NULL, "&", 1, hb_stackItemFromTop( -1 ) );
+
+      hb_stackPop();
 
       if( pResult )
       {
@@ -636,7 +646,9 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
          }
       }
       else
+      {
          hb_macroSyntaxError( &struMacro );
+      }
    }
 }
 
@@ -1162,7 +1174,9 @@ ULONG hb_compGenJump( LONG lOffset, HB_MACRO_DECL )
    /* TODO: We need a longer offset (longer then two bytes)
     */
    if( lOffset < ( LONG ) SHRT_MIN || lOffset > ( LONG ) SHRT_MAX )
+   {
       hb_macroError( HB_MACRO_TOO_COMPLEX, HB_MACRO_PARAM );
+   }
 
    hb_compGenPCode3( HB_P_JUMP, HB_LOBYTE( lOffset ), HB_HIBYTE( lOffset ), HB_MACRO_PARAM );
 
@@ -1174,7 +1188,9 @@ ULONG hb_compGenJumpFalse( LONG lOffset, HB_MACRO_DECL )
    /* TODO: We need a longer offset (longer then two bytes)
     */
    if( lOffset < ( LONG ) SHRT_MIN || lOffset > ( LONG ) SHRT_MAX )
+   {
       hb_macroError( HB_MACRO_TOO_COMPLEX, HB_MACRO_PARAM );
+   }
 
    hb_compGenPCode3( HB_P_JUMPFALSE, HB_LOBYTE( lOffset ), HB_HIBYTE( lOffset ), HB_MACRO_PARAM );
 
@@ -1189,7 +1205,9 @@ void hb_compGenJumpThere( ULONG ulFrom, ULONG ulTo, HB_MACRO_DECL )
    /* TODO: We need a longer offset (longer then two bytes)
     */
    if( lOffset < ( LONG ) SHRT_MIN || lOffset > ( LONG ) SHRT_MAX )
+   {
       hb_macroError( HB_MACRO_TOO_COMPLEX, HB_MACRO_PARAM );
+   }
 
    pCode[ ( ULONG ) ulFrom ]     = HB_LOBYTE( lOffset );
    pCode[ ( ULONG ) ulFrom + 1 ] = HB_HIBYTE( lOffset );
@@ -1205,7 +1223,9 @@ ULONG hb_compGenJumpTrue( LONG lOffset, HB_MACRO_DECL )
    /* TODO: We need a longer offset (longer then two bytes)
     */
    if( lOffset < ( LONG ) SHRT_MIN || lOffset > ( LONG ) SHRT_MAX )
+   {
       hb_macroError( HB_MACRO_TOO_COMPLEX, HB_MACRO_PARAM );
+   }
 
    hb_compGenPCode3( HB_P_JUMPTRUE, HB_LOBYTE( lOffset ), HB_HIBYTE( lOffset ), HB_MACRO_PARAM );
 
@@ -1286,7 +1306,7 @@ void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
          HB_MACRO_DATA->status |= HB_MACRO_UNKN_VAR;
       }
    }
-   
+
    /* Find the address of passed symbol - create the symbol if doesn't exist
     * (Clipper compatibility). */
    pSym = hb_dynsymGet( szVarName );
