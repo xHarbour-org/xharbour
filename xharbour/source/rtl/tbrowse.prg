@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.47 2003/10/24 04:46:57 walito Exp $
+ * $Id: tbrowse.prg,v 1.48 2003/11/12 12:58:44 andijahja Exp $
  */
 
 /*
@@ -958,7 +958,7 @@ METHOD GoBottom() CLASS TBrowse
    Eval( ::goBottomBlock )
 
    //   Skip back from last record as many records as TBrowse can hold
-   nToTop := Abs( Eval( ::SkipBlock, - ( ::RowCount - 1 ) ) )
+   nToTop := Abs( EvalSkipBlock( ::SkipBlock, - ( ::RowCount - 1 ) ) )
 
    //   From top of TBrowse new row position is nToTop + 1 records away
    ::nNewRowPos := nToTop + 1
@@ -1499,7 +1499,7 @@ METHOD _ForceStable() CLASS TBrowse
       If ::RowPos # 1     // No repositioning is required if current
                           // cursor row is one
 
-         nAvail := Eval( ::SkipBlock, 0 - ::RowPos - 1 )
+         nAvail := EvalSkipBlock( ::SkipBlock, 0 - ::RowPos - 1 )
          // You should reposition only if there are too few records
          // available or there are more than sufficient records
          // available.  If there are exact number of records
@@ -1509,7 +1509,7 @@ METHOD _ForceStable() CLASS TBrowse
 
          // Place back the data source pointer to where it was
 
-         Eval( ::SkipBlock, 0 - nAvail )
+         EvalSkipBlock( ::SkipBlock, 0 - nAvail )
 
          // ::GoBottom() go to top first, but need phase 2 of stabilization.
          // See form of work of ::GoBottom.
@@ -1641,11 +1641,11 @@ METHOD Stabilize() CLASS TBrowse
          // I have to set data source to cursor position
          //
          if ::nLastRetrieved <> ::nNewRowPos
-            Eval( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
+            EvalSkipBlock( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
             ::nLastRetrieved := ::nNewRowPos
          endif
 
-         nRecsSkipped := Eval( ::SkipBlock, ::nRecsToSkip )
+         nRecsSkipped := EvalSkipBlock( ::SkipBlock, ::nRecsToSkip )
 
          // I've tried to move past top or bottom margin
          //
@@ -1776,7 +1776,7 @@ METHOD Stabilize() CLASS TBrowse
             //       17 times. Should be made more clever.
             //
             if nRow <> ::nLastRetrieved
-               if lDisplay := Eval( ::SkipBlock, nRow - ::nLastRetrieved ) == ( nRow - ::nLastRetrieved )
+               if lDisplay := EvalSkipBlock( ::SkipBlock, nRow - ::nLastRetrieved ) == ( nRow - ::nLastRetrieved )
                   ::nLastRetrieved := nRow
                endif
             else
@@ -1892,7 +1892,7 @@ METHOD Stabilize() CLASS TBrowse
       // If I'm not already under cursor I have to set data source to cursor position
       //
       if ::nLastRetrieved <> ::nNewRowPos
-         Eval( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
+         EvalSkipBlock( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
          ::nLastRetrieved := ::nNewRowPos
       endif
 
@@ -2018,11 +2018,11 @@ METHOD ForceStabilize() CLASS TBrowse
          // I have to set data source to cursor position
          //
          if ::nLastRetrieved <> ::nNewRowPos
-            Eval( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
+            EvalSkipBlock( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
             ::nLastRetrieved := ::nNewRowPos
          endif
 
-         nRecsSkipped := Eval( ::SkipBlock, ::nRecsToSkip )
+         nRecsSkipped := EvalSkipBlock( ::SkipBlock, ::nRecsToSkip )
 
          // I've tried to move past top or bottom margin
          //
@@ -2151,7 +2151,7 @@ METHOD ForceStabilize() CLASS TBrowse
             //       17 times. Should be made more clever.
             //
             if nRow <> ::nLastRetrieved
-               if lDisplay := Eval( ::SkipBlock, nRow - ::nLastRetrieved ) == ( nRow - ::nLastRetrieved )
+               if lDisplay := EvalSkipBlock( ::SkipBlock, nRow - ::nLastRetrieved ) == ( nRow - ::nLastRetrieved )
                   ::nLastRetrieved := nRow
                endif
             else
@@ -2256,7 +2256,7 @@ METHOD ForceStabilize() CLASS TBrowse
       // If I'm not already under cursor I have to set data source to cursor position
       //
       if ::nLastRetrieved <> ::nNewRowPos
-         Eval( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
+         EvalSkipBlock( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
          ::nLastRetrieved := ::nNewRowPos
       endif
 
@@ -2695,6 +2695,17 @@ METHOD SetStyle( nMode, lSetting ) CLASS TBROWSE
   ENDIF
 
 RETURN lRet
+
+//-------------------------------------------------------------------//
+
+static Function EvalSkipBlock( bBlock, nSkip )
+   local lSign   := nSkip >= 0
+   local nSkiped := Eval( bBlock, nSkip )
+
+   if (lSign .and. nSkiped < 0) .or. (!lSign .and. nSkiped > 0)
+      nSkiped := 0
+   endif
+return nSkiped
 
 //-------------------------------------------------------------------//
 
