@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.8 2003/07/09 22:09:42 jonnymind Exp $
+ * $Id: philes.c,v 1.9 2003/07/30 14:07:41 druzus Exp $
  */
 
 /*
@@ -42,6 +42,15 @@
  *
  * Copyright 2000 David G. Holm <dholm@jsd-llc.com>
  *    HB_F_EOF()
+ *
+ * Copyright 2003 Giancarlo Niccolai <gian@niccolai.ws>
+ *    HB_OSPATHSEPARATOR()
+ *    HB_OSPATHLISTSEPARATOR()
+ *    HB_OSPATHDELIMITERS()
+ *    HB_OSDRIVESEPARATOR()
+ *    HB_OPENPROCESS()
+ *    HB_PROCESSVALUE()
+ *    HB_CLOSEPROCESS()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -279,4 +288,147 @@ HB_FUNC( HB_OSDRIVESEPARATOR )
    hb_retc( "" );
 #endif
 }
+
+HB_FUNC( HB_OPENPROCESS )
+{
+   char *szName = hb_parc( 1 );
+   PHB_ITEM pIn = hb_param( 2, HB_IT_BYREF );
+   PHB_ITEM pOut = hb_param( 3, HB_IT_BYREF );
+   PHB_ITEM pErr = hb_param( 4, HB_IT_BYREF );
+
+   FHANDLE fhIn, fhOut, fhErr;
+   FHANDLE *pfhIn, *pfhOut, *pfhErr;
+   FHANDLE fhProcess;
+
+   if ( szName == NULL )
+   {
+      hb_errRT_BASE( EG_ARG, 4001,
+         "First parameter (process name) is mandatory",
+         "HB_OPENPROCESS", 4,
+            hb_paramError( 1 ), hb_paramError( 2 ),  hb_paramError( 3 ),
+            hb_paramError( 4 ) );
+      return;
+   }
+
+   if ( (pIn != NULL && !ISBYREF(2) ) ||
+        (pOut != NULL && !ISBYREF(3) ) ||
+        (pErr != NULL && !ISBYREF(4) ) )
+   {
+      hb_errRT_BASE( EG_ARG, 4001,
+         "All the given file handle parameters must be by reference",
+         "HB_OPENPROCESS", 4,
+            hb_paramError( 1 ), hb_paramError( 2 ),  hb_paramError( 3 ),
+            hb_paramError( 4 ));
+      return;
+   }
+
+
+   if ( pIn != NULL )
+   {
+      pfhIn = &fhIn;
+   }
+   else
+   {
+      pfhIn = NULL;
+   }
+
+   if ( pOut != NULL )
+   {
+      pfhOut = &fhOut;
+   }
+   else
+   {
+      pfhOut = NULL;
+   }
+
+   if ( pErr != NULL )
+   {
+      pfhErr = &fhErr;
+   }
+   else
+   {
+      pfhErr = NULL;
+   }
+
+
+   fhProcess = hb_fsOpenProcess( szName, pfhIn, pfhOut, pfhErr );
+
+   if ( fhProcess != FS_ERROR )
+   {
+      if ( pIn != NULL )
+      {
+         hb_itemPutNL( pIn, fhIn );
+      }
+
+      if ( pOut != NULL )
+      {
+         hb_itemPutNL( pOut, fhOut );
+      }
+
+      if ( pErr != NULL )
+      {
+         hb_itemPutNL( pErr, fhErr );
+      }
+   }
+
+   hb_retnl( fhProcess );
+}
+
+HB_FUNC( HB_CLOSEPROCESS )
+{
+   FHANDLE fhProc = hb_parnl( 1 );
+   PHB_ITEM pGentle = hb_param( 2, HB_IT_LOGICAL );
+
+   if ( fhProc == 0 || hb_pcount() > 2 ||
+      ( hb_pcount() == 2 && pGentle == NULL) )
+   {
+      hb_errRT_BASE( EG_ARG, 4001,
+         "Wrong parameter count/type",
+         "HB_CLOSEPROCESS", 2,
+            hb_paramError( 1 ), hb_paramError( 2 ));
+      return;
+   }
+
+   if ( pGentle == NULL || pGentle->item.asLogical.value )
+   {
+      hb_retl( hb_fsCloseProcess( fhProc, TRUE ) );
+   }
+   else
+   {
+      hb_retl( hb_fsCloseProcess( fhProc, FALSE ) );
+   }
+
+}
+
+HB_FUNC( HB_PROCESSVALUE )
+{
+   FHANDLE fhProc = hb_parnl( 1 );
+   PHB_ITEM pWait = hb_param( 2, HB_IT_LOGICAL );
+
+   if ( fhProc == 0 || hb_pcount() > 2 ||
+      ( hb_pcount() == 2 && pWait == NULL) )
+   {
+      hb_errRT_BASE( EG_ARG, 4001,
+         "Wrong parameter count/type",
+         "HB_CLOSEPROCESS", 2,
+            hb_paramError( 1 ), hb_paramError( 2 ));
+      return;
+   }
+
+   if ( pWait == NULL || pWait->item.asLogical.value )
+   {
+      hb_retni( hb_fsProcessValue( fhProc, TRUE ) );
+   }
+   else
+   {
+      hb_retni( hb_fsProcessValue( fhProc, FALSE ) );
+   }
+
+}
+
+HB_FUNC( HB_FCOMMIT )
+{
+   hb_fsCommit( hb_parni(1) );
+}
+
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.42 2003/07/30 14:07:41 druzus Exp $
+ * $Id: filesys.c,v 1.43 2003/08/25 21:22:00 druzus Exp $
  */
 
 /*
@@ -77,6 +77,13 @@
  *    API calls to allow openning an unlimited number of files
  *    simultaneously.
  *
+ * Copyright 2003 Giancarlo Niccolai <gian@niccolai.ws>
+ *    hb_fsOpenProcess()
+ *    hb_fsProcessValue()
+ *    hb_fsCloseProcess()
+ *    Unix sensible creation flags
+ *    Thread safing and optimization
+ *
  * See doc/license.txt for licensing terms.
  *
  */
@@ -105,6 +112,9 @@
 
 #if defined(OS_UNIX_COMPATIBLE)
    #include <unistd.h>
+   #include <signal.h>
+   #include <sys/types.h>
+   #include <sys/wait.h>
 #endif
 
 
@@ -629,6 +639,282 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 
    return hFileHandle;
 }
+
+/*
+JC1: Piping functions
+hb_fsOpenProcess creates a process and get the control of the 4 main
+standard handlers. The handlers are returned in FHANDLE pointers;
+each of them can be 0 if the owner process don't want to get
+the ownership of that specific handler.
+
+The process return a resource identificator that allows to
+wait for the child process to be stopped. Incidentally, the
+type of the process resource identificator is the same as
+a file handle in all the systems were are using this functions:
+in windows it is a HANDLE, while in unix is a PID_T (that is
+an integer == file handle in all the GNU derived unces).
+
+On success, a valid FHandle is returned, and FError returns
+zero. On error, -1 is returned and FError() returns nonzero.
+*/
+
+FHANDLE HB_EXPORT hb_fsOpenProcess( BYTE * pFilename,
+      FHANDLE *fhStdin,
+      FHANDLE *fhStdout,
+      FHANDLE *fhStderr)
+{
+   HB_THREAD_STUB
+   FHANDLE hRet = FS_ERROR;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsOpenProcess(%s, %p, %p, %p )",
+      pFilename, fhStdin, fhStdout, fhStderr));
+
+#if defined(OS_UNIX_COMPATIBLE)
+   {
+#ifndef MAXFD
+    #define MAXFD		1024
+#endif
+   FHANDLE hPipeIn[2], hPipeOut[2], hPipeErr[2];
+   pid_t pid;
+
+   //JC1: unlocking the stack to allow cancelation points
+   HB_STACK_UNLOCK;
+
+   errno = 0;
+   if( pipe( hPipeIn ) != 0 ||
+      pipe( hPipeOut ) != 0 ||
+      pipe( hPipeErr ) != 0
+   ) {
+      hb_fsSetError( errno );
+      return (FHANDLE) -1;
+   }
+
+   if( ( pid = fork() ) == -1 )
+   {
+      hb_fsSetError( errno );
+      // closing unused handles should be nice
+      // TODO: check fs_Popen to close handles.
+      close( hPipeIn[0] );
+      close( hPipeIn[1] );
+      close( hPipeOut[0] );
+      close( hPipeOut[1] );
+      close( hPipeErr[0] );
+      close( hPipeErr[1] );
+      return (FHANDLE) -1;
+   }
+
+   if( pid != 0 ) {
+      // I am the father
+      close( hPipeIn[0] );
+      close( hPipeOut[1] );
+      close( hPipeErr[1] );
+
+      if ( fhStdin == 0 )
+      {
+         close( hPipeIn[1] );
+      }
+      else
+      {
+         *fhStdin = hPipeIn[1];
+      }
+
+      if ( fhStdout == 0 )
+      {
+         close( hPipeOut[0] );
+      }
+      else
+      {
+         *fhStdout = hPipeOut[0];
+      }
+
+      if ( fhStderr == 0 )
+      {
+         close( hPipeErr[0] );
+      }
+      else
+      {
+         *fhStderr = hPipeErr[0];
+      }
+
+      // father is done.
+      hb_fsSetError( 0 );
+      hRet = (FHANDLE) pid;
+
+   }
+   // I am che child
+   else
+   {
+      FHANDLE hNull;
+
+      // temporary solution
+      char *argv[4];
+      argv[0] = "sh";
+      argv[1] = "-c";
+      argv[2] = ( char * ) pFilename;
+      argv[3] = ( char * ) 0;
+      // drop uncontrolled streams
+      hNull = open("/dev/null", O_RDWR);
+
+      close( hPipeIn[ 1 ] ); // we don't write to stdin
+      close( hPipeOut[0] );
+      close( hPipeErr[0] );
+
+      // does father wants to control us?
+      if ( fhStdin != 0 )
+      {
+         dup2( hPipeIn[ 0 ], 0 );
+      }
+      else
+      {
+         dup2( hNull, 0 );
+      }
+
+      if ( fhStdout != 0 )
+      {
+         dup2( hPipeOut[ 1 ], 1 );
+      }
+      else
+      {
+         dup2( hNull, 1 );
+      }
+
+      if ( fhStderr != 0 )
+      {
+         dup2( hPipeErr[ 1 ], 2 );
+      }
+      else
+      {
+         dup2( hNull, 2 );
+      }
+
+      close( hNull );
+
+      //??????
+      for( hNull = 3; hNull < MAXFD; ++hNull )
+         close(hNull);
+
+      // ????
+      setuid(getuid());
+      setgid(getgid());
+
+      execv("/bin/sh", argv );
+   }
+   }
+   HB_STACK_LOCK;
+
+
+#else
+
+   HB_SYMBOL_UNUSED( pFilename );
+   HB_SYMBOL_UNUSED( fhStdin );
+   HB_SYMBOL_UNUSED( fhStdout );
+   HB_SYMBOL_UNUSED( fhStderr );
+
+   hb_fsSetError( FS_ERROR );
+
+#endif
+
+   return hRet;
+}
+
+/*
+   See if a process is still being executed. If bWait is true,
+   the function will wait for the process to finish  before
+   to return. When the process is terminated
+   with a signal, the signal is returned as -signum. Notice that
+   this does not apply to Windows.
+*/
+
+int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
+{
+   HB_THREAD_STUB
+   int iRetStatus = -1;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsProcessValue(%d, %d )", fhProc, bWait));
+
+#if defined(OS_UNIX_COMPATIBLE)
+{
+   int iStatus;
+
+   if ( ! bWait )
+   {
+      iRetStatus = waitpid( (pid_t) fhProc, &iStatus, WNOHANG );
+   }
+   else
+   {
+      HB_STACK_UNLOCK;
+      iRetStatus = waitpid( (pid_t) fhProc, &iStatus, 0 );
+      HB_STACK_LOCK;
+   }
+
+   if ( iRetStatus < 0 )
+   {
+      hb_fsSetError( errno );
+      iRetStatus = -2;
+   }
+   else if ( iRetStatus == 0 )
+   {
+      iRetStatus = -1;
+   }
+   else
+   {
+      if( WIFEXITED( iStatus ) )
+      {
+         iRetStatus = WEXITSTATUS( iStatus );
+      }
+      else
+      {
+         iRetStatus = 0;
+      }
+   }
+}
+
+#else
+
+   HB_SYMBOL_UNUSED( fhProc );
+   HB_SYMBOL_UNUSED( bWait );
+
+   hb_fsSetError( FS_ERROR );
+
+#endif
+
+   return iRetStatus;
+}
+
+/*
+   Closes a process (that is, kill the application running the
+   process); the handle is still valid until you
+   catch it with hb_fsProcessValue. If bGentle is true, then
+   a kind termination request is sent to the process, else
+   the process is just killed.
+   Retiurn
+*/
+
+BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
+{
+   BOOL bRet = FALSE;
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsCloseProcess(%d, %d )", fhProc, bGentle));
+
+#if defined(OS_UNIX_COMPATIBLE)
+{
+   int iSignal = bGentle ? SIGTERM : SIGKILL;
+   bRet = (kill( (pid_t) fhProc, iSignal ) == 0);
+   if ( ! bRet )
+   {
+      hb_fsSetError( errno );
+   }
+}
+
+#else
+
+   HB_SYMBOL_UNUSED( fhProc );
+   HB_SYMBOL_UNUSED( bGentle );
+   hb_fsSetError( FS_ERROR );
+
+#endif
+   return bRet;
+}
+
 
 FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 {

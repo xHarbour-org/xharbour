@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1383 2003/08/25 23:56:44 druzus Exp $
+ * $Id: ChangeLog,v 1.1384 2003/08/26 09:31:17 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-08-26 17:07 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/filesys.c
+  * include/hbapifs.h
+    + Added hb_fsOpenProcess(), hb_fsCloseProcess() and
+      hb_fsProcessValue() to control subprocess and piping (stream
+      redirections). Currently only Linux, windows is under way
+
+  * source/rtl/philes.c
+    + Added interfaces for process oriented routines
+      HB_OpenProcess()
+      HB_CloseProcess()
+      HB_ProcessValue()
+      HB_FCommit() -- to flush files
+
+  + tests/process.prg
+    + Added test for process oriented functions
+
 
 2003-08-26 11:28 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
   * test/bldtest.bat

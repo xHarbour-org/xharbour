@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.18 2003/07/13 18:10:00 walito Exp $
+ * $Id: hbapifs.h,v 1.19 2003/08/25 21:21:59 druzus Exp $
  */
 
 /*
@@ -143,6 +143,11 @@ extern void     HB_EXPORT hb_fsSetError   ( USHORT uiError ); /* set the file sy
 extern USHORT   HB_EXPORT hb_fsWrite      ( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount ); /* write to an open file from a buffer (<=64K) */
 extern ULONG    HB_EXPORT hb_fsWriteLarge ( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount ); /* write to an open file from a buffer (>64K) */
 extern FHANDLE  HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode );
+/* Open a child process */
+extern FHANDLE HB_EXPORT hb_fsOpenProcess( BYTE * pFilename, FHANDLE *fhStdin, FHANDLE *fhStdout, FHANDLE *fhStderr);
+extern BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle );
+int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait );
+
 
 #define hb_fsFLock( h, s, l )   hb_fsLock( h, s, l, FL_LOCK )
 #define hb_fsFUnlock( h, s, l ) hb_fsLock( h, s, l, FL_UNLOCK )
