@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.54 2004/03/28 16:02:38 likewolf Exp $
+ * $Id: win32ole.prg,v 1.55 2004/04/06 09:58:24 andijahja Exp $
  */
 
 /*
@@ -575,7 +575,7 @@ METHOD Collection( xIndex, xValue ) CLASS TOleAuto
 
 	 LOCAL xRet
 
-   TraceLog( PCount(), xIndex, xValue )
+   //TraceLog( PCount(), xIndex, xValue )
 
    IF PCount() == 1
       RETURN ::Item( xIndex )

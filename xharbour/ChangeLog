@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2825 2004/04/23 10:26:16 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2826 2004/04/23 15:00:04 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-23 15:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+    ! Fixed support for := Operator Overloading
+
+  * source/rtl/win32ole.prg
+    - Removed strat TraceLog()
 
 2004-04-23 17:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rdd/dbcmd.c
@@ -24,13 +32,13 @@
     * Formatting for recent changes.
 
     + Wvt_setPointer( nPointer )
-      Set the mouse pointer shape to predefined mouse pointer which are in the 
-      range of 1-15. 1-12 are usable on all win versions whereas 13-15 are for 
-      winver > 4. To know what 1-15 constants means, please examine the gtwvt.c, 
-      at per now I have not found a suitable .ch file to place them ( someone to 
+      Set the mouse pointer shape to predefined mouse pointer which are in the
+      range of 1-15. 1-12 are usable on all win versions whereas 13-15 are for
+      winver > 4. To know what 1-15 constants means, please examine the gtwvt.c,
+      at per now I have not found a suitable .ch file to place them ( someone to
       point ? ).
 
-      Also please note that if you set pointer through it, all windows running as 
+      Also please note that if you set pointer through it, all windows running as
       WVT windows will have the same pointer shape within them. So use it with care.
 
 2004-04-23 00:30 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.381 2004/04/21 01:29:29 andijahja Exp $
+ * $Id: hvm.c,v 1.382 2004/04/21 03:32:53 ronpinkas Exp $
  */
 
 /*
@@ -181,8 +181,8 @@ static void    hb_vmArrayGen( ULONG ulElements ); /* generates an ulElements Arr
 static void    hb_vmArrayNew( HB_ITEM_PTR, USHORT ); /* creates array */
 
 /* Object */
-static void    hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM ); /* call an overloaded operator */
-static void    hb_vmOperatorCallUnary( PHB_ITEM, char * ); /* call an overloaded unary operator */
+void    hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM ); /* call an overloaded operator */
+void    hb_vmOperatorCallUnary( PHB_ITEM, char * ); /* call an overloaded unary operator */
 
 /* Database */
 static ERRCODE hb_vmSelectWorkarea( PHB_ITEM );  /* select the workarea using a given item or a substituted value */
@@ -2320,7 +2320,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETINT") );
          {
             PHB_ITEM pLocal = hb_stackItemFromBase( pCode[ w + 1 ] );
-            short iNewVal = HB_PCODE_MKSHORT( &( pCode[ w + 2 ] ) );
+            int iNewVal = HB_PCODE_MKSHORT( &( pCode[ w + 2 ] ) );
 
             if( HB_IS_BYREF( pLocal ) )
             {
@@ -2329,7 +2329,20 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( HB_IS_COMPLEX( pLocal ) )
             {
-               hb_itemClear( pLocal );
+               if( HB_IS_OBJECT( pLocal ) && hb_objHasMsg( pLocal, "__OpAssign" ) )
+               {
+                  // hb_vmOperatorCall() will POP 2 arguments.
+                  hb_vmPushNil();
+                  hb_vmPushInteger( iNewVal );
+                  hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL );
+
+                  w += 4;
+                  break;
+               }
+               else
+               {
+                 hb_itemClear( pLocal );
+               }
             }
 
             pLocal->type = HB_IT_INTEGER;
@@ -2353,7 +2366,20 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( HB_IS_COMPLEX( pLocal ) )
             {
-               hb_itemClear( pLocal );
+               if( HB_IS_OBJECT( pLocal ) && hb_objHasMsg( pLocal, "__OpAssign" ) )
+               {
+                  // hb_vmOperatorCall() will POP 2 arguments.
+                  hb_vmPushNil();
+                  hb_itemPushStaticString( ( char * ) ( pCode ) + w + 4, ( ULONG ) ( uiSize - 1 ) );
+                  hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL );
+
+                  w += ( 4 + uiSize );
+                  break;
+               }
+               else
+               {
+                  hb_itemClear( pLocal );
+               }
             }
 
             pLocal->type = HB_IT_STRING;
@@ -2730,7 +2756,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPGLOBAL") );
 
-            hb_itemForwardValue( (*pGlobals)[ iGlobal ], *( HB_VM_STACK.pPos - 1 ) );
+            if( HB_IS_OBJECT( (*pGlobals)[ iGlobal ] ) && hb_objHasMsg( (*pGlobals)[ iGlobal ], "__OpAssign" ) )
+            {
+               // hb_vmOperatorCall() will POP 2 arguments but we only have 1 argument on the Stack.
+               hb_vmPushNil();
+               hb_vmOperatorCall( (*pGlobals)[ iGlobal ], *( HB_VM_STACK.pPos - 2 ), "__OPASSIGN", NULL );
+            }
+            else
+            {
+              hb_itemForwardValue( (*pGlobals)[ iGlobal ], *( HB_VM_STACK.pPos - 1 ) );
+            }
 
             hb_stackDec();
 
@@ -5228,7 +5263,7 @@ static void hb_vmArrayNew( PHB_ITEM pArray, USHORT uiDimension )
 /* Object                          */
 /* ------------------------------- */
 
-static void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSymbol, PHB_ITEM pArg )
+void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSymbol, PHB_ITEM pArg )
 {
    /* NOTE: There is no need to test if specified symbol exists. It is checked
     * by the caller (if HB_IS_OBJECT() && HAS_METHOD() )
@@ -5274,7 +5309,7 @@ static void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSy
    hb_vmPush( &(HB_VM_STACK.Return) );
 }
 
-static void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol )
+void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol )
 {
    /* NOTE: There is no need to test if specified symbol exists. It is checked
     * by the caller (if HB_IS_OBJECT() && HAS_METHOD() )
@@ -7382,7 +7417,16 @@ static void hb_vmPopLocal( SHORT iLocal )
       pLocal = hb_codeblockGetVar( hb_stackSelfItem(), iLocal ) ;
    }
 
-   hb_itemForwardValue( pLocal, pVal );
+   if( HB_IS_OBJECT( pLocal ) && hb_objHasMsg( pLocal, "__OpAssign" ) )
+   {
+      // hb_vmOperatorCall() will POP 2 arguments but we only have 1 argument on the Stack.
+      hb_vmPushNil();
+      hb_vmOperatorCall( pLocal, pVal, "__OPASSIGN", NULL );
+   }
+   else
+   {
+      hb_itemForwardValue( pLocal, pVal );
+   }
 
    hb_stackDec();
 }
@@ -7404,7 +7448,16 @@ static void hb_vmPopStatic( USHORT uiStatic )
 
    //TraceLog( NULL, "Assign Static: %i, Class: %s\n", uiStatic, hb_objGetClsName( pVal ) );
 
-   hb_itemForwardValue( pStatic, pVal );
+   if( HB_IS_OBJECT( pStatic ) && hb_objHasMsg( pStatic, "__OpAssign" ) )
+   {
+      // hb_vmOperatorCall() will POP 2 arguments but we only have 1 argument on the Stack.
+      hb_vmPushNil();
+      hb_vmOperatorCall( pStatic, pVal, "__OPASSIGN", NULL );
+   }
+   else
+   {
+      hb_itemForwardValue( pStatic, pVal );
+   }
 
    hb_stackDec();
 }

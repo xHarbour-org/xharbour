@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.75 2004/04/08 13:26:55 druzus Exp $
+ * $Id: memvars.c,v 1.76 2004/04/14 10:32:14 druzus Exp $
  */
 
 /*
@@ -148,6 +148,8 @@ static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR );
 void hb_memvarReleasePublic( PHB_ITEM pMemVar );
 
 // extern int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
+
+extern void hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM ); /* call an overloaded operator */
 
 #ifndef HB_THREAD_SUPPORT
 void hb_memvarsInit( void )
@@ -727,11 +729,12 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarSetValue(%p, %p)", pMemvarSymb, pItem));
 
    #ifdef HB_THREAD_SUPPORT
-   // we must find the thread specific name
-   pDyn = s_memvarThGetName( pMemvarSymb->szName, &HB_VM_STACK );
+      // we must find the thread specific name
+      pDyn = s_memvarThGetName( pMemvarSymb->szName, &HB_VM_STACK );
    #else
-   pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
+      pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
    #endif
+
    if( pDyn )
    {
       HB_TRACE(HB_TR_INFO, ("Memvar item (%i)(%s) assigned", pDyn->hMemvar , pMemvarSymb->szName));
@@ -751,7 +754,17 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
             pSetItem = hb_itemUnRef( pSetItem );
          }
 
-         hb_itemCopy( pSetItem, pItem );
+         if( HB_IS_OBJECT( pSetItem ) && hb_objHasMsg( pSetItem, "__OpAssign" ) )
+         {
+            // hb_vmOperatorCall() will POP 2 arguments.
+            hb_vmPushNil();
+            hb_vmPushNil();
+            hb_vmOperatorCall( pSetItem, pItem, "__OPASSIGN", NULL );
+         }
+         else
+         {
+            hb_itemCopy( pSetItem, pItem );
+         }
       }
       else
       {
