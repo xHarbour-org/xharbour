@@ -1,8 +1,11 @@
 #
-# $Id: Makefile,v 1.6 2002/12/11 11:06:55 ronpinkas Exp $
+# $Id: Makefile,v 1.7 2002/12/15 23:06:02 ronpinkas Exp $
 #
 
 ROOT = ../../
+
+CPP_SOURCES=\
+   tprint.cpp  \
 
 C_SOURCES=\
 	abs.c        \

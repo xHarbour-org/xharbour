@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.525 2002/12/13 20:06:31 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.526 2002/12/15 23:05:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-15 21:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * config/c.cf
+    config/rules.cf
+    * Added rules to compile .cpp files
+  * source/rtl/Makefile
+    + Added tprint.cpp
+  * utils/hbmake/hbmake.prg
+    * Minor change
 
 2002-12-15 15:00 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * config/w32/global.cf

@@ -1,8 +1,8 @@
 #
-# $Id: c.cf,v 1.12 2000/09/19 17:26:40 ronpinkas Exp $
+# $Id: c.cf,v 1.1.1.1 2001/12/21 10:47:57 ronpinkas Exp $
 #
 
-C_OBJS = $(C_SOURCES:.c=$(OBJ_EXT))
+C_OBJS = $(C_SOURCES:.c=$(OBJ_EXT)) $(CPP_SOURCES:.cpp=$(OBJ_EXT))
 
 C_MAIN_OBJ = $(C_MAIN:.c=$(OBJ_EXT))
 

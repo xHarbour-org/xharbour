@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.33 2002/10/27 19:16:40 lculik Exp $
+ * $Id: hbmake.prg,v 1.34 2002/11/09 00:50:08 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1891,7 +1891,7 @@ FUNC crtmakfile( cFile )
         Fwrite( nLinkHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include" + CRLF )
 
         Fwrite( nLinkHandle, "RFLAGS = " + CRLF )
-        Fwrite( nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib;$(FWH)\lib -Gn -M -m -s -Tpe" + If( lFWH, " -aa", IF( lMiniGui , " -aa" , " -ap" )) + CRLF )
+        Fwrite( nLinkHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib;$(FWH)\lib -Gn -M -m -s -Tpe" + If( lFWH, " -aa", IF( lMiniGui , " -aa" , " -ap" )) +if(lMinigui," -I$(MINIGUI)\lib" , "" ) + CRLF )
         Fwrite( nLinkHandle, "IFLAGS = " + CRLF )
         Fwrite( nLinkHandle, "LINKER = ilink32" + CRLF )
         Fwrite( nLinkHandle, " " + CRLF )
