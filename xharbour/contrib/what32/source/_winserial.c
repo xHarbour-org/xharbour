@@ -419,7 +419,7 @@ BOOL TransmitCommChar(
 */
 HB_FUNC( TRANSMITCOMMCHAR )
 {
-   hb_retl( TransmitCommChar( ( HANDLE ) hb_parnl( 1 ), ( char ) hb_parc( 2 ) ) );
+   hb_retl( TransmitCommChar( ( HANDLE ) hb_parnl( 1 ), ( char ) hb_parni( 2 ) ) );
 }
 
 //-------------------------------------------------------------------//

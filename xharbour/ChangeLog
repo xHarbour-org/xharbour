@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1923 2003/12/22 13:58:02 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.1924 2003/12/22 16:01:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-22 08:45 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * contrib/what32/_winserial.c
+    ! Fixed handling of 2nd param in HB_FUNC( TRANSMITCOMMCHAR )
 
 2003-12-22 08:01 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcomp.c
