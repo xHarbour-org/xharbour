@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.91 2004/04/05 02:29:29 druzus Exp $
+# $Id: makefile.wc,v 1.1 2004/04/06 21:11:34 andijahja Exp $
 #
 
 #
@@ -420,6 +420,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hbini.obj \
    $(RTL_OBJ_DIR)\hblog.obj \
    $(RTL_OBJ_DIR)\hblognet.obj \
+   $(RTL_OBJ_DIR)\hbmd5.obj \
    $(RTL_OBJ_DIR)\hbserial.obj \
    $(RTL_OBJ_DIR)\input.obj \
    $(RTL_OBJ_DIR)\listbox.obj \
@@ -1639,6 +1640,9 @@ $(RTL_OBJ_DIR)\hblog.c : $(RTL_DIR)\hblog.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\hblog.obj : $(RTL_OBJ_DIR)\hblog.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(RTL_OBJ_DIR)\hbmd5.obj : $(RTL_DIR)\hbmd5.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(RTL_OBJ_DIR)\hblognet.c : $(RTL_DIR)\hblognet.prg

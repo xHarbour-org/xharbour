@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.73 2004/03/28 09:05:51 andijahja Exp $
+# $Id: makefile.nt,v 1.74 2004/04/05 02:29:29 druzus Exp $
 #
 
 #
@@ -500,6 +500,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hbini.obj \
    $(OBJ_DIR)$(MT)\hblog.obj \
    $(OBJ_DIR)$(MT)\hblognet.obj \
+   $(OBJ_DIR)$(MT)\hbmd5.obj \
    $(OBJ_DIR)$(MT)\hbserial.obj \
    $(OBJ_DIR)$(MT)\input.obj \
    $(OBJ_DIR)$(MT)\listbox.obj \

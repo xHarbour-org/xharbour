@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.90 2004/03/16 11:37:13 andijahja Exp $
+# $Id: makefile.bc,v 1.91 2004/04/05 02:29:29 druzus Exp $
 #
 
 #
@@ -381,6 +381,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hbcrypt.obj \
    $(RTL_OBJ_DIR)\hbffind.obj \
    $(RTL_OBJ_DIR)\hbhex2n.obj \
+   $(RTL_OBJ_DIR)\hbmd5.obj \
    $(RTL_OBJ_DIR)\hboutdbg.obj \
    $(RTL_OBJ_DIR)\hbrandom.obj \
    $(RTL_OBJ_DIR)\hbserv.obj \
@@ -1843,6 +1844,9 @@ $(RTL_OBJ_DIR)\hblog.c : $(RTL_DIR)\hblog.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\hblog.obj : $(RTL_OBJ_DIR)\hblog.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\hbmd5.obj : $(RTL_DIR)\hbmd5.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\hblognet.c : $(RTL_DIR)\hblognet.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2829 2004/04/24 13:32:37 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.2830 2004/04/25 08:16:15 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-25 18:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/winprn/tprint.prg
+    ! major changes on font data collecting routine to permit usage of
+      TPrint class under XCC (previously GPF when executing callback)
+      (This is a very rough fix though. XCC fails to execute callback
+       function "the normal way" while GCC, BCC, MSVC and OW are doing OK)
+
+  + source/rtl/hbmd5.c
+    + md5 digest routine for a given string or file by: Dmitry V. Korzhov.
+
+  + tests/md5file.prg
+  + tests/md5test.prg
+    + test program for hb_md5 routine.
+
+    /*
+    Useful for:
+    1. Password encryption
+    2. File indentification
+    3. Indexing long character field ( index on HB_MD5( field  ) ... )
+    4. etc.
+    Note: I know we are in release freeze but this particular routine won't
+          affect anything and it is worthy to have it under RTL.
+    */
+
+  * hrbdll.bc
+  * hrbdll.vc
+  * hrbdll.wc
+  * makefile.bc
+  * makefile.vc
+  * makefile.nt
+  * makefile.wc
+    + add hbmd5.obj file dependency
 
 2004-04-25 12:55 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c
