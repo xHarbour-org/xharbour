@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: hb-func.sh,v 1.9 2004/01/02 17:22:44 druzus Exp $
+# $Id: hb-func.sh,v 1.10 2004/01/28 04:14:33 maurifull Exp $
 #
 
 # ---------------------------------------------------------------
@@ -39,14 +39,9 @@ get_hbver()
 
 mk_hbgetlibs()
 {
-    HB_GT_ALLEG=""
-    if [ "${HB_GTALLEG}" = "yes" ]; then
-	HB_GT_ALLEG=gtalleg
-    fi
-    export HB_GT_ALLEG
     if [ -z "$@" ]
     then
-        echo -n "vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtxvt ${HB_GT_ALLEG} gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 debug profiler"
+        echo -n "vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtxvt gtalleg gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 debug profiler"
     else
         echo -n "$@"
     fi
@@ -78,17 +73,12 @@ mk_hbtools()
     [ -z "${_DEFAULT_INC_DIR}" ] && _DEFAULT_INC_DIR="${HB_INC_INSTALL}"
     [ -z "${_DEFAULT_LIB_DIR}" ] && _DEFAULT_LIB_DIR="${HB_LIB_INSTALL}"
 
-    HB_ALLEG_LIBS=""
-    if [ "${HB_GTALLEG}" = "yes" ]; then
-	HB_ALLEG_LIBS=`allegro-config --static`
-    fi
-    export HB_ALLEG_LIBS
     HB_SYS_LIBS="-lm"
     if [ "${HB_COMPILER}" = "mingw32" ]; then
 	HB_SYS_LIBS="${HB_SYS_LIBS} -luser32 -lwinspool -lgdi32 -lcomctl32 -lole32 -loleaut32 -luuid -lwsock32 -lws2_32"
     else
         HB_SYS_LIBS="${HB_SYS_LIBS} -lncurses -lslang -lgpm"
-        HB_SYS_LIBS="${HB_SYS_LIBS} -L/usr/X11R6/lib -lX11 ${HB_ALLEG_LIBS}"
+        HB_SYS_LIBS="${HB_SYS_LIBS} -L/usr/X11R6/lib -lX11"
     fi
 
     cat > ${hb_tool} <<EOF
@@ -223,7 +213,23 @@ LINK_OPT=""
 if [ "\${HB_STATIC}" = "full" ]; then
     LINK_OPT="\${LINK_OPT} -static"
     HB_STATIC="yes"
+    SYSTEM_LIBS="\${SYSTEM_LIBS} -ldl"
 fi
+
+HB_LNK_REQ=""
+for gt in \${HB_GT_REQ}; do
+    if [ "\${HB_STATIC}" = "yes" ] || [ "\${gt}" = "ALLEG" ]; then
+        HB_LNK_REQ="\${HB_LNK_REQ} HB_GT_\${gt}"
+        if [ "\${gt}" = "ALLEG" ]; then
+            if [ "\${HB_STATIC}" = "yes" ]; then
+                SYSTEM_LIBS="\`allegro-config --static 2>/dev/null\` \${SYSTEM_LIBS}"
+            else
+                SYSTEM_LIBS="\`allegro-config --libs 2>/dev/null\` \${SYSTEM_LIBS}"
+            fi
+        fi
+    fi
+done
+[ -n "\${HB_FM_REQ}" ] && HB_LNK_REQ="\${HB_LNK_REQ} HB_FM_\${HB_FM_REQ}"
 
 HARBOUR_LIBS=""
 if [ "\${HB_STATIC}" = "yes" ]; then
@@ -232,20 +238,18 @@ else
     l="${name}"
     [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.so" ] && l="\${l}mt"
     [ -f "\${HB_LIB_INSTALL}/lib\${l}.so" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
-    libs="debug profiler ${hb_libsc}"
+    libs="gtalleg debug profiler ${hb_libsc}"
 fi
 for l in \${libs}
 do
     if [ "\${HB_MG}" = "yes" ] || [ "\${l#gt}" = "\${l}" ] || [ "\${l}" = "gt\${HB_GT_STAT}" ]; then
         [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
-        [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+        if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then
+            HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
+        fi
     fi
 done
-HB_ALLEG_LIBS=""
-if [ "\${HB_GTALLEG}" = "yes" ]; then
-    HB_ALLEG_LIBS=`allegro-config --static`
-fi
-HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} \${HB_ALLEG_LIBS} -Wl,--end-group"
+HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
 l="fm"
 [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
 if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then
@@ -273,7 +277,7 @@ hb_link()
     elif [ -f "\${FOUTO}" ]; then
         HB_MAIN_FUNC=\`hb_lnk_main "\${FOUTO}"\`
     fi
-    if [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_FM_REQ}" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
+    if [ -n "\${HB_LNK_REQ}" ] || [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
         hb_lnk_request > \${_TMP_FILE_} && \\
         gcc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     else
@@ -291,21 +295,15 @@ hb_cmp()
 hb_lnk_request()
 {
     echo "#include \\"hbapi.h\\""
-    if [ "\${HB_STATIC}" = "yes" ] || [ -n "\${HB_FM_REQ}" ]; then
-        for gt in \${HB_GT_REQ}; do
-            echo "extern HB_FUNC( HB_GT_\${gt} );"
+    if [ -n "\${HB_LNK_REQ}" ]; then
+        for fn in \${HB_LNK_REQ}; do
+            echo "extern HB_FUNC( \${fn} );"
         done
-        if [ -n "\${HB_FM_REQ}" ]; then
-            echo "extern HB_FUNC( HB_FM_\${HB_FM_REQ} );"
-        fi
         echo "void hb_lnk_ForceLink_build( void )"
         echo "{"
-        for gt in \${HB_GT_REQ}; do
-            echo "   HB_FUNCNAME( HB_GT_\${gt} )();"
+        for fn in \${HB_LNK_REQ}; do
+            echo "   HB_FUNCNAME( \${fn} )();"
         done
-        if [ -n "\${HB_FM_REQ}" ]; then
-            echo "   HB_FUNCNAME( HB_FM_\${HB_FM_REQ} )();"
-        fi
         echo "}"
     fi
     gt="\${HB_GT_REQ%% *}"
@@ -380,7 +378,7 @@ mk_hblibso()
     for l in ${hb_libs}
     do
         case $l in
-            debug|profiler|fm|hbodbc) ;;
+            debug|profiler|fm|hbodbc|gtalleg) ;;
             *)
                 ls="lib${l}.a"
                 if [ -f lib${l}mt.a ]

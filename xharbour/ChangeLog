@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2180 2004/01/29 23:24:10 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2181 2004/01/30 00:40:33 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-30 03:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/make_rpm.sh
+  * xharbour/xharbour.spec
+    * auto detect allegro-devel installed and build gtalleg
+    + new switch '--with allegro' to force allegro building
+      when allegro-devel not installed from RPM
+
+  * xharbour/bin/hb-func.sh
+    * buily gtalleg as static lib only to not force linking with
+      allegro libs. If user wants to use allegro in his apps he has
+      to use -gtalleg swich in xhb* scripts or add to his prg sources:
+      REQUEST HB_GT_ALLEG
+
+  * xharbour/source/rtl/gtalleg/gtalleg.c
+    * _mangled_main added to allow linking with shared allegro libs
+
 2004-01-30 07:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/debug.c
     + add wrappers (some 3rd-party-libs still use these ones) for :

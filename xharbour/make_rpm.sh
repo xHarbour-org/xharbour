@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.15 2003/11/15 23:33:13 druzus Exp $
+# $Id: make_rpm.sh,v 1.16 2003/12/07 19:36:17 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -16,6 +16,7 @@
 # --with mysql       - build mysql lib
 # --with odbc        - build build odbc lib
 # --with hrbsh       - build /etc/profile.d/harb.sh (not necessary)
+# --with allegro     - build GTALLEG - Allegro based GT driver
 # --without nf       - do not build nanforum lib
 # --without ct       - do not build clipper tools lib
 ######################################################################
@@ -66,12 +67,13 @@ do
         then
             if  [ -f /etc/conectiva-release ]
             then
-               [ "$1" = "mysql" ] && NEED_RPM="${NEED_RPM} MySQL-devel"
-               [ "$1" = "odbc" ] && NEED_RPM="${NEED_RPM} unixodbc-devel"
+                [ "$1" = "mysql" ] && NEED_RPM="${NEED_RPM} MySQL-devel"
+                [ "$1" = "odbc" ] && NEED_RPM="${NEED_RPM} unixodbc-devel"
             else    
-               [ "$1" = "mysql" ] && NEED_RPM="${NEED_RPM} mysql-devel"
-               [ "$1" = "odbc" ] && NEED_RPM="${NEED_RPM} unixODBC-devel"
+                [ "$1" = "mysql" ] && NEED_RPM="${NEED_RPM} mysql-devel"
+                [ "$1" = "odbc" ] && NEED_RPM="${NEED_RPM} unixODBC-devel"
             fi
+            [ "$1" = "allegro" ] && NEED_RPM="${NEED_RPM} allegro-devel"
         fi
     fi
     LAST="$1"
@@ -85,6 +87,10 @@ fi
 if test_reqrpm "unixodbc-devel" || test_reqrpm "unixODBC-devel"
 then
     INST_PARAM="${INST_PARAM} --with odbc"
+fi
+if test_reqrpm "allegro-devel"
+then
+    INST_PARAM="${INST_PARAM} --with allegro"
 fi
 
 TOINST_LST=""

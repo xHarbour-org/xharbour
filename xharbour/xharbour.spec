@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.50 2004/01/05 21:17:56 ronpinkas Exp $
+# $Id: xharbour.spec,v 1.51 2004/01/28 04:14:30 maurifull Exp $
 #
 
 # ---------------------------------------------------------------
@@ -315,10 +315,8 @@ EOF
 chmod 755 $RPM_BUILD_ROOT/etc/profile.d/harb.sh
 fi
 
-if [ ! "%{?_with_odbc:1}" ] && \
-   [ -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libhbodbc.a ]; then
-    rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libhbodbc.a
-fi
+[ "%{?_with_odbc:1}" ]    || rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libhbodbc.a
+[ "%{?_with_allegro:1}" ] || rm -f $RPM_BUILD_ROOT/%{prefix}/lib/%{name}/libgtalleg.a
 
 # Create PP
 pushd tests
@@ -329,15 +327,10 @@ install -m644 rp_dot.src $HB_INC_INSTALL/
 install -m644 rp_run.src $HB_INC_INSTALL/
 popd
 
-if [ "${HB_GTALLEG}" = yes ]
-then
-    export HB_ALLEG_LIBS=`allegro-config --static`
-fi
-
 # check if we should rebuild tools with shared libs
 if [ "%{hb_lnkso}" = yes ]
 then
-    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11 ${HB_ALLEG_LIBS}"
+    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11 %{?_with_allegro: %(allegro-config --static)}"
     for utl in hbmake hbrun hbpp hbdoc
     do
         pushd utils/${utl}

@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.6 2004/01/29 11:45:37 andijahja Exp $
+ * $Id: gtalleg.c,v 1.7 2004/01/29 21:40:09 andijahja Exp $
  */
 
 /*
@@ -1703,3 +1703,19 @@ HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
 #endif
 
 #endif
+
+/* 
+ * this is necessary if you want to link with .so allegro libs
+ * or when link staticalt and your linker will force to link main()
+ * from allegro library not the harbour one
+ */
+int _mangled_main( int argc, char * argv[] )
+{
+   HB_TRACE(HB_TR_DEBUG, ("_mangled_main(%d, %p)", argc, argv));
+
+   hb_cmdargInit( argc, argv );
+   hb_vmInit( TRUE );
+
+   return hb_vmQuit();
+}
+void *_mangled_main_address = _mangled_main;
