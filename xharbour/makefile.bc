@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.61 2003/07/09 14:19:36 andijahja Exp $
+# $Id: makefile.bc,v 1.62 2003/07/13 22:26:16 jonnymind Exp $
 #
 
 #
@@ -343,6 +343,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hblog.obj \
    $(RTL_OBJ_DIR)\hbloginet.obj \
    $(RTL_OBJ_DIR)\hbffind.obj \
+   $(RTL_OBJ_DIR)\hboutdebug.obj \
    $(RTL_OBJ_DIR)\hbrandom.obj \
    $(RTL_OBJ_DIR)\hbreadini.obj \
    $(RTL_OBJ_DIR)\hbsyslog.obj \
@@ -1674,6 +1675,9 @@ $(RTL_OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\hboutdebug.obj : $(RTL_DIR)\hboutdebug.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\hblog.c : $(RTL_DIR)\hblog.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrandom.c,v 1.3 2003/02/22 01:58:46 jonnymind Exp $
+ * $Id: hbrandom.c,v 1.4 2003/07/24 01:55:58 jonnymind Exp $
  */
 
 /*
@@ -50,7 +50,7 @@
  *
  */
 
-#include <hbapi.h>
+#include <hbmath.h>
 #include <stdlib.h>
 #include <time.h>
 
