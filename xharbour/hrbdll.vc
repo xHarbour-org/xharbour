@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.13 2003/07/08 20:19:30 andijahja Exp $
+# $Id: hrbdll.vc,v 1.14 2003/09/04 22:05:02 andijahja Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -72,7 +72,7 @@ HARBOUR_DLL  = lib\vc\harbour.dll
 # from DLL
 
 HARBOURFLAGS  = /D__EXPORT__ /i$(INCLUDE_DIR) /n /q0 /w /es2 /n1
-CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /MT /G6 /Ox /GD /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32
+CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /MT /G6 /Ogtyb2 /Gs /GD /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³  HARBOUR_DLL rules  ³Û
@@ -126,11 +126,10 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\hbcrypt.obj \
   $(OBJ_DIR)\hbffind.obj \
   $(OBJ_DIR)\hbhextonum.obj \
-  $(OBJ_DIR)\hbsyslog.obj \
-  $(OBJ_DIR)\hblog.obj \
   $(OBJ_DIR)\hboutdebug.obj \
   $(OBJ_DIR)\hbrandom.obj \
   $(OBJ_DIR)\hbsrlraw.obj \
+  $(OBJ_DIR)\hbsyslog.obj \
   $(OBJ_DIR)\hbxml.obj \
   $(OBJ_DIR)\idle.obj \
   $(OBJ_DIR)\inkey.obj \
@@ -231,6 +230,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\fieldbl.obj \
   $(OBJ_DIR)\getlist.obj \
   $(OBJ_DIR)\getsys.obj \
+  $(OBJ_DIR)\hblog.obj \
+  $(OBJ_DIR)\hbloginet.obj \
   $(OBJ_DIR)\hbreadini.obj \
   $(OBJ_DIR)\hbserial.obj \
   $(OBJ_DIR)\input.obj \
@@ -1692,6 +1693,12 @@ $(OBJ_DIR)\hblog.obj : $(OBJ_DIR)\hblog.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\hblog.c : $(RTL_DIR)\hblog.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\hbloginet.obj : $(OBJ_DIR)\hbloginet.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\hbloginet.c : $(RTL_DIR)\hbloginet.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\hbsyslog.obj : $(RTL_DIR)\hbsyslog.c

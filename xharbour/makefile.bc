@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.63 2003/07/24 02:10:39 jonnymind Exp $
+# $Id: makefile.bc,v 1.64 2003/09/06 01:19:19 lculik Exp $
 #
 
 #
@@ -335,17 +335,17 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\gx.obj \
    $(RTL_OBJ_DIR)\hardcr.obj \
    $(RTL_OBJ_DIR)\hbbitfield.obj \
-   $(RTL_OBJ_DIR)\hbcompress.obj \
-   $(RTL_OBJ_DIR)\hbcrypt.obj \
-   $(RTL_OBJ_DIR)\hbcrc32.obj \
    $(RTL_OBJ_DIR)\hbchecksum.obj \
+   $(RTL_OBJ_DIR)\hbcompress.obj \
+   $(RTL_OBJ_DIR)\hbcrc32.obj \
+   $(RTL_OBJ_DIR)\hbcrypt.obj \
+   $(RTL_OBJ_DIR)\hbffind.obj \
    $(RTL_OBJ_DIR)\hbhextonum.obj \
    $(RTL_OBJ_DIR)\hblog.obj \
    $(RTL_OBJ_DIR)\hbloginet.obj \
-   $(RTL_OBJ_DIR)\hbffind.obj \
    $(RTL_OBJ_DIR)\hboutdebug.obj \
    $(RTL_OBJ_DIR)\hbrandom.obj \
-   $(RTL_OBJ_DIR)\hbreadini.obj \
+   $(RTL_OBJ_DIR)\hbsrlraw.obj \
    $(RTL_OBJ_DIR)\hbsyslog.obj \
    $(RTL_OBJ_DIR)\hbxml.obj \
    $(RTL_OBJ_DIR)\idle.obj \
@@ -447,7 +447,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\fieldbl.obj \
    $(RTL_OBJ_DIR)\getlist.obj \
    $(RTL_OBJ_DIR)\getsys.obj \
-   $(RTL_OBJ_DIR)\hbsrlraw.obj \
+   $(RTL_OBJ_DIR)\hbreadini.obj \
    $(RTL_OBJ_DIR)\hbserial.obj \
    $(RTL_OBJ_DIR)\input.obj \
    $(RTL_OBJ_DIR)\listbox.obj \

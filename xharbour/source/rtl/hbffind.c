@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.4 2003/09/06 22:24:35 lculik Exp $
+ * $Id: hbffind.c,v 1.5 2003/09/07 03:01:14 ronpinkas Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.4 2003/09/06 22:24:35 lculik Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.5 2003/09/07 03:01:14 ronpinkas Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -197,34 +197,29 @@ FILETIME GetOldesFile( const char * szPath)
 {
    WIN32_FIND_DATA  Lastff32;
    HANDLE hLastFind;
-
    FILETIME ftLastWriteTime ={0x99999999,0x9999999};
-   FILETIME ft,ft1;
-   SYSTEMTIME time,time1;
-   LARGE_INTEGER l1,l2;
+
    char * szf = (char*)hb_xgrab(7);
+
    strcpy(szf,szPath);
    strcat(szf,"*.*");
 
-
    hLastFind = FindFirstFile( szf,&Lastff32 );
 
-  if ( hLastFind != INVALID_HANDLE_VALUE )
-  {
-     do
-      {
-      if (Lastff32.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-             if(CompareFileTime(  &ftLastWriteTime,&Lastff32.ftLastWriteTime ) ==1 )
-                ftLastWriteTime = Lastff32.ftLastWriteTime;
-       }   while ( FindNextFile( hLastFind,&Lastff32 )) ;
+   if ( hLastFind != INVALID_HANDLE_VALUE )
+   {
+      do
+       {
+       if (Lastff32.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+          if(CompareFileTime( &ftLastWriteTime,&Lastff32.ftLastWriteTime ) ==1 )
+             ftLastWriteTime = Lastff32.ftLastWriteTime;
+      } while ( FindNextFile( hLastFind,&Lastff32 )) ;
 
-            FindClose( hLastFind );
-}
+      FindClose( hLastFind );
+   }
    hb_xfree(szf);
    return ftLastWriteTime;
-
 }
-
 
 #endif
 
@@ -735,7 +730,6 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
 
       if ( uiAttr == HB_FA_LABEL )
       {
-         FILETIME fOld;
          DWORD dwSysFlags;
          char szPath[ 4 ]  = {0};
          strncpy( szPath, pszFileName, 3);

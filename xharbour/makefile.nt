@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.42 2003/07/14 12:33:48 andijahja Exp $
+# $Id: makefile.nt,v 1.43 2003/07/24 04:11:44 andijahja Exp $
 #
 
 #
@@ -135,8 +135,8 @@ HBPDF_DIR    =contrib\pdflib
 #
 
 AS           =ML
-C_FLAGSNMT   =-G6 -Ox -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
-C_FLAGS      =-G6 -Ox -GA -TP $(HB_MT) -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
+C_FLAGSNMT   =-G6 -Ogtyb2 -Gs -GA -TP -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
+C_FLAGS      =-G6 -Ogtyb2 -Gs -GA -TP $(HB_MT) -W3 -nologo -I$(INCLUDE_DIR) -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
 CLIBFLAGSNMT =-c $(C_FLAGSNMT) $(CLIBFLAGS)
 CLIBFLAGS    =-c $(C_FLAGS) $(CLIBFLAGS)
 HARBOURFLAGS =-i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
@@ -168,6 +168,10 @@ CODEPAGE_LIB     =$(LIB_DIR)\codepage.lib
 COMMON_LIB       =$(LIB_DIR)\common.lib
 DBFCDX_LIB       =$(LIB_DIR)\dbfcdx.lib
 DBFCDXMT_LIB     =$(LIB_DIR)\dbfcdx$(MT).lib
+DBFDBT_LIB       =$(LIB_DIR)\dbfdbt.lib
+DBFDBTMT_LIB     =$(LIB_DIR)\dbfdbt$(MT).lib
+DBFFPT_LIB       =$(LIB_DIR)\dbffpt.lib
+DBFFPTMT_LIB     =$(LIB_DIR)\dbffpt$(MT).lib
 DBFNTX_LIB       =$(LIB_DIR)\dbfntx.lib
 DBFNTXMT_LIB     =$(LIB_DIR)\dbfntx$(MT).lib
 DEBUG_LIB        =$(LIB_DIR)\debug.lib
@@ -255,6 +259,8 @@ LIBLIST = \
    $(LANG_LIB) \
    $(RDD_LIB) \
    $(DBFCDX_LIB) \
+   $(DBFDBT_LIB) \
+   $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(NULSYS_LIB) \
    $(VM_LIB) \
@@ -272,6 +278,8 @@ LIBLISTMT = \
    $(PPMT_LIB) \
    $(RDDMT_LIB) \
    $(DBFCDXMT_LIB) \
+   $(DBFDBTMT_LIB) \
+   $(DBFFPTMT_LIB) \
    $(DBFNTXMT_LIB) \
    $(VMMT_LIB) \
    $(VMMT_LIB_OPT_CON) \
@@ -366,10 +374,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hbcrc32.obj \
    $(OBJ_DIR)$(MT)\hbcrypt.obj \
    $(OBJ_DIR)$(MT)\hbffind.obj \
-   $(OBJ_DIR)$(MT)\hboutdebug.obj \
    $(OBJ_DIR)$(MT)\hbhextonum.obj \
-   $(OBJ_DIR)$(MT)\hblog.obj \
-   $(OBJ_DIR)$(MT)\hbloginet.obj \
+   $(OBJ_DIR)$(MT)\hboutdebug.obj \
    $(OBJ_DIR)$(MT)\hbrandom.obj \
    $(OBJ_DIR)$(MT)\hbsrlraw.obj \
    $(OBJ_DIR)$(MT)\hbsyslog.obj \
@@ -473,6 +479,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\fieldbl.obj \
    $(OBJ_DIR)$(MT)\getlist.obj \
    $(OBJ_DIR)$(MT)\getsys.obj \
+   $(OBJ_DIR)$(MT)\hblog.obj \
+   $(OBJ_DIR)$(MT)\hbloginet.obj \
    $(OBJ_DIR)$(MT)\hbreadini.obj \
    $(OBJ_DIR)$(MT)\hbserial.obj \
    $(OBJ_DIR)$(MT)\input.obj \
@@ -678,6 +686,38 @@ DBFCDX_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbfcdx0.obj
 
 #
+# DBFDBT.LIB rules
+#
+
+{$(RDD_DIR)\dbfdbt}.c{$(OBJ_DIR)$(MT)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+{$(RDD_DIR)\dbfdbt}.prg{$(OBJ_DIR)$(MT)}.obj::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFDBT_LIB)2
+
+DBFDBT_LIB_OBJS = \
+   $(OBJ_DIR)$(MT)\dbfdbt1.obj \
+   \
+   $(OBJ_DIR)$(MT)\dbfdbt0.obj
+
+#
+# DBFFPT.LIB rules
+#
+
+{$(RDD_DIR)\dbffpt}.c{$(OBJ_DIR)$(MT)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+{$(RDD_DIR)\dbffpt}.prg{$(OBJ_DIR)$(MT)}.obj::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFFPT_LIB)2
+
+DBFFPT_LIB_OBJS = \
+   $(OBJ_DIR)$(MT)\dbffpt1.obj \
+   \
+   $(OBJ_DIR)$(MT)\dbffpt0.obj
+
+#
 # PP.LIB rules
 #
 
@@ -703,6 +743,7 @@ PP_LIB_OBJS = \
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DEBUG_LIB)2
 
 DEBUG_LIB_OBJS = \
+   $(OBJ_DIR)\dbgaltd.obj \
    $(OBJ_DIR)\dbgmenu.obj \
    $(OBJ_DIR)\dbghelp.obj \
    $(OBJ_DIR)\dbgtmenu.obj \
@@ -1130,6 +1171,12 @@ $(RDDMT_LIB) : $(RDD_LIB_OBJS)
 $(DBFCDXMT_LIB) : $(DBFCDX_LIB_OBJS)
    lib /out:$@ $**
 
+$(DBFDBTMT_LIB) : $(DBFDBT_LIB_OBJS)
+   lib /out:$@ $**
+
+$(DBFFPTMT_LIB) : $(DBFFPT_LIB_OBJS)
+   lib /out:$@ $**
+
 $(DBFNTXMT_LIB) : $(DBFNTX_LIB_OBJS)
    lib /out:$@ $**
 
@@ -1175,6 +1222,12 @@ $(RDD_LIB) : $(RDD_LIB_OBJS)
    lib /out:$@ $**
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
+   lib /out:$@ $**
+
+$(DBFDBT_LIB) : $(DBFDBT_LIB_OBJS)
+   lib /out:$@ $**
+
+$(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
    lib /out:$@ $**
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
@@ -1253,6 +1306,8 @@ $(MACRO_LIB)2  : $(MACRO_LIB_OBJS)
 $(PP_LIB)2     : $(PP_LIB_OBJS)
 $(RDD_LIB)2    : $(RDD_LIB_OBJS)
 $(DBFCDX_LIB)2 : $(DBFCDX_LIB_OBJS)
+$(DBFDBT_LIB)2 : $(DBFDBT_LIB_OBJS)
+$(DBFFPT_LIB)2 : $(DBFFPT_LIB_OBJS)
 $(DBFNTX_LIB)2 : $(DBFNTX_LIB_OBJS)
 $(NULSYS_LIB)2 : $(NULSYS_LIB_OBJS)
 $(VM_LIB)2     : $(VM_LIB_OBJS)

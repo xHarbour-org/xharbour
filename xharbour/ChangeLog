@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1427 2003/09/08 19:18:42 druzus Exp $
+ * $Id: ChangeLog,v 1.1428 2003/09/09 01:32:20 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-08 22:07 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+   * makefile.nt
+   * makefile.vc
+     + dbgaltd.prg
+     * remove /Oi from flags for now (use of intrinsics)
+     * minor reordering
+     + new RDDs
+   * makefile.bc
+     * minor reordering
+   * hrbdll.vc
+   * hrbdll.bc
+     + hbloginet.prg
+     * minor reordering
+   * source/rdd/dbffpt/dbffpt1.c
+     * casts added for msvc karma
+   * source/rtl/hbffind.c
+     * remove unused vars @203
 
 2003-09-09 03:20 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/include/simplex.c
@@ -185,7 +203,7 @@
       This was interfering with new Array Management.
 
 2003-09-05 22:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
-   *makefile.bc
+   * makefile.bc
       ! added missing dependencie to debug.lib
 
 2003-09-05 03:14 UTC+2000 Giancarlo Niccolai <gian@niccolai.ws>
@@ -197,7 +215,6 @@
 
    * source/compiler/cmdcheck.c
       ! fixed interpretation of switch -j and -jfilename
-
 
 2003-09-05 04:50 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * hrbdll.bc
