@@ -1,9 +1,49 @@
-xHarbour is a fork from Harbour created December 2001. It aims to follow a more
-aggressive development path, and be more responsive to market trends, and users
-input.
-
 As it stands at this point, xHarbour offers many Syntax extensions over Harbour
 and Clipper, including:
+
+
+OOP Macros:
+-----------
+
+Objects now support macros:
+
+   Syntax:
+   -------
+
+   - <Obj>:&Macro
+   - <Obj>:&Macro.Suffix
+   - <Obj>:&( <MacroExp> )
+
+WITH OBJECT now supports macros:
+
+   Syntax:
+   -------
+
+   - :&Macro
+   - :&Macro.Suffix
+   - :&( <MacroExp> )
+
+
+Extended Literal Strings:
+-------------------------
+
+xHarbour introduces a new kind of lietal string known as "Extended
+Literal Strings".
+
+   Symtax:
+   -------
+
+   E"..."
+
+   The literal string may contain Escape Codes following the C language
+   conventions, like:
+
+   \n -> New Line character.
+   \t -> Tab character.
+   \r -> CR character.
+   \" -> lieral <"> character.
+   \' -> lieral <'> character.
+   \\ -> literal <\> character.
 
 PERSISTENT Codeblocks:
 ----------------------
@@ -103,13 +143,15 @@ Basic sample can be found at:
 
    tests/mttest.prg
 
-Syntax:
+   Syntax:
+   -------
 
    StartThread ( @MyThreadFunc() [, xParam1 [,xParamN ] ] )
 
-Syntax:
+   Syntax:
+   -------
 
-CRITICAL [STATIC] FUNCTION|PROCEDURE( [xParam1 [, xParamN ] ] )
+   CRITICAL [STATIC] FUNCTION|PROCEDURE( [xParam1 [, xParamN ] ] )
 
 NOTE: MT Application must link against the MT versions of the Libraries, i.e.
       vmmt.lib, rtlmt.lib, ppmt.lib, rddmt.lib, dbfntxmt.lib, and dbfcdxmt.lib.
@@ -192,7 +234,10 @@ GLOBAL variables:
 
 GLOBAL Variables are a new kind of a declared variables. they have PUBLIC like
 visibility, but are faster than even STATICs. GLOBLAS can be referenced from
-other modules using the syntax:
+other modules.
+
+   Syntax:
+   -------
 
    GLOBAL EXTERNAL <Id1> [,<Id2> [,<IdN>]]
 
@@ -226,6 +271,9 @@ WITH OBJECT syntax:
 
    HB_QWith() can also be used to retrieve the current WITH OBJECT within a
    WITH OBJECT block.
+
+   HB_SetWith() may be used to SET or RESET the value of the WITH OBJECT
+   from an expression, much like the WITH OBJECT construct.
 
 The above syntax not only saves typing, but is also MUCH faster than
 equivalent conventional coding.
