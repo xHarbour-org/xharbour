@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.33 2003/03/08 13:37:59 likewolf Exp $
+ * $Id: dbfntx1.c,v 1.34 2003/03/27 21:00:18 jonnymind Exp $
  */
 
 /*
@@ -2356,7 +2356,7 @@ static void hb_ntxBufferSave( LPTAGINFO pTag, LPNTXSORTINFO pSortInfo )
 
 static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, USHORT* numRecinBuf, LPDBORDERCONDINFO lpdbOrdCondInfo )
 {
-   if( !lpdbOrdCondInfo || lpdbOrdCondInfo->fAll )
+   if( (!lpdbOrdCondInfo || lpdbOrdCondInfo->fAll ) && !pArea->lpdbRelations )
    {
       if( *numRecinBuf == 10 )
          *numRecinBuf = 0;
@@ -2368,7 +2368,7 @@ static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, USHORT* numRecinBuf
       (*numRecinBuf) ++;
       return TRUE;
    }
-   else
+   else if( lpdbOrdCondInfo )
    {
       if( lpdbOrdCondInfo->lNextCount < 0 )
          return FALSE;
@@ -2462,14 +2462,14 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
    else
       sortInfo.sortBuffer = NULL;
 
-   if( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll )
+   if(( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll )  && !pArea->lpdbRelations )
    {
       pRecordTmp = pArea->pRecord;
       fValidBuffer = pArea->fValidBuffer;
       pArea->fValidBuffer = TRUE;
       hb_fsSeek( pArea->hDataFile, pArea->uiHeaderLen, FS_SET );
    }
-   else if( pArea->lpdbOrdCondInfo->fUseCurrent )
+   else if( pArea->lpdbRelations || pArea->lpdbOrdCondInfo->fUseCurrent )
       SELF_GOTOP( ( AREAP ) pArea );
    for( ulRecNo = 1; ulRecNo <= ulRecCount; ulRecNo++)
    {
@@ -2590,7 +2590,7 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
       }
    }
    hb_ntxSortKeyEnd( pTag, &sortInfo );
-   if( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll )
+   if(( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll ) && !pArea->lpdbRelations )
    {
       pArea->pRecord = pRecordTmp;
       pArea->fValidBuffer = fValidBuffer;
@@ -2985,7 +2985,14 @@ static ERRCODE ntxGoTop( NTXAREAP pArea )
      LPTAGINFO pTag = pArea->lpCurTag;
 
      if( pTag->topScope )
+     {
         ntxSeek( pArea, 1, pTag->topScope, 0 );
+        if( pTag->TagEOF )
+        {
+           hb_ntxGoEof( pArea );
+           return SUCCESS;
+        }
+     }
      else
         hb_ntxTagKeyGoTo( pTag, TOP_RECORD, NULL );
      SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra );
