@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.4 2005/03/14 11:17:00 modalsist Exp $
+ * $Id: disk.c,v 1.4 2005/03/14 15:43:56 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -302,13 +302,13 @@ HB_FUNC( GETVOLINFO )
     char * sDrive="";
     char * sVolName[255];
 
-    strncat( sDrive, (char*) hb_parcx(1), 3 ); 
+    strncat( sDrive, (char*) hb_parcx(1), 3 );
     strcat( sDrive, "\0" );
 
 #if defined(HB_OS_WIN_32)
 
     retval = GetVolumeInformation( sDrive,
-                                   &sVolName, 
+                                   (char*) &sVolName,
                                    256,
                                    NULL,
                                    NULL, 
