@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.30 2004/03/31 09:19:53 andijahja Exp $
+ * $Id: hbapigt.h,v 1.31 2004/04/02 22:01:57 andijahja Exp $
  */
 
 /*
@@ -112,8 +112,8 @@ HB_EXTERN_BEGIN
 #define _B_DOUBLE_SINGLE       "\xD5\xCD\xB8\xB3\xBE\xCD\xD4\xB3"
 #define HB_B_SINGLE_V          '\xB3'
 #define HB_B_SINGLE_H          '\xC4'
-#define HB_B_DOUBLE_V          '\xB3'
-#define HB_B_DOUBLE_H          '\xC4'
+#define HB_B_DOUBLE_V          '\xBA'
+#define HB_B_DOUBLE_H          '\xCD'
 
 /* Used to tell hb_gt_SetPos() when the cursor position
    is being set. Before or after text is or was displayed.

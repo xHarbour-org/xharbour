@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3112 2004/06/28 14:21:48 jonnymind Exp $
+ * $Id: ChangeLog,v 1.3113 2004/06/28 18:09:59 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-28 22:27 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * include/hbapigt.h
+    ! Fixed double-line definition when it's in a single line instead a box.
 
 2004-06-28 14:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gtapi.c
