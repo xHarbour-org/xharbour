@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.13 2003/12/21 21:12:44 peterrees Exp $
+ * $Id: memoedit.prg,v 1.14 2003/12/22 13:58:03 lf_sfnet Exp $
  */
 
 /*
@@ -121,7 +121,7 @@ METHOD Edit() CLASS TMemoEditor
          nKey := Inkey(0)
 
          if (bKeyBlock := Setkey( nKey )) <> NIL
-            Eval( bKeyBlock )
+            Eval( bKeyBlock, Self )  // 7/01/2004 12:47p.m. Pass Self as parameter
             Loop
          endif
 

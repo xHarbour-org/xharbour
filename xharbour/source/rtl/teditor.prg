@@ -6,9 +6,9 @@
 * Includes a fix for the bugs in Teditor key processing that previously caused array errors
 *
 * Note: --If using the paste function to enter text, increase size of keyboard buffer to 2048 or 4096!
-*         Otherwise buffer will overrun -- it takes some processor time to do all the dynamic reformatting 
+*         Otherwise buffer will overrun -- it takes some processor time to do all the dynamic reformatting
 *	--SetCursor() is used to change cursor between insert and overwrite. Modify if desired....
-*         This will need to be cleared to return to original cursor within Memoedit()!!     
+*         This will need to be cleared to return to original cursor within Memoedit()!!
 *       --K_LEFT is set to exit Memoedit() in read-only mode, in addition to the standard exit keys ESC.
 *       --CHR(141)+CHR(10) "soft CR" inserted by Clipper memoedit() is automatically removed when encountered in text
 *       --Color persistence problems in previous version corrected by taking setcolor() at Method New file call.
@@ -16,7 +16,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.9 2003/01/27 03:40:53 walito Exp $
+/* $Id: teditor.prg,v 1.13 2003/12/19 21:04:54 lanceowens Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -112,7 +112,7 @@ CLASS HBEditor
    DATA  nMarkPos                   // Mark proper new position of cursor when wrapping and splitting lines
    DATA  nMarkLen
    DATA  nOrigCursor    INIT SetCursor()  // Save to restore original cursor format on exit
-	                            
+
    METHOD New(cString, nTop, nLeft, nBottom,;            // Converts a string to an array of strings splitting input string at EOL boundaries
               nRight, lEditMode, nLineLength, nTabSize)
 
@@ -281,7 +281,7 @@ return cString
 
 METHOD New(cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabSize) CLASS HBEditor
    Local acsn
-    
+
    default  cString     to ""
    default  nTop        to 0
    default  nLeft       to 0
@@ -292,14 +292,14 @@ METHOD New(cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabSi
    default  nTabSize    to nil
 
    // fix setcolor() to value at New() call
-   ::cColorSpec := setcolor()  
+   ::cColorSpec := setcolor()
 
    // Note original cursor to restore after editing
-   ::nOrigCursor := SetCursor() 
+   ::nOrigCursor := SetCursor()
 
    // If memofield was created with Clipper, it needs to have chr(141)+chr(10) stripped
    if chr(141) $ cString
-       acsn := chr(32) + chr(141) + chr(10) 
+       acsn := chr(32) + chr(141) + chr(10)
        cString := STRTRAN(cString,acsn, " ")
 
        acsn := chr(141) + chr(10)
@@ -331,7 +331,7 @@ METHOD New(cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabSi
    // set correct insert state
    if ::lEditAllow
       ::InsertState(::lInsert)
-      if ::lInsert 
+      if ::lInsert
            SetCursor(2)		// change style for insert/overwrite modes
       else
 	   SetCursor(3)
@@ -473,7 +473,7 @@ METHOD RemoveLine(nRow) CLASS HBEditor
 
     ADel(::aText, nRow, .T.)
    ::naTextLen--
-  
+
 return Self
 
 
@@ -522,12 +522,12 @@ return Self
 STATIC function GetParagraph(oSelf, nRow)
 
    LOCAL cLine := ""
-   
-   while oSelf:aText[nRow]:lSoftCR      
+
+   while oSelf:aText[nRow]:lSoftCR
       cLine = cline + oSelf:aText[nRow]:cText
       // I don't need to increment nRow since I'm removing lines, ie line n is
       // a different line each time I add it to cLine
-      oSelf:RemoveLine(nRow)  
+      oSelf:RemoveLine(nRow)
    enddo
 
    // Last line, or only one line
@@ -583,7 +583,7 @@ METHOD SplitLine(nRow) CLASS HBEditor
                // This avoids error if the line has NO SPACES! Without this modif. code enters infinite loop on wrap
                // Note that cursor postioning when wrapping lines that have NO space is funky due to MovetoNextLine() problems
 
-               cSplittedLine := Left(cLine, ::nWordWrapCol) 
+               cSplittedLine := Left(cLine, ::nWordWrapCol)
 
                   // Old method was: else split at current cursor position
                   // cSplittedLine := Left(cLine, ::nCol - 1)
@@ -609,7 +609,7 @@ METHOD SplitLine(nRow) CLASS HBEditor
             for nI := 0 to nPosInWord
                ::MoveCursor(K_LEFT)
             next
-         endif   
+         endif
       else
          ::SetPos(nORow, nOCol)
       endif
@@ -643,7 +643,7 @@ METHOD RefreshWindow() CLASS HBEditor
 
    SetCursor(nOCur)
    ::SetPos(nORow, nOCol)
-   
+
 return Self
 
 
@@ -816,9 +816,9 @@ METHOD MoveCursor(nKey) CLASS HBEditor
          endif
 
          //mod = move to next line
-        
 
-         If ::lRightScroll 
+
+         If ::lRightScroll
            if ::nCol > ::LineLen(::nRow) .and. ::nRow < ::naTextLen
             ::MoveCursor(K_DOWN)
             ::MoveCursor(K_HOME)
@@ -836,13 +836,13 @@ METHOD MoveCursor(nKey) CLASS HBEditor
          enddo
 
          // mod = move to next line
-         If  ::lRightScroll 
+         If  ::lRightScroll
            if ::nCol > ::LineLen(::nRow) .and. ::nRow < ::naTextLen
             ::MoveCursor(K_DOWN)
             ::MoveCursor(K_HOME)
            endif
          endif
-         
+
          exit
 
       case K_LEFT
@@ -854,7 +854,7 @@ METHOD MoveCursor(nKey) CLASS HBEditor
                ::RefreshColumn()
 
            // Modified = keep at max of end of line
-            else 
+            else
                if ::nRow>1
                   ::MoveCursor(K_UP)
                   ::MoveCursor(K_END)
@@ -866,7 +866,7 @@ METHOD MoveCursor(nKey) CLASS HBEditor
             ::nCol--
             ::SetPos(::Row(), ::Col() - 1)
           endif
-        
+
           exit
 
       case K_CTRL_LEFT      		// splitline() does not use this function
@@ -935,7 +935,7 @@ METHOD InsertState(lInsState) CLASS HBEditor
    IF ISLOGICAL( lInsState )
       ::lInsert := lInsState
       SET(_SET_INSERT, lInsState)
-      if ::lInsert 
+      if ::lInsert
            Setcursor(2)
       else
 	   Setcursor(3)
@@ -966,16 +966,16 @@ STATIC procedure BrowseText(oSelf, nPassedKey)
       endif
 
       if (bKeyBlock := Setkey( nKey )) <> NIL
-         Eval( bKeyBlock )
+         Eval( bKeyBlock, oSelf )  // 7/01/2004 12:47p.m. Pass oSelf as parameter
          Loop
       endif
 
       // ******* modified to add exit with K_LEFT when in non-edit mode
-      if nKey == K_ESC 
+      if nKey == K_ESC
          oSelf:lExitEdit := .T.
-      elseif nKey == K_LEFT 
+      elseif nKey == K_LEFT
          oSelf:lExitEdit := .T.
-      else 
+      else
          if !oSelf:MoveCursor(nKey)
             oSelf:KeyboardHook(nKey)
          endif
@@ -989,17 +989,17 @@ return
 
 // Edits text
 METHOD Edit(nPassedKey) CLASS HBEditor
-   // Many of the complex key handling situations here could be avoided with a 
+   // Many of the complex key handling situations here could be avoided with a
    // complete rewrite of SplitLine() method. This is where the many recurrent problems occur.
    // But alas, that is not what I did....
-   
+
    LOCAL i
    LOCAL nKey
    LOCAL lOldInsert
    LOCAL lDelAppend
    LOCAL bKeyBlock
    LOCAL lSingleKeyProcess := .F.       // .T. if I have to process passed key and then exit
-   
+
    LOCAL lHardCR := .F.       		// This is a marker to respect :SoftCR status when line are combined
    LOCAL nLastLine
 
@@ -1025,11 +1025,11 @@ METHOD Edit(nPassedKey) CLASS HBEditor
          else
             lSingleKeyProcess := .T.
             nKey := nPassedKey
-            
+
          endif
 
       if (bKeyBlock := Setkey( nKey )) <> NIL
-         Eval( bKeyBlock )
+         Eval( bKeyBlock, Self )  // 7/01/2004 12:47p.m. Pass Self as parameter
          Loop
       endif
 
@@ -1051,7 +1051,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
             case K_RETURN
                ::lDirty := .T.
                if ::lInsert .OR. ::nRow == ::naTextLen
-                  if ::LineLen(::nRow) > 0 .AND. ::lInsert 
+                  if ::LineLen(::nRow) > 0 .AND. ::lInsert
                      // Split current line at cursor position
                      ::InsertLine(Right(::aText[::nRow]:cText, ::LineLen(::nRow) - ::nCol + 1), ::aText[::nRow]:lSoftCR, ::nRow + 1)
                      ::aText[::nRow]:cText := Left(::aText[::nRow]:cText, ::nCol - 1)
@@ -1059,7 +1059,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                         ::aText[::nRow]:lSoftCR := .F.
                      endif
                   else
-                     if ::lInsert 
+                     if ::lInsert
                          ::InsertLine("", .F., ::nRow + 1)
                      else
   	                 ::AddLine("", .F.)
@@ -1074,7 +1074,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                   lHardCR := .F.         // should already by .F., but just to be safe, and it is a tiny line of code...
 
                   if ::aText[::nRow]:lSoftCR
-                      if !::aText[::nRow+1]:lSoftCR  // the next line has a hard return, keep it 
+                      if !::aText[::nRow+1]:lSoftCR  // the next line has a hard return, keep it
                          lHardCR := .T.
                       endif
 
@@ -1085,12 +1085,12 @@ METHOD Edit(nPassedKey) CLASS HBEditor
 		      ::aText[::nRow]:cText =  ::aText[::nRow]:cText  + ::GetLine(::nRow + 1)
                       ::RemoveLine(::nRow + 1)
 
-                      ::aText[::nRow]:lSoftCR := !lHardCR  // .T. if lHardCR = .F. 
-                       
+                      ::aText[::nRow]:lSoftCR := !lHardCR  // .T. if lHardCR = .F.
+
                       ::SplitLine(::nRow)
                       ::RefreshWindow()
                   endif
-               endif 
+               endif
                exit
 
             case K_INS
@@ -1112,10 +1112,10 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                   ::aText[::nRow]:cText := ""
                   ::RefreshLine()
                endif
-                   
-            else       
+
+            else
                // wrap line if too near WordWrapCol (-1 is choosen value)  to fit another word on the same line
-               if ::lWordWrap .AND. ::nCol >= ::nWordWrapCol -1  .and. ::nCol >= ::LineLen(::nRow) 
+               if ::lWordWrap .AND. ::nCol >= ::nWordWrapCol -1  .and. ::nCol >= ::LineLen(::nRow)
                   If  ::nRow != ::naTextLen
                     ::MoveCursor(K_DOWN)
                     ::MoveCursor(K_HOME)
@@ -1125,14 +1125,14 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                   // Modified: ...BUT ALSO correct for lSoftCR of lines to avoid array overflow in GetParagraph()!
 
                   ::aText[::nRow]:cText := Stuff(::aText[::nRow]:cText, ::nCol, 1, "")
- 		  
+
                   lHardCR := .F.         // should already by .F., but just to be safe, and it is a tiny line of code...
  		  nLastLine =  ::nRow
 
                   if ::nRow = ::naTextLen .or. (!::aText[::nRow]:lSoftCR .and. ::nCol <= len(::aText[::nRow]:cText) ) // the last line, or hard return line not at end.
                         ::RefreshLine()
                   else
-                      if !::aText[::nRow+1]:lSoftCR  // the next line has a hard return, keep it 
+                      if !::aText[::nRow+1]:lSoftCR  // the next line has a hard return, keep it
                          lHardCR := .T.
                       endif
 
@@ -1144,19 +1144,19 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                       ::nMarkPos := 0
 
                       if  ::nCol > ::LineLen(::nRow) .AND.  At(" ", ::aText[::nRow+1]:cText ) + ::nCol >= ::nWordWrapCol
-                            
+
                             ::nMarkPos :=  ::nCol - RAt(" ", RTrim(::aText[::nRow]:cText )) - 1  // if wraps to new line, set new cursor marker
                       endif
 
 		      ::aText[::nRow]:cText +=  ::GetLine(::nRow + 1)
                       ::RemoveLine(::nRow + 1)
 
-                      ::aText[::nRow]:lSoftCR  = !lHardCR  // .T. if lHardCR = .F. 
-                       
+                      ::aText[::nRow]:lSoftCR  = !lHardCR  // .T. if lHardCR = .F.
+
                       ::SplitLine(::nRow)
                       ::RefreshWindow()
-			
-		      // this MAY (?) still have an occasional wrap misposition around line ends    	
+
+		      // this MAY (?) still have an occasional wrap misposition around line ends
                       if ::LineLen(::nRow)< ::nMarklen  // reposition cursor for wrapped word (line length was decrease by wrap)
                            if nLastLine =  ::nRow      	// cursor not yet on wrapped line
 			      ::MoveCursor(K_DOWN)
@@ -1165,13 +1165,13 @@ METHOD Edit(nPassedKey) CLASS HBEditor
  			   while ::nMarkPos>0		// wrap to character where cursor was before wrap
                               ::MoveCursor(K_RIGHT)
                               ::nMarkPos--
-                           enddo 
+                           enddo
                       else
 
                            if ::nCol > ::LineLen(::nRow) .AND. ::nRow < ::naTextLen  //cursor stuck at end of line, unable to wrap
                              ::MoveCursor(K_DOWN)
                              ::MoveCursor(K_HOME)
-           		   endif 
+           		   endif
 		      endif
                   endif
                endif
@@ -1188,11 +1188,11 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                endif
 
                ::lRightScroll := .F.      	//prevent auto linewrap
-               for i := 1 to ::nTabWidth 
+               for i := 1 to ::nTabWidth
                   if ::nCol < ::nWordWrapCol - ::nTabWidth -  ::nTabWidth
                        ::MoveCursor(K_RIGHT)
                        ::RefreshLine()
-                  else 
+                  else
                        i := ::nTabWidth      	// end of line, stop it!
                   endif
                next
@@ -1202,7 +1202,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
 	          lHardCR := .F.         	// should already by .F., but just to be safe, and it is a tiny line of code...
 
                   if ::aText[::nRow]:lSoftCR
-                      if !::aText[::nRow+1]:lSoftCR  // the next line has a hard return, keep it 
+                      if !::aText[::nRow+1]:lSoftCR  // the next line has a hard return, keep it
                          lHardCR := .T.
                       endif
 
@@ -1213,8 +1213,8 @@ METHOD Edit(nPassedKey) CLASS HBEditor
 		      ::aText[::nRow]:cText =  ::aText[::nRow]:cText  + ::GetLine(::nRow + 1)
                       ::RemoveLine(::nRow + 1)
 
-                      ::aText[::nRow]:lSoftCR := !lHardCR  // .T. if lHardCR = .F. 
-                       
+                      ::aText[::nRow]:lSoftCR := !lHardCR  // .T. if lHardCR = .F.
+
                       ::SplitLine(::nRow)
                       ::RefreshWindow()
                   endif
@@ -1227,7 +1227,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
             // Handling this destructive key properly is quite complex, especially at line end
 
              ::lDirty := .T.
-             if ::nCol == 1  
+             if ::nCol == 1
 	       if ::nRow>1
                   ::MoveCursor(K_UP)
                   ::MoveCursor(K_END)
@@ -1236,29 +1236,29 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                if ::LineLen(::nRow) == 0 .and. ::naTextLen>1
                  ::RemoveLine(::nRow)
                  ::RefreshWindow()
-               else				// if hardcr above, make soft and wordwrap and refresh merged paragraph     
-                 if ::LineLen(::nRow) > 0 .and. !::aText[::nRow]:lSoftCR 
+               else				// if hardcr above, make soft and wordwrap and refresh merged paragraph
+                 if ::LineLen(::nRow) > 0 .and. !::aText[::nRow]:lSoftCR
                     ::aText[::nRow]:lSoftCR := .T.
                     ::aText[::nRow]:cText :=  substr(::aText[::nRow]:cText,1,::nCol) // clears the extra space at line end
                     ::RefreshLine()
                     // Linewrap the new paragraph
                     if ::nRow < ::naTextLen
                        lHardCR := .F.         	// should already by .F., but just to be safe, and it is a tiny line of code...
-     
+
                        if ::aText[::nRow]:lSoftCR
-                           if !::aText[::nRow+1]:lSoftCR  // if the next line has a hard return, keep it 
+                           if !::aText[::nRow+1]:lSoftCR  // if the next line has a hard return, keep it
                               lHardCR := .T.
                            endif
-     
+
                            if ::nRow = ::naTextLen-1      // if next to last line of array, last line MUST have HR
                              lHardCR := .T.
                            endif
-     
+
           		   ::aText[::nRow]:cText +=  ::GetLine(::nRow + 1)
                            ::RemoveLine(::nRow + 1)
-     
-                           ::aText[::nRow]:lSoftCR := !lHardCR  // .T. if lHardCR = .F. 
-                            
+
+                           ::aText[::nRow]:lSoftCR := !lHardCR  // .T. if lHardCR = .F.
+
                            ::SplitLine(::nRow)
                            ::RefreshWindow()
 		       endif
@@ -1266,40 +1266,40 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                  endif
                endif
 
-             else      
+             else
                // delete previous character
                if ::nCol >= ::LineLen(::nRow)
                    ::aText[::nRow]:cText := Stuff(::aText[::nRow]:cText, --::nCol, 1, " ")
                else
                    ::aText[::nRow]:cText := Stuff(::aText[::nRow]:cText, --::nCol, 1, "")
                endif
-              
+
                // correct column position for next call to MoveCursor()
                ::nCol++
                ::MoveCursor(K_LEFT)
-               // refresh screen, respecting CR status               
-                 
+               // refresh screen, respecting CR status
+
                   if ::aText[::nRow]:lSoftCR = .F.  .or. ::nRow = ::naTextLen // the line has a HR, keep it.
                         ::RefreshLine()
                   else
-                                         
-                      if !::aText[::nRow+1]:lSoftCR  // the next line has a hard return, keep it 
+
+                      if !::aText[::nRow+1]:lSoftCR  // the next line has a hard return, keep it
                          lHardCR := .T.
                       endif
 
                       if ::nRow = ::naTextLen-1       // if next to last line, last line MUST have HR
                         lHardCR := .T.
                       endif
-          
+
                       ::aText[::nRow]:cText += ::GetLine(::nRow + 1)
                       ::RemoveLine(::nRow + 1)
-  
-                      ::aText[::nRow]:lSoftCR  = !lHardCR  // .T. if lHardCR = .F. 
-                       
+
+                      ::aText[::nRow]:lSoftCR  = !lHardCR  // .T. if lHardCR = .F.
+
                       ::SplitLine(::nRow)
                       ::RefreshWindow()
-                        
-                   endif 
+
+                   endif
              endif
              exit
 
@@ -1343,7 +1343,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
 	      // Space is a very tricky key, and requires its own routine to avoid array errors in Getparagraph()
 
               ::lDirty := .T.
-              nLastLine =  ::nRow 
+              nLastLine =  ::nRow
               if !(::nRow=::naTextLen .or. ::aText[::nRow]:lSoftCR = .F.)  // not the last line, not a HardCR
                   // If I'm past EOL I need to add as much spaces as I need to reach ::nCol
                   if ::nCol > ::LineLen(::nRow)
@@ -1355,19 +1355,19 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                   else
                      ::aText[::nRow]:cText := Stuff(::aText[::nRow]:cText, ::nCol, 1, Chr(nKey))
                   endif
-                   
+
                   ::RefreshLine()
                   ::SplitLine(::nRow)
                   if nLastLine =  ::nRow .or. ::lInsert
 		      ::lRightScroll := .F.
-                      ::MoveCursor(K_RIGHT) 
+                      ::MoveCursor(K_RIGHT)
 		      ::lRightScroll := .T.
                   endif
               else      					// The last line or a HardCR line
-                  if ::nCol >= ::nWordWrapCol      		// if at wordwrap of Hard CR line                  
+                  if ::nCol >= ::nWordWrapCol      		// if at wordwrap of Hard CR line
                       ::aText[::nRow]:lSoftCR = .T.		// wrap by adding a line and move down, merge CR status
                       ::InsertLine("", .F. , ::nRow +1 )
-                      ::MoveCursor(K_DOWN)  
+                      ::MoveCursor(K_DOWN)
                       ::RefreshLine()
 
                   else						// Not at wordwrap of line
@@ -1386,14 +1386,14 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                         else
                            ::aText[::nRow]:cText := Stuff(::aText[::nRow]:cText, ::nCol, 1, Chr(nKey))
                         endif
-                         
+
                         ::RefreshLine()
                         ::SplitLine(::nRow)
-                       
+
                         ::lRightScroll := .F.
-                        ::MoveCursor(K_RIGHT) 
+                        ::MoveCursor(K_RIGHT)
 	                ::lRightScroll := .T.
-                       
+
                      endif
                   endif
 
@@ -1404,7 +1404,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
             Default		// many modifications were beeded to avoid array errors with text entry and line wraps
 
                if nKey >  K_SPACE .AND. nKey < 256
-                  // nKey := ASC(HB_ANSITOOEM(CHR(nKey))) 	// convert from windows 
+                  // nKey := ASC(HB_ANSITOOEM(CHR(nKey))) 	// convert from windows
 
                   ::lDirty := .T.
 		  ::nMarkPos := 0
@@ -1419,30 +1419,30 @@ METHOD Edit(nPassedKey) CLASS HBEditor
                   else
                      ::aText[::nRow]:cText := Stuff(::aText[::nRow]:cText, ::nCol, 1, Chr(nKey))
                   endif
-       
+
                   if len(::aText[::nRow]:cText) <= ::nWordWrapCol	// New line doesn't neet to wrap
           	     ::RefreshLine()                            	// so just refresh
 	             ::lRightScroll := .F.
-                     ::MoveCursor(K_RIGHT) 
-		     ::lRightScroll := .T.          
+                     ::MoveCursor(K_RIGHT)
+		     ::lRightScroll := .T.
                   else							// Else: it needs to wrap
                   //>
                   if ::nRow = ::naTextLen .or. !::aText[::nRow]:lSoftCR // It is the last line or hard CR
                         nLastLine :=  ::nRow
                         ::aText[::nRow]:lSoftCR := .F.
-                        
+
                         ::SplitLine(::nRow)
                         ::RefreshLine()
-                        
+
 			if nLastLine =  ::nRow .or. ::lInsert
 		           ::lRightScroll := .F.
-                           ::MoveCursor(K_RIGHT) 
+                           ::MoveCursor(K_RIGHT)
 			   ::lRightScroll := .T.
                         endif
                   else
 		      lHardCR := .F.         // should already by .F., but just to be safe, and it is a tiny line of code...
 
-                      if !::aText[::nRow+1]:lSoftCR  	// the next line has a hard return, keep it 
+                      if !::aText[::nRow+1]:lSoftCR  	// the next line has a hard return, keep it
                          lHardCR := .T.
                       endif
 
@@ -1455,13 +1455,13 @@ METHOD Edit(nPassedKey) CLASS HBEditor
 
                       ::nMarkPos :=  ::nCol - RAt(" ", RTrim(::aText[::nRow]:cText ))   // if wraps to new line, set new cursor marker
                       ::nMarklen := ::LineLen(::nRow)  	// set up markers to check for word wrap with the delete
-                      
+
 
 		      ::aText[::nRow]:cText +=  ::GetLine(::nRow + 1)
                       ::RemoveLine(::nRow + 1)
 
-                      ::aText[::nRow]:lSoftCR  = !lHardCR  	// .T. if lHardCR = .F. 
-                                    
+                      ::aText[::nRow]:lSoftCR  = !lHardCR  	// .T. if lHardCR = .F.
+
                       ::SplitLine(::nRow)
                       ::RefreshLine()
 
@@ -1471,13 +1471,13 @@ METHOD Edit(nPassedKey) CLASS HBEditor
  			   while ::nMarkPos>0
                               ::MoveCursor(K_RIGHT)
                               ::nMarkPos--
-                           enddo 
+                           enddo
                       else
-  			   if nLastLine < ::nRow 	// if the line has wrapped from previous, no Kdown/khome needed                     
+  			   if nLastLine < ::nRow 	// if the line has wrapped from previous, no Kdown/khome needed
     			      while ::nMarkPos>0
                                  ::MoveCursor(K_RIGHT)
                                  ::nMarkPos--
-                              enddo 
+                              enddo
 			   else				// no wrap, just move cursor over
                               //::lRightScroll := .F.
                               ::MoveCursor(K_RIGHT)
@@ -1497,7 +1497,7 @@ METHOD Edit(nPassedKey) CLASS HBEditor
 
 
    endif
-      
+
 return Self
 
 
@@ -1513,16 +1513,16 @@ METHOD IdleHook()  CLASS HBEditor
 
 return Self
 
- 
+
 METHOD SetColor(cColorString) CLASS HBEditor
- 
+
     local cOldColor := ::cColorSpec
- 
+
     if cColorString <> nil
        ::cColorSpec := cColorString
     endif
- 
-return cOldColor 
+
+return cOldColor
 
 
 
