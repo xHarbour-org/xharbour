@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.33 2003/10/09 20:45:56 paultucker Exp $
+ * $Id: set.c,v 1.34 2003/10/18 01:15:19 jonnymind Exp $
  */
 
 /*
@@ -84,6 +84,7 @@ static HB_PATHNAMES * sp_set_path;
       extern BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
 #endif
 char s_PrintFileName[ _POSIX_PATH_MAX + 1 ], s_PrinterName[ _POSIX_PATH_MAX + 1 ];
+BOOL s_HaveSetPrinterName ;
 static void hb_setFreeSetPath( void )
 {
    /* Free all set paths */
@@ -736,11 +737,6 @@ HB_FUNC( SET )
 
             /* If the print file is not already open, open it in overwrite mode. */
            hb_set.HB_SET_DEVICE = set_string( pArg2, hb_set.HB_SET_DEVICE );
-           if( hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 &&
-             hb_set.hb_set_printhan == FS_ERROR &&
-             hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0 ) {
-                hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, FALSE, ".prn", HB_SET_PRINTFILE );
-           }
          }
          break;
 
@@ -972,9 +968,22 @@ HB_FUNC( SET )
 
       case HB_SET_PRINTER    :
          hb_retl( hb_set.HB_SET_PRINTER );
-         if( args > 1 )
-         {
+         if( args > 1 ) {
+            BOOL bWasOn = hb_set.HB_SET_PRINTER ;
             hb_set.HB_SET_PRINTER = set_logical( pArg2, hb_set.HB_SET_PRINTER );
+
+            // Only do next section if command "SET PRINTER TO [<xcDevice> | <xcFile>]" has not been used.
+            // This makes "SET PRINTER ON/OFF" Clipper compatible
+            if ( !s_HaveSetPrinterName ) {
+              if ( bWasOn && !hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR ) {
+                close_binary( hb_set.hb_set_printhan );
+                hb_set.hb_set_printhan = FS_ERROR;
+              }
+              else if ( !bWasOn && hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan == FS_ERROR ) {
+                if (hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0)
+                  hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, FALSE, ".prn", HB_SET_PRINTER );
+              }
+            }
          }
          break;
 
@@ -1009,9 +1018,11 @@ HB_FUNC( SET )
          {
             close_binary( hb_set.hb_set_printhan );
             hb_set.hb_set_printhan = FS_ERROR;
+            s_HaveSetPrinterName = FALSE ;
 
             if (hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0  && bOpen)  {
               hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, bFlag, ".prn", HB_SET_PRINTFILE );
+              s_HaveSetPrinterName = TRUE ;
             }
          }
         if (hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) == 0)
@@ -1326,11 +1337,11 @@ HB_FUNC( SET )
          }
          break;
 
-      case HB_SET_OUTPUTSAFETY:         
+      case HB_SET_OUTPUTSAFETY:
          hb_set.HB_SET_OUTPUTSAFETY = set_logical(pArg2, TRUE );
          break;
-               
-                  
+
+
 
       default                :
          /* Return NIL if called with invalid SET specifier */
@@ -1445,6 +1456,7 @@ void hb_setInitialize( void )
    hb_set.hb_set_winprinter=FALSE;
    sp_sl_first = sp_sl_last = NULL;
    s_next_listener = 1;
+   s_HaveSetPrinterName = FALSE ;
 
    /* Listener test (2 of 2)
    {
