@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.570 2003/01/02 03:31:01 jonnymind Exp $
+ * $Id: ChangeLog,v 1.571 2003/01/02 03:56:16 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-02 05:44 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/thread.c
+    + Now StartThread on method can be called both with a method pointer or
+      with a method name:
+        StartThread( oMyObject, oMyMethodPtr, ... )
+      or
+        StartThread( oMyObject, "MethodName", ... )
+
+  * tests/mttest.prg
+    * Changed one of the StartThraed to show the "methodname" call.
+
 
 2003-01-02 04:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * include/hbstack.h

@@ -19,8 +19,10 @@ PROCEDURE Main()
 
   nStart := Seconds()
 
-  StartThread ( oMyObject, MethodPtr, 10, "1st Thread:",     0,  5000 )
-  StartThread ( oMyObject, MethodPtr, 12, "2nd Thread:",  5000, 10000 )
+  // StartThread() for methods can be called using an already available
+  // Method Pointer or using a method name
+  StartThread ( oMyObject, "Count", 10, "1st Thread:",     0,  5000 )
+  StartThread ( oMyObject, "Count", 12, "2nd Thread:",  5000, 10000 )
   StartThread ( oMyObject, MethodPtr, 14, "3rd Thread:", 10000, 15000 )
 
   WaitForThreads()

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.29 2002/12/31 18:47:51 lculik Exp $
+* $Id: thread.c,v 1.30 2003/01/02 03:31:02 jonnymind Exp $
 */
 
 /*
@@ -487,6 +487,7 @@ HB_FUNC( STARTTHREAD )
       return;
    }
 
+   /* Is it a function pointer? */
    if ( pPointer->type == HB_IT_LONG )
    {
       pFunc =  (PHB_FUNC) hb_itemGetNL( pPointer );
@@ -504,10 +505,27 @@ HB_FUNC( STARTTHREAD )
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
    }
+   /* Is it an object? */
    else if( hb_pcount() >= 2 && pPointer->type == HB_IT_OBJECT )
    {
-      pFunc = (PHB_FUNC) hb_itemGetNL( hb_arrayGetItemPtr( pArgs, 2 ) );
+      PHB_ITEM pString = hb_arrayGetItemPtr( pArgs, 2 );
+
+      if( pString->type == HB_IT_STRING )
+      {
+         pFunc = (PHB_FUNC) hb_objHasMsg( pPointer, pString->item.asString.value );
+      }
+      else if( pString->type == HB_IT_LONG )
+      {
+         pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+      }
+      else
+      {
+         hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_ObjMsgPtr", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+         return;
+      }
+
       pExecSym = hb_clsSymbolFromFunction( pPointer , pFunc );
+
       if( pExecSym == NULL )
       {
          hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "StartThread", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
@@ -521,6 +539,7 @@ HB_FUNC( STARTTHREAD )
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
    }
+   /* Is it a function name? */
    else if( pPointer->type == HB_IT_STRING )
    {
       pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pPointer ) );
@@ -535,6 +554,7 @@ HB_FUNC( STARTTHREAD )
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
    }
+   /* Is it a code block? */
    else if( pPointer->type != HB_IT_BLOCK )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "STARTTHREAD", 1, pArgs );
