@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.36 2002/12/29 19:58:43 ronpinkas Exp $
+ * $Id: arrays.c,v 1.37 2002/12/29 23:32:42 jonnymind Exp $
  */
 
 /*
@@ -881,9 +881,6 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
    }
    else
    {
-      #ifdef HB_THREAD_SUPPORT
-         hb_threadAllow( &hb_gcCollectionMutex );
-      #endif
       return FALSE;
    }
 }
@@ -1214,6 +1211,7 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    #ifdef HB_THREAD_SUPPORT
       hb_threadAllow( &hb_gcCollectionMutex );
    #endif
+
    return pArray;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.29 2002/12/29 17:55:42 ronpinkas Exp $
+ * $Id: garbage.c,v 1.30 2002/12/29 23:32:42 jonnymind Exp $
  */
 
 /*
@@ -121,6 +121,13 @@ static HB_GARBAGE_FUNC( hb_gcGripRelease );
 static void hb_gcLink( HB_GARBAGE_PTR *pList, HB_GARBAGE_PTR pAlloc )
 {
 
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_threadForbidenLock( &hb_gcCollectionMutex );
+      }
+   #endif
+
    if( *pList )
    {
       /* add new block at the logical end of list */
@@ -134,10 +141,22 @@ static void hb_gcLink( HB_GARBAGE_PTR *pList, HB_GARBAGE_PTR pAlloc )
       *pList = pAlloc->pNext = pAlloc->pPrev = pAlloc;
    }
 
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_threadForbidenUnlock( &hb_gcCollectionMutex );
+      }
+   #endif
 }
 
 static void hb_gcUnlink( HB_GARBAGE_PTR *pList, HB_GARBAGE_PTR pAlloc )
 {
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_threadForbidenLock( &hb_gcCollectionMutex );
+      }
+   #endif
 
    pAlloc->pPrev->pNext = pAlloc->pNext;
    pAlloc->pNext->pPrev = pAlloc->pPrev;
@@ -151,6 +170,13 @@ static void hb_gcUnlink( HB_GARBAGE_PTR *pList, HB_GARBAGE_PTR pAlloc )
    {
       *pList = NULL;    /* this was the last block */
    }
+
+   #ifdef HB_THREAD_SUPPORT
+      if( hb_ht_context )
+      {
+         hb_threadForbidenUnlock( &hb_gcCollectionMutex );
+      }
+   #endif
 }
 
 /* allocates a memory block */
@@ -280,13 +306,6 @@ static HB_GARBAGE_FUNC( hb_gcGripRelease )
 HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
 {
    HB_GARBAGE_PTR pAlloc;
-   
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadForbidenLock( &hb_gcCollectionMutex );
-      }
-   #endif
 
    #ifdef GC_RECYCLE
       if( s_pAvailableItems )
@@ -322,23 +341,11 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
          memset( pItem, 0, sizeof( HB_ITEM ) );
          pItem->type = HB_IT_NIL;
       }
-      #ifdef HB_THREAD_SUPPORT
-         if( hb_ht_context )
-         {
-            hb_threadForbidenUnlock( &hb_gcCollectionMutex );
-         }
-      #endif
 
       return pItem;
    }
    else
    {
-      #ifdef HB_THREAD_SUPPORT
-         if( hb_ht_context )
-         {
-            hb_threadForbidenUnlock( &hb_gcCollectionMutex );
-         }
-      #endif
       return NULL;
    }
 }
@@ -354,13 +361,6 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 
       return;
    }
-
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadForbidenLock( &hb_gcCollectionMutex );
-      }
-   #endif
 
    if( pItem )
    {
@@ -381,13 +381,6 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
 
       HB_GARBAGE_FREE( pAlloc );
    }
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadForbidenUnlock( &hb_gcCollectionMutex );
-      }
-   #endif
-
 }
 
 /* Lock a memory pointer so it will not be released if stored
@@ -408,11 +401,6 @@ void * hb_gcLock( void * pBlock )
          pContextList = &( hb_threadGetCurrentContext()->GCList );
       }
       */
-
-      if( hb_ht_context )
-      {
-         hb_threadForbidenLock( &hb_gcCollectionMutex );
-      }
    #endif
 
    if( pBlock )
@@ -431,13 +419,6 @@ void * hb_gcLock( void * pBlock )
       }
       ++pAlloc->locked;
    }
-
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadForbidenUnlock( &hb_gcCollectionMutex );
-      }
-   #endif
 
    return pBlock;
 }
@@ -460,11 +441,6 @@ void *hb_gcUnlock( void *pBlock )
          pContextList = &( hb_threadGetCurrentContext()->GCList );
       }
       */
-
-      if( hb_ht_context )
-      {
-         hb_threadForbidenLock( &hb_gcCollectionMutex );
-      }
    #endif
 
    if( pBlock )
@@ -485,13 +461,6 @@ void *hb_gcUnlock( void *pBlock )
          }
       }
    }
-
-   #ifdef HB_THREAD_SUPPORT
-      if( hb_ht_context )
-      {
-         hb_threadForbidenUnlock( &hb_gcCollectionMutex );
-      }
-   #endif
 
    return pBlock;
 }
@@ -603,9 +572,7 @@ void hb_gcCollectAll( void )
       }
    #endif
 
-
    //printf(  "Collecting...\n" );
-
 
    HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
 
@@ -655,6 +622,7 @@ void hb_gcCollectAll( void )
       if( s_pLockedBlock )
       {
          pAlloc = s_pLockedBlock;
+
          do
          {
             /* it is not very elegant method but it works well */

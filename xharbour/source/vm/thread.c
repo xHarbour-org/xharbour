@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.21 2002/12/29 17:55:42 ronpinkas Exp $
+* $Id: thread.c,v 1.22 2002/12/29 23:32:42 jonnymind Exp $
 */
 
 /*
@@ -1070,8 +1070,9 @@ void hb_threadForbid( HB_FORBID_MUTEX *Forbid )
 {
    /* Request for control section */
    HB_CRITICAL_LOCK( Forbid->Control );
+
    /* Now we'll lock the critical mutex if we are the first thread forbidding */
-   if ( Forbid->nCount == 0 )
+   if( Forbid->nCount == 0 )
    {
       hb_threadLock( &Forbid->Critical );
    }
@@ -1088,8 +1089,9 @@ void hb_threadAllow( HB_FORBID_MUTEX *Forbid )
    /* Request for control section */
    HB_CRITICAL_LOCK( Forbid->Control );
    Forbid->nCount --;
+
    /* Now we'll unlock critical no other threads are forbidding */
-   if ( Forbid->nCount == 0 )
+   if( Forbid->nCount == 0 )
    {
       hb_threadUnlock( &Forbid->Critical );
    }
