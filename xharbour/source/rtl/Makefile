@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.26 2003/04/13 11:35:46 jonnymind Exp $
+# $Id: Makefile,v 1.27 2003/04/13 19:04:55 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -195,8 +195,8 @@ PRG_SOURCES=\
         wait.prg     \
         win32ole.prg \
 
-ifneq ($(HB_ARCHITECTURE),dos)
-MT_LIBNAME=rtlmt
+ifeq ($(HB_MT),MT)
+   MT_LIBNAME=rtlmt
 endif
 
 LIBNAME=rtl

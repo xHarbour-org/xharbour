@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.7 2003/01/10 16:13:07 jonnymind Exp $
+# $Id: Makefile,v 1.8 2003/01/12 22:50:21 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -8,7 +8,7 @@ ifeq ($(HB_ARCHITECTURE),w32)
 	C_MAIN := mainstd.c mainwin.c
 else
 	ifeq ($(HB_ARCHITECTURE),os2)
-		C_MAIN := mainstd.c mainpm.c
+		C_MAIN := mainstd.c 
 	else
 		C_MAIN := main.c
 	endif

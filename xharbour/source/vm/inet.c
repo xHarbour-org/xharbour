@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.25 2003/04/20 22:46:11 jonnymind Exp $
+* $Id: inet.c,v 1.26 2003/04/21 01:40:30 jonnymind Exp $
 */
 
 /*
@@ -57,9 +57,36 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE ) || defined( HB_OS_BSD )
+#if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE ) || defined( HB_OS_BSD ) || defined(HB_OS_OS2)
    #include <sys/time.h>
 #endif
+
+#if defined(HB_OS_OS2)
+   #include <sys/socket.h>
+   #include <sys/select.h>
+   #include <sys/ioctl.h>
+   /* NET_SIZE_T exists because of shortsightedness on the POSIX committee.  BSD
+    * systems used "int *" as the parameter to accept(), getsockname(),
+    * getpeername() et al.  Consequently many unixes took an int * for that
+    * parameter.  The POSIX committee decided that "int" was just too generic and
+    * had to be replaced with size_t almost everywhere.  There's no problem with
+    * that when you're passing by value.  But when you're passing by reference
+    * this creates a gross source incompatibility with existing programs.  On
+    * 32-bit architectures it creates only a warning.  On 64-bit architectures it
+    * creates broken code -- because "int *" is a pointer to a 64-bit quantity and
+    * "size_t *" is frequently a pointer to a 32-bit quantity.
+    *
+    * Some Unixes adopted "size_t *" for the sake of POSIX compliance.  Others
+    * ignored it because it was such a broken interface.  Chaos ensued.  POSIX
+    * finally woke up and decided that it was wrong and created a new type
+    * socklen_t.  The only useful value for socklen_t is int, and that's how
+    * everyone who has a clue implements it.  It is almost always the case that
+    * NET_SIZE_T should be defined to be an int, unless the system being compiled
+    * for was created in the window of POSIX madness.
+    */
+   #define socklen_t int
+#endif
+
 
 #ifdef HB_OS_LINUX
    #include <signal.h>
@@ -186,6 +213,8 @@ struct hostent *hb_getHosts( char *name, HB_SOCKET_STRUCT *Socket )
       #if defined(HB_OS_WIN_32)
          HB_SOCKET_SET_ERROR2( Socket, WSAGetLastError() , "Generic error in GetHostByName()" );
          WSASetLastError( 0 );
+      #elif defined(HB_OS_OS2)
+         HB_SOCKET_SET_ERROR2( Socket, h_errno, "Generic error in GetHostByName()" );
       #else
          HB_SOCKET_SET_ERROR2( Socket, h_errno, (char *) hstrerror( h_errno ) );
       #endif
@@ -357,6 +386,8 @@ HB_FUNC( INETCLOSE )
    {
       #if defined( HB_OS_WIN_32 )
          shutdown( Socket->com, SD_BOTH );
+      #elif defined(HB_OS_OS2)
+         shutdown( Socket->com, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
       #else
          shutdown( Socket->com, SHUT_RDWR );
       #endif
@@ -396,6 +427,8 @@ HB_FUNC( INETDESTROY )
    {
       #if defined( HB_OS_WIN_32 )
           shutdown( Socket->com, SD_BOTH );
+      #elif defined(HB_OS_OS2)
+         shutdown( Socket->com, SO_RCV_SHUTDOWN + SO_SND_SHUTDOWN );
       #else
           shutdown( Socket->com, SHUT_RDWR );
       #endif

@@ -1,5 +1,5 @@
 #
-# $Id: lib.cf,v 1.1.1.1 2001/12/21 10:47:57 ronpinkas Exp $
+# $Id: lib.cf,v 1.2 2003/01/12 22:50:16 jonnymind Exp $
 #
 
 ifneq ($(HB_ARCHITECTURE),)
@@ -24,7 +24,11 @@ endif
 ALL_OBJS = $(ALL_C_OBJS) $(ALL_PRG_OBJS)
 
 #main configurable rule
-ifeq ($(MT_LIBNAME),)
+# 2003-04-19 - <maurilio.longo@libero.it>
+# This test fails if I don't want to compile mt code (at least on OS/2)
+#ifeq ($(MT_LIBNAME),)
+# This one is correct
+ifeq ($(HB_MT),)
 first:: dirbase descend
 else
 first:: dirbase dirbase_mt descend descend_mt

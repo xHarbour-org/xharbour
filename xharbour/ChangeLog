@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.978 2003/04/21 20:03:47 walito Exp $
+ * $Id: ChangeLog,v 1.979 2003/04/21 23:21:21 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-04-22 09:53 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * config/lib.cf
+    * changed first:: rule to test HB_MT instead of MT_LIBNAME to be able to
+      build a single threaded xHarbour on OS/2
+  * source/odbc/odbc.c
+    * don't build on OS/2 (no ODBC support available)
+  * source/rtl/Makefile
+    * test HB_MT instead of MT_LIBNAME
+  * source/vm/Makefile
+    * don't build mainpm.c on OS/2 not needed right now
+  * source/vm/inet.c
+    * changes to compile on OS/2 with EMX GCC compiler
+
+  NOTE: With these changes the single threaded xHarbour can be built on OS/2 using EMX GCC
+        If a compiled program wants to use xHarbour socket support it has to be linked
+        with -lsocket to add socket library to resulting .exe file
+
 
 2003-04-22 01:21 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/trpccli.prg
