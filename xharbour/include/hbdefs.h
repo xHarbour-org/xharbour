@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.22 2003/11/05 13:41:41 druzus Exp $
+ * $Id: hbdefs.h,v 1.23 2003/12/03 13:01:20 mauriliolongo Exp $
  */
 
 /*
@@ -148,6 +148,18 @@
    #define TRUE   (BOOL) !0
 
 #endif /* HB_DONT_DEFINE_BASIC_TYPES */
+
+#ifndef HB_LONG_LONG_OFF
+   #ifndef __GNUC__
+      #define LONGLONG_MIN         _I64_MIN
+      #define LONGLONG_MAX         _I64_MAX
+      #define ULONGLONG_MAX        _UI64_MAX
+   #else
+      #define LONGLONG_MIN         LLONG_MIN
+      #define LONGLONG_MAX         LLONG_MAX
+      #define ULONGLONG_MAX        ULLONG_MAX
+   #endif
+#endif
 
 #define HB_MAX( a, b )          ( ( ( a ) > ( b ) ) ? ( a ) : ( b ) )
 #define HB_MIN( a, b )          ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )

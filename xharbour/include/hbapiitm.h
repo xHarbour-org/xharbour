@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.26 2003/12/05 02:09:20 jonnymind Exp $
+ * $Id: hbapiitm.h,v 1.27 2003/12/05 02:15:51 jonnymind Exp $
  */
 
 /*
@@ -123,6 +123,11 @@ extern char     HB_EXPORT * hb_itemTypeStr    ( PHB_ITEM pItem );
 extern LONGLONG HB_EXPORT hb_itemGetNLL       ( PHB_ITEM pItem );
 extern PHB_ITEM HB_EXPORT hb_itemPutNLL       ( PHB_ITEM pItem, LONGLONG llNumber );
 extern PHB_ITEM HB_EXPORT hb_itemPutNLLLen    ( PHB_ITEM pItem, LONGLONG llNumber, int iWidth);
+extern PHB_ITEM HB_EXPORT hb_itemPutNInt      ( PHB_ITEM pItem, LONGLONG lNumber );
+extern PHB_ITEM HB_EXPORT hb_itemPutNIntLen   ( PHB_ITEM pItem, LONGLONG lNumber, int iWidth );
+#else
+extern PHB_ITEM HB_EXPORT hb_itemPutNInt      ( PHB_ITEM pItem, long lNumber );
+extern PHB_ITEM HB_EXPORT hb_itemPutNIntLen   ( PHB_ITEM pItem, long lNumber, int iWidth );
 #endif
 
 /* Non Clipper compliant internal API */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.110 2003/12/28 22:25:34 druzus Exp $
+ * $Id: hbapi.h,v 1.111 2003/12/29 19:25:52 ronpinkas Exp $
  */
 
 /*
@@ -87,6 +87,7 @@ HB_EXTERN_BEGIN
 #define HB_IT_ARRAY     ( ( USHORT ) 0x8000 )
 #define HB_IT_OBJECT    HB_IT_ARRAY
 #define HB_IT_NUMERIC   ( ( USHORT ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE | HB_IT_LONGLONG ) )
+#define HB_IT_NUMERINT  ( ( USHORT ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_LONGLONG ) )
 #define HB_IT_ANY       ( ( USHORT ) 0xFFFF )
 
 #define HB_IS_OF_TYPE( p, t ) ( ( ( p )->type & ~HB_IT_BYREF ) == t )
@@ -102,6 +103,7 @@ HB_EXTERN_BEGIN
 #define HB_IS_LONG( p )    HB_IS_OF_TYPE( p, HB_IT_LONG )
 #define HB_IS_NUMERIC( p ) ( ( p )->type & HB_IT_NUMERIC  || HB_IS_DATE(p) || ( HB_IS_STRING(p) && (p)->item.asString.length == 1 ) )
 #define HB_IS_NUMBER( p ) ( ( p )->type & HB_IT_NUMERIC )
+#define HB_IS_NUMBER_INT( p ) ( ( p )->type & HB_IT_NUMERINT )
 #define HB_IS_OBJECT( p )  ( HB_IS_OF_TYPE( p, HB_IT_OBJECT ) && ( p )->item.asArray.value->uiClass != 0 )
 #define HB_IS_STRING( p )  ( ( ( p )->type & ~( HB_IT_BYREF | HB_IT_MEMOFLAG ) ) == HB_IT_STRING )
 #define HB_IS_MEMO( p )    HB_IS_OF_TYPE( p, HB_IT_MEMO )
