@@ -6,12 +6,12 @@ GLOBAL Form1
 // ! AUTO_GENERATED !
 CLASS TForm1 FROM TForm
 
-   DATA CAPTION INIT "Form1"
+   DATA CAPTION INIT "MyForm1"
    DATA HEIGHT INIT        400
    DATA LEFT INIT        200
    DATA STYLE INIT   13565952
    DATA TOP INIT        125
-   DATA WIDTH INIT        300
+   DATA WIDTH INIT        500
 
    CONTROL Button1 FROM TBUTTON
       :CAPTION := "MyButton"
@@ -22,12 +22,13 @@ CLASS TForm1 FROM TForm
       :TOP :=         96
       :WIDTH :=         80
 
-      :SetMethod( "OnClick", { || HB_QSelf():Parent:Button1Click( HB_QSelf() ) } )
+      :OnClick := { |Button1| Button1:Parent:Button1Click( HB_QSelf() ) }
    END CONTROL
 
    // Generated only for On... Events that were specied in the Designer.
-   METHOD OnClick()
-   METHOD OnLButtonDblClk
+   DATA OnClick INIT {|Self| TraceLog(), Self:Click() }
+
+   METHOD Click()
 
    // Methods...
    METHOD Button1Click( Sender )
@@ -35,7 +36,7 @@ CLASS TForm1 FROM TForm
 
 END CLASS 
 
-METHOD OnClick() CLASS TForm1
+METHOD Click() CLASS TForm1
 
     /*
        Code specified by developer in IDE for overridden event.
@@ -44,17 +45,6 @@ METHOD OnClick() CLASS TForm1
     */
     MessageBox( 0, ::Caption + " was clicked.", "Project1", 0 )
 
-Return Self
-
-METHOD OnLButtonDblClk CLASS TForm1
-
-
-   ::Button1:Caption := "New Caption"
-
-   //::Button1:SHow()
-
-   MessageBox( 0, ::Name + " was double clicked.", "Project1", 0 )
-   
 Return Self
 
 // Controls:

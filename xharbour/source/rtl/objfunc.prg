@@ -1,5 +1,5 @@
 /*
- * $Id: objfunc.prg,v 1.10 2002/11/29 20:12:28 walito Exp $
+ * $Id: objfunc.prg,v 1.11 2003/01/27 04:15:58 walito Exp $
  */
 
 /*
@@ -184,12 +184,59 @@ FUNCTION __ObjGetValueDiff( oObject, oBase, nScope )
    aReturn := {}
 
    FOR EACH aVar IN aObjectVars
-      IF HB_EnumIndex() > Len( aBaseVars ) .OR. ( ! ( aVar[2] == aBaseVars[ HB_EnumIndex() ][ 2 ] ) )
+      IF HB_EnumIndex() > Len( aBaseVars ) .OR. ! ( aVar[2] == aBaseVars[ HB_EnumIndex() ][ 2 ] )
          AAdd( aReturn, aVar )
       ENDIF
    NEXT
 
 RETURN aReturn
+
+FUNCTION __ObjGetDerivedDiff( oObject, oBase, nScope )
+
+   LOCAL aBaseVars, aObjectVars
+   LOCAL aReturn
+   LOCAL aVar
+
+   IF ValType( oObject ) != 'O' .OR. ( oBase != NIL .AND. ! oObject:IsDerivedFrom( oBase ) )
+      __errRT_BASE( EG_ARG, 3101, NIL, ProcName( 0 ) )
+   ENDIF
+
+   IF oBase == NIL
+      oBase := __ClsInst( oObject:ClassH )
+   ENDIF
+
+   IF nScope == NIL
+      nScope := HB_OO_CLSTP_EXPORTED
+   ENDIF
+
+   aBaseVars   := aSort( __objGetValueList( oBase  , NIL, nScope ), , , {|x, y| x[1] < y[1] } )
+   aObjectVars := aSort( __objGetValueList( oObject, NIL, nScope ), , , {|x, y| x[1] < y[1] } )
+
+   aReturn := {}
+
+   FOR EACH aVar IN aBaseVars
+      IF Len( aObjectVars ) >= HB_EnumIndex()
+         IF aVar[1] == aObjectVars[ HB_EnumIndex() ][ 1 ]
+            aObjectVars[ HB_EnumIndex()] := NIL
+         ELSE
+            WHILE Len( aObjectVars ) >= HB_EnumIndex() .AND. ! ( aVar[1] == aObjectVars[ HB_EnumIndex() ][ 1 ] )
+               AAdd( aReturn, aObjectVars[ HB_EnumIndex() ] )
+               aDel( aObjectVars, HB_EnumIndex(), .T. )
+            ENDDO
+         ENDIF
+      ELSE
+         AAdd( aReturn, aVar )
+      ENDIF
+   NEXT
+
+   FOR EACH aVar IN aObjectVars
+       IF aVar != NIL
+          AAdd( aReturn, aVar )
+       ENDIF
+   NEXT
+
+RETURN aReturn
+
 
 FUNCTION __ObjSetValueList( oObject, aData )
 

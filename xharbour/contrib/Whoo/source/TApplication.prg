@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.48 2002/11/14 07:59:26 what32 Exp $
+ * $Id: TApplication.prg,v 1.49 2003/01/09 08:21:01 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -52,7 +52,7 @@ CLASS Application FROM TComponent
    DATA Instance
    DATA InstMsg
 
-   
+
    PROPERTY Handle READ FHandle
    DATA FTerminate INIT .F.
 
@@ -65,7 +65,7 @@ CLASS Application FROM TComponent
 
    PROPERTY MainForm READ FMainForm
    DATA Showing INIT .F.
-   
+
    METHOD Initialize() CONSTRUCTOR
    METHOD Run()
    METHOD CreateForm()
@@ -115,7 +115,12 @@ Return 0
 *------------------------------------------------------------------------------*
 METHOD CreateForm( oForm, oTarget ) CLASS Application
 
+   STATIC oBase
    LOCAL aVars, aVar
+
+   IF oBase == NIL
+      oBase := TForm()
+   ENDIF
 
    oForm:Create( Self )
 
@@ -124,17 +129,20 @@ METHOD CreateForm( oForm, oTarget ) CLASS Application
    //__ObjSetValueList( self, { { oForm:Name, oForm } } )
 
    //TraceLog( :Caption, :Top, :Left, :Height, :Width )
-/*
-   aVars := __objGetValueList( oForm, NIL, HB_OO_CLSTP_EXPORTED )
-   
+
+
+   //aVars := __objGetValueList( oForm, NIL, HB_OO_CLSTP_EXPORTED )
+   aVars := __ObjGetDerivedDiff( oForm, oBase, HB_OO_CLSTP_EXPORTED )
+
    FOR EACH aVar IN aVars
       IF ValType( aVar[2] ) == 'O'
          aVar[2]:Create( oForm )
+         aVar[2]:SetParent( oForm )
       ENDIF
    NEXT
-*/
+
    ::Showing := .T.
-   
+
    IF ::FMainForm == NIL
       ::FMainForm := oForm
       ::FMainForm:HandleNeeded()

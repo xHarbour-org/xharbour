@@ -29,6 +29,12 @@
                         END WITH;;
                         #undef __CONTROL__
 
+#command :Caption := <x> => :FCaption := <x>
+#command :Top     := <x> => :FTop     := <x>
+#command :Left    := <x> => :FLeft    := <x>
+#command :Height  := <x> => :FHeight  := <x>
+#command :Width   := <x> => :FWidth   := <x>
+
 #command OBJECT <!object!> IS <!class!> => WITH OBJECT ( :<object> := <class>() )
 
 #command DATA Caption INIT <x> => DATA FCaption PROTECTED INIT <x>
