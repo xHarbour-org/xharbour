@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.32 2003/04/04 19:04:33 walito Exp $
+ * $Id: tbrowse.prg,v 1.33 2003/04/04 19:40:13 walito Exp $
  */
 
 /*
@@ -2152,7 +2152,7 @@ METHOD ForceStabilize() CLASS TBrowse
                next
             endif
 
-            DispOut( Space( Int( Round( ( ::nVisWidth - ::nColsWidth ) / 2, 0 ) ) ), ColorSpec )
+            DispOut( Space( ::nVisWidth - ::nColsWidth ), ColorSpec )
 
             // doesn't need to be redrawn
             //
