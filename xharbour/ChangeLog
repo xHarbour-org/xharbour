@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.118 2002/03/17 03:50:38 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.119 2002/03/17 06:46:33 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2002-03-1720:25 UTC-0300 Luiz Rafael Culik<culikr@uol.com.br>
+  * source/rtl/listbox.org
+    source/rtl/radiobtn.prg
+    source/rtl/radiogpr.prg
+    source/rtl/checkbox.prg
+    source/rtl/tget.prg
+    source/rtl/pushbtn.prg
+    source/rtl/tbrowse.prg
+    source/rtl/getsys.prg
+    source/rtl/tgetsys.prg
+    * Added the missing Clip53 Methods and Functions
+    % minor fix to Clip53 classes
+  * include/hbgetcmt.ch
+    * Added the @ Get... Tbrowse command
+    
 2002-03-16 22:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbtrace.h
   * source/rtl/trace.c
