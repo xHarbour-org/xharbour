@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.4 2003/03/14 22:23:29 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.5 2003/05/14 08:44:24 jonnymind Exp $
  */
 
 /*
@@ -795,8 +795,8 @@ PHB_ITEM HB_EXPORT hb_errRT_New(
    hb_errPutOsCode( pError, uiOsCode );
    hb_errPutFlags( pError, uiFlags );
 
-   hb_errPutProcName( pError, hb_procinfo( 1, szName, NULL ) );
-   hb_procinfo( 1, NULL, &uLine );
+   hb_errPutProcName( pError, hb_procinfo( 0, szName, NULL ) );
+   hb_procinfo( 0, NULL, &uLine );
    hb_errPutProcLine( pError, uLine );
 
    return pError;
@@ -825,8 +825,8 @@ PHB_ITEM HB_EXPORT hb_errRT_New_Subst(
    hb_errPutOsCode( pError, uiOsCode );
    hb_errPutFlags( pError, uiFlags | EF_CANSUBSTITUTE );
 
-   hb_errPutProcName( pError, hb_procinfo( 1, szName, NULL ) );
-   hb_procinfo( 1, NULL, &uLine );
+   hb_errPutProcName( pError, hb_procinfo( 0, szName, NULL ) );
+   hb_procinfo( 0, NULL, &uLine );
    hb_errPutProcLine( pError, uLine );
 
    return( pError );
