@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.18 2002/10/13 18:42:16 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.19 2002/12/15 23:06:03 ronpinkas Exp $
  */
 
 /*
@@ -80,15 +80,6 @@ RETURN TOleAuto():GetActiveObject( cString )
 
 #pragma BEGINDUMP
 
-   #include "hbapi.h"
-   #include "hbstack.h"
-   #include "hbapierr.h"
-   #include "hbapiitm.h"
-   #include "hbvm.h"
-   #include "hbdate.h"
-   #include "hboo.ch"
-   #include "hbfast.h"
-
    #ifndef __STDC__
       #define __STDC__ 1
    #endif
@@ -101,9 +92,16 @@ RETURN TOleAuto():GetActiveObject( cString )
      #define __FLAT__ 1
    #endif
 
-   #ifdef __MINGW32__
-      #define NONAMELESSUNION
-   #endif
+   #define NONAMELESSUNION
+
+   #include "hbapi.h"
+   #include "hbstack.h"
+   #include "hbapierr.h"
+   #include "hbapiitm.h"
+   #include "hbvm.h"
+   #include "hbdate.h"
+   #include "hboo.ch"
+   #include "hbfast.h"
 
    #include <ctype.h>
 
