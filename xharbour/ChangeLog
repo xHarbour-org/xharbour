@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3047 2004/06/09 06:25:23 bdj Exp $
+ * $Id: ChangeLog,v 1.3048 2004/06/09 06:26:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-09 12:10 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rdd/dbcmd.c
+    * Fixed the export of numeric fields in __dbSql.
 
 2004-06-08 23:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.slx

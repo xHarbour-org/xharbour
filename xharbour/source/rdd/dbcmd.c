@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.119 2004/05/24 10:04:32 lf_sfnet Exp $
+ * $Id: dbcmd.c,v 1.120 2004/06/04 14:51:07 jacekp Exp $
  */
 
 /*
@@ -5512,9 +5512,10 @@ static BOOL hb_ExportBufSqlVar( PHB_FILEBUF pFileBuf, PHB_ITEM pValue, char *cDe
       case HB_IT_DOUBLE:
       {
          char szResult[ HB_MAX_DOUBLE_LENGTH ];
-         int iSize, iDec;
+         int iSize, iWidth, iDec;
 
-         hb_itemGetNLen( pValue, &iSize, &iDec );
+         hb_itemGetNLen( pValue, &iWidth, &iDec );
+         iSize = ( iDec > 0 ? iWidth + 1 + iDec : iWidth );
          if ( hb_itemStrBuf( szResult, pValue, iSize, iDec ) )
          {
             int iPos = 0;
