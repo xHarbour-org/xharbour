@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.8 2002/02/01 23:48:06 ronpinkas Exp $
+ * $Id: estack.c,v 1.9 2002/02/16 02:29:32 ronpinkas Exp $
  */
 
 /*
@@ -204,123 +204,10 @@ HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
 
 void hb_stackOldFrame( HB_STACK_STATE * pStack )
 {
-   #if 0
-   PHB_SCANNED_ARRAYS pForcedReleased = NULL, pLastReleased = NULL;
-   PHB_ITEM *pTop = hb_stack.pPos;
-   #endif
-
-   //printf( "\n%s:%s( %i )", hb_objGetClsName( *( hb_stack.pBase + 1 ) ), (*hb_stack.pBase)->item.asSymbol.value->szName, (*hb_stack.pBase)->item.asSymbol.paramcnt );
-
    while( hb_stack.pPos > hb_stack.pBase )
    {
-      //hb_stackPop();
-
-      if( --hb_stack.pPos < hb_stack.pItems )
-      {
-         hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
-      }
-
-      if( HB_IS_ARRAY( *hb_stack.pPos ) )
-      {
-         if( ( *hb_stack.pPos )->item.asArray.value->uiHolders == 0 || --( ( *hb_stack.pPos )->item.asArray.value->uiHolders ) == 0 )
-         {
-            hb_arrayRelease( *hb_stack.pPos );
-         }
-      }
-      else if( HB_IS_COMPLEX( *hb_stack.pPos ) )
-      {
-         hb_itemClear( *hb_stack.pPos );
-      }
-      else
-      {
-         ( *hb_stack.pPos )->type = HB_IT_NIL;
-      }
+      hb_stackPop();
    }
-
-   #if 0
-   /* Resetting for 2nd phase. */
-   hb_stack.pPos = pTop;
-
-   pTop = hb_stack.pBase + (*hb_stack.pBase)->item.asSymbol.paramcnt + 2;
-   while( hb_stack.pPos > pTop )
-   {
-      --hb_stack.pPos;
-
-      if( HB_IS_ARRAY( *hb_stack.pPos ) )
-      {
-         if( ( *hb_stack.pPos )->item.asArray.value->uiExtRef == 0 )
-         {
-            /* None released yet, release and create the top of the list. */
-            if( pLastReleased == NULL )
-            {
-               pForcedReleased = hb_xgrab( sizeof( HB_SCANNED_ARRAYS ) );
-               pLastReleased = pForcedReleased;
-               pLastReleased->pScannedBaseArray = ( *hb_stack.pPos )->item.asArray.value;
-               pLastReleased->pNext = NULL;
-               //printf( "\nReleasing: %p", *hb_stack.pPos );
-               hb_arrayRelease( *hb_stack.pPos );
-               //printf( "\n---Released: %p\n\n", *hb_stack.pPos );
-            }
-            else
-            {
-               /* Search the list incase we released this array already. */
-               pLastReleased = pForcedReleased;
-               do
-               {
-                  if( pLastReleased->pScannedBaseArray == ( *hb_stack.pPos )->item.asArray.value )
-                  {
-                     /* Released already! */
-                     break;
-                  }
-                  pLastReleased = pLastReleased->pNext;
-
-               } while( pLastReleased->pNext );
-
-               /* Not yet released, add to list and release. */
-               if( pLastReleased->pNext == NULL && pLastReleased->pScannedBaseArray != ( *hb_stack.pPos )->item.asArray.value )
-               {
-                  pLastReleased->pNext = hb_xgrab( sizeof( HB_SCANNED_ARRAYS ) );
-                  pLastReleased = pLastReleased->pNext;
-                  pLastReleased->pScannedBaseArray = ( *hb_stack.pPos )->item.asArray.value;
-                  //printf( "\n*Releasing: %p", *hb_stack.pPos );
-                  hb_arrayRelease( *hb_stack.pPos );
-               }
-               else
-               {
-                  ( *hb_stack.pPos )->type = HB_IT_NIL;
-               }
-            }
-         }
-         else
-         {
-            //printf( "External Refrences: %i", ( *hb_stack.pPos )->item.asArray.value->uiExtRef );
-            ( *hb_stack.pPos )->type = HB_IT_NIL;
-         }
-      }
-   }
-
-   /* Must decrease down to base. */
-   while( hb_stack.pPos > hb_stack.pBase )
-   {
-      --hb_stack.pPos;
-   }
-
-   if( pLastReleased )
-   {
-      //printf( "\nFreeing..." );
-      pLastReleased = pForcedReleased;
-      do
-      {
-         hb_xfree( pLastReleased );
-
-         pForcedReleased = pForcedReleased->pNext;
-         pLastReleased = pForcedReleased;
-
-      } while( pLastReleased );
-   }
-   //printf( "\nRestored %s( %i )\n\n", (*hb_stack.pBase)->item.asSymbol.value->szName, (*hb_stack.pBase)->item.asSymbol.paramcnt );
-
-   #endif
 
    hb_stack.pBase = hb_stack.pItems + pStack->lBaseItem;
    hb_stack.iStatics = pStack->iStatics;
