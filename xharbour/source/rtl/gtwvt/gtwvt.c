@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.136 2004/11/23 17:04:23 lf_sfnet Exp $
+ * $Id: gtwvt.c,v 1.137 2004/11/24 18:31:06 lf_sfnet Exp $
  */
 
 /*
@@ -4247,6 +4247,7 @@ static void HB_GT_FUNC( gtFnInit( PHB_GT_FUNCS gt_funcs ) )
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard       );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard       );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize   );
+    gt_funcs->ProcessMessages       = HB_GT_FUNC( gt_ProcessMessages    );
 
     /* Graphics API */
     gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );

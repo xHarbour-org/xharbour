@@ -1,5 +1,5 @@
  /*
- * $Id: gtstd.c,v 1.18 2004/09/08 00:17:15 druzus Exp $
+ * $Id: gtstd.c,v 1.19 2004/10/22 11:26:46 paultucker Exp $
  */
 
 /*
@@ -901,6 +901,11 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
    return s_clipsize;
 }
 
+void HB_GT_FUNC( gt_ProcessMessages( void ) )
+{
+   return;
+}
+
 /* *********************************************************************** */
 
 #ifdef HB_MULTI_GT
@@ -949,6 +954,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
     gt_funcs->info                  = HB_GT_FUNC( gt_info );
+    gt_funcs->ProcessMessages       = HB_GT_FUNC( gt_ProcessMessages );
 
     /* Graphics API */
     gt_funcs->gfxPrimitive          = HB_GT_FUNC( gt_gfxPrimitive );

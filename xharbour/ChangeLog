@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3622 2004/11/24 12:01:03 modalsist Exp $
+ * $Id: ChangeLog,v 1.3623 2004/11/24 18:30:43 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-11-24 19:49 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/gtcgi/gtcgi.c
+  * source/rtl/gtpca/gtpca.c
+  * source/rtl/gtstd/gtstd.c
+    + Added a dummy gt_ProcessMessages().
+  * source/rtl/gtwvt/gtwvt.c
+    + Added reference of gt_ProcessMessages() in gt_funcs.
 
 2004-11-24 19:30 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/rtl/gtcrs/gtcrs.c
