@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.19 2003/10/01 19:22:32 ronpinkas Exp $
+# $Id: hrbdll.vc,v 1.20 2003/10/09 20:45:54 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -128,6 +128,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\hbhextonum.obj \
   $(OBJ_DIR)\hboutdebug.obj \
   $(OBJ_DIR)\hbrandom.obj \
+  $(OBJ_DIR)\hbservice.obj \
   $(OBJ_DIR)\hbsrlraw.obj \
   $(OBJ_DIR)\hbsyslog.obj \
   $(OBJ_DIR)\hbxml.obj \
@@ -526,6 +527,9 @@ $(OBJ_DIR)\hbhextonum.obj : $(RTL_DIR)\hbhextonum.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\hbrandom.obj : $(RTL_DIR)\hbrandom.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\hbservice.obj : $(RTL_DIR)\hbservice.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\hbsrlraw.obj : $(RTL_DIR)\hbsrlraw.c

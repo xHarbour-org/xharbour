@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.72 2003/10/09 20:45:54 paultucker Exp $
+# $Id: makefile.vc,v 1.73 2003/10/10 13:33:48 paultucker Exp $
 #
 
 #
@@ -344,6 +344,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hbhextonum.obj \
    $(OBJ_DIR)$(MT)\hboutdebug.obj \
    $(OBJ_DIR)$(MT)\hbrandom.obj \
+   $(OBJ_DIR)$(MT)\hbservice.obj \
    $(OBJ_DIR)$(MT)\hbsrlraw.obj \
    $(OBJ_DIR)$(MT)\hbsyslog.obj \
    $(OBJ_DIR)$(MT)\hbxml.obj \

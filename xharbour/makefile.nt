@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.49 2003/10/10 13:33:48 paultucker Exp $
+# $Id: makefile.nt,v 1.50 2003/10/10 13:40:19 paultucker Exp $
 #
 
 #
@@ -380,6 +380,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hbhextonum.obj \
    $(OBJ_DIR)$(MT)\hboutdebug.obj \
    $(OBJ_DIR)$(MT)\hbrandom.obj \
+   $(OBJ_DIR)$(MT)\hbservice.obj \
    $(OBJ_DIR)$(MT)\hbsrlraw.obj \
    $(OBJ_DIR)$(MT)\hbsyslog.obj \
    $(OBJ_DIR)$(MT)\hbxml.obj \
@@ -1040,7 +1041,7 @@ CLEAN:
 
 $(HBPP_EXE) : \
    $(HBPP_DIR)\hbpp.c
-   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $** -o $(HBPP_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB)
+   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $** -o $(HBPP_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB) $(EXTRALIB)
 
 #
 # HBRUN.EXE rules
@@ -1052,7 +1053,7 @@ $(HBRUN_EXE) : \
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $**
    $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)$(MT)\ $(OBJ_DIR)$(MT)\hbrun.c \
                                         $(OBJ_DIR)$(MT)\external.c \
-                       -o $(HBRUN_EXE) /link $(L_DFLAGS) $(LIBLISTMT) $(LIBS2)
+                       -o $(HBRUN_EXE) /link $(L_DFLAGS) $(LIBLISTMT) $(LIBS2) $(EXTRALIB)
 
 #
 # HBTEST.EXE rules
@@ -1082,7 +1083,7 @@ $(HBTEST_EXE) : \
                                       $(OBJ_DIR)\rt_str.c \
                                       $(OBJ_DIR)\rt_stra.c \
                                       $(OBJ_DIR)\rt_trans.c \
-                       -o $(HBTEST_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) ole32.lib oleaut32.lib
+                       -o $(HBTEST_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) $(EXTRALIB) ole32.lib oleaut32.lib
 
 #
 # HBDOC.EXE rules
@@ -1130,7 +1131,7 @@ $(HBDOC_EXE) : \
                                       $(OBJ_DIR)\fclass1.c \
                                       $(OBJ_DIR)\ffile1.c \
                                       $(OBJ_DIR)\ft_funcs.c \
-                      -o $(HBDOC_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) $(PDFHBDOC) $(GENPDF1)
+                      -o $(HBDOC_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) $(EXTRALIB) $(PDFHBDOC) $(GENPDF1)
 
 #
 # HBMAKE.EXE rules
@@ -1161,7 +1162,7 @@ $(HBMAKE_EXE) : \
                                       $(OBJ_DIR)\pickfile.c \
                                       $(OBJ_DIR)\prb_stak.c \
                                       $(HBMAKE_DIR)\hbmlang.c \
-                      -o $(HBMAKE_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2)
+                      -o $(HBMAKE_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) $(EXTRALIB)
 
 #
 # HARBOUR.EXE rules
