@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.30 2004/02/20 22:33:55 ronpinkas Exp $
+ * $Id: ads1.c,v 1.31 2004/02/22 00:47:04 brianhays Exp $
  */
 
 /*
@@ -555,7 +555,12 @@ static ERRCODE adsGoTo( ADSAREAP pArea, ULONG ulRecNo )
       }
          /* don't do a GO 0 if already at EOF because we can't skip -1 off of it if you do */
       pArea->ulRecNo = pArea->ulRecCount + 1;
-      /* pArea->fBof = TRUE; */
+      /*
+       * Why pArea->fBof = TRUE; is commented out in dbgoto(0) ???
+       * I reenabled it but if it has some side effects for ADS please
+       * fix me and leave some notes about it, Druzus.
+       */
+      pArea->fBof = TRUE;
       pArea->fEof = TRUE;
    }
 
@@ -605,6 +610,13 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
       commonError( pArea, EG_NOORDER, 1201, NULL, EF_CANDEFAULT );
       return FAILURE;
    }
+
+   /*
+    * This flag should be cleaned inside seek
+    * They could be used by SKIP_FILTER and gives differ result
+    * when seek is called just after GOTOP or GOBOTTOM, Druzus.
+    */
+   pArea->fTop = pArea->fBottom = FALSE;
 
    if( bFindLast )
    {
@@ -699,6 +711,13 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
       return SUPER_SKIPFILTER( (AREAP)pArea, 1 );
    }
 
+   /*
+    * Clipper clears BOF after seek - I found only one strang situation
+    * when it doesn't but only sometimes I has been not able to detect
+    * the rule yet. Any how it's much better to clear it, Druzus.
+    */
+   pArea->fBof = FALSE;
+
    return SUCCESS;
 }
 
@@ -771,6 +790,12 @@ static ERRCODE adsSkip( ADSAREAP pArea, LONG lToSkip )
          lReturn = SUPER_SKIPFILTER( (AREAP)pArea, lUnit );
          lCount--;
       }
+
+      /* Update Bof and Eof flags int the way as Clipper do, Druzus. */
+      if( lUnit < 0 )
+         pArea->fEof = FALSE;
+      else /* if( lUnit > 0 ) */
+         pArea->fBof = FALSE;
 
       return (ERRCODE) lReturn;
    }

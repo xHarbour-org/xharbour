@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.104 2004/02/23 08:31:55 andijahja Exp $
+ * $Id: dbfcdx1.c,v 1.105 2004/02/23 10:01:40 andijahja Exp $
  */
 
 /*
@@ -4428,33 +4428,6 @@ static LPCDXTAG hb_cdxGetActiveTag( CDXAREAP pArea )
 }
 
 /*
- * go to Eof and update BOF and EOF flags.
- */
-static ERRCODE hb_cdxGoEof( CDXAREAP pArea )
-{
-   ERRCODE  retvalue;
-   LPCDXTAG pTag;
-
-   HB_TRACE(HB_TR_DEBUG, ("cdxGoEof(%p)", pArea));
-
-   pTag = hb_cdxGetActiveTag( pArea );
-   retvalue = SELF_GOTO( ( AREAP ) pArea, 0 );
-   if ( pArea->ulRecCount )
-   {
-      pArea->fBof = FALSE;
-      if ( pTag )
-         pTag->TagBOF = FALSE;
-   }
-   if ( pTag )
-   {
-      pTag->TagEOF = TRUE;
-      pTag->fRePos = FALSE;
-      pTag->CurKey->rec = 0;
-   }
-   return retvalue;
-}
-
-/*
  * refresh CurKey value and set proper path from RootPage to LeafPage
  * fUniq is used for forward skipunique
  */
@@ -4528,10 +4501,8 @@ static ERRCODE hb_cdxSkipUnique( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward )
                pTag->TagEOF = TRUE;
          }
       }
-      if ( pArea->fEof || pTag->TagEOF )
-         retval = hb_cdxGoEof( pArea );
-      else
-         retval = SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
+      retval = SELF_GOTO( ( AREAP ) pArea, ( pArea->fEof || pTag->TagEOF )
+                                           ? 0 : pTag->CurKey->rec );
    }
    else
    {
@@ -4564,6 +4535,13 @@ static ERRCODE hb_cdxSkipUnique( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward )
       }
    }
    hb_cdxIndexUnLockRead( pTag->pIndex );
+
+   /* Update Bof and Eof flags */
+   if( fForward )
+      pArea->fBof = FALSE;
+   else
+      pArea->fEof = FALSE;
+
    return retval;
 }
 
@@ -4787,7 +4765,7 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
       fFilters = 0;
 
    if ( ulKeyNo == 0 )
-      retval = hb_cdxGoEof( pArea );
+      retval = SELF_GOTO( ( AREAP ) pArea, 0 );
    else if ( fFilters )
    {
       USHORT uiTag = pArea->uiTag;
@@ -4839,10 +4817,7 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
             pTag->CurKey->rec = 0;
       }
       hb_cdxIndexUnLockRead( pTag->pIndex );
-      if ( pTag->CurKey->rec == 0 )
-         retval = hb_cdxGoEof( pArea );
-      else
-         retval = SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
+      retval = SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
    }
    else
    {
@@ -4883,6 +4858,10 @@ static ERRCODE hb_cdxGoBottom( CDXAREAP pArea )
       hb_cdxTagKeyRead( pTag, BTTM_RECORD );
    if ( pTag->CurKey->rec != 0 && ! hb_cdxTopScope( pTag ) )
       pTag->CurKey->rec = 0;
+
+   pArea->fTop = FALSE;
+   pArea->fBottom = TRUE;
+
    retval = SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
    if ( retval != FAILURE && !pArea->fEof )
       retval = SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
@@ -4915,6 +4894,10 @@ static ERRCODE hb_cdxGoTop( CDXAREAP pArea )
       hb_cdxTagKeyRead( pTag, TOP_RECORD );
    if ( pTag->CurKey->rec != 0 && ! hb_cdxBottomScope( pTag ) )
       pTag->CurKey->rec = 0;
+
+   pArea->fTop = TRUE;
+   pArea->fBottom = FALSE;
+
    retval = SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
    if ( retval != FAILURE && !pArea->fEof  )
       retval = SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
@@ -4945,6 +4928,8 @@ static ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pKeyItm, BOO
       ERRCODE retval = SUCCESS;
       BOOL  fEOF = FALSE;
       ULONG ulRec;
+
+      pArea->fTop = pArea->fBottom = FALSE;
 
       if ( !pTag->UsrAscend )
          fFindLast = !fFindLast;
@@ -4996,8 +4981,9 @@ static ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pKeyItm, BOO
            ( fEOF || ! hb_cdxTopScope( pTag ) ||
                      ! hb_cdxBottomScope( pTag ) ) )
       {
-         retval = hb_cdxGoEof( pArea );
+         retval = SELF_GOTO( ( AREAP ) pArea, 0 );
       }
+      pArea->fBof = FALSE;
       hb_cdxKeyFree( pKey );
       return retval;
    }
@@ -5054,10 +5040,8 @@ static ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip )
             }
          }
       }
-      if ( pArea->fEof || pTag->TagEOF )
-         retval = hb_cdxGoEof( pArea );
-      else
-         retval = SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
+      retval = SELF_GOTO( ( AREAP ) pArea, ( pArea->fEof || pTag->TagEOF )
+                                           ? 0 : pTag->CurKey->rec );
    }
    else /* if ( lToSkip < 0 ) */
    {
@@ -5173,7 +5157,7 @@ static ERRCODE hb_cdxGoCold( CDXAREAP pArea )
                if ( hb_cdxValCompare( pTag, pKey->val, pKey->len,
                         pTag->HotKey->val, pTag->HotKey->len, TRUE ) == 0 )
                {
-                  fAdd = !pTag->HotFor;
+                  fAdd = fAdd && !pTag->HotFor;
                   fDel = FALSE;
                }
                else if ( !pTag->HotFor )
@@ -5192,7 +5176,7 @@ static ERRCODE hb_cdxGoCold( CDXAREAP pArea )
             {
                if ( !fLck )
                {
-       	      hb_cdxIndexLockWrite( pTag->pIndex );
+                  hb_cdxIndexLockWrite( pTag->pIndex );
                   fLck = TRUE;
                }
                if ( fDel )

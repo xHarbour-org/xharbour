@@ -1,5 +1,5 @@
 /*
- * $Id: padr.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: padr.c,v 1.4 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -59,10 +59,15 @@
 HB_FUNC( PADR )
 {
    ULONG ulSize;
-   char buffer[ 128 ];
-   char * szText = hb_itemPadConv( hb_param( 1, HB_IT_ANY ), buffer, &ulSize );
+   BOOL bFreeReq;
+   char * szText;
 
-   if( szText && ISNUM( 2 ) )
+   if ( ISNUM( 2 ) )
+      szText = hb_itemPadConv( hb_param( 1, HB_IT_ANY ), &ulSize, &bFreeReq );
+   else
+      szText = NULL;
+
+   if( szText )
    {
       LONG lLen = hb_parnl( 2 );
 
@@ -91,6 +96,10 @@ HB_FUNC( PADR )
          }
 
          hb_retclen( szText, lLen );
+      }
+      if ( bFreeReq )
+      {
+         hb_xfree( szText );
       }
    }
    else

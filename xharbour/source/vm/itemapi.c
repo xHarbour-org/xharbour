@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.82 2004/02/23 10:01:44 andijahja Exp $
+ * $Id: itemapi.c,v 1.83 2004/02/23 19:55:28 andijahja Exp $
  */
 
 /*
@@ -87,12 +87,6 @@
 
 #include <stdio.h>
 
-#if defined( _MSC_VER )
-   #ifndef __XCC__
-      #define snprintf _snprintf
-   #endif
-#endif
-
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbstack.h"
@@ -116,9 +110,6 @@ extern PHB_CODEPAGE s_cdpage;
 #ifdef HB_THREAD_SUPPORT
    extern HB_CRITICAL_T hb_gcCollectionMutex;
 #endif
-
-/* DJGPP can sprintf a float that is almost 320 digits long */
-#define HB_MAX_DOUBLE_LENGTH 320
 
 PHB_ITEM HB_EXPORT hb_itemNew( PHB_ITEM pNull )
 {
@@ -1373,9 +1364,22 @@ int HB_EXPORT hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact
 */
 BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int iDec )
 {
-   int iBytes;
+   int iPos, iDot;
+   BOOL fNeg;
 
-   /* Be paranoid and use a large amount of padding */
+   if ( iDec < 0 )
+   {
+      iDec = 0;
+   }
+   if ( iDec > 0 )
+   {
+      iPos = iDot = iSize - iDec - 1;
+   }
+   else
+   {
+      iPos = iSize;
+      iDot = 0;
+   }
 
    if( HB_IS_DOUBLE( pNumber ) )
    {
@@ -1385,11 +1389,11 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
    does exist for your compiler and add this to the check below */
 
 #if defined(__RSXNT__) || defined(__EMX__)
-#  define HB_FINITE_DBL(d)    ( isfinite(d)==0 )
+#  define HB_FINITE_DBL(d)    ( isfinite(d)!=0 )
 #elif defined(__WATCOMC__) || defined(__BORLANDC__)
-#  define HB_FINITE_DBL(d)    ( _finite(d)==0 )
+#  define HB_FINITE_DBL(d)    ( _finite(d)!=0 )
 #elif defined( __GNUC__ ) || defined( __DJGPP__ ) || defined( __MINGW32__ ) || defined( __LCC__ )
-#  define HB_FINITE_DBL(d)    ( finite(d)==0 )
+#  define HB_FINITE_DBL(d)    ( finite(d)!=0 )
 #else
       /* added infinity check for Borland C [martin vogel] */
       /* Borland C 5.5 has _finite() function, if it's necessary
@@ -1408,7 +1412,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
          hb_mathSetHandler (fOldMathHandler);
          s_bInfinityInit = TRUE;
       }
-#  define HB_FINITE_DBL(d)    ( (d) == s_dInfinity || (d) == -s_dInfinity )
+#  define HB_FINITE_DBL(d)    ( (d) != s_dInfinity && (d) != -s_dInfinity )
 #endif
 
    /* I would like to know why finite() function is not use for MinGW instead
@@ -1420,164 +1424,222 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
          ( snprintf( szResult, iSize + 1, "%f", dNumber ) > 0 && strstr( szResult, "#IND" ) )
    */
 
-      if( pNumber->item.asDouble.length == 99 || HB_FINITE_DBL( dNumber ) )
+      if( pNumber->item.asDouble.length == 99 || !HB_FINITE_DBL( dNumber ) )
       {
          /* Numeric overflow */
-         iBytes = iSize + 1;
+         iPos = -1;
       }
       else
       {
-         int iDecR;
+         double dInt, dFract, dDig;
+         int iPrec, iFirst = -1;
 
-         if ( iDec < 0 )
+         //dNumber = hb_numRound( dNumber, iDec );
+
+#ifdef HB_NUM_PRECISION
+         iPrec = HB_NUM_PRECISION;
+#else
+         iPrec = 16;
+#endif
+
+         if ( dNumber < 0 )
          {
-            iDec = 0;
-         }
-
-         /*
-          * always round! decimal item pointer cannot be used
-          * in numerical expressions
-          * // if( iDec < pNumber->item.asDouble.decimal ) 
-          */
-         dNumber = hb_numRound( dNumber, iDec );
-
-         if( dNumber != 0.0 )
-         {
-            double dAbs = fabs( dNumber );
-            iDecR = ( dAbs < 1 ? 16 : 15 ) - ( int ) log10( dAbs );
+            fNeg = TRUE;
+            dFract = modf( -dNumber, &dInt );
          }
          else
          {
-            dNumber = 0.0; /* -0.0 hack */
-            iDecR = iDec;
+            fNeg = FALSE;
+            dFract = modf( dNumber, &dInt );
          }
 
-         if( iDecR >= 0 )
+         while ( iPos-- > 0 )
          {
-            if( iDec == 0 )
+            dDig = modf( dInt / 10.0 + 0.01, &dInt ) * 10.0;
+            szResult[ iPos ] = ( char ) ( dDig + 0.01 ) + '0';
+            if ( szResult[ iPos ] != '0' )
+               iFirst = iPos;
+            if ( dInt < 1 )
+               break;
+         }
+
+         if ( fNeg && iPos-- > 0 )
+         {
+            szResult[ iPos ] = '-';
+         }
+         if ( iPos > 0 )
+         {
+            memset( szResult, ' ', iPos );
+         }
+
+         if ( iDec > 0 && iPos >= 0 )
+         {
+            for ( iPos = iDot + 1; iPos < iSize; iPos++ )
             {
-               iBytes = snprintf( szResult, iSize + 1, "%*.0f", iSize, dNumber );
-            }
-            else
-            {
-               if( iDec <= iDecR )
+               dFract = modf( dFract * 10, &dDig );
+               szResult[ iPos ] = ( char ) ( dDig + 0.01 ) + '0';
+               if ( iFirst < 0 )
                {
-                  iBytes = snprintf( szResult, iSize + 1, "%*.*f", iSize, iDec, dNumber );
+                  if ( szResult[ iPos ] != '0' )
+                  {
+                     iFirst = iPos-1;
+                  }
                }
-               else if ( iDecR == 0 )
+               else if ( iPos - iFirst >= iPrec )
                {
-                  iBytes = snprintf( szResult, iSize + 1, "%*.0f.%0*u", iSize-iDec-1, dNumber, iDec, 0 );
-               }
-               else
-               {
-                  iBytes = snprintf( szResult, iSize + 1, "%*.*f%0*u", iSize-iDec+iDecR, iDecR, dNumber, iDec-iDecR, 0 );
+                  break;
                }
             }
          }
-         else
+
+         /* now try to round the results and set 0 in places over defined
+            precision, the same is done by Clipper */
+         if ( iPos >= 0 )
          {
-            if( iDec == 0 )
+            int iZer, iLast;
+
+            iZer = iSize - iFirst - iPrec - 1;
+            dFract = modf( dFract * 10, &dDig );
+            iLast = ( int ) ( dDig + 0.01 );
+
+            /* hack for x.xxxx4999999999, f.e. 8.995 ~FL 8.994999999999999218.. */
+            if ( iLast == 4 && iZer < 0 )
             {
-               iBytes = snprintf( szResult, iSize + 1, "%*.0f%0*u", iSize + iDecR , dNumber / pow( 10.0, ( double ) ( -iDecR ) ), -iDecR, 0 );
+               for ( iPos = -iZer; iPos > 0; --iPos )
+               {
+                  dFract = modf( dFract * 10, &dDig );
+                  if ( dDig + 0.01 < 9 && ( iPos != 1 || dDig < 2 ) )
+                     break;
+               }
+               if ( iPos == 0 )
+                  iLast = 5;
             }
-            else
+            iLast = iLast >= 5 ? 1 : 0;
+
+            iPos = iSize;
+            while ( iPos-- > 0 )
             {
-               iBytes = snprintf( szResult, iSize + 1, "%*.0f%0*u.%0*u", (iSize + iDecR - iDec - 1) > 0 ? iSize + iDecR - iDec - 1 : iSize - iDec - 1  , dNumber / pow( 10.0, ( double ) ( -iDecR ) ), -iDecR, 0, iDec, 0 );
+               if ( iDec == 0 || iPos != iDot )
+               {
+                  if ( iZer > 0 )
+                  {
+                     if ( iPos < iDot )
+                     {
+                        iLast = szResult[ iPos ] >= '5' ? 1 : 0;
+                     }
+                     szResult[ iPos ] = '0';
+                     --iZer;
+                  }
+                  else if ( iLast > 0 )
+                  {
+                     if ( szResult[ iPos ] == '9' )
+                     {
+                        szResult[ iPos ] = '0';
+                     }
+                     else
+                     {
+                        if ( szResult[ iPos ] < '0' ) /* '-' or ' ' */
+                        {
+                           szResult[ iPos ] = '1';
+                           if ( fNeg && iPos-- > 0 )
+                           {
+                              szResult[ iPos ] = '-';
+                           }
+                        }
+                        else
+                        {
+                           szResult[ iPos ]++;
+                        }
+                        break;
+                     }
+                  }
+                  else
+                  {
+                     break;
+                  }
+               }
             }
          }
       }
    }
    else
    {
-      switch( pNumber->type & ~HB_IT_BYREF )
-      {
-         case HB_IT_INTEGER:
-            if ( iDec > 0 )
-               iBytes = snprintf( szResult, iSize + 1, "%*i.%0*u", iSize - iDec - 1, pNumber->item.asInteger.value, iDec, 0 );
-            else
-               iBytes = snprintf( szResult, iSize + 1, "%*i", iSize, pNumber->item.asInteger.value );
-            break;
-
-         case HB_IT_LONG:
-            if ( iDec > 0 )
-               iBytes = snprintf( szResult, iSize + 1, "%*li.%0*u", iSize - iDec - 1, pNumber->item.asLong.value, iDec, 0 );
-            else
-               iBytes = snprintf( szResult, iSize + 1, "%*li", iSize, pNumber->item.asLong.value );
-            break;
-
 #ifndef HB_LONG_LONG_OFF
-         case HB_IT_LONGLONG:
-#if defined( __MINGW32__ ) || defined( _MSC_VER )
+      if( HB_IS_LONGLONG( pNumber ) )
+      {
+         LONGLONG llNumber = pNumber->item.asLongLong.value;
+         fNeg = ( llNumber < 0 );
+         while ( iPos-- > 0 )
          {
-            LONGLONG llVal = pNumber->item.asLongLong.value;
-            BOOL fNeg = ( llVal < 0 );
-            char szBuf[21];
-            int i = 20;
-
-            szBuf[ i ] = '\0';
-            do
-            {
-               szBuf[ --i ] = '0' + ( char ) ( fNeg ? -( llVal % 10 ) : ( llVal % 10 ) );
-               llVal /= 10;
-            }
-            while ( llVal );
-
-            if ( fNeg )
-               szBuf[ --i ] = '-';
-
-            if ( iDec > 0 )
-               iBytes = snprintf( szResult, iSize + 1, "%*s.%0*u", iSize - iDec - 1, &szBuf[ i ], iDec, 0 );
-            else
-               iBytes = snprintf( szResult, iSize + 1, "%*s", iSize, &szBuf[ i ] );
+            szResult[ iPos ] = '0' + ( char ) ( fNeg ? -( llNumber % 10 ) : ( llNumber % 10 ) );
+            llNumber /= 10;
+            if ( llNumber == 0 )
+               break;
          }
-#elif defined( __LCC__ ) || defined( _MSC_VER )
-            if ( iDec > 0 )
-               iBytes = snprintf( szResult, iSize + 1, "%*lld.%0*u", iSize - iDec - 1, pNumber->item.asLongLong.value, iDec, 0 );
-            else
-               iBytes = snprintf( szResult, iSize + 1, "%*lld", iSize, pNumber->item.asLongLong.value );
-#else
-            if ( iDec > 0 )
-               iBytes = snprintf( szResult, iSize + 1, "%*Ld.%0*u", iSize - iDec - 1, pNumber->item.asLongLong.value, iDec, 0 );
-            else
-               iBytes = snprintf( szResult, iSize + 1, "%*Ld", iSize, pNumber->item.asLongLong.value );
+      }
+      else
 #endif
-            break;
-#endif
+      {
+         LONG lNumber;
 
-         case HB_IT_DATE:
-            if ( iDec > 0 )
-               iBytes = snprintf( szResult, iSize + 1, "%*li.%0*u", iSize - iDec - 1, pNumber->item.asDate.value, iDec, 0 );
-            else
-               iBytes = snprintf( szResult, iSize + 1, "%*li", iSize, pNumber->item.asDate.value );
-            break;
+         switch( pNumber->type & ~HB_IT_BYREF )
+         {
+            case HB_IT_INTEGER:
+               lNumber = pNumber->item.asInteger.value;
+               break;
 
-         case HB_IT_STRING:
-            if ( iDec > 0 )
-               iBytes = snprintf( szResult, iSize + 1, "%*i.%0*u", iSize - iDec - 1, pNumber->item.asString.value[0], iDec, 0 );
-            else
-               iBytes = snprintf( szResult, iSize + 1, "%*i", iSize, pNumber->item.asString.value[0] );
-            break;
+            case HB_IT_LONG:
+               lNumber = pNumber->item.asLong.value;
+               break;
 
-         default:
-            memset( szResult, '*', iSize );
-            szResult[ iSize ] = '\0';  /* empty string */
-            iBytes = iSize;
-            break;
+            case HB_IT_DATE:
+               lNumber = pNumber->item.asDate.value;
+               break;
+
+            case HB_IT_STRING:
+               lNumber = pNumber->item.asString.value[0];
+               break;
+
+            default:
+               lNumber = 0;
+               iPos = -1;
+               break;
+         }
+
+         fNeg = ( lNumber < 0 );
+         while ( iPos-- > 0 )
+         {
+            szResult[ iPos ] = '0' + ( char ) ( fNeg ? -( lNumber % 10 ) : ( lNumber % 10 ) );
+            lNumber /= 10;
+            if ( lNumber == 0 )
+               break;
+         }
+      }
+      if ( fNeg && iPos-- > 0 )
+      {
+         szResult[ iPos ] = '-';
+      }
+      if ( iPos > 0 )
+      {
+         memset( szResult, ' ', iPos );
+      }
+      if ( iDec > 0 && iPos >= 0 )
+      {
+         memset( &szResult[iSize - iDec], '0', iDec );
       }
    }
 
+   szResult[ iSize ] = '\0';
    /* Set to asterisks in case of overflow */
-   if( iBytes > iSize
-        #if defined( _MSC_VER ) && ! defined( __XCC__ )
-           || iBytes < 0
-        #endif
-     )
+   if( iPos < 0 )
    {
       memset( szResult, '*', iSize );
-      szResult[ iSize ] = '\0';
       return FALSE;
    }
-
+   else if ( iDot > 0 )
+   {
+      szResult[ iDot ] = '.';
+   }
    return TRUE;
 }
 
@@ -1613,15 +1675,8 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
       if( hb_set.HB_SET_FIXED )
       {
          /* If fixed mode is enabled, always use the default. */
-         iDec = pDec ? hb_set.HB_SET_DECIMALS : 0;
+         iDec = hb_set.HB_SET_DECIMALS;
       }
-         /* Otherwise, the maximum is 9. */
-/*
-      else if( iDec > 9 )
-      {
-         iDec = 9;
-      }
-*/
 
       if( pWidth )
       {
@@ -1684,9 +1739,7 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemString(%p, %p, %p)", pItem, ulLen, bFreeReq));
 
-
-
-   switch( pItem->type )
+   switch( pItem->type & ~HB_IT_BYREF )
    {
       case HB_IT_STRING:
       case HB_IT_MEMO:
@@ -1708,12 +1761,12 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
          }
          break;
 
-      #ifndef HB_LONG_LONG_OFF
-      case HB_IT_LONGLONG:
-      #endif
       case HB_IT_DOUBLE:
       case HB_IT_INTEGER:
       case HB_IT_LONG:
+#ifndef HB_LONG_LONG_OFF
+      case HB_IT_LONGLONG:
+#endif
          buffer = hb_itemStr( pItem, NULL, NULL );
          if( buffer )
          {
@@ -1735,8 +1788,8 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
          break;
 
       case HB_IT_LOGICAL:
-         buffer = ( hb_itemGetL( pItem ) ? ".T." : ".F." );
-         * ulLen = 3;
+         buffer = ( hb_itemGetL( pItem ) ? "T" : "F" );
+         * ulLen = 1;
          * bFreeReq = FALSE;
          break;
 
@@ -1753,84 +1806,52 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
    being padded. If date, convert to string using hb_dateFormat(). If numeric,
    convert to unpadded string. Return pointer to string and set string length */
 
-char HB_EXPORT * hb_itemPadConv( PHB_ITEM pItem, char * buffer, ULONG * pulSize )
+char HB_EXPORT * hb_itemPadConv( PHB_ITEM pItem, ULONG * pulSize, BOOL * bFreeReq )
 {
-   char * szText;
-
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPadConv(%p, %p, %p)", pItem, buffer, pulSize));
 
+   /* to be clipper compatible don't convert HB_IT_BYREF items */
    if( pItem )
    {
-      if( HB_IS_STRING( pItem ) )
+      switch( pItem->type )
       {
-         // This call redundantly check for ( pItem != NULL )
-         // and HB_IS_STRING( pItem )
-         // szText = hb_itemGetCPtr( pItem );
-         // *pulSize = hb_itemGetCLen( pItem );
-         // Changed to use members directly.
+         case HB_IT_STRING:
+         case HB_IT_MEMO:
+         case HB_IT_DATE:
+            return hb_itemString( pItem, pulSize, bFreeReq );
 
-         szText = pItem->item.asString.value ;
-         *pulSize = pItem->item.asString.length ;
-      }
-      else if( HB_IS_DATE( pItem ) )
-      {
-         char szDate[ 9 ];
-
-         szText = hb_dateFormat( hb_pardsbuff( szDate, 1 ), buffer, hb_set.HB_SET_DATEFORMAT );
-         *pulSize = strlen( szText );
-      }
-      else if( HB_IS_INTEGER( pItem ) )
-      {
-         // Redundant check, see note above.
-         // sprintf( buffer, "%d", hb_itemGetNI( pItem ) );
-
-         sprintf( buffer, "%d", pItem->item.asInteger.value );
-         szText = buffer;
-         *pulSize = strlen( szText );
-      }
-      else if( HB_IS_LONG( pItem ) )
-      {
-         // Redundant check, see note above.
-         // sprintf( buffer, "%ld", hb_itemGetNL( pItem ) );
-
-         sprintf( buffer, "%ld", pItem->item.asLong.value );
-         szText = buffer;
-         *pulSize = strlen( szText );
-      }
-      else if( HB_IS_DOUBLE( pItem ) )
-      {
-         // int iDecimal;
-         // Redundant check, see note above.
-         // hb_itemGetNLen( pItem, NULL, &iDecimal );
-         // sprintf( buffer, "%.*f", iDecimal, hb_itemGetND( pItem ) );
-
-         sprintf( buffer, "%.*f", pItem->item.asDouble.decimal, pItem->item.asDouble.value );
-
-         szText = buffer;
-         *pulSize = strlen( szText );
-      }
+         case HB_IT_DOUBLE:
+         case HB_IT_INTEGER:
+         case HB_IT_LONG:
 #ifndef HB_LONG_LONG_OFF
-      else if( HB_IS_LONGLONG( pItem ) )
-      {
-         // Redundant check, see note above.
-         // sprintf( buffer, "%Ld", hb_itemGetNLL( pItem ) );
-
-         sprintf( buffer, "%Ld", pItem->item.asLongLong.value );
-         szText = buffer;
-         *pulSize = strlen( szText );
-      }
+         case HB_IT_LONGLONG:
 #endif
-      else
-      {
-         szText = NULL;
+         {
+            int i;
+            char * buffer = hb_itemString( pItem, pulSize, bFreeReq );
+
+            /* remove leading spaces if any, a little bit redundant but
+             * I don't want to complicate the API interface more. Druzus
+             */
+            for ( i = 0; buffer[i] == ' '; i++ );
+
+            if ( i > 0 )
+            {
+               int j = 0;
+               * pulSize -= i;
+               do
+               {
+                  buffer[j++] = buffer[i];
+               }
+               while ( buffer[i++] );
+            }
+            return buffer;
+         }
+         default:
+            break;
       }
    }
-   else
-   {
-      szText = NULL;
-   }
-
-   return szText;
+   return NULL;
 }
 
 PHB_ITEM HB_EXPORT hb_itemValToStr( PHB_ITEM pItem )

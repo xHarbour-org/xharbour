@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.41 2003/12/17 23:55:14 ronpinkas Exp $
+ * $Id: console.c,v 1.42 2004/02/18 10:50:45 andijahja Exp $
  */
 /*
  * Harbour Project source code:
@@ -230,32 +230,6 @@ HB_FUNC( HB_OSNEWLINE )
 
 typedef void hb_out_func_typedef( char *, ULONG );
 
-/* Format items for output, then call specified output function */
-static void hb_conOut( USHORT uiParam, hb_out_func_typedef * pOutFunc )
-{
-   char * pszString;
-   ULONG ulLen;
-   BOOL bFreeReq;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_conOut(%hu, %p)", uiParam, pOutFunc));
-
-   pszString = hb_itemString( hb_param( uiParam, HB_IT_ANY ), &ulLen, &bFreeReq );
-
-   if ( ulLen )
-   {
-      pOutFunc( pszString, ulLen );
-   }
-
-   if( bFreeReq )
-   {
-      /* never call xfree with stack unlocked */
-      HB_THREAD_STUB
-      HB_STACK_LOCK
-      hb_xfree( pszString );
-      HB_STACK_UNLOCK
-   }
-}
-
 /* Output an item to STDOUT */
 void hb_conOutStd( char * pStr, ULONG ulLen )
 {
@@ -359,6 +333,42 @@ static void hb_conOutDev( char * pStr, ULONG ulLen )
    {
       /* Otherwise, display to console */
       hb_gtWrite( ( BYTE * ) pStr, ulLen );
+   }
+}
+
+/* Format items for output, then call specified output function */
+static void hb_conOut( USHORT uiParam, hb_out_func_typedef * pOutFunc )
+{
+   char * pszString;
+   ULONG ulLen;
+   BOOL bFreeReq;
+   PHB_ITEM pItem = hb_param( uiParam, HB_IT_ANY );
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_conOut(%hu, %p)", uiParam, pOutFunc));
+
+   if( pOutFunc != hb_conOutDev && HB_IS_LOGICAL( pItem ) )
+   {
+      ulLen = 3;
+      bFreeReq = FALSE;
+      pszString = hb_itemGetL( pItem ) ? ".T." : ".F.";
+   }
+   else
+   {
+      pszString = hb_itemString( pItem, &ulLen, &bFreeReq );
+   }
+
+   if ( ulLen )
+   {
+      pOutFunc( pszString, ulLen );
+   }
+
+   if( bFreeReq )
+   {
+      /* never call xfree with stack unlocked */
+      HB_THREAD_STUB
+      HB_STACK_LOCK
+      hb_xfree( pszString );
+      HB_STACK_UNLOCK
    }
 }
 

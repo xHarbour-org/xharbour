@@ -13,8 +13,8 @@
 #command ?? =>
 #command ?? <xx,...> => outstd(<xx>)
 
-#command RDDTEST <x> => rdd_test( <x> )
-#command RDDTEST <f>, <r>, <x> => rdd_test( #<f>, <{f}>, <r>, <x> )
+//#command RDDTEST <x> => rdd_test( <x> )
+//#command RDDTEST <f>, <r>, <x> => rdd_test( #<f>, <{f}>, <r>, <x> )
 
 #ifdef _TEST_CREATE_
   #command RDDTESTC <*x*> => <x>; rddtst_wr( #<x> )
@@ -23,7 +23,7 @@
   #command RDDTEST  <x> => RDDTESTF <x>
 #else
   #command RDDTESTC <s>, <*x*> => <x>; rddtst_tst( #<x>, <s> )
-  #command RDDTESTF <r>, <s>, <*x*> => rddtst_tst( #<x>, <s>, <x>, <r> )
+  #command RDDTESTF <r>, <s>, <x> => rddtst_tst( #<x>, <s>, <x>, <r> )
   //#command RDDTEST  <s>, <*x*> => RDDTESTC <x>
 #endif
 #define _DBNAME "_tst"
@@ -37,8 +37,25 @@ field FSTR, FNUM
 static nTested := 0
 static nErrors := 0
 
+/* list of functions which may return unexpected value in Clipper
+    instead of documented NIL. If you will find others please add them */
+static aBadRetFunc:={ "DBSKIP", "DBGOTO", "DBDELETE", "DBRECALL", ;
+                      "DBUNLOCK", "DBCOMMIT" }
+
 #include "ord.ch"
 #include "dbinfo.ch"
+
+#ifdef __HARBOUR__
+#ifdef _TEST_ADS_
+#include "ads.ch"
+REQUEST _ADS
+init proc adstest_init()
+rddRegister( "ADS", 1 )
+AdsSetServerType( ADS_LOCAL_SERVER )
+//__rddSetDefault( "ADS" )
+return
+#endif
+#endif
 
 REQUEST DBSEEK, DBGOTO, DBGOTOP, DBGOBOTTOM, ORDSETFOCUS, ORDSCOPE
 
@@ -75,7 +92,11 @@ rddSetDefault(rdd)
     ? "Cannot create file: ", cOutFile
     quit
   endif
-  cOut:=;
+  cOut:=""
+  #ifdef _TEST_ADS_
+    cOut+='#define _TEST_ADS_'+EOL
+  #endif
+  cOut+=;
         'REQUEST '+rdd+EOL+;
         '#define _TESTRDD "'+rdd+'"'+EOL+;
         '#include "rddtst.prg"'+EOL+;
@@ -165,6 +186,10 @@ return cStr
 #ifdef _TEST_CREATE_
   static function rddtst_wr(cAction, xRet)
   local aState, cOut
+
+  if ascan( aBadRetFunc, {|x| upper(cAction) = x + "(" } ) != 0
+    xRet := NIL
+  endif
   aState:=rdd_state()
   if pcount()>1
     cOut:="RDDTESTF "+itm2str(xRet)+", "+itm2str(aState)+", "+cAction+EOL
@@ -183,6 +208,9 @@ return cStr
 
   aState:=rdd_state()
   if pcount()>=4
+    if ascan( aBadRetFunc, {|x| upper(cAction) = x + "(" } ) != 0
+      xRet := NIL
+    endif
     if !valtype(xRet)==valtype(xExRet) .or.;
        !iif(valtype(xRet)=="B", eval(xRet)==eval(xExRet), xRet==xExRet)
       lOK:=(.f.)
@@ -212,4 +240,3 @@ return cStr
   nTested++
   return nil
 #endif
-

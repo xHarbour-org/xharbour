@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.9 2003/09/08 12:56:53 druzus Exp $
+ * $Id: math.c,v 1.10 2004/02/20 22:33:59 ronpinkas Exp $
  */
 
 /*
@@ -56,10 +56,10 @@
  */
 
 #if defined(__DJGPP__)
-#include <libm/math.h>
-_LIB_VERSION_TYPE _LIB_VERSION = _XOPEN_;
+#  include <libm/math.h>
+   _LIB_VERSION_TYPE _LIB_VERSION = _XOPEN_;
 #else
-#include <math.h>
+#  include <math.h>
 #endif
 
 #include "hbapi.h"
@@ -67,6 +67,11 @@ _LIB_VERSION_TYPE _LIB_VERSION = _XOPEN_;
 #include "hbapierr.h"
 #include "hbvm.h"
 #include "hbmath.h"
+
+#if defined(HB_MATH_ERRNO)
+#  include <errno.h>
+#  include <error.h>
+#endif
 
 /*
  * ************************************************************
@@ -90,6 +95,9 @@ void hb_mathResetError (void)
    s_hb_exc.retvalwidth = -1; /* we don't know */
    s_hb_exc.retvaldec = -1; /* use standard SET DECIMALS */
    s_hb_exc.handled = 1;
+#if defined(HB_MATH_ERRNO)
+   errno = 0;
+#endif
    return;
 }
 
@@ -126,6 +134,7 @@ int hb_mathIsMathErr (void)
 
 /* route C math lib errors to Harbour error handling */
 #if defined(HB_MATH_HANDLER)
+
 int matherr (struct exception * err)
 {
    int retval;
@@ -191,7 +200,75 @@ int matherr (struct exception * err)
      retval = 1;  /* don't print any message, don't set errno and use return value provided by C RTL */
    }
    return (retval);
+}
 
+#elif defined(HB_MATH_ERRNO)
+
+int hb_mathErrSet( double dResult, double arg1, double arg2, char * szFunc, int errCode )
+{
+   HB_MATH_HANDLERPROC mathHandler;
+
+   HB_TRACE (HB_TR_DEBUG, ("hb_mathErrSet(%f, %d)", dResult, errCode));
+
+   switch (errCode)
+   {
+      case EDOM:
+      case ERANGE:
+      case EOVERFLOW:
+         break;
+
+      default:
+         if ( isnan( dResult ) )
+         {
+            errCode = EDOM;
+         }
+         else if ( isinf( dResult ) )
+         {
+            errCode = ERANGE;
+         }
+   }
+
+   if ( errCode == 0 )
+   {
+      return 0;
+   }
+
+   /* map math error types */
+   switch (errCode)
+   {
+      case EDOM:
+         s_hb_exc.type = HB_MATH_ERR_DOMAIN;
+         s_hb_exc.error = "Argument not in domain of function";
+         break;
+
+      case ERANGE:
+         s_hb_exc.type = HB_MATH_ERR_SING;
+         s_hb_exc.error = "Calculation results in singularity";
+         break;
+
+      case EOVERFLOW:
+         s_hb_exc.type = HB_MATH_ERR_OVERFLOW;
+         s_hb_exc.error = "Calculation result too large to represent";
+         break;
+
+      default:
+         s_hb_exc.type = HB_MATH_ERR_UNKNOWN;
+         s_hb_exc.error = "Unknown math error";
+         break;
+   }
+
+   s_hb_exc.funcname = szFunc;
+   s_hb_exc.arg1 = arg1;
+   s_hb_exc.arg2 = arg2;
+   s_hb_exc.retval = dResult;
+   s_hb_exc.handled = 0;
+
+   mathHandler = hb_mathGetHandler();
+   if (mathHandler != NULL)
+   {
+     (*(mathHandler))(&s_hb_exc);
+   }
+   return 1;
 }
 #endif
 
@@ -561,8 +638,11 @@ HB_FUNC (EXP)
 
     hb_mathResetError();
     dResult = exp (hb_parnd (1));
-
-    if (hb_mathIsMathErr())
+#if defined(HB_MATH_ERRNO)
+    if ( hb_mathErrSet( dResult, hb_parnd (1), 0.0, "EXP", errno ) )
+#else
+    if ( hb_mathIsMathErr() )
+#endif
     {
       /* the C-RTL provides a kind of matherr() mechanism */
       int iLastError = hb_mathGetLastError (&hb_exc);
@@ -607,8 +687,11 @@ HB_FUNC (LOG)
 
     hb_mathResetError();
     dResult = log (hb_parnd (1));
-
-    if (hb_mathIsMathErr())
+#if defined(HB_MATH_ERRNO)
+    if ( hb_mathErrSet( dResult, hb_parnd (1), 0.0, "LOG", errno ) )
+#else
+    if ( hb_mathIsMathErr() )
+#endif
     {
       /* the C-RTL provides a kind of matherr() mechanism */
       int iLastError = hb_mathGetLastError (&hb_exc);
@@ -655,31 +738,34 @@ HB_FUNC (SQRT)
     double dResult;
 
     hb_mathResetError();
-    dResult = sqrt (hb_parnd (1));
-
-    if (hb_mathIsMathErr())
+    dResult = sqrt(hb_parnd (1));
+#if defined(HB_MATH_ERRNO)
+    if ( hb_mathErrSet( dResult, hb_parnd (1), 0.0, "SQRT", errno ) )
+#else
+    if ( hb_mathIsMathErr() )
+#endif
     {
       /* the C-RTL provides a kind of matherr() mechanism */
       int iLastError = hb_mathGetLastError (&hb_exc);
       if (iLastError != HB_MATH_ERR_NONE)
       {
-	if (hb_exc.handled)
-	{
-	  hb_retndlen (hb_exc.retval, hb_exc.retvalwidth, hb_exc.retvaldec);
-	}
-	else
-	{
-	  /* math exception is up to the Harbour function, so do this as Clipper compatible as possible */
-	  hb_retnd (0.0);  /* return 0.0 on all errors (all (?) of type DOMAIN) */
-	}
-	return;
+        if (hb_exc.handled)
+        {
+          hb_retndlen (hb_exc.retval, hb_exc.retvalwidth, hb_exc.retvaldec);
+        }
+        else
+        {
+          /* math exception is up to the Harbour function, so do this as Clipper compatible as possible */
+          hb_retnd (0.0);  /* return 0.0 on all errors (all (?) of type DOMAIN) */
+        }
+        return;
       }
     }
     hb_retnd (dResult);
-   }
-   else
-   {
-      hb_errRT_BASE_SubstR (EG_ARG, 1097, NULL, "SQRT", 1, hb_paramError (1));
-   }
+  }
+  else
+  {
+     hb_errRT_BASE_SubstR (EG_ARG, 1097, NULL, "SQRT", 1, hb_paramError (1));
+  }
 }
 

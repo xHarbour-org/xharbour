@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.26 2004/01/26 16:41:43 druzus Exp $
+ * $Id: hbdefs.h,v 1.27 2004/02/12 19:19:12 druzus Exp $
  */
 
 /*
@@ -184,6 +184,10 @@
       #endif
    #endif
 #endif
+
+/* maximum length of double number in decimal representation:
+   log10(2^1024) ~ 308.25 */
+#define HB_MAX_DOUBLE_LENGTH 320
 
 #define HB_MAX( a, b )          ( ( ( a ) > ( b ) ) ? ( a ) : ( b ) )
 #define HB_MIN( a, b )          ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )

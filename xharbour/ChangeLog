@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2438 2004/03/01 22:58:02 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2439 2004/03/02 00:23:45 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,77 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-02 01:35 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/workarea.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! changing EOF()/BOF() flags setting to be Clipper compatible in some
+      strange situation (empty database, total clear filters, etc. is skip
+      and seek operations)
+      It has to be extensively check in all RDD because I change some
+      workarea behaviors.
+    * removed 20 bytes limit for numbers in DBF, now numeric fields
+      can have up to 255 bytes
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed bug in FOR filter. It was possible that some keys
+      which should be excluded by for expression were added to
+      index file.
+
+  * xharbour/tests/rddtest/out.prg
+  + xharbour/tests/rddtest/outads.prg
+  * xharbour/tests/rddtest/rddmktst.prg
+  * xharbour/tests/rddtest/rddtst.prg
+    + extended to test above changes, outads.prg is reduced version of
+      test limited to implemented in ADS RDD features
+
+  * xharbour/source/rtl/round.c
+    ! changing in double round to avoid problem with rounding down
+      the results in conversion to integers (LONGLONG) - this hack
+      does not have to work with all C compilers/platforms/hardware
+      ((co)processors). I'm waiting for your feedback.
+    + added suport for HB_NUM_PRECISION in round - disabled now.
+
+   * xharbour/include/hbapiitm.h
+   * xharbour/source/vm/itemapi.c
+    * !!! hb_itemPadConv() params change to avoid buffer overflow for
+      very big numbers and use common function in all numebers conversion
+      Now '? padr(2^1023,10)' doesn't cause GPF
+    ! fixed number to string conversion in PAD?() functions to be Clipper
+      compatible. In general pad?(number,x) should work like
+      pad?(ltrim(str(number)),x)
+    ! removed hack in hb_itemStr[Buf] which totally disabled SET FIXED switch
+      in string conversions.
+    * !!! hb_itemString changed - now it return for logical items string
+      without dot ('T' not '.T.')
+    * hb_itemStrBuf() rewritten to not use *printf() functions.
+
+   * xharbour/include/hbdefs.h
+    * HB_MAX_DOUBLE_LENGTH macro moved from *.c files - it should be always
+      set over maximum size of double decimal representation:
+      log10(2^1024) ~=~ 308.25
+
+   * xharbour/source/rtl/math.c
+   * xharbour/include/hbmath.h
+    + new macro HB_MATH_ERRNO for systems/compilers which do not use
+      matherr function but set errno on problems with math operations
+      Now log(-1) and sqrt(-1) with GCC on Linux works like in Clipper
+
+   * xharbour/include/hbsetup.h
+    * set HB_OS_UNIX macro when HB_OS_BSD is set
+
+   * xharbour/source/rtl/console.c
+    * fixed bug in devout/dispout logical values, it should be without dots,
+      ('T' not '.T.'). In Clipper devout/dispout makes differ conversion
+      then qout()/outstd().
+
+   * xharbour/source/rtl/padc.c
+   * xharbour/source/rtl/padl.c
+   * xharbour/source/rtl/padr.c
+    * modified to use new version of hb_itemPadConv().
+
 2004-03-02 07:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * contrib/hbzlib/zip.c
     ! minor correction on resetting file attributes.

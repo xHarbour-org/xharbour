@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.63 2004/02/23 08:31:55 andijahja Exp $
+ * $Id: dbf1.c,v 1.64 2004/02/27 16:01:11 andijahja Exp $
  */
 
 /*
@@ -71,9 +71,6 @@ extern PHB_CODEPAGE s_cdpage;
 #endif
 
 #define __PRG_SOURCE__ __FILE__
-
-/* DJGPP can sprintf a float that is almost 320 digits long */
-#define HB_MAX_DOUBLE_LENGTH 320
 
 HB_FUNC( _DBFC );
 HB_FUNC( DBF_GETFUNCTABLE );
@@ -849,12 +846,11 @@ static ERRCODE hb_dbfSkip( DBFAREAP pArea, LONG lToSkip )
    }
 
    /* Update Bof and Eof flags */
-   /*
    if( lToSkip < 0 )
       pArea->fEof = FALSE;
-   else if( lToSkip > 0 )
+   else /* if( lToSkip > 0 ) */
       pArea->fBof = FALSE;
-   */
+
    return uiError;
 }
 
@@ -1052,7 +1048,7 @@ static ERRCODE hb_dbfFlush( DBFAREAP pArea )
 static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 {
    LPFIELD pField;
-   char szBuffer[ 21 ];
+   char szBuffer[ 256 ];
    BOOL bError;
    PHB_ITEM pError;
 
@@ -1092,9 +1088,15 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case HB_IT_LONG:
+         /* DBASE documentation defines maximum numeric field size as 20
+          * but Clipper alows to create longer fileds so I remove this
+          * limit, Druzus
+          */
+         /*
          if( pField->uiLen > 20 )
             bError = TRUE;
          else
+         */
          {
             memcpy( szBuffer, pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                     pField->uiLen );
@@ -1235,7 +1237,11 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 {
    USHORT uiSize;
    LPFIELD pField;
-   char szBuffer[ HB_MAX_DOUBLE_LENGTH ];
+   /* this buffer is for date and number conversion,
+    * DBASE documentation defines maximum numeric field size as 20
+    * but Clipper alows to create longer fileds so I remove this limit, Druzus
+    */
+   char szBuffer[ 256 ];
    PHB_ITEM pError;
    ERRCODE uiError;
 
@@ -1970,9 +1976,15 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
 
          case 'N':
             pFieldInfo.uiType = HB_IT_LONG;
+         /* DBASE documentation defines maximum numeric field size as 20
+          * but Clipper alows to create longer fileds so I remove this
+          * limit, Druzus
+          */
+         /*
             if( pField->bLen > 20 )
                bError = TRUE;
             else
+          */
                pFieldInfo.uiDec = pField->bDec;
             break;
 
