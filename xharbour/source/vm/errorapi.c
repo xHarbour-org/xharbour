@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.20 2003/09/14 20:42:30 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.21 2003/09/14 20:51:38 ronpinkas Exp $
  */
 
 /*
@@ -261,11 +261,39 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
 USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
 {
    HB_THREAD_STUB
+   #ifdef HB_THREAD_SUPPORT
+   BOOL old_bIdleFence;
+   #endif
 
    USHORT uiAction = E_DEFAULT; /* Needed to avoid GCC -O2 warning */
    USHORT usRequest;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_errLaunch(%p)", pError));
+
+   /* Act as an idle inspector */
+   #ifdef HB_THREAD_SUPPORT
+      HB_MUTEX_LOCK( hb_runningStacks.Mutex );
+      /* Don't run on quit request */
+      if ( hb_vm_bQuitRequest  )
+      {
+         HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+         return 0; /* Meaningless here */
+      }
+      /* Remove ourselves from running stacks */
+      hb_runningStacks.content.asLong--;
+      HB_VM_STACK.bInUse = FALSE;
+      HB_COND_SIGNAL( hb_runningStacks.Cond );
+
+      /* Force idle fencing */
+      old_bIdleFence = hb_bIdleFence;
+      hb_bIdleFence = TRUE;
+      hb_threadWaitForIdle();
+      hb_bIdleFence = old_bIdleFence;
+
+      /* Make this thread the only one VM thread running */
+      HB_VM_STACK.uiIdleInspecting++;
+      HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+   #endif
 
    if( pError )
    {
@@ -316,6 +344,18 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
          }
 
          hb_errRelease( pError );
+         /* Allow other threads to go */
+         #if defined( HB_THREAD_SUPPORT )
+            /* We are going to quit now, so we don't want to have mutexes
+               blocking our output */
+            hb_set.HB_SET_OUTPUTSAFETY = FALSE;
+
+            /* no more unstoppable thread */
+            HB_VM_STACK.uiIdleInspecting--;
+            hb_runningStacks.aux = 0;
+            // this will also signal the changed situation.
+            HB_STACK_LOCK
+         #endif
          hb_vmQuit();
       }
       else if( usRequest == HB_BREAK_REQUESTED || usRequest == HB_ENDPROC_REQUESTED )
@@ -374,6 +414,18 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
       uiAction = E_RETRY; /* Clipper does this, undocumented */
    }
 
+   /* Allow other threads to go */
+   #if defined( HB_THREAD_SUPPORT )
+      if( usRequest != HB_QUIT_REQUESTED )
+      {
+         /* no more unstoppable thread */
+         HB_VM_STACK.uiIdleInspecting--;
+         hb_runningStacks.aux = 0;
+         // this will also signal the changed situation.
+         HB_STACK_LOCK
+      }
+   #endif
+
    return uiAction;
 }
 
@@ -395,7 +447,35 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
    PHB_ITEM pResult;
    USHORT usRequest;
 
+   #ifdef HB_THREAD_SUPPORT
+   BOOL old_bIdleFence;
+   #endif
+
    HB_TRACE(HB_TR_DEBUG, ("hb_errLaunchSubst(%p)", pError));
+
+   /* Act as an idle inspector */
+   #ifdef HB_THREAD_SUPPORT
+      HB_MUTEX_LOCK( hb_runningStacks.Mutex );
+      /* Don't run on quit request */
+      if ( hb_vm_bQuitRequest  )
+      {
+         HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+         return NULL; /* Meaningless here */
+      }
+      /* Remove ourselves from running stacks */
+      hb_runningStacks.content.asLong--;
+      HB_VM_STACK.bInUse = FALSE;
+      HB_COND_SIGNAL( hb_runningStacks.Cond );
+
+      /* Force idle fencing */
+      old_bIdleFence = hb_bIdleFence;
+      hb_bIdleFence = TRUE;
+      hb_threadWaitForIdle();
+      hb_bIdleFence = old_bIdleFence;
+      HB_VM_STACK.uiIdleInspecting++;
+
+      HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
+   #endif
 
    if( pError )
    {
@@ -449,6 +529,18 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
           *  If the error happened from an EXIT procedure (already called from hb_vmQuit() then
           *   hb_vmQuit() might immdeiately return here!
           */
+         #if defined( HB_THREAD_SUPPORT )
+            /* We are going to quit now, so we don't want to have mutexes
+               blocking our output */
+            hb_set.HB_SET_OUTPUTSAFETY = FALSE;
+            
+            /* no more unstoppable thread */
+            HB_VM_STACK.uiIdleInspecting--;
+            hb_runningStacks.aux = 0;
+            // this will also signal the changed situation.
+            HB_STACK_LOCK
+         #endif
+
          hb_vmQuit();
       }
       else if( usRequest == HB_BREAK_REQUESTED || usRequest == HB_ENDPROC_REQUESTED )
@@ -475,6 +567,18 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
    {
       pResult = hb_itemNew( NULL );
    }
+
+   /* Allow other threads to go */
+   #if defined( HB_THREAD_SUPPORT )
+      if( usRequest != HB_QUIT_REQUESTED )
+      {
+         /* no more unstoppable thread */
+         HB_VM_STACK.uiIdleInspecting--;
+         hb_runningStacks.aux = 0;
+         // this will also signal the changed situation.
+         HB_STACK_LOCK
+      }
+   #endif
 
    return pResult;
 }

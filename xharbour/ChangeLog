@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1597 2003/10/18 14:13:31 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1598 2003/10/18 16:20:00 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,44 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-19 02:10 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+   * include/thread.h
+   * source/vm/thread.c
+   * source/vm/garbage.c
+      + Added support for "Explicit idle inspecting". An idle inspector
+        (a thread that knows that it is running alone with no other threads)
+        won't be blocked when trying to acquire the lock on the stack;
+        it will be considere "alone" if executing VM instructions, and
+        all the MT cares will be dropped.
+
+
+   * source/vm/hvm.c
+      + Added support for GLOBAL vm termination request. When a thread
+        terminates issuing a LOCAL termination request, as soon as this
+        VM_QUIT request is fulfilled, the request is turned into a GLOBAL
+        TERMINATION request, that forcess all other threads to cleaunp
+        cleanly as soon as possible and terminates the main thread.
+      + Added support for hb_vmQuit() called from non-main thread. In MT,
+        when a thread calls hb_vmQuit() (generally because of an error),
+        then it is cleanly terminated and a GLOBAL VM termination request
+        is given. This will make the main thread to cleanly shut all the
+        VM (one for each thread) as soon as possible.
+
+   * source/vm/errorapi.c
+      + Added support for reporting error as idle inspector. Error is reported
+        AFTER blocking every other thread and WHILE being the only thread
+        running; soon after error-quit request, the thread is terminated
+        and a GLOBAL quit request is risen.
+
+   * source/rtl/errorsys.prg
+      ! Typo in OS thread error reporting in error.log
+
+   * source/rtl/console.c
+      ! Removed an extra lock in hb_conDevPos() that was left by mistake.
+
+   + tests/mterror.prg
+      + Test to display cancelation and error reporting/quitting under MT.
 
 2003-10-18 18:20 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
    * include/thread.h

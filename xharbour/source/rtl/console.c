@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.33 2003/10/18 01:15:19 jonnymind Exp $
+ * $Id: console.c,v 1.34 2003/10/18 02:38:45 jonnymind Exp $
  */
 /*
  * Harbour Project source code:
@@ -475,14 +475,10 @@ HB_FUNC( PCOL ) /* Returns the current printer row position */
 
 static void hb_conDevPos( SHORT iRow, SHORT iCol )
 {
-   HB_THREAD_STUB
-
    HB_TRACE(HB_TR_DEBUG, ("hb_conDevPos(%hd, %hd)", iRow, iCol));
 
    /* Position printer if SET DEVICE TO PRINTER and valid printer file
       otherwise position console */
-
-   HB_CONSOLE_SAFE_LOCK
 
    if( (hb_set.hb_set_printhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 )){
       USHORT uiCount;
@@ -524,17 +520,20 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
       hb_gtSetPos( iRow, iCol );
    }
 
-   HB_CONSOLE_SAFE_UNLOCK
 }
 
 /* NOTE: This should be placed after the hb_conDevPos() definition. */
 
 HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
 {
+
+   HB_THREAD_STUB
+   HB_CONSOLE_SAFE_LOCK
    if( ISNUM( 1 ) && ISNUM( 2 ) )
    {
       hb_conDevPos( hb_parni( 1 ), hb_parni( 2 ) );
    }
+   HB_CONSOLE_SAFE_UNLOCK
 }
 
 HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */

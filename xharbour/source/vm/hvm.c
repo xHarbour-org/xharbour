@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.270 2003/10/08 13:07:24 paultucker Exp $
+ * $Id: hvm.c,v 1.271 2003/10/16 20:27:49 ronpinkas Exp $
  */
 
 /*
@@ -306,6 +306,9 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
 #else
    #define s_uiActionRequest  (HB_VM_STACK.uiActionRequest)
    #define s_lRecoverBase     (HB_VM_STACK.lRecoverBase)
+   /* static, for now */
+   BOOL hb_vm_bQuitRequest = FALSE;
+
 #endif
 
 static int s_iBaseLine;
@@ -606,6 +609,28 @@ void HB_EXPORT hb_vmQuit( void )
    HB_THREAD_STUB
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmQuit(%i)"));
+
+   #ifdef HB_THREAD_SUPPORT
+      /* Quit sequences for non-main thread */
+      /* We are going to quit now, so we don't want to have mutexes
+         blocking our output */
+      hb_set.HB_SET_OUTPUTSAFETY = FALSE;
+
+      if (! HB_SAME_THREAD( hb_main_thread_id, HB_CURRENT_THREAD()) )
+      {
+         hb_vm_bQuitRequest = TRUE;
+         #ifdef HB_OS_WIN_32
+            HB_DISABLE_ASYN_CANC
+            HB_STACK_LOCK
+            hb_threadCancelInternal(); // never returns
+         #else
+            pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL );
+            HB_STACK_LOCK
+            //hb_threadTerminator( NULL );
+            pthread_exit(0);
+         #endif
+      }
+   #endif
 
    if( bQuitting == FALSE )
    {
@@ -3068,6 +3093,14 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             break;
       }
 
+      /* Accepts generalized quit request */
+      #ifdef HB_THREAD_SUPPORT
+      if ( hb_vm_bQuitRequest )
+      {
+         s_uiActionRequest = HB_QUIT_REQUESTED;
+      }
+      #endif
+
       if( s_uiActionRequest )
       {
          if( s_uiActionRequest & HB_BREAK_REQUESTED )
@@ -3101,6 +3134,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          }
          else if( s_uiActionRequest & HB_QUIT_REQUESTED )
          {
+            #ifdef HB_THREAD_SUPPORT
+            /* Generalize quit request so that the whole VM is affected */
+            hb_vm_bQuitRequest = TRUE;
+            #endif
+
             HB_STACK_UNLOCK;
             HB_TEST_CANCEL_ENABLE_ASYN;
             break;

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.57 2003/10/18 01:15:19 jonnymind Exp $
+ * $Id: garbage.c,v 1.58 2003/10/18 14:13:33 jonnymind Exp $
  */
 
 /*
@@ -500,11 +500,7 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 void hb_gcCollect( void )
 {
    /* TODO: decrease the amount of time spend collecting */
-   /*#if defined( HB_OS_WIN_32 ) && defined( HB_THREAD_SUPPORT )
-      hb_threadSubscribeIdle( hb_gcCollectAll );
-   #else*/
-      hb_gcCollectAll();
-   //#endif
+   hb_gcCollectAll();
 }
 
 /* Check all memory blocks if they can be released
@@ -530,6 +526,11 @@ void hb_gcCollectAll()
       s_bCollecting = TRUE;
 
       hb_threadWaitForIdle();
+
+      /* We are now idle inspectors. Currently, this is useless for
+         GC, as it does not runs VM code, but it may turn useful in the
+         future */
+      HB_VM_STACK.uiIdleInspecting++;
 
       HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );
    #else
@@ -728,7 +729,8 @@ void hb_gcCollectAll()
    /* Unblocks all threads */
    HB_CRITICAL_UNLOCK( hb_threadStackMutex );
 
-   #if defined( HB_THREAD_SUPPORT ) //&& ! defined( HB_OS_WIN_32 )
+   #if defined( HB_THREAD_SUPPORT )
+      HB_VM_STACK.uiIdleInspecting--;
       hb_runningStacks.aux = 0;
       // this will also signal the changed situation.
       HB_STACK_LOCK
@@ -864,11 +866,6 @@ HB_FUNC( HB_GCALL )
    {
       s_uAllocated = HB_GC_COLLECTION_JUSTIFIED;
    }
-
-   /*#if defined( HB_OS_WIN_32 ) && defined( HB_THREAD_SUPPORT )
-      hb_threadSubscribeIdle( hb_gcCollectAll );
-   #else*/
-      hb_gcCollectAll();
-   //#endif
+   hb_gcCollectAll();
 }
 

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.110 2003/10/18 14:13:33 jonnymind Exp $
+* $Id: thread.c,v 1.111 2003/10/18 16:20:03 jonnymind Exp $
 */
 
 /*
@@ -192,6 +192,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    #ifdef HB_OS_WIN_32
    tc->th_vm_id = hb_threadUniqueId();
    #endif
+   tc->uiIdleInspecting = 0;
 
    tc->next = NULL;
 
@@ -710,8 +711,10 @@ void hb_threadCancel( HB_STACK *pStack )
    */
 
    TerminateThread( pStack->th_h, 0 );
-   hb_threadTerminator( (void *)pStack );
+   HB_DISABLE_ASYN_CANC;
    HB_CRITICAL_UNLOCK( hb_cancelMutex );
+
+   hb_threadTerminator( (void *)pStack );
 
 }
 
@@ -1737,6 +1740,14 @@ void hb_threadResetAux( void *ptr )
 /* hb_runningStacks mutex must be held before calling this function */
 void hb_threadWaitForIdle( void )
 {
+   HB_THREAD_STUB
+
+   /* Are we already idle inspectors ? */
+   if ( HB_VM_STACK.uiIdleInspecting )
+   {
+      return;
+   }
+
    /* Do we have to set an idle fence? */
    if ( hb_bIdleFence )
    {

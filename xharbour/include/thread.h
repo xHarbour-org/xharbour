@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.62 2003/10/18 14:13:33 jonnymind Exp $
+* $Id: thread.h,v 1.63 2003/10/18 16:20:03 jonnymind Exp $
 */
 
 /*
@@ -218,7 +218,7 @@ extern "C" {
 #define HB_STACK_LOCK \
 {\
    HB_MUTEX_LOCK( hb_runningStacks.Mutex );\
-   if( ! HB_VM_STACK.bInUse ) \
+   if( ! HB_VM_STACK.bInUse && ! HB_VM_STACK.uiIdleInspecting ) \
    {\
       while ( hb_runningStacks.aux ) \
       {\
@@ -234,7 +234,7 @@ extern "C" {
 #define HB_STACK_UNLOCK \
 {\
    HB_MUTEX_LOCK( hb_runningStacks.Mutex );\
-   if( HB_VM_STACK.bInUse ) \
+   if( HB_VM_STACK.bInUse && ! HB_VM_STACK.uiIdleInspecting ) \
    {\
       hb_runningStacks.content.asLong--;\
       HB_VM_STACK.bInUse = FALSE;\
@@ -291,6 +291,10 @@ typedef struct tag_HB_STACK
    UINT uiParams;
    /* Flag to signal that the context is in use */
    BOOL bInUse; /* this must be used with the guard of a global resource */
+
+   /* Flag to signal that this thread is idle inspecting. When idle inspecting,
+      a thread must be granted not to lock/unlock its stack. */
+   UINT uiIdleInspecting;
 
    /* MT error handler, one for thread! */
    struct HB_ERROR_INFO_ *errorHandler;
@@ -568,6 +572,8 @@ extern BOOL hb_bIdleFence;
 
 /***********************************************************************/
 /* Function and globals definitions */
+extern HB_EXPORT BOOL hb_vm_bQuitRequest;
+
 extern HB_STACK *last_stack;
 extern HB_STACK *hb_ht_stack;
 extern HB_MUTEX_STRUCT *hb_ht_mutex;
