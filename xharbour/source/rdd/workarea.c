@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.4 2002/01/30 03:32:40 ronpinkas Exp $
+ * $Id: workarea.c,v 1.5 2002/01/31 22:26:33 ronpinkas Exp $
  */
 
 /*
@@ -245,7 +245,7 @@ ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
 
    if( sFieldName[ulSize] != '\0' )
    {
-	  char *sTmp = hb_xgrab( ulSize + 1 );
+      char *sTmp = (char *) hb_xgrab( ulSize + 1 );
 	  strncpy( sTmp, sFieldName, ulSize );
 	  sFieldName = sTmp;
       sFieldName[ulSize] = '\0';
@@ -273,7 +273,7 @@ ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
 
    if( bFreeName )
    {
-	  hb_xfree( sFieldName );
+      hb_xfree( (void *) sFieldName );
    }
 
    return SUCCESS;
