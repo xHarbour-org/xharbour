@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.20 2004/02/29 17:09:41 andijahja Exp $
+ * $Id: zip.c,v 1.21 2004/03/01 22:00:38 andijahja Exp $
  */
 
 /*
@@ -67,28 +67,6 @@ static HB_ITEM FileAttribs;
 #define FA_ARCH            32   /* A */
 #define FA_NORMAL         128
 
-static BOOL ZipAttribute( char *szFile, int iAttr )
-{
-   DWORD dwFlags=FILE_ATTRIBUTE_ARCHIVE;
-   BOOL lSuccess;
-
-   if(  iAttr & FA_RDONLY  )
-      dwFlags |= FILE_ATTRIBUTE_READONLY;
-
-   if(  iAttr & FA_HIDDEN  )
-      dwFlags |= FILE_ATTRIBUTE_HIDDEN;
-
-   if(  iAttr & FA_SYSTEM  )
-      dwFlags |= FILE_ATTRIBUTE_SYSTEM;
-
-   if(  iAttr & FA_NORMAL  )
-      dwFlags |=    FILE_ATTRIBUTE_NORMAL;
-
-   lSuccess=SetFileAttributes( szFile, dwFlags );
-
-   return lSuccess;
-}
-
 static void ResetAttribs()
 {
    ULONG ulAtt, ulZipLen = FileToZip.item.asArray.value->ulLen;
@@ -99,7 +77,7 @@ static void ResetAttribs()
    {
      szFile = hb_arrayGetC( &FileToZip, ulAtt + 1 );
      iAttr  = hb_arrayGetNI( &FileAttribs, ulAtt + 1 );
-     ZipAttribute( szFile, iAttr );
+     SetFileAttributes( szFile, iAttr );
      hb_xfree( szFile );
    }
 
@@ -315,7 +293,7 @@ static void ZipCreateArray( PHB_ITEM pParam )
                {
                   hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szEntry ) );
                   hb_arrayAddForward( &FileAttribs, hb_itemPutNI( &Temp, GetFileAttributes( szEntry ) ) );
-                  ZipAttribute( szEntry, FA_ARCH );
+                  SetFileAttributes( szEntry, FA_ARCH );
                }
 
                hb_xfree( szEntry );
@@ -325,7 +303,7 @@ static void ZipCreateArray( PHB_ITEM pParam )
          {
             hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szArrEntry ) );
             hb_arrayAddForward( &FileAttribs, hb_itemPutNI( &Temp, GetFileAttributes( szArrEntry ) ) );
-            ZipAttribute( szArrEntry, FA_ARCH );
+            SetFileAttributes( szArrEntry, FA_ARCH );
          }
 
          hb_xfree( szArrEntry );
