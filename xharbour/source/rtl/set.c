@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.29 2003/09/02 03:55:57 lculik Exp $
+ * $Id: set.c,v 1.30 2003/10/07 22:13:59 ronpinkas Exp $
  */
 
 /*
@@ -1440,9 +1440,9 @@ void hb_setInitialize( void )
       char DefaultPrinter[ 80 ];
       unsigned long pdwBufferSize = 80;
 
-      extern BOOL THarbourPrinter_DPGetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize );
+      extern BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize );
 
-      THarbourPrinter_DPGetDefaultPrinter( ( char* ) &DefaultPrinter, &pdwBufferSize);
+      hb_GetDefaultPrinter( ( char* ) &DefaultPrinter, &pdwBufferSize);
    #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_setInitialize()"));

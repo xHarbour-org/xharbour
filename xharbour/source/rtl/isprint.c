@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.20 2003/08/06 13:50:22 lculik Exp $
+ * $Id: isprint.c,v 1.21 2003/09/23 03:51:39 lculik Exp $
  */
 
 /*
@@ -71,20 +71,17 @@
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
 
    #include <stdio.h>
-   #include <malloc.h>
+//   #include <malloc.h>
    #include <winspool.h>
 
-   static BOOL IsPrinterError(HANDLE hPrinter);
+   static DWORD IsPrinterError(HANDLE hPrinter);
 
-   static BOOL GetJobs(HANDLE hPrinter,
-                       JOB_INFO_2 **ppJobInfo,
-                       int *pcJobs,
-                       DWORD *pStatus);
-   static BOOL DPGetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
+   static BOOL GetJobs(HANDLE hPrinter,JOB_INFO_2 **ppJobInfo,int *pcJobs);
    static DWORD hb_printerIsReadyn( char * pszPrinterName );
    static DWORD IsPrinterErrorn(HANDLE hPrinter);
-   extern BOOL THarbourPrinter_GetPrinterNameByPort(LPTSTR pPrinterName, LPDWORD pdwBufferSize,LPTSTR pPortName);
+   extern BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
 #endif
+#define MAXBUFFERSIZE 255    // 7/10/2003 12:51p.m.
 
 BOOL hb_printerIsReady( char * pszPrinterName )
 {
@@ -130,9 +127,15 @@ BOOL hb_printerIsReady( char * pszPrinterName )
    {
       HANDLE hPrinter;
 
-      OpenPrinter( pszPrinterName, &hPrinter, NULL );
-
-      bIsPrinter = ! IsPrinterError( hPrinter );
+      if (*pszPrinterName) {
+        bIsPrinter= OpenPrinter( pszPrinterName, &hPrinter, NULL ) ;
+        if (bIsPrinter ) {
+          bIsPrinter = (BOOL) !IsPrinterError( hPrinter );
+          CloseHandle(hPrinter) ;
+        }
+      }
+      else
+        bIsPrinter = FALSE ;
    }
 
 #else
@@ -163,9 +166,9 @@ HB_FUNC( ISPRINTER )
 {
    #if defined(HB_OS_WIN_32) && !defined(__RSXNT__)
    {
-      char DefaultPrinter[ 80 ];
-      DWORD pdwBufferSize = 80;
-      DPGetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize);
+      char DefaultPrinter[MAXBUFFERSIZE];
+      DWORD pdwBufferSize = MAXBUFFERSIZE;
+      hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize);
       hb_retl( hb_printerIsReady( ISCHAR( 1 ) ? hb_parc( 1 ) : (char*)DefaultPrinter ) );
    }
    #else
@@ -177,89 +180,38 @@ HB_FUNC( ISPRINTER )
 
 #if defined(HB_OS_WIN_32) && !defined(__RSXNT__) && !defined(__CYGWIN__)
 
-static BOOL IsPrinterError( HANDLE hPrinter )
-{
-    JOB_INFO_2  *pJobs;
-    int         cJobs,
-                i;
-    DWORD       dwPrinterStatus;
-
-    /*
-     *  Get the state information for the Printer Queue and
-     *  the jobs in the Printer Queue.
-     */
-    if (!GetJobs(hPrinter, &pJobs, &cJobs, &dwPrinterStatus))
-        return FALSE;
-
-    /*
-     *  If the Printer reports an error, believe it.
-     */
-    if (dwPrinterStatus &
-        (PRINTER_STATUS_ERROR |
-         PRINTER_STATUS_PAPER_JAM |
-         PRINTER_STATUS_PAPER_OUT |
-         PRINTER_STATUS_PAPER_PROBLEM |
-         PRINTER_STATUS_OUTPUT_BIN_FULL |
-         PRINTER_STATUS_NOT_AVAILABLE |
-         PRINTER_STATUS_NO_TONER |
-         PRINTER_STATUS_OUT_OF_MEMORY |
-         PRINTER_STATUS_OFFLINE |
-         PRINTER_STATUS_DOOR_OPEN))
-    {
-        return TRUE;
+static DWORD IsPrinterError( HANDLE hPrinter ) {
+  BOOL Result = -1 ;
+  PRINTER_INFO_2 * pPrinterInfo;
+  DWORD cByteNeeded;
+  HB_TRACE(HB_TR_DEBUG, ("isprint.c IsPrinterError()"));
+  GetPrinter(hPrinter, 2, NULL, 0, &cByteNeeded);
+  if (cByteNeeded>0) {
+    pPrinterInfo = (PRINTER_INFO_2 *) hb_xgrab(cByteNeeded);
+    if (pPrinterInfo) {
+      if (GetPrinter(hPrinter,2,(LPBYTE)pPrinterInfo,cByteNeeded,&cByteNeeded))
+        Result = pPrinterInfo->Status;
+      hb_xfree(pPrinterInfo) ;
     }
-
-    /*
-     *  Find the Job in the Queue that is printing.
-     */
-    for (i=0; i < cJobs; i++)
-    {
-        if (pJobs[i].Status & JOB_STATUS_PRINTING)
-        {
-            /*
-             *  If the job is in an error state,
-             *  report an error for the printer.
-             *  Code could be inserted here to
-             *  attempt an interpretation of the
-             *  pStatus member as well.
-             */
-            if (pJobs[i].Status &
-                (JOB_STATUS_ERROR |
-                JOB_STATUS_OFFLINE |
-                JOB_STATUS_PAPEROUT |
-                JOB_STATUS_BLOCKED_DEVQ))
-            {
-                return TRUE;
-            }
-        }
-    }
-
-    /*
-     *  No error condition.
-     */
-    return FALSE;
-
+  }
+  return Result;
 }
 
-static DWORD IsPrinterErrorn( HANDLE hPrinter )
-{
-    JOB_INFO_2  *pJobs;
-    int         cJobs,
-                i;
-    DWORD       dwPrinterStatus;
-    DWORD       dwError;
-    BOOL        bPrinterError = FALSE;
-    /*
-     *  Get the state information for the Printer Queue and
-     *  the jobs in the Printer Queue.
-     */
-    if (!GetJobs(hPrinter, &pJobs, &cJobs, &dwPrinterStatus))
-        return 0;
 
-    /*
-     *  If the Printer reports an error, believe it.
-     */
-     switch (dwPrinterStatus &
+static DWORD IsPrinterErrorn( HANDLE hPrinter ) {
+  JOB_INFO_2  *pJobs;
+  int         cJobs,i;
+  DWORD       dwError;
+  dwError = IsPrinterError(hPrinter) ;  // Just return the PrinterStatus
+/*
+
+// This original logic is flawed - it works if there is only one error on the printer
+//   but the WinApi allows a combination of flags.
+//   The caller to XISPRINTER() should take the return value and determine the error(s).
+//   8/10/2003 12:46p.m. Peter Rees
+
+  if (dwError) {
+    switch (dwPrinterStatus &
         (PRINTER_STATUS_ERROR |
          PRINTER_STATUS_PAPER_JAM |
          PRINTER_STATUS_PAPER_OUT |
@@ -271,519 +223,105 @@ static DWORD IsPrinterErrorn( HANDLE hPrinter )
          PRINTER_STATUS_OFFLINE |
          PRINTER_STATUS_DOOR_OPEN) ) {
 
-        case PRINTER_STATUS_ERROR :
-        dwError = 10;
-        bPrinterError = TRUE;
-        break;
-
-        case PRINTER_STATUS_PAPER_JAM :
-        dwError = 11;
-        bPrinterError = TRUE;
-        break;
-
-        case PRINTER_STATUS_PAPER_OUT :
-        dwError = 12;
-        bPrinterError = TRUE;
-        break;
-
-        case PRINTER_STATUS_PAPER_PROBLEM :
-        dwError = 13;
-        bPrinterError = TRUE;
-        break;
-
-        case PRINTER_STATUS_OUTPUT_BIN_FULL :
-        dwError = 14;
-        bPrinterError = TRUE;
-        break;
-
-        case PRINTER_STATUS_NOT_AVAILABLE :
-        dwError = 15;
-        bPrinterError = TRUE;
-        break;
-
-        case PRINTER_STATUS_NO_TONER :
-        dwError = 16;
-        bPrinterError = TRUE;
-        break;
-
-        case PRINTER_STATUS_OUT_OF_MEMORY :
-        dwError = 17;
-        bPrinterError = TRUE;
-        break;
-
-        case PRINTER_STATUS_OFFLINE :
-        dwError = 18;
-        bPrinterError = TRUE;
-        break;
-
-        case PRINTER_STATUS_DOOR_OPEN:
-        dwError = 19;
-        bPrinterError = TRUE;
-        break;
-         }
-    if (bPrinterError)
-    {
-        return dwError;
+    case PRINTER_STATUS_ERROR :
+      dwError = 10;
+      break;
+    case PRINTER_STATUS_PAPER_JAM :
+      dwError = 11;
+      break;
+    case PRINTER_STATUS_PAPER_OUT :
+      dwError = 12;
+      break;
+    case PRINTER_STATUS_PAPER_PROBLEM :
+      dwError = 13;
+      break;
+    case PRINTER_STATUS_OUTPUT_BIN_FULL :
+      dwError = 14;
+      break;
+    case PRINTER_STATUS_NOT_AVAILABLE :
+      dwError = 15;
+      break;
+    case PRINTER_STATUS_NO_TONER :
+      dwError = 16;
+      break;
+    case PRINTER_STATUS_OUT_OF_MEMORY :
+      dwError = 17;
+      break;
+    case PRINTER_STATUS_OFFLINE :
+      dwError = 18;
+      break;
+    case PRINTER_STATUS_DOOR_OPEN:
+      dwError = 19;
+      break;
     }
-
-    /*
-     *  Find the Job in the Queue that is printing.
-     */
-    for (i=0; i < cJobs; i++)
-    {
-        if (pJobs[i].Status & JOB_STATUS_PRINTING)
-        {
-            /*
-             *  If the job is in an error state,
-             *  report an error for the printer.
-             *  Code could be inserted here to
-             *  attempt an interpretation of the
-             *  pStatus member as well.
-             */
-             switch (pJobs[i].Status &
-                (JOB_STATUS_ERROR |
-                JOB_STATUS_OFFLINE |
-                JOB_STATUS_PAPEROUT |
-                JOB_STATUS_BLOCKED_DEVQ) ) {
-
-                case JOB_STATUS_ERROR :
-                    dwError = 20;
-                    bPrinterError = TRUE;
-                    break;
-
-                case JOB_STATUS_OFFLINE :
-                    dwError = 21;
-                    bPrinterError = TRUE;
-                    break;
-
-                case JOB_STATUS_PAPEROUT :
-                    dwError = 22;
-                    bPrinterError = TRUE;
-                    break;
-
-                case JOB_STATUS_BLOCKED_DEVQ:
-                    dwError = 23;
-                    bPrinterError = TRUE;
-                    break;
-
-                }
-            if (bPrinterError)
-            {
-            return dwError;
-            }
-        }
-    }
-
-    /*
-     *  No error condition.
-     */
-    return 0;
-
-}
-
-static BOOL GetJobs(HANDLE hPrinter,        /* Handle to the printer. */
-                JOB_INFO_2 **ppJobInfo, /* Pointer to be filled.  */
-                int *pcJobs,            /* Count of jobs filled.  */
-                DWORD *pStatus)         /* Print Queue status.    */
-{
-
-   DWORD cByteNeeded;
-   DWORD nReturned;
-   DWORD cByteUsed;
-   JOB_INFO_2 * pJobStorage;
-   PRINTER_INFO_2 * pPrinterInfo;
-
-/* Get the buffer size needed. */
-    if (!GetPrinter(hPrinter, 2, NULL, 0, &cByteNeeded))
-    {
-        if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
-            return FALSE;
-    }
-
-    pPrinterInfo = (PRINTER_INFO_2 *)malloc(cByteNeeded);
-    if (!(pPrinterInfo))
-        /* Failure to allocate memory. */
-        return FALSE;
-
-    /* Get the printer information. */
-    if (!GetPrinter(hPrinter,
-            2,
-            (LPBYTE)pPrinterInfo,
-            cByteNeeded,
-            &cByteUsed))
-    {
-        /* Failure to access the printer. */
-        free(pPrinterInfo);
-        return FALSE;
-    }
-
-    /* Get job storage space. */
-    if (!EnumJobs(hPrinter,
-            0,
-            pPrinterInfo->cJobs,
-            2,
-            NULL,
-            0,
-            (LPDWORD)&cByteNeeded,
-            (LPDWORD)&nReturned))
-    {
-        if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
-        {
-            free(pPrinterInfo);
-            return FALSE;
-        }
-    }
-
-    pJobStorage = (JOB_INFO_2 *)malloc(cByteNeeded);
-    if (!pJobStorage)
-    {
-        /* Failure to allocate Job storage space. */
-        free(pPrinterInfo);
-        return FALSE;
-    }
-
-    ZeroMemory(pJobStorage, cByteNeeded);
-
-    /* Get the list of jobs. */
-    if (!EnumJobs(hPrinter,
-            0,
-            pPrinterInfo->cJobs,
-            2,
-            (LPBYTE)pJobStorage,
-            cByteNeeded,
-            (LPDWORD)&cByteUsed,
-            (LPDWORD)&nReturned))
-    {
-        free(pPrinterInfo);
-        free(pJobStorage);
-        return FALSE;
-    }
-
-    /*
-     *  Return the information.
-     */
-    *pcJobs = nReturned;
-    *pStatus = pPrinterInfo->Status;
-    *ppJobInfo = pJobStorage;
-    free(pPrinterInfo);
-
-    return TRUE;
-}
-#define MAXBUFFERSIZE 250
-static BOOL DPGetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize)
-{
-  BOOL bFlag;
-  OSVERSIONINFO osv;
-  TCHAR cBuffer[MAXBUFFERSIZE];
-  PRINTER_INFO_2 *ppi2 = NULL;
-  DWORD dwNeeded = 0;
-  DWORD dwReturned = 0;
-
-  /* What version of Windows are you running? */
-  osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-  GetVersionEx(&osv);
-
-  /* If Windows 95 or 98, use EnumPrinters... */
-  if (osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
-  {
-    /* The first EnumPrinters() tells you how big our buffer should
-       be in order to hold ALL of PRINTER_INFO_2. Note that this will
-       usually return FALSE. This only means that the buffer (the 4th
-       parameter) was not filled in. You don't want it filled in here... */
-    EnumPrinters(PRINTER_ENUM_DEFAULT, NULL, 2, NULL, 0, &dwNeeded, &dwReturned);
-    if (dwNeeded == 0)
-      return FALSE;
-
-    /* Allocate enough space for PRINTER_INFO_2... */
-    ppi2 = (PRINTER_INFO_2 *)GlobalAlloc(GPTR, dwNeeded);
-    if (!ppi2)
-      return FALSE;
-
-    /* The second EnumPrinters() will fill in all the current information... */
-    bFlag = EnumPrinters(PRINTER_ENUM_DEFAULT, NULL, 2, (LPBYTE)ppi2, dwNeeded, &dwNeeded, &dwReturned);
-    if (!bFlag)
-    {
-      GlobalFree(ppi2);
-      return FALSE;
-    }
-
-    /* If given buffer too small, set required size and fail... */
-    if ((DWORD)lstrlen(ppi2->pPrinterName) >= *pdwBufferSize)
-    {
-      *pdwBufferSize = (DWORD)lstrlen(ppi2->pPrinterName) + 1;
-      GlobalFree(ppi2);
-      return FALSE;
-    }
-
-    /* Copy printer name into passed-in buffer... */
-    lstrcpy(pPrinterName, ppi2->pPrinterName);
-
-    /* Set buffer size parameter to min required buffer size... */
-    *pdwBufferSize = (DWORD)lstrlen(ppi2->pPrinterName) + 1;
-  }
-
-  /* If Windows NT, use the GetDefaultPrinter API for Windows 2000,
-     or GetProfileString for version 4.0 and earlier... */
-  else if (osv.dwPlatformId == VER_PLATFORM_WIN32_NT)
-  {
-#if(WINVER >= 0x0500)
-    if (osv.dwMajorVersion >= 5) /* Windows 2000 or later */
-    {
-      bFlag = GetDefaultPrinter(pPrinterName, pdwBufferSize);
-      if (!bFlag)
-        return FALSE;
-    }
-
-    else /* NT4.0 or earlier */
-#endif
-    {
-      /* Retrieve the default string from Win.ini (the registry).
-         String will be in form "printername,drivername,portname". */
-      if (GetProfileString("windows", "device", ",,,", cBuffer, MAXBUFFERSIZE) <= 0)
-        return FALSE;
-
-      /* Printer name precedes first "," character... */
-      strtok(cBuffer, ",");
-
-      /* If given buffer too small, set required size and fail... */
-      if ((DWORD)lstrlen(cBuffer) >= *pdwBufferSize)
-      {
-        *pdwBufferSize = (DWORD)lstrlen(cBuffer) + 1;
-        return FALSE;
+*/
+  if (!dwError) {
+    if (GetJobs(hPrinter, &pJobs, &cJobs)) {
+      for (i=0; !dwError && i < cJobs; i++) {
+        if (pJobs[i].Status & JOB_STATUS_ERROR)
+          dwError = -20 ;
+        else if (pJobs[i].Status & JOB_STATUS_OFFLINE)
+          dwError = -21 ;
+        else if (pJobs[i].Status & JOB_STATUS_PAPEROUT)
+          dwError = -22 ;
+        else if (pJobs[i].Status & JOB_STATUS_BLOCKED_DEVQ)
+          dwError = -23 ;
       }
-
-      /* Copy printer name into passed-in buffer... */
-      lstrcpy(pPrinterName, cBuffer);
-
-      /* Set buffer size parameter to min required buffer size... */
-      *pdwBufferSize = (DWORD)lstrlen(cBuffer) + 1;
+      hb_xfree(pJobs) ;
     }
   }
-
-  /* Cleanup... */
-  if (ppi2)
-    GlobalFree(ppi2);
-
-  return TRUE;
+  return dwError;
 }
-#define MAX_PRINTERS 20
 
-HB_FUNC(GETPRINTERS)
-
-{
-    PHB_ITEM pArrayPrinter = hb_itemArrayNew( 0 );
-
-    unsigned char *buffer;
-    unsigned char *xpbuffer;
-    unsigned long needed = 0 , returned=0 ,needed1 = 0 , returned1 = 0, a = 0 ,b = 0 ;
-    BOOL res = FALSE;
-    OSVERSIONINFO osv;
-    osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    GetVersionEx(&osv);
-
-  /* If Windows 95 or 98, use EnumPrinters... */
-   if (osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
-   {
-
-      buffer = ( unsigned char * ) malloc( MAX_PRINTERS * sizeof( PRINTER_INFO_5 ) ) ;
-
-      res = EnumPrinters( PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS ,
-          NULL ,
-          5 ,
-          buffer ,
-          MAX_PRINTERS * sizeof( PRINTER_INFO_5 ) ,
-          &needed ,
-          &returned );
-
-      if( !res )
-      {
-         if( GetLastError() != ERROR_INSUFFICIENT_BUFFER )
-            hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
-
-         else
-         {
-             free(buffer) ;
-             buffer = ( unsigned char * ) malloc( needed ) ;
-
-             res=EnumPrinters(PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL| PRINTER_ENUM_CONNECTIONS  ,
-             NULL ,
-             5 ,
-             buffer ,
-             needed ,
-             &needed ,
-             &returned );
-         }
-      }
-
-      if( !res )
-         hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
-
-      for ( a = 0 ; a < returned ; a++ )
-      {
-
-         PHB_ITEM pSubItems = hb_itemArrayNew( 2 );
-         PHB_ITEM pFile = hb_itemPutC( NULL, ( ( PRINTER_INFO_5 * ) ( buffer + sizeof( PRINTER_INFO_5 ) * a ) )->pPrinterName );
-
-         PHB_ITEM pPort = hb_itemPutC( NULL,( ( PRINTER_INFO_5 * ) ( buffer + sizeof( PRINTER_INFO_5 ) * a ) )->pPortName );
-
-         hb_arraySet( pSubItems , 1 , pFile ) ;
-
-         hb_arraySet( pSubItems , 2 , pPort ) ;
-
-         hb_arrayAdd( pArrayPrinter , pSubItems );
-
-         hb_itemRelease( pFile ) ;
-
-         hb_itemRelease( pPort ) ;
-
-         hb_itemRelease( pSubItems );
-      }
-      free(buffer) ;
-   }
-   else
-   {
-
-      xpbuffer = ( unsigned char * ) malloc( MAX_PRINTERS * sizeof( PRINTER_INFO_1 ) ) ;
-
-      res = EnumPrinters( PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS | PRINTER_ENUM_REMOTE | PRINTER_ENUM_NETWORK | PRINTER_ENUM_SHARED,
-          NULL ,
-          1 ,
-          xpbuffer ,
-          MAX_PRINTERS * sizeof( PRINTER_INFO_1 ) ,
-          &needed ,
-          &returned );
-
-      if( !res )
-      {
-         if( GetLastError() != ERROR_INSUFFICIENT_BUFFER )
-            hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
-
-         else
-         {
-             free(xpbuffer) ;
-             xpbuffer = ( unsigned char * ) malloc( needed ) ;
-
-             res=EnumPrinters( PRINTER_ENUM_LOCAL| PRINTER_ENUM_CONNECTIONS | PRINTER_ENUM_REMOTE | PRINTER_ENUM_NETWORK | PRINTER_ENUM_SHARED  ,
-             NULL ,
-             1 ,
-             xpbuffer ,
-             needed ,
-             &needed ,
-             &returned );
-         }
-      }
-
-      if( !res )
-         hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
-
-      for ( a = 0 ; a < returned ; a++ )
-      {
-
-         buffer = ( unsigned char * ) malloc( MAX_PRINTERS * sizeof( PRINTER_INFO_2 ) ) ;
-
-         res = EnumPrinters( PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS | PRINTER_ENUM_SHARED,
-            ( ( PRINTER_INFO_1 * ) ( xpbuffer + sizeof( PRINTER_INFO_1 ) * a ) )->pName ,
-            2 ,
-            buffer ,
-            MAX_PRINTERS * sizeof( PRINTER_INFO_2 ) ,
-            &needed1 ,
-            &returned1 );
-
-         if( !res )
-         {
-            if( GetLastError() != ERROR_INSUFFICIENT_BUFFER )
-               hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
-            else
-            {
-
-               free(buffer) ;
-               buffer = ( unsigned char * ) malloc( needed1 ) ;
-
-               res=EnumPrinters(PRINTER_ENUM_LOCAL| PRINTER_ENUM_CONNECTIONS | PRINTER_ENUM_SHARED ,
-               ( ( PRINTER_INFO_1 * ) ( xpbuffer + sizeof( PRINTER_INFO_1 ) * a ) )->pName ,
-               2 ,
-               buffer ,
-               needed1 ,
-               &needed1 ,
-               &returned1);
+static BOOL GetJobs(HANDLE hPrinter,JOB_INFO_2 **ppJobInfo,int *pcJobs) {
+  DWORD Result = FALSE ;
+  DWORD cByteNeeded;
+  DWORD nReturned;
+  DWORD cByteUsed;
+  JOB_INFO_2 * pJobStorage;
+  PRINTER_INFO_2 * pPrinterInfo;
+  HB_TRACE(HB_TR_DEBUG, ("isprint.c GetJobs()"));
+  GetPrinter(hPrinter, 2, NULL, 0, &cByteNeeded);
+  if (cByteNeeded>0) {
+    pPrinterInfo = (PRINTER_INFO_2 *) hb_xgrab(cByteNeeded);
+    if (pPrinterInfo) {
+      if (GetPrinter(hPrinter,2,(LPBYTE)pPrinterInfo,cByteNeeded,&cByteUsed)) {
+        EnumJobs(hPrinter,0,pPrinterInfo->cJobs,2,NULL,0,(LPDWORD)&cByteNeeded,(LPDWORD)&nReturned) ;
+        if (cByteNeeded>0) {
+          pJobStorage = (JOB_INFO_2 *) hb_xgrab(cByteNeeded);
+          if (pJobStorage) {
+            if (EnumJobs(hPrinter,0,nReturned,2,(LPBYTE)pJobStorage,cByteNeeded,(LPDWORD)&cByteUsed,(LPDWORD)&nReturned)) {
+              *pcJobs = nReturned;
+              *ppJobInfo = pJobStorage;
+              Result = TRUE ;
             }
-         }
-
-         if( !res )
-            hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
-
-         for ( b = 0 ; b < returned1 ; b++ )
-         {
-            PHB_ITEM pSubItems = hb_itemArrayNew( 2 );
-            PHB_ITEM pFile = hb_itemPutC( NULL, ( ( PRINTER_INFO_2 * ) ( buffer + sizeof( PRINTER_INFO_2 ) * b ) )->pPrinterName );
-
-            PHB_ITEM pPort = hb_itemPutC( NULL,( ( PRINTER_INFO_2 * ) ( buffer + sizeof( PRINTER_INFO_2 ) * b ) )->pPortName );
-
-            hb_arraySet( pSubItems , 1 , pFile ) ;
-
-            hb_arraySet( pSubItems , 2 , pPort ) ;
-
-            hb_arrayAdd( pArrayPrinter , pSubItems );
-
-            hb_itemRelease( pFile ) ;
-
-            hb_itemRelease( pPort ) ;
-
-            hb_itemRelease( pSubItems );
+            else {
+              hb_xfree(pJobStorage) ;
+            }
           }
-          free(buffer) ;
+        }
       }
-       free(xpbuffer) ;
-   }
-
-  
-
-
-   hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
-
+      hb_xfree(pPrinterInfo);
+    }
+  }
+  return Result;
 }
 
-DWORD hb_printerIsReadyn( char * pszPrinterName )
-{
-   DWORD dwPrinter;
+DWORD hb_printerIsReadyn( char * pszPrinterName ) {
+  DWORD dwPrinter= -1;
+  HANDLE hPrinter;
+  if (*pszPrinterName && OpenPrinter( pszPrinterName, &hPrinter, NULL ))
+    dwPrinter =  IsPrinterErrorn( hPrinter );
+    CloseHandle(hPrinter) ;
+  return dwPrinter;
+}
 
-
-   {
-      HANDLE hPrinter;
-
-      OpenPrinter( pszPrinterName, &hPrinter, NULL );
-
-      dwPrinter =  IsPrinterErrorn( hPrinter );
-   }
-
-   return dwPrinter;
+HB_FUNC( XISPRINTER ) {
+  char DefaultPrinter[MAXBUFFERSIZE];
+  DWORD pdwBufferSize = MAXBUFFERSIZE;
+  hb_GetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize);
+  hb_retnl( hb_printerIsReadyn( ISCHAR( 1 ) ? hb_parc( 1 ) : (char*)DefaultPrinter ) );
 }
 
 #endif
 
-HB_FUNC( XISPRINTER )
-{
-   #if defined(HB_OS_WIN_32) && !defined(__RSXNT__)
-   {
-      char DefaultPrinter[ 80 ];
-      DWORD pdwBufferSize = 80;
-      DPGetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize);
-      hb_retnl( hb_printerIsReadyn( ISCHAR( 1 ) ? hb_parc( 1 ) : (char*)DefaultPrinter ) );
-    }
-    #endif
-}
-HB_FUNC(PRINTERPORTTONAME)
-{
-   #if defined(HB_OS_WIN_32) && !defined(__RSXNT__)
-   {
-
-      char szDefaultPrinter[ 160 ];
-      DWORD pdwBufferSize = 160;
-      if( THarbourPrinter_GetPrinterNameByPort( ( LPTSTR ) &szDefaultPrinter , &pdwBufferSize , hb_parc(1)) )
-        hb_retc(szDefaultPrinter);
-      else
-        hb_retc("");
-    }
-    #endif
-
-}

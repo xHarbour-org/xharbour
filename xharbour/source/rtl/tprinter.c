@@ -67,9 +67,8 @@ BOOL THarbourPrinter_WriteString(LPCSTR Text);
 BOOL THarbourPrinter_NewPage( void );
 void THarbourPrinter_SetDevice(LPTSTR szDevice);
 void THarbourPrinter_SetJobName(LPTSTR szJobName);
-BOOL THarbourPrinter_DPGetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
-BOOL THarbourPrinter_ReOpenDevice( void );
-BOOL THarbourPrinter_GetPrinterNameByPort(LPTSTR pPrinterName, LPDWORD pdwBufferSize,LPTSTR pPortName);
+BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
+BOOL hb_GetPrinterNameByPort(LPTSTR pPrinterName, LPDWORD pdwBufferSize,LPTSTR pPortName);
 HANDLE THarbourPrinter_hPrinter( void );
 
 static HANDLE hPrinter;
@@ -203,158 +202,219 @@ BOOL THarbourPrinter_NewPage()
    return Result;
 }
 
-#define MAXBUFFERSIZE 250
+#define MAXBUFFERSIZE 255
 
-/* WHY OH WHY ARE YOU DOING THIS?????? */
-   /* #define WINVER  0x0500 */
-
-BOOL THarbourPrinter_DPGetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
+BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
 {
-   BOOL bFlag;
-   OSVERSIONINFO osv;
+   BOOL Result= FALSE ;
    TCHAR cBuffer[ MAXBUFFERSIZE ];
-   PRINTER_INFO_2 *ppi2 = NULL;
-   DWORD dwNeeded = 0;
-   DWORD dwReturned = 0;
-
-   /* What version of Windows are you running? */
-   osv.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
-   GetVersionEx( &osv );
-
-   /* If Windows 95 or 98, use EnumPrinters... */
-   if ( osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
-   {
-      /* The first EnumPrinters() tells you how big our buffer should
-        be in order to hold ALL of PRINTER_INFO_2. Note that this will
-        usually return FALSE. This only means that the buffer (the 4th
-        parameter) was not filled in. You don't want it filled in here... */
-
-      EnumPrinters( PRINTER_ENUM_DEFAULT, NULL, 2, NULL, 0, &dwNeeded, &dwReturned ) ;
-
-      if ( dwNeeded == 0 )
-      {
-         return FALSE;
-      }
-
-      /* Allocate enough space for PRINTER_INFO_2... */
-      ppi2 = ( PRINTER_INFO_2 * ) GlobalAlloc( GPTR, dwNeeded ) ;
-
-      if ( !ppi2 )
-      {
-         return FALSE;
-      }
-
-      /* The second EnumPrinters( )  will fill in all the current information... */
-      bFlag = EnumPrinters( PRINTER_ENUM_DEFAULT, NULL, 2, ( LPBYTE ) ppi2, dwNeeded, &dwNeeded, &dwReturned ) ;
-
-      if ( !bFlag )
-      {
-         GlobalFree( ppi2 ) ;
-
-         return FALSE;
-      }
-
-      /* If given buffer too small, set required size and fail... */
-      if ( ( DWORD ) lstrlen( ppi2->pPrinterName )  >= *pdwBufferSize )
-      {
-         *pdwBufferSize = ( DWORD ) lstrlen( ppi2->pPrinterName )  + 1;
-         GlobalFree( ppi2 ) ;
-
-        return FALSE;
-      }
-
-      /* Copy printer name into passed-in buffer... */
-      lstrcpy( pPrinterName, ppi2->pPrinterName ) ;
-
-      /* Set buffer size parameter to min required buffer size... */
-      *pdwBufferSize = ( DWORD ) lstrlen( ppi2->pPrinterName )  + 1;
+   DWORD nSize ;
+   *pPrinterName = '\0' ;
+   nSize = GetProfileString( "windows", "device", "", cBuffer, MAXBUFFERSIZE ) ;
+   if (nSize < *pdwBufferSize) {
+     strtok( cBuffer, "," ) ;
+     lstrcpy( pPrinterName, cBuffer ) ;
+     /* Set buffer size parameter to min required buffer size... */
+     *pdwBufferSize = ( DWORD ) lstrlen( cBuffer )+1;
+     Result = TRUE ;
    }
-   else if ( osv.dwPlatformId == VER_PLATFORM_WIN32_NT )
-   {
-      /* If Windows NT, use the GetDefaultPrinter API for Windows 2000,
-         or GetProfileString for version 4.0 and earlier... */
-#if 0 // Link error on GetDefaultPrinter() as missing external.
-#if( WINVER >= 0x0500 )
-      extern BOOL GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize );
-
-      if ( osv.dwMajorVersion >= 5 )  /* Windows 2000 or later */
-      {
-         bFlag = GetDefaultPrinter( pPrinterName, pdwBufferSize ) ;
-
-         if ( !bFlag )
-         {
-            return FALSE;
-         }
-      }
-      else /* NT4.0 or earlier */
-#endif
-#endif
-      {
-         /* Retrieve the default string from Win.ini (the registry ) .
-           String will be in form "printername,drivername,portname". */
-         if ( GetProfileString( "windows", "device", ",,,", cBuffer, MAXBUFFERSIZE )  <= 0 )
-         {
-            return FALSE;
-         }
-
-         /* Printer name precedes first "," character... */
-         strtok( cBuffer, "," ) ;
-
-         /* If given buffer too small, set required size and fail... */
-         if ( ( DWORD ) lstrlen( cBuffer )  >= *pdwBufferSize )
-         {
-            *pdwBufferSize = ( DWORD ) lstrlen( cBuffer )  + 1;
-
-            return FALSE;
-         }
-
-         /* Copy printer name into passed-in buffer... */
-         lstrcpy( pPrinterName, cBuffer ) ;
-
-         /* Set buffer size parameter to min required buffer size... */
-         *pdwBufferSize = ( DWORD ) lstrlen( cBuffer )  + 1;
-      }
+   else {
+     /* If given buffer too small, set required size and fail... */
+     *pdwBufferSize = nSize+1 ;
    }
-
-   /* Cleanup... */
-   if ( ppi2 )
-   {
-      GlobalFree( ppi2 ) ;
-   }
-
-   return TRUE;
+   return Result ;
 }
 
-
-#define MAX_PRINTERS 20
-BOOL THarbourPrinter_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize,LPTSTR pPortName )
-{
-   unsigned long needed, returned, a;
-   PRINTER_INFO_5 buffer[ MAX_PRINTERS ];
-
-   EnumPrinters( PRINTER_ENUM_SHARED | PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL |PRINTER_ENUM_CONNECTIONS ,NULL,5,( LPBYTE ) buffer, MAX_PRINTERS*sizeof( PRINTER_INFO_5 ), &needed,&returned ) ;
-
-   for( a = 0 ; a < returned ; a++ )
-   {
-      if ( lstrcmp( buffer[a].pPortName , pPortName ) == 0 )
-      {
-          lstrcpy( pPrinterName , buffer[a].pPrinterName ) ;
-          *pdwBufferSize = ( DWORD ) lstrlen( buffer[a].pPrinterName )  + 1;
-
-          return TRUE;
-      }
-   }
-
-   return FALSE;
-}
 
 HB_FUNC(GETDEFAULTPRINTER)
 {
-      char szDefaultPrinter[ 160 ];
-      DWORD pdwBufferSize = 160;
-      if( THarbourPrinter_DPGetDefaultPrinter( ( LPTSTR ) &szDefaultPrinter , &pdwBufferSize ) )
-         hb_retclen(szDefaultPrinter , pdwBufferSize);
+      char szDefaultPrinter[MAXBUFFERSIZE];
+      DWORD pdwBufferSize = MAXBUFFERSIZE;
+      if( hb_GetDefaultPrinter( ( LPTSTR ) &szDefaultPrinter , &pdwBufferSize ) )
+         hb_retclen(szDefaultPrinter , pdwBufferSize-1);
       else
          hb_retc("");
 }
+
+BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize,LPTSTR pPortName )
+{
+  BOOL Result = FALSE, bFound = FALSE ;
+  unsigned long needed, returned, a;
+  PRINTER_INFO_5 *pPrinterEnum,*buffer;
+  HB_TRACE(HB_TR_DEBUG, "hb_GetPrinterNameByPort()");
+  EnumPrinters( PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS ,NULL,5,( LPBYTE ) buffer, 0, &needed,&returned ) ;
+  if (needed>0) {
+    pPrinterEnum = buffer = ( PRINTER_INFO_5 * ) hb_xgrab( needed ) ;
+    if (EnumPrinters( PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS ,NULL,5,( LPBYTE ) buffer, needed, &needed,&returned ) ) {
+      for( a = 0 ; a < returned && !bFound ; a++, pPrinterEnum++ )  {
+        if ( lstrcmp( pPrinterEnum->pPortName , pPortName ) == 0 ) {
+          bFound = TRUE ;
+          if (*pdwBufferSize >= strlen(pPrinterEnum->pPrinterName)+1) {
+            lstrcpy( pPrinterName , pPrinterEnum->pPrinterName ) ;
+            Result = TRUE;
+          }
+          // Store name length + \0 char for return
+          *pdwBufferSize = ( DWORD ) lstrlen( pPrinterEnum->pPrinterName )  + 1;
+        }
+      }
+    }
+    hb_xfree(buffer) ;
+  }
+  return Result;
+}
+
+HB_FUNC(PRINTERPORTTONAME) {
+  char szDefaultPrinter[MAXBUFFERSIZE];
+  DWORD pdwBufferSize = MAXBUFFERSIZE;
+  if( ISCHAR(1) && hb_parclen(1)>0 && hb_GetPrinterNameByPort( ( LPTSTR ) &szDefaultPrinter , &pdwBufferSize , hb_parc(1)) )
+    hb_retc(szDefaultPrinter);
+  else
+    hb_retc("");
+}
+#define BIG_PRINT_BUFFER (1024*32)
+
+LONG hb_PrintFileRaw(UCHAR *cPrinterName,UCHAR *cFileName, UCHAR *cDocName) {
+  UCHAR  printBuffer[BIG_PRINT_BUFFER] ;
+  HANDLE  hPrinter, hFile ;
+  DOC_INFO_1 DocInfo ;
+  DWORD nRead, nWritten, Result;
+  if ( OpenPrinter(cPrinterName, &hPrinter, NULL) != 0 ) {
+    DocInfo.pDocName = cDocName ;
+    DocInfo.pOutputFile = NULL ;
+    DocInfo.pDatatype = "RAW" ;
+    if ( StartDocPrinter(hPrinter,1,(char *) &DocInfo) != 0 ) {
+      if ( StartPagePrinter(hPrinter) != 0 ) {
+        hFile = CreateFile(cFileName,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL)   ;
+        if (hFile != INVALID_HANDLE_VALUE ) {
+          while (ReadFile(hFile, printBuffer, BIG_PRINT_BUFFER, &nRead, NULL) && (nRead > 0)) {
+            if (printBuffer[nRead-1] == 26 )
+              nRead-- ; // Skip the EOF() character
+            WritePrinter(hPrinter, printBuffer, nRead, &nWritten) ;
+          }
+          Result = 1 ;
+          CloseHandle(hFile) ;
+        }
+        else
+          Result= -6 ;
+        EndPagePrinter(hPrinter) ;
+      }
+      else
+        Result = -4 ;
+      EndDocPrinter(hPrinter);
+    }
+    else
+      Result= -3 ;
+    ClosePrinter(hPrinter) ;
+  }
+  else
+    Result= -2 ;
+  return Result ;
+}
+
+HB_FUNC( PRINTFILERAW )  {
+  UCHAR *cPrinterName, *cFileName, *cDocName ;
+  DWORD Result = -1 ;
+  if (ISCHAR(1) && ISCHAR(2)) {
+    cPrinterName= hb_parc(1) ;
+    cFileName= hb_parc(2) ;
+    cDocName = ISCHAR(3) ? hb_parc(3) : cFileName ;
+    Result = hb_PrintFileRaw(cPrinterName, cFileName, cDocName) ;
+  }
+  hb_retnl(Result) ;
+}
+static BOOL isWinNt(void) {
+  OSVERSIONINFO osvi ;
+  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+  GetVersionEx (&osvi);
+  return(osvi.dwPlatformId == VER_PLATFORM_WIN32_NT); // && osvi.dwMajorVersion >= 4);
+}
+
+HB_FUNC(GETPRINTERS) {
+  HANDLE hPrinter ;
+  DWORD Flags = PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS;
+  BOOL bPrinterNamesOnly= TRUE ;
+  PRINTER_INFO_4 *buffer4, *pPrinterEnum4;
+  PRINTER_INFO_5 *buffer, *pPrinterEnum;
+  PRINTER_INFO_2 *pPrinterInfo2 ;
+  unsigned long needed = 0 , returned=0, a;
+  PHB_ITEM pSubItems, pFile, pPort ;
+  PHB_ITEM pArrayPrinter = hb_itemArrayNew( 0 );
+  buffer = NULL ;
+  HB_TRACE(HB_TR_DEBUG, "GETPRINTERS()");
+  if (ISLOG(1))
+    bPrinterNamesOnly = !hb_parl(1) ;
+  if (isWinNt()) {
+    EnumPrinters(Flags,NULL,4,(LPBYTE) pPrinterEnum4,0,&needed,&returned) ;
+    if (needed > 0) {
+      pPrinterEnum4 = buffer4 = ( PRINTER_INFO_4 * ) hb_xgrab( needed ) ;
+      if (EnumPrinters(Flags,NULL,4,(LPBYTE)  pPrinterEnum4,needed,&needed,&returned)) {
+        if (bPrinterNamesOnly ) {
+          for ( a = 0 ; a < returned ; a++, pPrinterEnum4++) {
+            pFile = hb_itemPutC( NULL, pPrinterEnum4->pPrinterName );
+            hb_arrayAdd( pArrayPrinter , pFile );
+            hb_itemRelease( pFile ) ;
+          }
+        }
+        else {
+          for ( a = 0 ; a < returned ; a++, pPrinterEnum4++) {
+            pSubItems = hb_itemArrayNew( 2 );
+            pFile = hb_itemPutC( NULL, pPrinterEnum4->pPrinterName );
+            if (OpenPrinter(pPrinterEnum4->pPrinterName, &hPrinter, NULL)) {
+              GetPrinter(hPrinter, 2, NULL, 0, &needed);
+              pPrinterInfo2 = ( PRINTER_INFO_2 * ) hb_xgrab( needed ) ;
+              if (GetPrinter(hPrinter,2,(LPBYTE) pPrinterInfo2, needed,&needed))
+                pPort = hb_itemPutC( NULL,pPrinterInfo2->pPortName );
+              else
+                pPort = hb_itemPutC( NULL,"Error" );
+              hb_xfree(pPrinterInfo2) ;
+              CloseHandle(hPrinter) ;
+            }
+            else
+              pPort = hb_itemPutC( NULL,"Error" );
+
+            hb_arraySet( pSubItems , 1 , pFile ) ;
+            hb_arraySet( pSubItems , 2 , pPort ) ;
+            hb_arrayAdd( pArrayPrinter , pSubItems );
+            hb_itemRelease( pFile ) ;
+            hb_itemRelease( pPort ) ;
+            hb_itemRelease( pSubItems );
+          }
+        }
+      }
+      hb_xfree(buffer4) ;
+    }
+  }
+  else {
+    EnumPrinters( Flags,NULL,5,(LPBYTE) buffer,0,&needed,&returned );
+    if( needed > 0 ) {
+      pPrinterEnum = buffer = ( PRINTER_INFO_5 * ) hb_xgrab( needed ) ;
+      if ( EnumPrinters(Flags, NULL , 5 , (LPBYTE) buffer , needed , &needed , &returned ) ) {
+        for ( a = 0 ; a < returned ; a++, pPrinterEnum++) {
+          if (bPrinterNamesOnly ) {
+            pFile = hb_itemPutC( NULL, pPrinterEnum->pPrinterName );
+            hb_arrayAdd( pArrayPrinter , pFile );
+            hb_itemRelease( pFile ) ;
+          }
+          else {
+            pSubItems = hb_itemArrayNew( 2 );
+            pFile = hb_itemPutC( NULL, pPrinterEnum->pPrinterName );
+            pPort = hb_itemPutC( NULL,pPrinterEnum->pPortName );
+            hb_arraySet( pSubItems , 1 , pFile ) ;
+            hb_arraySet( pSubItems , 2 , pPort ) ;
+            hb_arrayAdd( pArrayPrinter , pSubItems );
+            hb_itemRelease( pFile ) ;
+            hb_itemRelease( pPort ) ;
+            hb_itemRelease( pSubItems );
+          }
+        }
+      }
+      hb_xfree(buffer) ;
+    }
+  }
+  hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
+}
+
+
 #endif
+
+
