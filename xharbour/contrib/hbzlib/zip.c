@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.27 2004/03/04 13:48:47 andijahja Exp $
+ * $Id: zip.c,v 1.28 2004/03/18 03:38:59 ronpinkas Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include <hbzip2.h>
+#include "hbapifs.h"
 
 extern HB_ITEM ZipArray;
 static HB_ITEM FileToZip;
@@ -181,6 +182,7 @@ static void ZipCreateExclude( PHB_ITEM pExclude )
 
          WildFile.type = HB_IT_NIL;
          hb_fsDirectory( &WildFile, pExclude->item.asString.value,NULL,NULL,TRUE);
+
          uiLen = WildFile.item.asArray.value->ulLen;
 
          for ( ui = 0 ; ui < uiLen; ui ++ )
@@ -295,7 +297,14 @@ static void ZipCreateArray( PHB_ITEM pParam )
       {
          if ( strchr( szArrEntry, '*' ) != NULL || strchr( szArrEntry, '?' ) != NULL )
          {
+//s.r. Keep current directory because hb_fsdirectory change it !
+            BYTE * pCurDir;
+            pCurDir = ( BYTE * )hb_xstrcpy( NULL, OS_PATH_DELIMITER_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
+//
             hb_fsDirectory(&WildFile,szArrEntry,NULL,NULL,TRUE);
+
+            hb_fsChDir( pCurDir ) ;
+            hb_xfree( pCurDir ) ;
             ulLen = WildFile.item.asArray.value->ulLen;
 
             for ( ul = 0; ul < ulLen ; ul ++ )
@@ -314,7 +323,10 @@ static void ZipCreateArray( PHB_ITEM pParam )
 
                hb_xfree( szEntry );
             }
-
+//s.r. restore to the old directory
+            hb_fsChDir( pCurDir ) ;
+            hb_xfree( pCurDir ) ;
+//
             hb_itemClear( &WildFile );
          }
          else

@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.17 2004/03/18 13:48:20 lculik Exp $
+ * $Id: zipnew.cpp,v 1.18 2004/03/18 13:55:10 lculik Exp $
  */
 
 /*
@@ -607,17 +607,19 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
          szZip.SetPassword( szPassWord );
       }
       if ( pbyBuffer )
-      { 
+      {
          if (hb_stricmp(pbyBuffer,".\\")==0 )
          {
-            hb_fsCurDirBuffEx( 0, (BYTE*) szPath, _POSIX_PATH_MAX + 1 );
+//s.r.
+            szPath[0] = OS_PATH_DELIMITER ;
+            hb_fsCurDirBuffEx( 0, (BYTE*) szPath + 1 , _POSIX_PATH_MAX );
+//
          }
          else
          {
             strcpy(szPath,pbyBuffer);
          }
-         hb_fsChDir((BYTE*)"\\");
-
+//s.r.         hb_fsChDir((BYTE*)"\\");
          szZip.SetRootPath(szPath);
       }
 
@@ -697,7 +699,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
 
    if (szPath)
    {
-      hb_fsChDir((BYTE*)szPath);
+//s.r.      hb_fsChDir((BYTE*)szPath);
       hb_xfree(szPath);
    }
 
