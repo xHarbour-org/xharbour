@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.66 2003/06/23 22:43:19 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.67 2003/06/30 22:29:05 walito Exp $
  */
 
 /*
@@ -85,8 +85,9 @@ extern "C" {
 #define HB_IT_BYREF     ( ( USHORT ) 0x2000 )
 #define HB_IT_MEMVAR    ( ( USHORT ) 0x4000 )
 #define HB_IT_ARRAY     ( ( USHORT ) 0x8000 )
+#define HB_IT_LDOUBLE    ( ( USHORT ) 0x9000 )
 #define HB_IT_OBJECT    HB_IT_ARRAY
-#define HB_IT_NUMERIC   ( ( USHORT ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) )
+#define HB_IT_NUMERIC   ( ( USHORT ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE | HB_IT_LDOUBLE ) )
 #define HB_IT_ANY       ( ( USHORT ) 0xFFFF )
 
 #define HB_IS_OF_TYPE( p, t ) ( ( ( p )->type & ~HB_IT_BYREF ) == t )
@@ -96,6 +97,7 @@ extern "C" {
 #define HB_IS_BLOCK( p )   HB_IS_OF_TYPE( p, HB_IT_BLOCK )
 #define HB_IS_DATE( p )    HB_IS_OF_TYPE( p, HB_IT_DATE )
 #define HB_IS_DOUBLE( p )  HB_IS_OF_TYPE( p, HB_IT_DOUBLE )
+#define HB_IS_LDOUBLE( p )  HB_IS_OF_TYPE( p, HB_IT_LDOUBLE )
 #define HB_IS_INTEGER( p ) HB_IS_OF_TYPE( p, HB_IT_INTEGER )
 #define HB_IS_LOGICAL( p ) HB_IS_OF_TYPE( p, HB_IT_LOGICAL )
 #define HB_IS_LONG( p )    HB_IS_OF_TYPE( p, HB_IT_LONG )
@@ -214,6 +216,10 @@ extern PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask ); /* retrieve a gener
 extern PHB_ITEM HB_EXPORT hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
 extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
 
+#ifndef HB_LONG_DOUBLE_OFF
+extern long double   HB_EXPORT hb_parnld( int iParam, ... ); /* retrieve a numeric parameter as a double */
+#endif
+
 #define hb_retc_buffer( szText )                   hb_retcAdopt( (szText) )
 #define hb_retclen_buffer( szText, ulLen )         hb_retclenAdopt( (szText), (ulLen) )
 #define hb_retc_const( szText )                    hb_retcStatic( (szText) )
@@ -257,6 +263,12 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
     #define hb_retnilen( iNumber, iWidth )       hb_itemPutNILen( &HB_VM_STACK.Return, (iNumber), (iWidth) )
     #define hb_retnllen( lNumber, iWidth )       hb_itemPutNLLen( &HB_VM_STACK.Return, (lNumber), (iWidth) )
     #define hb_retptr( voidPtr )                 hb_itemPutPtrGC( &HB_VM_STACK.Return, (voidPtr) )
+   #ifndef HB_LONG_DOUBLE_OFF
+    #define hb_retnld( dNumber )                  hb_itemPutNLD( &HB_VM_STACK.Return, (dNumber) )
+    #define hb_retnldlen( dNumber, iWidth, iDec ) hb_itemPutNLDLen( &HB_VM_STACK.Return, (dNumber), (iWidth), (iDec) )
+
+   #endif
+
 #else
    //JC1: including thread anyways, because it defines some void macros when not in MT
    #include "thread.h"
@@ -287,6 +299,11 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
     extern void  HB_EXPORT  hb_retnllen( long lNumber, int iWidth ); /* returns a long number, with specific width */
     extern void  HB_EXPORT  hb_reta( ULONG ulLen );  /* returns an array with a specific length */
     extern void  HB_EXPORT  hb_retptr( void *voidPtr ); /* returns a pointer to an allocated memory, collected by GC */
+   #ifndef HB_LONG_DOUBLE_OFF
+   extern void  HB_EXPORT  hb_retnld( long double dNumber ); /* returns a double */
+   extern void  HB_EXPORT  hb_retnldlen( long double dNumber, int iWidth, int iDec ); /* returns a double, with specific width and decimals */
+
+   #endif
 #endif
 
 extern void  HB_EXPORT  hb_storc( char * szText, int iParam, ... ); /* stores a szString on a variable by reference */
@@ -296,7 +313,11 @@ extern void  HB_EXPORT  hb_storl( int iLogical, int iParam, ... ); /* stores a l
 extern void  HB_EXPORT  hb_storni( int iValue, int iParam, ... ); /* stores an integer on a variable by reference */
 extern void  HB_EXPORT  hb_stornl( long lValue, int iParam, ... ); /* stores a long on a variable by reference */
 extern void  HB_EXPORT  hb_stornd( double dValue, int iParam, ... ); /* stores a double on a variable by reference */
+extern void  HB_EXPORT  hb_stornld(long double dValue, int iParam, ... ); /* stores a double on a variable by reference */
 
+#ifndef HB_LONG_DOUBLE_OFF
+extern void  HB_EXPORT  hb_stornld( long double dValue, int iParam, ... ); /* stores a double on a variable by reference */
+#endif
 extern void    HB_EXPORT hb_xinit( void );                         /* Initialize fixed memory subsystem */
 extern void    HB_EXPORT hb_xexit( void );                         /* Deinitialize fixed memory subsystem */
 extern void    HB_EXPORT * hb_xalloc( ULONG ulSize );                /* allocates memory, returns NULL on failure */
@@ -353,6 +374,10 @@ extern BOOL     HB_EXPORT hb_arraySort( PHB_ITEM pArray, ULONG * pulStart, ULONG
 extern PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen ); /* Creates and returns an Array of n Elements from the Eval Stack - Does NOT pop the items. */
 extern PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase ); /* Creates and returns an Array of Generic Parameters for specified base symbol. */
 extern PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase ); /* Creates and returns GC-LOCKED an Array of Generic Parameters for specified base symbol. */
+
+#ifndef HB_LONG_DOUBLE_OFF
+extern long double   HB_EXPORT hb_arrayGetNLD( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the double value contained on an array element */
+#endif
 
 /* string management */
 
@@ -544,6 +569,11 @@ extern char * hb_getenv( const char * name );
 #ifndef HB_I_
    #define HB_I_( x ) x
 #endif
+ /* long Double support */
+#ifndef 
+
+
+
 
 #if defined(HB_EXTERN_C)
 }

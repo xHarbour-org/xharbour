@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.9 2003/05/26 00:19:15 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.10 2003/06/18 08:57:01 ronpinkas Exp $
  */
 
 /*
@@ -187,6 +187,15 @@
        PHB_SYMB value;
     };
 
+   #ifndef HB_LONG_DOUBLE_OFF
+   struct hb_struLDouble
+   {
+      USHORT length;
+      USHORT decimal;
+      long double value;
+   };
+#endif
+
     /* items hold at the virtual machine stack */
     typedef struct _HB_ITEM
     {
@@ -197,6 +206,9 @@
           struct hb_struBlock   asBlock;
           struct hb_struDate    asDate;
           struct hb_struDouble  asDouble;
+          #ifndef HB_LONG_DOUBLE_OFF
+          struct hb_struLDouble asLDouble;
+          #endif
           struct hb_struInteger asInteger;
           struct hb_struLogical asLogical;
           struct hb_struLong    asLong;

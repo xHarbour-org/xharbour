@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.13 2003/01/29 21:30:26 andijahja Exp $
+ * $Id: hbapifs.h,v 1.14 2003/02/10 00:47:24 lculik Exp $
  */
 
 /*
@@ -176,8 +176,11 @@ typedef struct
    char      szDate[ 9 ]; /* in YYYYMMDD format */
    char      szTime[ 9 ]; /* in HH:MM:SS format */
    USHORT    attr;
-   ULONG     size; /* TOFIX: Use LONGLONG or double instead */
-
+   #ifndef HB_LONG_DOUBLE_OFF
+   long double size; 
+   #else
+   ULONG   size; 
+   #endif
    void *    info; /* Pointer to the platform specific find info */
 
 } HB_FFIND, * PHB_FFIND;
