@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.134 2002/06/22 16:20:33 alkresin Exp $
+ * $Id: dbfntx1.c,v 1.20 2002/06/25 00:49:18 lculik Exp $
  */
 
 /*
@@ -130,6 +130,11 @@
 
 HB_FUNC( _DBFNTX );
 HB_FUNC( DBFNTX_GETFUNCTABLE );
+
+#ifdef HB_PCODE_VER
+   #undef HB_PRG_PCODE_VER
+   #define HB_PRG_PCODE_VER HB_PCODE_VER
+#endif
 
 HB_INIT_SYMBOLS_BEGIN( dbfntx1__InitSymbols )
 { "_DBFNTX",             HB_FS_PUBLIC, HB_FUNCNAME( _DBFNTX ),             0 },
