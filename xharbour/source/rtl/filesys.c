@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.38 2003/07/18 18:06:49 jonnymind Exp $
+ * $Id: filesys.c,v 1.39 2003/07/23 22:09:30 druzus Exp $
  */
 
 /*
@@ -531,14 +531,45 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 
 #if defined(OS_UNIX_COMPATIBLE)
    {
-      FHANDLE hPipeHandle[2];
+#ifndef MAXFD
+    #define MAXFD		1024
+#endif
+      FHANDLE hPipeHandle[2], hNullHandle;
       pid_t pid;
+      BYTE * pbyTmp;
       BOOL bRead;
+      ULONG ulLen;
 
       //JC1: unlocking the stack to allow cancelation points
       HB_STACK_UNLOCK;
 
-      bRead = ( *pMode == 'r' );
+      ulLen = strlen( pFilename );
+      if( *pMode == 'r' || *pMode == 'w' )
+         bRead = ( *pMode == 'r' );
+      else
+      {
+         if( pFilename[0] == '|' )
+            bRead = FALSE;
+         else if( pFilename[ ulLen - 1 ] == '|' )
+            bRead = TRUE;
+         else
+            bRead = FALSE;
+      }
+
+      if( pFilename[0] == '|' )
+      {
+          ++pFilename;
+          --ulLen;
+      }
+      if( pFilename[ ulLen - 1 ] == '|' )
+      {
+          pbyTmp = hb_xgrab( ulLen );
+          hb_xmemcpy( pbyTmp, pFilename, --ulLen );
+          pbyTmp[ulLen] = 0;
+          pFilename = pbyTmp;
+      } else
+          pbyTmp = NULL;
+
       errno = 0;
       if( pipe( hPipeHandle ) == 0 ) {
          if( ( pid = fork() ) != -1 ) {
@@ -556,13 +587,22 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
                argv[1] = "-c";
                argv[2] = ( char * ) pFilename;
                argv[3] = ( char * ) 0;
+               hNullHandle = open("/dev/null", O_RDWR);
                if( bRead ) {
                   close( hPipeHandle[ 0 ] );
                   dup2( hPipeHandle[ 1 ], 1 );
+                  dup2( hNullHandle, 0 );
+                  dup2( hNullHandle, 2 );
                } else {
                   close( hPipeHandle[ 1 ] );
                   dup2( hPipeHandle[ 0 ], 0 );
+                  dup2( hNullHandle, 1 );
+                  dup2( hNullHandle, 2 );
                }
+               for( hNullHandle = 3; hNullHandle < MAXFD; ++hNullHandle )
+                  close(hNullHandle);
+               setuid(getuid());
+               setgid(getgid());
                execve("/bin/sh", argv, environ);
                exit(1);
             }
@@ -572,15 +612,17 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
          }
       }
       s_uiErrorLast = errno;
+      if( pbyTmp )
+         hb_xfree( pbyTmp );
    }
 
    HB_STACK_LOCK;
+
 #else
 
    HB_SYMBOL_UNUSED( pFilename );
    HB_SYMBOL_UNUSED( pMode );
 
-   // hFileHandle = FS_ERROR;
    s_uiErrorLast = FS_ERROR;
 
 #endif
