@@ -1,5 +1,5 @@
 /*
- * $Id: charone.c,v 1.1 2003/03/04 21:04:08 lculik Exp $
+ * $Id: charone.c,v 1.2 2004/07/23 08:53:07 likewolf Exp $
  */
 
 /*
@@ -132,7 +132,7 @@ static void do_charone( int iSwitch )
 
          case DO_CHARONE_WORDONE:
          {
-            if ( sStrLen > 3 )
+            if ( sStrLen > 3 && sDeleteSetLen >= 2 )
             {
                char *pcSub;
                char *pcRet;
@@ -157,11 +157,11 @@ static void do_charone( int iSwitch )
 		  }
 		  else if ( pcDeleteSet != NULL )
 		  {
-		     char *pc;
+		     char *pc = NULL;
 		     char *pStart = pcDeleteSet;
 		     size_t sLen = sDeleteSetLen;
 		     
-		     while ( sLen > 1
+		     while ( sLen >= 2
 		             && ( pc = ct_at_exact_forward( pStart, sLen,
 		                                            pcSub, 2, NULL ) )
 			     && ( pc - pcDeleteSet ) % 2 == 1 )

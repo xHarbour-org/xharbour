@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3230 2004/07/28 23:27:52 druzus Exp $
+ * $Id: ChangeLog,v 1.3231 2004/07/29 06:43:27 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-07-29 14:58 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * contrib/libct/charone.c
+    ! Fixed WORDONE() to work when the second parameter is less than 2
+      characters in length.
+  * contrib/libct/replace.c
+    ! Fixed REPLALL(), REPLLEFT(), REPLRIGHT(). Fix provided by Martin Vogel.
+  + contrib/libct/replace.prg
+    + Added a test for REPLALL(), REPLLEFT(), and REPLRIGHT().
+			
 2004-07-28 23:42 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * xdiff.txt
     * Updated to include NIL in native type related extensions.
@@ -216,6 +225,7 @@
     - Removed ::DrawRows(). It was integrated to ::DrawARow(), so there
       will not be double code for the same task.
 
+>>>>>>> 1.3231
 2004-07-24 13:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * contrib/libct/ascpos.c
   * contrib/libct/tests/ascpos.prg
