@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.923 2003/04/07 06:48:43 paultucker Exp $
+ * $Id: ChangeLog,v 1.924 2003/04/07 20:15:10 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-08 10:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * remove unneeded file -> include/hbclass.chk
+  * include/hbver.h
+    ! change build number to 81
+    ! change ChangeLog entries
+  * taggeg CVC files per "04-08-2003 10:00:00" (Local Time)
 
 2003-04-07 22:14 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/hbcrypt.c
