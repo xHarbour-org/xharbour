@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.19 2004/03/10 19:06:09 peterrees Exp $
+ * $Id: achoice.prg,v 1.20 2004/05/25 18:56:47 guerra000 Exp $
  */
 
 /*
@@ -611,13 +611,13 @@ STATIC PROCEDURE DispLine( cLine, nRow, nCol, lSelect, lHiLite, nNumCols )
 
    ColorSelect( iif( lSelect .AND. ISCHARACTER( cLine ), ;
                 iif( lHiLite, CLR_ENHANCED, CLR_STANDARD ), CLR_UNSELECTED ) )
-
+   
    IF ISCHARACTER( cLine )
       DispOutAt( nRow, nCol, PadR( cLine, nNumCols ) )
    ELSE
       DispOutAt( nRow, nCol, Space( nNumCols ) )
    ENDIF
-
+   SetPos( nRow, nCol )
    ColorSelect( CLR_STANDARD )
 
    RETURN
