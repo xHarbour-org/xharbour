@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:43:15 ronpinkas Exp $
+# $Id: Makefile,v 1.2 2003/01/12 22:50:20 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -7,7 +7,6 @@ ROOT = ../../
 C_SOURCES=\
 	ppcore.c \
 	ppcomp.c \
-	pplib.c \
 	pptable.c \
 	pragma.c \
 

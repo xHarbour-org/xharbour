@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.20 2003/02/23 20:13:38 jonnymind Exp $
+# $Id: Makefile,v 1.21 2003/03/18 15:02:46 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -83,6 +83,7 @@ C_SOURCES=\
         philes.c     \
         philes53.c   \
         philesx.c    \
+        pplib.c      \
         rat.c        \
         regex.c      \
         replic.c     \

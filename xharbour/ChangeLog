@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.860 2003/03/20 16:07:33 patrickmast Exp $
+ * $Id: ChangeLog,v 1.861 2003/03/21 00:06:22 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-20 16:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/Makefile
+  * source/rtl/Makefile
+    * Modified to reflect new location of pplib.c.
 
 2003-03-20 16:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   - source/compiler/simplex.c
@@ -22,10 +27,6 @@
 
   * makefile.bc
     * Modified to reflect new location of pplib.c.
-
-  /*
-     I'll soon correct VC make files, someone may need to correct the GNU make.
-   */
 
 2003-03-20 17:05 UTC+0100 Patrick Mast <patrick@winfakt.com>
   * utils/hbmake/hbmake.prg
