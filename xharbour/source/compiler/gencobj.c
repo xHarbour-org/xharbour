@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.9 2004/02/05 12:44:17 andijahja Exp $
+ * $Id: gencobj.c,v 1.10 2004/08/21 17:27:15 lf_sfnet Exp $
  */
 
 /*
@@ -32,7 +32,7 @@
 /* Prototype */
 static char * hb_searchpath( const char *, char *, char * );
 
-#define HB_CFG_FILENAME    "harbour.cfg"
+
 
 /* QUESTION: Allocate buffer dynamically ? */
 #define HB_CFG_LINE_LEN    100
@@ -48,19 +48,23 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
    char szOptions[ HB_CFG_LINE_LEN ] = "";
    char szCommandLine[ HB_CFG_LINE_LEN * 2 ];
    char szOutPath[ _POSIX_PATH_MAX ] = "\0";
+
 #if defined( OS_UNIX_COMPATIBLE )
    char szDefaultPath[ _POSIX_PATH_MAX ] = "/etc:/usr/local/etc";
    char * pszEnv = szDefaultPath;
+   #define HB_CFG_FILENAME    "harbour.cfg"   
    #define HB_NULL_STR " > /dev/null"
    #define HB_ACCESS_FLAG F_OK
 #elif defined( OS_DOS_COMPATIBLE )
    char szDefaultPath[ _POSIX_PATH_MAX ] = "PATH";
    char * pszEnv = hb_getenv( "PATH" );
+   #define HB_CFG_FILENAME    "harbour.cfg"   
    #define HB_NULL_STR " >nul"      
    #define HB_ACCESS_FLAG 0
 #else
    char szDefaultPath[ _POSIX_PATH_MAX ] = NULL;
 #endif
+   
    FILE * yyc;
    char * pszCfg;
    BOOL bVerbose = FALSE;   /* Don't show C compiler messages (default). */
@@ -76,16 +80,29 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
 
    /* Begin second pass */
 
-   /* Grab space */
-   pszCfg = ( char * ) hb_xgrab( /*strlen( pszEnv )*/ _POSIX_PATH_MAX );
+   pszCfg = hb_getenv( "HB_CFG_FILE" );
+   
+   if( !pszCfg )
+   {
+      /* Grab space */
+      pszCfg = ( char * ) hb_xgrab( /*strlen( pszEnv )*/ _POSIX_PATH_MAX );
 
-   if( pszEnv && pszEnv[ 0 ] != '\0' && *hb_searchpath( HB_CFG_FILENAME, pszEnv, pszCfg ) )
+      if( pszEnv && pszEnv[ 0 ] != '\0' )
+      { 
+         if( !*hb_searchpath( HB_CFG_FILENAME, pszEnv, pszCfg ) )
+         { 
+            pszCfg = NULL;
+         }
+      }
+   }
+         
+   if( pszCfg )
    {
 
       yyc = fopen( pszCfg, "rt" );
       if( ! yyc )
       {
-         printf( "\nError: Can't open %s file.\n", HB_CFG_FILENAME );
+         printf( "\nError: Can't open %s file.\n", pszCfg );
          return;
       }
 

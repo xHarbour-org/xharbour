@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3397 2004/09/03 08:39:51 druzus Exp $
+ * $Id: ChangeLog,v 1.3398 2004/09/03 13:45:13 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-03 17:55 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * xharbour/source/compiler/gencobj.c
+    * now you can you set HB_CFG_FILE=mycfg.conf. It is useful if you use
+    * ( like me ) different C compilers. Before it was necessary to copy
+    * <file>.cfg to harbour.cfg. It is an addition, it does not change 
+    * the default behaviour.
 
 2004-09-03 15:55 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   + xharbour/bin/pack_src.bat
