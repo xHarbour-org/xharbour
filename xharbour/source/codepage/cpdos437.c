@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cpdos437.c,v 1.1 2004/12/21 13:51:49 mauriliolongo Exp $
  */
 
 /*
@@ -83,7 +83,7 @@
  */
 
 static HB_CODEPAGE s_codepage = { "ITDOS437",
-    CPID_437, UNITB_8859_1, NUMBER_OF_CHARACTERS,
+    CPID_437, UNITB_437, NUMBER_OF_CHARACTERS,
     "AÖ†BCDEäÇFGHIç°JKLMNOï¢PQRSTUó£VWXYZ",
     "aÖ†bcdeäÇfghiç°jklmnoï¢pqrstuó£vwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0,NULL,NULL,NULL,NULL,0,NULL };

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3688 2004/12/20 16:47:45 mlombardo Exp $
+ * $Id: ChangeLog,v 1.3689 2004/12/21 13:51:19 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-21 15:40 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   ! source/codepage/cpdos437.c
+     ! it has to "point" to unicode 437 UNITB_437, fixed
 
 2004-12-21 14:40 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/codepage/Makefile
