@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.18 2002/10/14 04:19:23 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.19 2002/10/17 09:59:15 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -288,7 +288,7 @@ METHOD enableall() CLASS TToolBar
 CLASS ToolButton
    DATA ImageIndex INIT -1
    DATA Name       INIT "ToolButton"
-   DATA Style      INIT TBSTYLE_BUTTON
+   DATA Style      PROTECTED INIT TBSTYLE_BUTTON
    DATA PopupMenu
    DATA Hint
    DATA Height
@@ -301,6 +301,7 @@ CLASS ToolButton
    DATA Cargo
    DATA TextIndex  INIT 0
    DATA Parent     HIDDEN
+   ASSIGN Enabled(l) INLINE IF( l,::Parent:enable( ::id),::Parent:disable( ::id))
    METHOD New() CONSTRUCTOR
 ENDCLASS
 

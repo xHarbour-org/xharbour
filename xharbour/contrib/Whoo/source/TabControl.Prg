@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.19 2002/10/14 04:19:23 what32 Exp $
+ * $Id: TabControl.Prg,v 1.20 2002/10/17 09:59:15 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -42,26 +42,24 @@ IMPORT C STRUCTURE NMHDR
 
 *-----------------------------------------------------------------------------*
 
-//CLASS TTabControl FROM TWinControl
 CLASS TTabControl FROM TCustomControl
 
-   DATA Caption  PROTECTED INIT ""
-   DATA xxLeft   PROTECTED  INIT    0
-   DATA xxTop    PROTECTED  INIT    0
-   DATA xxWidth  PROTECTED  INIT  160
-   DATA xxHeight PROTECTED  INIT  160
+   DATA Caption   PROTECTED INIT ""
+   DATA xxLeft    PROTECTED INIT    0
+   DATA xxTop     PROTECTED INIT    0
+   DATA xxWidth   PROTECTED INIT  160
+   DATA xxHeight  PROTECTED INIT  160
 
    DATA CurSel  INIT    1
 
-   DATA Style   INIT  WS_CHILD + WS_VISIBLE + WS_TABSTOP
-   DATA ExStyle INIT  0
+   DATA Style     PROTECTED INIT  WS_CHILD + WS_VISIBLE + WS_TABSTOP
+   DATA ExStyle   PROTECTED INIT  0
 
    DATA lRegister PROTECTED INIT .F.
    DATA lControl  PROTECTED INIT .T.
    DATA Msgs      PROTECTED INIT {WM_SIZE,WM_MOVE}
    DATA WndProc   PROTECTED INIT 'ControlProc'
    DATA Name      PROTECTED INIT WC_TABCONTROL
-
 
    DATA Cargo            PROTECTED
    DATA SendTo AS OBJECT PROTECTED
@@ -135,6 +133,7 @@ METHOD AddTab( cName, oPage, nImgPos ) CLASS TTabControl
       oPage:= NIL
    endif
    DEFAULT oPage TO TabPage():New( self, cName )
+   ShowWindow( oPage:handle, SW_SHOW )
    if cRes != NIL
       oPage:resname := cRes
       oPage:ImageIndex := nImgPos

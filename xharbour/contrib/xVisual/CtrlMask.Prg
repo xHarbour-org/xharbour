@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.21 2002/10/18 20:12:20 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.22 2002/10/19 10:03:48 what32 Exp $
  */
 
 /*
@@ -489,6 +489,7 @@ METHOD OnLButtonDown( wParam, x, y )
                ::aSelected:={{hChild,aclone(aRect),x-aRect[1],y-aRect[2],{},aclone(aRect)}}   // handle,rect,anchorX,anchorY,aHot
             ENDIF
             ::HintWindow:Activate(1)
+                  ::HintWindow:TrackHint(1)
             ::lHintActive := .T.
             IF Len(::aSelected)==1 .and. (nPos:=aScan(::aSelected[1,SEL_HOTAREAS],{|a| ptInRect(a[1],{x,y})})) > 0 // <= aHot
                ::nClick:=::aSelected[1,SEL_HOTAREAS,nPos,2]

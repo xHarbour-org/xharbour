@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.65 2002/10/18 20:12:20 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.66 2002/10/19 10:03:48 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -84,6 +84,7 @@ GLOBAL EXTERNAL oApp
                                       ::xGrid   := 8          ,;
                                       ::yGrid   := 8          ,;
                                       ::GridColor:=RGB(0,0,0) ,;
+                                      ::BorderStyle := "bsSizeable",;
                                       super:New( oParent )    ,;
                                       ::XFMTop()
 
@@ -199,7 +200,7 @@ METHOD CreateControl(aRect)
 
    LOCAL oObj
    LOCAL nInd:=0
-   LOCAL cName
+   LOCAL cName, oTree, o, n
    static cRebar
    IF ! Empty( ::CtrlName )
 
@@ -233,6 +234,7 @@ METHOD CreateControl(aRect)
          oObj:=::Add(cName, TTabControl():New( self,        508, aRect[1], aRect[2], aRect[3], aRect[4] ) )
          oObj:AddTab( "Tab1" )
          oObj:configure()
+      CASE ::CtrlName=="TabPage"
       CASE ::CtrlName=="GroupBox"
          oObj:=::Add(cName, TGroupBox():New(   self, cName, 509, aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="TreeView"
@@ -251,6 +253,7 @@ METHOD CreateControl(aRect)
          oObj:AddButton("Open",ToolButton():New( 1 , ,"Open", 100 ) )
          IF cRebar != NIL
             ::GetObj(cRebar):AddBand( , RBBS_GRIPPERALWAYS+RBBS_NOVERT+RBBS_BREAK, oObj:handle, 200, 20, 200, "", NIL )
+            ::Parent:ObjTree:GetItem(::GetObj(cRebar)):Add( oObj:PropName,1, oObj:handle )
          ENDIF
 
       CASE ::CtrlName=="ProgressBar"
@@ -263,15 +266,22 @@ METHOD CreateControl(aRect)
       ENDCASE
 
       if oObj!=NIL
-        // oObj:SetMethod("OnMove",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj,1,::oMask:moving,::oMask:sizing )})
-        // oObj:SetMethod("OnSize",{||oObj:Parent:Parent:ObjInsp:SetBrowserData( oObj,1,::oMask:moving,::oMask:sizing )})
          oObj:SetMethod("Delete",{||oApp:MainFrame:ObjInsp:InspCombo:DelObject( oObj ), ;
                                     HB_QSELF():DelControl(), oObj:Parent:XFMControl( NIL, oObj, .T. ) } )
 
          oApp:MainFrame:ObjInsp:InspCombo:AddString(oObj:propname+chr(9)+oObj:ClassName(),oObj)
          oApp:MainFrame:ObjInsp:InspCombo:SetCurSel(oApp:MainFrame:ObjInsp:InspCombo:GetCount()-1)
-         ::Parent:ObjTree:Tree:Add( oObj:PropName,1, oObj:handle )
+         oTree := ::Parent:ObjTree:Tree:Add( oObj:PropName,1, oObj:handle )
          ::Parent:ObjTree:Tree:Expand()
+         
+         IF !EMPTY(oObj:Controls)
+            FOR n:=1 TO LEN(oObj:Controls)
+                o:=oObj:Controls[n]
+                oTree:Add( o:propname,1, o:handle )
+                oTree:Expand()
+            NEXT
+         ENDIF
+         
       endif
    ENDIF
    ::Parent:StdBar:CheckButton( 150, .T. )

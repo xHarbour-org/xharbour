@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.31 2002/10/17 09:59:17 what32 Exp $
+ * $Id: xInspect.prg,v 1.32 2002/10/17 17:16:46 what32 Exp $
  */
 
 /*
@@ -38,18 +38,6 @@
 
 GLOBAL EXTERNAL oApp
 
-typedef struct {;
-    UINT    mask;
-    int     cxy;
-    LPTSTR  pszText;
-    HBITMAP hbm;
-    int     cchTextMax;
-    int     fmt;
-    LPARAM  lParam;
-    int     iImage;
-    int     iOrder;
-} HDITEM, FAR * LPHDITEM
-
 CLASS ObjInspect FROM TForm
 
    VAR Browser  AS OBJECT
@@ -67,9 +55,8 @@ CLASS ObjInspect FROM TForm
    METHOD OnCreate()
    METHOD OnSize(n,x,y)  INLINE  ::GetObj("InspCombo"):Move(,,x,21,.t.),;
                                  ::GetObj("InspTabs"):Move(,25,x,y-25,.t.),;
-                                 MoveWindow(::browser:hWnd, 0, 0,;
-                                                      ::InspTabs:Properties:ClientRect()[3],;
-                                                      ::InspTabs:Properties:ClientRect()[4],.t.),;
+                                 ::browser:width :=::InspTabs:Properties:ClientRect()[3],;
+                                 ::browser:height:=::InspTabs:Properties:ClientRect()[4],;
                                  nil
    METHOD SetBrowserData()
    METHOD SaveVar()
@@ -100,7 +87,7 @@ RETURN Self
 //-------------------------------------------------------------------------------------------------
 
 METHOD OnCreate() CLASS ObjInspect
-  local oCol1, oCol2, aProp, aHeads
+  local oCol, aProp, aHeads
 
   local aRect := ::ClientRect()
   local oCombo:= ComboInsp():New(  self, 100, 0, 0, aRect[3], 100 )
@@ -116,18 +103,18 @@ METHOD OnCreate() CLASS ObjInspect
 
 
 //------------------------------------------------------------------------ sets the browser
-  aHeads:= { { "Property", 85,},;
-             { "Value",    80, {|cText,o,nKey|::SaveVar(cText,nKey)} }   }
 
-  aProp := { {"",""} }  // initial data
+aHeads:= { { "Property", 83,},;
+           { "Value",    80, {|cText,o,nKey|::SaveVar(cText,nKey)} }   }
 
-  ::Browser:= TCBrowser():New( ::InspTabs:Properties, 0, 0, 100, 100, aHeads, aProp )
-  ::Browser:wantHScroll  :=.F.
-  ::Browser:HeadHeight   :=0
-  ::Browser:BgColor      := GetSysColor(COLOR_BTNFACE)
-  ::Browser:HiliteNoFocus:= GetSysColor(COLOR_BTNFACE)
-  ::Browser:Create()
+aProp := { {"",""} }  // initial data
 
+::Browser:=TWBrowse():New( ::InspTabs:Properties, 150, 0, 0, 100, 100, aProp, aHeads )
+::Browser:BgColor      := GetSysColor(COLOR_BTNFACE)
+::Browser:HiliteNoFocus:= GetSysColor(COLOR_BTNFACE)
+::Browser:wantHScroll  :=.F.
+::Browser:HeadHeight   := 0
+::Browser:Create()
 
 return( super:OnCreate() )
 
@@ -161,12 +148,12 @@ METHOD SaveVar(cText,nKey) CLASS ObjInspect
          ::CurObject:Parent:oMask:Refresh()
       ENDIF
 //----------------------------------------------------------------------------------------
-      SetFocus(::Browser:hWnd)
+      SetFocus(::Browser:handle)
    endif
 
    IF nKey==VK_UP .OR. nKey==VK_DOWN
-      PostMessage( ::Browser:hWnd, WM_KEYDOWN, nKey, 0 )
-      PostMessage( ::Browser:hWnd, WM_LBUTTONDBLCLK, 0, 0 )
+      PostMessage( ::Browser:handle, WM_KEYDOWN, nKey, 0 )
+      PostMessage( ::Browser:handle, WM_LBUTTONDBLCLK, 0, 0 )
       ::Browser:RefreshAll()
    ENDIF
 return(self)

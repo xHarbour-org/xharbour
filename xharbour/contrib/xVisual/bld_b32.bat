@@ -65,9 +65,9 @@ echo edcolor.obj + >> b32.bc
 echo , + >> b32.bc
 echo %1.exe, + >> b32.bc
 echo %1.map, + >> b32.bc
+echo %BCC_DIR%\lib\ws2_32.lib + >> b32.bc
 echo %WHAT32%\lib\What32.lib + >> b32.bc
 echo %WHOO%\lib\whoo.lib  + >> b32.bc
-echo whatplus.lib  + >> b32.bc
 echo %HB_INSTALL%\lib\rtl.lib + >> b32.bc
 echo %HB_INSTALL%\lib\vm.lib + >> b32.bc
 echo %HB_INSTALL%\lib\gtwin.lib + >> b32.bc

@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.42 2002/10/13 11:16:29 what32 Exp $
+ * $Id: TForm.prg,v 1.43 2002/10/14 01:36:55 fsgiudice Exp $
  */
 
 /*
@@ -42,15 +42,19 @@
 *-----------------------------------------------------------------------------*
 
 CLASS TForm FROM TWinControl
-   DATA WindowMenu   EXPORTED
    DATA Modal        PROTECTED INIT .F.
    DATA resname      PROTECTED
    DATA xhBorder     PROTECTED
 
 //-------------------------------------------------------------------------------------------
    ACCESS biSystemMenu    INLINE AND( ::Style, WS_SYSMENU ) # 0
-   ASSIGN biSystemMenu(l) INLINE ::SetStyle(WS_SYSMENU,l),;
-                                 ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
+   ASSIGN biSystemMenu(l) INLINE IF(::handle!=NIL.AND.IsWindow(::handle),;
+                                    ::SetStyle(WS_SYSMENU,l),;
+                                    ::Style := OR( ::Style, WS_SYSMENU ) ;
+                                    ),;
+                                 IF(::handle!=NIL.AND.IsWindow(::handle),;
+                                    ::Style := GetWindowLong( ::handle, GWL_STYLE ),;
+                                    )
 
    ACCESS biMinimize      INLINE AND( ::Style, WS_MAXIMIZEBOX ) # 0
    ASSIGN biMinimize(l)   INLINE ::SetStyle(WS_MAXIMIZEBOX,l),;
@@ -62,26 +66,23 @@ CLASS TForm FROM TWinControl
 
 //-------------------------------------------------------------------------------------------
 
-   ACCESS bsSizeable    INLINE {WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+;
+   ACCESS bsSizeable    INLINE {WS_OVERLAPPED+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+;
                                          WS_MAXIMIZEBOX+WS_THICKFRAME,  0 }
-   ACCESS bsSingle      INLINE {WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+;
+   ACCESS bsSingle      INLINE {WS_OVERLAPPED+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+;
                                          WS_MAXIMIZEBOX, 0 }
 
-   ACCESS bsDialog      INLINE {WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+DS_MODALFRAME, 0 }
+   ACCESS bsDialog      INLINE {WS_OVERLAPPED+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+DS_MODALFRAME, 0 }
 
-   ACCESS bsNone        INLINE {WS_POPUP+WS_VISIBLE, 0 }
+   ACCESS bsNone        INLINE {WS_OVERLAPPED+WS_VISIBLE, 0 }
    ACCESS bsSizeToolWin INLINE {WS_OVERLAPPEDWINDOW, WS_EX_TOOLWINDOW }
-   ACCESS bsToolWindow  INLINE {WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+;
+   ACCESS bsToolWindow  INLINE {WS_OVERLAPPED+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+;
                                          DS_MODALFRAME, WS_EX_TOOLWINDOW }
 
 
    ACCESS BorderStyle    INLINE iif( ::xhBorder != NIL, ::xhBorder, "bsSizeable" )
    ASSIGN BorderStyle(c) INLINE ::xhBorder := c,;
-                                ::SetLong( GWL_STYLE, __objSendMsg( self, c )[1] ),;
-                                ::SetLong( GWL_EXSTYLE, __objSendMsg( self, c )[2] ),;
-                                ::Style := ::GetLong( GWL_STYLE ),;
-                                ::ExStyle := ::GetLong( GWL_EXSTYLE ),;
-                                InvalidateRect( ::handle )
+                                ::SetBorders(c)
+                                
 
 //-------------------------------------------------------------------------------------------
 
@@ -92,7 +93,24 @@ CLASS TForm FROM TWinControl
    METHOD ChildFromId( hHandle )
    METHOD GetObj()
    METHOD SetLink()
+   METHOD SetBorders()
+   
 ENDCLASS
+
+METHOD SetBorders(c) CLASS TForm
+   local nSt  := __objSendMsg( self, c )[1]
+   local nExSt:= __objSendMsg( self, c )[2]
+   IF ::handle!=NIL.AND.IsWindow( ::handle )
+      ::SetLong( GWL_STYLE, nSt )
+      ::SetLong( GWL_EXSTYLE, nExSt )
+      ::Style := ::GetLong( GWL_STYLE )
+      ::ExStyle := ::GetLong( GWL_EXSTYLE )
+      UpdateWindow( ::handle )
+     else
+      ::Style  := OR( ::Style, nSt )
+      ::ExStyle:= OR( ::Style, nExSt )
+    ENDIF
+RETURN(c)
 
 *-----------------------------------------------------------------------------*
 

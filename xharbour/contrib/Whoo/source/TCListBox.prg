@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.12 2002/10/14 01:36:55 fsgiudice Exp $
+ * $Id: TCListBox.prg,v 1.13 2002/10/17 09:59:15 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -82,10 +82,10 @@ ENDCLASS
 METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TListBox
 
    ::id        := nId
-   ::Left      := nLeft
-   ::Top       := nTop
-   ::width     := IFNIL( nWidth,  ::width , nWidth )
-   ::Height    := IFNIL( nHeight, ::height, nHeight)
+   ::Left      := IFNIL( nLeft,    ::Left,    nLeft    )
+   ::Top       := IFNIL( nTop,     ::Top,     nTop     )
+   ::Width     := IFNIL( nWidth ,  ::Width,   nWidth   )
+   ::Height    := IFNIL( nHeight,  ::height,  nHeight  )
 
    RETURN( super:new( oParent ) )
 

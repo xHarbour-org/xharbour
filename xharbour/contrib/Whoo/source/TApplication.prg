@@ -1,5 +1,5 @@
 /*
- * $Id: TApplication.prg,v 1.26 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TApplication.prg,v 1.27 2002/10/12 09:40:53 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -49,7 +49,7 @@ CLASS Application
    DATA MultiInstance         INIT .F.
    DATA InstMsg               INIT NIL
    DATA aForms                INIT {}
-   
+
    METHOD Initialize() CONSTRUCTOR
    METHOD Run()
    METHOD CreateForm()

@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.7 2002/10/16 03:32:06 what32 Exp $
+ * $Id: xTree.prg,v 1.8 2002/10/17 17:16:46 what32 Exp $
  */
 
 /*
@@ -68,12 +68,13 @@ CLASS TreeObj FROM TTreeView
 ENDCLASS
 
 METHOD Add( cText, nImg, hObj ) CLASS TreeObj
+   local o
    if empty( ::Parent:TreeRoot )
-      ::Parent:TreeRoot:=super:Add( cText, nImg )
+      o:=::Parent:TreeRoot:=super:Add( cText, nImg )
      else
-      ::Parent:TreeRoot:Add( cText, nImg, hObj )
+      o:=::Parent:TreeRoot:Add( cText, nImg, hObj )
    endif
-return(nil)
+return(o)
 
 METHOD OnChange( oItem ) CLASS TreeObj
    local n := aScan( ::Parent:Parent:ObjInsp:Objects, {|o|o:PropName == oItem:Caption} )
