@@ -1,5 +1,5 @@
 /*
- * $Id: tpopup.prg,v 1.4 2003/01/27 04:03:12 walito Exp $
+ * $Id: tpopup.prg,v 1.5 2003/01/31 21:03:35 walito Exp $
  */
 
 /*
@@ -478,7 +478,7 @@ return Self
 #ifdef HB_EXTENSION
 //--------------------------------------------------------------------------//
 METHOD SetCoors( nRow, nCol, lTop ) CLASS PopUpMenu
-   Local oItem
+   Local oItem, nDif
 
    if ::top == -1 .or. ::left == -1
       ::top    := nRow
