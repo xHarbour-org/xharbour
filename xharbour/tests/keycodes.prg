@@ -188,7 +188,7 @@ aadd(aKeys, { "K_MMLEFTDOWN",    1011, "mouse move left down"           }  )
 aadd(aKeys, { "K_MMRIGHTDOWN",   1012, "mouse move right down"          }  )
 aadd(aKeys, { "K_MMMIDDLEDOWN",  1013, "mouse move middle down"         }  )
 aadd(aKeys, { "K_MWFORWARD",     1014, "mouse wheel forward"            }  )
-aadd(aKeys, { "K_MWBACKWARD",    1015, "mouse wheel nackward"           }  )
+aadd(aKeys, { "K_MWBACKWARD",    1015, "mouse wheel backward"           }  )
 
 setcancel(.f.)
 //altd(0)  // it's unnecessary now since now VM detect if debugger

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.7 2004/11/25 05:11:59 guerra000 Exp $
+ * $Id: gtxwc.c,v 1.8 2004/12/28 07:16:15 druzus Exp $
  */
 
 /*
@@ -70,7 +70,7 @@
 #include "gtxwc.h"
 
 /* mouse button mapping into Clipper keycodes */
-static int mousePressKeys[ XVT_MAX_BUTTONS ]    = { K_LBUTTONDOWN, K_MBUTTONDOWN, K_RBUTTONDOWN };
+static int mousePressKeys[ XVT_MAX_BUTTONS ]    = { K_LBUTTONDOWN, K_MBUTTONDOWN, K_RBUTTONDOWN, K_MWFORWARD, K_MWBACKWARD };
 static int mouseReleaseKeys[ XVT_MAX_BUTTONS ]  = { K_LBUTTONUP,   K_MBUTTONUP,   K_RBUTTONUP   };
 static int mouseDblPressKeys[ XVT_MAX_BUTTONS ] = { K_LDBLCLK,     K_MDBLCLK,     K_RDBLCLK     };
 
