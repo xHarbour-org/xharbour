@@ -50,8 +50,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <extend.api>
-#include <item.api>
+#include <hbapi.h>
 #include <hbapifs.h>
 #include <hbapiitm.h>
 #include <libpq-fe.h>
@@ -70,7 +69,7 @@ HB_FUNC(PQCONNECT)
     
     if (hb_pcount() != 5)
     {
-        _retc("");
+        hb_retc("");
         return;
     }    
     
@@ -81,14 +80,14 @@ HB_FUNC(PQCONNECT)
     
     if (PQstatus(conn) != CONNECTION_OK)
         {
-        _retc(PQerrorMessage(conn));
+        hb_retc(PQerrorMessage(conn));
         PQfinish(conn);
         return;
         }
         
         db_handle = hb_itemPutPtr( NULL, ( void * ) conn );        
-    _itemReturn(db_handle);
-    _itemRelease(db_handle); 
+    hb_itemReturn(db_handle);
+    hb_itemRelease(db_handle); 
     
 }    
 
@@ -118,17 +117,17 @@ HB_FUNC(PQEXEC)
      
         if (PQresultStatus(res) != PGRES_COMMAND_OK && PQresultStatus(res) != PGRES_TUPLES_OK )
         {
-            _retc(PQresultErrorMessage(res));
+            hb_retc(PQresultErrorMessage(res));
             PQclear(res);
             return;
         }
             
         qry_handle = hb_itemPutPtr( NULL, ( void * ) res );        
-        _itemReturn(qry_handle);
-        _itemRelease(qry_handle); 
+        hb_itemReturn(qry_handle);
+        hb_itemRelease(qry_handle); 
     }
     else
-        _retc("");        
+        hb_retc("");        
 }
 
 HB_FUNC(PQFCOUNT)
@@ -144,7 +143,7 @@ HB_FUNC(PQFCOUNT)
                 nFields = PQnfields(res);            
     }       
             
-    _retni(nFields);        
+    hb_retni(nFields);        
 }    
 
 HB_FUNC(PQLASTREC)
@@ -159,7 +158,7 @@ HB_FUNC(PQLASTREC)
         if (PQresultStatus(res) == PGRES_TUPLES_OK)
             nRows = PQntuples(res);            
     }       
-    _retni(nRows);          
+    hb_retni(nRows);          
 }    
 
 HB_FUNC(PQGETVALUE)
@@ -177,7 +176,7 @@ HB_FUNC(PQGETVALUE)
             nCol = hb_parni(3) - 1;
         
             if (! PQgetisnull(res, nRow, nCol))
-                _retc(PQgetvalue(res, nRow, nCol));
+                hb_retc(PQgetvalue(res, nRow, nCol));
         }
     }        
 }    
@@ -199,7 +198,7 @@ HB_FUNC(PQMETADATA)
         {
             nFields = PQnfields(res);            
     
-            aNew = _itemArrayNew( nFields );
+            aNew = hb_itemArrayNew( nFields );
 
             for (i=0; i < nFields; i++ )
             {

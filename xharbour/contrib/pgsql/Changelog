@@ -1,5 +1,5 @@
 /*
- * Chr(36) + "Id" + Chr(36)
+ * $Id:$
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-04 10:10 UTC-0300 Luiz Rafael Culik<culikr@brturbo.com>
+  * All Files recommited (trash on source file( chr(13))
+  *  postgres.c Xharbour sources should only include "hbapi.h" clipper
+     compatible headers( extend.api and item.api) should now be used
+     on xharbour modules
 
 2004-01-02 15:05 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   * INITIAL RELEASE
