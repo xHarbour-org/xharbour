@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.124 2003/11/27 17:57:50 jonnymind Exp $
+* $Id: thread.c,v 1.125 2003/11/27 20:18:04 jonnymind Exp $
 */
 
 /*
@@ -1172,7 +1172,7 @@ HB_GARBAGE_FUNC( hb_threadMutexFinalize )
 
    hb_threadUnlinkMutex( Mutex );
 
-   HB_MUTEX_DESTROY( Mutex->mutex );
+   HB_CRITICAL_DESTROY( Mutex->mutex );
    HB_COND_DESTROY( Mutex->cond );
    hb_arrayRelease( Mutex->aEventObjects );
    hb_gcFree( Mutex );
@@ -1187,7 +1187,7 @@ HB_FUNC( CREATEMUTEX )
    mt = (HB_MUTEX_STRUCT *)
       hb_gcAlloc( sizeof( HB_MUTEX_STRUCT ), hb_threadMutexFinalize );
 
-   HB_MUTEX_INIT( mt->mutex );
+   HB_CRITICAL_INIT( mt->mutex );
    HB_COND_INIT( mt->cond );
 
    mt->sign = HB_MUTEX_SIGNATURE;
@@ -1218,7 +1218,7 @@ HB_FUNC( MUTEXLOCK )
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXLOCK", 1, hb_paramError(0) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXLOCK", 1, hb_paramError(1) );
       return;
    }
 
@@ -1255,7 +1255,7 @@ HB_FUNC( MUTEXTRYLOCK )
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXTRYLOCK", 1, hb_paramError(0) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXTRYLOCK", 1, hb_paramError(1) );
       return;
    }
 
@@ -1288,7 +1288,7 @@ HB_FUNC( MUTEXUNLOCK )
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXUNLOCK", 1, hb_paramError(0) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXUNLOCK", 1, hb_paramError(1) );
       return;
    }
 
