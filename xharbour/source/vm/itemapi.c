@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.71 2004/02/09 21:25:07 druzus Exp $
+ * $Id: itemapi.c,v 1.72 2004/02/10 00:36:18 ronpinkas Exp $
  */
 
 /*
@@ -1364,8 +1364,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
 #  define HB_FINITE_DBL(d)    ( isfinite(d)==0 )
 #elif defined(__WATCOMC__) || defined(__BORLANDC__)
 #  define HB_FINITE_DBL(d)    ( _finite(d)==0 )
-#elif defined( __GNUC__ ) || defined( __DJGPP__ ) || defined( __MINGW32__ ) \
-      defined( __LCC__ )
+#elif defined( __GNUC__ ) || defined( __DJGPP__ ) || defined( __MINGW32__ ) || defined( __LCC__ )
 #  define HB_FINITE_DBL(d)    ( finite(d)==0 )
 #else
       /* added infinity check for Borland C [martin vogel] */
@@ -1393,7 +1392,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
       for the code below reenable it and please add description WHY? [druzus] */
    /*
    #elif defined(__MINGW32__)
-      || dNumber == s_dInfinity || dNumber == -s_dInfinity || 
+      || dNumber == s_dInfinity || dNumber == -s_dInfinity ||
          ( snprintf( szResult, iSize + 1, "%f", dNumber ) > 0 && strstr( szResult, "#IND" ) )
    */
 
