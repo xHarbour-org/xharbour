@@ -142,7 +142,7 @@ HB_FUNC( GETSCROLLINFO )
 // GetScrollBarInfo(hWnd,nId) -> SCROLLBARINFO structure or NIL
 
 // to be tested
-
+#if (WINVER >= 0x0500)
 HB_FUNC( GETSCROLLBARINFO )
 {
    SCROLLBARINFO sbi     ;
@@ -154,3 +154,4 @@ HB_FUNC( GETSCROLLBARINFO )
      // hb_itemPutCRaw( &hb_stack.Return, (char *) &sbi, sizeof( SCROLLBARINFO ) );      
 }
 
+#endif

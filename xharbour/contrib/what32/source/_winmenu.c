@@ -292,12 +292,12 @@ HB_FUNC( SETMENUINFO )
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI EndMenu( VOID);
 
-
+#if (WINVER >=0x0500)
 HB_FUNC( ENDMENU )
 {
-   hb_retl( EndMenu(  ) ) ;
+   hb_retl( EndMenu() ) ;
 }
-
+#endif
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI InsertMenuItemA( IN HMENU, IN UINT, IN BOOL, IN LPCMENUITEMINFOA );
 

@@ -256,7 +256,7 @@ HB_FUNC( SETSYSTEMCURSOR )
 
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI GetCursorInfo( OUT PCURSORINFO pci );
-
+#if (WINVER >= 0x0500)
 HB_FUNC( GETCURSORINFO )
 {
    PCURSORINFO pci ;
@@ -268,3 +268,4 @@ HB_FUNC( GETCURSORINFO )
 }
 
 
+#endif
