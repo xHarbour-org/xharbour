@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.81 2004/11/21 21:43:44 druzus Exp $
+ * $Id: genc.c,v 1.82 2005/01/02 03:31:13 guerra000 Exp $
  */
 
 /*
@@ -490,7 +490,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       }
 
       fprintf( yyc, "\nHB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n"
-                    "#if defined(HB_PRAGMA_STARTUP)\n"
+                    "#if defined(__DMC__)\n"
+                    "   static int hb_vm_auto_SymbolInit_%s%s = hb_vm_SymbolInit_%s%s();\n"
+                    "#elif defined(HB_PRAGMA_STARTUP)\n"
                     "   #pragma startup hb_vm_SymbolInit_%s%s\n"
                     "#elif defined(_MSC_VER)\n"
                     "   #if _MSC_VER >= 1010\n"
@@ -504,6 +506,8 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                     "   static HB_$INITSYM hb_vm_auto_SymbolInit_%s%s = hb_vm_SymbolInit_%s%s;\n"
                     "   #pragma data_seg()\n"
                     "#endif\n\n",
+                    hb_comp_szPrefix, hb_comp_FileAsSymbol,
+                    hb_comp_szPrefix, hb_comp_FileAsSymbol,
                     hb_comp_szPrefix, hb_comp_FileAsSymbol,
                     hb_comp_szPrefix, hb_comp_FileAsSymbol,
                     hb_comp_szPrefix, hb_comp_FileAsSymbol,
