@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.22 2003/06/26 03:58:08 ronpinkas Exp $
+ * $Id: pptable.c,v 1.23 2003/06/26 04:04:52 ronpinkas Exp $
  */
 
 /*
@@ -457,7 +457,7 @@ void hb_pp_Table( void )
    static COMMANDS sC___258 = {0,"READ","[MSG AT \1A00,\1B00,\1C00 [MSG COLOR \1D00]]",
        "ReadModal(GetList,NIL,NIL,\1A00,\1B00,\1C00,\1D00 ) ; GetList := {}",&sC___257 };
    static COMMANDS sC___259 = {0,"@","\1A00,\1B00 GET \1C00 [PICTURE \1D00] [VALID \1E00] [WHEN \1F00] [CAPTION \1G00] [MESSAGE \1H00] [SEND \1I00]",
-       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1C00,\1C20,\1D00,\1E40,\1F40 ) ) [; ATail(GetList):Caption := \1G00] [; ATail(GetList):CapRow := ATail(Getlist):row ; ATail(GetList):CapCol := ATail(Getlist):col - __CapLength(\1G00) - 1] [; ATail(GetList):message := \1H00] [; ATail(GetList):\1I00] ; ATail(GetList):Display()",&sC___259 };
+       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1C00,\1C20,\1D00,\1E40,\1F40 ) ) [; ATail(GetList):Caption := \1G00] [; ATail(GetList):CapRow := ATail(Getlist):row ; ATail(GetList):CapCol := ATail(Getlist):col - __CapLength(\1G00) - 1] [; ATail(GetList):message := \1H00] [; ATail(GetList):\1I00] ; ATail(GetList):Display()",&sC___258 };
 #endif
 
    static COMMANDS sT___01 = {0,"{","\1A00 => \1B00 [,\1C00 => \1D00] }", "( HB_SetWith( TAssociativeArray({ { \1A00,\1B00 } [,{ \1C00,\1D00 } ] } ) ), __ClsSetModule( HB_QWith():ClassH ), HB_SetWith() ) ",NULL };
