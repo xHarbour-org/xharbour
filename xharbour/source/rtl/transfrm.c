@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.20 2003/07/06 16:42:35 lculik Exp $
+ * $Id: transfrm.c,v 1.21 2003/07/06 17:00:31 lculik Exp $
  */
 
 /*
@@ -438,11 +438,8 @@ HB_FUNC( TRANSFORM )
 
       else if( HB_IS_NUMERIC( pValue ) )
       {
-      #ifndef HB_LONG_DOUBLE_OFF
-         long long   dPush;
-      #else
          double   dPush;
-      #endif
+
 
          int      iOrigWidth;
          int      iOrigDec;
@@ -462,11 +459,7 @@ HB_FUNC( TRANSFORM )
          BOOL     bFound = FALSE;
          BOOL     bInit  = FALSE;
          BOOL     bPDec  = FALSE;
-      #ifndef HB_LONG_DOUBLE_OFF
-         dValue = hb_itemGetNLD( pValue );
-      #else
          dValue = hb_itemGetND( pValue );
-      #endif
          hb_itemGetNLen( pValue, &iOrigWidth, &iOrigDec );
 
          /* Support date function for numbers */
