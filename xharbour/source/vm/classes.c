@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.50 2003/03/29 20:54:29 ronpinkas Exp $
+ * $Id: classes.c,v 1.51 2003/03/29 21:28:51 ronpinkas Exp $
  */
 
 /*
@@ -2239,7 +2239,8 @@ HB_FUNC( __OBJSENDMSG )
 
          for( uiParam = 3; uiParam <= uiPCount; uiParam++ )   /* Push arguments on stack */
          {
-            hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
+            // NOTE: hb_param() cannot be used here, because it dereferences the parameters
+            hb_vmPush( hb_stackItemFromBase( uiParam ) );
          }
 
          hb_vmSend( ( USHORT ) ( uiPCount - 2 ) );             /* Execute message */
