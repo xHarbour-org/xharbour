@@ -18,7 +18,6 @@
          The above two were added to keep Clipper compatibility
       + Added 5th param to commonError() in order to provide uiFlags, like other RDD's
 
-
 2004-02-22 16:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/hbxml.c
     ! Fixed memory leaks.
