@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3026 2004/06/04 19:15:17 kaddath Exp $
+ * $Id: ChangeLog,v 1.3027 2004/06/04 19:22:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -28,7 +28,6 @@
   Above changed made per Przemek's request to avoid warnings on big endian machines
   Under BCC 5.5.1 compiles with zero warnings.  Please report with other compilers.
 
->>>>>>> 1.3026
 2004-06-04 16:42 UTC+0100 Jacek Potempa (Jacek.Potempa@otc.pl)
   * source\rdd\dbcmd.c
   * include\hbapirdd.h
