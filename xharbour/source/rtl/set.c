@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.17 2003/01/06 21:32:00 lculik Exp $
+ * $Id: set.c,v 1.18 2003/01/12 11:55:22 lculik Exp $
  */
 
 /*
@@ -98,6 +98,24 @@ static void hb_setFreeSetPath( void )
    }
 
    sp_set_path = NULL;
+}
+
+static char set_char( PHB_ITEM pItem, char oldChar )
+{
+   char newChar = oldChar;
+
+   HB_TRACE(HB_TR_DEBUG, ("set_char(%p, %c)", pItem, oldChar));
+
+   if( HB_IS_STRING( pItem ) )
+   {
+      /* Only replace if string has at least one character. */
+      ULONG ulLen = hb_itemGetCLen( pItem );
+      if( ulLen > 0 )
+      {
+         newChar = *hb_itemGetCPtr( pItem );
+      }
+   }
+   return newChar;
 }
 
 static BOOL set_logical( PHB_ITEM pItem )
