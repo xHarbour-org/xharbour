@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.72 2004/11/29 22:09:41 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.73 2004/12/03 22:00:20 aleytys Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -406,6 +406,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cstruct.obj \
   $(OBJ_DIR)\win32ole.obj \
   $(OBJ_DIR)\win32prn.obj \
+  $(OBJ_DIR)\winos.obj \
+  $(OBJ_DIR)\winreg.obj \
   $(OBJ_DIR)\traceprg.obj \
   $(OBJ_DIR)\sprintf.obj \
   $(OBJ_DIR)\stream.obj \
@@ -964,6 +966,8 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\tprinter.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\win32ole.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\win32prn.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\winos.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\winreg.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\sprintf.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\stream.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hvm.obj               + >> hdll.tmp
@@ -2378,6 +2382,18 @@ $(OBJ_DIR)\win32prn.c : $(RTL_DIR)\win32prn.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\win32prn.obj : $(OBJ_DIR)\win32prn.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\winos.c : $(RTL_DIR)\winos.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\winos.obj : $(OBJ_DIR)\winos.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\winreg.c : $(RTL_DIR)\winreg.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\winreg.obj : $(OBJ_DIR)\winreg.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\traceprg.c : $(RTL_DIR)\traceprg.prg

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.132 2004/11/30 04:54:49 paultucker Exp $
+# $Id: makefile.vc,v 1.133 2004/12/03 22:00:41 aleytys Exp $
 #
 
 #
@@ -523,7 +523,9 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\typefile.obj \
    $(OBJ_DIR)$(MT)\wait.obj \
    $(OBJ_DIR)$(MT)\win32ole.obj \
-   $(OBJ_DIR)$(MT)\win32prn.obj
+   $(OBJ_DIR)$(MT)\win32prn.obj \
+   $(OBJ_DIR)$(MT)\winos.obj \
+   $(OBJ_DIR)$(MT)\winreg.obj
 
 
 #

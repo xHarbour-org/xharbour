@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.125 2004/11/29 22:09:56 ptsarenko Exp $
+# $Id: makefile.bc,v 1.126 2004/12/03 22:00:22 aleytys Exp $
 #
 
 #
@@ -549,7 +549,9 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\typefile.obj \
    $(RTL_OBJ_DIR)\wait.obj \
    $(RTL_OBJ_DIR)\win32ole.obj \
-   $(RTL_OBJ_DIR)\win32prn.obj
+   $(RTL_OBJ_DIR)\win32prn.obj \
+   $(RTL_OBJ_DIR)\winos.obj \
+   $(RTL_OBJ_DIR)\winreg.obj
 
 #
 # LANG.LIB rules
@@ -2548,6 +2550,18 @@ $(RTL_OBJ_DIR)\win32prn.c : $(RTL_DIR)\win32prn.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\win32prn.obj : $(RTL_OBJ_DIR)\win32prn.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\winos.c : $(RTL_DIR)\winos.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\winos.obj : $(RTL_OBJ_DIR)\winos.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\winreg.c : $(RTL_DIR)\winreg.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\winreg.obj : $(RTL_OBJ_DIR)\winreg.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\word.obj : $(RTL_DIR)\word.c

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.25 2004/11/30 20:19:53 ptsarenko Exp $
+# $Id: hrbdll.wc,v 1.26 2004/12/03 22:00:21 aleytys Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -405,6 +405,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\macroslx.obj \
   $(OBJ_DIR)\cstruct.obj \
   $(OBJ_DIR)\win32ole.obj \
+  $(OBJ_DIR)\winos.obj \
+  $(OBJ_DIR)\winreg.obj \
   $(OBJ_DIR)\traceprg.obj \
 #
 # Codepage
@@ -1881,6 +1883,18 @@ $(OBJ_DIR)\win32ole.c : $(RTL_DIR)\win32ole.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\win32ole.obj : $(OBJ_DIR)\win32ole.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\winos.c : $(RTL_DIR)\winos.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\winos.obj : $(OBJ_DIR)\winos.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\winreg.c : $(RTL_DIR)\winreg.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\winreg.obj : $(OBJ_DIR)\winreg.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\traceprg.c : $(RTL_DIR)\traceprg.prg

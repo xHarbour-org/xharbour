@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.55 2004/11/29 22:09:53 ptsarenko Exp $
+# $Id: hrbdll.vc,v 1.56 2004/12/03 22:00:21 aleytys Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -287,6 +287,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\wait.obj \
   $(OBJ_DIR)\win32ole.obj \
   $(OBJ_DIR)\win32prn.obj \
+  $(OBJ_DIR)\winos.obj \
+  $(OBJ_DIR)\winreg.obj \
 #
 # Vm c
 #
@@ -1929,6 +1931,18 @@ $(OBJ_DIR)\win32prn.c : $(RTL_DIR)\win32prn.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\win32prn.obj : $(OBJ_DIR)\win32prn.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\winos.c : $(RTL_DIR)\winos.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\winos.obj : $(OBJ_DIR)\winos.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\winreg.c : $(RTL_DIR)\winreg.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\winreg.obj : $(OBJ_DIR)\winreg.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\traceprg.c : $(RTL_DIR)\traceprg.prg
