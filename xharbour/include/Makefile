@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2002/01/29 07:19:50 ronpinkas Exp $
+# $Id: Makefile,v 1.3 2002/12/19 22:25:24 jonnymind Exp $
 #
 
 ROOT = ../
@@ -52,6 +52,7 @@ PRG_HEADERS=\
 	color.ch     \
 	common.ch    \
 	dbedit.ch    \
+   dbinfo.ch    \
 	dbstruct.ch  \
 	directry.ch  \
 	error.ch     \
