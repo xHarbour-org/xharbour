@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.0 2004/05/20 11:47:08 ronpinkas Exp $
+# $Id: Makefile,v 1.1 2004/05/20 21:09:22 ronpinkas Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -11,13 +11,11 @@ ROOT = ../../
 PRG_SOURCES=\
 	xbscript.prg \
 
-PRG_MAIN=hbrun.prg
+PRG_MAIN=xbscript.prg
 
-ifeq ($(HB_ARCHITECTURE),OS2)
-SOCK = socket 
-else
-SOCK = 
-endif
+PRG_HEADERS = \
+	rp_dot.src \
+	rp_run.src \
 
 LIBS=\
 	debug \
@@ -25,12 +23,18 @@ LIBS=\
 	rtl \
 	lang \
 	rdd \
-	rtl \
-	vm \
 	macro \
 	pp \
 	common \
-	$(SOCK) \
 
+ifeq ($(HB_ARCHITECTURE),OS2)
+LIBS += socket 
+endif
+
+include $(TOP)$(ROOT)config/header.cf
+INSTALL_RULE_HEADERS := $(INSTALL_RULE)
 
 include $(TOP)$(ROOT)config/bin.cf
+
+install::
+	$(INSTALL_RULE_HEADERS)
