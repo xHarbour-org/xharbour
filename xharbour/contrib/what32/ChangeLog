@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.38 2002/11/02 23:24:13 paultucker Exp $
+ * $Id: ChangeLog,v 1.39 2002/11/03 15:17:44 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -12,6 +12,7 @@
    * env/bccwin32.mak
    * make_b32.bat
    * make_vc.bat
+   * makefile.bc
    * makefile.nt
    * makefile.vc
      * changes so both BCC and VC versions can co-exist.
