@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.366 2002/08/31 14:34:25 lculik Exp $
+ * $Id: ChangeLog,v 1.367 2002/08/31 22:25:46 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-08-30 21:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/tget.prg
+    ! Added Missing Caption Data
+  * source/rtl/tbcolumn.prg
+    ! Defaults ::Colsep to Nil (Somehow This Data make Linux CPU usage Become Very High, also Fix some formating  problems)
 
 2002-08-31 15:24 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rdd/dbf1.c
