@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2189 2004/01/31 00:48:14 andijahja Exp $
+ * $Id: ChangeLog,v 1.2190 2004/01/31 02:57:41 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-31 09:00 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/debug/debugger.prg
+    ! Fixed some typos from my previous commits.
+    ! Merged in the latest Harbour debugger fixes by Ryszard Glab.
 
 2004-01-30 23:50 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * tests/xhbmidi.prg
