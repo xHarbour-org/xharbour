@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.99 2004/04/30 15:24:52 lf_sfnet Exp $
+ * $Id: gtwvt.c,v 1.100 2004/05/07 15:33:32 lf_sfnet Exp $
  */
 
 /*
@@ -2843,7 +2843,7 @@ static void hb_wvt_gtHandleMenuSelection( int menuIndex )
 static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
   POINT xy, colrow ;
-  SHORT keyCode;
+  SHORT keyCode = 0;
   SHORT keyState = 0;
   ULONG lPopupRet ;
 
@@ -2958,7 +2958,7 @@ static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
         break;
     }
 
-    if ( _s.pSymWVT_MOUSE )
+    if ( _s.pSymWVT_MOUSE && keyCode != 0 )
     {
       hb_vmPushSymbol( _s.pSymWVT_MOUSE->pSymbol );
       hb_vmPushNil();
@@ -3297,7 +3297,7 @@ IPicture * HB_EXPORT hb_wvt_gtLoadPicture( char * image )
   HANDLE    hFile;
   DWORD     nFileSize;
   DWORD     nReadByte;
-  IPicture  *Result;
+  IPicture  *Result = NULL;
 
   hFile = CreateFile( image, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
   if ( hFile != INVALID_HANDLE_VALUE )
@@ -3705,6 +3705,11 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
             case FW_EXTRABOLD:
             case FW_HEAVY:
                iOldValue = GTI_FONTW_BOLD;
+            break;
+
+            default:
+               iOldValue = 0;
+            break;
          }
 
          if ( bUpdate )
@@ -3740,6 +3745,11 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
             case NONANTIALIASED_QUALITY:
             case PROOF_QUALITY:
                iOldValue = GTI_FONTQ_DRAFT;
+            break;
+
+            default:
+               iOldValue = 0;
+            break;
          }
 
          if ( bUpdate )
@@ -4951,6 +4961,7 @@ HB_FUNC( WVT_DRAWOUTLINE )
    }
    else
    {
+      hPen = 0;
       SelectObject( _s.hdc, _s.penBlack );
    }
 
@@ -5370,19 +5381,16 @@ HB_FUNC( WVT_DRAWBUTTON )
       SetBkMode( _s.hdc, oldBkMode );
       SetTextAlign( _s.hdc, oldTextAlign );
    }
+   else
+   {
+      iTextHeight = -1;
+   }
 
    if ( bImage )
    {
       iImageWidth = ( iRight - iLeft + 1 - 8 );
 
-      if ( bText )
-      {
-         iImageHeight = ( iBottom - iTop + 1 - 8 - iTextHeight );
-      }
-      else
-      {
-         iImageHeight = ( iBottom - iTop + 1 - 8 + 1 );
-      }
+      iImageHeight = ( iBottom - iTop + 1 - 8 - iTextHeight );
 
       if ( ISNUM( 6 ) )
       {
