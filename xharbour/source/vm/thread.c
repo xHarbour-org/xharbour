@@ -290,11 +290,12 @@ hb_create_a_thread(
 {
    USHORT uiParam;
    HB_THREAD_PARAM *pt = (HB_THREAD_PARAM *) Cargo;
+   HB_THREAD_T tCurrent = HB_CURRENT_THREAD();
    PHB_ITEM pPointer = hb_arrayGetItemPtr( pt->pArgs, 1 );
 
    #ifndef HB_OS_WIN_32
       /* Under windows, the context is created by the caller */
-      hb_threadCreateContext( HB_CURRENT_THREAD() );
+      hb_threadCreateContext( tCurrent );
       //printf( "Created context %p: %ld (%ld)\r\n", test, test->th_id, HB_CURRENT_THREAD() );
 
       /* now that the context has been created,
@@ -343,11 +344,14 @@ hb_create_a_thread(
 
    hb_itemRelease( pt->pArgs );
    free( pt );
-   hb_threadDestroyContext( HB_CURRENT_THREAD() );
+   hb_threadDestroyContext( tCurrent );
+
 
    #ifdef HB_OS_WIN_32
       return 0;
    #else
+      /* now we can detach this thread */
+      pthread_detach( HB_CURRENT_THREAD() );
       return NULL;
    #endif
 }
@@ -636,6 +640,7 @@ HB_FUNC( CLEARTHREAD )
 HB_FUNC( JOINTHREAD )
 {
    HB_THREAD_T  th;
+   int result;
 #ifdef HB_OS_WIN_32
    HB_THREAD_CONTEXT *context;
 #endif
@@ -653,10 +658,10 @@ HB_FUNC( JOINTHREAD )
    th = (HB_THREAD_T) hb_parnl( 1 );
 
    #if ! defined( HB_OS_WIN_32 )
-      pthread_join( th, 0 );
+      result = pthread_join( th, 0 );
    #else
       context = hb_threadGetContext( th );
-      WaitForSingleObject( context->th_h, INFINITE );
+      result = (int) WaitForSingleObject( context->th_h, INFINITE );
    #endif
 }
 
@@ -670,6 +675,7 @@ HB_FUNC( CREATEMUTEX )
    mt->lock_count = 0;
    mt->waiting = 0;
    mt->locker = 0;
+   mt->aEventObjects = hb_itemArrayNew( 0 );
 
    hb_retclenAdoptRaw( (char *) mt, sizeof( HB_MUTEX_STRUCT ) );
 }
@@ -699,6 +705,7 @@ HB_FUNC( DESTROYMUTEX )
 
    HB_MUTEX_DESTROY( Mutex->mutex );
    HB_COND_DESTROY( Mutex->cond );
+   hb_itemRelease( Mutex->aEventObjects );
 }
 
 HB_FUNC( MUTEXLOCK )
@@ -762,8 +769,9 @@ HB_FUNC( MUTEXUNLOCK )
 
 HB_FUNC( SUBSCRIBE )
 {
-   int lc;
+   int lc, iWaitRes;
    int islocked;
+   PHB_ITEM pNotifyVal;
 
    HB_MUTEX_STRUCT *Mutex;
    PHB_ITEM pMutex = hb_param( 1, HB_IT_STRING );
@@ -795,14 +803,9 @@ HB_FUNC( SUBSCRIBE )
    lc = Mutex->lock_count;
    Mutex->lock_count = 0;
 
-   /* destroy an old signaled objec, but not incoming objects */
-   if ( Mutex->waiting >= 0 )
-   {
-      Mutex->event_object = NULL;
-   }
-
    Mutex->waiting ++;
 
+   iWaitRes = 0; /* presuming success */
    if( Mutex->waiting > 0 )
    {
       if ( hb_pcount() == 1 )
@@ -811,11 +814,9 @@ HB_FUNC( SUBSCRIBE )
       }
       else
       {
-         int wt = Mutex->waiting;
-
-         HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, hb_parnl( 2 ) );
-
-         if ( wt == Mutex->waiting )
+         iWaitRes = HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, hb_parnl( 2 ));
+         /* On success, the notify will decrease the counter */
+         if ( iWaitRes != 0 )
          {
             Mutex->waiting --;
          }
@@ -832,11 +833,15 @@ HB_FUNC( SUBSCRIBE )
    else
    {
       Mutex->locker = HB_CURRENT_THREAD();
+      Mutex->locker = 0;
    }
 
-   if( Mutex->event_object )
+   if ( iWaitRes == 0 )
    {
-      hb_itemReturn( Mutex->event_object );
+      pNotifyVal = hb_itemNew( NULL );
+      pNotifyVal = hb_arrayGetItemPtr( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects) );
+      hb_itemReturn( pNotifyVal );
+      hb_arraySize( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects) -1 );
    }
    else
    {
@@ -846,9 +851,10 @@ HB_FUNC( SUBSCRIBE )
 
 HB_FUNC( SUBSCRIBENOW )
 {
-   int lc;
+   int lc, iWaitRes;
    int islocked;
    HB_MUTEX_STRUCT *Mutex;
+   PHB_ITEM pNotifyVal;
    PHB_ITEM pMutex = hb_param( 1, HB_IT_STRING );
 
    /* Parameter error checking */
@@ -876,9 +882,6 @@ HB_FUNC( SUBSCRIBENOW )
    lc = Mutex->lock_count;
    Mutex->lock_count = 0;
 
-   Mutex->event_object = NULL;
-   Mutex->waiting++;
-
    if( Mutex->waiting <= 0 )
    {
       Mutex->waiting = 1;
@@ -888,37 +891,40 @@ HB_FUNC( SUBSCRIBENOW )
       Mutex->waiting++;
    }
 
+   iWaitRes = 0;
    if( hb_pcount() == 1 )
    {
       HB_COND_WAIT( Mutex->cond, Mutex->mutex );
    }
    else
    {
-      int wt = Mutex->waiting;
-
-      HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, hb_parnl( 2 ) );
-
-      if( wt == Mutex->waiting )
+      iWaitRes = HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, hb_parnl( 2 ) );
+      /* On success, the notify will decrease the counter */
+      if ( iWaitRes != 0 )
       {
          Mutex->waiting --;
       }
    }
 
-   // Prepare return value
+   /* Prepare return value */
    Mutex->lock_count = lc;
 
    if( ! islocked )
    {
       HB_MUTEX_UNLOCK( Mutex->mutex );
+      Mutex->locker = 0;
    }
    else
    {
       Mutex->locker = HB_CURRENT_THREAD();
    }
 
-   if( Mutex->event_object )
+   if ( iWaitRes == 0 )
    {
-      hb_itemReturn( Mutex->event_object );
+      pNotifyVal = hb_itemNew( NULL );
+      pNotifyVal = hb_arrayGetItemPtr( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects) );
+      hb_itemReturn( pNotifyVal );
+      hb_arraySize( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects) -1 );
    }
    else
    {
@@ -930,6 +936,7 @@ HB_FUNC( NOTIFY )
 {
    HB_MUTEX_STRUCT *Mutex;
    PHB_ITEM pMutex = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pVal = hb_param( 2, HB_IT_ANY );
 
    /* Parameter error checking */
    if( pMutex == NULL )
@@ -942,28 +949,23 @@ HB_FUNC( NOTIFY )
 
    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
 
-   if( hb_pcount() == 2 )
-   {
-      Mutex->event_object = hb_itemNew( NULL );
-      hb_itemCopy( Mutex->event_object, hb_param( 2, HB_IT_ANY ));
-   }
-   else
-   {
-      Mutex->event_object = NULL;
-   }
 
-   if( Mutex->waiting > 0 )
+   if ( pVal == NULL )
    {
-      HB_COND_SIGNAL( Mutex->cond );
+      pVal = hb_itemNew( NULL );
    }
 
    Mutex->waiting--;
+   hb_arrayAddForward( Mutex->aEventObjects, pVal );
+   HB_COND_SIGNAL( Mutex->cond );
 }
 
 HB_FUNC( NOTIFYALL )
 {
    HB_MUTEX_STRUCT *Mutex;
+   int iWt;
    PHB_ITEM pMutex = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pVal = hb_param( 2, HB_IT_ANY );
 
    /* Parameter error checking */
    if( pMutex == NULL )
@@ -976,20 +978,20 @@ HB_FUNC( NOTIFYALL )
 
    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
 
-   if( hb_pcount() == 2 )
+   if ( pVal == NULL )
    {
-      Mutex->event_object = hb_itemNew( NULL );
-      hb_itemCopy( Mutex->event_object, hb_param( 2, HB_IT_ANY ));
-   }
-   else
-   {
-      Mutex->event_object = NULL;
+      pVal = hb_itemNew( NULL );
    }
 
-   while( Mutex->waiting  > 0)
+   for( iWt = 0; iWt < Mutex->waiting; iWt++ )
    {
+      hb_arrayAddForward( Mutex->aEventObjects, pVal );
+   }
+
+   while( Mutex->waiting > 0 )
+   {
+      Mutex->waiting --;
       HB_COND_SIGNAL( Mutex->cond );
-      Mutex->waiting--;
    }
 }
 
@@ -1044,15 +1046,25 @@ JC: I am leaving this in the source code for now; you can never know, this could
 be useful in the future.
 */
 #if defined( HB_OS_WIN_32 )
-void hb_SignalObjectAndWait( HB_COND_T hToSignal, HB_MUTEX_T hToWaitFor, DWORD dwMillisec, BOOL bUnused )
+DWORD hb_SignalObjectAndWait( HB_COND_T hToSignal, HB_MUTEX_T hToWaitFor, DWORD dwMillisec, BOOL bUnused )
 {
    HB_SYMBOL_UNUSED( bUnused );
 
    ReleaseMutex( hToSignal );
-   WaitForSingleObject( hToWaitFor, dwMillisec );
+   /* return 0 on success like unix functions */
+   return ( WaitForSingleObject( hToWaitFor, dwMillisec ) != WAIT_OBJECT_0);
+}
+#else
+int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec )
+{
+   struct timeval now;
+   struct timespec timeout;
+   gettimeofday( &now, NULL );
+   timeout.tv_sec = now.tv_sec + (iMillisec / 1000);
+   timeout.tv_nsec = (now.tv_usec + ( (iMillisec % 1000) * 1000 ) )* 1000;
+   return pthread_cond_timedwait( cond, mutex, &timeout );
 }
 #endif
-
 /*
 JC1: This should be reactivated if we want flat mutex
 

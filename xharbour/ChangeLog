@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.649 2003/01/27 05:27:20 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.650 2003/01/27 12:31:34 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-01-27 22:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/thread.h
+  * source/vm/thread.c
+    ! Mutex condition-and-wait has moved from macro to function on linux.
+    ! Detaching threads just before terminatio on linux to avoid memory leaks
+    + Added notification object stack (this resolves the subscribe/notify
+      problem when having multiple notify before one thread subscribes).
+
+  * tests/Makefile
+    ! Better usage of HB_MT flag
+
+  * tests/inetto.prg
+  * tests/mtgc.prg
+    * Work in progress and tests
+
 2003-01-27 10:35 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
     * Added support for linking the correct HVMxxx.obj
@@ -376,6 +393,58 @@
 2003-01-15 12:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/compiler/hbusage.c
     ! fix serious bug on header file: 2002 -> 2003 :-)
+
+2003-01-14 23:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/inet.c
+    * commented out all garbage collecting stuff; now inet socket
+      collection can AND must be done at PRG level, since Inet
+      pbjects could and generally are shared among threads.
+    ! Connecting functions fixed under windows.
+
+  * include/thread.h
+  * source/vm/thread.c
+    * hb_threadCreateContext() accepts thread ID parameter
+      and returns the created context.
+    * Now hb_threadDestroyContext() and hb_threadGetContext()
+      accept a parameter (desired thraed id); removed
+      hb_destroyContextFromHandle() for stake of simplicity.
+    * under Windows, use just thread ID to identify threads;
+      Handle is saved in the context but just to be used when
+      managing the thread
+    * in StartThread(), removed polling loop waiting for handle
+      (now given in context creation).
+    ! Subscribe() with a timeout might have been returning an
+      uninitialized  object instead of the notified object.
+      Fixed
+    * Under pthreads, now threads are started in asynchronous
+      cancellation mode to allow simpler termiation scheme. This
+      mode is more "powerful" and thus "dangerous" for the
+      inexperienced user, but it does mimic the winodws thread
+      termination model and it can be controlled with prg level code.
+    ! Optimization made threads tests to run more than twice faster
+      than before in linux; windws mttest.exe is reporting multithread
+      tests to run about the same speed as sequential tests.
+
+  * estack
+    ! In an MT environment, if the main thread is requesting his stack
+      the main stack is immediately returned, instead of scanning for a
+      thread context.
+    * Using hb_threadGetContext() to simplify the code and keep all the
+      code scanning for a context in just one place.
+
+  * source/rtl/getsys.prg
+  * source/rtl/tget.prg
+    ! Additional console locking to grant better field input in multithread
+      environments. This is still not perfect, but much better.
+
+  * tests/Makefile
+    ! harbour compilation rule was missing -I
+
+  * tests/client.prg
+  * tests/inetto.prg
+  * tests/mtcomplex.prg
+    * updated using latest transmission control techniques
+    * minimal stylistic fix
 
 2003-01-14 19:07 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/thread.c

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.21 2003/01/14 23:47:27 jonnymind Exp $
+* $Id: thread.h,v 1.22 2003/01/16 15:42:47 walito Exp $
 */
 
 /*
@@ -87,7 +87,7 @@
    #define HB_COND_T                   HANDLE
    #define HB_COND_INIT( x )           x = CreateEvent( NULL,FALSE, FALSE, NULL )
 
-   void hb_SignalObjectAndWait( HB_COND_T hToSignal, HB_MUTEX_T hToWaitFor, DWORD dwMillisec, BOOL bUnused );
+   DWORD hb_SignalObjectAndWait( HB_COND_T hToSignal, HB_MUTEX_T hToWaitFor, DWORD dwMillisec, BOOL bUnused );
 
    #define HB_COND_WAIT( x, y )        hb_SignalObjectAndWait( y, x, INFINITE, FALSE )
    #define HB_COND_WAITTIME( x, y, t ) hb_SignalObjectAndWait( y, x, t, FALSE )
@@ -115,18 +115,12 @@
     #define HB_CRITICAL_UNLOCK( x )        pthread_mutex_unlock( &(x) )
 **/
 
+    int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec );
+    
     #define HB_COND_T                   pthread_cond_t
     #define HB_COND_INIT( x )           pthread_cond_init( &(x), NULL )
     #define HB_COND_WAIT( x, y )        pthread_cond_wait( &(x), &(y) )
-    #define HB_COND_WAITTIME( x, y, t )  \
-        {\
-            struct timeval now;\
-            struct timespec timeout;\
-            gettimeofday( &now, NULL );\
-            timeout.tv_sec = now.tv_sec + (t / 1000);\
-            timeout.tv_nsec = (now.tv_usec + ( (t % 1000) * 1000 ) )* 1000   ;\
-            pthread_cond_timedwait( &(x), &(y), &timeout );\
-        }
+    #define HB_COND_WAITTIME( x, y, t )  hb_condTimeWait( &(x) , &(y), t )
     #define HB_COND_SIGNAL( x )         pthread_cond_signal( &(x) )
     #define HB_COND_DESTROY( x )        pthread_cond_destroy( &(x) )
 
@@ -142,7 +136,7 @@ typedef struct {
    HB_THREAD_T locker;
    USHORT lock_count;
    int waiting;
-   PHB_ITEM event_object;
+   PHB_ITEM aEventObjects;
 } HB_MUTEX_STRUCT;
 
 /* Context */

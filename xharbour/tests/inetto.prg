@@ -5,7 +5,8 @@
 *
 * Contributed by Giancarlo Niccolai and Charles Kwon
 *
-
+* $Id$
+*
 
 * This array contain the socket control objects that
 * the control system will use to do it's cleanups

@@ -1,13 +1,16 @@
 
 ifeq ($(HB_MT),MT)
-  MTLIBS= -lvmmt -lrtlmt -lrddmt -lrtlmt -lvmmt -ldbfntxmt -ldbfcdxmt 
+MTLIBS= -lvmmt -lrtlmt -lrddmt -lrtlmt -lvmmt -ldbfntxmt -ldbfcdxmt 
+ifeq ($(HB_ARCHITECTURE),linux)
+MTLIBS+=-lpthread
+endif
 else
   MTLIBS= -lvm -lrtl -lrdd -lrtl -lvm -ldbfntx -ldbfcdx
 endif
 
 ifeq ($(HB_ARCHITECTURE),linux)
-  GT_LIBS=-lgtsln -lslang -lgpm -lpthread
-  EXE_EXT=
+GT_LIBS=-lgtsln -lslang -lgpm 
+EXE_EXT=
 else
   ifeq ($(HB_ARCHITECTURE),darwin)
     ifeq ($(HB_GT_LIB),gtcrs)
