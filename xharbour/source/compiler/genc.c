@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.51 2003/10/06 21:31:35 ronpinkas Exp $
+ * $Id: genc.c,v 1.52 2003/12/04 09:26:54 druzus Exp $
  */
 
 /*
@@ -59,13 +59,13 @@ extern BOOL hb_comp_iGenVarList;
  hb_comp_pCodeList is the file handle on which pCode Listing will be written
 */
 FILE *hb_comp_pCodeList = NULL;
+static void hb_compGenCInLine( FILE*, char* ) ;
 
 void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSourcePath )       /* generates the C language output */
 {
    char szFileName[ _POSIX_PATH_MAX ];
    char szpCodeFileName[ _POSIX_PATH_MAX ] ;
    char szSourceName[ _POSIX_PATH_MAX ], *pTmp;
-   char *pszFileName;
    PFUNCTION pFunc = hb_comp_functions.pFirst;
    PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
    PCOMDECLARED pDeclared;
@@ -579,30 +579,24 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
       }
 
       pInline = hb_comp_inlines.pFirst;
-      while( pInline )
-      {
-      /* fprintf( yyc, "#line %i \"%s\"\n", pInline->iLine, pInline->szFileName ); */
-         fprintf( yyc, "#line %i \"", ( pInline->iLine + 1 ) );
-         pszFileName = pInline->szFileName;
-         while( *pszFileName )
-         {
-            if( *pszFileName == '\\' )
-               fprintf( yyc, "\\" );
-            fprintf( yyc, "%c", *pszFileName++ );
-         }
-         fprintf( yyc, "\"\n" );
 
-         if( pInline->szName )
-         {
-            fprintf( yyc, "HB_FUNC_STATIC( %s )\n", pInline->szName );
-         }
-         fprintf( yyc, "%s", pInline->pCode );
-         pInline = pInline->pNext;
+      if ( pInline )
+      {
+         hb_compGenCInLine( yyc, pInline->szFileName );
       }
    }
    else
    {
-      fprintf( yyc, "/* Empty source file */\n\n" );
+      pInline = hb_comp_inlines.pFirst;
+
+      if ( pInline )
+      {
+         hb_compGenCInLine( yyc, pInline->szFileName );
+      }
+      else
+      {
+         fprintf( yyc, "/* Empty source file */\n\n" );
+      }
    }
 
    fclose( yyc );
@@ -695,6 +689,29 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
    {
       fclose( hb_comp_pCodeList );
    }
+}
+
+static void hb_compGenCInLine( FILE *yyc, char *pszFileName )
+{
+      PINLINE pInline = hb_comp_inlines.pFirst;
+      while( pInline )
+      {
+         fprintf( yyc, "#line %i \"", ( pInline->iLine + 1 ) );
+         while( *pszFileName )
+         {
+            if( *pszFileName == '\\' )
+               fprintf( yyc, "\\" );
+            fprintf( yyc, "%c", *pszFileName++ );
+         }
+         fprintf( yyc, "\"\n" );
+
+         if( pInline->szName )
+         {
+            fprintf( yyc, "HB_FUNC_STATIC( %s )\n", pInline->szName );
+         }
+         fprintf( yyc, "%s", pInline->pCode );
+         pInline = pInline->pNext;
+      }
 }
 
 static HB_GENC_FUNC( hb_p_and )
