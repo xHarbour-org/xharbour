@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.12 2004/02/23 19:55:27 andijahja Exp $
+ * $Id: zip.c,v 1.13 2004/02/25 14:30:07 andijahja Exp $
  */
 
 /*
@@ -53,6 +53,32 @@
 #include <hbzip2.h>
 
 extern HB_ITEM ZipArray;
+static HB_ITEM FileToZip;
+
+static void ZipCreateArray( PHB_ITEM pParam )
+{
+   PHB_ITEM pDirEntry;
+   PHB_ITEM pWildFile;
+   HB_ITEM Temp;
+   int ul, ulLen;
+   char *szEntry;
+
+   FileToZip.type = HB_IT_NIL;
+   Temp.type = HB_IT_NIL;
+   pWildFile = hb_fsDirectory(pParam->item.asString.value,NULL,NULL,TRUE);
+   hb_arrayNew( &FileToZip, 0);
+   ulLen = pWildFile->item.asArray.value->ulLen;
+
+   for ( ul = 0; ul < ulLen ; ul ++ )
+   {
+      pDirEntry = hb_arrayGetItemPtr( pWildFile, ul + 1 );
+      szEntry = hb_arrayGetC( pDirEntry, 1 );
+      hb_arrayAddForward( &FileToZip, hb_itemPutC( &Temp, szEntry ) );
+      hb_xfree( szEntry );
+   }
+
+   hb_itemRelease( pWildFile );
+}
 
 HB_FUNC( HB_ZIPFILE )
 {
@@ -60,35 +86,34 @@ HB_FUNC( HB_ZIPFILE )
 
    if( ISCHAR( 1 ) )
    {
-      char szFile[ _POSIX_PATH_MAX ];
-      PHB_ITEM pProgress = hb_param( 9, HB_IT_BLOCK );
-      HB_ITEM iProgress;
+      PHB_ITEM pParam = hb_param( 2, HB_IT_STRING | HB_IT_ARRAY );
 
-      iProgress.type = HB_IT_NIL;
-
-      if( pProgress )
+      if ( pParam )
       {
-        hb_itemCopy( &iProgress, pProgress );
-      }
+         char szFile[ _POSIX_PATH_MAX ];
+         PHB_ITEM pProgress = hb_param( 9, HB_IT_BLOCK );
+         HB_ITEM iProgress;
 
-      strcpy( szFile, hb_parc( 1 ) );
+         iProgress.type = HB_IT_NIL;
 
-      if( ISCHAR( 2 ) )
-      {
-         bRet = hb_CompressFileStd( hb___CheckFile( szFile ),
-                                    hb_parc( 2 ),
-                                    ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
-                                    hb_param( 4, HB_IT_BLOCK ),
-                                    ISLOG( 5 ) ? hb_parl( 5 ) : 0,
-                                    ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
-                                    ISLOG( 7 ) ? hb_parl( 7 ) : 0,
-                                    ISLOG( 8 ) ? hb_parl( 8 ) : 0,
-                                    &iProgress );
-      }
-      else if( ISARRAY( 2 ) )
-      {
+         if ( hb_param( 2, HB_IT_STRING ) )
+         {
+            ZipCreateArray( hb_param( 2, HB_IT_STRING ) );
+         }
+         else
+         {
+            hb_itemCopy( &FileToZip, pParam );
+         }
+
+         if( pProgress )
+         {
+           hb_itemCopy( &iProgress, pProgress );
+         }
+
+         strcpy( szFile, hb_parc( 1 ) );
+
          bRet = hb_CompressFile( hb___CheckFile( szFile ),
-                                 hb_param( 2, HB_IT_ARRAY ),
+                                 &FileToZip,
                                  ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
                                  hb_param( 4, HB_IT_BLOCK ),
                                  ISLOG( 5 ) ? hb_parl( 5 ) : 0,
@@ -96,7 +121,6 @@ HB_FUNC( HB_ZIPFILE )
                                  ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                                  &iProgress );
-
       }
    }
 
@@ -141,36 +165,34 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
 
    if( ISCHAR( 1 ) )
    {
-      char szFile[ _POSIX_PATH_MAX ];
-      PHB_ITEM pProgress = hb_param( 10, HB_IT_BLOCK );
-      HB_ITEM iProgress;
+      PHB_ITEM pParam = hb_param( 2, HB_IT_STRING | HB_IT_ARRAY );
 
-      iProgress.type = HB_IT_NIL;
-
-      if( pProgress )
+      if ( pParam )
       {
-        hb_itemCopy( &iProgress, pProgress );
-      }
+         char szFile[ _POSIX_PATH_MAX ];
+         PHB_ITEM pProgress = hb_param( 10, HB_IT_BLOCK );
+         HB_ITEM iProgress;
 
-      strcpy( szFile, hb_parc( 1 ) );
+         iProgress.type = HB_IT_NIL;
 
-      if( ISCHAR( 2 ) )
-      {
-         bRet = hb_CmpTdSpanStd( hb___CheckFile( szFile ),
-                                 hb_parc( 2 ),
-                                 ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
-                                 hb_param( 4, HB_IT_BLOCK ),
-                                 ISLOG( 5 ) ? hb_parl( 5 ) : 0,
-                                 ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
-                                 ISNUM( 7 ) ? hb_parni( 7 ) : 0,
-                                 ISLOG( 8 ) ? hb_parl( 8 ) : 0,
-                                 ISLOG( 9 ) ? hb_parl( 9 ) : 0,
-                                 &iProgress );
-      }
-      else if( ISARRAY( 2 ) )
-      {
+         if ( hb_param( 2, HB_IT_STRING ) )
+         {
+            ZipCreateArray( hb_param( 2, HB_IT_STRING ) );
+         }
+         else
+         {
+            hb_itemCopy( &FileToZip, pParam );
+         }
+
+         if( pProgress )
+         {
+           hb_itemCopy( &iProgress, pProgress );
+         }
+
+         strcpy( szFile, hb_parc( 1 ) );
+
          bRet = hb_CmpTdSpan( hb___CheckFile( szFile ),
-                              hb_param( 2, HB_IT_ARRAY ),
+                              &FileToZip,
                               ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
                               hb_param( 4, HB_IT_BLOCK ),
                               ISLOG( 5 ) ? hb_parl( 5 ) : 0,
@@ -191,35 +213,34 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
 
    if( ISCHAR( 1 ) )
    {
-      char szFile[ _POSIX_PATH_MAX ];
-      PHB_ITEM pProgress = hb_param( 9, HB_IT_BLOCK );
-      HB_ITEM iProgress;
+      PHB_ITEM pParam = hb_param( 2, HB_IT_STRING | HB_IT_ARRAY );
 
-      iProgress.type = HB_IT_NIL;
-
-      if( pProgress )
+      if ( pParam )
       {
-        hb_itemCopy( &iProgress, pProgress );
-      }
+         char szFile[ _POSIX_PATH_MAX ];
+         PHB_ITEM pProgress = hb_param( 9, HB_IT_BLOCK );
+         HB_ITEM iProgress;
 
-      strcpy( szFile, hb_parc( 1 ) );
+         iProgress.type = HB_IT_NIL;
 
-      if( ISCHAR( 2 ) )
-      {
-         bRet = hb_CmpPkSpanStd( hb___CheckFile( szFile ),
-                                 hb_parc( 2 ),
-                                 ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
-                                 hb_param( 4, HB_IT_BLOCK ),
-                                 ISLOG( 5 ) ? hb_parl( 5 ) : 0,
-                                 ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
-                                 ISLOG( 7 ) ? hb_parl( 7 ) : 0,
-                                 ISLOG( 8 ) ? hb_parl( 8 ) : 0,
-                                 &iProgress );
-      }
-      else if( ISARRAY( 2 ) )
-      {
+         if ( hb_param( 2, HB_IT_STRING ) )
+         {
+            ZipCreateArray( hb_param( 2, HB_IT_STRING ) );
+         }
+         else
+         {
+            hb_itemCopy( &FileToZip, pParam );
+         }
+
+         if( pProgress )
+         {
+           hb_itemCopy( &iProgress, pProgress );
+         }
+
+         strcpy( szFile, hb_parc( 1 ) );
+
          bRet = hb_CmpPkSpan( hb___CheckFile( szFile ),
-                              hb_param( 2, HB_IT_ARRAY ),
+                              &FileToZip,
                               ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
                               hb_param( 4, HB_IT_BLOCK ),
                               ISLOG( 5 ) ? hb_parl( 5 ) : 0,

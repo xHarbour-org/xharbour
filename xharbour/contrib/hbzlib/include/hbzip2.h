@@ -1,5 +1,5 @@
 /*
- * $Id: hbzip2.h,v 1.4 2003/11/30 12:32:29 druzus Exp $
+ * $Id: hbzip2.h,v 1.5 2004/02/14 16:37:54 lculik Exp $
  */
 
 /*
@@ -107,7 +107,6 @@ extern unsigned long   GetCurrentFileSize(   LPCTSTR szFile);
 extern PHB_ITEM hb___GetFileNamesFromZip(char *szFile,BOOL iMode);
 
 extern int      hb_CmpPkSpan(char *szFile,PHB_ITEM pArray,int iCompLevel,PHB_ITEM pBlock,BOOL bOverWrite,char *szPassWord,BOOL bPath,BOOL bDrive,PHB_ITEM pProgress);
-extern int      hb_CmpPkSpanStd(char *szFile,char *szFiletoCompress,int iCompLevel,PHB_ITEM pBlock,BOOL bOverWrite,char *szPassWord,BOOL bPath,BOOL bDrive,PHB_ITEM pProgress);
 extern BOOL     hb_TransferFilesFromzip(char *szSource,char *szDest,PHB_ITEM pArray);
 extern char     *hb_getPassWord(char *szName);
 extern int      hb___GetNumberofFilestoUnzip(char *szFile);
@@ -115,8 +114,6 @@ extern int      hb___SetCallbackFunc(PHB_ITEM pFunc);
 extern int      hb_CmpTdSpan(char *szFile,PHB_ITEM pArray,int iCompLevel,PHB_ITEM pBlock,BOOL bOverWrite,char *szPassWord,int iSpanSize ,BOOL bPath ,BOOL bDrive,PHB_ITEM pProgress);
 
 extern int      hb_CompressFile(char *szFile,PHB_ITEM pArray,int iCompLevel,PHB_ITEM pBlock,BOOL bOverWrite,char *szPassWord,BOOL bPath,BOOL bDrive,PHB_ITEM pProgress);
-extern int      hb_CompressFileStd(char *szFile,char *szFiletoCompress,int iCompLevel,PHB_ITEM pBlock,BOOL bOverWrite,char *szPassWord,BOOL bPath,BOOL bDrive,PHB_ITEM pProgress);
-extern int      hb_CmpTdSpanStd(char *szFile,char * szFiletoCompress,int iCompLevel,PHB_ITEM pBlock,BOOL bOverWrite,char *szPassWord,int iSpanSize,BOOL bPath,BOOL bDrive,PHB_ITEM pProgress);
 extern int      hb_UnzipAll(char *szFile,PHB_ITEM pBlock,BOOL bWithPath,char *szPassWord,char *szPath,PHB_ITEM pProgress);
 extern int      hb_UnzipOne(char *szFile,PHB_ITEM pBlock,BOOL bWithPath,char *szPassWord,char *szPath,char *szFiletoExtract,PHB_ITEM pProgress);
 extern int      hb_UnzipSel(char *szFile,PHB_ITEM pBlock,BOOL bWithPath,char *szPassWord,char *szPath,PHB_ITEM pArray,PHB_ITEM pProgress);

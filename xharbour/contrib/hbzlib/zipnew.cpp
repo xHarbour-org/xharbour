@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.12 2004/02/24 12:55:56 andijahja Exp $
+ * $Id: zipnew.cpp,v 1.13 2004/02/25 14:30:07 andijahja Exp $
  */
 
 /*
@@ -488,118 +488,6 @@ int hb___GetNumberofFilestoUnzip( char *szFile )
    szZip.Close( );
 
    return iNumberOfFiles;
-}
-
-int hb_CmpPkSpanStd( char *szFile, char *szFiletoCompress, int iCompLevel, PHB_ITEM pBlock, BOOL bOverWrite, char *szPassWord, BOOL bPath, BOOL bDrive, PHB_ITEM pProgress )
-{
-
-   BOOL bReturn = TRUE;
-   BOOL bAdded = FALSE;
-   BOOL bFileExist = hb_fsFile( ( BYTE* )szFile );
-
-   CZipArchive szZip;
-   SpanCallback span;
-   SpanActionCallback spanac;
-
-   szZip.SetSpanCallback( &span );
-   bDrive= false;
-
-   try
-   {
-      if( ( bFileExist && bOverWrite ) || !bFileExist )
-      {
-         szZip.Open( szFile, CZipArchive::zipCreateSpan, 0 );
-      }
-      else
-      {
-         return ( int ) FALSE;
-      }
-   }
-
-   catch ( CZipException&  e )
-   {
-      bReturn = FALSE;
-   }
-
-   catch( ... ){}
-
-   if ( ! bReturn )
-   {
-      return ( int ) bReturn;
-   }
-
-   if ( szPassWord != NULL )
-   {
-      szZip.SetPassword( szPassWord );
-   }
-
-   if ( pZipI.szComment !=  NULL )
-   {
-      szZip.SetGlobalComment( pZipI.szComment );
-      hb_xfree( pZipI.szComment );
-   }
-
-   if ( HB_IS_BLOCK( pProgress ) )
-   {
-      pProgressInfo = pProgress;
-      szZip.SetCallback( &spanac );
-   }
-
-   try
-   {
-      if( pBlock  !=  NULL )
-      {
-          HB_ITEM FileName;
-
-          FileName.type = HB_IT_NIL;
-
-          hb_vmEvalBlockV( pBlock, 1, hb_itemPutC( &FileName, szFiletoCompress ));
-
-          hb_itemClear( &FileName );
-      }
-
-//      if ( szPassWord !=  NULL )
-//      {
-//          szZip.SetPassword( szPassWord );
-//      }
-
-/*      #if defined( __WIN32__ ) || defined( __MINGW32__ )
-         if ( bDrive && !bAdded )
-         {
-            szZip.AddNewFileDrv( szFiletoCompress, iCompLevel, true, CZipArchive::zipsmSafeSmart, 65536 );
-            bAdded  = true;
-         }
-      #endif*/
-
-      if ( bPath && !bAdded )
-      {
-         szZip.AddNewFile( szFiletoCompress, iCompLevel, true, CZipArchive::zipsmSafeSmart, 65536 );
-         bAdded  = true;
-      }
-
-      if ( !bDrive && !bPath && !bAdded )
-      {
-         szZip.AddNewFile( szFiletoCompress, iCompLevel, false, CZipArchive::zipsmSafeSmart, 65536 );
-         bAdded  = true;
-      }
-
-   }
-
-   catch( ... ) {}
-
-   try
-   {
-      szZip.Close( );
-   }
-
-   catch ( CZipException&  e )
-   {
-      bReturn = FALSE;
-   }
-
-   catch( ... ){}
-
-   return ( int ) bReturn;
 }
 
 int hb___SetCallbackFunc( PHB_ITEM pFunc )

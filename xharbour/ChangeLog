@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2414 2004/02/27 22:04:43 andijahja Exp $
+ * $Id: ChangeLog,v 1.2415 2004/02/28 00:39:15 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-28 10:50 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/hbzlib/include/hbzip2.h
+  * contrib/hbzlib/zipcomp.cpp
+  * contrib/hbzlib/zipnew.cpp
+    - remove function hb_CompressFileStd()
+    - remove function hb_CmpTdSpanStd()
+    - remove function hb_CmpPkSpanStd()
+
+  * contrib/hbzlib/zip.c
+    % enhanced and simplified zip surface functions
+    % HB_ZIPFILE now accept wild cards for files to be zipped
 
 2004-02-28 03:30 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/debug/debugger.prg
