@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.6 2003/05/30 21:28:17 ronpinkas Exp $
+ * $Id: val.c,v 1.7 2003/07/13 18:20:52 walito Exp $
  */
 
 /*
@@ -69,7 +69,7 @@ double HB_EXPORT hb_strVal( const char * szText, ... )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strVal(%s)", szText));
 
-   while( isspace( szText[ulPad] ) )
+   while( isspace((int) szText[ulPad] ) )
    {
       ulPad++;
    }
@@ -83,7 +83,7 @@ double HB_EXPORT hb_strVal( const char * szText, ... )
 
    while( szText[ulLen] )
    {
-      if( ! ( isdigit( szText[ulLen] ) || szText[ulLen] == '.' ) )
+      if( ! ( isdigit((int) szText[ulLen] ) || szText[ulLen] == '.' ) )
       {
          if( ulLen > ulPad )
          {

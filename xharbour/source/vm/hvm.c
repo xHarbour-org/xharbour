@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.289 2003/11/30 12:32:30 druzus Exp $
+ * $Id: hvm.c,v 1.290 2003/12/01 23:50:13 druzus Exp $
  */
 
 /*
@@ -632,7 +632,7 @@ int HB_EXPORT hb_vmQuit( void )
       if (! HB_SAME_THREAD( hb_main_thread_id, HB_CURRENT_THREAD()) )
       {
          hb_vm_bQuitRequest = TRUE;
-         #ifdef HB_OS_WIN_32
+         #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
             HB_DISABLE_ASYN_CANC
             HB_STACK_LOCK
             hb_threadCancelInternal(); // never returns
@@ -4332,21 +4332,21 @@ static void hb_vmNot( void )
       {
          if( pItem->item.asInteger.value == 0 )
             pItem->item.asInteger.value = 1;
- 	 else
+    else
             pItem->item.asInteger.value = 0;
       }
       else if( HB_IS_LONG( hb_stackItemFromTop( -1 ) ) )
       {
          if( pItem->item.asLong.value == 0 )
             pItem->item.asLong.value = 1;
- 	 else
+    else
             pItem->item.asLong.value = 0;
       }
       else
       {
          if( pItem->item.asDouble.value == 0 )
             pItem->item.asDouble.value = 1.0;
-	 else
+    else
             pItem->item.asDouble.value = 0.0;
       }
    }

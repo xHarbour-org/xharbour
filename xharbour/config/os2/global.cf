@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.1.1.1 2001/12/21 10:47:58 ronpinkas Exp $
+# $Id: global.cf,v 1.2 2003/05/16 19:52:04 druzus Exp $
 #
 
 all : first
@@ -37,9 +37,15 @@ dirbase::
 	-CMD.EXE /c IF NOT EXIST $(HB_ARCHITECTURE) $(MD) $(HB_ARCHITECTURE)
 	-CMD.EXE /c IF NOT EXIST $(OS2_ARCH_DIR)    $(MD) $(OS2_ARCH_DIR)
 
+dirbase_mt::
+	-CMD.EXE /c IF NOT EXIST $(HB_ARCHITECTURE) $(MD) $(HB_ARCHITECTURE)
+	-CMD.EXE /c IF NOT EXIST $(OS2_ARCH_DIR)_mt $(MD) $(OS2_ARCH_DIR)_mt
+
 clean::
 	-CMD.EXE /c IF EXIST $(OS2_ARCH_DIR)\\*.* $(RM) $(OS2_ARCH_DIR)\\*.*
+	-CMD.EXE /c IF EXIST $(OS2_ARCH_DIR)_mt\\*.* $(RM) $(OS2_ARCH_DIR)_mt\\*.*
 	-CMD.EXE /c IF EXIST $(OS2_ARCH_DIR)     $(RD) $(OS2_ARCH_DIR)
+	-CMD.EXE /c IF EXIST $(OS2_ARCH_DIR)_mt     $(RD) $(OS2_ARCH_DIR)_mt
 	-CMD.EXE /c IF EXIST $(HB_ARCHITECTURE)  $(RD) $(HB_ARCHITECTURE)
 
 else  # bash
@@ -56,6 +62,11 @@ MD = mkdir
 dirbase::
 	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \
 	 [ -d $(ARCH) ] || $(MD) $(ARCH)
+
+dirbase_mt::
+	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \
+	[ -d $(ARCH)_mt ] || $(MD) $(ARCH)_mt
+
 
 clean::
 	-$(RD) $(ARCH_DIR)

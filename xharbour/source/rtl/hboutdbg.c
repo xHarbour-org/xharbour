@@ -1,5 +1,5 @@
 /*
- * $Id: hboutdbg.c,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
+ * $Id: hboutdbg.c,v 1.2 2003/11/24 16:57:26 lf_sfnet Exp $
  */
 
 /*
@@ -162,7 +162,7 @@ HB_FUNC( HB_OUTDEBUGNAME )
 
 HB_FUNC( HB_OUTDEBUG )
 {
-   #if defined(HB_OS_UNIX)
+   #if defined(HB_OS_UNIX) || ! defined(HB_OS_OS2)
    int iStatus, iPid;
 
    /* Are we under X? */

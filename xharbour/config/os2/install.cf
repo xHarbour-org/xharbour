@@ -1,31 +1,17 @@
 #
-# $Id: install.cf,v 1.3 2000/04/16 13:27:23 mauriliolongo Exp $
+# $Id: install.cf,v 1.1.1.1 2001/12/21 10:47:58 ronpinkas Exp $
 #
 
-ifeq ($(SHLVL),) # An OS/2 command shell
+include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
+
+define inst_file
+ECHO $(CP) $(file) $(INSTALL_OS2_DIR) >> _NSTALL.CMD
+
+endef
+
 
 INSTALL_LIST = $(subst /,\,$(INSTALL_OBJS))
-OS2_INSTALL_DIR = $(subst /,\,$(INSTALL_DIR))
-INSTALL_RULE =\
-        CMD.EXE /c FOR %f IN ($(INSTALL_LIST)) DO IF EXIST $(OS2_INSTALL_DIR). COPY %f $(OS2_INSTALL_DIR)
+INSTALL_OS2_DIR = $(subst /,\,$(INSTALL_DIR))
+INSTALL_RULE = $(foreach file, $(INSTALL_LIST), $(inst_file)) \
+		$(COMSPEC) /c _NSTALL.CMD & $(RM) _NSTALL.CMD
 
-else  # bash
-
-INSTALL_RULE =\
-        @if [ ! -d $(INSTALL_DIR) ]; \
-        then \
-          echo "! Can't install, path not found:" $(INSTALL_DIR); \
-        else \
-          for i in $(INSTALL_OBJS); \
-          do \
-            if [ -r $$i ]; \
-            then \
-              echo "! Installing $$i on $(INSTALL_DIR)"; \
-              $(CP) $$i $(INSTALL_DIR); \
-            else \
-              echo "! Can't install $$i, not found"; \
-            fi \
-          done \
-        fi
-
-endif

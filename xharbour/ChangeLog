@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1812 2003/12/03 11:15:41 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1813 2003/12/03 11:48:36 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,37 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2003-12-03 13:55 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+  * xharbour/config/os2/gcc.cf
+    xharbour/config/os2/global.cf
+    xharbour/config/os2/install.cf
+    * changed to build OS/2 GCC/EMX build and overcome CMD.EXE 1024 chars limit
+      on input line
+  * xharbour/include/hbdefs.h
+    * Always define INCL_ needed by OS/2
+  * xharbour/source/pp/ppcore.c
+  * xharbour/source/rtl/val.c
+    * isXXX() receives an int, removed a few warnings
+  * xharbour/source/rtl/hboutdbg.c
+    * nothing like this available on OS/2, commented out during build
+  * xharbour/source/rtl/hbserv.c
+    * tryed to port it to OS/2, no tests done, it compiles but could easily be
+      broken/not functioning as expected
+  * xharbour/source/vm/hvm.c
+    * a few defines
+  * xharbour/source/vm/inet.c
+    * ported to OS/2, gethostname() works, no other tests done
+  * xharbour/source/vm/thread.c
+    * compiles on ST mode, an #ifdef was required
+  * xharbour/utils/hbdict/Makefile
+    * instead of redefining INSTALL_RULE added *.hit file to INSTALL_OBJS
+      exe file gets copied to right place toghether with them
+
+  After these changes I can build a ST xHarbour on OS/2 using GCC and EMX runtime
+  hbtest.prg runs as expected and a few of my programs run as well.
+  MT flavour is, sadly, far ahead.
 
 2003-12-03 12:30 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * /source/debug/debugger.prg
@@ -24,9 +55,9 @@
     * hb_xrealloc() was called without reassigning the returned pointer; should
       have been working anyway as it was used only to reduce page sizes, but
       it is better to reassign the pointer each time.
-  
+
   * source/vm/classes.c
-    ! Added hash to deep initialization types for INIT clauses.  
+    ! Added hash to deep initialization types for INIT clauses.
 
 2003-01-02 10:25 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * include/hbapifs.ch
@@ -38,7 +69,7 @@
      returning  FALSE if File contain HIDDEN+DIRECTORY attribute
 
 2003-12-02 12:30 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
-  * /xharbour/bin/bld.bat 
+  * /xharbour/bin/bld.bat
     * changes to support OpenWatcom DOS e Windows 32
 
 2003-12-02 10:25 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
@@ -747,10 +778,10 @@ for main function.
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
   * xharbour/source/rtl/set.c
     + different locking schemes implemented. Current possible values:
-	#define HB_SET_DBFLOCK_DEFAULT    0
-	#define HB_SET_DBFLOCK_CLIP       1
-	#define HB_SET_DBFLOCK_CL53       2
-	#define HB_SET_DBFLOCK_VFP        3
+   #define HB_SET_DBFLOCK_DEFAULT    0
+   #define HB_SET_DBFLOCK_CLIP       1
+   #define HB_SET_DBFLOCK_CL53       2
+   #define HB_SET_DBFLOCK_VFP        3
       If default is set then DBFCDX uses DBFLOCK_VFP others DBFLOCK_CLIP.
       User can set before dbf open:
           SET DBFLOCKSCHEME TO <n>

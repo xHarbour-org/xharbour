@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.100 2003/11/19 16:26:14 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.101 2003/11/26 20:16:07 likewolf Exp $
  */
 
 /*
@@ -3429,7 +3429,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                         // always accept as extended marker, or end of stream.
                         State = STATE_ID;
                      }
-                     else if( isdigit( *(*ptri + 1) ) )
+                     else if( isdigit((int) *(*ptri + 1) ) )
                      {
                         int iLen;
 
@@ -3437,13 +3437,13 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                         {
                            //printf( "Back scan: %c %i of %i\n", *(*ptri - iLen), iLen, lens );
 
-                           if( isalpha( *(*ptri - iLen) ) )
+                           if( isalpha((int) *(*ptri - iLen) ) )
                            {
                               //printf( "Rejected: >%s< after: >%.*s<\n", *ptri, lens, expreal - lens  );
                               rez = TRUE;
                               break;
                            }
-                           else if( ! isdigit( *(*ptri - iLen) ) )
+                           else if( ! isdigit((int) *(*ptri - iLen) ) )
                            {
                               break;
                            }
@@ -3463,7 +3463,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            lens++;
 
                            // grab while digits
-                           while( isdigit( **ptri ) )
+                           while( isdigit((int) **ptri ) )
                            {
                               //printf( "Grabing: %c\n", **ptri );
 
@@ -3478,7 +3478,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
                            //printf( "Stopper: %c\n", **ptri );
 
-                           if( isalpha( **ptri ) )
+                           if( isalpha((int) **ptri ) )
                            {
                               rez = TRUE;
                            }
@@ -3490,7 +3490,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                            }
                         }
                      }
-                     else if( isalpha( *(*ptri + 1) ) || *(*ptri + 1) == '_' )
+                     else if( isalpha((int) *(*ptri + 1) ) || *(*ptri + 1) == '_' )
                      {
                         // Accept even following a digit.
                         State = STATE_ID;
@@ -5199,11 +5199,11 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
               {
                  lPos += 5;
               }
-              else if( lPos && isdigit( szText[lPos - 1] ) && isdigit( szText[lPos + 1] ) )
+              else if( lPos && isdigit((int) szText[lPos - 1] ) && isdigit((int) szText[lPos + 1] ) )
               {
                  lPos++;
 
-                 while( isdigit( szText[lPos] ) )
+                 while( isdigit((int) szText[lPos] ) )
                  {
                     lPos++;
                  }
@@ -5809,12 +5809,12 @@ static int NextName( char ** sSource, char * sDest )
      (*sSource)++;
   }
 
-  if( ! isalpha( **sSource ) )
+  if( ! isalpha((int) **sSource ) )
   {
      s_bNewLine = FALSE;
   }
 
-  while( **sSource != '\0' && ( State != STATE_NORMAL || ( **sSource != '_' && ! isalpha( **sSource ) ) ) )
+  while( **sSource != '\0' && ( State != STATE_NORMAL || ( **sSource != '_' && ! isalpha((int) **sSource ) ) ) )
   {
      if( State == STATE_QUOTE1 )
      {
@@ -6383,13 +6383,13 @@ int hb_pp_NextToken( char** pLine, char *sToken )
    }
    /* END - Added by Giancarlo Niccolai */
 
-   if( isalpha( sLine[0] ) || sLine[0] == '_' )
+   if( isalpha((int) sLine[0] ) || sLine[0] == '_' )
    {
       sToken[0] = sLine[0];
       Counter = 1;
 
       // Why did I have the '\\' is NOT clear - document if and when reinstating!!!
-      while( isalnum( sLine[Counter] ) || sLine[Counter] == '_'  ) //|| sLine[Counter] == '\\' )
+      while( isalnum((int) sLine[Counter] ) || sLine[Counter] == '_'  ) //|| sLine[Counter] == '\\' )
       {
          sToken[Counter] = sLine[Counter];
          Counter++;
@@ -6398,24 +6398,24 @@ int hb_pp_NextToken( char** pLine, char *sToken )
       sToken[Counter] = '\0';
       goto Done;
    }
-   else if( isdigit( sLine[0] ) )
+   else if( isdigit((int) sLine[0] ) )
    {
       sToken[0] = sLine[0];
       Counter = 1;
-      while( isdigit( sLine[Counter] ) || sLine[Counter] == '\\' )
+      while( isdigit((int) sLine[Counter] ) || sLine[Counter] == '\\' )
       {
          sToken[Counter] = sLine[Counter];
          Counter++;
       }
 
       // Consume the point (and subsequent digits) only if digits follow...
-      if( sLine[Counter] == '.' && isdigit( sLine[Counter + 1] ) )
+      if( sLine[Counter] == '.' && isdigit((int) sLine[Counter + 1] ) )
       {
          sToken[Counter] = '.';
          Counter++;
          sToken[Counter] = sLine[Counter];
          Counter++;
-         while( isdigit( sLine[Counter] ) || sLine[Counter] == '\\' )
+         while( isdigit((int) sLine[Counter] ) || sLine[Counter] == '\\' )
          {
             sToken[Counter] = sLine[Counter];
             Counter++;
@@ -6426,12 +6426,12 @@ int hb_pp_NextToken( char** pLine, char *sToken )
       sToken[Counter] = '\0';
       goto Done;
    }
-   else if( sLine[0] == '.' && isdigit( sLine[1] ) )
+   else if( sLine[0] == '.' && isdigit((int) sLine[1] ) )
    {
       sToken[0] = '.';
       sToken[1] = sLine[1];
       Counter = 2;
-      while( isdigit( sLine[Counter] ) )
+      while( isdigit((int) sLine[Counter] ) )
       {
          sToken[Counter] = sLine[Counter];
          Counter++;
@@ -6612,7 +6612,7 @@ int hb_pp_NextToken( char** pLine, char *sToken )
    }
    else
    {
-      s_bArray = ( isalnum( sToken[0] ) || strchr( "])}._", sToken[0] ) );
+      s_bArray = ( isalnum((int) sToken[0] ) || strchr( "])}._", sToken[0] ) );
    }
 
    while( sLine[0] == ' ' || sLine[0] == '\t' )

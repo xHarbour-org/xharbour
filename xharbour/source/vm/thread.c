@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.128 2003/11/28 20:39:14 jonnymind Exp $
+* $Id: thread.c,v 1.129 2003/11/28 21:21:07 jonnymind Exp $
 */
 
 /*
@@ -2223,6 +2223,8 @@ void hb_threadSleep( int millisec )
          ts.tv_nsec = (millisec % 1000) * 1000000;
          nanosleep( &ts, 0 );
       }
+   #elif defined(HB_OS_OS2)
+      DosSleep( millisec );
    #else
       HB_TEST_CANCEL_ENABLE_ASYN;
       Sleep( millisec );

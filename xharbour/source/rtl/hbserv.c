@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.3 2003/11/26 03:17:49 likewolf Exp $
+* $Id: hbserv.c,v 1.4 2003/11/26 20:16:07 likewolf Exp $
 */
 
 /*
@@ -61,7 +61,7 @@
 #include <stdio.h>
 
 #if !defined(HB_OS_DOS) && !defined(HB_OS_DARWIN) // dos and Darwin can't compile this module
-#if defined( HB_OS_UNIX )
+#if defined( HB_OS_UNIX ) || defined (HARBOUR_GCC_OS2)
 #include <sys/types.h>
 #include <unistd.h>
 #include <signal.h>
@@ -111,7 +111,7 @@ static int s_translateSignal( UINT sig, UINT subsig );
 * signals, both from kernel or from users.
 *****************************************************************************/
 
-#ifdef HB_OS_UNIX
+#if defined(HB_OS_UNIX) || defined (HARBOUR_GCC_OS2)
 
 //TODO: Register the old signal action to allow graceful fallback
 //static struct sigaction sa_oldAction[SIGUSR2+1];
@@ -131,7 +131,11 @@ static S_TUPLE s_sigTable[] = {
    {0 , 0, 0}
 };
 
+#ifdef HARBOUR_GCC_OS2
+static void s_signalHandler( int sig )
+#else
 static void s_signalHandler( int sig, siginfo_t *info, void *v )
+#endif
 {
    UINT uiMask;
    UINT uiSig;
@@ -139,7 +143,9 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
    PHB_ITEM pExecArray, pRet;
    ULONG ulPos;
 
+   #ifndef HARBOUR_GCC_OS2
    HB_SYMBOL_UNUSED(v);
+   #endif
 
    // let's find the right signal handler.
    HB_CRITICAL_LOCK( s_ServiceMutex );
@@ -173,13 +179,19 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
          // the third parameter is an array:
 
          pRet = hb_itemNew( NULL );
+         #ifdef HARBOUR_GCC_OS2
+         hb_arrayNew( pRet, 1 );
+         #else
          hb_arrayNew( pRet, 6 );
+         #endif
          hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSSIGNAL), sig );
+         #ifndef HARBOUR_GCC_OS2
          hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSSUBSIG), info->si_code );
          hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSERROR), info->si_errno );
          hb_itemPutNL( hb_arrayGetItemPtr( pRet, HB_SERVICE_ADDRESS), (long) info->si_addr );
          hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_PROCESS), info->si_pid );
          hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_UID), info->si_uid );
+         #endif
          hb_itemForwardValue( hb_arrayGetItemPtr( pExecArray, 3), pRet );
 
          // forbid a re-call
@@ -222,7 +234,10 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
    }*/
 }
 
-#ifdef HB_THREAD_SUPPORT
+/* 2003 - <maurilio.longo@libero.it>
+   to fix as soon as thread support is ready on OS/2
+*/
+#if defined(HB_THREAD_SUPPORT) && ! defined(HB_OS_OS2)
 void *s_signalListener( void *v )
 {
    static BOOL bFirst = TRUE;
@@ -291,7 +306,7 @@ void *s_signalListener( void *v )
 /*****************************************************************************
 * Windows specific exception filter system.
 *
-* Windows will only catch exceptions; It is necessary to rely on the 
+* Windows will only catch exceptions; It is necessary to rely on the
 * HB_SERVICELOOP to receive user generated messages.
 *****************************************************************************/
 
@@ -336,7 +351,7 @@ static S_TUPLE s_sigTable[] = {
    { 1, WM_USER + 2, HB_SIGNAL_REFRESH },
    { 1, WM_USER + 3, HB_SIGNAL_INTERRUPT },
    { 1, WM_QUIT, HB_SIGNAL_QUIT },
-   
+
    // Console handler
    { 2, CTRL_C_EVENT, HB_SIGNAL_INTERRUPT },
    { 2, CTRL_BREAK_EVENT, HB_SIGNAL_INTERRUPT },
@@ -396,7 +411,7 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
 
          pRet = hb_itemNew( NULL );
          hb_arrayNew( pRet, 6 );
-         
+
          hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSSIGNAL), type );
          hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSSUBSIG), sig );
          //could be meaningless, but does not matter here
@@ -445,7 +460,7 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
 }
 
 
-static LRESULT CALLBACK s_exceptionFilter( PEXCEPTION_POINTERS exInfo ) 
+static LRESULT CALLBACK s_exceptionFilter( PEXCEPTION_POINTERS exInfo )
 {
    return s_signalHandler( 0, exInfo->ExceptionRecord->ExceptionCode, exInfo->ExceptionRecord );
 }
@@ -453,7 +468,7 @@ static LRESULT CALLBACK s_exceptionFilter( PEXCEPTION_POINTERS exInfo )
 static LRESULT CALLBACK s_MsgFilterFunc( int nCode, WPARAM wParam, LPARAM lParam )
 {
    PMSG msg;
-   
+
    if ( nCode < 0 )
    {
       return CallNextHookEx( s_hMsgHook, nCode, wParam, lParam );
@@ -487,10 +502,10 @@ BOOL WINAPI s_ConsoleHandlerRoutine( DWORD dwCtrlType )
 #ifdef HB_THREAD_SUPPORT
    BOOL bHaveNewStack = FALSE;
    HB_STACK *pStack;
-   
+
    /* we need a new stack: this is NOT an hb thread. */
 
-   if ( TlsGetValue( hb_dwCurrentStack ) == 0 ) 
+   if ( TlsGetValue( hb_dwCurrentStack ) == 0 )
    {
       bHaveNewStack = TRUE;
       pStack = hb_threadCreateStack( GetCurrentThreadId() );
@@ -498,11 +513,11 @@ BOOL WINAPI s_ConsoleHandlerRoutine( DWORD dwCtrlType )
       TlsSetValue( hb_dwCurrentStack, ( void * ) pStack );
    }
 #endif
-   
+
    s_signalHandler( 2, dwCtrlType, NULL );
 
 #ifdef HB_THREAD_SUPPORT
-   if ( bHaveNewStack ) 
+   if ( bHaveNewStack )
    {
       hb_threadDestroyStack( pStack );
    }
@@ -526,7 +541,7 @@ BOOL WINAPI s_ConsoleHandlerRoutine( DWORD dwCtrlType )
 
 static void s_serviceSetHBSig( void )
 {
-#ifdef HB_OS_UNIX
+#if defined( HB_OS_UNIX ) || defined(HARBOUR_GCC_OS2)
    #ifdef HB_THREAD_SUPPORT
       sigset_t blockall;
       //set signal mask
@@ -546,12 +561,21 @@ static void s_serviceSetHBSig( void )
    #else
       struct sigaction act;
 
+      #ifdef HARBOUR_GCC_OS2
+      act.sa_handler = s_signalHandler;
+      #else
       // using more descriptive sa_action instead of sa_handler
       act.sa_handler = NULL; // if act.sa.. is a union, we just clean this
       act.sa_sigaction = s_signalHandler; // this is what matters
       // block al signals, we don't want to be interrupted.
       //sigfillset( &act.sa_mask );
+      #endif
+
+      #ifdef HARBOUR_GCC_OS2
+      act.sa_flags = SA_NOCLDSTOP;
+      #else
       act.sa_flags = SA_NOCLDSTOP | SA_SIGINFO;
+      #endif
 
       sigaction( SIGHUP, &act, NULL );
       sigaction( SIGQUIT, &act, NULL );
@@ -578,7 +602,7 @@ static void s_serviceSetHBSig( void )
    SetUnhandledExceptionFilter( s_exceptionFilter );
    s_hMsgHook = SetWindowsHookEx( WH_GETMESSAGE, s_MsgFilterFunc, NULL, GetCurrentThreadId() );
    SetConsoleCtrlHandler( s_ConsoleHandlerRoutine, TRUE );
-   
+
 #endif
 }
 //---------------------------------------------------
@@ -840,13 +864,13 @@ HB_FUNC( HB_SIGNALDESC )
    int iSubSig = hb_parni( 2 );
 
    // UNIX MESSGES
-   #ifdef HB_OS_UNIX
+   #if defined (HB_OS_UNIX) || defined(HARBOUR_GCC_OS2)
 
    switch ( iSig )
    {
       case SIGSEGV: switch( iSubSig )
       {
-         #ifndef HB_OS_BSD
+         #if ! defined(HB_OS_BSD) && ! defined(HARBOUR_GCC_OS2)
          case SEGV_MAPERR: hb_retc( "Segmentation fault: address not mapped to object"); return;
          case SEGV_ACCERR: hb_retc( "Segmentation fault: invalid permissions for mapped object"); return;
          #endif
@@ -856,7 +880,7 @@ HB_FUNC( HB_SIGNALDESC )
 
       case SIGILL: switch( iSubSig )
       {
-         #ifndef HB_OS_BSD
+         #if ! defined(HB_OS_BSD) && ! defined(HARBOUR_GCC_OS2)
          case ILL_ILLOPC: hb_retc( "Illegal operation: illegal opcode"); return;
          case ILL_ILLOPN: hb_retc( "Illegal operation: illegal operand"); return;
          case ILL_ILLADR: hb_retc( "Illegal operation: illegal addressing mode"); return;
@@ -872,6 +896,7 @@ HB_FUNC( HB_SIGNALDESC )
 
       case SIGFPE: switch( iSubSig )
       {
+         #if ! defined(HARBOUR_GCC_OS2)
          case FPE_INTDIV: hb_retc( "Floating point: integer divide by zero"); return;
          case FPE_INTOVF: hb_retc( "Floating point: integer overflow"); return;
          case FPE_FLTDIV: hb_retc( "Floating point: floating point divide by zero"); return;
@@ -880,6 +905,7 @@ HB_FUNC( HB_SIGNALDESC )
          case FPE_FLTRES: hb_retc( "Floating point: floating point inexact result"); return;
          case FPE_FLTINV: hb_retc( "Floating point: floating point invalid operation"); return;
          case FPE_FLTSUB: hb_retc( "Floating point: subscript out of range"); return;
+         #endif
          default: hb_retc( "Floating point" ); return;
       }
       break;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.21 2003/11/05 03:32:48 druzus Exp $
+ * $Id: hbdefs.h,v 1.22 2003/11/05 13:41:41 druzus Exp $
  */
 
 /*
@@ -90,9 +90,9 @@
    /* 28/03/2000 - maurilio.longo@libero.it
       The same holds true when using GCC under OS/2
    */
-   #define INCL_TYPES
-   #define INCL_DOSEXCEPTIONS    /* DOS exception values */
-   #define INCL_ERRORS           /* DOS error values     */
+   #define INCL_BASE
+   #define INCL_DOS
+   #define INCL_DOSMISC
 
    #include <os2.h>
    #undef INT
@@ -154,8 +154,8 @@
 
 #define HB_LOBYTE( w )          ( ( BYTE ) ( w ) )
 #define HB_HIBYTE( w )          ( ( BYTE ) ( ( ( USHORT ) ( w ) >> 8 ) & 0xFF ) )
-#define HB_LOWORD( l )		( ( USHORT ) ( l ) )
-#define HB_HIWORD( l )		( ( USHORT ) ( ( ( l ) >> 16 ) & 0xFFFF ) )
+#define HB_LOWORD( l )     ( ( USHORT ) ( l ) )
+#define HB_HIWORD( l )     ( ( USHORT ) ( ( ( l ) >> 16 ) & 0xFFFF ) )
 #define HB_MKSHORT( lo, hi )    ( ( SHORT ) ( ( ( SHORT ) ( hi ) ) << 8 ) | ( lo ) )
 #define HB_MKUSHORT( lo, hi )   ( ( USHORT ) ( ( ( USHORT ) ( hi ) ) << 8 ) | ( lo ) )
 #define HB_MKLONG( b1, b2, b3, b4 )  ( ( ( ( LONG ) ( b4 ) ) << 24 ) | \
@@ -294,28 +294,28 @@
    #define HB_PUT_LE_DOUBLE( p, d ) ( *( double * )( p ) = HB_DOUBLE_TO_LE( d ) )
 
    #define HB_DOUBLE_TO_LE( d )     HB_DOUBLE_FROM_LE( d )
-   #define HB_DOUBLE_FROM_LE( d )	\
-	( { \
-	   BYTE double_var[ 8 ]; \
-	   *( double * )double_var = d; \
-	   HB_PCODE_MKDOUBLE( double_var ); \
-	} )
-   #define HB_PCODE_MKDOUBLE( p )	\
-	( { \
-	   union { \
-	      double d; \
-	      BYTE buffer[ 8 ]; \
-	   } u; \
-	   u.buffer[ 0 ] = ( p )[ 7 ]; \
-	   u.buffer[ 1 ] = ( p )[ 6 ]; \
-	   u.buffer[ 2 ] = ( p )[ 5 ]; \
-	   u.buffer[ 3 ] = ( p )[ 4 ]; \
-	   u.buffer[ 4 ] = ( p )[ 3 ]; \
-	   u.buffer[ 5 ] = ( p )[ 2 ]; \
-	   u.buffer[ 6 ] = ( p )[ 1 ]; \
-	   u.buffer[ 7 ] = ( p )[ 0 ]; \
-	   u.d; \
-	} )
+   #define HB_DOUBLE_FROM_LE( d )   \
+   ( { \
+      BYTE double_var[ 8 ]; \
+      *( double * )double_var = d; \
+      HB_PCODE_MKDOUBLE( double_var ); \
+   } )
+   #define HB_PCODE_MKDOUBLE( p )   \
+   ( { \
+      union { \
+         double d; \
+         BYTE buffer[ 8 ]; \
+      } u; \
+      u.buffer[ 0 ] = ( p )[ 7 ]; \
+      u.buffer[ 1 ] = ( p )[ 6 ]; \
+      u.buffer[ 2 ] = ( p )[ 5 ]; \
+      u.buffer[ 3 ] = ( p )[ 4 ]; \
+      u.buffer[ 4 ] = ( p )[ 3 ]; \
+      u.buffer[ 5 ] = ( p )[ 2 ]; \
+      u.buffer[ 6 ] = ( p )[ 1 ]; \
+      u.buffer[ 7 ] = ( p )[ 0 ]; \
+      u.d; \
+   } )
 #else
    #error Little-Endian IEEE 754 double type conversion unimplemented with a non-GCC compiler
 #endif
