@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1443 2003/09/11 06:56:40 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1444 2003/09/11 09:34:26 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-11-03 07:35 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/rtl/hbcompress.c
+    ! Corrected typo in HB_UNCOMPRESS parameter check
+
 2003-09-11 11:30 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * harbour/harbour.spec
     * small fix in auto platform detection (thanks to Tomaz Zupan)
   * harbour/make_tgz.sh
-    * added auto platform detection 
+    * added auto platform detection
 
 2003-09-10 23:55 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapi.h
