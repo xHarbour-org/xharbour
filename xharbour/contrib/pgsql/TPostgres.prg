@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.24 2004/06/18 14:01:20 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.26 2004/07/13 14:34:23 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -292,6 +292,16 @@ METHOD TableStruct( cTable ) CLASS TPQserver
                 // Postgres don't store ".", but .dbf does, it can cause data width problem
                 nSize := val(nSize) + iif( ! Empty(nDec), 1, 0 )
 
+                // Numeric/Decimal without scale/precision can genarete big values, so, i limit this to 10,5
+                
+                if nDec > 100
+                    nDec := 5
+                endif
+                
+                if nSize > 100
+                    nSize := 15
+                endif
+
             elseif 'real' $ cType 
                 cType := 'N'
                 nSize := 15
@@ -572,6 +582,15 @@ METHOD Refresh(lQuery) CLASS TPQquery
                     if ! Empty(nDec)
                         nSize++
                     endif                        
+
+                    // Numeric/Decimal without scale/precision can genarete big values, so, i limit this to 10,5
+                    if nDec > 100
+                        nDec := 5
+                    endif
+                
+                    if nSize > 100
+                        nSize := 15
+                    endif        
         
                 elseif 'real' $ cType 
                     cType := 'N'
