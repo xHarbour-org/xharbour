@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2052 2004/01/14 05:26:08 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2053 2004/01/14 12:56:17 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-14 11:00 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
+  *source/rtl/file.c
+    ! fixed an problem with trainling blanks on filename, which was returning
+      wrong results
+      FUNCTION Main()
+         ? File('t.prg')
+         ? File('t.prg ')
+      RETURN NIL
+      Prior this fix return was
+      windows : TRUE,TRUE
+      linux :   TRUE,FALSE
+      now all return TRUE
 
 2004-01-14 18:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
    * xharbour/source/rtl/gtwvt/gtwvt.c
