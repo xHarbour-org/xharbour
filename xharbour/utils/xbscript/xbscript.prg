@@ -1,9 +1,9 @@
 /*
  * xBaseScript Project source code:
- * Pre-Processor / Dot prompt environment / Script Interpreter
+ * Script Interpreter/ Dot Prompt Console / Pre-Processor
  *
- * Copyright 2000-2001 Ron Pinkas <ronpinkas@ronpinkas.com>
- * www - http://www.xBaseScript.com
+ * Copyright 2000-2004 Ron Pinkas <ron@xharbour.com>
+ * www - http://www.xbScript.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA (or visit
  * their web site at http://www.gnu.org/).
+ *
+ * Please note: You are NOT allowed to include any portions of the source
+ * files (xbscript.prg, xbs_harb.ch, rp_run.src, and rp_dot.src) into 
+ * any propriatary (non GPL) application, except if you purchase an alternate
+ * Typical Retail License (TRL).
+ *
+ * For any Licensing questions please contact the autor at <ron@xharbour.com>
+ *
  */
 
 #ifdef PP_QUIET
@@ -9817,7 +9825,7 @@ RETURN s_anForEachEnumerationIndex[ s_nForEachIndex ]
 
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
-   #include "pp_harb.ch"
+   #include "xbs_harb.ch"
 #endif
 
 //--------------------------------------------------------------//

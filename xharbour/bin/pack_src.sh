@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.3 2003/12/30 22:59:13 druzus Exp $
+# $Id: pack_src.sh,v 1.4 2004/01/28 04:14:33 maurifull Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -242,6 +242,16 @@ $hb_collect utils/hbmake/Makefile
 $hb_collect utils/hbmake/*.ch
 $hb_collect utils/hbmake/*.prg
 $hb_collect utils/hbmake/*.c
+
+# UTILS\XBSCRIPT
+$hb_collect utils/xbscript/Makefile
+$hb_collect utils/xbscript/*.ch
+$hb_collect utils/xbscript/*.prg
+$hb_collect utils/xbscript/*.src
+$hb_collect utils/xbscript/*.txt
+
+# UTILS\XPROMPT
+$hb_collect utils/xprompt/*.txt
 
 # UTILS\HBPP
 $hb_collect utils/hbpp/Makefile

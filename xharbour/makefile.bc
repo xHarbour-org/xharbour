@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.94 2004/05/11 16:29:48 ronpinkas Exp $
+# $Id: makefile.bc,v 1.95 2004/05/14 12:33:58 vouchcac Exp $
 #
 
 #
@@ -150,6 +150,7 @@ HBTEST_DIR   = utils\hbtest
 HBDOC_DIR    = utils\hbdoc
 HBPP_DIR     = utils\hbpp
 HBMAKE_DIR   = utils\hbmake
+XBSCRIPT_DIR = utils\xbscript
 
 INCLUDE_DIR  = $(INCLUDE_DIR);source\compiler;source\macro
 
@@ -262,6 +263,7 @@ HBRUN_EXE    = $(BIN_DIR)\hbrun.exe
 HBTEST_EXE   = $(BIN_DIR)\hbtest.exe
 HBDOC_EXE    = $(BIN_DIR)\hbdoc.exe
 HBMAKE_EXE   = $(BIN_DIR)\hbmake.exe
+XBSCRIPT_EXE = $(BIN_DIR)\xbscript.exe
 
 
 #
@@ -787,7 +789,7 @@ GTWIN_LIB_OBJS = \
 GTWVT_LIB_OBJS = \
    $(OBJ_DIR)\gtwvt.obj \
    $(OBJ_DIR)\wvtcore.obj \
-   $(OBJ_DIR)\wvtutils.obj 
+   $(OBJ_DIR)\wvtutils.obj
 
 #
 # GTALLEG.LIB rules
@@ -929,6 +931,13 @@ HBMAKE_EXE_OBJS = \
    $(OBJ_DIR)\radios.obj \
    $(OBJ_DIR)\hbmlang.obj
 
+#
+# XBSCRIPT.EXE rules
+#
+
+XBSCRIPT_EXE_OBJS = \
+   $(OBJ_DIR)\xbscript.obj
+
 SAMPLES_LIB_OBJS =  \
    $(SAM_OBJ_DIR)\environ.obj \
    $(SAM_OBJ_DIR)\date.obj   \
@@ -973,7 +982,8 @@ all: \
    $(HBPP_EXE) \
    $(HBTEST_EXE) \
    $(HBDOC_EXE) \
-   $(HBMAKE_EXE)
+   $(HBMAKE_EXE) \
+   $(XBSCRIPT_EXE)
 
 #
 # Library dependencies and build rules
@@ -3267,4 +3277,31 @@ $(OBJ_DIR)\prb_stak.obj : $(OBJ_DIR)\prb_stak.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\hbmlang.obj : $(HBMAKE_DIR)\hbmlang.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+
+$(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
+
+   $(ECHO) $(CFLAGS) > make.tmp
+   $(ECHO) -e$(XBSCRIPT_EXE) >> make.tmp
+   $(ECHO) $(OBJ_DIR)\xbscript.obj >> make.tmp
+   $(ECHO) $(PP_STLIB) >> make.tmp
+   $(ECHO) $(COMMON_LIB) >> make.tmp
+   $(ECHO) $(VM_STLIB) >> make.tmp
+   $(ECHO) $(RTL_STLIB) >> make.tmp
+   $(ECHO) $(HB_GT_LIB) >> make.tmp
+   $(ECHO) $(LANG_LIB) >> make.tmp
+   $(ECHO) $(RDD_STLIB) >> make.tmp
+   $(ECHO) $(MACRO_STLIB) >> make.tmp
+   $(ECHO) $(DBFDBT_STLIB) >> make.tmp
+   $(ECHO) $(DBFFPT_STLIB) >> make.tmp
+   $(ECHO) $(DBFNTX_STLIB) >> make.tmp
+   $(ECHO) $(DBFCDX_STLIB) >> make.tmp
+   $(CC) @make.tmp
+   $(DEL) make.tmp
+
+$(OBJ_DIR)\xbscript.c : $(XBSCRIPT_DIR)\xbscript.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS)  $** -o$@
+
+$(OBJ_DIR)\xbscript.obj : $(OBJ_DIR)\xbscript.c
    $(CC) $(CLIBFLAGS) -o$@ $**

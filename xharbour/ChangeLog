@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2962 2004/05/20 14:13:43 srobert Exp $
+ * $Id: ChangeLog,v 1.2963 2004/05/20 18:15:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,46 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-20 14:07 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  -  tests/pp.prg
+  -  tests/pp.txt
+  -  tests/pp_harb.ch
+  -  tests/ppclass.prg
+  -  tests/pptest.prg
+  -  tests/prgscrpt.prg
+  -  tests/rp_dot.src
+  -  tests/rp_run.src
+  + utils/xbscript/Makefile
+  + utils/xbscript/prgscrpt.prg
+  + utils/xbscript/rp_dot.src
+  + utils/xbscript/rp_run.src
+  + utils/xbscript/xbs_harb.ch
+  + utils/xbscript/xbsclass.ch
+  + utils/xbscript/xbscript.prg
+  + utils/xbscript/xbscript.txt
+  + utils/xbscript/xbstest.prg
+    -+ Moved pp to utils as xbscript and xprompt
+
+  + utils/xprompt/readme.txt
+    + New empty folder with just a text file directing to utils\xbscript
+
+  + bin/xprompt.bat
+  + bin/xprompt.sh
+    + New startup file to serve as a fake front and redirect to xbscript.exe
+      ( please test .sh as I only guessed usages.)
+
+  * utils/Makefile
+  * makefile.bc
+  * makefile.nt
+  * makefile.vc
+  * bin/!pack_src.bat
+  * bin/pack_src.sh
+    + Added support for utils\xbscript
+
+  * source/rtl/cstruct.prg
+  * source/rtl/str2ptr.c
+    ! Fixed support fot :Pointer() method.
 
 2004-05-20 11:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/pp.prg

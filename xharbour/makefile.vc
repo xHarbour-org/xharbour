@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.99 2004/05/11 16:29:48 ronpinkas Exp $
+# $Id: makefile.vc,v 1.100 2004/05/14 12:33:58 vouchcac Exp $
 #
 
 #
@@ -100,6 +100,7 @@ HBTEST_DIR   =utils\hbtest
 HBDOC_DIR    =utils\hbdoc
 HBPP_DIR     =utils\hbpp
 HBMAKE_DIR   =utils\hbmake
+XBSCRIPT_DIR =utils\hbmake
 ODBC_DIR     =source\odbc
 SAMPLES_DIR  =source\clipsamp
 
@@ -190,6 +191,7 @@ HBRUN_EXE        =$(BIN_DIR)\hbrun$(MT).exe
 HBTEST_EXE       =$(BIN_DIR)\hbtest.exe
 HBDOC_EXE        =$(BIN_DIR)\hbdoc.exe
 HBMAKE_EXE       =$(BIN_DIR)\hbmake.exe
+XBSCRIPT_EXE     =$(BIN_DIR)\xbscript.exe
 
 #
 # GT driver list
@@ -1030,7 +1032,8 @@ TARGETS= \
    $(HBPP_EXE) \
    $(HBTEST_EXE) \
    $(HBDOC_EXE) \
-   $(HBMAKE_EXE)
+   $(HBMAKE_EXE) \
+   $(XBSCRIPT_EXE)
 
 !if ( "$(MK_FLAGS:Y=)"=="A" )
 
@@ -1192,6 +1195,16 @@ $(HBMAKE_EXE) : \
                                       $(OBJ_DIR)\prb_stak.c \
                                       $(HBMAKE_DIR)\hbmlang.c \
                       -o $(HBMAKE_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB)
+
+#
+# XBSCRIPT.EXE rules
+#
+
+$(XBSCRIPT_EXE) : \
+   $(XBSCRIPT_DIR)\XBSCRIPT.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
+   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\XBSCRIPT.c \
+                      -o $(XBSCRIPT_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB)
 
 #
 # HARBOUR.EXE rules

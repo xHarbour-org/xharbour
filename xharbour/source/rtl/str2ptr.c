@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: str2ptr.c,v 1.1 2004/05/09 23:40:05 druzus Exp $
  */
 
 /*
@@ -60,16 +60,9 @@ HB_FUNC( HB_POINTER2STRING )
    PHB_ITEM pPointer = hb_param( 1, HB_IT_POINTER );
    PHB_ITEM pLen     = hb_param( 2, HB_IT_NUMERIC );
 
-   if( pPointer )
+   if( pPointer && pLen )
    {
-      if( pLen )
-      {
-         hb_retclenAdoptRawStatic( (char *) hb_itemGetPtr( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
-      }
-      else
-      {
-         hb_retcAdoptStatic( (char *) hb_itemGetPtr( pPointer ) );
-      }
+      hb_retclenAdoptRawStatic( (char *) hb_itemGetPtr( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
    }
    else
    {
