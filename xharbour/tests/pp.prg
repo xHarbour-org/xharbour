@@ -25,7 +25,7 @@
    #COMMAND @ Row(), 0 SAY <nLine> =>
 #endif
 
-#DEFINE MAX_CICLES 64
+#DEFINE MAX_CICLES 256
 #DEFINE PP_BUFFER_SIZE 8192 //16384
 
 #ifdef __HARBOUR__
@@ -1891,7 +1891,11 @@ PROCEDURE PP_Privates( aVars )
          cInit := "NIL"
       ENDIF
 
-      IF aScan( s_asPrivates, aVars[nVar] ) == 0
+    #ifdef __XHARBOUR__
+      IF aScan( s_asPrivates, aVars[nVar], , , .T. ) == 0
+    #else
+      IF aScan( s_asPrivates, {|sPrivate| sPrivate == aVars[nVar] } ) == 0
+    #endif
          __QQPUB( aVars[nVar] )
          &( aVars[nVar] ) := &( cInit )
          aAdd( s_asPrivates, aVars[nVar] )
@@ -1940,7 +1944,11 @@ PROCEDURE PP_Publics( aVars )
          cInit := ".F."
       ENDIF
 
+    #ifdef __XHARBOUR__
       IF aScan( s_asPublics, aVars[nVar] ) == 0
+    #else
+      IF aScan( s_asPublics, {|sPublic| sPublic == aVars[nVar] } ) == 0
+    #endif
          __QQPUB( aVars[nVar] )
          &( aVars[nVar] ) := &( cInit )
          aAdd( s_asPublics, aVars[nVar] )
@@ -1970,7 +1978,11 @@ PROCEDURE PP_Statics( aVars )
          &( aVars[nVar] ) := &( cInit )
          aAdd( s_asStatics, aVars[nVar] )
       ELSE
-         IF aScan( aVars, aVars[nVar], 1, nVar - 1 ) > 0
+       #ifdef __XHARBOUR__
+         IF aScan( aVars, aVars[nVar], 1, nVar - 1, .T. ) > 0
+       #else
+         IF aScan( aVars, {|sVar| sVar == aVars[nVar] }, 1, nVar - 1 ) > 0
+       #endif
             Alert( [Type: ] + Type( aVars[nVar] ) + [ Static redeclaration: '] + aVars[nVar] )
          ENDIF
       ENDIF
@@ -3069,6 +3081,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
       IF nCycles < MAX_CICLES
          nCycles++
       ELSE
+         TraceLog( "Circularity!", sLine )
          Alert( [ERROR! Circularity detected ]+"[" + sSource + "(" + LTrim( Str( nLine ) ) + ")]" )
          ? sLine
          BREAK
@@ -3837,7 +3850,11 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      aMP := aRules[nRule][2][nMatch]
 
                      IF aMP[3] == NIL .AND. aMP[4] == ':'
+                      #ifdef __XHARBOUR__
+                        IF aScan( aMP[5], sMultiStopper, , , .T. ) > 0
+                      #else
                         IF aScan( aMP[5], {|sWord| sWord == sMultiStopper } ) > 0
+                      #endif
                            EXIT
                         ENDIF
                      ELSE
@@ -6019,8 +6036,11 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
                IF nNext > 1
                   sMarker := RTrim( Left( sRule, nNext - 1 ) )
-
-                  IF ( nMarkerID := aScan( aMarkers, sMarker ) ) > 0
+                #ifdef __XHARBOUR__
+                  IF ( nMarkerID := aScan( aMarkers, sMarker, , , .T. ) ) > 0
+                #else
+                  IF ( nMarkerID := aScan( aMarkers, {|s| s == sMarker } ) ) > 0
+                #endif
                      nId := nMarkerID
                   ELSE
                      aAdd( aMarkers, sMarker )
@@ -6062,7 +6082,11 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                IF nNext > 1
                   sMarker := RTrim( Left( sRule, nNext - 1 ) )
 
-                  IF ( nMarkerID := aScan( aMarkers, sMarker ) ) > 0
+                #ifdef __XHARBOUR__
+                  IF ( nMarkerID := aScan( aMarkers, sMarker, , , .T. ) ) > 0
+                #else
+                  IF ( nMarkerID := aScan( aMarkers, {|s| s == sMarker } ) ) > 0
+                #endif
                      nId := nMarkerID
                   ELSE
                      aAdd( aMarkers, sMarker )
@@ -6104,7 +6128,11 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                IF nNext > 1
                   sMarker := RTrim( Left( sRule, nNext - 1 ) )
 
-                  IF ( nMarkerID := aScan( aMarkers, sMarker ) ) > 0
+                #ifdef __XHARBOUR__
+                  IF ( nMarkerID := aScan( aMarkers, sMarker, , , .T. ) ) > 0
+                #else
+                  IF ( nMarkerID := aScan( aMarkers, {|s| s == sMarker } ) ) > 0
+                #endif
                      nId := nMarkerID
                   ELSE
                      aAdd( aMarkers, sMarker )
@@ -6172,7 +6200,11 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
             sMarker := RTrim( Left( sRule, nNext - 1 ) )
             ExtractLeadingWS( @sMarker )
 
-            IF ( nMarkerID := aScan( aMarkers, sMarker ) ) > 0
+          #ifdef __XHARBOUR__
+            IF ( nMarkerID := aScan( aMarkers, sMarker, , , .T. ) ) > 0
+          #else
+            IF ( nMarkerID := aScan( aMarkers, {|s| s == sMarker } ) ) > 0
+          #endif
                nId := nMarkerID
             ELSE
                aAdd( aMarkers, sMarker )
@@ -6193,7 +6225,11 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
             sMarker := RTrim( Left( sRule, nNext - 1 ) )
             ExtractLeadingWS( @sMarker )
 
-            IF ( nMarkerID := aScan( aMarkers, sMarker ) ) > 0
+          #ifdef __XHARBOUR__
+            IF ( nMarkerID := aScan( aMarkers, sMarker, , , .T. ) ) > 0
+          #else
+            IF ( nMarkerID := aScan( aMarkers, {|s| s == sMarker } ) ) > 0
+          #endif
                nId := nMarkerID
             ELSE
                aAdd( aMarkers, sMarker )
@@ -6234,7 +6270,11 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                sMarker := RTrim( Left( sRule, nCloseAt - 1 ) )
                ExtractLeadingWS( @sMarker )
 
-               IF ( nMarkerID := aScan( aMarkers, sMarker ) ) > 0
+             #ifdef __XHARBOUR__
+               IF ( nMarkerID := aScan( aMarkers, sMarker, , , .T. ) ) > 0
+             #else
+               IF ( nMarkerID := aScan( aMarkers, {|s| s == sMarker } ) ) > 0
+             #endif
                   nId := nMarkerID
                ELSE
                   aAdd( aMarkers, sMarker )
@@ -6390,7 +6430,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       nOffset := 0
       nOptionalAt := At( '[', sResult )
       WHILE nOPtionalAt > 1 .AND. SubStr( sResult, nOptionalAt - 1, 1 ) == '\'
-         nOffset += nOptionalAt
+         nOffset := nOptionalAt
          nOptionalAt := At( '[', SubStr( sResult, nOffset + 1 ) )
       ENDDO
       IF nOptionalAt > 0
@@ -6402,11 +6442,11 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
          nMarkerAt := At( '<', sResult )
          WHILE nMarkerAt > 0
             IF nMarkerAt > 1 .AND. SubStr( sResult, nMarkerAt - 1, 1 ) == '\'
-               nOffset   += nMarkerAt
+               nOffset   := nMarkerAt
                nMarkerAt := At( '<', sResult, nOffset + 1 )
                //TraceLog( sResult, nOffset, nMarkerAt )
             ELSEIF nMarkerAt > 0 .AND. SubStr( sResult, nMarkerAt + 1, 1 ) $ ">=" // ignore <= and <>
-               nOffset   += nMarkerAt + 1
+               nOffset   := nMarkerAt + 1
                nMarkerAt := At( '<', sResult, nOffset + 1 )
             ELSE
                EXIT
@@ -6416,11 +6456,11 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
          nMarkerAt := At( '<', sResult )
          WHILE nMarkerAt > 0
             IF nMarkerAt > 1 .AND. nMarkerAt < nOptionalAt .AND. SubStr( sResult, nMarkerAt - 1, 1 ) == '\'
-               nOffset   += nMarkerAt
+               nOffset   := nMarkerAt
                nMarkerAt := At( '<', sResult, nOffset + 1 )
                //TraceLog( sResult, nOffset, nMarkerAt )
             ELSEIF nMarkerAt > 0 .AND. nMarkerAt < nOptionalAt .AND. SubStr( sResult, nMarkerAt + 1, 1 ) $ ">=" // ignore <= and <>
-               nOffset   += nMarkerAt + 1
+               nOffset   := nMarkerAt + 1
                nMarkerAt := At( '<', sResult, nOffset + 1 )
             ELSE
                EXIT
@@ -6563,7 +6603,13 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                IF Right( sTemp, 1 ) == '-'
                   nType := 0
                   sTemp := RTrim( Left( sTemp, Len( sTemp ) - 1 ) )
-                  nId := aScan( aMarkers, sTemp )
+
+                #ifdef __XHARBOUR__
+                  nId := aScan( aMarkers, sTemp, , , .T. )
+                #else
+                  nId := aScan( aMarkers, {|s| s == sTemp } )
+                #endif
+
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
@@ -6585,7 +6631,13 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
             ELSE
                /*nType := 2*/
                sTemp := RTrim( Left( sResult, nNext - 1 ) )
-               nId := aScan( aMarkers, sTemp )
+
+             #ifdef __XHARBOUR__
+               nId := aScan( aMarkers, sTemp, , , .T. )
+             #else
+               nId := aScan( aMarkers, {|s| s == sTemp } )
+             #endif
+
                sResult := SubStr( sResult, nNext + 1 )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
@@ -6611,7 +6663,13 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                IF Right( sTemp, 1 ) == '"'
                   nType := 3
                   sTemp := RTrim( Left( sTemp, Len( sTemp ) - 1 ) )
-                  nId := aScan( aMarkers, sTemp )
+
+                #ifdef __XHARBOUR__
+                  nId := aScan( aMarkers, sTemp, , , .T. )
+                #else
+                  nId := aScan( aMarkers, {|s| s == sTemp } )
+                #endif
+
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
@@ -6638,7 +6696,13 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                IF Right( sTemp, 1 ) == ')'
                   nType := 4
                   sTemp := RTrim( Left( sTemp, Len( sTemp ) - 1 ) )
-                  nId := aScan( aMarkers, sTemp )
+
+                #ifdef __XHARBOUR__
+                  nId := aScan( aMarkers, sTemp, , , .T. )
+                #else
+                  nId := aScan( aMarkers, {|s| s == sTemp } )
+                #endif
+
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
@@ -6665,7 +6729,13 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                IF Right( sTemp, 1 ) == '}'
                   nType := 5
                   sTemp := RTrim( Left( sTemp, Len( sTemp ) - 1 ) )
-                  nId := aScan( aMarkers, sTemp )
+
+                #ifdef __XHARBOUR__
+                  nId := aScan( aMarkers, sTemp, , , .T. )
+                #else
+                  nId := aScan( aMarkers, {|s| s == sTemp } )
+                #endif
+
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
@@ -6686,13 +6756,19 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( ">", sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP: '<.' : '] + sTemp + "'" )
+               Alert( [ERROR! Unbalanced RP: '<.' : '] + sResult + "'" )
             ELSE
                sTemp := RTrim( Left( sResult, nNext - 1 ) )
                IF Right( sTemp, 1 ) == '.'
                   nType := 6
                   sTemp := RTrim( Left( sTemp, Len( sTemp ) - 1 ) )
-                  nId := aScan( aMarkers, sTemp )
+
+                #ifdef __XHARBOUR__
+                  nId := aScan( aMarkers, sTemp, , , .T. )
+                #else
+                  nId := aScan( aMarkers, {|s| s == sTemp } )
+                #endif
+
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
@@ -6709,12 +6785,18 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( '>', sResult )
             IF nNext == 0
-               Alert( [ERROR! Unbalanced RP: <] )
+               Alert( [ERROR! Unbalanced RP: '<' : '] + sResult + "'" )
             ELSE
                /* <x> Regular */
                nType := 1
                sTemp := Left( sResult, nNext - 1 )
-               nId := aScan( aMarkers, sTemp )
+
+             #ifdef __XHARBOUR__
+               nId := aScan( aMarkers, sTemp, , , .T. )
+             #else
+               nId := aScan( aMarkers, {|s| s == sTemp } )
+             #endif
+
                sResult := SubStr( sResult, nNext + 1 )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
@@ -7078,8 +7160,11 @@ STATIC FUNCTION CompileDefine( sRule )
                DropTrailingWS( @sToken )
 
 //? "Token: '" + sToken + "'"
-
+             #ifdef __XHARBOUR__
+               IF ( nId := aScan( aMarkers, sToken, , , .T. ) ) > 0
+             #else
                IF ( nId := aScan( aMarkers, {|sMarker| sMarker == sToken } ) ) > 0
+             #endif
                   aAdd( aRPs, { 0, nId } )
                   aAdd( aResult[2], 1 )
                ELSE

@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.24 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.25 2002/12/31 00:58:55 ronpinkas Exp $
  */
 
 /*
@@ -343,14 +343,14 @@ HB_FUNC( ASCAN )
    {
       ULONG ulStart = hb_parnl( 3 );
       ULONG ulCount = hb_parnl( 4 );
+      BOOL bExact   = hb_parl( 5 );
 
-      hb_retnl( hb_arrayScan( pArray,
-                              pValue,
-                              ISNUM( 3 ) ? &ulStart : NULL,
-                              ISNUM( 4 ) ? &ulCount : NULL ) );
+      hb_retnl( hb_arrayScan( pArray, pValue, ISNUM( 3 ) ? &ulStart : NULL, ISNUM( 4 ) ? &ulCount : NULL, bExact ) );
    }
    else
+   {
       hb_retnl( 0 );
+   }
 }
 
 /* TODO: In Xbase++ fifth parameter determines whether array elements

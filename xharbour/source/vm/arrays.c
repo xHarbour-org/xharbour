@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.44 2002/12/30 21:24:09 ronpinkas Exp $
+ * $Id: arrays.c,v 1.45 2003/01/19 21:44:02 andijahja Exp $
  */
 
 /*
@@ -684,9 +684,9 @@ void HB_EXPORT hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, UL
    }
 }
 
-ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount )
+ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount, BOOL bExact )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayScan(%p, %p, %p, %p)", pArray, pValue, pulStart, pulCount));
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayScan(%p, %p, %p, %p)", pArray, pValue, pulStart, pulCount, bExact));
 
    if( HB_IS_ARRAY( pArray ) )
    {
@@ -703,12 +703,18 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       if( ulStart <= ulLen )
       {
          if( pulCount && ( *pulCount <= ulLen - ulStart ) )
+         {
             ulCount = *pulCount;
+         }
          else
+         {
             ulCount = ulLen - ulStart + 1;
+         }
 
          if( ulStart + ulCount > ulLen )             /* check range */
+         {
             ulCount = ulLen - ulStart + 1;
+         }
 
          /* Make separate search loops for different types to find, so that
             the loop can be faster. */
@@ -737,8 +743,10 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 
                /* NOTE: The order of the pItem and pValue parameters passed to
                         hb_itemStrCmp() is significant, please don't change it. [vszakats] */
-               if( HB_IS_STRING( pItem ) && hb_itemStrCmp( pItem, pValue, FALSE ) == 0 )
+               if( HB_IS_STRING( pItem ) && hb_itemStrCmp( pItem, pValue, bExact ) == 0 )
+               {
                   return ulStart + 1;
+               }
             }
          }
          else if( HB_IS_DATE( pValue ) ) // Must precede HB_IS_NUMERIC()
@@ -750,7 +758,9 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
                PHB_ITEM pItem = pBaseArray->pItems + ulStart;
 
                if( HB_IS_DATE( pItem ) && hb_itemGetDL( pItem ) == lValue )
+               {
                   return ulStart + 1;
+               }
             }
          }
          else if( HB_IS_NUMERIC( pValue ) )
@@ -764,7 +774,9 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
                 HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %d", pItem, dValue ) );
 
                if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue )
+               {
                   return ulStart + 1;
+               }
             }
          }
          else if( HB_IS_LOGICAL( pValue ) )
@@ -776,7 +788,9 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
                PHB_ITEM pItem = pBaseArray->pItems + ulStart;
 
                if( HB_IS_LOGICAL( pItem ) && hb_itemGetL( pItem ) == bValue )
+               {
                   return ulStart + 1;
+               }
             }
          }
          else if( HB_IS_NIL( pValue ) )
@@ -784,7 +798,9 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
             for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
             {
                if( HB_IS_NIL( pBaseArray->pItems + ulStart ) )
+               {
                   return ulStart + 1;
+               }
             }
          }
       }
