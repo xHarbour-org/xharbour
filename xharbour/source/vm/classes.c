@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.90 2003/12/07 00:10:07 jonnymind Exp $
+ * $Id: classes.c,v 1.91 2004/01/27 03:06:59 ronpinkas Exp $
  */
 
 /*
@@ -3336,10 +3336,11 @@ HB_FUNC( __CLS_PARAM )
    USHORT n;
 
    Array.type = HB_IT_NIL;
-   hb_arrayNew( &Array, uiParam );
 
    if( uiParam >= 1 )
    {
+      hb_arrayNew( &Array, uiParam );
+
       for( n = 1; n <= uiParam; n++ )
       {
          hb_arraySet( &Array, n, hb_param( n, HB_IT_ANY ) );
@@ -3352,6 +3353,7 @@ HB_FUNC( __CLS_PARAM )
       Parent.type = HB_IT_NIL;
       hb_itemPutCStatic( &Parent, (char *) "HBObject" );
 
+      hb_arrayNew( &Array, 1 );
       hb_arraySetForward( &Array, 1, &Parent );
    }
 
