@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.79 2004/12/28 22:00:00 ptsarenko Exp $
+ * $Id: gtwin.c,v 1.79 2004/12/28 20:32:33 ptsarenko Exp $
  */
 
 /*
@@ -394,12 +394,10 @@ static void HB_GT_FUNC(gt_xSetCursorStyle( void ))
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_xSetCursorStyle(%hu)", s_usCursorStyle));
 
-    GetConsoleCursorInfo( s_HOutput, &cci );
-
     switch( s_usCursorStyle )
     {
     case SC_NONE:
-//        cci.dwSize = 25;
+        cci.dwSize = 13;
         cci.bVisible = FALSE;
         break;
 
@@ -423,15 +421,7 @@ static void HB_GT_FUNC(gt_xSetCursorStyle( void ))
     case SC_NORMAL:
     default:
         cci.bVisible = TRUE;
-#ifndef HB_GTWIN_NORMAL_CURSOR
-        cci.dwSize = 25;  /* this was 12, but when used in full screen dos window
-                             cursor state is erratic  - doesn't turn off, etc.
-              09-10-2002 druzus: I hope now it's OK.
-              09-14-2003 ptucker:Not really....
-                                        Make your case before changing this */
-#else
-        cci.dwSize = 12;
-#endif
+        cci.dwSize = 13;
         break;
     }
     s_usOldCurStyle = s_usCursorStyle;
