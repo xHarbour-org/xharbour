@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.16 2004/04/28 20:07:50 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.17 2004/04/30 18:23:06 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -369,7 +369,7 @@ CLASS TPQQuery
     DATA     TableName
     DATA     Schema
 
-    METHOD   New( pDB, cQuery, lallCols, cSchema )
+    METHOD   New( pDB, cQuery, lallCols, cSchema, res )
     METHOD   Destroy()          
     METHOD   Close()            INLINE ::Destroy()
 
@@ -408,24 +408,30 @@ CLASS TPQQuery
 ENDCLASS
 
 
-METHOD New( pDB, cQuery, lallCols, cSchema ) CLASS TPQquery
+METHOD New( pDB, cQuery, lallCols, cSchema, res ) CLASS TPQquery
     ::pDB      := pDB
     ::cQuery   := RemoveSpaces(cQuery)
-    ::lClosed  := .F.    
+    ::lClosed  := .T.    
     ::lallCols := lallCols
     ::Schema   := cSchema
     
-    ::Refresh()        
+    if ! ISNIL(res)
+        ::pQuery := res
+    endif
+            
+    ::Refresh(ISNIL(res))        
 RETURN self
 
 
 METHOD Destroy() CLASS TPQquery
-    PQclear( ::pQuery )    
-    ::lClosed := .t.
-RETURN .t.
+    if ! ::lClosed
+        PQclear( ::pQuery )    
+        ::lClosed := .T.
+    endif        
+RETURN .T.
 
 
-METHOD Refresh() CLASS TPQquery
+METHOD Refresh(lQuery) CLASS TPQquery
     Local res
     Local result
     Local cTableCodes := ''
@@ -438,13 +444,13 @@ METHOD Refresh() CLASS TPQquery
     Local cQuery
     Local cType, nType, nDec, nSize
 
-    if ! ::lClosed
-        ::Destroy()    
-        ::lClosed := .F.
-    end
+    Default lQuery To .T.
+    
+    ::Destroy()
 
     ::lBof := .F.
     ::lEof := .F.
+    ::lClosed := .F.
     
     ::nRecno := 0
     ::nFields := 0
@@ -452,7 +458,11 @@ METHOD Refresh() CLASS TPQquery
     
     ::aStruct := {}
 
-    res := PQexec( ::pDB, ::cQuery )
+    if lQuery
+        res := PQexec( ::pDB, ::cQuery )
+    else
+        res := ::pQuery
+    endif                
 
     if PQresultstatus(res) == PGRES_TUPLES_OK     
         // Get some information about metadata
@@ -543,7 +553,7 @@ METHOD Refresh() CLASS TPQquery
         result := .F.            
     endif            
     
-   ::pQuery := res
+    ::pQuery := res
 
 RETURN result    
     
