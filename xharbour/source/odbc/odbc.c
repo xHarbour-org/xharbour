@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.7 2003/07/15 09:15:33 andijahja Exp $
+ * $Id: odbc.c,v 1.8 2003/07/22 16:16:24 mlombardo Exp $
  */
 
 /*
@@ -195,7 +195,7 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
    int iReallocs = 0;
 
    lLen       = ( SDWORD )( hb_parnl( 4 ) ? hb_parnl( 4 ) : 64 );
-   bBuffer    = hb_xgrab( lLen );
+   bBuffer    = hb_xgrab( lLen+1 );
    lInitBuff  = (int) lLen;
    wType      = ( hb_parni( 3 ) ? hb_parni( 3 ) : SQL_BINARY );
 
@@ -211,7 +211,7 @@ HB_FUNC( SQLGETDATA ) /* HB_SQLGETDATA( hStmt, nField, nType, nLen, @cBuffer ) -
       else if ( wResult == SQL_SUCCESS_WITH_INFO && iReallocs == 0 )
       {
          /* Perheps a data truncation */
-         if( lLen > lInitBuff )
+         if( lLen >= lInitBuff )
          {
             /* data right truncated! */
             bOut    = ( char * ) hb_xgrab( lLen + 1 );
