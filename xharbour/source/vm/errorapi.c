@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.12 2002/12/29 08:32:41 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.1 2003/01/05 06:50:36 ronpinkas Exp $
  */
 
 /*
@@ -420,7 +420,7 @@ void HB_EXPORT hb_errRelease( PHB_ITEM pError )
    hb_itemRelease( pError );
 }
 
-char * HB_EXPORT hb_errGetDescription( PHB_ITEM pError )
+char HB_EXPORT * hb_errGetDescription( PHB_ITEM pError )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetDescription(%p)", pError));
 
@@ -443,7 +443,7 @@ PHB_ITEM HB_EXPORT hb_errPutDescription( PHB_ITEM pError, char * szDescription )
    return pError;
 }
 
-char * HB_EXPORT hb_errGetFileName( PHB_ITEM pError )
+char HB_EXPORT * hb_errGetFileName( PHB_ITEM pError )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetFileName(%p)", pError));
 
@@ -489,7 +489,7 @@ PHB_ITEM HB_EXPORT hb_errPutGenCode( PHB_ITEM pError, USHORT uiGenCode )
    return pError;
 }
 
-char * HB_EXPORT hb_errGetOperation( PHB_ITEM pError )
+char HB_EXPORT * hb_errGetOperation( PHB_ITEM pError )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetOperation(%p)", pError));
 
@@ -581,7 +581,7 @@ PHB_ITEM HB_EXPORT hb_errPutSubCode( PHB_ITEM pError, USHORT uiSubCode )
    return pError;
 }
 
-char * HB_EXPORT hb_errGetSubSystem( PHB_ITEM pError )
+char HB_EXPORT * hb_errGetSubSystem( PHB_ITEM pError )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetSubSytem(%p)", pError));
 

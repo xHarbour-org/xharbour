@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.633 2003/01/17 12:28:33 likewolf Exp $
+ * $Id: ChangeLog,v 1.634 2003/01/17 20:00:04 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-01-20 04:40 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * include/hbfast.h
+  * include/hbapierr.h
+  * include/hbdate.h
+  * include/hbapilng.h
+  * include/hbapirdd.h
+  * source/rdd/dbcmd.c
+  * source/vm/arrays.c
+  * source/vm/errorapi.c
+  * source/rtl/filesys.c
+  * source/common/hbstr.c
+    ! matching function declaration in header files with those
+      of the function bodies'. Now that MSVC DLL works again.
+  * hrbdll.bc
+  * hrbdll.vc
+    ! Modification to include flags: -DHB_NO_DEFAULT_API_MACROS -DHB_NO_DEFAULT_STACK_MACROS
 
 2003-01-17 16:58 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
   * include/hbapirdd.h

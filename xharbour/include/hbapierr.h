@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.1.1.1 2001/12/21 10:47:15 ronpinkas Exp $
+ * $Id: hbapierr.h,v 1.2 2002/10/27 14:41:36 lculik Exp $
  */
 
 /*
@@ -97,15 +97,15 @@ extern "C" {
 
 /* Standard API */
 
-extern char *   HB_EXPORT hb_errGetDescription    ( PHB_ITEM pError );
-extern char *   HB_EXPORT hb_errGetFileName       ( PHB_ITEM pError );
+extern char     HB_EXPORT * hb_errGetDescription    ( PHB_ITEM pError );
+extern char     HB_EXPORT * hb_errGetFileName       ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errGetFlags          ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errGetGenCode        ( PHB_ITEM pError );
-extern char *   HB_EXPORT hb_errGetOperation      ( PHB_ITEM pError );
+extern char     HB_EXPORT * hb_errGetOperation      ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errGetOsCode         ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errGetSeverity       ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errGetSubCode        ( PHB_ITEM pError );
-extern char *   HB_EXPORT hb_errGetSubSystem      ( PHB_ITEM pError );
+extern char     HB_EXPORT * hb_errGetSubSystem      ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errGetTries          ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errLaunch            ( PHB_ITEM pError );
 extern PHB_ITEM HB_EXPORT hb_errNew               ( void );

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapilng.h,v 1.2 2002/01/12 10:04:27 ronpinkas Exp $
+ * $Id: hbapilng.h,v 1.3 2002/10/27 14:41:37 lculik Exp $
  */
 
 /*
@@ -96,14 +96,14 @@ extern PHB_LANG HB_EXPORT hb_langFind             ( char * pszID );
 /* Default language selection and data query */
 
 extern PHB_LANG HB_EXPORT hb_langSelect           ( PHB_LANG lang );
-extern char *   HB_EXPORT hb_langSelectID         ( char * pszID );
-extern char *   HB_EXPORT hb_langDGetItem         ( int iIndex );
-extern char *   HB_EXPORT hb_langID               ( void );
-extern char *   HB_EXPORT hb_langName             ( void );
+extern char   HB_EXPORT * hb_langSelectID         ( char * pszID );
+extern char   HB_EXPORT * hb_langDGetItem         ( int iIndex );
+extern char   HB_EXPORT * hb_langID               ( void );
+extern char   HB_EXPORT * hb_langName             ( void );
 
 /* Compatibility interface */
 
-extern char *   HB_EXPORT hb_langDGetErrorDesc    ( ULONG ulIndex );
+extern char    HB_EXPORT * hb_langDGetErrorDesc    ( ULONG ulIndex );
 
 #if defined(HB_EXTERN_C)
 }

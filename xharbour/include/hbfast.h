@@ -1,5 +1,5 @@
 /*
- * $Id: hbfast.h,v 1.9 2002/04/28 03:08:04 ronpinkas Exp $
+ * $Id: hbfast.h,v 1.10 2002/05/02 00:05:03 ronpinkas Exp $
  */
 
 /*
@@ -63,17 +63,17 @@
        struct _HB_SCANNED_ARRAYS * pNext;
     } HB_SCANNED_ARRAYS, * PHB_SCANNED_ARRAYS;
 
-   extern PHB_ITEM hb_itemPutCStatic( PHB_ITEM pItem, char * szText );
-   extern PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLen );
-   extern void     hb_itemPushForward( PHB_ITEM pItem );
-   extern void     hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
-   extern void     hb_itemReleaseString( PHB_ITEM pItem );
-   extern void     hb_itemFastClear( PHB_ITEM pItem );
-   extern void     hb_itemPushStaticString( char * szText, ULONG length );
+   extern PHB_ITEM HB_EXPORT hb_itemPutCStatic( PHB_ITEM pItem, char * szText );
+   extern PHB_ITEM HB_EXPORT hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLen );
+   extern void     HB_EXPORT hb_itemPushForward( PHB_ITEM pItem );
+   extern void     HB_EXPORT hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
+   extern void     HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem );
+   extern void     HB_EXPORT hb_itemFastClear( PHB_ITEM pItem );
+   extern void     HB_EXPORT hb_itemPushStaticString( char * szText, ULONG length );
 
-   extern USHORT   hb_itemArrayCyclicCount( PHB_ITEM pArray );
-   extern USHORT   hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pArray, PHB_SCANNED_ARRAYS pScannedList, PHB_BASEARRAY pTopBaseArray );
-   extern BYTE     hb_itemParamId( PHB_ITEM pItem );
+   extern USHORT HB_EXPORT hb_itemArrayCyclicCount( PHB_ITEM pArray );
+   extern USHORT HB_EXPORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pArray, PHB_SCANNED_ARRAYS pScannedList, PHB_BASEARRAY pTopBaseArray );
+   extern BYTE   HB_EXPORT hb_itemParamId( PHB_ITEM pItem );
 
    #if defined(HB_EXTERN_C)
       }

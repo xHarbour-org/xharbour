@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.4 2002/05/25 18:42:19 lculik Exp $
+# $Id: hrbdll.vc,v 1.5 2002/06/17 22:34:23 andijahja Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -69,8 +69,8 @@ HARBOUR_DLL  = lib\vc\harbour.dll
 # Make sure to define __EXPORT__ or we cannot access xHarbour functions
 # from DLL
 
-HARBOURFLAGS  = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /i$(INCLUDE_DIR) /n /q0 /w /es2 /n1
-CLIBFLAGS     = /D__EXPORT__ /MT /G6 /Ox /GD /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32
+HARBOURFLAGS  = /D__EXPORT__ /i$(INCLUDE_DIR) /n /q0 /w /es2 /n1
+CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /DHB_NO_DEFAULT_API_MACROS /DHB_NO_DEFAULT_STACK_MACROS /MT /G6 /Ox /GD /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³  HARBOUR_DLL rules  ³Û
@@ -1450,10 +1450,10 @@ $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
 $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
-$(OBJ_DIR)\tprint.obj : $(RTL_DIR)\tprint.cpp
-   $(CC) $(CLIBFLAGS) /Fo$@ $** 
+$(OBJ_DIR)\tprint.obj : $(RTL_DIR)\tprint.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
 
-$(OBJ_DIR)\tprinter.obj : $(RTL_DIR)\tprinter.cpp
+$(OBJ_DIR)\tprinter.obj : $(RTL_DIR)\tprinter.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\cstr.c : $(RTL_DIR)\cstr.prg

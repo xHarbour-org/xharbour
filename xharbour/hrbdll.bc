@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.7 2002/10/25 03:06:04 ronpinkas Exp $
+# $Id: hrbdll.bc,v 1.8 2002/10/26 14:31:23 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -51,7 +51,8 @@ INCLUDE_DIR  = include
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 
-C_USR          = -tW -DHB_FM_STATISTICS_OFF -D__WIN32__ -D__EXPORT__
+
+C_USR          = -tW -DHB_FM_STATISTICS_OFF -DHB_NO_DEFAULT_API_MACROS -DHB_NO_DEFAULT_STACK_MACROS -D__WIN32__ -D__EXPORT__
 CLIBFLAGS      = $(C_USR) -a8 -OS -O2 -6 -c -I$(INCLUDE_DIR) -d -w3 -DSIMPLEX
 HARBOURFLAGS   = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /i$(INCLUDE_DIR) /q0 /w /es2 /n1 /gc0
 
@@ -329,11 +330,11 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msgsriso.obj \
   $(OBJ_DIR)\msgzhgb.obj \
   $(OBJ_DIR)\msgzhb5.obj \
-  $(OBJ_DIR)\ppcomp.obj \
-  $(OBJ_DIR)\ppcore.obj \
-  $(OBJ_DIR)\pplib.obj \
-  $(OBJ_DIR)\pptable.obj \
-  $(OBJ_DIR)\pragma.obj \
+# $(OBJ_DIR)\ppcomp.obj \
+# $(OBJ_DIR)\ppcore.obj \
+# $(OBJ_DIR)\pplib.obj \
+# $(OBJ_DIR)\pptable.obj \
+# $(OBJ_DIR)\pragma.obj \
   $(OBJ_DIR)\gtwin.obj \
   $(OBJ_DIR)\mousewin.obj \
   $(OBJ_DIR)\dbgmenu.obj \
@@ -1756,10 +1757,10 @@ $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
 $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\tprint.obj : $(RTL_DIR)\tprint.cpp
-   $(CC) $(CLIBFLAGS) -o$@ $** 
+$(OBJ_DIR)\tprint.obj : $(RTL_DIR)\tprint.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\tprinter.obj : $(RTL_DIR)\tprinter.cpp
+$(OBJ_DIR)\tprinter.obj : $(RTL_DIR)\tprinter.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cstruct.c : $(RTL_DIR)\cstruct.prg

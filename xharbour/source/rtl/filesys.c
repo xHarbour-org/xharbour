@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.23 2003/01/12 11:55:22 lculik Exp $
+ * $Id: filesys.c,v 1.24 2003/01/16 16:30:29 walito Exp $
  */
 
 /*
@@ -101,6 +101,17 @@
 
 #if defined(OS_UNIX_COMPATIBLE)
    #include <unistd.h>
+#endif
+
+#ifdef _MSC_VER
+__inline
+void *
+LongToHandle(
+    const long h
+    )
+{
+    return((void *) (INT_PTR) h );
+}
 #endif
 
 #if defined(__GNUC__) && !defined(__MINGW32__)
@@ -434,7 +445,7 @@ static void convert_create_flags_ex( USHORT uiAttr, USHORT uiFlags, int * result
 
 #endif
 
-BYTE * HB_EXPORT hb_filecase(char *str) {
+BYTE HB_EXPORT * hb_filecase(char *str) {
    // Convert file and dir case. The allowed SET options are:
    // LOWER - Convert all caracters of file to lower
    // UPPER - Convert all caracters of file to upper
@@ -1646,7 +1657,7 @@ BOOL HB_EXPORT    hb_fsRmDir( BYTE * pDirname )
 /* NOTE: This is not thread safe function, it's there for compatibility. */
 /* NOTE: 0 = current drive, 1 = A, 2 = B, 3 = C, etc. */
 
-BYTE * HB_EXPORT   hb_fsCurDir( USHORT uiDrive )
+BYTE HB_EXPORT * hb_fsCurDir( USHORT uiDrive )
 {
    static BYTE s_byDirBuffer[ _POSIX_PATH_MAX + 1 ];
 

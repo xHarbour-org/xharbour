@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.43 2002/12/30 08:17:15 ronpinkas Exp $
+ * $Id: arrays.c,v 1.44 2002/12/30 21:24:09 ronpinkas Exp $
  */
 
 /*
@@ -438,7 +438,7 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
    return FALSE;
 }
 
-char * HB_EXPORT hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate )
+char HB_EXPORT * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetDS(%p, %lu, %s)", pArray, ulIndex, szDate));
 
@@ -558,7 +558,7 @@ ULONG HB_EXPORT hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, 
    }
 }
 
-char * HB_EXPORT hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex )
+char HB_EXPORT * hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetC(%p, %lu)", pArray, ulIndex));
 
@@ -572,7 +572,7 @@ char * HB_EXPORT hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex )
    }
 }
 
-char * HB_EXPORT hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex )
+char HB_EXPORT * hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetCPtr(%p, %lu)", pArray, ulIndex));
 

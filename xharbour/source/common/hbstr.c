@@ -99,7 +99,7 @@ ULONG HB_EXPORT hb_strAt( const char * szSub, ULONG ulSubLen, const char * szTex
       return 0;
 }
 
-char * HB_EXPORT hb_strupr( char * pszText )
+char HB_EXPORT * hb_strupr( char * pszText )
 {
    char * pszPos;
 
@@ -111,7 +111,7 @@ char * HB_EXPORT hb_strupr( char * pszText )
    return pszText;
 }
 
-char * HB_EXPORT hb_strdup( const char * pszText )
+char HB_EXPORT * hb_strdup( const char * pszText )
 {
    char * pszDup;
    int iLen = strlen( pszText ) + 1;
@@ -124,7 +124,7 @@ char * HB_EXPORT hb_strdup( const char * pszText )
    return pszDup;
 }
 
-int HB_EXPORT hb_stricmp( const char * s1, const char * s2 )
+int hb_stricmp( const char * s1, const char * s2 )
 {
    int rc = 0;
    ULONG l1;

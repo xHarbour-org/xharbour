@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.24 2003/01/06 12:39:26 horacioroldan Exp $
+ * $Id: dbcmd.c,v 1.25 2003/01/10 05:43:21 horacioroldan Exp $
  */
 
 /*
@@ -783,7 +783,7 @@ ERRCODE  HB_EXPORT hb_rddSelectWorkAreaAlias( char * szName )
 /*
  *  Function for getting current workarea pointer
  */
-void *  HB_EXPORT hb_rddGetCurrentWorkAreaPointer( void )
+void HB_EXPORT * hb_rddGetCurrentWorkAreaPointer( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_rddGetCurrentWorkAreaPointer()"));
 
