@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2185 2004/01/30 09:42:17 andijahja Exp $
+ * $Id: ChangeLog,v 1.2186 2004/01/30 17:04:58 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-30 10:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/classes.c
+    + Added logic to reset HB_OO_CLSTP_PUBLISHED for the assignment twin property ('_' ) in HB_FUNC( __CLSADDMSG )
+    + Added support for HB_OO_CLSTP_PUBLISHED scope in HB_FUNC( __CLSGETPROPERTIESANDVALUES )
+
+    /*
+       I recommend that we discourage the usage of PERSISTENT Flag, in favour of the PUBLISHED scope which provides
+       same functionality but in a more elegant fashion.
+    */
 
 2004-01-30 13:55 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/gtalleg/ssf.h

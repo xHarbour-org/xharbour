@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.91 2004/01/27 03:06:59 ronpinkas Exp $
+ * $Id: classes.c,v 1.92 2004/01/27 04:08:42 ronpinkas Exp $
  */
 
 /*
@@ -1677,6 +1677,9 @@ HB_FUNC( __CLSADDMSG )
          wType -= HB_OO_PROPERTY;
 
          hb_clsAddMsg( uiClass, szMessage, lID_or_FuncPointer_or_BlockPointer, wType, 0, uiScope, bPersistent, hb_param( 5, HB_IT_ANY ), FALSE, bCase );
+
+         // Remove HB_OO_CLSTP_PUBLISHED flag if present.
+         uiScope &= ~HB_OO_CLSTP_PUBLISHED;
 
          szAssign[0] = '_';
          szAssign[1] = '\0';
@@ -3499,7 +3502,8 @@ HB_FUNC( __CLSGETPROPERTIESANDVALUES )
          {
             PHB_DYNS pMessage = ( PHB_DYNS ) pClass->pMethods[ uiAt ].pMessage;
 
-            if( pMessage && pClass->pMethods[ uiAt ].bIsPersistent && pClass->pMethods[ uiAt ].uiData )
+            //if( pMessage && pClass->pMethods[ uiAt ].bIsPersistent && pClass->pMethods[ uiAt ].uiData )
+            if( pMessage && ( pClass->pMethods[ uiAt ].uiScope & HB_OO_CLSTP_PUBLISHED || pClass->pMethods[ uiAt ].bIsPersistent ) && pClass->pMethods[ uiAt ].uiData )
             {
                hb_itemPutC( &Property, pMessage->pSymbol->szName );
                hb_arrayGet( pObject, pClass->pMethods[ uiAt ].uiData, &Value );
