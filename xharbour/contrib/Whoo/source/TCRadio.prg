@@ -1,5 +1,5 @@
 /*
- * $Id: TCRadio.prg,v 1.18 2002/11/07 20:05:55 what32 Exp $
+ * $Id: TCRadio.prg,v 1.19 2002/11/19 00:47:01 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -33,7 +33,7 @@
 
 *------------------------------------------------------------------------------*
 
-CLASS TRadio FROM TCustomControl
+CLASS TRadioButton FROM TCustomControl
 
 //   DATA Caption INIT  "RadioButton"
    DATA FLeft   PROTECTED  INIT   0

@@ -1,5 +1,5 @@
 /*
- * $Id: TCStatic.prg,v 1.19 2002/11/07 20:05:56 what32 Exp $
+ * $Id: TCStatic.prg,v 1.20 2002/11/19 00:47:01 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -33,7 +33,7 @@
 
 *------------------------------------------------------------------------------*
 
-CLASS TStatic FROM TCustomControl
+CLASS TLabel FROM TCustomControl
 
 //   DATA Caption INIT  "StaticText"
    DATA FLeft   PROTECTED  INIT   0

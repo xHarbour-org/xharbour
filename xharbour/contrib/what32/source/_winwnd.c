@@ -789,6 +789,20 @@ HB_FUNC( SHOWWINDOWASYNC )
 
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI FlashWindow( IN HWND hWnd, IN BOOL bInvert);
+/*
+
+FUNCTION Flash(hWnd,nTimes)
+
+   LOCAL n
+   DEFAULT nTimes TO 10
+   For n := 1 To nTimes
+       FlashWindow(hWnd,1)
+       Sleep(500)
+   Next
+   FlashWindow(hWnd,0)
+
+RETURN(nil)
+*/
 
 
 HB_FUNC( FLASHWINDOW )
@@ -1307,22 +1321,3 @@ HB_FUNC ( LOCKWINDOWUPDATE )
 }
 
 
-
-HB_FUNC ( FLASHWINDOW )
-{
-   FlashWindow( (HWND) hb_parnl( 1 ), hb_parni( 2 ) );
-}
-
-/*
-FUNCTION Flash(hWnd,nTimes)
-
-   LOCAL n
-   DEFAULT nTimes TO 10
-   For n := 1 To nTimes
-       FlashWindow(hWnd,1)
-       Sleep(500)
-   Next
-   FlashWindow(hWnd,0)
-
-RETURN(nil)
-*/
