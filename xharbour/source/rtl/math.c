@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.13 2004/03/05 15:22:53 andijahja Exp $
+ * $Id: math.c,v 1.14 2004/03/22 03:16:00 ronpinkas Exp $
  */
 
 /*
@@ -82,7 +82,13 @@
  * ************************************************************
  */
 
-static HB_MATH_EXCEPTION s_hb_exc = {HB_MATH_ERR_NONE, "", "", 0.0, 0.0, 0.0, 1, 0, 0};
+#if defined(HB_THREAD_SUPPORT)
+   #define s_hb_exc   (HB_VM_STACK.math_exc)
+#else
+   #define s_hb_exc   s_hb_exc
+   static HB_MATH_EXCEPTION s_hb_exc = {HB_MATH_ERR_NONE, "", "", 0.0, 0.0, 0.0, 1, 0, 0};
+#endif
+
 
 /* reset math error information */
 void hb_mathResetError (void)

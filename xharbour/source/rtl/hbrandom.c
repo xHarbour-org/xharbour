@@ -1,5 +1,5 @@
 /*
- * $Id: hbrandom.c,v 1.10 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: hbrandom.c,v 1.11 2004/03/30 22:47:23 druzus Exp $
  */
 
 /*
@@ -50,6 +50,7 @@
  *
  */
 
+#include <hbapi.h>
 #include <hbmath.h>
 #include <stdlib.h>
 #include <time.h>
@@ -60,13 +61,13 @@
 
 /* Globally available data, no need to MT it */
 static volatile int s_bInit = 0;
- 
+
 /*
 * HB_RANDOM
 *
 * HB_RANDOM() --> returns a real value n so that 0 <= n < 1
-* HB_RANDOM( x ) --> returns a real number n so that 0 <= n < x 
-* HB_RANDOM( x, y) --> Returns a  real number n so that  x <= n < y 
+* HB_RANDOM( x ) --> returns a real number n so that 0 <= n < x
+* HB_RANDOM( x, y) --> Returns a  real number n so that  x <= n < y
 */
 HB_FUNC( HB_RANDOM )
 {
@@ -103,23 +104,23 @@ HB_FUNC( HB_RANDOM )
 
 /*
 * HB_RANDOMINT
-* 
+*
 * HB_RANDOMINT() --> returns 0 or 1, evenly distributed
 * HB_RANDOMINT( N ) --> returns an integer between 1 and N (inclusive)
-* HB_RANDOMINT( x, y) --> Returns a real number between x and y (inclusive) 
+* HB_RANDOMINT( x, y) --> Returns a real number between x and y (inclusive)
 * The integer returned is of the longest type available
 */
 
 HB_FUNC( HB_RANDOMINT )
 {
    double dRnd;
-   
+
    #ifndef HB_LONG_LONG_OFF
    LONGLONG lX, lY;
    #else
    LONG lX, lY;
    #endif
-   
+
    dRnd = hb_random_num();
 
    if( ! ISNUM( 1 ) )
@@ -155,7 +156,7 @@ HB_FUNC( HB_RANDOMINT )
          #else
          LONG lZ;
          #endif
-         
+
          lY = lX;
          lX = lZ;
       }
@@ -174,14 +175,14 @@ HB_FUNC( HB_RANDOMSEED )
    {
       srand( (unsigned)time( NULL ) );
    }
-   else 
+   else
    {
       srand( hb_parni(1) );
    }
-   
+
    s_bInit = 1;
 }
-      
+
 /* Returns a double value between 0 and 1 */
 double hb_random_num()
 {
@@ -192,7 +193,7 @@ double hb_random_num()
       srand( (unsigned)time( NULL ) );
       s_bInit = 1;
    }
-   
+
    d1 = (double) rand();
    d2 = (double) RAND_MAX;
    #ifdef HB_OS_WIN_32
@@ -204,7 +205,7 @@ double hb_random_num()
    #else
    d2 += DBL_EPSILON;
    #endif
-   
+
    return d1 / d2;
 }
 

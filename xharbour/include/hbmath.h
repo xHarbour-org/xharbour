@@ -1,5 +1,5 @@
 /*
- * $Id: hbmath.h,v 1.5 2003/11/30 12:32:30 druzus Exp $
+ * $Id: hbmath.h,v 1.6 2004/03/02 00:28:18 druzus Exp $
  */
 
 /*
@@ -54,7 +54,13 @@
 #ifndef HB_MATH_H_
 #define HB_MATH_H_
 
-#include "hbapi.h"
+#ifdef HB_THREAD_SUPPORT
+   #undef HB_THREAD_SUPPORT
+   #include "hbapi.h"
+   #define HB_THREAD_SUPPORT
+#else
+   #include "hbapi.h"
+#endif
 
 #if defined(__DJGPP__)
 #include <libm/math.h>

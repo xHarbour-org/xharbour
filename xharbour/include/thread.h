@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.86 2004/05/17 01:51:04 ronpinkas Exp $
+* $Id: thread.h,v 1.87 2004/05/17 14:21:01 mauriliolongo Exp $
 */
 
 /*
@@ -53,9 +53,10 @@
 #ifndef HB_THREAD_H_
 #define HB_THREAD_H_
 
-#include "hbapi.h"
-
 #ifdef HB_THREAD_SUPPORT
+
+#include "hbapi.h"
+#include "hbmath.h"
 
 
 /* Check if malloc/free is thread safe */
@@ -366,6 +367,9 @@ typedef struct tag_HB_STACK
    PHB_ITEM errorBlock;
    int     iLaunchCount;
    USHORT  uiErrorDOS; /* The value of DOSERROR() */
+
+   /* Math error handler, again one for thread */
+   HB_MATH_EXCEPTION    math_exc;
 
    /* List of error handlers for TRY/CATCH blocks */
    PHB_ITEM aTryCatchHandlerStack;
@@ -699,7 +703,6 @@ void hb_threadCancelInternal( void );
    BOOL hb_threadCondWait( HB_COND_T *cond, CRITICAL_SECTION *mutex , DWORD dwTimeout );
 
 #endif
-
 
 /******************************************************/
 /* Definitions when threading is turned off */
