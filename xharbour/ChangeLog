@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1369 2003/08/20 20:48:50 lculik Exp $
+ * $Id: ChangeLog,v 1.1370 2003/08/20 22:07:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-08-20 16:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/macro.c
+    ! Fixed hb_compMemvarCheck() to also check for Fields - what a bad name for this function :-(
 
 2003-08-20 15:06 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rdd/dbcmd.c

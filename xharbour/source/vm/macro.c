@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.26 2003/08/20 04:55:23 ronpinkas Exp $
+ * $Id: macro.c,v 1.27 2003/08/20 05:01:49 ronpinkas Exp $
  */
 
 /*
@@ -1181,10 +1181,29 @@ static void hb_compMemvarCheck( char * szVarName, HB_MACRO_DECL )
             PHB_DYNS pDyn = hb_dynsymFind( szVarName );
 
             /* there is no memvar or field variable visible at this moment */
-            if( pDyn == NULL || pDyn->hMemvar == 0 )
+            if( pDyn == NULL )
             {
-                HB_MACRO_DATA->status |= HB_MACRO_UNKN_VAR;
-                HB_MACRO_DATA->status &= ~HB_MACRO_CONT;  /* don't run this pcode */
+               HB_MACRO_DATA->status |= HB_MACRO_UNKN_VAR;
+               HB_MACRO_DATA->status &= ~HB_MACRO_CONT;  /* don't run this pcode */
+            }
+            else if( pDyn->hMemvar == 0 )
+            {
+               HB_ITEM Dummy;
+
+               Dummy.type = HB_IT_NIL;
+
+               if( hb_rddFieldGet( &Dummy, pDyn->pSymbol ) == SUCCESS )
+               {
+                  if( HB_IS_COMPLEX( &Dummy ) )
+                  {
+                     hb_itemClear( &Dummy );
+                  }
+               }
+               else
+               {
+                  HB_MACRO_DATA->status |= HB_MACRO_UNKN_VAR;
+                  HB_MACRO_DATA->status &= ~HB_MACRO_CONT;  /* don't run this pcode */
+               }
             }
          }
       }
