@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.10 2003/03/15 23:23:46 walito Exp $
+ * $Id: tmysql.prg,v 1.11 2003/10/22 01:00:09 lculik Exp $
  */
 
  /*
@@ -1106,7 +1106,7 @@ METHOD MakePrimaryKeyWhere() CLASS TMySQLTable
 
          // if a part of a primary key has been changed, use original value
 
-            cWhere += ClipValue2SQL( ::aOldValue[ HB_EnumIndex() ], ::FieldType(HB_EnumIndex()) )
+            cWhere += ClipValue2SQL( ::aOldValue[ HB_EnumIndex() ], SQL2ClipType(::FieldType(HB_EnumIndex())) )
 
          cWhere += " AND "
       endif

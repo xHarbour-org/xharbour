@@ -1,5 +1,5 @@
 /*
- * $Id: mysql.c,v 1.3 2003/02/18 17:15:43 lculik Exp $
+ * $Id: mysql.c,v 1.4 2003/03/15 23:19:28 walito Exp $
  */
 
 /*
@@ -165,11 +165,11 @@ HB_FUNC(SQLFETCHR) // MYSQL_ROW *mysql_fetch_row(MYSQL_RES *)
             temp = _itemPutC(NULL, "");
           }
 
-         hb_arraySet(aRow, i + 1, temp);
-         _itemRelease(temp);
+         hb_arraySetForward(aRow, i + 1, temp);
+//         _itemRelease(temp);
       }
-   _itemReturn(aRow);
-   _itemRelease(aRow);
+   hb_itemReturn(aRow);
+//   _itemRelease(aRow);
 }
 
 
@@ -199,40 +199,40 @@ HB_FUNC(SQLFETCHF) // MYSQL_FIELD *mysql_fetch_field(MYSQL_RES *)
 
    if (!(mfield == NULL)) {
       temp = _itemPutC(NULL, mfield->name);
-      hb_arraySet(aField, 1, temp);
-      _itemRelease(temp);
+      hb_arraySetForward(aField, 1, temp);
+//      _itemRelease(temp);
 
       temp = _itemPutC(NULL, mfield->table);
-      hb_arraySet(aField, 2, temp);
-      _itemRelease(temp);
+      hb_arraySetForward(aField, 2, temp);
+//      _itemRelease(temp);
 
       temp = _itemPutC(NULL, mfield->def);
-      hb_arraySet(aField, 3, temp);
-      _itemRelease(temp);
+      hb_arraySetForward(aField, 3, temp);
+//      _itemRelease(temp);
 
       temp = _itemPutNL(NULL, (long)mfield->type);
-      hb_arraySet(aField, 4, temp);
-      _itemRelease(temp);
+      hb_arraySetForward(aField, 4, temp);
+//      _itemRelease(temp);
 
       temp = _itemPutNL(NULL, mfield->length);
-      hb_arraySet(aField, 5, temp);
-      _itemRelease(temp);
+      hb_arraySetForward(aField, 5, temp);
+//      _itemRelease(temp);
 
       temp = _itemPutNL(NULL, mfield->max_length);
-      hb_arraySet(aField, 6, temp);
-      _itemRelease(temp);
+      hb_arraySetForward(aField, 6, temp);
+//      _itemRelease(temp);
 
       temp = _itemPutNL(NULL, mfield->flags);
-      hb_arraySet(aField, 7, temp);
-      _itemRelease(temp);
+      hb_arraySetForward(aField, 7, temp);
+//      _itemRelease(temp);
 
       temp = _itemPutNL(NULL, mfield->decimals);
-      hb_arraySet(aField, 8, temp);
-      _itemRelease(temp);
+      hb_arraySetForward(aField, 8, temp);
+//      _itemRelease(temp);
 
    }
-   _itemReturn(aField);
-   _itemRelease(aField);
+   hb_itemReturn(aField);
+//   _itemRelease(aField);
 
 }
 
@@ -289,13 +289,13 @@ HB_FUNC(SQLLISTDB) // MYSQL_RES * mysql_list_dbs(MYSQL *, char * wild);
       mrow = mysql_fetch_row(mresult);
       temp = _itemPutC(NULL, mrow[0]);
 
-      hb_arraySet(aDBs, i + 1, temp);
-      _itemRelease(temp);
+      hb_arraySetForward(aDBs, i + 1, temp);
+//      _itemRelease(temp);
    }
 
    mysql_free_result(mresult);
-   _itemReturn(aDBs);
-   _itemRelease(aDBs);
+   hb_itemReturn(aDBs);
+//   _itemRelease(aDBs);
 }
 
 
@@ -317,13 +317,13 @@ HB_FUNC(SQLLISTTBL) // MYSQL_RES * mysql_list_tables(MYSQL *, char * wild);
       mrow = mysql_fetch_row(mresult);
       temp = _itemPutC(NULL, mrow[0]);
 
-      hb_arraySet(aTables, i + 1, temp);
-      _itemRelease(temp);
+      hb_arraySetForward(aTables, i + 1, temp);
+//      _itemRelease(temp);
    }
 
    mysql_free_result(mresult);
-   _itemReturn(aTables);
-   _itemRelease(aTables);
+   hb_itemReturn(aTables);
+//   _itemRelease(aTables);
 }
 
 
@@ -378,8 +378,8 @@ HB_FUNC(DATATOSQL)
 
    buffer=(char*)hb_xgrab((iSize*2)+1);
    iSize = mysql_escape_string(buffer,from,iSize); 
-   hb_retclen((char*)buffer,iSize) ;               
-   hb_xfree(buffer);
+   hb_retclenAdopt((char*)buffer,iSize) ;               
+//   hb_xfree(buffer);
 }
 
 HB_FUNC(FILETOSQLBINARY)
@@ -399,7 +399,7 @@ HB_FUNC(FILETOSQLBINARY)
    from=(char*)filetoBuff(FromBuffer,szFile);
    buffer=(char*)hb_xgrab(iLen+1);
    iSize = mysql_escape_string(buffer,from,iSize);  
-   hb_retclen((char*)buffer, iSize);                
-   hb_xfree(buffer);
+   hb_retclenAdopt((char*)buffer, iSize);                
+//   hb_xfree(buffer);
    hb_xfree(FromBuffer);
 }
