@@ -3,7 +3,7 @@
 # юддддддддддддддддддыш
 #  ъъъъъъъъъъъъъъъъъъъъ
 #
-# $Id: makefile.pc,v 1.3 2005/02/20 22:14:03 andijahja Exp $
+# $Id: makefile.pc,v 1.4 2005/02/28 10:17:28 andijahja Exp $
 # makefile for PellesC compiler
 #
 
@@ -527,8 +527,8 @@ HBMAKE_EXE_OBJS = \
    $(OBJ_DIR)\hbmlang.obj
 
 ODBC_LIB_OBJS = \
-   $(OBJ_DIR)\odbc.obj \
-   $(OBJ_DIR)\todbc.obj
+   $(OBJ_DIR)\odbc$(THREAD_MODE).obj \
+   $(OBJ_DIR)\todbc$(THREAD_MODE).obj
 
 XBSCRIPT_EXE_OBJS = \
    $(OBJ_DIR)\xbscript.obj
@@ -4411,13 +4411,13 @@ $(OBJ_DIR)\mousestd.obj : $(RTL_DIR)\gtstd\mousestd.c
 # юдддддддддддддддддддддддддыш
 #  ъъъъъъъъъъъъъъъъъъъъъъъъъъъ
 
-$(OBJ_DIR)\odbc.obj  : $(ODBC_DIR)\odbc.c
+$(OBJ_DIR)\odbc$(THREAD_MODE).obj  : $(ODBC_DIR)\odbc.c
    $(CC_CMD)
 
-$(OBJ_DIR)\todbc.c   : $(ODBC_DIR)\todbc.prg
+$(OBJ_DIR)\todbc$(THREAD_MODE).c   : $(ODBC_DIR)\todbc.prg
    $(HARBOUR_CMD)
 
-$(OBJ_DIR)\todbc.obj : $(OBJ_DIR)\todbc.c
+$(OBJ_DIR)\todbc$(THREAD_MODE).obj : $(OBJ_DIR)\todbc$(THREAD_MODE).c
    $(CC_CMD)
 
 # здддддддддддддддддддддддд©

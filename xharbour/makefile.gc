@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.4 2005/02/19 11:22:29 andijahja Exp $
+# $Id: makefile.gc,v 1.5 2005/03/01 21:23:18 andijahja Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -234,17 +234,17 @@ all: $(PROJECT)
 # libhbodbc.a
 #-------------------------------------------------------------------------------
 $(ODBC_LIB) : \
-   $(OBJ_DIR)/odbc.o \
-   $(OBJ_DIR)/todbc.o
+   $(OBJ_DIR)/odbc$(THREAD_MODE).o \
+   $(OBJ_DIR)/todbc$(THREAD_MODE).o
 	$(AR_CMD)
 
-$(OBJ_DIR)/odbc.o : $(ODBC_DIR)/odbc.c
+$(OBJ_DIR)/odbc$(THREAD_MODE).o : $(ODBC_DIR)/odbc.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/todbc.c : $(ODBC_DIR)/todbc.prg
+$(OBJ_DIR)/todbc$(THREAD_MODE).c : $(ODBC_DIR)/todbc.prg
 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)/todbc.o : $(OBJ_DIR)/todbc.c
+$(OBJ_DIR)/todbc$(THREAD_MODE).o : $(OBJ_DIR)/todbc$(THREAD_MODE).c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------
