@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.19 2004/03/12 13:56:13 likewolf Exp $
+ * $Id: files.c,v 1.20 2004/03/18 03:43:08 ronpinkas Exp $
  */
 
 /*
@@ -1038,58 +1038,69 @@ HB_FUNC( SETFDATI )
 }
 
 
-
 HB_FUNC( FILEDELETE )
 {
    BOOL bReturn = FALSE;
-   PHB_FFIND ffind;
-   USHORT uiAttr = HB_FA_ALL;
-   BYTE *pDirSpec;
-
-   PHB_FNAME fname =NULL;
-   BYTE *pCurDir;
-   char cCurDsk;
 
    if ( ISCHAR( 1 ) )
    {
+      BYTE *pDirSpec;
+      PHB_FFIND ffind;
+      USHORT uiAttr = HB_FA_ALL;
+
       pDirSpec = hb_fileNameConv( hb_strdup( hb_parcx( 1 ) ) );
 
-      cCurDsk = hb_fsCurDrv() ;
-      pCurDir = hb_fsCurDir( cCurDsk ) ;
-
       if ( ISNUM( 2 ) )
-         {
-         uiAttr = hb_parni( 2 );
-         }
-
-      if( ( ffind = hb_fsFindFirst( ( const char *)pDirSpec, uiAttr ) ) != NULL )
       {
+         uiAttr = hb_parni( 2 );
+      }
 
-         if( (fname = hb_fsFNameSplit( (char*) pDirSpec )) !=NULL )
+      if( ( ffind = hb_fsFindFirst( ( const char *) pDirSpec, uiAttr ) ) != NULL )
+      {
+         PHB_FNAME fname;
+         BYTE *pCurDir;
+         char cCurDsk;
+         char sRoot[2];
+
+         cCurDsk = hb_fsCurDrv() ;
+         pCurDir = hb_fsCurDir( cCurDsk ) ;
+
+         sRoot[0] = OS_PATH_DELIMITER ;
+         sRoot[1] = '\0' ;
+
+         if( ( fname = hb_fsFNameSplit( (char*) pDirSpec )) != NULL )
          {
-           if( fname->szDrive )
-               hb_fsChDrv( ( BYTE ) (fname->szDrive[0] - 'A') );
+            if( fname->szDrive )
+            {
+               hb_fsChDrv( ( BYTE ) ( fname->szDrive[0] - 'A' ) );
+            }
 
-           if( fname->szPath)
+            if( fname->szPath)
+            {
                hb_fsChDir( ( BYTE *) fname->szPath );
+            }
+
+            hb_xfree( fname );
          }
 
          do
          {
-         if( hb_fsDelete( ( BYTE * ) ffind->szName ) )
-              bReturn = TRUE;
+            if( hb_fsDelete( ( BYTE * ) ffind->szName ) )
+            {
+               bReturn = TRUE;
+            }
          }
          while( hb_fsFindNext( ffind ) );
 
          hb_fsFindClose( ffind );
+
+         hb_fsChDrv( (BYTE ) cCurDsk );
+         hb_fsChDir( ( BYTE *) sRoot ) ;
+         hb_fsChDir( pCurDir );
       }
+
       hb_xfree( pDirSpec );
    }
-   hb_fsChDrv( (BYTE ) cCurDsk );
-   hb_fsChDir( pCurDir );
-
-   if ( fname )
-     hb_xfree( fname );
 
    hb_retl( bReturn );
 }
