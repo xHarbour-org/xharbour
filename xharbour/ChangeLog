@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2271 2004/02/12 21:37:21 andijahja Exp $
+ * $Id: ChangeLog,v 1.2272 2004/02/12 22:00:25 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-13 00:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * include/hbexprc.c
+    % Optimize INCrement & DECrement operators if are using LOCAL vars.
+      Use HB_P_LOCALNEARADDINT instead of HB_P_INC o HB_P_DEC.
+
 2004-02-13 04:55 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/itemapi.c
   * source/rtl/val.c
