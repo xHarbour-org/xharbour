@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.49 2003/02/23 23:27:08 lculik Exp $
+ * $Id: hbmake.prg,v 1.50 2003/03/07 16:18:40 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1512,6 +1512,7 @@ FUNC CreateMakeFile( cFile )
             cHtmlLib += aLibsOut[ npos ]
             aDel( aLibsOut, nPos )
             aSize( aLibsOut, Len( aLibsOut ) - 1 )
+            cOldLib := StrTran( cOldLib, "gtwin" , "gtcgi" )
          ENDIF
 
          aEval( aLibsOut, { | cLib | cLibs += " " + cLib } )
@@ -1540,9 +1541,22 @@ FUNC CreateMakeFile( cFile )
             IF ! lMt
                cOldLib        := " " + cDefLibGccLibs
                cDefLibGccLibs := cHtmlLib + " " + cOldLib + " " + cLibs
+
+               IF "html" IN cDefLibGccLibs 
+                   cDefLibGccLibs := StrTran( cDefLibGccLibs, "gtsln" , "gtcgi" )
+                   cDefLibGccLibs := StrTran( cDefLibGccLibs, "slang" , "" )
+               ENDIF
+
             ELSE
+
                cOldLib          := " " + cDefLibGccLibsMt
                cDefLibGccLibsMt := cHtmlLib + " " + cOldLib + " " + cLibs
+
+               IF "html" IN cDefLibGccLibsMt
+                   cDefLibGccLibsMt := StrTran( cDefLibGccLibsMt, "gtsln" , "gtcgi" )
+                   cDefLibGccLibsMt := StrTran( cDefLibGccLibsMt, "slang" , "" )
+               ENDIF
+
             ENDIF
 
          ELSEIF cOs == "OS/2"
@@ -1550,9 +1564,18 @@ FUNC CreateMakeFile( cFile )
             IF ! lMt
                cOldLib     := " " + cGccLibsOs2
                cGccLibsOs2 := cHtmlLib + " " + cOldLib + " " + cLibs
+
+               IF "html" IN cGccLibsOs2
+                   cGccLibsOs2 := StrTran( cGccLibsOs2, "gtos2" , "gtcgi" )
+               ENDIF
+
             ELSE
                cOldLib       := " " + cGccLibsOs2Mt
                cGccLibsOs2Mt := cHtmlLib + " " + cOldLib + " " + cLibs
+               IF "html" IN cGccLibsOs2Mt
+                   cGccLibsOs2Mt := StrTran( cGccLibsOs2Mt, "gtos2" , "gtcgi" )
+               ENDIF
+
             ENDIF
          ELSE
 
@@ -1565,7 +1588,7 @@ FUNC CreateMakeFile( cFile )
       ENDIF
 
    ENDIF
-
+ 
    IF s_lBcc .OR. s_lVcc
       IF lFwh
 
