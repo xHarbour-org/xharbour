@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.45 2003/11/23 02:56:43 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.46 2003/11/23 19:34:54 druzus Exp $
  */
 
 /*
@@ -1774,7 +1774,7 @@ static ERRCODE hb_dbfNewArea( DBFAREAP pArea )
 static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
 {
    USHORT uiFlags, uiFields, uiSize, uiCount;
-   BOOL bRetry, bError;
+   BOOL bRetry, bError, bLock;
    PHB_ITEM pError, pFileExt;
    PHB_FNAME pFileName;
    char * szFileName;
@@ -1829,6 +1829,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    /* Try open */
    do
    {
+      bLock = FALSE;
       pArea->hDataFile = hb_spOpen( pOpenInfo->abName, uiFlags );
 #ifdef DBF_EXLUSIVE_LOCKPOS
       if( pArea->hDataFile != FS_ERROR )
@@ -1838,6 +1839,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
          {
             hb_fsClose( pArea->hDataFile );
             pArea->hDataFile = FS_ERROR;
+	      bLock = TRUE;
          }
       }
 #endif
@@ -1850,16 +1852,16 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             hb_errPutSubCode( pError, EDBF_OPEN_DBF );
             hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_OPEN ) );
             hb_errPutFileName( pError, ( char * ) pOpenInfo->abName );
-            /*
-             * Temporary fix for neterr() support and Clipper compatibility,
-             * should be revised with a better solution.
-             */
-            if ( hb_fsError() == EACCES )
-               hb_errPutOsCode( pError, 32 );
-            else
-               hb_errPutOsCode( pError, hb_fsError() );
             hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
          }
+         /*
+          * Temporary fix for neterr() support and Clipper compatibility,
+          * should be revised with a better solution.
+          */
+         if ( hb_fsError() == EACCES || bLock )
+            hb_errPutOsCode( pError, 32 );
+         else
+            hb_errPutOsCode( pError, hb_fsError() );
          bRetry = ( SELF_ERROR( ( AREAP ) pArea, pError ) == E_RETRY );
       }
       else

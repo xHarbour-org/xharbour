@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1764 2003/11/24 23:51:29 druzus Exp $
+ * $Id: ChangeLog,v 1.1765 2003/11/24 23:59:48 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-11-25 02:30 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbf1.c
+    ! hack on hack in hack :-) for exclusive mode. We definitely
+      have to clean error codes some days
+
+  - xharbour/contrib/libct/invertwin.prg
+  + xharbour/contrib/libct/invrtwin.prg
+  * xharbour/contrib/libct/Makefile
+  * xharbour/contrib/libct/makefile.bc
+  * xharbour/contrib/libct/makefile.vc
+    * change naem to 8.3 format for DOS compilation
+
 2003-11-24 21:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
   * utils/hbmake/tmake.prg
     ! Some fix on screen layout thanks to Eduardo
     ! Some new items are stored on makefile for later makefile edit
-
 
 2003-11-25 00:40 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.9 2003/09/23 21:23:56 paultucker Exp $
+# $Id: Makefile,v 1.10 2003/11/04 00:25:33 lculik Exp $
 #
 
 ROOT = ../../
@@ -75,10 +75,10 @@ PRG_SOURCES= \
 	ctmisc.prg \
 	datetime.prg \
 	dattime2.prg \
-    fcopy.prg \
-	invertwin.prg \
+	fcopy.prg \
+	invrtwin.prg \
 	numconv.prg \
-    strfile.prg \
+	strfile.prg \
 	screen2.prg \
 	time.prg \
 
