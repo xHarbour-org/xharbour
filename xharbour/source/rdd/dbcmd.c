@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.75 2004/02/21 20:06:42 andijahja Exp $
+ * $Id: dbcmd.c,v 1.76 2004/02/21 21:14:11 andijahja Exp $
  */
 
 /*
@@ -3309,8 +3309,8 @@ HB_FUNC( ORDLISTADD )
             hb_itemRelease( pOrderInfo.itmOrder );
             SELF_GOTOP( ( AREAP ) s_pCurrArea->pArea );
          }
-         hb_itemRelease( pOrderInfo.itmResult );
       }
+      hb_itemRelease( pOrderInfo.itmResult );
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDLISTADD" );
