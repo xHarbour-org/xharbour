@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.127 2004/09/03 01:34:59 druzus Exp $
+ * $Id: dbcmd.c,v 1.128 2004/09/13 13:16:40 druzus Exp $
  */
 
 /*
@@ -373,7 +373,7 @@ static int hb_rddRegister( char * szDriver, USHORT uiType )
    hb_vmPushPointer( ( void * ) &uiFunctions );
    hb_vmPushPointer( ( void * ) &pRddNewNode->pTable );
    hb_vmPushPointer( ( void * ) &pRddNewNode->pSuperTable );
-   hb_vmDo( 2 );
+   hb_vmDo( 3 );
    if ( hb_parni( -1 ) != SUCCESS )
    {
       hb_xfree( pRddNewNode );         /* Delete de new RDD node */

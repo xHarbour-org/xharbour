@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.26 2004/08/19 00:04:10 peterrees Exp $
+ * $Id: tgetlist.prg,v 1.27 2004/09/13 11:12:04 lf_sfnet Exp $
  */
 
 /*
@@ -507,6 +507,8 @@ METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
             oGet:Insert( cToPaste[ nI ] )
          next nI
          exit
+
+   #endif
 
       Default
 
