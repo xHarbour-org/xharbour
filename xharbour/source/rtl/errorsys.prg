@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.39 2004/08/26 08:00:32 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.40 2005/03/06 00:53:04 andijahja Exp $
  */
 
 /*
@@ -574,6 +574,12 @@ HB_FUNC( SETUNHANDLEDEXCEPTIONFILTER )
 
    hb_retnl( (LONG) pDefaultHandler );
 }
+
+#pragma ENDDUMP
+
+#pragma BEGINDUMP
+
+#include "hbapi.h"
 
 HB_FUNC( HB_BUILDDATE )
 {
