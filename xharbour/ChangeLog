@@ -26,7 +26,9 @@
    * source/vm/extend.c
    * source/vm/fastitem.c
    * source/vm/estack.c
-     * surround with 'extern "C"'
+     * surround with 'Extern "C"'
+   * makallbc.bat
+     * remove bcc_dir check
 
 2003-10-01 09:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   *  hrbdll.bc
