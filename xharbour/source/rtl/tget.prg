@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.25 2002/09/01 00:47:19 lculik Exp $
+ * $Id: tget.prg,v 1.26 2002/09/07 03:32:45 lculik Exp $
  */
 
 /*
@@ -351,8 +351,13 @@ return Self
 METHOD Display( lForced ) CLASS Get
 
    local nOldCursor := SetCursor( SC_NONE )
+   local xbuffer := ::buffer
 
    DEFAULT lForced TO .t.
+
+   if !Empty(::DecPos ) .and. ::minus .and. !( "-" $ xbuffer )
+      xbuffer := space(::DecPos-2) + "-." + substr(::buffer,::Decpos+1)
+   endif
 
    if ::HasScroll() .and. ::Pos != NIL
       if ::nDispLen > 8
@@ -362,9 +367,9 @@ METHOD Display( lForced ) CLASS Get
       endif
    endif
 
-   if ::buffer != NIL .and. ( lForced .or. ( ::nDispPos != ::nOldPos ) )
+   if xbuffer != NIL .and. ( lForced .or. ( ::nDispPos != ::nOldPos ) )
       DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ),;
-                 Substr( ::buffer, ::nDispPos, ::nDispLen ), ;
+                 Substr( xbuffer, ::nDispPos, ::nDispLen ), ;
                  hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ) )
       if !(::cDelimit == NIL)
          DispOutAt( ::Row, ::Col, Substr( ::cDelimit, 1, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ) )
@@ -404,6 +409,8 @@ METHOD End() CLASS Get
       ::Clear := .f.
       ::Display( .f. )
    endif
+
+   ::minus := NIL
 
 return Self
 
@@ -470,7 +477,9 @@ METHOD SetFocus() CLASS Get
 
    if ::type == "N"
       ::decpos := At( iif( ::lDecRev .or. "E" $ ::cPicFunc, ",", "." ), ::buffer )
-      ::minus := ( ::VarGet() < 0 )
+      if !::minus
+         ::minus := ( ::VarGet() < 0 )
+      endif
    else
       ::decpos := NIL
       ::minus  := .f.
@@ -569,7 +578,9 @@ METHOD Untransform( cBuffer ) CLASS Get
 
    case ::type == "N"
 
-      ::minus := .f.
+      if !::minus
+         ::minus := .f.
+      endif
       if "X" $ ::cPicFunc
          if Right( cBuffer, 2 ) == "DB"
             ::minus := .t.
@@ -1002,6 +1013,7 @@ METHOD Input( cChar ) CLASS Get
 
       do case
       case cChar == "-"
+         ::minus := .t.
                /* The minus symbol can be write in any place */
 
       case cChar $ ".,"
@@ -1164,7 +1176,6 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
          ::nMaxEdit -= 3
       endif
    endif
-
 
    If ::type == "D" .and. ::BadDate
       cBuffer := ::Buffer

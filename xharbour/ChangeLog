@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.409 2002/09/28 11:55:13 map Exp $
+ * $Id: ChangeLog,v 1.410 2002/09/29 00:53:13 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2002-09-29 12:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/rtl/tget.prg
+    ! fixed get (value and display) involving negative (with decimal)
+      number whose value is less than 1.
 
 2002-09-28 21:50 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
    * source/compiler/hbusage.c
