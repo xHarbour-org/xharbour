@@ -1,4 +1,4 @@
-As it stands at this point, xHarbour offers many Syntax extensions over Harbour
+As it stands at this point, xHarbour offers many syntax extensions over Harbour
 and Clipper, including:
 
 
@@ -27,10 +27,10 @@ WITH OBJECT now supports macros:
 Extended Literal Strings:
 -------------------------
 
-xHarbour introduces a new kind of lietal string known as "Extended
+xHarbour introduces a new kind of literal strings known as "Extended
 Literal Strings".
 
-   Symtax:
+   Syntax:
    -------
 
    E"..."
@@ -41,8 +41,8 @@ Literal Strings".
    \n -> New Line character.
    \t -> Tab character.
    \r -> CR character.
-   \" -> lieral <"> character.
-   \' -> lieral <'> character.
+   \" -> literal <"> character.
+   \' -> literal <'> character.
    \\ -> literal <\> character.
 
 PERSISTENT Codeblocks:
@@ -119,7 +119,7 @@ NOTE: This syntax is modeled after the C 'switch' flow control. It offers
       great speed benefit [30-300%] over DO CASE flow control, but is
       restricted to comparing only constants.
 
-      Constants maybe: Integers, Longs, or Single Character
+      Constants may be: Integers, Longs, or Single Character
       Strings [much like in C]
 
 WARNING: Those NOT familiar with the C switch flow control, should understand
@@ -206,7 +206,7 @@ IN operator:
 
    <Exp> IN <Array_or_StringExp> => .T./.F.
 
-The IN operator is very similar to the @ operator, but is valid on *both*
+The IN operator is very similar to the $ operator, but is valid on *both*
 Strings and Arrays. IN is much faster than the equivalent:
 
    aScan( <Array>, <Exp> ) > 0
@@ -216,10 +216,10 @@ Variable Parameters syntax:
 
    Function <cFuncName>( ... )
 
-The above definition allows this Function to receive up-to 254 parameters.
+The above definition allows this Function to receive up to 254 parameters.
 You may retrieve an ARRAY with all the parameters using:
 
-   HB_aParamas()
+   HB_aParams()
 
 The above is appropriate for such functions that may receive any number of
 generic parameters, which normally will then be processed in a loop, or with
@@ -321,7 +321,7 @@ String as Array Index can also accepts a numeric as an assigned value:
 
    <StringExp>[<IndexExp>] := 65 // Same as := 'A'
 
-String Index and all String of 1 character length, automatically carry a
+String Index and all Strings of 1 character length automatically carry a
 secondary CHAR type, which means they are also compatible with numeric
 operations.
 
@@ -366,7 +366,7 @@ The underlying ITEM API has been rewritten (source/vm/fastitem.c) and is far
 faster and consumes much less memory.
 
 Much extended Expression Optimizer produces faster code for common functions,
-and code notations. For example it will automatically convert:
+and code notations. For example, it will automatically convert:
 
    aTail( <aArray> )         to aArray[-1]
    SubStr( <cString>, X, 1 ) to cString[X]
@@ -374,7 +374,7 @@ and code notations. For example it will automatically convert:
 which will execute much faster than the above common code.
 
 Optimized generation of Line numbers and other similar optimizations which
-end up producing smaller and faster executables.
+end up in producing smaller and faster executables.
 
 Built-in support for SET TRACE [On|Off] and TraceLog() function.
 
@@ -409,8 +409,8 @@ Fixed:
    @ x,y GET &( xMacro )[...]
    -> Clipper complains: Error C2047  GET contains complex macro.
 
-xHarbour is about twice as fast as Clipper, on most common operations
-[excluding console screen output, and DBF access], and about 25% to 1000%
+xHarbour is about twice as fast as Clipper on most common operations
+[excluding console screen output and DBF access], and about 25% to 1000%
 faster than Harbour.
 
 xHarbour should compile and execute all valid Clipper and Harbour code,
