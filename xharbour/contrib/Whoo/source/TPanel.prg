@@ -31,6 +31,6 @@ METHOD New( oParent ) CLASS TPanel
    ::lControl  := .F.
    ::Modal     := .T.
    
-   return( self )
+   RETURN( self )
 
 *-----------------------------------------------------------------------------*

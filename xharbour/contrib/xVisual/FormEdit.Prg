@@ -68,8 +68,7 @@ METHOD OnSize(nFlag,Width,Height)
    IF ::oMask <> NIL
       aRect:=GetClientRect(::Handle)
       ::oMask:Move(aRect[1],aRect[2],aRect[3],aRect[4],.T.)
-      ::oMask:BringToTop()
-      ::oMask:SetFocus()
+      ::oMask:Refresh()
    ENDIF
 
    RETURN(NIL)
@@ -97,6 +96,9 @@ METHOD OnMenuCommand(oItem)
       ::Add(cName, TComboBox():New( self,        505, 200, 10 ) )
    CASE oItem:Text=="ListBox"
       ::Add(cName, TListBox():New(  self,        506, 200, 40 ) )
+   CASE oItem:Text=="StatusBar"
+      ::Add(cName, TStatusBar():New( self, cName, 507 ) )
+
    ENDCASE
 
   RETURN(NIL)
@@ -189,82 +191,6 @@ HB_FUNC( DRAWGRID )
 
 
 //----------------------------------------------------------------------------//
-
-/*
-
-METHOD DrawGrid(hDC,nGran)
-
-   LOCAL i,j
-   LOCAL nColor:=rgb(0,0,0)
-
-   FOR i:=0 to ::width step 8 // <= example
-      FOR j:=0 to ::height step 8 // <= example
-         SetPixel(hDC,i,j,nColor)
-      NEXT
-   NEXT
-
-   RETURN(0)
-
-*/
-
-/*
-METHOD DrawGrid(hDC,nGran)
-
-   LOCAL aRect,hBrush,hOldPen,hOldBrush,hPen,hBmp
-
-   DEFAULT nGran TO 3
-
-   DO CASE
-      CASE nGran == 1
-          hBmp := CreateBitmap( 8, 8, 1, 1,;
-                          Chr(255)+chr(0) +;
-                          Chr(170)+chr(0) +;
-                          Chr(255)+chr(0) +;
-                          Chr(170)+chr(0) +;
-                          Chr(255)+chr(0) +;
-                          Chr(170)+chr(0) +;
-                          Chr(255)+chr(0) +;
-                          Chr(170)+chr(0) )
-      CASE nGran == 2
-           hBmp := CreateBitmap( 8, 8, 1, 1,;
-                          Chr(255)+chr(0) +;
-                          Chr(187)+chr(0) +;
-                          Chr(255)+chr(0) +;
-                          Chr(255)+chr(0) +;
-                          Chr(255)+chr(0) +;
-                          Chr(187)+chr(0) +;
-                          Chr(255)+chr(0) +;
-                          Chr(255)+chr(0) )
-      CASE nGran == 3
-           hBmp := CreateBitmap( 8, 8, 1, 1, ;
-                          CHR(255)+CHR(0) + ;
-                          CHR(255)+CHR(0) + ;
-                          CHR(255)+CHR(0) + ;
-                          CHR(255)+CHR(0) + ;
-                          CHR(255)+CHR(0) + ;
-                          CHR(251)+CHR(0) + ;
-                          CHR(255)+CHR(0) + ;
-                          CHR(255)+CHR(0))
-   ENDCASE
-
-   hBrush    := CreatePatternBrush( hBmp )
-   hPen      := CreatePen( PS_NULL, 0, 0 )
-   hOldBrush := SelectObject( hDC, hBrush )
-   hOldPen   := SelectObject( hDC, hPen )
-   aRect     := GetClientRect( ::handle )
-
-   SetTextColor( hDC, rgb( 0, 0, 0 ) )
-   SetBkColor( hDC, GetSysColor( COLOR_BTNFACE ) )
-   Rectangle( hDC, aRect[1], aRect[2], aRect[3], aRect[4] )
-   SelectObject( hDC, hOldBrush )
-   SelectObject( hDC, hOldPen )
-   DeleteObject( hBrush )
-   DeleteObject( hBmp )
-   DeleteObject( hPen )
-
-RETURN(0)
-
-*/
 
 //----------------------------------------------------------------------------//
 

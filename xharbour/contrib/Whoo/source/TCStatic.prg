@@ -27,7 +27,7 @@ METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TStatic
    ::Left      := nLeft
    ::Top       := nTop
    ::Width     := IFNIL( nWidth, IFNIL( ::Width,  80, ::Width) , nWidth )
-   ::Height    := IFNIL( nHeight,IFNIL( ::height, 20, ::height), nHeight) 
+   ::Height    := IFNIL( nHeight,IFNIL( ::height, 16, ::height), nHeight) 
    ::Name      := 'static'
    ::Style     := WS_CHILD + WS_VISIBLE + SS_LEFT
    

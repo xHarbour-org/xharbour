@@ -37,6 +37,7 @@ FUNCTION Main
                :AddItem( 'RadioButton', 106, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'CheckBox'   , 107, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
                :AddItem( 'ListBox'    , 108, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
+               :AddItem( 'StatusBar'  , 109, {|oItem| oApp:SubForm:OnMenuCommand(oItem) } )
 
             END
          END
