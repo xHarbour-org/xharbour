@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.105 2004/02/23 10:01:40 andijahja Exp $
+ * $Id: dbfcdx1.c,v 1.106 2004/03/02 00:28:18 druzus Exp $
  */
 
 /*
@@ -603,9 +603,9 @@ static int hb_cdxValCompare( LPCDXTAG pTag, BYTE * val1, BYTE len1,
  * store Item in index key
  * TODO: uiType check
  */
-static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LPCDXTAG pTag, BOOL fTrans )
+static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LPCDXTAG pTag, BOOL fTrans, BOOL fSize )
 {
-   BYTE buf[8], *ptr;
+   BYTE buf[CDX_MAXKEY], *ptr;
    BYTE len = 0;
    double d;
 
@@ -615,8 +615,17 @@ static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LP
    {
       case HB_IT_STRING:
       case HB_IT_STRING | HB_IT_MEMO:
-         ptr = ( BYTE * ) pItem->item.asString.value;
-         len = ( BYTE ) HB_CDXMAXKEY( pItem->item.asString.length );
+         len = ( BYTE ) HB_MIN( pItem->item.asString.length, pTag->uiLen );
+         if ( fSize && len < pTag->uiLen )
+         {
+            memcpy( ptr, pItem->item.asString.value, len );
+            memset( ptr + len, pTag->uiType == 'C' ? ' ' : '\0', pTag->uiLen - len );
+            len = pTag->uiLen;
+         }
+         else
+         {
+            ptr = ( BYTE * ) pItem->item.asString.value;
+         }
          break;
       case HB_IT_INTEGER:
       case HB_IT_LONG:
@@ -718,7 +727,7 @@ static LPCDXKEY hb_cdxKeyEval( LPCDXKEY pKey, LPCDXTAG pTag, BOOL fSetWA )
    {
       PHB_ITEM pItem = hb_itemNew( NULL );
       SELF_GETVALUE( ( AREAP ) pArea, pTag->nField, pItem );
-      pKey = hb_cdxKeyPutItem( pKey, pItem, pArea->ulRecNo, pTag, FALSE );
+      pKey = hb_cdxKeyPutItem( pKey, pItem, pArea->ulRecNo, pTag, FALSE, TRUE );
       hb_itemRelease( pItem );
    }
    else if ( hb_itemType( pTag->pKeyItem ) == HB_IT_BLOCK )
@@ -726,13 +735,13 @@ static LPCDXKEY hb_cdxKeyEval( LPCDXKEY pKey, LPCDXTAG pTag, BOOL fSetWA )
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pTag->pKeyItem );
       hb_vmSend( 0 );
-      pKey = hb_cdxKeyPutItem( pKey, &(HB_VM_STACK.Return), pArea->ulRecNo, pTag, FALSE );
+      pKey = hb_cdxKeyPutItem( pKey, &(HB_VM_STACK.Return), pArea->ulRecNo, pTag, FALSE, TRUE );
    }
    else
    {
       pMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pTag->pKeyItem );
       hb_macroRun( pMacro );
-      pKey = hb_cdxKeyPutItem( pKey, hb_stackItemFromTop( -1 ), pArea->ulRecNo, pTag, FALSE );
+      pKey = hb_cdxKeyPutItem( pKey, hb_stackItemFromTop( -1 ), pArea->ulRecNo, pTag, FALSE, TRUE );
       hb_stackPop();
    }
 
@@ -4935,7 +4944,7 @@ static ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pKeyItm, BOO
          fFindLast = !fFindLast;
 
       /* TODO: runtime error if valtype(pKeyItm) != pTag->Type */
-      pKey = hb_cdxKeyPutItem( NULL, pKeyItm, fFindLast ? CDX_MAX_REC_NUM : CDX_IGNORE_REC_NUM, pTag, TRUE );
+      pKey = hb_cdxKeyPutItem( NULL, pKeyItm, fFindLast ? CDX_MAX_REC_NUM : CDX_IGNORE_REC_NUM, pTag, TRUE, FALSE );
 
       hb_cdxIndexLockRead( pTag->pIndex );
       ulRec = hb_cdxTagKeyFind( pTag, pKey );
@@ -6324,7 +6333,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                LPCDXKEY pKey;
                hb_cdxIndexLockWrite( pTag->pIndex );
                if ( pOrderInfo->itmNewVal && !HB_IS_NIL( pOrderInfo->itmNewVal ) )
-                  pKey = hb_cdxKeyPutItem( NULL, pOrderInfo->itmNewVal, pArea->ulRecNo, pTag, TRUE );
+                  pKey = hb_cdxKeyPutItem( NULL, pOrderInfo->itmNewVal, pArea->ulRecNo, pTag, TRUE, TRUE );
                else
                   pKey = hb_cdxKeyEval( NULL, pTag, TRUE );
                hb_cdxTagKeyAdd( pTag, pKey );
@@ -6353,7 +6362,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                LPCDXKEY pKey;
                hb_cdxIndexLockWrite( pTag->pIndex );
                if ( pOrderInfo->itmNewVal && !HB_IS_NIL( pOrderInfo->itmNewVal ) )
-                  pKey = hb_cdxKeyPutItem( NULL, pOrderInfo->itmNewVal, pArea->ulRecNo, pTag, TRUE );
+                  pKey = hb_cdxKeyPutItem( NULL, pOrderInfo->itmNewVal, pArea->ulRecNo, pTag, TRUE, TRUE );
                else
                   pKey = hb_cdxKeyEval( NULL, pTag, TRUE );
                if ( hb_cdxTagKeyFind( pTag, pKey ) > 0 )
@@ -6491,7 +6500,7 @@ static ERRCODE hb_cdxSetScope( CDXAREAP pArea, LPDBORDSCOPEINFO sInfo )
             *pScopeKey = hb_cdxKeyPutItem( *pScopeKey,
                            fCB ? &(HB_VM_STACK.Return) : sInfo->scopeValue,
                            (nScope == 0) ? CDX_IGNORE_REC_NUM : CDX_MAX_REC_NUM,
-                           pTag, TRUE );
+                           pTag, TRUE, FALSE );
          }
          else
          {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2478 2004/03/04 01:08:49 mlombardo Exp $
+ * $Id: ChangeLog,v 1.2479 2004/03/04 01:13:16 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-04 03:20 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed dbseek(cVal) when length of cVal is greater then length of
+      key expression (cVal should be cut to index key length before seek)
+    ! fixed possible index corruption when using keys with variable
+      length. Clipper docs says that key expression has to return fixed
+      length key but it could work in some cases with variable length
+      keys so xHarbour should too.
+
+  * xharbour/tests/rddtest/out.prg
+  * xharbour/tests/rddtest/rddmktst.prg
+    * extended to test seek with longer keys.
+
 2004-03-04 08:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/direct.c
     ! minor correction to the latest changes that caused attribute "V" if
