@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.71 2004/06/17 09:23:44 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.72 2004/06/18 01:04:22 vouchcac Exp $
  */
 
 /*
@@ -631,10 +631,12 @@ METHOD Configure( nMode ) CLASS TBrowse
 //-------------------------------------------------------------------//
 
 METHOD AColInfo( oCol ) CLASS Tbrowse
-   LOCAL aCol
+   LOCAL aCol, cType
 
    if HB_ISOBJECT( oCol )
-      aCol := { oCol, valtype( Eval( oCol:block ) ), ::SetColumnWidth( oCol ),;
+      cType := valtype( oCol:block )
+      aCol := { oCol, if( cType == 'B', valtype( Eval( oCol:block ) ), '' ), ;
+                      if( cType == 'B', ::SetColumnWidth( oCol ), 0 ),;
                             '', '', '', 0, '', 0, oCol:DefColor, .f., '', .t. }
    else
       aCol := { oCol, '', 0, '', '', '', 0, '', 0, {}, .f., '', .t. }

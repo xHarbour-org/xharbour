@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3084 2004/06/18 01:05:37 paultucker Exp $
+ * $Id: ChangeLog,v 1.3085 2004/06/18 01:20:13 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -20,7 +20,6 @@
   * include/hbver.h
     * Refreshed.
 
->>>>>>> 1.3084
 2004-06-17 20:19 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
   * include/hbclass.ch
     ! Add syntax for Visual Objects compatibility.
