@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.119 2002/11/08 04:46:52 ronpinkas Exp $
+ * $Id: xide.prg,v 1.120 2002/11/08 05:45:10 what32 Exp $
  */
 
 /*
@@ -224,15 +224,17 @@ METHOD MainToolBar() CLASS MainFrame
          NEXT
 
          // ----------------------------------------------------   set imagelist
+
          hImg2:= ImageList_Create( 24, 24, ILC_COLORDDB+ILC_MASK )
          hBmp := LoadImage( hInstance(), "STDTAB", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
          ImageList_AddMasked( hImg2, hBmp, RGB( 0, 255, 255 ) )
          DeleteObject(hBmp)
          SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
+
          //---------------------------------------------------------------------
       End
       :Rebar1:AddBand( NIL, RBBS_NOVERT, :StdTools:handle, 100, 30,  , "", NIL )
-      //:StdTools:Disable()
+      :StdTools:Disable()
    End
 
 //----------------------------------------------------------------------------------------------
@@ -252,16 +254,18 @@ METHOD MainToolBar() CLASS MainFrame
          next
 
          // ----------------------------------------------------   set imagelist
+
          hImg2:= ImageList_Create( 24, 24, ILC_COLORDDB+ILC_MASK )
          hBmp := LoadImage( hInstance(), "WIN32", IMAGE_BITMAP, 0, 0, LR_LOADTRANSPARENT )
          ImageList_AddMasked( hImg2, hBmp, RGB( 0, 255, 255 ) )
          DeleteObject(hBmp)
          SendMessage( :handle, TB_SETIMAGELIST, 0, hImg2 )
+
          //---------------------------------------------------------------------
 
       End
       :Rebar1:AddBand( NIL, RBBS_NOVERT, :WinTools:handle, 100, 30,  , "", NIL )
-      //:WinTools:Disable()
+      :WinTools:Disable()
    End
 
    //--------- sets a QUICK access to the control

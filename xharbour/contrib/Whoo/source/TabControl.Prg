@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.27 2002/11/07 23:01:33 what32 Exp $
+ * $Id: TabControl.Prg,v 1.28 2002/11/08 01:35:57 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -403,7 +403,7 @@ return(nil)
 
 *-----------------------------------------------------------------------------*
 
-CLASS TabPage FROM TPanel
+CLASS TabPage FROM TForm
    DATA ImageIndex
    METHOD Create() CONSTRUCTOR
    METHOD OnCommand()

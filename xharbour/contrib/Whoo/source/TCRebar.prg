@@ -1,5 +1,5 @@
 /*
- * $Id: TCRebar.prg,v 1.24 2002/11/05 21:55:15 what32 Exp $
+ * $Id: TCRebar.prg,v 1.25 2002/11/07 20:05:56 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -98,17 +98,15 @@ METHOD RebarProc(nMsg,nwParam,nlParam) CLASS TRebar
    LOCAL acRect
    LOCAL aRect
 
-   IF nMsg==WM_SIZE
-      acRect:=GetClientRect(::Parent:handle)
-      aRect:=GetWindowRect(::handle)
+   acRect:=GetClientRect(::Parent:handle)
+   aRect :=GetWindowRect(::handle)
       
-      ::FWidth := acRect[3]
-      ::FHeight:= aRect[4]-aRect[2]
+   ::FWidth := acRect[3]
+   ::FHeight:= aRect[4]-aRect[2]
       
-      ::Move( , , , , .T. )
-   endif
-   
-   RETURN( CallWindowProc(::nrProc,::Parent:handle,nMsg,nwParam,nlParam) )
+   ::Move( , , , , .T. )
+      
+   RETURN 0
 
 *------------------------------------------------------------------------------*
 
@@ -119,7 +117,7 @@ METHOD Create( oParent ) CLASS TRebar
 
    ::FHeight := 20
    ::nrProc := SetProcedure(::Parent:handle,{|hWnd, nMsg,nwParam,nlParam|;
-                            ::RebarProc(nMsg,nwParam,nlParam)},{WM_SIZE})
+                            ::RebarProc(nMsg,nwParam,nlParam)}, WM_SIZE )
    ::RebarProc( WM_SIZE,0,0)
    
 RETURN( self )
