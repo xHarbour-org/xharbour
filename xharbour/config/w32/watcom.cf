@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.15 2004/07/22 14:29:04 lf_sfnet Exp $
+# $Id: watcom.cf,v 1.16 2004/08/02 20:11:13 lf_sfnet Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -27,9 +27,8 @@ ifeq ($(HB_LIB_COMPILE),)
 endif
 
 # work arround to DOS command line size limit
-export WPP386 := $(strip $(CPPFLAGS) $(C_USR))
+export WPP386 := $(CPPFLAGS)
 CPPFLAGS =
-C_USR = 
 
 # Note: The empty line directly before 'endef' HAVE TO exist!
 # It causes that the 'echo' command is separated by LF
