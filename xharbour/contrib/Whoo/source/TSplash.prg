@@ -1,5 +1,5 @@
 /*
- * $Id: TSplash.prg,v 1.5 2002/11/05 21:39:58 what32 Exp $
+ * $Id: TSplash.prg,v 1.6 2002/11/07 20:05:56 what32 Exp $
  */
 
 /*
@@ -32,6 +32,8 @@
 #include "debug.ch"
 #include "what32.ch"
 
+GLOBAL EXTERNAL Application
+
 CLASS TSplash FROM TForm
    DATA bitmap
    METHOD Create() CONSTRUCTOR
@@ -63,6 +65,6 @@ METHOD Create( oParent, cFile, nTimeOut ) CLASS TSplash
 
    SetTimer( ::Handle, 1, nTimeOut )
 
-   ProcessMessages()
+   Application:ProcessMessages()
 
 return( self )
