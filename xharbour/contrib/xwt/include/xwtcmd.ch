@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwtcmd.ch,v 1.9 2004/01/26 13:52:21 lculik Exp $
+   $Id: xwtcmd.ch,v 1.10 2004/01/26 20:30:09 lculik Exp $
 
    Definitions
 */
@@ -89,7 +89,9 @@
 	  
 #xcommand @ <x>,<y> COMBO [ <oTextBox> ] [ VAR <cText> ] [ OF <oParent> ] ITEMS <aItems>;
           => [ <oTextBox> := ] XWTComboBox():New( <cText>, <x>, <y>, <oParent> ,<aItems>)
-	  
+
+#xcommand @ <x>,<y> LISTBOX [ <oTextBox> ] [ VAR <cText> ] [ OF <oParent> ] ITEMS <aItems>;
+          => [ <oTextBox> := ] XWTListBox():New( <cText>, <x>, <y>, <oParent> ,<aItems>)	  
 	  
 // Tope level commands --------------------------------------------------------------------------
 #xcommand QUIT => XWTQUIT()

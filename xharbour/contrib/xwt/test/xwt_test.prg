@@ -4,7 +4,7 @@
 * Giancarlo Niccolai et al.:
 * (PLZ. add your copyright...)
 *
-* $Id: xwt_test.prg,v 1.25 2004/01/26 13:52:21 lculik Exp $
+* $Id: xwt_test.prg,v 1.26 2004/01/26 20:30:31 lculik Exp $
 *
 
 
@@ -125,6 +125,12 @@ PROCEDURE MAIN()
    oVLay2:Add( oRadioPanel )
    @ 50,2 COMBO oCombo VAR cCombo of oVlay2 items aItems 
       oCombo:AddEventListener(XWT_E_UPDATED, @ComboModified())
+      
+   @ 60,2 LISTBOX oCombo VAR cCombo of oVlay2 items aItems 
+      oCombo:AddEventListener(XWT_E_UPDATED, @ComboModified())
+      
+      
+      
 //   oVlay2:add(oCombo)
    
    /***** A list **********/

@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.53 2004/01/26 13:52:16 lculik Exp $
+ * $Id: Changelog,v 1.54 2004/01/26 20:29:25 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-30 16:30 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
+  + src/listbox.prg
+    class for list boxes
+  + source/xwt_gtk/xwt_gtk_listbox.c
+    !list box routines
+  * src/xwt_api.c
+    src/xwt_gtk/xwt_gtk.c
+    src/xwt_gtk/xwt_gtk.h
+    ! support for list boxes
+
 2004-01-26 18:40 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
   * src/xwt_gtk/xwt_gtk_combobox.c
     ! added signal to get text select on entry

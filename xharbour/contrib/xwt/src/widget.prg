@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: widget.prg,v 1.6 2003/08/31 19:02:19 xthefull Exp $
+   $Id: widget.prg,v 1.8 2003/11/11 12:44:22 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
@@ -160,9 +160,10 @@ RETURN .not. bRaw
 
 METHOD Move( x, y ) CLASS XWTWidget
    LOCAL bRaw := XWT_FastRiseEvent( XWT_E_MOVE, Self, x, y )
-
+   tracelog(braw)
    IF .not. bRaw
       bRaw := .not. XWT_SetProperty( ::oRawWidget, XWT_PROP_POSITION, x, y )
+      tracelog(bRaw,x,y,::x,::y)
       ::x := x
       ::y := y
    ENDIF

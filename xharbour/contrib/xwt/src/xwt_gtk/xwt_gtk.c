@@ -4,7 +4,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.28 2004/01/26 13:52:21 lculik Exp $
+   $Id: xwt_gtk.c,v 1.29 2004/01/26 20:30:25 lculik Exp $
 
    Global declarations, common functions
 
@@ -111,7 +111,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 
          if( wParent == 0 )
          {
-            if(wWidget->type == XWT_TYPE_FRAME || wWidget->type == XWT_TYPE_WINDOW)
+            if(wWidget->type == XWT_TYPE_FRAME || wWidget->type == XWT_TYPE_WINDOW ||  wWidget->type ==XWT_TYPE_BUTTON)
             {
                gtk_widget_set_uposition( wSelf,
                   prop->value.position.x, prop->value.position.y );
@@ -761,6 +761,10 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       case XWT_PROP_SETCOMBOITEMS:  
           xwt_gtk_ComboAddItem(wWidget,(PHB_ITEM) prop->value.data);
 	  return TRUE;
+      case XWT_PROP_SETLISTITEMS:  
+          xwt_gtk_ListAddItem(wWidget,(PHB_ITEM) prop->value.data);
+	  return TRUE;
+
 //      case XWT_PROP_SETCOMBOEDIT:
          
 
@@ -1168,6 +1172,7 @@ BOOL xwt_drv_create( PXWT_WIDGET xwtData )
       case XWT_TYPE_CALENDAR:    return xwt_gtk_createCalendar(xwtData);
       case XWT_TYPE_CALENDARM:    return xwt_gtk_createCalendarModal(xwtData);
       case XWT_TYPE_COMBOBOX: return  xwt_gtk_createComboBox(xwtData);
+      case XWT_TYPE_LISTBOX: return xwt_gtk_createListBox( xwtData );
 
    }
    return FALSE;

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.17 2004/01/26 13:52:21 lculik Exp $
+   $Id: xwt_api.c,v 1.18 2004/01/26 20:30:11 lculik Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -337,6 +337,7 @@ HB_FUNC( XWT_SETPROPERTY )
       case XWT_PROP_CONTENT:
       case XWT_PROP_TITLES:
       case XWT_PROP_SETCOMBOITEMS:
+      case XWT_PROP_SETLISTITEMS:
          prop.value.data = hb_param( 3, HB_IT_ARRAY );
          if ( prop.value.data == NULL )
          {

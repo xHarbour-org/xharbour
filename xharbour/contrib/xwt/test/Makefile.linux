@@ -1,5 +1,5 @@
 ##################################
-# $Id: Makefile.linux,v 1.1 2003/11/28 14:46:34 lf_sfnet Exp $
+# $Id: Makefile.linux,v 1.2 2003/12/18 14:34:44 jonnymind Exp $
 #
 # Makefile for XWT Test program
 #
@@ -8,5 +8,5 @@
 PRGFLAGS=-I../include
 LIBS=`pkg-config --libs gtk+-2.0` -L../lib -lxwt -lxwt_gtk -lxwt
 
-TARGETS=t_browse xwt_test
+TARGETS=t_browse xwt_test xw
 include ../Rules.make

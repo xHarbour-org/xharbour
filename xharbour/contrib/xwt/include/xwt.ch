@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.22 2003/11/08 00:45:55 jonnymind Exp $
+   $Id: xwt.ch,v 1.23 2004/01/26 13:52:21 lculik Exp $
 
    Definitions
 */
@@ -111,7 +111,7 @@
 #define XWT_PROP_SETCOMBOITEMS 160
 #define XWT_PROP_SETCOMBOEDIT  161
 #define XWT_PROP_GETCOMBOSELECT 162
-
+#define XWT_PROP_SETLISTITEMS 170
 
 // Global widget management status
 #define XWT_PROP_UPDATE    200  // boolean (ready or not)
@@ -193,6 +193,7 @@
 #define XWT_TYPE_CALENDAR 110
 #define XWT_TYPE_CALENDARM 120
 #define XWT_TYPE_COMBOBOX    130
+#define XWT_TYPE_LISTBOX    140
 // Container of Widgets ---------------------------
 
 #endif
