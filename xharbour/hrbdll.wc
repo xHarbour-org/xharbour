@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.15 2004/10/22 11:55:52 paultucker Exp $
+# $Id: hrbdll.wc,v 1.16 2004/10/22 16:01:29 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -345,9 +345,11 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msgcskam.obj \
   $(OBJ_DIR)\msgcswin.obj \
   $(OBJ_DIR)\msgde.obj \
+  $(OBJ_DIR)\msgdewin.obj \
   $(OBJ_DIR)\msgen.obj \
   $(OBJ_DIR)\msgeo.obj \
   $(OBJ_DIR)\msges.obj \
+  $(OBJ_DIR)\msgeswin.obj \
   $(OBJ_DIR)\msgeu.obj \
   $(OBJ_DIR)\msgfr.obj \
   $(OBJ_DIR)\msggl.obj \
@@ -367,13 +369,18 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msgpl852.obj \
   $(OBJ_DIR)\msgpliso.obj \
   $(OBJ_DIR)\msgplmaz.obj \
+  $(OBJ_DIR)\msgplwin.obj \
   $(OBJ_DIR)\msgpt.obj \
   $(OBJ_DIR)\msgro.obj \
   $(OBJ_DIR)\msgru866.obj \
+  $(OBJ_DIR)\msgrukoi.obj \
   $(OBJ_DIR)\msgruwin.obj \
+  $(OBJ_DIR)\msgsl852.obj \
+  $(OBJ_DIR)\msgsliso.obj \
+  $(OBJ_DIR)\msgslwin.obj \
   $(OBJ_DIR)\msgsr852.obj \
-  $(OBJ_DIR)\msgsrwin.obj \
   $(OBJ_DIR)\msgsriso.obj \
+  $(OBJ_DIR)\msgsrwin.obj \
   $(OBJ_DIR)\msgzhgb.obj \
   $(OBJ_DIR)\msgzhb5.obj \
   $(OBJ_DIR)\gtwin.obj \

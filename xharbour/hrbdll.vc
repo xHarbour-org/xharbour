@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.46 2004/09/30 14:15:49 mlombardo Exp $
+# $Id: hrbdll.vc,v 1.47 2004/10/22 11:55:52 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -402,15 +402,18 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msgcskam.obj \
   $(OBJ_DIR)\msgcswin.obj \
   $(OBJ_DIR)\msgde.obj \
+  $(OBJ_DIR)\msgdewin.obj \
   $(OBJ_DIR)\msgen.obj \
   $(OBJ_DIR)\msgeo.obj \
   $(OBJ_DIR)\msges.obj \
+  $(OBJ_DIR)\msgeswin.obj \
   $(OBJ_DIR)\msgeu.obj \
   $(OBJ_DIR)\msgfr.obj \
   $(OBJ_DIR)\msggl.obj \
   $(OBJ_DIR)\msghe862.obj \
   $(OBJ_DIR)\msghewin.obj \
   $(OBJ_DIR)\msghr852.obj \
+  $(OBJ_DIR)\msghr1250.obj \
   $(OBJ_DIR)\msghriso.obj \
   $(OBJ_DIR)\msghu852.obj \
   $(OBJ_DIR)\msghucwi.obj \
@@ -423,13 +426,18 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msgpl852.obj \
   $(OBJ_DIR)\msgpliso.obj \
   $(OBJ_DIR)\msgplmaz.obj \
+  $(OBJ_DIR)\msgplwin.obj \
   $(OBJ_DIR)\msgpt.obj \
   $(OBJ_DIR)\msgro.obj \
   $(OBJ_DIR)\msgru866.obj \
+  $(OBJ_DIR)\msgrukoi.obj \
   $(OBJ_DIR)\msgruwin.obj \
+  $(OBJ_DIR)\msgsl852.obj \
+  $(OBJ_DIR)\msgsliso.obj \
+  $(OBJ_DIR)\msgslwin.obj \
   $(OBJ_DIR)\msgsr852.obj \
-  $(OBJ_DIR)\msgsrwin.obj \
   $(OBJ_DIR)\msgsriso.obj \
+  $(OBJ_DIR)\msgsrwin.obj \
   $(OBJ_DIR)\msgzhgb.obj \
   $(OBJ_DIR)\msgzhb5.obj \
 #
