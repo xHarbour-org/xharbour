@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.54 2004/09/06 19:25:53 mlombardo Exp $
+ * $Id: set.c,v 1.55 2004/09/16 21:27:04 peterrees Exp $
  */
 
 /*
@@ -82,7 +82,7 @@ static HB_PATHNAMES * sp_set_path;
       extern BOOL hb_PrinterExists(LPTSTR pPrinterName) ;
       extern LONG hb_PrintFileRaw(UCHAR *cPrinterName,UCHAR *cFileName, UCHAR *cDocName) ;
       extern BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
-      extern BOOL isLegacyDevice( LPTSTR pPrinterName);
+      extern BOOL hb_isLegacyDevice( LPTSTR pPrinterName);
 #endif
 char s_PrintFileName[ _POSIX_PATH_MAX + 1 ], s_PrinterName[ _POSIX_PATH_MAX + 1 ];
 BOOL s_HaveSetPrinterName ;
