@@ -2,7 +2,7 @@
 * TIP test
 * FTP Advanced operations Test
 *
-* $Id$
+* $Id: ftpadvtest.prg,v 1.1 2003/11/14 12:01:53 jonnymind Exp $
 *****/
 
 PROCEDURE MAIN( cUrl )
@@ -28,15 +28,23 @@ PROCEDURE MAIN( cUrl )
    IF oCon:Open( cUrl )
       ? "Connection eshtablished"
       ? "Deleting", oUrl:cPath
-      IF oCon:Dele( oUrl:cPath + "/" + oUrl:cFile )
-         ? "Success"
+      IF oCon:CWD( oUrl:cPath )
+         ? "CWD success"
+         IF oCon:Dele( oUrl:cFile )
+            ? "DELE success"
+         ELSE
+            ? "DELE Faliure (server reply:", oCon:cReply + ")"
+         ENDIF
       ELSE
-         ? "Faliure (server reply:", oCon:cReply + ")"
+         ? "CWD Faliure (server reply:", oCon:cReply + ")"
       ENDIF
+
       oCon:Close()
    ELSE
       ? "Can't connect with", oUrl:cServer
-      IF InetErrorCode( oCon:SocketCon ) == 0
+      IF oCon:SocketCon == NIL
+         ? "Connection not initiated"
+      ELSEIF InetErrorCode( oCon:SocketCon ) == 0
          ? "Server sayed:", oCon:cReply
       ELSE
          ? "Error in connection:", InetErrorDesc( oCon:SocketCon )
