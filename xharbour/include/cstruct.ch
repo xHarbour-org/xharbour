@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.ch,v 1.2 2002/06/13 22:44:17 ronpinkas Exp $
+ * $Id: cstruct.ch,v 1.3 2002/06/17 08:07:35 ronpinkas Exp $
  */
 
 /*
@@ -83,11 +83,27 @@
 
 // Exclude from C compilation
 #ifdef _SET_CH
-   #command C STRUCTURE <!stru!> [ALIGN <align> ] => INIT PROCEDURE __INIT_<stru>; MEMVAR <stru>; PUBLIC <stru> := __ActiveStructure( #<stru>, <align> )
+   #command C STRUCTURE <!stru!> [ALIGN <align> ] => ;
+            INIT PROCEDURE __INIT_<stru>; __ActiveStructure( #<stru>, <align> )
+
    // <elem> instead of <!elem!> to allow ElemName[n] syntax.
-   #command MEMBER <elem> AS <type> => aAdd( __ActiveStructure(), HB_Member( { #<elem>, <type> } ) )
-   #command MEMBER <!elem!> AS <type> ( <nlen> ) => aAdd( __ActiveStructure(), { #<elem>, HB_CTypeArrayID( <type>, <nlen> ) } )
-   #command MEMBER <!elem!> AS [<inplace: INPLACE>] C STRUCTURE <!stru!> => IIF( M-><stru> == __ActiveStructure(), /* No need to instanciate */, HB_CStructure( #<stru>, M-><stru> ) ) ; aAdd( __ActiveStructure(), { #<elem>, HB_CStructureId( #<stru>, <.inplace.> ) } )
+   #command MEMBER <elem> AS <type> => HB_Member( #<elem>, <type> )
+
+   #command MEMBER <!elem!> AS <type> ( <nlen> ) => HB_Member( #<elem>, HB_CTypeArrayID( <type>, <nlen> ) )
+
+   #command MEMBER <!elem!> <inplace: IS, INPLACE> C STRUCTURE <!stru!> => ;
+            IIF( Upper( #<stru> ) == __ActiveStructure()[1], ;
+                 /* No need to instanciate */, ;
+                 HB_CStructure( #<stru> ) ) ; ;
+            HB_Member( #<elem>, HB_CStructureId( #<stru>, .T. ) )
+
+   #command MEMBER <!elem!> AS C STRUCTURE <!stru!> => ;
+            IIF( Upper( #<stru> ) == __ActiveStructure()[1], ;
+                 /* No need to instanciate */, ;
+                 HB_CStructure( #<stru> ) ) ; ;
+            HB_Member( #<elem>, HB_CStructureId( #<stru>, .F. ) )
+
    #command END C STRUCTURE [<!stru!>] => ; __ActiveStructure( NIL ); RETURN
-   #translate := C STRUCTURE <!stru!> => := HB_CStructure( #<stru>, M-><stru> )
+
+   #translate := C STRUCTURE <!stru!> => := HB_CStructure( #<stru> )
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.279 2002/06/17 21:35:44 andijahja Exp $
+ * $Id: ChangeLog,v 1.280 2002/06/17 22:40:42 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-06-17 22:46 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/cstruct.ch
+  * source/rtl/cstruct.prg
+    * Greatly simplified and optimized.
+    + Added support for IS caluse as an alternative to INPLACE. The AS clause can't be used with this clause.
+
+  * doc/cstruct.txt
+    * Updated documentation.
+
+  * tests/tstcstru.prg
+    * Modified INPLACE sample to use IS syntax, and added an explanation comment.
 
 2002-06-18 05:40 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * source/rtl/win32.ole

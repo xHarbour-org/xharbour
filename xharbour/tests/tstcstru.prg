@@ -11,8 +11,10 @@ C STRUCTURE MyStructure Align 4
   Member cAge     AS CTYPE_CHAR
   Member uiWeight AS CTYPE_UNSIGNED_INT
   Member dHeight  AS CTYPE_DOUBLE
-  // This is IN-PLACE - Note INPLACE clause.
-  Member Nested   AS INPLACE C STRUCTURE MyNestedStructure
+
+  // This is IN-PLACE - Note IS clause (may also use INPLACE clause).
+  Member Nested   IS C STRUCTURE MyNestedStructure
+
   // This is DETACHED (default).
   Member pNext    AS C STRUCTURE MyStructure
 END C STRUCTURE
