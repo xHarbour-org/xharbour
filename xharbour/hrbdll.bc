@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.46 2004/04/25 11:26:01 andijahja Exp $
+# $Id: hrbdll.bc,v 1.47 2004/04/27 15:25:47 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -285,6 +285,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\extend.obj \
   $(OBJ_DIR)\fm.obj \
   $(OBJ_DIR)\garbage.obj \
+  $(OBJ_DIR)\inet.obj \
   $(OBJ_DIR)\initexit.obj \
   $(OBJ_DIR)\initsymb.obj \
   $(OBJ_DIR)\itemapi.obj \
@@ -711,6 +712,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\extend.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\fm.obj                + >> hdll.tmp
   echo. $(OBJ_DIR)\garbage.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\inet.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\initexit.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\initsymb.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\itemapi.obj           + >> hdll.tmp
@@ -1012,6 +1014,9 @@ $(OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\fastitem.obj : $(VM_DIR)\fastitem.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\inet.obj : $(VM_DIR)\inet.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\initexit.obj : $(VM_DIR)\initexit.c
