@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld_b32.bat,v 1.1 2001/12/22 06:36:17 ronpinkas Exp $
+rem $Id: bldsvr.bat,v 1.1 2003/01/10 06:31:12 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -16,4 +16,4 @@ set HB_COMPILER=bcc32
 SET HB_BIN_INSTALL=..\..\bin
 SET HB_MT=mt
 
-call bld.bat sitesrv blddbf %1 %2 %3 %4 %5
+call bld.bat sitesvr blddbf %1 %2 %3 %4 %5
