@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.59 2003/03/25 02:36:11 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.60 2003/04/01 00:42:08 ronpinkas Exp $
  */
 
 /*
@@ -258,6 +258,8 @@ extern BOOL     HB_EXPORT hb_extIsArray( int iParam );
     #define hb_retnllen( lNumber, iWidth )       hb_itemPutNLLen( &HB_VM_STACK.Return, (lNumber), (iWidth) )
     #define hb_retptr( voidPtr )                 hb_itemPutPtrGC( &HB_VM_STACK.Return, (voidPtr) )
 #else
+   //JC1: including thread anyways, because it defines some void macros when not in MT
+   #include "thread.h"
     extern int   HB_EXPORT  hb_pcount( void );          /* returns the number of suplied parameters */
 
     extern void  HB_EXPORT  hb_ret( void );             /* post a NIL return value */

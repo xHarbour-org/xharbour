@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.40 2003/03/27 07:44:56 ronpinkas Exp $
+* $Id: thread.h,v 1.41 2003/04/04 17:21:21 paultucker Exp $
 */
 
 /*
@@ -387,7 +387,7 @@ typedef struct tag_HB_SHARED_RESOURCE
    this variable will be accessed instead of HB_VM_STACK.
 */
 
-#ifdef HB_THREAD_OPTIMIZE_STACK
+#if defined( HB_THREAD_OPTIMIZE_STACK ) && ! defined( HB_NO_DEFAULT_STACK_MACROS )
    #define HB_VM_STACK (*_pStack_)
    #define HB_THREAD_STUB\
       HB_STACK *_pStack_ = hb_threadGetCurrentStack();
