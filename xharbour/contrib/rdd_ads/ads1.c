@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.7 2003/05/23 09:46:35 lculik Exp $
+ * $Id: ads1.c,v 1.8 2003/05/25 21:50:48 lculik Exp $
  */
 
 /*
@@ -65,6 +65,7 @@
 #include "hbset.h"
 #include <ctype.h>
 
+#define __PRG_SOURCE__ __FILE__
 
 static ERRCODE adsRecCount(  ADSAREAP pArea, ULONG * pRecCount );
 static ERRCODE adsScopeInfo( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem );
