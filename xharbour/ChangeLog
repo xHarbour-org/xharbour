@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2491 2004/03/05 06:28:14 andijahja Exp $
+ * $Id: ChangeLog,v 1.2492 2004/03/05 08:27:06 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,6 +11,7 @@
 2004-03-05 05:32 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
   * make_b32.bat
     ! Fixed to do not delete 3rd party libs when make clean
+      Thanks to Eduardo Fernandes
 
 2004-03-05 13:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/memvars.c
