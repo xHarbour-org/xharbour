@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.25 2004/03/17 02:29:00 druzus Exp $
+ * $Id: hbcomp.h,v 1.26 2004/04/14 20:59:10 andijahja Exp $
  */
 
 /*
@@ -439,9 +439,7 @@ extern void hb_compAddI18nString( char *szString );
 extern void hb_compFixFuncPCode( PFUNCTION );
 
 /* Misc functions defined in harbour.y */
-#if 0
 extern int hb_compYACCMain( char * szName );
-#endif
 extern BOOL hb_compInclude( char * szFileName, HB_PATHNAMES * pSearchPath );  /* end #include support */
 
 extern char * hb_comp_buffer; /* yacc input buffer */
