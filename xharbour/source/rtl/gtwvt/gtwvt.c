@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.62 2004/02/03 15:16:31 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.63 2004/02/03 22:12:50 ronpinkas Exp $
  */
 
 /*
@@ -162,6 +162,10 @@ static void    hb_wvt_gtCreateObjects( void );
 static void    hb_wvt_gtKillCaret( void );
 static void    hb_wvt_gtCreateCaret( void );
 static void    hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+
+/** CLIPBOARD MANAGEMENT (to be removed)**/
+static char *s_clipboard = NULL;
+static int s_clipsize = 0;
 
 //-------------------------------------------------------------------//
 //
@@ -3238,9 +3242,39 @@ HB_EXPORT BOOL hb_wvt_gtDrawOutline( int iTop, int iLeft, int iBottom, int iRigh
    return ( TRUE );
 }
 
-//-------------------------------------------------------------------//
-//-------------------------------------------------------------------//
-//-------------------------------------------------------------------//
+/* ************************** Clipboard support ********************************** */
+
+void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
+{
+   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
+   {
+      *pulMaxSize = s_clipsize;
+   }
+
+   if ( *pulMaxSize != 0 )
+   {
+      memcpy( szData, s_clipboard, *pulMaxSize );
+   }
+
+}
+
+void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
+{
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
+
+   s_clipboard = (char *) hb_xgrab( ulSize +1 );
+   memcpy( s_clipboard, szData, ulSize );
+   s_clipboard[ ulSize ] = '\0';
+   s_clipsize = ulSize;
+}
+
+ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
+{
+   return s_clipsize;
+}
 
 /* *********************************************************************** */
 
@@ -3249,6 +3283,11 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    HB_SYMBOL_UNUSED( bUpdate );
    HB_SYMBOL_UNUSED( iParam );
    HB_SYMBOL_UNUSED( vpParam );
+
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
 
    switch ( iMsgType )
    {
@@ -3259,6 +3298,7 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    return -1;
 }
 
+/* *********************************************************************** */
 
 #ifdef HB_MULTI_GT
 
@@ -3306,6 +3346,9 @@ static void HB_GT_FUNC( gtFnInit( PHB_GT_FUNCS gt_funcs ) )
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
     gt_funcs->info                  = HB_GT_FUNC( gt_info );
+    gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
+    gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
+    gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
 }
 
 //-------------------------------------------------------------------//

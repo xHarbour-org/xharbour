@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.26 2004/02/01 23:09:34 jonnymind Exp $
+ * $Id: hbapigt.h,v 1.27 2004/02/02 19:32:25 ronpinkas Exp $
  */
 
 /*
@@ -361,6 +361,11 @@ extern void   hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen );
 extern void   hb_gt_SetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL bBox );
 extern void   hb_gt_SetKeyCP( char * pszTermCDP, char * pszHostCDP );
 
+/* Clipboard support */
+extern void HB_EXPORT hb_gt_GetClipboard( char *szData, ULONG *pulMaxSize );
+extern void HB_EXPORT hb_gt_SetClipboard( char *szData, ULONG ulSize );
+extern ULONG HB_EXPORT hb_gt_GetClipboardSize( void );
+
 /* Keyboard related declarations */
 
 #define HB_BREAK_FLAG 256 /* 256, because that's what DJGPP returns Ctrl+Break as.
@@ -421,6 +426,18 @@ extern HB_EXPORT void hb_gt_hasChanged( int status );
 */
 extern void hb_gt_update( int status );
 
+/* Support for HB_GT_GOBJECT system */
+extern void HB_EXPORT hb_gtAddGobject( HB_GT_GOBJECT *gobject );
+extern void HB_EXPORT hb_gtDestroyGobject( HB_GT_GOBJECT *gobject );
+extern void HB_EXPORT hb_gtClearGobjects( void );
+extern HB_EXPORT HB_GT_COLDEF * hb_gt_gcolorFromString( char *color_name );
+extern BOOL HB_EXPORT hb_gtGobjectInside( HB_GT_GOBJECT *gobject, int x1, int y1, int x2, int y2 );
+
+/* Support for clipboard system */
+extern void HB_EXPORT hb_gtGetClipboard( char *szData, ULONG *pulMaxSize );
+extern void HB_EXPORT hb_gtSetClipboard( char *szData, ULONG ulSize );
+extern ULONG HB_EXPORT hb_gtGetClipboardSize( void );
+extern void HB_EXPORT hb_gtPasteFromClipboard( ULONG ulSize );
 
 /*
    GT information query or update. msgType determines the kind of information
@@ -557,8 +574,14 @@ typedef struct _HB_GT_FUNCS
     void    (* mouse_SetBounds) ( int, int, int, int );
     void    (* mouse_GetBounds) ( int *, int *, int *, int * );
     /* extended GT functions */
+    void    (* GetClipboard) ( char *, ULONG * );
+    void    (* SetClipboard) ( char *, ULONG );
+    ULONG   (* GetClipboardSize) ( void );
+
+    /* GT CLIPBOARD functions */
     void    (* SetDispCP) ( char *, char *, BOOL );
     void    (* SetKeyCP) ( char *, char * );
+
     /* GT to DRIVER communication functions */
     void    (* update ) ( int );
     int     (* info ) (int, BOOL , int , void * );
@@ -632,6 +655,11 @@ extern int    HB_GT_FUNC( mouse_CountButton( void ) );
 extern void   HB_GT_FUNC( mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight ) );
 extern void   HB_GT_FUNC( mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ) );
 
+/* Gt clipboard functions */
+extern void HB_EXPORT HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) );
+extern void HB_EXPORT HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) );
+extern ULONG HB_EXPORT HB_GT_FUNC( gt_GetClipboardSize( void ) );
+
 /* Gt to driver communication */
 /*
    GT API request to driver to update its status: PRG level made
@@ -663,13 +691,6 @@ extern void   hb_setkeyExit( void );
 /* Private interface listed below. these are common to all platforms */
 
 /* none as of yet */
-
-/* Support for HB_GT_GOBJECT system */
-extern void HB_EXPORT hb_gtAddGobject( HB_GT_GOBJECT *gobject );
-extern void HB_EXPORT hb_gtDestroyGobject( HB_GT_GOBJECT *gobject );
-extern void HB_EXPORT hb_gtClearGobjects( void );
-extern HB_EXPORT HB_GT_COLDEF * hb_gt_gcolorFromString( char *color_name );
-extern BOOL HB_EXPORT hb_gtGobjectInside( HB_GT_GOBJECT *gobject, int x1, int y1, int x2, int y2 );
 
 /* JC1: Supporting Screen Output lock also from other modules */
 #ifdef HB_THREAD_SUPPORT

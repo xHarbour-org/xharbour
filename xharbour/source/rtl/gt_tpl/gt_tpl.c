@@ -1,5 +1,5 @@
 /*
- * $Id: gt_tpl.c,v 1.5 2003/09/15 22:42:22 druzus Exp $
+ * $Id: gt_tpl.c,v 1.6 2004/02/01 23:40:49 jonnymind Exp $
  */
 
 /*
@@ -727,6 +727,42 @@ void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
    hb_fsWriteLarge( s_iStdErr, ( BYTE * ) pbyStr, ulLen );
 }
 
+/* ************************** Clipboard support ********************************** */
+static char *s_clipboard = NULL;
+static int s_clipsize = 0;
+
+void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
+{
+   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
+   {
+      *pulMaxSize = s_clipsize;
+   }
+
+   if ( *pulMaxSize != 0 )
+   {
+      memcpy( szData, s_clipboard, *pulMaxSize );
+   }
+
+}
+
+void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
+{
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
+
+   s_clipboard = (char *) hb_xgrab( ulSize +1 );
+   memcpy( s_clipboard, szData, ulSize );
+   s_clipboard[ ulSize ] = '\0';
+   s_clipsize = ulSize;
+}
+
+ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
+{
+   return s_clipsize;
+}
+
 /* *********************************************************************** */
 
 int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
@@ -792,6 +828,9 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
     gt_funcs->info                  = HB_GT_FUNC( gt_info );
+    gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
+    gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
+    gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
 }
 
 /* ********************************************************************** */

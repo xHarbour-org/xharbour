@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.16 2003/12/28 22:25:34 druzus Exp $
+ * $Id: gtsln.c,v 1.17 2004/02/01 23:40:51 jonnymind Exp $
  */
 
 /*
@@ -151,6 +151,10 @@ static char * s_colorNames[] =
 /* a box drawing hack when nation chars are used */
 static BOOL s_bUse_Alt_Char_Hack = FALSE;
 
+/* clipboard support */
+static char *s_clipboard = NULL;
+static int s_clipsize = 0;
+
 /* *********************************************************************** */
 
 volatile BOOL hb_gt_sln_bScreen_Size_Changed = FALSE;
@@ -283,6 +287,11 @@ void HB_GT_FUNC(gt_Exit( void ))
     /* NOTE: This is incompatible with Clipper - on exit leave a cursor visible */
     if( s_sCursorStyle != SC_UNAVAIL )
         HB_GT_FUNC(gt_SetCursorStyle( SC_NORMAL ));
+
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
 
     SLsmg_refresh();
     SLsmg_reset_smg();
@@ -1338,6 +1347,40 @@ static void HB_GT_FUNC(gt_build_conv_tabs())
         hb_xfree( ( void * ) p );
 }
 
+/* ************************** Clipboard support ********************************** */
+
+void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
+{
+   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
+   {
+      *pulMaxSize = s_clipsize;
+   }
+
+   if ( *pulMaxSize != 0 )
+   {
+      memcpy( szData, s_clipboard, *pulMaxSize );
+   }
+
+}
+
+void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
+{
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
+
+   s_clipboard = (char *) hb_xgrab( ulSize +1 );
+   memcpy( s_clipboard, szData, ulSize );
+   s_clipboard[ ulSize ] = '\0';
+   s_clipsize = ulSize;
+}
+
+ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
+{
+   return s_clipsize;
+}
+
 /* *********************************************************************** */
 
 int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
@@ -1400,6 +1443,10 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->Tone                  = HB_GT_FUNC( gt_Tone );
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
+    gt_funcs->info                  = HB_GT_FUNC( gt_info );
+    gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
+    gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
+    gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
 }
 
 /* ********************************************************************** */

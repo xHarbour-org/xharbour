@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.11 2003/12/29 21:57:34 druzus Exp $
+ * $Id: gtdos.c,v 1.12 2004/02/01 23:40:50 jonnymind Exp $
  */
 
 /*
@@ -129,6 +129,9 @@ static void hb_gt_xPutch( USHORT cRow, USHORT cCol, BYTE attr, BYTE ch );
 static char hb_gt_GetScreenMode( void );
 static void hb_gt_SetCursorSize( char start, char end );
 static void hb_gt_GetCursorSize( char * start, char * end );
+
+static char *s_clipboard = NULL;
+static int s_clipsize = 0;
 
 #if defined(__WATCOMC__)
    #if defined(__386__)
@@ -273,6 +276,11 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 void hb_gt_Exit( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
+
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
 
    hb_mouse_Exit();
 #if !defined(__DJGPP__)
@@ -1706,6 +1714,43 @@ void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
 {
     hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }
+
+/* ************************** Clipboard support ********************************** */
+
+void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
+{
+   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
+   {
+      *pulMaxSize = s_clipsize;
+   }
+
+   if ( *pulMaxSize != 0 )
+   {
+      memcpy( szData, s_clipboard, *pulMaxSize );
+   }
+
+}
+
+void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
+{
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
+
+   s_clipboard = (char *) hb_xgrab( ulSize +1 );
+   memcpy( s_clipboard, szData, ulSize );
+   s_clipboard[ ulSize ] = '\0';
+   s_clipsize = ulSize;
+}
+
+ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
+{
+   return s_clipsize;
+}
+
+
+/**************************************************************/
 
 int hb_gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: gtos2.c,v 1.6 2003/05/21 09:35:36 druzus Exp $
+ * $Id: gtos2.c,v 1.7 2004/02/01 23:40:50 jonnymind Exp $
  */
 
 /*
@@ -120,6 +120,9 @@ static char * hb_gt_ScreenPtr( USHORT cRow, USHORT cCol );
 static void hb_gt_xGetXY( USHORT cRow, USHORT cCol, BYTE * attr, BYTE * ch );
 static void hb_gt_xPutch( USHORT cRow, USHORT cCol, BYTE attr, BYTE ch );
 
+static char *s_clipboard = NULL;
+static int s_clipsize = 0;
+
 /*
 static void hb_gt_GetCursorSize( char * start, char * end );
 */
@@ -220,6 +223,11 @@ void hb_gt_Exit( void )
 
    DosFreeMem(s_key);
    DosFreeMem(s_hk);
+
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
 
    hb_mouse_Exit();
    VioSetCp(0, s_usOldCodePage, 0);
@@ -1150,10 +1158,46 @@ void hb_gt_OutErr( BYTE * pbyStr, ULONG ulLen )
     hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
 }
 
+/* ************************** Clipboard support ********************************** */
+
+void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
+{
+   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
+   {
+      *pulMaxSize = s_clipsize;
+   }
+
+   if ( *pulMaxSize != 0 )
+   {
+      memcpy( szData, s_clipboard, *pulMaxSize );
+   }
+
+}
+
+void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
+{
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
+
+   s_clipboard = (char *) hb_xgrab( ulSize +1 );
+   memcpy( s_clipboard, szData, ulSize );
+   s_clipboard[ ulSize ] = '\0';
+   s_clipsize = ulSize;
+}
+
+ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
+{
+   return s_clipsize;
+}
+
+/* *********************************************************************** */
+
 /*
 * GTInfo() implementation
 */
-int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
+int hb_gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
 {
    HB_SYMBOL_UNUSED( bUpdate );
    HB_SYMBOL_UNUSED( iParam );

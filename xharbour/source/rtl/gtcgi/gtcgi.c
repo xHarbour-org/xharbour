@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.8 2003/11/07 18:20:54 jonnymind Exp $
+ * $Id: gtcgi.c,v 1.9 2004/02/01 23:40:50 jonnymind Exp $
  */
 
 /*
@@ -74,6 +74,9 @@ static BOOL s_OutputDone;
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
 
+static char *s_clipboard = NULL;
+static int s_clipsize = 0;
+
 void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
@@ -103,6 +106,11 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 void HB_GT_FUNC(gt_Exit( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
+
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
 
    HB_GT_FUNC(mouse_Exit());
 }
@@ -610,6 +618,41 @@ void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
     hb_fsWriteLarge( s_iStdErr, ( BYTE * ) pbyStr, ulLen );
 }
 
+/* ************************** Clipboard support ********************************** */
+
+void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
+{
+   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
+   {
+      *pulMaxSize = s_clipsize;
+   }
+
+   if ( *pulMaxSize != 0 )
+   {
+      memcpy( szData, s_clipboard, *pulMaxSize );
+   }
+
+}
+
+void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
+{
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
+
+   s_clipboard = (char *) hb_xgrab( ulSize +1 );
+   memcpy( s_clipboard, szData, ulSize );
+   s_clipboard[ ulSize ] = '\0';
+   s_clipsize = ulSize;
+}
+
+ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
+{
+   return s_clipsize;
+}
+
+/* *********************************************************************** */
 /*
 * GTInfo() implementation
 */
@@ -675,6 +718,9 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
     gt_funcs->info                  = HB_GT_FUNC( gt_info );
+    gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
+    gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
+    gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
 }
 
 /* ********************************************************************** */

@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.18 2004/02/03 16:37:43 maurifull Exp $
+ * $Id: gtalleg.c,v 1.19 2004/02/06 03:36:50 maurifull Exp $
  */
 
 /*
@@ -79,6 +79,9 @@ static AL_BITMAP *bmp;
 BOOL lClearInit = TRUE;
 
 static void hb_gt_DoCursor( void );
+
+static char *s_clipboard = NULL;
+static int s_clipsize = 0;
 
 // I'm not sure of removing these (yet)
 // (they used to be static vars to center gt in hw screen, but now the
@@ -250,6 +253,12 @@ void HB_GT_FUNC(gt_Exit( void ))
       s_pbyScrBuffer = NULL;
       al_destroy_bitmap(bmp);
    }
+
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
+
 }
 
 
@@ -1748,6 +1757,42 @@ int HB_EXPORT HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *
    return -1;
 }
 
+/* ************************** Clipboard support ********************************** */
+
+void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
+{
+   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
+   {
+      *pulMaxSize = s_clipsize;
+   }
+
+   if ( *pulMaxSize != 0 )
+   {
+      memcpy( szData, s_clipboard, *pulMaxSize );
+   }
+
+}
+
+void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
+{
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
+
+   s_clipboard = (char *) hb_xgrab( ulSize +1 );
+   memcpy( s_clipboard, szData, ulSize );
+   s_clipboard[ ulSize ] = '\0';
+   s_clipsize = ulSize;
+}
+
+ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
+{
+   return s_clipsize;
+}
+
+/* ******************************************************************* */
+
 #ifdef HB_MULTI_GT
 
 static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
@@ -1794,6 +1839,10 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
    gt_funcs->ExtendedKeySupport = HB_GT_FUNC(gt_ExtendedKeySupport);
    gt_funcs->ReadKey            = HB_GT_FUNC(gt_ReadKey);
    gt_funcs->info               = HB_GT_FUNC(gt_info);
+   gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
+    gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
+    gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
+
    // todo: update
 }
 

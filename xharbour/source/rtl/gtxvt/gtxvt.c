@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.23 2004/02/01 23:40:52 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.24 2004/02/03 12:32:54 jonnymind Exp $
  */
 
 /*
@@ -309,7 +309,7 @@ static void xvt_windowSetColors( PXWND_DEF wnd, BYTE attr );
 static void xvt_eventKeyProcess( PXVT_BUFFER buffer, XKeyEvent *evt);
 static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt );
 static void xvt_processMessages( PXWND_DEF wnd );
-static void xvt_appProcess();
+static void xvt_appProcess( USHORT usWaitFor );
 
 static PXVT_STATUS xvt_statusNew( void );
 static int xvt_statusQueryMouseBtns( PXVT_STATUS status, Display *dpy );
@@ -379,6 +379,9 @@ static HB_GT_GOBJECT *s_gLastObj = NULL;
 
 PXWND_DEF s_wnd = NULL;
 
+/**** TO BE REMOVED ****/
+static char *s_clipboard = NULL;
+static int s_clipsize = 0;
 
 /**********************************************************************
 *                                                                     *
@@ -620,7 +623,8 @@ static BOOL xvt_bufferResize( PXVT_BUFFER buf,  USHORT cols, USHORT rows )
 static void xvt_bufferInvalidate( PXVT_BUFFER buf,
    int left, int top, int right, int bottom )
 {
-   xvt_appProcess();
+   /* process but don't wait */
+   xvt_appProcess( 0 );
 
    if ( buf->bInvalid == FALSE ) {
       buf->bInvalid = TRUE;
@@ -840,10 +844,11 @@ static PXWND_DEF xvt_windowCreate( Display *dpy, PXVT_BUFFER buf, PXVT_STATUS st
    XFontStruct *xfs;
 
    // load the standard font
-   xfs = xvt_fontNew( dpy, "fixed", "medium", 18, NULL );
+   xfs = xvt_fontNew( dpy, XVT_DEFAULT_FONT_NAME, XVT_DEFAULT_FONT_WEIGHT,
+                  XVT_DEFAULT_FONT_HEIGHT, NULL );
    if ( xfs == NULL )
    {
-      hb_errInternal( EG_CREATE, "Can't load 'fixed' font", NULL, NULL );
+      hb_errInternal( EG_CREATE, "Can't load '%s' defualt font", XVT_DEFAULT_FONT_NAME, NULL );
       return NULL;
    }
 
@@ -855,6 +860,7 @@ static PXWND_DEF xvt_windowCreate( Display *dpy, PXVT_BUFFER buf, PXVT_STATUS st
    wnd->buffer = buf;
    wnd->status = status;
    wnd->gc = NULL;
+   wnd->usFlags = 0;
    xvt_windowSetFont( wnd, xfs );
 
    /* Create the phisical window */
@@ -2346,7 +2352,8 @@ static void xvt_eventKeyProcess( PXVT_BUFFER buffer, XKeyEvent *evt)
       }
       else
       {
-         if ( ! s_modifiers.bCtrl && ! s_modifiers.bAlt )
+         if ( (s_modifiers.bCtrl && *buf <=26 ) ||
+               (! s_modifiers.bCtrl && ! s_modifiers.bAlt ) )
          {
             // ready for UTF input!!!
             xvt_bufferQueueKey( buffer, *buf + (buf[1] << 8) );
@@ -2471,7 +2478,8 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
                      asel = XInternAtom( wnd->dpy, "PRIMARY", 1 );
                      aprop = XInternAtom( wnd->dpy, "CUT_BUFFER0", 1 );
                      atarget = XInternAtom( wnd->dpy, "STRING", 1 );
-
+                     /* signal a X-Paste request */
+                     wnd->usFlags = 1;
                      XConvertSelection( wnd->dpy,
                         asel, atarget, aprop,
                         wnd->window,
@@ -2560,8 +2568,10 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
       case SelectionNotify:
       {
          XTextProperty text;
-         int npos, data;
-         USHORT appMsg = XVT_ICM_KEYSTORE;
+         int npos, data, stream;
+         USHORT appMsg;
+         ULONG nCount;
+         char cData;
 
          // have we got a property to read?
          if ( evt->xselection.property != None )
@@ -2569,24 +2579,97 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
             if ( XGetTextProperty( wnd->dpy,
                   wnd->window, &text, evt->xselection.property) != 0 )
             {
-               for( npos = 0; npos < text.nitems; npos++ )
+               // is the action generated internally?
+               if ( wnd->usFlags )
                {
-                  switch (text.format)
+                  stream = streamChr[1];
+                  appMsg = XVT_ICM_KEYSTORE;
+
+                  /* Signal the application we have received the data */
+                  /* TODO: use UTF buffer for clipboard*/
+                  for( npos = 0; npos < text.nitems; npos++ )
                   {
-                     case 8: data = (int) text.value[npos]; break;
-                     case 16: data = (int) ((unsigned short *)text.value)[npos]; break;
-                     case 32: data = (int) ((unsigned int *)text.value)[npos]; break;
-                     default: data = 0;
+                     switch (text.format)
+                     {
+                        case 8: data = (int) text.value[npos]; break;
+                        case 16: data = (int) ((unsigned short *)text.value)[npos]; break;
+                        case 32: data = (int) ((unsigned int *)text.value)[npos]; break;
+                        default: data = 0;
+                     }
+                     write( stream, &appMsg, sizeof( appMsg ) );
+                     write( stream, &data, sizeof( data ) );
                   }
-                  write( streamChr[1], &appMsg, sizeof( appMsg ) );
-                  write( streamChr[1], &data, sizeof( data ) );
                }
-               //XFree( buf1 );
+               else
+               {
+                  stream = streamFeedback[1];
+                  appMsg= XVT_ICM_SETSELECTION;
+                  write( stream, &appMsg, sizeof( appMsg ) );
+                  nCount = (ULONG) text.nitems;
+                  write( stream, &nCount, sizeof( nCount ) );
+                  for( npos = 0; npos < text.nitems; npos++ )
+                  {
+                     switch (text.format)
+                     {
+                        case 8: cData = (int) text.value[npos]; break;
+                        case 16: cData = (int) ((unsigned short *)text.value)[npos]; break;
+                        case 32: cData = (int) ((unsigned int *)text.value)[npos]; break;
+                        default: cData = 0;
+                     }
+                     write( stream, &cData, sizeof( cData ) );
+                  }
+               }
             }
          }
+         wnd->usFlags = 0;
       }
       break;
 
+      // Someone asked us to give away our selection
+      case SelectionRequest:
+      {
+         XSelectionRequestEvent *req;
+         XEvent respond;
+         int atarget, atomtg;
+
+         atarget = XInternAtom( wnd->dpy, "STRING", 1 );
+         atomtg = XInternAtom( wnd->dpy, "TARGETS", 1 );
+
+         req = &(evt->xselectionrequest);
+         if (req->target == atarget)
+         {
+            XChangeProperty (wnd->dpy,
+               req->requestor,
+               req->property, atarget, 8, PropModeReplace,
+               (unsigned char*) s_clipboard,
+               s_clipsize);
+            respond.xselection.property = req->property;
+         }
+         else if ( req->target == atomtg )
+         {
+            XChangeProperty (wnd->dpy,
+               req->requestor,
+               req->property, atomtg, 32,
+               PropModeReplace,
+               (unsigned char*) &atarget,
+               1);
+         }
+         else
+         {
+            respond.xselection.property = None;
+         }
+
+         respond.xselection.type = SelectionNotify;
+         respond.xselection.display = req->display;
+         respond.xselection.requestor = req->requestor;
+         respond.xselection.selection = req->selection;
+         respond.xselection.target = req->target;
+         respond.xselection.time = CurrentTime;
+
+         XSendEvent (wnd->dpy, req->requestor, 0, 0, &respond);
+         XFlush (wnd->dpy);
+      }
+      break;
    }
 }
 
@@ -2601,6 +2684,8 @@ static void xvt_processMessages( PXWND_DEF wnd )
    HB_GT_GOBJECT *pgObj;
    //struct timespec ts;
    BOOL bLoop = TRUE, bUpdate;
+   int aprop, atarget, asel;
+
    XSegment rUpdate = {32000,32000,-1,-1};
 
    FD_ZERO(&updateSet);
@@ -2672,6 +2757,43 @@ static void xvt_processMessages( PXWND_DEF wnd )
                xvt_windowSetCursor( wnd );
             break;
 
+            /* Manage copy requests */
+            case XVT_ICM_SETSELECTION:
+            {
+               ULONG nlen;
+               unsigned char *data;
+
+               // read data from application
+               read( streamUpdate[0], &nlen, sizeof( nlen ) );
+               if ( s_clipboard != NULL )
+               {
+                  hb_xfree( s_clipboard );
+               }
+               s_clipboard = hb_xgrab( nlen +1);
+               read( streamUpdate[0], s_clipboard, nlen);
+               s_clipboard[ nlen ] = '\0';
+               s_clipsize = nlen;
+
+               asel = XInternAtom( wnd->dpy, "PRIMARY", 1 );
+               // tell the server we own the new selection
+               XSetSelectionOwner(wnd->dpy, asel, wnd->window, CurrentTime);
+            }
+
+            /*If a request to achieve a selection is received... */
+            case XVT_ICM_GETSELECTION:
+
+               asel = XInternAtom( wnd->dpy, "PRIMARY", 1 );
+               aprop = XInternAtom( wnd->dpy, "CUT_BUFFER0", 1 );
+               atarget = XInternAtom( wnd->dpy, "STRING", 1 );
+
+               /* ask X to send the selection */
+               wnd->usFlags = 0; // request event handler to put data in clipboard.
+               XConvertSelection( wnd->dpy,
+                  asel, atarget, aprop,
+                  wnd->window,
+                  CurrentTime );
+            break;
+
             case XVT_ICM_CLEAROBJECTS:
                hb_gtClearGobjects();
             break;
@@ -2735,8 +2857,12 @@ static void xvt_processMessages( PXWND_DEF wnd )
 
 /** App process is called by both inkey and output aware functions to
    process pending data.
+   If wait for is different from 0, the app loop continues until the
+   wait for is achieved. This is used for semi-synchronous communications
+   with the parallel application.
+
 */
-static void xvt_appProcess()
+static void xvt_appProcess( USHORT usWaitFor )
 {
    static int period = 50;
    USHORT appMsg;
@@ -2745,42 +2871,71 @@ static void xvt_appProcess()
 
    period --;
 
-   if ( period == 0 )
+   if ( period == 0 || usWaitFor != 0)
    {
-      // quit immediately if child is died
-      if( s_childPid != 0 &&
-               waitpid( s_childPid, NULL, WNOHANG ) == s_childPid )
+      do
       {
-         hb_vmRequestQuit();
-         return;
-      }
-
-      FD_ZERO(&keySet);
-      FD_SET(streamFeedback[0], &keySet );
-
-      while ( select( streamFeedback[0] + 1, &keySet, NULL , NULL, &timeout) )
-      {
-         read( streamFeedback[0], &appMsg, sizeof( appMsg ) );
-         switch( appMsg )
+         // quit immediately if child is died
+         if( s_childPid != 0 &&
+                  waitpid( s_childPid, NULL, WNOHANG ) == s_childPid )
          {
-
-            case XVT_ICM_RESIZE:
-            {
-               ICM_DATA_RESIZE resize;
-               read( streamFeedback[0], &resize, sizeof( resize ) );
-               hb_gtSetMode( resize.rows, resize.cols );
-               hb_gtHandleResize();
-            }
-            break;
-
-            case XVT_ICM_QUIT:
-               hb_gtHandleClose();
-               break;
+            hb_vmRequestQuit();
+            return;
          }
-         timeout.tv_sec = 0;
-         timeout.tv_usec = 0;
+
+         FD_ZERO(&keySet);
          FD_SET(streamFeedback[0], &keySet );
-      }
+
+         while ( select( streamFeedback[0] + 1, &keySet, NULL , NULL, &timeout) )
+         {
+            read( streamFeedback[0], &appMsg, sizeof( appMsg ) );
+            switch( appMsg )
+            {
+
+               case XVT_ICM_RESIZE:
+               {
+                  ICM_DATA_RESIZE resize;
+                  read( streamFeedback[0], &resize, sizeof( resize ) );
+                  hb_gtSetMode( resize.rows, resize.cols );
+                  hb_gtHandleResize();
+               }
+               break;
+
+               case XVT_ICM_QUIT:
+                  hb_gtHandleClose();
+               break;
+
+               // receiving a selection storage request
+               case XVT_ICM_SETSELECTION:
+               {
+                  ULONG nlen;
+
+                  // read data from application
+                  read( streamFeedback[0], &nlen, sizeof( nlen ) );
+                  if ( s_clipboard != NULL )
+                  {
+                     hb_xfree( s_clipboard );
+                  }
+                  s_clipboard = hb_xgrab( nlen + 1 );
+                  read( streamFeedback[0], s_clipboard, nlen);
+                  s_clipboard[ nlen ] = 0;
+                  s_clipsize = nlen;
+               }
+               break;
+            }
+
+            if ( usWaitFor != 0 )
+            {
+               break;
+            }
+
+            timeout.tv_sec = 0;
+            timeout.tv_usec = 0;
+            FD_SET(streamFeedback[0], &keySet );
+         }
+         timeout.tv_usec = 2500;
+      } while( usWaitFor != 0 && appMsg != usWaitFor );
+
       period = 50;
    }
 }
@@ -3051,6 +3206,11 @@ void HB_GT_FUNC(gt_Exit( void ))
       }
       XCloseDisplay( s_wnd->dpy );
       hb_xfree( s_wnd );
+   }
+
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
    }
 
    munmap( s_buffer, sizeof( XVT_BUFFER) );
@@ -3501,7 +3661,6 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
    }
 
    hb_xfree( memory );
-
    HB_GT_FUNC( gt_DispEnd() );
 
    return(bResult);
@@ -3863,7 +4022,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
       xvt_processMessages( s_wnd );
    }
 
-   xvt_appProcess();
+   xvt_appProcess( 0 );
 
    if ( eventmask & ( INKEY_KEYBOARD | HB_INKEY_RAW | HB_INKEY_EXTENDED ) )
    {
@@ -4048,19 +4207,136 @@ void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int 
    HB_SYMBOL_UNUSED( piRight );
 }
 
+/* ************************** Clipboard support ********************************** */
+
+void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
+{
+   USHORT appMsg;
+   appMsg = XVT_ICM_GETSELECTION;
+
+   write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+   // wait until the feedback is done
+   xvt_appProcess( XVT_ICM_SETSELECTION );
+
+   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
+   {
+      *pulMaxSize = s_clipsize;
+   }
+
+   if ( *pulMaxSize != 0 )
+   {
+      memcpy( szData, s_clipboard, *pulMaxSize );
+   }
+}
+
+void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
+{
+   USHORT appMsg;
+
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
+
+   // send data to our application
+   appMsg = XVT_ICM_SETSELECTION;
+   write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+   write( streamUpdate[1], &ulSize, sizeof( ulSize ) );
+   write( streamUpdate[1], szData, ulSize );
+
+   // temporarily, copy also our data locally
+   s_clipboard = (char *) hb_xgrab( ulSize +1 );
+   memcpy( s_clipboard, szData, ulSize );
+   s_clipboard[ ulSize ] = '\0';
+   s_clipsize = ulSize;
+}
+
+ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
+{
+   return s_clipsize;
+}
 
 /* *********************************************************************** */
 
 int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
 {
-   HB_SYMBOL_UNUSED( bUpdate );
-   HB_SYMBOL_UNUSED( iParam );
+   int iOldValue;
+   USHORT appMsg;
+
    HB_SYMBOL_UNUSED( vpParam );
 
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
-      return (int) FALSE;
+      return (int) TRUE;
+
+      case GTI_SCREENWIDTH:
+         // if the window is already open, and is reachable, this is an
+         // easy task.
+         if ( s_wnd != 0 )
+         {
+            iOldValue =  s_wnd->width;
+         }
+         // TODO: else, use our local image.
+         else
+         {
+            iOldValue = s_buffer->cols * XVT_DEFAULT_FONT_WIDTH;
+         }
+
+         if ( bUpdate )
+         {
+            //send requst to change width
+            hb_gtSetMode( s_buffer->rows, iParam / XVT_DEFAULT_FONT_WIDTH );
+            if ( s_wnd != 0 || s_childPid != 0 )
+            {
+               appMsg = XVT_ICM_RESIZE;
+               write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+            }
+         }
+      return iOldValue;
+
+      case GTI_SCREENHEIGHT:
+         // if the window is already open, and is reachable, this is an
+         // easy task.
+         if ( s_wnd != 0 )
+         {
+            iOldValue =  s_wnd->height;
+         }
+         // else, use our local image.
+         else
+         {
+            iOldValue = s_buffer->rows * XVT_DEFAULT_FONT_HEIGHT;
+         }
+
+         if ( bUpdate )
+         {
+            //send requst to change width
+            hb_gtSetMode( iParam / XVT_DEFAULT_FONT_HEIGHT, s_buffer->cols );
+            if ( s_wnd != 0 || s_childPid != 0 )
+            {
+               appMsg = XVT_ICM_RESIZE;
+               write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+            }
+         }
+      return iOldValue;
+
+      case GTI_SCREENDEPTH:
+         return -1;
+
+      case GTI_FONTSIZE:
+         return -1;
+
+      case GTI_FONTWIDTH:
+         return -1;
+
+      case GTI_DESKTOPWIDTH:
+         return -1;
+
+      case GTI_DESKTOPHEIGHT:
+         return -1;
+
+      case GTI_DESKTOPDEPTH:
+         return -1;
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;
@@ -4113,6 +4389,9 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->ExtendedKeySupport    = HB_GT_FUNC( gt_ExtendedKeySupport );
     gt_funcs->ReadKey               = HB_GT_FUNC( gt_ReadKey );
     gt_funcs->info                  = HB_GT_FUNC( gt_info );
+    gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
+    gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
+    gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
 }
 
 /* ********************************************************************** */

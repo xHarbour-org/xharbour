@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.4 2004/01/24 16:29:40 jonnymind Exp $
+ * $Id: gx.c,v 1.5 2004/02/01 23:09:34 jonnymind Exp $
  */
 
 /*
@@ -144,6 +144,71 @@ HB_FUNC( SETGTRESIZEEVENT )
    }
 }
 
+HB_FUNC( GTSETCLIPBOARD )
+{
+   PHB_ITEM pData = hb_param( 1, HB_IT_STRING );
+   if ( pData == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "GTSETCLIPBOARD", 1, hb_paramError( 1 ) );
+   }
+   else
+   {
+      hb_gtSetClipboard( hb_itemGetCPtr( pData ), hb_itemGetCLen( pData ) );
+   }
+}
+
+HB_FUNC( GTGETCLIPBOARD )
+{
+   PHB_ITEM pData = hb_param( 1, HB_IT_STRING );
+   ULONG ulMaxLen;
+   char *szData;
+   int pCount = hb_pcount();
+
+   if ( (pData == NULL && pCount == 1) || pCount > 1 )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "GTGETCLIPBOARD", 1, hb_paramError( 1 ) );
+      return;
+   }
+
+   if ( pCount == 1 )
+   {
+      ulMaxLen = hb_itemGetCLen( pData );
+      if ( ulMaxLen == 0 )
+      {
+         return;
+      }
+      szData = hb_itemGetCPtr( pData );
+   }
+   else
+   {
+      ulMaxLen = hb_gtGetClipboardSize();
+      if ( ulMaxLen == 0 )
+      {
+         hb_retc("");
+         return;
+      }
+      szData = (char *) hb_xgrab( ulMaxLen );
+   }
+
+   hb_gtGetClipboard( szData , &ulMaxLen );
+   if ( pCount == 0 )
+   {
+      hb_retclenAdoptRaw( szData , ulMaxLen );
+   }
+
+}
+
+HB_FUNC( GTGETCLIPBOARDSIZE )
+{
+   hb_retnl(hb_gtGetClipboardSize());
+}
+
+HB_FUNC( GTPASTECLIPBOARD )
+{
+   hb_gtPasteFromClipboard( hb_parnl(1) );
+}
+
+/************************************************************************************/
 
 HB_FUNC( GTINFO )
 {

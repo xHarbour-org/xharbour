@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.36 2004/02/01 23:40:51 jonnymind Exp $
+ * $Id: gtwin.c,v 1.37 2004/02/05 12:30:53 jonnymind Exp $
  */
 
 /*
@@ -1836,6 +1836,42 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
     }
 }
 
+/* ************************** Clipboard support ********************************** */
+static char *s_clipboard = NULL;
+static int s_clipsize = 0;
+
+void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
+{
+   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
+   {
+      *pulMaxSize = s_clipsize;
+   }
+
+   if ( *pulMaxSize != 0 )
+   {
+      memcpy( szData, s_clipboard, *pulMaxSize );
+   }
+
+}
+
+void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
+{
+   if ( s_clipboard != NULL )
+   {
+      hb_xfree( s_clipboard );
+   }
+
+   s_clipboard = (char *) hb_xgrab( ulSize +1 );
+   memcpy( s_clipboard, szData, ulSize );
+   s_clipboard[ ulSize ] = '\0';
+   s_clipsize = ulSize;
+}
+
+ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
+{
+   return s_clipsize;
+}
+
 /* *********************************************************************** */
 
 int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) )
@@ -1904,6 +1940,9 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     /* extended GT functions */
 //    gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
 //    gt_funcs->SetKeyCP              = HB_GT_FUNC( gt_SetKeyCP );
+    gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
+    gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
+    gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
 }
 
 /* ********************************************************************** */

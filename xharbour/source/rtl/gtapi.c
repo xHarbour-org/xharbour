@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.20 2004/01/27 03:11:46 ronpinkas Exp $
+ * $Id: gtapi.c,v 1.21 2004/02/01 23:09:34 jonnymind Exp $
  */
 
 /*
@@ -1449,5 +1449,53 @@ BOOL HB_EXPORT hb_gtGobjectInside( HB_GT_GOBJECT *gobject,
 /******************************************************************/
 void HB_EXPORT hb_gt_hasChanged( int status )
 {
-   
+
 }
+
+/******************************************************************/
+void HB_EXPORT hb_gtGetClipboard( char *szData, ULONG *pulMaxSize )
+{
+   HB_GT_FUNC( gt_GetClipboard( szData, pulMaxSize ) );
+}
+
+void HB_EXPORT hb_gtSetClipboard( char *szData, ULONG ulSize )
+{
+   HB_GT_FUNC(gt_SetClipboard( szData, ulSize ) );
+}
+
+ULONG HB_EXPORT hb_gtGetClipboardSize( void )
+{
+   return HB_GT_FUNC(gt_GetClipboardSize());
+}
+
+void HB_EXPORT hb_gtPasteFromClipboard( ULONG ulSize )
+{
+   ULONG ulClipSize, ulPos;
+   char *szData;
+
+   if ( ulSize == 0 )
+   {
+      /* Includes the extra 0 space */
+      ulClipSize = hb_gtGetClipboardSize();
+   }
+   else
+   {
+      ulClipSize = ulSize;
+   }
+
+   if ( ulClipSize == 0 )
+   {
+      return;
+   }
+
+   szData = (char *) hb_xgrab( ulClipSize );
+   hb_gt_GetClipboard( szData, &ulClipSize );
+
+   for ( ulPos = 0; ulPos < ulClipSize; ulPos++ )
+   {
+      hb_inkeyPut( szData[ ulPos ] );
+   }
+
+   hb_xfree( szData );
+}
+

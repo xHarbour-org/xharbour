@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.h,v 1.7 2004/01/24 16:30:17 jonnymind Exp $
+ * $Id: gtxvt.h,v 1.8 2004/01/25 19:15:53 jonnymind Exp $
  */
 
 /*
@@ -75,6 +75,12 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
+
+#define XVT_DEFAULT_FONT_NAME "fixed"
+#define XVT_DEFAULT_FONT_WEIGHT "medium"
+#define XVT_DEFAULT_FONT_HEIGHT 18
+#define XVT_DEFAULT_FONT_WIDTH 9
+
 /************************************************************/
 /* Utility functions                                        */
 typedef USHORT HB_GT_CELLTYPE;
@@ -129,6 +135,8 @@ typedef USHORT HB_GT_CELLTYPE;
 #define XVT_ICM_SETCURSOR     4     // Application has changed cursor shape
 #define XVT_ICM_ADDOBJECT     10    // A new graphical object has been added
 #define XVT_ICM_CLEAROBJECTS  11    // Graphical objects deleted
+#define XVT_ICM_SETSELECTION  20    // Set X selection.
+#define XVT_ICM_GETSELECTION  21    // Set X selection.
 #define XVT_ICM_BEGIN         50
 #define XVT_ICM_QUIT          100   // App requests message loop to quit
 
@@ -302,6 +310,9 @@ typedef struct tag_x_wnddef
    XFontStruct *xfs;
    int fontHeight;
    int fontWidth;
+   
+   // useful flags;
+   USHORT usFlags;
 
    XVT_BUFFER *buffer;
    XVT_STATUS *status;
