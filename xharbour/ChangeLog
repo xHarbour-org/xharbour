@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2140 2004/01/26 01:18:12 likewolf Exp $
+ * $Id: ChangeLog,v 1.2141 2004/01/26 01:39:16 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,47 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-26 14:10 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    + Wvt_Minimize()
+      Minimizes the application window. Useful when application is engaged in 
+      long uninterrupted tasks.
+
+    + Wvt_Maximize()
+      Maximizes, I mean, restores to normal position the previously minimized
+      application window.
+     
+    + Wvt_SetOnTop()
+      Forces the application window to be as the TOPMOST window. Useful when a 
+      compulsory input is required, or, where developer wants that no other window
+      is allowed to operlap application window.
+
+    + Wvt_SetAsNormal()
+      Restores windows TOPMOST attributes to normal. It is default, maens, any other
+      window on the Desktop can be brought in focus overlapping application window.
+
+    + Wvt_SaveScreen( nTop, nLeft, nBottom, nRight )
+      Saves the designated rectangle in an array with three elelments, viz., 
+      { nWidth, nHeight, hBitmap }. The bitmap image of the rectanle is retained
+      in memory until Wvt_RestScreen() is called. So it is important that 
+      Wvt_RestScreen() must be called when current program returns.
+
+    + Wvt_RestScreen( nTop, nLeft, nBottom, nRight, aSavedScreen )
+      Flushes the bitmap referenced in <aSavedScreen> onto the designated rectangle.
+      This function must be called after Wvt_SaveScreen() just not to exhaust 
+      GDI resources of Windows.
+
+    ! Wvt_DrawLine( nTop, nLeft, nBottom, nRight, nOrientation, nFormat, nAlign, ;
+                                                       nStyle, nThick, nRgbColor )
+      Line drawing has been made more user friendly.
+
+    ! Formatting and logocal ordering of functions.
+
+  * xharbour/tests/wvtgui.prg
+    Enhanced to demonstrate above functions. A beautiful ststus bar is added. And much more.
+
+    /*   Francesco, will you please update above functionality to wvtgui.ch and wvt.prg?   */
 
 2004-01-26 02:38 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/gtxvt/gtxvt.c
