@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.126 2004/10/25 01:58:18 kaddath Exp $
+# $Id: makefile.vc,v 1.127 2004/11/03 20:11:14 paultucker Exp $
 #
 
 #
@@ -368,6 +368,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hbcrypt.obj \
    $(OBJ_DIR)$(MT)\hbffind.obj \
    $(OBJ_DIR)$(MT)\hbhex2n.obj \
+   $(OBJ_DIR)$(MT)\hbmd5.obj \
    $(OBJ_DIR)$(MT)\hboutdbg.obj \
    $(OBJ_DIR)$(MT)\hbrandom.obj \
    $(OBJ_DIR)$(MT)\hbserv.obj \
@@ -385,7 +386,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\math.obj \
    $(OBJ_DIR)$(MT)\maxrow.obj \
    $(OBJ_DIR)$(MT)\memofile.obj \
-   $(OBJ_DIR)$(MT)\txtline.obj \
    $(OBJ_DIR)$(MT)\minmax.obj \
    $(OBJ_DIR)$(MT)\mlctopos.obj \
    $(OBJ_DIR)$(MT)\mod.obj \
@@ -443,6 +443,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\trace.obj \
    $(OBJ_DIR)$(MT)\transfrm.obj \
    $(OBJ_DIR)$(MT)\trim.obj \
+   $(OBJ_DIR)$(MT)\txtline.obj \
    $(OBJ_DIR)$(MT)\type.obj \
    $(OBJ_DIR)$(MT)\val.obj \
    $(OBJ_DIR)$(MT)\valtostr.obj \
@@ -476,7 +477,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hbini.obj \
    $(OBJ_DIR)$(MT)\hblog.obj \
    $(OBJ_DIR)$(MT)\hblognet.obj \
-   $(OBJ_DIR)$(MT)\hbmd5.obj \
    $(OBJ_DIR)$(MT)\hbserial.obj \
    $(OBJ_DIR)$(MT)\input.obj \
    $(OBJ_DIR)$(MT)\listbox.obj \
@@ -496,6 +496,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\scrollbr.obj \
    $(OBJ_DIR)$(MT)\setfunc.obj \
    $(OBJ_DIR)$(MT)\setta.obj \
+   $(OBJ_DIR)$(MT)\sprintf.obj \
    $(OBJ_DIR)$(MT)\stream.obj \
    $(OBJ_DIR)$(MT)\tbcolumn.obj \
    $(OBJ_DIR)$(MT)\tbrowse.obj \

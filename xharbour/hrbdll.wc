@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.18 2004/10/25 03:07:25 kaddath Exp $
+# $Id: hrbdll.wc,v 1.19 2004/10/26 20:09:56 oh1 Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -253,6 +253,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\regex.obj \
   $(OBJ_DIR)\setfunc.obj \
   $(OBJ_DIR)\setta.obj \
+  $(OBJ_DIR)\sprintf.obj \
+  $(OBJ_DIR)\stream.obj \
   $(OBJ_DIR)\tbcolumn.obj \
   $(OBJ_DIR)\tbrowse.obj \
   $(OBJ_DIR)\tclass.obj \
@@ -1419,6 +1421,18 @@ $(OBJ_DIR)\stuff.obj : $(RTL_DIR)\stuff.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\substr.obj : $(RTL_DIR)\substr.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\sprintf.c : $(RTL_DIR)\sprintf.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\sprintf.obj : $(OBJ_DIR)\sprintf.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\stream.c : $(RTL_DIR)\stream.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\stream.obj : $(OBJ_DIR)\stream.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\tbcolumn.c : $(RTL_DIR)\tbcolumn.prg

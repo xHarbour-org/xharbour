@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.119 2004/10/25 01:58:17 kaddath Exp $
+# $Id: makefile.bc,v 1.120 2004/10/25 03:07:26 kaddath Exp $
 #
 
 #
@@ -434,7 +434,6 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\philesx.obj \
    $(RTL_OBJ_DIR)\rat.obj \
    $(RTL_OBJ_DIR)\readline.obj \
-   $(RTL_OBJ_DIR)\txtline.obj \
    $(RTL_OBJ_DIR)\regex.obj \
    $(RTL_OBJ_DIR)\replic.obj \
    $(RTL_OBJ_DIR)\right.obj \
@@ -471,6 +470,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\trace.obj \
    $(RTL_OBJ_DIR)\transfrm.obj \
    $(RTL_OBJ_DIR)\trim.obj \
+   $(RTL_OBJ_DIR)\txtline.obj \
    $(RTL_OBJ_DIR)\type.obj \
    $(RTL_OBJ_DIR)\val.obj \
    $(RTL_OBJ_DIR)\valtostr.obj \
@@ -523,6 +523,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\scrollbr.obj \
    $(RTL_OBJ_DIR)\setfunc.obj \
    $(RTL_OBJ_DIR)\setta.obj \
+   $(RTL_OBJ_DIR)\sprintf.obj \
    $(RTL_OBJ_DIR)\stream.obj \
    $(RTL_OBJ_DIR)\tbcolumn.obj \
    $(RTL_OBJ_DIR)\tbrowse.obj \
@@ -2328,6 +2329,12 @@ $(RTL_OBJ_DIR)\strcase.obj : $(RTL_DIR)\strcase.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\strdel.obj : $(RTL_DIR)\strdel.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(RTL_OBJ_DIR)\sprintf.c : $(RTL_DIR)\sprintf.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\sprintf.obj : $(RTL_OBJ_DIR)\sprintf.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\stream.c : $(RTL_DIR)\stream.prg

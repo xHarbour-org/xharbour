@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.66 2004/10/25 03:07:25 kaddath Exp $
+# $Id: hrbdll.bc,v 1.67 2004/10/26 20:09:44 oh1 Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -407,6 +407,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\win32ole.obj \
   $(OBJ_DIR)\win32prn.obj \
   $(OBJ_DIR)\traceprg.obj \
+  $(OBJ_DIR)\sprintf.obj \
   $(OBJ_DIR)\stream.obj \
   $(OBJ_DIR)\cdpesdos.obj \
   $(OBJ_DIR)\cdpesmwin.obj \
@@ -938,6 +939,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\tprinter.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\win32ole.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\win32prn.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\sprintf.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\stream.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hvm.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\fastitem.obj          + >> hdll.tmp
@@ -2345,6 +2347,12 @@ $(OBJ_DIR)\traceprg.c : $(RTL_DIR)\traceprg.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\traceprg.obj : $(OBJ_DIR)\traceprg.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\sprintf.c : $(RTL_DIR)\sprintf.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\sprintf.obj : $(OBJ_DIR)\sprintf.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\stream.c : $(RTL_DIR)\stream.prg

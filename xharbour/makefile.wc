@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.23 2004/10/25 01:58:18 kaddath Exp $
+# $Id: makefile.wc,v 1.24 2004/10/25 03:07:26 kaddath Exp $
 #
 
 #
@@ -322,6 +322,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hbcrypt.obj \
    $(RTL_OBJ_DIR)\hbffind.obj \
    $(RTL_OBJ_DIR)\hbhex2n.obj \
+   $(RTL_OBJ_DIR)\hbmd5.obj \
    $(RTL_OBJ_DIR)\hboutdbg.obj \
    $(RTL_OBJ_DIR)\hbrandom.obj \
    $(RTL_OBJ_DIR)\hbserv.obj \
@@ -339,7 +340,6 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\math.obj \
    $(RTL_OBJ_DIR)\maxrow.obj \
    $(RTL_OBJ_DIR)\memofile.obj \
-   $(RTL_OBJ_DIR)\txtline.obj \
    $(RTL_OBJ_DIR)\minmax.obj \
    $(RTL_OBJ_DIR)\mlctopos.obj \
    $(RTL_OBJ_DIR)\mpostolc.obj \
@@ -397,6 +397,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\trace.obj \
    $(RTL_OBJ_DIR)\transfrm.obj \
    $(RTL_OBJ_DIR)\trim.obj \
+   $(RTL_OBJ_DIR)\txtline.obj \
    $(RTL_OBJ_DIR)\type.obj \
    $(RTL_OBJ_DIR)\val.obj \
    $(RTL_OBJ_DIR)\valtostr.obj \
@@ -430,7 +431,6 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hbini.obj \
    $(RTL_OBJ_DIR)\hblog.obj \
    $(RTL_OBJ_DIR)\hblognet.obj \
-   $(RTL_OBJ_DIR)\hbmd5.obj \
    $(RTL_OBJ_DIR)\hbserial.obj \
    $(RTL_OBJ_DIR)\input.obj \
    $(RTL_OBJ_DIR)\listbox.obj \
@@ -450,6 +450,8 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\scrollbr.obj \
    $(RTL_OBJ_DIR)\setfunc.obj \
    $(RTL_OBJ_DIR)\setta.obj \
+   $(RTL_OBJ_DIR)\sprintf.obj \
+   $(RTL_OBJ_DIR)\stream.obj \
    $(RTL_OBJ_DIR)\tbcolumn.obj \
    $(RTL_OBJ_DIR)\tbrowse.obj \
    $(RTL_OBJ_DIR)\tclass.obj \
@@ -2113,6 +2115,18 @@ $(RTL_OBJ_DIR)\stuff.obj : $(RTL_DIR)\stuff.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(RTL_OBJ_DIR)\substr.obj : $(RTL_DIR)\substr.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(RTL_OBJ_DIR)\sprintf.c : $(RTL_DIR)\sprintf.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\sprintf.obj : $(RTL_OBJ_DIR)\sprintf.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(RTL_OBJ_DIR)\stream.c : $(RTL_DIR)\stream.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(RTL_OBJ_DIR)\stream.obj : $(RTL_OBJ_DIR)\stream.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(RTL_OBJ_DIR)\tbcolumn.c : $(RTL_DIR)\tbcolumn.prg
