@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.8 2002/07/23 01:36:43 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.9 2002/07/23 07:22:34 ronpinkas Exp $
  */
 
 /*
@@ -105,7 +105,9 @@ Procedure HB_Member( cMember, CType )
 
   IF cMember[-1] == "]"
      nAt := At( "[", cMember )
-     nLen := Val( SubStr( cMember, nAt + 1, Len( cMember ) ) )
+     //nLen := Val( SubStr( cMember, nAt + 1, Len( cMember ) ) )
+     // Support expressions like x + y, x - y, x * y
+     nLen := &( SubStr( cMember, nAt + 1, Len( cMember ) - nAt - 1 ) )
 
      aAdd( s_aActiveStructure[3], Left( cMember, nAt - 1 ) )
      aAdd( s_aActiveStructure[4], HB_CTypeArrayID( CType, nLen ) )
@@ -228,6 +230,7 @@ Function HB_CStructure( cStructure, nAlign )
       __clsAddMsg( hClass,  "Array"     , @ArrayMethod(), HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "SayMembers", @SayMembers() , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Init"      , @Init()       , HB_OO_MSG_METHOD )
+      __clsAddMsg( hClass,  "Pointer"   , @Pointer()    , HB_OO_MSG_METHOD )
 
       Counter := 1
       FOR EACH cMember IN acMembers
@@ -383,6 +386,7 @@ Function HB_CTypeArrayID( CType, nLen )
       __clsAddMsg( hClass,  "Array"     , @ArrayMethod(), HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "SayMembers", @SayMembers() , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Init"      , @Init()       , HB_OO_MSG_METHOD )
+      __clsAddMsg( hClass,  "Pointer"   , @Pointer()    , HB_OO_MSG_METHOD )
 
       FOR Counter := 1 TO nLen
          cMember := "Element_" + LTrim( Str( Counter ) )
@@ -483,7 +487,7 @@ STATIC Function Value()
 
    LOCAL aValues := {}
 
-   aScan( QSelf(), {|xVal| aAdd( aValues, xVal ) }, 1, Len( QSelf() ) - CLASS_PROPERTIES )
+   aEval( QSelf(), {|xVal| aAdd( aValues, xVal ) }, 1, Len( QSelf() ) - CLASS_PROPERTIES )
 
    QSelf():InternalBuffer := HB_ArrayToStructure( aValues, QSelf():aCTypes, QSelf():nAlign )
 
@@ -515,7 +519,7 @@ STATIC Function ArrayMethod()
 
    LOCAL aValues := {}
 
-   aScan( QSelf(), {|xVal| aAdd( aValues, xVal ) }, 1, Len( QSelf() ) - CLASS_PROPERTIES )
+   aEval( QSelf(), {|xVal| aAdd( aValues, xVal ) }, 1, Len( QSelf() ) - CLASS_PROPERTIES )
 
 Return aValues
 
@@ -533,4 +537,15 @@ STATIC Function Init( aValues )
     NEXT
 
 Return QSelf()
+
+//---------------------------------------------------------------------------//
+STATIC Function Pointer( nNewPointer )
+
+   LOCAL nPointer := HB_String2Pointer( QSelf():Buffer() )
+
+   IF nNewPointer != NIL
+      QSelf():Buffer( HB_Pointer2String( nNewPointer ), QSelf():SizeOf() )
+   ENDIF
+
+Return nPointer
 //---------------------------------------------------------------------------//
