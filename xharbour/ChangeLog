@@ -1,5 +1,5 @@
 /*                                
- * $Id: ChangeLog,v 1.909 2003/04/03 23:20:38 lculik Exp $
+ * $Id: ChangeLog,v 1.910 2003/04/03 23:22:42 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-04 12:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * include/inet.h
+  * include/hbdefs.h
+  * include/thread.h
+    ! add #define _WINSOCKAPI_  to Prevent inclusion of Winsock.h in Windows.h
+  * makefile.nt
+  * makefile.vc
+  * make_vc.bat
+    * If you set HB_MT=<anything>, enables Multi-Thread support.
+    * If you need dbfntx.lib as well as dbfntxMT.lib (for example), then
+    * you'll have to make_vc once without hb_mt set and once with.
+    * additionally, make_vc /a will still create all targets.
+  * source/vm/thread.c
+    ! added #define extern/#undef extern around #include thread.h
+    * I don't understand quite what's going on yet, but for some reason,
+    * the extern dword hb_dwCurrentStack in thread.h is over-riding the actual
+    * declaration further down in thread.c under msvc. This is not yet a proper
+    * fix
 
 2003-04-03 20:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmutils.prg

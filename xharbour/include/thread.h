@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.39 2003/03/16 06:00:32 jonnymind Exp $
+* $Id: thread.h,v 1.40 2003/03/27 07:44:56 ronpinkas Exp $
 */
 
 /*
@@ -67,6 +67,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
    #ifndef _WIN32_WINNT
       #define _WIN32_WINNT 0x0400
    #endif
+   #define _WINSOCKAPI_  // Prevents inclusion of Winsock.h in Windows.h
    #include <windows.h>
 
    #define HB_THREAD_T                 DWORD
@@ -139,7 +140,13 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       HB_VM_STACK.iCleanCount--;\
    }*/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
    extern DWORD hb_dwCurrentStack;
+#ifdef __cplusplus
+}
+#endif
    #define hb_threadGetCurrentStack() ( (HB_STACK *) TlsGetValue( hb_dwCurrentStack ) )
 
    #define HB_STACK_LOCK \

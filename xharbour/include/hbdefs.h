@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.7 2003/01/21 04:56:18 likewolf Exp $
+ * $Id: hbdefs.h,v 1.8 2003/01/26 02:48:51 likewolf Exp $
  */
 
 /*
@@ -66,6 +66,7 @@
 #if defined(HB_OS_WIN_32_USED) && defined(HB_OS_WIN_32)
 
    #define WIN32_LEAN_AND_MEAN
+   #define _WINSOCKAPI_  // Prevents inclusion of Winsock.h in Windows.h
    #include <windows.h>
    #if defined(__GNUC__)
       #define HB_DONT_DEFINE_BASIC_TYPES

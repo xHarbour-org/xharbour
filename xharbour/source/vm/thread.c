@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.67 2003/03/16 06:00:36 jonnymind Exp $
+* $Id: thread.c,v 1.68 2003/03/16 13:01:03 jonnymind Exp $
 */
 
 /*
@@ -75,8 +75,13 @@
 #include "hbapierr.h"
 #include "hbvm.h"
 #include "hbstack.h"
+#ifdef HB_OS_WIN_32
+#define extern
+#endif
 #include "thread.h"
-
+#ifdef HB_OS_WIN_32
+#undef extern
+#endif
 /* Creating a trylock for systems that have to use LWR */
 #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
 
