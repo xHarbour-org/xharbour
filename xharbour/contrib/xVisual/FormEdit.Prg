@@ -30,9 +30,9 @@ GLOBAL EXTERNAL hThisInstance
                                      super:New( oParent )
 
    METHOD Add()
-   METHOD OnPaint( hDC )     INLINE ::DrawGrid( hDC, 3 ),1
+   METHOD OnPaint( hDC )     INLINE ::DrawGrid( hDC, 3 ),0
    METHOD OnCreate()         INLINE ::CreateSub()
-
+  // METHOD OnEraseBkgnd()
    METHOD OnSize()
 
    METHOD OnCommand(nwParam) INLINE ::SubCommands( nwParam )
@@ -99,10 +99,10 @@ METHOD CreateSub()
 
    ::Add('TestButton',  TButton():New( self, 'OOPS',                       500,   0,  0, 200, 100 ) ) 
    ::Add('TestEdit',      TEdit():New( self, 'This is an edit control',    501, 210,  0, 200,  20 ) )
-   ::Add('TestCombo', TComboBox():New( self,                               502, 210, 30, 200, 100 ) )
+   ::Add('TestCombo', TComboBox():New( self, 'This is a ComboBox control', 502, 210, 30, 200, 100 ) )
    ::Add('TestText',    TStatic():New( self, 'This is a Static control',   503, 210, 55, 200,  20 ) )
-   ::Add('TestRadio',    TRadio():New( self, 'This is a &Radio Button',    504, 210, 80, 200,  20 ) )
-   ::Add('TestCheck',    TCheck():New( self, 'This is a &Check Button',    505, 210,105, 200,  20 ) )
+   ::Add('TestRadio',    TRadio():New( self, 'This is a &Radio Button',     504, 210, 80, 200,  20 ) )
+   ::Add('TestCheck',    TCheck():New( self, 'This is a &Check Button',     505, 210,105, 200,  20 ) )
 
    ::TestButton:SetFocus()
 
@@ -115,11 +115,51 @@ METHOD CreateSub()
    ::oMask:BringToTop()
    ::oMask:SetFocus()
 
-   RETURN( NIL )
+   RETURN( xRet )
+
+/*
+//----------------------------------------------------------------------------//
+
+METHOD OnEraseBkgnd(hDC)
+
+   LOCAL aRect:=GetClientRect(::Handle)
+   LOCAL i,j
+   LOCAL nColor:=rgb(0,0,0)
+   //LOCAL nRet:=super:OnEraseBkgnd(hDC)
+   FillRect(hDC,aRect,::color)
+   for i:=0 to aRect[3] step 3
+      for j:=0 to aRect[4] step 9
+         setpixel(hDC,i,j,nColor)
+      next
+   next
+
+    view "in meth"
+
+ RETURN(0) //nRet)
+*/
 
 //----------------------------------------------------------------------------//
 
+
+// __objGetValueList( oObject ) <- lists properties ?
+
 METHOD DrawGrid(hDC,nGran)
+
+/*
+
+   LOCAL i,j
+   LOCAL nColor:=rgb(0,0,0)
+
+   FOR i:=0 to ::width step 8 // <= example
+      FOR j:=0 to ::height step 8 // <= example
+         SetPixel(hDC,i,j,nColor)
+      NEXT
+   NEXT
+
+   RETURN(0)
+
+*/
+
 
    LOCAL aRect,hBrush,hOldPen,hOldBrush,hPen,hBmp
 

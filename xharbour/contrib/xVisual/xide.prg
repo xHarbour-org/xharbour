@@ -1,3 +1,5 @@
+
+
 #include "windows.ch"
 #include "wingdi.ch"
 #include "common.ch"
@@ -8,7 +10,6 @@
 #Include "winlview.ch"
 
 static oApp
-
 
 //-------------------------------------------------------------------------------------------
 
@@ -53,7 +54,7 @@ FUNCTION Main
 
       :MainFrame:Rebar:AddBand( NIL, RBBS_GRIPPERALWAYS + RBBS_NOVERT + RBBS_BREAK , :MainFrame:Rebar:Tools:handle, 110, 26, 150 , "", NIL )
 
-//----------------------------------------------------------------------------------------------
+//------------------------------------
 
       :MainFrame:Add('Status',  TStatusBar():New( :MainFrame, 'StatusBar', 1001 ) ) 
       :MainFrame:Status:SetPanels( { 150,380,480,580,-1 } )
@@ -65,7 +66,7 @@ FUNCTION Main
 
 RETURN( nil)
 
-//-------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 
 CLASS MainFrame FROM TFrame
    
@@ -76,12 +77,12 @@ CLASS MainFrame FROM TFrame
                                 ::height  := 100,;
                                 super:new( oParent )
 
-   METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Quitting Whoo', 'OnCloseQuery', MB_YESNO ) == IDYES,;
+   METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Quitting xIDE ?', 'OnCloseQuery', MB_YESNO ) == IDYES,;
                                     PostQuitMessage(0), 0 )
 
 ENDCLASS
 
-//-------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 
 CLASS SubForm1 FROM TPanel
    
@@ -100,13 +101,15 @@ CLASS SubForm1 FROM TPanel
    METHOD SubCommands()
 ENDCLASS
 
-//----------------------------------
+//----------------------------------------------------------------------------------------------
 
 METHOD SubCommands( nwParam ) CLASS SubForm1
    if nwParam == 500 
       ::MsgBox( 'HI FROM TBUTTON')
    endif
 return(nil)
+
+//----------------------------------------------------------------------------------------------
 
 METHOD CreateSub() CLASS SubForm1
 
@@ -137,4 +140,7 @@ METHOD CreateSub() CLASS SubForm1
 
 
 return( super:OnCreate() )
+
+//----------------------------------------------------------------------------------------------
+
 
