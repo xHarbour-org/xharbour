@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.13 2003/07/30 14:07:41 druzus Exp $
+ * $Id: debugger.prg,v 1.14 2003/07/31 12:51:01 druzus Exp $
  */
 
 /*
@@ -132,7 +132,7 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
                        ASize( s_oDebugger:aCallStack, Len( s_oDebugger:aCallStack ) + 1 )
                        AIns( s_oDebugger:aCallStack, 1 )
                        // nil means no line number stored yet
-                       s_oDebugger:aCallStack[ 1 ] := { cProcName, {}, nil }
+                       s_oDebugger:aCallStack[ 1 ] := { cProcName, {}, nil, nil }
                        s_oDebugger:lCodeblock := .T.
                     endif
                  endif
@@ -676,6 +676,9 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
            endif
 
       case nKey == K_ENTER
+           /* We must call :Assign() before :VarGet(), because it's no longer
+            * called on every change */
+           ::oGetListCommand:oGet:Assign()
            cCommand := ::oGetListCommand:oGet:VarGet()
 
            if ! Empty( cCommand )
@@ -742,7 +745,7 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
            ::oGetListCommand:oGet:Display()
 
       otherwise
-          ::oGetListCommand:GetApplyKey( nKey )
+	   ::oGetListCommand:GetApplyKey( nKey )
    endcase
 
 return nil
@@ -1519,7 +1522,7 @@ return nil
 METHOD Open() CLASS TDebugger
 
    local cFileName := ::InputBox( "Please enter the filename", Space( 30 ) )
-  if (cFileName != ::cPrgName .OR. valtype(::cPrgName)=='U')
+   if (cFileName != ::cPrgName .OR. valtype(::cPrgName)=='U')
       ::cPrgName := cFileName
       ::oBrwText := nil
       ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;

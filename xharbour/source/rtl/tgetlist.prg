@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.20 2003/11/12 08:42:04 andijahja Exp $
+ * $Id: tgetlist.prg,v 1.21 2003/11/21 13:22:35 lculik Exp $
  */
 
 /*
@@ -318,6 +318,8 @@ METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
    endif
 
 #endif
+   
+   DEFAULT lDelEnd TO .F.
 
    Switch nKey
       case K_UP

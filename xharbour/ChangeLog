@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1752 2003/11/22 21:35:20 druzus Exp $
+ * $Id: ChangeLog,v 1.1753 2003/11/22 21:49:40 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-11-23 04:15 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * ChangeLog
+    ! Fixed a typo in my previous ChangeLog entry.
+  * source/rtl/tgetlist.prg
+    ! Initialize lDelEnd parameter in :GetApplyKey() if not passed. This
+      fixes a crash in the debugger's command window.
+  * source/debug/debugger.prg
+    ! Borrowed the last fix by Alexander Kresin from Harbour.
+    ! Fixed the command window.
+    
 2003-11-22 19:45 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * contrib/hbzlib/zip.c
     contrib/hbzlib/zipnew.cpp
@@ -21,7 +31,7 @@
     ! fix in HB_IDLESTATE
     + new .prg function HB_IDLERESET
 
-2003-11-23 16:20 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+2003-11-22 16:20 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * include/Makefile
     ! Do not try to install the nonexistent hbgetcmt.ch file.
 
@@ -1839,13 +1849,13 @@
 
   * /tests/testwprn.prg
     minor change
+
 2003-10-10 03:15 UTC+0300 Phil Krylov <phil@mail.ru>
   * source/debug/dbgwa.prg
     * Corrected the file header.
     ! Fixed a problem with empty work areas.
 
 2003-10-10 11:57 GMT+1200 Peter Rees <peter@rees.co.nz>
-
   * /rtl/tprinter.c
     GETPRINTERS() & hb_PrinterExists() alway check EnumPrinter() & GetPrinter() bytes need
     return value & hb_xgrab() return value
