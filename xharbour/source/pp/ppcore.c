@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.31 2002/09/27 02:43:49 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.32 2002/09/30 07:26:27 ronpinkas Exp $
  */
 
 /*
@@ -135,7 +135,7 @@ static BOOL   IsIdentifier( char *szProspect );
 #define ISNAME( c )  ( isalnum( ( int ) c ) || ( c ) == '_' || ( c ) > 0x7E )
 #define MAX_NAME     255
 #define MAX_EXP      2048
-#define PATTERN_SIZE 2048
+#define PATTERN_SIZE 4096
 
 #define STATE_INIT      0
 #define STATE_NORMAL    1
@@ -219,7 +219,8 @@ char * hb_pp_szErrors[] =
    "Invalid command definitions file name: \'%s\'",
    "Too many nested #includes, can\'t open: \'%s\'",
    "Input buffer overflow",
-   "Label missing in #define \'%s\'."
+   "Label missing in #define \'%s\'.",
+   "Too many match markers in #translate or #command"
 };
 
 /* Table with warnings */
@@ -1037,6 +1038,11 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
   {
      if( *(mpatt+i) == '<' && ( i == 0 || *(mpatt+i-1) != '\\' ) )
      {
+        if( (unsigned ) lastchar == 255 )
+        {
+           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_TOO_MANY_MARKERS, NULL, NULL );
+        }
+
         /* Drag match marker, determine it type */
         explen = 0; ipos = i; i++; exptype = '0';
 
