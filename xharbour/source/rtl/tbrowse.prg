@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.27 2003/03/06 21:02:20 walito Exp $
+ * $Id: tbrowse.prg,v 1.28 2003/03/07 04:36:29 walito Exp $
  */
 
 /*
@@ -99,7 +99,7 @@
 #define o_Width        3    // Column Width
 #define o_Heading      4    // Column Headings
 #define o_Footing      5    // Column Footings
-#define o_Pict         6    // Column Picture 
+#define o_Pict         6    // Column Picture
 #define o_WidthCell    7    // Width of the Cell
 #define o_ColSep       8    // Column Seperator
 #define o_SepWidth     9    // Width of the Separator
@@ -462,7 +462,7 @@ METHOD Configure( nMode ) CLASS TBrowse
    next
 
    if nMode == 1
-      return
+      return Self
    endif
 
    do while .t.     // Reduce footer, headers and separator if the data

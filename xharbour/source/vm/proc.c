@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.3 2002/12/19 18:15:36 ronpinkas Exp $
+ * $Id: proc.c,v 1.4 2003/03/07 03:04:47 ronpinkas Exp $
  */
 
 /*
@@ -112,7 +112,6 @@ HB_FUNC( PROCFILE )
 char * hb_procinfo( int iLevel, char *szName, USHORT *uLine  )
 {
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
-   //BOOL bBlock = FALSE ;
 
    // Default and safety to empty string.
    if( szName )
@@ -127,16 +126,6 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine  )
 
    if( iLevel < 0 )
    {
-      #if 0
-      /* Is it a block evaluation or inline method? if so back one more ... */
-      if( ( strcmp( ( *pBase )->item.asSymbol.value->szName, "EVAL" ) == 0 ||
-            strcmp( ( *pBase )->item.asSymbol.value->szName, "__EVAL" ) == 0 ) &&  pBase != HB_VM_STACK.pItems )
-      {
-         pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-         bBlock = TRUE ;
-      }
-      #endif
-
       if( szName )
       {
          if( ( *( pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.170 2003/03/02 18:45:18 jonnymind Exp $
+ * $Id: hvm.c,v 1.171 2003/03/07 03:04:46 ronpinkas Exp $
  */
 
 /*
@@ -5169,8 +5169,19 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    ( * HB_VM_STACK.pPos )->item.asBlock.paramcnt = HB_PCODE_MKUSHORT( &( pCode[ 3 ] ) );
    /* store the line number where the codeblock was defined
     */
-   ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 );
-   hb_procinfo( 0, ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, &( ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno) );
+
+    if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
+    {
+       ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 1 );
+       strcpy( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, hb_objGetRealClsName( *( HB_VM_STACK.pBase + 1 ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName ) );
+       strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ":" );
+       strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
+    }
+    else
+    {
+       ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName;
+    }
+    ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
 
    hb_stackPush();
 }
@@ -5202,8 +5213,19 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    ( * HB_VM_STACK.pPos )->item.asBlock.paramcnt = 0;
    /* store the line number where the codeblock was defined
     */
-   ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 );
-   hb_procinfo( 0, ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, &( ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno) );
+   if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
+   {
+      ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 1 );
+      strcpy( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, hb_objGetRealClsName( *( HB_VM_STACK.pBase + 1 ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName ) );
+      strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ":" );
+      strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
+   }
+   else
+   {
+      ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName;
+   }
+   ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
+
    hb_stackPush();
 }
 
@@ -5233,8 +5255,19 @@ static void hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols )
    ( * HB_VM_STACK.pPos )->item.asBlock.paramcnt = HB_PCODE_MKUSHORT( &( pCode[ 3 ] ) );
    /* store the line number where the codeblock was defined
     */
-   ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 );
-   hb_procinfo( 0, ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, &( ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno) );
+    if( ( *( HB_VM_STACK.pBase + 1 ) )->type == HB_IT_ARRAY )  /* it is a method name */
+    {
+       ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = hb_xgrab( HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 1 );
+       strcpy( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, hb_objGetRealClsName( *( HB_VM_STACK.pBase + 1 ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName ) );
+       strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ":" );
+       strcat( ( * HB_VM_STACK.pPos )->item.asBlock.value->procname, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
+    }
+    else
+    {
+       ( * HB_VM_STACK.pPos )->item.asBlock.value->procname = ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName;
+    }
+    ( * HB_VM_STACK.pPos )->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
+
    hb_stackPush();
 }
 

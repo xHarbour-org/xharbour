@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.19 2003/02/26 05:36:09 jonnymind Exp $
+ * $Id: codebloc.c,v 1.20 2003/03/07 03:04:46 ronpinkas Exp $
  */
 
 /*
@@ -244,7 +244,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
 
    if( pCBlock && (--pCBlock->ulCounter == 0) )
    {
-      if( pCBlock->procname )
+      if( pCBlock->procname && strchr( pCBlock->procname, ':' ) )
       {
          hb_xfree( pCBlock->procname );
       }
@@ -290,7 +290,7 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
 
    HB_TRACE(HB_TR_INFO, ("hb_codeblockDeleteGarbage(%p)", Cargo));
 
-   if( pCBlock->procname )
+   if( pCBlock->procname && strchr( pCBlock->procname, ':' ) )
    {
       hb_xfree( pCBlock->procname );
    }
