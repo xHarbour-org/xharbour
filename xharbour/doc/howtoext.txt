@@ -10,7 +10,7 @@
                                  gc@niccolai.ws
 
 
-$Id: howtoext.txt,v 1.1 2004/02/22 16:56:40 jonnymind Exp $
+$Id: howtoext.txt,v 1.2 2004/02/23 18:23:44 mlombardo Exp $
 
 
 STATUS OF THIS DOCUMENT
@@ -26,15 +26,15 @@ ABSTRACT
 
 This is a short HOWTO targeted to explain the "correct" programming
 techniques and standards that have been developed lately by the xharbour
-core developers group. These guidelines meant to help developers
-to build extensions to xharbour language, 3d party libraries or to
+core developers group. These guidelines are meant to help developers
+to build extensions to the xharbour language, 3d party libraries or to
 contribute to the core xharbour project, both by refining older
-existing functions and add new functionalities.
+existing functions and adding new functionalities.
 
-Here it's presumed a very basic knowledge of C and xharbour/clipper
+This document presumes a very basic knowledge of C and xharbour/clipper
 "extend" api; actually, the most important things are explained, so
 you can continue reading this text even if you have never written
-an clipper extension. If you're missing details, you can consult
+a clipper extension. If you're missing details, you can consult
 the api guide (somewhere in this directory).
 
 This document is divided into four sections:
@@ -90,8 +90,8 @@ Follow those rules:
       be separated by one space from the parameter list, and every element
       should be separated by a comma then a space from the next. Statements
       before the parenthesis (i.e. function calls) should be immediately
-      followed by open brackets. Separate operators with two spaces on
-      each sides (exception: ++ and -- operators).
+      followed by open brackets. Separate operators with spaces on
+      each side ( A = B ) (exception: ++ and -- operators).
       Brackets indicating a cast should touch their content, without spaces.
       This is an example of well formatted line:
 
@@ -107,7 +107,7 @@ Follow those rules:
          statements...
       }
 
-   7) Please, try to write lots of comment. Put comments before the
+   7) Please, try to write lots of comments. Put comments before the
       instruction they refer to, with the same indentation level.
       Also, avoid absolutely trivial comments; some comments are
       more confusing than the code they wish to explain. Use //
@@ -145,10 +145,10 @@ Follow those rules:
       8) Remember to put the CVS Id Command and the xharbour disclaimer
          at the head of each file you write. It's important.
 
-      9) Place new source files in correct directories. Some common 
+      9) Place new source files in correct directories. Some common
          folders are:
 
-         source/common - shared files by compiler, macro and run time 
+         source/common - shared files by compiler, macro and run time
                          libraries in general
          source/rdd    - rdd abstract (driver independent) functions
          source/vm     - variable, function, class, memory, program flow
@@ -159,9 +159,9 @@ Follow those rules:
 
       11) When new functionality is created, always create a small, self
           contained sample in tests directory to demonstrate it.
-         
 
-Of course, no one will torture you (maybe) if you don't follow this rules,
+
+Of course, no one will torture you (maybe) if you don't follow these rules,
 but you can bet that sooner or later someone will change your code to match
 them; so, it's better to make it right from the start.
 
@@ -188,14 +188,14 @@ HB_FUNC( FUNCTION_NAME )
    // 5: Feedback logic
 }
 
-All this parts except 4 (processing logic, that is, the real job) are optionals,
+All these parts except 4 (processing logic, that is, the real job) are optional,
 and in some cases, for efficiency reason as we'll see, they may be intermixed.
 
 Let's see the various parts in detail:
 
 
-Parameter retrival logic
-========================
+Parameter retrieval logic
+=========================
 
 The first part of the function is dedicated to retrieve data passed as
 parameters from xharbour. Xharbour supports variable length parameter functions,
@@ -208,12 +208,12 @@ this helps the readers to have an immediate idea of what kind of parameters
 you are willing to receive.
 
 Unless steps 1 to 3 are exceptionally simple, use hb_param( num, TYPE ) to
-retreive parameter values; this function return NULL if the given parameter
-does not matches the kind of data you are expecting, so checks are easy
-to do. Also, older hb_parxx( num ) functions does not return any information
-of the item that were holding the data, so you won't be able to know details
-as i.e. a string length without using strlen(), which is an heavy function,
-and you will loose numeric precision hints stored in parameters. In other
+retrieve parameter values; this function return NULL if the given parameter
+does not match the kind of data you are expecting, so checks are easy
+to do. Also, older hb_parxx( num ) functions do not return any information
+of the item that was holding the data, so you won't be able to know details
+such as a string length without using strlen(), which is a heavy function,
+and you will lose numeric precision hints stored in parameters. In other
 words, generally avoid them.
 
 hb_param( num, type ); returns a PHB_ITEM, a pointer to an xharbour variable
@@ -241,9 +241,9 @@ This is a well written extension function prolog:
 
 HB_FUNC( MYFUNC )
 {
-   PHB_ITEM pName = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pAge = hb_param( 2, HB_IT_NUMERIC );  // if nil must default to 18
-   PHB_ITEM pResult = hb_param( 3, HB_IT_BYREF ); // may be NIL
+   PHB_ITEM pName   = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pAge    = hb_param( 2, HB_IT_NUMERIC );  // if nil must default to 18
+   PHB_ITEM pResult = hb_param( 3, HB_IT_BYREF );    // may be NIL
 
    USHORT usTempVar;  // parameters are over here.
    HB_ITEM hbMyInternalItem;
@@ -309,12 +309,12 @@ the system should not report any error.
 Parameter error signaling
 =========================
 
-To signal an error bound to wrong arguments, two functions has been provided:
+To signal an error bound to wrong arguments, two functions have been provided:
 they are hb_errRT_BASE_SubstR() and hb_paramError(). The first creates an
-error event that reports a list of hb_items, the second reterivs a given
+error event that reports a list of hb_items, the second retrieves a given
 argument of any kind, returning a valid PHB_ITEM with NIL value if the
 parameter is missing. hb_errRT_BASE_SubstR() also informs the VM that an
-error condition has been rised, and so triggers BEGIN SEQUENCE, TRY/CATCH or
+error condition has been raised, and so triggers BEGIN SEQUENCE, TRY/CATCH or
 default error handlers, as soon as the Virtual Machine returns in control.
 
 They both are defined in hbapierr.h:
@@ -441,7 +441,7 @@ HB_FUNC( MYFUNC )
    PHB_ITEM pAge = hb_param( 2, HB_IT_NUMERIC ); // defaults to 18
    USHORT usAge;
 
-   /* parameter cheching here;
+   /* parameter checking here;
       ripped for simplicity
    */
 
@@ -459,9 +459,9 @@ Resist the temptation to write some defaults into the parameters by using
 hb_itemPutxxxx( pParameter, someValue ); doing this my have unexpected
 results, from page faults to memory leaks, at best.
 
-There's two way to alter parameters so that the calling program receives
-the parameters changed: first method consists in having the calling program
-to pass a variable by reference with the "@" Xharbour pass-by-reference
+There are two ways to alter parameters so that the calling program receives
+the parameters changed: first method consists of having the calling program
+pass a variable by reference with the "@" Xharbour pass-by-reference
 operator, like i.e. MyFunc( @xParam ). The called function will retrieve
 that data  with hb_param( n, HB_IT_BYREF ); if the data is both input and
 output, that is, if the data must be used by the called function before
@@ -496,7 +496,7 @@ not the right type. Finally, you may wish to have the parameter passed
 by reference, but act differently if it had an initial value or if it
 was NIL.
 
-Is then also possible to alter the content of deep variables passed as
+It's then also possible to alter the content of deep variables passed as
 normal parameters; deep variables are strings, arrays, hashes, objects
 and in general any item whose PHB_ITEM->item.asXXXX.value field is
 just a pointer to "something else".
@@ -506,7 +506,7 @@ thing with no importance at all; but the item.asXXX.value field contains
 the real object as seen by the PRG program, and you may alter it at will,
 provided you change it in a consistent way.
 
-In general, you can use functions that alters arrays, hashes and strings
+In general, you can use functions that alter arrays, hashes and strings
 provided you use them respectively on arrays, hashes and strings.
 You may add items to arrays, change the value of any item, delete them
 or even shrink them and erase each one element; the calling program
@@ -594,7 +594,7 @@ may use hb_itemReturn and hb_itemReturnCopy. We'll speak about that
 in the section dedicated to memory management, as the way those
 functions are handled is quite delicate, and deserves a deeper look.
 
-hb_retxxx() does not returns immediately; this means that it's possible
+hb_retxxx() does not return immediately; this means that it's possible
 to issue more than one hb_retxxx() call; each will overwrite the previous,
 deleting the previously returned HB_ITEM. Anyhow, is quite preferable to
 have all the hb_retxxx() calls in one place, or have just one accepting some
@@ -610,7 +610,7 @@ of numbers, dates or logical entities into the VM, and translates more or less
 into a simple data copy inside the HB_VM_STACK.Return convenience item.
 
 Supported returns are a set of hb_ret functions using their parameter to create
-a new item, that is then referenced by the virtual machin return. In this
+a new item, that is then referenced by the virtual machine return. In this
 class, you can find hb_reta( ulLen ), hb_retc( szText ) and
 hb_retclen( szText, ulLen ). hb_reta returns a newly created array that has ulLen
 elements, all of them set to NIL. hb_retc abd hb_retclen return a text, creating
@@ -736,7 +736,7 @@ At the moment, xgrab() can provide also memory that may be stored inside strings
 hb_itemPutCPtr() or returned via hb_retcAdopt* function family.
 
 
-Collecatble memory
+Collectable memory
 ==================
 
 Collectable memory is subject to be collected in the case of the Virtual Machine
@@ -902,7 +902,7 @@ before the virtual machine terminates the execution, or the last complete
 collection won't be able to reclaim the objects, and a warning will be issued.
 
 
-Returning and copiyng values
+Returning and copyng values
 ============================
 
 Having the ability to save virtual machine items OUTSIDE the virtual machine may
@@ -914,7 +914,7 @@ hb_itemCopy() stores an item and its value in a locally provided item; hb_itemRe
 moves the value from our locally provided shell to the VM return item.
 hb_itemReturnCopy() does the same, but our local shell is left unaltered.
 
-Any of this function will act on the shell, but will left untouched the value. If
+Any of these functions will act on the shell, but will leave the value untouched. If
 a flat object is copied with hb_itemCopy, a change on the original flat shell would
 not be reflected in the copy, but if a deep object is copied, both the separate shells
 share the same deep value.
