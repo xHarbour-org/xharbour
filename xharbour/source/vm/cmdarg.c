@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.7 2003/06/26 12:37:09 druzus Exp $
+ * $Id: cmdarg.c,v 1.8 2003/12/15 14:09:38 druzus Exp $
  */
 
 /*
@@ -319,5 +319,17 @@ void hb_cmdargProcessVM( void )
       hb_verBuildInfo();
    }
 
+   #if defined(HB_OS_DOS) && defined(__WATCOMC__)
+
+   int iHandles;
+
+   iHandles = hb_cmdargNum( "F" );
+   
+   if ( iHandles > 20 )
+   {
+      _grow_handles( iHandles );
+   }
+   #endif
+   
    hb_traceInit();
 }

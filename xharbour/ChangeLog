@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1907 2003/12/20 01:15:57 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1908 2003/12/20 03:13:49 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,21 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-12-20 11:30 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/vm/cmdarg.c
+    * use the //F:n parameter to open more than 20 files 
+      with OpenWatcom 1.1 DOS
+  * config/rules.cf
+  * config/w32/watcom.cf
+  * config/dos/watcom.cf 
+    * all libraries now look for HB_LIB_COMPILE path
+    * added support of HB_USER_LIBS to build user apps
+    with gnu make and the config dir can be used for user applications
+    simply copying the config dir in the user app tree, creating Makefiles like
+    xHarbour ones using lib, bin, dir config files and adding app libraries to HB_USER_LIBS.
+    The build script should set HB_BIN_COMPILE, HB_LIB_COMPILE, HB_INC_COMPILE to xHarbour directories
+    and use HB_USER_FLAGS for app defines flags and include dirs
+    
 2003-12-19 00:00 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/sprintf.prg
     + Added xHarbour header

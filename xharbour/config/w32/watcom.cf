@@ -40,16 +40,19 @@ endef
 
 define link_exe_file
 echo $(LDFLAGS) NAME $@ > __link__.tmp
-echo LIB kernel32.lib, user32.lib, winspool.lib, oleaut32.lib, uuid.lib >> __link__.tmp
 $(foreach file, $^, $(link_file))
+$(foreach lib, $(HB_USER_LIBS), $(link_lib))
 $(foreach lib, $(LINKLIBS), $(link_lib))
 $(foreach lib, $(RDDLIBS), $(link_lib))
 $(foreach lib, $(GTLIBS), $(link_lib))
+echo LIB kernel32.lib, user32.lib, winspool.lib, oleaut32.lib, uuid.lib >> __link__.tmp
 -$(LD) @__link__.tmp
 endef
 
 LD = wlink
 LDFLAGS = debug all OP osn=NT OP stack=65536 OP CASEEXACT
+
+HB_USER_LIBS := $(foreach lib, $(HB_USER_LIBS), $(subst /,\,$(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)))
 
 ifeq ($(HB_LIB_COMPILE),)
 LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst /,\,$(TOP)$(ROOT)contrib/$(lib)/$(ARCH)/$(subst lib,,$(lib))))
@@ -61,11 +64,19 @@ endif
 
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rdd,$(LIBS)),rdd)
+ifeq ($(HB_LIB_COMPILE),)
 RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst /,\,$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)/$(drv)))
+else
+RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst /,\,$(HB_LIB_COMPILE)/$(drv)))
+endif
 endif
 
 ifeq ($(findstring rtl,$(LIBS)),rtl)
+ifeq ($(HB_LIB_COMPILE),)
 GTLIBS := $(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)/$(HB_GT_LIB)
+else
+GTLIBS := $(HB_LIB_COMPILE)/$(HB_GT_LIB)
+endif
 ifeq ($(HB_MULTI_GT),yes)
 GTLIBS := $(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)/gtnul
 endif
