@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3263 2004/08/03 10:36:03 paultucker Exp $
+ * $Id: ChangeLog,v 1.3264 2004/08/03 11:16:16 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-03 17:55 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+   ! fixed the hack with HB_CDX_CLIP_AUTOPEN - it cannot work in such
+     way because it will change the locking schemes for VFP
+   * COMIX and CL5.3 scheme for creating new order implemented:
+      INDEX ON .. TO .. (no TAG) => overwrite any index file with given name
+      INDEX ON .. TAG .. TO ..   => ads the Tag to index file
+      INDEX ON .. TAG .. (no TO) => add the Tag to the structural index
+     I've found that the above is intentional when I was reading COMIX
+     documentation.
 
 2004-08-03 13:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

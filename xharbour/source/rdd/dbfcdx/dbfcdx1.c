@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.146 2004/08/02 18:26:08 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.147 2004/08/03 11:16:18 druzus Exp $
  */
 
 /*
@@ -5626,7 +5626,7 @@ static ERRCODE hb_cdxGoBottom( CDXAREAP pArea )
    LPCDXTAG pTag;
    ERRCODE retval;
 
-   HB_TRACE(HB_TR_DEBUG, ("cdxGoBottom(%p)", pArea));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxGoBottom(%p)", pArea));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
@@ -5668,7 +5668,7 @@ static ERRCODE hb_cdxGoTop( CDXAREAP pArea )
    LPCDXTAG pTag;
    ERRCODE retval;
 
-   HB_TRACE(HB_TR_DEBUG, ("cdxGoTop(%p)", pArea));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxGoTop(%p)", pArea));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
@@ -5701,7 +5701,7 @@ static ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pKeyItm, BOO
 {
    LPCDXTAG pTag;
 
-   HB_TRACE(HB_TR_DEBUG, ("cdxSeek(%p, %d, %p, %d)", pArea, fSoftSeek, pKeyItm, fFindLast));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxSeek(%p, %d, %p, %d)", pArea, fSoftSeek, pKeyItm, fFindLast));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
@@ -5776,7 +5776,7 @@ static ERRCODE hb_cdxSkip( CDXAREAP pArea, LONG lToSkip )
    LPCDXTAG pTag;
    ULONG ulPos;
 
-   HB_TRACE(HB_TR_DEBUG, ("cdxSkip(%p, %ld)", pArea, lToSkip));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxSkip(%p, %ld)", pArea, lToSkip));
 
    pTag = lToSkip == 0 ? NULL : hb_cdxGetActiveTag( pArea );
    ulPos = ( pTag && CURKEY_LOGPOS( pTag ) ) ? pTag->logKeyPos : 0;
@@ -5825,7 +5825,7 @@ static ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip )
    ERRCODE retval;
    BOOL fOut = FALSE, fForward;
 
-   HB_TRACE(HB_TR_DEBUG, ("cdxSkipRaw(%p, %ld)", pArea, lToSkip));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxSkipRaw(%p, %ld)", pArea, lToSkip));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
@@ -6176,9 +6176,9 @@ static ERRCODE hb_cdxOpen( CDXAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    /* If SET_AUTOPEN open index */
 #ifdef HB_CDX_CLIP_AUTOPEN
-   if ( pArea->fHasTags && hb_set.HB_SET_AUTOPEN )
-#else
    if ( hb_set.HB_SET_AUTOPEN )
+#else
+   if ( pArea->fHasTags && hb_set.HB_SET_AUTOPEN )
 #endif
    {
       char * szFileName;
@@ -6212,7 +6212,15 @@ static ERRCODE hb_cdxOpen( CDXAREAP pArea, LPDBOPENINFO pOpenInfo )
 
          SELF_GOTOP( ( AREAP ) pArea );
       }
+      else
+      {
+         pArea->fHasTags = FALSE;
+      }
       hb_xfree( szFileName );
+   }
+   else
+   {
+      pArea->fHasTags = FALSE;
    }
 
    return SUCCESS;
@@ -6307,7 +6315,7 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
    LPCDXINDEX pIndex, pIndexTmp;
    BOOL bRetry;
 
-   HB_TRACE(HB_TR_DEBUG, ("cdxOrderListAdd(%p, %p)", pArea, pOrderInfo));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxOrderListAdd(%p, %p)", pArea, pOrderInfo));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
@@ -6447,7 +6455,7 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
  */
 static ERRCODE hb_cdxOrderListClear( CDXAREAP pArea )
 {
-   HB_TRACE(HB_TR_DEBUG, ("cdxOrderListClear(%p)", pArea));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxOrderListClear(%p)", pArea));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
@@ -6466,7 +6474,7 @@ static ERRCODE hb_cdxOrderListFocus( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
    LPCDXTAG pTag;
 
-   HB_TRACE(HB_TR_DEBUG, ("cdxOrderListFocus(%p, %p)", pArea, pOrderInfo));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxOrderListFocus(%p, %p)", pArea, pOrderInfo));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
@@ -6491,7 +6499,7 @@ static ERRCODE hb_cdxOrderListRebuild( CDXAREAP pArea )
    LPCDXINDEX pIndex, * pIndexPtr;
    USHORT uiPrevTag;
 
-   HB_TRACE(HB_TR_DEBUG, ("nb_cdxPack(%p)", pArea ));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxPack(%p)", pArea ));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
@@ -6556,7 +6564,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    pForExp = NULL;
    pExpMacro = pForMacro = NULL;
 
-   HB_TRACE(HB_TR_DEBUG, ("cdxOrderCreate(%p, %p)", pArea, pOrderInfo));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxOrderCreate(%p, %p)", pArea, pOrderInfo));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
@@ -6695,7 +6703,15 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          return FAILURE;
       }
    }
+   /*
+    * abBagName -> cBag, atomBagName -> cTag
+    * The following scheme implemented:
+    * 1. abBagName == NULL   -> add the Tag to the structural index
+    * 2. atomBagName == NULL -> overwrite any index file of abBagName
+    * 3. ads the Tag to index file
+    */
    /* Check file name */
+
    szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 3 );
    szFileName[ 0 ] = '\0';
    if ( !pOrderInfo->abBagName || ( strlen( ( char * ) pOrderInfo->abBagName ) == 0 ) )
@@ -6725,23 +6741,47 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    szCpndTagName = ( char * ) hb_xgrab( CDX_MAXTAGNAMELEN + 1 );
    hb_strncpyUpperTrim( szCpndTagName, pFileName->szName, CDX_MAXTAGNAMELEN );
    hb_xfree( pFileName );
-   if ( pOrderInfo->atomBagName && ( strlen( ( char * ) pOrderInfo->atomBagName ) > 0 ) )
+   if ( pOrderInfo->atomBagName && strlen( ( char * ) pOrderInfo->atomBagName ) > 0 )
+   {
       hb_strncpyUpperTrim( szTagName, ( char * ) pOrderInfo->atomBagName, CDX_MAXTAGNAMELEN );
+      fNewFile = FALSE;
+   }
    else
+   {
       strcpy( szTagName, szCpndTagName );
+      fNewFile = TRUE;
+   }
 
    if ( !pArea->lpdbOrdCondInfo ||
         ( pArea->lpdbOrdCondInfo->fAll && !pArea->lpdbOrdCondInfo->fAdditive ) )
       hb_cdxOrdListClear( pArea, FALSE, NULL );
 
    pIndex = hb_cdxFindBag( pArea, szFileName );
+
+   if ( fNewFile && pIndex != NULL )
+   {
+      LPCDXINDEX * pIndexPtr = &pArea->lpIndexes;
+      while ( *pIndexPtr )
+      {
+         if ( pIndex == *pIndexPtr )
+         {
+            *pIndexPtr = pIndex->pNext;
+            break;
+         }
+         pIndexPtr = &(*pIndexPtr)->pNext;
+      }
+      hb_cdxIndexFree( pIndex );
+      pIndex = NULL;
+   }
    fOpenedIndex = ( pIndex != NULL );
-   fNewFile = FALSE;
 
    if ( !fOpenedIndex )
    {
       FHANDLE hFile;
-      fNewFile = ! hb_spFile( ( BYTE * ) szFileName, szSpFile );
+
+      if ( !fNewFile )
+         fNewFile = ! hb_spFile( ( BYTE * ) szFileName, szSpFile );
+
       if ( fNewFile )
       {
          /* TODO: no API to take real file name with path */
@@ -6810,11 +6850,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    }
 
    /* Update DBF header */
-#ifdef HB_CDX_CLIP_AUTOPEN
-   if ( hb_set.HB_SET_AUTOPEN && !pArea->fHasTags )
-#else
    if ( !pArea->fHasTags )
-#endif
    {
       pFileName = hb_fsFNameSplit( pArea->szDataFileName );
       hb_strncpyUpperTrim( szFileName, pFileName->szName, CDX_MAXTAGNAMELEN );
@@ -6822,7 +6858,10 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       if ( hb_stricmp( szFileName, szCpndTagName ) == 0 )
       {
          pArea->fHasTags = TRUE;
-         SELF_WRITEDBHEADER( ( AREAP ) pArea );
+#ifdef HB_CDX_CLIP_AUTOPEN
+         if ( hb_set.HB_SET_AUTOPEN )
+#endif
+            SELF_WRITEDBHEADER( ( AREAP ) pArea );
       }
    }
    hb_xfree( szFileName );
@@ -6869,7 +6908,7 @@ static ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
    LPCDXTAG pTag;
    char * szFileName;
 
-   HB_TRACE(HB_TR_DEBUG, ("cdxOrderDestroy(%p, %p)", pArea, pOrderInfo));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxOrderDestroy(%p, %p)", pArea, pOrderInfo));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
@@ -6893,14 +6932,13 @@ static ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
                if ( pArea->lpIndexes == pIndex )
                {
                   pArea->lpIndexes = pIndex->pNext;
-#ifdef HB_CDX_CLIP_AUTOPEN
-                  if ( hb_set.HB_SET_AUTOPEN && pArea->fHasTags )
-#else
                   if ( pArea->fHasTags )
-#endif
                   {
                      pArea->fHasTags = FALSE;
-                     SELF_WRITEDBHEADER( ( AREAP ) pArea );
+#ifdef HB_CDX_CLIP_AUTOPEN
+                     if ( hb_set.HB_SET_AUTOPEN )
+#endif
+                        SELF_WRITEDBHEADER( ( AREAP ) pArea );
                   }
                }
                else
