@@ -1,0 +1,24 @@
+/*
+ * $Id: whatsnew.txt,v 1.1 2004/01/14 13:59:52 andijahja Exp $
+ */
+
+03.03.2003 v.0.1.4 alpha
+- First published release
+  supports Unicode (UCS2LE, UCS2BE) and any other charset conversion
+
+17.03.2003 v.0.1.5 alpha
+- Unicode (UTF-7 and UTF-8) added
+- Base64 added
+- Quoted-Printable added
+- URLencode added
+
+28.03.2003 v.0.1.6 alpha
+- stupid bug with UTF-8 encoding fixed (decoding was OK)
+- UU/XXencode added
+- CCITT CRC added
+- simple 32bit encryption added
+
+29.03.2003 v.0.1.7 alpha
+- YEnc YYencode added
+- CRC functions changed to support YYencode fragmental CRCing
+- Hexadecimal string representationss to integer added

@@ -1,50 +1,84 @@
+/*
+ * $Id: ChangeLog,v 1.1 2004/01/14 17:28:45 andijahja Exp $
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+2004-01-14 08:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   + contrib/unicode/util/txt2cst.c
+   + contrib/unicode/include/hbcc.ch
+   + contrib/unicode/hbcc.prg
+   + contrib/unicode/hbc7.c
+   + contrib/unicode/hbcrc16.c
+   + contrib/unicode/hbcrc32.c
+   + contrib/unicode/hbcrpt32.c
+   + contrib/unicode/hbcrpt128.c
+   + contrib/unicode/hbcu.c
+   + contrib/unicode/hbcx.c
+   + contrib/unicode/hbcy.c
+   + contrib/unicode/hbhex.c
+   + contrib/unicode/makefile.bc
+   + contrib/unicode/makefile.vc
+   + contrib/unicode/make_b32.bat
+   + contrib/unicode/make_vc.bat
+   + contrib/unicode/hbcc.txt
+   + contrib/unicode/hbcclic.txt
+   + contrib/unicode/whatsnew.txt
+   + contrib/unicode/test/c_test.prg
+   + contrib/unicode/test/cp1251.cst
+   + contrib/unicode/test/cp866.cst
+   + contrib/unicode/test/shiftjis.cst
+
 2004-01-14 08:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
    The following unicode tables have been uploaded to contrib/unicode:
-   + contrib\unicode\cst\eastasia\jis\jis0201.txt
-   + contrib\unicode\cst\eastasia\jis\jis0208.txt
-   + contrib\unicode\cst\eastasia\jis\jis0212.txt
-   + contrib\unicode\cst\eastasia\jis\shiftjis.txt
-   + contrib\unicode\cst\eastasia\other\big5.txt
-   + contrib\unicode\cst\iso8859\8859-1.TXT
-   + contrib\unicode\cst\iso8859\8859-10.TXT
-   + contrib\unicode\cst\iso8859\8859-13.TXT
-   + contrib\unicode\cst\iso8859\8859-14.TXT
-   + contrib\unicode\cst\iso8859\8859-15.TXT
-   + contrib\unicode\cst\iso8859\8859-2.TXT
-   + contrib\unicode\cst\iso8859\8859-3.TXT
-   + contrib\unicode\cst\iso8859\8859-4.TXT
-   + contrib\unicode\cst\iso8859\8859-5.TXT
-   + contrib\unicode\cst\iso8859\8859-6.TXT
-   + contrib\unicode\cst\iso8859\8859-7.TXT
-   + contrib\unicode\cst\iso8859\8859-8.TXT
-   + contrib\unicode\cst\iso8859\8859-9.TXT
-   + contrib\unicode\cst\vendor\apple\roman.txt
-   + contrib\unicode\cst\vendor\misc\cp1006.txt
-   + contrib\unicode\cst\vendor\misc\cp424.txt
-   + contrib\unicode\cst\vendor\misc\cp856.txt
-   + contrib\unicode\cst\vendor\misc\koi8-r.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp437.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp737.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp775.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp850.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp852.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp855.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp857.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp860.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp861.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp862.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp863.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp864.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp865.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp866.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp869.txt
-   + contrib\unicode\cst\vendor\ms\pc\cp874.txt
-   + contrib\unicode\cst\vendor\ms\windows\cp1250.txt
-   + contrib\unicode\cst\vendor\ms\windows\cp1251.txt
-   + contrib\unicode\cst\vendor\ms\windows\cp1252.txt
-   + contrib\unicode\cst\vendor\ms\windows\cp1253.txt
-   + contrib\unicode\cst\vendor\ms\windows\cp1254.txt
-   + contrib\unicode\cst\vendor\ms\windows\cp1255.txt
-   + contrib\unicode\cst\vendor\ms\windows\cp1256.txt
-   + contrib\unicode\cst\vendor\ms\windows\cp1257.txt
-   + contrib\unicode\cst\vendor\ms\windows\cp1258.txt
+   + contrib/unicode/cst/eastasia/jis/jis0201.txt
+   + contrib/unicode/cst/eastasia/jis/jis0208.txt
+   + contrib/unicode/cst/eastasia/jis/jis0212.txt
+   + contrib/unicode/cst/eastasia/jis/shiftjis.txt
+   + contrib/unicode/cst/eastasia/other/big5.txt
+   + contrib/unicode/cst/iso8859/8859-1.TXT
+   + contrib/unicode/cst/iso8859/8859-10.TXT
+   + contrib/unicode/cst/iso8859/8859-13.TXT
+   + contrib/unicode/cst/iso8859/8859-14.TXT
+   + contrib/unicode/cst/iso8859/8859-15.TXT
+   + contrib/unicode/cst/iso8859/8859-2.TXT
+   + contrib/unicode/cst/iso8859/8859-3.TXT
+   + contrib/unicode/cst/iso8859/8859-4.TXT
+   + contrib/unicode/cst/iso8859/8859-5.TXT
+   + contrib/unicode/cst/iso8859/8859-6.TXT
+   + contrib/unicode/cst/iso8859/8859-7.TXT
+   + contrib/unicode/cst/iso8859/8859-8.TXT
+   + contrib/unicode/cst/iso8859/8859-9.TXT
+   + contrib/unicode/cst/vendor/apple/roman.txt
+   + contrib/unicode/cst/vendor/misc/cp1006.txt
+   + contrib/unicode/cst/vendor/misc/cp424.txt
+   + contrib/unicode/cst/vendor/misc/cp856.txt
+   + contrib/unicode/cst/vendor/misc/koi8-r.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp437.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp737.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp775.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp850.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp852.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp855.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp857.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp860.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp861.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp862.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp863.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp864.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp865.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp866.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp869.txt
+   + contrib/unicode/cst/vendor/ms/pc/cp874.txt
+   + contrib/unicode/cst/vendor/ms/windows/cp1250.txt
+   + contrib/unicode/cst/vendor/ms/windows/cp1251.txt
+   + contrib/unicode/cst/vendor/ms/windows/cp1252.txt
+   + contrib/unicode/cst/vendor/ms/windows/cp1253.txt
+   + contrib/unicode/cst/vendor/ms/windows/cp1254.txt
+   + contrib/unicode/cst/vendor/ms/windows/cp1255.txt
+   + contrib/unicode/cst/vendor/ms/windows/cp1256.txt
+   + contrib/unicode/cst/vendor/ms/windows/cp1257.txt
+   + contrib/unicode/cst/vendor/ms/windows/cp1258.txt

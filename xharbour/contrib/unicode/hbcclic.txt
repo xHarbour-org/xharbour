@@ -1,0 +1,24 @@
+/*
+ * $Id: hbcclic.txt,v 1.1 2004/01/14 13:59:52 andijahja Exp $
+ */
+
+HBCC lib sources are intended to be used absolutely free in [x]Harbour
+environment. In any case I will never be responsible for anything 
+concerning it's work. I never promise I will support users but only if
+I have time and energy to answer. I even do not promise I will make any
+further development of it. Any feature requests may (but not must) be
+implemented only if I find them of some interest and have enough time
+to do this job.
+
+Just because:
+ - I'm not a professional coder for several years
+ - it is a "side effect" product of my mail/news/logs handlers
+ - and I do not want to support its users on obligatory basis
+ - and I am in deep doubts whether its main concept is optimal
+ - and "software must be free" (C) Torwalds
+ - and [x]Harbour itself is free
+ - and I really hate an idea of supervising any legal use of it.
+
+Use it, modify it, criticize it - in any way you want.
+
+WBR, Dmitry V. Korzhov (dk@april26.spb.ru)

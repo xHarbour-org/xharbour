@@ -1,0 +1,349 @@
+/*
+ * $Id: hbcc.txt,v 1.1 2004/01/14 13:59:52 andijahja Exp $
+ */
+
+HBCC project version 0.1.7 alpha
+Author: dk@april26.spb.ru
+
+Harbour project OS-independent routines for character conversion
+Test proposal version.
+Checked on Harbour/Win32 BCC 5.5.1 (Win2k and Win98SE) - OK
+and Harbour/Linux GCC 2.96 (ASPLinux 7.1) -sometimes fails :-(
+
+===
+
+Notes:
+1) There are several Unicode flavours. Now supported are:
+   a) UCS2 little Endian (low byte,high byte sequence)
+   b) UCS2 big Endian (byte inversion of a) )
+   c) UTF8 big Endian (bitstuffed b) )
+   c) UTF7 big Endian (partly base64 encoded b) )
+
+2) First bytes of valid Unicode file (not fragment) are Endian mark:
+   0xFF 0xFE for UCS2 little Endian
+   0xFE 0xFF for UCS2 big Endian
+   0xEF 0xBB 0xBF for UTF-8 big Endian
+   (I have never seen standalone UTF-7 file)
+   End program is to strip them when reading a file
+   and correctly set unicode flavour
+   and correctly insert when writing a file at start
+
+3) Other charset <-> Unicode conversion maps are implemented as external
+   charset table files (last 4 symbols are ".cst"). By default they are
+   searched in current work directory but .cst placeholder may easily be
+   altered with HBCSPATH environment variable. This implementation helps
+   to minimize memory usage while not using charset conversions and save
+   execution time in multiple conversion actions, allows to convert
+   OS-absent charsets but adds necessarity to "register" (allocate memory
+   to) charsets prior to use.
+   For maximal convenience, charset files are useful to be named as
+   "canonical_MIME_charset_name.cst" but it is not necessary.
+   I'll be pleased if anyone proposes more smart decision.
+
+4) To convert any charset from Unicode, Inc. distributed text (format A)
+   to .cst table files there is a special txt2cst.c source included.
+
+5) Now are implemented 1- and 2-byte charsets conversions.
+
+6) Maximal there may be registered up to 4096 charsets at a time
+   (you need more?).
+
+7) Added low-level (body only) support for:
+   base64,
+   UU/XXencode,
+   YEnc YYencode,
+   Quoted-Printable,
+   URLencode,
+   End program needs to separate pure encoded bodies from encodings'
+   headers and tails (and split/collect fragments properly and calculate 
+   checksums if necessary) by itself.
+
+8) Added CCITT CRC16 and CRC32 for strings or byte sequences
+
+9) Added weak encryption (32bit) - for only test'n'play purposes 
+   (it is too weak to be used in commercial software).
+===
+
+Harbour functions list:
+---
+Charset conversion functions:
+  HB_CSGETERROR()
+  HB_CSLIST()
+  HB_CSAVAIL()
+  HB_CSOPENED()
+  HB_CSREG()
+  HB_CSUNREG()
+  HB_CSTOCS()
+
+7<->8bit standard encoding functions:
+  HB_B64ENCODE()
+  HB_B64DECODE()
+  HB_QPENCODE()
+  HB_QPDECODE()
+  HB_URLENCODE()
+  HB_URLDECODE()
+  HB_UUENCODE()
+  HB_UUDECODE()
+  HB_XXENCODE()
+  HB_XXDECODE()
+  HB_YYENCODE()
+  HB_YYDECODE()
+
+CCITT CRC functions:
+  HB_CRC16()
+  HB_NCRC16()
+  HB_CRC32()
+  HB_NCRC32()
+
+Simple encryption functions:
+  HB_ENCRYPT32()
+  HB_DECRYPT32()
+
+Hex 32bit integer values show:
+  HB_NLTOHX()
+  HB_HXTONL()
+
+---
+
+HB_CSGETERROR()
+      Returns last error code from charset operations (see include file)
+   Parameters:
+      None
+   Returns
+      Error code from last operation
+
+HB_CSLIST() -> charset_string
+      returns opened charsets list
+   Parameters:
+      None
+   Returns:
+      Comma separated active charsets list as a string
+
+HB_CSOPENED(charset_name) -> charset_handle
+      returns a handle to opened charset table
+   Parameters:
+      charset_name - name of active charset table
+   Returns:
+      handle to charset or HB_CSINVALID on error
+
+HB_CSAVAIL(charset_name) -> .t. or .f.
+      Checks availability of "charset_name" .cst file
+      The sense of this function is it does not allocate memory
+      if charset_name does not need to become active.
+   Parameters:
+      charset_name - name of charset table file (.cst) without extension
+   Returns:
+      .t. if charset (table file) found, else .f.
+
+HB_CSREG(charset_name)
+      Register charset and make it active
+   Parameters:
+      charset_name - name of available charset table
+   Returns:
+      handle of opened charset table or HB_CSINVALID on error
+
+HB_CSUNREG(charset)
+      unregisters (makes inactive) unnecessary charset (frees memory)
+   Parameters:
+      charset - active charset (handle or name)
+   Returns
+      Nil
+
+HB_CSTOCS(src_string,src_charset,dst_charset) -> dst_string
+      Converts string values between charsets
+      This is main function for character conversion.
+   Parameters:
+      src_string  - source character string
+      src_charset - source active charset handle
+      dst_charset - destination active charset handle
+      ("active" means preset or previously registered with HB_CSREG())
+   Returns:
+      converted string, empty string on error
+
+HB_B64ENCODE(string) -> b64_string
+      Encodes string to base64
+   Parameters:
+      string  - source character string
+   Returns:
+      encoded string
+
+HB_B64DECODE(b64_string) -> string
+      Decodes string from base64
+   Parameters:
+      b64_string  - base64 encoded string
+   Returns:
+      decoded string
+
+HB_QPENCODE(string) -> qp_string
+      Encodes string to Quoted-Printable (=XX)
+      "Mail unsafe" characters are encoded to "=XX",
+      where XX-hexadecimal character code.
+   Parameters:
+      string  - source character string
+   Returns:
+      encoded string
+
+HB_QPDECODE(qp_string) -> string
+      Decodes string from Quoted-Printable
+   Parameters:
+      qp_string  - Quoted-Printable encoded string
+   Returns:
+      decoded string
+
+HB_URLENCODE(string) -> ue_string
+      Encodes string to URLencode (%XX)
+      "HTTP unsafe" characters are encoded to "%XX",
+      where XX-hexadecimal character code.
+   Parameters:
+      string  - source character string
+   Returns:
+      encoded string
+
+HB_URLDECODE(ue_string) -> string
+      Decodes string from URLencode
+   Parameters:
+      ue_string  - URLencode encoded string
+   Returns:
+      decoded string
+
+HB_UUENCODE(string) -> uu_string
+      Encodes string to UUencode (mail/news used)
+   Parameters:
+      string  - source character string
+   Returns:
+      UUencoded string
+
+HB_UUDECODE(uu_string) -> string
+      Decodes string from UUencode
+   Parameters:
+      uu_string  - UUencode encoded string
+   Returns:
+      decoded string
+
+HB_XXENCODE(string) -> xx_string
+      Encodes string to XXencode (some mail/news software used)
+   Parameters:
+      string  - source character string
+   Returns:
+      XXencoded string
+
+HB_XXDECODE(xx_string) -> string
+      Decodes string from XXencode
+   Parameters:
+      xx_string  - XXencode encoded string
+   Returns:
+      decoded string
+
+HB_YYENCODE(string) -> yy_string
+      Encodes string to YYencode (some YEnc aware mail/news software used)
+      NB: remember of getting CRC32 checksum for source string
+   Parameters:
+      string  - source character string
+   Returns:
+      YYencoded string
+
+HB_YYDECODE(xx_string) -> string
+      Decodes string from YYencode (1 section)
+   Parameters:
+      yy_string  - YYencode encoded string
+   Returns:
+      decoded string
+
+HB_CRC16(string) -> Crc16
+      Calculates CCITT Crc16 (16-bit Cyclic redundancy checksum)
+   Parameters:
+      string  - string variable to calculate CRC16
+   Returns:
+      Crc16 as a 2-byte string variable (high byte first)
+
+HB_CRC32(string) -> Crc32
+      Calculates CCITT Crc32 (32-bit Cyclic redundancy checksum)
+   Parameters:
+      string  - string variable to calculate CRC32
+   Returns:
+      Crc32 as a 4-byte string variable (high byte first)
+
+HB_NCRC16(string,intermed16) -> nCrc16
+      Calculates CCITT Crc16 (16-bit Cyclic redundancy checksum)
+   Parameters:
+      string     - string variable to calculate CRC16
+      intermed16 - unnecessary parameter to start from default 0
+                   as an integer (0-65535) if current string
+                   is a fragment to calculate CRC32 for entire file
+                   [HB_NCRC16(c1+c2,0)==HB_NCRC16(c2,HB_NCRC16(c1,0))]
+   Returns:
+      nCrc16 as an integer (0-65535)
+
+HB_NCRC32(string,intermed32) -> nCrc32
+      Calculates CCITT Crc32 (32-bit Cyclic redundancy checksum)
+   Parameters:
+      string     - string variable to calculate CRC32
+      intermed32 - unnecessary parameter to start from default 0
+                   as an integer (0-4294967295) if current string
+                   is a fragment to calculate CRC32 for entire file
+                   [HB_NCRC32(c1+c2,0)==HB_NCRC32(c2,HB_NCRC32(c1,0))]
+   Returns:
+      nCrc32 as an integer (0-4294967295)
+
+HB_ENCRYPT32(string,pass) -> enc_string
+      Encrypts a string
+   Parameters:
+      string - string variable to encrypt
+      pass   - string variable to calculate encryption key
+   Returns:
+      Encrypted byte sequence (size changes)
+
+HB_DECRYPT32(enc_string,pass) -> string
+      Decrypts a string
+   Parameters:
+      enc_string - encrypted byte sequence
+      pass       - string variable to calculate encryption key
+   Returns:
+      Decrypted string
+
+HB_NLTOHX(n) -> c
+      Converts integer variables to string
+   Parameters:
+      n - numeric value (0-4294967295)
+   Returns:
+      hexadecimal string ("0"-"FFFFFFFF") representation
+
+HB_HXTONL(c) -> n
+      Gets integer numeric variable from string
+   Parameters:
+      c - hexadecimal string ("0"-"FFFFFFFF") representation
+   Returns:
+      numeric value (0-4294967295)
+
+===
+
+Examples: see test\c_test.prg
+
+===
+
+Inside *.cst (file structure):
+
+---
+
+.cst file structure:
+
+Offset	Type Name&size   Description
+------	---- ----------- ---------------------------------------------------
+0x00	char name[48]    charset name string ('\0' padded),
+0x30	char chsize      Max char size (1 or 2),
+0x31	char defchar[2]  now is '?','\0' pair only (and not used yet),
+0x33	char zero1='\0'  Pad character,
+0x34	char leads[10]   5x two-byte lead bytes intervals for 2-byte charsets
+	                 (similar to MS Windows concepts),
+0x3E	char zero2='\0'  Pad character,
+0x3F	char tc2usize    number of charset-to-unicode**) tables (512 bytes each,
+	                 one for unled, others for led in natural order,
+	                 similar to MS Windows concepts)
+0x40	char tc2u[512*tc2usize]  charset-to-unicode**) tables (512 bytes each,
+	                 one for unled, others for led in natural order,
+	                 similar to MS Windows concepts)
+off*)	char tu2c[65536*chsize]  unicode-to-charset**) table, 1-byte chars
+                         in 2-byte charsets are right padded with '\0'.
+---
+*)  off=(0x10000*chsize)+(0x200*t2usize)+0x40 (in bytes)
+**) "unicode" here means UCS2 little Endian as base Unicode flavour

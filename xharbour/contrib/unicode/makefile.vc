@@ -1,0 +1,103 @@
+#
+# $Id: makefile.vc,v 1.2 2003/09/23 21:23:56 paultucker Exp $
+#
+
+#
+# Directory macros. These should never have to change.
+#
+
+INCLUDE_DIR = ..\..\include;include
+
+BIN_DIR     = ..\..\bin
+LIB_DIR     = ..\..\lib\vc
+OBJ_DIR     = ..\..\obj\vc
+
+#
+# C compiler definition and C flags. These should never have to change.
+#
+
+CC = cl
+C_FLAGS = -G6 -Ogtyb2 -FD -Gs -GA -TP -W3 -nologo $(HB_MT) -I$(INCLUDE_DIR) -DWIN32 $(C_USR) $(CFLAGS)
+CLIBFLAGS = $(C_FLAGS) -c
+CLIBFLAGSDEBUG = $(CLIBFLAGS) -Zi
+
+#
+# Macros to access our library names
+#
+
+HBCC_LIB = $(LIB_DIR)\hbcc.lib
+HARBOUR_EXE = $(BIN_DIR)\harbour.exe
+HARBOURFLAGS = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0
+
+#
+# OBJ list for hbcc.lib
+#
+
+HBCC_LIB_OBJS = \
+   $(OBJ_DIR)\hbcc.obj \
+   $(OBJ_DIR)\hbc7.obj \
+   $(OBJ_DIR)\hbcu.obj \
+   $(OBJ_DIR)\hbcx.obj \
+   $(OBJ_DIR)\hbcy.obj \
+   $(OBJ_DIR)\hbhex.obj \
+   $(OBJ_DIR)\hbcrc16.obj \
+   $(OBJ_DIR)\hbcrc32.obj \
+   $(OBJ_DIR)\hbcrpt32.obj
+
+#
+# Our default target
+#
+
+all: $(HBCC_LIB)
+
+CLEAN:
+   -@if exist $(OBJ_DIR)\hbcc.c       del $(OBJ_DIR)\hbcc.c
+   -@if exist $(OBJ_DIR)\hbcc.obj     del $(OBJ_DIR)\hbcc.obj
+   -@if exist $(OBJ_DIR)\hbc7.obj     del $(OBJ_DIR)\hbc7.obj
+   -@if exist $(OBJ_DIR)\hbcu.obj     del $(OBJ_DIR)\hbcu.obj
+   -@if exist $(OBJ_DIR)\hbcx.obj     del $(OBJ_DIR)\hbcx.obj
+   -@if exist $(OBJ_DIR)\hbcy.obj     del $(OBJ_DIR)\hbcy.obj
+   -@if exist $(OBJ_DIR)\hbhex.obj    del $(OBJ_DIR)\hbhex.obj
+   -@if exist $(OBJ_DIR)\hbcrc16.obj  del $(OBJ_DIR)\hbcrc16.obj
+   -@if exist $(OBJ_DIR)\hbcrc32.obj  del $(OBJ_DIR)\hbcrc32.obj
+   -@if exist $(OBJ_DIR)\hbcrpt32.obj del $(OBJ_DIR)\hbcrpt32.obj
+   -@if exist $(HBCC_LIB) del $(HBCC_LIB)
+
+#
+# Library dependencies and build rules
+#
+
+$(HBCC_LIB) : $(HBCC_LIB_OBJS)
+    lib /OUT:$(HBCC_LIB) $(HBCC_LIB_OBJS)
+
+#
+# HBCC dependencies
+#
+
+$(OBJ_DIR)\hbcc.obj : hbcc.prg
+    $(HARBOUR_EXE) $** $(HARBOURFLAGS) -o$*.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $*.c
+
+$(OBJ_DIR)\hbc7.obj : hbc7.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $**
+
+$(OBJ_DIR)\hbcu.obj : hbcu.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $**
+
+$(OBJ_DIR)\hbcx.obj : hbcx.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $**
+
+$(OBJ_DIR)\hbcy.obj : hbcy.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $**
+
+$(OBJ_DIR)\hbhex.obj : hbhex.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $**
+
+$(OBJ_DIR)\hbcrc16.obj : hbcrc16.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $**
+
+$(OBJ_DIR)\hbcrc32.obj : hbcrc32.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $**
+
+$(OBJ_DIR)\hbcrpt32.obj : hbcrpt32.c
+    $(CC) $(CLIBFLAGS) -Fo$@ $**
