@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1234 2003/07/10 12:50:40 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1235 2003/07/10 14:20:45 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-10 17:10 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/empty.c
+    ! Added support for LONG LONG type (without it, any check on a LONG
+      LONG for EMPTY was true).
 
 2003-07-10 16:20 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * include/hbdefs.h

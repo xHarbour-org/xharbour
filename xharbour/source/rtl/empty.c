@@ -1,5 +1,5 @@
 /*
- * $Id: empty.c,v 1.1.1.1 2001/12/21 10:41:31 ronpinkas Exp $
+ * $Id: empty.c,v 1.2 2003/05/06 08:31:39 jonnymind Exp $
  */
 
 /*
@@ -73,8 +73,14 @@ HB_FUNC( EMPTY )
          break;
 
       case HB_IT_LONG:
-         hb_retl( hb_itemGetNL( pItem ) == 0 );
+         hb_retl( hb_itemGetNL( pItem ) == 0l );
          break;
+
+#ifndef HB_LONG_LONG_OFF
+      case HB_IT_LONGLONG:
+         hb_retl( hb_itemGetNLL( pItem ) == 0l );
+         break;
+#endif
 
       case HB_IT_DOUBLE:
          hb_retl( hb_itemGetND( pItem ) == 0.0 );
