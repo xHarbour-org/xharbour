@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2250 2004/02/09 16:46:57 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2251 2004/02/09 18:00:21 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-09 10:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/itemapi.c
+    * Corrected snprintf() support for MSVC
 
 2004-02-09 18:52 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/include/gtinfo.ch
@@ -105,7 +109,7 @@ only correct the bugs I might introduce but not add new extensions.
   * contrib/hbzlib/zipnew.cpp
     !fixed all unzip function. it was not respecting the directory to extract the files
     Reported by Synvain Robert and Patrick Mast
-    
+
 2004-02-08 07:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/round.c
     ! change pow10( n ) to pow( 10, n ) for MSVC.
@@ -157,7 +161,7 @@ only correct the bugs I might introduce but not add new extensions.
     + #define K_MMMIDDLEDOWN          1013   // Mouse Move Middle Down
     + #define K_MWFORWARD             1014   // Mouse Wheel Forward
     + #define K_MWBACKWARD            1015   // Mouse Wheel Backward
- 
+
   * xharbour/source/rtl/gtwvt/gtwvt.c
     ! Updated to support above Inkey() constants.
 
@@ -210,13 +214,13 @@ I have to fix sth.
 
 2004-02-06 19:10 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/gtwvt/gtwvt.c
-  * source/rtl/gtwvt/gtwin.h 
+  * source/rtl/gtwvt/gtwin.h
     + Added OS clipboard support.
 
   * source/rtl/gtapi.c
   * source/rtl/gx.c
     ! fixed some little overflows
-    
+
   * tests/clipbrd.prg
     * Added some comment.
 
@@ -332,7 +336,7 @@ I have to fix sth.
       /* I don't know why you wished to ingore those chars, but anything
          you wanted to do MUST be done in a different way.
       */
-      
+
 2004-02-05 00:03 UTC-0600 Vicente Guerra <vic@guerra.com.mx>
   * makefile.bc
     ! $(CFLAGS) was overwritten when hbrunmt.exe is created.

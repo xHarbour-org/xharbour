@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.67 2004/02/08 04:31:39 walito Exp $
+ * $Id: itemapi.c,v 1.68 2004/02/09 18:00:38 druzus Exp $
  */
 
 /*
@@ -83,6 +83,12 @@
 
 #if !defined(__DJGPP__)
 #include <math.h> /* For log() */
+#endif
+
+#include <stdio.h>
+
+#if defined( _MSC_VER )
+   #define snprintf _snprintf
 #endif
 
 #include "hbapi.h"
@@ -1457,7 +1463,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
          }
       }
    }
-   else 
+   else
    {
       switch( pNumber->type & ~HB_IT_BYREF )
       {
@@ -1481,7 +1487,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
                iBytes = snprintf( szResult, iSize + 1, "%*Ld.%0*u", iSize - iDec - 1, pNumber->item.asLongLong.value, iDec, 0 );
             else
                iBytes = snprintf( szResult, iSize + 1, "%*Ld", iSize, pNumber->item.asLongLong.value );
-		  
+
             break;
 #endif
 
@@ -1830,7 +1836,7 @@ PHB_ITEM HB_EXPORT hb_itemPutNLL( PHB_ITEM pItem, LONGLONG llNumber )
    pItem->type = HB_IT_LONGLONG;
    pItem->item.asLongLong.length = 20;
    pItem->item.asLongLong.value = llNumber;
-  
+
    return pItem;
 }
 
