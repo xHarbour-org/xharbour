@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.67 2003/06/30 22:29:05 walito Exp $
+ * $Id: hbapi.h,v 1.68 2003/07/05 17:30:50 lculik Exp $
  */
 
 /*
@@ -570,7 +570,6 @@ extern char * hb_getenv( const char * name );
    #define HB_I_( x ) x
 #endif
  /* long Double support */
-#ifndef 
 
 
 
