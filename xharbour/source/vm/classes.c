@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.101 2004/02/24 17:27:18 ronpinkas Exp $
+ * $Id: classes.c,v 1.102 2004/02/25 12:57:55 toninhofwi Exp $
  */
 
 /*
@@ -1359,6 +1359,10 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, LONG lID_or_FuncPointer_or_B
       else if (strcmp( ".OR.", szMessage) == 0 )
       {
          pMessage = hb_dynsymGet( "__OpOr" ) ;
+      }
+      else if( strcmp( "[]", szMessage ) == 0 )
+      {
+         pMessage = hb_dynsymGet( "__OpArrayIndex" ) ;
       }
       else
       {

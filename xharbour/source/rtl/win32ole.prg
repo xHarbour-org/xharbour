@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.39 2004/02/04 01:15:12 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.40 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -190,6 +190,8 @@ CLASS TOleAuto
    METHOD Invoke( cMember, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 )
    METHOD Set( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 )
    METHOD Get( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, uParam8, uParam9 )
+
+   METHOD Collection( xIndex, xValue ) OPERATOR "[]"
 
    ERROR HANDLER OnError()
 
@@ -567,6 +569,16 @@ METHOD Get( cProperty, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 ) CL
    ENDIF
 
 RETURN uObj
+
+//--------------------------------------------------------------------
+
+METHOD Collection( xIndex, xValue ) CLASS TOleAuto
+
+   IF PCount() == 1
+      RETURN ::Item( xIndex )
+   ENDIF
+
+RETURN ::SetItem( xIndex, xValue )
 
 //--------------------------------------------------------------------
 

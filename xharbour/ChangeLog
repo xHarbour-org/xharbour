@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2436 2004/03/01 09:54:51 andijahja Exp $
+ * $Id: ChangeLog,v 1.2437 2004/03/01 22:00:37 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-01 15:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/hvm.c
+    * Enahnced hb_vmOperatorCall() to accept 4th optional PHB_ITEM argument.
+    + Added Array[Index] operator overloading support in hb_vmArrayPush() and hb_vmArrayPop().
+
+  * source/vm/classes.c
+    + Added [] operator overloading support.
+
+  * source/rtl/win32ole.prg
+    + Added Method Collection( xIndex, xValue ) OPERATOR "[]"
+
 2004-03-02 05:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * include/hbapifs.h
   * source/rtl/direct.c
@@ -28,7 +40,7 @@
   * xharbour/debug/tbrwtext.prg
     - Removed Up(), Down(), PageUp(), PageDown(), Left(), Right(), GoTop(), GoBottom() Methods
       in Class TBrwText causing recursion as the same were introduced in TEditor() recently.
-    
+
     /* I am sorry, I could not preceive TEditor() was being used in Debugger as I never use it.
        If TEditor() class is inherited in some other classes let me know.
        Phil and Paul, will you please confirm if my changes are correct!
