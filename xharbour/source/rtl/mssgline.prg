@@ -1,5 +1,5 @@
 /*
- * $Id: mssgline.prg,v 1.1 2003/01/27 04:13:51 walito Exp $
+ * $Id: mssgline.prg,v 1.2 2003/06/22 05:34:29 ronpinkas Exp $
  */
 
 /*
@@ -50,7 +50,6 @@
  *
  */
 
-#include "hbsetup.ch"
 #include "hbclass.ch"
 
 #ifdef HB_COMPAT_C53
@@ -97,7 +96,6 @@ METHOD New( nRow, nLeft, nRight, cColor ) CLASS MssgLine
 
    ::aMsg := { ::Flag, nRow, nLeft, nRight, ::Color ,,,,, }
                                                  // GUI not yet supported
-
 return Self
 
 METHOD SaveScreen() CLASS MssgLine
@@ -200,7 +198,6 @@ METHOD Show( oMenu, lMode ) CLASS MenuMssgLine
    ENDIF
    MSetCursor( mlOldState )
 
-   RETURN ( .T. )
+RETURN .T.
 
 #endif
-
