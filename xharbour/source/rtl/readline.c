@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.1 2003/12/08 01:36:13 mlombardo Exp $
+ * $Id: readline.c,v 1.2 2003/12/08 01:45:07 mlombardo Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 
 USHORT HB_EXPORT hb_fsReadLine( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiMaxLineLen, char ** Term, int * iTermSizes, USHORT iTerms  )
 {
-   USHORT protos, read, iPos, uiPosition;
+   USHORT uiPosTerm, read, iPos, uiPosition;
    BOOL bFound;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLine(%p, %p, %hu, %p, %p, %hu)", hFileHandle, pBuff, uiMaxLineLen, Term, iTermSizes, iTerms ));
@@ -76,15 +76,15 @@ USHORT HB_EXPORT hb_fsReadLine( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiMaxL
       for( iPos=0; iPos<read; iPos++ )
       {
          bFound = 0;
-         for( protos=0;protos < iTerms;protos++)
+         for( uiPosTerm=0;uiPosTerm < iTerms;uiPosTerm++)
          {
             /* Compare with the LAST char in every terminator */
-            if( pBuff[iPos] == Term[protos][iTermSizes[protos]-1] && (iTermSizes[protos]-1) <= iPos )
+            if( pBuff[iPos] == Term[uiPosTerm][iTermSizes[uiPosTerm]-1] && (iTermSizes[uiPosTerm]-1) <= iPos )
             {
                bFound = 1;
-               for(uiPosition=0; uiPosition < (iTermSizes[protos]-1); uiPosition++)
+               for(uiPosition=0; uiPosition < (iTermSizes[uiPosTerm]-1); uiPosition++)
                {
-                  if(Term[protos][uiPosition] != pBuff[ (iPos-iTermSizes[protos])+uiPosition+1 ])
+                  if(Term[uiPosTerm][uiPosition] != pBuff[ (iPos-iTermSizes[uiPosTerm])+uiPosition+1 ])
                   {
                      bFound = 0;
                      break;
@@ -103,10 +103,10 @@ USHORT HB_EXPORT hb_fsReadLine( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiMaxL
       }
       if(bFound)
       {
-         pBuff[iPos-iTermSizes[protos]+1] = '\0';
+         pBuff[iPos-iTermSizes[uiPosTerm]+1] = '\0';
          /* Set handle pointer in the end of the line */
          hb_fsSeek( hFileHandle, (((((long)read)-((long)iPos)))*-1)+1, FS_RELATIVE );
-         return( iPos-iTermSizes[protos] );
+         return( iPos-iTermSizes[uiPosTerm] );
       }
    }
    return( read );
