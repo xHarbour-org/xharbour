@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3507 2004/10/21 09:44:36 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3508 2004/10/21 13:02:36 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-10-21 16:27 UTC+0200 Giancarlo Niccolai <gc at niccolai dot ws>
+   * source/rtl/gtxvt/gtxvt.c
+   * source/rtl/gtxvt/gtxvt.h
+     + Added support for GTI_WINTITLE.
+
+   * tests/gtinfo.prg
+     * Just some little changes.
+
 2004-10-21 14:56 UTC+0200 Giancarlo Niccolai <gc at niccolai dot ws>
   * source/rtl/gtwin/gtwin.c
     + Added support for GTI_WINTITLE GTInfo request in gtwin. Console
@@ -15,7 +23,7 @@
   * tests/gtinfo.prg
     + Added an initial title setting that is displayed also in non
       graphical GTs (if possible).
-      
+
 2004-10-21 11:45 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/ct/files.c
     ! FileDate() and FileTime() where not correclty compiled on OS/2

@@ -2,7 +2,7 @@
  * Test to query/set properties for graphics gts
  * Under textual gts it should only properly quit
  *
- * $Id: gtinfo.prg,v 1.6 2004/08/02 01:46:17 maurifull Exp $
+ * $Id: gtinfo.prg,v 1.7 2004/10/21 13:03:02 jonnymind Exp $
  */
 #include "gtinfo.ch"
 
@@ -11,13 +11,13 @@ Function Main
 
    // try to set anyhow the name of the console
    GTInfo( GTI_WINTITLE, "GT - Info functionality test" )
-   
+
    If GTInfo(GTI_ISGRAPHIC) == 0
      ?
      ? "You are using a non graphics capable gt:"
      ? hb_gt_Version()
      ? "Press a key to end."
-     ? 
+     ?
      Inkey(0)
      Quit
    End

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.45 2004/09/26 11:26:52 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.46 2004/09/26 11:31:14 jonnymind Exp $
  */
 
 /*
@@ -2931,6 +2931,22 @@ static void xvt_processMessages( PXWND_DEF wnd )
             }
             break;
 
+            case XVT_ICM_WINTITLE:
+            {
+               USHORT usData;
+               char *name;
+
+               read( streamUpdate[0], &usData, sizeof( usData ) );
+               name = hb_xalloc( usData );
+               if ( name != 0 ) {
+                  read( streamUpdate[0], name, appMsg );
+                  XStoreName( wnd->dpy, wnd->window, name );
+                  XSetIconName( wnd->dpy, wnd->window, name );
+                  hb_xfree( name );
+               }
+            }
+            break;
+
             case XVT_ICM_QUIT:
                return;
          }
@@ -4590,6 +4606,16 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
 
       case GTI_ERRORFD:
          return fileno( stderr );
+
+      case GTI_WINTITLE:
+         appMsg = XVT_ICM_WINTITLE;
+         write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+
+         appMsg = (USHORT) strlen( (char *) vpParam ) + 1;
+         write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+         write( streamUpdate[1], vpParam, appMsg );
+      return 1;
+
    }
    // DEFAULT: there's something wrong if we are here.
    return -1;
