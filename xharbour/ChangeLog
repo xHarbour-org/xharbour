@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.855 2003/03/19 08:49:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.856 2003/03/19 13:30:40 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-03-19 18:01 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/pp/pptable.c
+    ! hb_pp_topDefine = &sD___56 to hb_pp_topDefine = &sD___58
+    
 2003-03-19 14:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * include/set.ch
     ! Added _SET_TRACEFILE and _SET_TRACESTACK, and changed the

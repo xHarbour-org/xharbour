@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.14 2003/03/09 17:30:36 ronpinkas Exp $
+ * $Id: pptable.c,v 1.15 2003/03/19 08:50:11 ronpinkas Exp $
  */
 
 /*
@@ -439,7 +439,7 @@ void hb_pp_Table( void )
 
    static COMMANDS sT___01 = {0,"{","\1A00 => \1B00 [,\1C00 => \1D00] }", "TAssociativeArray({ { \1A00,\1B00 } [,{ \1C00,\1D00 } ] } )",NULL };
 
-   hb_pp_topDefine = &sD___56;
+   hb_pp_topDefine = &sD___58;
    hb_pp_topCommand = &sC___251;
    hb_pp_topTranslate = &sT___01;
 }
