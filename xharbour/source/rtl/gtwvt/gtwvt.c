@@ -1,6 +1,6 @@
 
 /*
- * $Id: gtwvt.c,v 1.16 2003/12/30 21:59:40 peterrees Exp $
+ * $Id: gtwvt.c,v 1.17 2004/01/03 09:37:53 vouchcac Exp $
  */
 
 /*
@@ -29,7 +29,7 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * the Free Software Foundation; either version 2, or (at your option )
  * any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -40,7 +40,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software; see the file COPYING.   If not, write to
  * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+ * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/ ).
  *
  * As a special exception, the Harbour Project gives permission for
  * additional uses of the text contained in its release of Harbour.
@@ -123,26 +123,26 @@
 #define YELLOW         RGB( 0xFF,0xFF,0x00 )
 #define BRIGHT_WHITE   RGB( 0xFF,0xFF,0xFF )
 
-#define WM_MY_UPDATE_CARET (WM_USER+0x0101)
+#define WM_MY_UPDATE_CARET ( WM_USER + 0x0101 )
 
 //-------------------------------------------------------------------//
 
-static TCHAR szAppName[] = TEXT("xHarbour WVT");
+static TCHAR szAppName[] = TEXT( "xHarbour WVT" );
 
 typedef struct global_data
 {
 
   POINT     PTEXTSIZE;                 // size of the fixed width font
   BOOL      FixedFont;                 // TRUE if current font is a fixed font
-  int       FixedSize[WVT_MAX_COLS];   // buffer for ExtTextOut() to emulate fixed pitch when Proportional font selected
+  int       FixedSize[ WVT_MAX_COLS ]; // buffer for ExtTextOut() to emulate fixed pitch when Proportional font selected
   USHORT    ROWS;                      // number of displayable rows in window
   USHORT    COLS;                      // number of displayable columns in window
   COLORREF  foreground;                // forground colour
   COLORREF  background;                // background colour
 
   USHORT    BUFFERSIZE;                // size of the screen text buffer
-  BYTE      byAttributes[WVT_MAX_ROWS * WVT_MAX_COLS]; // buffer with the attributes
-  BYTE      byBuffer[WVT_MAX_ROWS * WVT_MAX_COLS];     // buffer with the text to be displayed on the screen
+  BYTE      byAttributes[ WVT_MAX_ROWS * WVT_MAX_COLS ]; // buffer with the attributes
+  BYTE      byBuffer[ WVT_MAX_ROWS * WVT_MAX_COLS ];     // buffer with the text to be displayed on the screen
   BYTE      *pAttributes;              // pointer to buffer
   BYTE      *pBuffer;                  //   "     "    "
   POINT     caretPos;                  // the current caret position
@@ -151,7 +151,7 @@ typedef struct global_data
   POINT     mousePos;                  // the last mousedown position
   BOOL      MouseMove;                 // Flag to say whether to return mouse movement events
   HWND      hWnd;                      // the window handle
-  int       Keys[WVT_CHAR_QUEUE_SIZE]; // Array to hold the characters & events
+  int       Keys[ WVT_CHAR_QUEUE_SIZE ]; // Array to hold the characters & events
   int       keyPointerIn;              // Offset into key array for character to be placed
   int       keyPointerOut;             // Offset into key array of next character to read
   BOOL      displayCaret;              // flag to indicate if caret is on
@@ -161,9 +161,9 @@ typedef struct global_data
   int       fontWidth ;                // requested font width
   int       fontWeight;                // Bold level
   int       fontQuality;
-  char      fontFace[LF_FACESIZE];     // requested font face name LF_FACESIZE #defined in wingdi.h
-  int       closeEvent;                // command to return (in ReadKey) on close
-  int       shutdownEvent;             // command to return (in ReadKey) on shutdown
+  char      fontFace[ LF_FACESIZE ];   // requested font face name LF_FACESIZE #defined in wingdi.h
+  int       closeEvent;                // command to return ( in ReadKey ) on close
+  int       shutdownEvent;             // command to return ( in ReadKey ) on shutdown
   int       LastMenuEvent;             // Last menu item selected
   int       MenuKeyEvent;              // User definable event number for windows menu command
   BOOL      CentreWindow;              // True if window is to be Reset into centre of window
@@ -217,52 +217,52 @@ static int _Alt_Num[] = {
 //
 //                         private functions
 //
-static void    gt_hbInitStatics(void);
-static HWND    hb_wvt_gtCreateWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow);
-static BOOL    hb_wvt_gtInitWindow(HWND hWnd, USHORT col, USHORT row);
-static void    hb_wvt_gtResetWindowSize(HWND hWnd);
-static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-static BOOL    hb_wvt_gtAllocSpBuffer(USHORT col, USHORT row);
-static DWORD   hb_wvt_gtProcessMessages(void);
-static BOOL    hb_wvt_gtValidWindowSize(int rows, int cols, HFONT hFont);
+static void    gt_hbInitStatics( void );
+static HWND    hb_wvt_gtCreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow );
+static BOOL    hb_wvt_gtInitWindow( HWND hWnd, USHORT col, USHORT row );
+static void    hb_wvt_gtResetWindowSize( HWND hWnd );
+static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
+static BOOL    hb_wvt_gtAllocSpBuffer( USHORT col, USHORT row );
+static DWORD   hb_wvt_gtProcessMessages( void );
+static BOOL    hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont );
 
-static void    hb_wvt_gtSetCaretOn(BOOL bOn);
-static BOOL    hb_wvt_gtSetCaretPos(void);
-static void    hb_wvt_gtValidateCaret(void);
+static void    hb_wvt_gtSetCaretOn( BOOL bOn );
+static BOOL    hb_wvt_gtSetCaretPos( void );
+static void    hb_wvt_gtValidateCaret( void );
 
-static USHORT  hb_wvt_gtGetMouseX (void);
-static USHORT  hb_wvt_gtGetMouseY (void);
-static void    hb_wvt_gtSetMouseX (USHORT ix);
-static void    hb_wvt_gtSetMouseY (USHORT iy);
+static USHORT  hb_wvt_gtGetMouseX( void );
+static USHORT  hb_wvt_gtGetMouseY( void );
+static void    hb_wvt_gtSetMouseX( USHORT ix );
+static void    hb_wvt_gtSetMouseY( USHORT iy );
 
-static BOOL    hb_wvt_gtGetCharFromInputQueue (int * c);
-static void    hb_wvt_gtAddCharToInputQueue (int data);
-static void    hb_wvt_gtTranslateKey(int key, int shiftkey, int altkey, int controlkey);
+static BOOL    hb_wvt_gtGetCharFromInputQueue( int * c );
+static void    hb_wvt_gtAddCharToInputQueue( int data );
+static void    hb_wvt_gtTranslateKey( int key, int shiftkey, int altkey, int controlkey );
 
-static void    hb_wvt_gtSetInvalidRect(USHORT left, USHORT top, USHORT right, USHORT bottom);
-static void    hv_wvt_gtDoInvalidateRect(void);
+static void    hb_wvt_gtSetInvalidRect( USHORT left, USHORT top, USHORT right, USHORT bottom );
+static void    hv_wvt_gtDoInvalidateRect( void );
 
-static void    hb_wvt_gtHandleMenuSelection(int);
-static int     hb_wvt_gtGetCloseEvent(void);
-static int     hb_wvt_gtGetShutdownEvent(void);
+static void    hb_wvt_gtHandleMenuSelection( int );
+static int     hb_wvt_gtGetCloseEvent( void );
+static int     hb_wvt_gtGetShutdownEvent( void );
 
-static POINT   hb_wvt_gtGetColRowFromXY( USHORT x, USHORT y);
-static RECT    hb_wvt_gtGetColRowFromXYRect( RECT xy);
-static POINT   hb_wvt_gtGetColRowForTextBuffer(USHORT index);
-static POINT   hb_wvt_gtGetXYFromColRow( USHORT col, USHORT row);
-static void    hb_wvt_gtValidateCol(void);
-static void    hb_wvt_gtValidateRow(void);
+static POINT   hb_wvt_gtGetColRowFromXY( USHORT x, USHORT y );
+static RECT    hb_wvt_gtGetColRowFromXYRect( RECT xy );
+static POINT   hb_wvt_gtGetColRowForTextBuffer( USHORT index );
+static POINT   hb_wvt_gtGetXYFromColRow( USHORT col, USHORT row );
+static void    hb_wvt_gtValidateCol( void );
+static void    hb_wvt_gtValidateRow( void );
 
-static USHORT  hb_wvt_gtCalcPixelHeight(void);
-static USHORT  hb_wvt_gtCalcPixelWidth(void);
-static BOOL    hb_wvt_gtSetColors(HDC hdc, BYTE attr);
-static HFONT   hb_wvt_gtGetFont(char * pszFace, int iHeight, int iWidth, int iWeight, int iQuality, int iCodePage);
+static USHORT  hb_wvt_gtCalcPixelHeight( void );
+static USHORT  hb_wvt_gtCalcPixelWidth( void );
+static BOOL    hb_wvt_gtSetColors( HDC hdc, BYTE attr );
+static HFONT   hb_wvt_gtGetFont( char * pszFace, int iHeight, int iWidth, int iWeight, int iQuality, int iCodePage );
 
-static BOOL    hb_wvt_gtTextOut(HDC hdc, USHORT col, USHORT row, LPCTSTR lpString,  USHORT cbString  );
-static void    hb_wvt_gtSetStringInTextBuffer(USHORT col, USHORT row, BYTE attr, BYTE *sBuffer, USHORT length);
-static USHORT  hb_wvt_gtGetIndexForTextBuffer(USHORT col, USHORT row);
-static RECT    hb_wvt_gtGetXYFromColRowRect( RECT colrow);
-static RECT    hb_wvt_gtGetColRowFromXYRect( RECT xy);
+static BOOL    hb_wvt_gtTextOut( HDC hdc, USHORT col, USHORT row, LPCTSTR lpString,  USHORT cbString  );
+static void    hb_wvt_gtSetStringInTextBuffer( USHORT col, USHORT row, BYTE attr, BYTE *sBuffer, USHORT length );
+static USHORT  hb_wvt_gtGetIndexForTextBuffer( USHORT col, USHORT row );
+static RECT    hb_wvt_gtGetXYFromColRowRect( RECT colrow );
+static RECT    hb_wvt_gtGetColRowFromXYRect( RECT xy );
 
 //-------------------------------------------------------------------//
 //
@@ -292,10 +292,9 @@ static int s_iStdIn, s_iStdOut, s_iStdErr;
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))
+void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ) )
 {
-
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
+    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Init()" ) );
 
     /* stdin && stdout && stderr */
     s_iStdIn  = iFilenoStdin;
@@ -304,8 +303,8 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
     s_usOldCurStyle = s_usCursorStyle = SC_NORMAL;
     gt_hbInitStatics();
-    _s.hWnd = hb_wvt_gtCreateWindow( (HINSTANCE) hb_hInstance,  (HINSTANCE) hb_hPrevInstance,  "", hb_iCmdShow);
-    if (!_s.hWnd)
+    _s.hWnd = hb_wvt_gtCreateWindow( ( HINSTANCE ) hb_hInstance, ( HINSTANCE ) hb_hPrevInstance,  "", hb_iCmdShow );
+    if ( !_s.hWnd )
     {
       //  Runtime error
       //
@@ -313,24 +312,25 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
     }
     if( b_MouseEnable )
     {
-      HB_GT_FUNC(mouse_Init());
+      HB_GT_FUNC( mouse_Init() );
     }
 }
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(gt_Exit( void ))
+void HB_GT_FUNC( gt_Exit( void ) )
 {
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
-    if (_s.hWnd)
+    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Exit()" ) );
+
+    if ( _s.hWnd )
     {
-      DestroyWindow(_s.hWnd);
+      DestroyWindow( _s.hWnd );
     }
-    UnregisterClass(szAppName,(HINSTANCE) hb_hInstance);
+    UnregisterClass( szAppName,( HINSTANCE ) hb_hInstance );
 
     if( b_MouseEnable )
     {
-       HB_GT_FUNC(mouse_Exit());
+       HB_GT_FUNC( mouse_Exit() );
     }
 }
 
@@ -338,45 +338,51 @@ void HB_GT_FUNC(gt_Exit( void ))
 //
 //   returns the number of displayable columns
 //
-USHORT HB_GT_FUNC(gt_GetScreenWidth( void ))
+USHORT HB_GT_FUNC( gt_GetScreenWidth( void ) )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenWidth()"));
-  return(_s.COLS);
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenWidth()" ) );
+
+  return( _s.COLS );
 }
 
 //-------------------------------------------------------------------//
 //
 //   returns the number of displayable rows
 //
-USHORT HB_GT_FUNC(gt_GetScreenHeight( void ))
+USHORT HB_GT_FUNC( gt_GetScreenHeight( void ) )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetScreenHeight()"));
-  return(_s.ROWS);
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetScreenHeight()" ) );
+
+  return( _s.ROWS );
 }
 
 //-------------------------------------------------------------------//
 
-SHORT HB_GT_FUNC(gt_Col( void ))
+SHORT HB_GT_FUNC( gt_Col( void ) )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_Col()"));
-  return(_s.caretPos.x);
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Col()" ) );
+
+  return( _s.caretPos.x );
 }
 
 //-------------------------------------------------------------------//
 
-SHORT HB_GT_FUNC(gt_Row( void ))
+SHORT HB_GT_FUNC( gt_Row( void ) )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_Row()"));
-  return(_s.caretPos.y);
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Row()" ) );
+
+  return( _s.caretPos.y );
 }
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(gt_SetPos( SHORT sRow, SHORT sCol, SHORT sMethod ))
+void HB_GT_FUNC( gt_SetPos( SHORT sRow, SHORT sCol, SHORT sMethod ) )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetPos(%hd, %hd, %hd)", sRow, sCol, sMethod));
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_SetPos( %hd, %hd, %hd )", sRow, sCol, sMethod ) );
+
   HB_SYMBOL_UNUSED( sMethod );
-  if (sRow >= 0 && sRow< _s.ROWS && sCol>=0 && sCol <= _s.COLS )
+
+  if ( sRow >= 0 && sRow< _s.ROWS && sCol>=0 && sCol <= _s.COLS )
   {
     _s.caretPos.x = sCol;
     _s.caretPos.y = sRow;
@@ -386,36 +392,42 @@ void HB_GT_FUNC(gt_SetPos( SHORT sRow, SHORT sCol, SHORT sMethod ))
 
 //-------------------------------------------------------------------//
 
-BOOL HB_GT_FUNC(gt_AdjustPos( BYTE * pStr, ULONG ulLen ))
+BOOL HB_GT_FUNC( gt_AdjustPos( BYTE * pStr, ULONG ulLen ) )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_AdjustPos(%s, %lu)", pStr, ulLen ));
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_AdjustPos( %s, %lu )", pStr, ulLen ) );
+
   HB_SYMBOL_UNUSED( pStr );
   HB_SYMBOL_UNUSED( ulLen );
-  return(FALSE);
+
+  return( FALSE );
 }
 
 //-------------------------------------------------------------------//
 
-BOOL HB_GT_FUNC(gt_IsColor( void ))
+BOOL HB_GT_FUNC( gt_IsColor( void ) )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_IsColor()"));
-  return(TRUE);
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_IsColor()" ) );
+
+  return( TRUE );
 }
 
 //-------------------------------------------------------------------//
 
-USHORT HB_GT_FUNC(gt_GetCursorStyle( void ))
+USHORT HB_GT_FUNC( gt_GetCursorStyle( void ) )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetCursorStyle()"));
-  return(s_usCursorStyle);
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetCursorStyle()" ) );
+
+  return( s_usCursorStyle );
 }
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(gt_SetCursorStyle( USHORT usStyle ))
+void HB_GT_FUNC( gt_SetCursorStyle( USHORT usStyle ) )
 {
   BOOL bCursorOn= TRUE;
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetCursorStyle(%hu)", usStyle));
+
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_SetCursorStyle( %hu )", usStyle ) );
+
   s_usCursorStyle = usStyle;
   switch( usStyle )
   {
@@ -424,44 +436,46 @@ void HB_GT_FUNC(gt_SetCursorStyle( USHORT usStyle ))
       bCursorOn= FALSE;
       break ;
     case SC_INSERT:
-      _s.CaretSize = (_s.PTEXTSIZE.y / 2) ;
+      _s.CaretSize = ( _s.PTEXTSIZE.y / 2 ) ;
       break;
     case SC_SPECIAL1:
       _s.CaretSize = _s.PTEXTSIZE.y ;
       break;
     case SC_SPECIAL2:
-      _s.CaretSize = -(_s.PTEXTSIZE.y / 2) ;
+      _s.CaretSize = -( _s.PTEXTSIZE.y / 2 ) ;
       break;
     case SC_NORMAL:
     default:
       _s.CaretSize = 4 ;
       break;
   }
-  if (bCursorOn )
+  if ( bCursorOn )
   {
-    _s.CaretExist = CreateCaret(_s.hWnd, (HBITMAP) NULL, _s.PTEXTSIZE.x, _s.CaretSize);
+    _s.CaretExist = CreateCaret( _s.hWnd, ( HBITMAP ) NULL, _s.PTEXTSIZE.x, _s.CaretSize );
   }
-  hb_wvt_gtSetCaretOn(bCursorOn);
+  hb_wvt_gtSetCaretOn( bCursorOn );
 }
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(gt_DispBegin( void ))
+void HB_GT_FUNC( gt_DispBegin( void ) )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispBegin()"));
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_DispBegin()" ) );
+
   ++s_uiDispCount;
 }
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(gt_DispEnd())
+void HB_GT_FUNC( gt_DispEnd() )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispEnd()"));
-  if (s_uiDispCount > 0)
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_DispEnd()" ) );
+
+  if ( s_uiDispCount > 0 )
   {
     --s_uiDispCount;
   }
-  if (s_uiDispCount<= 0)
+  if ( s_uiDispCount<= 0 )
   {
     hv_wvt_gtDoInvalidateRect();
   }
@@ -469,18 +483,19 @@ void HB_GT_FUNC(gt_DispEnd())
 
 //-------------------------------------------------------------------//
 
-USHORT HB_GT_FUNC(gt_DispCount())
+USHORT HB_GT_FUNC( gt_DispCount() )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispCount()"));
-  return(s_uiDispCount);
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_DispCount()" ) );
+
+  return( s_uiDispCount );
 }
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(gt_Puts( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE *pbyStr, ULONG ulLen ))
+void HB_GT_FUNC( gt_Puts( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE *pbyStr, ULONG ulLen ) )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_Puts(%hu, %hu, %d, %p, %lu)", usRow, usCol, (int) byAttr, pbyStr, ulLen));
-  hb_wvt_gtSetStringInTextBuffer( usCol, usRow, byAttr, pbyStr, ulLen);
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Puts( %hu, %hu, %d, %p, %lu )", usRow, usCol, ( int ) byAttr, pbyStr, ulLen ) );
+  hb_wvt_gtSetStringInTextBuffer( usCol, usRow, byAttr, pbyStr, ulLen );
 #ifdef WVT_DEBUG
   nCountPuts++;
 #endif
@@ -488,15 +503,17 @@ void HB_GT_FUNC(gt_Puts( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE *pbyStr, 
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(gt_Replicate( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE byChar, ULONG ulLen ))
+void HB_GT_FUNC( gt_Replicate( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE byChar, ULONG ulLen ) )
 {
-  BYTE ucBuff[WVT_CHAR_BUFFER], *byChars;
+  BYTE  ucBuff[ WVT_CHAR_BUFFER ], *byChars;
   ULONG i;
-  BOOL bMalloc = FALSE;
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_Replicate(%hu, %hu, %i, %i, %lu)", usRow, usCol, byAttr, byChar, ulLen));
-  if (ulLen > WVT_CHAR_BUFFER)
+  BOOL  bMalloc = FALSE;
+
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Replicate( %hu, %hu, %i, %i, %lu )", usRow, usCol, byAttr, byChar, ulLen ) );
+
+  if ( ulLen > WVT_CHAR_BUFFER )
   {  // Avoid allocating memory if possible
-    byChars = (BYTE*) hb_xgrab(ulLen);
+    byChars = ( BYTE* ) hb_xgrab( ulLen );
     bMalloc= TRUE;
   }
   else
@@ -504,47 +521,49 @@ void HB_GT_FUNC(gt_Replicate( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE byCh
     byChars = ucBuff ;
   }
 
-  for (i = 0; i < ulLen; i++)
+  for ( i = 0; i < ulLen; i++ )
   {
-    *(byChars+i) = byChar;
+    *( byChars+i ) = byChar;
   }
 
-  hb_wvt_gtSetStringInTextBuffer(usCol, usRow, byAttr, byChars, ulLen);
-  if (bMalloc)
+  hb_wvt_gtSetStringInTextBuffer( usCol, usRow, byAttr, byChars, ulLen );
+  if ( bMalloc )
   {
-    hb_xfree(byChars);
+    hb_xfree( byChars );
   }
 }
 
 //-------------------------------------------------------------------//
 
-int HB_GT_FUNC(gt_RectSize( USHORT rows, USHORT cols ))
+int HB_GT_FUNC( gt_RectSize( USHORT rows, USHORT cols ) )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_RectSize()"));
-  return(rows * cols * 2);
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_RectSize()" ) );
+
+  return( rows * cols * 2 );
 }
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(gt_GetText( USHORT top, USHORT left, USHORT bottom, USHORT right, BYTE * sBuffer ))
+void HB_GT_FUNC( gt_GetText( USHORT top, USHORT left, USHORT bottom, USHORT right, BYTE * sBuffer ) )
 {
   USHORT irow, icol, index, j;
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetText(%hu, %hu, %hu, %hu, %p)", top, left, bottom, right, sBuffer));
+
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetText( %hu, %hu, %hu, %hu, %p )", top, left, bottom, right, sBuffer ) );
 
   j = 0;
-  for (irow = top; irow <= bottom; irow++)
+  for ( irow = top; irow <= bottom; irow++ )
   {
-    index = hb_wvt_gtGetIndexForTextBuffer(left, irow);
-    for (icol = left; icol <= right; icol++)
+    index = hb_wvt_gtGetIndexForTextBuffer( left, irow );
+    for ( icol = left; icol <= right; icol++ )
     {
-      if (index >= _s.BUFFERSIZE)
+      if ( index >= _s.BUFFERSIZE )
       {
         break;
       }
       else
       {
-        sBuffer[j++] = _s.pBuffer[index];
-        sBuffer[j++] = _s.pAttributes[index];
+        sBuffer[ j++ ] = _s.pBuffer[ index ];
+        sBuffer[ j++ ] = _s.pAttributes[ index ];
         index++;
       }
     }
@@ -553,76 +572,77 @@ void HB_GT_FUNC(gt_GetText( USHORT top, USHORT left, USHORT bottom, USHORT right
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(gt_PutText( USHORT top, USHORT left, USHORT bottom, USHORT right, BYTE * sBuffer ))
+void HB_GT_FUNC( gt_PutText( USHORT top, USHORT left, USHORT bottom, USHORT right, BYTE * sBuffer ) )
 {
   USHORT irow, icol, index, j;
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_PutText(%hu, %hu, %hu, %hu, %p)", top, left, bottom, right, sBuffer));
+
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_PutText( %hu, %hu, %hu, %hu, %p )", top, left, bottom, right, sBuffer ) );
 
   j = 0;
-  for (irow = top; irow <= bottom; irow++)
+  for ( irow = top; irow <= bottom; irow++ )
   {
-    index = hb_wvt_gtGetIndexForTextBuffer(left, irow);
-    for (icol = left; icol <= right; icol++)
+    index = hb_wvt_gtGetIndexForTextBuffer( left, irow );
+    for ( icol = left; icol <= right; icol++ )
     {
-      if (index >= _s.BUFFERSIZE)
+      if ( index >= _s.BUFFERSIZE )
       {
         break;
       }
       else
       {
-        _s.pBuffer[index] = sBuffer[j++];
-        _s.pAttributes[index] = sBuffer[j++];
+        _s.pBuffer[ index ] = sBuffer[ j++ ];
+        _s.pAttributes[ index ] = sBuffer[ j++ ];
         index++;
       }
     }
   }
-  hb_wvt_gtSetInvalidRect(left, top, right, bottom);
+  hb_wvt_gtSetInvalidRect( left, top, right, bottom );
 }
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(gt_SetAttribute( USHORT rowStart, USHORT colStart, USHORT rowStop, USHORT colStop, BYTE attr ))
+void HB_GT_FUNC( gt_SetAttribute( USHORT rowStart, USHORT colStart, USHORT rowStop, USHORT colStop, BYTE attr ) )
 {
   USHORT irow, icol, index;
 
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d", rowStart, colStart, rowStop, colStop, (int) attr));
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_SetAttribute( %hu, %hu, %hu, %hu, %d", rowStart, colStart, rowStop, colStop, ( int ) attr ) );
 
-  for ( irow = rowStart; irow <=rowStop; irow++)
+  for ( irow = rowStart; irow <=rowStop; irow++ )
   {
-    index = hb_wvt_gtGetIndexForTextBuffer(colStart, irow);
-    for (icol = colStart; icol <= colStop; icol++)
+    index = hb_wvt_gtGetIndexForTextBuffer( colStart, irow );
+    for ( icol = colStart; icol <= colStop; icol++ )
     {
-      if (index >= _s.BUFFERSIZE)
+      if ( index >= _s.BUFFERSIZE )
       {
         break;
       }
       else
       {
-        _s.pAttributes[index++] = attr;
+        _s.pAttributes[ index++ ] = attr;
       }
     }
   }
-  hb_wvt_gtSetInvalidRect(colStart, rowStart, colStop, rowStop );
+  hb_wvt_gtSetInvalidRect( colStart, rowStart, colStop, rowStop );
 }
 
 //-------------------------------------------------------------------//
 //
 //    copied from gtwin...
 //
-void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE byAttr, SHORT iRows, SHORT iCols ))
+void HB_GT_FUNC( gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE byAttr, SHORT iRows, SHORT iCols ) )
 {
-  SHORT usSaveRow, usSaveCol;
-  UINT uiSize;
-  unsigned char ucBlank[WVT_CHAR_BUFFER], ucBuff[WVT_CHAR_BUFFER*2] ;
+  SHORT         usSaveRow, usSaveCol;
+  UINT          uiSize;
+  unsigned char ucBlank[ WVT_CHAR_BUFFER ], ucBuff[ WVT_CHAR_BUFFER * 2 ] ;
   unsigned char * fpBlank ;
   unsigned char * fpBuff  ;
-  int iLength = ( usRight - usLeft ) + 1;
-  int iCount, iColOld, iColNew, iColSize;
-  BOOL bMalloc = FALSE;
+  int           iLength = ( usRight - usLeft ) + 1;
+  int           iCount, iColOld, iColNew, iColSize;
+  BOOL          bMalloc = FALSE;
 
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_Scroll(%hu, %hu, %hu, %hu, %d, %hd, %hd)", usTop, usLeft, usBottom, usRight, (int) byAttr, iRows, iCols));
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Scroll( %hu, %hu, %hu, %hu, %d, %hd, %hd )", usTop, usLeft, usBottom, usRight, ( int ) byAttr, iRows, iCols ) );
 
-  if (iLength > WVT_CHAR_BUFFER)
+  if ( iLength > WVT_CHAR_BUFFER )
   { // Avoid allocating memory if possible
     fpBlank = ( unsigned char * ) hb_xgrab( iLength );
     fpBuff  = ( unsigned char * ) hb_xgrab( iLength * 2 );  //*2 room for attribs
@@ -648,20 +668,23 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
     iColNew -= iCols;
     iColSize += iCols;
   }
-  // use the ScrollWindowEx() where possible (Optimised for Terminal Server)
+  // use the ScrollWindowEx() where possible ( Optimised for Terminal Server )
   // if both iCols & iRows are ZERO then the entire area is to be cleared and
   // there is no advantage in using ScrollWindowEx()
-  _s.InvalidateWindow = HB_GT_FUNC(gt_DispCount()) > 0 || (!iRows && !iCols) ;
+  //
+  _s.InvalidateWindow = HB_GT_FUNC( gt_DispCount() ) > 0 || ( !iRows && !iCols ) ;
+  
   // if _s.InvalidateWindow is FALSE it is used to stop
-  //   HB_GT_FUNC(gt_Puts()) & HB_GT_FUNC(gt_PutText())
+  //   HB_GT_FUNC( gt_Puts() ) & HB_GT_FUNC( gt_PutText() )
   //   from actually updating the screen. ScrollWindowEx() is used
-  if (_s.InvalidateWindow )
+  //
+  if ( _s.InvalidateWindow )
   {
-    HB_GT_FUNC(gt_DispBegin());
+    HB_GT_FUNC( gt_DispBegin() );
   }
 
-  usSaveCol = HB_GT_FUNC(gt_Col() ) ;
-  usSaveRow = HB_GT_FUNC(gt_Row() ) ;
+  usSaveCol = HB_GT_FUNC( gt_Col() ) ;
+  usSaveRow = HB_GT_FUNC( gt_Row() ) ;
   for( iCount = ( iRows >= 0 ? usTop : usBottom );
        ( iRows >= 0 ? iCount <= usBottom : iCount >= usTop );
        ( iRows >= 0 ? iCount++ : iCount-- ) )
@@ -672,16 +695,16 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
       /* Read the text to be scrolled into the current row */
       if( ( iRows || iCols ) && iRowPos <= usBottom && iRowPos >= usTop )
       {
-        HB_GT_FUNC(gt_GetText( iRowPos, iColOld, iRowPos, iColOld + iColSize, fpBuff ));
+        HB_GT_FUNC( gt_GetText( iRowPos, iColOld, iRowPos, iColOld + iColSize, fpBuff ) );
       }
 
       /* Blank the scroll region in the current row */
-      HB_GT_FUNC(gt_Puts( iCount, usLeft, byAttr, fpBlank, iLength ));
+      HB_GT_FUNC( gt_Puts( iCount, usLeft, byAttr, fpBlank, iLength ) );
 
       /* Write the scrolled text to the current row */
       if( ( iRows || iCols ) && iRowPos <= usBottom && iRowPos >= usTop )
       {
-        HB_GT_FUNC(gt_PutText( iCount, iColNew, iCount, iColNew + iColSize, fpBuff ));
+        HB_GT_FUNC( gt_PutText( iCount, iColNew, iCount, iColNew + iColSize, fpBuff ) );
       }
   }
   HB_GT_FUNC( gt_SetPos( usSaveRow, usSaveCol, HB_GT_SET_POS_AFTER ) );
@@ -702,7 +725,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
     cr = hb_wvt_gtGetXYFromColRowRect( cr );
     ScrollWindowEx( _s.hWnd, -iCols * _s.PTEXTSIZE.x, -iRows *_s.PTEXTSIZE.y, &cr, NULL, NULL, &crInvalid, 0 ) ;
     InvalidateRect( _s.hWnd, &crInvalid, FALSE );
-    _s.InvalidateWindow= TRUE ;
+    _s.InvalidateWindow = TRUE ;
   }
   if ( bMalloc )
   {
@@ -716,45 +739,46 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
 
 //-------------------------------------------------------------------//
 //
-//    resize the (existing) window
+//    resize the ( existing ) window
 //
-BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
+BOOL HB_GT_FUNC( gt_SetMode( USHORT row, USHORT col ) )
 {
   BOOL bResult= FALSE;
   HFONT hFont;
 
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", row, col));
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_SetMode( %hu, %hu )", row, col ) );
 
-  if (row<= WVT_MAX_ROWS && col<= WVT_MAX_COLS)
+  if ( row<= WVT_MAX_ROWS && col<= WVT_MAX_COLS )
   {
-    hFont = hb_wvt_gtGetFont(_s.fontFace, _s.fontHeight, _s.fontWidth, _s.fontWeight, _s.fontQuality, _s.CodePage);
+    hFont = hb_wvt_gtGetFont( _s.fontFace, _s.fontHeight, _s.fontWidth, _s.fontWeight, _s.fontQuality, _s.CodePage );
     if ( hFont )
     {
       // make sure that the mode selected along with the current
       // font settings will fit in the window
-      if ( hb_wvt_gtValidWindowSize(row,col, hFont))
+      //
+      if ( hb_wvt_gtValidWindowSize( row,col, hFont ) )
       {
-        bResult = hb_wvt_gtInitWindow(_s.hWnd, col, row);
+        bResult = hb_wvt_gtInitWindow( _s.hWnd, col, row );
       }
-      DeleteObject(hFont);
+      DeleteObject( hFont );
     }
   }
-  return(bResult);
+  return( bResult );
 }
 
 //-------------------------------------------------------------------//
 
-BOOL HB_GT_FUNC(gt_GetBlink())
+BOOL HB_GT_FUNC( gt_GetBlink() )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetBlink()"));
-  return(TRUE);
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetBlink()" ) );
+  return( TRUE );
 }
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(gt_SetBlink( BOOL bBlink ))
+void HB_GT_FUNC( gt_SetBlink( BOOL bBlink ) )
 {
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetBlink(%d)", (int) bBlink));
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_SetBlink( %d )", ( int ) bBlink ) );
   HB_SYMBOL_UNUSED( bBlink );
 }
 
@@ -767,19 +791,20 @@ char * HB_GT_FUNC( gt_Version( void ) )
 
 //-------------------------------------------------------------------//
 
-static void HB_GT_FUNC(gt_xPutch( USHORT iRow, USHORT iCol, BYTE bAttr, BYTE bChar ))
+static void HB_GT_FUNC( gt_xPutch( USHORT iRow, USHORT iCol, BYTE bAttr, BYTE bChar ) )
 {
   USHORT index;
-  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_xPutch(%hu, %hu, %d, %i)", iRow, iCol, (int) bAttr, bChar ) );
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_xPutch( %hu, %hu, %d, %i )", iRow, iCol, ( int ) bAttr, bChar ) );
 
-  index = hb_wvt_gtGetIndexForTextBuffer(iCol, iRow);
-  if (index < _s.BUFFERSIZE )
+  index = hb_wvt_gtGetIndexForTextBuffer( iCol, iRow );
+  if ( index < _s.BUFFERSIZE )
   {
-    _s.pBuffer[index]     = bChar;
-    _s.pAttributes[index] = bAttr;
+    _s.pBuffer[ index ]     = bChar;
+    _s.pAttributes[ index ] = bAttr;
 
-    //determine bounds of rect around character to refresh
-    hb_wvt_gtSetInvalidRect(iCol, iRow, iCol, iRow);
+    //  determine bounds of rect around character to refresh
+    //
+    hb_wvt_gtSetInvalidRect( iCol, iRow, iCol, iRow );
   }
 }
 
@@ -844,13 +869,13 @@ USHORT HB_GT_FUNC( gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
         if( Col <= Right && Col < sWidth &&
                 Top >= 0 && Top < sHeight )
         {
-            HB_GT_FUNC(gt_Replicate( Top, Col, byAttr, szBox[ 1 ], Width + ( (Right - Left) > 1 ? -2 : 0 ) )); /* Top line */
+            HB_GT_FUNC( gt_Replicate( Top, Col, byAttr, szBox[ 1 ], Width + ( ( Right - Left ) > 1 ? -2 : 0 ) ) ); /* Top line */
         }
         if( Height > 1 &&
-               (Right - Left) > 1 && Right < sWidth &&
+               ( Right - Left ) > 1 && Right < sWidth &&
                Top >= 0 && Top < sHeight )
         {
-            HB_GT_FUNC(gt_xPutch( Top, Right, byAttr, szBox[ 2 ] )); /* Upper right corner */
+            HB_GT_FUNC( gt_xPutch( Top, Right, byAttr, szBox[ 2 ] ) ); /* Upper right corner */
         }
         if( szBox[ 8 ] && Height > 2 && Width > 2 )
         {
@@ -877,17 +902,17 @@ USHORT HB_GT_FUNC( gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
         }
         else
         {
-            for( Row = ( Width > 1 ? Top + 1 : Top ); Row < ( (Right - Left ) > 1 ? Bottom : Bottom + 1 ); Row++ )
+            for( Row = ( Width > 1 ? Top + 1 : Top ); Row < ( ( Right - Left ) > 1 ? Bottom : Bottom + 1 ); Row++ )
             {
                 if( Row >= 0 && Row < sHeight )
                 {
                     if( Left >= 0 && Left < sWidth )
                     {
-                        HB_GT_FUNC(gt_xPutch( Row, Left, byAttr, szBox[ 7 ] ));            /* Left side */
+                        HB_GT_FUNC( gt_xPutch( Row, Left, byAttr, szBox[ 7 ] ) );            /* Left side */
                     }
                     if( ( Width > 1 || Left < 0 ) && Right < sWidth )
                     {
-                        HB_GT_FUNC(gt_xPutch( Row, Right, byAttr, szBox[ 3 ] ));           /* Right side */
+                        HB_GT_FUNC( gt_xPutch( Row, Right, byAttr, szBox[ 3 ] ) );           /* Right side */
                     }
                 }
             }
@@ -897,7 +922,7 @@ USHORT HB_GT_FUNC( gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
         {
             if( Left >= 0 && Bottom < sHeight )
             {
-                HB_GT_FUNC(gt_xPutch( Bottom, Left, byAttr, szBox[ 6 ] ));                /* Bottom left corner */
+                HB_GT_FUNC( gt_xPutch( Bottom, Left, byAttr, szBox[ 6 ] ) );                /* Bottom left corner */
             }
             Col = Left + 1;
             if( Col < 0 )
@@ -906,18 +931,18 @@ USHORT HB_GT_FUNC( gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
             }
             if( Col <= Right && Bottom < sHeight )
             {
-                HB_GT_FUNC(gt_Replicate( Bottom, Col, byAttr, szBox[ 5 ], Width - 2 ));  /* Bottom line */
+                HB_GT_FUNC( gt_Replicate( Bottom, Col, byAttr, szBox[ 5 ], Width - 2 ) );  /* Bottom line */
             }
             if( Right < sWidth && Bottom < sHeight )
             {
-                HB_GT_FUNC(gt_xPutch( Bottom, Right, byAttr, szBox[ 4 ] ));              /* Bottom right corner */
+                HB_GT_FUNC( gt_xPutch( Bottom, Right, byAttr, szBox[ 4 ] ) );              /* Bottom right corner */
             }
         }
         HB_GT_FUNC( gt_DispEnd() );
         ret = 0;
     }
 
-    return(ret);
+    return( ret );
 }
 
 //-------------------------------------------------------------------//
@@ -967,22 +992,22 @@ USHORT HB_GT_FUNC( gt_HorizLine( SHORT Row, SHORT Left, SHORT Right, BYTE byChar
       }
       if( Left < Right )
       {
-          HB_GT_FUNC(gt_Replicate( Row, Left, byAttr, byChar, Right - Left + 1 ));
+          HB_GT_FUNC( gt_Replicate( Row, Left, byAttr, byChar, Right - Left + 1 ) );
       }
       else
       {
-          HB_GT_FUNC(gt_Replicate( Row, Right, byAttr, byChar, Left - Right + 1 ));
+          HB_GT_FUNC( gt_Replicate( Row, Right, byAttr, byChar, Left - Right + 1 ) );
       }
       ret = 0;
   }
-  return( ret);
+  return( ret );
 }
 
 //-------------------------------------------------------------------//
 //
 //   copied from gtwin
 //
-USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, BYTE byAttr ))
+USHORT HB_GT_FUNC( gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, BYTE byAttr ) )
 {
     USHORT ret     = 1;
     USHORT sWidth  = HB_GT_FUNC( gt_GetScreenWidth()  );
@@ -1017,7 +1042,7 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, 
             Bottom = Top;
         }
 
-        HB_GT_FUNC(gt_DispBegin());
+        HB_GT_FUNC( gt_DispBegin() );
 
         while( Row <= Bottom )
         {
@@ -1094,10 +1119,13 @@ int HB_GT_FUNC( gt_ReadKey( HB_inkey_enum eventmask ) )
   int  c = 0;
   BOOL bKey;
 
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_ReadKey( %d )", ( int ) eventmask ) );
+
   HB_SYMBOL_UNUSED( eventmask );                  // we ignore the eventmask!
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", ( int ) eventmask ) );
+
   hb_wvt_gtProcessMessages() ;
   bKey = hb_wvt_gtGetCharFromInputQueue( &c );
+
   return( bKey ? c : 0 );
 }
 
@@ -1105,24 +1133,24 @@ int HB_GT_FUNC( gt_ReadKey( HB_inkey_enum eventmask ) )
 //
 //   Copied from gtwin
 //
-#if defined(__BORLANDC__) || defined(_MSC_VER)
+#if defined( __BORLANDC__ ) || defined( _MSC_VER )
 static int hb_Inp9x( USHORT usPort )
 {
   USHORT usVal;
 
-    HB_TRACE( HB_TR_DEBUG, ("hb_Inp9x(%hu)", usPort ) );
+  HB_TRACE( HB_TR_DEBUG, ( "hb_Inp9x( %hu )", usPort ) );
 
-    #if defined(__BORLANDC__)
-       _DX = usPort;
-       __emit__(0xEC);        /* ASM  IN AL, DX */
-       __emit__(0x32,0xE4);   /* ASM XOR AH, AH */
-       usVal = _AX;
-    #else
+  #if defined( __BORLANDC__ )
+     _DX = usPort;
+     __emit__( 0xEC );        /* ASM  IN AL, DX */
+     __emit__( 0x32,0xE4 );   /* ASM XOR AH, AH */
+     usVal = _AX;
+  #else
 
-       usVal = _inp( usPort );
-    #endif
+     usVal = _inp( usPort );
+  #endif
 
-    return( usVal);
+  return( usVal );
 }
 
 //-------------------------------------------------------------------//
@@ -1131,99 +1159,97 @@ static int hb_Inp9x( USHORT usPort )
 //
 static int hb_Outp9x( USHORT usPort, USHORT usVal )
 {
-    HB_TRACE( HB_TR_DEBUG, ("hb_Outp9x(%hu, %hu)", usPort, usVal));
+  HB_TRACE( HB_TR_DEBUG, ( "hb_Outp9x( %hu, %hu )", usPort, usVal ) );
 
-    #if defined(__BORLANDC__)
-      _DX = usPort;
-      _AL = usVal;
-      __emit__(0xEE);        /* ASM OUT DX, AL */
-      __emit__(0x32,0xE4);   /* ASM XOR AH, AH */
-      usVal = _AX;
-    #else
-       _outp( usPort, usVal );
-    #endif
+  #if defined( __BORLANDC__ )
+    _DX = usPort;
+    _AL = usVal;
+    __emit__( 0xEE );        /* ASM OUT DX, AL */
+    __emit__( 0x32,0xE4 );   /* ASM XOR AH, AH */
+    usVal = _AX;
+  #else
+     _outp( usPort, usVal );
+  #endif
 
-    return( usVal);
+  return( usVal );
 }
 
 //-------------------------------------------------------------------//
 //
 //    Copied from gtwin
 //
-static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat, double dTick ))
+static void HB_GT_FUNC( gt_w9xTone( double dFreq, double dDurat, double dTick ) )
 {
-  INT   uLSB,uMSB;
-  UINT  uiValue;
-  ULONG lAdjFreq;
+  INT     uLSB, uMSB;
+  UINT    uiValue;
+  ULONG   lAdjFreq;
   clock_t end_clock;
 
-    HB_TRACE( HB_TR_DEBUG, ("hb_gt_w9xtone(%lf, %lf, %lf)", dFreq, dDurat, dTick));
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_w9xtone( %lf, %lf, %lf )", dFreq, dDurat, dTick ) );
 
-    /* Clipper ignores Tone() requests if Frequency is less than
-       < 20 hz (and so should we) to maintain compatibility .. */
+  /* Clipper ignores Tone() requests if Frequency is less than
+     < 20 hz ( and so should we ) to maintain compatibility .. */
 
-    if ( dFreq > 20.0 )
-    {
+  if ( dFreq > 20.0 )
+  {
 
-      /* Setup Sound Control Port Registers.. */
+    /* Setup Sound Control Port Registers.. */
 
-      /* select timer channel 2 */
+    /* select timer channel 2 */
 
-      hb_Outp9x(67, 182) ;
+    hb_Outp9x( 67, 182 ) ;
 
-      lAdjFreq = (ULONG)( 1193180 / dFreq ) ;
+    lAdjFreq = ( ULONG )( 1193180 / dFreq ) ;
 
-      if( (LONG) lAdjFreq < 0 )
-         uLSB = lAdjFreq + 65536;
-      else
-         uLSB = lAdjFreq % 256;
+    if( ( LONG ) lAdjFreq < 0 )
+       uLSB = lAdjFreq + 65536;
+    else
+       uLSB = lAdjFreq % 256;
 
-      if( (LONG) lAdjFreq < 0 )
-         uMSB = lAdjFreq + 65536;
-      else
-         uMSB = lAdjFreq / 256;
+    if( ( LONG ) lAdjFreq < 0 )
+       uMSB = lAdjFreq + 65536;
+    else
+       uMSB = lAdjFreq / 256;
 
+    /* set the frequency ( LSB,MSB ) */
+    hb_Outp9x( 66, uLSB );
+    hb_Outp9x( 66, uMSB );
 
-      /* set the frequency (LSB,MSB) */
-      hb_Outp9x( 66, uLSB );
-      hb_Outp9x( 66, uMSB );
+    /* Get current Port setting */
+    uiValue = hb_Inp9x( 97 );
 
-      /* Get current Port setting */
-      uiValue = hb_Inp9x( 97 );
+    /* enable Speaker Data & Timer gate bits */
+    uiValue = uiValue | 3;  /* 00000011B is bitmask to enable sound */
 
-      /* enable Speaker Data & Timer gate bits */
-      uiValue = uiValue | 3;  /* 00000011B is bitmask to enable sound */
+    /* Turn on Speaker - sound Tone for duration.. */
+    hb_Outp9x( 97, uiValue );
 
-      /* Turn on Speaker - sound Tone for duration.. */
-      hb_Outp9x( 97, uiValue );
-
-      end_clock = clock() + ( clock_t ) ( dDurat );
-      while( clock() < end_clock )
-      {
-        hb_idleState();
-      }
-      hb_idleReset();
-
-      /* Read back current Port value for Reset */
-      uiValue = hb_Inp9x( 97 );
-
-      /* disable Speaker Data & Timer gate bits */
-      uiValue = uiValue & 0xFC ;
-
-      /* Turn off the Speaker ! */
-      hb_Outp9x( 97, uiValue );
-
-    }
-
-    /* Delay (1) clock tick, just like Clipper .. */
-
-    end_clock = clock() + ( clock_t ) ( dTick );
+    end_clock = clock() + ( clock_t ) ( dDurat );
     while( clock() < end_clock )
     {
       hb_idleState();
     }
     hb_idleReset();
 
+    /* Read back current Port value for Reset */
+    uiValue = hb_Inp9x( 97 );
+
+    /* disable Speaker Data & Timer gate bits */
+    uiValue = uiValue & 0xFC ;
+
+    /* Turn off the Speaker ! */
+    hb_Outp9x( 97, uiValue );
+
+  }
+
+  /* Delay ( 1 ) clock tick, just like Clipper .. */
+
+  end_clock = clock() + ( clock_t ) ( dTick );
+  while( clock() < end_clock )
+  {
+    hb_idleState();
+  }
+  hb_idleReset();
 }
 #endif
 
@@ -1231,21 +1257,21 @@ static void HB_GT_FUNC(gt_w9xTone( double dFreq, double dDurat, double dTick ))
 //
 //   Copied from gtwin
 //
-static void HB_GT_FUNC(gt_wNtTone( double dFreq, double dDurat, double dTick ))
+static void HB_GT_FUNC( gt_wNtTone( double dFreq, double dDurat, double dTick ) )
 {
   clock_t end_clock;
 
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_wNtTone(%lf, %lf, %lf)", dFreq, dDurat, dTick));
+    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_wNtTone( %lf, %lf, %lf )", dFreq, dDurat, dTick ) );
 
     /* Clipper ignores Tone() requests if Frequency is less than
-       < 20 hz (and so should we) to maintain compatibility .. */
+       < 20 hz ( and so should we ) to maintain compatibility .. */
 
     if ( dFreq > 20.0 )
     {
-       Beep( (ULONG) dFreq, (ULONG) dDurat );
+       Beep( ( ULONG ) dFreq, ( ULONG ) dDurat );
     }
 
-    /* Delay (1) clock tick, just like Clipper .. */
+    /* Delay ( 1 ) clock tick, just like Clipper .. */
 
     end_clock = clock() + ( clock_t ) ( dTick );
     while( clock() < end_clock )
@@ -1253,19 +1279,18 @@ static void HB_GT_FUNC(gt_wNtTone( double dFreq, double dDurat, double dTick ))
       hb_idleState();
     }
     hb_idleReset();
-
 }
 
 //-------------------------------------------------------------------//
 //
 //    Copied from gtwin
 //
-void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
+void HB_GT_FUNC( gt_Tone( double dFrequency, double dDuration ) )
 {
     double dMillisecs;
     OSVERSIONINFO osv;
 
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Tone(%lf, %lf)", dFrequency, dDuration));
+    HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Tone( %lf, %lf )", dFrequency, dDuration ) );
 
     /* The conversion from Clipper timer tick units to
        milliseconds is * 1000.0 / 18.2. */
@@ -1274,110 +1299,112 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
 
     if( dDuration > 0 )
     {
-      double dTick = (double) ( CLOCKS_PER_SEC / 18.2 );
+      double dTick = ( double ) ( CLOCKS_PER_SEC / 18.2 );
 
       dMillisecs = dDuration * dTick;   /* milliseconds */
 
       /* What version of Windows are you running? */
-      osv.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-      GetVersionEx(&osv);
+      osv.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
+      GetVersionEx( &osv );
 
       /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
-      if (osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+      if ( osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
       {
-         #if defined(__BORLANDC__) || defined( _MSC_VER )
-            HB_GT_FUNC(gt_w9xTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
-                                   dMillisecs, dTick ));
+         #if defined( __BORLANDC__ ) || defined( _MSC_VER )
+            HB_GT_FUNC( gt_w9xTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
+                                   dMillisecs, dTick ) );
          #else
-            HB_GT_FUNC(gt_wNtTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
-                                   dMillisecs, dTick ));
+            HB_GT_FUNC( gt_wNtTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
+                                   dMillisecs, dTick ) );
          #endif
       }
 
       /* If Windows NT or NT2k, use wNtTone, which provides TONE()
-         reset sequence support (new) */
-      else if (osv.dwPlatformId == VER_PLATFORM_WIN32_NT)
+         reset sequence support ( new ) */
+      else if ( osv.dwPlatformId == VER_PLATFORM_WIN32_NT )
       {
         /* We pass the Millisecond converted value here .. */
-        HB_GT_FUNC(gt_wNtTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
-                   dMillisecs, dTick ));
+        HB_GT_FUNC( gt_wNtTone( HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 ),
+                   dMillisecs, dTick ) );
       }
    }
 }
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(mouse_Init( void ))
+void HB_GT_FUNC( mouse_Init( void ) )
 {
-  hb_wvt_gtSetMouseX(0);
-  hb_wvt_gtSetMouseY(0);
+  hb_wvt_gtSetMouseX( 0 );
+  hb_wvt_gtSetMouseY( 0 );
 }
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(mouse_Exit( void ))
-{
-}
-
-//-------------------------------------------------------------------//
-
-BOOL HB_GT_FUNC(mouse_IsPresent( void ))
-{
-   return( TRUE);
-}
-
-//-------------------------------------------------------------------//
-
-void HB_GT_FUNC(mouse_Show( void ))
+void HB_GT_FUNC( mouse_Exit( void ) )
 {
 }
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(mouse_Hide( void ))
+BOOL HB_GT_FUNC( mouse_IsPresent( void ) )
+{
+   return( TRUE );
+}
+
+//-------------------------------------------------------------------//
+
+void HB_GT_FUNC( mouse_Show( void ) )
 {
 }
 
 //-------------------------------------------------------------------//
 
-int HB_GT_FUNC(mouse_Col( void ))
+void HB_GT_FUNC( mouse_Hide( void ) )
 {
-  return( hb_wvt_gtGetMouseX());
 }
 
 //-------------------------------------------------------------------//
 
-int HB_GT_FUNC(mouse_Row( void ))
+int HB_GT_FUNC( mouse_Col( void ) )
 {
-  return( hb_wvt_gtGetMouseY());
+  return( hb_wvt_gtGetMouseX() );
 }
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(mouse_SetPos( int iRow, int iCol ))
+int HB_GT_FUNC( mouse_Row( void ) )
 {
-  hb_wvt_gtSetMouseX(iRow);
-  hb_wvt_gtSetMouseY(iCol);
+  return( hb_wvt_gtGetMouseY() );
 }
 
 //-------------------------------------------------------------------//
 
-BOOL HB_GT_FUNC(mouse_IsButtonPressed( int iButton ))
+void HB_GT_FUNC( mouse_SetPos( int iRow, int iCol ) )
+{
+  hb_wvt_gtSetMouseX( iRow );
+  hb_wvt_gtSetMouseY( iCol );
+}
+
+//-------------------------------------------------------------------//
+
+BOOL HB_GT_FUNC( mouse_IsButtonPressed( int iButton ) )
 {
   BOOL bReturn = FALSE;
-  if (iButton == 0)
+
+  if ( iButton == 0 )
   {
-    bReturn =GetKeyState(VK_LBUTTON) & 0x8000;
+    bReturn = GetKeyState( VK_LBUTTON ) & 0x8000;
   }
-  else if (iButton== 1)
+  else if ( iButton== 1 )
   {
-    bReturn =GetKeyState(VK_RBUTTON) & 0x8000;
+    bReturn = GetKeyState( VK_RBUTTON ) & 0x8000;
   }
-  else if (iButton == 2)
+  else if ( iButton == 2 )
   {
-    bReturn =GetKeyState(VK_MBUTTON) & 0x8000;
+    bReturn = GetKeyState( VK_MBUTTON ) & 0x8000;
   }
-  return( bReturn);
+
+  return( bReturn );
 }
 
 //-------------------------------------------------------------------//
@@ -1399,7 +1426,7 @@ void HB_GT_FUNC( mouse_SetBounds( int iTop, int iLeft, int iBottom, int iRight )
 
 //-------------------------------------------------------------------//
 
-void HB_GT_FUNC(mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ) )
+void HB_GT_FUNC( mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ) )
 {
    HB_SYMBOL_UNUSED( piTop    );
    HB_SYMBOL_UNUSED( piLeft   );
@@ -1437,12 +1464,13 @@ static BOOL hb_wvt_gtAllocSpBuffer( USHORT col, USHORT row )
 
   _s.COLS        = col;
   _s.ROWS        = row;
-  _s.BUFFERSIZE  = col * row * sizeof(char);
-  _s.pBuffer     =  _s.byBuffer ;
+  _s.BUFFERSIZE  = col * row * sizeof( char );
+  _s.pBuffer     = _s.byBuffer ;
   _s.pAttributes = _s.byAttributes;
   memset( _s.pBuffer, ' ', _s.BUFFERSIZE );
   memset( _s.pAttributes,_s.background, _s.BUFFERSIZE );
-  return(bRet);
+
+  return( bRet );
 }
 
 //-------------------------------------------------------------------//
@@ -1452,6 +1480,7 @@ static BOOL hb_wvt_gtInitWindow( HWND hWnd, USHORT col, USHORT row )
   BOOL bRet = hb_wvt_gtAllocSpBuffer( col, row );
 
   hb_wvt_gtResetWindowSize( hWnd );
+
   return( bRet );
 }
 
@@ -1478,6 +1507,7 @@ static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont )
 
   width     = tm.tmAveCharWidth * cols ;  // Total pixel width this setting would take
   height    = tm.tmHeight * rows;         // Total pixel height this setting would take
+
   return( ( width <= maxWidth ) && ( height <= maxHeight ) );
 }
 
@@ -1497,7 +1527,7 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
 
   // set the font and get it's size to determine the size of the client area
   // for the required number of rows and columns
-
+  //
   hdc      = GetDC( hWnd );
   hFont    = hb_wvt_gtGetFont( _s.fontFace, _s.fontHeight, _s.fontWidth, _s.fontWeight, _s.fontQuality, _s.CodePage );
   _s.hFont = hFont ;
@@ -1516,7 +1546,7 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
   _s.PTEXTSIZE.x = tm.tmAveCharWidth; // For fixed FONT should == tm.tmMaxCharWidth
   _s.PTEXTSIZE.y = tm.tmHeight;       //     but seems to be a problem on Win9X so
                                       //     assume proportional fonts always for Win9X
-  if ( _s.Win9X || (tm.tmPitchAndFamily & TMPF_FIXED_PITCH) || (_s.PTEXTSIZE.x != tm.tmMaxCharWidth))
+  if ( _s.Win9X || ( tm.tmPitchAndFamily & TMPF_FIXED_PITCH ) || ( _s.PTEXTSIZE.x != tm.tmMaxCharWidth ) )
   {
     _s.FixedFont = FALSE;
   }
@@ -1527,10 +1557,11 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
 
   for( n=0 ; n< _s.COLS ; n++ ) // _s.FixedSize[] is used by ExtTextOut() to emulate
   {                             //          fixed font when a proportional font is used
-    _s.FixedSize[n]= _s.PTEXTSIZE.x;
+    _s.FixedSize[ n ] = _s.PTEXTSIZE.x;
   }
 
   // resize the window to get the specified number of rows and columns
+  //
   height = hb_wvt_gtCalcPixelHeight();
   width  = hb_wvt_gtCalcPixelWidth();
 
@@ -1544,7 +1575,8 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
 
   // Centre the window within the CLIENT area on the screen
   //                   but only if _s.CentreWindow == TRUE
-  if ( _s.CentreWindow && SystemParametersInfo(SPI_GETWORKAREA,0, &rcWorkArea, 0 ) )
+  //
+  if ( _s.CentreWindow && SystemParametersInfo( SPI_GETWORKAREA,0, &rcWorkArea, 0 ) )
   {
     wi.left = rcWorkArea.left + ( ( ( rcWorkArea.right-rcWorkArea.left ) - ( width  ) ) / 2 ) ;
     wi.top  = rcWorkArea.top  + ( ( ( rcWorkArea.bottom-rcWorkArea.top ) - ( height ) ) / 2 ) ;
@@ -1554,23 +1586,25 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
 
 //-------------------------------------------------------------------//
 
-static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
   static BOOL bIgnoreWM_SYSCHAR = FALSE ;
   BOOL bRet;
 
-  switch (message)
+  switch ( message )
   {
     case WM_CREATE:
     {
       bRet = hb_wvt_gtInitWindow( hWnd, WVT_DEFAULT_COLS, WVT_DEFAULT_ROWS );
       return( bRet );
     }
+
     case WM_COMMAND: // handle menu items
     {
       hb_wvt_gtHandleMenuSelection( ( int ) LOWORD( wParam ) );
       return( 0 );
     }
+
     case WM_PAINT:
     {
       PAINTSTRUCT ps;
@@ -1597,21 +1631,23 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
         // need to account for truncation in conversion
         // i.e. redraw any 'cell' partially covered...
-        rcRect   = hb_wvt_gtGetColRowFromXYRect(updateRect);
+        rcRect   = hb_wvt_gtGetColRowFromXYRect( updateRect );
         rowStart = max( 0, rcRect.top-1 );
         rowStop  = min( _s.ROWS, rcRect.bottom+1 );
         colStart = max( 0, rcRect.left -1 );
         colStop  = min( _s.COLS, rcRect.right+1 );
+
         for ( irow = rowStart; irow <rowStop; irow++ )
         {
           USHORT icol, index, startIndex, startCol, len;
           BYTE oldAttrib, attrib;
           icol       = colStart;
-          index      = hb_wvt_gtGetIndexForTextBuffer(icol, irow);
+          index      = hb_wvt_gtGetIndexForTextBuffer( icol, irow );
           startIndex = index;
           startCol   = icol;
           len        = 0;
-          oldAttrib  = *(_s.pAttributes+index);
+          oldAttrib  = *( _s.pAttributes+index );
+
           /* attribute may change mid line...
           * so buffer up text with same attrib, and output it
           * then do next section with same attrib, etc
@@ -1626,7 +1662,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
             if ( attrib != oldAttrib )
             {
               hb_wvt_gtSetColors( hdc, oldAttrib );
-              hb_wvt_gtTextOut( hdc, startCol, irow, (char const *) _s.pBuffer+startIndex, len );
+              hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer+startIndex, len );
               oldAttrib  = attrib;
               startIndex = index;
               startCol   = icol;
@@ -1638,20 +1674,22 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
             index++;
           }
           hb_wvt_gtSetColors( hdc, oldAttrib );
-          hb_wvt_gtTextOut( hdc, startCol, irow, (char const *) _s.pBuffer+startIndex, len );
+          hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer+startIndex, len );
         }
       }
       EndPaint( hWnd, &ps );
 #ifdef WVT_DEBUG
-  printf("\nPuts(%d), Scroll(%d), Paint(%d), SetFocus(%d), KillFocus(%d) ",nCountPuts, nCountScroll, ++nCountPaint, nSetFocus, nKillFocus) ;
+  printf( "\nPuts( %d ), Scroll( %d ), Paint( %d ), SetFocus( %d ), KillFocus( %d ) ",nCountPuts, nCountScroll, ++nCountPaint, nSetFocus, nKillFocus ) ;
 #endif
-      return(0);
+      return( 0 );
     }
+
     case WM_MY_UPDATE_CARET:
     {
       hb_wvt_gtSetCaretPos();
       return( 0 );
     }
+
     case WM_SETFOCUS:
     {
 #ifdef WVT_DEBUG
@@ -1659,7 +1697,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
 #endif
       // create and show the caret
       // create an underline caret of height - _s.CaretSize
-      _s.CaretExist = CreateCaret(hWnd, (HBITMAP) NULL, _s.PTEXTSIZE.x, _s.CaretSize);
+      _s.CaretExist = CreateCaret( hWnd, ( HBITMAP ) NULL, _s.PTEXTSIZE.x, _s.CaretSize );
       if ( _s.CaretExist && _s.displayCaret )
       {
         hb_wvt_gtSetCaretPos();
@@ -1667,6 +1705,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
       }
       return( 0 );
     }
+
     case WM_KILLFOCUS:
 #ifdef WVT_DEBUG
   nKillFocus++;
@@ -1676,7 +1715,8 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
         DestroyCaret();
         _s.CaretExist = FALSE ;
       }
-      return(0);
+      return( 0 );
+
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
     {
@@ -1685,164 +1725,166 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
       switch ( wParam )
       {
         case VK_LEFT:
-          hb_wvt_gtTranslateKey(K_LEFT, K_LEFT, K_ALT_LEFT, K_CTRL_LEFT);
+          hb_wvt_gtTranslateKey( K_LEFT, K_LEFT, K_ALT_LEFT, K_CTRL_LEFT );
           break;
         case VK_RIGHT:
-          hb_wvt_gtTranslateKey(K_RIGHT, K_RIGHT, K_ALT_RIGHT, K_CTRL_RIGHT);
+          hb_wvt_gtTranslateKey( K_RIGHT, K_RIGHT, K_ALT_RIGHT, K_CTRL_RIGHT );
           break;
         case VK_UP:
-          hb_wvt_gtTranslateKey(K_UP, K_UP, K_ALT_UP, K_CTRL_UP);
+          hb_wvt_gtTranslateKey( K_UP, K_UP, K_ALT_UP, K_CTRL_UP );
           break;
         case VK_DOWN:
-          hb_wvt_gtTranslateKey(K_DOWN, K_DOWN, K_ALT_DOWN, K_CTRL_DOWN);
+          hb_wvt_gtTranslateKey( K_DOWN, K_DOWN, K_ALT_DOWN, K_CTRL_DOWN );
           break;
         case VK_HOME:
-          hb_wvt_gtTranslateKey(K_HOME, K_HOME, K_ALT_HOME, K_CTRL_HOME);
+          hb_wvt_gtTranslateKey( K_HOME, K_HOME, K_ALT_HOME, K_CTRL_HOME );
           break;
         case VK_END:
-          hb_wvt_gtTranslateKey(K_END, K_END, K_ALT_END, K_CTRL_END);
+          hb_wvt_gtTranslateKey( K_END, K_END, K_ALT_END, K_CTRL_END );
           break;
         case VK_DELETE:
-          hb_wvt_gtTranslateKey(K_DEL, K_DEL, K_ALT_DEL, K_CTRL_DEL);
+          hb_wvt_gtTranslateKey( K_DEL, K_DEL, K_ALT_DEL, K_CTRL_DEL );
           break;
         case VK_INSERT:
-          hb_wvt_gtTranslateKey(K_INS, K_INS, K_ALT_INS, K_CTRL_INS);
+          hb_wvt_gtTranslateKey( K_INS, K_INS, K_ALT_INS, K_CTRL_INS );
           break;
         case VK_PRIOR:
-          hb_wvt_gtTranslateKey(K_PGUP, K_PGUP, K_ALT_PGUP, K_CTRL_PGUP);
+          hb_wvt_gtTranslateKey( K_PGUP, K_PGUP, K_ALT_PGUP, K_CTRL_PGUP );
           break;
         case VK_NEXT:
-          hb_wvt_gtTranslateKey(K_PGDN, K_PGDN, K_ALT_PGDN, K_CTRL_PGDN);
+          hb_wvt_gtTranslateKey( K_PGDN, K_PGDN, K_ALT_PGDN, K_CTRL_PGDN );
           break;
         case VK_F1:
-          hb_wvt_gtTranslateKey(K_F1, K_SH_F1, K_ALT_F1, K_CTRL_F1);
+          hb_wvt_gtTranslateKey( K_F1, K_SH_F1, K_ALT_F1, K_CTRL_F1 );
           break;
         case VK_F2:
-          hb_wvt_gtTranslateKey(K_F2, K_SH_F2, K_ALT_F2, K_CTRL_F2);
+          hb_wvt_gtTranslateKey( K_F2, K_SH_F2, K_ALT_F2, K_CTRL_F2 );
           break;
         case VK_F3:
-          hb_wvt_gtTranslateKey(K_F3, K_SH_F3, K_ALT_F3, K_CTRL_F3);
+          hb_wvt_gtTranslateKey( K_F3, K_SH_F3, K_ALT_F3, K_CTRL_F3 );
           break;
         case VK_F4:
         {
-          if (_s.AltF4Close && bAlt)
+          if ( _s.AltF4Close && bAlt )
           {
-            return(DefWindowProc(hWnd, message, wParam, lParam));
+            return( DefWindowProc( hWnd, message, wParam, lParam ) );
           }
           else
           {
-            hb_wvt_gtTranslateKey(K_F4, K_SH_F4, K_ALT_F4, K_CTRL_F4);
+            hb_wvt_gtTranslateKey( K_F4, K_SH_F4, K_ALT_F4, K_CTRL_F4 );
           }
           break;
         }
         case VK_F5:
-          hb_wvt_gtTranslateKey(K_F5, K_SH_F5, K_ALT_F5, K_CTRL_F5);
+          hb_wvt_gtTranslateKey( K_F5, K_SH_F5, K_ALT_F5, K_CTRL_F5 );
           break;
         case VK_F6:
-          hb_wvt_gtTranslateKey(K_F6, K_SH_F6, K_ALT_F6, K_CTRL_F6);
+          hb_wvt_gtTranslateKey( K_F6, K_SH_F6, K_ALT_F6, K_CTRL_F6 );
           break;
         case VK_F7:
-          hb_wvt_gtTranslateKey(K_F7, K_SH_F7, K_ALT_F7, K_CTRL_F7);
+          hb_wvt_gtTranslateKey( K_F7, K_SH_F7, K_ALT_F7, K_CTRL_F7 );
           break;
         case VK_F8:
-          hb_wvt_gtTranslateKey(K_F8, K_SH_F8, K_ALT_F8, K_CTRL_F8);
+          hb_wvt_gtTranslateKey( K_F8, K_SH_F8, K_ALT_F8, K_CTRL_F8 );
           break;
         case VK_F9:
-          hb_wvt_gtTranslateKey(K_F9, K_SH_F9, K_ALT_F9, K_CTRL_F9);
+          hb_wvt_gtTranslateKey( K_F9, K_SH_F9, K_ALT_F9, K_CTRL_F9 );
           break;
         case VK_F10:
-          hb_wvt_gtTranslateKey(K_F10, K_SH_F10, K_ALT_F10, K_CTRL_F10);
+          hb_wvt_gtTranslateKey( K_F10, K_SH_F10, K_ALT_F10, K_CTRL_F10 );
           break;
         case VK_F11:
-          hb_wvt_gtTranslateKey(K_F11, K_SH_F11, K_ALT_F11, K_CTRL_F11);
+          hb_wvt_gtTranslateKey( K_F11, K_SH_F11, K_ALT_F11, K_CTRL_F11 );
           break;
         case VK_F12:
-          hb_wvt_gtTranslateKey(K_F12, K_SH_F12, K_ALT_F12, K_CTRL_F12);
+          hb_wvt_gtTranslateKey( K_F12, K_SH_F12, K_ALT_F12, K_CTRL_F12 );
           break;
         default:
         {
-          BOOL bCtrl    = GetKeyState(VK_CONTROL) & 0x8000;
-          BOOL bShift   = GetKeyState(VK_SHIFT) & 0x8000;
-          int iScanCode = HIWORD(lParam) & 0xFF ;
+          BOOL bCtrl     = GetKeyState( VK_CONTROL ) & 0x8000;
+          BOOL bShift    = GetKeyState( VK_SHIFT ) & 0x8000;
+          int  iScanCode = HIWORD( lParam ) & 0xFF ;
 
-          if (bCtrl && iScanCode == 76 ) // CTRL_VK_NUMPAD5)
+          if ( bCtrl && iScanCode == 76 ) // CTRL_VK_NUMPAD5 )
           {
-            hb_wvt_gtAddCharToInputQueue(KP_CTRL_5);
+            hb_wvt_gtAddCharToInputQueue( KP_CTRL_5 );
           }
-          else if (iScanCode == 70 ) // Ctrl_Break key
+          else if ( iScanCode == 70 ) // Ctrl_Break key
           {
-            hb_wvt_gtAddCharToInputQueue(HB_BREAK_FLAG); // Pretend Alt+C pressed
-            bIgnoreWM_SYSCHAR= TRUE;
+            hb_wvt_gtAddCharToInputQueue( HB_BREAK_FLAG ); // Pretend Alt+C pressed
+            bIgnoreWM_SYSCHAR = TRUE;
           }
-          else if (bCtrl && iScanCode==53 && bShift)
+          else if ( bCtrl && iScanCode==53 && bShift )
           {
-            hb_wvt_gtAddCharToInputQueue(K_CTRL_QUESTION);
+            hb_wvt_gtAddCharToInputQueue( K_CTRL_QUESTION );
           }
-          else if ((bAlt || bCtrl) && (
+          else if ( ( bAlt || bCtrl ) && ( 
               wParam==VK_MULTIPLY || wParam==VK_ADD || wParam== VK_SUBTRACT
-              || wParam== VK_DIVIDE))
+              || wParam== VK_DIVIDE ) )
           {
-            if (bAlt)
+            if ( bAlt )
             {
               bIgnoreWM_SYSCHAR= TRUE;
             }
-            switch (wParam)
+            switch ( wParam )
             {
               case VK_MULTIPLY:
-                hb_wvt_gtTranslateKey('*','*', KP_ALT_ASTERISK, KP_CTRL_ASTERISK);
+                hb_wvt_gtTranslateKey( '*','*', KP_ALT_ASTERISK, KP_CTRL_ASTERISK );
                 break;
               case VK_ADD:
-                hb_wvt_gtTranslateKey('+','+', KP_ALT_PLUS, KP_CTRL_PLUS);
+                hb_wvt_gtTranslateKey( '+','+', KP_ALT_PLUS, KP_CTRL_PLUS );
                 break;
               case VK_SUBTRACT:
-                hb_wvt_gtTranslateKey('-','-', KP_ALT_MINUS, KP_CTRL_MINUS);
+                hb_wvt_gtTranslateKey( '-','-', KP_ALT_MINUS, KP_CTRL_MINUS );
                 break;
               case VK_DIVIDE:
-                hb_wvt_gtTranslateKey('/','/', KP_ALT_SLASH, KP_CTRL_SLASH);
+                hb_wvt_gtTranslateKey( '/','/', KP_ALT_SLASH, KP_CTRL_SLASH );
                 break;
             }
           }
-          else if (_s.EnableShortCuts )
+          else if ( _s.EnableShortCuts )
           {
-            return(DefWindowProc(hWnd, message, wParam, lParam));
+            return( DefWindowProc( hWnd, message, wParam, lParam ) );
           }
         }
       }
-      return(0);
+      return( 0 );
     }
+
     case WM_CHAR:
     {
-      int c = (int)wParam;
-      if (!bIgnoreWM_SYSCHAR)
+      int c = ( int )wParam;
+      if ( !bIgnoreWM_SYSCHAR )
       {
-        switch (c)
+        switch ( c )
         {
           // handle special characters
           case VK_BACK:
-            hb_wvt_gtTranslateKey(K_BS, K_BS, K_ALT_BS, K_CTRL_BS);
+            hb_wvt_gtTranslateKey( K_BS, K_BS, K_ALT_BS, K_CTRL_BS );
             break;
           case VK_TAB:
-            hb_wvt_gtTranslateKey(K_TAB, K_SH_TAB, K_ALT_TAB, K_CTRL_TAB);
+            hb_wvt_gtTranslateKey( K_TAB, K_SH_TAB, K_ALT_TAB, K_CTRL_TAB );
             break;
           case VK_RETURN:
-            hb_wvt_gtTranslateKey(K_RETURN, K_RETURN, K_ALT_RETURN, K_CTRL_RETURN);
+            hb_wvt_gtTranslateKey( K_RETURN, K_RETURN, K_ALT_RETURN, K_CTRL_RETURN );
             break;
           case VK_ESCAPE:
-            hb_wvt_gtAddCharToInputQueue(K_ESC);
+            hb_wvt_gtAddCharToInputQueue( K_ESC );
             break;
           default:
-            hb_wvt_gtAddCharToInputQueue(c);
+            hb_wvt_gtAddCharToInputQueue( c );
             break;
         }
       }
-      return(0);
+      return( 0 );
     }
+
     case WM_SYSCHAR:
     {
-      if (!bIgnoreWM_SYSCHAR)
+      if ( !bIgnoreWM_SYSCHAR )
       {
-        int c, iScanCode = HIWORD(lParam) & 0xFF ;
-        switch (iScanCode)
+        int c, iScanCode = HIWORD( lParam ) & 0xFF ;
+        switch ( iScanCode )
         {
           case  2:
             c = K_ALT_1 ;
@@ -1959,44 +2001,48 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
             c = K_ALT_M ;
             break;
           default:
-            c = (int) wParam ;
+            c = ( int ) wParam ;
             break;
         }
-        hb_wvt_gtAddCharToInputQueue(c);
+        hb_wvt_gtAddCharToInputQueue( c );
 
       }
-      return(0);
+      return( 0 );
     }
+
     case WM_QUERYENDSESSION: // Closing down computer
     {
       /* if we have set a shutdown command return false,
-       * so windows (and our app)doesn't shutdown
+       * so windows ( and our app )doesn't shutdown
        * otherwise let the default handler take it
        */
       int iEvent = hb_wvt_gtGetShutdownEvent();
-      if (iEvent)
+      if ( iEvent )
       {
-        hb_wvt_gtAddCharToInputQueue(iEvent);
-        return(0);
+        hb_wvt_gtAddCharToInputQueue( iEvent );
+        return( 0 );
       }
       break;
     }
+
     case WM_CLOSE:  // Clicked 'X' on system menu
     {
       /* if an event has been set then return it otherwise
          fake an Alt+C
       */
       int iEvent = hb_wvt_gtGetCloseEvent();
-      if (!iEvent)
+      if ( !iEvent )
       {
         iEvent= HB_BREAK_FLAG ; // Pretend Alt+C pressed
       }
-      hb_wvt_gtAddCharToInputQueue(iEvent);
-      return(0);
+      hb_wvt_gtAddCharToInputQueue( iEvent );
+      return( 0 );
     }
+
     case WM_QUIT:
     case WM_DESTROY:
-      return(0);
+      return( 0 );
+
     case WM_RBUTTONDOWN:
     case WM_LBUTTONDOWN:
     {
@@ -2028,8 +2074,8 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
       {
         POINT xy, colrow ;
 
-        xy.x   = LOWORD(lParam);
-        xy.y   = HIWORD(lParam);
+        xy.x   = LOWORD( lParam );
+        xy.y   = HIWORD( lParam );
         colrow = hb_wvt_gtGetColRowFromXY( xy.x, xy.y );
         hb_wvt_gtSetMouseX( colrow.x );
         hb_wvt_gtSetMouseY( colrow.y );
@@ -2048,8 +2094,8 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
       {
         POINT xy, colrow ;
 
-        xy.x   = LOWORD(lParam);
-        xy.y   = HIWORD(lParam);
+        xy.x   = LOWORD( lParam );
+        xy.y   = HIWORD( lParam );
         colrow = hb_wvt_gtGetColRowFromXY( xy.x, xy.y );
         hb_wvt_gtSetMouseX( colrow.x );
         hb_wvt_gtSetMouseY( colrow.y );
@@ -2077,18 +2123,19 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
       }
     }
   }
-  return(DefWindowProc(hWnd, message, wParam, lParam));
+  return( DefWindowProc( hWnd, message, wParam, lParam ) );
 }
 
 //-------------------------------------------------------------------//
 
-static HWND hb_wvt_gtCreateWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
+static HWND hb_wvt_gtCreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow )
 {
-  HWND hWnd;
+  HWND     hWnd;
   WNDCLASS wndclass;
 
   HB_SYMBOL_UNUSED( hPrevInstance );
   HB_SYMBOL_UNUSED( szCmdLine );
+
   InitCommonControls();
 
   wndclass.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
@@ -2097,20 +2144,20 @@ static HWND hb_wvt_gtCreateWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
   wndclass.cbWndExtra    = 0;
   wndclass.hInstance     = hInstance;
   wndclass.hIcon         = NULL;
-  wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+  wndclass.hCursor       = LoadCursor( NULL, IDC_ARROW );
   wndclass.hbrBackground = NULL;
   wndclass.lpszMenuName  = NULL;
   wndclass.lpszClassName = szAppName;
 
-  if (! RegisterClass(&wndclass))
+  if ( ! RegisterClass( &wndclass ) )
   {
-    MessageBox(NULL, TEXT("Failed to register class."),
-                szAppName, MB_ICONERROR);
-    return(0);
+    MessageBox( NULL, TEXT( "Failed to register class." ),
+                szAppName, MB_ICONERROR );
+    return( 0 );
   }
 
-  hWnd = CreateWindow(szAppName,                          //classname
-     TEXT("XHARBOUR_WVT"),                                //window name
+  hWnd = CreateWindow( szAppName,                         //classname
+     TEXT( "XHARBOUR_WVT" ),                              //window name
      WS_OVERLAPPED|WS_CAPTION|WS_SYSMENU|WS_MINIMIZEBOX,  //style
      0,                                                   //x
      0,                                                   //y
@@ -2119,45 +2166,45 @@ static HWND hb_wvt_gtCreateWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
      NULL,                                                //window parent
      NULL,                                                //menu
      hInstance,                                           //instance
-     NULL);                                               //lpParam
+     NULL );                                              //lpParam
 
 
-  if (hWnd == NULL)
+  if ( hWnd == NULL )
   {
-    MessageBox(NULL, TEXT("Failed to create window."),
-              TEXT("XHARBOUR_WVT"), MB_ICONERROR);
+    MessageBox( NULL, TEXT( "Failed to create window." ),
+                  TEXT( "XHARBOUR_WVT" ), MB_ICONERROR );
   }
 
-  ShowWindow(hWnd, iCmdShow);
+  ShowWindow( hWnd, iCmdShow );
 
-  UpdateWindow(hWnd);
-  return( hWnd) ;
+  UpdateWindow( hWnd );
+  return( hWnd ) ;
 }
 
 //-------------------------------------------------------------------//
 
-static DWORD hb_wvt_gtProcessMessages(void)
+static DWORD hb_wvt_gtProcessMessages( void )
 {
   MSG msg;
-  while (PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ))
+  while ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
   {
-    TranslateMessage(&msg);
-    DispatchMessage(&msg);
+    TranslateMessage( &msg );
+    DispatchMessage( &msg );
   }
-  return(msg.wParam);
+  return( msg.wParam );
 
 }
 
 //-------------------------------------------------------------------//
 
-static POINT hb_wvt_gtGetXYFromColRow( USHORT col, USHORT row)
+static POINT hb_wvt_gtGetXYFromColRow( USHORT col, USHORT row )
 {
   POINT xy;
 
-  xy.x = (col) * _s.PTEXTSIZE.x;
-  xy.y = (row) * _s.PTEXTSIZE.y;
+  xy.x = ( col ) * _s.PTEXTSIZE.x;
+  xy.y = ( row ) * _s.PTEXTSIZE.y;
 
-  return(xy);
+  return( xy );
 }
 
 //-------------------------------------------------------------------//
@@ -2166,14 +2213,14 @@ static POINT hb_wvt_gtGetXYFromColRow( USHORT col, USHORT row)
  * This works because we are using the FIXED system font
  *
  */
-static POINT hb_wvt_gtGetColRowFromXY( USHORT x, USHORT y)
+static POINT hb_wvt_gtGetColRowFromXY( USHORT x, USHORT y )
 {
   POINT colrow;
 
-  colrow.x = (x/_s.PTEXTSIZE.x);
-  colrow.y = (y/_s.PTEXTSIZE.y);
+  colrow.x = ( x/_s.PTEXTSIZE.x );
+  colrow.y = ( y/_s.PTEXTSIZE.y );
 
-  return(colrow);
+  return( colrow );
 }
 
 //-------------------------------------------------------------------//
@@ -2183,7 +2230,7 @@ static POINT hb_wvt_gtGetColRowFromXY( USHORT x, USHORT y)
  * This works because we are using the FIXED system font
  *
  */
-static RECT hb_wvt_gtGetColRowFromXYRect( RECT xy)
+static RECT hb_wvt_gtGetColRowFromXYRect( RECT xy )
 {
   RECT colrow;
 
@@ -2192,7 +2239,7 @@ static RECT hb_wvt_gtGetColRowFromXYRect( RECT xy)
   colrow.right  = ( xy.right  / _s.PTEXTSIZE.x );
   colrow.bottom = ( xy.bottom / _s.PTEXTSIZE.y );
 
-  return(colrow);
+  return( colrow );
 }
 
 //-------------------------------------------------------------------//
@@ -2202,7 +2249,7 @@ static RECT hb_wvt_gtGetColRowFromXYRect( RECT xy)
  * This works because we are using the FIXED system font
  *
  */
-static RECT hb_wvt_gtGetXYFromColRowRect( RECT colrow)
+static RECT hb_wvt_gtGetXYFromColRowRect( RECT colrow )
 {
   RECT xy;
 
@@ -2211,39 +2258,39 @@ static RECT hb_wvt_gtGetXYFromColRowRect( RECT colrow)
   xy.right  = ( colrow.right+1  ) * _s.PTEXTSIZE.x;
   xy.bottom = ( colrow.bottom+1 ) * _s.PTEXTSIZE.y;
 
-  return(xy);
+  return( xy );
 }
 
 //-------------------------------------------------------------------//
 /*
- * hb_wvt_gtSetCaretPos converts col and row to x and y (pixels) and calls
- * the Windows function SetCaretPos (with the expected coordinates)
+ * hb_wvt_gtSetCaretPos converts col and row to x and y ( pixels ) and calls
+ * the Windows function SetCaretPos ( with the expected coordinates )
  */
-static BOOL hb_wvt_gtSetCaretPos(  )
+static BOOL hb_wvt_gtSetCaretPos()
 {
   POINT xy;
-  xy = hb_wvt_gtGetXYFromColRow(_s.caretPos.x, _s.caretPos.y);
+  xy = hb_wvt_gtGetXYFromColRow( _s.caretPos.x, _s.caretPos.y );
   if ( _s.CaretSize > 0 )
   {
-    xy.y += (_s.PTEXTSIZE.y - _s.CaretSize);
+    xy.y += ( _s.PTEXTSIZE.y - _s.CaretSize );
   }
-  if (_s.CaretExist)
+  if ( _s.CaretExist )
   {
-    SetCaretPos( xy.x, xy.y);
+    SetCaretPos( xy.x, xy.y );
   }
-  return(TRUE);
+  return( TRUE );
 }
 
 //-------------------------------------------------------------------//
 /*
  * hb_wvt_gtValidateRow checks the row bounds for the caret, wrapping if indicated
  */
-static void hb_wvt_gtValidateRow(void)
+static void hb_wvt_gtValidateRow( void )
 {
-  if (_s.caretPos.y < 0 )
+  if ( _s.caretPos.y < 0 )
   {
     _s.caretPos.y = _s.ROWS-1;
-    if (_s.caretPos.x > 0)
+    if ( _s.caretPos.x > 0 )
     {
       _s.caretPos.x--;
     }
@@ -2252,10 +2299,10 @@ static void hb_wvt_gtValidateRow(void)
       _s.caretPos.x = _s.COLS-1;
     }
   }
-  else if (_s.caretPos.y >= _s.ROWS)
+  else if ( _s.caretPos.y >= _s.ROWS )
   {
     _s.caretPos.y = 0;
-    if (_s.caretPos.x < _s.COLS-1)
+    if ( _s.caretPos.x < _s.COLS-1 )
     {
       _s.caretPos.x++;
     }
@@ -2270,12 +2317,12 @@ static void hb_wvt_gtValidateRow(void)
 /*
  * hb_wvt_gtValidateCol checks the column bounds for the caret, wrapping if indicated
  */
-static void hb_wvt_gtValidateCol(void)
+static void hb_wvt_gtValidateCol( void )
 {
-  if (_s.caretPos.x < 0)
+  if ( _s.caretPos.x < 0 )
   {
     _s.caretPos.x = _s.COLS-1;
-    if (_s.caretPos.y > 0)
+    if ( _s.caretPos.y > 0 )
     {
       _s.caretPos.y--;
     }
@@ -2284,10 +2331,10 @@ static void hb_wvt_gtValidateCol(void)
       _s.caretPos.y = _s.ROWS-1;
     }
   }
-  else if (_s.caretPos.x >= _s.COLS)
+  else if ( _s.caretPos.x >= _s.COLS )
   {
     _s.caretPos.x = 0;
-    if (_s.caretPos.y < _s.ROWS-1)
+    if ( _s.caretPos.y < _s.ROWS-1 )
     {
       _s.caretPos.y++;
     }
@@ -2303,13 +2350,14 @@ static void hb_wvt_gtValidateCol(void)
  * hb_wvt_gtValidateCaret checks the bounds for the caret, wrapping if indicated
  * before setting the caret position on the screen
  */
-static void hb_wvt_gtValidateCaret(void)
+static void hb_wvt_gtValidateCaret( void )
 {
-
   hb_wvt_gtValidateCol();
   hb_wvt_gtValidateRow();
+
   // send message to window to display updated caret
-  SendMessage(_s.hWnd, WM_MY_UPDATE_CARET, 0, 0);
+  //
+  SendMessage( _s.hWnd, WM_MY_UPDATE_CARET, 0, 0 );
 }
 
 //-------------------------------------------------------------------//
@@ -2317,9 +2365,9 @@ static void hb_wvt_gtValidateCaret(void)
  * hb_wvt_gtGetIndexForTextBuffer takes a row and column, and returns the appropriate
  * index into the screen Text buffer
  */
-static USHORT hb_wvt_gtGetIndexForTextBuffer(USHORT col, USHORT row)
+static USHORT hb_wvt_gtGetIndexForTextBuffer( USHORT col, USHORT row )
 {
-  return(row * _s.COLS + col);
+  return( row * _s.COLS + col );
 }
 
 //-------------------------------------------------------------------//
@@ -2327,35 +2375,38 @@ static USHORT hb_wvt_gtGetIndexForTextBuffer(USHORT col, USHORT row)
   * hb_wvt_gtGetColRowForTextBuffer takes an index into the screen Text buffer
   * and returns the corresponding row and column
   */
-static POINT hb_wvt_gtGetColRowForTextBuffer(USHORT index)
+static POINT hb_wvt_gtGetColRowForTextBuffer( USHORT index )
 {
   POINT colrow;
+
   colrow.x = index % _s.COLS;
   colrow.y = index / _s.COLS;
-  return(colrow);
+
+  return( colrow );
 }
 
 //-------------------------------------------------------------------//
 /*
- * hb_wvt_gtTextOut converts col and row to x and y (pixels) and calls
+ * hb_wvt_gtTextOut converts col and row to x and y ( pixels ) and calls
  * the Windows function TextOut with the expected coordinates
  */
 static BOOL hb_wvt_gtTextOut( HDC hdc,  USHORT col, USHORT row, LPCTSTR lpString, USHORT cbString  )
 {
   BOOL Result ;
   POINT xy;
-  if (cbString > _s.COLS) // make sure string is not too long
+
+  if ( cbString > _s.COLS ) // make sure string is not too long
   {
     cbString = _s.COLS;
   }
-  xy = hb_wvt_gtGetXYFromColRow(col, row);
-  if (_s.FixedFont)
+  xy = hb_wvt_gtGetXYFromColRow( col, row );
+  if ( _s.FixedFont )
   {
-    Result = TextOut(hdc, xy.x, xy.y, lpString, cbString);
+    Result = TextOut( hdc, xy.x, xy.y, lpString, cbString );
   }
   else
   {
-    Result = ExtTextOut(hdc, xy.x, xy.y, 0, NULL, lpString, cbString, _s.FixedSize) ;
+    Result = ExtTextOut( hdc, xy.x, xy.y, 0, NULL, lpString, cbString, _s.FixedSize ) ;
   }
   return( Result ) ;
 }
@@ -2364,55 +2415,59 @@ static BOOL hb_wvt_gtTextOut( HDC hdc,  USHORT col, USHORT row, LPCTSTR lpString
 //
 /* get for and background colours from attribute and set them for window
 */
-static BOOL hb_wvt_gtSetColors(HDC hdc, BYTE attr)
+static BOOL hb_wvt_gtSetColors( HDC hdc, BYTE attr )
 {
   BOOL bResult= FALSE;
-  if (attr != ' ')
+
+  if ( attr != ' ' )
   {
     int fore = attr & 0x000F;
-    int back = (attr & 0x00F0)>>4;
+    int back = ( attr & 0x00F0 )>>4;
 
-    _s.foreground = _COLORS[fore];
-    _s.background = _COLORS[back];
+    _s.foreground = _COLORS[ fore ];
+    _s.background = _COLORS[ back ];
 
-    SetTextColor(hdc, _s.foreground);
-    SetBkColor(hdc, _s.background);
+    SetTextColor( hdc, _s.foreground );
+    SetBkColor( hdc, _s.background );
     bResult= TRUE;
   }
-  return(bResult);
+  return( bResult );
 }
 
 //-------------------------------------------------------------------//
 //
 /* compute invalid rect in pixels, from row and col
 */
-static void hb_wvt_gtSetInvalidRect(USHORT left, USHORT top, USHORT right, USHORT bottom)
+static void hb_wvt_gtSetInvalidRect( USHORT left, USHORT top, USHORT right, USHORT bottom )
 {
   RECT rect;
-  if (_s.InvalidateWindow)
+
+  if ( _s.InvalidateWindow )
   {
     rect.left   = left;
     rect.top    = top;
     rect.right  = right;
     rect.bottom = bottom;
-    rect = hb_wvt_gtGetXYFromColRowRect(rect);
+
+    rect = hb_wvt_gtGetXYFromColRowRect( rect );
 
     // check for wrapping
-    rect.left = min(rect.left, rect.right);
-    rect.top = min(rect.top, rect.bottom);
+    //
+    rect.left = min( rect.left, rect.right );
+    rect.top  = min( rect.top, rect.bottom );
 
-    rect.right = max(rect.left, rect.right);
-    rect.bottom = max(rect.top, rect.bottom);
-    if (_s.RectInvalid.left < 0 )
+    rect.right  = max( rect.left, rect.right );
+    rect.bottom = max( rect.top, rect.bottom );
+    if ( _s.RectInvalid.left < 0 )
     {
-      memcpy(&_s.RectInvalid, &rect, sizeof(RECT));
+      memcpy( &_s.RectInvalid, &rect, sizeof( RECT ) );
     }
     else
     {
-      _s.RectInvalid.left   = min(_s.RectInvalid.left, rect.left    );
-      _s.RectInvalid.top    = min(_s.RectInvalid.top, rect.top      );
-      _s.RectInvalid.right  = max(_s.RectInvalid.right, rect.right  );
-      _s.RectInvalid.bottom = max(_s.RectInvalid.bottom, rect.bottom);
+      _s.RectInvalid.left   = min( _s.RectInvalid.left  , rect.left   );
+      _s.RectInvalid.top    = min( _s.RectInvalid.top   , rect.top    );
+      _s.RectInvalid.right  = max( _s.RectInvalid.right , rect.right  );
+      _s.RectInvalid.bottom = max( _s.RectInvalid.bottom, rect.bottom );
     }
     hv_wvt_gtDoInvalidateRect() ;
   }
@@ -2420,11 +2475,11 @@ static void hb_wvt_gtSetInvalidRect(USHORT left, USHORT top, USHORT right, USHOR
 
 //-------------------------------------------------------------------//
 
-static void hv_wvt_gtDoInvalidateRect(void)
+static void hv_wvt_gtDoInvalidateRect( void )
 {
-  if (HB_GT_FUNC(gt_DispCount()) <= 0 && (_s.RectInvalid.left != -1))
+  if ( HB_GT_FUNC( gt_DispCount() ) <= 0 && ( _s.RectInvalid.left != -1 ) )
   {
-    InvalidateRect(_s.hWnd, &_s.RectInvalid, TRUE);
+    InvalidateRect( _s.hWnd, &_s.RectInvalid, TRUE );
     _s.RectInvalid.left = -1 ;
     hb_wvt_gtProcessMessages();
   }
@@ -2432,30 +2487,30 @@ static void hv_wvt_gtDoInvalidateRect(void)
 
 //-------------------------------------------------------------------//
 
-static void hb_wvt_gtTranslateKey(int key, int shiftkey, int altkey, int controlkey)
+static void hb_wvt_gtTranslateKey( int key, int shiftkey, int altkey, int controlkey )
 {
-  int nVirtKey = GetKeyState(VK_SHIFT);
-  if (nVirtKey & 0x8000) // shift + key
+  int nVirtKey = GetKeyState( VK_SHIFT );
+  if ( nVirtKey & 0x8000 ) // shift + key
   {
-    hb_wvt_gtAddCharToInputQueue(shiftkey);
+    hb_wvt_gtAddCharToInputQueue( shiftkey );
   }
   else
   {
-    nVirtKey = GetKeyState(VK_MENU);
-    if (nVirtKey & 0x8000) // alt + key
+    nVirtKey = GetKeyState( VK_MENU );
+    if ( nVirtKey & 0x8000 ) // alt + key
     {
-      hb_wvt_gtAddCharToInputQueue(altkey);
+      hb_wvt_gtAddCharToInputQueue( altkey );
     }
     else
     {
-      nVirtKey = GetKeyState(VK_CONTROL);
-      if (nVirtKey & 0x8000) // control + key
+      nVirtKey = GetKeyState( VK_CONTROL );
+      if ( nVirtKey & 0x8000 ) // control + key
       {
-        hb_wvt_gtAddCharToInputQueue(controlkey);
+        hb_wvt_gtAddCharToInputQueue( controlkey );
       }
       else //just key
       {
-        hb_wvt_gtAddCharToInputQueue(key);
+        hb_wvt_gtAddCharToInputQueue( key );
       }
     }
   }
@@ -2466,10 +2521,10 @@ static void hb_wvt_gtTranslateKey(int key, int shiftkey, int altkey, int control
 // font stuff
 /* use the standard fixed oem font, unless the caller has requested set size fonts
 */
-static HFONT hb_wvt_gtGetFont(char * pszFace, int iHeight, int iWidth, int iWeight, int iQuality, int iCodePage)
+static HFONT hb_wvt_gtGetFont( char * pszFace, int iHeight, int iWidth, int iWeight, int iQuality, int iCodePage )
 {
   HFONT hFont;
-  if ( iHeight > 0)
+  if ( iHeight > 0 )
   {
     LOGFONT logfont;
 
@@ -2489,14 +2544,14 @@ static HFONT hb_wvt_gtGetFont(char * pszFace, int iHeight, int iWidth, int iWeig
 
     strcpy( logfont.lfFaceName,pszFace );
 
-    hFont = CreateFontIndirect(&logfont);
+    hFont = CreateFontIndirect( &logfont );
   }
   else
   {
-//    hFont = GetStockObject(SYSTEM_FIXED_FONT);
-    hFont = (HFONT) GetStockObject(OEM_FIXED_FONT);
+//    hFont = GetStockObject( SYSTEM_FIXED_FONT );
+    hFont = ( HFONT ) GetStockObject( OEM_FIXED_FONT );
   }
-  return(hFont);
+  return( hFont );
 
 }
 
@@ -2531,7 +2586,7 @@ static void gt_hbInitStatics( void )
   _s.fontWidth        = 0;
   _s.fontWeight       = 0; 
   _s.fontQuality      = DEFAULT_QUALITY;
-  strcpy(_s.fontFace,"Terminal");
+  strcpy( _s.fontFace,"Terminal" );
   _s.closeEvent       = 0;
   _s.shutdownEvent    = 0;
   _s.LastMenuEvent    = 0;
@@ -2539,9 +2594,9 @@ static void gt_hbInitStatics( void )
   _s.CentreWindow     = TRUE;       // Default is to always display window in centre of screen
   _s.CodePage         = GetACP() ;  // Set code page to default system
 
-  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-  GetVersionEx (&osvi);
-  _s.Win9X            = (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS);
+  osvi.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
+  GetVersionEx ( &osvi );
+  _s.Win9X            = ( osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS );
   _s.AltF4Close       = FALSE;
   _s.InvalidateWindow = TRUE;
   _s.EnableShortCuts  = FALSE;
@@ -2551,58 +2606,58 @@ static void gt_hbInitStatics( void )
 /*
  *  functions for handling the input queues for the mouse and keyboard
  */
-static void hb_wvt_gtAddCharToInputQueue ( int data)
+static void hb_wvt_gtAddCharToInputQueue ( int data )
 {
   int iNextPos;
-  iNextPos = (_s.keyPointerIn >= WVT_CHAR_QUEUE_SIZE) ? 0 : _s.keyPointerIn+1 ;
-  if (iNextPos != _s.keyPointerOut ) // Stop accepting characters once the buffer is full
+  iNextPos = ( _s.keyPointerIn >= WVT_CHAR_QUEUE_SIZE ) ? 0 : _s.keyPointerIn+1 ;
+  if ( iNextPos != _s.keyPointerOut ) // Stop accepting characters once the buffer is full
   {
-    _s.Keys[_s.keyPointerIn] = data ;
+    _s.Keys[ _s.keyPointerIn ] = data ;
     _s.keyPointerIn = iNextPos ;
   }
 }
 
 //-------------------------------------------------------------------//
 
-static BOOL hb_wvt_gtGetCharFromInputQueue (int *c)
+static BOOL hb_wvt_gtGetCharFromInputQueue ( int *c )
 {
   int iNextPos;
   BOOL bRet = FALSE;
   *c = 0;
-  iNextPos = (_s.keyPointerOut >= WVT_CHAR_QUEUE_SIZE) ? 0 : _s.keyPointerOut+1 ;
-  if (iNextPos != _s.keyPointerIn )  // No more events in queue ??
+  iNextPos = ( _s.keyPointerOut >= WVT_CHAR_QUEUE_SIZE ) ? 0 : _s.keyPointerOut+1 ;
+  if ( iNextPos != _s.keyPointerIn )  // No more events in queue ??
   {
-    *c = _s.Keys[iNextPos] ;
+    *c = _s.Keys[ iNextPos ] ;
     _s.keyPointerOut = iNextPos ;
     bRet =  TRUE;
   }
-  return(bRet);
+  return( bRet );
 }
 
 //-------------------------------------------------------------------//
 
-static USHORT hb_wvt_gtGetMouseX (void)
+static USHORT hb_wvt_gtGetMouseX ( void )
 {
-  return(_s.mousePos.x);
+  return( _s.mousePos.x );
 }
 
 //-------------------------------------------------------------------//
 
-static USHORT hb_wvt_gtGetMouseY (void)
+static USHORT hb_wvt_gtGetMouseY ( void )
 {
-  return(_s.mousePos.y);
+  return( _s.mousePos.y );
 }
 
 //-------------------------------------------------------------------//
 
-static void hb_wvt_gtSetMouseX (USHORT ix)
+static void hb_wvt_gtSetMouseX ( USHORT ix )
 {
   _s.mousePos.x = ix;
 }
 
 //-------------------------------------------------------------------//
 
-static void hb_wvt_gtSetMouseY (USHORT iy)
+static void hb_wvt_gtSetMouseY ( USHORT iy )
 {
   _s.mousePos.y = iy;
 }
@@ -2613,42 +2668,44 @@ static void hb_wvt_gtSetMouseY (USHORT iy)
  * the specified caret position
  * It then determines the invalid rectangle, so the string will be displayed
  */
-static void hb_wvt_gtSetStringInTextBuffer(USHORT col, USHORT row, BYTE attr, BYTE *sBuffer, USHORT length)
+static void hb_wvt_gtSetStringInTextBuffer( USHORT col, USHORT row, BYTE attr, BYTE *sBuffer, USHORT length )
 {
   POINT end;
   USHORT index;
 
 
   // determine the index and put the string into the TextBuffer
-  index = hb_wvt_gtGetIndexForTextBuffer(col, row);
-  if (length + index <= _s.BUFFERSIZE)
+  //
+  index = hb_wvt_gtGetIndexForTextBuffer( col, row );
+  if ( length + index <= _s.BUFFERSIZE )
   {
-    memcpy((_s.pBuffer+index), sBuffer, length);
-    if (attr != ' ') // if no attribute, don't overwrite
+    memcpy( ( _s.pBuffer+index ), sBuffer, length );
+    if ( attr != ' ' ) // if no attribute, don't overwrite
     {
-      memset((_s.pAttributes+index), attr, length);
+      memset( ( _s.pAttributes+index ), attr, length );
     }
 
-    //determine bounds of rect around character to refresh
-    end = hb_wvt_gtGetColRowForTextBuffer(index + (length -1) ); //location of last char
-    hb_wvt_gtSetInvalidRect(col, row, end.x, end.y);
+    //  determine bounds of rect around character to refresh
+    //
+    end = hb_wvt_gtGetColRowForTextBuffer( index + ( length -1 ) ); //location of last char
+    hb_wvt_gtSetInvalidRect( col, row, end.x, end.y );
   }
 }
 
 //-------------------------------------------------------------------//
 
-static void hb_wvt_gtSetCaretOn(BOOL bOn)
+static void hb_wvt_gtSetCaretOn( BOOL bOn )
 {
-  if (_s.CaretExist)
+  if ( _s.CaretExist )
   {
-    if (bOn)
+    if ( bOn )
     {
       hb_wvt_gtSetCaretPos();
-      ShowCaret(_s.hWnd);
+      ShowCaret( _s.hWnd );
     }
     else
     {
-      HideCaret(_s.hWnd);
+      HideCaret( _s.hWnd );
     }
   }
   _s.displayCaret = bOn;
@@ -2656,24 +2713,24 @@ static void hb_wvt_gtSetCaretOn(BOOL bOn)
 
 //-------------------------------------------------------------------//
 
-static void hb_wvt_gtHandleMenuSelection(int menuIndex)
+static void hb_wvt_gtHandleMenuSelection( int menuIndex )
 {
   _s.LastMenuEvent = menuIndex ;
-  hb_wvt_gtAddCharToInputQueue(_s.MenuKeyEvent);
+  hb_wvt_gtAddCharToInputQueue( _s.MenuKeyEvent );
 }
 
 //-------------------------------------------------------------------//
 
-static int hb_wvt_gtGetCloseEvent(void)
+static int hb_wvt_gtGetCloseEvent( void )
 {
-  return(_s.closeEvent);
+  return( _s.closeEvent );
 }
 
 //-------------------------------------------------------------------//
 
-static int hb_wvt_gtGetShutdownEvent(void)
+static int hb_wvt_gtGetShutdownEvent( void )
 {
-  return(_s.shutdownEvent);
+  return( _s.shutdownEvent );
 }
 
 //-------------------------------------------------------------------//
@@ -2686,80 +2743,80 @@ static int hb_wvt_gtGetShutdownEvent(void)
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 
-BOOL HB_EXPORT hb_wvt_gtSetMenuKeyEvent(int iMenuKeyEvent)
+BOOL HB_EXPORT hb_wvt_gtSetMenuKeyEvent( int iMenuKeyEvent )
 {
   int iOldEvent;
   iOldEvent = _s.MenuKeyEvent ;
-  if (iMenuKeyEvent)
+  if ( iMenuKeyEvent )
   {
     _s.MenuKeyEvent = iMenuKeyEvent;
   }
-  return(iOldEvent);
+  return( iOldEvent );
 }
 
 //-------------------------------------------------------------------//
 
-BOOL HB_EXPORT hb_wvt_gtSetCentreWindow(BOOL bCentre, BOOL bPaint)
+BOOL HB_EXPORT hb_wvt_gtSetCentreWindow( BOOL bCentre, BOOL bPaint )
 {
   BOOL bWasCentre;
   bWasCentre = _s.CentreWindow ;
   _s.CentreWindow = bCentre;
-  if ( bPaint)
+  if ( bPaint )
   {
-    hb_wvt_gtResetWindowSize(_s.hWnd) ;
+    hb_wvt_gtResetWindowSize( _s.hWnd ) ;
   }
-  return(bWasCentre);
+  return( bWasCentre );
 }
 
 //-------------------------------------------------------------------//
 
-void HB_EXPORT hb_wvt_gtResetWindow(void)
+void HB_EXPORT hb_wvt_gtResetWindow( void )
 {
-  hb_wvt_gtResetWindowSize(_s.hWnd) ;
+  hb_wvt_gtResetWindowSize( _s.hWnd ) ;
 }
 
 //-------------------------------------------------------------------//
 
-BOOL HB_EXPORT hb_wvt_gtSetCodePage(int iCodePage)
+BOOL HB_EXPORT hb_wvt_gtSetCodePage( int iCodePage )
 {
   int iOldCodePage;
   iOldCodePage = _s.CodePage ;
-  if (iCodePage)
+  if ( iCodePage )
   {
     _s.CodePage = iCodePage;
   }
-  if (iOldCodePage != iCodePage)
+  if ( iOldCodePage != iCodePage )
   {
     hb_wvt_gtResetWindow();
   }
-  return(iOldCodePage);
+  return( iOldCodePage );
 }
 
 //-------------------------------------------------------------------//
 
-int HB_EXPORT hb_wvt_gtGetLastMenuEvent(void)
+int HB_EXPORT hb_wvt_gtGetLastMenuEvent( void )
 {
-  return(_s.LastMenuEvent);
+  return( _s.LastMenuEvent );
 }
 
 //-------------------------------------------------------------------//
 
-void HB_EXPORT hb_wvt_gtSetWindowTitle(char * title)
+void HB_EXPORT hb_wvt_gtSetWindowTitle( char * title )
 {
-  SetWindowText(_s.hWnd, title);
+  SetWindowText( _s.hWnd, title );
 }
 
 //-------------------------------------------------------------------//
 
-DWORD HB_EXPORT hb_wvt_gtSetWindowIcon(int icon)
+DWORD HB_EXPORT hb_wvt_gtSetWindowIcon( int icon )
 {
-  HICON hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, MAKEINTRESOURCE(icon));
+  HICON hIcon = LoadIcon( ( HINSTANCE ) hb_hInstance, MAKEINTRESOURCE( icon ) );
   if ( hIcon )
   {
-    SendMessage(_s.hWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon); // Set Title Bar ICON
-    SendMessage(_s.hWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon); // Set Task List Icon
+    SendMessage( _s.hWnd, WM_SETICON, ICON_SMALL, ( LPARAM )hIcon ); // Set Title Bar ICON
+    SendMessage( _s.hWnd, WM_SETICON, ICON_BIG, ( LPARAM )hIcon ); // Set Task List Icon
   }
-  return((DWORD) hIcon) ;
+  return( ( DWORD ) hIcon ) ;
 }
 
 //-------------------------------------------------------------------//
@@ -2778,23 +2835,26 @@ DWORD HB_EXPORT hb_wvt_gtSetWindowIconFromFile( char *icon )
 
 //-------------------------------------------------------------------//
 
-int HB_EXPORT hb_wvt_gtGetWindowTitle(char *title, int length)
+int HB_EXPORT hb_wvt_gtGetWindowTitle( char *title, int length )
 {
-  return(GetWindowText(_s.hWnd, title, length));
+  return( GetWindowText( _s.hWnd, title, length ) );
 }
 
 //-------------------------------------------------------------------//
 
-BOOL HB_EXPORT hb_wvt_gtSetFont(char *fontFace, int height, int width, int Bold, int Quality )
+BOOL HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold, int Quality )
 {
   int   size;
   BOOL  bResult = TRUE ;
-  HFONT hFont   = hb_wvt_gtGetFont(fontFace, height, width, Bold, Quality, _s.CodePage);
+  HFONT hFont   = hb_wvt_gtGetFont( fontFace, height, width, Bold, Quality, _s.CodePage );
+
   // make sure the font could actually be created
+  //
   if ( hFont )
   {
     // make sure that the font  will fit inside the
     // window with the current _s.ROWS and _s.COLS setting
+    //
     if ( hb_wvt_gtValidWindowSize( _s.ROWS,_s.COLS, hFont ) )
     {
       _s.fontHeight  = height;
@@ -2810,53 +2870,56 @@ BOOL HB_EXPORT hb_wvt_gtSetFont(char *fontFace, int height, int width, int Bold,
       if ( _s.hWnd )
       {
         // resize the window based on new fonts
+        //
         hb_wvt_gtResetWindowSize( _s.hWnd );
+        
         // send message to force resize of caret
+        //
         SendMessage( _s.hWnd, WM_KILLFOCUS, 0, 0 );
         SendMessage( _s.hWnd, WM_SETFOCUS , 0, 0 );
       }
       bResult= TRUE;
     }
-    DeleteObject(hFont);
+    DeleteObject( hFont );
   }
-  return(bResult);
+  return( bResult );
 }
 
 //-------------------------------------------------------------------//
 
-void HB_EXPORT hb_wvt_gtSetCloseEvent(int iEvent)
+void HB_EXPORT hb_wvt_gtSetCloseEvent( int iEvent )
 {
   _s.closeEvent = iEvent;
 }
 
 //-------------------------------------------------------------------//
 
-void HB_EXPORT hb_wvt_gtSetShutdownEvent(int iEvent)
+void HB_EXPORT hb_wvt_gtSetShutdownEvent( int iEvent )
 {
   _s.shutdownEvent = iEvent;
 }
 
 //-------------------------------------------------------------------//
 
-HWND HB_EXPORT hb_wvt_gtGetWindowHandle(void)
+HWND HB_EXPORT hb_wvt_gtGetWindowHandle( void )
 {
-  return(_s.hWnd);
+  return( _s.hWnd );
 }
 
 //-------------------------------------------------------------------//
 
-void HB_EXPORT hb_wvt_gtPostMessage(int message)
+void HB_EXPORT hb_wvt_gtPostMessage( int message )
 {
-  SendMessage(_s.hWnd, WM_CHAR,message, 0);
+  SendMessage( _s.hWnd, WM_CHAR,message, 0 );
 }
 
 //-------------------------------------------------------------------//
 
-BOOL HB_EXPORT hb_wvt_gtSetWindowPos(int left, int top)
+BOOL HB_EXPORT hb_wvt_gtSetWindowPos( int left, int top )
 {
   RECT wi;
-  GetWindowRect(_s.hWnd, &wi);
-  return(SetWindowPos(_s.hWnd, NULL, left, top, (wi.right-wi.left)+1, (wi.bottom-wi.top)+1, SWP_NOZORDER));
+  GetWindowRect( _s.hWnd, &wi );
+  return( SetWindowPos( _s.hWnd, NULL, left, top, ( wi.right-wi.left )+1, ( wi.bottom-wi.top )+1, SWP_NOZORDER ) );
 }
 
 //-------------------------------------------------------------------//
@@ -2866,32 +2929,32 @@ BOOL HB_EXPORT hb_wvt_gtSetAltF4Close( BOOL bCanClose )
   BOOL bWas;
   bWas = _s.AltF4Close;
   _s.AltF4Close = bCanClose;
-  return(bWas);
+  return( bWas );
 }
 
 //-------------------------------------------------------------------//
 
-void HB_EXPORT hb_wvt_gtDoProcessMessages(void)
+void HB_EXPORT hb_wvt_gtDoProcessMessages( void )
 {
   hb_wvt_gtProcessMessages();
 }
 
 //-------------------------------------------------------------------//
 
-BOOL HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent)
+BOOL HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent )
 {
   BOOL bWas = _s.MouseMove;
   _s.MouseMove = bHandleEvent;
-  return(bWas);
+  return( bWas );
 }
 
 //-------------------------------------------------------------------//
 
-BOOL HB_EXPORT hb_wvt_gtEnableShortCuts( BOOL bEnable)
+BOOL HB_EXPORT hb_wvt_gtEnableShortCuts( BOOL bEnable )
 {
   BOOL bWas = _s.EnableShortCuts;
   _s.EnableShortCuts = bEnable;
-  return(bWas);
+  return( bWas );
 }
 
 //-------------------------------------------------------------------//
@@ -2900,9 +2963,9 @@ BOOL HB_EXPORT hb_wvt_gtEnableShortCuts( BOOL bEnable)
 
 #ifdef HB_MULTI_GT
 
-static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
+static void HB_GT_FUNC( gtFnInit( PHB_GT_FUNCS gt_funcs ) )
 {
-    HB_TRACE(HB_TR_DEBUG, ("hb_gtFnInit(%p)", gt_funcs));
+    HB_TRACE( HB_TR_DEBUG, ( "hb_gtFnInit( %p )", gt_funcs ) );
 
     gt_funcs->Init                  = HB_GT_FUNC( gt_Init );
     gt_funcs->Exit                  = HB_GT_FUNC( gt_Exit );
@@ -2949,7 +3012,7 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
 
 static void HB_GT_FUNC( mouseFnInit( PHB_GT_FUNCS gt_funcs ) )
 {
-    HB_TRACE(HB_TR_DEBUG, ("hb_mouseFnInit(%p)", gt_funcs));
+    HB_TRACE( HB_TR_DEBUG, ( "hb_mouseFnInit( %p )", gt_funcs ) );
 
     gt_funcs->mouse_Init            = HB_GT_FUNC( mouse_Init );
     gt_funcs->mouse_Exit            = HB_GT_FUNC( mouse_Exit );
@@ -2968,15 +3031,15 @@ static void HB_GT_FUNC( mouseFnInit( PHB_GT_FUNCS gt_funcs ) )
 //-------------------------------------------------------------------//
 
 static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
-                             HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
+                             HB_GT_FUNC( gtFnInit ), HB_GT_FUNC( mouseFnInit ) };
 
 HB_GT_ANNOUNCE( HB_GT_NAME );
 
-HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
+HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC( _gt_Init_ ) )
    hb_gtRegister( &gtInit );
-HB_CALL_ON_STARTUP_END( HB_GT_FUNC(_gt_Init_) )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup HB_GT_FUNC(_gt_Init_)
+HB_CALL_ON_STARTUP_END( HB_GT_FUNC( _gt_Init_ ) )
+#if defined( HB_STATIC_STARTUP ) || ( ( ! defined( __GNUC__ ) ) && ( ! defined( _MSC_VER ) ) )
+   #pragma startup HB_GT_FUNC( _gt_Init_ )
 #endif
 
 #endif  /* HB_MULTI_GT */
@@ -3006,50 +3069,50 @@ HB_FUNC( WVT_SETFONT )
 
 HB_FUNC( WVT_SETICON )
 {
-	if ( ISNUM( 1 ) )
-	{
-	   hb_retnl( hb_wvt_gtSetWindowIcon( hb_parni( 1 ) ) ) ;
-	}
-	else
-	{
-		hb_retnl( hb_wvt_gtSetWindowIconFromFile( hb_parc( 1 ) ) ) ;	
-	}   
+   if ( ISNUM( 1 ) )
+   {
+      hb_retnl( hb_wvt_gtSetWindowIcon( hb_parni( 1 ) ) ) ;
+   }
+   else
+   {
+      hb_retnl( hb_wvt_gtSetWindowIconFromFile( hb_parc( 1 ) ) ) ;	
+   }   
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_SETTITLE )
 {
-	hb_wvt_gtSetWindowTitle( hb_parc( 1 ) ) ;
-	return ;
+   hb_wvt_gtSetWindowTitle( hb_parc( 1 ) ) ;
+   return ;
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_SETWINDOWPOS )
 {
-	hb_wvt_gtSetWindowPos( hb_parni( 1 ), hb_parni( 2 ) );	
+   hb_wvt_gtSetWindowPos( hb_parni( 1 ), hb_parni( 2 ) );	
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_GETWINDOWHANDLE )
 {
-	hb_retnl( ( LONG ) hb_wvt_gtGetWindowHandle() ) ;
+   hb_retnl( ( LONG ) hb_wvt_gtGetWindowHandle() ) ;
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_SETCODEPAGE )
 {
-	hb_retni( hb_wvt_gtSetCodePage( hb_parni( 1 ) ) );
+   hb_retni( hb_wvt_gtSetCodePage( hb_parni( 1 ) ) );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_CENTERWINDOW )
 {
-	hb_retl( hb_wvt_gtSetCentreWindow( 
+   hb_retl( hb_wvt_gtSetCentreWindow( 
 	            ISNIL( 1 ) ? TRUE  : hb_parl( 1 ), 
 	            ISNIL( 2 ) ? FALSE : hb_parl( 2 ) ) );
 }
@@ -3058,14 +3121,14 @@ HB_FUNC( WVT_CENTERWINDOW )
 
 HB_FUNC( WVT_SETMOUSEMOVE )
 {
-	if ( ISNIL( 1 ) )
-	{
-		hb_retl( FALSE );
-	}
-	else
-	{
-	   hb_retl( hb_wvt_gtSetMouseMove( hb_parl( 1 ) ) );
-	}   
+   if ( ISNIL( 1 ) )
+   {
+      hb_retl( FALSE );
+   }
+   else
+   {
+      hb_retl( hb_wvt_gtSetMouseMove( hb_parl( 1 ) ) );
+   }   
 }
 
 //-------------------------------------------------------------------//
