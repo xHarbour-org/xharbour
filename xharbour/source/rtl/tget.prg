@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.21 2002/07/08 04:48:45 walito Exp $
+ * $Id: tget.prg,v 1.22 2002/07/14 16:38:50 walito Exp $
  */
 
 /*
@@ -178,6 +178,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    DEFAULT cColorSpec TO hb_ColorIndex( SetColor(), CLR_UNSELECTED ) + "," + hb_ColorIndex( SetColor(), CLR_ENHANCED )
 
    ::HasFocus   := .f.
+   ::lEdit      := .f.
    ::BadDate    := .f.
    ::Block      := bVarBlock
    ::Changed    := .f.
