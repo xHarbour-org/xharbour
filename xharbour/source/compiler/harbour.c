@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.50 2003/08/14 08:44:21 ronpinkas Exp $
+ * $Id: harbour.c,v 1.51 2003/08/20 04:55:22 ronpinkas Exp $
  */
 
 /*
@@ -166,6 +166,7 @@ PHB_FNAME      hb_comp_pFileName = NULL;
 BOOL           hb_comp_bPPO = FALSE;                      /* flag indicating, is ppo output needed */
 FILE *         hb_comp_yyppo = NULL;                      /* output .ppo file */
 BOOL           hb_comp_bStartProc = TRUE;                 /* holds if we need to create the starting procedure */
+BOOL           hb_comp_bExplicitStartProc = FALSE;        /* holds if we need to support EXPLICIT App starting procedure */
 BOOL           hb_comp_bLineNumbers = TRUE;               /* holds if we need pcodes with line numbers */
 BOOL           hb_comp_bQuiet = FALSE;                    /* quiet mode */
 BOOL           hb_comp_bShortCuts = TRUE;                 /* .and. & .or. expressions shortcuts */

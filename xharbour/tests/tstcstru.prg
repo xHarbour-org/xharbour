@@ -137,7 +137,7 @@ Return
 
      MyStructure2->pNext = NULL;
 
-     hb_itemPutCRaw( &hb_stack.Return, (char *) MyStructure, sizeof( MY_STRUCTURE ) );
+     hb_itemPutCRaw( &(HB_VM_STACK.Return), (char *) MyStructure, sizeof( MY_STRUCTURE ) );
   }
 
 #pragma ENDDUMP

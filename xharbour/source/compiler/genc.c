@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.49 2003/07/21 22:41:06 ronpinkas Exp $
+ * $Id: genc.c,v 1.50 2003/09/09 01:32:26 druzus Exp $
  */
 
 /*
@@ -82,6 +82,8 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
    BOOL bIsGlobalVariable ;
 
    BOOL bCritical = FALSE;
+
+   int  iSymOffset, iStarupOffset;
 
    if( ! pFileName->szExtension )
    {
@@ -276,6 +278,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
 
       fprintf( yyc, "\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_%s%s )\n", hb_comp_szPrefix, pFileName->szName );
 
+      iSymOffset = 0;
+      iStarupOffset = -1;
+
       while( pSym )
       {
          if( pSym->szName[ 0 ] == '(' )
@@ -351,6 +356,8 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
             if ( ( pSym->cScope & HB_FS_FIRST ) &&  ( ! hb_comp_bNoStartUp ) )
             {
                fprintf( yyc, " | HB_FS_FIRST" );
+
+               iStarupOffset = iSymOffset;
             }
 
             /* specify the function address if it is a defined function or an
@@ -370,9 +377,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
          }
 
          if( pSym != hb_comp_symbols.pLast )
+         {
             fprintf( yyc, ",\n" );
+         }
 
          pSym = pSym->pNext;
+         iSymOffset++;
       }
 
       fprintf( yyc, "\nHB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n"
@@ -397,6 +407,23 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
                     hb_comp_szPrefix, pFileName->szName,
                     hb_comp_szPrefix, pFileName->szName,
                     hb_comp_szPrefix, pFileName->szName );
+
+      if( hb_comp_bExplicitStartProc && iStarupOffset >= 0 )
+      {
+         fprintf( yyc, "extern HB_EXPORT void hb_vmExplicitStartup( PHB_SYMB pSymbol );\n" );
+         fprintf( yyc, "void hb_InitExplicitStartup( void )\n" );
+         fprintf( yyc, "{\n" );
+         fprintf( yyc, "   hb_vmExplicitStartup( symbols + %i );\n", iStarupOffset );
+         fprintf( yyc, "}\n" );
+
+         fprintf( yyc, "#if defined(HB_STATIC_STARTUP)\n" );
+         fprintf( yyc, "   #pragma startup hb_InitExplicitStartup\n" );
+         fprintf( yyc, "#elif defined(_MSC_VER)\n" );
+         fprintf( yyc, "   static HB_$INITSYM hb_auto_InitExplicitStartup = hb_InitExplicitStartup;\n" );
+         fprintf( yyc, "#elif ! defined(__GNUC__)\n" );
+         fprintf( yyc, "   #pragma startup hb_InitExplicitStartup\n" );
+         fprintf( yyc, "#endif\n\n" );
+      }
 
       if( bCritical )
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.266 2003/10/05 05:25:07 paultucker Exp $
+ * $Id: hvm.c,v 1.267 2003/10/06 03:35:40 ronpinkas Exp $
  */
 
 /*
@@ -6969,6 +6969,8 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols i
    pNewSymbols->pNext = NULL;
    pNewSymbols->hScope = 0;
 
+   //printf( "Module: '%s'\n", sModule );
+
    if( bFree )
    {
       pNewSymbols->szModuleName = sModule;
@@ -7003,12 +7005,12 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols i
 
       pNewSymbols->hScope |= hSymScope;
 
-      //printf( "Module: '%s' Sym: '%s'\n", sModule, pSymbol->szName );
+      //printf( "Module: '%s' Sym: '%s' Scope: %i\n", sModule, pSymbol->szName, hSymScope );
 
       if( ( ! s_pSymStart ) && ( hSymScope & HB_FS_FIRST && ! (  hSymScope & HB_FS_INITEXIT ) ) )
       {
          s_pSymStart = pSymbol;  /* first public defined symbol to start execution */
-         //TraceLog( NULL, "Startup: '%s' Func: %p\n", pSymbol->szName, pSymbol->pFunPtr );
+         //printf( "Startup: '%s' Func: %p\n", pSymbol->szName, pSymbol->pFunPtr );
       }
 
       if( hSymScope & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR | HB_FS_FIRST ) )
@@ -7031,6 +7033,12 @@ HB_EXPORT PSYMBOLS hb_vmLastModule( void )
    }
 
    return pLastModule;
+}
+
+HB_EXPORT void hb_vmExplicitStartup( PHB_SYMB pSymbol )
+{
+   s_pSymStart = pSymbol;  /* first public defined symbol to start execution */
+   //printf( "Startup: '%s' Func: %p\n", pSymbol->szName, pSymbol->pFunPtr );
 }
 
 static void hb_vmReleaseLocalSymbols( void )

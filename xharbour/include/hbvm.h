@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.8 2003/06/17 14:22:21 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.9 2003/07/22 01:54:29 ronpinkas Exp $
  */
 
 /*
@@ -66,6 +66,7 @@ extern void HB_EXPORT hb_vmQuit( void );            /* Immediately quits the vir
 /* Harbour virtual machine functions */
 extern void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
 extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics symbols initialization */
+extern HB_EXPORT void hb_vmExplicitStartup( PHB_SYMB pSymbol );
 extern void    hb_vmSymbolInit_RT( void );   /* initialization of runtime support symbols */
 
 /* Harbour virtual machine escaping API */

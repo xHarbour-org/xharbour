@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.12 2003/07/24 20:53:45 andijahja Exp $
+ * $Id: hbusage.c,v 1.13 2003/09/09 01:32:26 druzus Exp $
  */
 
 /*
@@ -81,6 +81,7 @@ void hb_compPrintUsage( char * szSelf )
            "\n          %cn[<type>]       no implicit starting procedure (default)",
            "\n                           <type>: 0=no implicit starting procedure",
            "\n                                   1=no starting procedure at all",
+           "\n                                   2=force application starting procedure",
            "\n          %co<path>         object file drive and/or path",
            "\n          %cp               generate pre-processed output (.ppo) file",
            "\n          %cq               quiet",

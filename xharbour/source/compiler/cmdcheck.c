@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.10 2003/07/24 20:53:45 andijahja Exp $
+ * $Id: cmdcheck.c,v 1.11 2003/09/05 01:15:34 jonnymind Exp $
  */
 
 /*
@@ -706,25 +706,40 @@ void hb_compChkEnvironVar( char * szSwitch )
                    -n1 no start up procedure and no implicit start up procedure
                 */
                 if( *( s + 1 ) == '1' )
-                   {
+                {
                    hb_comp_bStartProc = FALSE;
                    hb_comp_bNoStartUp = TRUE;
-                   }
+                }
+                /*
+                   -n2 Explicit app start up procedure.
+                */
+                else if( *( s + 1 ) == '2' )
+                {
+                   printf( "Explicit Startup\n" );
+                   hb_comp_bStartProc = FALSE;
+                   hb_comp_bExplicitStartProc = TRUE;
+                }
                 /*
                    -n or -n0 no implicit start up procedure
                 */
                 else if ( ( *( s + 1 ) == '0' ) || ( *( s + 1 ) == '\0' ) )
+                {
                    hb_comp_bStartProc = FALSE;
+                }
                 /*
                    -n- ceates implicit start up procedure
                 */
                 else if( *( s + 1 ) == '-' )
+                {
                    hb_comp_bStartProc = TRUE;
+                }
                 /*
                    invalid command
                 */
                 else
+                {
                    hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+                }
                 break;
 
              case 'o':

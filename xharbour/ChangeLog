@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1557 2003/10/06 12:09:57 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1558 2003/10/06 13:01:42 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-06 14:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+    + Added: BOOL hb_comp_bExplicitStartProc (default to FALSE);
+
+  * include/hbvm.h
+  * source/vm/hvm.c
+    + Added: HB_EXPORT void hb_vmExplicitStartup( PHB_SYMB pSymbol )
+
+  * source/compiler/cmdcheck.c
+  * source/compiler/genc.c
+    + Added support for new -N2 (Forces application startup procedure.)
+
+    /*
+       This allows linkage with the DLL R/T without having to compile the R/T system with -N1
+       (by compiling the main prg module with -N2).
+
+       So now we can compile the R/T just once, and use the same objects for both the static
+       lib and the dll version, of the R/T.
+     */
+
+  * source/compiler/hbusage.c
+    + Added help text for new -N2
+
+  * tests/tstcstru.prg
+    * Minor correction of hb_stack to HB_VM_STACK
 
 2003-10-06 09:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gtwin/gtwin.c
@@ -16,18 +43,18 @@
 2003-10-06 14:05 UTC+2000 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/hbrandom.c
     ! when using the format hb_random( n1, n2 ), the interval is now
-      high-open (that is, n1 <= hb_random( n1, n2) < n2 ) 
+      high-open (that is, n1 <= hb_random( n1, n2) < n2 )
       (reporting AGAIN for clarity. Fixed under windows).
 
     + Added HB_RandomSeed() to allow generation of predictable random
-      sequences (debugging purposes) and HB_RandomInt that generates 
+      sequences (debugging purposes) and HB_RandomInt that generates
       integer numbers in inclusive intervals:
       /*
       * HB_RANDOMINT
-      * 
+      *
       * HB_RANDOMINT() --> returns 0 or 1, evenly distributed
       * HB_RANDOMINT( N ) --> returns an integer between 1 and N (inclusive)
-      * HB_RANDOMINT( x, y) --> Returns a real number between x and y (inclusive) 
+      * HB_RANDOMINT( x, y) --> Returns a real number between x and y (inclusive)
       * The integer returned is of the longest type available
       */
 
