@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.100 2003/08/18 19:16:41 jonnymind Exp $
+* $Id: thread.c,v 1.101 2003/08/27 19:04:06 jonnymind Exp $
 */
 
 /*
@@ -447,8 +447,6 @@ void hb_threadDestroyStack( HB_STACK *pStack )
       // Main thread should have them removed before arriving here.
       hb_memvarsRelease( pStack );
    }
-
-   hb_memvarsFree( pStack );
 
 /*
    if( pStack->hMemvars )
@@ -1895,7 +1893,7 @@ void hb_threadCloseHandles( void )
 {
    // Now we destroy the things that makes MT stack to exist,
    // so, after this one the VM must really quit
-   
+
    /* Destroyng all shell locks mutexes */
    HB_SHARED_DESTROY( hb_runningStacks );
    HB_CRITICAL_DESTROY( hb_mutexMutex );

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.79 2003/08/20 04:55:22 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.80 2003/08/24 23:55:20 ronpinkas Exp $
  */
 
 /*
@@ -464,7 +464,6 @@ extern HB_VALUE_PTR * hb_memvarValueBaseAddress( void ); /* retrieve the base ad
 #ifndef HB_THREAD_SUPPORT
 extern void     hb_memvarsInit( void ); /* initialize the memvar API system */
 extern void     hb_memvarsRelease( void ); /* clear all PUBLIC and PRIVATE variables */
-extern void     hb_memvarsFree( void ); /* release the memvar API system */
 #endif
 
 extern void     hb_memvarValueIncRef( HB_HANDLE hValue ); /* increase the reference count of a global value */

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.258 2003/09/07 23:12:15 ronpinkas Exp $
+ * $Id: hvm.c,v 1.259 2003/09/08 12:56:53 druzus Exp $
  */
 
 /*
@@ -701,12 +701,8 @@ void HB_EXPORT hb_vmQuit( void )
    hb_gcReleaseAll();
    //printf("After GC\n" );
 
-
 #ifndef HB_THREAD_SUPPORT
    //JC1: under threads, we'll kill our stack when needed
-
-   hb_memvarsFree();    /* free memory allocated for memvars table */
-   //printf("After memvarsFree\n" );
 
    hb_stackFree();
    //printf("After hbStackFree\n" );

@@ -904,8 +904,8 @@ PROCEDURE RP_Dot()
 
    bCount := .F.
 
-   IF File( "ro_dot.ch" )
-      PP_PreProFile( "rp_dot.ch" )
+   IF File( "rp_dot.ch" )
+      //PP_PreProFile( "rp_dot.ch" )
    ELSE
       PP_LoadDot()
    ENDIF
@@ -914,14 +914,16 @@ PROCEDURE RP_Dot()
       PP_PreProLine( '#COMMAND Alert( <x> ) => MessageBox( 0, CStr( <x> ), "TInterpreter for Windows", 0 )' )
    #endif
 
-   aCpyDefRules     := aClone( aDefRules )
-   aCpyDefResults   := aClone( aDefResults )
+   #ifndef DONT_CLONE_RULES
+      aCpyDefRules     := aClone( aDefRules )
+      aCpyDefResults   := aClone( aDefResults )
 
-   aCpyCommRules    := aClone( aCommRules )
-   aCpyCommResults  := aClone( aCommResults )
+      aCpyCommRules    := aClone( aCommRules )
+      aCpyCommResults  := aClone( aCommResults )
 
-   aCpyTranRules   := aClone( aTransRules )
-   aCpyTranResults := aClone( aTransResults )
+      aCpyTranRules   := aClone( aTransRules )
+      aCpyTranResults := aClone( aTransResults )
+   #endif
 
    ErrorBlock( {|oErr| RP_Dot_Err( oErr ) } )
 
@@ -984,20 +986,22 @@ PROCEDURE RP_Dot()
          s_nRow := MaxRow() - 2
       ENDIF
 
-      IF s_lRunLoaded
-         aDefRules     := aClone( aCpyDefRules )
-         aDefResults   := aClone( aCpyDefResults )
+      #ifndef DONT_CLONE_RULES
+         IF s_lRunLoaded
+            aDefRules     := aClone( aCpyDefRules )
+            aDefResults   := aClone( aCpyDefResults )
 
-         aCommRules    := aClone( aCpyCommRules )
-         aCommResults  := aClone( aCpyCommResults )
+            aCommRules    := aClone( aCpyCommRules )
+            aCommResults  := aClone( aCpyCommResults )
 
-         aTransRules   := aClone( aCpyTranRules )
-         aTransResults := aClone( aCpyTranResults )
+            aTransRules   := aClone( aCpyTranRules )
+            aTransResults := aClone( aCpyTranResults )
 
-         s_lRunLoaded := .F.
-         s_lClsLoaded := .F.
-         s_lFWLoaded  := .F.
-      ENDIF
+            s_lRunLoaded := .F.
+            s_lClsLoaded := .F.
+            s_lFWLoaded  := .F.
+         ENDIF
+      #endif
 
    ENDDO
 

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.56 2003/08/01 11:36:04 jonnymind Exp $
+* $Id: thread.h,v 1.57 2003/08/27 19:04:06 jonnymind Exp $
 */
 
 /*
@@ -625,7 +625,6 @@ extern void hb_threadTerminator( void *pData );
 /* External functions used by thread as helper */
 extern void hb_memvarsInit( HB_STACK * );
 extern void hb_memvarsRelease( HB_STACK * );
-extern void hb_memvarsFree( HB_STACK * );
 extern void hb_memvarValueDecRefMT( HB_HANDLE hValue, HB_STACK *pStack );
 extern void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack );
 

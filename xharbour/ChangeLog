@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1434 2003/09/10 00:33:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1435 2003/09/10 01:03:55 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-09 23:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrays.c
+  * source/vm/asort.c
+  * source/vm/classes.c
+  * source/vm/codebloc.c
+  * source/vm/estack.c
+  * source/vm/fastitem.c
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+    ! Many revisions and fixes in the way GC handles Codeblocks and Arrays.
+
+  * include/hbapi.h
+  * source/vm/thread.c
+  * source/vm/hvm.c
+    ! Revised termination order so that hb_memvarsFree() is no longer needed.
+
+  * source/vm/proc.c
+    ! Fixed GPF trap when called from hb_vmQuit().
+
+  * tests/pp.prg
+    * Fixed typo.
 
 2003-09-10 03:00 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

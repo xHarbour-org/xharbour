@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.28 2003/09/07 23:12:15 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.29 2003/09/08 02:17:11 ronpinkas Exp $
  */
 
 /*
@@ -251,6 +251,14 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockDelete(%p)", pItem));
 
+   #ifndef HB_ARRAY_USE_COUNTER
+   // Called recursively from hb_codeblockDeleteGarbage()!
+   if( pCBlock && pCBlock->pSelfBase == (PHB_BASEARRAY) 1 )
+   {
+      return;
+   }
+   #endif
+
    if( pCBlock && (--pCBlock->ulCounter == 0) )
    {
       if( pCBlock->pSelfBase )
@@ -258,8 +266,14 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
          #ifdef HB_ARRAY_USE_COUNTER
             pCBlock->pSelfBase->uiHolders--;
          #else
-            hb_arrayReleaseHolder( pCBlock->pSelfBase, (void *) pCBlock );
+            PHB_BASEARRAY pSelfBase = pCBlock->pSelfBase;
+
+            // HACK! Avoid possible recursion problem when one of the array items of the attached object in turn points to this block.
+            pCBlock->pSelfBase = (PHB_BASEARRAY) 1;
+
+            hb_arrayReleaseHolder( pSelfBase, (void *) pCBlock );
          #endif
+
          pCBlock->pSelfBase = NULL;
       }
 
@@ -311,10 +325,16 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
    if( pCBlock->pSelfBase )
    {
       #ifdef HB_ARRAY_USE_COUNTER
-         //pCBlock->pSelfBase->uiHolders--;
+         pCBlock->pSelfBase->uiHolders--;
       #else
-         //hb_arrayReleaseHolder( pCBlock->pSelfBase, (void *) pCBlock );
+         PHB_BASEARRAY pSelfBase = pCBlock->pSelfBase;
+
+         // HACK! Avoid possible recursion problem when one of the array items of the attached object in turn points to this block.
+         pCBlock->pSelfBase = (PHB_BASEARRAY) 1;
+
+         hb_arrayReleaseHolder( pSelfBase, (void *) pCBlock );
       #endif
+
       pCBlock->pSelfBase = NULL;
    }
 
@@ -323,11 +343,13 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
    if( pCBlock->pLocals )
    {
       USHORT ui = 1;
+
       while( ui <= pCBlock->uiLocals )
       {
          hb_memvarValueDecGarbageRef( pCBlock->pLocals[ ui ].item.asMemvar.value );
          ++ui;
       }
+
       /* decrement the table reference counter and release memory if
        * it was the last reference
        */

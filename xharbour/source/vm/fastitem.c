@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.48 2003/08/02 06:14:26 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.49 2003/08/24 23:55:20 ronpinkas Exp $
  */
 
 /*
@@ -105,7 +105,7 @@ void HB_EXPORT hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
    #ifndef HB_ARRAY_USE_COUNTER
-      if( HB_IS_ARRAY( pSource ) )
+      if( HB_IS_ARRAY( pSource ) && pSource->item.asArray.value )
       {
          hb_arrayResetHolder( pSource->item.asArray.value, (void *) pSource, (void *) pDest );
       }
@@ -252,12 +252,12 @@ void HB_EXPORT hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
    */
 
    #ifndef HB_ARRAY_USE_COUNTER
-      if( HB_IS_ARRAY( pItem1 ) )
+      if( HB_IS_ARRAY( pItem1 ) && pItem1->item.asArray.value )
       {
          hb_arrayResetHolder( pItem1->item.asArray.value, (void *) pItem1, (void *) pItem2 );
       }
 
-      if( HB_IS_ARRAY( pItem2 ) )
+      if( HB_IS_ARRAY( pItem2 ) && pItem2->item.asArray.value )
       {
          hb_arrayResetHolder( pItem2->item.asArray.value, (void *) pItem2, (void *) pItem1 );
       }

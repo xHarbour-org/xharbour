@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.32 2003/09/07 23:12:15 ronpinkas Exp $
+ * $Id: memvars.c,v 1.33 2003/09/08 00:35:09 ronpinkas Exp $
  */
 
 /*
@@ -165,28 +165,35 @@ void hb_memvarsRelease( void )
    {
       while( --ulCnt )
       {
+         /*
+          * 2003-Sep-09 Ron Pinkas commented. - OK to release detached variables, we simply added:
+          * if( s_GlobalTable == NULL ) to hb_memvarValueDecRef() and hb_memvarValueDecGarbageRef()
+          *
          if( s_globalTable[ ulCnt ].counter && s_globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE )-1 )
+         */
          {
             if( HB_IS_COMPLEX( &s_globalTable[ ulCnt ].item ) )
             {
                hb_itemClear( &s_globalTable[ ulCnt ].item );
             }
+
             s_globalTable[ ulCnt ].counter = 0;
          }
       }
+
+      hb_xfree( s_globalTable );
+      s_globalTable = NULL;
+   }
+
+   if( s_privateStack )
+   {
+      hb_xfree( s_privateStack );
+      s_privateStack = NULL;
    }
 }
 
-void hb_memvarsFree( void )
-{
-   if( s_globalTable )
-      hb_xfree( s_globalTable );
-
-   if( s_privateStack )
-      hb_xfree( s_privateStack );
-}
-
 #else
+
 void hb_memvarsInit( HB_STACK *pStack )
 {
    // we MUST use malloc instead of hb_xgrab, as destruction sequence of main
@@ -222,25 +229,23 @@ void hb_memvarsRelease( HB_STACK *pStack )
             {
                hb_itemClearMT( &pStack->globalTable[ ulCnt ].item, pStack );
             }
+
             pStack->globalTable[ ulCnt ].counter = 0;
          }
       }
+
+      hb_xfree( pStack->globalTable );
+      pStack->globalTable = NULL;
+   }
+
+   if( pStack->privateStack )
+   {
+      hb_xfree( pStack->privateStack );
+      pStack->privateStack = NULL;
    }
 }
 
-
-void hb_memvarsFree( HB_STACK *pStack )
-{
-   if( pStack->globalTable )
-      hb_xfree( pStack->globalTable );
-
-   if( pStack->privateStack )
-      hb_xfree( pStack->privateStack );
-
-}
-
 #endif
-
 
 /*
  * This function base address of values table
@@ -336,7 +341,7 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
             {
                for( ulPos = 0; ulPos < ulValues; ulPos++ )
                {
-                  if( HB_IS_ARRAY( &( ( s_globalTable + ulPos )->item ) ) )
+                  if( HB_IS_ARRAY( &( ( s_globalTable + ulPos )->item ) ) && ( s_globalTable + ulPos )->item.item.asArray.value )
                   {
                      hb_arrayResetHolder( ( s_globalTable + ulPos )->item.item.asArray.value, (void *) &( ( pOldValues + ulPos )->item ), (void * ) &( ( s_globalTable + ulPos )->item ) );
                   }
@@ -366,7 +371,7 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
             #ifdef HB_ARRAY_USE_COUNTER
                pSource->item.asArray.value->uiHolders++;
             #else
-               hb_arrayRegisterHolder( pSource->item.asArray.value, &pValue->item );
+               hb_arrayResetHolder( pSource->item.asArray.value, pSource, &pValue->item );
             #endif
          }
       }
@@ -490,11 +495,16 @@ static void hb_memvarRecycle( HB_HANDLE hValue )
    else if( ( s_globalLastFree - hValue ) == 1 )
    {
       s_globalLastFree = hValue;         /* last item */
+
       if( s_globalLastFree == s_globalFirstFree )
+      {
          s_globalFreeCnt = 0;
+      }
    }
    else
+   {
       ++s_globalFreeCnt;
+   }
 }
 
 #else
@@ -533,6 +543,12 @@ void hb_memvarValueDecRef( HB_HANDLE hValue )
    HB_VALUE_PTR pValue;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarValueDecRef(%lu)", hValue));
+
+   // hb_vmQuit() - Memvars have been released already.
+   if( s_globalTable == NULL )
+   {
+      return;
+   }
 
    pValue = s_globalTable + hValue;
 
@@ -615,6 +631,12 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarValueDecRef(%lu)", hValue));
 
+   // hb_vmQuit() - Memvars have been released already.
+   if( s_globalTable == NULL )
+   {
+      return;
+   }
+
    pValue = s_globalTable + hValue;
 
    HB_TRACE(HB_TR_INFO, ("Memvar item (%i) decrement refCounter=%li", hValue, pValue->counter-1));
@@ -635,6 +657,15 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
             //JC1: It is safe to use it in this locked area.
             hb_itemReleaseString( &pValue->item );
          }
+       #ifndef HB_ARRAY_USE_COUNTER
+         else if( HB_IS_ARRAY( &pValue->item ) )
+         {
+            if( pValue->item.item.asArray.value )
+            {
+               hb_arrayReleaseHolder( pValue->item.item.asArray.value, (void *) &( pValue->item ) );
+            }
+         }
+       #endif
 
          #ifndef HB_THREAD_SUPPORT
          hb_memvarRecycle( hValue );

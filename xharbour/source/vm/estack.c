@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.39 2003/09/07 23:12:15 ronpinkas Exp $
+ * $Id: estack.c,v 1.40 2003/09/08 02:42:26 ronpinkas Exp $
  */
 
 /*
@@ -135,7 +135,7 @@ void hb_stackPush( void )
          {
             for( i = 0; i < CurrIndex; ++i )
             {
-               if( HB_IS_ARRAY( HB_VM_STACK.pItems[ i ] ) )
+               if( HB_IS_ARRAY( HB_VM_STACK.pItems[ i ] ) && HB_VM_STACK.pItems[ i ]->item.asArray.value )
                {
                   hb_arrayResetHolder( HB_VM_STACK.pItems[ i ]->item.asArray.value, (void *) ( pOldItems[i] ), (void *) ( HB_VM_STACK.pItems[i] ) );
                }
@@ -209,7 +209,11 @@ void hb_stackFree( void )
    {
       hb_xfree( hb_stack.pItems[ i-- ] );
    }
+
    hb_xfree( hb_stack.pItems );
+
+   hb_stack.pItems = NULL;
+   hb_stack.pBase = NULL;
 
    #endif
 }

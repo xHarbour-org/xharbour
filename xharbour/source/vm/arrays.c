@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.66 2003/09/07 23:12:15 ronpinkas Exp $
+ * $Id: arrays.c,v 1.67 2003/09/08 02:42:26 ronpinkas Exp $
  */
 
 /*
@@ -112,8 +112,6 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
       pBaseArray->pItems = NULL;
    }
 
-   pBaseArray->ulLen = ulLen;
-
    #ifdef HB_ARRAY_USE_COUNTER
       pBaseArray->uiHolders = 1;
    #else
@@ -121,6 +119,7 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
       hb_arrayRegisterHolder( pBaseArray, (void *) pItem );
    #endif
 
+   pBaseArray->ulLen = ulLen;
    pBaseArray->uiClass    = 0;
    pBaseArray->uiPrevCls  = 0;
    pBaseArray->puiClsTree = NULL;
@@ -242,7 +241,7 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
                   {
                      for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
                      {
-                        if( HB_IS_ARRAY( pBaseArray->pItems + ulPos ) )
+                        if( HB_IS_ARRAY( pBaseArray->pItems + ulPos ) && ( pBaseArray->pItems + ulPos )->item.asArray.value )
                         {
                            hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, ( pOldItems + ulPos ), ( pBaseArray->pItems + ulPos ) );
                         }
@@ -289,7 +288,7 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
                      {
                         for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
                         {
-                           if( HB_IS_ARRAY( pBaseArray->pItems + ulPos ) )
+                           if( HB_IS_ARRAY( pBaseArray->pItems + ulPos ) && ( pBaseArray->pItems + ulPos )->item.asArray.value )
                            {
                               hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, (void *) ( pOldItems + ulPos ), (void *) ( pBaseArray->pItems + ulPos ) );
                            }
@@ -971,6 +970,14 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
 {
    HB_TRACE( HB_TR_DEBUG, ( "pBaseArray %p", pBaseArray ) );
 
+   //TraceLog( NULL, "Releasing Basearray %p\n", pBaseArray );
+
+   // Called recursively from hb_arrayReleaseGarbage!
+   if( pBaseArray->pItems == (PHB_ITEM) 1 )
+   {
+      return;
+   }
+
    /* Release object tree as needed */
    if( pBaseArray->puiClsTree )
    {
@@ -1008,12 +1015,14 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
           * --------------------------------------------------*/
          if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value == pBaseArray )
          {
-            HB_TRACE( HB_TR_DEBUG, ("Warning! Nested Release (Cyclic) %p", pItem, pItem->item.asArray.value ) );
+            HB_TRACE( HB_TR_DEBUG, ("Warning! Nested Release (Cyclic) %p %p", pItem, pItem->item.asArray.value ) );
+            TraceLog( NULL, "Warning! Nested Release (Cyclic) %p %p\n", pItem, pItem->item.asArray.value );
          }
          else if( HB_IS_COMPLEX( pItem ) )
          {
-            //TraceLog( NULL, "Releasing Element: %i %p\n", pBaseArray->ulLen - ulLen, pItem );
+            //TraceLog( NULL, "Releasing Element: %i %p Type: %i\n", pBaseArray->ulLen - ulLen, pItem, pItem->type );
             hb_itemClear( pItem );
+            //TraceLog( NULL, "DONE Releasing Element: %i %p\n", pBaseArray->ulLen - ulLen, pItem );
          }
 
          ++pItem;
@@ -1026,6 +1035,8 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
 
    HB_TRACE( HB_TR_INFO, ( "Release pBaseArray %p", pBaseArray ) );
    hb_gcFree( ( void * ) pBaseArray );
+
+   //TraceLog( NULL, "DONE Releasing Basearray %p\n", pBaseArray );
 }
 
 BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
@@ -1039,30 +1050,25 @@ BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
       #ifdef HB_ARRAY_USE_COUNTER
           hb_arrayReleaseBase( pArray->item.asArray.value );
       #else
-          if( pArray->item.asArray.value->pOwners )
+          if( pArray->item.asArray.value && pArray->item.asArray.value->pOwners )
           {
-             if( pArray->item.asArray.value->pOwners->pOwner == (void *) pArray )
-             {
-                if( pArray->item.asArray.value->pOwners->pNext )
-                {
-                   char szProc[64], szModule[64];
-                   USHORT uiLine;
+             PHB_ARRAY_HOLDER pOwners = pArray->item.asArray.value->pOwners;
 
-                   hb_procinfo( 0, szProc, &uiLine, szModule  );
-                   TraceLog( NULL, "Warning! (1) Residual owner %p of array %p [%s->%s(%i)]\n",
-                                   pArray->item.asArray.value->pOwners->pNext->pOwner, pArray->item.asArray.value,
-                                   szModule, szProc, uiLine );
-                }
-             }
-             else
+             while( pOwners )
              {
                 char szProc[64], szModule[64];
                 USHORT uiLine;
 
                 hb_procinfo( 0, szProc, &uiLine, szModule  );
-                TraceLog( NULL, "Warning! (2) Residual owner %p of array %p [%s->%s(%i)]\n",
-                                pArray->item.asArray.value->pOwners->pOwner, pArray->item.asArray.value,
+
+                if( pOwners->pOwner != (void *) pArray )
+                {
+                   TraceLog( NULL, "Warning! (1) Residual owner %p of array %p [%s->%s(%i)]\n",
+                                   pOwners, pArray->item.asArray.value,
                                    szModule, szProc, uiLine );
+                }
+
+                pOwners = pOwners->pNext;
              }
 
              //TraceLog( NULL, "Diverting to ReleaseHolder() - Class '%s'\n", hb_objGetClsName( pArray ) );
@@ -1477,20 +1483,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 
    HB_TRACE( HB_TR_INFO, ( "hb_arrayReleaseGarbage( %p )", pBaseArray ) );
 
-   #ifndef HB_ARRAY_USE_COUNTER
-      while( pOwners )
-      {
-         //TraceLog( NULL, "Warning! (3) Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
-
-         pFree = pOwners;
-
-         pOwners = pOwners->pNext;
-
-         hb_xfree( pFree );
-      }
-
-      pBaseArray->pOwners = NULL;
-   #endif
+   //TraceLog( NULL, "hb_arrayReleaseGarbage( %p )\n", pBaseArray );
 
    /* Release object tree as needed */
    if( pBaseArray->puiClsTree )
@@ -1502,8 +1495,13 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 
    if( pBaseArray->pItems )
    {
-      HB_ITEM_PTR pItem = pBaseArray->pItems;
+      PHB_ITEM pItems = pBaseArray->pItems, pItem;
       ULONG ulLen = pBaseArray->ulLen;
+
+      // HACK! Avoid possible recursion problem when one of the items in turn points to this Array.
+      pBaseArray->pItems = (PHB_ITEM) 1;
+
+      pItem = pItems;
 
       while( ulLen-- )
       {
@@ -1514,10 +1512,21 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
            * allocated by the GC, its just a portion of the
            * pItems chunk, which will be released as one piece.
            * --------------------------------------------------*/
-         if( HB_IS_STRING( pItem ) && ! pItem->item.asString.bStatic )
+         if( HB_IS_STRING( pItem ) )
          {
-            hb_itemReleaseString( pItem );
+            if( ! pItem->item.asString.bStatic )
+            {
+               hb_itemReleaseString( pItem );
+            }
          }
+         else if( HB_IS_ARRAY( pItem ) )
+         {
+            if( pItem->item.asArray.value )
+            {
+               hb_arrayReleaseHolder( pItem->item.asArray.value, pItem );
+            }
+         }
+
          /* 03-07-2002 RP commented out - Needs further testing.
          else if( HB_IS_MEMVAR( pItem ) )
          {
@@ -1527,19 +1536,64 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
          ++pItem;
       }
 
-      if( pBaseArray->pItems )
-      {
-         HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pBaseArray->pItems ) );
-         hb_xfree( pBaseArray->pItems );
-         pBaseArray->pItems = NULL;
-      }
+      HB_TRACE( HB_TR_INFO, ( "Release pItems %p", pItems ) );
+      hb_xfree( pItems );
+      pBaseArray->pItems = NULL;
    }
+
+   // Has to be AFTER the array elements have been released!
+   #ifndef HB_ARRAY_USE_COUNTER
+      while( pOwners )
+      {
+         if( HB_IS_ARRAY( (PHB_ITEM) (pOwners->pOwner) ) )
+         {
+            //TraceLog( NULL, "Warning! (2) Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
+
+            if( ((PHB_ITEM) (pOwners->pOwner))->item.asArray.value == pBaseArray || ((PHB_ITEM) (pOwners->pOwner))->item.asArray.value == NULL )
+            {
+               // Forcing reset of the orphan refernce or else a GPF will folow when that item will be passed to hb_itemClear().
+               ((PHB_ITEM) (pOwners->pOwner) )->type = HB_IT_NIL;
+            }
+            else
+            {
+               TraceLog( NULL, "Warning! (4) Invalid Residual owner %p of array %p Stack: %p\n", pOwners->pOwner, pBaseArray, hb_stackItemFromTop( 1 ) );
+            }
+         }
+         else if( ((HB_CODEBLOCK_PTR) (pOwners->pOwner))->pSelfBase == pBaseArray )
+         {
+            //TraceLog( NULL, "Warning! (3) Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
+
+            // Forcing reset of the orphan refernce or else a GPF will folow when that item will be passed to hb_itemClear().
+            ((HB_CODEBLOCK_PTR) (pOwners->pOwner) )->pSelfBase = NULL;
+         }
+         else
+         {
+            TraceLog( NULL, "Warning! (5) Invalid Residual owner %p Type: %i of array %p Stack: %p\n", pOwners->pOwner, ((PHB_ITEM) (pOwners->pOwner))->type, pBaseArray, hb_stackItemFromTop( 1 ) );
+         }
+
+         pFree = pOwners;
+
+         pOwners = pOwners->pNext;
+
+         hb_xfree( pFree );
+      }
+
+      pBaseArray->pOwners = NULL;
+   #endif
+
+   //TraceLog( NULL, "DONE hb_arrayReleaseGarbage( %p )\n", pBaseArray );
+
 }
 
 #ifndef HB_ARRAY_USE_COUNTER
    void hb_arrayRegisterHolder( PHB_BASEARRAY pBaseArray, void *pHolder )
    {
       PHB_ARRAY_HOLDER pOwner = (PHB_ARRAY_HOLDER) hb_xgrab( sizeof( HB_ARRAY_HOLDER ) );
+
+      if( pBaseArray == NULL )
+      {
+         hb_errInternal( HB_EI_ERRUNRECOV, "Invalid base array passed to hb_arrayRegisterHolder().", NULL, NULL );
+      }
 
       #ifdef DEBUG_ARRAYS
          TraceLog( NULL, "Allocated %p Registring: %p of %p Next %p\n", pOwner, pBaseArray, pHolder, pBaseArray->pOwners );
@@ -1554,6 +1608,11 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    void hb_arrayResetHolder( PHB_BASEARRAY pBaseArray, void *pOldHolder, void *pNewHolder )
    {
       PHB_ARRAY_HOLDER pOwners = pBaseArray->pOwners;
+
+      if( pBaseArray == NULL )
+      {
+         hb_errInternal( HB_EI_ERRUNRECOV, "Invalid base array passed to hb_arrayResetHolder().", NULL, NULL );
+      }
 
       #ifdef DEBUG_ARRAYS
          TraceLog( NULL, "*Resetting: %p of %p to %p\n", pBaseArray, pOldHolder, pNewHolder );
@@ -1585,6 +1644,13 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    void hb_arrayReleaseHolder( PHB_BASEARRAY pBaseArray, void *pHolder )
    {
       PHB_ARRAY_HOLDER pOwners = pBaseArray->pOwners, pPrevious = NULL;
+
+      //TraceLog( NULL, "hb_arrayReleaseHolder( %p, %p )\n", pBaseArray, pHolder );
+
+      if( pBaseArray == NULL )
+      {
+         hb_errInternal( HB_EI_ERRUNRECOV, "Invalid base array passed to hb_arrayReleaseHolder().", NULL, NULL );
+      }
 
       #ifdef DEBUG_ARRAYS
          TraceLog( NULL, "-UNRegistering: %p of %p\n", pBaseArray, pHolder );
@@ -1623,6 +1689,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
                TraceLog( NULL, "Last Owner - Releasing array %p\n", pBaseArray );
             #endif
 
+            //TraceLog( NULL, "Last Owner - Releasing array %p\n", pBaseArray );
             hb_arrayReleaseBase( pBaseArray );
          }
       }
@@ -1634,6 +1701,8 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
          hb_procinfo( 0, szProc, &uiLine, szModule  );
          TraceLog( NULL, "Warning! Could not locate owner %p of array %p [%s->%s(%i)]\n", pHolder, pBaseArray, szModule, szProc, uiLine );
       }
+
+      //TraceLog( NULL, "DONE hb_arrayReleaseHolder( %p, %p )\n", pBaseArray, pHolder );
    }
 #endif
 

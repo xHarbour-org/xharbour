@@ -1,5 +1,5 @@
 /*
- * $Id: asort.c,v 1.7 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: asort.c,v 1.8 2003/08/24 23:55:20 ronpinkas Exp $
  */
 
 /*
@@ -118,7 +118,7 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
    memcpy( &pivot, pItems + p, sizeof( HB_ITEM ) );
 
    #ifndef HB_ARRAY_USE_COUNTER
-      if( HB_IS_ARRAY( &pivot ) )
+      if( HB_IS_ARRAY( &pivot ) && pivot.item.asArray.value )
       {
          hb_arrayResetHolder( pivot.item.asArray.value, (void *) ( pItems + p ), (void *) &pivot );
       }
@@ -129,7 +129,7 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
       memcpy( pItems + p, pItems + lb, sizeof( HB_ITEM ) );
 
       #ifndef HB_ARRAY_USE_COUNTER
-         if( HB_IS_ARRAY( pItems + p ) )
+         if( HB_IS_ARRAY( pItems + p ) && ( pItems + p )->item.asArray.value )
          {
             hb_arrayResetHolder( ( pItems + p )->item.asArray.value, (void *) ( pItems + lb ), (void *) ( pItems + p ) );
          }
@@ -205,12 +205,12 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
          HB_ITEM temp;
 
          #ifndef HB_ARRAY_USE_COUNTER
-            if( HB_IS_ARRAY( pItems + j ) )
+            if( HB_IS_ARRAY( pItems + j ) && ( pItems + j )->item.asArray.value )
             {
                hb_arrayResetHolder( ( pItems + j )->item.asArray.value, (void *) ( pItems + j ), (void *) ( pItems + i ) );
             }
 
-            if( HB_IS_ARRAY( pItems + i ) )
+            if( HB_IS_ARRAY( pItems + i ) && ( pItems + i )->item.asArray.value )
             {
                hb_arrayResetHolder( ( pItems + i )->item.asArray.value, (void *) ( pItems + i ), (void *) ( pItems + j ) );
             }
@@ -231,7 +231,7 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
       memcpy( pItems + lb, pItems + j, sizeof( HB_ITEM ) );
 
       #ifndef HB_ARRAY_USE_COUNTER
-         if( HB_IS_ARRAY( pItems + j ) )
+         if( HB_IS_ARRAY( pItems + j ) && ( pItems + j )->item.asArray.value )
          {
             hb_arrayResetHolder( ( pItems + j )->item.asArray.value, (void *) ( pItems + j ), (void *) ( pItems + lb ) );
          }
@@ -241,7 +241,7 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
    memcpy( pItems + j, &pivot, sizeof( HB_ITEM ) );
 
    #ifndef HB_ARRAY_USE_COUNTER
-      if( HB_IS_ARRAY( &pivot ) )
+      if( HB_IS_ARRAY( &pivot ) && pivot.item.asArray.value )
       {
          hb_arrayResetHolder( pivot.item.asArray.value, (void *) &pivot, (void *) ( pItems + j ) );
       }

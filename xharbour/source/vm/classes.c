@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.75 2003/08/18 22:17:16 ronpinkas Exp $
+ * $Id: classes.c,v 1.76 2003/09/07 23:12:15 ronpinkas Exp $
  */
 
 /*
@@ -3303,7 +3303,6 @@ HB_FUNC( __CLSGETIVARNAMESANDVALUES )
          HB_ITEM Property;
          HB_ITEM Value;
          HB_ITEM SubArray;
-
 
          Return.type   = HB_IT_NIL;
          Property.type = HB_IT_NIL;

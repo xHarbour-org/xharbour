@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.12 2003/08/18 18:24:59 ronpinkas Exp $
+ * $Id: proc.c,v 1.13 2003/08/24 23:55:20 ronpinkas Exp $
  */
 
 /*
@@ -124,6 +124,27 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
       szModuleName[0] = '\0';
    }
 
+   if( uLine )
+   {
+      *uLine = 0;
+   }
+
+   // Called from hb_vmQuit().
+   if( HB_VM_STACK.pPos == pBase )
+   {
+      if( szName )
+      {
+         strcpy( szName, "hb_vmQuit" );
+      }
+
+      if( szModuleName )
+      {
+         strcpy( szModuleName, "hvm.c" );
+      }
+
+      return szName;
+   }
+
    while( iLevel-- > 0 && pBase != HB_VM_STACK.pItems )
    {
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
@@ -214,7 +235,10 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
          }
          else
          {
-            if( ( *pBase )->item.asSymbol.value->pDynSym && ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols )
+            if( pBase &&
+                ( *pBase )->item.asSymbol.value->pDynSym &&
+                ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols &&
+                ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName )
             {
                strcpy( szModuleName, ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName );
             }
