@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.12 2001/12/27 00:16:59 lculik Exp $
+ * $Id: gencobj.c,v 1.13 2002/06/05 13:14:36 horacioroldan Exp $
  */
 
 /*
@@ -45,7 +45,7 @@ void hb_compGenCObj( PHB_FNAME pFileName )
    char szFileName[ _POSIX_PATH_MAX ];
    char szLine[ HB_CFG_LINE_LEN ];
    char szCompiler[ HB_CFG_LINE_LEN ] = "";
-   char szOptions[ HB_CFG_LINE_LEN ];
+   char szOptions[ HB_CFG_LINE_LEN ] = "";
    char szCommandLine[ HB_CFG_LINE_LEN * 2 ];
    char szOutPath[ _POSIX_PATH_MAX ] = "\0";
 #if defined( OS_UNIX_COMPATIBLE )
