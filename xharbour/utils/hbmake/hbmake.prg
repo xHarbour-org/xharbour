@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.78 2003/07/06 19:18:18 lculik Exp $
+ * $Id: hbmake.prg,v 1.79 2003/07/14 12:01:57 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1794,13 +1794,13 @@ cResname += cAllRes
          IF lXfwh
             fWrite( s_nLinkHandle, "LIBFILES = $(FWH)\lib\fivehx.lib $(FWH)\lib\fivehc.lib optgui.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
          ELSE
-            fWrite( s_nLinkHandle, "LIBFILES = $(FWH)\lib\fiveh.lib $(FWH)\lib\fivehc.lib optgui.lib" + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+            fWrite( s_nLinkHandle, "LIBFILES = $(FWH)\lib\fiveh.lib $(FWH)\lib\fivehc.lib optgui.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
          ENDIF
 
       ELSEIF lMiniGui
-         fWrite( s_nLinkHandle, "LIBFILES = Minigui.lib optgui.lib" + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = Minigui.lib optgui.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSEIF lHwGui
-         fWrite( s_nLinkHandle, "LIBFILES = hwgui.lib procmisc.lib hwg_qhtm.lib optgui.lib" + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         fWrite( s_nLinkHandle, "LIBFILES = hwgui.lib procmisc.lib hwg_qhtm.lib optgui.lib " + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSEIF lCw
          fWrite( s_nLinkHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib optgui.lib "  + IIF( ! lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ELSE
