@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1021 2003/05/15 01:52:20 andijahja Exp $
+ * $Id: ChangeLog,v 1.1022 2003/05/16 04:10:24 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-05-16 11:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbclass.ch
+    + Added support for syntax: MESSAGE <MsgName>[(...)] PROCEDURE <ProcName>[(...)]
+
 2003-05-15 21:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbclass.ch
-    + Added support for PROCEDURE <ProcName> CLASS <ClassName> Syntax.
+    + Added support for syntax: PROCEDURE <ProcName> CLASS <ClassName>
 
   * tests/pp.prg
     * Corrected few Alert() messages.
