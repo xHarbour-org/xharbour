@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.13 2004/08/30 14:10:20 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.14 2004/09/09 11:48:40 lf_sfnet Exp $
  */
 
 /*
@@ -1221,7 +1221,7 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
       // This code does not work //
       //
 #ifndef __WATCOMC__
-      pFunc = HB_ITEM_LOCK( ( PHB_ITEM ) pFirst );
+      pFunc = (PHB_ITEM) HB_ITEM_LOCK( ( PHB_ITEM ) pFirst );
 #endif      
       pFirst->item.asBlock.value->ulCounter++;
       iType = 2;

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.127 2004/08/31 12:57:28 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.129 2004/09/13 11:12:02 lf_sfnet Exp $
  */
 
 /*
@@ -3680,7 +3680,7 @@ void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
          
          if( _s.CodePage == OEM_CHARSET )
          {
-            lptstrOem = ( BYTE* ) hb_xgrab( *pulMaxSize );
+            lptstrOem = ( char* ) hb_xgrab( *pulMaxSize );
             CharToOemBuff( ( LPCSTR ) lptstr, ( LPTSTR ) lptstrOem, *pulMaxSize );
             memcpy( szData, lptstrOem, *pulMaxSize );
             hb_xfree( lptstrOem );
@@ -3737,7 +3737,7 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
 
    if( _s.CodePage == OEM_CHARSET )
    {
-      lptstrAnsi = ( BYTE* ) hb_xgrab( ulSize+1 );
+      lptstrAnsi = ( char* ) hb_xgrab( ulSize+1 );
       OemToCharBuff( ( LPCSTR ) szData, ( LPTSTR ) lptstrAnsi, ulSize + 1 );
       memcpy( lptstrCopy, lptstrAnsi, ( ulSize+1 ) * sizeof( TCHAR ) );      
       hb_xfree( lptstrAnsi );
