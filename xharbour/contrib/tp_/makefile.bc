@@ -1,0 +1,28 @@
+#
+# $Id$
+#
+
+# makefile for Borland C/C++ 32 bits
+# Building of telepath.lib
+
+INCLUDE_DIR = ..\..\include
+
+BIN_DIR = ..\..\bin\b32
+OBJ_DIR = ..\..\obj\b32
+LIB_DIR = ..\..\lib\b32
+
+$(LIB_DIR)\telepath.lib : \
+   $(OBJ_DIR)\telepath.obj \
+   $(OBJ_DIR)\win32.obj
+
+$(OBJ_DIR)\telepath.c	: telepath.prg
+$(OBJ_DIR)\telepath.obj	: $(OBJ_DIR)\telepath.c
+$(OBJ_DIR)\win32.obj	: win32.c
+
+.c.obj:
+  bcc32 $(CLIBFLAGS) -c -O2 -I$(INCLUDE_DIR) -DHB_OS_WIN_32_USED -o$@ $<
+  tlib $(LIB_DIR)\telepath.lib -+$@,,
+
+.prg.c:
+  $(BIN_DIR)\harbour.exe $< -q0 -w -es2 -gc0 -n -i$(INCLUDE_DIR) -o$@
+

@@ -1,14 +1,20 @@
-/*
- * $Id$
- */
+#
+# $Id$
+#
 
+ROOT = ../../
 
-testtp : testtp.o telepathy.o
-	FlagShip -Mmain -otesttp testtp.o telepathy.o
+ifneq ($(HB_ARCHITECTURE),dos)
 
-testtp.o : testtp.prg
-	FlagShip -c -w1 -na testtp.prg
+C_SOURCES=\
+        os2.c \
 
-telepathy.o : telepathy.prg
-	FlagShip -c -w1 -na telepathy.prg
+PRG_SOURCES=\
+        telepath.prg
+
+LIBNAME=telepath
+
+include $(TOP)$(ROOT)config/lib.cf
+
+endif
 

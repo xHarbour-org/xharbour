@@ -1,12 +1,13 @@
 /*
- * $Id: testtp.prg,v 1.3 2004/08/16 14:49:44 mauriliolongo Exp $
+ * $Id$
  */
 
 /*
  * Harbour Project source code:
  * Telepathy emulation library
+ * C low level module for Win32 serial communication
  *
- * Copyright 2000, 2001 Dan Levitt <dan@boba-fett.net>
+ * Copyright 2004 - Maurilio Longo <maurilio.longo@libero.it>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,29 +51,69 @@
  *
  */
 
-/*
-   This is based upon a library originally made by Dan Levitt <dan@boba-fett.net>
-   (see README and ChangeLog). The original files have been committed as v1.0,
-   so you can always retrieve them (see CVS docs on how to)
+#define _CLIPDEFS_H
+#include <windows.h>
+#include <stdio.h>
 
-   First xHarbour Port by Luiz Rafael Culik Guimaraes (culikr@brturbo.com)
-*/
+#include "hbapifs.h"
+#include "extend.api"
+#include "item.api"
 
-/*
-    instructions - hook up a loopback device to "com1" of your computer
-    run this program.  It should echo Hi there bob.
-    If it gives you a file i/o error, try running as root.
-    also make sure that other programs (minicom?) can successfully talk to your
-    com port.
-*/
 
-function main
-   ?
-   ?
-   ? tp_open( 1,, 9600, 8, "N", 1 )
-   //tp_send( 1, "Hi there bob" )
-   tp_inkey( .5 )
-   //? tp_recv( 1 )
-   ?
-   tp_Close( 1 )
-return nil
+HB_FUNC( P_INITPORTSPEED ) {
+
+   DCB dcb;
+   char values[20];
+
+   FillMemory(&dcb, sizeof(dcb), 0);
+   dcb.DCBlength = sizeof(dcb);
+
+   sprintf(values, "%u,%1s,%1u,%1u", hb_parnl(2), hb_parcx(4), hb_parnl(3), hb_parnl(5));
+
+   if ( ! BuildCommDCB(values, &dcb)) {
+      hb_retnl(-1);
+
+   } else {
+      if ( ! SetCommState( (HANDLE) hb_parnl(1), &dcb) ) {
+         hb_retnl(-1);
+
+      } else {
+         COMMTIMEOUTS timeouts;
+
+         // read/write operations return immediatly
+         timeouts.ReadIntervalTimeout = MAXDWORD;
+         timeouts.ReadTotalTimeoutMultiplier = 0;
+         timeouts.ReadTotalTimeoutConstant = 0;
+         timeouts.WriteTotalTimeoutMultiplier = 0;
+         timeouts.WriteTotalTimeoutConstant = 0;
+
+         if ( SetCommTimeouts( (HANDLE) hb_parnl(1), &timeouts ) ) {
+            hb_retnl(0);
+         } else {
+            hb_retnl(-1);
+         }
+      }
+   }
+}
+
+
+
+HB_FUNC( P_READPORT ) {
+
+   char  Buffer[512];
+   DWORD nRead = 0;
+   BOOL  bRet;
+   OVERLAPPED Overlapped = {0};
+
+   bRet = ReadFile( (HANDLE) hb_parnl( 1 ), Buffer, 512, &nRead, &Overlapped );
+
+   if ( bRet ) {
+      hb_retclen( Buffer, nRead );
+   } else {
+      hb_retclen( "", 0 );
+   }
+}
+
+
+
+

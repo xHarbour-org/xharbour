@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3 2004/08/16 14:37:13 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4 2004/08/16 14:49:43 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,35 +8,52 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-08-25 10:35 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * tp_/telepath.prg
+     + tp_crc16() thanks to Pete Disdale.
+     * modified a few functions to start using low level win32.c
+   + tp_/win32.c
+     + Low level C code for win32 serial port access
+   + tp_/Makefile
+     + OS/2 Makefile
+   + tp_/makefile.bc
+     + bcc32 makefile
+   + tp_/make_b32.bat
+     + win32 makefile
+   + tp_/TELEPATH.CH
+     + .prg level defines for telepathy compatibility
+
+   /* At this time, on win32, I can ask to my modem its name :) */
+
 2004-08-16 16:32 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
-	* tp_/telepath.prg
-	* tp_/testtp.prg
-		+ Added xharbour Copyright header with full credit to the original
-		  author of this library
+   * tp_/telepath.prg
+   * tp_/testtp.prg
+      + Added xharbour Copyright header with full credit to the original
+        author of this library
 
-	/*	I think I will change a lot this library since I want to have it
-	   multiplatform, so, for example, all C code will go to separated files
-	   (one per platform) to have a common (high level) .prg code which
-	   calls common (low level) C code functions from different (one per
-	   platform) .c files.
+   /* I think I will change a lot this library since I want to have it
+      multiplatform, so, for example, all C code will go to separated files
+      (one per platform) to have a common (high level) .prg code which
+      calls common (low level) C code functions from different (one per
+      platform) .c files.
 
-	   As it is now should compile and work under linux, I can't test it right
-	   now and, probably, something will break in the process of making it
-	   multiplatform.
-	*/
+      As it is now should compile and work under linux, I can't test it right
+      now and, probably, something will break in the process of making it
+      multiplatform.
+   */
 
 2004-08-16 16:32 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
-	* tp_/telepath.prg
-		+ removed the original developed with Flagship and inserted
-		  the one ported to xharbour by Luiz Rafael Culik Guimaraes (culikr@brturbo.com)
+   * tp_/telepath.prg
+      + removed the original developed with Flagship and inserted
+        the one ported to xharbour by Luiz Rafael Culik Guimaraes (culikr@brturbo.com)
 
 2004-08-16 16:22 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
-	* tp_/ChangeLog
-	* tp_/Makefile
-	* tp_/README
-	* tp_/telepath.prg
-	* tp_/testtp.prg
-	   + Added CVS ID to every file
+   * tp_/ChangeLog
+   * tp_/Makefile
+   * tp_/README
+   * tp_/telepath.prg
+   * tp_/testtp.prg
+      + Added CVS ID to every file
 
 
 I sent the original version to the flagship website in may 2000.
