@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.79 2003/11/10 16:42:27 paultucker Exp $
+ * $Id: dbfcdx1.c,v 1.80 2003/11/11 01:34:45 druzus Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
  *
  */
 
-//#define HB_CDX_DBGCODE_OFF
+#define HB_CDX_DBGCODE_OFF
 //#define HB_CDX_DSPDBG_INFO
 //#define HB_CDP_SUPPORT_OFF
 //#define HB_CDX_DBGTIME
@@ -3113,6 +3113,8 @@ static void hb_cdxTagLoad( LPCDXTAG pTag )
          break;
    }
    hb_stackPop();    /* pop macro evaluated value */
+   if ( pTag->uiType == 'C' )
+      hb_cdxMakeSortTab( pTag->pIndex->pArea );
 
    pTag->nField  = hb_rddFieldIndex( ( AREAP ) pTag->pIndex->pArea, pTag->KeyExpr );
 
@@ -6505,104 +6507,6 @@ static int hb_cdxSortKeyValCompare( LPCDXTAG pTag, BYTE * pKeyVal1, BYTE keyLen1
 }
 
 
-static LPSORTINFO hb_cdxSortNew( LPCDXTAG pTag, BOOL bUnique )
-{
-   BYTE * P;
-   LPSORTINFO pSort;
-
-   pSort = ( LPSORTINFO ) hb_xgrab( sizeof( SORTINFO ) );
-   memset( pSort, 0, sizeof( SORTINFO ) );
-   pSort->SortChunk = SORT_CHUNK_LIMIT;
-   pSort->NodeLimit = pSort->SortChunk / sizeof( SORTDATA );
-   pSort->NodeMask = pSort->NodeShift = pSort->NodeCur = 1;
-   pSort->ChunkLimit = 0x8000;
-   while( pSort->NodeMask < pSort->NodeLimit - 1 )
-   {
-      pSort->NodeMask = ( pSort->NodeMask << 1 ) + 1;
-      pSort->ChunkLimit >>= 1;
-      pSort->NodeShift++;
-   }
-   pSort->ChunkSize = pSort->ChunkLimit;
-   pSort->ChunkList = ( long * ) hb_xgrab( pSort->ChunkSize * sizeof( LONG ) );
-   memset( pSort->ChunkList, 0, pSort->ChunkSize * sizeof( LONG ) );
-   P = ( BYTE * ) hb_xgrab( pSort->SortChunk * sizeof( BYTE ) );
-   memset( P, 0, pSort->SortChunk * sizeof( BYTE ) );
-   pSort->ChunkList[ 0 ] = ( LONG ) P;
-   hb_cdxSortLinkNew( pSort, &pSort->RootLink );
-   pSort->Unique = bUnique;
-   pSort->Ascend = TRUE;
-   pSort->CurTag = pTag;
-   pSort->KeyTot = pTag->pIndex->pArea->ulRecCount;
-   pSort->KeyWork = hb_cdxSortKeyNew();
-   pSort->LastKey = hb_cdxSortKeyNew();
-   return pSort;
-}
-
-static void hb_cdxSortFree( LPSORTINFO pSort )
-{
-   USHORT usCount;
-   LONG pa;
-
-   pSort->Closing = TRUE;
-   for( usCount = 0; usCount <= 30; usCount++ )
-   {
-      if( pSort->NodeList[ usCount ] != NULL )
-      {
-         pa = pSort->NodeList[ usCount ]->Rght_Ptr;
-         pSort->NodeList[ usCount ]->Rght_Ptr = -1;
-         if( pSort->NodeList[ usCount ]->Entry_Ct > 0 )
-         {
-            if( pSort->NodeList[ usCount + 1 ] == NULL )
-            {
-               pSort->CurTag->RootBlock = pa;
-               pSort->NodeList[ usCount ]->Node_Atr++;
-            }
-            hb_cdxIndexPageWrite( pSort->CurTag->pIndex, pa, (BYTE *) pSort->NodeList[ usCount ],
-                                  sizeof( CDXDATA ) );
-            if( pSort->NodeList[ usCount + 1 ] != NULL )
-               hb_cdxSortAddToNode( pSort, ( USHORT ) ( usCount + 1 ), pa,
-                                    pSort->LastTag, pSort->KeyWork );
-         }
-         hb_xfree( ( LPCDXDATA ) pSort->NodeList[ usCount ] );
-      }
-   }
-
-   if( pSort->ChunkList != NULL )
-   {
-      for( usCount = 0; usCount < pSort->ChunkLimit; usCount++ )
-      {
-         if( pSort->ChunkList[ usCount ] != 0 )
-            hb_xfree( ( BYTE * ) pSort->ChunkList[ usCount ] );
-      }
-      hb_xfree( pSort->ChunkList );
-   }
-   hb_cdxSortKeyFree( pSort->KeyWork );
-   hb_cdxSortKeyFree( pSort->LastKey );
-
-   if ( pSort->hTempFile )
-   {
-      // hb_fsCommit( pSort->hTempFile );
-      hb_fsClose( pSort->hTempFile );
-      pSort->hTempFile = FS_ERROR;
-   }
-   if ( pSort->szTempFileName )
-   {
-      hb_fsDelete( (BYTE *)  ( pSort->szTempFileName ) );
-      hb_xfree( pSort->szTempFileName );
-      pSort->szTempFileName = NULL;
-   }
-
-   hb_xfree( pSort );
-}
-
-static void hb_cdxSortLinkNew( LPSORTINFO pSort, LONG * NewLink )
-{
-   if( pSort->NodeCur >= pSort->NodeLimit )
-      hb_cdxSortGetNewChunk( pSort );
-   * NewLink = ( pSort->ChunkCur << pSort->NodeShift ) + pSort->NodeCur;
-   pSort->NodeCur++;
-}
-
 static void hb_cdxSortSwapSendWord( LPSORTINFO pSort, BYTE * Value )
 {
    LONG Tag;
@@ -6944,6 +6848,105 @@ static int hb_cdxSortSwapBuildIndex( LPSORTINFO pSort )
    pSort->pSwapPage = NULL;
    return 0;
 }
+
+static LPSORTINFO hb_cdxSortNew( LPCDXTAG pTag, BOOL bUnique )
+{
+   BYTE * P;
+   LPSORTINFO pSort;
+
+   pSort = ( LPSORTINFO ) hb_xgrab( sizeof( SORTINFO ) );
+   memset( pSort, 0, sizeof( SORTINFO ) );
+   pSort->SortChunk = SORT_CHUNK_LIMIT;
+   pSort->NodeLimit = pSort->SortChunk / sizeof( SORTDATA );
+   pSort->NodeMask = pSort->NodeShift = pSort->NodeCur = 1;
+   pSort->ChunkLimit = 0x8000;
+   while( pSort->NodeMask < pSort->NodeLimit - 1 )
+   {
+      pSort->NodeMask = ( pSort->NodeMask << 1 ) + 1;
+      pSort->ChunkLimit >>= 1;
+      pSort->NodeShift++;
+   }
+   pSort->ChunkSize = pSort->ChunkLimit;
+   pSort->ChunkList = ( long * ) hb_xgrab( pSort->ChunkSize * sizeof( LONG ) );
+   memset( pSort->ChunkList, 0, pSort->ChunkSize * sizeof( LONG ) );
+   P = ( BYTE * ) hb_xgrab( pSort->SortChunk * sizeof( BYTE ) );
+   memset( P, 0, pSort->SortChunk * sizeof( BYTE ) );
+   pSort->ChunkList[ 0 ] = ( LONG ) P;
+   hb_cdxSortLinkNew( pSort, &pSort->RootLink );
+   pSort->Unique = bUnique;
+   pSort->Ascend = TRUE;
+   pSort->CurTag = pTag;
+   pSort->KeyTot = pTag->pIndex->pArea->ulRecCount;
+   pSort->KeyWork = hb_cdxSortKeyNew();
+   pSort->LastKey = hb_cdxSortKeyNew();
+   return pSort;
+}
+
+static void hb_cdxSortFree( LPSORTINFO pSort )
+{
+   USHORT usCount;
+   LONG pa;
+
+   pSort->Closing = TRUE;
+   for( usCount = 0; usCount <= 30; usCount++ )
+   {
+      if( pSort->NodeList[ usCount ] != NULL )
+      {
+         pa = pSort->NodeList[ usCount ]->Rght_Ptr;
+         pSort->NodeList[ usCount ]->Rght_Ptr = -1;
+         if( pSort->NodeList[ usCount ]->Entry_Ct > 0 )
+         {
+            if( pSort->NodeList[ usCount + 1 ] == NULL )
+            {
+               pSort->CurTag->RootBlock = pa;
+               pSort->NodeList[ usCount ]->Node_Atr++;
+            }
+            hb_cdxIndexPageWrite( pSort->CurTag->pIndex, pa, (BYTE *) pSort->NodeList[ usCount ],
+                                  sizeof( CDXDATA ) );
+            if( pSort->NodeList[ usCount + 1 ] != NULL )
+               hb_cdxSortAddToNode( pSort, ( USHORT ) ( usCount + 1 ), pa,
+                                    pSort->LastTag, pSort->KeyWork );
+         }
+         hb_xfree( ( LPCDXDATA ) pSort->NodeList[ usCount ] );
+      }
+   }
+
+   if( pSort->ChunkList != NULL )
+   {
+      for( usCount = 0; usCount < pSort->ChunkLimit; usCount++ )
+      {
+         if( pSort->ChunkList[ usCount ] != 0 )
+            hb_xfree( ( BYTE * ) pSort->ChunkList[ usCount ] );
+      }
+      hb_xfree( pSort->ChunkList );
+   }
+   hb_cdxSortKeyFree( pSort->KeyWork );
+   hb_cdxSortKeyFree( pSort->LastKey );
+
+   if ( pSort->hTempFile )
+   {
+      // hb_fsCommit( pSort->hTempFile );
+      hb_fsClose( pSort->hTempFile );
+      pSort->hTempFile = FS_ERROR;
+   }
+   if ( pSort->szTempFileName )
+   {
+      hb_fsDelete( (BYTE *)  ( pSort->szTempFileName ) );
+      hb_xfree( pSort->szTempFileName );
+      pSort->szTempFileName = NULL;
+   }
+
+   hb_xfree( pSort );
+}
+
+static void hb_cdxSortLinkNew( LPSORTINFO pSort, LONG * NewLink )
+{
+   if( pSort->NodeCur >= pSort->NodeLimit )
+      hb_cdxSortGetNewChunk( pSort );
+   * NewLink = ( pSort->ChunkCur << pSort->NodeShift ) + pSort->NodeCur;
+   pSort->NodeCur++;
+}
+
 static void hb_cdxSortGetNewChunk( LPSORTINFO pSort )
 {
    BYTE * P;
@@ -6991,22 +6994,8 @@ static void hb_cdxSortInsertWord( LPSORTINFO pSort, LONG Tag, char * Value,
    memcpy( pSort->WPch+1, Value, uiLen );
    pSort->WPch[0] = (BYTE) uiLen;
 
-   if( pSort->WPch[0] > 0 )
-   {
-      if( pSort->WPch[0] > pSort->KeySize )
-         pSort->KeySize = pSort->WPch[0];
-      /* pSort->WPch[0]--; lose last byte! */
-      /*
-         Patch for empty fields (> 1)
-      */
-/*
-         while( pSort->WPch[0] > 1 && pSort->WPch[ pSort->WPch[0] ] ==
-                                      ( pSort->CurTag->uiType == 'C' ? ' ' : 0 ) )
-         {
-            pSort->WPch[0]--;
-         }
-*/
-   }
+   if( pSort->WPch[0] > pSort->KeySize )
+      pSort->KeySize = pSort->WPch[0];
    pSort->LevelPtr = pSort->RootLink;
    pSort->PriorPtr = 0;
    pSort->WCur = 0;
