@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.20 2002/12/18 16:32:02 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.21 2003/03/17 20:17:48 ronpinkas Exp $
  */
 
 /*
@@ -1045,7 +1045,7 @@ RETURN uObj
                  */
 
                  default:
-                   TraceLog( NULL, "*** Unexpected Type: %i***\n", dParams->rgvarg[ n ].n1.n2.vt );
+                   TraceLog( NULL, "*** Unexpected Type: %i [%p]***\n", dParams->rgvarg[ n ].n1.n2.vt, dParams->rgvarg[ n ].n1.n2.vt );
               }
            }
            else
@@ -1385,10 +1385,17 @@ RETURN uObj
                                              &RetVal,
                                              &excep,
                                              &uArgErr ) ;
-        FreeParams( &dParams );
-     }
 
-     RetValue();
+        //TraceLog( NULL, "Invoke '%s' Result: %p\n", hb_parc(2), s_nOleError );
+
+        FreeParams( &dParams );
+
+        RetValue();
+     }
+     else
+     {
+        //TraceLog( NULL, "Invoke GetIDsOfNames '%s' Error: %p\n", hb_parc(2), s_nOleError );
+     }
   }
 
   //---------------------------------------------------------------------------//
@@ -1397,11 +1404,10 @@ RETURN uObj
   {
      IDispatch * pDisp = ( IDispatch * ) hb_parnl( 1 );
      BSTR wMember;
-     DISPID lDispID, lPropPut = DISPID_PROPERTYPUT;
+     DISPID lDispID, lPropPut = DISPID_PROPERTYPUT, wFlags;
      DISPPARAMS dParams;
      UINT uArgErr;
 
-     VariantInit( &RetVal );
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
      wMember = AnsiToWide( hb_parc( 2 ) );
@@ -1414,20 +1420,38 @@ RETURN uObj
         dParams.rgdispidNamedArgs = &lPropPut;
         dParams.cNamedArgs = 1;
 
+        if( dParams.rgvarg[0].n1.n2.vt == VT_DISPATCH )
+        {
+           wFlags = DISPATCH_PROPERTYPUTREF;
+           //TraceLog( NULL, "SetProperty '%s' BYREF\n", hb_parc(2) );
+        }
+        else
+        {
+           wFlags = DISPATCH_PROPERTYPUT;
+        }
+
+        //TraceLog( NULL, "SetProperty '%s' Args: %i\n", hb_parc(2), dParams.cArgs );
+
         s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                            lDispID,
                                            &IID_NULL,
                                            LOCALE_USER_DEFAULT,
-                                           DISPATCH_PROPERTYPUT,
+                                           wFlags,
                                            &dParams,
                                            NULL,    // No return value
                                            &excep,
                                            &uArgErr );
 
-        FreeParams( &dParams );
-     }
+        //TraceLog( NULL, "SetProperty '%s' Result: %p\n", hb_parc(2), s_nOleError );
 
-     hb_ret();
+        FreeParams( &dParams );
+
+        hb_ret();
+     }
+     else
+     {
+        //TraceLog( NULL, "SetProperty GetIDsOfNames '%s' Error: %p\n", hb_parc(2), s_nOleError );
+     }
   }
 
   //---------------------------------------------------------------------------//
@@ -1462,10 +1486,16 @@ RETURN uObj
                                            &excep,
                                            &uArgErr );
 
-        FreeParams( &dParams );
-     }
+        //TraceLog( NULL, "GetProperty '%s' Result: %p\n", hb_parc(2), s_nOleError );
 
-     RetValue();
+        FreeParams( &dParams );
+
+        RetValue();
+     }
+     else
+     {
+        //TraceLog( NULL, "GetProperty GetIDsOfNames '%s' Error: %p\n", hb_parc(2), s_nOleError );
+     }
   }
 
   //---------------------------------------------------------------------------//
