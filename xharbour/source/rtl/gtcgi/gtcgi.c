@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.13 2004/02/17 18:44:14 andijahja Exp $
+ * $Id: gtcgi.c,v 1.14 2004/03/21 15:55:05 druzus Exp $
  */
 
 /*
@@ -622,7 +622,7 @@ void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
 
 void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
 {
-   if ( *pulMaxSize == 0 || s_clipsize < *pulMaxSize )
+   if ( *pulMaxSize == 0 || s_clipsize < (int) *pulMaxSize )
    {
       *pulMaxSize = s_clipsize;
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.43 2004/03/02 00:28:18 druzus Exp $
+ * $Id: console.c,v 1.44 2004/03/18 03:58:36 ronpinkas Exp $
  */
 /*
  * Harbour Project source code:
@@ -160,7 +160,7 @@ void hb_conInit( void )
       else if( iStderr == 0 )  /* //STDERR with no parameter or 0 */
          s_iFilenoStderr = s_iFilenoStdout;
       else                     /* //STDERR:x */
-         s_iFilenoStderr = iStderr;
+         s_iFilenoStderr = (void*) iStderr;
    }
 #else
 #if !defined(X__WIN32__)

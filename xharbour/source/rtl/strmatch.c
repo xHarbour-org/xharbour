@@ -1,5 +1,5 @@
 /*
- * $Id: strmatch.c,v 1.4 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: strmatch.c,v 1.5 2004/03/21 15:55:05 druzus Exp $
  */
 
 /*
@@ -126,7 +126,7 @@ BOOL HB_EXPORT hb_strMatchRegExp( const char * szString, const char * szMask )
    {
       if( regexec( &re, szString, 1, aMatches, EFlags ) == 0 )
       {
-         return aMatches[0].rm_so == 0 && aMatches[0].rm_eo == strlen( szString );
+         return aMatches[0].rm_so == 0 && aMatches[0].rm_eo == (int) strlen( szString );
       }
    }
 

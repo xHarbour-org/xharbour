@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.42 2004/03/19 17:42:23 likewolf Exp $
+ * $Id: direct.c,v 1.43 2004/03/21 02:44:36 ronpinkas Exp $
  */
 
 /*
@@ -298,7 +298,7 @@ static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BO
 
    if( bInitReg && regexec( &re, szString, 1, aMatches, EFlags ) == 0 )
    {
-      return aMatches[0].rm_so == 0 && aMatches[0].rm_eo == strlen( szString );
+      return aMatches[0].rm_so == 0 && aMatches[0].rm_eo == (int) strlen( szString );
    }
 
    return FALSE;

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.74 2004/03/21 15:55:05 druzus Exp $
+ * $Id: filesys.c,v 1.75 2004/03/21 21:48:49 druzus Exp $
  */
 
 /*
@@ -118,12 +118,25 @@
 #endif
 
 
-#if defined(X__WIN32__)
-   #ifdef _MSC_VER
-      __inline void * LongToHandle(  const long h )
-      {
-         return((void *) (INT_PTR) h );
-      }
+#if defined( X__WIN32__ )
+   #if defined( _MSC_VER )
+
+      #if _MSC_VER >= 1010
+         __inline void * LongToHandle(  const long h )
+         {
+            return((void *) (INT_PTR) h );
+         }
+
+         __inline long HandleToLong( const void *h )
+         {
+            return((long) h );
+         }
+      #endif
+
+      #if !defined( INVALID_SET_FILE_POINTER )
+         #define INVALID_SET_FILE_POINTER ((DWORD)-1)
+      #endif
+
    #endif
 #endif
 
@@ -1007,8 +1020,8 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
    STARTUPINFO si;
    PROCESS_INFORMATION proc;
    ULONG ulSize;
-   int iSize;
-   DWORD iRet;
+   // int iSize;
+   // DWORD iRet;
    DWORD iFlags=0;
    char fullCommand[1024], cmdName[256];
    char *completeCommand, *pos;
@@ -1598,8 +1611,8 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 {
    HB_THREAD_STUB
    FHANDLE hFileHandle;
-   int oflag;
-   unsigned pmode;
+   // int oflag;
+   // unsigned pmode;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCreate(%p, %hu)", pFilename, uiAttr));
 
@@ -2611,19 +2624,21 @@ void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
 
 #if defined(HB_OS_WIN_32)
    {
-      BOOL bStatus;
+      #if defined(X__WIN32__)
+         BOOL bStatus;
+      #endif
 
       // allowing async cancelation here
       HB_TEST_CANCEL_ENABLE_ASYN
 
-      #if defined(X__WIN32__) 
+      #if defined(X__WIN32__)
          bStatus = FlushFileBuffers( ( HANDLE ) DostoWinHandle( hFileHandle ) );
       #else
-         #if defined(__WATCOMC__) 
+         #if defined(__WATCOMC__)
             hb_fsSetError( FlushFileBuffers( ( HANDLE ) hFileHandle ) );
          #else
             hb_fsSetError( _commit( hFileHandle ) );
-         #endif    
+         #endif
       #endif
 
       HB_DISABLE_ASYN_CANC

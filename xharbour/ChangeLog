@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2630 2004/03/22 23:32:26 andijahja Exp $
+ * $Id: ChangeLog,v 1.2631 2004/03/23 02:12:56 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-03-23 19:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * source/rtl/console.c
+     ! type cast
+
+   * source/rtl/filesys.c
+     ! fix non-compilation under MSVC when X__WIN32__ is defined.
+
+   * source/rtl/direct.c
+   * source/rtl/strmatch.c
+   * source/rtl/gtcgi/gtcgi.c
+     ! kill signed/unsigned mismatch warnings
+
 2004-03-23 09:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * include/simplex.c
     ! add dummy return value in function SimpLex_GetNextToken()
