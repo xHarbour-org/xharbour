@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.38 2004/11/21 21:44:20 druzus Exp $
+ * $Id: transfrm.c,v 1.39 2004/12/28 07:16:12 druzus Exp $
  */
 
 /*
@@ -529,6 +529,7 @@ HB_FUNC( TRANSFORM )
          BOOL     bFound = FALSE;
          BOOL     bInit  = FALSE;
          BOOL     bPDec  = FALSE;
+         BOOL     bTrueDec = FALSE;
 
          dValue = hb_itemGetND( pValue );
          hb_itemGetNLen( pValue, &iOrigWidth, &iOrigDec );
@@ -590,10 +591,16 @@ HB_FUNC( TRANSFORM )
                    szPic[ i ] == '$' ||
                    szPic[ i ] == '*' )
                {
+		  bTrueDec = TRUE;
                   iWidth++;
                   iDec++;
                }
             }
+	    if( !bTrueDec )
+	    {
+               iWidth++;
+               iDec++;
+	    }
          }
          else
             iDec = 0;
