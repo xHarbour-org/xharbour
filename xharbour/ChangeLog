@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1544 2003/10/03 01:18:00 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1545 2003/10/03 05:50:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-03 19:48 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * contrib/WoopGUI/env/bccWin32.Mak
+     - Removed all settings and settings' dependancy.
+
+   * source/compiler/harbour.slx
+     ! Fixed minor bug related to strings that open with <['> or <["> but ending with just <]>
+     % Greatly optimized handling of string literals, and Escaped Strings <E"...">.
+       /* Compiler appears noticably faster. */
 
 2003-10-02 22:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/tobject.prg

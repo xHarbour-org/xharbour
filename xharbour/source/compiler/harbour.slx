@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.36 2003/06/20 21:29:17 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.37 2003/09/16 15:51:13 ronpinkas Exp $
  */
 
 /*
@@ -111,19 +111,16 @@ ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
 
 /* Custom Intermediate Token needed to be expanded. */
 #define HB_LIT_ACT      LEX_CUSTOM_ACTION - 2
-#define HB_NESTED_LIT   LEX_CUSTOM_ACTION - 3
-
-#define HB_ESCAPE_LIT   LEX_CUSTOM_ACTION - 30
 
 /* Stream Pairs. */
 DEFINE_STREAM_AS_ONE_OF_THESE {
                                 START_WITH("\"")     END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT),
                                 START_WITH("'")      END_WITH("'")    STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT),
                                 START_WITH("[")      END_WITH("]" )   STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_LIT_ACT),
-                                START_WITH("[\"")    END_WITH("\"]" ) STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_NESTED_LIT),
-                                START_WITH("['")     END_WITH("\']" ) STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_NESTED_LIT),
-                                START_WITH("[[")     END_WITH("]]" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_NESTED_LIT),
-                                START_WITH("E\"")    END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_ESCAPE_LIT),
+                                START_WITH("[\"")    END_WITH("\"]" ) STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_LIT_ACT),
+                                START_WITH("['")     END_WITH("\']" ) STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_LIT_ACT),
+                                START_WITH("[[")     END_WITH("]]" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_LIT_ACT),
+                                START_WITH("E\"")    END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT),
                               };
 
 START_NEW_LINE_IF_ONE_OF_THESE( "\n;" );
@@ -499,28 +496,100 @@ LANGUAGE_RULES_ARE {
 
 #undef STREAM_EXCEPTION
    #define STREAM_EXCEPTION( sPair, cChar ) \
-           if( sTerm[1] == ']' && iCloseSquare ) \
-           { \
-              szBuffer -= ( ( strlen( sPair ) - iCloseSquare ) + 1 ); \
-              sPair[ iCloseSquare - 1 ] = '\0'; \
-              aiHold[ iHold++ ] = HB_LIT_ACT; \
-           } \
-           else \
-           { \
               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_STRING_TERMINATOR, sPair, NULL ); \
               aiHold[ iHold++ ] = '\n'; \
               yylval.string = hb_compIdentifierNew( sPair, TRUE ); \
-              aiHold[ iHold++ ] = LITERAL + DONT_REDUCE ; \
-           } \
+              aiHold[ iHold++ ] = LITERAL + DONT_REDUCE ;
 
 #undef STREAM_APPEND
    #define STREAM_APPEND(x) \
-      if( iPairLen == 0 && sStart[0] == '[' && sStart[1] ) { sPair[ iPairLen++ ] = sStart[1]; } \
-      if( x == ']' && iCloseSquare == 0 ) { iCloseSquare = iPairLen + 1; } sPair[ iPairLen++ ] = x;\
-      if( x == '\\' && sStart[0] == 'E' ) { sPair [ iPairLen++ ] = *szBuffer++; }
-
-#undef STREAM_OPEN
-   #define STREAM_OPEN( sStarter ) iCloseSquare = 0;
+      \
+      if( sStart[0] == 'E' ) \
+      { \
+         if( x == '\\' ) \
+         { \
+            switch( *szBuffer ) \
+            { \
+               case '\\' : \
+               case '"'  : \
+               case '\'' : \
+                  sPair [ iPairLen++ ] = *szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               case 'n' : \
+                  sPair [ iPairLen++ ] = '\n'; \
+                  szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               case 't' : \
+                  sPair [ iPairLen++ ] = '\t'; \
+                  szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               case 'b' : \
+                  sPair [ iPairLen++ ] = '\b'; \
+                  szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               case 'r' : \
+                  sPair [ iPairLen++ ] = '\r'; \
+                  szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               default :\
+                  sPair[ iPairLen++ ] = x; \
+            } \
+         } \
+         else \
+         { \
+            sPair[ iPairLen++ ] = x; \
+         } \
+      } \
+      else \
+      { \
+         char *sClose; \
+         \
+         if( sStart[1] == '\0' ) \
+         { \
+            sClose = strchr( szBuffer, sTerm[0] ); \
+         } \
+         else \
+         { \
+            sClose = strstr( szBuffer, sTerm ); \
+            \
+            if( sClose == NULL ) \
+            { \
+               szBuffer--; iSize++; \
+               sClose = strchr( szBuffer, ']' ); \
+            } \
+         } \
+         \
+         if( sClose ) \
+         { \
+            szBuffer--; iSize++; \
+            \
+            strncpy( sPair, szBuffer, sClose - szBuffer ); \
+            sPair[ sClose - szBuffer ] = '\0'; \
+            s_szBuffer = sClose + strlen( sTerm ); \
+            iSize -= s_szBuffer - szBuffer; \
+            yylval.string = hb_compIdentifierNew( sPair, TRUE ); \
+            \
+            /*printf( "Lit: <%s>, Rest: <%s>\n", sPair, s_szBuffer );*/ \
+            iPairToken = 0; \
+            return LITERAL + DONT_REDUCE ; \
+         } \
+         else \
+         { \
+            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_STRING_TERMINATOR, szBuffer, NULL ); \
+            iSize = 0; \
+            return LITERAL + DONT_REDUCE; \
+         } \
+      }
 
 #undef IF_BELONG_LEFT
    #define IF_BELONG_LEFT(chr) if( iLastToken == IDENTIFIER || iLastToken == SELF || iLastToken == ']' || iLastToken == MACROVAR || iLastToken == MACROTEXT || \
@@ -919,47 +988,6 @@ static int hb_comp_SLX_CustomAction( int x )
          yylval.string = hb_compIdentifierNew( sPair, TRUE );
          return LITERAL + DONT_REDUCE ;
 
-      case HB_ESCAPE_LIT :
-         {
-            int iPos, iLen = strlen( sPair );
-            char *pTmp = sPair;
-            BOOL bShift = FALSE;
-
-            while( iLen > 0 )
-            {
-               if ( *pTmp == '\\' )
-               {
-                  switch( pTmp[1] )
-                  {
-                     case 'n': *pTmp = '\n'; bShift = TRUE; break;
-                     case 't': *pTmp = '\t'; bShift = TRUE; break;
-                     case 'b': *pTmp = '\b'; bShift = TRUE; break;
-                     case 'r': *pTmp = '\r'; bShift = TRUE; break;
-
-                     case '\\':
-                     case '\'':
-                     case '"':
-                        *pTmp = pTmp[1]; bShift = TRUE; break;
-                  }
-
-                  // Shift the rest of the string
-                  if( bShift )
-                  {
-                     for ( iPos = 1; iPos < iLen; iPos++ )
-                     {
-                        pTmp[ iPos ] = pTmp[ iPos + 1 ];
-                     }
-                  }
-               }
-
-               pTmp++;
-               iLen--;
-            }
-         }
-
-         yylval.string = hb_compIdentifierNew( sPair, TRUE );
-         return LITERAL + DONT_REDUCE ;
-
       case HB_INIT_PROC :
          aiHold[ iHold++ ] = PROCEDURE + DONT_REDUCE;
          return INIT + DONT_REDUCE;
@@ -1101,16 +1129,6 @@ static int hb_comp_SLX_CustomAction( int x )
          iIdentifier++;
          DEBUG_INFO( printf( "_WITH_ID_SEMI, Primary Identifier %s Increased to: %i\n", "WITH", iIdentifier ) );
          return IDENTIFIER + DONT_REDUCE;
-
-      case HB_NESTED_LIT :
-         {
-            int iPairLen = strlen( sPair );
-
-            sPair[ iPairLen ] = sTerm[0];
-            sPair[ iPairLen + 1 ] = '\0';
-            yylval.string = hb_compIdentifierNew( sPair, TRUE );
-            return LITERAL + DONT_REDUCE ;
-         }
 
       case HB_DO_WHILE_ID :
          iIdentifier++;
