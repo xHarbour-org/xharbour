@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.5 2003/05/30 18:15:49 paultucker Exp $
+ * $Id: val.c,v 1.6 2003/05/30 21:28:17 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ double HB_EXPORT hb_strVal( const char * szText, ... )
    char *pCopy = NULL;
    ULONG ulPad = 0, ulLen;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_strVal(%s, %d)", szText));
+   HB_TRACE(HB_TR_DEBUG, ("hb_strVal(%s)", szText));
 
    while( isspace( szText[ulPad] ) )
    {
