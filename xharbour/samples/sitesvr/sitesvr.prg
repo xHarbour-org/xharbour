@@ -1,5 +1,5 @@
 /*
- * $Id: sitesrv.prg,v 1.4 2003/01/10 09:45:32 jonnymind Exp $
+ * $Id: sitesvr.prg,v 1.1 2003/01/10 22:17:58 jonnymind Exp $
  */
 
 ***********************************************************
@@ -29,6 +29,10 @@ PROCEDURE Main( cPort)
 
    BuildDBF()
 
+   IF cPort == NIL
+      cPort := "8085"
+   ENDIF
+
    GetList := {}
    g_nUserCount  := 0
    g_nTotalCount := 0
@@ -45,7 +49,7 @@ PROCEDURE Main( cPort)
    *
 
    SELECT 1
-   use "site.dbf" index "site01.ntx", "site02.ntx"
+   USE "site.dbf" INDEX "site01.ntx", "site02.ntx"
 
    @ 1, 15 SAY "Welcome to Giancarlo Niccolai's xHarbour WEB SERVER"
 
@@ -57,13 +61,13 @@ PROCEDURE Main( cPort)
 
    * Initializing List of Threads
 
-   hView   := StartThread( @ViewUpdate(), Socket )
+   hView   := StartThread( @ViewUpdate(), Socket )
    hAccept := StartThread( @AcceptIncoming(), Socket )
 
    DO WHILE .T.
       cCommand := Space( 50 )
 
-      @ 5, 5 SAY "Enter Command: " get cCommand
+      @ 5, 5 SAY "Enter Command      : " GET cCommand
       READ
 
       cCommand := Trim( cCommand )
@@ -101,18 +105,18 @@ PROCEDURE ViewUpdate( Socket )
 
       HBConsoleLock()
 
-      nRow = Row()
-      nCol = Col()
+      nRow := Row()
+      nCol := Col()
 
       Looping( @nProgress, 6, 5 )
 
       @ 6, 9 SAY "Looping "
-      @ 7, 5 SAY "Main socket status: " + InetErrorDesc( Socket );
-         + "(" + trim( str( InetErrorCode( Socket ) ) )+ ")"
-      @ 8, 5 SAY "Connected Users: " + str( g_nUserCount )
-      @ 9, 5 SAY "Total users: " + str( g_nTotalCount )
+      @ 7, 5 SAY "Main socket status : " + InetErrorDesc( Socket ) + ;
+                 "(" + Trim( Str( InetErrorCode( Socket ) ) ) + ")"
+      @ 8, 5 SAY "Connected Users    : " + Str( g_nUserCount )
+      @ 9, 5 SAY "Total users        : " + Str( g_nTotalCount )
 
-      @  nRow, nCol
+      @ nRow, nCol
       HBConsoleUnlock()
 
       ThreadSleep( 100 )
@@ -126,20 +130,20 @@ RETURN
 
 PROCEDURE AcceptIncoming( Socket )
 
-   LOCAL com
+   LOCAL Com
 
    TraceLog( Socket )
 
    DO WHILE .T.
       * Saving cursor status before screen update
-      Com = InetAccept( Socket )
+      Com := InetAccept( Socket )
 
       IF InetErrorCode( Com ) == 0
          g_nUserCount++
          g_nTotalCount++
 
          *StartThread( @ServeClient(), com )
-         ServeClient( com )
+         ServeClient( Com )
          HB_GcAll( .T. )
       ELSE
          InetDestroy( Com )
@@ -161,8 +165,8 @@ PROCEDURE ServeClient( Socket )
    LOCAL aFields
    LOCAL cPostData := ""
 
-   LOCAL nLength := 0
-   LOCAL nContLen := 0
+   LOCAL nLength   := 0
+   LOCAL nContLen  := 0
 
    aFields := {}
 
@@ -186,8 +190,8 @@ PROCEDURE ServeClient( Socket )
          AAdd( @aFields, cLine )
          *** We must record Content-Length for later
          IF At( "CONTENT-LENGTH:", Upper( cLine ) ) == 1
-            cLine = Substr( cLine, At( ":", cLine)+1 )
-            nContLen = Val( cLine )
+            cLine    := Substr( cLine, At( ":", cLine)+1 )
+            nContLen := Val( cLine )
          ENDIF
       ELSE
          *** invalid
@@ -199,7 +203,7 @@ PROCEDURE ServeClient( Socket )
    *** Now, if the request has a content-lenght, we must read it
    IF nContLen > 0
       *** cPostData is autoAllocated
-      cPostData = space( nContLen )
+      cPostData := Space( nContLen )
       IF InetRecvAll( Socket, @cPostData, nContLen ) <= 0
          InetDestroy( Socket )
          RETURN
@@ -230,8 +234,8 @@ PROCEDURE ProcessRequest( Socket, cRequest, aFields, cPostData )
 
    nRow := Row()
    nCol := Col()
-   @15, 1 SAY "REQ: " + substr( cRequest, 0 , 75 ) + space( 60 )
-   @16, 1 SAY "CONTENT-LENGTH: " + RTrim( Str( Len( cPostData ) ) ) + space( 60 )
+   @ 15, 1 SAY "REQ: " + Substr( cRequest, 0 , 75 ) + Space( 60 )
+   @ 16, 1 SAY "CONTENT-LENGTH: " + RTrim( Str( Len( cPostData ) ) ) + Space( 60 )
 
    nR := 12
 
@@ -264,10 +268,10 @@ RETURN
 *
 PROCEDURE ParseRequest( cRequest, cReq, cFile, cSign )
    /** Request field is <REQ> <FILE> <HTTPsing> **/
-   cReq := Substr( cRequest, 0, At( " ", cRequest ) -1 )
+   cReq     := Substr( cRequest, 0, At( " ", cRequest ) -1 )
    cRequest := Substr( cRequest, At( " ", cRequest ) +1 )
-   cFile := Substr( cRequest, 0, At( " ", cRequest ) -1 )
-   cSign := Substr( cRequest, At( " ", cRequest ) +1 )
+   cFile    := Substr( cRequest, 0, At( " ", cRequest ) -1 )
+   cSign    := Substr( cRequest, At( " ", cRequest ) +1 )
 RETURN
 
 ******************************************
@@ -287,32 +291,32 @@ FUNCTION ProcessFileRequest( cRequest )
    SET ORDER TO 2
 
    /* PARENT of the root directory */
-   nLocId := 0
-   cFileOrig = cFile
+   nLocId    := 0
+   cFileOrig := cFile
 
    DO WHILE Len( cFile ) > 0
 
       IF At( "/", cFile ) > 0
-         cLocName = Substr( cFile, 1, At( "/", cFile ) -1 )
+         cLocName := Substr( cFile, 1, At( "/", cFile ) -1 )
       ELSE
-         cLocName = cFile
+         cLocName := cFile
       ENDIF
 
       IF cLocName == ""
          if nLocId == 0
             *** Index page:
-            cLocName = "ROOT"
+            cLocName := "ROOT"
          ELSE
             *** remove "///"
-            cFile = Substr( cFile, 2 )
+            cFile    := Substr( cFile, 2 )
             LOOP
          ENDIF
       ENDIF
 
       *** do the seek: current location + the name of the child
-      SEEK str( nLocId ) + "-" + cLocName
+      SEEK Str( nLocId ) + "-" + cLocName
 
-      IF .not. Found()
+      IF .NOT. Found()
          cReply := PageNotFound( cFileOrig )
          nLocId := -1
          EXIT
@@ -321,9 +325,9 @@ FUNCTION ProcessFileRequest( cRequest )
       nLocId := field->ID
 
       IF At( "/", cFile ) > 0
-         cFile = Substr( cFile, At( "/", cFile ) +1 )
+         cFile := Substr( cFile, At( "/", cFile ) +1 )
       ELSE
-         cFile = ""
+         cFile := ""
       ENDIF
    ENDDO
 
@@ -346,30 +350,30 @@ FUNCTION ProcessAdminRequest( cRequest, cPostData )
 
    ParseRequest( cRequest, @cReq, @cFile, @cSign )
 
-   nPos = At( "?ID=", cFile )
+   nPos := At( "?ID=", cFile )
    IF nPos > 0
-      nID = Val( Substr( cFile, nPos + 4 ) )
-      cFile = Substr( cFile, 1, nPos -1 )
+      nID   := Val( Substr( cFile, nPos + 4 ) )
+      cFile := Substr( cFile, 1, nPos -1 )
    ELSE
-      nID = -1
+      nID   := -1
    ENDIF
 
 
    DO CASE
       CASE cFile == "/admin"
-         cReply := AdminFrontPage()
+           cReply := AdminFrontPage()
 
       CASE cFile == "/admin/new"
-         cReply := AdminEditPageMask( -nID )
+           cReply := AdminEditPageMask( -nID )
 
       CASE cFile == "/admin/edit"
-         cReply := AdminEditPageMask( nID )
+           cReply := AdminEditPageMask( nID )
 
       CASE cFile == "/admin/del"
-         cReply := AdminDelPage( nID )
+           cReply := AdminDelPage( nID )
 
       CASE cFile == "/admin/mod"
-         cReply := AdminModPage( cPostData )
+           cReply := AdminModPage( cPostData )
 
    ENDCASE
 
@@ -382,8 +386,8 @@ RETURN cReply
 FUNCTION AdminFrontPage()
    LOCAL cReply
 
-   cReply = "<HTML><HEAD><TITLE>Clipper Server Administration</TITLE></HEAD>" +;
-       "<BODY><H1>Clipper Server Administration</H1><H2>Directory structure:</H2>"
+   cReply := "<HTML><HEAD><TITLE>xHarbour Server Administration</TITLE></HEAD>" +;
+             "<BODY><H1>xHarbour Server Administration</H1><H2>Directory structure:</H2>"
 
    /* Now we can traverse the whole database in search of our pages */
    MutexLock( MutexDB )
@@ -398,7 +402,7 @@ FUNCTION AdminFrontPage()
 RETURN cReply
 
 PROCEDURE DrawDBTree( nItemID, nLevel, cReply )
-   LOCAL i,nID, nRecno, cID
+   LOCAL i, nID, nRecno, cID
 
    MutexLock( MutexDB )
    cID := AllTrim( Str( nItemID ) )
@@ -407,7 +411,7 @@ PROCEDURE DrawDBTree( nItemID, nLevel, cReply )
    SEEK Str( nItemID ) + "-"
 
    DO WHILE FIELD->PARENT == nItemID
-      nID = FIELD->ID
+      nID    := FIELD->ID
       nRecno := Recno()
       AddPageToList( @cReply, nLevel )
       MutexUnlock( MutexDB )
@@ -424,7 +428,7 @@ PROCEDURE DrawDBTree( nItemID, nLevel, cReply )
 
    /** The ADD request */
    FOR i := 1 TO nLevel
-      cReply += "&nbsp;&nbsp;&nbsp;"
+       cReply += "&nbsp;&nbsp;&nbsp;"
    NEXT
    cReply += "<a href='/admin/new?ID=" + cID +"'>--&gt;Add a page here</a><BR>"
 
@@ -432,15 +436,16 @@ RETURN
 
 PROCEDURE AddPageToList( cReply, nLevel )
    LOCAL cID, i
+
    cID := AllTrim( Str( FIELD->ID ) )
 
    FOR i := 1 TO nLevel
-      cReply += "&nbsp;&nbsp;&nbsp;"
+       cReply += "&nbsp;&nbsp;&nbsp;"
    NEXT
 
-cReply += AllTrim(FIELD->NAME) + " &nbsp;<a href='/admin/edit?ID=" + cID +;
-     "'>&lt;mod&gt;</a>&nbsp;<a href='/admin/del?ID=" + cID +;
-      "'>&lt;del&gt;</a><BR>"
+   cReply += AllTrim(FIELD->NAME) + " &nbsp;<a href='/admin/edit?ID=" + cID +;
+             "'>&lt;mod&gt;</a>&nbsp;<a href='/admin/del?ID=" + cID +;
+             "'>&lt;del&gt;</a><BR>"
 RETURN
 
 ************************************************************
@@ -456,31 +461,31 @@ FUNCTION AdminEditPageMask( nID )
    /** IF ID < 0 , we must add a page */
    IF nID < 0
       GOTO BOTTOM
-      nParent = -nID
-      nID = FIELD->ID + 1
+      nParent := -nID
+      nID     := FIELD->ID + 1
       APPEND BLANK
-      REPLACE ID with nID, PARENT with nParent
+      REPLACE ID WITH nID, PARENT WITH nParent
    ELSE
       SEEK nID
    ENDIF
 
-   cReply :="<HTML><HEAD><TITLE>Modify record</TITLE></HEAD><BODY>"
+   cReply := "<HTML><HEAD><TITLE>Modify record</TITLE></HEAD><BODY>"
 
-   IF .not. Found()
-      cReply +="<P>ERROR: record not found"
+   IF .NOT. Found()
+      cReply += "<P>ERROR: record not found"
    ELSE
-      cName = AllTrim(FIELD->NAME )
-      cID = AllTrim( Str( nID) )
+      cName  := AllTrim( FIELD->NAME )
+      cID    := AllTrim( Str( nID ) )
       cReply := "<H1>Changing page " +cName + "(" + cID + ")</H1>" +;
-         "<FORM ACTION='/admin/mod' METHOD='POST'>" + ;
-         "<INPUT TYPE='HIDDEN' NAME='ID' VALUE='" + cID +"'>" +;
-         "<P>Page Name: <INPUT NAME='NAME' SIZE='30' MAXLENGTH='30' TYPE='TEXT' VALUE='"+ cName + "'><BR>" +;
-         "Page Type: <INPUT NAME='MIMETYPE' SIZE='30' MAXLENGTH='30' TYPE='TEXT' VALUE='"+ AllTrim( FIELD->MIMETYPE ) + "'><BR>"
-      IF FIELD->MIMETYPE = "text/plain" .or. FIELD->MIMETYPE = "text/html" .or.;
-         FIELD->MIMETYPE = "text/xml" .or. FIELD->MIMETYPE = ""
+                "<FORM ACTION='/admin/mod' METHOD='POST'>" + ;
+                "<INPUT TYPE='HIDDEN' NAME='ID' VALUE='" + cID +"'>" +;
+                "<P>Page Name: <INPUT NAME='NAME' SIZE='30' MAXLENGTH='30' TYPE='TEXT' VALUE='"+ cName + "'><BR>" +;
+                "Page Type: <INPUT NAME='MIMETYPE' SIZE='30' MAXLENGTH='30' TYPE='TEXT' VALUE='"+ AllTrim( FIELD->MIMETYPE ) + "'><BR>"
+      IF FIELD->MIMETYPE = "text/plain" .OR. FIELD->MIMETYPE = "text/html" .OR.;
+         FIELD->MIMETYPE = "text/xml"   .OR. FIELD->MIMETYPE = ""
          cReply += "<P>Change the content:<BR><TEXTAREA ROWS='10' COLS='70' NAME='CONTENT'>" +;
-            FIELD->CONTENT +;
-            "</TEXTAREA>"
+                   FIELD->CONTENT +;
+                   "</TEXTAREA>"
       ENDIF
 
       cReply += "<BR><BR><INPUT TYPE='SUBMIT' VALUE='Modify'></FORM>"
@@ -488,8 +493,8 @@ FUNCTION AdminEditPageMask( nID )
 
    MutexUnlock( MutexDB )
 
-   cReply +="<BR><HR><BR><a href='/admin'>Return to administration page</a>" +;
-      "</BODY></HTML> "
+   cReply += "<BR><HR><BR><a href='/admin'>Return to administration page</a>" +;
+             "</BODY></HTML> "
 
 RETURN cReply
 
@@ -504,9 +509,9 @@ FUNCTION AdminDelPage( nID )
    SET ORDER TO 1
    SEEK nID
 
-   cReply :="<HTML><HEAD><TITLE>Delete page</TITLE></HEAD><BODY>"
-   IF .not. Found()
-      cReply +="<P>ERROR: record not found"
+   cReply := "<HTML><HEAD><TITLE>Delete page</TITLE></HEAD><BODY>"
+   IF .NOT. Found()
+      cReply += "<P>ERROR: record not found"
    ELSE
       DELETE
       PACK
@@ -515,8 +520,8 @@ FUNCTION AdminDelPage( nID )
 
    MutexUnlock( MutexDB )
 
-   cReply +="<BR><HR><BR><a href='/admin'>Return to administration page</a>" +;
-      "</BODY></HTML> "
+   cReply += "<BR><HR><BR><a href='/admin'>Return to administration page</a>" +;
+             "</BODY></HTML> "
 
 RETURN cReply
 
@@ -524,33 +529,33 @@ RETURN cReply
 * Change a page content
 *
 FUNCTION AdminModPage( cPostData )
-   LOCAL cReply,cName, nID, cContent, cMimeType
-   Local aFields := ParsePostData( cPostData )
+   LOCAL cReply, cName, nID, cContent, cMimeType
+   LOCAL aFields := ParsePostData( cPostData )
 
 
    MutexLock( MutexDB )
    SET ORDER TO 1
-   nID = Val( GetPostField( aFields, "ID" ) )
+   nID := Val( GetPostField( aFields, "ID" ) )
    SEEK nID
 
-   cReply :="<HTML><HEAD><TITLE>Modify page</TITLE></HEAD><BODY>"
-   IF .not. Found()
-      cReply +="<P>ERROR: record not found"
+   cReply := "<HTML><HEAD><TITLE>Modify page</TITLE></HEAD><BODY>"
+   IF .NOT. Found()
+      cReply += "<P>ERROR: record not found"
    ELSE
-      cName := GetPostField( aFields, "NAME" )
-      cContent := GetPostField( aFields, "CONTENT" )
+      cName     := GetPostField( aFields, "NAME" )
+      cContent  := GetPostField( aFields, "CONTENT" )
       cMimeType := GetPostField( aFields, "MIMETYPE" )
 
       IF cName != NIL
-         REPLACE NAME with cName
+         REPLACE NAME WITH cName
       ENDIF
 
       IF cContent != NIL
-         REPLACE CONTENT with cContent
+         REPLACE CONTENT WITH cContent
       ENDIF
 
       IF cMimeType != NIL
-         REPLACE MIMETYPE with cMimeType
+         REPLACE MIMETYPE WITH cMimeType
       ENDIF
 
       cReply += "<P>Page has been Changed"
@@ -558,8 +563,8 @@ FUNCTION AdminModPage( cPostData )
 
    MutexUnlock( MutexDB )
 
-   cReply +="<BR><HR><BR><a href='/admin'>Return to administration page</a>" +;
-      "</BODY></HTML> "
+   cReply += "<BR><HR><BR><a href='/admin'>Return to administration page</a>" +;
+             "</BODY></HTML> "
 
 RETURN cReply
 
@@ -573,14 +578,14 @@ FUNCTION ParsePostData( cPostData )
 
    DO WHILE Len( cPostData ) > 0
       IF At( "&", cPostData ) > 1
-         cElem := Substr( cPostData, 1, At( "&", cPostData )-1 )
-         cPostData := SubStr( cPostData, At( "&", cPostData) +1 )
+         cElem     := Substr( cPostData, 1, At( "&", cPostData ) - 1 )
+         cPostData := SubStr( cPostData, At( "&", cPostData) + 1 )
       ELSE
-         cElem := cPostData
-         cPostData = ""
+         cElem     := cPostData
+         cPostData := ""
       ENDIF
-      cField := Substr( cElem, 1, At("=", cElem ) -1  )
-      cValue := Substr( cElem, At("=", cElem ) +1  )
+      cField := Substr( cElem, 1, At( "=", cElem ) - 1  )
+      cValue := Substr( cElem, At( "=", cElem ) + 1  )
 
       cValue := URLDecode( cValue )
 
@@ -596,27 +601,27 @@ FUNCTION URLDecode( cStr )
       DO CASE
 
          CASE cStr[i] == "+"
-            cRet += " "
+              cRet += " "
 
          CASE cStr[i] == "%"
-            cCar := UPPER( cStr[i+1] )
-            IF cCar >= "0" .and. cCar <= "9"
-               nVal := ( Asc( cCar ) - Asc( "0" ))  * 16
-            ELSE
-               nVal := ( Asc( cCar ) - Asc( "A" ) + 10) * 16
-            ENDIF
+              cCar := UPPER( cStr[i+1] )
+              IF cCar >= "0" .AND. cCar <= "9"
+                 nVal := ( Asc( cCar ) - Asc( "0" ) ) * 16
+              ELSE
+                 nVal := ( Asc( cCar ) - Asc( "A" ) + 10 ) * 16
+              ENDIF
 
-            cCar := UPPER( cStr[i+2] )
-            IF cCar >= "0" .and. cCar <= "9"
-               nVal += ( Asc( cCar ) - Asc( "0" ))
-            ELSE
-               nVal += Asc( cCar ) - Asc( "A" ) + 10
-            ENDIF
-            cRet += chr( nVal )
-            i += 2
+              cCar := UPPER( cStr[i+2] )
+              IF cCar >= "0" .AND. cCar <= "9"
+                 nVal += ( Asc( cCar ) - Asc( "0" ) )
+              ELSE
+                 nVal += Asc( cCar ) - Asc( "A" ) + 10
+              ENDIF
+              cRet += Chr( nVal )
+              i += 2
 
          OTHERWISE
-            cRet += cStr[i]
+              cRet += cStr[i]
 
       ENDCASE
    NEXT
@@ -625,7 +630,7 @@ RETURN cRet
 FUNCTION GetPostField( aFields, cField )
    LOCAL cRet := NIL, nPos := 1
 
-   DO WHILE cRet == NIL .and. nPos <= Len( aFields )
+   DO WHILE cRet == NIL .AND. nPos <= Len( aFields )
       IF aFields[ nPos ][1] == cField
          cRet := aFields[ nPos ][2]
       ENDIF
@@ -640,16 +645,16 @@ FUNCTION CreateReply( nCode, cDesc, cContent, cMimeType )
    LOCAL cReply, CRLF := InetCRLF()
 
    IF cMimeType == NIL
-      cMimeType = "text/html"
+      cMimeType := "text/html"
    ENDIF
 
-   cReply := "HTTP/1.1 "+ AllTrim( Str( nCode ) )+" "+ cDesc + CRLF +;
-      "Server: Clipper Server" + CRLF +;
-      "Content-Type: " + cMimeType + CRLF +;
-      "Pragma: No-Cache" +CRLF +;
-      "Content-Length: " + RTrim( Str( Len( cContent ) ) ) + CRLF +;
-      CRLF +;
-      cContent
+   cReply := "HTTP/1.1 "+ AllTrim( Str( nCode ) ) + " " + cDesc + CRLF +;
+             "Server: Clipper Server" + CRLF +;
+             "Content-Type: " + cMimeType + CRLF +;
+             "Pragma: No-Cache" + CRLF +;
+             "Content-Length: " + RTrim( Str( Len( cContent ) ) ) + CRLF +;
+             CRLF +;
+             cContent
 
 RETURN cReply
 
@@ -657,16 +662,16 @@ RETURN cReply
 FUNCTION PageDown()
    LOCAL cContent
 
-   cContent := "<HTML><HEAD><TITLE>Page Down</TITLE></HEAD>"+;
-      "<BODY><H1>Sorry</H1><P>We are currently down; retry later</BODY>"
+   cContent := "<HTML><HEAD><TITLE>Page Down</TITLE></HEAD>" + ;
+               "<BODY><H1>Sorry</H1><P>We are currently down; retry later</BODY>"
 
 RETURN CreateReply( 501, "Site down", cContent )
 
 FUNCTION PageNotFound( cPage )
    LOCAL cContent
 
-   cContent := "<HTML><HEAD><TITLE>Page NotFound</TITLE></HEAD>"+;
-      "<BODY><H1>Sorry</H1><P>Page " + cPage + " has not been found.</BODY></HTML>"
+   cContent := "<HTML><HEAD><TITLE>Page NotFound</TITLE></HEAD>" + ;
+               "<BODY><H1>Sorry</H1><P>Page " + cPage + " has not been found.</BODY></HTML>"
 
 RETURN CreateReply( 501, "Site down", cContent )
 
@@ -677,7 +682,7 @@ PROCEDURE Looping( nProgress,  nR, nC )
 
    LOCAL nRow := Row(), nCol := Col()
 
-   IF nProgress > 3 .or. nProgress < 0
+   IF nProgress > 3 .OR. nProgress < 0
       nProgress := 0
    ENDIF
 
@@ -685,14 +690,14 @@ PROCEDURE Looping( nProgress,  nR, nC )
    @ nRow, nCol
 
    DO CASE
-      CASE nProgress = 0
-         @  nR, nC + 1 SAY "-"
+      CASE nProgress == 0
+           @  nR, nC + 1 SAY "-"
       CASE nProgress == 1
-         @  nR, nC + 1 SAY "\"
+           @  nR, nC + 1 SAY "\"
       CASE nProgress == 2
-         @  nR, nC + 1 SAY "|"
+           @  nR, nC + 1 SAY "|"
       CASE nProgress == 3
-         @  nR, nC + 1 SAY "/"
+           @  nR, nC + 1 SAY "/"
    ENDCASE
 
    nProgress++
@@ -702,3 +707,4 @@ PROCEDURE Looping( nProgress,  nR, nC )
 RETURN
 
 
+                  

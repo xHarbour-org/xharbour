@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bldsvr.bat,v 1.3 2003/01/11 01:53:48 ronpinkas Exp $
+rem $Id: bldsvr.bat,v 1.4 2003/01/11 02:18:09 fsgiudice Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -20,3 +20,10 @@ set HB_LIB_INSTALL=..\..\lib
 SET HB_MT=mt
 
 call %HB_BIN_INSTALL%\bld.bat sitesvr blddbf %1 %2 %3 %4 %5
+
+if exist sitesvr.c   del sitesvr.c
+if exist sitesvr.obj del sitesvr.obj
+if exist sitesvr.tds del sitesvr.tds
+if exist blddbf.c    del blddbf.c
+if exist blddbf.obj  del blddbf.obj
+
