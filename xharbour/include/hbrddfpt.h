@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.6 2003/11/30 12:32:30 druzus Exp $
+ * $Id: hbrddfpt.h,v 1.7 2004/02/24 17:41:14 paultucker Exp $
  */
 
 /*
@@ -113,18 +113,19 @@ HB_EXTERN_BEGIN
 #define FPTIT_FLEX_LONG    0x03F6
 #define FPTIT_FLEX_DOUBLE  0x03F8
 
-#define FPTIT_FLEXAR_ARAY  0x0C
-#define FPTIT_FLEXAR_NIL   0x00
-#define FPTIT_FLEXAR_TRUE  0x19
-#define FPTIT_FLEXAR_FALSE 0x1A
-#define FPTIT_FLEXAR_DATE  0x0E
-#define FPTIT_FLEXAR_BYTE  0x12
-#define FPTIT_FLEXAR_BYTE2 0x1D
-#define FPTIT_FLEXAR_SHORT 0x13
+#define FPTIT_FLEXAR_ARAY   0x0C
+#define FPTIT_FLEXAR_NIL    0x00
+#define FPTIT_FLEXAR_TRUE   0x19
+#define FPTIT_FLEXAR_FALSE  0x1A
+#define FPTIT_FLEXAR_DATE   0x0E
+#define FPTIT_FLEXAR_BYTE   0x12
+#define FPTIT_FLEXAR_BYTE2  0x1D
+#define FPTIT_FLEXAR_SHORT  0x13
 #define FPTIT_FLEXAR_SHORT2 0x1E
-#define FPTIT_FLEXAR_LONG  0x20
-#define FPTIT_FLEXAR_DBL   0x0F
-#define FPTIT_FLEXAR_STR   0x07
+#define FPTIT_FLEXAR_LONG   0x20
+#define FPTIT_FLEXAR_DBL    0x0F
+#define FPTIT_FLEXAR_STR    0x07
+#define FPTIT_FLEXAR_NUL    0x18
 
 /*
 #define HB_IT_NIL       ( ( USHORT ) 0x0000 )

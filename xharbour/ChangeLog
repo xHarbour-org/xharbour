@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2409 2004/02/26 04:56:53 mlombardo Exp $
+ * $Id: ChangeLog,v 1.2410 2004/02/26 05:00:51 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-27 09:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * include/hbrddfpt.h
+  * source/rdd/dbffpt/dbffpt1.c
+    + support for empty string type when arrays found in memo fields
 
 2004-02-26 01:55 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
   * source/rtl/hbserv.c
