@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.4 2003/03/05 05:11:52 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.5 2003/04/03 17:49:21 ronpinkas Exp $
  */
 
 /*
@@ -330,7 +330,7 @@ int hb_pp_ReadRules( void )
      {
         if( hb_comp_files.iFiles == 1 )
         {
-           return 0;      /* we have reached the main EOF */
+           break;      /* we have reached the main EOF */
         }
         else
         {
@@ -342,7 +342,6 @@ int hb_pp_ReadRules( void )
      }
   }
 
-  // Formal only.
   return 0;
 }
 

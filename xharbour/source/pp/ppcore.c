@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.52 2003/03/29 07:01:27 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.53 2003/04/03 17:49:21 ronpinkas Exp $
  */
 
 /*
@@ -155,11 +155,14 @@ static int    NextParm( char **, char * );
 static BOOL   OpenInclude( char *, HB_PATHNAMES *, PHB_FNAME, BOOL bStandardOnly, char * );
 static BOOL   IsIdentifier( char *szProspect );
 
+int hb_pp_NextToken( char** pLine );
+
 #define ISID( c )  ( isalpha( ( int ) c ) || ( c ) == '_' || ( c ) > 0x7E )
 #define ISNAME( c )  ( isalnum( ( int ) c ) || ( c ) == '_' || ( c ) > 0x7E )
 #define MAX_NAME     255
 #define MAX_EXP      2048
 #define PATTERN_SIZE HB_PP_STR_SIZE
+#define MAX_CICLES   256
 
 #define IT_EXPR       1
 #define IT_ID         2
@@ -204,6 +207,8 @@ char *     hb_pp_STD_CH = NULL;
 
 /* Ron Pinkas added 2000-11-21 */
 static BOOL s_bArray = FALSE;
+
+static char s_sToken[2048];
 
 #if defined(__WATCOMC__)
 extern BOOL hb_pp_bInline;
@@ -265,9 +270,7 @@ void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
 
             if( (* hb_compInclude)( szFileName, hb_comp_pIncludePath ) )
             {
-               /*
-               printf( "Loading Standard Rules from: \'%s\'\n", szFileName );
-               */
+               //printf( "Loading Standard Rules from: \'%s\'\n", szFileName );
 
                hb_pp_Init();
 
@@ -305,7 +308,9 @@ void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
                if ( s_kolAddComs || s_kolAddTras || s_kolAddDefs > 3 )
                {
                   if( ! hb_comp_bQuiet )
+                  {
                      printf( "Loaded: %i Commands, %i Translates, %i Defines from: %s\n", s_kolAddComs, s_kolAddTras, s_kolAddDefs - 3, szFileName );
+                  }
                }
                else
                {
@@ -861,10 +866,9 @@ int hb_pp_ParseDefine( char * sLine )
         sLine++;
      }
 
-     HB_SKIPTABSPACES(sLine);
+     HB_SKIPTABSPACES( sLine );
 
      lastdef = hb_pp_AddDefine( defname, ( *sLine == '\0' ) ? NULL : sLine );
-
      lastdef->npars = iParams;
      lastdef->pars = ( iParams <= 0 ) ? NULL : hb_strdup( sParams );
   }
@@ -906,7 +910,34 @@ DEFINES * hb_pp_AddDefine( char * defname, char * value )
     s_kolAddDefs++;
   }
 
-  stdef->value = ( value == NULL ) ? NULL : hb_strdup( value );
+  if( value )
+  {
+     char *pTmp;
+
+     stdef->value = hb_xgrab( strlen( value ) + 1 );
+
+     pTmp = stdef->value;
+
+     while( *value )
+     {
+        *pTmp = *value;
+        pTmp++; value++;
+     }
+     --pTmp;
+     while( *pTmp == ' ' )
+     {
+       --pTmp;
+     }
+     ++pTmp;
+     *pTmp = '\0';
+
+     //printf( "Added: >%s<\n", stdef->value );
+  }
+  else
+  {
+     stdef->value = NULL;
+  }
+
   stdef->pars = NULL;
 
   return stdef;
@@ -1059,12 +1090,13 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
   HB_TRACE(HB_TR_DEBUG, ("ParseCommand(%s, %d, %d, %d)", sLine, com_or_xcom, com_or_tra, bRemove));
 
   HB_SKIPTABSPACES( sLine );
-  ipos = 0;
 
+  #if 0
   /* JFL 2000-09-19 */
   /* This was the original line as Alexander wrote it */
   /* while( *sLine != '\0' && *sLine != ' ' && *sLine != '\t' && *sLine != '<' && *sLine != '=' && ( *sLine != '(' || ipos == 0 ) ) */
   /* Now the line #xtranslate = name(.. => will be allowed */
+  ipos = 0;
 
   /* I changed it to the following to allow < and = to be the first char within a translate or xtranslate */
   while( *sLine != '\0' && *sLine != ' ' && *sLine != '\t' && ( *sLine != '<' || ipos == 0 ) && ( *sLine != '=' || ipos == 0 ) && ( *sLine != '(' || ipos == 0 ) )
@@ -1100,6 +1132,18 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
   {
      return;
   }
+  #else
+
+     ipos = hb_pp_NextToken( &sLine );
+
+     if( ipos == 0 || ipos > MAX_NAME )
+     {
+        // Error???
+        return;
+     }
+
+     strcpy( cmdname, s_sToken );
+  #endif
 
   hb_strupr( cmdname );
   HB_SKIPTABSPACES(sLine);
@@ -1247,11 +1291,7 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
     stcmd->mpatt = hb_strdup( mpatt );
     stcmd->value = ( rlen > 0 ) ? hb_strdup( rpatt ) : NULL;
 
-    /* JFL */
-    /*
-    printf( "Parsecommand Name: %s Pat: %s Val: %s\n", stcmd->name, stcmd->mpatt, stcmd->value );
-    */
-
+    //printf( "Parsecommand Name: %s Pat: %s Val: %s\n", stcmd->name, stcmd->mpatt, stcmd->value );
   }
   else
   {
@@ -1530,270 +1570,295 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 {
   char sToken[MAX_NAME];
   char * ptri, * ptro, * ptrb;
-  int lenToken, i, ipos, isdvig, lens;
+  int lenToken, i, ipos, isdvig, lens, iOffset;
   int ifou;
-  int rezDef, rezTra, rezCom, kolpass = 0;
+  int kolpass = 0;
   DEFINES * stdef;
   COMMANDS * stcmd;
 
   HB_TRACE(HB_TR_DEBUG, ("hb_pp_ParseExpression(%s, %s)", sLine, sOutLine));
 
-  #if 0
-     printf( "Line: >%s<\n", sLine );
-  #endif
+  strotrim( sLine, FALSE );
+
+  isdvig = 0;
 
   do
   {
-     strotrim( sLine, FALSE );
+    Top:
+     //printf( "  *** Line: >%s<\n", sLine );
+
+     ptro = sOutLine;
+     ptri = sLine + isdvig;
+
+     ipos = md_strAt( ";", 1, ptri, TRUE, FALSE, FALSE, FALSE );
+
+     if( ipos > 0 )
+     {
+        *( ptri + ipos - 1 ) = '\0';
+     }
+
+     HB_SKIPTABSPACES( ptri );
+
+     if( *ptri == '\0' )
+     {
+        if ( ipos == 0 )
+        {
+           break;
+        }
+
+        *ptri = ' ';
+        isdvig += ipos;
+        goto Top;
+     }
 
      #if 0
-        printf( "Trimed: >%s<\n", sLine );
+        if( ipos > 0 )
+        {
+           printf( "Holding: >%s<\n", sLine + isdvig + ipos );
+        }
+        printf( "Processing: >%s<\n", ptri );
      #endif
 
-     rezDef = 0; rezTra = 0; rezCom = 0;
-     isdvig = 0;
-
-     do
+     if( *ptri == '#' )
      {
-        ptro = sOutLine;
-        ptri = sLine + isdvig;
-        ipos = md_strAt( ";", 1, ptri, TRUE, FALSE, FALSE, FALSE );
+        hb_pp_ParseDirective( ptri + 1 );
 
         if( ipos > 0 )
         {
-           *(ptri+ipos-1) = '\0';
+           *( sLine + isdvig + ipos - 1 ) = ';';
         }
 
-        HB_SKIPTABSPACES( ptri );
+        lens = strlen( ptri );
 
-        if( *ptri == '#' )
+        //printf( "Len: %i, Digesting: >%s<\n", lens, ptri );
+
+        hb_pp_Stuff( " ", ptri, 0, ipos ? ipos : lens, lens );
+
+        //printf( "ipos: %i, Digested: >%s<\n", ipos, sLine + isdvig );
+
+        if( ipos > 0 && *( sLine + isdvig ) )
         {
-           hb_pp_ParseDirective( ptri+1 );
-
-           if( ipos > 0 )
-           {
-              *( sLine + isdvig + ipos - 1 ) = ';';
-           }
-
-           lens = strlen( sLine + isdvig );
-           hb_pp_Stuff( " ", sLine + isdvig, 0, ipos ? ipos : lens, lens );
-
-           if( ipos > 0 )
-           {
-              ipos = 1;
-           }
+           ipos = 1;
         }
-        else
-        {   /* Look for macros from #define      */
-           while( ( lenToken = NextName( &ptri, sToken ) ) > 0 )
-           {
-              #if 0
-                 printf( "Token: >%s< Line: >%s<\n", sToken, sLine );
-              #endif
+     }
+     else
+     {
+       NextName:
 
-              if( (stdef=DefSearch(sToken,NULL)) != NULL )
-              {
-                 ptrb = ptri - lenToken;
+        if( kolpass > MAX_CICLES )
+        {
+           hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_RECURSE, NULL, NULL );
+           break;
+        }
 
-                 if( ( i = WorkDefine( &ptri, ptro, stdef ) ) >= 0 )
-                 {
-                    rezDef++;
-                    lens = strlen( ptrb );
-
-                    if( ipos > 0 )
-                    {
-                       *(ptrb+lens) = ';';
-                       lens += strlen( ptrb+lens+1 );
-                    }
-
-                    hb_pp_Stuff( ptro, ptrb, i, ptri-ptrb, lens+1 );
-
-                    if( ipos > 0 )
-                    {
-                       ipos += i - (ptri-ptrb);
-                       *(sLine + isdvig + ipos - 1) = '\0';
-                    }
-
-                    // Ron Pinkas 2002-06-21
-                    //ptri += i - (ptri-ptrb);
-                    // Because we need to check the expansion for nested #defines as well!
-                    ptri += - (ptri-ptrb);
-                 }
-              }
-           }
-
+        if( ( lenToken = NextName( &ptri, sToken ) ) > 0 )
+        {
            #if 0
-               if( *sOutLine )
-                  printf( "*After #defines: >%s<\n", sOutLine );
-               else
-                  printf( "After #defines: >%s<\n", sLine );
+              printf( "Define: >%s< Line: >%s<\n", sToken, ptri );
            #endif
 
-           /* Look for definitions from #translate    */
-           stcmd = hb_pp_topTranslate;
-           while( stcmd != NULL )
+           if( ( stdef = DefSearch( sToken, FALSE ) ) == NULL )
            {
-              ptri = sLine + isdvig;
-              lenToken = strlen(stcmd->name);
-
-              //printf( "Anchore: '%s' MP: '%s' Against: '%s'\n", stcmd->name, stcmd->mpatt, ptri );
-
-              while( ( ifou = md_strAt( stcmd->name, lenToken, ptri, TRUE, FALSE, FALSE, TRUE )) > 0 )
-              {
-                 ptri += ifou -1;
-
-                 //printf( "Trying %s\n", ptri + lenToken );
-
-                 if( ( i = WorkTranslate( ptri+lenToken, ptro, stcmd, &lens ) ) >= 0 )
-                 {
-                    lens += lenToken;
-                    while( lens > 0 && (*(ptri+lens-1)==' ' || *(ptri+lens-1)=='\t') )
-                    {
-                       lens--;
-                    }
-
-                    if( ipos > 0 )
-                    {
-                       *(sLine+isdvig+ipos-1) = ';';
-                    }
-
-                    hb_pp_Stuff( ptro, ptri, i, lens, strlen(ptri) );
-                    rezTra = 1;
-
-                    if( ipos > 0 )
-                    {
-                       ipos += i - lens;
-                       *(sLine+isdvig+ipos-1) = '\0';
-                    }
-
-                    ptri += i;
-                    //printf( "Translated.\n" );
-                 }
-                 else
-                 {
-                    ptri += lenToken;
-                    //printf( "No Match.\n" );
-                 }
-              }
-
-              stcmd = stcmd->last;
+              goto NextName;
            }
-
-           #if 0
-               if( *sOutLine )
-                  printf( "*After #translate: >%s<\n", sOutLine );
-               else
-                  printf( "After #translate: >%s<\n", sLine );
-           #endif
-
-           /* Look for definitions from #command      */
-           /* JFL ! Was 3 but insufficient in most cases */
-           /* I know this is a new hardcoded limit ... any better idea's welcome */
-           if( kolpass < 20 )
+           else
            {
-              ptri = sLine + isdvig;
-              HB_SKIPTABSPACES( ptri );
+              ptrb = ptri - lenToken;
 
-              if( ISNAME( *ptri ) )
+              if( ( i = WorkDefine( &ptri, ptro, stdef ) ) >= 0 )
               {
-                 NextName( &ptri, sToken );
-              }
-              else
-              {
-                 /* Ron Pinkas commented 2000-01-24
-                 i = 0;
-                 while( *ptri != ' ' && *ptri != '\t' && *ptri != '\0' && *ptri != '\"' && *ptri != '\'' && *ptri != '('  && !ISNAME(*ptri) )
-                 {
-                    *(sToken+i) = *ptri++;
-                    i++;
-                 }
-                 *(sToken+i) = '\0';
-                 */
-
-                 /* Ron Pinkas added 2000-01-24 */
-                 if( IS_2CHAR_OPERATOR( ptri ) )
-                 {
-                    sToken[0] = *ptri++;
-                    sToken[1] = *ptri++;
-                    sToken[2] = '\0';
-                 }
-                 else
-                 {
-                    sToken[0] = *ptri++;
-                    sToken[1] = '\0';
-                 }
-                 /* END, Ron Pinkas added 2000-01-24 */
-              }
-
-              HB_SKIPTABSPACES( ptri );
-
-              #if 0
-                 printf( "Token: %s\n", sToken );
-              #endif
-
-              if( ( *ptri == '\0' || ( *ptri != '=' && (!IsInStr(*ptri,":/+*-%^") || *(ptri+1) != '=') &&
-                  ( *ptri != '-' || *(ptri+1) != '>' ) ) ) && ( stcmd = ComSearch(sToken,NULL) ) != NULL )
-              {
-                 ptro = sOutLine;
-
-                 i = WorkCommand( ptri, ptro, stcmd );
-                 ptri = sLine + isdvig;
+                 lens = strlen( ptrb );
 
                  if( ipos > 0 )
                  {
-                    *(ptri+ipos-1) = ';';
+                    *( ptrb + lens ) = ';';
+                    lens += strlen( ptrb + lens + 1 );
                  }
 
-                 if( i >= 0 )
+                 hb_pp_Stuff( ptro, ptrb, i, ptri - ptrb, lens + 1 );
+
+                 //printf( "Defined: >%s<\n", ptrb );
+
+                 if( ipos > 0 )
                  {
-                    if( isdvig + ipos > 0 )
-                    {
-                       lens = strlen( sLine+isdvig );
-                       hb_pp_Stuff( ptro, sLine+isdvig, i, (ipos)? ipos-1:lens, lens );
-
-                       if( ipos > 0 )
-                       {
-                          ipos = i + 1;
-                       }
-                    }
-                    else
-                    {
-                       memcpy( sLine, sOutLine, i+1);
-                    }
-
-                    rezCom = 1;
+                    ipos += i - ( ptri - ptrb );
+                    *( sLine + isdvig + ipos - 1 ) = '\0';
                  }
+
+                 kolpass++;
+                 ptri = ptrb;
+                 goto NextName;
               }
-              else if( ipos > 0 )
+              else
               {
-                 *(sLine+isdvig+ipos-1) = ';';
+                 //printf( "Failed!\n" );
+
+                 goto NextName;
               }
-           }
-           else if( ipos > 0 )
-           {
-              *(sLine+isdvig+ipos-1) = ';';
            }
         }
 
-        isdvig += ipos;
-     }
-     while( ipos != 0 );
+        #if 0
+            printf( "    After #defines: >%s<\n", sLine );
+        #endif
 
-     kolpass++;
+        iOffset = 0;
 
-     if( kolpass > 20 && rezDef )
-     {
-        hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_RECURSE, NULL, NULL );
-        break;
+       NextToken:
+
+        stcmd = NULL;
+        ptri = sLine + isdvig + iOffset;
+        ptrb = ptri;
+
+        if( *ptrb && ( lenToken = hb_pp_NextToken( &ptrb ) ) > 0 )
+        {
+           #if 0
+              printf( "Token: >%s< Line: >%s<\n", s_sToken, ptri );
+           #endif
+
+         NextTranslate:
+
+           if( ( stcmd = TraSearch( s_sToken, stcmd ) ) == NULL )
+           {
+              iOffset += lenToken;
+              goto NextToken;
+           }
+           else
+           {
+              //printf( "Trying: >%s<\n", ptrb );
+
+              if( ( i = WorkTranslate( ptrb, ptro, stcmd, &lens ) ) >= 0 )
+              {
+                 lens += lenToken;
+                 while( lens > 0 && ( *( ptri + lens - 1 ) == ' ' || *( ptri + lens - 1 )== '\t' ) )
+                 {
+                    lens--;
+                 }
+
+                 if( ipos > 0 )
+                 {
+                    *( sLine + isdvig + ipos - 1 ) = ';';
+                 }
+
+                 hb_pp_Stuff( ptro, ptri, i, lens, strlen( ptri ) );
+
+                 //printf( "Translated: >%s<\n", ptri );
+
+                 kolpass++;
+
+                 // All the way from top again, check #defines from this same start position.
+                 goto Top;
+              }
+              else
+              {
+                 //printf( "Failed: %s\n", ptrb );
+
+                 stcmd = stcmd->last;
+
+                 if( stcmd )
+                 {
+                    goto NextTranslate;
+                 }
+                 else
+                 {
+                   iOffset += lenToken;
+                   goto NextToken;
+                 }
+              }
+           }
+        }
+
+        #if 0
+            printf( "   After #translate: >%s<\n", sLine );
+        #endif
+
+        /* Look for definitions from #command      */
+        ptri = sLine + isdvig;
+
+        HB_SKIPTABSPACES( ptri );
+
+        hb_pp_NextToken( &ptri );
+
+        #if 0
+           printf( "Command: >%s< Line: >%s<\n", s_sToken, ptri );
+        #endif
+
+        stcmd = NULL;
+
+        ptrb = ptri;
+
+      NextCommand:
+
+        if( ( stcmd = ComSearch( s_sToken, stcmd ) ) == NULL )
+        {
+           if( ipos > 0 )
+           {
+              *( sLine + isdvig+ ipos - 1 ) = ';';
+              //printf( "Restored: >%s<\n", sLine );
+           }
+        }
+        else
+        {
+           //printf( "Trying: >%s<\n", ptri );
+
+           ptro = sOutLine;
+
+           if( ( i = WorkCommand( ptri, ptro, stcmd ) ) >= 0 )
+           {
+              ptri = sLine + isdvig;
+
+              if( ipos > 0 )
+              {
+                 *( ptri + ipos - 1 ) = ';';
+                 //printf( "Restored: >%s<\n", sLine );
+              }
+
+              if( isdvig + ipos > 0 )
+              {
+                 lens = strlen( sLine + isdvig );
+
+                 hb_pp_Stuff( ptro, ptri, i, (ipos)? ipos - 1 : lens, lens );
+              }
+              else
+              {
+                 memcpy( sLine, sOutLine, i+1);
+              }
+
+              //printf( "Commanded: >%s<\n", ptro );
+              //printf( "Whole: >%s<\n", sLine );
+
+              kolpass++;
+
+              // All the way from top again, check #defines from this same start position.
+              goto Top;
+           }
+           else
+           {
+              //printf( "Failed!\n" );
+
+              stcmd = stcmd->last;
+
+              if( stcmd )
+              {
+                 #if 0
+                    if( ptri != ptrb )
+                    {
+                       printf( "ASSERT FAILED! >%s< != >%s<\n", ptri, ptrb );
+                       ptri = ptrb;
+                    }
+                 #endif
+                 goto NextCommand;
+              }
+           }
+        }
      }
+
+     isdvig += ipos;
   }
-  while( rezDef || rezTra || rezCom );
+  while( ipos > 0 && *( sLine + isdvig ) );
 
   #if 0
-      if( *sOutLine )
-         printf( "Out: >%s<\n", sOutLine );
-      else
-         printf( "Out: >%s<\n", sLine );
+      printf( "Outed: >%s<\n", sLine );
   #endif
 
   return 0;
@@ -1939,25 +2004,23 @@ static int WorkCommand( char * ptri, char * ptro, COMMANDS * stcmd )
   int rez;
   int lenres;
   char * ptrmp;
-  char * sToken = stcmd->name;
 
   HB_TRACE(HB_TR_DEBUG, ("WorkCommand(%s, %s, %p)", ptri, ptro, stcmd));
 
-  do
-    {
-      lenres = hb_pp_strocpy( ptro, stcmd->value );   /* Copying result pattern */
-      ptrmp = stcmd->mpatt;                      /* Pointer to a match pattern */
-      s_Repeate = 0;
-      s_groupchar = '@';
-      rez = CommandStuff( ptrmp, ptri, ptro, &lenres, TRUE, stcmd->com_or_xcom );
+  //printf( "Command Key: '%s' MP: '%s' RP: >%s< Against: '%s'\n", stcmd->name, stcmd->mpatt, stcmd->value , ptri );
 
-      stcmd = stcmd->last;
-      if( rez < 0 && stcmd != NULL ) stcmd = ComSearch(sToken, stcmd);
-    }
-  while( rez < 0 && stcmd != NULL );
+  lenres = hb_pp_strocpy( ptro, stcmd->value );   /* Copying result pattern */
+  ptrmp = stcmd->mpatt;                      /* Pointer to a match pattern */
+  s_Repeate = 0;
+  s_groupchar = '@';
+  rez = CommandStuff( ptrmp, ptri, ptro, &lenres, TRUE, stcmd->com_or_xcom );
 
-  *(ptro+lenres) = '\0';
-  if( rez >= 0 ) return lenres;
+  if( rez >= 0 )
+  {
+     *( ptro + lenres ) = '\0';
+     return lenres;
+  }
+
   return -1;
 }
 
@@ -1966,34 +2029,21 @@ static int WorkTranslate( char * ptri, char * ptro, COMMANDS * sttra, int * lens
   int rez;
   int lenres;
   char * ptrmp;
-  //char * sToken = sttra->name;
 
   HB_TRACE(HB_TR_DEBUG, ("WorkTranslate(%s, %s, %p, %p)", ptri, ptro, sttra, lens));
 
-  //do
-  //{
-     lenres = hb_pp_strocpy( ptro, sttra->value );
-     ptrmp = sttra->mpatt;
-     s_Repeate = 0;
-     s_groupchar = '@';
+  //printf( "Translate Key: '%s' MP: '%s' RP: >%s< Against: '%s'\n", sttra->name, sttra->mpatt, sttra->value , ptri );
 
-     //printf( "Same: '%s' MP: '%s' Against: '%s'\n", sttra->name, sttra->mpatt, ptri );
+  lenres = hb_pp_strocpy( ptro, sttra->value );
+  ptrmp = sttra->mpatt;
+  s_Repeate = 0;
+  s_groupchar = '@';
 
-     rez = CommandStuff( ptrmp, ptri, ptro, &lenres, FALSE, sttra->com_or_xcom );
-
-     //sttra = sttra->last;
-
-     //if( rez < 0 && sttra != NULL )
-     //{
-     //   sttra = TraSearch(sToken, sttra);
-     //}
-  //}
-  //while( rez < 0 && sttra != NULL );
-
-  *(ptro+lenres) = '\0';
+  rez = CommandStuff( ptrmp, ptri, ptro, &lenres, FALSE, sttra->com_or_xcom );
 
   if( rez >= 0 )
   {
+     *(ptro+lenres) = '\0';
      *lens = rez;
      return lenres;
   }
@@ -2011,7 +2061,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
   HB_TRACE(HB_TR_DEBUG, ("CommandStuff(%s, %s, %s, %p, %i, %i)", ptrmp, inputLine, ptro, lenres, com_or_tra, com_or_xcom));
 
-  //printf( "MP: %s\nInput: %s\n", ptrmp, ptri ) ;
+  //printf( "MP: >%s< Input: >%s<\n", ptrmp, ptri ) ;
 
   s_numBrackets = 0;
   HB_SKIPTABSPACES( ptri );
@@ -2451,9 +2501,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
         }
         else
         {
-           /*
-           printf( "\nFound: '%s' Len: %i In: '%s' At: %i \n", expreal, lenreal, *ptri, ipos );
-           */
+           //printf( "\nFound: '%s' Len: %i In: '%s' At: %i \n", expreal, lenreal, *ptri, ipos );
 
            lenreal = stroncpy( expreal, *ptri, ipos-1 );
 
@@ -2467,17 +2515,13 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
                {
                   if( IsIdentifier( expreal ) )
                   {
-                     /*
-                     printf( "Accepted ID: >%s<\n", expreal );
-                     */
+                     //printf( "Accepted ID: >%s<\n", expreal );
                      *ptri += lenreal;
                   }
                }
                else if( isExpres( expreal, *(exppatt+2) == '1' ) )
                {
-                  /*
-                  printf( "Accepted: >%s<\n", expreal );
-                  */
+                  //printf( "Accepted: >%s<\n", expreal );
                   *ptri += lenreal;
                }
            }
@@ -2515,9 +2559,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
         lenreal = getExpReal( expreal, ptri, FALSE, maxlenreal, FALSE );
      }
 
-     /*
-     printf("Len: %i Pat: %s Exp: %s\n", lenreal, exppatt, expreal );
-     */
+     //printf("Len: %i Pat: %s Exp: %s\n", lenreal, exppatt, expreal );
 
      if( lenreal && IsIdentifier( expreal ) )
      {
@@ -2625,10 +2667,11 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
      /* Copying a real expression to 'expreal' */
      if( ! lenreal )
      {
+        //printf( "Getting >%s<\n", *ptri );
         lenreal = getExpReal( expreal, ptri, FALSE, maxlenreal, FALSE );
      }
 
-     //printf("Len: %i Pat: %s Exp: %s\n", lenreal, exppatt, expreal );
+     //printf("Len: %i Pat: >%s< Exp: >%s<\n", lenreal, exppatt, expreal );
 
      if( lenreal )
      {
@@ -4528,7 +4571,7 @@ static BOOL truncmp( char ** ptro, char ** ptri, BOOL lTrunc )
         }
      }
 
-     if( **ptri == ',' || **ptri == '[' || **ptri == ']' || **ptri == '\1' || toupper( **ptri ) != toupper( **ptro ) )
+     if( **ptri == ' ' || **ptri == ',' || **ptri == '[' || **ptri == ']' || **ptri == '\1' || toupper( **ptri ) != toupper( **ptro ) )
      {
         break;
      }
@@ -4673,7 +4716,7 @@ static int strotrim( char * stroka, BOOL bRule )
         }
      }
 
-     if( State != STATE_NORMAL || curc != ' ' || ( curc == ' ' && lastc != ' ' && lastc != ',' && lastc != '(' && *(stroka+1) != ',' ) )
+     if( State != STATE_NORMAL || curc != ' ' || ( curc == ' ' && *( stroka + 1 ) != '\0' && lastc != ' ' && lastc != ',' && lastc != '(' && *( stroka + 1 ) != ',' ) )
      {
         *ptr++ = curc;
         lastc = curc;
@@ -4733,7 +4776,7 @@ static int NextName( char ** sSource, char * sDest )
      printf( "In: >%s<\n", *sSource );
   #endif
 
-  while( **sSource != '\0' && ( !ISNAME(**sSource) || State != STATE_NORMAL ) )
+  while( **sSource != '\0' && ( State != STATE_NORMAL || **sSource != '_' && ! isalpha( **sSource ) ) )
   {
      if( State == STATE_QUOTE1 )
      {
@@ -5131,4 +5174,300 @@ void CloseInclude( void )
    if( hb_comp_files.pLast )
       hb_comp_iLine = hb_comp_files.pLast->iLine;
    hb_comp_files.iFiles--;
+}
+
+int hb_pp_NextToken( char** pLine )
+{
+   char *sLine, *pTmp;
+   char s2[3];
+   size_t Counter, nLen, iPad = 0;
+
+   sLine = *pLine;
+   nLen = strlen( sLine );
+
+   //printf( "\nProcessing: '%s'\n", sLine );
+
+   // *** To be removed after final testing !!!
+   while( sLine[0] == ' ' )
+   {
+      sLine++; nLen--; iPad++;
+   }
+
+   s_sToken[0] = '\0';
+   s2[2]      = '\0';
+
+   if( nLen >= 2 )
+   {
+      s2[0] = sLine[0];
+      s2[1] = sLine[1];
+
+      if( strstr( "++\\--\\->\\:=\\==\\!=\\<>\\>=\\<=\\+=\\-=\\*=\\^=\\**\\/=\\%=", (char*) s2 ) )
+      {
+         s_sToken[0] = s2[0];
+         s_sToken[1] = s2[1];
+         s_sToken[2] = '\0';
+
+         goto Done;
+      }
+      else if( s2[0] == '[' && s2[1] == '[' )
+      {
+         pTmp = strstr( sLine + 2, "]]" );
+         if( pTmp == NULL )
+         {
+            s_sToken[0] = '['; // Clipper does NOT consider '[[' a single token
+            s_sToken[1] = '\0';
+         }
+         else
+         {
+            strncpy( (char *) s_sToken, sLine, ( pTmp - sLine ) + 2 );
+            s_sToken[( pTmp - sLine ) + 2] = '\0';
+         }
+
+         goto Done;
+      }
+   }
+
+   if( isalpha( sLine[0] ) || sLine[0] == '_' )
+   {
+      s_sToken[0] = sLine[0];
+      Counter = 1;
+
+      // Why did I have the '\\' is NOT clear - document if and when reinstating!!!
+      while( isalnum( sLine[Counter] ) || sLine[Counter] == '_'  ) //|| sLine[Counter] == '\\' )
+      {
+         s_sToken[Counter] = sLine[Counter];
+         Counter++;
+      }
+
+      s_sToken[Counter] = '\0';
+      goto Done;
+   }
+   else if( isdigit( sLine[0] ) )
+   {
+      s_sToken[0] = sLine[0];
+      Counter = 1;
+      while( isdigit( sLine[Counter] ) || sLine[Counter] == '\\' )
+      {
+         s_sToken[Counter] = sLine[Counter];
+         Counter++;
+      }
+
+      // Consume the point (and subsequent digits) only if digits follow...
+      if( sLine[Counter] == '.' && isdigit( sLine[Counter + 1] ) )
+      {
+         s_sToken[Counter] = '.';
+         Counter++;
+         s_sToken[Counter] = sLine[Counter];
+         Counter++;
+         while( isdigit( sLine[Counter] ) || sLine[Counter] == '\\' )
+         {
+            s_sToken[Counter] = sLine[Counter];
+            Counter++;
+         }
+      }
+
+      // Either way we are done.
+      s_sToken[Counter] = '\0';
+      goto Done;
+   }
+   else if( sLine[0] == '.' && isdigit( sLine[1] ) )
+   {
+      s_sToken[0] = '.';
+      s_sToken[1] = sLine[1];
+      Counter = 2;
+      while( isdigit( sLine[Counter] ) )
+      {
+         s_sToken[Counter] = sLine[Counter];
+         Counter++;
+      }
+
+      s_sToken[Counter] = '\0';
+      goto Done;
+   }
+   else if( sLine[0] == '.' )
+   {
+      if( nLen >= 5 && sLine[4] == '.' )
+      {
+         if( toupper( sLine[1] ) == 'A' && toupper( sLine[2] ) == 'N' && toupper( sLine[3] ) == 'D' )
+         {
+            s_sToken[0] = '.';
+            s_sToken[1] = 'A';
+            s_sToken[2] = 'N';
+            s_sToken[3] = 'D';
+            s_sToken[4] = '.';
+            s_sToken[5] = '\0';
+
+            goto Done;
+         }
+         else if( toupper( sLine[1] ) == 'N' && toupper( sLine[2] ) == 'O' && toupper( sLine[3] ) == 'T' )
+         {
+            s_sToken[0] = '!';
+            s_sToken[1] = '\0';
+
+            /* Skip the unaccounted letters ( .NOT. <-> ! ) */
+            sLine += 4;
+
+            goto Done;
+         }
+      }
+
+      if( nLen >= 4 && sLine[3] == '.' && toupper( sLine[1] ) == 'O' && toupper( sLine[2] ) == 'R' )
+      {
+         s_sToken[0] = '.';
+         s_sToken[1] = 'O';
+         s_sToken[2] = 'R';
+         s_sToken[3] = '.';
+         s_sToken[4] = '\0';
+
+         goto Done;
+      }
+
+      if( nLen >= 3 && sLine[2] == '.' )
+      {
+         if( toupper( sLine[1] ) == 'T' )
+         {
+            s_sToken[0] = '.';
+            s_sToken[1] = 'T';
+            s_sToken[2] = '.';
+            s_sToken[3] = '\0';
+
+            goto Done;
+         }
+         else if( toupper( sLine[1] ) == 'F' )
+         {
+            s_sToken[0] = '.';
+            s_sToken[1] = 'F';
+            s_sToken[2] = '.';
+            s_sToken[3] = '\0';
+
+            goto Done;
+         }
+      }
+
+      s_sToken[0] = '.';
+      s_sToken[1] = '\0';
+
+      goto Done;
+   }
+   else if( sLine[0] == '"' )
+   {
+      pTmp = strchr( sLine + 1, '"' );
+      if( pTmp == NULL )
+      {
+         s_sToken[0] = '"';
+         s_sToken[1] = '\0';
+      }
+      else
+      {
+         strncpy( (char *) s_sToken, sLine, ( pTmp - sLine ) + 1 );
+         s_sToken[( pTmp - sLine ) + 1] = '\0';
+      }
+
+      goto Done;
+   }
+   else if( sLine[0] == '\'' )
+   {
+      pTmp = strchr( sLine + 1, '\'' );
+      if( pTmp == NULL )
+      {
+         s_sToken[0] = '\'';
+         s_sToken[1] = '\0';
+      }
+      else
+      {
+         strncpy( (char *) s_sToken, sLine, ( pTmp - sLine ) + 1 );
+         s_sToken[( pTmp - sLine ) + 1] = '\0';
+
+         if( strchr( s_sToken, '"' ) == NULL )
+         {
+            s_sToken[0] = '"';
+            s_sToken[( pTmp - sLine )] = '"';
+         }
+      }
+
+      goto Done;
+   }
+   else if( sLine[0] == '[' )
+   {
+      if( s_bArray )
+      {
+         s_sToken[0] = '[';
+         s_sToken[1] = '\0';
+      }
+      else
+      {
+         pTmp = strchr( sLine + 1, ']' );
+         if( pTmp == NULL )
+         {
+            s_sToken[0] = '[';
+            s_sToken[1] = '\0';
+         }
+         else
+         {
+            strncpy( (char *) s_sToken, sLine, ( pTmp - sLine ) + 1 );
+            s_sToken[( pTmp - sLine ) + 1] = '\0';
+
+            if( strchr( (char *) s_sToken, '"' ) == NULL )
+            {
+               s_sToken[0] = '"';
+               s_sToken[( pTmp - sLine )] = '"';
+            }
+            else if( strchr( (char *) s_sToken, '\'' ) == NULL )
+            {
+               s_sToken[0] = '\'';
+               s_sToken[( pTmp - sLine )] = '\'';
+            }
+         }
+      }
+
+      goto Done;
+   }
+   else if( sLine[0] == '\\' )
+   {
+      s_sToken[0] = '\\';
+      s_sToken[1] = sLine[1];
+      s_sToken[2] = '\0';
+
+      goto Done;
+   }
+   else if ( strchr( "+-*/:=^!&()[]{}@,|<>#%?$~", sLine[0] ) )
+   {
+      s_sToken[0] = sLine[0];
+      s_sToken[1] = '\0';
+
+      goto Done;
+   }
+   else
+   {
+      // Todo Generic Error.
+      //printf( "\nUnexpected case: %s\n", sLine );
+      //getchar();
+      s_sToken[0] = sLine[0];
+      s_sToken[1] = '\0';
+   }
+
+ Done:
+
+   sLine += ( nLen = strlen( (char *) s_sToken ) );
+
+   if( s_sToken[0] == '.' && nLen > 1 && s_sToken[nLen - 1] == '.' )
+   {
+      s_bArray = FALSE;
+   }
+   else
+   {
+      s_bArray = ( isalnum( s_sToken[0] ) || strchr( "])}._", s_sToken[0] ) );
+   }
+
+   while( sLine[0] == ' ' || sLine[0] == '\t' )
+   {
+      sLine++;
+      nLen++;
+   }
+
+   *pLine = (char *) sLine;
+
+   //printf( "\nToken: '%s' Line: '%s'\n", s_sToken, *pLine );
+
+   return nLen + iPad;
 }

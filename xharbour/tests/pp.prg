@@ -4500,7 +4500,7 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
 
          s2 := Left( sLine, 2 )
 
-         IF s2 $ "++\--\->\:=\==\!=\<>\>=\<=\+=\-=\*=\^=\**\/=\%=\??"
+         IF s2 $ "++\--\->\:=\==\!=\<>\>=\<=\+=\-=\*=\^=\**\/=\%="
 
             sReturn := s2
 
@@ -5180,7 +5180,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         IF s2 $ '++\--'
            sExp += sToken
            LOOP
-        ELSEIF s2 $ "->\:=\==\!=\<>\>=\<=\+=\-=\*=\^=\**\/=\%=\??"
+        ELSEIF s2 $ "->\:=\==\!=\<>\>=\<=\+=\-=\*=\^=\**\/=\%="
            sLine := sToken + sLine
            EXIT
         ELSE
@@ -5973,7 +5973,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
          ENDIF
 
          IF nLen >= 2
-            IF s2 $ "++\--\->\:=\==\!=\<>\>=\<=\+=\-=\*=\^=\**\/=\%=\??"
+            IF s2 $ "++\--\->\:=\==\!=\<>\>=\<=\+=\-=\*=\^=\**\/=\%="
                sTemp := s2
                BREAK
             ENDIF
@@ -7615,7 +7615,7 @@ STATIC FUNCTION InitRules()
   aAdd( aCommRules, { 'SET' , { {    1,   0, 'CURSOR', ':', { 'ON', 'OFF', '&' } } } , .F. } )
   aAdd( aCommRules, { 'SET' , { {    0,   0, 'CURSOR', NIL, NIL }, {    1,   0, '(', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
   aAdd( aCommRules, { '?' , { {    1,   1, NIL, 'A', NIL } } , .F. } )
-  aAdd( aCommRules, { '??' , { {    1,   1, NIL, 'A', NIL } } , .F. } )
+  aAdd( aCommRules, { '?' , { {    1,   1, '?', 'A', NIL } } , .F. } )
   aAdd( aCommRules, { 'EJECT' ,  , .F. } )
   aAdd( aCommRules, { 'TEXT' ,  , .F. } )
   aAdd( aCommRules, { 'TEXT' , { {    0,   0, 'TO', NIL, NIL }, {    1,   0, 'FILE', '(', NIL } } , .F. } )
