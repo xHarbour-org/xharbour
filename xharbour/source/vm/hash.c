@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.22 2004/02/14 21:01:18 andijahja Exp $
+ * $Id: hash.c,v 1.23 2004/02/21 04:45:20 ronpinkas Exp $
  */
 
 /*
@@ -2176,7 +2176,7 @@ HB_FUNC( HEVAL )
 
 HB_FUNC( HCLONE )
 {
-   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH ), pClone;
 
    if( ! pHash )
    {
@@ -2184,7 +2184,9 @@ HB_FUNC( HCLONE )
       hb_paramError( 1 ), hb_paramError( 2 ));
    }
 
-   hb_itemForwardValue( &HB_VM_STACK.Return, hb_hashClone( pHash ) );
+   pClone = hb_hashClone( pHash );
+   hb_itemForwardValue( &HB_VM_STACK.Return, pClone );
+   hb_itemRelease( pClone );
 }
 
 
