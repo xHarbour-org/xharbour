@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.8 2004/02/08 12:07:39 jonnymind Exp $
+ * $Id: gx.c,v 1.9 2004/02/09 16:31:24 jonnymind Exp $
  */
 
 /*
@@ -189,7 +189,7 @@ HB_FUNC( GTGETCLIPBOARD )
       ulMaxLen = hb_gtGetClipboardSize();
       if ( ulMaxLen == 0 )
       {
-         hb_retc("zero");
+         hb_retc("");
          return;
       }
       szData = (char *) hb_xgrab( ulMaxLen+1 );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2248 2004/02/09 12:11:28 andijahja Exp $
+ * $Id: ChangeLog,v 1.2249 2004/02/09 16:31:22 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2004-02-08 13:04 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+2004-02-09 17:48 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/rtl/gx.c
+    ! OPS... I left in a little debug code ;-)
+
+2004-02-09 17:35 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/gx.c
     ! Now returning always a STRING type, independently on the
       parameters.
