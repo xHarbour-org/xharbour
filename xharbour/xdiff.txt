@@ -33,7 +33,8 @@ EXTEND CLASS:
 The EXTEND CLASS syntax allows the xHarbour developer to extend any existing
 class (including native type classes) using the flowwing syntax:
 
-   EXTEND CLASS <SomeClass> WITH METHOD <SomeFunc>
+   EXTEND CLASS <SomeClass> WITH DATA|VAR <SomeVar>
+      [SCOPE <Scope>] [<Persistent: PERSITENT> ] [<Case: NOUPPER>]
    EXTEND CLASS <SomeClass> WITH METHOD <SomeFunc>
    EXTEND CLASS <SomeClass> WITH MESSAGE <SomeMessage> METHOD <SomeFunc>
    EXTEND CLASS <SomeClass> WITH MESSAGE <SomeMessage> INLINE <SomeCode>
@@ -68,6 +69,8 @@ NATIVE Types as OOP objects:
 ----------------------------
 
 You may usee the following syntax to anable OOP support for native types:
+
+   ENABLE CLASS TYPE ALL
 
    ENABLE TYPE CLASS ARRAY|BLOCK|CHARACTER|DATE|LOGICAL|NIL|NUMERIC|POINTER
 

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.53 2004/05/09 20:51:15 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.54 2004/06/09 06:26:50 ronpinkas Exp $
  */
 
 /*
@@ -61,8 +61,29 @@
 #undef LEX_ABBREVIATE
    #define LEX_ABBREVIATE 4
 
-#define IS_OP( x ) ( x == DEC || x == INASSIGN || x == ALIASOP || x == PLUSEQ || x == MINUSEQ || x == MULTEQ || x == DIVEQ || \
-                     x == EXPEQ || x == MODEQ || x == '=' || x == LIKE || x == MATCH || x == STEP || x == TO )
+#define IS_OP( x ) (                    \
+                      x == INASSIGN  || \
+                      x == EQ        || \
+                      x == BITSHIFTL || \
+                      x == LE        || \
+                      x == NE2       || \
+                      x == GE        || \
+                      x == BITSHIFTR || \
+                      x == NE2       || \
+                      x == INC       || \
+                      x == PLUSEQ    || \
+                      x == DEC       || \
+                      x == MINUSEQ   || \
+                      x == ALIASOP   || \
+                      x == MULTEQ    || \
+                      x == POWER     || \
+                      x == DIVEQ     || \
+                      x == EXPEQ     || \
+                      x == BITXOR    || \
+                      x == MODEQ     || \
+                      x <= 256       || \
+                      x == LIKE || x == MATCH || x == STEP || x == TO || x == IN \
+                   )
 
 static int iWantsEOL, iWantsEXP, iWantsID, iWantsVAR;
 
