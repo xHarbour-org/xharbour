@@ -41,12 +41,18 @@
    #ifndef OS_PATH_LIST_SEPARATOR
       #define OS_PATH_LIST_SEPARATOR ':'
    #endif
+   #ifndef OS_PATH_DELIMITER_LIST
+      #define OS_PATH_DELIMITER_LIST "/"
+   #endif
 #else
    #ifndef OS_PATH_DELIMITER
       #define OS_PATH_DELIMITER '\'
    #endif
    #ifndef OS_PATH_LIST_SEPARATOR
       #define OS_PATH_LIST_SEPARATOR ';'
+   #endif
+   #ifndef OS_PATH_DELIMITER_LIST
+      #define OS_PATH_DELIMITER_LIST "\/:"
    #endif
 #endif
 
@@ -438,21 +444,25 @@ STATIC s_aSwitchDefs := {}
    #endif
 
    #ifdef _DEFAULT_INC_DIR
-      aAdd( s_asPaths, _DEFAULT_INC_DIR )
+      sPath := _DEFAULT_INC_DIR
+      IF ! ( Right( sPath, 1 ) $ OS_PATH_DELIMITER_LIST )
+         sPath += OS_PATH_DELIMITER
+      ENDIF
+      aAdd( s_asPaths, sPath )
    #endif
 
    sIncludePath := GetE( "INCLUDE" )
 
    WHILE ( nNext := At( OS_PATH_LIST_SEPARATOR, sIncludePath ) ) > 0
       sPath := Left( sIncludePath, nNext - 1 )
-      IF ! ( Right( sPath, 1 ) $ '\/' )
+      IF ! ( Right( sPath, 1 ) $ OS_PATH_DELIMITER_LIST )
          sPath += OS_PATH_DELIMITER
       ENDIF
       aAdd( s_asPaths, sPath )
       sIncludePath := SubStr( sIncludePath, nNext + 1 )
    ENDDO
    IF ! ( sIncludePath == '' )
-      IF ! ( Right( sIncludePath, 1 ) $ '\/' )
+      IF ! ( Right( sIncludePath, 1 ) $ OS_PATH_DELIMITER_LIST )
          sIncludePath += OS_PATH_DELIMITER
       ENDIF
       aAdd( s_asPaths, sIncludePath )
@@ -470,7 +480,7 @@ STATIC s_aSwitchDefs := {}
    IF nAt != 0
       sIncludePath := Left( sIncludePath, nAt - 1 )
 
-      IF ! ( Right( sIncludePath, 1 ) $ "\/" )
+      IF ! ( Right( sIncludePath, 1 ) $ OS_PATH_DELIMITER_LIST )
          sIncludePath += OS_PATH_DELIMITER
       ENDIF
 
@@ -530,14 +540,14 @@ STATIC s_aSwitchDefs := {}
 
          WHILE ( nNext := At( OS_PATH_LIST_SEPARATOR, sIncludePath ) ) > 0
             sPath := Left( sIncludePath, nNext - 1 )
-            IF ! ( Right( sPath, 1 ) $ '\/' )
+            IF ! ( Right( sPath, 1 ) $ OS_PATH_DELIMITER_LIST )
                sPath += OS_PATH_DELIMITER
             ENDIF
             aAdd( s_asPaths, sPath )
             sIncludePath := SubStr( sIncludePath, nNext + 1 )
          ENDDO
          IF ! ( sIncludePath == '' )
-            IF ! ( Right( sIncludePath, 1 ) $ '\/' )
+            IF ! ( Right( sIncludePath, 1 ) $ OS_PATH_DELIMITER_LIST )
                sIncludePath += OS_PATH_DELIMITER
             ENDIF
             aAdd( s_asPaths, sIncludePath )
