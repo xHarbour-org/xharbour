@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.117 2002/10/14 18:22:03 ronpinkas Exp $
+ * $Id: hvm.c,v 1.118 2002/10/15 17:36:37 mlombardo Exp $
  */
 
 /*
@@ -5217,7 +5217,7 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
 
 static void hb_vmPushVariable( PHB_SYMB pVarSymb )
 {
-   USHORT uiAction;
+   USHORT uiAction = E_DEFAULT;
 
    do
    {
@@ -5225,11 +5225,15 @@ static void hb_vmPushVariable( PHB_SYMB pVarSymb )
          * in a current workarea - if it is not a field (FAILURE)
          * then try the memvar variable
          */
-      if( hb_rddFieldGet( ( * hb_stack.pPos ), pVarSymb ) == SUCCESS )
+
+      uiAction = hb_rddFieldGet( ( * hb_stack.pPos ), pVarSymb );
+
+      if( uiAction == SUCCESS )
          hb_stackPush();
       else
       {
-         if( hb_memvarGet( ( * hb_stack.pPos ), pVarSymb ) == SUCCESS )
+         uiAction = hb_memvarGet( ( * hb_stack.pPos ), pVarSymb );
+         if( uiAction == SUCCESS )
             hb_stackPush();
          else
          {
