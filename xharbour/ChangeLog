@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1231 2003/07/09 22:09:39 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1232 2003/07/10 07:10:36 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-10 12:45 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  + include/hblog.ch
+  + include/hblogdef.ch
+  + source/rtl/hblog.prg
+  + source/rtl/hbsyslog.c
+    + Added HB logging system
+
+  * source/rtl/Makefile
+    + Added log compilation support in rtl
+
+  * tests/Makefile
+    ! More strict rules to compile test files (-es2 -w2 added to cmd line)
+
+  + tests/logtest.prg
+    + Added a test to show the log system
 
 2003-07-10 14:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
    * include/hbver.h

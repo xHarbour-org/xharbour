@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.33 2003/06/19 00:07:59 druzus Exp $
+# $Id: Makefile,v 1.34 2003/07/08 06:05:40 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -46,13 +46,14 @@ C_SOURCES=\
         gx.c         \
         hardcr.c     \
         hbbitfield.c \
-        hbrandom.c   \
         hbcompress.c \
         hbchecksum.c \
         hbcrc32.c    \
         hbcrypt.c    \
         hbhextonum.c \
+	hbsyslog.c \
         hbffind.c \
+        hbrandom.c   \
         hbsrlraw.c   \
         hbxml.c      \
         idle.c       \
@@ -157,8 +158,9 @@ PRG_SOURCES=\
         getlist.prg  \
         getsys.prg   \
         input.prg    \
-        hbserial.prg \
+	hblog.prg    \
         hbreadini.prg \
+        hbserial.prg \
         listbox.prg  \
         memoedit.prg \
         memvarbl.prg \
