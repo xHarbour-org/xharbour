@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1873 2003/12/14 01:58:53 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1874 2003/12/14 06:42:10 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-14 12:27 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/contrib/libct/Makefile
+    - removed C_USR=... - it disabled user C switches
+
 2003-12-14 13:42 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/compiler/genc.c
     * allow xHarbour to produce C file for inline C routines contained in a PRG

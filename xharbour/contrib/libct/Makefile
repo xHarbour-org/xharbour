@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.10 2003/11/04 00:25:33 lculik Exp $
+# $Id: Makefile,v 1.11 2003/11/25 08:31:12 druzus Exp $
 #
 
 ROOT = ../../
@@ -86,7 +86,7 @@ LIBNAME=ct
 ifeq ($(HB_MT),MT)
   MT_LIBNAME=ctmt
 endif
-C_USR = -I../../include
+
 include $(TOP)$(ROOT)config/header.cf
 INSTALL_RULE_HEADERS := $(INSTALL_RULE)
 include $(TOP)$(ROOT)config/lib.cf
