@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1440 2003/09/10 21:37:32 druzus Exp $
+ * $Id: ChangeLog,v 1.1441 2003/09/10 22:07:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,9 +7,6 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
-2003-09-10 15:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
-  * Testing removal of hb_itemClear() for HB_IS_MEMVAR( pIetm ) in hb_arrayReleaseGarbage()
 
 2003-09-10 23:27 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbf1.c

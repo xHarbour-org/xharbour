@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.74 2003/09/10 21:03:23 ronpinkas Exp $
+ * $Id: arrays.c,v 1.75 2003/09/10 22:02:59 ronpinkas Exp $
  */
 
 /*
@@ -1535,10 +1535,6 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
                   hb_arrayReleaseHolder( pItem->item.asArray.value, pItem );
                }
             #endif
-         }
-         else if( HB_IS_MEMVAR( pItem ) )
-         {
-            //hb_itemClear( pItem );
          }
          else if( HB_IS_COMPLEX( pItem ) )
          {
