@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1716 2003/11/12 23:57:58 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1717 2003/11/14 01:17:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -17,6 +17,8 @@
 
   * source/pp/pptable.c
     - Removed TAssociativeArray support.
+    * Modified Hash() support to use => instead of :>
+    * Consolidated Hash() support into 1 directive.
 
   + include/assocarr.ch
     + New header with TAssociativeArray() support.
