@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.79 2004/04/02 04:30:52 ronpinkas Exp $
+ * $Id: garbage.c,v 1.80 2004/04/03 01:51:03 ronpinkas Exp $
  */
 
 /*
@@ -590,7 +590,7 @@ HB_EXPORT void hb_gcCollectAll( BOOL bForce )
 
    //printf( "Sweep Scan\n" );
 
-   /* Step 2 - sweep */
+   /* Step 1 - MARK */
    /* check all known places for blocks they are referring */
    #ifdef HB_THREAD_SUPPORT
       hb_threadIsLocalRef();
@@ -606,7 +606,10 @@ HB_EXPORT void hb_gcCollectAll( BOOL bForce )
    hb_vmIsGlobalRef();
    //printf( "After Globals\n" );
 
+   #ifndef HB_THREAD_SUPPORT
+   /* JC1: under MT, each threadIsLocalRef does its memvar reffing */
    hb_memvarsIsMemvarRef();
+   #endif
    //printf( "After MemvarRef\n" );
 
    hb_clsIsClassRef();

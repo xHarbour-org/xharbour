@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.162 2004/03/30 22:47:23 druzus Exp $
+* $Id: thread.c,v 1.163 2004/04/01 22:00:43 druzus Exp $
 */
 
 /*
@@ -711,9 +711,12 @@ void hb_threadIsLocalRef( void )
             hb_gcItemRef( &( pStack->aWithObject[ i ] ) );
          }
       }
+      // stack memvars:
+      hb_memvarsIsMemvarRef( pStack );
 
       pStack = pStack->next;
    }
+   
 }
 
 /* DEBUG FUNCTION:

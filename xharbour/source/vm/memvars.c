@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.71 2004/04/03 01:51:03 ronpinkas Exp $
+ * $Id: memvars.c,v 1.72 2004/04/03 03:28:13 ronpinkas Exp $
  */
 
 /*
@@ -2241,11 +2241,34 @@ HB_FUNC( __MVRESTORE )
 /* Mark all memvars as used so they will not be released by the
  * garbage collector
  */
-//JC1: This is done inside a garbage collecting, that is done one
-// thread at a time. No need to lock mutex.
+#ifdef HB_THREAD_SUPPORT
+void hb_memvarsIsMemvarRef( void *pData )
+{
+   HB_STACK *pStack = ( HB_STACK *) pData;
+   
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarsIsMemvarRef()"));
+
+   if( pStack->globalTable )
+   {
+      ULONG ulCnt = pStack->globalLastFree;
+
+      while( --ulCnt )
+      {
+         /* do not check detached variables - for these variables only
+          * references from the eval stack are meaningfull for the GC
+         */
+         if( pStack->globalTable[ ulCnt ].counter && 
+            pStack->globalTable[ ulCnt ].hPrevMemvar != ( HB_HANDLE )-1 )
+         {
+            hb_gcItemRef( &(pStack->globalTable[ ulCnt ].item) );
+         }
+      }
+   }
+}
+
+#else
 void hb_memvarsIsMemvarRef( void )
 {
-   HB_THREAD_STUB
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarsIsMemvarRef()"));
 
@@ -2265,6 +2288,7 @@ void hb_memvarsIsMemvarRef( void )
       }
    }
 }
+#endif
 
 HB_HANDLE hb_memvarGetVarHandle( char *szName )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.132 2004/03/31 09:19:53 andijahja Exp $
+ * $Id: hbapi.h,v 1.133 2004/04/03 01:51:01 ronpinkas Exp $
  */
 
 /*
@@ -212,7 +212,11 @@ extern void   hb_vmIsGlobalRef( void ); /* hvm.c - mark all global variables as 
 extern void   HB_EXPORT hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals ); /* hvm.c - Register module globals into s_aGlobals */
 
 extern void   hb_vmGlobalUnlock( PHB_ITEM pGlobal ); /* hvm.c - Calls hb_gcUnlock(...) when needed. */
+#ifndef HB_THREAD_SUPPORT
 extern void   hb_memvarsIsMemvarRef( void ); /* memvars.c - mark all memvar variables as used */
+#else
+extern void   hb_memvarsIsMemvarRef( void * ); /* memvars.c - mark all memvar variables as used */
+#endif
 extern void   hb_clsIsClassRef( void ); /* classes.c - mark all class internals as used */
 extern HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage ); /* clear a codeblock before releasing by the GC */
 extern HB_GARBAGE_FUNC( hb_arrayReleaseGarbage ); /* clear an array before releasing by the GC */
