@@ -1,5 +1,5 @@
 ##################################
-# $Id: Rules.make,v 1.7 2003/12/18 14:34:44 jonnymind Exp $
+# $Id: Rules.make,v 1.8 2004/08/07 17:25:35 lf_sfnet Exp $
 #
 # Rules for making simwin
 #
@@ -19,17 +19,21 @@
 #Generic make options
 LINKER = ar
 CC = gcc
+CFLAGS += -Wall -fms-extensions -I.
 ifeq ($(HB_COMPILER),mingw32)
-   CFLAGS += -Wall -mno-cygwin -fms-extensions -mms-bitfields -mwindows -I.
-   ifeq ($(HB_MULTI_GT),yes)
-      GT_LIBS=-lgtnul -lgtwin
-   endif
-else
-   CFLAGS += -Wall -I.
+   CFLAGS += -mno-cygwin -mms-bitfields -mwindows
 endif
 LIBRARIAN = ranlib
 
-GT_LIBS += -lgtcgi
+ifeq ($(HB_MULTI_GT),yes)
+   ifeq ($(HB_COMPILER),mingw32)
+      GT_LIBS=-lgtnul -lgtwin
+   else
+      GT_LIBS=-lgtnul -lgtcrs  -lncurses
+   endif
+else
+   GT_LIBS += -lgtcgi
+endif
 
 #libraries for binary building
 ifeq ($(HB_MT),MT)

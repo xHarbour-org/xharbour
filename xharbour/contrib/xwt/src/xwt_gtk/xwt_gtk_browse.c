@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_browse.c,v 1.1 2003/11/08 00:45:56 jonnymind Exp $
+   $Id: xwt_gtk_browse.c,v 1.2 2003/11/26 22:58:45 jonnymind Exp $
 
    GTK interface - browse widget
 */
@@ -216,7 +216,7 @@ tbcol_list_get_iter (GtkTreeModel *tree_model,
 
   g_assert(TBCOL_IS_LIST(tree_model));
   g_assert(path!=NULL);
-  g_assert( tbcol_list->hbColumns.type == HB_IT_ARRAY );
+  //g_assert( tbcol_list->hbColumns.type == HB_IT_ARRAY );
 
   tbcol_list = TBCOL_LIST(tree_model);
 
