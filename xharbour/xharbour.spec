@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.10 2003/06/25 01:38:50 lculik Exp $
+# $Id: xharbour.spec,v 1.11 2003/06/26 12:37:07 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -16,7 +16,7 @@
 
 %define name     xharbour
 %define dname    xHarbour
-%define version  0.81.0
+%define version  0.82.0
 %define releasen 0
 %define platform cl80
 %define prefix   /usr
@@ -28,7 +28,7 @@
 %define hb_libs  vm pp rtl rdd dbfcdx dbfntx odbc macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca debug
 
 %define hb_cc    export HB_COMPILER="gcc"
-%define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O2 $RPM_OPT_FLAGS"
+%define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O3 $RPM_OPT_FLAGS"
 %define hb_arch  export HB_ARCHITECTURE="linux"
 %define hb_cmt   export HB_MT="%{hb_mt}"
 %define hb_cgt   export HB_GT_LIB="gt%{hb_gt}"
