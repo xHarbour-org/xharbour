@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.58 2003/09/18 19:48:45 paultucker Exp $
+ * $Id: tget.prg,v 1.59 2003/09/23 04:52:34 paultucker Exp $
  */
 
 /*
@@ -1633,18 +1633,24 @@ return ::bBlock
 
 //---------------------------------------------------------------------------//
 
-METHOD HitTest(mrow,mcol) CLASS GET
-        if ::row != mrow
-           return HTNOWHERE
-        endif
+METHOD HitTest( mRow, mCol ) CLASS GET
 
-        IF ::ndispLen == NIL
-           ::nDispLen := 1
-        ENDIF
+    IF ( Valtype( ::Control ) == "O" )
+        Return ::Control:HitTest( mRow, mCol )
+    ENDIF
 
-        if mcol >= ::col .and. mcol <= ::col+::ndispLen+if( ::cDelimit == NIL, 0, 2 )
-           return HTCLIENT
-        endif
+    IF ::Row != mRow
+        return HTNOWHERE
+    ENDIF
+
+    IF ::nDispLen == NIL
+        ::nDispLen := 1
+    ENDIF
+
+    IF mCol >= ::Col .AND. mCol <= ::Col + ::nDispLen + IIF( ::cDelimit == NIL, 0, 2 )
+       return HTCLIENT
+    ENDIF
+
 return HTNOWHERE
 
 //---------------------------------------------------------------------------//
