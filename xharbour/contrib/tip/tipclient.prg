@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclient.prg,v 1.11 2004/02/07 16:03:12 jonnymind Exp $
+* $Id: tipclient.prg,v 1.12 2004/06/28 14:16:32 jonnymind Exp $
 ************************************************/
 /* 2004-01-13
   Enhaced tip cliente to conenct to secure smtp servers by Luiz Rafael Culik
@@ -146,7 +146,7 @@ METHOD Read( nLen ) CLASS tIPClient
       // read till end of stream
       cStr1 := Space( 1024 )
       cStr0 := ""
-      ::nLastRead := InetRecvAll( ::SocketCon, @cStr1, 1024 )
+      ::nLastRead := InetRecv( ::SocketCon, @cStr1, 1024 )
       DO WHILE ::nLastRead > 0
          ::nRead += ::nLastRead
          cStr0 += Substr( cStr1, 1, ::nLastRead )
