@@ -1,5 +1,5 @@
 /*
- * $Id: tipmail.prg,v 1.26 2004/04/08 13:26:53 druzus Exp $
+ * $Id: ftpcln.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ CLASS tIPClientFTP FROM tIPClient
    DATA bUsePasv
    DATA RegBytes
    DATA RegPasv
-   // Socket opened in respose to a port command
+   // Socket opened in response to a port command
    DATA SocketControl
 
    METHOD New()
@@ -138,7 +138,7 @@ METHOD GetReply() CLASS tIPClientFTP
       RETURN .F.
    ENDIF
 
-   // now, if the reply has a '-' as fuorth character, we need to proceed...
+   // now, if the reply has a '-' as fourth character, we need to proceed...
    cRep := ::cReply
    DO WHILE .not. Empty(cRep) .and. cRep[4] == '-'
       cRep := InetRecvLine( ::SocketCon, @nLen, 128 )
@@ -200,7 +200,7 @@ METHOD DELE( cPath ) CLASS tIPClientFTP
 RETURN ::GetReply()
 
 
-// scan last reply for an hint of lenght
+// scan last reply for an hint of length
 METHOD ScanLength() CLASS tIPClientFTP
    LOCAL aBytes
    aBytes := HB_Regex( ::RegBytes, ::cReply )

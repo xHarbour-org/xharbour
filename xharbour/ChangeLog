@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3756 2005/01/19 23:36:16 druzus Exp $
+ * $Id: ChangeLog,v 1.3757 2005/01/19 23:40:36 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2004-01-20 00:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+2005-01-20 00:20 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * doc/hbi18n.txt
+  * doc/hblog.txt
+  * doc/inet.txt
+  * source/rtl/hbcomprs.c
+  * source/tip/ftpcln.prg
+     * miscellaneous little spelling and grammar fixes.
+  * tests/i18ntest.prg
+    * added a test for isDirectory("i18n") for those of us who
+      relocate tests to other directories to test them.
+
+2005-01-20 00:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbrddcdx.h
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
     * improve the speed of indexing DBFs with very big number of
@@ -90,11 +101,11 @@
   * contrib/WoopGUI/source/TDateTime.prg
     ! small fix
 
-2004-01-15 16:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+2005-01-15 16:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/config/w32/mingw32.cf
     * yet another fixes
 
-2004-01-15 12:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+2005-01-15 12:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
     * some minor modifications
 
@@ -159,7 +170,7 @@
     ! Fixed a hidden bug:
       HB_GT_FUNC( mouse_SetPos ) was using X for row, and Y for col (!).
 
-2004-01-13 09:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+2005-01-13 09:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/filesys.c
     * modified HB_FS_SETDRIVE() macro for save use in any C statement
 
@@ -187,7 +198,7 @@
   * source/compiler/hbslex.c
     * Minor correction for xCC
 
-2004-01-12 17:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+2005-01-12 17:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/make_gnu.sh
     * fixed DJGPP name
     * modified BSD detection for GNU make

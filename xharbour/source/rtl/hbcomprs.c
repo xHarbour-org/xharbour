@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomprs.c,v 1.8 2004/04/06 09:58:23 andijahja Exp $
+ * $Id: hbcomprs.c,v 1.9 2004/12/15 13:39:34 druzus Exp $
  */
 
 /*
@@ -3990,7 +3990,7 @@ int r)
 
 /*******************************************************************
 * Giancarlo Niccolai:
-* Calculates the minimum lenght of destination buffer
+* Calculates the minimum length of destination buffer
 */
 
 int s_hb_compress_error;

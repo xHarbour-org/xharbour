@@ -1,6 +1,6 @@
 ************************************************************
 * i18ntest.prg
-* $Id: i18ntest.prg,v 1.4 2004/08/19 16:21:38 kaddath Exp $
+* $Id: i18ntest.prg,v 1.5 2004/08/23 22:41:32 druzus Exp $
 *
 * Test for internationalization system
 *
@@ -37,6 +37,15 @@ Procedure MAIN()
       @8,10 SAY i18n( "This is a test using a 'compile time' '" +chr(65)+"'")
       @9,10 SAY i18n( "Test mixing" + e"\tescaped\t")
 
+      IF !isDirectory("i18n")
+         SET COLOR TO GR+/B
+         @19,10 SAY i18n( "WARNING!" )
+         @20,10 SAY i18n( "The .\i18n folder is missing." )
+         @21,10 SAY i18n( "It contains the .hit files that contain" )
+         @22,10 SAY i18n( "the translations. Please restore it." )
+         SET COLOR TO W+/B
+      ENDIF
+
       @12,10 SAY i18n( "Select Language: " )
       MakeBox( 12,40, 13+len(aLanguages), 55 )
       nChoice := Achoice(13, 41, 12+len(aLanguages), 54, aLanguages,,, ;
@@ -46,6 +55,7 @@ Procedure MAIN()
          HB_I18NSetLanguage( aLangCodes[ nChoice ] )
       ENDIF
    ENDDO
+   @24, 0 SAY ""
 
 
 RETURN
