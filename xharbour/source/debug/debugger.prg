@@ -79,6 +79,7 @@ procedure AltD( nAction )
       case nAction == nil
            if SET( _SET_DEBUG )
               s_lExit := .f.
+              s_oDebugger:lGo := .F.
               __dbgEntry( ProcLine( 1 ) )
            endif
 
@@ -165,12 +166,12 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
                     if s_oDebugger:lShowLocals
                        if ( nAt := AScan( s_oDebugger:aVars,; // Is there another var with this name ?
                             { | aVar | aVar[ 1 ] == cLocalName } ) ) != 0
-                          s_oDebugger:aVars[ nAt ] := { cLocalName, nLocalIndex, "Local", cProcName }
+                          s_oDebugger:aVars[ nAt ] := { cLocalName, nLocalIndex, "Local", ProcName( 1 ) }
                        else
-                          AAdd( s_oDebugger:aVars, { cLocalName, nLocalIndex, "Local", cProcName } )
+                          AAdd( s_oDebugger:aVars, { cLocalName, nLocalIndex, "Local", ProcName( 1 ) } )
                        endif
                     endif
-                    IF valtype( s_oDebugger:aCallStack[ 1 ][ 2 ])=='A'
+                    IF Len( s_oDebugger:aCallStack )>0 .AND. valtype( s_oDebugger:aCallStack[ 1 ][ 2 ])=='A'
                       AAdd( s_oDebugger:aCallStack[ 1 ][ 2 ], { cLocalName, nLocalIndex, "Local", ProcName( 1 ) } )
                     endif
                  endif
@@ -189,16 +190,6 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
               if s_oDebugger:lGo
                  s_oDebugger:lGo := ! s_oDebugger:IsBreakPoint( uParam1 )
               endif
-/*  Alexander Kresin removed 21.06.2001
-              if s_oDebugger:lGo
-                 DispBegin()
-                 DispBegin()
-                 s_oDebugger:SaveAppStatus()
-                 s_oDebugger:RestoreAppStatus()
-                 DispEnd()
-                 DispEnd()
-              else
-*/
               if !s_oDebugger:lGo .or. InvokeDebug()  .or. ;
                  ProcName( 1 ) == "ALTD"  // debugger invoked from AltD( 1 )
                  s_oDebugger:lGo := .F.
@@ -341,9 +332,10 @@ ENDCLASS
 METHOD New() CLASS TDebugger
 
    s_oDebugger := Self
-
    ::aColors := {"W+/BG","N/BG","R/BG","N+/BG","W+/B","GR+/B","W/B","N/W","R/W","N/BG","R/BG"}
+
    ::lMonoDisplay   := .f.
+   
    ::lAnimate          := .f.
    ::lEnd              := .f.
    ::lTrace            := .f.
@@ -353,7 +345,10 @@ METHOD New() CLASS TDebugger
    ::aVars             := {}
    ::lCaseSensitive    := .f.
    ::cSearchString     := ""
-   ::cPathForFiles     := ""
+   // default the search path for files to the current directory
+   // that way if the source is in the same directory it will still be found even if the application
+   // changes the current directory with the SET DEFAULT command
+   ::cPathForFiles:= CURDRIVE()+':\'+CURDIR()+'\'
    ::lShowCallStack    := .f.
    ::nTabWidth         := 4
    ::nSpeed            := 0
@@ -919,11 +914,10 @@ METHOD EndProc() CLASS TDebugger
 
    if Len( ::aCallStack ) > 1
    
-   // free the browse for the exiting procedure, and recover the one from the stack
-   ::oBrwText:=nil
-   ::oBrwText:=::acallstack[1][3]
+      // free the browse for the exiting procedure, and recover the one from the stack
+      ::oBrwText:=nil
+      ::oBrwText:=::aCallStack[1][3]
       ADel( ::aCallStack, 1, .t. )
-
       if ::oBrwStack != nil .and. ! ::lTrace
          ::oBrwStack:RefreshAll()
       endif
@@ -1344,12 +1338,10 @@ METHOD ShowVars() CLASS TDebugger
                                If( Len( ::aVars ) > 0, ::oBrwVars:Cargo[ 1 ] - nOld, 0 ) }
 
       nWidth := ::oWndVars:nWidth() - 1
-   ::oBrwVars:AddColumn( oCol:=TBColumnNew( "",  { || If( Len( ::aVars ) > 0, AllTrim( Str( ::oBrwVars:Cargo[1] -1 ) ) + ") " + ;
-      PadR( GetVarInfo( ::aVars[ Max( ::oBrwVars:Cargo[1], 1 ) ] ),;
-      ::oWndVars:nWidth() - 5 ), "" ) } ) )
-
+      ::oBrwVars:AddColumn( oCol:=TBColumnNew( "",  { || If( Len( ::aVars ) > 0, AllTrim( Str( ::oBrwVars:Cargo[1] -1 ) ) + ") " + ;
+         PadR( GetVarInfo( ::aVars[ Max( ::oBrwVars:Cargo[1], 1 ) ] ),;
+         ::oWndVars:nWidth() - 5 ), "" ) } ) )
       AAdd(::oBrwVars:Cargo[2],::avars)
-//      oCol:DefColor:={2,1}
       oCol:DefColor:={1,2}
       if Len( ::aVars ) > 0
          ::oBrwVars:ForceStable()
@@ -1443,8 +1435,9 @@ return { | a | a[ 1 ] == Self:oBrwText:nRow }  // it was nLine
 
 METHOD ShowCode( cModuleName ) CLASS TDebugger
 
+   // always treat filename as lower case - we need it consistent for comparisons   
    local cFunction := SubStr( cModuleName, RAt( ":", cModuleName ) + 1 )
-   local cPrgName  := SubStr( cModuleName, 1, RAt( ":", cModuleName ) - 1 )
+   local cPrgName  := lower(SubStr( cModuleName, 1, RAt( ":", cModuleName ) - 1 ))
 
    AIns( ::aCallStack, 1, { cFunction, {} , ::oBrwText}, .t. ) // function name and locals array
                                                                // and the code window browse
@@ -1542,7 +1535,6 @@ METHOD HideCallStack() CLASS TDebugger
       DispEnd()
       ::nCurrentWindow = 1
    endif
-
 return nil
 
 METHOD HideVars() CLASS TDebugger
@@ -1644,10 +1636,9 @@ METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS TDebugger
 
 return iif( LastKey() != K_ESC, uTemp, uValue )
 
-
+// test to see if this line in the currently running file has a breakpoint set
 METHOD IsBreakPoint( nLine ) CLASS TDebugger
-
-return AScan( ::aBreakPoints, { | aBreak | aBreak[ 1 ] == nLine } ) != 0
+return AScan( ::aBreakPoints, { | aBreak | (aBreak[ 1 ] == nLine) .AND. (aBreak [ 2 ] == ::cPrgName) } ) != 0
 
 
 METHOD GotoLine( nLine ) CLASS TDebugger
@@ -1837,7 +1828,6 @@ METHOD SaveSettings() CLASS TDebugger
    endif
 
 return nil
-
 METHOD Stack() CLASS TDebugger
 
    if ::lShowCallStack := ! ::lShowCallStack
@@ -1847,7 +1837,6 @@ METHOD Stack() CLASS TDebugger
    endif
 
 return nil
-
 
 METHOD Static() CLASS TDebugger
 
@@ -1861,15 +1850,20 @@ METHOD Static() CLASS TDebugger
 
 return nil
 
+// Toggle a breakpoint at the cursor position in the currently viewed file
+// which may be different from the file in which execution was broken
 METHOD ToggleBreakPoint() CLASS TDebugger
-
+   // look for a breakpoint which matches both line number and program name
    local nAt := AScan( ::aBreakPoints, { | aBreak | aBreak[ 1 ] == ;
-                       ::oBrwText:nRow } ) // it was nLine
+                       ::oBrwText:nRow ;
+                       .AND. aBreak [ 2 ] == ::cPrgName} ) // it was nLine
 
    if nAt == 0
+      // didn't find one, so add a new one
       AAdd( ::aBreakPoints, { ::oBrwText:nRow, ::cPrgName } )     // it was nLine
       ::oBrwText:ToggleBreakPoint(::oBrwText:nRow, .T.)
    else
+      // remove the matching one
       ADel( ::aBreakPoints, nAt, .t. )
       ::oBrwText:ToggleBreakPoint(::oBrwText:nRow, .F.)
    endif
@@ -1989,8 +1983,8 @@ static procedure SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cCaption, bEdit )
 
    oWnd:SetCaption( cCaption + "[" + AllTrim( Str( oBrwSets:Cargo[1] ) ) + ;
                        ".." + AllTrim( Str( nSets ) ) + "]" )
-
 return
+
 static procedure SetsKeyVarPressed( nKey, oBrwSets, nSets, oWnd, bEdit )
    Local nRectoMove
    local nSet := oBrwSets:Cargo[1]
@@ -2139,6 +2133,7 @@ METHOD RemoveWindow( oWnd ) CLASS TDebugger
   ::nCurrentWindow = 1
 
 return nil
+
 METHOD SearchLine() CLASS TDebugger
 
    local cLine
@@ -2150,14 +2145,6 @@ METHOD SearchLine() CLASS TDebugger
    endif
 
 return nil
-
-/* Not declared - it seems ToggleCaseSensitive() replaced this!!!
-METHOD CaseSensitive() CLASS TDebugger
-
-   ::lCaseSensitive := !::lCaseSensitive
-
-return nil
-*/
 
 function __DbgColors()
 
@@ -2200,6 +2187,7 @@ static function ArrayBrowseSkip( nPos, oBrwSets,n )
    return iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;
       iif( oBrwSets:cargo[ 1 ] + nPos > Len(oBrwSets:cargo[ 2 ][ 1 ]), ;
       Len(oBrwSets:cargo[ 2 ][ 1 ]) - oBrwSets:cargo[ 1 ], nPos ) )
+      
 static function DoCommand( o,cCommand )
    local bLastHandler, cResult, nLocals := len( o:aCallStack[1][2] )
    local nProcLevel := 1, oE, i, vtmp
