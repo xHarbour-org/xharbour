@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.23 2003/07/01 08:17:45 ronpinkas Exp $
+ * $Id: set.c,v 1.25 2003/07/30 20:45:40 andijahja Exp $
  */
 
 /*
@@ -218,6 +218,7 @@ static void close_binary( FHANDLE handle )
    }
 }
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
+
 static void close_binarywin( FHANDLE handle )
 {
    HB_TRACE(HB_TR_DEBUG, ("close_binarywin(%p)", handle));
@@ -641,7 +642,7 @@ HB_FUNC( SET )
 
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
-            /*Check if the SET_PRINTFILE start with WIN:*/
+          /*Check if the SET_PRINTFILE start with WIN:*/
            char   szTemp[5] ={0} ;
            char * szResult;
            char * sPrinterName;
@@ -815,6 +816,45 @@ HB_FUNC( SET )
          if( args > 1 ) hb_set.HB_SET_PRINTER = set_logical( pArg2 );
          break;
       case HB_SET_PRINTFILE  :
+      {
+      /* moved check for "Win:" and "Job:" before setting the hb_set.HB_SET_PRINTFILE becouse it can a file name insted of an printername*/
+         char   szTemp[5] = {0};
+         char * szResult;
+         BOOL bOpen=TRUE;
+         PHB_FNAME pOut ;
+         char * szNewFile =  pArg2 == NULL ? hb_set.HB_SET_PRINTFILE : ( char *) hb_itemGetCPtr( pArg2 ) ;
+         strncpy(szTemp,szNewFile , 4);
+         szResult=hb_strupr(szTemp);
+
+         /* NOTE lCulik
+         Only follow issues enter on block below
+         Filenames with lenght >0
+         All others (like Printer Names/Job names) are processed outside
+         Check for "WIN:" and "JOB: only do when compiling with Borland or Msvc C Compilers
+         */
+   #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
+         if ( (hb_stricmp( szResult, "WIN:") != 0 ) &&( hb_stricmp( szResult,"JOB:") != 0)  && (strlen(szNewFile) != 0))
+   #else
+         if ( strlen(szNewFile) != 0)
+   #endif
+         {
+           if ( pArg2 != NULL) 
+           {
+             char pszTemp[ 256 ] = "";
+             if (hb_stricmp( ( char * ) hb_itemGetCPtr(pArg2), (char * ) hb_set.HB_SET_PRINTFILE ) != 0)
+             {
+                pOut = hb_fsFNameSplit( ( char * ) hb_itemGetCPtr(pArg2)  );
+                if (!pOut->szExtension) 
+                {
+                   pOut->szExtension = ".prn";
+                }         
+                hb_fsFNameMerge( pszTemp, pOut );
+                hb_xfree( pOut );
+                hb_itemPutC( pArg2, pszTemp);
+             }  
+           }
+         }
+                 
          if( hb_set.HB_SET_PRINTFILE ) hb_retc( hb_set.HB_SET_PRINTFILE );
          else hb_retc( NULL );
          if( args > 1 && ! HB_IS_NIL( pArg2 ) ) hb_set.HB_SET_PRINTFILE = set_string( pArg2, hb_set.HB_SET_PRINTFILE );
@@ -823,23 +863,20 @@ HB_FUNC( SET )
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
             /* Check is the Passed String is a file or an Windows Printer Name or Windows Printer Job Name*/
-           char   szTemp[5] = {0};
-           char * szResult;
-           BOOL bOpen=TRUE;
-           strncpy(szTemp, hb_set.HB_SET_PRINTFILE, 4);
-           szResult=hb_strupr(szTemp);
-           if (hb_stricmp(szResult, "WIN:") == 0)
+           if (hb_stricmp(szResult,"JOB:") == 0)  /* Check for an Printer Name */ 
                bOpen=FALSE;
-           if (hb_stricmp(szResult,"JOB:") == 0)  /* Check for an Jobname*/ {
+
+           if (hb_stricmp(szResult,"JOB:") == 0)  /* Check for an Jobname*/ 
+           {
                 bOpen=FALSE;
                 hb_set.hb_set_printerjob=hb_set.HB_SET_PRINTFILE + 4;
-                }
+           }
 
-            if (!hb_set.hb_set_winprinter)
-            {
-               close_binary( hb_set.hb_set_printhan );
-               hb_set.hb_set_printhan = FS_ERROR;
-            }
+           if (!hb_set.hb_set_winprinter)
+           {
+              close_binary( hb_set.hb_set_printhan );
+              hb_set.hb_set_printhan = FS_ERROR;
+           }
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__)) //&& (!defined(__MINGW32__))
             else{
                hb_set.hb_set_winprinter=FALSE;
@@ -852,6 +889,7 @@ HB_FUNC( SET )
 
             if( hb_set.HB_SET_PRINTFILE && strlen( hb_set.HB_SET_PRINTFILE ) > 0  && bOpen)
                hb_set.hb_set_printhan = open_handle( hb_set.HB_SET_PRINTFILE, bFlag, ".prn", HB_SET_PRINTFILE );
+         }
          }
          break;
       case HB_SET_SCOREBOARD :
@@ -1088,7 +1126,16 @@ End listener test (1 of 2) */
 
 void hb_setInitialize( void )
 {
+
+   #if defined(HB_OS_WIN_32) && !defined(__RSXNT__)
+   /* Get default Windows Printer Name Here */
+   char DefaultPrinter[ 80 ];
+   unsigned long pdwBufferSize = 80;
+   THarbourPrinter_DPGetDefaultPrinter( ( char* ) &DefaultPrinter, &pdwBufferSize);
+   #endif
+
    HB_TRACE(HB_TR_DEBUG, ("hb_setInitialize()"));
+
 
    hb_set.HB_SET_ALTERNATE = FALSE;
    hb_set.HB_SET_ALTFILE = NULL;
@@ -1143,8 +1190,14 @@ void hb_setInitialize( void )
    hb_set.HB_SET_PRINTFILE = ( char * ) hb_xgrab( 5 );
    memcpy( hb_set.HB_SET_PRINTFILE, "|lpr", 5 ); /* Default printer device */
 #else
+   #if defined(HB_OS_WIN_32) && !defined(__RSXNT__)
+   hb_set.HB_SET_PRINTFILE = ( char * ) hb_xgrab( pdwBufferSize + 4 );
+   strcpy( hb_set.HB_SET_PRINTFILE,"WIN:");
+   strcat( hb_set.HB_SET_PRINTFILE, DefaultPrinter );/* Default printer device */
+   #else
    hb_set.HB_SET_PRINTFILE = ( char * ) hb_xgrab( 4 );
    memcpy( hb_set.HB_SET_PRINTFILE, "PRN", 4 ); /* Default printer device */
+   #endif
 #endif
    hb_set.hb_set_printhan = FS_ERROR;
    hb_set.hb_set_winhan=FS_ERROR;
