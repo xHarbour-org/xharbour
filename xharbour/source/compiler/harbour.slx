@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.26 2003/02/26 06:45:30 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.27 2003/02/28 10:37:20 ronpinkas Exp $
  */
 
 /*
@@ -372,6 +372,7 @@ LANGUAGE_RULES_ARE {
                     IF_SEQUENCE_IS( REJECT_OP      , DIVEQ       , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( REJECT_OP      , EXPEQ       , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( REJECT_OP      , MODEQ       , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( REJECT_OP      , ')'         , 0      , 0          ) PASS_THROUGH(),
                  /* IF_SEQUENCE_IS( REJECT_OP      , '('         , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( REJECT_OP      , '['         , 0      , 0          ) PASS_THROUGH(), DONT uncomment!!!*/
                     IF_SEQUENCE_IS( REJECT_OP      , '='         , 0      , 0          ) PASS_THROUGH(),
