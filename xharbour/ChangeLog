@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1161 2003/06/21 07:36:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1162 2003/06/21 15:04:29 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-06-22 05:00 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/compiler/harbour.c
+    ! Allow harbour.exe to generate C source file from PRG file despite of
+      warnings. This is implemented in order to be compatible with Clipper
+      (and most C compilers too). Now harbour.exe can use /w2 or /w3 flags.
+      One benefit of this implementation is that programmer can see how
+      productive he is in manipulating local variables. This implementation
+      may probably have effect on strong-type-coding-style when it become
+      effectively implemented.
 
 2003-06-21 17:01 UTC+0200 Giancarlo Niccolai <giancarlo@niccolai.ws>
   * source/vm/hbi18n.c

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.41 2003/06/20 17:32:41 jonnymind Exp $
+ * $Id: harbour.c,v 1.42 2003/06/21 06:59:22 jonnymind Exp $
  */
 
 /*
@@ -4610,7 +4610,8 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
             /* End of finalization phase. */
 
-            if( hb_comp_iErrorCount || hb_comp_bAnyWarning )
+            // if( hb_comp_iErrorCount || hb_comp_bAnyWarning )
+            if( hb_comp_iErrorCount )
             {
                if( hb_comp_iErrorCount )
                {
