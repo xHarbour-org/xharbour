@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.20 2003/10/09 20:45:54 paultucker Exp $
+# $Id: hrbdll.vc,v 1.21 2003/10/21 15:31:05 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -299,6 +299,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\fastitem.obj \
   $(OBJ_DIR)\fm.obj \
   $(OBJ_DIR)\garbage.obj \
+  $(OBJ_DIR)\hash.obj \
   $(OBJ_DIR)\hbi18n.obj \
   $(OBJ_DIR)\hvm.obj \
   $(OBJ_DIR)\inet.obj \
@@ -704,6 +705,9 @@ $(OBJ_DIR)\harbinit.c : $(VM_DIR)\harbinit.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\harbinit.obj : $(OBJ_DIR)\harbinit.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\hash.obj : $(VM_DIR)\hash.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\hbi18n.obj : $(VM_DIR)\hbi18n.c

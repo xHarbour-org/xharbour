@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.28 2003/10/01 13:32:28 paultucker Exp $
+# $Id: hrbdll.bc,v 1.29 2003/10/09 20:45:54 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -115,6 +115,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\hardcr.obj \
   $(OBJ_DIR)\hbbitfield.obj \
   $(OBJ_DIR)\hbffind.obj \
+  $(OBJ_DIR)\hash.obj \
   $(OBJ_DIR)\hbi18n.obj \
   $(OBJ_DIR)\hboutdebug.obj \
   $(OBJ_DIR)\hbrandom.obj \
@@ -494,6 +495,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\hardcr.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hbbitfield.obj        + >> hdll.tmp
   echo. $(OBJ_DIR)\hbffind.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\hash.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\hbi18n.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hboutdebug.obj        + >> hdll.tmp
   echo. $(OBJ_DIR)\hbrandom.obj          + >> hdll.tmp
@@ -1248,6 +1250,9 @@ $(OBJ_DIR)\hbbitfield.obj : $(RTL_DIR)\hbbitfield.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\hash.obj : $(VM_DIR)\hash.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\hbi18n.obj : $(VM_DIR)\hbi18n.c
