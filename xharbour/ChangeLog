@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3248 2004/07/31 16:40:44 likewolf Exp $
+ * $Id: ChangeLog,v 1.3249 2004/07/31 23:15:41 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-01 14:00 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/vm/runner.c
+    ! HRB file loading process very optimized. Now it works on a memory
+      buffer, not with a file handle.
+    + Added hb_hrbLoadFromFile() function.
+    - Removed useless (due to above change) file management functions.
+    ! __HRBLOAD() can now receive as parameter either a file name or
+      a string variable with the HRB body. It recognizes HRB header
+      signature and call hb_hrbLoad() or hb_hrbLoadFromFile() properly.
 
 2004-07-31 20:10 UTC-0300 Luiz Rafael Culik <culikr at brturbo.com
   * include/thread.h

@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.28 2004/05/20 01:43:03 ronpinkas Exp $
+ * $Id: runner.c,v 1.29 2004/07/16 22:58:07 lculik Exp $
  */
 
 /*
@@ -130,20 +130,17 @@ HB_EXTERN_BEGIN
 HB_EXPORT PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Create a dynamic function*/
 HB_EXTERN_END
 
-PHRB_BODY hb_hrbLoad( char* szHrb );
+PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize );
+PHRB_BODY hb_hrbLoadFromFile( char* szHrb );
 void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] );
 void hb_hrbUnLoad( PHRB_BODY pHrbBody );
 static ULONG     hb_hrbFindSymbol( char * szName, PHB_DYNF pDynFunc, ULONG ulLoaded );
 void hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address );
 void hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset, void * Address, ULONG ulNext );
 
-static FHANDLE   hb_hrbFileOpen( char * szFileName );
-static void      hb_hrbFileRead( FHANDLE file, char * szFileName, char * cBuffer, int iSize, int iCount );
-static BYTE      hb_hrbFileReadByte( FHANDLE file, char * szFileName );
-static int       hb_hrbFileReadHead( FHANDLE file, char * szFileName );
-static char *    hb_hrbFileReadId( FHANDLE file, char * szFileName, BOOL bUseFM );
-static LONG      hb_hrbFileReadLong( FHANDLE file, char * szFileName );
-static void      hb_hrbFileClose( FHANDLE file );
+static int       hb_hrbReadHead( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset );
+static char *    hb_hrbReadId( char * szBody, BOOL bUseFM, ULONG ulBodySize, ULONG * ulBodyOffset );
+static LONG      hb_hrbReadLong( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset );
 
 static ULONG     s_ulSymEntry = 0;              /* Link enhancement         */
 
@@ -163,7 +160,7 @@ HB_FUNC( __HRBRUN )
 
    if( argc >= 1 )
    {
-      PHRB_BODY pHrbBody = hb_hrbLoad( hb_parcx( 1 ) );
+      PHRB_BODY pHrbBody = hb_hrbLoadFromFile( hb_parcx( 1 ) );
 
       if( pHrbBody )
       {
@@ -206,11 +203,23 @@ HB_FUNC( __HRBLOAD )
 {
    if( hb_pcount() >= 1 )
    {
-      hb_retptr( ( void *) hb_hrbLoad( hb_parcx( 1 ) ) );
+      BYTE szHead[] = { (BYTE)192,'H','R','B' };
+      char * fileOrBody = hb_parc( 1 );
+
+      // If parameter string
+
+      if ( fileOrBody && hb_parclen( 1 ) > 4 && strncmp( ( char * ) szHead, ( char * ) fileOrBody, 4 ) == 0  )
+      {
+         hb_retptr( ( void *) hb_hrbLoad( fileOrBody, hb_parclen( 1 ) ) );
+      }
+      else
+      {
+         hb_retptr( ( void *) hb_hrbLoadFromFile( fileOrBody ) );
+      }
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 9999, NULL, "__HRBLOAD", 0 );
+      hb_errRT_BASE( EG_ARG, 9998, NULL, "__HRBLOAD", 0 );
    }
 }
 
@@ -341,13 +350,12 @@ HB_FUNC( __HRBDOFU )
    }
 }
 
-PHRB_BODY hb_hrbLoad( char* szHrb )
+PHRB_BODY hb_hrbLoadFromFile( char* szHrb )
 {
    char szFileName[ _POSIX_PATH_MAX + 1 ];
+   PHRB_BODY pHrbBody = NULL;
    PHB_FNAME pFileName;
    FHANDLE file;
-   BOOL bError = FALSE;
-   PHRB_BODY pHrbBody = NULL;
 
    /* Create full filename */
 
@@ -364,7 +372,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
 
    /* Open as binary */
 
-   while ( ( file = hb_hrbFileOpen( szFileName ) ) == 0 )
+   while ( ( file = hb_fsOpen( ( BYTE *)szFileName, FO_READ )) == 0 )
    {
       USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 9999, NULL, szFileName, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 1, hb_paramError( 1 ) );
 
@@ -374,7 +382,36 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
       }
    }
 
-   if( file )
+   if (file)
+   {
+      ULONG ulBodySize = hb_fsSeek( file, 0, FS_END );
+
+      if( ulBodySize )
+      {
+         BYTE * pbyBuffer;
+
+         pbyBuffer = ( BYTE * ) hb_xgrab( ulBodySize + sizeof( char ) + 1 );
+         hb_fsSeek( file, 0, FS_SET );
+         hb_fsReadLarge( file, pbyBuffer, ulBodySize );
+         pbyBuffer[ ulBodySize ] = '\0';
+
+         pHrbBody = hb_hrbLoad( (char*) pbyBuffer, (ULONG) ulBodySize );
+
+         hb_xfree( pbyBuffer );
+      }
+      hb_fsClose( file );
+   }
+   return( pHrbBody );
+}
+
+
+PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
+{
+   BOOL bError = FALSE;
+   PHRB_BODY pHrbBody = NULL;
+   ULONG ulBodyOffset = 0;
+
+   if( szHrbBody )
    {
       ULONG ulSize;                                /* Size of function         */
       ULONG ul, ulPos;
@@ -382,18 +419,17 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
       PHB_SYMB pSymRead;                           /* Symbols read             */
       PHB_DYNF pDynFunc;                           /* Functions read           */
       PHB_DYNS pDynSym;
-      int nVersion = hb_hrbFileReadHead( file, szFileName );
+      int nVersion = hb_hrbReadHead( (char *) szHrbBody, (ULONG) ulBodySize, &ulBodyOffset );
 
       if( !nVersion )
       {
-         hb_hrbFileClose( file );
          return NULL;
       }
 
       pHrbBody = ( PHRB_BODY ) hb_xgrab( sizeof( HRB_BODY ) );
 
       pHrbBody->ulSymStart = -1;
-      pHrbBody->ulSymbols = hb_hrbFileReadLong( file, szFileName );
+      pHrbBody->ulSymbols = hb_hrbReadLong( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
       pHrbBody->pPrevLastModule = NULL;
 
       /*
@@ -409,9 +445,10 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
 
       for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )  /* Read symbols in .HRB     */
       {
-         pSymRead[ ul ].szName  = hb_hrbFileReadId( file, szFileName, FALSE );
-         pSymRead[ ul ].cScope  = hb_hrbFileReadByte( file, szFileName );
-         pSymRead[ ul ].value.pFunPtr = ( PHB_FUNC ) ( HB_PTRDIFF ) hb_hrbFileReadByte( file, szFileName );
+         pSymRead[ ul ].szName  = hb_hrbReadId( (char *) szHrbBody, FALSE, ulBodySize, &ulBodyOffset );
+         //printf( "at offset %i, found symbol %s, scope %i, type %i\n", ulBodyOffset, pSymRead[ ul ].szName, szHrbBody[ulBodyOffset], szHrbBody[ulBodyOffset+1] );
+         pSymRead[ ul ].cScope  = szHrbBody[ulBodyOffset++];
+         pSymRead[ ul ].value.pFunPtr = ( PHB_FUNC ) ( HB_PTRDIFF ) szHrbBody[ulBodyOffset++];
          pSymRead[ ul ].pDynSym = NULL;
 
          if ( pHrbBody->ulSymStart == -1 && pSymRead[ ul ].cScope & HB_FS_FIRST && ! ( pSymRead[ ul ].cScope & HB_FS_INITEXIT ) )
@@ -420,24 +457,26 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
          }
       }
 
-      pHrbBody->ulFuncs = hb_hrbFileReadLong( file, szFileName );  /* Read number of functions */
+      pHrbBody->ulFuncs = hb_hrbReadLong( (char *) szHrbBody, ulBodySize, &ulBodyOffset );  /* Read number of functions */
+
       pDynFunc = ( PHB_DYNF ) hb_xgrab( pHrbBody->ulFuncs * sizeof( HB_DYNF ) );
       memset( pDynFunc, 0, pHrbBody->ulFuncs * sizeof( HB_DYNF ) );
 
       for( ul = 0; ul < pHrbBody->ulFuncs; ul++ )         /* Read symbols in .HRB     */
       {
-         pDynFunc[ ul ].szName = hb_hrbFileReadId( file, szFileName, TRUE );
+         pDynFunc[ ul ].szName = hb_hrbReadId( (char *) szHrbBody, TRUE, ulBodySize, &ulBodyOffset );
 
-         ulSize = hb_hrbFileReadLong( file, szFileName );      /* Read size of function    */
+         ulSize = hb_hrbReadLong( (char *) szHrbBody, ulBodySize, &ulBodyOffset );      /* Read size of function    */
          pDynFunc[ ul ].pCode = ( BYTE * ) hb_xgrab( ulSize );
 
          /* Read the block           */
-         hb_hrbFileRead( file, szFileName, ( char * ) pDynFunc[ ul ].pCode, 1, ulSize );
+         memcpy( ( char * ) pDynFunc[ ul ].pCode, (char *) (szHrbBody + ulBodyOffset), ulSize );
+         ulBodyOffset += ulSize;
 
         /* Create matching dynamic function */
          pDynFunc[ ul ].pAsmCall = hb_hrbAsmCreateFun( pSymRead, pDynFunc[ ul ].pCode );
 
-         //printf( "#%i/%i Sym: >%s<, pAsm: %p\n", ul, pHrbBody->ulFuncs, pDynFunc[ ul ].szName, pDynFunc[ ul ].pAsmCall );
+         //printf( "#%i/%i Sym: >%s<, pAsm: %p, offset %i\n", ul, pHrbBody->ulFuncs, pDynFunc[ ul ].szName, pDynFunc[ ul ].pAsmCall, ulBodyOffset );
       }
 
       pHrbBody->pSymRead = pSymRead;
@@ -446,7 +485,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
 
       for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )    /* Linker                   */
       {
-         //printf( "#%i/%i Sym: >%s<\n", ul, pHrbBody->ulSymbols, pSymRead[ ul ].szName );
+         //printf( "linking #%i/%i Sym: >%s<\n", ul, pHrbBody->ulSymbols, pSymRead[ ul ].szName );
 
          if( ( ( HB_PTRDIFF ) pSymRead[ ul ].value.pFunPtr ) == SYM_FUNC )
          {
@@ -506,16 +545,16 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
 
       if( bError )
       {
+         //printf( "Error occourred!\n" );
          hb_hrbUnLoad( pHrbBody );
          pHrbBody = NULL;
       }
-
-      hb_hrbFileClose( file );
    }
 
    pHrbBody->pPrevLastModule = hb_vmLastModule();
 
-   hb_vmProcessSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols, szFileName, (int) HB_PCODE_VER );
+//   hb_vmProcessSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols, szFileName, (int) HB_PCODE_VER );
+   hb_vmProcessSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols, "PCODE_HRB_FILE.hrb", (int) HB_PCODE_VER );
 
    return pHrbBody;
 }
@@ -682,42 +721,50 @@ static ULONG hb_hrbFindSymbol( char * szName, PHB_DYNF pDynFunc, ULONG ulLoaded 
    return ulRet;
 }
 
-static int hb_hrbFileReadHead( FHANDLE file, char * szFileName )
+static int hb_hrbReadHead( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset )
 {
-   BYTE szHead[] = { (BYTE)192,'H','R','B' }, szBuf[4];
+   BYTE szHead[] = { (BYTE)192,'H','R','B' };
    char cInt[ 2 ];
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileReadHead(%p)", file ));
+   HB_TRACE(HB_TR_DEBUG, ("hb_hrbReadHead(%p,%i,%i)", szBody, ulBodySize, * ulBodyOffset ));
 
-   hb_hrbFileRead( file, szFileName, ( char * ) szBuf, 1, 4 );
-
-   if( strncmp( ( char * ) szHead, ( char * ) szBuf, 4 ) )
+   if( ulBodySize < 6 || strncmp( ( char * ) szHead, ( char * ) szBody, 4 ) )
    {
-      hb_errRT_BASE_Ext1( EG_CORRUPTION, 9999, NULL, szFileName, 0, EF_CANDEFAULT, 1, hb_paramError( 1 ) );
+      hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "__HRBLOAD", 0 );
       return 0;
    }
 
-   hb_hrbFileRead( file, szFileName, cInt, 2, 1 );
+   cInt[0] = szBody[(*ulBodyOffset)+4];
+   cInt[1] = szBody[(*ulBodyOffset)+5];
+
+   * ulBodyOffset += 6;    // header + version offset
 
    return HB_PCODE_MKSHORT( cInt );
 }
 
 /* ReadId
    Read the next (zero terminated) identifier */
-static char * hb_hrbFileReadId( FHANDLE file, char * szFileName, BOOL bUseFM )
+static char * hb_hrbReadId( char * szBody, BOOL bUseFM, ULONG ulBodySize, ULONG * ulBodyOffset )
 {
    char szTemp[256];                                /* Temporary buffer         */
    char * szIdx;
    char * szRet;
    BOOL  bCont = TRUE;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileReadId(%p, %s, %i)", file, szFileName, bUseFM));
+   HB_TRACE(HB_TR_DEBUG, ("hb_hrbReadId(%p,%i,%i,%i)", szBody, bUseFM, ulBodySize, *ulBodyOffset));
 
    szIdx = (char *) szTemp;
 
    do
    {
-      hb_hrbFileRead( file, szFileName, szIdx, 1, 1 );
+      szIdx[0] = szBody[* ulBodyOffset];
+      (* ulBodyOffset) ++;
+
+      if ((*ulBodyOffset) > ulBodySize)
+      {
+         hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "__HRBLOAD", 0 );
+         return( "" );
+      }
 
       if( *szIdx )
       {
@@ -754,70 +801,31 @@ static char * hb_hrbFileReadId( FHANDLE file, char * szFileName, BOOL bUseFM )
 }
 
 
-static BYTE hb_hrbFileReadByte( FHANDLE file, char * szFileName )
-{
-   BYTE bRet;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileReadByte(%p, %s)", file, szFileName));
-
-   hb_hrbFileRead( file, szFileName, ( char * ) &bRet, 1, 1 );
-
-   return bRet;
-}
-
-
-static LONG hb_hrbFileReadLong( FHANDLE file, char * szFileName )
+static LONG hb_hrbReadLong( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset )
 {
    char cLong[ 4 ];                               /* Temporary long           */
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileReadLong(%p, %s)", file, szFileName));
+   HB_TRACE(HB_TR_DEBUG, ("hb_hrbReadLong(%p,%i,%i)", szBody, ulBodySize, * ulBodyOffset));
 
-   hb_hrbFileRead( file, szFileName, cLong, 4, 1 );
+   if ( (* ulBodyOffset + 4) > ulBodySize )
+   {
+      hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "__HRBLOAD", 0 );
+      return 0;
+   }
+
+   memcpy( cLong, (char *) (szBody+(*ulBodyOffset)), 4 );
+
+   * ulBodyOffset += 4;
 
    if( cLong[ 3 ] )                             /* Convert to long if ok    */
    {
-      hb_errRT_BASE_Ext1( EG_READ, 9999, NULL, szFileName, 0, EF_NONE, 0 );
+      hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "__HRBLOAD", 0 );
       return 0;
    }
    else
    {
       return HB_PCODE_MKLONG( cLong );
    }
-}
-
-
-/*  hb_hrbFileRead
-    Controlled read from file. If errornous -> Break */
-static void hb_hrbFileRead( FHANDLE file, char * szFileName, char * cBuffer, int iSize, int iCount )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileRead(%p, %s, %p, %d, %d)", file, szFileName, cBuffer, iSize, iCount));
-
-//   if( iCount != ( int ) fread( cBuffer, iSize, iCount, file ) )
-
-   if( iCount != ( int ) ( hb_fsRead( file, ( BYTE *) cBuffer, (USHORT) iCount * iSize ) / iSize ) )
-   {
-      hb_errRT_BASE_Ext1( EG_READ, 9999, NULL, szFileName, 0, EF_NONE, 0 );
-   }
-}
-
-
-/*  hb_hrbFileOpen
-    Open an .HRB file  */
-static FHANDLE hb_hrbFileOpen( char * szFileName )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileOpen(%s)", szFileName));
-//   return fopen( szFileName, "rb" );
-   return hb_fsOpen( ( BYTE *)szFileName, FO_READ );
-}
-
-
-/*  hb_hrbFileClose
-    Close an .HRB file  */
-static void hb_hrbFileClose( FHANDLE file )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileClose(%p)", file));
-//   fclose( file );
-   hb_fsClose( file );
 }
 
 /*
