@@ -1,5 +1,5 @@
 ##################################
-# $Id: Rules.make,v 1.2 2003/04/18 13:28:26 jonnymind Exp $
+# $Id: Rules.make,v 1.3 2003/07/23 15:58:02 lculik Exp $
 #
 # Rules for making simwin
 #
@@ -25,9 +25,9 @@ GT_LIBS=-lgtcgi
 
 #libraries for binary building
 ifeq ($(HB_MT),MT)
-LIBFILES_=-ldebug -lgpm -lvmmt -lrtlmt $(GT_LIBS) -lrddmt -lrtlmt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -lcommon -lm -lpthread
+LIBFILES_=-ldebug -lgpm -lvmmt -lrtlmt $(GT_LIBS) -lrddmt -lrtlmt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdxmt -ldbfdbt -lcommon -lm -lpthread
 else
-LIBFILES_=-ldebug -lgpm -lvm -lrtl $(GT_LIBS)  -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -lcommon -lm
+LIBFILES_=-ldebug -lgpm -lvm -lrtl $(GT_LIBS)  -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbfdbt -lcommon -lm
 endif
 
 LIBDIR_ = $(LIBDIR) -L$(HB_LIB_INSTALL)

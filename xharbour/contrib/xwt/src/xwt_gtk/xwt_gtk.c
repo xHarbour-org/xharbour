@@ -4,7 +4,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.23 2003/09/04 20:26:24 xthefull Exp $
+   $Id: xwt_gtk.c,v 1.24 2003/10/09 23:18:34 jonnymind Exp $
 
    Global declarations, common functions
 
@@ -729,14 +729,14 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 	    widget_set_color(wMain, &color,TEXTCOLOR)
 ;
 
-	    break;	    
+	    break;
 	    case XWT_TYPE_MENUITEM:
 	    {
 	        PXWT_GTK_MENUITEM itm = (PXWT_GTK_MENUITEM) wWidget->widget_data;
 		widget_set_color(itm->label, &color,TEXTCOLOR)
 ;
 	    }
-	    	    
+
             break;
 
          }
@@ -744,7 +744,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
         return TRUE;
    }
 
-   
+
    }
 
 
@@ -757,6 +757,9 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
    GtkWidget *wSelf = GTK_WIDGET( wWidget->get_top_widget( wWidget->widget_data ));
    GtkWidget *wMain = GTK_WIDGET( wWidget->get_main_widget( wWidget->widget_data ));
 
+   // GTK always return static data
+   prop->bStatic = TRUE;
+   
    switch( prop->type )
    {
       case XWT_PROP_FOCUS:
@@ -858,9 +861,7 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
       case XWT_PROP_TEXT:
          switch( wWidget->type )
          {
-            // GTK always return static data
-            prop->bStatic = TRUE;
-            
+
             case XWT_TYPE_WINDOW:
             case XWT_TYPE_FRAME:
                prop->value.text = gtk_window_get_title ( GTK_WINDOW(wSelf) );
