@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3699 2004/12/28 07:16:07 druzus Exp $
+ * $Id: ChangeLog,v 1.3700 2004/12/28 08:35:13 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-28 16:25 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+	* source/rtl/run.c
+	  * added a second byref parameter which, if present, receives
+	    result of system() call
 
 2004-12-28 09:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfntx/dbfntx1.c
@@ -132,7 +137,7 @@
   * contrib/Whoo/source//TApplication.prg
     ! added parameter in the hb_idleState() call
 
-2004-12-25 21:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br> 
+2004-12-25 21:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils/hbmake/tmake.prg
   * utils/hbmake/radios.prg
   * utils/hbmake/hbmake.prg
@@ -143,7 +148,7 @@
 2004-12-25 18:17 UTC+0100 Patrick Mast <patrick@xHarbour.com>
   + Added Croatien code page 437 (DOS) on bhalf of Vladimir Miholic.
 
-2004-12-25 21:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br> 
+2004-12-25 21:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils/hbmake/tmake.prg
   * utils/hbmake/radios.prg
   * utils/hbmake/hbmake.prg

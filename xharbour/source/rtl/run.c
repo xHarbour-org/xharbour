@@ -1,5 +1,5 @@
 /*
- * $Id: run.c,v 1.3 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: run.c,v 1.4 2004/11/21 21:44:20 druzus Exp $
  */
 
 /*
@@ -61,14 +61,22 @@ HB_FUNC( __RUN )
 {
 #if defined(__TURBOC__) || defined(__BORLANDC__) || defined(_MSC_VER) || \
     defined(__WATCOMC__) || defined(__IBMCPP__) || defined(__GNUC__)
+
+	int iret;
+
    if( ISCHAR( 1 ) && hb_gtSuspend() == 0 )
    {
-      system( hb_parc( 1 ) );
+      iret = system( hb_parc( 1 ) );
 
       if( hb_gtResume() != 0 )
       {
          /* an error should be generated here !! Something like */
          /* hb_errRT_BASE_Ext1( EG_GTRESUME, 9999, NULL, "__RUN", 0, EF_CANDEFAULT ); */
+      }
+
+      /* A second, byref, parameter gets the result code */
+      if ( ISBYREF( 2 ) ) {
+      	hb_storni( iret, 2 ) ;
       }
    }
 #else
