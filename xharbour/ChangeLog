@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.617 2003/01/12 08:28:13 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.618 2003/01/12 11:55:20 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-12 17:50 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
+  * utils/hbmake/hbmake.prg
+    ! minor fix when using -R option with Editor mode On Linux
+  * source/pp/pptable.c
+    + Added missing commands From previus upload( SET FILECASE, SET DIRCASE, SET DIRSEPARATOR)
 
 2003-01-12 10:00 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
   * include/hbapifs.h

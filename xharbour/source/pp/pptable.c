@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.11 2003/01/12 01:52:16 horacioroldan Exp $
+ * $Id: pptable.c,v 1.12 2003/01/12 11:55:22 lculik Exp $
  */
 
 /*
@@ -428,8 +428,14 @@ void hb_pp_Table( void )
    static COMMANDS sC___243 = {0,"SET","TRACE \1A20ON,OFF,&>","Set( _SET_TRACE, \1A30 )",&sC___242 };
    static COMMANDS sC___244 = {0,"SET","AUTOPEN \1A20 ON,OFF,&>","Set(_SET_AUTOPEN,\1A30 )",&sC___243 };
    static COMMANDS sC___245 = {0,"SET","AUTOPEN (\1A00)","Set(_SET_AUTOPEN,\1A00 )",&sC___244 };
+   static COMMANDS sC___246 = {0,"SET","FILECASE \1A30","Set(_SET_FILECASE, \1A10 )",&sC___245 };
+   static COMMANDS sC___247 = {0,"SET","FILECASE ( \1A00 )","Set(_SET_FILECASE, \1A00 )",&sC___246 };
+   static COMMANDS sC___248 = {0,"SET","DIRCASE \1A30","Set(_SET_DIRCASE, \1A10 )",&sC___247 };
+   static COMMANDS sC___249 = {0,"SET","DIRCASE ( \1A00 )","Set(_SET_DIRCASE, \1A00 )",&sC___248 };
+   static COMMANDS sC___250 = {0,"SET","DIRSEPARATOR \1A30","Set(_SET_DIRSEPARATOR, \1A10 )",&sC___249 };
+   static COMMANDS sC___251 = {0,"SET","DIRSEPARATOR ( \1A00 )","Set(_SET_DIRSEPARATOR, \1A00 )",&sC___250 };
 
    hb_pp_topDefine = &sD___56;
-   hb_pp_topCommand = &sC___245;
+   hb_pp_topCommand = &sC___251;
    hb_pp_topTranslate = NULL;
 }

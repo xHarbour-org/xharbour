@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.37 2003/01/11 20:53:59 lculik Exp $
+ * $Id: hbmake.prg,v 1.38 2003/01/11 21:01:29 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1479,12 +1479,12 @@ FUNC crtmakfile( cFile )
     attention( aLangMessages[ 41 ] , 22 )
 
     IF !lRecurse
-
+	TRACELOG(LGCC,COS)
         ain      := GetSourceFiles( .f., lGcc, cOs )
         nLenaSrc := Len( ain )
 
     ELSE
-
+	TRACELOG(LGCC,COS)
         ain      := GetSourceFiles(, lGcc, cOs )
         nLenaSrc := Len( asrc )
 
@@ -1597,7 +1597,7 @@ FUNC crtmakfile( cFile )
 
             IF nPos > 0
 
-                Aeval( aprgs, { | a, b | hb_FNAMESPLIT( a, @cPath, @cTest, @cExt, @cDrive ), If( cPath == citem, aprgs[ b ] := Strtran( a, cpath, "$(" + amacros[ x, 1 ] + ')\' ), ) } )
+                Aeval( aprgs, { | a, b | hb_FNAMESPLIT( a, @cPath, @cTest, @cExt, @cDrive ), If( cPath == citem, aprgs[ b ] := Strtran( a, cpath, "$(" + amacros[ x, 1 ] + if(lGcc,')/',')\') ), ) } )
 
                 IF !amacros[ x, 3 ]
 
@@ -2629,7 +2629,7 @@ FUNC crtlibmakfile( cFile )
 
             IF nPos > 0
 
-                Aeval( aprgs, { | a, b | hb_FNAMESPLIT( a, @cPath, @cTest, @cExt, @cDrive ), If( cPath == citem, aprgs[ b ] := Strtran( a, cpath, "$(" + amacros[ x, 1 ] + ')\' ), ) } )
+                Aeval( aprgs, { | a, b | hb_FNAMESPLIT( a, @cPath, @cTest, @cExt, @cDrive ), If( cPath == citem, aprgs[ b ] := Strtran( a, cpath, "$(" + amacros[ x, 1 ] + If( lgcc, ")/", ')\' ) ), ) } )
 
                 IF !amacros[ x, 3 ]
 
