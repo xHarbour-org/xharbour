@@ -2501,7 +2501,9 @@
             PHB_DYNS pDyn;
          } DYN_PROC;
 
+         HB_EXTERN_BEGIN
          extern PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Create a dynamic function*/
+         HB_EXTERN_END
 
          static DYN_PROC *s_pDynList;
          static int s_iDyn = 0;
