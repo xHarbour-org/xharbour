@@ -31,6 +31,7 @@
 #include   'WinTypes.ch'
 #include    'Winuser.ch'
 #include     'Common.ch'
+#include   'winstruc.ch'
 
 //---------------------------------------------------------------------//
 
@@ -53,7 +54,7 @@ typedef struct { ;
     char     cFileName[ MAX_PATH ];
     char     cAlternateFileName[ 14 ];
 } FIND_DATA
-
+/*
 typedef struct { ;
     WORD     wYear ;
     WORD     wMonth ;
@@ -64,7 +65,7 @@ typedef struct { ;
     WORD     wSecond ;
     WORD     wMilliSeconds ;
 } SYSTEMTIME
-
+*/
 //---------------------------------------------------------------------//
 
 CLASS xhFtp

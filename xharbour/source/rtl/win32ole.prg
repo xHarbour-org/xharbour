@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.59 2004/11/22 15:35:09 druzus Exp $
+ * $Id: win32ole.prg,v 1.61 2005/01/30 10:00:00 ptsarenko Exp $
  */
 
 /*
@@ -132,20 +132,6 @@ RETURN TOleAuto():GetActiveObject( cString )
 
    static char *s_OleRefFlags = NULL;
 
-   void Win32_OleInitialize( void )
-   {
-      s_nOleError = OleInitialize( NULL );
-
-      s_pSym_OleAuto = hb_dynsymFindName( "TOLEAUTO" );
-      s_pSym_New     = hb_dynsymFindName( "NEW" );
-      s_pSym_hObj    = hb_dynsymFindName( "HOBJ" );;
-   }
-
-   void Win32_OleUnInitialize( void )
-   {
-      OleUninitialize();
-   }
-
    HB_FUNC( SETOLEREFFLAGS )
    {
       if( s_OleRefFlags )
@@ -161,6 +147,22 @@ RETURN TOleAuto():GetActiveObject( cString )
    }
 
 #pragma ENDDUMP
+
+//----------------------------------------------------------------------------//
+
+INIT PROC HB_OLEINIT
+HB_INLINE()
+{
+   s_nOleError = OleInitialize( NULL );
+}
+return
+
+EXIT PROC HB_OLEEXIT
+HB_INLINE()
+{
+   OleUninitialize();
+}
+return
 
 //----------------------------------------------------------------------------//
 
@@ -182,6 +184,13 @@ CLASS TOleAuto
    ERROR HANDLER OnError()
 
    DESTRUCTOR Release()
+
+   HB_INLINE()
+   {
+      s_pSym_OleAuto = hb_dynsymFindName( "TOLEAUTO" );
+      s_pSym_New     = hb_dynsymFindName( "NEW" );
+      s_pSym_hObj    = hb_dynsymFindName( "HOBJ" );
+   }
 
 ENDCLASS
 
@@ -820,6 +829,9 @@ METHOD OnError( uParam1, uParam2, uParam3, uParam4, uParam5, uParam6, uParam7, u
          RETURN Eval( ErrorBlock(), oErr )
 
       ELSEIF ( cError := Ole2TxtError() ) != "S_OK"
+         IF cMsg == "END"
+            RETURN .t.
+         ENDIF
 
          oErr := ErrorNew()
          oErr:Args          := { Self, cMsg, HB_aParams() }

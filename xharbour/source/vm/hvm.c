@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.433 2005/01/25 10:47:54 druzus Exp $
+ * $Id: hvm.c,v 1.435 2005/01/30 10:00:00 ptsarenko Exp $
  */
 
 /*
@@ -146,9 +146,6 @@
    /* Mouse Disabling */
    extern BOOL b_MouseEnable;
 
-
-   extern void Win32_OleInitialize( void );
-   extern void Win32_OleUnInitialize( void );
 
    /* DEBUG only*/
    #include <windows.h>
@@ -585,11 +582,6 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    //printf( "Before InitRdd\n" );
    hb_vmDoInitRdd();  // Initialize DBFCDX and DBFNTX if linked.
 
-   #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) ) && !defined(HB_NO_WIN32_OLE)
-      HB_TRACE( HB_TR_INFO, ("InitOle" ) );
-      Win32_OleInitialize();
-   #endif
-
    //printf( "Before InitFunctions\n" );
    HB_TRACE( HB_TR_INFO, ("InitFunctions" ) );
    hb_vmDoInitFunctions(); /* process defined INIT functions */
@@ -848,11 +840,6 @@ int HB_EXPORT hb_vmQuit( void )
       HB_TRACE(HB_TR_DEBUG, ("   Released s_aStatics: %p\n", &s_aStatics) );
    }
    //printf("\nAfter Statics\n" );
-
-   #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) ) && !defined(HB_NO_WIN32_OLE)
-      HB_TRACE( HB_TR_INFO, ("Quit Ole" ) );
-      Win32_OleUnInitialize();
-   #endif
 
    hb_inkeyExit();
    //printf("\nAfter inkey\n" );
