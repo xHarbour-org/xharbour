@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.621 2003/01/12 22:29:59 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.622 2003/01/12 22:50:11 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-12 03:24 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/inet.h
+  * source/vm/inet.c
+    + Added a timeout field in the Socket structure.
+    ! Now all sockets are internally non blocking, and Select() is used
+      to regulate timeout (or infinite wait) accordingly with timeout
+      field
+    + Added InetSetTimeout and InetClearTimeout function to control the
+      timeout field
+    + Added the InetRecvEndBlock() by Marcelo Lombardo, a
+      generalization of InetRecvLine
+
+  * doc/inet.txt
+    * Updated documentation accordingly
+
+  * tests/client.prg
+  * tests/inetto.prg
+  * tests/server.prg
+  * tests/udpclient.prg
+    * Updated files to test the new functions and modes
+    * Some minor style refinements
+
+  NOTICE: this updates are WIP under windws, and working under linux.
+  Tomorrow I will complete them under windows. Sorry for the delay,
+  but this is a major design switch.
 
 2003-01-12 23:45 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/Makefile

@@ -62,6 +62,23 @@ InetDestroy( SOCKET ) --> Numeric
   anymore. Returns 0 on success -1 on failure.
 
 
+InetSetTimeout( SOCKET, nMillisecs ) --> NIL
+  Sets the default timeout of the given socket. Default timeout is used in all
+  blocking operations: if the operation can't be done in nMillisec milliseconds,
+  the function returns immediately and the InetErrorCode( SOCKET ) returns -1.
+  The default timeout is not the maximum time that a function using the socket
+  is allowed to execute: it is the maximum time that each single blocking 
+  operation inside that function is allowed to hold the control of the socket.
+  So, an function like InetReadAll(), that may repeat a raw recv() several 
+  times, is not guaranteed to terminate in nMillisecs, but you are guaranteed
+  that if any of that raw socket read operation is going to take more than
+  nMillisecs, the function will be terminated.
+  When created, a socket is created with an infinite default timeout (-1).
+
+
+InetClearTimeout( SOCKET, nMillisecs ) --> NIL
+  Clears the default timeout of the given socket. Default timeout is used in all
+  blocking operations.
 
 
 Informative functions
@@ -105,8 +122,8 @@ InetServer( port [, cBindAddr [, nListenLimit]]  ) --> SOCKET
   Creates a server that can accept connections from client on a certain port.
   If the computer on which InetServe is called has more than one logical
   interface (e.g. one network card, one loopback and one PPP address),
-  cBindAddr can be specified to select only one of this interface to accept 
-  connections for this process. This is useful when a server is present on 
+  cBindAddr can be specified to select only one of this interface to accept
+  connections for this process. This is useful when a server is present on
   two networks, and the service is to be available only in one of them. Also,
   the same port on other addresses is left free to be used, so you can have
   different server programs running for different networks but managing
@@ -148,14 +165,17 @@ InetConnect( cAddress, PORT, SOCKET ) --> NIL
   The second version of this functions accepts a pre-built socket
   as parameter. This allows to kill asyncronously a thread waiting
   for InetConnect to connect, and then cleaning up the leftover
-  socket data.
+  socket data. Also, it is possible to give timeout at the given SOCKET,
+  but this timeout will be used only in the connection phase, after that
+  the network address resolution is completed. Use GetHosts() and
+  InetConnectIP for a finer timeout control.
   On error, the error of the returned socket is set. The error could
   be due to unavailable name resolving service, host name not valid,
   host address not reachable and host reachable but port not open.
 
 
 InetConnectIP( cAddress, PORT ) --> SOCKET
-InetConnect( cAddress, PORT, SOCKET ) --> NIL
+InetConnectIP( cAddress, PORT, SOCKET ) --> NIL
   Connects to a remote server described by cAddress, that can be specified
   only in quad dot IPV4 notation (e.g. "127.0.0.1"), using the desired port.
   This version of InetConnect does not use gethostbyname, and thus is thread
@@ -164,7 +184,8 @@ InetConnect( cAddress, PORT, SOCKET ) --> NIL
   The second version of this functions accepts a pre-built socket
   as parameter. This allows to kill asyncronously a thread waiting
   for InetConnectIP to connect, and then cleaning up the leftover
-  socket data.
+  socket data. Also, it is possible to give timeout at the given SOCKET.
+
   On error, the error of the returned socket is set.
 
 
@@ -219,6 +240,14 @@ InetRecvLine( SOCKET [, @nResult, [, nMaxLength [, nBufSize]]] ) --> STRING
   once, at the beginning of the function).
 
 
+InetRecvEndBlock( SOCKET [, cBlock [, @nResult, [, nMaxLength [,
+       nBufSize]]]] ) --> STRING
+  This functions operates exactly the same way as InetRecvLine, but
+  the "record termination" is customizable thorugh the cBlock parameter.
+  If not given, this parameter defaults to the CRLF sequence.
+  Provided by: Marcelo Lombardo
+
+
 InetDataReady( SOCKET [, nMillisecs] ) --> NUMERIC
   Verifies if some data is available to be read in the socket without blocking
   execution of the caller. If nMillisecs is not given, the functions returns
@@ -249,10 +278,10 @@ InetSend( SOCKET, STRING [, nLength ] ) --> NUNERIC
 InetSendAll( SOCKET, STRING [, nLength ] ) --> NUNERIC
   This function works exactly as InetSend() but it ensures that all the
   data to be sent is written before returning.
-  
 
 
-  
+
+
 Utitlity Functions
 ------------------
 
@@ -337,21 +366,5 @@ InetDGramRecv( SOCKET, cBuffer [, nSize ] ) --> NUMERIC
   that less than the system datagram size will be sent and received
   as a single item.
   Returns -1 on error, or the number of bytes actually read on success.
-
-
-InetDGRecvTout( SOCKET, nMillisecs, cBuffer [, nSize ] ) --> NUMERIC
-  Sorry for a so counter intuitive function name. It's complete name
-  is "Internet (module) Datagram Receive (with) Timeout". This function
-  comes handy when a network service scan is in order, or when expecting
-  for another UDP socket to give an answer in a determined time lapse.
-  Reads at maximum nSize bytes incoming from a UDP socket, if nSize is
-  given, or reads at maximum cBuffer length if nSize is not given.
-  The return value is -1 if a network error occoured, or 0 if the
-  nMillisecs timeout elapses and there isn't still any data
-  available. If a datagram arrives while waiting, the wait is
-  immediately interrupted, and the lenght of the datagram (up to nSize or
-  cBuffer lenght) is returned.
-  
-
 
 
