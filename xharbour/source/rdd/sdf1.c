@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.26 2001/06/18 18:04:05 dholm Exp $
+ * $Id: sdf1.c,v 1.1.1.1 2001/12/21 10:42:47 ronpinkas Exp $
  */
 
 /*
@@ -59,6 +59,9 @@
 
 HB_FUNC( _SDFC );
 HB_FUNC( SDF_GETFUNCTABLE );
+
+#undef HB_PRG_PCODE_VER
+#define HB_PRG_PCODE_VER HB_PCODE_VER
 
 HB_INIT_SYMBOLS_BEGIN( sdf1__InitSymbols )
 { "_SDFC",            HB_FS_PUBLIC, HB_FUNCNAME( _SDFC ), NULL },

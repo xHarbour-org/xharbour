@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.6 2002/03/31 02:56:32 ronpinkas Exp $
+ * $Id: runner.c,v 1.7 2002/05/02 13:42:05 map Exp $
  */
 
 /*
@@ -408,7 +408,7 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
 
       hb_hrbFileClose( file );
    }
-   hb_vmProcessSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols );
+   hb_vmProcessSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols, __FILE__, (int) HB_PCODE_VER );
    return pHrbBody;
 }
 

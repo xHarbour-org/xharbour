@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.8 2002/05/10 03:34:52 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.9 2002/05/11 00:48:39 ronpinkas Exp $
  */
 
 /*
@@ -1605,7 +1605,7 @@ RETURN uObj
   {
      UINT uLen;
      BSTR wString = ( BSTR ) hb_parc( 1 );
-     char *cString = NULL;
+     char *cString;
 
      uLen = SysStringLen( wString ) + 1;
 

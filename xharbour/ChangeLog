@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.218 2002/05/14 16:43:52 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.219 2002/05/15 00:39:04 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-05-15 19:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/win32ole.prg
+    - Removed 1 unneed initialization.
+
+  * source/rtl/errorapi.c
+    ! Corrected hb_errInternal() to not GPF if called before hb_langRegister() is called.
+    + Added output ot error.log
+    + Added MessageBox() output if under Windows.
+
+  * include/hbinit.h
+  * include/hbsetup.h
+  * include/hbvm.h
+  * source/compiler/genc.c
+  * source/vm/hvm.c
+    + Added support for version check of PCODE in compiled prg.
+
+  * source/vm/initsymb.c
+  * source/vm/runner.c
+  * source/rdd/dbf1.c
+  * source/rdd/delim1.c
+  * source/rdd/sdf1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+    + Added version indicator.
+
+  /*
+    NOTE: xHarbour will now report error when a prg was compiled with incompatible version of Harbour or xHarbour.
+        : If you don't recompile all prg files you will get such error when linking it with this version.
+  */
 
 2002-05-14 21:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
  * source/rtl/console.c

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.91 2002/03/18 04:50:40 horacioroldan Exp $
+ * $Id: dbfcdx1.c,v 1.14 2002/05/01 04:47:21 horacioroldan Exp $
  */
 
 /*
@@ -69,6 +69,9 @@
 
 extern HB_FUNC( _DBFCDX );
 extern HB_FUNC( DBFCDX_GETFUNCTABLE );
+
+#undef HB_PRG_PCODE_VER
+#define HB_PRG_PCODE_VER HB_PCODE_VER
 
 HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
 { "_DBFCDX",             HB_FS_PUBLIC, HB_FUNCNAME( _DBFCDX ), NULL },

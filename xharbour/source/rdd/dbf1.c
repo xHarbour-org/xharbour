@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.8 2002/03/06 06:21:14 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.9 2002/03/11 23:54:57 ronpinkas Exp $
  */
 
 /*
@@ -68,6 +68,9 @@
 
 HB_FUNC( _DBFC );
 HB_FUNC( DBF_GETFUNCTABLE );
+
+#undef HB_PRG_PCODE_VER
+#define HB_PRG_PCODE_VER HB_PCODE_VER
 
 HB_INIT_SYMBOLS_BEGIN( dbf1__InitSymbols )
 { "_DBFC",            HB_FS_PUBLIC, HB_FUNCNAME( _DBFC ), NULL },

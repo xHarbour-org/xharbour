@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.27 2001/06/18 18:04:05 dholm Exp $
+ * $Id: delim1.c,v 1.1.1.1 2001/12/21 10:42:46 ronpinkas Exp $
  */
 
 /*
@@ -59,6 +59,9 @@
 
 HB_FUNC( _DELIMC );
 HB_FUNC( DELIM_GETFUNCTABLE );
+
+#undef HB_PRG_PCODE_VER
+#define HB_PRG_PCODE_VER HB_PCODE_VER
 
 HB_INIT_SYMBOLS_BEGIN( delim1__InitSymbols )
 { "_DELIMC",            HB_FS_PUBLIC, HB_FUNCNAME( _DELIMC ), NULL },

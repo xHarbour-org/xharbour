@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.68 2002/01/08 22:49:26 dholm Exp $
+ * $Id: hbsetup.h,v 1.2 2002/01/12 10:04:27 ronpinkas Exp $
  */
 
 /*
@@ -52,6 +52,11 @@
 
 #ifndef HB_SETUP_H_
 #define HB_SETUP_H_
+
+#define HB_PCODE_VER 1
+
+// Don't change - this is the default for older compiled prgs.!!!
+#define HB_PRG_PCODE_VER 0
 
 #include <limits.h>
 
@@ -211,7 +216,7 @@
 
 
 /* ***********************************************************************
- *  Detect GCC/OS2 
+ *  Detect GCC/OS2
 */
 #if defined(__EMX__) && ! defined(__RSXNT__)
    #define HARBOUR_GCC_OS2

@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.12 2001/12/21 20:28:24 andijahja Exp $
+ * $Id: hbinit.h,v 1.2 2001/12/22 06:36:17 ronpinkas Exp $
  */
 
 /*
@@ -59,17 +59,17 @@
 extern "C" {
 #endif
 
-extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiSymbols ); /* statics symbols initialization */
+extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics symbols initialization */
 
 #if defined(HARBOUR_STRICT_ANSI_C)
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static HB_SYMB symbols[] = {
-   
+
    #define HB_INIT_SYMBOLS_END( func ) }; \
       void func( void ) \
       { \
-         hb_vmProcessSymbols( symbols, sizeof( symbols ) / sizeof( HB_SYMB ) ); \
+         hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __FILE__, (int) HB_PRG_PCODE_VER ); \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) func( void ) {
@@ -83,7 +83,7 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiSymbols )
    #define HB_INIT_SYMBOLS_END( func )  }; \
       static void __attribute__ ((constructor)) func( void ) \
       { \
-         hb_vmProcessSymbols( symbols, sizeof( symbols ) / sizeof( HB_SYMB ) ); \
+         hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __FILE__, (int) HB_PRG_PCODE_VER ); \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
@@ -99,7 +99,7 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiSymbols )
    #define HB_INIT_SYMBOLS_END( func )  }; \
       static void func( void ) \
       { \
-         hb_vmProcessSymbols( symbols, sizeof( symbols ) / sizeof( HB_SYMB ) ); \
+         hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __FILE__, (int) HB_PRG_PCODE_VER ); \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
@@ -115,7 +115,7 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiSymbols )
    #define HB_INIT_SYMBOLS_END( func ) }; \
       static int func( void ) \
       { \
-         hb_vmProcessSymbols( symbols, sizeof( symbols ) / sizeof( HB_SYMB ) ); \
+         hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __FILE__, (int) HB_PRG_PCODE_VER ); \
          return 1; \
       }; \
       static int static_int_##func = func();
@@ -136,7 +136,7 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiSymbols )
    #define HB_INIT_SYMBOLS_END( func ) }; \
       static int func( void ) \
       { \
-         hb_vmProcessSymbols( symbols, sizeof( symbols ) / sizeof( HB_SYMB ) ); \
+         hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __FILE__, (int) HB_PRG_PCODE_VER ); \
          return 1; \
       }
 
@@ -154,7 +154,7 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiSymbols )
    #define HB_INIT_SYMBOLS_END( func ) }; \
       static int func( void ) \
       { \
-         hb_vmProcessSymbols( symbols, sizeof( symbols ) / sizeof( HB_SYMB ) ); \
+         hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __FILE__, (int) HB_PRG_PCODE_VER ); \
          return 1; \
       }; \
       static int static_int_##func = func();

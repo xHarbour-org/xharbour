@@ -1,5 +1,5 @@
 /*
- * $Id: initsymb.c,v 1.41 2001/06/15 17:59:21 dholm Exp $
+ * $Id: initsymb.c,v 1.1.1.1 2001/12/21 10:40:57 ronpinkas Exp $
  */
 
 /*
@@ -190,6 +190,6 @@ void hb_vmSymbolInit_RT( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmSymbolInit_RT()"));
 
-   hb_vmProcessSymbols( symbols, sizeof( symbols ) / sizeof( HB_SYMB ) );
+   hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __FILE__, (int) HB_PCODE_VER );
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.69 2002/05/06 02:52:07 ronpinkas Exp $
+ * $Id: hvm.c,v 1.70 2002/05/09 07:25:33 ronpinkas Exp $
  */
 
 /*
@@ -72,6 +72,7 @@
 
 #include <math.h>
 #include <time.h>
+#include <ctype.h>
 
 #include "hbapi.h"
 #include "hbfast.h"
@@ -385,7 +386,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    }
    else
    {
-      hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
+      //hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
    }
 
    /* Call functions that initializes static variables
@@ -5407,12 +5408,56 @@ static void hb_vmPopStatic( USHORT uiStatic )
 
 /* ----------------------------------------------- */
 
-void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, USHORT uiModuleSymbols ) /* module symbols initialization */
+void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... ) /* module symbols initialization */
 {
    PSYMBOLS pNewSymbols;
    USHORT ui;
+   va_list ap;
+   USHORT uiModuleSymbols;
+   int iPCodeVer = 0, iLen;
+   char *sModule;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %hu)", pModuleSymbols, uiModuleSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pModuleSymbols, lModuleSymbols));
+
+   va_start( ap, pModuleSymbols );
+      uiModuleSymbols = va_arg( ap, USHORT );
+      sModule = va_arg( ap, char * );
+
+      if( sModule )
+      {
+         iLen = strlen( sModule );
+         if( iLen > 2 && sModule[ iLen - 2 ] == '.' && toupper( sModule[ iLen - 1 ] ) == 'C' )
+         {
+            iPCodeVer = va_arg( ap, int );
+         }
+         else
+         {
+            for( ui = 0; ui < uiModuleSymbols; ui++ )
+            {
+               if( pModuleSymbols[ui].pFunPtr )
+               {
+                  sprintf( sModule, "Owner of 1st fun: %s", pModuleSymbols[ui].szName );
+                  break;
+               }
+            }
+
+            if( ui == uiModuleSymbols )
+            {
+               sprintf( sModule, "Owner of 1st sym: %s", pModuleSymbols[0].szName );
+            }
+
+            iPCodeVer = 0;
+         }
+      }
+   va_end( ap );
+
+   if( iPCodeVer != HB_PCODE_VER )
+   {
+      char sTemp[256];
+
+      sprintf( sTemp, "HVM version %i is incompatible with '%s' PCODE version %i\n", HB_PCODE_VER, sModule, iPCodeVer );
+      hb_errInternal( HB_EI_ERRUNRECOV, sTemp, NULL, NULL );
+   }
 
    pNewSymbols = ( PSYMBOLS ) hb_xgrab( sizeof( SYMBOLS ) );
    pNewSymbols->pModuleSymbols = pModuleSymbols;
@@ -5428,8 +5473,9 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, USHORT uiModuleSymb
 
       pLastSymbols = s_pSymbols;
       while( pLastSymbols->pNext ) /* locates the latest processed group of symbols */
+      {
          pLastSymbols = pLastSymbols->pNext;
-
+      }
       pLastSymbols->pNext = pNewSymbols;
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.11 2002/04/22 23:09:58 ronpinkas Exp $
+ * $Id: genc.c,v 1.12 2002/05/09 07:25:33 ronpinkas Exp $
  */
 
 /*
@@ -142,6 +142,10 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
       /* writes the symbol table */
       /* Generate the wrapper that will initialize local symbol table
        */
+
+      fprintf( yyc, "\n\n#undef HB_PRG_PCODE_VER\n" );
+      fprintf( yyc, "#define HB_PRG_PCODE_VER %i\n", (int) HB_PCODE_VER );
+
       hb_strupr( pFileName->szName );
       fprintf( yyc, "\n\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_%s%s )\n", hb_comp_szPrefix, pFileName->szName );
 
