@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.58 2003/02/10 01:22:31 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.59 2003/03/25 02:36:11 ronpinkas Exp $
  */
 
 /*
@@ -379,6 +379,7 @@ extern double   HB_EXPORT hb_numRound( double dResult, int iDec ); /* round a nu
 
 /* class management */
 extern void     hb_clsReleaseAll( void );    /* releases all defined classes */
+extern BOOL     hb_clsIsParent( USHORT uiClass, char * szParentName ); /* is a class handle inherited from szParentName Class ? */
 extern PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunction );
 
 /* object management */

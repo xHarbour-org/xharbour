@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.51 2003/03/29 21:28:51 ronpinkas Exp $
+ * $Id: classes.c,v 1.52 2003/03/30 19:35:08 ronpinkas Exp $
  */
 
 /*
@@ -1482,6 +1482,7 @@ HB_FUNC( __CLSADDMSG )
          szAssign[1] = '\0';
          strcat( (char*) szAssign, szMessage );
          szMessage = (char *) szAssign;
+         bPersistent = FALSE;
          break;
 
       default:
