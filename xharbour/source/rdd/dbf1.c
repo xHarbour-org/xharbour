@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.31 2003/06/19 02:44:49 druzus Exp $
+ * $Id: dbf1.c,v 1.32 2003/06/26 01:29:15 ronpinkas Exp $
  */
 
 /*
@@ -582,6 +582,9 @@ static void hb_dbfGetMemo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       *pBuffer = '\0';
 
    hb_itemPutCPtr( pItem, ( char * ) pBuffer, ulSize );
+   #ifndef HB_CDP_SUPPORT_OFF
+   hb_cdpTranslate( pItem->item.asString.value, pArea->cdPage,s_cdpage );
+   #endif
    hb_itemSetCMemo( pItem );
 }
 
@@ -1245,7 +1248,13 @@ ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    if( pField->uiType == HB_IT_MEMO )
    {
       if( HB_IS_MEMO( pItem ) || HB_IS_STRING( pItem ) )
+#ifndef HB_CDP_SUPPORT_OFF
+         hb_cdpTranslate( pItem->item.asString.value, s_cdpage, pArea->cdPage );
+#endif
          uiError = hb_dbfPutMemo( pArea, uiIndex, pItem ) ? SUCCESS : EDBF_DATAWIDTH;
+#ifndef HB_CDP_SUPPORT_OFF
+         hb_cdpTranslate( pItem->item.asString.value, pArea->cdPage,s_cdpage );
+#endif
       else
          uiError = EDBF_DATATYPE;
    }
@@ -1918,6 +1927,7 @@ ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    {
       pField = ( LPDBFFIELD ) ( pBuffer + uiCount * sizeof( DBFFIELD ) );
       pFieldInfo.atomName = pField->bName;
+      pFieldInfo.atomName[10] = '\0';
       hb_strUpper( (char *) pFieldInfo.atomName, 11 );
       pFieldInfo.uiLen = pField->bLen;
       pFieldInfo.uiDec = 0;

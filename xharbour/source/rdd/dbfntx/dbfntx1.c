@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.49 2003/06/26 01:29:15 ronpinkas Exp $
+ * $Id: dbfntx1.c,v 1.50 2003/06/27 05:05:36 ronpinkas Exp $
  */
 
 /*
@@ -852,7 +852,7 @@ static BOOL hb_ntxTagGoToNextKey( LPTAGINFO pTag, BOOL lContinue )
    LPNTXITEM p;
 
    // pTag->blockNext = 0; pTag->keyNext = 0;
-   if( pTag->CurKeyInfo->Tag )
+   if( pTag->CurKeyInfo->Tag && ((ULONG)pTag->CurKeyInfo->Xtra) == pTag->Owner->Owner->ulRecNo )
    {
       pPage =  hb_ntxPageLoad( pTag,pTag->CurKeyInfo->Tag );
       pPage->CurKey =  hb_ntxPageFindCurrentKey( pPage,pTag->CurKeyInfo->Xtra );
@@ -952,7 +952,7 @@ static BOOL hb_ntxTagGoToPrevKey( LPTAGINFO pTag, BOOL lContinue )
    LPPAGEINFO pPage, pChildPage;
 
    // pTag->blockPrev = 0; pTag->keyPrev = 0;
-   if( pTag->CurKeyInfo->Tag )
+   if( pTag->CurKeyInfo->Tag && ((ULONG)pTag->CurKeyInfo->Xtra) == pTag->Owner->Owner->ulRecNo )
    {
       pPage =  hb_ntxPageLoad( pTag,pTag->CurKeyInfo->Tag );
       pPage->CurKey =  hb_ntxPageFindCurrentKey( pPage,pTag->CurKeyInfo->Xtra );
@@ -3443,7 +3443,7 @@ static ERRCODE ntxZap( NTXAREAP pArea )
       {
          hb_ntxPageFree( pTag,TRUE );
          pTag->RootBlock = pTag->TagBlock = NTXBLOCKSIZE;
-         pTag->keyCount = 0;
+         pTag->keyCount = pTag->Owner->NextAvail = 0;
          hb_ntxHeaderSave( pTag->Owner, FALSE );
 
          memset( buffer, 0, NTXBLOCKSIZE );
@@ -3738,6 +3738,8 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          }
          pTagNext->pNext = pTag;
       }
+      else
+         pArea->lpNtxTag = pTag;
    }
    else
       pArea->lpNtxTag = pTag;
