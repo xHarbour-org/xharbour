@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.69 2003/09/10 06:40:56 ronpinkas Exp $
+ * $Id: arrays.c,v 1.70 2003/09/10 07:21:23 ronpinkas Exp $
  */
 
 /*
@@ -1484,7 +1484,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) Cargo;
 
    #ifndef HB_ARRAY_USE_COUNTER
-      PHB_ARRAY_HOLDER pOwners = pBaseArray->pOwners, pFree;
+      PHB_ARRAY_HOLDER pOwners, pFree;
    #endif
 
    HB_TRACE( HB_TR_INFO, ( "hb_arrayReleaseGarbage( %p )", pBaseArray ) );
@@ -1551,6 +1551,8 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 
    // Has to be AFTER the array elements have been released!
    #ifndef HB_ARRAY_USE_COUNTER
+      pOwners = pBaseArray->pOwners;
+
       while( pOwners )
       {
          if( HB_IS_ARRAY( (PHB_ITEM) (pOwners->pOwner) ) )
