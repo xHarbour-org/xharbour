@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2003/06/17 00:54:33 druzus Exp $
+# $Id: Makefile,v 1.1 2003/06/27 23:48:54 lculik Exp $
 #
 
 ROOT = ../../
@@ -17,6 +17,7 @@ C_SOURCES = \
 
 CPP_SOURCES = \
 	stdafx.cpp \
+	ZipString.cpp \
 	ziparchive.cpp \
 	zipautobuffer.cpp \
 	zipcentraldir.cpp \
@@ -33,7 +34,7 @@ CPP_SOURCES = \
 	zipplatformcomm.cpp \
 	../../Linux/ZipPlatform.cpp \
 	zipstorage.cpp \
-	ZipString.cpp \
+
 
 
 PRG_SOURCES= \

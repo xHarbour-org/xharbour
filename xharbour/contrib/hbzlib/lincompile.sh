@@ -1,3 +1,3 @@
 #!/bin/sh
-cp Linux/zipfilemapping.h .
+cp Linux/ZipFileMapping.h zipfilemapping.h
 make
