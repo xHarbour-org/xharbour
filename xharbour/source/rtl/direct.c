@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.50 2004/06/12 13:23:09 druzus Exp $
+ * $Id: direct.c,v 1.51 2004/06/13 08:41:33 lf_sfnet Exp $
  */
 
 /*
@@ -152,7 +152,12 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
             /* Don't exit when array limit is reached */
             if ( bDirOnly )
             {
+               /* 30/07/04 - <maurilio.longo@libero.it>
+                             why do we issue a hb_fsIsDirectory() when hb_fsFindFirst() already returns
+                             such info for every entry?
                bAddEntry = hb_fsIsDirectory( ( BYTE * ) ffind->szName );
+               */
+               bAddEntry = ( ( ffind->attr & HB_FA_DIRECTORY ) == HB_FA_DIRECTORY );
             }
 
             if( bAddEntry )
@@ -409,7 +414,7 @@ HB_FUNC( DIRECTORYRECURSE )
    BOOL bAddDrive = TRUE;
 #endif
    char *szAttributes;
-   
+
    Dir.type = HB_IT_NIL;
 
    if( pDirSpec && pDirSpec->item.asString.length <= _POSIX_PATH_MAX )

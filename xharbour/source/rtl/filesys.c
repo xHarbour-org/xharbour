@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.114 2004/07/22 14:47:45 likewolf Exp $
+ * $Id: filesys.c,v 1.115 2004/07/23 10:35:29 likewolf Exp $
  */
 
 /*
@@ -2713,6 +2713,12 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
    fResult = GetCurrentDirectory( ulLen, ( char * ) pbyBuffer );
    hb_fsSetIOError( fResult, 0 );
    HB_DISABLE_ASYN_CANC
+
+#elif defined(HB_OS_OS2)
+
+   fResult = ( _getcwd1( (char *) pbyBuffer, uiDrive == 0 ?  0 : 'A' + uiDrive - 1 ) == 0 );
+   hb_fsSetIOError( fResult, 0 );
+
 #elif defined(HAVE_POSIX_IO)
 
    fResult = ( getcwd( ( char * ) pbyBuffer, ulLen ) != NULL );
@@ -3063,11 +3069,11 @@ USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulL
       if( strchr( OS_PATH_DELIMITER_LIST, pbyBuffer[ ulPthLen - 1 ] ) )
       {
          pbyBuffer[ ulPthLen  ] = '\0';
-	  }
+     }
       else
-	  {
+     {
          strcat( (char *) pbyBuffer, OS_PATH_DELIMITER_LIST);
-	  }
+     }
 
       return 0; // if it reaches here, it is right.
    }

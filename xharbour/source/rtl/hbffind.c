@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.24 2004/04/05 14:36:20 druzus Exp $
+ * $Id: hbffind.c,v 1.25 2004/04/06 01:50:55 druzus Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.24 2004/04/05 14:36:20 druzus Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.25 2004/04/06 01:50:55 druzus Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -483,29 +483,17 @@ static void hb_fsFindFill( PHB_FFIND ffind )
 #elif defined(HB_OS_OS2)
 
    {
-      struct stat sStat;
-      time_t ftime;
-      struct tm * ft;
-
-      stat( info->entry.achName, &sStat );
-
       strncpy( ffind->szName, info->entry.achName, _POSIX_PATH_MAX );
-      ffind->size = sStat.st_size;
-
+      ffind->size = info->entry.cbFile;
       raw_attr = info->entry.attrFile;
 
-      {
-         ftime = sStat.st_mtime;
-         ft = localtime( &ftime );
+      lYear  = info->entry.fdateLastWrite.year + 1980;
+      lMonth = info->entry.fdateLastWrite.month;
+      lDay   = info->entry.fdateLastWrite.day;
 
-         lYear  = ft->tm_year + 1900;
-         lMonth = ft->tm_mon + 1;
-         lDay   = ft->tm_mday;
-
-         lHour  = ft->tm_hour;
-         lMin   = ft->tm_min;
-         lSec   = ft->tm_sec;
-      }
+      lHour  = info->entry.ftimeLastWrite.hours;
+      lMin   = info->entry.ftimeLastWrite.minutes;
+      lSec   = info->entry.ftimeLastWrite.twosecs;
    }
 
 #elif defined(HB_OS_WIN_32)
@@ -656,9 +644,6 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
 
       ffind->info = ( void * ) hb_xgrab( sizeof( HB_FFIND_INFO ) );
       info = ( PHB_FFIND_INFO ) ffind->info;
-
-      tzset();
-
       info->hFindFile = HDIR_CREATE;
       info->findCount = 1;
 
@@ -669,7 +654,9 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
                              sizeof( info->entry ),
                              &info->findCount,
                              FIL_STANDARD ) == NO_ERROR && info->findCount > 0;
+
       hb_fsSetIOError( bFound, 0 );
+
    }
 #elif defined(HB_OS_WIN_32)
   {

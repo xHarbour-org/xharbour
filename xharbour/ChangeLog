@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3240 2004/07/30 09:55:35 likewolf Exp $
+ * $Id: ChangeLog,v 1.3241 2004/07/30 11:42:42 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-07-30 15:45 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/direct.c
+     * small optimization
+   * source/rtl/filesys.c
+   * source/rtl/hbffind.c
+     ! fixed OS/2 support for Directory(), still not working DirectoryRecurse()
 
 2004-07-30 08:40 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/listbox.prg
@@ -878,7 +886,7 @@
 2004-07-01 11:39 UTC-0800 Tony Bretado <jabrecer@yahoo.com>
   * contrib/libct/ctwin.prg
     * CTW_RestScreen(): Now returns Nil like in Clipper Documentation for restscreen()
-	// Sorry Ron, It's was my fault! I Remove the variable cRet
+   // Sorry Ron, It's was my fault! I Remove the variable cRet
 
 2004-07-01 10:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.nt
@@ -960,18 +968,18 @@
 2004-06-30 11:39 UTC-0800 Tony Bretado <jabrecer@yahoo.com>
   * contrib/libct/ctwin.prg
     * wOpen()
-	+ now handle shadows
+   + now handle shadows
     + ctw_memoedit()
     + CTW_SaveScreen()
     + CTW_RestScreen()
     * ctw_MAXCOL(lMode)
-	+ added parameter lMode for CA-TOOLS compatibility
+   + added parameter lMode for CA-TOOLS compatibility
     * ctw_MAXROW(lMode)
-	+ added parameter lMode for CA-TOOLS compatibility
+   + added parameter lMode for CA-TOOLS compatibility
     * METHOD MaxRow( lMode)
     * METHOD MaxCol( lMode)
     * METHOD Restore()
-	+ now handle shadows
+   + now handle shadows
     + METHOD SaveScreen()
     + METHOD RestScreen()
     + METHOD MemoEdit()
@@ -979,9 +987,9 @@
     + METHOD ColorShadow()   // shadow system
   * contrib/libct/include/ctwin.ch
     * MAXCOL(
-	- remove second parenthesis for CA-TOOLS compatibility
+   - remove second parenthesis for CA-TOOLS compatibility
     * MAXROW(
-	- remove second parenthesis for CA-TOOLS compatibility
+   - remove second parenthesis for CA-TOOLS compatibility
     + MEMOEDIT(
     + RESTSCREEN(
     + SAVESCREEN(
