@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.9 2004/02/03 02:05:40 andijahja Exp $
+ * $Id: ChangeLog,v 1.10 2004/02/03 08:43:17 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-04 05:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+   * contrib/unicode/hbencode.c
+     ! missing new line at end of multi-part encoded files
+
+   * contrib/unicode/hbdecode.prg
+     + Decoding functions now support multi-part decoded files
+
+   * tests/xhbenc.prg
+    + test program for file decoding
+
 2004-02-03 15:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
    + contrib/unicode/hbdecode.prg
      + added the following file decoding functions:

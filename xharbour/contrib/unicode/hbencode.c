@@ -1,5 +1,5 @@
 /*
- * $Id: hbencode.c,v 1.3 2004/02/02 21:21:21 andijahja Exp $
+ * $Id: hbencode.c,v 1.4 2004/02/03 02:05:40 andijahja Exp $
  */
 
 /*
@@ -618,7 +618,7 @@ static int uuencode_file ( BYTE *strIn, BYTE *strOut )
       fprintf (fpOutFile, "\n");
    }
 
-   fprintf (fpOutFile, "end");
+   fprintf (fpOutFile, "end\n");
    fclose (fpin);
    fclose (fpOutFile);
 
@@ -677,6 +677,7 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
 
      if ( ++nlinedone >= (nlines-1) )
      {
+        fprintf (fpOutFile, "\n");
         fclose( fpOutFile );
         nlinedone = -1;
         filenumber ++;
@@ -702,7 +703,7 @@ static int uuencode_file_by_chunk ( BYTE *strIn, BYTE *sMask, ULONG nlines )
 
    if ( fpOutFile )
    {
-      fprintf (fpOutFile, "end");
+      fprintf (fpOutFile, "end\n");
       fclose (fpOutFile);
    }
 

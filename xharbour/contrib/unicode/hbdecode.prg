@@ -1,5 +1,5 @@
 /*
- * $Id: hbdecode.prg,v 1.1 2004/02/03 08:40:55 andijahja Exp $
+ * $Id: hbdecode.prg,v 1.2 2004/02/03 10:07:41 andijahja Exp $
  */
 
 /*
@@ -60,7 +60,9 @@ UUDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
    Description:
       UUDecode a given file
    Parameters:
-      cFileInput = source filename to be decoded
+      cFileInput = string, source filename to be decoded
+                   OR
+                   array, an array of file chunks arranged in proper order
       cFileOutput = output filename
    Returns:
       Upon succesful decoding the function returns numnber of bytes written
@@ -69,7 +71,9 @@ B64DECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
    Description:
       Decode a Base64 encoded file
    Parameters:
-      cFileInput = source filename to be decoded
+      cFileInput = string, source filename to be decoded
+                   OR
+                   array, an array of file chunks arranged in proper order
       cFileOutput = output filename
    Returns:
       Upon succesful decoding the function returns numnber of bytes written
@@ -78,7 +82,9 @@ YYDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
    Description:
       YYDecode a given
    Parameters:
-      cFileInput = source filename to be decoded
+      cFileInput = string, source filename to be decoded
+                   OR
+                   array, an array of file chunks arranged in proper order
       cFileOutput = output filename
    Returns:
       Upon succesful decoding the function returns numnber of bytes written
@@ -90,6 +96,7 @@ YYDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
    A. Trick for decoding multi-chunk encoded file:
       1. Create a new file from the file chunks which represent a merge
          of all chunks. They are pure text file so there should be no problem.
+         (See static function joinfile for processing)
          a. UUENCODED file: No specialities
          b. B64ENCODED file: No specialities
          c. YYENCODED file:
@@ -100,10 +107,10 @@ YYDECODE_FILE( <cFileInput>, [<cFileOutput>] ) -> int
             =yend etc. etc.
       2. Decode that new file
 
-   B. These decoding function functions use TFileRead Class from libmisc.
+   B. These decoding functions use TFileRead Class from libmisc.
       So libmisc.lib must be linked upon usage.
 
-   C. These decoding functions is intended to only decode files that were
+   C. These decoding functions are intended to only decode files that were
       previously encoded using encoding functions of this library.
 */
 
@@ -118,8 +125,29 @@ FUNCTION UUDECODE_FILE( cEncodedFile, cOutFile )
    LOCAL cEncoded
    LOCAL lStart := .F.
    LOCAL nAt
+   LOCAL cItem
+   LOCAL lIsArray := .F.
 
-   IF !File( cEncodedFile )
+   IF ValType( cEncodedFile ) == "C"
+      IF !File( cEncodedFile )
+         RETURN 0
+      ENDIF
+   ELSEIF ValType( cEncodedFile ) == "A"
+      /* file chunks are passed in a one dimension array.
+         the array should be arranged in such a way so that elements are in
+         proper order. ie. element 1 is the first chunk, element 2 the second
+         etc.
+      */
+      FOR EACH cItem IN cEncodedFile
+         IF !File( cItem )
+            RETURN 0
+         ENDIF
+      NEXT
+      IF empty( cEncodedFile := JoinSection( cEncodedFile, 1 ) )
+         RETURN 0
+      ENDIF
+      lIsArray := .T.
+   ELSE
       RETURN 0
    ENDIF
 
@@ -161,6 +189,11 @@ FUNCTION UUDECODE_FILE( cEncodedFile, cOutFile )
 
    ENDIF
 
+   /* delete temporary joint file */
+   IF lIsArray .AND. File( cEncodedFile )
+      FErase( cEncodedFile )
+   ENDIF
+
    RETURN nBytesWritten
 
 //----------------------------------------------------------------------------//
@@ -174,8 +207,29 @@ FUNCTION B64DECODE_FILE( cEncodedFile, cOutFile )
    LOCAL cEncoded
    LOCAL lStart := .F.
    LOCAL nAt
+   LOCAL cItem
+   LOCAL lIsArray := .F.
 
-   IF !File( cEncodedFile )
+   IF ValType( cEncodedFile ) == "C"
+      IF !File( cEncodedFile )
+         RETURN 0
+      ENDIF
+   ELSEIF ValType( cEncodedFile ) == "A"
+      /* file chunks are passed in a one dimension array.
+         the array should be arranged in such a way so that elements are in
+         proper order. ie. element 1 is the first chunk, element 2 the second
+         etc.
+      */
+      FOR EACH cItem IN cEncodedFile
+         IF !File( cItem )
+            RETURN 0
+         ENDIF
+      NEXT
+      IF empty( cEncodedFile := JoinSection( cEncodedFile, 2 ) )
+         RETURN 0
+      ENDIF
+      lIsArray := .T.
+   ELSE
       RETURN 0
    ENDIF
 
@@ -216,6 +270,11 @@ FUNCTION B64DECODE_FILE( cEncodedFile, cOutFile )
 
    ENDIF
 
+   /* delete temporary joint file */
+   IF lIsArray .AND. File( cEncodedFile )
+      FErase( cEncodedFile )
+   ENDIF
+
    RETURN nBytesWritten
 
 //----------------------------------------------------------------------------//
@@ -229,8 +288,29 @@ FUNCTION YYDECODE_FILE( cEncodedFile, cOutFile )
    LOCAL cEncoded
    LOCAL lStart := .F.
    LOCAL nAt
+   LOCAL cItem
+   LOCAL lIsArray := .F.
 
-   IF !File( cEncodedFile )
+   IF ValType( cEncodedFile ) == "C"
+      IF !File( cEncodedFile )
+         RETURN 0
+      ENDIF
+   ELSEIF ValType( cEncodedFile ) == "A"
+      /* file chunks are passed in a one dimension array.
+         the array should be arranged in such a way so that elements are in
+         proper order. ie. element 1 is the first chunk, element 2 the second
+         etc.
+      */
+      FOR EACH cItem IN cEncodedFile
+         IF !File( cItem )
+            RETURN 0
+         ENDIF
+      NEXT
+      IF empty( cEncodedFile := JoinSection( cEncodedFile, 3 ) )
+         RETURN 0
+      ENDIF
+      lIsArray := .T.
+   ELSE
       RETURN 0
    ENDIF
 
@@ -258,7 +338,7 @@ FUNCTION YYDECODE_FILE( cEncodedFile, cOutFile )
             ENDIF
          ENDIF
 
-         IF ! ( "=YEND" IN Upper( cEncoded ) )
+         IF ! ( "=YEND" IN Upper( cEncoded ) ) .AND. ! ( "=YPART" IN Upper( cEncoded ) )
             cDecoded      := HB_YYDECODE( cEncoded )
             nBytesWritten += FWrite( hOut, cDecoded )
          ENDIF
@@ -273,4 +353,77 @@ FUNCTION YYDECODE_FILE( cEncodedFile, cOutFile )
 
    ENDIF
 
+   /* delete temporary joint file */
+   IF lIsArray .AND. File( cEncodedFile )
+      FErase( cEncodedFile )
+   ENDIF
+
    RETURN nBytesWritten
+
+//----------------------------------------------------------------------------//
+STATIC FUNCTION JoinSection( aFile, nEncoding )
+
+   LOCAL cTempFile := "_" + strtran(ltrim(str(seconds())),".") + ".enc"
+   LOCAL hTemp := FCreate( cTempFile )
+   LOCAL nFile, nTotalFile := LEN( aFile )
+   LOCAL cContent, oFile, nLine := 0
+
+   IF hTemp < 0
+      cTempFile := ""
+      RETURN ""
+   ENDIF
+
+   SWITCH ( nEncoding )
+
+   CASE 1 // UUEncoded
+   CASE 2 // Base64
+      FOR nFile := 1 TO LEN( aFile )
+         oFile := TFileRead():New( aFile[ nFile ] )
+         oFile:Open()
+         IF ! oFile:Error()
+            WHILE oFile:MoreToRead()
+               cContent := oFile:ReadLine()
+               FWrite( hTemp, cContent + CHR(10) )
+            ENDDO
+            oFile:Close()
+         ELSE
+            cTempFile := ""
+            FClose( hTemp )
+            EXIT
+         ENDIF
+      NEXT
+      FClose( hTemp )
+      EXIT
+   CASE 3 // YYEncoded
+      FOR nFile := 1 TO LEN( aFile )
+         oFile := TFileRead():New( aFile[ nFile ] )
+         oFile:Open()
+         IF ! oFile:Error()
+            WHILE oFile:MoreToRead()
+               cContent := oFile:ReadLine()
+               IF nFile == 1
+                  IF ! ( "=YEND" IN Upper( cContent ) )
+                     FWrite( hTemp, cContent + CHR(10) )
+                  ENDIF
+               ELSEIF nFile < nTotalFile
+                  IF ! ( "=YEND" IN Upper( cContent ) ) .AND. ! ( "=YBEGIN" IN Upper( cContent ) )
+                     FWrite( hTemp, cContent + CHR(10) )
+                  ENDIF
+               ELSE
+                  IF ! ( "=YPART" IN Upper( cContent ) ) .AND. ! ( "=YBEGIN" IN Upper( cContent ) )
+                     FWrite( hTemp, cContent + CHR(10) )
+                  ENDIF
+               ENDIF
+            ENDDO
+            oFile:Close()
+         ELSE
+            cTempFile := ""
+            FClose( hTemp )
+            EXIT
+         ENDIF
+      NEXT
+      FClose( hTemp )
+      EXIT
+   END
+
+   RETURN cTempFile
