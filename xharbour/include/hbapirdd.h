@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.3 2002/05/21 16:41:13 horacioroldan Exp $
+ * $Id: hbapirdd.h,v 1.4 2002/08/07 20:58:22 horacioroldan Exp $
  */
 
 /*
@@ -62,7 +62,7 @@ extern "C" {
 
 #define HARBOUR_MAX_RDD_DRIVERNAME_LENGTH       32
 #define HARBOUR_MAX_RDD_ALIAS_LENGTH            32
-#define HARBOUR_MAX_RDD_FIELDNAME_LENGTH        32
+/* #define HARBOUR_MAX_RDD_FIELDNAME_LENGTH        32 */
 
 
 
@@ -625,6 +625,7 @@ typedef struct _AREA
    USHORT heap;
    USHORT heapSize;
    USHORT rddID;
+   USHORT uiMaxFieldNameLength;
 } AREA;
 
 typedef AREA * LPAREA;

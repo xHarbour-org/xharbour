@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.6 2001/06/18 18:04:05 dholm Exp $
+ * $Id: hbrdddbf.h,v 1.7 2002/09/28 04:56:26 horacioroldan Exp $
  */
 
 /*
@@ -124,6 +124,7 @@ typedef struct _DBFAREA
    USHORT   heap;
    USHORT   heapSize;
    USHORT   rddID;
+   USHORT uiMaxFieldNameLength;
 
    /*
    *  DBFS's additions to the workarea structure

@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.1 2002/07/11 02:57:52 lculik Exp $
+ * $Id: adsmgmnt.c,v 1.9 2002/05/15 15:25:56 alkresin Exp $
  */
 
 /*
@@ -116,7 +116,7 @@ HB_FUNC( ADSMGGETACTIVITYINFO )
    UNSIGNED32  ulRetVal;
    UNSIGNED16  usStructSize;
    ADS_MGMT_ACTIVITY_INFO  stActivityInfo;
-   int iOption = hb_parni( 1 );
+   unsigned int iOption = hb_parni( 1 );
 
    usStructSize = sizeof( ADS_MGMT_ACTIVITY_INFO );
    ulRetVal = AdsMgGetActivityInfo( hMgmtHandle, &stActivityInfo, &usStructSize );
@@ -306,7 +306,7 @@ HB_FUNC( ADSMGGETCONFIGINFO )
    {
       if ( iOption == 0 )
       {
-         hb_reta( 26 );
+         hb_reta( 25 );
          hb_stornl( stConfigValues.ulNumConnections       , -1, 1 );  /* number connections            */
          hb_stornl( stConfigValues.ulNumWorkAreas         , -1, 2 );  /* number work areas             */
          hb_stornl( stConfigValues.ulNumTables            , -1, 3 );  /* number tables                 */
@@ -332,7 +332,7 @@ HB_FUNC( ADSMGGETCONFIGINFO )
          hb_storni( stConfigValues.ucReserved4            , -1, 23);  /* reserved                      */
          hb_stornl( stConfigValues.usSendIPPort           , -1, 24);  /* NT Service IP send port #     */
          hb_stornl( stConfigValues.usReceiveIPPort        , -1, 25);  /* NT Service IP rcv port #      */
-         hb_stornl( stConfigValues.ucUseIPProtocol            , -1, 26);  /* reserved                      */
+         /* hb_stornl( stConfigValues.usReserved5            , -1, 26);   reserved                     */
 
       }else
       if ( iOption == 1 )
@@ -364,7 +364,7 @@ HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
 
    UNSIGNED32  ulRetVal ;
    UNSIGNED16  ulMaxUsers = 100 ;        /* needed for array memory allocation; caller can set with 2nd arg */
-   UNSIGNED32  ulCount;
+   UNSIGNED16  ulCount;
    UNSIGNED16  usStructSize = sizeof( ADS_MGMT_USER_INFO );
    ADS_MGMT_USER_INFO*  pastUserInfo;
 /*

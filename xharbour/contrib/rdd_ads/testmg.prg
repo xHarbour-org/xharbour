@@ -1,5 +1,5 @@
 /*
- * $Id: testmg.prg,v 1.4 2001/04/13 05:52:38 brianhays Exp $
+ * $Id: testmg.prg,v 1.5 2002/04/02 14:55:54 alkresin Exp $
  */
 
 /*
@@ -169,7 +169,7 @@ function Main()
    ?
 
    aRay := AdsMgGetConfigInfo(0)
-   IF len(aRay) > 25
+   IF len(aRay) > 24
       ? aRay[1] , " number connections            "
       ? aRay[2] , " number work areas             "
       ? aRay[3] , " number tables                 "
@@ -195,7 +195,7 @@ function Main()
       ? aRay[23], " reserved                      "
       ? aRay[24], " NT Service IP send port #     "
       ? aRay[25], " NT Service IP rcv port #      "
-      ? aRay[26], " reserved                      "
+      // ? aRay[26], " reserved                      "
    ENDIF
 
    wait

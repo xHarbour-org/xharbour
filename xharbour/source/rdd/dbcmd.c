@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.199 2002/06/14 16:24:18 alkresin Exp $
+ * $Id: dbcmd.c,v 1.205 2002/10/04 10:41:14 alkresin Exp $
  */
 
 /*
@@ -2081,7 +2081,8 @@ HB_FUNC( FIELDNAME )
       if( SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields ) == SUCCESS &&
           uiIndex > 0 && uiIndex <= uiFields )
       {
-         szName = ( char * ) hb_xgrab( HARBOUR_MAX_RDD_FIELDNAME_LENGTH + 1 );
+         /* szName = ( char * ) hb_xgrab( HARBOUR_MAX_RDD_FIELDNAME_LENGTH + 1 ); */
+         szName = ( char * ) hb_xgrab( ( ( AREAP ) s_pCurrArea->pArea)->uiMaxFieldNameLength + 1 );
          SELF_FIELDNAME( ( AREAP ) s_pCurrArea->pArea, hb_parni( 1 ), szName );
          hb_retc( szName );
          hb_xfree( szName );
@@ -2094,12 +2095,20 @@ HB_FUNC( FIELDNAME )
 
 HB_FUNC( FIELDPOS )
 {
-   char szName[ HARBOUR_MAX_RDD_FIELDNAME_LENGTH ];
+   /* char szName[ HARBOUR_MAX_RDD_FIELDNAME_LENGTH ]; */
+   char * szName;
 
    if( s_pCurrArea )
    {
-      hb_strncpyUpperTrim( szName, hb_parc( 1 ), hb_parclen( 1 ) );
-      hb_retni( hb_rddFieldIndex( ( AREAP ) s_pCurrArea->pArea, szName ) );
+      if ( hb_parc( 1 ) && ( (int) hb_parclen( 1 ) <= (int) ( ( AREAP ) s_pCurrArea->pArea)->uiMaxFieldNameLength ) )
+      {
+         szName = ( char * ) hb_xgrab( ( ( AREAP ) s_pCurrArea->pArea)->uiMaxFieldNameLength + 1 );
+         hb_strncpyUpperTrim( szName, hb_parc( 1 ), hb_parclen( 1 ) );
+         hb_retni( hb_rddFieldIndex( ( AREAP ) s_pCurrArea->pArea, szName ) );
+         hb_xfree( szName );
+      }
+      else
+         hb_retni( 0 );
    }
    else
       hb_retni( 0 );
@@ -3468,7 +3477,11 @@ static BOOL IsFieldIn( char * fieldName, PHB_ITEM pFields )
   for ( i=0; i<uiFields; i++ )
   {
     PHB_ITEM pField = pFields->item.asArray.value->pItems + i;
-    ptr = (char *)pField->item.asString.value;
+    ptr = strrchr( (char *)pField->item.asString.value,'>' );
+    if( ptr && ptr > (char *)pField->item.asString.value && *(ptr-1)=='-' )
+       ptr ++;
+    else
+       ptr = (char *)pField->item.asString.value;
     lresult = TRUE;
     for( j=0;*ptr;j++,ptr++ )
         if( *(fieldName+j) != toupper(*ptr) )

@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.9 2001/06/06 18:49:36 dholm Exp $
+ * $Id: rddads.h,v 1.10 2002/09/28 05:01:20 horacioroldan Exp $
  */
 
 /*
@@ -84,6 +84,7 @@ typedef struct _ADSAREA_
    USHORT heap;
    USHORT heapSize;
    USHORT rddID;
+   USHORT uiMaxFieldNameLength;
 
    /*
    *  ADS's additions to the workarea structure

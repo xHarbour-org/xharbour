@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.26 2002/09/20 08:28:56 alkresin Exp $
+ * $Id: hbrddntx.h,v 1.27 2002/09/28 04:56:26 horacioroldan Exp $
  */
 
 /*
@@ -260,7 +260,7 @@ typedef struct _NTXAREA
    USHORT heap;
    USHORT heapSize;
    USHORT rddID;
-
+   USHORT uiMaxFieldNameLength;
    /*
    *  DBFS's additions to the workarea structure
    *

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.15 2002/06/08 19:15:36 horacioroldan Exp $
+ * $Id: hbrddcdx.h,v 1.17 2002/09/28 04:56:26 horacioroldan Exp $
  */
 
 /*
@@ -318,6 +318,7 @@ typedef struct _CDXAREA
    USHORT heap;
    USHORT heapSize;
    USHORT rddID;
+   USHORT uiMaxFieldNameLength;
 
    /*
    *  DBFS's additions to the workarea structure
