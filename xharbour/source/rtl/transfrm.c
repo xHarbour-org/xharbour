@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.22 2003/07/06 17:25:30 lculik Exp $
+ * $Id: transfrm.c,v 1.23 2003/07/18 03:17:53 andijahja Exp $
  */
 
 /*
@@ -141,6 +141,7 @@ HB_FUNC( TRANSFORM )
             switch( toupper( *szPic ) )
             {
                case HB_CHAR_HT:
+               case '9':
                case ' ':
                   bDone = TRUE;      /* End of function string */
                   break;
@@ -477,7 +478,6 @@ HB_FUNC( TRANSFORM )
       {
          double   dPush;
 
-
          int      iOrigWidth;
          int      iOrigDec;
          int      iWidth;                             /* Width of string          */
@@ -496,6 +496,7 @@ HB_FUNC( TRANSFORM )
          BOOL     bFound = FALSE;
          BOOL     bInit  = FALSE;
          BOOL     bPDec  = FALSE;
+
          dValue = hb_itemGetND( pValue );
          hb_itemGetNLen( pValue, &iOrigWidth, &iOrigDec );
 
@@ -586,6 +587,7 @@ HB_FUNC( TRANSFORM )
 
                   if( !bInit && ( cPic == '9' || cPic == '#' || cPic == '$' || cPic == '*' ) )
                      bInit = TRUE;
+
                   if( cPic == '9' || cPic == '#' )
                   {
                      if( iCount < iWidth )
@@ -640,6 +642,12 @@ HB_FUNC( TRANSFORM )
                            szResult[ i ] = '*';
                         else
                            szResult[ i ] = ' ';
+
+                        if ( i && szResult[ i - 1 ] == '-' )
+                        {
+                            szResult[ i -1 ] = ' ';
+                            szResult[ i ] = '-';
+                        }
                      }
                   }
                   else
