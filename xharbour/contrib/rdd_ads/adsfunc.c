@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.1 2002/07/11 02:57:52 lculik Exp $
+ * $Id: adsfunc.c,v 1.2 2002/09/07 03:57:57 lculik Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ HB_FUNC( ADSSETDATEFORMAT  )
 
    if( ISCHAR( 1 ))
    {
-      AdsSetDateFormat ( (UCHAR*) hb_parc(1) );
+      AdsSetDateFormat ( (UNSIGNED8*) hb_parc(1) );
    }
 }
 
@@ -274,7 +274,7 @@ HB_FUNC( ADSBLOB2FILE )
    }
 
    pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
-   ulRetVal = AdsBinaryToFile(  pArea->hTable, (UCHAR*)szFieldName, (UCHAR*)szFileName);
+   ulRetVal = AdsBinaryToFile(  pArea->hTable, (UNSIGNED8*)szFieldName, (UNSIGNED8*)szFileName);
    if ( ulRetVal == AE_SUCCESS )
      hb_retl( 1 );
    else
@@ -302,7 +302,7 @@ HB_FUNC( ADSFILE2BLOB )
       usBinaryType = ADS_BINARY;
 
    pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
-   ulRetVal = AdsFileToBinary(  pArea->hTable, (UCHAR*)szFieldName, usBinaryType, (UCHAR*)szFileName);
+   ulRetVal = AdsFileToBinary(  pArea->hTable, (UNSIGNED8*)szFieldName, usBinaryType, (UNSIGNED8*)szFileName);
    if ( ulRetVal == AE_SUCCESS )
      hb_retl( 1 );
    else
@@ -329,7 +329,7 @@ HB_FUNC( ADSKEYNO )
          }
          else
          {
-            ordName = (UCHAR*)hb_parc( 1 );
+            ordName = (UNSIGNED8*)hb_parc( 1 );
             AdsGetIndexHandle( pArea->hTable, ordName, &hIndex );
          }
          AdsGetKeyNum  ( hIndex, ADS_IGNOREFILTERS, &pulKey);
@@ -372,7 +372,7 @@ HB_FUNC( ADSKEYCOUNT )
       }
       else if(ISCHAR( 1 ))
       {
-         ordName = (UCHAR*)hb_parc( 1 );
+         ordName = (UNSIGNED8*)hb_parc( 1 );
          AdsGetIndexHandle( pArea->hTable, ordName, &hIndex );
       }
       else if(! ISNIL( 1 ))
@@ -446,7 +446,7 @@ HB_FUNC( ADSADDCUSTOMKEY )
          }
          else
          {
-            ordName = (UCHAR*)hb_parc( 1 );
+            ordName = (UNSIGNED8*)hb_parc( 1 );
             AdsGetIndexHandle( pArea->hTable, ordName, &hIndex );
          }
          hb_retnl( (LONG) AdsAddCustomKey( hIndex ) );
@@ -485,7 +485,7 @@ HB_FUNC( ADSDELETECUSTOMKEY )
          }
          else
          {
-            ordName = (UCHAR*)hb_parc( 1 );
+            ordName = (UNSIGNED8*)hb_parc( 1 );
             AdsGetIndexHandle( pArea->hTable, ordName, &hIndex );
          }
          hb_retnl( (LONG) AdsDeleteCustomKey( hIndex ) );

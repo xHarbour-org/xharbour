@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.401 2002/09/25 18:45:44 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.402 2002/09/25 22:24:32 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-09-26 13:00 UTC -0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * contrib/rdd_ads/ace.h
+    * removed typedef for UCHAR and UNIT
+  * contrib/rdd_ads/adsfunc1.c
+    contrib/rdd_ads/adsmgmnt.c
+    * changed UCHAR to UNSIGNED8 , UINT to int 
+    
 2002-09-25 15:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/pp.prg
     * Added logic to set/restore action for key Up/Down in DOT mode.

@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.7 2001/11/17 02:20:14 andijahja Exp $
+ * $Id: adsmgmnt.c,v 1.1 2002/07/11 02:57:52 lculik Exp $
  */
 
 /*
@@ -116,7 +116,7 @@ HB_FUNC( ADSMGGETACTIVITYINFO )
    UNSIGNED32  ulRetVal;
    UNSIGNED16  usStructSize;
    ADS_MGMT_ACTIVITY_INFO  stActivityInfo;
-   UINT iOption = hb_parni( 1 );
+   int iOption = hb_parni( 1 );
 
    usStructSize = sizeof( ADS_MGMT_ACTIVITY_INFO );
    ulRetVal = AdsMgGetActivityInfo( hMgmtHandle, &stActivityInfo, &usStructSize );
