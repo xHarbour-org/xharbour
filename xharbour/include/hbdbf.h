@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbf.h,v 1.2 2002/01/26 21:13:58 ronpinkas Exp $
+ * $Id: hbdbf.h,v 1.3 2003/05/31 22:26:54 lculik Exp $
  */
 
 /*
@@ -79,7 +79,7 @@ typedef struct _DBFHEADER
    BYTE   bReserved1[ 16 ];
    BYTE   bHasTags;
    BYTE   bCodePage;
-   BYTE   bReserved2[ 3 ];
+   BYTE   bReserved2[ 2 ];
 } DBFHEADER;
 
 typedef DBFHEADER * LPDBFHEADER;
