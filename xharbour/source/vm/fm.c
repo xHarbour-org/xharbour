@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.31 2003/05/16 19:52:12 druzus Exp $
+ * $Id: fm.c,v 1.32 2003/05/16 22:03:50 ronpinkas Exp $
  */
 
 /*
@@ -139,16 +139,12 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
 
 #ifdef HB_FM_STATISTICS
 
-#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_LOCK( hb_allocMutex );
-#endif
    pMem = malloc( ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
 
    if( ! pMem )
    {
-#ifndef HB_SAFE_ALLOC
       HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
       return NULL;
    }
 
@@ -222,9 +218,7 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
 
    HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xalloc(%lu) returning: %p", ulSize, (char *) pMem + sizeof( HB_MEMINFO ) ) );
 
-#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
 
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
@@ -260,17 +254,12 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 
 #ifdef HB_FM_STATISTICS
 
-#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_LOCK( hb_allocMutex );
-#endif
-
    pMem = malloc( ulSize + sizeof( HB_MEMINFO ) + sizeof( ULONG ) );
 
    if( ! pMem )
    {
-#ifndef HB_SAFE_ALLOC
       HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
 
       hb_errInternal( HB_EI_XGRABALLOC, NULL, NULL, NULL );
    }
@@ -345,9 +334,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 
    HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xgrab(%lu) returning: %p", ulSize, (char *) pMem + sizeof( HB_MEMINFO ) ) );
 
-#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
 
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
@@ -382,25 +369,18 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 
    HB_TRACE_STEALTH(HB_TR_INFO, ("hb_xrealloc(%p, %lu)", pMem, ulSize));
 
-#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_LOCK( hb_allocMutex );
-#endif
-
    s_lReAllocations++;
 
    if( ! pMem )
    {
-#ifndef HB_SAFE_ALLOC
       HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
       hb_errInternal( HB_EI_XREALLOCNULL, NULL, NULL, NULL );
    }
 
    if( ulSize == 0 )
    {
-#ifndef HB_SAFE_ALLOC
       HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
       hb_errInternal( HB_EI_XREALLOCNULLSIZE, NULL, NULL, NULL );
    }
 
@@ -408,9 +388,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 
    if( pMemBlock->ulSignature != HB_MEMINFO_SIGNATURE )
    {
-#ifndef HB_SAFE_ALLOC
       HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
       hb_errInternal( HB_EI_XREALLOCINV, NULL, NULL, NULL );
    }
 
@@ -420,9 +398,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 
    if( *pSig != HB_MEMINFO_SIGNATURE )
    {
-#ifndef HB_SAFE_ALLOC
       HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
       hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xrealloc()", NULL, NULL );
    }
 
@@ -437,11 +413,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 
    if( ! pMem )
    {
-/*
-#ifndef HB_SAFE_ALLOC
       HB_CRITICAL_UNLOCK( hb_allocMutex );
-#ifndef HB_SAFE_ALLOC
-*/
       hb_errInternal( HB_EI_XREALLOC, NULL, NULL, NULL );
    }
 
@@ -471,9 +443,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
       s_pLastBlock = ( PHB_MEMINFO ) pMem;
    }
 
-#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
 
    return ( char * ) pMem + sizeof( HB_MEMINFO );
 
@@ -519,10 +489,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 
    HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xfree(%p)", pMem ) );
 
-#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_LOCK( hb_allocMutex );
-#endif
-
    s_lFreed++;
 
    if( pMem )
@@ -534,9 +501,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       {
          //printf( "hb_xfree() Invalid Pointer %p %s", (char *) pMem, (char *) pMem );
 
-#ifndef HB_SAFE_ALLOC
          HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
          hb_errInternal( HB_EI_XFREEINV, "hb_xfree() Invalid Pointer %p %s", (char *) pMem, (char *) pMem );
       }
 
@@ -544,9 +509,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 
       if( *pSig != HB_MEMINFO_SIGNATURE )
       {
-#ifndef HB_SAFE_ALLOC
          HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
          hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xfree(%p) Pointer Overflow '%s'", (char *) pMem, (char *) pMem );
       }
 
@@ -573,17 +536,13 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 
       free( ( void * ) pMemBlock );
 
-#ifndef HB_SAFE_ALLOC
       HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
    }
    else
    {
       HB_TRACE_STEALTH(HB_TR_INFO, ("hb_xfree(NULL)!"));
 
-#ifndef HB_SAFE_ALLOC
       HB_CRITICAL_UNLOCK( hb_allocMutex );
-#endif
 
       hb_errInternal( HB_EI_XFREENULL, "hb_xfree(NULL)", NULL, NULL );
    }

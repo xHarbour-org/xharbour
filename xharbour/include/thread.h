@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.45 2003/05/16 19:52:06 druzus Exp $
+* $Id: thread.h,v 1.46 2003/05/24 00:29:09 ronpinkas Exp $
 */
 
 /*
@@ -66,6 +66,7 @@
 /* We should assert that cleanup functions must be in limited number */
 typedef void (*HB_CLEANUP_FUNC)(void *);
 #define HB_MAX_CLEANUPS  12
+#define HB_THREAD_MAX_UNIQUE_ID  32000
 
 /* Maximun number of cycles that can be completed by VM without stack unlock */
 #define HB_VM_UNLOCK_PERIOD 20
@@ -276,6 +277,9 @@ extern "C" {
 * Enanched stack for multithreading
 */
 
+/* Forward declarations for stack */
+struct HB_ERROR_INFO_;
+
 typedef struct tag_HB_STACK
 {
    PHB_ITEM * pItems;       /* pointer to the stack items */
@@ -291,6 +295,8 @@ typedef struct tag_HB_STACK
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
 
+   UINT th_vm_id;
+
    HB_THREAD_T th_id;
    /* Is this thread going to run a method? */
    BOOL bIsMethod;
@@ -298,13 +304,25 @@ typedef struct tag_HB_STACK
    UINT uiParams;
    /* Flag to signal that the context is in use */
    BOOL bInUse; // this must be used with the guard of a global resource
+
+   /* MT error handler, one for thread! */
+   struct HB_ERROR_INFO_ *errorHandler;
+   /* Codeblock for error handling */
+   PHB_ITEM errorBlock;
+   int     iLaunchCount;
+   USHORT  uiErrorDOS; /* The value of DOSERROR() */
+
+   /* List of error handlers for TRY/CATCH blocks */
+   PHB_ITEM aTryCatchHandlerStack;
+
    struct tag_HB_STACK *next;
 
 #ifdef HB_OS_WIN_32
    HANDLE th_h;
    BOOL bCanceled; // set when there is a cancel request and bInUse is true
    BOOL bCanCancel;
-   /*
+   /* Windows cleanup functions are working, but currently uneeded;
+   So the are left here in [LEFTOVER] status
    HB_CLEANUP_FUNC *pCleanUp;
    void **pCleanUpParam;
    int iCleanCount;*/
@@ -484,14 +502,14 @@ extern HB_CRITICAL_T hb_globalsMutex;
 extern HB_CRITICAL_T hb_staticsMutex;
 /* Monitor for sync access to the global stack */
 extern HB_CRITICAL_T hb_memvarsMutex;
-#ifndef HB_SAFE_ALLOC
 /* Guard for threadunsafe malloc and free */
 extern HB_CRITICAL_T hb_allocMutex;
-#endif
 /* Guard for console and output and free */
 extern HB_CRITICAL_T hb_outputMutex;
 /* Guard for memory allocated by the garbage collector */
 extern HB_CRITICAL_T hb_garbageAllocMutex;
+/* Guard for thread unsafe macro compilation */
+extern HB_CRITICAL_T hb_macroMutex;
 /* Guard for PRG level mutex asyncrhonous operations */
 extern HB_CRITICAL_T hb_mutexMutex;
 

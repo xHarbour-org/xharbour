@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1044 2003/05/24 00:29:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1045 2003/05/24 00:33:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-17 20:14 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/fm.c
+    ! using now hb_allocMutex to threadsafe statistics also when
+      HB_SAFE_ALLOC is on.
+
+  * include/thread.h
+  * source/vm/thread.c
+  * source/vm/estack.c
+    + Added support for macro and try/catch blocks under MT. - mainly
+      is an issue related with thread specific error block (or error
+      management).
+    + Added hb_macroMutex to mutex macro compilation, that is thread
+      unsafe.
+
+  * source/macro/macro.y
+    ! macro compilation is now subject to mutexing, as it uses
+      static variables that are not thread safe. This is a limit
+      in bison/ylex, and there is nothing we can do about it.
+
+  * source/rtl/terror.prg
+  * source/rtl/errorsys.prg
+    + Added thread specific error management
+    + Added thread specific fields for error reporting.
+
+  * include/hbapierr.h
+  * source/vm/errorapi.c
+    + Added functions to access (put/get) directly thread related members
+      in tError
+
+  * source/vm/arrays.c
+    - remove old comments.
+    
 
 2003-05-23 17:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbcomp.h

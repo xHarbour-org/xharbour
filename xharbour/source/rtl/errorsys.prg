@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.19 2003/03/19 08:50:11 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.20 2003/05/24 00:29:10 ronpinkas Exp $
  */
 
 /*
@@ -321,6 +321,13 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, "     Arguments:"  + Arguments( oErr ) )
         FWriteLine( nHandle, " Involved File: " + oErr:filename() )
         FWriteLine( nHandle, "Dos Error Code: " + strvalue( oErr:oscode() ) )
+
+        #ifdef HB_THREAD_SUPPORT
+        FWriteLine( nHandle, "Running threads: " + strvalue( oErr:RunningThreads() ) )
+        FWriteLine( nHandle, "VM thread ID: " + strvalue( oErr:VmThreadId() ) )
+        FWriteLine( nHandle, "OS specific thread ID: " + strvalue( oErr:VMThreadId() ) )
+        #endif
+
         FWriteLine( nHandle, "" )
         FWriteLine( nHandle, " Trace Through:" )
         FWriteLine( nHandle, "---------------" )

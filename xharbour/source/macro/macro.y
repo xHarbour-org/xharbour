@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.8 2003/03/04 00:11:48 ronpinkas Exp $
+ * $Id: macro.y,v 1.9 2003/04/03 04:15:15 ronpinkas Exp $
  */
 
 /*
@@ -64,6 +64,9 @@
 
 #include "hbmacro.h"
 #include "hbcomp.h"
+
+//JC1: yylex is not threadsafe, we need mutexes
+#include "hbstack.h"    // that also includes thread.h
 
 /* Compile using: bison -d -p hb_comp macro.y */
 
@@ -916,6 +919,10 @@ int hb_macroYYParse( HB_MACRO_PTR pMacro )
    int iResult;
    void * lexBuffer;
 
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_LOCK( hb_macroMutex );
+   #endif
+
    lexBuffer = hb_compFlexNew( pMacro );
 
    pMacro->status = HB_MACRO_CONT;
@@ -924,6 +931,10 @@ int hb_macroYYParse( HB_MACRO_PTR pMacro )
    iResult = yyparse( ( void * ) pMacro );
 
    hb_compFlexDelete( lexBuffer );
+
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_UNLOCK( hb_macroMutex );
+   #endif
 
    return iResult;
 }

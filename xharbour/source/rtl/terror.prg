@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.6 2003/05/14 08:44:24 jonnymind Exp $
+ * $Id: terror.prg,v 1.7 2003/05/24 00:29:10 ronpinkas Exp $
  */
 
 /*
@@ -55,7 +55,9 @@
 
 #include "error.ch"
 
-static s_aErrHandlers := {}
+#ifndef HB_THREAD_SUPPORT
+   static s_aErrHandlers := {}
+#endif
 
 FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args )
 
@@ -83,6 +85,12 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args )
       s_oClass:AddData( "ProcName"     , Procname(1) )
       s_oClass:AddData( "ProcLine"     , Procline(1) )
 
+      #ifdef HB_THREAD_SUPPORT
+         s_oClass:AddData( "RunningThreads"     , HB_ThreadCountStacks() )
+         s_oClass:AddData( "OsThreadId"     , ThreadGetCurrent() )
+         s_oClass:AddData( "VMThreadId"     , ThreadGetCurrentInternal() )
+      #endif
+
       s_oClass:AddData( "ModuleName"   , "" )
 
       s_oClass:Create()
@@ -108,6 +116,8 @@ FUNCTION ErrorNew( SubSystem, SubCode, Operation, Description, Args )
 
 RETURN oErr
 
+#ifndef HB_THREAD_SUPPORT
+
 PROCEDURE HB_SetTry()
 
    aAdd( s_aErrHandlers, ErrorBlock( {|e| Break(e) } ) )
@@ -120,6 +130,24 @@ PROCEDURE HB_ResetTry()
    aSize( s_aErrHandlers, Len( s_aErrHandlers ) - 1 )
 
 RETURN
+
+#else
+
+PROCEDURE HB_SetTry()
+
+   aAdd( HB_threadGetTryErrorArray(), ErrorBlock( {|e| Break(e) } ) )
+
+RETURN
+
+PROCEDURE HB_ResetTry()
+   LOCAL aTryErrHandlers := HB_threadGetTryErrorArray()
+
+   ErrorBlock( aTryErrHandlers[-1] )
+   aSize( aTryErrHandlers, Len( aTryErrHandlers ) - 1 )
+
+RETURN
+
+#endif
 
 FUNCTION Throw( oErr )
 

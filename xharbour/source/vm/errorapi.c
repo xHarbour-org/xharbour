@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.6 2003/05/14 10:03:57 jonnymind Exp $
+ * $Id: errorapi.c,v 1.7 2003/05/24 00:29:10 ronpinkas Exp $
  */
 
 /*
@@ -73,6 +73,8 @@
  * See doc/license.txt for licensing terms.
  *
  */
+/*JC1: say we are going to optimze MT stack */
+#define HB_THREAD_OPTIMIZE_STACK
 
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -93,10 +95,18 @@
    better shows what is really the problem. [vszakats] */
 #define HB_ERROR_LAUNCH_MAX 8
 
-static HB_ERROR_INFO_PTR s_errorHandler = NULL;
-static HB_ITEM_PTR s_errorBlock;
-static int     s_iLaunchCount = 0;
-static USHORT  s_uiErrorDOS = 0; /* The value of DOSERROR() */
+/* In MT, this data is held in the stack */
+#ifndef HB_THREAD_SUPPORT
+   static HB_ERROR_INFO_PTR s_errorHandler = NULL;
+   static HB_ITEM_PTR s_errorBlock;
+   static int     s_iLaunchCount = 0;
+   static USHORT  s_uiErrorDOS = 0; /* The value of DOSERROR() */
+#else
+   #define s_errorHandler      (HB_VM_STACK.errorHandler)
+   #define s_errorBlock        (HB_VM_STACK.errorBlock)
+   #define s_iLaunchCount      (HB_VM_STACK.iLaunchCount)
+   #define s_uiErrorDOS        (HB_VM_STACK.uiErrorDOS)
+#endif
 
 extern HB_FUNC( ERRORNEW );
 
@@ -122,6 +132,8 @@ HB_FUNC( __ERRINHANDLER )
 
 HB_FUNC( ERRORBLOCK )
 {
+   HB_THREAD_STUB
+
    HB_ITEM oldError;
    PHB_ITEM pNewErrorBlock = hb_param( 1, HB_IT_BLOCK );
 
@@ -146,6 +158,7 @@ HB_FUNC( ERRORBLOCK )
  */
 HB_ERROR_INFO_PTR HB_EXPORT hb_errorHandler( HB_ERROR_INFO_PTR pNewHandler )
 {
+   HB_THREAD_STUB
    HB_ERROR_INFO_PTR pOld = s_errorHandler;
 
    if( pNewHandler )
@@ -159,10 +172,12 @@ HB_ERROR_INFO_PTR HB_EXPORT hb_errorHandler( HB_ERROR_INFO_PTR pNewHandler )
 
 HB_FUNC( DOSERROR )
 {
+   HB_THREAD_STUB
+
    hb_retni( s_uiErrorDOS );
 
    if( ISNUM( 1 ) )
-      s_uiErrorDOS = ( USHORT ) hb_parni( 1 );
+         s_uiErrorDOS = ( USHORT ) hb_parni( 1 );
 }
 
 void HB_EXPORT hb_errInit( void )
@@ -173,21 +188,42 @@ void HB_EXPORT hb_errInit( void )
     * NOTE: hb_itemClear() cannot be used to initialize an item because
     * memory occupied by the item can contain garbage bits
    */
-   s_errorBlock = hb_itemNew( NULL );
+   #ifndef HB_THREAD_SUPPORT
+      s_errorBlock = hb_itemNew( NULL );
+   #else
+      hb_stack.errorBlock = hb_itemNew( NULL );
+      hb_stack.aTryCatchHandlerStack = hb_itemNew( NULL );
+      hb_arrayNew( hb_stack.aTryCatchHandlerStack, 0 );
+      hb_gcLock( hb_stack.aTryCatchHandlerStack );
+   #endif
 }
 
 void HB_EXPORT hb_errExit( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errExit()"));
 
-   if( s_errorBlock && s_errorBlock->type )
-   {
-      hb_itemRelease( s_errorBlock );
-   }
+   #ifndef HB_THREAD_SUPPORT
+      if( s_errorBlock && s_errorBlock->type )
+      {
+         hb_itemRelease( s_errorBlock );
+      }
+   #else
+    /* Error handler is never allocated; it resides in the stack, or
+            is owned by callers. */
+      if( hb_stack.errorBlock && hb_stack.errorBlock->type )
+      {
+         hb_itemRelease( hb_stack.errorBlock );
+      }
+
+      hb_itemClear( hb_stack.aTryCatchHandlerStack );
+   #endif
 }
 
 PHB_ITEM HB_EXPORT hb_errNew( void )
 {
+
+   HB_THREAD_STUB
+
    PHB_ITEM pError;
    char *szModuleName = hb_vmGetModuleName();
 
@@ -208,6 +244,8 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
 
 USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
 {
+   HB_THREAD_STUB
+
    USHORT uiAction = E_DEFAULT; /* Needed to avoid GCC -O2 warning */
    USHORT usRequest;
 
@@ -336,6 +374,8 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
 
 PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
 {
+   HB_THREAD_STUB
+
    PHB_ITEM pResult;
    USHORT usRequest;
 
@@ -427,6 +467,8 @@ void HB_EXPORT hb_errRelease( PHB_ITEM pError )
 
 char HB_EXPORT * hb_errGetDescription( PHB_ITEM pError )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetDescription(%p)", pError));
 
    hb_vmPushSymbol( hb_dynsymGet( "DESCRIPTION" )->pSymbol );
@@ -450,6 +492,7 @@ PHB_ITEM HB_EXPORT hb_errPutDescription( PHB_ITEM pError, char * szDescription )
 
 char HB_EXPORT * hb_errGetFileName( PHB_ITEM pError )
 {
+   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetFileName(%p)", pError));
 
    hb_vmPushSymbol( hb_dynsymGet( "FILENAME" )->pSymbol );
@@ -473,6 +516,8 @@ PHB_ITEM HB_EXPORT hb_errPutFileName( PHB_ITEM pError, char * szFileName )
 
 USHORT HB_EXPORT hb_errGetGenCode( PHB_ITEM pError )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetGenCode(%p)", pError));
 
    hb_vmPushSymbol( hb_dynsymGet( "GENCODE" )->pSymbol );
@@ -496,6 +541,8 @@ PHB_ITEM HB_EXPORT hb_errPutGenCode( PHB_ITEM pError, USHORT uiGenCode )
 
 char HB_EXPORT * hb_errGetOperation( PHB_ITEM pError )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetOperation(%p)", pError));
 
    hb_vmPushSymbol( hb_dynsymGet( "OPERATION" )->pSymbol );
@@ -519,6 +566,8 @@ PHB_ITEM HB_EXPORT hb_errPutOperation( PHB_ITEM pError, char * szOperation )
 
 USHORT HB_EXPORT hb_errGetOsCode( PHB_ITEM pError )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetOsCode(%p)", pError));
 
    hb_vmPushSymbol( hb_dynsymGet( "OSCODE" )->pSymbol );
@@ -542,6 +591,8 @@ PHB_ITEM HB_EXPORT hb_errPutOsCode( PHB_ITEM pError, USHORT uiOsCode )
 
 USHORT HB_EXPORT hb_errGetSeverity( PHB_ITEM pError )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetSeverity(%p)", pError));
 
    hb_vmPushSymbol( hb_dynsymGet( "SEVERITY" )->pSymbol );
@@ -565,6 +616,8 @@ PHB_ITEM HB_EXPORT hb_errPutSeverity( PHB_ITEM pError, USHORT uiSeverity )
 
 USHORT HB_EXPORT hb_errGetSubCode( PHB_ITEM pError )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetSubCode(%p)", pError));
 
    hb_vmPushSymbol( hb_dynsymGet( "SUBCODE" )->pSymbol );
@@ -588,6 +641,8 @@ PHB_ITEM HB_EXPORT hb_errPutSubCode( PHB_ITEM pError, USHORT uiSubCode )
 
 char HB_EXPORT * hb_errGetSubSystem( PHB_ITEM pError )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetSubSytem(%p)", pError));
 
    hb_vmPushSymbol( hb_dynsymGet( "SUBSYSTEM" )->pSymbol );
@@ -611,6 +666,8 @@ PHB_ITEM HB_EXPORT hb_errPutSubSystem( PHB_ITEM pError, char * szSubSystem )
 
 char HB_EXPORT * hb_errGetProcName( PHB_ITEM pError )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetProcName(%p)", pError));
 
    hb_vmPushSymbol( hb_dynsymGet( "PROCNAME" )->pSymbol );
@@ -635,6 +692,8 @@ PHB_ITEM HB_EXPORT hb_errPutProcName( PHB_ITEM pError, char * szProcName )
 
 USHORT hb_errGetProcLine( PHB_ITEM pError )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetProcLine(%p)", pError));
 
    hb_vmPushSymbol( hb_dynsymGet( "PROCLINE" )->pSymbol );
@@ -656,6 +715,86 @@ PHB_ITEM HB_EXPORT hb_errPutProcLine( PHB_ITEM pError, USHORT uiLine )
    return pError;
 }
 
+#ifdef HB_THREAD_SUPPORT
+
+HB_THREAD_T hb_errGetThreadId( PHB_ITEM pError )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_errGetThreadId(%p)", pError));
+
+   hb_vmPushSymbol( hb_dynsymGet( "OSTHREADID" )->pSymbol );
+   hb_vmPush( pError );
+   hb_vmSend( 0 );
+
+   return (HB_THREAD_T) hb_itemGetNI( &(HB_VM_STACK.Return) );
+}
+
+PHB_ITEM HB_EXPORT hb_errPutThreadId( PHB_ITEM pError, HB_THREAD_T thId)
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_errPutThreadId(%p, %X)", pError, (int)thId));
+
+   hb_vmPushSymbol( hb_dynsymGet( "_RUNNINGTHREADS" )->pSymbol );
+   hb_vmPush( pError );
+   hb_vmPushInteger( (HB_THREAD_T) thId  );
+   hb_vmSend( 1 );
+
+   return pError;
+}
+
+
+UINT hb_errGetRunningThreads( PHB_ITEM pError )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_errGetRunningThreads(%p)", pError));
+
+   hb_vmPushSymbol( hb_dynsymGet( "RUNNINGTHREADS" )->pSymbol );
+   hb_vmPush( pError );
+   hb_vmSend( 0 );
+
+   return (UINT) hb_itemGetNI( &(HB_VM_STACK.Return) );
+}
+
+PHB_ITEM HB_EXPORT hb_errPutRunningThreads( PHB_ITEM pError, UINT uiCount )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_errPutRunningThreads(%p, %d)", pError, uiCount));
+
+   hb_vmPushSymbol( hb_dynsymGet( "_RUNNINGTHREADS" )->pSymbol );
+   hb_vmPush( pError );
+   hb_vmPushInteger( (int) uiCount );
+   hb_vmSend( 1 );
+
+   return pError;
+}
+
+UINT hb_errGetVmThreadId( PHB_ITEM pError )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_errGetVmThreadId(%p)", pError));
+
+   hb_vmPushSymbol( hb_dynsymGet( "VMTHREADID" )->pSymbol );
+   hb_vmPush( pError );
+   hb_vmSend( 0 );
+
+   return (UINT) hb_itemGetNI( &(HB_VM_STACK.Return) );
+}
+
+PHB_ITEM HB_EXPORT hb_errPutVmThreadId( PHB_ITEM pError, UINT uiThid )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_errPutRunningThreads(%p, %d)", pError, uiThid));
+
+   hb_vmPushSymbol( hb_dynsymGet( "_VMTHREADID" )->pSymbol );
+   hb_vmPush( pError );
+   hb_vmPushInteger( (int) uiThid );
+   hb_vmSend( 1 );
+
+   return pError;
+}
+
+#endif
+
 PHB_ITEM HB_EXPORT hb_errPutModuleName( PHB_ITEM pError, char * szModuleName )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutModuleName(%p, %s)", pError, szModuleName));
@@ -670,6 +809,8 @@ PHB_ITEM HB_EXPORT hb_errPutModuleName( PHB_ITEM pError, char * szModuleName )
 
 USHORT HB_EXPORT hb_errGetTries( PHB_ITEM pError )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetTries(%p)", pError));
 
    hb_vmPushSymbol( hb_dynsymGet( "TRIES" )->pSymbol );
@@ -693,6 +834,8 @@ PHB_ITEM HB_EXPORT hb_errPutTries( PHB_ITEM pError, USHORT uiTries )
 
 USHORT HB_EXPORT hb_errGetFlags( PHB_ITEM pError )
 {
+   HB_THREAD_STUB
+
    USHORT uiFlags = EF_NONE;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_errGetFlags(%p)", pError));
@@ -798,6 +941,8 @@ PHB_ITEM HB_EXPORT hb_errRT_New(
    USHORT uiOsCode,
    USHORT uiFlags )
 {
+   HB_THREAD_STUB
+
    PHB_ITEM pError = hb_errNew();
    char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
    USHORT uLine;
@@ -814,6 +959,12 @@ PHB_ITEM HB_EXPORT hb_errRT_New(
    hb_errPutProcName( pError, hb_procinfo( 0, szName, &uLine ) );
    hb_errPutProcLine( pError, uLine );
 
+   #ifdef HB_THREAD_SUPPORT
+      hb_errPutThreadId( pError, HB_CURRENT_THREAD() );
+      hb_errPutVmThreadId( pError, HB_VM_STACK.th_vm_id );
+      hb_errPutRunningThreads( pError, hb_threadCountStacks() );
+   #endif
+
    return pError;
 }
 
@@ -827,6 +978,8 @@ PHB_ITEM HB_EXPORT hb_errRT_New_Subst(
    USHORT uiOsCode,
    USHORT uiFlags )
 {
+   HB_THREAD_STUB
+
    PHB_ITEM pError = hb_errNew();
    char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
    USHORT uLine;
@@ -842,6 +995,12 @@ PHB_ITEM HB_EXPORT hb_errRT_New_Subst(
 
    hb_errPutProcName( pError, hb_procinfo( 0, szName, &uLine ) );
    hb_errPutProcLine( pError, uLine );
+
+   #ifdef HB_THREAD_SUPPORT
+      hb_errPutThreadId( pError, HB_CURRENT_THREAD() );
+      hb_errPutVmThreadId( pError, HB_VM_STACK.th_vm_id );
+      hb_errPutRunningThreads( pError, hb_threadCountStacks() );
+   #endif
 
    return( pError );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.3 2003/01/19 21:44:01 andijahja Exp $
+ * $Id: hbapierr.h,v 1.4 2003/05/14 08:44:23 jonnymind Exp $
  */
 
 /*
@@ -109,6 +109,13 @@ extern char     HB_EXPORT * hb_errGetSubSystem    ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errGetTries          ( PHB_ITEM pError );
 extern char     HB_EXPORT * hb_errGetProcName     ( PHB_ITEM pError );
 extern USHORT   HB_EXPORT hb_errGetProcLine       ( PHB_ITEM pError );
+
+#ifdef HB_THREAD_SUPPORT
+extern UINT     HB_EXPORT hb_errGetRunningThreads ( PHB_ITEM pError );
+extern HB_THREAD_T HB_EXPORT hb_errGetThreadId    ( PHB_ITEM pError );
+extern UINT     HB_EXPORT hb_errGetVmThreadId     ( PHB_ITEM pError );
+#endif
+
 extern USHORT   HB_EXPORT hb_errLaunch            ( PHB_ITEM pError );
 extern PHB_ITEM HB_EXPORT hb_errNew               ( void );
 extern PHB_ITEM HB_EXPORT hb_errPutArgs           ( PHB_ITEM pError, ULONG ulArgCount, ... );
@@ -124,6 +131,13 @@ extern PHB_ITEM HB_EXPORT hb_errPutSubSystem      ( PHB_ITEM pError, char * szSu
 extern PHB_ITEM HB_EXPORT hb_errPutTries          ( PHB_ITEM pError, USHORT uiTries );
 extern PHB_ITEM HB_EXPORT hb_errPutProcName       ( PHB_ITEM pError, char * szProcname );
 extern PHB_ITEM HB_EXPORT hb_errPutProcLine       ( PHB_ITEM pError, USHORT uiProcline );
+
+#ifdef HB_THREAD_SUPPORT
+extern PHB_ITEM HB_EXPORT hb_errPutRunningThreads ( PHB_ITEM pError, UINT uiCount );
+extern PHB_ITEM HB_EXPORT hb_errPutThreadId       ( PHB_ITEM pError, HB_THREAD_T thId );
+extern PHB_ITEM HB_EXPORT hb_errPutVmThreadId     ( PHB_ITEM pError, UINT uiVmId );
+#endif
+
 extern void     HB_EXPORT hb_errRelease           ( PHB_ITEM pError );
 
 /* Harbour additions */

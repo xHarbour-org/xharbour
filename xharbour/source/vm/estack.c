@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.29 2003/03/08 02:06:47 jonnymind Exp $
+ * $Id: estack.c,v 1.30 2003/04/21 03:05:18 jonnymind Exp $
  */
 
 /*
@@ -181,10 +181,18 @@ void hb_stackInit( void )
    // other data to be initialized under MT
    #ifdef HB_THREAD_SUPPORT
       hb_stack.th_id = HB_CURRENT_THREAD();
+      /* internal thread ID is 1 */
+      hb_stack.th_vm_id = 1;
       hb_stack.next = NULL;
       hb_stack.pMethod = NULL;
       hb_stack.Return.type = HB_IT_NIL;
       hb_stack.bInUse = FALSE;
+      hb_stack.errorHandler = NULL;
+      // FM is not ready now, so error block of hb_stack must be initialized
+      // by init_error
+      hb_stack.iLaunchCount = 0;
+      hb_stack.uiErrorDOS = 0;
+
       #ifdef HB_OS_WIN_32
          hb_stack.th_h = NULL;
          hb_stack.bCanceled = FALSE;
@@ -216,6 +224,8 @@ void hb_stackFree( void )
    }
 
    #ifdef HB_THREAD_SUPPORT
+      // error block and related are freed by hb_errExit()
+     
       free( hb_stack.pItems );
    #else
       hb_xfree( hb_stack.pItems );

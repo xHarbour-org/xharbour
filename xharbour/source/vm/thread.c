@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.75 2003/05/07 10:06:07 jonnymind Exp $
+* $Id: thread.c,v 1.76 2003/05/16 19:52:12 druzus Exp $
 */
 
 /*
@@ -83,6 +83,7 @@
 #ifdef HB_OS_WIN_32
 #undef extern
 #endif
+
 /* Creating a trylock for systems that have to use LWR */
 #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
 
@@ -123,6 +124,9 @@ HB_STACK *last_stack;
 HB_MUTEX_STRUCT *hb_ht_mutex;
 HB_THREAD_T hb_main_thread_id;
 
+static HB_CRITICAL_T s_thread_unique_id_mutex;
+static UINT s_thread_unique_id;
+
 #ifdef HB_OS_WIN_32
    DWORD hb_dwCurrentStack;
 #else
@@ -134,9 +138,8 @@ HB_CRITICAL_T hb_threadStackMutex;
 HB_CRITICAL_T hb_globalsMutex;
 HB_CRITICAL_T hb_staticsMutex;
 HB_CRITICAL_T hb_memvarsMutex;
-#ifndef HB_SAFE_ALLOC
-    HB_CRITICAL_T hb_allocMutex;
-#endif
+HB_CRITICAL_T hb_macroMutex;
+HB_CRITICAL_T hb_allocMutex;
 HB_CRITICAL_T hb_garbageAllocMutex;
 HB_CRITICAL_T hb_outputMutex;
 HB_CRITICAL_T hb_mutexMutex;
@@ -150,6 +153,21 @@ HB_SHARED_RESOURCE hb_runningStacks;
 
 BOOL hb_bIdleFence;
 
+static UINT hb_threadUniqueId()
+{
+   volatile UINT uiRet;
+   HB_CRITICAL_LOCK( s_thread_unique_id_mutex );
+   if ( s_thread_unique_id == HB_THREAD_MAX_UNIQUE_ID )
+   {
+      s_thread_unique_id = 1;
+   }
+   s_thread_unique_id++;
+   uiRet = s_thread_unique_id;
+   HB_CRITICAL_UNLOCK( s_thread_unique_id_mutex );
+
+   return uiRet;
+}
+
 HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
 {
    HB_STACK *tc;
@@ -161,6 +179,8 @@ HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
    tc = (HB_STACK *) malloc( sizeof( HB_STACK));
 
    tc->th_id = th;
+   tc->th_vm_id = hb_threadUniqueId();
+
    tc->next = NULL;
 
    tc->pItems = ( HB_ITEM_PTR * ) malloc( sizeof( HB_ITEM_PTR ) * STACK_THREADHB_ITEMS );
@@ -170,6 +190,15 @@ HB_STACK *hb_threadCreateStack( HB_THREAD_T th )
    tc->pMethod = NULL;
    tc->Return.type = HB_IT_NIL;
    tc->bInUse = FALSE;
+
+   tc->errorHandler = NULL;
+   tc->errorBlock = hb_itemNew( NULL );
+   tc->aTryCatchHandlerStack = hb_itemNew( NULL );
+   hb_arrayNew( tc->aTryCatchHandlerStack, 0 );
+   hb_gcLock(  tc->aTryCatchHandlerStack );
+   tc->iLaunchCount = 0;
+   tc->uiErrorDOS = 0;
+
    #ifdef HB_OS_WIN_32
       tc->th_h = NULL;
       tc->bCanceled = FALSE;
@@ -210,7 +239,7 @@ HB_STACK *hb_threadLinkStack( HB_STACK *tc )
    }
 
    p->next = tc;
-   
+
    //last_stack = p;
 
    return tc;
@@ -284,6 +313,11 @@ int hb_threadCountStacks()
    return count;
 }
 
+HB_FUNC( HB_THREADGETTRYERRORARRAY )
+{
+   HB_THREAD_STUB
+   hb_itemCopy( &(HB_VM_STACK.Return), HB_VM_STACK.aTryCatchHandlerStack );
+}
 
 HB_FUNC( HB_THREADCOUNTSTACKS )
 {
@@ -311,6 +345,15 @@ void hb_threadDestroyStack( HB_STACK *pStack )
          hb_itemClear( *pPos );
       }
    }
+
+   /* Error handler is never allocated; it resides in the stack, or
+      is owned by callers. */
+   if( pStack->errorBlock && pStack->errorBlock->type )
+   {
+      hb_itemClear( pStack->errorBlock );
+   }
+
+   hb_itemClear( pStack->aTryCatchHandlerStack );
 
    /* Free each element of the stack */
 #ifndef HB_SAFE_ALLOC
@@ -592,7 +635,7 @@ void hb_threadSubscribeIdle( HB_IDLE_FUNC pFunc )
 {
    HB_IDLE_FUNC_LIST *pIdle, *pBeg;
    HB_THREAD_STUB
-    
+
    /* Executes immediately if no other thread is running */
    HB_CRITICAL_LOCK( hb_runningStacks.Mutex );
    if ( hb_runningStacks.content.asLong == 1 )
@@ -750,7 +793,7 @@ void hb_mutexForceUnlock( void *mtx )
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) mtx;
    Mutex->locker = 0;
    Mutex->lock_count = 0;
-   HB_MUTEX_UNLOCK( Mutex->mutex );	
+   HB_MUTEX_UNLOCK( Mutex->mutex );
 }
 
 void hb_rawMutexForceUnlock( void * mtx )
@@ -767,6 +810,8 @@ void hb_rawMutexForceUnlock( void * mtx )
 #endif
 {
    volatile HB_STACK *_pStack_ = (HB_STACK *) Cargo;
+   PHB_DYNS pExecSym;
+
    /* Sets the cancellation handler so small delays in
    cancellation do not cause segfault or memory leaks */
 #ifdef HB_OS_WIN_32
@@ -781,6 +826,16 @@ void hb_rawMutexForceUnlock( void * mtx )
       as long as necessary */
    HB_CRITICAL_UNLOCK( hb_threadStackMutex );
 #endif
+
+   // call errorsys() to initialize errorblock
+   pExecSym = hb_dynsymFind( "ERRORSYS" );
+
+   if( pExecSym )
+   {
+      hb_vmPushSymbol( pExecSym->pSymbol );
+      hb_vmPushNil();
+      hb_vmDo(0);
+   }
 
    if( _pStack_->bIsMethod )
    {
@@ -950,10 +1005,10 @@ HB_FUNC( STARTTHREAD )
    }
 
    // Create the stack here to avoid cross locking of alloc mutex
-   pStack = hb_threadCreateStack( 0 ); 
+   pStack = hb_threadCreateStack( 0 );
    pStack->uiParams = hb_pcount();
    pStack->bIsMethod = bIsMethod;
- 
+
    HB_CRITICAL_LOCK( hb_threadStackMutex );
    hb_threadFillStack( pStack, pArgs );
    hb_threadLinkStack( pStack );
@@ -989,7 +1044,7 @@ HB_FUNC( STARTTHREAD )
 HB_FUNC( STOPTHREAD )
 {
    HB_THREAD_STUB
-   
+
    HB_MUTEX_STRUCT *Mutex;
    HB_THREAD_T th;
    PHB_ITEM pMutex;
@@ -1014,10 +1069,10 @@ HB_FUNC( STOPTHREAD )
       
       pthread_cancel( th );
       pthread_join( th, NULL );
-      
+
    #else
       stack = hb_threadGetStack( th );
-      
+
       HB_CRITICAL_LOCK( hb_cancelMutex );
       stack->bCanceled = TRUE;
       HB_CRITICAL_UNLOCK( hb_cancelMutex );
@@ -1153,7 +1208,7 @@ HB_FUNC( CREATEMUTEX )
 HB_FUNC( DESTROYMUTEX )
 {
    HB_THREAD_STUB
-   
+
    HB_MUTEX_STRUCT *Mutex;
    PHB_ITEM pMutex = hb_param( 1, HB_IT_STRING );
 
@@ -1558,6 +1613,12 @@ HB_FUNC( THREADGETCURRENT )
    hb_retnl( (long) HB_CURRENT_THREAD() );
 }
 
+HB_FUNC( THREADGETCURRENTINTERNAL )
+{
+   HB_THREAD_STUB
+   hb_retnl( (long) HB_VM_STACK.th_vm_id );
+}
+
 void hb_threadWaitAll()
 {
    HB_THREAD_STUB
@@ -1728,10 +1789,9 @@ int hb_condTimeWait( pthread_cond_t *cond, pthread_mutex_t *mutex, int iMillisec
 void hb_threadInit( void )
 {
    HB_CRITICAL_INIT( hb_threadStackMutex );
-#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_INIT( hb_allocMutex );
-#endif
    HB_CRITICAL_INIT( hb_garbageAllocMutex );
+   HB_CRITICAL_INIT( hb_macroMutex );
    HB_CRITICAL_INIT( hb_outputMutex );
    HB_CRITICAL_INIT( hb_mutexMutex );
 
@@ -1759,6 +1819,9 @@ void hb_threadInit( void )
    #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
       HB_CRITICAL_INIT( s_mtxTryLock );
    #endif
+
+   s_thread_unique_id = 1;
+   HB_CRITICAL_INIT( s_thread_unique_id_mutex );
 }
 
 void hb_threadExit( void )
@@ -1774,10 +1837,9 @@ void hb_threadExit( void )
    HB_SHARED_DESTROY( hb_runningStacks );
    HB_CRITICAL_DESTROY( hb_mutexMutex );
    HB_CRITICAL_DESTROY( hb_outputMutex );
+   HB_CRITICAL_DESTROY( hb_macroMutex );
    HB_CRITICAL_DESTROY( hb_garbageAllocMutex );
-#ifndef HB_SAFE_ALLOC
    HB_CRITICAL_DESTROY( hb_allocMutex );
-#endif
    HB_CRITICAL_DESTROY( hb_threadStackMutex );
 
    #ifdef HB_OS_WIN_32
@@ -1792,6 +1854,8 @@ void hb_threadExit( void )
    #if defined(HB_OS_UNIX) && ! defined(HB_OS_LINUX )
       HB_CRITICAL_DESTROY( s_mtxTryLock );
    #endif
+
+   HB_CRITICAL_DESTROY( s_thread_unique_id_mutex );
 }
 
 #endif
