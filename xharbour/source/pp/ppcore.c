@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.118 2004/01/17 00:05:59 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.119 2004/01/17 01:53:11 ronpinkas Exp $
  */
 
 /*
@@ -3246,7 +3246,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
          expreal += lens;
       }
 
-      goto Done;           goto Done;
+      goto Done;
    }
 
    State = ( **ptri=='\'' || **ptri=='\"' || IS_ESC_STRING( **ptri ) || **ptri=='[' ) ? STATE_EXPRES: STATE_ID;
