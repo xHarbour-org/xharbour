@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.17 2004/03/31 19:29:46 likewolf Exp $
+ * $Id: hbusage.c,v 1.18 2004/04/01 21:21:11 andijahja Exp $
  */
 
 /*
@@ -98,7 +98,7 @@ void hb_compPrintUsage( char * szSelf )
            "\n          %cy               trace lex & yacc activity",
 #endif
            "\n          %cz               suppress shortcutting (.and. & .or.)",
-/* TODO:   "\n           @<file>         compile list of modules in <file>", */
+           "\n          @<file>          compile list of modules in <file>",
            "\n"
    };
 

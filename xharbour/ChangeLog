@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2735 2004/04/03 14:03:15 srobert Exp $
+ * $Id: ChangeLog,v 1.2736 2004/04/03 19:41:14 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-04 04:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/compiler/hbusage.c
+  * source/compiler/harbour.c
+    ! code formatting, mainly putting single-line if,else,while into
+      curly brackets as per xHarbour coding convention
+    ! remove one TODO item (harbour.exe command line):
+       @<file> => compile list of modules in <file>
+
+    /*
+    New syntax: harbour.exe @mylist.rsp
+       mylist.rsp is a plain text file containing a PRG file in each line.
+
+    Example:
+    .---
+    |  main.prg
+    |  process.prg
+    |  doc.prg
+    `---
+    */
 
 2004-04-03 16:55 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
   * source/rtl/hbhex2n.c
