@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.36 2003/07/15 09:15:33 andijahja Exp $
+ * $Id: filesys.c,v 1.37 2003/07/15 22:01:17 andijahja Exp $
  */
 
 /*
@@ -93,6 +93,8 @@
 #ifndef HB_OS_WIN_32_USED
    #define HB_OS_WIN_32_USED
 #endif
+
+#define HB_THREAD_OPTIMIZE_STACK
 
 #include <ctype.h>
 
@@ -267,7 +269,11 @@
    #define SH_DENYNO    0x40    /* Deny nothing */
 #endif
 
+#ifndef HB_THREAD_SUPPORT
 static USHORT s_uiErrorLast = 0;
+#else
+#define s_uiErrorLast   HB_VM_STACK.uiErrorLast
+#endif
 
 #if defined(HAVE_POSIX_IO) || defined(_MSC_VER) || defined(__MINGW32__)
 /* Only compilers with Posix or Posix-like I/O support are supported */
@@ -407,6 +413,7 @@ static void convert_create_flags( USHORT uiFlags, int * result_flags, unsigned *
    *result_flags = O_BINARY | O_CREAT | O_TRUNC | O_RDWR;
    //JC1: sorry, but at least under unix is more sensible to
    // create files without the X attribute
+   *result_pmode = 0;
    if( uiFlags & FC_HIDDEN )
    {
       *result_pmode = S_IRUSR;
@@ -514,6 +521,7 @@ BYTE HB_EXPORT * hb_filecase(char *str) {
 
 FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 {
+   HB_THREAD_STUB
    FHANDLE hFileHandle ;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsPOpen(%p, %s)", pFilename, pMode));
@@ -582,6 +590,8 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 
 FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 {
+   HB_THREAD_STUB
+
    FHANDLE hFileHandle;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsOpen(%p, %hu)", pFilename, uiFlags));
@@ -731,6 +741,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 
 FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 {
+   HB_THREAD_STUB
    FHANDLE hFileHandle;
    int oflag;
    unsigned pmode;
@@ -815,6 +826,7 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 
 FHANDLE HB_EXPORT hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags )
 {
+   HB_THREAD_STUB
    FHANDLE hFileHandle;
    int oflag;
    unsigned pmode;
@@ -862,6 +874,7 @@ FHANDLE HB_EXPORT hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags
 
 void    HB_EXPORT hb_fsClose( FHANDLE hFileHandle )
 {
+   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsClose(%p)", hFileHandle));
 
 
@@ -910,6 +923,7 @@ void    HB_EXPORT hb_fsClose( FHANDLE hFileHandle )
 
 void    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
 {
+   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSetDevMode(%p, %hu)", hFileHandle, uiDevMode));
 
 #if defined(__BORLANDC__) || defined(__IBMCPP__) || defined(__DJGPP__) || defined(__CYGWIN__) || defined(__WATCOMC__)
@@ -952,6 +966,7 @@ void    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
 
 USHORT  HB_EXPORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
 {
+   HB_THREAD_STUB
    USHORT uiRead;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsRead(%p, %p, %hu)", hFileHandle, pBuff, uiCount));
@@ -1004,6 +1019,7 @@ USHORT  HB_EXPORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
 
 USHORT  HB_EXPORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
 {
+   HB_THREAD_STUB
    USHORT uiWritten;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsWrite(%p, %p, %hu)", hFileHandle, pBuff, uiCount));
@@ -1065,6 +1081,7 @@ USHORT  HB_EXPORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount 
 
 ULONG   HB_EXPORT hb_fsReadLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount )
 {
+   HB_THREAD_STUB
    ULONG ulRead;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLarge(%p, %p, %lu)", hFileHandle, pBuff, ulCount));
@@ -1157,6 +1174,7 @@ ULONG   HB_EXPORT hb_fsReadLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCou
 
 ULONG   HB_EXPORT hb_fsWriteLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount )
 {
+   HB_THREAD_STUB
    ULONG ulWritten;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsWriteLarge(%p, %p, %lu)", hFileHandle, pBuff, ulCount));
@@ -1266,6 +1284,7 @@ ULONG   HB_EXPORT hb_fsWriteLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCo
 
 ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
 {
+   HB_THREAD_STUB
    ULONG ulPos;
    USHORT Flags;
 
@@ -1394,6 +1413,7 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
 
 ULONG   HB_EXPORT hb_fsTell( FHANDLE hFileHandle )
 {
+   HB_THREAD_STUB
    ULONG ulPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsTell(%p)", hFileHandle));
@@ -1437,6 +1457,7 @@ ULONG   HB_EXPORT hb_fsTell( FHANDLE hFileHandle )
 
 USHORT  HB_EXPORT hb_fsError( void )
 {
+   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsError()"));
 
    return s_uiErrorLast;
@@ -1444,6 +1465,7 @@ USHORT  HB_EXPORT hb_fsError( void )
 
 void    HB_EXPORT hb_fsSetError( USHORT uiError )
 {
+   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSetError(%hu)", uiError));
 
    s_uiErrorLast = uiError;
@@ -1451,6 +1473,7 @@ void    HB_EXPORT hb_fsSetError( USHORT uiError )
 
 BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
 {
+   HB_THREAD_STUB
    BOOL bResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsDelete(%s)", (char*) pFilename));
@@ -1505,6 +1528,7 @@ BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
 
 BOOL HB_EXPORT hb_fsRename( BYTE * pOldName, BYTE * pNewName )
 {
+   HB_THREAD_STUB
    BOOL bResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsRename(%s, %s)", (char*) pOldName, (char*) pNewName));
@@ -1551,6 +1575,7 @@ BOOL HB_EXPORT hb_fsRename( BYTE * pOldName, BYTE * pNewName )
 BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
                       ULONG ulLength, USHORT uiMode )
 {
+   HB_THREAD_STUB
    BOOL bResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsLock(%p, %lu, %lu, %hu)", hFileHandle, ulStart, ulLength, uiMode));
@@ -1745,6 +1770,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
 
 void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
 {
+   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCommit(%p)", hFileHandle));
 
    HB_STACK_UNLOCK
@@ -1817,6 +1843,7 @@ void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
 
 BOOL HB_EXPORT    hb_fsMkDir( BYTE * pDirname )
 {
+   HB_THREAD_STUB
    BOOL bResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsMkDir(%s)", (char*) pDirname));
@@ -1857,6 +1884,7 @@ BOOL HB_EXPORT    hb_fsMkDir( BYTE * pDirname )
 
 BOOL HB_EXPORT    hb_fsChDir( BYTE * pDirname )
 {
+   HB_THREAD_STUB
    BOOL bResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsChDir(%s)", (char*) pDirname));
@@ -1892,6 +1920,7 @@ BOOL HB_EXPORT    hb_fsChDir( BYTE * pDirname )
 
 BOOL HB_EXPORT    hb_fsRmDir( BYTE * pDirname )
 {
+   HB_THREAD_STUB
    BOOL bResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsRmDir(%s)", (char*) pDirname));
@@ -1940,6 +1969,7 @@ BYTE HB_EXPORT * hb_fsCurDir( USHORT uiDrive )
 
 USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 {
+   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDirBuff(%hu)", uiDrive));
 
    HB_SYMBOL_UNUSED( uiDrive );
@@ -2006,6 +2036,7 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
 
 USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 {
+   HB_THREAD_STUB
    USHORT uiResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsChDrv(%d)", (int) nDrive));
@@ -2084,6 +2115,7 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 
 USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
 {
+   HB_THREAD_STUB
    USHORT uiResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsIsDrv(%d)", (int) nDrive));
@@ -2149,6 +2181,7 @@ USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
 
 BOOL   HB_EXPORT  hb_fsIsDevice( FHANDLE hFileHandle )
 {
+   HB_THREAD_STUB
    BOOL bResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsIsDevice(%p)", hFileHandle));
@@ -2174,6 +2207,7 @@ BOOL   HB_EXPORT  hb_fsIsDevice( FHANDLE hFileHandle )
 
 BYTE   HB_EXPORT  hb_fsCurDrv( void )
 {
+   HB_THREAD_STUB
    USHORT uiResult;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDrv()"));
@@ -2230,6 +2264,7 @@ BYTE   HB_EXPORT  hb_fsCurDrv( void )
 FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
                       USHORT uiFlags, BYTE * pPaths, PHB_ITEM pError )
 {
+   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsExtOpen(%s, %s, %hu, %p, %p)", (char*) pFilename, (char*) pDefExt, uiFlags, pPaths, pError));
 
    s_uiErrorLast = FS_ERROR;
@@ -2246,6 +2281,7 @@ FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
 BOOL HB_EXPORT hb_fsEof( FHANDLE hFileHandle )
 {
 #if defined(__DJGPP__) || defined(__CYGWIN__) || defined(OS_UNIX_COMPATIBLE)
+   HB_THREAD_STUB
    long curPos;
    long endPos;
    long newPos;
@@ -2278,6 +2314,7 @@ BOOL HB_EXPORT hb_fsEof( FHANDLE hFileHandle )
 
 USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen )
 {
+   HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCurDirBuff(%hu)", uiDrive));
 
    HB_SYMBOL_UNUSED( uiDrive );

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.87 2003/07/14 23:27:57 jonnymind Exp $
+* $Id: thread.c,v 1.88 2003/07/17 19:19:41 jonnymind Exp $
 */
 
 /*
@@ -207,6 +207,8 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    hb_gcLock(  tc->aTryCatchHandlerStack );
    tc->iLaunchCount = 0;
    tc->uiErrorDOS = 0;
+
+   tc->uiErrorLast = 0;
 
    #ifdef HB_OS_WIN_32
       tc->th_h = NULL;

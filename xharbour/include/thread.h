@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.49 2003/07/13 19:34:33 jonnymind Exp $
+* $Id: thread.h,v 1.50 2003/07/14 19:18:46 jonnymind Exp $
 */
 
 /*
@@ -341,6 +341,9 @@ typedef struct tag_HB_STACK
    int iExtraElementsIndex;
    int iExtraElements;
    int iExtraIndex;
+
+   /* FS api error system */
+   UINT uiErrorLast;
 
    /* Dynsym thread-specific table */
    UINT uiClosestDynSym;
