@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.132 2004/05/12 02:25:26 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.133 2004/05/20 13:53:12 druzus Exp $
  */
 
 /*
@@ -100,10 +100,9 @@
 
 
 /*
- * TODO: !!! hb_cdxFindTag doesn't use bag name!
- * TODO: Tag->fRePos = TURE means that rootPage->...->childLeafPage path is
- *       bad and has to be reloaded
- *       CurKey->rec == 0 means that there is no correct CurKey
+ * Tag->fRePos = TURE means that rootPage->...->childLeafPage path is
+ * bad and has to be reloaded
+ * CurKey->rec == 0 means that there is no correct CurKey
  */
 
 /* create a new Tag (make index) */
@@ -606,7 +605,7 @@ static int hb_cdxValCompare( LPCDXTAG pTag, BYTE * val1, BYTE len1,
 
 /*
  * store Item in index key
- * TODO: uiType check
+ * TODO: uiType check anf generate RT error if necessary
  */
 static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LPCDXTAG pTag, BOOL fTrans, BOOL fSize )
 {
@@ -1201,7 +1200,7 @@ static void hb_cdxIndexCheckVersion( LPCDXINDEX pIndex )
       pIndex->freePage = ulFree;
       hb_cdxIndexDiscardBuffers( pIndex );
    }
-   /* TODO: !!! ## remove it */
+   /* TODO: !!! ## remove it it's for test only */
    //hb_cdxIndexDiscardBuffers( pIndex );
 }
 
@@ -3349,16 +3348,16 @@ static void hb_cdxTagLoad( LPCDXTAG pTag )
    pTag->uiLen     = HB_GET_LE_UINT16( pHeader.keySize );
    pTag->MaxKeys   = CDX_INT_FREESPACE / ( pTag->uiLen + 8 );
    pTag->OptFlags  = pHeader.indexOpt;
-   pTag->UniqueKey = ( pTag->OptFlags & CDX_TYPE_UNIQUE );
-   pTag->Temporary = ( pTag->OptFlags & CDX_TYPE_TEMPORARY );
-   pTag->Custom    = ( pTag->OptFlags & CDX_TYPE_CUSTOM );
+   pTag->UniqueKey = ( pTag->OptFlags & CDX_TYPE_UNIQUE ) != 0;
+   pTag->Temporary = ( pTag->OptFlags & CDX_TYPE_TEMPORARY ) != 0;
+   pTag->Custom    = ( pTag->OptFlags & CDX_TYPE_CUSTOM ) != 0;
    pTag->AscendKey = pTag->UsrAscend = ( HB_GET_LE_UINT16( pHeader.ascendFlg ) == 0 );
    pTag->UsrUnique = FALSE;
    pTag->KeyExpr = ( char * ) hb_xgrab( CDX_MAXKEY + 1 );
    /* QUESTION: Is UPPER a valid operation here?
     * This will break expressions like:
     * somefield+'lowerletter'+otherfield
-    * TODO:
+    * TODO: fix it - it's a bug
    */
    hb_strncpyUpper( pTag->KeyExpr, ( char * ) pHeader.keyExpPool, CDX_MAXKEY );
 
@@ -4509,19 +4508,16 @@ static void hb_cdxOrdListClear( CDXAREAP pArea, BOOL fAll, LPCDXINDEX pKeepInd )
 
 /*
  * find order bag by its name
- * TODO: This only checks for basename of bag,
- * a complete (but reliable) test should be done to look for the same file
- * druzus: if we allow to make more bugs with the same name -
- *         I'm not a fun of this
  */
 static LPCDXINDEX hb_cdxFindBag( CDXAREAP pArea, char * szBagName )
 {
    LPCDXINDEX pIndex;
    PHB_FNAME pFileName;
-   char * szBaseName;
+   char * szBaseName, * szBasePath;
 
    pFileName = hb_fsFNameSplit( szBagName );
    szBaseName = hb_strdup( pFileName->szName );
+   szBasePath = pFileName->szPath ? hb_strdup( pFileName->szPath ) : "";
    hb_strUpper( szBaseName, strlen(szBaseName) );
 
    pIndex = pArea->lpIndexes;
@@ -4529,13 +4525,14 @@ static LPCDXINDEX hb_cdxFindBag( CDXAREAP pArea, char * szBagName )
    {
       hb_xfree( pFileName );
       pFileName = hb_fsFNameSplit( pIndex->szFileName );
-      hb_strUpper( pFileName->szName, strlen(pFileName->szName) );
-      if ( !hb_stricmp( pFileName->szName, szBaseName ) )
-         break;
+      if ( !hb_stricmp( pFileName->szName, szBaseName ) &&
+          ( !pFileName->szPath || !hb_stricmp( pFileName->szPath, szBasePath ) ) )
+            break;
       pIndex = pIndex->pNext;
    }
    hb_xfree( pFileName );
    hb_xfree( szBaseName );
+   hb_xfree( szBasePath );
    return pIndex;
 }
 
@@ -4592,47 +4589,56 @@ static USHORT hb_cdxGetTagNumber( CDXAREAP pArea, LPCDXTAG pFindTag )
 /*
  * find Tag in tag list
  */
-static USHORT hb_cdxFindTag( CDXAREAP pArea, PHB_ITEM pItem )
+static LPCDXTAG hb_cdxFindTag( CDXAREAP pArea, PHB_ITEM pTagItem,
+                               PHB_ITEM pBagItem, USHORT *puiTag )
 {
-   USHORT uiTag = 0;
+   LPCDXTAG pTag = NULL;
+   USHORT uiTag = 0, uiFind = 0;
+   LPCDXINDEX pIndex, pBagIndex;
+   char szName[ CDX_MAXTAGNAMELEN + 1 ];
 
-   if ( pItem )
+   szName[ 0 ] = '\0';
+   if ( HB_IS_NUMBER( pTagItem ) )
    {
-      if ( HB_IS_NUMBER( pItem ) )
-      {
-         uiTag = hb_itemGetNI( pItem );
-         if ( ! hb_cdxGetTagByNumber(pArea, uiTag ) )
-            uiTag = 0;
-      }
-      else if ( HB_IS_STRING( pItem ) )
-      {
-         LPCDXTAG pTag;
-         LPCDXINDEX pIndex;
-         char szName[ CDX_MAXTAGNAMELEN + 1 ];
+      uiFind = hb_itemGetNI( pTagItem );
+   }
+   else if ( HB_IS_STRING( pTagItem ) )
+   {
+      hb_strncpyUpperTrim( szName, pTagItem->item.asString.value,
+                  HB_MIN( pTagItem->item.asString.length, CDX_MAXTAGNAMELEN) );
+   }
+   pIndex = pArea->lpIndexes;
 
-         hb_strncpyUpperTrim( szName, pItem->item.asString.value,
-                     HB_MIN( pItem->item.asString.length, CDX_MAXTAGNAMELEN) );
-         pIndex = pArea->lpIndexes;
-         pTag = NULL;
-         uiTag = 0;
-         while ( pIndex && !pTag)
+   if ( pIndex && ( uiFind != 0 || szName[ 0 ] ) )
+   {
+      if ( pBagItem && HB_IS_STRING( pBagItem ) && pBagItem->item.asString.length > 0 )
+         pBagIndex = hb_cdxFindBag( pArea, pBagItem->item.asString.value );
+      else
+         pBagIndex = NULL;
+
+      while ( pIndex )
+      {
+         pTag = pIndex->TagList;
+         while ( pTag )
          {
-            pTag = pIndex->TagList;
-            while ( pTag )
-            {
-               uiTag++;
-               if ( !hb_stricmp( pTag->szName, szName ) )
-                  break;
-               pTag = pTag->pNext;
-            }
-            pIndex = pIndex->pNext;
+            uiTag++;
+            if ( ( ! pBagIndex || pBagIndex == pIndex ) &&
+                 ( uiFind != 0 ? uiTag == uiFind : !hb_stricmp( pTag->szName, szName ) ) )
+               break;
+            pTag = pTag->pNext;
          }
-         if ( !pTag )
-            uiTag = 0;
+         if ( pTag || pBagIndex == pIndex )
+            break;
+         pIndex = pIndex->pNext;
       }
+      if ( !pTag )
+         uiTag = 0;
    }
 
-   return uiTag;
+   if ( puiTag )
+      *puiTag = uiTag;
+
+   return pTag;
 }
 
 /*
@@ -6274,7 +6280,7 @@ static ERRCODE hb_cdxOrderListFocus( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
       pOrderInfo->itmResult = hb_itemPutC( pOrderInfo->itmResult, pTag->szName );
 
    if ( pOrderInfo->itmOrder )
-      pArea->uiTag = hb_cdxFindTag( pArea, pOrderInfo->itmOrder );
+      hb_cdxFindTag( pArea, pOrderInfo->itmOrder, pOrderInfo->atomBagName, &(pArea->uiTag) );
       /* TODO: RTerror if not found? */
 
    return SUCCESS;
@@ -6621,9 +6627,6 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    }
    hb_xfree( szFileName );
 
-   if ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll )
-      pArea->uiTag = 0;
-
    pTag = hb_cdxIndexAddTag( pIndex, szTagName, pOrderInfo->abExpr->item.asString.value,
                       pKeyExp, bType, uiLen, ( char * ) ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->abFor :
                       NULL ), pForExp,
@@ -6664,7 +6667,6 @@ static ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
    LPCDXINDEX pIndex, pIndexTmp;
    LPCDXTAG pTag;
-   USHORT uiTag;
    char * szFileName;
 
    HB_TRACE(HB_TR_DEBUG, ("cdxOrderDestroy(%p, %p)", pArea, pOrderInfo));
@@ -6677,10 +6679,9 @@ static ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
 
    if ( pOrderInfo->itmOrder )
    {
-      uiTag = hb_cdxFindTag( pArea, pOrderInfo->itmOrder );
-      if ( uiTag )
+      pTag = hb_cdxFindTag( pArea, pOrderInfo->itmOrder, pOrderInfo->atomBagName, NULL );
+      if ( pTag )
       {
-         pTag = hb_cdxGetTagByNumber( pArea, uiTag );
          pIndex = pTag->pIndex;
          if ( !pIndex->fShared && !pIndex->fReadonly )
          {
@@ -6753,11 +6754,12 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
          break;
       default:
          if ( pOrderInfo->itmOrder )
-            /* TODO: check for atom bug name (indename) */
-            uiTag = hb_cdxFindTag( pArea, pOrderInfo->itmOrder );
+            pTag = hb_cdxFindTag( pArea, pOrderInfo->itmOrder, pOrderInfo->atomBagName, &uiTag );
          else
+         {
             uiTag = pArea->uiTag;
-         pTag = hb_cdxGetTagByNumber( pArea, uiTag );
+            pTag = hb_cdxGetTagByNumber( pArea, uiTag );
+         }
    }
 
    switch( uiIndex )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2967 2004/05/21 02:31:39 druzus Exp $
+ * $Id: ChangeLog,v 1.2968 2004/05/21 11:08:22 srobert Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-21 15:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+   * check for bag name in hb_cdxFindTag() (SELF_ORDINFO)
+
+  * xharbour/source/rdd/dbfcdx/dbcmd.c
+   ! always initialize atomBagName (to NULL if not necessary)
 
 2004-05-21 07:05 UTC-0400 Sylvain Robert <s.robert/at/videotron.ca>
   * xharbour/contrib/mysql/makefile.vc

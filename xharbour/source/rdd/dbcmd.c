@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.113 2004/05/10 10:38:05 mauriliolongo Exp $
+ * $Id: dbcmd.c,v 1.114 2004/05/18 10:07:41 lf_sfnet Exp $
  */
 
 /*
@@ -2773,6 +2773,7 @@ HB_FUNC( INDEXORD )
       DBORDERINFO pInfo;
       pInfo.itmResult = hb_itemPutNI( NULL, 0 );
       pInfo.itmOrder = NULL;
+      pInfo.atomBagName = NULL;
       SELF_ORDINFO( pArea, DBOI_NUMBER, &pInfo );
       hb_retni( hb_itemGetNI( pInfo.itmResult ) );
       hb_itemRelease( pInfo.itmResult );
@@ -2840,6 +2841,7 @@ HB_FUNC( ORDBAGEXT )
    AREAP pArea = HB_CURRENT_WA;
 
    pInfo.itmOrder = NULL;
+   pInfo.atomBagName = NULL;
    pInfo.itmResult = hb_itemPutC( NULL, "" );
    if( !pArea )
    {
@@ -2889,6 +2891,7 @@ HB_FUNC( ORDBAGNAME )
             return;
          }
       }
+      pOrderInfo.atomBagName = NULL;
       pOrderInfo.itmResult = hb_itemPutC( NULL, "" );
       SELF_ORDINFO( pArea, DBOI_BAGNAME, &pOrderInfo );
       hb_itemReturn( pOrderInfo.itmResult );
@@ -3046,8 +3049,8 @@ HB_FUNC( ORDFOR )
             pOrderInfo.itmOrder  = NULL;
          else
             pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
-
-      }else
+      }
+      else
       {
          pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
          if( !pOrderInfo.itmOrder )
@@ -3179,6 +3182,7 @@ HB_FUNC( ORDSKIPUNIQUE )
    if( pArea )
    {
       pOrderInfo.itmOrder = NULL;
+      pOrderInfo.atomBagName = NULL;
       pOrderInfo.itmNewVal = hb_param( 1, HB_IT_ANY );
       pOrderInfo.itmResult = hb_itemPutL( NULL, FALSE );
       SELF_ORDINFO( pArea, DBOI_SKIPUNIQUE, &pOrderInfo );
@@ -3197,7 +3201,8 @@ HB_FUNC( ORDKEYVAL )
 
    if( pArea )
    {
-      pOrderInfo.itmOrder  = NULL;
+      pOrderInfo.itmOrder = NULL;
+      pOrderInfo.atomBagName = NULL;
       pOrderInfo.itmResult = hb_itemNew( NULL );
       SELF_ORDINFO( pArea, DBOI_KEYVAL, &pOrderInfo );
       hb_itemReturn( pOrderInfo.itmResult );
