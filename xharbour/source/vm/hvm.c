@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.32 2002/01/27 10:34:18 ronpinkas Exp $
+ * $Id: hvm.c,v 1.33 2002/01/27 22:30:07 ronpinkas Exp $
  */
 
 /*
@@ -4334,7 +4334,7 @@ static void hb_vmPushAliasedVar( PHB_SYMB pSym )
 
    if( HB_IS_STRING( pAlias ) )
    {
-      char * szAlias = hb_strUpper( pAlias->item.asString.value, pAlias->item.asString.length );
+      char *szAlias = hb_strUpperCopy( pAlias->item.asString.value, pAlias->item.asString.length );
 
       if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' )
       {  /* M->variable */
@@ -4343,8 +4343,12 @@ static void hb_vmPushAliasedVar( PHB_SYMB pSym )
       else
       {
          int iCmp = strncmp( szAlias, "MEMVAR", 4 );
+
          if( iCmp == 0 )
-               iCmp = strncmp( szAlias, "MEMVAR", pAlias->item.asString.length );
+		 {
+            iCmp = strncmp( szAlias, "MEMVAR", pAlias->item.asString.length );
+		 }
+
          if( iCmp == 0 )
          {  /* MEMVAR-> or MEMVA-> or MEMV-> */
             hb_memvarGetValue( pAlias, pSym );
@@ -4352,8 +4356,12 @@ static void hb_vmPushAliasedVar( PHB_SYMB pSym )
          else
          {  /* field variable */
             iCmp = strncmp( szAlias, "FIELD", 4 );
-            if( iCmp == 0 )
+
+			if( iCmp == 0 )
+			{
                iCmp = strncmp( szAlias, "FIELD", pAlias->item.asString.length );
+			}
+
             if( iCmp == 0 )
             {  /* FIELD-> */
                hb_rddGetFieldValue( pAlias, pSym );
@@ -4365,9 +4373,12 @@ static void hb_vmPushAliasedVar( PHB_SYMB pSym )
          }
       }
 
+	  hb_xfree( szAlias );
    }
    else
+   {
       hb_vmPushAliasedField( pSym );
+   }
 }
 
 static void hb_vmPushLocal( SHORT iLocal )

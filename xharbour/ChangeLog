@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.58 2002/01/29 07:19:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.59 2002/01/29 08:27:32 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-29 07:28 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    + Added missing declaration of hb_strUpperCopy()
+  * source/rdd/dbcmd.c
+  * source/rdd/workarea.c
+    * Minor formatting, and corrected usage of string conversion.
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+    * Minor formatting, and corrected usage of string conversion.
+  * tests/pp.prg
+    + Added ifndef __XHARBOUR__ guard for Tracelog() definition.
 
 2002-01-29 00:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * make_b32.bat

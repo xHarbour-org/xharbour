@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.4 2002/01/19 14:15:45 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.5 2002/01/27 09:01:56 ronpinkas Exp $
  */
 
 /*
@@ -1183,12 +1183,18 @@ HB_FUNC( DBCREATE )
    BOOL bOpen;
 
    hb_retl( FALSE );
+
    szFileName = hb_parc( 1 );
-   pStruct = hb_param( 2 , HB_IT_ARRAY );
+   pStruct    = hb_param( 2 , HB_IT_ARRAY );
+
    if( pStruct )
+   {
       uiLen = ( USHORT ) hb_arrayLen( pStruct );
+   }
    else
+   {
       uiLen = 0;
+   }
 
    if( ( strlen( szFileName ) == 0 ) || !pStruct || uiLen == 0 )
    {
@@ -1225,30 +1231,43 @@ HB_FUNC( DBCREATE )
    else
    {
       bOpen = TRUE;
+
       if( hb_parl( 4 ) )
+      {
          hb_rddSelectFirstAvailable();
+      }
       else if( s_pCurrArea )                  /* If current WorkArea is used then close it */
+      {
          hb_rddReleaseCurrentArea();
+      }
    }
 
    hb_rddCheck();
    uiLen = ( USHORT ) hb_parclen( 3 );
+
    if( uiLen > 0 )
    {
       if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
+      {
          uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
+      }
 
       hb_strncpyUpper( cDriverBuffer, hb_parc( 3 ), uiLen );
       szDriver = cDriverBuffer;
    }
    else
+   {
       szDriver = s_szDefDriver;
+   }
 
    pFileName = hb_fsFNameSplit( szFileName );
    strncpy( szAlias, hb_parc( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
    uiLen = strlen( szAlias );
+
    if( uiLen == 0 )
+   {
       strncpy( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
+   }
    else if( uiLen == 1 )
    {
       /* Alias with a single letter. Only are valid 'L' and > 'M' */
@@ -1269,14 +1288,15 @@ HB_FUNC( DBCREATE )
 
    szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
    strncpy( szFileName, hb_parc( 1 ), _POSIX_PATH_MAX );
+
    if( !pFileName->szExtension )
    {
       pFileExt = hb_itemPutC( NULL, "" );
       SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, pFileExt );
-      strncat( szFileName, hb_itemGetCPtr( pFileExt ), _POSIX_PATH_MAX -
-               strlen( szFileName ) );
+      strncat( szFileName, hb_itemGetCPtr( pFileExt ), _POSIX_PATH_MAX - strlen( szFileName ) );
       hb_itemRelease( pFileExt );
    }
+
    hb_xfree( pFileName );
 
    /* Save filename for later use */
@@ -1310,7 +1330,8 @@ HB_FUNC( DBCREATE )
    }
 
    hb_xfree( szFileName );
-   if( !bOpen )
+
+   if( ! bOpen )
    {
       hb_rddReleaseCurrentArea();
       hb_rddSelectWorkAreaNumber( uiPrevArea );
@@ -1319,6 +1340,7 @@ HB_FUNC( DBCREATE )
    {
       USHORT uiAreaSize, uiRddID;
       struct _RDDFUNCS * lprfsHost = ( ( AREAP ) s_pCurrArea->pArea )->lprfsHost;
+
       uiRddID = ( ( AREAP ) s_pCurrArea->pArea )->rddID;
       SELF_STRUCTSIZE( ( AREAP ) s_pCurrArea->pArea, &uiAreaSize );
       /* Close and release WorkArea */
@@ -1337,13 +1359,16 @@ HB_FUNC( DBCREATE )
       strcpy( ( char * ) pInfo.abName, szSavedFileName );
       pInfo.fShared = !hb_set.HB_SET_EXCLUSIVE;
       ( ( AREAP ) s_pCurrArea->pArea )->uiArea = s_uiCurrArea;
+
       if( SELF_OPEN( ( AREAP ) s_pCurrArea->pArea, &pInfo ) == FAILURE )
       {
          s_bNetError = TRUE;           /* Temp fix! What about other types of errors? */
          hb_rddReleaseCurrentArea();
       }
       else
+      {
          hb_retl( TRUE );
+      }
       //hb_xfree( pInfo.abName );
       hb_xfree( szFileName );
    }

@@ -7733,6 +7733,8 @@ STATIC FUNCTION InitClsResults()
  #endif
 
 RETURN .T.
+
+#ifndef __XHARBOUR__
 //--------------------------------------------------------------//
 INIT PROCEDURE PPInit
 
@@ -7819,6 +7821,8 @@ FUNCTION xToStr( xExp )
    ENDCASE
 
 RETURN ""
+
+#endif
 
 //--------------------------------------------------------------//
 FUNCTION PP_QSelf( o )

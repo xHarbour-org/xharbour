@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.2 2002/01/12 10:04:27 ronpinkas Exp $
+ * $Id: workarea.c,v 1.3 2002/01/17 23:20:47 ronpinkas Exp $
  */
 
 /*
@@ -228,27 +228,53 @@ ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
 {
    ULONG ulSize;
    LPFIELD pField;
+   char *sFieldName = ( char *) pFieldInfo->atomName;
+   BOOL bFreeName;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waAddField(%p, %p)", pArea, pFieldInfo));
 
    /* Validate the name of field */
-   ulSize = strlen( ( char * ) pFieldInfo->atomName );
-   hb_strLTrim( ( char * ) pFieldInfo->atomName, &ulSize );
-   ulSize = hb_strRTrimLen( ( char * ) pFieldInfo->atomName, ulSize, TRUE );
-   if( !ulSize )
+   ulSize = strlen( sFieldName );
+   hb_strLTrim( sFieldName, &ulSize );
+   ulSize = hb_strRTrimLen( sFieldName, ulSize, TRUE );
+
+   if( ! ulSize )
+   {
       return FAILURE;
-   pFieldInfo->atomName[ulSize] = '\0';
+   }
+
+   if( sFieldName[ulSize] != '\0' )
+   {
+	  hb_xgrab( ulSize + 1 );
+	  strncpy( sFieldName, ( char * ) pFieldInfo->atomName, ulSize );
+      sFieldName[ulSize] = '\0';
+	  bFreeName = TRUE;
+   }
+   else
+   {
+	  bFreeName = FALSE;
+   }
 
    pField = pArea->lpFields + pArea->uiFieldCount;
+
    if( pArea->uiFieldCount > 0 )
+   {
       ( ( LPFIELD ) ( pField - 1 ) )->lpfNext = pField;
-   pField->sym = ( void * ) hb_dynsymGet( ( char * ) pFieldInfo->atomName );
+   }
+
+   pField->sym = ( void * ) hb_dynsymGet( sFieldName );
    pField->uiType = pFieldInfo->uiType;
    pField->uiTypeExtended = pFieldInfo->uiTypeExtended;
    pField->uiLen = pFieldInfo->uiLen;
    pField->uiDec = pFieldInfo->uiDec;
    pField->uiArea = pArea->uiArea;
-   pArea->uiFieldCount ++;
+   pArea->uiFieldCount++;
+
+   if( bFreeName )
+   {
+	  hb_xfree( sFieldName );
+   }
+
    return SUCCESS;
 }
 
@@ -315,9 +341,12 @@ ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
          default:
             return FAILURE;
       }
+
       /* Add field */
       if( SELF_ADDFIELD( pArea, &pFieldInfo ) == FAILURE )
+	  {
          return FAILURE;
+	  }
    }
    return SUCCESS;
 }

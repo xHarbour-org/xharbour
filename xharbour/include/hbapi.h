@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.7 2002/01/27 09:01:56 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.8 2002/01/27 10:57:09 ronpinkas Exp $
  */
 
 /*
@@ -414,6 +414,7 @@ extern BOOL     hb_strEmpty( const char * szText, ULONG ulLen ); /* returns whet
 extern void     hb_strDescend( char * szStringTo, const char * szStringFrom, ULONG ulLen ); /* copy a string to a buffer, inverting each character */
 extern ULONG    hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen ); /* returns an index to a sub-string within another string */
 extern char *   hb_strUpper( char * szText, ULONG ulLen ); /* convert an existing string buffer to upper case */
+extern char *   hb_strUpperCopy( char * szText, ULONG ulLen );
 extern char *   hb_strLower( char * szText, ULONG ulLen ); /* convert an existing string buffer to lower case */
 extern char *   hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLen ); /* copy an existing string buffer to another buffer, as upper case */
 extern char *   hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen );

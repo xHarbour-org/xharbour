@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.7 2002/01/27 09:01:57 ronpinkas Exp $
+ * $Id: memvars.c,v 1.8 2002/01/27 19:14:51 ronpinkas Exp $
  */
 
 /*
@@ -868,10 +868,16 @@ int hb_memvarScope( char * szVarName, ULONG ulLength )
 
       memcpy( szName, szVarName, ulLength );
       pDynVar = hb_dynsymFind( hb_strUpper( szName, ulLength - 1 ) );
+
       if( pDynVar )
+	  {
          iMemvar = hb_memvarScopeGet( pDynVar );
+	  }
       else
+	  {
          iMemvar = HB_MV_NOT_FOUND;
+	  }
+
       hb_xfree( szName );
    }
 
