@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.88 2003/07/17 19:19:41 jonnymind Exp $
+* $Id: thread.c,v 1.89 2003/07/18 18:06:49 jonnymind Exp $
 */
 
 /*
@@ -418,7 +418,12 @@ void hb_threadDestroyStack( HB_STACK *pStack )
          hb_itemClear( *pPos );
       }
    }
-   
+   /* Eventually free the return value of the stack */
+   if( HB_IS_COMPLEX( &(pStack->Return) ) )
+   {
+      hb_itemClear( &(pStack->Return) );   
+   }
+  
 
    /* Error handler is never allocated; it resides in the stack, or
       is owned by callers. */
@@ -429,11 +434,6 @@ void hb_threadDestroyStack( HB_STACK *pStack )
       if( pStack != &hb_stack ) {
          hb_itemClear( pStack->errorBlock );
       }
-   }
-
-   if (  pStack->aTryCatchHandlerStack &&  pStack->aTryCatchHandlerStack->type != HB_IT_NIL )
-   {
-      //hb_itemClear( pStack->aTryCatchHandlerStack );
    }
 
    /* Free each element of the stack */
@@ -450,14 +450,18 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    free( pStack->pItems );
 
    // releases this thread's memvars
+   
    if( pStack != &hb_stack )
    {
+      if ( pStack->aTryCatchHandlerStack &&  pStack->aTryCatchHandlerStack->type != HB_IT_NIL )
+      {
+         hb_itemClear( pStack->aTryCatchHandlerStack );
+      }
       // Main thread should have them removed before arriving here.
       hb_memvarsRelease( pStack );
    }
-   hb_xfree( pStack->privateStack );
-   hb_xfree( pStack->globalTable );
-
+   hb_memvarsFree( pStack );
+   
    /*
    #ifdef HB_OS_WIN_32
    free( pStack->pCleanUp );

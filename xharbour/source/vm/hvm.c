@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.237 2003/07/16 11:12:43 andijahja Exp $
+ * $Id: hvm.c,v 1.238 2003/07/17 01:52:50 andijahja Exp $
  */
 
 /*
@@ -599,18 +599,19 @@ void HB_EXPORT hb_vmQuit( void )
 
 #ifndef HB_CDP_SUPPORT_OFF
    hb_cdpReleaseAll();          /* releases codepages */
+   //printf( "After Cdp\n" );
 #endif
 
    /* release all remaining items */
 #ifndef HB_THREAD_SUPPORT
    hb_stackRemove( 0 );
    //printf( "After Stack\n" );
+#endif
 
    if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
    {
-      hb_itemClear( &(HB_VM_STACK.Return) );
+      hb_itemClear( &(HB_VM_STACK.Return) );   
    }
-#endif
    //printf( "After Return\n" );
 
    if( s_aStatics.type == HB_IT_ARRAY )
@@ -627,14 +628,14 @@ void HB_EXPORT hb_vmQuit( void )
    //printf( "\nAfter Globals\n" );
 
 #ifndef HB_THREAD_SUPPORT
-   // in threads, it is called by the th stack destructor
    hb_memvarsRelease();    /* clear all PUBLIC variables */
+#else
+   hb_memvarsRelease( &hb_stack );
 #endif
 
    //printf( "After Memvar\n" );
 
    /* release all known garbage */
-   //hb_gcCollectAll();
    hb_gcReleaseAll();
    //printf( "After GC\n" );
 
@@ -646,10 +647,7 @@ void HB_EXPORT hb_vmQuit( void )
    //printf( "After memvarsFree\n" );
 
    hb_stackFree();
-#else
-
-    hb_threadExit();
-
+   //printf( "After hbStackFree\n" );
 #endif
 
    //printf( "After stackFree\n" );
@@ -664,6 +662,11 @@ void HB_EXPORT hb_vmQuit( void )
 
    hb_traceExit();
    //printf( "After traceExit\n" );
+
+#ifdef HB_THREAD_SUPPORT
+    hb_threadExit();
+    //printf( "After thread exit\n" );
+#endif
 
    exit( s_byErrorLevel );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.34 2003/06/26 12:37:09 druzus Exp $
+ * $Id: fm.c,v 1.35 2003/07/13 22:26:17 jonnymind Exp $
  */
 
 /*
@@ -604,6 +604,12 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
    HB_TRACE(HB_TR_DEBUG, ("hb_xexit()"));
 
 #ifdef HB_FM_STATISTICS
+
+//JC1: The problem with threads here is that the stack has already been
+// destroyed, but hb_conOut and other functions may allocate memory with xgrab, using the
+// stack... Notice that this can possibly leads to problem also in ST
+// apps in the future. We must de-tangle the initialization and closing
+// sequence
 
    if( s_lMemoryBlocks || hb_cmdargCheck( "INFO" ) )
    {

@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.6 2003/01/12 22:50:17 jonnymind Exp $
+# $Id: global.cf,v 1.7 2003/05/16 19:52:05 druzus Exp $
 #
 
 all : first
@@ -49,7 +49,7 @@ dirbase::
 
 dirbase_mt::
 	-if not exist $(HB_ARCHITECTURE) $(MD) $(HB_ARCHITECTURE)
-	-if not exist $(ARCH_DOS)        $(MD) $(ARCH_DOS)_mt
+	-if not exist $(ARCH_DOS)_mt     $(MD) $(ARCH_DOS)_mt
 
 clean::
 	-for %f in ($(ARCH_DOS)\*.*) do $(RM) %f

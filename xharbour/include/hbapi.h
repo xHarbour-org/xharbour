@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.74 2003/07/13 18:10:00 walito Exp $
+ * $Id: hbapi.h,v 1.75 2003/07/14 19:18:46 jonnymind Exp $
  */
 
 /*
@@ -452,12 +452,14 @@ extern void     hb_codeblockEvaluate( HB_ITEM_PTR pItem ); /* evaluate a codeblo
 /* memvars subsystem */
 extern HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar ); /* create a new global value */
 extern HB_VALUE_PTR * hb_memvarValueBaseAddress( void ); /* retrieve the base address of the values table */
+
 //JC1: thread version is a little different
 #ifndef HB_THREAD_SUPPORT
 extern void     hb_memvarsInit( void ); /* initialize the memvar API system */
 extern void     hb_memvarsRelease( void ); /* clear all PUBLIC and PRIVATE variables */
-#endif
 extern void     hb_memvarsFree( void ); /* release the memvar API system */
+#endif
+
 extern void     hb_memvarValueIncRef( HB_HANDLE hValue ); /* increase the reference count of a global value */
 extern void     hb_memvarValueDecRef( HB_HANDLE hValue ); /* decrease the reference count of a global value */
 extern void     hb_memvarValueDecGarbageRef( HB_HANDLE hValue ); /* decrease the reference count of a detached local variable */

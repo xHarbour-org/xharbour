@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1267 2003/07/19 02:26:40 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1268 2003/07/19 07:24:06 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-20 00:01 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
+  * config/w32/global.cf
+    ! Wasn't building the directory gcc_mt under CMD environment. Fixed. 
+
+  * include/hbdefs.h
+    ! gcc is not able to see a typedef in #if defined(), so if the _winnt_h
+      is declared, LONGLONG must not be redefined
+
+  * include/hbapi.h
+  * include/thread.h
+    ! hb_memvarRelese() is now thread-specific
+
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+  * source/vm/thread.c
+    ! fixed vmQuit phase under MT. Still, I have not been able to release
+      memvar's data at the end of a thread. Help is needed here;
+      For the moment, MT programs using memvars should set them to 0 before
+      thread termination.
+  
+  * source/vm/fm.c
+    + added a comment about thread termination sequence.
 
 2003-07-19 09:19 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
   * utils/hbdict/hbdict.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.21 2003/07/14 19:18:47 jonnymind Exp $
+ * $Id: memvars.c,v 1.22 2003/07/16 13:46:55 andijahja Exp $
  */
 
 /*
@@ -158,18 +158,38 @@ void hb_memvarsRelease( void )
    }
 }
 
+void hb_memvarsFree( void )
+{
+   if( s_globalTable )
+      hb_xfree( s_globalTable );
+
+   if( s_privateStack )
+      hb_xfree( s_privateStack );
+}
+
 #else
 void hb_memvarsInit( HB_STACK *pStack )
 {
+   // we MUST use malloc instead of hb_xgrab, as destruction sequence of main
+   // thread is different.
+   #ifndef HB_SAFE_ALLOC
+      HB_CRITICAL_LOCK( hb_allocMutex );
+   #endif
 
-   pStack->globalTable = ( HB_VALUE_PTR ) hb_xgrab( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );
+   pStack->globalTable = ( HB_VALUE_PTR ) malloc( sizeof( HB_VALUE ) * TABLE_INITHB_VALUE );
+   pStack->privateStack = ( PHB_DYNS * ) malloc( sizeof( PHB_DYNS ) * TABLE_INITHB_VALUE );
+
+   #ifndef HB_SAFE_ALLOC
+      HB_CRITICAL_UNLOCK( hb_allocMutex );
+   #endif
+
    pStack->globalTableSize = TABLE_INITHB_VALUE;
    pStack->globalFreeCnt   = 0;
    pStack->globalFirstFree = pStack->globalLastFree = 1;
 
-   pStack->privateStack = ( PHB_DYNS * ) hb_xgrab( sizeof( PHB_DYNS ) * TABLE_INITHB_VALUE );
    pStack->privateStackSize = TABLE_INITHB_VALUE;
    pStack->privateStackCnt  = pStack->privateStackBase = 0;
+
 }
 
 /* clear all variables except the detached ones
@@ -177,12 +197,15 @@ void hb_memvarsInit( HB_STACK *pStack )
 */
 void hb_memvarsRelease( HB_STACK *pStack )
 {
+/* TODO
    ULONG ulCnt;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarsClear()"));
 
+
    ulCnt = pStack->globalLastFree;
 
+   printf ("Releasing for: %d, ulCnt:%d\n", pStack->th_vm_id, ulCnt );
    if( pStack->globalTable )
    {
       while( --ulCnt )
@@ -197,21 +220,29 @@ void hb_memvarsRelease( HB_STACK *pStack )
          }
       }
    }
+   */
+}
+
+
+void hb_memvarsFree( HB_STACK *pStack )
+{
+   #ifndef HB_SAFE_ALLOC
+      HB_CRITICAL_LOCK( hb_allocMutex );
+   #endif
+
+   if( pStack->globalTable )
+      free( pStack->globalTable );
+
+   if( pStack->privateStack )
+      free( pStack->privateStack );
+
+   #ifndef HB_SAFE_ALLOC
+      HB_CRITICAL_UNLOCK( hb_allocMutex );
+   #endif
 }
 
 #endif
 
-
-void hb_memvarsFree( void )
-{
-   #ifndef HB_THREAD_SUPPORT
-   if( s_globalTable )
-      hb_xfree( s_globalTable );
-
-   if( s_privateStack )
-      hb_xfree( s_privateStack );
-   #endif
-}
 
 /*
  * This function base address of values table
