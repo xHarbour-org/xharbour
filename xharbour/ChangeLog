@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.797 2003/03/04 00:11:41 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.798 2003/03/04 02:55:07 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,147 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-03-04 18:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br)
+  + contrib\libct\addascii.c
+    contrib\libct\makefile
+    contrib\libct\asciisum.c
+    contrib\libct\ascpos.c
+    contrib\libct\atadjust.c
+    contrib\libct\atnum.c
+    contrib\libct\atrepl.c
+    contrib\libct\bit1.c
+    contrib\libct\bit2.c
+    contrib\libct\bit3.c
+    contrib\libct\charevod.c
+    contrib\libct\charlist.c
+    contrib\libct\charmirr.c
+    contrib\libct\charmix.c
+    contrib\libct\charone.c
+    contrib\libct\charonly.c
+    contrib\libct\charop.c
+    contrib\libct\charrepl.c
+    contrib\libct\charsort.c
+    contrib\libct\charswap.c
+    contrib\libct\color.prg
+    contrib\libct\count.c
+    contrib\libct\ct.ch
+    contrib\libct\ct.h
+    contrib\libct\ct.prg
+    contrib\libct\ctc.c
+    contrib\libct\ctchksum.c
+    contrib\libct\ctcrypt.c
+    contrib\libct\cterror.ch
+    contrib\libct\ctflist.txt
+    contrib\libct\ctmath.c
+    contrib\libct\ctmath.h
+    contrib\libct\ctmisc.prg
+    contrib\libct\ctset.c
+    contrib\libct\ctset.h
+    contrib\libct\ctstr.c
+    contrib\libct\ctstr.h
+    contrib\libct\datetime.prg
+    contrib\libct\dattime2.prg
+    contrib\libct\exponent.c
+    contrib\libct\files.c
+    contrib\libct\finan.c
+    contrib\libct\ftoc.c
+    contrib\libct\invertwin.prg
+    contrib\libct\justify.c
+    contrib\libct\keyset.c
+    contrib\libct\make_b32.bat
+    contrib\libct\make_vc.bat
+    contrib\libct\makefile.bc
+    contrib\libct\makefile.vc
+    contrib\libct\math.c
+    contrib\libct\misc1.c
+    contrib\libct\num1.c
+    contrib\libct\numat.c
+    contrib\libct\numconv.prg
+    contrib\libct\pad.c
+    contrib\libct\pos1.c
+    contrib\libct\pos2.c
+    contrib\libct\posdiff.c
+    contrib\libct\print.c
+    contrib\libct\range.c
+    contrib\libct\readme.txt
+    contrib\libct\relation.c
+    contrib\libct\remove.c
+    contrib\libct\replace.c
+    contrib\libct\screen1.c
+    contrib\libct\screen2.prg
+    contrib\libct\setlast.prg
+    contrib\libct\strdiff.c
+    contrib\libct\strswap.c
+    contrib\libct\tab.c
+    contrib\libct\token1.c
+    contrib\libct\token2.c
+    contrib\libct\trig.c
+    contrib\libct\wordrepl.c
+    contrib\libct\wordtoch.c
+    contrib\libct\alt\ctcolton.c
+    contrib\libct\alt\token1.prg
+    contrib\libct\tests\addascii.prg
+    contrib\libct\tests\makefile
+    contrib\libct\tests\afteratn.prg
+    contrib\libct\tests\asciisum.prg
+    contrib\libct\tests\ascpos.prg
+    contrib\libct\tests\atadjust.prg
+    contrib\libct\tests\atnum.prg
+    contrib\libct\tests\atrepl.prg
+    contrib\libct\tests\attoken.prg
+    contrib\libct\tests\beforatn.prg
+    contrib\libct\tests\charadd.prg
+    contrib\libct\tests\charand.prg
+    contrib\libct\tests\chareven.prg
+    contrib\libct\tests\charhist.prg
+    contrib\libct\tests\charlist.prg
+    contrib\libct\tests\charmirr.prg
+    contrib\libct\tests\charmix.prg
+    contrib\libct\tests\charnlst.prg
+    contrib\libct\tests\charnot.prg
+    contrib\libct\tests\charodd.prg
+    contrib\libct\tests\charone.prg
+    contrib\libct\tests\charonly.prg
+    contrib\libct\tests\charor.prg
+    contrib\libct\tests\charrem.prg
+    contrib\libct\tests\charrepl.prg
+    contrib\libct\tests\charrll.prg
+    contrib\libct\tests\charrlr.prg
+    contrib\libct\tests\charshl.prg
+    contrib\libct\tests\charshr.prg
+    contrib\libct\tests\charslst.prg
+    contrib\libct\tests\charsort.prg
+    contrib\libct\tests\charsub.prg
+    contrib\libct\tests\charswap.prg
+    contrib\libct\tests\charxor.prg
+    contrib\libct\tests\csetarge.prg
+    contrib\libct\tests\csetatmu.prg
+    contrib\libct\tests\csetref.prg
+    contrib\libct\tests\datetime.prg
+    contrib\libct\tests\expomant.prg
+    contrib\libct\tests\finan.prg
+    contrib\libct\tests\math.prg
+    contrib\libct\tests\num1.prg
+    contrib\libct\tests\numtoken.prg
+    contrib\libct\tests\rangerem.prg
+    contrib\libct\tests\rangerep.prg
+    contrib\libct\tests\setatlik.prg
+    contrib\libct\tests\strdiff.prg
+    contrib\libct\tests\tab.prg
+    contrib\libct\tests\token.prg
+    contrib\libct\tests\token2.prg
+    contrib\libct\tests\tokenlow.prg
+    contrib\libct\tests\tokensep.prg
+    contrib\libct\tests\tokenupp.prg
+    contrib\libct\tests\trig.prg
+    contrib\libct\tests\valpos.prg
+    contrib\libct\tests\wordone.prg
+    contrib\libct\tests\wordonly.prg
+    contrib\libct\tests\wordrem.prg
+    contrib\libct\tests\wordrepl.prg
+    contrib\libct\tests\wordswap.prg
+    + Imported CA Tools Compatible Functions From Harbour CVS
 
 2003-03-03 18:54 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.sly
