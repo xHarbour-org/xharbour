@@ -26,7 +26,7 @@ GLOBAL EXTERNAL oApp
 
  CLASS TFormEdit FROM TForm
 
-   CLASSDATA nForms INIT 0
+   CLASSDATA nForms  PROTECTED INIT 0
 
    DATA oMask        PROTECTED
    DATA Editing      PROTECTED

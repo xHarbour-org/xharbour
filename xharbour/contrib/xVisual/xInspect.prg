@@ -5,6 +5,7 @@
 #include "wintypes.ch"
 #include "cstruct.ch"
 #include "debug.ch"
+#include "accel.ch"
 
 GLOBAL EXTERNAL oApp
 
@@ -96,7 +97,7 @@ METHOD OnCreate() CLASS ObjInspect
   oCol2:=whColumn():INIT( 'Value'   , {|oCol,oB,n| asString(oB:source[n,2]) } ,DT_LEFT,81)
   oCol2:VertAlign  :=TA_CENTER
   oCol2:fgColor    := RGB(0,0,128)
-  oCol2:bSaveBlock := {|cText|::SaveVar(cText)}
+  oCol2:bSaveBlock := {|cText,o,nwParam|::SaveVar(cText,nwParam) }
 
   ::Browser:addColumn(oCol1)
   ::Browser:addColumn(oCol2)
@@ -113,11 +114,10 @@ return( super:OnCreate() )
 
 //----------------------------------------------------------------------------------------------
 
-METHOD SaveVar(cText) CLASS ObjInspect
+METHOD SaveVar(cText,nwParam) CLASS ObjInspect
    local cType, cVar
    cVar := ::Browser:source[::Browser:RecPos][1]
    cType:= valtype( __objSendMsg( ::CurObject, cVar ) )
-   view ::Browser:RecPos
    do case
       case cType == 'N'
            cText:=VAL(cText)
@@ -126,12 +126,20 @@ METHOD SaveVar(cText) CLASS ObjInspect
       case cType == 'L'
            cText:= IIF( cText == ".T.",.T.,.F.)
    endcase
-   __objSendMsg( ::CurObject, "_"+cVar, cText )
-   ::Browser:source[::Browser:RecPos][2]:= cText
-   ::Browser:RefreshCurrent()
-   ::CurObject:Update()
-   ::CurObject:SetFocus()
-   SetFocus( ::Browser:hWnd)
+   if __objSendMsg( ::CurObject, cVar ) != cText
+      __objSendMsg( ::CurObject, "_"+cVar, cText )
+      ::Browser:source[::Browser:RecPos][2]:= cText
+      ::Browser:RefreshCurrent()
+      ::CurObject:Update()
+      ::CurObject:SetFocus()
+      SetFocus( ::Browser:hWnd)
+   endif
+   IF nwParam==VK_UP .OR. nwParam==VK_DOWN
+      ::Browser:RefreshCurrent()
+      PostMessage( ::Browser:hWnd, WM_KEYDOWN, nwParam, 0 )
+      PostMessage( ::Browser:hWnd, WM_LBUTTONDBLCLK, 0, 0 )
+      ::Browser:RefreshAll()
+   ENDIF
 return(self)
 
 //----------------------------------------------------------------------------------------------
