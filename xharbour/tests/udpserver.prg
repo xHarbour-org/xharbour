@@ -1,4 +1,10 @@
-// SERVER:
+*************************************************
+* Test UDP server
+* Will reply to datagrams having "AYT?" messages
+* with a "HERE!" reply. All other messages will
+* be just printed to screen
+*************************************************
+
 Procedure Main( cPort )
 
    LOCAL Socket
@@ -22,10 +28,9 @@ Procedure Main( cPort )
 
    DO WHILE InetErrorCode( Socket )  == 0 .and. Upper( Trim(cResponse )) != "QUIT" .and. INKEY() == 0
 
-      IF InetDataReady( Socket ) != 0
+      IF InetDataReady( Socket, 150 ) != 0
          nResponse := InetDGramRecv( Socket, cResponse, 60 )
       ELSE
-         ThreadSleep( 100 )
          Progress( @nProgress )
          LOOP
       ENDIF
@@ -39,6 +44,15 @@ Procedure Main( cPort )
       @ 7, 5 SAY "Received:"
       @ 8, 5 SAY space(70)
       @ 8, 5 SAY cResponse
+
+      /* If we recive an Are You There code, we must send an HERE response */
+      IF SubStr( cResponse, 1, nResponse ) == "AYT?"
+         
+         /* Recv functions fill the remote address with the latest connection */
+         InetDGramSend( Socket, InetAddress( Socket ), InetPort( Socket ), "HERE!" )
+      
+      ENDIF
+
       cResponse := Space( 60 )
    ENDDO
 

@@ -204,14 +204,17 @@ InetRecvLine( SOCKET [, @nResult, [, nMaxLength [, nBufSize]]] ) --> STRING
   once, at the beginning of the function).
 
 
-InetDataReady( SOCKET [, nAmount] ) --> NUMERIC
+InetDataReady( SOCKET [, nMillisecs] ) --> NUMERIC
   Verifies if some data is available to be read in the socket without blocking
-  execution of the caller. If nAmount is not given, the functions returns 1 if
-  there is some data to be read, 0 if there isn't any data and -1 in case of
-  error. If nAmount is given, the functon will check if the stream has
-  available for reading at least nAmount characters; it will return the number
-  of available characters up to nAmount, 0 if none and -1 on error.
-  On error, the socket will report what kind of error happend.
+  execution of the caller. If nMillisecs is not given, the functions returns 
+  immediately 1 if there is some data to be read, 0 if there isn't any data and 
+  -1 in case of error. If nMillisecs is given, the functon will wait up to that
+  amount of milliseconds for data to be available; if some data arrives in the
+  meanwhile, the wait is immediately interrupted.
+  The next InetRecv() function will read all the available data (up to the
+  reqired lenght) without blocking.
+  On error, InetErrorCode and InetErrorDesc can be use to determine what kind 
+  of error happend.
 
 
 InetSend( SOCKET, STRING [, nLength ] ) --> NUNERIC
@@ -310,7 +313,7 @@ InetDGramSend( SOCKET, cAddress, nPort, cBuffer [, nSize ] ) --> NUMERIC
 
 InetDGramRecv( SOCKET, cBuffer [, nSize ] ) --> NUMERIC
   Reads at maximum nSize bytes incoming from a UDP socket, if nSize is
-  given, or to cBuffer length if not given.
+  given, or reads at maximum cBuffer length if nSize is not given.
   There isn't any guarantee that all the data required to be written is
   really sent to the socket: the calling program should check for the
   numeric return and send iteratively the unsent data, up to complete
@@ -319,4 +322,21 @@ InetDGramRecv( SOCKET, cBuffer [, nSize ] ) --> NUMERIC
   that less than the system datagram size will be sent and received
   as a single item.
   Returns -1 on error, or the number of bytes actually read on success.
+
+
+InetDGRecvTout( SOCKET, nMillisecs, cBuffer [, nSize ] ) --> NUMERIC
+  Sorry for a so counter intuitive function name. It's complete name
+  is "Internet (module) Datagram Receive (with) Timeout". This function
+  comes handy when a network service scan is in order, or when expecting
+  for another UDP socket to give an answer in a determined time lapse.
+  Reads at maximum nSize bytes incoming from a UDP socket, if nSize is
+  given, or reads at maximum cBuffer length if nSize is not given.
+  The return value is -1 if a network error occoured, or 0 if the
+  nMillisecs timeout elapses and there isn't still any data
+  available. If a datagram arrives while waiting, the wait is
+  immediately interrupted, and the lenght of the datagram (up to nSize or
+  cBuffer lenght) is returned.
+  
+
+
 

@@ -66,7 +66,7 @@ PROCEDURE ReceivePoll( Socket )
    @ nRow, nCol
 
    DO WHILE ! g_bDone
-      IF InetDataReady( Socket ) > 0
+      IF InetDataReady( Socket, 100 ) > 0
          cResponse := InetRecvLine( Socket, @nResponse )
 
          IF nResponse > 0
@@ -78,8 +78,6 @@ PROCEDURE ReceivePoll( Socket )
      ENDIF
 
      Progress( @nProgress )
-
-     ThreadSleep( 100 )
    ENDDO
 
 RETURN

@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.3 2003/01/08 09:23:24 jonnymind Exp $
+* $Id: inet.c,v 1.4 2003/01/08 19:22:25 jonnymind Exp $
 */
 
 /*
@@ -540,13 +540,8 @@ HB_FUNC( INETDATAREADY )
    int iLen;
    HB_SOCKET_STRUCT *Socket;
 
-   //#if defined( HB_OS_WIN_32 )
-      fd_set rfds;
-      struct timeval tv = {0,0};
-   //#else
-   //   char cChar;
-   //   char *Buffer;
-   //#endif
+   fd_set rfds;
+   struct timeval tv = {0,0};
 
    if( pSocket == NULL || ( hb_pcount() == 2 && ! ISNUM(2)) )
    {
@@ -558,30 +553,19 @@ HB_FUNC( INETDATAREADY )
 
    Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
 
-   //HB_CRITICAL_INET_LOCK( Socket->Mutex );
-
    HB_SOCKET_ZERO_ERROR( Socket );
 
-   //#if defined( HB_OS_WIN_32 )
-      /* Watch our socket. */
-      FD_ZERO(&rfds);
-      FD_SET(Socket->com, &rfds);
-      iLen = select(Socket->com + 1, &rfds, NULL, NULL, &tv);
-      /* Don't rely on the value of tv now! */
+   /* Watch our socket. */
+   if( hb_pcount() == 2 ) {
+      iLen = hb_parni( 2 );
+      tv.tv_sec = iLen / 1000;
+      tv.tv_usec = (iLen % 1000) * 1000;
+   }
 
-   //#else
-   //   if( hb_pcount() == 2 )
-   //   {
-   //      iLen = hb_parni(2);
-   //      Buffer = (char *) hb_xgrab( iLen );
-   //      iLen = recv( Socket->com, Buffer, iLen, MSG_NOSIGNAL | MSG_PEEK | MSG_DONTWAIT );
-   //      hb_xfree( (void *) Buffer );
-   //   }
-   //   else
-   //   {
-   //      iLen = recv( Socket->com, &cChar, 1, MSG_NOSIGNAL | MSG_PEEK | MSG_DONTWAIT );
-   //   }
-   //#endif
+   FD_ZERO(&rfds);
+   FD_SET(Socket->com, &rfds);
+   iLen = select(Socket->com + 1, &rfds, NULL, NULL, &tv);
+   /* Don't rely on the value of tv now! */
 
    if( iLen < 0 )
    {
@@ -590,7 +574,6 @@ HB_FUNC( INETDATAREADY )
 
    hb_retni( iLen );
 
-   //HB_CRITICAL_INET_UNLOCK( Socket->Mutex );
 }
 
 HB_FUNC( INETSEND )
@@ -1283,7 +1266,7 @@ HB_FUNC( INETDGRAMRECV )
       hb_itemRelease( pArgs );
       return;
    }
-   
+
    Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
    Buffer = pBuffer->item.asString.value;
 
@@ -1313,4 +1296,83 @@ HB_FUNC( INETDGRAMRECV )
    //HB_CRITICAL_INET_UNLOCK( Socket->Mutex );
 }
 
+HB_FUNC( INETDGRECVTOUT )
+{
+   char *Buffer;
+   int iLen;
+   fd_set rfds;
+   struct timeval tv;
+
+   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pBuffer = hb_param( 3, HB_IT_STRING );
+
+
+   #if defined(HB_OS_WIN_32)
+      int iDtLen;
+   #else
+      socklen_t iDtLen;
+   #endif
+
+   HB_SOCKET_STRUCT *Socket;
+
+   if( pSocket == NULL || !ISNUM(2) || pBuffer == NULL )
+   {
+      PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDGRAMRECV", 1, pArgs );
+      hb_itemRelease( pArgs );
+      return;
+   }
+
+   Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
+   Buffer = pBuffer->item.asString.value;
+
+
+   HB_SOCKET_ZERO_ERROR( Socket );
+
+   /* Extract waiting time in milliseconds */
+   iLen = hb_parni( 2 );
+   tv.tv_sec = iLen / 1000;
+   tv.tv_usec = (iLen % 1000) * 1000;
+
+
+   /* Watch our socket. */
+
+   FD_ZERO(&rfds);
+   FD_SET(Socket->com, &rfds);
+   iLen = select(Socket->com + 1, &rfds, NULL, NULL, &tv);
+
+   /* Some error conditions occoured in select */
+   if( iLen < 0 ) {
+      HB_SOCKET_SET_ERROR( Socket );
+      hb_retni( -1 );
+      return;
+   }
+
+   /* Timeout expired without data being catched */
+   if( iLen == 0 ) {
+      hb_retni( 0 );
+      return;
+   }
+
+   /* Now we put ourselves in recv mode */
+   if( ISNUM( 4 ) )
+   {
+      iLen = hb_parni( 4 );
+   }
+   else
+   {
+      iLen = pBuffer->item.asString.length;
+   }
+
+   Socket->count = recvfrom( Socket->com, Buffer, iLen, 0,
+         (struct sockaddr *) &Socket->remote, &iDtLen );
+
+   if( Socket->count <= 0 )
+   {
+      HB_SOCKET_SET_ERROR( Socket );
+   }
+
+   hb_retni( Socket->count );
+
+}
 #endif
