@@ -154,12 +154,13 @@ if AND(nFlags,OFN_ALLOWMULTISELECT ) > 0
    END
    x:=AT(CHR(0),cFile) // fist null
    cPath:=LEFT(cFile,x)
+   
    cFile:=STRTRAN(cFile,cPath)
    IF !EMPTY(cFile) // user selected more than 1 file
       c:=''
       FOR n:=1 TO LEN(cFile)
           IF SUBSTR(cFile,n,1)==CHR(0)
-             AADD(aFiles,cPath+'\'+c)
+             AADD(aFiles,STRTRAN(cPath,CHR(0) )+'\'+c)
              c:=''
              LOOP
           END
@@ -171,7 +172,7 @@ if AND(nFlags,OFN_ALLOWMULTISELECT ) > 0
       x:=RAT('\',cFile)
       cPath:=LEFT(cFile,x-1)
       */
-      aFiles:={cPath} //STRTRAN(STRTRAN(cFile,cPath),'\')}
+      aFiles:={STRTRAN(cPath,CHR(0) )} //STRTRAN(STRTRAN(cFile,cPath),'\')}
    END
    Return(aFiles)
 else
