@@ -3971,14 +3971,16 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      asRevert[ nOptional ] := NIL
                   ENDIF
 
-                  // Now rewind.
-                  WHILE nMatch > 1
-                     nMatch--
-                     IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
-                        EXIT
-                     ENDIF
-                  ENDDO
-                  nMatch++
+                  IF nMatch > 1
+                     // Now rewind.
+                     WHILE nMatch > 1
+                        nMatch--
+                        IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
+                           EXIT
+                        ENDIF
+                     ENDDO
+                     nMatch++
+                  ENDIF
 
                   nOptional := 0
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.263 2002/06/08 17:56:24 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.264 2002/06/09 19:15:35 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-06-10 13:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Reverted recent fix in TestOptional() untim more complete fix.
+
+   * tests/pp.prg
+     ! Fixed minor bug in MatchRule()
 
 2002-06-08 14:51 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
    * include/hbrddcdx.h
