@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.314 2002/07/23 01:36:43 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.315 2002/07/23 01:52:46 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,8 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-07-23 00:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/isprint.c
+    ! Minor formating
+
 2002-07-22 18:43 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
-  * source/rt/isprint.c
+  * source/rtl/isprint.c
     ! Fixed 2 type errors reported by MSVC.
 
 2002-07-22 18:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
