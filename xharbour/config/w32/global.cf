@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.13 2004/08/05 12:21:16 lf_sfnet Exp $
+# $Id: global.cf,v 1.14 2005/01/11 23:53:42 likewolf Exp $
 #
 
 ifndef MK
@@ -19,6 +19,12 @@ HB_GT_LIBS=\
 ifeq ($(HB_GT_LIB),)
    HB_GT_LIB = gtwin
 endif
+ifeq ($(SHLVL),)
+ifeq ($(SHELL),/bin/sh.exe)
+SHLVL=1
+endif
+endif
+
 
 ifeq ($(SHLVL),) # COMMAND.COM
 

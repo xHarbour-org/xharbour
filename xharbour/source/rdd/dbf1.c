@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.106 2005/01/30 21:19:23 druzus Exp $
+ * $Id: dbf1.c,v 1.107 2005/01/31 19:43:48 druzus Exp $
  */
 
 /*
@@ -918,6 +918,9 @@ static ERRCODE hb_dbfSkipRaw( DBFAREAP pArea, LONG lToSkip )
    BOOL bBof, bEof;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfSkipRaw(%p, %ld)", pArea, lToSkip));
+
+   if( pArea->lpdbPendingRel )
+      SELF_FORCEREL( ( AREAP ) pArea );
 
    if( lToSkip == 0 )
    {
@@ -3106,13 +3109,11 @@ static ERRCODE hb_dbfLock( DBFAREAP pArea, LPDBLOCKINFO pLockInfo )
       switch( pLockInfo->uiMethod )
       {
          case DBLM_EXCLUSIVE:
-            return hb_dbfLockRecord( pArea, pArea->ulRecNo, &pLockInfo->fResult,
-                                     TRUE );
+            return hb_dbfLockRecord( pArea, 0, &pLockInfo->fResult, TRUE );
 
          case DBLM_MULTIPLE:
             return hb_dbfLockRecord( pArea, hb_itemGetNL( pLockInfo->itmRecID ),
-                                     &pLockInfo->fResult,
-                                     FALSE );
+                                     &pLockInfo->fResult, FALSE );
 
          case DBLM_FILE:
             return hb_dbfLockFile( pArea, &pLockInfo->fResult );

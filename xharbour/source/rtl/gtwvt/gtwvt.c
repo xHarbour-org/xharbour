@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.143 2005/01/22 15:21:09 lf_sfnet Exp $
+ * $Id: gtwvt.c,v 1.144 2005/01/22 18:38:42 fsgiudice Exp $
  */
 
 /*
@@ -1185,24 +1185,34 @@ int HB_GT_FUNC( gt_ReadKey( HB_inkey_enum eventmask ) )
 //
 //   Copied from gtwin
 //
-#if defined( __BORLANDC__ ) || defined( _MSC_VER )
+#if defined(__BORLANDC__) || defined(_MSC_VER)
 static int hb_Inp9x( USHORT usPort )
 {
-  USHORT usVal;
+   USHORT usVal;
 
-  HB_TRACE( HB_TR_DEBUG, ( "hb_Inp9x( %hu )", usPort ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_Inp9x( %hu )", usPort ) );
 
-  #if defined( __BORLANDC__ )
-     _DX = usPort;
-     __emit__( 0xEC );        /* ASM  IN AL, DX */
-     __emit__( 0x32,0xE4 );   /* ASM XOR AH, AH */
-     usVal = _AX;
-  #else
+   #if defined( __BORLANDC__ )
 
-     usVal = _inp( usPort );
-  #endif
+      _DX = usPort;
+      __emit__( 0xEC );        /* ASM  IN AL, DX */
+      __emit__( 0x32,0xE4 );   /* ASM XOR AH, AH */
+      usVal = _AX;
 
-  return( usVal );
+   #elif defined( __XCC__ )
+      __asm {
+               mov   dx, usPort
+               xor   ax, ax
+               in    al, dx
+               mov   usVal, ax
+            }
+   #else
+
+      usVal = _inp( usPort );
+
+   #endif
+
+   return( usVal );
 }
 
 //-------------------------------------------------------------------//
@@ -1211,19 +1221,27 @@ static int hb_Inp9x( USHORT usPort )
 //
 static int hb_Outp9x( USHORT usPort, USHORT usVal )
 {
-  HB_TRACE( HB_TR_DEBUG, ( "hb_Outp9x( %hu, %hu )", usPort, usVal ) );
+   HB_TRACE( HB_TR_DEBUG, ( "hb_Outp9x( %hu, %hu )", usPort, usVal ) );
 
-  #if defined( __BORLANDC__ )
-    _DX = usPort;
-    _AL = usVal;
-    __emit__( 0xEE );        /* ASM OUT DX, AL */
-    __emit__( 0x32,0xE4 );   /* ASM XOR AH, AH */
-    usVal = _AX;
-  #else
-     _outp( usPort, usVal );
-  #endif
+   #if defined( __BORLANDC__ )
 
-  return( usVal );
+      _DX = usPort;
+      _AL = usVal;
+      __emit__( 0xEE );        /* ASM OUT DX, AL */
+
+   #elif defined( __XCC__ )
+      __asm {
+               mov   dx, usPort
+               mov   ax, usVal
+               out   dx, al
+            }
+   #else
+
+      _outp( usPort, usVal );
+
+   #endif
+
+   return( usVal );
 }
 
 //-------------------------------------------------------------------//

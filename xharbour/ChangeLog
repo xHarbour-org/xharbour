@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3801 2005/02/08 18:32:28 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3802 2005/02/10 23:05:29 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-11 19:45 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/config/w32/global.cf
+    * additional check to recognize the situation when user run GNU
+      make from Windows command line with SHELL env var set to some
+      /bin/sh.exe - trick possible in MinGW
+
+  * xharbour/include/gfx.ch
+  + xharbour/include/gfxtrans.ch
+    * the #translate definitions moved to separate files
+      some C compilers checks the lines with # at the beginning
+      and doesn't like 'translate' directive ;-)
+
+  * xharbour/include/hbdefs.h
+    * changed the LONGLONG MIN/MAX definitions changed a little bit
+
+  * xharbour/include/hbinit.h
+    * small modifications - IMHO we should simplify this code. In
+      fact now we have only the following different cases:
+      - STRICT ANSI C without startup functions
+      - C++ initialization which should be used by default for C++ mode
+      - #pragma startup initialization
+      - #pragma (...MSC...) initialization
+      - constructor initialization (f.e. GCC)
+
+  * xharbour/source/rdd/dbf1.c
+    ! resolve pending relations in LOCK() method
+    * resolve pending relations in SKIPRAW() method - it's not strictly
+      necessary for Clipper compatibility because Clipper does not give
+      .prg function to SKIPRAW() and SKIP() resolves pending relations
+      but I added ordSkipRaw() function which IMHO should be defined
+      as respected relations
+
+  * xharbour/source/rtl/gtwin/gtwin.c
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    * small modification for direct XCC compilation
 
 2005-02-10 15:02 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/hbclass.ch

@@ -58,8 +58,8 @@
  *
  */
 
-#ifndef _GFX_CH_
-#define _GFX_CH_
+#ifndef _GFXTRANS_CH_
+#define _GFXTRANS_CH_
 
 /*
  * NOTE: ACQUIRE / RELEASE screen pair must work same way DispBegin()/DispEnd() pair does
@@ -75,44 +75,21 @@
  *
  */
 
-/* Misc, internals */
-#define GFX_ACQUIRESCREEN   1  // Some GTs may require that you 'acquire' the screen before doing gfx things
-#define GFX_RELEASESCREEN   2  // Release a previously 'acquired' screen
-#define GFX_MAKECOLOR       3  // Calculate gfx color number based on RGBA values
-/* Functions that affect drawing area */
-#define GFX_CLIPTOP        10
-#define GFX_CLIPLEFT       11
-#define GFX_CLIPBOTTOM     12
-#define GFX_CLIPRIGHT      13
-#define GFX_SETCLIP        14  // NOTE: set to 0, 0, 0, 0 to disable ;)
-/* Functions that affect drawing mode */
-#define GFX_DRAWINGMODE    20
-/* Drawing primitives */
-#define GFX_GETPIXEL       50
-#define GFX_PUTPIXEL       51
-#define GFX_LINE           52
-#define GFX_RECT           53
-#define GFX_FILLEDRECT     54
-#define GFX_CIRCLE         55
-#define GFX_FILLEDCIRCLE   56
-#define GFX_ELLIPSE        57
-#define GFX_FILLEDELLIPSE  58
-#define GFX_FLOODFILL      59
+#translate GFXACQUIRESCREEN() => gfxPrimitive(GFX_ACQUIRESCREEN)
+#translate GFXRELEASESCREEN() => gfxPrimitive(GFX_RELEASESCREEN)
+#translate GFXMAKECOLOR(<nRed>, <nGreen>, <nBlue>[, <nAlpha>]) => gfxPrimitive(GFX_MAKECOLOR, <nRed>, <nGreen>, <nBlue>[, <nAlpha>])
+#translate GFXGETCLIP(<nTop>, <nLeft>, <nBottom>, <nRight>) => <nTop> := gfxPrimitive(GFX_CLIPTOP); <nLeft> := gfxPrimitive(GFX_CLIPLEFT); <nBottom> := gfxPrimitive(GFX_CLIPBOTTOM); <nRight> := gfxPrimitive(GFX_CLIPRIGHT)
+#translate GFXSETCLIP(<nTop>, <nLeft>, <nBottom>, <nRight>) => gfxPrimitive(GFX_SETCLIP, <nTop>, <nLeft>, <nBottom>, <nRight>)
+#translate GFXDRAWINGMODE([<nMode>]) => gfxPrimitive(GFX_DRAWINGMODE[, <nMode>])
+#translate GFXGETPIXEL(<nY>, <nX>) => gfxPrimitive(GFX_GETPIXEL, <nY>, <nX>)
+#translate GFXPUTPIXEL(<nY>, <nX>, <nColor>) => gfxPrimitive(GFX_PUTPIXEL, <nY>, <nX>, <nColor>)
+#translate GFXLINE(<nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>) => gfxPrimitive(GFX_LINE, <nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>)
+#translate GFXRECT(<nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>) => gfxPrimitive(GFX_RECT, <nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>)
+#translate GFXFILLEDRECT(<nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>) => gfxPrimitive(GFX_FILLEDRECT, <nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>)
+#translate GFXCIRCLE(<nY>, <nX>, <nRadius>, <nColor>) => gfxPrimitive(GFX_CIRCLE, <nY>, <nX>, <nRadius>, <nColor>)
+#translate GFXFILLEDCIRCLE(<nY>, <nX>, <nRadius>, <nColor>) => gfxPrimitive(GFX_FILLEDCIRCLE, <nY>, <nX>, <nRadius>, <nColor>)
+#translate GFXELLIPSE(<nY>, <nX>, <nRadY>, <nRadX>, <nColor>) => gfxPrimitive(GFX_ELLIPSE, <nY>, <nX>, <nRadY>, <nRadX>, <nColor>)
+#translate GFXFILLEDELLIPSE(<nY>, <nX>, <nRadY>, <nRadX>, <nColor>) => gfxPrimitive(GFX_FILLEDELLIPSE, <nY>, <nX>, <nRadY>, <nRadX>, <nColor>)
+#translate GFXFLOODFILL(<nY>, <nX>, <nColor>) => gfxPrimitive(GFX_FLOODFILL, <nY>, <nX>, <nColor>)
 
-/* Drawing mode constants */
-#define GFX_MODE_SOLID      1  // Solid mode, no translucency, no patterned primitives
-#define GFX_MODE_XOR        2  // XOR with current screen contents
-#define GFX_MODE_ALPHA      3  // Use alpha for transluced effect (SLOW)
-/* TODO: add patterned mode drawings */
-
-#ifndef _NO_GFX_TRANSLATES_
-
-#ifdef __XHARBOUR__
-
-#include "gfxtrans.ch"
-
-#endif /* __XHARBOUR__*/
-
-#endif /* _NO_GFX_TRANSLATES_ */
-
-#endif  /* _GFX_CH_ */
+#endif  /* _GFXTRANS_CH_ */

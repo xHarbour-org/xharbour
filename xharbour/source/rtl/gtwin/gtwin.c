@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.79 2004/12/28 20:32:33 ptsarenko Exp $
+ * $Id: gtwin.c,v 1.80 2005/01/07 11:24:47 paultucker Exp $
  */
 
 /*
@@ -1955,40 +1955,58 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 #if defined(__BORLANDC__) || defined(_MSC_VER)
 static int hb_Inp9x( USHORT usPort )
 {
-  USHORT usVal;
+   USHORT usVal;
 
-    HB_TRACE(HB_TR_DEBUG, ("hb_Inp9x(%hu)", usPort));
+   HB_TRACE(HB_TR_DEBUG, ("hb_Inp9x(%hu)", usPort));
 
-    #if defined(__BORLANDC__)
-       _DX = usPort;
-       __emit__(0xEC);        /* ASM  IN AL, DX */
-       __emit__(0x32,0xE4);   /* ASM XOR AH, AH */
-       usVal = _AX;
-    #else
+   #if defined( __BORLANDC__ )
 
-       usVal = _inp( usPort );
-    #endif
+      _DX = usPort;
+      __emit__(0xEC);         /* ASM  IN AL, DX */
+      __emit__(0x32,0xE4);    /* ASM XOR AH, AH */
+      usVal = _AX;
 
-    return usVal;
+   #elif defined( __XCC__ )
+      __asm {
+               mov   dx, usPort
+               xor   ax, ax
+               in    al, dx
+               mov   usVal, ax
+            }
+   #else
+
+      usVal = _inp( usPort );
+
+   #endif
+
+   return usVal;
 }
 
 /* *********************************************************************** */
 
 static int hb_Outp9x( USHORT usPort, USHORT usVal )
 {
-    HB_TRACE(HB_TR_DEBUG, ("hb_Outp9x(%hu, %hu)", usPort, usVal));
+   HB_TRACE(HB_TR_DEBUG, ("hb_Outp9x(%hu, %hu)", usPort, usVal));
 
-    #if defined(__BORLANDC__)
+   #if defined( __BORLANDC__ )
+
       _DX = usPort;
       _AL = usVal;
       __emit__(0xEE);        /* ASM OUT DX, AL */
-      __emit__(0x32,0xE4);   /* ASM XOR AH, AH */
-      usVal = _AX;
-    #else
-       _outp( usPort, usVal );
-    #endif
 
-    return usVal;
+   #elif defined( __XCC__ )
+      __asm {
+               mov   dx, usPort
+               mov   ax, usVal
+               out   dx, al
+            }
+   #else
+
+      _outp( usPort, usVal );
+
+   #endif
+
+   return usVal;
 }
 
 /* *********************************************************************** */
@@ -2095,7 +2113,7 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
     /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
     if( s_osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
     {
-       #if defined(__BORLANDC__) || defined( _MSC_VER )
+       #if defined( __BORLANDC__ ) || defined( _MSC_VER )
           HB_GT_FUNC(gt_w9xTone( dFrequency, dDuration ));
        #else
           HB_GT_FUNC(gt_wNtTone( dFrequency, dDuration ));

@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.10 2004/02/17 18:44:12 andijahja Exp $
+ * $Id: hbinit.h,v 1.11 2004/03/29 17:04:19 ronpinkas Exp $
  */
 
 /*
@@ -59,6 +59,11 @@ HB_EXTERN_BEGIN
 
 extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics symbols initialization */
 
+#if !defined( HB_STATIC_STARTUP ) && \
+    ( defined( __XCC__ ) )
+   #define HB_STATIC_STARTUP
+#endif
+
 #if defined(HARBOUR_STRICT_ANSI_C)
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
@@ -73,7 +78,7 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) func( void ) {
    #define HB_CALL_ON_STARTUP_END( func ) }
 
-#elif defined(HB_STATIC_STARTUP)
+#elif defined(HB_STATIC_STARTUP) || defined(HB_PRAGMA_STARTUP)
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static HB_SYMB symbols[] = {
@@ -213,7 +218,8 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
 
 #endif
 
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
+#if ! defined(HB_PRAGMA_STARTUP) && \
+    ( defined(HB_STATIC_STARTUP) || ( !defined(__GNUC__) && !defined(_MSC_VER) ) )
    #define HB_PRAGMA_STARTUP
 #endif
 
