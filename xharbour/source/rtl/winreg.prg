@@ -1,5 +1,5 @@
 /*
- * $Id: winreg.prg,v 1.1 2004/12/08 01:01:08 peterrees Exp $
+ * $Id: winreg.prg,v 1.2 2004/12/11 04:20:36 paultucker Exp $
  */
 
 /*
@@ -304,3 +304,4 @@ HB_FUNC_STATIC( WINREGCLOSEKEY )
   hb_retnl( RegCloseKey( (HKEY) hb_parnl( 1 ) ) );
 }
 
+#pragma ENDDUMP

@@ -1,5 +1,5 @@
 /*
- * $Id: winos.prg,v 1.3 2005/02/15 21:06:32 andijahja Exp $
+ * $Id: winos.prg,v 1.4 2005/02/15 22:48:45 andijahja Exp $
  */
 
 /*
@@ -289,3 +289,5 @@ HB_FUNC( OS_VERSIONINFO )
   hb_itemPutC(  hb_arrayGetItemPtr( pArray, 5 ), osvi.szCSDVersion   );
   hb_itemRelease( hb_itemReturn( pArray) );
 }
+
+#pragma ENDDUMP
