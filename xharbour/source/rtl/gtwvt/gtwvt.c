@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.13 2003/12/26 17:11:32 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.14 2003/12/29 01:23:27 peterrees Exp $
  */
 
 /*
@@ -161,6 +161,7 @@ typedef struct global_data
   BOOL      Win9X;                     // Flag to say if running on Win9X not NT/2000/XP
   BOOL      AltF4Close;                // Can use Alt+F4 to close application
   BOOL      InvalidateWindow;          // Flag for controlling whether to use ScrollWindowEx()
+  BOOL      EnableShortCuts;           // Determines whether ALT key enables menu or system menu
 } GLOBAL_DATA;
 
 static GLOBAL_DATA _s;
@@ -1494,7 +1495,6 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
 
 static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-  static BOOL lMouseDown = FALSE, rMouseDown= FALSE;
   static BOOL bIgnoreWM_SYSCHAR = FALSE ;
   BOOL bRet;
 
@@ -1596,8 +1596,6 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
 #ifdef WVT_DEBUG
   nSetFocus++;
 #endif
-      lMouseDown = FALSE;
-      rMouseDown = FALSE;
       // create and show the caret
       // create an underline caret of height - _s.CaretSize
       _s.CaretExist = CreateCaret(hWnd, (HBITMAP) NULL, _s.PTEXTSIZE.x, _s.CaretSize);
@@ -1612,8 +1610,6 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
 #ifdef WVT_DEBUG
   nKillFocus++;
 #endif
-      lMouseDown = FALSE;
-      rMouseDown = FALSE;
       if ( _s.CaretExist )
       {
         DestroyCaret();
@@ -1745,7 +1741,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
                 break;
             }
           }
-          else
+          else if (_s.EnableShortCuts )
           {
             return(DefWindowProc(hWnd, message, wParam, lParam));
           }
@@ -1850,14 +1846,6 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
         colrow = hb_wvt_gtGetColRowFromXY( xy.x, xy.y );
         hb_wvt_gtSetMouseX( colrow.x );
         hb_wvt_gtSetMouseY( colrow.y );
-        if ( message == WM_LBUTTONDOWN )
-        {
-          lMouseDown = TRUE;
-        }
-        else
-        {
-          rMouseDown = TRUE;
-        }
         hb_wvt_gtAddCharToInputQueue( message == WM_LBUTTONDOWN ? K_LBUTTONDOWN : K_RBUTTONDOWN );
         return( 0 );
       }
@@ -1865,7 +1853,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
     case WM_RBUTTONUP:
     case WM_LBUTTONUP:
     {
-      if ( !b_MouseEnable || ( message == WM_LBUTTONUP && !lMouseDown ) || ( message == WM_RBUTTONUP && !rMouseDown ) )
+      if ( !b_MouseEnable )
       {
         break;
       }
@@ -1878,14 +1866,6 @@ static LRESULT CALLBACK hb_wvt_gtWndProc(HWND hWnd, UINT message, WPARAM wParam,
         colrow = hb_wvt_gtGetColRowFromXY( xy.x, xy.y );
         hb_wvt_gtSetMouseX( colrow.x );
         hb_wvt_gtSetMouseY( colrow.y );
-        if (message == WM_LBUTTONUP)
-        {
-          lMouseDown = FALSE;
-        }
-        else
-        {
-          rMouseDown = FALSE;
-        }
         hb_wvt_gtAddCharToInputQueue( message == WM_LBUTTONUP ? K_LBUTTONUP : K_RBUTTONUP );
         return( 0 );
       }
@@ -2370,6 +2350,7 @@ static void gt_hbInitStatics(void)
   _s.Win9X            = (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS);
   _s.AltF4Close       = FALSE;
   _s.InvalidateWindow = TRUE;
+  _s.EnableShortCuts  = FALSE;
 }
 
 /*
@@ -2642,6 +2623,14 @@ BOOL HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent)
   _s.MouseMove = bHandleEvent;
   return(bWas);
 }
+
+BOOL HB_EXPORT hb_wvt_gtEnableShortCuts( BOOL bEnable)
+{
+  BOOL bWas = _s.EnableShortCuts;
+  _s.EnableShortCuts = bEnable;
+  return(bWas);
+}
+
 
 /* *********************************************************************** */
 
