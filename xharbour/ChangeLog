@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2984 2004/05/24 10:31:36 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2985 2004/05/24 13:45:53 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-24 22:16 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! real fix for the problem of path checking in hb_cdxFindBag()
+      It was my fault - I had to have realy bad day that I hadn't
+      noticed missed '!'
 
 2004-03-24 15:35 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
