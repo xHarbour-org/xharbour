@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.35 2003/01/16 16:40:55 walito Exp $
+ * $Id: tget.prg,v 1.36 2003/01/27 03:49:44 walito Exp $
  */
 
 /*
@@ -303,6 +303,7 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::cPicMask := StrTran( ::cPicmask, "M", "9" )
          ::cPicMask := StrTran( ::cPicmask, "d", "9" )
          ::cPicMask := StrTran( ::cPicmask, "D", "9" )
+         exit
 
       case "N"
 
@@ -313,6 +314,7 @@ METHOD ParsePict( cPicture ) CLASS Get
          else
             ::cPicMask := Replicate( '9', Len( cNum ) )
          endif
+         exit
 
       end
 
