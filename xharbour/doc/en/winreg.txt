@@ -1,0 +1,159 @@
+/*
+ * $Id: winreg.txt  $
+ */
+
+/*
+ * The following parts are Copyright of the individual authors.
+ * www - http://www.xharbour.org
+ *
+ *     Copyright 2004 Peter Rees <peter@rees.co.nz>
+ *                    Rees Software & Systems Ltd
+ *
+ * See doc/license.txt for licensing terms.
+ *
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      QUERYREGISTRY()
+ * $ONELINER$
+ *      Tests if the registry contains the current key with specified value.
+ *  $SYNTAX$
+ *      QueryRegistry( <nHkey>, <cKeyName>, <cEntryName>, < xValueOfEntry >
+ *            [, < lSetIt > ] ) => < lResult >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *     < lResult >  -> True if the cEntryName exists in cKey with a value of
+ *         < xValueOfEntry >.
+ *  $DESCRIPTION$
+ *      This function checks to see if a value exists in the Windows registry
+ *      and if it is equal to the value passed in that parameter
+ *      < xValueOfEntry >. If the optional parameter < lSetIt > is passed with
+ *      a value of .T. then; If the key does not exist in the registry or its
+ *      value is different from < xValueOfEntry > it is created and/or it's
+ *      value is set to be equal to < xValueOfEntry >. On Window NT, 2000 & XP
+ *      the user needs correct security rights to be able to write to the
+ *      registry. If not then an attempt to < lSetIt > will fail and the
+ *      functions return value will be .F.
+ *      The value of nHkey is as specified in WINUSER.H for the registry HKEY_*
+ *      values. As an option for xHarbour you can specify;
+ *      0 = HKEY_LOCAL_MACHINE
+ *      1 = HKEY_CLASSES_ROOT
+ *      2 = HKEY_CURRENT_USER
+ *      3 = HKEY_CURRENT_CONFIG
+ *      4 = HKEY_LOCAL_MACHINE
+ *      5 = HKEY_USERS
+ *  $EXAMPLES$
+ *   LOCAL cKeySrv:="System\CurrentControlSet\Services\LanmanServer\Parameters"
+ *   ? QueryRegistry( 0, cKeySrv, "CachedOpenLimit", 0)
+ *   ? QueryRegistry( 0, cKeySrv, "SharingViolationRetries", 0, .T.)
+ *  $TESTS$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winreg.c
+ *  $SEEALSO$
+ *      SetRegistry(), GetRegistry()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      GETREGISTRY()
+ * $ONELINER$
+ *      Used to get the value of a registry entry
+ *  $SYNTAX$
+ *      GetRegistry( <nHkey>, <cKeyName>, <cEntryName> ) => < xValue >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *     < xValue >  -> The value of the registry key or NIL if it does not exist
+ *  $DESCRIPTION$
+ *      This function returns the value of an entry in a registry key. If the
+ *      key does not exist or there is an error then NIL is returned. On Window
+ *      NT, 2000 & XP the user may need certain security rights to be able to
+ *      read the registry. The value of nHkey is as specified in WINUSER.H for
+ *      the registry HKEY_* values. As an option for xHarbour you can specify;
+ *      0 = HKEY_LOCAL_MACHINE
+ *      1 = HKEY_CLASSES_ROOT
+ *      2 = HKEY_CURRENT_USER
+ *      3 = HKEY_CURRENT_CONFIG
+ *      4 = HKEY_LOCAL_MACHINE
+ *      5 = HKEY_USERS
+ *  $EXAMPLES$
+ *   LOCAL cKeySrv:="System\CurrentControlSet\Services\LanmanServer\Parameters"
+ *   ? GetRegistry( 0, cKeySrv, "CachedOpenLimit")
+ *   ? GetRegistry( 0, cKeySrv, "SharingViolationRetries", 0 )
+ *  $TESTS$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winreg.c
+ *  $SEEALSO$
+ *      QueryRegistry(), SetRegistry()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      SETREGISTRY()
+ * $ONELINER$
+ *      Sets an entry in a registry key
+ *  $SYNTAX$
+ *      SetRegistry( <nHkey>, <cKeyName>, <cEntryName>, < xValueOfEntry > )
+ *          => < lResult >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *     < lResult >  -> .T. if the cEntryName was created with value
+ *     < xValueOfEntry > else .F. if failed
+ *  $DESCRIPTION$
+ *      This function creates and/or sets a value in the Windows registry. If
+ *      the key does not exist in the registry or its value is different from
+ *      < xValueOfEntry > then it is created and/or it's value is set to be
+ *      equal to < xValueOfEntry >. On Window NT, 2000 & XP the user needs
+ *      correct security rights to be able to write to the registry. If not then
+ *      the call will fail and the functions return value will be .F.. The value
+ *      of nHkey is as specified in WINUSER.H for the registry HKEY_* values.
+ *      As an option for xHarbour you can specify;
+ *      0 = HKEY_LOCAL_MACHINE
+ *      1 = HKEY_CLASSES_ROOT
+ *      2 = HKEY_CURRENT_USER
+ *      3 = HKEY_CURRENT_CONFIG
+ *      4 = HKEY_LOCAL_MACHINE
+ *      5 = HKEY_USERS
+ *
+ *      If < xValueOfEntry > is a date value it will be converted to string by
+ *      DTOS() and set as REG_SZ. A logical value will be converted to 1 or 0
+ *      and set as REG_DWORD
+ *      Storing arrays or codeblocks in the registry is not supported.
+ *  $EXAMPLES$
+ *   LOCAL cKeySrv:="System\CurrentControlSet\Services\LanmanServer\Parameters"
+ *   ? SetRegistry( 0, cKeySrv, "CachedOpenLimit", 0)
+ *   ? SetRegistry( 0, cKeySrv, "SharingViolationRetries", 0)
+ *   // Set up a start up program on NT, 2000 XP
+ *   ? SetRegistry( 0, "SOFTWARE\Microsoft\Windows\CurrentVersion\Run",;
+        "My Start up program", "c:\My Documents\my programs\myStartUp.bat")
+ *   ? SetRegistry( 0, "SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce",;
+        "Program Update",;
+ *                "c:\temp\myupdate.exe")
+ *  $TESTS$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winreg.c
+ *  $SEEALSO$
+ *      QueryRegistry(), GetRegistry()
+ *  $END$
+ */

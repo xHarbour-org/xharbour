@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.5 2002/10/15 19:32:05 ronpinkas Exp $
+ * $Id: version.c,v 1.6 2004/09/05 22:52:39 peterrees Exp $
  */
 
 /*
@@ -70,11 +70,6 @@ HB_FUNC( OS )
 {
    char * pszPlatform = hb_verPlatform();
    hb_retcAdopt( pszPlatform );
-}
-
-HB_FUNC( OS_ISWINNT )
-{
-   hb_retl( hb_iswinnt() ) ;
 }
 
 HB_FUNC( HB_COMPILER )

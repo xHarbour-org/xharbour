@@ -1,0 +1,502 @@
+/*
+ * $Id: winos.txt  $
+ */
+
+/*
+ * The following parts are Copyright of the individual authors.
+ * www - http://www.xharbour.org
+ *
+ *     Copyright 2004 Peter Rees <peter@rees.co.nz>
+ *                    Rees Software & Systems Ltd
+ *
+ * See doc/license.txt for licensing terms.
+ *
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OS_ISWINNT()
+ * $ONELINER$
+ *      Returns .T. if running on Windows NT platform ( NT, 2000, XP, 2003 )
+ *  $SYNTAX$
+ *      OS_IsWinNt() => < lResult >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *      Returns .T. if running on Windows NT platform ( NT, 2000, XP, 2003 )
+ *  $DESCRIPTION$
+ *     Used to check if running on Windows NT platform. These os versions
+ *     include NT, 2000, XP & 2003 Server
+ *  $EXAMPLES$
+ *     ? OS_ISWINNT()
+ *  $TESTS$
+ *      tests/wincheck.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winos.c
+ *  $SEEALSO$
+ *      os_iswin9x(), os_iswin95(), os_iswin98(), os_iswinme(), os_iswinnt351(),
+ *      os_iswinnt4(), os_iswin2000(), os_iswinxp(), os_iswin2003(),
+ *      os_iswtsclient(), os_versioninfo()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OS_ISWIN9X()
+ * $ONELINER$
+ *      Returns .T. if running on Windows NT platform ( 95, 98, ME )
+ *  $SYNTAX$
+ *      OS_IsWin9X() => < lResult >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *      Returns .T. if running on Windows platform ( 95, 98, ME )
+ *  $DESCRIPTION$
+ *     Used to check if running on Windows platform. These os versions
+ *     include 95, 98, ME
+ *  $EXAMPLES$
+ *     ? OS_ISWIN9X()
+ *  $TESTS$
+ *      tests/wincheck.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winos.c
+ *  $SEEALSO$
+ *      os_iswinnt(), os_iswin95(), os_iswin98(), os_iswinme(), os_iswinnt351(),
+ *      os_iswinnt4(), os_iswin2000(), os_iswinxp(), os_iswin2003(),
+ *      os_iswtsclient(), os_versioninfo()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OS_ISWIN95()
+ * $ONELINER$
+ *      Returns .T. if running on Windows 95
+ *  $SYNTAX$
+ *      OS_IsWin95() => < lResult >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *      Returns .T. if running on Windows 95
+ *  $DESCRIPTION$
+ *     Used to check if running on Windows 95
+ *  $EXAMPLES$
+ *     ? OS_ISWIN95()
+ *  $TESTS$
+ *      tests/wincheck.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winos.c
+ *  $SEEALSO$
+ *      os_iswinnt(), os_iswin9X(), os_iswin98(), os_iswinme(), os_iswinnt351(),
+ *      os_iswinnt4(), os_iswin2000(), os_iswinxp(), os_iswin2003(),
+ *      os_iswtsclient(), os_versioninfo()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OS_ISWIN98()
+ * $ONELINER$
+ *      Returns .T. if running on Windows 98
+ *  $SYNTAX$
+ *      OS_IsWin98() => < lResult >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *      Returns .T. if running on Windows 98
+ *  $DESCRIPTION$
+ *     Used to check if running on Windows 98
+ *  $EXAMPLES$
+ *     ? OS_ISWIN98()
+ *  $TESTS$
+ *      tests/wincheck.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winos.c
+ *  $SEEALSO$
+ *      os_iswinnt(), os_iswin9X(), os_iswin95(), os_iswinme(), os_iswinnt351(),
+ *      os_iswinnt4(), os_iswin2000(), os_iswinxp(), os_iswin2003(),
+ *      os_iswtsclient(), os_versioninfo()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OS_ISWINME()
+ * $ONELINER$
+ *      Returns .T. if running on Windows ME
+ *  $SYNTAX$
+ *      OS_IsWinME() => < lResult >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *      Returns .T. if running on Windows ME
+ *  $DESCRIPTION$
+ *     Used to check if running on Windows ME
+ *  $EXAMPLES$
+ *     ? OS_ISWINME()
+ *  $TESTS$
+ *      tests/wincheck.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winos.c
+ *  $SEEALSO$
+ *      os_iswinnt(), os_iswin9X(), os_iswin95(), os_iswin98(), os_iswinnt351(),
+ *      os_iswinnt4(), os_iswin2000(), os_iswinxp(), os_iswin2003(),
+ *      os_iswtsclient(), os_versioninfo()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OS_ISWINNT351()
+ * $ONELINER$
+ *      Returns .T. if running on Windows NT 3.51
+ *  $SYNTAX$
+ *      OS_IsWinNt351() => < lResult >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *      Returns .T. if running on Windows NT 3.51
+ *  $DESCRIPTION$
+ *     Used to check if running on Windows NT 3.51
+ *  $EXAMPLES$
+ *     ? OS_ISWINNT351()
+ *  $TESTS$
+ *      tests/wincheck.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winos.c
+ *  $SEEALSO$
+ *      os_iswinnt(), os_iswin9X(), os_iswin95(), os_iswin98(), os_iswinme(),
+ *      os_iswinnt4(), os_iswin2000(), os_iswinxp(), os_iswin2003(),
+ *      os_iswtsclient(), os_versioninfo()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OS_ISWINNT4()
+ * $ONELINER$
+ *      Returns .T. if running on Windows NT 4.0
+ *  $SYNTAX$
+ *      OS_IsWinNT4() => < lResult >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *      Returns .T. if running on Windows NT 4.0
+ *  $DESCRIPTION$
+ *     Used to check if running on Windows NT 4.0
+ *  $EXAMPLES$
+ *     ? OS_ISWINNT4()
+ *  $TESTS$
+ *      tests/wincheck.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winos.c
+ *  $SEEALSO$
+ *      os_iswinnt(), os_iswin9X(), os_iswin95(), os_iswin98(), os_iswinme(),
+ *      os_iswinnt351(), os_iswin2000(), os_iswinxp(), os_iswin2003(),
+ *      os_iswtsclient(), os_versioninfo()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OS_ISWIN2000()
+ * $ONELINER$
+ *      Returns .T. if running on Windows 2000
+ *  $SYNTAX$
+ *      OS_IsWin2000() => < lResult >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *      Returns .T. if running on Windows 2000
+ *  $DESCRIPTION$
+ *     Used to check if running on Windows 2000
+ *  $EXAMPLES$
+ *     ? OS_ISWIN2000()
+ *  $TESTS$
+ *      tests/wincheck.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winos.c
+ *  $SEEALSO$
+ *      os_iswinnt(), os_iswin9X(), os_iswin95(), os_iswin98(), os_iswinme(),
+ *      os_iswinnt351(), os_iswinnt4(), os_iswinxp(), os_iswin2003(),
+ *      os_iswtsclient(), os_versioninfo()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OS_ISWINXP()
+ * $ONELINER$
+ *      Returns .T. if running on Windows XP
+ *  $SYNTAX$
+ *      OS_IsWinXP() => < lResult >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *      Returns .T. if running on Windows XP
+ *  $DESCRIPTION$
+ *     Used to check if running on Windows XP
+ *  $EXAMPLES$
+ *     ? OS_ISWINXP()
+ *  $TESTS$
+ *      tests/wincheck.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winos.c
+ *  $SEEALSO$
+ *      os_iswinnt(), os_iswin9X(), os_iswin95(), os_iswin98(), os_iswinme(),
+ *      os_iswinnt351(), os_iswinnt4(), os_iswin2000(), os_iswin2003(),
+ *      os_iswtsclient(), os_versioninfo()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OS_ISWIN2003()
+ * $ONELINER$
+ *      Returns .T. if running on Windows 2003
+ *  $SYNTAX$
+ *      OS_IsWin2003() => < lResult >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *      Returns .T. if running on Windows 2003
+ *  $DESCRIPTION$
+ *     Used to check if running on Windows 2003
+ *  $EXAMPLES$
+ *     ? OS_ISWIN2003()
+ *  $TESTS$
+ *      tests/wincheck.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winos.c
+ *  $SEEALSO$
+ *      os_iswinnt(), os_iswin9X(), os_iswin95(), os_iswin98(), os_iswinme(),
+ *      os_iswinnt351(), os_iswinnt4(), os_iswinxp(), os_iswin2000(),
+ *      os_iswtsclient(), os_versioninfo()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OS_ISWTSCLIENT()
+ * $ONELINER$
+ *      Returns .T. if running on Windows Terminal Server Client.
+ *  $SYNTAX$
+ *      OS_ISWTSCLIENT() => < lResult >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *      Returns .T. if running on Windows Terminal Server Client
+ *  $DESCRIPTION$
+ *     This function is used to see if your applications is running on a
+ *     computer as a Windows Terminal Server client.
+ *  $EXAMPLES$
+ *     ? OS_IsWtsClient()
+ *  $TESTS$
+ *      tests/wincheck.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winos.c
+ *  $SEEALSO$
+ *      os_iswinnt(), os_iswin9X(), os_iswin95(), os_iswin98(), os_iswinme(),
+ *      os_iswinnt351(), os_iswinnt4(), os_iswinxp(), os_iswin2000(),
+ *      os_iswin2003(), os_versioninfo()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OS_VERSIONINFO()
+ * $ONELINER$
+ *      Gives specific data about operating system
+ *  $SYNTAX$
+ *      OS_VERSIONINFO() => < aData >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *      Returns an array of OS version infomation
+ *  $DESCRIPTION$
+ *     This function returns a 5 element array with operating system data
+ *     Element[ 1 ]: The major version number
+ *          3 = Windows NT 3.51
+ *          4 = Windows 95, 98, ME or NT 4.0
+ *          5 = Windows 2000, XP, 2003 Server
+ *     Element[ 2 ]: The minor version number
+ *          0 = Windows 95
+ *         10 = Windows 98
+ *         90 = Windows Me
+ *         51 = Windows NT 3.51
+ *          0 = Windows NT 4.0
+ *          0 = Windows 2000
+ *          1 = Windows XP
+ *          2 = Windows Server 2000
+ *     Element[ 3 ]: The build number of the OS
+ *     Element[ 4 ]: The platform identifier
+ *          0 = VER_PLATFORM_WIN32s
+ *          1 = VER_PLATFORM_WIN32_WINDOWS
+ *          2 = VER_PLATFORM_WIN32_NT
+ *     Element[ 5 ]: Service Pack number or additional information about OS
+ *
+ *  $EXAMPLES$
+ *     ? OS_IsWtsClient()
+ *  $TESTS$
+ *      tests/wincheck.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winos.c
+ *  $SEEALSO$
+ *      os_iswinnt(), os_iswin9X(), os_iswin95(), os_iswin98(), os_iswinme(),
+ *      os_iswinnt351(), os_iswinnt4(), os_iswinxp(), os_iswin2000(),
+ *      os_iswin2003(), os_iswtsclient()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OS_NETREGOK() => < lResult >
+ * $ONELINER$
+ *      Sets an entry in a registry key
+ *  $SYNTAX$
+ *      OS_NETREGOK( [ < lSetIt > ] )
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *     < lResult >  -> True if registry set ok for safe networking
+ *  $DESCRIPTION$
+ *     Call this functions to see if the registry of the computer is set for
+ *  $EXAMPLES$
+     PROCEDURE MAIN()
+ *     LOCAL nResult:= 0
+ *     ?
+ *     ? 'Checking and setting network for Windows'
+ *     ? '----------------------------------------'
+ *     ?
+ *     IF OS_ISWTSCLIENT() .AND. !OS_NETREGOK()
+ *       ? 'Registry on WTS server is not set correctly for networking.'
+ *     ELSEIF OS_NETREGOK( .T. )
+ *       ? 'Registry set OK for networking'
+ *     ELSE
+ *       ? 'Failed to set registry - May need "Administrator" rights'
+ *     ENDIF
+ *     ?
+ *     IF !OS_NETVREDIROK( @nResult )
+ *       ? 'Invalid RVREDIR.VXD file installed'
+ *       IF nResult = 950
+ *         ? 'You need file VREDRUPD.EXE if your vredir.vxd is dated "09:50:00"'
+ *       ELSEIF nResult == 1111
+ *         ? 'You need file VRDRUPD.EXE if your vredir.vxd is dated "11:11:10"'
+ *       ENDIF
+ *     ENDIF
+ *     WAIT
+ *     RETURN
+ *  $TESTS$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winos.c
+ *  $SEEALSO$
+ *      OS_NetVRedirOk()
+ *  $END$
+ */
+/*  $DOC$
+ *  $FUNCNAME$
+ *      OS_NETVREDIROK()
+ * $ONELINER$
+ *      Sets an entry in a registry key
+ *  $SYNTAX$
+ *      OS_NETVREDIROK( [ <@nResult> ] ) => < lResult >
+ *  $CATEGORY$
+ *      Windows
+ *  $RETURNS$
+ *     < lResult >  -> .T. if the file VREDIR.VXD for Win95 is OK
+ *                     or not running on Win95 OS. Else .F. and
+ *                     the VREDIR patch should be applied for
+ *                     reliable networking.
+ *  $DESCRIPTION$
+ *     The function check if the Windows version is Win9X and if it is, checks
+ *     the time stamp and file size of VREDIR.VXD against known buggy versions.
+ *     If there is a match the function returns .F.. If the optional parameter
+ *     nResult is passed by reference then the build number of the buggy file
+ *     is returned. The valid values are;
+ *       0  = Not a buggy version or not Windows 9X
+ *      950 = version that came with original 95. MS patch file is VREDRUPD.EXE
+ *     1111 = version that came with 95B. MS patch file is VRDRUPD.EXE
+ *
+ *  $EXAMPLES$
+ *
+ *     For an example see OS_NETREGOK()
+ *
+ *  $TESTS$
+ *      tests/wincheck.prg
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is an Extended function
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      source/rtl/winos.c
+ *  $SEEALSO$
+ *      OS_NetRegOk()
+ *  $END$
+ */
