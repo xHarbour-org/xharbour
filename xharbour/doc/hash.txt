@@ -332,8 +332,126 @@ retrieve their values:
 - ClassName: returns "HASH"
 - ClassH: returns 0
 
-You can't use this messages as keys with the colon operator, but they
-can still be accessed with the hash api or with the accessor ([]).
+You can't use this fuor special values as keys with the colon operator,
+but they can still be accessed with the hash api or with the accessor ([]).
+With the accessor or under the API calls, they have no particular meaning.
+
+
+
+
+
+
+HASH AUTOMATIC PARTITIONING
+===========================
+
+
+When really massive operations on hashes comes around, a standard
+hash may hog down its prestation, till becoming very slow in adding a single
+element. This is because xharbour arrays and hashes are optimized for access
+and add at bottom operations, while insertion in the middle is relatively slow.
+
+   ----------------------------------------------------------------------
+   * NOTE: if data is key-wise pre-ordered, you won't notice any slow
+     down. You should always save/restore big hashes with the hash key
+     ordering, so you will be just adding new keys at bottom, resulting
+     in sensibly faster operations.
+   ----------------------------------------------------------------------
+
+To overcome this problem, when hashes gets very big (above 5,000 elements) or
+when they are highly dynamic and prestations are at stake, you can turn them
+into partitioned hashes.
+
+A partitioned hash is internally treated as a hash of hashes; the main hash holds
+smaller hashes in its values, each of them containing a set of real hash values.
+The keys of the main hash are a copy of the last key held by the page that they
+refers to. So, a scan for a given value is made on the main hash, the page that
+may contain the value is found, and then a normal hash scan is done on the page.
+Pages are ordereded so that every key in the first page is lower than every
+key in the second page, and so on. If an item is added to a full page, the
+page is split in two, and the new half of the page is orderly added to the main
+hash. If the last item is removed from a page, also the whole page is removed.
+Page size is dynamic, so that a page occupies just enough memory to store its
+elements, and is grown or shrinked as needed (like ordinary hashes).
+
+Pages have a maximum fixed lenght, that you decide at hash creation; you must
+use a page lenght that gives you a good trade-off between access time (that
+grows at a log2 rate) and insertion/deletion time (that grows exponentially).
+The smaller page, the better insertion/deletion time, the worse access time;
+anyhow, since access is log2 based and insertion time is exponential, you can
+find out that small pages does a good job. Tests on building an hash
+of 100,000 elements show that summed up insertion time on non-paged sequence
+ranges up to 300+ seconds on fast machines, while scan time is insignificant.
+Using 500 items pages, scan time grows about 50% (being still very small), while
+insertion time is in the order of 10 seconds, that is a speedup of far more than
+30 times.
+
+   ----------------------------------------------------------------------
+   * NOTE: The main hash may have an unlimited number of pages; this
+     means that if you have too many pages to hold your data, even the
+     insertion of the pages in your main hash can take a significant
+     time.
+   ----------------------------------------------------------------------
+
+Pagination can also be multilelvel. This means that the main hash may hold
+also a set of sub-main hashes, that can in turn hold the real pages. This allow
+to limit the size of the main hash or of each single level, so that inserting
+pages has the same efficiency as inserting items in the pages.
+
+As a rule of thumb, keep in mind those data about random insertion: 500 items
+hashes are lighting fast. 1,500 items hashes are still very fast for the most jobs.
+2500 item hashes are still a fair choice for an hash that is not extremely dynamic.
+Up to 5000 items you can still rely on non-paged hashes if your job is primarily
+accessing data, and adding it rather sparsly. 5,000 to 10,000 items is an edge area,
+in which you must decide to use pagination on your specific problems. Above
+10,000 items, random insertion time is macroscopic.
+
+You must chose a page size and partioning level that fits your needs, being
+sure that the data you have to add to your hash will cause acceptable overhead
+at every level. In example, a two level hash of 500 items per level may store
+500 items per page and 25,000 items per sub hash. This means that each key in
+the main level will point to a sub-main hash holding a maximum of 25,000 items
+(500 keys each holding pages holding 500 items); to store 100,000 items, the
+main hash will just need 4 pages and the middle level will be very fast (having
+500 items in each of those 4 pages). Anyhow, keep in mind that the pages are
+rarely filled; they will be usually filled by half (as a mean measure), so
+to store 100,000 items a main hash with 2 levels and 500 pages per level will
+use about 8 pages. To store 4,000,000,000 items you just need two levels of
+2000 pages (the main hash will hold 10,000 to 20,000 pages), or three level
+of 500 pages, and the main hash will have to hold about 3 elements.
+
+
+
+Invoking automatic hash partitioning
+------------------------------------
+
+To set the partitioning system of a hash, use the HSetPartition() function:
+
+   hHash := {=>}
+   HSetPartition( hHash, 2500 )      // One level 2500 items per page
+   HSetPartition( hHash, 500, 2 )    // Two levels, 500 items per level
+
+
+Only empty hashes may be made partitioned. If you want to turn a non partitioned
+hash into a partitioned one, because i.e. you find out that you have been adding
+too many items, or if you want to change the partition scheme, create a new
+empty hash, partition it at will and then add the filled hash to it:
+
+   hHashLinear := {=>}
+   FillHash( hHashLinear )
+
+   IF Len( hHashLinear ) > 5000
+      hHashPart := {=>}
+      HSetPartition( hHashPart, 500 )
+      hHashPart += hHashLinear            // merging in the hHashPart!
+      hHashLinear := hHashPart            // discarding old value
+   ENDIF
+
+   * here hHashLinear is partitioned if needed.
+
+
+The function HGetPartition() returns true if a given hash is partitioned; two
+optional parameters may be passed by reference to obtain the page size and
+the partition level of a given hash.
 
 
 
@@ -555,14 +673,14 @@ FUNCTION HMerge( hDest, hSource, [xMode] ) --> hDest
 
 It is a shortcut for HCopy( hSource, hDest, 1, Len(hSource), xMode ).
 Notice the inversion of hDest and hSource parameters with respect
-to HCopy
+to HCopy.
 
 
 FUNCTION HClone( hSource ) --> hDest
 ------------------------------------
 
 Creates a new copy of hSource, and copies also all its items. Be careful
-not to have any element of hSource referenced to hSource itself.
+not to have any element of hSource referencing hSource itself.
 
 
 PROCEDURE HEval( hSource, bCode, [nStart], [nCount] )
@@ -679,12 +797,37 @@ PROCEDURE HAllocate( hHash, nDimension )
 
 Preallocates nDimension hash items, or reduces a pre-allocated size.
 If you have already an idea of how many items are going to be added
-at the hash, then HAllocate may be useful to reduce the time needed
+to the hash, then HAllocate may be useful to reduce the time needed
 to allocate memory and grow it. Also, if a big deal of items are
 preallocated with this function and then you find that you don't
 need them, you can call HAllocate with a small size (i.e. 1); this
 will shrink the allocated space to the minimum needed to store the
 hash.
+
+
+PROCEDURE HSetPartition( hHash, nPageSize, [nLevel] )
+-----------------------------------------------------
+
+Sets the partitioning scheme of a hash. NPageSize is the maximum page
+size allowed. NLevel, if given, is the hash partitioning depth, and
+if not given defaults to one.
+Set page size to zero to disable partitioning.
+
+WARNING: This function may be called only on empty hashes. To partition
+an already existing one, or repartition it, create an empty hash, set
+the desiered partition scheme and merge the filled hash into the
+partitioned empty one.
+
+
+FUNCTION HGetPartition( hHash, [@nPageSize], [@nLevel] ) --> lMode
+------------------------------------------------------------------
+
+Returns true if hHash is partitioned. If nPageSize and nLevel are
+given, they are filled with the maximum page size and hash level
+depth respectively.
+
+
+
 
 
 EOD

@@ -8,15 +8,15 @@
                                gian@nccolai.ws
 
 
-$Id: hbxml.txt,v 1.2 2003/07/02 10:12:38 jonnymind Exp $
+$Id: hbxml.txt,v 1.3 2003/07/04 10:34:34 jonnymind Exp $
 
 
 STATUS OF THE LIBRARY
 =====================
 
-Functions and classes of this library have been tested in a test
-environment; a wide range test on  big/heavy XML documents has
-still to be performed
+The library has been tested under various production environments. Recently
+attribute list for nodes has been turned in a hash (it was formerly an array
+of arrays before).
 
 TODO: Namespace management
 TODO: User-defined entity management
@@ -272,11 +272,11 @@ Possible node types are:
      this node type is created and managed by the TXMLDocument class.
 
 
-The ::aAttriubte property is an array of arrays, each of which has two element:
-the first is the attribute name, and the second is the attribute value. The
+The ::aAttriubtes property is an hash (see hash.txt): the hash keys are the
+attribute names, and the hash values are attribute values. The
 attribute value is ALWAYS specified as a string. Only "tag" type nodes have
-::aAttribute always set (having an empty list in the worst case);
-all the others have ::aAttribute set to NIL.
+::aAttribute always set (having an empty hash if no attribute is declared);
+all the others have ::aAttributes set to NIL.
 
 
 A node has also fuor "directional" properties that refers to other nodes
@@ -390,7 +390,8 @@ has not any child, oNode becomes its first child.
 TXmlNode:GetAttribute( cAttrib ) --> cValue | NIL
 
 If the current node has the attribute described in cAttrib, its value
-(as a string) is returned. Else, NIL is returned
+(as a string) is returned. Else, NIL is returned. Notice that this is an
+inline to :aAttribute[ cAttrib ]
 
 
 ===================
@@ -399,7 +400,7 @@ TXmlNode:SetAttribute( cAttrib, cValue )
 
 If the current node has a given attribute, its value is set to cValue
 (that must be a string), else a new attribute is created with the
-given value
+given value. This is an inline for :aAttribute[ cAttrib ] := cValue
 
 ===================
 
@@ -433,9 +434,6 @@ TXmlNode:Write( fhHandle, nStyle ) --> lValue
 Writes an XML string representation of current node and all its children to
 an open file handle. See TXMLDocument:Write() for a description of the nStyle
 parameter.
-
-
-
 
 
 UTILITY FUNCTIONS

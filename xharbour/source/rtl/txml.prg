@@ -1,5 +1,5 @@
 /*
- * $Id: txml.prg,v 1.7 2003/07/17 19:47:01 jonnymind Exp $
+ * $Id: txml.prg,v 1.8 2003/11/21 13:03:29 jonnymind Exp $
  */
 
 /*
@@ -78,7 +78,7 @@ CLASS TXMLNode
    METHOD InsertBelow( oNode )         INLINE HBXml_node_insert_below( Self, oNode )
    METHOD AddBelow( oNode )            INLINE HBXml_node_add_below( Self, oNode )
 
-   METHOD GetAttribute( cAttrib )         INLINE ::aAttributes[ cAttrib ]
+   METHOD GetAttribute( cAttrib )         INLINE IIF ( cAttrib IN ::aAttributes, ::aAttributes[ cAttrib ], NIL )
    METHOD SetAttribute( cAttrib, xValue ) INLINE ::aAttributes[ cAttrib ] := xValue
 
    METHOD Depth()
