@@ -15,8 +15,8 @@ METHOD New( oParent ) CLASS TForm
    ::WndProc := 'FormProc'
    ::Msgs    := -1
    ::FrameWnd:= .F.
-   ::Style   := WS_OVERLAPPEDWINDOW + WS_DLGFRAME
-   ::ExStyle := WS_EX_DLGMODALFRAME
+   ::Style   := WS_OVERLAPPEDWINDOW
+//   ::ExStyle := WS_EX_DLGMODALFRAME
    ::FormStyle := 0
 
 return( self )
@@ -36,7 +36,7 @@ METHOD New( oParent ) CLASS TFrame
    ::Msgs    := -1
    ::FrameWnd:= .T.
    ::Style   := WS_OVERLAPPEDWINDOW
-   ::FormStyle := 2
+   ::FormStyle := 1
    super:New( oParent )
 
 return( self )

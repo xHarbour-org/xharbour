@@ -95,10 +95,9 @@ ENDCLASS
 CLASS SubForm1 FROM TForm
 
    METHOD New( oParent )       INLINE ::Caption := 'SubForm1 from TForm',;
-                                      ::Style   := WS_POPUP+WS_CAPTION+WS_SYSMENU,;
                                       super:new( oParent )
 
-   METHOD OnPaint( hDC )       INLINE OutputDebugString('painting'), DrawGrid( ::handle, hDC, 3 ),0
+   METHOD OnPaint( hDC )       INLINE DrawGrid( ::handle, hDC, 3 ),0
 
 ENDCLASS
 
