@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.98 2004/11/25 15:31:54 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.99 2004/11/30 13:49:49 mauriliolongo Exp $
  */
 
 /*
@@ -2465,7 +2465,7 @@ METHOD DispCell( nRow, nColumn, nColor ) CLASS TBrowse
       DispOut( Space( Round( ( nWidth - nLen ) / 2, 0 ) ), cColorBKG )
       nNotLeftCol := Col()
       DispOut( iif( ftmp, "T", "F" ), cColor )
-      DispOut( Space( Round( ( nWidth - nLen ) / 2, 0 ) ), cColorBKG )
+      DispOut( Space( Int( ( nWidth - nLen ) / 2 ) ), cColorBKG )
       exit
 
    default

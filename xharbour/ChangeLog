@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3644 2004/12/01 00:54:24 peterrees Exp $
+ * $Id: ChangeLog,v 1.3645 2004/12/01 01:43:19 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-01 11:45 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/tbrowse.prg
+    ! fixed centering of logical cells inside ::DispCell()
 
 2004-12-01 14:40 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/rtl/regex.c
