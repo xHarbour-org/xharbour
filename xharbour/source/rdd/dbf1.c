@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.16 2002/08/31 22:25:47 ronpinkas Exp $
+ * $Id: dbf1.c,v 1.17 2002/09/01 03:43:28 ronpinkas Exp $
  */
 
 /*
@@ -349,15 +349,14 @@ static ERRCODE hb_dbfLockRecord( DBFAREAP pArea, ULONG ulRecNo, BOOL * pResult,
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfLockRecord(%p, %lu, %p, %i)", pArea, ulRecNo,
             pResult, (int) bExclusive));
 
+   if( pArea->lpdbPendingRel )
+      SELF_FORCEREL( ( AREAP ) pArea );
 
    if( pArea->fFLocked )
    {
       * pResult = TRUE;
       return SUCCESS;
    }
-
-   if( pArea->lpdbPendingRel )
-      SELF_FORCEREL( ( AREAP ) pArea );
 
    if( bExclusive )
       hb_dbfUnlockAllRecords( pArea );
@@ -1249,7 +1248,7 @@ ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          else
             uiError = EDBF_DATATYPE;
       }
-      // Must precede HB_IS_NUMERIC() because a DATE is also a NUMERIC.
+      // Must precede HB_IS_NUMERIC() because a DATE is also a NUMERIC. (xHarbour)
       else if( HB_IS_DATE( pItem ) )
       {
          if( pField->uiType == HB_IT_DATE )
@@ -1681,6 +1680,14 @@ ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
       case DBI_MEMOEXT:
          hb_itemPutC( pItem, DBF_MEMOEXT );
+         break;
+
+      case DBI_FULLPATH:
+         hb_itemPutC( pItem, pArea->szDataFileName);
+         break;
+
+      case DBI_SHARED:
+         hb_itemPutL( pItem, pArea->fShared );
          break;
    }
 
