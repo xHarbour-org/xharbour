@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1566 2003/10/08 12:52:38 paultucker Exp $
+ * $Id: ChangeLog,v 1.1567 2003/10/08 13:07:18 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,147 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-10-08 11:00 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  + contrib/libnf/aading.prg
+  + contrib/libnf/makefile
+  + contrib/libnf/aavg.prg
+  + contrib/libnf/acctadj.prg
+  + contrib/libnf/acctmnth.prg
+  + contrib/libnf/acctqtr.prg
+  + contrib/libnf/acctweek.prg
+  + contrib/libnf/acctyear.prg
+  + contrib/libnf/adessort.prg
+  + contrib/libnf/aemaxlen.prg
+  + contrib/libnf/aeminlen.prg
+  + contrib/libnf/alt.c
+  + contrib/libnf/amedian.prg
+  + contrib/libnf/anomatch.prg
+  + contrib/libnf/any2any.prg
+  + contrib/libnf/aredit.prg
+  + contrib/libnf/asum.prg
+  + contrib/libnf/at2.prg
+  + contrib/libnf/bitclr.prg
+  + contrib/libnf/bitset.prg
+  + contrib/libnf/blink.prg
+  + contrib/libnf/byt2bit.prg
+  + contrib/libnf/byt2hex.prg
+  + contrib/libnf/byteand.prg
+  + contrib/libnf/byteneg.prg
+  + contrib/libnf/bytenot.prg
+  + contrib/libnf/byteor.prg
+  + contrib/libnf/bytexor.prg
+  + contrib/libnf/calendar.prg
+  + contrib/libnf/caplock.c
+  + contrib/libnf/chdir.c
+  + contrib/libnf/clrsel.prg
+  + contrib/libnf/cntryset.prg
+  + contrib/libnf/color2n.c
+  + contrib/libnf/ctrl.c
+  + contrib/libnf/d2e.prg
+  + contrib/libnf/datecnfg.prg
+  + contrib/libnf/dayofyr.prg
+  + contrib/libnf/daytobow.prg
+  + contrib/libnf/dectobin.prg
+  + contrib/libnf/descend.c
+  + contrib/libnf/dfile.prg
+  + contrib/libnf/dhkey.h
+  + contrib/libnf/diskfunc.prg
+  + contrib/libnf/dispc.c
+  + contrib/libnf/dispmsg.prg
+  + contrib/libnf/dosver.prg
+  + contrib/libnf/e2d.prg
+  + contrib/libnf/easter.prg
+  + contrib/libnf/elapmil.prg
+  + contrib/libnf/elapsed.prg
+  + contrib/libnf/eltime.prg
+  + contrib/libnf/findith.prg
+  + contrib/libnf/firstday.prg
+  + contrib/libnf/floptst.prg
+  + contrib/libnf/ftattr.c
+  + contrib/libnf/ftint86.ch
+  + contrib/libnf/ftmenuto.ch
+  + contrib/libnf/gcd.prg
+  + contrib/libnf/getenvrn.c
+  + contrib/libnf/getver.c
+  + contrib/libnf/getvid.c
+  + contrib/libnf/hex2dec.prg
+  + contrib/libnf/idle.c
+  + contrib/libnf/invclr.prg
+  + contrib/libnf/isbit.prg
+  + contrib/libnf/isbiton.prg
+  + contrib/libnf/isshare.prg
+  + contrib/libnf/kspeed.c
+  + contrib/libnf/lastday.prg
+  + contrib/libnf/linked.prg
+  + contrib/libnf/madd.prg
+  + contrib/libnf/make_b32.bat
+  + contrib/libnf/make_vc.bat
+  + contrib/libnf/makefile.vc
+  + contrib/libnf/menu1.prg
+  + contrib/libnf/menuto.prg
+  + contrib/libnf/metaph.prg
+  + contrib/libnf/miltime.prg
+  + contrib/libnf/min2dhm.prg
+  + contrib/libnf/mkdir.c
+  + contrib/libnf/month.prg
+  + contrib/libnf/mouse.c
+  + contrib/libnf/mouse1.prg
+  + contrib/libnf/mouse2.prg
+  + contrib/libnf/n2color.c
+  + contrib/libnf/nanfor.bc
+  + contrib/libnf/netpv.prg
+  + contrib/libnf/nooccur.prg
+  + contrib/libnf/ntow.prg
+  + contrib/libnf/numlock.c
+  + contrib/libnf/nwlstat.prg
+  + contrib/libnf/nwsem.prg
+  + contrib/libnf/nwuid.prg
+  + contrib/libnf/ontick.c
+  + contrib/libnf/origin.c
+  + contrib/libnf/page.prg
+  + contrib/libnf/pchr.prg
+  + contrib/libnf/peek.c
+  + contrib/libnf/pegs.prg
+  + contrib/libnf/pending.prg
+  + contrib/libnf/pickday.prg
+  + contrib/libnf/poke.c
+  + contrib/libnf/popadder.prg
+  + contrib/libnf/proper.c
+  + contrib/libnf/prtesc.prg
+  + contrib/libnf/prtscr.c
+  + contrib/libnf/pvid.prg
+  + contrib/libnf/qtr.prg
+  + contrib/libnf/rand1.prg
+  + contrib/libnf/readme.txt
+  + contrib/libnf/restsets.prg
+  + contrib/libnf/rmdir.c
+  + contrib/libnf/round.prg
+  + contrib/libnf/savearr.prg
+  + contrib/libnf/savesets.prg
+  + contrib/libnf/scancode.prg
+  + contrib/libnf/scregion.prg
+  + contrib/libnf/setdate.prg
+  + contrib/libnf/settime.prg
+  + contrib/libnf/shift.c
+  + contrib/libnf/sinkey.prg
+  + contrib/libnf/sleep.prg
+  + contrib/libnf/sqzn.prg
+  + contrib/libnf/stod.c
+  + contrib/libnf/sysmem.prg
+  + contrib/libnf/tbwhile.prg
+  + contrib/libnf/tempfile.prg
+  + contrib/libnf/test.prg
+  + contrib/libnf/vertmenu.prg
+  + contrib/libnf/vidcur.prg
+  + contrib/libnf/vidmode.prg
+  + contrib/libnf/wda.prg
+  + contrib/libnf/week.prg
+  + contrib/libnf/workdays.prg
+  + contrib/libnf/woy.prg
+  + contrib/libnf/xbox.prg
+  + contrib/libnf/year.prg
+    ! added source files to build the nanfor library on xharbour,
+     source code was get from harbour cvs
 
 2003-10-08 09:05 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * include/hbapi.h
