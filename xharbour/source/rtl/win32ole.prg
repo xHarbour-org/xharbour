@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.77 2005/03/21 17:40:26 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.78 2005/03/22 01:13:14 ronpinkas Exp $
  */
 
 /*
@@ -452,16 +452,10 @@ RETURN xRet
 
            uParam = hb_param( nArg, HB_IT_ANY );
 
-           if( ( bByRef = HB_IS_BYREF( hb_stackItemFromBase( nArg ) ) ) != 0 )
-           {
-              // 1 Based!!!
-              s_OleRefFlags[ nArg ] = TRUE;
-           }
-           else
-           {
-              // 1 Based!!!
-              s_OleRefFlags[ nArg ] = FALSE;
-           }
+           bByRef = HB_IS_BYREF( hb_stackItemFromBase( nArg ) );
+
+           // 1 Based!!!
+           s_OleRefFlags[ nArg ] = bByRef;
 
            //TraceLog( NULL, "N: %i Arg: %i Type: %i %i ByRef: %i\n", n, nArg, hb_stackItemFromBase( nArg  )->type, uParam->type, bByRef );
 
@@ -477,7 +471,7 @@ RETURN xRet
               case HB_IT_MEMO:
                 if( bByRef )
                 {
-                   hb_itemPutCRaw( uParam, (char *) AnsiToWide( hb_parcx( nArg ) ), uParam->item.asString.length * 2 + 1 );
+                   hb_itemPutCRawStatic( uParam, (char *) AnsiToSysString( hb_parcx( nArg ) ), uParam->item.asString.length * 2 + 1 );
 
                    pArgs[ n ].n1.n2.vt   = VT_BYREF | VT_BSTR;
                    pArgs[ n ].n1.n2.n3.pbstrVal = (BSTR *) &( uParam->item.asString.value );
@@ -677,6 +671,8 @@ RETURN xRet
                  case VT_BYREF | VT_BSTR:
                    //printf( "String\n" );
                    sString = WideToAnsi( *( pDispParams->rgvarg[ n ].n1.n2.n3.pbstrVal ) );
+
+                   SysFreeString( *( pDispParams->rgvarg[ n ].n1.n2.n3.pbstrVal ) );
 
                    hb_itemPutCPtr( aPrgParams[ n ], sString, strlen( sString ) );
                    break;
