@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.25 2004/05/08 22:07:09 druzus Exp $
+ * $Id: workarea.c,v 1.26 2004/07/28 20:56:18 druzus Exp $
  */
 
 /*
@@ -473,9 +473,11 @@ ERRCODE hb_waAlias( AREAP pArea, BYTE * szAlias )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_waAlias(%p, %p)", pArea, szAlias));
 
-   szAlias[0] = '\0';
-   strncat( ( char * ) szAlias, ( ( PHB_DYNS ) pArea->atomAlias )->pSymbol->szName,
-            HARBOUR_MAX_RDD_ALIAS_LENGTH );
+   hb_strncpy( ( char * ) szAlias,
+               ( pArea->atomAlias && ( ( PHB_DYNS ) pArea->atomAlias )->hArea )
+               ? ( ( PHB_DYNS ) pArea->atomAlias )->pSymbol->szName : "",
+               HARBOUR_MAX_RDD_ALIAS_LENGTH );
+
    return SUCCESS;
 }
 

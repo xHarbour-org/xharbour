@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.151 2004/08/10 01:25:15 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.152 2004/08/10 20:21:03 druzus Exp $
  */
 
 /*
@@ -849,8 +849,14 @@ static BOOL hb_cdxEvalSeekCond( LPCDXTAG pTag, PHB_ITEM pCondItem )
  */
 static USHORT hb_cdxFieldIndex( CDXAREAP pArea, char * cExpr )
 {
-   char szKeyExpr[ CDX_MAXKEY + 1 ];
-   int i, j, n = 0;
+   char szKeyExpr[ CDX_MAXKEY + 1 ],
+        szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
+   int i, j, l, n = 0;
+
+   if ( SELF_ALIAS( ( AREAP ) pArea, ( BYTE * ) szAlias ) == SUCCESS )
+      l = strlen( szAlias );
+   else
+      l = 0;
 
    hb_strncpyUpperTrim( szKeyExpr, cExpr, CDX_MAXKEY );
 
@@ -865,6 +871,8 @@ static USHORT hb_cdxFieldIndex( CDXAREAP pArea, char * cExpr )
          i = 5;
       else if ( strncmp( &szKeyExpr[ n ], "_FIELD", 6 ) )
          i = 6;
+      else if ( l > 0 && strncmp( &szKeyExpr[ n ], szAlias, l ) )
+         i = l;
       else
          i = 0;
 
@@ -1651,9 +1659,9 @@ static void hb_cdxPageCheckKeys( LPCDXPAGE pPage )
 /*
  * Check decoded leaf page if all trailing and duplicate characters are set
  */
-static void hb_cdxPageCheckDupTrl( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
+static void hb_cdxPageCheckDupTrl( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys, BOOL fSpc )
 {
-   SHORT iNum = pPage->TagParent->uiLen, iKey, iPos;
+   SHORT iNum = pPage->TagParent->uiLen, iKey, iPos, iFree = CDX_EXT_FREESPACE;
    SHORT iLen = iNum + 6;
    BYTE  bDup, bTrl;
    BYTE  bTrail = ( pPage->TagParent->uiType == 'C' ) ? ' ' : '\0';
@@ -1710,6 +1718,14 @@ static void hb_cdxPageCheckDupTrl( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys 
             bErr = TRUE;
          }
       }
+      iFree -= iNum + pPage->ReqByte - bDup - bTrl;
+   }
+   if ( fSpc && ( iFree != pPage->iFree /* || iFree < 0 */ ) )
+   {
+      printf( "\r\nFreeSpace calculated wrong! iFree=%d, pPage->iFree=%d",
+              iFree, pPage->iFree );
+      fflush(stdout);
+      bErr = TRUE;
    }
    if ( bErr )
    {
@@ -1725,7 +1741,7 @@ static void hb_cdxPageCheckDupTrlRaw( LPCDXPAGE pPage )
    BYTE *pKeyBuf = (BYTE *) hb_xgrab( pPage->iKeys * ( pPage->TagParent->uiLen + 6 ) );
 
    hb_cdxPageLeafDecode( pPage, pKeyBuf );
-   hb_cdxPageCheckDupTrl( pPage, pKeyBuf, pPage->iKeys );
+   hb_cdxPageCheckDupTrl( pPage, pKeyBuf, pPage->iKeys, TRUE );
    hb_xfree( pKeyBuf );
 }
 #endif
@@ -1770,7 +1786,7 @@ static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
 #ifdef HB_CDX_DBGCODE_EXT
    if ( ! pKeyBuf )
       hb_cdxErrInternal( "hb_cdxPageLeafEncode: page has no buffer." );
-   hb_cdxPageCheckDupTrl( pPage, pKeyBuf, iKeys );
+   hb_cdxPageCheckDupTrl( pPage, pKeyBuf, iKeys, TRUE );
 #endif
    iNum = pPage->TagParent->uiLen;
    iLen = iNum + 6;
@@ -1823,7 +1839,7 @@ static void hb_cdxPageLeafEncode( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKeys )
       pPage->pKeyBuf = pKeyBf;
    }
    hb_cdxPageCheckKeys( pPage );
-   hb_cdxPageCheckDupTrl( pPage, pKeyBuf, pPage->iKeys );
+   hb_cdxPageCheckDupTrl( pPage, pKeyBuf, pPage->iKeys, TRUE );
 #endif
 }
 
@@ -1926,7 +1942,7 @@ static void hb_cdxPageCalcLeafSpace( LPCDXPAGE pPage, BYTE * pKeyBuf, SHORT iKey
    RNMask = pPage->RNMask;
    ReqByte = pPage->ReqByte;
 #ifdef HB_CDX_DBGCODE_EXT
-   hb_cdxPageCheckDupTrl( pPage, pKeyBuf, iKeys );
+   hb_cdxPageCheckDupTrl( pPage, pKeyBuf, iKeys, FALSE );
 #endif
    for ( iKey = 0; iKey < iKeys; iKey++ )
    {
@@ -1988,9 +2004,10 @@ static int hb_cdxPageLeafDelKey( LPCDXPAGE pPage )
       pPage->pKeyBuf = pKeyBuf;
    }
 #ifdef HB_CDX_DSPDBG_INFO
-   printf("\r\ndelkey: Page=%lx, iKey=%d/%d, rec=%ld",
+   printf("\r\ndelkey: Page=%lx, iKey=%d/%d, rec=%ld, iFree=%d",
           pPage->Page, iKey, pPage->iKeys,
-          (ULONG) HB_GET_LE_UINT32( &pPage->pKeyBuf[ ( iKey + 1 ) * iLen - 6 ] ));
+          (ULONG) HB_GET_LE_UINT32( &pPage->pKeyBuf[ ( iKey + 1 ) * iLen - 6 ] ),
+	  pPage->iFree );
    fflush(stdout);
 #endif
    iSpc = pPage->ReqByte + pPage->TagParent->uiLen -
@@ -2022,6 +2039,19 @@ static int hb_cdxPageLeafDelKey( LPCDXPAGE pPage )
                                    pPage->pKeyBuf[ iNext + iDup ] )
                ++iDup;
          }
+#ifdef HB_CDX_DSPDBG_INFO
+         printf("+%d=%d", iSpc+iDup, pPage->iFree+iSpc+iDup );
+         if ( iSpc+iDup < 0 )
+            printf( " iLen=%d, iDup=%d, iNum=%d pd=%d pt=%d cd=%d ct=%d nd=%d nt=%d",
+                     iLen-6, iDup, iNum,
+                     pPage->pKeyBuf[ iPrev + iLen - 2 ],
+                     pPage->pKeyBuf[ iPrev + iLen - 1 ],
+                     pPage->pKeyBuf[ ( iKey + 1 ) * iLen - 2 ],
+                     pPage->pKeyBuf[ ( iKey + 1 ) * iLen - 1 ],
+                     pPage->pKeyBuf[ iNext + iLen - 2 ],
+                     pPage->pKeyBuf[ iNext + iLen - 1 ] );
+         fflush(stdout);
+#endif
       }
       iSpc += ( pPage->pKeyBuf[ iPos ] = ( BYTE ) iDup );
    }
@@ -2035,12 +2065,14 @@ static int hb_cdxPageLeafDelKey( LPCDXPAGE pPage )
    pPage->fBufChanged = pPage->fChanged = TRUE;
 #ifdef HB_CDX_DBGCODE_EXT
    hb_cdxPageCheckKeys( pPage );
-   hb_cdxPageCheckDupTrl( pPage, pPage->pKeyBuf, pPage->iKeys );
+   hb_cdxPageCheckDupTrl( pPage, pPage->pKeyBuf, pPage->iKeys, TRUE );
 #endif
    if ( iKey >= pPage->iKeys )
       iRet |= NODE_NEWLASTKEY;
    if ( pPage->iKeys == 0 )
       iRet |= NODE_JOIN;
+   else if ( pPage->iFree < 0 )
+      iRet |= NODE_SPLIT;
    /* if ( pPage->iFree >= CDX_EXT_FREESPACE / 2 ) */
    if ( pPage->iFree >= pPage->ReqByte )
       iRet |= NODE_BALANCE;
@@ -2081,7 +2113,7 @@ static int hb_cdxPageLeafAddKey( LPCDXPAGE pPage, LPCDXKEY pKey )
 
 #ifdef HB_CDX_DBGCODE_EXT
    hb_cdxPageCheckKeys( pPage );
-   hb_cdxPageCheckDupTrl( pPage, pPage->pKeyBuf, pPage->iKeys );
+   hb_cdxPageCheckDupTrl( pPage, pPage->pKeyBuf, pPage->iKeys, TRUE );
 #endif
 
    iTrl = iDup = 0;
@@ -2150,7 +2182,7 @@ static int hb_cdxPageLeafAddKey( LPCDXPAGE pPage, LPCDXKEY pKey )
    pPage->fBufChanged = pPage->fChanged = TRUE;
 #ifdef HB_CDX_DBGCODE_EXT
    hb_cdxPageCheckKeys( pPage );
-   hb_cdxPageCheckDupTrl( pPage, pPage->pKeyBuf, pPage->iKeys );
+   hb_cdxPageCheckDupTrl( pPage, pPage->pKeyBuf, pPage->iKeys, TRUE );
 #endif
    if ( iKey >= pPage->iKeys - 1 )
       iRet |= NODE_NEWLASTKEY;
@@ -2653,7 +2685,7 @@ static int hb_cdxPageKeyLeafBalance( LPCDXPAGE pPage, int iChildRet )
    }
 
 #ifdef HB_CDX_DBGCODE_EXT
-   hb_cdxPageCheckDupTrl( pPage, pKeyPool, iKeys );
+   hb_cdxPageCheckDupTrl( pPage, pKeyPool, iKeys, FALSE );
 #endif
    pPtr = pKeyPool;
    fIns = FALSE;

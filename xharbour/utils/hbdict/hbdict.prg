@@ -1,7 +1,7 @@
 *****************************************************
 * HB I18N dictionary editor
 *
-* $Id: hbdict.prg,v 1.11 2003/11/12 15:04:59 jonnymind Exp $
+* $Id: hbdict.prg,v 1.12 2003/12/11 16:32:23 lf_sfnet Exp $
 *
 * Usage: hbdict <infile> <outfile>
 *
@@ -53,7 +53,8 @@ PROCEDURE Main( cInput, cOutput )
 
    IF cInput == NIL .or. cOutput == NIL
       Popup( i18n( "Incorrect format" ) )
-      @12,12 say i18n( "Usage:" )  + " hbdict <input> <output>"
+      @12,12 say i18n( "Usage:" ) + " " + hb_argv( 0 ) + " " + ;
+                 i18n( "<input> <output>" )
       DoQuit()
    ENDIF
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.123 2004/07/12 23:58:37 kaddath Exp $
+ * $Id: dbcmd.c,v 1.124 2004/08/02 12:37:13 druzus Exp $
  */
 
 /*
@@ -1199,12 +1199,15 @@ HB_FUNC( ALIAS )
 
    uiArea = hb_parni( 1 );
    pArea = uiArea ? HB_GET_WA( uiArea ) : HB_CURRENT_WA;
-   if( pArea && pArea->atomAlias && ( ( PHB_DYNS ) pArea->atomAlias )->hArea )
+   if( pArea )
    {
-      char * szAlias = ( char * ) hb_xgrab( HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 );
-      SELF_ALIAS( pArea, ( BYTE * ) szAlias );
-      hb_retcAdopt( szAlias );
-      return;
+      char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
+
+      if ( SELF_ALIAS( pArea, ( BYTE * ) szAlias ) == SUCCESS )
+      {
+         hb_retc( szAlias );
+         return;
+      }
    }
    hb_retc( NULL );
 }
@@ -1271,12 +1274,15 @@ HB_FUNC( DBF )
    HB_THREAD_STUB
    AREAP pArea = HB_CURRENT_WA;
 
-   if( pArea->atomAlias && ( ( PHB_DYNS ) pArea->atomAlias )->hArea )
+   if( pArea )
    {
-      char * szAlias = ( char * ) hb_xgrab( HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 );
-      SELF_ALIAS( pArea, ( BYTE * ) szAlias );
-      hb_retcAdopt( szAlias );
-      return;
+      char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
+
+      if ( SELF_ALIAS( pArea, ( BYTE * ) szAlias ) == SUCCESS )
+      {
+         hb_retc( szAlias );
+         return;
+      }
    }
    hb_retc( NULL );
 }
