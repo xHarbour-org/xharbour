@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallbc.bat,v 1.11 2004/08/05 16:41:42 paultucker Exp $
+rem $Id: makallbc.bat,v 1.12 2004/08/27 05:42:13 paultucker Exp $
 rem 
 
 echo create system files
@@ -138,4 +138,12 @@ echo xwt
 cd contrib\xwt
 call make_b32.bat %1
 cd ..\..
+if errorlevel 1 goto end
+
+:gtwvw
+echo gtwvw
+cd contrib\gtwvw
+call make_b32.bat %1
+cd ..\..
+
 :end
