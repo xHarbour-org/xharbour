@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.48 2003/09/02 05:41:14 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.49 2003/09/03 00:34:01 ronpinkas Exp $
  */
 
 /*
@@ -2226,21 +2226,29 @@ HB_FUNC( DBSTRUCT )
    if( s_pCurrArea )
    {
       SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields );
+
       pData = hb_itemNew( NULL );
       pItem = hb_itemNew( NULL );
+
       for( uiCount = 1; uiCount <= uiFields; uiCount++ )
       {
          hb_arrayNew( pItem, 4 );
+
          SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_NAME, pData );
-         hb_arraySet( pItem, 1, pData );
+         hb_arraySetForward( pItem, 1, pData );
+
          SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_TYPE, pData );
-         hb_arraySet( pItem, 2, pData );
+         hb_arraySetForward( pItem, 2, pData );
+
          SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_LEN, pData );
-         hb_arraySet( pItem, 3, pData );
+         hb_arraySetForward( pItem, 3, pData );
+
          SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_DEC, pData );
-         hb_arraySet( pItem, 4, pData );
-         hb_arrayAdd( &(HB_VM_STACK.Return), pItem );
+         hb_arraySetForward( pItem, 4, pData );
+
+         hb_arrayAddForward( &(HB_VM_STACK.Return), pItem );
       }
+
       hb_itemRelease( pItem );
       hb_itemRelease( pData );
    }
@@ -3248,12 +3256,17 @@ HB_FUNC( RDDLIST )
    pName = hb_itemNew( NULL );
    pRddNode = s_pRddList;
    uiType = hb_parni( 1 );       /* 0 all types of RDD's */
+
    while( pRddNode )
    {
       if( ( uiType == 0 ) || ( pRddNode->uiType == uiType ) )
-         hb_arrayAdd( &(HB_VM_STACK.Return), hb_itemPutC( pName, pRddNode->szName ) );
+      {
+         hb_arrayAddForward( &(HB_VM_STACK.Return), hb_itemPutC( pName, pRddNode->szName ) );
+      }
+
       pRddNode = pRddNode->pNext;
    }
+
    hb_itemRelease( pName );
 }
 
@@ -4090,15 +4103,21 @@ static BOOL IsFieldIn( char * fieldName, PHB_ITEM pFields )
 static void AddField( PHB_ITEM pFieldArray, PHB_ITEM pItem, PHB_ITEM pData, USHORT uiCount )
 {
     HB_THREAD_STUB
+
     hb_arrayNew( pItem, 4 );
+
     SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_NAME, pData );
-    hb_arraySet( pItem, 1, pData );
+    hb_arraySetForward( pItem, 1, pData );
+
     SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_TYPE, pData );
-    hb_arraySet( pItem, 2, pData );
+    hb_arraySetForward( pItem, 2, pData );
+
     SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_LEN, pData );
-    hb_arraySet( pItem, 3, pData );
+    hb_arraySetForward( pItem, 3, pData );
+
     SELF_FIELDINFO( ( AREAP ) s_pCurrArea->pArea, uiCount, DBS_DEC, pData );
-    hb_arraySet( pItem, 4, pData );
+    hb_arraySetForward( pItem, 4, pData );
+
     hb_arrayAdd( pFieldArray, pItem );
 }
 
@@ -4304,28 +4323,25 @@ static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields, LPA
 
   fieldValue = hb_itemNew( NULL );
 
-  for ( i = 0 ; i < pAreaFrom->uiFieldCount; i++ )
+  for( i = 0 ; i < pAreaTo->uiFieldCount; i++ )
   {
-    /* list or field in the list?*/
-    if ( ! pFields || IsFieldIn( ( ( PHB_DYNS )(pAreaFrom->lpFields + i)->sym )->pSymbol->szName,  pFields ) )
+    /* field in the list?*/
+    if ( pFields == NULL || IsFieldIn( ( ( PHB_DYNS )(pAreaTo->lpFields + i)->sym )->pSymbol->szName, pFields ) )
     {
-      if( pFields )
-      {
-        f = hb_rddFieldIndex( pAreaTo, (( PHB_DYNS )(pAreaFrom->lpFields + i)->sym )->pSymbol->szName );
-      }
+      f = hb_rddFieldIndex( pAreaFrom, (( PHB_DYNS )(pAreaTo->lpFields + i)->sym )->pSymbol->szName );
 
       if( f )
       {
         LPAREANODE s_curr = s_pCurrArea;
 
-        SELF_GETVALUE( pAreaFrom, i + 1, fieldValue );
+        SELF_GETVALUE( pAreaFrom, f++, fieldValue );
 
         if( s )
         {
           s_pCurrArea = s;
         }
 
-        SELF_PUTVALUE( pAreaTo, f++, fieldValue );
+        SELF_PUTVALUE( pAreaTo, i + 1, fieldValue );
 
         s_pCurrArea = s_curr;
       }

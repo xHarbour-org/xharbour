@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1417 2003/09/05 01:15:32 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1418 2003/09/06 01:23:17 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-09-06 13:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rdd/dbcmd.c
+    ! Fixed and optimized rddMoveFields()
+
+  * source/vm/arrays.c
+    * Added debugging related commented define.
+
+  * source/vm/hvm.c
+    ! Fixed invalid swaping of items, was using memcpy() instead of hb_itemSwap() in hb_vmSwapAlias().
+      This was interfering with new Array Management.
 
 2003-09-05 22:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
    *makefile.bc

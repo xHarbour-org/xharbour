@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.255 2003/08/27 20:02:14 ronpinkas Exp $
+ * $Id: hvm.c,v 1.256 2003/09/02 05:41:15 ronpinkas Exp $
  */
 
 /*
@@ -5037,17 +5037,27 @@ static void hb_vmSwapAlias( void )
 {
    HB_THREAD_STUB
 
-   HB_ITEM_PTR pItem;
-   HB_ITEM_PTR pWorkArea;
+   PHB_ITEM pItem;
+   PHB_ITEM pWorkArea;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmSwapAlias()"));
 
    pItem = hb_stackItemFromTop( -1 );
    pWorkArea = hb_stackItemFromTop( -2 );
+
    hb_vmSelectWorkarea( pWorkArea );
 
-   memcpy( pWorkArea, pItem, sizeof( HB_ITEM ) );
-   pItem->type = HB_IT_NIL;
+   hb_itemSwap( pWorkArea, pItem );
+
+   if( HB_IS_COMPLEX( pItem ) )
+   {
+      hb_itemClear( pItem );
+   }
+   else
+   {
+      pItem->type = HB_IT_NIL;
+   }
+
    hb_stackDec();
 }
 
