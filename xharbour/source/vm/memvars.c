@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.35 2003/09/10 19:02:29 ronpinkas Exp $
+ * $Id: memvars.c,v 1.36 2003/09/10 19:31:22 ronpinkas Exp $
  */
 
 /*
@@ -338,9 +338,11 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
       }
       else
       {
+        ULONG ulPos;
+
         #ifndef HB_ARRAY_USE_COUNTER
            HB_VALUE_PTR pOldValues = s_globalTable;
-           ULONG ulPos, ulValues = s_globalTableSize;
+           ULONG ulValues = s_globalTableSize;
         #endif
 
          /* No more free values in the table - expand the table
