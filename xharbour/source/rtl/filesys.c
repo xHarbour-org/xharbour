@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.78 2004/03/23 22:30:22 jonnymind Exp $
+ * $Id: filesys.c,v 1.79 2004/03/24 10:17:22 druzus Exp $
  */
 
 /*
@@ -530,10 +530,10 @@ BYTE HB_EXPORT * hb_filecase(char *str) {
 FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 {
 #if defined(OS_UNIX_COMPATIBLE)
-   HB_THREAD_STUB;
+   HB_THREAD_STUB
 #endif
 
-   FHANDLE hFileHandle ;
+   FHANDLE hFileHandle;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsPOpen(%p, %s)", pFilename, pMode));
 
@@ -543,7 +543,7 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
 #if defined(OS_UNIX_COMPATIBLE)
    {
 #ifndef MAXFD
-    #define MAXFD		1024
+      #define MAXFD     1024
 #endif
       FHANDLE hPipeHandle[2], hNullHandle;
       pid_t pid;
