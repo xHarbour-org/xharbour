@@ -1781,8 +1781,8 @@ PROCEDURE RP_Comp_Err( oErr, sLine, nLine )
       sArgs := Left( sArgs, Len( sArgs ) -2 )
    ENDIF
 
-   TraceLog( "Line: " + Str( nLine, 4 ) + " could not compile: '" + sLine + ";" + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
-   Alert( "Line: " + Str( nLine, 4 ) + " could not compile: '" + sLine + ";" + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
+   TraceLog( "Line: " + Str( nLine, 4 ) + " could not compile: '" + sLine + "';" + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
+   Alert( "Line: " + Str( nLine, 4 ) + " could not compile: '" + sLine + "';" + oErr:Description + sArgs + " " + ProcName(2) + '[' + Str( ProcLine(2) ) + ']')
 
    BREAK
 
@@ -6382,7 +6382,11 @@ FUNCTION ExtractLeadingWS( sLine, sWS )
 
 RETURN sWS
 
+#endif
+
 //--------------------------------------------------------------//
+
+#ifndef __HARBOUR__
 
 FUNCTION DropTrailingWS( sLine, sWS )
 
@@ -6405,7 +6409,11 @@ FUNCTION DropTrailingWS( sLine, sWS )
 
 RETURN sLine
 
+#endif
+
 //--------------------------------------------------------------//
+
+#ifndef __HARBOUR__
 
 FUNCTION DropExtraTrailingWS( sLine )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.13 2002/01/03 06:28:32 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.14 2002/01/03 09:57:59 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,12 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-03 17:33 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
+  *  xharbour/source/vm/fastitem.c
+  *  xharbour/source/vm/hvm.c
+     ! More speed optimizations.
+
+     /* xHarbour executables are now about 30% faster than Harbour executables. */
+
+  *  xharbour/tests/pp.prg
+  *  xharbour/tests/pp_harb.ch
+     ! Fixed C functions to use itemapi instead of direct access.
+
 2002-01-03 08:00 UTC-0300 Luiz Rafael Culik <culik@sl.conex.net>
    * utils/hbmake/hbmake.prg
      * updated the date
    * utils/hbmake/hbmutils.prg
     * Reupdaload again, the function Getlibs() is in this module
-
 
 2002-01-02 22:22 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/source/vm/classes.c
@@ -22,7 +33,7 @@
 
 2002-01-02 20:11 UTC+0100 Ron Pinkas <ron@ronpinkas.com>
   * xharbour/source/rtl/filesys.c
-    ! Changed #ifdef __WIN32__ to #ifdef X__WIN32__ to disable wi32 logic, which is still broken.
+    ! Changed #ifdef __WIN32__ to #ifdef X__WIN32__ to disable win32 logic, which is still broken.
 
   * xharbour/utils/hbmake/hbmake.prg
     ! Commented out line 1107 :

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.6 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: hvm.c,v 1.7 2002/01/03 06:28:34 ronpinkas Exp $
  */
 
 /*
@@ -3995,11 +3995,11 @@ static void hb_vmPushLocal( SHORT iLocal )
 
    if( HB_IS_BYREF( pLocal ) )
    {
-      hb_itemCopy( ( hb_stackTopItem() ), hb_itemUnRef( pLocal ) );
+      hb_itemShareValue( ( hb_stackTopItem() ), hb_itemUnRef( pLocal ) );
    }
    else
    {
-      hb_itemCopy( ( hb_stackTopItem() ), pLocal );
+      hb_itemShareValue( ( hb_stackTopItem() ), pLocal );
    }
 
    hb_stackPush();
@@ -4034,10 +4034,16 @@ static void hb_vmPushStatic( USHORT uiStatic )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushStatic(%hu)", uiStatic));
 
    pStatic = s_aStatics.item.asArray.value->pItems + hb_stack.iStatics + uiStatic - 1;
+
    if( HB_IS_BYREF( pStatic ) )
-      hb_itemCopy( hb_stackTopItem(), hb_itemUnRef( pStatic ) );
+   {
+      hb_itemShareValue( hb_stackTopItem(), hb_itemUnRef( pStatic ) );
+   }
    else
-      hb_itemCopy( hb_stackTopItem(), pStatic );
+   {
+      hb_itemShareValue( hb_stackTopItem(), pStatic );
+   }
+
    hb_stackPush();
 }
 
@@ -4092,7 +4098,7 @@ static void hb_vmDuplicate( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDuplicate()"));
 
-   hb_itemCopy( ( hb_stackTopItem() ), hb_stackItemFromTop( -1 ) );
+   hb_itemShareValue( ( hb_stackTopItem() ), hb_stackItemFromTop( -1 ) );
    hb_stackPush();
 }
 
@@ -4100,9 +4106,9 @@ static void hb_vmDuplTwo( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDuplTwo()"));
 
-   hb_itemCopy( ( hb_stackTopItem() ), hb_stackItemFromTop( -2 ) );
+   hb_itemShareValue( ( hb_stackTopItem() ), hb_stackItemFromTop( -2 ) );
    hb_stackPush();
-   hb_itemCopy( ( hb_stackTopItem() ), hb_stackItemFromTop( -2 ) );
+   hb_itemShareValue( ( hb_stackTopItem() ), hb_stackItemFromTop( -2 ) );
    hb_stackPush();
 }
 

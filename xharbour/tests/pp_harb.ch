@@ -123,14 +123,11 @@ static HB_FUNC( NEXTTOKEN )
 {
    PHB_ITEM pLine       = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pDontRecord = hb_param( 2, HB_IT_LOGICAL );
-
    char *sLine, *pTmp;
-   BOOL lDontRecord;
-
    char sReturn[2048];
-   size_t Counter, nLen;
-
    char s2[3];
+   BOOL lDontRecord;
+   size_t Counter, nLen;
 
    if( pLine == NULL || pLine->item.asString.length == 0 )
    {
@@ -439,9 +436,7 @@ static HB_FUNC( NEXTTOKEN )
       }
       else
       {
-         pTmp = hb_strdup( sLine );
-         hb_itemPutC( pLine, pTmp );
-         hb_xfree( pTmp );
+         hb_itemPutCPtr( pLine, hb_strdup( sLine ), strlen( sLine ) );
       }
       //printf( "\nToken: '%s' value: '%s'\n", sReturn, pLine->item.asString.value );
    }
@@ -460,12 +455,10 @@ static HB_FUNC( NEXTIDENTIFIER )
 {
    PHB_ITEM pLine    = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pSkipped = hb_param( 2, HB_IT_ANY );
-
    char *sLine;
-
+   char cChar, cLastChar = ' ';
    size_t nAt, nLen;
    int nStart = -1;
-   char cChar, cLastChar = ' ';
 
    if( pLine == NULL || pLine->item.asString.length == 0 )
    {
@@ -575,11 +568,7 @@ static HB_FUNC( NEXTIDENTIFIER )
 
        if( ISBYREF( 1 ) )
        {
-          char *pTmp;
-
-          pTmp = hb_strdup( sLine + nAt );
-          hb_itemPutC( pLine, pTmp );
-          hb_xfree( pTmp );
+          hb_itemPutCPtr( pLine, hb_strdup( sLine + nAt ), strlen( sLine + nAt ) );
        }
 
        //printf( "\nIdentifier: '%s'\n", sIdentifier );
@@ -596,9 +585,17 @@ static HB_FUNC( NEXTIDENTIFIER )
 //----------------------------------------------------------------------------//
 HB_FUNC( EXTRACTLEADINGWS )
 {
-   PHB_ITEM pLine = hb_itemUnRef( hb_stackItemFromBase( 1 ) );
-   size_t iLen = pLine->item.asString.length, i = 0;
-   void *pTmp;
+   PHB_ITEM pLine = hb_param( 1, HB_IT_STRING );
+   size_t iLen, i = 0;
+   char *pTmp;
+
+   if( pLine == NULL )
+   {
+      hb_retclen( "", 0 );
+      return;
+   }
+
+   iLen = pLine->item.asString.length;
 
    while( pLine->item.asString.value[i] == ' ' )
    {
@@ -609,50 +606,20 @@ HB_FUNC( EXTRACTLEADINGWS )
    {
       if( HB_IS_BYREF( hb_stackItemFromBase( 1 ) ) )
       {
-         if( pLine->bShadow )
-         {
-            pLine->bShadow = FALSE;
-            pLine->item.asString.value = hb_strdup( pLine->item.asString.value + i ) ;
-            pLine->item.asString.length = iLen - i;
-         }
-         else
-         {
-            pTmp = (void *) pLine->item.asString.value;
-            pLine->item.asString.value = hb_strdup( pLine->item.asString.value + i ) ;
-            pLine->item.asString.length = iLen - i;
-            hb_xfree( pTmp );
-         }
-      }
-      else
-      {
-         /* No need to manipulate at all if not passed by reference. */
+         hb_itemPutCPtr( pLine, hb_strdup( pLine->item.asString.value + i ), iLen - i );
       }
    }
+
+   pTmp = ( char * ) hb_xgrab( i + 1 );
+   memset( pTmp, ' ', i );
 
    if( HB_IS_BYREF( hb_stackItemFromBase( 2 ) ) )
    {
       PHB_ITEM pWS = hb_itemUnRef( hb_stackItemFromBase( 2 ) );
-
-      hb_itemClear( pWS );
-
-      pWS->type = HB_IT_STRING;
-      pWS->item.asString.length = i;
-      pWS->item.asString.value = ( char * ) hb_xgrab( pWS->item.asString.length + 1 );
-      memset( pWS->item.asString.value, ' ', pWS->item.asString.length );
-      pWS->item.asString.value[ pWS->item.asString.length ] = '\0';
-
-      hb_itemReturn( pWS );
+      hb_itemPutCL( pWS, pTmp, i );
    }
-   else
-   {
-      hb_itemClear( &hb_stack.Return );
 
-      ( &hb_stack.Return )->type = HB_IT_STRING;
-      ( &hb_stack.Return )->item.asString.length = i;
-      ( &hb_stack.Return )->item.asString.value = ( char * ) hb_xgrab( ( &hb_stack.Return )->item.asString.length + 1 );
-      memset( ( &hb_stack.Return )->item.asString.value, ' ', ( &hb_stack.Return )->item.asString.length );
-      ( &hb_stack.Return )->item.asString.value[ i ] = '\0';
-   }
+   hb_retclenAdopt( pTmp, i );
 }
 
 //----------------------------------------------------------------------------//
@@ -662,23 +629,14 @@ HB_FUNC( DROPTRAILINGWS )
    char *pString;
    size_t iLen, i;
 
-   if( ! pLine )
+   if( pLine == NULL )
    {
       hb_retclen( "", 0 );
       return;
    }
 
-   if( HB_IS_BYREF( hb_stackItemFromBase( 1 ) ) )
-   {
-      pString = pLine->item.asString.value;
-      iLen    = pLine->item.asString.length;
-   }
-   else
-   {
-      pString = hb_itemGetC( pLine );
-      iLen    = hb_itemGetCLen( pLine );
-      pLine   = NULL;
-   }
+   pString = hb_itemGetC( pLine );
+   iLen    = hb_itemGetCLen( pLine );
 
    i = iLen - 1;
 
@@ -690,35 +648,24 @@ HB_FUNC( DROPTRAILINGWS )
    if( ++i < iLen )
    {
       pString[i] = '\0';
+   }
 
-      if( pLine )
-      {
-         pLine->item.asString.length = i;
-      }
+   if( HB_IS_BYREF( hb_stackItemFromBase( 1 ) ) )
+   {
+      hb_itemPutCL( pLine, pString, i );
    }
 
    if( HB_IS_BYREF( hb_stackItemFromBase( 2 ) ) )
    {
       PHB_ITEM pWS = hb_itemUnRef( hb_stackItemFromBase( 2 ) );
+      char *pTmp = ( char * ) hb_xgrab( iLen - i + 1 );
 
-      hb_itemClear( pWS );
-
-      pWS->type = HB_IT_STRING;
-      pWS->item.asString.length = ( iLen - i );
-      pWS->item.asString.value = ( char * ) hb_xgrab( pWS->item.asString.length + 1 );
-      memset( pWS->item.asString.value, ' ', pWS->item.asString.length );
-      pWS->item.asString.value[ pWS->item.asString.length ] = '\0';
+      memset( pTmp, ' ', iLen - i );
+      hb_itemPutCPtr( pWS, pTmp, iLen - i );
    }
 
-   if( pLine )
-   {
-      hb_itemReturn( pLine );
-   }
-   else
-   {
-      hb_retclenAdopt( pString, i );
-      //hb_xfree( pString );
-   }
+   hb_retclenAdopt( pString, i );
+   //hb_xfree( pString );
 }
 
 //----------------------------------------------------------------------------//
@@ -728,23 +675,14 @@ HB_FUNC( DROPEXTRATRAILINGWS )
    char *pString;
    size_t iLen, i;
 
-   if( ! pLine )
+   if( pLine == NULL )
    {
       hb_retclen( "", 0 );
       return;
    }
 
-   if( HB_IS_BYREF( hb_stackItemFromBase( 1 ) ) )
-   {
-      pString = pLine->item.asString.value;
-      iLen    = pLine->item.asString.length;
-   }
-   else
-   {
-      pString = hb_itemGetC( pLine );
-      iLen    = hb_itemGetCLen( pLine );
-      pLine   = NULL;
-   }
+   pString = hb_itemGetC( pLine );
+   iLen    = hb_itemGetCLen( pLine );
 
    i = iLen - 1;
 
@@ -756,22 +694,15 @@ HB_FUNC( DROPEXTRATRAILINGWS )
    if( ++i < iLen )
    {
       pString[i] = '\0';
-
-      if( pLine )
-      {
-         pLine->item.asString.length = i;
-      }
    }
 
-   if( pLine )
+   if( HB_IS_BYREF( hb_stackItemFromBase( 1 ) ) )
    {
-      hb_itemReturn( pLine );
+      hb_itemPutCL( pLine, pString, i );
    }
-   else
-   {
-      hb_retclenAdopt( pString, i );
-      //hb_xfree( pString );
-   }
+
+   hb_retclenAdopt( pString, i );
+   //hb_xfree( pString );
 }
 
 #pragma ENDDUMP
