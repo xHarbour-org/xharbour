@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.14 2003/07/16 17:03:02 druzus Exp $
+# $Id: xharbour.spec,v 1.15 2003/07/23 12:35:56 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -214,6 +214,7 @@ export HB_LIB_INSTALL=$RPM_BUILD_ROOT/$HB_LIB_INSTALL
 mkdir -p $HB_BIN_INSTALL
 mkdir -p $HB_INC_INSTALL
 mkdir -p $HB_LIB_INSTALL
+mkdir -p $RPM_BUILD_ROOT/usr/lib
 
 make -i install
 
@@ -269,12 +270,15 @@ do
 	;;
     esac
 done
-$HB_BIN_INSTALL/hb-mkslib lib%{name}.so $LIBS
-[ $HB_MT != "MT" ] || $HB_BIN_INSTALL/hb-mkslib lib%{name}mt.so $LIBSMT
-cd ..
-for l in lib%{name}.so lib%{name}mt.so
+$HB_BIN_INSTALL/hb-mkslib lib%{name}-%{version}.so $LIBS
+[ $HB_MT != "MT" ] || $HB_BIN_INSTALL/hb-mkslib lib%{name}mt-%{version}.so $LIBSMT
+for l in lib%{name}-%{version}.so lib%{name}mt-%{version}.so
 do
-    [ -f %{name}/$l ] && ln -s %{name}/$l $l
+    if [ -f $l ]
+    then
+        ll=${l%%-%{version}.so}.so
+        ln -s $l $ll && ln -s %{name}/$l $RPM_BUILD_ROOT/usr/lib/$ll
+    fi
 done
 #export LD_LIBRARY_PATH="$HB_LIB_INSTALL:$LD_LIBRARY_PATH"
 popd
@@ -691,6 +695,8 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Wed Jul 23 2003 Przemyslaw Czerpak <druzus@polbox.com>
 - fixed file (user and group) owner for RPMs builded from non root account
+- shared lib names changed from xharbour{mt,}.so to
+  xharbour{mt,}-<version>.so and soft links with short names created
 - 0.82 version set
 
 * Wed Apr 30 2003 Przemyslaw Czerpak <druzus@polbox.com>
