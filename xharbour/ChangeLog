@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.609 2003/01/10 22:17:53 jonnymind Exp $
+ * $Id: ChangeLog,v 1.610 2003/01/10 22:54:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-10 17:58 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * make_b32.bat
+    - Removed options [ST|MT|BOTH] now always make BOTH sets of libs.
+
+  * bin/bld.bat
+  * makefile.bc
+    + Added mt support for rddmt.lib
+
+  /*
+     NOTE: Make_b32 and soon all make procedures ALWAYS create both set of libraries ST and MT. The affected lib are:
+           vm[mt].lib rtl[mt].lib rdd[mt].lib dbntx[mt].lib dbfcdx[mt].lib
+
+           Bld_b32.bat and similiar applications and samples build batch by default link ST version of libs unless
+           HB_MT Environment Variables is set to MT like this: SET HB_MT=mt
+
+  */
 
 2003-01-10 14:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * make_b32.bat
