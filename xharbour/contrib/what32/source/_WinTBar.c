@@ -74,7 +74,7 @@ HB_FUNC( GETTOOLBARITEMRECT )
    RECT    rc = {0,0,0,0};
    PHB_ITEM aRect ;
    SendMessage((HWND) hb_parnl(1), TB_GETITEMRECT, hb_parni(2), (LPARAM)&rc);
-   MapWindowPoints((HWND) hb_parnl(1), HWND_DESKTOP, (POINT*)&rc, 2);
+//   MapWindowPoints((HWND) hb_parnl(1), HWND_DESKTOP, (POINT*)&rc, 2);
    aRect = Rect2Array( &rc  );
    _itemReturn( aRect );
    _itemRelease( aRect );

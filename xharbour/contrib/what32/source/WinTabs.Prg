@@ -6,7 +6,6 @@
 #Include "cstruct.ch"
 #Include "winGdi.ch"
 
-
 // move that structure to WinStruc.ch
 
 typedef struct {;
@@ -64,6 +63,8 @@ CLASS TabControl
    METHOD SetUnicodeFormat()
    METHOD TabSubClass()
    METHOD OnInit() VIRTUAL
+   METHOD OnColorDlg() VIRTUAL
+   METHOD OnCommand() VIRTUAL
 ENDCLASS
 
 *-----------------------------------------------------------------------------*
@@ -77,7 +78,7 @@ METHOD New( hDlg, nL, nT, nW, nH, nStyle, nSel,nId ) CLASS TabControl
    ::nCurSel:=IF(nSel==NIL,1,nSel)
    ::hTab:=TabCtrl_Create( hDlg, nL, nT, nW, nH, nStyle,nId)
    ::nProc:=SetProcedure( hDlg, {|hDlg,nMsg,nwParam,nlParam|;
-            ::TabProc(hDlg,nMsg,nwParam,nlParam)} , {WM_NOTIFY} )
+            ::TabProc(hDlg,nMsg,nwParam,nlParam)} ,{WM_NOTIFY,WM_CTLCOLORDLG} )
 RETURN Self
 
 *-----------------------------------------------------------------------------*
@@ -100,10 +101,10 @@ METHOD TabProc(hDlg, nMsg, nwParam, nlParam) CLASS TabControl
    LOCAL lEnabled
    LOCAL nLen
    IF nMsg==WM_NOTIFY
-
-    //  tnhdr IS NMHDR
-    //  tnhdr:Buffer( peek(nlParam,tnhdr:sizeof() ) )
-
+      //tnhdr IS NMHDR
+      //tnhdr:Buffer( peek(nlParam,tnhdr:sizeof() ) )
+      //IF tnhdr:code==TCN_GETOBJECT
+      //end
       IF  .T. // tnhdr:code==TCN_SELCHANGE
 
         nSel:=TabCtrl_GetCurSel( ::hTab )+1
@@ -490,5 +491,10 @@ METHOD TabSubClass(hDlg,nMsg,nwParam,nlParam)
 DO CASE
    CASE nMsg==WM_INITDIALOG
         ::OnInit(hDlg)
+   CASE nMsg == WM_CTLCOLORDLG
+        RETURN(::OnColorDlg())
+   CASE nMsg == WM_COMMAND
+        RETURN(::OnCommand(nwParam,nlParam))
 END        
 RETURN(self)
+

@@ -1193,3 +1193,15 @@ HB_FUNC( CREATEMDICLIENT )
   hwndClient = CreateWindowEx(WS_EX_CLIENTEDGE,"MDICLIENT", NULL,WS_CHILD|WS_CLIPSIBLINGS|WS_VISIBLE,hb_parni(4), hb_parni(5), hb_parni(6), hb_parni(7), (HWND)hFrame,0,GetModuleHandle(NULL),&clientCreate);
   hb_retnl((LONG)hwndClient);
 }
+
+/*
+SetLayeredWindowAttributes(
+    HWND hwnd,
+    COLORREF crKey,
+    BYTE bAlpha,
+    DWORD dwFlags);
+HB_FUNC( SETLAYEREDWINDOWATTRIBUTES )
+{
+   SetLayeredWindowAttributes( (HWND) hb_parnl(1), (COLORREF) hb_parnl(2), (BYTE) hb_parni(3), (DWORD) hb_parnl(4));
+}
+*/

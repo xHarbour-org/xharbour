@@ -247,7 +247,7 @@ METHOD Create(hParent,nStyle,nId,nImg,hBMInst,nBMId,xBtn,yBtn,xBmp,yBmp)
  //    SendMessage(::hWnd,TB_ADDBITMAP,::aBitmaps[i,2],::aBitmaps[i,1]:value)
  //  NEXT
 
-//   sendmessage(::hwnd,TB_SETEXTENDEDSTYLE,0,TBSTYLE_EX_DRAWDDARROWS )
+   sendmessage(::hwnd,TB_SETEXTENDEDSTYLE,0,TBSTYLE_EX_DRAWDDARROWS )
 
 
    //SendMessage(::hWnd,TB_ADDBUTTONS,LEN(::aButtons),cButtons)
@@ -386,8 +386,9 @@ method GetItemId
 RETURN(self)
 *-----------------------------------------------------------------------------*
 
-method getitemrect
-RETURN(self)
+method getitemrect(nIndex)
+RETURN(GetToolbarItemRect(::hWnd,nIndex))
+
 *-----------------------------------------------------------------------------*
 
 method getbuttonstyle
