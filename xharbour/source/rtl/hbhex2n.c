@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.6 2004/04/03 21:26:34 mlombardo Exp $
+ * $Id: hbhex2n.c,v 1.7 2004/04/04 08:56:20 lf_sfnet Exp $
  */
 
 /*
@@ -165,8 +165,8 @@ HB_FUNC( HB_STRTOHEX )
    }
 
    cStr = hb_parc( 1 );
-   len = hb_parclen( 1 );
-   outbuff = hb_xgrab( (len * 2) + 1 );
+   len = (int) hb_parclen( 1 );
+   outbuff = (char *) hb_xgrab( (len * 2) + 1 );
    c = outbuff;
 
    for( i = 0; i < len; i++ )
@@ -219,10 +219,10 @@ HB_FUNC( HB_HEXTOSTR )
       return;
    }
 
-   cStr = hb_parc( 1 );
+   cStr = (char *) hb_parc( 1 );
    len = hb_parclen( 1 );
    nalloc = (USHORT) (len/2);
-   outbuff = hb_xgrab( nalloc + 1 );
+   outbuff = (char *) hb_xgrab( nalloc + 1 );
 
    for( i = 0; i < nalloc; i++ )
    {
