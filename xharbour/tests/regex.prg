@@ -1,5 +1,5 @@
 * regex.prg
-* $Id: regex.prg,v 1.1 2003/02/05 18:19:55 jonnymind Exp $
+* $Id: regex.prg,v 1.2 2003/03/18 11:19:23 jonnymind Exp $
 * Test for regular expression functions
 *
 * Giancarlo Niccolai
@@ -58,16 +58,32 @@ PROCEDURE Main()
    nRow++
    aMatch := HB_RegexSplit( ":|;", cStr )
    IF Empty( aMatch )
-      @nRow, 10 SAY "Test failed"
+      @nRow++, 10 SAY "Test failed"
    ELSE
       nCol := 10
       FOR EACH cStr in aMatch
          @nRow, nCol SAY cStr + "/"
          nCol += Len( cStr ) +1
       NEXT
+      nRow++
    ENDIF
 
-   @nRow + 1, 1
+   cStr := "A string without separators"
+   @nRow, 5 SAY "Split test; splitting '" + cStr + "' by ':|;'"
+   nRow++
+   aMatch := HB_RegexSplit( ":|;", cStr )
+   IF Empty( aMatch )
+      @nRow++, 10 SAY "Test failed"
+   ELSE
+      nCol := 10
+      FOR EACH cStr in aMatch
+         @nRow, nCol SAY cStr + "/"
+         nCol += Len( cStr ) +1
+      NEXT
+      nRow++
+   ENDIF
+
+   @nRow, 1
    @23, 25 SAY "Press a key to continue"
    Inkey( 0 )
 RETURN

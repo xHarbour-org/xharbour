@@ -6535,6 +6535,15 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       }
    }
 
+   /* If we have no match, we must anyway return an array of one element
+      for request kind == 3 (split) */
+   if( cRequest == 3 )
+   {
+      hb_arrayNew( &(HB_VM_STACK.Return), 0 );
+      hb_arrayAdd( &(HB_VM_STACK.Return), pString );
+      return TRUE;
+   }
+
    return FALSE;
 }
 
