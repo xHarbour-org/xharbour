@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.5 2002/10/14 04:19:24 what32 Exp $
+ * $Id: xTree.prg,v 1.6 2002/10/15 01:13:56 what32 Exp $
  */
 
 /*
@@ -57,20 +57,27 @@ METHOD OnCreate() CLASS ObjTree
    DeleteObject(hBmp)
 
    ::Add('tree', TreeObj():New( self, 100,  0,  0, 100, 100) )
-   ::Tree:Hint := "OOPS"
+   ::Tree:Hint := "This is the Object Tree Window "+"THintWindow"
    TVSetImageList(::Tree:handle, hImg, 0 )
 RETURN(nil)
 
 
 CLASS TreeObj FROM TTreeView
    METHOD Add()
+   METHOD OnChange()
 ENDCLASS
 
-METHOD Add( cText, nImg ) CLASS TreeObj
+METHOD Add( cText, nImg, hObj ) CLASS TreeObj
    if empty( ::Parent:TreeRoot )
       ::Parent:TreeRoot:=super:Add( cText, nImg )
      else
-      ::Parent:TreeRoot:Add( cText, nImg )
+      ::Parent:TreeRoot:Add( cText, nImg, hObj )
    endif
 return(nil)
 
+METHOD OnChange( oItem ) CLASS TreeObj
+   local n := aScan( ::Parent:Parent:ObjInsp:Objects, {|o|o:PropName == oItem:Caption} )
+   IF n>0
+      ::Parent:Parent:ObjInsp:InspCombo:SetCurSel(n-1)
+   ENDIF
+return(0)

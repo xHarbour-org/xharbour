@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.4 2002/10/10 02:51:46 what32 Exp $
+ * $Id: TTVItem.prg,v 1.5 2002/10/11 03:53:16 what32 Exp $
  */
 
 /*
@@ -42,9 +42,11 @@ CLASS TTVItem
    DATA   Items
    DATA   Tree
    DATA   Cargo
+   DATA   Caption
    METHOD New() CONSTRUCTOR
    METHOD Add()
    METHOD Expand() INLINE SendMessage( ::Tree:handle, TVM_EXPAND, TVE_EXPAND, ::handle )
+   METHOD Delete()
 ENDCLASS
 
 //----------------------------------------------------------------------------//
@@ -60,7 +62,13 @@ return Self
 
 METHOD Add( cPrompt, nImage, Cargo ) CLASS TTVItem
    local oItem := TTVItem():New( TVInsertItem( ::Tree:handle, cPrompt, ::handle, nImage ), ::Tree, Cargo )
+   oItem:Caption := cPrompt
    AAdd( ::Items, oItem )
 return oItem
 
 //----------------------------------------------------------------------------//
+
+METHOD Delete() CLASS TTVItem
+   TVDeleteItem( ::Tree:handle, ::handle )
+   aDel( ::Items, self )
+return( len( ::Items) )

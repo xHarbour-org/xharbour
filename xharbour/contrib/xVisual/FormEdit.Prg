@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.59 2002/10/10 07:02:16 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.60 2002/10/10 21:50:04 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -258,7 +258,7 @@ METHOD CreateControl(aRect)
 
          oApp:MainFrame:ObjInsp:InspCombo:AddString(oObj:propname+chr(9)+oObj:ClassName(),oObj)
          oApp:MainFrame:ObjInsp:InspCombo:SetCurSel(oApp:MainFrame:ObjInsp:InspCombo:GetCount()-1)
-         ::Parent:ObjTree:Tree:Add( oObj:PropName,1 )
+         ::Parent:ObjTree:Tree:Add( oObj:PropName,1, oObj:handle )
          ::Parent:ObjTree:Tree:Expand()
 
       endif

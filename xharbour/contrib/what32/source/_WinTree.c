@@ -29,6 +29,12 @@ HB_FUNC( TVINSERTITEM )
 }
 
 //-------------------------------------------------------------------------//
+HB_FUNC( TVDELETEITEM )
+{
+   TreeView_DeleteItem( (HWND) hb_parnl( 1 ), ( HTREEITEM ) hb_parnl( 2 ) );
+}
+
+//-------------------------------------------------------------------------//
 
 HB_FUNC( TVSETIMAGELIST ) // ( hWnd, hImageList, nType )
 {

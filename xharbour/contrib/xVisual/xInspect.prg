@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.28 2002/10/12 19:58:13 what32 Exp $
+ * $Id: xInspect.prg,v 1.29 2002/10/13 11:16:30 what32 Exp $
  */
 
 /*
@@ -151,8 +151,6 @@ METHOD SaveVar(cText,nKey) CLASS ObjInspect
       
       ::Browser:source[::Browser:RecPos][2]:= cText
       ::Browser:RefreshCurrent()
-//      ::CurObject:Update()
-
       ::CurObject:SetFocus()
       SetFocus( ::Browser:hWnd)
 
@@ -214,8 +212,14 @@ return(super:SetCurSel(n))
 //---------------------------------------------------------------------------------
 
 METHOD DelObject( oObj ) CLASS ComboInsp
-   local n
+   local n,x,y
    IF ( n:= aScan( ::Parent:Objects, {|o|o:handle == oObj:handle} ))>0
+      for x:=1 to len(::Parent:Parent:ObjTree:Tree:Items)
+          if( y:=aScan( ::Parent:Parent:ObjTree:Tree:Items[x]:Items,{|o|o:cargo == oObj:handle} ))>0
+             ::Parent:Parent:ObjTree:Tree:Items[x]:Items[y]:Delete()
+             exit
+          endif
+      next
       aDel( ::Parent:Objects, n, .T. )
       ::DeleteString( n-1 )
       ::SetCurSel( n-2 )

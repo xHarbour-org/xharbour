@@ -1,5 +1,5 @@
 /*
- * $Id: TTreeview.prg,v 1.9 2002/10/14 01:36:55 fsgiudice Exp $
+ * $Id: TTreeview.prg,v 1.10 2002/10/14 04:19:23 what32 Exp $
  */
 
 /*
@@ -36,9 +36,9 @@
 #include "cstruct.ch"
 #include "debug.ch"
 
+
 //----------------------------------------------------------------------------//
 
-//CLASS TTreeView FROM TWinControl
 CLASS TTreeView FROM TCustomControl
 
    DATA Items     PROTECTED INIT {}
@@ -56,7 +56,7 @@ CLASS TTreeView FROM TCustomControl
 
    DATA lRegister PROTECTED INIT .F.
    DATA lControl  PROTECTED INIT .T.
-   DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_NOTIFY,WM_SIZE,WM_MOVE}
+   DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
    DATA WndProc   PROTECTED INIT 'ControlProc'
    DATA Name      PROTECTED INIT "SysTreeView32"
 
@@ -65,13 +65,15 @@ CLASS TTreeView FROM TCustomControl
    METHOD Add()
    METHOD Expand()               INLINE aEval( ::Items, { | oItem | oItem:Expand() } )
    METHOD GetSelected()
+   METHOD GetItem()
    METHOD GetSelText()           INLINE TVGetSelText( ::handle )
    METHOD SelChanged()           INLINE If( ::bChanged != nil, Eval( ::bChanged, Self ), nil )
    METHOD SetBkColor( nColor )   INLINE ::SendMessage( TVM_SETBKCOLOR, 0, nColor )
    METHOD SetTextColor( nColor ) INLINE ::SendMessage( TVM_SETTEXTCOLOR, 0, nColor )
    METHOD SetImageList()
    METHOD Notify()
-   METHOD OnSelChange() VIRTUAL
+   METHOD OnChange() VIRTUAL
+   METHOD OnDelete() VIRTUAL
 ENDCLASS
 
 //----------------------------------------------------------------------------//
@@ -89,6 +91,7 @@ return( super:New( oParent ) )
 METHOD Add( cPrompt, nImage ) CLASS TTreeView
    local oItem
    oItem := TTVItem():New( TVInsertItem( ::handle, cPrompt,, nImage ), Self )
+   oItem:Caption := cPrompt
    AAdd( ::Items, oItem )
 return oItem
 
@@ -119,6 +122,11 @@ return FindItem( ::Items, TVGetSelected( ::handle ) )
 
 //----------------------------------------------------------------------------//
 
+METHOD GetItem(n) CLASS TTreeView
+return( ::Items[n] )
+
+//----------------------------------------------------------------------------//
+
 METHOD SetImageList( oImageList ) CLASS TTreeView
    ::oImageList = oImageList
    TVSetImageList( ::handle, oImageList:handle, 0 )
@@ -126,12 +134,16 @@ return nil
 
 //----------------------------------------------------------------------------//
 
-METHOD Notify( hdr ) CLASS TTreeView
+METHOD Notify( hdr, nlParam ) CLASS TTreeView
+   local oItem
    DO CASE
       CASE Hdr:code == TVN_BEGINDRAG
       CASE Hdr:code == TVN_BEGINLABELEDIT
       CASE Hdr:code == TVN_BEGINRDRAG
       CASE Hdr:code == TVN_DELETEITEM
+           oItem := FindItem( ::Items, TVGetSelected( ::handle ) )
+           Return( ::OnDelete( oItem ) )
+      
       CASE Hdr:code == TVN_ENDLABELEDIT
       CASE Hdr:code == TVN_GETDISPINFO
       CASE Hdr:code == TVN_GETINFOTIP
@@ -139,6 +151,9 @@ METHOD Notify( hdr ) CLASS TTreeView
       CASE Hdr:code == TVN_ITEMEXPANDING
       CASE Hdr:code == TVN_KEYDOWN
       CASE Hdr:code == TVN_SELCHANGED
+           oItem := FindItem( ::Items, TVGetSelected( ::handle ) )
+           Return( ::OnChange( oItem ) )
+
       CASE Hdr:code == TVN_SELCHANGING
       CASE Hdr:code == TVN_SETDISPINFO
       CASE Hdr:code == TVN_SINGLEEXPAND

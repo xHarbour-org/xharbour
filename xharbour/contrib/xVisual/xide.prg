@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.85 2002/10/14 04:19:24 what32 Exp $
+ * $Id: xide.prg,v 1.86 2002/10/14 04:35:32 what32 Exp $
  */
 
 /*
@@ -73,7 +73,7 @@ RETURN( nil)
 
 //----------------------------------------------------------------------------------------------
 
-CLASS MainFrame FROM TForm
+CLASS MainFrame FROM TFrame
    METHOD New( oParent ) INLINE ::Caption := 'xHarbour xIde',;
                                 ::left    := 0,;
                                 ::top     := 0,;
