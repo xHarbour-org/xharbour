@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.502 2002/11/20 23:45:31 lculik Exp $
+ * $Id: ChangeLog,v 1.503 2002/11/24 05:30:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-24 09:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    * Changed all SET to refrences to ENUM.
+
+  /*
+    Corrected syntax is:
+
+    ENUM[ERATION] <SetName> := <Member1> [, <MembersN>] ...
+
+    LOCAL/STATIC <VarName> AS ENUM[ERATION] <SetName>
+
+    <VarName> := <MemberX>
+
+    This is still work in progress.
+  */
 
 2002-11-23 21:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbcomp.h

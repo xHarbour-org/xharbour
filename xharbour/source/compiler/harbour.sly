@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.25 2002/10/18 05:15:55 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.26 2002/11/24 05:30:32 ronpinkas Exp $
  */
 
 /*
@@ -172,11 +172,11 @@ static void hb_compDebugStart( void ) { };
 %token PLUSEQ MINUSEQ MULTEQ DIVEQ POWER EXPEQ MODEQ
 %token PRIVATE BEGINSEQ BREAK RECOVER RECOVERUSING DO WITH SELF LINE
 %token MACROVAR MACROTEXT
-%token AS_ARRAY AS_BLOCK AS_CHARACTER AS_CLASS AS_DATE AS_LOGICAL AS_NUMERIC AS_OBJECT AS_SET AS_VARIANT DECLARE OPTIONAL DECLARE_CLASS DECLARE_MEMBER
-%token AS_ARRAY_ARRAY AS_BLOCK_ARRAY AS_CHARACTER_ARRAY AS_CLASS_ARRAY AS_DATE_ARRAY AS_LOGICAL_ARRAY AS_NUMERIC_ARRAY AS_OBJECT_ARRAY AS_SET_ARRAY
+%token AS_ARRAY AS_BLOCK AS_CHARACTER AS_CLASS AS_DATE AS_LOGICAL AS_NUMERIC AS_OBJECT AS_ENUM AS_VARIANT DECLARE OPTIONAL DECLARE_CLASS DECLARE_MEMBER
+%token AS_ARRAY_ARRAY AS_BLOCK_ARRAY AS_CHARACTER_ARRAY AS_CLASS_ARRAY AS_DATE_ARRAY AS_LOGICAL_ARRAY AS_NUMERIC_ARRAY AS_OBJECT_ARRAY AS_ENUM_ARRAY
 %token PROCREQ GET
 %token WITHOBJ FOREACH EPSILON
-%token SET
+%token ENUM
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
@@ -259,7 +259,7 @@ Source     : Crlf
            | FieldsDef
            | MemvarDef
            | Declaration
-           | SetDef
+           | EnumDef
            | Function
            | Statement
            | Line
@@ -270,7 +270,7 @@ Source     : Crlf
            | Source FieldsDef
            | Source MemvarDef
            | Source Declaration
-           | Source SetDef
+           | Source EnumDef
            | Source Function
            | Source Statement
            | Source Line
@@ -316,7 +316,7 @@ StrongType : AS_NUMERIC                    { hb_comp_cVarType = 'N'; }
            | AS_BLOCK                      { hb_comp_cVarType = 'B'; }
            | AS_OBJECT                     { hb_comp_cVarType = 'O'; }
            | AS_CLASS IdentName            { hb_comp_cVarType = 'S'; hb_comp_szFromClass = $2 }
-           | AS_SET IdentName              { hb_comp_cVarType = 'S'; hb_comp_szFromSet = $2 }
+           | AS_ENUM IdentName             { hb_comp_cVarType = 'E'; hb_comp_szFromEnum = $2 }
            | AS_VARIANT                    { hb_comp_cVarType = ' '; }
 	   | AsArray
            ;
@@ -330,7 +330,7 @@ AsArray    : AS_ARRAY                      { hb_comp_cVarType = 'A'; }
            | AS_BLOCK_ARRAY                { hb_comp_cVarType = 'b'; }
            | AS_OBJECT_ARRAY               { hb_comp_cVarType = 'o'; }
            | AS_CLASS_ARRAY IdentName      { hb_comp_cVarType = 's'; hb_comp_szFromClass = $2 }
-           | AS_SET_ARRAY IdentName        { hb_comp_cVarType = 's'; hb_comp_szFromSet = $2 }
+           | AS_ENUM_ARRAY IdentName       { hb_comp_cVarType = 'e'; hb_comp_szFromEnum = $2 }
            ;
 
 ParamList  : IdentName AsType                { hb_compVariableAdd( $1, hb_comp_cVarType ); $$ = 1; }
@@ -1718,12 +1718,12 @@ OptList    : OPTIONAL IdentName AsType                               { hb_compDe
            | OptList ',' OPTIONAL '@' IdentName '(' DummyArgList ')' { hb_compDeclaredParameterAdd( $5, hb_comp_cVarType + VT_OFFSET_OPTIONAL + VT_OFFSET_BYREF ); }
 	   ;
 
-SetDef     : SET IdentName { hb_compNewSet( $2 ); } INASSIGN SetMembers
-           ;
+EnumDef     : ENUM IdentName { hb_compEnumAdd( $2 ); } INASSIGN EnumMembers
+            ;
 
-SetMembers : IdentName { hb_compSetMember( $1 ); }
-           | SetMembers ',' IdentName { hb_compSetMember( $3 ); }
-           ;
+EnumMembers : IdentName { hb_compEnumMemberAdd( $1 ); }
+            | EnumMembers ',' IdentName { hb_compEnumMemberAdd( $3 ); }
+            ;
 
 ExecFlow   : IfEndif
            | DoCase

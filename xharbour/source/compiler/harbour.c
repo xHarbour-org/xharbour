@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.24 2002/10/13 18:06:29 ronpinkas Exp $
+ * $Id: harbour.c,v 1.25 2002/11/24 05:30:32 ronpinkas Exp $
  */
 
 /*
@@ -41,8 +41,8 @@
  *    hb_compMethodFind()
  *    hb_compDeclaredAdd()
  *    hb_compDeclaredInit()
- *    hb_compNewSet()
- *    hb_compSetMember()
+ *    hb_compEnumAdd()
+ *    hb_compEnumMemberAdd()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -147,9 +147,9 @@ PCOMCLASS      hb_comp_pReleaseClass;
 char *         hb_comp_szFromClass;
 PCOMDECLARED   hb_comp_pLastMethod;
 
-PSETDEF        hb_comp_pSet;
+PENUMDEF       hb_comp_pEnum;
 
-char *         hb_comp_szFromSet;
+char *         hb_comp_szFromEnum;
 
 int            hb_comp_iLine;                             /* currently processed line number (globaly) */
 char *         hb_comp_szFile;                            /* File Name of last compiled line */
@@ -1552,7 +1552,7 @@ static PFUNCTION hb_compFunctionNew( char * szName, HB_SYMBOLSCOPE cScope )
    pFunc->pFields         = NULL;
    pFunc->pMemvars        = NULL;
    pFunc->pPrivates       = NULL;
-   pFunc->pSets           = NULL;
+   pFunc->pEnums          = NULL;
    pFunc->pCode           = NULL;
    pFunc->lPCodeSize      = 0;
    pFunc->lPCodePos       = 0;
@@ -1808,13 +1808,13 @@ PFUNCTION hb_compFunctionKill( PFUNCTION pFunc )
       hb_xfree( ( void * ) pVar );
    }
 
-   while( pFunc->pSets )
+   while( pFunc->pEnums )
    {
-      PSETDEF pSet = pFunc->pSets;
-      pFunc->pSets = pSet->pNext;
+      PENUMDEF pEnum = pFunc->pEnums;
+      pFunc->pEnums = pEnum->pNext;
 
-      hb_xfree( ( void * ) pSet->pMembers );
-      hb_xfree( ( void * ) pSet );
+      hb_xfree( ( void * ) pEnum->pMembers );
+      hb_xfree( ( void * ) pEnum );
    }
 
    /* Release the NOOP array. */
@@ -4170,7 +4170,7 @@ static void hb_compInitVars( void )
    hb_comp_pGlobals       = NULL;
    hb_comp_iGlobals       = 0;
 
-   hb_comp_pSet           = NULL;
+   hb_comp_pEnum          = NULL;
 }
 
 static void hb_compGenOutput( int iLanguage )
@@ -4629,41 +4629,41 @@ int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
    return iStatus;
 }
 
-void hb_compNewSet( char *szName )
+void hb_compEnumAdd( char *szName )
 {
-   PSETDEF pSet = (PSETDEF) hb_xgrab( sizeof( SETDEF ) );
+   PENUMDEF pEnum = (PENUMDEF) hb_xgrab( sizeof( ENUMDEF ) );
 
    //printf( "New set: '%s'\n", szName );
 
-   pSet->szName = szName;
-   pSet->lMembers = 0;
-   pSet->pMembers = NULL;
-   pSet->pNext = NULL;
+   pEnum->szName = szName;
+   pEnum->lMembers = 0;
+   pEnum->pMembers = NULL;
+   pEnum->pNext = NULL;
 
-   if( hb_comp_functions.pLast->pSets )
+   if( hb_comp_functions.pLast->pEnums )
    {
-      hb_comp_functions.pLast->pSets->pNext = pSet;
+      hb_comp_functions.pLast->pEnums->pNext = pEnum;
    }
    else
    {
-      hb_comp_functions.pLast->pSets = pSet;
+      hb_comp_functions.pLast->pEnums = pEnum;
    }
 
-   hb_comp_pSet = pSet;
+   hb_comp_pEnum = pEnum;
 }
 
-void hb_compSetMember( char *szName )
+void hb_compEnumMemberAdd( char *szName )
 {
    //printf( "Member: '%s'\n", szName );
 
-   if ( hb_comp_pSet->pMembers )
+   if ( hb_comp_pEnum->pMembers )
    {
-      hb_comp_pSet->pMembers = hb_xrealloc( hb_comp_pSet->pMembers, ++hb_comp_pSet->lMembers * sizeof( char * ) );
+      hb_comp_pEnum->pMembers = hb_xrealloc( hb_comp_pEnum->pMembers, ++hb_comp_pEnum->lMembers * sizeof( char * ) );
    }
    else
    {
-      hb_comp_pSet->pMembers = hb_xgrab( sizeof( char * ) );
+      hb_comp_pEnum->pMembers = hb_xgrab( sizeof( char * ) );
    }
 
-   hb_comp_pSet->pMembers[ hb_comp_pSet->lMembers - 1 ] = szName;
+   hb_comp_pEnum->pMembers[ hb_comp_pEnum->lMembers - 1 ] = szName;
 }
