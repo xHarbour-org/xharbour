@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1739 2003/11/18 03:39:34 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1740 2003/11/19 16:26:09 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-11-19 08:10 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/rtl/inkey.c
+    * Function __KeyBoard(), clear typeahead buffer only when correct argument
+      passed. (Clipper compatibility)
+      Bug report by : "Alexandre Tadeu Peretti" <aperetti@terra.com.br>
 
 2003-11-19 08:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/pp/ppcore.c minor fix to hb_strAtSkipStrings()

@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.7 2003/09/03 00:42:21 andijahja Exp $
+ * $Id: inkey.c,v 1.9 2003/09/04 05:31:32 andijahja Exp $
  */
 
 /*
@@ -343,12 +343,13 @@ HB_FUNC( INKEY )
 
 HB_FUNC( __KEYBOARD )
 {
-   /* Clear the typeahead buffer without reallocating the keyboard buffer */
-   hb_inkeyReset( FALSE );
 
    if( ISCHAR( 1 ) )
    {
       ULONG size = hb_parclen( 1 );
+
+      /* Clear the typeahead buffer without reallocating the keyboard buffer */
+      hb_inkeyReset( FALSE );
 
       if( size != 0 )
       {
