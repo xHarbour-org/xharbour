@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.15 2004/01/17 15:12:28 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.16 2004/01/18 10:12:42 jonnymind Exp $
  */
 
 /*
@@ -607,7 +607,7 @@ static void xvt_bufferInvalidate( PXVT_BUFFER buf,
       if ( buf->rInvalid.y2 < bottom ) buf->rInvalid.y2 = bottom;
    }
 
-   if ( s_uiDispCount == 0 )
+   if ( s_uiDispCount == 0 && s_childPid > 0 )
    {
       USHORT appMsg;
 
@@ -2359,18 +2359,18 @@ static void xvt_eventManage( PXWND_DEF wnd, XEvent *evt )
       break;
 
       case ConfigureNotify:
-         if ( wnd->bResizing )
+      {
+         ICM_DATA_RESIZE resize;
+         USHORT appMsg;
+         resize.cols = evt->xconfigure.width/wnd->fontWidth;
+         resize.rows = evt->xconfigure.height/wnd->fontHeight;
+         if ( resize.cols != wnd->buffer->cols || resize.rows != wnd->buffer->rows )
          {
-            break;
+            appMsg = XVT_ICM_RESIZE;
+            write( streamFeedback[1], &appMsg, sizeof( appMsg ) );
+            write( streamFeedback[1], &resize, sizeof( resize ) );
          }
-
-         wnd->bResizing = TRUE;
-         // will silently ignore resetting to current dimensions
-         hb_gtSetMode(
-            evt->xconfigure.height/wnd->fontHeight,
-            evt->xconfigure.width/wnd->fontWidth );
-         wnd->bResizing = FALSE;
-
+      }
       break;
 
       // Protocol request from the window manager (usually delete window)
@@ -2536,7 +2536,7 @@ static void xvt_processMessages( PXWND_DEF wnd )
 */
 static void xvt_appProcess()
 {
-   static int period = 100;
+   static int period = 50;
    USHORT appMsg;
    fd_set keySet;
    struct timeval timeout = {0,0};
@@ -2564,6 +2564,15 @@ static void xvt_appProcess()
                s_buffer->bInvalid = FALSE;
                break;
 
+            case XVT_ICM_RESIZE:
+            {
+               ICM_DATA_RESIZE resize;
+               read( streamFeedback[0], &resize, sizeof( resize ) );
+               hb_gtSetMode( resize.rows, resize.cols );
+               hb_gtHandleResize();
+            }
+            break;
+
             case XVT_ICM_QUIT:
                hb_gtHandleClose();
                break;
@@ -2572,7 +2581,7 @@ static void xvt_appProcess()
          timeout.tv_usec = 0;
          FD_SET(streamFeedback[0], &keySet );
       }
-      period = 100;
+      period = 50;
    }
 }
 
@@ -2827,10 +2836,10 @@ void HB_GT_FUNC(gt_Exit( void ))
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
 
-   write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
-   close( streamUpdate[1] );
    if ( s_childPid > 0 )
    {
+      write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+      close( streamUpdate[1] );
       waitpid( s_childPid, &result, 0 );
    }
 
@@ -2938,12 +2947,15 @@ USHORT HB_GT_FUNC(gt_GetCursorStyle( void ))
 void HB_GT_FUNC(gt_SetCursorStyle( USHORT usStyle ))
 {
    USHORT appMsg;
-  HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetCursorStyle(%hu)", usStyle));
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetCursorStyle(%hu)", usStyle));
 
-  s_buffer->curs_style = usStyle;
+   s_buffer->curs_style = usStyle;
 
-  appMsg = XVT_ICM_SETCURSOR;
-  write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+   if ( s_childPid > 0 )
+   {
+      appMsg = XVT_ICM_SETCURSOR;
+      write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+   }
 }
 
 /* *********************************************************************** */
@@ -2964,13 +2976,14 @@ void HB_GT_FUNC(gt_DispEnd())
    {
       --s_uiDispCount;
 
-      if ( s_uiDispCount == 0 )
+      if ( s_uiDispCount == 0 && s_childPid > 0 )
       {
          USHORT appMsg;
 
          msync( s_buffer, sizeof( XVT_BUFFER ), MS_INVALIDATE | MS_ASYNC );
          appMsg = XVT_ICM_UPDATE;
          write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+         write( streamUpdate[1], &s_buffer->rInvalid, sizeof( XSegment ) );
       }
    }
 }
@@ -2980,7 +2993,7 @@ void HB_GT_FUNC(gt_DispEnd())
 USHORT HB_GT_FUNC(gt_DispCount())
 {
   HB_TRACE(HB_TR_DEBUG, ("hb_gt_DispCount()"));
-  return(s_uiDispCount);
+  return s_uiDispCount;
 }
 
 /* *********************************************************************** */
@@ -3250,6 +3263,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
 
    memory = (BYTE *) hb_xgrab( (s_buffer->rows *s_buffer->cols+ 1) * HB_GT_CELLSIZE );
 
+   HB_GT_FUNC( gt_DispBegin() );
    HB_GT_FUNC(gt_GetText( 0, 0, oldrows, oldcols, memory ));
 
    if (row<= XVT_MAX_ROWS && col<= XVT_MAX_COLS)
@@ -3266,12 +3280,14 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT row, USHORT col ))
             col = oldcols;
          }
          xvt_putTextInternal( 0, 0, row, col, oldcols+1,  memory );
-         
+
          xvt_bufferInvalidate( s_buffer, 0, 0, s_buffer->cols, s_buffer->rows );
       }
    }
 
    hb_xfree( memory );
+
+   HB_GT_FUNC( gt_DispEnd() );
 
    return(bResult);
 }

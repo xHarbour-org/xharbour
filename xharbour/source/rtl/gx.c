@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.1.1.1 2001/12/21 10:41:43 ronpinkas Exp $
+ * $Id: gx.c,v 1.2 2004/01/14 23:02:05 jonnymind Exp $
  */
 
 /*
@@ -129,5 +129,17 @@ HB_FUNC( SETSHUTDOWNEVENT )
    }
    else {
       hb_gtSetShutdownEvent( hb_itemGetNL( pEvent ) );
+   }
+}
+
+HB_FUNC( SETGTRESIZEEVENT )
+{
+   PHB_ITEM pEvent = hb_param( 1, HB_IT_NUMERIC );
+   if ( pEvent == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SETRESIZEEVENT", 1, hb_paramError( 1 ) );
+   }
+   else {
+      hb_gtSetResizeEvent( hb_itemGetNL( pEvent ) );
    }
 }

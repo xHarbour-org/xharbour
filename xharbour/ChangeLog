@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2095 2004/01/18 10:12:40 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2096 2004/01/18 13:04:24 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-18 21:46 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapigt.h
+  * source/rtl/gtapi.c
+  * source/rtl/gx.c
+    + Added function SetGtResizeEvent( nEventId ) to be used from PRG;
+      GT modules willing to declare that they have their size changed can
+      call hb_gtHandleResize(). This will cause nEventId to be queued in inkey()
+      loops.
+      + Added functions hb_gtSetResizeEvent() and hb_gtGetResizeEvent()
+
+  * source/rtl/gtxvt/gtxvt.c
+    + Using hb_gtHandleResize() when the scree is resized.
+
+  + tests/gtevent.prg
+    + Added a test for this AND future GT generated events.
 
 2004-01-18 08:05 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.vc

@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.14 2003/11/11 20:20:54 ronpinkas Exp $
+ * $Id: gtapi.c,v 1.15 2004/01/14 23:02:05 jonnymind Exp $
  */
 
 /*
@@ -101,6 +101,7 @@ static int *  s_pColor;
 /* Close event returned by inkey for asynchronous GT kills */
 static int s_closeEvent = 0;
 static int s_shutdownEvent = 0;
+static int s_resizeEvent = 0;
 static BOOL s_closing = FALSE;
 static PHB_ITEM s_pOnClose = 0;
 
@@ -1280,4 +1281,23 @@ int HB_EXPORT hb_gtGetCloseEvent( void )
 int HB_EXPORT hb_gtGetShutdownEvent( void )
 {
   return( s_shutdownEvent );
+}
+
+/******************************************************************/
+void HB_EXPORT hb_gtSetResizeEvent( int iEvent )
+{
+   s_resizeEvent = iEvent;
+}
+
+int HB_EXPORT hb_gtGetResizeEvent( void )
+{
+  return s_resizeEvent;
+}
+
+void HB_EXPORT hb_gtHandleResize( void )
+{
+   if ( s_resizeEvent != 0 )
+   {
+      hb_inkeyPut( s_resizeEvent );
+   }
 }
