@@ -1,5 +1,5 @@
 /*
-* $Id: hblognet.prg,v 1.3 2003/11/28 16:10:50 jonnymind Exp $
+* $Id: hblognet.prg,v 1.4 2003/12/09 02:53:49 ronpinkas Exp $
 */
 
 /*
@@ -249,7 +249,7 @@ METHOD Open( cName ) CLASS HB_LogInetPort
    ENDIF
 
 #ifdef HB_THREAD_SUPPORT
-   ::mtxBusy := HB_CreateMutex()
+   ::mtxBusy := HB_MutexCreate()
    ::nThread := StartThread( Self, "AcceptCon" )
 #else
    // If we have not threads, we have to sync accept incoming connection
@@ -292,7 +292,7 @@ METHOD Send( nStyle, cMessage, cName, nPrio ) CLASS HB_LogInetPort
 
 #ifdef HB_THREAD_SUPPORT
    // be sure thread is not busy now
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
 #else
    // IF we have not a thread, we must see if there is a new connection
    sk := InetAccept( ::skIn )  //timeout should be short
@@ -319,7 +319,7 @@ METHOD Send( nStyle, cMessage, cName, nPrio ) CLASS HB_LogInetPort
    ENDDO
 
 #ifdef HB_THREAD_SUPPORT
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
 #endif
 
 RETURN .T.
@@ -334,9 +334,9 @@ METHOD AcceptCon() CLASS HB_LogInetPort
       sk := InetAccept( ::skIn )
       // A gentle termination request, or an error
       IF sk != NIL
-         MutexLock( ::mtxBusy )
+         HB_MutexLock( ::mtxBusy )
          AAdd( ::aListeners, sk )
-         MutexUnlock( ::mtxBusy )
+         HB_MutexUnlock( ::mtxBusy )
       ENDIF
    ENDDO
 RETURN .T.

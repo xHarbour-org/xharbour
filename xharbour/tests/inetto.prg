@@ -5,7 +5,7 @@
 *
 * Contributed by Giancarlo Niccolai and Charles Kwon
 *
-* $Id: inetto.prg,v 1.8 2003/01/31 19:37:39 jonnymind Exp $
+* $Id: inetto.prg,v 1.9 2003/11/28 16:10:51 jonnymind Exp $
 *
 
 * This array contain the socket control objects that
@@ -48,7 +48,7 @@ PROCEDURE Main( cAddress, nPort, nTimeout )
 
    /* Initializing socket control structure to void */
    aCntSockets := {}
-   MutexCnt := CreateMutex()
+   MutexCnt := HB_MutexCreate()
 
    /* Now starting the control thread */
    CtlThreadID := StartThread ( @ControlThread(), nTimeout )
@@ -61,12 +61,12 @@ PROCEDURE Main( cAddress, nPort, nTimeout )
       ThreadSleep( 200 ) // always a sleep!
       @7, 10 + nDots SAY "."
       nDots ++
-      MutexLock( MutexCnt )
+      HB_MutexLock( MutexCnt )
       IF Len( aCntSockets ) > 0 .and. aCntSockets[1][3] != 0
-         MutexUnlock( MutexCnt )
+         HB_MutexUnlock( MutexCnt )
          EXIT
       ENDIF
-      MutexUnlock( MutexCnt )
+      HB_MutexUnlock( MutexCnt )
    ENDDO
 
    // -1: connection timed out
@@ -118,23 +118,23 @@ FUNCTION Connect( cAddress, nPort, nTimeout )
 
    /* Locking here to prevent control thread to intervene in the middle
       of our operation */
-   MutexLock( MutexCnt )
+   HB_MutexLock( MutexCnt )
    AAdd( aCntSockets, aServiceData )
-   MutexUnlock( MutexCnt )
+   HB_MutexUnlock( MutexCnt )
 
    /* request to get the inet address of the server asynchronously */
-   MutexDone := CreateMutex()
+   MutexDone := HB_MutexCreate()
    thSearcher := StartThread( @SearchForServer(), cAddress, MutexDone )
 
    /* we'll wait 1/2 of the timeout */
 
    aServer := Subscribe( MutexDone, 500 * nTimeout, @bSuccess )
    /*And if we have not found an answer, we return failure */
-   MutexLock( MutexCnt )
+   HB_MutexLock( MutexCnt )
 
    IF .not. bSuccess
       aServiceData[3] := -2 /* timed out */
-      MutexUnlock( MutexCnt )
+      HB_MutexUnlock( MutexCnt )
       /* Kill that thread, but without waiting for it to be done*/
       KillThread( thSearcher )
       RETURN
@@ -143,18 +143,18 @@ FUNCTION Connect( cAddress, nPort, nTimeout )
    /* But the resolver could also return a failure */
    IF Len( aServer ) == 0
       aServiceData[3] := 3 /* Name not found */
-      MutexUnlock( MutexCnt )
+      HB_MutexUnlock( MutexCnt )
       RETURN
    ENDIF
 
-   MutexUnlock( MutexCnt )
+   HB_MutexUnlock( MutexCnt )
 
    /* now we can be interrupted */
 
    InetConnectIP( aServer[1], nPort, aServiceData[1] )
 
    /* now we need to be not interrupted */
-   MutexLock( MutexCnt )
+   HB_MutexLock( MutexCnt )
    IF InetErrorCode( aServiceData[ 1 ] ) > 0
       aServiceData[ 3 ] := 2  // Connection rejected
    ELSE
@@ -164,7 +164,7 @@ FUNCTION Connect( cAddress, nPort, nTimeout )
    aServiceData[ 4 ] := Seconds()
    aCntSockets[ 1 ] := aServiceData
 
-   MutexUnlock( MutexCnt )
+   HB_MutexUnlock( MutexCnt )
 
 RETURN NIL
 
@@ -180,7 +180,7 @@ FUNCTION ControlThread( nTimeout )
 
    DO WHILE .T.
       ThreadSleep( 1000 )
-      MutexLock( MutexCnt )
+      HB_MutexLock( MutexCnt )
       FOR EACH aTicket IN aCntSockets
 
          /* If status is still connecting ... */
@@ -193,7 +193,7 @@ FUNCTION ControlThread( nTimeout )
          /* A complete app could have more status/timeout relations */
 
       NEXT
-      MutexUnlock( MutexCnt )
+      HB_MutexUnlock( MutexCnt )
 
       /* In a complete enviroment, this thread should also remove
          unused tickets */

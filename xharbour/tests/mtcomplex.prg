@@ -2,7 +2,7 @@
 * Complex example of Multi thread usage
 *
 * Giancarlo Niccolai
-* $Id: mtcomplex.prg,v 1.14 2003/11/26 21:58:35 jonnymind Exp $
+* $Id: mtcomplex.prg,v 1.15 2003/11/27 23:39:13 jonnymind Exp $
 *
 * Here we have a main thread counting, and some secondary
 * threads counting too (in different fashons).
@@ -13,8 +13,8 @@
 
 PROCEDURE Main()
    LOCAL i
-   LOCAL Mutex := CreateMutex()
-   LOCAL Mutex2 := CreateMutex()
+   LOCAL Mutex := HB_MutexCreate()
+   LOCAL Mutex2 := HB_MutexCreate()
    LOCAL Thread4Handle, MonitorHandle
    LOCAL bKill := .F.
 

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.140 2003/12/07 13:35:02 jonnymind Exp $
+* $Id: thread.c,v 1.141 2003/12/09 02:53:49 ronpinkas Exp $
 */
 
 /*
@@ -1896,7 +1896,7 @@ HB_GARBAGE_FUNC( hb_threadMutexFinalize )
 /*
    Create a new mutex (marking it disposeable by the GC)
 */
-HB_FUNC( HB_CREATEMUTEX )
+HB_FUNC( HB_MUTEXCREATE )
 {
 #if defined(HB_API_MACROS)
    HB_THREAD_STUB
@@ -1936,7 +1936,7 @@ HB_FUNC( DESTROYMUTEX )
    to become available. This wait is cancelable.
 */
 
-HB_FUNC( MUTEXLOCK )
+HB_FUNC( HB_MUTEXLOCK )
 {
 #if defined(HB_API_MACROS)
    HB_THREAD_STUB
@@ -1979,7 +1979,7 @@ HB_FUNC( MUTEXLOCK )
 /*
    Try to lock a mutex; return immediately on failure.
 */
-HB_FUNC( MUTEXTRYLOCK )
+HB_FUNC( HB_MUTEXTRYLOCK )
 {
 #if defined(HB_API_MACROS)
    HB_THREAD_STUB
@@ -2019,7 +2019,7 @@ HB_FUNC( MUTEXTRYLOCK )
    Unlocks a mutex; this succeeds only if the calling thread is
    the owner of the mutex, else the call is ignored.
 */
-HB_FUNC( MUTEXUNLOCK )
+HB_FUNC( HB_MUTEXUNLOCK )
 {
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parpointer(1);
 

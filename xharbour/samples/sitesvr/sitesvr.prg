@@ -1,5 +1,5 @@
 /*
- * $Id: sitesvr.prg,v 1.9 2003/11/03 06:07:06 jonnymind Exp $
+ * $Id: sitesvr.prg,v 1.10 2003/11/28 16:10:50 jonnymind Exp $
  */
 
 ***********************************************************
@@ -38,8 +38,8 @@ PROCEDURE Main( cPort)
    g_nUserCount  := 0
    g_nTotalCount := 0
 
-   MutexDB := CreateMutex()
-   MutexCount := CreateMutex()
+   MutexDB := HB_MutexCreate()
+   MutexCount := HB_MutexCreate()
 
    CLEAR SCREEN
 
@@ -122,10 +122,10 @@ PROCEDURE ViewUpdate( Socket )
       @ 6, 9 SAY "Looping "
       @ 7, 5 SAY "Main socket status : " + InetErrorDesc( Socket ) + ;
                  "(" + Trim( Str( InetErrorCode( Socket ) ) ) + ")"
-      MutexLock( MutexCount )
+      HB_MutexLock( MutexCount )
       @ 8, 5 SAY "Connected Users    : " + Str( g_nUserCount )
       @ 9, 5 SAY "Total users        : " + Str( g_nTotalCount )
-      MutexUnlock( MutexCount )
+      HB_MutexUnlock( MutexCount )
 
       @ nRow, nCol
       //HBConsoleUnlock()
@@ -149,10 +149,10 @@ PROCEDURE AcceptIncoming( Socket )
       Com := InetAccept( Socket )
 
       IF Com != NIL
-         MutexLock( MutexCount )
+         HB_MutexLock( MutexCount )
          g_nUserCount++
          g_nTotalCount++
-         MutexUnlock( MutexCount )
+         HB_MutexUnlock( MutexCount )
 
          StartThread( @ServeClient(), com )
          HB_GcAll( .T. )
@@ -184,9 +184,9 @@ PROCEDURE ServeClient( Socket )
    *** First of all, we must take the request of the user
    cRequest := InetRecvLine( Socket, @nLength )
    IF nLength < 0
-      MutexLock( MutexCount )
+      HB_MutexLock( MutexCount )
       g_nUserCount--
-      MutexUnlock( MutexCount )
+      HB_MutexUnlock( MutexCount )
       RETURN
    ENDIF
 
@@ -211,9 +211,9 @@ PROCEDURE ServeClient( Socket )
          ENDIF
       ELSE
          *** invalid
-         MutexLock( MutexCount )
+         HB_MutexLock( MutexCount )
          g_nUserCount--
-         MutexUnlock( MutexCount )
+         HB_MutexUnlock( MutexCount )
          RETURN
       ENDIF
    ENDDO
@@ -223,9 +223,9 @@ PROCEDURE ServeClient( Socket )
       *** cPostData is autoAllocated
       cPostData := Space( nContLen )
       IF InetRecvAll( Socket, @cPostData, nContLen ) <= 0
-         MutexLock( MutexCount )
+         HB_MutexLock( MutexCount )
          g_nUserCount--
-         MutexUnlock( MutexCount )
+         HB_MutexUnlock( MutexCount )
          RETURN
       ENDIF
    ENDIF
@@ -234,9 +234,9 @@ PROCEDURE ServeClient( Socket )
    ProcessRequest( Socket, @cRequest, @aFields, cPostData )
 
    InetClose( Socket )
-   MutexLock( MutexCount )
+   HB_MutexLock( MutexCount )
    g_nUserCount--
-   MutexUnlock( MutexCount )
+   HB_MutexUnlock( MutexCount )
 
 RETURN
 
@@ -305,7 +305,7 @@ FUNCTION ProcessFileRequest( cRequest )
    ParseRequest( cRequest, @cReq, @cFile, @cSign )
 
    /*** NEED TO LOCK THE DATABASE HERE ***/
-   MutexLock( MutexDB )
+   HB_MutexLock( MutexDB )
 
    ** Using parent/name based index
    SET ORDER TO 2
@@ -357,7 +357,7 @@ FUNCTION ProcessFileRequest( cRequest )
       cReply := CreateReply( 200, "OK", field->CONTENT, field->MIMETYPE )
    ENDIF
 
-   MutexUnlock( MutexDB )
+   HB_MutexUnlock( MutexDB )
 
 RETURN cReply
 
@@ -411,11 +411,11 @@ FUNCTION AdminFrontPage()
              "<BODY><H1>xHarbour Server Administration</H1><H2>Directory structure:</H2>"
 
    /* Now we can traverse the whole database in search of our pages */
-   MutexLock( MutexDB )
+   HB_MutexLock( MutexDB )
    SET ORDER TO 1
    SEEK 1
    AddPageToList( @cReply, 0 )
-   MutexUnlock( MutexDB )
+   HB_MutexUnlock( MutexDB )
 
    DrawDBTree( 1, 1, @cReply )
 
@@ -425,7 +425,7 @@ RETURN cReply
 PROCEDURE DrawDBTree( nItemID, nLevel, cReply )
    LOCAL i, nID, nRecno, cID
 
-   MutexLock( MutexDB )
+   HB_MutexLock( MutexDB )
    cID := AllTrim( Str( nItemID ) )
    /* Now draw the tree for all the elements that have myself as parent */
    SET ORDER TO 2
@@ -435,17 +435,17 @@ PROCEDURE DrawDBTree( nItemID, nLevel, cReply )
       nID    := FIELD->ID
       nRecno := Recno()
       AddPageToList( @cReply, nLevel )
-      MutexUnlock( MutexDB )
+      HB_MutexUnlock( MutexDB )
 
       DrawDBTree( nID, nLevel + 1, @cReply )
 
-      MutexLock( MutexDB )
+      HB_MutexLock( MutexDB )
       SET ORDER TO 2
       GOTO nRecno
       SKIP
    ENDDO
 
-   MutexUnlock( MutexDB )
+   HB_MutexUnlock( MutexDB )
 
    /** The ADD request */
    FOR i := 1 TO nLevel
@@ -477,7 +477,7 @@ FUNCTION AdminEditPageMask( nID )
    LOCAL cReply, cName, cID, nParent
    LOCAL bFound
 
-   MutexLock( MutexDB )
+   HB_MutexLock( MutexDB )
    SET ORDER TO 1
 
    /** IF ID < 0 , we must add a page */
@@ -515,7 +515,7 @@ FUNCTION AdminEditPageMask( nID )
       cReply += "<BR><BR><INPUT TYPE='SUBMIT' VALUE='Modify'></FORM>"
    ENDIF
 
-   MutexUnlock( MutexDB )
+   HB_MutexUnlock( MutexDB )
 
    cReply += "<BR><HR><BR><a href='/admin'>Return to administration page</a>" +;
              "</BODY></HTML> "
@@ -529,7 +529,7 @@ RETURN cReply
 FUNCTION AdminDelPage( nID )
    LOCAL cReply
 
-   MutexLock( MutexDB )
+   HB_MutexLock( MutexDB )
    SET ORDER TO 1
    SEEK nID
 
@@ -542,7 +542,7 @@ FUNCTION AdminDelPage( nID )
       cReply += "<P>Record deleted"
    ENDIF
 
-   MutexUnlock( MutexDB )
+   HB_MutexUnlock( MutexDB )
 
    cReply += "<BR><HR><BR><a href='/admin'>Return to administration page</a>" +;
              "</BODY></HTML> "
@@ -557,7 +557,7 @@ FUNCTION AdminModPage( cPostData )
    LOCAL aFields := ParsePostData( cPostData )
 
 
-   MutexLock( MutexDB )
+   HB_MutexLock( MutexDB )
    SET ORDER TO 1
    nID := Val( GetPostField( aFields, "ID" ) )
    SEEK nID
@@ -585,7 +585,7 @@ FUNCTION AdminModPage( cPostData )
       cReply += "<P>Page has been Changed"
    ENDIF
 
-   MutexUnlock( MutexDB )
+   HB_MutexUnlock( MutexDB )
 
    cReply += "<BR><HR><BR><a href='/admin'>Return to administration page</a>" +;
              "</BODY></HTML> "

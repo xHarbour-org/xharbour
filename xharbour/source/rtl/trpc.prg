@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.24 2003/12/07 13:35:02 jonnymind Exp $
+ * $Id: trpc.prg,v 1.25 2003/12/09 02:53:49 ronpinkas Exp $
  */
 
 /*
@@ -432,7 +432,7 @@ ENDCLASS
 METHOD New( oParent, skIn ) CLASS tRPCServeCon
    ::oServer := oParent
    ::skRemote := skIn
-   ::mtxBusy := HB_CreateMutex()
+   ::mtxBusy := HB_MutexCreate()
    ::bEncrypted := .F.
    ::nAuthLevel := 0
    ::nChallengeCRC := -1
@@ -440,29 +440,29 @@ RETURN Self
 
 
 METHOD Destroy() CLASS tRPCServeCon
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    // Eventually wait for the function to terminate
    IF ::thFunction != NIL
       ::lCanceled := .T.
-      MutexUnlock( ::mtxBusy )
+      HB_MutexUnlock( ::mtxBusy )
       JoinThread( ::thFunction )
-      MutexLock( ::mtxBusy )
+      HB_MutexLock( ::mtxBusy )
    ENDIF
 
    ::skRemote := NIL
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
 RETURN .T.
 
 
 METHOD Start() CLASS tRPCServeCon
    LOCAL lRet := .F.
 
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    IF ::thSelf == NIL
       ::thSelf := StartThread( Self, "RUN" )
       lRet := .T.
    ENDIF
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
 
 RETURN lRet
 
@@ -470,15 +470,15 @@ RETURN lRet
 METHOD Stop() CLASS tRPCServeCon
    LOCAL lRet := .F.
 
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    IF IsValidThread( ::thSelf )
       KillThread( ::thSelf )
       lRet := .T.
-      MutexUnlock( ::mtxBusy )
+      HB_MutexUnlock( ::mtxBusy )
       JoinThread( ::thSelf )
       ::thSelf := NIL
    ELSE
-      MutexUnlock( ::mtxBusy )
+      HB_MutexUnlock( ::mtxBusy )
    ENDIF
 
 RETURN lRet
@@ -500,9 +500,9 @@ METHOD Run() CLASS tRPCServeCon
          EXIT
       ENDIF
 
-      MutexLock( ::mtxBusy )
+      HB_MutexLock( ::mtxBusy )
       nSafeStatus := ::nStatus
-      MutexUnlock( ::mtxBusy )
+      HB_MutexUnlock( ::mtxBusy )
 
       DO CASE
 
@@ -650,9 +650,9 @@ METHOD Run() CLASS tRPCServeCon
             IF nSafeStatus != RPCS_STATUS_RUNNING
                nSafeStatus := RPCS_STATUS_ERROR
             ELSE
-               MutexLock( ::mtxBusy )
+               HB_MutexLock( ::mtxBusy )
                ::lCanceled = .T.
-               MutexUnlock( ::mtxBusy )
+               HB_MutexUnlock( ::mtxBusy )
                InetSendAll( ::skRemote, "XHBR34")
             ENDIF
 
@@ -672,11 +672,11 @@ METHOD Run() CLASS tRPCServeCon
          OTHERWISE
             /* The running status is set (in this thread) indipendently
                by the function launcher, if everything is fine */
-            MutexLock( ::mtxBusy )
+            HB_MutexLock( ::mtxBusy )
             IF ::nStatus != RPCS_STATUS_RUNNING
                ::nStatus := nSafeStatus
             ENDIF
-            MutexUnlock( ::mtxBusy )
+            HB_MutexUnlock( ::mtxBusy )
       ENDCASE
 
    ENDDO
@@ -941,7 +941,7 @@ METHOD LaunchFunction( cFuncName, aParams, nMode, aDesc ) CLASS tRPCServeCon
       RETURN .T.
    ENDIF
 
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    // allow progress indicator by default
    ::lAllowProgress := .T.
    // setting the cancel indicator as false
@@ -950,7 +950,7 @@ METHOD LaunchFunction( cFuncName, aParams, nMode, aDesc ) CLASS tRPCServeCon
    ::nStatus := RPCS_STATUS_RUNNING
    ::thFunction := StartThread( Self, "FunctionRunner", ;
       cFuncName, oFunc, nMode, aParams, aDesc )
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
 
 RETURN .T.
 
@@ -1072,9 +1072,9 @@ METHOD FunctionRunner( cFuncName, oFunc, nMode, aParams, aDesc ) CLASS tRPCServe
    ENDCASE
 
    // Now we can signal that execution terminated
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    ::nStatus := RPCS_STATUS_LOGGED
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
    // The execution of the function terminates BEFORE the sending of
    // the last data or the confirmation data, even if the thread
    // has still something to do.
@@ -1082,9 +1082,9 @@ METHOD FunctionRunner( cFuncName, oFunc, nMode, aParams, aDesc ) CLASS tRPCServe
 
    //Signal that the thread is no longer alive
    // Should not be needed!
-   /*MutexLock( ::mtxBusy )
+   /*HB_MutexLock( ::mtxBusy )
    ::thFunction := -1
-   MutexUnlock( ::mtxBusy )*/
+   HB_MutexUnlock( ::mtxBusy )*/
 RETURN .T.
 
 
@@ -1092,13 +1092,13 @@ METHOD SendResult( oRet, cFuncName )
    LOCAL cData, cOrigLen, cCompLen
 
    // Ignore requests to send result if function is canceled
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    IF ::lCanceled
-      MutexUnlock( ::mtxBusy )
+      HB_MutexUnlock( ::mtxBusy )
       ::oServer:OnFunctionCanceled( Self, cFuncName )
       RETURN .T. //as if it were done
    ENDIF
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
 
    IF oRet == NIL
       ::oServer:OnFunctionError( Self, cFuncName, 10 )
@@ -1130,12 +1130,12 @@ METHOD SendProgress( nProgress, oData ) CLASS tRPCServeCon
    LOCAL cData
 
    //Ignore if told so
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    IF .not. ::lAllowProgress .or. ::lCanceled
-      MutexUnlock( ::mtxBusy )
+      HB_MutexUnlock( ::mtxBusy )
       RETURN .T.
    ENDIF
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
 
    ::oServer:OnFunctionProgress( Self, nProgress, oData )
    IF Empty( oData )
@@ -1190,7 +1190,7 @@ CLASS tRPCService
    DATA thAccept INIT 0
    DATA thUdp INIT 0
    DATA aServing INIT {}
-   DATA mtxBusy INIT HB_CreateMutex()
+   DATA mtxBusy INIT HB_MutexCreate()
 
    DATA skUdp
    DATA skServer
@@ -1273,13 +1273,13 @@ METHOD Add( xFunction, cVersion, nLevel, oExec, oMethod )
       oFunction := xFunction
    ENDIF
 
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    nElem := AScan( ::aFunctions, {|x| oFunction:cName == x:cName})
    IF nElem == 0
       Aadd( ::aFunctions  , oFunction )
       lRet := .T.
    ENDIF
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
 RETURN lRet
 
 
@@ -1287,12 +1287,12 @@ METHOD Find( cName ) class tRPCService
    LOCAL nElem
    LOCAL oRet := NIL
 
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    nElem := AScan( ::aFunctions, {|x| cName == x:cName})
    IF nElem != 0
       oRet := ::aFunctions[ nElem ]
    ENDIF
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
 RETURN oRet
 
 
@@ -1300,14 +1300,14 @@ METHOD Remove( cName ) class tRPCService
    LOCAL nElem
    LOCAL lRet := .F.
 
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    nElem := AScan( ::aFunctions, {|x| cName == x:cName})
    IF nElem != 0
       ADel( ::aFunctions, nElem )
       ASize( ::aFunctions, Len( ::aFunctions ) - 1 )
       lRet := .T.
    ENDIF
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
 RETURN lRet
 
 
@@ -1315,11 +1315,11 @@ METHOD Run( cName, aParams ) class tRPCService
    LOCAL oFunc := ::Find( cName )
    LOCAL oRet := NIL
 
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    IF ! Empty( oFunc )
       oRet := oFunc:Run( aParams )
    ENDIF
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
 
 RETURN oRet
 
@@ -1328,11 +1328,11 @@ METHOD Describe( cName ) class tRPCService
    LOCAL oFunc := ::Find( cName )
    LOCAL cRet := NIL
 
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    IF ! Empty( oFunc )
       cRet := oFunc:Describe()
    ENDIF
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
 
 RETURN cRet
 
@@ -1361,9 +1361,9 @@ RETURN .T.
 METHOD Stop() CLASS tRPCService
    LOCAL oElem
 
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    IF .not. IsValidThread( ::thAccept )
-      MutexUnlock( ::mtxBusy )
+      HB_MutexUnlock( ::mtxBusy )
       RETURN .F.
    ENDIF
 
@@ -1389,7 +1389,7 @@ METHOD Stop() CLASS tRPCService
    ::skServer := NIL
    ::skUdp := NIL
 
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
 
 RETURN .T.
 
@@ -1413,11 +1413,11 @@ RETURN .T.
 METHOD StartService( skIn ) CLASS tRPCService
    LOCAL oService
 
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    oService := tRpcServeCon():New( Self, skIn )
    AAdd( ::aServing, oService )
    oService:Start()
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
    ::OnClientConnect( oService )
 RETURN .T.
 
@@ -1507,13 +1507,13 @@ METHOD Terminating( oConnection ) CLASS tRPCService
    LOCAL nToken
 
    ::OnClientTerminate( oConnection )
-   MutexLock( ::mtxBusy )
+   HB_MutexLock( ::mtxBusy )
    nToken := AScan( ::aServing, {|x| x == oConnection } )
    IF nToken > 0
       ADel( ::aServing, nToken )
       ASize( ::aServing, Len( ::aServing ) -1 )
    ENDIF
-   MutexUnlock( ::mtxBusy )
+   HB_MutexUnlock( ::mtxBusy )
 RETURN .T.
 
 
