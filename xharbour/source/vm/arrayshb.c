@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.31 2003/07/18 21:42:35 andijahja Exp $
+ * $Id: arrayshb.c,v 1.32 2003/07/30 09:44:19 toninhofwi Exp $
  */
 
 /*
@@ -136,12 +136,18 @@ HB_FUNC( AADD )
       PHB_ITEM pValue = hb_param( 2, HB_IT_ANY );
 
       if( pValue && hb_arrayAdd( pArray, pValue ) )
-         hb_itemCopy( &(HB_VM_STACK.Return), pValue );
+      {
+         hb_itemForwardValue( &(HB_VM_STACK.Return), pValue );
+      }
       else
+      {
          hb_errRT_BASE( EG_BOUND, 1187, NULL, "AADD", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "AADD", 2, hb_paramError(1), hb_paramError( 2 ) );
+   }
 }
 
 HB_FUNC( HB_ARRAYID )  /* for debugging: returns the array's "address" so dual references to same array can be seen */
@@ -149,11 +155,14 @@ HB_FUNC( HB_ARRAYID )  /* for debugging: returns the array's "address" so dual r
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
 
    if( HB_IS_ARRAY(pArray) )
+   {
       hb_retnl( (long) pArray->item.asArray.value );
+   }
    else
+   {
       hb_retnl( -1 );
+   }
 }
-
 
 /* NOTE: CA-Cl*pper 5.3 and older will return NIL on bad parameter, 5.3a,b
          will throw a runtime error. [vszakats] */
@@ -168,11 +177,13 @@ HB_FUNC( ASIZE )
 
       hb_arraySize( pArray, HB_MAX( lSize, 0 ) );
 
-      hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* ASize() returns the array itself */
+      hb_itemForwardValue( &(HB_VM_STACK.Return), pArray ); /* ASize() returns the array itself */
    }
 #ifdef HB_COMPAT_C53 /* From CA-Cl*pper 5.3a */
    else
+   {
       hb_errRT_BASE( EG_ARG, 2023, NULL, "ASIZE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
 #endif
 }
 
@@ -181,7 +192,9 @@ HB_FUNC( ATAIL )
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
 
    if( pArray )
+   {
       hb_arrayLast( pArray, &(HB_VM_STACK.Return) );
+   }
 }
 
 HB_FUNC( AINS )
@@ -211,7 +224,7 @@ HB_FUNC( AINS )
       }
     #endif
 
-      hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* AIns() returns the array itself */
+      hb_itemForwardValue( &(HB_VM_STACK.Return), pArray ); /* AIns() returns the array itself */
    }
 }
 
@@ -241,7 +254,7 @@ HB_FUNC( ADEL )
       }
     #endif
 
-      hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* ADel() returns the array itself */
+      hb_itemForwardValue( &(HB_VM_STACK.Return), pArray ); /* ADel() returns the array itself */
    }
 }
 
@@ -261,7 +274,7 @@ HB_FUNC( AFILL )
          /* Explicy ulCount of 0 - Nothing to do! */
          if( ISNUM(4) && ulCount == 0 )
          {
-            hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
+            hb_itemForwardValue( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
             return;
          }
 
@@ -273,7 +286,7 @@ HB_FUNC( AFILL )
          else if( ulStart < 0 )
          {
             /* Clipper aborts if negative start. */
-            hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
+            hb_itemForwardValue( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
             return;
          }
 
@@ -292,7 +305,7 @@ HB_FUNC( AFILL )
             else
             {
                /* Clipper aborts if negative count and start is not at 1. */
-               hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
+               hb_itemForwardValue( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
                return;
             }
          }
@@ -300,7 +313,7 @@ HB_FUNC( AFILL )
          hb_arrayFill( pArray, pValue, (ULONG) ulStart, (ULONG) ulCount );
       }
 
-      hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
+      hb_itemForwardValue( &(HB_VM_STACK.Return), pArray ); /* AFill() returns the array itself */
    }
    else
    {
@@ -352,10 +365,12 @@ HB_FUNC( AEVAL )
                     ISNUM( 3 ) ? &ulStart : NULL,
                     ISNUM( 4 ) ? &ulCount : NULL );
 
-      hb_itemCopy( &(HB_VM_STACK.Return), hb_stackItemFromBase( 1 ) ); /* AEval() returns the array itself */
+      hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromBase( 1 ) ); /* AEval() returns the array itself */
    }
    else
+   {
       hb_errRT_BASE( EG_ARG, 2017, NULL, "AEVAL", 4, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
+   }
 }
 
 HB_FUNC( ACOPY )
@@ -379,7 +394,7 @@ HB_FUNC( ACOPY )
                        ISNUM( 5 ) ? &ulTarget : NULL );
       }
 
-      hb_itemCopy( &(HB_VM_STACK.Return), hb_stackItemFromBase( 2 ) ); /* ACopy() returns the target array */
+      hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromBase( 2 ) ); /* ACopy() returns the target array */
    }
 }
 
@@ -390,7 +405,9 @@ HB_FUNC( ACLONE )
    PHB_ITEM pSrcArray = hb_param( 1, HB_IT_ARRAY );
 
    if( pSrcArray && ! hb_arrayIsObject( pSrcArray ) )
+   {
       hb_itemRelease( hb_itemReturn( hb_arrayClone( pSrcArray, NULL ) ) ); /* AClone() returns the new array */
+   }
 }
 
 HB_FUNC( HB_APARAMS )
@@ -522,13 +539,13 @@ HB_FUNC( HB_ATOKENS )
             iOffset = i + 1;
          }
       }
+
       if( iOffset < pLine->item.asString.length )
       {
          hb_arrayAddForward( pArray, hb_itemPutCL( pToken, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
       }
 
       hb_itemRelease( pToken );
-
    }
    else
    {

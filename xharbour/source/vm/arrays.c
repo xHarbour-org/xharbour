@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.63 2003/09/04 02:14:39 ronpinkas Exp $
+ * $Id: arrays.c,v 1.64 2003/09/06 20:42:58 ronpinkas Exp $
  */
 
 /*
@@ -1525,7 +1525,9 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    {
       PHB_ARRAY_HOLDER pOwner = (PHB_ARRAY_HOLDER) hb_xgrab( sizeof( HB_ARRAY_HOLDER ) );
 
-      //TraceLog( NULL, "Allocated %p Registring: %p of %p Next %p\n", pOwner, pBaseArray, pHolder, pBaseArray->pOwners );
+      #ifdef DEBUG_ARRAYS
+         TraceLog( NULL, "Allocated %p Registring: %p of %p Next %p\n", pOwner, pBaseArray, pHolder, pBaseArray->pOwners );
+      #endif
 
       pOwner->pOwner = pHolder;
       pOwner->pNext = pBaseArray->pOwners;
@@ -1537,7 +1539,9 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    {
       PHB_ARRAY_HOLDER pOwners = pBaseArray->pOwners;
 
-      //TraceLog( NULL, "*Resetting: %p of %p to %p\n", pBaseArray, pOldHolder, pNewHolder );
+      #ifdef DEBUG_ARRAYS
+         TraceLog( NULL, "*Resetting: %p of %p to %p\n", pBaseArray, pOldHolder, pNewHolder );
+      #endif
 
       while( pOwners )
       {
@@ -1559,12 +1563,12 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    {
       PHB_ARRAY_HOLDER pOwners = pBaseArray->pOwners, pPrevious = NULL;
 
-      //TraceLog( NULL, "-UNRegistering: %p of %p\n", pBaseArray, pHolder );
+      #ifdef DEBUG_ARRAYS
+         TraceLog( NULL, "-UNRegistering: %p of %p\n", pBaseArray, pHolder );
+      #endif
 
       while( pOwners )
       {
-         //TraceLog( NULL, "pOwners: %p %p\n", pOwners, pOwners->pOwner );
-
          if( pOwners->pOwner == pHolder )
          {
             if( pPrevious )
@@ -1576,7 +1580,9 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
                pBaseArray->pOwners = pOwners->pNext;
             }
 
-            //TraceLog( NULL, "Released pOwners: %p\n", pOwners );
+            #ifdef DEBUG_ARRAYS
+               TraceLog( NULL, "Released pOwners: %p\n", pOwners );
+            #endif
 
             hb_xfree( (void *) pOwners );
             break;
@@ -1590,13 +1596,20 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       {
          if( pBaseArray->pOwners == NULL )
          {
-            //TraceLog( NULL, "Last Owner - Releasing array %p\n", pBaseArray );
+            #ifdef DEBUG_ARRAYS
+               TraceLog( NULL, "Last Owner - Releasing array %p\n", pBaseArray );
+            #endif
+
             hb_arrayReleaseBase( pBaseArray );
          }
       }
       else
       {
-         TraceLog( NULL, "Warning! Could not locate owner %p of array %p\n", pHolder, pBaseArray );
+         char szProc[64], szModule[64];
+         USHORT uiLine;
+
+         hb_procinfo( 0, szProc, &uiLine, szModule  );
+         TraceLog( NULL, "Warning! Could not locate owner %p of array %p [%s->%s(%i)]\n", pHolder, pBaseArray, szModule, szProc, uiLine );
       }
    }
 #endif
