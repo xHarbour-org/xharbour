@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.17 2003/06/23 22:45:19 druzus Exp $
+ * $Id: gtcrs.c,v 1.18 2003/06/26 12:37:08 druzus Exp $
  */
 
 /*
@@ -1706,6 +1706,11 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
     if (!isatty(ioBase->base_outfd) && isatty(ioBase->base_infd))
 	ioBase->base_outfd = ioBase->base_infd;
 
+    if (isatty(ioBase->stdoutfd))
+	ioBase->stdoutfd = -1;
+    if (isatty(ioBase->stderrfd))
+	ioBase->stderrfd = -1;
+
     if (isatty(ioBase->base_infd)) {
 	tcgetattr( ioBase->base_infd, &ioBase->curr_TIO ); /* save current terminal settings */
 	memcpy(&ioBase->saved_TIO, &ioBase->curr_TIO, sizeof(struct termios));
@@ -1721,6 +1726,7 @@ static InOutBase* create_ioBase(char *term, int infd, int outfd, int errfd, pid_
 
 	memset(ioBase->curr_TIO.c_cc, 0, NCCS);
     }
+
 
     /* curses SCREEN initialisation */
     if (ioBase->base_infd == fileno(stdin))
@@ -2315,7 +2321,7 @@ void HB_GT_FUNC(gt_OutStd( BYTE * pbyStr, ULONG ulLen ))
 
     if (s_ioBase)
     {
-	if (s_ioBase->baseout != NULL && s_ioBase->base_outfd == s_ioBase->stdoutfd)
+	if (s_ioBase->stdoutfd == -1)
 	{
 	    HB_GT_FUNC(gt_DispBegin());
 	    hb_gtWriteCon( pbyStr, ulLen );
@@ -2334,7 +2340,16 @@ void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
 {
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_OutErr(%s, %hu)", pbyStr, ulLen));
     if (s_ioBase)
-	gt_outerr( s_ioBase, pbyStr, ulLen );
+    {
+	if (s_ioBase->stderrfd == -1)
+	{
+	    HB_GT_FUNC(gt_DispBegin());
+	    hb_gtWriteCon( pbyStr, ulLen );
+	    HB_GT_FUNC(gt_DispEnd());
+	}
+	else
+	    gt_outerr( s_ioBase, pbyStr, ulLen );
+    }
     else
 	hb_fsWriteLarge( s_iStdErr, ( BYTE * ) pbyStr, ulLen );
 }

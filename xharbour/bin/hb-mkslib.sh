@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id$
+# $Id: hb-mkslib.sh,v 1.2 2003/05/17 15:55:18 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -52,7 +52,12 @@ do
 	    cp "${dir}/${f}" "${OTMPDIR}" || exit 1
 	    ;;
 	*.a)
+	    d="${f%.a}"
+	    d="${f##*/}"
+	    mkdir $d
+	    cd $d
 	    ar -x "${dir}/${f}" || exit 1
+	    cd ..
 	    ;;
 	*)
 	    echo "unrecognized file: ${f}"
@@ -60,13 +65,13 @@ do
 	    ;;
     esac
 done
-
+OBJLST=`find . -name \*.o`
 cd "${dir}"
 rm -f "${HB_SO_LIB}"
 cd "${OTMPDIR}"
 
 base=`basename "${HB_SO_LIB}"`
-gcc -shared -o "${base}" *.o && \
+gcc -shared -o "${base}" $OBJLST && \
     cd "${dir}" && \
     mv -f "${OTMPDIR}/${base}" "${HB_SO_LIB}"
 

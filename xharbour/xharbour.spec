@@ -16,16 +16,16 @@
 
 %define name     xharbour
 %define dname    xHarbour
-%define version  0.82.0
+%define version  0.81.0
 %define releasen 0
-%define platform cl80
+%define platform rh73
 %define prefix   /usr
 %define hb_pref  xhb
 %define hb_gt    crs
 %define hb_mt    MT
 %define hb_mgt   yes
 %define hb_lnkso yes
-%define hb_libs  vm pp rtl rdd dbfcdx dbfntx odbc macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca debug
+%define hb_libs  vm pp rtl rdd dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca odbc ct debug profiler
 
 %define hb_cc    export HB_COMPILER="gcc"
 %define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O3 $RPM_OPT_FLAGS"
@@ -192,6 +192,11 @@ rm -rf $RPM_BUILD_ROOT
 %{hb_env}
 make
 
+# build CT lib
+pushd contrib/libct
+    make
+popd
+
 ######################################################################
 ## Install.
 ######################################################################
@@ -211,6 +216,11 @@ mkdir -p $HB_INC_INSTALL
 mkdir -p $HB_LIB_INSTALL
 
 make -i install
+
+# install CT lib
+pushd contrib/libct
+    make -i install
+popd
 
 # build fm lib with memory statistic
 pushd source/vm
@@ -238,21 +248,26 @@ LIBS=""
 LIBSMT=""
 for l in %{hb_libs}
 do
-    ls="lib${l}.a"
-    if [ -f lib${l}mt.a ]
-    then
-	lm="lib${l}mt.a"
-    else
-	lm="${ls}"
-    fi
-    if [ -f $ls ]
-    then
-	LIBS="$LIBS $ls"
-    fi
-    if [ -f $lm ]
-    then
-	LIBSMT="$LIBSMT $lm"
-    fi
+    case $l in
+        debug|profiler) ;;
+        *)
+            ls="lib${l}.a"
+            if [ -f lib${l}mt.a ]
+            then
+                lm="lib${l}mt.a"
+            else
+                lm="${ls}"
+            fi
+            if [ -f $ls ]
+            then
+                LIBS="$LIBS $ls"
+            fi
+            if [ -f $lm ]
+            then
+                LIBSMT="$LIBSMT $lm"
+            fi
+	;;
+    esac
 done
 $HB_BIN_INSTALL/hb-mkslib lib%{name}.so $LIBS
 [ $HB_MT != "MT" ] || $HB_BIN_INSTALL/hb-mkslib lib%{name}mt.so $LIBSMT
@@ -354,7 +369,7 @@ else
     l="%{name}"
     [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.so" ] && l="\${l}mt"
     [ -f "\${HB_LIB_INSTALL}/lib\${l}.so" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
-    libs="debug"
+    libs="debug profiler"
 fi
 for l in \${libs}
 do
