@@ -1,6 +1,6 @@
 @ECHO OFF
 rem
-rem $Id: make_pc.bat,v 1.0 2005/02/16 08:37:21 andijahja Exp $
+rem $Id: make_pc.bat,v 1.2 2005/02/20 13:00:00 ptsarenko Exp $
 rem
 rem Batch File For Building xHarbour with PellesC
 rem
@@ -32,6 +32,7 @@ SET PATH=%BISONPATH%;%_PATH%
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
 
+if not exist obj                       md obj
 if not exist %LIB_DIR%                 md %LIB_DIR%
 if not exist %BIN_DIR%                 md %BIN_DIR%
 if not exist %OBJ_DIR%                 md %OBJ_DIR%
@@ -46,6 +47,7 @@ if not exist %OBJ_DIR%\mt              md %OBJ_DIR%\mt
 if not exist %OBJ_DIR%\opt             md %OBJ_DIR%\opt
 if not exist %OBJ_DIR%\opt\console     md %OBJ_DIR%\opt\console
 if not exist %OBJ_DIR%\opt\gui         md %OBJ_DIR%\opt\gui
+if not exist %OBJ_DIR%\mt\opt          md %OBJ_DIR%\mt\opt
 if not exist %OBJ_DIR%\mt\opt\gui      md %OBJ_DIR%\mt\opt\gui
 if not exist %OBJ_DIR%\mt\opt\console  md %OBJ_DIR%\mt\opt\console
 if not exist %OBJ_DIR%\mt\opt\gui      md %OBJ_DIR%\mt\opt\gui
@@ -56,10 +58,10 @@ if not exist %OBJ_DIR%\mt\libmisc      md %OBJ_DIR%\mt\libmisc
 if not exist %OBJ_DIR%\mt\ct           md %OBJ_DIR%\mt\ct
 
    @set THREAD_MODE=
-   %MAKEEXE% -f "makefile.pc"
+   %MAKEEXE% -f "makefile.pc" > make_pc.log
    if errorlevel 1 goto BUILD_ERR
    @set THREAD_MODE=mt
-   %MAKEEXE% -f "makefile.pc"
+   %MAKEEXE% -f "makefile.pc" >> make_pc.log
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK

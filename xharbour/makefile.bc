@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.138 2005/01/23 12:14:30 ptsarenko Exp $
+# $Id: makefile.bc,v 1.140 2005/02/20 13:00:00 ptsarenko Exp $
 #
 
 #
@@ -131,6 +131,9 @@ LIB_DIR = lib\b32
    CFLAGS = -O2 $(CFLAGS)
 !endif
 
+# uncomment this line if you want to build harbour with multi-gt capabilities
+#HB_MULTI_GT = yes
+
 #
 # Directory macros. These should never have to change.
 #
@@ -169,6 +172,10 @@ INCLUDE_DIR  = $(INCLUDE_DIR);source\compiler;source\macro
 #
 
 CFLAGS               = -I$(INCLUDE_DIR) -d $(C_USR) -5 -6 -O2 -a8 $(CFLAGS) -D__WIN32__
+!if $d(HB_MULTI_GT)
+CFLAGS               = $(CFLAGS) -DHB_MULTI_GT
+!endif
+
 CLIBFLAGS            = -c $(CFLAGS) $(CLIBFLAGS)
 CLIBFLAGSDEBUG       = -v $(CLIBFLAGS)
 HARBOURFLAGS         = -i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
@@ -833,6 +840,10 @@ GTALLEG_LIB_OBJS = \
 GTNUL_LIB_OBJS = \
    $(OBJ_DIR)\gtnul.obj \
    $(OBJ_DIR)\gtext.obj
+!if $d(HB_MULTI_GT)
+GTNUL_LIB_OBJS = $(GTNUL_LIB_OBJS) \
+   $(OBJ_DIR)\gtsys.obj
+!endif
 
 #
 # TIP.LIB rules
@@ -3002,6 +3013,11 @@ $(OBJ_DIR)\gtnul.obj : $(RTL_DIR)\gtnul\gtnul.c
 $(OBJ_DIR)\gtext.obj : $(RTL_DIR)\gtnul\gtext.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+!if $d(HB_MULTI_GT)
+$(OBJ_DIR)\gtsys.obj : $(RTL_DIR)\gtnul\gtsys.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+!endif
+
 #
 # CODEPAGE.LIB dependencies
 #
@@ -3640,6 +3656,9 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(VM_LIB) >> make.tmp
    $(ECHO) $(RTL_LIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
+!if $d(HB_MULTI_GT)
+   $(ECHO) $(GTNUL_LIB) >> make.tmp
+!endif
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
@@ -3687,6 +3706,9 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(VM_STLIB) >> make.tmp
    $(ECHO) $(RTL_STLIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
+!if $d(HB_MULTI_GT)
+   $(ECHO) $(GTNUL_LIB) >> make.tmp
+!endif
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_STLIB) >> make.tmp
    $(ECHO) $(MACRO_STLIB) >> make.tmp
@@ -3799,6 +3821,9 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(VM_STLIB) >> make.tmp
    $(ECHO) $(RTL_STLIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
+!if $d(HB_MULTI_GT)
+   $(ECHO) $(GTNUL_LIB) >> make.tmp
+!endif
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_STLIB) >> make.tmp
    $(ECHO) $(MACRO_STLIB) >> make.tmp
@@ -3954,6 +3979,9 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
    $(ECHO) $(VM_STLIB) >> make.tmp
    $(ECHO) $(RTL_STLIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
+!if $d(HB_MULTI_GT)
+   $(ECHO) $(GTNUL_LIB) >> make.tmp
+!endif
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_STLIB) >> make.tmp
    $(ECHO) $(MACRO_STLIB) >> make.tmp
@@ -4026,6 +4054,9 @@ $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
    $(ECHO) $(VM_STLIB) >> make.tmp
    $(ECHO) $(RTL_STLIB) >> make.tmp
    $(ECHO) $(HB_GT_LIB) >> make.tmp
+!if $d(HB_MULTI_GT)
+   $(ECHO) $(GTNUL_LIB) >> make.tmp
+!endif
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_STLIB) >> make.tmp
    $(ECHO) $(MACRO_STLIB) >> make.tmp
