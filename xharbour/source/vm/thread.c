@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.127 2003/11/27 23:39:13 jonnymind Exp $
+* $Id: thread.c,v 1.128 2003/11/28 20:39:14 jonnymind Exp $
 */
 
 /*
@@ -1008,7 +1008,9 @@ void hb_threadResetAux( void *ptr )
 */
 void hb_threadWaitForIdle( void )
 {
-   //HB_THREAD_STUB
+   #ifdef HB_OS_WIN_32
+   HB_THREAD_STUB
+   #endif
 
    /* Are we already idle inspectors ? */
    /*if ( HB_VM_STACK.uiIdleInspecting )

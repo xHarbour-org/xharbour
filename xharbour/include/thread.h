@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.67 2003/11/27 20:18:04 jonnymind Exp $
+* $Id: thread.h,v 1.68 2003/11/28 20:39:14 jonnymind Exp $
 */
 
 /*
@@ -144,13 +144,6 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       HB_CRITICAL_UNLOCK( hb_cancelMutex );\
    }
 
-
-   #define HB_CLEANUP_PUSH(X,Y)
-   #define HB_CLEANUP_POP
-   #define HB_CLEANUP_POP_EXEC
-
-   /* CURRENTLY TESTING THEESE:
-
    #define HB_CLEANUP_PUSH(X,Y) {\
       HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ] = (X);\
       HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount ] = (void *)&(Y);\
@@ -163,7 +156,6 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       HB_VM_STACK.iCleanCount--;\
       HB_VM_STACK.pCleanUp[ HB_VM_STACK.iCleanCount ]( HB_VM_STACK.pCleanUpParam[ HB_VM_STACK.iCleanCount ]);\
    }
-   */
 
 #ifdef __cplusplus
 extern "C" {
