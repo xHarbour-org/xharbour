@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.4 2002/01/31 05:08:31 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.5 2002/04/17 17:16:09 lculik Exp $
  */
 
 /*
@@ -63,7 +63,7 @@
 
 #include "common.ch"
 #include "error.ch"
-
+#include "fileio.ch"
 #define  CRLF HB_OsNewLine()
 
 PROCEDURE ErrorSys
