@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.97 2004/02/19 04:41:56 mlombardo Exp $
+ * $Id: classes.c,v 1.98 2004/02/20 00:22:40 ronpinkas Exp $
  */
 
 /*
@@ -352,30 +352,7 @@ void hb_clsReleaseAll( void )
 
    for( uiClass = 0 ; uiClass < s_uiClasses ; uiClass++ )
    {
-      /*-----------------12/21/2001 7:51PM-----------------
-       * Class itself is an Array within the list of the GC,
-       * it does not require explicit release, when using
-       * hb_gcReleaseAll(). The class methods pInitValue,
-       * are items also within the GC control.
-       * UNCOMMENT if reverting to hb_gcCollectAll()
-       * --------------------------------------------------*/
       hb_clsRelease( s_pClasses + uiClass  );
-
-     /*-----------------1/2/2002 10:17PM-----------------
-      * These 2 lines have to be commented if uncommenting
-      * the hb_clsRelease() call above.
-      * --------------------------------------------------*/
-      //hb_xfree( ( s_pClasses + uiClass )->szName );
-      //hb_xfree( ( s_pClasses + uiClass )->pMethods );
-
-      /*-----------------12/21/2001 7:53PM-----------------
-       * The pClassDatas and pInlines are Arrays within the
-       * list of the GC, they do not require explicit
-       * release when using hb_gcReleaseAll().
-       * UNCOMMENT if reverting to hb_gcCollectAll()
-       * --------------------------------------------------*/
-      //hb_itemRelease( ( s_pClasses + uiClass )->pClassDatas );
-      //hb_itemRelease( ( s_pClasses + uiClass )->pInlines );
    }
 
    if( s_pClasses )

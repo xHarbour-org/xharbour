@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.118 2004/02/16 12:28:45 andijahja Exp $
+ * $Id: hbapi.h,v 1.119 2004/02/18 10:50:44 andijahja Exp $
  */
 
 /*
@@ -188,7 +188,7 @@ extern HB_EXPORT void   hb_gcFree( void *pAlloc ); /* deallocates a memory alloc
 extern HB_EXPORT void * hb_gcLock( void *pAlloc ); /* do not release passed memory block */
 extern HB_EXPORT void * hb_gcUnlock( void *pAlloc ); /* passed block is allowed to be released */
 extern HB_EXPORT void   hb_gcCollect( void ); /* checks if a single memory block can be released */
-extern HB_EXPORT void   hb_gcCollectAll( void ); /* checks if all memory blocks can be released */
+extern HB_EXPORT void   hb_gcCollectAll( BOOL bForce ); /* checks if all memory blocks can be released */
 
 extern void   hb_gcReleaseAll( void ); /* release all memory blocks unconditionally */
 extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers passed memory block pointer */

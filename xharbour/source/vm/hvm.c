@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.327 2004/02/20 22:34:00 ronpinkas Exp $
+ * $Id: hvm.c,v 1.328 2004/02/21 01:40:54 andijahja Exp $
  */
 
 /*
@@ -814,7 +814,7 @@ int HB_EXPORT hb_vmQuit( void )
    /* release all known garbage */
    if ( hb_xquery( HB_MEM_USEDMAX ) ) /* check if fmstat is ON */
    {
-      hb_gcCollectAll();
+      hb_gcCollectAll( TRUE );
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2347 2004/02/21 01:45:55 andijahja Exp $
+ * $Id: ChangeLog,v 1.2348 2004/02/21 02:29:20 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-20 20:49 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+  * source/vm/garbage.c
+    + Added paramater bForce to hb_gcCollectAll()
+
+  * source/rtl/hbserv.c
+  * source/rtl/idle.c
+    * Changed calls of hb_gcCollectAll() to hb_gcCollectAll( FALSE )
+
+  * source/vm/hvm.c
+    * Changed call of hb_gcCollectAll() to hb_gcCollectAll( TRUE ) to force collection
+      on app termination even if collection is not justified - to avoid false warnings
+      of memory leaks.
+
+  * source/vm/hash.c
+    ! Fixed memory leak (few more are still pending).
+
+  * source/vm/classes.c
+    - Removed outdated comments.
+
 2004-02-21 09:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/trim.c
     ! minor changes on function linkage.

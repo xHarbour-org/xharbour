@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.72 2004/01/27 03:07:00 ronpinkas Exp $
+ * $Id: garbage.c,v 1.73 2004/02/20 00:42:24 ronpinkas Exp $
  */
 
 /*
@@ -519,16 +519,16 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 HB_EXPORT void hb_gcCollect( void )
 {
    /* TODO: decrease the amount of time spend collecting */
-   hb_gcCollectAll();
+   hb_gcCollectAll( FALSE );
 }
 
 /* Check all memory blocks if they can be released
 */
-HB_EXPORT void hb_gcCollectAll()
+HB_EXPORT void hb_gcCollectAll( BOOL bForce )
 {
    HB_GARBAGE_PTR pAlloc, pDelete;
 
-   HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(), %p, %i", s_pCurrBlock, s_bCollecting ) );
+   HB_TRACE( HB_TR_INFO, ( "hb_gcCollectAll(%i), %p, %i", bForce, s_pCurrBlock, s_bCollecting ) );
 
    /* is anoter garbage in action? */
    #ifdef HB_THREAD_SUPPORT
@@ -548,7 +548,7 @@ HB_EXPORT void hb_gcCollectAll()
       }
       /* Even if not locked, a read only non-critical variable here
       should not be a problem */
-      if( s_pCurrBlock==0 || s_uAllocated < HB_GC_COLLECTION_JUSTIFIED )
+      if( s_pCurrBlock == NULL || ( bForce == FALSE && s_uAllocated < HB_GC_COLLECTION_JUSTIFIED ) )
       {
          s_bCollecting = FALSE;
          return;
@@ -878,6 +878,7 @@ HB_FUNC( HB_GCALL )
    {
       s_uAllocated = HB_GC_COLLECTION_JUSTIFIED;
    }
-   hb_gcCollectAll();
+
+   hb_gcCollectAll( FALSE );
 }
 

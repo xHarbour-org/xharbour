@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.21 2004/02/10 13:16:18 andijahja Exp $
+ * $Id: hash.c,v 1.22 2004/02/14 21:01:18 andijahja Exp $
  */
 
 /*
@@ -290,8 +290,7 @@ PHB_ITEM HB_EXPORT hb_hashNew( PHB_ITEM pItem ) /* creates a new hash */
    PHB_BASEHASH pBaseHash;
    HB_TRACE(HB_TR_DEBUG, ("hb_hashNew(%p)", pItem ));
 
-   pBaseHash = ( PHB_BASEHASH )
-      hb_gcAlloc( sizeof( HB_BASEHASH ), hb_hashReleaseGarbage );
+   pBaseHash = ( PHB_BASEHASH ) hb_gcAlloc( sizeof( HB_BASEHASH ), hb_hashReleaseGarbage );
 
    if ( pItem == NULL )
    {
@@ -319,7 +318,6 @@ PHB_ITEM HB_EXPORT hb_hashNew( PHB_ITEM pItem ) /* creates a new hash */
 
    return pItem;
 }
-
 
 
 BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue )
@@ -1276,20 +1274,20 @@ PHB_ITEM HB_EXPORT hb_hashClone( PHB_ITEM pSrcHash )
 }
 
 
-void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
-      ULONG ulStart, ULONG ulCount, PHB_ITEM pBlock )
+void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource, ULONG ulStart, ULONG ulCount, PHB_ITEM pBlock )
 {
    int mode = 0;
    ULONG ulElem;
    PHB_ITEM pKey, pValue;
    ULONG ulPos;
 
-   if ( pBlock != NULL )
+   if( pBlock != NULL )
    {
-      if ( HB_IS_NUMERIC( pBlock ) )
+      if( HB_IS_NUMERIC( pBlock ) )
       {
          mode = hb_itemGetNI( pBlock );
-         if ( mode < 0 || mode > 3 )
+
+         if( mode < 0 || mode > 3 )
          {
             mode = 0;
          }
@@ -1473,10 +1471,10 @@ void hb_hashReleaseBase( PHB_BASEHASH pBaseHash )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_hashReleaseBase( %p )", pBaseHash ) );
 
-   //TraceLog( NULL, "Releasing Basearray %p\n", pBaseArray );
+   TraceLog( NULL, "Releasing BaseHash %p %i\n", pBaseHash, pBaseHash->ulAllocated );
 
    // Called recursively from hb_hashReleaseGarbage!
-   if( pBaseHash->ulAllocated == 0)
+   if( pBaseHash->ulAllocated == 0 )
    {
       return;
    }
@@ -1496,8 +1494,7 @@ void hb_hashReleaseBase( PHB_BASEHASH pBaseHash )
 
       while( ulLen-- )
       {
-         HB_TRACE( HB_TR_INFO, ( "Hash Key %p, Value %p, type:%i",
-               pKey, pValue, pValue->type ) );
+         HB_TRACE( HB_TR_INFO, ( "Hash Key %p, Value %p, type:%i", pKey, pValue, pValue->type ) );
 
          if( HB_IS_HASH( pValue ) && pValue->item.asHash.value == pBaseHash )
          {
@@ -1517,7 +1514,6 @@ void hb_hashReleaseBase( PHB_BASEHASH pBaseHash )
          pKey++;
          pValue++;
       }
-
    }
 
    if ( pBaseHash->pKeys )
@@ -1561,10 +1557,12 @@ BOOL HB_EXPORT hb_hashRelease( PHB_ITEM pHash )
 }
 
 
-/* This releases array when called from the garbage collector */
+/* This releases hash when called from the garbage collector */
 HB_GARBAGE_FUNC( hb_hashReleaseGarbage )
 {
    PHB_BASEHASH pBaseHash = ( PHB_BASEHASH ) Cargo;
+
+   TraceLog( NULL, "Here!!!\n" );
 
    HB_TRACE( HB_TR_INFO, ( "hb_hashReleaseGarbage( %p )", pBaseHash ) );
 
@@ -1740,12 +1738,12 @@ HB_FUNC( HASH )
 
    if ( iPCount % 2 != 0 )
    {
-      hb_errRT_BASE( EG_BOUND, 1131, "Hash arguments must be in pairs",
-         hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
+      hb_errRT_BASE( EG_BOUND, 1131, "Hash arguments must be in pairs", hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
       return;
    }
 
    pHash = hb_hashNew( NULL );
+
    if( iPCount > 0 )
    {
       int iParam;
@@ -1767,8 +1765,7 @@ HB_FUNC( HASH )
 
          if (! hb_hashAdd( pHash, ULONG_MAX, pKey, pValue ) )
          {
-            hb_errRT_BASE( EG_BOUND, 1131, "Hash value insertion failed",
-               hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
+            hb_errRT_BASE( EG_BOUND, 1131, "Hash value insertion failed", hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
             hb_hashRelease( pHash );
             return;
          }
@@ -1777,6 +1774,8 @@ HB_FUNC( HASH )
    }
 
    hb_itemReturn( pHash );
+
+   hb_itemRelease( pHash );
 }
 
 
@@ -2150,10 +2149,7 @@ HB_FUNC( HEVAL )
       ULONG ulStart = hb_parnl( 3 );
       ULONG ulCount = hb_parnl( 4 );
 
-      hb_arrayEval( pHash,
-                    pBlock,
-                    ISNUM( 3 ) ? &ulStart : NULL,
-                    ISNUM( 4 ) ? &ulCount : NULL );
+      hb_arrayEval( pHash, pBlock, ISNUM( 3 ) ? &ulStart : NULL, ISNUM( 4 ) ? &ulCount : NULL );
 
       /* HEval() returns the array itself */
       if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )

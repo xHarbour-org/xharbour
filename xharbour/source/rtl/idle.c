@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.12 2003/12/19 22:07:12 jonnymind Exp $
+ * $Id: idle.c,v 1.13 2003/12/28 22:25:34 druzus Exp $
  */
 
 /*
@@ -169,7 +169,7 @@ void hb_idleState( void )
       if( hb_vm_bCollectGarbage )
       {
          hb_vm_bCollectGarbage = FALSE;
-         hb_gcCollectAll();
+         hb_gcCollectAll( FALSE );
       }
       else if ( s_uiIdleTask < s_uiIdleMaxTask )
       {

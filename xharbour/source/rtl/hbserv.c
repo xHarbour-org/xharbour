@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.7 2004/02/14 01:29:42 andijahja Exp $
+* $Id: hbserv.c,v 1.8 2004/02/14 21:01:17 andijahja Exp $
 */
 
 /*
@@ -783,7 +783,7 @@ HB_FUNC( HB_SERVICELOOP )
    }
 #endif
 
-    hb_gcCollectAll();
+    hb_gcCollectAll( FALSE );
 }
 
 HB_FUNC( HB_PUSHSIGNALHANDLER )
