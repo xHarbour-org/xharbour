@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.65 2004/02/17 18:52:11 andijahja Exp $
+ * $Id: genc.c,v 1.66 2004/03/22 23:32:29 andijahja Exp $
  */
 
 /*
@@ -156,6 +156,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )       /* ge
        for ( iCh = 0; iCh < iTmp; iCh ++ )
        {
           if ( ( hb_comp_FileAsSymbol[ iCh ] == '!' ) ||
+               ( hb_comp_FileAsSymbol[ iCh ] == '~' ) ||
                ( hb_comp_FileAsSymbol[ iCh ] == '$' ) ||
                ( hb_comp_FileAsSymbol[ iCh ] == '%' ) ||
                ( hb_comp_FileAsSymbol[ iCh ] == '\'') ||
