@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.22 2003/06/24 03:35:04 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.23 2004/01/10 05:51:26 ronpinkas Exp $
  */
 
 /*
@@ -60,20 +60,26 @@ static s_aActiveStructure
 static s_aClasses := {}
 static s_aArrayClasses := {}
 static s_aSynonyms := {}
+static s_lInitLongs := .T.
 
-typedef struct {;
-   ULONG ulong[2];
-} ULONGLONG;
+PROCEDURE __INIT_LONGLONGS
+   HB_CStructureCSyntax( "ULONGLONG", { "-4", "ulong[2]", }, , , 8 )
+   __ClsSetModule( __ActiveStructure() )
 
-typedef struct {;
-   LONG long[2];
-} LONGLONG;
+   HB_CStructureCSyntax( "LONGLONG", { "4", "long[2]", } , , , 8 )
+   __ClsSetModule( __ActiveStructure() )
+RETURN
 
 //---------------------------------------------------------------------------//
 Function __ActiveStructure( cStructure, nAlign )
 
    LOCAL oErr
    LOCAL acMembers, aCTypes, hClass, Counter, cMember
+
+   IF s_lInitLongs
+      s_lInitLongs := .F.
+      __INIT_LONGLONGS()
+   ENDIF
 
    IF PCount() == 2
       cStructure := Upper( cStructure )
