@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1791 2003/11/28 20:39:05 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1792 2003/11/28 21:21:03 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-28 20:05 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  % Implementation of control of value returned by SkipBlock.
+    If the sign of returned value is not equal to caller, the skip is
+    interpreted as 0.
+    Reported by Guillermo Varona
 
 2003-11-28 22:15 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/thread.c
