@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.40 2003/05/26 00:19:15 ronpinkas Exp $
+ * $Id: genc.c,v 1.41 2003/05/28 04:10:17 ronpinkas Exp $
  */
 
 /*
@@ -2125,7 +2125,11 @@ static HB_GENC_FUNC( hb_p_localnearsetstr )
 
    if( cargo->bVerbose )
    {
-      fprintf( cargo->yyc, "\t/* %i */", uLen );
+      // fprintf( cargo->yyc, "\t/* %i */", uLen );
+      // To Be More Readable
+      fprintf( cargo->yyc, "\t/* %s %i*/", hb_compLocalVariableFind( pFunc, ( signed char ) pFunc->pCode[ lPCodePos + 1 ] )->szName,
+               uLen );
+
    }
 
    lPCodePos += 4;
