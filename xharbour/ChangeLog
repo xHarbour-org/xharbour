@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.623 2003/01/14 02:34:55 jonnymind Exp $
+ * $Id: ChangeLog,v 1.624 2003/01/14 02:41:12 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-15 00:10 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/macro/macro.slx
+    ! Fixed macro error if there´s a chr(10) inside a string as this :
+      &( " 'line 1' + chr(10) + 'line 2' " )
 
 2003-01-14 03:31 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * include/inet.h
