@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.292 2003/12/05 04:34:58 jonnymind Exp $
+ * $Id: hvm.c,v 1.293 2003/12/05 05:25:56 jonnymind Exp $
  */
 
 /*
@@ -408,6 +408,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
       hb_xinit();
    }
 
+   /* No need to lock dynsyms: we are single thread now */
 #if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
    pDynSymHbNoMouse = hb_dynsymFind( "HB_NOMOUSE" );
 #endif
@@ -2659,10 +2660,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             #ifdef HB_THREAD_SUPPORT
             {
             char *szName = (pSymbols + uiParams)->szName;
-            char *szNewName = (char *) hb_xgrab( strlen( szName) + 14 );
+            char szNewName[256+14];
             sprintf( szNewName, ":TH:%d:%s", HB_VM_STACK.th_vm_id, szName );
+            hb_dynsymLock();
             pDyn = hb_dynsymFindName( szNewName );
-            hb_xfree( szNewName );
             }
             #else
             pDyn = ( PHB_DYNS ) (pSymbols + uiParams)->pDynSym;
@@ -2670,11 +2671,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( pDyn && pDyn->hMemvar )
             {
+               hb_dynsymUnlock();
                /* If exist a memory symbol with this name use it */
                hb_memvarSetValue( pSymbols + uiParams, ( hb_stackItemFromTop(-1) ) );
             }
             else
             {
+               hb_dynsymUnlock();
                /* Try with a field and after create a memvar */
                if( hb_rddFieldPut( ( hb_stackItemFromTop(-1) ), pSymbols + uiParams ) == FAILURE )
                {
@@ -4511,7 +4514,9 @@ static void hb_vmArrayPush( void )
       }
       else if( HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
       {
+         hb_dynsymLock();
          hb_vmPushSymbol( hb_dynsymGetCase( pIndex->item.asString.value )->pSymbol );
+         hb_dynsymUnlock();
          hb_itemPushForward( pArray );
 
          hb_vmSend( 0 );
@@ -4754,7 +4759,9 @@ static void hb_vmArrayPop( void )
 
             // Recicle pValue as Message.
             pValue->type = HB_IT_SYMBOL;
+            hb_dynsymLock();
             pValue->item.asSymbol.value = hb_dynsymGetCase( szMessage )->pSymbol;
+            hb_dynsymUnlock();
             pValue->item.asSymbol.stackbase = HB_VM_STACK.pPos - 3 - HB_VM_STACK.pItems;
 
             if( HB_IS_BYREF( hb_stackItemFromTop( -2 ) ) )
@@ -4764,7 +4771,9 @@ static void hb_vmArrayPop( void )
 
             hb_vmSend( 1 );
          #else
+            hb_dynsymLock();
             hb_vmPushSymbol( hb_dynsymGetCase( szMessage )->pSymbol );
+            hb_dynsymUnlock();
             hb_vmPush( pArray );
             hb_vmPush( pValue );
 
@@ -5023,7 +5032,9 @@ static void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSy
    HB_TRACE(HB_TR_DEBUG, ("hb_vmOperatorCall(%p, %p, %s)", pObjItem, pMsgItem, szSymbol));
 
    ItemMsg.type = HB_IT_SYMBOL;
+   hb_dynsymLock();
    ItemMsg.item.asSymbol.value = hb_dynsymFind( szSymbol )->pSymbol;
+   hb_dynsymUnlock();
    ItemMsg.item.asSymbol.stackbase = hb_stackTopOffset();
 
    hb_vmPush( &ItemMsg );
@@ -5054,7 +5065,9 @@ static void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmOperatorCallUnary(%p, %s)", pObjItem, szSymbol));
 
    ItemMsg.type = HB_IT_SYMBOL;
+   hb_dynsymLock();
    ItemMsg.item.asSymbol.value = hb_dynsymFind( szSymbol )->pSymbol;
+   hb_dynsymUnlock();
    ItemMsg.item.asSymbol.stackbase = hb_stackTopOffset();
 
    hb_vmPush( &ItemMsg );
@@ -5784,7 +5797,9 @@ static void hb_vmLocalName( USHORT uiLocal, char * szLocalName ) /* locals and p
 
    s_bDebugging = TRUE;
    s_bDebugShowLines = FALSE;
+   hb_dynsymLock();
    hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
+   hb_dynsymUnlock();
    hb_vmPushNil();
    hb_vmPushLongConst( uiLocal );
    hb_vmPushString( szLocalName, strlen( szLocalName ) );
@@ -5803,7 +5818,9 @@ static void hb_vmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticNam
 
    s_bDebugging = TRUE;
    s_bDebugShowLines = FALSE;
+   hb_dynsymLock();
    hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
+   hb_dynsymUnlock();
    hb_vmPushNil();
 
    if( bIsGlobal )
@@ -5828,7 +5845,9 @@ static void hb_vmModuleName( char * szModuleName ) /* PRG and function name info
 
    s_bDebugging = TRUE;
    s_bDebugShowLines = FALSE;
+   hb_dynsymLock();
    hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
+   hb_dynsymUnlock();
    hb_vmPushNil();
    hb_vmPushString( szModuleName, strlen( szModuleName ) );
    s_bDebuggerIsWorking = TRUE;
@@ -5951,7 +5970,9 @@ static void hb_vmDebuggerEndProc( void )
    hb_itemForwardValue( &item, &(HB_VM_STACK.Return) ); /* saves the previous returned value */
 
    s_bDebugShowLines = FALSE;
+   hb_dynsymLock();
    hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
+   hb_dynsymUnlock();
    hb_vmPushNil();
    s_bDebuggerIsWorking = TRUE;
    hb_vmDo( 0 );
@@ -5966,7 +5987,9 @@ static void hb_vmDebuggerShowLine( USHORT uiLine ) /* makes the debugger shows a
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDebuggerShowLine(%hu)", uiLine));
 
    s_bDebugShowLines = FALSE;
+   hb_dynsymLock();
    hb_vmPushSymbol( hb_dynsymFind( "__DBGENTRY" )->pSymbol );
+   hb_dynsymUnlock();
    hb_vmPushNil();
    hb_vmPushInteger( uiLine );
    s_bDebuggerIsWorking = TRUE;
@@ -7763,8 +7786,10 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols
 
       if( ( hSymScope == HB_FS_PUBLIC ) || ( hSymScope & ( HB_FS_MESSAGE | HB_FS_MEMVAR | HB_FS_FIRST ) ) )
       {
-         PHB_DYNS pDynSym = hb_dynsymFind( pSymbol->szName );
+         PHB_DYNS pDynSym;
 
+         hb_dynsymLock();
+         pDynSym= hb_dynsymFind( pSymbol->szName );
          if( pDynSym && pDynSym->pFunPtr && pSymbol->pFunPtr )
          {
             pSymbol->pFunPtr = pDynSym->pFunPtr;
@@ -7773,6 +7798,7 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols
          {
             hb_dynsymNew( pSymbol, pNewSymbols );
          }
+         hb_dynsymUnlock();
       }
    }
 }
@@ -7788,8 +7814,8 @@ HB_FUNC( HB_FUNCPTR )
    {
       char *sSym = hb_strUpperCopy( pParam->item.asString.value, pParam->item.asString.length );
 
+      hb_dynsymLock();
       pDynSym = hb_dynsymFind( sSym );
-      hb_xfree( sSym );
 
       if( pDynSym )
       {
@@ -7801,6 +7827,10 @@ HB_FUNC( HB_FUNCPTR )
       {
          hb_vmPushLong( 0 );
       }
+      hb_dynsymUnlock();
+
+      /* avoid cross locking */
+      hb_xfree( sSym );
    }
    else
    {

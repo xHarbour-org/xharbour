@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.44 2003/10/14 15:30:49 ronpinkas Exp $
+ * $Id: memvars.c,v 1.45 2003/12/05 01:38:29 jonnymind Exp $
  */
 
 /*
@@ -115,20 +115,16 @@ static HB_VALUE_PTR s_globalTable = NULL;
 
 PHB_DYNS s_memvarThGetName( char * szName, HB_STACK *pstack )
 {
-   PHB_DYNS dyn;
    char szNewName[270];
    sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
-   dyn = hb_dynsymGet( szNewName );
-   return dyn;
+   return hb_dynsymGet( szNewName );
 }
 
 PHB_DYNS s_memvarThFindName( char * szName, HB_STACK *pstack )
 {
-   PHB_DYNS dyn;
    char szNewName[270];
    sprintf( szNewName, ":TH:%d:%s", pstack->th_vm_id, szName );
-   dyn = hb_dynsymFindName( szNewName );
-   return dyn;
+   return hb_dynsymFindName( szNewName );
 }
 
 #endif
@@ -868,7 +864,7 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarGetRefer(%p, %p)", pItem, pMemvarSymb));
    #ifdef HB_THREAD_SUPPORT
    // we must find the thread specific name
-   pDyn = s_memvarThGetName( pMemvarSymb->szName, _pStack_ );
+   pDyn = s_memvarThGetName( pMemvarSymb->szName, _pStack_);
    #else
    pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
    #endif
@@ -964,6 +960,8 @@ char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
    itName.type = HB_IT_STRING;
    itName.item.asString.value  = szVarName;
    itName.item.asString.length = *pulLen;
+
+   hb_dynsymLock();
    pDynVar = hb_memvarFindSymbol( &itName );
 
    if( pDynVar )
@@ -976,6 +974,7 @@ char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
          /* variable contains some data
           */
          HB_ITEM_PTR pItem = &s_globalTable[ pDynVar->hMemvar ].item;
+         hb_dynsymUnlock();
 
          if( HB_IS_BYREF( pItem ) )
          {
@@ -988,6 +987,14 @@ char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
             *pulLen = pItem->item.asString.length;
          }
       }
+      else
+      {
+         hb_dynsymUnlock();
+      }
+   }
+   else
+   {
+      hb_dynsymUnlock();
    }
 
    return szValue;
@@ -1010,6 +1017,7 @@ void hb_memvarCreateFromItem( PHB_ITEM pMemvar, BYTE bScope, PHB_ITEM pValue )
 {
    HB_THREAD_STUB
    PHB_DYNS pDynVar = NULL;
+
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarCreateFromItem(%p, %d, %p)", pMemvar, bScope, pValue));
 
@@ -1427,6 +1435,7 @@ static HB_ITEM_PTR hb_memvarDebugVariable( int iScope, int iPos, char * *pszName
    return pValue;
 }
 
+/* JC1 NOTE: Not locking it because it is necessary to lock the caller. */
 static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR pName )
 {
    HB_DYNS_PTR pDynSym = NULL;
@@ -1442,7 +1451,9 @@ static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR pName )
       {
          #ifdef HB_THREAD_SUPPORT
             HB_THREAD_STUB;
-            pDynSym = s_memvarThFindName( pName->item.asString.value, _pStack_ );
+            char szNewName[270];
+            sprintf( szNewName, ":TH:%d:%s", _pStack_->th_vm_id, pName->item.asString.value );
+            pDynSym = hb_dynsymFindName( szNewName );
          #else
             pDynSym = hb_dynsymFindName( pName->item.asString.value );
          #endif
@@ -1707,7 +1718,9 @@ HB_FUNC( __MVEXIST )
    HB_ITEM_PTR pName = hb_param( 1, HB_IT_STRING );
    PHB_DYNS pDyn = NULL;
 
+   hb_dynsymLock();
    hb_retl( pName && ( ( pDyn = hb_memvarFindSymbol( pName ) ) != NULL ) && pDyn->hMemvar );
+   hb_dynsymUnlock();
 }
 
 HB_FUNC( __MVGET )
@@ -1716,14 +1729,20 @@ HB_FUNC( __MVGET )
 
    if( pName )
    {
-      HB_DYNS_PTR pDynVar = hb_memvarFindSymbol( pName );
+      HB_DYNS_PTR pDynVar;
+
+      hb_dynsymLock();
+      pDynVar = hb_memvarFindSymbol( pName );
 
       if( pDynVar )
       {
          HB_ITEM retValue;
+         PHB_SYMB pSymbol;
+
+         pSymbol = pDynVar->pSymbol;
+         hb_dynsymUnlock();
 
          ( &retValue )->type = HB_IT_NIL;
-
          hb_memvarGetValue( &retValue, pDynVar->pSymbol );
 
          hb_itemReturn( &retValue );
@@ -1733,6 +1752,8 @@ HB_FUNC( __MVGET )
          /* Generate an error with retry possibility
           * (user created error handler can create this variable)
           */
+         hb_dynsymUnlock();
+
          USHORT uiAction = E_RETRY;
          HB_ITEM_PTR pError;
 
@@ -1745,19 +1766,26 @@ HB_FUNC( __MVGET )
 
             if( uiAction == E_RETRY )
             {
+               hb_dynsymLock();
                pDynVar = hb_memvarFindSymbol( pName );
 
                if( pDynVar )
                {
                   HB_ITEM retValue;
+                  PHB_SYMB pSymbol = pDynVar->pSymbol;
 
+                  hb_dynsymUnlock();
                   ( &retValue )->type = HB_IT_NIL;
 
-                  hb_memvarGetValue( &retValue, pDynVar->pSymbol );
+                  hb_memvarGetValue( &retValue, pSymbol );
 
                   hb_itemReturn( &retValue );
 
                   uiAction = E_DEFAULT;
+               }
+               else
+               {
+                  hb_dynsymUnlock();
                }
             }
          }
@@ -1797,22 +1825,27 @@ HB_FUNC( __MVPUT )
    {
       /* the first parameter is a string with not empty variable name
        */
+      hb_dynsymLock();
       HB_DYNS_PTR pDynVar = hb_memvarFindSymbol( pName );
 
       if( pDynVar )
       {
          /* variable was declared somwhere - assign a new value
           */
-         hb_memvarSetValue( pDynVar->pSymbol, pValue );
+         PHB_SYMB pSymbol = pDynVar->pSymbol;
+         hb_dynsymUnlock();
+         hb_memvarSetValue( pSymbol, pValue );
       }
       else
       {
          PHB_DYNS pDyn;
+         hb_dynsymUnlock();
+
          /* attempt to assign a value to undeclared variable
           * create the PRIVATE one
           */
          #ifdef HB_THREAD_SUPPORT
-            pDyn = s_memvarThGetName( pName->item.asString.value, _pStack_ );
+            pDyn = s_memvarThGetName( pName->item.asString.value, _pStack_);
          #else
             pDyn = hb_dynsymGet( pName->item.asString.value );
          #endif
@@ -2013,6 +2046,7 @@ HB_FUNC( __MVSAVE )
 HB_FUNC( __MVRESTORE )
 {
    HB_THREAD_STUB
+
    /* Clipper checks for the number of arguments here here, but we cannot
       in Harbour since we have two optional parameters as an extension. */
    if( ISCHAR( 1 ) && ISLOG( 2 ) )
@@ -2129,16 +2163,24 @@ HB_FUNC( __MVRESTORE )
                if( bIncludeMask ? bMatch : ! bMatch )
                {
                   /* the first parameter is a string with not empty variable name */
-                  HB_DYNS_PTR pDynVar = hb_memvarFindSymbol( pName );
+                  HB_DYNS_PTR pDynVar;
+
+                  hb_dynsymLock();
+                  pDynVar = hb_memvarFindSymbol( pName );
 
                   if( pDynVar )
                   {
                      /* variable was declared somwhere - assign a new value */
-                     hb_memvarSetValue( pDynVar->pSymbol, pItem );
+                     PHB_SYMB pSymbol = pDynVar->pSymbol;
+                     hb_dynsymUnlock();
+
+                     hb_memvarSetValue( pSymbol, pItem );
                   }
                   else
                   {
                      PHB_DYNS pDyn;
+
+                     hb_dynsymUnlock();
                      /* attempt to assign a value to undeclared variable create the PRIVATE one */
                      #ifdef HB_THREAD_SUPPORT
                         pDyn = s_memvarThGetName( pName->item.asString.value, _pStack_ );
@@ -2209,17 +2251,22 @@ HB_HANDLE hb_memvarGetVarHandle( char *szName )
    PHB_DYNS pDyn;
 
    #ifdef HB_THREAD_SUPPORT
-      pDyn = s_memvarThFindName( szName, _pStack_ );
-   #else
-      pDyn = hb_dynsymFindName( szName );
+      char szNewName[270];
+      sprintf( szNewName, ":TH:%d:%s", _pStack_->th_vm_id, szName );
    #endif
+
+   hb_dynsymLock();
+   pDyn = hb_dynsymFindName( szName );
 
    if( pDyn != NULL )
    {
-      return  pDyn->hMemvar;
+      HB_HANDLE hHand = pDyn->hMemvar;
+      hb_dynsymUnlock();
+      return hHand;
    }
    else
    {
+      hb_dynsymUnlock();
       return 0; /* invalid handle */
    }
 }

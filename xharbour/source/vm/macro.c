@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.31 2003/11/30 12:32:30 druzus Exp $
+ * $Id: macro.c,v 1.32 2003/11/30 13:20:47 jonnymind Exp $
  */
 
 /*
@@ -839,14 +839,17 @@ void hb_macroPushSymbol( HB_ITEM_PTR pItem )
 
       if( hb_macroIsIdent( szString ) )
       {
-         HB_DYNS_PTR pDynSym =  hb_dynsymGet( szString );
+         HB_DYNS_PTR pDynSym;
 
          hb_stackPop();    /* remove compiled string */
 
          /* NOTE: checking for valid function name (valid pointer) is done
           * in hb_vmDo()
           */
+         hb_dynsymLock();
+         pDynSym =  hb_dynsymGet( szString );
          hb_vmPushSymbol( pDynSym->pSymbol );  /* push compiled symbol instead of a string */
+         hb_dynsymUnlock();
 
          if( bNewBuffer )
          {
@@ -1169,7 +1172,16 @@ static void hb_compMemvarCheck( char * szVarName, HB_MACRO_DECL )
       {
          if( hb_memvarScope( szVarName ) <= HB_MV_ERROR )
          {
-            PHB_DYNS pDyn = hb_dynsymFind( szVarName );
+            #ifdef HB_THREAD_SUPPORT
+            HB_DYNS Dyn;
+            #endif
+            PHB_DYNS pDyn;
+
+            #ifdef HB_THREAD_SUPPORT
+            pDyn = hb_dynsymFind_r( szVarName, &Dyn );
+            #else
+            pDyn = hb_dynsymFind( szVarName );
+            #endif
 
             /* there is no memvar or field variable visible at this moment */
             if( pDyn == NULL )
@@ -1208,6 +1220,8 @@ void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
 {
    HB_DYNS_PTR pSym;
 
+   hb_dynsymLock();
+
    if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_TYPE )
    {
       /* we are determining the type of expression (called from TYPE() function)
@@ -1233,6 +1247,7 @@ void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
 
    hb_compGenPCode1( bPCode, HB_MACRO_PARAM );
    hb_compGenPCodeN( ( BYTE * )( &pSym ), sizeof( pSym ), HB_MACRO_PARAM );
+   hb_dynsymUnlock();
 }
 
 /* generates the pcode to push a symbol on the virtual machine stack */
@@ -1243,6 +1258,7 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_
    HB_SYMBOL_UNUSED( bFunction );
    HB_SYMBOL_UNUSED( bAlias );
 
+   hb_dynsymLock();
    if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_TYPE )
    {
       /* we are determining the type of expression (called from TYPE() function)
@@ -1274,6 +1290,7 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_
 
    hb_compGenPCode1( HB_P_MPUSHSYM, HB_MACRO_PARAM );
    hb_compGenPCodeN( ( BYTE * ) &pSym, sizeof( pSym ), HB_MACRO_PARAM );
+   hb_dynsymUnlock();
 }
 
 /* generates the pcode to push a long number on the virtual machine stack */
@@ -1297,10 +1314,14 @@ void hb_compGenMessage( char * szMsgName, HB_MACRO_DECL )
 {
    /* Find the address of passed symbol - create the symbol if doesn't exist
     */
-   HB_DYNS_PTR pSym = hb_dynsymGet( szMsgName );
+   HB_DYNS_PTR pSym;
+
+   hb_dynsymLock();
+   pSym = hb_dynsymGet( szMsgName );
 
    hb_compGenPCode1( HB_P_MMESSAGE, HB_MACRO_PARAM );
    hb_compGenPCodeN( ( BYTE * ) &pSym, sizeof( pSym ), HB_MACRO_PARAM );
+   hb_dynsymUnlock();
 }
 
 /* generates an underscore-symbol name for a data assignment */

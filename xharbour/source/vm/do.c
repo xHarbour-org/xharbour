@@ -1,5 +1,5 @@
 /*
- * $Id: do.c,v 1.3 2002/12/19 18:15:34 ronpinkas Exp $
+ * $Id: do.c,v 1.1 2003/01/05 06:50:36 ronpinkas Exp $
  */
 
 /*
@@ -64,16 +64,23 @@ HB_FUNC( DO )
 
    if( HB_IS_STRING( pItem ) )
    {
-      PHB_DYNS pDynSym = hb_dynsymFindName( hb_itemGetCPtr( pItem ) );
+      PHB_DYNS pDynSym;
+
+      hb_dynsymLock();
+      pDynSym = hb_dynsymFindName( hb_itemGetCPtr( pItem ) );
 
       if( pDynSym )
       {
-         USHORT uiPCount = hb_pcount();
+         USHORT uiPCount;
          USHORT uiParam;
 
          hb_vmPushSymbol( pDynSym->pSymbol );
+
+         hb_dynsymUnlock();
+
          hb_vmPushNil();
 
+         uiPCount = hb_pcount();
          for( uiParam = 2; uiParam <= uiPCount; uiParam++ )
          {
             hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
@@ -83,7 +90,11 @@ HB_FUNC( DO )
       }
       else
       {
-         PHB_ITEM pArgsArray = hb_arrayFromParams( HB_VM_STACK.pBase );
+         PHB_ITEM pArgsArray;
+
+         hb_dynsymUnlock();
+
+         pArgsArray = hb_arrayFromParams( HB_VM_STACK.pBase );
 
          hb_errRT_BASE( EG_NOFUNC, 1001, NULL, hb_itemGetCPtr( pItem ), 1, pArgsArray );
          hb_itemRelease( pArgsArray );

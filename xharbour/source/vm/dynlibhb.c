@@ -1,5 +1,5 @@
 /*
- * $Id: dynlibhb.c,v 1.5 2002/03/06 06:21:14 ronpinkas Exp $
+ * $Id: dynlibhb.c,v 1.6 2003/10/01 04:39:39 ronpinkas Exp $
  */
 
 /*
@@ -94,7 +94,10 @@ HB_FUNC( LIBFREE )
 HB_FUNC( HB_LIBDO )
 {
    char *szName = hb_strupr( hb_strdup( hb_parc( 1 ) ) );
-   PHB_DYNS pDynSym = hb_dynsymFind( szName );
+   PHB_DYNS pDynSym;
+
+   hb_dynsymLock();
+   pDynSym = hb_dynsymFind( szName );
 
    if( pDynSym )
    {
@@ -102,6 +105,7 @@ HB_FUNC( HB_LIBDO )
       USHORT uiParam;
 
       hb_vmPushSymbol( pDynSym->pSymbol );
+      hb_dynsymUnlock();
       hb_vmPushNil();
 
       /* same logic here as from HB_FUNC( EVAL ) */
@@ -111,6 +115,10 @@ HB_FUNC( HB_LIBDO )
       }
 
       hb_vmDo( uiPCount - 1 );
+   }
+   else
+   {
+      hb_dynsymUnlock();
    }
 
    hb_xfree( szName );

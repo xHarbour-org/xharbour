@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1828 2003/12/06 15:58:28 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1829 2003/12/06 17:40:45 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-07 01:11 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbapi.h
+    + Added macros to disable _r version of dynsym functions.
+      Currently unused, they should stay here until the doom of
+      dynsyms is decided.
+
+  * source/vm/classes.c
+  * source/vm/do.c
+  * source/vm/dynlibhb.c
+  * source/vm/errorapi.c
+  * source/vm/eval.c
+  * source/vm/hvm.c
+  * source/vm/macro.c
+  * source/vm/memvars.c
+  * source/vm/runner.c
+  * source/vm/thread.c
+    ! Added locks to secure, WHERE POSSIBLE, dynsym usage.
 
 2003-12-06 16:55 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/thread.c

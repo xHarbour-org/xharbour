@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.17 2003/12/01 05:56:56 ronpinkas Exp $
+ * $Id: runner.c,v 1.18 2003/12/01 20:06:19 ronpinkas Exp $
  */
 
 /*
@@ -466,18 +466,21 @@ PHRB_BODY hb_hrbLoad( char* szHrb )
          {
             //printf( "External\n" );
 
+            hb_dynsymLock();
             pDynSym = hb_dynsymFind( pSymRead[ ul ].szName );
 
             //printf( "Found: %p\n", pDynSym );
 
             if( pDynSym )
             {
-
                pSymRead[ ul ].pFunPtr = pDynSym->pFunPtr;
+               hb_dynsymUnlock();
             }
             else
             {
                char szName[21];
+
+               hb_dynsymUnlock();
 
                strncpy( szName, pSymRead[ ul ].szName, 20 );
 
@@ -592,6 +595,7 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
    {
       PHB_DYNS pDyn;
 
+      hb_dynsymLock();
       pDyn = hb_dynsymFind( pHrbBody->pDynFunc[ ul ].szName );
 
       if( pDyn && pDyn->pFunPtr && pDyn->pFunPtr == pHrbBody->pDynFunc[ ul ].pAsmCall->pFunPtr )
@@ -601,6 +605,7 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
          pDyn->pFunPtr = NULL;
          pDyn->pSymbol->pFunPtr = NULL;
       }
+      hb_dynsymUnlock();
 
       hb_xfree( pHrbBody->pDynFunc[ ul ].pAsmCall->pAsmData );
       hb_xfree( pHrbBody->pDynFunc[ ul ].pAsmCall );

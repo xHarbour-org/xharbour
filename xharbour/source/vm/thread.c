@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.137 2003/12/06 17:40:53 jonnymind Exp $
+* $Id: thread.c,v 1.138 2003/12/06 17:48:30 jonnymind Exp $
 */
 
 /*
@@ -738,13 +738,19 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
 
 
    // call errorsys() to initialize errorblock
+   hb_dynsymLock();
    pExecSym = hb_dynsymFind( "ERRORSYS" );
 
    if( pExecSym )
    {
       hb_vmPushSymbol( pExecSym->pSymbol );
+      hb_dynsymUnlock();
       hb_vmPushNil();
       hb_vmDo(0);
+   }
+   else
+   {
+      hb_dynsymLock();
    }
 
    if( _pStack_->bIsMethod )
@@ -1242,11 +1248,13 @@ HB_FUNC( STARTTHREAD )
    if ( pPointer->type == HB_IT_LONG )
    {
       pFunc =  (PHB_FUNC) hb_itemGetNL( pPointer );
+      hb_dynsymLock();
       pExecSym = hb_dynsymFindFromFunction( pFunc );
 
       if( pExecSym == NULL )
       {
-         hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "StartThread", 1, hb_paramError( 1 ) );
+         hb_dynsymUnlock();
+         hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "STARTTHREAD", 1, hb_paramError( 1 ) );
          hb_itemRelease( pArgs );
          return;
       }
@@ -1254,6 +1262,7 @@ HB_FUNC( STARTTHREAD )
       // Converting it to its Symbol.
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
+      hb_dynsymUnlock();
    }
    /* Is it an object? */
    else if( hb_pcount() >= 2 && pPointer->type == HB_IT_OBJECT )
@@ -1294,10 +1303,12 @@ HB_FUNC( STARTTHREAD )
    /* Is it a function name? */
    else if( pPointer->type == HB_IT_STRING )
    {
+      hb_dynsymLock();
       pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pPointer ) );
 
       if( ! pExecSym )
       {
+         hb_dynsymUnlock();
          hb_errRT_BASE( EG_NOFUNC, 1001, NULL, hb_itemGetCPtr( pPointer ), 1, pArgs );
          hb_itemRelease( pArgs );
          return;
@@ -1305,6 +1316,7 @@ HB_FUNC( STARTTHREAD )
 
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
+      hb_dynsymUnlock();
    }
    /* Is it a code block? */
    else if( pPointer->type != HB_IT_BLOCK )

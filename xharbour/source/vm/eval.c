@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.11 2003/11/11 20:20:55 ronpinkas Exp $
+ * $Id: eval.c,v 1.12 2003/11/18 00:57:26 fsgiudice Exp $
  */
 
 /*
@@ -135,7 +135,12 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
 
       if( HB_IS_STRING( pEvalInfo->pItems[ 0 ] ) )
       {
-         hb_vmPushSymbol( hb_dynsymFindName( hb_itemGetCPtr( pEvalInfo->pItems[ 0 ] ) )->pSymbol );
+         char *ptr = hb_itemGetCPtr( pEvalInfo->pItems[ 0 ] );
+
+         hb_dynsymLock();
+         hb_vmPushSymbol( hb_dynsymFindName( ptr )->pSymbol );
+         hb_dynsymUnlock();
+
          hb_vmPushNil();
 
          while( uiParam <= pEvalInfo->paramCount )
@@ -221,13 +226,18 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
    {
       if( HB_IS_STRING( pItem ) )
       {
-         PHB_DYNS pDynSym = hb_dynsymFindName( hb_itemGetCPtr( pItem ) );
+         PHB_DYNS pDynSym;
+         char *ptr = hb_itemGetCPtr( pItem );
+
+         hb_dynsymLock();
+         pDynSym = hb_dynsymFindName( ptr );
 
          if( pDynSym )
          {
             ULONG ulParam;
 
             hb_vmPushSymbol( pDynSym->pSymbol );
+            hb_dynsymUnlock();
             hb_vmPushNil();
 
             if( ulPCount )
@@ -249,6 +259,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
          }
          else
          {
+            hb_dynsymUnlock();
             pResult = NULL;
          }
       }
@@ -327,13 +338,17 @@ PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
 
    if( szFunc )
    {
-      PHB_DYNS pDynSym = hb_dynsymFindName( szFunc );
+      PHB_DYNS pDynSym;
+
+      hb_dynsymLock();
+      pDynSym = hb_dynsymFindName( szFunc );
 
       if( pDynSym )
       {
          ULONG ulParam;
 
          hb_vmPushSymbol( pDynSym->pSymbol );
+         hb_dynsymUnlock();
          hb_vmPushNil();
 
          if( ulPCount )
@@ -355,6 +370,7 @@ PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
       }
       else
       {
+         hb_dynsymUnlock();
          pResult = NULL;
       }
    }
@@ -461,7 +477,14 @@ HB_FUNC( HB_EXECFROMARRAY )
       {
          pFunc = (PHB_FUNC) hb_itemGetNL( pString );
       }
+
+      hb_dynsymLock();
       pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
+      if ( pExecSym )
+      {
+         hb_vmPushSymbol( pExecSym->pSymbol );
+      }
+      hb_dynsymUnlock();
    }
    else if( HB_IS_OBJECT( pFirst ) && uiPcount == 3) /* hb_ExecFromArray( oObject, cMessage | pMessage, { params,... } )  */
    {
@@ -476,27 +499,57 @@ HB_FUNC( HB_EXECFROMARRAY )
       {
          pFunc = (PHB_FUNC) hb_itemGetNL( pString );
       }
+      hb_dynsymLock();
       pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
+      if ( pExecSym )
+      {
+         hb_vmPushSymbol( pExecSym->pSymbol );
+      }
+      hb_dynsymUnlock();
       pArgs = hb_param( 3, HB_IT_ARRAY );
    }
    else if( pFirst->type == HB_IT_STRING && uiPcount == 1) /* hb_ExecFromArray( cFunc )  */
    {
+      hb_dynsymLock();
       pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pFirst ) );
+      if ( pExecSym )
+      {
+         hb_vmPushSymbol( pExecSym->pSymbol );
+      }
+      hb_dynsymUnlock();
    }
    else if( pFirst->type == HB_IT_STRING && uiPcount == 2) /* hb_ExecFromArray( cFunc, { params,... } )  */
    {
+      hb_dynsymLock();
       pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pFirst ) );
+      if ( pExecSym )
+      {
+         hb_vmPushSymbol( pExecSym->pSymbol );
+      }
+      hb_dynsymUnlock();
       pArgs = hb_param( 2, HB_IT_ARRAY );
    }
    else if( pFirst->type == HB_IT_LONG && uiPcount == 1)   /* hb_ExecFromArray( pFunc )  */
    {
       pFunc = (PHB_FUNC) hb_itemGetNL( pFirst );
+      hb_dynsymLock();
       pExecSym = hb_dynsymFindFromFunction( pFunc );
+      if ( pExecSym )
+      {
+         hb_vmPushSymbol( pExecSym->pSymbol );
+      }
+      hb_dynsymUnlock();
    }
    else if( pFirst->type == HB_IT_LONG && uiPcount == 2)   /* hb_ExecFromArray( pFunc, { params,... } )  */
    {
       pFunc = (PHB_FUNC) hb_itemGetNL( pFirst );
+      hb_dynsymLock();
       pExecSym = hb_dynsymFindFromFunction( pFunc );
+      if ( pExecSym )
+      {
+         hb_vmPushSymbol( pExecSym->pSymbol );
+      }
+      hb_dynsymUnlock();
       // prepare stack to launch the function
       pArgs = hb_param( 2, HB_IT_ARRAY );
    }
@@ -538,18 +591,36 @@ HB_FUNC( HB_EXECFROMARRAY )
          {
             pFunc = (PHB_FUNC) hb_itemGetNL( pString );
          }
+         hb_dynsymLock();
          pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
+         if ( pExecSym )
+         {
+            hb_vmPushSymbol( pExecSym->pSymbol );
+         }
+         hb_dynsymUnlock();
          ulStart = 3;
       }
       else if( pString->type == HB_IT_STRING )
       {
+         hb_dynsymLock();
          pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pString ) );
+         if ( pExecSym )
+         {
+            hb_vmPushSymbol( pExecSym->pSymbol );
+         }
+         hb_dynsymUnlock();
          ulStart = 2;
       }
       else if( pString->type == HB_IT_LONG )
       {
          pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+         hb_dynsymLock();
          pExecSym = hb_dynsymFindFromFunction( pFunc );
+         if ( pExecSym )
+         {
+            hb_vmPushSymbol( pExecSym->pSymbol );
+         }
+         hb_dynsymUnlock();
          ulStart = 2;
       }
       else if ( HB_IS_BLOCK( pString ) )
@@ -573,7 +644,6 @@ HB_FUNC( HB_EXECFROMARRAY )
       return;
    }
 
-   hb_vmPushSymbol( pExecSym->pSymbol );
    if ( pSelf )
    {
       hb_vmPush( pSelf );
@@ -648,18 +718,38 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
       {
          pFunc = (PHB_FUNC) hb_itemGetNL( pString );
       }
+
+      hb_dynsymLock();
       pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
+      if ( pExecSym )
+      {
+         hb_vmPushSymbol( pExecSym->pSymbol );
+      }
+      hb_dynsymUnlock();
+
       ulStart = 3;
    }
    else if( pString->type == HB_IT_STRING )
    {
+      hb_dynsymLock();
       pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pString ) );
+      if ( pExecSym )
+      {
+         hb_vmPushSymbol( pExecSym->pSymbol );
+      }
+      hb_dynsymUnlock();
       ulStart = 2;
    }
    else if( pString->type == HB_IT_LONG )
    {
       pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+      hb_dynsymLock();
       pExecSym = hb_dynsymFindFromFunction( pFunc );
+      if ( pExecSym )
+      {
+         hb_vmPushSymbol( pExecSym->pSymbol );
+      }
+      hb_dynsymUnlock();
       ulStart = 2;
    }
    else if ( HB_IS_BLOCK( pString ) )
@@ -687,7 +777,6 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
    }
    else
    {
-      hb_vmPushSymbol( pExecSym->pSymbol );
       if ( pSelf )
       {
          hb_vmPush( pSelf );
@@ -734,6 +823,8 @@ HB_FUNC( HB_EXEC )
       PHB_DYNS pExecSym = NULL;
       int iParams;
 
+      hb_dynsymLock();
+
       if( hb_pcount() >= 2 )
       {
          if( HB_IS_OBJECT( *( HB_VM_STACK.pBase + 1 + 2 ) ) )
@@ -762,6 +853,7 @@ HB_FUNC( HB_EXEC )
 
       if( pExecSym == NULL )
       {
+         hb_dynsymUnlock();
          hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_Exec", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
          return;
       }
@@ -772,6 +864,8 @@ HB_FUNC( HB_EXEC )
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
       pPointer->item.asSymbol.stackbase = hb_stackTopOffset() - 2 - iParams;
+
+      hb_dynsymUnlock();
 
       if( pSelf )
       {

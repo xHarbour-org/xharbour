@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.101 2003/11/30 12:32:29 druzus Exp $
+ * $Id: hbapi.h,v 1.102 2003/12/06 15:33:39 jonnymind Exp $
  */
 
 /*
@@ -454,6 +454,13 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCase_r( char * szName, PHB_DYNS pDest );
 PHB_DYNS HB_EXPORT hb_dynsymFind_r( char * szName, PHB_DYNS pDest );
 PHB_DYNS HB_EXPORT hb_dynsymFindName_r( char * szName, PHB_DYNS pDest );
 PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction_r( PHB_FUNC pFunc, PHB_DYNS pDest );
+#else
+#define hb_dynsymNew_r( a, b )      hb_dynsymNew( a )
+#define hb_dynsymGet_r( a, b )      hb_dynsymGet( a )
+#define hb_dynsymGetCase_r( a, b )  hb_dynsymGetCase( a )
+#define hb_dynsymFind_r( a, b )     hb_dynsymFind( a )
+#define hb_dynsymFindName_r( a, b ) hb_dynsymFindName( a )
+#define hb_dynsymFindFromFunction_r( a, b ) hb_dynsymFindFromFunction( a )
 #endif
 
 /* Command line and environment argument management */
