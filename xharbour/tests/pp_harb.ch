@@ -110,6 +110,12 @@
            ::nNextStartProc := nProcID + 1
         ENDIF
 
+        IF Empty( ::cName )
+           PP_ModuleName( "" )
+        ELSE
+           PP_ModuleName( ::cName )
+        ENDIF
+
         ::cPPed += PP_PreProText( ::cText, ::acPPed, .T., .F., ::nStartLine, ::cName )
         nLines  := Len( ::acPPed )
 

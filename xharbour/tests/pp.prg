@@ -387,7 +387,7 @@ STATIC s_nProcId := 0, s_aProcedures := {}, s_xRet, s_nIfLevel := 0, ;
 STATIC s_asPrivates := {}, s_asPublics := {}, s_asLocals := {}, ;
        s_asStatics := {}, s_aParams := {}
 
-STATIC s_sModule, s_aInitExit := { {}, {} }
+STATIC s_sModule := "", s_aInitExit := { {}, {} }
 
 STATIC s_nCompIf := 0,  s_nCompLoop := 0, s_aIfJumps := {}, s_aLoopJumps := {}
 STATIC s_acFlowType := {},  s_nFlowId := 0
