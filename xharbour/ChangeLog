@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.109 2002/03/15 15:57:44 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.110 2002/03/15 21:16:59 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,7 +11,7 @@
 2002-03-15 13:15 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hberrors.h
   * source/compiler/hbgenerr.c
-    + Added #define HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE 53 -> "Optimized local [%s] out of range, after offseting %s PARAMTERS."
+    + Added #define HB_COMP_ERR_OPTIMIZEDLOCAL_OUT_OF_RANGE 53 -> "Optimized local [%s] out of range, after offsetting %s PARAMETERS."
 
   * source/compiler/hbfix.c
     + Added hb_p_localnearaddint, hb_p_localnearsetint, and hb_p_localnearsetstr
