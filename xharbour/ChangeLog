@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1043 2003/05/23 09:46:31 lculik Exp $
+ * $Id: ChangeLog,v 1.1044 2003/05/24 00:29:06 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -33,6 +33,8 @@
   * source/vm/hvm.c
   * include/hbvm.h
     + Added new char * hb_vmGetModuleName( void )
+    + Added new PSYMBOLS hb_vmFindModule( PHB_SYMB pModuleSymbols );
+    + Added new PSYMBOLS hb_vmFindModuleByName( char *szModuleName );
 
   * source/vm/hvm.c
     * Added logic to set HB_VM_STACK.pModuleSymbols with passed pSymbols in hb_vmExecute()

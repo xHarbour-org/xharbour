@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.197 2003/05/23 03:27:08 ronpinkas Exp $
+ * $Id: hvm.c,v 1.198 2003/05/24 00:29:10 ronpinkas Exp $
  */
 
 /*
@@ -229,6 +229,7 @@ ULONG hb_ulOpcodesCalls[ HB_P_LAST_PCODE ]; /* array to profile opcodes calls */
 ULONG hb_ulOpcodesTime[ HB_P_LAST_PCODE ]; /* array to profile opcodes consumed time */
 
 PSYMBOLS hb_vmFindModule( PHB_SYMB pModuleSymbols );
+PSYMBOLS hb_vmFindModuleByName( char *szModuleName );
 
 /* virtual machine state */
 
