@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3827 2005/02/16 00:34:36 guerra000 Exp $
+ * $Id: ChangeLog,v 1.3828 2005/02/16 17:19:08 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-16 16:55 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/simplex.c
+    * Moved RESET_LEX() above #include LEX_RULES to make it usable by lexical definition sources.
+  * source/macro/macro.slx
+    * Use RESET_LEX() hb_compFlexNew() instead of hard coded reset.
+
+  /* Above fixes macro compilation error, when last macro processed errored
+     on a non terminated literal. */
 
 2005-02-16 11:15 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/teditor.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.19 2004/11/21 21:43:47 druzus Exp $
+ * $Id: macro.slx,v 1.20 2005/01/09 01:41:05 ronpinkas Exp $
  */
 
 /*
@@ -212,26 +212,26 @@ LANGUAGE_RULES_ARE {
    #undef INTERCEPT_ACTION
    	#define INTERCEPT_ACTION(x) \
          if( x == IDENTIFIER ) \
-           printf( "   IDENTIFIER = \"%s\"\n", pYYLVAL->string  ); \
+           TraceLog( NULL, "   IDENTIFIER = \"%s\"\n", pYYLVAL->string  ); \
          else if( x == LITERAL ) \
-           printf( "   LITERAL = \"%s\"\n", pYYLVAL->string  ); \
+           TraceLog( NULL, "   LITERAL = \"%s\"\n", pYYLVAL->string  ); \
          else if( x == MACROVAR ) \
-           printf( "   MACROVAR = \"%s\"\n", pYYLVAL->string  ); \
+           TraceLog( NULL, "   MACROVAR = \"%s\"\n", pYYLVAL->string  ); \
          else if( x == MACROTEXT ) \
-           printf( "   MACROTEXT = \"%s\"\n", pYYLVAL->string  ); \
+           TraceLog( NULL, "   MACROTEXT = \"%s\"\n", pYYLVAL->string  ); \
          else if( x == NUM_LONG ) \
-           printf( "   INTEGER = %li\n", pYYLVAL->valLong.lNumber  ); \
+           TraceLog( NULL, "   INTEGER = %li\n", pYYLVAL->valLong.lNumber  ); \
          else if( x == NUM_DOUBLE ) \
-           printf( "   DOUBLE = %f\n", pYYLVAL->valDouble.dNumber  ); \
+           TraceLog( NULL, "   DOUBLE = %f\n", pYYLVAL->valDouble.dNumber  ); \
          else if( x < 256 ) \
            if( x == '\n' || x == ';' ) \
-              printf( "                  NEW LINE %i\n", hb_comp_iLine - 1  ); \
+              TraceLog( NULL, "                  NEW LINE %i\n", hb_comp_iLine - 1  ); \
            else if( iRet == -1 ) \
-              printf( "!!!<EOF>\n" ); \
+              TraceLog( NULL, "!!!<EOF>\n" ); \
            else \
-              printf( "   DELIMITER = \"%c\"\n", x  ); \
+              TraceLog( NULL, "   DELIMITER = \"%c\"\n", x  ); \
          else \
-           printf( "   TOKEN = %i\n", x  );
+           TraceLog( NULL, "   TOKEN = %i\n", x  );
 #endif
 
 #undef ELEMENT_TOKEN
@@ -400,7 +400,7 @@ void * hb_compFlexNew( HB_MACRO_PTR pNewMacro )
    pYYLVAL = NULL;
    pMacro = pNewMacro;
 
-   { iLastToken = 0; iLen = 0; iHold = 0; iReturn = 0; bNewLine = TRUE; bIgnoreWords = FALSE; }
+   RESET_LEX()
 
    DEBUG_INFO( printf( "*** New Macro: >>>%s<<< Len: %i\n", pMacro->string, pMacro->length ) );
    //TraceLog( NULL, "*** New Macro: >>>%s<<< Len: %i\n", pMacro->string, pMacro->length );

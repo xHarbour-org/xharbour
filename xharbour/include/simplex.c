@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.10 2004/05/09 02:54:28 ronpinkas Exp $
+ * $Id: simplex.c,v 1.11 2004/05/09 20:51:15 ronpinkas Exp $
  */
 
 /*
@@ -173,6 +173,8 @@ static BOOL bNewLine = TRUE, bStart = TRUE;
 char * yytext = (char *) sToken;
 int yyleng;
 
+#define RESET_LEX() { iLen = 0; iHold = 0; iReturn = 0; bNewLine = TRUE; bIgnoreWords = FALSE; iPairToken = 0; }
+
 /* Above are NOT overidable !!! Need to precede the Language Definitions. */
 
 /* --------------------------------------------------------------------------------- */
@@ -272,7 +274,6 @@ static int rulecmp( const void * pLeft, const void * pRight );
 #define LEX_PAIR_SIZE ( sizeof( LEX_PAIR ) )
 #define IF_TOKEN_READY()  if( iReturn )
 #define IF_TOKEN_ON_HOLD()  if( iHold )
-#define RESET_LEX() { iLen = 0; iHold = 0; iReturn = 0; bNewLine = TRUE; bIgnoreWords = FALSE; }
 #define FORCE_REDUCE() Reduce( 0 )
 
 #define HOLD_TOKEN(x) PUSH_TOKEN(x)
