@@ -1,5 +1,5 @@
 /*
- * $Id: at.c,v 1.8 2004/07/01 14:45:32 paultucker Exp $
+ * $Id: at.c,v 1.9 2004/10/04 15:42:19 ronpinkas Exp $
  */
 
 /*
@@ -87,7 +87,7 @@
        if( pText && pSub )
        {
           LONG lStart = pStart ? hb_itemGetNL( pStart ) : 1;
-          LONG lEnd = pEnd ? hb_itemGetNL( pEnd ) : pText->item.asString.length;
+          LONG lEnd = pEnd ? hb_itemGetNL( pEnd ) : ( LONG ) pText->item.asString.length;
           ULONG ulPos;
 
           if( lStart < 0 )
@@ -109,7 +109,7 @@
              lEnd += pText->item.asString.length + 1;
           }
 
-          if( lEnd > pText->item.asString.length )
+          if( lEnd > ( LONG ) pText->item.asString.length )
           {
              lEnd = pText->item.asString.length;
           }

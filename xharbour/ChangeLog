@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3495 2004/10/13 20:03:49 oh1 Exp $
+ * $Id: ChangeLog,v 1.3496 2004/10/14 17:10:55 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-14 19:45 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * use hb_fsFNameMerge()  for creating final file name instead
+      of doing the job inside DBFCDX - it could be platform dependent
+      and only hb_fsFNameMerge() may know about necessary hacks.
+
+  * xharbour/source/rtl/at.c
+    * casting to avoid warnings
 
 2004-10-14 19:05 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
