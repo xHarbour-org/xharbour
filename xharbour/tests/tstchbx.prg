@@ -1,5 +1,5 @@
 /*
- * $Id: tstchbx.prg,v 1.2 2003/09/19 17:05:49 ronpinkas Exp $
+ * $Id: tstchbx.prg,v 1.3 2004/02/15 19:11:55 jonnymind Exp $
  */
 
 #include "inkey.ch"
@@ -13,10 +13,10 @@ function Main
 
    SET EVENTMASK TO INKEY_ALL
 
-   aitems[1]:=RADIOBUTTO( 3,3,"&Windows NT/2000")
-   aitems[2]:=RADIOBUTTO( 4,3,"W&indows 9x")
-   aitems[3]:=RADIOBUTTO( 5,3,"&Linux")
-   aitems[4]:=RADIOBUTTO( 6,3,"&Mac OS")
+   aitems[1]:=RadioButton( 3,3,"&Windows NT/2000")
+   aitems[2]:=RadioButton( 4,3,"W&indows 9x")
+   aitems[3]:=RadioButton( 5,3,"&Linux")
+   aitems[4]:=RadioButton( 6,3,"&Mac OS")
 
    cls
    Setcolor('w/b+,r/b,g+/r,b+/r+,bg/n+,w/bg,rb/bg')

@@ -1,5 +1,5 @@
 /*
- * $Id: radiobtn.prg,v 1.1.1.1 2001/12/21 10:41:48 ronpinkas Exp $
+ * $Id: radiobtn.prg,v 1.2 2003/11/21 13:22:35 lculik Exp $
  */
 
 /*
@@ -212,7 +212,7 @@ METHOD IsAccel( xValue )  CLASS HBRadioButton
    endif
    return .F.
 
-METHOD HITTESt( nRow, nCol )  CLASS HBRadioButton
+METHOD HitTest( nRow, nCol )  CLASS HBRadioButton
 
    local nPos, nLen
    if ( nRow != ::Row )
@@ -246,12 +246,21 @@ METHOD SetData(Arg1) CLASS HBRadioButton
    return ::pData
 
 function RADIOBUTTO( nRow, nCol,cCaption,xData)
-
    default cCaption to ""
    if ( ( ISNUMBER( nRow ) ) ) .and. ( ( ISNUMBER( nCol ) ) )
      Return  HBRadioButton():New(nRow, nCol,cCaption,xData)
    endif
 return nil
+
+#ifdef HB_EXTENSION
+FUNCTION RadioButton( nRow, nCol,cCaption,xData)
+   DEFAULT cCaption TO ""
+   IF ( ( ISNUMBER( nRow ) ) ) .and. ( ( ISNUMBER( nCol ) ) )
+     RETURN  HBRadioButton():New(nRow, nCol,cCaption,xData)
+   ENDIF
+RETURN nil
+#endif
+
 
 /** Return the Caption Letter of an Given Caption String */
 function __CAPTION( cCaption )

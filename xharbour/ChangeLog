@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2293 2004/02/15 15:57:26 jonnymind Exp $
+ * $Id: ChangeLog,v 1.2294 2004/02/15 19:11:53 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-15 21:12 UTC+0100 Giancarlo Niccolai <gc@niccolai.ws>
+  * source/rtl/radiobtn.prg
+    ! Added function RadioButton() beside RadioButto() under HB_EXTENSION
+
+  * tests/tstchbx.prg
+    ! RadioButto() changed in RadioButton()
 
 2004-02-15 20:13 UTC+0100 Giancarlo Niccolai <gc@niccolai.ws>
   * source/rtl/checkbox.prg
