@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.89 2004/12/31 11:56:09 druzus Exp $
+ * $Id: dbfntx1.c,v 1.90 2005/01/22 11:32:05 druzus Exp $
  */
 
 /*
@@ -1602,7 +1602,7 @@ static void hb_ntxTagBalance( LPTAGINFO pTag, int level )
         else
         {
            pPagePair = hb_ntxPageLoad( pTag, KEYITEM( pPageParent, pairkey )->page );
-           if( pPageParent->uiKeys == 1 &&
+           if( pPageParent->uiKeys == 1 && pPage->uiKeys && pPagePair->uiKeys &&
                  ( pPage->uiKeys + pPagePair->uiKeys ) > pTag->MaxKeys - 2 )
            {
               hb_ntxPageRelease( pTag,pPageParent );
@@ -1633,7 +1633,7 @@ static void hb_ntxTagBalance( LPTAGINFO pTag, int level )
          else
          {
            pPagePair = hb_ntxPageLoad( pTag, KEYITEM( pPageParent, pairkey )->page );
-           if( pPageParent->uiKeys == 1 &&
+           if( pPageParent->uiKeys == 1 && pPage->uiKeys  && pPagePair->uiKeys &&
                  ( pPage->uiKeys + pPagePair->uiKeys ) > pTag->MaxKeys - 2 )
            {
               hb_ntxPageRelease( pTag,pPageParent );
@@ -1884,6 +1884,7 @@ static void hb_ntxTagKeyAdd( LPTAGINFO pTag, LPKEYINFO pKey )
       pPage->uiKeys = 1;
       KEYITEM( pPage, 0 )->rec_no = pKey->Xtra;
       memcpy( KEYITEM( pPage, 0 )->key, pKey->key,pTag->KeyLength );
+      KEYITEM( pPage, 1 )->page = 0;
       pPage->Changed = TRUE;
    }
    else

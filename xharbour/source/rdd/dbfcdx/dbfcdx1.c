@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.175 2005/01/19 23:36:34 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.176 2005/01/22 11:32:04 druzus Exp $
  */
 
 /*
@@ -7929,27 +7929,30 @@ static void hb_cdxSortOrderPages( LPCDXSORTINFO pSort )
    pSort->pSortedPages = ( ULONG * ) hb_xgrab( pSort->ulPages * sizeof( ULONG ) );
    pSort->pSortedPages[ 0 ] = 0;
 
-   for ( n = 0; n < pSort->ulPages; n++ )
+   if ( pSort->ulTotKeys > 0 )
    {
-      hb_cdxSortGetPageKey( pSort, n, &pKey, &ulRec );
-      l = 0;
-      r = n - 1;
-      while ( l <= r )
+      for ( n = 0; n < pSort->ulPages; n++ )
       {
-         m = ( l + r ) >> 1;
-         ulPage = pSort->pSortedPages[ m ];
-         pTmp = &pSort->pSwapPage[ ulPage ].pKeyPool[ pSort->pSwapPage[ ulPage ].ulCurKey * ( iLen + 4 ) ];
-         i = hb_cdxValCompare( pSort->pTag, pKey, iLen, pTmp, iLen, TRUE );
-         if ( i == 0 )
-            i = ( ulRec < HB_GET_LE_UINT32( &pTmp[ iLen ] ) ) ? -1 : 1;
-         if ( i > 0 )
-            l = m + 1;
-         else
-            r = m - 1;
-      }
-      for ( r = n; r > l; r-- )
+         hb_cdxSortGetPageKey( pSort, n, &pKey, &ulRec );
+         l = 0;
+         r = n - 1;
+         while ( l <= r )
+         {
+            m = ( l + r ) >> 1;
+            ulPage = pSort->pSortedPages[ m ];
+            pTmp = &pSort->pSwapPage[ ulPage ].pKeyPool[ pSort->pSwapPage[ ulPage ].ulCurKey * ( iLen + 4 ) ];
+            i = hb_cdxValCompare( pSort->pTag, pKey, iLen, pTmp, iLen, TRUE );
+            if ( i == 0 )
+               i = ( ulRec < HB_GET_LE_UINT32( &pTmp[ iLen ] ) ) ? -1 : 1;
+            if ( i > 0 )
+               l = m + 1;
+            else
+               r = m - 1;
+         }
+         for ( r = n; r > l; r-- )
          pSort->pSortedPages[ r ] = pSort->pSortedPages[ r - 1 ];
-      pSort->pSortedPages[ l ] = n;
+         pSort->pSortedPages[ l ] = n;
+      }
    }
 }
 

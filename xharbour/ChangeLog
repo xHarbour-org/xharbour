@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3765 2005/01/22 16:13:53 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3766 2005/01/22 18:38:29 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-01-23 12:21 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * last Alexander's fixes to DBFNTX
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * fixed indexing error when created index is empty due
+      in nonempty DBFs due to used FOR or WHILE expression
 
 2005-01-22 19:35 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * xharbour/makallbc.bat
