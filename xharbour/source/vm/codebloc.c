@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.27 2003/09/04 01:03:46 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.28 2003/09/07 23:12:15 ronpinkas Exp $
  */
 
 /*
@@ -132,14 +132,6 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
              * In this case we have to copy the current value to a global memory
              * pool so it can be shared by codeblocks
              */
-
-            #ifndef HB_ARRAY_USE_COUNTER
-               if( HB_IS_ARRAY( pLocal ) )
-               {
-                  //TraceLog( NULL, "Detached: %p from %p to %p\n", pLocal->item.asArray.value, pLocal, pCBlock->pLocals + ui );
-                  hb_arrayResetHolder( pLocal->item.asArray.value, pLocal, pCBlock->pLocals + ui );
-               }
-            #endif
 
             hMemvar = hb_memvarValueNew( pLocal, FALSE );
 
