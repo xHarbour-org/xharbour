@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.134 2002/11/19 21:00:25 what32 Exp $
+ * $Id: xide.prg,v 1.135 2002/11/20 06:03:15 what32 Exp $
  */
 
 /*
@@ -50,6 +50,7 @@ GLOBAL ObjEdit
 
 FUNCTION Main
    local oSplash
+ 
    
    Application():Initialize()
 
@@ -63,7 +64,7 @@ FUNCTION Main
          :SetStyle( WS_THICKFRAME, .F. )
          :SetStyle( WS_MAXIMIZEBOX, .F. )
 
-//         :MainMenu()
+         :MainMenu()
          :MainToolBar()
          :MainStatusBar()
 
@@ -78,7 +79,7 @@ FUNCTION Main
       END
       
       MainForm:Update()
-      
+
       :Run()
   END
   
@@ -107,25 +108,38 @@ ENDCLASS
 
 METHOD MainMenu() CLASS MainForm
 
-   LOCAL oPopup, oMenuItem
+   LOCAL oItem, oSubItem, oMenu
 
-   ::WindowMenu := TMainMenu():Create( Self ) //TMenu():New()
+   oMenu := TMainMenu():Create( Self )
+   oMenu:GetHandle()
 
-   oPopup := TMenuItem():Create( ::WindowMenu )
+      oItem := TMenuItem():Create( oMenu )
+      oItem:Caption := "File"
+      oItem:AppendTo( oMenu )
+   
+         oSubItem := TMenuItem():Create( oItem )
+         oSubItem:Caption := "New"
+         oItem:Add( oSubItem )
+
+      oMenu:Items:Add( oItem )
+   
+
+   ::SetMenu( oMenu )
+/*
    oPopup:Caption := "File"
-
    oPopup:AppendTo( ::WindowMenu:Handle )
-
+*/
+/*
    oMenuItem := TMenuItem():Create( oPopup )
    oMenuItem:Caption := "Editor"
-   oMenuItem:Command := 101
-   oMenuItem:OnClick := {||Application:CreateForm( TFormEdit(), @FormEdit ) }
+//   oMenuItem:Command := 101
+//   oMenuItem:OnClick := {||Application:CreateForm( TFormEdit(), @FormEdit ) }
    oMenuItem:AppendTo( oPopup:Handle )
 
    oMenuItem := TMenuItem():Create( oPopup )
    oMenuItem:Caption := "Open"
-   oMenuItem:Command := 102
-   oMenuItem:OnClick := {|| OpenProject():Create() }
+//   oMenuItem:Command := 102
+//   oMenuItem:OnClick := {|| OpenProject():Create() }
    oMenuItem:AppendTo( oPopup:Handle )
 
    oMenuItem := TMenuItem():Create( Self )
@@ -134,8 +148,8 @@ METHOD MainMenu() CLASS MainForm
 
    oMenuItem := TMenuItem():Create( oPopup )
    oMenuItem:Caption := "Exit"
-   oMenuItem:Command := 200
-   oMenuItem:OnClick := {||MainForm:PostMessage( WM_SYSCOMMAND, SC_CLOSE )}
+//   oMenuItem:Command := 200
+//   oMenuItem:OnClick := {||MainForm:PostMessage( WM_SYSCOMMAND, SC_CLOSE )}
    oMenuItem:AppendTo( oPopup:Handle )
 
    //With Object ::WindowMenu
@@ -148,8 +162,8 @@ METHOD MainMenu() CLASS MainForm
    //   end
    //end
    //::SetWindowMenu()
-
-return(self)
+*/
+RETURN Self
 
 //----------------------------------------------------------------------------------------------
 

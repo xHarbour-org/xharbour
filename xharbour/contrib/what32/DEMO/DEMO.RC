@@ -1,4 +1,4 @@
-//1 24 "demo.Manifest"
+1 24 "demo.Manifest"
 #define MENU_2 2
 #define CM_POPUPITEM 101
 0DEMO ICON "demo.ico"

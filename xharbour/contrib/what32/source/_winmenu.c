@@ -301,13 +301,11 @@ HB_FUNC( ENDMENU )
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI InsertMenuItemA( IN HMENU, IN UINT, IN BOOL, IN LPCMENUITEMINFOA );
 
-/*
+
 
 HB_FUNC( INSERTMENUITEM )
 {
-   LPCMENUITEMINFOA lpcmenuitemInfoa ;
-
-   // Your code goes here
+   LPCMENUITEMINFOA lpcmenuitemInfoa =(LPCMENUITEMINFOA) hb_param( 4, HB_IT_STRING )->item.asString.value;
 
    hb_retl( InsertMenuItem( (HMENU) hb_parnl( 1 ),
                             (UINT) hb_parni( 2 ) ,
@@ -316,7 +314,7 @@ HB_FUNC( INSERTMENUITEM )
                           ) ) ;
 }
 
-*/
+
 
 //-----------------------------------------------------------------------------
 // WINUSERAPI BOOL WINAPI GetMenuItemInfoA( IN HMENU, IN UINT, IN BOOL, IN OUT LPMENUITEMINFOA );

@@ -31,18 +31,28 @@
 #include "hbclass.ch"
 #include "what32.ch"
 #include "classex.ch"
+#include "debug.ch"
 
 *-----------------------------------------------------------------------------*
 
 CLASS TMenu FROM TComponent
 
    DATA Popup  AS OBJECT
-
-   PROPERTY Items READ FItems
-   PROPERTY OnChange READ FOnChange
+   DATA FOwnerDraw INIT .F.
+   
+   PROPERTY Items        READ FItems
+   PROPERTY OnChange     READ FOnChange
+   PROPERTY Handle       READ GetHandle
+   PROPERTY WindowHandle READ FWindowHandle WRITE SetWindowHandle
+   PROPERTY OwnerDraw    READ FOwnerDraw
+   PROPERTY Images       READ FImages
 
    METHOD Create() CONSTRUCTOR
    METHOD GetHandle()
+   METHOD SetWindowHandle()
+   METHOD UpdateImage()
+   METHOD IsOwnerDraw()
+
    METHOD AddPopUp()
    METHOD Set()
    METHOD GetItem(nId)
@@ -55,13 +65,57 @@ CLASS TMenu FROM TComponent
 
 ENDCLASS
 
+METHOD SetWindowHandle( Value ) CLASS TMenu
+
+  ::FWindowHandle := Value
+  ::UpdateImage()
+  
+  IF ( Value <> 0 )
+     IF ::FParentBiDiMode
+//        ::ParentBiDiModeChanged()
+     ELSE
+//        ::AdjustBiDiBehavior()
+     ENDIF
+  ENDIF
+
+RETURN NIL
+
+METHOD UpdateImage() CLASS TMenu
+/*
+var
+  Image: array[0..511] of Char;
+
+  procedure BuildImage(Menu: HMENU);
+  var
+    P, ImageEnd: PChar;
+    I, C: Integer;
+    State: Word;
+  begin
+    C := GetMenuItemCount(Menu);
+    P := Image;
+    ImageEnd := @Image[SizeOf(Image) - 5];
+    I := 0;
+    while (I < C) and (P < ImageEnd) do
+    begin
+      DoGetMenuString(Menu, I, P, ImageEnd - P, MF_BYPOSITION);
+      P := StrEnd(P);
+      State := GetMenuState(Menu, I, MF_BYPOSITION);
+      if State and MF_DISABLED <> 0 then P := StrECopy(P, '$');
+      if State and MF_MENUBREAK <> 0 then P := StrECopy(P, '@');
+      if State and MF_GRAYED <> 0 then P := StrECopy(P, '#');
+      P := StrECopy(P, ';');
+      Inc(I);
+    end;
+  end;
+*/
+RETURN NIL
+
 *-----------------------------------------------------------------------------*
 
 METHOD Create( oParent ) CLASS TMenu
 
   ::FItems := TMenuItem():Create( Self )
   ::FItems:FOnChange := HB_ObjMsgPtr( Self, "MenuChanged" )
-
   ::FItems:FMenu := Self
 
   //::FImageChangeLink := TChangeLink():Create
@@ -116,7 +170,15 @@ METHOD GetPos( nId ) CLASS TMenu
 Return( aScan( ::aItems,{|o|o:id == nId} ) )
 
 METHOD GetHandle() CLASS TMenu
+Return ::FItems:GetHandle()
 
-Return ::FItems.GetHandle
+METHOD IsOwnerDraw() CLASS TMenu
 
+   LOCAL Result 
+   
+   IF ::FOwnerDraw == NIL
+      ::FOwnerDraw := .F.
+   ENDIF
 
+   Result := ( ::OwnerDraw .OR. ::Images != NIL )
+RETURN Result

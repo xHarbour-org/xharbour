@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomForm.prg,v 1.10 2002/11/18 06:38:05 what32 Exp $
+ * $Id: TCustomForm.prg,v 1.11 2002/11/19 00:47:01 what32 Exp $
  */
 
 /*
@@ -26,12 +26,14 @@
  * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
  *
  */
+GLOBAL EXTERNAL Application
 
 #include "windows.ch"
 #include "hbclass.ch"
 #include "what32.ch"
 #include "classex.ch"
 #include "types.ch"
+#include "debug.ch"
 
 
 CLASS TCustomForm FROM TScrollingWinControl
@@ -66,14 +68,17 @@ CLASS TCustomForm FROM TScrollingWinControl
     PROPERTY AlphaBlendValue            AS NUMERIC   //: Byte;
     PROPERTY BorderIcons                TYPE TBorderIcons DEFAULT {biSystemMenu, biMinimize, biMaximize}
     PROPERTY AutoScroll                 //stored IsAutoScrollStored;
-    PROPERTY ClientHandle               AS NUMERIC //: HWND;
     PROPERTY ClientHeight               WRITE SetClientHeight //stored IsClientSizeStored;
     PROPERTY ClientWidth                WRITE SetClientWidth  //stored IsClientSizeStored;
     PROPERTY TransparentColor           AS LOGICAL
     PROPERTY TransparentColorValue      //: TColor
     PROPERTY Ctl3D                      DEFAULT TRUE
     PROPERTY DefaultMonitor             TYPE TDefaultMonitor DEFAULT dmActiveForm
-    PROPERTY FormStyle                  TYPE TFormStyle      DEFAULT fsNormal
+
+    PROPERTY Menu READ FMenu WRITE SetMenu DEFAULT TMainMenu()
+    
+    DATA ClientHandle //              AS NUMERIC //: HWND;
+    DATA FormStyle //                 TYPE TFormStyle      DEFAULT fsNormal
 //    PROPERTY Height                     //stored IsFormSizeStored;
     PROPERTY HorzScrollBar              //stored IsForm;
     PROPERTY Icon                       //: TIcon
@@ -115,7 +120,7 @@ CLASS TCustomForm FROM TScrollingWinControl
     METHOD   SetFocusedControl          VIRTUAL //(Control: TWinControl): Boolean; virtual;
     METHOD   ShowModal                  VIRTUAL //: Integer; virtual;
     METHOD   WantChildKey               VIRTUAL //(Child: TControl; var Message: TMessage): Boolean; virtual;
-/*
+
     PROPERTY Active                     AS LOGICAL  //: Boolean;
     PROPERTY ActiveControl                      //: TWinControl;
     PROPERTY Action
@@ -130,18 +135,66 @@ CLASS TCustomForm FROM TScrollingWinControl
     PROPERTY FormState                  //: TFormState;
     PROPERTY HelpFile                   AS STRING
     PROPERTY KeyPreview                 AS LOGICAL DEFAULT FALSE
-    PROPERTY Menu                       //: TMainMenu;
     PROPERTY ModalResult                //: TModalResult;
     PROPERTY Monitor                    //: TMonitor;
     PROPERTY OleFormObject              //: IOleForm;
     PROPERTY WindowState                TYPE TWindowState DEFAULT wsNormal
-*/
+
 
     METHOD SetWindowMenu( oMenu )
     METHOD RefreshMDIMenu()
 //    METHOD SetParent( oParent )
-
+    METHOD SetMenu()
 ENDCLASS
+
+METHOD SetMenu( Value )
+  LOCAL I, oForm
+
+  IF Value != NIL
+  
+     FOR EACH oForm IN Application:aForms
+     
+       IF ( oForm:Menu = Value) .AND. ( oForm != Self )
+          //raise EInvalidOperation.CreateFmt(sDuplicateMenus, [Value.Name]);
+       ENDIF
+     NEXT
+
+     IF ::FMenu != NIL
+        ::FMenu:WindowHandle := 0
+        ::FMenu := Value
+     ENDIF
+
+     IF Value != NIL 
+        Value:FreeNotification( Self )
+     ENDIF
+  
+//     IF Value != NIL .AND. ::BorderStyle != bsDialog
+   
+//        IF ! ( ::Menu:AutoMerge .OR. ( ::FormStyle == fsMDIChild ))
+
+           IF ::HandleAllocated
+              IF GetMenu( ::Handle ) != ::Menu:Handle
+                 SetMenu( ::Handle, ::Menu:Handle)
+                 Value:WindowHandle := ::Handle
+              ENDIF
+           ENDIF
+
+//        ELSEIF ::FormStyle != fsMDIChild
+//           IF ::HandleAllocated 
+//              SetMenu( ::Handle, 0 )
+//           ENDIF
+//        ENDIF
+//     ENDIF
+
+   ELSEIF ::HandleAllocated 
+      SetMenu( ::Handle, 0)
+//      IF ::Active 
+//         ::MergeMenu( TRUE )
+//      ENDIF
+      ::RefreshMDIMenu()
+   ENDIF
+
+RETURN NIL
 
 METHOD SetWindowMenu( Value ) CLASS TCustomForm
 
@@ -161,7 +214,6 @@ METHOD RefreshMDIMenu() CLASS TCustomForm
 
    LOCAL MenuHandle, WindowMenuHandle
    LOCAL Redraw
-
    IF ( ::FormStyle == fsMDIForm ) .AND. ( ::ClientHandle <> 0 )
       MenuHandle := 0
       IF ::Menu != NIL
@@ -181,7 +233,7 @@ METHOD RefreshMDIMenu() CLASS TCustomForm
          DrawMenuBar( ::Handle )
       ENDIF
    ENDIF
-
+   
 Return NIL
 /*
 METHOD SetParent( oParent ) CLASS TCustomForm

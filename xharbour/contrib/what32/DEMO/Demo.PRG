@@ -320,6 +320,7 @@ SetTimer(hWnd,1,100)
 
 //sndPlaySoundA('S_8_22.WAV',SND_ASYNC )
 
+
 DO WHILE GetMessage( @cMsg, 0, 0, 0 )
    IF !IsDialogMessage( , cMsg )
       TranslateMessage( cMsg )
@@ -895,7 +896,6 @@ DO CASE
         RETURN(0)
    CASE nMsg == WM_COMMAND
         IF nwParam == IDOK
-          // view SHBrowseForFolder(hDlg,"Installed Printers",BIF_BROWSEFORPRINTER,CSIDL_PRINTERS )
 
            EndDialog( hDlg, IDOK )
            RETURN( 0 )

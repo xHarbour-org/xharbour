@@ -38,15 +38,15 @@
 CLASS TMainMenu FROM TMenu
 
   PROTECTED:
-    METHOD   MenuChanged               virtual // override
-    METHOD   GetHandle                 virtual // override
+    METHOD   MenuChanged               VIRTUAL // override
+//    METHOD   GetHandle                 VIRTUAL // override
 
   PUBLIC:
-    METHOD   Merge                     virtual
-    METHOD   Unmerge                   virtual
-    METHOD   PopulateOle2Menu          virtual
-    METHOD   GetOle2AcceleratorTable   virtual
-    METHOD   SetOle2MenuHandle         virtual
+    METHOD   Merge                     VIRTUAL
+    METHOD   Unmerge                   VIRTUAL
+    METHOD   PopulateOle2Menu          VIRTUAL
+    METHOD   GetOle2AcceleratorTable   VIRTUAL
+    METHOD   SetOle2MenuHandle         VIRTUAL
 
   PUBLISHED:
     PROPERTY AutoHotkeys
@@ -55,7 +55,7 @@ CLASS TMainMenu FROM TMenu
     PROPERTY AutoMerge              AS LOGICAL DEFAULT FALSE
     PROPERTY Images
     PROPERTY OwnerDraw
-    PROPERTY ParentBiDiMode
+    PROPERTY ParentBiDiMode DEFAULT .F.
     PROPERTY OnChange
 
 ENDCLASS

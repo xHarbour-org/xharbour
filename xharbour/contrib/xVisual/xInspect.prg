@@ -1,5 +1,5 @@
 /*
- * $Id: xInspect.prg,v 1.69 2002/11/18 06:24:20 what32 Exp $
+ * $Id: xInspect.prg,v 1.70 2002/11/20 06:03:15 what32 Exp $
  */
 
 /*
@@ -97,13 +97,13 @@ METHOD SetBrowserData( oObj, bCurrent ) CLASS ObjInspect
 
    ENDIF
 
-
+/*
    IF oObj:ClassName == "TFORMEDIT"
       FormEdit:XFMRoot()
    ELSE
       FormEdit:XFMControl( , oObj, .F. )
    ENDIF
-
+*/
 RETURN Self
 
 //-------------------------------------------------------------------------------------------------
