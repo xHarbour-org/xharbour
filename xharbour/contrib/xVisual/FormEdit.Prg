@@ -108,10 +108,12 @@ METHOD OnMenuCommand(oItem)
 METHOD GetUniquePropName(cName)
 
    LOCAL nInd:=1
-   DO WHILE aScan( ::Controls, {|o| o:propname==cName+alltrim(str(nInd))}) > 0
+
+   DO WHILE aScan( ::Controls, {|o| o: PropName==cName+AllTrim(Str(nInd))}) > 0
       nInd++
    ENDDO
-   RETURN(cName+alltrim(str(nInd)))
+
+   RETURN(cName+AllTrim(Str(nInd)))
 
 
 //----------------------------------------------------------------------------//
