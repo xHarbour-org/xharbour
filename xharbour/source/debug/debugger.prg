@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.36 2004/05/07 12:46:07 likewolf Exp $
+ * $Id: debugger.prg,v 1.37 2004/05/07 21:38:41 likewolf Exp $
  */
 
 /*
@@ -503,6 +503,12 @@ METHOD New() CLASS TDebugger
 
    ::oPullDown      := __dbgBuildMenu( Self )
    ::oPullDown:GetItemByIdent( "ALTD" ):Checked := ::lRunAtStartup
+   ::oPullDown:GetItemByIdent( "PUBLIC" ):Checked := ::lShowPublics
+   ::oPullDown:GetItemByIdent( "PRIVATE" ):Checked := ::lShowPrivates
+   ::oPullDown:GetItemByIdent( "STATIC" ):Checked := ::lShowStatics
+   ::oPullDown:GetItemByIdent( "LOCAL" ):Checked := ::lShowLocals
+   ::oPullDown:GetItemByIdent( "ALL" ):Checked := ;
+      ::lShowPublics .AND. ::lShowPrivates .AND. ::lShowStatics .AND. ::lShowLocals
 
    ::oWndCode       := TDbWindow():New( 1, 0, MaxRow() - 6, MaxCol() )
    ::oWndCode:Cargo       := { ::oWndCode:nTop, ::oWndCode:nLeft }
@@ -1657,6 +1663,9 @@ METHOD ShowVars() CLASS TDebugger
          if ::oWndVars:nBottom - ::oWndVars:nTop > 1
             ::oWndVars:Resize( ,, ::oWndVars:nTop + 1 )
             lRepaint := .t.
+         else
+            /* We still need to redraw window caption, it could have changed */
+            ::oWndVars:Refresh()
          endif
       elseif Len( ::aVars ) > ::oWndVars:nBottom - ::oWndVars:nTop - 1
          ::oWndVars:Resize( ,, ::oWndVars:nTop + Min( Len( ::aVars ) + 1, 7 ) )

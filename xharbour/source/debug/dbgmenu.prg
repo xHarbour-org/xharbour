@@ -1,5 +1,5 @@
 /*
- * $Id: dbgmenu.prg,v 1.4 2004/01/29 14:25:59 likewolf Exp $
+ * $Id: dbgmenu.prg,v 1.5 2004/02/20 02:29:14 likewolf Exp $
  */
 
 /*
@@ -127,20 +127,20 @@ function __dbgBuildMenu( oDebugger )  // Builds the debugger pulldown menu
 
       MENUITEM " ~Monitor "
       MENU
-         MENUITEM oPublic PROMPT " ~Public" ;
+         MENUITEM oPublic PROMPT " ~Public" IDENT "PUBLIC" ;
             ACTION ( oDebugger:Public(), oPublic:Toggle() )
 
-         MENUITEM oPrivate PROMPT " pri~Vate " ;
+         MENUITEM oPrivate PROMPT " pri~Vate " IDENT "PRIVATE" ;
             ACTION ( oDebugger:Private(), oPrivate:Toggle() )
 
-         MENUITEM oStatic PROMPT " ~Static" ;
+         MENUITEM oStatic PROMPT " ~Static" IDENT "STATIC" ;
             ACTION ( oDebugger:Static(), oStatic:Toggle() )
 
-         MENUITEM oLocal PROMPT " ~Local" ;
+         MENUITEM oLocal PROMPT " ~Local" IDENT "LOCAL" ;
             ACTION ( oDebugger:Local(), oLocal:Toggle() )
 
          SEPARATOR
-         MENUITEM oAll PROMPT " ~All" ;
+         MENUITEM oAll PROMPT " ~All" IDENT "ALL" ;
             ACTION ( oDebugger:All(), oAll:Toggle(),;
                      oPublic:lChecked := oPrivate:lChecked := oStatic:lChecked := ;
                      oLocal:lChecked := oAll:lChecked )

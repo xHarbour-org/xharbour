@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: dbgbrwsr.prg,v 1.1 2004/02/20 02:29:14 likewolf Exp $
  */
 
 /*
@@ -88,7 +88,11 @@ LOCAL lResize:=.F.
       lResize := .T.
    ENDIF
    IF( lResize )
-      ::configure()
+      /* The following check prevents a "High limit exceeded" error. Maybe it
+       * would be wiser to make TBrowse handle height of 0 rows -- Ph.K. */
+      IF ::nBottom >= ::nTop
+         ::configure()
+      ENDIF
    ENDIF
       
 RETURN self
