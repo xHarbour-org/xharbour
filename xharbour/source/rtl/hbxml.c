@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.18 2004/03/23 22:30:22 jonnymind Exp $
+ * $Id: hbxml.c,v 1.19 2004/03/25 09:38:32 jonnymind Exp $
  */
 
 /*
@@ -874,7 +874,8 @@ static MXML_STATUS mxml_node_read_name( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITE
 
    hbtemp.type = HB_IT_NIL;
    buf[ iPos ] = 0;
-   hb_itemPutCRaw( &hbtemp, buf, iPos );
+   hb_itemPutCL( &hbtemp, buf, iPos );
+   MXML_DELETOR( buf );
    hb_objSendMsg( pNode,"_CNAME", 1, &hbtemp );
    --*( hbtemp.item.asString.puiHolders );
 
@@ -950,7 +951,8 @@ static void mxml_node_read_directive( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM 
          hbtemp.type = HB_IT_NIL;
          hb_itemPutNI( &hbtemp, MXML_TYPE_DIRECTIVE );
          hb_objSendMsg( pNode,"_NTYPE", 1, &hbtemp );
-         hb_itemPutCRaw( &hbtemp, buf, iPos );
+         hb_itemPutCL( &hbtemp, buf, iPos );
+         MXML_DELETOR( buf );
          hb_objSendMsg( pNode,"_CDATA", 1, &hbtemp );
          --*( hbtemp.item.asString.puiHolders );
       }
@@ -1029,7 +1031,8 @@ static void mxml_node_read_pi( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc )
       hb_itemPutNI( &hbtemp, MXML_TYPE_PI );
       hb_objSendMsg( pNode,"_NTYPE", 1, &hbtemp );
       hbtemp.type = HB_IT_NIL;
-      hb_itemPutCRaw( &hbtemp, buf, iPos );
+      hb_itemPutCL( &hbtemp, buf, iPos );
+      MXML_DELETOR( buf );
       hb_objSendMsg( pNode,"_CDATA", 1, &hbtemp );
       --*( hbtemp.item.asString.puiHolders );
    }
@@ -1143,7 +1146,8 @@ static void mxml_node_read_comment( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM do
 
    if ( ref->status == MXML_STATUS_OK ) {
       buf[ iPos ] = 0;
-      hb_itemPutCRaw( &hbtemp, buf, iPos );
+      hb_itemPutCL( &hbtemp, buf, iPos );
+      MXML_DELETOR( buf );
       hb_objSendMsg( pNode,"_CDATA", 1, &hbtemp );
       --*( hbtemp.item.asString.puiHolders );
    }
@@ -1951,10 +1955,14 @@ MXML_STATUS mxml_sgs_append_string( MXML_SGS *sgs, char *s )
 
 char * mxml_sgs_extract( MXML_SGS *sgs )
 {
-   char *temp = sgs->buffer;
-   temp[ sgs->length ] = 0;
+   char *ret;
+   ret = (char *) MXML_ALLOCATOR( sgs->length + 1 );
+   memcpy( ret, sgs->buffer, sgs->length );
+   ret[ sgs->length ] = 0;
+   MXML_DELETOR( sgs->buffer );
    MXML_DELETOR( sgs );
-   return temp;
+
+   return ret;
 }
 
 /***********************************************************
@@ -1982,7 +1990,7 @@ static char *edesc[] =
 char *mxml_error_desc( MXML_ERROR_CODE code )
 {
    int iCode = ((int)code) - 1;
-   if ( iCode < 0 || iCode > sizeof( edesc ) / sizeof( char * ) )
+   if ( iCode < 0 || iCode > (signed) (sizeof( edesc ) / sizeof( char * ) ) )
       return NULL;
 
    return edesc[ iCode ];

@@ -1,7 +1,7 @@
 # xHarbour project
 # Demo makefile for GNU MAKE in tests/ subdir
 #
-# $Id: Makefile,v 1.20 2003/12/29 23:38:58 jonnymind Exp $
+# $Id: Makefile,v 1.21 2004/03/03 19:27:13 likewolf Exp $
 #
 # Copyright 2003 Giancarlo Niccolai
 #
@@ -39,7 +39,11 @@ ifeq ($(HB_ARCHITECTURE),linux)
        ifeq ($(HB_GT_LIB),gtcgi)
           GT_LIBS=-lgtcgi
        else
-          GT_LIBS=-lgtcrs -lncurses -lgpm
+	   ifeq ($(HB_GT_LIB),gtnul)
+	      GT_LIBS=-lgtnul
+	   else
+	      GT_LIBS=-lgtcrs -lncurses -lgpm
+	   endif
        endif
      endif
    endif

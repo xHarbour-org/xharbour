@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2683 2004/03/30 09:31:54 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.2684 2004/03/30 11:46:05 srobert Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-03-30 17:58 UTC+0200 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
+  * source/rtl/hbxml.c
+    ! reduced memory requirements. Growing strings are re-allocated to
+      fit size; this involves a copy of the strings.
+    /* An alternative here is to just resize memory, that won't cause
+       reallocation and copy, but I fear about memory fragmentation on
+       very big XML files (> 2MB). */
+  * tests/Makefile
+    + Added support for GTNUL.
+      /* WARNING: GTNUL doesn't link on linux: it misses GTXVT
+         declaration. I will see what is needed, but a hint may
+         help me a lot here. What is missing? */
+
 2004-03-29 16:53 UTC-0500 Sylvain Robert (s.robert/at/videotron.ca)
-* source\rtl\str.c
+  * source\rtl\str.c
     ! Corrected a compile error under BCC
-     * move up declaration of szResult and change the line calling
+    * move up declaration of szResult and change the line calling
        hb_itemStr() in function STR()
 
 2004-03-30 11:42 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
