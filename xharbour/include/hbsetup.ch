@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.ch,v 1.1.1.1 2001/12/21 10:47:54 ronpinkas Exp $
+ * $Id: hbsetup.ch,v 1.2 2003/06/19 00:07:59 druzus Exp $
  */
 
 /*
@@ -77,6 +77,11 @@
 /* Turn on short names support for the class engine */
 #ifdef HB_C52_STRICT
    #define HB_SHORTNAMES
+#endif
+
+/* Turn on extended shift key codes not available in Clipper */
+#ifndef HB_C52_STRICT
+   #define HB_EXT_SHIFT_KEYS_CODES
 #endif
 
 /* #define HB_FILE_VER_STATIC */  /* Enable inclusion of file version strings */

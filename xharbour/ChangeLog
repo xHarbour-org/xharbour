@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3036 2004/06/06 19:31:45 bdj Exp $
+ * $Id: ChangeLog,v 1.3037 2004/06/06 22:46:32 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-07 11:40 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * include/hbsetup.ch
+    Define HB_EXT_SHIFT_KEYS_CODES as default mode, unless HB_C52_STRICT.
+
+  * source/rtl/gtsln/keytrans.c
+    Apply HB_EXT_SHIFT_KEYS_CODES for 11 extended shift key codes.
+    Note:
+    I can't test this gt, somebody pls kindly test if I broke something.
 
 2004-06-07 02:45 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/debug/dbgmenu.prg

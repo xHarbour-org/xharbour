@@ -1,5 +1,5 @@
 /*
- * $Id: keytrans.c,v 1.4 2004/03/21 15:55:06 druzus Exp $
+ * $Id: keytrans.c,v 1.5 2004/06/06 11:33:21 lf_sfnet Exp $
  */
 
 /*
@@ -88,6 +88,7 @@ static int KeyTranslationTable[][ 2 ] =
    { SL_KEY_PPAGE      | ( ALTL_PRESSED << 16 ),     K_ALT_PGUP   },
    { SL_KEY_NPAGE      | ( ALTL_PRESSED << 16 ),     K_ALT_PGDN   },
 
+ #ifdef HB_EXT_SHIFT_KEYS_CODES
    { SL_KEY_UP         | ( SHIFT_PRESSED << 16 ),     K_SH_UP     },
    { SL_KEY_DOWN       | ( SHIFT_PRESSED << 16 ),     K_SH_DOWN   },
    { SL_KEY_LEFT       | ( SHIFT_PRESSED << 16 ),     K_SH_LEFT   },
@@ -96,7 +97,8 @@ static int KeyTranslationTable[][ 2 ] =
    { SL_KEY_END        | ( SHIFT_PRESSED << 16 ),     K_SH_END    },
    { SL_KEY_PPAGE      | ( SHIFT_PRESSED << 16 ),     K_SH_PGUP   },
    { SL_KEY_NPAGE      | ( SHIFT_PRESSED << 16 ),     K_SH_PGDN   },
-   
+ #endif
+
 #endif
 
    { SL_KEY_IC,                                      K_INS        },
@@ -140,10 +142,13 @@ static int KeyTranslationTable[][ 2 ] =
    { SL_KEY_B2         | ( ALTR_PRESSED << 16 ),     KP_ALT_5     },
 
    { K_TAB             | ( SHIFT_PRESSED << 16 ),    K_SH_TAB     },
-   
+
+ #ifdef HB_EXT_SHIFT_KEYS_CODES
    { SL_KEY_IC         | ( SHIFT_PRESSED << 16 ),    K_SH_INS     },
    { SL_KEY_DELETE     | ( SHIFT_PRESSED << 16 ),    K_SH_DEL     },
    { K_ENTER           | ( SHIFT_PRESSED << 16 ),    K_SH_ENTER   },
+ #endif
+
 #endif
 
 #if HB_GT_KBD_MODIF_MASK
@@ -470,7 +475,7 @@ int HB_GT_FUNC(gt_SetKeyInKeyTranslationTable( int SlangKey, int ClipKey ))
       {
          if ( SlangKey == KeyTranslationTable[ i ][ 0 ] )
             KeyTranslationTable[ i ][ 1 ] = ClipKey;
-	    Found = 1;
+       Found = 1;
             /* we don't break here because SlangKey can be defined more than once */
       }
    }
