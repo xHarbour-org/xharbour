@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.68 2003/10/19 18:11:44 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.69 2003/10/26 03:34:10 ronpinkas Exp $
  */
 
 /*
@@ -1505,6 +1505,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      HB_XFREE( pReduced );
                   }
                }
+               #if 0
                else if( ( strcmp( "UPPER", pName->value.asSymbol ) == 0 ) && usCount == 1 )
                {
                   pReduced = pParms->value.asList.pExprList;
@@ -1533,6 +1534,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      HB_XFREE( pReduced );
                   }
                }
+               #endif
                else if( ( strcmp( "CHR", pName->value.asSymbol ) == 0 ) && usCount )
                {
                   /* try to change it into a string */
