@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3049 2004/06/09 10:09:29 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.3050 2004/06/09 12:23:20 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-09 16:45 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/debug/tbrwtext.prg
+    ! Inhibit word-wrapping in debugger with the current version of TEditor by
+      passing negative nLineLength to the TEditor constructor.
 
 2004-06-09 12:10 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * source/rdd/dbcmd.c
