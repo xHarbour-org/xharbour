@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.11 2004/02/22 12:15:57 andijahja Exp $
+ * $Id: zip.c,v 1.12 2004/02/23 19:55:27 andijahja Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 #include <hbzip2.h>
 
-extern PHB_ITEM pArray;
+extern HB_ITEM ZipArray;
 
 HB_FUNC( HB_ZIPFILE )
 {
@@ -111,8 +111,7 @@ HB_FUNC( HB_GETFILESINZIP )
       strcpy( szFile, hb_parc( 1 ) );
       hb___GetFileNamesFromZip( hb___CheckFile( szFile ),
                                 ISLOG( 2 ) ? hb_parl( 2 ) : 0 );
-      hb_itemReturn( pArray );
-      hb_itemRelease( pArray );
+      hb_itemReturn( &ZipArray );
    }
 }
 
@@ -289,7 +288,7 @@ HB_FUNC( HB_UNZIPFILE )
 
 HB_FUNC( HB_SETDISKZIP )
 {
-   hb_retl( hb___SetCallbackFunc( hb_itemParam( 1 ) ) );
+   hb_retl( hb___SetCallbackFunc( hb_param( 1, HB_IT_BLOCK ) ) );
 }
 
 HB_FUNC( HB_ZIPDELETEFILES )
@@ -337,8 +336,7 @@ HB_FUNC( HB_SETZIPCOMMENT )
 HB_FUNC( HB_GETZIPCOMMENT )
 {
    char *szComment=( char* )hb_GetZipComment( hb_parc( 1 ) );
-   hb_retc( szComment );
-   hb_xfree( szComment );
+   hb_retcAdopt( szComment );
 }
 
 HB_FUNC( HB_UNZIPFILEINDEX )

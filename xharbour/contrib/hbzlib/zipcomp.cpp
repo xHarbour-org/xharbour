@@ -1,5 +1,5 @@
 /*
- * $Id: zipcomp.cpp,v 1.10 2004/02/22 00:59:03 andijahja Exp $
+ * $Id: zipcomp.cpp,v 1.11 2004/02/24 12:55:54 andijahja Exp $
  */
 
 /*
@@ -52,10 +52,10 @@
 #define HB_OS_WIN_32_USED
 #include "hbzip2.h"
 
-extern PHB_ITEM pArray;
+extern HB_ITEM ZipArray;
 PHB_ITEM pDiskStatus = NULL;
 PHB_ITEM pProgressInfo = NULL;
-extern PHB_ITEM pChangeDiskBlock;
+extern HB_ITEM ChangeDiskBlock;
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,7 +74,7 @@ class SpanCallbackc : public CZipSpanCallback
       Disk.type = HB_IT_NIL;
       hb_itemPutNL( &Disk, m_uDiskNeeded );
 
-      hb_vmEvalBlockV( pChangeDiskBlock, 1, &Disk  );
+      hb_vmEvalBlockV( &ChangeDiskBlock, 1, &Disk  );
       hb_itemClear( &Disk );
 
       return TRUE;

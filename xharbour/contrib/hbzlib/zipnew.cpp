@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.11 2004/02/22 02:00:16 lculik Exp $
+ * $Id: zipnew.cpp,v 1.12 2004/02/24 12:55:56 andijahja Exp $
  */
 
 /*
@@ -54,9 +54,9 @@
 #include "hbapifs.h"
 
 char szTempTime[ 80 ];
-PHB_ITEM pArray = NULL;
+HB_ITEM ZipArray;
 
-PHB_ITEM pChangeDiskBlock;
+HB_ITEM ChangeDiskBlock;
 extern PHB_ITEM pProgressInfo;
 
 int hb_CheckSpanMode( char * szFile );
@@ -80,8 +80,7 @@ class SpanCallback : public CZipSpanCallback
 
       Disk.type = HB_IT_NIL;
 
-      hb_vmEvalBlockV( pChangeDiskBlock, 1, hb_itemPutNL( &Disk, m_uDiskNeeded ) );
-      hb_itemClear( &Disk );
+      hb_vmEvalBlockV( &ChangeDiskBlock, 1, hb_itemPutNL( &Disk, m_uDiskNeeded ) );
 
       return true;
    }
@@ -167,7 +166,7 @@ int hb_CmpPkSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
    for( ulCount = 1;( ulCount <= hb_arrayLen( pArray ) ); ulCount++ )
    {
       szDummy = ( char * )hb_arrayGetCPtr( pArray, ulCount );
-      bAdded = FALSE;    
+      bAdded = FALSE;
 
       if( pBlock  !=  NULL )
       {
@@ -209,14 +208,8 @@ int hb_CmpPkSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
    }
    catch( ... ){}
 
-   if ( pChangeDiskBlock )
-   {
-      hb_itemRelease( pChangeDiskBlock );
-   }
-
    return ( int ) bReturn;
 }
-
 
 PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
 {
@@ -260,7 +253,9 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
    if ( iReturn )
    {
       iNumberOfFiles = szZip.GetCount();
-      pArray = hb_itemArrayNew( iNumberOfFiles );
+
+      ZipArray.type = HB_IT_NIL;
+      hb_arrayNew( &ZipArray, iNumberOfFiles );
       time_t theTime;
       tm *SzTime;
 
@@ -377,7 +372,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
 
             hb_arraySetForward( &TempArray, Time, hb_itemPutCL( &pItem, szTime, 5 ) );
             hb_arraySetForward( &TempArray, Attr, hb_itemPutCL( &pItem, szAttr, 5 ));
-            hb_arraySetForward( pArray, ulCount+1, &TempArray );
+            hb_arraySetForward( &ZipArray, ulCount+1, &TempArray );
 
          }
          else
@@ -385,19 +380,14 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
             const char *  szFileNameInZip;
             CZipString szTempString = ( LPCTSTR )fh.GetFileName( );
             szFileNameInZip = ( const char * )szTempString;
-            hb_arraySetForward( pArray, ulCount+1, hb_itemPutC( &pItem, ( char * ) szFileNameInZip ));
+            hb_arraySetForward( &ZipArray, ulCount+1, hb_itemPutC( &pItem, ( char * ) szFileNameInZip ));
          }
       }
    }
 
    szZip.Close( );
 
-   if ( pChangeDiskBlock )
-   {
-      hb_itemRelease( pChangeDiskBlock );
-   }
-
-   return pArray;
+   return &ZipArray;
 }
 
 char *hb___CheckFile( char * szFile )
@@ -497,11 +487,6 @@ int hb___GetNumberofFilestoUnzip( char *szFile )
    iNumberOfFiles = szZip.GetCount( );
    szZip.Close( );
 
-   if ( pChangeDiskBlock )
-   {
-      hb_itemRelease( pChangeDiskBlock );
-   }
-
    return iNumberOfFiles;
 }
 
@@ -562,7 +547,6 @@ int hb_CmpPkSpanStd( char *szFile, char *szFiletoCompress, int iCompLevel, PHB_I
 
    try
    {
-
       if( pBlock  !=  NULL )
       {
           HB_ITEM FileName;
@@ -599,7 +583,6 @@ int hb_CmpPkSpanStd( char *szFile, char *szFiletoCompress, int iCompLevel, PHB_I
          bAdded  = true;
       }
 
-      
    }
 
    catch( ... ) {}
@@ -616,19 +599,20 @@ int hb_CmpPkSpanStd( char *szFile, char *szFiletoCompress, int iCompLevel, PHB_I
 
    catch( ... ){}
 
-   if ( pChangeDiskBlock )
-   {
-      hb_itemRelease( pChangeDiskBlock );
-   }
-
    return ( int ) bReturn;
 }
 
-
 int hb___SetCallbackFunc( PHB_ITEM pFunc )
 {
-   pChangeDiskBlock = pFunc;
-   pZipI.pItem = pFunc;
+
+   ChangeDiskBlock.type = HB_IT_NIL;
+
+   if( pFunc )
+   {
+     hb_itemCopy( &ChangeDiskBlock, pFunc );
+   }
+
+   pZipI.pItem = &ChangeDiskBlock;
 
    return ( int ) true;
 }
@@ -641,7 +625,7 @@ bool hb_SetCallBack( DWORD iNumber, int, void* pData )
 
    Disk.type = HB_IT_NIL;
 
-   hb_vmEvalBlockV( pChangeDiskBlock, 1, hb_itemPutNL( &Disk, iNumber ) );
+   hb_vmEvalBlockV( &ChangeDiskBlock, 1, hb_itemPutNL( &Disk, iNumber ) );
 
    hb_itemClear( &Disk );
 
@@ -906,17 +890,11 @@ int hb_UnzipOne( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
 
    szZip.Close( );
 
-   if ( pChangeDiskBlock )
-   {
-      hb_itemRelease( pChangeDiskBlock );
-   }
-
    if (szPath)
    {
       hb_fsChDir((BYTE*)szPath);
       hb_xfree(szPath);
    }
-
 
    return ( int ) iReturn;
 
@@ -971,11 +949,6 @@ int hb_DeleteOne( char *szFile, char *szFiletoDelete )
 
    szZip.Close( );
 
-   if ( pChangeDiskBlock )
-   {
-      hb_itemRelease( pChangeDiskBlock );
-   }
-
    return ( int ) iReturn;
 }
 
@@ -1015,11 +988,6 @@ int hb_DeleteSel( char *szFile, PHB_ITEM pArray, BOOL bCase )
    }
 
    szZip.Close( );
-
-   if ( pChangeDiskBlock )
-   {
-      hb_itemRelease( pChangeDiskBlock );
-   }
 
    return ( int ) iReturn;
 }
@@ -1161,11 +1129,6 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
       }
    }
 
-   if ( pChangeDiskBlock )
-   {
-      hb_itemRelease( pChangeDiskBlock );
-   }
-
    szZip.Close();
 
    if (szPath)
@@ -1173,7 +1136,6 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
       hb_fsChDir((BYTE*)szPath);
       hb_xfree(szPath);
    }
-
 
    return ( int ) iReturn;
 }
@@ -1248,11 +1210,6 @@ const char * hb_GetZipComment( char *szFile )
 
    szTempR = ( char* ) hb_xgrab( strlen( ( const char* ) szReturn ) + 1 );
    strcpy( szTempR, ( char* ) szReturn );
-
-   if ( pChangeDiskBlock )
-   {
-      hb_itemRelease( pChangeDiskBlock );
-   }
 
    szZip.Close( );
 
@@ -1349,10 +1306,6 @@ int hb_UnzipOneIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
 
    }
    szZip.Close( );
-   if ( pChangeDiskBlock )
-   {
-      hb_itemRelease( pChangeDiskBlock );
-   }
 
    return ( int ) iReturn;
 }
@@ -1445,11 +1398,6 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
             catch ( CZipException&  e )   {}
          }
       }
-   }
-
-   if ( pChangeDiskBlock )
-   {
-      hb_itemRelease( pChangeDiskBlock );
    }
 
    szZip.Close( );
@@ -1567,11 +1515,6 @@ int hb_DeleteOneIndex( char *szFile, ULONG ulCount )
    }
 
    szZip.Close( );
-
-   if ( pChangeDiskBlock )
-   {
-      hb_itemRelease( pChangeDiskBlock );
-   }
 
    return ( int ) iReturn;
 }

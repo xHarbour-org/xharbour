@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2400 2004/02/25 12:40:17 lculik Exp $
+ * $Id: ChangeLog,v 1.2401 2004/02/25 12:57:53 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-25 21:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/hbzlib/zip.c
+  * contrib/hbzlib/zipcomp.cpp
+  * contrib/hbzlib/zipnew.cpp
+    % more optimization using HB_ITEM
+    % replace hb_retc()/hb_xfree() construct with hb_retcAdopt()
+    ! change public variable from pArray to ZipArray to avoid confusion
+      because some internal zip functions use pArray as parameters.
 
 2004-02-26 08:55 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/vm/classes.c
@@ -60,19 +68,19 @@
     + Added HB_QSlef() as 2nd argument of generated HB_RestoreBlock() in ValToPrgExp()
 
 2004-02-24 22:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
-  + contrib\design\general.prg
-  + contrib\design\makefile.bc
-  + contrib\design\makefile.vc
-  + contrib\design\makelib.bat
-  + contrib\design\make_b32.bat
-  + contrib\design\make_vc.bat
-  + contrib\design\readme.txt
-  + contrib\design\tbox.prg
-  + contrib\design\tcheck.prg
-  + contrib\design\tmenu.prg
-  + contrib\design\tradio.prg
-  + contrib\design\twindow.prg
-  + tests\design.prg
+  + contrib/design/general.prg
+  + contrib/design/makefile.bc
+  + contrib/design/makefile.vc
+  + contrib/design/makelib.bat
+  + contrib/design/make_b32.bat
+  + contrib/design/make_vc.bat
+  + contrib/design/readme.txt
+  + contrib/design/tbox.prg
+  + contrib/design/tcheck.prg
+  + contrib/design/tmenu.prg
+  + contrib/design/tradio.prg
+  + contrib/design/twindow.prg
+  + tests/design.prg
     + text mode screen designer and code generator
 
 2004-02-24 20:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
