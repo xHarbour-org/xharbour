@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.56 2004/01/19 20:49:33 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.57 2004/01/23 14:53:24 andijahja Exp $
  */
 
 /*
@@ -181,6 +181,9 @@ static USHORT  s_usOldCurStyle;
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
 
+/* last updated GT object */
+HB_GT_GOBJECT *last_gobject;
+
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
@@ -203,6 +206,8 @@ void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr
     s_iStdOut = iFilenoStdout;
     s_iStdErr = iFilenoStderr;
 
+    last_gobject = NULL;
+    
     s_usOldCurStyle = s_usCursorStyle = SC_NORMAL;
     gt_hbInitStatics();
     _s.hWnd = hb_wvt_gtCreateWindow( ( HINSTANCE ) hb_hInstance, ( HINSTANCE ) hb_hPrevInstance,  "", hb_iCmdShow );
@@ -1498,6 +1503,93 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
   }
   SetWindowPos( hWnd, NULL, wi.left, wi.top, width, height, SWP_NOZORDER );
 }
+//-------------------------------------------------------------------//
+/* JC1: rendering of graphical objects */
+
+static void s_wvt_paintGraphicObjects( HDC hdc, RECT *updateRect )
+{
+   HB_GT_GOBJECT *pObj;
+   COLORREF color;
+   HPEN hPen, hOldPen;
+   HBRUSH hBrush, hOldBrush;
+   
+   pObj = hb_gt_gobjects;
+
+   while ( pObj )
+   {
+      /* Check if pObj boundaries are inside the area to be updated */
+      if ( hb_gtGobjectInside( pObj, updateRect->left, updateRect->top, 
+         updateRect->right, updateRect->bottom ) )
+      {
+         color = RGB( pObj->color.usRed >> 8, pObj->color.usGreen >> 8, 
+               pObj->color.usBlue >> 8);
+         hPen = CreatePen( PS_SOLID, 1, color );
+         hOldPen = SelectObject( hdc, hPen ); 
+         hBrush = CreateSolidBrush( color );
+         hOldBrush = SelectObject( hdc, hBrush );
+         
+         switch( pObj->type )
+         {
+            case GTO_POINT:
+               MoveToEx( hdc, pObj->x, pObj->y, NULL );
+               LineTo( hdc, pObj->x, pObj->y );
+            break;
+
+            case GTO_LINE:
+               /* For lines, width and height represent X2, Y2 */
+               MoveToEx( hdc, pObj->x, pObj->y, NULL );
+               LineTo( hdc, pObj->width, pObj->height );
+            break;
+
+            case GTO_SQUARE:
+            {
+               RECT r;
+               r.left  = pObj->x;
+               r.top   = pObj->y;
+               r.right = pObj->x + pObj->width;
+               r.bottom= pObj->y + pObj->height;
+               
+               FrameRect( hdc, &r, hBrush );
+            }
+            break;
+
+            case GTO_RECTANGLE:
+               /* For lines, width and height represent X2, Y2 */
+               Rectangle( hdc,
+                  pObj->x, pObj->y,
+                  pObj->x + pObj->width, pObj->y + pObj->height );
+            break;
+
+
+            case GTO_CIRCLE:
+               Arc( hdc,
+                  pObj->x, pObj->y,
+                  pObj->x + pObj->width, pObj->y + pObj->height,
+                  0,0,0,0 );
+            break;
+
+            case GTO_DISK:
+               Ellipse( hdc,
+                  pObj->x, pObj->y,
+                  pObj->x + pObj->width, pObj->y + pObj->height );
+            break;
+
+            case GTO_TEXT:
+               TextOut( hdc,
+                  pObj->x, pObj->y,
+                  pObj->data, pObj->data_len );
+            break;
+         }
+         SelectObject( hdc, hOldPen );
+         SelectObject( hdc, hOldBrush );
+         DeleteObject( hBrush );
+         DeleteObject( hPen );
+      }
+
+      pObj = pObj->next;
+   }
+
+}
 
 //-------------------------------------------------------------------//
 
@@ -1595,6 +1687,12 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           hb_wvt_gtTextOut( hdc, startCol, irow, ( char const * ) _s.pBuffer+startIndex, len );
         }
       }
+
+      if ( hb_gt_gobjects != NULL )
+      {
+         s_wvt_paintGraphicObjects( hdc, &updateRect );
+      }
+
       EndPaint( hWnd, &ps );
 
       if ( bPaint )
@@ -2076,6 +2174,17 @@ static HWND hb_wvt_gtCreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 static DWORD hb_wvt_gtProcessMessages( void )
 {
   MSG msg;
+  /* See if we have some graphic object to draw */
+  if ( hb_gt_gobjects == NULL )
+  {
+    last_gobject = NULL;
+  }
+  else if( hb_gt_gobjects_end != last_gobject )
+  {
+    last_gobject = hb_gt_gobjects_end;
+    InvalidateRect( _s.hWnd, NULL, FALSE );
+  }
+  
   while ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
   {
     TranslateMessage( &msg );
