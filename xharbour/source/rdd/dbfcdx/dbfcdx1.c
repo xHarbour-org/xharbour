@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.126 2004/04/30 15:24:52 lf_sfnet Exp $
+ * $Id: dbfcdx1.c,v 1.127 2004/05/02 10:47:48 druzus Exp $
  */
 
 /*
@@ -7491,6 +7491,22 @@ static void hb_cdxSortOut( LPCDXSORTINFO pSort )
             continue;
          }
       }
+#ifdef HB_CDX_DBGCODE_EXT
+      if ( ulKey != 0 )
+      {
+         int i = hb_cdxValCompare( pSort->pTag, pSort->pLastKey, iLen, pKeyVal, iLen, TRUE );
+         if ( i == 0 )
+         {
+            i = ( pSort->ulLastRec < ulRec ) ? -1 : 1;
+         }
+         if ( i > 0 )
+         {
+            printf("\r\nulKey=%ld, pKeyVal=[%s][%ld], pKeyLast=[%s][%ld]\r\n",
+                   ulKey, pKeyVal, ulRec, pSort->pLastKey, pSort->ulLastRec); fflush(stdout);
+            hb_errInternal( 9999, "hb_cdxSortOut: sorting fails.", "", "" );
+         }
+      }
+#endif
       hb_cdxSortAddNodeKey( pSort, 0, pKeyVal, ulRec, 0 );
       memcpy( pSort->pLastKey, pKeyVal, iLen );
       pSort->ulLastRec = ulRec;
@@ -7663,7 +7679,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
       {
          if ( bDirectRead )
          {
-            if ( iRecBuff == 0 || iRecBuff > iRecBufSize )
+            if ( iRecBuff == 0 || iRecBuff >= iRecBufSize )
             {
                int iRec;
                if ( ulRecCount - ulRecNo >= (ULONG) iRecBufSize )
