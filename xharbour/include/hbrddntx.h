@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.8 2002/10/12 00:38:25 horacioroldan Exp $
+ * $Id: hbrddntx.h,v 1.9 2003/01/06 12:40:55 horacioroldan Exp $
  */
 
 /*
@@ -141,6 +141,7 @@ typedef struct _TAGINFO
    PHB_ITEM   pForItem;
    PHB_ITEM   topScope;
    PHB_ITEM   bottomScope;
+   BOOL       fTagName;
    BOOL       AscendKey;
    BOOL       UniqueKey;
    BOOL       Custom;
@@ -207,6 +208,7 @@ typedef struct _NTXHEADER    /* Header of NTX file */
    char     unknown2;
    char     for_expr[ NTX_MAX_KEY ];
    char     custom;
+   char     tag_name[ 12 ];
 } NTXHEADER;
 
 typedef NTXHEADER * LPNTXHEADER;
