@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.253 2003/08/27 19:04:06 jonnymind Exp $
+ * $Id: hvm.c,v 1.254 2003/08/27 19:51:34 ronpinkas Exp $
  */
 
 /*
@@ -6993,6 +6993,8 @@ static void hb_vmDoInitStatics( void )
 
 static void hb_vmDoExitFunctions( void )
 {
+   HB_THREAD_STUB
+
    PSYMBOLS pLastSymbols = s_pSymbols;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDoExitFunctions()"));
@@ -7149,6 +7151,8 @@ HB_FUNC( ERRORLEVEL )
 
 void hb_vmRequestQuit( void )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestQuit()"));
 
    s_uiActionRequest = HB_QUIT_REQUESTED;
@@ -7156,6 +7160,8 @@ void hb_vmRequestQuit( void )
 
 void hb_vmRequestEndProc( void )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestEndProc()"));
 
    s_uiActionRequest = HB_ENDPROC_REQUESTED;
@@ -7186,6 +7192,8 @@ void hb_vmRequestBreak( PHB_ITEM pItem )
 
 USHORT hb_vmRequestQuery( void )
 {
+   HB_THREAD_STUB
+
    return s_uiActionRequest;
 }
 
@@ -7229,12 +7237,16 @@ void hb_vmRequestCancel( void )
 void hb_vmRequestDebug( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestCancel()"));
+
    s_bDebugRequest = TRUE;
 }
 
 void hb_vmRequestReset( void )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestReset()"));
+
    s_uiActionRequest = 0;
 }
 
