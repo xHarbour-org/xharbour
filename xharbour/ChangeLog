@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2676 2004/03/29 17:04:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2677 2004/03/29 18:03:36 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-29 16:16 UTC-0500 Sylvain Robert (s.robert/at/videotron.ca)
+  * source\rtl\str.c
+    ! str() should not follow SET FIXED rules (Clipper compatibility)
+    Ex: ? STR(3) now return 3 as in Clipper
+    ! if pWidth - (pDec+1) ==0 return '*' equal to pWidth (Clipper
+      compatibility)
+    Ex: ? STR(3,7,6) now return ******* as in Clipper
 
 2004-03-29 10:13 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/error.ch
