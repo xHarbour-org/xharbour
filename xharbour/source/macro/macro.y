@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.11 2003/12/04 09:26:54 druzus Exp $
+ * $Id: macro.y,v 1.12 2004/01/19 20:57:13 ronpinkas Exp $
  */
 
 /*
@@ -495,7 +495,7 @@ FunCall    : IDENTIFIER '(' ArgList ')'   {
             | IDENTIFIER '(' error        {
                                             hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
 
-                                            if( yylval.string )
+                                            if( yychar == IDENTIFIER && yylval.string )
                                             {
                                                hb_xfree( yylval.string );
                                                yylval.string = NULL;
@@ -915,7 +915,7 @@ PareExpList : ExpList ')'                 { $$ = $1; }
                                                hb_compExprDelete( s_Pending[ --s_iPending ], HB_MACRO_PARAM );
                                             }
 
-                                            if( yylval.string )
+                                            if( yychar == IDENTIFIER && yylval.string )
                                             {
                                                hb_xfree( yylval.string );
                                                yylval.string = NULL;
