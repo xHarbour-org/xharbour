@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.121 2004/05/27 20:57:07 lculik Exp $
+ * $Id: hbmake.prg,v 1.123 2004/06/17 20:17:24 modalsist Exp $
  */
 /*
  * Harbour Project source code:
@@ -1609,7 +1609,12 @@ FUNC CreateMakeFile( cFile )
 
    aSort( aSelFiles )
 
-   WHILE .T.
+   if Len( aSelFiles ) = 1
+      cTopFile := aSelFiles[1] 
+      cTopFile := PadR( Left(cTopfile,At(Upper(".prg"),Upper(cTopFile))+4 ), 20)
+   endif
+
+   WHILE Len( aSelFiles ) > 1
 
       IF s_nLang=1 // PT
          @ 15,01 say "Informe o PRG principal da sua aplica‡Æo: " Get cTopFile valid !empty(cTopFile)
@@ -1620,6 +1625,10 @@ FUNC CreateMakeFile( cFile )
       ENDIF
 
       READ
+      
+      if lastkey()=27
+         exit
+      endif 
 
       IF !file(ALLTRIM(cTopFile))
          IF s_nLang=1 // PT
@@ -1635,7 +1644,7 @@ FUNC CreateMakeFile( cFile )
 
    END
 
-
+   // Selecting External Libs.
    IF s_lExternalLib
       aLibs := Getlibs( s_lGcc, GetMakeDir() + '\lib' )
 

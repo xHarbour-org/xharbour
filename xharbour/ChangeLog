@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3080 2004/06/17 22:12:15 peterrees Exp $
+ * $Id: ChangeLog,v 1.3082 2004/06/17 20:18:37 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-17 20:19 UTC-0300 Eduardo Fernandes <eduardo@modalsistemas.com.br>
+  * include/hbclass.ch
+    ! Add syntax for Visual Objects compatibility.
+    Note: See line 351, 373 and 378 for changes.
+    
+  * utils/hbmake/hbmake.prg
+    ! Fixed to not ask by the main prg if only one prg is selected. 
 
 2004-06-17 15:10 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/rtl/gtapi.c
