@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3561 2004/10/30 18:17:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3562 2004/10/30 22:41:31 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,40 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-31 14:13 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/config/rules.cf
+  * xharbour/config/bsd/gcc.cf
+  * xharbour/config/darwin/gcc.cf
+  * xharbour/config/dos/bcc16.cf
+  * xharbour/config/dos/djgpp.cf
+  * xharbour/config/dos/global.cf
+  * xharbour/config/dos/rsx32.cf
+  * xharbour/config/dos/watcom.cf
+  * xharbour/config/linux/gcc.cf
+  * xharbour/config/os2/gcc.cf
+  * xharbour/config/os2/icc.cf
+  * xharbour/config/w32/bcc32.cf
+  * xharbour/config/w32/gcc.cf
+  * xharbour/config/w32/icc.cf
+  * xharbour/config/w32/mingw32.cf
+  * xharbour/config/w32/msvc.cf
+  * xharbour/config/w32/rsxnt.cf
+  * xharbour/config/w32/watcom.cf
+    * changed the C rules to respect hacked path in the C_SOURCES
+      in compiling and linking process. It should allow to add
+      calconst.c to HBPP and also fixes the Lorenzo's hack with
+      opt{con,gui} libs.
+      Unfortunately this modification will allow to hack dependences
+      in the future :-(
+
+  * xharbour/utils/hbpp/Makefile
+    + added $(TOP)$(ROOT)source/compiler/calconst.c to HBPP
+
+  * xharbour/utils/hbpp/hbpp.c
+    - removed dummy CalcConst() function
+
+   Please test it.
 
 2004-10-31 00:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/gtapi.c

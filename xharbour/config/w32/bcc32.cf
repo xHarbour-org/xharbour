@@ -1,5 +1,5 @@
 #
-# $Id: bcc32.cf,v 1.4 2003/09/25 02:24:02 paultucker Exp $
+# $Id: bcc32.cf,v 1.5 2004/01/28 22:02:36 druzus Exp $
 #
 # The Harbour Project
 # GNU MAKE file for Borland C/C++ 32bit (4.x, 5.x)
@@ -85,7 +85,7 @@ endef
 
 define link_exe_file
 echo. > __link__.tmp
-$(foreach file, $^, $(link_file))
+$(foreach file, $(^F), $(link_file))
 $(foreach file, $(LINKLIBS), $(link_file))
 $(LD) $(LD_OUT)$@ $(LDFLAGS) @__link__.tmp
 endef
@@ -103,7 +103,7 @@ echo -+$(file) &>> __lib__.tmp
 endef
 
 define create_library
-$(foreach file, $^, $(lib_object))
+$(foreach file, $(^F), $(lib_object))
 echo ->> __lib__.tmp
 $(AR) $(ARFLAGS) $@ @__lib__.tmp
 endef
@@ -111,7 +111,7 @@ endef
 AR = tlib
 ARFLAGS = $(A_USR)
 AR_RULE = $(create_library)
-#AROBJS = $(foreach file, $^, -+$(file))
+#AROBJS = $(foreach file, $(^F), -+$(file))
 #AR_RULE = $(AR) $(ARFLAGS) $@ $(AROBJS),,
 
 include $(TOP)$(ROOT)config/rules.cf

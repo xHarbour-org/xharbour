@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.10 2003/09/14 15:30:26 jonnymind Exp $
+# $Id: gcc.cf,v 1.11 2003/09/25 02:24:02 paultucker Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -108,6 +108,6 @@ LDFLAGS = $(LINKPATHS)
 
 AR = ar
 ARFLAGS = $(A_USR)
-AR_RULE = $(AR) $(ARFLAGS) r $@ $^ 
+AR_RULE = $(AR) $(ARFLAGS) r $@ $(^F) 
 
 include $(TOP)$(ROOT)config/rules.cf

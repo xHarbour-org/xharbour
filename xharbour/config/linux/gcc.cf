@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.27 2004/06/12 13:23:09 druzus Exp $
+# $Id: gcc.cf,v 1.28 2004/09/08 00:17:10 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -36,6 +36,7 @@ CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE
 HB_MT_FLAGS = -DHB_THREAD_SUPPORT
 endif
 endif
+
 
 LD = gcc
 LD_OUT = -o
@@ -92,12 +93,15 @@ endif
 
 # Add the specified GT driver library
 ifeq ($(findstring rtl,$(LIBS)),rtl)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
-LINKLIBS += -l$(HB_GT_LIB)
+
 ifeq ($(HB_MULTI_GT),yes)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
 LINKLIBS += -lgtnul
 endif
+
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+LINKLIBS += -l$(HB_GT_LIB)
+
 # HB_SCREEN_LIB: empty, or one of ncurses, slang
 ifeq ($(HB_GT_LIB),gtcrs)
 HB_SCREEN_LIB:=ncurses
@@ -111,9 +115,11 @@ LINKLIBS += `allegro-config --static`
 endif
 endif
 endif
+
 ifneq ($(HB_SCREEN_LIB),)
 LINKLIBS += -l$(HB_SCREEN_LIB)
 endif
+
 ifeq ($(HB_GT_LIB),gtxvt)
 LINKLIBS += -lX11
 LINKPATHS +=-L/usr/X11R6/lib
@@ -123,10 +129,12 @@ LINKLIBS += -lX11
 LINKPATHS +=-L/usr/X11R6/lib
 endif
 endif
+
 # HB_GPM_MOUSE: use gpm mouse driver
 ifeq ($(HB_GPM_MOUSE),yes)
 LINKLIBS += -lgpm
 endif
+
 endif
 
 #it never hurts if MT is enabled.
@@ -141,6 +149,6 @@ LDFLAGS = $(LINKPATHS)
 
 AR = ar
 ARFLAGS = $(A_USR)
-AR_RULE = $(AR) $(ARFLAGS) cr $@ $^ && $(RANLIB) $@ || ( $(RM) $@ && false )
+AR_RULE = $(AR) $(ARFLAGS) cr $@ $(^F) && $(RANLIB) $@ || ( $(RM) $@ && false )
 
 include $(TOP)$(ROOT)config/rules.cf

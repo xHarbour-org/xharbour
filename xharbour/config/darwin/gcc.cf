@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.12 2004/09/08 00:17:10 druzus Exp $
+# $Id: gcc.cf,v 1.13 2004/10/18 10:22:25 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -18,6 +18,10 @@ CPPFLAGS = -no-cpp-precomp -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 
 # -fno-common enables building .dylib files
 CFLAGS = -fno-common -fsigned-char -Wall -W
+
+# It's to avoid warning message generated when 'long double' is used
+# remove it if you have newer compiler version
+CFLAGS += -Wno-long-double
 
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
@@ -63,7 +67,6 @@ else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
 
-# LINKLIBS += -Wl,--start-group
 LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(lib))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
@@ -98,13 +101,13 @@ endif
 
 # Add the specified GT driver library
 ifeq ($(findstring rtl,$(LIBS)),rtl)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
-LINKLIBS += -l$(HB_GT_LIB)
 ifeq ($(HB_MULTI_GT),yes)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
 LINKLIBS += -lgtnul
 endif
-endif
+
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+LINKLIBS += -l$(HB_GT_LIB)
 
 # HB_SCREEN_LIB: empty, or one of ncurses, slang
 ifeq ($(HB_GT_LIB),gtcrs)
@@ -112,6 +115,7 @@ HB_SCREEN_LIB:=ncurses
 else
 ifeq ($(HB_GT_LIB),gtsln)
 HB_SCREEN_LIB:=slang
+endif
 endif
 
 ifneq ($(HB_SCREEN_LIB),)
@@ -142,16 +146,15 @@ endif
 endif
 
 LINKLIBS += -lm
-# -Wl,--end-group
 
 LDFLAGS = $(LINKPATHS)
-LD_RULE = $(LD) $(CFLAGS) $(LD_OUT) $@ $^ $(LDFLAGS) $(L_USR) $(LINKLIBS) $(LINKLIBS)
+LD_RULE = $(LD) $(CFLAGS) $(LD_OUT) $@ $(^F) $(LDFLAGS) $(L_USR) $(LINKLIBS) $(LINKLIBS)
 
 #AR = ar
 #ARFLAGS = $(A_USR)
-#AR_RULE = $(AR) $(ARFLAGS) r $@ $^ || $(RM) $@
+#AR_RULE = $(AR) $(ARFLAGS) r $@ $(^F) || $(RM) $@
 LIBTOOL = libtool
 LIBTOOLFLAGS = $(LIBTOOL_USR)
-AR_RULE = $(LIBTOOL) -static $(LIBTOOLFLAGS) -o $@ $^ || $(RM) $@
+AR_RULE = $(LIBTOOL) -static $(LIBTOOLFLAGS) -o $@ $(^F) || $(RM) $@
 RANLIB = ranlib
 include $(TOP)$(ROOT)config/rules.cf

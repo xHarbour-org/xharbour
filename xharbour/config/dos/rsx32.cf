@@ -1,5 +1,5 @@
 #
-# $Id: rsx32.cf,v 1.3 2003/05/16 19:52:04 druzus Exp $
+# $Id: rsx32.cf,v 1.4 2003/09/25 02:24:02 paultucker Exp $
 #
 # GNU Make file for RSXNT for DOS target
 
@@ -69,6 +69,6 @@ LDFLAGS += $(LINKPATHS)
 
 AR = ar
 ARFLAGS = $(A_USR)
-AR_RULE = $(AR) $(ARFLAGS) r $@ $^ || $(RM) $@
+AR_RULE = $(AR) $(ARFLAGS) r $@ $(^F) || $(RM) $@
 
 include $(TOP)$(ROOT)config/rules.cf

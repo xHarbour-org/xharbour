@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.7 2003/12/23 00:49:08 druzus Exp $
+# $Id: global.cf,v 1.8 2004/03/03 19:27:13 likewolf Exp $
 #
 
 ifndef MK
@@ -38,7 +38,7 @@ else
     ifeq ($(HB_COMPILER),rsx32)
       #Use standard dos path, which is already set up.
     else
-      ifeq ($(HB_COMPILER),watcom)
+      ifneq ($(findstring watcom,$(HB_COMPILER)),)
         #Use standard dos path, which is already set up.
       else
         ifeq ($(HB_COMPILER),djgpp)

@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.17 2004/06/17 12:23:19 druzus Exp $
+# $Id: mingw32.cf,v 1.18 2004/09/13 17:20:55 lf_sfnet Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -72,13 +72,13 @@ endif
 endif
 
 # Add the specified GT driver library
-ifeq ($(findstring rtl,$(LIBS)),rtl)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
-LINKLIBS += -l$(HB_GT_LIB)
 ifeq ($(HB_MULTI_GT),yes)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
 LINKLIBS += -lgtnul
 endif
+ifeq ($(findstring rtl,$(LIBS)),rtl)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+LINKLIBS += -l$(HB_GT_LIB)
 endif
 
 # HB_SCREEN_LIB: empty, or one of ncurses, slang
@@ -119,7 +119,7 @@ endef
 # in commmand line
 define create_library
 echo. CREATE $@ > __lib__.tmp
-$(foreach file, $^, $(lib_object))
+$(foreach file, $(^F), $(lib_object))
 echo. SAVE >> __lib__.tmp
 echo. END >> __lib__.tmp
 $(AR) -M < __lib__.tmp
@@ -133,7 +133,7 @@ endef
 
 define link_exe_file
 echo. $(LDFLAGS) $(L_USR) $(LD_OUT)$@ > __link__.tmp
-$(foreach file, $^, $(link_file))
+$(foreach file, $(^F), $(link_file))
 $(foreach file, $(LINKPATHS), $(link_file))
 $(foreach file, $(LINKLIBS), $(link_file))
 -$(LD) @__link__.tmp
@@ -143,7 +143,7 @@ LDFLAGS = $(LINKPATHS) -mno-cygwin
 
 AR = ar
 ARFLAGS = $(A_USR)
-AR_RULE = $(AR) $(ARFLAGS) r $@ $^ && $(RANLIB) $@ || $(RM) $@
+AR_RULE = $(AR) $(ARFLAGS) r $@ $(^F) && $(RANLIB) $@ || $(RM) $@
 #AR_RULE = $(create_library)
 
 #LD_RULE = $(link_exe_file)

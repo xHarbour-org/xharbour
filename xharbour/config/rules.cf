@@ -1,5 +1,5 @@
 #
-# $Id: rules.cf,v 1.9 2004/01/05 18:59:28 lf_sfnet Exp $
+# $Id: rules.cf,v 1.10 2004/08/04 23:25:12 mauriliolongo Exp $
 #
 
 # How to run yacc.
@@ -30,7 +30,7 @@ endif
 # The rule to link an executable.
 ifeq ($(LD_RULE),)
 # Use default rule if architecture/compiler specific rule is not defined
-LD_RULE = $(LD) $(CFLAGS) $(LD_OUT)$@ $^ $(LDFLAGS) $(L_USR) $(LINKLIBS)
+LD_RULE = $(LD) $(CFLAGS) $(LD_OUT)$@ $(^F) $(LDFLAGS) $(L_USR) $(LINKLIBS)
 endif
 
 # Eliminate these rules.
@@ -52,27 +52,27 @@ endif
 ifeq ($(CC),bcc)
 # Rule to generate an object file from a C source file in the parent.
 %$(OBJ_EXT) : $(SOURCE_DIR)%.c
-	$(strip $(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_OUT)$(subst .c,$(OBJ_EXT),$(subst $(SOURCE_DIR),,$?)) $(CC_IN) $?)
+	$(strip $(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_OUT)$(subst .c,$(OBJ_EXT),$(subst $(SOURCE_DIR),,$(?F))) $(CC_IN) $(?F))
 
 # Rule to generate an object file from a C source file.
 %$(OBJ_EXT) : %.c
-	$(strip $(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_OUT)$(?:.c=$(OBJ_EXT)) $(CC_IN) $?)
+	$(strip $(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_OUT)$(?F:.c=$(OBJ_EXT)) $(CC_IN) $?F)
 else
 # Rule to generate an object file from a C source file in the parent.
 %$(OBJ_EXT) : $(SOURCE_DIR)%.c
-	$(strip $(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_IN) $? $(CC_OUT)$(subst .c,$(OBJ_EXT),$(subst $(SOURCE_DIR),,$?)))
+	$(strip $(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_IN) $? $(CC_OUT)$(subst .c,$(OBJ_EXT),$(subst $(SOURCE_DIR),,$(?F))))
 
 # Rule to generate an object file from a C source file.
 %$(OBJ_EXT) : %.c
-	$(strip $(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_IN) $? $(CC_OUT)$(?:.c=$(OBJ_EXT)))
+	$(strip $(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_IN) $? $(CC_OUT)$(?F:.c=$(OBJ_EXT)))
 endif
 
 #rules for CPP files
 %$(OBJ_EXT) : $(SOURCE_DIR)%.cpp
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_IN) $? $(CC_OUT)$(subst .cpp,$(OBJ_EXT),$(subst $(SOURCE_DIR),,$?))
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_IN) $? $(CC_OUT)$(subst .cpp,$(OBJ_EXT),$(subst $(SOURCE_DIR),,$(?F)))
 
 %$(OBJ_EXT) : %.cpp
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_IN) $? $(CC_OUT)$(?:.cpp=$(OBJ_EXT))
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(C_USR) $(CC_IN) $? $(CC_OUT)$(?F:.cpp=$(OBJ_EXT))
 
 # Rule to generate an executable file from an object file.
 %$(EXE_EXT) : %$(OBJ_EXT)

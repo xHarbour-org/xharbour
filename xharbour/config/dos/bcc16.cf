@@ -1,5 +1,5 @@
 # 
-# $Id: bcc16.cf,v 1.4 2003/05/16 19:52:03 druzus Exp $
+# $Id: bcc16.cf,v 1.5 2003/09/25 02:24:02 paultucker Exp $
 #
 # The Harbour Project
 # GNU MAKE file for Borland C/C++ 3.x, 4.x, 5.0x
@@ -36,7 +36,7 @@ endef
 
 define link_exe_file
 echo. $(LDFLAGS) -e$@ > __link__.tmp
-$(foreach file, $^, $(link_file))
+$(foreach file, $(^F), $(link_file))
 $(foreach file, $(LINKLIBS), $(link_file))
 -$(LD) @__link__.tmp
 endef
@@ -82,7 +82,7 @@ endef
 
 define create_library
 echo. $@ &> __lib__.tmp
-$(foreach file, $^, $(lib_object))
+$(foreach file, $(^F), $(lib_object))
 echo. ,, >> __lib__.tmp
 $(AR) $(ARFLAGS) @__lib__.tmp
 del __lib__.tmp

@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.10 2004/05/28 18:51:21 likewolf Exp $
+# $Id: gcc.cf,v 1.11 2004/09/08 00:17:09 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -87,12 +87,14 @@ endif
 
 # Add the specified GT driver library
 ifeq ($(findstring rtl,$(LIBS)),rtl)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
-LINKLIBS += -l$(HB_GT_LIB)
+
 ifeq ($(HB_MULTI_GT),yes)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
 LINKLIBS += -lgtnul
 endif
+
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+LINKLIBS += -l$(HB_GT_LIB)
 
 # HB_SCREEN_LIB: empty, or one of ncurses, slang
 ifeq ($(HB_GT_LIB),gtcrs)
@@ -131,6 +133,6 @@ LDFLAGS +=  $(LINKPATHS)
 
 AR = ar
 ARFLAGS = $(A_USR)
-AR_RULE = $(AR) $(ARFLAGS) r $@ $^ && $(RANLIB) $@ || ( $(RM) $@ && false )
+AR_RULE = $(AR) $(ARFLAGS) r $@ $(^F) && $(RANLIB) $@ || ( $(RM) $@ && false )
 
 include $(TOP)$(ROOT)config/rules.cf
