@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.19 2002/11/25 05:09:01 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.20 2002/12/08 20:10:50 ronpinkas Exp $
  */
 
 /*
@@ -128,23 +128,27 @@ START_NEW_LINE_IF_ONE_OF_THESE( "\n;" );
 #define HB_SELF         LEX_CUSTOM_ACTION - 6
 
 SELF_CONTAINED_WORDS_ARE {
-                           LEX_WORD( ".AND." ) AS_TOKEN( AND     + DONT_REDUCE ),
-                           LEX_WORD( ".NOT." ) AS_TOKEN( NOT     + DONT_REDUCE ),
-                           LEX_WORD( ".OR."  ) AS_TOKEN( OR      + DONT_REDUCE ),
+                           LEX_WORD( ".AND." ) AS_TOKEN( AND        + DONT_REDUCE ),
+                           LEX_WORD( ".F."   ) AS_TOKEN( FALSEVALUE + DONT_REDUCE ),
+                           LEX_WORD( ".N."   ) AS_TOKEN( FALSEVALUE + DONT_REDUCE ),
+                           LEX_WORD( ".NOT." ) AS_TOKEN( NOT        + DONT_REDUCE ),
+                           LEX_WORD( ".OR."  ) AS_TOKEN( OR         + DONT_REDUCE ),
+                           LEX_WORD( ".T."   ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE ),
+                           LEX_WORD( ".Y."   ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE ),
                            LEX_WORD( ":="    ) AS_TOKEN( INASSIGN   ),
                            LEX_WORD( "::"    ) AS_TOKEN( HB_SELF    ),
-                           LEX_WORD( "=="    ) AS_TOKEN( EQ      + DONT_REDUCE ),
-                           LEX_WORD( "<>"    ) AS_TOKEN( NE2     + DONT_REDUCE ),
-                           LEX_WORD( "<="    ) AS_TOKEN( LE      + DONT_REDUCE ),
-                           LEX_WORD( ">="    ) AS_TOKEN( GE      + DONT_REDUCE ),
-                           LEX_WORD( "!="    ) AS_TOKEN( NE2     + DONT_REDUCE ),
+                           LEX_WORD( "=="    ) AS_TOKEN( EQ         + DONT_REDUCE ),
+                           LEX_WORD( "<>"    ) AS_TOKEN( NE2        + DONT_REDUCE ),
+                           LEX_WORD( "<="    ) AS_TOKEN( LE         + DONT_REDUCE ),
+                           LEX_WORD( ">="    ) AS_TOKEN( GE         + DONT_REDUCE ),
+                           LEX_WORD( "!="    ) AS_TOKEN( NE2        + DONT_REDUCE ),
                            LEX_WORD( "++"    ) AS_TOKEN( INC        ),
                            LEX_WORD( "+="    ) AS_TOKEN( PLUSEQ     ),
                            LEX_WORD( "--"    ) AS_TOKEN( DEC        ),
                            LEX_WORD( "-="    ) AS_TOKEN( MINUSEQ    ),
                            LEX_WORD( "->"    ) AS_TOKEN( ALIASOP    ),
                            LEX_WORD( "*="    ) AS_TOKEN( MULTEQ     ),
-                           LEX_WORD( "**"    ) AS_TOKEN( POWER   + DONT_REDUCE ),
+                           LEX_WORD( "**"    ) AS_TOKEN( POWER      + DONT_REDUCE ),
                            LEX_WORD( "/="    ) AS_TOKEN( DIVEQ      ),
                            LEX_WORD( "^="    ) AS_TOKEN( EXPEQ      ),
                            LEX_WORD( "%="    ) AS_TOKEN( MODEQ      )
@@ -269,10 +273,6 @@ LANGUAGE_KEY_WORDS_ARE {
 /* Words. */
 LANGUAGE_WORDS_ARE {
                      LEX_WORD( "..."                              ) AS_TOKEN( EPSILON            + DONT_REDUCE ),
-                     LEX_WORD( ".F."                              ) AS_TOKEN( FALSEVALUE         + DONT_REDUCE ),
-                     LEX_WORD( ".N."                              ) AS_TOKEN( FALSEVALUE         + DONT_REDUCE ),
-                     LEX_WORD( ".T."                              ) AS_TOKEN( TRUEVALUE          + DONT_REDUCE ),
-                     LEX_WORD( ".Y."                              ) AS_TOKEN( TRUEVALUE          + DONT_REDUCE ),
 
                      LEX_WORD( "AS{WS}ANYTYPE"                    ) AS_TOKEN( AS_VARIANT         + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY"                      ) AS_TOKEN( AS_ARRAY           + DONT_REDUCE ),

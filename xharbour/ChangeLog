@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.523 2002/12/13 04:12:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.524 2002/12/13 10:23:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-13 12:05 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/compiler/harbour.slx
+    * Moved .F., .N., .T., .Y. to list of SELF_CONTAINED_WORDS.
 
 2002-12-13 02:22 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/regex.h
