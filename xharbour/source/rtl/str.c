@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.2 2002/04/28 03:08:04 ronpinkas Exp $
+ * $Id: str.c,v 1.3 2002/04/29 01:27:27 ronpinkas Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
+#include "hbfast.h"
 
 HB_FUNC( STR )
 {
