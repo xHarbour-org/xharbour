@@ -1,5 +1,5 @@
 /*
- * $Id: minmax.c,v 1.1.1.1 2001/12/21 10:41:51 ronpinkas Exp $
+ * $Id: minmax.c,v 1.2 2002/08/08 19:36:08 ronpinkas Exp $
  */
 
 /*
@@ -67,6 +67,10 @@ HB_FUNC( MAX )
 
       hb_retds( hb_itemGetDL( p1 ) >= hb_itemGetDL( p2 ) ? hb_pardsbuff( szDate, 1 ) : hb_pardsbuff( szDate, 2 ) );
    }
+   else if( ( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) ) && ( ( ! ( HB_IS_DATE( p1 ) ) || ( ! HB_IS_DATE( p2 ) ) ) ) )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1093, NULL, "MAX", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
    else if( HB_IS_NUMERIC( p1 ) && HB_IS_NUMERIC( p2 ) )
    {
       /* NOTE: The order of these if() branches is significant,
@@ -121,6 +125,10 @@ HB_FUNC( MIN )
       char szDate[ 9 ];
 
       hb_retds( hb_itemGetDL( p1 ) <= hb_itemGetDL( p2 ) ? hb_pardsbuff( szDate, 1 ) : hb_pardsbuff( szDate, 2 ) );
+   }
+   else if( ( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) ) && ( ( ! ( HB_IS_DATE( p1 ) ) || ( ! HB_IS_DATE( p2 ) ) ) ) )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1092, NULL, "MIN", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
    else if( HB_IS_NUMERIC( p1 ) && HB_IS_NUMERIC( p2 ) )
    {

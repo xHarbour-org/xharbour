@@ -1,5 +1,5 @@
 /*
- * $Id: round.c,v 1.1.1.1 2001/12/21 10:42:01 ronpinkas Exp $
+ * $Id: round.c,v 1.2 2002/10/16 01:18:31 ronpinkas Exp $
  */
 
 /*
@@ -78,8 +78,7 @@ HB_FUNC( INT )
 
       hb_itemGetNLen( pNumber, &iWidth, NULL );
 
-      //hb_retndlen( dNumber >= 0 ? floor( dNumber ) : ceil( dNumber ), iWidth, 0 );
-      hb_retnl( dNumber >= 0 ? (long) floor( dNumber ) : (long) ceil( dNumber ) );
+      hb_retndlen( dNumber >= 0 ? floor( dNumber ) : ceil( dNumber ), iWidth, 0 );
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.11 2002/10/13 18:06:30 ronpinkas Exp $
+ * $Id: macro.c,v 1.12 2002/10/15 17:02:42 mlombardo Exp $
  */
 
 /*
@@ -347,8 +347,12 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
          if( ! ( *pName == '_' && ulNameLen == 1 ) )
          {
             /* this is not the "&_" string */
-            char * szValPtr;
+            char * szValPtr, cSave;
             ULONG ulValLen;
+
+            // Save overriden char, and terminate.
+            cSave = pName[ ulNameLen ];
+            pName[ ulNameLen ] = '\0';
 
             /* Get a pointer to the string value stored in this variable
              * or NULL if variable doesn't exist or doesn't contain a string
@@ -356,8 +360,11 @@ char * hb_macroTextSubst( char * szString, ULONG *pulStringLen )
              * NOTE: This doesn't create a copy of the value then it
              * shouldn't be released here.
              */
-            ulValLen = ulNameLen;   /* the length of name */
             szValPtr = hb_memvarGetStrValuePtr( pName, &ulValLen );
+
+            // Restore.
+            pName[ ulNameLen ] = cSave;
+
             if( szValPtr )
             {
                if( *pHead == '.' )

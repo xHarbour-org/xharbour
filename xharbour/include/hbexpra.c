@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.9 2002/05/22 16:35:10 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.10 2002/09/24 03:26:12 ronpinkas Exp $
  */
 
 /*
@@ -294,9 +294,8 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
 
       if( ( strcmp( "AT", pName->value.asSymbol ) == 0 ) && iCount == 2 )
       {
-         HB_EXPR_PTR pSub  = pParms->value.asList.pExprList;
-         HB_EXPR_PTR pText = pSub->pNext;
-
+         HB_EXPR_PTR pSub  = HB_EXPR_USE( pParms->value.asList.pExprList, HB_EA_REDUCE );
+         HB_EXPR_PTR pText = HB_EXPR_USE( pSub->pNext, HB_EA_REDUCE );
 
          if( pSub->ExprType == HB_ET_STRING && pText->ExprType == HB_ET_STRING )
          {
@@ -315,12 +314,20 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
       }
       else if( ( strcmp( "UPPER", pName->value.asSymbol ) == 0 ) && iCount == 1 )
       {
-         HB_EXPR_PTR pText = pParms->value.asList.pExprList;
+         HB_EXPR_PTR pText = HB_EXPR_USE( pParms->value.asList.pExprList, HB_EA_REDUCE );
 
          if( pText->ExprType == HB_ET_STRING )
          {
-            pExpr = hb_compExprNewString( hb_strupr( pText->value.asString.string ) );
+            ULONG i;
 
+            for ( i = 0; i < pText->ulLength; i++ )
+            {
+               pText->value.asString.string[i] = toupper( pText->value.asString.string[i] );
+            }
+
+            pExpr = pText;
+
+            pParms->value.asList.pExprList = NULL;
             HB_EXPR_PCODE1( hb_compExprDelete, pParms );
             HB_EXPR_PCODE1( hb_compExprDelete, pName );
          }
@@ -328,7 +335,7 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
       else if( ( strcmp( "CHR", pName->value.asSymbol ) == 0 ) && iCount )
       {
          /* try to change it into a string */
-         HB_EXPR_PTR pArg = pParms->value.asList.pExprList;
+         HB_EXPR_PTR pArg = HB_EXPR_USE( pParms->value.asList.pExprList, HB_EA_REDUCE );
 
          if( pArg->ExprType == HB_ET_NUMERIC )
          {
@@ -385,7 +392,7 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
       else if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_XBASE ) &&
           (( strcmp( "__DBLIST", pName->value.asSymbol ) == 0 ) && iCount >= 10) )
       {
-         HB_EXPR_PTR pArray = pParms->value.asList.pExprList->pNext;
+         HB_EXPR_PTR pArray = HB_EXPR_USE( pParms->value.asList.pExprList->pNext, HB_EA_REDUCE );
 
          if( pArray->ExprType == HB_ET_ARRAY )
          {

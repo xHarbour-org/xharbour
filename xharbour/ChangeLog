@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.446 2002/10/16 04:20:24 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.447 2002/10/16 05:42:09 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-16 17:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexpra.c
+    + Added reduction with HB_EA_REDUCE to paramas of functions optimized in hb_compExprNewFunCall().
+    ! Fixed compile time optimization of Upper() to support embeded NULL characters in the string.
+
+  * include/hbexprb.c
+    + Added compile time optimization of SubStr( "Some Literal", litralNum, literalNum or NIL )
+
+  * source/compiler/harbour.slx
+    - Removed few commented lines.
+
+  * source/rtl/minmax.c
+    ! Corrected support for Date compared with Non Date in Max() and Min()
+
+  * source/rtl/round.c
+    * Reverted recent change to Int()
+
+  * source/vm/macro.c
+    ! Corrected call to hb_memvarGetStrValuePtr() to support new optimization of hb_memvarFindSymbol()
+
+  * source/vm/memvars.c
+    * Minor correction to trace message.
+
 2002-10-16 12:40 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * source/rtl/dircmd.prg
     ! modified output format in function PutNormal()

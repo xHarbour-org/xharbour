@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.29 2002/08/09 16:50:55 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.30 2002/10/13 18:06:28 ronpinkas Exp $
  */
 
 /*
@@ -1354,20 +1354,85 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
             }
 
          #ifndef HB_C52_STRICT
-            // SubStr( Str, n, 1 ) => Str[n]
             if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME )
             {
                if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBSTR" ) == 0 )
                {
                   USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
 
-                  if( usCount == 3 )
+                  if( usCount > 1 )
                   {
                      HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
                      HB_EXPR_PTR pStart  = pString->pNext;
                      HB_EXPR_PTR pLen    = pStart->pNext;
 
-                     if( pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG && pLen->value.asNum.lVal == 1 )
+                     if( pString->ExprType == HB_ET_STRING && pStart->ExprType == HB_ET_NUMERIC && pStart->value.asNum.NumType == HB_ET_LONG )
+                     {
+                        // Can default.
+                        if( pLen == NULL )
+                        {
+                           pLen = hb_compExprNewLong( pString->ulLength );
+                        }
+
+                        // Optimization only possible if BOTH nStart and nLen are numerics.
+                        if( pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG )
+                        {
+                           char *sSubStr;
+
+                           // Start - From Right.
+                           if( pStart->value.asNum.lVal < 0 )
+                           {
+                              pStart->value.asNum.lVal += pString->ulLength + 1;
+                           }
+
+                           // Start - Must be postive.
+                           if( pStart->value.asNum.lVal <= 0 )
+                           {
+                              pStart->value.asNum.lVal = 1;
+                           }
+
+                           // Start - Never beyond terminator.
+                           if( (ULONG) pStart->value.asNum.lVal > pString->ulLength )
+                           {
+                              pStart->value.asNum.lVal = pString->ulLength + 1;
+                           }
+
+                           // Len - Never negative.
+                           if( pLen->value.asNum.lVal < 0 )
+                           {
+                              pLen->value.asNum.lVal = 0;
+                           }
+
+                           // Len - Never beyond range.
+                           if( (ULONG) pStart->value.asNum.lVal + (ULONG) pLen->value.asNum.lVal - 1 > pString->ulLength )
+                           {
+                              pLen->value.asNum.lVal = pString->ulLength - pStart->value.asNum.lVal + 1;
+                           }
+
+                           //printf( "String: '%s', Start: %i, Len: %i\n", pString->value.asString.string, pStart->value.asNum.lVal, pLen->value.asNum.lVal );
+
+                           sSubStr = (char *) hb_xgrab( pLen->value.asNum.lVal + 1 );
+
+                           memcpy( sSubStr, pString->value.asString.string + pStart->value.asNum.lVal - 1, pLen->value.asNum.lVal );
+                           sSubStr[ pLen->value.asNum.lVal ] = '\0';
+
+                           #if defined( HB_MACRO_SUPPORT )
+                              hb_xfree( pString->value.asString.string );
+                           #endif
+
+                           pString->value.asString.string = sSubStr;
+                           pString->ulLength = pLen->value.asNum.lVal;
+                           pString->value.asString.dealloc = TRUE;
+
+                           // Skipping over the first paramter, being used by the optimization.
+                           pSelf->value.asFunCall.pParms->value.asList.pExprList = pStart;
+                           HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+
+                           pSelf = pString;
+                        }
+                     }
+                     // SubStr( Str, n, 1 ) => Str[n]
+                     else if( usCount == 3 && pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG && pLen->value.asNum.lVal == 1 )
                      {
                         // Delete the pre-optimization components.
                         // Skipping the first 2 elements of the list, as they are used by the optimization.

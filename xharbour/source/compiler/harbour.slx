@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.14 2002/09/17 06:27:24 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.15 2002/10/09 20:42:59 ronpinkas Exp $
  */
 
 /*
@@ -550,8 +550,6 @@ int hb_comp_SLX_InterceptAction( int iRet, char *sToken )
    }
 
    #ifdef SHOW_LEX_TOKENS
-     //if( hb_comp_iLine > 2489 && hb_comp_iLine < 2493 )
-     {
      if( iRet == IDENTIFIER )       { printf( "   IDENTIFIER = \"%s\"\n", yylval.string  ); }
      else if( iRet == LITERAL )     { printf( "   LITERAL = \"%s\"\n", yylval.string  ); }
      else if( iRet == MACROVAR )    { printf( "   MACROVAR = \"%s\"\n", yylval.string  ); }
@@ -741,8 +739,6 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    }
 
    DEBUG_INFO( printf(  "Element \"%s\" is %i\n", szToken, iRet ) );
-
-   //if( hb_comp_iLine > 2488 && hb_comp_iLine < 2493 ) { printf( "\nElement %s is %i\n", szToken, iRet ); fflush( stdout ); }
 
    return iRet;
 }

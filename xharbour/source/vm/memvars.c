@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.17 2002/10/15 17:02:42 mlombardo Exp $
+ * $Id: memvars.c,v 1.18 2002/10/15 19:32:05 ronpinkas Exp $
  */
 
 /*
@@ -634,7 +634,7 @@ char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
    HB_DYNS_PTR pDynVar;
    char * szValue = NULL;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_memvarGetStrValuePtr(%s, %li)", szVarName, pulLen));
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarGetStrValuePtr(%s, %p)", szVarName, pulLen));
 
    itName.type = HB_IT_STRING;
    itName.item.asString.value  = szVarName;
