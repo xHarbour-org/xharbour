@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.41 2003/02/28 10:01:40 mlombardo Exp $
+ * $Id: dbfcdx1.c,v 1.42 2003/05/24 00:29:09 ronpinkas Exp $
  */
 
 /*
@@ -7486,6 +7486,7 @@ ERRCODE hb_cdxReadDBHeader( CDXAREAP pArea )
    pArea->ulRecCount = dbHeader.ulRecCount;
    pArea->fHasMemo = ( dbHeader.bVersion == 0xF5 );
    pArea->fHasTags = dbHeader.bHasTags;
+   pArea->bCodePage = dbHeader.bCodePage;
    return SUCCESS;
 }
 
@@ -7508,6 +7509,7 @@ ERRCODE hb_cdxWriteDBHeader( CDXAREAP pArea )
    dbfHeader.bMonth = ( BYTE ) lMonth;
    dbfHeader.bDay = ( BYTE ) lDay;
    dbfHeader.bHasTags = ( BYTE ) pArea->fHasTags;
+   dbfHeader.bCodePage = pArea->bCodePage;
 
    /* Update record count */
    SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount );
