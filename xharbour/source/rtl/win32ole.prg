@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.10 2002/05/16 02:28:38 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.11 2002/06/17 22:37:07 andijahja Exp $
  */
 
 /*
@@ -689,7 +689,7 @@ RETURN uObj
 
      uLen  = strlen( cString ) + 1;
 
-     if( uLen )
+     if( uLen > 1 )
      {
         wString = ( BSTR ) hb_xgrab( uLen * 2 );
         MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, uLen, wString, uLen );
@@ -716,7 +716,7 @@ RETURN uObj
 
      uLen = SysStringLen( wString ) + 1;
 
-     if( uLen )
+     if( uLen > 1 )
      {
         cString = (char *) hb_xgrab( uLen );
         WideCharToMultiByte( CP_ACP, 0, wString, uLen, cString, uLen, NULL, NULL );
@@ -935,6 +935,11 @@ RETURN uObj
 
                  case VT_BYREF | VT_DISPATCH:
                    //printf( "Dispatch\n" );
+                   if( dParams->rgvarg[ n ].n1.n2.n3.pdispVal == NULL )
+                   {
+                      hb_itemClear( aPrgParams[ n ] );
+                      break;
+                   }
 
                    OleAuto.type = HB_IT_NIL;
 
@@ -1013,11 +1018,20 @@ RETURN uObj
   {
      LPSTR cString;
 
+     /*
+     printf( "Type: %i\n", RetVal.n1.n2.vt );
+     fflush( stdout );
+     getchar();
+     */
+
      switch( RetVal.n1.n2.vt )
      {
         case VT_BSTR:
+          //printf( "String\n" );
           cString = WideToAnsi( RetVal.n1.n2.n3.bstrVal );
+          //printf( "cString %s\n", cString );
           hb_retcAdopt( cString );
+          //printf( "Adopted\n" );
           break;
 
         case VT_BOOL:
@@ -1025,6 +1039,12 @@ RETURN uObj
           break;
 
         case VT_DISPATCH:
+          if( RetVal.n1.n2.n3.pdispVal == NULL )
+          {
+             hb_ret();
+             break;
+          }
+
           OleAuto.type = HB_IT_NIL;
 
           if( s_pSym_OleAuto )
@@ -1066,6 +1086,7 @@ RETURN uObj
           break;
 
         default:
+          //printf( "Default %i!\n", RetVal.n1.n2.vt );
           if( s_nOleError == S_OK )
           {
              (LONG) s_nOleError = -1;
@@ -1075,7 +1096,7 @@ RETURN uObj
           break;
      }
 
-     if( RetVal.n1.n2.vt == VT_DISPATCH )
+     if( RetVal.n1.n2.vt == VT_DISPATCH && RetVal.n1.n2.n3.pdispVal )
      {
         //printf( "Dispatch: %ld\n", ( LONG ) RetVal.n1.n2.n3.pdispVal );
      }
