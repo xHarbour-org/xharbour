@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.19 2003/09/03 00:34:01 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.20 2003/09/14 20:42:30 ronpinkas Exp $
  */
 
 /*
@@ -1285,15 +1285,10 @@ void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, char * sz
 
    /* Ok, launch... */
    pResult = hb_errLaunchSubst( pError );
-   
+
    if( pResult )
    {
       hb_itemRelease( hb_itemReturn( pResult ) );
-   }
-
-   // Might have been released by hb_errLaunchSubst()
-   if( pError->type )
-   {
       hb_errRelease( pError );
    }
 }
