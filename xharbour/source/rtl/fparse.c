@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.8 2004/03/10 20:19:36 andijahja Exp $
+ * $Id: fparse.c,v 1.9 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -650,7 +650,7 @@ HB_FUNC( FCHARCOUNT )
         case '\n'  :
         case '\r'  :
         case ' '   :
-        case '\tab':
+        case '\t':
            break;
         default:
            ulResult ++;

@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.40 2004/03/07 00:01:19 andijahja Exp $
+ * $Id: direct.c,v 1.41 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -242,12 +242,12 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
       {
          if( fDirSpec->szDrive )
          {
-            hb_fsChDrv( ( BYTE ) fDirSpec->szDrive );
+            hb_fsChDrv( (BYTE) ( fDirSpec->szDrive[0] - 'A' ) );
          }
 
          if( fDirSpec->szPath )
          {
-            hb_fsChDir( ( BYTE *) fDirSpec->szPath );
+            hb_fsChDir( (BYTE *) fDirSpec->szPath );
          }
       }
    }
