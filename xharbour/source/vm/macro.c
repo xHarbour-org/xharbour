@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.43 2004/04/20 14:33:23 jacekp Exp $
+ * $Id: macro.c,v 1.44 2004/04/28 18:31:40 druzus Exp $
  */
 
 /*
@@ -142,7 +142,7 @@ static BOOL hb_macroCheckParam( HB_ITEM_PTR pItem )
 
    if( ! HB_IS_STRING(pItem) )
    {
-      HB_ITEM_PTR pResult = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 0 );
+      HB_ITEM_PTR pResult = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, pItem );
 
       bValid = FALSE;
 
@@ -241,7 +241,10 @@ static void hb_macroSyntaxError( HB_MACRO_PTR pMacro )
    }
    else
    {
-      pResult = hb_errRT_BASE_Subst( EG_SYNTAX, 1449, NULL, "&", 0 );
+      PHB_ITEM  pItem = hb_itemPutCL( NULL, pMacro->string, pMacro->length );
+
+      pResult = hb_errRT_BASE_Subst( EG_SYNTAX, 1449, NULL, "&", 1, pItem );
+      hb_itemRelease(pItem);
 
       if( pResult )
       {
