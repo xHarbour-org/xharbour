@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.11 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: transfrm.c,v 1.12 2003/01/05 06:50:36 ronpinkas Exp $
  */
 
 /*
@@ -803,8 +803,7 @@ HB_FUNC( TRANSFORM )
          if( uiPicFlags & PF_EMPTY )
             memset( szResult, ' ', ulResultPos );
 
-         hb_retclen( szResult, ( uiPicFlags & PF_WIDTH && ulResultPos > ulParamS ) ? ulParamS : ulResultPos );
-         hb_xfree( szResult );
+         hb_retclenAdopt( szResult, ( uiPicFlags & PF_WIDTH && ulResultPos > ulParamS && ulParamS > 0 ) ? ulParamS : ulResultPos );
       }
    }
    else if( pPic || ISNIL( 2 ) ) /* Picture is an empty string or NIL */
