@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.20 2002/09/21 05:21:06 ronpinkas Exp $
+ * $Id: harbour.c,v 1.21 2002/09/23 00:40:37 ronpinkas Exp $
  */
 
 /*
@@ -4286,36 +4286,6 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                if( pGlobal )
                {
                   PCOMSYMBOL pSym;
-                  short iGlobal;
-                  PFUNCTION pReleaseGlobalsFunc = hb_compFunctionNew( hb_strdup( "hb_RELEASEGLOBALS" ), HB_FS_EXIT );
-
-                  pReleaseGlobalsFunc->pOwner = hb_comp_functions.pLast;
-                  pReleaseGlobalsFunc->bFlags = FUN_PROCEDURE;
-
-                  pSym = hb_compSymbolAdd( pReleaseGlobalsFunc->szName, NULL );
-                  pSym->cScope |= pReleaseGlobalsFunc->cScope;
-
-                  hb_comp_functions.pLast->pNext = pReleaseGlobalsFunc;
-                  hb_comp_functions.pLast = pReleaseGlobalsFunc;
-
-                  pGlobal = hb_comp_pGlobals;
-                  iGlobal = 0;
-
-                  while( pGlobal )
-                  {
-                     if( pGlobal->szAlias == NULL )
-                     {
-                        hb_compGenPCode1( HB_P_PUSHNIL );
-                        hb_compGenPCode2( HB_P_POPGLOBAL, (BYTE) iGlobal, FALSE );
-                     }
-
-                     iGlobal++;
-
-                     pGlobal = pGlobal->pNext;
-                  }
-
-                  hb_compGenPCode1( HB_P_ENDPROC );
-                  ++hb_comp_functions.iCount;
 
                   pSym = hb_compSymbolAdd( hb_strdup( "{_REGISTERGLOBALS}" ), NULL );
                   pSym->cScope = HB_FS_INIT | HB_FS_EXIT ;

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.104 2002/09/21 05:21:07 ronpinkas Exp $
+ * $Id: hvm.c,v 1.105 2002/09/23 00:40:37 ronpinkas Exp $
  */
 
 /*
@@ -270,7 +270,7 @@ PHB_ITEM hb_vm_apEnumVar[ HB_MAX_ENUMERATIONS ];
 ULONG    hb_vm_awEnumIndex[ HB_MAX_ENUMERATIONS ];
 USHORT   hb_vm_wEnumCollectionCounter = 0; // Initilaized in hb_vmInit()
 
-HB_ITEM  hb_vm_aGlobals;         /* Harbour array to hold all application global variables */
+static   HB_ITEM  s_aGlobals;         /* Harbour array to hold all application global variables */
 
 /* 21/10/00 - maurilio.longo@libero.it
    This Exception Handler gets called in case of an abnormal termination of an harbour program and
@@ -354,8 +354,8 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    }
    hb_vm_wEnumCollectionCounter = 0;
 
-   hb_vm_aGlobals.type = HB_IT_NIL;
-   hb_arrayNew( &hb_vm_aGlobals, 0 );
+   s_aGlobals.type = HB_IT_NIL;
+   hb_arrayNew( &s_aGlobals, 0 );
 
    HB_TRACE( HB_TR_INFO, ("xinit" ) );
    hb_xinit();
@@ -531,6 +531,9 @@ void HB_EXPORT hb_vmQuit( void )
 
    hb_arrayRelease( &s_aStatics );
    //printf( "After Statics\n" );
+
+   hb_arrayRelease( &s_aGlobals );
+   //printf( "After Globals\n" );
 
    hb_memvarsRelease();    /* clear all PUBLIC variables */
    //printf( "After Memvar\n" );
@@ -1478,7 +1481,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                 pTop->type = HB_IT_BYREF;
 
-                /* we store its stack offset instead of a pointer to support a dynamic stack */
                 pTop->item.asRefer.value = iGlobal + 1; // To offset the -1 below.
                 pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
                 pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
@@ -5820,7 +5822,7 @@ HB_FUNC( INVOKEDEBUG )
 
 /* $Doc$
  * $FuncName$     <aStat> __vmVarSList()
- * $Description$  Return the statics array. Please aClone before assignments
+ * $Description$  Return a clone of the statics array.
  * $End$ */
 HB_FUNC( __VMVARSLIST )
 {
@@ -5872,12 +5874,43 @@ void hb_vmIsStaticRef( void )
    hb_gcItemRef( &s_aStatics );
 }
 
+void hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals )
+{
+   HB_ITEM_PTR pTop = ( * hb_stack.pPos );
+   short iGlobal;
+
+   pTop->type = HB_IT_BYREF;
+
+   for ( iGlobal = 0; iGlobal < iGlobals; iGlobal++ )
+   {
+      pTop->item.asRefer.value = iGlobal + 1; // To offset the -1 below.
+      pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
+      pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
+
+      hb_arrayAdd( &s_aGlobals, pTop );
+   }
+
+   pTop->type = HB_IT_NIL;
+}
+
 void hb_vmIsGlobalRef( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmIsGlobalRef()"));
 
    /* statics are stored as an item of array type */
-   hb_gcItemRef( &hb_vm_aGlobals );
+   hb_gcItemRef( &s_aGlobals );
+}
+
+/* $Doc$
+ * $FuncName$     <aStat> __vmVarGList()
+ * $Description$  Return a clone of the globals array.
+ * $End$ */
+HB_FUNC( __VMVARGLIST )
+{
+   PHB_ITEM pGlobals = hb_arrayClone( &s_aGlobals, NULL );
+
+   hb_itemForwardValue( &hb_stack.Return, pGlobals );
+   hb_itemRelease( pGlobals );
 }
 
 /* $Doc$

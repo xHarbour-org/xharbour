@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.23 2002/09/21 05:21:06 ronpinkas Exp $
+ * $Id: genc.c,v 1.24 2002/09/23 00:40:37 ronpinkas Exp $
  */
 
 /*
@@ -57,13 +57,13 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
    FILE * yyc; /* file handle for C output */
    PINLINE pInline = hb_comp_inlines.pFirst;
    PVAR pGlobal, pDelete;
+   short iGlobals = 0;
 
    BOOL bIsPublicFunction ;
    BOOL bIsInitFunction   ;
    BOOL bIsExitFunction   ;
    BOOL bIsStaticVariable ;
    BOOL bIsGlobalVariable ;
-   BOOL bRegisterGlobals;
 
    if( ! pFileName->szExtension )
    {
@@ -141,16 +141,13 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
       {
          if( pGlobal->szAlias == NULL )
          {
-            break;
+            iGlobals++;
          }
 
          pGlobal = pGlobal->pNext;
       }
 
-      // Yes.
-      bRegisterGlobals = (BOOL) pGlobal;
-
-      if( bRegisterGlobals )
+      if( iGlobals )
       {
          fprintf( yyc, "static HARBOUR hb_REGISTERGLOBALS( void );\n" ); /* NOTE: hb_ intentionally in lower case */
       }
@@ -209,7 +206,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
             * we are using these two bits to mark the special function used to
             * initialize global variables
             */
-            fprintf( yyc, "{ \"(_REGISTERGLOBALS)\", HB_FS_INIT | HB_FS_EXIT, hb_REGISTERGLOBALS, NULL }" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "{ \"hb_REGISTERGLOBALS\", HB_FS_INIT | HB_FS_EXIT, hb_REGISTERGLOBALS, NULL }" ); /* NOTE: hb_ intentionally in lower case */
          }
          else
          {
@@ -369,23 +366,11 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
          pFunc = pFunc->pNext;
       }
 
-      if( bRegisterGlobals )
+      if( iGlobals )
       {
          fprintf( yyc, "static HARBOUR hb_REGISTERGLOBALS( void )\n"
                        "{\n"
-                       "   extern HB_ITEM hb_vm_aGlobals;\n" );
-
-         pGlobal = hb_comp_pGlobals;
-         while( pGlobal )
-         {
-            if( pGlobal->szAlias == NULL )
-            {
-               fprintf( yyc, "   hb_arrayAdd( &hb_vm_aGlobals, &%s );\n", pGlobal->szName );
-            }
-
-            pGlobal = pGlobal->pNext;
-         }
-
+                       "   hb_vmRegisterGlobals( &pGlobals, %i );\n", iGlobals );
          fprintf( yyc, "}\n\n" );
       }
 

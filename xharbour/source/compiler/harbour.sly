@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.19 2002/08/31 14:04:56 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.20 2002/09/16 05:34:02 ronpinkas Exp $
  */
 
 /*
@@ -1531,7 +1531,7 @@ VarDef     : IdentName AsType { hb_compVariableAdd( $1, hb_comp_cVarType ); }
                   else if( hb_comp_iVarScope == VS_GLOBAL )
                   {
                      hb_compGlobalsDefStart();   /* switch to statics pcode buffer */
-                     hb_compExprDelete( hb_compExprGenStatement( hb_compExprAssign( hb_compExprNewVar( $1 ), $6 ) ) );
+                     hb_compExprDelete( hb_compExprGenStatement( hb_compExprAssignStatic( hb_compExprNewVar( $1 ), $6 ) ) );
                      hb_compGlobalsDefEnd();
                   }
                   else if( hb_comp_iVarScope == VS_EXTERNGLOBAL )

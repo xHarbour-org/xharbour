@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.395 2002/09/23 00:40:36 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.396 2002/09/23 00:47:02 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-23 10:50 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+  * source/vm/hvm.c
+    + Added void hb_vmRegisterGlobals( PHB_ITEM **pGlobals, short iGlobals )
+
+  * source/compiler/genc.c
+    * Changed generation of hb_REGISTERGLOBALS() to call new hb_vmRegisterGlobals()
+
+  * source/vm/hvm.c
+    * Modified HB_ITEM hb_vm_aGlobals to static HB_ITEM s_aGlobals.
+    + Added hb_arrayRelease( &s_aGlobals ) to hb_vmQuit()
+
+  * source/compiler/harbour.c
+    - Removed generation of hb_RELEASEGLOBALS()
+
+  * source/compiler/harbour.sly
+    + Added Static Intialization check on values used to initialize GLOBALS.
 
 2002-09-22 17:38 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbpcode.h
