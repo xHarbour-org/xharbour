@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.129 2004/12/17 10:58:22 aleytys Exp $
+# $Id: makefile.bc,v 1.131 2004/12/19 14:00:00 ptsarenko Exp $
 #
 
 #
@@ -600,6 +600,9 @@ LANG_LIB_OBJS = \
    $(OBJ_DIR)\msgsr852.obj \
    $(OBJ_DIR)\msgsriso.obj \
    $(OBJ_DIR)\msgsrwin.obj \
+   $(OBJ_DIR)\msgua866.obj \
+   $(OBJ_DIR)\msguakoi.obj \
+   $(OBJ_DIR)\msguawin.obj \
    $(OBJ_DIR)\msgzhgb.obj \
    $(OBJ_DIR)\msgzhb5.obj
 
@@ -877,6 +880,9 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cprukoi.obj \
    $(OBJ_DIR)\cphr852.obj \
    $(OBJ_DIR)\cphr1250.obj \
+   $(OBJ_DIR)\cpua866.obj \
+   $(OBJ_DIR)\cpuawin.obj \
+   $(OBJ_DIR)\cpuakoi.obj \
    $(OBJ_DIR)\uc1250.obj   \
    $(OBJ_DIR)\uc1251.obj   \
    $(OBJ_DIR)\uc1257.obj   \
@@ -887,6 +893,7 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\uc8859_2.obj \
    $(OBJ_DIR)\uc88591b.obj \
    $(OBJ_DIR)\uckoi8.obj   \
+   $(OBJ_DIR)\uckoi8u.obj  \
    $(OBJ_DIR)\ucmaz.obj
 
 CT_LIB_OBJS = \
@@ -2716,6 +2723,15 @@ $(OBJ_DIR)\msgsriso.obj : $(LANG_DIR)\msgsriso.c
 $(OBJ_DIR)\msgsrwin.obj : $(LANG_DIR)\msgsrwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\msgua866.obj : $(LANG_DIR)\msgua866.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\msguakoi.obj : $(LANG_DIR)\msguakoi.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\msguawin.obj : $(LANG_DIR)\msguawin.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\msgzhb5.obj : $(LANG_DIR)\msgzhb5.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -3044,6 +3060,15 @@ $(OBJ_DIR)\cphr852.obj : $(CODEPAGE_DIR)\cphr852.c
 $(OBJ_DIR)\cphr1250.obj : $(CODEPAGE_DIR)\cphr1250.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\cpua866.obj : $(CODEPAGE_DIR)\cpua866.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cpuawin.obj : $(CODEPAGE_DIR)\cpuawin.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cpuakoi.obj : $(CODEPAGE_DIR)\cpuakoi.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(OBJ_DIR)\uc1250.obj : $(CODEPAGE_DIR)\uc1250.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -3072,6 +3097,9 @@ $(OBJ_DIR)\uc88591b.obj : $(CODEPAGE_DIR)\uc88591b.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\uckoi8.obj : $(CODEPAGE_DIR)\uckoi8.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\uckoi8u.obj : $(CODEPAGE_DIR)\uckoi8u.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\ucmaz.obj : $(CODEPAGE_DIR)\ucmaz.c

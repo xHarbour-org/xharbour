@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.3 2004/12/18 16:00:00 ptsarenko Exp $
+ * $Id: win32prn.prg,v 1.4 2004/12/19 14:00:00 ptsarenko Exp $
  */
 
 /*
@@ -138,6 +138,9 @@ CLASS WIN32PRN
 
 
   METHOD SetPos(nX, nY)                               // **WARNING** : (Col,Row) _NOT_ (Row,Col)
+  METHOD SetColor(nClrText, nClrPane, nAlign) INLINE (;
+         ::TextColor:=nClrText, ::BkColor:=nClrPane, ::TextAlign:=nAlign,;
+         SetColor(::hPrinterDC, nClrText, nClrPane, nAlign) )
   METHOD TextOut(cString, lNewLine, lUpdatePosX)
   METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX) // **WARNING** : (Col,Row) _NOT_ (Row,Col)
   METHOD SetPen(nStyle, nWidth, nColor) INLINE (;
@@ -145,6 +148,9 @@ CLASS WIN32PRN
          SetPen(::hPrinterDC, nStyle, nWidth, nColor) )
   METHOD Line(nX1, nY1, nX2, nY2) INLINE LineTo(::hPrinterDC, nX1, nY1, nX2, nY2)
   METHOD Box(nX1, nY1, nX2, nY2) INLINE Rectangle(::hPrinterDC, nX1, nY1, nX2, nY2)
+  METHOD Arc(nX1, nY1, nX2, nY2) INLINE Arc(::hPrinterDC, nX1, nY1, nX2, nY2)
+  METHOD Ellipse(nX1, nY1, nX2, nY2) INLINE Ellipse(::hPrinterDC, nX1, nY1, nX2, nY2)
+  METHOD FillRect(nX1, nY1, nX2, nY2, nColor) INLINE FillRect(::hPrinterDC, nX1, nY1, nX2, nY2, nColor)
   METHOD GetCharWidth()
   METHOD GetCharHeight()
   METHOD GetTextWidth(cString)
@@ -197,6 +203,10 @@ CLASS WIN32PRN
 
   VAR PosX           INIT 0
   VAR PosY           INIT 0
+
+  VAR TextColor
+  VAR BkColor
+  VAR TextAlign
 
   VAR PenStyle
   VAR PenWidth
@@ -928,6 +938,21 @@ HB_FUNC_STATIC( GETEXEFILENAME )
   hb_retc( (char*) pBuf ) ;
 }
 
+HB_FUNC_STATIC( SETCOLOR )
+{
+   HDC hDC = ( HDC ) hb_parnl( 1 );
+
+   SetTextColor( hDC, (COLORREF) hb_parnl( 2 ) );
+   if( ISNUM(3) )
+   {
+      SetBkColor( hDC, (COLORREF) hb_parnl( 3 ) );
+   }
+   if( ISNUM(4) )
+   {
+      SetTextAlign( hDC, hb_parni( 4 ) );
+   }
+}
+
 HB_FUNC_STATIC( SETPEN )
 {
    HDC hDC = ( HDC ) hb_parnl( 1 );
@@ -936,12 +961,35 @@ HB_FUNC_STATIC( SETPEN )
                hb_parni( 3 ),	// pen width  
                (COLORREF) hb_parnl( 4 ) 	// pen color 
                );
-   HPEN hOldPen = SelectObject( hDC, hPen);
+   HPEN hOldPen = (HPEN) SelectObject( hDC, hPen);
 
    if( hOldPen )
       DeleteObject( hOldPen );
 
    hb_retnl( (LONG) hPen);
+}
+
+
+HB_FUNC_STATIC( FILLRECT )
+{
+   HDC hDC = ( HDC ) hb_parnl( 1 );
+   int x1 = hb_parni( 2 );
+   int y1 = hb_parni( 3 );
+   int x2 = hb_parni( 4 );
+   int y2 = hb_parni( 5 );
+   HBRUSH hBrush = CreateSolidBrush( (COLORREF) hb_parnl( 6 ) );
+   RECT rct;
+
+   rct.top    = y1;
+   rct.left   = x1;
+   rct.bottom = y2;
+   rct.right  = x2;
+
+   FillRect( hDC, &rct, hBrush );
+
+   DeleteObject( hBrush );
+
+   hb_ret( );
 }
 
 HB_FUNC_STATIC( LINETO )
@@ -966,6 +1014,28 @@ HB_FUNC_STATIC( RECTANGLE )
    int y2 = hb_parni( 5 );
 
    hb_retl( Rectangle( hDC, x1, y1, x2, y2) );
+}
+
+HB_FUNC_STATIC( ARC )
+{
+   HDC hDC = ( HDC ) hb_parnl( 1 );
+   int x1 = hb_parni( 2 );
+   int y1 = hb_parni( 3 );
+   int x2 = hb_parni( 4 );
+   int y2 = hb_parni( 5 );
+
+   hb_retl( Arc( hDC, x1, y1, x2, y2, 0, 0, 0, 0) );
+}
+
+HB_FUNC_STATIC( ELLIPSE )
+{
+   HDC hDC = ( HDC ) hb_parnl( 1 );
+   int x1 = hb_parni( 2 );
+   int y1 = hb_parni( 3 );
+   int x2 = hb_parni( 4 );
+   int y2 = hb_parni( 5 );
+
+   hb_retl( Ellipse( hDC, x1, y1, x2, y2) );
 }
 
 #pragma ENDDUMP

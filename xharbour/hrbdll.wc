@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.27 2004/12/08 01:24:57 peterrees Exp $
+# $Id: hrbdll.wc,v 1.29 2004/12/19 14:00:00 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -382,6 +382,9 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msgsr852.obj \
   $(OBJ_DIR)\msgsriso.obj \
   $(OBJ_DIR)\msgsrwin.obj \
+  $(OBJ_DIR)\msgua866.obj \
+  $(OBJ_DIR)\msguakoi.obj \
+  $(OBJ_DIR)\msguawin.obj \
   $(OBJ_DIR)\msgzhgb.obj \
   $(OBJ_DIR)\msgzhb5.obj \
   $(OBJ_DIR)\gtwin.obj \
@@ -405,6 +408,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\macroslx.obj \
   $(OBJ_DIR)\cstruct.obj \
   $(OBJ_DIR)\win32ole.obj \
+  $(OBJ_DIR)\win32prn.obj \
   $(OBJ_DIR)\winos.obj \
   $(OBJ_DIR)\winreg.obj \
   $(OBJ_DIR)\traceprg.obj \
@@ -1733,6 +1737,15 @@ $(OBJ_DIR)\msgsriso.obj : $(LANG_DIR)\msgsriso.c
 $(OBJ_DIR)\msgsrwin.obj : $(LANG_DIR)\msgsrwin.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
+$(OBJ_DIR)\msgua866.obj : $(LANG_DIR)\msgua866.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\msguakoi.obj : $(LANG_DIR)\msguakoi.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\msguawin.obj : $(LANG_DIR)\msguawin.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
 $(OBJ_DIR)\msgzhb5.obj : $(LANG_DIR)\msgzhb5.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
@@ -1884,6 +1897,12 @@ $(OBJ_DIR)\win32ole.c : $(RTL_DIR)\win32ole.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\win32ole.obj : $(OBJ_DIR)\win32ole.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+
+$(OBJ_DIR)\win32prn.c : $(RTL_DIR)\win32prn.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\win32prn.obj : $(OBJ_DIR)\win32prn.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\winos.c : $(RTL_DIR)\winos.prg

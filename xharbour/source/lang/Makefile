@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2003/06/17 22:10:22 druzus Exp $
+# $Id: Makefile,v 1.6 2004/12/19 14:00:00 ptsarenko Exp $
 #
 
 ROOT = ../../
@@ -46,6 +46,9 @@ C_SOURCES=\
 	msgsr852.c   \
 	msgsriso.c   \
 	msgsrwin.c   \
+	msgua866.c   \
+	msguakoi.c   \
+	msguawin.c   \
 	msgzhb5.c    \
 	msgzhgb.c    \
 	

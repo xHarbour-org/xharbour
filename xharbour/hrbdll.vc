@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.57 2004/12/08 01:24:57 peterrees Exp $
+# $Id: hrbdll.vc,v 1.59 2004/12/19 14:00:00 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -441,6 +441,9 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msgsr852.obj \
   $(OBJ_DIR)\msgsriso.obj \
   $(OBJ_DIR)\msgsrwin.obj \
+  $(OBJ_DIR)\msgua866.obj \
+  $(OBJ_DIR)\msguakoi.obj \
+  $(OBJ_DIR)\msguawin.obj \
   $(OBJ_DIR)\msgzhgb.obj \
   $(OBJ_DIR)\msgzhb5.obj \
 #
@@ -486,6 +489,9 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\cpsliso.obj \
   $(OBJ_DIR)\cpslwin.obj \
   $(OBJ_DIR)\cpsrwin.obj \
+  $(OBJ_DIR)\cpua866.obj \
+  $(OBJ_DIR)\cpuakoi.obj \
+  $(OBJ_DIR)\cpuawin.obj \
   $(OBJ_DIR)\uc1250.obj \
   $(OBJ_DIR)\uc1251.obj \
   $(OBJ_DIR)\uc1257.obj \
@@ -496,6 +502,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\uc8859_2.obj \
   $(OBJ_DIR)\uc88591b.obj \
   $(OBJ_DIR)\uckoi8.obj  \
+  $(OBJ_DIR)\uckoi8u.obj \
   $(OBJ_DIR)\ucmaz.obj \
 #
 # hbtip
@@ -1765,6 +1772,15 @@ $(OBJ_DIR)\msgsriso.obj : $(LANG_DIR)\msgsriso.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\msgsrwin.obj : $(LANG_DIR)\msgsrwin.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\msgua866.obj : $(LANG_DIR)\msgua866.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\msguakoi.obj : $(LANG_DIR)\msguakoi.c
+   $(CC) $(CLIBFLAGS) /Fo$@ $**
+
+$(OBJ_DIR)\msguawin.obj : $(LANG_DIR)\msguawin.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\msgzhb5.obj : $(LANG_DIR)\msgzhb5.c

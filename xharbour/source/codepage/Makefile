@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.8 2004/09/19 03:59:20 kaddath Exp $
+# $Id: Makefile,v 1.11 2004/12/19 21:43:40 ptsarenko Exp $
 #
 
 ROOT = ../../
@@ -29,6 +29,9 @@ C_SOURCES=\
       cpsliso.c    \
       cpslwin.c    \
       cpsrwin.c    \
+      cpua866.c    \
+      cpuakoi.c    \
+      cpuawin.c    \
       uc1250.c      \
       uc1251.c      \
       uc1257.c      \
@@ -39,6 +42,7 @@ C_SOURCES=\
       uc88591b.c    \
       uc8859_2.c    \
       uckoi8.c      \
+      uckoi8u.c     \
       ucmaz.c       \
 
 

@@ -3,6 +3,17 @@
 
 #define PS_SOLID            0
 
+#define RGB( nR,nG,nB )   ( nR + ( nG * 256 ) + ( nB * 256 * 256 ) )
+
+#define BLACK          RGB( 0x0 ,0x0 ,0x0  )
+#define BLUE           RGB( 0x0 ,0x0 ,0x85 )
+#define GREEN          RGB( 0x0 ,0x85,0x0  )
+#define CYAN           RGB( 0x0 ,0x85,0x85 )
+#define RED            RGB( 0x85,0x0 ,0x0  )
+#define MAGENTA        RGB( 0x85,0x0 ,0x85 )
+#define BROWN          RGB( 0x85,0x85,0x0  )
+#define WHITE          RGB( 0xC6,0xC6,0xC6 )
+
 FUNCTION Main()
   LOCAL nPrn:=1
   LOCAL aPrn:= GetPrinters()
@@ -33,7 +44,7 @@ STATIC FUNCTION PrnTest(cPrinter)
     IF !oPrinter:startDoc('Win32Prn(Doc name in Printer Properties)')
       Alert("StartDoc() failed")
     ELSE
-      oPrinter:SetPen(PS_SOLID, 1, 0)
+      oPrinter:SetPen(PS_SOLID, 1, RED)
       oPrinter:Bold(800)
       oPrinter:TextOut(oPrinter:PrinterName+': MaxRow() = '+STR(oPrinter:MaxRow(),4)+'   MaxCol() = '+STR(oPrinter:MaxCol(),4))
       oPrinter:Bold(0)     // Normal
@@ -93,8 +104,12 @@ STATIC FUNCTION PrnTest(cPrinter)
       oPrinter:NewLine()
       oPrinter:NewLine()
       oPrinter:SetFont('Lucida Console',18, 0)  // Large print
+      oPrinter:SetColor( GREEN )
       oPrinter:TextOut("Finally some larger print")
-      oPrinter:Box(oPrinter:PosX, oPrinter:PosY, oPrinter:PosX+100, oPrinter:PosY+100)
+      oPrinter:Box(  0, oPrinter:PosY+100, 100, oPrinter:PosY+200)
+      oPrinter:Arc(200, oPrinter:PosY+100, 300, oPrinter:PosY+200)
+      oPrinter:Ellipse(400, oPrinter:PosY+100, 500, oPrinter:PosY+200)
+      oPrinter:FillRect(600, oPrinter:PosY+100, 700, oPrinter:PosY+200, RED)
       oPrinter:EndDoc()
     ENDIF
     oPrinter:Destroy()

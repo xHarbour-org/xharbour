@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3683 2004/12/18 13:49:44 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3685 2004/12/19 14:00:00 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,43 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-12-19 14:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  * source/rtl/win32prn.prg
+    + added SetColor(), Arc(), Ellipse() and FillRect() methods
+  * tests/testw32p.prg
+    + added sample for new methods
+  + source/codepage/cpua866.c
+  + source/codepage/cpuawin.c
+  + source/codepage/cpuakoi.c
+  + source/codepage/uckoi8u.c
+    + added ukrainian codepages
+  * source/codepage/Makefile
+    + added support for ukrainian codepages
+  * include/hbapicdp.h
+    + added koi8-u codepage
+  * source/lang/msgru866.c
+  * source/lang/msgruwin.c
+  * source/lang/msgrukoi.c
+    * minor corrections
+  + source/lang/msgua866.c
+  + source/lang/msguawin.c
+  + source/lang/msguakoi.c
+    + added ukrainian language support
+  * source/lang/Makefile
+    + added support for the ukrainian language
+  * makefile.wc
+    ! fixed rules for source/rtl/ct/setkeys.prg
+    + added missing rule for source/rtl/win32prn.prg
+    + added support for the ukrainian codepages and language
+  * hrbdll.wc
+    + added missing rule for source/rtl/win32prn.prg
+    + added support for the ukrainian codepages and language
+  * makefile.bc
+  * makefile.nt
+  * makefile.vc
+  * hrbdll.bc
+  * hrbdll.vc
+    + added support for the ukrainian codepages and language
 
 2004-12-19 00:40 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * source/rtl/gtwvt/gtwvt.c
