@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.33 2003/05/26 05:58:54 paultucker Exp $
+ * $Id: dbcmd.c,v 1.34 2003/06/03 15:30:08 lculik Exp $
  */
 
 /*
@@ -423,6 +423,31 @@ static void hb_rddSelectFirstAvailable( void )
    }
    s_pCurrArea = NULL;   /* Selected WorkArea must be created */
 }
+
+
+/*
+ * Return the first free WorkArea number
+ */
+static USHORT hb_rddFindFirstFreeAreaNum( void )
+{
+   LPAREANODE pAreaNode;
+   USHORT uiFreeAreaNum;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddFirstFreeAreaNum()"));
+
+   uiFreeAreaNum = 1;
+   pAreaNode = s_pWorkAreas;
+   while( pAreaNode )
+   {
+      if( ( ( AREAP ) pAreaNode->pArea )->uiArea > uiFreeAreaNum )
+         break;
+      else if( ( ( AREAP ) pAreaNode->pArea )->uiArea == uiFreeAreaNum )
+         uiFreeAreaNum++;
+      pAreaNode = pAreaNode->pNext;
+   }
+	return uiFreeAreaNum;
+}
+
 
 /*
  * pTable - a table in new RDDNODE that will be filled
@@ -3760,7 +3785,7 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
 
 /* Fill pInfo structure */
   memset( &pInfo, 0, sizeof(DBOPENINFO) );
-  pInfo.uiArea = uiRddID;
+  pInfo.uiArea = hb_rddFindFirstFreeAreaNum();
   pInfo.abName = ( BYTE * )  hb_xgrab( _POSIX_PATH_MAX + 1 );
   strcpy( ( char * ) pInfo.abName, szFileName );
   pInfo.atomAlias = ( BYTE * ) "__TMPAREA";
