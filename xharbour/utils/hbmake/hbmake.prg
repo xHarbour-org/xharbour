@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.38 2003/01/11 21:01:29 lculik Exp $
+ * $Id: hbmake.prg,v 1.39 2003/01/12 19:47:58 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1303,7 +1303,7 @@ FUNC crtmakfile( cFile )
     @ 11, 40 get lXFwh checkbox caption "Xharbour FWH"             style "[o ]"
     @ 12,  1 Say "Resource file Name" Get CResName
     @ 13, 1 say aLangMessages[ 43 ] get nFilestoAdd pict "99" valid nFilestoAdd > 0
-    @ 13, 40 GET lMt checkbox caption aLangMessages [44] style "[o ]"
+    @ 14, 1 GET lMt checkbox caption aLangMessages [44] style "[o ]"
     READ
 
     IF !Empty( cUserDef )
