@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.55 2003/11/12 13:49:13 jonnymind Exp $
+ * $Id: filesys.c,v 1.56 2003/11/27 13:27:21 lf_sfnet Exp $
  */
 
 /*
@@ -3344,6 +3344,7 @@ int GnuErrtoDosErr( int ErrCode )
         iResult = 5  ;
 
 }
+
 #endif
 
     return iResult;
@@ -3371,6 +3372,11 @@ void  HB_EXPORT hb_fsSetError( USHORT uiError )
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSetError(%hu)", uiError));
 
+   #if defined(_MSC_VER)
+      if ( uiError == EBADF )
+         uiError = 6;
+   #endif
+
    #if defined(X__WIN32__)
       s_uiErrorLast=WintoDosError(uiError);
    #else
@@ -3380,8 +3386,6 @@ void  HB_EXPORT hb_fsSetError( USHORT uiError )
          s_uiErrorLast = uiError;
       #endif
    #endif
-
    s_uiOsErrorLast = uiError;
 
 }
-

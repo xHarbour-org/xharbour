@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1845 2003/12/10 23:16:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1846 2003/12/11 05:09:24 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-12-11 16:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/filesys.c
+    * translate EBADF as 6 for MSVC for Clipper compatibility.
+
 2003-12-11 12:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/pp/ppcore.c
     * Increase MAX_EXP to 4096 (previously 2048) to enable pp to process longer
