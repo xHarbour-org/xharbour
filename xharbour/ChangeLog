@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.783 2003/02/26 16:56:08 jonnymind Exp $
+ * $Id: ChangeLog,v 1.784 2003/02/27 03:59:36 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-02-26 21:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   - contrib/what32/include/classex.ch
+   + include/classex.ch
+     -+ Moved classex.ch to include folder.
+     * Corrected PROPERTY to use PROTECTED instead of HIDDEN scope for the backbone data.
+
+  * source/vm/classes.c
+    * Minor correction and optimizations.
+
+  * tests/tstscope.prg
+    + Added test for Property scope.
 
 2003-02-27 06:00 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/fm.c
     ! Compilation with statistics off was broken. Now it has
       been fixed.
-      
-     
+
 2003-02-26 17:51 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/thread.c
     ! Linux version of last commit was missing a ";". Now
@@ -38,8 +48,8 @@
        being killed in the meanwhile.
 
    * source/vm/garbage.c
-     ! There was a duplicate mutex unlock in the GC collection last steps 
-       (it was a typo!). This error is ignored under linux but causes 
+     ! There was a duplicate mutex unlock in the GC collection last steps
+       (it was a typo!). This error is ignored under linux but causes
        an immediate deadlock under windows. Now it is gone (and MTGC
        is running fine also on Windows).
 

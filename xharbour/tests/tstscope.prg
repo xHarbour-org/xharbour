@@ -1,4 +1,5 @@
 #include "hbclass.ch"
+#include "classex.ch"
 
 static oChild
 
@@ -36,9 +37,20 @@ PROCEDURE Main()
    ?
    ? oChild:ReadOnlyOfParent
 
+   oChild:Property := "Can assign into a property."
+
+   TRY
+      ? oChild:FProperty
+      ? "OOPS", '[' + Str( ProcLine(), 3 ) + ']'
+   CATCH oErr
+      ? "Caught:", oErr:Description, oErr:Operation, '[' + Str( ProcLine(), 3 ) + ']'
+   END
+
 RETURN
 
 CLASS TParent
+
+   PROPERTY Property READ FProperty WRITE FProperty
 
    DATA ReadOnlyOfParent READONLY
 
@@ -67,6 +79,7 @@ METHOD Create() CLASS TChild
 
    ::ProtectedOfParent := "Can assign PROTECTED of Parent in a DERIVED Class - Can read anywhere."
    ::ReadOnlyOfParent := "Can assign READONLY of Parent in a DERIVED Class if NOT PROTECTED - Can read anywhere."
+   ::FProperty := "Can assign property from derived class, otherwise hidden."
 
    TRY
       ? ::PrivateOfParent

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.35 2003/02/25 19:07:14 ronpinkas Exp $
+ * $Id: classes.c,v 1.36 2003/02/25 19:38:18 ronpinkas Exp $
  */
 
 /*
@@ -482,13 +482,13 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
    if( uiScope & HB_OO_CLSTP_READONLY )
    {
       // Allow anyway if all we do is read a property.
-      if( ( pMethod->pFunction == hb___msgGetData ) || ( pMethod->pFunction == hb___msgGetClsData ) || ( pMethod->pFunction == hb___msgGetShrData ) )
+      if( pMethod->pMessage->pSymbol->szName[0] != '_' )
       {
          return TRUE;;
       }
    }
 
-   if( ( uiScope & HB_OO_CLSTP_PROTECTED ) || ( uiScope & HB_OO_CLSTP_HIDDEN ) )
+   if( ( uiScope & HB_OO_CLSTP_PROTECTED ) || ( uiScope & HB_OO_CLSTP_HIDDEN ) || ( uiScope & HB_OO_CLSTP_READONLY ) )
    {
       HB_THREAD_STUB
 
@@ -509,14 +509,18 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
 
       if( HB_IS_OBJECT( pCaller ) )
       {
-         char *szClassOfMessage;
+         #ifdef DEBUG_SCOPE
+            printf( "Object: %s, Caller: %s\n", ( s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ) )->szName, ( s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 ) )->szName );
+         #endif
 
          // This is an Inherited Method
          if( uiScope & HB_OO_CLSTP_SUPER )
          {
             char *szCallerMessage = (*pBase)->item.asSymbol.value->szName;
 
-            //printf( "Object: %s, Caller: %s CallerMessage: %s, CallerMessageClass: %s\n", ( s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ) )->szName, ( s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 ) )->szName, szCallerMessage, hb_objGetRealClsName( pCaller, szCallerMessage ) );
+            #ifdef DEBUG_SCOPE
+               printf( "Object: %s, Caller: %s CallerMessage: %s, CallerMessageClass: %s\n", ( s_pClasses + ( pObject->item.asArray.value->uiClass - 1 ) )->szName, ( s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 ) )->szName, szCallerMessage, hb_objGetRealClsName( pCaller, szCallerMessage ) );
+            #endif
 
             // It's possible that the Caller Message is a Super Messge, and Super is also where this Derived  Method is defined.
             if( hb_objGetRealCls( pObject, pMethod->pMessage->pSymbol->szName ) == hb_objGetRealCls( pCaller, szCallerMessage ) )
@@ -530,80 +534,86 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod )
                goto ScopeError;
             }
 
-            szClassOfMessage = hb_objGetRealClsName( pObject, pMethod->pMessage->pSymbol->szName );
-            //printf( "Defined in: %s\n", szClassOfMessage );
-         }
-         else
-         {
-            if( pCaller->item.asArray.value->uiClass == pObject->item.asArray.value->uiClass )
+            // PROTECTED + READONLY Method can't be written from subclass.
+            if( ( uiScope & HB_OO_CLSTP_PROTECTED ) && ( uiScope & HB_OO_CLSTP_READONLY ) )
             {
-               // Caller is same class as the object, and this is NOT an inhertided Method, so all scopes allowed.
-               return TRUE;;
+               goto ScopeError;
             }
             else
             {
-               // This is NON Inherted Method, and Caller is NOT Derived!.
-               goto ScopeError;
-            }
-         }
-
-         // If we got here, this MUST be a Derived NON HIDDEN Message, thus a Derived PROTECTED Method.
-
-         // Derived class is allowed if scope is PROTECTED, but NOT if ALSO READONLY.
-         if( uiScope & HB_OO_CLSTP_READONLY )
-         {
-            // This is PROTECTED and READONLY Method, NOT allowed in a Derived Caller!
-            goto ScopeError;
-         }
-         else
-         {
-            PCLASS pClass = s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 );
-            USHORT uiAt, uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET );
-
-            for( uiAt = 0; uiAt < uiLimit; uiAt++ )
-            {
-               if( ( pClass->pMethods[ uiAt ].uiScope & HB_OO_CLSTP_CLASS ) == HB_OO_CLSTP_CLASS )
+               if( uiScope & HB_OO_CLSTP_READONLY )
                {
-                  if( strcmp( pClass->pMethods[ uiAt ].pMessage->pSymbol->szName, szClassOfMessage ) == 0 )
+                  // Derived READONLY Message ( NOT PROTCTED ) allowed.
+                  return TRUE;
+               }
+               else
+               {
+                  // If we got here, this MUST be a Derived NON HIDDEN, NON READONLY Message, thus a Derived PROTECTED Method.
+                  PCLASS pCallerClass = s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 );
+                  USHORT uiAt, uiLimit = ( USHORT ) ( pCallerClass->uiHashKey * BUCKET );
+                  char *szClassOfMessage = hb_objGetRealClsName( pObject, pMethod->pMessage->pSymbol->szName );
+
+                  #ifdef DEBUG_SCOPE
+                     printf( "Defined in: %s\n", szClassOfMessage );
+                  #endif
+
+                  // Is the Caller derived from the Object?
+                  for( uiAt = 0; uiAt < uiLimit; uiAt++ )
                   {
-                     // Derived class - allow access to PROTECTED.
-                     return TRUE;;
+                     if( ( pCallerClass->pMethods[ uiAt ].uiScope & HB_OO_CLSTP_CLASS ) == HB_OO_CLSTP_CLASS )
+                     {
+                        if( strcmp( pCallerClass->pMethods[ uiAt ].pMessage->pSymbol->szName, szClassOfMessage ) == 0 )
+                        {
+                           // Derived class - allow access to PROTECTED.
+                           return TRUE;;
+                        }
+                     }
                   }
                }
             }
+         }
+         else
+         {
+            // NON Inherited Message, and Caller is same class as the object, so all scopes allowed.
+            if( pCaller->item.asArray.value->uiClass == pObject->item.asArray.value->uiClass )
+            {
+               return TRUE;;
+            }
+
+            // This is NOT an Inherted Method, and Caller is Different Class - No restricted scope could be valid (excpet READONLY addressed above)!
          }
       }
 
       // All else is not allowed.
       ScopeError:
-        {
-           char szScope[ 32 ];
+      {
+         char szScope[ 32 ];
 
-           szScope[0] = '\0';
+         szScope[0] = '\0';
 
-           strcat( szScope, "Scope Violation <" );
+         strcat( szScope, "Scope Violation <" );
 
-           if( uiScope & HB_OO_CLSTP_HIDDEN )
-           {
-              strcat( szScope, "HIDDEN+" );
-           }
+         if( uiScope & HB_OO_CLSTP_HIDDEN )
+         {
+            strcat( szScope, "HIDDEN+" );
+         }
 
-           if( uiScope & HB_OO_CLSTP_PROTECTED )
-           {
-              strcat( szScope, "PROTECTED+" );
-           }
+         if( uiScope & HB_OO_CLSTP_PROTECTED )
+         {
+            strcat( szScope, "PROTECTED+" );
+         }
 
-           if( uiScope & HB_OO_CLSTP_READONLY )
-           {
-              strcat( szScope, "READONLY+" );
-           }
+         if( uiScope & HB_OO_CLSTP_READONLY )
+         {
+            strcat( szScope, "READONLY+" );
+         }
 
-           szScope[ strlen( szScope ) - 1 ] = '>';
+         szScope[ strlen( szScope ) - 1 ] = '>';
 
-           hb_errRT_BASE( EG_NOMETHOD, 1004, szScope, pMethod->pMessage->pSymbol->szName + ( pMethod->pMessage->pSymbol->szName[0] == '_' ? 1 : 0 ), 1, pObject );
+         hb_errRT_BASE( EG_NOMETHOD, 1004, szScope, pMethod->pMessage->pSymbol->szName + ( pMethod->pMessage->pSymbol->szName[0] == '_' ? 1 : 0 ), 1, pObject );
 
-           return FALSE;
-        }
+         return FALSE;
+      }
    }
 
    return TRUE;
