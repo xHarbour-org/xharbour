@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.193 2003/04/29 23:55:40 ronpinkas Exp $
+ * $Id: hvm.c,v 1.194 2003/05/09 02:53:00 ronpinkas Exp $
  */
 
 /*
@@ -4030,11 +4030,23 @@ static void hb_vmArrayPush( void )
          {
             lIndex += pArray->item.asString.length;
          }
-         // Empty string and -1 Index -> return NIL.
          else if( lIndex == -1 )
          {
             hb_stackPop();
-            hb_itemClear( hb_stackItemFromTop( -1 ) );
+
+            /*
+             * Empty String and Index is -1, this may be result of optimixations:
+             *
+             *    SubStr( "", -1, 1 ) or aTail( "" ).
+             *
+             * The SubStr() should return "", while the aTail("") should return NIL (Invalid Argument).
+             *
+             * We choose the SubStr() context as the more appropriate, because the Invalid Arguemnt context
+             * is of questionable compabtibilty value.
+             *
+             hb_itemClear( hb_stackItemFromTop( -1 ) );
+             */
+
             return;
          }
 

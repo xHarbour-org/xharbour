@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.67 2003/05/07 23:47:32 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.68 2003/05/09 18:44:06 ronpinkas Exp $
  */
 
 /*
@@ -2719,7 +2719,11 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
 
    HB_TRACE(HB_TR_DEBUG, ("getExpReal(%s, %s, %d, %d, %d)", expreal, *ptri, prlist, maxrez, bStrict));
 
-   //printf( "\ngetExpReal( %p, '%s', %d, %d, %d )\n", expreal, *ptri, prlist, maxrez, bStrict );
+   //#define DEBUG_EXP
+
+   #ifdef DEBUG_EXP
+      printf( "\ngetExpReal( %p, '%s', %d, %d, %d )\n", expreal, *ptri, prlist, maxrez, bStrict );
+   #endif
 
    HB_SKIPTABSPACES( *ptri );
 
@@ -2959,6 +2963,9 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
             }
             else if( IsInStr( **ptri, sZnaki ) )
             {
+               // Must terminate macro if any.
+               bMacro = FALSE;
+
                /* Ron Pinkas added 2000-06-02 */
                if( **ptri == '.' && bMacro )
                {
@@ -2967,8 +2974,6 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
                   {
                      State = STATE_ID_END;
                   }
-
-                  bMacro = FALSE;
 
                   /* Ron Pinkas added 2000-05-03 */
                   /* Macro terminator is NOT a coninutation char unlike '.' of logical operators, so we don't want it recorded as cLastChar! */
@@ -2983,7 +2988,9 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
                }
                else
                /* Ron Pinkas end 2000-06-02 */
+               {
                   State = STATE_EXPRES;
+               }
             }
             else if( **ptri == '(' )
             {
@@ -3157,7 +3164,7 @@ static int getExpReal( char * expreal, char ** ptri, BOOL prlist, int maxrez, BO
       *expreal = '\0';
    }
 
-   #if 0
+   #ifdef DEBUG_EXP
       if( lens )
       {
          printf( "Len=%i >%.*s<\n", lens, lens, *ptri - lens );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1014 2003/05/10 01:46:21 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1015 2003/05/12 05:00:03 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-12 13:48 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    ! Fixed getExpReal() to consider operators as Macro terminator.
+
+  * source/vm/hvm.c
+    * Corrected hb_vmArrayPush() to return empty string when processing a -1 Index on an Emprt String.
+      /*
+       * Empty String and Index is -1, this may be result of optimixations:
+       *
+       *    SubStr( "", -1, 1 ) or aTail( "" ).
+       *
+       * The SubStr() should return "", while the aTail("") should return NIL (Invalid Argument).
+       *
+       * We choose the SubStr() context as the more appropriate, because the Invalid Arguemnt context
+       * is of questionable compabtibilty value.
+       *
+       * HBTest now returns 101 "errors" (up from 100) on WinXP using BCC 5.5.1
+       */
 
 2003-05-12 01:35 UTC-0300 Walter Negro <anegro@overnet.com.ar>
   * source/rtl/tget.prg
