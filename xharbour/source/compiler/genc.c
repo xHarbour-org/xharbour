@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.35 2003/03/14 00:32:40 ronpinkas Exp $
+ * $Id: genc.c,v 1.36 2003/03/27 07:44:56 ronpinkas Exp $
  */
 
 /*
@@ -475,7 +475,7 @@ void hb_compGenCCode( PHB_FNAME pFileName )       /* generates the C language ou
       while( pInline )
       {
       /* fprintf( yyc, "#line %i \"%s\"\n", pInline->iLine, pInline->szFileName ); */
-         fprintf( yyc, "#line %i \"", pInline->iLine );
+         fprintf( yyc, "#line %i \"", ( pInline->iLine + 1 ) );
          pszFileName = pInline->szFileName;
          while( *pszFileName )
          {
