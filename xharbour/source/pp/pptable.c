@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.38 2004/03/03 03:31:17 mlombardo Exp $
+ * $Id: pptable.c,v 1.39 2004/03/03 19:37:55 mlombardo Exp $
  */
 
 /*
@@ -216,10 +216,12 @@ void hb_pp_Table( void )
        "DispBox( \1A00, \1B00, \1C00, \1D00, 2 \16, \1E00 \17 )",&sC___75 };
    static COMMANDS sC___77 = {0,"@","\1A00, \1B00 TO \1C00, \1D00 \16COLOR \1E00\17",
        "DispBox( \1A00, \1B00, \1C00, \1D00, 1 \16, \1E00 \17 )",&sC___76 };
+
    static COMMANDS sC___78 = {0,"@","\1A00, \1B00 SAY \1C00 \16PICTURE \1D00\17 \16COLOR \1E00\17",
-       "DevOutPict( \1C00, \1D00, \1E00,\1A00, \1B00  )",&sC___77 };
+       "DevPos( \1A00, \1B00 ); DevOutPict( \1C00, \1D00, \1E00  )",&sC___77 };
    static COMMANDS sC___79 = {0,"@","\1A00, \1B00 SAY \1C00 \16COLOR \1D00\17",
-       "DevOut( \1C00, \1D00, \1A00, \1B00 )",&sC___78 };
+       "DevPos( \1A00, \1B00 ); DevOut( \1C00, \1D00 )",&sC___78 };
+
    /* This hack breaks compatibility with some proper Clipper code
       If someone wants to use it then should put it in your own .ch file */
    /*
@@ -228,6 +230,7 @@ void hb_pp_Table( void )
    static COMMANDS sC___79 = {0,"@","\1A00, \1B00 SAY \1C00 \16COLOR \1D00\17",
        "DevOut( \1C00, \1D00, \1A00, \1B00 )",&sC___78 };
    */
+
    static COMMANDS sC___80 = {0,"SET","BELL \1A20ON,OFF,&>","Set( _SET_BELL, \1A30 )",&sC___79 };
    static COMMANDS sC___81 = {0,"SET","BELL (\1A00)","Set( _SET_BELL, \1A00 )",&sC___80 };
    static COMMANDS sC___82 = {0,"SET","CONFIRM \1A20ON,OFF,&>","Set( _SET_CONFIRM, \1A30 )",&sC___81 };
