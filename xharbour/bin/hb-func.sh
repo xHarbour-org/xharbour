@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.48 2005/02/19 20:49:20 likewolf Exp $
+# $Id: hb-func.sh,v 1.49 2005/02/19 21:07:45 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -379,6 +379,7 @@ elif [ "\${HB_ARCHITECTURE}" = "sunos" ]; then
     HB_STRIP="no"
 elif [ "\${HB_ARCHITECTURE}" = "w32" ]; then
     CC_OPT="$CC_C_USR"
+    HB_OPT="$CC_PRG_USR"
 fi
 
 FOUTC="\${DIROUT}/\${FILEOUT%.*}.c"
@@ -388,7 +389,7 @@ FOUTE="\${FOUTE%.[oc]}${hb_exesuf}"
 
 hb_cc()
 {
-    ${hb_cmpname} "\$@" \${HB_PATHS} && [ -f "\${FOUTC}" ] 
+    ${hb_cmpname} "\$@" \${HB_OPT} \${HB_PATHS} && [ -f "\${FOUTC}" ] 
 }
 
 hb_link()
