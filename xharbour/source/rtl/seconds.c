@@ -1,5 +1,5 @@
 /*
- * $Id: seconds.c,v 1.6 2003/11/26 03:17:49 likewolf Exp $
+ * $Id: seconds.c,v 1.7 2003/12/29 19:25:52 ronpinkas Exp $
  */
 
 /*
@@ -65,7 +65,7 @@
    #include <sys\timeb.h>
 #endif
 
-double hb_dateSeconds( void )
+HB_EXPORT double hb_dateSeconds( void )
 {
 #if defined(_MSC_VER)
    #define timeb _timeb

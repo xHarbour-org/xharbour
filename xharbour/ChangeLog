@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3179 2004/07/21 21:51:06 peterrees Exp $
+ * $Id: ChangeLog,v 1.3180 2004/07/21 22:09:20 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-22 00:52 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/include/hbapi.h
+    + Added export declaration of hb_dateSecond()
+    + Added #define of hb_seconds() as alias of hb_dateSeconds()
+  * source/rtl/bkgtsks.c
+    * changed hb_secondsCPU() with hb_seconds()
+    ! fixed hb_backgroundRun() to run tasks only if SET BACKGROUND TASKS is ON
+    * changed function descriptions
+  * source/rtl/seconds.c
+    * exported hb_dateSeconds()
+
 2004-07-21 19:15 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/dbedit.prg
     ! Fixed bug with columns checking

@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.16 2004/04/06 01:50:54 druzus Exp $
+ * $Id: bkgtsks.c,v 1.17 2004/05/10 10:38:06 mauriliolongo Exp $
  */
 
 /*
@@ -118,7 +118,8 @@ ULONG hb_backgroundAddFunc( PHB_ITEM pBlock, int nMillisec, BOOL bActive )
    pBkgTask = ( PHB_BACKGROUNDTASK ) hb_xgrab( sizeof( HB_BACKGROUNDTASK ) );
 
    pBkgTask->pTask    = hb_itemNew( pBlock );
-   pBkgTask->dSeconds = hb_secondsCPU( 3 );
+   //pBkgTask->dSeconds = hb_secondsCPU( 3 );
+   pBkgTask->dSeconds = hb_seconds();
    pBkgTask->millisec = nMillisec;
    pBkgTask->bActive  = bActive;
 
@@ -169,7 +170,7 @@ void hb_backgroundRun( void )
    HB_THREAD_STUB
    PHB_BACKGROUNDTASK pBkgTask;
 
-   if( ! s_bIamBackground )
+   if( ! s_bIamBackground && hb_set.HB_SET_BACKGROUNDTASKS )
    {
       s_bIamBackground = TRUE;
 
@@ -181,7 +182,8 @@ void hb_backgroundRun( void )
          if ( pBkgTask->bActive &&
               ( pBkgTask->millisec == 0 ||
                 !( pBkgTask->dSeconds ) ||
-                ( ( ( hb_secondsCPU( 3 ) - pBkgTask->dSeconds ) * 1000 ) >= pBkgTask->millisec )
+                //( ( ( hb_secondsCPU( 3 ) - pBkgTask->dSeconds ) * 1000 ) >= pBkgTask->millisec )
+                ( ( ( hb_seconds() - pBkgTask->dSeconds ) * 1000 ) >= pBkgTask->millisec )
               )
             )
          {
@@ -194,7 +196,8 @@ void hb_backgroundRun( void )
             {
                hb_execFromArray( pItem );
             }
-            pBkgTask->dSeconds = hb_secondsCPU( 3 );
+            //pBkgTask->dSeconds = hb_secondsCPU( 3 );
+            pBkgTask->dSeconds = hb_seconds();
          }
          ++s_uiBackgroundTask;
       }
@@ -210,7 +213,7 @@ void hb_backgroundRun( void )
    }
 }
 
-/* RUN only one tasks, no control done */
+/* RUN only one tasks, intentionally no check if bacground are active is done */
 void hb_backgroundRunSingle( ULONG ulID )
 {
    HB_THREAD_STUB
@@ -447,7 +450,7 @@ HB_FUNC( HB_BACKGROUNDDEL )
    }
 }
 
-/* Delete a task with given handle and return a codeblock with this task */
+/* Set a task as active or not */
 HB_FUNC( HB_BACKGROUNDACTIVE )
 {
    HB_THREAD_STUB
@@ -465,11 +468,11 @@ HB_FUNC( HB_BACKGROUNDACTIVE )
       bOldActive = hb_backgroundActive( ulID, bActive );
    }
 
-   hb_retl( bOldActive ); /* return a codeblock */
+   hb_retl( bOldActive ); /* return old active value */
 
 }
 
-/* Delete a task with given handle and return a codeblock with this task */
+/* Set milliseconds after which a task will be executed */
 HB_FUNC( HB_BACKGROUNDTIME )
 {
    HB_THREAD_STUB
@@ -487,5 +490,5 @@ HB_FUNC( HB_BACKGROUNDTIME )
       nOldMillisec = hb_backgroundTime( ulID, nMillisec );
    }
 
-   hb_retni( nOldMillisec ); /* return a codeblock */
+   hb_retni( nOldMillisec ); /* return old millisecond value */
 }
