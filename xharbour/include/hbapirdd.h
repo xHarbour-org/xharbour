@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.24 2001/11/12 07:34:45 brianhays Exp $
+ * $Id: hbapirdd.h,v 1.1.1.1 2001/12/21 10:47:34 ronpinkas Exp $
  */
 
 /*
@@ -68,7 +68,8 @@ extern "C" {
 
 /* RDD virtual machine integration functions */
 
-extern USHORT hb_rddInsertAreaNode( char *szDriver );
+extern USHORT  hb_rddInsertAreaNode( char *szDriver );
+extern USHORT  hb_rddGetCurrentFieldPos( char * szName );
 extern int     hb_rddGetCurrentWorkAreaNumber( void );
 void *         hb_rddGetCurrentWorkAreaPointer( void );
 extern ERRCODE hb_rddSelectWorkAreaAlias( char * szAlias );

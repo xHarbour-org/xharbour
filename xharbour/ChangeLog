@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.122 2002/03/18 16:00:47 lculik Exp $
+ * $Id: ChangeLog,v 1.123 2002/03/18 22:15:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-18 14:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/getexit.ch
+    - Removed 2 defines.
+
+  * include/hbapirdd.h
+  * source/rdd/dbcmd.c
+    + Added USHORT  hb_rddGetCurrentFieldPos( char * szName );
+
+  * include/hbrddntx.h
+  * source/rdd/dbfntx/dbfntx1.c
+    > Synched with Harbour.
+
+  * source/vm/macro.c
+    ! Improved recent fix.
 
 2002-03-18 14:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/getexit.ch

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.4 2002/01/31 05:08:31 ronpinkas Exp $
+ * $Id: macro.c,v 1.5 2002/03/17 03:50:39 ronpinkas Exp $
  */
 
 /*
@@ -1199,18 +1199,15 @@ void hb_compGenPopVar( char * szVarName, HB_MACRO_DECL )
    }
    else
    {
-      HB_DYNS_PTR pSym = hb_dynsymFind( szVarName );
-
-      if( pSym && ! pSym->hMemvar )
+      if( hb_rddGetCurrentFieldPos( szVarName ) )
       {
          hb_compMemvarGenPCode( HB_P_MPOPFIELD, szVarName, HB_MACRO_PARAM );
       }
       else
       {
          hb_compMemvarGenPCode( HB_P_MPOPMEMVAR, szVarName, HB_MACRO_PARAM );
+         hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
       }
-
-      hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
    }
 }
 
@@ -1293,23 +1290,15 @@ void hb_compGenPushVar( char * szVarName, HB_MACRO_DECL )
    }
    else
    {
-      HB_DYNS_PTR pSym = hb_dynsymFind( szVarName );
-
-      if( pSym && pSym->hMemvar )
-      {
-         hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
-      }
-      else if( pSym )
+      if( hb_rddGetCurrentFieldPos( szVarName ) )
       {
          hb_compMemvarGenPCode( HB_P_MPUSHFIELD, szVarName, HB_MACRO_PARAM );
       }
       else
       {
-         // Will result in: HB_MACRO_UNKN_SYM + ~HB_MACRO_CONT
-         hb_compMemvarGenPCode( HB_P_MPUSHVARIABLE, szVarName, HB_MACRO_PARAM );
+         hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
+         hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
       }
-
-      hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
    }
 }
 

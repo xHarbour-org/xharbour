@@ -1,5 +1,5 @@
 /*
- * $Id: getexit.ch,v 1.1.1.1 2001/12/21 10:47:15 ronpinkas Exp $
+ * $Id: getexit.ch,v 1.2 2002/03/18 22:15:17 ronpinkas Exp $
  */
 
 /*
@@ -67,11 +67,6 @@
 #ifdef HB_COMPAT_C53
   #define GE_SHORTCUT     9      // introduced in 5.3
   #define GE_MOUSEHIT     10     // introduced in 5.3
-
-  // tBrowse ApplyKey() method return codes
-  #define TBR_EXIT        -1
-  #define TBR_CONTINUE     0
-  #define TBR_EXCEPTION    1
 #endif
 
 #endif /* _GETEXIT_CH */

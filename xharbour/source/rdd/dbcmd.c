@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.189 2002/02/04 19:21:58 alkresin Exp $
+ * $Id: dbcmd.c,v 1.191 2002/03/18 12:08:06 alkresin Exp $
  */
 
 /*
@@ -596,6 +596,39 @@ static USHORT hb_rddFieldIndex( AREAP pArea, char * szName )
 /*
  * -- FUNCTIONS ACCESSED FROM VIRTUAL MACHINE --
  */
+
+USHORT hb_rddGetCurrentFieldPos( char * szName )
+{
+   USHORT uiCount;
+   LPFIELD pField;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddFieldIndex(%s)", szName));
+
+   if( s_pCurrArea )
+   {
+      pField = ( (AREAP) s_pCurrArea->pArea )->lpFields;
+   }
+   else
+   {
+      return 0;
+   }
+
+   uiCount = 0;
+
+   while( pField )
+   {
+      ++uiCount;
+
+      if( strcmp( szName, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName ) == 0 )
+      {
+         return uiCount;
+      }
+
+      pField = pField->lpfNext;
+   }
+
+   return 0;
+}
 
 /*
  * Return the current WorkArea number.
@@ -2857,20 +2890,16 @@ HB_FUNC( ORDSCOPE )
       sInfo.nScope = hb_parni( 1 );
 
       SELF_SCOPEINFO( ( AREAP ) s_pCurrArea->pArea, sInfo.nScope, pScopeValue );
-      hb_itemRelease( hb_itemReturn( pScopeValue ) );
 
-      if( hb_pcount() > 1 )
-      {
-         if ( ISNIL( 2 ) )                /* explicitly passed NIL, clear it */
-            sInfo.scopeValue = NULL;
-         else
-            sInfo.scopeValue = hb_param( 2, HB_IT_ANY) ;
-
-         /* rdd must not alter the scopeValue item -- it's not a copy */
-         SELF_SETSCOPE( ( AREAP ) s_pCurrArea->pArea, (LPDBORDSCOPEINFO) &sInfo );
-
-      }else
+      if( hb_pcount() < 2 || ISNIL( 2 ) )     /* explicitly passed NIL, clear it */
          sInfo.scopeValue = NULL;
+      else
+         sInfo.scopeValue = hb_param( 2, HB_IT_ANY) ;
+
+      /* rdd must not alter the scopeValue item -- it's not a copy */
+      SELF_SETSCOPE( ( AREAP ) s_pCurrArea->pArea, (LPDBORDSCOPEINFO) &sInfo );
+
+      hb_itemRelease( hb_itemReturn( pScopeValue ) );
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDSCOPE" );
@@ -3372,11 +3401,22 @@ HB_FUNC( DBEXISTS )
 // check if the field is on the Fields Array
 static BOOL IsFieldIn( char * fieldName, PHB_ITEM pFields )
 {
-  USHORT i, uiFields = ( USHORT ) hb_arrayLen( pFields );
+  USHORT i, j, uiFields = ( USHORT ) hb_arrayLen( pFields );
+  char *ptr;
+  BOOL lresult;
+
   for ( i=0; i<uiFields; i++ )
   {
     PHB_ITEM pField = pFields->item.asArray.value->pItems + i;
-    if ( strcmp( fieldName, (char *)pField->item.asString.value ) == 0 )
+    ptr = (char *)pField->item.asString.value;
+    lresult = TRUE;
+    for( j=0;*ptr;j++,ptr++ )
+        if( *(fieldName+j) != toupper(*ptr) )
+        {
+           lresult = FALSE;
+           break;
+        }
+    if ( lresult )
       return TRUE;
   }
   return FALSE;
@@ -3455,6 +3495,15 @@ static LPAREANODE GetTheOtherArea( char *szDriver, char * szFileName, BOOL creat
     }
     hb_itemRelease( pItem );
     hb_itemRelease( pData );
+    if( !hb_arrayLen( pFieldArray ) )
+    {
+       hb_itemRelease( pFieldArray );
+       SELF_RELEASE( ( AREAP ) pAreaNode->pArea );
+       hb_xfree( pInfo.abName );
+       hb_xfree( pAreaNode );
+       hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
+       return NULL;
+    }
 
 /* check for table existence and if true, drop it */
     tableItem = hb_itemNew( NULL );
