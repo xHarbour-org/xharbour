@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.152 2004/12/31 11:55:49 druzus Exp $
+ * $Id: hbapi.h,v 1.153 2005/02/25 10:43:46 andijahja Exp $
  */
 
 /*
@@ -692,6 +692,7 @@ extern char * hb_verCompiler( void ); /* retrieves a newly allocated buffer cont
 extern char * hb_verHarbour( void ); /* retrieves a newly allocated buffer containing harbour version */
 extern void   hb_verBuildInfo( void ); /* display harbour, compiler, and platform versions to standard console */
 extern BOOL hb_iswinnt(void) ; /* return .T. if OS == WinNt, 2000, XP */
+extern char * hb_builddate( void ); /* return date and time of harbour.exe build */
 
 /* Executable array execution */
 extern BOOL hb_execFromArray( PHB_ITEM pCallableArray );

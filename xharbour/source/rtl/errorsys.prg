@@ -502,7 +502,6 @@ RETURN cArguments
 #include <windows.h>
 
 static PHB_FUNC s_xHbFunc;
-extern char* hb_builddate( void );
 
 LONG WINAPI PRGUnhandledExceptionFilter( EXCEPTION_POINTERS *ExceptionInfo )
 {
