@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.4 2003/04/07 22:06:21 jonnymind Exp $
+   $Id: xwt.ch,v 1.5 2003/04/08 18:21:20 jonnymind Exp $
 
    Definitions
 */
@@ -19,6 +19,8 @@
 #define XWT_E_TEXT         5  // cText
 #define XWT_E_ADDCHILD     6  // oChild
 #define XWT_E_REMOVECHILD  7  // oChild
+#define XWT_E_ADDEDTO      8  // oContainer
+#define XWT_E_REMOVEDFROM  9  // oContainer
 
 #define XWT_E_ENTER        10 // No Params
 #define XWT_E_LEAVE        11 // No Params
@@ -31,6 +33,10 @@
 #define XWT_E_CHANGED      30  // Depending on the sender object, generally a text
 #define XWT_E_UPDATED      31  // Means a "definitive" change, like pressing enter in a textbox
 #define XWT_E_REVERTED     32  // Means a "Revert" request, or a cancelation of current op
+#define XWT_E_CANCELED     32  // Synonym
+
+#define XWT_E_SCROLL       40  // Scrolling is set (x,y)
+#define XWT_E_SCROLLED     41  // Manin widget sends this to child (x,y)
 
 #define XWT_E_CREATE       100 // No Params
 #define XWT_E_DESTROY_REQ  101 // No Params
@@ -65,6 +71,11 @@
 #define XWT_PROP_SHRINK    42 // BOOL
 
 #define XWT_PROP_IMAGE     50 // text
+
+#define XWT_PROP_SCROLL    60 // text
+
+#define XWT_PROP_STATUS    70 // Integer or bool, depending on widget
+#define XWT_PROP_RADIOGROUP    71 // Pointer
 
 #define XWT_PROP_FIXED      100 // bool
 #define XWT_PROP_MODAL      101 // bool
@@ -124,13 +135,20 @@
 #define XWT_TYPE_FRAME    2
 #define XWT_TYPE_PANE     3
 #define XWT_TYPE_LAYOUT   4
+#define XWT_TYPE_VIEWPORT 5
 #define XWT_TYPE_GRID     6
 
 #define XWT_TYPE_BUTTON   10
+#define XWT_TYPE_RADIOBUTTON   11
+
 #define XWT_TYPE_LABEL    20
+
 #define XWT_TYPE_MENU     30
+
 #define XWT_TYPE_MENUITEM 31
+
 #define XWT_TYPE_TEXTBOX  40
+
 #define XWT_TYPE_IMAGE    50
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.5 2003/04/07 22:05:29 jonnymind Exp $
+ * $Id: Changelog,v 1.6 2003/04/08 18:35:23 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,57 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-04-13 01:40 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  ! src/event.prg
+    ! Wrong Empty() check for the parameter. ::aParam was always
+      created empty. Fixed
 
+  * src/container.prg
+  + src/radiobutton.prg
+    + Added radiobutton object. A container is used to store a radio
+      button group: each group must belong to a container, and vice-versa.
+      So, the container class is now aware if a raidio group is inside
+      it with the member oRadioGroup. Also, all widgets are notified when
+      they are added to a container with the XWT_E_ADDEDTO event; this is
+      risen BEFORE the widget is really added, so it cannot propagated to
+      the new owner. A similar XWT_E_REMOVEFROM event is risen after the
+      widget has been removed
+
+  + src/viewport.prg
+    + Added scrollable viewport: it can hold just a container or a large
+      widget, wich is scrolled automatically by the viewport (if needed);
+      scrollbars are automatically added on need.
+
+  * src/widget.prg
+    + Added support for preventing event propagation to parents using
+      ::bEventsToParent boolean member. If false, events are not
+      propagated. By default, this member is true, but it can be changed
+      depending on widgets and situations.
+
+  * include/xwt.ch
+  * src/xwt_api.c
+    + Implementation of new widgets and events
+
+  + src/xwt_gtk/xwt_gtk_radiobutton.c
+    + GTK implementation of radio buttons
+
+  + src/xwt_gtk/xwt_gtk_viewport.c
+    + GTK implementation of viewports
+
+  * src/xwt_gtk/xwt_gtk.c
+  * src/xwt_gtk/xwt_gtk.h
+    + GTK implementations of new widgets
+
+  * src/grid.prg
+  * src/layout.prg
+  * src/xwt_gtk/xwt_gtk_button.c
+  * src/xwt_gtk/xwt_gtk_framewnd.c
+    ! Minor stylistic fix
+
+  * test/xwt_test.prg
+    + Added tests for new widgets.
+
+    
 2003-04-08 20:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * contrib/xwt/src/xwt_gtk/xwt_gtk_image.c
   * contrib/xwt/src/xwt_gtk/xwt_gtk_label.c

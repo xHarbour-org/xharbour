@@ -1,11 +1,11 @@
 #include "xwt.ch"
 
-Global oOtherBox
+GLOBAL oOtherBox
 
 PROCEDURE MAIN()
    LOCAL oWindow, oButton, oMenuItem, oMenu, oMenuHelp
-   LOCAL oMenuSec, oPane, oTextbox, oLabel
-   LOCAL oImg, oHlay, oVLay
+   LOCAL oMenuSec, oPane, oTextbox, oLabel, oViewPort
+   LOCAL oImg, oHlay, oVLay, oFrame
    LOCAL oGrid
 
    XwtInit()
@@ -37,7 +37,7 @@ PROCEDURE MAIN()
 
    oVlay:Add( oHLay )
 
-   /* A couple of Textboxes in a pane */
+   /* A couple of Textboxes in a pane, inside a scrollable */
    oPane := XwtPane():New()
 
    oTextbox := XwtTextbox():New("A text", 10, 10 )
@@ -46,9 +46,7 @@ PROCEDURE MAIN()
    oOtherBox := XwtTextbox():New("Another box", 10, 40 )
    oPane:Add( oOtherBox )
    oPane:SetBox( .T.,"A fixed pane" )
-
    oVLay:Add( oPane )
-
 
    /* A beautiful GRID */
    oGrid := XwtGrid():New(2,3)
@@ -73,6 +71,30 @@ PROCEDURE MAIN()
    oImg:SetSensible()
    oVLay:add( oImg )
 
+   /*** An input mask ***/
+   aInputs := {;
+      { "Variable 1", "Default value"}, ;
+      { "Variable 2", "Default value 2"}, ;
+      { "Variable 3", "Default value 3"} ;
+   }
+   oInput := XWTInputMask():New( aInputs )
+   oInput:AddEventListener( XWT_E_CHANGED, @InputChanged() )
+
+   oFrame := XwtLayout():New( XWT_LM_VERT )
+   oViewPort := XwtViewPort():new(75, 50)
+   oFrame:add( oViewPort )
+   oViewPort:SetContent( oInput )
+   oFrame:SetBox( .T., "Inside a scrollable..." )
+   oVLay:Add( oFrame )
+
+
+   /***  Radio buttons ***/
+   oRadioPanel := XWTLayout():New( XWT_LM_VERT )
+   oRadioPanel:add( XWTRadioButton():New( "Option 1" ) )
+   oRadioPanel:add( XWTRadioButton():New( "Option 2" ) )
+   oRadioPanel:add( XWTRadioButton():New( "Option 3" ) )
+
+   oVLay:Add( oRadioPanel )
    /***** MENU design *****/
    oMenu := XwtMenu():New( "File" )
 
@@ -102,6 +124,7 @@ PROCEDURE MAIN()
    XwtMainLoop()
 
    /*** Going to terminate */
+   //oButton:Destroy()  // the button might or might not be deteached from window
    oWindow:Destroy()
 RETURN
 
@@ -130,3 +153,15 @@ FUNCTION BoxModified( oEvent )
    oEvent:oSender:SetText( "Reset" )
    oOtherBox:SetFocus()
 RETURN .F.
+
+
+FUNCTION InputChanged( oEvent )
+   Local aField
+   ? "Input has been set:"
+
+   FOR EACH aField IN oEvent:oSender:aInputFields
+      ? aField[1], ": ", aField[2]
+   NEXT
+
+   ? ""
+RETURN

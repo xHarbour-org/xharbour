@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.5 2003/04/07 22:06:40 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.6 2003/04/08 18:21:48 jonnymind Exp $
 
    Global declarations, common functions
 */
@@ -109,6 +109,7 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             return TRUE;
 
             case XWT_TYPE_BUTTON:
+            case XWT_TYPE_RADIOBUTTON:
                gtk_button_set_label (GTK_BUTTON(wSelf), prop->value.text );
             return TRUE;
 
@@ -359,6 +360,15 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
       return FALSE;
 
+      case XWT_PROP_RADIOGROUP:
+         if ( wWidget->type == XWT_TYPE_RADIOBUTTON)
+         {
+            PXWT_WIDGET wRadio = ( PXWT_WIDGET ) prop->value.data;
+            GSList *gl = gtk_radio_button_get_group( GTK_RADIO_BUTTON( wRadio->widget_data ) );
+            gtk_radio_button_set_group( GTK_RADIO_BUTTON( wMain ), gl );
+            return TRUE;
+         }
+      return FALSE;
    }
 
    return FALSE;
@@ -477,6 +487,7 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
             return TRUE;
 
             case XWT_TYPE_BUTTON:
+            case XWT_TYPE_RADIOBUTTON:
                prop->value.text = gtk_button_get_label (GTK_BUTTON(wSelf) );
             return TRUE;
 
@@ -626,6 +637,8 @@ PXWT_WIDGET xwt_drv_create(  PHB_ITEM pSelf, int type )
       case XWT_TYPE_IMAGE:  return xwt_gtk_createImage( pSelf );
       case XWT_TYPE_LAYOUT:  return xwt_gtk_createLayout( pSelf );
       case XWT_TYPE_GRID:  return xwt_gtk_createGrid( pSelf );
+      case XWT_TYPE_VIEWPORT:  return xwt_gtk_createViewPort( pSelf );
+      case XWT_TYPE_RADIOBUTTON:  return xwt_gtk_createRadioButton( pSelf );
    }
    return FALSE;
 }
@@ -674,6 +687,14 @@ BOOL xwt_drv_add( PXWT_WIDGET wWSelf, PXWT_WIDGET wWChild )
       }
       break;
 
+      case XWT_TYPE_VIEWPORT:
+      {
+         PXWT_GTK_WND vp = ( PXWT_GTK_WND ) wWSelf->widget_data;
+         vp->main_widget = wChild;
+         gtk_scrolled_window_add_with_viewport( GTK_SCROLLED_WINDOW( vp->window ), wChild );
+      }
+      break;
+
       default:
          gtk_container_add( GTK_CONTAINER( wSelf ), wChild );
    }
@@ -685,7 +706,16 @@ BOOL xwt_drv_remove( PXWT_WIDGET wWSelf, PXWT_WIDGET wWChild )
    GtkWidget *wSelf = GTK_WIDGET( wWSelf->get_main_widget( wWSelf->widget_data ) );
    GtkWidget *wChild = GTK_WIDGET( wWChild->get_top_widget( wWChild->widget_data ) );
 
+   // removal of the child object should NOT cause it's destruction
+   g_object_ref( G_OBJECT( wChild ) );
    gtk_container_remove( GTK_CONTAINER( wSelf ), wChild );
+
+   if ( wWSelf->type == XWT_TYPE_VIEWPORT )
+   {
+      PXWT_GTK_WND vp = ( PXWT_GTK_WND ) wWSelf->widget_data;
+      vp->main_widget = NULL;
+   }
+
    return TRUE;
 }
 

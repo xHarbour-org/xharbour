@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: grid.prg,v 1.2 2003/04/07 22:06:39 jonnymind Exp $
+   $Id: grid.prg,v 1.3 2003/04/08 18:21:46 jonnymind Exp $
 
    Grid Pane class.
    The child objects are arranged in a fixed size grid,
@@ -20,6 +20,8 @@ CLASS XWTGrid FROM XWTLayContainer
    METHOD Attach( oChild, nFromRow, nFromCol, nRowWidth, nColWidth )
    METHOD Add( oChild )
    METHOD SetPadding( nRowPad, nColPad )
+   METHOD SetDimension( nRow, nCol )
+   METHOD GetDimension( nRow, nCol )
 ENDCLASS
 
 METHOD New(iRows, iCols ) CLASS XWTGrid
@@ -71,3 +73,10 @@ RETURN ::Attach( oChild, 1, 1, ::nRows, ::nCols )
 
 METHOD SetPadding( nRowPad, nColPad ) CLASS XWTGrid
 RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_PADDING, nRowPad, nColPad )
+
+
+METHOD SetDimension( nRows, nCols ) CLASS XWTGrid
+RETURN XWT_SetProperty( ::oRawWidget, XWT_PROP_COLROWS, nCols, nRows )
+
+METHOD GetDimension( nRows, nCols ) CLASS XWTGrid
+RETURN XWT_GetProperty( ::oRawWidget, XWT_PROP_COLROWS, nCols, nRows )

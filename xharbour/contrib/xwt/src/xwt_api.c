@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.4 2003/04/07 22:06:39 jonnymind Exp $
+   $Id: xwt_api.c,v 1.5 2003/04/08 18:21:47 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -63,7 +63,6 @@ int xwt_rise_event( PHB_ITEM pObject, int iEventType, int argc, ... )
    pItem = hb_itemNew( NULL );
    hb_itemPutNI( pItem, iEventType );
    hb_objSendMsg( pEvent, "NEW", 3, pItem, pObject, pEventParams );
-
 
    /* Rise the event in pObject */
    hb_objSendMsg( pObject, "RISEEVENT", 1, pEvent );
@@ -194,11 +193,13 @@ HB_FUNC( XWT_SETPROPERTY )
       case XWT_PROP_FILL:
       case XWT_PROP_SHRINK:
       case XWT_PROP_BOX:
+      case XWT_PROP_STATUS:
          prop.value.setting = hb_parl( 3 );
       break;
 
       //Position parameter
       case XWT_PROP_POSITION:
+      case XWT_PROP_SCROLL:
       case XWT_PROP_SELREGION:
          prop.value.position.x = hb_parni( 3 );
          prop.value.position.y = hb_parni( 4 );
@@ -236,6 +237,11 @@ HB_FUNC( XWT_SETPROPERTY )
          {
             prop.value.number = hb_parni( 3 );
          }
+      break;
+
+      // Pointer
+      case XWT_PROP_RADIOGROUP:
+         prop.value.data = hb_parptr( 3 );
       break;
 
       //Array
@@ -286,6 +292,7 @@ HB_FUNC( XWT_GETPROPERTY )
       case XWT_PROP_SHRINK:
       case XWT_PROP_FILL:
       case XWT_PROP_BOX:
+      case XWT_PROP_STATUS:
          if( pParam1 != NULL )
          {
             hb_itemPutL( pParam1, prop.value.setting );
@@ -295,6 +302,7 @@ HB_FUNC( XWT_GETPROPERTY )
 
       //Position parameter
       case XWT_PROP_POSITION:
+      case XWT_PROP_SCROLL:
       case XWT_PROP_SELREGION:
          if( pParam1 != NULL && pParam2 != NULL )
          {

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: event.prg,v 1.1.1.1 2003/03/21 22:48:52 gian Exp $
+   $Id: event.prg,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    Event class
 */
@@ -21,7 +21,7 @@ ENDCLASS
 METHOD New( nType, oSender, aParams ) CLASS XWTEvent
    ::nType := nType
    ::oSender := oSender
-   IF Empty( aParams )
+   IF .not. Empty( aParams )
       ::aParams := aParams
    ELSE
       ::aParams := {}

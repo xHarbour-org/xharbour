@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: layout.prg,v 1.2 2003/04/07 15:41:06 jonnymind Exp $
+   $Id: layout.prg,v 1.3 2003/04/07 18:20:30 jonnymind Exp $
 
    Pane class. Each widget is arranged below the
    previous one.
@@ -14,7 +14,7 @@
 
 CLASS XWTLayout FROM XWTLayContainer
 
-   METHOD New( nMode, nWidth, nHeight )
+   METHOD New( nMode, nWidth, nHeight ) CONSTRUCTOR
 
    METHOD SetPadding( iPadding )
    METHOD GetPadding( iPadding )

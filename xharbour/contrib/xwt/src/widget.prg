@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: widget.prg,v 1.2 2003/04/07 15:41:06 jonnymind Exp $
+   $Id: widget.prg,v 1.3 2003/04/07 22:06:39 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
@@ -19,6 +19,7 @@ CLASS XWTWidget
    DATA oRawWidget
    DATA x
    DATA y
+   DATA bEventsToParent
 
    /* The identifier can be a number or a string to uniquely identify an
       item in your application */
@@ -49,7 +50,6 @@ CLASS XWTWidget
    METHOD AddEventListener( nType, oListener, mthListener )
    METHOD RemoveListener( oListener, mthListener )
 
-
    METHOD RiseEvent( oEvent )
    METHOD Destroy()
 
@@ -62,6 +62,7 @@ METHOD New() CLASS XWTWidget
    /* By default we'll use the text as an identifier */
    ::x = 0
    ::y = 0
+   ::bEventsToParent := .T.
 
 RETURN Self
 
@@ -120,8 +121,8 @@ METHOD RiseEvent( oEvent ) CLASS XWTWidget
       ENDIF
    NEXT
 
-   /* Back broadcasting */   
-   IF .not. Empty( ::oOwner ) 
+   /* Back broadcasting */
+   IF ::bEventsToParent .and. ::oOwner != NIL
       RETURN ::oOwner:RiseEvent( oEvent )
    ENDIF
 RETURN .F.
@@ -222,7 +223,7 @@ RETURN bRet
 METHOD Destroy( ) CLASS XWTWidget
    LOCAL bRaw := XWT_FastRiseEvent( XWT_E_DESTROY, Self )
    IF .not. bRaw
-      XWT_Destroy( ::oRawWidget )
+         XWT_Destroy( ::oRawWidget )
    ENDIF
 RETURN .not. bRaw
 

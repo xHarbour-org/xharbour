@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_framewnd.c,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
+   $Id: xwt_gtk_framewnd.c,v 1.2 2003/04/08 18:21:51 jonnymind Exp $
 
    GTK interface - Frame window
 */
@@ -111,7 +111,6 @@ void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
    {
       PHB_ITEM pMenuItem = pBaseArray->pItems + ulPos;
 
-      printf("Setting menu item\r\n");
       hb_objSendMsg( pMenuItem, "ORAWWIDGET",0 );
       xwtData = (PXWT_WIDGET) HB_VM_STACK.Return.item.asPointer.value;
       gtk_menu_bar_append (GTK_MENU_BAR (frame->menu_bar),

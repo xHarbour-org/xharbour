@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_button.c,v 1.4 2003/03/28 14:44:40 gian Exp $
+   $Id: xwt_gtk_button.c,v 1.1 2003/04/02 00:56:38 jonnymind Exp $
 
    GTK interface - management of button widget
 */
@@ -62,6 +62,8 @@ PXWT_WIDGET xwt_gtk_createButton( PHB_ITEM pSelf )
    xwtData->widget_data = button;
    xwtData->destructor = NULL;
    xwtData->get_main_widget = xwtData->get_top_widget = xwt_gtk_get_topwidget_neuter;
+
+   gtk_widget_show( button );
 
    return xwtData;
 }

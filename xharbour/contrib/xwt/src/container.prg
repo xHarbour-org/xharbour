@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: container.prg,v 1.3 2003/04/07 18:20:26 jonnymind Exp $
+   $Id: container.prg,v 1.4 2003/04/07 22:06:39 jonnymind Exp $
 
    Widget class - basic widget & event management
 */
@@ -14,13 +14,24 @@
 CLASS XWTContainer FROM XWTWidget
    DATA aChildren
 
+   // The radio box is at disposal of the drivers to set
+   // the radio button group. Can be any kind of object
+   // depending on the underlying system.
+
+   // When a radio button is first added to a container,
+   // it is stored also in this variable. The underlying
+   // system must then be able to retreive the data to
+   // set the same radio button group as the first one.
+
+   DATA oRadioBox
+
    METHOD New()
    METHOD Add( oWidget )
    METHOD Remove( oWidget )
-   
+
    METHOD Show()
    METHOD Hide()
-   
+
    METHOD Destroy()
 
    METHOD SetBox( bHasBox, cBoxTitle )
@@ -28,8 +39,6 @@ CLASS XWTContainer FROM XWTWidget
 
    METHOD SetBorder( iBorder )
    METHOD GetBorder()
-
-
 
 ENDCLASS
 
@@ -46,9 +55,10 @@ METHOD Add( oChild ) CLASS XWTContainer
    bRet := .not. XWT_FastRiseEvent( XWT_E_ADDCHILD, Self, oChild )
 
    IF bRet
-      AAdd( ::aChildren, oChild )
-      oChild:oOwner := Self
       XWT_add( ::oRawWidget, oChild:oRawWidget )
+      XWT_FastRiseEvent( XWT_E_ADDEDTO, oChild, Self )
+      oChild:oOwner := Self
+      AAdd( ::aChildren, oChild )
       // ensure a relative refresh after addition.
       oChild:Move( oChild:x, oChild:y )
    ENDIF
@@ -61,13 +71,13 @@ METHOD Remove( oChild ) CLASS XWTContainer
 
    nPos := AScan( ::aChildren, {|oElem| oElem == oChild} )
    IF nPos > 0
-      ::aChildren:oOwner := NIL
-      ADel( ::aChildren, nPos )
-      ASize( ::aChildren, Len( ::aChildren ) -1 )
-
       bRet := .not. XWT_FastRiseEvent( XWT_E_REMOVECHILD, Self, oChild  )
       IF bRet
+         ::aChildren[nPos]:oOwner := NIL
+         ADel( ::aChildren, nPos )
+         ASize( ::aChildren, Len( ::aChildren ) -1 )
          XWT_remove( Self:oRawWidget, oChild:oRawWidget )
+         XWT_FastRiseEvent( XWT_E_REMOVEDFROM, oChild, Self )
       ENDIF
    ENDIF
 
@@ -96,11 +106,11 @@ RETURN ::Super:Hide()
 
 METHOD Destroy() CLASS XWTContainer
    LOCAL oChild
-   
+
    FOR EACH oChild IN ::aChildren
       oChild:Destroy()
    NEXT
-   
+
 RETURN ::Super:Destroy()
 
 METHOD SetBox( bHasBox, cBoxTitle ) CLASS XWTContainer
