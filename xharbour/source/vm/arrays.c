@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.37 2002/12/29 23:32:42 jonnymind Exp $
+ * $Id: arrays.c,v 1.38 2002/12/30 00:16:52 ronpinkas Exp $
  */
 
 /*
@@ -92,7 +92,7 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
       hb_threadForbid( &hb_gcCollectionMutex );
    #endif
 
-   pBaseArray= ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
+   pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
 
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayNew(%p, %lu)", pItem, ulLen));
@@ -103,6 +103,7 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
    {
       hb_itemClear( pItem );
    }
+
    pItem->type = HB_IT_ARRAY;
 
    if( ulLen > 0 )
@@ -995,7 +996,6 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
 
       pDstArray = hb_itemNew( NULL );
 
-
       hb_arrayNew( pDstArray, ulSrcLen );
 
       if( pClonedList == NULL )
@@ -1016,6 +1016,7 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
          bTop = FALSE;
 
          pCloned = pClonedList;
+
          while( pCloned->pNext )
          {
             pCloned = pCloned->pNext;
@@ -1053,6 +1054,7 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
                pClone = pCloned->pDest;
                goto DontClone;
             }
+
             while( pCloned->pNext )
             {
                pCloned = pCloned->pNext;
@@ -1063,6 +1065,7 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
                   goto DontClone;
                }
             }
+
             if( pCloned->pSrcBaseArray == pSrcItem->item.asArray.value )
             {
                pClone = pCloned->pDest;

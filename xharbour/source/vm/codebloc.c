@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.13 2002/12/29 19:58:43 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.14 2002/12/29 23:32:42 jonnymind Exp $
  */
 
 /*
@@ -147,6 +147,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
              */
             memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
          }
+
          hb_memvarValueIncRef( pLocal->item.asMemvar.value );
          ++ui;
       }
@@ -157,15 +158,15 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
        * codeblock - all inner codeblocks use the local variables table
        * created during creation of the outermost codeblock
        */
-      PHB_ITEM pLocal;
+      PHB_ITEM pLocal = hb_stackSelfItem();
 
-      pLocal = hb_stackSelfItem();
       if( HB_IS_BLOCK( pLocal ) )
       {
          HB_CODEBLOCK_PTR pOwner = pLocal->item.asBlock.value;
 
          pCBlock->pLocals = pOwner->pLocals;
          pCBlock->uiLocals = uiLocals = pOwner->uiLocals;
+
          if( pOwner->pLocals )
          {  /* the outer codeblock have the table with local references - reuse it */
             while( uiLocals )
@@ -196,7 +197,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
    pCBlock->ulCounter = 1;
 
    pCBlock->pGlobals  = pGlobals;
-   
+
    #ifdef HB_THREAD_SUPPORT
       hb_threadAllow( &hb_gcCollectionMutex );
    #endif
@@ -262,6 +263,7 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
       if( pCBlock->pLocals )
       {
          USHORT ui = pCBlock->uiLocals;
+
          while( ui )
          {
             hb_memvarValueDecRef( pCBlock->pLocals[ ui-- ].item.asMemvar.value );
@@ -309,11 +311,13 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
    if( pCBlock->pLocals )
    {
       USHORT ui = 1;
+
       while( ui <= pCBlock->uiLocals )
       {
          hb_memvarValueDecGarbageRef( pCBlock->pLocals[ ui ].item.asMemvar.value );
          ++ui;
       }
+
       /* decrement the table reference counter and release memory if
        * it was the last reference
        */

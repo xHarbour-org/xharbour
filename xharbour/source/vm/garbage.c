@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.30 2002/12/29 23:32:42 jonnymind Exp $
+ * $Id: garbage.c,v 1.31 2002/12/30 00:16:52 ronpinkas Exp $
  */
 
 /*
@@ -651,7 +651,8 @@ void hb_gcCollectAll( void )
 
             pAlloc = pAlloc->pNext;
 
-         } while ( s_pLockedBlock != pAlloc );
+         }
+         while ( s_pLockedBlock != pAlloc );
       }
 
       HB_TRACE( HB_TR_INFO, ( "Cleanup Scan" ) );
@@ -678,7 +679,8 @@ void hb_gcCollectAll( void )
 
          s_pCurrBlock = s_pCurrBlock->pNext;
 
-      } while ( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
+      }
+      while ( s_pCurrBlock && ( s_pCurrBlock != pAlloc ) );
 
       HB_TRACE( HB_TR_INFO, ( "Release Scan" ) );
 
@@ -725,7 +727,8 @@ void hb_gcCollectAll( void )
             s_pCurrBlock = s_pCurrBlock->pNext;
          }
 
-      } while ( s_pCurrBlock && ( pAlloc != s_pCurrBlock ) );
+      }
+      while ( s_pCurrBlock && ( pAlloc != s_pCurrBlock ) );
 
       s_bCollecting = FALSE;
 
