@@ -1,5 +1,5 @@
 /*
- * $Id: tbcolumn.prg,v 1.5 2002/09/19 21:07:23 lculik Exp $
+ * $Id: tbcolumn.prg,v 1.6 2002/11/29 20:21:06 walito Exp $
  */
 
 /*
@@ -67,6 +67,10 @@ CLASS TBColumn
    DATA  FootSep              // Footing separator character
    DATA  HeadSep              // Heading separator character
    DATA  Picture              // Column picture string
+#ifdef HB_COMPAT_C53
+   DATA  PreBlock             // 
+   DATA  PostBlock            //
+#endif
 
    ACCESS Width INLINE ::nWidth           // Column display width
    ASSIGN Width(n) INLINE ::SetWidth(n)

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.42 2003/05/27 19:58:32 walito Exp $
+ * $Id: tbrowse.prg,v 1.43 2003/07/02 17:58:47 walito Exp $
  */
 
 /*
@@ -1143,11 +1143,12 @@ return Self
 
 METHOD Moved() CLASS TBrowse
 
+   // Internal flags used to set ::HitTop/Bottom during next stabilization
+   ::lHitTop    := .F.
+   ::lHitBottom := .F.
+
    // No need to Dehilite() current cell more than once
    if ::stable
-      // Internal flags used to set ::HitTop/Bottom during next stabilization
-      ::lHitTop    := .F.
-      ::lHitBottom := .F.
 
       if ::AutoLite
          ::DeHilite()
@@ -2538,22 +2539,22 @@ return ::TApplyKey( nKey, self )
 METHOD InitKeys( o ) CLASS TBROWSE
 
    Default o:aKeys to {;
-              { K_DOWN,        {| Ob, nKey | Ob:Down()    , 0 } },;
-              { K_END,         {| Ob, nKey | Ob:End()     , 0 } },;
-              { K_CTRL_PGDN,   {| Ob, nKey | Ob:GoBottom(), 0 } },;
-              { K_CTRL_PGUP,   {| Ob, nKey | Ob:GoTop()   , 0 } },;
-              { K_HOME,        {| Ob, nKey | Ob:Home()    , 0 } },;
-              { K_LEFT,        {| Ob, nKey | Ob:Left()    , 0 } },;
-              { K_PGDN,        {| Ob, nKey | Ob:PageDown(), 0 } },;
-              { K_PGUP,        {| Ob, nKey | Ob:PageUp()  , 0 } },;
-              { K_CTRL_END,    {| Ob, nKey | Ob:PanEnd()  , 0 } },;
-              { K_CTRL_HOME,   {| Ob, nKey | Ob:PanHome() , 0 } },;
-              { K_CTRL_LEFT,   {| Ob, nKey | Ob:PanLeft() , 0 } },;
-              { K_CTRL_RIGHT,  {| Ob, nKey | Ob:PanRight(), 0 } },;
-              { K_RIGHT,       {| Ob, nKey | Ob:Right()   , 0 } },;
-              { K_UP,          {| Ob, nKey | Ob:Up()      , 0 } },;
-              { K_ESC,         {| Ob, nKey | -1 } },;
-              { K_LBUTTONDOWN, {| Ob, nKey | tbmouse( ob,mrow(),mcol() ) } } }
+              { K_DOWN,        {| oB, nKey | oB:Down()    , 0 } },;
+              { K_END,         {| oB, nKey | oB:End()     , 0 } },;
+              { K_CTRL_PGDN,   {| oB, nKey | oB:GoBottom(), 0 } },;
+              { K_CTRL_PGUP,   {| oB, nKey | oB:GoTop()   , 0 } },;
+              { K_HOME,        {| oB, nKey | oB:Home()    , 0 } },;
+              { K_LEFT,        {| oB, nKey | oB:Left()    , 0 } },;
+              { K_PGDN,        {| oB, nKey | oB:PageDown(), 0 } },;
+              { K_PGUP,        {| oB, nKey | oB:PageUp()  , 0 } },;
+              { K_CTRL_END,    {| oB, nKey | oB:PanEnd()  , 0 } },;
+              { K_CTRL_HOME,   {| oB, nKey | oB:PanHome() , 0 } },;
+              { K_CTRL_LEFT,   {| oB, nKey | oB:PanLeft() , 0 } },;
+              { K_CTRL_RIGHT,  {| oB, nKey | oB:PanRight(), 0 } },;
+              { K_RIGHT,       {| oB, nKey | oB:Right()   , 0 } },;
+              { K_UP,          {| oB, nKey | oB:Up()      , 0 } },;
+              { K_ESC,         {| oB, nKey | -1 } },;
+              { K_LBUTTONDOWN, {| oB, nKey | tbmouse( ob,mrow(),mcol() ) } } }
 return o
 
 //-------------------------------------------------------------------//
