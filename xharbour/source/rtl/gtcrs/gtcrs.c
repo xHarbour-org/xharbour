@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.34 2004/02/18 21:35:56 druzus Exp $
+ * $Id: gtcrs.c,v 1.35 2004/03/31 02:16:43 druzus Exp $
  */
 
 /*
@@ -301,10 +301,10 @@ static const ClipKeyCode extdKeyTab[NO_EXTDKEYS] = {
     {K_F10,        K_ALT_F10,    K_CTRL_F10,  K_SH_F10}, /*  09 */
     {K_F11,        K_ALT_F11,    K_CTRL_F11,  K_SH_F11}, /*  10 */
     {K_F12,        K_ALT_F12,    K_CTRL_F12,  K_SH_F12}, /*  11 */
-    {K_UP,          K_ALT_UP,     K_CTRL_UP,         0}, /*  12 */
-    {K_DOWN,      K_ALT_DOWN,   K_CTRL_DOWN,         0}, /*  13 */
-    {K_LEFT,      K_ALT_LEFT,   K_CTRL_LEFT,         0}, /*  14 */
-    {K_RIGHT,    K_ALT_RIGHT,  K_CTRL_RIGHT,         0}, /*  15 */
+    {K_UP,          K_ALT_UP,     K_CTRL_UP,   K_SH_UP}, /*  12 */
+    {K_DOWN,      K_ALT_DOWN,   K_CTRL_DOWN, K_SH_DOWN}, /*  13 */
+    {K_LEFT,      K_ALT_LEFT,   K_CTRL_LEFT, K_SH_LEFT}, /*  14 */
+    {K_RIGHT,    K_ALT_RIGHT,  K_CTRL_RIGHT, K_SH_RIGHT}, /*  15 */
     {K_INS,        K_ALT_INS,    K_CTRL_INS,         0}, /*  16 */
     {K_DEL,        K_ALT_DEL,    K_CTRL_DEL,         0}, /*  17 */
     {K_HOME,      K_ALT_HOME,   K_CTRL_HOME,         0}, /*  18 */

@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.ch,v 1.5 2004/02/19 23:43:09 jonnymind Exp $
+ * $Id: inkey.ch,v 1.6 2004/03/09 12:54:52 lf_sfnet Exp $
  */
 
 /*
@@ -70,9 +70,6 @@
 #define INKEY_KEYBOARD          128
 #define INKEY_ALL               255
 
-#define HB_INKEY_RAW            256 /* Harbour extension */
-#define HB_INKEY_EXTENDED       512 /* Harbour extension */
-
 /* Mouse events */
 
 #define K_MOUSEMOVE             1001
@@ -93,11 +90,6 @@
 
 #define K_MINMOUSE              1001
 #define K_MAXMOUSE              1015
-
-/* Harbour extension - this marks that multi-characters keycode will be
-   returned - call INKEY() until ZERO will be returned
-*/
-#define HB_K_MULTICODE          4096
 
 /* Cursor movement keys */
 
@@ -184,6 +176,11 @@
 #define K_ALT_TAB               421   /* * Alt-Tab                       */
 
 #define K_CTRL_SH_TAB           423   /* * Ctrl-Shift-Tab                */
+
+#define K_SH_LEFT               424   /* * Shift-Left                    */
+#define K_SH_UP                 425   /* * Shift-Up                      */
+#define K_SH_RIGHT              426   /* * Shift-Right                   */
+#define K_SH_DOWN               427   /* * Shift-Down                    */
 
 /* Control keys */
 

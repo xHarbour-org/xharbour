@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.109 2004/04/24 11:52:22 lf_sfnet Exp $
+ * $Id: dbcmd.c,v 1.110 2004/04/28 18:24:23 druzus Exp $
  */
 
 /*
@@ -5569,7 +5569,8 @@ static void hb_Dbf2Sql( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
                hb_xfree( szFieldName );
             }
          }
-         hb_fsWriteLarge( handle, (BYTE*) " );\r\n", 5 );
+         hb_fsWriteLarge( handle, (BYTE*) " );", 3 );
+         hb_fsWriteLarge( handle, (BYTE*) hb_conNewLine(), OS_EOL_LEN );
          bWriteSep = FALSE;
       }
 
@@ -5677,7 +5678,7 @@ HB_FUNC( __DBSQL )
                   hb_errPutSubCode( pError, 1002 ); // Where is the Macro ?
                   hb_errPutFileName( pError, szFileName );
                   hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
-                  hb_errPutSubSystem( pError, "DELIM" );
+                  hb_errPutSubSystem( pError, "DBF2SQL" );
                }
 
                hb_errPutOsCode( pError, hb_fsError() );

@@ -4,6 +4,7 @@
  *
  * Copyright 1999 Felipe G. Coury <fcoury@creation.com.br>
  * www - http://www.harbour-project.org
+ * Copyright 2004 Lorenzo Fiorini <lorenzo_fiorini@tin.it>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -75,18 +76,35 @@ ENDCLASS
 
 METHOD New( cCnn ) CLASS HDO_ODBC_Connection
 
-   LOCAL nRet
+   LOCAL xRet
    LOCAL xBuf
 
    ::ConnectionString := cCnn
 
-   SQLAllocEn( @xBuf )
+   ::Debug := TRUE
+
+   xRet := SQLAllocEn( @xBuf )
+
+   if xRet <> SQL_SUCCESS   
+      ::SQLError()
+   endif
+
    ::hEnv := xBuf
 
-   SQLAllocCo( ::hEnv, @xBuf )
+   xRet := SQLAllocCo( ::hEnv, @xBuf )
+
+   if xRet <> SQL_SUCCESS   
+      ::SQLError()
+   endif
+
    ::hDbc := xBuf
 
-   SQLDriverC( ::hDbc, ::ConnectionString, @xBuf )     // Connects to Driver
+   xRet := SQLDriverC( ::hDbc, ::ConnectionString, @xBuf )     // Connects to Driver
+
+   if xRet <> SQL_SUCCESS   
+      ::SQLError()
+   endif
+
    ::Provider := xBuf
 
    ::Error := FALSE
@@ -131,7 +149,7 @@ METHOD SQLError( hStmt, cStmt ) CLASS HDO_ODBC_Connection
 *+
 CLASS HDO_ODBC_Command FROM HBClass
 
-   DATA ActiveConnection
+   DATA Connection
    DATA CommandText
 
    DATA hStmt
@@ -151,9 +169,9 @@ METHOD New( cCmd, oCnn ) CLASS HDO_ODBC_Command
    LOCAL xBuf
 
    ::CommandText := cCmd
-   ::ActiveConnection := oCnn
+   ::Connection := oCnn
 
-   SQLAllocSt( ::ActiveConnection:hDbc, @xBuf )
+   SQLAllocSt( ::Connection:hDbc, @xBuf )
 
    ::hStmt := xBuf
 
@@ -166,7 +184,7 @@ METHOD Prepare() CLASS HDO_ODBC_Command
    xRet := SQLPrepare( ::hStmt, ::CommandText )
    
    if xRet <> SQL_SUCCESS   
-      ::ActiveConnection:SQLError( ::CommandText:hStmt, ::CommandText )
+      ::Connection:SQLError( ::hStmt, ::CommandText )
    endif
 
 RETURN xRet
@@ -178,7 +196,7 @@ METHOD Execute() CLASS HDO_ODBC_Command
    xRet := SQLExecute( ::hStmt )
    
    if xRet <> SQL_SUCCESS   
-      ::ActiveConnection:SQLError( ::hStmt, ::CommandText )
+      ::Connection:SQLError( ::hStmt, ::CommandText )
    endif
 
 RETURN xRet
@@ -190,7 +208,7 @@ METHOD ExecuteDir() CLASS HDO_ODBC_Command
    xRet := SQLExecDir( ::hStmt, ::CommandText )
    
    if xRet <> SQL_SUCCESS   
-      ::ActiveConnection:SQLError( ::hStmt, ::CommandText )
+      ::Connection:SQLError( ::hStmt, ::CommandText )
    endif
 
 RETURN xRet
@@ -210,7 +228,7 @@ RETURN xRet
 METHOD ExecuteReader() CLASS HDO_ODBC_Command
 
    if SQLExecDir( ::hStmt, ::CommandText ) <> SQL_SUCCESS
-      ::ActiveConnection:SQLError( ::hStmt, ::CommandText )
+      ::Connection:SQLError( ::hStmt, ::CommandText )
    endif
 
 RETURN HDO_ODBC_Reader( Self )

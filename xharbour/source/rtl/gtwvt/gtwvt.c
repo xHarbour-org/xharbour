@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.98 2004/04/30 11:49:00 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.99 2004/04/30 15:24:52 lf_sfnet Exp $
  */
 
 /*
@@ -1843,16 +1843,16 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       switch ( wParam )
       {
         case VK_LEFT:
-          hb_wvt_gtTranslateKey( K_LEFT , K_LEFT , K_ALT_LEFT , K_CTRL_LEFT  );
+          hb_wvt_gtTranslateKey( K_LEFT , K_SH_LEFT , K_ALT_LEFT , K_CTRL_LEFT  );
           break;
         case VK_RIGHT:
-          hb_wvt_gtTranslateKey( K_RIGHT, K_RIGHT, K_ALT_RIGHT, K_CTRL_RIGHT );
+          hb_wvt_gtTranslateKey( K_RIGHT, K_SH_RIGHT, K_ALT_RIGHT, K_CTRL_RIGHT );
           break;
         case VK_UP:
-          hb_wvt_gtTranslateKey( K_UP   , K_UP   , K_ALT_UP   , K_CTRL_UP    );
+          hb_wvt_gtTranslateKey( K_UP   , K_SH_UP   , K_ALT_UP   , K_CTRL_UP    );
           break;
         case VK_DOWN:
-          hb_wvt_gtTranslateKey( K_DOWN , K_DOWN , K_ALT_DOWN , K_CTRL_DOWN  );
+          hb_wvt_gtTranslateKey( K_DOWN , K_SH_DOWN , K_ALT_DOWN , K_CTRL_DOWN  );
           break;
         case VK_HOME:
           hb_wvt_gtTranslateKey( K_HOME , K_HOME , K_ALT_HOME , K_CTRL_HOME  );

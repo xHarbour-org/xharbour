@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2882 2004/05/07 12:45:51 likewolf Exp $
+ * $Id: ChangeLog,v 1.2883 2004/05/07 14:55:31 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-07 17:30 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * include/inkey.ch
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtcrs/gtcrs.c
+  * source/rtl/gtxvt/gtxvt.c
+    * added support for K_SH_UP, K_SH_DOWN, K_SH_LEFT, K_SH_RIGHT
+    * removed HB_INKEY_RAW, HB_INKEY_EXTENDED, HB_K_MULTICODE from inkey.ch
+  * source/odbc/hdo_odbc.prg
+    * added more error checking
+  * source/rdd/dbcmd.c
+    * used hb_conNewLine() instead of fixed \r\n
 
 2004-05-07 12:00 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * source/rtl/tgetlist.prg
