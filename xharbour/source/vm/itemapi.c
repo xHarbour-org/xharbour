@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.35 2001/12/05 11:39:30 vszakats Exp $
+ * $Id: itemapi.c,v 1.1.1.1 2001/12/21 10:41:08 ronpinkas Exp $
  */
 
 /*
@@ -269,7 +269,9 @@ char * hb_itemGetC( PHB_ITEM pItem )
       return szResult;
    }
    else
+   {
       return NULL;
+   }
 }
 
 /* NOTE: Caller should not modify the buffer returned by this function.
@@ -280,9 +282,13 @@ char * hb_itemGetCPtr( PHB_ITEM pItem )
    HB_TRACE(HB_TR_DEBUG, ("hb_itemGetCPtr(%p)", pItem));
 
    if( pItem && HB_IS_STRING( pItem ) )
+   {
       return pItem->item.asString.value;
+   }
    else
+   {
       return "";
+   }
 }
 
 ULONG hb_itemGetCLen( PHB_ITEM pItem )
@@ -302,14 +308,18 @@ ULONG hb_itemCopyC( PHB_ITEM pItem, char * szBuffer, ULONG ulLen )
    if( pItem && HB_IS_STRING( pItem ) )
    {
       if( ulLen == 0 )
+      {
          ulLen = pItem->item.asString.length;
+      }
 
       hb_xmemcpy( szBuffer, pItem->item.asString.value, ulLen );
 
       return ulLen;
    }
    else
+   {
       return 0;
+   }
 }
 
 BOOL hb_itemFreeC( char * szText )
@@ -793,18 +803,25 @@ void hb_itemClear( PHB_ITEM pItem )
          hb_xfree( pItem->item.asString.value );
          pItem->item.asString.value = NULL;
       }
-      pItem->item.asString.length = 0;
+
+      /* should not be needed.
+      pItem->item.asString.length = 0; */
    }
    else if( HB_IS_ARRAY( pItem ) && pItem->item.asArray.value )
    {
       if( --( pItem->item.asArray.value )->uiHolders == 0 )
+      {
          hb_arrayRelease( pItem );
+      }
    }
    else if( HB_IS_BLOCK( pItem ) )
+   {
       hb_codeblockDelete( pItem );
-
+   }
    else if( HB_IS_MEMVAR( pItem ) )
+   {
       hb_memvarValueDecRef( pItem->item.asMemvar.value );
+   }
 
    pItem->type = HB_IT_NIL;
 }
@@ -816,10 +833,14 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
    HB_TRACE(HB_TR_DEBUG, ("hb_itemCopy(%p, %p)", pDest, pSource));
 
    if( pDest->type )
+   {
       hb_itemClear( pDest );
+   }
 
    if( pDest == pSource )
+   {
       hb_errInternal( HB_EI_ITEMBADCOPY, NULL, "hb_itemCopy()", NULL );
+   }
 
    memcpy( pDest, pSource, sizeof( HB_ITEM ) );
 
@@ -828,8 +849,8 @@ void hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       pDest->item.asString.value = ( char * ) hb_xgrab( pSource->item.asString.length + 1 );
       hb_xmemcpy( pDest->item.asString.value, pSource->item.asString.value, pSource->item.asString.length );
       pDest->item.asString.value[ pSource->item.asString.length ] = '\0';
+      // why was missing??? pDest->item.asString.length = pSource->item.asString.length;
    }
-
    else if( HB_IS_ARRAY( pSource ) )
    {
       ( pSource->item.asArray.value )->uiHolders++;

@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.12 2001/06/14 21:20:43 dholm Exp $
+ * $Id: codebloc.c,v 1.1.1.1 2001/12/21 10:40:47 ronpinkas Exp $
  */
 
 /*
@@ -231,18 +231,27 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
       {
          USHORT ui = pCBlock->uiLocals;
          while( ui )
+         {
             hb_memvarValueDecRef( pCBlock->pLocals[ ui-- ].item.asMemvar.value );
+         }
+
          /* decrement the table reference counter and release memory if
           * it was the last reference
           */
          if( --pCBlock->pLocals[ 0 ].item.asLong.value == 0 )
+         {
+            HB_TRACE( HB_TR_DEBUG, ( "Free,Locals %p", pCBlock->pLocals ) );
             hb_xfree( pCBlock->pLocals );
+         }
       }
 
       /* free space allocated for pcodes - if it was a macro-compiled codeblock
        */
-      if( pCBlock->dynBuffer )
+      if( pCBlock->pCode && pCBlock->dynBuffer )
+      {
+         HB_TRACE( HB_TR_DEBUG, ( "Free pCode, %p", pCBlock->pCode ) );
          hb_xfree( pCBlock->pCode );
+      }
 
       /* free space allocated for a CODEBLOCK structure
       */

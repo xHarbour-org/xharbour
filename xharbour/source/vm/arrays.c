@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.32 2001/12/02 17:08:31 mafact Exp $
+ * $Id: arrays.c,v 1.1.1.1 2001/12/21 10:40:45 ronpinkas Exp $
  */
 
 /*
@@ -87,9 +87,13 @@ BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
    pItem->type = HB_IT_ARRAY;
 
    if( ulLen > 0 )
+   {
       pBaseArray->pItems = ( PHB_ITEM ) hb_xgrab( sizeof( HB_ITEM ) * ulLen );
+   }
    else
+   {
       pBaseArray->pItems = NULL;
+   }
 
    pBaseArray->ulLen      = ulLen;
    pBaseArray->uiHolders  = 1;
@@ -179,7 +183,9 @@ BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
             {
                /* release old items */
                for( ulPos = ulLen; ulPos < pBaseArray->ulLen; ulPos++ )
+               {
                   hb_itemClear( pBaseArray->pItems + ulPos );
+               }
 
                if( ulLen == 0 )
                {
@@ -187,7 +193,9 @@ BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
                   pBaseArray->pItems = NULL;
                }
                else
+               {
                   pBaseArray->pItems = ( PHB_ITEM ) hb_xrealloc( pBaseArray->pItems, sizeof( HB_ITEM ) * ulLen );
+               }
             }
          }
 
@@ -626,7 +634,7 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
       ULONG ulLen = pBaseArray->ulLen;
       ULONG ulPos;
 
-      /* clear object tree as needed */
+      /* Release object tree as needed */
       if( pBaseArray->puiClsTree )
       {
          HB_TRACE( HB_TR_INFO, ( "Release Tree, %p", pArray ) );
@@ -636,10 +644,21 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
 
       if( pBaseArray->pItems )
       {
-         for( ulPos = 0; ulPos < ulLen; ulPos++ )
+         HB_ITEM_PTR pItem = pBaseArray->pItems;
+         ULONG ulLen = pBaseArray->ulLen;
+
+         while( ulLen-- )
          {
-            hb_itemClear( pBaseArray->pItems + ulPos );
-            //hb_itemRelease( pBaseArray->pItems + ulPos );
+            HB_TRACE( HB_TR_INFO, ( "Array Item %p type:%i", pItem, pItem->type ) );
+
+            /*-----------------12/21/2001 8:01PM----------------
+             * The item is not released because it was not
+             * allocated by the GC, its just a portion of the
+             * pItems chunk, which will be released as one piece.
+             * --------------------------------------------------*/
+             hb_itemClear( pItem );
+
+            ++pItem;
          }
 
          hb_xfree( pBaseArray->pItems );
@@ -653,7 +672,9 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )
       return TRUE;
    }
    else
+   {
       return FALSE;
+   }
 }
 
 /* NOTE: CA-Cl*pper 5.3a has a fix for the case when the starting position
@@ -675,14 +696,22 @@ BOOL hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pulStart,
       ULONG ulTarget;
 
       if( pulStart && ( *pulStart >= 1 ) )
+      {
          ulStart = *pulStart;
+      }
       else
+      {
          ulStart = 1;
+      }
 
       if( pulTarget && ( *pulTarget >= 1 ) )
+      {
          ulTarget = *pulTarget;
+      }
       else
+      {
          ulTarget = 1;
+      }
 
 #ifdef HB_COMPAT_C53 /* From CA-Cl*pper 5.3a */
       if( ulStart <= ulSrcLen )
@@ -692,12 +721,18 @@ BOOL hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pulStart,
       {
 #ifndef HB_COMPAT_C53 /* From CA-Cl*pper 5.3a */
          if( ulStart > ulSrcLen )
+         {
             ulStart = ulSrcLen;
+         }
 #endif
          if( pulCount && ( *pulCount <= ulSrcLen - ulStart ) )
+         {
             ulCount = *pulCount;
+         }
          else
+         {
             ulCount = ulSrcLen - ulStart + 1;
+         }
 
 /* This is probably a bug, present in all versions of CA-Cl*pper. */
 #ifdef HB_FIX_ACOPY_BUG
@@ -707,21 +742,29 @@ BOOL hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pulStart,
          if( ulDstLen > 0 )
          {
             if( ulTarget > ulDstLen )
+            {
                ulTarget = ulDstLen;
+            }
 #endif
 
             if( ulCount > ulDstLen - ulTarget )
+            {
                ulCount = ulDstLen - ulTarget + 1;
+            }
 
             for( ulTarget--, ulStart--; ulCount > 0; ulCount--, ulStart++, ulTarget++ )
+            {
                hb_itemCopy( pDstBaseArray->pItems + ulTarget, pSrcBaseArray->pItems + ulStart );
+            }
          }
       }
 
       return TRUE;
    }
    else
+   {
       return FALSE;
+   }
 }
 
 PHB_ITEM hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedList )
@@ -777,7 +820,7 @@ PHB_ITEM hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedList )
       pDstBaseArray->uiClass = pSrcBaseArray->uiClass;
 
       /*-----------------12/20/2001 7:05PM----------------
-       * TODO: Is this correct?
+       * TODO: Is this correct? was taken form __objClone()
        * --------------------------------------------------*/
       pDstBaseArray->puiClsTree = NULL;
 
@@ -860,9 +903,13 @@ PHB_ITEM hb_arrayFromStack( USHORT uiLen )
    pArray->type = HB_IT_ARRAY;
 
    if( uiLen > 0 )
+   {
       pBaseArray->pItems = ( PHB_ITEM ) hb_xgrab( sizeof( HB_ITEM ) * uiLen );
+   }
    else
+   {
       pBaseArray->pItems = NULL;
+   }
 
    pBaseArray->ulLen      = uiLen;
    pBaseArray->uiHolders  = 1;
@@ -891,9 +938,13 @@ PHB_ITEM hb_arrayFromParams( PHB_ITEM *pBase )
    pArray->type = HB_IT_ARRAY;
 
    if( uiPCount > 0 )
+   {
       pBaseArray->pItems = ( PHB_ITEM ) hb_xgrab( sizeof( HB_ITEM ) * uiPCount );
+   }
    else
+   {
       pBaseArray->pItems = NULL;
+   }
 
    pBaseArray->ulLen      = uiPCount;
    pBaseArray->uiHolders  = 1;
@@ -918,7 +969,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 
    HB_TRACE( HB_TR_INFO, ( "hb_arrayReleaseGarbage( %p )", pBaseArray ) );
 
-   /* clear object tree as needed */
+   /* Release object tree as needed */
    if( pBaseArray->puiClsTree )
    {
       HB_TRACE( HB_TR_INFO, ( "Release Tree, %p )", pBaseArray ) );
@@ -935,23 +986,16 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
       {
          HB_TRACE( HB_TR_INFO, ( "Array Item %p type:%i", pItem, pItem->type ) );
 
-         /* Only strings should be deallocated.
-          * Arrays, objects and codeblock should be released directly by
-          * the garbage collector
-          */
-         if( HB_IS_STRING( pItem ) && pItem->item.asString.value )
-         {
-            hb_xfree( pItem->item.asString.value );
-            pItem->item.asString.value = NULL;
-            pItem->type = HB_IT_NIL;
-         }
+          /*-----------------12/21/2001 8:01PM----------------
+           * The item is not released because it was not
+           * allocated by the GC, its just a portion of the
+           * pItems chunk, which will be released as one piece.
+           * --------------------------------------------------*/
+          hb_itemClear( pItem );
 
          ++pItem;
       }
 
       hb_xfree( pBaseArray->pItems );
-      pBaseArray->pItems = NULL;
-      pBaseArray->ulLen  = 0;
    }
 }
-

@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.11 2001/04/12 18:56:28 dholm Exp $
+ * $Id: hbinit.h,v 1.12 2001/12/21 20:28:24 andijahja Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 extern "C" {
 #endif
 
-extern void hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiSymbols ); /* statics symbols initialization */
+extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiSymbols ); /* statics symbols initialization */
 
 #if defined(HARBOUR_STRICT_ANSI_C)
 

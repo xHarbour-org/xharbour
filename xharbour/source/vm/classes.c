@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.94 2001/12/15 12:43:47 vszakats Exp $
+ * $Id: classes.c,v 1.1.1.1 2001/12/21 10:40:52 ronpinkas Exp $
  */
 
 /*
@@ -349,8 +349,24 @@ void hb_clsReleaseAll( void )
    for( uiClass = 0 ; uiClass < s_uiClasses ; uiClass++ )
    {
       /* hb_clsRelease( s_pClasses + uiClass  ); */
+      /*-----------------12/21/2001 7:51PM-----------------
+       * Class itself is an Array within the list of the GC,
+       * it does not require explicit release. The class
+       * methods pInitValue, are items also within the GC
+       * control.
+       * --------------------------------------------------*/
       hb_xfree( ( s_pClasses + uiClass )->szName );
       hb_xfree( ( s_pClasses + uiClass )->pMethods );
+
+      /*
+      hb_itemRelease( ( s_pClasses + uiClass )->pClassDatas );
+      hb_itemRelease( ( s_pClasses + uiClass )->pInlines );
+      */
+      /*-----------------12/21/2001 7:53PM-----------------
+       * The pClassDatas and pInlines are Arrays within the
+       * list of the GC, they do not require explicit
+       * release.
+       * --------------------------------------------------*/
    }
 
    if( s_pClasses )
@@ -379,18 +395,24 @@ void hb_clsIsClassRef( void )
    while( uiClass-- )
    {
       if( pClass->pInlines )
+      {
          hb_gcItemRef( pClass->pInlines );
+      }
 
       if( pClass->pClassDatas )
+      {
          hb_gcItemRef( pClass->pClassDatas );
+      }
 
       uiLimit = ( USHORT ) ( pClass->uiHashKey * BUCKET );
       pMeth = pClass->pMethods;
       for( uiAt = 0; uiAt < uiLimit; uiAt++, pMeth++ )
-       {
+      {
          if( pMeth->pInitValue )
+         {
             hb_gcItemRef( pMeth->pInitValue );
-       }
+         }
+      }
 
       ++pClass;
    }
@@ -1490,12 +1512,13 @@ HB_FUNC( __CLSDELMSG )
                                                 /* Move messages            */
             while( pClass->pMethods[ uiAt ].pMessage && uiAt != uiLimit )
             {
-               hb_xmemcpy( pClass->pMethods + uiAt,
-                       pClass->pMethods + ( ( uiAt == uiMask ) ? 0 : uiAt + 1 ),
-                       sizeof( METHOD ) );
+               hb_xmemcpy( pClass->pMethods + uiAt, pClass->pMethods + ( uiAt == uiMask ? 0 : uiAt + 1 ), sizeof( METHOD ) );
                uiAt++;
+
                if( uiAt == uiMask )
+               {
                   uiAt = 0;
+               }
             }
             memset( pClass->pMethods + uiAt, 0, sizeof( METHOD ) );
             pClass->uiMethods--;                    /* Decrease number messages */
@@ -1672,16 +1695,22 @@ HB_FUNC( __CLSMODMSG )
                PHB_ITEM pBlock = hb_param( 3, HB_IT_BLOCK );
 
                if( pBlock == NULL )
+               {
                   hb_errRT_BASE( EG_ARG, 3000, NULL, "__CLSMODMSG", 0 );
+               }
                else
+               {
                   hb_arraySet( pClass->pInlines, pClass->pMethods[ uiAt ].uiData, pBlock );
+               }
             }
             else if( ( pFunc == hb___msgSetData ) || ( pFunc == hb___msgGetData ) )
             {                                      /* Not allowed for DATA     */
                hb_errRT_BASE( EG_ARG, 3004, "Cannot modify a DATA item", "__CLSMODMSG", 0 );
             }
-            else                                   /* Modify METHOD            */
+            else
+            {                                   /* Modify METHOD            */
                pClass->pMethods[ uiAt ].pFunction = ( PHB_FUNC ) hb_parnl( 3 );
+            }
          }
       }
    }

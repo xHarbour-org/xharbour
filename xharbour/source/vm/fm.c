@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.21 2001/05/15 13:02:07 vszakats Exp $
+ * $Id: fm.c,v 1.1.1.1 2001/12/21 10:40:53 ronpinkas Exp $
  */
 
 /*
@@ -272,38 +272,56 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       ULONG *pSig;
 
       if( pMemBlock->ulSignature != HB_MEMINFO_SIGNATURE )
+      {
          hb_errInternal( HB_EI_XFREEINV, NULL, NULL, NULL );
+      }
 
       pSig  = (ULONG *)( ( ( unsigned char * ) pMem ) + pMemBlock->ulSize );
       if( *pSig != HB_MEMINFO_SIGNATURE )
+      {
          hb_errInternal( HB_EI_XMEMOVERFLOW, NULL, NULL, NULL );
+      }
 
       s_lMemoryConsumed -= pMemBlock->ulSize;
       s_lMemoryBlocks--;
 
       if( pMemBlock->pPrevBlock )
+      {
          pMemBlock->pPrevBlock->pNextBlock = pMemBlock->pNextBlock;
+      }
       else
+      {
          s_pFirstBlock = pMemBlock->pNextBlock;
+      }
 
       if( pMemBlock->pNextBlock )
+      {
          pMemBlock->pNextBlock->pPrevBlock = pMemBlock->pPrevBlock;
+      }
       else
+      {
          s_pLastBlock = pMemBlock->pPrevBlock;
+      }
 
       free( ( void * ) pMemBlock );
    }
    else
+   {
+      HB_TRACE_STEALTH(HB_TR_INFO, ("hb_xfree(NULL)!"));
       hb_errInternal( HB_EI_XFREENULL, NULL, NULL, NULL );
-
+   }
 #else
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xfree(%p)", pMem));
 
    if( pMem )
+   {
       free( pMem );
+   }
    else
+   {
       hb_errInternal( HB_EI_XFREENULL, NULL, NULL, NULL );
+   }
 
 #endif
 }

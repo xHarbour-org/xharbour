@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.21 2001/12/18 06:20:04 mafact Exp $
+ * $Id: garbage.c,v 1.1.1.1 2001/12/21 10:40:34 ronpinkas Exp $
  */
 
 /*
@@ -153,6 +153,8 @@ void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
 /* release a memory block allocated with hb_gcAlloc() */
 void hb_gcFree( void *pBlock )
 {
+   HB_TRACE( HB_TR_DEBUG, ( "hb_gcFree(%p)", pBlock ) );
+
    if( pBlock )
    {
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pBlock;
@@ -189,6 +191,7 @@ static HB_GARBAGE_FUNC( hb_gcGripRelease )
       if( HB_IS_STRING( (HB_ITEM_PTR) Cargo ) && ( (HB_ITEM_PTR) Cargo )->item.asString.value )
       {
          HB_TRACE( HB_TR_INFO, ( "Release String %p", ( (HB_ITEM_PTR) Cargo )->item.asString.value ) );
+
          hb_xfree( ( (HB_ITEM_PTR) Cargo )->item.asString.value );
          ( (HB_ITEM_PTR) Cargo )->item.asString.value = NULL;
          ( (HB_ITEM_PTR) Cargo )->type = HB_IT_NIL;
@@ -293,6 +296,7 @@ void *hb_gcUnlock( void *pBlock )
          }
       }
    }
+
    return pBlock;
 }
 
@@ -348,7 +352,6 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
    }
    /* all other data types don't need the GC */
 }
-
 
 void hb_gcCollect( void )
 {
