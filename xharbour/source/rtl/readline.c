@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.3 2003/12/08 03:42:14 mlombardo Exp $
+ * $Id: readline.c,v 1.4 2003/12/13 17:09:48 mlombardo Exp $
  */
 
 /*
@@ -64,7 +64,7 @@
 BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT uiBuffLen, char ** Term, int * iTermSizes, USHORT iTerms  )
 {
    USHORT uiPosTerm, iPos, uiPosition;
-   BOOL bFound, bEof;
+   BOOL bFound;
    USHORT nTries, uiSize;
    long lRead, lOffset;
    BYTE * pBuff;
@@ -79,7 +79,7 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT uiBuffLen, char ** Term, int *
    if (uiBuffLen < 10)
       uiBuffLen = READING_BLOCK;
 
-   pBuff = hb_xgrab( uiBuffLen );
+   pBuff = (BYTE*) hb_xgrab( uiBuffLen );
 
    do
    {
@@ -148,7 +148,6 @@ HB_FUNC( HB_FREADLINE )
    char ** Term;
    BYTE * pBuffer;
    int * iTermSizes;
-   long result;
    long lSize = hb_parnl(4);
    USHORT i, iTerms;
 
@@ -210,7 +209,7 @@ HB_FUNC( HB_FREADLINE )
 
    pBuffer = hb_fsReadLine( hFileHandle, lSize, Term, iTermSizes, iTerms  );
 
-   hb_storc( pBuffer, 2 );
+   hb_storc( (char*) pBuffer, 2 );
    hb_xfree( pBuffer );
    hb_retnl( hb_fsError() );
    hb_xfree( Term );
