@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.9 2002/05/15 15:25:56 alkresin Exp $
+ * $Id: adsmgmnt.c,v 1.3 2002/10/12 00:38:22 horacioroldan Exp $
  */
 
 /*
@@ -406,6 +406,51 @@ HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
    hb_xfree( pastUserInfo );
 
 }
+
+HB_FUNC( ADSMGGETLOCKOWNER )
+{
+   // UNSIGNED32	AdsMgGetLockOwner  (ADSHANDLE hMgmtConnect,
+   //                                     UNSIGNED8 *pucTableName,
+   //                                     UNSIGNED32 ulRecordNumber,
+   //                                     ADS_MGMT_USER_INFO *pstUserInfo,
+   //                                     UNSIGNED16 *pusStructSize,
+   //                                     UNSIGNED16 *pusLockType);
+   //
+   // returns an array of 5 elements if successful
+   // [1] Client machine name when server runs on NT/2000
+   //     Client Username when server runs on Netware
+   // [2] Netware connection number
+   // [3] Login user name for data dictionary connections (ADS 6.0 and above)
+   // [4] Client machine IP address
+   // [5] lock type ADS_MGMT_NO_LOCK ADS_MGMT_RECORD_LOCK ADS_MGMT_FILE_LOCK
+   //
+   // returns the advantage error code if it fails
+   //
+   UNSIGNED32  ulRetVal ;
+   UNSIGNED16  usStructSize = sizeof( ADS_MGMT_USER_INFO );
+   UNSIGNED16  pusLockType;
+   ADS_MGMT_USER_INFO * pstUserInfo;
+   pstUserInfo = (ADS_MGMT_USER_INFO *) hb_xgrab( sizeof( ADS_MGMT_USER_INFO ));
+
+   ulRetVal = AdsMgGetLockOwner( hMgmtHandle,
+                                 (UNSIGNED8 *) hb_parc( 1 ),
+                                 (UNSIGNED32) hb_parnl(2),
+                                 pstUserInfo,
+                                 &usStructSize,
+                                 &pusLockType);
+   if (ulRetVal== AE_SUCCESS)
+   {
+       hb_reta(5);
+       hb_storc ( (char *)  pstUserInfo->aucUserName , -1, 1); /* Machine name under NT */
+       hb_stornl( (UNSIGNED16) pstUserInfo->usConnNumber, -1, 2); /* NetWare conn # (NLM only) */
+       hb_storc ( (char *) pstUserInfo->aucAuthUserName, -1, 3); /* logon name with Data Dictionary */
+       hb_storc ( (char *) pstUserInfo->aucAddress, -1, 4); /* IP adddress */
+       hb_stornl( pusLockType, -1, 5);						/* type of lock */
+   }
+   else
+       hb_retnl ( ulRetVal );
+}
+
 /*
 
 HB_FUNC( ADSMGGETOPENTABLES )
@@ -442,11 +487,6 @@ HB_FUNC( ADSMGGETWORKERTHREADACTIVITY )
    AdsMgGetWorkerThreadActivity();
 }
 
-HB_FUNC( ADSMGGETLOCKOWNER )
-{
-   UNSIGNED32              ulRetVal = AE_SUCCESS;
-   AdsMgGetLockOwner();
-}
 
 HB_FUNC( ADSMGKILLUSER )
 {
