@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.61 2003/11/07 04:17:17 maurifull Exp $
+ * $Id: tget.prg,v 1.62 2003/11/14 03:11:07 walito Exp $
  */
 
 /*
@@ -1605,7 +1605,7 @@ METHOD Picture( cPicture ) CLASS Get
 
       ::cPicture := cPicture
 
-      if ::HasFocus
+      if ::xVarGet != NIL
          ::ParsePict( cPicture )
       endif
 
