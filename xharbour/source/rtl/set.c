@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.48 2004/05/19 23:47:10 peterrees Exp $
+ * $Id: set.c,v 1.49 2004/05/20 04:38:14 peterrees Exp $
  */
 
 /*
@@ -1669,7 +1669,7 @@ int hb_setListenerRemove( int listener )
    return listener;
 }
 
-HB_PATHNAMES * hb_setGetFirstSetPath( void )
+HB_EXPORT HB_PATHNAMES * hb_setGetFirstSetPath( void )
 {
    return sp_set_path;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.24 2004/04/20 14:33:08 jacekp Exp $
+ * $Id: hbset.h,v 1.25 2004/05/19 23:46:15 peterrees Exp $
  */
 
 /*
@@ -238,7 +238,7 @@ extern HB_SET_STRUCT hb_set;
 HB_EXPORT HB_SET_STRUCT *hb_GetSetStructPtr( void );
 extern void hb_setInitialize( void );
 extern void hb_setRelease( void );
-extern HB_PATHNAMES * hb_setGetFirstSetPath( void );
+extern HB_EXPORT HB_PATHNAMES * hb_setGetFirstSetPath( void );
 
 typedef enum
 {
@@ -250,6 +250,10 @@ typedef void HB_SET_LISTENER_CALLBACK( HB_set_enum, HB_set_listener_enum );
 extern int hb_setListenerAdd( HB_SET_LISTENER_CALLBACK * );
 extern void hb_setListenerNotify( HB_set_enum, HB_set_listener_enum );
 extern int hb_setListenerRemove( int );
+
+#ifndef HB_SET_STACK
+   #define HB_SET_STACK (*hb_GetSetStructPtr())
+#endif
 
 HB_EXTERN_END
 
