@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2239 2004/02/07 20:40:29 andijahja Exp $
+ * $Id: ChangeLog,v 1.2240 2004/02/07 21:20:21 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-08 01:25 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * include\hbapi.h
+  * source\rdd\dbfntx\dbfntx1.c
+  * source\rdd\dbf1.c
+  * source\rtl\round.c
+  * source\vm|itemapi.c
+    ! Improvement in the algorithm of round.
+    ! INT() now return an integer number.
+    ! ROUND() now return an integer when nDec is equal o greather than 0.
+
 2004-02-08 04:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/gtnul/gtnul.c
     * function prototype declaration for hb_gtFindNoNul()
