@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.91 2005/04/01 20:16:30 andijahja Exp $
+ * $Id: genc.c,v 1.92 2005/04/02 00:57:19 andijahja Exp $
  */
 
 /*
@@ -121,24 +121,10 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    PSSYMLIST pTemp;
    BOOL bSymFIRST = FALSE;
 
-#ifdef __XHB__
-   char szObjFileName[_POSIX_PATH_MAX];
-   hb_xmemset( szObjFileName, '\0', _POSIX_PATH_MAX );
-   if ( pFileName->szPath )
-   {
-      hb_xstrcat( szObjFileName, pFileName->szPath, pFileName->szName, ".obj", NULL );
-   }
-   else
-   {
-      hb_xstrcat( szObjFileName, pFileName->szName, ".obj", NULL );
-   }
-   pFileName->szExtension = ".c";
-#else
    if( ! pFileName->szExtension )
    {
       pFileName->szExtension = ".c";
    }
-#endif
 
    hb_fsFNameMerge( szFileName, pFileName );
 
@@ -978,12 +964,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       {
          printf( "Done.\n" );
       }
-   }
-   else
-   {
-#if defined ( __XHB__ )
-      xccmain( szFileName, szObjFileName );
-#endif
    }
 
    /*
