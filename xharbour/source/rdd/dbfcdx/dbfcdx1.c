@@ -4798,7 +4798,7 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
             pOwnerPage = pPage;
             pPage = pPage->Child;
          }
-         while ( (USHORT) pPage->iKeys < (USHORT) ulKeyNo && pOwnerPage &&
+         while ( (ULONG) pPage->iKeys < ulKeyNo && pOwnerPage &&
                  ( ulNextPg = pTag->UsrAscend ?
                    pPage->Right : pPage->Left ) != CDX_DUMMYNODE )
          {
@@ -4807,7 +4807,7 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
             hb_cdxPageFree( pPage, FALSE );
             pPage = pOwnerPage->Child;
          }
-         if ( (USHORT) pPage->iKeys >= (USHORT) ulKeyNo )
+         if ( (ULONG) pPage->iKeys >= ulKeyNo )
          {
             pPage->iCurKey = pTag->UsrAscend ? ( SHORT ) ulKeyNo - 1 : pPage->iKeys - ( SHORT ) ulKeyNo;
             hb_cdxSetCurKey( pPage );
