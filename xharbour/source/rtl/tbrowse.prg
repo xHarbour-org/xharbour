@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.19 2002/12/06 04:01:53 walito Exp $
+ * $Id: tbrowse.prg,v 1.20 2002/12/25 15:23:21 walito Exp $
  */
 
 /*
@@ -203,7 +203,7 @@ CLASS TBrowse
    METHOD HitTest( nMouseRow,nMouseCol )
    METHOD SetStyle( nMode,lSetting )
 #endif
-
+ 
    PROTECTED:     /* P R O T E C T E D */
 
    METHOD MGotoYX( nRow, nCol )           // Given screen coordinates nRow, nCol sets TBrowse cursor on underlaying cell
@@ -634,7 +634,7 @@ return oOldCol
 //
 METHOD DelColumn( nPos ) CLASS TBrowse
 
-   local oCol, nFreeze
+   local oCol
 
    if nPos > ::nColumns .or. nPos < 1
       return NIL
@@ -2475,7 +2475,7 @@ METHOD SetKey( nKey,bBlock ) CLASS TBrowse
 
    if ( nPos := ascan( ::aKeys,{| x | x[ 1 ] == nkey } ) ) == 0
       if ISBLOCK( bBlock )
-         bReturn := bBlock
+//         bReturn := bBlock
          aadd( ::aKeys, { nKey, bBlock } )
       endif
       bReturn := bBlock
