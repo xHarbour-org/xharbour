@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.20 2002/12/28 05:43:47 ronpinkas Exp $
+ * $Id: console.c,v 1.21 2002/12/29 08:32:41 ronpinkas Exp $
  */
 
 /*
@@ -101,6 +101,8 @@ void hb_conInit( void )
 
    #ifdef HB_THREAD_SUPPORT
       HB_CRITICAL_INIT( s_ConsoleMutex.Critical );
+      s_ConsoleMutex.nCount = 0;
+      s_ConsoleMutex.Locker = 0;
    #endif
 
 #if defined(OS_UNIX_COMPATIBLE) && !defined(HB_EOL_CRLF)
