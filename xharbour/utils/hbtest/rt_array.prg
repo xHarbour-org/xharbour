@@ -1,5 +1,5 @@
 /*
- * $Id: rt_array.prg,v 1.2 2003/07/13 22:21:26 andijahja Exp $
+ * $Id: rt_array.prg,v 1.3 2003/07/16 02:07:28 andijahja Exp $
  */
 
 /*
@@ -207,7 +207,11 @@ FUNCTION Main_ARRAY()
    TEST_LINE( Array( 1 )                      , "{.[1].}"                                  )
    TEST_LINE( Array( -1 )                     , "E BASE 1131 Bound error array dimension A:1:N:-1 ")
    TEST_LINE( Array( 1, 0, -10 )              , "E BASE 1131 Bound error array dimension A:1:N:1 ")
-   TEST_LINE( Array( 1, 0, "A" )              , NIL                                        )
+
+   // xHarbour support a feature that treats character as int
+   // so, "A" in here is 65 and the result is intentionally not nil
+   // TEST_LINE( Array( 1, 0, "A" )              , NIL                                        )
+   TEST_LINE( Array( 1, 0, "A" )              , "{.[1].}"                                  )
    TEST_LINE( Array( 1, 0, 2 )                , "{.[1].}"                                  )
    TEST_LINE( Array( 4, 3, 2 )                , "{.[4].}"                                  )
    TEST_LINE( Array( 0, 3, 2 )                , "{.[0].}"                                  )
