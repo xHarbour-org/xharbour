@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomprs.c,v 1.4 2004/02/23 08:31:57 andijahja Exp $
+ * $Id: hbcomprs.c,v 1.5 2004/03/07 21:42:52 andijahja Exp $
  */
 
 /*
@@ -2925,6 +2925,9 @@ int r)
       r = Z_STREAM_ERROR;
       LEAVE
   }
+#ifdef NEED_DUMMY_RETURN
+  return 0;  /* Some dumb compilers complain without this */
+#endif
 }
 
 
