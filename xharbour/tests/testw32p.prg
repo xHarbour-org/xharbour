@@ -1,6 +1,8 @@
 
 #define FORM_A4 9
 
+#define PS_SOLID            0
+
 FUNCTION Main()
   LOCAL nPrn:=1
   LOCAL aPrn:= GetPrinters()
@@ -31,6 +33,7 @@ STATIC FUNCTION PrnTest(cPrinter)
     IF !oPrinter:startDoc('Win32Prn(Doc name in Printer Properties)')
       Alert("StartDoc() failed")
     ELSE
+      oPrinter:SetPen(PS_SOLID, 1, 0)
       oPrinter:Bold(800)
       oPrinter:TextOut(oPrinter:PrinterName+': MaxRow() = '+STR(oPrinter:MaxRow(),4)+'   MaxCol() = '+STR(oPrinter:MaxCol(),4))
       oPrinter:Bold(0)     // Normal
@@ -72,6 +75,7 @@ STATIC FUNCTION PrnTest(cPrinter)
           ENDIF
           ENDIF
         ENDIF
+        oPrinter:Line(0, oPrinter:PosY+5, 2000, oPrinter:PosY+5)
       NEXT x
       oPrinter:SetFont('Lucida Console',8,{3,-50})  // Alternative Compressed print
       oPrinter:CharSet(0)  // Reset default charset
@@ -90,6 +94,7 @@ STATIC FUNCTION PrnTest(cPrinter)
       oPrinter:NewLine()
       oPrinter:SetFont('Lucida Console',18, 0)  // Large print
       oPrinter:TextOut("Finally some larger print")
+      oPrinter:Box(oPrinter:PosX, oPrinter:PosY, oPrinter:PosX+100, oPrinter:PosY+100)
       oPrinter:EndDoc()
     ENDIF
     oPrinter:Destroy()

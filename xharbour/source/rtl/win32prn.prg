@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.1 2004/08/02 20:11:13 lf_sfnet Exp $
+ * $Id: win32prn.prg,v 1.3 2004/12/18 16:00:00 ptsarenko Exp $
  */
 
 /*
@@ -65,7 +65,6 @@
 
 
   TO DO:    Colour printing
-            Line & Box drawing
             etc....
 
   Peter Rees 21 January 2004 <peter@rees.co.nz>
@@ -141,6 +140,11 @@ CLASS WIN32PRN
   METHOD SetPos(nX, nY)                               // **WARNING** : (Col,Row) _NOT_ (Row,Col)
   METHOD TextOut(cString, lNewLine, lUpdatePosX)
   METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX) // **WARNING** : (Col,Row) _NOT_ (Row,Col)
+  METHOD SetPen(nStyle, nWidth, nColor) INLINE (;
+         ::PenStyle:=nStyle, ::PenWidth:=nWidth, ::PenColor:=nColor,;
+         SetPen(::hPrinterDC, nStyle, nWidth, nColor) )
+  METHOD Line(nX1, nY1, nX2, nY2) INLINE LineTo(::hPrinterDC, nX1, nY1, nX2, nY2)
+  METHOD Box(nX1, nY1, nX2, nY2) INLINE Rectangle(::hPrinterDC, nX1, nY1, nX2, nY2)
   METHOD GetCharWidth()
   METHOD GetCharHeight()
   METHOD GetTextWidth(cString)
@@ -193,6 +197,11 @@ CLASS WIN32PRN
 
   VAR PosX           INIT 0
   VAR PosY           INIT 0
+
+  VAR PenStyle
+  VAR PenWidth
+  VAR PenColor
+
 ENDCLASS
 
 METHOD New(cPrinter) CLASS WIN32PRN
@@ -917,6 +926,46 @@ HB_FUNC_STATIC( GETEXEFILENAME )
   unsigned char pBuf[1024] ;
   GetModuleFileName(NULL, (LPTSTR) pBuf, 1023) ;
   hb_retc( (char*) pBuf ) ;
+}
+
+HB_FUNC_STATIC( SETPEN )
+{
+   HDC hDC = ( HDC ) hb_parnl( 1 );
+   HPEN hPen = CreatePen(
+               hb_parni( 2 ),	// pen style 
+               hb_parni( 3 ),	// pen width  
+               (COLORREF) hb_parnl( 4 ) 	// pen color 
+               );
+   HPEN hOldPen = SelectObject( hDC, hPen);
+
+   if( hOldPen )
+      DeleteObject( hOldPen );
+
+   hb_retnl( (LONG) hPen);
+}
+
+HB_FUNC_STATIC( LINETO )
+{
+   HDC hDC = ( HDC ) hb_parnl( 1 );
+   int x1 = hb_parni( 2 );
+   int y1 = hb_parni( 3 );
+   int x2 = hb_parni( 4 );
+   int y2 = hb_parni( 5 );
+
+   MoveToEx( hDC, x1, y1, NULL );
+
+   hb_retl( LineTo( hDC, x2, y2 ) );
+}
+
+HB_FUNC_STATIC( RECTANGLE )
+{
+   HDC hDC = ( HDC ) hb_parnl( 1 );
+   int x1 = hb_parni( 2 );
+   int y1 = hb_parni( 3 );
+   int x2 = hb_parni( 4 );
+   int y2 = hb_parni( 5 );
+
+   hb_retl( Rectangle( hDC, x1, y1, x2, y2) );
 }
 
 #pragma ENDDUMP
