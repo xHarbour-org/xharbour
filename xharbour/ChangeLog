@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.455 2002/10/22 02:37:03 walito Exp $
+ * $Id: ChangeLog,v 1.456 2002/10/22 20:04:39 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2002-22-19 13:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+2002-10-22 17:08 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.vc
+    + source/debug/dbghelp.prg
+
+2002-10-22 13:03 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
     * Changed hb_vmProcessSymbols() to support extensions other than .c for compiled modules.
 
