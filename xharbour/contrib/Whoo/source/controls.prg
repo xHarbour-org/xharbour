@@ -1,5 +1,5 @@
 /*
- * $Id: controls.prg,v 1.3 2004/02/15 23:56:44 ronpinkas Exp $
+ * $Id: controls.prg,v 1.4 2004/02/20 19:45:50 ronpinkas Exp $
  */
 
 /*
@@ -575,7 +575,7 @@ CLASS TWinControl FROM TControl
    METHOD WMInitMenuPopup()     VIRTUAL
    METHOD WMKillFocus()         VIRTUAL
    METHOD WMLButtonDown()       VIRTUAL
-   METHOD WMLButtonUp( nwParam, nlParam1, nlParam2 ) INLINE IIF( __ClsMsgAssigned( Self, "Click" ), ::Click( nwParam, nlParam1, nlParam2 ), NIL )//VIRTUAL
+   METHOD WMLButtonUp( nwParam, nlParam1, nlParam2 ) INLINE IIF( __ClsMsgAssigned( Self, "OnClick" ), ::OnClick( nwParam, nlParam1, nlParam2 ), NIL )
    METHOD WMLButtonDblClk()     VIRTUAL
    METHOD WMMButtonDown()       VIRTUAL
    METHOD WMMButtonUp()         VIRTUAL
@@ -749,68 +749,82 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
       ENDIF
    ENDIF
 
-   DO CASE
-      CASE nMsg == WM_ACTIVATE
+   SWITCH nMsg
+      CASE WM_ACTIVATE
           SWITCH nwParam
               CASE WA_ACTIVE
               CASE WA_CLICKACTIVE
-                 IF ValType( ::OnActivate ) == "B"
-                    nRet := EVAL( ::OnActivate, Self )
-                 ELSEIF ValType( ::OnActivate ) == "N"
-                    nRet := HB_Exec( ::OnActivate, Self )
+                 IF __ClsMsgAssigned( Self, "OnActivate" )
+                    nRet := ::OnActivate()
+                 ELSE
+                    nRet := ::WMActivate( nwParam, nlParam )
                  ENDIF
                  EXIT
 
               CASE WA_INACTIVE
-                 IF ValType( ::OnDeActivate ) == "B"
-                    nRet := EVAL( ::OnDeActivate, Self )
-                 ELSEIF ValType( ::OnDeActivate ) == "N"
-                    nRet := HB_Exec( ::OnDeActivate, Self )
+                 IF __ClsMsgAssigned( Self, "OnDeActivate" )
+                    nRet := ::OnDeActivate
+                 ELSE
+                    nRet := ::WMActivate( nwParam, nlParam )
                  ENDIF
                  EXIT
+
               DEFAULT
                 nRet := ::WMActivate( nwParam, nlParam )
            END
+           EXIT
 
-      CASE nMsg == WM_SETFONT
+      CASE WM_SETFONT
            nRet := ::WMSetFont()
+           EXIT
 
-      CASE nMsg == WM_NCLBUTTONUP
+      CASE WM_NCLBUTTONUP
            nRet := ::WMNCLButtonUp( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_NCLBUTTONDOWN
+      CASE WM_NCLBUTTONDOWN
            nRet := ::WMNCLButtonDown( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_NCCREATE
+      CASE WM_NCCREATE
            nRet := ::WMNcCreate()
+           EXIT
 
-      CASE nMsg == WM_NCACTIVATE
+      CASE WM_NCACTIVATE
            nRet := ::WMNcActivate()
+           EXIT
 
-      CASE nMsg == WM_NCCALCSIZE
+      CASE WM_NCCALCSIZE
            nRet := ::WMNcCalcSize()
+           EXIT
 
-      CASE nMsg == WM_NCDESTROY
+      CASE WM_NCDESTROY
            nRet := ::WMNcDestroy()
+           EXIT
 
-      CASE nMsg == WM_NCHITTEST
+      CASE WM_NCHITTEST
            nRet := ::WMNCHitTest( loword(nlParam), hiword(nlParam) )
+           EXIT
 
-      CASE nMsg == WM_CREATE
+      CASE WM_CREATE
            DEFAULT ::FHandle TO hWnd
            nRet := ::WMCreation( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_INITDIALOG
+      CASE WM_INITDIALOG
            DEFAULT ::FHandle TO hWnd
            nRet := ::WMInitDialog( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_CHAR
+      CASE WM_CHAR
            nRet := ::WMChar( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_CLOSE
+      CASE WM_CLOSE
            nRet := ::WMClose( nwParam )
+           EXIT
 
-      CASE nMsg == WM_MENUCOMMAND
+      CASE WM_MENUCOMMAND
 /*
            IF ::FMenu != NIL
               OsVer IS OSVERSIONINFOEX
@@ -846,8 +860,9 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
               ENDIF
            ENDIF
 */
-      CASE nMsg == WM_COMMAND
+           EXIT
 
+      CASE WM_COMMAND
            nCode := HIWORD( nwParam )
            nId   := LOWORD( nwParam )
 
@@ -892,22 +907,26 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
              .AND. oMenuItem:Action != NIL
               nRet := Eval( oMenuItem:Action, oMenuItem )
 */
-           else
+           ELSE
               nRet := ::WMCommand( nwParam, nlParam )
            ENDIF
+           EXIT
 
-      CASE nMsg == WM_GETMINMAXINFO
+      CASE WM_GETMINMAXINFO
            nRet := ::WMGetMinMaxInfo( nlParam )
+           EXIT
 
-      CASE nMsg == WM_PAINT
+      CASE WM_PAINT
            hDC  := BeginPaint( ::FHandle, @cPaint )
            nRet := ::WMPaint( hDC )
            EndPaint( ::FHandle, cPaint)
+           EXIT
 
-      CASE nMsg == WM_DESTROY
+      CASE WM_DESTROY
            nRet := ::WMDestroy()
+           EXIT
 
-      CASE nMsg == WM_DRAWITEM
+      CASE WM_DRAWITEM
            dis IS DRAWITEMSTRUCT
            dis:buffer( peek( nlParam, dis:sizeof() ) )
 
@@ -916,91 +935,115 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
            ELSE
               nRet := ::WMDrawItem(dis,nlParam,nwParam)
            ENDIF
+           EXIT
 
-      CASE nMsg == WM_ERASEBKGND
+      CASE WM_ERASEBKGND
            nRet := ::WMEraseBkGnd( nwParam )
+           EXIT
 
-      CASE nMsg == WM_GETDLGCODE
+      CASE WM_GETDLGCODE
            nRet := ::WMGetDlgCode()
+           EXIT
 
-      CASE nMsg == WM_HSCROLL
+      CASE WM_HSCROLL
            nRet := ::WMHScroll( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_KEYDOWN
+      CASE WM_KEYDOWN
            nRet := ::WMKeyDown( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_KEYUP
+      CASE WM_KEYUP
            nRet := ::WMKeyUp( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_INITMENUPOPUP
+      CASE WM_INITMENUPOPUP
            nRet := ::WMInitMenuPopup( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
+           EXIT
 
-      CASE nMsg == WM_KILLFOCUS
+      CASE WM_KILLFOCUS
            nRet := ::WMKillFocus( nwParam )
+           EXIT
 
-      CASE nMsg == WM_LBUTTONDOWN
+      CASE WM_LBUTTONDOWN
            nRet := ::WMLButtonDown( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
+           EXIT
 
-      CASE nMsg == WM_LBUTTONUP
+      CASE WM_LBUTTONUP
            nRet := ::WMLButtonUp( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
+           EXIT
 
-      CASE nMsg == WM_LBUTTONDBLCLK
+      CASE WM_LBUTTONDBLCLK
            nRet := ::WMLButtonDblClk( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
+           EXIT
 
-      CASE nMsg == WM_MBUTTONDOWN
+      CASE WM_MBUTTONDOWN
            nRet := ::WMMButtonDown( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
+           EXIT
 
-      CASE nMsg == WM_MBUTTONUP
+      CASE WM_MBUTTONUP
            nRet := ::WMMButtonUp( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
+           EXIT
 
-      CASE nMsg == WM_MEASUREITEM
+      CASE WM_MEASUREITEM
            DEFAULT ::handle TO hWnd
 
            mi IS MEASUREITEMSTRUCT
            mi:Pointer( nlParam ) //buffer( peek( nlParam, mi:sizeof() ) )
 
            nRet := ::WMMeasureItem( mi, nlParam )
+           EXIT
 
-      CASE nMsg == WM_MENUSELECT
+      CASE WM_MENUSELECT
            nRet := ::WMMenuSelect( LoWord(nwParam), Hiword(nwparam), nlParam )
+           EXIT
 
-      CASE nMsg == WM_MOUSEMOVE
+      CASE WM_MOUSEMOVE
            nRet := ::WMMouseMove( nwParam, LoWord(nlParam), Hiword(nlparam) )
+           EXIT
 
-      CASE nMsg == WM_NCMOUSEMOVE
+      CASE WM_NCMOUSEMOVE
            nRet := ::WMNcMouseMove( nwParam, LoWord( nlParam ), HiWord( nlParam ) )
+           EXIT
 
-      CASE nMsg == WM_RBUTTONDOWN
+      CASE WM_RBUTTONDOWN
            nRet := ::WMRButtonDown( nwParam, LoWord(nlParam), Hiword(nlparam) )
+           EXIT
 
-      CASE nMsg == WM_RBUTTONUP
+      CASE WM_RBUTTONUP
            nRet := ::WMRButtonUp( nwParam, LoWord(nlParam), Hiword(nlparam) )
+           EXIT
 
-      CASE nMsg == WM_SIZE
+      CASE WM_SIZE
            aRect := ::WindowRect()
            ::Fwidth := aRect[3]-aRect[1]
            ::Fheight:= aRect[4]-aRect[2]
            nRet := ::WMSize( nwParam, LoWord(nlParam), Hiword(nlparam) )
+           EXIT
 
-      CASE nMsg == WM_MOVING
+      CASE WM_MOVING
            aRect := ::WindowRect()
            ::FLeft:= aRect[1]
            ::FTop := aRect[2]
            nRet := ::WMMoving( LoWord( nlParam ), HiWord( nlParam ) )
+           EXIT
 
-      CASE nMsg == WM_MOVE
+      CASE WM_MOVE
            aRect := ::WindowRect()
            ::FLeft:= aRect[1]
            ::FTop := aRect[2]
            nRet := ::WMMove( LoWord( nlParam ), HiWord( nlParam ) )
+           EXIT
 
-      CASE nMsg == WM_SETFOCUS
+      CASE WM_SETFOCUS
            nRet := ::WMSetFocus( nwParam )
+           EXIT
 
-      CASE nMsg == WM_VSCROLL
+      CASE WM_VSCROLL
            nRet := ::WMVScroll( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_SYSCOMMAND
+      CASE WM_SYSCOMMAND
            nRet := ::WMSysCommand( nwParam, nlParam )
 
            IF nRet == NIL .AND. nwParam == SC_CLOSE
@@ -1027,93 +1070,117 @@ METHOD FormProc( hWnd, nMsg, nwParam, nlParam ) CLASS TWinControl
 
               ENDIF
            ENDIF
+           EXIT
 
-      CASE nMsg == WM_TIMER
+      CASE WM_TIMER
            nRet := ::WMTimer( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_CTLCOLORSTATIC .or. ;
-           nMsg == WM_CTLCOLOREDIT   .or. ;
-           nMsg == WM_CTLCOLORDLG   .or. ;
-           nMsg == WM_CTLCOLORLISTBOX
+      CASE WM_CTLCOLORSTATIC
+      CASE WM_CTLCOLOREDIT
+      CASE WM_CTLCOLORDLG
+      CASE WM_CTLCOLORLISTBOX
            nRet := ::WMCtlColor( nMsg, nwParam, nlParam )
-           IF nRet == NIL .AND. ::hBkBrush != NIL .AND. nMsg == WM_CTLCOLORDLG
-              return( ::hBkBrush )
-           ENDIF
 
-      CASE nMsg == WM_NOTIFY
+           IF nRet == NIL .AND. ::hBkBrush != NIL .AND. nMsg == WM_CTLCOLORDLG
+              RETURN( ::hBkBrush )
+           ENDIF
+           EXIT
+
+      CASE WM_NOTIFY
            hdr IS NMHDR
            hdr:Pointer( nlParam )
 
-           IF __ClsMsgAssigned( self, "WMNotify" )
+           IF __ClsMsgAssigned( Self, "WMNotify" )
               nRet := ::WMNotify( hdr, nlParam )
            ELSEIF ( n := aScan( ::Controls, {|o| o:FHandle == hdr:hwndFrom } ) ) > 0
               nRet := ::Controls[n]:Notify( hdr, nlParam )
            ENDIF
+           EXIT
 
-      CASE nMsg == WM_NCPAINT
+      CASE WM_NCPAINT
            nRet := ::WMNCPaint( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_WINDOWPOSCHANGED
+      CASE WM_WINDOWPOSCHANGED
            nRet := ::WMWindowPosChanged( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_WINDOWPOSCHANGING
+      CASE WM_WINDOWPOSCHANGING
            nRet := ::WMWindowPosChanging( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_SYSCOLORCHANGE
+      CASE WM_SYSCOLORCHANGE
            nRet := ::WMSysColorChange( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_SYSKEYDOWN
+      CASE WM_SYSKEYDOWN
            nRet := ::WMSysKeyDown( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_SYSKEYUP
+      CASE WM_SYSKEYUP
            nRet := ::WMSysKeyUp( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_SIZING
+      CASE WM_SIZING
            nRet := ::WMSizing( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_SHOWWINDOW
+      CASE WM_SHOWWINDOW
            nRet := ::WMShowWindow( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_SETCURSOR
+      CASE WM_SETCURSOR
            nRet := ::WMSetCursor( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_ENABLE
+      CASE WM_ENABLE
            nRet := ::WMEnable( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_CONTEXTMENU
+      CASE WM_CONTEXTMENU
            nRet := ::WMContextMenu( LOWORD(nlparam) , HIWORD(nlparam) )
+           EXIT
 
-      CASE nMsg == WM_DROPFILES
+      CASE WM_DROPFILES
            nRet := ::WMDropFiles( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg == WM_SETTEXT
+      CASE WM_SETTEXT
            nRet := ::WMSetText( nwParam, nlParam )
+           EXIT
 
-      CASE nMsg >= WM_USER
-           nRet :=  ::WMUserMsg( nMsg, nwParam, nlParam)
-
-      CASE ::Parent != NIL .AND. nMsg == ::Parent:InstMsg
-           nRet:= SetForegroundWindow( hWnd )
-
-      otherwise
-           nRet := ::WMMessage( nMsg, nwParam, nlParam)
-   endcase
+      DEFAULT
+           IF nMsg >= WM_USER
+              nRet := ::WMUserMsg( nMsg, nwParam, nlParam)
+           ELSEIF ::Parent != NIL .AND. nMsg == ::Parent:InstMsg
+              nRet:= SetForegroundWindow( hWnd )
+           ELSE
+              nRet := ::WMMessage( nMsg, nwParam, nlParam)
+           ENDIF
+   END
 
    IF nRet != NIL
-      return( nRet )
+      RETURN  nRet
    ENDIF
 
    IF ::nProc == nil // no SetProcedure
-      do CASE
-         CASE ::FormType == WT_MDICHILD
-              return( DefMDIChildProc( hWnd, nMsg, nwParam, nlParam ) )
-         CASE ::FormType == WT_MDIFRAME
-              return( DefFrameProc( hWnd, nMsg, nwParam, nlParam ) )
-         CASE ::FormType == WT_WINDOW
-              return( DefWindowProc( hWnd, nMsg, nwParam, nlParam ) )
-         CASE ::FormType == WT_DIALOG
-              return( 0 )
-      EndCase
+      SWITCH ::FormType
+         CASE WT_MDICHILD
+              RETURN DefMDIChildProc( hWnd, nMsg, nwParam, nlParam )
+              EXIT
+
+         CASE WT_MDIFRAME
+              RETURN DefFrameProc( hWnd, nMsg, nwParam, nlParam )
+              EXIT
+
+         CASE WT_WINDOW
+              RETURN DefWindowProc( hWnd, nMsg, nwParam, nlParam )
+              EXIT
+
+         CASE WT_DIALOG
+              RETURN 0
+      END
    ENDIF
 
    return( CallWindowProc( ::nProc, ::handle, nMsg, nwParam, nlParam ) )
