@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.36 2004/12/12 06:40:37 walito Exp $
+ * $Id: hash.c,v 1.37 2004/12/17 13:15:47 jonnymind Exp $
  */
 
 /*
@@ -1602,12 +1602,14 @@ HB_GARBAGE_FUNC( hb_hashReleaseGarbage )
          if( HB_IS_STRING( pValue ) )
          {
             hb_itemReleaseString( pValue );
+            pValue->type = HB_IT_NIL;
          }
 
 		 // All other complex items will be released directly bt the GC.
          if( HB_IS_STRING( pKey ) )
          {
             hb_itemReleaseString( pKey );
+            pKey->type = HB_IT_NIL;
          }
 
          pKey++;

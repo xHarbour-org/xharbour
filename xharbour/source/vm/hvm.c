@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.445 2005/03/10 02:41:45 ronpinkas Exp $
+ * $Id: hvm.c,v 1.446 2005/03/17 16:03:42 snaiperis Exp $
  */
 
 /*
@@ -3728,9 +3728,9 @@ static void hb_vmPlus( void )
 
              hb_xmemcpy( (void * ) pNewString, (void *) pItem1->item.asString.value, ulLen1 );
 
+             // Not changing ->type
              hb_itemReleaseString( pItem1 );
 
-             pItem1->type = HB_IT_STRING;
              pItem1->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
              *( pItem1->item.asString.pulHolders ) = 1;
              pItem1->item.asString.bStatic = FALSE;
@@ -3860,8 +3860,9 @@ static void hb_vmMinus( void )
 
          HB_TRACE( HB_TR_DEBUG, ( "Released hb_vmMinus() Created \"%s\"", szNewString ) );
 
+         // Not changing ->type
          hb_itemReleaseString( pItem1 );
-         //pItem1->type = HB_IT_STRING;
+
          pItem1->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
          *( pItem1->item.asString.pulHolders ) = 1;
          pItem1->item.asString.bStatic = FALSE;
@@ -5145,6 +5146,7 @@ static void hb_vmBitAnd( void )
          pNewString = (char*) hb_xgrab( ulLen1 + 1 );
          hb_xmemcpy( (void*) pNewString, (void*) pString1, ulLen1 + 1 );
 
+         // Not changing ->type
          hb_itemReleaseString( pItem1 );
 
          pItem1->item.asString.value = pNewString;
@@ -5181,6 +5183,7 @@ static void hb_vmBitAnd( void )
          pNewString = (char*) hb_xgrab( ulLen + 1 );
          hb_xmemcpy( (void*) pNewString, (void*) pString, ulLen + 1 );
 
+         // Not changing ->type
          hb_itemReleaseString( pItem1 );
 
          pItem1->item.asString.value = pNewString;
@@ -5264,6 +5267,7 @@ static void hb_vmBitOr( void )
          pNewString = (char*) hb_xgrab( ulLen1 + 1 );
          hb_xmemcpy( (void*) pNewString, (void*) pString1, ulLen1 + 1 );
 
+         // Not changing ->type
          hb_itemReleaseString( pItem1 );
 
          pItem1->item.asString.value = pNewString;
@@ -5300,6 +5304,7 @@ static void hb_vmBitOr( void )
          pNewString = (char*) hb_xgrab( ulLen + 1 );
          hb_xmemcpy( (void*) pNewString, (void*) pString, ulLen + 1 );
 
+         // Not changing ->type
          hb_itemReleaseString( pItem1 );
 
          pItem1->item.asString.value = pNewString;
@@ -5384,6 +5389,7 @@ static void hb_vmBitXor( void )
          pNewString = (char*) hb_xgrab( ulLen1 + 1 );
          hb_xmemcpy( (void*) pNewString, (void*) pString1, ulLen1 + 1 );
 
+         // Not changing ->type
          hb_itemReleaseString( pItem1 );
 
          pItem1->item.asString.value = pNewString;
@@ -5420,6 +5426,7 @@ static void hb_vmBitXor( void )
          pNewString = (char*) hb_xgrab( ulLen + 1 );
          hb_xmemcpy( (void*) pNewString, (void*) pString, ulLen + 1 );
 
+         // Not changing ->type
          hb_itemReleaseString( pItem1 );
 
          pItem1->item.asString.value = pNewString;

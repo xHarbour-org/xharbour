@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.96 2005/02/01 14:39:11 druzus Exp $
+ * $Id: memvars.c,v 1.97 2005/02/02 01:16:48 druzus Exp $
  */
 
 /*
@@ -201,6 +201,7 @@ void hb_memvarsRelease( void )
                if( HB_IS_STRING( s_globalTable[ ulCnt ].pVarItem ) )
                {
                   hb_itemReleaseString( s_globalTable[ ulCnt ].pVarItem );
+                  s_globalTable[ ulCnt ].pVarItem->type = HB_IT_NIL;
                }
             }
             else if( HB_IS_COMPLEX( s_globalTable[ ulCnt ].pVarItem ) )
@@ -266,6 +267,7 @@ void hb_memvarsRelease( HB_STACK *pStack )
                if( HB_IS_STRING( pStack->globalTable[ ulCnt ].pVarItem ) )
                {
                   hb_itemReleaseString( pStack->globalTable[ ulCnt ].pVarItem );
+                  pStack->globalTable[ ulCnt ].pVarItem->type = HB_IT_NIL;
                }
             }
             else if( HB_IS_COMPLEX( pStack->globalTable[ ulCnt ].pVarItem ) )
@@ -276,6 +278,7 @@ void hb_memvarsRelease( HB_STACK *pStack )
             {
                pStack->globalTable[ ulCnt ].pVarItem->type = HB_IT_NIL;
             }
+
             hb_xfree( pStack->globalTable[ ulCnt ].pVarItem );
             pStack->globalTable[ ulCnt ].counter = 0;
          }
@@ -677,7 +680,9 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
          if( HB_IS_STRING( pValue->pVarItem ) )
          {
             hb_itemReleaseString( pValue->pVarItem );
+            pValue->pVarItem->type = HB_IT_NIL;
          }
+
          hb_xfree( pValue->pVarItem );
    	   #ifndef HB_THREAD_SUPPORT
    	      hb_memvarRecycle( hValue );
@@ -873,6 +878,7 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
 
             if( pReference->item.asString.bStatic == FALSE )
             {
+                // Not changinh ->type
                 hb_itemReleaseString( pReference );
             }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.76 2005/03/21 08:52:41 brianhays Exp $
+ * $Id: win32ole.prg,v 1.77 2005/03/21 17:40:26 ronpinkas Exp $
  */
 
 /*
@@ -410,21 +410,11 @@ RETURN xRet
 
   static LPSTR WideToAnsi( BSTR wString )
   {
-     UINT uLen;
      char *cString;
+     int nConvertedLen = WideCharToMultiByte( CP_ACP, 0, wString, -1, NULL, 0, NULL, NULL );
 
-     uLen = SysStringLen( wString ) + 1;
-
-     if( uLen > 1 )
-     {
-        cString = (char *) hb_xgrab( uLen );
-        WideCharToMultiByte( CP_ACP, 0, wString, uLen, cString, uLen, NULL, NULL );
-     }
-     else
-     {
-        cString = (char *) hb_xgrab( 1 );
-        cString[0] = '\0';
-     }
+     cString = (char *) hb_xgrab( nConvertedLen );
+     WideCharToMultiByte( CP_ACP, 0, wString, -1, cString, nConvertedLen, NULL, NULL );
 
      //wprintf( L"\nWide: '%s'\n", wString );
      //printf( "\nAnsi: '%s'\n", cString );
@@ -439,7 +429,6 @@ RETURN xRet
      VARIANTARG * pArgs = NULL;
      PHB_ITEM uParam;
      int n, nArgs, nArg;
-     BSTR bstrString;
      BOOL bByRef;
 
      nArgs = hb_pcount();
@@ -488,9 +477,8 @@ RETURN xRet
               case HB_IT_MEMO:
                 if( bByRef )
                 {
-                   bstrString = AnsiToWide( hb_parcx( nArg ) );
-                   hb_itemReleaseString( uParam );
-                   hb_itemPutCRaw( uParam, (char *) bstrString, uParam->item.asString.length * 2 + 1 );
+                   hb_itemPutCRaw( uParam, (char *) AnsiToWide( hb_parcx( nArg ) ), uParam->item.asString.length * 2 + 1 );
+
                    pArgs[ n ].n1.n2.vt   = VT_BYREF | VT_BSTR;
                    pArgs[ n ].n1.n2.n3.pbstrVal = (BSTR *) &( uParam->item.asString.value );
                    //wprintf( L"*** BYREF >%s<\n", *pArgs[ n ].n1.n2.n3.bstrVal );
@@ -689,8 +677,6 @@ RETURN xRet
                  case VT_BYREF | VT_BSTR:
                    //printf( "String\n" );
                    sString = WideToAnsi( *( pDispParams->rgvarg[ n ].n1.n2.n3.pbstrVal ) );
-
-                   SysFreeString( *( pDispParams->rgvarg[ n ].n1.n2.n3.pbstrVal ) );
 
                    hb_itemPutCPtr( aPrgParams[ n ], sString, strlen( sString ) );
                    break;
