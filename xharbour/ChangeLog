@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2722 2004/04/02 17:54:29 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2723 2004/04/02 18:29:48 srobert Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-02 14:00 UTC-0500 Sylvain Robert <s.robert/at/videotron.ca>
+  * source/rdd/dbf1.c
+    + Add Os error code to the  error object in hb_dbfCreate()
+      (clipper compatibility)
 
 2004-04-02 13:30 UTC-0500 Sylvain Robert <s.robert/at/videotron.ca>
   * source/rtl/filesys.c
