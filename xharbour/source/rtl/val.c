@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.16 2004/02/15 20:21:39 andijahja Exp $
+ * $Id: val.c,v 1.17 2004/02/23 08:31:57 andijahja Exp $
  */
 
 /*
@@ -239,7 +239,7 @@ HB_FUNC( VAL )
             iWidth++;
          }
 
-         hb_retnlen( dValue, iWidth, iDec );
+         hb_retnlen( dValue, iWidth, HB_MAX( 0, iDec ) );
       }
    }
    else

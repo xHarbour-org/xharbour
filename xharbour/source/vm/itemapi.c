@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.100 2004/04/30 16:11:04 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.101 2004/05/02 10:47:49 druzus Exp $
  */
 
 /*
@@ -1538,7 +1538,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
                {
                   if ( iZer > 0 )
                   {
-                     if ( iPos <= iDot + 1 )
+                     if ( iDec == 0 || iPos <= iDot + 1 )
                      {
                         iLast = szResult[ iPos ] >= '5' ? 1 : 0;
                      }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3417 2004/09/08 16:29:12 druzus Exp $
+ * $Id: ChangeLog,v 1.3418 2004/09/09 11:48:37 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-09 23:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/val.c
+    ! do not decimal part for very big integer numbers
+
+  * xharbour/source/vm/itemapi.c
+    ! small fix in rounding str result for very big (over double
+      precision) numbers when converted without decimal part
 
 2004-09-09 13:45 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/config/w32/watcom.cf
