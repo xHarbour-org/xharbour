@@ -23,7 +23,7 @@ CLASS TStatusBar FROM TControl
    DATA rect
    
    METHOD New() CONSTRUCTOR
-   METHOD Create() INLINE ::handle := CreateStatusBar( ::Style, ::Caption, ::Parent:handle, ::Id  )
+   METHOD Create() INLINE ::handle := CreateStatusBar( ::Style, ::Caption, ::Parent:handle, ::Id  ),aadd( ::Parent:Controls, self )
    METHOD SetPanels
    METHOD SetPanelText
    METHOD GetHeight

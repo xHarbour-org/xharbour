@@ -13,7 +13,7 @@
 *-----------------------------------------------------------------------------*
 
 CLASS TForm FROM TWindow
-   
+   DATA Controls INIT {}
    METHOD New()
    METHOD Add()
    METHOD Del()
@@ -52,12 +52,9 @@ METHOD Add( cName, oObj ) CLASS TForm
 METHOD Del( cName ) CLASS TForm
 
    local n
-   local aList := __objGetValueList( self )
-
-   if (n := aScan( aList, {|a| valtype( a[2] )=='O' .and.a[1] == UPPER(cName)} ) ) > 0
-      aList[n][2]:Delete()
+   if (n := aScan( ::Controls, {|o| lower(o:name) == lower(cName)} ) ) > 0
+      ::Controls[n]:Delete()
    endif
-   
    RETURN( .t. )
 
 *-----------------------------------------------------------------------------*
@@ -65,12 +62,9 @@ METHOD Del( cName ) CLASS TForm
 METHOD ChildFromHandle( hHandle ) CLASS TForm
 
    local n
-   local aList := __objGetValueList( self )
-
-   if (n := aScan( aList, {|a|valtype( a[2] )=='O' .and. a[2]:handle == hHandle} ) ) > 0
-      return( aList[n][2] )
+   if (n := aScan( ::Controls, {|o| o:handle == hHandle} ) ) > 0
+      return( ::Controls[n] )
    endif
-
    RETURN(nil)
 
 *-----------------------------------------------------------------------------*
@@ -78,12 +72,9 @@ METHOD ChildFromHandle( hHandle ) CLASS TForm
 METHOD ChildFromId( nId ) CLASS TForm
 
    local n
-   local aList := __objGetValueList( self )
-
-   if (n := aScan( aList, {|a|valtype( a[2] )=='O' .and. a[2]:Id == nId} ) ) > 0
-      return( aList[n][2] )
+   if (n := aScan( ::Controls, {|o| o:id == nId} ) ) > 0
+      return( ::Controls[n] )
    endif
-
    return(nil)
 
 *-----------------------------------------------------------------------------*
