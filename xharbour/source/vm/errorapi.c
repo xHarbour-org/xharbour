@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.13 2003/07/04 10:34:34 jonnymind Exp $
+ * $Id: errorapi.c,v 1.14 2003/07/07 02:32:58 ronpinkas Exp $
  */
 
 /*
@@ -190,11 +190,6 @@ void HB_EXPORT hb_errInit( void )
    */
    #ifndef HB_THREAD_SUPPORT
       s_errorBlock = hb_itemNew( NULL );
-   #else
-      hb_stack.errorBlock = hb_itemNew( NULL );
-      hb_stack.aTryCatchHandlerStack = hb_itemNew( NULL );
-      hb_arrayNew( hb_stack.aTryCatchHandlerStack, 0 );
-      hb_gcLock( hb_stack.aTryCatchHandlerStack );
    #endif
 }
 
@@ -207,15 +202,6 @@ void HB_EXPORT hb_errExit( void )
       {
          hb_itemRelease( s_errorBlock );
       }
-   #else
-    /* Error handler is never allocated; it resides in the stack, or
-            is owned by callers. */
-      if( hb_stack.errorBlock && hb_stack.errorBlock->type )
-      {
-         hb_itemRelease( hb_stack.errorBlock );
-      }
-
-      hb_itemClear( hb_stack.aTryCatchHandlerStack );
    #endif
 }
 
