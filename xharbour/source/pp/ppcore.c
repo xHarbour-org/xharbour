@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.62 2003/04/19 05:17:01 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.63 2003/04/21 08:09:52 ronpinkas Exp $
  */
 
 /*
@@ -4845,7 +4845,7 @@ static int strotrim( char * stroka, BOOL bRule )
         }
         /* Ron Pinkas added 2000-11-05 */
         /* Ron Pinkas 2001-02-14 added bRule logic */
-        else if( curc == '[' && bRule == FALSE && ( strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) )
+        else if( curc == '[' && bRule == FALSE && ( strchr( ")]}.\"'\\", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) )
         {
            pString = ptr;
            State = STATE_QUOTE3;
@@ -4875,16 +4875,13 @@ static int strotrim( char * stroka, BOOL bRule )
 
      if( State != STATE_NORMAL || curc != ' ' || ( curc == ' ' && *( stroka + 1 ) != '\0' && lastc != ' ' && lastc != ',' && lastc != '(' && *( stroka + 1 ) != ',' ) )
      {
-        if( State != STATE_NORMAL || bRule || curc != '\\' )
-        {
-           *ptr++ = curc;
-           lastc = curc;
-           lens++;
+        *ptr++ = curc;
+        lastc = curc;
+        lens++;
 
-           if( State == STATE_NORMAL && curc != ' ' )
-           {
-              cLastChar = curc;
-           }
+        if( State == STATE_NORMAL && curc != ' ' )
+        {
+           cLastChar = curc;
         }
      }
 
