@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.51 2004/10/01 01:21:00 brianhays Exp $
+ * $Id: ads1.c,v 1.52 2004/11/21 21:43:34 druzus Exp $
  */
 
 /*
@@ -1589,7 +1589,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          It seems wrong for this to be reset if OTHER fields have been
          written successfully already. But
          this flag is apparently not used by RDDADS. It has been there
-         since the beginning and may be implmented later. In the
+         since the beginning and may be implemented later. In the
          internal RDDs it is apparently just used as a short-circuit flag for
          avoiding repeated calls to GoHot, a method rddads never used.
          If in fact GoHot does get implemented, it may be better if
@@ -1663,7 +1663,7 @@ static ERRCODE adsRecInfo( ADSAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType, P
       {
          BOOL bDeleted = FALSE;
          ULONG ulPrevRec = 0;
-         
+
          if( pArea->ulRecNo != ulRecNo )
          {
             ulPrevRec = pArea->ulRecNo;
@@ -1697,7 +1697,7 @@ static ERRCODE adsRecInfo( ADSAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType, P
          break;
 
       case DBRI_UPDATED:
-         /* this will not work properly with current ADS RDD */
+         /* TODO: this will not work properly with current ADS RDD */
          hb_itemPutL( pInfo, ulRecNo == pArea->ulRecNo && pArea->fRecordChanged );
          break;
 
@@ -2005,6 +2005,22 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_itemPutL( pItem, pArea->fFLocked );
          break;
 
+      case DBI_ISREADONLY:
+         hb_itemPutL( pItem, pArea->fReadonly );
+         break;
+
+      case DBI_LOCKCOUNT:
+      {
+         UNSIGNED16 uiCount;
+         uRetVal = AdsGetNumLocks( pArea->hTable, &uiCount );
+         if( uRetVal != AE_SUCCESS )
+         {
+            return FAILURE;
+         }
+
+         hb_itemPutNL( pItem, ( long ) uiCount );
+         break;
+      }
 
       case DBI_SHARED:
          hb_itemPutL( pItem, pArea->fShared );
@@ -2037,26 +2053,18 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
 
-/* TODO ... */
-      //case DBI_DBFILTER:
-      /*  XXX must have locally unless server can't handle it...   adsFilterText( pArea, pItem ); */
-      //   break;
-
-      case DBI_CHILDCOUNT     :   /* Number of opened relations */
+      // unsupported options
       case DBI_FILEHANDLE     :   /* Handle of opened file */
-      case DBI_BOF            :   /* BOF flag - alternate to bof() */
-      case DBI_EOF            :   /* EOF flag - alternate to eof() */
-      case DBI_DBFILTER       :   /* Filter expression */
-      case DBI_FOUND          :   /* FOUND flag - alternate to found */
-      case DBI_FCOUNT         :   /* Number of fields */
-      case DBI_LOCKCOUNT      :   /* Locked records */
       case DBI_VALIDBUFFER    :   /* Is the current buffer valid */
-      case DBI_ALIAS          :   /* Alias name of workarea */
       case DBI_GETSCOPE       :   /* Locate codeblock */
       case DBI_LOCKOFFSET     :   /* New locking offset */
       case DBI_MEMOHANDLE     :   /* Dos handle for memo file */
       case DBI_MEMOBLOCKSIZE  :   /* Blocksize in memo files */
          break;
+
+      /* use workarea.c implmentation */
+      default:
+         return SUPER_INFO( ( AREAP ) pArea, uiIndex, pItem );
    }
    return SUCCESS;
 }
@@ -2928,20 +2936,32 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_POSITION :
-         if( phIndex )
+         if ( pOrderInfo->itmNewVal && HB_IS_NUMERIC( pOrderInfo->itmNewVal ) )
          {
-            UNSIGNED16 usFilterOption = ( pArea->dbfi.itmCobExpr ? ADS_RESPECTFILTERS : ADS_RESPECTSCOPES ) ;
-            AdsGetKeyNum( phIndex, usFilterOption, &pul32);
+            // TODO: results will be wrong if filter is not valid for ADS server
+            AdsGotoTop( phIndex );
+            AdsSkip( phIndex, hb_itemGetNL( pOrderInfo->itmNewVal ) - 1 );
+            hb_adsCheckBofEof( pArea );
+
+            pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, !pArea->fEof );
          }
          else
          {
-            UNSIGNED16 usFilterOption = ( pArea->dbfi.itmCobExpr ? ADS_RESPECTFILTERS : ADS_IGNOREFILTERS ) ;
-            AdsGetRecordNum( pArea->hTable, usFilterOption, &pul32);
+            if( phIndex )
+            {
+               UNSIGNED16 usFilterOption = ( pArea->dbfi.itmCobExpr ? ADS_RESPECTFILTERS : ADS_RESPECTSCOPES ) ;
+               AdsGetKeyNum( phIndex, usFilterOption, &pul32);
+            }
+            else
+            {
+               UNSIGNED16 usFilterOption = ( pArea->dbfi.itmCobExpr ? ADS_RESPECTFILTERS : ADS_IGNOREFILTERS ) ;
+               AdsGetRecordNum( pArea->hTable, usFilterOption, &pul32);
+            }
+            /*
+               TODO: This count will be wrong if server doesn't know full filter!
+            */
+            hb_itemPutNL( pOrderInfo->itmResult, pul32 );
          }
-         /*
-            TODO: This count will be wrong if server doesn't know full filter!
-         */
-         hb_itemPutNL( pOrderInfo->itmResult, pul32 );
          break;
 
       case DBOI_RECNO :                 /* TODO: OR IS THIS JUST RECNO?? */

@@ -8,7 +8,7 @@
                                   gian@nccolai.ws
 
 
-$Id: hbi18n.txt,v 1.4 2003/11/03 05:16:58 jonnymind Exp $
+$Id: hbi18n.txt,v 1.5 2004/03/07 14:42:22 likewolf Exp $
 
 
 /*  $DOC$
@@ -27,7 +27,7 @@ $Id: hbi18n.txt,v 1.4 2003/11/03 05:16:58 jonnymind Exp $
  *      This is a small draft to explain the working of the i18n system in xharbour.
  *      There could be error or even typos, and the document is Work IN Progress...
  *      But the system i18n in itself is pretty complete, and is NOT subject to
- *      radical changes: it can be used in production environent.
+ *      radical changes: it can be used in a production environment.
  *      
  *      
  *      I18N CONCEPT
@@ -38,17 +38,17 @@ $Id: hbi18n.txt,v 1.4 2003/11/03 05:16:58 jonnymind Exp $
  *      ------------------------------------------
  *      
  *      For i18n we mean a subcomponent of the localization (l10n) problem. I18N is
- *      the ability of translate the user interface of a program into any possible
+ *      the ability to translate the user interface of a program into any possible
  *      language. Currently, i18n() only supports languages in western encodings,
- *      as left to right and unicode supported languages are NOT supported by
- *      XHARBOUR. But i18n() is ready to use this extensions as soon as they
+ *      as right to left and unicode supported languages are NOT supported by
+ *      XHARBOUR. But i18n() is ready to use these extensions as soon as they
  *      are available.
  *      
  *      While i18n is translation of the UI into many languages, l10n is the usage
  *      of local national standards for dates, monetary values, mathematica symbols
  *      (many countries have comma and dot meaning swapped).
  *      
- *      This document and the i18n system only reates the first problem, in the future
+ *      This document and the i18n system only handles the first problem, in the future
  *      we could have a standard interface for producing both internationalized and
  *      localized programs.
  *      
@@ -56,9 +56,9 @@ $Id: hbi18n.txt,v 1.4 2003/11/03 05:16:58 jonnymind Exp $
  *      How is this accomplished?
  *      -------------------------
  *      
- *      How do we are able to translate a program in any possible language without
- *      having to recompile it, or without having to put a comprhensive prebuilt
- *      table of translation somewhere available?
+ *      How are we able to translate a program into any possible language without
+ *      having to recompile it, or without having to put a comprehensive prebuilt
+ *      table of translation somewhere?
  *      
  *      The thing goes like this: you write down your program as always, without
  *      worryng about writing your application in a specified language. You should
@@ -74,12 +74,12 @@ $Id: hbi18n.txt,v 1.4 2003/11/03 05:16:58 jonnymind Exp $
  *      When your program is complete, you will use xharbour support for i18n in
  *      these steps:
  *      
- *      1) compile your project using the -j step, obtaining an
+ *      1) compile your project using the -j switch, obtaining an
  *         "Harbour international list" (or .hil) file as output.
  *      
  *      2) use a program called hbdict (available under utils/) to translate
  *         every string you want to be translated into a language; you can
- *         crete in this way any amount of "harbour international tables", or
+ *         create in this way any number of "harbour international tables", or
  *         .hit.
  *      
  *      3) put the .hits into a subdirectory available to your program, that must
@@ -109,7 +109,7 @@ $Id: hbi18n.txt,v 1.4 2003/11/03 05:16:58 jonnymind Exp $
  *        confident that the program has reached a fairly stable moment of its
  *        developement. Also, this systems allow foreign users to add their own
  *        translation (and then send it to you or share with other ousers), so
- *        that you are freed from this part of developement.
+ *        that you are freed from this part of development.
  *      
  *      If used without any parameter, /j (or -j, depending on the system you
  *      are compiling on), will create an hit file named after your source, along
@@ -156,7 +156,7 @@ $Id: hbi18n.txt,v 1.4 2003/11/03 05:16:58 jonnymind Exp $
  *      complete dictionary utilities can be built. Anyway, hbdict has anything an
  *      essential dictionary editor should have, and will have more in the future.
  *      
- *      As hit files names, you are invited to choose names after the international
+ *      As for hit files names, you are invited to choose names after the international
  *      language names schemes. It is a 5 character code, having two lowercase letters
  *      indicating the main language, an underscore and two uppercase letters indicating
  *      the subtype of the language. In example:
@@ -183,8 +183,8 @@ $Id: hbi18n.txt,v 1.4 2003/11/03 05:16:58 jonnymind Exp $
  *      hbdict file.hil it_IT.hit
  *      
  *      you will see the hbdict interface. With arrows you will be able to see all
- *      the strings that were found in i18n() funciton calls in your sources. Pressing
- *      enter, you can set a new translation, or change it; the windows in which the
+ *      the strings that were found in i18n() function calls in your sources. Pressing
+ *      enter, you can set a new translation, or change it; the window in which the
  *      translations are made is a simple memoedit, so you can use standard memoedit
  *      keys to do edits.
  *      

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3668 2004/12/11 00:42:39 druzus Exp $
+ * $Id: ChangeLog,v 1.3669 2004/12/11 04:20:14 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,43 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-12-11 22:00 UTC-0800 Brian Hays <bhays@abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+    * fixed dbInfo
+      case DBI_ISREADONLY:
+      case DBI_LOCKCOUNT:
+      case DBI_ALIAS:
+      case DBI_FCOUNT:
+      case DBI_FOUND:
+      case DBI_DBFILTER:
+      case DBI_EOF:
+      case DBI_BOF:
+      case DBI_CHILDCOUNT:
+      case DBOI_POSITION (to support passing a new value)
+         also "fixes" ordKeyGoTo
+         notice ADS does not have a KeyGoTo function so this was implemented
+         via GoTop and Skip and is not guaranteed to be fast.
+         PLEASE use ads[G|S]etRelKeyPos() for scrollbars!
+
+      case DBOI_ISDESC
+         was already supported to return the value.
+         ads does not support dynamic switching of the descend flag.
+
+  * contrib/rdd_ads/adsfunc.c
+    * added HB_FUNC( ADSISRECORDVALID )
+         Returns: Does current record match current filter?
+         Useful after setting a filter to decide if GoTop is required to
+            be on a valid record; or if after a dbGoTo to know if on a valid record.
+         Eventually this should be replaced by a generic rdd call.
+
+  * doc/hbi18n.txt
+    * minor typo tweaks
+
 2004-12-10 23:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/winreg.prg
     * added a few casts.
   * source/rtl/gtapi.c
-    * added some (BOOL) casts that the compiler should not be 
+    * added some (BOOL) casts that the compiler should not be
     * complaining about
 
 2004-12-11 01:30 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)

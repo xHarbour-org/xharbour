@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.44 2004/09/06 19:53:42 kaddath Exp $
+ * $Id: adsfunc.c,v 1.45 2004/11/21 21:43:34 druzus Exp $
  */
 
 /*
@@ -943,6 +943,42 @@ HB_FUNC( ADSISRECORDINAOF )
    {
       hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSISRECORDINAOF" );
    }
+}
+
+HB_FUNC( ADSISRECORDVALID )             // Does current record match any current filter?
+{
+   ADSAREAP pArea;
+   UNSIGNED32 ulRecordNumber = 0;       /* 0 for current record */
+   UNSIGNED16 bIsInAOF = 0;
+   UNSIGNED32 ulRetVal;
+   BOOL bReturn = 0;
+   PHB_ITEM pResult;
+
+   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   if( pArea )
+   {
+      if( pArea->fEof )
+      {
+         hb_retl( 0 );
+         return;
+      }
+      if( ! pArea->dbfi.itmCobExpr )
+      {
+         hb_retl( 1 );
+         return;
+      }
+
+      pResult = hb_vmEvalBlock( pArea->dbfi.itmCobExpr );
+      if( HB_IS_LOGICAL( pResult ) && hb_itemGetL( pResult ) )
+      {
+         bReturn = 1;
+      }
+   }
+   //   else
+   //   {
+   //      hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSISRECORDVALID" );
+   //   }
+   hb_retl( bReturn );
 }
 
 HB_FUNC( ADSREFRESHAOF )
