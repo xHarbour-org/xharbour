@@ -4,8 +4,11 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclient.prg,v 1.5 2003/11/28 16:05:40 jonnymind Exp $
+* $Id: tipclient.prg,v 1.6 2003/12/10 00:11:22 jonnymind Exp $
 ************************************************/
+/* 2004-01-13
+  Enhaced tip cliente to conenct to secure smtp servers by Luiz Rafael Culik
+*/
 #include "hbclass.ch"
 #include "fileio.ch"
 #include "tip.ch"
@@ -41,6 +44,7 @@ CLASS tIPClient
 
    METHOD New( oUrl, oCredentials )
    METHOD Open()
+   METHOD OpenSecure()
    METHOD Read( iLen )
    METHOD ReadToFile( cFile, nMode )
    METHOD Write( cData, iLen, bCommit )
@@ -48,6 +52,10 @@ CLASS tIPClient
    METHOD WriteFromFile( cFile )
    METHOD Reset()
    METHOD Close()
+   /* Method for smtp server that require login */
+   METHOD AUTH( cUser, cPass) // Auth by login method
+   METHOD AUTHplain( cUser, cPass) // Auth by plain method
+
 ENDCLASS
 
 
@@ -86,27 +94,45 @@ METHOD New( oUrl, oCredentials ) CLASS tIPClient
 
 RETURN oRet
 
-METHOD Open( cUrl ) CLASS tIPClient
-   LOCAL nPort
+METHOD OpenSecure( ) CLASS tIPClient
 
-   IF HB_IsString( cUrl )
-      ::oUrl := tUrl():New( cUrl )
-   ENDIF
+   Local cUser
 
-   IF ::oUrl:nPort == -1
-      nPort := ::nDefaultPort
-   ELSE
-      nPort := ::oUrl:nPort
-   ENDIF
-
-   ::SocketCon := InetCreate()
-
-   InetSetTimeout( ::SocketCon, ::nConnTimeout )
-   InetConnect( ::oUrl:cServer, nPort, ::SocketCon )
-   IF InetErrorCode( ::SocketCon ) != 0
+   IF .not. ::super:Open()
       RETURN .F.
    ENDIF
-RETURN .T.
+ 
+   InetSetTimeout( ::SocketCon, ::nConnTimeout )
+
+   cUser := ::oUrl:cUserid
+   
+   IF .not. Empty ( ::oUrl:cUserid )
+      InetSendAll( ::SocketCon, "EHLO " +  cUser + ::cCRLF )
+   ELSE
+      InetSendAll( ::SocketCon, "EHLO tipClientSMTP" + ::cCRLF )
+   ENDIF
+
+RETURN ::getOk()
+
+
+METHOD Open() CLASS tIPClientSMTP
+   Local cUser
+   IF .not. ::super:Open()
+      RETURN .F.
+   ENDIF
+ 
+   InetSetTimeout( ::SocketCon, ::nConnTimeout )
+
+	cUser := ::oUrl:cUserid
+   
+   IF .not. Empty ( ::oUrl:cUserid )
+      InetSendAll( ::SocketCon, "EHLO " +  cUser + ::cCRLF )
+   ELSE
+      InetSendAll( ::SocketCon, "EHLO tipClientSMTP" + ::cCRLF )
+   ENDIF
+
+RETURN ::GetOk()
+
 
 METHOD Close() CLASS tIPClient
    IF .not. Empty( ::SocketCon )
@@ -161,17 +187,32 @@ METHOD Read( nLen ) CLASS tIPClient
    ENDIF
 RETURN cStr
 
-METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
-
-   IF Empty( nLen )
-      nLen := Len( cData )
+METHOD Write( cData, nLen, bCommit ) CLASS tIPClientSMTP
+Local aTo,cRecpt
+   IF .not. ::bInitialized
+      IF Empty( ::oUrl:cUserid ) .or. Empty( ::oUrl:cFile )
+         RETURN -1
+      ENDIF
+		
+      IF .not. ::Mail( ::oUrl:cUserid ) 	 
+         RETURN -1
+      ENDIF
+      aTo:= HB_RegexSplit(",", ::oUrl:cFile )
+		
+      FOR each cRecpt in Ato				
+         IF .not.   ::Rcpt(cRecpt)
+            RETURN -1
+         ENDIF
+      NEXT 
+		
+      InetSendAll( ::SocketCon, "DATA" + ::cCRLF )
+      IF .not. ::GetOk()
+         RETURN -1
+      ENDIF
+      ::bInitialized := .T.
    ENDIF
 
-   ::nLastWrite := InetSendAll( ::SocketCon,  cData , nLen )
-   IF .not. Empty( bCommit ) .and. bCommit
-      ::Commit()
-   ENDIF
-
+   ::nLastWrite := ::super:Write( cData, nLen, bCommit )
 RETURN ::nLastWrite
 
 
@@ -239,3 +280,43 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
    ::nStatus := 2
    Fclose( nFin )
 RETURN .T.
+
+METHOD AUTH( cUser, cPass) CLASS tIPClientSMTP
+
+   Local cs:=''
+   Local cEncodedUser
+   Local cEncodedPAss
+
+   cUser := StrTran( cUser,"&at;", "@")
+
+   cEncodedUser := alltrim(HB_BASE64(cuser,len(cuser)))
+   cEncodedPAss :=alltrim(HB_BASE64(cPass,len(cpass)))
+
+
+   InetSendAll( ::SocketCon, "AUTH LOGIN " +::ccrlf )
+
+   if ::GetOk()
+      InetSendAll( ::SocketCon, cEncodedUser+::cCrlf  )   
+      if ::Getok()
+         InetSendAll( ::SocketCon, cEncodedPass +::cCrlf )   
+      endif
+   endif
+
+   return ::GetOk()     
+
+METHOD AuthPlain( cUser, cPass) CLASS tIPClientSMTP
+
+   Local cBase := BUILDUSERPASSSTRING( cUser, cPass )
+   Local cen   := HB_BASE64( cBase, 2 + Len( cUser ) + Len( cPass ) )
+
+   InetSendAll( ::SocketCon, "AUTH PLAIN " + cen + ::cCrlf) 
+   return ::GetOk()     
+    
+METHOD Data( cData ) CLASS tIPClientSMTP
+   InetSendAll( ::SocketCon, "DATA" + ::cCRLF )
+   IF .not. ::GetOk()
+      RETURN .F.
+   ENDIF
+   InetSendAll(::SocketCon, cData + ::cCRLF + "." + ::cCRLF )
+RETURN ::GetOk()
+

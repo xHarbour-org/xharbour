@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.5 2003/12/01 03:44:07 ronpinkas Exp $
+# $Id: makefile.bc,v 1.6 2003/12/03 00:51:16 fsgiudice Exp $
 #
 
 #
@@ -54,6 +54,7 @@ HBTIP_OBJS=\
    $(OBJ_DIR)\tipurl.obj\
    $(OBJ_DIR)\tipmail.obj\
    $(OBJ_DIR)\tiputils.obj\
+   $(OBJ_DIR)\base64x.obj\
 
 all: $(HBTIP_LIB)
 
