@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.38 2003/09/04 20:26:17 xthefull Exp $
+ * $Id: Changelog,v 1.39 2003/10/09 23:18:32 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,8 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-10-10 01:46 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
+  * test/bldtest.bat
+  * test/makefile.bc
+    * updated to build prg passing filename[ without .prg ] as parameter to bldtest.bat
+
 2003-10-10 01:12 UTC+0200 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
- 
+
   + src/xwt_win/xwt_win.c
   + src/xwt_win/xwt_win.h
     + Added XWT driver for Windows
@@ -34,8 +39,8 @@
 
   * src/framewindow.prg
     ! Do not delete menus when there are no menus...
-  
-  
+
+
   + src/xwt_win/xwt_win_msgbox.c
     + Added MessageBox (skeleton)
 
@@ -66,7 +71,7 @@
 
 2003-08-31 21:49 UTC+0200 Rafa Carmona <thefull@wanadoo.es>
   * src/framewindow.prg
-    + New pass parameters for creation of menu in method New 
+    + New pass parameters for creation of menu in method New
 
   * include/xwtcmd.ch
     + Added support command DEFINE WINDOW ...
@@ -121,20 +126,20 @@
     ! minor update
   * test/xwt_test.prg
     * now togglebuttons and checkbox has diferent colors
-   Please note this is an work in progress    
+   Please note this is an work in progress
 
 
 2003-08-28 23:20 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
-  *src/button.prg 
+  *src/button.prg
     ! Enhaced to accept font/fontsize and color parameter
-  *src/xwt_api.c 
+  *src/xwt_api.c
     ! Changed XWT_SET_PROPERTY/XWT_GET_PROPERTY to handle the font/color properties on buttons
-  *src/xwt_gtk/xwt_gtk.c 
+  *src/xwt_gtk/xwt_gtk.c
     ! xtw_drv_set_property changes to properly handle font/color properties on buttons
   * test/xwt_test.prg
-    ! Now buttons can has diferent color 
+    ! Now buttons can has diferent color
   *include/xwtcmd.ch
-    ! buttons now can has color , as also other font and font size    
+    ! buttons now can has color , as also other font and font size
    Please note this is an work in progress
 
 >>>>>>> 1.30
@@ -143,12 +148,12 @@
   *include/xwtcmd.ch
     ! menuitems now can has color , as also other font and font size
   *include/xwt_api.h
-    !small change to hold all 4 colors state   
-  *src/menuitem.prg 
+    !small change to hold all 4 colors state
+  *src/menuitem.prg
     ! Enhaced to accept font/fontsize and color parameter
-  *src/xwt_api.c 
+  *src/xwt_api.c
     ! Changed XWT_SET_PROPERTY/XWT_GET_PROPERTY to handle the font/color properties on menutitems
-  *src/xwt_gtk/xwt_gtk.c 
+  *src/xwt_gtk/xwt_gtk.c
     ! xtw_drv_set_property changes to properly handle font/color properties on menuitems
   * test/xwt_test.prg
     ! changes to menuitems so now it has colors or diferent font size
@@ -329,7 +334,7 @@
 2003-05-14 10:28 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   + doc/es/createwidgets.txt
     + added spanish docmumentation on how create an XWT widget,
-      provided by Rafa Carmona (TheFull) 
+      provided by Rafa Carmona (TheFull)
 
 2003-04-22 21:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * src/button.prg
@@ -363,11 +368,11 @@
 
   * test/xwt_test.prg
     + Added a test for togglebuttons and Widget::GetType()
-    
+
 2003-04-22 21:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * src/splitter.prg
     ! Fixed a mispelled macro.
- 
+
 2003-04-22 21:20 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
    * src/xwt_gtk/xwt_gtk_grid.c
      ! One of the struct member was not set to null during creation,
@@ -435,10 +440,10 @@
     + GetFile() Method
   * src/xwt_gtk/xwt_gtk_fileselct.c
     * Rewrited Ok_button call back
-  * include/xwt.ch       
+  * include/xwt.ch
     + XWT_PROP_FILENAME 81
   * src/xwt_api.c
-  * src/xwt_gtk/xwt_gtk.c    
+  * src/xwt_gtk/xwt_gtk.c
     * Added code to proper Get and Set Properties on FileSelection Dialog
 
 2003-04-15 00:35 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
@@ -507,7 +512,7 @@
   * test/xwt_test.prg
     + Added tests for new widgets.
 
-    
+
 2003-04-08 20:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * contrib/xwt/src/xwt_gtk/xwt_gtk_image.c
   * contrib/xwt/src/xwt_gtk/xwt_gtk_label.c
