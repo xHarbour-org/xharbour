@@ -1,5 +1,5 @@
 /*
- * $Id: hboutdbg.c,v 1.4 2003/12/03 14:00:49 mauriliolongo Exp $
+ * $Id: hboutdbg.c,v 1.5 2003/12/03 23:26:54 fsgiudice Exp $
  */
 
 /*
@@ -143,7 +143,7 @@ HB_FUNC( HB_OUTDEBUGNAME )
 
    if ( s_iDebugFd == 0 && pName != NULL)
    {
-      strncpy( s_szDebugName, hb_itemGetCPtr( pName ), 127 );
+      strncpy( s_szDebugName, pName->item.asString.value, 127 );
       s_iUseDebugName = 1;
 
       hb_retl( TRUE );

@@ -1,5 +1,5 @@
 /*
- * $Id: soundex.c,v 1.1.1.1 2001/12/21 10:42:04 ronpinkas Exp $
+ * $Id: soundex.c,v 1.2 2004/02/20 12:52:52 druzus Exp $
  */
 
 /*
@@ -70,8 +70,8 @@ HB_FUNC( SOUNDEX )
 
    if( pString )
    {
-      char * pszString = hb_itemGetCPtr( pString );
-      ULONG ulLen = hb_itemGetCLen( pString );
+      char * pszString = pString->item.asString.value;
+      ULONG ulLen = pString->item.asString.length;
       ULONG nPos = 0;
       ULONG nResultPos = 0;
       char cCharPrev = '0';

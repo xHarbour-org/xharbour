@@ -1,5 +1,5 @@
 /*
- * $Id: gtgraph.c,v 1.4 2004/02/10 13:16:18 andijahja Exp $
+ * $Id: gtgraph.c,v 1.5 2004/02/13 09:22:47 andijahja Exp $
  */
 
 /*
@@ -62,7 +62,7 @@ static HB_GT_GCOLOR *s_paramToColor( PHB_ITEM pColor, char *funcname )
 
    if ( HB_IS_STRING( pColor ) )
    {
-      color = hb_gt_gcolorFromString( hb_itemGetCPtr( pColor ) );
+      color = hb_gt_gcolorFromString( pColor->item.asString.value );
       if ( color == NULL )
       {
          hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong color code", funcname, 0 );
@@ -440,9 +440,9 @@ HB_FUNC( GTTEXT )
          gobj->color = *color;
          gobj->x = hb_itemGetNI( pX );
          gobj->y = hb_itemGetNI( pY );
-         gobj->data_len = (USHORT) hb_itemGetCLen( pText );
+         gobj->data_len = (USHORT) pText->item.asString.length;
          gobj->data = (char*) hb_xgrab( gobj->data_len );
-         memcpy( gobj->data, hb_itemGetCPtr( pText ), gobj->data_len );
+         memcpy( gobj->data, pText->item.asString.value, gobj->data_len );
          hb_gtAddGobject( gobj );
       }
    }

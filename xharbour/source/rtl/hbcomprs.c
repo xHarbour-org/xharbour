@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomprs.c,v 1.2 2004/02/14 01:29:42 andijahja Exp $
+ * $Id: hbcomprs.c,v 1.3 2004/02/14 21:01:16 andijahja Exp $
  */
 
 /*
@@ -4043,7 +4043,7 @@ HB_FUNC( HB_COMPRESS )
    }
    else
    {
-      ulSrclen = hb_itemGetCLen( pSource );
+      ulSrclen = pSource->item.asString.length;
    }
 
    /* Allocation mode: user provided or allocated here */
@@ -4131,7 +4131,7 @@ HB_FUNC( HB_UNCOMPRESS )
    }
    else
    {
-      ulSrclen = hb_itemGetCLen( pSource );
+      ulSrclen = pSource->item.asString.length;
    }
 
    /* Allocation mode: user provided or allocated here */

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.102 2004/02/18 21:35:55 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.103 2004/02/20 22:33:57 ronpinkas Exp $
  */
 
 /*
@@ -4387,8 +4387,8 @@ static USHORT hb_cdxFindTag( CDXAREAP pArea, PHB_ITEM pItem )
          LPCDXINDEX pIndex;
          char szName[ CDX_MAXTAGNAMELEN + 1 ];
 
-         hb_strncpyUpperTrim( szName, hb_itemGetCPtr( pItem ),
-                     HB_MIN(hb_itemGetCLen( pItem ), CDX_MAXTAGNAMELEN) );
+         hb_strncpyUpperTrim( szName, pItem->item.asString.value,
+                     HB_MIN( pItem->item.asString.length, CDX_MAXTAGNAMELEN) );
          pIndex = pArea->lpIndexes;
          pTag = NULL;
          uiTag = 0;
@@ -5489,7 +5489,7 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
       return FAILURE;
 
    szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 3 );
-   strcpy( szFileName, hb_itemGetCPtr( pOrderInfo->atomBagName ) );
+   strcpy( szFileName, pOrderInfo->atomBagName->item.asString.value );
    szFileName = ( char * ) hb_fileNameConv( szFileName ) ;
 
    if ( strlen( szFileName ) == 0 )

@@ -1,5 +1,5 @@
 /*
- * $Id: do.c,v 1.1 2003/01/05 06:50:36 ronpinkas Exp $
+ * $Id: do.c,v 1.2 2003/12/07 00:10:07 jonnymind Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ HB_FUNC( DO )
       PHB_DYNS pDynSym;
 
       hb_dynsymLock();
-      pDynSym = hb_dynsymFindName( hb_itemGetCPtr( pItem ) );
+      pDynSym = hb_dynsymFindName( pItem->item.asString.value );
 
       if( pDynSym )
       {
@@ -96,7 +96,7 @@ HB_FUNC( DO )
 
          pArgsArray = hb_arrayFromParams( HB_VM_STACK.pBase );
 
-         hb_errRT_BASE( EG_NOFUNC, 1001, NULL, hb_itemGetCPtr( pItem ), 1, pArgsArray );
+         hb_errRT_BASE( EG_NOFUNC, 1001, NULL, pItem->item.asString.value, 1, pArgsArray );
          hb_itemRelease( pArgsArray );
       }
    }

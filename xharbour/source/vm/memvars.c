@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.57 2004/02/20 22:34:01 ronpinkas Exp $
+ * $Id: memvars.c,v 1.58 2004/02/21 08:58:26 jonnymind Exp $
  */
 
 /*
@@ -1920,17 +1920,17 @@ static HB_DYNS_FUNC( hb_memvarSave )
          strncpy( ( char * ) buffer, pDynSymbol->pSymbol->szName, 10 );
          buffer[ 10 ] = '\0';
 
-         if( HB_IS_STRING( pItem ) && ( hb_itemGetCLen( pItem ) + 1 ) <= SHRT_MAX )
+         if( HB_IS_STRING( pItem ) && ( pItem->item.asString.length + 1 ) <= SHRT_MAX )
          {
             /* Store the closing zero byte, too */
-            USHORT uiLength = ( USHORT ) ( hb_itemGetCLen( pItem ) + 1 );
+            USHORT uiLength = ( USHORT ) ( pItem->item.asString.length + 1 );
 
             buffer[ 11 ] = 'C' + 128;
             buffer[ 16 ] = HB_LOBYTE( uiLength );
             buffer[ 17 ] = HB_HIBYTE( uiLength );
 
             hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
-            hb_fsWrite( fhnd, ( BYTE * ) hb_itemGetCPtr( pItem ), uiLength );
+            hb_fsWrite( fhnd, ( BYTE * ) pItem->item.asString.value, uiLength );
          }
          else if( HB_IS_DATE( pItem ) )
          {
@@ -2158,7 +2158,7 @@ HB_FUNC( __MVRESTORE )
 
             if( pItem )
             {
-               BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_strMatchRegExp( hb_itemGetCPtr( pName ), pszMask ) );
+               BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_strMatchRegExp( pName->item.asString.value, pszMask ) );
 
                /* Process it if it matches the passed mask */
                if( bIncludeMask ? bMatch : ! bMatch )

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.61 2004/02/18 21:35:55 druzus Exp $
+ * $Id: dbf1.c,v 1.62 2004/02/20 22:33:56 ronpinkas Exp $
  */
 
 /*
@@ -1266,11 +1266,11 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       {
          if( pField->uiType == HB_IT_STRING )
          {
-            uiSize = ( USHORT ) hb_itemGetCLen( pItem );
+            uiSize = ( USHORT ) pItem->item.asString.length;
             if( uiSize > pField->uiLen )
                uiSize = pField->uiLen;
             memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
-                    hb_itemGetCPtr( pItem ), uiSize );
+                    pItem->item.asString.value, uiSize );
 #ifndef HB_CDP_SUPPORT_OFF
             if( HB_IS_STRING( pItem ) )
                hb_cdpnTranslate( (char *) pArea->pRecord + pArea->pFieldOffset[ uiIndex ], s_cdpage, pArea->cdPage, uiSize );
@@ -1632,7 +1632,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
       hb_xfree( pFileName );
       pFileExt = hb_itemPutC( NULL, "" );
       SELF_INFO( ( AREAP ) pArea, DBI_MEMOEXT, pFileExt );
-      strncat( pArea->szMemoFileName, hb_itemGetCPtr( pFileExt ),
+      strncat( pArea->szMemoFileName, pFileExt->item.asString.value,
                _POSIX_PATH_MAX - strlen( pArea->szMemoFileName ) );
       hb_itemRelease( pFileExt );
       tmp = pCreateInfo->abName;
@@ -1876,7 +1876,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       if( pFileName->szPath )
          strcat( szFileName, pFileName->szPath );
       strcat( szFileName, pFileName->szName );
-      strncat( szFileName, hb_itemGetCPtr( pFileExt ), _POSIX_PATH_MAX -
+      strncat( szFileName, pFileExt->item.asString.value, _POSIX_PATH_MAX -
                strlen( szFileName ) );
       hb_itemRelease( pFileExt );
       hb_xfree( pFileName );
@@ -2765,7 +2765,7 @@ static ERRCODE hb_dbfDrop( PHB_ITEM pItemTable )
   BYTE   * pBuffer;
   char szFileName[ _POSIX_PATH_MAX + 1 ];
 
-  pBuffer = (BYTE *) hb_itemGetCPtr( pItemTable );
+  pBuffer = (BYTE *) pItemTable->item.asString.value;
   strcpy( (char *) szFileName, (char *) pBuffer );
   if ( !strchr( szFileName, '.' ))
     strcat( szFileName, DBF_TABLEEXT );
@@ -2778,7 +2778,8 @@ BOOL hb_dbfExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex )
   char szFileName[ _POSIX_PATH_MAX + 1 ];
   BYTE * pBuffer;
 
-  pBuffer = (BYTE *) hb_itemGetCPtr( pItemIndex != NULL ? pItemIndex : pItemTable );
+  pBuffer = (BYTE *) ( pItemIndex != NULL ? pItemIndex->item.asString.value : pItemTable->item.asString.value );
+
   strcpy( (char *) szFileName, (char *) pBuffer );
   if ( pItemTable && !strchr( szFileName, '.' ))
     strcat( szFileName, DBF_TABLEEXT );

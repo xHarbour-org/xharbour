@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.72 2004/02/17 18:44:13 andijahja Exp $
+ * $Id: dbfntx1.c,v 1.73 2004/02/20 22:33:58 ronpinkas Exp $
  */
 
 /*
@@ -2622,7 +2622,7 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
          switch( hb_itemType( pItem ) )
          {
             case HB_IT_STRING:
-               uiCurLen = (USHORT) hb_itemGetCLen( pItem );
+               uiCurLen = (USHORT) pItem->item.asString.length;
                if(uiCurLen > NTX_MAX_KEY )
                   uiCurLen = NTX_MAX_KEY ;
                if( pTag->KeyLength != uiCurLen )
@@ -2967,7 +2967,7 @@ static LPTAGINFO ntxFindIndex( NTXAREAP pArea , PHB_ITEM lpOrder )
    {
       do
       {
-         if( !hb_stricmp( current->TagName , hb_itemGetCPtr( lpOrder ) ) )
+         if( !hb_stricmp( current->TagName , lpOrder->item.asString.value ) )
             return current;
          current = current->pNext;
       } while( current );
@@ -3737,7 +3737,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       strcat( szFileName, pFileName->szName );
       pExtInfo.itmResult = hb_itemPutC( NULL, "" );
       SELF_ORDINFO( ( AREAP ) pArea, DBOI_BAGEXT, &pExtInfo );
-      strcat( szFileName, hb_itemGetCPtr( pExtInfo.itmResult ) );
+      strcat( szFileName, pExtInfo.itmResult->item.asString.value );
       hb_itemRelease( pExtInfo.itmResult );
    }
    else
@@ -3748,7 +3748,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       {
          pExtInfo.itmResult = hb_itemPutC( NULL, "" );
          SELF_ORDINFO( ( AREAP ) pArea, DBOI_BAGEXT, &pExtInfo );
-         strcat( szFileName, hb_itemGetCPtr( pExtInfo.itmResult ) );
+         strcat( szFileName, pExtInfo.itmResult->item.asString.value );
          hb_itemRelease( pExtInfo.itmResult );
       }
    }
@@ -3915,7 +3915,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             }
             break;
          case DBOI_ORDERCOUNT:
-            if( pInfo->atomBagName && (char*) hb_itemGetCPtr( pInfo->atomBagName ))
+            if( pInfo->atomBagName && (char*) pInfo->atomBagName->item.asString.value )
             {
                hb_itemPutNL( pInfo->itmResult, 1 );
             }
@@ -4008,11 +4008,11 @@ static ERRCODE ntxScopeInfo( NTXAREAP pArea, USHORT nScope, PHB_ITEM pItem )
          case HB_IT_LONG:
          case HB_IT_DOUBLE:
             hb_itemPutND( pItem, hb_strVal(
-              hb_itemGetCPtr( (nScope)? pTag->bottomScope:pTag->topScope ),
-              hb_itemGetCLen( (nScope)? pTag->bottomScope:pTag->topScope ) ) );
+              (nScope)? pTag->bottomScope->item.asString.value:pTag->topScope->item.asString.value,
+              (nScope)? pTag->bottomScope->item.asString.length:pTag->topScope->item.asString.length ) );
             break;
         case HB_IT_DATE:
-           hb_itemPutDS( pItem, hb_itemGetCPtr( (nScope)? pTag->bottomScope:pTag->topScope ) );
+           hb_itemPutDS( pItem, (nScope)? pTag->bottomScope->item.asString.value:pTag->topScope->item.asString.value );
            break;
       }
    }
@@ -4037,7 +4037,7 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
 
    szFileName = ( char * ) hb_xgrab( _POSIX_PATH_MAX + 3 );
    szFileName[ 0 ] = '\0';
-   strcpy( szFileName, hb_itemGetCPtr( pOrderInfo->atomBagName ) );
+   strcpy( szFileName, pOrderInfo->atomBagName->item.asString.value );
    szFileName =  (char*) hb_fileNameConv( szFileName );
 
    if( strlen( szFileName ) == 0 )
@@ -4050,7 +4050,7 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
    {
       pExtInfo.itmResult = hb_itemPutC( NULL, "" );
       SELF_ORDINFO( ( AREAP ) pArea, DBOI_BAGEXT, &pExtInfo );
-      strcat( szFileName, hb_itemGetCPtr( pExtInfo.itmResult ) );
+      strcat( szFileName, pExtInfo.itmResult->item.asString.value );
       hb_itemRelease( pExtInfo.itmResult );
    }
    pIndex = hb_ntxIndexNew( pArea );

@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.15 2004/02/12 22:00:26 andijahja Exp $
+ * $Id: val.c,v 1.16 2004/02/15 20:21:39 andijahja Exp $
  */
 
 /*
@@ -193,8 +193,8 @@ HB_FUNC( VAL )
 
    if( pText )
    {
-      char * szText = hb_itemGetCPtr( pText );
-      int iWidth, iLen = ( int ) hb_itemGetCLen( pText );
+      char * szText = pText->item.asString.value;
+      int iWidth, iLen = ( int ) pText->item.asString.length;
       int iDec;
       BOOL bInteger = TRUE;
 

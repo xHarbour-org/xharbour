@@ -1,5 +1,5 @@
 /*
- * $Id: natmsg.c,v 1.16 2001/12/05 18:44:47 vszakats Exp $
+ * $Id: natmsg.c,v 1.1.1.1 2001/12/21 10:42:18 ronpinkas Exp $
  */
 
 /*
@@ -99,14 +99,14 @@ HB_FUNC( ISAFFIRM )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
 
-   hb_retl( pItem && hb_itemGetCLen( pItem ) >= 1 && toupper( hb_itemGetCPtr( pItem )[ 0 ] ) == ( ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_NATMSG + _LF_YN - 1 ) )[ 0 ] );
+   hb_retl( pItem && pItem->item.asString.length >= 1 && toupper( pItem->item.asString.value[ 0 ] ) == ( ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_NATMSG + _LF_YN - 1 ) )[ 0 ] );
 }
 
 HB_FUNC( ISNEGATIVE )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
 
-   hb_retl( pItem && hb_itemGetCLen( pItem ) >= 1 && toupper( hb_itemGetCPtr( pItem )[ 0 ] ) == ( ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_NATMSG + _LF_YN - 1 ) )[ 2 ] );
+   hb_retl( pItem && pItem->item.asString.length >= 1 && toupper( pItem->item.asString.value[ 0 ] ) == ( ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_NATMSG + _LF_YN - 1 ) )[ 2 ] );
 }
 
 HB_FUNC( NATIONMSG )

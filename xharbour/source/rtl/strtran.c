@@ -1,5 +1,5 @@
 /*
- * $Id: strtran.c,v 1.5 2003/07/18 21:42:35 andijahja Exp $
+ * $Id: strtran.c,v 1.6 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -71,13 +71,13 @@ HB_FUNC( STRTRAN )
 
       if( pSeek )
       {
-         char * szText = hb_itemGetCPtr( pText );
-         ULONG ulText = hb_itemGetCLen( pText );
-         ULONG ulSeek = hb_itemGetCLen( pSeek );
+         char * szText = pText->item.asString.value;
+         ULONG ulText = pText->item.asString.length;
+         ULONG ulSeek = pSeek->item.asString.length;
 
          if( ulSeek && ulSeek <= ulText )
          {
-            char * szSeek = hb_itemGetCPtr( pSeek );
+            char * szSeek = pSeek->item.asString.value;
             char * szReplace;
             ULONG ulStart;
 
@@ -97,8 +97,8 @@ HB_FUNC( STRTRAN )
 
                if( pReplace )
                {
-                  szReplace = hb_itemGetCPtr( pReplace );
-                  ulReplace = hb_itemGetCLen( pReplace );
+                  szReplace = pReplace->item.asString.value;
+                  ulReplace = pReplace->item.asString.length;
                }
                else
                {

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.76 2004/02/21 21:14:11 andijahja Exp $
+ * $Id: dbcmd.c,v 1.77 2004/02/22 10:17:02 lf_sfnet Exp $
  */
 
 /*
@@ -1640,7 +1640,7 @@ HB_FUNC( DBFILTER )
    {
       pFilter = hb_itemPutC( NULL, "" );
       SELF_FILTERTEXT( ( AREAP ) s_pCurrArea->pArea, pFilter );
-      hb_retc( hb_itemGetCPtr( pFilter ) );
+      hb_retc( pFilter->item.asString.value );
       hb_itemRelease( pFilter );
    }
    else
@@ -2309,7 +2309,7 @@ HB_FUNC( DBTABLEEXT )
       {
          pItem = hb_itemPutC( NULL, "" );
          SELF_INFO( ( AREAP ) pTempArea, DBI_TABLEEXT, pItem );
-         hb_retc( hb_itemGetCPtr( pItem ) );
+         hb_retc( pItem->item.asString.value );
          hb_itemRelease( pItem );
          SELF_RELEASE( pTempArea );
       }
@@ -2318,7 +2318,7 @@ HB_FUNC( DBTABLEEXT )
    {
       pItem = hb_itemPutC( NULL, "" );
       SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, pItem );
-      hb_retc( hb_itemGetCPtr( pItem ) );
+      hb_retc( pItem->item.asString.value );
       hb_itemRelease( pItem );
    }
 }
@@ -2835,7 +2835,7 @@ HB_FUNC( ORDBAGEXT )
       {
          pInfo.itmResult = hb_itemPutC( NULL, "" );
          SELF_ORDINFO( pTempArea, DBOI_BAGEXT, &pInfo );
-         hb_retc( hb_itemGetCPtr( pInfo.itmResult ) );
+         hb_retc( pInfo.itmResult->item.asString.value );
          hb_itemRelease( pInfo.itmResult );
          SELF_RELEASE( pTempArea );
       }
@@ -2844,7 +2844,7 @@ HB_FUNC( ORDBAGEXT )
    {
       pInfo.itmResult = hb_itemPutC( NULL, "" );
       SELF_ORDINFO( ( AREAP ) s_pCurrArea->pArea, DBOI_BAGEXT, &pInfo );
-      hb_retc( hb_itemGetCPtr( pInfo.itmResult ) );
+      hb_retc( pInfo.itmResult->item.asString.value );
       hb_itemRelease( pInfo.itmResult );
    }
 }
@@ -2874,7 +2874,7 @@ HB_FUNC( ORDBAGNAME )
       }
       pOrderInfo.itmResult = hb_itemPutC( NULL, "" );
       SELF_ORDINFO( ( AREAP ) s_pCurrArea->pArea, DBOI_BAGNAME, &pOrderInfo );
-      hb_retc( hb_itemGetCPtr( pOrderInfo.itmResult ) );
+      hb_retc( pOrderInfo.itmResult->item.asString.value );
       hb_itemRelease( pOrderInfo.itmResult );
    }
    else
@@ -3039,7 +3039,7 @@ HB_FUNC( ORDFOR )
       pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
       pOrderInfo.itmResult = hb_itemPutC( NULL, "" );
       SELF_ORDINFO( ( AREAP ) s_pCurrArea->pArea, DBOI_CONDITION, &pOrderInfo );
-      hb_retc( hb_itemGetCPtr( pOrderInfo.itmResult ) );
+      hb_retc( pOrderInfo.itmResult->item.asString.value );
       hb_itemRelease( pOrderInfo.itmResult );
    }
    else
@@ -3073,7 +3073,7 @@ HB_FUNC( ORDKEY )
       pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
       pOrderInfo.itmResult = hb_itemPutC( NULL, "" );
       SELF_ORDINFO( ( AREAP ) s_pCurrArea->pArea, DBOI_EXPRESSION, &pOrderInfo );
-      hb_retc( hb_itemGetCPtr( pOrderInfo.itmResult ) );
+      hb_retc( pOrderInfo.itmResult->item.asString.value );
       hb_itemRelease( pOrderInfo.itmResult );
    }
    else
@@ -3358,7 +3358,7 @@ HB_FUNC( ORDNAME )
       pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
       pOrderInfo.itmResult = hb_itemPutC( NULL, "" );
       SELF_ORDINFO( ( AREAP ) s_pCurrArea->pArea, DBOI_NAME, &pOrderInfo );
-      hb_retc( hb_itemGetCPtr( pOrderInfo.itmResult ) );
+      hb_retc( pOrderInfo.itmResult->item.asString.value );
       hb_itemRelease( pOrderInfo.itmResult );
    }
    else
@@ -3401,7 +3401,7 @@ HB_FUNC( ORDSETFOCUS )
       pInfo.atomBagName = hb_param( 2, HB_IT_STRING );
       pInfo.itmResult = hb_itemPutC( NULL, "" );
       SELF_ORDLSTFOCUS( ( AREAP ) s_pCurrArea->pArea, &pInfo );
-      hb_retc( hb_itemGetCPtr( pInfo.itmResult ) );
+      hb_retc( pInfo.itmResult->item.asString.value );
       hb_itemRelease( pInfo.itmResult );
    }
    else
@@ -4135,7 +4135,7 @@ HB_FUNC( DBFILEGET )
           SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields ) == SUCCESS &&
           uiIndex > 0 && uiIndex <= uiFields )
       {
-         strncat( szFileName, hb_itemGetCPtr( pFileName ), _POSIX_PATH_MAX );
+         strncat( szFileName, pFileName->item.asString.value, _POSIX_PATH_MAX );
          hb_retl( SELF_GETVALUEFILE( ( AREAP ) s_pCurrArea->pArea, uiIndex, szFileName,
                                      hb_itemGetNI( pMode ) ) );
          return;
@@ -4165,7 +4165,7 @@ HB_FUNC( DBFILEPUT )
           SELF_FIELDCOUNT( ( AREAP ) s_pCurrArea->pArea, &uiFields ) == SUCCESS &&
           uiIndex > 0 && uiIndex <= uiFields )
       {
-         strncat( szFileName, hb_itemGetCPtr( pFileName ), _POSIX_PATH_MAX );
+         strncat( szFileName, pFileName->item.asString.value, _POSIX_PATH_MAX );
          hb_retl( SELF_PUTVALUEFILE( ( AREAP ) s_pCurrArea->pArea, uiIndex, szFileName ) );
          return;
       }
@@ -4791,7 +4791,7 @@ HB_FUNC( DBUSEAREAD )
    {
       pFileExt = hb_itemPutC( NULL, "" );
       SELF_INFO( ( AREAP ) s_pCurrArea->pArea, DBI_TABLEEXT, pFileExt );
-      strncat( szFileName, hb_itemGetCPtr( pFileExt ), _POSIX_PATH_MAX -
+      strncat( szFileName, pFileExt->item.asString.value, _POSIX_PATH_MAX -
                strlen( szFileName ) );
       hb_itemRelease( pFileExt );
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.85 2004/02/14 01:29:44 andijahja Exp $
+ * $Id: arrays.c,v 1.86 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -664,11 +664,16 @@ char HB_EXPORT * hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex )
 char HB_EXPORT * hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex )
 {
    char *cRet;
+//   PHB_ITEM pTemp;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetCPtr(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      cRet = hb_itemGetCPtr( pArray->item.asArray.value->pItems + ulIndex - 1 );
+//      pTemp = pArray->item.asArray.value->pItems + ulIndex - 1 ;
+//      cRet = pTemp->item.asString.value;
+      cRet = (pArray->item.asArray.value->pItems + ulIndex - 1)->item.asString.value;
+      // cRet = hb_itemGetCPtr( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
    else
    {
@@ -684,7 +689,7 @@ ULONG HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex )
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      ulRet = hb_itemGetCLen( pArray->item.asArray.value->pItems + ulIndex - 1 );
+      ulRet = ( pArray->item.asArray.value->pItems + ulIndex - 1 )->item.asString.length;
    }
    else
    {

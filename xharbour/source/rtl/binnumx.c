@@ -1,5 +1,5 @@
 /*
- * $Id: binnumx.c,v 1.6 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: binnumx.c,v 1.1.1.1 2001/12/21 10:41:12 ronpinkas Exp $
  */
 
 /*
@@ -63,8 +63,8 @@ HB_FUNC( BIN2U )
 
    if( pItem )
    {
-      char * pszString = hb_itemGetCPtr( pItem );
-      ULONG ulLen = hb_itemGetCLen( pItem );
+      char * pszString = pItem->item.asString.value;
+      ULONG ulLen = pItem->item.asString.length;
 
       hb_retnl( HB_MKULONG( ( ulLen >= 1 ) ? ( BYTE ) pszString[ 0 ] : 0,
                             ( ulLen >= 2 ) ? ( BYTE ) pszString[ 1 ] : 0,

@@ -1,5 +1,5 @@
 /*
- * $Id: filestat.c,v 1.3 2004/02/11 19:11:52 andijahja Exp $
+ * $Id: filestat.c,v 1.4 2004/02/18 21:35:55 druzus Exp $
  */
 
 /*
@@ -318,7 +318,7 @@ HB_FUNC( FILESTATS )
       return;
    }
 
-   if ( hb_fsFileStats( (BYTE*) hb_itemGetCPtr( pFileName ),
+   if ( hb_fsFileStats( (BYTE*) pFileName->item.asString.value,
             szAttr, &llSize, &lcDate, &lcTime, &lmDate, &lmTime ) )
    {
       if ( pAttr != NULL )

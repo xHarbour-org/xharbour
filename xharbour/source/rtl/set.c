@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.40 2004/01/28 16:42:18 jonnymind Exp $
+ * $Id: set.c,v 1.41 2004/02/14 01:29:42 andijahja Exp $
  */
 
 /*
@@ -118,10 +118,10 @@ static char set_char( PHB_ITEM pItem, char oldChar )
    if( HB_IS_STRING( pItem ) )
    {
       /* Only replace if string has at least one character. */
-      ULONG ulLen = hb_itemGetCLen( pItem );
+      ULONG ulLen = pItem->item.asString.length;
       if( ulLen > 0 )
       {
-         newChar = *hb_itemGetCPtr( pItem );
+         newChar = *pItem->item.asString.value;
       }
    }
    return newChar;
@@ -137,8 +137,8 @@ static BOOL set_logical( PHB_ITEM pItem, BOOL bDefault )
       bLogical = hb_itemGetL( pItem );
    else if( HB_IS_STRING( pItem ) )
    {
-      char * szString = hb_itemGetCPtr( pItem );
-      ULONG ulLen = hb_itemGetCLen( pItem );
+      char * szString = pItem->item.asString.value;
+      ULONG ulLen = pItem->item.asString.length;
 
       if( ulLen >= 2
        && toupper( szString[ 0 ] ) == 'O'
@@ -177,7 +177,7 @@ static char * set_string( PHB_ITEM pItem, char * szOldString )
    if( HB_IS_STRING( pItem ) )
    {
       /* Limit size of SET strings to 64K, truncating if source is longer */
-      ULONG ulLen = hb_itemGetCLen( pItem );
+      ULONG ulLen = pItem->item.asString.length;
 
       if( ulLen > USHRT_MAX )
       {
@@ -193,7 +193,7 @@ static char * set_string( PHB_ITEM pItem, char * szOldString )
          szString = ( char * ) hb_xgrab( ulLen + 1 );
       }
 
-      memcpy( szString, hb_itemGetCPtr( pItem ), ulLen );
+      memcpy( szString, pItem->item.asString.value, ulLen );
       szString[ ulLen ] = '\0';
    }
    else if( HB_IS_NIL( pItem ) )
@@ -608,7 +608,7 @@ HB_FUNC( SET )
          break;
 
       case HB_SET_COLOR      :
-         hb_retc( hb_conSetColor( args >= 2 && HB_IS_STRING( pArg2 ) ? hb_itemGetCPtr( pArg2 ) : ( char * ) NULL ) );
+         hb_retc( hb_conSetColor( args >= 2 && HB_IS_STRING( pArg2 ) ? pArg2->item.asString.value : ( char * ) NULL ) );
          break;
 
       case HB_SET_CONFIRM    :
@@ -851,12 +851,12 @@ HB_FUNC( SET )
          hb_retni( hb_set.HB_SET_GTMODE );
          if( args > 1 && HB_IS_STRING(pArg2) )
          {
-            if ( hb_stricmp( hb_itemGetCPtr(pArg2), "DETACHED" ) == 0 )
+            if ( hb_stricmp( pArg2->item.asString.value, "DETACHED" ) == 0 )
             {
                hb_set.HB_SET_GTMODE = 1;
                break;
             }
-            else if ( hb_stricmp( hb_itemGetCPtr(pArg2), "INLINE" ) == 0 )
+            else if ( hb_stricmp( pArg2->item.asString.value, "INLINE" ) == 0 )
             {
                hb_set.HB_SET_GTMODE = 0;
                break;
@@ -1136,7 +1136,7 @@ HB_FUNC( SET )
          hb_retc( hb_langID() );
          if( args > 1 && ! HB_IS_NIL( pArg2 ) )
          {
-            hb_langSelectID( hb_itemGetCPtr( pArg2 ) );
+            hb_langSelectID( pArg2->item.asString.value );
          }
          break;
 
@@ -1198,15 +1198,15 @@ HB_FUNC( SET )
          {
             if( HB_IS_STRING( pArg2 ) )
             {
-               if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "NONE" ) )
+               if( ! hb_stricmp( pArg2->item.asString.value, "NONE" ) )
                {
                   hb_set.HB_SET_TRACESTACK = HB_SET_TRACESTACK_NONE;
                }
-               else if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "CURRENT" ) )
+               else if( ! hb_stricmp( pArg2->item.asString.value, "CURRENT" ) )
                {
                   hb_set.HB_SET_TRACESTACK = HB_SET_TRACESTACK_CURRENT;
                }
-               else if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "ALL" ) )
+               else if( ! hb_stricmp( pArg2->item.asString.value, "ALL" ) )
                {
                   hb_set.HB_SET_TRACESTACK = HB_SET_TRACESTACK_ALL;
                }
@@ -1245,15 +1245,15 @@ HB_FUNC( SET )
          {
             if( HB_IS_STRING( pArg2 ) )
             {
-               if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "LOWER" ) )
+               if( ! hb_stricmp( pArg2->item.asString.value, "LOWER" ) )
                {
                   hb_set.HB_SET_FILECASE = HB_SET_CASE_LOWER;
                }
-               else if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "UPPER" ) )
+               else if( ! hb_stricmp( pArg2->item.asString.value, "UPPER" ) )
                {
                   hb_set.HB_SET_FILECASE = HB_SET_CASE_UPPER;
                }
-               else if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "MIXED" ) )
+               else if( ! hb_stricmp( pArg2->item.asString.value, "MIXED" ) )
                {
                   hb_set.HB_SET_FILECASE = HB_SET_CASE_MIXED;
                }
@@ -1286,15 +1286,15 @@ HB_FUNC( SET )
          {
             if( HB_IS_STRING( pArg2 ) )
             {
-               if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "LOWER" ) )
+               if( ! hb_stricmp( pArg2->item.asString.value, "LOWER" ) )
                {
                   hb_set.HB_SET_DIRCASE = HB_SET_CASE_LOWER;
                }
-               else if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "UPPER" ) )
+               else if( ! hb_stricmp( pArg2->item.asString.value, "UPPER" ) )
                {
                   hb_set.HB_SET_DIRCASE = HB_SET_CASE_UPPER;
                }
-               else if( ! hb_stricmp( hb_itemGetCPtr( pArg2 ), "MIXED" ) )
+               else if( ! hb_stricmp( pArg2->item.asString.value, "MIXED" ) )
                {
                   hb_set.HB_SET_DIRCASE = HB_SET_CASE_MIXED;
                }

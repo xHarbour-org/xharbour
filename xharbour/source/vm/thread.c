@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.156 2004/02/21 08:58:27 jonnymind Exp $
+* $Id: thread.c,v 1.157 2004/02/22 07:36:19 jonnymind Exp $
 */
 
 /*
@@ -1383,12 +1383,12 @@ HB_FUNC( STARTTHREAD )
    else if( pPointer->type == HB_IT_STRING )
    {
       hb_dynsymLock();
-      pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pPointer ) );
+      pExecSym = hb_dynsymFindName( pPointer->item.asString.value );
 
       if( ! pExecSym )
       {
          hb_dynsymUnlock();
-         hb_errRT_BASE( EG_NOFUNC, 1001, NULL, hb_itemGetCPtr( pPointer ), 1, pArgs );
+         hb_errRT_BASE( EG_NOFUNC, 1001, NULL, pPointer->item.asString.value, 1, pArgs );
          hb_itemRelease( pArgs );
          return;
       }

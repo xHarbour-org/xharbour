@@ -1,5 +1,5 @@
 /*
- * $Id: oemansi.c,v 1.6 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: oemansi.c,v 1.7 2003/01/05 06:50:36 ronpinkas Exp $
  */
 
 /*
@@ -69,10 +69,10 @@ HB_FUNC( HB_ANSITOOEM )
    if( pString )
 #if defined(HB_OS_WIN_32)
    {
-      DWORD ulLen = hb_itemGetCLen( pString );
+      DWORD ulLen = pString->item.asString.length;
       char * pszDst = ( char * ) hb_xgrab( ulLen + 1 );
 
-      CharToOemBuff( ( LPCSTR ) hb_itemGetCPtr( pString ), ( LPSTR ) pszDst, ulLen );
+      CharToOemBuff( ( LPCSTR ) pString->item.asString.value, ( LPSTR ) pszDst, ulLen );
 
       hb_retclenAdopt( pszDst, ulLen );
    }
@@ -92,10 +92,10 @@ HB_FUNC( HB_OEMTOANSI )
    if( pString )
 #if defined(HB_OS_WIN_32)
    {
-      DWORD ulLen = hb_itemGetCLen( pString );
+      DWORD ulLen = pString->item.asString.length;
       char * pszDst = ( char * ) hb_xgrab( ulLen + 1 );
 
-      OemToCharBuff( ( LPCSTR ) hb_itemGetCPtr( pString ), ( LPSTR ) pszDst, ulLen );
+      OemToCharBuff( ( LPCSTR ) pString->item.asString.value, ( LPSTR ) pszDst, ulLen );
 
       hb_retclenAdopt( pszDst, ulLen );
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.25 2004/01/15 18:18:15 ronpinkas Exp $
+ * $Id: transfrm.c,v 1.26 2004/01/16 00:36:42 ronpinkas Exp $
  */
 
 /*
@@ -102,10 +102,10 @@ HB_FUNC( TRANSFORM )
    PHB_ITEM pPic = hb_param( 2, HB_IT_STRING ); /* Picture string */
    BOOL bError = FALSE;
 
-   if( pPic && hb_itemGetCLen( pPic ) > 0 )
+   if( pPic && pPic->item.asString.length > 0 )
    {
-      char * szPic = hb_itemGetCPtr( pPic );
-      ULONG  ulPicLen = hb_itemGetCLen( pPic );
+      char * szPic = pPic->item.asString.value;
+      ULONG  ulPicLen = pPic->item.asString.length;
       USHORT uiPicFlags; /* Function flags */
 
       ULONG  ulParamS = 0; /* To avoid GCC -O2 warning */
@@ -212,8 +212,8 @@ HB_FUNC( TRANSFORM )
 
       if( HB_IS_STRING( pValue ) )
       {
-         char * szExp = hb_itemGetCPtr( pValue );
-         ULONG  ulExpLen = hb_itemGetCLen( pValue );
+         char * szExp = pValue->item.asString.value;
+         ULONG  ulExpLen = pValue->item.asString.length;
          ULONG  ulExpPos = 0;
 
          char szPicDate[ 11 ];
@@ -236,7 +236,7 @@ HB_FUNC( TRANSFORM )
          /* ======================================================= */
          if ( ( uiPicFlags & PF_BRITISH ) && ( ulExpLen <= 3 ) )
          {
-            char *pTmp = hb_itemGetCPtr( pPic );
+            char *pTmp = pPic->item.asString.value;
             if ( hb_stricmp( pTmp, "@E" ) == 0 || hb_stricmp( pTmp, "@E ." ) == 0 || hb_stricmp( pTmp, "@E ," ) == 0 )
             {
                if ( ulExpLen == 3 )

@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.12 2004/02/21 14:39:01 andijahja Exp $
+ * $Id: direct.c,v 1.13 2004/02/21 20:06:42 andijahja Exp $
  */
 
 /*
@@ -146,15 +146,15 @@ HB_FUNC( DIRECTORY )
 
    hb_arrayNew( &pDir, 0 );
 
-   if( pAttributes && hb_itemGetCLen( pAttributes ) > 0 )
-      if ( ( uiMask |= hb_fsAttrEncode( hb_itemGetCPtr( pAttributes ) ) ) & HB_FA_LABEL )
+   if( pAttributes && pAttributes->item.asString.length > 0 )
+      if ( ( uiMask |= hb_fsAttrEncode( pAttributes->item.asString.value ) ) & HB_FA_LABEL )
       {
          /* NOTE: This is Clipper Doc compatible. (not operationally) */
          uiMask = HB_FA_LABEL;
       }
 
    szDirSpec = pDirSpec ?
-               hb_fileNameConv( hb_strdup( ( char * ) hb_itemGetCPtr( pDirSpec ) ) ) :
+               hb_fileNameConv( hb_strdup( ( char * ) pDirSpec->item.asString.value ) ) :
                (BYTE *) HB_DIR_ALL_FILES_MASK;
 
    /* Get the file list */

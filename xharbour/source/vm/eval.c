@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.14 2004/02/14 01:29:44 andijahja Exp $
+ * $Id: eval.c,v 1.15 2004/02/15 21:58:47 ronpinkas Exp $
  */
 
 /*
@@ -135,7 +135,7 @@ PHB_ITEM hb_evalLaunch( PEVALINFO pEvalInfo )
 
       if( HB_IS_STRING( pEvalInfo->pItems[ 0 ] ) )
       {
-         char *ptr = hb_itemGetCPtr( pEvalInfo->pItems[ 0 ] );
+         char *ptr = pEvalInfo->pItems[ 0 ]->item.asString.value;
 
          hb_dynsymLock();
          hb_vmPushSymbol( hb_dynsymFindName( ptr )->pSymbol );
@@ -227,7 +227,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
       if( HB_IS_STRING( pItem ) )
       {
          PHB_DYNS pDynSym;
-         char *ptr = hb_itemGetCPtr( pItem );
+         char *ptr = pItem->item.asString.value;
 
          hb_dynsymLock();
          pDynSym = hb_dynsymFindName( ptr );
@@ -511,7 +511,7 @@ HB_FUNC( HB_EXECFROMARRAY )
    else if( pFirst->type == HB_IT_STRING && uiPcount == 1) /* hb_ExecFromArray( cFunc )  */
    {
       hb_dynsymLock();
-      pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pFirst ) );
+      pExecSym = hb_dynsymFindName( pFirst->item.asString.value );
       if ( pExecSym )
       {
          hb_vmPushSymbol( pExecSym->pSymbol );
@@ -521,7 +521,7 @@ HB_FUNC( HB_EXECFROMARRAY )
    else if( pFirst->type == HB_IT_STRING && uiPcount == 2) /* hb_ExecFromArray( cFunc, { params,... } )  */
    {
       hb_dynsymLock();
-      pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pFirst ) );
+      pExecSym = hb_dynsymFindName( pFirst->item.asString.value );
       if ( pExecSym )
       {
          hb_vmPushSymbol( pExecSym->pSymbol );
@@ -603,7 +603,7 @@ HB_FUNC( HB_EXECFROMARRAY )
       else if( pString->type == HB_IT_STRING )
       {
          hb_dynsymLock();
-         pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pString ) );
+         pExecSym = hb_dynsymFindName( pString->item.asString.value );
          if ( pExecSym )
          {
             hb_vmPushSymbol( pExecSym->pSymbol );
@@ -732,7 +732,7 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
    else if( pString->type == HB_IT_STRING )
    {
       hb_dynsymLock();
-      pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pString ) );
+      pExecSym = hb_dynsymFindName( pString->item.asString.value );
       if ( pExecSym )
       {
          hb_vmPushSymbol( pExecSym->pSymbol );

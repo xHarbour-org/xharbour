@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.13 2003/11/24 15:15:25 lf_sfnet Exp $
+ * $Id: hbxml.c,v 1.14 2004/02/22 00:33:47 ronpinkas Exp $
  */
 
 /*
@@ -304,21 +304,21 @@ MXML_STATUS mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, PHBXML_ATTRIBUT
 
 MXML_STATUS mxml_attribute_write( MXML_OUTPUT *out, PHBXML_ATTRIBUTE pAttr, int style )
 {
-   char *name = hb_itemGetCPtr( pAttr->pName );
+   char *name = pAttr->pName->item.asString.value;
 
-   mxml_output_string_len( out, name, hb_itemGetCLen( pAttr->pName ) );
+   mxml_output_string_len( out, name, pAttr->pName->item.asString.length );
    mxml_output_char( out, '=' );
    mxml_output_char( out, '"' );
 
    if ( style & MXML_STYLE_NOESCAPE )
    {
       mxml_output_string_escape(  out,
-         hb_itemGetCPtr( pAttr->pValue) );
+         pAttr->pValue->item.asString.value );
    }
    else
    {
       mxml_output_string_len(  out,
-         hb_itemGetCPtr(pAttr->pValue), hb_itemGetCLen( pAttr->pValue ) );
+         pAttr->pValue->item.asString.value, pAttr->pValue->item.asString.length );
    }
    mxml_output_char( out, '"' );
 

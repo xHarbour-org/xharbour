@@ -1,5 +1,5 @@
 /*
- * $Id: descend.c,v 1.43 2002/01/06 09:17:59 vszakats Exp $
+ * $Id: descend.c,v 1.4 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -74,12 +74,12 @@ HB_FUNC( DESCEND )
    {
       if( HB_IS_STRING( pItem ) )
       {
-         ULONG ulLen = hb_itemGetCLen( pItem );
+         ULONG ulLen = pItem->item.asString.length;
 
          if( ulLen > 0 )
          {
             char * szBuffer = ( char * ) hb_xgrab( ulLen );
-            hb_strDescend( szBuffer, hb_itemGetCPtr( pItem ), ulLen );
+            hb_strDescend( szBuffer, pItem->item.asString.value, ulLen );
             hb_retclen( szBuffer, ulLen );
             hb_xfree( szBuffer );
          }

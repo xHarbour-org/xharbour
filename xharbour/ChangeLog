@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2376 2004/02/23 03:35:29 lculik Exp $
+ * $Id: ChangeLog,v 1.2377 2004/02/23 04:03:26 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-23 15:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/binnum.c
+  * source/rtl/binnumx.c
+  * source/rtl/descend.c
+  * source/rtl/direct.c
+  * source/rtl/strtran.c
+  * source/rtl/natmsg.c
+  * source/rtl/oemansi.c
+  * source/rtl/set.c
+  * source/rtl/soundex.c
+  * source/rtl/transfrm.c
+  * source/rtl/substr.c
+  * source/rtl/val.c
+  * source/rtl/gtgraph.c
+  * source/rtl/hbxml.c
+  * source/rtl/filestat.c
+  * source/rtl/hboutdbg.c
+  * source/rtl/hbcomprs.c
+  * source/rdd/dbcmd.c
+  * source/rdd/dbf1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/vm/arrays.c
+  * source/vm/do.c
+  * source/vm/eval.c
+  * source/vm/thread.c
+  * source/vm/memvars.c
+    % optimize to directly use member of PHB_ITEM wherever possible.
+
 2004-02-23 11:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/itemapi.c
     % optimize hb_itemPadConv() to directly use member of PHB_ITEM.
