@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.17 2004/07/14 02:15:02 paultucker Exp $
+ * $Id: listbox.prg,v 1.18 2004/07/14 02:34:04 paultucker Exp $
  */
 
 /*
@@ -54,6 +54,9 @@
 #include "color.ch"
 #include 'common.ch'
 #include "box.ch"
+#include "button.ch"
+#include "inkey.ch"
+
 #IFdef HB_COMPAT_C53
 Class HBListBox
 
@@ -94,9 +97,9 @@ Class HBListBox
    DATA Style Init ""
    DATA sBlock Init NIL
    DAta fBlock Init Nil
-   DATA Hotbox Init ""
+   DATA hotbox Init ""
    Data ColorSpec Init ""
-   DATA ColdBox
+   DATA coldBox
    Data ISOPEN Init .f.
    Data aItems Init {}
    Data vScrolls
@@ -161,7 +164,8 @@ Method New( nTop, nLeft, nBottom, nRight, lDrop )
    ::CapRow    := nTop
    ::Cargo     := Nil
    ::ColdBox   := B_SINGLE
-   IF ( Isdefcolor() )
+
+   IF Isdefcolor()
       ::Colorspec := "W/N,W+/N,W+/N,N/W,W/N,W/N,W+/N,W/N"
    ELSE
       cColor      := Setcolor()
@@ -173,6 +177,7 @@ Method New( nTop, nLeft, nBottom, nRight, lDrop )
                      __guiColor( cColor, CLR_STANDARD   + 1 ) +","+;
                      __guiColor( cColor, CLR_BACKGROUND + 1 )
    ENDIF
+
    ::isopen    := !lDrop
    ::aItems    := {}
    ::dropdown  := lDrop
@@ -183,25 +188,26 @@ Method New( nTop, nLeft, nBottom, nRight, lDrop )
    ::hotbox    := B_DOUBLE
    ::itemCount := 0
 
-   ::message := ""
+   ::message   := ""
 
-   ::ascreen := Str( nTop + 1, 2 ) + ;
-                Str( nleft, 2 ) + ;
-                Str( nBottom, 2 ) + ;
-                Str( nRight, 2 ) + ;
-                Savescreen( nTop + 1, nleft, nBottom, nRight )
+   ::ascreen   := Str( nTop + 1, 2 ) + ;
+                  Str( nleft, 2 ) + ;
+                  Str( nBottom, 2 ) + ;
+                  Str( nRight, 2 ) + ;
+                  Savescreen( nTop + 1, nleft, nBottom, nRight )
 
    ::sBlock    := Nil
    ::nCursor   := Nil
    ::Style     := Chr( 240 )
    ::TextValue := ""
 
-   ::Topitem  := 0
-   ::nTopItem := 0
-   ::vScroll  := Nil
-   ::Value    := 0
+   ::Topitem   := 0
+   ::nTopItem  := 0
+   ::vScroll   := Nil
+   ::Value     := 0
 
-   RETURN SELF
+RETURN SELF
+
 /**** Get/Set Datas ****/
 
 Method SetScroll( xData ) Class HBListBox
@@ -217,8 +223,9 @@ Method SetTop( xData ) Class HBListBox
 
    Local nTop
 
-   IF ( !( ISNIL( xData ) .and. ISNUMBER( xData ) ) .and. ;
-              ISNUMBER( ::xTop := xData ) .and. ISOBJECT( ::vScroll ) )
+   IF !( ISNIL( xData ) .and. ISNUMBER( xData ) ) .and. ;
+        ISNUMBER( ::xTop := xData ) .and. ;
+        ISOBJECT( ::vScroll )
       ::vScroll:start := xData + 1
    ENDIF
 
@@ -272,7 +279,7 @@ RETURN ::xBottom
 
 Method ADDITEM( cText, xValue ) Class HBListBox
 
-   IF !( ISCHARACTER( cText ) )
+   IF ! ISCHARACTER( cText )
    ELSEIF Valtype( xValue ) IN "CU"
       Aadd( ::aItems, { cText, xValue } )
       ::iTemCount ++
@@ -379,7 +386,7 @@ Method FindData( cText, nPos, lCaseSensitive, lExact ) Class HBListBox
 
    nSize := Len( ::aitems ) - nPos + 1
 
-   IF !( ISLOGICAL( lCaseSensitive ) )
+   IF ! ISLOGICAL( lCaseSensitive )
       lCaseSensitive := .T.
    ENDIF
 
@@ -413,7 +420,7 @@ Method FindData( cText, nPos, lCaseSensitive, lExact ) Class HBListBox
       nPos  := 1
    NEXT
 
-   IF !( ISNIL( lOldExact ) )
+   IF ! ISNIL( lOldExact )
       Set Exact ( lOldExact )
    ENDIF
 
@@ -441,7 +448,7 @@ Method FindText( cText, nPos, lCaseSensitive, lExact ) Class HBListBox
 
    nSize := Len( ::aitems ) - nPos + 1
 
-   IF !( ISLOGICAL( lCaseSensitive ) )
+   IF ! ISLOGICAL( lCaseSensitive )
       lCaseSensitive := .T.
    ENDIF
 
@@ -475,7 +482,7 @@ Method FindText( cText, nPos, lCaseSensitive, lExact ) Class HBListBox
       nPos  := 1
    NEXT
 
-   IF !( ISNIL( lOldExact ) )
+   IF ! ISNIL( lOldExact )
       Set Exact ( lOldExact )
    ENDIF
 
@@ -486,7 +493,7 @@ Method NEXTITEM() Class HBListBox
    Local nCurValue
    Local nValue
 
-   IF !::hasfocus
+   IF ! ::hasfocus
    ELSEIF ::itemCount > 0
 
       IF ( nCurValue := ::value ) == ::itemCount
@@ -506,7 +513,7 @@ Method PREVITEM() Class HBListBox
    Local nCurValue
    Local nValue
 
-   IF !::hasfocus
+   IF ! ::hasfocus
    ELSEIF ::itemCount > 0
 
       IF ( nCurValue := ::value ) == 0
@@ -539,56 +546,10 @@ Method _SCROLL( nMethod ) Class HBListBox
    Local nStart
 
    Switch nMethod
-      CASE -3074
-         IF ::topitem > 1
-            ::topitem --
-            ::vScroll:current := lbadjustcu( SELF )
-            SELF:display()
-         ENDIF
-         EXIT
-
-      CASE -3075
-         IF ( ::topitem + ::bottom - ::top ) <= ::itemCount + 1
-            ::topitem ++
-            ::vScroll:current( lbadjustcu( SELF ) )
-            SELF:display()
-         ENDIF
-         EXIT
-
-      CASE -3077
-         nPos     := ::bottom - ::top - 1
-         nCount   := ::itemCount
-         nTopItem := ::topitem + nPos
-         IF ::topitem < nCount - nPos + 1
-            IF nTopItem + nPos - 1 > nCount
-               nTopItem := nCount - nPos + 1
-            ENDIF
-            ::topitem  := nTopItem
-            ::ntopitem := nTopItem
-            ::vScroll:current( lbadjustcu( SELF ) )
-            SELF:display()
-         ENDIF
-         EXIT
-
-      CASE -3076
-         nPos := ::bottom - ::top - IIF( ::bitmap, 2, 1 )
-         nCount   := ::itemCount
-         nTopItem := ::topitem - nPos
-         IF ::topitem > 1
-            IF nTopItem < 1
-               nTopItem := 1
-            ENDIF
-            ::topitem  := nTopItem
-            ::ntopitem := nTopItem
-            ::vScroll:current( lbadjustcu( SELF ) )
-            SELF:display()
-         ENDIF
-         EXIT
-
-      CASE -3073
+      CASE HTSCROLLTHUMBDRAG
          nMouseRow := Mrow()
          Do While ( ( nKey := Inkey( 0 ) ) != 1003 )
-            IF nKey == 1001
+            IF nKey == K_MOUSEMOVE
                nMouRow := Mrow()
                IF nMouRow <=::vScroll:start()
                   nMouRow :=::vScroll:start() + 1
@@ -611,11 +572,11 @@ Method _SCROLL( nMethod ) Class HBListBox
                   nCurrent :=::vScroll:current()
                   IF nSize - nCurrent > 0
                      FOR nStart := 1 TO nSize - nCurrent
-                        SELF:scroll( - 3075 )
+                        SELF:scroll( HTSCROLLUNITINC )
                      NEXT
                   ELSE
                      FOR nStart := 1 TO nCurrent - nSize
-                        SELF:scroll( - 3074 )
+                        SELF:scroll( HTSCROLLUNITDEC )
                      NEXT
                   ENDIF
                   nMouseRow := nMouRow
@@ -623,6 +584,53 @@ Method _SCROLL( nMethod ) Class HBListBox
             ENDIF
          Enddo
          EXIT
+
+      CASE HTSCROLLUNITDEC
+         IF ::topitem > 1
+            ::topitem --
+            ::vScroll:current := lbadjustcu( SELF )
+            SELF:display()
+         ENDIF
+         EXIT
+
+      CASE HTSCROLLUNITINC
+         IF ( ::topitem + ::bottom - ::top ) <= ::itemCount + 1
+            ::topitem ++
+            ::vScroll:current( lbadjustcu( SELF ) )
+            SELF:display()
+         ENDIF
+         EXIT
+
+      CASE HTSCROLLBLOCKDEC
+         nPos     := ::bottom - ::top - IIF( ::bitmap, 2, 1 )
+         nCount   := ::itemCount
+         nTopItem := ::topitem - nPos
+         IF ::topitem > 1
+            IF nTopItem < 1
+               nTopItem := 1
+            ENDIF
+            ::topitem  := nTopItem
+            ::ntopitem := nTopItem
+            ::vScroll:current( lbadjustcu( SELF ) )
+            SELF:display()
+         ENDIF
+         EXIT
+
+      CASE HTSCROLLBLOCKINC
+         nPos     := ::bottom - ::top - 1
+         nCount   := ::itemCount
+         nTopItem := ::topitem + nPos
+         IF ::topitem < nCount - nPos + 1
+            IF nTopItem + nPos - 1 > nCount
+               nTopItem := nCount - nPos + 1
+            ENDIF
+            ::topitem  := nTopItem
+            ::ntopitem := nTopItem
+            ::vScroll:current( lbadjustcu( SELF ) )
+            SELF:display()
+         ENDIF
+         EXIT
+
    End
 RETURN SELF
 
@@ -774,7 +782,6 @@ Method Display() Class HBListBox
    ENDIF
 
    IF ::isopen
-
       IF !Empty( cHotBox )
 
          SET COLOR TO (__guicolor(::colorspec, 5))
@@ -839,7 +846,7 @@ Method Display() Class HBListBox
 
 RETURN SELF
 
-Method GETITEM( xItem ) Class HBListBox
+Method GetItem( xItem ) Class HBListBox
 
    Local xRet := Nil
 
@@ -850,7 +857,7 @@ Method GETITEM( xItem ) Class HBListBox
 
 RETURN xRet
 
-Method GETTEXT( xItem ) Class HBListBox
+Method GetText( xItem ) Class HBListBox
 
    Local xRet := Nil
 
@@ -861,10 +868,10 @@ Method GETTEXT( xItem ) Class HBListBox
 
 RETURN xRet
 
-Method INSITEM( nPosition, cText, xExp )
+Method InsItem( nPosition, cText, xExp )
 
-   IF !( ISCHARACTER( cText ) )
-   ELSEIF !( ISNUMBER( nPosition ) )
+   IF ! ISCHARACTER( cText )
+   ELSEIF ! ISNUMBER( nPosition )
    ELSEIF nPosition < ::itemCount
 //        Asize( ::aitems, ++ ::itemCount )
       ::itemCount++
@@ -883,62 +890,62 @@ Method INSITEM( nPosition, cText, xExp )
    ENDIF
 RETURN SELF
 
-Method HITTEST( nMouseRow, nMouseCol ) Class HBListBox
+Method HitTest( nMouseRow, nMouseCol ) Class HBListBox
 
    Local Local1
    Local Local2 := 0
    Local Local3
    Local cColor
 
-   IF !::isopen
-   ELSEIF !( ISOBJECT( ::vScroll ) )
-   ELSEIF ( Local2 :=::vScroll:hittest( nMouseRow, nMouseCol ) ) != 0
+   IF ! ::isopen
+   ELSEIF ! ISOBJECT( ::vScroll )
+   ELSEIF ( Local2 := ::vScroll:hittest( nMouseRow, nMouseCol ) ) != 0
       RETURN Local2
    ENDIF
 
-   IF !::isopen .or. Empty( ::hotbox + ::coldbox )
+   IF ! ::isopen .or. Empty( ::hotbox + ::coldbox )
       Local1 := 0
    ELSE
       cColor := ::top
-      IF ( ::DropDown )
+      IF ::DropDown
          cColor ++
       ENDIF
 
       Do CASE
          CASE nMouseRow == cColor
             IF nMouseCol == ::left
-               RETURN - 1
+               RETURN HTTOPLEFT
             ELSEIF nMouseCol == ::right
-               RETURN - 3
+               RETURN HTTOPRIGHT
             ELSEIF nMouseCol >= ::left .and. nMouseCol <= ::right
-               RETURN - 2
+               RETURN HTTOP
             ENDIF
          CASE nMouseRow == ::bottom
             IF nMouseCol == ::left
-               RETURN - 7
+               RETURN HTBOTTOMLEFT
             ELSEIF nMouseCol == ::right
-               RETURN - 5
+               RETURN HTBOTTOMRIGHT
             ELSEIF nMouseCol >= ::left .and. nMouseCol <= ::right
-               RETURN - 6
+               RETURN HTBOTTOM
             ENDIF
          CASE nMouseCol == ::left
             IF nMouseRow >= ::top .and. nMouseRow <= ::bottom
-               RETURN - 8
+               RETURN HTLEFT
             ELSE
-               RETURN 0
+               RETURN HTNOWHERE
             ENDIF
          CASE nMouseCol == ::right
             IF nMouseRow >= ::top .and. nMouseRow <= ::bottom
-               RETURN - 4
+               RETURN HTRIGHT
             ELSE
-               RETURN 0
+               RETURN HTNOWHERE
             ENDIF
       ENDCASE
       Local1 := 1
    ENDIF
 
    Do CASE
-      CASE !::isopen
+      CASE ! ::isopen
       CASE nMouseRow < cColor + Local1
       CASE nMouseRow > ::bottom - Local1
       CASE nMouseCol < ::left + Local1
@@ -947,13 +954,13 @@ Method HITTEST( nMouseRow, nMouseCol ) Class HBListBox
    ENDCASE
 
    Do CASE
-      CASE !::dropdown
+      CASE ! ::dropdown
       CASE nMouseRow != ::top
       CASE nMouseCol < ::left
       CASE nMouseCol < ::right
-         RETURN - 2049
+         RETURN HTCLIENT
       CASE nMouseCol == ::right
-         RETURN - 4097
+         RETURN HTDROPBUTTON
    ENDCASE
 
    Do CASE
@@ -961,7 +968,7 @@ Method HITTEST( nMouseRow, nMouseCol ) Class HBListBox
       CASE nMouseRow != ::caprow
       CASE nMouseCol < ::capcol
       CASE nMouseCol < ::capcol + __CapLength( ::caption )
-         RETURN - 1025
+         RETURN HTCAPTION
    ENDCASE
 
 RETURN 0
@@ -994,7 +1001,7 @@ RETURN SELF
 
 Method Open() Class HBListBox
 
-   IF !::isopen
+   IF ! ::isopen
 
       ::ascreen := Str( ::top + 1, 2 ) + ;
                    Str( ::left, 2 ) + ;
@@ -1026,9 +1033,9 @@ Method SetItem( nPos, cText ) Class HBListBox
    ENDCASE
 RETURN SELF
 
-Method SETFOCUS() Class HBListBox
+Method SetFocus() Class HBListBox
 
-   IF !::hasfocus
+   IF ! ::hasfocus
       ::nCursor  := Setcursor( 0 )
       ::hasfocus := .T.
       Dispbegin()
@@ -1043,9 +1050,9 @@ Method SETFOCUS() Class HBListBox
 
 RETURN SELF
 
-Method SetDAta( nPos, xData ) Class HBListBox
+Method SetData( nPos, xData ) Class HBListBox
 
-   IF !( nPos < 1 )
+   IF nPos < 1
    ELSEIF nPos <= ::itemCount
       ::aitems[ nPos, 2 ] := xData
    ENDIF
@@ -1088,12 +1095,12 @@ Static Function CHANGEITEM( oList, nPos, nItem )
       IF oList:Topitem > oList:value
          oList:topitem := oList:value
 
-         IF ( ISOBJECT( oList:vScroll ) )
+         IF ISOBJECT( oList:vScroll )
             oList:vScroll:current := lbadjustcu( oList )
          ENDIF
 
       ELSEIF oList:topitem <= Local1 .and. ;
-                       ISOBJECT( ( oList:topitem := Local1, oList:vScroll ) )
+                        ISOBJECT( ( oList:topitem := Local1, oList:vScroll ) )
          oList:vScroll:current := lbadjustcu( oList )
       ENDIF
 
@@ -1124,8 +1131,10 @@ RETURN nNewSize
 
 Function Listbox( nTop, nLeft, nBottom, nRight, lDrop )
 
-   IF ISNUMBER( nTop ) .and. ISNUMBER( nleft ) .and. ;
-      ISNUMBER( nBottom ) .and. ISNUMBER( nRight )
+   IF ISNUMBER( nTop ) .and. ;
+      ISNUMBER( nleft ) .and. ;
+      ISNUMBER( nBottom ) .and. ;
+      ISNUMBER( nRight )
 
       RETURN HBListBox():New( nTop, nLeft, nBottom, nRight, lDrop )
 
@@ -1156,7 +1165,7 @@ Function _LISTBOX_( Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, ;
 
    oScroll := Listbox( Arg1, Arg2, Arg3, Arg4, Arg12 )
 
-   IF !( ISNIL( oScroll ) )
+   IF ! ISNIL( oScroll )
 
       IF ISCHARACTER( Arg7 )
          oScroll:capcol  := NIL
@@ -1177,7 +1186,7 @@ Function _LISTBOX_( Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, ;
       FOR nPos := 1 TO nLen
          nCurPos := Arg6[ nPos ]
 
-         IF !( ISARRAY( nCurPos ) )
+         IF ! ISARRAY( nCurPos )
             oScroll:additem( nCurPos )
          ELSEIF Len( nCurPos ) == 1
             oScroll:additem( nCurPos[ 1 ] )
@@ -1187,9 +1196,9 @@ Function _LISTBOX_( Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7, ;
 
       NEXT
 
-      IF !( ISNIL( Arg13 ) ) .and. Arg13
+      IF ISLOGICAL( Arg13 ) .and. Arg13
 
-         IF !( ISLOGICAL( Arg12 ) )
+         IF ! ISLOGICAL( Arg12 )
          ELSEIF Arg12
             Arg1 ++
          ENDIF

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3153 2004/07/14 02:14:59 paultucker Exp $
+ * $Id: ChangeLog,v 1.3154 2004/07/14 06:54:46 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-14 18:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/listbox.prg
+    * Method SetData() -> corrected If logic.
+    + #include "button.ch"
+    + #include "inkey.ch"
+    * replace constants with proper definitions.
 
 2004-07-13 23:54 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/cstruct.ch
