@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3283 2004/08/05 17:10:36 paultucker Exp $
+ * $Id: ChangeLog,v 1.3284 2004/08/06 09:37:17 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-06 14:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/dates.c
+    ! fixed problem with date to string conversion when internal date
+      value less then 1721060 (01/01/0000) - negative number of years
+      - and when greater then 5373484 (31/12/9999). Now is Clipper
+      compatible - for empty date it returns empty string, for valid
+      when number of years greater equal to 0 it returns formated date
+      and in other case it fills buffers with 0 characters.
 
 2004-08-06 11:30 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tbrowse.prg
