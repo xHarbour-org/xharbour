@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.15 2004/01/14 23:02:05 jonnymind Exp $
+ * $Id: inkey.c,v 1.16 2004/01/15 19:38:57 peterrees Exp $
  */
 
 /*
@@ -386,6 +386,10 @@ HB_FUNC( SETINKEYBEFOREBLOCK )
   {
     hb_itemReturn( s_inKeyBlockBefore );
   }
+  else
+  {
+    hb_ret() ;
+  }
   if ( uiPCount > 0 )
   {
     if ( ISBLOCK(1) )
@@ -405,6 +409,10 @@ HB_FUNC( SETINKEYAFTERBLOCK )
   if ( s_inKeyBlockAfter )
   {
     hb_itemReturn( s_inKeyBlockAfter );
+  }
+  else
+  {
+    hb_ret() ;
   }
   if ( uiPCount > 0 )
   {

@@ -1,5 +1,5 @@
 /*
- * $Id: tprint.prg,v 1.3 2004/01/21 19:57:52 peterrees Exp $
+ * $Id: tprint.prg,v 1.4 2004/01/21 22:08:08 peterrees Exp $
  */
 
 /*
@@ -918,6 +918,7 @@ static int CALLBACK FontEnumCallBack(LOGFONT *lplf, TEXTMETRIC *lpntm, DWORD Fon
 
 static HB_FUNC( ENUMFONTS )
 {
+  BOOL Result= FALSE ;
   HDC hDC                  = (HDC) hb_parnl(1) ;
   if (hDC)
   {
@@ -926,8 +927,12 @@ static HB_FUNC( ENUMFONTS )
     {
       EnumFonts(hDC, (LPCTSTR) NULL, (FONTENUMPROC) FontEnumCallBack, (LPARAM) pArray);
       hb_itemReturn( pArray) ;
-//      hb_itemRelease(pArray );
+      Result = TRUE ;
     }
+  }
+  if (!Result)
+  {
+    hb_ret() ;
   }
 }
 
