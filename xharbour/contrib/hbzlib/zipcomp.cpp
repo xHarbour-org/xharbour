@@ -1,5 +1,5 @@
 /*
- * $Id: zipcomp.cpp,v 1.14 2004/03/24 03:18:05 lculik Exp $
+ * $Id: zipcomp.cpp,v 1.15 2004/03/29 14:36:20 srobert Exp $
  */
 
 /*
@@ -103,6 +103,8 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
 {
    ULONG ulCount;
    const char *szDummy ;
+   char *szDummyLower ;
+   char *szFileLower = hb_strdup((char *)szFile) ;
    BOOL bFileExist = hb_fsFile( ( BYTE* )szFile );
    BOOL bAdded     = FALSE;
    BOOL bReturn    = TRUE;
@@ -113,6 +115,10 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
    SpanActionCallbackc spanac;
 
    szZip.SetSpanCallback( &span );
+
+   #ifdef HB_OS_WIN_32
+   hb_strLower( szFileLower, strlen( szFileLower )) ;
+   #endif
 
    try
    {
@@ -159,8 +165,14 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
          dwSize  = GetCurrentFileSize( szDummy );
          bAdded  = FALSE;
 
+         szDummyLower = hb_strdup( (char *)szDummy ) ;
+
+         #ifdef HB_OS_WIN_32
+         hb_strLower( szDummyLower, strlen( szDummyLower )) ;
+         #endif
+
 // Prevent adding current archive file !
-         if ( strstr( szFile, szDummy ) == NULL && strstr( szDummy, szFile ) == NULL)
+         if ( strstr( szFileLower, szDummyLower ) == NULL && strstr( szDummyLower, szFileLower ) == NULL)
          {
             if( dwSize != (DWORD) -1 )
             {
@@ -193,9 +205,10 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
                catch( ... ){}
             }
          }
+         hb_xfree( szDummyLower ) ;
       }
    }
-
+   hb_xfree( szFileLower ) ;
    try
    {
       szZip.Close(  );
