@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.3 2002/12/01 03:59:21 walito Exp $
+ * $Id: debugger.prg,v 1.4 2003/01/30 02:23:58 walito Exp $
  */
 
 /*
@@ -861,34 +861,33 @@ METHOD HandleEvent() CLASS TDebugger
               ::PrevWindow()
               exit
 
+         case K_F8
+         case 255
+              ::Step()
+              exit
+
+         case K_F4
+              ::ShowAppScreen()
+              exit
+
+         case K_F5
+              ::Go()
+              exit
+
+         case K_F6
+              ::ShowWorkAreas()
+              exit
+
+         case K_F9
+              ::ToggleBreakPoint()
+              exit
+
+         case K_F10
+              ::Trace()
+              exit
+
          default
 
-         do case  // When SWITCH-CASE support negative numbers, convert this DO CASE to SWITCH-CASE
-         case nKey == K_F8 .OR. nKey == 255
-              ::Step()
-//              exit
-
-         case nKey == K_F4
-              ::ShowAppScreen()
-//              exit
-
-         case nKey == K_F5
-              ::Go()
-//              exit
-
-         case nKey == K_F6
-              ::ShowWorkAreas()
-//              exit
-
-         case nKey == K_F9
-              ::ToggleBreakPoint()
-//              exit
-
-         case nKey == K_F10
-              ::Trace()
-//              exit
-
-         other
               if ::oWndCommand:lFocused .and. nKey < 272 // Alt
                  ::oWndCommand:KeyPressed( nKey )
               elseif ( nPopup := ::oPullDown:GetHotKeyPos( __dbgAltToKey( nKey ) ) ) != 0
@@ -897,7 +896,6 @@ METHOD HandleEvent() CLASS TDebugger
                     ::oPullDown:ShowPopup( nPopup )
                  endif
               endif
-         endcase
          end
       endif
    end
