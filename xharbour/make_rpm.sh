@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.8 2003/09/11 17:59:01 druzus Exp $
+# $Id: make_rpm.sh,v 1.9 2003/09/16 02:21:49 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -46,12 +46,13 @@ then
 	    mkdir -p ${RPMDIR}/SOURCES ${RPMDIR}/RPMS ${RPMDIR}/SRPMS \
 		     ${RPMDIR}/BUILD ${RPMDIR}/SPECS
 	    echo "%_topdir ${RPMDIR}" > ${HOME}/.rpmmacros
-	    if [ "${BUGGY_RPM}" = "yes" ]
-		then
-		    cp ${hb_filename} ${RPMDIR}/SOURCES
-		    cp xharbour.spec ${RPMDIR}/SPECS	
-		fi
+
 	fi	
+        if [ "${BUGGY_RPM}" = "yes" ]
+	then
+	    cp ${hb_filename} ${RPMDIR}/SOURCES
+	    cp xharbour.spec ${RPMDIR}/SPECS	
+	fi
 	if [ "${BUGGY_RPM}" = "yes" ]
 	then
 	    rpm -ba xharbour.spec
