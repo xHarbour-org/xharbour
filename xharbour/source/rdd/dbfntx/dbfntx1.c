@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.99 2005/03/31 18:43:15 guerra000 Exp $
+ * $Id: dbfntx1.c,v 1.100 2005/04/01 16:20:27 druzus Exp $
  */
 
 /*
@@ -1211,8 +1211,8 @@ static ERRCODE hb_ntxHeaderLoad( LPNTXINDEX pIndex , char *szTagName )
 
    if( SELF_COMPILE( ( AREAP ) pIndex->Owner, Header.key_expr ) == FAILURE )
       return FAILURE;
-   pKeyExp = hb_itemNew( NULL );
-   hb_itemCopy( pKeyExp, pIndex->Owner->valResult );
+   pKeyExp = pIndex->Owner->valResult;
+   pIndex->Owner->valResult = NULL;
 
    if( usType & NTX_FLAG_FORITEM && Header.for_expr[0] >= 20 )
    {
@@ -1221,8 +1221,8 @@ static ERRCODE hb_ntxHeaderLoad( LPNTXINDEX pIndex , char *szTagName )
          hb_ntxDestroyExp( pKeyExp );
          return FAILURE;
       }
-      pForExp = hb_itemNew( NULL );
-      hb_itemCopy( pForExp, pIndex->Owner->valResult );
+      pForExp = pIndex->Owner->valResult;
+      pIndex->Owner->valResult = NULL;
    }
 
    pTag = ( LPTAGINFO ) hb_xgrab( sizeof( TAGINFO ) );
@@ -2388,7 +2388,7 @@ static void hb_ntxTagGoTop( LPTAGINFO pTag )
    PHB_NTXSCOPE pScope = pTag->fUsrDescend ? &pTag->bottom : &pTag->top;
 
    if( pScope->scopeKeyLen )
-      hb_ntxTagKeyFind( pTag, pScope->scopeKey, pTag->KeyLength );
+      hb_ntxTagKeyFind( pTag, pScope->scopeKey, pScope->scopeKeyLen );
    else if ( pTag->fUsrDescend == pTag->AscendKey )
       hb_ntxTagBottomKey( pTag );
    else
@@ -2406,7 +2406,7 @@ static void hb_ntxTagGoBottom( LPTAGINFO pTag )
    PHB_NTXSCOPE pScope = pTag->fUsrDescend ? &pTag->top : &pTag->bottom;
 
    if( pScope->scopeKeyLen )
-      hb_ntxTagKeyFind( pTag, pScope->scopeKey, pTag->KeyLength );
+      hb_ntxTagKeyFind( pTag, pScope->scopeKey, pScope->scopeKeyLen );
    else if ( pTag->fUsrDescend == pTag->AscendKey )
       hb_ntxTagTopKey( pTag );
    else
@@ -2488,7 +2488,7 @@ static LPTAGINFO hb_ntxFindTag( NTXAREAP pArea, PHB_ITEM lpOrder )
       pTag = pArea->lpCurTag;
    else if( pTag && lpOrder )
    {
-      if( hb_itemType( lpOrder ) == HB_IT_STRING )
+      if( hb_itemType( lpOrder ) & HB_IT_STRING )
       {
          do
          {
@@ -4792,6 +4792,7 @@ static ERRCODE hb_ntxIndexCreate( LPNTXINDEX pIndex )
          switch( hb_itemType( pItem ) )
          {
             case HB_IT_STRING:
+            case HB_IT_STRING | HB_IT_MEMO:
                uiCurLen = (USHORT) pItem->item.asString.length;
                if( uiCurLen > NTX_MAX_KEY )
                   uiCurLen = NTX_MAX_KEY ;

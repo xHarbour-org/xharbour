@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.190 2005/03/22 18:24:32 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.191 2005/03/31 03:51:15 druzus Exp $
  */
 
 /*
@@ -8618,6 +8618,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
             switch( hb_itemType( pItem ) )
             {
                case HB_IT_STRING:
+               case HB_IT_STRING | HB_IT_MEMO:
                   hb_cdxSortKeyAdd( pSort, pArea->ulRecNo,
                                     ( BYTE * ) pItem->item.asString.value,
                                     HB_CDXMAXKEY( pItem->item.asString.length ) );

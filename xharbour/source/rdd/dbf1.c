@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.112 2005/02/27 11:56:02 andijahja Exp $
+ * $Id: dbf1.c,v 1.113 2005/03/31 03:28:40 druzus Exp $
  */
 
 /*
@@ -664,10 +664,12 @@ BOOL HB_EXPORT hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET
          *ulPool = IDX_LOCKPOOL_VFP;
          break;
 
+#ifndef HB_LONG_LONG_OFF
       case HB_SET_DBFLOCK_XHB64:
          *ulPos  = IDX_LOCKPOS_XHB64;
          *ulPool = IDX_LOCKPOOL_XHB64;
          break;
+#endif
 
       default:
          return FALSE;
@@ -2044,7 +2046,9 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             case HB_SET_DBFLOCK_CL53:
             case HB_SET_DBFLOCK_CL53EXT:
             case HB_SET_DBFLOCK_VFP:
+#ifndef HB_LONG_LONG_OFF
             case HB_SET_DBFLOCK_XHB64:
+#endif
                pArea->bLockType = (BYTE) bScheme;
          }
          break;
@@ -3072,12 +3076,14 @@ static ERRCODE hb_dbfRawLock( DBFAREAP pArea, USHORT uiAction, ULONG ulRecNo )
             }
             break;
 
+#ifndef HB_LONG_LONG_OFF
          case HB_SET_DBFLOCK_XHB64:
             ulPos = DBF_LOCKPOS_XHB64;
             iDir = DBF_LOCKDIR_XHB64;
             ulFlSize = DBF_FLCKSIZE_XHB64;
             ulRlSize = DBF_RLCKSIZE_XHB64;
             break;
+#endif
 
          default:
             return FAILURE;
