@@ -1,5 +1,5 @@
 /*
- * $Id: genrtf.prg,v 1.2 2003/03/03 02:08:58 lculik Exp $
+ * $Id: genrtf.prg,v 1.3 2003/10/13 03:40:12 lculik Exp $
  */
 
 /*
@@ -113,7 +113,7 @@ FUNCTION ProcessRtf()
    LOCAL xAddBlank
    LOCAL nNumTopics     := 0
    LOCAL nCurTopics     := 1
-   LOCAL cBar           := " " + REPL( ')', 80 )
+   LOCAL cBar           := " " + replicate( ')', 80 )
    LOCAL nMode
    LOCAL cFuncName
    LOCAL cOneLine
@@ -1096,11 +1096,11 @@ FUNCTION GenRtfTable( oRtf )
    nPos  := maxrtfelem( afitable )
    nPos2 := ASCAN( alensfitem, { | x | x == nPos } )
 
-   oRtf:WriteParBox( "       " + REPL( CHR( 196 ), 80 ) )
+   oRtf:WriteParBox( "       " + replicate( CHR( 196 ), 80 ) )
    FOR x := 1 TO LEN( afiTable )
       ortf:WriteParFixed( IF( AT( "|", afiTable[ x ] ) > 0, STRTRAN( afiTable[ x ], "|", " " ), afiTable[ x ] ), '\fi-426\li426' )
    NEXT
-   oRtf:WriteParBox( "       " + REPL( CHR( 196 ), 80 ) )
+   oRtf:WriteParBox( "       " + replicate( CHR( 196 ), 80 ) )
 //   oRtf:WritePar( "" )
    afiTable := {}
 

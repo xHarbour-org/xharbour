@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbdoc.prg,v 1.2 2003/08/02 18:09:53 lculik Exp $
+ * $Id: hbdoc.prg,v 1.3 2003/10/13 03:40:12 lculik Exp $
  */
 
 /*
@@ -54,8 +54,8 @@
 /*
  * File......: HBDOC.PRG
  * Author....: Luiz Rafael Culik
- * Date......: $Date: 2003/08/02 18:09:53 $
- * Revision..: $Revision: 1.2 $
+ * Date......: $Date: 2003/10/13 03:40:12 $
+ * Revision..: $Revision: 1.3 $
  * Log file..: $Logfile:     $
  *
  *
@@ -129,6 +129,7 @@
 //  The delimiter
 MEMVAR aDirList
 MEMVAR aDocInfo
+MEMVAR aDocwwwInfo
 MEMVAR aLinkInfo
 MEMVAR aAuthorList
 MEMVAR lAscii
@@ -179,6 +180,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
    PUBLIC theHandle
    PUBLIC aDirList
    PUBLIC aDocInfo    := {}
+   PUBLIC aDocWwwInfo := {}
    PUBLIC aLinkInfo   := {}
    PUBLIC aAuthorList := {}
    PUBLIC lAscii      := .F.               // Create ascii output instead of NG/EH input
@@ -413,6 +415,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
 
    ASORT( aDocInfo,,, { | a, b | UPPER( a[ 1 ] + " " + a[ 2 ] ) < UPPER( b[ 1 ] + " " + b[ 2 ] ) } )
 
+
    //  Now actually build the info
 
    @ INFILELINE,  0 CLEAR TO INFILELINE, MAXCOL()
@@ -572,7 +575,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
     fClose(nHpj)
 set console off
    ELSEIF lWWW
-
+      ASORT( aDocWWWInfo,,, { | a, b | UPPER( a[ 1 ]  ) < UPPER( b[ 1 ]) } )
       asort(adocinfo,,,{|x,y| x[1]+x[2]<y[1]+y[2]})
             do while .t.
           citem:=adocinfo[1,1]
@@ -643,6 +646,14 @@ set console off
         ohtm1:close()
 
       oHtm:Close()
+
+
+     ohtm:=THTML():new("htm\harbourfuntionwithsyntax.htm",aMetaContents)
+     For each ppp in aDocwwwInfo
+     ohtm:Writelink(ppp[2],ppp[1])
+     next
+     ohtm:close()
+
    ELSEIF lChm
       nHpj := FCREATE( 'chm\'+lower(substr(cLinkName,1,AT(".",cLinkName)-1)) +".hhp" )
 

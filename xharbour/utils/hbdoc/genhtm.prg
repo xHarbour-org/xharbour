@@ -1,5 +1,5 @@
 /*
- * $Id: genhtm.prg,v 1.25 2001/04/15 03:04:00 lculik Exp $
+ * $Id: genhtm.prg,v 1.1.1.1 2001/12/21 10:45:20 ronpinkas Exp $
  */
 
 /*
@@ -68,7 +68,7 @@
 #define LONGLINE     600
 #define LONGONELINE  86
 MEMVAR aDirList
-MEMVAR aDocInfo
+MEMVAR aDocInfo, aDocwwwInfo
 MEMVAR aWww,aResult
 
 STATIC aAlso
@@ -81,6 +81,8 @@ STATIC aFoiTable      := {}
 STATIC atiTable       := {}
 STATIC nNumTableItems := 0
 STATIC aCurDoc        := {}
+static cLastText      := ""
+Static clastBuffer    := ""
 STATIC nCurDoc := 1
 STATIC lWasTestExamples := .f.
 STATIC aColorTable := { 'aqua', 'black', 'fuchia', 'grey', 'green', 'lime', 'maroon', 'navy', 'olive', 'purple', 'red', 'silver', 'teal', 'white', 'yellow' }
@@ -664,7 +666,7 @@ oHtm:writeText("<br>")  //:endpar()
                      IF lAddBlank
                         lAddBlank := .F.
                      ENDIF
-                     prochtmdesc( cbuffer, oHtm, "Syntax" )
+                     prochtmdesc( cbuffer, oHtm, "Syntax" ,cFileName)
 
                   ELSEIF nMode = D_ARG
                      IF LEN( cBuffer ) > LONGLINE
@@ -1091,7 +1093,7 @@ RETURN cbuffer
 *+
 *+北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北北
 *+
-FUNCTION ProchtmDesc( cBuffer, oHtm, cStyle )
+FUNCTION ProchtmDesc( cBuffer, oHtm, cStyle ,cFileName)
 
    LOCAL cOldLine      := ''
    LOCAL npos
@@ -1109,8 +1111,13 @@ FUNCTION ProchtmDesc( cBuffer, oHtm, cStyle )
    LOCAL LFstTableItem := .T.
    LOCAL lEndTable     := .F.
    LOCAL lEndBuffer    := .f.
-   DEFAULT cStyle TO "Default"
 
+   DEFAULT cStyle TO "Default"
+   DEFAULT cFileName TO NIL
+   iF cStyle == "Syntax"
+   tracelog('cBuffer',cBuffer)
+   clastBuffer += cBuffer
+   endif
    IF AT( '<par>', cBuffer ) == 0 .AND. !EMPTY( cBuffer ) .AND. cstyle <> "Example"
       cBuffer := '<par>' + cBuffer
    ENDIF
@@ -1198,6 +1205,13 @@ FUNCTION ProchtmDesc( cBuffer, oHtm, cStyle )
          IF !EMPTY( cBuffer )
             //                    cBuffer:=SUBSTR(cBuffer,2)
             cBuffeR := ALLTRIM( cBuffer )
+            cLastText += cBuffer
+            if At("->" ,clastBuffer) >0
+               aadd(aDocWwwInfo, { cLastText,cFileName})
+               clastBuffer:=""
+               cLastText:=""
+            endif
+            tracelog(cLastBuffer)
             oHtm:WritePar( cBuffer )
          ENDIF
 
