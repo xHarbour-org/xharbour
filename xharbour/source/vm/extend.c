@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.43 2004/04/28 18:31:22 druzus Exp $
+ * $Id: extend.c,v 1.44 2004/05/19 07:25:59 ronpinkas Exp $
  */
 
 /*
@@ -163,7 +163,7 @@ char HB_EXPORT * hb_parc( int iParam, ... )
 {
    HB_THREAD_STUB
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parcx(%d, ...)", iParam));
+   HB_TRACE(HB_TR_DEBUG, ("hb_parc(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
