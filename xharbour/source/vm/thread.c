@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.134 2003/12/05 18:04:40 jonnymind Exp $
+* $Id: thread.c,v 1.135 2003/12/06 15:33:39 jonnymind Exp $
 */
 
 /*
@@ -131,7 +131,6 @@ HB_EXPORT HB_CRITICAL_T hb_dynsymMutex;
 HB_EXPORT HB_SHARED_RESOURCE hb_runningStacks;
 
 BOOL hb_bIdleFence;
-BOOL hb_bThreadIsInspector;
 
 
 /**************************************************************/
@@ -261,6 +260,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    ULONG uCount;
 
    tc->th_id = th;
+   tc->uiIdleInspect = 0;
    /* In unix, is the thread that sets up its data. */
    #ifdef HB_OS_WIN_32
    tc->th_vm_id = hb_threadUniqueId();
@@ -724,10 +724,12 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
    void *hb_create_a_thread( void *Cargo )
 #endif
 {
-   volatile HB_STACK *_pStack_ = (HB_STACK *) Cargo;
+   HB_STACK *_pStack_ = (HB_STACK *) Cargo;
    PHB_DYNS pExecSym;
 
    /* thread stack is locked since creation */
+   HB_CRITICAL_LOCK( hb_threadStackMutex );
+   hb_threadLinkStack( _pStack_ );
 
    /* Sets the cancellation handler so small delays in
    cancellation do not cause segfault or memory leaks */
@@ -735,17 +737,17 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
    TlsSetValue( hb_dwCurrentStack, ( void * ) _pStack_ );
 #else
    /* wait for the father to be done */
-   HB_CRITICAL_LOCK( hb_threadStackMutex );
    _pStack_->th_id = HB_CURRENT_THREAD();
    _pStack_->th_vm_id = hb_threadUniqueId();
    pthread_setspecific( hb_pkCurrentStack, Cargo );
    /* tell the world we are ready */
    HB_COND_SIGNAL( hb_threadStackCond );
 
-   HB_CRITICAL_UNLOCK( hb_threadStackMutex );
-
    pthread_cleanup_push( hb_threadTerminator, NULL );
 #endif
+
+   HB_CRITICAL_UNLOCK( hb_threadStackMutex );
+
 
    // call errorsys() to initialize errorblock
    pExecSym = hb_dynsymFind( "ERRORSYS" );
@@ -1025,6 +1027,7 @@ void hb_threadWaitForIdle( void )
 
    HB_CLEANUP_PUSH( hb_threadResetAux, hb_runningStacks );
    HB_VM_STACK.bInUse = FALSE;
+
    /* wait until the road is clear (only WE are running) */
    while ( hb_runningStacks.content.asLong != 0 )
    {
@@ -1032,11 +1035,13 @@ void hb_threadWaitForIdle( void )
    }
    /* blocks all threads here if not blocked before */
    hb_runningStacks.aux = 1;
+
    /* And also prevents other idle inspectors to go */
    hb_runningStacks.content.asLong ++;
 
-   /* Is is useful for debugger */
-   hb_bThreadIsInspector = TRUE;
+   /* And this allows ourself to ignore our stack lock requests,
+      being then able to run PRG level code */
+   HB_VM_STACK.uiIdleInspect++;
 
    // no need to signal, no one must be awaken
    HB_CLEANUP_POP;
@@ -1050,10 +1055,9 @@ void hb_threadIdleEnd( void )
 {
    HB_THREAD_STUB
 
-   /* Is is useful for debugger */
-   hb_bThreadIsInspector = FALSE;
-
    hb_runningStacks.aux = 0;
+
+   HB_VM_STACK.uiIdleInspect--;
 
    HB_VM_STACK.bInUse = TRUE;
    // this will also signal the changed situation.
@@ -1353,8 +1357,6 @@ HB_FUNC( STARTTHREAD )
    HB_STACK_UNLOCK;
 
    HB_CRITICAL_LOCK( hb_threadStackMutex );
-
-   hb_threadLinkStack( pStack );
 
 #if defined(HB_OS_WIN_32)
 /*   #ifndef __BORLANDC__
@@ -2310,14 +2312,12 @@ HB_FUNC( THREADINSPECTEND )
 
 HB_FUNC( THREADISINSPECTOR )
 {
-#ifdef HB_API_MACROS
    HB_THREAD_STUB
-#endif
 
    #ifdef HB_THREAD_SUPPORT
    /* This is atomically changed by idle inspectors; there is no need
       to lock it as non-idle-inspectors can only read it */
-   hb_retl( hb_bThreadIsInspector );
+   hb_retl( HB_VM_STACK.uiIdleInspect > 0 );
    #else
    hb_retl( TRUE ); // always inspecting
    #endif

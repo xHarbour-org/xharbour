@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.70 2003/12/05 18:04:39 jonnymind Exp $
+* $Id: thread.h,v 1.71 2003/12/06 15:33:39 jonnymind Exp $
 */
 
 /*
@@ -269,6 +269,8 @@ typedef struct tag_HB_STACK
    UINT uiParams;
    /* Flag to signal that the context is in use */
    BOOL bInUse; /* this must be used with the guard of a global resource */
+   /* Mark current thread as idle inspector  */
+   USHORT uiIdleInspect;
 
    /* MT error handler, one for thread! */
    struct HB_ERROR_INFO_ *errorHandler;
@@ -432,29 +434,29 @@ typedef struct tag_HB_SHARED_RESOURCE
 
 #define HB_STACK_LOCK \
 {\
-   HB_SHARED_LOCK( hb_runningStacks );\
-   if( ! HB_VM_STACK.bInUse ) \
+   if( ! HB_VM_STACK.bInUse && HB_VM_STACK.uiIdleInspect == 0) \
    {\
+      HB_SHARED_LOCK( hb_runningStacks );\
       while ( hb_runningStacks.aux ) \
       {\
          HB_SHARED_WAIT( hb_runningStacks );\
       }\
       hb_runningStacks.content.asLong++;\
       HB_VM_STACK.bInUse = TRUE;\
+      HB_SHARED_UNLOCK( hb_runningStacks );\
    }\
-   HB_SHARED_UNLOCK( hb_runningStacks );\
 }
 
 #define HB_STACK_UNLOCK \
 {\
-   HB_SHARED_LOCK( hb_runningStacks );\
-   if( HB_VM_STACK.bInUse ) \
+   if( HB_VM_STACK.bInUse && HB_VM_STACK.uiIdleInspect == 0 ) \
    {\
+      HB_SHARED_LOCK( hb_runningStacks );\
       hb_runningStacks.content.asLong--;\
       HB_VM_STACK.bInUse = FALSE;\
       HB_SHARED_SIGNAL( hb_runningStacks );\
+      HB_SHARED_UNLOCK( hb_runningStacks );\
    }\
-   HB_SHARED_UNLOCK( hb_runningStacks );\
 }
 
 /*********************************************************************/

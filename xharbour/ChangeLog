@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1826 2003/12/05 18:04:21 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1827 2003/12/06 15:33:37 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-06 16:55 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/thread.c
+  * include/thread.c
+    ! Ops, uiIdleInspecting is not so useless after all: it allows to run
+      PRG level code during idle inspection. Readded.
+    * I moved stack link inside the starting of the new thread for testing;
+      I think I like that position, so it will stay there.
 
 2003-12-06 16:23 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * include/hbapi.h
