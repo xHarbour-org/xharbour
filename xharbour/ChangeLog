@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3946 2005/03/16 16:01:02 druzus Exp $
+ * $Id: ChangeLog,v 1.3947 2005/03/17 00:41:16 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-03-17 01:45 UTC-0100 Ath <Ath1 at sourceforg.net>
+  * tests/tiptest/base64.prg
+    * modified to allow for direct filename use in addition to
+      processing stdin and stdout.
 
 2005-03-16 21:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * xharbour/source/ct/disk.c
