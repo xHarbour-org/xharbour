@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.597 2003/01/08 03:16:42 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.598 2003/01/08 09:03:59 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,16 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-01-08 10:18 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/inet.c
+    ! Fixed compilation under windows
+
+  * tests/inetto.prg
+    ! Minor compilation issues
+
 2003-01-08 09:55 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/inet.c
     + Added InetGetHosts, InetGetAlias and InetConnectIP function for better
       control over remote connections.
-  
+
   + tests/inethosts.prg
     + Test to demonstrate InetGetAlias and InetGetHosts
 
   + tests/inetto.prg
-    + Test to demonstrate asynchronous thread driven timeout control in 
+    + Test to demonstrate asynchronous thread driven timeout control in
       connections, suggested by Charles Kwon
 
 

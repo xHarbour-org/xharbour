@@ -9,7 +9,7 @@ PROCEDURE Main( cAddress, nPort, nTimeout )
    InetInit()
 
    IF cAddress == NIL
-      cAddres := "intel.com"
+      cAddress := "intel.com"
    ENDIF
 
    IF nPort == NIL
@@ -60,7 +60,7 @@ PROCEDURE Main( cAddress, nPort, nTimeout )
    
    InetCleanup()
 
-RETURN NIL
+RETURN 
 
 FUNCTION Connect( cAddress, nPort, Socket, nStatus )
 

@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.1 2003/01/05 06:50:36 ronpinkas Exp $
+* $Id: inet.c,v 1.2 2003/01/08 09:04:03 jonnymind Exp $
 */
 
 /*
@@ -1098,7 +1098,7 @@ HB_FUNC( INETCONNECTIP )
 
    Socket->remote.sin_family = AF_INET;
    Socket->remote.sin_port= iPort;
-   inet_aton( pHost->item.asString.value, &Socket->remote.sin_addr );
+   Socket->remote.sin_addr.s_addr = inet_addr( pHost->item.asString.value );
 
    if( connect( Socket->com, (struct sockaddr *) &Socket->remote, sizeof(Socket->remote) ) )
    {
