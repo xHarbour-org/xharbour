@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.12 2003/01/12 11:55:22 lculik Exp $
+ * $Id: hbapifs.h,v 1.13 2003/01/29 21:30:26 andijahja Exp $
  */
 
 /*
@@ -197,6 +197,9 @@ extern BYTE      HB_EXPORT * hb_filecase ( char * ); /* Convert string to enviro
 #ifdef HB_OS_WIN_32
    extern int WintoDosError( unsigned long lError);
 #endif
+
+extern int GnuErrtoDosErr( int ErrCode );
+
 
 #if defined(HB_EXTERN_C)
 }

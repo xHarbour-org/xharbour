@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.14 2002/07/24 12:22:39 lculik Exp $
+ * $Id: isprint.c,v 1.15 2002/08/01 00:33:15 lculik Exp $
  */
 
 /*
@@ -81,6 +81,9 @@
                        int *pcJobs,
                        DWORD *pStatus);
    static BOOL DPGetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
+   static DWORD hb_printerIsReadyn( char * pszPrinterName );
+   static DWORD IsPrinterErrorn(HANDLE hPrinter);
+   extern BOOL THarbourPrinter_GetPrinterNameByPort(LPTSTR pPrinterName, LPDWORD pdwBufferSize,LPTSTR pPortName);
 #endif
 
 BOOL hb_printerIsReady( char * pszPrinterName )
@@ -150,6 +153,22 @@ BOOL hb_printerIsReady( char * pszPrinterName )
 #endif
 
    return bIsPrinter;
+}
+
+DWORD hb_printerIsReadyn( char * pszPrinterName )
+{
+   DWORD dwPrinter;
+
+
+   {
+      HANDLE hPrinter;
+
+      OpenPrinter( pszPrinterName, &hPrinter, NULL );
+
+      dwPrinter =  IsPrinterErrorn( hPrinter );
+   }
+
+   return dwPrinter;
 }
 
 /* NOTE: The parameter is an extension over CA-Cl*pper, it's also supported
@@ -234,6 +253,146 @@ static BOOL IsPrinterError( HANDLE hPrinter )
      *  No error condition.
      */
     return FALSE;
+
+}
+
+static DWORD IsPrinterErrorn( HANDLE hPrinter )
+{
+    JOB_INFO_2  *pJobs;
+    int         cJobs,
+                i;
+    DWORD       dwPrinterStatus;
+    DWORD       dwError;
+    BOOL        bPrinterError = FALSE;
+    /*
+     *  Get the state information for the Printer Queue and
+     *  the jobs in the Printer Queue.
+     */
+    if (!GetJobs(hPrinter, &pJobs, &cJobs, &dwPrinterStatus))
+        return 0;
+
+    /*
+     *  If the Printer reports an error, believe it.
+     */
+     switch (dwPrinterStatus &
+        (PRINTER_STATUS_ERROR |
+         PRINTER_STATUS_PAPER_JAM |
+         PRINTER_STATUS_PAPER_OUT |
+         PRINTER_STATUS_PAPER_PROBLEM |
+         PRINTER_STATUS_OUTPUT_BIN_FULL |
+         PRINTER_STATUS_NOT_AVAILABLE |
+         PRINTER_STATUS_NO_TONER |
+         PRINTER_STATUS_OUT_OF_MEMORY |
+         PRINTER_STATUS_OFFLINE |
+         PRINTER_STATUS_DOOR_OPEN) ) {
+
+        case PRINTER_STATUS_ERROR :
+        dwError = 10;
+        bPrinterError = TRUE;
+        break;
+
+        case PRINTER_STATUS_PAPER_JAM :
+        dwError = 11;
+        bPrinterError = TRUE;
+        break;
+
+        case PRINTER_STATUS_PAPER_OUT :
+        dwError = 12;
+        bPrinterError = TRUE;
+        break;
+
+        case PRINTER_STATUS_PAPER_PROBLEM :
+        dwError = 13;
+        bPrinterError = TRUE;
+        break;
+
+        case PRINTER_STATUS_OUTPUT_BIN_FULL :
+        dwError = 14;
+        bPrinterError = TRUE;
+        break;
+
+        case PRINTER_STATUS_NOT_AVAILABLE :
+        dwError = 15;
+        bPrinterError = TRUE;
+        break;
+
+        case PRINTER_STATUS_NO_TONER :
+        dwError = 16;
+        bPrinterError = TRUE;
+        break;
+
+        case PRINTER_STATUS_OUT_OF_MEMORY :
+        dwError = 17;
+        bPrinterError = TRUE;
+        break;
+
+        case PRINTER_STATUS_OFFLINE :
+        dwError = 18;
+        bPrinterError = TRUE;
+        break;
+
+        case PRINTER_STATUS_DOOR_OPEN:
+        dwError = 19;
+        bPrinterError = TRUE;
+        break;
+         }
+    if (bPrinterError)
+    {
+        return dwError;
+    }
+
+    /*
+     *  Find the Job in the Queue that is printing.
+     */
+    for (i=0; i < cJobs; i++)
+    {
+        if (pJobs[i].Status & JOB_STATUS_PRINTING)
+        {
+            /*
+             *  If the job is in an error state,
+             *  report an error for the printer.
+             *  Code could be inserted here to
+             *  attempt an interpretation of the
+             *  pStatus member as well.
+             */
+             switch (pJobs[i].Status &
+                (JOB_STATUS_ERROR |
+                JOB_STATUS_OFFLINE |
+                JOB_STATUS_PAPEROUT |
+                JOB_STATUS_BLOCKED_DEVQ) ) {
+
+                case JOB_STATUS_ERROR :
+                    dwError = 20;
+                    bPrinterError = TRUE;
+                    break;
+
+                case JOB_STATUS_OFFLINE :
+                    dwError = 21;
+                    bPrinterError = TRUE;
+                    break;
+
+                case JOB_STATUS_PAPEROUT :
+                    dwError = 22;
+                    bPrinterError = TRUE;
+                    break;
+
+                case JOB_STATUS_BLOCKED_DEVQ:
+                    dwError = 23;
+                    bPrinterError = TRUE;
+                    break;
+
+                }
+            if (bPrinterError)    
+            {
+            return dwError;
+            }
+        }
+    }
+
+    /*
+     *  No error condition.
+     */
+    return 0;
 
 }
 
@@ -493,3 +652,29 @@ HB_FUNC(GETPRINTERS)
 
 #endif
 
+HB_FUNC( XISPRINTER )
+{
+   #if defined(HB_OS_WIN_32) && !defined(__RSXNT__)
+   {
+      char DefaultPrinter[ 80 ];
+      DWORD pdwBufferSize = 80;
+      DPGetDefaultPrinter( ( LPTSTR ) &DefaultPrinter, &pdwBufferSize);
+      hb_retnl( hb_printerIsReadyn( ISCHAR( 1 ) ? hb_parc( 1 ) : (char*)DefaultPrinter ) );
+    }
+    #endif
+}
+HB_FUNC(PRINTERPORTTONAME)
+{
+   #if defined(HB_OS_WIN_32) && !defined(__RSXNT__)
+   {
+
+      char szDefaultPrinter[ 160 ];
+      DWORD pdwBufferSize = 160;
+      if( THarbourPrinter_GetPrinterNameByPort( ( LPTSTR ) &szDefaultPrinter , &pdwBufferSize , hb_parc(1)) )
+        hb_retc(szDefaultPrinter);
+      else
+        hb_retc("");
+    }
+    #endif
+
+}

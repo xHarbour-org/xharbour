@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.692 2003/02/07 18:18:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.693 2003/02/09 00:10:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-02-09 10:50 UTC-0200 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/common/hbffind.c
+    % Replace Direct errno convertion in DOS Section to an Call to GnuErrtoDosErr()
+  * include/hbapifs.h
+    Added GnuErrtoDosErr() prototype
+  * source/rtl/filesys.c
+    + GnuErrtoDosErr() function added to Proper Convert GNU Errno Values to Proper DosValues.
+    + Also Called GnuErrtoDosErr() in hb_fsCreate() and hb_fsOpen() Apis and on Sections to DJGPP compiler
+  * source/rtl/tprinter.c
+    *THarbourPrinter_GetPrinterNameByPort() changes for usage on new function inside isprint.c
+  * source/rtl/isprint.c
+    + Functions Xisprinter() and PRINTERPORTTONAME()
+       This function Xisprinter() Test the status of the printer, return 0 if no error, 10 to 19 for Printer Errors and 20 to 23 for Jobs error
+    The PRINTERPORTTONAME() return the Instaled printer name from an given Port 
+  * utils/hbmake/hbmake.prg
+    utils/hbmake/hbmutils.prg
+     * Minor fixed to Editor mode
 
 2003-02-08 16:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbinit.h

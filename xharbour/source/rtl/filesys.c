@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.25 2003/01/19 21:44:02 andijahja Exp $
+ * $Id: filesys.c,v 1.26 2003/02/09 00:10:24 ronpinkas Exp $
  */
 
 /*
@@ -625,6 +625,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 
    errno = 0;
    hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
+   errno = GnuErrtoDosErr( errno );
    s_uiErrorLast = errno;
 
 #elif defined(_MSC_VER)
@@ -668,6 +669,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
          hFileHandle = sopen( ( char * ) pFilename, convert_open_flags( uiFlags ), iShare );
       else
          hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
+      errno = GnuErrtoDosErr( errno );
       s_uiErrorLast = errno;
    }
 
@@ -728,6 +730,7 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
       /* This if block is required, because errno will be set
          if the file did not exist and had to be created, even
          when the create is successful! */
+      errno = GnuErrtoDosErr( errno );    
       s_uiErrorLast = errno;
    }
 
@@ -769,6 +772,7 @@ FHANDLE HB_EXPORT hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags
       /* This if block is required, because errno will be set
          if the file did not exist and had to be created, even
          when the create is successful! */
+      errno = GnuErrtoDosErr( errno );
       s_uiErrorLast = errno;
    }
 
@@ -805,7 +809,7 @@ void    HB_EXPORT hb_fsClose( FHANDLE hFileHandle )
          close( hFileHandle );
       }
    #endif
-
+   errno = GnuErrtoDosErr( errno );
    s_uiErrorLast = errno;
 
 #else
@@ -1296,8 +1300,7 @@ BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
 
    errno = 0;
    bResult = ( unlink( ( char * ) pFilename ) == 0 );
-   if( errno == 22 )
-      errno = 2;
+   errno = GnuErrtoDosErr( errno );
    s_uiErrorLast = errno;
 
 #elif defined(_MSC_VER) || defined(__MINGW32__)
@@ -1340,8 +1343,7 @@ BOOL HB_EXPORT hb_fsRename( BYTE * pOldName, BYTE * pNewName )
 
    errno = 0;
    bResult = ( rename( ( char * ) pOldName, ( char * ) pNewName ) == 0 );
-   if( errno == 22 )
-      errno = 2;
+   errno = GnuErrtoDosErr( errno );
    s_uiErrorLast = errno;
 
 #else
@@ -1520,6 +1522,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
       default:
          bResult = FALSE;
    }
+   errno = GnuErrtoDosErr( errno );
    s_uiErrorLast = errno;
 
 #else
@@ -1617,7 +1620,7 @@ BOOL HB_EXPORT    hb_fsMkDir( BYTE * pDirname )
    #else
       bResult = ( mkdir( ( char * ) pDirname ) == 0 );
    #endif
-
+   errno = GnuErrtoDosErr( errno );
    s_uiErrorLast = errno;
 
 #else
@@ -1645,6 +1648,7 @@ BOOL HB_EXPORT    hb_fsChDir( BYTE * pDirname )
 
    errno = 0;
    bResult = ( chdir( ( char * ) pDirname ) == 0 );
+   errno = GnuErrtoDosErr( errno );
    s_uiErrorLast = errno;
 
 #else
@@ -2093,3 +2097,59 @@ HANDLE DostoWinHandle( FHANDLE fHandle)
    }
 }
 #endif
+
+int GnuErrtoDosErr( int ErrCode )
+{
+
+    int iResult = ErrCode;
+
+#if defined(__DJGPP__) || defined(__RSX32__)
+{
+
+    if (ErrCode == EMFILE)
+        iResult = 4 ;
+    
+    if (ErrCode == ESPIPE)
+        iResult = 25;
+
+    if (ErrCode == EACESS )
+        iResult = 5  ;
+        
+    if (ErrCode == ENOENT)
+        iResult = 2;
+
+}
+#elif defined(__MINGW32__)
+{
+
+    if (ErrCode == EMFILE)
+        iResult = 4 ;
+    
+    if (ErrCode == ESPIPE)
+        iResult = 25;
+
+    if (ErrCode == EACESS )
+        iResult = 5  ;
+        
+    if (ErrCode == ENOENT)
+        iResult = 2;
+}
+
+#elif defined(__GNUC__)
+{
+
+    if (ErrCode == EMFILE)
+        iResult = 4 ;
+    
+    if (ErrCode == ESPIPE)
+        iResult = 25;
+
+    if (ErrCode == EACESS )
+        iResult = 5  ;
+        
+}            
+#endif
+
+    return iResult;
+}
+
