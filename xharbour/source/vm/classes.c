@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.124 2004/07/03 03:34:54 ronpinkas Exp $
+ * $Id: classes.c,v 1.125 2004/07/26 10:38:07 ronpinkas Exp $
  */
 
 /*
@@ -1694,7 +1694,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
 }
 
 /*
-/*               1                  2            3                     4         5                  6           7                8
+ *               1                  2            3                     4         5                  6           7                8
  * __clsAddMsg( <hClass/pObject>,  <cMessage>, <Func_or_Block_or_ID>, <nType>, [<Super_or_Init>], [<nScope>], [<lPersistent>], [<lCase> ] )
  *
  * Add a message to the class.
