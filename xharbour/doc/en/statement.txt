@@ -469,7 +469,7 @@
  *  $FUNCNAME$
  *      RETURN
  *  $CATEGORY$
- *      Statememt
+ *      Statement
  *  $ONELINER$
  *      Terminate a procedure, user-defined function, or program
  *  $SYNTAX$

@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbdoc.prg,v 1.7 2004/03/17 21:34:50 lculik Exp $
+ * $Id: hbdoc.prg,v 1.8 2004/08/25 17:02:57 lf_sfnet Exp $
  */
 
 /*
@@ -54,8 +54,8 @@
 /*
  * File......: HBDOC.PRG
  * Author....: Luiz Rafael Culik
- * Date......: $Date: 2004/03/17 21:34:50 $
- * Revision..: $Revision: 1.7 $
+ * Date......: $Date: 2004/08/25 17:02:57 $
+ * Revision..: $Revision: 1.8 $
  * Log file..: $Logfile:     $
  *
  *
@@ -564,7 +564,7 @@ FUNCTION MAIN( cFlags, cLinkName, cAtFile )
       for ppp:=1 to nItem
 
         cLast:=GetNextContent(ppp)
-        if cLast<>'Run Time Errors' .and. cLast <>"Document"  .and. cLast <>"The garbage collector"  .and. cLast <>"OOP Command" .and. cLast <>"Command"  .and. cLast <>"The idle states"
+        if cLast =='Statement' .or. cLast =="Command"  
             WriteContentFile(aWww,cLast,nHpj)
         endif
       Next
@@ -654,13 +654,29 @@ set console off
       for ppp:=1 to nItem
 
         cLast:=GetNextContent(ppp)
-        if cLast<>'Run Time Errors' .and. cLast <>"Document"  .and. cLast <>"The garbage collector"  .and. cLast <>"OOP Command" .and. cLast <>"Command"  .and. cLast <>"The idle states"
+        if (cLast<>'Run Time Errors' .and. cLast <>"Document"  .and. cLast <>"The garbage collector" .and. cLast <>"The idle states") .and. (cLast !=  "Command" .and. clast !="OOP Command" .and. cLast !="Statement")
+            ohtm1:WriteLink('hb'+strtran(aResult[ppp]," ","")+'.htm',aResult[ppp])
+
+        endif
+      Next
+      ohtm1:writetext('</ul>')
+
+      oHtm1:WriteText( "<H2>Commands and Statements</H2>" )
+      ohtm1:writetext('<ul>')
+
+      for ppp:=1 to nItem
+
+        cLast:=GetNextContent(ppp)
+        if cLast ==  "Command" .or. clast =="OOP Command" .or. cLast =="Statement"
             ohtm1:WriteLink('hb'+strtran(aResult[ppp]," ","")+'.htm',aResult[ppp])
 
         endif
       Next
       ohtm1:writetext('</ul>')        
         ohtm1:close()
+
+        ohtm1:close()
+
 
       oHtm:Close()
 
@@ -1472,10 +1488,13 @@ return nil
 
 function GetNextContent(nPos)
 Local cReturn
+tracelog( nPos)
 if nPos <=Len(aResult)
 cReturn := aResult[nPos]
 endif
+tracelog(cReturn)
 return cReturn
+
 Function WriteChmContentFile(aTop,cCat,oHtm)
 Local nCount:=0
 
