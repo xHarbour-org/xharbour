@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.56 2003/06/24 08:37:21 andijahja Exp $
+# $Id: makefile.bc,v 1.57 2003/07/08 06:14:47 jonnymind Exp $
 #
 
 #
@@ -146,9 +146,7 @@ HBDOC_DIR    = utils\hbdoc
 HBPP_DIR     = utils\hbpp
 HBMAKE_DIR   = utils\hbmake
 
-!if $(HB_LEX) == SIMPLEX
-   INCLUDE_DIR = $(INCLUDE_DIR);source\compiler;source\macro
-!endif
+INCLUDE_DIR  = $(INCLUDE_DIR);source\compiler;source\macro
 
 !if $d(HB_DOC_PDF)
    HBPDF_DIR = contrib\pdflib
@@ -537,17 +535,8 @@ MACRO_LIB_OBJS = \
    $(MACRO_OBJ_DIR)\macroy.obj \
    $(MACRO_OBJ_DIR)\macroa.obj \
    $(MACRO_OBJ_DIR)\macrob.obj \
-   $(MACRO_OBJ_DIR)\macroc.obj
-
-!if $(HB_LEX) == SIMPLEX
-    MACRO_LIB_OBJS = \
-       $(MACRO_LIB_OBJS) \
-       $(MACRO_OBJ_DIR)\macroslx.obj
-!else
-    MACRO_LIB_OBJS = \
-       $(MACRO_LIB_OBJS) \
-       $(MACRO_OBJ_DIR)\macrol.obj
-!endif
+   $(MACRO_OBJ_DIR)\macroc.obj \
+   $(MACRO_OBJ_DIR)\macroslx.obj
 
 #
 # RDD.LIB rules
@@ -763,17 +752,8 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\exproptb.obj \
    $(OBJ_DIR)\exproptc.obj \
    $(OBJ_DIR)\hbfunchk.obj \
-   $(PP_LIB)
-
-!if $(HB_LEX) == SIMPLEX
-   HARBOUR_EXE_OBJS = \
-      $(HARBOUR_EXE_OBJS) \
-      $(OBJ_DIR)\hbslex.obj
-!else
-   HARBOUR_EXE_OBJS = \
-      $(HARBOUR_EXE_OBJS) \
-      $(OBJ_DIR)\harbourl.obj
-!endif
+   $(PP_LIB) \
+   $(OBJ_DIR)\hbslex.obj
 
 #
 # HBRUN.EXE rules
@@ -891,27 +871,462 @@ all: \
 # Library dependencies and build rules
 #
 
-$(COMMON_LIB)     : $(COMMON_LIB_OBJS)
-$(DBFCDX_LIB)     : $(DBFCDX_LIB_OBJS)
-$(DBFNTX_LIB)     : $(DBFNTX_LIB_OBJS)
-$(DEBUG_LIB)      : $(DEBUG_LIB_OBJS)
-$(LANG_LIB)       : $(LANG_LIB_OBJS)
-$(MACRO_LIB)      : $(MACRO_LIB_OBJS)
-$(NULSYS_LIB)     : $(NULSYS_LIB_OBJS)
-$(PP_LIB)         : $(PP_LIB_OBJS)
-$(RDD_LIB)        : $(RDD_LIB_OBJS)
-$(RTL_LIB)        : $(RTL_LIB_OBJS)
-$(VM_LIB)         : $(VM_LIB_OBJS)
+$(COMMON_LIB) : $(COMMON_LIB_OBJS)
+   $(ECHO) + $(OBJ_DIR)\hbfhnd.obj     &  > common.rsp
+   $(ECHO) + $(OBJ_DIR)\hbfsapi.obj    & >> common.rsp
+   $(ECHO) + $(OBJ_DIR)\hbgete.obj     & >> common.rsp
+   $(ECHO) + $(OBJ_DIR)\hbhash.obj     & >> common.rsp
+   $(ECHO) + $(OBJ_DIR)\hbstr.obj      & >> common.rsp
+   $(ECHO) + $(OBJ_DIR)\hbtrace.obj    & >> common.rsp
+   $(ECHO) + $(OBJ_DIR)\hbver.obj      & >> common.rsp
+   $(ECHO) + $(OBJ_DIR)\expropt1.obj   & >> common.rsp
+   $(ECHO) + $(OBJ_DIR)\expropt2.obj   & >> common.rsp
+   $(ECHO) + $(OBJ_DIR)\reserved.obj     >> common.rsp
+   if exist $(COMMON_LIB) $(DEL) $(COMMON_LIB) > NUL
+   TLIB $(COMMON_LIB) @common.rsp $(ARFLAGS)
+   if exist common.rsp $(DEL) common.rsp > NUL
+
+$(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
+   $(ECHO) + $(CDX_OBJ_DIR)\dbfcdx1.obj &  > dbfcdx.rsp
+   $(ECHO) + $(CDX_OBJ_DIR)\dbfcdx0.obj   >> dbfcdx.rsp
+   if exist $(DBFCDX_LIB) $(DEL) $(DBFCDX_LIB) > NUL
+   TLIB $(DBFCDX_LIB) @dbfcdx.rsp $(ARFLAGS)
+   if exist dbfcdx.rsp $(DEL) dbfcdx.rsp > NUL
+
+$(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
+   $(ECHO) + $(NTX_OBJ_DIR)\dbfntx1.obj &  > dbfntx.rsp
+   $(ECHO) + $(NTX_OBJ_DIR)\dbfntx0.obj   >> dbfntx.rsp
+   if exist $(DBFNTX_LIB) $(DEL) $(DBFNTX_LIB) > NUL
+   TLIB $(DBFNTX_LIB) @dbfntx.rsp $(ARFLAGS)
+   if exist dbfntx.rsp $(DEL) dbfntx.rsp > NUL
+
+$(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
+   $(ECHO) + $(OBJ_DIR)\dbgmenu.obj   &  > debug.rsp
+   $(ECHO) + $(OBJ_DIR)\dbgtmenu.obj  & >> debug.rsp
+   $(ECHO) + $(OBJ_DIR)\dbgtmitm.obj  & >> debug.rsp
+   $(ECHO) + $(OBJ_DIR)\dbgtwin.obj   & >> debug.rsp
+   $(ECHO) + $(OBJ_DIR)\debugger.obj  & >> debug.rsp
+   $(ECHO) + $(OBJ_DIR)\dbghelp.obj   & >> debug.rsp
+   $(ECHO) + $(OBJ_DIR)\dbgtarr.obj   & >> debug.rsp
+   $(ECHO) + $(OBJ_DIR)\dbgtobj.obj   & >> debug.rsp
+   $(ECHO) + $(OBJ_DIR)\tbrwtext.obj  & >> debug.rsp
+   $(ECHO) + $(OBJ_DIR)\dbgwa.obj       >> debug.rsp
+   if exist $(DEBUG_LIB) $(DEL) $(DEBUG_LIB) > NUL
+   TLIB $(DEBUG_LIB) @debug.rsp $(ARFLAGS)
+   if exist debug.rsp $(DEL) debug.rsp > NUL
+
+$(LANG_LIB) : $(LANG_LIB_OBJS)
+   $(ECHO) + $(OBJ_DIR)\msgca.obj       &  > lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgcs852.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgcsiso.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgcskam.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgcswin.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgde.obj       & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgen.obj       & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgeo.obj       & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msges.obj       & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgeu.obj       & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgfr.obj       & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msggl.obj       & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msghe862.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msghewin.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msghr852.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msghriso.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msghu852.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msghucwi.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msghuwin.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgid.obj       & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgis850.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgit.obj       & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgko.obj       & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgpl852.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgpliso.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgplmaz.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgpt.obj       & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgro.obj       & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgru866.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgruwin.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgsr852.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgsrwin.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgsriso.obj    & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgzhgb.obj     & >> lang.rsp
+   $(ECHO) + $(OBJ_DIR)\msgzhb5.obj       >> lang.rsp
+   if exist $(LANG_LIB) $(DEL) $(LANG_LIB) > NUL
+   TLIB $(LANG_LIB) @lang.rsp $(ARFLAGS)
+   if exist lang.rsp $(DEL) lang.rsp > NUL
+
+$(MACRO_LIB) : $(MACRO_LIB_OBJS)
+   $(ECHO) + $(MACRO_OBJ_DIR)\macroy.obj  &  > macro.rsp
+   $(ECHO) + $(MACRO_OBJ_DIR)\macroa.obj  & >> macro.rsp
+   $(ECHO) + $(MACRO_OBJ_DIR)\macrob.obj  & >> macro.rsp
+   $(ECHO) + $(MACRO_OBJ_DIR)\macroc.obj  & >> macro.rsp
+   $(ECHO) + $(MACRO_OBJ_DIR)\macroslx.obj  >> macro.rsp
+   if exist $(MACRO_LIB) $(DEL) $(MACRO_LIB) > NUL
+   TLIB $(MACRO_LIB) @macro.rsp $(ARFLAGS)
+   if exist macro.rsp $(DEL) macro.rsp > NUL
+
+$(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
+   $(ECHO) + $(OBJ_DIR)\nulsys.obj  > nulsys.rsp
+   if exist $(NULSYS_LIB) $(DEL) $(NULSYS_LIB) > NUL
+   TLIB $(NULSYS_LIB) @nulsys.rsp $(ARFLAGS)
+   if exist nulsys.rsp $(DEL) nulsys.rsp > NUL
+
+$(PP_LIB) : $(PP_LIB_OBJS)
+   $(ECHO) + $(PP_OBJ_DIR)\ppcore.obj  &  > pp.rsp
+   $(ECHO) + $(PP_OBJ_DIR)\ppcomp.obj  & >> pp.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\pplib.obj  & >> pp.rsp
+   $(ECHO) + $(PP_OBJ_DIR)\pptable.obj & >> pp.rsp
+   $(ECHO) + $(PP_OBJ_DIR)\pragma.obj    >> pp.rsp
+   if exist $(PP_LIB) $(DEL) $(PP_LIB) > NUL
+   TLIB $(PP_LIB) @pp.rsp $(ARFLAGS)
+   if exist pp.rsp $(DEL) pp.rsp > NUL
+
+$(RDD_LIB) : $(RDD_LIB_OBJS)
+   $(ECHO) + $(RDD_OBJ_DIR)\dbcmd.obj      &  > rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\workarea.obj   & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\dbf1.obj       & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\dbnubs.obj     & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\delim1.obj     & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\sdf1.obj       & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\dbf0.obj       & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\dbfuncs.obj    & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\dbtotal.obj    & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\dblist.obj     & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\dbsort.obj     & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\hbdbsort.obj   & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\dbstrux.obj    & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\dbupdat.obj    & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\delim0.obj     & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\rddord.obj     & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\rddsys.obj     & >> rddlib.rsp
+   $(ECHO) + $(RDD_OBJ_DIR)\sdf0.obj         >> rddlib.rsp
+   if exist $(RDD_LIB) $(DEL) $(RDD_LIB) > NUL
+   TLIB $(RDD_LIB) @rddlib.rsp $(ARFLAGS)
+   if exist rddlib.rsp $(DEL) rddlib.rsp > NUL
+
+$(RTL_LIB) : $(RTL_LIB_OBJS)
+   $(ECHO) + $(RTL_OBJ_DIR)\abs.obj         &  > rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\accept.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\ampm.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\at.obj          & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\binnum.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\binnumx.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\box.obj         & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\cdpapi.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\chrasc.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\colorind.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\console.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\copyfile.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\datec.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\dates.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\dateshb.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\datesx.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\defpath.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\descend.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\dirdrive.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\direct.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\diskspac.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\disksphb.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\empty.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\file.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\filehb.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\filesys.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\fkmax.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\fnsplit.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\fssize.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\fstemp.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\gete.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\gt.obj          & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\gtapi.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\gtapiu.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\gx.obj          & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\hardcr.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\hbbitfield.obj  & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\hbcompress.obj  & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\hbcrypt.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\hbcrc32.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\hbchecksum.obj  & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\hbhextonum.obj  & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\hbffind.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\hbrandom.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\hbreadini.obj   & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\hbxml.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\idle.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\inkey.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\is.obj          & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\isprint.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\langapi.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\left.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\len.obj         & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\lennum.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\math.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\maxrow.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\memofile.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\memoline.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\minmax.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\mlcount.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\mlpos.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\mlctopos.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\mpostolc.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\mod.obj         & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\mouseapi.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\mousex.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\mtran.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\natmsg.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\net.obj         & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\oemansi.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\oldbox.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\oldclear.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\pad.obj         & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\padc.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\padl.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\padr.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\philes.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\philes53.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\philesx.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\rat.obj         & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\regex.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\replic.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\right.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\round.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\run.obj         & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\samples.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\saverest.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\scroll.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\seconds.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\set.obj         & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\setcolor.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\setcurs.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\setkey.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\setpos.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\setposbs.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\shadow.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\soundex.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\space.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\spfiles.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\str.obj         & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\strcase.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\strings.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\strmatch.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\strpeek.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\strtran.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\strzero.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\stuff.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\substr.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\teditorl.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\tone.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\tprint.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\tprinter.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\trace.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\transfrm.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\trim.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\type.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\val.obj         & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\valtostr.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\valtype.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\version.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\word.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\xhelp.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\xsavescr.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\achoice.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\adir.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\alert.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\arrayblk.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\browdb.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\browdbx.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\browse.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\checkbox.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\color53.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\cstr.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\cstruct.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\dbedit.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\dbdelim.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\dbsdf.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\devoutp.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\dircmd.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\dummy.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\errorsys.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\fieldbl.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\getlist.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\getsys.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\hbsrlraw.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\hbserial.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\input.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\listbox.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\memoedit.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\memvarbl.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\menuto.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\mssgline.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\objfunc.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\perfuncs.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\persist.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\profiler.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\pushbtn.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\radiobtn.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\radiogrp.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\readkey.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\readvar.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\scrollbr.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\setfunc.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\setta.obj       & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\tbcolumn.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\tbrowse.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\tclass.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\teditor.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\terror.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\text.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\tget.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\tgetint.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\tgetlist.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\tlabel.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\tmenuitm.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\tobject.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\tpopup.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\traceprg.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\treport.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\trpc.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\trpccli.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\ttable.obj      & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\ttextlin.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\ttopbar.obj     & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\txml.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\typefile.obj    & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\wait.obj        & >> rtl.rsp
+   $(ECHO) + $(RTL_OBJ_DIR)\win32ole.obj      >> rtl.rsp
+   if exist $(RTL_LIB) $(DEL) $(RTL_LIB) > NUL
+   TLIB $(RTL_LIB) @rtl.rsp $(ARFLAGS)
+   if exist rtl.rsp $(DEL) rtl.rsp > NUL
+
+$(VM_LIB) : $(VM_LIB_OBJS)
+   $(ECHO) + $(VM_OBJ_DIR)\arrays.obj      &  > vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\arrayshb.obj    & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\asort.obj       & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\break.obj       & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\classes.obj     & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\cmdarg.obj      & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\codebloc.obj    & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\debug.obj       & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\do.obj          & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\dynlibhb.obj    & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\dynsym.obj      & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\errorapi.obj    & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\estack.obj      & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\eval.obj        & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\evalhb.obj      & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\extend.obj      & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\fm.obj          & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\garbage.obj     & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\hbi18n.obj      & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\hvm.obj         & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\inet.obj        & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\initexit.obj    & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\initsymb.obj    & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\itemapi.obj     & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\fastitem.obj    & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\macro.obj       & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\maindll.obj     & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\mainstd.obj     & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\mainwin.obj     & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\memvars.obj     & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\memvclip.obj    & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\pcount.obj      & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\proc.obj        & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\pvalue.obj      & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\runner.obj      & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\thread.obj      & >> vm.rsp
+   $(ECHO) + $(VM_OBJ_DIR)\harbinit.obj      >> vm.rsp
+   if exist $(VM_LIB) $(DEL) $(VM_LIB) > NUL
+   TLIB $(VM_LIB) @vm.rsp $(ARFLAGS)
+   if exist vm.rsp $(DEL) vm.rsp > NUL
+
 $(VM_LIB_OPT_CON) : $(VM_LIB_OPT_CON_OBJS)
+   $(ECHO) + $(OPT_CON_OBJ_DIR)\hvm.obj      &  > optcon.rsp
+   $(ECHO) + $(OPT_CON_OBJ_DIR)\classes.obj  & >> optcon.rsp
+   $(ECHO) + $(OPT_CON_OBJ_DIR)\fm.obj         >> optcon.rsp
+   if exist $(VM_LIB_OPT_CON) $(DEL) $(VM_LIB_OPT_CON) > NUL
+   TLIB $(VM_LIB_OPT_CON) @optcon.rsp $(ARFLAGS)
+   if exist optcon.rsp $(DEL) optcon.rsp > NUL
+
 $(VM_LIB_OPT_GUI) : $(VM_LIB_OPT_GUI_OBJS)
-$(GTCGI_LIB)      : $(GTCGI_LIB_OBJS)
-$(GTDOS_LIB)      : $(GTDOS_LIB_OBJS)
-$(GTPCA_LIB)      : $(GTPCA_LIB_OBJS)
-$(GTSTD_LIB)      : $(GTSTD_LIB_OBJS)
-$(GTWIN_LIB)      : $(GTWIN_LIB_OBJS)
-$(CODEPAGE_LIB)   : $(CODEPAGE_LIB_OBJS)
-$(SAMPLES_LIB)    : $(SAMPLES_LIB_OBJS)
-$(ODBC_LIB)       : $(ODBC_LIB_OBJS)
+   $(ECHO) + $(OPT_GUI_OBJ_DIR)\hvm.obj     &  > optgui.rsp
+   $(ECHO) + $(OPT_GUI_OBJ_DIR)\classes.obj & >> optgui.rsp
+   $(ECHO) + $(OPT_GUI_OBJ_DIR)\fm.obj        >> optgui.rsp
+   if exist $(VM_LIB_OPT_GUI) $(DEL) $(VM_LIB_OPT_GUI) > NUL
+   TLIB $(VM_LIB_OPT_GUI) @optgui.rsp $(ARFLAGS)
+   if exist optgui.rsp $(DEL) optgui.rsp > NUL
+
+$(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
+   $(ECHO) + $(OBJ_DIR)\gtcgi.obj     &  > gtcgi.rsp
+   $(ECHO) + $(OBJ_DIR)\mousecgi.obj    >> gtcgi.rsp
+   if exist $(GTCGI_LIB) $(DEL) $(GTCGI_LIB) > NUL
+   TLIB $(GTCGI_LIB) @gtcgi.rsp $(ARFLAGS)
+   if exist gtcgi.rsp $(DEL) gtcgi.rsp > NUL
+
+$(GTDOS_LIB) : $(GTDOS_LIB_OBJS)
+   $(OBJ_DIR)\gtdos.obj     &  > gtdos.rsp
+   $(OBJ_DIR)\mousedos.obj    >> gtdos.rsp
+   if exist $(GTDOS_LIB) $(DEL) $(GTDOS_LIB) > NUL
+   TLIB $(GTDOS_LIB) @gtdos.rsp $(ARFLAGS)
+   if exist gtdos.rsp $(DEL) gtdos.rsp > NUL
+
+$(GTPCA_LIB) : $(GTPCA_LIB_OBJS)
+   $(ECHO) + $(OBJ_DIR)\gtpca.obj    &  > gtpca.rsp
+   $(ECHO) + $(OBJ_DIR)\mousepca.obj   >> gtpca.rsp
+   if exist $(GTPCA_LIB) $(DEL) $(GTPCA_LIB) > NUL
+   TLIB $(GTPCA_LIB) @gtpca.rsp $(ARFLAGS)
+   if exist gtpca.rsp $(DEL) gtpca.rsp > NUL
+
+$(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
+   $(ECHO) + $(OBJ_DIR)\gtstd.obj     &  > gtstd.rsp
+   $(ECHO) + $(OBJ_DIR)\mousestd.obj    >> gtstd.rsp
+   if exist $(GTSTD_LIB) $(DEL) $(GTSTD_LIB) > NUL
+   TLIB $(GTSTD_LIB) @gtstd.rsp $(ARFLAGS)
+   if exist gtstd.rsp $(DEL) gtstd.rsp > NUL
+
+$(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
+   $(ECHO) + $(OBJ_DIR)\gtwin.obj    &  > gtwin.rsp
+   $(ECHO) + $(OBJ_DIR)\mousewin.obj   >> gtwin.rsp
+   if exist $(GTWIN_LIB) $(DEL) $(GTWIN_LIB) > NUL
+   TLIB $(GTWIN_LIB) @gtwin.rsp $(ARFLAGS)
+   if exist gtwin.rsp $(DEL) gtwin.rsp > NUL
+
+$(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
+   $(ECHO) + $(OBJ_DIR)\cdpesdos.obj &  > codepage.rsp
+   $(ECHO) + $(OBJ_DIR)\cdpeswin.obj & >> codepage.rsp
+   $(ECHO) + $(OBJ_DIR)\cdpgedos.obj & >> codepage.rsp
+   $(ECHO) + $(OBJ_DIR)\cdpgewin.obj & >> codepage.rsp
+   $(ECHO) + $(OBJ_DIR)\cdppt850.obj & >> codepage.rsp
+   $(ECHO) + $(OBJ_DIR)\cdpptiso.obj & >> codepage.rsp
+   $(ECHO) + $(OBJ_DIR)\cdppl852.obj & >> codepage.rsp
+   $(ECHO) + $(OBJ_DIR)\cdppliso.obj & >> codepage.rsp
+   $(ECHO) + $(OBJ_DIR)\cdpplmaz.obj & >> codepage.rsp
+   $(ECHO) + $(OBJ_DIR)\cdpru866.obj & >> codepage.rsp
+   $(ECHO) + $(OBJ_DIR)\cdpruwin.obj & >> codepage.rsp
+   $(ECHO) + $(OBJ_DIR)\cdpsrwin.obj & >> codepage.rsp
+   $(ECHO) + $(OBJ_DIR)\cdprukoi.obj   >> codepage.rsp
+   if exist $(CODEPAGE_LIB) $(DEL) $(CODEPAGE_LIB) > NUL
+   TLIB $(CODEPAGE_LIB) @codepage.rsp $(ARFLAGS)
+   if exist codepage.rsp $(DEL) codepage.rsp > NUL
+
+$(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
+   $(ECHO) + $(SAM_OBJ_DIR)\environ.obj  &  > samples.rsp
+   $(ECHO) + $(SAM_OBJ_DIR)\date.obj     & >> samples.rsp
+   $(ECHO) + $(SAM_OBJ_DIR)\dbf.obj      & >> samples.rsp
+   $(ECHO) + $(SAM_OBJ_DIR)\gauge.obj    & >> samples.rsp
+   $(ECHO) + $(SAM_OBJ_DIR)\num.obj      & >> samples.rsp
+   $(ECHO) + $(SAM_OBJ_DIR)\stack.obj    & >> samples.rsp
+   $(ECHO) + $(SAM_OBJ_DIR)\status.obj   & >> samples.rsp
+   $(ECHO) + $(SAM_OBJ_DIR)\time.obj       >> samples.rsp
+   if exist $(SAMPLES_LIB) $(DEL) $(SAMPLES_LIB) > NUL
+   TLIB $(SAMPLES_LIB) @samples.rsp $(ARFLAGS)
+   if exist samples.rsp $(DEL) samples.rsp > NUL
+
+$(ODBC_LIB) : $(ODBC_LIB_OBJS)
+   $(ECHO) + $(OBJ_DIR)\odbc.obj   &  > odbc.rsp
+   $(ECHO) + $(OBJ_DIR)\todbc.obj    >> odbc.rsp
+   if exist $(ODBC_LIB) $(DEL) $(ODBC_LIB) > NUL
+   TLIB $(ODBC_LIB) @odbc.rsp $(ARFLAGS)
+   if exist odbc.rsp $(DEL) odbc.rsp > NUL
 
 #
 # OPTCON.LIB dependencies
@@ -919,15 +1334,12 @@ $(ODBC_LIB)       : $(ODBC_LIB_OBJS)
 
 $(OPT_CON_OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
    $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -o$@ $**
-   tlib $(VM_LIB_OPT_CON) $(ARFLAGS) -+$@,,
 
 $(OPT_CON_OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
    $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -o$@ $**
-   tlib $(VM_LIB_OPT_CON) $(ARFLAGS) -+$@,,
 
 $(OPT_CON_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
    $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -o$@ $**
-   tlib $(VM_LIB_OPT_CON) $(ARFLAGS) -+$@,,
 
 #
 # OPTGUI.LIB dependencies
@@ -935,15 +1347,12 @@ $(OPT_CON_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
 
 $(OPT_GUI_OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
    $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -DHB_GUI -o$@ $**
-   tlib $(VM_LIB_OPT_GUI) $(ARFLAGS) -+$@,,
 
 $(OPT_GUI_OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
    $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -DHB_GUI -o$@ $**
-   tlib $(VM_LIB_OPT_GUI) $(ARFLAGS) -+$@,,
 
 $(OPT_GUI_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
    $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -DHB_GUI -o$@ $**
-   tlib $(VM_LIB_OPT_GUI) $(ARFLAGS) -+$@,,
 
 #
 # COMMON.LIB dependencies
@@ -951,43 +1360,33 @@ $(OPT_GUI_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
 
 $(OBJ_DIR)\hbfhnd.obj : $(COMMON_DIR)\hbfhnd.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(COMMON_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\hbfsapi.obj : $(COMMON_DIR)\hbfsapi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(COMMON_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\hbgete.obj : $(COMMON_DIR)\hbgete.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(COMMON_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\hbhash.obj : $(COMMON_DIR)\hbhash.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(COMMON_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\hbstr.obj : $(COMMON_DIR)\hbstr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(COMMON_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\hbtrace.obj : $(COMMON_DIR)\hbtrace.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(COMMON_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\hbver.obj : $(COMMON_DIR)\hbver.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(COMMON_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\expropt1.obj : $(COMMON_DIR)\expropt1.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(COMMON_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\expropt2.obj : $(COMMON_DIR)\expropt2.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(COMMON_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\reserved.obj : $(COMMON_DIR)\reserved.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(COMMON_LIB) $(ARFLAGS) -+$@,,
 
 #
 # PP.LIB dependencies
@@ -995,23 +1394,18 @@ $(OBJ_DIR)\reserved.obj : $(COMMON_DIR)\reserved.c
 
 $(PP_OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(PP_LIB) $(ARFLAGS) -+$@,,
 
 $(PP_OBJ_DIR)\ppcomp.obj : $(PP_DIR)\ppcomp.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(PP_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\pplib.obj : $(RTL_DIR)\pplib.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(PP_LIB) $(ARFLAGS) -+$@,,
 
 $(PP_OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(PP_LIB) $(ARFLAGS) -+$@,,
 
 $(PP_OBJ_DIR)\pragma.obj : $(PP_DIR)\pragma.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(PP_LIB) $(ARFLAGS) -+$@,,
 
 #
 # HARBOUR.EXE dependencies
@@ -1022,11 +1416,7 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
    $(ECHO) -e$(HARBOUR_EXE) >> make.tmp
    $(ECHO) $(OBJ_DIR)\harbour.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\harboury.obj >> make.tmp
-!if $(HB_LEX) == SIMPLEX
    $(ECHO) $(OBJ_DIR)\hbslex.obj >> make.tmp
-!else
-   $(ECHO) $(OBJ_DIR)\harbourl.obj >> make.tmp
-!endif
    $(ECHO) $(OBJ_DIR)\cmdcheck.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbusage.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbident.obj >> make.tmp
@@ -1049,37 +1439,14 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
 $(OBJ_DIR)\harbour.obj : $(COMPILER_DIR)\harbour.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-!if $(HB_LEX) == SIMPLEX
-
 $(OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.sly
    bison -v -d $** -o$@
-
-!else
-
-$(OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.y
-   bison -v -d $** -o$@
-
-!endif
-
-!if $(HB_LEX) == SIMPLEX
-   # Flex not needed in SimpLex build.
-!else
-$(OBJ_DIR)\harbourl.c : $(COMPILER_DIR)\harbour.l
-   flex  -i -8 -o$@ $**
-!endif
 
 $(OBJ_DIR)\harboury.obj : $(OBJ_DIR)\harboury.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-!if $(HB_LEX) == SIMPLEX
 $(OBJ_DIR)\hbslex.obj : $(COMPILER_DIR)\hbslex.c
    $(CC) $(CLIBFLAGS) -I$(OBJ_DIR) -o$@ $**
-!else
-$(OBJ_DIR)\harbourl.obj : $(OBJ_DIR)\harbourl.c
-   -$(ECHO)  > $(OBJ_DIR)\unistd.h
-   $(CC) $(CLIBFLAGS) -I$(OBJ_DIR) -o$@ $**
-   -$(DEL) $(OBJ_DIR)\unistd.h
-!endif
 
 $(OBJ_DIR)\cmdcheck.obj : $(COMPILER_DIR)\cmdcheck.c
    $(CC) $(CLIBFLAGS) -o$@ $**
@@ -1132,108 +1499,90 @@ $(OBJ_DIR)\hbfunchk.obj : $(COMPILER_DIR)\hbfunchk.c
 
 $(RDD_OBJ_DIR)\dbcmd.obj : $(RDD_DIR)\dbcmd.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\workarea.obj : $(RDD_DIR)\workarea.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\dbf0.c : $(RDD_DIR)\dbf0.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RDD_OBJ_DIR)\dbf0.obj : $(RDD_OBJ_DIR)\dbf0.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\dbf1.obj : $(RDD_DIR)\dbf1.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\dbtotal.c : $(RDD_DIR)\dbtotal.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RDD_OBJ_DIR)\dbtotal.obj : $(RDD_OBJ_DIR)\dbtotal.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\dblist.c : $(RDD_DIR)\dblist.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RDD_OBJ_DIR)\dblist.obj : $(RDD_OBJ_DIR)\dblist.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\dbfuncs.c : $(RDD_DIR)\dbfuncs.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RDD_OBJ_DIR)\dbfuncs.obj : $(RDD_OBJ_DIR)\dbfuncs.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\dbsort.c : $(RDD_DIR)\dbsort.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RDD_OBJ_DIR)\dbsort.obj : $(RDD_OBJ_DIR)\dbsort.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\hbdbsort.obj : $(RDD_DIR)\hbdbsort.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\dbnubs.obj : $(RDD_DIR)\dbnubs.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\dbstrux.c : $(RDD_DIR)\dbstrux.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RDD_OBJ_DIR)\dbstrux.obj : $(RDD_OBJ_DIR)\dbstrux.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\dbupdat.c : $(RDD_DIR)\dbupdat.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RDD_OBJ_DIR)\dbupdat.obj : $(RDD_OBJ_DIR)\dbupdat.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\sdf0.c : $(RDD_DIR)\sdf0.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RDD_OBJ_DIR)\sdf0.obj : $(RDD_OBJ_DIR)\sdf0.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\sdf1.obj : $(RDD_DIR)\sdf1.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\delim0.c : $(RDD_DIR)\delim0.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RDD_OBJ_DIR)\delim0.obj : $(RDD_OBJ_DIR)\delim0.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\delim1.obj : $(RDD_DIR)\delim1.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\rddord.c : $(RDD_DIR)\rddord.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RDD_OBJ_DIR)\rddord.obj : $(RDD_OBJ_DIR)\rddord.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 $(RDD_OBJ_DIR)\rddsys.c : $(RDD_DIR)\rddsys.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RDD_OBJ_DIR)\rddsys.obj : $(RDD_OBJ_DIR)\rddsys.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RDD_LIB) $(ARFLAGS) -+$@,,
 
 #
 # VM.LIB dependencies
@@ -1241,154 +1590,117 @@ $(RDD_OBJ_DIR)\rddsys.obj : $(RDD_OBJ_DIR)\rddsys.c
 
 $(VM_OBJ_DIR)\arrays.obj : $(VM_DIR)\arrays.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\arrayshb.obj : $(VM_DIR)\arrayshb.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\asort.obj : $(VM_DIR)\asort.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\break.obj : $(VM_DIR)\break.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\cmdarg.obj : $(VM_DIR)\cmdarg.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\codebloc.obj : $(VM_DIR)\codebloc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\debug.obj : $(VM_DIR)\debug.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\do.obj : $(VM_DIR)\do.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\dynlibhb.obj : $(VM_DIR)\dynlibhb.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\dynsym.obj : $(VM_DIR)\dynsym.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\errorapi.obj : $(VM_DIR)\errorapi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\eval.obj : $(VM_DIR)\eval.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\evalhb.obj : $(VM_DIR)\evalhb.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\estack.obj : $(VM_DIR)\estack.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\extend.obj : $(VM_DIR)\extend.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\garbage.obj : $(VM_DIR)\garbage.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\harbinit.c : $(VM_DIR)\harbinit.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(VM_OBJ_DIR)\harbinit.obj : $(VM_OBJ_DIR)\harbinit.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\hbi18n.obj : $(VM_DIR)\hbi18n.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\inet.obj : $(VM_DIR)\inet.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\initexit.obj : $(VM_DIR)\initexit.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\initsymb.obj : $(VM_DIR)\initsymb.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\itemapi.obj : $(VM_DIR)\itemapi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\fastitem.obj : $(VM_DIR)\fastitem.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\macro.obj : $(VM_DIR)\macro.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\maindll.obj : $(VM_DIR)\maindll.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\mainstd.obj : $(VM_DIR)\mainstd.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\mainwin.obj : $(VM_DIR)\mainwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\memvars.obj : $(VM_DIR)\memvars.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\memvclip.obj : $(VM_DIR)\memvclip.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\pcount.obj : $(VM_DIR)\pcount.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\proc.obj : $(VM_DIR)\proc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\pvalue.obj : $(VM_DIR)\pvalue.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\runner.obj : $(VM_DIR)\runner.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 $(VM_OBJ_DIR)\thread.obj : $(VM_DIR)\thread.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(VM_LIB) $(ARFLAGS) -+$@,,
 
 #
 # RTL.LIB dependencies
@@ -1396,957 +1708,765 @@ $(VM_OBJ_DIR)\thread.obj : $(VM_DIR)\thread.c
 
 $(RTL_OBJ_DIR)\abs.obj : $(RTL_DIR)\abs.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\accept.obj : $(RTL_DIR)\accept.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\achoice.c : $(RTL_DIR)\achoice.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\achoice.obj : $(RTL_OBJ_DIR)\achoice.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\adir.c : $(RTL_DIR)\adir.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\adir.obj : $(RTL_OBJ_DIR)\adir.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\alert.c : $(RTL_DIR)\alert.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\alert.obj : $(RTL_OBJ_DIR)\alert.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\ampm.obj : $(RTL_DIR)\ampm.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\arrayblk.c : $(RTL_DIR)\arrayblk.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\arrayblk.obj : $(RTL_OBJ_DIR)\arrayblk.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\at.obj : $(RTL_DIR)\at.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\binnum.obj : $(RTL_DIR)\binnum.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\binnumx.obj : $(RTL_DIR)\binnumx.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\box.obj : $(RTL_DIR)\box.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\browdb.c : $(RTL_DIR)\browdb.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\browdb.obj : $(RTL_OBJ_DIR)\browdb.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\browdbx.c : $(RTL_DIR)\browdbx.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\browdbx.obj : $(RTL_OBJ_DIR)\browdbx.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\browse.c : $(RTL_DIR)\browse.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\browse.obj : $(RTL_OBJ_DIR)\browse.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\cdpapi.obj : $(RTL_DIR)\cdpapi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\checkbox.c : $(RTL_DIR)\checkbox.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\checkbox.obj : $(RTL_OBJ_DIR)\checkbox.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\color53.c : $(RTL_DIR)\color53.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\color53.obj : $(RTL_OBJ_DIR)\color53.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\chrasc.obj : $(RTL_DIR)\chrasc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\colorind.obj : $(RTL_DIR)\colorind.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\console.obj : $(RTL_DIR)\console.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\copyfile.obj : $(RTL_DIR)\copyfile.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\cstr.c : $(RTL_DIR)\cstr.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\cstr.obj : $(RTL_OBJ_DIR)\cstr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\cstruct.c : $(RTL_DIR)\cstruct.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\cstruct.obj : $(RTL_OBJ_DIR)\cstruct.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\datec.obj : $(RTL_DIR)\datec.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\datehb.obj : $(RTL_DIR)\datehb.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\datesx.obj : $(RTL_DIR)\datesx.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\dbedit.c : $(RTL_DIR)\dbedit.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\dbedit.obj : $(RTL_OBJ_DIR)\dbedit.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\dbdelim.c : $(RTL_DIR)\dbdelim.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\dbdelim.obj : $(RTL_OBJ_DIR)\dbdelim.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\dbsdf.c : $(RTL_DIR)\dbsdf.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\dbsdf.obj : $(RTL_OBJ_DIR)\dbsdf.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\defpath.obj : $(RTL_DIR)\defpath.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\descend.obj : $(RTL_DIR)\descend.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\devoutp.c : $(RTL_DIR)\devoutp.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\devoutp.obj : $(RTL_OBJ_DIR)\devoutp.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\dirdrive.obj : $(RTL_DIR)\dirdrive.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\direct.obj : $(RTL_DIR)\direct.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\diskspac.obj : $(RTL_DIR)\diskspac.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\disksphb.obj : $(RTL_DIR)\disksphb.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\dircmd.c : $(RTL_DIR)\dircmd.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\dircmd.obj : $(RTL_OBJ_DIR)\dircmd.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\dummy.c : $(RTL_DIR)\dummy.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\dummy.obj : $(RTL_OBJ_DIR)\dummy.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\empty.obj : $(RTL_DIR)\empty.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\errorsys.c : $(RTL_DIR)\errorsys.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\errorsys.obj : $(RTL_OBJ_DIR)\errorsys.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\fieldbl.c : $(RTL_DIR)\fieldbl.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\fieldbl.obj : $(RTL_OBJ_DIR)\fieldbl.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\getlist.c : $(RTL_DIR)\getlist.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\getlist.obj : $(RTL_OBJ_DIR)\getlist.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\getsys.c : $(RTL_DIR)\getsys.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\getsys.obj : $(RTL_OBJ_DIR)\getsys.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\file.obj : $(RTL_DIR)\file.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\filehb.obj : $(RTL_DIR)\filehb.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\filesys.obj : $(RTL_DIR)\filesys.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\fkmax.obj : $(RTL_DIR)\fkmax.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\fnsplit.obj : $(RTL_DIR)\fnsplit.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\fssize.obj : $(RTL_DIR)\fssize.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\fstemp.obj : $(RTL_DIR)\fstemp.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\gete.obj : $(RTL_DIR)\gete.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\gt.obj : $(RTL_DIR)\gt.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\gtapi.obj : $(RTL_DIR)\gtapi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\gtapiu.obj : $(RTL_DIR)\gtapiu.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hardcr.obj : $(RTL_DIR)\hardcr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbbitfield.obj : $(RTL_DIR)\hbbitfield.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbcompress.obj : $(RTL_DIR)\hbcompress.c
    $(CC) $(CLIBFLAGS) -DZLIB_DLL;WIN32 -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbchecksum.obj : $(RTL_DIR)\hbchecksum.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbcrc32.obj : $(RTL_DIR)\hbcrc32.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbhextonum.obj : $(RTL_DIR)\hbhextonum.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbrandom.obj : $(RTL_DIR)\hbrandom.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbreadini.c : $(RTL_DIR)\hbreadini.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\hbreadini.obj : $(RTL_OBJ_DIR)\hbreadini.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbserial.c : $(RTL_DIR)\hbserial.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\hbserial.obj : $(RTL_OBJ_DIR)\hbserial.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbsrlraw.obj : $(RTL_DIR)\hbsrlraw.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\hbxml.obj : $(RTL_DIR)\hbxml.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\inkey.obj : $(RTL_DIR)\inkey.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\input.c : $(RTL_DIR)\input.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\input.obj : $(RTL_OBJ_DIR)\input.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\is.obj : $(RTL_DIR)\is.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\isprint.obj : $(RTL_DIR)\isprint.c
    $(CC) $(CLIBFLAGS)  -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\langapi.obj : $(RTL_DIR)\langapi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\left.obj : $(RTL_DIR)\left.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\len.obj : $(RTL_DIR)\len.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\lennum.obj : $(RTL_DIR)\lennum.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\listbox.c : $(RTL_DIR)\listbox.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\listbox.obj : $(RTL_OBJ_DIR)\listbox.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\math.obj : $(RTL_DIR)\math.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\maxrow.obj : $(RTL_DIR)\maxrow.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\minmax.obj : $(RTL_DIR)\minmax.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\memofile.obj : $(RTL_DIR)\memofile.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\memoline.obj : $(RTL_DIR)\memoline.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\memoedit.c : $(RTL_DIR)\memoedit.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\memoedit.obj : $(RTL_OBJ_DIR)\memoedit.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\memvarbl.c : $(RTL_DIR)\memvarbl.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\memvarbl.obj : $(RTL_OBJ_DIR)\memvarbl.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\menuto.c : $(RTL_DIR)\menuto.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\menuto.obj : $(RTL_OBJ_DIR)\menuto.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\mlcount.obj : $(RTL_DIR)\mlcount.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\mlpos.obj : $(RTL_DIR)\mlpos.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\mpostolc.obj : $(RTL_DIR)\mpostolc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\mlctopos.obj : $(RTL_DIR)\mlctopos.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\mod.obj : $(RTL_DIR)\mod.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\mouseapi.obj : $(RTL_DIR)\mouseapi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\mousex.obj : $(RTL_DIR)\mousex.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\mssgline.c : $(RTL_DIR)\mssgline.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\mssgline.obj : $(RTL_OBJ_DIR)\mssgline.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\mtran.obj : $(RTL_DIR)\mtran.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\natmsg.obj : $(RTL_DIR)\natmsg.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\net.obj : $(RTL_DIR)\net.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\objfunc.c : $(RTL_DIR)\objfunc.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\objfunc.obj : $(RTL_OBJ_DIR)\objfunc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\oemansi.obj : $(RTL_DIR)\oemansi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\oldbox.obj : $(RTL_DIR)\oldbox.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\oldclear.obj : $(RTL_DIR)\oldclear.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\pad.obj : $(RTL_DIR)\pad.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\padc.obj : $(RTL_DIR)\padc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\padl.obj : $(RTL_DIR)\padl.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\padr.obj : $(RTL_DIR)\padr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\philes.obj : $(RTL_DIR)\philes.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\philes53.obj : $(RTL_DIR)\philes53.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\philesx.obj : $(RTL_DIR)\philesx.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\perfuncs.c : $(RTL_DIR)\perfuncs.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\perfuncs.obj : $(RTL_OBJ_DIR)\perfuncs.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\persist.c : $(RTL_DIR)\persist.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\persist.obj : $(RTL_OBJ_DIR)\persist.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\profiler.c : $(RTL_DIR)\profiler.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\profiler.obj : $(RTL_OBJ_DIR)\profiler.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\pushbtn.c : $(RTL_DIR)\pushbtn.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\pushbtn.obj : $(RTL_OBJ_DIR)\pushbtn.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
-
 
 $(RTL_OBJ_DIR)\radiobtn.c : $(RTL_DIR)\radiobtn.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\radiobtn.obj : $(RTL_OBJ_DIR)\radiobtn.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\radiogrp.c : $(RTL_DIR)\radiogrp.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\radiogrp.obj : $(RTL_OBJ_DIR)\radiogrp.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
-
 
 $(RTL_OBJ_DIR)\rat.obj : $(RTL_DIR)\rat.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\readkey.c : $(RTL_DIR)\readkey.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\readkey.obj : $(RTL_OBJ_DIR)\readkey.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\readvar.c : $(RTL_DIR)\readvar.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\readvar.obj : $(RTL_OBJ_DIR)\readvar.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\regex.obj : $(RTL_DIR)\regex.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\replic.obj : $(RTL_DIR)\replic.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\right.obj : $(RTL_DIR)\right.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\round.obj : $(RTL_DIR)\round.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\run.obj : $(RTL_DIR)\run.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\samples.obj : $(RTL_DIR)\samples.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\saverest.obj : $(RTL_DIR)\saverest.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\scroll.obj : $(RTL_DIR)\scroll.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\scrollbr.c : $(RTL_DIR)\scrollbr.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\scrollbr.obj : $(RTL_OBJ_DIR)\scrollbr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\seconds.obj : $(RTL_DIR)\seconds.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\set.obj : $(RTL_DIR)\set.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\setcolor.obj : $(RTL_DIR)\setcolor.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\setcurs.obj : $(RTL_DIR)\setcurs.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\setfunc.c : $(RTL_DIR)\setfunc.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\setfunc.obj : $(RTL_OBJ_DIR)\setfunc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\setkey.obj : $(RTL_DIR)\setkey.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\setpos.obj : $(RTL_DIR)\setpos.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\setposbs.obj : $(RTL_DIR)\setposbs.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\setta.c : $(RTL_DIR)\setta.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\setta.obj : $(RTL_OBJ_DIR)\setta.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\shadow.obj : $(RTL_DIR)\shadow.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\soundex.obj : $(RTL_DIR)\soundex.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\space.obj : $(RTL_DIR)\space.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\spfiles.obj : $(RTL_DIR)\spfiles.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\str.obj : $(RTL_DIR)\str.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\strcase.obj : $(RTL_DIR)\strcase.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\strings.obj : $(RTL_DIR)\strings.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\strmatch.obj : $(RTL_DIR)\strmatch.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\strpeek.obj : $(RTL_DIR)\strpeek.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\strtran.obj : $(RTL_DIR)\strtran.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\strzero.obj : $(RTL_DIR)\strzero.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\stuff.obj : $(RTL_DIR)\stuff.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\substr.obj : $(RTL_DIR)\substr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\tbcolumn.c : $(RTL_DIR)\tbcolumn.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\tbcolumn.obj : $(RTL_OBJ_DIR)\tbcolumn.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\tbrowse.c : $(RTL_DIR)\tbrowse.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\tbrowse.obj : $(RTL_OBJ_DIR)\tbrowse.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\tclass.c : $(RTL_DIR)\tclass.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\tclass.obj : $(RTL_OBJ_DIR)\tclass.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\teditor.c : $(RTL_DIR)\teditor.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\teditor.obj : $(RTL_OBJ_DIR)\teditor.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\teditorl.obj : $(RTL_DIR)\teditorl.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\terror.c : $(RTL_DIR)\terror.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\terror.obj : $(RTL_OBJ_DIR)\terror.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\text.c : $(RTL_DIR)\text.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\text.obj : $(RTL_OBJ_DIR)\text.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\tget.c : $(RTL_DIR)\tget.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\tget.obj : $(RTL_OBJ_DIR)\tget.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\tgetint.c : $(RTL_DIR)\tgetint.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\tgetint.obj : $(RTL_OBJ_DIR)\tgetint.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\tgetlist.c : $(RTL_DIR)\tgetlist.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\tgetlist.obj : $(RTL_OBJ_DIR)\tgetlist.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\tlabel.c : $(RTL_DIR)\tlabel.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\tlabel.obj : $(RTL_OBJ_DIR)\tlabel.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\tmenuitm.c : $(RTL_DIR)\tmenuitm.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\tmenuitm.obj : $(RTL_OBJ_DIR)\tmenuitm.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\tobject.c : $(RTL_DIR)\tobject.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\tobject.obj : $(RTL_OBJ_DIR)\tobject.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\tone.obj : $(RTL_DIR)\tone.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\tpopup.c : $(RTL_DIR)\tpopup.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\tpopup.obj : $(RTL_OBJ_DIR)\tpopup.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\tprint.obj : $(RTL_DIR)\tprint.c
    $(CC) $(CLIBFLAGS)  -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\tprinter.obj : $(RTL_DIR)\tprinter.c
    $(CC) $(CLIBFLAGS)  -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\trace.obj : $(RTL_DIR)\trace.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\transfrm.obj : $(RTL_DIR)\transfrm.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\traceprg.c : $(RTL_DIR)\traceprg.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\traceprg.obj : $(RTL_OBJ_DIR)\traceprg.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\treport.c : $(RTL_DIR)\treport.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\treport.obj : $(RTL_OBJ_DIR)\treport.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
-
 
 $(RTL_OBJ_DIR)\ttable.c : $(RTL_DIR)\ttable.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\ttable.obj : $(RTL_OBJ_DIR)\ttable.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\trim.obj : $(RTL_DIR)\trim.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\ttextlin.c : $(RTL_DIR)\ttextlin.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\ttextlin.obj : $(RTL_OBJ_DIR)\ttextlin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\ttopbar.c : $(RTL_DIR)\ttopbar.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\ttopbar.obj : $(RTL_OBJ_DIR)\ttopbar.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\txml.c : $(RTL_DIR)\txml.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\txml.obj : $(RTL_OBJ_DIR)\txml.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\type.obj : $(RTL_DIR)\type.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\typefile.c : $(RTL_DIR)\typefile.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\typefile.obj : $(RTL_OBJ_DIR)\typefile.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\val.obj : $(RTL_DIR)\val.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\valtostr.obj : $(RTL_DIR)\valtostr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\valtype.obj : $(RTL_DIR)\valtype.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\version.obj : $(RTL_DIR)\version.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\wait.c : $(RTL_DIR)\wait.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\wait.obj : $(RTL_OBJ_DIR)\wait.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\win32ole.c : $(RTL_DIR)\win32ole.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\win32ole.obj : $(RTL_OBJ_DIR)\win32ole.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\word.obj : $(RTL_DIR)\word.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\xhelp.obj : $(RTL_DIR)\xhelp.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\xsavescr.obj : $(RTL_DIR)\xsavescr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\trpc.c : $(RTL_DIR)\trpc.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\trpc.obj : $(RTL_OBJ_DIR)\trpc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 $(RTL_OBJ_DIR)\trpccli.c : $(RTL_DIR)\trpccli.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\trpccli.obj : $(RTL_OBJ_DIR)\trpccli.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(RTL_LIB) $(ARFLAGS) -+$@,,
 
 #
 # LANG.LIB dependencies
@@ -2354,143 +2474,108 @@ $(RTL_OBJ_DIR)\trpccli.obj : $(RTL_OBJ_DIR)\trpccli.c
 
 $(OBJ_DIR)\msgca.obj : $(LANG_DIR)\msgca.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgcs852.obj : $(LANG_DIR)\msgcs852.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgcsiso.obj : $(LANG_DIR)\msgcsiso.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgcskam.obj : $(LANG_DIR)\msgcskam.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgcswin.obj : $(LANG_DIR)\msgcswin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgde.obj : $(LANG_DIR)\msgde.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgen.obj : $(LANG_DIR)\msgen.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgeo.obj : $(LANG_DIR)\msgeo.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msges.obj : $(LANG_DIR)\msges.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgeu.obj : $(LANG_DIR)\msgeu.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgfr.obj : $(LANG_DIR)\msgfr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msggl.obj : $(LANG_DIR)\msggl.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msghe862.obj : $(LANG_DIR)\msghe862.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msghewin.obj : $(LANG_DIR)\msghewin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msghr852.obj : $(LANG_DIR)\msghr852.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msghriso.obj : $(LANG_DIR)\msghriso.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msghu852.obj : $(LANG_DIR)\msghu852.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msghucwi.obj : $(LANG_DIR)\msghucwi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msghuwin.obj : $(LANG_DIR)\msghuwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgis850.obj : $(LANG_DIR)\msgis850.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgid.obj : $(LANG_DIR)\msgid.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgit.obj : $(LANG_DIR)\msgit.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgko.obj : $(LANG_DIR)\msgko.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgpl852.obj : $(LANG_DIR)\msgpl852.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgpliso.obj : $(LANG_DIR)\msgpliso.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgplmaz.obj : $(LANG_DIR)\msgplmaz.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgpt.obj : $(LANG_DIR)\msgpt.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgro.obj : $(LANG_DIR)\msgro.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgru866.obj : $(LANG_DIR)\msgru866.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgruwin.obj : $(LANG_DIR)\msgruwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgsr852.obj : $(LANG_DIR)\msgsr852.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgsrwin.obj : $(LANG_DIR)\msgsrwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgsriso.obj : $(LANG_DIR)\msgsriso.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgzhb5.obj : $(LANG_DIR)\msgzhb5.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\msgzhgb.obj : $(LANG_DIR)\msgzhgb.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(LANG_LIB) $(ARFLAGS) -+$@,,
 
 #
 # MACRO.LIB dependencies
@@ -2499,40 +2584,20 @@ $(OBJ_DIR)\msgzhgb.obj : $(LANG_DIR)\msgzhgb.c
 $(MACRO_OBJ_DIR)\macroy.c : $(MACRO_DIR)\macro.y
    bison -v -p hb_comp -d $** -o$@
 
-!if $(HB_LEX) == SIMPLEX
-   # Flex not needed in SimpLex build.
-!else
-$(OBJ_DIR)\macrol.c : $(MACRO_DIR)\macro.l
-   flex -Phb_comp -i -8 -o$@ $**
-!endif
-
 $(MACRO_OBJ_DIR)\macroy.obj : $(OBJ_DIR)\macroy.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(MACRO_LIB) $(ARFLAGS) -+$@,,
 
-!if $(HB_LEX) == SIMPLEX
 $(MACRO_OBJ_DIR)\macroslx.obj : $(MACRO_DIR)\macroslx.c
    $(CC) $(CLIBFLAGS) -I$(OBJ_DIR) -o$@ $**
-   tlib $(MACRO_LIB) $(ARFLAGS) -+$@,,
-!else
-$(MACRO_OBJ_DIR)\macrol.obj : $(OBJ_DIR)\macrol.c
-   -$(ECHO) > $(OBJ_DIR)\unistd.h
-   $(CC) $(CLIBFLAGS) -I$(OBJ_DIR) -o$@ $**
-   -$(DEL) $(OBJ_DIR)\unistd.h
-   tlib $(MACRO_LIB) $(ARFLAGS) -+$@,,
-!endif
 
 $(MACRO_OBJ_DIR)\macroa.obj : $(MACRO_DIR)\macroa.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(MACRO_LIB) $(ARFLAGS) -+$@,,
 
 $(MACRO_OBJ_DIR)\macrob.obj : $(MACRO_DIR)\macrob.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(MACRO_LIB) $(ARFLAGS) -+$@,,
 
 $(MACRO_OBJ_DIR)\macroc.obj : $(MACRO_DIR)\macroc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(MACRO_LIB) $(ARFLAGS) -+$@,,
 
 #
 # NULSYS.LIB dependencies
@@ -2543,7 +2608,6 @@ $(OBJ_DIR)\nulsys.c : $(RDD_DIR)\nulsys\nulsys.prg
 
 $(OBJ_DIR)\nulsys.obj : $(OBJ_DIR)\nulsys.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(NULSYS_LIB) $(ARFLAGS) -+$@,,
 
 #
 # DBFNTX.LIB dependencies
@@ -2554,11 +2618,9 @@ $(NTX_OBJ_DIR)\dbfntx0.c : $(RDD_DIR)\dbfntx\dbfntx0.prg
 
 $(NTX_OBJ_DIR)\dbfntx0.obj : $(OBJ_DIR)\dbfntx0.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(DBFNTX_LIB) $(ARFLAGS) -+$@,,
 
 $(NTX_OBJ_DIR)\dbfntx1.obj : $(RDD_DIR)\dbfntx\dbfntx1.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(DBFNTX_LIB) $(ARFLAGS) -+$@,,
 
 #
 # DBFCDX.LIB dependencies
@@ -2569,11 +2631,9 @@ $(CDX_OBJ_DIR)\dbfcdx0.c : $(RDD_DIR)\dbfcdx\dbfcdx0.prg
 
 $(CDX_OBJ_DIR)\dbfcdx0.obj : $(OBJ_DIR)\dbfcdx0.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(DBFCDX_LIB) $(ARFLAGS) -+$@,,
 
 $(CDX_OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(DBFCDX_LIB) $(ARFLAGS) -+$@,,
 
 #
 # DEBUG.LIB dependencies
@@ -2584,70 +2644,60 @@ $(OBJ_DIR)\dbgmenu.c : $(DEBUG_DIR)\dbgmenu.prg
 
 $(OBJ_DIR)\dbgmenu.obj : $(OBJ_DIR)\dbgmenu.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(DEBUG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\dbgtmenu.c : $(DEBUG_DIR)\dbgtmenu.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\dbgtmenu.obj : $(OBJ_DIR)\dbgtmenu.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(DEBUG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\dbgtmitm.c : $(DEBUG_DIR)\dbgtmitm.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\dbgtmitm.obj : $(OBJ_DIR)\dbgtmitm.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(DEBUG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\dbgtwin.c : $(DEBUG_DIR)\dbgtwin.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\dbgtwin.obj : $(OBJ_DIR)\dbgtwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(DEBUG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\debugger.c : $(DEBUG_DIR)\debugger.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\debugger.obj : $(OBJ_DIR)\debugger.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(DEBUG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\dbghelp.c : $(DEBUG_DIR)\dbghelp.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\dbghelp.obj : $(OBJ_DIR)\dbghelp.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(DEBUG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\tbrwtext.c : $(DEBUG_DIR)\tbrwtext.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\tbrwtext.obj : $(OBJ_DIR)\tbrwtext.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(DEBUG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\dbgtarr.c : $(DEBUG_DIR)\dbgtarr.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\dbgtarr.obj : $(OBJ_DIR)\dbgtarr.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(DEBUG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\dbgtobj.c : $(DEBUG_DIR)\dbgtobj.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\dbgtobj.obj : $(OBJ_DIR)\dbgtobj.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(DEBUG_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\dbgwa.c : $(DEBUG_DIR)\dbgwa.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\dbgwa.obj : $(OBJ_DIR)\dbgwa.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(DEBUG_LIB) $(ARFLAGS) -+$@,,
 
 #
 # GTCGI.LIB dependencies
@@ -2655,11 +2705,9 @@ $(OBJ_DIR)\dbgwa.obj : $(OBJ_DIR)\dbgwa.c
 
 $(OBJ_DIR)\gtcgi.obj : $(RTL_DIR)\gtcgi\gtcgi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(GTCGI_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\mousecgi.obj : $(RTL_DIR)\gtcgi\mousecgi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(GTCGI_LIB) $(ARFLAGS) -+$@,,
 
 #
 # GTDOS.LIB dependencies
@@ -2667,11 +2715,9 @@ $(OBJ_DIR)\mousecgi.obj : $(RTL_DIR)\gtcgi\mousecgi.c
 
 $(OBJ_DIR)\gtdos.obj : $(RTL_DIR)\gtdos\gtdos.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(GTDOS_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\mousedos.obj : $(RTL_DIR)\gtdos\mousedos.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(GTDOS_LIB) $(ARFLAGS) -+$@,,
 
 #
 # GTPCA.LIB dependencies
@@ -2679,11 +2725,9 @@ $(OBJ_DIR)\mousedos.obj : $(RTL_DIR)\gtdos\mousedos.c
 
 $(OBJ_DIR)\gtpca.obj : $(RTL_DIR)\gtpca\gtpca.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(GTPCA_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\mousepca.obj : $(RTL_DIR)\gtpca\mousepca.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(GTPCA_LIB) $(ARFLAGS) -+$@,,
 
 #
 # GTSTD.LIB dependencies
@@ -2691,11 +2735,9 @@ $(OBJ_DIR)\mousepca.obj : $(RTL_DIR)\gtpca\mousepca.c
 
 $(OBJ_DIR)\gtstd.obj : $(RTL_DIR)\gtstd\gtstd.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(GTSTD_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\mousestd.obj : $(RTL_DIR)\gtstd\mousestd.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(GTSTD_LIB) $(ARFLAGS) -+$@,,
 
 #
 # GTWIN.LIB dependencies
@@ -2703,11 +2745,9 @@ $(OBJ_DIR)\mousestd.obj : $(RTL_DIR)\gtstd\mousestd.c
 
 $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(GTWIN_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(GTWIN_LIB) $(ARFLAGS) -+$@,,
 
 #
 # CODEPAGE.LIB dependencies
@@ -2715,55 +2755,42 @@ $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
 
 $(OBJ_DIR)\cdpesdos.obj : $(CODEPAGE_DIR)\cdpesdos.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\cdpeswin.obj : $(CODEPAGE_DIR)\cdpeswin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\cdpgedos.obj : $(CODEPAGE_DIR)\cdpgedos.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\cdpgewin.obj : $(CODEPAGE_DIR)\cdpgewin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\cdppt850.obj : $(CODEPAGE_DIR)\cdppt850.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\cdpptiso.obj : $(CODEPAGE_DIR)\cdpptiso.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\cdppl852.obj : $(CODEPAGE_DIR)\cdppl852.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\cdppliso.obj : $(CODEPAGE_DIR)\cdppliso.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\cdpplmaz.obj : $(CODEPAGE_DIR)\cdpplmaz.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\cdpru866.obj : $(CODEPAGE_DIR)\cdpru866.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\cdpruwin.obj : $(CODEPAGE_DIR)\cdpruwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\cdpsrwin.obj : $(CODEPAGE_DIR)\cdpsrwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\cdprukoi.obj : $(CODEPAGE_DIR)\cdprukoi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(CODEPAGE_LIB) $(ARFLAGS) -+$@,,
 
 #
 # SAMPLES.LIB dependencies
@@ -2771,35 +2798,27 @@ $(OBJ_DIR)\cdprukoi.obj : $(CODEPAGE_DIR)\cdprukoi.c
 
 $(SAM_OBJ_DIR)\environ.obj : $(SAMPLES_DIR)\environ.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
-   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
 $(SAM_OBJ_DIR)\date.obj : $(SAMPLES_DIR)\date.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
-   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
 $(SAM_OBJ_DIR)\dbf.obj : $(SAMPLES_DIR)\dbf.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
-   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
 $(SAM_OBJ_DIR)\gauge.obj : $(SAMPLES_DIR)\gauge.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
-   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
 $(SAM_OBJ_DIR)\num.obj : $(SAMPLES_DIR)\num.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
-   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
 $(SAM_OBJ_DIR)\stack.obj : $(SAMPLES_DIR)\stack.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
-   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
 $(SAM_OBJ_DIR)\status.obj : $(SAMPLES_DIR)\status.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
-   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
 $(SAM_OBJ_DIR)\time.obj : $(SAMPLES_DIR)\time.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
-   tlib $(SAMPLES_LIB) $(ARFLAGS) -+$@,,
 
 #
 # HBODBC.lib dependencies
@@ -2807,16 +2826,12 @@ $(SAM_OBJ_DIR)\time.obj : $(SAMPLES_DIR)\time.c
 
 $(OBJ_DIR)\odbc.obj  : $(ODBC_DIR)\odbc.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
-   tlib $(ODBC_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\todbc.c   : $(ODBC_DIR)\todbc.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(OBJ_DIR)\todbc.obj : $(OBJ_DIR)\todbc.c
    $(CC) -c $(CLIBFLAGS) -o$@ $**
-   tlib $(ODBC_LIB) $(ARFLAGS) -+$@,,
-
-
 
 #
 # HBPP.EXE dependencies
@@ -3200,4 +3215,3 @@ $(OBJ_DIR)\prb_stak.obj : $(OBJ_DIR)\prb_stak.c
 
 $(OBJ_DIR)\hbmlang.obj : $(HBMAKE_DIR)\hbmlang.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1226 2003/07/08 06:14:47 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1227 2003/07/08 20:19:30 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-07-09 05:20 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * makefile.bc
+    Change the linking process of OBJ files in such a way so that now
+    TLIB.EXE is called only ONCE for making a library.
+
 2003-07-09 03:10 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
   * makefile.nt
   * makefile.vc
