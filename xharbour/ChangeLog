@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3439 2004/09/16 17:31:47 druzus Exp $
+ * $Id: ChangeLog,v 1.3440 2004/09/16 18:35:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-09-17 09:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * /source/rtl/set.c
+    - open_handle() - for HB_OS_WIN_32 legacy devices use hb_fsOpen() not hb_fsCreate()
+       ( recommended in Win32 SDK )
+  * /source/rtl/tprinter.c
+    - rename isLegacyDevice() -> hb_isLegacyDevice()
+    HB_FUNC( PRINTERPORTTONAME ) - now case insensitive comparison and 2nd parameter
+       to allow partial name match  i.e. PRINTERPORTTONAME( "lpt1", .T. ) matches "LPT1:"
+    formatted code
+  * /doc/en/print.txt
+    - added PRINTERPORTTONAME()
 
 2004-09-16 11:33 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/pp/ppcore.c

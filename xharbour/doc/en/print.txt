@@ -62,7 +62,7 @@
  *  $FILES$
  *      This function is part of Rtl library
  *  $SEEALSO$
- *      GETDEFAULTPRINTER(), PRINTFILERAW()
+ *      GETDEFAULTPRINTER(), PRINTFILERAW(), PRINTEREXISTS(), PRINTERPORTTONAME()
  *  $END$
  */
 
@@ -96,7 +96,7 @@
  *  $FILES$
  *      This function is part of Rtl library
  *  $SEEALSO$
- *      GETPRINTERS(), PRINTFILERAW()
+ *      GETPRINTERS(), PRINTFILERAW(), PRINTEREXISTS(), PRINTERPORTTONAME()
  *  $END$
  */
 
@@ -153,7 +153,7 @@
  *  $FILES$
  *      This function is part of Rtl library
  *  $SEEALSO$
- *      GETPRINTERS(), GETDEFAULTPRINTER()
+ *      GETPRINTERS(), GETDEFAULTPRINTER(), PRINTEREXISTS(), PRINTERPORTTONAME()
  *  $END$
  */
 
@@ -186,6 +186,43 @@
  *  $FILES$
  *      This function is part of Rtl library
  *  $SEEALSO$
- *      GETPRINTERS(), GETDEFAULTPRINTER(), ISPRINTER(), XISPRINTER()
+ *      GETPRINTERS(), GETDEFAULTPRINTER(), ISPRINTER(), XISPRINTER(), PRINTERPORTTONAME()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      PRINTERPORTTONAME()
+ *  $CATEGORY$
+ *      Printer
+ *  $ONELINER$
+ *      Get the name of the printer attached to the cPortName
+ *  $SYNTAX$
+ *      PRINTERPORTTONAME( <cPortName>, [ < lPartialMatch> ]) -> cPrinterName
+ *  $ARGUMENTS$
+ *      <cPortName> = is a valid Windows printer port e.g. LPT1, COM1
+ *      <lPartialMatch> = optional parameter matches lpt1 to LPT1: ( i.e. only the first LEN( cPortName ) are used to match
+ *  $RETURNS$
+ *      < cPrinterName > e.g. "HP LaserJet 1200 Series PCL". IF not found then an empty string is returned ""
+ *  $DESCRIPTION$
+ *      PRINTERPORTTONAME() is used to help port legacy Clipper applications to Windows
+ *  $EXAMPLES$
+ *      FUNCTION MAIN()
+           IF EMPTY( PRINTERPORTTONAME( "lpt1", .T. ) )
+              Alert( "No printer installed - cannot continue" )
+              QUIT
+           ENDIF
+           // .....
+ *      RETURN(NIL)
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is Xharbour extension
+ *  $PLATFORMS$
+ *      Windows
+ *  $FILES$
+ *      This function is part of Rtl library
+ *  $SEEALSO$
+ *      GETPRINTERS(), GETDEFAULTPRINTER(), ISPRINTER(), XISPRINTER(), PRINTEREXISTS()
  *  $END$
  */

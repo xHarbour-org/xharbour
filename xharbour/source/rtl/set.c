@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.53 2004/08/10 01:25:16 druzus Exp $
+ * $Id: set.c,v 1.54 2004/09/06 19:25:53 mlombardo Exp $
  */
 
 /*
@@ -82,6 +82,7 @@ static HB_PATHNAMES * sp_set_path;
       extern BOOL hb_PrinterExists(LPTSTR pPrinterName) ;
       extern LONG hb_PrintFileRaw(UCHAR *cPrinterName,UCHAR *cFileName, UCHAR *cDocName) ;
       extern BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
+      extern BOOL isLegacyDevice( LPTSTR pPrinterName);
 #endif
 char s_PrintFileName[ _POSIX_PATH_MAX + 1 ], s_PrinterName[ _POSIX_PATH_MAX + 1 ];
 BOOL s_HaveSetPrinterName ;
@@ -384,7 +385,18 @@ static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_s
          else bCreate = TRUE; /* Always create a new file for overwrite mode. */
 
          if( bCreate )
-            handle = hb_fsCreate( ( BYTE * ) szPrnFile, FC_NORMAL );
+         {
+#if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
+           if ( hb_isLegacyDevice( s_PrinterName ) )
+            {  // according to the Win SDK devices should be opened not created
+               handle = hb_fsOpen( ( BYTE * ) szPrnFile, FO_READWRITE );
+            }
+            else
+#endif
+            {
+               handle = hb_fsCreate( ( BYTE * ) szPrnFile, FC_NORMAL );
+            }
+         }
       }
 
       if( handle == FS_ERROR )
