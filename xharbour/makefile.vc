@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.61 2003/06/24 22:02:50 paultucker Exp $
+# $Id: makefile.vc,v 1.62 2003/06/24 22:06:43 paultucker Exp $
 #
 
 #
@@ -752,6 +752,7 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\eval.obj \
    $(OBJ_DIR)$(MT)\evalhb.obj \
    $(OBJ_DIR)$(MT)\extend.obj \
+   $(OBJ_DIR)$(MT)\fastitem.obj \
    $(OBJ_DIR)$(MT)\fm.obj \
    $(OBJ_DIR)$(MT)\garbage.obj \
    $(OBJ_DIR)$(MT)\hvm.obj \
@@ -760,7 +761,6 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\initexit.obj \
    $(OBJ_DIR)$(MT)\initsymb.obj \
    $(OBJ_DIR)$(MT)\itemapi.obj \
-   $(OBJ_DIR)$(MT)\fastitem.obj \
    $(OBJ_DIR)$(MT)\macro.obj \
    $(OBJ_DIR)$(MT)\maindll.obj \
    $(OBJ_DIR)$(MT)\mainstd.obj \
