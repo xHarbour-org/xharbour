@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.6 2002/09/29 00:53:13 horacioroldan Exp $
+ * $Id: hbusage.c,v 1.7 2003/01/15 04:37:53 andijahja Exp $
  */
 
 /*
@@ -174,6 +174,7 @@ void hb_compPrintCredits( void )
            "Tim Stone <timstone@mstrlink.com>\n"
            "Viktor Szakats <viktor.szakats@syenar.hu>\n"
            "Vladimir Kazimirchik <v_kazimirchik@yahoo.com>\n"
+           "Walter Negro <anegro@overnet.com.ar>\n"
            );
 }
 
