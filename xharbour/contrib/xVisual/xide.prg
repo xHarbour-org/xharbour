@@ -22,7 +22,7 @@ FUNCTION Main
             :AddPopup('popup 1')
 
             WITH OBJECT :Popup
-               :AddItem( 'item 100', 100, {||MessageBox(,'HI FROM THE MAIN CLASS')})
+               :AddItem( 'item 100', 100, {||MessageBox( GetActiveWindow(),'HI FROM THE MAIN CLASS')})
                :AddItem( 'item 101', 101)
                :AddItem( 'item 102', 102)
                :AddItem( 'item 103', 103)
@@ -31,7 +31,7 @@ FUNCTION Main
             :AddPopup('popup 2')
 
             WITH OBJECT :Popup
-               :AddItem( 'item 200', 200, {||oApp:MainFrame:Maximize(), oApp:CreateForm( 'SubForm1', SubForm1(),oApp:MainFrame ) } )
+               :AddItem( 'item 200', 200, {||oApp:CreateForm( 'SubForm1', SubForm1(),oApp:MainFrame ) } )
                :AddItem( 'item 201', 201)
                :AddItem( 'item 202', 202)
                :AddItem( 'item 203', 203, {||oApp:SubForm1:SetProcedure()} )
@@ -44,65 +44,52 @@ FUNCTION Main
       :Run()
   END
 
- #ifdef ZZ
-   oApp:CreateForm( 'MainFrame', MainFrame() )
-
-   oApp:MainFrame:SetBkBrush( COLOR_APPWORKSPACE+1 )
-
-   oApp:MainFrame:WindowMenu := TMenu():New()
-
-      oApp:MainFrame:WindowMenu:AddPopup( 'popup 1' )
-
-         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 100', 100, {||MessageBox(,'HI FROM THE MAIN CLASS')})
-         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 101', 101)
-         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 102', 102)
-         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 103', 103)
-
-      oApp:MainFrame:WindowMenu:AddPopup( 'popup 2' )
-
-         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 200', 200, {||oApp:MainFrame:Maximize(),;
-                                                                     oApp:CreateForm( 'SubForm1',SubForm1(),oApp:MainFrame ) } )
-         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 201', 201)
-         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 202', 202)
-         oApp:MainFrame:WindowMenu:Popup:AddItem( 'item 203', 203)
-
-      oApp:MainFrame:SetWindowMenu()
-
-   oApp:MainFrame:PostMessage( WM_COMMAND, 200 )
-   oApp:Run()
- #endif
-
-
 RETURN( nil)
 
 //-------------------------------------------------------------------------------------------
 
 CLASS MainFrame FROM TFrame
 
-   METHOD New( oParent )       INLINE ::Caption := 'Main Form from TForm',;
-                                      super:new( oParent )
+   METHOD New( oParent ) INLINE ::Caption := 'Main Form from TForm',;
+                                super:new( oParent )
 
-   METHOD OnClose()            INLINE MessageBox( ::handle, 'OnClose','Whoo'),;
-                                      PostQuitMessage(0)
+   METHOD OnClose()      INLINE MessageBox( ::handle, 'OnClose','Whoo'),;
+                                PostQuitMessage(0)
 
-   METHOD OnCommand( nwParam ) INLINE IF( nwParam == 103,;
-                                         MessageBox(, 'THIS IS FROM THE OnCommand MESSAGE' ),),0
-
+   METHOD OnCommand( nwParam, nlParam ) INLINE ::MainCommands( nwParam, nlParam )
+   METHOD MainCommands()
 ENDCLASS
+
+METHOD MainCommands( nwParam, nlParam ) CLASS MainFrame
+   local oForm
+   do case
+      case nwParam == 101
+           oForm:=SubForm1():New( self )
+           oForm:Caption := 'SubForm1 from TForm'
+           oForm:Create()
+   endcase
+return( 0 )
 
 //-------------------------------------------------------------------------------------------
 
 CLASS SubForm1 FROM TForm
 
-   METHOD New( oParent )       INLINE ::Caption := 'SubForm1 from TForm',;
-                                      super:new( oParent )
-
-   METHOD OnPaint( hDC )       INLINE DrawGrid( ::handle, hDC, 3 ),0
+   METHOD OnPaint( hDC ) INLINE DrawGrid( ::handle, hDC, 3 ),0
+   METHOD OnCreate()     INLINE ::CreateSub()  // careful handles OnCreate not OnCreation
+   METHOD CreateSub()
 
 ENDCLASS
 
+METHOD CreateSub() CLASS SubForm1
 
+   ::WindowMenu := TMenu():New()
 
+   ::WindowMenu:AddPopup( 'popup 1' )
+      ::WindowMenu:Popup:AddItem( 'item 100', 100, {||MessageBox( ::handle, 'HI FROM SUBFORM1')})
+      ::WindowMenu:Popup:AddItem( 'item 101', 101)
+   ::SetWindowMenu()
+
+return(0)
 
 
 
