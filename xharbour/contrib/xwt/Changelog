@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.40 2003/10/09 23:50:02 fsgiudice Exp $
+ * $Id: Changelog,v 1.41 2003/10/09 23:57:22 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-10 09:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.bc
+    * minor change to del command
+  * make_vc.bat
+    - gtk message
+  * makefile.nt
+  * makefile.vc
+    + src\xwt_win\*.*
 
 2003-10-10 02:00 UTC+0200 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * Rules.make
@@ -49,7 +58,6 @@
 
   * src/framewindow.prg
     ! Do not delete menus when there are no menus...
-
 
   + src/xwt_win/xwt_win_msgbox.c
     + Added MessageBox (skeleton)

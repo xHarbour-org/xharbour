@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.3 2003/09/25 14:24:52 paultucker Exp $
+# $Id: makefile.nt,v 1.4 2003/10/09 05:31:55 paultucker Exp $
 #
 
 #
@@ -98,7 +98,7 @@ OBJ_DIR      =obj\vc
 
 INCLUDE_DIR  =include
 SOURCE_DIR   =src
-XWT_DIR      =$(SOURCE_DIR)\xwt_mfc # ??
+XWT_DIR      =$(SOURCE_DIR)\xwt_win # ??
 
 #
 # C compiler definition and C flags. These should never have to change.
@@ -167,6 +167,7 @@ LIBLIST = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(SOURCE_DIR)}.prg{$(OBJ_DIR)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
 
 {$(SOURCE_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
@@ -177,6 +178,9 @@ LIBLIST = \
 XWT_LIB_OBJS = \
    $(OBJ_DIR)\xwt_api.obj \
    \
+   $(OBJ_DIR)\xwt_win.obj \
+   $(OBJ_DIR)\xwt_win_framewnd.obj \
+   $(OBJ_DIR)\xwt_win_msgbox.obj \
    \
    $(OBJ_DIR)\button.obj \
    $(OBJ_DIR)\checkbox.obj \
@@ -205,6 +209,8 @@ XWT_LIB_OBJS = \
    $(OBJ_DIR)\viewport.obj \
    $(OBJ_DIR)\widget.obj \
    $(OBJ_DIR)\window.obj
+
+
 
 #
 # Our default target

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_framewnd.c,v 1.5 2003/07/23 15:58:10 lculik Exp $
+   $Id: xwt_win_framewnd.c,v 1.1 2003/10/09 23:18:34 jonnymind Exp $
 
    MS-Windows interface - Frame window
 */
@@ -48,7 +48,7 @@ LRESULT CALLBACK xwt_gtk_framewndproc(
 
 BOOL xwt_win_createFrameWindow( PXWT_WIDGET xwtData )
 {
-   PXWT_WIN_DATA data;
+//   PXWT_WIN_DATA data;
    HWND hWnd;
    
    /* Create the window */
@@ -62,7 +62,7 @@ BOOL xwt_win_createFrameWindow( PXWT_WIDGET xwtData )
     0,
     NULL,   // no parent
     NULL, // no menu
-    hb_hInstance,
+    (HINSTANCE) hb_hInstance,
     NULL // no win parameter
    );
 

@@ -4,7 +4,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.23 2003/09/04 20:26:24 xthefull Exp $
+   $Id: xwt_win.c,v 1.1 2003/10/09 23:18:34 jonnymind Exp $
 
    Global declarations, common functions
 
@@ -202,12 +202,12 @@ BOOL xwt_drv_init( int argc, char **argv )
         wc.lpfnWndProc = (WNDPROC) xwt_gtk_framewndproc; 
         wc.cbClsExtra = 0; 
         wc.cbWndExtra = 0; 
-        wc.hInstance = hb_hInstance; 
+        wc.hInstance = (HINSTANCE) hb_hInstance; 
         /* TODO: manage XWT application icons */
         wc.hIcon = LoadIcon((HINSTANCE) NULL, IDI_APPLICATION); 
         
         wc.hCursor = LoadCursor((HINSTANCE) NULL, IDC_ARROW); 
-        wc.hbrBackground = GetStockObject(WHITE_BRUSH); 
+        wc.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH); 
         wc.lpszMenuName =  NULL; 
         wc.lpszClassName = XWT_WIN_FRMCLSNAME; 
  

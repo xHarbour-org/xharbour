@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.47 2003/10/09 05:31:53 paultucker Exp $
+# $Id: makefile.nt,v 1.48 2003/10/09 20:45:54 paultucker Exp $
 #
 
 #
@@ -326,6 +326,7 @@ LIBS2 = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 {$(RTL_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
 {$(RTL_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
@@ -617,6 +618,7 @@ MACRO_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 {$(RDD_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
 {$(RDD_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
@@ -651,6 +653,7 @@ RDD_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(RDD_DIR)\nulsys}.prg{$(OBJ_DIR)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
 {$(RDD_DIR)\nulsys}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
@@ -667,6 +670,7 @@ NULSYS_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 {$(RDD_DIR)\dbfntx}.prg{$(OBJ_DIR)$(MT)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
 {$(RDD_DIR)\dbfntx}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
@@ -685,6 +689,7 @@ DBFNTX_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 {$(RDD_DIR)\dbfcdx}.prg{$(OBJ_DIR)$(MT)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
 {$(RDD_DIR)\dbfcdx}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
@@ -703,6 +708,7 @@ DBFCDX_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 {$(RDD_DIR)\dbfdbt}.prg{$(OBJ_DIR)$(MT)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
 {$(RDD_DIR)\dbfdbt}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
@@ -753,6 +759,7 @@ PP_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(DEBUG_DIR)}.prg{$(OBJ_DIR)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
 {$(DEBUG_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
@@ -798,6 +805,7 @@ COMMON_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -DHB_FM_STATISTICS_OFF -DHB_NO_PROFILER -Fo$(OBJ_DIR)$(MT)\OPT\CONSOLE\ $<
 
 {$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
 {$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\OPT\CONSOLE\ $<
@@ -816,6 +824,7 @@ VM_LIB_OPT_CON_OBJS = \
    $(CC) $(CLIBFLAGS) -DHB_FM_STATISTICS_OFF -DHB_NO_PROFILER -DHB_GUI -Fo$(OBJ_DIR)$(MT)\OPT\GUI\ $<
 
 {$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\GUI}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
 {$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\GUI}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\OPT\GUI\ $<
@@ -834,6 +843,7 @@ VM_LIB_OPT_GUI_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 {$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
 {$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
@@ -967,6 +977,7 @@ SAMPLES_LIB_OBJS =  \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 {$(ODBC_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
 {$(ODBC_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<

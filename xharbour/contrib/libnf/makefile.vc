@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.1 2003/10/08 14:03:56 lculik Exp $
+# $Id: makefile.vc,v 1.2 2003/10/09 05:31:55 paultucker Exp $
 #
 
 #
@@ -114,6 +114,7 @@ LIBLIST = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(TOOLS_DIR)}.prg{$(OBJ_DIR)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
 
 {$(TOOLS_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<

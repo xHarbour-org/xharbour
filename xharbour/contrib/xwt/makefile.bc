@@ -1,5 +1,5 @@
 
-# $Id: makefile.bc,v 1.5 2003/09/25 17:42:43 paultucker Exp $
+# $Id: makefile.bc,v 1.6 2003/10/09 23:18:32 jonnymind Exp $
 #
 
 #
@@ -174,10 +174,10 @@ all: \
    $(XWT_LIB)
 
 CLEAN:
-   -@if exist $(XWT_LIB) del $(XWT_LIB)
-   -@if exist obj\b32\*.obj del obj\b32\*.obj > nul
-   -@if exist obj\b32\*.c   del obj\b32\*.c > nul
-   -@if exist obj\b32\*.h   del obj\b32\*.h > nul
+   -@if exist $(XWT_LIB) $(DEL) $(XWT_LIB)
+   -@if exist obj\b32\*.obj $(DEL) obj\b32\*.obj > nul
+   -@if exist obj\b32\*.c   $(DEL) obj\b32\*.c > nul
+   -@if exist obj\b32\*.h   $(DEL) obj\b32\*.h > nul
 
 #
 # Library dependencies and build rules

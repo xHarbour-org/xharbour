@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.8 2003/09/23 21:23:56 paultucker Exp $
+# $Id: makefile.vc,v 1.9 2003/10/09 05:31:55 paultucker Exp $
 #
 
 # File:     makefile.vc
@@ -65,6 +65,7 @@ LIBLIST  = $(WHAT32LIB)
    $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(SRCDIR)}.prg{$(OBJ_DIR)}.c:
+   $(hbc) $(hbcflags) -o$(OBJ_DIR)\ $<
 
 {$(SRCDIR)}.prg{$(OBJ_DIR)}.obj:
    $(hbc) $(hbcflags) -o$(OBJ_DIR)\ $<

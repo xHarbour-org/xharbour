@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.5 2003/09/23 21:23:55 paultucker Exp $
+# $Id: makefile.vc,v 1.6 2003/10/09 05:31:55 paultucker Exp $
 #
 
 # File:     makefile.vc
@@ -66,6 +66,7 @@ LIBLIST  = $(WOOPGUILIB) $(WAPILIB) $(WOOPGUIRES)
    $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)\ $<
 
 {$(SRCDIR)}.prg{$(OBJ_DIR)}.c:
+   $(hbc) $(hbcflags) -o$(OBJ_DIR)\ $<
 
 {$(SRCDIR)}.prg{$(OBJ_DIR)}.obj:
    $(hbc) $(hbcflags) -o$(OBJ_DIR)\ $<

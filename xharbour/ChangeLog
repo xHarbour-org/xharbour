@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1578 2003/10/10 06:40:55 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1579 2003/10/10 13:14:40 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-10 08:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.vc
+  * makefile.nt
+  * contrib/htmllib/makefile.vc
+  * contrib/internet/makefile.vc
+  * contrib/libct/makefile.vc
+  * contrib/libmisc/makefile.vc
+  * contrib/libnf/makefile.vc
+  * contrib/mysql/makefile.vc
+  * contrib/tip/makefile.vc
+  * contrib/what32/makefile.nt
+  * contrib/what32/makefile.vc
+  * contrib/whoo/makefile.nt
+  * contrib/whoo/makefile.vc
+  * contrib/woopgui/makefile.nt
+  * contrib/woopgui/makefile.vc
+  * contrib/xwt/makefile.nt
+  * contrib/xwt/makefile.vc
+    * obj to prg dependance improved (really, I mean it...)
+  * contrib/xwt/makefile.nt
+  * contrib/xwt/makefile.vc
+    + src/xwt_win/xwt_win.c
+    + src/xwt_win/xwt_win_framewnd.c
+    + src/xwt_win/xwt_win_msgbox.c
+  * contrib/xwt/makefile.bc
+    * minor change to del command
+  * contrib/xwt/make_vc.bat
+    - gtk message
 
 2003-10-09 10:10 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * utils/hbmake/hbmake.prg
