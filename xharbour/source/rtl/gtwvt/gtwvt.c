@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.37 2004/01/10 17:11:38 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.38 2004/01/11 14:03:39 andijahja Exp $
  */
 
 /*
@@ -241,7 +241,7 @@ void HB_GT_FUNC( gt_Exit( void ) )
       DeleteObject( _s.penDarkGray );
       DeleteObject( _s.currentPen );
       DeleteObject( _s.currentBrush );
-      
+
       ReleaseDC( _s.hWnd, _s.hdc );
 
       DestroyWindow( _s.hWnd );
@@ -1343,18 +1343,18 @@ void HB_GT_FUNC( mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int
 static void hb_wvt_gtCreateObjects( void )
 {
    LOGBRUSH lb;
-      
+
    _s.penWhite     = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 255,255,255 ) );
    _s.penBlack     = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );
    _s.penWhiteDim  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 205,205,205 ) );
    _s.penDarkGray  = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB( 150,150,150 ) );
-   
-   _s.currentPen   = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );   
-   
+
+   _s.currentPen   = CreatePen( PS_SOLID, 0, ( COLORREF ) RGB(   0,  0,  0 ) );
+
    lb.lbStyle      = BS_NULL;
    lb.lbColor      = RGB( 198,198,198 );
    lb.lbHatch      = NULL;
-   
+
    _s.currentBrush = CreateBrushIndirect( &lb );
 }
 
@@ -1507,7 +1507,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
   static BOOL bIgnoreWM_SYSCHAR = FALSE ;
   static BOOL bPaint     = FALSE;
   static BOOL bGetFocus  = FALSE;
-    
+
   BOOL        bRet;
 
   switch ( message )
@@ -1634,7 +1634,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
   nSetFocus++;
 #endif
       hb_wvt_gtCreateCaret() ;
-      
+
       if ( bGetFocus )
       {
         if ( _s.pSymWVT_SETFOCUS )
@@ -1659,7 +1659,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
   nKillFocus++;
 #endif
       hb_wvt_gtKillCaret();
-      
+
       if ( _s.pSymWVT_KILLFOCUS )
       {
         hb_vmPushSymbol( _s.pSymWVT_KILLFOCUS->pSymbol );
@@ -1670,7 +1670,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       }
       return( 0 );
     }
-    
+
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
     {
@@ -1762,6 +1762,10 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
           if ( bCtrl && iScanCode == 76 ) // CTRL_VK_NUMPAD5 )
           {
             hb_wvt_gtAddCharToInputQueue( KP_CTRL_5 );
+          }
+          else if ( bCtrl && wParam == VK_TAB ) // K_CTRL_TAB
+          {
+            hb_wvt_gtAddCharToInputQueue( K_CTRL_TAB );
           }
           else if ( iScanCode == 70 ) // Ctrl_Break key
           {
@@ -2231,7 +2235,7 @@ static void hb_wvt_gtCreateCaret()
 }
 
 //-------------------------------------------------------------------//
- 
+
 static void hb_wvt_gtKillCaret()
 {
    if ( _s.CaretExist )
@@ -2577,7 +2581,7 @@ static void gt_hbInitStatics( void )
   _s.EnableShortCuts  = FALSE;
   _s.pSymWVT_PAINT    = hb_dynsymFind( "WVT_PAINT" ) ;
   _s.pSymWVT_SETFOCUS = hb_dynsymFind( "WVT_SETFOCUS" ) ;
-  _s.pSymWVT_KILLFOCUS= hb_dynsymFind( "WVT_KILLFOCUS" ) ;  
+  _s.pSymWVT_KILLFOCUS= hb_dynsymFind( "WVT_KILLFOCUS" ) ;
 }
 
 //-------------------------------------------------------------------//
@@ -3384,7 +3388,7 @@ HB_FUNC( WVT_DRAWBOXRECESSED )
    LineTo( _s.hdc, iRight, iBottom );
 
    SelectObject( _s.hdc, _s.penWhite );
-   
+
    MoveToEx( _s.hdc, iRight+1, iTop-1, NULL );        // Right Outer
    LineTo( _s.hdc, iRight + 1, iBottom + 1 );
 
@@ -3625,9 +3629,9 @@ HB_FUNC( WVT_DRAWLINE )
    iRight  = xy.x-1;
 
    iOffset = ( ( iBottom - iTop + 1 ) / 2 ) ;
-   
+
    iTop    = iTop + iOffset;
-   
+
    SelectObject( _s.hdc, _s.penWhite );
 
    MoveToEx( _s.hdc, iLeft, iTop, NULL );         //  Top
@@ -3658,7 +3662,7 @@ HB_FUNC( WVT_DRAWELLIPSE )
 
    SelectObject( _s.hdc, _s.currentBrush );
    SelectObject( _s.hdc, _s.currentPen );
-   
+
    hb_retl( Ellipse( _s.hdc, iLeft, iTop, iRight, iBottom ) );
 }
 
@@ -3679,7 +3683,7 @@ HB_FUNC( WVT_DRAWRECTANGLE )
 
    SelectObject( _s.hdc, _s.currentBrush );
    SelectObject( _s.hdc, _s.currentPen );
-   
+
    hb_retl( Rectangle( _s.hdc, iLeft, iTop, iRight, iBottom ) );
 }
 
@@ -3703,7 +3707,7 @@ HB_FUNC( WVT_DRAWROUNDRECT )
 
    SelectObject( _s.hdc, _s.currentBrush );
    SelectObject( _s.hdc, _s.currentPen );
-   
+
    hb_retl( RoundRect( _s.hdc, iLeft, iTop, iRight, iBottom, iWd, iHt ) );
 }
 
@@ -3716,16 +3720,16 @@ HB_FUNC( WVT_SETPEN )
    int      iPenWidth, iPenStyle;
    COLORREF crColor;
    HPEN     hPen;
-   
+
    if ( ISNIL( 1 ) )
    {
       hb_retl( FALSE );
    }
 
-   iPenStyle = hb_parni( 1 ) ;   
+   iPenStyle = hb_parni( 1 ) ;
    iPenWidth = ISNIL( 2 ) ? 0 : hb_parni( 2 );
    crColor   = ISNIL( 3 ) ? RGB( 0,0,0 ) : ( COLORREF ) hb_parnl( 3 );
-   
+
    hPen      = CreatePen( iPenStyle, iPenWidth, crColor );
 
    if ( hPen )
@@ -3752,18 +3756,18 @@ HB_FUNC( WVT_SETBRUSH )
 {
    HBRUSH   hBrush;
 	LOGBRUSH lb;
-	
+
    if ( ISNIL( 1 ) )
    {
       hb_retl( FALSE );
    }
-   
+
    lb.lbStyle = hb_parnl( 1 );
    lb.lbColor = ISNIL( 2 ) ? RGB( 0,0,0 ) : ( COLORREF ) hb_parnl( 2 ) ;
    lb.lbHatch = ISNIL( 3 ) ? NULL : hb_parnl( 3 );
-   
+
    hBrush     = CreateBrushIndirect( &lb );
-   
+
    if ( hBrush )
    {
       if ( _s.currentBrush )
@@ -3771,7 +3775,7 @@ HB_FUNC( WVT_SETBRUSH )
          DeleteObject( _s.currentBrush );
       }
       _s.currentBrush = hBrush;
-      
+
       hb_retl( TRUE );
    }
    else

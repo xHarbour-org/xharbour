@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2036 2004/01/11 17:59:32 paultucker Exp $
+ * $Id: ChangeLog,v 1.2037 2004/01/11 20:36:13 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-12 10:24 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+    + Handle K_CTRL_TAB
+
 2004-01-12 09:35 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/persist.prg
    + ::LoadFromText() - fix to work with Version 1 saved data
