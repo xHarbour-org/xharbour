@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.37 2003/09/16 15:51:13 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.38 2003/10/04 02:49:32 ronpinkas Exp $
  */
 
 /*
@@ -552,11 +552,12 @@ LANGUAGE_RULES_ARE {
       } \
       else \
       { \
-         char *sClose; \
+         char *sClose, cTermLen; \
          \
          if( sStart[1] == '\0' ) \
          { \
             sClose = strchr( szBuffer, sTerm[0] ); \
+            cTermLen = 1; \
          } \
          else \
          { \
@@ -566,6 +567,11 @@ LANGUAGE_RULES_ARE {
             { \
                szBuffer--; iSize++; \
                sClose = strchr( szBuffer, ']' ); \
+               cTermLen = 1; \
+            } \
+            else \
+            { \
+               cTermLen = 2; \
             } \
          } \
          \
@@ -575,7 +581,7 @@ LANGUAGE_RULES_ARE {
             \
             strncpy( sPair, szBuffer, sClose - szBuffer ); \
             sPair[ sClose - szBuffer ] = '\0'; \
-            s_szBuffer = sClose + strlen( sTerm ); \
+            s_szBuffer = sClose + cTermLen; \
             iSize -= s_szBuffer - szBuffer; \
             yylval.string = hb_compIdentifierNew( sPair, TRUE ); \
             \
