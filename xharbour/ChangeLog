@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1143 2003/06/19 18:29:43 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1144 2003/06/19 19:09:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-06-20 03:40 UTC+0700 Andi Jahja <andijahja@harbour-id.net>
+  * source/vm/hvm.c
+  * source/vm/classes.c
+    ! Reverse back profiler feature to be enabled by default.
 
 2003-06-19 12:08 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/win32ole.prg
