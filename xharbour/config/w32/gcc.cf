@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.5 2003/01/10 22:17:57 jonnymind Exp $
+# $Id: gcc.cf,v 1.6 2003/01/10 22:41:52 jonnymind Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -19,8 +19,17 @@ else
 CFLAGS = -Wall
 endif
 
-ifeq ($(HB_MT),MT)
-CFLAGS += -DHB_THREAD_SUPPORT
+ifeq ($(HB_LIBCOMP_MT),)
+#always add thread support if not compiling a lib and using vmmt
+ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+CFLAGS+= -DHB_THREAD_SUPPORT
+endif
+else
+#Add thread support to lib compilation only if compiling a _mt lib
+ifeq ($(HB_LIBCOMP_MT),YES)
+CFLAGS+= -DHB_THREAD_SUPPORT
+HB_MT_FLAGS = -DHB_THREAD_SUPPORT
+endif
 endif
 
 LD = gcc

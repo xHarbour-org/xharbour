@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.6 2003/01/12 22:50:18 jonnymind Exp $
+# $Id: mingw32.cf,v 1.7 2003/02/12 11:23:30 jonnymind Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -28,8 +28,10 @@ else
 #Add thread support to lib compilation only if compiling a _mt lib
 ifeq ($(HB_LIBCOMP_MT),YES)
 CFLAGS+= -DHB_THREAD_SUPPORT
+HB_MT_FLAGS = -DHB_THREAD_SUPPORT
 endif
 endif
+
 
 LD = gcc
 LD_OUT = -o

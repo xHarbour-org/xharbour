@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.9 2003/02/12 11:23:30 jonnymind Exp $
+# $Id: gcc.cf,v 1.10 2003/02/22 05:54:56 jonnymind Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -32,6 +32,7 @@ else
 #Add thread support to lib compilation only if compiling a _mt lib
 ifeq ($(HB_LIBCOMP_MT),YES)
 CFLAGS+= -DHB_THREAD_SUPPORT
+HB_MT_FLAGS = -DHB_THREAD_SUPPORT
 endif
 endif
 

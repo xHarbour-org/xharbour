@@ -1,5 +1,5 @@
 #
-# $Id: rules.cf,v 1.3 2002/12/15 23:44:48 lculik Exp $
+# $Id: rules.cf,v 1.4 2002/12/16 06:02:46 ronpinkas Exp $
 #
 
 # How to run yacc.
@@ -20,7 +20,7 @@ HB := $(HB_BIN_COMPILE)/
 endif
 HB := $(HB)harbour$(EXE_EXT)
 
-HB_FLAGS = -n -q0 -w -es2 -gc0 -I$(TOP) -I$(HB_INC_COMPILE)
+HB_FLAGS = -n -q0 -w -es2 -gc0 -I$(TOP) -I$(HB_INC_COMPILE) $(HB_MT_FLAGS)
 
 # The rule to link an executable.
 ifeq ($(LD_RULE),)
