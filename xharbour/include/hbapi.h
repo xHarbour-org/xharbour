@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.112 2004/01/21 13:37:59 walito Exp $
+ * $Id: hbapi.h,v 1.113 2004/01/27 03:06:58 ronpinkas Exp $
  */
 
 /*
@@ -329,10 +329,10 @@ extern void  HB_EXPORT  hb_storl( int iLogical, int iParam, ... ); /* stores a l
 extern void  HB_EXPORT  hb_storni( int iValue, int iParam, ... ); /* stores an integer on a variable by reference */
 extern void  HB_EXPORT  hb_stornl( long lValue, int iParam, ... ); /* stores a long on a variable by reference */
 extern void  HB_EXPORT  hb_stornd( double dValue, int iParam, ... ); /* stores a double on a variable by reference */
-
 #ifndef HB_LONG_LONG_OFF
 extern void  HB_EXPORT  hb_stornll( LONGLONG llValue, int iParam, ... ); /* stores a long long int on a variable by reference */
 #endif
+
 extern void    HB_EXPORT hb_xinit( void );                         /* Initialize fixed memory subsystem */
 extern void    HB_EXPORT hb_xexit( void );                         /* Deinitialize fixed memory subsystem */
 extern void    HB_EXPORT * hb_xalloc( ULONG ulSize );                /* allocates memory, returns NULL on failure */
@@ -425,7 +425,7 @@ extern double   HB_EXPORT hb_strVal( const char * szText, ... ); /* return the n
 extern char     HB_EXPORT * hb_strLTrim( const char * szText, ULONG * ulLen ); /* return a pointer to the first non-white space character */
 extern ULONG    HB_EXPORT hb_strRTrimLen( const char * szText, ULONG ulLen, BOOL bAnySpace ); /* return length of a string, ignoring trailing white space (or true spaces) */
 
-extern double   HB_EXPORT hb_numRound( double dResult, int iDec ); /* round a number to a specific number of digits */
+extern double   HB_EXPORT hb_numRound( double dResult, int iDec, int iDecR ); /* round a number to a specific number of digits */
 
 
 /* class management */

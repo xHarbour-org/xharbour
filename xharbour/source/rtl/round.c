@@ -73,12 +73,36 @@ HB_FUNC( INT )
 
    if( pNumber )
    {
-      double dNumber = hb_itemGetND( pNumber );
       int iWidth;
+      double dNumber = hb_itemGetND( pNumber );
 
       hb_itemGetNLen( pNumber, &iWidth, NULL );
 
-      hb_retndlen( dNumber >= 0 ? floor( dNumber ) : ceil( dNumber ), iWidth, 0 );
+      dNumber = (dNumber >= 0 ? floor( dNumber ) : ceil( dNumber ));
+
+#ifndef HB_LONG_LONG_OFF
+      if( (double) LONGLONG_MIN <= dNumber && dNumber <= (double) LONGLONG_MAX )
+      {
+         PHB_ITEM pNumber = hb_itemNew( NULL );
+
+         hb_itemPutNIntLen( pNumber, (LONGLONG) dNumber, iWidth );
+
+         hb_itemRelease( hb_itemReturn( pNumber ) );
+      }
+#else
+      if( (double) LONG_MIN <= dNumber && dNumber <= (double) LONG_MAX )
+      {
+         PHB_ITEM pNumber = hb_itemNew( NULL );
+
+         hb_itemPutNIntLen( pNumber, (LONG) dNumber, iWidth );
+
+         hb_itemRelease( hb_itemReturn( pNumber ) );
+      }
+#endif
+      else
+      {
+         hb_retndlen( dNumber, iWidth, 0 );
+      }
    }
    else
    {
@@ -86,28 +110,39 @@ HB_FUNC( INT )
    }
 }
 
-double hb_numRound( double dResult, int iDec )
+double hb_numRound( double dNum, int iDec, int iDecR )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_numRound(%lf, %d)", dResult, iDec));
+   double dResult = 0.0;
+   double dFine;
 
-   if( dResult != 0.0 )
+   HB_TRACE(HB_TR_DEBUG, ("hb_numRound(%lf, %d, %d)", dNum, iDec, iDecR));
+
+   if( dNum != 0.0 )
    {
-      if( iDec == 0 )
+      double dAdjust;
+
+      dResult = modf( dNum, &dNum );
+
+/*
+      if( iDec < iDecR )
       {
+         dAdjust = pow10( HB_MAX( iDec + 3, iDecR ) );
+
          if( dResult < 0.0 )
-         {
-            dResult = ceil( dResult - 0.5 );
-            if ( dResult == -0 )
-               dResult = 0;
-         }
+            dResult = ceil( (( dResult * dAdjust ) - 5.0 ) / 10.0 );
          else
-         {
-            dResult = floor( dResult + 0.5 );
-         }
+            dResult = floor( (( dResult * dAdjust ) + 5.0 ) / 10.0 );
+
+         dAdjust /= 10.0;
+         dResult /= dAdjust;
       }
-      else if( iDec < 0 )
+
+*/
+
+/*
+      if( iDec < 0 )
       {
-         double dAdjust = pow( 10, -iDec );
+         double dAdjust = pow10( -iDec );
 
          if( dResult < 0.0 )
             dResult = ceil( ( dResult / dAdjust ) - 0.5 );
@@ -117,19 +152,23 @@ double hb_numRound( double dResult, int iDec )
          dResult *= dAdjust;
       }
       else
+*/
       {
-         double dAdjust = pow( 10, iDec );
+         dAdjust = pow10( iDec + 1 );
+         dFine   = pow10( -( iDecR - iDec + 4 ) );
+
 
          if( dResult < 0.0 )
-            dResult = ceil( ( dResult * dAdjust ) - 0.5 );
+            dResult = ceil( (( dResult * dAdjust ) - ( 5.0 + dFine ) ) / 10.0 );
          else
-            dResult = floor( ( dResult * dAdjust ) + 0.5 );
+            dResult = floor( (( dResult * dAdjust ) + ( 5.0 + dFine ) ) / 10.0 );
 
+         dAdjust /= 10.0;
          dResult /= dAdjust;
       }
    }
 
-   return dResult;
+   return dNum + dResult;
 }
 
 HB_FUNC( ROUND )
@@ -139,8 +178,43 @@ HB_FUNC( ROUND )
    {
       int iDec = hb_parni( 2 );
 
-      hb_retndlen( hb_numRound( hb_parnd( 1 ), iDec ), 0, HB_MAX( iDec, 0 ) );
+      if( iDec >= 0 )
+      {
+         int iLen, iDecR;
+         hb_itemGetNLen( hb_param( 1, HB_IT_NUMERIC ), &iLen, &iDecR );
+
+         hb_retndlen( hb_numRound( hb_parnd( 1 ), iDec, iDecR ), 0, HB_MAX( iDec, 0 ));
+      }
+      else
+      {
+         double dNumber = hb_numRound( hb_parnd( 1 ), iDec, 0 );
+
+#ifndef HB_LONG_LONG_OFF
+         if( (double) LONGLONG_MIN <= dNumber && dNumber <= (double) LONGLONG_MAX )
+         {
+            PHB_ITEM pNumber = hb_itemNew( NULL );
+
+            hb_itemPutNInt( pNumber, (LONGLONG) dNumber );
+
+            hb_itemReturn( pNumber );
+         }
+#else
+         if( (double) LONG_MIN <= dNumber && dNumber <= (double) LONG_MAX )
+         {
+            PHB_ITEM pNumber = hb_itemNew( NULL );
+
+            hb_itemPutNInt( pNumber, (LONG) dNumber );
+
+            hb_itemReturn( pNumber );
+         }
+#endif
+         else
+         {
+            hb_retndlen( dNumber, 0, HB_MAX( iDec, 0 ) );
+         }
+      }
    }
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1094, NULL, "ROUND", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
 }
+ 

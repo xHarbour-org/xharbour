@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.65 2004/01/21 23:39:58 walito Exp $
+ * $Id: itemapi.c,v 1.66 2004/01/27 21:40:47 lculik Exp $
  */
 
 /*
@@ -1478,7 +1478,7 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
 
                if( HB_IS_DOUBLE( pNumber ) && iDec < pNumber->item.asDouble.decimal )
                {
-                  dNumber = hb_numRound( dNumber, iDec );
+                  dNumber = hb_numRound( dNumber, iDec, pNumber->item.asDouble.decimal );
                }
 
                if( dNumber != 0.0 )

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.55 2004/02/04 00:51:45 andijahja Exp $
+ * $Id: dbf1.c,v 1.56 2004/02/07 06:18:08 guerra000 Exp $
  */
 
 /*
@@ -1300,14 +1300,17 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
             if( HB_IS_DOUBLE( pItem ) )
             {
+               int iLen, iDec;
+               hb_itemGetNLen( pItem, &iLen, &iDec );
+
                if( pField->uiDec == 0 )
                {
                   if( pField->uiLen > 9 )
                      uiSize = sprintf( szBuffer, "%*.0f", pField->uiLen,
-                                    hb_numRound( hb_itemGetND( pItem ), 0 ) );
+                                    hb_numRound( hb_itemGetND( pItem ), 0, iDec ) );
                   else
                      uiSize = sprintf( szBuffer, "%*li", pField->uiLen,
-                                    ( LONG ) hb_numRound( hb_itemGetND( pItem ), 0 ) );
+                                    ( LONG ) hb_numRound( hb_itemGetND( pItem ), 0, iDec ) );
                }
                else
                   /*
@@ -1317,7 +1320,7 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                   */
                   uiSize = sprintf( szBuffer, "%*.*f", pField->uiLen, pField->uiDec,
                                     hb_numRound( hb_itemGetND( pItem ),
-                                    pField->uiDec ) );
+                                    pField->uiDec, iDec ) );
             }
             else
             {

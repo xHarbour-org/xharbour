@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.66 2004/01/17 17:51:43 lculik Exp $
+ * $Id: dbfntx1.c,v 1.67 2004/01/26 18:43:46 druzus Exp $
  */
 
 /*
@@ -308,19 +308,22 @@ static char * numToStr( PHB_ITEM pItem, char* szBuffer, USHORT length, USHORT de
 {
    if( HB_IS_DOUBLE( pItem ) )
    {
+      int iLen, iDec;
+      hb_itemGetNLen( pItem, &iLen, &iDec );
+
       if( dec == 0 )
       {
          if( length > 9 )
             sprintf( szBuffer, "%0*.0f", length,
-                hb_numRound( hb_itemGetND( pItem ), 0 ) );
+                hb_numRound( hb_itemGetND( pItem ), 0, iDec ) );
          else
             sprintf( szBuffer, "%0*li", length,
-                ( LONG ) hb_numRound( hb_itemGetND( pItem ), 0 ) );
+                ( LONG ) hb_numRound( hb_itemGetND( pItem ), 0, iDec ) );
       }
       else
          sprintf( szBuffer, "%0*.*f", length,
                 dec, hb_numRound( hb_itemGetND( pItem ),
-                dec ) );
+                dec, iDec ) );
    }
    else
    {
@@ -2482,7 +2485,7 @@ static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, USHORT* numRecinBuf
 
       return TRUE;
    }
-   return TRUE;
+      return TRUE;
 }
 
 /* DJGPP can sprintf a float that is almost 320 digits long */
