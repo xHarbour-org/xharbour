@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.952 2003/04/13 23:55:21 jonnymind Exp $
+ * $Id: ChangeLog,v 1.953 2003/04/14 00:17:00 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2003-04-14 13:20 Luiz Rafael Culik <culikr@uol.com.br>
+  + contrib/libmisc/dbftools.c
+    contrib/libmisc/makefile
+    contrib/libmisc/dates2.c
+    contrib/libmisc/fileread.prg
+    contrib/libmisc/hb_f.c
+    contrib/libmisc/make_b32.bat
+    contrib/libmisc/make_vc.bat
+    contrib/libmisc/makefile.bc
+    contrib/libmisc/makefile.vc
+    contrib/libmisc/mathx.c
+    contrib/libmisc/nconvert.prg
+    contrib/libmisc/numtxten.prg
+    contrib/libmisc/numtxthu.prg
+    contrib/libmisc/strfmt.c
+    contrib/libmisc/stringp.prg
+    contrib/libmisc/stringsx.c
+    contrib/libmisc/twirler.prg
+    * Imported libmisc from harbour contribs
 
 2003-04-14 02:15 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/inet.c
