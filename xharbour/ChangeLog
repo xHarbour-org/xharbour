@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.914 2003/04/04 23:18:45 paultucker Exp $
+ * $Id: ChangeLog,v 1.915 2003/04/05 20:00:10 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -19,10 +19,10 @@
   * source/pp/ppcomp.c
   * source/pp/ppcore.c
     + Added hb_pp_NextToken() borrowed from pp.prg.
-    ! Complete rewrite of main matching logic to fix ong outstanding Clipper compatibility problems.
+    ! Complete rewrite of main matching logic to fix long outstanding Clipper compatibility problems.
 
   /*
-     NOTE: I wanted to fix this for the longest time, but for some reason realy dreaded it. Pre-Processor
+     NOTE: I wanted to fix this for the longest time, but for some reason really dreaded it. Pre-Processor
            was seriously NOT Clipper compatible regarding some critical issues that [likely] were not that
            common. But as I feared, with time, I got more and more reports of problems where a complete
            re-write of the matching engine was requires. Here are some of the more obvious examples of
@@ -37,7 +37,7 @@
               KEY SUFFIX "indeed"
               //---------------------------------------------
 
-          Of course there were many similiar variations. Well now after this rewrite the Pre-Processor should
+          Of course there were many similar variations. Well now after this rewrite the Pre-Processor should
           be MUCH more Clipper compatible. I've tested the new engine against full build of xHarbour as well
           full build of FiveHX, and many other tests, and all seems to work correctly, BUT since this is a
           major rewrite I'd like all developers to test this with all their applications before we release
