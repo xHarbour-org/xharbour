@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.2 2002/08/31 14:34:27 lculik Exp $
+ * $Id: dbdelim.prg,v 1.3 2003/01/27 03:37:23 walito Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.2 2002/08/31 14:34:27 lculik Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.3 2003/01/27 03:37:23 walito Exp $" )
 
 #define AppendEOL( handle )       FWRITE( handle, CHR( 13 ) + CHR( 10 ) )
 #define AppendEOF( handle )       FWRITE( handle, CHR( 26 ) )
@@ -117,7 +117,7 @@ local lcisonoeol
       // The NEXT clause has the next highest priority.
       nStart := -1
       nCount := nNext
-   ELSEIF bWhile != NIL .OR. lRest
+   ELSEIF bWhile != NIL .OR. (lRest != NIL .and. lRest)
       // The WHILE and REST clauses have equal priority.
       nStart := -1
       nCount := -1
