@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.20 2002/09/17 22:28:48 ronpinkas Exp $
+ * $Id: garbage.c,v 1.21 2002/09/20 19:48:20 ronpinkas Exp $
  */
 
 /*
@@ -365,7 +365,7 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 {
    if( HB_IS_BYREF( pItem ) )
    {
-      pItem = hb_itemUnRef( pItem, NULL );
+      pItem = hb_itemUnRef( pItem );
    }
 
    if( HB_IS_POINTER( pItem ) )
@@ -480,7 +480,7 @@ void hb_gcCollectAll( void )
       /*-----------------9/19/2002 6:16PM-----------------
        * Statics are now Locked on each assignment, and thus can be excluded.
        * --------------------------------------------------*/
-      //hb_vmIsStaticRef();
+      hb_vmIsStaticRef();
       //printf( "After StaticRef\n" );
 
       hb_memvarsIsMemvarRef();

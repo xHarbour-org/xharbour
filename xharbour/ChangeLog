@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.390 2002/09/20 19:48:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.391 2002/09/21 02:41:16 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,8 +7,53 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-20 22:19 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/arrays.c
+  * source/vm/classes.c
+  * source/vm/codebloc.c
+  * source/vm/extend.c
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+  * source/vm/memvars.c
+  * include/hbapi.h
+  * include/hbapiitm.h
+  * include/hbvmpub.h
+  * tests/pp_harb.ch
+    < Reverted last change related to bNeedLock, hb_itemUnRef() and exclusion of statics from GC.
+
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * source/vm/hvm.c
+    - Removed support for HB_P_PUSHGLOBALREF
+
+  * source/compiler/harbour.c
+    + Added Error on attempting to pass a GLOBAL by refrence.
+
+  * source/pp/ppcore.c
+    ! Fixed bug with support of X in #[X]command and #[X]translate if abbreviation used.
+    - Removed support for #unxcommand and #unxtranslate.
+    * Finalized implementation of [x]uncommand and [x]untranslate.
+      /*
+          NOTE: #uncommand and #untranslate do NOT require MATCH specification [nor RESULT specification] the KEY itself is sufficient.
+               #Xuncommand and #Xuntranslate DO require correct MATCH specification, but do NOT require RESULT specification.
+
+          IOW:
+               1. #uncommand will search a matching most recent #[x]command based on the KEY only, and will remove it if found.
+               2. #untranslate will search a matching most recent #[x]translate based on the KEY only, and will remove it if found.
+               3. #Xuncommand will search a matching most recent #[x]command based on the KEY, AND Match Rule, and will remove it if found.
+               4. #Xuntranslate will search a matching most recent #[x]translate based on the KEY, AND MatchRule, and will remove it if found.
+
+       */
+
+  * tests/global1.prg
+    - Removed sample of Global passed by refernce.
+
 2002-09-20 23:40 UTC -0300 Luiz Rafael Culik <culikr@uol.com.br>
-  * utils/hbmake/hbmake.prg  
+  * utils/hbmake/hbmake.prg
     * Minor changes.
         - The select Main file, only allow to select between all files need by the app
         - The select main file is now sorted

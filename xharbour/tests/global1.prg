@@ -8,7 +8,7 @@ Procedure Global1()
    MyGlobal1 := ProcName()
    MyGlobal2 := ProcName()
 
-   Global2( {|| MyGlobal3 }, @MyGlobal3 )
+   Global2( {|| MyGlobal3 }, MyGlobal3 )
 
    ? "In Global1() After Global2():", MyGlobal1, MyGlobal2, MyGlobal3
 

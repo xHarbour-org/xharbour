@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.19 2002/07/30 16:24:43 ronpinkas Exp $
+ * $Id: classes.c,v 1.20 2002/09/20 19:48:20 ronpinkas Exp $
  */
 
 /*
@@ -2223,7 +2223,7 @@ static HARBOUR hb___msgClsParent( void )
 
    if( HB_IS_BYREF( hb_stackSelfItem() ) ) // Is it possible?
    {
-      pItemRef = hb_itemUnRef( hb_stackSelfItem(), NULL );
+      pItemRef = hb_itemUnRef( hb_stackSelfItem() );
    }
    else
    {
@@ -2263,7 +2263,7 @@ static HARBOUR hb___msgClsName( void )
 
    if( HB_IS_BYREF( pItemRef ) ) // Is it possible?
    {
-      pItemRef = hb_itemUnRef( pItemRef, NULL );
+      pItemRef = hb_itemUnRef( pItemRef );
    }
 
    hb_retc( hb_objGetClsName( pItemRef ) );
@@ -2295,7 +2295,7 @@ static HARBOUR hb___msgClsSel( void )
 
    if( ( ! uiClass ) && HB_IS_BYREF( pSelf ) )
    {
-      PHB_ITEM pItemRef = hb_itemUnRef( pSelf, NULL ); // Is it possible?
+      PHB_ITEM pItemRef = hb_itemUnRef( pSelf ); // Is it possible?
 
       if( HB_IS_ARRAY( pItemRef ) )
       {

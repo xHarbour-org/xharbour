@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.21 2002/09/06 10:38:04 andijahja Exp $
+ * $Id: itemapi.c,v 1.22 2002/09/20 19:48:20 ronpinkas Exp $
  */
 
 /*
@@ -964,21 +964,13 @@ void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
 /* Internal API, not standard Clipper */
 /* De-references item passed by the reference */
 
-PHB_ITEM hb_itemUnRef( PHB_ITEM pItem, BOOL *pbNeedLock )
+PHB_ITEM hb_itemUnRef( PHB_ITEM pItem )
 {
-   PHB_ITEM pRef;
-
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemUnRef(%p, %p)", pItem, pbNeedLock));
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemUnRef(%p)", pItem));
 
    while( HB_IS_BYREF( pItem ) )
    {
-      pRef  = pItem;
-      pItem = hb_itemUnRefOnce( pRef );
-   }
-
-   if( pbNeedLock )
-   {
-      *pbNeedLock = pRef->item.asRefer.bNeedLock;
+      pItem = hb_itemUnRefOnce( pItem );
    }
 
    return pItem;

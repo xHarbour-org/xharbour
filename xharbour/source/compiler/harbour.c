@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.18 2002/09/17 05:51:42 ronpinkas Exp $
+ * $Id: harbour.c,v 1.19 2002/09/18 03:00:50 ronpinkas Exp $
  */
 
 /*
@@ -3122,7 +3122,7 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
    if( iVar )
    {
       /* pushing Global by reference is not allowed */
-      hb_compGenPCode2( HB_P_PUSHGLOBALREF, (BYTE) iVar - 1, ( BOOL ) 1 );
+      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_REFER, szVarName, NULL );
 
       return;
    }

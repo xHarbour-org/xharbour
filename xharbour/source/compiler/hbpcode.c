@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.9 2002/09/16 05:34:02 ronpinkas Exp $
+ * $Id: hbpcode.c,v 1.10 2002/09/17 05:51:42 ronpinkas Exp $
  */
 
 /*
@@ -187,8 +187,7 @@ static BYTE s_pcode_len[] = {
    1,        /* HB_P_ENUMERATE,            */
    1,        /* HB_P_ENDENUMERATE,         */
    2,        /* HB_P_PUSHGLOBAL,           */
-   2,        /* HB_P_POPGLOBAL,            */
-   2         /* HB_P_PUSHGLOBALREF         */
+   2         /* HB_P_POPGLOBAL             */
 };
 
 static PVAR hb_compPrivateFind( char * szPrivateName )

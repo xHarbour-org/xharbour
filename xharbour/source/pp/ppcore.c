@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.26 2002/08/27 17:54:54 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.27 2002/09/16 18:17:29 ronpinkas Exp $
  */
 
 /*
@@ -517,22 +517,22 @@ int hb_pp_ParseDirective( char * sLine )
       else if( (i >= 4 && i <= 7 && memcmp( sDirective, "COMMAND", i ) == 0) ||
                (i >= 4 && i <= 8 && memcmp( sDirective, "XCOMMAND", i ) == 0) )
                                 /* --- #command  --- */
-        ParseCommand( sLine, (i==7)? FALSE:TRUE, TRUE, FALSE );
+        ParseCommand( sLine, sDirective[0] == 'X' ? TRUE : FALSE, TRUE, FALSE );
 
       else if( (i >= 4 && i <= 9 && memcmp( sDirective, "UNCOMMAND", i ) == 0) ||
-               (i >= 4 && i <= 10 && memcmp( sDirective, "UNXCOMMAND", i ) == 0) )
+               (i >= 4 && i <= 10 && memcmp( sDirective, "XUNCOMMAND", i ) == 0) )
                                 /* --- #uncommand  --- */
-        ParseCommand( sLine, (i==9)? FALSE:TRUE, TRUE, TRUE );
+        ParseCommand( sLine, sDirective[0] == 'X' ? TRUE : FALSE, TRUE, TRUE );
 
       else if( (i >= 4 && i <= 9 && memcmp( sDirective, "TRANSLATE", i ) == 0) ||
                (i >= 4 && i <= 10 && memcmp( sDirective, "XTRANSLATE", i ) == 0) )
                                 /* --- #translate  --- */
-        ParseCommand( sLine, (i==9)? FALSE:TRUE, FALSE, FALSE );
+        ParseCommand( sLine, sDirective[0] == 'X' ? TRUE : FALSE, FALSE, FALSE );
 
       else if( (i >= 4 && i <= 11 && memcmp( sDirective, "UNTRANSLATE", i ) == 0) ||
-               (i >= 4 && i <= 12 && memcmp( sDirective, "UNXTRANSLATE", i ) == 0) )
+               (i >= 4 && i <= 12 && memcmp( sDirective, "XUNTRANSLATE", i ) == 0) )
                                 /* --- #untranslate  --- */
-        ParseCommand( sLine, (i==11)? FALSE:TRUE, FALSE, TRUE );
+        ParseCommand( sLine, sDirective[0] == 'X' ? TRUE : FALSE, FALSE, TRUE );
 
       else if( i >= 4 && i <= 6 && memcmp( sDirective, "STDOUT", i ) == 0 )
         printf( "%s\n", sLine ); /* --- #stdout  --- */
@@ -820,6 +820,9 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
   /* Ron Pinkas added 2000-12-03 */
   BOOL bOk = FALSE;
 
+  /* Ron Pinkas added 2002-09-20 */
+  mpatt[0] = '\0';
+
   HB_TRACE(HB_TR_DEBUG, ("ParseCommand(%s, %d, %d, %d)", sLine, com_or_xcom, com_or_tra, bRemove));
 
   HB_SKIPTABSPACES( sLine );
@@ -908,13 +911,15 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
   }
   /* End - Ron Pinkas added 2000-12-03 */
 
+  if( ! bOk )
+  {
+     mpatt[ipos] = '\0';
+  }
+
   /* Ron Pinkas modified 2000-12-03
   if( (ipos = hb_strAt( "=>", 2, sLine, strlen(sLine) )) > 0 ) */
-  if( bOk )
+  if( bOk || bRemove )
   {
-    /* Ron Pinkas removed 2000-12-03
-    stroncpy( mpatt, sLine, ipos-1 ); */
-
     RemoveSlash( mpatt );
     mlen = strotrim( mpatt, TRUE );
 
@@ -929,7 +934,7 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
 
     if( bRemove )
     {
-       COMMANDS *cmd, *cmdLast = NULL;
+       COMMANDS *cmd, *cmdPrev = NULL;
 
        if( com_or_tra )
        {
@@ -942,13 +947,13 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
 
        while ( cmd )
        {
-          //printf( "Searching Key (%i) '%s' Rule '%s' Result '%s' in Command: (%i) '%s' Rule: '%s' Result '%s'\n", com_or_xcom, cmdname, mpatt, rpatt, cmd->name, cmd->com_or_xcom, cmd->mpatt, cmd->value );
+          //printf( "Searching Key X=%i '%s' Rule '%s' in Command: '%s' Rule: '%s'\n", com_or_xcom, cmdname, mpatt, cmd->name, cmd->mpatt );
 
-          if( strcmp( cmd->name, cmdname ) == 0 && cmd->com_or_xcom == com_or_xcom )
+          if( strcmp( cmd->name, cmdname ) == 0 )
           {
-             if( strcmp( cmd->mpatt, mpatt ) == 0 && strcmp( cmd->value, rpatt ) == 0 )
+             if( com_or_xcom == FALSE || strcmp( cmd->mpatt, mpatt ) == 0 )
              {
-                if( cmdLast == NULL )
+                if( cmdPrev == NULL )
                 {
                    if( com_or_tra )
                    {
@@ -961,8 +966,10 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
                 }
                 else
                 {
-                   cmdLast = cmd->last;
+                   cmdPrev->last = cmd->last;
                 }
+
+                //printf( "Found: X:%i cmd->mpatt: '%s' mpatt: '%s'\n", com_or_xcom, cmd->mpatt, mpatt );
 
                 hb_xfree( cmd->name );
                 hb_xfree( cmd->mpatt );
@@ -973,6 +980,7 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
              }
           }
 
+          cmdPrev = cmd;
           cmd = cmd->last;
        }
 

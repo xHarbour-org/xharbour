@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.20 2002/08/24 01:48:13 ronpinkas Exp $
+ * $Id: arrays.c,v 1.21 2002/09/20 19:48:20 ronpinkas Exp $
  */
 
 /*
@@ -326,7 +326,7 @@ BOOL hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
    {
       if( HB_IS_BYREF( pArray->item.asArray.value->pItems + ( ulIndex - 1 ) ) )
       {
-         hb_itemCopy( hb_itemUnRef( pArray->item.asArray.value->pItems + ( ulIndex - 1 ), NULL ), pItem );
+         hb_itemCopy( hb_itemUnRef( pArray->item.asArray.value->pItems + ( ulIndex - 1 ) ), pItem );
       }
       else
       {

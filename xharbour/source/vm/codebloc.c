@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.9 2002/09/19 01:57:42 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.10 2002/09/20 19:48:20 ronpinkas Exp $
  */
 
 /*
@@ -370,14 +370,14 @@ void hb_codeblockEvaluate( HB_ITEM_PTR pItem )
 
 /* Get local variable referenced in a codeblock
  */
-PHB_ITEM  hb_codeblockGetVar( PHB_ITEM pItem, LONG iItemPos, BOOL *pbNeedLock )
+PHB_ITEM  hb_codeblockGetVar( PHB_ITEM pItem, LONG iItemPos )
 {
    HB_CODEBLOCK_PTR pCBlock = pItem->item.asBlock.value;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockGetVar(%p, %ld)", pItem, iItemPos));
 
    /* local variables accessed in a codeblock are always stored as reference */
-   return hb_itemUnRef( pCBlock->pLocals - iItemPos, pbNeedLock );
+   return hb_itemUnRef( pCBlock->pLocals - iItemPos );
 }
 
 /* Get local variable passed by reference
