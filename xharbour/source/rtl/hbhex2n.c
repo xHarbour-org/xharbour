@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.4 2004/04/03 19:41:19 mlombardo Exp $
+ * $Id: hbhex2n.c,v 1.5 2004/04/03 19:45:24 mlombardo Exp $
  */
 
 /*
@@ -153,8 +153,8 @@ HB_FUNC( HB_STRTOHEX )
    char *outbuff;
    char *cStr;
    char *c;
-   USHORT i, len;
-   int iCipher, iNum;
+   USHORT i, len, iNum;
+   int iCipher;
 
    if( ! ISCHAR(1) )
    {
@@ -170,11 +170,12 @@ HB_FUNC( HB_STRTOHEX )
    for( i = 0; i < len; i++ )
    {
 
-      iNum = cStr[i];
+      iNum = (int) cStr[i];
       c[0] = '0';
       c[1] = '0';
 
-      iCipher = iNum % 16;
+      iCipher = (int) (iNum % 16);
+
       if ( iCipher < 10 )
       {
          c[1] = '0' + iCipher;
@@ -271,5 +272,5 @@ HB_FUNC( HB_HEXTOSTR )
    }
 
    outbuff[nalloc] = '\0';
-   hb_retc( outbuff );
+   hb_retclen( outbuff, nalloc );
 }
