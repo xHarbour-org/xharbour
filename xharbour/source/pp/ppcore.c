@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.177 2004/10/22 01:45:50 druzus Exp $
+ * $Id: ppcore.c,v 1.178 2004/10/22 02:40:35 ronpinkas Exp $
  */
 
 /*
@@ -828,6 +828,14 @@ int hb_pp_ParseDirective( char * sLine )
 
   if( i == 2 && memcmp( sDirective, "IF", 2 ) == 0 )
   {
+     szExpandedLine[0] = '\0';
+     hb_pp_ParseExpression( sLine, szExpandedLine );
+
+     if( szExpandedLine[0] )
+     {
+        strcpy( sLine, szExpandedLine );
+     }
+
      ParseIf( sLine ); /* --- #if  --- */
   }
   else if( i == 4 && memcmp( sDirective, "ELIF", 4 ) == 0 )
@@ -845,6 +853,14 @@ int hb_pp_ParseDirective( char * sLine )
         }
         else if( hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] == 0 )
         {
+           szExpandedLine[0] = '\0';
+           hb_pp_ParseExpression( sLine, szExpandedLine );
+
+           if( szExpandedLine[0] )
+           {
+              strcpy( sLine, szExpandedLine );
+           }
+
            hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] = CalcConstant( &sLine ) ? 1 : 0;
         }
      }
