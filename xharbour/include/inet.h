@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.6 2002/12/20 23:19:35 jonnymind Exp $
+* $Id: inet.h,v 1.7 2002/12/21 16:59:21 jonnymind Exp $
 */
 
 /*
@@ -72,6 +72,9 @@
     #include <netdb.h>
     extern int h_errno;
     #define HB_INET_CLOSE( x )    close( x )
+    #ifdef HB_OS_DARWIN
+        #include <netinet/in.h>
+    #endif
     #include <errno.h>
 #endif
 

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.12 2002/12/21 18:20:39 ronpinkas Exp $
+* $Id: thread.c,v 1.13 2002/12/21 19:24:44 jonnymind Exp $
 */
 
 /*
@@ -58,11 +58,19 @@
 
 #ifdef HB_THREAD_SUPPORT
 
+#if defined( HB_OS_DARWIN )
+#include <stdlib.h>
+#else
 #include <malloc.h>
+#endif
 
 #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+#if defined( HB_OS_DARWIN )
+#include <unistd.h>    /* We need usleep() in Darwin */
+#else
 #include <time.h>
 #include <sys/time.h>
+#endif
 #endif
 
 #include "hbapi.h"
@@ -464,6 +472,8 @@ HB_FUNC( STARTTHREAD )
         {
             #if defined(HB_OS_WIN_32)
                 Sleep( 0 );
+	    #elif defined(HB_OS_DARWIN)
+	        usleep( 1 );
             #else
                 static struct timespec nanosecs = { 0, 1000 };
                 nanosleep( &nanosecs, NULL );
@@ -891,7 +901,9 @@ HB_FUNC( THREADSLEEP )
         return;
     }
 
-    #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+    #if defined( HB_OS_DARWIN )
+        usleep( 1 );
+    #elif defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
         struct timespec ts;
         ts.tv_sec = hb_parni( 1 ) / 1000;
         ts.tv_nsec = (hb_parni( 1 ) % 1000) * 1000000;
@@ -907,6 +919,8 @@ HB_FUNC( WAITFORTHREADS )
     {
         #if defined(HB_OS_WIN_32)
            Sleep( 1 );
+	#elif defined(HB_OS_DARWIN)
+	   usleep( 1 );
         #else
            static struct timespec nanosecs = { 0, 1000 };
            nanosleep( &nanosecs, NULL );
