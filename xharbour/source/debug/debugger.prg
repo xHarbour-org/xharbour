@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.7 2003/04/09 20:57:05 lculik Exp $
+ * $Id: debugger.prg,v 1.8 2003/04/09 21:10:24 lculik Exp $
  */
 
 /*
@@ -79,7 +79,7 @@ procedure AltD( nAction )
       case nAction == nil
            if SET( _SET_DEBUG )
               s_lExit := .f.
-              __dbgEntry( ProcLine( 2 ) )
+              __dbgEntry( ProcLine( 1 ) )
            endif
 
       case nAction == ALTD_DISABLE
@@ -93,7 +93,7 @@ return
 
 procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
 
-   local cModuleName
+   local cModuleName, cProcName
    local nStaticsBase, nStaticIndex, cStaticName
    local cLocalName, nLocalIndex
    local nAt
@@ -109,7 +109,10 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
                  if ! s_oDebugger:lTrace
                     s_oDebugger:ShowCode( cModuleName )
                  else
+                    ASize( s_oDebugger:aCallStack, Len( s_oDebugger:aCallStack ) + 1 )
                     AIns( s_oDebugger:aCallStack, 1, NIL, .t. )
+                    s_oDebugger:aCallStack[ 1 ] = { SubStr( cModuleName,;
+                                             RAt( ":", cModuleName ) + 1 ), {}, nil }
                  endif
                  s_oDebugger:LoadVars()
               endif
@@ -122,7 +125,8 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
               __DbgStatics := {}
            endif
 
-           if ProcName( 1 ) == "(_INITSTATICS)"
+           cProcName := ProcName( 1 )
+           if cProcName == "(_INITSTATICS)"
               nStaticsBase := uParam1
               cStaticName  := uParam2
               if AScan( __DbgStatics, { | a | a[ 1 ] == nStaticsBase } ) == 0
@@ -135,6 +139,15 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
 
            if s_oDebugger != nil
               if PCount() == 3 // called from hvm.c hb_vmLocalName() and hb_vmStaticName()
+                 if cProcName == "__EVAL" .OR. cProcName == "EVAL"
+                    if !s_oDebugger:lCodeblock
+                       ASize( s_oDebugger:aCallStack, Len( s_oDebugger:aCallStack ) + 1 )
+                       AIns( s_oDebugger:aCallStack, 1 )
+                       // nil means no line number stored yet
+                       s_oDebugger:aCallStack[ 1 ] := { cProcName, {}, nil }
+                       s_oDebugger:lCodeblock := .T.
+                    endif
+                 endif
                  if uParam3 == 1 // in-function static variable
                     cStaticName  := uParam2
                     nStaticIndex := uParam1
@@ -152,9 +165,9 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
                     if s_oDebugger:lShowLocals
                        if ( nAt := AScan( s_oDebugger:aVars,; // Is there another var with this name ?
                             { | aVar | aVar[ 1 ] == cLocalName } ) ) != 0
-                          s_oDebugger:aVars[ nAt ] := { cLocalName, nLocalIndex, "Local", ProcName( 1 ) }
+                          s_oDebugger:aVars[ nAt ] := { cLocalName, nLocalIndex, "Local", cProcName }
                        else
-                          AAdd( s_oDebugger:aVars, { cLocalName, nLocalIndex, "Local", ProcName( 1 ) } )
+                          AAdd( s_oDebugger:aVars, { cLocalName, nLocalIndex, "Local", cProcName } )
                        endif
                     endif
                     IF valtype( s_oDebugger:aCallStack[ 1 ][ 2 ])=='A'
@@ -186,7 +199,8 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
                  DispEnd()
               else
 */
-              if !s_oDebugger:lGo .or. InvokeDebug()
+              if !s_oDebugger:lGo .or. InvokeDebug()  .or. ;
+                 ProcName( 1 ) == "ALTD"  // debugger invoked from AltD( 1 )
                  s_oDebugger:lGo := .F.
                  s_oDebugger:SaveAppStatus()
                  s_oDebugger:GoToLine( uParam1 )
@@ -200,6 +214,9 @@ procedure __dbgEntry( uParam1, uParam2, uParam3 )  // debugger entry point
             return
          endif
          if s_oDebugger != nil
+            if s_oDebugger:lCodeblock
+               s_oDebugger:lCodeblock := .F.
+            endif
             s_oDebugger:EndProc()
             s_oDebugger:LoadVars()
          endif
@@ -221,18 +238,21 @@ CLASS TDebugger
    DATA   cSearchString, cPathForFiles, cSettingsFileName
    DATA   nTabWidth, nSpeed
    DATA   lShowPublics, lShowPrivates, lShowStatics, lShowLocals, lAll
+   DATA   lShowCallStack
    DATA   nTraceLevel
+   DATA   lCodeblock INIT .F.
 
    METHOD New()
    METHOD Activate( cModuleName )
 
    METHOD All()
 
-   METHOD Animate() INLINE ::lAnimate := .t., ::Step()
+   METHOD Animate() INLINE If( ::lAnimate, ::Step(), nil )
 
    METHOD BarDisplay()
    METHOD BuildCommandWindow()
 
+   METHOD CallStackProcessKey( nKey )
    METHOD ClrModal() INLINE iif( ::lMonoDisplay, "N/W, W+/W, W/N, W+/N",;
                                 "N/W, R/W, N/BG, R/BG" )
 
@@ -248,8 +268,10 @@ CLASS TDebugger
    METHOD GoToLine( nLine )
    METHOD HandleEvent()
    METHOD Hide()
+   METHOD HideCallStack()
    METHOD HideVars()
-   METHOD InputBox( cMsg, uValue, bValid )
+   METHOD InputBox( cMsg, uValue, bValid, lEditable )
+   METHOD Inspect( uValue, cValueName )
    METHOD IsBreakPoint( nLine )
    METHOD LoadSettings()
    METHOD LoadVars()
@@ -272,6 +294,7 @@ CLASS TDebugger
    METHOD ShowAppScreen()
    METHOD ShowCallStack()
    METHOD ShowCode( cModuleName )
+   METHOD ShowHelp( nTopic )
    METHOD ShowVars()
 
 /*   METHOD Sort() INLINE ASort( ::aVars,,, {|x,y| x[1] < y[1] } ),;
@@ -287,6 +310,7 @@ CLASS TDebugger
           ::nSpeed := ::InputBox( "Step delay (in tenths of a second)",;
                                   ::nSpeed )
 
+   METHOD Stack()
    METHOD Static()
 
    METHOD Step() INLINE ::RestoreAppStatus(), ::Exit()
@@ -305,7 +329,9 @@ CLASS TDebugger
    METHOD Locate()
    METHOD FindNext()
    METHOD FindPrevious()
+   METHOD RemoveWindow()
    METHOD SearchLine()
+   METHOD ToggleAnimate() INLINE ::lAnimate := ! ::lAnimate
    METHOD ToggleCaseSensitive() INLINE ::lCaseSensitive := !::lCaseSensitive
    METHOD ShowWorkAreas() INLINE __dbgShowWorkAreas( Self )
 
@@ -314,13 +340,33 @@ ENDCLASS
 
 METHOD New() CLASS TDebugger
 
-   ::aColors := {"W+/BG","N/BG","R/BG","N+/BG","W+/B","GR+/B","W/B","N/W","R/W","N/BG","R/BG"}
-
-   ::lMonoDisplay   := .f.
    s_oDebugger := Self
 
+   ::aColors := {"W+/BG","N/BG","R/BG","N+/BG","W+/B","GR+/B","W/B","N/W","R/W","N/BG","R/BG"}
+   ::lMonoDisplay   := .f.
+   ::lAnimate          := .f.
+   ::lEnd              := .f.
+   ::lTrace            := .f.
+   ::aBreakPoints      := {}
+   ::aCallStack        := {}
+   ::lGo               := .f.
+   ::aVars             := {}
+   ::lCaseSensitive    := .f.
+   ::cSearchString     := ""
+   ::cPathForFiles     := ""
+   ::lShowCallStack    := .f.
+   ::nTabWidth         := 4
+   ::nSpeed            := 0
+
+   ::lShowPublics      := .f.
+   ::lShowPrivates     := .f.
+   ::lShowStatics      := .f.
+   ::lShowLocals       := .f.
+   ::lAll              := .f.
+   ::lSortVars         := .f.
+
    ::cSettingsFileName := "init.cld"
-   if File( "init.cld" )
+   if File( ::cSettingsFileName )
       ::LoadSettings()
    endif
 
@@ -346,25 +392,6 @@ METHOD New() CLASS TDebugger
 
    ::BuildCommandWindow()
 
-   ::lAnimate          := .f.
-   ::lEnd              := .f.
-   ::lTrace            := .f.
-   ::aBreakPoints      := {}
-   ::aCallStack        := {}
-   ::lGo               := .f.
-   ::aVars             := {}
-   ::lCaseSensitive    := .f.
-   ::cSearchString     := ""
-   ::cPathForFiles     := ""
-   ::nTabWidth         := 4
-   ::nSpeed            := 0
-
-   ::lShowPublics      := .f.
-   ::lShowPrivates     := .f.
-   ::lShowStatics      := .f.
-   ::lShowLocals       := .f.
-   ::lAll              := .f.
-   ::lSortVars         := .f.
 return Self
 
 METHOD PathForFiles() CLASS TDebugger
@@ -379,7 +406,10 @@ METHOD Activate( cModuleName ) CLASS TDebugger
 
    ::Show()
    ::ShowCode( cModuleName )
+   if ::lShowCallStack
    ::ShowCallStack()
+   endif
+   ::ShowVars()
    ::RestoreAppStatus()
 
 return nil
@@ -450,16 +480,94 @@ METHOD BuildCommandWindow() CLASS TDebugger
 
 return nil
 
+METHOD CallStackProcessKey( nKey ) CLASS TDebugger
+
+   local n, nSkip, lUpdate := .f.
+
+   do case
+      case nKey == K_HOME
+           if ::oBrwStack:Cargo > 1
+              ::oBrwStack:GoTop()
+              ::oBrwStack:ForceStable()
+              lUpdate = .t.
+           endif
+
+      case nKey == K_END
+           if ::oBrwStack:Cargo < Len( ::aCallStack )
+              ::oBrwStack:GoBottom()
+              ::oBrwStack:ForceStable()
+              lUpdate = .t.
+           endif
+
+      case nKey == K_UP
+           if ::oBrwStack:Cargo > 1
+              ::oBrwStack:Up()
+              ::oBrwStack:ForceStable()
+              lUpdate = .t.
+           endif
+
+      case nKey == K_DOWN
+           if ::oBrwStack:Cargo < Len( ::aCallStack )
+              ::oBrwStack:Down()
+              ::oBrwStack:ForceStable()
+              lUpdate = .t.
+           endif
+
+      case nKey == K_PGUP
+           ::oBrwStack:PageUp()
+           ::oBrwStack:ForceStable()
+           lUpdate = .t.
+
+      case nKey == K_PGDN
+           ::oBrwStack:PageDown()
+           ::oBrwStack:ForceStable()
+           lUpdate = .t.
+
+      case nKey == K_LBUTTONDOWN
+           if ( nSkip := MRow() - ::oWndStack:nTop - ::oBrwStack:RowPos ) != 0
+              if nSkip > 0
+                 for n = 1 to nSkip
+                    ::oBrwStack:Down()
+                    ::oBrwStack:Stabilize()
+                 next
+              else
+                 for n = 1 to nSkip + 2 step -1
+                    ::oBrwStack:Up()
+                    ::oBrwStack:Stabilize()
+                 next
+              endif
+              ::oBrwStack:ForceStable()
+           endif
+           lUpdate = .t.
+   endcase
+
+   if lUpdate
+      // source line for a function
+      if ::aCallStack[ ::oBrwStack:Cargo ][ 3 ] != nil
+         ::GotoLine( ::aCallStack[ ::oBrwStack:Cargo ][ 3 ] )
+      else
+         ::GotoLine( 1 )
+      endif
+   endif
+
+return nil
 METHOD CodeWindowProcessKey( nKey ) CLASS TDebugger
 
    Switch nKey
       case K_HOME
            ::oBrwText:GoTop()
-           exit
+           if ::oWndCode:lFocused
+              SetCursor( SC_SPECIAL1 )
+           endif ; exit
 
       case K_END
            ::oBrwText:GoBottom()
-           exit
+           ::oBrwText:nCol = ::oWndCode:nLeft + 1
+           ::oBrwText:nFirstCol = ::oWndCode:nLeft + 1
+           SetPos( Row(), ::oWndCode:nLeft + 1 )
+           if ::oWndCode:lFocused
+              SetCursor( SC_SPECIAL1 )
+           endif;exit
 
       case K_LEFT
            ::oBrwText:Left()
@@ -546,6 +654,7 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
 
    local cCommand, cResult, oE
    local bLastHandler
+   local lDisplay
 
    Switch nKey
       case K_UP
@@ -574,11 +683,13 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
 
       case K_ENTER
            cCommand := ::oGetListCommand:oGet:VarGet()
+           if ! Empty( cCommand )
            AAdd( ::aLastCommands, cCommand )
            ::nCommand++
            ::oWndCommand:ScrollUp( 1 )
+           endif
 
-           bLastHandler := ErrorBlock({ |objErr| BREAK (objErr) })
+/*           bLastHandler := ErrorBlock({ |objErr| BREAK (objErr) })
 
            if SubStr( LTrim( cCommand ), 1, 2 ) == "? "
               begin sequence
@@ -595,13 +706,56 @@ METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
            endif
 
            ErrorBlock(bLastHandler)
+           */
+           do case
+              case Empty( cCommand )
+                 lDisplay = .f.
+
+              case SubStr( LTrim( cCommand ), 1, 3 ) == "?? " .or. ;
+                       SubStr( LTrim( cCommand ), 1, 2 ) == "? "
+                 lDisplay := !Empty( cResult := DoCommand( Self,cCommand ) )
+
+              case Upper( SubStr( LTrim( cCommand ), 1, 4 ) ) == "ANIM" .or. ;
+                   Upper( SubStr( LTrim( cCommand ), 1, 7 ) ) == "ANIMATE"
+                 ::lAnimate = .t.
+                 ::Animate()
+                 SetCursor( SC_NORMAL )
+                 lDisplay = .f.
+
+              case Upper( SubStr( LTrim( cCommand ), 1, 3 ) ) == "DOS"
+                 ::OsShell()
+                 SetCursor( SC_NORMAL )
+                 lDisplay = .f.
+
+              case Upper( SubStr( LTrim( cCommand ), 1, 4 ) ) == "HELP"
+                 ::ShowHelp()
+                 lDisplay = .f.
+
+              case Upper( SubStr( LTrim( cCommand ), 1, 4 ) ) == "QUIT"
+                 ::Exit()
+                 ::Hide()
+                 __Quit()
+
+              case Upper( SubStr( LTrim( cCommand ), 1, 6 ) ) == "OUTPUT"
+                 SetCursor( SC_NONE )
+                 ::ShowAppScreen()
+                 SetCursor( SC_NORMAL )
+                 lDisplay = .f.
+
+              otherwise
+                 cResult = "Command error"
+                 lDisplay = .t.
+
+           endcase
 
            DispOutAt( ::oWndCommand:nBottom - 1, ::oWndCommand:nLeft + 1,;
               Space( ::oWndCommand:nRight - ::oWndCommand:nLeft - 1 ),;
               __DbgColors()[ 2 ] )
+           if lDisplay
            DispOutAt( ::oWndCommand:nBottom - 1, ::oWndCommand:nLeft + 3, cResult,;
               __DbgColors()[ 2 ] )
            ::oWndCommand:ScrollUp( 1 )
+           endif
            DispOutAt( ::oWndCommand:nBottom - 1, ::oWndCommand:nLeft + 1, "> ",;
               __DbgColors()[ 2 ] )
            cCommand := Space( ::oWndCommand:nRight - ::oWndCommand:nLeft - 3 )
@@ -629,7 +783,7 @@ METHOD EditColor( nColor, oBrwColors ) CLASS TDebugger
    oBrwColors:ForceStable()
 
    SetCursor( SC_NORMAL )
-   @ Row(), Col() GET cColor COLOR SubStr( ::ClrModal(), 5 ) ;
+   @ Row(), Col() + 15 GET cColor COLOR SubStr( ::ClrModal(), 5 ) ;
       VALID iif( Type( cColor ) != "C", ( Alert( "Must be string" ), .f. ), .t. )
 
    READ
@@ -682,6 +836,7 @@ METHOD EditVar( nVar ) CLASS TDebugger
    local cVarType   := ::aVars[ nVar ][ 3 ]
    local nProcLevel := 1
    local aArray
+   local cVarStr
 
    if ::aVars[ nVar ][ 3 ] == "Local"
       while ProcName( nProcLevel ) != ::aVars[ nVar ][ 4 ]
@@ -694,7 +849,17 @@ METHOD EditVar( nVar ) CLASS TDebugger
       uVarValue := __vmVarSGet( ::aVars[ nVar ][ 2 ] )
    endif
 
-   uVarValue := ::InputBox( cVarName, ValToStr( uVarValue ) )
+   do case
+      case ValType( uVarValue ) == "A"
+           ::InputBox( cVarName, uVarValue,, .f. )
+
+      case ValType( uVarValue ) == "O"
+           ::InputBox( cVarName, uVarValue,, .f. )
+
+      otherwise
+           cVarStr := ::InputBox( cVarName, ValToStr( uVarValue ),;
+       { | u | If( Type( u ) == "UE", ( Alert( "Expression error" ), .f. ), .t. ) } )
+   endcase
 
    if LastKey() != K_ESC
       do case
@@ -758,6 +923,7 @@ METHOD EndProc() CLASS TDebugger
    ::oBrwText:=nil
    ::oBrwText:=::acallstack[1][3]
       ADel( ::aCallStack, 1, .t. )
+
       if ::oBrwStack != nil .and. ! ::lTrace
          ::oBrwStack:RefreshAll()
       endif
@@ -1178,11 +1344,13 @@ METHOD ShowVars() CLASS TDebugger
                                If( Len( ::aVars ) > 0, ::oBrwVars:Cargo[ 1 ] - nOld, 0 ) }
 
       nWidth := ::oWndVars:nWidth() - 1
-      ::oBrwVars:AddColumn( oCol:=TBColumnNew( "",  { || If( Len( ::aVars ) > 0, AllTrim( Str( ::oBrwVars:Cargo[1] -1 ) ) + ") " + ;
-         PadR( GetVarInfo( ::aVars[ Max( ::oBrwVars:Cargo[1], 1 ) ] ),;
-         ::oWndVars:nWidth() - 5 ), "" ) } ) )
+   ::oBrwVars:AddColumn( oCol:=TBColumnNew( "",  { || If( Len( ::aVars ) > 0, AllTrim( Str( ::oBrwVars:Cargo[1] -1 ) ) + ") " + ;
+      PadR( GetVarInfo( ::aVars[ Max( ::oBrwVars:Cargo[1], 1 ) ] ),;
+      ::oWndVars:nWidth() - 5 ), "" ) } ) )
+
       AAdd(::oBrwVars:Cargo[2],::avars)
-      oCol:DefColor:={2,1}
+//      oCol:DefColor:={2,1}
+      oCol:DefColor:={1,2}
       if Len( ::aVars ) > 0
          ::oBrwVars:ForceStable()
       endif
@@ -1352,6 +1520,31 @@ METHOD OSShell() CLASS TDebugger
 
 return nil
 
+METHOD HideCallStack() CLASS TDebugger
+
+   ::lShowCallStack = .f.
+
+   if ::oWndStack != nil
+      DispBegin()
+      ::oWndStack:Hide()
+      ::RemoveWindow( ::oWndStack )
+      ::oWndStack = nil
+      ::oWndCode:Hide()
+      ::oWndCode:nRight += 16
+      ::oWndCode:Show( .t. )
+      ::oBrwText:Resize( ,,, ::oBrwText:nRight + 16 )
+      ::oBrwText:GotoLine( ::oBrwText:nActiveLine )
+      if ::oWndVars != nil
+         ::oWndVars:Hide()
+         ::oWndVars:nRight += 16
+         ::oWndVars:Show( .f. )
+      endif
+      DispEnd()
+      ::nCurrentWindow = 1
+   endif
+
+return nil
+
 METHOD HideVars() CLASS TDebugger
 
    ::oWndVars:Hide()
@@ -1361,7 +1554,7 @@ METHOD HideVars() CLASS TDebugger
 
 return nil
 
-METHOD InputBox( cMsg, uValue, bValid ) CLASS TDebugger
+METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS TDebugger
 
    local nTop    := ( MaxRow() / 2 ) - 5
    local nLeft   := ( MaxCol() / 2 ) - 25
@@ -1372,16 +1565,60 @@ METHOD InputBox( cMsg, uValue, bValid ) CLASS TDebugger
    local GetList := {}
    local nOldCursor
    local lScoreBoard := Set( _SET_SCOREBOARD, .f. )
+   local lExit
    local oWndInput := TDbWindow():New( nTop, nLeft, nBottom, nRight, cMsg,;
                                        ::oPullDown:cClrPopup )
 
+   DEFAULT lEditable TO .t.
    oWndInput:lShadow := .t.
    oWndInput:Show()
+   tracelog( cMsg, uValue, bValid, lEditable )
+   if lEditable
+      if bValid == nil
+         @ nTop + 1, nLeft + 1 GET uTemp COLOR "," + __DbgColors()[ 5 ]
+         else
+            @ nTop + 1, nLeft + 1 GET uTemp VALID Eval( bValid, uTemp ) ;
+              COLOR "," + __DbgColors()[ 5 ]
+         endif
 
-   if bValid == nil
-      @ nTop + 1, nLeft + 1 GET uTemp COLOR "," + __DbgColors()[ 5 ]
+      nOldCursor := SetCursor( SC_NORMAL )
+      READ
+      SetCursor( nOldCursor )
    else
       @ nTop + 1, nLeft + 1 GET uTemp VALID bValid COLOR "," + __DbgColors()[ 5 ]
+      SetPos( nTop + 1, nLeft + 1 )
+      nOldCursor := SetCursor( SC_NONE )
+
+      lExit = .f.
+
+      while ! lExit
+         Inkey( 0 )
+
+         do case
+            case LastKey() == K_ESC
+               lExit = .t.
+
+            case LastKey() == K_ENTER
+               if cType == "A"
+                  if Len( uValue ) == 0
+                     Alert( "Array is empty" )
+                  else
+                     __DbgArrays( uValue, cMsg )
+                  endif
+
+               elseif cType == "O"
+                  __DbgObject( uValue, cMsg )
+
+               else
+                  Alert( "Value cannot be edited" )
+               endif
+
+            otherwise
+               Alert( "Value cannot be edited" )
+         endcase
+      end
+
+      SetCursor( nOldCursor )
    endif
 
    nOldCursor := SetCursor( SC_NORMAL )
@@ -1415,14 +1652,27 @@ return AScan( ::aBreakPoints, { | aBreak | aBreak[ 1 ] == nLine } ) != 0
 
 METHOD GotoLine( nLine ) CLASS TDebugger
 
+   local nRow, nCol
+
    if ::oBrwVars != nil
       ::ShowVars()
    endif
 
    ::oBrwText:GotoLine( nLine )
+   nRow = Row()
+   nCol = Col()
 
+   // no source code line stored yet
+   if ::oBrwStack != nil .and. Len( ::aCallStack ) > 0 .and. ;
+      ::aCallStack[ ::oBrwStack:Cargo ][ 3 ] == nil
+      ::aCallStack[ ::oBrwStack:Cargo ][ 3 ] = nLine
+   endif
    if ::oBrwStack != nil .and. ! ::oBrwStack:Stable
       ::oBrwStack:ForceStable()
+   endif
+   if ::oWndCode:lFocused .and. SetCursor() != SC_SPECIAL1
+      SetPos( nRow, nCol )
+      SetCursor( SC_SPECIAL1 )
    endif
 
 return nil
@@ -1511,7 +1761,7 @@ return nil
 
 METHOD SaveSettings() CLASS TDebugger
 
-   local cInfo := "", nLen, oWnd, cColor
+   local cInfo := "", nLen, oWnd, cColor , n
 
    ::cSettingsFileName := ::InputBox( "File name", ::cSettingsFileName )
 
@@ -1553,10 +1803,51 @@ METHOD SaveSettings() CLASS TDebugger
          cInfo += "Options Tab " + AllTrim( Str( ::nTabWidth ) ) + Chr( 13 ) + Chr( 10 )
       endif
 
+      if ::lShowStatics
+         cInfo += "Monitor Static" + HB_OsNewLine()
+      endif
+
+      if ::lShowPublics
+         cInfo += "Monitor Public" + HB_OsNewLine()
+      endif
+
+      if ::lShowLocals
+         cInfo += "Monitor Local" + HB_OsNewLine()
+      endif
+
+      if ::lShowPrivates
+         cInfo += "Monitor Private" + HB_OsNewLine()
+      endif
+
+      if ::lSortVars
+         cInfo += "Monitor Sort" + HB_OsNewLine()
+      endif
+
+      if ::lShowCallStack
+         cInfo += "View CallStack" + HB_OsNewLine()
+      endif
+
+      if ! Empty( ::aBreakPoints )
+         for n := 1 to Len( ::aBreakPoints )
+            cInfo += "BP " + AllTrim( Str( ::aBreakPoints[ n ][ 1 ] ) ) + " " + ;
+                     AllTrim( ::aBreakPoints[ n ][ 2 ] ) + HB_OsNewLine()
+         next
+      endif
       MemoWrit( ::cSettingsFileName, cInfo )
    endif
 
 return nil
+
+METHOD Stack() CLASS TDebugger
+
+   if ::lShowCallStack := ! ::lShowCallStack
+      ::ShowCallStack()
+   else
+      ::HideCallStack()
+   endif
+
+return nil
+
 
 METHOD Static() CLASS TDebugger
 
@@ -1837,6 +2128,17 @@ METHOD FindPrevious() CLASS TDebugger
 
 return lFound
 
+METHOD RemoveWindow( oWnd ) CLASS TDebugger
+
+  local n := AScan( ::aWindows, { | o | o == oWnd } )
+
+  if n != 0
+     ::aWindows = ADel ( ::aWindows, n, .t. )
+  endif
+
+  ::nCurrentWindow = 1
+
+return nil
 METHOD SearchLine() CLASS TDebugger
 
    local cLine
@@ -1898,3 +2200,71 @@ static function ArrayBrowseSkip( nPos, oBrwSets,n )
    return iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;
       iif( oBrwSets:cargo[ 1 ] + nPos > Len(oBrwSets:cargo[ 2 ][ 1 ]), ;
       Len(oBrwSets:cargo[ 2 ][ 1 ]) - oBrwSets:cargo[ 1 ], nPos ) )
+static function DoCommand( o,cCommand )
+   local bLastHandler, cResult, nLocals := len( o:aCallStack[1][2] )
+   local nProcLevel := 1, oE, i, vtmp
+
+   if nLocals > 0
+      while ProcName( nProcLevel ) != o:aCallStack[1][2][1][4]
+         nProcLevel++
+      enddo
+      for i := 1 to nLocals
+         __mvPrivate( o:aCallStack[1][2][i][1] )
+         __mvPut( o:aCallStack[1][2][i][1], ;
+              __vmVarLGet( nProcLevel, o:aCallStack[1][2][i][2] ) )
+      next
+   endif
+
+   bLastHandler := ErrorBlock({ |objErr| BREAK (objErr) })
+
+   if SubStr( LTrim( cCommand ), 1, 3 ) == "?? "
+
+      begin sequence
+         o:Inspect( AllTrim( SubStr( LTrim( cCommand ), 4 ) ),;
+                    &( AllTrim( SubStr( LTrim( cCommand ), 4 ) ) ) )
+         cResult := ""
+      recover using oE
+         cResult = "Command error: " + oE:description
+      end sequence
+
+   elseif SubStr( LTrim( cCommand ), 1, 2 ) == "? "
+
+      begin sequence
+          cResult := ValToStr( &( AllTrim( SubStr( LTrim( cCommand ), 3 ) ) ) )
+
+      recover using oE
+          cResult := "Command error: " + oE:description
+
+      end sequence
+
+   else
+      cResult := "Command error"
+
+   endif
+
+   ErrorBlock(bLastHandler)
+
+   for i := 1 to nLocals
+      vtmp := __mvGet( o:aCallStack[1][2][i][1] )
+      if !(Valtype( vtmp ) $ "AO")
+         __vmVarLSet( nProcLevel, o:aCallStack[1][2][i][2], vtmp )
+      endif
+   next
+
+Return cResult
+
+METHOD ShowHelp( nTopic ) CLASS TDebugger
+
+   local nCursor := SetCursor( SC_NONE )
+
+   __dbgHelp( nTopic )
+   SetCursor( nCursor )
+
+return nil
+
+METHOD Inspect( uValue, cValueName ) CLASS TDebugger
+
+   uValue = ::InputBox( uValue, cValueName,, .f. )
+
+return nil
+

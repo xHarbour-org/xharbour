@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtarr.prg,v 1.3 2002/12/01 03:58:01 walito Exp $
+ * $Id: dbgtarr.prg,v 1.4 2003/01/30 02:23:58 walito Exp $
  */
 
 /*
@@ -61,13 +61,15 @@ data aWindows
 data TheArray
 data arrayname
 data nCurWindow
+data lEditable
 Method new
 method addWindows
 method doget
 method SetsKeyPressed
 end class
 
-method new(aArray,pArName) Class TDBGArray
+method new(aArray,pArName,lEditable) Class TDBGArray
+   DEFAULT lEditable TO .t.
 ::aWindows:={}
 ::arrayName:=parName
 ::TheArray:=aArray
@@ -173,14 +175,22 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) Class T
                elseif valtype(aArray[nSet])=="B"
                   Alert("Value cannot be edited")
                else
+                  if ::lEditable
+                     oBrwSets:RefreshCurrent()
+                    if ValType( aArray[ nSet ] ) == "O"
+                       __DbgObject( aArray[ nSet ], cName + ;
+                                 "[" + AllTrim( Str( nSet ) ) + "]" )
+                    else
+                       ::doget(oBrwsets,aarray,nSet)
+                    endif
 
-                  oBrwSets:RefreshCurrent()
-                  ::doget(oBrwsets,aarray,nSet)
-                  oBrwSets:RefreshCurrent()
-                  oBrwSets:ForceStable()
-
+                     oBrwSets:RefreshCurrent()
+                     oBrwSets:ForceStable()
+                 else
+                    Alert("Value cannot be edited")
+                  endif
                endif
-               exit
+            exit
 
    end
       RefreshVarsS(oBrwSets)
@@ -236,6 +246,8 @@ METHOD doGet(oBro,pItem,nSet) Class TDBGArray
     LOCAL lScoreSave := Set( _SET_SCOREBOARD, .f. )
     LOCAL lExitSave  := Set( _SET_EXIT, .t. )
     LOCAL bInsSave   := SetKey( K_INS )
+    local cValue     := PadR( ValToStr( pItem[ nSet ] ),;
+                              oBro:nRight - oBro:nLeft - oBro:GetColumn( 1 ):width )
 
     // make sure browse is stable
     obro:forcestable()
@@ -249,13 +261,13 @@ METHOD doGet(oBro,pItem,nSet) Class TDBGArray
     // initial cursor setting
     SetCursor( IF( ReadInsert(), SC_INSERT, SC_NORMAL ) )
 
-    // get column object from browse
-    column := oBro:getColumn( oBro:colPos )
-
     // create a corresponding GET
-    @  row(),col() get pItem[nSet]
-    // read it
-    ReadModal(getlist )
+    @ row(), oBro:nLeft + oBro:GetColumn( 1 ):width + 1 GET cValue ;
+       VALID If( Type( cValue ) == "UE", ( Alert( "Expression error" ), .f. ), .t. )
+    READ
+    if LastKey() == K_ENTER
+       pItem[ nSet ] = &cValue
+    endif
     SetCursor( 0 )
     Set( _SET_SCOREBOARD, lScoreSave )
     Set( _SET_EXIT, lExitSave )
@@ -268,15 +280,24 @@ METHOD doGet(oBro,pItem,nSet) Class TDBGArray
     END
 RETURN  nil
 
-function __DbgArrays(aArray,cArrayName)
-return TDBGArray():New(aArray,cArrayName)
+function __DbgArrays( aArray, cArrayName, lEditable )
+
+return TDBGArray():New( aArray, cArrayName, lEditable )
+
 Static function GetTopPos(nPos)
-Local nReturn:=0
-nReturn:=if((maxrow()-nPos)<5,Maxrow()-nPos,nPos)
-return nReturn
+
+   Local nReturn:=0
+
+   nReturn:=if((maxrow()-nPos)<5,Maxrow()-nPos,nPos)
+
+   return nReturn
+
 Static function GetBottomPos(nPos)
-Local nReturn:=0
-nReturn :=if(nPos<maxrow()-2,nPos ,maxrow()-2)
+
+   Local nReturn:=0
+
+   nReturn :=if(nPos<maxrow()-2,nPos ,maxrow()-2)
+
 return nReturn
 
 static procedure RefreshVarsS( oBrowse )
@@ -291,7 +312,9 @@ static procedure RefreshVarsS( oBrowse )
       oBrowse:hilite():colpos:=1
    endif
    oBrowse:hilite()
-   return
+
+return
+
 static function ArrayBrowseSkip( nPos, oBrwSets,n )
 
    return iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;

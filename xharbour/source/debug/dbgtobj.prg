@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtobj.prg,v 1.2 2002/12/01 03:58:35 walito Exp $
+ * $Id: dbgtobj.prg,v 1.3 2003/01/30 02:23:58 walito Exp $
  */
 
 /*
@@ -66,15 +66,17 @@ data pItems
 Data ArrayReference
 Data ArrayIndex
 Data AllNames
+data lEditable
 Method new
 method addWindows
 method doget
 method SetsKeyPressed
 endclass
 
-method new(aArray,pArName) class tdbgObject
+method new(aArray,pArName,lEditable) class tdbgObject
 Local aTemp
 
+DEFAULT lEditable TO .t.
 ::pItems:={}
 ::AllNames:={}
 for each aTemp in __objGetValueList(aArray)
@@ -94,6 +96,7 @@ next
 ::nCurWindow:=0
 ::ArrayReference:={}
 ::ArrayIndex:=1
+::lEditable = lEditable
 
 ::addWindows(::pItems)
 Return Self
@@ -131,8 +134,10 @@ Local owndsets
    oBrwSets:SkipBlock := { | nSkip, nPos | nPos := ::arrayindex,;
                           ::arrayindex := iif( nSkip > 0, Min( ::arrayindex+nSkip, Len(::arrayreference)),;
                           Max( 1, ::arrayindex + nSkip ) ), ::arrayindex - nPos }
-   oBrwSets:AddColumn( ocol:=     TBColumnNew("", { || ::ArrayReference[::arrayindex,1]} ))
+
    nMaxElem := maxelem(::AllNames)
+   oBrwSets:AddColumn( ocol := TBColumnNew( "",;
+                    { || PadR( ::ArrayReference[ ::arrayindex, 1 ], nMaxElem ) } ) )
    ocol:width := nMaxElem
    ocol:ColorBlock :=    { || { iif( ::Arrayindex == oBrwSets:Cargo, 2, 1 ), 2 } }
    oBrwSets:Freeze:=1
@@ -227,10 +232,14 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) class t
                   Alert("Value cannot be edited")
 
               else
-                 oBrwSets:RefreshCurrent()
-                 cTemp:=::doget(oBrwsets,::arrayreference,nSet)
-                 oBrwSets:RefreshCurrent()
-                 oBrwSets:ForceStable()
+                 if ::lEditable
+                    oBrwSets:RefreshCurrent()
+                    cTemp:=::doget(oBrwsets,::arrayreference,nSet)
+                    oBrwSets:RefreshCurrent()
+                    oBrwSets:ForceStable()
+                 else
+                    Alert( "Value cannot be edited" )
+                 endif
 
                endif
 
@@ -310,8 +319,8 @@ METHOD doGet(oBro,pItem,nSet) class tdbgObject
 
     // create a corresponding GET
     cValue := PadR( ValToStr( pitem[nSet,2] ), column:Width )
-    @  row(),col() GET cValue
-//    get := Getnew( Row(),col(), column:block,,, oBro:colorSpec )
+    @ row(),col() GET cValue ;
+        VALID If( Type( cValue ) == "UE", ( Alert( "Expression error" ), .f. ), .t. )
 
 
     // read it
@@ -348,5 +357,5 @@ static FUNC maxelem( a )
 
 RETURN max
 
-function __DbgObject(aArray,pArName)
-return TDBGObject():New(aArray,pArName)
+function __DbgObject(aArray,pArName,lEditable)
+return TDBGObject():New(aArray,pArName,lEditable)
