@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.447 2005/03/22 01:13:15 ronpinkas Exp $
+ * $Id: hvm.c,v 1.448 2005/03/31 04:02:25 druzus Exp $
  */
 
 /*
@@ -6268,7 +6268,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDo(%hu)", uiParams));
 
-   //printf( "\VmDo nItems: %i Params: %i Extra %i\n", HB_VM_STACK.pPos - HB_VM_STACK.pBase, uiParams, hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] );
+   //printf( "\VmDo nItems: %i Params: %i \n", HB_VM_STACK.pPos - HB_VM_STACK.pBase, uiParams );
 
    s_ulProcLevel++;
 
@@ -6286,7 +6286,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
 
    if( hb_stackItemFromTop( - ( uiParams + 1 ) )->type )
    {
-      //TraceLog( NULL, "DIVERTED hb_vmDo() to hb_vmSend()\n" );
+      TraceLog( NULL, "DIVERTED hb_vmDo() to hb_vmSend()\n" );
       hb_vmSend( uiParams );
       return;
    }
@@ -6298,7 +6298,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
       }
    #endif
 
-   //TraceLog( NULL, "StackNewFrame %hu\n", uiParams );
+   TraceLog( NULL, "StackNewFrame %hu\n", uiParams );
 
    pItem = hb_stackNewFrame( &sStackState, uiParams );
    pSym = pItem->item.asSymbol.value;
@@ -6306,7 +6306,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
    bDebugPrevState = s_bDebugging;
    s_bDebugging = FALSE;
 
-   //TraceLog( NULL, "Symbol: '%s'\n", pSym->szName );
+   TraceLog( NULL, "Symbol: '%s'\n", pSym->szName );
 
    if( HB_IS_NIL( pSelf ) ) /* are we sending a message ? */
    {
@@ -6331,7 +6331,15 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
          HB_TRACE( HB_TR_DEBUG, ("Calling: %s", pSym->szName));
 
          //printf( "Doing: '%s'\n", pSym->szName );
-         pFunc();
+         if ( pSym->cScope & HB_FS_PCODEFUNC )
+         {
+            /* Running pCode dynamic function from .HRB */
+            hb_vmExecute( ((PHB_PCODEFUNC)pFunc)->pCode, ((PHB_PCODEFUNC)pFunc)->pSymbols, ((PHB_PCODEFUNC)pFunc)->pGlobals );
+         }
+         else
+         {
+            pFunc();
+         }
          //printf( "Done: '%s'\n", pSym->szName );
 
          HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
@@ -6354,7 +6362,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
       else
       {
          /* Attempt to call an undefined function
-          *  - generate unrecoverable runtime error
+         *  - generate unrecoverable runtime error
           */
          PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
 
@@ -6660,7 +6668,15 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       HB_TRACE( HB_TR_DEBUG, ("Calling: %s", pSym->szName));
 
       //TraceLog( NULL, "Doing %s\n", pSym->szName );
-      pFunc();
+      if ( pSym->cScope & HB_FS_PCODEFUNC )
+      {
+         /* Running pCode dynamic function from .HRB */
+         hb_vmExecute( ((PHB_PCODEFUNC)pFunc)->pCode, ((PHB_PCODEFUNC)pFunc)->pSymbols, ((PHB_PCODEFUNC)pFunc)->pGlobals );
+      }
+      else
+      {
+         pFunc();
+      }
       //TraceLog( NULL, "Done\n" );
 
       HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));

@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.32 2004/09/28 15:32:39 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.33 2004/11/21 21:43:39 druzus Exp $
  */
 
 /*
@@ -295,17 +295,26 @@
     #define HB_DYNS_FUNC( hbfunc )   BOOL hbfunc( PHB_DYNS pDynSymbol, void * Cargo )
     typedef HB_DYNS_FUNC( PHB_DYNS_FUNC );
 
-    /* Harbour Functions scope ( HB_SYMBOLSCOPE ) */
-    #define HB_FS_PUBLIC   ( ( HB_SYMBOLSCOPE ) 0x01 )
-    #define HB_FS_STATIC   ( ( HB_SYMBOLSCOPE ) 0x02 )
-    #define HB_FS_FIRST    ( ( HB_SYMBOLSCOPE ) 0x04 )
-    #define HB_FS_INIT     ( ( HB_SYMBOLSCOPE ) 0x08 )
-    #define HB_FS_EXIT     ( ( HB_SYMBOLSCOPE ) 0x10 )
-    #define HB_FS_INITEXIT ( HB_FS_INIT | HB_FS_EXIT )
-    #define HB_FS_CRITICAL ( ( HB_SYMBOLSCOPE ) 0x20 )
+    /* pCode dynamic function - HRB */
+    typedef struct
+    {
+       BYTE *      pCode;      /* function body - PCODE */
+       PHB_SYMB    pSymbols;   /* module symbol table */
+       PHB_ITEM ** pGlobals;   /* globals */
+    } HB_PCODEFUNC, * PHB_PCODEFUNC;
 
-    #define HB_FS_MESSAGE  ( ( HB_SYMBOLSCOPE ) 0x40 )
-    #define HB_FS_MEMVAR   ( ( HB_SYMBOLSCOPE ) 0x80 )
+    /* Harbour Functions scope ( HB_SYMBOLSCOPE ) */
+    #define HB_FS_PUBLIC    ( ( HB_SYMBOLSCOPE ) 0x01 )
+    #define HB_FS_STATIC    ( ( HB_SYMBOLSCOPE ) 0x02 )
+    #define HB_FS_FIRST     ( ( HB_SYMBOLSCOPE ) 0x04 )
+    #define HB_FS_INIT      ( ( HB_SYMBOLSCOPE ) 0x08 )
+    #define HB_FS_EXIT      ( ( HB_SYMBOLSCOPE ) 0x10 )
+    #define HB_FS_INITEXIT  ( HB_FS_INIT | HB_FS_EXIT )
+    #define HB_FS_CRITICAL  ( ( HB_SYMBOLSCOPE ) 0x20 )
+
+    #define HB_FS_MESSAGE   ( ( HB_SYMBOLSCOPE ) 0x40 )
+    #define HB_FS_MEMVAR    ( ( HB_SYMBOLSCOPE ) 0x80 )
+    #define HB_FS_PCODEFUNC ( ( HB_SYMBOLSCOPE ) 0x100 )
 
     extern void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
 

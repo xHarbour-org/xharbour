@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.31 2004/08/14 07:57:54 ronpinkas Exp $
+ * $Id: runner.c,v 1.33 2005/04/05 00:32:10 druzus Exp $
  */
 
 /*
@@ -75,36 +75,10 @@
 /* TOFIX: Change this assembler hack to something standard and portable */
 /* TOFIX: Fix the memory leak on error. */
 
-/* NOTE: This is the assembler output from : hb_vmExecute( pcode, symbols ).  */
-
-/* #if INTEL32 */
-
-static BYTE prgFunction[] =
-{
-   0x68, 0x00, 0x00, 0x00, 0x00,  /* push offset Globals             */
-   0x68, 0x00, 0x00, 0x00, 0x00,  /* push offset symbols             */
-   0x68, 0x00, 0x00, 0x00, 0x00,  /* push offset pcode               */
-   0xE8, 0x00, 0x00, 0x00, 0x00,  /* call near relative hb_vmExecute */
-   0x83, 0xC4, 0x0C,              /* add esp, 12                     */
-   0xC3                           /* ret near                        */
-};
-
-/* #elseif INTEL16 */
-/* #elseif MOTOROLA */
-/* #elseif ... */
-/* #endif */
-
-typedef union
-{
-   BYTE *   pAsmData;                           /* The assembler bytes      */
-   PHB_FUNC pFunPtr;                            /* The (dynamic) harbour
-                                                   function                 */
-} ASM_CALL, * PASM_CALL;
-
 typedef struct
 {
    char *     szName;                           /* Name of the function     */
-   PASM_CALL  pAsmCall;                         /* Assembler call           */
+   PHB_PCODEFUNC pCodeFunc;                     /* Dynamic function info    */
    BYTE *     pCode;                            /* P-code                   */
 } HB_DYNF, * PHB_DYNF;
 
@@ -121,21 +95,16 @@ typedef struct
 } HRB_BODY, * PHRB_BODY;
 
 
-#define SYM_NOLINK  0                           /* Symbol does not have to
-                                                                  be linked */
+#define SYM_NOLINK  0                           /* Symbol does not have to be linked */
 #define SYM_FUNC    1                           /* Defined function         */
 #define SYM_EXTERN  2                           /* Prev. defined function   */
+#define SYM_NOT_FOUND 0xFFFFFFFF                /* Symbol not found.        */
 
-#define SYM_NOT_FOUND 0xFFFFFFFF                /* Symbol not found.
-                                                   FindSymbol               */
 HB_EXTERN_BEGIN
-HB_EXPORT PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Create a dynamic function*/
 HB_EXPORT PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize );
 HB_EXPORT PHRB_BODY hb_hrbLoadFromFile( char* szHrb );
 HB_EXPORT void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] );
 HB_EXPORT void hb_hrbUnLoad( PHRB_BODY pHrbBody );
-HB_EXPORT void hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address );
-HB_EXPORT void hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset, void * Address, ULONG ulNext );
 HB_EXTERN_END
 
 static void hb_hrbInit( PHRB_BODY pHrbBody, int argc, char * argv[] );
@@ -220,7 +189,7 @@ HB_FUNC( __HRBLOAD )
       {
          char **argv = NULL;
          int i;
-         
+
          if( argc > 1 )
          {
             argv = (char**) hb_xgrab( sizeof(char*) * (argc-1) );
@@ -517,7 +486,16 @@ static void hb_hrbInitStatic( PHRB_BODY pHrbBody )
              * to pass any parameters to this function because they
              * cannot be used to initialize static variable.
              */
-            pHrbBody->pSymRead[ ul ].value.pFunPtr();
+
+            /* changed to call VM execution instead of direct function address call
+             * // pHrbBody->pSymRead[ ul ].value.pFunPtr();
+             * [MLombardo]
+             */
+
+            hb_vmPushSymbol( &(pHrbBody->pSymRead[ ul ]) );
+            hb_vmPushNil();
+            hb_vmDo( 0 );
+
          }
       }
    }
@@ -596,17 +574,14 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
       hb_dynsymLock();
       pDyn = hb_dynsymFind( pHrbBody->pDynFunc[ ul ].szName );
 
-      if( pDyn && pDyn->pFunPtr && pDyn->pFunPtr == pHrbBody->pDynFunc[ ul ].pAsmCall->pFunPtr )
+      if( pDyn && pDyn->pFunPtr && pDyn->pFunPtr == ( PHB_FUNC ) pHrbBody->pDynFunc[ ul ].pCodeFunc )
       {
          //printf( "Reset >%s<\n", pHrbBody->pDynFunc[ ul ].szName );
-
          pDyn->pFunPtr = NULL;
          pDyn->pSymbol->value.pFunPtr = NULL;
       }
       hb_dynsymUnlock();
-
-      hb_xfree( pHrbBody->pDynFunc[ ul ].pAsmCall->pAsmData );
-      hb_xfree( pHrbBody->pDynFunc[ ul ].pAsmCall );
+      hb_xfree( pHrbBody->pDynFunc[ ul ].pCodeFunc );
       hb_xfree( pHrbBody->pDynFunc[ ul ].pCode );
       hb_xfree( pHrbBody->pDynFunc[ ul ].szName );
    }
@@ -642,6 +617,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
       PHB_SYMB pSymRead;                           /* Symbols read             */
       PHB_DYNF pDynFunc;                           /* Functions read           */
       PHB_DYNS pDynSym;
+
       int nVersion = hb_hrbReadHead( (char *) szHrbBody, (ULONG) ulBodySize, &ulBodyOffset );
 
       if( !nVersion )
@@ -686,7 +662,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
 
       pDynFunc = ( PHB_DYNF ) hb_xgrab( pHrbBody->ulFuncs * sizeof( HB_DYNF ) );
       memset( pDynFunc, 0, pHrbBody->ulFuncs * sizeof( HB_DYNF ) );
-
+      //printf( "\nWill read symbols\n" );
       for( ul = 0; ul < pHrbBody->ulFuncs; ul++ )         /* Read symbols in .HRB     */
       {
          pDynFunc[ ul ].szName = hb_hrbReadId( (char *) szHrbBody, TRUE, ulBodySize, &ulBodyOffset );
@@ -697,21 +673,20 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
          /* Read the block           */
          memcpy( ( char * ) pDynFunc[ ul ].pCode, (char *) (szHrbBody + ulBodyOffset), ulSize );
          ulBodyOffset += ulSize;
-
-        /* Create matching dynamic function */
-         pDynFunc[ ul ].pAsmCall = hb_hrbAsmCreateFun( pSymRead, pDynFunc[ ul ].pCode );
-
-         //printf( "#%i/%i Sym: >%s<, pAsm: %p, offset %i\n", ul, pHrbBody->ulFuncs, pDynFunc[ ul ].szName, pDynFunc[ ul ].pAsmCall, ulBodyOffset );
+         pDynFunc[ ul ].pCodeFunc = (PHB_PCODEFUNC) hb_xgrab( sizeof( HB_PCODEFUNC ) );
+         pDynFunc[ ul ].pCodeFunc->pCode    = pDynFunc[ ul ].pCode;
+         pDynFunc[ ul ].pCodeFunc->pSymbols = pSymRead;
+         pDynFunc[ ul ].pCodeFunc->pGlobals = NULL;
+         //printf( "Reading function %s and storing in %p\n", pDynFunc[ ul ].szName, pDynFunc[ ul ].pCodeFunc );
       }
 
       pHrbBody->pSymRead = pSymRead;
       pHrbBody->pDynFunc = pDynFunc;
       s_ulSymEntry = 0;
 
-      for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )    /* Linker                   */
+      for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )    /* Linker */
       {
          //printf( "linking #%i/%i Sym: >%s<\n", ul, pHrbBody->ulSymbols, pSymRead[ ul ].szName );
-
          if( ( ( HB_PTRDIFF ) pSymRead[ ul ].value.pFunPtr ) == SYM_FUNC )
          {
             ulPos = hb_hrbFindSymbol( pSymRead[ ul ].szName, pDynFunc, pHrbBody->ulFuncs );
@@ -734,7 +709,11 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
                   break;
                }
                */
-               pSymRead[ ul ].value.pFunPtr = pDynFunc[ ulPos ].pAsmCall->pFunPtr;
+
+               pSymRead[ ul ].value.pFunPtr = ( PHB_FUNC ) pDynFunc[ ulPos ].pCodeFunc;
+               pSymRead[ ul ].cScope |= HB_FS_PCODEFUNC;
+
+               //printf( "Function pointer is %p\n", pSymRead[ ul ].value.pFunPtr );
             }
          }
 
@@ -905,87 +884,4 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
    {
       hb_itemRelease( hb_itemReturn( pRetVal ) );
    }
-}
-
-/*
-   Create dynamic function.
-
-   This function is needed, since it will allow the existing strategy of
-   function pointers to work properly.
-
-   For each Harbour function a little program calling the virtual machine
-   should be present (see : *.c)
-
-   Since these programs no longer exists when using this system, they should
-   be create dynamically at run-time.
-
-   If a .PRG contains 10 functions, 10 dynamic functions are created which
-   are all the same :-) except for 2 pointers.
-*/
-HB_EXPORT PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode )
-{
-   PASM_CALL asmRet;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_hrbAsmCreateFun(%p, %p)", pSymbols, pCode));
-
-   asmRet = ( PASM_CALL ) hb_xgrab( sizeof( ASM_CALL ) );
-   asmRet->pAsmData = ( BYTE * ) hb_xgrab( sizeof( prgFunction ) );
-   memcpy( asmRet->pAsmData, prgFunction, sizeof( prgFunction ) );
-                                              /* Copy new assembler code in */
-/* #if INTEL32 */
-
-   //hb_hrbAsmPatch( asmRet->pAsmData, 1, NULL );       /* Insert pointer to globals */
-   hb_hrbAsmPatch( asmRet->pAsmData, 6, pSymbols );   /* Insert pointer to symbols */
-   hb_hrbAsmPatch( asmRet->pAsmData, 11, pCode );      /* Insert pointer to pcode */
-   hb_hrbAsmPatchRelative( asmRet->pAsmData, 16, ( void * ) hb_vmExecute, 20 );
-                                      /* Insert pointer to hb_vmExecute() */
-
-/* #elseif INTEL16 */
-/* #elseif MOTOROLA */
-/* #elseif ... */
-/* #endif */
-   return asmRet;
-}
-
-/* Patch an address of the dynamic function */
-void hb_hrbAsmPatch( BYTE * pCode, ULONG ulOffset, void * Address )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_hrbAsmPatch(%p, %lu, %p)", pCode, ulOffset, Address));
-
-/* #if 32 bits and low byte first */
-
-   pCode[ ulOffset     ] = ( BYTE ) ( ( ( ULONG ) Address       ) & 0xFF );
-   pCode[ ulOffset + 1 ] = ( BYTE ) ( ( ( ULONG ) Address >>  8 ) & 0xFF );
-   pCode[ ulOffset + 2 ] = ( BYTE ) ( ( ( ULONG ) Address >> 16 ) & 0xFF );
-   pCode[ ulOffset + 3 ] = ( BYTE ) ( ( ( ULONG ) Address >> 24 ) & 0xFF );
-
-/* #elseif 16 bits and low byte first */
-/* #elseif 32 bits and high byte first */
-/* #elseif ... */
-/* #endif */
-}
-
-
-/* Intel specific ?? Patch an address relative to the next instruction */
-void hb_hrbAsmPatchRelative( BYTE * pCode, ULONG ulOffset, void * Address, ULONG ulNext )
-{
-   ULONG ulBase;
-   ULONG ulRelative;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_hrbAsmPatchRelative(%p, %lu, %p, %lu)", pCode, ulOffset, Address, ulNext));
-
-/* #if 32 bits and low byte first */
-   ulBase = ( ULONG ) pCode + ulNext;
-                                /* Relative to next instruction */
-   ulRelative = ( ULONG ) Address - ulBase;
-
-   pCode[ ulOffset     ] = ( BYTE ) ( ( ulRelative       ) & 0xFF );
-   pCode[ ulOffset + 1 ] = ( BYTE ) ( ( ulRelative >>  8 ) & 0xFF );
-   pCode[ ulOffset + 2 ] = ( BYTE ) ( ( ulRelative >> 16 ) & 0xFF );
-   pCode[ ulOffset + 3 ] = ( BYTE ) ( ( ulRelative >> 24 ) & 0xFF );
-
-/* #elseif 16 bits and low byte first */
-/* #elseif 32 bits and high byte first */
-/* #elseif ... */
-/* #endif */
 }

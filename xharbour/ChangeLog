@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4008 2005/04/05 22:25:31 druzus Exp $
+ * $Id: ChangeLog,v 1.4009 2005/04/06 02:17:16 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-04 00:40 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * include/hbdefs.h
+    + Added new HB_PCODEFUNC structure
+  * include/hbvmpub.h
+    ! HB_SYMBOLSCOPE changed from char to SHORT
+    + Added function scope 9th bit HB_FS_PCODEFUNC
+  * source/vm/runner.c
+    ! Removed all ASM patch from HRB files load and added pCode
+      and symbols structure pointer to symbol.value.pFunPtr
+    ! Fixed statics initialization to avoid direct pFunPtr()
+      call
+  * source/vm/hvm.c
+    + Added hack in function call and vmSend to check scope for
+      HB_FS_PCODEFUNC and make direct call to hb_vmExecute()
+
 2005-04-06 09:10 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * source/compiler/genc.c
     * simplification of some sub routines
@@ -27,7 +43,7 @@
   * xharbour/source/rtl/filesys.c
   * xharbour/source/compiler/genc.c
     * casting
-  
+
   * xharbour/source/rdd/dbfntx/dbfntx1.c
     * minor modification in detecting bad expressions
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.69 2005/03/31 03:15:18 druzus Exp $
+ * $Id: hbdefs.h,v 1.70 2005/04/02 21:13:46 andijahja Exp $
  */
 
 /*
@@ -551,7 +551,7 @@ typedef long HB_PTRDIFF;
                                                 ( ( ( UINT64 ) ( w ) & HB_LL( 0x00FF000000000000 ) ) >> 40 ) | \
                                                 ( ( ( UINT64 ) ( w ) & HB_LL( 0xFF00000000000000 ) ) >> 56 ) ) )
 
-/* 
+/*
  * on some machines it's not safe to directly access pointers stored
  * at byte buffer they have to be stored at odd (or other alignment)
  * addresses.
@@ -1077,7 +1077,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
 #define HB_FUNC_REGISTERGLOBAL( )  static HARBOUR hb_REGISTERGLOBALS( void )
 
 typedef ULONG HB_HANDLE;        /* handle to memvar value */
-typedef char  HB_SYMBOLSCOPE;   /* stores symbol's scope */
+typedef SHORT HB_SYMBOLSCOPE;   /* stores symbol's scope */
 
 typedef BYTE HB_CHAR;
 typedef BYTE HB_ATTR;
