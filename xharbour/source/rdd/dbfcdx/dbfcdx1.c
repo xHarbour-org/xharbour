@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.121 2004/03/30 05:55:36 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.122 2004/03/30 16:43:38 druzus Exp $
  */
 
 /*
@@ -5108,7 +5108,7 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
       USHORT uiTag = pArea->uiTag;
       pArea->uiTag = hb_cdxGetTagNumber( pArea, pTag );
       retval = SELF_GOTOP( ( AREAP ) pArea );
-      while ( !pArea->fEof && ulKeyNo-- )
+      while ( !pArea->fEof && --ulKeyNo )
          retval = SELF_SKIP( ( AREAP ) pArea, 1 );
       pArea->uiTag = uiTag;
    }
