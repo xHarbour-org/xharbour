@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.646 2003/01/25 20:43:40 lculik Exp $
+ * $Id: ChangeLog,v 1.647 2003/01/26 02:48:40 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,97 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-27 01:45 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * makefile.bc
+  * makefile.vc
+  * hrbdll.bc
+  * hrbdll.vc
+    + Add arrayblk.prg, color53.prg, mssgline.prg
+
+2003-01-27 01:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/vm/hvm.c
+    + Add support for cancel with Ctrl-Break
+    + Add support to call to debug in an infinite or very big loop.
+
+2003-01-27 01:27 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/Makefile
+    + Add arrayblk.prg, color53.prg, mssgline.prg
+
+2003-01-27 01:25 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * include/hblang.ch
+    + Add constant from hbapilng.h
+
+2003-01-27 01:20 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/inkey.c
+  * include/hbapigt.h
+    + Support for KEYBOARD command independent of SET TYPEAHEAD
+    + Add function hb_setInkeyLast for support to SETLASTKEY function of
+      CT library.
+
+2003-01-27 01:15 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/objfunc.prg
+    + Add function for create Access & Assign method for simulate
+      controled instance variable.
+
+2003-01-27 01:12 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/mssgline.prg
+    + Message Line Class for Get and Menu System.
+      Implemented by Larry Sevilla.
+
+2003-01-27 01:10 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/color53.prg
+    + Undocumented functions of treatment of color. Used in Get and Menu.
+
+2003-01-27 01:05 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/arrayblk.prg
+    + Add function HB_ArrayBlk( array, index ).
+      Generate a codeblock to access to a position of the array.
+
+2003-01-27 01:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tmenuitm.prg
+  * source/rtl/tpopup.prg
+  * source/rtl/ttopbar.prg
+    * More readable code
+    + Add routines, simulating Menusys of Clip53
+      Modifications maked by Larry Sevilla
+
+2003-01-27 00:55 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/getsys.prg
+  * source/rtl/tgetlist.prg
+    + Add support for Menu system
+    * enclosed Clip53 compatible routines with HB_COMPAT_C53
+    * Line Message was implemented as object.
+    * Modified ReadFormat & __SetFormat routines
+      Modifications maked by Larry Sevilla
+
+2003-01-27 00:45 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/tget.prg
+    * Optimizations with SWITCH and FOR EACH
+    + Support for press YES/NO key in national languages for logicals get.
+
+2003-01-27 00:30 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+   * source/rtl/achoice.prg
+   * source/rtl/alert.prg
+   * source/rtl/browse.prg
+   * source/rtl/cstr.prg
+   * source/rtl/dbdelim.prg
+   * source/rtl/dbedit.prg
+   * source/rtl/dbsdf.prg
+   * source/rtl/errorsys.prg
+   * source/rtl/listbox.prg
+   * source/rtl/memoedit.prg
+   * source/rtl/menuto.prg
+   * source/rtl/persist.prg
+   * source/rtl/profiler.prg
+   * source/rtl/radiogrp.prg
+   * source/rtl/readkey.prg
+   * source/rtl/setfunc.prg
+   * source/rtl/tbrowse.prg
+   * source/rtl/teditor.prg
+   * source/rtl/treport.prg
+   * source/rtl/ttable.prg
+     * Optimizations with SWITCH-CASE
 
 2003-01-26 05:50 UTC+0300 Phil Krylov <phil@mail.ru>
   * include/hbdefs.h
