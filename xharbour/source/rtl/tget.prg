@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.62 2003/11/14 03:11:07 walito Exp $
+ * $Id: tget.prg,v 1.63 2003/11/15 04:46:23 walito Exp $
  */
 
 /*
@@ -498,7 +498,7 @@ METHOD Undo() CLASS Get
    if ::hasfocus
       ::VarPut( ::Original, .t. )
       ::pos := ::FirstEditable( )
-      ::Display()
+      ::updateBuffer() // 7/01/2004 9:44a.m. was ::Display()
    endif
 
 return Self
@@ -1639,9 +1639,9 @@ METHOD Block( bBlock ) CLASS Get
 
 /*
 //
-// This is the first step to eliminate this method SETGET.  
-// Given the current state of compatibility, is no longer 
-// necessary to have this method. 
+// This is the first step to eliminate this method SETGET.
+// Given the current state of compatibility, is no longer
+// necessary to have this method.
 //
 
    if bBlock != NIL .AND. !::HasFocus
