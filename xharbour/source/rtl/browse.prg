@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.2 2003/01/27 03:37:23 walito Exp $
+ * $Id: browse.prg,v 1.3 2003/09/06 22:24:35 lculik Exp $
  */
 
 /*
@@ -110,9 +110,9 @@ function Browse( nTop, nLeft, nBottom, nRight )
 
    while ! lExit
 
-      if ( !lKeyPressed)       
-         while !oBrw:stabilize() 
-            if ( ( nKey := InKey() ) != 0 )
+      if ( !lKeyPressed)
+         while !oBrw:stabilize()
+            if ( ( nKey := InKey(0.1) ) != 0 )
                lKeyPressed := .T.
                exit
             endif
