@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.8 2003/07/15 09:15:34 andijahja Exp $
+ * $Id: hbxml.c,v 1.9 2003/07/17 21:11:10 jonnymind Exp $
  */
 
 /*
@@ -130,10 +130,11 @@ PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
    char buf_attrib[ MXML_MAX_NAME_LEN *2 + 1];
    int iPosn = 0, iPosa = 0;
    int iStatus = 0;
+   int iPosAmper;
 
    HB_SYMBOL_UNUSED( style );
 
-   while ( iStatus < 5 && iPosn <= MXML_MAX_NAME_LEN && iPosa <= MXML_MAX_ATTRIB_LEN ) {
+   while ( iStatus < 6 && iPosn <= MXML_MAX_NAME_LEN && iPosa <= MXML_MAX_ATTRIB_LEN ) {
       chr = mxml_refil_getc( ref );
       if ( chr == MXML_EOF ) break;
 
@@ -219,7 +220,12 @@ PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
          // scanning the attribute content ( until next quotechr )
          case 4:
             if ( chr == quotechr ) {
+               iStatus = 6;
+            }
+            else if ( chr == '&' && !( style & MXML_STYLE_NOESCAPE) ) {
                iStatus = 5;
+               iPosAmper = iPosa;
+               buf_attrib[ iPosa++ ] = chr; //we'll need it
             }
             else if( chr == MXML_LINE_TERMINATOR ) {
                hbxml_doc_new_line( pDoc );
@@ -231,6 +237,37 @@ PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
             }
          break;
 
+         case 5:
+            if ( chr == ';' ) {
+               int iAmpLen = iPosa - iPosAmper - 2;
+               char *bp = buf_attrib + iPosAmper + 1;
+
+               if ( iAmpLen <= 0 ) {
+                  //error! - we have "&;"
+                  hbxml_set_doc_status( pDoc, MXML_STATUS_MALFORMED, MXML_ERROR_WRONGENTITY );
+                  return NULL;
+               }
+
+               iStatus = 4;
+
+               // we see if we have a predef entity (also known as escape)
+               if ( strncmp( bp, "amp", iAmpLen ) == 0 ) chr = '&';
+               else if ( strncmp( bp, "lt", iAmpLen ) == 0 ) chr = '<';
+               else if ( strncmp( bp, "gt", iAmpLen ) == 0 ) chr = '>';
+               else if ( strncmp( bp, "quot", iAmpLen ) == 0 ) chr = '"';
+               else if ( strncmp( bp, "apos", iAmpLen ) == 0 ) chr = '\'';
+               iPosa = iPosAmper;
+               buf_attrib[ iPosa++ ] = chr;
+            }
+            else if ( ! isalpha( chr ) ) {
+               //error - we have something like &amp &amp
+               hbxml_set_doc_status( pDoc, MXML_STATUS_MALFORMED, MXML_ERROR_WRONGENTITY );
+               return NULL;
+            }
+            else {
+               buf_attrib[ iPosa++ ] = chr;
+            }
+         break;
       }
 
    }
@@ -238,7 +275,7 @@ PHB_ITEM mxml_attribute_read( MXML_REFIL *ref, PHB_ITEM pDoc, int style )
    if ( ref->status != MXML_STATUS_OK )
       return NULL;
 
-   if ( iStatus < 5 ) {
+   if ( iStatus < 6 ) {
       if ( iPosn > MXML_MAX_NAME_LEN )
          hbxml_set_doc_status( pDoc, MXML_STATUS_MALFORMED, MXML_ERROR_ATTRIBTOOLONG);
       else if ( iPosa > MXML_MAX_ATTRIB_LEN )

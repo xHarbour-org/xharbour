@@ -1,6 +1,6 @@
 ************************************************************
 * threadstress.prg
-* $Id: mtstress.prg,v 1.4 2003/08/01 12:16:51 jonnymind Exp $
+* $Id: mtstress.prg,v 1.5 2003/08/07 00:18:50 jonnymind Exp $
 *
 * Stresstest for thread programs
 * Stress all those feature that are thread-critical:
@@ -21,7 +21,6 @@ PROCEDURE Main()
 
    CLEAR SCREEN
    @2,15 SAY "X H A R B O U R - Multithreading / Stress tests"
-   @3,5 SAY "WARNING: This should crash near the end; it is normal, don't worry"
 
    nStart := Seconds()
 
@@ -118,7 +117,7 @@ PROCEDURE Stress( nId, nRow )
    END
 
    // Step 3: private test
-
+/*
    @nRow,5 SAY Space( 80 )
 
    m->cMemVal := "XXX"
@@ -144,6 +143,7 @@ PROCEDURE Stress( nId, nRow )
    NEXT
 
    // Step 5: macro test
+
    @nRow,5 SAY Space( 80 )
    FOR nCount := 1 TO 10000
       cData := "cRndMem := cRnd[ Int( HB_Random(1, 21) ) ] + cRnd[ Int( HB_Random(1, 21) ) ] + cRnd[ Int( HB_Random(1, 21) ) ]"
@@ -152,6 +152,7 @@ PROCEDURE Stress( nId, nRow )
        Alltrim( Str( nCount ) ) + ": "+ m->cRndMem
    NEXT
 
+*/
 RETURN
 
 
