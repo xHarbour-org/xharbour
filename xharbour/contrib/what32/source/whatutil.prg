@@ -173,7 +173,7 @@ Function Alert( cMsg, aChoices )
                       2, 8, w - 4, msgh, ;
                       cMsg )
 
-   MessageBeep( MB_ICONHAND )
+   MessageBeep( MB_OK )
 
    i := DialogBox( ,aDlg, hWnd, { | hDlg, nMsg, nwParam, nlParam | AlertProc( hDlg, nMsg, nwParam, nlParam ) } )
 
