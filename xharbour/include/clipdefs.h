@@ -1,5 +1,5 @@
 /*
- * $Id: clipdefs.h,v 1.3 2004/03/17 02:29:00 druzus Exp $
+ * $Id: clipdefs.h,v 1.4 2005/02/19 10:08:40 andijahja Exp $
  */
 
 /*
@@ -79,7 +79,7 @@ typedef USHORT * USHORTP;
 typedef USHORTP PUSHORT;
 
 #if !(defined(HB_OS_WIN_32) && defined(HB_OS_WIN_32_USED))
-   #if !( ( defined(__MINGW32__) || defined(__POCC__) ) && defined(HB_THREAD_SUPPORT))
+   #if !( ( defined(__DMC__) || defined(__MINGW32__) || defined(__POCC__) ) && defined(HB_THREAD_SUPPORT))
       typedef unsigned int WORD;
       typedef WORD *  WORDP;
       typedef WORDP   PWORD;
