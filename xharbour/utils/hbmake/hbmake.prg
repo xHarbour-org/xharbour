@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.101 2003/11/12 20:52:49 lculik Exp $
+ * $Id: hbmake.prg,v 1.102 2003/11/24 23:48:43 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1603,6 +1603,7 @@ FUNC CreateMakeFile( cFile )
       ENDIF
 
    END
+   cTopFile := AllTrim( cTopFile )
 
    IF s_lExternalLib
       aLibs := Getlibs( s_lGcc, GetMakeDir() + '\lib' )
