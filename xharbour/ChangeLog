@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1026 2003/05/16 22:03:43 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1027 2003/05/17 00:26:04 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-17 04:22 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/bin/!pack_src.sh
+    * some minor modifications
+
+  + xharbour/bin/hb-mkslib.sh
+    + simple script to build shared libraries from static ones and object
+      files
+
+  + xharbour/xharbour.spec
+    + RPM spec to build xHarbour binaries RPMs. It produce three RPMs
+      xharbour (compiler and tools), xharbour-lib (shared xHarbour libraries
+      for developers and users of application linked with shard libs)
+      xharbour-static (static libs for developers who want to produce static
+      binaries). xharbour rpm has additional tools 'xhbcmp', 'xhlnk', 'xhbmk'
+      See README.RPM for detailed description.
+    
+  + xharbour/make_rpm.sh
+    + simple script which automaticaly packs the CVS tree and builds
+      RPMs
 
 2003-05-16 17:23 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * tests/serialize.prg
@@ -189,6 +209,7 @@
   * xharbour/bin/!pack_src.bat
   + xharbour/bin/!pack_src.sh
     * some cleanups.
+
 2003-05-16 11:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbclass.ch
     + Added support for syntax: MESSAGE <MsgName>[(...)] PROCEDURE <ProcName>[(...)]
