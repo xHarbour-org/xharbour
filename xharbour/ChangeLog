@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2453 2004/03/02 22:42:04 druzus Exp $
+ * $Id: ChangeLog,v 1.2454 2004/03/02 23:19:37 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-03 01:15 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/utils/hbtest/hbtest.prg
+  * xharbour/utils/hbtest/rt_misc.prg
+   * BAD file name are platform dependent now. * and ? can be use in file
+     name on Linux
+   * some small fixes for case sensitive FS to proper clean temporary files
 
 2004-03-03 00:30 UTC+0100 Giancarlo Niccolai <gc [at] niccolai [dot] ws>
   * source/rtl/gtapi.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hbtest.prg,v 1.5 2003/09/10 21:35:46 druzus Exp $
+ * $Id: hbtest.prg,v 1.6 2004/02/12 07:37:57 andijahja Exp $
  */
 
 /*
@@ -183,7 +183,7 @@ STATIC FUNCTION Main_LAST()
 #endif
    TEST_LINE( MEMVARBLOCK( "mcString" )           , NIL                                               )
 #ifndef __XPP__
-   TEST_LINE( __MSave( "*BADNAM*.MEM", "*", .T. ) , "E BASE 2006 Create error *BADNAM*.MEM A:3:C:*BADNAM*.MEM;C:*;L:.T. F:DR")
+   TEST_LINE( __MSave( BADFNAME(), "*", .T. ) , "E BASE 2006 Create error " + BADFNAME() + " A:3:C:" + BADFNAME() + ";C:*;L:.T. F:DR")
 #endif
 
    RETURN NIL
@@ -289,7 +289,7 @@ STATIC FUNCTION TEST_BEGIN( cParam )
    //rddSetDefault( "DBFCDX" )
 #endif
 
-   dbCreate( "!TEMP!.DBF",;
+   dbCreate( "!TEMP!.dbf",;
       { { "TYPE_C"   , "C", 15, 0 } ,;
         { "TYPE_C_E" , "C", 15, 0 } ,;
         { "TYPE_D"   , "D",  8, 0 } ,;
@@ -303,7 +303,7 @@ STATIC FUNCTION TEST_BEGIN( cParam )
         { "TYPE_L"   , "L",  1, 0 } ,;
         { "TYPE_L_E" , "L",  1, 0 } } )
 
-   USE ( "!TEMP!.DBF" ) NEW ALIAS w_TEST EXCLUSIVE
+   USE ( "!TEMP!.dbf" ) NEW ALIAS w_TEST EXCLUSIVE
 
    dbAppend()
 
@@ -410,8 +410,8 @@ STATIC FUNCTION TEST_END()
 
    dbSelectArea( "w_TEST" )
    dbCloseArea()
-   fErase( "!TEMP!.DBF" )
-   fErase( "!TEMP!.DBT" )
+   fErase( "!TEMP!.dbf" )
+   fErase( "!TEMP!.dbt" )
 
    s_nEndTime := Seconds()
 
@@ -606,6 +606,14 @@ FUNCTION HB_SToD( cDate )
 #endif
 #endif
 #endif
+
+STATIC FUNCTION BADFNAME()
+#ifdef __PLATFORM__Linux
+   return "*BADNAM/*.MEM"
+#else
+   return "*BADNAM*.MEM"
+#endif
+
 
 /* Don't change the position of this #include. */
 #include "rt_init.ch"
