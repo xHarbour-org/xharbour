@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.128 2004/05/02 12:00:50 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.129 2004/05/02 13:44:05 druzus Exp $
  */
 
 /*
@@ -7670,7 +7670,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
       BOOL bSaveDeleted = hb_set.HB_SET_DELETED, fSaveRecDeleted = pArea->fDeleted;
       PHB_ITEM pSaveFilter = pArea->dbfi.itmCobExpr;
       USHORT uiSaveTag = pArea->uiTag;
-      ULONG ulSaveRecNo = pArea->ulRecNo, ulStartRec = 0;
+      ULONG ulSaveRecNo = pArea->ulRecNo, ulStartRec = 0, ulNextCount = 0;
       BYTE * pRecBuff = NULL, * pSaveRecBuff = pArea->pRecord;
       int iRecBuff = 0, iRecBufSize = 0xffff / pArea->uiRecordLen;
 
@@ -7692,6 +7692,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
       else if ( pArea->lpdbOrdCondInfo->lRecno )
       {
          ulStartRec = ulRecCount = pArea->lpdbOrdCondInfo->lRecno;
+         ulNextCount = 1;
       }
       else if ( pArea->lpdbOrdCondInfo->fUseCurrent )
       {
@@ -7699,8 +7700,13 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
          {
             ulStartRec = pArea->lpdbOrdCondInfo->lStartRecno;
          }
+         if ( pArea->lpdbOrdCondInfo->lNextCount > 0 )
+         {
+            ulNextCount = pArea->lpdbOrdCondInfo->lNextCount;
+            ulRecCount = ulStartRec + ulNextCount - 1;
+         }
       }
-      else if ( pArea->lpdbOrdCondInfo->fRest || pArea->lpdbOrdCondInfo->lNextCount )
+      else if ( pArea->lpdbOrdCondInfo->fRest || pArea->lpdbOrdCondInfo->lNextCount > 0 )
       {
          if ( pArea->lpdbOrdCondInfo->lStartRecno )
          {
@@ -7712,7 +7718,8 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
          }
          if ( pArea->lpdbOrdCondInfo->lNextCount > 0 )
          {
-            ulRecCount = ulStartRec + pArea->lpdbOrdCondInfo->lNextCount - 1;
+            ulNextCount = pArea->lpdbOrdCondInfo->lNextCount;
+            ulRecCount = ulStartRec + ulNextCount - 1;
          }
       }
       else
@@ -7847,10 +7854,9 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                   break;
             }
          }
-         if ( pArea->lpdbOrdCondInfo && pArea->lpdbOrdCondInfo->lNextCount > 0 )
+         if( ulNextCount > 0 )
          {
-            pArea->lpdbOrdCondInfo->lNextCount--;
-            if ( pArea->lpdbOrdCondInfo->lNextCount <= 0 )
+            if ( --ulNextCount == 0 )
                break;
          }
          if ( !bDirectRead )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2865 2004/05/03 07:54:05 vouchcac Exp $
+ * $Id: ChangeLog,v 1.2866 2004/05/03 13:02:53 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-03 19:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed indexing single record with RECORD clause as subindex.
+
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * TABs replaced by SPACEs
+
+  * xharbour/source/vm/hvm.c
+    * finished the modification I had to missed in one of my previous
+      commit - I've just noticed it replaying to Gian email.
+      BTW - Why stack frame index was in xHarbour in pDynSym not in
+      pFunPtr of HB_SYMB structure like in Harbour?
+      Ron, Gian can this modification interact with something else?
 
 2004-05-03 10:00 UTC-0300 Luiz Rafael Culik<culikr / at /brturbo.com >
   * utils/hbmake/hbmake.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.386 2004/04/30 19:42:23 druzus Exp $
+ * $Id: hvm.c,v 1.387 2004/05/02 10:47:48 druzus Exp $
  */
 
 /*
@@ -6203,7 +6203,7 @@ static void hb_vmSFrame( PHB_SYMB pSym )      /* sets the statics frame for a fu
    HB_TRACE(HB_TR_DEBUG, ("hb_vmSFrame(%p)", pSym));
 
    /* _INITSTATICS is now the statics frame. Statics() changed it! */
-   HB_VM_STACK.iStatics = ( int ) pSym->pDynSym; /* pSym is { "$_INITSTATICS", HB_FS_INIT | HB_FS_EXIT, _INITSTATICS } for each PRG */
+   HB_VM_STACK.iStatics = pSym->value.iStaticsBase; /* pSym is { "$_INITSTATICS", HB_FS_INIT | HB_FS_EXIT, _INITSTATICS } for each PRG */
 }
 
 static void hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ) /* initializes the global aStatics array or redimensionates it */
@@ -6212,13 +6212,13 @@ static void hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ) /* initializes the g
 
    if( HB_IS_NIL( &s_aStatics ) )
    {
-      pSym->pDynSym = NULL;         /* statics frame for this PRG */
+      pSym->value.iStaticsBase = 0;         /* statics frame for this PRG */
       hb_arrayNew( &s_aStatics, uiStatics );
       //printf( "Allocated s_aStatics: %p %p\n", &s_aStatics, s_aStatics.item.asArray.value->pOwners );
    }
    else
    {
-      pSym->pDynSym = ( PHB_DYNS ) (&s_aStatics)->item.asArray.value->ulLen;
+      pSym->value.iStaticsBase = (&s_aStatics)->item.asArray.value->ulLen;
       hb_arraySize( &s_aStatics, (&s_aStatics)->item.asArray.value->ulLen + uiStatics );
       //TraceLog( NULL, "Symbol: %s Statics: %i Size: %i\n", pSym->szName, uiStatics, hb_arrayLen( &s_aStatics ) );
    }
@@ -8282,9 +8282,9 @@ HB_FUNC( HB_FUNCPTR )
 
       if( pDynSym )
       {
-         ( &(HB_VM_STACK.Return) )->type = HB_IT_LONG;
-         ( &(HB_VM_STACK.Return) )->item.asLong.value = (ULONG) pDynSym->pSymbol->value.pFunPtr;
-         ( &(HB_VM_STACK.Return) )->item.asLong.length = 10;
+         ( &(HB_VM_STACK.Return) )->type = HB_IT_POINTER;
+         ( &(HB_VM_STACK.Return) )->item.asPointer.value = (void *) pDynSym->pSymbol->value.pFunPtr;
+         ( &(HB_VM_STACK.Return) )->item.asPointer.collect = FALSE;
       }
       else
       {
