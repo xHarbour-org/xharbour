@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1311 2003/07/31 12:50:59 druzus Exp $
+ * $Id: ChangeLog,v 1.1312 2003/07/31 18:56:10 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-31 19:57 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbsetup.h
+    + Added missing definitions when NON GNU compiler used. This fixes CurrDir() and CurrDrive() on Windows.
 
 2003-07-31 20:42 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/make_tgz.sh

@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.11 2003/07/23 12:35:57 druzus Exp $
+ * $Id: hbsetup.h,v 1.12 2003/07/30 14:07:41 druzus Exp $
  */
 
 /*
@@ -253,6 +253,8 @@
    #define OS_PATH_LIST_SEPARATOR    ';'
    #define OS_PATH_DELIMITER         '\\'
    #define OS_PATH_DELIMITER_LIST    "\\/:"
+   #define OS_DRIVE_DELIMITER        ':'
+   #define OS_HAS_DRIVE_LETTER
    #define OS_OPT_DELIMITER_LIST     "/-"
    #define OS_EOL_LEN                2
 #endif
