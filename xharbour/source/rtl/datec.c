@@ -1,5 +1,5 @@
 /*
- * $Id: datec.c,v 1.6 2004/02/23 10:01:42 andijahja Exp $
+ * $Id: datec.c,v 1.7 2004/11/21 21:44:17 druzus Exp $
  */
 
 /*
@@ -60,14 +60,14 @@ char HB_EXPORT * hb_dateCMonth( int iMonth )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateCMonth(%d)", iMonth));
 
-   return ( iMonth >= 1 && iMonth <= 12 ) ? ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + iMonth - 1 ) : "";
+   return ( iMonth >= 1 && iMonth <= 12 ) ? ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + iMonth - 1 ) : ( char * ) "";
 }
 
 char HB_EXPORT * hb_dateCDOW( int iDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateCDOW(%d)", iDay));
 
-   return ( iDay >= 1 && iDay <= 7 ) ? ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_DAY + iDay - 1 ) : "";
+   return ( iDay >= 1 && iDay <= 7 ) ? ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_DAY + iDay - 1 ) : ( char * ) "";
 }
 
 HB_FUNC( CMONTH )

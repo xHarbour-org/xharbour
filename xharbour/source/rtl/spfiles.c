@@ -1,5 +1,5 @@
 /*
- * $Id: spfiles.c,v 1.7 2004/09/21 02:52:36 druzus Exp $
+ * $Id: spfiles.c,v 1.8 2004/10/22 01:45:51 druzus Exp $
  */
 
 /*
@@ -107,7 +107,7 @@ BOOL hb_spFile( BYTE * pFilename, BYTE * pRetPath )
        */
       if( ! bIsFile )
       {
-         pFilepath->szPath = hb_set.HB_SET_DEFAULT ? hb_set.HB_SET_DEFAULT : ".";
+         pFilepath->szPath = hb_set.HB_SET_DEFAULT ? hb_set.HB_SET_DEFAULT : ( char * ) ".";
          hb_fsFNameMerge( (char*) Path, pFilepath );
       }
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.30 2004/08/01 17:11:37 mlombardo Exp $
+ * $Id: runner.c,v 1.31 2004/08/14 07:57:54 ronpinkas Exp $
  */
 
 /*
@@ -858,7 +858,7 @@ HB_EXPORT PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode )
    //hb_hrbAsmPatch( asmRet->pAsmData, 1, NULL );       /* Insert pointer to globals */
    hb_hrbAsmPatch( asmRet->pAsmData, 6, pSymbols );   /* Insert pointer to symbols */
    hb_hrbAsmPatch( asmRet->pAsmData, 11, pCode );      /* Insert pointer to pcode */
-   hb_hrbAsmPatchRelative( asmRet->pAsmData, 16, hb_vmExecute, 20 );
+   hb_hrbAsmPatchRelative( asmRet->pAsmData, 16, ( void * ) hb_vmExecute, 20 );
                                       /* Insert pointer to hb_vmExecute() */
 
 /* #elseif INTEL16 */

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.18 2005/02/27 11:56:04 andijahja Exp $
+ * $Id: dbfdbt1.c,v 1.19 2005/02/28 10:17:31 andijahja Exp $
  */
 
 /*
@@ -482,6 +482,10 @@ static ERRCODE hb_dbtInfo( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    {
       case DBI_MEMOEXT:
          hb_itemPutC( pItem, DBT_MEMOEXT );
+         break;
+
+      case DBI_MEMOBLOCKSIZE:
+         hb_itemPutNI( pItem, DBT_BLOCKSIZE );
          break;
 
       /* case DBI_RDD_VERSION */

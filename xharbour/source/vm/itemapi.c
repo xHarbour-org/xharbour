@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.110 2005/02/24 10:44:14 andijahja Exp $
+ * $Id: itemapi.c,v 1.111 2005/02/26 15:16:52 andijahja Exp $
  */
 
 /*
@@ -235,7 +235,7 @@ PHB_ITEM HB_EXPORT hb_itemArrayPut( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pIt
 
 /* Defed out - using String Sharing Versions in source/vm/fastitem.c. */
 #if 0
-PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
+PHB_ITEM hb_itemPutC( PHB_ITEM pItem, const char * szText )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
 
@@ -261,7 +261,7 @@ PHB_ITEM hb_itemPutC( PHB_ITEM pItem, char * szText )
    return pItem;
 }
 
-PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
+PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
 
@@ -618,10 +618,9 @@ PHB_ITEM hb_itemReturn( PHB_ITEM pItem )
 
 /* Internal Item API. Use this with care. */
 
-PHB_ITEM HB_EXPORT hb_itemPutDS( PHB_ITEM pItem, char * szDate )
+PHB_ITEM HB_EXPORT hb_itemPutDS( PHB_ITEM pItem, const char * szDate )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutDS(%p, %s)", pItem, szDate));
-
 
    if( pItem )
    {
@@ -637,7 +636,6 @@ PHB_ITEM HB_EXPORT hb_itemPutDS( PHB_ITEM pItem, char * szDate )
 
    pItem->type = HB_IT_DATE;
    pItem->item.asDate.value = hb_dateEncStr( szDate );
-
 
    return pItem;
 }
@@ -1046,7 +1044,7 @@ char HB_EXPORT * hb_itemTypeStr( PHB_ITEM pItem )
    switch( pItem->type & ~HB_IT_BYREF )
    {
       case HB_IT_ARRAY:
-         return ( hb_arrayIsObject( pItem ) ? "O" : "A" );
+         return ( ( char * ) ( hb_arrayIsObject( pItem ) ? "O" : "A" ) );
 
       case HB_IT_BLOCK:
          return "B";
@@ -1716,7 +1714,7 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
          break;
 
       case HB_IT_LOGICAL:
-         buffer = ( hb_itemGetL( pItem ) ? "T" : "F" );
+         buffer = ( char * ) ( hb_itemGetL( pItem ) ? "T" : "F" );
          * ulLen = 1;
          * bFreeReq = FALSE;
          break;

@@ -1,5 +1,5 @@
 /*
- * $Id: diskspac.c,v 1.8 2004/11/21 21:44:17 druzus Exp $
+ * $Id: diskspac.c,v 1.9 2005/01/10 18:45:33 druzus Exp $
  */
 
 /*
@@ -210,7 +210,7 @@ HB_FUNC( DISKSPACE )
 #elif defined(HB_OS_UNIX)
 
    {
-      char *szName = ISCHAR( 1 ) ? hb_parc( 1 ) : "/";
+      char *szName = ISCHAR( 1 ) ? hb_parc( 1 ) : ( char * ) "/";
 
 #if defined(__WATCOMC__)
       struct stat st;

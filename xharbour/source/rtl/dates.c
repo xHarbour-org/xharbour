@@ -1,5 +1,5 @@
 /*
- * $Id: dates.c,v 1.8 2004/10/22 18:22:16 paultucker Exp $
+ * $Id: dates.c,v 1.9 2004/11/21 21:44:17 druzus Exp $
  */
 
 /*
@@ -204,7 +204,7 @@ char HB_EXPORT * hb_dateDecStr( char * szDate, LONG lJulian )
    return szDate;
 }
 
-LONG HB_EXPORT hb_dateEncStr( char * szDate )
+LONG HB_EXPORT hb_dateEncStr( const char * szDate )
 {
    int  iYear, iMonth, iDay;
 

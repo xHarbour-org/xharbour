@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.34 2004/12/28 07:16:14 druzus Exp $
+ * $Id: gtsln.c,v 1.35 2005/01/10 18:45:38 druzus Exp $
  */
 
 /*
@@ -227,7 +227,7 @@ static void hb_sln_setACSCtrans( void )
    chArrow[ 3 ] = SLSMG_BUILD_CHAR( '^', 0 );
 
    /* init an alternate chars table */
-   if( ( p = SLtt_Graphics_Char_Pairs ) )
+   if( ( p = ( unsigned char * ) SLtt_Graphics_Char_Pairs ) )
    {
       SLsmg_Char_Type SLch;
       int i, len = strlen( ( char * ) p );
@@ -570,7 +570,7 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
     if( ! gt_Inited )
     {
-        char *errmsg = '\r'+'\n'+"Internal error : screen driver initialization failure"+'\r'+'\n'+( char )0;
+        char *errmsg = "\r\nInternal error : screen driver initialization failure\r\n";
 
         /* something went wrong - restore default settings */
         SLang_reset_tty();

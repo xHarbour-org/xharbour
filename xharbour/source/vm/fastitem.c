@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.73 2004/12/02 03:26:20 druzus Exp $
+ * $Id: fastitem.c,v 1.74 2004/12/28 06:39:23 druzus Exp $
  */
 
 /*
@@ -443,7 +443,7 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
    }
 }
 
-PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, char * szText )
+PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, const char * szText )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
 
@@ -486,7 +486,7 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, char * szText )
    return pItem;
 }
 
-PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
+PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
 

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.115 2004/12/27 11:06:10 lf_sfnet Exp $
+ * $Id: arrays.c,v 1.116 2005/03/09 07:16:28 andijahja Exp $
  */
 
 /*
@@ -558,21 +558,18 @@ char HB_EXPORT * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate )
 
 LONG HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
 {
-   LONG lData;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetDL(%p, %lu)", pArray, ulIndex ));
 
    if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      lData = ( pArray->item.asArray.value->pItems + ulIndex - 1 )->item.asDate.value;
+      return hb_itemGetDL( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
    else
    {
       /* NOTE: Intentionally calling it with a bad parameter in order to get
                the default value from hb_itemGetDL(). [vszakats] */
-      lData = hb_itemGetDL( NULL );
+      return hb_itemGetDL( NULL );
    }
-
-   return lData;
 }
 
 /*

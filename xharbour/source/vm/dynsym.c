@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.18 2004/04/28 18:31:16 druzus Exp $
+ * $Id: dynsym.c,v 1.19 2004/11/21 21:44:26 druzus Exp $
  */
 
 /*
@@ -128,16 +128,24 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
    if( pDynSym )            /* If name exists */
    {
-      if( pSymbol->cScope & HB_FS_PUBLIC ) /* only for HB_FS_PUBLIC */
+      if( pSymbol->value.pFunPtr && ! pDynSym->pFunPtr 
+#if 0 /* see note below */
+         /* register only non static functions */
+          && ! pSymbol->cScope & ( HB_FS_STATIC | HB_FS_PUBLIC ) == HB_FS_STATIC
+#endif
+        ) /* The DynSym existed without function pointer */
       {
-         if( ( ! pDynSym->pFunPtr ) && pSymbol->value.pFunPtr ) /* The DynSym existed */
+         /* free runtime allocated symbols */
+         if ( pDynSym->pSymbol->cScope == SYM_ALLOCATED )
          {
-            pDynSym->pFunPtr = pSymbol->value.pFunPtr;  /* but had no function ptr assigned */
-            pDynSym->pSymbol = pSymbol;
-            pDynSym->ulCalls = 0; /* profiler support */
-            pDynSym->ulTime  = 0; /* profiler support */
-            pDynSym->ulRecurse = 0;
+            hb_xfree( pDynSym->pSymbol->szName );
+            hb_xfree( pDynSym->pSymbol );
          }
+         pDynSym->pFunPtr = pSymbol->value.pFunPtr;  /* but had no function ptr assigned */
+         pDynSym->pSymbol = pSymbol;
+         pDynSym->ulCalls = 0; /* profiler support */
+         pDynSym->ulTime  = 0; /* profiler support */
+         pDynSym->ulRecurse = 0;
       }
 
       if( pSymbol->pDynSym == (PHB_DYNS) 1 && pDynSym->pModuleSymbols == NULL )
@@ -178,21 +186,34 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
    s_uiDynSymbols++;                   /* Got one more symbol */
 
-   pDynSym->pSymbol        = pSymbol;
    pDynSym->hMemvar        = 0;
    pDynSym->hArea          = 0;
    pDynSym->ulCalls        = 0; /* profiler support */
    pDynSym->ulTime         = 0; /* profiler support */
    pDynSym->ulRecurse      = 0;
 
-   if( pSymbol->cScope & HB_FS_PUBLIC ) /* only for HB_FS_PUBLIC */
+#if 0
+   /* now the compiler creates separate symbols for functions and
+    * fields/memvars/aliases so we should not have any problem here
+    * and this code is not necessary but I decide to left it here
+    * disabled at least for debugging.
+    */
+   if( pSymbol->value.pFunPtr && 
+       pSymbol->cScope & ( HB_FS_STATIC | HB_FS_PUBLIC ) == HB_FS_STATIC )
    {
-      pDynSym->pFunPtr = pSymbol->value.pFunPtr;    /* place the function pointer at DynSym */
+      /*
+       * This symbol points to static function - we cannot register
+       * such symbols in global dynsyms because we may have more
+       * static functions with the same name and non static one
+       * registered later - the static function should be directly
+       * accessible _ONLY_ from their modules.
+       * So we will clone this symbol.
+       */
+      pSymbol->pDynSym = pDynSym;  /* place a pointer to DynSym in original symbol */
+      pSymbol = hb_symbolNew( pSymbol->szName ); /* clone the symbol */
    }
-   else
-   {
-      pDynSym->pFunPtr = NULL;
-   }
+#endif
+   pDynSym->pFunPtr = pSymbol->value.pFunPtr; /* place the pointer function at DynSym */
 
    if( pSymbol->pDynSym == (PHB_DYNS) 1 )
    {
@@ -204,6 +225,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
       pDynSym->pModuleSymbols = NULL;
    }
 
+   pDynSym->pSymbol = pSymbol;
    pSymbol->pDynSym = pDynSym;                /* place a pointer to DynSym */
 
    hb_dynsymUnlock();

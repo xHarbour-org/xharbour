@@ -1,5 +1,5 @@
 /*
- * $Id: txtline.c,v 1.1 2004/09/06 19:25:53 mlombardo Exp $
+ * $Id: txtline.c,v 1.2 2004/09/30 14:16:29 mlombardo Exp $
  */
 
 /*
@@ -256,7 +256,7 @@ HB_FUNC( HB_READLINE )
 
 HB_FUNC( MLCOUNT )
 {
-   char * pszString    = ISCHAR( 1 ) ? hb_parcx( 1 ) : "";
+   char * pszString    = hb_parcx( 1 );
    ULONG ulLineSize    = ISNUM( 2 ) ? hb_parnl( 2 ) : 79;
    USHORT uiTabLen     = ISNUM( 3 ) ? (USHORT) hb_parni( 3 ) : 4;
    BOOL bLongLines     = ISLOG( 5 ) ? hb_parl( 5 ) : 0;
@@ -347,7 +347,7 @@ HB_FUNC( MLCOUNT )
 
 HB_FUNC( MEMOLINE )
 {
-   char * pszString    = ISCHAR( 1 ) ? hb_parcx( 1 ) : "";
+   char * pszString    = hb_parcx( 1 );
    ULONG ulLineSize    = ISNUM( 2 ) ? hb_parni( 2 ) : 79;
    ULONG ulLineNumber  = ISNUM( 3 ) ? hb_parni( 3 ) : 1;
    USHORT uiTabLen     = ISNUM( 4 ) ? (USHORT) hb_parni( 4 ) : 4;
@@ -464,7 +464,7 @@ HB_FUNC( MEMOLINE )
 
 HB_FUNC( MLPOS ) 
 {
-   char * pszString    = ISCHAR( 1 ) ? hb_parcx( 1 ) : "";
+   char * pszString    = hb_parcx( 1 );
    ULONG ulLineSize    = ISNUM( 2 ) ? hb_parni( 2 ) : 79;
    ULONG ulLineNumber  = ISNUM( 3 ) ? hb_parni( 3 ) : 1;
    USHORT uiTabLen     = ISNUM( 4 ) ? (USHORT) hb_parni( 4 ) : 4;

@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.53 2004/10/23 23:31:30 oh1 Exp $
+ * $Id: console.c,v 1.54 2004/11/07 21:12:54 guerra000 Exp $
  */
 /*
  * Harbour Project source code:
@@ -373,7 +373,7 @@ static void hb_conOut( USHORT uiParam, hb_out_func_typedef * pOutFunc )
    {
       ulLen = 3;
       bFreeReq = FALSE;
-      pszString = hb_itemGetL( pItem ) ? ".T." : ".F.";
+      pszString = ( char * ) ( hb_itemGetL( pItem ) ? ".T." : ".F." );
    }
    else
    {

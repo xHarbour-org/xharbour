@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.47 2004/12/14 00:15:40 druzus Exp $
+ * $Id: extend.c,v 1.48 2005/03/30 21:31:14 andijahja Exp $
  */
 
 /*
@@ -379,6 +379,43 @@ char  HB_EXPORT * hb_pardsbuff( char * szDate, int iParam, ... )
    }
 
    return hb_dateDecStr( szDate, 0 );
+}
+
+/* retrieve a date as long integer - number of days from Julian's day */
+
+LONG  HB_EXPORT hb_pardl( int iParam, ... )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_pardl(%d, ...)", iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? &(HB_VM_STACK.Return) : hb_stackItemFromBase( iParam );
+
+      if( HB_IS_BYREF( pItem ) )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_DATE( pItem ) )
+      {
+         return pItem->item.asDate.value;
+      }
+      else if( HB_IS_ARRAY( pItem ) )
+      {
+         va_list va;
+         ULONG ulArrayIndex;
+
+         va_start( va, iParam );
+         ulArrayIndex = va_arg( va, ULONG );
+         va_end( va );
+
+         return hb_arrayGetDL( pItem, ulArrayIndex );
+      }
+   }
+
+   return hb_itemGetDL( NULL );
 }
 
 int  HB_EXPORT hb_parl( int iParam, ... )
@@ -808,7 +845,7 @@ void  HB_EXPORT hb_reta( ULONG ulLen )  /* undocumented hb_reta() */
 }
 
 #undef hb_retc
-void HB_EXPORT  hb_retc( char * szText )
+void HB_EXPORT  hb_retc( const char * szText )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retc(%s)", szText));
 
@@ -816,7 +853,7 @@ void HB_EXPORT  hb_retc( char * szText )
 }
 
 #undef hb_retclen
-void  HB_EXPORT hb_retclen( char * szText, ULONG ulLen )
+void  HB_EXPORT hb_retclen( const char * szText, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retclen(%s, %lu)", szText, ulLen));
 
@@ -826,7 +863,7 @@ void  HB_EXPORT hb_retclen( char * szText, ULONG ulLen )
 /* szDate must have YYYYMMDD format */
 
 #undef hb_retds
-void HB_EXPORT hb_retds( char * szDate )
+void HB_EXPORT hb_retds( const char * szDate )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retds(%s)", szDate));
 
@@ -1052,6 +1089,34 @@ void HB_EXPORT hb_stords( char * szDate, int iParam, ... )
       else if( bByRef || iParam == -1 )
       {
          hb_itemPutDS( pItem, szDate );
+      }
+   }
+}
+
+void HB_EXPORT hb_stordl( LONG lJulian, int iParam, ... )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_stordl(%ld, %d, ...)", lJulian, iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? &(HB_VM_STACK.Return) : hb_stackItemFromBase( iParam );
+      BOOL bByRef = HB_IS_BYREF( pItem );
+
+      if( bByRef  )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_ARRAY( pItem ) )
+      {
+         va_list va;
+         va_start( va, iParam );
+         hb_itemPutDL( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), lJulian );
+         va_end( va );
+      }
+      else if( bByRef || iParam == -1 )
+      {
+         hb_itemPutDL( pItem, lJulian );
       }
    }
 }

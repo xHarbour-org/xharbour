@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.185 2005/02/20 22:14:08 andijahja Exp $
+* $Id: thread.c,v 1.186 2005/03/14 20:34:23 andijahja Exp $
 */
 
 /*
@@ -982,7 +982,7 @@ void hb_threadTerminator( void *pData )
 #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    HB_STACK *_pStack_ = (HB_STACK *) pData;
 #else
-   HB_STACK *_pStack_ = pthread_getspecific( hb_pkCurrentStack );
+   HB_STACK *_pStack_ = (HB_STACK *) pthread_getspecific( hb_pkCurrentStack );
    HB_SYMBOL_UNUSED( pData );
 #endif
 

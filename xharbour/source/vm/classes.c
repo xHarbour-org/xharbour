@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.134 2005/03/02 05:54:33 ronpinkas Exp $
+ * $Id: classes.c,v 1.135 2005/03/02 14:23:48 andijahja Exp $
  */
 
 /*
@@ -4422,7 +4422,7 @@ HB_FUNC( HB_OBJMSGPTR )
 
    if( pObject && pString )
    {
-      hb_retptr( hb_objHasMsg( pObject, pString->item.asString.value ) );
+      hb_retptr( ( void * ) hb_objHasMsg( pObject, pString->item.asString.value ) );
    }
    else
    {

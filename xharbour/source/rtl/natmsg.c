@@ -1,5 +1,5 @@
 /*
- * $Id: natmsg.c,v 1.1.1.1 2001/12/21 10:42:18 ronpinkas Exp $
+ * $Id: natmsg.c,v 1.2 2004/02/23 08:31:57 andijahja Exp $
  */
 
 /*
@@ -90,7 +90,7 @@ char * hb_nationGetMsg( USHORT uiMsg )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_nationGetMsg(%hu)", uiMsg));
 
-   return ( uiMsg >= 1 && uiMsg <= 13 ) ? ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_NATMSG + uiMsg - 1 ) : "";
+   return ( uiMsg >= 1 && uiMsg <= 13 ) ? ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_NATMSG + uiMsg - 1 ) : ( char * ) "";
 }
 
 #ifdef HB_C52_UNDOC

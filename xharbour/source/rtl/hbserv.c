@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.24 2005/02/12 19:54:03 druzus Exp $
+* $Id: hbserv.c,v 1.25 2005/02/24 10:44:08 andijahja Exp $
 */
 
 /*
@@ -605,6 +605,10 @@ static void s_serviceSetHBSig( void )
       pthread_sigmask( SIG_SETMASK, &blockall, NULL );
    #endif
 
+   /* to avoid problems with differ sigaction structures and uninitialized
+      fields */
+   memset( &act, 0, sizeof( struct sigaction ) );
+
    #if defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ )
    act.sa_handler = s_signalHandler;
    #else
@@ -615,6 +619,7 @@ static void s_serviceSetHBSig( void )
    //sigfillset( &act.sa_mask );
    #endif
 
+   
    #ifdef HARBOUR_GCC_OS2
    act.sa_flags = SA_NOCLDSTOP;
    #else

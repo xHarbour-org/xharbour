@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.51 2004/11/21 21:44:22 druzus Exp $
+ * $Id: gtxvt.c,v 1.52 2004/11/25 05:11:59 guerra000 Exp $
  */
 
 /*
@@ -2255,7 +2255,7 @@ static void xvt_eventKeyProcess( PXVT_BUFFER buffer, XKeyEvent *evt)
    int ikey = 0;
    XComposeStatus compose;
 
-   XLookupString( evt , buf, 5, &out, &compose );
+   XLookupString( evt , ( char * ) buf, 5, &out, &compose );
    //printf( "BUF: %s\n", buf );
    // printf( "OUT: %d\n", (int)out );
 
@@ -2868,8 +2868,8 @@ static void xvt_processMessages( PXWND_DEF wnd )
                {
                   hb_xfree( s_clipboard );
                }
-               s_clipboard = hb_xgrab( nlen +1);
-               read( streamUpdate[0], s_clipboard, nlen);
+               s_clipboard = ( char * ) hb_xgrab( nlen + 1 );
+               read( streamUpdate[0], s_clipboard, nlen );
                s_clipboard[ nlen ] = '\0';
                s_clipsize = nlen;
 
@@ -2898,11 +2898,11 @@ static void xvt_processMessages( PXWND_DEF wnd )
             break;
 
             case XVT_ICM_ADDOBJECT:
-               pgObj = hb_xgrab( sizeof( HB_GT_GOBJECT ) );
+               pgObj = ( HB_GT_GOBJECT * ) hb_xgrab( sizeof( HB_GT_GOBJECT ) );
                read( streamUpdate[0], pgObj, sizeof( HB_GT_GOBJECT ) );
                if ( pgObj->type == GTO_TEXT )
                {
-                  pgObj->data = hb_xgrab( pgObj->data_len+1 );
+                  pgObj->data = ( char * ) hb_xgrab( pgObj->data_len + 1 );
                   read( streamUpdate[0], pgObj->data, pgObj->data_len );
                   pgObj->data[ pgObj->data_len ] = 0;
                }
@@ -2940,7 +2940,7 @@ static void xvt_processMessages( PXWND_DEF wnd )
                char *name;
 
                read( streamUpdate[0], &usData, sizeof( usData ) );
-               name = hb_xalloc( usData );
+               name = ( char * ) hb_xalloc( usData );
                if ( name != 0 ) {
                   read( streamUpdate[0], name, appMsg );
                   XStoreName( wnd->dpy, wnd->window, name );
@@ -3056,7 +3056,7 @@ static void xvt_appProcess( USHORT usWaitFor )
                   {
                      hb_xfree( s_clipboard );
                   }
-                  s_clipboard = hb_xgrab( nlen + 1 );
+                  s_clipboard = ( char * ) hb_xgrab( nlen + 1 );
                   read( streamFeedback[0], s_clipboard, nlen);
                   s_clipboard[ nlen ] = 0;
                   s_clipsize = nlen;
@@ -4258,8 +4258,8 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
    if ( disp )
    {
       kbc.bell_percent = 50;
-      kbc.bell_pitch = dFrequency;
-      kbc.bell_duration = dDuration/ 18.0 * 1000.0;
+      kbc.bell_pitch = ( int ) dFrequency;
+      kbc.bell_duration = ( int ) ( dDuration / 18.0 * 1000.0 );
 
       XChangeKeyboardControl( disp,
          KBBellPercent | KBBellPitch | KBBellDuration,

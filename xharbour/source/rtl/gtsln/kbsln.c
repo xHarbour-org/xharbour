@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.15 2005/01/10 18:45:39 druzus Exp $
+ * $Id: kbsln.c,v 1.16 2005/01/12 16:36:23 druzus Exp $
  */
 
 /*
@@ -235,7 +235,7 @@ int HB_GT_FUNC(gt_Init_Terminal( int phase ))
 #endif
  
         /* get Dead key definition */
-        p = hb_getenv( hb_DeadKeyEnvName );
+        p = ( unsigned char * ) hb_getenv( hb_DeadKeyEnvName );
  
         if( p && p[ 0 ] != '\0' )
         {

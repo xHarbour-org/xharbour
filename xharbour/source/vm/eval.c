@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.18 2004/04/28 18:31:22 druzus Exp $
+ * $Id: eval.c,v 1.19 2005/02/19 05:04:16 ronpinkas Exp $
  */
 
 /*
@@ -327,7 +327,6 @@ PHB_ITEM HB_EXPORT hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
 /* NOTE: Same as hb_itemDo(), but even simpler, since the function name can be
          directly passed as a zero terminated string. [vszakats]
 */
-
 PHB_ITEM HB_EXPORT hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
 {
    HB_THREAD_STUB
@@ -365,6 +364,82 @@ PHB_ITEM HB_EXPORT hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
 
          hb_vmDo( ( USHORT ) ulPCount );
 
+         pResult = hb_itemNew( NULL );
+         hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+      }
+      else
+      {
+         hb_dynsymUnlock();
+         pResult = NULL;
+      }
+   }
+   else
+   {
+      pResult = NULL;
+   }
+
+   return pResult;
+}
+
+/* NOTE: Same as hb_itemDoC(), but has additional second parameter
+         which set the reference mask for 1-st 32/64 parametes [druzus]
+*/
+PHB_ITEM HB_EXPORT hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... )
+{
+   HB_THREAD_STUB
+
+   PHB_ITEM pResult;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemDoCRef(%s, %hu, %hu, ...)", szFunc, ulRefMask, ulPCount));
+
+   if( szFunc )
+   {
+      PHB_DYNS pDynSym;
+
+      hb_dynsymLock();
+      pDynSym = hb_dynsymFindName( szFunc );
+
+      if( pDynSym )
+      {
+         PHB_ITEM pParam, pItemRefBuf[ sizeof(ULONG) * 8 ], *pRefBase;
+         HB_ITEM itmRef;
+         ULONG ulParam, ulRef;
+         va_list va;
+
+         pRefBase = pItemRefBuf;
+         /* initialize the reference item */
+         itmRef.type = HB_IT_BYREF;
+         itmRef.item.asRefer.offset = -1;
+         itmRef.item.asRefer.BasePtr.itemsbasePtr = &pRefBase;
+
+         hb_vmPushSymbol( pDynSym->pSymbol );
+         hb_dynsymUnlock();
+         hb_vmPushNil();
+
+         if( ulPCount )
+         {
+            ulRef = 0;
+            va_start( va, ulPCount );
+            for( ulParam = 0; ulParam < ulPCount; ulParam++ )
+            {
+               pParam = va_arg( va, PHB_ITEM );
+               if ( ulRefMask & ( 1L << ulParam ) )
+               {
+                  /* when item is passed by reference then we have to put
+                     the reference on the stack instead of the item itself */
+                  pItemRefBuf[ ulRef++ ] = pParam;
+                  itmRef.item.asRefer.value = ulRef;
+                  hb_vmPush( &itmRef );
+               }
+               else
+               {
+                  hb_vmPush( pParam );
+               }
+            }
+            va_end( va );
+         }
+
+         hb_vmDo( ( USHORT ) ulPCount );
          pResult = hb_itemNew( NULL );
          hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
       }

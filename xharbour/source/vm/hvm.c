@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.446 2005/03/17 16:03:42 snaiperis Exp $
+ * $Id: hvm.c,v 1.447 2005/03/22 01:13:15 ronpinkas Exp $
  */
 
 /*
@@ -6835,6 +6835,37 @@ HB_EXPORT HB_ITEM_PTR hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ...
    return &(HB_VM_STACK.Return);
 }
 
+/* Evaluates a passed codeblock item or macro pointer item
+ */
+HB_EXPORT HB_ITEM_PTR hb_vmEvalBlockOrMacro( HB_ITEM_PTR pItem )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmEvalBlockOrMacro(%p)", pItem));
+
+   if ( pItem->type == HB_IT_BLOCK )
+   {
+      hb_vmPushSymbol( &hb_symEval );
+      hb_vmPush( pItem );
+      hb_vmSend( 0 );
+   }
+   else
+   {
+      HB_MACRO_PTR pMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pItem );
+      if ( pMacro )
+      {
+         hb_macroRun( pMacro );
+         hb_itemForwardValue( hb_stackReturnItem(), hb_stackItemFromTop( - 1 ) );
+         hb_stackPop();
+      }
+      else
+      {
+         hb_itemClear( hb_stackReturnItem() );
+      }
+   }
+   return hb_stackReturnItem();
+}
+
 HB_EXPORT void hb_vmFunction( USHORT uiParams )
 {
    HB_THREAD_STUB
@@ -6988,7 +7019,7 @@ static void hb_vmSFrame( PHB_SYMB pSym )      /* sets the statics frame for a fu
    HB_TRACE(HB_TR_DEBUG, ("hb_vmSFrame(%p)", pSym));
 
    /* _INITSTATICS is now the statics frame. Statics() changed it! */
-   HB_VM_STACK.iStatics = pSym->value.iStaticsBase; /* pSym is { "$_INITSTATICS", HB_FS_INIT | HB_FS_EXIT, _INITSTATICS } for each PRG */
+   HB_VM_STACK.iStatics = pSym->value.iStaticsBase; /* pSym is { "$_INITSTATICS", HB_FS_INITEXIT, _INITSTATICS } for each PRG */
 }
 
 static void hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ) /* initializes the global aStatics array or redimensionates it */
@@ -7146,7 +7177,7 @@ HB_EXPORT void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType
 
 static void hb_vmPushNumInt( HB_LONG lNumber )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumType(%Ld, %i, %i)", lNumber ));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNumInt(%Ld, %i, %i)", lNumber ));
 
    if ( HB_LIM_INT( lNumber ) )
    {
@@ -7349,7 +7380,7 @@ HB_EXPORT void hb_vmPushPointer( void * pPointer )
    hb_stackPush();
 }
 
-HB_EXPORT void hb_vmPushString( char * szText, ULONG length )
+HB_EXPORT void hb_vmPushString( const char * szText, ULONG length )
 {
    HB_THREAD_STUB
 
@@ -7845,7 +7876,7 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
    #ifdef HB_ARRAY_USE_COUNTER
       s_aStatics.item.asArray.value->ulHolders++;
    #else
-       hb_arrayRegisterHolder( s_aStatics.item.asArray.value, (void *) pTop );
+      hb_arrayRegisterHolder( s_aStatics.item.asArray.value, (void *) pTop );
    #endif
 
    hb_stackPush();
@@ -8456,7 +8487,7 @@ HB_EXPORT void hb_vmExplicitStartup( PHB_SYMB pSymbol )
 
 
 /* This calls all _INITSTATICS functions defined in the application.
- * We are using a special symbol's scope ( HB_FS_INIT | HB_FS_EXIT ) to mark
+ * We are using a special symbol's scope HB_FS_INITEXIT to mark
  * this function. These two bits cannot be marked at the same
  * time for normal user defined functions.
  */
@@ -8468,15 +8499,15 @@ static void hb_vmDoInitStatics( void )
 
    do
    {
-      if( ( pLastSymbols->hScope & ( HB_FS_INIT | HB_FS_EXIT ) ) == ( HB_FS_INIT | HB_FS_EXIT ) )
+      if( ( pLastSymbols->hScope & HB_FS_INITEXIT ) == HB_FS_INITEXIT )
       {
          USHORT ui;
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
          {
-            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->cScope & ( HB_FS_EXIT | HB_FS_INIT );
+            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->cScope & HB_FS_INITEXIT;
 
-            if( scope == ( HB_FS_INIT | HB_FS_EXIT ) )
+            if( scope == HB_FS_INITEXIT )
             {
                hb_vmPushSymbol( pLastSymbols->pModuleSymbols + ui );
 
@@ -8507,7 +8538,7 @@ HB_EXPORT void hb_vmDoExitFunctions( void )
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
          {
-            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->cScope & ( HB_FS_EXIT | HB_FS_INIT );
+            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->cScope & HB_FS_INITEXIT;
 
             if( scope == HB_FS_EXIT )
             {
@@ -8546,7 +8577,7 @@ static void hb_vmDoInitFunctions( void )
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
          {
-            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->cScope & ( HB_FS_EXIT | HB_FS_INIT );
+            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->cScope & HB_FS_INITEXIT;
 
             if( scope == HB_FS_INIT )
             {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbmlang.c,v 1.1 2002/05/18 13:19:29 lculik Exp $
+ * $Id: hbmlang.c,v 1.2 2002/11/09 00:50:09 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -197,7 +197,7 @@ HB_FUNC( GAUGENEW )
    hb_itemArrayPut( pReturn, B_DISPLAYNUM, pItem );
    hb_itemRelease( pItem );
 
-   pItem = hb_itemPutC( NULL, ( ISCHAR( B_BARCHAR ) ? hb_parc( B_BARCHAR ) : ( char * ) '\xdb') );
+   pItem = hb_itemPutC( NULL, ( ISCHAR( B_BARCHAR ) ? hb_parc( B_BARCHAR ) : "\xdb" ) );
    hb_itemArrayPut( pReturn, B_BARCHAR, pItem );
    hb_itemRelease( pItem );
 

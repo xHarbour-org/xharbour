@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.142 2005/02/24 10:44:07 andijahja Exp $
+ * $Id: filesys.c,v 1.143 2005/03/30 21:30:28 andijahja Exp $
  */
 
 /*
@@ -119,11 +119,11 @@
    #include <signal.h>
    #include <sys/types.h>
    #include <sys/wait.h>
-   #if !defined( HB_OS_DARWIN )
-      extern char **environ;
-   #else
+   #if defined( HB_OS_DARWIN )
       #include <crt_externs.h>
       #define environ (*_NSGetEnviron())
+   #elif !defined( __WATCOMC__ )
+      extern char **environ;
    #endif
 #endif
 
@@ -658,7 +658,7 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
       }
       if( pFilename[ ulLen - 1 ] == '|' )
       {
-          pbyTmp = hb_strdup( ( char * ) pFilename );
+          pbyTmp = ( BYTE * ) hb_strdup( ( char * ) pFilename );
           pbyTmp[--ulLen] = 0;
           pFilename = pbyTmp;
       } else
@@ -1508,7 +1508,7 @@ BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
    else
    {
       bRet = FALSE;
-      hb_fsSetError( FS_ERROR );
+      hb_fsSetError( ( USHORT ) FS_ERROR );
    }
 #elif defined( HB_WIN32_IO )
    bRet = (TerminateProcess( DostoWinHandle( fhProc ), bGentle ? 0:1 ) != 0);
@@ -1522,6 +1522,10 @@ BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
    if ( hProc != NULL )
    {
       bRet = (TerminateProcess( hProc, bGentle ? 0:1 ) != 0);
+   }
+   else
+   {
+      bRet = FALSE;
    }
    hb_fsSetIOError( bRet, 0 );
 }
@@ -1822,7 +1826,7 @@ void    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
 
    HB_SYMBOL_UNUSED( hFileHandle );
    HB_SYMBOL_UNUSED( uiDevMode );
-   hb_fsSetError( FS_ERROR );
+   hb_fsSetError( ( USHORT ) FS_ERROR );
 
 #else
 
@@ -3160,8 +3164,8 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
 #else
 
    HB_SYMBOL_UNUSED( nDrive );
-   uiResult = FS_ERROR;
-   hb_fsSetError( FS_ERROR );
+   uiResult = ( USHORT ) FS_ERROR;
+   hb_fsSetError( ( USHORT ) FS_ERROR );
 
 #endif
 
@@ -3213,8 +3217,8 @@ USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
 #else
 
    HB_SYMBOL_UNUSED( nDrive );
-   uiResult = FS_ERROR;
-   hb_fsSetError( FS_ERROR );
+   uiResult = ( USHORT ) FS_ERROR;
+   hb_fsSetError( ( USHORT ) FS_ERROR );
 
 #endif
 
@@ -3264,7 +3268,7 @@ BYTE   HB_EXPORT  hb_fsCurDrv( void )
 
    /* 27/08/04 - <maurilio.longo@libero.it>
                  This is wrong, IMHO, should set 0 if HB_FS_GETDRIVE() returned something */
-   hb_fsSetError( FS_ERROR );
+   hb_fsSetError( ( USHORT ) FS_ERROR );
    return ( BYTE ) uiResult; /* Return the drive number, base 0. */
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.53 2004/12/28 07:16:13 druzus Exp $
+ * $Id: gtcrs.c,v 1.54 2005/01/10 18:45:36 druzus Exp $
  */
 
 /*
@@ -1384,7 +1384,7 @@ void get_acsc( InOutBase * ioBase, unsigned char c, chtype * pch )
    unsigned char *ptr;
 
    if ( ioBase->acsc != NULL )
-      for ( ptr = ioBase->acsc; *ptr && *( ptr + 1 ); ptr += 2 )
+      for ( ptr = ( unsigned char * ) ioBase->acsc; *ptr && *( ptr + 1 ); ptr += 2 )
          if ( *ptr == c )
          {
             *pch = *( ptr + 1 ) | A_ALTCHARSET;
@@ -1979,7 +1979,7 @@ static InOutBase *create_ioBase( char *term, int infd, int outfd, int errfd,
    HB_GT_FUNC( gt_chrmapinit( ioBase->charmap, term ) );
    setDispTrans( ioBase, NULL, NULL, 0 );
 
-   ioBase->attr_mask = -1;
+   ioBase->attr_mask = ( chtype ) -1;
    if ( has_colors() )
    {
       /*  DOS->CURSES color maping

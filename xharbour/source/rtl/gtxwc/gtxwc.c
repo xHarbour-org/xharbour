@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.9 2005/02/04 13:26:21 likewolf Exp $
+ * $Id: gtxwc.c,v 1.10 2005/02/06 20:35:42 druzus Exp $
  */
 
 /*
@@ -1826,7 +1826,7 @@ static void hb_xvt_processKey( PXWND_DEF wnd, XKeyEvent *evt)
 
    /* First check if there is no string bound with with a key, because
       we not check all modifiers in all possible keyboards */
-   if ( ( n = XLookupString( evt , buf, sizeof(buf), &outISO, NULL ) ) <= 0 )
+   if ( ( n = XLookupString( evt, ( char * ) buf, sizeof(buf), &outISO, NULL ) ) <= 0 )
    {
       /*
        * This is a temporary hack for Latin-x input see gt_SetKeyCP
@@ -4074,7 +4074,7 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
          {
             if ( s_wnd->szFontName )
                hb_xfree( s_wnd->szFontName );
-            s_wnd->szFontName = hb_strdup( vpParam );
+            s_wnd->szFontName = hb_strdup( ( char * ) vpParam );
             iRet = 1;
          }
          break;

@@ -1,5 +1,5 @@
  /*
- * $Id: fstemp.c,v 1.18 2004/11/21 21:44:19 druzus Exp $
+ * $Id: fstemp.c,v 1.19 2005/01/10 18:45:34 druzus Exp $
  */
 
 /*
@@ -158,7 +158,7 @@ static BOOL fsGetTempDirByCase( BYTE *pszName, const char *pszTempDir )
       if ( hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER || hb_set.HB_SET_DIRCASE == HB_SET_CASE_UPPER )
       {
          // check to see if temp directory already upper or lower. If not use current directory ( "." )
-         char *psZ = pszName ;
+         char *psZ = ( char * ) pszName ;
          int iChar ;
          BOOL bLower =  hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER  ;
          while ( *psZ )
@@ -238,7 +238,7 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
       else
       {
          strcat( ( char * ) pszName, "XXXXXX" );
-         fd = (FHANDLE) mkstemp( pszName );
+         fd = (FHANDLE) mkstemp( ( char * ) pszName );
          hb_fsSetIOError( fd != (FHANDLE) -1, 0 );
       }
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: speedtst.prg,v 1.4 2004/10/30 22:41:35 druzus Exp $
+ * $Id: speedtst.prg,v 1.5 2005/01/10 18:45:43 druzus Exp $
  */
 
 #define ARR_LEN 16
@@ -46,7 +46,7 @@ field F_C, F_N, F_D
 #endif
 memvar M_C, M_N, M_D
 local L_C, L_N, L_D
-local i, j, t, c, n, d, bc, tn, total, totalr, aa,;
+local i, j, t, c, c2, n, d, bc, tn, total, totalr, aa,;
       a[ARR_LEN], a2[ARR_LEN], a3[ARR_LEN], aDb, cFi
 #ifdef ASSOC_ARRAY
     local aAssoc := ASSOC_ARRAY
@@ -386,6 +386,20 @@ for i:=1 to N_LOOPS
     f2(@c)
 next
 dsp_time( "f2(@c["+ltrim(str(len(c)))+"]) -> ", t, tn)
+
+t:=secondscpu()
+for i:=1 to N_LOOPS
+    f2(c)
+    c2:=c
+next
+dsp_time( "f2(c["+ltrim(str(len(c)))+"]); c2:=c -> ", t, tn)
+
+t:=secondscpu()
+for i:=1 to N_LOOPS
+    f2(@c)
+    c2:=c
+next
+dsp_time( "f2(@c["+ltrim(str(len(c)))+"]); c2:=c -> ", t, tn)
 
 c:=dtos(date())
 t:=secondscpu()
