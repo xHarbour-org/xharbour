@@ -2,7 +2,7 @@
 * Complex example of Multi thread usage
 *
 * Giancarlo Niccolai
-* $Id: mtcomplex.prg,v 1.11 2003/10/18 16:20:03 jonnymind Exp $
+* $Id: mtcomplex.prg,v 1.12 2003/10/19 00:57:54 jonnymind Exp $
 *
 * Here we have a main thread counting, and some secondary
 * threads counting too (in different fashons).
@@ -65,7 +65,6 @@ PROCEDURE Main()
       
    WaitforThreads()
 
-   DestroyMutex( Mutex )
    @ 19, 10 SAY 'Program over - press a key    '
    Inkey( 0 )
 

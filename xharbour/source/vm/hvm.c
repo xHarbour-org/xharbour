@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.285 2003/11/26 05:44:04 jonnymind Exp $
+ * $Id: hvm.c,v 1.286 2003/11/26 06:29:36 jonnymind Exp $
  */
 
 /*
@@ -306,8 +306,18 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
    static LONG     s_lRecoverBase;
 
 #else
+   #define hb_vm_aWithObject  (HB_VM_STACK.aWithObject)
+   #define hb_vm_wWithObjectCounter (HB_VM_STACK.wWithObjectCounter)
+   #define hb_vm_bWithObject (HB_VM_STACK.bWithObject)
+
    #define s_uiActionRequest  (HB_VM_STACK.uiActionRequest)
    #define s_lRecoverBase     (HB_VM_STACK.lRecoverBase)
+   
+   #define hb_vm_aEnumCollection (HB_VM_STACK.aEnumCollection)
+   #define hb_vm_apEnumVar (HB_VM_STACK.apEnumVar)
+   #define hb_vm_awEnumIndex (HB_VM_STACK.awEnumIndex)
+   #define hb_vm_wEnumCollectionCounter (HB_VM_STACK.wEnumCollectionCounter)
+
    /* static, for now */
    BOOL hb_vm_bQuitRequest = FALSE;
 
@@ -769,13 +779,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    BOOL bCanRecover = FALSE;
    ULONG ulPrivateBase;
    LONG lOffset;
-#ifndef HB_THREAD_SUPPORT
    USHORT wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
    USHORT wWithObjectCounter = hb_vm_wWithObjectCounter;
-#else
-   USHORT wEnumCollectionCounter = HB_VM_STACK.wEnumCollectionCounter;
-   USHORT wWithObjectCounter = HB_VM_STACK.wWithObjectCounter;
-#endif
 
    #ifndef HB_NO_PROFILER
       ULONG ulLastOpcode = 0; /* opcodes profiler support */
@@ -1139,21 +1144,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_WITHOBJECT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_WITHOBJECT") );
 
-            #ifndef HB_THREAD_SUPPORT
-               hb_itemForwardValue( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter++ ] ), hb_stackItemFromTop( -1 ) );
+            hb_itemForwardValue( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter++ ] ), hb_stackItemFromTop( -1 ) );
 
-               if( hb_vm_wWithObjectCounter == HB_MAX_WITH_OBJECTS )
-               {
-                  hb_errRT_BASE( EG_ARG, 9002, NULL, "WITH OBJECT excessive nesting!", 0 );
-               }
-            #else
-               hb_itemForwardValue( &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter++ ] ), hb_stackItemFromTop( -1 ) );
-
-               if( HB_VM_STACK.wWithObjectCounter == HB_MAX_WITH_OBJECTS )
-               {
-                  hb_errRT_BASE( EG_ARG, 9002, NULL, "WITH OBJECT excessive nesting!", 0 );
-               }
-            #endif
+            if( hb_vm_wWithObjectCounter == HB_MAX_WITH_OBJECTS )
+            {
+               hb_errRT_BASE( EG_ARG, 9002, NULL, "WITH OBJECT excessive nesting!", 0 );
+            }
 
             hb_stackPop();
             w++;
@@ -1162,11 +1158,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_ENDWITHOBJECT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ENDWITHOBJECT") );
 
-            #ifndef HB_THREAD_SUPPORT
-               hb_itemClear( &( hb_vm_aWithObject[ --hb_vm_wWithObjectCounter ] ) );
-            #else
-               hb_itemClear( &( HB_VM_STACK.aWithObject[ --HB_VM_STACK.wWithObjectCounter ] ) );
-            #endif
+            hb_itemClear( &( hb_vm_aWithObject[ --hb_vm_wWithObjectCounter ] ) );
 
             w++;
             break;
@@ -1270,11 +1262,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_SENDWITH:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SENDWITH") );
 
-            #ifndef HB_THREAD_SUPPORT
-               hb_vm_bWithObject = TRUE;
-            #else
-               HB_VM_STACK.bWithObject = TRUE;
-            #endif
+            hb_vm_bWithObject = TRUE;
             // Intentionally NOT breaking - fall through!
 
          case HB_P_SEND:
@@ -1299,11 +1287,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_SENDWITHSHORT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SENDWITHSHORT") );
 
-            #ifndef HB_THREAD_SUPPORT
-               hb_vm_bWithObject = TRUE;
-            #else
-               HB_VM_STACK.bWithObject = TRUE;
-            #endif
+            hb_vm_bWithObject = TRUE;
             // Intentionally NOT breaking - fall through!
 
          case HB_P_SENDSHORT:
@@ -3161,43 +3145,23 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
 
    // Reset FOR EACH.
-   #ifndef HB_THREAD_SUPPORT
-      while( hb_vm_wEnumCollectionCounter > wEnumCollectionCounter )
-      {
-         hb_vm_wEnumCollectionCounter--;
-         //hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
-         // We might get here from BREAK, so item may have been released.
-         hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type = HB_IT_NIL;
-         hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
-      }
+   while( hb_vm_wEnumCollectionCounter > wEnumCollectionCounter )
+   {
+      hb_vm_wEnumCollectionCounter--;
+      //hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
+      // We might get here from BREAK, so item may have been released.
+      hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type = HB_IT_NIL;
+      hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
+   }
 
-      // Reset WITH OBJECT.
-      while( hb_vm_wWithObjectCounter > wWithObjectCounter )
-      {
-         --hb_vm_wWithObjectCounter;
-         //hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
-         // We might get here from BREAK, so item may have been released.
-         hb_vm_aWithObject[ hb_vm_wWithObjectCounter ].type = HB_IT_NIL;
-      }
-   #else
-      while( HB_VM_STACK.wEnumCollectionCounter > wEnumCollectionCounter )
-      {
-         HB_VM_STACK.wEnumCollectionCounter--;
-         //hb_itemClear( &( HB_VM_STACK.aEnumCollection[ HB_VM_STACK.wEnumCollectionCounter ] ) );
-         // We might get here from BREAK, so item may have been released.
-         HB_VM_STACK.aEnumCollection[ HB_VM_STACK.wEnumCollectionCounter ].type = HB_IT_NIL;
-         HB_VM_STACK.awEnumIndex[ HB_VM_STACK.wEnumCollectionCounter ] = 0;
-      }
-
-      // Reset WITH OBJECT.
-      while( HB_VM_STACK.wWithObjectCounter > wWithObjectCounter )
-      {
-         --HB_VM_STACK.wWithObjectCounter;
-         //hb_itemClear( &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter ] ) );
-         // We might get here from BREAK, so item may have been released.
-         HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter ].type = HB_IT_NIL;
-      }
-   #endif
+   // Reset WITH OBJECT.
+   while( hb_vm_wWithObjectCounter > wWithObjectCounter )
+   {
+      --hb_vm_wWithObjectCounter;
+      //hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
+      // We might get here from BREAK, so item may have been released.
+      hb_vm_aWithObject[ hb_vm_wWithObjectCounter ].type = HB_IT_NIL;
+   }
 
    //JC1: do not allow cancellation or idle MT func: thread cleanup procedure
    // is under way, or another VM might return in control
@@ -5459,19 +5423,11 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    pItem = hb_stackNewFrame( &sStackState, uiParams );   /* procedure name */
    pSym = pItem->item.asSymbol.value;
 
-   #ifndef HB_THREAD_SUPPORT
-      if( hb_vm_bWithObject )
-      {
-         hb_vm_bWithObject = FALSE;
-         hb_itemCopy( * ( HB_VM_STACK.pBase + 1 ), &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter - 1 ] ) ) ;
-      }
-   #else
-      if( HB_VM_STACK.bWithObject )
-      {
-         HB_VM_STACK.bWithObject = FALSE;
-         hb_itemCopy( * ( HB_VM_STACK.pBase + 1 ), &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter - 1 ] ) ) ;
-      }
-   #endif
+   if( hb_vm_bWithObject )
+   {
+      hb_vm_bWithObject = FALSE;
+      hb_itemCopy( * ( HB_VM_STACK.pBase + 1 ), &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter - 1 ] ) ) ;
+   }
 
    pSelf = ( * ( HB_VM_STACK.pBase + 1 ) );   /* NIL, OBJECT or BLOCK */
 
@@ -7852,18 +7808,13 @@ HB_FUNC( HB_QWITH )
 {
    HB_THREAD_STUB
 
-#ifndef HB_THREAD_SUPPORT
    hb_itemCopy( &(HB_VM_STACK.Return), &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter - 1 ] ) );
-#else
-   hb_itemCopy( &(HB_VM_STACK.Return), &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter - 1 ] ) );
-#endif
 }
 
 HB_FUNC( HB_SETWITH )
 {
    HB_THREAD_STUB
 
-#ifndef HB_THREAD_SUPPORT
    if( hb_pcount() == 0 )
    {
       hb_itemForwardValue( &(HB_VM_STACK.Return), &( hb_vm_aWithObject[ --hb_vm_wWithObjectCounter ] ) );
@@ -7879,23 +7830,6 @@ HB_FUNC( HB_SETWITH )
          hb_errRT_BASE( EG_ARG, 9002, NULL, "WITH OBJECT excessive nesting!", 0 );
       }
    }
-#else
-   if( hb_pcount() == 0 )
-   {
-      hb_itemForwardValue( &(HB_VM_STACK.Return), &( HB_VM_STACK.aWithObject[ --HB_VM_STACK.wWithObjectCounter ] ) );
-   }
-   else
-   {
-      PHB_ITEM pWith = hb_param( 1, HB_IT_OBJECT );
-
-      hb_itemForwardValue( &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter++ ] ), pWith );
-
-      if( HB_VM_STACK.wWithObjectCounter == HB_MAX_WITH_OBJECTS )
-      {
-         hb_errRT_BASE( EG_ARG, 9002, NULL, "WITH OBJECT excessive nesting!", 0 );
-      }
-   }
-#endif
 }
 
 HB_FUNC( HB_QSELF )
