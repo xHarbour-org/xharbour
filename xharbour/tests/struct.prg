@@ -13,7 +13,7 @@ procedure main()
 
       MEMBER n1, n2, n3, n4 AS NUMERIC
 
-      MEMBER b1             AS CODEBLOCK
+      MEMBER b1             AS CODEBLOCK INIT { || QOut( "Hello!!!" ) }
 
       MEMBER a1, a2, a3     AS ARRAY
 
@@ -21,15 +21,16 @@ procedure main()
 
    ENDSTRUCTURE
 
-   ? oStru:c1
-   ? oStru:c2
-   ? oStru:c3
-   ? oStru:c4
-   ? oStru:c5
-   ?
-   ? oStru:d1
+   ? ValToPrg( oStru:c1 )
+   ? ValToPrg( oStru:c2 )
+   ? ValToPrg( oStru:c3 )
+   ? ValToPrg( oStru:c4 )
+   ? ValToPrg( oStru:c5 )
+   ? ValToPrg( oStru:b1 )
+   ? ValToPrg( oStru:d1 )
 
    Eval( oStru:b1 )
+   ?
 
 return
 

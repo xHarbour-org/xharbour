@@ -1,5 +1,5 @@
 /*
- * $Id: hbstruct.ch,v 1.1 2003/10/29 16:35:03 toninhofwi Exp $
+ * $Id: hbstruct.ch,v 1.2 2003/11/17 10:58:50 toninhofwi Exp $
  */
 
 /*
@@ -52,8 +52,8 @@
 #ifndef _H_STRUCTURE
 #define _H_STRUCTURE
 
-#xcommand STRUCTURE <hStruct> => <hStruct> := Hash() ; #undef _TSTRUCT_ ; #define _TSTRUCT_ <hStruct>
-#xcommand STRUC <hStruct> => <hStruct> := Hash() ; #undef _TSTRUCT_ ; #define _TSTRUCT_ <hStruct>
+#xcommand STRUCTURE <hStruct> => <hStruct> := HSetCaseMatch( Hash(), .F. ) ; #undef _TSTRUCT_ ; #define _TSTRUCT_ <hStruct>
+#xcommand STRUC <hStruct> => <hStruct> := HSetCaseMatch( Hash(), .F.) ; #undef _TSTRUCT_ ; #define _TSTRUCT_ <hStruct>
 
 #xcommand MEMBER <cName, ...> ;
              [ AS <type:LOGICAL,NUMERIC,STRING,DATE,CODEBLOCK,ARRAY,OBJECT> ] ;

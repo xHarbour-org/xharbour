@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1892 2003/12/18 11:11:23 druzus Exp $
+ * $Id: ChangeLog,v 1.1894 2003/12/18 14:48:26 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-18 17:15 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/hbstruct.ch
+    ! Hash() must be set case insensitive at creation to
+      provide coherently the oStru:c1 grammar
+  * tests/struct.prg
+    * more intensive tests
 
 2003-12-18 15:46 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/rtl/idle.c
