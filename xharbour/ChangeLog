@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3282 2004/08/05 16:45:12 paultucker Exp $
+ * $Id: ChangeLog,v 1.3283 2004/08/05 17:10:36 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-06 11:30 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/tbrowse.prg
+    ! fixed a very peculiar bug, that is: let's say we have a tbrowse
+      on an array, tbrowse is stable and ::rowpos == 10. Now, pressing
+      a key we reload this array with different values _and_ now we have
+      a different (smaller) number of items, let's say 5, after
+      reloading the array a browse:gotop() is called.
+      ::GoTop() calls ::Moved() which calls ::DeHilite() which calls
+      ::Dispcell() which evaluates oCol:Block to refetch data from
+      datasource, but now the array is smaller... BUM! out of bounds.
+      So now ::DeHilite() doesn't call anymore ::DispCell (by the way,
+      should be a little faster since we save two Evals()) but
+      takes cell content from screen and repaints it dehighlighted.
+      In my opinion the code that exploits this bug is a little tricky
+      since clipper works only because it has an internal buffer,
+      nevertheless, this stopped working as soon as we compiled it with
+      xharbour.
 
 2004-08-05 13:10 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * include/hbcomp.h
@@ -39,7 +57,7 @@
 2004-08-05 08:18 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * source/rtl/tget.prg
     ! Fixed a Clipper compatibility issure in Static Function BuildGetColor()
-      when the param received was non-numeric.  
+      when the param received was non-numeric.
       Reported by David Arturo Macías Corona
 
 2004-08-05 14:25 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>

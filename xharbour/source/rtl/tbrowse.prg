@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.85 2004/08/04 12:34:07 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.86 2004/08/05 00:51:07 guerra000 Exp $
  */
 
 /*
@@ -129,6 +129,10 @@ CLASS TBrowse
    DATA skipBlock             // Code block used to reposition data source
    DATA stable                // Indicates if the TBrowse object is stable
    DATA aColumns
+
+   /* 06/08/2004 - <maurilio.longo@libero.it>
+                   next two DATAs should not be public, at least protected
+   */
    DATA aColumnsSep           // Holds the column position where seperators are marked . for Wvt_DrawGridVert()
    DATA aColorSpec            // Holds colors of Tbrowse:ColorSpec
 
@@ -284,6 +288,8 @@ CLASS TBrowse
    DATA cSpaceLast                        // Blank space after the last column
    DATA cSpaceWidth                       // Spaces of browse width
    DATA lRect
+
+   DATA aHighCellColor                    // Result of colorblock evaluation of currently highlighted cell
 
 #ifdef HB_COMPAT_C53
    DATA rect
@@ -2133,18 +2139,50 @@ METHOD PosCursor() CLASS TBrowse
 //-------------------------------------------------------------------//
 
 METHOD DeHilite() CLASS TBrowse
+
    LOCAL nRow := ::RowPos + ::nRowData
    LOCAL nCol := ::aColsInfo[ ::nColPos, o_Obj ]:colPos
+   LOCAL cScr, cColor, i, cCell
 
    SetPos( nRow, nCol )
 
    if ::lRect .and.;
-              ::aRect[ 1 ] <= nRow .and. ::aRect[ 3 ] >= nRow .and.;
-              ::aRect[ 2 ] <= nCol .and. ::aRect[ 4 ] >= nCol
-      ::DispCell( ::nColPos, TBC_CLR_STANDARD, ::aRectColor )
+      ::aRect[ 1 ] <= nRow .and. ::aRect[ 3 ] >= nRow .and.;
+      ::aRect[ 2 ] <= nCol .and. ::aRect[ 4 ] >= nCol
+
+      cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aRectColor, TBC_CLR_STANDARD ) - 1 )
+
    else
-      ::DispCell( ::nColPos, TBC_CLR_STANDARD )
+
+      if ::aColsInfo[ ::nColPos, o_Obj ]:colorBlock == NIL
+
+         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aColsInfo[ ::nColPos, o_Obj ]:defColor, TBC_CLR_STANDARD ) - 1 )
+
+      else
+
+         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aHighCellColor, TBC_CLR_STANDARD ) - 1 )
+
+      endif
+
    endif
+
+   // Take highlighted cell from screen
+   cCell := SaveScreen(nRow, nCol, nRow, nCol + ::aColsInfo[ ::nColPos, o_Width ] - 1)
+
+   // Write first char with dehighlighted attribute
+   DispOut(cCell[1], cColor)
+
+   // Take dehighlighted attribute from screen
+   cScr := SaveScreen(nRow, nCol, nRow, nCol + 1)
+
+   // Replace highlighted attribute with dehighlighted inside string representing
+   // highlighted cell
+   for i := 2 to len(cCell) step 2
+      cCell[i] := cScr[2]
+   next
+
+   // Write back cell, now dehighlighted.
+   RestScreen(nRow, nCol, nRow, nCol + ::aColsInfo[ ::nColPos, o_Width ] - 1, cCell)
 
    SetPos( nRow, nCol )
 
@@ -2200,7 +2238,7 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
          cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, nColor ) - 1 )
 
       else
-         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( Eval( oCol:ColorBlock, ftmp ), nColor ) - 1 )
+         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( (::aHighCellColor := Eval( oCol:ColorBlock, ftmp ) ), nColor ) - 1 )
 
       endif
    else
@@ -2223,7 +2261,7 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
       exit
 
    case "L"
-      DispOut( padc( iif( ftmp, "T", "F" ),nWidth ), cColor )
+      DispOut( padc( iif( ftmp, "T", "F" ), nWidth ), cColor )
       exit
 
    default
