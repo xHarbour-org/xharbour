@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.41 2003/05/12 04:50:58 walito Exp $
+ * $Id: tbrowse.prg,v 1.42 2003/05/27 19:58:32 walito Exp $
  */
 
 /*
@@ -421,7 +421,7 @@ METHOD Configure( nMode ) CLASS TBrowse
    // Find out highest header and footer
    FOR EACH aCol IN ::aColsInfo
 
-      if nMode = 0 .or. nMode = 1
+      if nMode <= 1
          xVal := Eval( aCol[ o_Obj ]:block )
 
          aCol[ o_Type      ] := valtype( xVal )
@@ -435,7 +435,7 @@ METHOD Configure( nMode ) CLASS TBrowse
                                           aCol[ o_Obj ]:ColSep, ::ColSep )
       endif
 
-      if nMode = 0 .or. ::lNeverDisplayed
+      if nMode <= 1 .or. ::lNeverDisplayed
          xVal := Eval( aCol[ o_Obj ]:block )
 
          if !aCol[ o_SetWidth ]
@@ -1471,6 +1471,14 @@ METHOD ForceStable() CLASS TBrowse
 
          Eval( ::SkipBlock, 0 - nAvail )
 
+         // ::GoBottom() go to top first, but need phase 2 of stabilization.
+         // See form of work of ::GoBottom.
+
+         IF nAvail == 0 .and. ::nLastRetrieved == 0
+            ::Moved()
+            lReset := .F.
+         ENDIF
+
       EndIf
 
    EndIf
@@ -1480,8 +1488,8 @@ METHOD ForceStable() CLASS TBrowse
       // nNewRowPos and nLastRetrieved have to be updated
       // as we will entering phase 2 of stabilization
 
-//      ::RowPos := ::nNewRowPos := ::nLastRetrieved := ;
-//                  If( Abs( nAvail ) + 1 > ::RowPos, ::RowPos, Abs( nAvail ) + 1 )
+      ::RowPos := ::nNewRowPos := ::nLastRetrieved := ;
+                  If( Abs( nAvail ) + 1 > ::RowPos, ::RowPos, Abs( nAvail ) + 1 )
       ::Moved()
 
       // To ensure phase 1 is skipped
