@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2808 2004/04/20 09:44:47 likewolf Exp $
+ * $Id: ChangeLog,v 1.2809 2004/04/20 12:47:48 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-20 23:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/teditor.prg
+    * Cursor movement is now much more compatible to Clipper's. The fixes are for:
+      PageUp, PageDown.
+
+    * Numerous small fixes especially for memoedit() with WordWrap ON. Now it follows
+      Clipper behavior more alike.
+
+    * Introduced mouse support. Currently Left Button Up, Mouse Scroll Forward and 
+      Mouse Scroll Backward is supported. Clicked position of mouse is made current.
+      Forward and Backward movement of mouse scroll causes memoedit() to go up or down
+      by one row.
+
+  * xharbour/source/rtl/memoline.c
+    * Fixed for memoline retrieved properly where WordWrap is on. If a line was wordwrapped
+      at a point the next character had been space, it was returning next line with preceding
+      space as:
+      "A Lazy Fox Jumped over the bush"
+                       .                 Point where line was wrapped.
+      Clipper  -> "over the bush"
+      xHarbour -> " over the bush"
 
 2004-04-20 16:47 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/debug/debugger.prg
