@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.26 2003/02/09 00:10:24 ronpinkas Exp $
+ * $Id: filesys.c,v 1.27 2003/02/10 00:47:24 lculik Exp $
  */
 
 /*
@@ -509,32 +509,32 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
          if( ( pid = fork() ) != -1 ) {
             if( pid != 0 ) {
               if( bRead ) {
-	          close( hPipeHandle[ 1 ] );
-	          hFileHandle = hPipeHandle[ 0 ];
-	       } else {
-	          close( hPipeHandle[ 0 ] );
-	          hFileHandle = hPipeHandle[ 1 ];
-	       }
-	    } else {
+             close( hPipeHandle[ 1 ] );
+             hFileHandle = hPipeHandle[ 0 ];
+          } else {
+             close( hPipeHandle[ 0 ] );
+             hFileHandle = hPipeHandle[ 1 ];
+          }
+       } else {
                char *argv[4];
-	       argv[0] = "sh";
+          argv[0] = "sh";
                argv[1] = "-c";
                argv[2] = ( char * ) pFilename;
                argv[3] = ( char * ) 0;
-	       if( bRead ) {
-	          close( hPipeHandle[ 0 ] );
-		  dup2( hPipeHandle[ 1 ], 1 );
-	       } else {
-	          close( hPipeHandle[ 1 ] );
-	          dup2( hPipeHandle[ 0 ], 0 );
-	       }
+          if( bRead ) {
+             close( hPipeHandle[ 0 ] );
+        dup2( hPipeHandle[ 1 ], 1 );
+          } else {
+             close( hPipeHandle[ 1 ] );
+             dup2( hPipeHandle[ 0 ], 0 );
+          }
                execve("/bin/sh", argv, environ);
-	       exit(1);
-	    }
-	 } else {
-	    close( hPipeHandle[0] );
-	    close( hPipeHandle[1] );
-	 }
+          exit(1);
+       }
+    } else {
+       close( hPipeHandle[0] );
+       close( hPipeHandle[1] );
+    }
       }
       s_uiErrorLast = errno;
    }
@@ -730,7 +730,7 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
       /* This if block is required, because errno will be set
          if the file did not exist and had to be created, even
          when the create is successful! */
-      errno = GnuErrtoDosErr( errno );    
+      errno = GnuErrtoDosErr( errno );
       s_uiErrorLast = errno;
    }
 
@@ -2108,13 +2108,13 @@ int GnuErrtoDosErr( int ErrCode )
 
     if (ErrCode == EMFILE)
         iResult = 4 ;
-    
+
     if (ErrCode == ESPIPE)
         iResult = 25;
 
-    if (ErrCode == EACESS )
+    if (ErrCode == EACCES )
         iResult = 5  ;
-        
+
     if (ErrCode == ENOENT)
         iResult = 2;
 
@@ -2124,13 +2124,13 @@ int GnuErrtoDosErr( int ErrCode )
 
     if (ErrCode == EMFILE)
         iResult = 4 ;
-    
+
     if (ErrCode == ESPIPE)
         iResult = 25;
 
-    if (ErrCode == EACESS )
+    if (ErrCode == EACCES )
         iResult = 5  ;
-        
+
     if (ErrCode == ENOENT)
         iResult = 2;
 }
@@ -2140,14 +2140,14 @@ int GnuErrtoDosErr( int ErrCode )
 
     if (ErrCode == EMFILE)
         iResult = 4 ;
-    
+
     if (ErrCode == ESPIPE)
         iResult = 25;
 
-    if (ErrCode == EACESS )
+    if (ErrCode == EACCES )
         iResult = 5  ;
-        
-}            
+
+}
 #endif
 
     return iResult;

@@ -1,5 +1,5 @@
 /*
- * $Id: isprint.c,v 1.15 2002/08/01 00:33:15 lculik Exp $
+ * $Id: isprint.c,v 1.16 2003/02/10 00:47:25 lculik Exp $
  */
 
 /*
@@ -155,21 +155,6 @@ BOOL hb_printerIsReady( char * pszPrinterName )
    return bIsPrinter;
 }
 
-DWORD hb_printerIsReadyn( char * pszPrinterName )
-{
-   DWORD dwPrinter;
-
-
-   {
-      HANDLE hPrinter;
-
-      OpenPrinter( pszPrinterName, &hPrinter, NULL );
-
-      dwPrinter =  IsPrinterErrorn( hPrinter );
-   }
-
-   return dwPrinter;
-}
 
 /* NOTE: The parameter is an extension over CA-Cl*pper, it's also supported
          by Xbase++. [vszakats] */
@@ -382,7 +367,7 @@ static DWORD IsPrinterErrorn( HANDLE hPrinter )
                     break;
 
                 }
-            if (bPrinterError)    
+            if (bPrinterError)
             {
             return dwError;
             }
@@ -593,7 +578,7 @@ HB_FUNC(GETPRINTERS)
     BOOL res;
 
     buffer = ( unsigned char * ) malloc( MAX_PRINTERS * sizeof( PRINTER_INFO_5 ) ) ;
-                                                                                           
+
     res = EnumPrinters( PRINTER_ENUM_NETWORK | PRINTER_ENUM_LOCAL |PRINTER_ENUM_CONNECTIONS ,
           NULL ,
           5 ,
@@ -604,9 +589,9 @@ HB_FUNC(GETPRINTERS)
 
     if( !res )
       {
-        if( GetLastError() != ERROR_INSUFFICIENT_BUFFER )  
+        if( GetLastError() != ERROR_INSUFFICIENT_BUFFER )
              hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
-            
+
         else {
 
                free(buffer) ;
@@ -616,7 +601,7 @@ HB_FUNC(GETPRINTERS)
                NULL ,
                5 ,
                buffer ,
-               needed , 
+               needed ,
                &needed ,
                &returned );
                }
@@ -640,7 +625,7 @@ HB_FUNC(GETPRINTERS)
           hb_arrayAdd( pArrayPrinter , pSubItems );
 
           hb_itemRelease( pFile ) ;
-                       
+
           hb_itemRelease( pPort ) ;
 
           hb_itemRelease( pSubItems );
@@ -648,6 +633,22 @@ HB_FUNC(GETPRINTERS)
 
    hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
 
+}
+
+DWORD hb_printerIsReadyn( char * pszPrinterName )
+{
+   DWORD dwPrinter;
+
+
+   {
+      HANDLE hPrinter;
+
+      OpenPrinter( pszPrinterName, &hPrinter, NULL );
+
+      dwPrinter =  IsPrinterErrorn( hPrinter );
+   }
+
+   return dwPrinter;
 }
 
 #endif
