@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.12 2003/11/21 13:03:29 jonnymind Exp $
+ * $Id: hbxml.c,v 1.13 2003/11/24 15:15:25 lf_sfnet Exp $
  */
 
 /*
@@ -94,7 +94,7 @@ static void hbxml_set_doc_status( PHB_ITEM doc, int status, int error )
    hb_itemPutNI( &number, error );
    hb_objSendMsg( doc, "_NERROR", 1 , &number );
 }
-   
+
 static void hbxml_doc_new_line( PHB_ITEM pDoc )
 {
    HB_ITEM number;
@@ -103,7 +103,7 @@ static void hbxml_doc_new_line( PHB_ITEM pDoc )
    hb_objSendMsg( pDoc, "NLINE", 0 );
    hb_itemPutNI( &number, HB_VM_STACK.Return.item.asInteger.value + 1);
    hb_objSendMsg( pDoc, "_NLINE", 1 , &number );
-}  
+}
 
 static void hbxml_doc_new_node( PHB_ITEM pDoc, int amount )
 {
@@ -113,10 +113,10 @@ static void hbxml_doc_new_node( PHB_ITEM pDoc, int amount )
    hb_objSendMsg( pDoc, "NNODECOUNT", 0 );
    hb_itemPutNI( &number, HB_VM_STACK.Return.item.asInteger.value + amount);
    hb_objSendMsg( pDoc, "_NNODECOUNT", 1 , &number );
-   
+
    //TODO: launch a callback
-}  
- 
+}
+
 /***********************************************************
    HBXML lib
    Attribute oriented routines
@@ -569,7 +569,7 @@ PHB_ITEM mxml_node_clone( PHB_ITEM pTg )
    //sets clone data
    hb_objSendMsg( pTg, "CDATA", 0 );
    hb_objSendMsg( pNode, "_CDATA", 1, &(HB_VM_STACK.Return) );
-   
+
    // clone attributes
    hb_objSendMsg( pTg, "AATTRIBUTES", 0 );
    pArrayClone = hb_arrayClone( &(HB_VM_STACK.Return), NULL );
@@ -580,7 +580,10 @@ PHB_ITEM mxml_node_clone( PHB_ITEM pTg )
 
 HB_FUNC( HBXML_NODE_CLONE )
 {
-  mxml_node_clone( hb_param( 1, HB_IT_OBJECT ) );
+   PHB_ITEM pClone = mxml_node_clone( hb_param( 1, HB_IT_OBJECT ) );
+
+   hb_itemReturn( pClone );
+   hb_itemRelease( pClone );
 }
 
 /**
@@ -594,12 +597,13 @@ PHB_ITEM mxml_node_clone_tree( PHB_ITEM pTg )
    HB_ITEM node;
 
    node.type = HB_IT_NIL;
-   
+
    // Get the TG child
    hb_objSendMsg( pTg, "OCHILD", 0 );
    hb_itemCopy( &node, &(HB_VM_STACK.Return) );
 
-   while ( node.type != HB_IT_NIL ) {
+   while ( node.type != HB_IT_NIL )
+   {
       PHB_ITEM pSubTree;
 
       pSubTree = mxml_node_clone_tree( &node );
@@ -609,7 +613,7 @@ PHB_ITEM mxml_node_clone_tree( PHB_ITEM pTg )
       // the parent of the subtree is the clone
       hb_objSendMsg( pSubTree, "_OPARENT", 1, pClone );
 
-      // go to the next node            
+      // go to the next node
       hb_objSendMsg( &node, "ONEXT", 0 );
       hb_itemCopy( &node, &(HB_VM_STACK.Return) );
    }
@@ -619,7 +623,10 @@ PHB_ITEM mxml_node_clone_tree( PHB_ITEM pTg )
 
 HB_FUNC( HBXML_NODE_CLONE_TREE )
 {
-  mxml_node_clone_tree( hb_param( 1, HB_IT_OBJECT ) );
+   PHB_ITEM pClone = mxml_node_clone_tree( hb_param( 1, HB_IT_OBJECT ) );
+
+   hb_itemReturn( pClone );
+   hb_itemRelease( pClone );
 }
 
 /* reads a data node */
@@ -939,7 +946,7 @@ static void mxml_node_read_tag( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc,
    hbtemp.type = HB_IT_NIL;
    hb_itemPutNI( &hbtemp, MXML_TYPE_TAG );
    hb_objSendMsg( pNode,"_NTYPE", 1, &hbtemp );
-      
+
    if ( mxml_node_read_name( ref, pNode, doc ) == MXML_STATUS_OK ) {
       mxml_node_read_attributes( ref, pNode, doc, style );
    }
@@ -970,7 +977,7 @@ static void mxml_node_read_comment( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM do
    hbtemp.type = HB_IT_NIL;
    hb_itemPutNI( &hbtemp, MXML_TYPE_COMMENT );
    hb_objSendMsg( pNode,"_NTYPE", 1, &hbtemp );
-   
+
    //  we'll put all the comment into the data member, up to ->
 
    buf = (char *) MXML_ALLOCATOR( MXML_ALLOC_BLOCK );
@@ -983,7 +990,7 @@ static void mxml_node_read_comment( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM do
       switch ( iStatus ) {
          // scanning for ->
          case 0:
-            if ( chr == MXML_LINE_TERMINATOR ) 
+            if ( chr == MXML_LINE_TERMINATOR )
             {
                hbxml_doc_new_line( doc );
                buf[ iPos ++ ] = chr;
@@ -1083,7 +1090,8 @@ MXML_STATUS mxml_node_read( MXML_REFIL *ref, PHB_ITEM pNode,PHB_ITEM doc, int st
       // resetting new node foundings
       node = NULL;
 
-      switch ( iStatus ) {
+      switch( iStatus )
+      {
 
          case 0:  // outside nodes
             switch ( chr ) {
@@ -1100,43 +1108,52 @@ MXML_STATUS mxml_node_read( MXML_REFIL *ref, PHB_ITEM pNode,PHB_ITEM doc, int st
          break;
 
          case 1: //inside a node, first character
-            if ( chr == '/' ) {
+            if ( chr == '/' )
+            {
                // This can be met only inside current tag
                iStatus = -1; // done
             }
-            else if ( chr == '!' ) {
+            else if ( chr == '!' )
+            {
                iStatus = 2;
             }
-            else if ( chr == '?' ) {
+            else if ( chr == '?' )
+            {
                node = mxml_node_new();
                mxml_node_read_pi( ref, node, doc );
             }
-            else if ( isalpha( chr ) ) {
+            else if ( isalpha( chr ) )
+            {
                mxml_refil_ungetc( ref, chr );
                node = mxml_node_new();
                mxml_node_read_tag( ref, node, doc, style );
             }
-            else {
+            else
+            {
                hbxml_set_doc_status( doc, MXML_STATUS_MALFORMED, MXML_ERROR_INVNODE );
             }
          break;
 
          case 2: //inside a possible comment (<!-/<!?)
-            if ( chr == '-') {
+            if ( chr == '-')
+            {
                iStatus = 3;
             }
-            else if ( isalpha( chr ) ) {
+            else if ( isalpha( chr ) )
+            {
                node = mxml_node_new();
                mxml_refil_ungetc( ref, chr );
                mxml_node_read_directive( ref, node, doc );
             }
-            else {
+            else
+            {
                hbxml_set_doc_status( doc, MXML_STATUS_MALFORMED, MXML_ERROR_INVNODE );
             }
          break;
 
          case 3:
-            if ( chr == '-') {
+            if ( chr == '-')
+            {
                node = mxml_node_new();
                mxml_node_read_comment( ref, node, doc );
             }
@@ -1147,14 +1164,19 @@ MXML_STATUS mxml_node_read( MXML_REFIL *ref, PHB_ITEM pNode,PHB_ITEM doc, int st
       }
 
       // have I to add a node below our structure ?
-      if ( node != NULL ) {
-         if ( ref->status == MXML_STATUS_OK ) {
+      if( node != NULL )
+      {
+         if( ref->status == MXML_STATUS_OK )
+         {
             mxml_node_add_below( pNode, node );
+            hb_itemRelease( node );
             // beginning again - a new node is born
             hbxml_doc_new_node( doc, 1 );
             iStatus = 0;
          }
-         else {
+         else
+         {
+            hb_itemRelease( node );
             hbxml_set_doc_status( doc, ref->status, ref->error );
             // node will be destroyed by GC when needed
             return ref->status;
