@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.2 2002/01/23 02:32:08 ronpinkas Exp $
+ * $Id: gtapi.c,v 1.3 2002/09/20 19:18:17 map Exp $
  */
 
 /*
@@ -261,7 +261,7 @@ USHORT hb_gtDispBegin( void )
    if( s_uiPreCount == 0 )
       hb_gt_DispBegin();
    else
-      ++s_uiPreCount;
+      ++s_uiPreCount;  /* defined in each terminal driver */
 
    return 0;
 }
@@ -783,7 +783,7 @@ USHORT hb_gtMaxRow( void )
    return hb_gt_GetScreenHeight() - 1;
 }
 
-USHORT hb_gtRectSize( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, USHORT * uipBuffSize )
+USHORT hb_gtRectSize( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, UINT * uipBuffSize )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtRectSize(%hu, %hu, %hu, %hu, %p)", uiTop, uiLeft, uiBottom, uiRight, uipBuffSize));
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.9 2002/10/08 12:33:46 map Exp $
+ * $Id: gtwin.c,v 1.10 2002/10/09 03:43:21 druzus Exp $
  */
 
 /*
@@ -181,8 +181,8 @@ static void hb_gt_xSetCursorStyle( void )
     switch( s_usCursorStyle )
     {
     case SC_NONE:
-        cci.dwSize = 25;
         cci.bVisible = FALSE;
+        cci.dwSize = 25;
         break;
 
     case SC_INSERT:
@@ -262,7 +262,7 @@ static void hb_gt_xScreenUpdate( void )
 
 static void hb_gt_xUpdtSet( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight )
 {
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_xUpdtSet(%hu, %hu)", usTop, usBottom));
+    HB_TRACE(HB_TR_DEBUG, ("hb_gt_xUpdtSet(%hu, %hu, %hu, %hu)", usTop, usLeft, usBottom, usRight));
 
     if ( usTop < s_usUpdtTop )
         s_usUpdtTop = usTop;
@@ -595,8 +595,8 @@ void hb_gt_Puts( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE *pbyStr, ULONG ul
             }
             while( i-- )
             {
-                s_pCharInfoScreen[j].Attributes = ( WORD )( byAttr & 0xFF );
                 s_pCharInfoScreen[j].Char.AsciiChar = ( CHAR ) *pbyStr++;
+                s_pCharInfoScreen[j].Attributes = ( WORD )( byAttr & 0xFF );
                 ++j;
             }
             hb_gt_xUpdtSet( usRow, l, u, r );
@@ -657,7 +657,8 @@ int hb_gt_RectSize( USHORT rows, USHORT cols )
 
 void hb_gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE * pbyDst )
 {
-    USHORT x, y, i;
+    USHORT x,y;
+    ULONG  i;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_GetText(%hu, %hu, %hu, %hu, %p)", usTop, usLeft, usBottom, usRight, pbyDst));
 
@@ -685,7 +686,8 @@ void hb_gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight
 
 void hb_gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE * pbySrc )
 {
-    USHORT x, y, i;
+    USHORT x,y;
+    ULONG  i;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_PutText(%hu, %hu, %hu, %hu, %p)", usTop, usLeft, usBottom, usRight, pbySrc));
 
@@ -718,7 +720,8 @@ void hb_gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight
 
 void hb_gt_SetAttribute( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE attr )
 {
-    USHORT x, y, i;
+    USHORT x, y;
+    ULONG i;
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetAttribute(%hu, %hu, %hu, %hu, %d", usTop, usLeft, usBottom, usRight, (int) attr));
 
@@ -749,7 +752,7 @@ void hb_gt_SetAttribute( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT us
 void hb_gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, BYTE byAttr, SHORT iRows, SHORT iCols )
 {
     SHORT usSaveRow, usSaveCol;
-    USHORT uiSize;
+    UINT uiSize;
 
     int iLength = ( usRight - usLeft ) + 1;
     int iCount, iColOld, iColNew, iColSize;
@@ -764,16 +767,15 @@ void hb_gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight,
         memset( fpBlank, ' ', iLength );
 
         iColOld = iColNew = usLeft;
+        iColSize = iLength -1;
         if( iCols >= 0 )
         {
             iColOld += iCols;
-            iColSize = ( int ) ( usRight - usLeft );
             iColSize -= iCols;
         }
         else
         {
             iColNew -= iCols;
-            iColSize = ( int ) ( usRight - usLeft );
             iColSize += iCols;
         }
 
@@ -783,8 +785,8 @@ void hb_gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight,
         hb_gtGetPos( &usSaveRow, &usSaveCol );
 
         for( iCount = ( iRows >= 0 ? usTop : usBottom );
-              ( iRows >= 0 ? iCount <= usBottom : iCount >= usTop );
-              ( iRows >= 0 ? iCount++ : iCount-- ) )
+             ( iRows >= 0 ? iCount <= usBottom : iCount >= usTop );
+             ( iRows >= 0 ? iCount++ : iCount-- ) )
         {
             int iRowPos = iCount + iRows;
 
@@ -929,10 +931,11 @@ static void hb_gt_xPutch( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE byChar )
     if ( s_pCharInfoScreen != NULL &&
          usRow < s_csbi.dwSize.Y && usCol < s_csbi.dwSize.X )
     {
-        int i;
-        i = ( int ) ( usRow * s_csbi.dwSize.X + usCol );
-        s_pCharInfoScreen[i].Attributes = ( WORD )( byAttr & 0xFF );
+        int i = ( int ) ( usRow * s_csbi.dwSize.X + usCol );
+
         s_pCharInfoScreen[i].Char.AsciiChar = ( CHAR ) byChar;
+        s_pCharInfoScreen[i].Attributes = ( WORD )( byAttr & 0xFF );
+
         hb_gt_xUpdtSet( usRow, usCol, usRow, usCol );
     }
 }
@@ -977,11 +980,13 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
 
         hb_gt_DispBegin();
 
-        if( Height > 1 && Width > 1 && Top >= 0 && Top < hb_gt_GetScreenHeight() && Left >= 0 && Left < hb_gt_GetScreenWidth() )
+        if( Height > 1 && Width > 1 &&
+               Top >= 0 && Top < hb_gt_GetScreenHeight() &&
+              Left >= 0 && Left < hb_gt_GetScreenWidth() )
             hb_gt_xPutch( Top, Left, byAttr, szBox[ 0 ] ); /* Upper left corner */
 
         Col = ( Height > 1 ? Left + 1 : Left );
-        if(Col < 0 )
+        if( Col < 0 )
         {
             Width += Col;
             Col = 0;
@@ -991,10 +996,13 @@ USHORT hb_gt_Box( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
             Width -= Right - hb_gt_GetScreenWidth();
         }
 
-        if( Col <= Right && Col < hb_gt_GetScreenWidth() && Top >= 0 && Top < hb_gt_GetScreenHeight() )
+        if( Col <= Right && Col < hb_gt_GetScreenWidth() && 
+                Top >= 0 && Top < hb_gt_GetScreenHeight() )
             hb_gt_Replicate( Top, Col, byAttr, szBox[ 1 ], Width + ( (Right - Left) > 1 ? -2 : 0 ) ); /* Top line */
 
-        if( Height > 1 && (Right - Left) > 1 && Right < hb_gt_GetScreenWidth() && Top >= 0 && Top < hb_gt_GetScreenHeight() )
+        if( Height > 1 &&
+               (Right - Left) > 1 && Right < hb_gt_GetScreenWidth() &&
+               Top >= 0 && Top < hb_gt_GetScreenHeight() )
             hb_gt_xPutch( Top, Right, byAttr, szBox[ 2 ] ); /* Upper right corner */
 
         if( szBox[ 8 ] && Height > 2 && Width > 2 )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.452 2002/10/19 01:22:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.453 2002/10/19 16:30:44 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-10-21 18:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * include/hbdefs.h
+    * Added definition for UINT
+  * include/hbapigt.h
+  * source/rtl/gtapi.c
+  * source/rtl/saverest.c
+  * source/rtl/xsavescr.c
+  * source/rtl/gtdos/gtdos.c
+  * source/rtl/gtsln/gtsln.c
+  * source/rtl/gtos2/gtos2.c
+  * source/rtl/gtwin/gtwin.c
+     ! Properly account for the fact that hb_gt_rectsize returns an int
+       (ok, so we treat it as UINT, but this is better than USHORT)
+  * source/rtl/trace.c
+  * source/rtl/errorapi.c
+     ! one of these needs to account for a null error message.
+     ! I fixed both.  (errInternal)
+  + tests/vidtest.prg by Brian Dukes <bdukes@yellowthingy.co.uk>
 
 2002-10-19 19:29 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/tgetint.prg

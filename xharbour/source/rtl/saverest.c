@@ -1,5 +1,5 @@
 /*
- * $Id: saverest.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: saverest.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
  */
 
 /*
@@ -60,12 +60,11 @@ HB_FUNC( SAVESCREEN )
    USHORT uiLeft   = hb_parni( 2 ); /* Defaults to zero on bad type */
    USHORT uiBottom = ISNUM( 3 ) ? hb_parni( 3 ) : hb_gtMaxRow();
    USHORT uiRight  = ISNUM( 4 ) ? hb_parni( 4 ) : hb_gtMaxCol();
-
-   USHORT uiSize;
+   UINT uiSize;
    void * pBuffer;
 
    hb_gtRectSize( uiTop, uiLeft, uiBottom, uiRight, &uiSize );
-   pBuffer = hb_xgrab( uiSize + 1 );
+   pBuffer = hb_xgrab( uiSize );
 
    hb_gtSave( uiTop, uiLeft, uiBottom, uiRight, pBuffer );
    hb_retclenAdopt( ( char * ) pBuffer, uiSize );

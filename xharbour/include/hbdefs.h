@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.3 2002/01/12 10:04:27 ronpinkas Exp $
+ * $Id: hbdefs.h,v 1.4 2002/06/02 12:36:52 horacioroldan Exp $
  */
 
 /*
@@ -123,8 +123,11 @@
    #undef BOOL                            /* boolean */
    typedef int BOOL;
 
-   #undef BYTE
-   typedef unsigned char BYTE;            /* 1 byte unsigned */
+   #undef UINT                            /* varies with platform */
+   typedef unsigned int UINT;
+
+   #undef BYTE                            /* 1 byte unsigned */
+   typedef unsigned char BYTE;
 
    #undef SHORT                           /* 2 bytes signed */
    typedef short int SHORT;

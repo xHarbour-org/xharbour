@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.1.1.1 2001/12/21 10:42:15 ronpinkas Exp $
+ * $Id: trace.c,v 1.2 2002/03/17 06:46:34 ronpinkas Exp $
  */
 
 /*
@@ -58,6 +58,9 @@
 void TraceLog( const char * sFile, const char * sTraceMsg )
 {
    FILE *hFile;
+
+   if( !sTraceMsg )
+      return;
 
    if( sFile == NULL )
    {

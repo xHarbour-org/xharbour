@@ -1,5 +1,5 @@
 /*
- * $Id: xsavescr.c,v 1.8 2001/06/19 18:53:58 dholm Exp $
+ * $Id: xsavescr.c,v 1.1.1.1 2001/12/21 10:42:19 ronpinkas Exp $
  */
 
 /*
@@ -87,7 +87,7 @@ HB_FUNC( __XSAVESCREEN )
    hb_gtGetPos( &s_iRow, &s_iCol );
 
    {
-      USHORT uiSize;
+      UINT uiSize;
       hb_gtRectSize( 0, 0, hb_gtMaxRow(), hb_gtMaxCol(), &uiSize );
       s_pBuffer = hb_xgrab( uiSize );
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.1.1.1 2001/12/21 10:47:31 ronpinkas Exp $
+ * $Id: hbapigt.h,v 1.2 2002/09/20 19:11:38 map Exp $
  */
 
 /*
@@ -174,7 +174,7 @@ extern USHORT hb_gtSuspend( void ); /* prepare the reminal for shell output */
 extern USHORT hb_gtResume( void ); /* resume the terminal after the shell output */
 extern int    hb_gtExtendedKeySupport( void );
 extern int    hb_gtReadKey( HB_inkey_enum eventmask );
-extern USHORT hb_gtRectSize( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, USHORT * puiBuffSize );
+extern USHORT hb_gtRectSize( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, UINT * puiBuffSize );
 extern USHORT hb_gtRepChar( USHORT uiRow, USHORT uiCol, BYTE byChar, USHORT uiCount );
 extern USHORT hb_gtRest( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff );
 extern USHORT hb_gtSave( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff );
