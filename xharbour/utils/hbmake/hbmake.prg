@@ -1,6 +1,6 @@
 
 /*
- * $Id: hbmake.prg,v 1.40 2003/01/12 20:28:47 lculik Exp $
+ * $Id: hbmake.prg,v 1.41 2003/01/25 20:43:41 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -283,6 +283,7 @@ FUNCTION ParseMakfi( cFile )
     LOCAL lCfgFound   := .F.
     LOCAL aTempCFiles := {}
     LOCAL lLinux      := At( 'linux', Lower( Os() ) ) > 0
+    Local aLib, aLibx ,lGui := .f. , lMt := .f.
 
     nHandle := FT_FUSE( cFile )
     IF nHandle < 0
@@ -365,7 +366,33 @@ FUNCTION ParseMakfi( cFile )
                             Aadd( amacros, { aTemp[ 1 ], Strtran( Replacemacros( atemp[ 2 ] ), "\", "/" ) } )
 
                         ELSE
+                            if aTemp[1] == "GUI" .and. aTemp[2] =="YES"
+                              lGui := .T.
+                            endif
+                            if aTemp[1] == "MT" .and. aTemp[2] =="YES"
+                              lMt := .T.
+                            endif
 
+                            if aTemp[1] == "LIBFILES" .and. !lMt
+                              aLib:=ListasArray2(aTemp[2],' ')
+                              for each alibx in alib
+                                 if At('mt.lib',lower(alibx))>0
+                                    lMt := .T.
+                                 endif
+                                 if at('fivehc.lib',lower(alibx))>0 .or. at('minigui.lib',lower(alibx))>0
+                                    lGui := .T.
+                                 endif                                    
+                             next
+                            endif
+                            if aTemp[1] == "ALLOBJ" .and. !lmt
+                                if at('hvm',lower(atemp[2]))==0
+                                   aTemp[2]+= if( !lmt .and. !lgui, " $(BHC)\obj\hvm.obj",;
+                                            if( lmt .and. !lgui," $(BHC)\obj\hvmmt.obj",;
+                                            if( !lmt .and. lgui, " $(BHC)\obj\hvmgui.obj",;
+                                            " $(BHC)\obj\hvmguimt.obj")))
+                                endif
+                            endif
+                                          
                             Aadd( amacros, { aTemp[ 1 ], Replacemacros( atemp[ 2 ] ) } )
 
                         ENDIF
@@ -687,7 +714,7 @@ FUNCTION setBuild()
     cRead     := Alltrim( readln( @leof ) )
     szProject := cRead
     amacro    := Listasarray2( cRead, ":" )
-
+   tracelog(cRead)
     IF Len( amacro ) > 1
 
         aTemp := Listasarray2( amacro[ 2 ], " " )
@@ -717,6 +744,7 @@ FUNCTION setBuild()
         cRead        := Alltrim( readln( @leof ) )
         cCurrentRead := cRead
         amacro       := Listasarray2( cRead, " " )
+        tracelog( cRead )
 
         FOR ncount := 1 TO Len( amacro )
 
@@ -1255,6 +1283,7 @@ FUNC crtmakfile( cFile )
     Local cResName       := Space(50)
     Local aSelFiles
     Local nFilestoAdd:=0
+    Local lGui := .F.
 
     nLinkHandle := Fcreate( cFile )
     WriteMakeFileHeader()
@@ -1306,7 +1335,7 @@ FUNC crtmakfile( cFile )
     @ 13, 1 say aLangMessages[ 43 ] get nFilestoAdd pict "99" valid nFilestoAdd > 0
     @ 14, 1 GET lMt checkbox caption aLangMessages [44] style "[o ]"
     READ
-
+   tracelog(lmt)
     IF !Empty( cUserDef )
 
         cDefHarOpts += " -D" + Alltrim( cUserDef ) + " "
@@ -1316,6 +1345,7 @@ FUNC crtmakfile( cFile )
     IF !Empty( cUserInclude )
 
         cDefHarOpts += " -I" + Alltrim( cUserInclude ) + " "
+
 
     ENDIF
 
@@ -1577,17 +1607,21 @@ FUNC crtmakfile( cFile )
     IF lFwh
 
         Fwrite( nLinkHandle, "FWH = " + cfwhpath + CRLF )
+        lGui := .T.
 
     ELSEIF lCw
 
         Fwrite( nLinkHandle, "C4W =" + ccwpath + CRLF )
+        lGui := .T.
 
     ELSEIF lMiniGui
 
         Fwrite( nLinkHandle, "MINIGUI =" + cMiniPath + CRLF )
-
+        lGui := .T.
 
     ENDIF
+    Fwrite( nLinkHandle, "GUI = " + if(lFwh .or. lCw .or. lMinigui,"YES","NO") + CRLF )
+    Fwrite( nLinkHandle, "MT = "  + if(lMt,"YES","NO") + CRLF )    
 
     FOR x := 1 TO Len( amacros )
 
@@ -1845,7 +1879,7 @@ FUNC crtmakfile( cFile )
     ENDIF
 
     IF lBcc .or. lVcc
-
+   tracelog(if(!lMt,cDefBccLibs,cDefBccLibsmt))
         IF lFwh
 
             if lXfwh
@@ -1868,7 +1902,7 @@ FUNC crtmakfile( cFile )
 
         ELSE
 
-            Fwrite( nLinkHandle, "LIBFILES = " + cDefBccLibs + CRLF )
+            Fwrite( nLinkHandle, "LIBFILES = " + if(!lMt,cDefBccLibs,cDefBccLibsmt) + CRLF )
 
         ENDIF
 
@@ -1903,7 +1937,11 @@ FUNC crtmakfile( cFile )
         Fwrite( nLinkHandle, "IFLAGS = " + CRLF )
         Fwrite( nLinkHandle, "LINKER = ilink32" + CRLF )
         Fwrite( nLinkHandle, " " + CRLF )
-        Fwrite( nLinkHandle, "ALLOBJ = " + If( (lFwh .or. lMinigui), "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + If( lextended, " $(OBJCFILES)", " " ) + CRLF )
+        Fwrite( nLinkHandle, "ALLOBJ = " + If( (lFwh .or. lMinigui), "c0w32.obj", "c0x32.obj" ) + " $(OBJFILES)" + If( lextended, " $(OBJCFILES)", " " ) + ;
+        if( !lmt .and. !lgui, " $(BHC)\lib\hvm.obj",;
+                                            if( lmt .and. !lgui," $(BHC)\lib\hvmmt.obj",;
+                                            if( !lmt .and. lgui, " $(BHC)\lib\hvmgui.obj",;
+                                            " $(BHC)\lib\hvmguimt.obj"))) + CRLF )
         Fwrite( nLinkHandle, "ALLRES = $(RESDEPEN)" + CRLF )
         Fwrite( nLinkHandle, "ALLLIB = $(LIBFILES) import32.lib cw32.lib" + CRLF )
         Fwrite( nLinkHandle, ".autodepend" + CRLF )
