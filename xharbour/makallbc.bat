@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallbc.bat,v 1.7 2004/01/06 09:37:51 paultucker Exp $
+rem $Id: makallbc.bat,v 1.8 2004/01/16 16:54:37 paultucker Exp $
 rem 
 
 echo create system files
@@ -116,6 +116,13 @@ if errorlevel 1 goto end
 echo WoopGui
 cd contrib\WoopGUI
 call make_b32.bat %1
+cd ..\..
+if errorlevel 1 goto end
+
+:xhwgui
+echo xhwgui
+cd contrib\xhwgui
+if exist make_b32.bat call make_b32.bat %1
 cd ..\..
 if errorlevel 1 goto end
 
