@@ -1,5 +1,5 @@
 /*
- * $Id: round.c,v 1.9 2001/04/04 01:05:08 dholm Exp $
+ * $Id: round.c,v 1.1.1.1 2001/12/21 10:42:01 ronpinkas Exp $
  */
 
 /*
@@ -78,10 +78,13 @@ HB_FUNC( INT )
 
       hb_itemGetNLen( pNumber, &iWidth, NULL );
 
-      hb_retndlen( dNumber >= 0 ? floor( dNumber ) : ceil( dNumber ), iWidth, 0 );
+      //hb_retndlen( dNumber >= 0 ? floor( dNumber ) : ceil( dNumber ), iWidth, 0 );
+      hb_retnl( dNumber >= 0 ? (long) floor( dNumber ) : (long) ceil( dNumber ) );
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1090, NULL, "INT", 1, hb_paramError( 1 ) );
+   }
 }
 
 double hb_numRound( double dResult, int iDec )

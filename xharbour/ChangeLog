@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.443 2002/10/15 19:09:45 mlombardo Exp $
+ * $Id: ChangeLog,v 1.444 2002/10/15 19:32:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-10-15 18:17 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * bin/bld.bat
+    - Removed refernce to RDDADS.lib and Ace32.lib.
+
+  * source/rtl/round.c
+    * Changed Int() to return a long insread of double.
 2002-10-15 12:30 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/version.c
     * Renamed HB_PCODE() to HB_PCODEVER()
