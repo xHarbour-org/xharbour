@@ -49,11 +49,11 @@ RETURN( nil)
 //-------------------------------------------------------------------------------------------
 
 CLASS MainFrame FROM TFrame
-
+   
    METHOD New( oParent ) INLINE ::Caption := 'Main Form from TFrame',;
                                 super:new( oParent )
 
-   METHOD OnCloseQuery() INLINE if( MessageBox( ::handle, 'Quitting Whoo', 'OnCloseQuery', MB_YESNO ) == IDYES,;
+   METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Quitting Whoo', 'OnCloseQuery', MB_YESNO ) == IDYES,;
                                     PostQuitMessage(0), 0 )
 
    METHOD OnCommand( nwParam, nlParam ) INLINE ::MainCommands( nwParam, nlParam )
@@ -67,7 +67,6 @@ METHOD MainCommands( nwParam, nlParam ) CLASS MainFrame
    do case
       case nwParam == 101
            oForm := SubForm1():New( self )
-           oForm:Caption := 'SubForm1 from TForm'
            oForm:Create()
    endcase
 return( 0 )
@@ -75,9 +74,13 @@ return( 0 )
 //-------------------------------------------------------------------------------------------
 
 CLASS SubForm1 FROM TForm
-
+   
+   METHOD New( oParent ) INLINE ::Caption := 'SubForm1 from TForm', super:New( oParent )
    METHOD OnPaint( hDC ) INLINE ::DrawGrid( hDC, 3 ),0
    METHOD OnCreate()     INLINE ::CreateSub()  // careful handles OnCreate not OnCreation
+//   METHOD OnCloseQuery() INLINE if( ::MsgBox( 'Closing SubForm1', 'OnCloseQuery', MB_YESNO ) == IDYES,;
+//                                    nil, 0 )
+
    METHOD CreateSub()
    METHOD DrawGrid()
 
@@ -90,11 +93,13 @@ METHOD CreateSub() CLASS SubForm1
    ::WindowMenu := TMenu():New()
 
    ::WindowMenu:AddPopup( 'popup 1' )
-      ::WindowMenu:Popup:AddItem( 'item 100', 100, {||MessageBox( ::handle, 'HI FROM SUBFORM1')})
+   
+      ::WindowMenu:Popup:AddItem( 'item 100', 100, {|| ::MsgBox( 'HI FROM SUBFORM1')})
       ::WindowMenu:Popup:AddItem( 'item 101', 101)
+      
    ::SetWindowMenu()
 
-return(0)
+return( super:OnCreate() )
 
 //----------------------------------
 
