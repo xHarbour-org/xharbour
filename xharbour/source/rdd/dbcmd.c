@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.138 2004/12/28 06:39:20 druzus Exp $
+ * $Id: dbcmd.c,v 1.139 2004/12/31 11:56:05 druzus Exp $
  */
 
 /*
@@ -4352,8 +4352,12 @@ static AREAP GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, 
    memset( &pInfo, 0, sizeof(DBOPENINFO) );
    pInfo.uiArea = uiNewArea;
    pInfo.atomAlias = ( BYTE * ) "__TMPAREA";
+   /* It doesn't seem to be Clipper compatible */
+   /*
    pInfo.fShared = createIt ? FALSE : !hb_set.HB_SET_EXCLUSIVE;
    pInfo.fReadonly = !createIt;
+   */
+   pInfo.fShared = pInfo.fReadonly = !createIt;
 
    strncpy( szFile, szFileName, _POSIX_PATH_MAX );
    szFile[ _POSIX_PATH_MAX ] = '\0';

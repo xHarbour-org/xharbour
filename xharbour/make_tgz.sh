@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.36 2005/01/09 20:39:46 likewolf Exp $
+# $Id: make_tgz.sh,v 1.37 2005/01/10 18:45:10 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -23,7 +23,11 @@ hb_lnkso="yes"
 hb_pref="xhb"
 hb_contrib=""
 hb_sysdir="yes"
+hb_exesuf=""
 export C_USR="-DHB_FM_STATISTICS_OFF -O3"
+
+if [ -z "$TMPDIR" ]; then TMPDIR="/tmp"; fi
+HB_INST_PREF="$TMPDIR/$name.bin.$USER.$$"
 
 if [ -z "$HB_ARCHITECTURE" ]; then
     if [ "$OSTYPE" = "msdosdjgpp" ]; then
@@ -57,8 +61,15 @@ if [ -z "$HB_GT_LIB" ]; then
     export HB_GT_LIB
 fi
 
+if [ -z "$HB_MT" ]; then
+    case "$HB_ARCHITECTURE" in
+        dos) HB_MT="" ;;
+        *)   HB_MT="MT" ;;
+    esac
+    export HB_MT
+fi
+
 if [ -z "$HB_MULTI_GT" ]; then export HB_MULTI_GT=yes; fi
-if [ -z "$HB_MT" ]; then export HB_MT=MT; fi
 if [ -z "$HB_COMMERCE" ]; then export HB_COMMERCE=no; fi
 
 # default lib dir name
@@ -76,6 +87,10 @@ case "$HB_ARCHITECTURE" in
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/${name}"
         HB_INSTALL_GROUP=root
         hb_sysdir="no"
+        hb_exesuf=".exe"
+        hb_instfile=""
+        hb_archfile="${name}.tgz"
+        HB_INST_PREF="$TMPDIR/hb-$$"
         ;;
     *)
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr/local"
@@ -156,8 +171,6 @@ do
 done
 
 # install
-if [ -z "$TMPDIR" ]; then TMPDIR="/tmp"; fi
-HB_INST_PREF="$TMPDIR/$name.bin.$USER.$$"
 rm -fR "${HB_INST_PREF}"
 
 export _DEFAULT_BIN_DIR=$HB_BIN_INSTALL
@@ -178,7 +191,7 @@ do
 done
 
 # Keep the size of the binaries to a minimim.
-strip $HB_BIN_INSTALL/harbour
+strip $HB_BIN_INSTALL/harbour${hb_exesuf}
 # Keep the size of the libraries to a minimim, but don't try to strip symlinks.
 strip -S `find $HB_LIB_INSTALL -type f`
 
@@ -218,19 +231,22 @@ then
          strip "${HB_BIN_INSTALL}/${utl}")
     done
 fi
-ln -s xbscript ${HB_BIN_INSTALL}/pprun
-ln -s xbscript ${HB_BIN_INSTALL}/xprompt
+ln -s xbscript${hb_exesuf} ${HB_BIN_INSTALL}/pprun${hb_exesuf}
+ln -s xbscript${hb_exesuf} ${HB_BIN_INSTALL}/xprompt${hb_exesuf}
 
 
-$TAR -czvf "${hb_archfile}" --owner=${HB_INSTALL_OWNER} --group=${HB_INSTALL_GROUP} -C "${HB_INST_PREF}" .
+CURDIR=$(pwd)
+(cd "${HB_INST_PREF}"; $TAR -czvf "${CURDIR}/${hb_archfile}" --owner=${HB_INSTALL_OWNER} --group=${HB_INSTALL_GROUP} .)
 rm -fR "${HB_INST_PREF}"
 
-if [ "${HB_ARCHITECTURE}" = darwin ]; then
-  DO_LDCONFIG=""
-else
-  DO_LDCONFIG="&& ldconfig"
-fi
-cat > "${hb_instfile}" <<EOF
+if [ -n "${hb_instfile}" ]; then
+
+   if [ "${HB_ARCHITECTURE}" = linux ]; then
+      DO_LDCONFIG="&& ldconfig"
+   else
+      DO_LDCONFIG=""
+   fi
+   cat > "${hb_instfile}" <<EOF
 #!/bin/sh
 if [ "\$1" == "--extract" ]; then
     sed -e '1,/^HB_INST_EOF\$/ d' \$0 > "${hb_archfile}"
@@ -249,6 +265,8 @@ fi
 exit \$?
 HB_INST_EOF
 EOF
-cat "${hb_archfile}" >> "${hb_instfile}"
-chmod +x "${hb_instfile}"
-rm -f "${hb_archfile}"
+   cat "${hb_archfile}" >> "${hb_instfile}"
+   chmod +x "${hb_instfile}"
+   rm -f "${hb_archfile}"
+
+fi

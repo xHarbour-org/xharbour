@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.18 2004/06/17 12:23:20 druzus Exp $
+ * $Id: mainwin.c,v 1.19 2005/01/10 18:45:42 druzus Exp $
  */
 
 /*
@@ -72,9 +72,9 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
                     int iCmdShow )            /* show state of window */
 {
 #ifdef HB_FM_WIN32_ALLOC
-     LPSTR pArgs = ( LPSTR ) LocalAlloc( LMEM_FIXED, strlen( lpCmdLine ) + 1 );
+   LPSTR pArgs = ( LPSTR ) LocalAlloc( LMEM_FIXED, strlen( lpCmdLine ) + 1 );
 #else
-     LPSTR pArgs = ( LPSTR ) malloc(strlen( lpCmdLine ) + 1 );
+   LPSTR pArgs = ( LPSTR ) malloc(strlen( lpCmdLine ) + 1 );
 #endif
    LPSTR pStart, pArg = pArgs;
    char szAppName[ 250 ];
@@ -91,65 +91,65 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 
    while (*lpCmdLine && argc < MAX_ARGS )
    {
-     while (*lpCmdLine== ' ')  // Skip over any white space
-     {
-       lpCmdLine++ ;
-     }
-     if (*lpCmdLine)
-     {
-       pStart= NULL ;
-       bInQuotedParam= FALSE;
-       while (*lpCmdLine)
-       {
-         if (*lpCmdLine == '"')
+      while (*lpCmdLine== ' ')  // Skip over any white space
+      {
+         lpCmdLine++ ;
+      }
+      if (*lpCmdLine)
+      {
+         pStart= NULL ;
+         bInQuotedParam= FALSE;
+         while (*lpCmdLine)
          {
-           lpCmdLine++;
-           if ( bInQuotedParam )
-           {
-             if (pStart == NULL)
-             {
-               pStart = pArg;
-             }
-             break ;
-           }
-           else
-           {
-             bInQuotedParam = TRUE ;
-           }
+            if (*lpCmdLine == '"')
+            {
+               lpCmdLine++;
+               if ( bInQuotedParam )
+               {
+                  if (pStart == NULL)
+                  {
+                     pStart = pArg;
+                  }
+                  break ;
+               }
+               else
+               {
+                  bInQuotedParam = TRUE ;
+               }
+            }
+            else if (*lpCmdLine== ' ')
+            {
+               if ( bInQuotedParam )
+               {
+                  *pArg = *lpCmdLine++ ;
+                  if (pStart == NULL)
+                  {
+                     pStart = pArg;
+                  }
+                  pArg++;
+               }
+               else
+               {
+                  lpCmdLine++ ;
+                  break ;
+               }
+            }
+            else
+            {
+               *pArg = *lpCmdLine++ ;
+               if (pStart == NULL)
+               {
+                  pStart = pArg;
+               }
+               pArg++;
+            }
          }
-         else if (*lpCmdLine== ' ')
+         if (pStart)
          {
-           if ( bInQuotedParam )
-           {
-             *pArg = *lpCmdLine++ ;
-             if (pStart == NULL)
-             {
-               pStart = pArg;
-             }
-             pArg++;
-           }
-           else
-           {
-             lpCmdLine++ ;
-             break ;
-           }
+            *pArg++ = '\0';
+            argv[ argc++ ] = pStart ;
          }
-         else
-         {
-           *pArg = *lpCmdLine++ ;
-           if (pStart == NULL)
-           {
-             pStart = pArg;
-           }
-           pArg++;
-         }
-       }
-       if (pStart)
-       {
-         *pArg++ = '\0';
-         argv[ argc++ ] = pStart ;
-       }
-     }
+      }
    }
 
    hb_cmdargInit( argc, argv );
@@ -158,17 +158,17 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 
    iResult = hb_vmQuit();
 #ifdef HB_FM_WIN32_ALLOC
-      LocalFree( pArgs );
+   LocalFree( pArgs );
 #else
-      free( pArgs );
+   free( pArgs );
 #endif
    return iResult;
 }
 
-HB_EXTERN_END
-
 #if ( defined(__WATCOMC__) || defined(__MINGW32__) ) && !defined(__EXPORT__)
 void HB_EXPORT hb_forceLinkMainWin( void ) {}
 #endif
+
+HB_EXTERN_END
 
 #endif

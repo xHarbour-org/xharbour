@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.107 2004/12/28 07:16:15 druzus Exp $
+ * $Id: itemapi.c,v 1.108 2004/12/31 11:56:11 druzus Exp $
  */
 
 /*
@@ -383,23 +383,19 @@ ULONG HB_EXPORT hb_itemCopyC( PHB_ITEM pItem, char * szBuffer, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemCopyC(%p, %s, %lu)", pItem, szBuffer, ulLen));
 
-
-
    if( pItem && HB_IS_STRING( pItem ) )
    {
-      if( ulLen == 0 )
+      if( ulLen == 0 || ulLen > pItem->item.asString.length )
       {
          ulLen = pItem->item.asString.length;
       }
 
       hb_xmemcpy( szBuffer, pItem->item.asString.value, ulLen );
 
-
       return ulLen;
    }
    else
    {
-
       return 0;
    }
 }
@@ -595,7 +591,7 @@ void HB_EXPORT * hb_itemGetPtr( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetPtr(%p)", pItem));
 
-   if( pItem )
+   if( pItem && HB_IS_POINTER( pItem ) )
    {
       return pItem->item.asPointer.value;
    }

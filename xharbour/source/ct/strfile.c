@@ -1,5 +1,5 @@
 /*
- * $Id: strfile.c,v 1.1 2004/11/28 17:59:27 ptsarenko Exp $
+ * $Id: strfile.c,v 1.1 2004/11/28 15:29:31 ptsarenko Exp $
  */
 
 /*
@@ -116,19 +116,18 @@ HB_FUNC (CSETSAFETY)
 LONG ct_StrFile( BYTE *pFileName, BYTE *pcStr, LONG sLen, BOOL bOverwrite, LONG lOffset, BOOL bTrunc)
 {
    FHANDLE hFile;
-   BOOL bOpen;
+   BOOL bOpen = FALSE;
    BOOL bFile = hb_fsFile(pFileName);
    LONG lWrite = 0;
 
    if( bFile && bOverwrite)
    {
       hFile = hb_fsOpen(pFileName, FO_READWRITE);
-      bOpen = 1;
+      bOpen = TRUE;
    }
    else if ( ! bFile || ! ct_getsafety() )
    {
       hFile = hb_fsCreate(pFileName, ct_getfcreate() );
-      bOpen = 0;
    }
    else
    {
