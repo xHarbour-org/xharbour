@@ -1,5 +1,5 @@
-/*
- * $Id: ChangeLog,v 1.2235 2004/02/07 11:40:39 druzus Exp $
+﻿/*
+ * $Id: ChangeLog,v 1.2236 2004/02/07 13:14:39 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-08 01:13 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/include/inkey.ch
+    + #define K_MBUTTONDOWN           1008   // Middle Button Down
+    + #define K_MBUTTONUP             1009   // Middle Button Up
+    + #define K_MDBLCLK               1010   // Middle Button Double Click
+    + #define K_MMLEFTDOWN            1011   // Mouse Move Left Down
+    + #define K_MMRIGHTDOWN           1012   // Mouse Move Right Down
+    + #define K_MMMIDDLEDOWN          1013   // Mouse Move Middle Down
+    + #define K_MWFORWARD             1014   // Mouse Wheel Forward
+    + #define K_MWBACKWARD            1015   // Mouse Wheel Backward
+ 
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    ! Updated to support above Inkey() constants.
 
 2004-02-02 11:00 UTC-0300 Luiz Rafael Culik Guimares <culikr@brturbo.com>
   * contrib/tip/tipclient.prg
