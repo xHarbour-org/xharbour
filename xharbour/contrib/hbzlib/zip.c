@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.27 2004/03/04 13:48:47 andijahja Exp $
+ * $Id: zip.c,v 1.31 2004/03/24 03:18:05 lculik Exp $
  */
 
 /*
@@ -343,6 +343,13 @@ HB_FUNC( HB_ZIPFILE )
       if ( pParam )
       {
 //s.r. Error if the 4 paramater is passed and it's not a codeblock
+         char szFile[ _POSIX_PATH_MAX ];
+         PHB_ITEM pProgress = hb_param( 9, HB_IT_BLOCK );
+         PHB_ITEM pExclude = hb_param( 10, HB_IT_STRING | HB_IT_ARRAY );
+         HB_ITEM iProgress;
+         BYTE *pCurDir;
+         char *szZipFileName;
+
          if ( ! ISNIL( 4 ) && ! ISBLOCK( 4 ) )
          {
             hb_errRT_BASE_SubstR( EG_ARG, 2017, "Invalid Codeblock ","hb_zipfile",
@@ -353,16 +360,11 @@ HB_FUNC( HB_ZIPFILE )
             return;
          }
 //
-         char szFile[ _POSIX_PATH_MAX ];
-         PHB_ITEM pProgress = hb_param( 9, HB_IT_BLOCK );
-         PHB_ITEM pExclude = hb_param( 10, HB_IT_STRING | HB_IT_ARRAY );
-         HB_ITEM iProgress;
-         char *szZipFileName;
 
          iProgress.type = HB_IT_NIL;
 
 //s.r. Keep current directory because hb_fsdirectory change it !
-            BYTE *pCurDir;
+
             pCurDir = ( BYTE * )hb_xstrcpy( NULL, OS_PATH_DELIMITER_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
 //
 
@@ -565,12 +567,13 @@ HB_FUNC( HB_UNZIPFILE )
       PHB_ITEM pUnzip = hb_param( 6, HB_IT_ANY );
       HB_ITEM iProgress, Temp;
       char *szZipFileName;
+      BYTE *pCurDir;
 
       Temp.type = HB_IT_NIL;
       iProgress.type = HB_IT_NIL;
 
 //s.r. Keep current directory  !
-      BYTE *pCurDir;
+
       pCurDir = ( BYTE * )hb_xstrcpy( NULL, OS_PATH_DELIMITER_STRING, ( const char * )hb_fsCurDir( 0 ) , NULL );
 //
 
