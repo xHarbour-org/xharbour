@@ -1,5 +1,5 @@
 /*
- * $Id: getlist.prg,v 1.3 2001/09/10 22:04:29 vszakats Exp $
+ * $Id: getlist.prg,v 1.1.1.1 2001/12/21 10:42:23 ronpinkas Exp $
  */
 
 /*
@@ -61,7 +61,10 @@ PROCEDURE __GetListSetActive( oGetList )
    ENDIF
 
    s_oGetListActive := oGetList
-   s_oGetListActive:lHasFocus := .T.
+
+   IF s_oGetListActive != NIL
+      s_oGetListActive:lHasFocus := .T.
+   ENDIF
 
    RETURN
 
