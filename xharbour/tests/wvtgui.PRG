@@ -1,6 +1,4 @@
 //-------------------------------------------------------------------//
-//-------------------------------------------------------------------//
-//-------------------------------------------------------------------//
 //
 //                   GTWVT Console GUI Interface
 //
@@ -8,292 +6,247 @@
 //
 //       I have tried to simulate the gui controls through GDI
 //        functions and found a way to refresh those controls
-//          through WM_PAINT message issued to the Window.         
+//          through WM_PAINT message issued to the Window.
 //                               and
-//             I feel that if this functionality is built
+//             I feel that IF this functionality is built
 //                 into the GT itself, what a wonder!
 //
 //   This protocol opens up the the distinct possibilities and hope
-//            you all will cooperate to enhance it further. 
-//                       
+//            you all will cooperate to enhance it further.
+//
 //           Thanks Peter Rees! You have laid the foundation!
 //
-//-------------------------------------------------------------------//
-//-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 
 #include    'inkey.ch'
 #include   'common.ch'
 
 //-------------------------------------------------------------------//
+PROCEDURE Main()
 
-function Main()
+   LOCAL aLastPaint, clr, scr
+   LOCAL get_1   := ctod( '' )
+   LOCAL get_2   := Pad( 'Pritpal Bedi', 35 )
+   LOCAL get_3   := Pad( '60, New Professor Colony', 35 )
+   LOCAL get_4   := Pad( 'Ludhiana, INDIA', 35 )
+   LOCAL get_5   := Pad( 'http://www.vouchcac.com', 35 )
+   LOCAL get_6   := 20000
+   LOCAL aBlocks := {}
+   LOCAL nColGet := 8
+   LOCAL GetList := {}
+   LOCAL nTop    := 4
+   LOCAL nLft    := 4
+   LOCAL nBtm    := 20
+   LOCAL nRgt    := 75
+   LOCAL kf2     := SetKey( K_F2, {|| GuiGets_1() } )
+   LOCAL kf3     := SetKey( K_F3, {|| Wvt_WindowExpand( 1 ) } )
+   LOCAL kf4     := SetKey( K_F4, {|| Wvt_WindowExpand( -1 ) } )
+   LOCAL cLabel  := 'xHarbour simulated GUI.'
 
-local aLastPaint, clr, scr
-local get_1   := ctod( '' )
-local get_2   := pad( 'Pritpal Bedi', 35 )
-local get_3   := pad( '60, New Professor Colony', 35 )
-local get_4   := pad( 'Ludhiana, INDIA', 35 )
-local get_5   := pad( 'http://www.vouchcac.com', 35 )
-local get_6   := 20000
-local aBlocks := {}
-local nColGet := 8
-local GetList := {}
-local nTop    := 4
-local nLft    := 4
-local nBtm    := 20
-local nRgt    := 75
-local kf2     := setKey( K_F2, {|| GuiGets_1() } )
-local kf3     := setKey( K_F3, {|| Wvt_WindowExpand( 1 ) } )
-local kf4     := setKey( K_F4, {|| Wvt_WindowExpand( -1 ) } )
-local cLabel  := 'VOUCH, that GROWS with you'
-local box_    := ;
-      {{ 7,nColGet,8 },{10,nColGet,35},{13,nColGet,35},{15,nColGet,35},{17,nColGet,35},{17,61,10} }
-local aGetsParam := ;
-      {{ 7,nColGet,8 },{10,nColGet,35},{13,nColGet,35},{15,nColGet,35},{17,nColGet,35},{17,61,10} }
+   SET DATE BRITISH
 
-SET DATE BRITISH
+   get_1 := ctod( '04/01/04' )
 
-get_1 := ctod( '04/01/04' )
+   Wvt_SetFont( 'Courier New', 18 )
+   // aAdd( aBlocks, {|| Wvt_SetFont( 'Courier New', 18 ) } )
 
-Wvt_SetFont( 'Courier New', 18 )
-// aadd( aBlocks, {|| Wvt_SetFont( 'Courier New', 18 ) } )
+   aAdd( aBlocks, {|| Wvt_SetIcon( 'vr_1.ico' ) } )
+   aAdd( aBlocks, {|| Wvt_SetTitle( 'Vouch' ) } )
+   aAdd( aBlocks, {|| Wvt_DrawLabel( 1,40, cLabel,6,, rgb(255,255,255), rgb(198,198,198), 'Arial', 26, , , , , .t., .t. ) } )
+   aAdd( aBlocks, {|| Wvt_DrawBoxRaised( nTop, nLft, nBtm, nRgt ) } )
+   aAdd( aBlocks, {|| Wvt_DrawBoxRecessed( 7, 61, 13, 70 ) } )
+   aAdd( aBlocks, {|| Wvt_DrawBoxGroup( 15, 59, 18, 72 ) } )
+   aAdd( aBlocks, {|| Wvt_DrawBoxGroup( 5, 6, 19, 44 ) } )
+   aAdd( aBlocks, {|| Wvt_DrawImage( 8,62,12,69, 'vouch1.bmp' ) } )
+   aAdd( aBlocks, {|| Wvt_DrawBoxRecessed( 7, 48, 13, 55 ) } )
+   aAdd( aBlocks, {|| aEval( GetList, {|oGet| Wvt_DrawBoxGet( oGet:Row, oGet:Col, Len( Transform( oGet:VarGet(), oGet:Picture ) ) ) } ) } )
 
-aadd( aBlocks, {|| Wvt_SetIcon( 'vr_1.ico' ) } )
-aadd( aBlocks, {|| Wvt_SetTitle( 'Vouch' ) } )
-aadd( aBlocks, {|| Wvt_DrawLabel( 1,40, cLabel,6,, rgb(255,255,255), ;
-                      rgb(198,198,198), 'Arial', 26, , , , , .t., .t. ) } )
-aadd( aBlocks, {|| Wvt_DrawBoxRaised( nTop, nLft, nBtm, nRgt ) } )
-aadd( aBlocks, {|| Wvt_DrawBoxRecessed( 7, 61, 13, 70 ) } )
-aadd( aBlocks, {|| Wvt_DrawBoxGroup( 15, 59, 18, 72 ) } )
-aadd( aBlocks, {|| Wvt_DrawBoxGroup( 5, 6, 19, 44 ) } )
-aadd( aBlocks, {|| Wvt_DrawImage( 8,62,12,69, 'vouch1.bmp' ) } )
-aadd( aBlocks, {|| Wvt_DrawBoxRecessed( 7, 48, 13, 55 ) } )
-aadd( aBlocks, {|| aeval( box_, {|o_| Wvt_DrawBoxGet( o_[ 1 ], o_[ 2 ], o_[ 3 ] ) } ) } )
+   aLastPaint := Wvt_SetBlocks( aBlocks )
 
-aLastPaint := Wvt_SetBlocks( aBlocks )
+   scr := SaveScreen( 0,0,maxrow(),maxcol() )
+   clr := SetColor( 'N/W' )
 
-scr := SaveScreen( 0,0,maxrow(),maxcol() )
-clr := SetColor( 'N/W' )
+   CLS
 
-CLS
+   SetColor( 'N/W,N/GR*,,,N/W*' )
 
-SetColor( 'N/W,N/GR*,,,N/W*' )
+   @ MaxRow(), 0 SAY PadC( 'xHarbour + WVT Console GUI Screen',80 ) COLOR 'R+/W'
+   @ MaxRow()-2, 8 say 'F2 New Screen' COLOR 'GR+/B'
+   @ MaxRow()-2,24 say 'F3 Expand'     COLOR 'GR+/BG'
+   @ MaxRow()-2,34 say 'F4 Shrink'     COLOR 'GR+/G'
 
-@ maxrow(), 0 SAY padc( 'xHarbour + WVT Console GUI Screen',80 ) COLOR 'R+/W'
-@ maxrow()-2, 8 say 'F2 New Screen' COLOR 'GR+/B'
-@ maxrow()-2,24 say 'F3 Expand'     COLOR 'GR+/BG'
-@ maxrow()-2,34 say 'F4 Shrink'     COLOR 'GR+/G'
+   @  6, nColGet SAY '< Date >'
+   @  9, nColGet SAY '<' + PadC( 'Name', 33 ) + '>'
+   @ 12, nColGet SAY '<' + PadC( 'Address', 33 ) + '>'
+   @ 16, 61      SAY '< Salary >'
 
-VouSay( { {  6, nColGet, '< Date >' },;
-          {  9, nColGet, '<'+padc('Name'   ,33)+'>'},;
-          { 12, nColGet, '<'+padc('Address',33)+'>'},;
-          { 16,      61, '< Salary >' } } )
+   @  7, nColGet GET get_1
+   @ 10, nColGet GET get_2 VALID ( VouChoice() < 7 )
+   @ 13, nColGet GET get_3
+   @ 15, nColGet GET get_4
+   @ 17, nColGet GET get_5
+   @ 17, 61      GET get_6 PICTURE '@Z 9999999.99'
 
-@  7, nColGet GET get_1
-@ 10, nColGet GET get_2 VALID ( VouChoice() < 7 )
-@ 13, nColGet GET get_3 
-@ 15, nColGet GET get_4 
-@ 17, nColGet GET get_5 
-@ 17, 61      GET get_6 PICTURE '@Z 9999999.99'
+   READ
 
-Read
+   //  Restore Environment
+   //
+   Wvt_setBlocks( aLastPaint )
+   SetColor( clr )
+   RestScreen( 0,0,maxrow(),maxcol(), scr )
+   SetKey( K_F2, kf2 )
+   SetKey( K_F3, kf3 )
+   SetKey( K_F4, kf4 )
 
-//  Restore Environment
-//
-Wvt_setBlocks( aLastPaint )
-SetColor( clr )
-RestScreen( 0,0,maxrow(),maxcol(), scr )
-SetKey( K_F2, kf2 )
-SetKey( K_F3, kf3 )
-SetKey( K_F4, kf4 )
-
-return nil
+RETURN
 
 //-------------------------------------------------------------------//
+PROCEDURE GuiGets_1()
 
-function GuiGets_1()
+   LOCAL aLastPaint, clr, scr
+   LOCAL get_1   := ctod( '' )
+   LOCAL get_2   := Space( 35 )
+   LOCAL get_3   := Space( 35 )
+   LOCAL get_4   := Space( 35 )
+   LOCAL get_5   := Space( 35 )
+   LOCAL get_6   := 0
+   LOCAL aBlocks := {}
+   LOCAL nColGet := 8
+   LOCAL GetList := {}
+   LOCAL nTop    := 4
+   LOCAL nLft    := 4
+   LOCAL nBtm    := 20
+   LOCAL nRgt    := 75
+   LOCAL kf2     := SetKey( K_F2, {|| GuiGets_1() } )
+   LOCAL kf3     := SetKey( K_F3, {|| Wvt_WindowExpand( 1 ) } )
+   LOCAL kf4     := SetKey( K_F4, {|| Wvt_WindowExpand( -1 ) } )
+   LOCAL cLabel  := 'VOUCH, that GROWS with you'
 
-local aLastPaint, clr, scr
-local get_1   := ctod( '' )
-local get_2   := space( 35 )
-local get_3   := space( 35 )
-local get_4   := space( 35 )
-local get_5   := space( 35 )
-local get_6   := 0
-local aBlocks := {}
-local nColGet := 8
-local GetList := {}
-local nTop    := 4
-local nLft    := 4
-local nBtm    := 20
-local nRgt    := 75
-local kf2     := setKey( K_F2, {|| GuiGets_1() } )
-local kf3     := setKey( K_F3, {|| Wvt_WindowExpand( 1 ) } )
-local kf4     := setKey( K_F4, {|| Wvt_WindowExpand( -1 ) } )
-local cLabel  := 'VOUCH, that GROWS with you'
-local box_    := ;
-      {{ 7,nColGet,8 },{10,nColGet,35},{13,nColGet,35},{15,nColGet,35},{17,nColGet,35},{17,61,10} }
-local aGetsParam := ;
-      {{ 7,nColGet,8 },{10,nColGet,35},{13,nColGet,35},{15,nColGet,35},{17,nColGet,35},{17,61,10} }
+   aAdd( aBlocks, {|| Wvt_SetFont( 'Courier New', 24 ) } )
+   aAdd( aBlocks, {|| Wvt_SetIcon( 'DIA_EXCL.ico' ) } )
+   aAdd( aBlocks, {|| Wvt_SetTitle( 'Vouch Gets 2' ) } )
+   aAdd( aBlocks, {|| Wvt_DrawLine( maxrow()-1,0,maxrow()-1,maxcol() ) })
+   aAdd( aBlocks, {|| Wvt_SetBrush( 0, rgb( 32,255,100 ) ) } )
+   aAdd( aBlocks, {|| Wvt_DrawEllipse( 6,50,10,58 ) } )
+   aAdd( aBlocks, {|| Wvt_SetBrush( 2, rgb( 255,255,100 ),1 ) } )
+   aAdd( aBlocks, {|| Wvt_DrawRectangle( 11, 50, 13, 58 ) } )
+   aAdd( aBlocks, {|| Wvt_DrawBoxGroupRaised( 5, 6, 19, 72 ) } )
+   aAdd( aBlocks, {|| aEval( GetList, {|oGet| Wvt_DrawBoxGet( oGet:Row, oGet:Col, Len( Transform( oGet:VarGet(), oGet:Picture ) ) ) } ) } )
 
+   aLastPaint := Wvt_SetBlocks( aBlocks )
+   scr        := SaveScreen( 0,0,maxrow(),maxcol() )
+   clr        := SetColor( 'N/W' )
 
-aadd( aBlocks, {|| Wvt_SetFont( 'Courier New', 24 ) } )
-aadd( aBlocks, {|| Wvt_SetIcon( 'DIA_EXCL.ico' ) } )
-aadd( aBlocks, {|| Wvt_SetTitle( 'Vouch Gets 2' ) } )
-aadd( aBlocks, {|| Wvt_DrawLine( maxrow()-1,0,maxrow()-1,maxcol() ) })
-aadd( aBlocks, {|| Wvt_SetBrush( 0, rgb( 32,255,100 ) ) } )
-aadd( aBlocks, {|| Wvt_DrawEllipse( 6,50,10,58 ) } )
-aadd( aBlocks, {|| Wvt_SetBrush( 2, rgb( 255,255,100 ),1 ) } )
-aadd( aBlocks, {|| Wvt_DrawRectangle( 11, 50, 13, 58 ) } )
-aadd( aBlocks, {|| Wvt_DrawBoxGroupRaised( 5, 6, 19, 72 ) } )
-aadd( aBlocks, {|| aeval( box_, {|o_| Wvt_DrawBoxGet( o_[ 1 ], o_[ 2 ], o_[ 3 ] ) } ) } )
+   CLS
 
-aLastPaint := Wvt_SetBlocks( aBlocks ) 
-scr        := SaveScreen( 0,0,maxrow(),maxcol() )
-clr        := SetColor( 'N/W' )
+   SetColor( 'N/W,N/GR*,,,N/W*' )
 
-CLS
+   @ MaxRow(), 0 SAY PadC( 'xHarbour + WVT Console GUI Screen',80 ) COLOR 'R+/W'
 
-SetColor( 'N/W,N/GR*,,,N/W*' )
+   @  6, nColGet SAY '< Date >'
+   @  9, nColGet SAY '<' + PadC( 'Name', 33 ) + '>'
+   @ 12, nColGet SAY '<' + PadC( 'Address', 33) + '>'
+   @ 16, 61      SAY '< Salary >'
 
-@ maxrow(), 0 SAY padc( 'xHarbour + WVT Console GUI Screen',80 ) COLOR 'R+/W'
+   @  7, nColGet GET get_1
+   @ 10, nColGet GET get_2
+   @ 13, nColGet GET get_3
+   @ 15, nColGet GET get_4
+   @ 17, nColGet GET get_5
+   @ 17, 61      GET get_6 PICTURE '@Z 9999999.99'
 
-VouSay( { {  6,nColGet,'< Date >' },;
-          {  9,nColGet,'<'+padc('Name'   ,33)+'>'},;
-          { 12,nColGet,'<'+padc('Address',33)+'>'},;
-          { 16,61,'< Salary >' } } )
+   READ
 
-@  7, nColGet GET get_1
-@ 10, nColGet GET get_2 VALID ( VouChoice() < 7 )
-@ 13, nColGet GET get_3 
-@ 15, nColGet GET get_4 
-@ 17, nColGet GET get_5 
-@ 17, 61      GET get_6 PICTURE '@Z 9999999.99'
+   // Restore Environment
+   //
+   Wvt_setBlocks( aLastPaint )
+   SetColor( clr )
+   RestScreen( 0,0,maxrow(),maxcol(), scr )
 
-Read
-
-// Restore Environment
-//
-Wvt_setBlocks( aLastPaint )
-SetColor( clr )
-RestScreen( 0,0,maxrow(),maxcol(), scr )
-
-return nil
+RETURN
 
 //-------------------------------------------------------------------//
-//
-//      Wvt_Paint() must be a function in your application
+//      Wvt_Paint() must be a FUNCTION in your application
 //      as it is called when Window gets WM_PAINT message.
-//
 //-------------------------------------------------------------------//
+FUNCTION Wvt_Paint( hWnd, msg, wParam, lParam )
 
-function Wvt_Paint( hWnd, msg, wParam, lParam )
-local aBlocks := Wvt_SetBlocks()
+   LOCAL aBlocks := Wvt_SetBlocks()
 
-aeval( aBlocks, {|e| eval( e ) } )
+   aEval( aBlocks, {|e| eval( e ) } )
 
-return 0
-
-//-------------------------------------------------------------------//
-//
-//  Wvt_SetBlocks() is a get/set function to be used by Wvt_Paint()
-//
-function Wvt_SetBlocks( a_ )
-local o
-static s := {}
-
-o := aclone( s )
-
-if a_ <> nil
-	s := aclone( a_ )
-endif
-
-return o
+RETURN 0
 
 //-------------------------------------------------------------------//
-//
-//                       Utility Functions 
-//
+//  Wvt_SetBlocks() is a get/set FUNCTION to be used by Wvt_Paint()
 //-------------------------------------------------------------------//
+FUNCTION Wvt_SetBlocks( a_ )
 
-function Wvt_WindowExpand( nUnits )
-static sUnits := 18
+   LOCAL o
+   STATIC s := {}
 
-sUnits += nUnits
+   o := aClone( s )
 
-Wvt_setFont( 'Courier New', sUnits )
+   IF a_ <> nil
+      s := aClone( a_ )
+   ENDIF
 
-return .t.
-
-//-------------------------------------------------------------------//
-
-static function rgb( r,g,b )
-
-return ( r + ( g * 256 ) + ( b * 256 * 256 ) )
+RETURN o
 
 //-------------------------------------------------------------------//
+FUNCTION Wvt_WindowExpand( nUnits )
 
-function VouGetsGui( box_ )
+   STATIC sUnits := 18
 
-aeval( box_, {|o_| Wvt_DrawBoxGet( o_[ 1 ], o_[ 2 ], o_[ 3 ] ) } )
+   sUnits += nUnits
 
-return .t.
+   Wvt_setFont( 'Courier New', sUnits )
 
-//-------------------------------------------------------------------//
-
-function vousay( a_ )
-local i
-
-for i := 1 to len( a_ )
-	@ a_[ i,1 ], a_[ i,2 ] SAY a_[ i,3 ]
-next
-
-return .t.
+RETURN .t.
 
 //-------------------------------------------------------------------//
+STATIC FUNCTION rgb( r,g,b )
 
-function VouChoice( aChoice_ )
-local scr, clr, nChoice
-
-DEFAULT aChoice_ TO { 'One','Two','Three','Four','Five','Six','Seven' }
-
-scr := SaveScreen( 7,48,13,55 )
-clr := SetColor( 'N/W*,GR+/B*,,,GR+/B' )
-
-nChoice := achoice( 7, 48, 13, 55, aChoice_ )
-
-setColor( clr )
-RestScreen( 7, 48, 13, 55, scr )
-
-return nChoice
+RETURN ( r + ( g * 256 ) + ( b * 256 * 256 ) )
 
 //-------------------------------------------------------------------//
+FUNCTION VouChoice( aChoices )
 
-function Wvt_SetFocus( hWnd )
-local nRow := row()
-local nCol := col()
+   LOCAL scr, clr, nChoice
 
-DispOutAt( 1,3, 'Focus Gained!', 'r/w' )
+   DEFAULT aChoices TO { 'One','Two','Three','Four','Five','Six','Seven' }
 
-DevPos( nRow, nCol )
+   scr := SaveScreen( 7,48,13,55 )
+   clr := SetColor( 'N/W*,GR+/B*,,,GR+/B' )
 
-return nil
+   nChoice := aChoice( 7, 48, 13, 55, aChoices )
 
-//-------------------------------------------------------------------//
+   setColor( clr )
+   RestScreen( 7, 48, 13, 55, scr )
 
-function Wvt_KillFocus( hWnd )
-local nRow := row()
-local nCol := col()
-
-DispOutAt( 1,3, 'Focus Lost...', 'B/w' )
-
-DevPos( nRow, nCol )
-
-return nil
+RETURN nChoice
 
 //-------------------------------------------------------------------//
-//-------------------------------------------------------------------//
-//-------------------------------------------------------------------//
+FUNCTION Wvt_SetFocus( hWnd )
 
+   LOCAL nRow := row()
+   LOCAL nCol := col()
 
+   DispOutAt( 1,3, 'Focus Gained!', 'r/w' )
+
+   DevPos( nRow, nCol )
+
+RETURN nil
+
+//-------------------------------------------------------------------//
+FUNCTION Wvt_KillFocus( hWnd )
+
+   LOCAL nRow := row()
+   LOCAL nCol := col()
+
+   DispOutAt( 1,3, 'Focus Lost...', 'B/w' )
+
+   DevPos( nRow, nCol )
+
+RETURN nil
+//-------------------------------------------------------------------//
