@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.11 2003/05/31 22:26:54 lculik Exp $
+ * $Id: hbapirdd.h,v 1.12 2003/09/08 12:56:52 druzus Exp $
  */
 
 /*
@@ -884,7 +884,7 @@ typedef RDDNODE * LPRDDNODE;
 #define SELF_TABLEEXT(w, fp)            ((*(w)->lprfsHost->info)(w, DBI_TABLEEXT, fp))
 
 
-   /* non WorkArea functions       */
+/* non WorkArea functions */
 #define SELF_EXIT(r)                    ((*(r)->pTable.exit)())
 #define SELF_DROP(r, i)                 ((*(r)->pTable.drop)(i))
 #define SELF_EXISTS(r, it, ii)          ((*(r)->pTable.exists)(it,ii))
@@ -1015,7 +1015,7 @@ typedef RDDNODE * LPRDDNODE;
 #define SUPER_GETLOCKS(w, g)            ((*(SUPERTABLE)->info)(w, DBI_GETLOCKARRAY, g))
 #define SUPER_RAWLOCK(w, i, l)          ((*(SUPERTABLE)->rawlock)(w, i, l))
 #define SUPER_LOCK(w, sp)               ((*(SUPERTABLE)->lock)(w, sp))
-#define SUPER_UNLOCK(w,l)                 ((*(SUPERTABLE)->unlock)(w,l))
+#define SUPER_UNLOCK(w,l)               ((*(SUPERTABLE)->unlock)(w,l))
 
 
 /* Memofile functions */
@@ -1035,17 +1035,17 @@ typedef RDDNODE * LPRDDNODE;
 
 /* Info operations */
 
-#define SUPER_RECSIZE(w, lp)          ((*(SUPERTABLE)->info)(w, DBI_GETRECSIZE, lp))
-#define SUPER_HEADERSIZE(w, fp)       ((*(SUPERTABLE)->info)(w, DBI_GETHEADERSIZE, fp))
-#define SUPER_LUPDATE(w, fp)          ((*(SUPERTABLE)->info)(w, DBI_LASTUPDATE, fp ))
-#define SUPER_SETDELIM(w, fp)         ((*(SUPERTABLE)->info)(w, DBI_SETDELIMITER, fp))
-#define SUPER_GETDELIM(w, fp)         ((*(SUPERTABLE)->info)(w, DBI_GETDELIMITER, fp))
-#define SUPER_TABLEEXT(w, fp)         ((*(SUPERTABLE)->info)(w, DBI_TABLEEXT, fp))
+#define SUPER_RECSIZE(w, lp)            ((*(SUPERTABLE)->info)(w, DBI_GETRECSIZE, lp))
+#define SUPER_HEADERSIZE(w, fp)         ((*(SUPERTABLE)->info)(w, DBI_GETHEADERSIZE, fp))
+#define SUPER_LUPDATE(w, fp)            ((*(SUPERTABLE)->info)(w, DBI_LASTUPDATE, fp ))
+#define SUPER_SETDELIM(w, fp)           ((*(SUPERTABLE)->info)(w, DBI_SETDELIMITER, fp))
+#define SUPER_GETDELIM(w, fp)           ((*(SUPERTABLE)->info)(w, DBI_GETDELIMITER, fp))
+#define SUPER_TABLEEXT(w, fp)           ((*(SUPERTABLE)->info)(w, DBI_TABLEEXT, fp))
 
-   /* non WorkArea functions       */
-#define SUPER_EXIT()                 ((*(SUPERTABLE)->exit)())
-#define SUPER_DROP(i)                ((*(SUPERTABLE)->drop)(i))
-#define SUPER_EXISTS(it, ii)         ((*(SUPERTABLE)->exists)(it, ii))
+/* non WorkArea functions */
+#define SUPER_EXIT()                    ((*(SUPERTABLE)->exit)())
+#define SUPER_DROP(i)                   ((*(SUPERTABLE)->drop)(i))
+#define SUPER_EXISTS(it, ii)            ((*(SUPERTABLE)->exists)(it, ii))
 
 /*
  *  PROTOTYPES

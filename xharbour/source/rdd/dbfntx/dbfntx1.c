@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.62 2003/09/10 01:03:58 druzus Exp $
+ * $Id: dbfntx1.c,v 1.63 2003/09/15 16:39:26 druzus Exp $
  */
 
 /*
@@ -3625,7 +3625,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       pExpMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pExpr );
       hb_macroRun( pExpMacro );
       pResult = pExpr;
-      hb_itemCopy( pResult, &(HB_VM_STACK.Return) );
+      hb_itemCopy( pResult, hb_stackItemFromTop( -1 ) );
       hb_stackPop();
    }
 
@@ -3716,7 +3716,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          pForMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pExpr );
          hb_macroRun( pForMacro );
          pResult = pExpr;
-         hb_itemCopy( pResult, &(HB_VM_STACK.Return) );
+         hb_itemCopy( pResult, hb_stackItemFromTop( -1 ) );
          hb_stackPop();
       }
       uiType = hb_itemType( pResult );

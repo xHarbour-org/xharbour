@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.19 2003/09/21 06:49:21 brianhays Exp $
+ * $Id: ads1.c,v 1.20 2003/09/30 03:05:46 walito Exp $
  */
 
 /*
@@ -145,8 +145,9 @@ void adsSetListener_callback( HB_set_enum setting, HB_set_listener_enum when )
          case HB_SET_STRICTREAD :
             hb_retl( hb_set.HB_SET_STRICTREAD );
             break;
-
 */
+         default:
+            break;
       }
    }
 

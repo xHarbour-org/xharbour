@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.68 2003/09/24 18:02:25 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.69 2003/09/27 16:15:41 paultucker Exp $
  */
 
 /*
@@ -2417,6 +2417,7 @@ static int hb_cdxPageSeekKey( LPCDXPAGEINFO pPage, LONG lBlock, LPCDXKEYINFO pKe
                else if( lBlock < p->Tag )
                   k = -1;
             }
+            break;
          }
          if( k > 0 )
             pPage->CurKey++;
