@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.19 2004/01/25 13:18:55 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.20 2004/01/25 19:15:39 jonnymind Exp $
  */
 
 /*
@@ -938,25 +938,25 @@ static void xvt_windowSetHints( PXWND_DEF wnd )
 /*********** Update cursor height based on buffer cursor style **********/
 static void xvt_windowSetCursor( PXWND_DEF wnd )
 {
-  switch( wnd->buffer->curs_style )
-  {
-    case SC_NONE:
-      wnd->cursorHeight = 0;
-      break ;
-    case SC_INSERT:
-      wnd->cursorHeight = wnd->fontHeight/4;
-      break;
-    case SC_SPECIAL1:
-      wnd->cursorHeight = wnd->fontHeight/2;
-      break;
-    case SC_SPECIAL2:
-      wnd->cursorHeight = -wnd->fontHeight/2;
-      break;
-    case SC_NORMAL:
-    default:
-      wnd->cursorHeight = wnd->fontHeight;
-      break;
-  }
+   switch( wnd->buffer->curs_style )
+   {
+      case SC_NONE:
+         wnd->cursorHeight = 0;
+         break ;
+      case SC_INSERT:
+         wnd->cursorHeight = wnd->fontHeight/4;
+         break;
+      case SC_SPECIAL1:
+         wnd->cursorHeight = wnd->fontHeight/2;
+         break;
+      case SC_SPECIAL2:
+         wnd->cursorHeight = -wnd->fontHeight/2;
+         break;
+      case SC_NORMAL:
+      default:
+         wnd->cursorHeight = wnd->fontHeight;
+         break;
+   }
 }
 
 /*************** Loads a font into memory ********************/
@@ -1027,7 +1027,6 @@ static void xvt_windowRepaintGraphical( PXWND_DEF wnd, int x1, int y1, int x2, i
       /* Check if pObj boundaries are inside the area to be updated */
       if ( hb_gtGobjectInside( pObj, x1, y1, x2, y2 ) )
       {
-         printf( "INSIDE %p\n", pObj );
          color.red = pObj->color.usRed;
          color.green = pObj->color.usGreen;
          color.blue = pObj->color.usBlue;
@@ -2597,9 +2596,10 @@ static void xvt_processMessages( PXWND_DEF wnd )
       while( bLoop &&
          select( streamUpdate[0] + 1, &updateSet, NULL, NULL, &timeout ) )
       {
+         appMsg = 0xFFFF;
          if ( read( streamUpdate[0], &appMsg, sizeof( appMsg ) ) <= 0 )
          {
-         return;
+            return;
          }
 
          switch( appMsg )

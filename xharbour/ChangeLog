@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2139 2004/01/26 00:30:46 likewolf Exp $
+ * $Id: ChangeLog,v 1.2140 2004/01/26 01:18:12 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-26 02:38 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/rtl/gtxvt/gtxvt.c
+    - removed debug printout...
+    ! setting appMsg to zero before trying to read it.
+    
 2004-01-26 04:20 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   + contrib/libct/numlohi.c
     + Implemented NumLow() and NumHigh().
