@@ -10,7 +10,7 @@ PROCEDURE Main()
 
    EXTEND CLASS NUMERIC WITH METHOD Plus
 
-   ? 3:AsString
+   ? 3:AsString + " test"
 
    ? 7:Plus( "33" )
 
