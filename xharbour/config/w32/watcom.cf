@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.19 2004/09/13 17:20:55 lf_sfnet Exp $
+# $Id: watcom.cf,v 1.20 2004/10/31 13:15:46 druzus Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -89,6 +89,10 @@ endif
 ifeq ($(HB_MULTI_GT),yes)
 GTLIBS += $(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)/gtnul
 endif
+ifneq ($(HB_DEFAULT_GT),$(HB_GT_LIB))
+GTLIBS += $(TOP)$(ROOT)source/rtl/$(HB_DEFAULT_GT)/$(ARCH)/$(HB_DEFAULT_GT)
+endif
+
 GTLIBS := $(subst /,\,$(GTLIBS))
 endif
 

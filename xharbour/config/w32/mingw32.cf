@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.19 2004/10/31 13:15:46 druzus Exp $
+# $Id: mingw32.cf,v 1.20 2004/10/31 19:43:30 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -76,6 +76,10 @@ ifeq ($(findstring rtl,$(LIBS)),rtl)
 ifeq ($(HB_MULTI_GT),yes)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
 LINKLIBS += -lgtnul
+endif
+ifneq ($(HB_DEFAULT_GT),$(HB_GT_LIB))
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_DEFAULT_GT)/$(ARCH)
+LINKLIBS += -l$(HB_DEFAULT_GT)
 endif
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
 LINKLIBS += -l$(HB_GT_LIB)
