@@ -43,7 +43,7 @@ GLOBAL EXTERNAL oApp
    METHOD Add()
    METHOD OnCreate()         INLINE ::CreateSub()
    METHOD OnSize()
-   METHOD OnPaint( hDC ) INLINE ::TileGrid(hDC)
+   METHOD OnPaint( hDC )     INLINE ::TileGrid(hDC)
    METHOD TileGrid(hDC)
    METHOD OnMenuCommand(oItem)
    METHOD CreateControl(aRect)
@@ -51,7 +51,7 @@ GLOBAL EXTERNAL oApp
    METHOD GetUniquePropName()
    METHOD OnDestroy()
    METHOD SetGridSize(x,y)
-   METHOD OnCloseQuery()  INLINE    ::Parent:WindowMenu:Enable( 101 ),;
+   METHOD OnCloseQuery()     INLINE ::Parent:WindowMenu:Enable( 101 ),;
                                     ::Parent:StdBar:DisableAll(),;
                                     super:OnCloseQuery()
 

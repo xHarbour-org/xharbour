@@ -20,6 +20,9 @@ typedef struct {;
 } HDITEM, FAR * LPHDITEM
 
 CLASS ObjInspect FROM TForm
+   
+   VAR Browser AS OBJECT
+   
    METHOD New( oParent ) INLINE ::Caption := 'Object Inspector',;
                                 ::left    := 0,;
                                 ::top     := 275,;
@@ -33,7 +36,7 @@ CLASS ObjInspect FROM TForm
    METHOD OnSize(n,x,y)  INLINE  ::GetObj("InspCombo"):Move(,,x,21,.t.),;
                                  ::GetObj("InspTabs"):Move(,25,x,y-25,.t.),;
                                  MoveWindow(::browser:hWnd, 0, 0,;
-                                                      ::InspTabs:Properties:ClientRect()[3],;
+                                                      ::InspTabs:Properties:ClientRect()[3]+1,;
                                                       ::InspTabs:Properties:ClientRect()[4],.t.),;
                                  nil
 ENDCLASS
@@ -41,7 +44,7 @@ ENDCLASS
 //-------------------------------------------------------------------------------------------------
 
 METHOD OnCreate() CLASS ObjInspect
-  local oBrowse, oCol1, oCol2
+  local oCol1, oCol2
   local aProp := {{"",""}}
   local aRect := ::ClientRect()
   local oCombo:= ComboInsp():New(  self, 100, 0, 0, aRect[3], 100 )
@@ -55,24 +58,22 @@ METHOD OnCreate() CLASS ObjInspect
   ::InspTabs:AddTab( "Events", TabPage():New( ::InspTabs, "Events") )
   ::InspTabs:Configure()
 
-  oBrowse:=whBrowse():Init( aProp )
-  oBrowse:Create( ::InspTabs:Properties:handle,  0, 0,;
+  ::Browser:=TBrowser():Init( aProp )
+  ::Browser:Create( ::InspTabs:Properties:handle,  0, 0,;
                                                  ::InspTabs:Properties:ClientRect()[3],;
                                                  ::InspTabs:Properties:ClientRect()[4],,WS_EX_CLIENTEDGE )
-  oBrowse:wantHScroll:=.F.
+  ::Browser:wantHScroll:=.F.
   oCol1:=whColumn():Init( 'Property', {|oCol,oB,n| asString(oB:source[n,1]) } ,DT_LEFT,94)
   oCol2:=whColumn():INIT( 'Value'   , {|oCol,oB,n| asString(oB:source[n,2]) } ,DT_LEFT,70)
   oCol1:VertAlign   :=TA_CENTER
   oCol2:VertAlign   :=TA_CENTER
-  oBrowse:addColumn(oCol1)
-  oBrowse:addColumn(oCol2)
-  oBrowse:HeadFont  :=GetMessageFont()
-  oBrowse:Font      :=GetMessageFont()
-  oBrowse:HeadHeight:=20
-  oBrowse:bKillBlock:={|| DeleteObject(oBrowse:Font),DeleteObject(oBrowse:HeadFont)}
-  oBrowse:configure()
-
-  ::SetLink( 'browser', oBrowse )
+  ::Browser:addColumn(oCol1)
+  ::Browser:addColumn(oCol2)
+  ::Browser:HeadFont  :=GetMessageFont()
+  ::Browser:Font      :=GetMessageFont()
+  ::Browser:HeadHeight:=20
+  ::Browser:bKillBlock:={|| DeleteObject(::Browser:Font),DeleteObject(::Browser:HeadFont)}
+  ::Browser:configure()
 
 return( super:OnCreate() )
 
@@ -104,7 +105,7 @@ METHOD DrawItem( dis ) CLASS ComboInsp
              exttextout( dis:hDC , dis:rcItem:Left + aRect[1]+2, dis:rcItem:Top , ;
                                  ETO_OPAQUE + ETO_CLIPPED, aRect, cText )
              cText:=""
-             aRect[1]+=70
+             aRect[1]+=80
              loop
           endif
           cText+=substr(itemTxt,n,1)
@@ -114,6 +115,15 @@ METHOD DrawItem( dis ) CLASS ComboInsp
       drawfocusrect( dis:hDC  , aclip )
    endif
 return(1)
+
+
+CLASS TBrowser FROM whBrowse
+   METHOD New() CONSTRUCTOR
+ENDCLASS
+
+METHOD New( oSource ) CLASS TBrowser
+   super:Init( oSource )
+return(self)
 
 FUNCTION ZeroInit(ostr)
   ostr:buffer(replicate(chr( 0 ),ostr : sizeof()))
