@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.129 2004/02/19 04:22:59 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.130 2004/02/29 07:28:25 ronpinkas Exp $
  */
 
 /*
@@ -2509,7 +2509,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
            strtptri = ptri;
            ptrmp    = strtopti;
 
-           //printf( "Restored: %s\n", ptrmp );
+           //printf( "3-Rewinded: %s\n", ptrmp );
 
            ptr      = ptri;
            ipos     = NextStopper( &ptr, tmpname );
@@ -2532,8 +2532,12 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
               if( ptr )
               {
-                 //printf( "Rewinded: %s\n", ptr );
+                 //printf( "1-Rewinded: %s\n", ptr );
                  ptrmp = ptr;
+              }
+              else
+              {
+                 //printf( "NO REWINDable: >%s<\n", strtopti );
               }
            }
         }
@@ -2580,7 +2584,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
                    {
                       ptr = PrevSquare( ptrmp+ipos-2, ptrmp+1, NULL );
 
-                      //printf( "Rewinded: %s\n", ptr );
+                      //printf( "2-Rewinded: %s\n", ptr );
 
                       if( !ptr || CheckOptional( ptrmp+1, ptri, ptro, lenres, com_or_tra, com_or_xcom ) )
                       {
@@ -2609,11 +2613,6 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
              }
              else
              {
-                if( !isWordInside )
-                {
-                   strtopti = NULL;
-                }
-
                 ptrmp++;
              }
 
@@ -2621,10 +2620,6 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
           }
           else
           {
-             if( !isWordInside )
-             {
-                strtopti = NULL;
-             }
              s_numBrackets--; ptrmp++;
           }
 

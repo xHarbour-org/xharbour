@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2428 2004/02/29 22:10:30 likewolf Exp $
+ * $Id: ChangeLog,v 1.2429 2004/02/29 22:44:12 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,8 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-02-29 15:12 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/pp/ppcore.c
+    - Removed questionable logic which caused bugs when rewinding optional repeating groups.
+
 2004-02-29 19:00 UTC-0300 Luiz Rafael Culik Guimaraes <culikr@brturbo.com>
-  * doc/lang_id.txt 
+  * doc/lang_id.txt
   * doc/linuxso_howto.txt
   * doc/pragma.txt
   * doc/regex.txt
