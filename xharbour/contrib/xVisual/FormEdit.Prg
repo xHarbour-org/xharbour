@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.93 2002/11/18 06:24:20 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.94 2002/11/19 00:47:06 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -246,6 +246,8 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
 
       cName:=::GetUniquePropName(::CtrlName)
 
+      oObj := &( "T" + AllTrim( ::CtrlName ) + "()" )
+      /*
       DO CASE
       CASE ::CtrlName == "Button"
          oObj := TButton()
@@ -297,7 +299,7 @@ METHOD CreateControl( aRect ) CLASS TFormEdit
          ::CtrlName    :=NIL
          ::oMask:Cursor:=NIL
       ENDCASE
-
+*/
       IF oObj != NIL
       
          oObj:Create( self )

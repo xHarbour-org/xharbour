@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.22 2002/11/08 04:46:51 ronpinkas Exp $
+ * $Id: TCListBox.prg,v 1.23 2002/11/19 00:47:01 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -43,13 +43,17 @@ IMPORT C STRUCTURE RECT
 *------------------------------------------------------------------------------*
 
 CLASS TListBox FROM TCustomListBox
+   METHOD Create()
 ENDCLASS
 
+METHOD Create( oOwner ) CLASS TListBox
+   ::Super:Create( oOwner )
+RETURN Self
 //--------------------------------------------------------------------------------------------------------------
 
 CLASS TCustomListBox FROM TCustomControl
 
-   DATA Caption   PROTECTED INIT ""
+   DATA FCaption PROTECTED INIT ""
 
    DATA FLeft    PROTECTED INIT    0
    DATA FTop     PROTECTED INIT    0
@@ -74,17 +78,17 @@ CLASS TCustomListBox FROM TCustomControl
    METHOD GetString()
    METHOD GetItemRect()
    METHOD GetSelItems()
-   METHOD Add( cText )              INLINE ::SendMessage( LB_ADDSTRING, 0, cText)
-   METHOD Insert(cText,nLine)       INLINE ::SendMessage( LB_INSERTSTRING, nLine, cText )
-   METHOD Delete(nLine)             INLINE ::SendMessage( LB_DELETESTRING, nLine, 0)
-   METHOD SetCurSel(nLine)          INLINE ::SendMessage( LB_SETCURSEL, nLine, 0)
-   METHOD SetSel(nLine,lSel)        INLINE ::SendMessage( LB_SETSEL, if(lSel,1,0), MAKELPARAM(nLine, 0))
-   METHOD FindString(nStart,cStr)   INLINE ::SendMessage( LB_FINDSTRING, IFNIL(nStart,-1,nStart), cStr)
-   METHOD FindExact(nStart,cStr)    INLINE ::SendMessage( LB_FINDSTRINGEXACT, IFNIL(nStart,-1,nStart), cStr)
-   METHOD GetCount()                INLINE ::SendMessage( LB_GETCOUNT, 0, 0)
-   METHOD GetCurSel()               INLINE ::SendMessage( LB_GETCURSEL, 0, 0)
-   METHOD Dir(nAttr, cFileSpec)     INLINE ::SendMessage( LB_DIR, nAttr, cFileSpec)
-   METHOD GetSelCount()             INLINE ::SendMessage( LB_GETSELCOUNT, 0, 0)
+   METHOD Add( cText )              INLINE IF( ::FHandle != NIL, ::SendMessage( LB_ADDSTRING, 0, cText), NIL )
+   METHOD Insert(cText,nLine)       INLINE IF( ::FHandle != NIL, ::SendMessage( LB_INSERTSTRING, nLine, cText ), NIL )
+   METHOD Delete(nLine)             INLINE IF( ::FHandle != NIL, ::SendMessage( LB_DELETESTRING, nLine, 0), NIL )
+   METHOD SetCurSel(nLine)          INLINE IF( ::FHandle != NIL, ::SendMessage( LB_SETCURSEL, nLine, 0), NIL )
+   METHOD SetSel(nLine,lSel)        INLINE IF( ::FHandle != NIL, ::SendMessage( LB_SETSEL, if(lSel,1,0), MAKELPARAM(nLine, 0)), NIL )
+   METHOD FindString(nStart,cStr)   INLINE IF( ::FHandle != NIL, ::SendMessage( LB_FINDSTRING, IFNIL(nStart,-1,nStart), cStr), NIL )
+   METHOD FindExact(nStart,cStr)    INLINE IF( ::FHandle != NIL, ::SendMessage( LB_FINDSTRINGEXACT, IFNIL(nStart,-1,nStart), cStr), NIL )
+   METHOD GetCount()                INLINE IF( ::FHandle != NIL, ::SendMessage( LB_GETCOUNT, 0, 0), NIL )
+   METHOD GetCurSel()               INLINE IF( ::FHandle != NIL, ::SendMessage( LB_GETCURSEL, 0, 0), NIL )
+   METHOD Dir(nAttr, cFileSpec)     INLINE IF( ::FHandle != NIL, ::SendMessage( LB_DIR, nAttr, cFileSpec), NIL )
+   METHOD GetSelCount()             INLINE IF( ::FHandle != NIL, ::SendMessage( LB_GETSELCOUNT, 0, 0), NIL )
    METHOD Create()
    METHOD SetItems()
 ENDCLASS
@@ -125,12 +129,9 @@ METHOD GetSelItems() CLASS TCustomListBox
 
 *------------------------------------------------------------------------------*
 
-METHOD Create() CLASS TCustomListBox
+METHOD Create( oOwner ) CLASS TCustomListBox
 
-   LOCAL cStr
-
-   Super:Create()
-
+   ::Super:Create( oOwner )
    ::FItems := TListBoxStrings()
    ::FItems:ListBox := Self
 

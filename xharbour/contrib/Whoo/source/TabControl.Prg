@@ -1,5 +1,5 @@
 /*
- * $Id: TabControl.Prg,v 1.36 2002/11/17 09:03:42 what32 Exp $
+ * $Id: TabControl.Prg,v 1.37 2002/11/17 23:43:16 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -125,8 +125,6 @@ METHOD Notify( hdr ) CLASS TTabControl
    LOCAL nSel
 
    nSel := TabCtrl_GetCurSel( ::FHandle ) + 1
-   
-   view nSel
    
    IF ::Cursel != nSel
       ShowWindow( ::Controls[::CurSel]:FHandle, SW_HIDE )
