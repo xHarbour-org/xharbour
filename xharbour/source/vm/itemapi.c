@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.42 2003/07/06 16:59:45 lculik Exp $
+ * $Id: itemapi.c,v 1.43 2003/07/06 17:18:44 lculik Exp $
  */
 
 /*
@@ -511,6 +511,11 @@ int HB_EXPORT hb_itemGetNI( PHB_ITEM pItem )
          case HB_IT_DOUBLE:
             return ( int ) pItem->item.asDouble.value;
 
+         #ifndef HB_LONG_DOUBLE_OFF
+         case HB_IT_LDOUBLE:
+            return ( int ) pItem->item.asLDouble.value;
+        #endif
+
          case HB_IT_DATE:
             return ( int ) pItem->item.asDate.value;
 
@@ -542,6 +547,10 @@ long HB_EXPORT hb_itemGetNL( PHB_ITEM pItem )
          case HB_IT_DOUBLE:
             return ( long ) pItem->item.asDouble.value;
 
+         #ifndef HB_LONG_DOUBLE_OFF
+         case HB_IT_DOUBLE:
+            return ( long ) pItem->item.asLDouble.value;
+         #endif
          case HB_IT_DATE:
             return pItem->item.asDate.value;
 
@@ -1742,7 +1751,6 @@ PHB_ITEM HB_EXPORT hb_itemPutNLD( PHB_ITEM pItem, LONGLONG dNumber )
 
    pItem->type = HB_IT_LDOUBLE;
    pItem->item.asLDouble.length = 20;
-   pItem->item.asLDouble.decimal = 0;
    pItem->item.asLDouble.value = dNumber;
    
 
@@ -1772,7 +1780,6 @@ PHB_ITEM HB_EXPORT hb_itemPutNLDLen( PHB_ITEM pItem, LONGLONG dNumber, int iWidt
 
    pItem->type = HB_IT_LDOUBLE;
    pItem->item.asLDouble.length = iWidth;
-   pItem->item.asLDouble.decimal = iDec;
    pItem->item.asLDouble.value = dNumber;
  
    return pItem;
