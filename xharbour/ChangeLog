@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.615 2003/01/12 01:56:59 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.616 2003/01/12 05:31:46 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-01-12 00:26 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/rtl/getsys.prg
+    ! Fixed GetActive() to be more Clipper compatible.
+
+  * source/vm/hvm.c
+    ! Fixed hb_vmArrayPop() to allow hb_vmArrayPush() optimzation of aTail( NIL ) to return NIL, like Clipper.
 
 2003-01-12 02:30 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
   * source/rdd/dbfcdx/dbfcdx1.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.148 2003/01/05 06:50:36 ronpinkas Exp $
+ * $Id: hvm.c,v 1.149 2003/01/07 10:48:18 likewolf Exp $
  */
 
 /*
@@ -3645,7 +3645,16 @@ static void hb_vmArrayPush( void )
  #endif
    else
    {
-      hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+      //aTail( NIL ) in Clipper -> NIL // No Error.
+      if( HB_IS_NIL( pArray ) && lIndex == -1 )
+      {
+         hb_stackPop();
+         hb_itemClear( hb_stackItemFromTop( -1 ) );
+      }
+      else
+      {
+         hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+      }
    }
 }
 
