@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.123 2002/11/11 23:18:06 what32 Exp $
+ * $Id: xide.prg,v 1.124 2002/11/12 00:51:47 what32 Exp $
  */
 
 /*
@@ -224,7 +224,7 @@ METHOD MainToolBar() CLASS MainFrame
                           'RadioGroup', 'Panel', 'ActionList' }
          FOR n :=0 TO 16
              oTool := ToolButton():Create( MainFrame:ToolTabs:StdTab:StdTools )
-             oTool:Action := {|oItem| FormEdit:OnMenuCommand( oItem ) }
+             oTool:OnClick:= {|oItem| FormEdit:OnMenuCommand( oItem ) }
              oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
              oTool:Hint   := aStdTab[ n +1 ]
          NEXT
@@ -254,7 +254,7 @@ METHOD MainToolBar() CLASS MainFrame
                       '', '' }
          for n:=0 to 9
              oTool := ToolButton():Create( ::ToolTabs:Win32:WinTools )
-             oTool:Action := {|oItem| FormEdit:OnMenuCommand(oItem) }
+             oTool:OnClick:= {|oItem| FormEdit:OnMenuCommand(oItem) }
              oTool:Style  := TBSTYLE_BUTTON + TBSTYLE_CHECKGROUP
              oTool:Hint   := aStdTab[ n +1 ]
          next

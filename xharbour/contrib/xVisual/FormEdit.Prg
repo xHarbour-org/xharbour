@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.86 2002/11/11 18:43:55 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.87 2002/11/11 23:18:06 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -176,7 +176,6 @@ METHOD OnMenuCommand(oItem)
 
       // store the control type in memory
       ::CtrlName := oItem:Hint // control type to be created
-
       // this cursor shape must be correct for the type of the control
       ::oMask:Cursor :=LoadCursor(hThisInstance,"FRAMES") //<= correct cursor for the control
 
