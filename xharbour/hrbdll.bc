@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.36 2003/12/15 22:41:56 ronpinkas Exp $
+# $Id: hrbdll.bc,v 1.37 2003/12/19 01:32:38 fsgiudice Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -291,6 +291,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\proc.obj \
   $(OBJ_DIR)\pvalue.obj \
   $(OBJ_DIR)\runner.obj \
+  $(OBJ_DIR)\thread.obj \
   $(OBJ_DIR)\harbinit.obj \
   $(OBJ_DIR)\macroy.obj \
   $(OBJ_DIR)\macroa.obj \
@@ -688,6 +689,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\proc.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\pvalue.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\runner.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\thread.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\harbinit.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\macroy.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\macroslx.obj          + >> hdll.tmp
@@ -1022,6 +1024,9 @@ $(OBJ_DIR)\pvalue.obj : $(VM_DIR)\pvalue.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\runner.obj : $(VM_DIR)\runner.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\thread.obj : $(VM_DIR)\thread.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\borinit.obj : $(VM_DIR)\borinit.c
