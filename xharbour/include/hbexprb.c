@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.53 2003/05/28 04:10:17 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.54 2003/06/06 14:46:50 ronpinkas Exp $
  */
 
 /*
@@ -1138,6 +1138,10 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             {
                pSelf->value.asList.pExprList->ExprType = HB_ET_VARREF;
                bRemoveRef = TRUE;
+            }
+            else if( pSelf->value.asList.pExprList->ExprType == HB_ET_SEND )
+            {
+               pSelf->value.asList.pExprList->value.asMessage.bByRef = TRUE;
             }
          #endif
 
