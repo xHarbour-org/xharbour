@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.501 2002/11/20 01:34:14 lculik Exp $
+ * $Id: ChangeLog,v 1.502 2002/11/20 23:45:31 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-23 21:27 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    + Added foundation for true Sets, compile time support.
+
+  /*
+    Syntax is:
+
+    SET <SetName> := <Member1> [, <MembersN>] ...
+
+    LOCAL/STATIC <VarName> AS SET <SetName>
+
+    <VarName> := <MemberX>
+
+    This is a work in progress. The above will parse correctly,
+    but no compile time error will be produced for invalid assignments yet.
+  */
+
 2002-11-20 21:45 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/pp/pptable.c
     + COLOR parameter to @...PROMPT
@@ -22,10 +43,10 @@
 
 2002-11-19 11:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * source/rtl\tbrowse.prg
-    ! Heavily optimized code to match the speed of Clipper. A few 
-      Properies are deleted and some new are created. Code for 
+    ! Heavily optimized code to match the speed of Clipper. A few
+      Properies are deleted and some new are created. Code for
       :forceStable() method is contributed by Sandeep ( Thanks ).
-      Though a few issues are still left to match the Clipper 
+      Though a few issues are still left to match the Clipper
       behaviour, but hope soon I will get a solution for them as well.
 
 2002-11-18 15:45 UTC+0100 Marek Paliwoda <paliwoda@inetia.pl>

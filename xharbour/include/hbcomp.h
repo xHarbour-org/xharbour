@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.5 2002/09/16 05:34:01 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.6 2002/10/13 18:06:27 ronpinkas Exp $
  */
 
 /*
@@ -138,6 +138,14 @@ typedef struct _VAR
    struct _VAR * pNext;            /* pointer to next defined variable */
 } VAR, * PVAR;
 
+typedef struct _SETDEF
+{
+   char *szName;                   /* Set name */
+   unsigned long lMembers;
+   char **pMembers;
+   struct _SETDEF *pNext;
+} SETDEF, *PSETDEF;
+
 /* pcode chunks bytes size */
 #define HB_PCODE_CHUNK   100
 
@@ -154,6 +162,7 @@ typedef struct __FUNC
    PVAR         pFields;                  /* pointer to fields variables list */
    PVAR         pMemvars;                 /* pointer to memvar variables list */
    PVAR         pPrivates;                /* pointer to private variables list */
+   PSETDEF      pSets;                    /* pointer to Set definitions list */
    BYTE *       pCode;                    /* pointer to a memory block where pcode is stored */
    ULONG        lPCodeSize;               /* total memory size for pcode */
    ULONG        lPCodePos;                /* actual pcode offset */
@@ -308,6 +317,9 @@ extern void hb_compExternAdd( char * szExternName ); /* defines a new extern nam
 
 extern void hb_compAutoOpenAdd( char * szName );
 
+extern void hb_compNewSet( char * szName );
+extern void hb_compSetMember( char * szName );
+
 #ifdef HB_MACRO_SUPPORT
 
 #define hb_compErrorType( p )    hb_macroError( EG_ARG, HB_MACRO_PARAM )
@@ -443,6 +455,9 @@ extern PCOMCLASS      hb_comp_pLastClass;
 extern PCOMCLASS      hb_comp_pReleaseClass;
 extern char *         hb_comp_szFromClass;
 extern PCOMDECLARED   hb_comp_pLastMethod;
+
+extern char *         hb_comp_szFromSet;
+
 extern HB_PATHNAMES * hb_comp_pIncludePath;
 extern PFUNCTION      hb_comp_pInitFunc;
 extern PFUNCTION      hb_comp_pGlobalsFunc;

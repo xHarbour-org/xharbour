@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.23 2002/10/09 20:42:58 ronpinkas Exp $
+ * $Id: harbour.c,v 1.24 2002/10/13 18:06:29 ronpinkas Exp $
  */
 
 /*
@@ -41,6 +41,8 @@
  *    hb_compMethodFind()
  *    hb_compDeclaredAdd()
  *    hb_compDeclaredInit()
+ *    hb_compNewSet()
+ *    hb_compSetMember()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -144,6 +146,10 @@ PCOMCLASS      hb_comp_pLastClass;
 PCOMCLASS      hb_comp_pReleaseClass;
 char *         hb_comp_szFromClass;
 PCOMDECLARED   hb_comp_pLastMethod;
+
+PSETDEF        hb_comp_pSet;
+
+char *         hb_comp_szFromSet;
 
 int            hb_comp_iLine;                             /* currently processed line number (globaly) */
 char *         hb_comp_szFile;                            /* File Name of last compiled line */
@@ -314,10 +320,14 @@ int main( int argc, char * argv[] )
    }
 
    if( hb_comp_pOutPath )
+   {
       hb_xfree( hb_comp_pOutPath );
+   }
 
    if( hb_comp_iErrorCount > 0 )
+   {
       iStatus = EXIT_FAILURE;
+   }
 
    return iStatus;
 }
@@ -549,6 +559,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
          return;
       }
    }
+
    if( ! hb_comp_bStartProc && hb_comp_functions.iCount <= 1 && hb_comp_iVarScope == VS_LOCAL )
    {
       /* Variable declaration is outside of function/procedure body.
@@ -1003,9 +1014,13 @@ PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * szMethodName )
    pMethod->pNext = NULL;
 
    if ( pClass->pMethod == NULL )
+   {
       pClass->pMethod = pMethod;
+   }
    else
+   {
       pClass->pLastMethod->pNext = pMethod;
+   }
 
    pClass->pLastMethod = pMethod;
 
@@ -1537,6 +1552,7 @@ static PFUNCTION hb_compFunctionNew( char * szName, HB_SYMBOLSCOPE cScope )
    pFunc->pFields         = NULL;
    pFunc->pMemvars        = NULL;
    pFunc->pPrivates       = NULL;
+   pFunc->pSets           = NULL;
    pFunc->pCode           = NULL;
    pFunc->lPCodeSize      = 0;
    pFunc->lPCodePos       = 0;
@@ -1658,6 +1674,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
       hb_xfree( pBuffer );
    }
+
    hb_comp_bDontGenLineNum = FALSE; /* reset the flag */
 }
 
@@ -1789,6 +1806,15 @@ PFUNCTION hb_compFunctionKill( PFUNCTION pFunc )
       pFunc->pPrivates = pVar->pNext;
 
       hb_xfree( ( void * ) pVar );
+   }
+
+   while( pFunc->pSets )
+   {
+      PSETDEF pSet = pFunc->pSets;
+      pFunc->pSets = pSet->pNext;
+
+      hb_xfree( ( void * ) pSet->pMembers );
+      hb_xfree( ( void * ) pSet );
    }
 
    /* Release the NOOP array. */
@@ -4143,6 +4169,8 @@ static void hb_compInitVars( void )
    hb_comp_pGlobalsFunc   = NULL;
    hb_comp_pGlobals       = NULL;
    hb_comp_iGlobals       = 0;
+
+   hb_comp_pSet           = NULL;
 }
 
 static void hb_compGenOutput( int iLanguage )
@@ -4599,4 +4627,43 @@ int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
    }
 
    return iStatus;
+}
+
+void hb_compNewSet( char *szName )
+{
+   PSETDEF pSet = (PSETDEF) hb_xgrab( sizeof( SETDEF ) );
+
+   //printf( "New set: '%s'\n", szName );
+
+   pSet->szName = szName;
+   pSet->lMembers = 0;
+   pSet->pMembers = NULL;
+   pSet->pNext = NULL;
+
+   if( hb_comp_functions.pLast->pSets )
+   {
+      hb_comp_functions.pLast->pSets->pNext = pSet;
+   }
+   else
+   {
+      hb_comp_functions.pLast->pSets = pSet;
+   }
+
+   hb_comp_pSet = pSet;
+}
+
+void hb_compSetMember( char *szName )
+{
+   //printf( "Member: '%s'\n", szName );
+
+   if ( hb_comp_pSet->pMembers )
+   {
+      hb_comp_pSet->pMembers = hb_xrealloc( hb_comp_pSet->pMembers, ++hb_comp_pSet->lMembers * sizeof( char * ) );
+   }
+   else
+   {
+      hb_comp_pSet->pMembers = hb_xgrab( sizeof( char * ) );
+   }
+
+   hb_comp_pSet->pMembers[ hb_comp_pSet->lMembers - 1 ] = szName;
 }

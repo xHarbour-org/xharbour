@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.15 2002/10/09 20:42:59 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.16 2002/10/17 00:48:07 ronpinkas Exp $
  */
 
 /*
@@ -157,7 +157,7 @@ SELF_CONTAINED_WORDS_ARE {
 
 /* KeyWords are grouped based on the next token they require. */
 #define WANTS_VAR        703 /* Wants Variable (including Macros): DO, FOR, PRIVATE, PUBLIC */
-#define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, EXTERN, FIELD, FUNCTION, LOCAL, GLOBAL, EXTERNGLOBAL, MEMVAR, PARAMETERS, PROCEDURE, STATIC */
+#define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, EXTERN, FIELD, FUNCTION, LOCAL, GLOBAL, EXTERNGLOBAL, MEMVAR, PARAMETERS, PROCEDURE, SET, STATIC */
 #define WANTS_EOL        705 /* Wants EOL: ELSE, END, ENDCASE, ENDDO, ENDIF, EXIT, LOOP, NEXT, OTHERWISE, RECOVER */
 #define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, RETURN, WHILE, WITHOBJ */
 #define REJECT_OP        707
@@ -249,6 +249,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "RECOVER"             ) AS_TOKEN( HB_WANTS_EOL - RECOVER          ),
                          LEX_WORD( "RECOVER{WS}USING"    ) AS_TOKEN( RECOVERUSING     ),
                          LEX_WORD( "RETURN"              ) AS_TOKEN( HB_WANTS_EXP - RETURN           ),
+                         LEX_WORD( "SET"                 ) AS_TOKEN( HB_WANTS_ID  - SET              ),
                          LEX_WORD( "STATIC"              ) AS_TOKEN( HB_WANTS_ID  - STATIC           ),
                          LEX_WORD( "STATIC{WS}FUNCTION"  ) AS_TOKEN( HB_STATIC_FUNC   ),
                          LEX_WORD( "STATIC{WS}PROCEDURE" ) AS_TOKEN( HB_STATIC_PROC   ),
@@ -283,6 +284,7 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}LOGICAL"   ) AS_TOKEN( AS_LOGICAL_ARRAY   + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}NUMERIC"   ) AS_TOKEN( AS_NUMERIC_ARRAY   + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}OBJECT"    ) AS_TOKEN( AS_OBJECT_ARRAY    + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}SET"       ) AS_TOKEN( AS_SET_ARRAY       + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}STRING"    ) AS_TOKEN( AS_CHARACTER_ARRAY + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}USUAL"     ) AS_TOKEN( AS_CHARACTER_ARRAY + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}CHARACTER"                ) AS_TOKEN( AS_CHARACTER       + DONT_REDUCE ),
@@ -292,6 +294,7 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( "AS{WS}LOGICAL"                  ) AS_TOKEN( AS_LOGICAL         + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}NUMERIC"                  ) AS_TOKEN( AS_NUMERIC         + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}OBJECT"                   ) AS_TOKEN( AS_OBJECT          + DONT_REDUCE ),
+                     LEX_WORD( "AS{WS}SET"                      ) AS_TOKEN( AS_SET             + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}STRING"                   ) AS_TOKEN( AS_CHARACTER       + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}USUAL"                    ) AS_TOKEN( AS_CHARACTER       + DONT_REDUCE ),
 
