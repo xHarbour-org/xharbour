@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.55 2004/04/06 09:58:24 andijahja Exp $
+ * $Id: win32ole.prg,v 1.56 2004/04/23 22:52:07 ronpinkas Exp $
  */
 
 /*
@@ -1256,8 +1256,8 @@ RETURN uObj
                    // Can'r CLEAR this Variant.
                    continue;
 
-                 case VT_ARRAY | VT_VARIANT:
-                   SafeArrayDestroy( dParams->rgvarg[ n ].n1.n2.n3.parray );
+                 //case VT_ARRAY | VT_VARIANT:
+                 //  SafeArrayDestroy( dParams->rgvarg[ n ].n1.n2.n3.parray );
               }
            }
 
