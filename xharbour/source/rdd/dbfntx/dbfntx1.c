@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.97 2005/02/27 11:56:04 andijahja Exp $
+ * $Id: dbfntx1.c,v 1.98 2005/03/31 03:58:16 druzus Exp $
  */
 
 /*
@@ -3492,8 +3492,8 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
          }
          else
          {
-            pTag = pArea->lpNtxTag;
             int i = 0;
+            pTag = pArea->lpNtxTag;
             while ( pTag )
             {
                ++i;
