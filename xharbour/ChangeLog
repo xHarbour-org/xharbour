@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2193 2004/01/31 20:18:25 tommir Exp $
+ * $Id: ChangeLog,v 1.2194 2004/02/01 01:29:11 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-01 09:40 UTC-0300 Luiz Rafael Culik <culikr@brturbo.com>
+  + contrib/libct/settime.c
+  + contrib/libct/diskutil.prg
+  + contrib/libct/util.prg
+  + contrib/libct/disk.c
+  + contrib/libct/dattime3.prg
+    Added new files that add support for to functions on libct
+    DeleteFile(),DirMake(),DirName(),DriveType(),FileMove(),DiskFormat(),
+    DiskFree(),DiskReady(),DiskReadyW(),DiskTotal(),DiskUsed(),FileValid(),
+    FloppyType(),RenameFile(),SetDate(),SetTime(),ShowTime(),TimeValid(),
+    WaitPeriod(),Default(),IsDir(),Occurs(),WhatWin()
+    All function come with Docs
+    Original functions that was in .c files was using only winapi. where
+    possible, the functions was changes to use xharbour hbapifs, so it can become
+    multi platform functions
+  * contrib/libct/Makefile*
+    ! all makefiles updated
+  * contrib/rcc_ads/doc/en/adsfuncs.txt
+    ! Fixed problem on file processing by hbdoc
+  + doc/gendoc.bat
+    !new .bat to generate docs
+  * doc/xharbour.rsp
+    ! added the new files from libct to process
+
+
 
 2004-01-31 21:25 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   + include/gtinfo.ch
