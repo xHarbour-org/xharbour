@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.968 2003/04/19 04:56:50 jonnymind Exp $
+ * $Id: ChangeLog,v 1.969 2003/04/19 05:16:59 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-04-19 06:52 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * include/hbapi.h
+  * source/vm/hvm.c
+    + Added the C function hb_execFromArray( PHB_ITEM caItem ), which is
+      similar to the PRG HB_ExecFromArray, except for the fact that
+      accepts only a "callable" array:
+      caItem = { @Func(),...} or { "FuncName",...}
+      caItem = { oObject, nMethodPtr,...} or { oObject, "MethodName",...}
+
+  * include/inet.h
+  * source/vm/inet.c
+    ! Fixed some imprecisions in stack locking for MT
+    + Added the Timelimit and Periodc callback system.
+      InetSetTimelimit( Socket, nTimelimit ) -->NIL
+      InetGetTimelimit( Socket ) --> nTimelimit
+      InetClearTimelimit( Socket ) --> Nil
+
+      InetSetPeriodicCallback( Socket, caPeriodicCallback ) --> NIL
+      InetGetPeriodicCallback( Socket ) --> caPeriodicCallback or NIL
+      InetClearPeriodicCallback( Socket ) --> NIL
+
+  * tests/server.prg
+    + Added test for a periodic callback
+
+  * source/rtl/trpccli.prg
+    + Added some accessors to screen local variables.
+
+  * source/rtl/hbsrlraw.c
+    + Added suport for objects containing NIL properties.
 
 2003-04-18 10:13 UTC+0200 Ron Pinkas <ron@ronpinkas.com>
   * contrib/what32/include/import.ch

@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.15 2003/04/17 21:22:23 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.16 2003/04/18 18:30:53 jonnymind Exp $
  */
 
 /*
@@ -92,10 +92,12 @@ CLASS tRPCClient
    METHOD SetLoopMode( nMethod, xData, nEnd, nStep )
    METHOD Call()  // variable parameters
    METHOD CallAgain()            INLINE ::TCPAccept()
+   METHOD StopAsyncCall()
 
 
    /* Accessors */
    METHOD SetEncryption( cKey )
+   METHOD IsEncrypted()             INLINE ::cCryptKey != NIL
    METHOD GetStatus()               INLINE ::nStatus
    METHOD SetTimeout( nTime )       INLINE ::nTimeout := nTime
    METHOD GetTimenout()             INLINE ::nTimeout
@@ -103,9 +105,12 @@ CLASS tRPCClient
    METHOD FoundServers()            INLINE Len( ::aServers ) != 0
    METHOD FoundFunctions()          INLINE Len( ::aFunctions ) != 0
 
-   METHOD HasError()                INLINE IIF( Empty( ::skTCP ), .F., InetErrorCode( ::skTCP ) > 0 )
-   METHOD GetErrorCode()            INLINE IIF( Empty( ::skTCP ), 0, InetErrorCode( ::skTCP ) )
-   METHOD GetErrorDesc()            INLINE IIF( Empty( ::skTCP ), "", InetErrorDesc( ::skTCP ) )
+   METHOD HasError()                INLINE ::nErrorCode != 0 .or. ::TcpHasError() .or. ::UdpHasError()
+   METHOD GetErrorCode()            INLINE ::nErrorCode
+
+   METHOD TcpHasError()             INLINE IIF( Empty( ::skTCP ), .F., InetErrorCode( ::skTCP ) > 0 )
+   METHOD GetTcpErrorCode()         INLINE IIF( Empty( ::skTCP ), 0, InetErrorCode( ::skTCP ) )
+   METHOD GetTcpErrorDesc()         INLINE IIF( Empty( ::skTCP ), "", InetErrorDesc( ::skTCP ) )
 
    METHOD UdpHasError()             INLINE IIF( Empty( ::skUDP ), .F., InetErrorCode( ::skUDP ) > 0 )
    METHOD UdpGetErrorCode()         INLINE IIF( Empty( ::skUDP ), 0, InetErrorCode( ::skUDP ) )
@@ -124,6 +129,8 @@ HIDDEN:
    #endif
 
    DATA nStatus
+   // This RPC protocol breaking error code
+   DATA nErrorCode
 
    /* Network data */
    DATA cServer
@@ -186,6 +193,7 @@ ENDCLASS
 
 METHOD New( cNetwork ) CLASS tRPCClient
    ::nStatus := RPC_STATUS_NONE // not connected
+   ::nErrorCode := 0 // no RPC error
    ::cServer := NIL // no server
 
    ::nUdpPort := 1139
@@ -592,13 +600,12 @@ METHOD Call( ... ) CLASS tRPCClient
       RETURN NIL
    ENDIF
 
+   ::oResult := NIL
 
    // do not allow asynchronous mode without timeout
    IF .not. ::lAsyncMode .and. ( ::nTimeOut == NIL .or. ::nTimeOut <= 0 )
       RETURN NIL
    ENDIF
-
-   ::oResult := NIL
 
    oCalling := HB_PValue( 1 )
    IF ValType( oCalling ) == "A"
@@ -635,7 +642,7 @@ METHOD Call( ... ) CLASS tRPCClient
       RETURN .F.
    ENDIF
 
-      // in async mode, just launch the listener
+   // in async mode, just launch the listener
    #ifdef HB_THREAD_SUPPORT
       IF ::lAsyncMode
          MutexLock( ::mtxBusy )
@@ -649,6 +656,27 @@ METHOD Call( ... ) CLASS tRPCClient
    #endif
 
 RETURN ::oResult
+
+
+METHOD StopAsyncCall() CLASS tRPCClient
+
+#ifdef HB_THREAD_SUPPORT
+   MutexLock( ::mtxBusy )
+   IF ::thTCPAccept > 0
+      KillThread( ::thTCPAccept )
+      ::thTCPAccept := -1
+      ::nStatus := RPC_STATUS_LOGGED
+      MutexUnlock( ::mtxBusy )
+      ::OnFunctionReturn( NIL )
+   ELSE
+      MutexUnlock( ::mtxBusy )
+   ENDIF
+#else
+  ::nStatus := RPC_STATUS_LOGGED
+  ::OnFunctionReturn( NIL )
+#endif
+
+RETURN .T.
 
 
 METHOD SendCall( cFunction, aParams ) CLASS tRPCClient
@@ -708,6 +736,19 @@ METHOD TCPAccept() CLASS tRPCClient
    LOCAL nTime := 0
    LOCAL cCode
 
+   // TcpAccept can also be called standalone, without the
+   // support of call(). So, we must set the waiting state.
+   #ifdef HB_THREAD_SUPPORT
+   MutexLock( ::mtxBusy )
+   #endif
+
+   ::nErrorCode := 0
+   ::nStatus := RPC_STATUS_WAITING
+
+   #ifdef HB_THREAD_SUPPORT
+   MutexUnlock( ::mtxBusy )
+   #endif
+
    // set default socket timeout
    IF ::nTimeout >= 0
       InetSetTimeout( ::skTCP, ::nTimeout )
@@ -742,7 +783,7 @@ METHOD TCPAccept() CLASS tRPCClient
    #endif
 
    // TIMED OUT?
-   // Then the call() will return NIL, with status still WAITING
+   // Then the call() will return NIL
    IF InetErrorCode( ::skTCP ) != -1 .and.;
                    nTime - ::nTCPTimeBegin < ::nTimeout - 5
 
@@ -756,6 +797,9 @@ METHOD TCPAccept() CLASS tRPCClient
          // signal that this thread is no longer active.
          ::thTcpAccept := -1
       ENDIF
+   ELSE
+      // NOT waiting anymore
+      ::nStatus := RPC_STATUS_LOGGED
    ENDIF
 
    #ifdef HB_THREAD_SUPPORT
@@ -771,12 +815,15 @@ METHOD TCPParse( cCode ) CLASS tRPCClient
    LOCAL cProgress := Space( 10 ), nProgress
    LOCAL lContinue := .F.
 
+   ::nErrorCode := 0
+
    DO CASE
       /* Warn error codes */
       CASE cCode == "XHBR40"
          cData := Space(2)
          InetRecvAll( ::skTCP, @cData, 2 )
-         ::OnFunctionFail( Val( cData ), "No description for now" )
+         ::nErrorCode := Val( cData )
+         ::OnFunctionFail( ::nErrorCode, "No description for now" )
 
       /* We have a reply */
       CASE cCode == "XHBR30"
@@ -813,8 +860,8 @@ METHOD TCPParse( cCode ) CLASS tRPCClient
 
       /* We have a progress */
       CASE cCode == "XHBR33"
-         IF InetRecvAll( ::skTCP, @cProgress ) == Len( cProgress )
-            nProgress := HB_Deserialize( cProgress, Len( cProgress ) )
+         IF InetRecvAll( ::skTCP, @cProgress, 10 ) == 10
+            nProgress := HB_Deserialize( cProgress, 10 )
             IF nProgress != NIL
                lContinue := .T.
                ::OnFunctionProgress( nProgress )
@@ -961,7 +1008,7 @@ METHOD OnFunctionReturn( oReturn ) CLASS tRPCClient
 RETURN .T.
 
 METHOD OnFunctionProgress( nProgress, oData ) CLASS tRPCClient
-   IF ::bOnFunctionReturn != NIL
+   IF ::bOnFunctionProgress != NIL
       RETURN Eval( ::bOnFunctionProgress, nProgress, oData )
    ENDIF
 RETURN .T.

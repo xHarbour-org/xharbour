@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.23 2003/04/13 23:55:26 jonnymind Exp $
+* $Id: inet.c,v 1.24 2003/04/14 00:17:02 jonnymind Exp $
 */
 
 /*
@@ -403,6 +403,11 @@ HB_FUNC( INETDESTROY )
       HB_INET_CLOSE( Socket->com );
    }
 
+   if ( Socket->caPeriodic != NULL )
+   {
+      hb_arrayRelease( Socket->caPeriodic );
+      Socket->caPeriodic = NULL;
+   }
    HB_SOCKET_FREE( Socket );
 
    hb_ret();
@@ -585,8 +590,8 @@ HB_FUNC( INETGETTIMEOUT )
    }
    else
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket, nTimeout)"
-         , "INETSETTIMEOUT", 0 );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket)"
+         , "INETGETTIMEOUT", 0 );
    }
 }
 
@@ -608,6 +613,127 @@ HB_FUNC( INETCLEARTIMEOUT )
    }
 }
 
+HB_FUNC( INETSETTIMELIMIT )
+{
+   HB_SOCKET_STRUCT *Socket;
+   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+
+   if ( pSocket != NULL && ISNUM( 2 ) )
+   {
+      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
+      Socket->timelimit = hb_parni(2);
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket, nTimeout)"
+         , "INETSETTIMELIMIT", 0 );
+   }
+}
+
+HB_FUNC( INETGETTIMELIMIT )
+{
+   HB_SOCKET_STRUCT *Socket;
+   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+
+   if ( pSocket != NULL )
+   {
+      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
+      hb_retni( Socket->timelimit );
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket )"
+         , "INETGETTIMELIMIT", 0 );
+   }
+}
+
+
+HB_FUNC( INETCLEARTIMELIMIT )
+{
+   HB_SOCKET_STRUCT *Socket;
+   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+
+   if ( pSocket != NULL )
+   {
+      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
+      Socket->timeout = -1;
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket)"
+         , "INETCLEARTIMELIMIT", 0 );
+   }
+}
+
+HB_FUNC( INETSETPERIODCALLBACK )
+{
+   HB_SOCKET_STRUCT *Socket;
+   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pArray = hb_param( 2, HB_IT_ARRAY );
+
+   if ( pSocket != NULL || pArray == NULL )
+   {
+      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
+      if ( Socket->caPeriodic != NULL )
+      {
+         hb_arrayRelease( Socket->caPeriodic );
+      }
+
+      Socket->caPeriodic  = hb_arrayClone( pArray, NULL );
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket, execArray )"
+         , "INETSETPERIODCALLBACK", 0 );
+   }
+}
+
+
+HB_FUNC( INETGETPERIODCALLBACK )
+{
+   HB_SOCKET_STRUCT *Socket;
+   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+
+   if ( pSocket != NULL )
+   {
+      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
+      if (  Socket->caPeriodic == NULL )
+      {
+         hb_ret();
+      }
+      else {
+         HB_VM_STACK.Return.type = HB_IT_ARRAY;
+         HB_VM_STACK.Return.item.asArray.value =
+               Socket->caPeriodic->item.asArray.value;
+      }
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket )"
+         , "INETGETPERIODCALLBACK", 0 );
+   }
+}
+
+HB_FUNC( INETCLEARPERIODCALLBACK )
+{
+   HB_SOCKET_STRUCT *Socket;
+   PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
+
+   if ( pSocket != NULL  )
+   {
+      Socket = (HB_SOCKET_STRUCT *) pSocket->item.asString.value;
+      if ( Socket->caPeriodic != NULL )
+      {
+         hb_arrayRelease( Socket->caPeriodic );
+         Socket->caPeriodic = NULL;
+      }
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Must be called with (Socket)"
+         , "INETSETPERIODCALLBACK", 0 );
+   }
+}
 
 /**********************************
 * TCP receive and send functions
@@ -684,11 +810,11 @@ HB_FUNC( INETRECVALL )
 {
    PHB_ITEM pSocket = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pBuffer = hb_param( 2, HB_IT_BYREF ); // hb_param() calls hb_itemUnref()!
-
+   int iTimeElapsed;
    char *Buffer;
-   int iLen, iMax, iReceived, iBufferLen;
+   int iLen = 0, iMax, iReceived, iBufferLen;
    HB_SOCKET_STRUCT *Socket;
-   
+
    if( pSocket == NULL || pBuffer == NULL )
    {
       PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
@@ -718,19 +844,21 @@ HB_FUNC( INETRECVALL )
 
    Buffer = pBuffer->item.asString.value;
    iReceived = 0;
+   iTimeElapsed = 0;
    HB_SOCKET_ZERO_ERROR( Socket );
 
-   HB_STACK_UNLOCK;
-   HB_TEST_CANCEL_ENABLE_ASYN;
-   
    do
    {
       iBufferLen = HB_SENDRECV_BUFFER_SIZE > iMax-iReceived ? iMax-iReceived : HB_SENDRECV_BUFFER_SIZE;
-      
-      
+
+      HB_STACK_UNLOCK;
+      HB_TEST_CANCEL_ENABLE_ASYN;
       if( hb_selectReadSocket( Socket ) )
       {
          iLen = recv( Socket->com, Buffer + iReceived, iBufferLen, MSG_NOSIGNAL );
+         HB_DISABLE_ASYN_CANC;
+         HB_STACK_LOCK;
+
          if( iLen > 0 )
          {
             iReceived += iLen;
@@ -738,7 +866,22 @@ HB_FUNC( INETRECVALL )
       }
       else
       {
+         // timed out; let's see if we have to run a cb routine
+         HB_DISABLE_ASYN_CANC;
          HB_STACK_LOCK;
+         iTimeElapsed += Socket->timeout;
+
+         if ( Socket->caPeriodic != NULL )
+         {
+            hb_execFromArray( Socket->caPeriodic );
+            // do we continue?
+            if ( hb_itemGetL( &HB_VM_STACK.Return ) &&
+               (Socket->timelimit == -1 || iTimeElapsed < Socket->timelimit ))
+            {
+               continue;
+            }
+         }
+
          HB_SOCKET_SET_ERROR2( Socket, -1, "Timeout" )
          hb_retni( iReceived );
          return;
@@ -746,8 +889,6 @@ HB_FUNC( INETRECVALL )
 
    }
    while( iReceived < iMax && iLen > 0 );
-   HB_DISABLE_ASYN_CANC;
-   HB_STACK_LOCK;
 
    Socket->count = iReceived;
 
@@ -778,8 +919,8 @@ HB_FUNC( INETRECVLINE )
    char cChar;
    char *Buffer;
    int iAllocated, iBufferSize, iMax;
-   int iLen;
-   int iPos = 0;
+   int iLen = 0;
+   int iPos = 0, iTimeElapsed;
 
    HB_SOCKET_STRUCT *Socket;
 
@@ -815,9 +956,8 @@ HB_FUNC( INETRECVLINE )
 
    Buffer = (char *) hb_xgrab( iBufferSize );
    iAllocated = iBufferSize;
+   iTimeElapsed = 0;
 
-   HB_STACK_UNLOCK;
-   HB_TEST_CANCEL_ENABLE_ASYN;
    do
    {
       if( iPos == iAllocated - 1 )
@@ -826,11 +966,31 @@ HB_FUNC( INETRECVLINE )
          Buffer = ( char * ) hb_xrealloc( Buffer, iAllocated );
       }
 
+      HB_STACK_UNLOCK;
+      HB_TEST_CANCEL_ENABLE_ASYN;
+
       if( hb_selectReadSocket( Socket ) )
       {
          iLen = recv( Socket->com, &cChar, 1, MSG_NOSIGNAL );
+         HB_DISABLE_ASYN_CANC;
+         HB_STACK_LOCK;
       }
       else {
+         HB_DISABLE_ASYN_CANC;
+         HB_STACK_LOCK;
+         iTimeElapsed += Socket->timeout;
+
+         if ( Socket->caPeriodic != NULL )
+         {
+            hb_execFromArray( Socket->caPeriodic );
+            // do we continue?
+            if ( hb_itemGetL( &HB_VM_STACK.Return ) &&
+               (Socket->timelimit == -1 || iTimeElapsed < Socket->timelimit ))
+            {
+               continue;
+            }
+         }
+
          iLen = -2;
       }
 
@@ -850,8 +1010,6 @@ HB_FUNC( INETRECVLINE )
 
    }
    while( iMax == 0 || iPos < iMax );
-   HB_DISABLE_ASYN_CANC;
-   HB_STACK_LOCK;
 
    if( iLen <= 0 )
    {
@@ -1952,5 +2110,6 @@ HB_FUNC( INETCRLF )
 {
    hb_retc( "\r\n" );
 }
+
 
 #endif

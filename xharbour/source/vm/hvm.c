@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.188 2003/03/27 21:08:03 ronpinkas Exp $
+ * $Id: hvm.c,v 1.189 2003/04/01 22:29:16 iananderson Exp $
  */
 
 /*
@@ -6819,7 +6819,7 @@ HB_FUNC( HB_EXEC )
    {
       PHB_FUNC pFunc = (PHB_FUNC) hb_itemGetNL( pPointer );
       PHB_ITEM pSelf;
-      PHB_DYNS pExecSym;
+      PHB_DYNS pExecSym = NULL;
       int iParams;
 
       if( hb_pcount() >= 2 )
@@ -6890,7 +6890,7 @@ HB_FUNC( HB_EXECFROMARRAY )
    PHB_ITEM pFirst = hb_param( 1, HB_IT_ANY );
    PHB_ITEM pArgs = NULL, pSelf = NULL, pString;
    PHB_DYNS pExecSym = NULL;
-   PHB_FUNC pFunc;
+   PHB_FUNC pFunc = NULL;
    ULONG i;
    ULONG ulLen, ulStart = 1;
 
@@ -6989,6 +6989,95 @@ HB_FUNC( HB_EXECFROMARRAY )
    {
       hb_vmDo( (USHORT) ( ulLen - ulStart + 1 ) );
    }
+}
+
+
+/* JC1: To reduce OH of using the HB_FUN_ version of hb_execFromArray()
+   as just a wrapper, here is a "reduced" version of hb_execFromArray
+   available for c programs, accepting only the format:
+
+   hb_execFromArray( aArray ) // aArray = { @Func(),...} or any other format
+   Returns TRUE if the routine call is sucessful (object returned by
+   the called xharbour routine is in HB_VM_STACK.Return), and false if
+   call is not possible (e.g. incorrect callable array)
+*/
+
+BOOL hb_execFromArray( PHB_ITEM pFirst )
+{
+   HB_THREAD_STUB
+   PHB_ITEM pArgs = NULL, pSelf = NULL, pString;
+   PHB_DYNS pExecSym = NULL;
+   PHB_FUNC pFunc = NULL;
+   ULONG i;
+   ULONG ulLen, ulStart = 1;
+
+   if( pFirst->type != HB_IT_ARRAY )
+   {
+      return FALSE;
+   }
+
+   pString = hb_arrayGetItemPtr( pFirst, 1 );
+   pArgs = pFirst;
+   if( HB_IS_OBJECT( pString ) &&  hb_arrayLen( pFirst ) >= 2 )
+   {
+      pSelf = pString;
+      pString = hb_arrayGetItemPtr( pFirst, 2 );
+
+      if( pString->type == HB_IT_STRING )
+      {
+         pFunc = (PHB_FUNC) hb_objHasMsg( pSelf, pString->item.asString.value );
+      }
+      else if( pString->type == HB_IT_LONG )
+      {
+         pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+      }
+      pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
+      ulStart = 3;
+   }
+   else if( pString->type == HB_IT_STRING )
+   {
+      pExecSym = hb_dynsymFindName( hb_itemGetCPtr( pString ) );
+      ulStart = 2;
+   }
+   else if( pString->type == HB_IT_LONG )
+   {
+      pFunc = (PHB_FUNC) hb_itemGetNL( pString );
+      pExecSym = hb_dynsymFindFromFunction( pFunc );
+      ulStart = 2;
+   }
+
+   if( pExecSym == NULL || pArgs == NULL)
+   {
+      return FALSE;
+   }
+
+   hb_vmPushSymbol( pExecSym->pSymbol );
+   if ( pSelf )
+   {
+      hb_vmPush( pSelf );
+   }
+   else
+   {
+      hb_vmPushNil();
+   }
+
+   ulLen = hb_arrayLen( pArgs );
+
+   // pushing the contents of the array
+   for( i = ulStart; i <= ulLen; i ++ )
+   {
+      hb_vmPush( hb_arrayGetItemPtr( pArgs, i ) );
+   }
+
+   if( pSelf )
+   {
+      hb_vmSend( (USHORT) ( ulLen - ulStart + 1 ) );
+   }
+   else
+   {
+      hb_vmDo( (USHORT) ( ulLen - ulStart + 1 ) );
+   }
+   return TRUE;
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.8 2003/04/13 21:39:24 jonnymind Exp $
+ * $Id: hbsrlraw.c,v 1.9 2003/04/17 09:28:34 paultucker Exp $
  */
 
 /*
@@ -205,6 +205,12 @@ HB_FUNC( HB_SERIALIZESIMPLE )
          hb_createlen8( cRet + 1, pItem->item.asDate.value );
       break;
 
+      case HB_IT_NIL:
+         ulRet = 1;
+         cRet = (BYTE *)hb_xgrab( ulRet );
+         cRet[0] = (BYTE)'Z';
+      break;
+
       /* not implemented ? */
       default:
          hb_ret();
@@ -286,6 +292,11 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
       case 'D':
          ulData = hb_getlen8( (BYTE *)(cBuf + 1) );
          hb_retdl( ulData );
+
+      case 'Z':
+         ulData = 1;
+         hb_ret();
+
       break;
    }
 }
@@ -348,6 +359,8 @@ ULONG hb_serialNextRaw( char *cBuf )
             ulCount --;
          }
       return ulData;
+
+      case 'Z': return 1;
     }
     return 0;
 }
