@@ -1,5 +1,5 @@
 /*
- * $Id: TMenuItem.prg,v 1.7 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TMenuItem.prg,v 1.8 2002/11/08 04:46:51 ronpinkas Exp $
  */
 
 /*
@@ -49,7 +49,11 @@ CLASS TMenuItem FROM TComponent
 
    PROPERTY Visible READ FVisible WRITE SetVisible DEFAULT .T.
 
-   DATA Menu    AS OBJECT
+   PROPERTY Caption READ FCaption WRITE SetCaption
+
+   PROPERTY OnChange READ FOnChange
+
+   DATA FMenu    AS OBJECT PRIVATE
    DATA Id
    DATA Action  AS CODEBLOCK
    DATA Checked
@@ -79,6 +83,7 @@ CLASS TMenuItem FROM TComponent
    METHOD SetEnabled()
    METHOD SetVisible()
    METHOD SetImageIndex()
+   METHOD SetCaption( Value )
 
 ENDCLASS
 
@@ -92,7 +97,7 @@ METHOD Create( oMenu ) CLASS TMenuItem
   ::FCommand := ::UniqueCommand()
   ::FImageIndex := -1
 
-   ::Menu  := oMenu
+   ::FMenu  := oMenu
 
    //aAdd( oMenu:aItems, self )
 
@@ -154,7 +159,7 @@ METHOD AppendTo( HMenu, ARightToLeft ) CLASS TMenuItem
           MenuItemInfo:hSubMenu := ::GetHandle()
        ENDIF
 
-       InsertMenuItem( ::Menu, DWORD(-1), .T., MenuItemInfo )
+       InsertMenuItem( ::FMenu, DWORD(-1), .T., MenuItemInfo )
     ELSE
       NewFlags := Or( Breaks[ IIF( ::FBreak, 2, 1 ) ], ;
                       Checks[ IIF( ::FChecked, 2, 1 ) ],;
@@ -163,9 +168,9 @@ METHOD AppendTo( HMenu, ARightToLeft ) CLASS TMenuItem
                       MF_BYPOSITION )
 
       IF ::GetCount > 0
-        InsertMenu( ::Menu, DWORD(-1), Or( MF_POPUP, NewFlags ), ::GetHandle, ::FCaption )
+        InsertMenu( ::FMenu, DWORD(-1), Or( MF_POPUP, NewFlags ), ::GetHandle, ::FCaption )
       ELSE
-        InsertMenu( ::Menu, DWORD(-1), NewFlags, ::Command, Caption )
+        InsertMenu( ::FMenu, DWORD(-1), NewFlags, ::Command, Caption )
       ENDIF
     ENDIF
   ENDIF
@@ -312,5 +317,14 @@ METHOD SetImageIndex( Value ) CLASS TMenuItem
     ::FImageIndex := Value
     ::MenuChanged( .T. )
   ENDIF
+
+Return NIL
+
+METHOD SetCaption( Value ) CLASS TMenuItem
+
+   IF ::FCaption != Value
+      ::FCaption := Value
+      ::MenuChanged( .T. )
+   ENDIF
 
 Return NIL

@@ -39,6 +39,7 @@ CLASS TMenu FROM TComponent
    DATA Popup  AS OBJECT
 
    PROPERTY Items READ FItems
+   PROPERTY OnChange READ FOnChange
 
    METHOD Create() CONSTRUCTOR
    METHOD GetHandle()

@@ -1,5 +1,5 @@
 /*
- * $Id: TCustomForm.prg,v 1.3 2002/11/11 18:43:31 what32 Exp $
+ * $Id: TCustomForm.prg,v 1.4 2002/11/11 23:18:02 what32 Exp $
  */
 
 /*
@@ -110,7 +110,9 @@ CLASS TCustomForm FROM TScrollingWinControl
     PROPERTY VertScrollBar              //stored IsForm;
     PROPERTY Visible                    WRITE SetVisible     DEFAULT FALSE
     PROPERTY Width                      //stored IsFormSizeStored;
-    PROPERTY WindowMenu                 //: TMenuItem;
+
+    PROPERTY WindowMenu                 READ WindowMenu WRITE SetWindowMenu //: TMenuItem;
+
 /*
   PUBLIC:
     METHOD   Create                     CONSTRUCTOR //(AOwner: TComponent); override;
@@ -158,5 +160,51 @@ CLASS TCustomForm FROM TScrollingWinControl
     PROPERTY OleFormObject              //: IOleForm;
     PROPERTY WindowState                TYPE TWindowState DEFAULT wsNormal
 */
+
+    METHOD SetWindowMenu( oMenu )
+    METHOD RefreshMDIMenu()
+
 ENDCLASS
+
+METHOD SetWindowMenu( Value ) CLASS TCustomForm
+
+   IF ::FWindowMenu != Value
+      ::FWindowMenu := Value
+
+      IF Value != NIL
+         Value:FreeNotification(Self)
+      ENDIF
+
+      ::RefreshMDIMenu()
+   ENDIF
+
+Return NIL
+
+METHOD RefreshMDIMenu() CLASS TCustomForm
+
+   LOCAL MenuHandle, WindowMenuHandle
+   LOCAL Redraw
+
+   IF ( ::FormStyle == fsMDIForm ) .AND. ( ::ClientHandle <> 0 )
+      MenuHandle := 0
+      IF ::Menu != NIL
+         MenuHandle := ::Menu:Handle
+      ENDIF
+
+      WindowMenuHandle := 0
+      IF ::WindowMenu != NIL
+         WindowMenuHandle := ::WindowMenu:Handle
+      ENDIF
+
+      Redraw := GetMenu( ::Handle ) <> MenuHandle
+
+      SendMessage( ::ClientHandle, WM_MDISETMENU, MenuHandle, WindowMenuHandle )
+
+      IF Redraw
+         DrawMenuBar( ::Handle )
+      ENDIF
+   ENDIF
+
+Return NIL
+
 

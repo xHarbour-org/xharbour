@@ -1,5 +1,5 @@
 /*
- * $Id: TComponent.prg,v 1.9 2002/11/08 05:45:03 what32 Exp $
+ * $Id: TComponent.prg,v 1.10 2002/11/11 18:43:30 what32 Exp $
  */
 
 /*
@@ -114,7 +114,7 @@ METHOD Create( oOwner ) CLASS TComponent
    IF ! oOwner == Application
       oOwner:InsertComponent( Self )
    ENDIF
-   
+
 RETURN( Self )
 
 
@@ -124,7 +124,7 @@ METHOD InsertComponent( oComponent ) CLASS TComponent
 
   //ValidateRename( oComponent, '', oComponent:FName )
 
-  ::Insert( oComponent )
+  ::TComponent:Insert( oComponent )
 
   //oComponent.SetReference( .T. )
   //IF And( csDesigning, ComponentState )
@@ -146,3 +146,98 @@ METHOD Insert( oComponent ) CLASS TComponent
   oComponent:FOwner := Self
 
 Return NIL
+
+/*
+procedure TComponent.ValidateRename(AComponent: TComponent;
+  const CurName, NewName: string);
+begin
+  if (AComponent <> nil) and (CompareText(CurName, NewName) <> 0) and
+    (FindComponent(NewName) <> nil) then
+    raise EComponentError.CreateFmt(SDuplicateName, [NewName]);
+  if (csDesigning in ComponentState) and (Owner <> nil) then
+    Owner.ValidateRename(AComponent, CurName, NewName);
+end;
+
+procedure TComponent.ValidateContainer(AComponent: TComponent);
+begin
+  AComponent.ValidateInsert(Self);
+end;
+
+procedure TComponent.ValidateInsert(AComponent: TComponent);
+begin
+end;
+
+function TComponent.FindComponent(const AName: string): TComponent;
+var
+  I: Integer;
+begin
+  if (AName <> '') and (FComponents <> nil) then
+    for I := 0 to FComponents.Count - 1 do
+    begin
+      Result := FComponents[I];
+      if CompareText(Result.FName, AName) = 0 then Exit;
+    end;
+  Result := nil;
+end;
+
+procedure TComponent.SetName(const NewName: TComponentName);
+begin
+  if FName <> NewName then
+  begin
+    if (NewName <> '') and not IsValidIdent(NewName) then
+      raise EComponentError.CreateFmt(SInvalidName, [NewName]);
+    if FOwner <> nil then
+      FOwner.ValidateRename(Self, FName, NewName) else
+      ValidateRename(nil, FName, NewName);
+    SetReference(False);
+    ChangeName(NewName);
+    SetReference(True);
+  end;
+end;
+
+procedure TComponent.ChangeName(const NewName: TComponentName);
+begin
+  FName := NewName;
+end;
+
+function TComponent.GetComponentIndex: Integer;
+begin
+  if (FOwner <> nil) and (FOwner.FComponents <> nil) then
+    Result := FOwner.FComponents.IndexOf(Self) else
+    Result := -1;
+end;
+
+function TComponent.GetComponent(AIndex: Integer): TComponent;
+begin
+  if FComponents = nil then TList.Error(SListIndexError, AIndex);
+  Result := FComponents[AIndex];
+end;
+
+function TComponent.GetComponentCount: Integer;
+begin
+  if FComponents <> nil then
+    Result := FComponents.Count else
+    Result := 0;
+end;
+
+procedure TComponent.SetComponentIndex(Value: Integer);
+var
+  I, Count: Integer;
+begin
+  if FOwner <> nil then
+  begin
+    I := FOwner.FComponents.IndexOf(Self);
+    if I >= 0 then
+    begin
+      Count := FOwner.FComponents.Count;
+      if Value < 0 then Value := 0;
+      if Value >= Count then Value := Count - 1;
+      if Value <> I then
+      begin
+        FOwner.FComponents.Delete(I);
+        FOwner.FComponents.Insert(Value, Self);
+      end;
+    end;
+  end;
+end;
+*/

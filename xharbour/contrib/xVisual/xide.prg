@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.124 2002/11/12 00:51:47 what32 Exp $
+ * $Id: xide.prg,v 1.125 2002/11/12 02:18:37 what32 Exp $
  */
 
 /*
@@ -58,7 +58,7 @@ FUNCTION Main
 
    WITH OBJECT Application
       WITH OBJECT :CreateForm( MainFrame(), @MainFrame )
-         
+
          :OnCloseQuery := {|o| IIF( o:MsgBox( 'Quitting xIDE ?','Exit', MB_YESNO ) == IDYES, NIL, 0 ) }
 
          :SetStyle( WS_THICKFRAME, .F. )
@@ -159,11 +159,11 @@ METHOD MainToolBar() CLASS MainFrame
 
     // add the xmake toolbar
    WITH OBJECT TToolBar():Create( MainFrame )
-      
+
       oTb := ToolButton():Create( ::ToolBar1 )
       oTb:Hint := "New Project"
       oTb:OnClick := {|| Application:CreateForm( TFormEdit(), @FormEdit ) }
-      
+
       ToolButton():Create( ::ToolBar1 ):Hint := "Open Project"
       ToolButton():Create( ::ToolBar1 ):Hint := "Properties"
       ToolButton():Create( ::ToolBar1 ):Hint := "Build Application"

@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.87 2002/11/11 23:18:06 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.88 2002/11/12 02:18:37 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -94,7 +94,6 @@ GLOBAL EXTERNAL ObjEdit
                                                           NIL },;
                                     ::XFMTop(),;
                                     ::Super:Create( oParent ) ,;
-                                    ::GetHandle(),;
                                     Self
 
 
@@ -372,7 +371,7 @@ METHOD WMCreate()
 
    ::oMask:=oCtrlMask():Create( self )
    ::oMask:GetHandle()
-   
+
    ::oMask:GetSiblings()
    ::oMask:BringToTop()
    ::oMask:SetFocus()
