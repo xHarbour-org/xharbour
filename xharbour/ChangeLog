@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3787 2005/02/01 16:16:00 kaddath Exp $
+ * $Id: ChangeLog,v 1.3788 2005/02/01 16:45:26 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-01 21:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed for Clipper compatibility.
+      'SET INDEX TO' should close production index when 'SET AUTOPEN OFF'
+      but it should not change the locking scheme and keep it like for
+      production indexes untill DBF will not have been closed - funy :-)
 
 2005-02-01 08:45 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * utils/hbdoc/hbhtm.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.178 2005/01/25 10:47:50 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.179 2005/01/28 03:29:32 druzus Exp $
  */
 
 /*
@@ -6627,7 +6627,11 @@ static ERRCODE hb_cdxOrderListClear( CDXAREAP pArea )
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-   hb_cdxOrdListClear( pArea, FALSE, NULL );
+#ifdef HB_CDX_CLIP_AUTOPEN
+   hb_cdxOrdListClear( pArea, !hb_set.HB_SET_AUTOPEN, NULL );
+#else
+   hb_cdxOrdListClear( pArea, !pArea->fHasTags || !hb_set.HB_SET_AUTOPEN, NULL );
+#endif
    pArea->uiTag = 0;
 
    return SUCCESS;
@@ -6890,7 +6894,11 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
 
    if ( !pArea->lpdbOrdCondInfo ||
         ( pArea->lpdbOrdCondInfo->fAll && !pArea->lpdbOrdCondInfo->fAdditive ) )
-      hb_cdxOrdListClear( pArea, FALSE, NULL );
+#ifdef HB_CDX_CLIP_AUTOPEN
+      hb_cdxOrdListClear( pArea, !hb_set.HB_SET_AUTOPEN, NULL );
+#else
+      hb_cdxOrdListClear( pArea, !pArea->fHasTags || !hb_set.HB_SET_AUTOPEN, NULL );
+#endif
 
    pIndex = hb_cdxFindBag( pArea, szFileName );
 
@@ -7020,7 +7028,11 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    if ( pArea->lpdbOrdCondInfo && ( !pArea->lpdbOrdCondInfo->fAll &&
                                     !pArea->lpdbOrdCondInfo->fAdditive ) )
    {
-      hb_cdxOrdListClear( pArea, FALSE, pIndex );
+#ifdef HB_CDX_CLIP_AUTOPEN
+      hb_cdxOrdListClear( pArea, !hb_set.HB_SET_AUTOPEN, NULL );
+#else
+      hb_cdxOrdListClear( pArea, !pArea->fHasTags || !hb_set.HB_SET_AUTOPEN, NULL );
+#endif
    }
    hb_cdxIndexUnLockWrite( pIndex );
    if ( !fOpenedIndex )
