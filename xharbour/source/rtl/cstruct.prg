@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.30 2004/05/20 21:15:15 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.31 2004/05/21 21:29:53 ronpinkas Exp $
  */
 
 /*
@@ -146,7 +146,7 @@ Function __ActiveStructure( cStructure, nAlign )
       __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_PROPERTY, HB_SizeOfCStructure( aCTypes, nAlign ), HB_OO_CLSTP_READONLY )
 
       Counter++
-      __clsAddMsg( hClass,  "nID"           , Counter, HB_OO_MSG_PROPERTY, Len( s_aClasses ) )
+      __clsAddMsg( hClass,  "_nID"           , Counter, HB_OO_MSG_PROPERTY, Len( s_aClasses ) )
 
       // WARNING InternalBuffer *MUST* remain the *LAST* Property!!!
       Counter++
@@ -456,7 +456,7 @@ Function HB_CTypeArrayID( CType, nLen )
       __clsAddMsg( hClass,  "SizeOf"        , Counter, HB_OO_MSG_PROPERTY, HB_SizeOfCStructure( aCTypes, 1 ), HB_OO_CLSTP_READONLY )
 
       Counter++
-      __clsAddMsg( hClass,  "nID", Counter, HB_OO_MSG_PROPERTY, nID )
+      __clsAddMsg( hClass,  "_nID", Counter, HB_OO_MSG_PROPERTY, nID )
 
       // WARNING InternalBuffer *MUST* remain the *LAST* Property!!!
       Counter++
