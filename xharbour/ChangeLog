@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2114 2004/01/21 22:18:34 walito Exp $
+ * $Id: ChangeLog,v 1.2115 2004/01/21 22:21:26 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-21 19:45 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  ! include/hbapigt.h
+    + Added missing #define _alleg _ALLEG directive
 
 2004-01-21 19:00 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   + source/rtl/gtalleg/Makefile
