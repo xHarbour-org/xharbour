@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclientsmtp.prg,v 1.3 2003/11/05 11:06:41 jonnymind Exp $
+* $Id: tipclientsmtp.prg,v 1.4 2004/02/07 12:53:55 lculik Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -99,24 +99,6 @@ METHOD Data( cData ) CLASS tIPClientSMTP
 RETURN ::GetOk()
 
 
-METHOD Write( cData, nLen, bCommit ) CLASS tIPClientSMTP
-   IF .not. ::bInitialized
-      IF Empty( ::oUrl:cUserid ) .or. Empty( ::oUrl:cFile )
-         RETURN -1
-      ENDIF
-      IF .not. ::Mail( ::oUrl:cUserid ) .or. .not. ::Rcpt( ::oUrl:cFile )
-         RETURN -1
-      ENDIF
-      InetSendAll( ::SocketCon, "DATA" + ::cCRLF )
-      IF .not. ::GetOk()
-         RETURN -1
-      ENDIF
-      ::bInitialized := .T.
-   ENDIF
-
-   ::nLastWrite := ::super:Write( cData, nLen, bCommit )
-RETURN ::nLastWrite
-
 
 METHOD OpenSecure( ) CLASS tIPClientSMTP
 
@@ -168,3 +150,31 @@ METHOD AuthPlain( cUser, cPass) CLASS tIPClientSMTP
 
    InetSendAll( ::SocketCon, "AUTH PLAIN " + cen + ::cCrlf)
    return ::GetOk()
+
+METHOD Write( cData, nLen, bCommit ) CLASS tIPClientSMTP
+Local aTo,cRecpt
+   IF .not. ::bInitialized
+      IF Empty( ::oUrl:cUserid ) .or. Empty( ::oUrl:cFile )
+         RETURN -1
+      ENDIF
+
+      IF .not. ::Mail( ::oUrl:cUserid )
+         RETURN -1
+      ENDIF
+      aTo:= HB_RegexSplit(",", ::oUrl:cFile )
+
+      FOR each cRecpt in Ato
+         IF .not.   ::Rcpt(cRecpt)
+            RETURN -1
+         ENDIF
+      NEXT
+
+      InetSendAll( ::SocketCon, "DATA" + ::cCRLF )
+      IF .not. ::GetOk()
+         RETURN -1
+      ENDIF
+      ::bInitialized := .T.
+   ENDIF
+
+   ::nLastWrite := ::super:Write( cData, nLen, bCommit )
+RETURN ::nLastWrite

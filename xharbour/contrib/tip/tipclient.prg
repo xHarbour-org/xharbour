@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclient.prg,v 1.8 2004/01/14 04:38:09 ronpinkas Exp $
+* $Id: tipclient.prg,v 1.9 2004/02/07 12:53:55 lculik Exp $
 ************************************************/
 /* 2004-01-13
   Enhaced tip cliente to conenct to secure smtp servers by Luiz Rafael Culik
@@ -166,33 +166,6 @@ METHOD Read( nLen ) CLASS tIPClient
    ENDIF
 RETURN cStr
 
-METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
-Local aTo,cRecpt
-   IF .not. ::bInitialized
-      IF Empty( ::oUrl:cUserid ) .or. Empty( ::oUrl:cFile )
-         RETURN -1
-      ENDIF
-
-      IF .not. ::Mail( ::oUrl:cUserid )
-         RETURN -1
-      ENDIF
-      aTo:= HB_RegexSplit(",", ::oUrl:cFile )
-
-      FOR each cRecpt in Ato
-         IF .not.   ::Rcpt(cRecpt)
-            RETURN -1
-         ENDIF
-      NEXT
-
-      InetSendAll( ::SocketCon, "DATA" + ::cCRLF )
-      IF .not. ::GetOk()
-         RETURN -1
-      ENDIF
-      ::bInitialized := .T.
-   ENDIF
-
-   ::nLastWrite := ::super:Write( cData, nLen, bCommit )
-RETURN ::nLastWrite
 
 
 METHOD ReadToFile( cFile, nMode ) CLASS tIPClient
@@ -240,6 +213,7 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
 
    ::nStatus := 0
    nFin := Fopen( cFile, FO_READ )
+   tracelog(nFin,cFile)
    IF nFin < 0
       RETURN .F.
    ENDIF
@@ -247,12 +221,14 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
    ::nStatus := 1
    cData := Space( 1024 )
    nLen := Fread( nFin, @cData, 1024 )
+   tracelog(cdata,nlen)
    DO WHILE nLen > 0
       IF ::Write( @cData, nLen ) != nLen
          Fclose( nFin )
          RETURN .F.
       ENDIF
       nLen := Fread( nFin, @cData, 1024 )
+   tracelog(cdata,nlen)
    ENDDO
    ::Commit()
 
@@ -269,3 +245,15 @@ METHOD Data( cData ) CLASS tIPClient
    InetSendAll(::SocketCon, cData + ::cCRLF + "." + ::cCRLF )
 RETURN ::GetOk()
 
+METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
+
+   IF Empty( nLen )
+      nLen := Len( cData )
+   ENDIF
+
+   ::nLastWrite := InetSendAll( ::SocketCon,  cData , nLen )
+   IF .not. Empty( bCommit ) .and. bCommit
+      ::Commit()
+   ENDIF
+
+RETURN ::nLastWrite
