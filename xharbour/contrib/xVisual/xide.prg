@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.82 2002/10/13 11:16:30 what32 Exp $
+ * $Id: xide.prg,v 1.83 2002/10/13 23:19:28 what32 Exp $
  */
 
 /*
@@ -141,7 +141,7 @@ METHOD MainToolBar() CLASS MainFrame
       // add the TabControl on the Rebarband
       With Object :Add( 'Tabs', TTabControl():New( oApp:MainFrame:GetObj("Rebar"), 445,  0,  0,  0,  0) )
          :AddTab( "StdTab", TabPage():New( oApp:MainFrame:GetObj("Rebar"):GetObj("Tabs"), "Standard" ) )
-         :AddTab( "Aditional" )
+         :AddTab( "Additional" )
          :AddTab( "Win32", TabPage():New( oApp:MainFrame:GetObj("Rebar"):GetObj("Tabs"), "Win32" ) )
          :AddTab( "System" )
          :AddTab( "Internet" )

@@ -1,5 +1,5 @@
 /*
- * $Id: TCStatic.prg,v 1.12 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TCStatic.prg,v 1.13 2002/10/13 11:16:29 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -33,7 +33,7 @@
 
 *------------------------------------------------------------------------------*
 
-CLASS TStatic FROM TControl
+CLASS TStatic FROM TCustomControl
 
 //   DATA Caption INIT  "StaticText"
    DATA Left    INIT   0
@@ -57,14 +57,14 @@ ENDCLASS
 *------------------------------------------------------------------------------*
 
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TStatic
-   
+
    ::Caption   := cCaption
    ::id        := nId
    ::Left      := nLeft
    ::Top       := nTop
    ::Width     := IFNIL( nWidth,  ::Width , nWidth )
-   ::Height    := IFNIL( nHeight, ::height, nHeight) 
-   
+   ::Height    := IFNIL( nHeight, ::height, nHeight)
+
    RETURN( super:new( oParent ) )
 
 *------------------------------------------------------------------------------*

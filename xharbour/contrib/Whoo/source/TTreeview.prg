@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.4 2002/10/10 02:51:46 what32 Exp $
+ * $Id: TTreeview.prg,v 1.8 2002/10/11 03:53:16 what32 Exp $
  */
 
 /*
@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------//
 
-CLASS TTreeView FROM TControl
+CLASS TTreeView FROM TWinControl
 
    DATA Items     PROTECTED INIT {}
    DATA ImageList PROTECTED
@@ -100,7 +100,7 @@ STATIC FUNCTION FindItem( aItems, hItem )
    FOR EACH oItem IN aItems
       IF Len( oItem:Items ) > 0
          IF ( oReturn := FindItem( oItem:Items, hItem ) ) != NIL
-            RETURN oReturn 
+            RETURN oReturn
          ENDIF
       ENDIF
 

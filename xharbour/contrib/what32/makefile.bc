@@ -2,7 +2,7 @@
 # File:     makefile.b32
 # Author:   Francesco Saverio Giudice (on a makefile by Julian Smart)
 # Created:  2002
-# Updated:  
+# Updated:
 # Copyright: (C) Francesco Saverio Giudice - WoopGUI - A Win32 OOP GUI Library
 #
 # Makefile : Builds woopgui library (Harbour & BC++ 32-bit)
@@ -28,10 +28,10 @@ WHAT32OBJ  = _winbrsh.obj    _wincall.obj    _winclpb.obj    _wincret.obj    _wi
              _winrgn.obj     _winscrlb.obj   _wintab.obj     _wintext.obj    _winview.obj \
              _winbmp.obj     _wincdlg.obj    _wincomm.obj    _windir.obj     _windlg.obj  \
              _wingdi.obj     _winmain.obj    _winmisc.obj    _winshell.obj   _winsys.obj  \
-             _winwnd.obj     _wintbar.obj    _WinINet.obj    _WinTree.obj                 \
+             _winwnd.obj     _wintbar.obj    _WinINet.obj    _WinTree.obj    _tooltip.obj \
              Debug.obj ErrorSys.obj WhatUtil.obj WinIni.obj WinCDlg.obj WinComm.obj       \
              WinCore.obj WinRBar.obj WinTBar.obj WinTabs.obj
-             
-          
+
+
 !include $(WH_DIR)\env\makelib.b32
 

@@ -1,5 +1,5 @@
 /*
- * $Id: TCStatusBar.prg,v 1.11 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TCStatusBar.prg,v 1.12 2002/10/13 11:16:29 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -36,7 +36,7 @@
 
 *------------------------------------------------------------------------------*
 
-CLASS TStatusBar FROM TControl
+CLASS TStatusBar FROM TCustomControl
 
 //   DATA Caption INIT  "StatusBar"
    DATA Left    INIT   0
@@ -54,7 +54,7 @@ CLASS TStatusBar FROM TControl
 
 
    DATA rect PROTECTED
-   
+
    METHOD New() CONSTRUCTOR
    METHOD Create() INLINE ::handle := CreateStatusBar( ::Style, ::Caption, ::Parent:handle, ::Id  )
    METHOD SetPanels

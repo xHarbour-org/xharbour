@@ -1,5 +1,5 @@
 /*
- * $Id: TCListBox.prg,v 1.10 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TCListBox.prg,v 1.11 2002/10/12 09:40:53 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -41,7 +41,7 @@ IMPORT C STRUCTURE RECT
 
 *------------------------------------------------------------------------------*
 
-CLASS TListBox FROM TControl
+CLASS TListBox FROM TCustomControl
 
    DATA Caption PROTECTED INIT ""
    DATA Left    INIT    0
@@ -81,13 +81,13 @@ ENDCLASS
 *------------------------------------------------------------------------------*
 
 METHOD New( oParent, nId, nLeft, nTop, nWidth, nHeight ) CLASS TListBox
-   
+
    ::id        := nId
    ::Left      := nLeft
    ::Top       := nTop
    ::width     := IFNIL( nWidth,  ::width , nWidth )
    ::Height    := IFNIL( nHeight, ::height, nHeight)
-   
+
    RETURN( super:new( oParent ) )
 
 *------------------------------------------------------------------------------*

@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.4 2002/10/10 02:51:46 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.16 2002/10/11 03:53:16 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -43,12 +43,12 @@ IMPORT C STRUCTURE RECT
 IMPORT C STRUCTURE NMHDR
 
 typedef struct _TBBUTTON {;
-    int iBitmap; 
-    int idCommand; 
-    BYTE fsState; 
-    BYTE fsStyle; 
-    DWORD dwData; 
-    int iString; 
+    int iBitmap;
+    int idCommand;
+    BYTE fsState;
+    BYTE fsStyle;
+    DWORD dwData;
+    int iString;
 } TBBUTTON, NEAR* PTBBUTTON, FAR* LPTBBUTTON
 
 typedef struct tagNMTOOLBAR {;
@@ -75,7 +75,7 @@ typedef struct {;
     UINT      uflags;
 } TOOLTIPTEXT
 
-CLASS TToolbar FROM TControl
+CLASS TToolBar FROM TWinControl
 
    DATA Caption PROTECTED INIT ""
    DATA Left    INIT    0
@@ -116,7 +116,7 @@ CLASS TToolbar FROM TControl
                                          ::SendMessage(TB_CHECKBUTTON,nBtn,If(lFlag,1,0))
    METHOD IsButtonChecked(nBtn)   INLINE IF(::SendMessage(TB_ISBUTTONCHECKED,nBtn,0)==0,.F.,.T.)
    METHOD AddMenu()
-   
+
    METHOD SetListStyle()          INLINE ::Style := OR(::Style,TBSTYLE_LIST)
 ENDCLASS
 
@@ -136,7 +136,7 @@ METHOD New( oParent, nId, nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp ) CLASS T
    ::yBtn    := yBtn
    ::xBmp    := xBmp
    ::yBmp    := yBmp
-  
+
    ::aButtons:={}
    ::Created := .F.
    ::aBitmaps:={}
@@ -147,11 +147,11 @@ METHOD New( oParent, nId, nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp ) CLASS T
 *-----------------------------------------------------------------------------*
 
 METHOD AddBitmap(hInst, nhIdBmp, nButtons) CLASS TToolBar
- 
+
    LOCAL tbab IS TBADDBITMAP
-  
+
    DEFAULT nButtons TO 1
-  
+
    tbab:hInst := hInst
    tbab:nId   := nhIdBmp
    AADD(::aBitmaps,{tbab,nButtons})
@@ -167,10 +167,10 @@ METHOD AddButton( cName, oBtn ) CLASS TToolBar
 
    LOCAL tbb IS TBBUTTON
    DEFAULT oBtn TO ToolButton():New()
-   
+
    oBtn:name     := cName
    oBtn:Parent   := self
-   
+
    tbb:ibitmap   := oBtn:ImageIndex
    tbb:idCommand := oBtn:Id
    tbb:fsState   := oBtn:State

@@ -35,7 +35,7 @@
 
 *-----------------------------------------------------------------------------*
 
-CLASS TFrame FROM TWindow
+CLASS TFrame FROM TWinControl
    DATA WindowMenu   EXPORTED
    DATA Modal        EXPORTED INIT .F.
    DATA biSystemMenu EXPORTED INIT .T.
@@ -44,7 +44,7 @@ CLASS TFrame FROM TWindow
 
    ASSIGN biSystemMenu(l) INLINE ::SetStyle(WS_SYSMENU,l),;
                                  ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
-   
+
    ASSIGN biMinimize(l)   INLINE ::SetStyle(WS_MAXIMIZEBOX,l),;
                                  ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
 
@@ -74,7 +74,7 @@ METHOD New( oParent ) CLASS TFrame
 *-----------------------------------------------------------------------------*
 
 METHOD Add( cName, oObj, lCreate ) CLASS TFrame
-   
+
    DEFAULT lCreate TO .T.
    oObj:propname := cName
    ::SetLink( cName, oObj )

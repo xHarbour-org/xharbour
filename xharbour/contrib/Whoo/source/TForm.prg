@@ -1,5 +1,5 @@
 /*
- * $Id: TForm.prg,v 1.41 2002/10/12 19:58:35 what32 Exp $
+ * $Id: TForm.prg,v 1.42 2002/10/13 11:16:29 what32 Exp $
  */
 
 /*
@@ -41,7 +41,7 @@
 
 *-----------------------------------------------------------------------------*
 
-CLASS TForm FROM TWindow
+CLASS TForm FROM TWinControl
    DATA WindowMenu   EXPORTED
    DATA Modal        PROTECTED INIT .F.
    DATA resname      PROTECTED
@@ -51,7 +51,7 @@ CLASS TForm FROM TWindow
    ACCESS biSystemMenu    INLINE AND( ::Style, WS_SYSMENU ) # 0
    ASSIGN biSystemMenu(l) INLINE ::SetStyle(WS_SYSMENU,l),;
                                  ::Style := GetWindowLong( ::handle, GWL_STYLE ),l
-   
+
    ACCESS biMinimize      INLINE AND( ::Style, WS_MAXIMIZEBOX ) # 0
    ASSIGN biMinimize(l)   INLINE ::SetStyle(WS_MAXIMIZEBOX,l),;
                                  ::Style := GetWindowLong( ::handle, GWL_STYLE )
@@ -66,9 +66,9 @@ CLASS TForm FROM TWindow
                                          WS_MAXIMIZEBOX+WS_THICKFRAME,  0 }
    ACCESS bsSingle      INLINE {WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+WS_MINIMIZEBOX+;
                                          WS_MAXIMIZEBOX, 0 }
-                                         
+
    ACCESS bsDialog      INLINE {WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+DS_MODALFRAME, 0 }
-   
+
    ACCESS bsNone        INLINE {WS_POPUP+WS_VISIBLE, 0 }
    ACCESS bsSizeToolWin INLINE {WS_OVERLAPPEDWINDOW, WS_EX_TOOLWINDOW }
    ACCESS bsToolWindow  INLINE {WS_POPUP+WS_VISIBLE+WS_CAPTION+WS_SYSMENU+;
@@ -97,7 +97,7 @@ ENDCLASS
 *-----------------------------------------------------------------------------*
 
 METHOD New( oParent ) CLASS TForm
-   
+
    ::WndProc   := IFNIL(::WndProc,'FormProc',::WndProc)
    ::Msgs      := IFNIL(::Msgs,-1,::Msgs)
    ::FrameWnd  := .F.
@@ -108,7 +108,7 @@ METHOD New( oParent ) CLASS TForm
    ::ExStyle   := IFNIL(::ExStyle,0,::ExStyle)
    ::PropName  := IFNIL(::PropName,"TForm",::PropName)
    InitCommonControls()
-   
+
    RETURN( super:New( oParent ) )
 
 *-----------------------------------------------------------------------------*

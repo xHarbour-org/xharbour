@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.14 2002/10/06 02:54:14 ronpinkas Exp $
+ * $Id: CtrlMask.Prg,v 1.17 2002/10/07 03:56:05 what32 Exp $
  */
 
 /*
@@ -88,7 +88,7 @@ GLOBAL EXTERNAL hThisInstance
 
 *-----------------------------------------------------------------------------*
 
-CLASS oCtrlMask FROM TWindow
+CLASS oCtrlMask FROM TWinControl
 
    DATA aSelected
    DATA aHot

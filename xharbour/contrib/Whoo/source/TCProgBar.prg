@@ -1,10 +1,10 @@
 /*
- * $Id: TCProgBar.prg,v 1.5 2002/10/12 09:40:53 what32 Exp $
+ * $Id: TCProgBar.prg,v 1.6 2002/10/13 11:16:29 what32 Exp $
  */
 /*
  * xHarbour Project source code:
  *
- * Whoo.lib TControl CLASS
+ * Whoo.lib TProgressBar CLASS
  *
  * Copyright 2002 Augusto Infante [augusto@2vias.com.ar]
  * www - http://www.xharbour.org
@@ -33,7 +33,7 @@
 #INCLUDE "WinGdi.ch"
 #INCLUDE "progbar.ch"
 
-CLASS TProgressBar FROM TControl
+CLASS TProgressBar FROM TCustomControl
 
 //   DATA Caption  INIT   ""
    DATA Left     INIT    0
@@ -44,10 +44,10 @@ CLASS TProgressBar FROM TControl
    DATA Max      INIT  100
    DATA Position INIT  0
    DATA Step     INIT  1
-   
+
    DATA bkColor  INIT GetSysColor(COLOR_BTNFACE)
    DATA BarColor INIT GetSysColor(COLOR_HIGHLIGHT)
-   
+
    DATA lRegister PROTECTED INIT .F.
    DATA lControl  PROTECTED INIT .T.
    DATA Msgs      PROTECTED INIT {WM_DESTROY,WM_SIZE,WM_MOVE}
@@ -59,7 +59,7 @@ CLASS TProgressBar FROM TControl
    DATA Style     PROTECTED INIT  WS_CHILD+WS_VISIBLE
    DATA ExStyle   PROTECTED INIT  0
    DATA Color     PROTECTED
-   
+
    METHOD New() CONSTRUCTOR
    METHOD SetPosition()
    METHOD DrawText()

@@ -18,10 +18,10 @@
 * NOT USE THIS CLASS DIRECTLY !!!
 */
 
-#include "woopgui.ch"
-#include "common.ch"
-#include "hbclass.ch"
-//#include "windows.ch"
+#include "windows.ch"
+#include "HbClass.ch"
+#include "what32.ch"
+#include "debug.ch"
 
 CLASS TObject  // FROM HBObject
 
@@ -89,9 +89,9 @@ CLASS TObject  // FROM HBObject
 
 
     // Mine
-    METHOD DisplayData()
-    METHOD DisplayMethods()
-    METHOD DisplayArray()
+    //METHOD DisplayData()
+    //METHOD DisplayMethods()
+    //METHOD DisplayArray()
 
 ENDCLASS
 
@@ -101,67 +101,67 @@ RETURN Self
 
 // ---------------------------------------------------------------------------------------
 
-METHOD DisplayArray( aData AS ARRAY, lMessageBox AS LOGICAL ) CLASS TObject
-   local cString := "", i
-
-      DEFAULT lMessageBox TO TRUE
-
-      FOR i = 1 to len ( aData )
-          cString += Str( i ) + " - " + cStr( aData[i] )
-          cString += CRLF
-      NEXT
-
-   IF lMessageBox
-      MessageBox(, cString, "Array Data" )
-   ENDIF
-
-RETURN cString
-
-METHOD DisplayData( cText AS STRING, lMessageBox AS LOGICAL ) CLASS TObject
-   local cString := "", i, aData
-   local oB := Self
-
-      DEFAULT cText       TO ""
-      DEFAULT lMessageBox TO TRUE
-
-      cString += "Object Name: " + oB:ClassName + CRLF
-
-      aData := __objGetValueList( oB )
-      FOR i = 1 to len ( aData )
-          cString += "DATA name: " + Pad( aData[ i, HB_OO_DATA_SYMBOL ], 25 )
-          cString += " - type: " + ValType( aData[ i, HB_OO_DATA_VALUE  ] )
-          cString += " - value: " + Pad( cStr( aData[ i, HB_OO_DATA_VALUE  ] ), 30 )
-          cString += CRLF
-      NEXT
-
-   IF lMessageBox
-      MessageBox(, cString, "Object Data" + ;
-                            IIF( Len( cText ) > 0, " - " + cText, "" ) )
-   ENDIF
-
-RETURN cString
-
-METHOD DisplayMethods( cText AS STRING, lMessageBox AS LOGICAL ) CLASS TObject
-   local cString := "", i, aData
-   local oB := Self
-
-      DEFAULT cText       TO ""
-      DEFAULT lMessageBox TO TRUE
-
-      cString += "Object Name: " + oB:ClassName + CRLF
-
-      aData := __objGetMethodList( oB )
-      FOR i = 1 to len ( aData )
-          cString += "Method name: " + Pad( aData[ i ], 25 )
-          //cString += " - type: " + ValType( aData[ i, HB_OO_DATA_VALUE  ] )
-          //cString += " - value: " + Pad( cStr( aData[ i, HB_OO_DATA_VALUE  ] ), 30 )
-          cString += CRLF
-      NEXT
-
-   IF lMessageBox
-      MessageBox(, cString, "Object Methods" + ;
-                            IIF( Len( cText ) > 0, " - " + cText, "" ) )
-   ENDIF
-
-RETURN cString
-
+//METHOD DisplayArray( aData AS ARRAY, lMessageBox AS LOGICAL ) CLASS TObject
+//   local cString := "", i
+//
+//      DEFAULT lMessageBox TO TRUE
+//
+//      FOR i = 1 to len ( aData )
+//          cString += Str( i ) + " - " + cStr( aData[i] )
+//          cString += CRLF
+//      NEXT
+//
+//   IF lMessageBox
+//      MessageBox(, cString, "Array Data" )
+//   ENDIF
+//
+//RETURN cString
+//
+//METHOD DisplayData( cText AS STRING, lMessageBox AS LOGICAL ) CLASS TObject
+//   local cString := "", i, aData
+//   local oB := Self
+//
+//      DEFAULT cText       TO ""
+//      DEFAULT lMessageBox TO TRUE
+//
+//      cString += "Object Name: " + oB:ClassName + CRLF
+//
+//      aData := __objGetValueList( oB )
+//      FOR i = 1 to len ( aData )
+//          cString += "DATA name: " + Pad( aData[ i, HB_OO_DATA_SYMBOL ], 25 )
+//          cString += " - type: " + ValType( aData[ i, HB_OO_DATA_VALUE  ] )
+//          cString += " - value: " + Pad( cStr( aData[ i, HB_OO_DATA_VALUE  ] ), 30 )
+//          cString += CRLF
+//      NEXT
+//
+//   IF lMessageBox
+//      MessageBox(, cString, "Object Data" + ;
+//                            IIF( Len( cText ) > 0, " - " + cText, "" ) )
+//   ENDIF
+//
+//RETURN cString
+//
+//METHOD DisplayMethods( cText AS STRING, lMessageBox AS LOGICAL ) CLASS TObject
+//   local cString := "", i, aData
+//   local oB := Self
+//
+//      DEFAULT cText       TO ""
+//      DEFAULT lMessageBox TO TRUE
+//
+//      cString += "Object Name: " + oB:ClassName + CRLF
+//
+//      aData := __objGetMethodList( oB )
+//      FOR i = 1 to len ( aData )
+//          cString += "Method name: " + Pad( aData[ i ], 25 )
+//          //cString += " - type: " + ValType( aData[ i, HB_OO_DATA_VALUE  ] )
+//          //cString += " - value: " + Pad( cStr( aData[ i, HB_OO_DATA_VALUE  ] ), 30 )
+//          cString += CRLF
+//      NEXT
+//
+//   IF lMessageBox
+//      MessageBox(, cString, "Object Methods" + ;
+//                            IIF( Len( cText ) > 0, " - " + cText, "" ) )
+//   ENDIF
+//
+//RETURN cString
+//

@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.4 2002/10/10 02:51:46 what32 Exp $
+ * $Id: TCCombo.prg,v 1.17 2002/10/11 03:53:16 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -37,7 +37,7 @@
 
 *------------------------------------------------------------------------------*
 
-CLASS TComboBox FROM TControl
+CLASS TComboBox FROM TWinControl
 
    DATA Caption PROTECTED INIT ""
    DATA Left    INIT   0

@@ -1,5 +1,5 @@
 /*
- * $Id: TCCheck.prg,v 1.11 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TCCheck.prg,v 1.12 2002/10/13 11:16:29 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -33,7 +33,7 @@
 
 *------------------------------------------------------------------------------*
 
-CLASS TCheck FROM TControl
+CLASS TCheck FROM TCustomControl
 
 //   DATA Caption INIT  "CheckButton"
    DATA Left    INIT   0

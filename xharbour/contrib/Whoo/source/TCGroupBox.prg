@@ -1,5 +1,5 @@
 /*
- * $Id: TCGroupBox.prg,v 1.7 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TCGroupBox.prg,v 1.8 2002/10/13 11:16:29 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -33,7 +33,7 @@
 
 *------------------------------------------------------------------------------*
 
-CLASS TGroupBox FROM TControl
+CLASS TGroupBox FROM TCustomControl
 
 //   DATA Caption INIT "GroupBox"
    DATA Left    INIT 0

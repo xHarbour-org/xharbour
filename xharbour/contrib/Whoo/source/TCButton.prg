@@ -1,5 +1,5 @@
 /*
- * $Id: TCButton.prg,v 1.13 2002/10/11 03:53:16 what32 Exp $
+ * $Id: TCButton.prg,v 1.14 2002/10/13 11:16:29 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -33,7 +33,7 @@
 
 *------------------------------------------------------------------------------*
 
-CLASS TButton FROM TControl
+CLASS TButton FROM TCustomControl
 
 //   DATA Caption INIT  "Button"
    DATA Left    INIT   0
@@ -55,14 +55,14 @@ ENDCLASS
 *------------------------------------------------------------------------------*
 
 METHOD New( oParent, cCaption, nId, nLeft, nTop, nWidth, nHeight ) CLASS TButton
-   
+
    ::id        := nId
    ::Caption   := IFNIL( cCaption, ::Caption, cCaption )
    ::Left      := IFNIL( nLeft,    ::Left,    nLeft    )
    ::Top       := IFNIL( nTop,     ::Top,     nTop     )
    ::Width     := IFNIL( nWidth ,  ::Width,   nWidth   )
    ::Height    := IFNIL( nHeight,  ::height,  nHeight  )
- 
+
    RETURN( super:new( oParent ) )
 
 *------------------------------------------------------------------------------*
