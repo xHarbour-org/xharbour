@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.30 2003/05/26 21:00:37 paultucker Exp $
+# $Id: makefile.nt,v 1.31 2003/05/27 05:55:06 paultucker Exp $
 #
 
 #
@@ -354,6 +354,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hardcr.obj \
    $(OBJ_DIR)$(MT)\hbcompress.obj \
    $(OBJ_DIR)$(MT)\hbcrc32.obj \
+   $(OBJ_DIR)$(MT)\hbcrypt.obj \
    $(OBJ_DIR)$(MT)\hbffind.obj \
    $(OBJ_DIR)$(MT)\hbrandom.obj \
    $(OBJ_DIR)$(MT)\hbsrlraw.obj \
@@ -732,6 +733,7 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\codebloc.obj \
    $(OBJ_DIR)$(MT)\debug.obj \
    $(OBJ_DIR)$(MT)\do.obj \
+   $(OBJ_DIR)$(MT)\dynlibhb.obj \
    $(OBJ_DIR)$(MT)\dynsym.obj \
    $(OBJ_DIR)$(MT)\errorapi.obj \
    $(OBJ_DIR)$(MT)\estack.obj \

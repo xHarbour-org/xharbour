@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbnxs.h,v 1.1 2003/02/23 20:13:38 jonnymind Exp $
  */
 
 /*
@@ -71,12 +71,12 @@
 
 void nxs_crypt(
    const unsigned char *source, unsigned long srclen,
-   const unsigned char *key, unsigned short keylen,
+   const unsigned char *key, unsigned long keylen,
    unsigned char *cipher );
 
 void nxs_decrypt(
    const unsigned char *cipher, unsigned long cypherlen,
-   const unsigned char *key, unsigned short keylen,
+   const unsigned char *key, unsigned long keylen,
    unsigned char *result );
 
 void nxs_scramble(
@@ -87,12 +87,12 @@ void nxs_scramble(
 void nxs_partial_scramble(
    const unsigned char *source, unsigned char *cipher,
    int *scramble,
-   unsigned long len, unsigned short keylen );
+   unsigned long len, unsigned long keylen );
 
 void nxs_partial_unscramble(
    unsigned char *cipher,
    int *scramble,
-   unsigned long len, unsigned short keylen );
+   unsigned long len, unsigned long keylen );
 
 void nxs_unscramble(
       unsigned char *cipher, unsigned long cypherlen,
@@ -100,21 +100,21 @@ void nxs_unscramble(
 
 void nxs_xorcode(
    unsigned char *cipher, unsigned long cipherlen,
-   const unsigned char *key, unsigned short keylen );
+   const unsigned char *key, unsigned long keylen );
 
 void nxs_xordecode(
    unsigned char *cipher, unsigned long cipherlen,
-   const unsigned char *key, unsigned short keylen );
+   const unsigned char *key, unsigned long keylen );
 
 void nxs_xorcyclic(
    unsigned char *cipher, unsigned long cipherlen,
-   const unsigned char *key, unsigned short keylen );
+   const unsigned char *key, unsigned long keylen );
 
 unsigned long nxs_cyclic_sequence( unsigned long input );
 
 void nxs_make_scramble(
    int *scramble,
    const unsigned char *key,
-   unsigned short keylen );
+   unsigned long keylen );
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1072 2003/05/27 20:05:12 walito Exp $
+ * $Id: ChangeLog,v 1.1073 2003/05/27 20:08:40 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-05-27 16:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/hbchecksum.c
+    * cast at 127
+  * include/hbnxs.h
+  * source/rtl/hbcrypt.c
+    * change all 'short keylen' to 'long keylen' for consistancy and to reduce warnings
+    * #include hbcompress.h for adler32 decl.
+  * makefile.nt
+  * makefile.vc
+    + source/rtl/hbchecksum.c
+    + source/rtl/hbcrypt.c
+    + source/vm/dynlibhb.c
+  * hrbdll.vc
+    ! numerous changes to make it current.
+  * include/hbapicdp.h
+    * corrections to declarations to match cdpapi.c and allow use in harbour.dll
+  * include/hbcompress.h
+    * corrections to declarations to match hbcompress.c and allow use in harbour.dll
+    * removed #ifdef __cplusplus since source file did not have this.
+  * makallvc.bat
+    + call dll_vc.bat
+  * dll_vc.bat
+    * made generic.  If you have specific requirements, copy this file.
 
 2003-05-27 22:07 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * source/rtl/regex.c

@@ -1,29 +1,28 @@
 @echo off
 
 REM
-REM $Id: dll_vc.bat,v 1.1 2002/01/06 03:45:43 andijahja Exp $
+REM $Id: dll_vc.bat,v 1.1 2002/01/07 04:06:26 andijahja Exp $
 REM
 REM ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 REM ³ This is a batch file to create harbour.dll ³Û
-REM ³ Please adjust envars accordingly           ³Û
 REM ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 REM  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
-REM Please adjust environment accordingly
+if not exist obj md obj
+if not exist obj\dll md obj\dll
+if not exist obj\dll\vc md obj\dll\vc
 
-SET BISON_SIMPLE=c:\windows\bison.simple
-SET _LIB=%LIB%
-SET _PATH=%PATH%
-SET _INCLUDE=%INCLUDE%
-SET LIB=C:\COMPILER\VC\LIB;%PATH%
-SET PATH=C:\COMPILER\VC\BIN;BIN\VC;%PATH%
-SET INCLUDE=INCLUDE;C:\COMPILER\VC\INCLUDE;%_INCLUDE%
+   nmake /NOLOGO /f hrbdll.vc %1 %2 %3 >hrbdllvc.log
+   if errorlevel 1 goto BUILD_ERR
 
-nmake /NOLOGO /f hrbdll.vc %1 %2 %3
+   copy lib\vc\harbour.lib lib > nul
+   copy lib\vc\harbour.exp lib > nul
+   copy lib\vc\harbour.dll lib > nul
 
-SET LIB=%_LIB%
-SET PATH=%_PATH%
-SET INCLUDE=%_INCLUDE%
-SET _LIB=
-SET _PATH=
-SET _INCLUDE=
+   goto EXIT
+
+:BUILD_ERR
+   notepad hrbdllvc.log
+   goto EXIT
+
+:EXIT
