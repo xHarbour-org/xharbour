@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.43 2004/03/02 05:17:18 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.44 2004/03/05 15:22:53 andijahja Exp $
  */
 
 /*
@@ -195,6 +195,8 @@ CLASS TOleAuto
 
    ERROR HANDLER OnError()
 
+   DESTRUCTOR Release()
+
 ENDCLASS
 
 //--------------------------------------------------------------------
@@ -252,6 +254,14 @@ METHOD New( uObj, cClass ) CLASS TOleAuto
    ENDIF
 
 RETURN Self
+
+//--------------------------------------------------------------------
+
+PROCEDURE Release() CLASS TOleAuto
+
+   OleReleaseObject( ::hObj )
+
+RETURN
 
 //--------------------------------------------------------------------
 
@@ -1452,6 +1462,15 @@ RETURN uObj
      }
 
      hb_retnl( ( LONG ) pDisp );
+  }
+
+  //---------------------------------------------------------------------------//
+
+  HB_FUNC( OLERELEASEOBJECT ) // (hOleObject, szMethodName, uParams...)
+  {
+     IDispatch * pDisp = ( IDispatch * ) hb_parnl( 1 );
+
+     s_nOleError = pDisp->lpVtbl->Release( pDisp );
   }
 
   //---------------------------------------------------------------------------//
