@@ -1,5 +1,5 @@
 /*
- * $Id: ctcolton.c,v 1.1 2002/05/04 16:37:31 mbirdyg Exp $
+ * $Id: ctcolton.c,v 1.1 2003/03/04 21:05:30 lculik Exp $
  */
 
 /*
@@ -118,6 +118,6 @@ static BYTE StrToColor( char * pszColor )
 
 HB_FUNC( COLORTON )
 {
-   hb_retni( StrToColor( hb_parc( 1 ) ) );
+   hb_retni( StrToColor( hb_parcx( 1 ) ) );
 }
 

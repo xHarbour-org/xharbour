@@ -1,5 +1,5 @@
 /*
- * $Id: color2n.c,v 1.1 2000/04/22 02:10:10 lculik Exp $
+ * $Id: color2n.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
  */
 
 /*
@@ -63,7 +63,7 @@ HB_FUNC(FT_COLOR2N)
        // make sure parameter is a char type and that it is 8 chars or less
 
        if ( ISCHAR( 1 )  && hb_parclen( 1 ) < 8 )
-          iRet = _ftColor2I( hb_parc( 1 ) );
+          iRet = _ftColor2I( hb_parcx( 1 ) );
 
        hb_retni( iRet );
 

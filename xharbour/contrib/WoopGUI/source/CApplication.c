@@ -51,7 +51,7 @@ HB_FUNC ( GET_Y_LPARAM )
 
 HB_FUNC ( GETSTRINGPTR )
 {
-   char *cString = hb_parc( 1 );
+   char *cString = hb_parcx( 1 );
    hb_retnl( ( LONG_PTR) cString );
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dispc.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
+ * $Id: dispc.c,v 1.2 2003/10/09 05:31:55 paultucker Exp $
  */
 
 /*
@@ -135,7 +135,7 @@ static void chattr(int x, int y, int len, int attr)
     int i;
     char *vmem;
 
-    vmem = vseg + (y * (width + 1) * 2) + (x * 2) + 1;      
+    vmem = vseg + (y * (width + 1) * 2) + (x * 2) + 1;
                                             /* calc the screen memory coord */
 
     for (i = 0; i <= len; i++, vmem += 2)   /* write the new attribute value */
@@ -567,7 +567,7 @@ HB_FUNC( _FT_DFINIT )
     lbuff  = (char *) hb_xalloc(maxlin + 1);  /*  for buffers     */
 
 
-    isallocated = !(buffer == NULL || lbuff == NULL || vseg == NULL); 
+    isallocated = !(buffer == NULL || lbuff == NULL || vseg == NULL);
                                               /* memory allocated? */
     if (isallocated == FALSE)
     {
@@ -598,7 +598,7 @@ HB_FUNC( _FT_DFINIT )
            kcount  = hb_parclen( 9 );
            if (kcount > 24)
               kcount = 24;
-           strcpyn(kstr, hb_parc(9), kcount);    /* get exit key string */
+           strcpyn(kstr, hb_parcx(9), kcount);    /* get exit key string */
         }
 
         brows = hb_parl(10);                  /* get browse flag   */
@@ -766,7 +766,7 @@ HB_FUNC( FT_DISPFILE )
 
             if ( brows == NO )
                 chattr(0, winrow - sline, width, norm);
-            
+
             hb_gtRest( sline, scol, eline, ecol, vseg );
 
                 /* figure out what the user wants to do */
@@ -873,7 +873,7 @@ HB_FUNC( FT_DISPFILE )
       }
     else
       ch = 0;
-        
+
 
     /* store the key pressed as a character to be returned */
 
@@ -914,7 +914,7 @@ static int keyin()
            ch = 27;      /* ESC with CapsLock ON = 257, with CapsLock OFF = 27 */
         hb_idleState();
     }
-        
+
 
     return ( ch );
 }

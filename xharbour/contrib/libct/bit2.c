@@ -1,5 +1,5 @@
 /*
- * $Id: bit2.c,v 1.1 2003/03/04 21:04:03 lculik Exp $
+ * $Id: bit2.c,v 1.2 2003/09/08 12:56:52 druzus Exp $
  */
 
 /*
@@ -108,7 +108,7 @@ HB_FUNC( CLEARBIT )
 
          if ( (iNum2 >= 1) && (iNum2 <= 32) )
            /* if bit to clear this between 1 and 32 */
-              
+
            lNumClearBit = lNum1 & ~( 1L << (iNum2 - 1) );
 
          else
@@ -262,7 +262,7 @@ static long int __hex2long( char *cNum1, int iLenHex )
 
      if ((iNum < 0) || (iNum > 0x0F))
        break;
-     
+
      iHexNum += (long int) iNum * (1 << (4 * ( iLenHex - i - 1 )));
      i--;
   }
@@ -274,7 +274,7 @@ static long int __getparam( int iParam )
 {
 
   if ( ISCHAR( iParam ) )
-     return  __hex2long( hb_parc( iParam ), hb_parclen( iParam ) );
+     return  __hex2long( hb_parcx( iParam ), hb_parclen( iParam ) );
   else
      return hb_parnl( iParam );
 

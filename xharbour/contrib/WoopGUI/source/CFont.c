@@ -31,7 +31,7 @@
 
 #include "woopgui.h"
 
-static LOGFONT mylf; 
+static LOGFONT mylf;
 
 HB_FUNC ( WG_REGISTERFONT )
 {
@@ -48,8 +48,8 @@ HB_FUNC ( WG_REGISTERFONT )
     mylf.lfClipPrecision     =  (BYTE)   hb_parnl(11);  // clipping precision
     mylf.lfQuality           =  (BYTE)   hb_parnl(12);  // output quality
     mylf.lfPitchAndFamily    =  (BYTE)   hb_parnl(13);  // pitch and family
-    strcpy( mylf.lfFaceName, hb_parc(14) );   // typeface name
-    
+    strcpy( mylf.lfFaceName, hb_parcx(14) );   // typeface name
+
 }
 
 
@@ -68,53 +68,53 @@ HB_FUNC ( CREATEFONT )
     DWORD fdwClipPrecision   =           hb_parnl(11);  // clipping precision
     DWORD fdwQuality         =           hb_parnl(12);  // output quality
     DWORD fdwPitchAndFamily  =           hb_parnl(13);  // pitch and family
-    CHAR  *lpszFace          =           hb_parc(14);   // typeface name
-    
-    hb_retnl( (long) CreateFont( nHeight, nWidth, nEscapement, nOrientation, fnWeight, 
-                                 fdwItalic, fdwUnderline, fdwStrikeOut, fdwCharSet, 
-                                 fdwOutputPrecision, fdwClipPrecision, fdwQuality, 
+    CHAR  *lpszFace          =           hb_parcx(14);   // typeface name
+
+    hb_retnl( (long) CreateFont( nHeight, nWidth, nEscapement, nOrientation, fnWeight,
+                                 fdwItalic, fdwUnderline, fdwStrikeOut, fdwCharSet,
+                                 fdwOutputPrecision, fdwClipPrecision, fdwQuality,
                                  fdwPitchAndFamily, lpszFace ) );
-                                 
+
 }
 
 
-HB_FUNC ( WG_CHOOSEFONT ) 
-{ 
-    CHOOSEFONT cf; 
-    LOGFONT lf; 
-    HFONT hfont; 
-    
+HB_FUNC ( WG_CHOOSEFONT )
+{
+    CHOOSEFONT cf;
+    LOGFONT lf;
+    HFONT hfont;
+
     PHB_ITEM pObject  = hb_param( 1, HB_IT_OBJECT );
- 
-    // Initialize members of the CHOOSEFONT structure. 
- 
-    cf.lStructSize = sizeof(CHOOSEFONT); 
-    cf.hwndOwner = (HWND)NULL; 
-    cf.hDC = (HDC)NULL; 
-    cf.lpLogFont = &lf; 
-    cf.iPointSize = 0; 
-    cf.Flags = CF_SCREENFONTS; 
-    cf.rgbColors = RGB(0,0,0); 
-    cf.lCustData = 0L; 
-    cf.lpfnHook = (LPCFHOOKPROC)NULL; 
-    cf.lpTemplateName = (LPSTR)NULL; 
-    cf.hInstance = (HINSTANCE) NULL; 
-    cf.lpszStyle = (LPSTR)NULL; 
-    cf.nFontType = SCREEN_FONTTYPE; 
-    cf.nSizeMin = 0; 
-    cf.nSizeMax = 0; 
- 
-    // Display the CHOOSEFONT common-dialog box. 
- 
-    if ( ChooseFont(&cf) ) 
+
+    // Initialize members of the CHOOSEFONT structure.
+
+    cf.lStructSize = sizeof(CHOOSEFONT);
+    cf.hwndOwner = (HWND)NULL;
+    cf.hDC = (HDC)NULL;
+    cf.lpLogFont = &lf;
+    cf.iPointSize = 0;
+    cf.Flags = CF_SCREENFONTS;
+    cf.rgbColors = RGB(0,0,0);
+    cf.lCustData = 0L;
+    cf.lpfnHook = (LPCFHOOKPROC)NULL;
+    cf.lpTemplateName = (LPSTR)NULL;
+    cf.hInstance = (HINSTANCE) NULL;
+    cf.lpszStyle = (LPSTR)NULL;
+    cf.nFontType = SCREEN_FONTTYPE;
+    cf.nSizeMin = 0;
+    cf.nSizeMax = 0;
+
+    // Display the CHOOSEFONT common-dialog box.
+
+    if ( ChooseFont(&cf) )
     {
-       // Create a logical font based on the user's 
-       // selection and return a handle identifying 
-       // that font. 
+       // Create a logical font based on the user's
+       // selection and return a handle identifying
+       // that font.
        hfont = CreateFontIndirect(cf.lpLogFont);
-       
+
        //MessageBox( NULL, "Fin qua sono arrivato", "Error", MB_OK | MB_ICONINFORMATION );
-       
+
        if ( hb_pcount()>=1 )
        {
 
@@ -139,26 +139,26 @@ HB_FUNC ( WG_CHOOSEFONT )
     }
     else
        hfont = 0;
-       
-    hb_retnl( (long) hfont ); 
-} 
 
-HB_FUNC ( WG_CREATEFONTINDIRECT ) 
-{ 
-    LOGFONT lf; 
+    hb_retnl( (long) hfont );
+}
+
+HB_FUNC ( WG_CREATEFONTINDIRECT )
+{
+    LOGFONT lf;
     HFONT hfont;
-    
+
     PHB_ITEM pObject  = hb_param( 1, HB_IT_OBJECT );
 
     memcpy(&lf,&mylf,sizeof(LOGFONT));
 
     hfont = CreateFontIndirect(&mylf);
- 
+
        //MessageBox( NULL, "Fin qua sono arrivato", "Error", MB_OK | MB_ICONINFORMATION );
-       
+
        if ( hb_pcount()>=1 )
        {
-       
+
          // Fill TFont object with real values
          WG_SetObjectDataLong( pObject, "NHANDLE", (long) hfont );                // nHandle
          WG_SetObjectDataLong( pObject, "NHEIGHT", lf.lfHeight );                 // nHeight
@@ -180,7 +180,7 @@ HB_FUNC ( WG_CREATEFONTINDIRECT )
 
     hb_retnl( (long) hfont );
 
-} 
+}
 
 
 HB_FUNC ( CONVERTPOINTSTOLU )
@@ -190,11 +190,11 @@ HB_FUNC ( CONVERTPOINTSTOLU )
   long lfHeight;
 
   hDC = GetDC ( HWND_DESKTOP ) ;
-  
+
   lfHeight = -MulDiv( nPointSize, GetDeviceCaps(hDC, LOGPIXELSY), 72);
-  
+
   ReleaseDC ( HWND_DESKTOP, hDC ) ;
-  
+
   hb_retnl( lfHeight );
-  
+
 }

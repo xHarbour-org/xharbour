@@ -1,5 +1,5 @@
 /*
- *  $Id: ftoc.c,v 1.1 2003/03/04 21:04:35 lculik Exp $
+ *  $Id: ftoc.c,v 1.2 2003/09/08 12:56:52 druzus Exp $
  */
 
 /*
@@ -63,20 +63,20 @@
  *  $ONELINER$
  *  $SYNTAX$
  *      FTOC( <nFloatingPointNumber> ) --> cFloatingPointNumber
- *           
+ *
  *  $ARGUMENTS$
  *      <nFloatingPointNumber> Designate any Harbour number.
  *
  *  $RETURNS$
  *      FTOC() return a string with the size of DOUBLE.
- *      ATTENTION: different implementations or platforms of Harbour, they 
+ *      ATTENTION: different implementations or platforms of Harbour, they
  *      could produce different format in the string returned by FTOC().
  *
  *  $DESCRIPTION$
  *      Harbour internal numbers in Floating Point are stored in data type
  *      DOUBLE. FTOC() returns these bits as an string. In this way,
  *      numbers con be saved more compactly.
- *      
+ *
  *      TODO: add documentation
  *  $EXAMPLES$
  *  $TESTS$
@@ -94,7 +94,7 @@
 
 HB_FUNC( FTOC )
 {
-   union 
+   union
    {
       double value;
       char   string[ sizeof( double )];
@@ -114,11 +114,11 @@ HB_FUNC( FTOC )
  *  $ONELINER$
  *  $SYNTAX$
  *      CTOF( <cFloatingPointNumber> ) --> nFloatingPointNumber
- *           
+ *
  *  $ARGUMENTS$
  *      <cFloatingPointNumber> Designate a string that contains a Harbour
  *      number in flotaing point format.
- *      ATTENTION: different implementations or platforms of Harbour, they 
+ *      ATTENTION: different implementations or platforms of Harbour, they
  *      could produce different format in the string returned by FTOC().
  *
  *  $RETURNS$
@@ -128,7 +128,7 @@ HB_FUNC( FTOC )
  *  $DESCRIPTION$
  *      Character strings created with FTOC() or XTOC() are convert into
  *      Harbour floating point number
- *      
+ *
  *      TODO: add documentation
  *  $EXAMPLES$
  *  $TESTS$
@@ -146,7 +146,7 @@ HB_FUNC( FTOC )
 
 HB_FUNC( CTOF )
 {
-   union 
+   union
    {
       double value;
       char   string[ sizeof( double )];
@@ -155,7 +155,7 @@ HB_FUNC( CTOF )
 
   if (hb_parclen( 1 ) == sizeof( double ))
   {
-    pcString = hb_parc( 1 );
+    pcString = hb_parcx( 1 );
 
     memcpy( xConvert.string, pcString, sizeof(double) );
     hb_retnd( xConvert.value );

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: video.c,v 1.1 2004/03/04 00:27:39 likewolf Exp $
  *
  * xHarbour Project source code:
  *
@@ -137,13 +137,13 @@ HB_FUNC( CHARPIX )
 
 HB_FUNC( SETFONT )
 {
-   char *font = hb_parc( 1 );
+   char *font = hb_parcx( 1 );
    int len = hb_parclen( 1 );
    int area = hb_parni( 2 );
    int offset = 0;
    int count = 256;
    int height = 16;
-   
+
    if ( !area )
      area = 1;
    if ( ISNUM( 3 ) )
@@ -153,11 +153,11 @@ HB_FUNC( SETFONT )
    if ( ISLOG( 3 ) )
      if ( hb_parl( 3 ) && count != 0 )
        height = len / count;
-   
+
 #ifdef __DJGPP__
    {
       __dpmi_regs r;
-      
+
       r.x.ax = 0x1100; /* Load user-defined text-mode display font */
       r.h.bl = area - 1;
       r.h.bh = height;
@@ -169,7 +169,7 @@ HB_FUNC( SETFONT )
       __dpmi_int( 0x10, &r );
    }
 #endif
-   
+
    hb_retni( 0 );
 }
 
@@ -219,7 +219,7 @@ HB_FUNC( VGAPALETTE )
    char *color_string;
    char red, green, blue;
    char attr = 0;
-   
+
    if ( hb_pcount() < 4 )
    {
       /* Resetting palette registers to default values is not supported yet */
@@ -233,8 +233,8 @@ HB_FUNC( VGAPALETTE )
    else if ( ISCHAR( 1 ) )
    {
       char *s;
-      
-      color_string = hb_parc( 1 );
+
+      color_string = hb_parcx( 1 );
       for ( s = color_string; *s; s++ )
       {
          switch ( UPCASE( *s ) )
@@ -260,7 +260,7 @@ HB_FUNC( VGAPALETTE )
       hb_retl( FALSE );
       return;
    }
-   
+
    red = hb_parni( 2 );
    green = hb_parni( 3 );
    blue = hb_parni( 4 );
@@ -269,24 +269,24 @@ HB_FUNC( VGAPALETTE )
    {
       __dpmi_regs r;
       int iflag;
-      
+
       /* Get palette register for this attribute to BH using BIOS -
        * I couldn't manage to get it through ports */
       r.x.ax = 0x1007;
       r.h.bl = attr;
       __dpmi_int( 0x10, &r );
-      
+
       iflag = __dpmi_get_and_disable_virtual_interrupt_state();
-      
+
       /* Wait for vertical retrace (for old VGA cards) */
       while ( inportb( 0x3DA ) & 8 );
       while ( !( inportb( 0x3DA ) & 8 ) );
-      
+
       outportb( 0x3C8, r.h.bh );
       outportb( 0x3C9, red );
       outportb( 0x3C9, green );
       outportb( 0x3C9, blue );
-      
+
       if ( iflag )
         __dpmi_get_and_enable_virtual_interrupt_state();
    }
@@ -329,7 +329,7 @@ HB_FUNC( VIDEOTYPE )
 {
 #if defined( __DJGPP__ )
    __dpmi_regs r;
-   
+
    r.h.ah = 0x12; /* Alternate Select */
    r.h.bl = 0x10; /* Get EGA info */
    __dpmi_int( 0x10, &r );

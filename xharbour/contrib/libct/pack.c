@@ -1,5 +1,5 @@
 /*
- * $Id: pack.c,v 1.3 2004/02/10 13:16:18 andijahja Exp $
+ * $Id: pack.c,v 1.4 2004/02/20 02:10:13 likewolf Exp $
  *
  * xHarbour Project source code:
  * CT3 CHARPACK() and CHARUNPACK() functions.
@@ -92,8 +92,8 @@
 HB_FUNC( CHARPACK )
 {
    unsigned len = hb_parclen(1);
-   unsigned char *in = (unsigned char*) hb_parc(1);
-   
+   unsigned char *in = (unsigned char*) hb_parcx(1);
+
    if (hb_parni(2) == 0)
    {
       unsigned char *out = (unsigned char *) hb_xgrab(len * 3 + 2);
@@ -101,12 +101,12 @@ HB_FUNC( CHARPACK )
 
       out[n_out++] = 158;
       out[n_out++] = 158;
-      
+
       while (n_in < len)
       {
          int n_count = 1, n_max = HB_MIN(255, len - n_in);
          unsigned char c = in[n_in];
-         
+
          while (n_count < n_max && in[n_in + n_count] == c)
            n_count++;
          out[n_out++] = 0;
@@ -173,10 +173,10 @@ HB_FUNC( CHARUNPACK )
    unsigned buf_size = 32768;
    unsigned len = hb_parclen(1);
    unsigned out_len = 0;
-   unsigned char *in = (unsigned char*) hb_parc(1);
+   unsigned char *in = (unsigned char*) hb_parcx(1);
    unsigned char *out;
    unsigned i;
-   
+
    if (hb_parni(2) == 0)
    {
       if (!(in[0] == 158 && in[1] == 158))

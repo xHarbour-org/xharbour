@@ -1,5 +1,5 @@
 /*
- * $Id: chdir.c,v 1.2 2002/03/29 19:47:18 dholm Exp $
+ * $Id: chdir.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
  */
 
 /* File......: CHDIR.ASM
@@ -76,7 +76,7 @@ Ends     _NanFor
 End
 */
 /* This is the New one Rewriten in C*/
- 
+
 #include "extend.h"
 #if defined(HB_OS_DOS)
 #include "dos.h"
@@ -88,7 +88,7 @@ HB_FUNC( FT_CHDIR)
    {
 
     int Status;
-    char *path=hb_parc(1);
+    char *path=hb_parcx(1);
     union REGS regs;
     struct SREGS sregs;
     segread(&sregs);

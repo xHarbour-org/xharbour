@@ -1,10 +1,10 @@
 /*
- * $Id: disk.c,v 1.4 2004/02/26 18:58:52 lculik Exp $
+ * $Id: disk.c,v 1.5 2004/03/03 19:27:13 likewolf Exp $
  */
 /*
  * xHarbour Project source code:
  * LibCT (Clipper Tools) Disk, File and Directory management.
- * 
+ *
  * Copyright 2004 Eduardo Fernandes <eduardo@modalsistemas.com.br>
  * DeleteFile()  - Ready. Source is in "disk.c"
  * DirMake()     - Ready. Already exist a MakeDir() function in xHarbour RT Library, but
@@ -12,7 +12,7 @@
  * DirName()     - Ready.
  * DriveType()   - Ready.
  * FileMove()    - Ready.
- * 
+ *
  * Copyright 2004 Phil Krylov <phil@newstar.rinet.ru>
  * NUMDISKL()
  *
@@ -141,8 +141,8 @@
  */
 HB_FUNC ( DELETEFILE )
 {
- 
-   BYTE * pFileName  = ( BYTE *) hb_parc( 1 ) ;
+
+   BYTE * pFileName  = ( BYTE *) hb_parcx( 1 ) ;
    int iRet;
 
    if ( hb_fsDelete( (BYTE*) pFileName) )
@@ -207,7 +207,7 @@ HB_FUNC ( DELETEFILE )
 HB_FUNC ( DIRMAKE )
 {
 
-   BYTE * pFileName  = ( BYTE *) hb_parc( 1 ) ;
+   BYTE * pFileName  = ( BYTE *) hb_parcx( 1 ) ;
    int iRet;
 
    if ( hb_fsMkDir( pFileName ) )
@@ -342,7 +342,7 @@ HB_FUNC ( DRIVETYPE )
 {
    #if defined(HB_OS_WIN_32)
       unsigned int uiType;
-      char * pDrive = hb_parc( 1 );
+      char * pDrive = hb_parcx( 1 );
 
       if ( strstr( pDrive, ":" ) == NULL )
       {
@@ -447,8 +447,8 @@ HB_FUNC ( DRIVETYPE )
  */
 HB_FUNC ( FILEMOVE )
 {
-   BYTE * pSourceFile = ( BYTE *) hb_parc( 1 );
-   BYTE *  pTargetFile = ( BYTE *) hb_parc( 2 );
+   BYTE * pSourceFile = ( BYTE *) hb_parcx( 1 );
+   BYTE *  pTargetFile = ( BYTE *) hb_parcx( 2 );
    int iRet;
 
    if (hb_fsRename( pSourceFile , pTargetFile ) )
@@ -496,11 +496,11 @@ HB_FUNC( NUMDISKL )
 #if defined( __DJGPP__ )
 {
    unsigned cur_drive, n_drives;
-   
+
    _dos_getdrive( &cur_drive );
    _dos_setdrive( cur_drive, &n_drives );
    hb_retni( n_drives );
-}   
+}
 #else
 {
    /* should be easily implementable somehow similar to DJGPP */

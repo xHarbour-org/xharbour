@@ -1,5 +1,5 @@
 /*
- * $Id: bit1.c,v 1.2 2003/09/08 12:56:52 druzus Exp $
+ * $Id: bit1.c,v 1.3 2004/01/18 04:25:14 likewolf Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ static long __numfun( int iPCount, USHORT (*operation)(USHORT wNum1, USHORT wNum
  *  $ONELINER$
  *      Bitwise logical AND operation on 16-bit numbers
  *  $SYNTAX$
- *      NUMAND( <nWORD1|cHexWORD1>, <nWORD2|cHexWORD2>[, ..<nWORDn|cHexWORDn>) 
+ *      NUMAND( <nWORD1|cHexWORD1>, <nWORD2|cHexWORD2>[, ..<nWORDn|cHexWORDn>)
  *            -> <nWordAND>
  *  $ARGUMENTS$
  *  $RETURNS$
@@ -115,7 +115,7 @@ HB_FUNC( NUMAND )
  *  $ONELINER$
  *      Bitwise logical OR operation on 16-bit numbers
  *  $SYNTAX$
- *      NUMOR( <nWORD1|cHexWORD>1, <nWORD2|cHexWORD2>[, ..<nWORDn|cHexWORDn>) 
+ *      NUMOR( <nWORD1|cHexWORD>1, <nWORD2|cHexWORD2>[, ..<nWORDn|cHexWORDn>)
  *           -> <nWordOR>
  *  $ARGUMENTS$
  *  $RETURNS$
@@ -234,7 +234,7 @@ HB_FUNC( NUMNOT )
  *  $ONELINER$
  *      Bitwise ROL (rotate left) operation on 16-bit numbers
  *  $SYNTAX$
- *      NUMROL( <nWORD1|cHexWORD1>, <nWORD1|cHexWORD1>[, <lLowByte>] ) 
+ *      NUMROL( <nWORD1|cHexWORD1>, <nWORD1|cHexWORD1>[, <lLowByte>] )
  *            -> <nWordROL>
  *  $ARGUMENTS$
  *  $RETURNS$
@@ -272,14 +272,14 @@ HB_FUNC( NUMROL )
   }
   else
     usBytes = 16;
-  
+
   usNum2 = usNum2 % usBytes;          /* Set usNum2 < usBytes  */
 
   usPattern = (-1) << usBytes;
 
   usTestRol = 1 << ( usBytes - 1 );   /* Pattern to test the MSB */
 
-  usNumBak = usNum1 & usPattern;      /* usNumBak contain the section 
+  usNumBak = usNum1 & usPattern;      /* usNumBak contain the section
                                          to doesn't ROL               */
 
   for (usFor = 1; usFor <= usNum2; usFor++)
@@ -332,7 +332,7 @@ HB_FUNC ( NUMMIRR )
   USHORT  usNum1, usBytes, usFor, usPattern = 0, usNumBak, usMirror = 0;
 
   usNum1 = (USHORT) __getparam( 1 );
-  
+
   if ( ISLOG( 2 ) )                   /* if 3th parameter is LOGICAL */
   {
     if ( hb_parl( 2 ) )
@@ -355,7 +355,7 @@ HB_FUNC ( NUMMIRR )
   {
     if ( usNum1 & 1 )
     {
-                                 
+
        usMirror = usMirror << 1;  /* if the LSB of usNum1 == 1 then */
        usMirror = usMirror | 1;   /* set the LSB of usMirror = 1    */
     }
@@ -377,7 +377,7 @@ HB_FUNC ( NUMMIRR )
 
 HB_FUNC ( HEX2NUM )
 {
-  hb_retnl( __hex2int( hb_parc( 1 ), hb_parclen( 1 ) ) );
+  hb_retnl( __hex2int( hb_parcx( 1 ), hb_parclen( 1 ) ) );
 }
 */
 
@@ -398,7 +398,7 @@ static USHORT __hex2int( char *cNum1, int iLenHex )
 
      if ((iNum < 0) || (iNum > 0x0F))
        break;
-     
+
      uiHexNum += (USHORT) iNum * (1 << (4 * ( iLenHex - i - 1 )));
      i--;
   }
@@ -410,7 +410,7 @@ static USHORT __getparam( int iParam )
 {
 
   if ( ISCHAR( iParam ) )
-     return  __hex2int( hb_parc( iParam ), hb_parclen( iParam ) );
+     return  __hex2int( hb_parcx( iParam ), hb_parclen( iParam ) );
   else
      return (USHORT) hb_parnl( iParam );
 
@@ -479,7 +479,7 @@ static long __numfun( int iPCount, USHORT (*operation)(USHORT wNum1, USHORT wNum
            uiNum1 = uiNumOp;
         }
 
-     }                 
+     }
 
   }
   else

@@ -39,7 +39,7 @@ HB_FUNC( MODIFYMENU )
   UINT uPosition         = (UINT)  hb_parni(2);        // item that new item precedes
   UINT uFlags            = (UINT)  hb_parni(3);        // options
   UINT_PTR uIDNewItem    = (UINT_PTR) hb_parni(4);     // identifier, menu, or submenu
-  LPCTSTR lpNewItem      = (LPCTSTR)  hb_parc(5);      // menu item content
+  LPCTSTR lpNewItem      = (LPCTSTR)  hb_parcx(5);      // menu item content
 
   hb_retl( (BOOL) ModifyMenu( hMenu, uPosition, uFlags, uIDNewItem, lpNewItem ) );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2592 2004/03/17 21:36:34 lculik Exp $
+ * $Id: ChangeLog,v 1.2593 2004/03/18 02:12:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,178 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2004-03-17 19:34 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbapi.h
+    + added hb_parcx()
+
+  * source/vm/arrays.c
+    ! Fixed GPG traps in hb_arrayGetC*()
+    ! Fixed hb_arrayGetCPtr() to return NULL on failures.
+    % Optimized hb_arrayGet*()
+
+  * source/vm/extend.c
+    * Renamed hb_parc() to hb_parcx()
+    + Added Clipper compatible hb_parc()
+
+  * source/clipsamp/environ.c
+  * source/clipsamp/gauge.c
+  * source/clipsamp/num.c
+  * source/clipsamp/status.c
+  * source/clipsamp/time.c
+  * source/odbc/odbc.c
+  * source/rdd/dbcmd.c
+  * source/rtl/ampm.c
+  * source/rtl/box.c
+  * source/rtl/cdpapi.c
+  * source/rtl/colorind.c
+  * source/rtl/console.c
+  * source/rtl/copyfile.c
+  * source/rtl/dateshb.c
+  * source/rtl/datesx.c
+  * source/rtl/dirdrive.c
+  * source/rtl/direct.c
+  * source/rtl/diskspac.c
+  * source/rtl/disksphb.c
+  * source/rtl/fnsplit.c
+  * source/rtl/fparse.c
+  * source/rtl/fssize.c
+  * source/rtl/fstemp.c
+  * source/rtl/gete.c
+  * source/rtl/hbhex2n.c
+  * source/rtl/hboutdbg.c
+  * source/rtl/hbsrlraw.c
+  * source/rtl/hbsyslog.c
+  * source/rtl/inkey.c
+  * source/rtl/is.c
+  * source/rtl/isprint.c
+  * source/rtl/langapi.c
+  * source/rtl/memoline.c
+  * source/rtl/mlcount.c
+  * source/rtl/mlctopos.c
+  * source/rtl/mlpos.c
+  * source/rtl/mouseapi.c
+  * source/rtl/mpostolc.c
+  * source/rtl/mtran.c
+  * source/rtl/oldbox.c
+  * source/rtl/padc.c
+  * source/rtl/padl.c
+  * source/rtl/padr.c
+  * source/rtl/philes.c
+  * source/rtl/philesx.c
+  * source/rtl/pplib.c
+  * source/rtl/rat.c
+  * source/rtl/regex.c
+  * source/rtl/replic.c
+  * source/rtl/run.c
+  * source/rtl/samples.c
+  * source/rtl/saverest.c
+  * source/rtl/set.c
+  * source/rtl/setcolor.c
+  * source/rtl/strdel.c
+  * source/rtl/strmatch.c
+  * source/rtl/stuff.c
+  * source/rtl/teditorl.c
+  * source/rtl/tprinter.c
+  * source/rtl/trace.c
+  * source/rtl/win32ole.prg
+  * source/rtl/gtnul/gtext.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/vm/classes.c
+  * source/vm/cmdarg.c
+  * source/vm/dynsym.c
+  * source/vm/errorapi.c
+  * source/vm/inet.c
+  * source/vm/memvars.c
+  * source/vm/runner.c
+  * tests/pp_harb.ch
+    * Renamed all instances of hb_parc() to hb_parcx()
+
+  * contrib/WoopGUI/source/CApplication.c
+  * contrib/WoopGUI/source/CDialog.c
+  * contrib/WoopGUI/source/CFont.c
+  * contrib/WoopGUI/source/CMenu.c
+  * contrib/WoopGUI/source/CStatusBar.c
+  * contrib/WoopGUI/source/CToolTip.c
+  * contrib/WoopGUI/source/CWindow.c
+  * contrib/WoopGUI/source/CWindowDef.c
+  * contrib/firebird/firebird.c
+  * contrib/hbzlib/zip.c
+  * contrib/libct/bit1.c
+  * contrib/libct/bit2.c
+  * contrib/libct/bit3.c
+  * contrib/libct/ctchksum.c
+  * contrib/libct/ctcrypt.c
+  * contrib/libct/disk.c
+  * contrib/libct/files.c
+  * contrib/libct/ftoc.c
+  * contrib/libct/misc1.c
+  * contrib/libct/net.c
+  * contrib/libct/numlohi.c
+  * contrib/libct/pack.c
+  * contrib/libct/print.c
+  * contrib/libct/video.c
+  * contrib/libct/alt/ctcolton.c
+  * contrib/libmisc/hb_f.c
+  * contrib/libmisc/strfmt.c
+  * contrib/libmisc/stringsx.c
+  * contrib/libnf/chdir.c
+  * contrib/libnf/color2n.c
+  * contrib/libnf/dispc.c
+  * contrib/libnf/ftattr.c
+  * contrib/libnf/getver.c
+  * contrib/libnf/mkdir.c
+  * contrib/libnf/proper.c
+  * contrib/libnf/rmdir.c
+  * contrib/libnf/stod.c
+  * contrib/mysql/mysql.c
+  * contrib/pgsql/postgres.c
+  * contrib/rdd_ads/adsfunc.c
+  * contrib/rdd_ads/adsmgmnt.c
+  * contrib/tip/base64x.c
+  * contrib/tip/encoding/base64.c
+  * contrib/tip/encoding/uuencode.c
+  * contrib/what32/source/_WinTBar.c
+  * contrib/what32/source/_WinTree.c
+  * contrib/what32/source/_winbmp.c
+  * contrib/what32/source/_wincdlg.c
+  * contrib/what32/source/_winclpb.c
+  * contrib/what32/source/_wincomm.c
+  * contrib/what32/source/_windate.c
+  * contrib/what32/source/_windc.c
+  * contrib/what32/source/_windir.c
+  * contrib/what32/source/_windlg.c
+  * contrib/what32/source/_windll.c
+  * contrib/what32/source/_windraw.c
+  * contrib/what32/source/_winfont.c
+  * contrib/what32/source/_wingdi.c
+  * contrib/what32/source/_winicon.c
+  * contrib/what32/source/_winilst.c
+  * contrib/what32/source/_wininet.c
+  * contrib/what32/source/_winini.c
+  * contrib/what32/source/_winkbrd.c
+  * contrib/what32/source/_winlv.c
+  * contrib/what32/source/_winmapi.c
+  * contrib/what32/source/_winmenu.c
+  * contrib/what32/source/_winmeta.c
+  * contrib/what32/source/_winmisc.c
+  * contrib/what32/source/_winmous.c
+  * contrib/what32/source/_winmsg.c
+  * contrib/what32/source/_winprn.c
+  * contrib/what32/source/_winreg.c
+  * contrib/what32/source/_winserial.c
+  * contrib/what32/source/_winshell.c
+  * contrib/what32/source/_winsock.c
+  * contrib/what32/source/_winsys.c
+  * contrib/what32/source/_wintab.c
+  * contrib/what32/source/_wintext.c
+  * contrib/what32/source/_winwnd.c
+  * contrib/xVisual/edcolor.c
+  * contrib/xwt/src/xwt_api.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_msgbox.c
+  * contrib/xwt/src/xwt_win/xwt_win_msgbox.c
+    * Renamed all instances of hb_parc() to hb_parcx()
 
 2004-03-17 18:20 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/compiler/harbour.sly

@@ -1,17 +1,17 @@
 /*
- * $Id: print.c,v 1.1 2003/03/04 21:04:47 lculik Exp $
+ * $Id: print.c,v 1.2 2004/03/03 19:27:13 likewolf Exp $
  */
 
 /*
  * Harbour Project source code:
  * CT3 Printer functions:
- * 
+ *
  * PRINTSTAT(), PRINTREADY()
  * Copyright 2001 Walter Negro - FOEESITRA" <waltern@foeesitra.org.ar>
- * 
+ *
  * PRINTSEND()
  * Copyright 2004 Phil Krylov <phil@newstar.rinet.ru>
- * 
+ *
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -200,9 +200,9 @@ HB_FUNC( PRINTSEND )
 {
 #ifdef __DJGPP__
    __dpmi_regs r;
-   
+
    r.x.dx = hb_parni( 2 ) - 1;
-   
+
    if ( ISNUM( 1 ) )
    {
       r.h.al = hb_parni( 1 );
@@ -211,9 +211,9 @@ HB_FUNC( PRINTSEND )
         hb_retni( 1 );
       else hb_retni( 0 );
    } else if ( ISCHAR( 1 ) ) {
-      char *string = hb_parc( 1 );
+      char *string = hb_parcx( 1 );
       int i, len = hb_parclen( 1 );
-      
+
       r.h.ah = 0;
       for (i = 0; i < len && !( r.h.ah & 1 ); i++)
       {

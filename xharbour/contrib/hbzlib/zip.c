@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.25 2004/03/03 21:11:22 andijahja Exp $
+ * $Id: zip.c,v 1.27 2004/03/04 13:48:47 andijahja Exp $
  */
 
 /*
@@ -359,7 +359,7 @@ HB_FUNC( HB_ZIPFILE )
            hb_itemCopy( &iProgress, pProgress );
          }
 
-         strcpy( szFile, hb_parc( 1 ) );
+         strcpy( szFile, hb_parcx( 1 ) );
          szZipFileName = hb___CheckFile( szFile );
 
          if ( FileToZip.item.asArray.value->ulLen > 0 )
@@ -369,7 +369,7 @@ HB_FUNC( HB_ZIPFILE )
                                     ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
                                     hb_param( 4, HB_IT_BLOCK ),
                                     ISLOG( 5 ) ? hb_parl( 5 ) : 0,
-                                    ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
+                                    ISCHAR( 6 ) ? hb_parcx( 6 ) : NULL,
                                     ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                     ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                                     &iProgress );
@@ -391,7 +391,7 @@ HB_FUNC( HB_GETFILESINZIP )
    {
       char szFile[ _POSIX_PATH_MAX ];
       char *szZipFileName;
-      strcpy( szFile, hb_parc( 1 ) );
+      strcpy( szFile, hb_parcx( 1 ) );
 
       szZipFileName = hb___CheckFile( szFile );
 
@@ -405,7 +405,7 @@ HB_FUNC( HB_GETFILESINZIP )
 
 HB_FUNC( HB_ZIPWITHPASSWORD )
 {
-   hb_retl( hb_IsPassWord( hb_parc( 1 ) ) );
+   hb_retl( hb_IsPassWord( hb_parcx( 1 ) ) );
 }
 
 HB_FUNC( HB_GETFILECOUNT )
@@ -416,7 +416,7 @@ HB_FUNC( HB_GETFILECOUNT )
    {
       char szFile[ _POSIX_PATH_MAX ];
       char *szZipFileName;
-      strcpy( szFile, hb_parc( 1 ) );
+      strcpy( szFile, hb_parcx( 1 ) );
 
       szZipFileName = hb___CheckFile( szFile );
 
@@ -455,7 +455,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
            hb_itemCopy( &iProgress, pProgress );
          }
 
-         strcpy( szFile, hb_parc( 1 ) );
+         strcpy( szFile, hb_parcx( 1 ) );
          szZipFileName = hb___CheckFile( szFile );
 
          if ( FileToZip.item.asArray.value->ulLen > 0 )
@@ -465,7 +465,7 @@ HB_FUNC( HB_ZIPFILEBYTDSPAN )
                                  ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
                                  hb_param( 4, HB_IT_BLOCK ),
                                  ISLOG( 5 ) ? hb_parl( 5 ) : 0,
-                                 ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
+                                 ISCHAR( 6 ) ? hb_parcx( 6 ) : NULL,
                                  ISNUM( 7 ) ? hb_parni( 7 ) : 0,
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                                  ISLOG( 9 ) ? hb_parl( 9 ) : 0,
@@ -509,7 +509,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
            hb_itemCopy( &iProgress, pProgress );
          }
 
-         strcpy( szFile, hb_parc( 1 ) );
+         strcpy( szFile, hb_parcx( 1 ) );
          szZipFileName = hb___CheckFile( szFile );
 
          if ( FileToZip.item.asArray.value->ulLen > 0 )
@@ -519,7 +519,7 @@ HB_FUNC( HB_ZIPFILEBYPKSPAN )
                                  ISNUM( 3 ) ? hb_parni( 3 ) : ( -1 ),
                                  hb_param( 4, HB_IT_BLOCK ),
                                  ISLOG( 5 ) ? hb_parl( 5 ) : 0,
-                                 ISCHAR( 6 ) ? hb_parc( 6 ) : NULL,
+                                 ISCHAR( 6 ) ? hb_parcx( 6 ) : NULL,
                                  ISLOG( 7 ) ? hb_parl( 7 ) : 0,
                                  ISLOG( 8 ) ? hb_parl( 8 ) : 0,
                                  &iProgress );
@@ -554,7 +554,7 @@ HB_FUNC( HB_UNZIPFILE )
         hb_itemCopy( &iProgress, pProgress );
       }
 
-      strcpy( szFile, hb_parc( 1 ) );
+      strcpy( szFile, hb_parcx( 1 ) );
       szZipFileName = hb___CheckFile( szFile );
 
       UnzipFiles.type = HB_IT_NIL;
@@ -605,8 +605,8 @@ HB_FUNC( HB_UNZIPFILE )
          bRet = hb_UnzipSel( szZipFileName,
                              hb_param( 2, HB_IT_BLOCK ),
                              ISLOG( 3 ) ? hb_parl( 3 ) : 0,
-                             ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
-                             ISCHAR( 5 ) ? hb_parc( 5 ) : ".\\",
+                             ISCHAR( 4 ) ? hb_parcx( 4 ) : NULL,
+                             ISCHAR( 5 ) ? hb_parcx( 5 ) : ".\\",
                              &UnzipFiles,
                              &iProgress );
       }
@@ -641,7 +641,7 @@ HB_FUNC( HB_ZIPDELETEFILES )
          char *szZipFileName;
          int ulLen;
 
-         strcpy( szFile, hb_parc( 1 ) );
+         strcpy( szFile, hb_parcx( 1 ) );
          szZipFileName = hb___CheckFile( szFile );
 
          hb___GetFileNamesFromZip( szZipFileName, TRUE );
@@ -720,7 +720,7 @@ HB_FUNC( HB_ZIPTESTPK )
    char szFile[ _POSIX_PATH_MAX ];
    char *szZipFileName;
 
-   strcpy( szFile, hb_parc( 1 ) );
+   strcpy( szFile, hb_parcx( 1 ) );
    szZipFileName = hb___CheckFile( szFile );
 
    hb_retni( hb_TestForPKS( szZipFileName ) );
@@ -735,12 +735,12 @@ HB_FUNC( HB_SETBUFFER )
 
 HB_FUNC( HB_SETZIPCOMMENT )
 {
-   hb_SetZipComment( hb_parc( 1 ) );
+   hb_SetZipComment( hb_parcx( 1 ) );
 }
 
 HB_FUNC( HB_GETZIPCOMMENT )
 {
-   char *szComment=( char* )hb_GetZipComment( hb_parc( 1 ) );
+   char *szComment=( char* )hb_GetZipComment( hb_parcx( 1 ) );
    hb_retcAdopt( szComment );
 }
 
@@ -771,7 +771,7 @@ HB_FUNC( HB_UNZIPFILEINDEX )
            hb_itemCopy( &iProgress, pProgress );
          }
 
-         strcpy( szFile, hb_parc( 1 ) );
+         strcpy( szFile, hb_parcx( 1 ) );
          szZipFileName = hb___CheckFile( szFile );
 
          hb___GetFileNamesFromZip( szZipFileName, TRUE );
@@ -808,8 +808,8 @@ HB_FUNC( HB_UNZIPFILEINDEX )
             bRet = hb_UnzipSelIndex( szZipFileName,
                                      hb_param( 2, HB_IT_BLOCK ),
                                      ISLOG( 3 ) ? hb_parl( 3 ) : 0,
-                                     ISCHAR( 4 ) ? hb_parc( 4 ) : NULL,
-                                     hb_parc( 5 ),
+                                     ISCHAR( 4 ) ? hb_parcx( 4 ) : NULL,
+                                     hb_parcx( 5 ),
                                      &DelZip,
                                      &iProgress );
          }
@@ -827,7 +827,7 @@ HB_FUNC( HB_UNZIPFILEINDEX )
 /*
 HB_FUNC( HB_ZIPINMEMORY )
 {
-    hb_retl( hb_CreateZipInMemory( hb_parc( 1 ), hb_parc( 2 ) ) );
+    hb_retl( hb_CreateZipInMemory( hb_parcx( 1 ), hb_parcx( 2 ) ) );
 }
 
 HB_FUNC( HB_SAVEZIPFROMMEMORY )
@@ -838,8 +838,8 @@ HB_FUNC( HB_SAVEZIPFROMMEMORY )
 
 HB_FUNC( TRANSFERFROMZIP )
 {
-   hb_retl( hb_TransferFilesFromzip( hb_parc( 1 ),
-                                     hb_parc( 2 ),
+   hb_retl( hb_TransferFilesFromzip( hb_parcx( 1 ),
+                                     hb_parcx( 2 ),
                                      hb_param( 3, HB_IT_ARRAY ) ) );
 }
 

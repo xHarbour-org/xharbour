@@ -1,5 +1,5 @@
 /*
- *  $Id: misc1.c,v 1.1 2002/02/18 23:13:03 mbirdyg Exp $
+ *  $Id: misc1.c,v 1.1 2003/03/04 21:04:40 lculik Exp $
  */
 
 /*
@@ -62,21 +62,21 @@
  *  $ONELINER$
  *  $SYNTAX$
  *      XTOC( <expValue> ) --> cValue
- *           
+ *
  *  $ARGUMENTS$
  *      <expValue> Designate an expression of some of the following data
  *      type: NUMBER, CHARACTER, DATE, LOGICAL.
  *
  *  $RETURNS$
- *      XTOC() return a string with the representation of data type of 
+ *      XTOC() return a string with the representation of data type of
  *      expValue.
- *      ATTENTION: different implementations or platforms of Harbour, they 
+ *      ATTENTION: different implementations or platforms of Harbour, they
  *      could produce different format in the string returned by XTOC() for
  *      data type NUMBER.
  *
  *  $DESCRIPTION$
  *      Each data type always returns a string with a particular fixed length:
- *      
+ *
  *      -----------------------------------------------------------
  *      Data Type    Result Length      Similar function
  *      -----------------------------------------------------------
@@ -85,7 +85,7 @@
  *      Date         8                  DTOS()
  *      String       Unchanged
  *      -----------------------------------------------------------
- *      
+ *
  *      TODO: add documentation
  *  $EXAMPLES$
  *  $TESTS$
@@ -103,7 +103,7 @@
 
 HB_FUNC( XTOC )
 {
-   union 
+   union
    {
       double value;
       char   string[ sizeof( double )];
@@ -112,7 +112,7 @@ HB_FUNC( XTOC )
 
   if (ISCHAR( 1 ))
   {
-    hb_retc( hb_parc( 1 ));
+    hb_retc( hb_parcx( 1 ));
   }
 
   else if (ISNUM( 1 ))
@@ -124,9 +124,9 @@ HB_FUNC( XTOC )
   else if (ISLOG( 1 ))
   {
     if (hb_parl( 1 ) == 0)
-      pcString[0] = 0x46;  
+      pcString[0] = 0x46;
     else
-      pcString[0] = 0x54;  
+      pcString[0] = 0x54;
     hb_retclen( pcString, 1 );
   }
 
@@ -141,6 +141,6 @@ HB_FUNC( XTOC )
     hb_retc( pcString );
   }
 
-   
+
 }
 

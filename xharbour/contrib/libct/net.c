@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.2 2004/01/04 23:15:52 ronpinkas Exp $
+ * $Id: net.c,v 1.3 2004/01/04 23:43:31 lculik Exp $
  *
  * xHarbour Project source code:
  * CT3 NET functions to PC-LAN/MS-NET.
@@ -254,7 +254,7 @@ HB_FUNC ( NETPRINTER )
 
 HB_FUNC ( NETDISK )
 {
-   char *cDrive = ( char *) hb_parc( 1 );
+   char *cDrive = ( char *) hb_parcx( 1 );
    if ( strstr( cDrive, ":" ) == NULL )
    {
       strcat( cDrive, ":" ) ;
@@ -333,9 +333,9 @@ HB_FUNC ( NETREDIR )
 {
 
    DWORD dwResult;
-   char *cLocalDev  = hb_parc( 1 );
-   char *cSharedRes = hb_parc( 2 );
-   char *cPassword  = hb_parc( 3 );
+   char *cLocalDev  = hb_parcx( 1 );
+   char *cSharedRes = hb_parcx( 2 );
+   char *cPassword  = hb_parcx( 3 );
 
    if ( strstr( cLocalDev, ":" ) == NULL )
    {
@@ -470,7 +470,7 @@ HB_FUNC ( NETWORK )
       }
    }
 
-   hb_retl( dwResult == NO_ERROR ? TRUE : FALSE ); 
+   hb_retl( dwResult == NO_ERROR ? TRUE : FALSE );
 }
 /*  $DOC$
  *  $FUNCNAME$

@@ -1,5 +1,5 @@
 /*
- * $Id: stringsx.c,v 1.1 2000/04/23 09:39:45 vszel Exp $
+ * $Id: stringsx.c,v 1.1 2003/04/14 16:09:14 lculik Exp $
  */
 
 #include "hbapi.h"
@@ -17,7 +17,7 @@ char *hb_strtoken(char *szText,
   long wCounter = 0;
 
   HB_TRACE(HB_TR_DEBUG, ("hb_strtoken(%s, %ld, %ld, %d, %p)", szText, lText, lIndex, (int) cDelimiter, lLen));
-   
+
   do
     {
       wStart = wEnd;
@@ -61,13 +61,13 @@ HB_FUNC( STRTOKEN )
 {
   char *szText;
   long lIndex = hb_parnl(2);
-  char cDelimiter = *hb_parc(3);
+  char cDelimiter = *hb_parcx(3);
   long lLen;
 
   if( !cDelimiter )
     cDelimiter = ' ';
 
-  szText = hb_strtoken(hb_parc(1), hb_parclen(1), lIndex, cDelimiter, &lLen);
+  szText = hb_strtoken(hb_parcx(1), hb_parclen(1), lIndex, cDelimiter, &lLen);
 
   hb_stornl(lLen, 4);
   hb_retclen(szText, lLen);
@@ -76,7 +76,7 @@ HB_FUNC( STRTOKEN )
 /* debug function to dump the ASCII values of an entire string */
 HB_FUNC( STRDUMP )
 {
-  char *szText = hb_parc(1);
+  char *szText = hb_parcx(1);
   long i, lLength = hb_parclen(1);
   for( i = 0; i < lLength; i++ )
     printf("%d ", szText[i]);
@@ -87,7 +87,7 @@ HB_FUNC( ROT13 )
 {
   if( ISCHAR(1) )
     {
-      char *szText = hb_parc( 1 );
+      char *szText = hb_parcx( 1 );
       ULONG i, lLen = hb_parclen( 1 );
       char *szResult = (char*)hb_xgrab(lLen + 1);
 

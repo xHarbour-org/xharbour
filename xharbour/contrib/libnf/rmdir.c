@@ -1,5 +1,5 @@
 /*
- * $Id: rmdir.c,v 1.2 2002/03/29 19:47:18 dholm Exp $
+ * $Id: rmdir.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
  */
 
 /* File......: RMDIR.ASM
@@ -88,7 +88,7 @@ HB_FUNC(FT_RMDIR)
 {
 #if defined(HB_OS_DOS)
    int Status;
-   char *path=hb_parc(1);
+   char *path=hb_parcx(1);
    union REGS regs;
    struct SREGS sregs;
    segread(&sregs);

@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: numlohi.c,v 1.1 2004/01/26 01:18:16 likewolf Exp $
  *
  * xHarbour Project source code:
  * CT3 NUMLOW() and NUMHIGH() functions.
@@ -88,11 +88,11 @@
 HB_FUNC( NUMLOW )
 {
    unsigned n;
-   
+
    if (ISNUM(1))
      n = hb_parni(1);
    else
-     sscanf("%x", hb_parc(1), &n);
+     sscanf("%x", hb_parcx(1), &n);
    hb_retni(n & 0xFF);
 }
 
@@ -135,6 +135,6 @@ HB_FUNC( NUMHIGH )
    if (ISNUM(1))
      n = hb_parni(1);
    else
-     sscanf("%x", hb_parc(1), &n);
+     sscanf("%x", hb_parcx(1), &n);
    hb_retni((n >> 8) & 0xFF);
 }

@@ -79,7 +79,7 @@ HB_FUNC ( SETSTATUSBAR )
     HWND hwnd     = (HWND)  hb_parnl (1);    // handle to the StatusBar control
     int  iPart    =         hb_parni (2)-1;  // part of statusbar to write
     int  uFlags   =         hb_parni (3);    // options flags
-    LPSTR szText  = (LPSTR) hb_parc(4);      // text to write
+    LPSTR szText  = (LPSTR) hb_parcx(4);      // text to write
 
     SendMessage(hwnd, SB_SETTEXT, (WPARAM) iPart | uFlags , (LPARAM) (LPSTR) szText );
 }

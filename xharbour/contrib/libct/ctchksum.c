@@ -1,5 +1,5 @@
 /*
- * $Id: ctchksum.c,v 1.2 2001/05/15 13:02:05 vszakats Exp $
+ * $Id: ctchksum.c,v 1.1 2003/03/04 21:04:24 lculik Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 
 HB_FUNC( CHECKSUM )
 {
-   BYTE * pbyString = ( BYTE * ) hb_parc( 1 );
+   BYTE * pbyString = ( BYTE * ) hb_parcx( 1 );
    ULONG ulLen = hb_parclen( 1 );
    ULONG ulPos;
    ULONG ulResult = 0;

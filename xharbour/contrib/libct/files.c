@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.18 2004/03/03 21:45:23 likewolf Exp $
+ * $Id: files.c,v 1.19 2004/03/12 13:56:13 likewolf Exp $
  */
 
 /*
@@ -8,7 +8,7 @@
  *
  * FILESEEK,FILESIZE,FILEATTR,FILETIME,FILEDATE,SETFATTR
  * Copyright 2001 Luiz Rafael Culik <culik@sl.conex.net>
- * 
+ *
  * FILESMAX, SETFDATI
  * Copyright 2004 Phil Krylov <phil@newstar.rinet.ru>
  *
@@ -200,7 +200,7 @@ HB_FUNC( FILEATTR )
    #if defined( HB_OS_DOS )
       #if defined( __DJGPP__ ) || defined( __BORLANDC__ )
       {
-         char *szFile=hb_parc( 1 );
+         char *szFile=hb_parcx( 1 );
          int iAttri=0;
 
          #if defined( __BORLANDC__ ) && ( __BORLANDC__ >= 1280 )
@@ -222,7 +222,7 @@ HB_FUNC( FILEATTR )
    {
       DWORD dAttr;
 
-      LPCTSTR cFile=hb_parc( 1 );
+      LPCTSTR cFile=hb_parcx( 1 );
       dAttr = GetFileAttributes( cFile );
       hb_retnl( dAttr );
 
@@ -243,7 +243,7 @@ HB_FUNC( SETFATTR )
 
          int iFlags;
          int iReturn = 0;
-         const char *szFile=hb_parc( 1 );
+         const char *szFile=hb_parcx( 1 );
 
          if ( ISNUM( 2 ) )
          {
@@ -309,7 +309,7 @@ HB_FUNC( SETFATTR )
       DWORD dwFlags=FILE_ATTRIBUTE_ARCHIVE;
       DWORD dwLastError=ERROR_SUCCESS;
       int iAttr;
-      LPCTSTR cFile=hb_parc( 1 );
+      LPCTSTR cFile=hb_parcx( 1 );
       BOOL lSuccess;
 
       if ( ISNUM( 2 ) )
@@ -372,7 +372,7 @@ HB_FUNC( FILESEEK )
 
       if ( hb_pcount() >= 1 )
       {
-         szFile=hb_parc( 1 );
+         szFile=hb_parcx( 1 );
 /*
          if ( ISNUM( 2 ) )
          {
@@ -424,7 +424,7 @@ HB_FUNC( FILESEEK )
 
       if ( hb_pcount() >=1 )
       {
-         szFiles=hb_parc( 1 );
+         szFiles=hb_parcx( 1 );
 
          if( ISNUM( 2 ) )
          {
@@ -482,7 +482,7 @@ HB_FUNC( FILESIZE )
       int iAttr;
       if ( hb_pcount() >= 1 )
       {
-         szFile=hb_parc( 1 );
+         szFile=hb_parcx( 1 );
 
 
          if ( ISNUM( 2 ) )
@@ -549,7 +549,7 @@ HB_FUNC( FILESIZE )
    int iFind;
    if ( hb_pcount() > 0 )
    {
-      char *szFiles=hb_parc( 1 );
+      char *szFiles=hb_parcx( 1 );
       int iAttr=0 ;
       struct ffblk fsFiles;
 
@@ -583,7 +583,7 @@ HB_FUNC( FILESIZE )
 {
    if ( hb_pcount(  ) >0 )
    {
-      const char *szFile=hb_parc( 1 );
+      const char *szFile=hb_parcx( 1 );
       USHORT   ushbMask = FA_ARCH;
       USHORT   usFileAttr;
       struct stat sStat;
@@ -627,7 +627,7 @@ HB_FUNC( FILEDATE )
 
       if ( hb_pcount(  ) >= 1 )
       {
-         szFile=hb_parc( 1 );
+         szFile=hb_parcx( 1 );
 
 
          if ( ISNUM( 2 ) )
@@ -676,7 +676,7 @@ HB_FUNC( FILEDATE )
    int iFind;
    if ( hb_pcount(  ) >0 )
    {
-      char *szFiles=hb_parc( 1 );
+      char *szFiles=hb_parcx( 1 );
       int iAttr=0 ;
       struct ffblk fsFiles;
 
@@ -702,7 +702,7 @@ HB_FUNC( FILEDATE )
    {
       if ( hb_pcount(  ) >0 )
       {
-         const char *szFile=hb_parc( 1 );
+         const char *szFile=hb_parcx( 1 );
          struct stat sStat;
          time_t tm_t=0;
          char szDate[9];
@@ -750,7 +750,7 @@ HB_FUNC( FILETIME )
    int iAttr;
    if ( hb_pcount(  ) >=1 )
    {
-      szFile=hb_parc( 1 );
+      szFile=hb_parcx( 1 );
 
       if ( ISNUM( 2 ) )
       {
@@ -799,7 +799,7 @@ HB_FUNC( FILETIME )
 
    if ( hb_pcount(  ) >0 )
    {
-      char *szFiles=hb_parc( 1 );
+      char *szFiles=hb_parcx( 1 );
       int iAttr=0 ;
       struct ffblk fsFiles;
 
@@ -829,7 +829,7 @@ HB_FUNC( FILETIME )
 #elif defined( OS_UNIX_COMPATIBLE )
 
 {
-   const char *szFile=hb_parc( 1 );
+   const char *szFile=hb_parcx( 1 );
    struct stat sStat;
    time_t tm_t=0;
    char szTime[9];
@@ -948,10 +948,10 @@ HB_FUNC( SETFDATI )
 {
    if ( hb_pcount() >= 1 )
    {
-      char *szFile = hb_parc( 1 );
+      char *szFile = hb_parcx( 1 );
       char *szDate = NULL, *szTime = NULL;
       int year, month, day, hour = 0, minute = 0, second = 0;
-      
+
       if ( ISDATE( 2 ) || ISDATE( 3 ) )
       {
          szDate = ISDATE(2) ? hb_pards(2) : hb_pards(3);
@@ -959,7 +959,7 @@ HB_FUNC( SETFDATI )
       }
       if ( ISCHAR( 2 ) || ISCHAR( 3 ) )
       {
-         szTime = ISCHAR( 2 ) ? hb_parc( 2 ) : hb_parc( 3 );
+         szTime = ISCHAR( 2 ) ? hb_parcx( 2 ) : hb_parcx( 3 );
          sscanf( szTime, "%2d:%2d:%2d", &hour, &minute, &second );
       }
 
@@ -968,7 +968,7 @@ HB_FUNC( SETFDATI )
          FILETIME ft, local_ft;
          SYSTEMTIME st;
          HANDLE f = (HANDLE)_lopen( szFile, OF_READWRITE | OF_SHARE_COMPAT );
-         
+
          if ( f != (HANDLE)HFILE_ERROR )
          {
             if ( !szDate || !szTime )
@@ -998,17 +998,17 @@ HB_FUNC( SETFDATI )
       {
          struct utimbuf buf;
          struct tm new_value;
-         
+
          if ( !szDate && !szTime )
          {
             hb_retl( utime( szFile, NULL ) == 0 );
             return;
          }
-         
+
          if ( !szDate || !szTime )
          {
             time_t current_time;
-            
+
             current_time = time( NULL );
 #if defined( __DJGPP__ ) || defined( HB_OS_DARWIN )
             new_value = *localtime( &current_time );
@@ -1036,8 +1036,8 @@ HB_FUNC( SETFDATI )
    }
    hb_retl( FALSE );
 }
-      
-   
+
+
 
 HB_FUNC( FILEDELETE )
 {
@@ -1052,7 +1052,7 @@ HB_FUNC( FILEDELETE )
 
    if ( ISCHAR( 1 ) )
    {
-      pDirSpec = hb_fileNameConv( hb_strdup( hb_parc( 1 ) ) );
+      pDirSpec = hb_fileNameConv( hb_strdup( hb_parcx( 1 ) ) );
 
       cCurDsk = hb_fsCurDrv() ;
       pCurDir = hb_fsCurDir( cCurDsk ) ;
@@ -1132,11 +1132,11 @@ HB_FUNC( FILESMAX )
    __dpmi_regs r;
    unsigned handles;
    unsigned long psp;
-   
+
    r.h.ah = 0x62; /* Get PSP address */
    __dpmi_int( 0x21, &r );
    psp = ( ( (unsigned long) r.x.bx ) << 4 ) & 0xFFFFF;
-   
+
    handles = _farpeekw( _dos_ds, psp + 0x32 );
    hb_retni( handles );
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: strfmt.c,v 1.2 2001/05/15 13:02:05 vszakats Exp $
+ * $Id: strfmt.c,v 1.1 2003/04/14 16:09:14 lculik Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 
 HB_FUNC( STRFORMAT )
 {
-   char* pszMask = hb_parc(1);
+   char* pszMask = hb_parcx(1);
    ULONG nMaskLen = hb_parclen(1);
    ULONG nMaskPos;
    ULONG nParNum = hb_pcount();
@@ -82,7 +82,7 @@ HB_FUNC( STRFORMAT )
    for (tmp = 0; tmp < nParNum; tmp++)
    {
       nLenTable[tmp] = hb_parclen(tmp + 2);
-      pszVarTable[tmp] = hb_parc(tmp + 2);
+      pszVarTable[tmp] = hb_parcx(tmp + 2);
    }
 
    nMaskPos = 0;

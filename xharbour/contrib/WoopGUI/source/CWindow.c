@@ -80,11 +80,11 @@ HB_FUNC ( REGISTERCLASSEX )
 
     hInst = hInstance;
 
-    cClassName         = ( hb_pcount()>0 && !ISNIL(1) ) ? hb_parc(1) : "WoopGUIWinClass" ;
-    cIcon              = ( hb_pcount()>1 && !ISNIL(2) ) ? hb_parc(2) : "" ;
+    cClassName         = ( hb_pcount()>0 && !ISNIL(1) ) ? hb_parcx(1) : "WoopGUIWinClass" ;
+    cIcon              = ( hb_pcount()>1 && !ISNIL(2) ) ? hb_parcx(2) : "" ;
     nBkColor           = ( hb_pcount()>2 && !ISNIL(3) ) ? hb_parnl(3) : COLOR_BTNFACE; //COLOR_WINDOW ;
-    cIconSm            = ( hb_pcount()>3 && !ISNIL(4) ) ? hb_parc(4) : "" ;
-    cWndProc           = ( hb_pcount()>4 && !ISNIL(5) ) ? hb_parc(5) : "W_WndProc" ;
+    cIconSm            = ( hb_pcount()>3 && !ISNIL(4) ) ? hb_parcx(4) : "" ;
+    cWndProc           = ( hb_pcount()>4 && !ISNIL(5) ) ? hb_parcx(5) : "W_WndProc" ;
 
     nlpWinProc         = ( cWndProc == "W_DlgProc" ) ? W_DlgProc : W_WndProc ;
 
@@ -130,8 +130,8 @@ HB_FUNC ( REGISTERCLASSEX )
     HICON     hIcon         = (HICON)     hb_parnl(4);    // Handle to the class icon. This member must be a handle to an icon resource. If this member is NULL, the system provides a default icon
     HCURSOR   hCursor       = ( !ISNIL(5) ? (HCURSOR) hb_parnl(5) : LoadCursor(NULL, IDC_ARROW) );    // Handle to the class cursor. This member must be a handle to a cursor resource. If this member is NULL, an application must explicitly set the cursor shape whenever the mouse moves into the application's window.
     int       hbrBackground =             hb_parni(6);    // Handle to the class background brush
-    LPCTSTR   cMenuName     = (LPCTSTR)   hb_parc(7);     // Pointer to a null-terminated character string that specifies the resource name of the class menu, as the name appears in the resource file. If you use an integer to identify the menu, use the MAKEINTRESOURCE macro. If this member is NULL, windows belonging to this class have no default menu
-    LPCTSTR   cClassName    = (LPCTSTR)   hb_parc(8);     // Pointer to a null-terminated string
+    LPCTSTR   cMenuName     = (LPCTSTR)   hb_parcx(7);     // Pointer to a null-terminated character string that specifies the resource name of the class menu, as the name appears in the resource file. If you use an integer to identify the menu, use the MAKEINTRESOURCE macro. If this member is NULL, windows belonging to this class have no default menu
+    LPCTSTR   cClassName    = (LPCTSTR)   hb_parcx(8);     // Pointer to a null-terminated string
     HICON     hIconSm       = (HICON)     hb_parnl(9);    // Handle to a small icon that is associated with the window class. If this member is NULL, the system searches the icon resource specified by the hIcon member for an icon of the appropriate size to use as the small icon
 
     HINSTANCE hInstance = GetModuleHandle( NULL );
@@ -169,7 +169,7 @@ HB_FUNC ( REGISTERCLASSEX )
 HB_FUNC ( UNREGISTERCLASS )
 {
 
-    LPCTSTR cClassName = (LPCTSTR) hb_parc(1);
+    LPCTSTR cClassName = (LPCTSTR) hb_parcx(1);
     HANDLE hInstance   = (HANDLE)  hb_parnl(2);
     BOOL   lOk ;
 
@@ -211,8 +211,8 @@ HB_FUNC ( CREATEWINDOWEX )
                            // Bisogna definire i defaults
     HWND hwnd;
     DWORD nExStyle       = hb_parnd(1);
-    LPCTSTR lcClassName  = (!ISNIL(2) ? (LPCTSTR) hb_parc(2) : szAppName );
-    LPCTSTR cName        = (LPCTSTR) hb_parc(3);
+    LPCTSTR lcClassName  = (!ISNIL(2) ? (LPCTSTR) hb_parcx(2) : szAppName );
+    LPCTSTR cName        = (LPCTSTR) hb_parcx(3);
     DWORD nStyle         = (DWORD) hb_parnd(4);
     int   nX             = hb_parni(6);
     int   nY             = hb_parni(5);
@@ -438,8 +438,8 @@ HB_FUNC ( ENABLEWINDOW )
 //
 HB_FUNC ( FINDWINDOW )
 {
-    LPCTSTR lpszClass   = (LPCTSTR) hb_parc(1);  // class name
-    LPCTSTR lpszWindow  = (LPCTSTR) hb_parc(2);  // window name
+    LPCTSTR lpszClass   = (LPCTSTR) hb_parcx(1);  // class name
+    LPCTSTR lpszWindow  = (LPCTSTR) hb_parcx(2);  // window name
 
     hb_retnl( (long) FindWindow( lpszClass, lpszWindow ) );
 }
@@ -452,8 +452,8 @@ HB_FUNC ( FINDWINDOWEX )
 {
     HWND hwndParent     = (HWND) hb_parnl(1);    // handle to parent window
     HWND hwndChildAfter = (HWND) hb_parnl(2);    // handle to child window
-    LPCTSTR lpszClass   = (LPCTSTR) hb_parc(3);  // class name
-    LPCTSTR lpszWindow  = (LPCTSTR) hb_parc(4);  // window name
+    LPCTSTR lpszClass   = (LPCTSTR) hb_parcx(3);  // class name
+    LPCTSTR lpszWindow  = (LPCTSTR) hb_parcx(4);  // window name
 
     hb_retnl( (long) FindWindowEx( hwndParent, hwndChildAfter, lpszClass, lpszWindow ) );
 }
@@ -610,7 +610,7 @@ HB_FUNC ( GETPARENT )
 HB_FUNC ( GETWINDOWTEXT )
 {
     HWND hwnd           = (HWND) hb_parnl(1);    // handle to window or control
-    LPCTSTR lpString    = (LPCTSTR) hb_parc(2);  // text buffer
+    LPCTSTR lpString    = (LPCTSTR) hb_parcx(2);  // text buffer
     int nMaxCount       =  hb_parni(3);          // maximum number of characters to copy
 
     hb_retni( (int) GetWindowText( hwnd, (char *)&lpString, nMaxCount ) );
@@ -722,7 +722,7 @@ HB_FUNC ( SETPARENT )
 HB_FUNC ( SETWINDOWTEXT )
 {
     HWND hwnd           = (HWND) hb_parnl(1);    // handle to window or control
-    LPCTSTR lpString    = (LPCTSTR) hb_parc(2);  // title or text
+    LPCTSTR lpString    = (LPCTSTR) hb_parcx(2);  // title or text
 
     hb_retl( (BOOL) SetWindowText( hwnd, lpString ) );
 }
@@ -928,12 +928,12 @@ LRESULT CALLBACK W_DlgProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 //  char *cText ;
 //
 //  if (ISBYREF(4)) {
-//     cText = hb_strdup( hb_parc(4) ) ;
+//     cText = hb_strdup( hb_parcx(4) ) ;
 //  }
 //
 //   hb_retnl( (LONG) SendMessage( (HWND) hb_parnl( 1 ), (UINT) hb_parni( 2 ),
 //                                (ISNIL(3) ? 0 : (WPARAM) hb_parnl( 3 ))   ,
-//                                (ISNIL(4) ? 0 : ( ISBYREF(4)? (LPARAM) (LPSTR) cText : ( ISCHAR(4) ? (LPARAM)(LPSTR) hb_parc(4) : (LPARAM) hb_parnl( 4 ))))
+//                                (ISNIL(4) ? 0 : ( ISBYREF(4)? (LPARAM) (LPSTR) cText : ( ISCHAR(4) ? (LPARAM)(LPSTR) hb_parcx(4) : (LPARAM) hb_parnl( 4 ))))
 //                               )
 //            );
 //

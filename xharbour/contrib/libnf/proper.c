@@ -1,5 +1,5 @@
 /*
- * $Id: proper.c,v 1.3 2002/04/15 04:44:46 walito Exp $
+ * $Id: proper.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
  */
 
 /*
@@ -89,7 +89,7 @@ HB_FUNC(FT_PROPER )
   int i, fCap = TRUE; /*, iPos = 0; */
 
   hb_storc( NULL, 1 );
-  cStr = hb_parc(1);
+  cStr = hb_parcx(1);
 
   for( i = 0; i < iLen + 1; i++ ) {
      if( _ftIsAlpha( cStr[i] ) != 0 )  {

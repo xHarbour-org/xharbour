@@ -36,7 +36,7 @@ HB_FUNC ( SETTOOLTIP )
 {
     HWND hwnd      = (HWND) hb_parnl(1);
     HWND hwndTT    = (HWND) hb_parnl(2);    // handle to the ToolTip control
-    char *strTT    = (LPTSTR) hb_parc(3);   // Stringa del tooltip
+    char *strTT    = (LPTSTR) hb_parcx(3);   // Stringa del tooltip
 
           // struct specifying info about tool in ToolTip control
 

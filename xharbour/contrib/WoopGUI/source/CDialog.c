@@ -103,7 +103,7 @@ HB_FUNC ( WG_DIALOGBOX )
 //    SetDlgItemText(
 //       (HWND) hb_parnl( 1 ),   // handle of dialog box
 //       hb_parni( 2 ),         // identifier of control
-//       (LPCTSTR) hb_parc( 3 )  // text to set
+//       (LPCTSTR) hb_parcx( 3 )  // text to set
 //    );
 //}
 //
@@ -172,7 +172,7 @@ HB_FUNC ( GETEDITTEXT )
 //
 HB_FUNC ( COMBOADDSTRING )
 {
-   char *cString = hb_parc( 2 );
+   char *cString = hb_parcx( 2 );
    SendMessage( (HWND) hb_parnl( 1 ), CB_ADDSTRING, 0, (LPARAM) cString );
 }
 
