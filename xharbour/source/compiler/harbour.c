@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.88 2004/10/27 05:27:37 ronpinkas Exp $
+ * $Id: harbour.c,v 1.89 2004/10/28 22:43:56 ronpinkas Exp $
  */
 
 /*
@@ -674,6 +674,8 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
    HB_SYMBOL_UNUSED( cValueType );
 
+   //printf( "Variable: %s\n", szVarName );
+
    if( hb_comp_iVarScope == VS_GLOBAL || hb_comp_iVarScope == VS_EXTERNGLOBAL )
    {
       if( (! hb_comp_bStartProc) && hb_comp_functions.iCount <= 1 )
@@ -711,6 +713,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
    // STATIC vars can not be declared in an Extebded Codeblock <|...| ...>.
    if( hb_comp_functions.iCount > 1 && hb_comp_functions.pLast->szName == NULL && hb_comp_iVarScope == VS_STATIC )
    {
+      printf( "%i Proc: %s\n", hb_comp_functions.iCount, hb_comp_functions.pLast->szName );
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FOLLOWS_EXEC, "STATIC", NULL );
    }
 
@@ -720,6 +723,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
       /* variable defined in a function/procedure */
       hb_compCheckDuplVars( pFunc->pFields, szVarName );
       hb_compCheckDuplVars( pFunc->pStatics, szVarName );
+
       /*NOTE: Clipper warns if PARAMETER variable duplicates the MEMVAR
        * declaration
       */
@@ -727,11 +731,6 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
       {
          hb_compCheckDuplVars( pFunc->pMemvars, szVarName );
       }
-   }
-   else
-   {
-      /* variable defined in a codeblock */
-      hb_comp_iVarScope = VS_PARAMETER;
    }
 
    hb_compCheckDuplVars( hb_comp_pGlobals, szVarName );
@@ -752,6 +751,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
       */
 
       pVar->Extended.pClass = hb_compClassFind( hb_comp_szFromClass );
+
       if( ! pVar->Extended.pClass )
       {
          hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_CLASS_NOT_FOUND, hb_comp_szFromClass, szVarName );
@@ -785,10 +785,12 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
          else
          {
             pLastVar = pFunc->pMemvars;
+
             while( pLastVar->pNext )
             {
                pLastVar = pLastVar->pNext;
             }
+
             pLastVar->pNext = pVar;
          }
       }
@@ -952,11 +954,13 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                else
                {
                   pLastVar = pFunc->pLocals;
+
                   while( pLastVar->pNext )
                   {
                      pLastVar = pLastVar->pNext;
                      wLocal++;
                   }
+
                   pLastVar->pNext = pVar;
                   wLocal++;
                }
@@ -1857,6 +1861,8 @@ PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos )
 static PFUNCTION hb_compFunctionNew( char * szName, HB_SYMBOLSCOPE cScope )
 {
    PFUNCTION pFunc;
+
+   //printf( "Function: %s\n", szName );
 
    pFunc                  = ( PFUNCTION ) hb_xgrab( sizeof( _FUNC ) );
    pFunc->szName          = szName;
@@ -4620,7 +4626,10 @@ void hb_compCodeBlockStart()
 {
    PFUNCTION pBlock;
 
-   pBlock       = hb_compFunctionNew( NULL, HB_FS_STATIC );
+   //printf( "Block start\n" );
+
+   pBlock = hb_compFunctionNew( NULL, HB_FS_STATIC );
+
    pBlock->pOwner       = hb_comp_functions.pLast;
    pBlock->iStaticsBase = hb_comp_functions.pLast->iStaticsBase;
 
@@ -4638,8 +4647,9 @@ void hb_compCodeBlockEnd( void )
    int iLocalPos;
    PVAR pVar, pFree;
 
-   if( hb_comp_functions.pLast &&
-       hb_comp_functions.pLast->iNOOPs )
+   //printf( "Block End\n" );
+
+   if( hb_comp_functions.pLast && hb_comp_functions.pLast->iNOOPs )
    {
       hb_compOptimizeJumps();
    }

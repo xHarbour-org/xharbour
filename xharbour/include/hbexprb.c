@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.83 2004/07/03 03:34:53 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.84 2004/10/27 05:27:36 ronpinkas Exp $
  */
 
 /*
@@ -456,11 +456,13 @@ static HB_EXPR_FUNC( hb_compExprUseCodeblock )
             {
                HB_CBVAR_PTR pVar;
 
+               hb_comp_iVarScope = VS_PARAMETER;
+
                pVar = ( HB_CBVAR_PTR ) pSelf->value.asList.pIndex;
                while( pVar )
                {
-                        hb_compVariableAdd( pVar->szName, pVar->bType );
-                        pVar =pVar->pNext;
+                  hb_compVariableAdd( pVar->szName, pVar->bType );
+                  pVar =pVar->pNext;
                }
             }
 

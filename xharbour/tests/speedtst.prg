@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: speedtst.prg,v 1.2 2003/12/23 13:59:23 druzus Exp $
  */
 
 #define ARR_LEN 16
@@ -20,7 +20,7 @@
     #xtranslate seconds() => fs_seconds()
 #endif
 #ifdef __XHARBOUR__
-    #define ASSOC_ARRAY TAssociativeArray()
+    #define ASSOC_ARRAY Hash()
     #undef REAL_TIME
 #endif
 #ifdef __HARBOUR__
@@ -52,8 +52,8 @@ local i, j, t, c, n, d, bc, tn, total, totalr, aa,;
     local aAssoc := ASSOC_ARRAY
 #endif
 private M_C := dtos(date()),;
-	M_N := 112345.67,;
-	M_D := date()
+   M_N := 112345.67,;
+   M_D := date()
 
 #ifndef __CLIP__
 //#ifdef __XHARBOUR__
@@ -349,7 +349,7 @@ aa:={}
 t:=secondscpu()
 for i:=1 to N_LOOPS
     if i%1000 == 0
-	aa:={}
+   aa:={}
     endif
     aadd(aa,{i,j,c,a,a2,t,bc})
 next
@@ -462,23 +462,23 @@ return space(50000)
         nret = (double) tv.tv_sec + (double) (tv.tv_usec) / 1000000;
 /*
         nret = (double) (tv.tv_sec - tz.tz_minuteswest * 60 ) % 86400 +
-	       (double) tv.tv_usec / 1000000;
+          (double) tv.tv_usec / 1000000;
 */
 }
 #endCinline
     return ( nret )
 
     #ifndef FlagShip5
-	FUNCTION cursesinit()
-	CALL fgsIoctl2
+   FUNCTION cursesinit()
+   CALL fgsIoctl2
 #Cinline
 {
-	#include <fcntl.h>
-	int arg;
-	if ((arg = fcntl(0, F_GETFL, 0)) != -1)
-	    fcntl(0, F_SETFL, arg | O_NONBLOCK);
+   #include <fcntl.h>
+   int arg;
+   if ((arg = fcntl(0, F_GETFL, 0)) != -1)
+       fcntl(0, F_SETFL, arg | O_NONBLOCK);
 }
 #endCinline
-	return nil
+   return nil
     #endif
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3557 2004/10/28 13:59:10 paultucker Exp $
+ * $Id: ChangeLog,v 1.3558 2004/10/28 22:43:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-10-28 18:28 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/hbexprb.c
+  * source/compiler/exproptb.c
+    * Reset hb_comp_iVarScope to VS_PARAMETER in hb_compExprUseCodeblock() before calling hb_compVariableAdd()
+
+  * source/compiler/harbour.c
+    * Minor formatting, and comment.
+
+  * tests/speedtst.prg
+    * Corrected #define of ASSOC_ARRAY to Hash() for __XHARBOUR__
 
 2004-10-28 03:42 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * source/compiler/harbour.c
