@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.131 2004/09/18 00:00:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.132 2004/09/29 00:00:00 modalsist Exp $
  */
 /*
  * Harbour Project source code:
@@ -69,7 +69,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion := "1.131"
+STATIC s_cHbMakeVersion := "1.132"
 STATIC s_lPrint        := .F.
 STATIC s_nHandle
 STATIC s_aDefines      := {}
@@ -1292,7 +1292,7 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL lGenppo          := .f.
    LOCAL x
    LOCAL getlist          := {}
-   LOCAL cTopFile         := Space( 30 )
+   LOCAL cTopFile         := Space( 50 )
    LOCAL cAppName         := s_Appname + Space( 50 )
    LOCAL cDefBccLibs      := "bcc640.lib lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib dbffpt.lib dbfdbt.lib common.lib gtwin.lib codepage.lib"
    LOCAL cDefGccLibs      := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -ldbfdbt -lcommon -lcodepage -lm"
@@ -1419,7 +1419,7 @@ FUNCTION CreateMakeFile( cFile )
          s_nFilesToAdd   := oMake:cFilesToAdd
          s_lMt           := oMake:lMt
          s_nWarningLevel := oMake:cWarningLevel
-         cTopFile        := PadR(oMake:cTopModule,30," ")
+         cTopFile        := PadR(oMake:cTopModule,50," ")
          cResName        := PadR(oMake:cRes,50)
          s_lRecurse      := oMake:lRecurse
 
@@ -1739,20 +1739,20 @@ FUNCTION CreateMakeFile( cFile )
 
    if Len( aSelFiles ) = 1
       cTopFile := aSelFiles[1] 
-      cTopFile := PadR( Left(cTopfile,At(Upper(".prg"),Upper(cTopFile))+4 ), 30)
+      cTopFile := PadR( Left(cTopfile,At(Upper(".prg"),Upper(cTopFile))+4 ), 50)
    endif
 
    WHILE Len( aSelFiles ) > 1
 
       IF s_nLang=1 // PT
-         s_cMsg := "Informe o PRG principal da sua aplica‡Æo: "
+         s_cMsg := "Informe o PRG principal da sua aplica‡Æo:"
       ELSEIF s_nLang=3
-         s_cMsg := "Informe o PRG principale de su aplicacion: "
+         s_cMsg := "Informe o PRG principale de su aplicacion:"
       ELSE
-         s_cMsg := "Inform the main PRG of your application: "
+         s_cMsg := "Inform the main PRG of your application:"
       ENDIF
 
-      @ 15,01 say s_cMsg Get cTopFile valid !empty(cTopFile)
+      @ 15,01 say s_cMsg Get cTopFile pict "@S35" valid !empty(cTopFile)
       READ
 
       if LastKey()=27
