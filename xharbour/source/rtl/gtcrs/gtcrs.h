@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.9 2004/01/26 15:00:53 druzus Exp $
+ * $Id: gtcrs.h,v 1.10 2004/02/07 11:41:01 druzus Exp $
  */
 
 /*
@@ -105,6 +105,8 @@ extern PHB_CODEPAGE s_cdpage;
 #if defined( HB_OS_LINUX ) || defined( HB_OS_BSD )
 # if defined( HB_OS_LINUX )
 #  include <pty.h>  /* for openpty and forkpty */
+# elif defined( HB_OS_DARWIN )
+#  include <util.h> /* for openpty and forkpty */
 # elif defined( HB_OS_BSD )
 #  include <libutil.h> /* for openpty and forkpty */
 # endif

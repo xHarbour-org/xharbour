@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.16 2004/02/15 22:47:50 lculik Exp $
+ * $Id: files.c,v 1.17 2004/03/03 19:27:13 likewolf Exp $
  */
 
 /*
@@ -994,7 +994,7 @@ HB_FUNC( SETFDATI )
             return;
          }
       }
-#elif defined( OS_UNIX_COMPATIBLE ) || defined ( __DJGPP__ )
+#elif defined( OS_UNIX_COMPATIBLE ) || defined( __DJGPP__ )
       {
          struct utimbuf buf;
          struct tm new_value;
@@ -1010,7 +1010,7 @@ HB_FUNC( SETFDATI )
             time_t current_time;
             
             current_time = time( NULL );
-#ifdef __DJGPP__
+#if defined( __DJGPP__ ) || defined( HB_OS_DARWIN )
             new_value = *localtime( &current_time );
 #else
             localtime_r( &current_time, &new_value );

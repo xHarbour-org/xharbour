@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.10 2004/02/20 22:33:59 ronpinkas Exp $
+ * $Id: math.c,v 1.11 2004/03/02 00:28:18 druzus Exp $
  */
 
 /*
@@ -70,7 +70,9 @@
 
 #if defined(HB_MATH_ERRNO)
 #  include <errno.h>
-#  include <error.h>
+#  if !defined( HB_OS_BSD )
+#    include <error.h>
+#  endif
 #endif
 
 /*

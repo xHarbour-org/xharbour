@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.36 2004/02/21 08:58:25 jonnymind Exp $
+ * $Id: errorapi.c,v 1.37 2004/02/23 10:01:43 andijahja Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ static PHB_DYNS s_pDynErrorNew;
 #endif
 
 extern HB_SET_STRUCT hb_set;
-#ifndef HB_OS_DOS
+#if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN )
 extern BOOL hb_isService(void);
 #endif
 extern HB_FUNC( ERRORNEW );
@@ -1536,7 +1536,7 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, char * szText, char * szPar1, ch
    hb_conOutErr( hb_conNewLine(), 0 );
    hb_stackDispCall();
 
-   #ifndef HB_OS_DOS
+   #if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN )
    if (!hb_isService())     /* We don't want a server side app showing message boxes */
    {
       #ifdef HB_OS_WIN_32

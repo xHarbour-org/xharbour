@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2471 2004/03/03 19:41:27 andijahja Exp $
+ * $Id: ChangeLog,v 1.2473 2004/03/03 21:11:21 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-04 00:50 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
+  * source/rtl/math.c
+    ! Don't try to include nonexistent error.h on BSD.
+  * source/rtl/gtcrs/gtcrs.h
+    ! Fixed to compile on Darwin.
+  * source/vm/errorapi.c
+    ! Don't try to use hb_isService() on Darwin.
+  * contrib/libct/files.c
+    ! Fixed SETFDATI() on Darwin.
+
 2004-03-04 04:15 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * contrib/hbzlib/zip.c
     ! wild argument "?" is ignored. Fixed.
