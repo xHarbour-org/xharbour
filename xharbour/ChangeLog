@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2716 2004/04/02 10:42:42 srobert Exp $
+ * $Id: ChangeLog,v 1.2717 2004/04/02 10:55:42 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-02 06:00 UTC-0500 Sylvain Robert <s.robert/at/videotron.ca>
+  * source/rtl/hbffind.c
+    ! WintoDosError() was returning 0 instead of the old Error value
+      if no error code translation was made.
 
 2004-04-02 13:12 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
   * source/rtl/gtxvt/gtxvt.c
