@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.62 2004/02/25 15:32:50 lculik Exp $
+ * $Id: memvars.c,v 1.63 2004/03/05 05:06:53 ronpinkas Exp $
  */
 
 /*
@@ -2118,11 +2118,15 @@ HB_FUNC( __MVRESTORE )
 
          while( hb_fsRead( fhnd, buffer, HB_MEM_REC_LEN ) == HB_MEM_REC_LEN )
          {
-            PHB_ITEM pName = hb_itemPutC( NULL, ( char * ) buffer );
+            HB_ITEM Name, Item ;
             USHORT uiType = ( USHORT ) ( buffer[ 11 ] - 128 );
             USHORT uiWidth = ( USHORT ) buffer[ 16 ];
             USHORT uiDec = ( USHORT ) buffer[ 17 ];
-            PHB_ITEM pItem = NULL;
+
+            Item.type = HB_IT_NIL;
+            Name.type = HB_IT_NIL;
+
+            hb_itemPutC( &Name, ( char * ) buffer );
 
             switch( uiType )
             {
@@ -2135,7 +2139,7 @@ HB_FUNC( __MVRESTORE )
 
                   if( hb_fsRead( fhnd, pbyString, uiWidth ) == uiWidth )
                   {
-                     pItem = hb_itemPutCL( NULL, ( char * ) pbyString, uiWidth - 1 );
+                     hb_itemPutCL( &Item, ( char * ) pbyString, uiWidth - 1 );
                   }
 
                   hb_xfree( pbyString );
@@ -2149,7 +2153,7 @@ HB_FUNC( __MVRESTORE )
 
                   if( hb_fsRead( fhnd, pbyNumber, HB_MEM_NUM_LEN ) == HB_MEM_NUM_LEN )
                   {
-                     pItem = hb_itemPutNLen( NULL, * ( double * ) &pbyNumber, uiWidth - ( uiDec ? ( uiDec + 1 ) : 0 ), uiDec );
+                     hb_itemPutNLen( &Item, * ( double * ) &pbyNumber, uiWidth - ( uiDec ? ( uiDec + 1 ) : 0 ), uiDec );
                   }
 
                   break;
@@ -2161,7 +2165,7 @@ HB_FUNC( __MVRESTORE )
 
                   if( hb_fsRead( fhnd, pbyNumber, HB_MEM_NUM_LEN ) == HB_MEM_NUM_LEN )
                   {
-                     pItem = hb_itemPutDL( NULL, ( LONG ) ( * ( double * ) &pbyNumber ) );
+                     hb_itemPutDL( &Item, ( LONG ) ( * ( double * ) &pbyNumber ) );
                   }
 
                   break;
@@ -2173,16 +2177,16 @@ HB_FUNC( __MVRESTORE )
 
                   if( hb_fsRead( fhnd, pbyLogical, 1 ) == 1 )
                   {
-                     pItem = hb_itemPutL( NULL, pbyLogical[ 0 ] != 0 );
+                     hb_itemPutL( &Item, pbyLogical[ 0 ] != 0 );
                   }
 
                   break;
                }
             }
 
-            if( pItem )
+            if( &Item )
             {
-               BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_strMatchRegExp( pName->item.asString.value, sRegEx ) );
+               BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_strMatchRegExp( (&Name)->item.asString.value, sRegEx ) );
 
                /* Process it if it matches the passed mask */
                if( bIncludeMask ? bMatch : ! bMatch )
@@ -2191,7 +2195,7 @@ HB_FUNC( __MVRESTORE )
                   HB_DYNS_PTR pDynVar;
 
                   hb_dynsymLock();
-                  pDynVar = hb_memvarFindSymbol( pName );
+                  pDynVar = hb_memvarFindSymbol( &Name );
 
                   if( pDynVar )
                   {
@@ -2199,7 +2203,7 @@ HB_FUNC( __MVRESTORE )
                      PHB_SYMB pSymbol = pDynVar->pSymbol;
                      hb_dynsymUnlock();
 
-                     hb_memvarSetValue( pSymbol, pItem );
+                     hb_memvarSetValue( pSymbol, &Item );
                   }
                   else
                   {
@@ -2208,20 +2212,21 @@ HB_FUNC( __MVRESTORE )
                      hb_dynsymUnlock();
                      /* attempt to assign a value to undeclared variable create the PRIVATE one */
                      #ifdef HB_THREAD_SUPPORT
-                        pDyn = s_memvarThGetName( pName->item.asString.value, &HB_VM_STACK );
+                        pDyn = s_memvarThGetName( (&Name)->item.asString.value, &HB_VM_STACK );
                      #else
-                        pDyn = hb_dynsymGet( pName->item.asString.value );
+                        pDyn = hb_dynsymGet( (&Name)->item.asString.value );
                      #endif
-                     hb_memvarCreateFromDynSymbol( pDyn, VS_PRIVATE, pItem );
+                     hb_memvarCreateFromDynSymbol( pDyn, VS_PRIVATE, &Item );
                   }
 
-                  hb_itemReturn( pItem );
+                  hb_itemReturn( &Item );
                }
 
-               hb_itemRelease( pItem );
+               hb_itemClear( &Item );
             }
 
-            hb_itemRelease( pName );
+            hb_itemClear( &Name );
+
          }
 
          hb_fsClose( fhnd );
@@ -2317,24 +2322,28 @@ static HB_DYNS_FUNC( hb_GetSymbolInfo )
   {
     PHB_ITEM pArray   = ( ( PHB_ITEM ) Cargo );
     PHB_ITEM pItem = &s_globalTable[ pDynSymbol->hMemvar ].item;
-    PHB_ITEM pSubItems = hb_itemArrayNew( 2 );
-    PHB_ITEM pName = hb_itemPutC( NULL,pDynSymbol->pSymbol->szName);
-    PHB_ITEM pValue = hb_itemNew(NULL);
-    hb_itemCopy(pValue,pItem );
-    hb_arraySet( pSubItems , 1 , pName ) ;
-    hb_arraySet( pSubItems , 2 , pValue) ;
-    hb_arrayAdd( pArray , pSubItems);
-    hb_itemRelease( pName ) ;
-    hb_itemRelease( pValue ) ;
-    hb_itemRelease( pSubItems );
+    HB_ITEM SubItems, Name, Value;
+
+    Value.type = HB_IT_NIL;
+    Name.type = HB_IT_NIL;
+    SubItems.type = HB_IT_NIL;
+
+    hb_arrayNew( &SubItems, 2 );
+    hb_itemPutC( &Name, pDynSymbol->pSymbol->szName );
+    hb_itemCopy( &Value, pItem );
+    hb_arraySetForward( &SubItems, 1, &Name ) ;
+    hb_arraySetForward( &SubItems, 2, &Value ) ;
+    hb_arrayAddForward( pArray, &SubItems );
   }
   return TRUE;
 }
 
 HB_FUNC( __MVSYMBOLINFO )
 {
-  PHB_ITEM pArray = hb_itemArrayNew( 0 );
-  hb_dynsymEval( hb_GetSymbolInfo, ( void * ) pArray );
-  hb_itemReturn( pArray);
-//  hb_itemRelease( pArray ) ;
+  HB_ITEM Array;
+
+  Array.type = HB_IT_NIL;
+  hb_arrayNew( &Array, 0 );
+  hb_dynsymEval( hb_GetSymbolInfo, ( void * ) &Array );
+  hb_itemReturn( &Array);
 }
