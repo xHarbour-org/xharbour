@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipArchive.cpp $
 // $Archive: /ZipArchive/ZipArchive.cpp $
-// $Date: 03-01-09 10:30 $ $Author: Tadeusz Dracz $
+// $Date: 2003/08/20 15:03:52 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -1152,6 +1152,20 @@ bool CZipArchive::AddNewFile(LPCTSTR lpszFilePath,
 	return AddNewFile(zanfi);	
 }
 
+bool CZipArchive::AddNewFileDrv(LPCTSTR lpszFilePath,
+                             int iComprLevel,          
+                             bool bFullPath,
+                      int iSmartLevel,
+                             unsigned long nBufSize)
+{
+   
+   CZipAddNewFileInfo zanfi (lpszFilePath, bFullPath);
+   zanfi.m_iComprLevel = iComprLevel;
+   zanfi.m_iSmartLevel = zipsmSafeSmart;
+   zanfi.m_nBufSize = nBufSize;
+   return AddNewFileDrv(zanfi); 
+}
+
 bool CZipArchive::AddNewFile(LPCTSTR lpszFilePath,
 							 LPCTSTR lpszFileNameInZip,
                              int iComprLevel,                                       
@@ -1178,6 +1192,294 @@ bool CZipArchive::AddNewFile(CZipMemFile& mf,
 	return AddNewFile(zanfi);
 }
 
+
+bool CZipArchive::AddNewFileDrv(CZipAddNewFileInfo& info)
+{
+   // no need for ASSERT and TRACE here - it will be done by OpenNewFile
+   
+   if (!m_info.m_iBufferSize)
+      return false;
+   CZipPathComponent::RemoveSeparators(info.m_szFilePath);
+   if (!info.m_szFilePath.IsEmpty()) // it may be empty after removing sep.
+   {
+      if (info.m_szFileNameInZip.IsEmpty())
+      {
+         CZipPathComponent zpc(info.m_szFilePath);
+         info.m_szFileNameInZip = info.m_bFullPath ? zpc.GetNoDrive() : TrimRootPath(zpc);
+      }
+   }
+   else if (!info.m_pFile)
+      return false;
+
+   bool bSpan = GetSpanMode() != 0;
+
+   // checking the iReplace index
+   if (!UpdateReplaceIndex(info.m_iReplaceIndex, info.m_szFileNameInZip))
+      return false;
+
+   bool bReplace = info.m_iReplaceIndex >= 0;
+   
+   DWORD uAttr;
+   time_t ttime;
+   if (info.m_pFile)
+   {
+      uAttr = ZipPlatform::GetDefaultAttributes();
+      ttime = time(NULL);
+   }
+   else
+   {
+      if (!ZipPlatform::GetFileAttr(info.m_szFilePath, uAttr))
+         return false; // we don't know whether it is a file or a directory
+      if (!ZipPlatform::GetFileModTime(info.m_szFilePath, ttime))
+         ttime = time(NULL);
+   }
+   CZipFileHeader header;
+   header.SetFileName(info.m_szFileNameInZip);
+   if (ZipPlatform::GetSystemID() != ZipCompatibility::zcUnix)
+      uAttr |= ZipCompatibility::ConvertToSystem(uAttr, ZipPlatform::GetSystemID(), ZipCompatibility::zcUnix);  // make it readable under Unix as well, since it stores its attributes in HIWORD(uAttr)
+   SetFileHeaderAttr(header, uAttr);
+   header.SetTime(ttime);
+   bool bInternal = (info.m_iSmartLevel & zipsmInternal01) != 0;
+   CZipActionCallback* pCallback = NULL;
+   if (!bInternal)
+   {
+      pCallback = GetCallback(cbAdd);
+      if (pCallback)
+         pCallback->Init(info.m_szFileNameInZip, info.m_szFilePath);
+   }
+
+   
+
+   if (header.IsDirectory()) // will never be when m_pFile is not NULL, so we don't check it
+   {
+      ASSERT(!info.m_pFile); // should never happened
+      ASSERT(!bInternal);
+
+      if (pCallback)
+         pCallback->SetTotal(0); // in case of calling LeftToDo afterwards    
+
+      // clear password for a directory
+      bool bRet = false;
+      CZipSmClrPass smcp;
+      if (info.m_iSmartLevel & zipsmCPassDir)
+         smcp.ClearPasswordSmartly(this);
+
+      bRet = OpenNewFile(header, bReplace ? (info.m_iReplaceIndex << 16) | ZIP_COMPR_REPL_SIGN : 0);
+      
+      CloseNewFile();
+      if (pCallback)
+         pCallback->CallbackEnd();
+      
+      return bRet;      
+   }
+   
+   CZipSmClrPass smcp;
+   bool bIsCompression = info.m_iComprLevel != 0;
+   bool bEff = (info.m_iSmartLevel & zipsmCheckForEff)&& bIsCompression;
+   bool bCheckForZeroSized = (info.m_iSmartLevel & zipsmCPFile0) && !GetPassword().IsEmpty();
+   bool bCheckForSmallFiles = (info.m_iSmartLevel & zipsmNotCompSmall) && bIsCompression;
+   DWORD iFileSize = DWORD(-1);
+   bool bNeedTempArchive = (bEff && bSpan) || (bReplace && bIsCompression);
+   if (bCheckForSmallFiles || bCheckForZeroSized || bNeedTempArchive)
+   {
+      
+      if (info.m_pFile)
+         iFileSize = info.m_pFile->GetLength();
+      else
+      {
+         if (!ZipPlatform::GetFileSize(info.m_szFilePath, iFileSize) && bEff)
+            bEff = false; // the file size is needed only when eff. in span mode       
+      }
+      if (iFileSize !=  DWORD(-1))
+      {
+         if (bCheckForZeroSized && iFileSize == 0)
+            smcp.ClearPasswordSmartly(this);       
+         if (bCheckForSmallFiles && iFileSize < 5)
+            info.m_iComprLevel = 0;       
+      }
+   }
+   bool bEffInMem = bEff && (info.m_iSmartLevel & zipsmMemoryFlag);
+   CZipString szTempFileName;
+   if (bNeedTempArchive && (bEffInMem || 
+      !(szTempFileName = ZipPlatform::GetTmpFileName(
+         m_szTempPath.IsEmpty() ? NULL : (LPCTSTR)m_szTempPath, iFileSize)
+      ).IsEmpty()))
+   {
+      CZipMemFile* pmf = NULL;
+      CZipArchive zip;
+      try
+      {
+         // compress first to a temporary file, if ok - copy the data, if not - add storing
+         
+         if (bEffInMem)
+         {
+            pmf = new CZipMemFile;
+            zip.Open(*pmf, zipCreate);
+         }
+         else
+            zip.Open(szTempFileName, zipCreate);
+         zip.SetRootPath(m_szRootPath);
+         zip.SetPassword(GetPassword());
+         zip.SetSystemCompatibility(m_iArchiveSystCompatib);
+         zip.SetCallback(pCallback, cbAdd);
+         // create a temporary file
+         int iTempReplaceIndex = info.m_iReplaceIndex;
+         info.m_iSmartLevel = zipsmLazy;
+         info.m_iReplaceIndex = -1;
+         if (!zip.AddNewFile(info))
+            throw false;
+         info.m_iReplaceIndex = iTempReplaceIndex;
+
+         // this may also happen when bReplace, but not in span mode
+         if (bEff)
+         {
+            CZipFileHeader fh;
+            zip.GetFileInfo(fh, 0);
+            if (!fh.CompressionEfficient())
+            {
+               info.m_iComprLevel = 0;
+               info.m_iSmartLevel = zipsmInternal01;
+               // compression is pointless, store instead
+               throw AddNewFile(info);
+            }
+         }
+         
+         m_info.Init();
+         throw GetFromArchive(zip, 0, info.m_iReplaceIndex, true, GetCallback(cbAddTmp));
+      }
+      catch (bool bRet)
+      {
+
+         zip.Close(!bRet); // that doesn't really matter how it will be closed
+         if (pmf)
+            delete pmf;
+         if (!bEffInMem)
+            ZipPlatform::RemoveFile(szTempFileName, false);
+         m_info.ReleaseBuf();
+         return bRet;
+      }
+      catch (...)
+      {
+         zip.Close(true);
+         if (pmf)
+            delete pmf;
+         if (!bEffInMem)
+            ZipPlatform::RemoveFile(szTempFileName, false);
+         m_info.ReleaseBuf();
+         throw;
+      }
+   }
+
+   // try to open before adding
+   CZipFile f;
+   CZipAbstractFile *pf;
+   if (info.m_pFile)
+      pf = info.m_pFile;
+   else
+   {
+      if (!f.Open(info.m_szFilePath, CZipFile::modeRead | CZipFile::shareDenyWrite, false))
+      {
+         if (pCallback)
+            pCallback->CallbackEnd();
+         return false;
+      }
+      pf = &f;
+   }
+
+   ASSERT(pf);
+   // call init before opening (in case of exception we have the names)
+   iFileSize = pf->GetLength();
+   
+   
+   bool bRet;  
+   if (bReplace)
+   {
+      ASSERT(!bIsCompression);
+      bRet = OpenNewFile(header, (info.m_iReplaceIndex << 16) | ZIP_COMPR_REPL_SIGN , NULL, iFileSize);
+   }
+   else
+      bRet = OpenNewFile(header, info.m_iComprLevel);
+   if (!bRet)
+   {
+      if (pCallback)
+         pCallback->CallbackEnd();
+      
+      return false;
+   }
+   if (bInternal) 
+   {
+      // we do it here, because if in OpenNewFile is replacing 
+      // then we get called cbReplace callback before and it would 
+      // overwrite callback information written in pCallback->Init
+      pCallback = GetCallback(cbAddStore);
+      if (pCallback)
+         pCallback->Init(info.m_szFileNameInZip, info.m_szFilePath);
+   }
+   if (pCallback)
+      pCallback->SetTotal(iFileSize);
+
+   CZipAutoBuffer buf(info.m_nBufSize);
+   DWORD iRead;
+   int iAborted = 0;
+   do
+   {
+      iRead = pf->Read(buf, info.m_nBufSize);
+      if (iRead)
+      {
+         WriteNewFile(buf, iRead);
+         if (pCallback)
+            if (!(*pCallback)(iRead))
+            {
+               // todo: we could remove here the bytes of the file partially added if not disk-spanning
+               if (iRead == buf.GetSize() && pf->Read(buf, 1) != 0) // test one byte if there is something left
+               {
+                  if (!m_storage.IsSpanMode() && !bReplace)
+                  {
+                     RemoveLast(true);                   
+                     CloseNewFile(true);
+                     iAborted = CZipException::abortedSafely;
+                  }
+                  else
+                     iAborted = CZipException::abortedAction; 
+               }
+               else
+               {
+                  iAborted = CZipException::abortedSafely; // we did it!
+                  CloseNewFile();
+               }
+               break;
+            }
+            
+      }
+      
+   }
+   while (iRead == buf.GetSize());
+   if (!iAborted)
+      CloseNewFile();
+   
+   if (pCallback)
+      pCallback->CallbackEnd();
+   
+   if (iAborted)
+      CZipException::Throw(iAborted); // throw to distuinguish from other return codes
+   
+   if (bEff)
+   {
+      // remove the last file and add it without the compression if needed
+      if (!info.m_pFile)
+         f.Close();
+
+      buf.Release();
+      if (RemoveLast())
+      {
+         info.m_iComprLevel = 0;
+         info.m_iSmartLevel = zipsmInternal01;
+         return AddNewFile(info);
+      }
+   }
+   return true;   
+   
+}
 
 bool CZipArchive::AddNewFile(CZipAddNewFileInfo& info)
 {
