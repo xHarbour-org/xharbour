@@ -374,6 +374,8 @@ STATIC s_acFlowType := {},  s_nFlowId := 0
 STATIC s_lRunLoaded := .F., s_lDotLoaded := .F., s_lClsLoaded := .F., s_lFWLoaded := .F., s_lMiniGUILoaded := .F.
 STATIC s_aSwitchDefs := {}
 
+STATIC s_sPending
+
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
   STATIC PROCEDURE Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
@@ -3142,7 +3144,6 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
    LOCAL sBackupLine
    LOCAL sSkipped
    LOCAL bArrayPrefix
-   LOCAL sPending
 
    //TraceLog( sLine )
 
@@ -3454,8 +3455,8 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
       ENDIF
 
       //TraceLog( sLine )
-      sPending := ""
-      aEval( aPendingLines, {|s| IIF( s != NIL, sPending += '; ' + s, ) } )
+      s_sPending := ""
+      aEval( aPendingLines, {|s| IIF( s != NIL, s_sPending += '; ' + s, ) } )
 
       sBackupLine := sLine
       sPassed     := ""
@@ -3552,7 +3553,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             bArrayPrefix := s_bArrayPrefix
          #endif
 
-         IF ( nRule := MatchRule( sToken, @sLine, aTransRules, aTransResults, .F., .T., @sPending ) ) > 0
+         IF ( nRule := MatchRule( sToken, @sLine, aTransRules, aTransResults, .F., .T. ) ) > 0
             //? "TRANSLATED: " + sLine
             //WAIT
 
@@ -3562,7 +3563,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                aAdd( aTranslated, nRule )
             ENDIF
 
-            IF Empty( sPending )
+            IF Empty( s_sPending )
                nPendingLines := 0
                aSize( aPendingLines, 0 )
             ENDIF
@@ -3626,7 +3627,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
       sToken := NextToken( @sLine )
 
-      IF sToken != NIL .AND. ( nRule := MatchRule( sToken, @sLine, aCommRules, aCommResults, .T., .T., @sPending ) ) > 0
+      IF sToken != NIL .AND. ( nRule := MatchRule( sToken, @sLine, aCommRules, aCommResults, .T., .T. ) ) > 0
          //? "COMMANDED: " + sLine
          //? '"' + sLeft +'"', '"' + sPassed + '"'
          //WAIT
@@ -3640,7 +3641,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
          ENDIF
          */
 
-         IF Empty( sPending )
+         IF Empty( s_sPending )
             nPendingLines := 0
             aSize( aPendingLines, 0 )
          ENDIF
@@ -3741,7 +3742,7 @@ RETURN sOut
 
 //--------------------------------------------------------------//
 
-STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper, sPending )
+STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
 
    LOCAL Counter, nRules, nRule, aMarkers, xMarker
    LOCAL aMP, nOptional := 0, sAnchor, cType, aList, nMarkerId, nKeyLen
@@ -4067,7 +4068,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper, sP
 
          IF ( sAnchor == NIL .OR. sMultiStopper != NIL .OR. ;
               ( ( ( sToken := NextToken( @sWorkLine ) ) != NIL  .AND. ( DropTrailingWS( @sToken, @sPad ), nLen := Max( 4, Len( sToken ) ), Upper( sToken ) == Left( sAnchor, nLen ) ) ) ) ) ;
-            .AND. ( nMarkerId == 0 .OR. ( sAnchor == NIL .AND. sMultiStopper != NIL ) .OR. ( ( xMarker := NextExp( @sWorkLine, cType, aList, sNextAnchor, aRules[nRule][3], @sPending ) ) != NIL ) )
+            .AND. ( nMarkerId == 0 .OR. ( sAnchor == NIL .AND. sMultiStopper != NIL ) .OR. ( ( xMarker := NextExp( @sWorkLine, cType, aList, sNextAnchor, aRules[nRule][3] ) ) != NIL ) )
 
             IF sMultiStopper != NIL
                IF sAnchor == NIL
@@ -4911,7 +4912,7 @@ RETURN sReturn
 
 //--------------------------------------------------------------//
 
-STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX, sPending )
+STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
   LOCAL  sExp, sTemp, Counter, sPad, sToken, sList
   LOCAL  sNextLine, sNextToken, sLastToken, sJustToken, sJustNext, cLastChar
@@ -5005,9 +5006,9 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX, sPending )
      CASE cType == '*'
         sExp  := sLine
         sLine := ""
-        IF ! Empty( sPending )
-           sExp += sPending
-           sPending := ""
+        IF ! Empty( s_sPending )
+           sExp += s_sPending
+           s_sPending := ""
         ENDIF
 
         //? "EXP <*>: " + sExp
@@ -8840,8 +8841,8 @@ STATIC FUNCTION InitRunRules()
    aAdd( aCommRules, { 'ALERT' , { {    1,   0, '(', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
  #endif
 
-   aAdd( aCommRules, { '_HB_CLASS' , { {    1,   0, NIL, '*', NIL } } , .F. } )
-   aAdd( aCommRules, { '_HB_MEMBER' , { {    1,   0, NIL, '*', NIL } } , .F. } )
+   aAdd( aCommRules, { '_HB_CLASS' , { {    1,   0, NIL, '<', NIL } } , .F. } )
+   aAdd( aCommRules, { '_HB_MEMBER' , { {    1,   0, NIL, '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'MEMVAR' , { {    1,   0, NIL, '*', NIL } } , .F. } )
    aAdd( aCommRules, { 'EXTERNAL' , { {    1,   0, NIL, '!', NIL }, { 1002,   1, ',', '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'DECLARE' , { {    1,   0, NIL, '!', NIL }, {    2,   0, NIL, '<', NIL }, {    3,   0, NIL, '*', NIL } } , .F. } )

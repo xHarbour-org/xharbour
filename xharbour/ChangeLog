@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1601 2003/10/19 04:07:38 walito Exp $
+ * $Id: ChangeLog,v 1.1602 2003/10/19 06:45:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-19 11:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * source/vm/codebloc.c
+    * Additional logic to recent fix of detached locals.
+
+  * tests/rp_run.ch
+    * Minor fix related to Wild Match Marker becoming a more greedy.
+  * tests/pp.prg
+    * Minor fix related to Wild Match Marker becoming a more greedy.
+    ! Minor optimization sPending => s_sPending
 
 2003-10-18 23:14 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * contrib/Whoo/source/TCustomForm.prg

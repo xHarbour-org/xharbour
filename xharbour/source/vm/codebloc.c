@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.30 2003/09/10 06:07:31 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.31 2003/10/16 20:27:49 ronpinkas Exp $
  */
 
 /*
@@ -105,7 +105,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
        * uiLocal will be also ZERO if it is a nested codeblock
        */
       USHORT ui = 1;
-      PHB_ITEM pLocal;
+      PHB_ITEM pLocal, pValue;
       HB_HANDLE hMemvar;
 
       /* Create a table that will store the values of local variables
@@ -127,10 +127,14 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
 
          if( HB_IS_BYREF( pLocal ) )
          {
-            pLocal = hb_itemUnRef( pLocal );
+            pValue = hb_itemUnRef( pLocal );
+         }
+         else
+         {
+            pValue = pLocal;
          }
 
-         if( ! HB_IS_MEMVAR( pLocal ) )
+         if( ! HB_IS_MEMVAR( pValue ) ) // Should we use pLocal instead???
          {
             /* Change the value only if this variable is not referenced
              * by another codeblock yet.
@@ -138,14 +142,23 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
              * pool so it can be shared by codeblocks
              */
 
-            hMemvar = hb_memvarValueNew( pLocal, FALSE );
+            hMemvar = hb_memvarValueNew( pValue, FALSE );
 
-            pLocal->type = HB_IT_BYREF | HB_IT_MEMVAR;
-            pLocal->item.asMemvar.itemsbase = hb_memvarValueBaseAddress();
-            pLocal->item.asMemvar.offset    = 0;
-            pLocal->item.asMemvar.value     = hMemvar;
+            pValue->type = HB_IT_BYREF | HB_IT_MEMVAR;
+            pValue->item.asMemvar.itemsbase = hb_memvarValueBaseAddress();
+            pValue->item.asMemvar.offset    = 0;
+            pValue->item.asMemvar.value     = hMemvar;
 
-            memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
+            memcpy( pCBlock->pLocals + ui, pValue, sizeof( HB_ITEM ) );
+
+            // Need to refelct in the local as well.
+            if( pLocal != pValue )
+            {
+               pLocal->type = HB_IT_BYREF | HB_IT_MEMVAR;
+               pLocal->item.asMemvar.itemsbase = hb_memvarValueBaseAddress();
+               pLocal->item.asMemvar.offset    = 0;
+               pLocal->item.asMemvar.value     = hMemvar;
+            }
          }
          else
          {
@@ -155,7 +168,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
             /* Increment the reference counter so this value will not be
              * released if other codeblock will be deleted
              */
-            memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
+            memcpy( pCBlock->pLocals + ui, pValue, sizeof( HB_ITEM ) );
             //TraceLog( NULL, "Detach: %p to %p\n", pLocal, pCBlock->pLocals + ui );
          }
 
