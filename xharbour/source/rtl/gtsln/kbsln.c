@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.9 2003/05/16 19:52:11 druzus Exp $
+ * $Id: kbsln.c,v 1.10 2003/10/19 18:03:29 lculik Exp $
  */
 
 /*
@@ -64,7 +64,7 @@
 
 /* we're assuming target has termios - should be better done */
 #include <termios.h> 
-#define HB_SLANG_ONE_ESC
+
 /* *********************************************************************** */
 
 /* keyboard states - these should be taken
