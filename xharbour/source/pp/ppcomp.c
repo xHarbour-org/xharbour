@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.3 2003/02/09 00:10:24 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.4 2003/03/05 05:11:52 ronpinkas Exp $
  */
 
 /*
@@ -85,6 +85,7 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
   int lContinue;
   int lens, rdlen;
   int lLine = 0;
+  int State = 0;
 
   HB_TRACE(HB_TR_DEBUG, ("hb_pp_Internal(%p, %s)", handl_o, sOut));
 
@@ -95,7 +96,7 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
      ptrOut = sOut;
      while( ( rdlen = hb_pp_RdStr( pFile->handle, s_szLine + lens, HB_PP_STR_SIZE - 1 -
                   lens, lContinue, ( char * ) pFile->pBuffer, &( pFile->lenBuffer ),
-                  &( pFile->iBuffer ) ) ) >= 0 )
+                  &( pFile->iBuffer ), State ) ) >= 0 )
      {
         lens += rdlen;
         hb_comp_iLine ++;
@@ -120,11 +121,13 @@ int hb_pp_Internal( FILE * handl_o, char * sOut )
            while( s_szLine[ lens ] == ' ' || s_szLine[ lens ] == '\t' ) lens--;
            s_szLine[ ++lens ] = ' ';
            s_szLine[ ++lens ] = '\0';
+           State = STATE_NORMAL;
         }
         else
         {
            lContinue = 0;
            lens = 0;
+           State = 0;
         }
 
         if( !lContinue )
@@ -267,6 +270,7 @@ int hb_pp_ReadRules( void )
   char * ptr;
   int lContinue;
   int lens, rdlen;
+  int State = 0;
 
   HB_TRACE(HB_TR_DEBUG, ("hb_pp_ReadRules()"));
 
@@ -276,7 +280,7 @@ int hb_pp_ReadRules( void )
      lens = lContinue = 0;
      while( ( rdlen = hb_pp_RdStr( pFile->handle, s_szLine + lens, HB_PP_STR_SIZE - 1 -
                   lens, lContinue, ( char * ) pFile->pBuffer, &( pFile->lenBuffer ),
-                  &( pFile->iBuffer ) ) ) >= 0 )
+                  &( pFile->iBuffer ), State ) ) >= 0 )
      {
         lens += rdlen;
         hb_comp_iLine++;
@@ -294,11 +298,13 @@ int hb_pp_ReadRules( void )
            while( s_szLine[ lens ] == ' ' || s_szLine[ lens ] == '\t' ) lens--;
            s_szLine[ ++lens ] = ' ';
            s_szLine[ ++lens ] = '\0';
+           State = STATE_NORMAL;
         }
         else
         {
            lContinue = 0;
            lens = 0;
+           State = 0;
         }
 
         if( ! lContinue )

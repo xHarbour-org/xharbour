@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.51 2003/03/22 00:08:05 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.52 2003/03/29 07:01:27 ronpinkas Exp $
  */
 
 /*
@@ -160,18 +160,6 @@ static BOOL   IsIdentifier( char *szProspect );
 #define MAX_NAME     255
 #define MAX_EXP      2048
 #define PATTERN_SIZE HB_PP_STR_SIZE
-
-#define STATE_INIT      0
-#define STATE_NORMAL    1
-#define STATE_COMMENT   2
-#define STATE_QUOTE1    3
-#define STATE_QUOTE2    4
-#define STATE_QUOTE3    5
-#define STATE_ID_END    6
-#define STATE_ID        7
-#define STATE_EXPRES    8
-#define STATE_EXPRES_ID 9
-#define STATE_BRACKET   10
 
 #define IT_EXPR       1
 #define IT_ID         2
@@ -1978,7 +1966,7 @@ static int WorkTranslate( char * ptri, char * ptro, COMMANDS * sttra, int * lens
   int rez;
   int lenres;
   char * ptrmp;
-  char * sToken = sttra->name;
+  //char * sToken = sttra->name;
 
   HB_TRACE(HB_TR_DEBUG, ("WorkTranslate(%s, %s, %p, %p)", ptri, ptro, sttra, lens));
 
@@ -3942,17 +3930,16 @@ static void pp_rQuotes( char * expreal, char * sQuotes )
     }
 }
 
-int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, char * sBuffer, int * lenBuffer, int * iBuffer )
+int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, char * sBuffer, int * lenBuffer, int * iBuffer, int State )
 {
 #ifndef __WATCOMC__
   extern BOOL hb_pp_bInline;
 #endif
   int readed = 0;
-  int State = 0;
   char cha, cLast = '\0', symbLast = '\0';
   BOOL bOK = TRUE;
 
-  HB_TRACE(HB_TR_DEBUG, ("hb_pp_RdStr(%p, %s, %d, %d, %s, %p, %p)", handl_i, buffer, maxlen, lDropSpaces, sBuffer, lenBuffer, iBuffer));
+  HB_TRACE(HB_TR_DEBUG, ("hb_pp_RdStr(%p, %s, %d, %d, %s, %p, %p, %i)", handl_i, buffer, maxlen, lDropSpaces, sBuffer, lenBuffer, iBuffer, State));
 
   if( *lenBuffer == 0 )
   {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.1.1.1 2001/12/21 10:47:41 ronpinkas Exp $
+ * $Id: hbpp.h,v 1.2 2003/02/10 01:50:56 ronpinkas Exp $
  */
 
 /*
@@ -101,7 +101,7 @@ extern void   CloseInclude( void );
 extern int    hb_pp_ParseDirective( char * ); /* Parsing preprocessor directives ( #... ) */
 extern int    hb_pp_ParseExpression( char *, char * ); /* Parsing a line ( without preprocessor directive ) */
 extern int    hb_pp_WrStr( FILE *, char * );
-extern int    hb_pp_RdStr( FILE *, char *, int, BOOL, char *, int *, int * );
+extern int    hb_pp_RdStr( FILE *, char *, int, BOOL, char *, int *, int *, int );
 extern void   hb_pp_Stuff( char *, char *, int, int, int );
 extern int    hb_pp_strocpy( char *, char * );
 extern DEFINES * hb_pp_AddDefine( char *, char * );         /* Add new #define to a linked list */
@@ -128,6 +128,18 @@ extern COMMANDS * hb_pp_topTranslate;
 /* PRAGMA.C exported functions */
 
 extern void hb_pp_ParsePragma( char * szline );
+
+#define STATE_INIT      0
+#define STATE_NORMAL    1
+#define STATE_COMMENT   2
+#define STATE_QUOTE1    3
+#define STATE_QUOTE2    4
+#define STATE_QUOTE3    5
+#define STATE_ID_END    6
+#define STATE_ID        7
+#define STATE_EXPRES    8
+#define STATE_EXPRES_ID 9
+#define STATE_BRACKET   10
 
 #if defined(HB_EXTERN_C)
 }
