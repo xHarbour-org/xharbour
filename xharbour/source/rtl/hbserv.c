@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.22 2004/11/01 05:38:10 likewolf Exp $
+* $Id: hbserv.c,v 1.23 2005/01/10 18:45:36 druzus Exp $
 */
 
 /*
@@ -544,14 +544,12 @@ extern DWORD hb_dwCurrentStack;
 BOOL WINAPI s_ConsoleHandlerRoutine( DWORD dwCtrlType )
 {
 #ifdef HB_THREAD_SUPPORT
-   BOOL bHaveNewStack = FALSE;
-   HB_STACK *pStack;
+   HB_STACK *pStack = NULL;
 
    /* we need a new stack: this is NOT an hb thread. */
 
    if ( TlsGetValue( hb_dwCurrentStack ) == 0 )
    {
-      bHaveNewStack = TRUE;
       pStack = hb_threadCreateStack( GetCurrentThreadId() );
       pStack->th_h = GetCurrentThread();
       TlsSetValue( hb_dwCurrentStack, ( void * ) pStack );
@@ -561,7 +559,7 @@ BOOL WINAPI s_ConsoleHandlerRoutine( DWORD dwCtrlType )
    s_signalHandler( 2, dwCtrlType, NULL );
 
 #ifdef HB_THREAD_SUPPORT
-   if ( bHaveNewStack )
+   if ( pStack )
    {
       hb_threadDestroyStack( pStack );
    }

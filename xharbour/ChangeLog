@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3808 2005/02/12 10:55:44 jonnymind Exp $
+ * $Id: ChangeLog,v 1.3809 2005/02/12 16:43:56 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-12 20:53 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/make_tgz.sh
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/hb-mkslib.sh
+    * modifications for MinGW cross compilation
+
+  * xharbour/source/compiler/cmdcheck.c
+    ! fixed parsing -DVAR="<value>" when value contains option separators
+
+  * xharbour/source/ct/files.c
+    * fixed uninitialized iAttr
+
+  * xharbour/source/rdd/workarea.c
+    * set as default Cl5.[23] behavior in
+      dbCreate({..{<cField>,"C",<n1>,<n2>}..},...)
+
+  * xharbour/source/rtl/win32prn.prg
+  * xharbour/source/rtl/hbserv.c
+  * xharbour/source/vm/thread.c
+    * small modifications to avoid compiler warnings
+
+  * xharbour/source/rtl/gtwin/gtwin.c
+    * commented out unused wKey var
 
 2005-02-12 17:45 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

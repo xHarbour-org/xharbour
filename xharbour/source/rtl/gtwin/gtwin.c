@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.80 2005/01/07 11:24:47 paultucker Exp $
+ * $Id: gtwin.c,v 1.81 2005/02/11 18:59:07 druzus Exp $
  */
 
 /*
@@ -1636,7 +1636,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
          if( s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
          {
             /* Save the keyboard state and ASCII,scan, key code */
-            WORD wKey = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode;
+            /* WORD wKey = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode; */
             WORD wChar = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualKeyCode;
             DWORD dwState= s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState;
 

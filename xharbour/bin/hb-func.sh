@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.45 2005/01/30 06:45:44 druzus Exp $
+# $Id: hb-func.sh,v 1.46 2005/02/11 23:01:10 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -146,6 +146,17 @@ mk_hbtools()
 # ---------------------------------------------------------------
 #
 
+# set environment variables
+export HB_ARCHITECTURE="${HB_ARCHITECTURE}"
+export HB_COMPILER="${HB_COMPILER}"
+[ -z "\${HB_BIN_INSTALL}" ] && export HB_BIN_INSTALL="${_DEFAULT_BIN_DIR}"
+[ -z "\${HB_INC_INSTALL}" ] && export HB_INC_INSTALL="${_DEFAULT_INC_DIR}"
+[ -z "\${HB_LIB_INSTALL}" ] && export HB_LIB_INSTALL="${_DEFAULT_LIB_DIR}"
+
+# be sure that ${name} binaries are in your path
+export PATH="\${HB_BIN_INSTALL}${hb_path_separator}\${PATH}"
+
+
 if [ \$# = 0 ]; then
     echo "syntax: \$0 [<options,...>] <file>[.prg|.o]
 
@@ -260,16 +271,6 @@ else
 fi
 HB_MAIN_FUNC=\`echo \${HB_MAIN_FUNC}|tr '[a-z]' '[A-Z]'\`
 
-# set environment variables
-export HB_ARCHITECTURE="${HB_ARCHITECTURE}"
-export HB_COMPILER="${HB_COMPILER}"
-[ -z "\${HB_BIN_INSTALL}" ] && export HB_BIN_INSTALL="${_DEFAULT_BIN_DIR}"
-[ -z "\${HB_INC_INSTALL}" ] && export HB_INC_INSTALL="${_DEFAULT_INC_DIR}"
-[ -z "\${HB_LIB_INSTALL}" ] && export HB_LIB_INSTALL="${_DEFAULT_LIB_DIR}"
-
-# be sure that ${name} binaries are in your path
-export PATH="\${HB_BIN_INSTALL}${hb_path_separator}\${PATH}"
-
 HB_PATHS="-I\${HB_INC_INSTALL}"
 GCC_PATHS="\${HB_PATHS} -L\${HB_LIB_INSTALL}"
 LINK_OPT=""
@@ -336,7 +337,7 @@ else
     elif [ "\${HB_ARCHITECTURE}" = "w32" ]; then
         pref=""
         ext=".dll"
-	HB_LNK_ATTR="__attribute__ ((dllimport))"
+        HB_LNK_ATTR="__attribute__ ((dllimport))"
     else
         pref="lib"
         ext=".so"

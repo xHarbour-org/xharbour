@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.5 2005/01/19 22:00:00 ptsarenko Exp $
+ * $Id: win32prn.prg,v 1.5 2005/01/19 21:19:24 ptsarenko Exp $
  */
 
 /*
@@ -891,7 +891,9 @@ HB_FUNC_STATIC( DRAWBITMAP ) {
   }
 
   SetStretchBltMode (hDC, COLORONCOLOR) ;
-  hb_retl(StretchDIBits(hDC,(int) hb_parnl(3),(int) hb_parnl(4),(int) hb_parnl(5), (int) hb_parnl(6) , 0, 0, cxDib, cyDib, pBits, pbmi, DIB_RGB_COLORS, SRCCOPY)!= GDI_ERROR) ;
+  hb_retl( StretchDIBits( hDC, hb_parni(3), hb_parni(4), hb_parni(5), hb_parni(6),
+                          0, 0, cxDib, cyDib, pBits, pbmi,
+                          DIB_RGB_COLORS, SRCCOPY ) != ( int ) GDI_ERROR );
 }
 
 static int CALLBACK FontEnumCallBack(LOGFONT *lplf, TEXTMETRIC *lpntm, DWORD FontType, LPVOID pArray )

@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.7 2004/12/20 16:48:43 mlombardo Exp $
+ * $Id: files.c,v 1.8 2005/01/30 21:58:03 druzus Exp $
  */
 
 /*
@@ -269,14 +269,9 @@ HB_FUNC( SETFATTR )
    {
       DWORD dwFlags=FILE_ATTRIBUTE_ARCHIVE;
       DWORD dwLastError=ERROR_SUCCESS;
-      int iAttr;
       LPCTSTR cFile=hb_parcx( 1 );
+      int iAttr = hb_parni( 2 );
       BOOL lSuccess;
-
-      if ( ISNUM( 2 ) )
-      {
-         iAttr=hb_parni( 2 );
-      }
 
       if(  iAttr & FA_RDONLY  )
          dwFlags |= FILE_ATTRIBUTE_READONLY;

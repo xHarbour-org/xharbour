@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-mkslib.sh,v 1.9 2005/01/21 18:41:38 druzus Exp $
+# $Id: hb-mkslib.sh,v 1.10 2005/01/30 06:45:44 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -12,7 +12,13 @@
 # See doc/license.txt for licensing terms.
 # ---------------------------------------------------------------
 
-hb_arch=`uname -s | tr -d "[-]" | tr '[A-Z]' '[a-z]' 2>/dev/null`
+if [ -n "${HB_ARCHITECTURE}" ]
+then
+    hb_arch="${HB_ARCHITECTURE}"
+else
+    hb_arch=`uname -s | tr -d "[-]" | tr '[A-Z]' '[a-z]' 2>/dev/null`
+fi
+
 case "$hb_arch" in
     *windows*|*mingw32*)    hb_arch="w32" ;;
     *dos)   hb_arch="dos" ;;

@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.19 2004/10/20 03:14:40 ronpinkas Exp $
+ * $Id: cmdcheck.c,v 1.20 2004/11/21 21:43:44 druzus Exp $
  */
 
 /*
@@ -993,11 +993,27 @@ static void hb_compChkDefineSwitch( char * pszSwitch )
       if ( pszSwitch[ 1 ] == 'd' || pszSwitch[ 1 ] == 'D' )
       {
          char *szDefText = hb_strdup( pszSwitch + 2 ), *pAssign, *sDefLine;
-         unsigned int i = 0;
+         unsigned int i = 0, n;
+         char cQuoted = '\0';
 
-         while( i < strlen( szDefText ) && ! HB_ISOPTSEP( szDefText[ i ] ) )
+         n = strlen( szDefText );
+         while( i < n && ( ! HB_ISOPTSEP( szDefText[ i ] ) || cQuoted ) )
          {
-           i++;
+            if ( cQuoted )
+            {
+               if ( szDefText[ i ] == cQuoted )
+               {
+                  cQuoted = '\0';
+                  i++;
+                  break;
+               }
+            }
+            else if ( i > 0 && szDefText[ i - 1 ] == '=' &&
+                     ( szDefText[ i ] == '"' || szDefText[ i ] == '\'' ) )
+            {
+               cQuoted = szDefText[ i ];
+            }
+            i++;
          }
 
          szDefText[ i ] = '\0';

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.41 2005/01/21 18:41:31 druzus Exp $
+# $Id: make_tgz.sh,v 1.42 2005/01/30 06:45:42 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -212,7 +212,7 @@ mkdir -p $HB_INST_PREF/etc/harbour
 $INSTALL -m644 source/rtl/gtcrs/hb-charmap.def $HB_INST_PREF/etc/harbour/hb-charmap.def
 
 cat > $HB_INST_PREF/etc/harbour.cfg <<EOF
-CC=gcc
+CC=${CCPREFIX}gcc
 CFLAGS=-c -I$_DEFAULT_INC_DIR -O3
 VERBOSE=YES
 DELTMP=YES
@@ -233,7 +233,7 @@ then
     [ "${HB_WITHOUT_X11}" != yes ] && ADD_LIBS="$ADD_LIBS -L/usr/X11R6/$HB_LIBDIRNAME -lX11"
 
     export L_USR="-L${HB_LIB_INSTALL} -l${name} ${ADD_LIBS}"
-    export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\""
+    export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\" ${PRG_USR}"
 
     for utl in hbmake hbrun hbpp hbdoc hbtest hbdict xbscript
     do

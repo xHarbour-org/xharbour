@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.33 2005/01/30 06:45:45 druzus Exp $
+ * $Id: workarea.c,v 1.34 2005/01/30 21:19:24 druzus Exp $
  */
 
 /*
@@ -283,11 +283,15 @@ ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
       {
          case 'C':
             pFieldInfo.uiType = HB_IT_STRING;
+            pFieldInfo.uiLen = uiLen;
+/* Too many people reported the behavior with code below as a
+   Clipper compatibility bug so I commented this code. Druzus.
 #ifdef HB_C52_STRICT
             pFieldInfo.uiLen = uiLen;
 #else
             pFieldInfo.uiLen = uiLen + uiDec * 256;
 #endif
+*/
             break;
 
          case 'L':

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.182 2004/12/14 00:15:41 druzus Exp $
+* $Id: thread.c,v 1.183 2005/01/10 18:45:42 druzus Exp $
 */
 
 /*
@@ -2323,13 +2323,14 @@ HB_FUNC( HB_MUTEXTIMEOUTLOCK )
 #endif
 
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
+   int iTimeOut = hb_parni(2);
 #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
-   DWORD dwTimeOut = (DWORD) hb_parni(2);
+   DWORD dwTimeOut = (DWORD) iTimeOut;
 #else
-   int dwTimeOut = hb_parni(2);
+   int dwTimeOut = iTimeOut;
 #endif
 
-   if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE || dwTimeOut < 0 )
+   if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE || iTimeOut < 0 )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXTIMEOUTLOCK", 2, hb_paramError(1), hb_paramError(2) );
       return;
