@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.26 2004/04/14 20:59:10 andijahja Exp $
+ * $Id: hbcomp.h,v 1.27 2004/04/14 22:39:19 andijahja Exp $
  */
 
 /*
@@ -533,10 +533,7 @@ extern char *         hb_comp_szLastMethod;
 
 extern char *         hb_comp_szErrors[];
 extern char *         hb_comp_szWarnings[];
-
-#if 0
 extern char *         hb_pp_STD_CH;
-#endif
 
 extern BOOL           hb_comp_bAutoOpen;
 extern BOOL           hb_comp_bError;
