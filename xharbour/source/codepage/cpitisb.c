@@ -1,5 +1,5 @@
 /*
- * $Id: cpitisb.c,v 1.1 2004/11/21 21:43:42 druzus Exp $
+ * $Id: cpitisb.c,v 1.2 2004/11/22 21:45:56 druzus Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  31    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  36    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
@@ -86,8 +86,8 @@
 
 static HB_CODEPAGE s_codepage = { "ITISB",
     CPID_8859_1B, UNITB_8859_1B, NUMBER_OF_CHARACTERS,
-    "AáBCDEéFGHIíJKLMNOóPQRSTUúVWXYZ",
-    "aábcdeéfghiíjklmnoópqrstuúvwxyz",
+    "AàáBCDEèéFGHIìíJKLMNOòóPQRSTUùúVWXYZ",
+    "aàábcdeèéfghiìíjklmnoòópqrstuùúvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0,NULL,NULL,NULL,NULL,0,NULL };
 
 HB_CODEPAGE_ANNOUNCE( ITISB );

@@ -1,14 +1,12 @@
 /*
- * $Id: cpitiso.c,v 1.2 2004/11/22 21:45:56 druzus Exp $
+ * $Id$
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Spanish MS-DOS )
+ * National Collation Support Module ( Italian MS-DOS cp 437 )
  *
- * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
- * www - http://www.harbour-project.org
- * Spanish MS-DOS support by Antonio Linares <alinares@fivetechsoft.com>
+ * Copyright 2004 Maurilio Longo - <maurilio.longo@libero.it>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +51,7 @@
 
 /* Language name: Italian */
 /* ISO language code (2 chars): IT */
-/* Codepage: ISO-8859-1 */
+/* Codepage: 437 */
 
 #include <ctype.h>
 #include "hbapi.h"
@@ -75,7 +73,7 @@
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-      a~«
+      a~Ä
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -84,17 +82,17 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "ITISO",
-    CPID_8859_1, UNITB_8859_1, NUMBER_OF_CHARACTERS,
-    "A‡·BCDEËÈFGHIÏÌJKLMNOÚÛPQRSTU˘˙VWXYZ",
-    "a‡·bcdeËÈfghiÏÌjklmnoÚÛpqrstu˘˙vwxyz",
+static HB_CODEPAGE s_codepage = { "ITDOS437",
+    CPID_437, UNITB_8859_1, NUMBER_OF_CHARACTERS,
+    "AÖ†BCDEäÇFGHIç°JKLMNOï¢PQRSTUó£VWXYZ",
+    "aÖ†bcdeäÇfghiç°jklmnoï¢pqrstuó£vwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( ITISO );
+HB_CODEPAGE_ANNOUNCE( ITDOS437 );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_ITISO )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_ITDOS437 )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_ITISO )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_ITDOS437 )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_ITISO
+   #pragma startup hb_codepage_Init_ITDOS437
 #endif

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.11 2004/12/19 11:34:09 ptsarenko Exp $
+# $Id: Makefile,v 1.12 2004/12/20 16:48:43 mlombardo Exp $
 #
 
 ROOT = ../../
@@ -15,6 +15,7 @@ C_SOURCES=\
       cpitiso.c \
       cpitisb.c \
       cpitdos.c \
+      cpdos437.c \
       cpltwin.c \
       cppl852.c \
       cppliso.c \
