@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2069 2004/01/15 19:19:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2070 2004/01/15 19:39:35 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-16 11:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+     - WVT_SETFONT()/hb_wvt_gtSetFont() change so parameter fontWidth can be < 0
+        if fontWidth is < 0 then the width of character is forced and tm.tmAveCharWidth is not used
+        Allow precise control over width of characters but if abused will produce weird display
+
 2004-01-16 08:40 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/inkey.c
     + inkey() - Reset LASTKEY() value to return of SETINKEYAFTERBLOCK()

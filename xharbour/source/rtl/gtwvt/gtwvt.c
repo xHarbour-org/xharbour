@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.49 2004/01/15 14:58:28 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.50 2004/01/15 16:52:22 lf_sfnet Exp $
  */
 
 /*
@@ -121,7 +121,7 @@ static void    hb_wvt_gtResetWindowSize( HWND hWnd );
 static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam );
 static BOOL    hb_wvt_gtAllocSpBuffer( USHORT col, USHORT row );
 static DWORD   hb_wvt_gtProcessMessages( void );
-static BOOL    hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont );
+static BOOL    hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int width );
 
 static void    hb_wvt_gtSetCaretOn( BOOL bOn );
 static BOOL    hb_wvt_gtSetCaretPos( void );
@@ -673,7 +673,7 @@ BOOL HB_GT_FUNC( gt_SetMode( USHORT row, USHORT col ) )
       // make sure that the mode selected along with the current
       // font settings will fit in the window
       //
-      if ( hb_wvt_gtValidWindowSize( row,col, hFont ) )
+      if ( hb_wvt_gtValidWindowSize( row,col, hFont, _s.fontWidth ) )
       {
         bResult = hb_wvt_gtInitWindow( _s.hWnd, col, row );
       }
@@ -1399,7 +1399,7 @@ static BOOL hb_wvt_gtInitWindow( HWND hWnd, USHORT col, USHORT row )
 
 //-------------------------------------------------------------------//
 
-static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont )
+static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int iWidth )
 {
   HDC        hdc;
   HFONT      hOldFont ;
@@ -1418,7 +1418,7 @@ static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont )
   SelectObject( hdc, hOldFont ); // Put old font back
   ReleaseDC( _s.hWnd, hdc );
 
-  width     = tm.tmAveCharWidth * cols ;  // Total pixel width this setting would take
+  width     = iWidth < 0 ? -iWidth : tm.tmAveCharWidth * cols ;  // Total pixel width this setting would take
   height    = tm.tmHeight * rows;         // Total pixel height this setting would take
 
   return( ( width <= maxWidth ) && ( height <= maxHeight ) );
@@ -1456,10 +1456,11 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
   // we will need to use the font size to handle the transformations from
   // row column space in the future, so we keep it around in a static!
   //
-  _s.PTEXTSIZE.x = tm.tmAveCharWidth; // For fixed FONT should == tm.tmMaxCharWidth
+
+  _s.PTEXTSIZE.x = _s.fontWidth<0 ? -_s.fontWidth : tm.tmAveCharWidth; // For fixed FONT should == tm.tmMaxCharWidth
   _s.PTEXTSIZE.y = tm.tmHeight;       //     but seems to be a problem on Win9X so
                                       //     assume proportional fonts always for Win9X
-  if ( _s.Win9X || ( tm.tmPitchAndFamily & TMPF_FIXED_PITCH ) || ( _s.PTEXTSIZE.x != tm.tmMaxCharWidth ) )
+  if (_s.fontWidth < 0 || _s.Win9X || ( tm.tmPitchAndFamily & TMPF_FIXED_PITCH ) || ( _s.PTEXTSIZE.x != tm.tmMaxCharWidth ) )
   {
     _s.FixedFont = FALSE;
   }
@@ -2518,7 +2519,7 @@ static HFONT hb_wvt_gtGetFont( char * pszFace, int iHeight, int iWidth, int iWei
     logfont.lfQuality        = iQuality;              // DEFAULT_QUALITY, DRAFT_QUALITY or PROOF_QUALITY
     logfont.lfPitchAndFamily = FIXED_PITCH+FF_MODERN; // all mapping depends on fixed width fonts!
     logfont.lfHeight         = iHeight;
-    logfont.lfWidth          = iWidth;
+    logfont.lfWidth          = iWidth < 0 ? -iWidth : iWidth ;
 
     strcpy( logfont.lfFaceName,pszFace );
 
@@ -2823,7 +2824,7 @@ BOOL HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold
     // make sure that the font  will fit inside the
     // window with the current _s.ROWS and _s.COLS setting
     //
-    if ( hb_wvt_gtValidWindowSize( _s.ROWS,_s.COLS, hFont ) )
+    if ( hb_wvt_gtValidWindowSize( _s.ROWS,_s.COLS, hFont, width ) )
     {
       _s.fontHeight  = height;
       _s.fontWidth   = width;
@@ -3246,11 +3247,11 @@ HB_FUNC( WVT_GETFONTINFO )
    temp = hb_itemPutNL( NULL, _s.PTEXTSIZE.y );
    hb_arraySet( info, 6, temp );
    hb_itemRelease( temp );
-   
+
    temp = hb_itemPutNL( NULL, _s.PTEXTSIZE.x );
    hb_arraySet( info, 7, temp );
    hb_itemRelease( temp );
-   
+
    hb_itemReturn( info );
    hb_itemRelease( info );
 }
@@ -3262,7 +3263,7 @@ HB_FUNC( WVT_GETPALLETE )
    PHB_ITEM  info;
    PHB_ITEM  temp;
    int       i;
-   
+
    info = hb_itemArrayNew( 16 );
 
    for ( i = 0; i < 16; i++ )
@@ -3282,7 +3283,7 @@ HB_FUNC( WVT_GETPALLETE )
 HB_FUNC( WVT_SETPALLETE )
 {
    int       i;
-   
+
    for ( i = 0; i < 16; i++ )
    {
       _COLORS[ i ] = hb_parnl( 1, i+1 );
@@ -3418,7 +3419,7 @@ HB_FUNC( WVT_SETALTF4CLOSE )
 HB_FUNC( WVT_PROCESSMESSAGES )
 {
   hb_wvt_gtDoProcessMessages();
- 
+
   hb_retl( 1 );
 }
 
@@ -3429,7 +3430,7 @@ HB_FUNC( WVT_GETTITLE )
   unsigned char ucText[ 1024 ];
 
   hb_wvt_gtGetWindowTitle( ( char* ) ucText, 1023 );
- 
+
   hb_retc( ( char* ) ucText ) ;
 }
 
@@ -3733,7 +3734,7 @@ HB_FUNC( WVT_DRAWLABEL )
    logfont.lfQuality        = ( ISNIL( 12 ) ? DEFAULT_QUALITY : hb_parni( 12 ) );
    logfont.lfPitchAndFamily = FF_DONTCARE;
    logfont.lfHeight         = ( ISNIL(  9 ) ? _s.fontHeight : hb_parni(  9 ) );
-   logfont.lfWidth          = ( ISNIL( 10 ) ? _s.fontWidth  : hb_parni( 10 ) );
+   logfont.lfWidth          = ( ISNIL( 10 ) ? (_s.fontWidth <0 ? -_s.fontWidth : _s.fontWidth)  : hb_parni( 10 ) );
 
    strcpy( logfont.lfFaceName, ( ISNIL( 8 ) ? _s.fontFace : hb_parc( 8 ) ) );
 
