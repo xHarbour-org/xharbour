@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.5 2003/11/10 11:49:48 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.6 2003/11/15 23:33:16 druzus Exp $
  */
 
 /*
@@ -65,11 +65,28 @@ extern "C" {
 
 
 /* DBF default file extensions */
-#define DBF_TABLEEXT                              ".dbf"
-/* DBF lock */
-#define DBF_LOCKPOS                          1000000000L
+#define DBF_TABLEEXT                      ".dbf"
+/* DBF locking schemes */
+#define DBF_LOCKPOS_CLIP                  1000000000L
+#define DBF_LOCKPOS_CL53                  1000000000L
+#define DBF_LOCKPOS_VFP                   0x7ffffffeL
 
+#define DBF_LOCKDIR_CLIP                  1
+#define DBF_LOCKDIR_CL53                  1
+#define DBF_LOCKDIR_VFP                   -1
 
+#define FILE_LOCKPOS_CLIP                 1000000000L
+#define FILE_LOCKPOS_CL53                 0xfffeffffL
+#define FILE_LOCKPOS_VFP                  0x7ffffffeL
+
+#define FILE_LOCKPOOL_CLIP                0L
+#define FILE_LOCKPOOL_CL53                0x0000ffffL
+#define FILE_LOCKPOOL_VFP                 0L
+
+#ifdef OS_UNIX_COMPATIBLE
+#define DBF_EXLUSIVE_LOCKPOS              0x7fffffffL
+#define DBF_EXLUSIVE_LOCKSIZE             1L
+#endif
 
 /*
  *  DBF WORKAREA
@@ -136,11 +153,12 @@ typedef struct _DBFAREA
    BOOL fDeleted;                /* TRUE if record is deleted */
    BOOL fUpdateHeader;           /* Update header of file */
    BOOL fFLocked;                /* TRUE if file is locked */
-   BOOL fHeaderLocked;           /* TRUE id DBF header is locked */
+   BOOL fHeaderLocked;           /* TRUE if DBF header is locked */
    LPDBRELINFO lpdbPendingRel;   /* Pointer to parent rel struct */
    BYTE bYear;                   /* Last update */
    BYTE bMonth;
    BYTE bDay;
+   BYTE bLockType;               /* Type of locking shemes */
    ULONG * pLocksPos;            /* List of records locked */
    ULONG ulNumLocksPos;          /* Number of records locked */
 #ifndef HB_CDP_SUPPORT_OFF
@@ -153,7 +171,6 @@ typedef DBFAREA * LPDBFAREA;
 #ifndef DBFAREAP
 #define DBFAREAP LPDBFAREA
 #endif
-
 
 #ifndef HB_EXTERNAL_RDDDBF_USE
 
@@ -260,6 +277,14 @@ static ERRCODE hb_dbfDrop( PHB_ITEM pItemTable );
 static BOOL    hb_dbfExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex );
 
 #define hb_dbfWhoCares                             NULL
+
+#else
+
+extern ULONG hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex );
+extern void  hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock );
+extern ERRCODE hb_dbfGetEGcode( ERRCODE errCode );
+extern BOOL hb_dbfLockExtFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, USHORT *pPoolPos );
+extern BOOL hb_dbfLockExtGetData( BYTE bScheme, ULONG *ulPos, USHORT *usPool );
 
 #endif /* HB_EXTERNAL_RDDDBF_USE */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.41 2003/09/15 16:39:26 druzus Exp $
+ * $Id: dbf1.c,v 1.42 2003/11/15 23:33:16 druzus Exp $
  */
 
 /*
@@ -549,6 +549,7 @@ ERRCODE hb_dbfGetEGcode( ERRCODE errCode )
 
    return errEGcode;
 }
+
 /*
  * Converts memo block offset into ASCII.
  * This function is common for different MEMO implementation
@@ -594,6 +595,88 @@ void hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock )
          pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] + iCount ] = ' ';
    }
 }
+
+/*
+ * Get information about locking schemes for additional files (MEMO, INDEX)
+ * This function is common for different MEMO implementation
+ * so I left it in DBF.
+ */
+BOOL hb_dbfLockExtGetData( BYTE bScheme, ULONG *ulPos, USHORT *usPool )
+{
+   switch ( bScheme )
+   {
+      case HB_SET_DBFLOCK_CLIP:
+         *ulPos  = FILE_LOCKPOS_CLIP;
+         *usPool = FILE_LOCKPOOL_CLIP;
+         break;
+
+      case HB_SET_DBFLOCK_CL53:
+         *ulPos  = FILE_LOCKPOS_CL53;
+         *usPool = FILE_LOCKPOOL_CL53;
+         break;
+
+      case HB_SET_DBFLOCK_VFP:
+         *ulPos  = FILE_LOCKPOS_VFP;
+         *usPool = FILE_LOCKPOOL_VFP;
+         break;
+
+      default:
+         return FALSE;
+   }
+   return TRUE;
+}
+
+/*
+ * Set lock using current locking schemes in additional files (MEMO, INDEX)
+ * This function is common for different MEMO implementation
+ * so I left it in DBF.
+ */
+BOOL hb_dbfLockExtFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, USHORT *pPoolPos )
+{
+   ULONG ulPos, ulSize = 1;
+   USHORT usPool;
+   BOOL fRet = FALSE, fWait;
+
+   if ( !hb_dbfLockExtGetData( bScheme, &ulPos, &usPool ) )
+      return FALSE;
+
+   do
+   {
+      switch ( usMode & FL_MASK )
+      {
+         case FL_LOCK:
+            if ( usPool )
+            {
+               if ( ( usMode & FLX_SHARED ) != 0 )
+                  *pPoolPos = 1; /* TODO: random value 1<=x<usPool */
+               else
+               {
+                  *pPoolPos = 0;
+                  ulSize = usPool;
+               }
+            }
+            break;
+
+         case FL_UNLOCK:
+            if ( usPool )
+            {
+               if ( ! *pPoolPos )
+                  ulSize = usPool;
+            }
+            break;
+
+         default:
+            return FALSE;
+      }
+      fRet = hb_fsLock( hFile, ulPos + *pPoolPos, ulSize, usMode );
+      fWait = ( !fRet && ( usMode & FLX_WAIT ) != 0 && ( usMode & FL_MASK ) == FL_LOCK );
+      /* TODO: call special error handler (LOCKHANDLER) hiere if fWait */
+
+   } while ( fWait );
+   return fRet;
+}
+
+
 
 /*
  * -- DBF METHODS --
@@ -676,7 +759,7 @@ static ERRCODE hb_dbfGoTo( DBFAREAP pArea, ULONG ulRecNo )
    pArea->lpdbPendingRel = NULL;
 
    /* Update record count */
-   if( pArea->fShared && ulRecNo > pArea->ulRecCount )
+   if( ulRecNo > pArea->ulRecCount && pArea->fShared )
       pArea->ulRecCount = hb_dbfCalcRecCount( pArea );
 
    if( ulRecNo <= pArea->ulRecCount && ulRecNo >= 1 )
@@ -850,7 +933,7 @@ static ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
    if( pArea->fShared )
    {
       bLocked = FALSE;
-      if( SELF_RAWLOCK( ( AREAP ) pArea, HEADER_LOCK, 0 ) == SUCCESS )
+      if( SELF_RAWLOCK( ( AREAP ) pArea, APPEND_LOCK, 0 ) == SUCCESS )
       {
          /* Update RecCount */
          pArea->ulRecCount = hb_dbfCalcRecCount( pArea );
@@ -862,7 +945,7 @@ static ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
       }
       if( !bLocked )
       {
-         SELF_RAWLOCK( ( AREAP ) pArea, HEADER_UNLOCK, 0 );
+         SELF_RAWLOCK( ( AREAP ) pArea, APPEND_UNLOCK, 0 );
          pError = hb_errNew();
          hb_errPutGenCode( pError, EG_APPENDLOCK );
          hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_APPENDLOCK ) );
@@ -885,7 +968,7 @@ static ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
    if( pArea->fShared )
    {
       uiError = SELF_GOCOLD( ( AREAP ) pArea );
-      SELF_RAWLOCK( ( AREAP ) pArea, HEADER_UNLOCK, 0 );
+      SELF_RAWLOCK( ( AREAP ) pArea, APPEND_UNLOCK, 0 );
       return uiError;
    }
    return SUCCESS;
@@ -1652,6 +1735,18 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_itemPutNL( pItem, (LONG)pArea->hMemoFile );
          break;
 
+      case DBI_LOCKSCHEME:
+      {
+         SHORT bScheme = hb_itemGetNI( pItem );
+         hb_itemPutNI( pItem, pArea->bLockType );
+         switch ( bScheme )
+         {
+            case HB_SET_DBFLOCK_CLIP:
+            case HB_SET_DBFLOCK_CL53:
+            case HB_SET_DBFLOCK_VFP:
+               pArea->bLockType = bScheme;
+         }
+      }
    }
 
    return SUCCESS;
@@ -1701,6 +1796,13 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       return FAILURE;
    }
 
+   if ( !pArea->bLockType )
+   {
+      if ( hb_set.HB_SET_DBFLOCKSCHEME )
+         pArea->bLockType = hb_set.HB_SET_DBFLOCKSCHEME;
+      else
+         pArea->bLockType = HB_SET_DBFLOCK_CLIP;
+   }
    ( ( PHB_DYNS ) pArea->atomAlias )->hArea = pOpenInfo->uiArea;
 #ifndef HB_CDP_SUPPORT_OFF
    if( pOpenInfo->cdpId )
@@ -1729,6 +1831,17 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    do
    {
       pArea->hDataFile = hb_spOpen( pOpenInfo->abName, uiFlags );
+#ifdef DBF_EXLUSIVE_LOCKPOS
+      if( pArea->hDataFile != FS_ERROR )
+      {
+         if ( !hb_fsLock( pArea->hDataFile, DBF_EXLUSIVE_LOCKPOS, DBF_EXLUSIVE_LOCKSIZE,
+                          FL_LOCK | ( pArea->fShared ? FLX_SHARED : FLX_EXCLUSIVE ) ) )
+         {
+            hb_fsClose( pArea->hDataFile );
+            pArea->hDataFile = FS_ERROR;
+         }
+      }
+#endif
       if( pArea->hDataFile == FS_ERROR )
       {
          if( !pError )
@@ -2317,17 +2430,46 @@ static ERRCODE hb_dbfSetFilter( DBFAREAP pArea, LPDBFILTERINFO pFilterInfo )
 static ERRCODE hb_dbfRawLock( DBFAREAP pArea, USHORT uiAction, ULONG ulRecNo )
 {
    ERRCODE uiErr = SUCCESS;
+   ULONG ulPos;
+   SHORT iDir;
+   BOOL fLck;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfRawLock(%p, %hu, %lu)", pArea, uiAction, ulRecNo));
 
    if( pArea->fShared )
    {
+      switch( pArea->bLockType )
+      {
+         case HB_SET_DBFLOCK_CLIP:
+            ulPos = DBF_LOCKPOS_CLIP;
+            iDir = DBF_LOCKDIR_CLIP;
+            break;
+
+         case HB_SET_DBFLOCK_CL53:
+            ulPos = DBF_LOCKPOS_CL53;
+            iDir = DBF_LOCKDIR_CL53;
+            break;
+
+         case HB_SET_DBFLOCK_VFP:
+            ulPos = DBF_LOCKPOS_VFP;
+            iDir = DBF_LOCKDIR_VFP;
+            break;
+
+         default:
+            return FAILURE;
+      }
+
       switch( uiAction )
       {
          case FILE_LOCK:
             if( !pArea->fFLocked )
             {
-               if( !hb_fsLock( pArea->hDataFile, DBF_LOCKPOS + 1, DBF_LOCKPOS, FL_LOCK ) )
+               if ( iDir < 0 )
+                  fLck = hb_fsLock( pArea->hDataFile, 1, ulPos - 1, FL_LOCK );
+               else
+                  fLck = hb_fsLock( pArea->hDataFile, ulPos + 1, ulPos, FL_LOCK );
+
+               if( !fLck )
                   uiErr = FAILURE;
                else
                   pArea->fFLocked = TRUE;
@@ -2337,40 +2479,59 @@ static ERRCODE hb_dbfRawLock( DBFAREAP pArea, USHORT uiAction, ULONG ulRecNo )
          case FILE_UNLOCK:
             if( pArea->fFLocked )
             {
-               if( !hb_fsLock( pArea->hDataFile, DBF_LOCKPOS + 1, DBF_LOCKPOS, FL_UNLOCK ) )
+               if ( iDir < 0 )
+                  fLck = hb_fsLock( pArea->hDataFile, 1, ulPos - 1, FL_UNLOCK );
+               else
+                  fLck = hb_fsLock( pArea->hDataFile, ulPos + 1, ulPos, FL_UNLOCK );
+
+               if( !fLck )
                   uiErr = FAILURE;
                pArea->fFLocked = FALSE;
             }
             break;
 
-         case APPEND_LOCK:
          case REC_LOCK:
             if( !pArea->fFLocked )
-               if( !hb_fsLock( pArea->hDataFile, DBF_LOCKPOS + ulRecNo, 1, FL_LOCK ) )
+            {
+               if ( iDir < 0 )
+                  fLck = hb_fsLock( pArea->hDataFile, ulPos - ulRecNo, 1, FL_LOCK );
+               else
+                  fLck = hb_fsLock( pArea->hDataFile, ulPos + ulRecNo, 1, FL_LOCK );
+
+               if( !fLck )
                   uiErr = FAILURE;
+            }
             break;
 
-         case APPEND_UNLOCK:
          case REC_UNLOCK:
             if( !pArea->fFLocked )
-               if( !hb_fsLock( pArea->hDataFile, DBF_LOCKPOS + ulRecNo, 1, FL_UNLOCK ) )
+            {
+               if ( iDir < 0 )
+                  fLck = hb_fsLock( pArea->hDataFile, ulPos - ulRecNo, 1, FL_UNLOCK );
+               else
+                  fLck = hb_fsLock( pArea->hDataFile, ulPos + ulRecNo, 1, FL_UNLOCK );
+               if( !fLck )
                   uiErr = FAILURE;
+            }
             break;
 
+         case APPEND_LOCK:
          case HEADER_LOCK:
             if( !pArea->fHeaderLocked )
             {
-               if( !hb_fsLock( pArea->hDataFile, DBF_LOCKPOS, 1, FL_LOCK ) )
+               while (! (fLck = hb_fsLock( pArea->hDataFile, ulPos, 1, FL_LOCK | FLX_WAIT ) ) );
+               if( !fLck )
                   uiErr = FAILURE;
                else
                   pArea->fHeaderLocked = TRUE;
             }
             break;
 
+         case APPEND_UNLOCK:
          case HEADER_UNLOCK:
             if( pArea->fHeaderLocked )
             {
-               if( !hb_fsLock( pArea->hDataFile, DBF_LOCKPOS, 1, FL_UNLOCK ) )
+               if( !hb_fsLock( pArea->hDataFile, ulPos, 1, FL_UNLOCK ) )
                   uiErr = FAILURE;
                pArea->fHeaderLocked = FALSE;
             }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.14 2003/11/10 11:49:48 druzus Exp $
+ * $Id: hbrddntx.h,v 1.15 2003/11/15 23:33:16 druzus Exp $
  */
 
 /*
@@ -285,11 +285,12 @@ typedef struct _NTXAREA
    BOOL fDeleted;                /* TRUE if record is deleted */
    BOOL fUpdateHeader;           /* Update header of file */
    BOOL fFLocked;                /* TRUE if file is locked */
-   BOOL fHeaderLocked;           /* TRUE id DBF header is locked */
+   BOOL fHeaderLocked;           /* TRUE if DBF header is locked */
    LPDBRELINFO lpdbPendingRel;   /* Pointer to parent rel struct */
    BYTE bYear;                   /* Last update */
    BYTE bMonth;
    BYTE bDay;
+   BYTE bLockType;               /* Type of locking shemes */
    ULONG * pLocksPos;            /* List of records locked */
    ULONG ulNumLocksPos;          /* Number of records locked */
 #ifndef HB_CDP_SUPPORT_OFF

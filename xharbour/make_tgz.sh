@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.17 2003/11/04 08:31:01 druzus Exp $
+# $Id: make_tgz.sh,v 1.18 2003/11/10 11:49:47 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -406,7 +406,8 @@ pushd tests
 $HB_BIN_INSTALL/${hb_pref}mk pp -n -w -D_DEFAULT_INC_DIR=\"${_DEFAULT_INC_DIR}\"
 install -m755 -s pp $HB_BIN_INSTALL/pp
 ln -s pp $HB_BIN_INSTALL/pprun
-install -m644 rp_dot.ch $HB_INC_INSTALL/
+install -m644 rp_dot.src $HB_INC_INSTALL/
+install -m644 rp_run.src $HB_INC_INSTALL/
 rm -f pp
 popd
 

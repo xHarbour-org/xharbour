@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.2 2002/10/16 08:54:39 brianhays Exp $
+ * $Id: dbinfo.ch,v 1.1 2002/12/23 20:04:15 lculik Exp $
  */
 
 /*
@@ -155,6 +155,9 @@
 
 #define DBI_DB_VERSION          101  /* Version of the Host driver          */
 #define DBI_RDD_VERSION         102  /* current RDD's version               */
+
+/* HARBOUR extension */
+#define DBI_LOCKSCHEME          128  /* locking scheme used by RDD */
 
 #define DBI_USER               1000  /* User-defined DBI_ constants */
 

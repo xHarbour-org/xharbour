@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.71 2003/11/10 00:59:32 fsgiudice Exp $
+# $Id: makefile.bc,v 1.72 2003/11/16 01:56:15 ronpinkas Exp $
 #
 
 #
@@ -756,6 +756,7 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cdppl852.obj \
    $(OBJ_DIR)\cdppliso.obj \
    $(OBJ_DIR)\cdpplmaz.obj \
+   $(OBJ_DIR)\cdpplwin.obj \
    $(OBJ_DIR)\cdpru866.obj \
    $(OBJ_DIR)\cdpruwin.obj \
    $(OBJ_DIR)\cdpsrwin.obj \
@@ -2607,6 +2608,9 @@ $(OBJ_DIR)\cdppliso.obj : $(CODEPAGE_DIR)\cdppliso.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cdpplmaz.obj : $(CODEPAGE_DIR)\cdpplmaz.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cdpplwin.obj : $(CODEPAGE_DIR)\cdpplwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cdpru866.obj : $(CODEPAGE_DIR)\cdpru866.c

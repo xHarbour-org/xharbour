@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.38 2003/11/11 01:34:45 druzus Exp $
+# $Id: xharbour.spec,v 1.39 2003/11/15 23:33:13 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -627,7 +627,8 @@ pushd tests
 $HB_BIN_INSTALL/%{hb_pref}mk pp -n -w -D_DEFAULT_INC_DIR=\"${_DEFAULT_INC_DIR}\"
 install -m755 -s pp $HB_BIN_INSTALL/pp
 ln -s pp $HB_BIN_INSTALL/pprun
-install -m644 rp_dot.ch $HB_INC_INSTALL/
+install -m644 rp_dot.src $HB_INC_INSTALL/
+install -m644 rp_run.src $HB_INC_INSTALL/
 popd
 
 # check if we should rebuild tools with shared libs

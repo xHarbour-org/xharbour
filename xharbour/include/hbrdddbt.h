@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbt.h,v 1.2 2003/09/09 09:47:16 paultucker Exp $
+ * $Id: hbrdddbt.h,v 1.3 2003/11/10 11:49:48 druzus Exp $
  */
 
 /*
@@ -193,8 +193,5 @@ static ERRCODE hb_dbtWriteDBHeader( DBTAREAP pArea );
 #if defined(HB_EXTERN_C)
 }
 #endif
-
-extern ULONG hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex );
-extern void  hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock );
 
 #endif /* HB_RDDDBT */

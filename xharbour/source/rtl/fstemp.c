@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.5 2003/03/08 13:37:59 likewolf Exp $
+ * $Id: fstemp.c,v 1.6 2003/11/11 20:20:54 ronpinkas Exp $
  */
 
 /*
@@ -119,12 +119,21 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
    USHORT nAttemptLeft = 99;
    FHANDLE fd;
 
+   HB_SYMBOL_UNUSED( uiAttr );
+
    pszName[0] = '\0';
 
    if ( pszDir != NULL && pszDir[0] != '\0' )
    {
+      strcpy( pszName, pszDir );
+   }
+   else
+   {
+      strcpy( pszName, P_tmpdir );
+   }
+   if ( pszName[0] != '\0' )
+   {
       int len;
-      strcpy(pszName, pszDir );
       len = strlen( pszName );
       pszName[ len ] = hb_set.HB_SET_DIRSEPARATOR;
       pszName[ len + 1 ] = '\0';

@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.9 2003/09/04 05:31:32 andijahja Exp $
+ * $Id: inkey.c,v 1.10 2003/11/20 01:18:58 andijahja Exp $
  */
 
 /*
@@ -467,8 +467,6 @@ HB_FUNC( HB_KEYPUT )
 
 HB_FUNC( NEXTKEY )
 {
-   hb_idleState();
-   hb_idleReset();
    hb_retni( hb_inkeyNext( ISNUM( 1 ) ? ( HB_inkey_enum ) hb_parni( 1 ) : hb_set.HB_SET_EVENTMASK ) );
 }
 

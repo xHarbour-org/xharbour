@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.13 2003/10/18 02:38:45 jonnymind Exp $
+ * $Id: hbset.h,v 1.14 2003/10/23 20:12:55 peterrees Exp $
  */
 
 /*
@@ -131,7 +131,8 @@ typedef enum
    HB_SET_DIRCASE       = 106,
    HB_SET_DIRSEPARATOR  = 107,
    HB_SET_ERRORLOOP     = 108,
-   HB_SET_OUTPUTSAFETY  = 109
+   HB_SET_OUTPUTSAFETY  = 109,
+   HB_SET_DBFLOCKSCHEME = 110
 
 } HB_set_enum;
 
@@ -201,7 +202,7 @@ typedef struct
    char    HB_SET_DIRSEPARATOR;
    int     HB_SET_ERRORLOOP;
    BOOL    HB_SET_OUTPUTSAFETY;
-
+   int     HB_SET_DBFLOCKSCHEME;
 } HB_SET_STRUCT;
 
 #define HB_SET_CASE_MIXED  0
@@ -211,6 +212,11 @@ typedef struct
 #define HB_SET_TRACESTACK_NONE    0
 #define HB_SET_TRACESTACK_CURRENT 1
 #define HB_SET_TRACESTACK_ALL     2
+
+#define HB_SET_DBFLOCK_DEFAULT    0
+#define HB_SET_DBFLOCK_CLIP       1
+#define HB_SET_DBFLOCK_CL53       2
+#define HB_SET_DBFLOCK_VFP        3
 
 extern HB_EXPORT HB_SET_STRUCT hb_set;
 

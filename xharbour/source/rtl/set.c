@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.34 2003/10/18 01:15:19 jonnymind Exp $
+ * $Id: set.c,v 1.35 2003/10/23 01:32:20 peterrees Exp $
  */
 
 /*
@@ -1341,9 +1341,22 @@ HB_FUNC( SET )
          hb_set.HB_SET_OUTPUTSAFETY = set_logical(pArg2, TRUE );
          break;
 
+      case HB_SET_DBFLOCKSCHEME:
+         hb_retni( hb_set.HB_SET_DBFLOCKSCHEME );
+         if( args > 1 )
+         {
+            if( set_number( pArg2, hb_set.HB_SET_DBFLOCKSCHEME ) < 0 )
+            {
+               hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+            }
+            else
+            {
+               hb_set.HB_SET_DBFLOCKSCHEME = set_number( pArg2, hb_set.HB_SET_DBFLOCKSCHEME );
+            }
+         }
+         break;
 
-
-      default                :
+      default:
          /* Return NIL if called with invalid SET specifier */
          break;
    }
@@ -1449,6 +1462,8 @@ void hb_setInitialize( void )
 
 /* JC1: Set for output thread safety */
    hb_set.HB_SET_OUTPUTSAFETY = TRUE;
+
+   hb_set.HB_SET_DBFLOCKSCHEME = 0;
 
    hb_set.HB_SET_WRAP = FALSE;
    hb_set.hb_set_winprinter=FALSE;
