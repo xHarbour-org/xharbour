@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.1220 2003/07/07 02:32:57 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1221 2003/07/07 03:34:51 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-07 01:35 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/compiler/harbour.c
+    ! Add type of 7th parameter in DBUSEAREA.
+  * source/pp/pptable.c
+    ! Fix name of parameters in translate USE => dbUseArea()
 
 2003-07-07 00:01 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
     include/hbapi.h
@@ -42,6 +48,15 @@
       TODO: I'll add a doc to explain the users how to create .so
       libraries from their own application libraries.
 
+2003-06-07 16:25 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * contrib/rdd_ads/ace.h
+    ! Fix warning in declaration of function
+  * contrib/rdd_ads/ads1.c
+  * contrib/rdd_ads/adsfunc.c
+    ! Fix error and potential error of AE_INSUFFICIENT_BUFFER in
+      some function.
+      The len of buffer should include the NULL char.
+    ! Fix, now adsGoTo() test if the new position is EOF.
 
 2003-07-06 16:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/vm/hvm.c
