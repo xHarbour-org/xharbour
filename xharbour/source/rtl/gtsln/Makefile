@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2001/11/20 08:21:38 davep Exp $
+# $Id: Makefile,v 1.1.1.1 2001/12/21 10:42:31 ronpinkas Exp $
 #
 
 ROOT = ../../../
@@ -7,6 +7,7 @@ ROOT = ../../../
 C_SOURCES=\
 	gtsln.c \
 	kbsln.c \
+	termtype.c \
 	mousesln.c \
 
 LIBNAME=gtsln

@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.1.1.1 2001/12/21 10:42:33 ronpinkas Exp $
+ * $Id: gtsln.c,v 1.2 2002/03/31 22:50:53 map Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 
 /* *********************************************************************** */
 
-#include <slang.h>
+#include "gtsln.h"
 
 /* missing defines in previous versions of Slang - this can not work ! */
 #if SLANG_VERSION < 10400
@@ -85,10 +85,6 @@
 #include <signal.h>
 #include <time.h>
 
-#include "hbapi.h"
-#include "hbapigt.h"
-#include "inkey.ch"
-
 /* *********************************************************************** */
 
 /* if we can not manipulate cursor state */
@@ -113,8 +109,6 @@ unsigned char *hb_NationCharsEnvName = "HRBNATIONCHARS";
 
 static USHORT s_uiDispCount = 0;
 static SHORT s_sCursorStyle = SC_NORMAL;
-static BOOL s_linuxConsole = FALSE;
-static BOOL s_underXTerm = FALSE;
 
 /* indicate if we are currently running a command from system */
 static BOOL s_bSuspended = FALSE;
@@ -206,22 +200,6 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
             if( SLtt_set_cursor_visibility( 1 ) == -1 )
                s_sCursorStyle = SC_UNAVAIL;
 
-            /* an uncertain way to check if we run under linux console */
-            {
-               char * tmp = hb_getenv( "TERM" );
-               s_linuxConsole = tmp && tmp[ 0 ] != '\0' && ( strncmp( tmp, "linux", 5 ) == 0 );
-               if( tmp )
-                  hb_xfree( ( void * ) tmp );
-            }
-
-            /* an uncertain way to check if we run under xterm */
-            {
-               char * tmp = hb_getenv( "TERM" );
-               s_underXTerm = tmp && tmp[ 0 ] != '\0' && ( strncmp( tmp, "xterm", 5 ) == 0 );
-               if( tmp )
-                  hb_xfree( ( void * ) tmp );
-            }
-
             /* NOTE: this driver is implemented in a way that it is
                imposible to get intensity/blinking background mode.
                The reason is the way Slang is written.
@@ -283,7 +261,7 @@ void hb_gt_Exit( void )
    SLang_reset_tty();
 
    /* restore a standard bell frequency and duration */
-   if( s_linuxConsole )
+   if( hb_gt_UnderLinuxConsole )
    {
       escstr = "\033[10]";
       write( s_iFilenoStdout, escstr, strlen( escstr ) );
@@ -438,7 +416,7 @@ void hb_gt_SetCursorStyle( USHORT uiStyle )
 
 #ifdef __linux__
       /* NOTE: cursor apearence works only under linux console */
-      if( s_linuxConsole )
+      if( hb_gt_UnderLinuxConsole )
       {
          switch( uiStyle )
          {
@@ -762,7 +740,7 @@ void hb_gt_Tone( double dFrequency, double dDuration )
    dFrequency = HB_MIN( HB_MAX( 0.0, dFrequency ), 32767.0 );
    /* dDuration = dDuration * 1000.0 / 18.2; */ /* clocks */
 
-   if( s_linuxConsole )
+   if( hb_gt_UnderLinuxConsole )
    {
       snprintf( escstr, 63, "\033[10;%hd]", ( int )dFrequency );
       SLtt_write_string( escstr );
@@ -773,7 +751,7 @@ void hb_gt_Tone( double dFrequency, double dDuration )
 
    SLtt_beep();
 
-   if( s_linuxConsole )
+   if( hb_gt_UnderLinuxConsole )
    {
       /* NOTE : the code below is adapted from gtdos.c/hb_gt_Tone() */
 
@@ -1220,7 +1198,7 @@ static void hb_gt_build_conv_tabs()
    }
 
    /* QUESTION: do we have double, single-double, ... frames under xterm ? */
-   if( s_underXTerm )
+   if( hb_gt_UnderXTerm )
    {
       /* frames of all Clipper type are _B_SINBLE under xterm */
       s_convHighChars[ 205 ] = s_convHighChars[ 196 ];
