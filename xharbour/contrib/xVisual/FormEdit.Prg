@@ -1,5 +1,5 @@
 /*
- * $Id: FormEdit.Prg,v 1.58 2002/10/10 02:51:45 what32 Exp $
+ * $Id: FormEdit.Prg,v 1.59 2002/10/10 07:02:16 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -238,6 +238,10 @@ METHOD CreateControl(aRect)
          oObj:=::Add(cName, TTreeView():New(   self,        510, aRect[1], aRect[2], aRect[3], aRect[4] ) )
       CASE ::CtrlName=="Rebar"
          oObj:=::Add(cName, TRebar():New( self ) )
+      CASE ::CtrlName=="ToolBar"
+         oObj:=::Add(cName, TToolBar():New( self, 511, 15, , , 26, 26, 20, 20, 14 ) )
+      CASE ::CtrlName=="ProgressBar"
+         oObj:=::Add(cName, TProgressBar():New(   self,          aRect[1], aRect[2], aRect[3], aRect[4] ) )
       OTHERWISE // unknown name
 
          ::CtrlName:=NIL

@@ -74,13 +74,26 @@ typedef struct {;
 
 CLASS TToolbar FROM TControl
 
+   DATA Caption PROTECTED INIT ""
+   DATA Left    INIT    0
+   DATA Top     INIT    0
+   DATA Width   INIT    0
+   DATA Height  INIT    0
+
+   DATA Style   INIT  TBSTYLE_FLAT + TBSTYLE_TOOLTIPS + WS_CLIPCHILDREN + ;
+                      WS_CLIPSIBLINGS + CCS_ADJUSTABLE + CCS_NODIVIDER + CCS_NORESIZE + WS_CHILD
+   DATA ExStyle INIT  0
+
+   DATA lRegister PROTECTED INIT .F.
+   DATA lControl  PROTECTED INIT .T.
+   DATA Msgs      PROTECTED INIT {WM_SIZE,WM_MOVE}
+   DATA Name      PROTECTED INIT "ToolBar32"
+
+
    DATA abuttons PROTECTED
    DATA aBitmaps PROTECTED
-   DATA hParent  PROTECTED 
    DATA Created  PROTECTED
-   DATA hBmp     PROTECTED
    DATA ntProc   PROTECTED
-   DATA nBtn     PROTECTED HIDDEN
    DATA aMenus   PROTECTED
    VAR nImg,hBMInst,nBMId,xBtn,yBtn,xBmp,yBmp PROTECTED
 
@@ -111,6 +124,8 @@ METHOD New( oParent, nId, nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp ) CLASS T
 
    InitCommonControlsEx(ICC_COOL_CLASSES)
 
+   ::Id      := nId
+
    ::nImg    := nImg
    ::hBMInst := hBMInst
    ::nBMId   := nBMId
@@ -120,24 +135,10 @@ METHOD New( oParent, nId, nImg, hBMInst, nBMId, xBtn, yBtn, xBmp, yBmp ) CLASS T
    ::yBmp    := yBmp
   
    ::aButtons:={}
-   ::Style   :=TBSTYLE_FLAT + TBSTYLE_TOOLTIPS + WS_CLIPCHILDREN + ;
-              WS_CLIPSIBLINGS + CCS_ADJUSTABLE + CCS_NODIVIDER + CCS_NORESIZE + WS_CHILD
-   ::Id      := nId
    ::Created := .F.
    ::aBitmaps:={}
    ::aMenus  :={}
 
-   ::lRegister := .F.
-   ::lControl  := .T.
-
-   ::Msgs      := IFNIL( ::Msgs, {WM_SIZE,WM_NOTIFY}, ::Msgs )
-   ::WndProc   := IFNIL( ::WndProc, 'FormProc', ::WndProc )
-   ::Left      := 0
-   ::Top       := 0
-   ::Width     := 0
-   ::Height    := 0
-   ::Name      := 'ToolBar32'
-   ::ExStyle   := 0
    RETURN( super:New( oParent ) )
 
 *-----------------------------------------------------------------------------*
@@ -259,6 +260,7 @@ METHOD tbProc(hWnd,nMsg,nwParam,nlParam) CLASS TToolBar
    ENDCASE
 
    RETURN(CallWindowProc(::ntProc,hWnd /*::Parent:handle*/,nMsg,nwParam,nlParam))
+
 
 *-----------------------------------------------------------------------------*
 

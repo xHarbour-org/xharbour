@@ -62,8 +62,29 @@ CLASS TRebar FROM TForm
    METHOD AddBand()
    METHOD RebarProc()
    METHOD OnCreate()
+   METHOD Delete()
+   METHOD DelControl()
 
 ENDCLASS
+
+METHOD Delete() CLASS TRebar
+   local n
+   if( n := ascan( ::Parent:Controls, {|o|o:handle==::handle} ) )>0
+      __objDelData( ::Parent, UPPER(::name ))
+      adel( ::Parent:Controls, n, .t. )
+      ::Destroy()
+   endif
+   RETURN(self)
+
+
+METHOD DelControl() CLASS TRebar
+   local n
+   if( n := ascan( ::Parent:Controls, {|o|o:handle==::handle} ) )>0
+      __objDelData( ::Parent, UPPER(::name ))
+      adel( ::Parent:Controls, n, .t. )
+      ::Destroy()
+   endif
+   RETURN(self)
 
 *------------------------------------------------------------------------------*
 

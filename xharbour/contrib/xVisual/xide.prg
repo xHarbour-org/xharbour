@@ -1,5 +1,5 @@
 /*
- * $Id: xide.prg,v 1.78 2002/10/10 02:51:46 what32 Exp $
+ * $Id: xide.prg,v 1.79 2002/10/10 07:02:16 what32 Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ METHOD MainToolBar() CLASS MainFrame
    LOCAL hImg1,hImg2,hImg3,hBmp,aStdTab
    With Object ::Add('Rebar', TRebar():New( oApp:MainFrame ) )
       // add the xmake toolbar
-      With Object :Add( 'Tools', TToolBar():New( oApp:MainFrame:GetObj("Rebar"), 444, 15, , , 26, 26, 20, 20, 14 ))
+      With Object :Add( 'Tools', TToolBar():New( oApp:MainFrame:Rebar, 444, 15, , , 26, 26, 20, 20, 14 ))
          :AddButton( "NewProj",      ToolButton():New( 0,,"New Project",                    100 ) )
          :AddButton( "OpenProj",     ToolButton():New( 1,,"Open Project",                   101 ) )
          :AddButton( "Properties",   ToolButton():New( 2,,"Properties",                     102 ) )
@@ -194,7 +194,7 @@ METHOD MainToolBar() CLASS MainFrame
 
                :SetStyle( TBSTYLE_CHECKGROUP )
 
-               aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', '', '', 'Rebar', ;
+               aStdTab := { '', 'TabControl', 'TreeView', '', 'StatusBar', 'ProgressBar', 'ToolBar', 'Rebar', ;
                                 '', '', '', '', '', '', ;
                                 '', '', '' }
                for n:=0 to 16
