@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.113 2004/01/28 15:07:55 lculik Exp $
+ * $Id: hbmake.prg,v 1.114 2004/02/21 11:58:27 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1899,7 +1899,7 @@ FUNC CreateMakeFile( cFile )
 	 
 	 if nPos >0 
         cLibs += " libpq.lib"
-        cLibs := strtran(cLibs,"hbpg","libhbpg")
+        cLibs := strtran(cLibs,"hbpg","hbpg")
 	 endif 
 
          IF ! s_lMt
