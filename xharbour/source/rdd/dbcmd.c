@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.41 2003/08/01 11:36:05 jonnymind Exp $
+ * $Id: dbcmd.c,v 1.42 2003/08/01 12:16:51 jonnymind Exp $
  */
 
 /*
@@ -107,8 +107,6 @@ static LPAREANODE s_pWorkAreas = NULL; /* WorkAreas */
    #define LOCK_AREA
    #define UNLOCK_AREA
 #else
-   #define LOCK_AREA
-   #define UNLOCK_AREA
    #define s_uiCurrArea    HB_VM_STACK.uiCurrArea
    #define s_pCurrArea     HB_VM_STACK.pCurrArea
    HB_CRITICAL_T  s_mtxWorkArea;
