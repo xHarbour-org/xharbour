@@ -79,50 +79,50 @@ static lxLabels,lyLabels,lLegends,lCage,lxGrid,lyGrid,lTop3,lData,lReversed,lOut
 
 pragma pack(4)
 typedef struct { ;
-    UINT    style; 
-    WNDPROC lpfnWndProc; 
-    int     cbClsExtra; 
-    int     cbWndExtra; 
-    HANDLE  hInstance; 
-    HICON   hIcon; 
-    HCURSOR hCursor; 
-    HBRUSH  hbrBackground; 
-    LPCTSTR lpszMenuName; 
-    LPCTSTR lpszClassName; 
+    UINT    style;
+    WNDPROC lpfnWndProc;
+    int     cbClsExtra;
+    int     cbWndExtra;
+    HANDLE  hInstance;
+    HICON   hIcon;
+    HCURSOR hCursor;
+    HBRUSH  hbrBackground;
+    LPCTSTR lpszMenuName;
+    LPCTSTR lpszClassName;
 } WNDCLASS
 
 typedef struct {;
-    UINT    mask; 
-    int     cxy; 
-    LPTSTR  pszText; 
-    HBITMAP hbm; 
-    int     cchTextMax; 
-    int     fmt; 
-    LPARAM  lParam; 
+    UINT    mask;
+    int     cxy;
+    LPTSTR  pszText;
+    HBITMAP hbm;
+    int     cchTextMax;
+    int     fmt;
+    LPARAM  lParam;
     int     iImage;
     int     iOrder;
 } HDITEM, FAR * LPHDITEM
 
 typedef struct { ;
-    RECT    *prc;  
-    WINDOWPOS *pwpos; 
+    RECT    *prc;
+    WINDOWPOS *pwpos;
 } HDLAYOUT
 
 typedef struct { ;// si
-    UINT cbSize; 
-    UINT fMask; 
-    int  nMin; 
-    int  nMax; 
-    UINT nPage; 
-    int  nPos; 
-    int  nTrackPos; 
+    UINT cbSize;
+    UINT fMask;
+    int  nMin;
+    int  nMax;
+    UINT nPage;
+    int  nPos;
+    int  nTrackPos;
 }   SCROLLINFO
 
 
 typedef struct tagDEVNAMES {; // dvnm
-    WORD wDriverOffset; 
-    WORD wDeviceOffset; 
-    WORD wOutputOffset; 
+    WORD wDriverOffset;
+    WORD wDeviceOffset;
+    WORD wOutputOffset;
     WORD wDefault;     // driver, device, and port name strings follow wDefault
 } DEVNAMES
 
@@ -135,100 +135,100 @@ typedef struct tagPOINT {;
 /* RECT */
 
 typedef struct _RECT { ;
-    LONG left; 
-    LONG top; 
-    LONG right; 
-    LONG bottom; 
-} RECT 
+    LONG left;
+    LONG top;
+    LONG right;
+    LONG bottom;
+} RECT
 
 
 
 typedef struct tagPSD {;  // psd
-    DWORD           lStructSize; 
-    HWND            hwndOwner; 
-    HGLOBAL         hDevMode; 
-    HGLOBAL         hDevNames; 
-    DWORD           Flags; 
-    POINT           ptPaperSize; 
-    RECT            rtMinMargin; 
-    RECT            rtMargin; 
-    HINSTANCE       hInstance; 
-    LPARAM          lCustData; 
-    LPPAGESETUPHOOK lpfnPageSetupHook; 
-    LPPAGEPAINTHOOK lpfnPagePaintHook; 
-    LPCTSTR         lpPageSetupTemplateName; 
-    HGLOBAL         hPageSetupTemplate; 
+    DWORD           lStructSize;
+    HWND            hwndOwner;
+    HGLOBAL         hDevMode;
+    HGLOBAL         hDevNames;
+    DWORD           Flags;
+    POINT           ptPaperSize;
+    RECT            rtMinMargin;
+    RECT            rtMargin;
+    HINSTANCE       hInstance;
+    LPARAM          lCustData;
+    LPPAGESETUPHOOK lpfnPageSetupHook;
+    LPPAGEPAINTHOOK lpfnPagePaintHook;
+    LPCTSTR         lpPageSetupTemplateName;
+    HGLOBAL         hPageSetupTemplate;
 } PAGESETUPDLG, * LPPAGESETUPDLG
 
 
 
 typedef struct tagPD {;  // pd
-    DWORD     lStructSize; 
-    HWND      hwndOwner; 
-    HANDLE    hDevMode; 
-    HANDLE    hDevNames; 
-    HDC       hDC; 
-    DWORD     Flags; 
-    WORD      nFromPage; 
-    WORD      nToPage; 
-    WORD      nMinPage; 
-    WORD      nMaxPage; 
-    WORD      nCopies; 
-    HINSTANCE hInstance; 
-    DWORD     lCustData; 
-    LPPRINTHOOKPROC lpfnPrintHook; 
-    LPSETUPHOOKPROC lpfnSetupHook; 
-    LPCTSTR    lpPrintTemplateName; 
-    LPCTSTR    lpSetupTemplateName; 
-    HANDLE    hPrintTemplate; 
-    HANDLE    hSetupTemplate; 
+    DWORD     lStructSize;
+    HWND      hwndOwner;
+    HANDLE    hDevMode;
+    HANDLE    hDevNames;
+    HDC       hDC;
+    DWORD     Flags;
+    WORD      nFromPage;
+    WORD      nToPage;
+    WORD      nMinPage;
+    WORD      nMaxPage;
+    WORD      nCopies;
+    HINSTANCE hInstance;
+    DWORD     lCustData;
+    LPPRINTHOOKPROC lpfnPrintHook;
+    LPSETUPHOOKPROC lpfnSetupHook;
+    LPCTSTR    lpPrintTemplateName;
+    LPCTSTR    lpSetupTemplateName;
+    HANDLE    hPrintTemplate;
+    HANDLE    hSetupTemplate;
 } PRINTDLG
 
 typedef struct tagBITMAP {;  // bm
-   LONG   bmType; 
-   LONG   bmWidth; 
-   LONG   bmHeight; 
-   LONG   bmWidthBytes; 
-   WORD   bmPlanes; 
-   WORD   bmBitsPixel; 
-   LPVOID bmBits; 
+   LONG   bmType;
+   LONG   bmWidth;
+   LONG   bmHeight;
+   LONG   bmWidthBytes;
+   WORD   bmPlanes;
+   WORD   bmBitsPixel;
+   LPVOID bmBits;
 } BITMAP
 
 typedef struct tagLOGFONT { ;
-   LONG lfHeight; 
-   LONG lfWidth; 
-   LONG lfEscapement; 
-   LONG lfOrientation; 
-   LONG lfWeight; 
-   BYTE lfItalic; 
-   BYTE lfUnderline; 
-   BYTE lfStrikeOut; 
-   BYTE lfCharSet; 
-   BYTE lfOutPrecision; 
-   BYTE lfClipPrecision; 
-   BYTE lfQuality; 
-   BYTE lfPitchAndFamily; 
-   TCHAR lfFaceName[LF_FACESIZE]; 
+   LONG lfHeight;
+   LONG lfWidth;
+   LONG lfEscapement;
+   LONG lfOrientation;
+   LONG lfWeight;
+   BYTE lfItalic;
+   BYTE lfUnderline;
+   BYTE lfStrikeOut;
+   BYTE lfCharSet;
+   BYTE lfOutPrecision;
+   BYTE lfClipPrecision;
+   BYTE lfQuality;
+   BYTE lfPitchAndFamily;
+   TCHAR lfFaceName[LF_FACESIZE];
 } LOGFONT
 
-typedef struct { ;   // cf 
-    DWORD        lStructSize; 
-    HWND         hwndOwner; 
-    HDC          hDC; 
-    LOGFONT     *lpLogFont; 
-    INT          iPointSize; 
-    DWORD        Flags; 
-    DWORD        rgbColors; 
-    LPARAM       lCustData; 
-    LPCFHOOKPROC lpfnHook; 
-    LPCTSTR      lpTemplateName; 
-    HINSTANCE    hInstance; 
-    LPTSTR       lpszStyle; 
-    WORD         nFontType; 
-    WORD         ___MISSING_ALIGNMENT__; 
-    INT          nSizeMin; 
-    INT          nSizeMax; 
-} CHOOSEFONT 
+typedef struct { ;   // cf
+    DWORD        lStructSize;
+    HWND         hwndOwner;
+    HDC          hDC;
+    LOGFONT     *lpLogFont;
+    INT          iPointSize;
+    DWORD        Flags;
+    DWORD        rgbColors;
+    LPARAM       lCustData;
+    LPCFHOOKPROC lpfnHook;
+    LPCTSTR      lpTemplateName;
+    HINSTANCE    hInstance;
+    LPTSTR       lpszStyle;
+    WORD         nFontType;
+    WORD         ___MISSING_ALIGNMENT__;
+    INT          nSizeMin;
+    INT          nSizeMax;
+} CHOOSEFONT
 
 
 typedef struct tagCOLORSCHEME {;
@@ -238,17 +238,17 @@ typedef struct tagCOLORSCHEME {;
 } COLORSCHEME
 
 typedef struct tagDRAWITEMSTRUCT {;
-    UINT  CtlType; 
-    UINT  CtlID; 
-    UINT  itemID; 
-    UINT  itemAction; 
-    UINT  itemState; 
-    HWND  hwndItem; 
-    HDC   hDC; 
-    RECT  rcItem; 
-    DWORD itemData; 
+    UINT  CtlType;
+    UINT  CtlID;
+    UINT  itemID;
+    UINT  itemAction;
+    UINT  itemState;
+    HWND  hwndItem;
+    HDC   hDC;
+    RECT  rcItem;
+    DWORD itemData;
 } DRAWITEMSTRUCT
-  
+
 *-----------------------------------------------------------------------------*
 
 FUNCTION WinMain()
@@ -357,7 +357,7 @@ DO CASE
            CASE nwParam==101
            //     cf IS CHOOSEFONT
            //     lf IS LOGFONT
-           //     cf:lpLogFont:=lf 
+           //     cf:lpLogFont:=lf
            //     cf:hwndOwner:=hWnd
            //     cf:Flags    :=/*CF_FIXEDPITCHONLY+*/CF_SCREENFONTS+CF_INITTOLOGFONTSTRUCT+CF_EFFECTS
            //     ChooseFont(cF:value)
@@ -402,7 +402,7 @@ DO CASE
                 IF lShow
                    MessageBox(hWnd,'CheckBox checked','MessageBoxEx')
                 END
-           
+
            CASE nwParam==202
                 Alert( {'First element','second element;you may set anything in here;just separated with a CR'},{'&Ok','&Cancel','&Print','&Retry','&GO HOME'})
            CASE nwParam==203
@@ -410,7 +410,7 @@ DO CASE
            CASE nwParam==204
                 ShellExecute(hWnd,"open","http://www.geocities.com/what32lib",,SW_SHOW)
            CASE nwParam==205
-                TView( hWnd, "TextView", "demo.prg") 
+                TView( hWnd, "TextView", "demo.prg")
            CASE nwParam==206
                 QUESTION(hWnd)
            CASE nwParam==307
@@ -614,17 +614,17 @@ DO CASE
                                { str(100000000,10), 'testing arrays', str(500,5) },;
                                { str(   358000,10), 'arrays',         str(200,5) },;
                                { str(      880,10), 'testing',        str(500,5) } }
-            
+
         oListView:AddColumn('Header 1', 100, 1 )
         oListView:AddColumn('Header 2', 130, 0 )
         oListView:AddColumn('Header 3',  80, 1 )
-            
+
         oListView:nItems :=15
 
         hIcon1:=LoadIcon(_GetInstance(),'red')
         hIcon2:=LoadIcon(_GetInstance(),'gray')
         hIcon3:=LoadIcon(_GetInstance(),'blue')
-        
+
         FOR n:=1 to 5
             oListView:AddIcon(hIcon1)
             oListView:AddIcon(hIcon2)
@@ -736,7 +736,7 @@ DO CASE
                  VALID { | x, lRet | lRet := ! ( ' ' $ x:cargo ) , If( lRet, , MessageBox( hDlg, 'The part number may not contain spaces', 'Error', MB_OK ) ) , lRet } ;
                  COLOR aColors ;
                  OVERSTRIKE LIKEDOS
-        aColors[1][1]:=RGB(128, 0, 0) 
+        aColors[1][1]:=RGB(128, 0, 0)
         @ DIALOG hDlg ID 102 GET dDate COLOR aColors OVERSTRIKE LIKEDOS
         aColors[1][1]:=RGB(0, 0, 128)
         @ DIALOG hDlg ID 103 GET Space( 14 ) PICTURE '(999) 999-9999' ;
@@ -1002,7 +1002,7 @@ LOCAL hIcon1,hIcon2,hIcon3,hIcon4,hDC,cPaint
 local GetList:={}
 static hImgSml,oBrowse,oCol1,oCol2,oCol3,oCol4,oCol5,lIcons
 DO CASE
-   CASE nMsg == WM_INITDIALOG 
+   CASE nMsg == WM_INITDIALOG
         lIcons:=.F.
         USE TEST ALIAS TEST NEW
         GO TOP
@@ -1084,7 +1084,7 @@ DO CASE
         oCol1:VertAlign   :=TA_TOP
         oCol2:VertAlign   :=TA_CENTER
         oCol3:VertAlign   :=TA_BOTTOM
-        
+
         oBrowse:addColumn(oCol1)
         oBrowse:addColumn(oCol2)
         oBrowse:addColumn(oCol3)
@@ -1125,7 +1125,7 @@ return(0)
 
 
 Function TestDBEdit( hParent )
- 
+
    Local aDlg
    Local aEdit := { }
    Local i
@@ -1136,68 +1136,68 @@ Function TestDBEdit( hParent )
    Local lCenter := .F. // center push buttons ?
    Local cAlias:="SOMEALIAS"
    Static cFile:=""
- 
+
    cFile:=GetOpenFileName(hParent, ;
                              LEFT(cFile,RAT("\",cFile)-1),;
                              "Select DBF File To Open",;
                              {{"DBF Files","*.DBF"}},,;
                              LEFT(cFile,RAT("\",cFile)-1),;
                              "DBF")
- 
+
   if ! empty(cFile)
- 
+
    DBUSEAREA(.T.,,cFile,cAlias,.T.,.F.) // or any data base with reasonable number of fields
    IF USED().AND.!neterr()
- 
+
    For i := 1 To MIN( (cAlias) -> ( FCOUNT( ) ), 12) // max 12 fields for this demo
       xVal := (cAlias) -> ( FieldGet( i ) )
       aAdd( aEdit, { Proper( (cAlias) -> ( FieldName( i ) ) ) , xVal , ;
                      If( ValType( xVal ) == "C" .AND. Len( xVal ) > 50, { 30, 3 } , ;
                          If( ValType( xVal ) == "N", Len( STR( xVal ) ) , ) ) } )
    Next
- 
+
    aAdd( aEdit, { "Previous", , , CT_BUTTON } )
    aAdd( aEdit, { "Next", , , CT_BUTTON } )
- 
+
    aDlg := AutoForm( cFile, @aEdit, "Print", "Close" , lHelp , lOnSide, lCenter, @aCtrl  )
- 
+
    DialogBox( , aDlg, hParent, { | h, m, w, l | DlgDbProc( h, m, w, l, aCtrl, cAlias ) } )
- 
+
    (cAlias) -> ( DBCLOSEAREA( ) )
- 
+
    endif
   Endif
- 
+
    Return( NIL )
- 
+
 *-----------------------------------------------------------------------------*
- 
+
 Function DlgDbProc( hDlg, nMsg, nwParam, nlParam, aCtrl, cAlias )
- 
+
    Do Case
    Case nMsg == WM_INITDIALOG
       SetValues( hDlg, aCtrl, cAlias )
       ShowWindow( hDlg, SW_SHOW )
       Return( 1 )
- 
+
    Case nMsg == WM_SYSCOMMAND
       If nwParam == SC_CLOSE
          // DestroyWindow(hDlg)
          EndDialog( hDlg, IDOK )
       EndIf
- 
+
    Case nMsg == WM_COMMAND
- 
+
       If nwParam == IDCANCEL
          EndDialog( hDlg, IDCANCEL )
          Return( 1 )
- 
+
       ElseIf nwParam == IDOK
          MessageBox( hDlg, "That would be too much for the first demo !", "Print ?", MB_ICONHAND )
- 
+
       ElseIf nwParam == 101
          MessageBox( hDlg, "If you have problems with this simple demo," + CHR( 13 ) + "Nothing will help you ay more", "Help? with what ?" )
- 
+
 
       ElseIf nwParam == 100 + Len( aCtrl )
          ( cAlias ) -> ( DBSKIP( 1 ) )
@@ -1206,7 +1206,7 @@ Function DlgDbProc( hDlg, nMsg, nwParam, nlParam, aCtrl, cAlias )
          Else
             SetValues( hDlg, aCtrl, cAlias )
          EndIf
- 
+
       ElseIf nwParam == 100 + Len( aCtrl ) - 1
          ( cAlias ) -> ( DBSKIP( - 1 ) )
          If ( cAlias ) -> ( BOF( ) )
@@ -1214,20 +1214,20 @@ Function DlgDbProc( hDlg, nMsg, nwParam, nlParam, aCtrl, cAlias )
          Else
             SetValues( hDlg, aCtrl, cAlias )
          EndIf
- 
+
       EndIf
    EndCase
- 
+
    Return( 0 )
- 
+
 
 *----------------------------
- 
+
 Function SetValues( hDlg, aCtrl, cAlias )
- 
+
    Local i
    Local xVar
- 
+
    For i := 1 To Len( aCtrl ) - 2
       xVar := ( cAlias ) -> ( FIELDGET( i ) )
       Do Case
@@ -1241,9 +1241,9 @@ Function SetValues( hDlg, aCtrl, cAlias )
          CheckDlgButton( hDlg, aCtrl[ i, 2 ] , If( xVar, 1, 0 ) )
       EndCase
    Next
- 
+
    Return( NIL )
- 
+
 FUNCTION DiaryProc( hDlg, nMsg, nwParam, nlParam )
 local oBrowse, dSdate,nYear,nMonth, aCal[6][7],o,hFont
 DO CASE
@@ -1256,23 +1256,23 @@ DO CASE
         o:=WHColumn():Init("Sun", {|oCol,oB,n|oB:source[n][1]}, DT_LEFT,50,,,,,,C_RED,DT_CENTER)
         o:fgColor :=C_RED
         o:style:=0
-        oBrowse:addColumn(o) 
+        oBrowse:addColumn(o)
         o:=WHColumn():Init("Mon", {|oCol,oB,n|oB:source[n][2]}, DT_LEFT,50,,,,,,C_RED,DT_CENTER)
         o:style:=0
-        oBrowse:addColumn(o) 
+        oBrowse:addColumn(o)
         o:=WHColumn():Init("Tue", {|oCol,oB,n|oB:source[n][3]}, DT_LEFT,50,,,,,,C_RED,DT_CENTER)
         o:style:=0
-        oBrowse:addColumn(o) 
+        oBrowse:addColumn(o)
         o:=WHColumn():Init("Wed", {|oCol,oB,n|oB:source[n][4]}, DT_LEFT,50)
         o:style:=0
         o:HeadAlign:=TA_CENTER
-        oBrowse:addColumn(o) 
+        oBrowse:addColumn(o)
         o:=WHColumn():Init("Thu", {|oCol,oB,n|oB:source[n][5]}, DT_LEFT,50,,,,,,C_RED,TA_CENTER)
         o:style:=0
-        oBrowse:addColumn(o) 
+        oBrowse:addColumn(o)
         o:=WHColumn():Init("Fri", {|oCol,oB,n|oB:source[n][6]}, DT_LEFT,51,,,,,,C_RED,TA_CENTER)
         o:style:=0
-        oBrowse:addColumn(o) 
+        oBrowse:addColumn(o)
         o:=WHColumn():Init("Sat", {|oCol,oB,n|oB:source[n][7]}, DT_LEFT,51,,,,,,C_RED,TA_CENTER)
         o:fgColor :=C_BLUE
         o:style:=0
@@ -1291,7 +1291,7 @@ DO CASE
         SetFocus(oBrowse:hWnd)
 
         BubbleTip(oBrowse:hWnd,'Using WhBrowse()',0,100,50,,,1,,2,2,,0,0)
-        
+
         return(0)
    CASE nMsg == WM_COMMAND
         DO CASE
@@ -1405,9 +1405,9 @@ FUNCTION AddToolbar(hParent)
 
   SendMessage(tb:hwnd,TB_SETIMAGELIST,0,hImg)
   SendMessage(tb:hwnd,TB_SETBUTTONSIZE,0,MAKELONG(50,40))
-  
+
   rb:addband(,,tb:hwnd,100,40,,"",)
- 
+
   RETURN(rb:hWnd)
 
 //------------------------------------------------------------------------------------------
@@ -1424,7 +1424,7 @@ DO CASE
                 end
            case nwParam==IDCANCEL
                 enddialog(hWnd,IDCANCEL)
-                
+
         ENDCASE
 ENDCASE
 return(0)
@@ -1545,13 +1545,13 @@ DO CASE
                        ntemp:=max(2,ntemp)
                        ntemp:=min(ntemp-1,4096)
                        SetDlgItemText(hdlg,114,alltrim(str(ntemp)))
-           
+
                   case hiword(nlParam)==EN_KILLFOCUS
                        ntemp:=Int(val(getdlgitemtext(hdlg,114)))
                        ntemp:=max(2,ntemp)
                        ntemp:=min(ntemp,4096)
                        SetDlgItemText(hdlg,114,alltrim(str(ntemp)))
-              
+
                endcase
           case nwParam==110 // reference line value
                //quick and dirty, user unfriendly numerical input
@@ -1564,7 +1564,7 @@ DO CASE
           case nwParam==111
                checkdlgbutton(hdlg,113,.F.)
                enablewindow(getdlgitem(hdlg,113),.F.)
- 
+
           case nwParam==112
                enablewindow(getdlgitem(hdlg,113),.T.)
 
@@ -1612,7 +1612,7 @@ acolors:={C_RED,C_BLUE,C_GREEN}
            return(NIL)
          endif
          adata  :={20,30,20,10,20}
-         acolors:= { C_RED,C_BLUE,C_GREEN,C_LIGHTCYAN,C_PURPLE} 
+         acolors:= { C_RED,C_BLUE,C_GREEN,C_LIGHTCYAN,C_PURPLE}
          alabels:={'Label 1','Label 2','Label 3','Label 4','Label 5'}
 
          oGraphObj:=PieChart():Init(hParent)
@@ -1652,13 +1652,13 @@ acolors:={C_RED,C_BLUE,C_GREEN}
          oGraphObj:wantYLabels:=lyLabels
          oGraphObj:wantLegends:=lLegends
          oGraphObj:wantCage   :=lCage
-         oGraphObj:wantXGrid  :=lxGrid  
-         oGraphObj:wantYGrid  :=lyGrid  
+         oGraphObj:wantXGrid  :=lxGrid
+         oGraphObj:wantYGrid  :=lyGrid
          oGraphObj:Reversed   :=lReversed
          oGraphObj:ShowData   :=lData
          oGraphObj:Reversed   :=lReversed
          oGraphObj:BlackLines :=lOutline
-         
+
 //         lTop3    :=isDlgButtonChecked(hdlg,127)>0
       endif
 
@@ -1670,13 +1670,13 @@ acolors:={C_RED,C_BLUE,C_GREEN}
       oTitle:color:=C_CYAN
       oTitle:font[5]:=700
       oTitle:font[7]:=.T.
-      
+
       oGraph:AddText(oSubTitle:New(subtitle,{10,65,1490,105}))
       oSubTitle:SetAlign('C')
       oSubtitle:color:=C_CYAN
       oTitle:font[5]:=700
       oTitle:SetFontSize(40)
-       
+
       oGraph:AddText(oSmallText:New(SmallTxt,{10,110,1490,135}))
       oSmallText:SetAlign('C')
       oSmallText:color:=C_CYAN
@@ -1694,7 +1694,7 @@ acolors:={C_RED,C_BLUE,C_GREEN}
       oYAxis:color:=C_RED
       oYAxis:font[5]:=700
       oYAxis:setfontsize(40)
-       
+
       oGraph:Show(hParent,100,100,600,400)
 
       endif
@@ -1734,3 +1734,6 @@ Return(CallWindowProc(nproc,hWnd,nMsg,nwParam,nlParam))
 
 
 *----------------------------------------------------------------------------*
+
+function GetNonChild()
+RETURN NIL

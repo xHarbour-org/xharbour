@@ -15,7 +15,8 @@ IF ERRORLEVEL 1 GOTO EXIT
 echo , demo.exe, + >> b32.bc
 echo demo.map, + >> b32.bc
 echo ..\lib\what32.lib +  >>  b32.bc
-echo ..\lib\whatplus.lib +  >>  b32.bc
+rem echo ..\..\whoo\lib\whoo.lib +  >>  b32.bc
+echo ..\..\xVisual\whatplus.lib +  >>  b32.bc
 echo %HB_INSTALL%\lib\rtl.lib + >> b32.bc
 echo %HB_INSTALL%\lib\vm.lib + >> b32.bc
 echo %HB_INSTALL%\lib\gtwin.lib + >> b32.bc
@@ -32,7 +33,7 @@ echo import32.lib,, + >> b32.bc
     IF EXIST demo.res echo demo.res >> b32.bc
 
 
-ECHO * 
+ECHO *
 ECHO Linking demo ...
 rem Use these flags to avoid the console window creation
     ilink32 -Gn -aa -Tpe -s @b32.bc > comp.log
@@ -65,6 +66,6 @@ GOTO EXIT
 IF ERRORLEVEL 1 GOTO END
   Echo Launching demo.exe ...
   demo.exe
-  EXIT
+  rem EXIT
 :END
 
