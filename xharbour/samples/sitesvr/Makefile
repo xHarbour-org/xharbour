@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2003/01/10 22:17:58 jonnymind Exp $
+# $Id: Makefile,v 1.5 2003/01/10 22:21:24 jonnymind Exp $
 #
 
 ROOT = ../../
@@ -21,6 +21,5 @@ LIBS=\
 	macro \
 	pp \
 	common \
-   pthread \
 
 include $(TOP)$(ROOT)config/bin.cf

@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.5 2003/01/10 22:17:58 jonnymind Exp $
+# $Id: mingw32.cf,v 1.6 2003/01/12 22:50:18 jonnymind Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -41,7 +41,7 @@ LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
 
 #Adding MT libs on need
 ifeq ($(findstring vmmt,$(LIBS)),vmmt)
-LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR)_mt/)
+LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(patsubst %mt,%,$(lib))/$(ARCH_DIR)_mt)
 endif
 
 else
