@@ -1,0 +1,63 @@
+#
+# File:		makefile.b32
+# Author:	Francesco Saverio Giudice (on a makefile by Julian Smart)
+# Created:	2002
+# Updated:
+# Copyright: (C) Francesco Saverio Giudice - WoopGUI - A Win32 OOP GUI Library
+#
+# Makefile : Builds woopgui library (Harbour & BC++ 32-bit)
+
+# Global paths
+#
+HBR_DIR=..\..
+BCC_DIR=c:\bcc55
+WG_DIR=.
+
+
+!include <env\bccwin32.mak>
+
+# library
+#
+WOOPGUILIB = lib\woopgui.lib
+WAPILIB    = lib\wapilib.lib
+UTILSLIB   = lib\utils.lib
+WOOPGUIRES = lib\woopgui.res
+
+WOOPGUIOBJ = tobject.obj twindowdef.obj \
+             tapplication.obj \
+             twindowbase.obj twindow.obj \
+             tframe.obj \
+             tgdiobj.obj \
+             tbrush.obj \
+             tdialog.obj tpanel.obj \
+             tcolor.obj tcolorDB.obj \
+             tcontrol.obj \
+             tbutton.obj tpushbtn.obj tcheckbox.obj tradiobtn.obj tradiogrp.obj t3state.obj \
+             tgroupbox.obj tcombobox.obj tsimplecb.obj tdropdcb.obj tdroplcb.obj \
+             tedit.obj teditmulti.obj \
+             tmenu.obj tmenubar.obj tmenupopup.obj tmenuitem.obj menufunc.obj \
+             tstatic.obj tstatictext.obj \
+             tfont.obj \
+             ttooltip.obj \
+             tsyssettings.obj \
+             tstatusbar.obj \
+             tinifile.obj tstack.obj \
+             tdatetime.obj tcalendar.obj \
+             txget.obj \
+             tget.obj tgetlist.obj \
+             errorsys.obj
+
+WOOPGUIRC  = woopgui.rc
+
+WAPIOBJ    =  _WinDate.obj _WinGDI.obj _WinSys.obj _WinBrsh.obj \
+              _WinMisc.obj _WinMain.obj _WinKbrd.obj _WinText.obj _WinDC.obj \
+              _WinDlg.obj _WinMsg.obj _WinCret.obj cdate.obj \
+              ccontrols.obj ccommon.obj cwindowdef.obj capplication.obj cwindow.obj \
+              cmenu.obj cfont.obj \
+              cdialog.obj cstatusbar.obj ctooltip.obj
+
+UTILSOBJ   = whatutil.obj cstr.obj xget.obj char.obj arrayfunc.obj datetime.obj condeval.obj
+
+
+!include $(WG_DIR)\env\makelib.b32
+
