@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.53 2004/01/17 21:54:04 fsgiudice Exp $
+ * $Id: gtwvt.c,v 1.54 2004/01/17 22:42:57 fsgiudice Exp $
  */
 
 /*
@@ -4064,7 +4064,6 @@ HB_FUNC( WVT_GETCLIPBOARD )
 {
    HGLOBAL   hglb;
    LPTSTR    lptstr;
-   ULONG     ul;
 
    if ( !IsClipboardFormatAvailable(CF_TEXT) )
    {
@@ -4079,7 +4078,7 @@ HB_FUNC( WVT_GETCLIPBOARD )
    hglb = GetClipboardData(CF_TEXT);
    if (hglb != NULL)
    {
-      lptstr = GlobalLock(hglb);
+      lptstr = (LPSTR) GlobalLock(hglb);
       if (lptstr != NULL)
       {
          hb_retc( lptstr );
@@ -4132,7 +4131,7 @@ HB_FUNC( WVT_SETCLIPBOARD )
 
    // Lock the handle and copy the text to the buffer.
 
-   lptstrCopy = GlobalLock(hglbCopy);
+   lptstrCopy = (LPSTR) GlobalLock(hglbCopy);
    memcpy(lptstrCopy, cText, (nLen+1) * sizeof(TCHAR));
    lptstrCopy[nLen+1] = (TCHAR) 0;    // null character
    GlobalUnlock(hglbCopy);
@@ -4164,7 +4163,7 @@ HB_FUNC( WVT_PASTEFROMCLIPBOARD )
    hglb = GetClipboardData(CF_TEXT);
    if (hglb != NULL)
    {
-      lptstr = GlobalLock(hglb);
+      lptstr = (LPSTR) GlobalLock(hglb);
       if (lptstr != NULL)
       {
          //TraceLog( NULL, "Clipboard %s\n", (LPSTR) lptstr );
