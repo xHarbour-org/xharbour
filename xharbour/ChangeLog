@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.448 2002/10/17 00:48:05 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.449 2002/10/17 04:41:28 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2002-10-17 07:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/hbexprb.c
+    ! Fixed GPF when pParms is NULL in hb_compExprUseFunCall()
+    ! Fixed typo.
+
+  * source/vm/hvm.c
+    * Fixed missing comma.
+
 2002-10-16 21:40 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
-  * include/hbexpra.c
   * include/hbexprb.c
     ! Fixed long standing TODO: Move Function optimizations from hb_compExprNewFunCall() to hb_compExprUseFunCall()
-      /* This fixed few GPFs resulting from recent optimizations. */
 
 2002-10-16 17:47 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbexpra.c

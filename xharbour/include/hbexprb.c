@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.32 2002/10/17 04:41:29 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.33 2002/10/17 14:43:09 ronpinkas Exp $
  */
 
 /*
@@ -1367,11 +1367,16 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                HB_EXPR_PTR pName = pSelf->value.asFunCall.pFunName;
                HB_EXPR_PTR pParms = pSelf->value.asFunCall.pParms;
                HB_EXPR_PTR pReduced;
-               USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
+               USHORT usCount;
 
-               if( usCount == 1 && pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+               if( pParms )
                {
-                  --usCount;
+                  usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asFunCall.pParms );
+
+                  if( usCount == 1 && pParms->value.asList.pExprList->ExprType == HB_ET_NONE )
+                  {
+                     --usCount;
+                  }
                }
 
                #ifndef HB_MACRO_SUPPORT
