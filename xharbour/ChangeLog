@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1631 2003/10/26 20:14:15 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1632 2003/10/27 09:01:09 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-10-27 11:45 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * source/rtl/tobject.prg
+  * include/struct.ch
+  * tests/struct.prg
+    + Add support for command Structure / Member / EndStructure to create
+      objects using Associative Arrays. 
 
 2003-10-27 04:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/strcase.c

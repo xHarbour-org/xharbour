@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.8 2003/06/24 03:35:05 ronpinkas Exp $
+ * $Id: tobject.prg,v 1.9 2003/10/03 05:50:03 ronpinkas Exp $
  */
 
 /*
@@ -226,3 +226,84 @@ STATIC FUNCTION TAssociativeArray_OnError( xParam )
     ENDIF
 
 RETURN NIL
+
+
+/*
+
+  This procedure is used to create structures using the
+  command STRUCTURE / MEMBER / ENDSTRUCTURE
+
+  Toninho@fwi.com.br
+
+*/
+procedure TAssociativeArrayMember( aName, cType, uInit, oObj )
+
+   local x := 0
+
+   local y := Len( aName )
+
+   if !( cType == nil )
+
+      cType = Upper( Left( cType, 1 ) )
+
+      switch cType
+
+         case "S"
+
+              if uInit == nil
+                 uInit  = ""
+              endif
+
+              exit
+
+         case "N"
+
+              if uInit == nil
+                 uInit  = 0
+              endif
+
+              exit
+
+         case "L"
+
+              if uInit == nil
+                 uInit  = .f.
+              endif
+
+              exit
+
+         case "D"
+
+              if uInit == nil
+                 uInit  = CtoD( "" )
+              endif
+
+              exit
+
+         case "C"
+
+              if uInit == nil
+                 uInit  = { || nil }
+              endif
+
+              exit
+
+         case "A"
+
+              if uInit == nil
+                 uInit  = {}
+              endif
+
+              exit
+
+      end switch
+
+   endif
+
+   for x := 1 to y
+       oObj[ aName[ x ] ] = uInit
+   next
+
+return
+
+
