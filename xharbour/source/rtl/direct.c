@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.31 2004/03/03 07:27:41 ronpinkas Exp $
+ * $Id: direct.c,v 1.32 2004/03/03 08:20:06 andijahja Exp $
  */
 
 /*
@@ -112,6 +112,66 @@ extern char *hb_vm_acAscii[256];
 
 extern int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
 
+static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT uiMask, PHB_FNAME fDirSpec, BOOL bFullPath, BOOL bDirOnly )
+{
+   PHB_FFIND ffind;
+
+   /* Get the file list */
+   if( ( ffind = hb_fsFindFirst( (const char *) szDirSpec, uiMask ) ) != NULL )
+   {
+      HB_ITEM Tmp;
+
+      Tmp.type = HB_IT_NIL ;
+
+      do
+      {
+         if( !( ( ( uiMask & HB_FA_HIDDEN    ) == 0 && ( ffind->attr & HB_FA_HIDDEN    ) != 0 ) ||
+                ( ( uiMask & HB_FA_SYSTEM    ) == 0 && ( ffind->attr & HB_FA_SYSTEM    ) != 0 ) ||
+                ( ( uiMask & HB_FA_LABEL     ) == 0 && ( ffind->attr & HB_FA_LABEL     ) != 0 ) ||
+                ( ( uiMask & HB_FA_DIRECTORY ) == 0 && ( ffind->attr & HB_FA_DIRECTORY ) != 0 ) ))
+         {
+            HB_ITEM Subarray;
+            char buffer[ 32 ];
+            BOOL bAddEntry;
+
+            hb_arrayNew( &Subarray, 0 );
+
+            if ( bFullPath )
+            {
+               char *szFullName = hb_xstrcpy(NULL,fDirSpec->szPath?fDirSpec->szPath:"",ffind->szName,NULL);
+               hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, szFullName ) );
+               hb_xfree( szFullName );
+            }
+            else
+            {
+               hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, ffind->szName ) );
+            }
+
+         #ifndef HB_LONG_LONG_OFF
+            hb_arrayAddForward( &Subarray, hb_itemPutNLL( &Tmp, ffind->size ) );
+         #else
+            hb_arrayAddForward( &Subarray, hb_itemPutNL( &Tmp, ffind->size ) );
+         #endif
+
+            hb_arrayAddForward( &Subarray, hb_itemPutDL( &Tmp, ffind->lDate ) );
+            hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, ffind->szTime ) );
+            hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, hb_fsAttrDecode( ffind->attr, buffer ) ) );
+
+            /* Don't exit when array limit is reached */
+            bAddEntry = bDirOnly ? hb_fsIsDirectory( ( BYTE * ) ffind->szName ) : TRUE;
+
+            if( bAddEntry )
+            {
+               hb_arrayAddForward( pDir, &Subarray );
+            }
+         }
+      }
+      while( hb_fsFindNext( ffind ) );
+
+      hb_fsFindClose( ffind );
+   }
+}
+
 void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath )
 {
    USHORT    uiMask;
@@ -127,7 +187,6 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
 #endif
 */
 
-   PHB_FFIND ffind;
    PHB_FNAME fDirSpec = NULL;
    BOOL bAlloc = FALSE;
    /* Get the passed attributes and convert them to Harbour Flags */
@@ -188,58 +247,12 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
    }
 
    /* Get the file list */
-   if( ( ffind = hb_fsFindFirst( (const char *) szDirSpec, uiMask ) ) != NULL )
+   hb_fsGrabDirectory( pDir, (const char*) szDirSpec, uiMask, fDirSpec, bFullPath, bDirOnly );
+
+   if ( uiMask & HB_FA_LABEL )
    {
-      HB_ITEM Tmp;
-
-      Tmp.type = HB_IT_NIL ;
-
-      do
-      {
-         if( !( ( ( uiMask & HB_FA_HIDDEN    ) == 0 && ( ffind->attr & HB_FA_HIDDEN    ) != 0 ) ||
-                ( ( uiMask & HB_FA_SYSTEM    ) == 0 && ( ffind->attr & HB_FA_SYSTEM    ) != 0 ) ||
-                ( ( uiMask & HB_FA_LABEL     ) == 0 && ( ffind->attr & HB_FA_LABEL     ) != 0 ) ||
-                ( ( uiMask & HB_FA_DIRECTORY ) == 0 && ( ffind->attr & HB_FA_DIRECTORY ) != 0 ) ))
-         {
-            HB_ITEM Subarray;
-            char buffer[ 32 ];
-            BOOL bAddEntry;
-
-            hb_arrayNew( &Subarray, 0 );
-
-            if ( bFullPath )
-            {
-               char *szFullName = hb_xstrcpy(NULL,fDirSpec->szPath?fDirSpec->szPath:"",ffind->szName,NULL);
-               hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, szFullName ) );
-               hb_xfree( szFullName );
-            }
-            else
-            {
-               hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, ffind->szName ) );
-            }
-
-         #ifndef HB_LONG_LONG_OFF
-            hb_arrayAddForward( &Subarray, hb_itemPutNLL( &Tmp, ffind->size ) );
-         #else
-            hb_arrayAddForward( &Subarray, hb_itemPutNL( &Tmp, ffind->size ) );
-         #endif
-
-            hb_arrayAddForward( &Subarray, hb_itemPutDL( &Tmp, ffind->lDate ) );
-            hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, ffind->szTime ) );
-            hb_arrayAddForward( &Subarray, hb_itemPutC( &Tmp, hb_fsAttrDecode( ffind->attr, buffer ) ) );
-
-            /* Don't exit when array limit is reached */
-            bAddEntry = bDirOnly ? hb_fsIsDirectory( ( BYTE * ) ffind->szName ) : TRUE;
-
-            if( bAddEntry )
-            {
-               hb_arrayAddForward( pDir, &Subarray );
-            }
-         }
-      }
-      while( hb_fsFindNext( ffind ) );
-
-      hb_fsFindClose( ffind );
+      uiMask &= ~HB_FA_LABEL;
+      hb_fsGrabDirectory( pDir, (const char*) szDirSpec, uiMask, fDirSpec, bFullPath, bDirOnly );
    }
 
    if ( fDirSpec != NULL )
