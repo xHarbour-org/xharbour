@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.55 2004/05/21 02:31:39 druzus Exp $
+# $Id: xharbour.spec,v 1.56 2004/05/27 23:58:16 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -359,8 +359,7 @@ fi
 if [ "%{hb_lnkso}" = yes ]
 then
     unset HB_GTALLEG
-    export L_USR="-L${HB_LIB_INSTALL} -l%{name}"
-    #-lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11"
+    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11"
     #export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses -lslang -lgpm -L/usr/X11R6/lib -lX11 %{?_with_allegro: %(allegro-config --static)}"
     export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\""
     for utl in hbmake hbrun hbpp hbdoc xbscript
