@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.60 2003/10/18 01:15:18 jonnymind Exp $
+* $Id: thread.h,v 1.61 2003/10/18 10:42:54 jonnymind Exp $
 */
 
 /*
@@ -159,38 +159,6 @@ extern "C" {
 }
 #endif
    #define hb_threadGetCurrentStack() ( (HB_STACK *) TlsGetValue( hb_dwCurrentStack ) )
-/*
-   #define HB_STACK_LOCK \
-   {\
-      HB_MUTEX_LOCK( hb_runningStacks.Mutex );\
-      if( ! HB_VM_STACK.bInUse ) \
-      {\
-         hb_runningStacks.content.asLong++;\
-         HB_VM_STACK.bInUse = TRUE;\
-      }\
-      HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );\
-   }
-
-   #define HB_STACK_UNLOCK \
-   {\
-      HB_MUTEX_LOCK( hb_runningStacks.Mutex );\
-      if( HB_VM_STACK.bInUse ) \
-      {\
-         HB_VM_STACK.bInUse = FALSE;\
-         if ( --hb_runningStacks.content.asLong == 0)\
-         {\
-            hb_threadCallIdle();\
-         }\
-      }\
-      HB_MUTEX_UNLOCK( hb_runningStacks.Mutex );\
-   }
-
-   typedef struct tag_HB_IDLE_FUNC_LIST
-   {
-      HB_IDLE_FUNC func;
-      struct tag_HB_IDLE_FUNC_LIST *next;
-   } HB_IDLE_FUNC_LIST;
-*/
 #else
 
    #include <pthread.h>
@@ -236,10 +204,10 @@ extern "C" {
    #define HB_CLEANUP_POP_EXEC         pthread_cleanup_pop(1)
    #define HB_SAME_THREAD(x,y)         pthread_equal( x, y )
 
-   #define HB_ENABLE_ASYN_CANC
-   #define HB_DISABLE_ASYN_CANC
-   #define HB_TEST_CANCEL_ENABLE_ASYN  pthread_testcancel()
-   #define HB_TEST_CANCEL              pthread_testcancel()
+   #define HB_ENABLE_ASYN_CANC         pthread_testcancel();
+   #define HB_DISABLE_ASYN_CANC        pthread_testcancel();
+   #define HB_TEST_CANCEL_ENABLE_ASYN  pthread_testcancel();
+   #define HB_TEST_CANCEL              pthread_testcancel();
 
    extern pthread_key_t hb_pkCurrentStack;
    #define hb_threadGetCurrentStack() ( (HB_STACK *) pthread_getspecific( hb_pkCurrentStack ) )

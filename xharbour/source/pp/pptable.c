@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.28 2003/09/09 01:32:27 druzus Exp $
+ * $Id: pptable.c,v 1.29 2003/10/18 01:15:18 jonnymind Exp $
  */
 
 /*
@@ -128,7 +128,7 @@ void hb_pp_Table( void )
    static DEFINES sD___57 = {"_SET_DIRCASE",NULL,-1,"106", &sD___56 };
    static DEFINES sD___58 = {"_SET_DIRSEPARATOR",NULL,-1,"107", &sD___57 };
    static DEFINES sD___59 = {"_SET_ERRORLOOP",NULL,-1,"108", &sD___58 };
-   static DEFINES sD___60 = {"_SET_OUTPUTSAFETY",NULL,-1,"109", &sD___56 };
+   static DEFINES sD___60 = {"_SET_OUTPUTSAFETY",NULL,-1,"109", &sD___59 };
 
    static COMMANDS sC___1 = {0,"NOTE","\1A30",NULL,NULL };
    static COMMANDS sC___2 = {0,"DO","WHILE \1A00","while \1A00",&sC___1 };
