@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.38 2004/03/03 21:45:23 likewolf Exp $
+ * $Id: errorapi.c,v 1.39 2004/03/17 08:29:44 ronpinkas Exp $
  */
 
 /*
@@ -230,7 +230,7 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_errNew()"));
 
-   if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && 
+   if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym &&
 	   (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 &&
 	   (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
    {
@@ -1198,8 +1198,8 @@ HB_FUNC( __ERRRT_BASE )
 {
    hb_errRT_BASE( ( ULONG ) hb_parnl( 1 ),
                   ( ULONG ) hb_parnl( 2 ),
-                  hb_parc( 3 ),
-                  hb_parc( 4 ),
+                  hb_parcx( 3 ),
+                  hb_parcx( 4 ),
                   ( USHORT ) hb_parni( 5 ),
                   hb_param( 6, HB_IT_ANY ) );
 }
@@ -1208,8 +1208,8 @@ HB_FUNC( __ERRRT_SBASE )
 {
    hb_errRT_BASE_SubstR( ( ULONG ) hb_parnl( 1 ),
                          ( ULONG ) hb_parnl( 2 ),
-                         hb_parc( 3 ),
-                         hb_parc( 4 ),
+                         hb_parcx( 3 ),
+                         hb_parcx( 4 ),
                          ( USHORT ) hb_parni( 5 ),
                          hb_param( 6, HB_IT_ANY ) );
 }

@@ -24,7 +24,7 @@
 HB_FUNC( LOADICON )
 {
    hb_retnl( (LONG) LoadIcon(  ( ISNIL(1) ? NULL : (HINSTANCE) hb_parnl( 1 ) ) ,
-             (hb_parinfo(2)==HB_IT_STRING ? hb_parc(2) : MAKEINTRESOURCE( (WORD) hb_parni(2))) ) ) ;
+             (hb_parinfo(2)==HB_IT_STRING ? hb_parcx(2) : MAKEINTRESOURCE( (WORD) hb_parni(2))) ) ) ;
 }
 
 
@@ -41,8 +41,8 @@ HB_FUNC( CREATEICON )
                                 hb_parni( 3 )            ,
                                 (BYTE) hb_parni( 4 )     ,
                                 (BYTE) hb_parni( 5 )     ,
-                                (BYTE *) hb_parc( 5 )    ,
-                                (BYTE *) hb_parc( 6 )             
+                                (BYTE *) hb_parcx( 5 )    ,
+                                (BYTE *) hb_parcx( 6 )
                               ) ) ;
 }
 
@@ -63,7 +63,7 @@ HB_FUNC( DESTROYICON )
 HB_FUNC( LOOKUPICONIDFROMDIRECTORY )
 {
 
-   hb_retni( LookupIconIdFromDirectory( (PBYTE) hb_parc( 1 ), hb_parl( 2 ) ) ) ;
+   hb_retni( LookupIconIdFromDirectory( (PBYTE) hb_parcx( 1 ), hb_parl( 2 ) ) ) ;
 }
 
 
@@ -74,7 +74,7 @@ HB_FUNC( LOOKUPICONIDFROMDIRECTORY )
 HB_FUNC( LOOKUPICONIDFROMDIRECTORYEX )
 {
 
-   hb_retni( LookupIconIdFromDirectoryEx( (PBYTE) hb_parc( 1 ) ,
+   hb_retni( LookupIconIdFromDirectoryEx( (PBYTE) hb_parcx( 1 ) ,
                                           hb_parl( 2 )         ,
                                           hb_parni( 3 )        ,
                                           hb_parni( 4 )        ,
@@ -89,7 +89,7 @@ HB_FUNC( LOOKUPICONIDFROMDIRECTORYEX )
 HB_FUNC( CREATEICONFROMRESOURCE )
 {
 
-   hb_retnl( (LONG) CreateIconFromResource( (PBYTE) hb_parc( 1 ) ,
+   hb_retnl( (LONG) CreateIconFromResource( (PBYTE) hb_parcx( 1 ) ,
                                             (DWORD) hb_parnl( 2 ),
                                             hb_parl( 3 )         ,
                                             (DWORD) hb_parnl( 4 )
@@ -103,13 +103,13 @@ HB_FUNC( CREATEICONFROMRESOURCE )
 HB_FUNC( CREATEICONFROMRESOURCEEX )
 {
 
-   hb_retnl( (LONG) CreateIconFromResourceEx( (PBYTE) hb_parc( 1 )  ,
+   hb_retnl( (LONG) CreateIconFromResourceEx( (PBYTE) hb_parcx( 1 )  ,
                                               (DWORD) hb_parnl( 2 ) ,
                                               hb_parl( 3 )          ,
                                               (DWORD) hb_parnl( 4 ) ,
                                               hb_parni( 5 )         ,
                                               hb_parni( 6 )         ,
-                                              (UINT) hb_parni( 7 ) 
+                                              (UINT) hb_parni( 7 )
                                             ) ) ;
 }
 
@@ -121,11 +121,11 @@ HB_FUNC( CREATEICONFROMRESOURCEEX )
 HB_FUNC( LOADIMAGE )
 {
    hb_retnl( (LONG) LoadImage( ISNIL( 1 ) ? GetModuleHandle(NULL) : (HINSTANCE) hb_parnl( 1 ),
-                               (LPCSTR) hb_parc( 2 )    ,
+                               (LPCSTR) hb_parcx( 2 )    ,
                                (UINT) hb_parni( 3 )     ,
                                hb_parni( 4 )            ,
                                hb_parni( 5 )            ,
-                               (UINT) hb_parni( 6 )     
+                               (UINT) hb_parni( 6 )
                              ) ) ;
 }
 
@@ -139,7 +139,7 @@ HB_FUNC( COPYIMAGE )
                                (UINT) hb_parni( 2 )  ,
                                hb_parni( 3 )         ,
                                hb_parni( 4 )         ,
-                               (UINT) hb_parni( 5 )  
+                               (UINT) hb_parni( 5 )
                              ) ) ;
 }
 
@@ -171,7 +171,7 @@ HB_FUNC( DRAWICONEX )
                         hb_parni( 6 )         ,
                         (UINT) hb_parni( 7 )  ,
                         (HBRUSH) hb_parnl( 8 ),
-                        (UINT) hb_parni( 9 )  
+                        (UINT) hb_parni( 9 )
                       ) ) ;
 }
 
@@ -236,7 +236,7 @@ HB_FUNC( EXTRACTASSOCIATEDICON )
    lpiIcon = (WORD) hb_parni( 2 );
 
    hiRet = ExtractAssociatedIcon( ( ISNIL( 1 ) ? GetModuleHandle(NULL) : (HINSTANCE) hb_parnl( 1 ) ) ,
-                                             (LPSTR) hb_parc( 2 )     ,
+                                             (LPSTR) hb_parcx( 2 )     ,
                                              &lpiIcon
                                 ) ;
 
@@ -255,7 +255,7 @@ HB_FUNC( EXTRACTASSOCIATEDICON )
 HB_FUNC( EXTRACTICON )
 {
    hb_retnl( (LONG) ExtractIcon( ISNIL( 1 ) ? GetModuleHandle(NULL) : (HINSTANCE) hb_parnl( 1 ),
-                                 (LPCSTR) hb_parc( 2 )    ,
+                                 (LPCSTR) hb_parcx( 2 )    ,
                                  (UINT) hb_parni( 3 )
                                ) ) ;
 }

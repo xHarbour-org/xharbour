@@ -1,5 +1,5 @@
 /*
- * $Id: TCButton.prg,v 1.17 2002/10/17 17:16:20 what32 Exp $
+ * $Id: edcolor.c,v 1.2 2002/10/22 17:23:46 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -217,7 +217,7 @@ int lenReserved = 62;
 
 
 // initiate params
-cText      = hb_parc(1);
+cText      = hb_parcx(1);
 lInComment = hb_parl(2);
 hDC        = (HDC)hb_parni(3);
 leftcol    = hb_parni(4);

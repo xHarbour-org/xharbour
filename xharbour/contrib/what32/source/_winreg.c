@@ -83,7 +83,7 @@ HB_FUNC( REGOPENKEYEX )
 {
 
    HKEY hwKey = ( ( HKEY ) hb_parnl( 1 ) );
-   LPCTSTR lpValue=hb_parc( 2 );
+   LPCTSTR lpValue=hb_parcx( 2 );
    LONG lError;
    HKEY phwHandle;
 
@@ -107,13 +107,13 @@ HB_FUNC( REGQUERYVALUEEX )
    DWORD lpType=hb_parnl( 4 );
 
    DWORD lpcbData=0;
-   lError=RegQueryValueExA( ( HKEY ) hb_parnl( 1 ) , ( LPTSTR ) hb_parc( 2 ) , NULL , &lpType , NULL , &lpcbData );
+   lError=RegQueryValueExA( ( HKEY ) hb_parnl( 1 ) , ( LPTSTR ) hb_parcx( 2 ) , NULL , &lpType , NULL , &lpcbData );
 
    if ( lError == ERROR_SUCCESS )
    {
       BYTE *lpData;
       lpData=(BYTE*)malloc( ( int ) lpcbData+1 );
-      lError= RegQueryValueExA( ( HKEY ) hb_parnl( 1 ) , ( LPTSTR ) hb_parc( 2 ) , NULL , &lpType , ( BYTE* ) lpData , &lpcbData );
+      lError= RegQueryValueExA( ( HKEY ) hb_parnl( 1 ) , ( LPTSTR ) hb_parcx( 2 ) , NULL , &lpType , ( BYTE* ) lpData , &lpcbData );
 
       if ( lError > 0 )
       {
@@ -162,7 +162,7 @@ HB_FUNC( REGENUMKEYEX )
 HB_FUNC( REGSETVALUEEX )
 {
 
-   hb_retnl( RegSetValueExA( ( HKEY ) hb_parnl( 1 ), hb_parc( 2 ), 0, hb_parnl( 4 ), ( BYTE * const ) hb_parc( 5 ), ( strlen( hb_parc( 5 ) ) + 1 ) ) ) ;
+   hb_retnl( RegSetValueExA( ( HKEY ) hb_parnl( 1 ), hb_parcx( 2 ), 0, hb_parnl( 4 ), ( BYTE * const ) hb_parcx( 5 ), ( strlen( hb_parcx( 5 ) ) + 1 ) ) ) ;
 
 }
 
@@ -171,7 +171,7 @@ HB_FUNC( REGCREATEKEY )
    HKEY hKey;
    LONG nErr;
 
-   nErr = RegCreateKey( ( HKEY ) hb_parnl( 1 ) , hb_parc( 2 ) , &hKey );
+   nErr = RegCreateKey( ( HKEY ) hb_parnl( 1 ) , hb_parcx( 2 ) , &hKey );
    if ( nErr == ERROR_SUCCESS )
    {
       hb_stornl( PtrToLong( hKey ) , 3 );
@@ -199,23 +199,23 @@ LONG RegCreateKeyEx(
 
 HB_FUNC( REGCREATEKEYEX )
 {
- 
+
   HKEY hkResult ;
-  DWORD dwDisposition ;  
+  DWORD dwDisposition ;
   LONG nErr ;
   SECURITY_ATTRIBUTES *sa ;
- 
-  if (ISCHAR(7)) 
+
+  if (ISCHAR(7))
        sa = (SECURITY_ATTRIBUTES *) hb_param(7, HB_IT_STRING)->item.asString.value;
-  
-  nErr = RegCreateKeyEx( (HKEY)    hb_parnl( 1 ) , 
-                         (LPCSTR)  hb_parc( 2 )  ,  
+
+  nErr = RegCreateKeyEx( (HKEY)    hb_parnl( 1 ) ,
+                         (LPCSTR)  hb_parcx( 2 )  ,
                          (DWORD)   0             ,
-                         (LPSTR)   hb_parc( 4 )  , 
+                         (LPSTR)   hb_parcx( 4 )  ,
                          (DWORD)   hb_parnl( 5 ) ,
                          (DWORD)   hb_parnl( 6 ) ,
-                         sa                      , 
-                         &hkResult               ,                            
+                         sa                      ,
+                         &hkResult               ,
                          &dwDisposition )        ;
 
   if ( nErr == ERROR_SUCCESS )
@@ -230,8 +230,8 @@ HB_FUNC( REGCREATEKEYEX )
 
 HB_FUNC( REGDELETEKEY )
 {
-	
-   if ( RegDeleteKeyA( ( HKEY ) hb_parnl( 1 ), ( LPCTSTR ) hb_parc( 2 ) ) == ERROR_SUCCESS )
+
+   if ( RegDeleteKeyA( ( HKEY ) hb_parnl( 1 ), ( LPCTSTR ) hb_parcx( 2 ) ) == ERROR_SUCCESS )
      {
         hb_retnl( 0 );
      }
@@ -245,8 +245,8 @@ HB_FUNC( REGDELETEKEY )
 //  May be I am missing something. Pritpal Bedi.
 
 HB_FUNC ( REGDELETEVALUE )
-{ 
-   if ( RegDeleteValue( ( HKEY ) hb_parnl( 1 ), hb_parc( 2 ) ) == ERROR_SUCCESS )
+{
+   if ( RegDeleteValue( ( HKEY ) hb_parnl( 1 ), hb_parcx( 2 ) ) == ERROR_SUCCESS )
      {
         hb_retnl( 0 );
      }

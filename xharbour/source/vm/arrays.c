@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.94 2004/03/05 22:37:57 ronpinkas Exp $
+ * $Id: arrays.c,v 1.95 2004/03/08 22:15:36 andijahja Exp $
  */
 
 /*
@@ -530,6 +530,7 @@ char HB_EXPORT * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate )
                the default value from hb_itemGetDS(). [vszakats] */
       exData = hb_itemGetDS( NULL, szDate );
    }
+
    return exData;
 }
 
@@ -559,149 +560,110 @@ LONG HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
 
 PHB_ITEM HB_EXPORT hb_arrayGetItemPtr( PHB_ITEM pArray, ULONG ulIndex )
 {
-   PHB_ITEM pItem = NULL;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetItemPtr(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      pItem = pArray->item.asArray.value->pItems + ulIndex - 1;
+      return pArray->item.asArray.value->pItems + ulIndex - 1;
    }
 
-   return pItem;
+   return NULL;
 }
 
 BOOL HB_EXPORT hb_arrayGetL( PHB_ITEM pArray, ULONG ulIndex )
 {
-   BOOL bRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetL(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      bRet = hb_itemGetL( pArray->item.asArray.value->pItems + ulIndex - 1 );
+      return hb_itemGetL( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
-   else
-   {
-      bRet =  FALSE;
-   }
-   return bRet;
+
+   return FALSE;
 }
 
 int HB_EXPORT hb_arrayGetNI( PHB_ITEM pArray, ULONG ulIndex )
 {
-   int iRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNI(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      iRet =  hb_itemGetNI( pArray->item.asArray.value->pItems + ulIndex - 1 );
+      return hb_itemGetNI( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
-   else
-   {
-      iRet = 0;
-   }
-   return iRet;
+
+   return 0;
 }
 
 LONG HB_EXPORT hb_arrayGetNL( PHB_ITEM pArray, ULONG ulIndex )
 {
-   LONG lRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetNL(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      lRet = hb_itemGetNL( pArray->item.asArray.value->pItems + ulIndex - 1 );
+      return hb_itemGetNL( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
-   else
-   {
-      lRet = 0;
-   }
-   return lRet;
+
+   return 0;
 }
 
 double HB_EXPORT hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex )
 {
-   double dRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetND(%p, %lu)", pArray, ulIndex));
 
    if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      dRet = hb_itemGetND( pArray->item.asArray.value->pItems + ulIndex - 1 );
-   }
-   else
-   {
-      dRet = 0;
+      return hb_itemGetND( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
 
-   return dRet;
+   return 0;
 }
 
 ULONG HB_EXPORT hb_arrayCopyC( PHB_ITEM pArray, ULONG ulIndex, char * szBuffer, ULONG ulLen )
 {
-   ULONG ulRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayCopyC(%p, %lu, %s, %lu)", pArray, ulIndex, szBuffer, ulLen));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen && (pArray->item.asArray.value->pItems + ulIndex - 1)->type == HB_IT_STRING )
    {
-      ulRet = hb_itemCopyC( pArray->item.asArray.value->pItems + ulIndex - 1, szBuffer, ulLen );
+      return hb_itemCopyC( pArray->item.asArray.value->pItems + ulIndex - 1, szBuffer, ulLen );
    }
-   else
-   {
-      ulRet = 0;
-   }
-   return ulRet;
+
+   return 0;
 }
 
 char HB_EXPORT * hb_arrayGetC( PHB_ITEM pArray, ULONG ulIndex )
 {
-   char *cRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetC(%p, %lu)", pArray, ulIndex));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen && (pArray->item.asArray.value->pItems + ulIndex - 1)->type == HB_IT_STRING )
    {
-      cRet = hb_itemGetC( pArray->item.asArray.value->pItems + ulIndex - 1 );
+      return hb_itemGetC( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
-   else
-   {
-      cRet = NULL;
-   }
-   return cRet;
+
+   return NULL;
 }
 
 char HB_EXPORT * hb_arrayGetCPtr( PHB_ITEM pArray, ULONG ulIndex )
 {
-   char *cRet;
-//   PHB_ITEM pTemp;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetCPtr(%p, %lu)", pArray, ulIndex));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen && (pArray->item.asArray.value->pItems + ulIndex - 1)->type == HB_IT_STRING )
    {
-//      pTemp = pArray->item.asArray.value->pItems + ulIndex - 1 ;
-//      cRet = pTemp->item.asString.value;
-      cRet = (pArray->item.asArray.value->pItems + ulIndex - 1)->item.asString.value;
-      // cRet = hb_itemGetCPtr( pArray->item.asArray.value->pItems + ulIndex - 1 );
+      return (pArray->item.asArray.value->pItems + ulIndex - 1)->item.asString.value;
    }
-   else
-   {
-      cRet = "";
-   }
-   return cRet;
+
+   return NULL;
 }
 
 ULONG HB_EXPORT hb_arrayGetCLen( PHB_ITEM pArray, ULONG ulIndex )
 {
-   ULONG ulRet;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetCLen(%p, %lu)", pArray, ulIndex));
 
-   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   if( HB_IS_ARRAY( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen && (pArray->item.asArray.value->pItems + ulIndex - 1)->type == HB_IT_STRING )
    {
-      ulRet = ( pArray->item.asArray.value->pItems + ulIndex - 1 )->item.asString.length;
+      return ( pArray->item.asArray.value->pItems + ulIndex - 1 )->item.asString.length;
    }
-   else
-   {
-      ulRet = 0;
-   }
-   return ulRet;
+
+   return 0;
 }
 
 USHORT HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex )
@@ -717,6 +679,7 @@ USHORT HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex )
    {
       uType = 0;
    }
+
    return uType;
 }
 

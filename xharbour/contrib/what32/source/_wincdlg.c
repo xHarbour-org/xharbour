@@ -62,7 +62,7 @@ HB_FUNC(_FINDTEXT)
    fr.hwndOwner        = (HWND) hb_parnl( 1 ) ;
    fr.hInstance        = (HINSTANCE) hb_parnl( 2 ) ;
    fr.Flags            = (DWORD)  hb_parnl( 3 ) ;
-   fr.lpstrFindWhat    = (LPTSTR) hb_parc( 4 ) ;
+   fr.lpstrFindWhat    = (LPTSTR) hb_parcx( 4 ) ;
    fr.lpstrReplaceWith = NULL ;
    fr.wFindWhatLen     = (WORD) hb_parclen(4) ;
    fr.wReplaceWithLen  = 0 ;
@@ -87,8 +87,8 @@ HB_FUNC(_REPLACETEXT)
    fr.hwndOwner        = (HWND) hb_parnl( 1 ) ;
    fr.hInstance        = (HINSTANCE) hb_parnl( 2 ) ;
    fr.Flags            = (DWORD)  hb_parnl( 3 ) ;
-   fr.lpstrFindWhat    = (LPTSTR) hb_parc( 4 )  ;
-   fr.lpstrReplaceWith = (LPTSTR) hb_parc( 5 )  ;
+   fr.lpstrFindWhat    = (LPTSTR) hb_parcx( 4 )  ;
+   fr.lpstrReplaceWith = (LPTSTR) hb_parcx( 5 )  ;
    fr.wFindWhatLen     = (WORD) hb_parclen( 4 ) ;
    fr.wReplaceWithLen  = (WORD) hb_parclen( 5 ) ;
    fr.lCustData        = 0 ;
@@ -192,7 +192,7 @@ HB_FUNC ( _GETOPENFILENAME )
    OPENFILENAME ofn;
    char *szFileName =(char*) hb_xgrab( hb_parcsiz(2));
 
-   strcpy( szFileName, hb_parc( 2 ) );
+   strcpy( szFileName, hb_parcx( 2 ) );
 
    ZeroMemory( &ofn, sizeof(ofn) );
    ofn.hInstance       = GetModuleHandle(NULL)  ;
@@ -270,7 +270,7 @@ HB_FUNC( SHBROWSEFORFOLDER )
    BrowseInfo.hwndOwner = hwnd;
    BrowseInfo.pidlRoot = pidlBrowse;
    BrowseInfo.pszDisplayName = lpBuffer;
-   BrowseInfo.lpszTitle = ISNIL (2) ?  "Select a Folder" : hb_parc(2);
+   BrowseInfo.lpszTitle = ISNIL (2) ?  "Select a Folder" : hb_parcx(2);
    BrowseInfo.ulFlags = hb_parni(3);
    BrowseInfo.lpfn = NULL;
    BrowseInfo.lParam = 1;

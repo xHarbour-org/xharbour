@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.20 2004/02/14 01:29:45 andijahja Exp $
+ * $Id: runner.c,v 1.21 2004/02/14 21:01:19 andijahja Exp $
  */
 
 /*
@@ -161,7 +161,7 @@ HB_FUNC( __HRBRUN )
 
    if( argc >= 1 )
    {
-      PHRB_BODY pHrbBody = hb_hrbLoad( hb_parc( 1 ) );
+      PHRB_BODY pHrbBody = hb_hrbLoad( hb_parcx( 1 ) );
 
       if( pHrbBody )
       {
@@ -174,7 +174,7 @@ HB_FUNC( __HRBRUN )
 
             for( i=0; i<argc-1; i++ )
             {
-               argv[i] = hb_parc( i+2 );
+               argv[i] = hb_parcx( i+2 );
             }
          }
 
@@ -204,7 +204,7 @@ HB_FUNC( __HRBLOAD )
 {
    if( hb_pcount() >= 1 )
    {
-      hb_retnl( (LONG) hb_hrbLoad( hb_parc( 1 ) ) );
+      hb_retnl( (LONG) hb_hrbLoad( hb_parcx( 1 ) ) );
    }
    else
    {
@@ -230,7 +230,7 @@ HB_FUNC( __HRBDO )
 
             for( i=0; i<argc-1; i++ )
             {
-               argv[i] = hb_parc( i+2 );
+               argv[i] = hb_parcx( i+2 );
             }
          }
 
@@ -273,7 +273,7 @@ HB_FUNC( __HRBGETFU )
 
       if( pHrbBody )
       {
-         char * szName = hb_strupr( hb_strdup( hb_parc( 2 ) ) );
+         char * szName = hb_strupr( hb_strdup( hb_parcx( 2 ) ) );
 
          while( ulPos < pHrbBody->ulSymbols )
          {

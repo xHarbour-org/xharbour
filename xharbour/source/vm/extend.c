@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.40 2004/03/07 00:01:19 andijahja Exp $
+ * $Id: extend.c,v 1.41 2004/03/08 22:15:36 andijahja Exp $
  */
 
 /*
@@ -163,7 +163,42 @@ char HB_EXPORT * hb_parc( int iParam, ... )
 {
    HB_THREAD_STUB
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parc(%d, ...)", iParam));
+   HB_TRACE(HB_TR_DEBUG, ("hb_parcx(%d, ...)", iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? &(HB_VM_STACK.Return) : hb_stackItemFromBase( iParam );
+
+      if( HB_IS_BYREF( pItem ) )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_STRING( pItem ) )
+      {
+         return pItem->item.asString.value;
+      }
+      else if( HB_IS_ARRAY( pItem ) )
+      {
+         va_list va;
+         ULONG ulArrayIndex;
+
+         va_start( va, iParam );
+         ulArrayIndex = va_arg( va, ULONG );
+         va_end( va );
+
+         return hb_arrayGetCPtr( pItem, ulArrayIndex );
+      }
+   }
+
+   return NULL;
+}
+
+char HB_EXPORT * hb_parcx( int iParam, ... )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_parcx(%d, ...)", iParam));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.82 2004/03/16 14:35:39 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.83 2004/03/16 16:04:03 andijahja Exp $
  */
 
 /*
@@ -3779,7 +3779,7 @@ HB_FUNC( WVT_APPENDMENU )
     iLen = hb_parclen( 4 );
     if ( iLen > 0 && iLen < 256 )   // Translate '~' to '&'
     {
-      lpszCaption = hb_parc( 4 ) ;
+      lpszCaption = hb_parcx( 4 ) ;
       for ( i=0; i< iLen ; i++ )
       {
         ucBuf[ i ] = ( *lpszCaption == '~' ) ? '&' : *lpszCaption ;
@@ -3790,7 +3790,7 @@ HB_FUNC( WVT_APPENDMENU )
     }
     else
     {
-      lpszCaption = hb_parc( 4 ) ;
+      lpszCaption = hb_parcx( 4 ) ;
     }
   }
   else
@@ -3984,7 +3984,7 @@ HB_FUNC( WVT_SETCLIPBOARD )
 
    // Get text from PRG
    //
-   cText = hb_parc( 1 );
+   cText = hb_parcx( 1 );
    nLen  = hb_parclen( 1 );
 
    // Allocate a global memory object for the text.
@@ -4067,7 +4067,7 @@ HB_FUNC( WVT_PASTEFROMCLIPBOARD )
 HB_FUNC( WVT_SETFONT )
 {
    hb_retl( hb_wvt_gtSetFont(
-            ISNIL( 1 ) ? _s.fontFace   : hb_parc( 1 ),
+            ISNIL( 1 ) ? _s.fontFace   : hb_parcx( 1 ),
             ISNIL( 2 ) ? _s.fontHeight : hb_parni( 2 ),
             ISNIL( 3 ) ? _s.fontWidth  : hb_parni( 3 ),
             ISNIL( 4 ) ? _s.fontWeight : hb_parni( 4 ),
@@ -4085,7 +4085,7 @@ HB_FUNC( WVT_SETICON )
    }
    else
    {
-      hb_retnl( hb_wvt_gtSetWindowIconFromFile( hb_parc( 1 ) ) ) ;
+      hb_retnl( hb_wvt_gtSetWindowIconFromFile( hb_parcx( 1 ) ) ) ;
    }
 }
 
@@ -4093,7 +4093,7 @@ HB_FUNC( WVT_SETICON )
 
 HB_FUNC( WVT_SETTITLE )
 {
-   hb_wvt_gtSetWindowTitle( hb_parc( 1 ) ) ;
+   hb_wvt_gtSetWindowTitle( hb_parcx( 1 ) ) ;
    return ;
 }
 
@@ -4654,7 +4654,7 @@ HB_FUNC( WVT_DRAWIMAGE )
    iBottom = xy.y - 1;
    iRight  = xy.x - 1;
 
-   hb_wvt_gtDrawImage( iLeft, iTop, ( iRight - iLeft ) + 1, ( iBottom - iTop ) + 1, hb_parc( 5 ) ) ;
+   hb_wvt_gtDrawImage( iLeft, iTop, ( iRight - iLeft ) + 1, ( iBottom - iTop ) + 1, hb_parcx( 5 ) ) ;
 
    hb_retl( TRUE );
 }
@@ -4687,7 +4687,7 @@ HB_FUNC( WVT_DRAWLABEL )
    logfont.lfHeight         = ( ISNIL(  9 ) ? _s.fontHeight : hb_parni(  9 ) );
    logfont.lfWidth          = ( ISNIL( 10 ) ? (_s.fontWidth <0 ? -_s.fontWidth : _s.fontWidth)  : hb_parni( 10 ) );
 
-   strcpy( logfont.lfFaceName, ( ISNIL( 8 ) ? _s.fontFace : hb_parc( 8 ) ) );
+   strcpy( logfont.lfFaceName, ( ISNIL( 8 ) ? _s.fontFace : hb_parcx( 8 ) ) );
 
    hFont = CreateFontIndirect( &logfont );
    if ( hFont )
@@ -4700,7 +4700,7 @@ HB_FUNC( WVT_DRAWLABEL )
 
       //  Ground is Ready, Drat the Text
       //
-      ExtTextOut( _s.hdc, xy.x, xy.y, 0, NULL, hb_parc( 3 ), strlen( hb_parc( 3 ) ), NULL );
+      ExtTextOut( _s.hdc, xy.x, xy.y, 0, NULL, hb_parcx( 3 ), strlen( hb_parcx( 3 ) ), NULL );
 
       //  Restore Old Settings
       //
@@ -5120,7 +5120,7 @@ HB_FUNC( WVT_DRAWBUTTON )
    {
       ( HFONT ) SelectObject( _s.hdc, GetStockObject( DEFAULT_GUI_FONT ) );
 
-      GetTextExtentPoint32( _s.hdc, hb_parc( 5 ), strlen( hb_parc( 5 ) ), &sz );
+      GetTextExtentPoint32( _s.hdc, hb_parcx( 5 ), strlen( hb_parcx( 5 ) ), &sz );
       // iTextWidth   = sz.cx;
       iTextHeight  = sz.cy;
 
@@ -5147,7 +5147,7 @@ HB_FUNC( WVT_DRAWBUTTON )
       oldBkMode    = SetBkMode( _s.hdc, TRANSPARENT );
       oldTextColor = SetTextColor( _s.hdc, textColor );
 
-      ExtTextOut( _s.hdc, xy.x, xy.y, 0, NULL, hb_parc( 5 ), strlen( hb_parc( 5 ) ), NULL );
+      ExtTextOut( _s.hdc, xy.x, xy.y, 0, NULL, hb_parcx( 5 ), strlen( hb_parcx( 5 ) ), NULL );
 
       SetTextColor( _s.hdc, oldTextColor );
       SetBkMode( _s.hdc, oldBkMode );
@@ -5163,7 +5163,7 @@ HB_FUNC( WVT_DRAWBUTTON )
       else
          iImageHeight = ( iBottom - iTop + 1 - 8 + 1 );
 
-      hb_wvt_gtDrawImage( iLeft+4, iTop+4, iImageWidth, iImageHeight, hb_parc( 6 ) );
+      hb_wvt_gtDrawImage( iLeft+4, iTop+4, iImageWidth, iImageHeight, hb_parcx( 6 ) );
    }
 
    hb_retl( TRUE );
@@ -5199,7 +5199,7 @@ HB_FUNC( WVT_CHOOSEFONT )
    lf.lfQuality        = ISNIL( 5 ) ? DEFAULT_QUALITY : hb_parni( 5 );
    lf.lfPitchAndFamily = FF_DONTCARE;
    if ( ISCHAR( 1 ) )
-      strcpy( lf.lfFaceName, hb_parc( 1 ) );
+      strcpy( lf.lfFaceName, hb_parcx( 1 ) );
 
    cf.lStructSize      = sizeof( CHOOSEFONT );
    cf.hwndOwner        = _s.hWnd;

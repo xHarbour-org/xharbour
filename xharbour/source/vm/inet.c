@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.41 2004/02/14 21:01:19 andijahja Exp $
+* $Id: inet.c,v 1.43 2004/03/07 00:01:19 andijahja Exp $
 */
 
 /*
@@ -1551,7 +1551,7 @@ HB_FUNC( INETSERVER )
       Socket->remote.sin_addr.s_addr = INADDR_ANY;
    }
    else {
-      Socket->remote.sin_addr.s_addr = inet_addr( hb_parc( 2 ) );
+      Socket->remote.sin_addr.s_addr = inet_addr( hb_parcx( 2 ) );
    }
 
    if ( ISNUM( 3 ) )
@@ -1857,7 +1857,7 @@ HB_FUNC( INETDGRAMBIND )
       Socket->remote.sin_addr.s_addr = INADDR_ANY;
    }
    else {
-      Socket->remote.sin_addr.s_addr = inet_addr( hb_parc( 2 ) );
+      Socket->remote.sin_addr.s_addr = inet_addr( hb_parcx( 2 ) );
    }
 
 
@@ -1907,7 +1907,7 @@ HB_FUNC( INETDGRAM )
 HB_FUNC( INETDGRAMSEND )
 {
    HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parpointer(1);
-   char *szAddress = hb_parc(2);
+   char *szAddress = hb_parcx(2);
    int iPort = hb_parni( 3 );
    PHB_ITEM pBuffer = hb_param( 4, HB_IT_STRING );
    int iLen;

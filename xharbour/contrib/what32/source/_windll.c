@@ -37,7 +37,7 @@
 
 HB_FUNC( LOADLIBRARY )
 {
-   hb_retnl( (LONG) LoadLibraryA( (LPCSTR) hb_parc( 1 ) ) ) ;
+   hb_retnl( (LONG) LoadLibraryA( (LPCSTR) hb_parcx( 1 ) ) ) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -46,9 +46,9 @@ HB_FUNC( LOADLIBRARY )
 
 HB_FUNC( LOADLIBRARYEX )
 {
-   hb_retnl( (LONG) LoadLibraryExA( (LPCSTR) hb_parc( 1 ) ,
+   hb_retnl( (LONG) LoadLibraryExA( (LPCSTR) hb_parcx( 1 ) ,
                                     (HANDLE) hb_parnl( 2 ),
-                                    (DWORD) hb_parnl( 3 ) 
+                                    (DWORD) hb_parnl( 3 )
                                     ) ) ;
 }
 
@@ -82,15 +82,15 @@ HB_FUNC( GETPROCADDRESS )
   ULONG dwProcAddr;
   char  cFuncName[MAX_PATH];
 
-    if ((dwProcAddr = (ULONG) GetProcAddress( (HMODULE) hb_parnl(1), 
-                                              ISCHAR( 2 ) ? (LPCSTR) hb_parc(2) : 
+    if ((dwProcAddr = (ULONG) GetProcAddress( (HMODULE) hb_parnl(1),
+                                              ISCHAR( 2 ) ? (LPCSTR) hb_parcx(2) :
                                               (LPCSTR) MAKELONG((WORD) hb_parni(2), 0) ) ) == 0 )
     {
        if ( ISCHAR( 2 ) )
        {
             // try forced ANSI flavour ?
-           strcpy(cFuncName, hb_parc(2));
-           strcat(cFuncName, "A");            
+           strcpy(cFuncName, hb_parcx(2));
+           strcat(cFuncName, "A");
            dwProcAddr = (ULONG) GetProcAddress((HMODULE) hb_parnl(1), cFuncName);
        }
     }

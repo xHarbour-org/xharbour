@@ -131,7 +131,7 @@ HB_FUNC( OPENCLIPBOARD )
 
 HB_FUNC( REGISTERCLIPBOARDFORMAT )
 {
-   hb_retni( RegisterClipboardFormat( (LPCSTR) hb_parc(1) ) ) ;
+   hb_retni( RegisterClipboardFormat( (LPCSTR) hb_parcx(1) ) ) ;
 }
 
 //-------------------------------------------------------------------------------
@@ -181,7 +181,7 @@ HB_FUNC( SETCLIPBOARDDATA )
       if (  hMem )
       {
           pMem = GlobalLock( hMem) ;
-          memcpy(pMem, hb_parc(2), dwLen ) ;
+          memcpy(pMem, hb_parcx(2), dwLen ) ;
           GlobalUnlock( hMem ) ;
           hb_retnl( (ULONG) SetClipboardData( (UINT) hb_parni(1), hMem ) ) ;
       }

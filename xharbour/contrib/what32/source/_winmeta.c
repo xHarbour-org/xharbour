@@ -36,7 +36,7 @@ extern BOOL Array2Point(PHB_ITEM aPoint, POINT *pt );
 
 HB_FUNC( CREATEMETAFILE )
 {
-   hb_retnl( (LONG) CreateMetaFile( (LPCSTR) hb_parc( 1 ) ) ) ;
+   hb_retnl( (LONG) CreateMetaFile( (LPCSTR) hb_parcx( 1 ) ) ) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ HB_FUNC( CREATEMETAFILE )
 HB_FUNC( COPYMETAFILE )
 {
    hb_retnl( (LONG) CopyMetaFile( (HMETAFILE) hb_parnl( 1 ),
-                                   (LPCSTR) hb_parc( 2 )    
+                                   (LPCSTR) hb_parcx( 2 )
                                    ) ) ;
 }
 
@@ -76,7 +76,7 @@ HB_FUNC( DELETEMETAFILE )
 
 HB_FUNC( GETMETAFILE )
 {
-   hb_retnl( (LONG) GetMetaFile( (LPCSTR) hb_parc( 1 ) ) ) ;
+   hb_retnl( (LONG) GetMetaFile( (LPCSTR) hb_parcx( 1 ) ) ) ;
 }
 
 
@@ -107,7 +107,7 @@ HB_FUNC( GETMETAFILEBITSEX )
 
    hb_retni( GetMetaFileBitsEx( (HMETAFILE) hb_parnl( 1 ),
                                 (UINT) hb_parni( 2 )     ,
-                                lpVoid                   
+                                lpVoid
                                 ) ) ;
 }
 
@@ -130,7 +130,7 @@ HB_FUNC( ENUMMETAFILE )
    hb_retl( EnumMetaFile( (HDC) hb_parnl( 1 )      ,
                           (HMETAFILE) hb_parnl( 2 ),
                           mfEnumProc               ,
-                          lParam                   
+                          lParam
                           ) ) ;
 }
 
@@ -169,11 +169,11 @@ HB_FUNC( CREATEENHMETAFILE )
 
    if ( ISARRAY(3) && Array2Rect( hb_param(3,HB_IT_ARRAY), &rc ))
       hb_retnl( (LONG) CreateEnhMetaFile( (HDC) hb_parnl( 1 )  ,
-                                           (LPCSTR) hb_parc( 2 ),
+                                           (LPCSTR) hb_parcx( 2 ),
                                            &rc                  ,
-                                           ISNIL(4) ? NULL : (LPCSTR) hb_parc( 4 )
+                                           ISNIL(4) ? NULL : (LPCSTR) hb_parcx( 4 )
                                         ) ) ;
-   
+
 
 }
 
@@ -183,7 +183,7 @@ HB_FUNC( CREATEENHMETAFILE )
 
 HB_FUNC( GETENHMETAFILE )
 {
-   hb_retnl( (LONG) GetEnhMetaFile( (LPCSTR) hb_parc( 1 ) ) ) ;
+   hb_retnl( (LONG) GetEnhMetaFile( (LPCSTR) hb_parcx( 1 ) ) ) ;
 }
 
 
@@ -236,7 +236,7 @@ HB_FUNC( PLAYENHMETAFILE )
    if ( ISARRAY(3) && Array2Rect( hb_param(3,HB_IT_ARRAY), &rc ))
       hb_retl( PlayEnhMetaFile( (HDC) hb_parnl( 1 )         ,
                                 (HENHMETAFILE) hb_parnl( 2 ),
-                                &rc                       
+                                &rc
                              ) ) ;
 }
 
@@ -248,7 +248,7 @@ HB_FUNC( PLAYENHMETAFILE )
 HB_FUNC( COPYENHMETAFILEA )
 {
    hb_retnl( (LONG) CopyEnhMetaFileA( (HENHMETAFILE) hb_parnl( 1 ),
-                                      (LPCSTR) hb_parc( 2 )       
+                                      (LPCSTR) hb_parcx( 2 )
                                       ) ) ;
 }
 
@@ -314,7 +314,7 @@ HB_FUNC( GETENHMETAFILEDESCRIPTION )
 {
    hb_retni( GetEnhMetaFileDescription( (HENHMETAFILE) hb_parnl( 1 ),
                                          (UINT) hb_parni( 2 )        ,
-                                         (LPSTR) hb_parc( 3 )        
+                                         (LPSTR) hb_parcx( 3 )
                                          ) ) ;
 }
 
@@ -372,7 +372,7 @@ HB_FUNC( SETWINMETAFILEBITS )
    hb_retnl( (LONG) SetWinMetaFileBits( (UINT) hb_parni( 1 ),
                                         &BYTE               ,
                                         (HDC) hb_parnl( 3 ) ,
-                                        &&METAFILEPICT      
+                                        &&METAFILEPICT
                                         ) ) ;
 }
 
@@ -397,7 +397,7 @@ HB_FUNC( ENUMENHMETAFILE )
                              (HENHMETAFILE) hb_parnl( 2 ),
                              enhmfEnumProc               ,
                              lpVoid                      ,
-                             &rc                       
+                             &rc
                              ) ) ;
 }
 
@@ -422,7 +422,7 @@ HB_FUNC( GETENHMETAFILEBITS )
 
    hb_retni( GetEnhMetaFileBits( (HENHMETAFILE) hb_parnl( 1 ),
                                  (UINT) hb_parni( 2 )        ,
-                                 lpByte                      
+                                 lpByte
                                  ) ) ;
 }
 
@@ -442,7 +442,7 @@ HB_FUNC( GETENHMETAFILEHEADER )
 
    hb_retni( GetEnhMetaFileHeader( (HENHMETAFILE) hb_parnl( 1 ),
                                    (UINT) hb_parni( 2 )        ,
-                                   lPenhMetaHeader             
+                                   lPenhMetaHeader
                                    ) ) ;
 }
 
@@ -461,7 +461,7 @@ HB_FUNC( GETENHMETAFILEPALETTEENTRIES )
 
    hb_retni( GetEnhMetaFilePaletteEntries( (HENHMETAFILE) hb_parnl( 1 ),
                                            (UINT) hb_parni( 2 )        ,
-                                           lpPaletteEntry              
+                                           lpPaletteEntry
                                            ) ) ;
 }
 
@@ -480,7 +480,7 @@ HB_FUNC( GETENHMETAFILEPIXELFORMAT )
 
    hb_retni( GetEnhMetaFilePixelFormat( (HENHMETAFILE) hb_parnl( 1 ),
                                         (UINT) hb_parni( 2 )        ,
-                                        &PixelFormatdescriptor      
+                                        &PixelFormatdescriptor
                                         ) ) ;
 }
 

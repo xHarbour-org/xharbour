@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.8 2003/12/15 14:09:38 druzus Exp $
+ * $Id: cmdarg.c,v 1.9 2003/12/20 10:57:27 lf_sfnet Exp $
  */
 
 /*
@@ -241,7 +241,7 @@ int hb_cmdargNum( const char * pszName )
 
 HB_FUNC( HB_ARGCHECK )
 {
-   hb_retl( ISCHAR( 1 ) ? hb_cmdargCheck( hb_parc( 1 ) ) : FALSE );
+   hb_retl( ISCHAR( 1 ) ? hb_cmdargCheck( hb_parcx( 1 ) ) : FALSE );
 }
 
 /* Returns the value of an internal switch */
@@ -250,7 +250,7 @@ HB_FUNC( HB_ARGSTRING )
 {
    if( ISCHAR( 1 ) )
    {
-      char * pszValue = hb_cmdargString( hb_parc( 1 ) );
+      char * pszValue = hb_cmdargString( hb_parcx( 1 ) );
 
       if( pszValue )
       {
@@ -324,12 +324,12 @@ void hb_cmdargProcessVM( void )
    int iHandles;
 
    iHandles = hb_cmdargNum( "F" );
-   
+
    if ( iHandles > 20 )
    {
       _grow_handles( iHandles );
    }
    #endif
-   
+
    hb_traceInit();
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.4 2003/02/28 09:44:10 iananderson Exp $
+ * $Id: adsmgmnt.c,v 1.5 2003/11/02 02:57:47 toninhofwi Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ HB_FUNC( ADSMGCONNECT )
       //                                       ADSHANDLE   *phMgmtHandle );
       */
 
-   hb_retnl( AdsMgConnect( (UNSIGNED8 *) hb_parc(1), (UNSIGNED8 *) hb_parc(2), (UNSIGNED8 *) hb_parc(3), &hMgmtHandle) );
+   hb_retnl( AdsMgConnect( (UNSIGNED8 *) hb_parcx(1), (UNSIGNED8 *) hb_parcx(2), (UNSIGNED8 *) hb_parcx(3), &hMgmtHandle) );
 }
 
 HB_FUNC( ADSMGDISCONNECT )
@@ -391,7 +391,7 @@ HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
       //                      UNSIGNED16 *pusArrayLen,
       //                      UNSIGNED16 *pusStructSize );
       */
-   ulRetVal = AdsMgGetUserNames( hMgmtHandle, ISCHAR( 1 ) ? (UNSIGNED8 *) hb_parc( 1 ) : NULL,
+   ulRetVal = AdsMgGetUserNames( hMgmtHandle, ISCHAR( 1 ) ? (UNSIGNED8 *) hb_parcx( 1 ) : NULL,
                                  pastUserInfo,
                                  &ulMaxUsers,
                                  &usStructSize );
@@ -445,7 +445,7 @@ HB_FUNC( ADSMGGETLOCKOWNER )
    pstUserInfo = (ADS_MGMT_USER_INFO *) hb_xgrab( sizeof( ADS_MGMT_USER_INFO ));
 
    ulRetVal = AdsMgGetLockOwner( hMgmtHandle,
-                                 (UNSIGNED8 *) hb_parc( 1 ),
+                                 (UNSIGNED8 *) hb_parcx( 1 ),
                                  (UNSIGNED32) hb_parnl(2),
                                  pstUserInfo,
                                  &usStructSize,

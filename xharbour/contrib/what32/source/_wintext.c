@@ -34,11 +34,11 @@ extern void Size2ArrayEx( SIZE *siz  ,  PHB_ITEM aSize);
 HB_FUNC ( TEXTOUT )
 {
 
-   hb_retl( TextOut((HDC) hb_parnl( 1 )   ,	// handle of device context 
-                    hb_parni( 2 )         ,    	// x-coordinate of starting position  
-                    hb_parni( 3 )         ,     // y-coordinate of starting position  
-                    (LPCTSTR) hb_parc( 4 ),     // address of string 
-                    hb_parclen( 4 ) 	        // number of characters in string 
+   hb_retl( TextOut((HDC) hb_parnl( 1 )   ,	// handle of device context
+                    hb_parni( 2 )         ,    	// x-coordinate of starting position
+                    hb_parni( 3 )         ,     // y-coordinate of starting position
+                    (LPCTSTR) hb_parcx( 4 ),     // address of string
+                    hb_parclen( 4 ) 	        // number of characters in string
                    )
           );
 }
@@ -73,7 +73,7 @@ HB_FUNC( EXTTEXTOUT )
    BOOL rcOk   ;
    UINT iCount ;
    UINT i      ;
-   char * cText = hb_parc( 6 );
+   char * cText = hb_parcx( 6 );
 
    rcOk = ( ISARRAY(5) && Array2Rect(hb_param(5, HB_IT_ARRAY), &rc) ) ;
 
@@ -110,7 +110,7 @@ HB_FUNC( EXTTEXTOUT )
 
 HB_FUNC ( DRAWTEXT )
 {
-   char *cText = hb_parc( 2 );
+   char *cText = hb_parcx( 2 );
    RECT rc;
 
    if ( ISARRAY( 3 ) && Array2Rect( hb_param( 3, HB_IT_ARRAY ), &rc ) )
@@ -132,7 +132,7 @@ HB_FUNC ( DRAWTEXT )
 
 HB_FUNC ( DRAWTEXTEX )
 {
-   char *cText = (char *) hb_parc( 2 );
+   char *cText = (char *) hb_parcx( 2 );
    RECT rc;
    DRAWTEXTPARAMS *dtp ;
 
@@ -160,7 +160,7 @@ HB_FUNC ( DRAWTEXTEX )
 
 HB_FUNC( TABBEDTEXTOUT )
 {
-   char *cText = hb_parc( 4 );
+   char *cText = hb_parcx( 4 );
    int iCount  ;
    int *aiTabs ;
    int i       ;
@@ -232,7 +232,7 @@ HB_FUNC( GETTABBEDTEXTEXTENT )
       {
         *(aiTabs+i) = hb_parni( 3, i+1 ) ;
       }
-      cText = hb_parc( 2 );
+      cText = hb_parcx( 2 );
       hb_retnl( (LONG) GetTabbedTextExtent( (HDC) hb_parnl( 1 )  ,
                                             (LPCTSTR) cText      ,
                                             strlen(cText)        ,
@@ -287,7 +287,7 @@ HB_FUNC( GETOUTLINETEXTMETRICSA )
 
 HB_FUNC ( GETTEXTEXTENTPOINT32 )
 {
-   char * pstr = hb_parc(2);
+   char * pstr = hb_parcx(2);
    SIZE sz;
    PHB_ITEM aMetr ;
 
@@ -345,7 +345,7 @@ HB_FUNC( SETTEXTJUSTIFICATION )
 {
    hb_retl( SetTextJustification( (HDC) hb_parnl( 1 ),
                                   hb_parni( 2 )      ,
-                                  hb_parni( 3 )      
+                                  hb_parni( 3 )
                                   ) ) ;
 }
 
@@ -401,7 +401,7 @@ HB_FUNC( GRAYSTRING )
                         hb_parni( 6 )         ,
                         hb_parni( 7 )         ,
                         hb_parni( 8 )         ,
-                        hb_parni( 9 )         
+                        hb_parni( 9 )
                       ) ) ;
 }
 
@@ -422,7 +422,7 @@ HB_FUNC( GETCHARABCWIDTHSA )
    hb_retl( GetCharABCWidthsA( (HDC) hb_parnl( 1 ) ,
                                (UINT) hb_parni( 2 ),
                                (UINT) hb_parni( 3 ),
-                               lpabc               
+                               lpabc
                                ) ) ;
 }
 
@@ -442,7 +442,7 @@ HB_FUNC( GETCHARABCWIDTHSFLOATA )
    hb_retl( GetCharABCWidthsFloatA( (HDC) hb_parnl( 1 ) ,
                                     (UINT) hb_parni( 2 ),
                                     (UINT) hb_parni( 3 ),
-                                    lpabcFloat          
+                                    lpabcFloat
                                     ) ) ;
 }
 
@@ -464,7 +464,7 @@ HB_FUNC( GETCHARABCWIDTHSI )
                                (UINT) hb_parni( 2 ),
                                (UINT) hb_parni( 3 ),
                                lpWord              ,
-                               lpabc               
+                               lpabc
                                ) ) ;
 }
 
@@ -482,7 +482,7 @@ HB_FUNC( GETCHARACTERPLACEMENTA )
    // Your code goes here
 
    hb_retnl( (LONG) GetCharacterPlacementA( (HDC) hb_parnl( 1 )  ,
-                                            (LPCSTR) hb_parc( 2 ),
+                                            (LPCSTR) hb_parcx( 2 ),
                                             hb_parni( 3 )        ,
                                             hb_parni( 4 )        ,
                                             lpgcp_resultsa       ,
@@ -506,7 +506,7 @@ HB_FUNC( GETCHARWIDTH32A )
    hb_retl( GetCharWidth32A( (HDC) hb_parnl( 1 ) ,
                              (UINT) hb_parni( 2 ),
                              (UINT) hb_parni( 3 ),
-                             lpInt               
+                             lpInt
                              ) ) ;
 }
 
@@ -526,7 +526,7 @@ HB_FUNC( GETCHARWIDTHA )
    hb_retl( GetCharWidthA( (HDC) hb_parnl( 1 ) ,
                            (UINT) hb_parni( 2 ),
                            (UINT) hb_parni( 3 ),
-                           lpInt               
+                           lpInt
                            ) ) ;
 }
 
@@ -546,7 +546,7 @@ HB_FUNC( GETCHARWIDTHFLOATA )
    hb_retl( GetCharWidthFloatA( (HDC) hb_parnl( 1 ) ,
                                 (UINT) hb_parni( 2 ),
                                 (UINT) hb_parni( 3 ),
-                                pFloat              
+                                pFloat
                                 ) ) ;
 }
 
@@ -568,7 +568,7 @@ HB_FUNC( GETCHARWIDTHI )
                            (UINT) hb_parni( 2 ),
                            (UINT) hb_parni( 3 ),
                            lpWord              ,
-                           lpInt               
+                           lpInt
                            ) ) ;
 }
 
@@ -587,7 +587,7 @@ HB_FUNC( GETKERNINGPAIRSA )
 
    hb_retnl( (LONG) GetKerningPairsA( (HDC) hb_parnl( 1 )  ,
                                       (DWORD) hb_parnl( 2 ),
-                                      lpkerningpair        
+                                      lpkerningpair
                                       ) ) ;
 }
 
@@ -626,12 +626,12 @@ HB_FUNC( GETTEXTEXTENTEXPOINTA )
    // Your code goes here
 
    hb_retl( GetTextExtentExPointA( (HDC) hb_parnl( 1 )  ,
-                                   (LPCSTR) hb_parc( 2 ),
+                                   (LPCSTR) hb_parcx( 2 ),
                                    hb_parni( 3 )        ,
                                    hb_parni( 4 )        ,
                                    lpInt1               ,
                                    lpInt2               ,
-                                   lpSize               
+                                   lpSize
                                    ) ) ;
 }
 
@@ -657,7 +657,7 @@ HB_FUNC( GETTEXTEXTENTEXPOINTI )
                                    hb_parni( 4 )      ,
                                    lpInt1             ,
                                    lpInt2             ,
-                                   lpSize             
+                                   lpSize
                                    ) ) ;
 }
 
@@ -676,9 +676,9 @@ HB_FUNC( GETTEXTEXTENTPOINTA )
    // Your code goes here
 
    hb_retl( GetTextExtentPointA( (HDC) hb_parnl( 1 )  ,
-                                 (LPCSTR) hb_parc( 2 ),
+                                 (LPCSTR) hb_parcx( 2 ),
                                  hb_parni( 3 )        ,
-                                 lpSize               
+                                 lpSize
                                  ) ) ;
 }
 
@@ -699,7 +699,7 @@ HB_FUNC( GETTEXTEXTENTPOINTI )
    hb_retl( GetTextExtentPointI( (HDC) hb_parnl( 1 ),
                                  lpWord             ,
                                  hb_parni( 3 )      ,
-                                 lpSize             
+                                 lpSize
                                  ) ) ;
 }
 

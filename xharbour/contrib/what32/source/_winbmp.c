@@ -9,7 +9,7 @@ Modified and non-API functions:
 
   DrawBitmap( hDC, hBmp, nROP, x, y, nWidth, nHeight) -> NIL  // to be revised !!!
   GetBitmapSize(hBmp) -> aSize
-  DrawGlyph(hDC, x , y , dx , dy , hBmp , rgbTransparent , lDisabled) -> NIL 
+  DrawGlyph(hDC, x , y , dx , dy , hBmp , rgbTransparent , lDisabled) -> NIL
 
 */
 
@@ -38,7 +38,7 @@ HB_FUNC ( LOADBITMAP )
    hb_retnl( (LONG) LoadBitmap(
              ISNIL(1) ? GetModuleHandle( NULL ): (HINSTANCE) hb_parnl(1) ,
              hb_parinfo(2)==HB_IT_STRING ?
-                       (LPCTSTR) hb_parc( 2 ) :
+                       (LPCTSTR) hb_parcx( 2 ) :
                        MAKEINTRESOURCE( (WORD) hb_parni(2)) ) );
 }
 
@@ -60,7 +60,7 @@ HB_FUNC ( DRAWBITMAP )
    GetObject( hBitmap, sizeof( BITMAP ), ( LPVOID ) &bitmap );
    if( nWidthDest && ( nWidthDest != bitmap.bmWidth || nHeightDest != bitmap.bmHeight ))
    {
-      StretchBlt( hDC, hb_parni(4), hb_parni(5), nWidthDest, nHeightDest, hDCmem, 
+      StretchBlt( hDC, hb_parni(4), hb_parni(5), nWidthDest, nHeightDest, hDCmem,
                   0, 0, bitmap.bmWidth, bitmap.bmHeight, dwraster );
    }
    else
@@ -129,12 +129,12 @@ HB_FUNC( SETBITMAPDIMENSIONEX )
    if ( SetBitmapDimensionEx( (HBITMAP) hb_parnl( 1 ),
                                   hb_parni( 2 )          ,
                                   hb_parni( 3 )          ,
-                                  &Size                 
-                                  ) ) 
+                                  &Size
+                                  ) )
    {
-    
+
    aSize = hb_itemArrayNew(2);
-   
+
    temp = _itemPutNL( NULL, Size.cx );
    hb_arraySet( aSize, 1, temp );
    hb_itemRelease( temp );
@@ -192,7 +192,7 @@ HB_FUNC( CREATEBITMAP )
                                   hb_parni( 2 )       ,
                                   (UINT) hb_parni( 3 ),
                                   (UINT) hb_parni( 4 ),
-                                  hb_parc(5)               
+                                  hb_parcx(5)
                                   ) ) ;
 }
 
@@ -219,7 +219,7 @@ HB_FUNC( CREATECOMPATIBLEBITMAP )
 {
    hb_retnl( (LONG) CreateCompatibleBitmap( (HDC) hb_parnl( 1 ),
                                             hb_parni( 2 )      ,
-                                            hb_parni( 3 )      
+                                            hb_parni( 3 )
                                             ) ) ;
 }
 
@@ -236,9 +236,9 @@ HB_FUNC( CREATEDIBITMAP )
    hb_retnl( (LONG) CreateDIBitmap( (HDC) hb_parnl( 1 )  ,
                                     bmih                ,
                                     (DWORD) hb_parnl( 3 ),
-                                    (VOID *) hb_parc( 3 ),
+                                    (VOID *) hb_parcx( 3 ),
                                     bmi                 ,
-                                    (UINT) hb_parni( 6 ) 
+                                    (UINT) hb_parni( 6 )
                                     ) ) ;
 }
 
@@ -259,9 +259,9 @@ HB_FUNC( CREATEDIBSECTION )
                                       (UINT) hb_parni( 3 )  ,
                                       ppBits                ,
                                       (HANDLE) hb_parnl( 5 ),
-                                      (DWORD) hb_parnl( 6 ) 
+                                      (DWORD) hb_parnl( 6 )
                                       ) ) ;
-   
+
    hb_stornl((LONG) *ppBits, 4) ;
 }
 
@@ -274,7 +274,7 @@ HB_FUNC( CREATEDISCARDABLEBITMAP )
 {
    hb_retnl( (LONG) CreateDiscardableBitmap( (HDC) hb_parnl( 1 ),
                                              hb_parni( 2 )      ,
-                                             hb_parni( 3 )      
+                                             hb_parni( 3 )
                                              ) ) ;
 }
 
@@ -295,7 +295,7 @@ HB_FUNC( MASKBLT )
                      (HBITMAP) hb_parnl( 9 ),
                      hb_parni( 10 )         ,
                      hb_parni( 11 )         ,
-                     (DWORD) hb_parnl( 12 ) 
+                     (DWORD) hb_parnl( 12 )
                      ) ) ;
 }
 
@@ -349,10 +349,10 @@ HB_FUNC( SETROP2 )
 
 HB_FUNC( SETBITMAPBITS )
 {
-   
+
    hb_retnl( (LONG) SetBitmapBits( (HBITMAP) hb_parnl( 1 ),
                                    (DWORD) hb_parclen( 2 )  ,
-                                   (VOID *) hb_parc( 2 )                  
+                                   (VOID *) hb_parcx( 2 )
                                    ) ) ;
 }
 
@@ -373,9 +373,9 @@ HB_FUNC( SETDIBITS )
                         (HBITMAP) hb_parnl( 2 ),
                         (UINT) hb_parni( 3 )   ,
                         (UINT) hb_parni( 4 )   ,
-                        (VOID *) hb_parc(5)    ,
+                        (VOID *) hb_parcx(5)    ,
                         bmi                    ,
-                        (UINT) hb_parni( 7 )   
+                        (UINT) hb_parni( 7 )
                         ) ) ;
 }
 
@@ -418,7 +418,7 @@ HB_FUNC( SETDIBITSTODEVICE )
                                 hb_parni( 7 )        ,
                                 (UINT) hb_parni( 8 ) ,
                                 (UINT) hb_parni( 9 ) ,
-                                (VOID *) hb_parc(10) ,
+                                (VOID *) hb_parcx(10) ,
                                 bmi                  ,
                                 (UINT) hb_parni( 12 )
                                 ) ) ;
@@ -444,7 +444,7 @@ HB_FUNC( STRETCHDIBITS )
                             hb_parni( 7 )         ,
                             hb_parni( 8 )         ,
                             hb_parni( 9 )         ,
-                            (VOID *) hb_parc(10)  ,
+                            (VOID *) hb_parcx(10)  ,
                             bmi                   ,
                             (UINT) hb_parni( 12 ) ,
                             (DWORD) hb_parnl( 13 )
@@ -459,7 +459,7 @@ void Pic(HDC hDC, int x , int y , int dx , int dy , HBITMAP hBmp , COLORREF rgbT
 //HB_FUNC( DRAWGLYPH )
 
 {
-      
+
    //  COLORREF rgbOld ;
      HDC      hDCMem ;
      HDC      hDCMem2 ;
@@ -468,12 +468,12 @@ void Pic(HDC hDC, int x , int y , int dx , int dy , HBITMAP hBmp , COLORREF rgbT
      HBITMAP  hbmTransMask ;
      HBRUSH   hBr  ;
      HBRUSH   hOld ;
-                          
-                          
-     hDCMem       = CreateCompatibleDC(hDC) ;       
-     hDCMem2      = CreateCompatibleDC(hDC) ;       
+
+
+     hDCMem       = CreateCompatibleDC(hDC) ;
+     hDCMem2      = CreateCompatibleDC(hDC) ;
      hbmTransMask = CreateBitmap(dx,dy,1,1,NULL) ;
-              
+
 
      SetBkColor(hDC, RGB(255,255,255)) ; //White)
      SetTextColor(hDC, RGB(0,0,0)) ;     //Black)
@@ -482,10 +482,10 @@ void Pic(HDC hDC, int x , int y , int dx , int dy , HBITMAP hBmp , COLORREF rgbT
      SelectObject(hDCMem2, hbmTransMask)   ;
 
     // build mask based on transparent color.
- 
+
      SetBkColor(hDCMem, rgbTransparent) ;
      BitBlt(hDCMem2, 0, 0, dx, dy, hDCMem, 0, 0, SRCCOPY) ;
-          
+
     if( disabled)
       {
         hBr=CreateSolidBrush(GetSysColor(COLOR_BTNHIGHLIGHT));
@@ -506,23 +506,23 @@ void Pic(HDC hDC, int x , int y , int dx , int dy , HBITMAP hBmp , COLORREF rgbT
         BitBlt(hDC, x, y, dx, dy, hDCMem2, 0, 0, SRCAND)   ;
         BitBlt(hDC, x, y, dx, dy, hDCMem, 0, 0, SRCINVERT) ;
       }
-    
+
 
     SelectObject(hDCMem, hbmDefault);
     SelectObject(hDCMem2, hbmDefault);
     DeleteObject(hbmTransMask);
 
     DeleteDC(hDCMem) ;
-    DeleteDC(hDCMem2) ;                       
-    
+    DeleteDC(hDCMem2) ;
+
     return ;
 
-}             
+}
 
 
 //-----------------------------------------------------------------------------
-                
-/*                  
+
+/*
 DrawGlyph(HDC hDC, int x , int y , int dx , int dy , HBITMAP hBmp , COLORREF rgbTransparent , BOOL disabled)
 */
 
@@ -535,9 +535,9 @@ HB_FUNC( DRAWGLYPH )
                   hb_parni(5),
         (HBITMAP) hb_parni(6),
        (COLORREF) hb_parnl(7),
-                  hb_parl(8)); 
+                  hb_parl(8));
     return;
-   }             
+   }
 
 
 
@@ -566,7 +566,7 @@ HB_FUNC( DRAWSTATE )
                        hb_parni( 7 )         ,
                        hb_parni( 8 )         ,
                        hb_parni( 9 )         ,
-                       (UINT) hb_parni( 10 ) 
+                       (UINT) hb_parni( 10 )
                      ) ) ;
 }
 
@@ -587,7 +587,7 @@ HB_FUNC( GETBITMAPBITS )
 
    hb_retnl( (LONG) GetBitmapBits( (HBITMAP) hb_parnl( 1 ),
                                    hb_parnl( 2 )          ,
-                                   lpVoid                 
+                                   lpVoid
                                    ) ) ;
 }
 
@@ -603,7 +603,7 @@ HB_FUNC( GETBITMAPBITS )
 /*
 HB_FUNC( GETDIBITS )
 {
-   VOID *lpvBits ; 
+   VOID *lpvBits ;
    BITMAPINFO *bmi  = (BITMAPINFO *) hb_param( 6, HB_IT_STRING)->item.asString.value ;
 
    hb_retni( GetDIBits( (HDC) hb_parnl( 1 )       ,
@@ -612,7 +612,7 @@ HB_FUNC( GETDIBITS )
                         (UINT) hb_parni( 4 )      ,
                         ISNIL(5) ? NULL : lpvBits ,
                         bmi                       ,
-                        (UINT) hb_parni( 7 )   
+                        (UINT) hb_parni( 7 )
                         ) ) ;
 
   hb_storc( lpvBits, 5) ;
@@ -632,7 +632,7 @@ HB_FUNC( GETGLYPHINDICESA )
    // Your code goes here
 
    hb_retnl( (LONG) GetGlyphIndicesA( (HDC) hb_parnl( 1 )  ,
-                                      (LPCSTR) hb_parc( 2 ),
+                                      (LPCSTR) hb_parcx( 2 ),
                                       hb_parni( 3 )        ,
                                       lpWord               ,
                                       (DWORD) hb_parnl( 5 )
@@ -660,7 +660,7 @@ HB_FUNC( GETGLYPHOUTLINEA )
                                       lpglyphMetrics       ,
                                       (DWORD) hb_parnl( 5 ),
                                       lpVoid               ,
-                                      &MAT2                
+                                      &MAT2
                                       ) ) ;
 }
 
@@ -711,7 +711,7 @@ HB_FUNC( PLGBLT )
                     hb_parni( 7 )          ,
                     (HBITMAP) hb_parnl( 8 ),
                     hb_parni( 9 )          ,
-                    hb_parni( 10 )         
+                    hb_parni( 10 )
                     ) ) ;
 }
 
@@ -732,7 +732,7 @@ HB_FUNC( SETDIBCOLORTABLE )
    hb_retni( SetDIBColorTable( (HDC) hb_parnl( 1 ) ,
                                (UINT) hb_parni( 2 ),
                                (UINT) hb_parni( 3 ),
-                               &RGBQUAD            
+                               &RGBQUAD
                                ) ) ;
 }
 

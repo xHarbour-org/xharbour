@@ -35,7 +35,7 @@ HB_FUNC( ACCEPT )
       hb_retnl( (LONG) accept( (SOCKET) hb_parnl(1), NULL, NULL ) ) ;
    else
    {
-      addr = hb_parc(2);
+      addr = hb_parcx(2);
       addrlen = ISNIL(3) ? hb_parni(3) : hb_parclen(2) ;
       hb_retnl( (LONG) accept( (SOCKET) hb_parnl(1), ( struct sockaddr *) addr, &addrlen ) ) ;
       hb_storclen( addr, addrlen, 2 );
@@ -170,7 +170,7 @@ HB_FUNC( HTONS )
 
 HB_FUNC( INET_ADDR )
 {
-   hb_retnl( (ULONG) inet_addr( hb_parc( 1 ) ) ) ;
+   hb_retnl( (ULONG) inet_addr( hb_parcx( 1 ) ) ) ;
 }
 
 
@@ -312,7 +312,7 @@ HB_FUNC( SOCKSELECT )
 HB_FUNC( SEND )
 {
    int  iBuffLen = (ISNIL(3) ? (ISNIL(2) ? 0 : hb_parclen(2) ) : hb_parni(3));
-   hb_retni( ( int ) send((SOCKET) hb_parnl( 1 ), hb_parc(2), iBuffLen, hb_parni( 4 ) ) ) ;
+   hb_retni( ( int ) send((SOCKET) hb_parnl( 1 ), hb_parcx(2), iBuffLen, hb_parni( 4 ) ) ) ;
 }
 
 
@@ -335,7 +335,7 @@ HB_FUNC( SENDTO )
    }
 
    hb_retni( (int ) sendto( (SOCKET) hb_parnl( 1 )       ,
-                                            hb_parc( 2 ) ,
+                                            hb_parcx( 2 ) ,
                                             iBuffLen     ,
                                             hb_parni( 4 ),
                                             to           ,
@@ -385,7 +385,7 @@ HB_FUNC( SOCKET )
 HB_FUNC( GETHOSTBYADDR )
 {
    HOSTENT *he ;
-   he = gethostbyaddr( hb_parc( 1 ) ,
+   he = gethostbyaddr( hb_parcx( 1 ) ,
                        hb_parni( 2 ),
                        hb_parni( 3 )
                      ) ;
@@ -401,7 +401,7 @@ HB_FUNC( GETHOSTBYNAME )
 {
    HOSTENT *he ;
 
-   he = gethostbyname( hb_parc( 1 ) ) ;
+   he = gethostbyname( hb_parcx( 1 ) ) ;
 
    hb_retclen( ( char *)he, sizeof(HOSTENT) ) ;
 
@@ -415,7 +415,7 @@ HB_FUNC( GETHOSTBYNAME )
 
 HB_FUNC( GETHOSTNAME )
 {
-   char *name  = ( char*) hb_parc( 1 )  ;
+   char *name  = ( char*) hb_parcx( 1 )  ;
    int iLen    =  hb_parclen( 1 ) ;
 
    hb_retni( (int ) gethostname( name, iLen ) )  ;
@@ -428,7 +428,7 @@ HB_FUNC( GETHOSTNAME )
 
 HB_FUNC( GETSERVBYPORT )
 {
-   hb_retclen( ( char * ) getservbyport( hb_parni( 1 ),hb_parc( 2 ) ), sizeof(SERVENT) ) ;
+   hb_retclen( ( char * ) getservbyport( hb_parni( 1 ),hb_parcx( 2 ) ), sizeof(SERVENT) ) ;
 }
 
 
@@ -437,7 +437,7 @@ HB_FUNC( GETSERVBYPORT )
 
 HB_FUNC( GETSERVBYNAME )
 {
-   hb_retclen( ( char *) getservbyname( hb_parc( 1 ), hb_parc( 2 ) ), sizeof(SERVENT) ) ;
+   hb_retclen( ( char *) getservbyname( hb_parcx( 1 ), hb_parcx( 2 ) ), sizeof(SERVENT) ) ;
 }
 
 
@@ -455,7 +455,7 @@ HB_FUNC( GETPROTOBYNUMBER )
 
 HB_FUNC( GETPROTOBYNAME )
 {
-   hb_retclen( ( char * ) getprotobyname( hb_parc( 1 ) ), sizeof(PROTOENT) ) ;
+   hb_retclen( ( char * ) getprotobyname( hb_parcx( 1 ) ), sizeof(PROTOENT) ) ;
 }
 
 
@@ -565,8 +565,8 @@ HB_FUNC( WSAASYNCGETSERVBYNAME )
 
    if( ( hRet = WSAAsyncGetServByName( (HWND)         hb_parnl( 1 ),
                                      (unsigned int) hb_parni( 2 ),
-                                     ( char *)      hb_parc( 3 ) ,
-                                     ISNIL( 4 ) ? NULL : ( char *) hb_parc( 4 ) ,
+                                     ( char *)      hb_parcx( 3 ) ,
+                                     ISNIL( 4 ) ? NULL : ( char *) hb_parcx( 4 ) ,
                                      ( char *)      buf          ,
                                      ( int)         MAXGETHOSTSTRUCT ) ) != 0 )
 
@@ -594,7 +594,7 @@ HB_FUNC( WSAASYNCGETSERVBYPORT )
    if( ( hRet = WSAAsyncGetServByPort( (HWND) hb_parnl( 1 )        ,
                                       (unsigned int) hb_parni( 2 ),
                                        hb_parni( 3 )              ,
-                                       ISNIL( 4 ) ? NULL : ( char *) hb_parc( 4 ) ,
+                                       ISNIL( 4 ) ? NULL : ( char *) hb_parcx( 4 ) ,
                                        ( char *)      buf         ,
                                        ( int)         MAXGETHOSTSTRUCT  ) ) != 0 )
 
@@ -622,7 +622,7 @@ HB_FUNC( WSAASYNCGETPROTOBYNAME )
 
    if( ( hRet = WSAAsyncGetProtoByName( (HWND)         hb_parnl( 1 ),
                                        (unsigned int) hb_parni( 2 ),
-                                       ( char *)      hb_parc( 3 ) ,
+                                       ( char *)      hb_parcx( 3 ) ,
                                        ( char *)      buf          ,
                                        ( int)         MAXGETHOSTSTRUCT  ) ) != 0 )
 
@@ -676,7 +676,7 @@ HB_FUNC( WSAASYNCGETHOSTBYNAME )
 
    if( ( hRet = WSAAsyncGetHostByName( (HWND) hb_parnl( 1 ),
                                        (unsigned int) hb_parni( 2 ),
-                                       ( char *)      hb_parc( 3 ) ,
+                                       ( char *)      hb_parcx( 3 ) ,
                                        ( char *)      buf          ,
                                        ( int)         MAXGETHOSTSTRUCT ) ) != 0 )
 
@@ -705,7 +705,7 @@ HB_FUNC( WSAASYNCGETHOSTBYADDR )
 
    if( ( hRet = WSAAsyncGetHostByAddr( (HWND)         hb_parnl( 1 ) ,
                                       (unsigned int) hb_parni( 2 ) ,
-                                      ( char *)      hb_parc( 3 )  ,
+                                      ( char *)      hb_parcx( 3 )  ,
                                       ( int )        hb_parclen( 3),
                                       ( int )        hb_parni( 4 ) ,
                                       ( char *)      buf           ,
@@ -1385,7 +1385,7 @@ HB_FUNC( WSAADDRESSTOSTRING )
 // hb_retni( (int ) WSAAddressToString( lpsaAddress            ,
                                                         (DWORD) hb_parnl( 2 )  ,
                                                         lpProtocolInfo         ,
-                                                        (LPSTR) hb_parc( 4 )   ,
+                                                        (LPSTR) hb_parcx( 4 )   ,
                                                         lpdwAddressStringLength
                                                       ) ) ;
 }
@@ -1407,7 +1407,7 @@ HB_FUNC( WSASTRINGTOADDRESS )
 
    // Your code goes here
 
-// hb_retni( (int ) WSAStringToAddress( (LPSTR) hb_parc( 1 ),
+// hb_retni( (int ) WSAStringToAddress( (LPSTR) hb_parcx( 1 ),
                                                         hb_parni( 2 )       ,
                                                         lpProtocolInfo      ,
                                                         lpAddress           ,
@@ -1565,7 +1565,7 @@ HB_FUNC( WSAGETSERVICECLASSNAMEBYCLASSID )
    // Your code goes here
 
 // hb_retni( (int ) WSAGetServiceClassNameByClassId( lpServiceClassId    ,
-                                                                     (LPSTR) hb_parc( 2 ),
+                                                                     (LPSTR) hb_parcx( 2 ),
                                                                      lpdwBufferLength
                                                                    ) ) ;
 }

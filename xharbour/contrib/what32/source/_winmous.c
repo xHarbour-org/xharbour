@@ -35,7 +35,7 @@ extern void Size2ArrayEx( SIZE *siz  ,  PHB_ITEM aSize);
 HB_FUNC ( LOADCURSOR )
 {
    hb_retnl( (LONG) LoadCursor( ISNIL(1) ? NULL : (HINSTANCE) hb_parnl(1) ,
-                    hb_parinfo(2)== HB_IT_STRING ? hb_parc(2): MAKEINTRESOURCE( hb_parnl( 2 ) ) ) );
+                    hb_parinfo(2)== HB_IT_STRING ? hb_parcx(2): MAKEINTRESOURCE( hb_parnl( 2 ) ) ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -206,7 +206,7 @@ HB_FUNC( SWAPMOUSEBUTTON )
 
 HB_FUNC( LOADCURSORFROMFILE )
 {
-   hb_retnl( (LONG) LoadCursorFromFile( (LPCSTR) hb_parc( 1 ) ) ) ;
+   hb_retnl( (LONG) LoadCursorFromFile( (LPCSTR) hb_parcx( 1 ) ) ) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -220,8 +220,8 @@ HB_FUNC( CREATECURSOR )
                                   hb_parni( 3 )            ,
                                   hb_parni( 4 )            ,
                                   hb_parni( 5 )            ,
-                                  hb_parc( 6 )             ,
-                                  hb_parc( 7 )
+                                  hb_parcx( 6 )             ,
+                                  hb_parcx( 7 )
                                  ) ) ;
 }
 

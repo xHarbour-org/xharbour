@@ -26,7 +26,7 @@ HB_FUNC( DRAGQUERYFILE )
   if ( hb_parni( 4 ) > 0  )
     cFile = (char*) hb_xgrab( hb_parni(4) + 1 );
   else
-    cFile = (char*) hb_xgrab( strlen( hb_parc(3) ) + 1 );
+    cFile = (char*) hb_xgrab( strlen( hb_parcx(3) ) + 1 );
 
 
   iRet = DragQueryFile( (HDROP) hb_parnl( 1 ),
@@ -51,12 +51,12 @@ HB_FUNC( DRAGQUERYFILE )
 HB_FUNC( DRAGQUERYPOINT )
 {
    POINT lpPoInt ;
-   BOOL lRet ;  
+   BOOL lRet ;
    lRet = DragQueryPoint( (HDROP) hb_parnl( 1 ),(LPPOINT) &lpPoInt )  ;
    if (ISBYREF( 2 ) ){
       hb_stornl(2,lpPoInt.x,1);
       hb_stornl(2,lpPoInt.y,2);
-   }  
+   }
    hb_retl( lRet ) ;
 
 }
@@ -87,10 +87,10 @@ HB_FUNC( DRAGACCEPTFILES )
 HB_FUNC( SHELLEXECUTE )
 {
    hb_retnl( (LONG) ShellExecute( (HWND) hb_parnl( 1 )     ,
-                                  (LPCSTR) hb_parc( 2 )    ,
-                                  (LPCSTR) hb_parc( 3 )    ,
-                                  ISNIL(4) ? NULL : (LPCSTR) hb_parc( 4 )    ,
-                                  (LPCSTR) hb_parc( 5 )    ,
+                                  (LPCSTR) hb_parcx( 2 )    ,
+                                  (LPCSTR) hb_parcx( 3 )    ,
+                                  ISNIL(4) ? NULL : (LPCSTR) hb_parcx( 4 )    ,
+                                  (LPCSTR) hb_parcx( 5 )    ,
                                    hb_parni( 6 )
                                  ) ) ;
 }
@@ -102,18 +102,18 @@ HB_FUNC( FINDEXECUTABLE )
 {
 
   char cBuffer[MAX_PATH];
-  HINSTANCE hInst ; 
-   
-   
-   hInst = FindExecutable( (LPCSTR) hb_parc( 1 )    ,
-                           (LPCSTR) hb_parc( 2 )    ,
+  HINSTANCE hInst ;
+
+
+   hInst = FindExecutable( (LPCSTR) hb_parcx( 1 )    ,
+                           (LPCSTR) hb_parcx( 2 )    ,
                            (LPSTR)  cBuffer
                          ) ;
 
    hb_retnl( (LONG) hInst) ;
 
    if ( (LONG) hInst > 32 )
-      hb_storc( cBuffer, 3 ) ;   
+      hb_storc( cBuffer, 3 ) ;
 }
 
 
@@ -129,9 +129,9 @@ HB_FUNC( COMMANDLINETOARGVW )
 
    // Your code goes here
 
-// () CommandLineToArgvW( (LPWSTR) hb_parc( 1 ) ,
-                          (LPCWSTR) hb_parc( 2 ),
-                          &Intpnumargs          
+// () CommandLineToArgvW( (LPWSTR) hb_parcx( 1 ) ,
+                          (LPCWSTR) hb_parcx( 2 ),
+                          &Intpnumargs
                         ) ) ;
 }
 
@@ -143,8 +143,8 @@ HB_FUNC( COMMANDLINETOARGVW )
 HB_FUNC ( SHELLABOUT )
 {
    hb_retni( ShellAbout( (HWND) hb_parnl(1),
-                         (LPCSTR) hb_parc(2),
-                         (LPCSTR) hb_parc(3),
+                         (LPCSTR) hb_parcx(2),
+                         (LPCSTR) hb_parcx(3),
                          (ISNIL(4) ? NULL : (HICON) hb_parnl(4) )
                        ) );
 }
@@ -172,7 +172,7 @@ HB_FUNC( SHAPPBARMESSAGE )
 
 HB_FUNC( DOENVIRONMENTSUBST )
 {
-   hb_retnl((LONG) DoEnvironmentSubst( (LPSTR) hb_parc( 1 ) ,
+   hb_retnl((LONG) DoEnvironmentSubst( (LPSTR) hb_parcx( 1 ) ,
                                        (UINT) hb_parni( 2 )
                                      ) ) ;
 }
@@ -187,7 +187,7 @@ HB_FUNC( EXTRACTICONEX )
    HICON iSmall;
    UINT  nIcons=hb_parni(5);
 
-   hb_retni( ExtractIconEx( (LPCSTR) hb_parc( 1 ),
+   hb_retni( ExtractIconEx( (LPCSTR) hb_parcx( 1 ),
                             hb_parni( 2 )        ,
                             &iLarge              ,
                             &iSmall              ,
@@ -243,8 +243,8 @@ HB_FUNC( WINEXECERROR )
 {
    WinExecError( (HWND) hb_parnl( 1 ) ,
                  hb_parni( 2 )        ,
-                 (LPCSTR) hb_parc( 3 ),
-                 (LPCSTR) hb_parc( 4 )
+                 (LPCSTR) hb_parcx( 3 ),
+                 (LPCSTR) hb_parcx( 4 )
                   ) ;
 }
 
@@ -278,7 +278,7 @@ HB_FUNC( SHQUERYRECYCLEBIN )
 
    // Your code goes here
 
-// (SHSTDAPI) SHQueryRecycleBin( (LPCSTR) hb_parc( 1 ), pSHQueryRBInfo ) ) ;
+// (SHSTDAPI) SHQueryRecycleBin( (LPCSTR) hb_parcx( 1 ), pSHQueryRBInfo ) ) ;
 }
 
 */
@@ -294,7 +294,7 @@ HB_FUNC( SHQUERYRECYCLEBIN )
 HB_FUNC( SHEMPTYRECYCLEBIN )
 {
    hb_retnl(  SHEmptyRecycleBin( (HWND) hb_parnl( 1 ) ,
-                                 (LPCSTR) hb_parc( 2 ),
+                                 (LPCSTR) hb_parcx( 2 ),
                                  (DWORD) hb_parnl( 3 )
                                 ) ) ;
 }
@@ -325,7 +325,7 @@ HB_FUNC( SHGETFILEINFO )
 
    // Your code goes here
 
-// hb_retnl( SHGetFileInfo( (LPCSTR) hb_parc( 1 )    ,
+// hb_retnl( SHGetFileInfo( (LPCSTR) hb_parcx( 1 )    ,
                             (DWORD) hb_parnl( 2 )    ,
                             &psfi                    ,
                             (UINT) hb_parni( 4 )     ,
@@ -348,10 +348,10 @@ HB_FUNC( SHGETDISKFREESPACEEX )
 
    // Your code goes here
 
-// () SHGetDiskFreeSpaceEx( (LPCSTR) hb_parc( 1 )         ,
+// () SHGetDiskFreeSpaceEx( (LPCSTR) hb_parcx( 1 )         ,
                             &pulFreeBytesAvailableToCaller,
                             &pulTotalNumberOfBytes        ,
-                            &pulTotalNumberOfFreeBytes    
+                            &pulTotalNumberOfFreeBytes
                           ) ) ;
 }
 
@@ -363,9 +363,9 @@ HB_FUNC( SHGETDISKFREESPACEEX )
 /*
 HB_FUNC( SHGETNEWLINKINFO )
 {
-   hb_retl( SHGetNewLinkInfo( (LPCSTR) hb_parc( 1 ),
-                             (LPCSTR) hb_parc( 2 ),
-                             (LPSTR) hb_parc( 3 ) ,
+   hb_retl( SHGetNewLinkInfo( (LPCSTR) hb_parcx( 1 ),
+                             (LPCSTR) hb_parcx( 2 ),
+                             (LPSTR) hb_parcx( 3 ) ,
                              hb_parl( 4 )         ,
                              (UINT) hb_parni( 5 )
                            ) ) ;
@@ -382,8 +382,8 @@ HB_FUNC( SHINVOKEPRINTERCOMMAND )
 {
    hb_retl( SHInvokePrinterCommand( (HWND) hb_parnl( 1 ) ,
                                     (UINT) hb_parni( 2 ) ,
-                                    (LPCSTR) hb_parc( 3 ),
-                                    (LPCSTR) hb_parc( 4 ),
+                                    (LPCSTR) hb_parcx( 3 ),
+                                    (LPCSTR) hb_parcx( 4 ),
                                      hb_parl( 5 )
                                    ) ) ;
 }

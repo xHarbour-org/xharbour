@@ -33,11 +33,11 @@ HB_FUNC( TABCTRL_CREATE )
 HB_FUNC (TABCTRL_ADDITEM)
 {
    int iCount = TabCtrl_GetItemCount( (HWND) hb_parnl(1) );
-   TC_ITEM item; 
+   TC_ITEM item;
 
-   item.mask = TCIF_TEXT | TCIF_IMAGE; 
-   item.iImage = ISNIL(3) ? -1 : (LONG) hb_parnl(3); 
-   item.pszText = (LPSTR) hb_parc(2);
+   item.mask = TCIF_TEXT | TCIF_IMAGE;
+   item.iImage = ISNIL(3) ? -1 : (LONG) hb_parnl(3);
+   item.pszText = (LPSTR) hb_parcx(2);
 
    hb_retni( TabCtrl_InsertItem( (HWND) hb_parnl(1), iCount, &item) );
 }
@@ -46,10 +46,10 @@ HB_FUNC (TABCTRL_ADDITEM)
 
 HB_FUNC (TABCTRL_INSERTITEM)
 {
-   TC_ITEM item; 
-   item.mask = TCIF_TEXT | TCIF_IMAGE; 
-   item.iImage = ISNIL(4) ? -1 : (LONG) hb_parnl(4); 
-   item.pszText = (LPSTR) hb_parc(2);
+   TC_ITEM item;
+   item.mask = TCIF_TEXT | TCIF_IMAGE;
+   item.iImage = ISNIL(4) ? -1 : (LONG) hb_parnl(4);
+   item.pszText = (LPSTR) hb_parcx(2);
    hb_retni( TabCtrl_InsertItem( (HWND) hb_parnl(1), (INT) hb_parni(3), &item) );
 }
 
@@ -129,7 +129,7 @@ HB_FUNC (TABCTRL_GETROWCOUNT)
 
 HB_FUNC(TABCTRL_GETIMAGELIST)
 {
-   hb_retnl( (LONG) TabCtrl_GetImageList( (HWND) hb_parnl(1) ) ) ;   
+   hb_retnl( (LONG) TabCtrl_GetImageList( (HWND) hb_parnl(1) ) ) ;
 }
 
 
@@ -139,7 +139,7 @@ HB_FUNC(TABCTRL_GETIMAGELIST)
 
 HB_FUNC(TABCTRL_SETIMAGELIST)
 {
-   hb_retnl( (LONG) TabCtrl_SetImageList( (HWND) hb_parnl( 1 ), 
+   hb_retnl( (LONG) TabCtrl_SetImageList( (HWND) hb_parnl( 1 ),
                     (LPARAM)(HIMAGELIST) hb_parnl( 2 ) ) ) ;
 }
 
@@ -151,9 +151,9 @@ HB_FUNC(TABCTRL_SETIMAGELIST)
 HB_FUNC( TABCTRL_SETITEM )
 {
    TC_ITEM item;
-   item.mask = TCIF_TEXT | TCIF_IMAGE; 
-   item.iImage = -1; 
-   item.pszText = (LPSTR) hb_parc( 3 );
+   item.mask = TCIF_TEXT | TCIF_IMAGE;
+   item.iImage = -1;
+   item.pszText = (LPSTR) hb_parcx( 3 );
    hb_retl( TabCtrl_SetItem( (HWND) hb_parnl( 1 ), hb_parni( 2 ), &item) ) ;
 }
 

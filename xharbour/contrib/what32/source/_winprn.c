@@ -22,11 +22,11 @@
 HB_FUNC( STARTDOC )
 {
    DOCINFO di;
-   di.cbSize       = sizeof(DOCINFO); 
-   di.lpszDocName  = hb_parc( 2 );
-   di.lpszOutput   = (LPTSTR) ( ISNIL( 3 ) ? NULL : hb_parc( 3 ) ) ; 
-   di.lpszDatatype = (LPTSTR) ( ISNIL( 4 ) ? NULL : hb_parc( 4 ) ) ; 
-   di.fwType       = (DWORD)  ( ISNIL( 5 ) ? 0 : hb_parnl( 5 ) ); 
+   di.cbSize       = sizeof(DOCINFO);
+   di.lpszDocName  = hb_parcx( 2 );
+   di.lpszOutput   = (LPTSTR) ( ISNIL( 3 ) ? NULL : hb_parcx( 3 ) ) ;
+   di.lpszDatatype = (LPTSTR) ( ISNIL( 4 ) ? NULL : hb_parcx( 4 ) ) ;
+   di.fwType       = (DWORD)  ( ISNIL( 5 ) ? 0 : hb_parnl( 5 ) );
 
    hb_retnl( (LONG) StartDoc( (HDC) hb_parnl( 1 ), &di ) );
 }
@@ -78,8 +78,8 @@ HB_FUNC( ESCAPE )
    hb_retni( Escape( (HDC) hb_parnl( 1 )  ,
                      hb_parni( 2 )        ,
                      hb_parni( 3 )        ,
-                     (LPCSTR) hb_parc( 4 ),
-                     lpVoid               
+                     (LPCSTR) hb_parcx( 4 ),
+                     lpVoid
                      ) ) ;
 }
 
@@ -93,9 +93,9 @@ HB_FUNC( EXTESCAPE )
    hb_retni( ExtEscape( (HDC) hb_parnl( 1 )  ,
                         hb_parni( 2 )        ,
                         hb_parni( 3 )        ,
-                        (LPCSTR) hb_parc( 4 ),
+                        (LPCSTR) hb_parcx( 4 ),
                         hb_parni( 5 )        ,
-                        (LPSTR) hb_parc( 6 ) 
+                        (LPSTR) hb_parcx( 6 )
                         ) ) ;
 }
 

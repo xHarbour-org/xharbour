@@ -186,7 +186,7 @@ HB_FUNC( IMAGELIST_GETICON )
 HB_FUNC( IMAGELIST_LOADIMAGE )
 {
    hb_retnl( (LONG) ImageList_LoadImageA( (HINSTANCE) hb_parnl(1),
-                                          ISCHAR(2)?(LPCSTR) hb_parc(2) : MAKEINTRESOURCE(hb_parni(2))   ,
+                                          ISCHAR(2)?(LPCSTR) hb_parcx(2) : MAKEINTRESOURCE(hb_parni(2))   ,
                                            hb_parni(3)           ,
                                            hb_parni(4)           ,
                                            (COLORREF) hb_parnl(5),

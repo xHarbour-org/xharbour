@@ -18,7 +18,7 @@
 
 HB_FUNC ( APPENDMENU )
 {
-  hb_retl( AppendMenu( (HMENU) hb_parnl(1), hb_parni(2), hb_parni(3), hb_parc(4)) ) ;
+  hb_retl( AppendMenu( (HMENU) hb_parnl(1), hb_parni(2), hb_parni(3), hb_parcx(4)) ) ;
 }
 
 
@@ -89,7 +89,7 @@ HB_FUNC ( ENABLEMENUITEM )
 {
   hb_retl( EnableMenuItem( (HMENU) hb_parnl(1), hb_parni(2), hb_parni(3) ) ) ;
 }
-         
+
 //-----------------------------------------------------------------------------
 
 HB_FUNC( GETMENUSTATE )
@@ -120,7 +120,7 @@ HB_FUNC( HILITEMENUITEM )
 
 HB_FUNC( INSERTMENU )
 {
-  hb_retl( InsertMenu( (HMENU) hb_parnl(1), hb_parni(2), hb_parni(3), hb_parni(4), hb_parc(5)) );
+  hb_retl( InsertMenu( (HMENU) hb_parnl(1), hb_parni(2), hb_parni(3), hb_parni(4), hb_parcx(5)) );
 }
 
 //-----------------------------------------------------------------------------
@@ -156,8 +156,8 @@ HB_FUNC( GETSUBMENU )
 HB_FUNC( TRACKPOPUPMENU )
 {
  RECT rc ;
- 
- if (!ISNIL(7)) { 
+
+ if (!ISNIL(7)) {
    rc.left   = hb_parni(7,1);
    rc.top    = hb_parni(7,2);
    rc.right  = hb_parni(7,3);
@@ -181,7 +181,7 @@ HB_FUNC( GETSYSTEMMENU )
 
 HB_FUNC( LOADMENU )
 {
-   hb_retnl( (LONG) LoadMenu( (HINSTANCE) hb_parnl( 1 ), (LPCSTR) hb_parc( 2 ) ) ) ;
+   hb_retnl( (LONG) LoadMenu( (HINSTANCE) hb_parnl( 1 ), (LPCSTR) hb_parcx( 2 ) ) ) ;
 }
 
 
@@ -204,9 +204,9 @@ HB_FUNC( CHANGEMENU )
 {
    hb_retl( ChangeMenu( (HMENU) hb_parnl( 1 ),
                         (UINT) hb_parni( 2 ) ,
-                        (LPCSTR) hb_parc( 3 ),
+                        (LPCSTR) hb_parcx( 3 ),
                         (UINT) hb_parni( 4 ) ,
-                        (UINT) hb_parni( 5 ) 
+                        (UINT) hb_parni( 5 )
                       ) ) ;
 }
 
@@ -218,7 +218,7 @@ HB_FUNC( REMOVEMENU )
 {
    hb_retl( RemoveMenu( (HMENU) hb_parnl( 1 ),
                         (UINT) hb_parni( 2 ) ,
-                        (UINT) hb_parni( 3 ) 
+                        (UINT) hb_parni( 3 )
                       ) ) ;
 }
 
@@ -249,7 +249,7 @@ HB_FUNC( MODIFYMENU )
                         (UINT) hb_parni( 2 ) ,
                         (UINT) hb_parni( 3 ) ,
                         uIDNewItem           ,
-                        (LPCSTR) hb_parc( 5 )
+                        (LPCSTR) hb_parcx( 5 )
                       ) ) ;
 }
 
@@ -308,7 +308,7 @@ HB_FUNC( INSERTMENUITEM )
    hb_retl( InsertMenuItem( (HMENU) hb_parnl( 1 ),
                             (UINT) hb_parni( 2 ) ,
                             hb_parl( 3 )         ,
-                            lpcmenuitemInfoa     
+                            lpcmenuitemInfoa
                           ) ) ;
 }
 
@@ -342,7 +342,7 @@ HB_FUNC( SETMENUITEMINFO )
    hb_retl( SetMenuItemInfo( (HMENU) hb_parnl( 1 ),
                              (UINT) hb_parni( 2 ) ,
                              hb_parl( 3 )         ,
-                             lpcmenuitemInfoa     
+                             lpcmenuitemInfoa
                            ) ) ;
 }
 
@@ -363,7 +363,7 @@ HB_FUNC( GETMENUBARINFO )
    hb_retl( GetMenuBarInfo( (HWND) hb_parnl( 1 ),
                             hb_parnl( 2 )       ,
                             hb_parnl( 3 )       ,
-                            pmbi                
+                            pmbi
                           ) ) ;
 }
 
@@ -376,11 +376,11 @@ HB_FUNC( GETMENUBARINFO )
 //-----------------------------------------------------------------------------
 
 //BOOL CheckMenuRadioItem( HMENU hmenu, UINT idFirst, UINT idLast, UINT idCheck, UINT uFlags );
- 
+
 HB_FUNC( CHECKMENURADIOITEM )
 {
-  hb_retl( CheckMenuRadioItem( (HMENU) hb_parnl( 1 ), (UINT) hb_parni(2), 
-                               (UINT) hb_parni(3), (UINT) hb_parni(4), (UINT) hb_parni(5) ) ) ; 
+  hb_retl( CheckMenuRadioItem( (HMENU) hb_parnl( 1 ), (UINT) hb_parni(2),
+                               (UINT) hb_parni(3), (UINT) hb_parni(4), (UINT) hb_parni(5) ) ) ;
 }
 
 HB_FUNC( ISMENU )

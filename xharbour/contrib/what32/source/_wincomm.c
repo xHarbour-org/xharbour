@@ -50,7 +50,7 @@ HB_FUNC (CREATESTATUSWINDOW )
 {
   hb_retnl( (ULONG) CreateStatusWindow (
                                          hb_parnl(1),
-                                         (LPCSTR) hb_parc(2) ,
+                                         (LPCSTR) hb_parcx(2) ,
                                          (HWND) hb_parnl(3) ,
                                          (UINT) hb_parni(4)
                                        )
@@ -72,7 +72,7 @@ HB_FUNC ( DRAWSTATUSTEXT )
     DrawStatusText(
                      (HDC) hb_parnl(1)  ,
                      (LPRECT) &rc       ,
-                     (LPCTSTR) hb_parc(3),
+                     (LPCTSTR) hb_parcx(3),
                      (UINT) hb_parni(4)
                   );
 
@@ -80,9 +80,9 @@ HB_FUNC ( DRAWSTATUSTEXT )
 
 //----------------------------------------------------------------------------//
 
-HB_FUNC ( WRITESTATUSWINDOW )  
+HB_FUNC ( WRITESTATUSWINDOW )
 {
-   SendMessage( (HWND) hb_parnl( 1 ), SB_SETTEXT, hb_parni( 2 ), (LPARAM) hb_parc( 3 ) );
+   SendMessage( (HWND) hb_parnl( 1 ), SB_SETTEXT, hb_parni( 2 ), (LPARAM) hb_parcx( 3 ) );
 }
 
 
@@ -91,7 +91,7 @@ HB_FUNC ( STATUSBARGETRECT )
   RECT rc;
   PHB_ITEM aRect ;
   HWND hWnd = (HWND) hb_parnl(1);
-  SendMessage ( hWnd, SB_GETRECT, hb_parnl(2), (LPARAM) &rc); 
+  SendMessage ( hWnd, SB_GETRECT, hb_parnl(2), (LPARAM) &rc);
   aRect = Rect2Array( &rc  );
   _itemReturn( aRect );
   _itemRelease( aRect );
@@ -103,7 +103,7 @@ HB_FUNC ( STATUSBARGETPARTS )
   RECT rc;
   PHB_ITEM aParts;
   HWND hWnd = (HWND) hb_parnl(1);
-  SendMessage ( hWnd, SB_GETPARTS, hb_parni(2), (LPARAM) &rc); 
+  SendMessage ( hWnd, SB_GETPARTS, hb_parni(2), (LPARAM) &rc);
   aParts = Rect2Array( &rc  );
   _itemReturn( aParts );
   _itemRelease( aParts );
@@ -153,7 +153,7 @@ HB_FUNC ( CREATEPROGRESSBAR )
    BOOL bBorder = ISNIL(7) ? FALSE : hb_parl(7);
    int cyVScroll = ISNIL(6) ? GetSystemMetrics( SM_CYVSCROLL ): hb_parni(6) ;
    LONG nStyle = ISNIL(8) ? 0 : hb_parnl(8) ;
-   
+
    int x1, y1, nwidth, nheight;
    if( hb_pcount() > 2 )
    {
@@ -176,12 +176,12 @@ HB_FUNC ( CREATEPROGRESSBAR )
               x1,                       /* x */
               y1,                       /* y */
               nwidth, nheight,          /* nWidth, nHeight */
-              hParentWindow,            /* parent window    */ 
+              hParentWindow,            /* parent window    */
               (HMENU) NULL,
               GetModuleHandle( NULL ), NULL );
 
    SendMessage( hPBar, PBM_SETRANGE, 0, MAKELPARAM( 0, hb_parni( 2 ) ) );
-   SendMessage(hPBar, PBM_SETSTEP, (WPARAM) 1, 0); 
+   SendMessage(hPBar, PBM_SETSTEP, (WPARAM) 1, 0);
 
 
   if( bBorder )
@@ -203,7 +203,7 @@ HB_FUNC ( CREATEPROGRESSBAR )
 HB_FUNC ( UPDATEPROGRESSBAR )
 {
    SendMessage( (HWND) hb_parnl(1), PBM_STEPIT, 0, 0 );
-}  
+}
 
 //----------------------------------------------------------------------------//
 
@@ -267,14 +267,14 @@ HB_FUNC (INITLISTVIEW)
 
    hbutton = CreateWindowEx(WS_EX_CLIENTEDGE,"SysListView32","",
    LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_CHILD | WS_TABSTOP | WS_VISIBLE | WS_BORDER | LVS_REPORT,
-   hb_parni(3), hb_parni(4) , hb_parni(5), hb_parni(6) ,  
+   hb_parni(3), hb_parni(4) , hb_parni(5), hb_parni(6) ,
    hwnd,(HMENU)hb_parni(2) , GetModuleHandle(NULL) , NULL ) ;
 
    SendMessage(hbutton,LVM_SETEXTENDEDLISTVIEWSTYLE, 0,LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT | LVS_EX_HEADERDRAGDROP );
 
    if ( hb_parni(8) != 0)
    {
-      //SendMessage(hbutton,(UINT)WM_SETFONT,(WPARAM) PrepareFont ( hb_parc(7) , (LPARAM) hb_parni(8)) , 1 ) ;
+      //SendMessage(hbutton,(UINT)WM_SETFONT,(WPARAM) PrepareFont ( hb_parcx(7) , (LPARAM) hb_parni(8)) , 1 ) ;
    }
 
    hb_retnl ( (LONG) hbutton );
@@ -304,7 +304,7 @@ HB_FUNC ( INITLISTVIEWCOLUMNS )
       {
 
       caption  = hb_itemGetCPtr ( hArray->item.asArray.value->pItems + s );
-      vi = hb_itemGetNI   ( wArray->item.asArray.value->pItems + s );      
+      vi = hb_itemGetNI   ( wArray->item.asArray.value->pItems + s );
 
       COL.cx=vi;
       COL.pszText=caption;
@@ -336,7 +336,7 @@ HB_FUNC ( ADDLISTVIEWITEMS )
    LI.stateMask=0;
         LI.iImage=0;
         LI.iSubItem=0;
-   LI.iItem=c; 
+   LI.iItem=c;
    LI.pszText=caption;
    ListView_InsertItem(h,&LI);
 
@@ -345,9 +345,9 @@ HB_FUNC ( ADDLISTVIEWITEMS )
       caption  = hb_itemGetCPtr ( hArray->item.asArray.value->pItems + s );
       ListView_SetItemText(h,c,s,caption);
    }
-} 
+}
 //------------------------------------------------------------------------------------------
-HB_FUNC (LISTVIEW_SETCURSEL) 
+HB_FUNC (LISTVIEW_SETCURSEL)
 {
    ListView_SetItemState((HWND) hb_parnl (1), (WPARAM) hb_parni(2)-1 ,LVIS_FOCUSED | LVIS_SELECTED , LVIS_FOCUSED | LVIS_SELECTED );
 }

@@ -492,7 +492,7 @@ HB_FUNC( POLYDRAW )
             }
 
             hb_retl( PolyPolyline( (HDC) hb_parnl( 1 ), Point, PolyPoints, iPolyCount ) ) ;
-            hb_retl( PolyDraw( (HDC) hb_parnl( 1 ), Point, hb_parc( 3 ) , iCount ) ) ;
+            hb_retl( PolyDraw( (HDC) hb_parnl( 1 ), Point, hb_parcx( 3 ) , iCount ) ) ;
             hb_xfree(PolyPoints);
             hb_xfree(Point);
        }

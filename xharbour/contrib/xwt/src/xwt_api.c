@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.18 2004/01/26 20:30:11 lculik Exp $
+   $Id: xwt_api.c,v 1.19 2004/01/30 18:34:12 lculik Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -158,14 +158,14 @@ HB_FUNC( XWT_MODAL )
 {
    PHB_ITEM pSelf = hb_param( 1, HB_IT_POINTER );
    PXWT_WIDGET wSelf;
-   
+
    /* Unready driver widget? */
-   if ( pSelf == NULL ) 
-   { 
+   if ( pSelf == NULL )
+   {
       hb_retl( FALSE );
       return;
    }
-   
+
    wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
    xwt_drv_modal( wSelf );
 }
@@ -277,7 +277,7 @@ HB_FUNC( XWT_SETPROPERTY )
       case XWT_PROP_NAME:
       case XWT_PROP_FILEMASK:
       case XWT_PROP_FILENAME:
-         prop.value.text = hb_parc( 3 );
+         prop.value.text = hb_parcx( 3 );
       break;
 
       //Numeric parameters
@@ -311,23 +311,23 @@ HB_FUNC( XWT_SETPROPERTY )
 
       //Font Parameter
       case XWT_PROP_FONT:
-         prop.value.font = hb_parc( 3 );
+         prop.value.font = hb_parcx( 3 );
       break;
 
       case XWT_PROP_FGCOLOR:
-         prop.color.fg = hb_parc( 3 );
+         prop.color.fg = hb_parcx( 3 );
       break;
 
       case XWT_PROP_BGCOLOR:
-         prop.color.bg = hb_parc( 3 );
+         prop.color.bg = hb_parcx( 3 );
       break;
 
       case XWT_PROP_BASECOLOR:
-         prop.color.base = hb_parc( 3 );
+         prop.color.base = hb_parcx( 3 );
       break;
 
       case XWT_PROP_TEXTCOLOR:
-         prop.color.text = hb_parc( 3 );
+         prop.color.text = hb_parcx( 3 );
       break;
 
       //Array
@@ -352,8 +352,8 @@ HB_FUNC( XWT_SETPROPERTY )
 	prop.day=01;
      }
      break;
-	
-	 
+
+
    }
 
    hb_retl( xwt_drv_set_property( wSelf, &prop ) );
@@ -367,14 +367,14 @@ HB_FUNC( XWT_GETPROPERTY )
    XWT_PROPERTY prop;
    PHB_ITEM pParam1, pParam2;
    BOOL bRet = FALSE;
-   
+
    /* Unready driver widget? */
-   if ( pSelf == NULL ) 
-   { 
+   if ( pSelf == NULL )
+   {
       hb_retl( FALSE );
       return;
    }
-   
+
    wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
 
    prop.type = hb_parni( 2 );
@@ -445,8 +445,8 @@ HB_FUNC( XWT_GETPROPERTY )
             else
             {
                hb_itemPutCRaw( pParam1, prop.value.string.text, prop.value.string.iLength );
-            } 
-            bRet = TRUE;    
+            }
+            bRet = TRUE;
          }
       break;
       // Font Parametre
@@ -525,8 +525,8 @@ HB_FUNC( XWT_GETPROPERTY )
 	   hb_itemPutD( pParam1,(long)prop.year,(long)prop.month,(long) prop.day);
 	   bRet= TRUE;
 	 }
-     break;	   
-	   
+     break;
+
    }
 
    hb_retl( bRet );
@@ -549,12 +549,12 @@ HB_FUNC( XWT_ADD )
    PXWT_WIDGET wChild;
 
    /* Unready driver widget? */
-   if ( pSelf == NULL || pChild == NULL ) 
-   { 
+   if ( pSelf == NULL || pChild == NULL )
+   {
       hb_retl( FALSE );
       return;
    }
-   
+
    wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
    wChild = (PXWT_WIDGET) pChild->item.asPointer.value;
 
@@ -569,15 +569,15 @@ HB_FUNC( XWT_REMOVE )
    PXWT_WIDGET wChild;
 
    /* Unready driver widget? */
-   if ( pSelf == NULL || pChild == NULL ) 
-   { 
+   if ( pSelf == NULL || pChild == NULL )
+   {
       hb_retl( FALSE );
       return;
    }
-   
+
    wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
    wChild = (PXWT_WIDGET) pChild->item.asPointer.value;
-   
+
    hb_retl( xwt_drv_remove( wSelf, wChild ) );
 }
 
@@ -590,13 +590,13 @@ HB_FUNC( XWTINIT )
    int argc = hb_pcount();
    char **argv;
    int i;
-   
+
    if ( argc > 0 )
    {
       argv = (char **) hb_xgrab( sizeof( char *) * (argc +1));
       for ( i = 0; i < argc; i ++ )
       {
-         argv[ i ] = hb_parc( i );
+         argv[ i ] = hb_parcx( i );
       }
       argv[ argc ] = 0;
    }
@@ -608,7 +608,7 @@ HB_FUNC( XWTINIT )
       argv[1] = 0;
    }
    hb_retl( xwt_drv_init( argc, argv ) );
-   
+
    hb_xfree( argv );
 }
 

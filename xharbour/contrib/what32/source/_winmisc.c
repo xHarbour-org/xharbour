@@ -22,7 +22,7 @@
 
 HB_FUNC( STR2PTR )
 {
-   char *cStr = hb_parc( 1 )    ;
+   char *cStr = hb_parcx( 1 )    ;
    hb_retnl( ( LONG_PTR ) cStr ) ;
 }
 
@@ -87,9 +87,9 @@ HB_FUNC( PEEK )
 HB_FUNC( POKE )
 {
    if( hb_pcount() ==3 )
-      hb_xmemcpy( (char *) hb_parnl(1), hb_parc( 2 ), hb_parnl( 3 ) );
+      hb_xmemcpy( (char *) hb_parnl(1), hb_parcx( 2 ), hb_parnl( 3 ) );
    else
-      hb_xmemcpy( (char *) hb_parnl(1), hb_parc( 2 ), hb_parclen( 2 ) );
+      hb_xmemcpy( (char *) hb_parnl(1), hb_parcx( 2 ), hb_parclen( 2 ) );
 }
 
 
@@ -124,14 +124,14 @@ HB_FUNC( F2BIN )
 
 HB_FUNC( BIN2D )
 {
-  hb_retnd( *( (double *) hb_parc( 1 ) ) );
+  hb_retnd( *( (double *) hb_parcx( 1 ) ) );
 }
 
 //-----------------------------------------------------------------------------
 
 HB_FUNC( BIN2F )
 {
-   hb_retnd( (double) *( (float *) hb_parc( 1 ) ) );
+   hb_retnd( (double) *( (float *) hb_parcx( 1 ) ) );
 }
 
 
@@ -333,11 +333,11 @@ HB_FUNC( MAKEINRESOURCE )
 
 HB_FUNC ( MESSAGEBOX )
 {
- // LPCSTR lpCaption =  hb_parc(3) ;
+ // LPCSTR lpCaption =  hb_parcx(3) ;
 
   hb_retnl( MessageBox( ISNIL(1) ? NULL : (HWND) hb_parnl(1) ,
-                        (LPCSTR) hb_parc(2),
-                        ISNIL(3) ? NULL : (LPCSTR) hb_parc(3) ,
+                        (LPCSTR) hb_parcx(2),
+                        ISNIL(3) ? NULL : (LPCSTR) hb_parcx(3) ,
                         ISNIL(4) ? 0 : (UINT) hb_parnl(4) ) ) ;
 }
 
@@ -416,7 +416,7 @@ HB_FUNC( GETENVIRONMENTVARIABLE )
    char *cText = (char*) hb_xgrab( MAX_PATH+1 );
    DWORD dwRet ;
 
-   dwRet = GetEnvironmentVariableA( (LPCSTR) hb_parc( 1 ),
+   dwRet = GetEnvironmentVariableA( (LPCSTR) hb_parcx( 1 ),
                                     (LPSTR) cText ,
                                     (DWORD) dwLen
                                   ) ;
@@ -431,8 +431,8 @@ HB_FUNC( GETENVIRONMENTVARIABLE )
 
 HB_FUNC( SETENVIRONMENTVARIABLE )
 {
-   hb_retl( SetEnvironmentVariableA( (LPCSTR) hb_parc( 1 ),
-                                     (LPCSTR) hb_parc( 2 )
+   hb_retl( SetEnvironmentVariableA( (LPCSTR) hb_parcx( 1 ),
+                                     (LPCSTR) hb_parcx( 2 )
                                      ) ) ;
 }
 
@@ -443,7 +443,7 @@ HB_FUNC( SETENVIRONMENTVARIABLE )
 
 HB_FUNC( WINEXEC )
 {
-   hb_retni( WinExec( (LPCSTR) hb_parc( 1 ), (UINT) hb_parni( 2 ) ) ) ;
+   hb_retni( WinExec( (LPCSTR) hb_parcx( 1 ), (UINT) hb_parni( 2 ) ) ) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -510,7 +510,7 @@ HB_FUNC( CREATEMUTEX )
        sa = (SECURITY_ATTRIBUTES *) hb_param( 1, HB_IT_STRING )->item.asString.value;
    }
 
-   hb_retnl( (ULONG) CreateMutex( ISNIL( 1 ) ? NULL : sa, hb_parnl( 2 ), hb_parc( 3 ) ) );
+   hb_retnl( (ULONG) CreateMutex( ISNIL( 1 ) ? NULL : sa, hb_parnl( 2 ), hb_parcx( 3 ) ) );
 }
 
 //----------------------------------------------------------------------------
@@ -518,7 +518,7 @@ HB_FUNC( CREATEMUTEX )
 
 HB_FUNC( OPENMUTEX )
 {
-  hb_retnl( (ULONG) OpenMutex( hb_parnl( 1 ), hb_parl( 2 ), hb_parc( 3 ) ) );
+  hb_retnl( (ULONG) OpenMutex( hb_parnl( 1 ), hb_parl( 2 ), hb_parcx( 3 ) ) );
 }
 
 //----------------------------------------------------------------------------
@@ -567,7 +567,7 @@ HB_FUNC( GETCLASSINFO )
    WNDCLASS WndClass  ;
 
    if ( GetClassInfo( ISNIL(1) ? NULL : (HINSTANCE) hb_parnl( 1 ),
-                      (LPCSTR) hb_parc( 2 ), &WndClass ) )
+                      (LPCSTR) hb_parcx( 2 ), &WndClass ) )
 
 
      hb_retclen( (char*) &WndClass, sizeof(WNDCLASS) ) ;
@@ -592,7 +592,7 @@ HB_FUNC( GETCLASSINFOEX )
    WNDCLASSEX WndClassEx ;
 
    if ( GetClassInfoEx( ISNIL(1) ? NULL : (HINSTANCE) hb_parnl( 1 ),
-                            (LPCSTR) hb_parc( 2 ), &WndClassEx ) )
+                            (LPCSTR) hb_parcx( 2 ), &WndClassEx ) )
 
       hb_retclen( (char*) &WndClassEx, sizeof(WNDCLASSEX) ) ;
       //hb_itemPutCRaw( hb_param( -1, HB_IT_ANY ), (char *) &WndClassEx, sizeof( WNDCLASSEX ) );

@@ -38,7 +38,7 @@ HB_FUNC( BUILDCOMMDCB )
 {
    DCB dcb ;
 
-   hb_retl( BuildCommDCB( ( LPCTSTR ) hb_parc( 1 ), &dcb ) );
+   hb_retl( BuildCommDCB( ( LPCTSTR ) hb_parcx( 1 ), &dcb ) );
 
    hb_storclen( ( char * ) &dcb, sizeof( DCB ), 2 ) ;
 }
@@ -62,8 +62,8 @@ dcb:buffer( dcbInfo )
 HB_FUNC( BUILDCOMMDCBANDTIMEOUTS )
 {
    DCB dcb ;
-   LPCOMMTIMEOUTS lptimeouts = ( LPCOMMTIMEOUTS ) hb_parc( 3 );
-   hb_retl( BuildCommDCBAndTimeouts( ( LPCTSTR ) hb_parc( 1 ), &dcb, lptimeouts ) ) ;
+   LPCOMMTIMEOUTS lptimeouts = ( LPCOMMTIMEOUTS ) hb_parcx( 3 );
+   hb_retl( BuildCommDCBAndTimeouts( ( LPCTSTR ) hb_parcx( 1 ), &dcb, lptimeouts ) ) ;
 
    hb_storclen( ( char * ) &dcb, sizeof( DCB ), 2 ) ;
 }
@@ -125,9 +125,9 @@ endif
 */
 HB_FUNC( COMMCONFIGDIALOG )
 {
-   LPCTSTR      lpszName = ( LPCTSTR ) hb_parc( 1 );
+   LPCTSTR      lpszName = ( LPCTSTR ) hb_parcx( 1 );
    HWND         hwnd     = ISNIL( 2 ) ? NULL : ( HWND ) hb_parnl( 2 );
-   LPCOMMCONFIG lpCC     = ( LPCOMMCONFIG ) hb_parc( 3 ) ;
+   LPCOMMCONFIG lpCC     = ( LPCOMMCONFIG ) hb_parcx( 3 ) ;
 
    hb_retl( CommConfigDialog( lpszName, hwnd, lpCC ) );
 
@@ -164,7 +164,7 @@ endif
 */
 HB_FUNC( GETCOMMCONFIG )
 {
-   COMMCONFIG lpCC ; // = ( LPCOMMCONFIG ) hb_parc( 2 );
+   COMMCONFIG lpCC ; // = ( LPCOMMCONFIG ) hb_parcx( 2 );
    DWORD        size = sizeof( COMMCONFIG );
 
    hb_retl( GetCommConfig( ( HANDLE ) hb_parnl( 1 ), &lpCC, &size ) ) ;
@@ -281,11 +281,11 @@ HB_FUNC( GETDEFAULTCOMMCONFIG )
    char * Buffer = (char *) hb_xgrab( sizeof( COMMCONFIG ) );
    DWORD size = sizeof( COMMCONFIG );
 
-   if ( GetDefaultCommConfig( ( LPCTSTR ) hb_parc( 1 ), ( COMMCONFIG * ) Buffer, &size ) == 0 )
+   if ( GetDefaultCommConfig( ( LPCTSTR ) hb_parcx( 1 ), ( COMMCONFIG * ) Buffer, &size ) == 0 )
    {
       hb_xfree( Buffer ) ;
       Buffer = (char *) hb_xgrab( size ) ;
-      if ( GetDefaultCommConfig( ( LPCTSTR ) hb_parc( 1 ), ( COMMCONFIG * ) Buffer, &size ) == 0 )
+      if ( GetDefaultCommConfig( ( LPCTSTR ) hb_parcx( 1 ), ( COMMCONFIG * ) Buffer, &size ) == 0 )
       {
          hb_xfree( Buffer ) ;
          hb_retl( FALSE ) ;
@@ -333,7 +333,7 @@ SetCommConfig( hFile, CommConfig:Value, nSize )
 */
 HB_FUNC( SETCOMMCONFIG )
 {
-   LPCOMMCONFIG lpCC = ( LPCOMMCONFIG ) hb_parc( 2 );
+   LPCOMMCONFIG lpCC = ( LPCOMMCONFIG ) hb_parcx( 2 );
    DWORD        size = ISNIL( 3 ) ? sizeof( COMMCONFIG ) : hb_parnl( 3 );
 
    hb_retl( SetCommConfig( ( HANDLE ) hb_parnl( 1 ), lpCC, size ) );
@@ -362,7 +362,7 @@ BOOL SetCommState(
 */
 HB_FUNC( SETCOMMSTATE )
 {
-   LPDCB lpDCB = ( LPDCB ) hb_parc( 2 );
+   LPDCB lpDCB = ( LPDCB ) hb_parcx( 2 );
 
    hb_retl( SetCommState( ( HANDLE ) hb_parnl( 1 ), lpDCB ) ) ;
 }
@@ -376,7 +376,7 @@ BOOL SetCommTimeouts(
 */
 HB_FUNC( SETCOMMTIMEOUTS )
 {
-   LPCOMMTIMEOUTS lptimeouts = ( LPCOMMTIMEOUTS ) hb_parc( 2 ) ;
+   LPCOMMTIMEOUTS lptimeouts = ( LPCOMMTIMEOUTS ) hb_parcx( 2 ) ;
 
    hb_retl( SetCommTimeouts( ( HANDLE ) hb_parnl( 1 ), lptimeouts ) );
 }
@@ -391,10 +391,10 @@ BOOL SetDefaultCommConfig(
 */
 HB_FUNC( SETDEFAULTCOMMCONFIG )
 {
-   LPCOMMCONFIG lpCC = ( LPCOMMCONFIG ) hb_parc( 2 );
+   LPCOMMCONFIG lpCC = ( LPCOMMCONFIG ) hb_parcx( 2 );
    DWORD        size = sizeof( COMMCONFIG ) ;
 
-   hb_retl( SetDefaultCommConfig( ( LPCTSTR ) hb_parc( 1 ), lpCC, size ) );
+   hb_retl( SetDefaultCommConfig( ( LPCTSTR ) hb_parcx( 1 ), lpCC, size ) );
 }
 
 //-------------------------------------------------------------------//

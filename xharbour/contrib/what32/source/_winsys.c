@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.18 2003/06/30 17:07:29 ronpinkas Exp $
+ * $Id: _winsys.c,v 1.19 2003/12/11 10:23:35 vouchcac Exp $
  */
 
 // WHAT32
@@ -49,7 +49,7 @@ HB_FUNC( GETFREESPACE )
 
 HB_FUNC ( OUTPUTDEBUGSTRING )
 {
-   OutputDebugString( (LPCSTR) hb_parc( 1 ) ) ;
+   OutputDebugString( (LPCSTR) hb_parcx( 1 ) ) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -112,7 +112,7 @@ HB_FUNC( DEBUGBREAK )
 /*
 HB_FUNC( ENCRYPTFILE )
 {
-   hb_retl( EncryptFileA( (LPCSTR) hb_parc( 1 ) ) ) ;
+   hb_retl( EncryptFileA( (LPCSTR) hb_parcx( 1 ) ) ) ;
 }
 */
 
@@ -123,7 +123,7 @@ HB_FUNC( ENCRYPTFILE )
 /*
 HB_FUNC( DECRYPTFILE )
 {
-   hb_retl( DecryptFileA( (LPCSTR) hb_parc( 1 ), 0 ) ) ; //(DWORD) hb_parnl( 2 ) ) ) ;
+   hb_retl( DecryptFileA( (LPCSTR) hb_parcx( 1 ), 0 ) ) ; //(DWORD) hb_parnl( 2 ) ) ) ;
 }
 */
 
@@ -140,7 +140,7 @@ HB_FUNC( FILEENCRYPTIONSTATUSA )
 
    // Your code goes here
 
-   hb_retl( FileEncryptionStatusA( (LPCSTR) hb_parc( 1 ), lpStatus ) ) ;
+   hb_retl( FileEncryptionStatusA( (LPCSTR) hb_parcx( 1 ), lpStatus ) ) ;
 }
 
 */
@@ -266,7 +266,7 @@ BOOL SetConsoleTitle(LPCSTR szTitle )
 
 HB_FUNC ( SETCONSOLETITLE )
 {
-   hb_retnl( (LONG) SetConsoleTitle( (LPCSTR) hb_parc(1) ) ) ;
+   hb_retnl( (LONG) SetConsoleTitle( (LPCSTR) hb_parcx(1) ) ) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -440,7 +440,7 @@ HB_FUNC( FORMATMESSAGE)
 {
 
    hb_retnl( FormatMessage( (DWORD) hb_parnl( 1 )           ,   // source and processing options
-                            ISNIL( 2) ? NULL : hb_parc( 2 ) ,   // pointer to  message source
+                            ISNIL( 2) ? NULL : hb_parcx( 2 ) ,   // pointer to  message source
                             (DWORD) hb_parnl( 3 )           ,  // requested message identifier
                             (DWORD) hb_parnl( 4 )           , // language identifier for requested message
   LPTSTR lpBuffer,    // pointer to message buffer
@@ -475,7 +475,7 @@ HB_FUNC( SETERRORMODE )
 
 HB_FUNC( OEMTOANSI )
 {
-   char *buffer = hb_parc(1);
+   char *buffer = hb_parcx(1);
    OemToChar( buffer, buffer );
    hb_retc( buffer );
 }
@@ -485,7 +485,7 @@ HB_FUNC( OEMTOANSI )
 
 HB_FUNC( ANSITOOEM )
 {
-   char *buffer = hb_parc(1);
+   char *buffer = hb_parcx(1);
    CharToOem( buffer, buffer );
    hb_retc( buffer );
 }
@@ -506,8 +506,8 @@ HB_FUNC( GETVERSION )
 HB_FUNC( FINDRESOURCE )
 {
    hb_retnl( (LONG) FindResourceA( (HMODULE) hb_parnl( 1 ),
-                                   (LPCSTR) hb_parc( 2 )  ,
-                                   (LPCSTR) hb_parc( 3 )
+                                   (LPCSTR) hb_parcx( 2 )  ,
+                                   (LPCSTR) hb_parcx( 3 )
                                    ) ) ;
 }
 
@@ -517,8 +517,8 @@ HB_FUNC( FINDRESOURCE )
 HB_FUNC( FINDRESOURCEEX )
 {
    hb_retnl( (LONG) FindResourceExA( (HMODULE) hb_parnl( 1 ),
-                                     (LPCSTR) hb_parc( 2 )  ,
-                                     (LPCSTR) hb_parc( 3 )  ,
+                                     (LPCSTR) hb_parcx( 2 )  ,
+                                     (LPCSTR) hb_parcx( 3 )  ,
                                      (WORD) hb_parni( 4 )
                                      ) ) ;
 }
@@ -593,7 +593,7 @@ HB_FUNC( LOADMODULE )
 
    // Your code goes here
 
-   hb_retnl( (LONG) LoadModule( (LPCSTR) hb_parc( 1 ), lpParameterBlock ) ) ;
+   hb_retnl( (LONG) LoadModule( (LPCSTR) hb_parcx( 1 ), lpParameterBlock ) ) ;
 }
 
 */
@@ -629,7 +629,7 @@ HB_FUNC( GETMODULEFILENAME )
 HB_FUNC( GETMODULEHANDLE )
 {
 
-   hb_retnl( (LONG) GetModuleHandleA( (ISNIL(1) ? NULL : (LPCSTR) hb_parc( 1 ) ) ) ) ;
+   hb_retnl( (LONG) GetModuleHandleA( (ISNIL(1) ? NULL : (LPCSTR) hb_parcx( 1 ) ) ) ) ;
 }
 
 
@@ -741,7 +741,7 @@ HB_FUNC( GETTICKCOUNT )
 HB_FUNC( GETLOGICALDRIVESTRINGS )
 {
    hb_retnl( (LONG) GetLogicalDriveStrings( (DWORD) hb_parnl( 1 ),
-                                             (LPSTR) hb_parc( 2 )
+                                             (LPSTR) hb_parcx( 2 )
                                              ) ) ;
 }
 
@@ -771,7 +771,7 @@ HB_FUNC( GETCOMPUTERNAME )
 
 HB_FUNC( SETCOMPUTERNAME )
 {
-   hb_retl( SetComputerNameA( (LPCSTR) hb_parc( 1 ) ) ) ;
+   hb_retl( SetComputerNameA( (LPCSTR) hb_parcx( 1 ) ) ) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -786,7 +786,7 @@ HB_FUNC( GETCOMPUTERNAMEEX )
 
    // Your code goes here
 
-   hb_retl( GetComputerNameExA( NameType, (LPSTR) hb_parc( 2 ), nSize ) ) ;
+   hb_retl( GetComputerNameExA( NameType, (LPSTR) hb_parcx( 2 ), nSize ) ) ;
 }
 
 */
@@ -802,7 +802,7 @@ HB_FUNC( SETCOMPUTERNAMEEX )
 
    // Your code goes here
 
-   hb_retl( SetComputerNameExA( NameType, (LPCSTR) hb_parc( 2 ) ) ) ;
+   hb_retl( SetComputerNameExA( NameType, (LPCSTR) hb_parcx( 2 ) ) ) ;
 }
 
 */
@@ -815,7 +815,7 @@ HB_FUNC( SETCOMPUTERNAMEEX )
 HB_FUNC( GETUSERNAME )
 {
    DWORD nSize    ;
-   char *szUser = hb_parc( 1 );
+   char *szUser = hb_parcx( 1 );
 
    hb_retl( GetUserNameA( szUser, &nSize ) ) ;
    hb_storc( szUser , 1 ) ;
@@ -936,7 +936,7 @@ HB_FUNC( CASCADEWINDOWS )
 HB_FUNC( WINHELP )
 {
       hb_retl( WinHelp( (HWND) hb_parnl( 1 ) ,
-                     (LPCSTR) hb_parc( 2 ),
+                     (LPCSTR) hb_parcx( 2 ),
                      (UINT) hb_parni( 3 ) ,
                      (ULONG) hb_parnl( 4 )
                    ) ) ;
@@ -963,7 +963,7 @@ HB_FUNC(HTMLHELP)
 {
 
  hb_retnl( (LONG) HtmlHelp( (HWND)   hb_parnl( 1 )  ,
-                            (LPCSTR) hb_parc( 2 ) ,
+                            (LPCSTR) hb_parcx( 2 ) ,
                             (UINT)   ISNIL(3) ? HH_DISPLAY_TOPIC : hb_parni( 3 )  ,
                             (DWORD)  ISNIL(4) ? NULL : hb_parnl( 4 )
                           )
@@ -995,7 +995,7 @@ HB_FUNC( CREATEFILE )
    if( ISCHAR( 4 ) )
       sa = ( SECURITY_ATTRIBUTES *) hb_param( 4, HB_IT_STRING )->item.asString.value ;
 
-   hb_retnl( (LONG) CreateFile( (LPCTSTR) hb_parc(1),
+   hb_retnl( (LONG) CreateFile( (LPCTSTR) hb_parcx(1),
                                 (DWORD)   hb_parnl(2),
                                 (DWORD)   hb_parnl(3),
                                 ISCHAR( 4 ) ? (SECURITY_ATTRIBUTES *) sa : NULL ,
@@ -1075,7 +1075,7 @@ HB_FUNC( WRITEFILE )
      Overlapped = ( OVERLAPPED *) hb_param( 4, HB_IT_STRING )->item.asString.value ;
 
    hb_retl ( WriteFile( (HANDLE)  hb_parnl( 1 )   ,
-                     hb_parc( 2 )       ,
+                     hb_parcx( 2 )       ,
                      hb_parclen( 2 )    ,
                      &nWritten          ,
                      ISCHAR( 4 ) ? Overlapped : NULL ) ) ;

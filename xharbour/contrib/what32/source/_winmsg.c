@@ -23,7 +23,7 @@
 
 HB_FUNC ( _ISDIALOGMESSAGE )
 {
-  hb_retl(IsDialogMessage( (HWND) hb_parnl(1), (MSG*) hb_parc(2) )) ;
+  hb_retl(IsDialogMessage( (HWND) hb_parnl(1), (MSG*) hb_parcx(2) )) ;
 }
 
 
@@ -32,7 +32,7 @@ HB_FUNC ( _ISDIALOGMESSAGE )
 
 HB_FUNC( TRANSLATEMDISYSACCEL )
 {
-   hb_retl( TranslateMDISysAccel( (HWND) hb_parnl( 1 ), (MSG*) hb_parc( 2 ) ) ) ;
+   hb_retl( TranslateMDISysAccel( (HWND) hb_parnl( 1 ), (MSG*) hb_parcx( 2 ) ) ) ;
 }
 
 
@@ -40,14 +40,14 @@ HB_FUNC( TRANSLATEMDISYSACCEL )
 
 HB_FUNC ( TRANSLATEMESSAGE )
 {
-  hb_retl(TranslateMessage( (MSG*) hb_parc(1))) ;
+  hb_retl(TranslateMessage( (MSG*) hb_parcx(1))) ;
 }
 
 //-----------------------------------------------------------------------------
 
 HB_FUNC ( DISPATCHMESSAGE )
 {
-  hb_retnl(DispatchMessage( (MSG*) hb_parc(1))) ;
+  hb_retnl(DispatchMessage( (MSG*) hb_parcx(1))) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -68,13 +68,13 @@ HB_FUNC ( POSTMESSAGE )
    if (ISBYREF(4))
    {
       cText = (char*) hb_xgrab( hb_parcsiz(4) );
-      hb_xmemcpy( cText, hb_parc(4), hb_parcsiz(4) );
+      hb_xmemcpy( cText, hb_parcx(4), hb_parcsiz(4) );
    }
 
 
    hb_retnl( (LONG) PostMessage( (HWND) hb_parnl( 1 ), (UINT) hb_parni( 2 ),
                                 (ISNIL(3) ? 0 : (WPARAM) hb_parnl( 3 ))   ,
-                                (ISNIL(4) ? 0 : ( ISBYREF(4)? (LPARAM) (LPSTR) cText : ( ISCHAR(4) ? (LPARAM)(LPSTR) hb_parc(4) : (LPARAM) hb_parnl( 4 ))))
+                                (ISNIL(4) ? 0 : ( ISBYREF(4)? (LPARAM) (LPSTR) cText : ( ISCHAR(4) ? (LPARAM)(LPSTR) hb_parcx(4) : (LPARAM) hb_parnl( 4 ))))
                                )
             );
 
@@ -97,12 +97,12 @@ HB_FUNC ( SENDMESSAGE )
    if( ISBYREF(4) )
    {
       cText = (char*) hb_xgrab( hb_parcsiz(4) );
-      hb_xmemcpy( cText, hb_parc(4), hb_parcsiz(4) );
+      hb_xmemcpy( cText, hb_parcx(4), hb_parcsiz(4) );
    }
 
    hb_retnl( (ULONG) SendMessage( (HWND) hb_parnl( 1 ), (UINT) hb_parni( 2 ),
                                   (ISNIL(3) ? 0 : (WPARAM) hb_parnl( 3 ))   ,
-                                  (ISNIL(4) ? 0 : ( ISBYREF(4)? (LPARAM) (LPSTR) cText : ( ISCHAR(4) ? (LPARAM)(LPSTR) hb_parc(4) : (LPARAM) hb_parnl( 4 ))))
+                                  (ISNIL(4) ? 0 : ( ISBYREF(4)? (LPARAM) (LPSTR) cText : ( ISCHAR(4) ? (LPARAM)(LPSTR) hb_parcx(4) : (LPARAM) hb_parnl( 4 ))))
                                 )
            );
 
@@ -156,7 +156,7 @@ HB_FUNC ( SENDDLGITEMMESSAGE )
                                 (int)   hb_parni(2) ,     // identifier of control
                                 (UINT)  hb_parni(3) ,     // message to send
                                 (ISNIL(4) ? 0 : (WPARAM) hb_parni(4) ) ,  // first message parameter
-                                (ISNIL(5) ? 0 : (hb_parinfo(5)==HB_IT_STRING ? (LPARAM) (LPSTR) hb_parc(5) : (LPARAM) hb_parnl( 5 )) )   // second message parameter
+                                (ISNIL(5) ? 0 : (hb_parinfo(5)==HB_IT_STRING ? (LPARAM) (LPSTR) hb_parcx(5) : (LPARAM) hb_parnl( 5 )) )   // second message parameter
                               ));
 
 */
@@ -212,7 +212,7 @@ HB_FUNC ( PEEKMESSAGE )
 
 HB_FUNC( REGISTERWINDOWMESSAGE )
 {
-   hb_retni( RegisterWindowMessageA( (LPCSTR) hb_parc( 1 ) ) ) ;
+   hb_retni( RegisterWindowMessageA( (LPCSTR) hb_parcx( 1 ) ) ) ;
 }
 
 

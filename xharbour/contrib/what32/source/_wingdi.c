@@ -294,7 +294,7 @@ HB_FUNC ( BEGINPAINT )
 
 HB_FUNC ( ENDPAINT )
 {
-   hb_retl( EndPaint( (HWND) hb_parnl( 1 ), (PAINTSTRUCT*) hb_parc( 2 ) ) );
+   hb_retl( EndPaint( (HWND) hb_parnl( 1 ), (PAINTSTRUCT*) hb_parcx( 2 ) ) );
 }
 
 
@@ -316,7 +316,7 @@ HB_FUNC( GETGRAPHICSMODE )
 HB_FUNC( GDICOMMENT )
 {
 
-   hb_retl( GdiComment( (HDC) hb_parnl( 1 ), (UINT) hb_parni( 2 ), ( const BYTE * ) hb_parc( 3 ) ) ) ;
+   hb_retl( GdiComment( (HDC) hb_parnl( 1 ), (UINT) hb_parni( 2 ), ( const BYTE * ) hb_parcx( 3 ) ) ) ;
 
 }
 
@@ -707,10 +707,10 @@ HB_FUNC( DEVICECAPABILITIESA )
 
    // Your code goes here
 
-   hb_retni( DeviceCapabilitiesA( (LPCSTR) hb_parc( 1 ),
-                                  (LPCSTR) hb_parc( 2 ),
+   hb_retni( DeviceCapabilitiesA( (LPCSTR) hb_parcx( 1 ),
+                                  (LPCSTR) hb_parcx( 2 ),
                                   Word                 ,
-                                  (LPSTR) hb_parc( 4 ) ,
+                                  (LPSTR) hb_parcx( 4 ) ,
                                   &DEVMODEA
                                   ) ) ;
 }

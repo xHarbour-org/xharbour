@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.109 2004/03/10 19:16:59 ronpinkas Exp $
+ * $Id: classes.c,v 1.110 2004/03/11 00:43:48 ronpinkas Exp $
  */
 
 /*
@@ -1636,7 +1636,7 @@ HB_FUNC( __CLSADDMSG )
    }
 
    // 2
-   szMessage = hb_parc( 2 );
+   szMessage = hb_parcx( 2 );
 
    // 3
    lID_or_FuncPointer_or_BlockPointer = (LONG) hb_param( 3, HB_IT_BLOCK );
@@ -1718,7 +1718,7 @@ HB_FUNC( __CLSNEW )
 
    HB_THREAD_STUB
 
-   HB_TRACE( HB_TR_DEBUG, ( "__ClsNew( %s, %i, %i, %i )\n", hb_parc(1), hb_parni(2), hb_parni(3), hb_itemSize( hb_param(4, HB_IT_ARRAY) ) ) );
+   HB_TRACE( HB_TR_DEBUG, ( "__ClsNew( %s, %i, %i, %i )\n", hb_parcx(1), hb_parni(2), hb_parni(3), hb_itemSize( hb_param(4, HB_IT_ARRAY) ) ) );
 
    if ( pahSuper )
    {
@@ -1739,7 +1739,7 @@ HB_FUNC( __CLSNEW )
 
    memset( pNewCls->szName, 0, hb_parclen( 1 ) + 1);
 
-   strcpy( pNewCls->szName, hb_parc( 1 ) );
+   strcpy( pNewCls->szName, hb_parcx( 1 ) );
    pNewCls->uiDataFirst = 0;
    pNewCls->uiDatas = 0;
    pNewCls->uiMethods = 0;
@@ -2538,11 +2538,11 @@ HB_FUNC( __OBJSENDMSG )
 
    if( uiPCount >= 2 && pObject )    /* Object & message passed */
    {
-                    /*hb_dynsymFindName( hb_parc(2) );*/
+                    /*hb_dynsymFindName( hb_parcx(2) );*/
       PHB_DYNS pMsg ;
 
       hb_dynsymLock();
-      pMsg = hb_dynsymGet( hb_parc(2) );
+      pMsg = hb_dynsymGet( hb_parcx(2) );
 
       if( pMsg )
       {
@@ -2586,11 +2586,11 @@ HB_FUNC( __OBJSENDMSGCASE )
 
    if( uiPCount >= 2 && pObject )    /* Object & message passed */
    {
-                    /*hb_dynsymFindName( hb_parc(2) );*/
+                    /*hb_dynsymFindName( hb_parcx(2) );*/
       PHB_DYNS pMsg;
 
       hb_dynsymLock();
-      pMsg  = hb_dynsymGetCase( hb_parc(2) );
+      pMsg  = hb_dynsymGetCase( hb_parcx(2) );
 
       if( pMsg )
       {
@@ -2633,7 +2633,7 @@ HB_FUNC( __CLSINSTSUPER )
    if( hb_pcount() >= 1 )
    {
 
-      char *cString = hb_parc( 1 );
+      char *cString = hb_parcx( 1 );
       PHB_DYNS pDynSym;
 
       hb_dynsymLock();
@@ -2820,7 +2820,7 @@ HB_FUNC( __GETMESSAGE )
 HB_FUNC( __CLSPARENT )
 {
    HB_THREAD_STUB
-   hb_retl( hb_clsIsParent( hb_parni( 1 ) , hb_parc( 2 ) ) );
+   hb_retl( hb_clsIsParent( hb_parni( 1 ) , hb_parcx( 2 ) ) );
 }
 
 HB_FUNC( __SENDER )
@@ -3427,7 +3427,7 @@ HB_FUNC( __GETMSGPRF ) /* profiler: returns a method called and consumed times *
       HB_THREAD_STUB
 
       PCLASS pClass  = s_pClasses + ( hb_parnl( 1 ) - 1 );
-      char * cMsg    = hb_parc( 2 );
+      char * cMsg    = hb_parcx( 2 );
       USHORT uiAt    = ( USHORT ) ( MsgToNum( cMsg, pClass->uiHashKey ) * BUCKET );
       USHORT uiMask  = ( USHORT ) ( pClass->uiHashKey * BUCKET );
       USHORT uiLimit = ( USHORT ) ( uiAt ? ( uiAt - 1 ) : ( uiMask - 1 ) );
@@ -3729,7 +3729,7 @@ UINT hb_clsGetHandleFromName( char *szClassName )
 HB_FUNC( __CLSGETHANDLEFROMNAME )
 {
    HB_THREAD_STUB
-   hb_retni( hb_clsGetHandleFromName( hb_parc(1) ) );
+   hb_retni( hb_clsGetHandleFromName( hb_parcx(1) ) );
 }
 
 void hb_clsSetModule( USHORT uiClass )

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.65 2004/03/07 00:01:19 andijahja Exp $
+ * $Id: memvars.c,v 1.66 2004/03/08 22:15:37 andijahja Exp $
  */
 
 /*
@@ -2005,7 +2005,7 @@ HB_FUNC( __MVSAVE )
 
       /* Generate filename */
 
-      pFileName = hb_fsFNameSplit( hb_parc( 1 ) );
+      pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
 
       if( pFileName->szExtension == NULL )
          pFileName->szExtension = ".mem";
@@ -2028,7 +2028,7 @@ HB_FUNC( __MVSAVE )
          BYTE buffer[ HB_MEM_REC_LEN ];
          MEMVARSAVE_CARGO msc;
 
-         msc.pszMask      = hb_parc( 2 );
+         msc.pszMask      = hb_parcx( 2 );
          msc.bIncludeMask = hb_parl( 3 );
          msc.buffer       = buffer;
          msc.fhnd         = fhnd;
@@ -2078,7 +2078,7 @@ HB_FUNC( __MVRESTORE )
 
       /* Generate filename */
 
-      pFileName = hb_fsFNameSplit( hb_parc( 1 ) );
+      pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
 
       if( pFileName->szExtension == NULL )
       {
@@ -2107,7 +2107,7 @@ HB_FUNC( __MVRESTORE )
 
       if( fhnd != FS_ERROR )
       {
-         char * pszMask = ISCHAR( 3 ) ? hb_parc( 3 ) : "*";
+         char * pszMask = ISCHAR( 3 ) ? hb_parcx( 3 ) : "*";
          BOOL bIncludeMask = ISCHAR( 4 ) ? hb_parl( 4 ) : TRUE;
          BYTE buffer[ HB_MEM_REC_LEN ];
 

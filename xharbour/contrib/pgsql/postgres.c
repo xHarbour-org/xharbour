@@ -66,30 +66,30 @@ HB_FUNC(PQCONNECT)
     const char conninfo[128];
     PGconn         *conn;
     PHB_ITEM   db_handle;
-    
+
     if (hb_pcount() != 5)
     {
         hb_retc("");
         return;
-    }    
-    
-    sprintf(conninfo, "dbname = %s host = %s user = %s password = %s port = %i", 
-                                           hb_parc(1), hb_parc(2), hb_parc(3), hb_parc(4), hb_parni(5) );
+    }
+
+    sprintf(conninfo, "dbname = %s host = %s user = %s password = %s port = %i",
+                                           hb_parcx(1), hb_parcx(2), hb_parcx(3), hb_parcx(4), hb_parni(5) );
 
     conn = PQconnectdb(conninfo);
-    
+
     if (PQstatus(conn) != CONNECTION_OK)
     {
         hb_retc(PQerrorMessage(conn));
         PQfinish(conn);
         return;
     }
-        
-    db_handle = hb_itemPutPtr( NULL, ( void * ) conn );        
+
+    db_handle = hb_itemPutPtr( NULL, ( void * ) conn );
     hb_itemReturn(db_handle);
-    hb_itemRelease(db_handle); 
-    
-}    
+    hb_itemRelease(db_handle);
+
+}
 
 HB_FUNC(PQCLOSE)
 {
@@ -105,34 +105,34 @@ HB_FUNC(PQCLEAR)
 
 HB_FUNC(PQEXEC)
 {
-    PGconn     *conn;    
+    PGconn     *conn;
     PGresult   *res;
     PHB_ITEM   qry_handle;
-    
+
     if (hb_pcount() == 2)
     {
         conn = ( PGconn * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-        
-        res = PQexec(conn, hb_parc(2));
-     
+
+        res = PQexec(conn, hb_parcx(2));
+
         if (PQresultStatus(res) != PGRES_COMMAND_OK && PQresultStatus(res) != PGRES_TUPLES_OK )
         {
             hb_retc(PQresultErrorMessage(res));
             PQclear(res);
             return;
         }
-            
-        qry_handle = hb_itemPutPtr( NULL, ( void * ) res );        
+
+        qry_handle = hb_itemPutPtr( NULL, ( void * ) res );
         hb_itemReturn(qry_handle);
-        hb_itemRelease(qry_handle); 
+        hb_itemRelease(qry_handle);
     }
     else
-        hb_retc("");        
+        hb_retc("");
 }
 
 HB_FUNC(PQEXECPARAMS)
 {
-    PGconn     *conn;    
+    PGconn     *conn;
     PGresult   *res;
     char       **paramvalues;
     int        i;
@@ -140,23 +140,23 @@ HB_FUNC(PQEXECPARAMS)
 
     PHB_ITEM   qry_handle;
     PHB_ITEM   aParam;
-    
+
     if (hb_pcount() == 3)
     {
         aParam = hb_param(3,HB_IT_ARRAY);
-                
+
         n = hb_arrayLen(aParam);
-        
+
         paramvalues = (char **) hb_xgrab( sizeof( char ) * n );
-        
-        for (i=0;i < n;i++) 
+
+        for (i=0;i < n;i++)
             paramvalues[i] = hb_itemGetCPtr(hb_itemArrayGet( aParam, i + 1 ));
-                        
+
         conn = ( PGconn * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-        
-        res = PQexecParams(conn, hb_parc(2), n, NULL, paramvalues, NULL, NULL, 1);
-        
-        hb_xfree(paramvalues);  
+
+        res = PQexecParams(conn, hb_parcx(2), n, NULL, paramvalues, NULL, NULL, 1);
+
+        hb_xfree(paramvalues);
 
         if (PQresultStatus(res) != PGRES_COMMAND_OK && PQresultStatus(res) != PGRES_TUPLES_OK )
         {
@@ -164,13 +164,13 @@ HB_FUNC(PQEXECPARAMS)
             PQclear(res);
             return;
         }
-            
-        qry_handle = hb_itemPutPtr( NULL, ( void * ) res );        
+
+        qry_handle = hb_itemPutPtr( NULL, ( void * ) res );
         hb_itemReturn(qry_handle);
-        hb_itemRelease(qry_handle); 
+        hb_itemRelease(qry_handle);
     }
     else
-        hb_retc("");        
+        hb_retc("");
 }
 
 HB_FUNC(PQFCOUNT)
@@ -178,16 +178,16 @@ HB_FUNC(PQFCOUNT)
     PGresult   *res;
     int nFields = 0;
 
-    if (hb_parinfo(1)) 
+    if (hb_parinfo(1))
     {
         res = ( PGresult * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-        
-        if (PQresultStatus(res) == PGRES_TUPLES_OK)        
-                nFields = PQnfields(res);            
-    }       
-            
-    hb_retni(nFields);        
-}    
+
+        if (PQresultStatus(res) == PGRES_TUPLES_OK)
+                nFields = PQnfields(res);
+    }
+
+    hb_retni(nFields);
+}
 
 HB_FUNC(PQLASTREC)
 {
@@ -197,12 +197,12 @@ HB_FUNC(PQLASTREC)
     if (hb_parinfo(1))
     {
         res = ( PGresult * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-        
+
         if (PQresultStatus(res) == PGRES_TUPLES_OK)
-            nRows = PQntuples(res);            
-    }       
-    hb_retni(nRows);          
-}    
+            nRows = PQntuples(res);
+    }
+    hb_retni(nRows);
+}
 
 HB_FUNC(PQGETVALUE)
 {
@@ -212,17 +212,17 @@ HB_FUNC(PQGETVALUE)
     if (hb_pcount() == 3)
     {
         res = ( PGresult * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-        
+
         if (PQresultStatus(res) == PGRES_TUPLES_OK)
         {
             nRow = hb_parni(2) - 1;
             nCol = hb_parni(3) - 1;
-        
+
             if (! PQgetisnull(res, nRow, nCol))
                 hb_retc(PQgetvalue(res, nRow, nCol));
         }
-    }        
-}    
+    }
+}
 
 
 HB_FUNC(PQMETADATA)
@@ -233,54 +233,54 @@ HB_FUNC(PQMETADATA)
     PHB_ITEM aNew;
     PHB_ITEM temp;
 
-    if (hb_parinfo(1)) 
+    if (hb_parinfo(1))
     {
         res = ( PGresult * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-        
-        if (PQresultStatus(res) == PGRES_TUPLES_OK)        
+
+        if (PQresultStatus(res) == PGRES_TUPLES_OK)
         {
-            nFields = PQnfields(res);            
-    
+            nFields = PQnfields(res);
+
             aNew = hb_itemArrayNew( nFields );
 
             for (i=0; i < nFields; i++ )
             {
                 aTemp = hb_itemArrayNew( 7 );
-            
-                temp = hb_itemPutC( NULL, PQfname( res, i ) );            
+
+                temp = hb_itemPutC( NULL, PQfname( res, i ) );
                 hb_itemArrayPut( aTemp, 1, temp);
                 hb_itemRelease( temp );
 
-                temp = hb_itemPutNL( NULL, PQftable( res, i ) );            
+                temp = hb_itemPutNL( NULL, PQftable( res, i ) );
                 hb_itemArrayPut( aTemp, 2, temp);
                 hb_itemRelease( temp );
 
-                temp = hb_itemPutNI( NULL, PQftablecol( res, i ) );            
+                temp = hb_itemPutNI( NULL, PQftablecol( res, i ) );
                 hb_itemArrayPut( aTemp, 3, temp);
                 hb_itemRelease( temp );
 
-                temp = hb_itemPutNI( NULL, PQfformat( res, i ) );            
+                temp = hb_itemPutNI( NULL, PQfformat( res, i ) );
                 hb_itemArrayPut( aTemp, 4, temp);
                 hb_itemRelease( temp );
 
-                temp = hb_itemPutNL( NULL, PQftype( res, i ) );            
+                temp = hb_itemPutNL( NULL, PQftype( res, i ) );
                 hb_itemArrayPut( aTemp, 5, temp);
                 hb_itemRelease( temp );
 
-                temp = hb_itemPutNI( NULL, PQfmod( res, i ) );            
+                temp = hb_itemPutNI( NULL, PQfmod( res, i ) );
                 hb_itemArrayPut( aTemp, 6, temp);
                 hb_itemRelease( temp );
-        
-                temp = hb_itemPutNI( NULL, PQfsize( res, i ) );            
+
+                temp = hb_itemPutNI( NULL, PQfsize( res, i ) );
                 hb_itemArrayPut( aTemp, 7, temp);
                 hb_itemRelease( temp );
-        
+
                 hb_itemArrayPut( aNew, i+1, aTemp );
                 hb_itemRelease( aTemp );
             }
-            
+
             hb_itemReturn(aNew);
-            hb_itemRelease(aNew);                   
+            hb_itemRelease(aNew);
         }
-    }                    
-}    
+    }
+}

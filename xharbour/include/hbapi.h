@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.125 2004/03/16 14:39:22 druzus Exp $
+ * $Id: hbapi.h,v 1.126 2004/03/17 02:29:00 druzus Exp $
  */
 
 /*
@@ -214,6 +214,7 @@ extern HB_GARBAGE_FUNC( hb_arrayReleaseGarbage ); /* clear an array before relea
 
 /* Extend API */
 extern char HB_EXPORT * hb_parc( int iParam, ... );  /* retrieve a string parameter */
+extern char HB_EXPORT * hb_parcx( int iParam, ... );  /* retrieve a string parameter */
 extern ULONG    HB_EXPORT hb_parclen( int iParam, ... ); /* retrieve a string parameter length */
 extern ULONG    HB_EXPORT hb_parcsiz( int iParam, ... ); /* retrieve a by-reference string parameter length, including terminator */
 extern char     HB_EXPORT * hb_pards( int iParam, ... ); /* retrieve a date as a string yyyymmdd */

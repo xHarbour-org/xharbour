@@ -2508,7 +2508,7 @@
 
          HB_FUNC_STATIC( PP_GENDYNPROCEDURE )
          {
-            char *sFunctionName = hb_parc( 1 );
+            char *sFunctionName = hb_parcx( 1 );
             short int iID = hb_parni( 2 );
             static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1;
 

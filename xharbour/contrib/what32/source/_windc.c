@@ -93,7 +93,7 @@ HB_FUNC( CREATECOMPATIBLEDC )
 
 //-----------------------------------------------------------------------------
 
-HB_FUNC ( WINDOWFROMDC )  
+HB_FUNC ( WINDOWFROMDC )
 {
    hb_retnl( (LONG) WindowFromDC( (HDC) hb_parnl( 1 ) ) );
 }
@@ -117,16 +117,16 @@ HB_FUNC( GETWINDOWDC )
 HB_FUNC( CREATEDC )
 {
    DEVMODE *lpInitData ;
-   
-   if ( ! ISNIL( 4 ) )
-        lpInitData = (DEVMODE *) hb_param( 4, HB_IT_STRING)->item.asString.value ; 
 
-   hb_retnl( (ULONG) CreateDC((LPCTSTR) hb_parc( 1 )  ,       // pointer to string specifying driver name
-                              (LPCTSTR) hb_parc( 2 )  ,       // pointer to string specifying device name
+   if ( ! ISNIL( 4 ) )
+        lpInitData = (DEVMODE *) hb_param( 4, HB_IT_STRING)->item.asString.value ;
+
+   hb_retnl( (ULONG) CreateDC((LPCTSTR) hb_parcx( 1 )  ,       // pointer to string specifying driver name
+                              (LPCTSTR) hb_parcx( 2 )  ,       // pointer to string specifying device name
                               NULL                    ,       // do not use; set to NULL
                               ISNIL( 4 ) ? NULL : lpInitData // pointer to optional printer data
                              )
-           ) ;   
+           ) ;
 }
 
 
@@ -138,7 +138,7 @@ HB_FUNC( RESETDC )
 {
 
    DEVMODE *lpInitData ;
-   
+
    if ( ! ISNIL( 2 ) )
         lpInitData = (DEVMODE *) hb_param( 2, HB_IT_STRING)->item.asString.value ;
 
@@ -160,7 +160,7 @@ HB_FUNC( GETDCORGEX )
    POINT Point ;
    PHB_ITEM aPt;
 
-   if ( GetDCOrgEx( (HDC) hb_parnl( 1 ), &Point ) ) 
+   if ( GetDCOrgEx( (HDC) hb_parnl( 1 ), &Point ) )
    {
      aPt = Point2Array(&Point);
      _itemReturn( aPt );
@@ -196,7 +196,7 @@ HB_FUNC( SCROLLDC )
                       &lprcScroll         ,
                       &lprcClip           ,
                       (HRGN) hb_parnl( 6 ),
-                      &lprcUpdate          
+                      &lprcUpdate
                     ) )
         {
          Rect2ArrayEx( &lprcUpdate,pArray);

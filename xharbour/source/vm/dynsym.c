@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.13 2004/01/27 03:07:00 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.14 2004/02/14 21:01:18 andijahja Exp $
  */
 
 /*
@@ -744,7 +744,7 @@ HB_FUNC( __DYNSGETINDEX ) /* Gimme index number of symbol: dsIndex = __dynsymGet
    /* JC1: Does not needs lock... */
    hb_dynsymLock();
 
-   pDynSym = hb_dynsymFindName( hb_parc( 1 ) );
+   pDynSym = hb_dynsymFindName( hb_parcx( 1 ) );
 
    if( pDynSym )
    {

@@ -55,7 +55,7 @@ HB_FUNC( CREATETOOLBAREX )
                                      (int) hb_parni(4),       // number of btn images in bmp
                                      ISNIL(5) ? NULL : (HINSTANCE) hb_parnl(5), // hInst of bmp
                                      (UINT) hb_parnl(6),      // resource id, or hBmp handle
-                                     (LPCTBBUTTON) hb_parc(7),// array of button structures
+                                     (LPCTBBUTTON) hb_parcx(7),// array of button structures
                                      (int) hb_parni(8),         // number of buttons to add
                                      (int) hb_parni(9),         // width of button
                                      (int) hb_parni(10),        // height of button

@@ -68,24 +68,24 @@ HB_FUNC (GETPROFILESTRING )
    DWORD nSize = 1024 ;
    LPTSTR bBuffer = (LPTSTR) hb_xgrab( nSize ) ;
    DWORD dwLen ;
-   char * lpSection = ISNIL( 1 ) ? NULL : hb_parc( 1 ) ;
-   char * lpEntry   = ISNIL( 2 ) ? NULL : hb_parc( 2 ) ;
+   char * lpSection = ISNIL( 1 ) ? NULL : hb_parcx( 1 ) ;
+   char * lpEntry   = ISNIL( 2 ) ? NULL : hb_parcx( 2 ) ;
    char * lpDefault = hb_parc ( 3 );
 
    while ( TRUE )
    {
       dwLen = GetProfileString( lpSection , lpEntry ,lpDefault , bBuffer, nSize );
       if ( ( ( ( lpSection == NULL ) || ( lpEntry == NULL ) ) && ( nSize - dwLen == 2 ) ) || ( ( lpSection && lpEntry ) && ( nSize - dwLen == 1 ) ) )
-      { 
+      {
         hb_xfree( bBuffer ) ;
-        nSize *= 2 ; 
+        nSize *= 2 ;
         bBuffer = (LPTSTR) hb_xgrab( nSize ) ;
       }
       else
-        break ;               
+        break ;
 
-   }   
-  
+   }
+
    if( dwLen )
      hb_retclen( ( char * ) bBuffer, dwLen );
    else
@@ -101,24 +101,24 @@ HB_FUNC (GETPRIVATEPROFILESTRING )
    DWORD nSize = 1024 ;
    LPTSTR bBuffer = (LPTSTR) hb_xgrab( nSize ) ;
    DWORD dwLen ;
-   char * lpSection  = ISNIL( 1 ) ? NULL : hb_parc( 1 );
-   char * lpEntry    = ISNIL( 2 ) ? NULL : hb_parc( 2 ) ;
-   char * lpDefault  = hb_parc( 3 );
-   char * lpFileName = hb_parc( 4 );
+   char * lpSection  = ISNIL( 1 ) ? NULL : hb_parcx( 1 );
+   char * lpEntry    = ISNIL( 2 ) ? NULL : hb_parcx( 2 ) ;
+   char * lpDefault  = hb_parcx( 3 );
+   char * lpFileName = hb_parcx( 4 );
 
    while ( TRUE )
    {
       dwLen = GetPrivateProfileString( lpSection , lpEntry ,lpDefault , bBuffer, nSize , lpFileName) ;
       if ( ( ( ( lpSection == NULL ) || ( lpEntry == NULL ) ) && ( nSize - dwLen == 2 ) ) || ( ( lpSection && lpEntry ) && ( nSize - dwLen == 1 ) ) )
-      { 
+      {
         hb_xfree( bBuffer ) ;
-        nSize *= 2 ; 
+        nSize *= 2 ;
         bBuffer = (LPTSTR) hb_xgrab( nSize ) ;
       }
       else
-        break ;               
+        break ;
 
-   }   
+   }
    if( dwLen )
      hb_retclen( ( char * ) bBuffer, dwLen );
    else
@@ -131,9 +131,9 @@ HB_FUNC (GETPRIVATEPROFILESTRING )
 //-----------------------------------------------------------------------------
 HB_FUNC( WRITEPROFILESTRING )
 {
-   char * lpSection = hb_parc( 1 );
-   char * lpEntry = ISCHAR(2) ? hb_parc( 2 ) : NULL ;
-   char * lpData = ISCHAR(3) ? hb_parc( 3 ) : NULL ;
+   char * lpSection = hb_parcx( 1 );
+   char * lpEntry = ISCHAR(2) ? hb_parcx( 2 ) : NULL ;
+   char * lpData = ISCHAR(3) ? hb_parcx( 3 ) : NULL ;
 
    if ( WriteProfileString( lpSection , lpEntry , lpData) )
       hb_retl( TRUE ) ;
@@ -144,10 +144,10 @@ HB_FUNC( WRITEPROFILESTRING )
 //-----------------------------------------------------------------------------
 HB_FUNC( WRITEPRIVATEPROFILESTRING )
 {
-   char * lpSection = hb_parc( 1 );
-   char * lpEntry = ISCHAR(2) ? hb_parc( 2 ) : NULL ;
-   char * lpData = ISCHAR(3) ? hb_parc( 3 ) : NULL ;
-   char * lpFileName= hb_parc( 4 );
+   char * lpSection = hb_parcx( 1 );
+   char * lpEntry = ISCHAR(2) ? hb_parcx( 2 ) : NULL ;
+   char * lpData = ISCHAR(3) ? hb_parcx( 3 ) : NULL ;
+   char * lpFileName= hb_parcx( 4 );
 
    if ( WritePrivateProfileString( lpSection , lpEntry , lpData , lpFileName ) )
       hb_retl( TRUE ) ;
@@ -162,10 +162,10 @@ HB_FUNC( WRITEPRIVATEPROFILESTRING )
 
 HB_FUNC( GETPRIVATEPROFILEINT )
 {
-   hb_retni( GetPrivateProfileIntA( (LPCSTR) hb_parc( 1 ),
-                                    (LPCSTR) hb_parc( 2 ),
+   hb_retni( GetPrivateProfileIntA( (LPCSTR) hb_parcx( 1 ),
+                                    (LPCSTR) hb_parcx( 2 ),
                                     hb_parni( 3 )        ,
-                                    (LPCSTR) hb_parc( 4 )
+                                    (LPCSTR) hb_parcx( 4 )
                                     ) ) ;
 }
 
@@ -176,9 +176,9 @@ HB_FUNC( GETPRIVATEPROFILEINT )
 
 HB_FUNC( GETPROFILEINT )
 {
-   hb_retni( GetProfileIntA( (LPCSTR) hb_parc( 1 ),
-                             (LPCSTR) hb_parc( 2 ),
-                             hb_parni( 3 )        
+   hb_retni( GetProfileIntA( (LPCSTR) hb_parcx( 1 ),
+                             (LPCSTR) hb_parcx( 2 ),
+                             hb_parni( 3 )
                              ) ) ;
 }
 
@@ -188,8 +188,8 @@ HB_FUNC( GETPROFILEINT )
 /*
 HB_FUNC( GETPROFILESECTION )
 {
-   hb_retnl( (LONG) GetProfileSectionA( (LPCSTR) hb_parc( 1 ),
-                                        (LPSTR) hb_parc( 2 ) ,
+   hb_retnl( (LONG) GetProfileSectionA( (LPCSTR) hb_parcx( 1 ),
+                                        (LPSTR) hb_parcx( 2 ) ,
                                         (DWORD) hb_parnl( 3 )
                                         ) ) ;
 }
@@ -201,7 +201,7 @@ HB_FUNC( GETPROFILESECTION )
 
 HB_FUNC( WRITEPROFILESECTION )
 {
-   hb_retl( WriteProfileSectionA( (LPCSTR) hb_parc( 1 ), (LPCSTR) hb_parc( 2 ) ) ) ;
+   hb_retl( WriteProfileSectionA( (LPCSTR) hb_parcx( 1 ), (LPCSTR) hb_parcx( 2 ) ) ) ;
 }
 
 /*
@@ -211,10 +211,10 @@ HB_FUNC( WRITEPROFILESECTION )
 
 HB_FUNC( GETPRIVATEPROFILESECTION )
 {
-   hb_retnl( (LONG) GetPrivateProfileSectionA( (LPCSTR) hb_parc( 1 ),
-                                               (LPSTR) hb_parc( 2 ) ,
+   hb_retnl( (LONG) GetPrivateProfileSectionA( (LPCSTR) hb_parcx( 1 ),
+                                               (LPSTR) hb_parcx( 2 ) ,
                                                (DWORD) hb_parnl( 3 ),
-                                               (LPCSTR) hb_parc( 4 )
+                                               (LPCSTR) hb_parcx( 4 )
                                                ) ) ;
 }
 
@@ -225,9 +225,9 @@ HB_FUNC( GETPRIVATEPROFILESECTION )
 
 HB_FUNC( WRITEPRIVATEPROFILESECTION )
 {
-   hb_retl( WritePrivateProfileSectionA( (LPCSTR) hb_parc( 1 ),
-                                         (LPCSTR) hb_parc( 2 ),
-                                         (LPCSTR) hb_parc( 3 )
+   hb_retl( WritePrivateProfileSectionA( (LPCSTR) hb_parcx( 1 ),
+                                         (LPCSTR) hb_parcx( 2 ),
+                                         (LPCSTR) hb_parcx( 3 )
                                          ) ) ;
 }
 
@@ -238,9 +238,9 @@ HB_FUNC( WRITEPRIVATEPROFILESECTION )
 
 HB_FUNC( GETPRIVATEPROFILESECTIONNAMES )
 {
-   hb_retnl( (LONG) GetPrivateProfileSectionNames( (LPSTR) hb_parc( 1 ) ,
+   hb_retnl( (LONG) GetPrivateProfileSectionNames( (LPSTR) hb_parcx( 1 ) ,
                                                     (DWORD) hb_parnl( 2 ),
-                                                    (LPCSTR) hb_parc( 3 )
+                                                    (LPCSTR) hb_parcx( 3 )
                                                     ) ) ;
 }
 */
@@ -255,11 +255,11 @@ HB_FUNC( GETPRIVATEPROFILESTRUCT )
 
    // Your code goes here
 
-   hb_retl( GetPrivateProfileStructA( (LPCSTR) hb_parc( 1 ),
-                                      (LPCSTR) hb_parc( 2 ),
+   hb_retl( GetPrivateProfileStructA( (LPCSTR) hb_parcx( 1 ),
+                                      (LPCSTR) hb_parcx( 2 ),
                                       lpStruct             ,
                                       (UINT) hb_parni( 4 ) ,
-                                      (LPCSTR) hb_parc( 5 )
+                                      (LPCSTR) hb_parcx( 5 )
                                       ) ) ;
 }
 
@@ -276,11 +276,11 @@ HB_FUNC( WRITEPRIVATEPROFILESTRUCT )
 
    // Your code goes here
 
-   hb_retl( WritePrivateProfileStructA( (LPCSTR) hb_parc( 1 ),
-                                        (LPCSTR) hb_parc( 2 ),
+   hb_retl( WritePrivateProfileStructA( (LPCSTR) hb_parcx( 1 ),
+                                        (LPCSTR) hb_parcx( 2 ),
                                         lpStruct             ,
                                         (UINT) hb_parni( 4 ) ,
-                                        (LPCSTR) hb_parc( 5 )
+                                        (LPCSTR) hb_parcx( 5 )
                                         ) ) ;
 }
 

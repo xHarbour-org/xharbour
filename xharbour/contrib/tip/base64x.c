@@ -58,8 +58,8 @@ char *base64enc(char *s, size_t s_len)
 HB_FUNC(BUILDUSERPASSSTRING)
 {
  char * s;
- char * szUser = hb_parc(1);
- char * szPass = hb_parc(2);
+ char * szUser = hb_parcx(1);
+ char * szPass = hb_parcx(2);
  size_t p_len= strlen(szPass);
  size_t u_len= strlen(szUser);
  s = (char * ) hb_xgrab((u_len + p_len + 3) * sizeof(char));
@@ -71,7 +71,7 @@ HB_FUNC(BUILDUSERPASSSTRING)
 }
 HB_FUNC( HB_BASE64)
 {
-char * szItem = hb_parc(1);
+char * szItem = hb_parcx(1);
 int nLen= hb_parni(2);
 char * szRet =  base64enc ( szItem,nLen);
 hb_retcAdopt( szRet);

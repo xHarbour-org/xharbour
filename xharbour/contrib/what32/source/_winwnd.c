@@ -58,8 +58,8 @@ HB_FUNC ( CLOSEWINDOW )
 
 HB_FUNC ( FINDWINDOW )
 {
- 
-   hb_retnl((ULONG) FindWindow( (LPCSTR) hb_parc(1), ISCHAR(2) ? hb_parc(2):NULL ) ) ;
+
+   hb_retnl((ULONG) FindWindow( (LPCSTR) hb_parcx(1), ISCHAR(2) ? hb_parcx(2):NULL ) ) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -70,8 +70,8 @@ HB_FUNC( FINDWINDOWEX )
 {
    hb_retnl( (LONG) FindWindowEx( (HWND) hb_parnl( 1 ) ,
                                   (HWND) hb_parnl( 2 ) ,
-                                  (LPCSTR) hb_parc( 3 ),
-                                  (LPCSTR) hb_parc( 4 )
+                                  (LPCSTR) hb_parcx( 3 ),
+                                  (LPCSTR) hb_parcx( 4 )
                                 ) ) ;
 }
 
@@ -238,7 +238,7 @@ HB_FUNC ( REDRAWWINDOW )
 HB_FUNC ( GETCLIENTRECT )
 {
    RECT rc;
-   
+
    PHB_ITEM aMetr ;
    GetClientRect( (HWND) hb_parnl( 1 ), &rc );
 
@@ -460,7 +460,7 @@ HB_FUNC( SCROLLWINDOW )
                           hb_parni( 2 )       ,
                           hb_parni( 3 )       ,
                           &lpRect             ,
-                          &lpClipRect         
+                          &lpClipRect
                         ) ) ;
 }
 
@@ -471,7 +471,7 @@ HB_FUNC( SCROLLWINDOW )
 
 HB_FUNC( SETWINDOWTEXT )
 {
-   hb_retl( SetWindowText( (HWND) hb_parnl( 1 ), (LPSTR) hb_parc( 2 ) ) ) ;
+   hb_retl( SetWindowText( (HWND) hb_parnl( 1 ), (LPSTR) hb_parcx( 2 ) ) ) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -480,9 +480,9 @@ HB_FUNC( SETWINDOWTEXT )
 // modified API - returns the string !
 
 HB_FUNC( GETWINDOWTEXT )
-{  
-   int iLen = GetWindowTextLength( (HWND) hb_parnl( 1 ) )  ; 
-   char *cText = (char*) hb_xgrab( iLen+1 ) ; 
+{
+   int iLen = GetWindowTextLength( (HWND) hb_parnl( 1 ) )  ;
+   char *cText = (char*) hb_xgrab( iLen+1 ) ;
    int iRet = GetWindowText( (HWND) hb_parnl( 1 ) ,
                             (LPSTR) cText       ,
                              iLen+1
@@ -625,8 +625,8 @@ HB_FUNC( MAPWINDOWPOINTS )
                                &lpPoints            ,
                               (UINT) hb_parni( 4 )
                             ) ) ;
-          Point2ArrayEx( &lpPoints   , pArray );  
-   
+          Point2ArrayEx( &lpPoints   , pArray );
+
 }
 
 
@@ -757,7 +757,7 @@ HB_FUNC( SETCLASSLONG )
 {
    hb_retnl( (LONG) SetClassLong( (HWND) hb_parnl( 1 ),
                                   hb_parni( 2 )       ,
-                                  hb_parnl( 3 )       
+                                  hb_parnl( 3 )
                                 ) ) ;
 }
 
@@ -849,7 +849,7 @@ HB_FUNC( SETWINDOWRGN )
 {
    hb_retni( SetWindowRgn( (HWND) hb_parnl( 1 ),
                            (HRGN) hb_parnl( 2 ),
-                           hb_parl( 3 )        
+                           hb_parl( 3 )
                          ) ) ;
 }
 
@@ -869,7 +869,7 @@ HB_FUNC( GETWINDOWRGN )
 HB_FUNC( SETPROP )
 {
    hb_retl( SetProp( (HWND) hb_parnl( 1 )  ,
-                     (LPCSTR) hb_parc( 2 ) ,
+                     (LPCSTR) hb_parcx( 2 ) ,
                      (HANDLE) hb_parnl( 3 )
                    ) ) ;
 }
@@ -879,7 +879,7 @@ HB_FUNC( SETPROP )
 
 HB_FUNC( GETPROP )
 {
-   hb_retnl( (LONG) GetProp( (HWND) hb_parnl( 1 ), (LPCSTR) hb_parc( 2 ) ) ) ;
+   hb_retnl( (LONG) GetProp( (HWND) hb_parnl( 1 ), (LPCSTR) hb_parcx( 2 ) ) ) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -887,7 +887,7 @@ HB_FUNC( GETPROP )
 
 HB_FUNC( REMOVEPROP )
 {
-   hb_retnl( (LONG) RemoveProp( (HWND) hb_parnl( 1 ), (LPCSTR) hb_parc( 2 ) ) ) ;
+   hb_retnl( (LONG) RemoveProp( (HWND) hb_parnl( 1 ), (LPCSTR) hb_parcx( 2 ) ) ) ;
 }
 
 //-----------------------------------------------------------------------------
@@ -987,9 +987,9 @@ HB_FUNC( ADJUSTWINDOWRECTEX )
                                 hb_parl( 3 )         ,
                                 (DWORD) hb_parnl( 4 )
                               )  ;
-   if (bAjust) 
+   if (bAjust)
             Rect2ArrayEx(&lpRect,pArray );
-      
+
    hb_retl(bAjust);
 
 }
@@ -1011,7 +1011,7 @@ HB_FUNC( SETWINDOWLONGPTR )
 {
    hb_retnl( (LONG) SetWindowLongPtr( (HWND) hb_parnl( 1 ),
                                       hb_parni( 2 )       ,
-                                      (LONG_PTR) hb_parnl(3)          
+                                      (LONG_PTR) hb_parnl(3)
                                     ) ) ;
 }
 
@@ -1109,7 +1109,7 @@ HB_FUNC( ENUMWINDOWS )
 HB_FUNC( REALGETWINDOWCLASS )
 {
    hb_retni( RealGetWindowClass( (HWND) hb_parnl( 1 ),
-                                 (LPSTR) hb_parc( 2 ),
+                                 (LPSTR) hb_parcx( 2 ),
                                  (UINT) hb_parni( 3 )
                                ) ) ;
 }
@@ -1126,11 +1126,11 @@ HB_FUNC( REALCHILDWINDOWFROMPOINT )
 {
    POINT ptParentClientCoords ;
    Array2Point( hb_param( 2 , HB_IT_ARRAY) , &ptParentClientCoords );
-  
+
    hb_retnl( (LONG) RealChildWindowFromPoint( (HWND) hb_parnl( 1 ),
                                               ptParentClientCoords
                                             ) ) ;
-   
+
 }
 
 
@@ -1150,7 +1150,7 @@ HB_FUNC( SETWINDOWEXTEX )
    if( SetWindowExtEx( (HDC) hb_parnl( 1 ),
                             hb_parni( 2 )      ,
                             hb_parni( 3 )      ,
-                            &lpSize             
+                            &lpSize
                             ) >0)
      {
 
@@ -1254,7 +1254,7 @@ usage:
 
 #define ASFW_ANY    (-1)
 
-AllowSetForegroundWindow( ASFW_ANY or GetCurrentProcessId() )  
+AllowSetForegroundWindow( ASFW_ANY or GetCurrentProcessId() )
 
 );
 */
@@ -1295,7 +1295,7 @@ HB_FUNC ( ALLOWSETFOREGROUNDWINDOW )
 
       FreeLibrary( h );
    }
- 
+
    hb_retl( bASFWRet );
 }
 

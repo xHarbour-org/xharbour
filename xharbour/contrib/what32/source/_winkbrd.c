@@ -39,7 +39,7 @@ HB_FUNC( OEMKEYSCAN )
 HB_FUNC( VKKEYSCAN )
 {
    char *Buffer ;
-   Buffer =hb_parc( 1 );
+   Buffer =hb_parcx( 1 );
 
    hb_retni( VkKeyScan( *Buffer ) ) ;
 }
@@ -51,7 +51,7 @@ HB_FUNC( VKKEYSCAN )
 HB_FUNC( VKKEYSCANEX )
 {
    char *Buffer ;
-   Buffer = hb_parc( 1 ) ;
+   Buffer = hb_parcx( 1 ) ;
 
    hb_retni( VkKeyScanEx( *Buffer, (HKL) hb_parnl( 2 ) ) ) ;
 }
@@ -92,9 +92,9 @@ HB_FUNC( GETASYNCKEYSTATE )
 HB_FUNC( GETKEYBOARDSTATE )
 {
    BYTE lpKeyState[256] ;
-   
+
    if ( GetKeyboardState( lpKeyState ))
-     hb_retclen( ( char *) lpKeyState, 256 ) ;  
+     hb_retclen( ( char *) lpKeyState, 256 ) ;
 }
 
 
@@ -107,7 +107,7 @@ HB_FUNC( GETKEYBOARDSTATE )
 
 HB_FUNC( SETKEYBOARDSTATE )
 {
-   hb_retl( SetKeyboardState( (LPBYTE) hb_parc(1) ) ) ;
+   hb_retl( SetKeyboardState( (LPBYTE) hb_parcx(1) ) ) ;
 }
 
 
@@ -155,7 +155,7 @@ HB_FUNC( MAPVIRTUALKEYEX )
 {
    hb_retni( MapVirtualKeyEx( (UINT) hb_parni( 1 ),
                               (UINT) hb_parni( 2 ),
-                              (HKL) hb_parnl( 3 ) 
+                              (HKL) hb_parnl( 3 )
                             ) ) ;
 }
 
@@ -184,7 +184,7 @@ HB_FUNC( GETQUEUESTATUS )
 HB_FUNC( LOADACCELERATORS )
 {
    hb_retnl( (LONG) LoadAccelerators( (HINSTANCE) hb_parnl( 1 ),
-                                      (LPCSTR) hb_parc( 2 )    
+                                      (LPCSTR) hb_parcx( 2 )
                                     ) ) ;
 }
 
@@ -200,7 +200,7 @@ HB_FUNC( LOADACCELERATORS )
 
 HB_FUNC( CREATEACCELERATORTABLE )
 {
-   
+
    ACCEL * aAccel ;
    INT iCount ;
    INT i ;
@@ -239,49 +239,49 @@ HB_FUNC( DESTROYACCELERATORTABLE )
 //-----------------------------------------------------------------------------
 // WINUSERAPI int WINAPI CopyAcceleratorTableA( IN HACCEL hAccelSrc, OUT LPACCEL lpAccelDst, IN int cAccelEntries);
 
-// SYNTAX 
-// CopyAcceleratorTable(hAccel,aAccel) -> nEntries, or nCopied  
+// SYNTAX
+// CopyAcceleratorTable(hAccel,aAccel) -> nEntries, or nCopied
 
 // to be tested
 
 HB_FUNC( COPYACCELERATORTABLE )
 {
    LPACCEL lpAccelDst    ;
-   int iCount = 0;  
-   int iRet ;    
+   int iCount = 0;
+   int iRet ;
    PHB_ITEM aParam ;
    PHB_ITEM aSub ;
    PHB_ITEM item ;
-   int i ;   
+   int i ;
 
    if ( ISARRAY(2) && ((iCount=hb_parinfa(2,0)) > 0 ) )
-      lpAccelDst = (LPACCEL) hb_xgrab( iCount * sizeof(ACCEL) ) ;     
-   
+      lpAccelDst = (LPACCEL) hb_xgrab( iCount * sizeof(ACCEL) ) ;
+
    iRet = CopyAcceleratorTable( (HACCEL) hb_parnl( 1 ) ,
                                    (iCount==0 ? NULL : lpAccelDst ) ,
-                                   iCount         
+                                   iCount
                               ) ;
-   
+
    if ( ( iCount > 0 ) && (iRet > 0 ) )
    {
       // read accelerator table elements into a subarrays
-      // and store them into the original array elements 
+      // and store them into the original array elements
 
       aParam = hb_param( 2, HB_IT_ARRAY ) ;
-      aSub = hb_itemArrayNew( 3 ) ;          
-      item = hb_itemNew( NULL ) ;      
-      for ( i = 0 ; i < iCount ; i++ ) 
+      aSub = hb_itemArrayNew( 3 ) ;
+      item = hb_itemNew( NULL ) ;
+      for ( i = 0 ; i < iCount ; i++ )
       {
          hb_arraySet( aSub, 1, hb_itemPutNI( item, lpAccelDst->fVirt ) ) ;
          hb_arraySet( aSub, 2, hb_itemPutNI( item, lpAccelDst->key   ) ) ;
          hb_arraySet( aSub, 3, hb_itemPutNI( item, lpAccelDst->cmd   ) ) ;
          hb_arraySet( aParam, i+1, hb_arrayClone(aSub, NULL ) ) ;
-      } 
+      }
       hb_itemRelease(item) ;
       hb_itemRelease(aSub) ;
    }
 
-   if ( iCount > 0 )  
+   if ( iCount > 0 )
       hb_xfree( lpAccelDst );
    hb_retni( iRet ) ;
 }
@@ -296,7 +296,7 @@ HB_FUNC( TRANSLATEACCELERATOR )
    LPMSG  lpMsg = ( MSG * ) hb_param(3, HB_IT_STRING)->item.asString.value;
    hb_retni( TranslateAccelerator( (HWND) hb_parnl( 1 )  ,
                                    (HACCEL) hb_parnl( 2 ),
-                                   lpMsg                 
+                                   lpMsg
                                  ) ) ;
 }
 
@@ -309,7 +309,7 @@ HB_FUNC( TRANSLATEACCELERATOR )
 //  WPARAM wParam,  // value passed to hook procedure
 //  LPARAM lParam   // value passed to hook procedure
 //);
- 
+
 HB_FUNC( CALLNEXTHOOKEX )
 {
     CallNextHookEx( (HHOOK) hb_parni(1), (int) hb_parni(2), (WPARAM) hb_parnl(3), (LPARAM) hb_parnl(4) );
@@ -332,7 +332,7 @@ HB_FUNC( SETWINDOWSHOOKEX )
 
 HB_FUNC( MAKEPROCINSTANCE )
 {
-   hb_retc( (FARPROC) MakeProcInstance( (FARPROC) hb_parc(1), (HINSTANCE) hb_parnl(2) ) );
+   hb_retc( (FARPROC) MakeProcInstance( (FARPROC) hb_parcx(1), (HINSTANCE) hb_parnl(2) ) );
 }
 
 
