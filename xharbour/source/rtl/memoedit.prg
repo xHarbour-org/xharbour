@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.18 2004/04/19 02:07:40 lculik Exp $
+ * $Id: memoedit.prg,v 1.24 2004/06/12 02:26:48 ronpinkas Exp $
  */
 
 /*
@@ -49,7 +49,6 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-//-------------------------------------------------------------------//
 
 #include "common.ch"
 #include "hbclass.ch"
@@ -86,9 +85,11 @@ METHOD MemoInit( cUserFunction ) CLASS TMemoEditor
    ::xUserFunction := cUserFunction
 
    if ISCHARACTER( ::xUserFunction )
-      // Keep calling user function until it returns 0
-      //
-      while ( nKey := ::xDo( ME_INIT ) ) <> ME_DEFAULT
+      /* Keep calling user function until it returns 0
+         05/08/2004 - <maurilio.longo@libero.it>
+                      Clipper 5.2 memoedit() treats a NIL as ME_DEFAULT
+      */
+      while ! ( nKey := ::xDo( ME_INIT ) ) IN { ME_DEFAULT, NIL }
 
          // At this time there is no input from user of MemoEdit() only handling
          // of values returned by ::xUserFunction, so I pass these value on both
@@ -119,7 +120,7 @@ METHOD Edit() CLASS TMemoEditor
    //
    if ::lEditAllow .AND. ISCHARACTER( ::xUserFunction )
 
-      while !( ::lExitEdit )
+      while ! ::lExitEdit
 
          // I need to test this condition here since I never block inside HBEditor:Edit()
          // if there is an user function
@@ -193,88 +194,100 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
 
    // HBEditor does not handle these keys and would call ::KeyboardHook() causing infinite loop
    //
-   local aUnHandledKeys := {K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T,;
-                            K_CTRL_U, K_F1, K_F2, K_F3, K_F4, K_F5, K_F6, K_F7, K_F8, K_F9, K_F10, K_F11, K_F12}
+   local aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T,;
+                             K_CTRL_U, K_F1, K_F2, K_F3, K_F4, K_F5, K_F6, K_F7, K_F8, K_F9, K_F10, K_F11, K_F12 }
 
-   if nUserKey <> nil
-      Switch nUserKey
-         // I won't reach this point during ME_INIT since ME_DEFAULT ends initialization phase of MemoEdit()
+
+   /* 05/08/2004 - <maurilio.longo@libero.it>
+                   A little trick to be able to handle a nUserKey with value of NIL
+                   like it had a value of ME_DEFAULT
+   */
+   default nUserKey to ME_DEFAULT
+
+   switch nUserKey
+      // I won't reach this point during ME_INIT since ME_DEFAULT ends initialization phase of MemoEdit()
+      //
+      case ME_DEFAULT
+         // HBEditor is not able to handle keys with a value higher than 256
          //
-         case ME_DEFAULT
-            // HBEditor is not able to handle keys with a value higher than 256
-            //
-            if ( nKey <= 256 .OR. nKey == K_ALT_W .or. nKey == K_CTRL_W ) .AND. !( nKey IN aUnHandledKeys )
-               super:Edit( nKey )
-            endif
-            exit
+         if (nKey <= 256 .OR. nKey == K_ALT_W .or. nKey == K_CTRL_W ) .AND.;
+            !( nKey IN aUnHandledKeys )
 
-         // TOFIX: Not clipper compatible, see teditor.prg
-         //
-         case 1
-         case 2
-         case 3
-         case 4
-         case 5
-         case 6
-         case 7
-         case 8
-         case 9
-         case 10
-         case 11
-         case 12
-         case 13
-         case 14
-         case 15
-         case 16
-         case 17
-         case 18
-         case 19
-         case 20
-         case 21
-         case 22
-         case 23
-         case 24
-         case 25
-         case 26
-         case 27
-         case 28
-         case 29
-         case 30
-         case 31
-         case K_ALT_W
-         case K_CTRL_W
-            if !( nUserKey IN aUnHandledKeys )
-               super:Edit( nUserKey )
-            endif
-            exit
+            super:Edit( nKey )
 
-         case ME_DATA
-            if nKey <= 256 .AND. !( nKey IN aUnHandledKeys )
-               super:Edit( nKey )
-            endif
-            exit
+         endif
+         exit
 
-         case ME_TOGGLEWRAP
-            ::lWordWrap := !( ::lWordWrap )
-            exit
+      // TOFIX: Not clipper compatible, see teditor.prg
+      //
+      case K_CTRL_A
+      case K_CTRL_B
+      case K_CTRL_C
+      case K_CTRL_D
+      case K_CTRL_E
+      case K_CTRL_F
+      case K_CTRL_G
+      case K_CTRL_H
+      case K_CTRL_I
+      case K_CTRL_J
+      case K_CTRL_K
+      case K_CTRL_L
+      case K_CTRL_M
+      case K_CTRL_N
+      case K_CTRL_O
+      case K_CTRL_P
+      case K_CTRL_Q
+      case K_CTRL_R
+      case K_CTRL_S
+      case K_CTRL_T
+      case K_CTRL_U
+      case K_CTRL_V
+      case K_CTRL_W
+      case K_CTRL_X
+      case K_CTRL_Y
+      case K_CTRL_Z
+      case K_ESC
+      case K_F1
+      case K_CTRL_HOME
+      case K_CTRL_PGDN
+      case K_CTRL_PGUP
+      case K_ALT_W
+      case K_CTRL_W
+         if !( nUserKey IN aUnHandledKeys )
 
-         case ME_TOGGLESCROLL
-            // TODO: HBEditor does not support vertical scrolling of text inside window without moving cursor position
-            exit
+            super:Edit( nUserKey )
 
-         case ME_WORDRIGHT
-            ::WordRight()  // MoveCursor(K_CTRL_RIGHT)
-            exit
+         endif
+         exit
 
-         case ME_BOTTOMRIGHT
-            ::Bottom()     // MoveCursor(K_CTRL_END)
-            exit
+      case ME_DATA
+         if nKey <= 256 .AND. !( nKey IN aUnHandledKeys )
 
-         default
-            // Do nothing
+            super:Edit( nKey )
 
-      end
-   endif
+         endif
+         exit
+
+      case ME_TOGGLEWRAP
+         ::lWordWrap := ! ::lWordWrap
+         exit
+
+      case ME_TOGGLESCROLL
+         // TODO: HBEditor does not support vertical scrolling of text inside window without moving cursor position
+         exit
+
+      case ME_WORDRIGHT
+         ::WordRight()  // MoveCursor(K_CTRL_RIGHT)
+         exit
+
+      case ME_BOTTOMRIGHT
+         ::Bottom()     // MoveCursor(K_CTRL_END)
+         exit
+
+      default
+         // Do nothing
+
+   END
 
 return Self
 
