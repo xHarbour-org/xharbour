@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.45 2004/03/28 15:12:02 likewolf Exp $
+ * $Id: direct.c,v 1.46 2004/03/31 09:19:54 andijahja Exp $
  */
 
 /*
@@ -414,7 +414,11 @@ HB_FUNC( DIRECTORYRECURSE )
    PHB_FNAME fDirSpec;
    HB_ITEM Dir;
    char *szFName = NULL;
+   #if defined( HB_OS_UNIX )
+   BOOL bAddDrive = FALSE;
+   #else
    BOOL bAddDrive = TRUE;
+   #endif
    char *szAttributes;
 
    Dir.type = HB_IT_NIL;
