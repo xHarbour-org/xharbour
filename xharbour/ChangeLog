@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2975 2004/05/22 15:38:27 likewolf Exp $
+ * $Id: ChangeLog,v 1.2976 2004/05/23 01:12:21 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-23 11:10 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
+  * source/rdd/dbcmd.c
+    * rewritten __dbSql. Now it takes half of the time and supports
+    * PostGreSQL COPY FROM data format. Still a work in progress...
 
 2004-05-23 05:10 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/pp/ppcore.c
