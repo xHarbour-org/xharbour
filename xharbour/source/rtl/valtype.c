@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.6 2003/11/12 11:28:49 toninhofwi Exp $
+ * $Id: valtype.c,v 1.7 2003/11/23 22:33:33 andijahja Exp $
  */
 
 /*
@@ -57,15 +57,16 @@
  * Copyright 2002-2003 Walter Negro <anegro@overnet.com.ar>
  *    HB_ISBYREF()
  *    HB_ISNIL()
- *    HB_ISCHAR()
+ *    HB_ISSTRING()
  *    HB_ISMEMO()
- *    HB_ISNUM()
- *    HB_ISLOGIC()
+ *    HB_ISNUMERIC()
+ *    HB_ISLOGICAL()
  *    HB_ISDATE()
  *    HB_ISARRAY()
  *    HB_ISOBJECT()
  *    HB_ISBLOCK()
  *    HB_ISPOINTER()
+ *    HB_ISNULL()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -73,8 +74,10 @@
 
 
 #include "hbapi.h"
+#include "hbapierr.h"
 #include "hbapiitm.h"
 #include "hbstack.h"
+#include "hashapi.h"
 
 HB_FUNC( VALTYPE )
 {
@@ -161,3 +164,25 @@ HB_FUNC( HB_ISHASH )
   hb_retl( ISHASH( 1 ) );
 }
 
+HB_FUNC( HB_ISNULL )
+{
+   PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
+
+   if( pItem )
+   {
+       switch( pItem->type )
+       {
+          case HB_IT_STRING:
+             hb_retl( pItem->item.asString.length == 0 );
+             return;
+          case HB_IT_ARRAY :
+             hb_retl( pItem->item.asArray.value->ulLen == 0 );
+             return;
+          case HB_IT_HASH :
+             hb_retl( hb_hashLen( pItem ) == 0 );
+             return;
+       }
+   }
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1111, NULL, "HB_ISNULL", 1, hb_paramError( 1 ) );
+}
