@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.88 2004/03/31 05:20:44 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.89 2004/04/05 19:33:31 andijahja Exp $
  */
 
 /*
@@ -1948,7 +1948,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
     case WM_CHAR:
     {
       BOOL bCtrl     = GetKeyState( VK_CONTROL ) & 0x8000;
-      int  iScanCode = HIWORD( lParam ) & 0xFF ;
+      // int  iScanCode = HIWORD( lParam ) & 0xFF ;
       int c = ( int )wParam;
       if ( !bIgnoreWM_SYSCHAR )
       {

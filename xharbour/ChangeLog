@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2756 2004/04/05 19:40:32 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.2757 2004/04/05 20:29:01 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-04-06 05:35 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/rtl/filesys.c
+    ! typo on trace info convert_create_flags -> convert_create_flags_ex
+    ! define convert_create_flags() only when HB_FS_FILE_IO is defined and
+      HB_WIN32_IO is not defined.
+  * source/rtl/fserror.c
+    ! define hb_errnoToDosError() only when HB_WIN32_IO is not defined
+  * source/compiler/hbpcode.c
+    ! function hb_compStrongType(): mark iSize as unused.
+  * source/rtl/gtwvt/gtwvt.c
+    ! remmed unused variable: iScanCode in line 1983
 
 2004-04-05 22:36 UTC+0200 Francesco Saverio Giudice <info / at / fsgiudice.com>
   * source/rtl/bkgtsks.c

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.93 2004/04/05 19:33:31 andijahja Exp $
+ * $Id: filesys.c,v 1.94 2004/04/05 19:58:00 ronpinkas Exp $
  */
 
 /*
@@ -417,6 +417,7 @@ static int convert_seek_flags( USHORT uiFlags )
    return result_flags;
 }
 
+#if ( defined(HB_FS_FILE_IO) && !defined(HB_WIN32_IO) )
 static void convert_create_flags( USHORT uiFlags, int * result_flags, unsigned * result_pmode )
 {
    HB_TRACE(HB_TR_DEBUG, ("convert_create_flags(%hu, %p, %p)", uiFlags, result_flags, result_pmode));
@@ -454,6 +455,7 @@ static void convert_create_flags( USHORT uiFlags, int * result_flags, unsigned *
 
    HB_TRACE(HB_TR_INFO, ("convert_create_flags: 0x%04x, 0x%04x\n", *result_flags, *result_pmode));
 }
+#endif
 
 static void convert_create_flags_ex( USHORT uiAttr, USHORT uiFlags, int * result_flags, unsigned * result_pmode )
 {
@@ -480,7 +482,7 @@ static void convert_create_flags_ex( USHORT uiAttr, USHORT uiFlags, int * result
    if( uiAttr & FC_SYSTEM )
       *result_flags |= 0;
 
-   HB_TRACE(HB_TR_INFO, ("convert_create_flags: 0x%04x, 0x%04x\n", *result_flags, *result_pmode));
+   HB_TRACE(HB_TR_INFO, ("convert_create_flags_ex: 0x%04x, 0x%04x\n", *result_flags, *result_pmode));
 }
 
 #endif
@@ -703,7 +705,6 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       )
 {
    FHANDLE hRet = FS_ERROR;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_fsOpenProcess(%s, %p, %p, %p )",
       pFilename, fhStdin, fhStdout, fhStderr));
 

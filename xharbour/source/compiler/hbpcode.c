@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.27 2004/04/05 00:16:03 andijahja Exp $
+ * $Id: hbpcode.c,v 1.28 2004/04/05 10:03:19 andijahja Exp $
  */
 
 /*
@@ -501,6 +501,7 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
 
 void hb_compStrongType( int iSize )
 {
+   HB_SYMBOL_UNUSED( iSize );
 #if 0
    PFUNCTION pFunc = hb_comp_functions.pLast, pTmp;
    PVAR pVar = NULL;

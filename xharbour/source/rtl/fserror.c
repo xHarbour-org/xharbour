@@ -1,5 +1,5 @@
 /*
- * $Id: fserror.c,v 1.3 2004/04/05 14:36:20 druzus Exp $
+ * $Id: fserror.c,v 1.4 2004/04/05 19:33:31 andijahja Exp $
  */
 
 /*
@@ -69,6 +69,8 @@
 
 
 /* Try to translate C errno into DOS error code */
+
+#if !defined(HB_WIN32_IO)
 static int hb_errnoToDosError( int ErrCode )
 {
    int iResult;
@@ -140,6 +142,7 @@ static int hb_errnoToDosError( int ErrCode )
 
    return iResult;
 }
+#endif
 
 #if defined(HB_WIN32_IO)
 static int hb_WinToDosError( ULONG ulError )
