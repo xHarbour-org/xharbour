@@ -17,14 +17,13 @@
 */
 // Modified from Ron Pinkas \harbour\samples\guestbk\inifiles.prg
 //
-// $Id: TIniFile.prg,v 1.1 2002/09/05 23:13:04 ronpinkas Exp $
+// $Id: TIniFile.prg,v 1.2 2002/09/06 01:47:29 fsgiudice Exp $
 //
 //
 
 #include "woopgui.ch"
 #include "common.ch"
 #include "hbclass.ch"
-#include "windows.ch"
 
 CLASS TIniFile FROM TObject
 

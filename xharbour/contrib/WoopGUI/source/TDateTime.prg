@@ -1,13 +1,21 @@
+#define DATETIME_YEAR         1
+#define DATETIME_MONTH        2
+#define DATETIME_DAYOFWEEK    3
+#define DATETIME_DAY          4
+#define DATETIME_HOUR         5
+#define DATETIME_MINUTE       6
+#define DATETIME_SECOND       7
+#define DATETIME_MILLISECONDS 8
 /*
 *-----------------------------------------------------------------------------
 * WoopGUI for Harbour - Win32 OOP GUI library source code
 * Copyright 2002 Francesco Saverio Giudice <info@fsgiudice.com>
 *
-*-----------------------------------------------------------------------------
-* Parts of this project come from:
-* "Harbour MiniGUI"
-*                   Copyright 2002 Roberto Lopez <roblez@ciudad.com.ar>
-*                   http://www.geocities.com/harbour_minigui/
+*----------------------------------------------------------------------------
+*Parts of this project come from:
+*"Harbour MiniGUI"
+*                  Copyright 2002 Roberto Lopez <roblez@ciudad.com.ar>
+*                  http://www.geocities.com/harbour_minigui/
 * "Harbour GUI framework for Win32"
 *                   Copyright 2001 Alexander S.Kresin <alex@belacy.belgorod.su>
 *                   Copyright 2001 Antonio Linares <alinares@fivetech.com>
@@ -19,16 +27,16 @@
 #include "woopgui.ch"
 #include "common.ch"
 #include "hbclass.ch"
-#include "windows.ch"
+#include "winuser.ch"
 
-#define DATETIME_YEAR         1
-#define DATETIME_MONTH        2
-#define DATETIME_DAYOFWEEK    3
-#define DATETIME_DAY          4
-#define DATETIME_HOUR         5
-#define DATETIME_MINUTE       6
-#define DATETIME_SECOND       7
-#define DATETIME_MILLISECONDS 8
+//#define DATETIME_YEAR         1
+//#define DATETIME_MONTH        2
+//#define DATETIME_DAYOFWEEK    3
+//#define DATETIME_DAY          4
+//#define DATETIME_HOUR         5
+//#define DATETIME_MINUTE       6
+//#define DATETIME_SECOND       7
+//#define DATETIME_MILLISECONDS 8
 
 // ----------------------------------------------------------------------------
 // constants

@@ -19,7 +19,8 @@
 #include "woopgui.ch"
 #include "common.ch"
 #include "hbclass.ch"
-#include "windows.ch"
+#include "winuser.ch"
+#include "commctrl.ch"
 
 CLASS TStatusBar FROM TWindowBase
 
@@ -184,7 +185,7 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TStatusBar
       DO CASE
          CASE nMsg == WM_SIZE
               ::Repaint(lParam)
-              //nRet := 0
+              nRet := 0
       ENDCASE
    ENDIF
    IF nRet == -1

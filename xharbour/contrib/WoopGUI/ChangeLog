@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.8 2002/09/08 01:07:55 what32 Exp $
+ * $Id: ChangeLog,v 1.9 2002/09/08 02:06:01 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2002-09-10 22:13 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
+   + winuser.ch and commctrl.ch as standard header
+   - windows.ch (is a replication of files above)
+   * ALL SOURCE to reflect new headers
 
 2002-09-07 23:59 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
    * source/TWindow.prg

@@ -20,13 +20,18 @@
 #include "woopgui.ch"
 #include "common.ch"
 #include "hbclass.ch"
-#include "windows.ch"
+#include "winuser.ch"
 
 CLASS TFrameMDIParent FROM TFrame
 
     // Data of this class only
 
-    DATA oMDIClienWindow AS OBJECT
+    DATA oMDIClienWindow    AS OBJECT
+    DATA oMDICurrentChild   AS OBJECT
+    DATA oMDIMenu           AS OBJECT
+    DATA lParentFrameActive AS LOGICAL INIT TRUE
+
+
     DATA aoMdiChilds   AS ARRAY INIT {} HIDDEN   // Childs mdi windows
 
     // Public Methods

@@ -12,6 +12,8 @@
 HBR_DIR=..\..
 BCC_DIR=c:\bcc55
 WG_DIR=.
+#WH_DIR=..\what32
+WH_DIR=.
 
 
 !include <env\bccwin32.mak>
@@ -45,8 +47,7 @@ WOOPGUIOBJ = tobject.obj twindowdef.obj \
              tdatetime.obj tcalendar.obj \
              txget.obj \
              tget.obj tgetlist.obj \
-             errorsys.obj \
-             cstr.obj xget.obj char.obj arrayfunc.obj datetime.obj condeval.obj
+             ERRORSYS.OBJ cstr.obj xget.obj char.obj arrayfunc.obj datetime.obj condeval.obj
 
 WOOPGUIRC  = woopgui.rc
 

@@ -18,7 +18,6 @@
 */
 
 #include "woopgui.ch"
-#include "windows.ch"
 #include "common.ch"
 #include "hbclass.ch"
 

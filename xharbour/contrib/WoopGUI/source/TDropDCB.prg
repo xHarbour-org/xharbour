@@ -19,7 +19,7 @@
 #include "woopgui.ch"
 #include "common.ch"
 #include "hbclass.ch"
-#include "windows.ch"
+#include "winuser.ch"
 
 // Windows definitions
 CLASS TDropDownComboBox FROM TComboBox

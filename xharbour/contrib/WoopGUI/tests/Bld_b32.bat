@@ -9,7 +9,7 @@ set BCC_DIR=c:\bcc55
 set WHAT32_LIB=..\..\what32\lib
 ECHO Compiling...
 
-%HB_INSTALL%\bin\harbour %1 -p -n -w -i%HB_INSTALL%\include;%WGUI_INSTALL%\include > clip.log
+%HB_INSTALL%\bin\harbour %1 -p -n -w -i%WGUI_INSTALL%\include;%HB_INSTALL%\include > clip.log
 IF ERRORLEVEL 1 type clip.log
 IF ERRORLEVEL 1 PAUSE
 if errorlevel 1 goto exit

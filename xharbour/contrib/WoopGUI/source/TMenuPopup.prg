@@ -19,7 +19,6 @@
 #include "woopgui.ch"
 #include "common.ch"
 #include "hbclass.ch"
-#include "windows.ch"
 
 // Menu definitions
 CLASS TMenuPopup FROM TMenu

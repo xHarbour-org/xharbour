@@ -1,7 +1,7 @@
 
 #include "woopgui.ch"
 #include "common.ch"
-#include "windows.ch"
+#include "winuser.ch"
 //#include "demo.ch"
 
 //#define WG_DEBUG

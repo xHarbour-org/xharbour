@@ -21,7 +21,8 @@
 #include "woopgui.ch"
 #include "common.ch"
 #include "hbclass.ch"
-#include "windows.ch"
+
+#include "winuser.ch"
 
 //static nWinID
 
@@ -683,8 +684,8 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
          //     nRet := ::OnLBtnUp(LoWord(lParam), HiWord(lParam), wParam)
          //CASE nMsg == WM_MENUCOMMAND  // THIS COMMAND EXIST IN WINVER > 5
          //     nRet := ::OnMenuCommand(wParam, lParam)
-         CASE nMsg == WM_MENUSELECT
-              nRet := ::OnMenuSelect(wParam, lParam)
+         //CASE nMsg == WM_MENUSELECT
+         //     nRet := ::OnMenuSelect(wParam, lParam)
          //CASE nMsg == WM_MDIACTIVATE
          //     nRet := ::OnMDIActivate(wParam == 1, LoWord(lParam), HiWord(lParam))
          CASE nMsg == WM_MOUSEMOVE

@@ -21,7 +21,7 @@
 #include "woopgui.ch"
 #include "common.ch"
 #include "hbclass.ch"
-#include "windows.ch"
+//#include "windows.ch"
 
 CLASS TObject  // FROM HBObject
 

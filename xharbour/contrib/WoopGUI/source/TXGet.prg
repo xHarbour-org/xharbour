@@ -19,7 +19,7 @@
 #include "woopgui.ch"
 #include "common.ch"
 #include "hbclass.ch"
-#include "windows.ch"
+#include "winuser.ch"
 
 #include "getexit.ch"
 #include "inkey.ch"
@@ -1020,3 +1020,34 @@ METHOD SetCaretType( lInsert ) CLASS TXGet
 RETURN Self
 
 
+Function UnMapDialogRect(cText,hfont)
+
+  Local nX,nY,nW,nH
+
+  Local hDC := GetDC(0)
+  Local hOldFont:=SelectObject(hDC,hFont)
+  Local aTextExt:=GetTextExtentPoint32(hDC,;
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
+
+  Local arect:={0,0,100,100}
+
+  nW:=aTextExt[1]
+  nH:=aTextExt[2]
+
+  // Looks like this is what it should be (?)
+
+  nW:=Int((Int(nW / 26) + 1)/2)
+  nX:=GetTextExtentPoint32(hDC,cText)[1]
+  nY:=nH
+
+  SelectObject(hDC,hOldFont)
+  ReleaseDC(0, hDC)
+
+  Return({Ceiling(nX*4/nW),Ceiling(nY*8/nY)})
+
+// returns ceiling of a number
+
+Function Ceiling( x )
+
+   Return( If( x - Int( x ) > 0, Int( x ) + 1, x ) )
+                                                    

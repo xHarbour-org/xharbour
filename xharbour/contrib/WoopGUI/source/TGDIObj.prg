@@ -21,7 +21,6 @@
 #include "woopgui.ch"
 #include "common.ch"
 #include "hbclass.ch"
-#include "windows.ch"
 
 // This is a virtual class - don't use directly
 

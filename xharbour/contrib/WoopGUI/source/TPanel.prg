@@ -20,7 +20,7 @@
 #include "woopgui.ch"
 #include "common.ch"
 #include "hbclass.ch"
-#include "windows.ch"
+#include "winuser.ch"
 #include "getexit.ch"
 
 

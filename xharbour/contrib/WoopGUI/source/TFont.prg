@@ -19,8 +19,8 @@
 #include "woopgui.ch"
 #include "common.ch"
 #include "hbclass.ch"
-#include "windows.ch"
-//#include "wingdi.ch"
+#include "winuser.ch"
+#include "wingdi.ch"
 
 CLASS TFont FROM TGDIObject
 

@@ -157,19 +157,19 @@
 #endif // !NOSHOWWINDOW
 
 //#if(WINVER >=   1280)
-///*
-// * AnimateWindow() Commands
-// */
-//#define AW_HOR_POSITIVE                      1
-//#define AW_HOR_NEGATIVE                      2
-//#define AW_VER_POSITIVE                      4
-//#define AW_VER_NEGATIVE                      8
-//#define AW_CENTER                           16
-//#define AW_HIDE                          65536
-//#define AW_ACTIVATE                     131072
-//#define AW_SLIDE                        262144
-//#define AW_BLEND                        524288
-//
+/*
+ * AnimateWindow() Commands
+ */
+#define AW_HOR_POSITIVE                      1
+#define AW_HOR_NEGATIVE                      2
+#define AW_VER_POSITIVE                      4
+#define AW_VER_NEGATIVE                      8
+#define AW_CENTER                           16
+#define AW_HIDE                          65536
+#define AW_ACTIVATE                     131072
+#define AW_SLIDE                        262144
+#define AW_BLEND                        524288
+
 //#endif // WINVER >= 0x0500
 
 
@@ -195,8 +195,8 @@
 #define VK_MBUTTON           4    // NOT contiguous with L & RBUTTON
 
 //#if(_WIN32_WINNT >=   1280)
-//#define VK_XBUTTON1          5    // NOT contiguous with L & RBUTTON
-//#define VK_XBUTTON2          6    // NOT contiguous with L & RBUTTON
+#define VK_XBUTTON1          5    // NOT contiguous with L & RBUTTON
+#define VK_XBUTTON2          6    // NOT contiguous with L & RBUTTON
 //#endif // _WIN32_WINNT >= 0x0500
 
 /*
@@ -346,26 +346,26 @@
 #define VK_RMENU           165
 
 //#if(_WIN32_WINNT >=   1280)
-//#define VK_BROWSER_BACK         166
-//#define VK_BROWSER_FORWARD      167
-//#define VK_BROWSER_REFRESH      168
-//#define VK_BROWSER_STOP         169
-//#define VK_BROWSER_SEARCH       170
-//#define VK_BROWSER_FAVORITES    171
-//#define VK_BROWSER_HOME         172
-//
-//#define VK_VOLUME_MUTE          173
-//#define VK_VOLUME_DOWN          174
-//#define VK_VOLUME_UP            175
-//#define VK_MEDIA_NEXT_TRACK     176
-//#define VK_MEDIA_PREV_TRACK     177
-//#define VK_MEDIA_STOP           178
-//#define VK_MEDIA_PLAY_PAUSE     179
-//#define VK_LAUNCH_MAIL          180
-//#define VK_LAUNCH_MEDIA_SELECT  181
-//#define VK_LAUNCH_APP1          182
-//#define VK_LAUNCH_APP2          183
-//
+#define VK_BROWSER_BACK         166
+#define VK_BROWSER_FORWARD      167
+#define VK_BROWSER_REFRESH      168
+#define VK_BROWSER_STOP         169
+#define VK_BROWSER_SEARCH       170
+#define VK_BROWSER_FAVORITES    171
+#define VK_BROWSER_HOME         172
+
+#define VK_VOLUME_MUTE          173
+#define VK_VOLUME_DOWN          174
+#define VK_VOLUME_UP            175
+#define VK_MEDIA_NEXT_TRACK     176
+#define VK_MEDIA_PREV_TRACK     177
+#define VK_MEDIA_STOP           178
+#define VK_MEDIA_PLAY_PAUSE     179
+#define VK_LAUNCH_MAIL          180
+#define VK_LAUNCH_MEDIA_SELECT  181
+#define VK_LAUNCH_APP1          182
+#define VK_LAUNCH_APP2          183
+
 //#endif // _WIN32_WINNT >= 0x0500
 
 /*
@@ -414,7 +414,7 @@
 
 
 //#if(_WIN32_WINNT >=   1280)
-//#define VK_PACKET          231
+#define VK_PACKET          231
 //#endif // _WIN32_WINNT >= 0x0500
 
 /*
@@ -4104,25 +4104,25 @@
 /*
  * Standard Cursor IDs
  */
-#define IDC_ARROW           MAKEINTRESOURCE(32512)
-#define IDC_IBEAM           MAKEINTRESOURCE(32513)
-#define IDC_WAIT            MAKEINTRESOURCE(32514)
-#define IDC_CROSS           MAKEINTRESOURCE(32515)
-#define IDC_UPARROW         MAKEINTRESOURCE(32516)
-#define IDC_SIZE            MAKEINTRESOURCE(32640)  // OBSOLETE: use IDC_SIZEALL
-#define IDC_ICON            MAKEINTRESOURCE(32641)  // OBSOLETE: use IDC_ARROW
-#define IDC_SIZENWSE        MAKEINTRESOURCE(32642)
-#define IDC_SIZENESW        MAKEINTRESOURCE(32643)
-#define IDC_SIZEWE          MAKEINTRESOURCE(32644)
-#define IDC_SIZENS          MAKEINTRESOURCE(32645)
-#define IDC_SIZEALL         MAKEINTRESOURCE(32646)
-#define IDC_NO              MAKEINTRESOURCE(32648) //not in win3.1
+#define IDC_ARROW           32512
+#define IDC_IBEAM           32513
+#define IDC_WAIT            32514
+#define IDC_CROSS           32515
+#define IDC_UPARROW         32516
+#define IDC_SIZE            32640  // OBSOLETE: use IDC_SIZEALL
+#define IDC_ICON            32641  // OBSOLETE: use IDC_ARROW
+#define IDC_SIZENWSE        32642
+#define IDC_SIZENESW        32643
+#define IDC_SIZEWE          32644
+#define IDC_SIZENS          32645
+#define IDC_SIZEALL         32646
+#define IDC_NO              32648 //not in win3.1
 //#if(WINVER >=   1280)
 //#define IDC_HAND            MAKEINTRESOURCE(32649)
 //#endif // WINVER >= 0x0500
-#define IDC_APPSTARTING     MAKEINTRESOURCE(32650) //not in win3.1
+#define IDC_APPSTARTING     32650 //not in win3.1
 //#if(WINVER >=   1024)
-#define IDC_HELP            MAKEINTRESOURCE(32651)
+#define IDC_HELP            32651
 //#endif // WINVER >= 0x0400
 
 
@@ -4274,12 +4274,12 @@
                                 ** language drivers.
                                 */
 
-#ifndef NOICONS
+//#ifndef NOICONS
 
 /*
  * Standard Icon IDs
  */
-#ifdef RC_INVOKED
+//#ifdef RC_INVOKED
 #define IDI_APPLICATION     32512
 #define IDI_HAND            32513
 #define IDI_QUESTION        32514
@@ -4297,7 +4297,7 @@
 ////#if(WINVER >=   1024)
 //#define IDI_WINLOGO         MAKEINTRESOURCE(32517)
 //#endif // WINVER >= 0x0400
-#endif // RC_INVOKED
+//#endif // RC_INVOKED
 
 //#if(WINVER >=   1024)
 #define IDI_WARNING     IDI_EXCLAMATION
@@ -4306,7 +4306,7 @@
 //#endif // WINVER >= 0x0400
 
 
-#endif // !NOICONS
+//#endif // !NOICONS
 
 
 //#ifdef UNICODE

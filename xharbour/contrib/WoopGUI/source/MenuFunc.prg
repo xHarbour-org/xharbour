@@ -18,7 +18,7 @@
 
 #include "woopgui.ch"
 #include "common.ch"
-#include "windows.ch"
+#include "winuser.ch"
 
 // -----------------------------------------------------
 

@@ -8,7 +8,7 @@
 
 #include "common.ch"
 #include "error.ch"
-#include "windows.ch"
+//#include "windows.ch"
 
 Static LogInitialPath
 
@@ -30,7 +30,7 @@ STATIC FUNCTION WG_DefError( oError )
    LOCAL n
 
    //MessageBox(0,"ERRORE ....." )
-   
+
    // By default, division by zero results in zero
    IF oError:genCode == EG_ZERODIV
       RETURN 0
@@ -67,7 +67,7 @@ STATIC FUNCTION WG_DefError( oError )
    ENDDO
 
    MemoWrit( LogInitialPath+"Error.log", cMessage )
-   //SendMessage( GetMainWindow()[1], WM_DESTROY, 0, 0 )   
+   //SendMessage( GetMainWindow()[1], WM_DESTROY, 0, 0 )
    QUIT
 
 RETURN .F.

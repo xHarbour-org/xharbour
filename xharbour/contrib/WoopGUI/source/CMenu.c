@@ -49,72 +49,72 @@ HB_FUNC( MODIFYMENU )
 // or its handle, allowing the menu to be reused. Before this function is called, the GetSubMenu
 // function should retrieve a handle to the drop-down menu or submenu.
 //
-HB_FUNC( REMOVEMENU )
+//HB_FUNC( REMOVEMENU )
+//{
+//  HMENU hMenu            = (HMENU) hb_parnl(1);        // handle to menu
+//  UINT uPosition         = (UINT)  hb_parni(2);        // item that new item precedes
+//  UINT uFlags            = (UINT)  hb_parni(3);        // options
+//
+//  hb_retl( (BOOL) RemoveMenu( hMenu, uPosition, uFlags ) );
+//}
+
+VOID APIENTRY DisplayContextMenu(HWND hwnd, POINT pt, HMENU hmenu)
 {
-  HMENU hMenu            = (HMENU) hb_parnl(1);        // handle to menu
-  UINT uPosition         = (UINT)  hb_parni(2);        // item that new item precedes
-  UINT uFlags            = (UINT)  hb_parni(3);        // options
+    //HMENU hmenu;            // top-level menu
+    HMENU hmenuTrackPopup;  // shortcut menu
 
-  hb_retl( (BOOL) RemoveMenu( hMenu, uPosition, uFlags ) );
+    // Load the menu resource.
+
+    //if ((hmenu = LoadMenu(hinst, "ShortcutExample")) == NULL)
+    //    return;
+
+    // TrackPopupMenu cannot display the menu bar so get
+    // a handle to the first shortcut menu.
+
+    hmenuTrackPopup = hmenu; //GetSubMenu(hmenu, 0);
+
+    // Display the shortcut menu. Track the right mouse
+    // button.
+
+    TrackPopupMenu(hmenuTrackPopup,
+            TPM_LEFTALIGN | TPM_RIGHTBUTTON,
+            pt.x, pt.y, 0, hwnd, NULL);
+
+    // Destroy the menu.
+
+    //DestroyMenu(hmenu);
 }
 
-VOID APIENTRY DisplayContextMenu(HWND hwnd, POINT pt, HMENU hmenu) 
-{ 
-    //HMENU hmenu;            // top-level menu 
-    HMENU hmenuTrackPopup;  // shortcut menu 
- 
-    // Load the menu resource. 
- 
-    //if ((hmenu = LoadMenu(hinst, "ShortcutExample")) == NULL) 
-    //    return; 
- 
-    // TrackPopupMenu cannot display the menu bar so get 
-    // a handle to the first shortcut menu. 
- 
-    hmenuTrackPopup = hmenu; //GetSubMenu(hmenu, 0); 
- 
-    // Display the shortcut menu. Track the right mouse 
-    // button. 
- 
-    TrackPopupMenu(hmenuTrackPopup, 
-            TPM_LEFTALIGN | TPM_RIGHTBUTTON, 
-            pt.x, pt.y, 0, hwnd, NULL); 
- 
-    // Destroy the menu. 
- 
-    //DestroyMenu(hmenu); 
-}
- 
-                                          
-BOOL WINAPI OnContextMenu(HWND hwnd, int x, int y, HMENU hmenu) 
-{ 
-    RECT rc;                    // client area of window 
-    POINT pt;                   // location of mouse click 
-    
+
+BOOL WINAPI OnContextMenu(HWND hwnd, int x, int y, HMENU hmenu)
+{
+    RECT rc;                    // client area of window
+    POINT pt;                   // location of mouse click
+
     pt.x = x;
     pt.y = y;
-    // Get the bounding rectangle of the client area. 
- 
-    GetClientRect(hwnd, &rc); 
- 
-    // Convert the mouse position to client coordinates. 
- 
-    ScreenToClient(hwnd, &pt); 
- 
-    // If the position is in the client area, display a  
-    // shortcut menu. 
- 
-    if (PtInRect(&rc, pt)) 
-    { 
-        ClientToScreen(hwnd, &pt); 
-        DisplayContextMenu(hwnd, pt, hmenu); 
-        return TRUE; 
-    } 
- 
-    // Return FALSE if no menu is displayed. 
- 
-    return FALSE; 
-} 
+    // Get the bounding rectangle of the client area.
+
+    GetClientRect(hwnd, &rc);
+
+    // Convert the mouse position to client coordinates.
+
+    ScreenToClient(hwnd, &pt);
+
+    // If the position is in the client area, display a
+    // shortcut menu.
+
+    if (PtInRect(&rc, pt))
+    {
+        ClientToScreen(hwnd, &pt);
+        DisplayContextMenu(hwnd, pt, hmenu);
+        return TRUE;
+    }
+
+    // Return FALSE if no menu is displayed.
+
+    return FALSE;
+}
 
 
 HB_FUNC( WG_ONCONTEXTMENU )
@@ -123,6 +123,6 @@ HB_FUNC( WG_ONCONTEXTMENU )
    int   x     =         hb_parni( 2 );  // x position
    int   y     =         hb_parni( 3 );  // y position
    HMENU hmenu = (HMENU) hb_parnl( 4 );  // Menu handle
-   
+
    hb_retl( (BOOL) OnContextMenu( hwnd, x, y, hmenu) );
 }

@@ -19,7 +19,8 @@
 #include "woopgui.ch"
 #include "common.ch"
 #include "hbclass.ch"
-#include "windows.ch"
+#include "winuser.ch"
+#include "commctrl.ch"
 
 // Windows definitions
 CLASS TButton FROM TControl

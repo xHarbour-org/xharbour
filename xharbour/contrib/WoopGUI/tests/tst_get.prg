@@ -1,3 +1,4 @@
+#include "wingdi.ch"
 
 PROCEDURE GetTest( oWnd )
    local oDlg
