@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1682 2003/11/10 01:06:37 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.1683 2003/11/10 01:48:28 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,39 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-11-10 12:19 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
+  * xharbour/include/hbdbsort.h
+  * xharbour/include/hbrdddbf.h
+  * xharbour/include/hbrdddbt.h
+  * xharbour/include/hbrddfpt.h
+    ! typo in macro name fixed
+
+  * xharbour/include/hbrddntx.h
+    ! _NTXHEADER fixed
+
+  * xharbour/include/hbrddcdx.h
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! possible memory leak fixed
+    * small improvment in balancing
+
+  * xharbour/make_tgz.sh
+    + optional contrib libs added to xhb* scripts
+
+  * xharbour/make_rpm.sh
+  * xharbour/xharbour.spec
+    + optional contrib libs added to xhb* scripts
+    ! changed very dangerous file right
+    + new optional switches to build contrib libs
+      --with adsrdd - build ads RDD
+      --with mysql  - build mysql lib
+      --with odbc   - build build odbc lib
+      --without nf  - do not build nanforum lib
+      --without ct  - do not build clipper tools lib
+      --with hrbsh  - build /etc/profile.d/harb.sh
+                      (not recommended, I added it only for compatibility
+                      with older versions)
+      by default make_rpm check if mysql-devel and/or unixODBC-devel are
+      installed and set --with mysql and/or --with odbc
 
 2003-11-10 01:34 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/hash.c

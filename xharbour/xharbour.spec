@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.33 2003/09/17 12:45:10 druzus Exp $
+# $Id: xharbour.spec,v 1.34 2003/10/22 21:42:50 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -9,6 +9,16 @@
 #
 # See doc/license.txt for licensing terms.
 # ---------------------------------------------------------------
+
+######################################################################
+# Conditional build:
+# --with adsrdd      - build ads RDD
+# --with mysql       - build mysql lib
+# --with odbc        - build build odbc lib
+# --with hrbsh       - build /etc/profile.d/harb.sh (not necessary)
+# --without nf       - do not build nanforum lib
+# --without ct       - do not build clipper tools lib
+######################################################################
 
 ######################################################################
 ## Definitions.
@@ -39,8 +49,8 @@
 %define hb_mt    MT
 %define hb_mgt   yes
 %define hb_lnkso yes
-%define hb_libs  vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca odbc ct debug profiler
-
+%define hb_libs  vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca hbodbc ct debug profiler
+%define hb_libsc nf rddads
 %define hb_cc    export HB_COMPILER=gcc
 %define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 %define hb_arch  export HB_ARCHITECTURE=linux
@@ -71,7 +81,8 @@ Vendor:         %{hb_host}
 URL:            http://%{hb_host}/
 Source:         %{name}-%{version}.src.tar.gz
 Packager:       Przemys³aw Czerpak <druzus@polbox.com> Luiz Rafael Culik Guimaraes <culikr@uol.com.br>
-BuildPrereq:    gcc binutils bash bison ncurses ncurses-devel slang-devel gpm-devel
+BuildPrereq:    gcc binutils bash bison ncurses ncurses-devel gpm-devel
+%{?_with_odbc:BuildRequires: unixODBC-devel}
 Requires:       gcc binutils bash sh-utils %{name}-lib = %{version}
 Provides:       %{name} harbour
 BuildRoot:      /tmp/%{name}-%{version}-root
@@ -149,15 +160,20 @@ dos os programas
 
 %package contrib
 Summary:        Contrib runtime libaries for %{dname} compiler
-Summary(pl):    Contrib bilioteki dla kompilatora %{dname}
-Summary(pt_BR):  Libs contrib para  %{dname}
+Summary(pl):    Bilioteki z drzewa contrib dla kompilatora %{dname}
+Summary(pt_BR): Libs contrib para %{dname}
 Group:          Development/Languages
 Requires:       %{name} = %{version}
+%{?_with_mysql:BuildRequires: mysql-devel}
 
 %description contrib
 %{dname} is a Clipper compatible compiler.
 This package provides %{dname} contrib libraries for program linking.
 
+%description -l pl contrib
+%{dname} to kompatybilny z jêzykiem CA-Clipper kompilator.
+Ten pakiet udostêpnia statyczne bilioteki z drzewa contrib dla
+kompilatora %{dname}
 
 %description -l pt_BR contrib
 %{dname} ‚ um compilador compativel com o clippe.
@@ -228,22 +244,14 @@ rm -rf $RPM_BUILD_ROOT
 
 make
 
-# build CT lib
-pushd contrib/libct
-    make
-popd
-
-pushd contrib/rdd_ads
-    make
-popd
-
-pushd contrib/libnf
-    make
-popd
-
-pushd contrib/mysql
-    make
-popd
+# build contrib libraries
+libs="%{!?_without_ct: libct} %{!?_without_nf: libnf} %{?_with_adsrdd: rdd_ads} %{?_with_mysql: mysql}"
+for l in $libs
+do
+    pushd contrib/$l
+        make
+    popd
+done
 
 ######################################################################
 ## Install.
@@ -267,22 +275,14 @@ mkdir -p $RPM_BUILD_ROOT/usr/lib
 
 make -i install
 
-# install CT lib
-pushd contrib/libct
-    make -i install
-popd
-
-pushd contrib/rdd_ads
-    make -i install
-popd
-
-pushd contrib/libnf
-    make -i install
-popd
-
-pushd contrib/mysql
-    make -i install
-popd
+# install contrib libraries
+libs="%{!?_without_ct: libct} %{!?_without_nf: libnf} %{?_with_adsrdd: rdd_ads} %{?_with_mysql: mysql}"
+for l in $libs
+do
+    pushd contrib/$l
+        make -i install
+    popd
+done
 
 # build fm lib with memory statistic
 pushd source/vm
@@ -469,12 +469,12 @@ fi
 
 HARBOUR_LIBS=""
 if [ "\${HB_STATIC}" = "yes" ]; then
-    libs="%{hb_libs}"
+    libs="%{hb_libs} %{hb_libsc}"
 else
     l="%{name}"
     [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.so" ] && l="\${l}mt"
     [ -f "\${HB_LIB_INSTALL}/lib\${l}.so" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
-    libs="debug profiler"
+    libs="debug profiler %{hb_libsc}"
 fi
 for l in \${libs}
 do
@@ -603,7 +603,7 @@ mkdir -p $RPM_BUILD_ROOT/etc/{harbour,profile.d}
 install -m644 source/rtl/gtcrs/hb-charmap.def $RPM_BUILD_ROOT/etc/harbour/hb-charmap.def
 cat > $RPM_BUILD_ROOT/etc/harbour.cfg <<EOF
 CC=gcc
-CFLAGS=-c -I$_DEFAULT_INC_DIR -O2
+CFLAGS=-c -I$_DEFAULT_INC_DIR -O3
 VERBOSE=YES
 DELTMP=YES
 EOF
@@ -616,9 +616,9 @@ cat > $RPM_BUILD_ROOT/etc/profile.d/harb.sh <<EOF
 %{hb_ldir}
 %{hb_cgt}
 export HB_LEX="SIMPLEX"
-export C_USR="-DHB_FM_STATISTICS_OFF -O2"
+export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 EOF
-chmod 777 $RPM_BUILD_ROOT/etc/profile.d/harb.sh
+chmod 755 $RPM_BUILD_ROOT/etc/profile.d/harb.sh
 
 # Create PP
 pushd tests
@@ -759,8 +759,6 @@ EOF
 ######################################################################
 ## Post install
 ######################################################################
-%post
-/etc/profile.d/harb.sh
 %post lib
 /sbin/ldconfig
 
@@ -791,7 +789,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir /etc/harbour
 /etc/harbour.cfg
-/etc/profile.d/harb.sh
+%{?_with_hrbsh:/etc/profile.d/harb.sh}
 /etc/harbour/hb-charmap.def
 %{prefix}/bin/harbour
 %{prefix}/bin/hb-mkslib
@@ -827,7 +825,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/lib/%{name}/libgtpca.a
 %{prefix}/lib/%{name}/libgtsln.a
 %{prefix}/lib/%{name}/libgtstd.a
-%{prefix}/lib/%{name}/libhbodbc.a
+%{?_with_odbc: %{prefix}/lib/%{name}/libhbodbc.a}
 %{prefix}/lib/%{name}/liblang.a
 %{prefix}/lib/%{name}/libmacro.a
 %{prefix}/lib/%{name}/libmacromt.a
@@ -837,15 +835,14 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/lib/%{name}/librtl*.a
 %{prefix}/lib/%{name}/libsamples.a
 %{prefix}/lib/%{name}/libvm*.a
-
+%{!?_without_ct: %{prefix}/lib/%{name}/libct*.a}
 
 %files contrib
 %defattr(-,root,root,755)
 %dir %{prefix}/lib/%{name}
-%{prefix}/lib/%{name}/libct*.a
-%{prefix}/lib/%{name}/libnf*.a
-%{prefix}/lib/%{name}/librddads*.a
-%{prefix}/lib/%{name}/libmysql*.a
+%{!?_without_nf: %{prefix}/lib/%{name}/libnf*.a}
+%{?_with_adsrdd: %{prefix}/lib/%{name}/librddads*.a}
+%{?_with_mysql: %{prefix}/lib/%{name}/libmysql*.a}
 
 %files lib
 %defattr(-,root,root,755)

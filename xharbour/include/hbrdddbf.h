@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.3 2003/05/31 22:26:54 lculik Exp $
+ * $Id: hbrdddbf.h,v 1.4 2003/09/08 12:56:52 druzus Exp $
  */
 
 /*
@@ -154,7 +154,7 @@ typedef DBFAREA * LPDBFAREA;
 #endif
 
 
-#ifndef HB_EXTRANAL_RDDDBF_USE
+#ifndef HB_EXTERNAL_RDDDBF_USE
 
 /*
  * -- DBF METHODS --
@@ -260,7 +260,7 @@ static BOOL    hb_dbfExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex );
 
 #define hb_dbfWhoCares                             NULL
 
-#endif /* HB_EXTRANAL_RDDDBF_USE */
+#endif /* HB_EXTERNAL_RDDDBF_USE */
 
 #if defined(HB_EXTERN_C)
 }

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.16 2003/09/11 17:59:01 druzus Exp $
+# $Id: make_tgz.sh,v 1.17 2003/11/04 08:31:01 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -34,7 +34,8 @@ name="xharbour"
 hb_ver=`get_hbver`
 hb_lnkso="yes"
 hb_pref="xhb"
-hb_libs="vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca odbc ct debug profiler"
+hb_libs="vm pp rtl rdd dbfdbt dbffpt dbfcdx dbfntx macro common lang codepage gtnul gtcrs gtsln gtcgi gtstd gtpca hbodbc ct debug profiler"
+hb_libsc="nf rddads"
 export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 if [ -z "$HB_ARCHITECTURE" ]; then export HB_ARCHITECTURE=linux; fi
 if [ -z "$HB_COMPILER" ]; then export HB_COMPILER=gcc; fi
@@ -261,12 +262,12 @@ fi
 
 HARBOUR_LIBS=""
 if [ "\${HB_STATIC}" = "yes" ]; then
-    libs="${hb_libs}"
+    libs="${hb_libs} ${hb_libsc}"
 else
     l="${name}"
     [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.so" ] && l="\${l}mt"
     [ -f "\${HB_LIB_INSTALL}/lib\${l}.so" ] && HARBOUR_LIBS="\${HARBOUR_LIBS} -l\${l}"
-    libs="debug profiler"
+    libs="debug profiler ${hb_libsc}"
 fi
 for l in \${libs}
 do

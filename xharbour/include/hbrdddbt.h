@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbt.h,v 1.1 2003/09/08 12:56:52 druzus Exp $
+ * $Id: hbrdddbt.h,v 1.2 2003/09/09 09:47:16 paultucker Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
 #endif
-#define HB_EXTRANAL_RDDDBF_USE
+#define HB_EXTERNAL_RDDDBF_USE
 #include "hbrdddbf.h"
 
 #if defined(HB_EXTERN_C)

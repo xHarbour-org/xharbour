@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbsort.h,v 1.2 2002/01/26 21:13:58 ronpinkas Exp $
+ * $Id: hbdbsort.h,v 1.3 2003/09/08 12:56:52 druzus Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 #ifndef HB_DBSORT_H_
 #define HB_DBSORT_H_
 
-#define HB_EXTRANAL_RDDDBF_USE
+#define HB_EXTERNAL_RDDDBF_USE
 #include "hbrdddbf.h"
 
 #if defined(HB_EXTERN_C)

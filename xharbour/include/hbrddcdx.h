@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.18 2003/11/04 18:00:30 ronpinkas Exp $
+ * $Id: hbrddcdx.h,v 1.19 2003/11/05 03:32:48 druzus Exp $
  */
 
 /*
@@ -412,6 +412,7 @@ typedef struct _CDXAREA
    BOOL       fCdxAppend;        /* Appended record changed */
    LPCDXINDEX lpIndexes;         /* Pointer to indexes array  */
    USHORT     uiTag;             /* current tag focus */
+   BYTE *     bCdxSortTab;       /* Table with storted characters */
 
 } CDXAREA;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.12 2003/07/23 12:35:57 druzus Exp $
+ * $Id: hbrddntx.h,v 1.13 2003/09/08 12:56:52 druzus Exp $
  */
 
 /*
@@ -194,8 +194,8 @@ typedef struct _NTXHEADER    /* Header of NTX file */
    char     descend;
    char     unknown2;
    char     for_expr[ NTX_MAX_KEY ];
-   char     custom;
    char     tag_name[ 12 ];
+   char     custom;
 } NTXHEADER;
 
 typedef NTXHEADER * LPNTXHEADER;
