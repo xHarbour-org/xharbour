@@ -1,12 +1,18 @@
 
 /*
- * $Id: _winsys.c,v 1.19 2003/12/11 10:23:35 vouchcac Exp $
+ * $Id: _winsys.c,v 1.20 2004/03/18 04:11:10 ronpinkas Exp $
  */
 
-// WHAT32
-
-// System Services
-
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//
+//                              WHAT32
+//                          System Services
+//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
+//-------------------------------------------------------------------//
 /*
  * Some parts Copyright 2001 Alexander S.Kresin <alex@belacy.belgorod.su>
  * with author's permission granted on 27 MAy 2002
@@ -19,47 +25,52 @@
    VirtualQuery()      - may not be functional, always seems to return error
    VirtualLock()       - may not be functional, always seems to return error
  */
+//-------------------------------------------------------------------//
 
-
-
+#define WINVER         0X0400
+#define HB_OS_WIN_32_USED
 #define _WIN32_WINNT   0x0400
 
-#include <windows.h>
-#include <shlobj.h>
-//#include <commctrl.h>
+//-------------------------------------------------------------------//
 
+#include <shlobj.h>
+#include <windows.h>
 #include <htmlhelp.h>
+
 #include "hbapi.h"
 #include "hbvm.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
 
+//-------------------------------------------------------------------//
+
 BOOL PASCAL enable_privilege( LPCTSTR privilege_name );
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI DWORD WINAPI GetFreeSpace(UINT);
-
-
+//
 HB_FUNC( GETFREESPACE )
 {
    hb_retnl( (LONG) GetFreeSpace( (UINT) hb_parni( 1 ) ) ) ;
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 
 HB_FUNC ( OUTPUTDEBUGSTRING )
 {
    OutputDebugString( (LPCSTR) hb_parcx( 1 ) ) ;
 }
 
-//-----------------------------------------------------------------------------
-//DWORD GetTimeZoneInformation(LPTIME_ZONE_INFORMATION lpTimeZoneInformation)
-
+//-------------------------------------------------------------------//
+//
+// DWORD GetTimeZoneInformation(LPTIME_ZONE_INFORMATION lpTimeZoneInformation)
+//
 // SYNTAX:
 // cTZI:=tzi:value
 // GetTimeZoneInformation(@cTZI)
 // tzi:Buffer(cTZI)
-
+//
 HB_FUNC( GETTIMEZONEINFORMATION )
 {
  TIME_ZONE_INFORMATION tzi;
@@ -68,14 +79,14 @@ HB_FUNC( GETTIMEZONEINFORMATION )
 
  if ( ISBYREF(1) )
     hb_storclen( (char*) &tzi, sizeof(tzi), 1);
-
 }
 
-//-----------------------------------------------------------------------------
-//BOOL SetTimeZoneInformation(TIME_ZONE_INFORMATION *TimeZoneInformation)
-
+//-------------------------------------------------------------------//
+//
+// BOOL SetTimeZoneInformation(TIME_ZONE_INFORMATION *TimeZoneInformation)
+//
 // SYNTAX: SetTimeZoneInformation(tzi:value)
-
+//
 HB_FUNC( SETTIMEZONEINFORMATION )
 {
  TIME_ZONE_INFORMATION *tzi = ( TIME_ZONE_INFORMATION *) hb_param( 1, HB_IT_STRING )->item.asString.value ;
@@ -84,30 +95,28 @@ HB_FUNC( SETTIMEZONEINFORMATION )
 
 }
 
-//-----------------------------------------------------------------------------
-
+//-------------------------------------------------------------------//
+//
 // Win98 ++
-
 /*
 HB_FUNC ( ISDEBUGGERPRESENT )
 {
    hb_retl( IsDebuggerPresent() ) ;
 }
 */
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI VOID WINAPI DebugBreak( VOID );
-
-
+//
 HB_FUNC( DEBUGBREAK )
 {
    DebugBreak(  ) ;
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINADVAPI BOOL WINAPI EncryptFileA( IN LPCSTR lpFileName );
-
+//
 // NT ?
 /*
 HB_FUNC( ENCRYPTFILE )
@@ -116,9 +125,10 @@ HB_FUNC( ENCRYPTFILE )
 }
 */
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINADVAPI BOOL WINAPI DecryptFileA( IN LPCSTR lpFileName, IN DWORD dwReserved );
-
+//
 // NT ?
 /*
 HB_FUNC( DECRYPTFILE )
@@ -127,11 +137,10 @@ HB_FUNC( DECRYPTFILE )
 }
 */
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINADVAPI BOOL WINAPI FileEncryptionStatusA( LPCSTR lpFileName, LPDWORD lpStatus );
-
 /*
-
 // need function info !
 
 HB_FUNC( FILEENCRYPTIONSTATUSA )
@@ -142,35 +151,31 @@ HB_FUNC( FILEENCRYPTIONSTATUSA )
 
    hb_retl( FileEncryptionStatusA( (LPCSTR) hb_parcx( 1 ), lpStatus ) ) ;
 }
-
 */
-
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI BOOL WINAPI IsProcessorFeaturePresent( IN DWORD ProcessorFeature );
-
-
+//
 HB_FUNC( ISPROCESSORFEATUREPRESENT )
 {
    hb_retl( IsProcessorFeaturePresent( (DWORD) hb_parnl( 1 ) ) ) ;
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI int WINAPI MulDiv( IN int nNumber, IN int nNumerator, IN int nDenominator );
-
 
 HB_FUNC( MULDIV )
 {
    hb_retni( MulDiv( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ) ) ) ;
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINUSERAPI BOOL WINAPI SystemParametersInfoA( IN UINT uiAction, IN UINT uiParam, IN OUT PVOID pvParam, IN UINT fWinIni);
-
+//
 // note: correct parameters must be passed, as per API requirements
-
+//
 HB_FUNC( SYSTEMPARAMETERSINFO )
 {
    char *cText;
@@ -204,38 +209,34 @@ HB_FUNC( SYSTEMPARAMETERSINFO )
    }
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI BOOL WINAPI FreeResource( IN HGLOBAL hResData );
-
+//
 HB_FUNC( FREERESOURCE )
 {
    hb_retl( FreeResource( (HGLOBAL) hb_parnl( 6 )) ) ;
 }
 
-
-
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINUSERAPI VOID WINAPI SetDebugErrorLevel( IN DWORD dwLevel );
-
-
+//
 HB_FUNC( SETDEBUGERRORLEVEL )
 {
    SetDebugErrorLevel( (DWORD) hb_parnl( 1 ) ) ;
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINUSERAPI VOID WINAPI SetLastErrorEx( IN DWORD dwErrCode, IN DWORD dwType );
-
-
+//
 HB_FUNC( SETLASTERROREX )
 {
    SetLastErrorEx( (DWORD) hb_parnl( 1 ), (DWORD) hb_parnl( 2 ) ) ;
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 /*
 HANDLE GetStdHandle(DWORD nStdHandle )  // input, output, or error device
 */
@@ -245,8 +246,7 @@ HB_FUNC ( GETSTDHANDLE )
    hb_retnl( (LONG) GetStdHandle( (DWORD) hb_parnl(1) ) ) ;
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 /*
 BOOL SetStdHandle(
                   DWORD nStdHandle,  // input, output, or error device
@@ -259,17 +259,17 @@ HB_FUNC ( SETSTDHANDLE )
    hb_retl( SetStdHandle( (DWORD) hb_parnl(1), (HANDLE) hb_parnl(2) ) ) ;
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 /*
 BOOL SetConsoleTitle(LPCSTR szTitle )
 */
 
 HB_FUNC ( SETCONSOLETITLE )
 {
-   hb_retnl( (LONG) SetConsoleTitle( (LPCSTR) hb_parcx(1) ) ) ;
+   hb_retnl( ( LONG ) SetConsoleTitle( ( LPCSTR ) hb_parcx( 1 ) ) ) ;
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 /*
 WINBASEAPI HANDLE WINAPI GetConsoleWindow(void);
 Note: The real API is only supported on Windows 2000 and above, so we do a nasty
@@ -279,35 +279,31 @@ Note: The real API is only supported on Windows 2000 and above, so we do a nasty
       3) use FindWindow to find the window handle of the window with our text
       4) restore the original text
 */
-
 HB_FUNC ( GETCONSOLEWINDOW )
 {
-   char realtitle[MAX_PATH];
+   char realtitle[ MAX_PATH ];
 
-   GetConsoleTitle(realtitle,MAX_PATH);
-   SetConsoleTitle("Finding Handle");
-   hb_retnl( (LONG) FindWindow(NULL,"Finding Handle"));
-   SetConsoleTitle(realtitle);
+   GetConsoleTitle( realtitle,MAX_PATH );
+   SetConsoleTitle( "Finding Handle" );
+   hb_retnl( ( LONG ) FindWindow( NULL,"Finding Handle" ) );
+   SetConsoleTitle( realtitle );
 }
 
-
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINUSERAPI int WINAPI GetSystemMetrics( IN int nIndex);
-
-
+//
 HB_FUNC( GETSYSTEMMETRICS )
 {
    hb_retni( GetSystemMetrics( hb_parni( 1 ) ) ) ;
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINUSERAPI UINT_PTR WINAPI SetTimer( IN HWND hWnd, IN UINT_PTR nIDEvent, IN UINT uElapse, IN TIMERPROC lpTimerFunc);
-
+//
 HB_FUNC( SETTIMER )
 {
-
    hb_retni( SetTimer( (HWND) hb_parnl( 1 ),
                        (UINT) hb_parni( 2 ),
                        (UINT) hb_parni( 3 ),
@@ -315,49 +311,44 @@ HB_FUNC( SETTIMER )
                       ) ) ;
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINUSERAPI BOOL WINAPI KillTimer( IN HWND hWnd, IN UINT_PTR uIDEvent);
-
+//
 HB_FUNC( KILLTIMER )
 {
-
    hb_retl( KillTimer( (HWND) hb_parnl( 1 ), (UINT) hb_parni(2) ) ) ;
-
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 
 HB_FUNC ( GETSYSCOLOR )
 {
   hb_retnl( GetSysColor( hb_parni(1) ) ) ;
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINUSERAPI BOOL WINAPI ExitWindowsEx( IN UINT uFlags, IN DWORD dwReserved);
-
-
+//
 HB_FUNC( EXITWINDOWSEX )
 {
    hb_retl( ExitWindowsEx( (UINT) hb_parni( 1 ), (DWORD) hb_parnl( 2 ) ) ) ;
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINUSERAPI HBRUSH WINAPI GetSysColorBrush( IN int nIndex);
-
-
+//
 HB_FUNC( GETSYSCOLORBRUSH )
 {
    hb_retnl( (LONG) GetSysColorBrush( hb_parni( 1 ) ) ) ;
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINUSERAPI BOOL WINAPI SetSysColors( IN int cElements, IN CONST INT * lpaElements, IN CONST COLORREF * lpaRgbValues);
-
 /*
-
 HB_FUNC( SETSYSCOLORS )
 {
    COLORREF lpaRgbValues ;
@@ -366,154 +357,145 @@ HB_FUNC( SETSYSCOLORS )
 
    hb_retl( SetSysColors( hb_parni( 1 ), hb_parni( 2 ), &lpaRgbValues ) ) ;
 }
-
 */
+//-------------------------------------------------------------------//
 
-
-
-//----------------------------------------------------------------------------
-
-HB_FUNC ( AND )
+HB_FUNC( AND )
 {
   hb_retnl( hb_parnl(1) & hb_parnl(2) ) ;
 }
 
-//----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 
-HB_FUNC ( OR )
+HB_FUNC( OR )
 {
   hb_retnl( hb_parnl(1) | hb_parnl(2) ) ;
 }
 
-//----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 
 HB_FUNC( NOT )
 {
    hb_retnl( ~( hb_parnl(1) ) ) ;
 }
 
+//-------------------------------------------------------------------//
 
-//-----------------------------------------------------------------------------
-
-HB_FUNC ( _GETINSTANCE )
+HB_FUNC( _GETINSTANCE )
 {
    hb_retnl( (LONG) GetModuleHandle( NULL ) );
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 
-HB_FUNC ( LOWORD )
+HB_FUNC( LOWORD )
 {
    hb_retni( (int) ( hb_parnl( 1 ) & 0xFFFF ) );
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 
-HB_FUNC ( HIWORD )
+HB_FUNC( HIWORD )
 {
    hb_retni( (int) ( ( hb_parnl( 1 ) >> 16 ) & 0xFFFF ) );
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 
-HB_FUNC (MAKELONG )
+HB_FUNC( MAKELONG )
 {
 
    hb_retnl( ((LONG) (((WORD) (hb_parni(1))) | ((DWORD) ((WORD) (hb_parni(2)))) << 16)) ) ;
 }
 
+//-------------------------------------------------------------------//
 
-//-----------------------------------------------------------------------------
-
-HB_FUNC (GETLASTERROR )
+HB_FUNC( GETLASTERROR )
 {
-  hb_retnl( (LONG) GetLastError() ) ;
+  hb_retnl( ( LONG ) GetLastError() ) ;
 }
 
-//-----------------------------------------------------------------------------
-
+//-------------------------------------------------------------------//
+//
 // T.B.D.
 // returns error message text
-
 /*
 HB_FUNC( FORMATMESSAGE)
 {
-
-   hb_retnl( FormatMessage( (DWORD) hb_parnl( 1 )           ,   // source and processing options
-                            ISNIL( 2) ? NULL : hb_parcx( 2 ) ,   // pointer to  message source
-                            (DWORD) hb_parnl( 3 )           ,  // requested message identifier
-                            (DWORD) hb_parnl( 4 )           , // language identifier for requested message
-  LPTSTR lpBuffer,    // pointer to message buffer
-  DWORD nSize,        // maximum size of message buffer
-  va_list *Arguments  // pointer to array of message inserts
-);
-
+   hb_retnl( FormatMessage( (DWORD) hb_parnl( 1 )            ,  // source and processing options
+                            ISNIL( 2) ? NULL : hb_parcx( 2 ) ,  // pointer to  message source
+                            (DWORD) hb_parnl( 3 )            ,  // requested message identifier
+                            (DWORD) hb_parnl( 4 )            ,  // language identifier for requested message
+                            LPTSTR lpBuffer                  ,  // pointer to message buffer
+                            DWORD nSize                      ,  // maximum size of message buffer
+                            va_list *Arguments                  // pointer to array of message inserts
+           );
 }
 */
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI VOID WINAPI SetLastError( IN DWORD dwErrCode );
-
-
+//
 HB_FUNC( SETLASTERROR )
 {
    SetLastError( (DWORD) hb_parnl( 1 ) ) ;
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI UINT WINAPI SetErrorMode( IN UINT uMode );
-
-
+//
 HB_FUNC( SETERRORMODE )
 {
    hb_retni( SetErrorMode( (UINT) hb_parni( 1 ) ) ) ;
 }
 
-
-//-----------------------------------------------------------------------------
-
+//-------------------------------------------------------------------//
 
 HB_FUNC( OEMTOANSI )
 {
-   char *buffer = hb_parcx(1);
+   char *buffer = hb_parcx( 1 );
+
    OemToChar( buffer, buffer );
    hb_retc( buffer );
 }
 
-//-----------------------------------------------------------------------------
-
+//-------------------------------------------------------------------//
 
 HB_FUNC( ANSITOOEM )
 {
    char *buffer = hb_parcx(1);
+
    CharToOem( buffer, buffer );
    hb_retc( buffer );
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI DWORD WINAPI GetVersion( VOID );
-
 
 HB_FUNC( GETVERSION )
 {
    hb_retnl( (LONG) GetVersion(  ) ) ;
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI HRSRC WINAPI FindResourceA( IN HMODULE hModule, IN LPCSTR lpName, IN LPCSTR lpType );
-
-
+//
 HB_FUNC( FINDRESOURCE )
 {
    hb_retnl( (LONG) FindResourceA( (HMODULE) hb_parnl( 1 ),
                                    (LPCSTR) hb_parcx( 2 )  ,
                                    (LPCSTR) hb_parcx( 3 )
-                                   ) ) ;
+                                  ) ) ;
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI HRSRC WINAPI FindResourceExA( IN HMODULE hModule, IN LPCSTR lpType, IN LPCSTR lpName, IN WORD wLanguage );
-
+//
 HB_FUNC( FINDRESOURCEEX )
 {
    hb_retnl( (LONG) FindResourceExA( (HMODULE) hb_parnl( 1 ),
@@ -523,11 +505,10 @@ HB_FUNC( FINDRESOURCEEX )
                                      ) ) ;
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI HGLOBAL WINAPI LoadResource( IN HMODULE hModule, IN HRSRC hResInfo );
-
-
+//
 HB_FUNC( LOADRESOURCE )
 {
    hb_retnl( (LONG) LoadResource( (HMODULE) hb_parnl( 1 ),
@@ -535,16 +516,16 @@ HB_FUNC( LOADRESOURCE )
                                  ) ) ;
 }
 
-
-//-----------------------------------------------------------------------------
-//int LoadString(HINSTANCE hInstance,  // handle to module containing string resource
-//               UINT uID,             // resource identifier
-//               LPTSTR lpBuffer,      // pointer to buffer for resource
-//               int nBufferMax        // size of buffer
-//              );
-
+//-------------------------------------------------------------------//
+//
+// int LoadString(HINSTANCE hInstance,  // handle to module containing string resource
+//                UINT uID,             // resource identifier
+//                LPTSTR lpBuffer,      // pointer to buffer for resource
+//                int nBufferMax        // size of buffer
+//                );
+//
 // modified
-
+//
 HB_FUNC( LOADSTRING )
 {
    ULONG iLen = ISNIL(3) ? MAX_PATH : (ULONG) hb_parclen( 3 );
@@ -559,10 +540,10 @@ HB_FUNC( LOADSTRING )
    hb_xfree( cText );
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI DWORD WINAPI SizeofResource( IN HMODULE hModule, IN HRSRC hResInfo );
-
-
+//
 HB_FUNC( SIZEOFRESOURCE )
 {
    hb_retnl( (LONG) SizeofResource( (HMODULE) hb_parnl( 1 ),
@@ -570,23 +551,19 @@ HB_FUNC( SIZEOFRESOURCE )
                                     ) ) ;
 }
 
-
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI LPVOID WINAPI LockResource( IN HGLOBAL hResData );
-
-
+//
 HB_FUNC( LOCKRESOURCE )
 {
    hb_retnl( (LONG) LockResource( (HGLOBAL) hb_parnl( 1 ) ) ) ;
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI DWORD WINAPI LoadModule( IN LPCSTR lpModuleName, IN LPVOID lpParameterBlock );
-
 /*
-
 HB_FUNC( LOADMODULE )
 {
    LPVOID lpParameterBlock ;
@@ -595,22 +572,20 @@ HB_FUNC( LOADMODULE )
 
    hb_retnl( (LONG) LoadModule( (LPCSTR) hb_parcx( 1 ), lpParameterBlock ) ) ;
 }
-
 */
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI BOOL WINAPI Beep( IN DWORD dwFreq, IN DWORD dwDuration );
-
-
+//
 HB_FUNC( TONE )
 {
    hb_retl( Beep( (DWORD) hb_parnl( 1 ), (DWORD) hb_parnl( 2 ) ) ) ;
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI DWORD WINAPI GetModuleFileNameA( IN HMODULE hModule, OUT LPSTR lpFilename, IN DWORD nSize );
-
 
 HB_FUNC( GETMODULEFILENAME )
 {
@@ -622,33 +597,28 @@ HB_FUNC( GETMODULEFILENAME )
    hb_retc(szBuffer);
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI HMODULE WINAPI GetModuleHandleA( IN LPCSTR lpModuleName );
-
-
+//
 HB_FUNC( GETMODULEHANDLE )
 {
-
    hb_retnl( (LONG) GetModuleHandleA( (ISNIL(1) ? NULL : (LPCSTR) hb_parcx( 1 ) ) ) ) ;
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI LPSTR WINAPI GetCommandLineA( VOID );
-
-
+//
 HB_FUNC( GETCOMMANDLINE )
 {
    hb_retc( (LPSTR) GetCommandLine() );
 }
 
-
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI VOID WINAPI GetSystemTime( OUT LPSYSTEMTIME lpSystemTime );
-
 /*
-
 HB_FUNC( GETSYSTEMTIME )
 {
    LPSYSTEMTIME lpSystemTime ;
@@ -657,14 +627,12 @@ HB_FUNC( GETSYSTEMTIME )
 
    GetSystemTime( lpSystemTime ) ;
 }
-
 */
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI BOOL WINAPI SetSystemTime( IN CONST SYSTEMTIME *lpSystemTime );
-
+//
 /*
-
 HB_FUNC( SETSYSTEMTIME )
 {
    SYSTEMTIME CONST lpSystemTime ;
@@ -673,14 +641,11 @@ HB_FUNC( SETSYSTEMTIME )
 
    hb_retl( SetSystemTime( &lpSystemTime ) ) ;
 }
-
 */
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI VOID WINAPI GetLocalTime( OUT LPSYSTEMTIME lpSystemTime );
-
 /*
-
 HB_FUNC( GETLOCALTIME )
 {
    LPSYSTEMTIME lpSystemTime ;
@@ -689,14 +654,11 @@ HB_FUNC( GETLOCALTIME )
 
    GetLocalTime( lpSystemTime ) ;
 }
-
 */
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI BOOL WINAPI SetLocalTime( IN CONST SYSTEMTIME *lpSystemTime );
-
 /*
-
 HB_FUNC( SETLOCALTIME )
 {
    SYSTEMTIME CONST lpSystemTime ;
@@ -705,14 +667,11 @@ HB_FUNC( SETLOCALTIME )
 
    hb_retl( SetLocalTime( &lpSystemTime ) ) ;
 }
-
 */
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI VOID WINAPI GetSystemInfo( OUT LPSYSTEM_INFO lpSystemInfo );
-
 /*
-
 HB_FUNC( GETSYSTEMINFO )
 {
    LPSYSTEM_INFO lpSystemInfo ;
@@ -721,22 +680,19 @@ HB_FUNC( GETSYSTEMINFO )
 
    GetSystemInfo( lpSystemInfo ) ;
 }
-
 */
-
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI DWORD WINAPI GetTickCount( VOID );
-
-
+//
 HB_FUNC( GETTICKCOUNT )
 {
    hb_retnl( (LONG) GetTickCount(  ) ) ;
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI DWORD WINAPI GetLogicalDriveStringsA( IN DWORD nBufferLength, OUT LPSTR lpBuffer );
-
 
 HB_FUNC( GETLOGICALDRIVESTRINGS )
 {
@@ -745,12 +701,11 @@ HB_FUNC( GETLOGICALDRIVESTRINGS )
                                              ) ) ;
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI BOOL WINAPI GetComputerNameA ( OUT LPSTR lpBuffer, IN OUT LPDWORD nSize );
-
-
-
+//
+//
 HB_FUNC( GETCOMPUTERNAME )
 {
    char cText[MAX_COMPUTERNAME_LENGTH+1]  ;
@@ -760,25 +715,21 @@ HB_FUNC( GETCOMPUTERNAME )
 
    hb_storc( cText, 1 ) ;
    hb_stornl( nSize, 2 ) ;
-
 }
 
-
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI BOOL WINAPI SetComputerNameA ( IN LPCSTR lpComputerName );
-
-
+//
 HB_FUNC( SETCOMPUTERNAME )
 {
    hb_retl( SetComputerNameA( (LPCSTR) hb_parcx( 1 ) ) ) ;
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI BOOL WINAPI GetComputerNameExA ( IN COMPUTER_NAME_FORMAT NameType, OUT LPSTR lpBuffer, IN OUT LPDWORD nSize );
-
 /*
-
 HB_FUNC( GETCOMPUTERNAMEEX )
 {
    COMPUTER_NAME_FORMAT NameType ;
@@ -788,14 +739,11 @@ HB_FUNC( GETCOMPUTERNAMEEX )
 
    hb_retl( GetComputerNameExA( NameType, (LPSTR) hb_parcx( 2 ), nSize ) ) ;
 }
-
 */
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI BOOL WINAPI SetComputerNameExA ( IN COMPUTER_NAME_FORMAT NameType, IN LPCSTR lpBuffer );
-
 /*
-
 HB_FUNC( SETCOMPUTERNAMEEX )
 {
    COMPUTER_NAME_FORMAT NameType ;
@@ -804,14 +752,11 @@ HB_FUNC( SETCOMPUTERNAMEEX )
 
    hb_retl( SetComputerNameExA( NameType, (LPCSTR) hb_parcx( 2 ) ) ) ;
 }
-
 */
-
- //-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINADVAPI BOOL WINAPI GetUserNameA ( OUT LPSTR lpBuffer, IN OUT LPDWORD nSize );
-
-
-
+//
 HB_FUNC( GETUSERNAME )
 {
    DWORD nSize    ;
@@ -822,14 +767,10 @@ HB_FUNC( GETUSERNAME )
    hb_stornl( ( LONG ) nSize , 2 ) ;
 }
 
-
-
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI BOOL WINAPI GetVersionExA( IN OUT LPOSVERSIONINFOA lpVersionInformation );
-
-
-
+//
 HB_FUNC( GETVERSIONEX )
 {
    BOOL bGetVer;
@@ -842,13 +783,10 @@ HB_FUNC( GETVERSIONEX )
    hb_retl( bGetVer );
 }
 
-
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINBASEAPI BOOL WINAPI VerifyVersionInfoA( IN LPOSVERSIONINFOEXA lpVersionInformation, IN DWORD dwTypeMask, IN DWORDLONG dwlConditionMask );
-
 /*
-
 HB_FUNC( VERIFYVERSIONINFO )
 {
    LPOSVERSIONINFOEXA lpVersionInformation ;
@@ -860,31 +798,27 @@ HB_FUNC( VERIFYVERSIONINFO )
                                 (DWORDLONG) hb_parnl( 3 )
                                 ) ) ;
 }
-
 */
-
-
-//--------------------------------------------
-
-// The next 3 functions should go to _WinMDI.c
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
+//         The next 3 functions should go to _WinMDI.c
+//
+//-------------------------------------------------------------------//
+//
 // WINUSERAPI UINT WINAPI ArrangeIconicWindows( IN HWND hWnd);
-
-
+//
 HB_FUNC( ARRANGEICONICWINDOWS )
 {
    hb_retni( ArrangeIconicWindows( (HWND) hb_parnl( 1 ) ) ) ;
 }
 
 
-   //-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINUSERAPI WORD WINAPI TileWindows( IN HWND hwndParent, IN UINT wHow, IN CONST RECT * lpRect, IN UINT cKids, IN const HWND FAR * lpKids);
-
+//
 // move to MDI
-
 /*
-
 HB_FUNC( TILEWINDOWS )
 {
    RECT lpRect     ;
@@ -898,16 +832,14 @@ HB_FUNC( TILEWINDOWS )
                           (HWND) hb_parnl( 5 )
                         ) ) ;
 }
-
 */
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINUSERAPI WORD WINAPI CascadeWindows( IN HWND hwndParent, IN UINT wHow, IN CONST RECT * lpRect, IN UINT cKids, IN const HWND FAR * lpKids);
-
+//
 // move to MDI
-
+//
 /*
-
 HB_FUNC( CASCADEWINDOWS )
 {
    RECT lpRect     ;
@@ -921,18 +853,13 @@ HB_FUNC( CASCADEWINDOWS )
                              (HWND) hb_parnl( 5 )
                            ) ) ;
 }
-
 */
-
-
-
-
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
+//
 // WINUSERAPI BOOL WINAPI WinHelpA( IN HWND hWndMain, IN LPCSTR lpszHelp, IN UINT uCommand, IN ULONG_PTR dwData );
-
+//
 // need to verify 4th parameter !
-
+//
 HB_FUNC( WINHELP )
 {
       hb_retl( WinHelp( (HWND) hb_parnl( 1 ) ,
@@ -942,10 +869,10 @@ HB_FUNC( WINHELP )
                    ) ) ;
 }
 
-//-----------------------------------------------------------------------------
-
+//-------------------------------------------------------------------//
+//
 // HWND HtmlHelp(HWND hwndCaller, LPCSTR pszFile, UINT uCommand, DWORD dwData);
-
+//
 //
 //  HtmlHelp( hWndCaller,        ;  // Handle of caller window, can be GetDeskTopWindow()
 //            cFullPathAndTopic  )  // C:\Creative.acp\Help\VVouch.htm::default.htm
@@ -956,8 +883,6 @@ HB_FUNC( WINHELP )
 //  To create a .chm file, you need to work with Microsoft's
 //  free HtmlHelp Workshop doanloadable from MSDN
 //
-
-
 /*
 HB_FUNC(HTMLHELP)
 {
@@ -969,11 +894,9 @@ HB_FUNC(HTMLHELP)
                           )
          ) ;
 }
-
 */
-
-//-----------------------------------------------------------------------------
- /*
+//-------------------------------------------------------------------//
+/*
  HANDLE CreateFile(
   LPCTSTR lpFileName,          // pointer to name of the file
   DWORD dwDesiredAccess,       // access (read-write) mode
@@ -986,7 +909,6 @@ HB_FUNC(HTMLHELP)
                                // copy
 );
 */
-
 HB_FUNC( CREATEFILE )
 {
 
@@ -1005,21 +927,18 @@ HB_FUNC( CREATEFILE )
 
 }
 
-
-//-----------------------------------------------------------------------------
-
+//-------------------------------------------------------------------//
 /*
 BOOL CloseHandle(
   HANDLE hObject   // handle to object to close
 );
 */
-
 HB_FUNC( CLOSEHANDLE )
 {
   hb_retl( CloseHandle( (HANDLE) hb_parnl(1) ) );
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 /*
  BOOL ReadFile(
   HANDLE       hFile,                 // handle of file to read
@@ -1047,13 +966,15 @@ HB_FUNC( READFILE )
                     ISCHAR( 5 ) ? Overlapped : NULL ) ;
 
    if ( bRet )
+   {
       hb_storclen( ( char * ) Buffer, nRead, 2 ) ;
+   }
 
    hb_stornl( nRead, 4 ) ;
    hb_retl( bRet ) ;
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 /*
 BOOL WriteFile(
   HANDLE hFile,                    // handle to file to write to
@@ -1062,9 +983,7 @@ BOOL WriteFile(
   LPDWORD lpNumberOfBytesWritten,  // pointer to number of bytes written
   LPOVERLAPPED lpOverlapped        // pointer to structure for overlapped I/O
 );
-
 */
-
 HB_FUNC( WRITEFILE )
 {
 
@@ -1081,46 +1000,41 @@ HB_FUNC( WRITEFILE )
                      ISCHAR( 4 ) ? Overlapped : NULL ) ) ;
 
    hb_stornl( nWritten, 3 ) ;
-
 }
 
-
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 /*
 DWORD GetCurrentProcessId( VOID )
 */
-
 HB_FUNC ( GETCURRENTPROCESSID )
 {
    hb_retnl( (ULONG) GetCurrentProcessId() );
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 /*
 DWORD GetCurrentProcess( VOID )
 */
-
 HB_FUNC ( GETCURRENTPROCESS )
 {
    hb_retnl( (LONG) GetCurrentProcess() );
 }
 
-//-----------------------------------------------------------------------------
+//-------------------------------------------------------------------//
 /*
 DWORD GetCurrentThreadId( VOID )
 */
-
 HB_FUNC ( GETCURRENTTHREADID )
 {
    hb_retnl( (DWORD) GetCurrentThreadId() );
 }
 
+//-------------------------------------------------------------------//
 /*
 BOOL GetProcessWorkingSetSize( HANDLE hProcess, PSIZE_T lpMinimumWorkingSetSize,
                                PSIZE_T lpMaximumWorkingSetSize );
 NOTE: This function is not supported and returns .F. under Windows 9x
 */
-
 HB_FUNC ( GETPROCESSWORKINGSETSIZE )
 {
    DWORD MinimumWorkingSetSize=0;
@@ -1132,46 +1046,48 @@ HB_FUNC ( GETPROCESSWORKINGSETSIZE )
    hb_stornl(MaximumWorkingSetSize,3);
 }
 
+//-------------------------------------------------------------------//
 /*
 BOOL SetProcessWorkingSetSize( HANDLE hProcess, PSIZE_T lpMinimumWorkingSetSize,
                                PSIZE_T lpMaximumWorkingSetSize );
 NOTE: This function is not supported and returns .F. under Windows 9x
       It may also fail if the process does not have right SE_INC_BASE_PRIORITY_NAME on NT/2000
 */
-
 HB_FUNC ( SETPROCESSWORKINGSETSIZE )
 {
    hb_retl(SetProcessWorkingSetSize(ISNIL(1) ? GetCurrentProcess() : (HANDLE) hb_parnl( 1 ),
                    hb_parnl( 2 ), hb_parnl( 3 ) ));
 }
 
+//-------------------------------------------------------------------//
 /*
 DWORD VirtualQuery( LPCVOID lpAddress, PMEMORY_BASIC_INFORMATION lpBuffer,  SIZE_T dwLength);
 - may not be functional, always seems to return error
 */
 HB_FUNC ( VIRTUALQUERY )
 {
-	if (hb_parni(1) >= sizeof(MEMORY_BASIC_INFORMATION))
-	    hb_retl(VirtualQuery((void *) hb_parnl(1), (struct _MEMORY_BASIC_INFORMATION *) hb_parnl(2), sizeof(MEMORY_BASIC_INFORMATION)));
-	else
-	{
-		SetLastError(ERROR_INSUFFICIENT_BUFFER);
-		hb_retl(FALSE);
-    }
+   if (hb_parni(1) >= sizeof(MEMORY_BASIC_INFORMATION))
+   {
+      hb_retl(VirtualQuery((void *) hb_parnl(1), (struct _MEMORY_BASIC_INFORMATION *) hb_parnl(2), sizeof(MEMORY_BASIC_INFORMATION)));
+   }
+   else
+   {
+      SetLastError(ERROR_INSUFFICIENT_BUFFER);
+      hb_retl(FALSE);
+   }
 }
 
+//-------------------------------------------------------------------//
 /*
 BOOL VirtualLock(LPVOID lpAddress, SIZE_T dwSize );
 - may not be functional, always seems to return error
 */
-
 HB_FUNC ( VIRTUALLOCK )
 {
-   hb_retl(VirtualLock((void *)hb_parnl( 1 ), hb_parni( 2 ) ));
+   hb_retl( VirtualLock( ( void * ) hb_parnl( 1 ), hb_parni( 2 ) ) );
 }
 
-
-//---------------------------------------------------------------------//
+//-------------------------------------------------------------------//
 //
 //   typedef struct { ;
 //       DWORD    dwLowDateTime;
@@ -1206,7 +1122,9 @@ HB_FUNC ( FILETIMETOSYSTEMTIME )
       }
    }
    else
+   {
       hb_retl( FALSE ) ;
+   } 
 }
 
 //---------------------------------------------------------------------//
