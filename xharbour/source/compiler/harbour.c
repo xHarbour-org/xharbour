@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.25 2002/11/24 05:30:32 ronpinkas Exp $
+ * $Id: harbour.c,v 1.26 2002/11/24 17:50:36 ronpinkas Exp $
  */
 
 /*
@@ -4658,11 +4658,11 @@ void hb_compEnumMemberAdd( char *szName )
 
    if ( hb_comp_pEnum->pMembers )
    {
-      hb_comp_pEnum->pMembers = hb_xrealloc( hb_comp_pEnum->pMembers, ++hb_comp_pEnum->lMembers * sizeof( char * ) );
+      hb_comp_pEnum->pMembers = (char **) hb_xrealloc( hb_comp_pEnum->pMembers, ++hb_comp_pEnum->lMembers * sizeof( char * ) );
    }
    else
    {
-      hb_comp_pEnum->pMembers = hb_xgrab( sizeof( char * ) );
+      hb_comp_pEnum->pMembers = (char **) hb_xgrab( sizeof( char * ) );
    }
 
    hb_comp_pEnum->pMembers[ hb_comp_pEnum->lMembers - 1 ] = szName;
