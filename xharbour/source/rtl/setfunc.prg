@@ -1,5 +1,5 @@
 /*
- * $Id: setfunc.prg,v 1.11 2001/06/15 17:59:21 dholm Exp $
+ * $Id: setfunc.prg,v 1.1.1.1 2001/12/21 10:42:03 ronpinkas Exp $
  */
 
 /*
@@ -59,14 +59,14 @@ PROCEDURE __SetFunction( nFunctionKey, cString )
    /* NOTE: CA-Cl*pper will not handle F11 and F12 here. 
             This is a Harbour extension. [vszakats] */
 
-   DO CASE
-   CASE nFunctionKey == 1  ; nFunctionKey := K_F1
+   SWITCH nFunctionKey
+   CASE 1  ; nFunctionKey := K_F1  ; exit
 #ifdef HB_EXTENSION
-   CASE nFunctionKey == 11 ; nFunctionKey := K_F11
-   CASE nFunctionKey == 12 ; nFunctionKey := K_F12
+   CASE 11 ; nFunctionKey := K_F11 ; exit
+   CASE 12 ; nFunctionKey := K_F12 ; exit
 #endif
-   OTHERWISE               ; nFunctionKey := -nFunctionKey + 1
-   ENDCASE
+   DEFAULT                ; nFunctionKey := -nFunctionKey + 1
+   END
 
    IF ISCHARACTER( cString )
       SetKey( nFunctionKey, {|| __Keyboard( cString ) } )

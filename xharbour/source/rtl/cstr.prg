@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.5 2002/10/25 21:29:12 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.6 2002/11/29 20:07:55 walito Exp $
  */
 
 /*
@@ -69,34 +69,34 @@ FUNCTION CStr( xExp )
 
    cType := ValType( xExp )
 
-   DO CASE
-      CASE cType = 'C'
+   SWITCH cType
+      CASE 'C'
          RETURN xExp
 
-      CASE cType = 'D'
+      CASE 'D'
          RETURN dToc( xExp )
 
-      CASE cType = 'L'
+      CASE 'L'
          RETURN IIF( xExp, '.T.', '.F.' )
 
-      CASE cType = 'N'
+      CASE 'N'
          RETURN Str( xExp )
 
-      CASE cType = 'M'
+      CASE 'M'
          RETURN xExp
 
-      CASE cType = 'A'
+      CASE 'A'
          RETURN "{ Array of " +  LTrim( Str( Len( xExp ) ) ) + " Items }"
 
-      CASE cType = 'B'
+      CASE 'B'
          RETURN '{|| Block }'
 
-      CASE cType = 'O'
+      CASE 'O'
          RETURN "{ " + xExp:ClassName() + " Object }"
 
-      OTHERWISE
+      DEFAULT
          RETURN "Type: " + cType
-   ENDCASE
+   END
 
 RETURN ""
 
@@ -107,40 +107,40 @@ FUNCTION CStrToVal( cExp, cType )
       __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
    ENDIF
 
-   DO CASE
-      CASE cType = 'C'
+   SWITCH cType
+      CASE 'C'
          RETURN cExp
 
-      CASE cType = 'D'
+      CASE 'D'
          IF cExp[3] >= '0' .AND. cExp[3] <= '9' .AND. cExp[5] >= '0' .AND. cExp[5] <= '9'
             RETURN cToD( cExp )
          ELSE
             RETURN sToD( cExp )
          ENDIF
 
-      CASE cType = 'L'
+      CASE 'L'
          RETURN IIF( cExp[1] == 'T' .OR. cExp[2] == 'Y' .OR. cExp[2] == 'T' .OR. cExp[2] == 'Y', .T., .F. )
 
-      CASE cType = 'N'
+      CASE 'N'
          RETURN Val( cExp )
 
-      CASE cType = 'M'
+      CASE 'M'
          RETURN cExp
 
       /*
-      CASE cType = 'A'
+      CASE 'A'
          __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
 
-      CASE cType = 'B'
+      CASE 'B'
          __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
 
-      CASE cType = 'O'
+      CASE 'O'
          __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
       */
 
-      OTHERWISE
+      DEFAULT
          __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
-   ENDCASE
+   END
 
 RETURN NIL
 
@@ -150,8 +150,8 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
    LOCAL cType := ValType( xVal )
    LOCAL aVars, aVar, cRet, cPad, nObj
 
-   DO CASE
-      CASE cType = 'C'
+   SWITCH cType
+      CASE 'C'
          IF ! '"' IN xVal
             RETURN '"' + xVal + '"'
          ELSEIF ! "'" IN xVal
@@ -162,19 +162,19 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
             __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
          ENDIF
 
-      CASE cType = 'D'
+      CASE 'D'
          RETURN "cToD( '" + dToC( xVal ) + "' )"
 
-      CASE cType = 'L'
+      CASE 'L'
          RETURN IIF( xVal, ".T.", ".F." )
 
-      CASE cType = 'N'
+      CASE 'N'
          RETURN Str( xVal )
 
-      CASE cType = 'M'
+      CASE 'M'
          RETURN xVal
 
-      CASE cType = 'A'
+      CASE 'A'
          cRet := "{ "
 
          FOR EACH aVar IN xVal
@@ -187,11 +187,11 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          cRet[ -1 ] := '}'
 
       /*
-      CASE cType = 'B'
+      CASE 'B'
          __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName() )
       */
 
-      CASE cType == 'O'
+      CASE 'O'
          cPad  := sPace( nPad + 3 )
          aVars := __objGetValueDiff( xVal )
          cRet  := Space( nPad ) + "OBJECT " + cName + " IS " + xVal:ClassName + CRLF
@@ -216,10 +216,10 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
          cRet += sPace( nPad ) + "END OBJECT"
 
-      OTHERWISE
+      DEFAULT
          return ""
          __ErrRT_BASE( EG_ARG, 3101, NIL, ProcName(), 1, { xVal, cName, nPad } )
-   ENDCASE
+   END
 
    //TraceLog( cRet )
 

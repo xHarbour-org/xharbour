@@ -1,5 +1,5 @@
 /*
- * $Id: profiler.prg,v 1.3 2002/01/29 04:38:12 ronpinkas Exp $
+ * $Id: profiler.prg,v 1.4 2002/11/13 04:18:15 walito Exp $
  */
 
 /*
@@ -176,28 +176,35 @@ Local nKey
 
       nKey := inkey( 0 )
 
-      Do Case
+      Switch nKey
 
-         Case nKey == K_ESC
+         Case K_ESC
             lBrowsing := .F.
+            exit
 
-         Case nKey == K_DOWN
+         Case K_DOWN
             oBrowse:down()
+            exit
 
-         Case nKey == K_UP
+         Case K_UP
             oBrowse:up()
+            exit
 
-         Case nKey == K_LEFT
+         Case K_LEFT
             oBrowse:left()
+            exit
 
-         Case nKey == K_RIGHT
+         Case K_RIGHT
             oBrowse:right()
+            exit
 
-         Case nKey == K_PGDN
+         Case K_PGDN
             oBrowse:pageDown()
+            exit
 
-         Case nKey == K_PGUP
+         Case K_PGUP
             oBrowse:pageUp()
+            exit
 
          // And so on.... (not really necessary for this test)
 

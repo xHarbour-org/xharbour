@@ -1,5 +1,5 @@
 /*
- * $Id: menuto.prg,v 1.7 2002/11/20 23:45:34 lculik Exp $
+ * $Id: menuto.prg,v 1.8 2002/12/07 23:49:35 lculik Exp $
  */
 
 /*
@@ -192,33 +192,53 @@ function __MenuTo( bBlock, cVariable )
          enddo
 
          // check for keystrokes
-         do case
-         case nKey == 1001
-         case nKey == 1002 .OR. nKey == 1006
+         Switch nKey
+         case 1001
+            exit
+
+         case 1002
+         case 1006
             if ( ( nMouseClik := hittest(s_aLevel[ nPointer-1 ], mrow(), mcol()) ) > 0 )
                 n := nMouseClik
             endif
             if ( nKey == 1006 )
                 lExit := .T.
             endif
+            exit
 
-         case nKey == K_DOWN .or. nKey == K_RIGHT
+         case K_DOWN
+         case K_RIGHT
             if ++n > nArrLen
                n := iif( Set( _SET_WRAP ), 1, nArrLen )
             endif
-         case nKey == K_UP .or. nKey == K_LEFT
+            exit
+
+         case K_UP
+         case K_LEFT
             if --n < 1
                n := iif( Set( _SET_WRAP ), nArrLen, 1 )
             endif
-         case nKey == K_HOME
+            exit
+
+         case K_HOME
             n := 1
-         case nKey == K_END
+            exit
+
+         case K_END
             n := nArrLen
-         case nKey == K_ENTER .or. nKey == K_PGUP .or. nKey == K_PGDN
+            exit
+
+         case K_ENTER
+         case K_PGUP
+         case K_PGDN
             lExit := .T.
-         case nKey == K_ESC
+            exit
+
+         case K_ESC
             n := 0
-         otherwise
+            exit
+
+         default
             // did user hit a hot key?
             for y := 1 to nArrLen
                if upper( left( ltrim( s_aLevel[ nPointer - 1, y, 3 ] ), 1 ) ) == upper( chr( nKey ) )
@@ -227,7 +247,7 @@ function __MenuTo( bBlock, cVariable )
                   exit
                endif
             next
-         endcase
+         end
 
          if n <> 0
             DispOutAt( s_aLevel[ nPointer - 1, q, 1 ],;

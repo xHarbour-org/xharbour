@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.7 2002/10/30 02:09:37 lculik Exp $
+ * $Id: memoedit.prg,v 1.8 2002/11/29 20:11:48 walito Exp $
  */
 
 /*
@@ -179,43 +179,81 @@ METHOD HandleUserKey(nKey, nUserKey) CLASS TMemoEditor
    local aUnHandledKeys := {K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T,;
                             K_CTRL_U, K_F1 ,K_CTRL_W}
 
-   do case
+   Switch nUserKey
       // I won't reach this point during ME_INIT since ME_DEFAULT ends initialization phase of MemoEdit()
-      case nUserKey == ME_DEFAULT
+      case ME_DEFAULT
          // HBEditor is not able to handle keys with a value higher than 256
          if (nKey <= 256 .OR. nKey == K_ALT_W .or. nKey == K_CTRL_W) .AND. !(nKey IN aUnHandledKeys)
             super:Edit(nKey)
          endif
+         exit
 
       // TOFIX: Not clipper compatible, see teditor.prg
 
-      case (nUserKey >= 1 .AND. nUserKey <= 31) .OR. nUserKey == K_ALT_W .or.nUserKey == K_CTRL_W
+      case 1
+      case 2
+      case 3
+      case 4
+      case 5
+      case 6
+      case 7
+      case 8
+      case 9
+      case 10
+      case 11
+      case 12
+      case 13
+      case 14
+      case 15
+      case 16
+      case 17
+      case 18
+      case 19
+      case 20
+      case 21
+      case 22
+      case 23
+      case 24
+      case 25
+      case 26
+      case 27
+      case 28
+      case 29
+      case 30
+      case 31
+      case K_ALT_W
+      case K_CTRL_W
          if !(nUserKey IN aUnHandledKeys)
             super:Edit(nUserKey)
          endif
+         exit
 
-
-      case nUserKey == ME_DATA
+      case ME_DATA
          if nKey <= 256 .AND. !( nKey IN aUnHandledKeys )
             super:Edit(nKey)
          endif
+         exit
 
-      case nUserKey == ME_TOGGLEWRAP
+      case ME_TOGGLEWRAP
          ::lWordWrap := !::lWordWrap
+         exit
 
-      case nUserKey == ME_TOGGLESCROLL
+      case ME_TOGGLESCROLL
          // TODO: HBEditor does not support vertical scrolling of text inside window without moving cursor position
+         exit
 
-      case nUserKey == ME_WORDRIGHT
+      case ME_WORDRIGHT
          ::MoveCursor(K_CTRL_RIGHT)
+         exit
 
-      case nUserKey == ME_BOTTOMRIGHT
+      case ME_BOTTOMRIGHT
          ::MoveCursor(K_CTRL_END)
+         exit
 
-      otherwise
+      default
          // Do nothing
 
-   endcase
+   end
 
 return Self
 

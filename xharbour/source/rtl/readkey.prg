@@ -1,5 +1,5 @@
 /*
- * $Id: readkey.prg,v 1.7 2001/05/15 13:02:06 vszakats Exp $
+ * $Id: readkey.prg,v 1.1.1.1 2001/12/21 10:42:00 ronpinkas Exp $
  */
 
 /*
@@ -55,19 +55,21 @@
 FUNCTION ReadKey()
    LOCAL nKey := LastKey()
 
-   DO CASE
-   CASE nKey == K_UP        ; nKey :=  4 /* NOTE: NG says 5 incorrectly */
-   CASE nKey == K_DOWN      ; nKey :=  5 /* NOTE: NG says 2 incorrectly */
-   CASE nKey == K_PGUP      ; nKey :=  6
-   CASE nKey == K_PGDN      ; nKey :=  7
-   CASE nKey == K_CTRL_PGUP ; nKey := 34 /* NOTE: NG says 31 incorrectly */
-   CASE nKey == K_CTRL_PGDN ; nKey := 35 /* NOTE: NG says 30 incorrectly */
-   CASE nKey == K_ESC       ; nKey := 12
-   CASE nKey == K_CTRL_W    ; nKey := 14
-   CASE nKey == K_ENTER     ; nKey := 15
-   CASE nKey >= K_SPACE     ; nKey := 15
-   OTHERWISE                ; RETURN 0
-   ENDCASE
+   SWITCH nKey
+   CASE K_UP        ; nKey :=  4 ; exit /* NOTE: NG says 5 incorrectly */
+   CASE K_DOWN      ; nKey :=  5 ; exit /* NOTE: NG says 2 incorrectly */
+   CASE K_PGUP      ; nKey :=  6 ; exit
+   CASE K_PGDN      ; nKey :=  7 ; exit
+   CASE K_CTRL_PGUP ; nKey := 34 ; exit /* NOTE: NG says 31 incorrectly */
+   CASE K_CTRL_PGDN ; nKey := 35 ; exit /* NOTE: NG says 30 incorrectly */
+   CASE K_ESC       ; nKey := 12 ; exit
+   CASE K_CTRL_W    ; nKey := 14 ; exit
+   CASE K_ENTER     ; nKey := 15 ; exit
+   DEFAULT
+     IF nKey >= K_SPACE ; nKey := 15
+     ELSE               ; RETURN 0
+     ENDIF
+   END
 
    IF Updated()
       nKey += 256

@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.5 2002/11/13 20:38:25 walito Exp $
+ * $Id: listbox.prg,v 1.6 2002/11/29 20:11:12 walito Exp $
  */
 
 /*
@@ -462,20 +462,25 @@ Method _SCROLL( nMethod ) Class HBListBox
      Local nMouseRow
      Local nKey
      Local nStart
-     Do Case
-         Case nMethod == - 3074
+
+     Switch -nMethod
+         Case 3074
              If ( ::topitem > 1 )
                 ::topitem --
                 ::vScroll:current := lbadjustcu( Self )
                 Self:display()
              Endif
-         Case nMethod == - 3075
+             Exit
+
+         Case 3075
              If ( ( ::topitem + ::bottom - ::top ) <= ::itemCount + 1 )
                 ::topitem ++
                 ::vScroll:current( lbadjustcu( Self ) )
                 Self:display()
              Endif
-         Case nMethod == - 3077
+             Exit
+
+         Case 3077
              nPos     := ::bottom - ::top - 1
              nCount   := ::itemCount
              nTopItem := ::topitem + nPos
@@ -488,7 +493,9 @@ Method _SCROLL( nMethod ) Class HBListBox
                 ::vScroll:current( lbadjustcu( Self ) )
                 Self:display()
              Endif
-         Case nMethod == - 3076
+             Exit
+
+         Case 3076
              nPos := ::bottom - ::top - Iif( ::bitmap, 2, ;
                      1 )
              nCount   := ::itemCount
@@ -502,7 +509,9 @@ Method _SCROLL( nMethod ) Class HBListBox
                 ::vScroll:current( lbadjustcu( Self ) )
                 Self:display()
              Endif
-         Case nMethod == - 3073
+             Exit
+
+         Case 3073
              nMouseRow := Mrow()
              Do While ( ( nKey := Inkey( 0 ) ) != 1003 )
                If ( nKey == 1001 )
@@ -540,16 +549,18 @@ Method _SCROLL( nMethod ) Class HBListBox
                   Endif
                Endif
              Enddo
-     Endcase
+             Exit
+     End
 Return Self
 
 Method SELECTS( nPosition ) Class HBListBox
 
      Local nValue
      Local nPos
-     Local xType
+     Local xType := Valtype( nPosition )
+
      Do Case
-         Case ( xType := Valtype( nPosition ) ) == "C"
+         Case xType == "C"
              nPos := Self:finddata( nPosition )
              If ( !( Valtype( ::buffer ) IN "CU" ) )
                 ::buffer := nPos

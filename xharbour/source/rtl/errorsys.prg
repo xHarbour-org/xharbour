@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.14 2002/12/18 13:43:56 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.15 2002/12/21 18:20:39 ronpinkas Exp $
  */
 
 /*
@@ -359,16 +359,20 @@ STATIC FUNCTION LogError( oerr )
           cTemp  += " TYPE " + Type( cVarName )
           cTemp  += " " + If( Type( cVarName ) == "C", '"' + &cVarName + '"', strvalue( &cVarName ) )
           nBytes := 0
-          Do Case
-              Case Type( cVarName ) == "C"
+          Switch ValType( cVarName )
+              Case "C"
                   nBytes += ( nLenTemp := Len( &cVarName ) )
-              Case Type( cVarName ) == "N"
+                  exit
+              Case "N"
                   nBytes += ( nLenTemp := 9 )
-              Case Type( cVarName ) == 'L'
+                  exit
+              Case 'L'
                   nBytes += ( nLenTemp := 2 )
-              Case Type( cVarName ) == "D"
+                  exit
+              Case "D"
                   nBytes += ( nLenTemp := 9 )
-          Endcase
+                  exit
+          End
           Fwrite( nFhandle, "            " + Transform( nLenTemp, '999999' ) + 'bytes -> ' )
           FWriteLine( nHandle, "      " + cTemp )
         Enddo
@@ -387,18 +391,23 @@ STATIC FUNCTION strvalue( c, l )
 
      LOCAL cr := ''
      Default l To .f.
-     Do Case
-         Case Valtype( c ) == "C"
+     Switch ValType( c )
+         Case "C"
              cr := c
-         Case Valtype( c ) == "N"
+             exit
+         Case "N"
              cr := Alltrim( Str( c ) )
-         Case Valtype( c ) == "M"
+             exit
+         Case "M"
              cr := c
-         Case Valtype( c ) == "D"
+             exit
+         Case "D"
              cr := Dtoc( c )
-         Case Valtype( c ) == "L"
+             exit
+         Case "L"
              cr := If( l, If( c, "On", "Off" ), If( c, "True", "False" ) )
-     Endcase
+             exit
+     End
 Return cr
 
 STATIC FUNCTION FWriteLine( nh, c )

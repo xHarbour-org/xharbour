@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.9 2002/08/30 22:09:09 dholm Exp $
+ * $Id: dbdelim.prg,v 1.2 2002/08/31 14:34:27 lculik Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.9 2002/08/30 22:09:09 dholm Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.2 2002/08/31 14:34:27 lculik Exp $" )
 
 #define AppendEOL( handle )       FWRITE( handle, CHR( 13 ) + CHR( 10 ) )
 #define AppendEOF( handle )       FWRITE( handle, CHR( 26 ) )
@@ -267,18 +267,22 @@ local lcisonoeol
 RETURN
 
 STATIC FUNCTION ExportVar( handle, xField, cDelim )
-   DO CASE
-      CASE VALTYPE( xField ) == "C"
+   SWITCH VALTYPE( xField )
+      CASE "C"
          FWRITE( handle, cDelim + TRIM( xField ) + cDelim )
-      CASE VALTYPE( xField ) == "D"
+         EXIT
+      CASE "D"
          FWRITE( handle, DTOS( xField ) )
-      CASE VALTYPE( xField ) == "L"
+         EXIT
+      CASE "L"
          FWRITE( handle, iif( xField, "T", "F" ) )
-      CASE VALTYPE( xField ) == "N"
+         EXIT
+      CASE "N"
          FWRITE( handle, LTRIM( STR( xField ) ) )
-      OTHERWISE
+         EXIT
+      DEFAULT
          RETURN .F.
-   END CASE
+   END
 RETURN .T.
 
 
@@ -311,17 +315,20 @@ append blank
 
 for ii:=1 to nDBFfields
    cBuffer:=strtran(aMyval[ii],'"','')
-   DO CASE
-      CASE aStruct[ ii,2 ] == "D"
+   SWITCH aStruct[ ii,2 ]
+      CASE "D"
          vRes := HB_STOD( cBuffer )
-      CASE aStruct[ ii,2 ] == "L"
+         EXIT
+      CASE "L"
          cUPbuffer:=upper(cBuffer)
          vRes := iif( cUPBuffer == "T" .or. cUPBuffer== "1" .or. cUPBuffer=="Y",.T.,.F. )
-      CASE aStruct[ ii,2 ] == "N"
+         EXIT
+      CASE "N"
          vRes := VAL( cBuffer )
-      OTHERWISE
+         EXIT
+      DEFAULT
          vRes := cBuffer
-   END CASE
+   END
 
    FIELDPUT(ii,vRes)
 next

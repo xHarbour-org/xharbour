@@ -1,5 +1,5 @@
 /*
- * $Id: treport.prg,v 1.2 2002/11/13 04:33:40 walito Exp $
+ * $Id: treport.prg,v 1.3 2002/11/29 20:15:50 walito Exp $
  */
 
 /*
@@ -1320,21 +1320,27 @@ METHOD GetColumn( cFieldsBuffer, nOffset ) CLASS HBReportForm
    IF USED()
       cType := VALTYPE( EVAL(aColumn[ RCT_EXP ]) )
       aColumn[ RCT_TYPE ] := cType
-      DO CASE
-      CASE cType == "C" .OR. cType == "M"
+
+      SWITCH cType
+      CASE "C"
+      CASE "M"
          aColumn[ RCT_PICT ] := REPLICATE("X", aColumn[ RCT_WIDTH ])
-      CASE cType == "D"
+         exit
+      CASE "D"
          aColumn[ RCT_PICT ] := "@D"
-      CASE cType == "N"
+         exit
+      CASE "N"
          IF aColumn[ RCT_DECIMALS ] != 0
             aColumn[ RCT_PICT ] := REPLICATE("9", aColumn[ RCT_WIDTH ] - aColumn[ RCT_DECIMALS ] -1) + "." + ;
                                   REPLICATE("9", aColumn[ RCT_DECIMALS ])
          ELSE
             aColumn[ RCT_PICT ] := REPLICATE("9", aColumn[ RCT_WIDTH ])
          ENDIF
-      CASE cType == "L"
+         exit
+      CASE "L"
          aColumn[ RCT_PICT ] := "@L" + REPLICATE("X",aColumn[ RCT_WIDTH ]-1)
-      ENDCASE
+         exit
+      END
    ENDIF
 
    // Update offset into ?_buffer
@@ -1386,22 +1392,23 @@ STATIC FUNCTION ListAsArray( cList, cDelimiter )
 
 STATIC FUNCTION MakeAStr( uVar, cType )
    LOCAL cString
-   DO CASE
-   CASE UPPER(cType) == "D"
+
+   SWITCH UPPER(cType)
+   CASE "D"
       cString := DTOC( uVar )
 
-   CASE UPPER(cType) == "L"
+   CASE "L"
       cString := iif( uVar, "T", "F" )
 
-   CASE UPPER(cType) == "N"
+   CASE "N"
       cString := STR( uVar )
 
-   CASE UPPER(cType) == "C"
+   CASE "C"
       cString := uVar
 
-   OTHERWISE
+   DEFAULT
       cString := "INVALID EXPRESSION"
-   ENDCASE
+   END
    RETURN cString
 
 FUNCTION __ReportForm( cFRMName, lPrinter, cAltFile, lNoConsole, bFor, ;

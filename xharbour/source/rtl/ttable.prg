@@ -1,5 +1,5 @@
 /*
- * $Id: $
+ * $Id: ttable.prg,v 1.1 2002/12/24 00:42:47 lculik Exp $
  */
 
 /*
@@ -168,16 +168,19 @@ FUNCTION NetLock( nType, lReleaseLocks, nSeconds )
 
    nWaitTime := nSeconds
 
-   DO CASE
-   CASE nType == NET_RECLOCK            // 1 = Record Lock...
+   SWITCH nType
+   CASE NET_RECLOCK                        // 1 = Record Lock...
       xIdentifier := IF( lReleaseLocks, NIL, RECNO() )
       bOperation  := { | x | DBRLOCK( x ) }
-   CASE nType == NET_FILELOCK           // 2 = File Lock...
+      exit
+   CASE NET_FILELOCK                       // 2 = File Lock...
       bOperation := { | x | FLOCK() }
-   CASE nType == NET_APPEND             // 3 = Append Blank...
+      exit
+   CASE NET_APPEND                         // 3 = Append Blank...
       xIdentifier := lReleaseLocks
       bOperation  := { | x | DBAPPEND( x ), !NETERR() }
-   ENDCASE
+      exit
+   END
 
    slNetOk := .F.
 
@@ -883,6 +886,7 @@ METHOD DBMove( nDirection ) CLASS Table
 
    LOCAL nRec := ( ::Alias )->( RECNO() )
    DEFAULT nDirection TO 0
+
    DO CASE
    CASE nDirection == 0
       ( ::Alias )->( DBSKIP( 0 ) )
@@ -1199,9 +1203,9 @@ METHOD Undo( nBuffer, nLevel ) CLASS Table
       nLevel := 0
    ENDIF
 
-   DO CASE
+   SWITCH nBuffer
 
-   CASE nBuffer == _DELETE_BUFFER
+   CASE _DELETE_BUFFER
 
       IF !EMPTY( ::DeleteBuffers )
 
@@ -1258,7 +1262,7 @@ METHOD Undo( nBuffer, nLevel ) CLASS Table
 
       ENDIF
 
-   CASE nBuffer == _WRITE_BUFFER
+   CASE _WRITE_BUFFER
       IF !EMPTY( ::WriteBuffers )
 
          DEFAULT nLevel TO LEN( ::WriteBuffers )
@@ -1316,9 +1320,9 @@ METHOD Undo( nBuffer, nLevel ) CLASS Table
 
       ENDIF
 
-   OTHERWISE
+   DEFAULT
 
-   ENDCASE
+   END
 
    ( ::Alias )->( DBUNLOCK() )
    ( ::Alias )->( DBGOTO( nRec ) )
@@ -1470,20 +1474,24 @@ METHOD SetOrder( xTag ) CLASS Table
 
    LOCAL xType   := VALTYPE( xTag )
    LOCAL nOldOrd := ( ::Alias )->( ORDSETFOCUS() )
-   DO CASE
-   CASE xType == "C"                    // we have an Order-TAG
+
+   SWITCH xType
+   CASE "C"                    // we have an Order-TAG
       ( ::Alias )->( ORDSETFOCUS( xTag ) )
-   CASE xType == "N"                    // we have an Order-Number
+      EXIT
+   CASE "N"                    // we have an Order-Number
       IF xTag <= 0
          ( ::Alias )->( ORDSETFOCUS( 0 ) )
       ELSE
          ::Getorder( xTag ):SetFocus()
       ENDIF
-   CASE xType == "O"                    // we have an Order-Object
+      EXIT
+   CASE "O"                    // we have an Order-Object
       xTag:SetFocus()
-   OTHERWISE
+      EXIT
+   DEFAULT
       ( ::Alias )->( ORDSETFOCUS( 0 ) )
-   ENDCASE
+   END
 RETURN nOldOrd
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴

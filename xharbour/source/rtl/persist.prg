@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.7 2002/11/13 04:17:10 walito Exp $
+ * $Id: persist.prg,v 1.8 2002/11/29 20:13:00 walito Exp $
  */
 
 /*
@@ -72,7 +72,7 @@ ENDCLASS
 METHOD LoadFromText( cObjectText ) CLASS HBPersistent
 
    local nLines := MLCount( cObjectText, 254 )
-   local nLine  := 1, cLine, cToken
+   local nLine  := 1, cLine  //, cToken
    local lStart := .t., aArray
    private oSelf
 
@@ -90,7 +90,6 @@ METHOD LoadFromText( cObjectText ) CLASS HBPersistent
          case Upper( LTrim( __StrToken( cLine, 1 ) ) ) == "OBJECT"
               if lStart
                  lStart := .f.
-              else
               endif
 
          case Upper( LTrim( __StrToken( cLine, 1 ) ) ) == "ARRAY"
@@ -130,7 +129,6 @@ METHOD SaveToText( cObjectName ) CLASS HBPersistent
 
    aProperties := __ClsGetProperties( ::ClassH )
 
-//   n := 1
    FOR EACH xProperties IN aProperties
       uValue := __objSendMsg( Self, xProperties )
       uNewValue := __objSendMsg( oNew, xProperties )
@@ -138,33 +136,33 @@ METHOD SaveToText( cObjectName ) CLASS HBPersistent
 
       if cType != ValType( uNewValue ) .OR. ! uValue == uNewValue
 
-         do case
-            case cType == "A"
+         Switch cType
+            case "A"
                  nIndent += 3
                  cObject += ArrayToText( uValue, xProperties, nIndent )
                  nIndent -= 3
-//                 if n < Len( aProperties )
                  if HB_EnumIndex() < Len( aProperties )
                     cObject += HB_OsNewLine()
                  endif
+                 exit
 
-            case cType == "O"
+            case "O"
                  if __objDerivedFrom( uValue, "HBPERSISTENT" )
                     cObject += uValue:SaveToText( xProperties )
                  endif
-//                 if n < Len( aProperties )
                  if HB_EnumIndex() < Len( aProperties )
                     cObject += HB_OsNewLine()
                  endif
+                 exit
 
-            otherwise
+            default
                  if HB_EnumIndex() == 1
                     cObject += HB_OsNewLine()
                  endif
                  cObject += Space( nIndent ) + "   ::" + ;
                             xProperties + " = " + ValToText( uValue ) + ;
                             HB_OsNewLine()
-         endcase
+         end
 
       endif
 
@@ -186,27 +184,29 @@ static function ArrayToText( aArray, cName, nIndent )
    FOR EACH uValue IN aArray
       cType  := ValType( uValue )
 
-      do case
-         case cType == "A"
+      Switch cType
+         case "A"
               nIndent += 3
               cArray += ArrayToText( uValue, cName + "[ " + ;
                         AllTrim( Str( HB_EnumIndex() ) ) + " ]", nIndent ) + HB_OsNewLine()
               nIndent -= 3
+              exit
 
-         case cType == "O"
+         case "O"
               if __objDerivedFrom( uValue, "HBPERSISTENT" )
                  cArray += uValue:SaveToText( cName + "[ " + AllTrim( Str( HB_EnumIndex() ) ) + ;
                            " ]" )
               endif
+              exit
 
-         otherwise
+         default
               if HB_EnumIndex() == 1
                  cArray += HB_OsNewLine()
               endif
               cArray += Space( nIndent ) + "   ::" + cName + ;
                         + "[ " + AllTrim( Str( HB_EnumIndex() ) ) + " ]" + " = " + ;
                         ValToText( uValue ) + HB_OsNewLine()
-      endcase
+      end
 //      n++
    NEXT
 
@@ -219,8 +219,8 @@ static function ValToText( uValue )
    local cType := ValType( uValue )
    local cText, cQuote := '"'
 
-   do case
-      case cType == "C"
+   Switch cType
+      case "C"
            if cQuote IN uValue
               cQuote := "'"
               if cQuote IN uValue
@@ -231,15 +231,18 @@ static function ValToText( uValue )
            else
               cText := cQuote + uValue + cQuote
            endif
+           exit
 
-      case cType == "N"
+      case "N"
            cText := AllTrim( Str( uValue ) )
+           exit
 
-      case cType == "D"
+      case "D"
            cText := 'HB_STOD( "' + DToS( uValue ) + '" )'
+           exit
 
-      otherwise
+      Default
            cText := HB_ValToStr( uValue )
-   endcase
+   end
 
 return cText

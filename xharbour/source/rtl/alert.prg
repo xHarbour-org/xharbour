@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.8 2002/11/29 20:07:11 walito Exp $
+ * $Id: alert.prg,v 1.9 2002/12/23 06:46:01 jonnymind Exp $
  */
 
 /*
@@ -63,8 +63,8 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
    LOCAL nOldDispCount
    LOCAL nCount
-//   LOCAL nIndex
    LOCAL nLen, sCopy
+   LOCAL lWhile
 
 #ifdef HB_COMPAT_C53
    LOCAL nMRow, nMCol
@@ -117,25 +117,42 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
    ELSE
 
-      DO CASE
-      CASE ValType( xMessage ) IN "CM" /* Do nothing, just speed up things */
-      CASE ValType( xMessage ) == "N" ; xMessage := LTrim( Str( xMessage ) )
-      CASE ValType( xMessage ) == "D" ; xMessage := DToC( xMessage )
-      CASE ValType( xMessage ) == "L" ; xMessage := iif( xMessage, ".T.", ".F." )
-      CASE ValType( xMessage ) == "O" ; xMessage := xMessage:className + " Object"
-      CASE ValType( xMessage ) == "B" ; xMessage := "{||...}"
-      OTHERWISE                       ; xMessage := "NIL"
-      ENDCASE
+      SWITCH ValType( xMessage )
+         CASE "C"
+         CASE "M"
+            EXIT
 
+         CASE "N"
+            xMessage := LTrim( Str( xMessage ) )
+            EXIT
+
+         CASE "D"
+            xMessage := DToC( xMessage )
+            EXIT
+
+         CASE "L"
+            xMessage := iif( xMessage, ".T.", ".F." )
+            EXIT
+
+         CASE "O"
+            xMessage := xMessage:className + " Object"
+            EXIT
+
+         CASE "B"
+            xMessage := "{||...}"
+            EXIT
+
+         DEFAULT
+            xMessage := "NIL"
+      END
+        
       DO WHILE ( nPos := At( ';', xMessage ) ) != 0
          AAdd( aSay, Left( xMessage, nPos - 1 ) )
          xMessage := SubStr( xMessage, nPos + 1 )
       ENDDO
       AAdd( aSay, xMessage )
 
-//      nIndex := 0
       FOR EACH xMessage IN aSay
-//         nIndex++
 
          IF ( nLen := Len( xMessage ) ) > 58
             FOR nPos := 58 TO 1 STEP -1
@@ -149,14 +166,11 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
             ENDIF
 
             sCopy := xMessage
-//            aSay[ nIndex ] := RTrim( Left( xMessage, nPos ) )
             aSay[ HB_EnumIndex() ] := RTrim( Left( xMessage, nPos ) )
 
-//            IF Len( aSay ) == nIndex
             IF Len( aSay ) == HB_EnumIndex()
                aAdd( aSay, SubStr( sCopy, nPos + 1 ) )
             ELSE
-//               aIns( aSay, nIndex + 1, SubStr( sCopy, nPos + 1 ), .T. )
                aIns( aSay, HB_EnumIndex() + 1, SubStr( sCopy, nPos + 1 ), .T. )
             ENDIF
         ENDIF
@@ -224,22 +238,18 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
    IF lConsole
 
-//      nEval  := 1
       nCount := Len( aSay )
       FOR EACH cEval IN aSay
          OutStd( cEval )
-//         IF nEval++ < nCount
          IF HB_EnumIndex() < nCount
             OutStd( hb_OSNewLine() )
          ENDIF
       NEXT
 
       OutStd( " (" )
-//      nEval  := 1
       nCount := Len( aOptionsOK )
       FOR EACH cEval IN aOptionsOK
          OutStd( cEval )
-//         IF nEval++ < nCount
          IF HB_EnumIndex() < nCount
             OutStd( ", " )
          ENDIF
@@ -247,27 +257,29 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
       OutStd( ") " )
 
       /* choice loop */
-      DO WHILE .T.
+      lWhile := .T.
+      DO WHILE lWhile
 
          nKey := Inkey( nDelay, INKEY_ALL )
 
-         DO CASE
+         SWITCH nKey
+            CASE 0
+               lWhile := .F.
+               EXIT
 
-         CASE nKey == 0
+            CASE K_ESC
 
-            EXIT
+               nChoice := 0
+               lWhile  := .F.
+               EXIT
 
-         CASE nKey == K_ESC
+            DEFAULT
+               IF Upper( Chr( nKey ) ) IN aHotkey
+                  nChoice := aScan( aHotkey, {| x | x == Upper( Chr( nKey ) ) } )
+                  lWhile  := .F.
+               ENDIF
 
-            nChoice := 0
-            EXIT
-
-         CASE Upper( Chr( nKey ) ) IN aHotkey
-
-            nChoice := aScan( aHotkey, {| x | x == Upper( Chr( nKey ) ) } )
-            EXIT
-
-         ENDCASE
+         END
 
       ENDDO
 
@@ -291,88 +303,93 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
       /* draw box */
       DispBox( nInitRow, nInitCol, nInitRow + Len( aSay ) + 3, nInitCol + nWidth + 1, B_SINGLE + ' ', cColorNorm )
 
-//      nEval := 1
       FOR EACH cEval IN aSay
-//         DispOutAt( nInitRow + nEval++, nInitCol + 1 + Int( ( ( nWidth - Len( cEval ) ) / 2 ) + .5 ), cEval, cColorNorm )
          DispOutAt( nInitRow + HB_EnumIndex(), nInitCol + 1 + Int( ( ( nWidth - Len( cEval ) ) / 2 ) + .5 ), cEval, cColorNorm )
       NEXT
 
       /* choice loop */
-      DO WHILE .T.
+      lWhile := .T.
+      DO WHILE lWhile
 
-//         nEval  := 1
          nCount := Len( aSay )
          FOR EACH cEval IN aOptionsOK
-//            DispOutAt( nInitRow + nCount + 2, aPos[ nEval++ ], " " + cEval + " ", cColorNorm )
             DispOutAt( nInitRow + nCount + 2, aPos[ HB_EnumIndex() ], " " + cEval + " ", cColorNorm )
          NEXT
          DispOutAt( nInitRow + nCount + 2, aPos[ nChoice ], " " + aOptionsOK[ nChoice ] + " ", cColorHigh )
 
          nKey := Inkey( nDelay, INKEY_ALL )
 
-         DO CASE
-         CASE nKey == K_ENTER .OR. ;
-              nKey == K_SPACE .OR. ;
-              nKey == 0
+         SWITCH nKey
+            CASE K_ENTER
+            CASE K_SPACE
+            CASE 0
+               lWhile := .F.
+               EXIT
 
-            EXIT
-
-         CASE nKey == K_ESC
-
-            nChoice := 0
-            EXIT
+            CASE K_ESC
+               nChoice := 0
+               lWhile  := .F.
+               EXIT
 
 #ifdef HB_COMPAT_C53
 
-         CASE nKey == K_LBUTTONDOWN
+            CASE K_LBUTTONDOWN
 
-            nMRow := MRow()
-            nMCol := MCol()
+               nMRow := MRow()
+               nMCol := MCol()
 
-//            nEval  := 1
-            nChoice := 0
-            nCount  := Len( aSay )
-            FOR EACH cEval IN aOptionsOK
-               IF nMRow == nInitRow + nCount + 2 .AND. ;
-                    INRANGE( aPos[ HB_EnumIndex() ], nMCol, aPos[ HB_EnumIndex() ] + Len( cEval ) + 2 - 1 )
-//                    INRANGE( aPos[ nEval ], nMCol, aPos[ nEval ] + Len( cEval ) + 2 - 1 )
-//                  nChoice := nEval
-                  nChoice := HB_EnumIndex()
-                  EXIT
+               nChoice := 0
+               nCount  := Len( aSay )
+               FOR EACH cEval IN aOptionsOK
+                  IF nMRow == nInitRow + nCount + 2 .AND. ;
+                       INRANGE( aPos[ HB_EnumIndex() ], nMCol, aPos[ HB_EnumIndex() ] + Len( cEval ) + 2 - 1 )
+                     nChoice := HB_EnumIndex()
+                     EXIT
+                  ENDIF
+               NEXT
+
+               IF nChoice == 0
+                  lWhile := .F.
                ENDIF
-//               nEval++
-            NEXT
 
-            IF nChoice == 0
                EXIT
-            ENDIF
 
 #endif
 
-         CASE ( nKey == K_LEFT .OR. nKey == K_SH_TAB ) .AND. Len( aOptionsOK ) > 1
+            CASE K_LEFT
+            CASE K_SH_TAB
+               IF Len( aOptionsOK ) > 1
 
-            nChoice--
-            IF nChoice == 0
-               nChoice := Len( aOptionsOK )
-            ENDIF
+                  nChoice--
+                  IF nChoice == 0
+                     nChoice := Len( aOptionsOK )
+                  ENDIF
 
-            nDelay := 0
+                  nDelay := 0
+               ENDIF
+               EXIT
 
-         CASE ( nKey == K_RIGHT .OR. nKey == K_TAB ) .AND. Len( aOptionsOK ) > 1
+            CASE K_RIGHT
+            CASE K_TAB
+               IF Len( aOptionsOK ) > 1
 
-            nChoice++
-            IF nChoice > Len( aOptionsOK )
-               nChoice := 1
-            ENDIF
+                  nChoice++
+                  IF nChoice > Len( aOptionsOK )
+                     nChoice := 1
+                  ENDIF
 
-            nDelay := 0
+                  nDelay := 0
+               ENDIF
+               EXIT
 
-         CASE Upper( Chr( nKey ) ) IN aHotkey
+            DEFAULT
+               IF Upper( Chr( nKey ) ) IN aHotkey
 
-            nChoice := aScan( aHotkey, {| x | x == Upper( Chr( nKey ) ) } )
-            EXIT
+                  nChoice := aScan( aHotkey, {| x | x == Upper( Chr( nKey ) ) } )
+                  lWhile  := .F.
+               ENDIF
 
-         ENDCASE
+         END
 
       ENDDO
 

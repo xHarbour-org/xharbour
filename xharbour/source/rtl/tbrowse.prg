@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.20 2002/12/25 15:23:21 walito Exp $
+ * $Id: tbrowse.prg,v 1.21 2003/01/16 16:39:56 walito Exp $
  */
 
 /*
@@ -1145,12 +1145,24 @@ return Min( nCol + 1, ::nColumns )
 
 METHOD PosCursor() CLASS TBrowse
 
-   local nRow := ::RowPos + ::nRowData
+   local nRow      := ::RowPos + ::nRowData
    local nCol
+   local aColsInfo := ::aColsInfo[ ::colpos ]
+   LOCAL nWidth    := aColsInfo[ o_Width ]
+   LOCAL nLen      := aColsInfo[ o_WidthCell ]
 
-   nCol := ::aColsInfo[ ::ColPos, o_Obj ]:ColPos + ;
-                  iif( ::aColsInfo[ ::colPos, o_Type ] == "L", ;
-                           ::aColsInfo[ ::ColPos, o_Width ] / 2, 0 )
+   nCol := aColsInfo[ o_Obj ]:ColPos
+
+   Switch aColsInfo[ o_Type ]
+   case "N"
+      if nWidth > nLen
+         nCol += nWidth - nLen
+      endif
+      exit
+   case "L"
+      nCol += Int( nWidth / 2 )
+      exit
+   end
 
    // Put cursor on first char of cell value
    SetPos( nRow, nCol )
@@ -1456,6 +1468,7 @@ METHOD Stabilize() CLASS TBrowse
    local colorSpec  := ::colorSpec
    local aColsInfo  := ::aColsInfo
    local lColorRect := .f.
+   local lRedraw
 
    if ::nColumns == 0
       // Return TRUE to avoid infinite loop ( do while !stabilize;end )
@@ -1646,10 +1659,11 @@ METHOD Stabilize() CLASS TBrowse
       // Data source is alredy at correct record number, now we need
       // to repaint browser accordingly.
       //
-      for nRow := 1 to ::RowCount
+      for each lRedraw in ::aRedraw
+         nRow := HB_EnumIndex()
 
          // if there is a row to repaint
-         if ::aRedraw[ nRow ]
+         if lRedraw
 
             // NOTE: If my TBrowse has 20 rows but I have only 3 recs, clipper clears
             //       remaining 17 rows in a single operation, I will, instead, try to skip
@@ -1745,7 +1759,7 @@ METHOD Stabilize() CLASS TBrowse
 
             // doesn't need to be redrawn
             //
-            ::aRedraw[ nRow ] := .F.
+            lRedraw := .F.
 
             // Exit incremental row stabilization
             //
@@ -1757,40 +1771,38 @@ METHOD Stabilize() CLASS TBrowse
 
       // If I reach this point I've repainted all rows so I can set ::stable state
       //
-      if nRow > ::RowCount
 
-         // If I have fewer records than available TBrowse rows, cursor cannot be lower than
-         // last record (note ::lHitBottom is set only during a movement)
-         //
-         if ::nLastRetrieved < ::nNewRowPos
-            ::nNewRowPos := ::nLastRetrieved
-         endif
-
-         // If I'm not already under cursor I have to set data source to cursor position
-         //
-         if ::nLastRetrieved <> ::nNewRowPos
-            Eval( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
-            ::nLastRetrieved := ::nNewRowPos
-         endif
-
-         // new cursor position
-         //
-         ::RowPos    := ::nNewRowPos
-
-         ::HitTop    := ::lHitTop
-         ::HitBottom := ::lHitBottom
-
-         if ::AutoLite
-            ::Hilite()
-         else
-            ::PosCursor()
-         endif
-         SetCursor( nOldCursor )
-
-         ::stable := .T.
-
-         return .T.
+      // If I have fewer records than available TBrowse rows, cursor cannot be lower than
+      // last record (note ::lHitBottom is set only during a movement)
+      //
+      if ::nLastRetrieved < ::nNewRowPos
+         ::nNewRowPos := ::nLastRetrieved
       endif
+
+      // If I'm not already under cursor I have to set data source to cursor position
+      //
+      if ::nLastRetrieved <> ::nNewRowPos
+         Eval( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
+         ::nLastRetrieved := ::nNewRowPos
+      endif
+
+      // new cursor position
+      //
+      ::RowPos    := ::nNewRowPos
+
+      ::HitTop    := ::lHitTop
+      ::HitBottom := ::lHitBottom
+
+      if ::AutoLite
+         ::Hilite()
+      else
+         ::PosCursor()
+      endif
+      SetCursor( nOldCursor )
+
+      ::stable := .T.
+
+      return .T.
 
    else
       /* NOTE: DBU relies upon current cell being reHilited() even if already stable */
@@ -1822,6 +1834,7 @@ METHOD ForceStabilize() CLASS TBrowse
    local colorSpec  := ::colorSpec
    local aColsInfo  := ::aColsInfo
    local lColorRect := .f.
+   local lRedraw
 
    if ::nColumns == 0
       // Return TRUE to avoid infinite loop ( do while !stabilize;end )
@@ -2010,10 +2023,11 @@ METHOD ForceStabilize() CLASS TBrowse
       // Data source is alredy at correct record number, now we need
       // to repaint browser accordingly.
       //
-      for nRow := 1 to ::RowCount
+      for each lRedraw in ::aRedraw
+         nRow := HB_EnumIndex()
 
          // if there is a row to repaint
-         if ::aRedraw[ nRow ]
+         if lRedraw
 
             // NOTE: If my TBrowse has 20 rows but I have only 3 recs, clipper clears
             //       remaining 17 rows in a single operation, I will, instead, try to skip
@@ -2106,47 +2120,42 @@ METHOD ForceStabilize() CLASS TBrowse
 
             // doesn't need to be redrawn
             //
-            ::aRedraw[ nRow ] := .F.
+            lRedraw := .F.
 
          endif
       next        // nRow
 
-      // If I reach this point I've repainted all rows so I can set ::stable state
+      // If I have fewer records than available TBrowse rows, cursor cannot be lower than
+      // last record (note ::lHitBottom is set only during a movement)
       //
-      if nRow > ::RowCount
-
-         // If I have fewer records than available TBrowse rows, cursor cannot be lower than
-         // last record (note ::lHitBottom is set only during a movement)
-         //
-         if ::nLastRetrieved < ::nNewRowPos
-            ::nNewRowPos := ::nLastRetrieved
-         endif
-
-         // If I'm not already under cursor I have to set data source to cursor position
-         //
-         if ::nLastRetrieved <> ::nNewRowPos
-            Eval( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
-            ::nLastRetrieved := ::nNewRowPos
-         endif
-
-         // new cursor position
-         //
-         ::RowPos    := ::nNewRowPos
-
-         ::HitTop    := ::lHitTop
-         ::HitBottom := ::lHitBottom
-
-         if ::AutoLite
-            ::Hilite()
-         else
-            ::PosCursor()
-         endif
-         SetCursor( nOldCursor )
-
-         ::stable := .T.
-
-         return .T.
+      if ::nLastRetrieved < ::nNewRowPos
+         ::nNewRowPos := ::nLastRetrieved
       endif
+
+      // If I'm not already under cursor I have to set data source to cursor position
+      //
+      if ::nLastRetrieved <> ::nNewRowPos
+         Eval( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
+         ::nLastRetrieved := ::nNewRowPos
+      endif
+
+      // new cursor position
+      //
+      ::RowPos    := ::nNewRowPos
+
+      ::HitTop    := ::lHitTop
+      ::HitBottom := ::lHitBottom
+
+      if ::AutoLite
+         ::Hilite()
+      else
+         ::PosCursor()
+      endif
+      SetCursor( nOldCursor )
+
+      ::stable := .T.
+
+      return .T.
 
    else
       /* NOTE: DBU relies upon current cell being reHilited() even if already stable */
@@ -2245,35 +2254,40 @@ METHOD DispCell( nColumn, nColor, aColors ) CLASS TBrowse
       cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( aColors, nColor ) - 1 )
    endif
 
-   do case
-   case cType IN "CM"
+   Switch cType
+   case "C"
+   case "M"
       nCol := Col()
       DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
       DispOut( Space( nWidth - nLen ) )
+      exit
 
-   case cType == "N"
+   case "N"
       if nWidth > nLen
          DispOut( Space( nWidth - nLen ) )
       endif
       nCol := Col()
       DispOut( PadL( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
+      exit
 
-   case cType == "D"
+   case "D"
       nCol := Col()
       DispOut( PadR( Transform( ftmp, aColsInfo[ o_Pict ] ), nLen ), cColor )
       DispOut( Space( nWidth - nLen ) )
+      exit
 
-   case cType == "L"
+   case "L"
       DispOut( Space( Int( nWidth / 2 ) ) )
       nCol := Col()
       DispOut( iif( ftmp, "T", "F" ), cColor )
       DispOut( Space( nWidth - Int( nWidth / 2 ) - 1 ) )
+      exit
 
-   otherwise
+   default
       nCol := Col()
       DispOut( Space( nWidth ), cColor )
 
-   endcase
+   end
 
 return nCol
 
@@ -2603,26 +2617,38 @@ static function LenVal( xVal, cType, cPict )
       cType := Valtype( xVal )
    endif
 
-   do case
-      case cType == "L"
+   Switch cType
+      case "L"
          nLen := 1
+         exit
 
-      case !Empty( cPict ) .and. cType IN "NCD"
-         nLen := Len( Transform( xVal, cPict ) )
+      case "N"
+      case "C"
+      case "D"
+         If !Empty( cPict )
+            nLen := Len( Transform( xVal, cPict ) )
+            exit
+         Endif
 
-      case cType == "N"
-         nLen := Len( Str( xVal ) )
+         Switch cType
+         case "N"
+            nLen := Len( Str( xVal ) )
+            exit
 
-      case cType == "C"
-         nLen := Len( xVal )
+         case "C"
+            nLen := Len( xVal )
+            exit
 
-      case cType == "D"
-         nLen := Len( DToC( xVal ) )
+         case "D"
+            nLen := Len( DToC( xVal ) )
+            exit
+         end
+         exit
 
-      otherwise
+      default
          nLen := 0
 
-   endcase
+   end
 
 return nLen
 

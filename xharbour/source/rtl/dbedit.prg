@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.3 2002/04/27 20:37:59 lculik Exp $
+ * $Id: dbedit.prg,v 1.4 2002/05/25 16:22:12 lculik Exp $
  */
 
 /*
@@ -99,6 +99,8 @@ FUNCTION dbEdit(;
    LOCAL cBlock
    LOCAL bBlock
    LOCAL aSubArray
+   LOCAL lWhile
+
    IF !Used()
       RETURN .F.
    ENDIF
@@ -254,7 +256,8 @@ FUNCTION dbEdit(;
    nOldCursor := SetCursor( SC_NONE )
    lException := .F.
 
-   DO WHILE .T.
+   lWhile := .T.
+   DO WHILE lWhile
 
       DO WHILE !oBrowse:Stabilize() .AND. NextKey() == 0
       ENDDO
@@ -282,27 +285,28 @@ FUNCTION dbEdit(;
 
       lException := .F.
 
-      DO CASE
-      CASE nKey == K_DOWN       ; oBrowse:Down()
-      CASE nKey == K_UP         ; oBrowse:Up()
-      CASE nKey == K_PGDN       ; oBrowse:PageDown()
-      CASE nKey == K_PGUP       ; oBrowse:PageUp()
-      CASE nKey == K_CTRL_PGUP  ; oBrowse:GoTop()
-      CASE nKey == K_CTRL_PGDN  ; oBrowse:GoBottom()
-      CASE nKey == K_RIGHT      ; oBrowse:Right()
-      CASE nKey == K_LEFT       ; oBrowse:Left()
-      CASE nKey == K_HOME       ; oBrowse:Home()
-      CASE nKey == K_END        ; oBrowse:End()
-      CASE nKey == K_CTRL_LEFT  ; oBrowse:PanLeft()
-      CASE nKey == K_CTRL_RIGHT ; oBrowse:PanRight()
-      CASE nKey == K_CTRL_HOME  ; oBrowse:PanHome()
-      CASE nKey == K_CTRL_END   ; oBrowse:PanEnd()
-      OTHERWISE
-         IF !dbEditCallUser( oBrowse, xUserFunc, nKey )
-            EXIT
-         ENDIF
-         lException := .T.
-      ENDCASE
+      SWITCH nKey
+         CASE K_DOWN       ; oBrowse:Down() ; exit
+         CASE K_UP         ; oBrowse:Up() ; exit
+         CASE K_PGDN       ; oBrowse:PageDown() ; exit
+         CASE K_PGUP       ; oBrowse:PageUp() ; exit
+         CASE K_CTRL_PGUP  ; oBrowse:GoTop() ; exit
+         CASE K_CTRL_PGDN  ; oBrowse:GoBottom() ; exit
+         CASE K_RIGHT      ; oBrowse:Right() ; exit
+         CASE K_LEFT       ; oBrowse:Left() ; exit
+         CASE K_HOME       ; oBrowse:Home() ; exit
+         CASE K_END        ; oBrowse:End() ; exit
+         CASE K_CTRL_LEFT  ; oBrowse:PanLeft() ; exit
+         CASE K_CTRL_RIGHT ; oBrowse:PanRight() ; exit
+         CASE K_CTRL_HOME  ; oBrowse:PanHome() ; exit
+         CASE K_CTRL_END   ; oBrowse:PanEnd() ; exit
+         DEFAULT
+            IF !dbEditCallUser( oBrowse, xUserFunc, nKey )
+               lWhile := .T.
+               EXIT
+            ENDIF
+            lException := .T.
+      END
    ENDDO
 
    SetCursor( nOldCursor )

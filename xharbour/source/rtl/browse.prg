@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.12 2001/07/10 08:42:50 mauriliolongo Exp $
+ * $Id: browse.prg,v 1.1.1.1 2001/12/21 10:41:13 ronpinkas Exp $
  */
 
 /*
@@ -112,53 +112,68 @@ function Browse( nTop, nLeft, nBottom, nRight )
          nKey := Inkey()
       endif
 
-      do case
-         case nKey == K_ESC
+      switch nKey
+         case K_ESC
             lExit := .t.
+            exit
 
-         case nKey == K_UP
+         case K_UP
             oBrw:Up()
+            exit
 
-         case nKey == K_DOWN
+         case K_DOWN
             oBrw:Down()
+            exit
 
-         case nKey == K_END
+         case K_END
             oBrw:End()
+            exit
 
-         case nKey == K_HOME
+         case K_HOME
             oBrw:Home()
+            exit
 
-         case nKey == K_LEFT
+         case K_LEFT
             oBrw:Left()
+            exit
 
-         case nKey == K_RIGHT
+         case K_RIGHT
             oBrw:Right()
+            exit
 
-         case nKey == K_PGUP
+         case K_PGUP
             oBrw:PageUp()
+            exit
 
-         case nKey == K_PGDN
+         case K_PGDN
             oBrw:PageDown()
+            exit
 
-         case nKey == K_CTRL_PGUP
+         case K_CTRL_PGUP
             oBrw:GoTop()
+            exit
 
-         case nKey == K_CTRL_PGDN
+         case K_CTRL_PGDN
             oBrw:GoBottom()
+            exit
 
-         case nKey == K_CTRL_LEFT
+         case K_CTRL_LEFT
             oBrw:panLeft()
+            exit
 
-         case nKey == K_CTRL_RIGHT
+         case K_CTRL_RIGHT
             oBrw:panRight()
+            exit
 
-         case nKey == K_CTRL_HOME
+         case K_CTRL_HOME
             oBrw:panHome()
+            exit
 
-         case nKey == K_CTRL_END
+         case K_CTRL_END
             oBrw:panEnd()
+            exit
 
-      endcase
+      end
    end
 
    RestScreen( nTop, nLeft, nBottom, nRight, cOldScreen )

@@ -1,5 +1,5 @@
 /*
- * $Id: dbsdf.prg,v 1.4 2002/11/13 04:14:36 walito Exp $
+ * $Id: dbsdf.prg,v 1.5 2003/01/06 20:56:37 mlombardo Exp $
  */
 
 /*
@@ -208,18 +208,22 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest 
 RETURN
 
 STATIC FUNCTION ExportFixed( handle, xField )
-   DO CASE
-      CASE VALTYPE( xField ) == "C"
+   SWITCH VALTYPE( xField )
+      CASE "C"
          FWRITE( handle, xField )
-      CASE VALTYPE( xField ) == "D"
+         EXIT
+      CASE "D"
          FWRITE( handle, DTOS( xField ) )
-      CASE VALTYPE( xField ) == "L"
+         EXIT
+      CASE "L"
          FWRITE( handle, iif( xField, "T", "F" ) )
-      CASE VALTYPE( xField ) == "N"
+         EXIT
+      CASE "N"
          FWRITE( handle, STR( xField ) )
-      OTHERWISE
+         EXIT
+      DEFAULT
          RETURN .F.
-   END CASE
+   END
 RETURN .T.
 
 STATIC FUNCTION ImportFixed( handle, index, aStruct, lLineEnd )
@@ -238,18 +242,24 @@ STATIC FUNCTION ImportFixed( handle, index, aStruct, lLineEnd )
       lLineEnd := .F.
    END IF
    
-   DO CASE
-      CASE aStruct[ index,2 ] == "C"
-         RETURN cBuffer
-      CASE aStruct[ index,2 ] == "D"
-         RETURN HB_STOD( cBuffer )
-      CASE aStruct[ index,2 ] == "L"
-         RETURN iif( cBuffer == "T",.T.,.F. )
-      CASE aStruct[ index,2 ] == "N" .or. aStruct[ index,2 ] == "DOUBLE" .or. ;
-        aStruct[ index,2 ] == "INTEGER" .or. aStruct[ index,2 ] == "CURDOUBLE" .or. ;
-         aStruct[ index,2 ] == "AUTOINC" 
+   SWITCH aStruct[ index,2 ]
+      CASE "N"
          RETURN VAL( cBuffer )
-   END CASE
+      CASE "C"
+         RETURN cBuffer
+      CASE "D"
+         RETURN HB_STOD( cBuffer )
+      CASE "L"
+         RETURN iif( cBuffer == "T",.T.,.F. )
+      DEFAULT
+         IF aStruct[ index, 2 ] == "DOUBLE" .OR.;
+            aStruct[ index, 2 ] == "INTEGER" .OR.;
+            aStruct[ index, 2 ] == "CURDOUBLE" .OR.;
+            aStruct[ index, 2 ] == "AUTOINC"
+
+            RETURN VAL( cBuffer )
+         ENDIF
+   END
 
 RETURN cBuffer
 

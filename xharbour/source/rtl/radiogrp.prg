@@ -1,5 +1,5 @@
 /*
- * $Id: radiogrp.prg,v 1.3 2002/11/13 04:19:24 walito Exp $
+ * $Id: radiogrp.prg,v 1.4 2002/11/13 20:40:30 walito Exp $
  */
 
 /*
@@ -227,18 +227,20 @@ METHOD  _Select( xValue ) CLASS HBRadioGroup
 
 METHOD  PrevItem()        CLASS HBRadioGroup
 
-   local xValue, nPos
+   local xValue := ::Value, nPos
 
    if ::HasFocus .AND. ::ItemCount > 0
 
-      Do Case
-      Case ( xValue := ::Value ) == 0
+      Switch xValue
+      Case 0
          nPos := 1
-      Case xValue == 1
+         exit
+      Case 1
          nPos := ::ItemCount
-      Otherwise
+         exit
+      Default
          nPos := xValue - 1
-      EndCase
+      End
 
       changebutt(self, xValue, nPos)
 

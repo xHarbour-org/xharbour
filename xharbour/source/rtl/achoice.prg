@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.10 2002/11/29 20:05:41 walito Exp $
+ * $Id: achoice.prg,v 1.11 2003/01/03 20:16:09 jonnymind Exp $
  */
 
 /*
@@ -457,23 +457,32 @@ FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, xSelect, xUserFunc, nPo
          nUserFunc := Do( xUserFunc, nMode, nPos, nPos - nAtTop )
          // DISPVAR nUserFunc
 
-         DO CASE
-         CASE nUserFunc == AC_ABORT .OR. nMode == AC_NOITEM
-            lFinished := .T.
-            IF nPos > 0
-               DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
-            ENDIF
-            nPos      := 0
-         CASE nUserFunc == AC_SELECT
-            lFinished := .T.
-         CASE nUserFunc == AC_CONT .OR. nUserFunc == AC_REDRAW
-            // Do nothing
-            nMode := AC_CONT
-         CASE nUserFunc == AC_GOTO
-            // Do nothing.  The next keystroke won't be read and
-            // this keystroke will be processed as a goto.
-            nMode := AC_GOTO
-         ENDCASE
+         SWITCH nUserFunc
+            CASE AC_ABORT
+            CASE AC_NOITEM
+               lFinished := .T.
+               IF nPos > 0
+                  DispLine( acItems[ nPos ], nTop + ( nPos - nAtTop ), nLeft, Eval( bSelect, alSelect[ nPos ]), .F., nNumCols )
+               ENDIF
+               nPos      := 0
+               EXIT
+
+            CASE AC_SELECT
+               lFinished := .T.
+               EXIT
+
+            CASE AC_CONT 
+            CASE AC_REDRAW
+               // Do nothing
+               nMode := AC_CONT
+               EXIT
+
+            CASE AC_GOTO
+               // Do nothing.  The next keystroke won't be read and
+               // this keystroke will be processed as a goto.
+               nMode := AC_GOTO
+               EXIT
+         END
 
          IF nPos > 0
 
