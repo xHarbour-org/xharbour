@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3860 2005/02/23 23:00:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3860 2005/02/23 21:59:36 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-24 05:30 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * include/hbdefs.h
+    * no need to declare static functions as extern "C" in CPP mode
 
 2005-02-23 23:30 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * contrib/rdd_ads/ads1.c
