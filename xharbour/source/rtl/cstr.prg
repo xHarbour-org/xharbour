@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.21 2004/07/29 23:55:59 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.22 2004/08/19 00:04:10 peterrees Exp $
  */
 
 /*
@@ -74,7 +74,7 @@ FUNCTION CStr( xExp )
          RETURN xExp
 
       CASE 'D'
-         RETURN dToc( xExp )
+         RETURN dToS( xExp )
 
       CASE 'L'
          RETURN IIF( xExp, '.T.', '.F.' )
@@ -122,9 +122,9 @@ FUNCTION CStrToVal( cExp, cType )
 
       CASE 'D'
          IF cExp[3] >= '0' .AND. cExp[3] <= '9' .AND. cExp[5] >= '0' .AND. cExp[5] <= '9'
-            RETURN cToD( cExp )
-         ELSE
             RETURN sToD( cExp )
+         ELSE
+            RETURN cToD( cExp )
          ENDIF
 
       CASE 'L'
@@ -178,7 +178,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          ENDIF
 
       CASE 'D'
-         RETURN "cToD( '" + dToC( xVal ) + "' )"
+         RETURN "sToD( '" + dToS( xVal ) + "' )"
 
       CASE 'L'
          RETURN IIF( xVal, ".T.", ".F." )
@@ -297,7 +297,7 @@ FUNCTION ValToPrgExp( xVal, aObjs )
          ENDIF
 
       CASE 'D'
-         RETURN "cToD( '" + dToC( xVal ) + "' )"
+         RETURN "sToD( '" + dToS( xVal ) + "' )"
 
       CASE 'L'
          RETURN IIF( xVal, ".T.", ".F." )
