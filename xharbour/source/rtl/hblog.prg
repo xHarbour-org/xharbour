@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.5 2003/07/17 20:49:33 jonnymind Exp $
+* $Id: hblog.prg,v 1.6 2003/07/22 11:35:11 jonnymind Exp $
 */
 
 /*
@@ -242,7 +242,7 @@ RETURN Self
 * Open all the channels calling their ::Open() method
 */
 
-METHOD Open() CLASS HB_Logger
+PROCEDURE Open() CLASS HB_Logger
    LOCAL oChannel
 
    IF ::cProgName == NIL
@@ -253,13 +253,13 @@ METHOD Open() CLASS HB_Logger
       oChannel:Open( ::cProgName )
    NEXT
 
-RETURN NIL
+RETURN 
 
 /**
 * Close all the channels calling their ::Close() method
 */
 
-METHOD Close() CLASS HB_Logger
+PROCEDURE Close() CLASS HB_Logger
    LOCAL oChannel
 
    IF ::cProgName == NIL
@@ -270,13 +270,13 @@ METHOD Close() CLASS HB_Logger
       oChannel:Close( ::cProgName )
    NEXT
 
-RETURN NIL
+RETURN 
 
 /**
 * Send a log message to all the channels
 */
 
-METHOD Log( cMessage, nPriority ) CLASS HB_Logger
+PROCEDURE Log( cMessage, nPriority ) CLASS HB_Logger
    LOCAL oChannel
    LOCAL cPrefix := ""
 
@@ -290,7 +290,7 @@ METHOD Log( cMessage, nPriority ) CLASS HB_Logger
       oChannel:Log( ::nStyle, cMessage, ::cProgName, nPriority )
    NEXT
 
-RETURN NIL
+RETURN 
 
 /**********************************************
 * Logger Channel class (mostly VIRTUAL)
@@ -336,11 +336,11 @@ RETURN Self
 * if the log level is higher or equal than the channel setting
 */
 
-METHOD Log( nStyle, cMessage, cName, nPriority ) CLASS HB_LogChannel
+PROCEDURE Log( nStyle, cMessage, cName, nPriority ) CLASS HB_LogChannel
    IF nPriority <= ::nLevel .and. ::lActive
       ::Send( nStyle, cMessage, cName, nPriority )
    ENDIF
-RETURN NIL
+RETURN 
 
 /**
 * This is an utility functions for subclasses, used to
@@ -433,9 +433,9 @@ METHOD Close( cName ) CLASS HB_LogConsole
    ::lOpened := .F.
 RETURN .T.
 
-METHOD Send( nStyle, cMessage, cName, nPriority )
+PROCEDURE Send( nStyle, cMessage, cName, nPriority )
    OutStd( ::Format( nStyle, cMessage, cName, nPriority ) , HB_OsNewLine() )
-RETURN NIL
+RETURN 
 
 
 /**********************************************

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1283 2003/07/23 12:35:55 druzus Exp $
+ * $Id: ChangeLog,v 1.1284 2003/07/23 16:37:09 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-07-23 17:10 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * source/rtl/hblog.prg
+    ! Replaced METHODs that return nil by PROCEDUREs.
+      There are some functions retunring nil in some prgs that I'll fix.
 
 2003-07-23 18:32 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/xharbour.spec
