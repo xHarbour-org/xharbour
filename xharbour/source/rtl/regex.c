@@ -6228,7 +6228,7 @@ preg->re_erroffset = erroffset;
 
 if (preg->re_pcre == NULL) return pcre_posix_error_code(errorptr);
 
-preg->re_nsub = pcre_info(preg->re_pcre, NULL, NULL);
+preg->re_nsub = pcre_info((const struct real_pcre *) ( preg->re_pcre ), NULL, NULL);
 return 0;
 }
 
@@ -6271,12 +6271,12 @@ rc = pcre_exec(preg->re_pcre, NULL, string, (int)strlen(string), 0, options,
 if ((eflags & REG_STARTEND) && pmatch && pmatch[0].rm_so >= 0 && pmatch[0].rm_eo > pmatch[0].rm_so && pmatch[0].rm_eo <= (int)strlen(string) )
  {
  iStartOffset = pmatch[0].rm_so;
- rc = pcre_exec(preg->re_pcre, NULL, string + pmatch[0].rm_so, (int)( pmatch[0].rm_eo - pmatch[0].rm_so ), 0, options, ovector, nmatch * 3);
+ rc = pcre_exec((const struct real_pcre *) (preg->re_pcre), NULL, string + pmatch[0].rm_so, (int)( pmatch[0].rm_eo - pmatch[0].rm_so ), 0, options, ovector, nmatch * 3);
  }
  else
  {
  iStartOffset = 0;
- rc = pcre_exec(preg->re_pcre, NULL, string, (int)strlen(string), 0, options, ovector, nmatch * 3);
+ rc = pcre_exec((const struct real_pcre *) (preg->re_pcre), NULL, string, (int)strlen(string), 0, options, ovector, nmatch * 3);
  }
 
 if (rc == 0) rc = nmatch;    /* All captured slots were filled in */
