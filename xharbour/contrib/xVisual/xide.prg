@@ -26,6 +26,7 @@ FUNCTION Main
             WITH OBJECT :Popup
                :AddItem( 'item 100', 100, {||MessageBox( GetActiveWindow(),'HI FROM THE MAIN CLASS')})
                :AddItem( 'item 101', 101)
+//               :AddItem( 'Editor', 101, {||oApp:CreateForm( 'SubForm', TFormEdit(),oApp:MainFrame ) } )
                :AddItem( 'item 102', 102)
                :AddItem( 'item 103', 103)
             END

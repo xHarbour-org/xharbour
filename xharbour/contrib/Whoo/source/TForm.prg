@@ -39,7 +39,15 @@ return( oObj )
 METHOD ChildFromHandle( hHandle ) CLASS TForm
    local n
    local aList := __objGetValueList( self )
-   if (n := aScan( aList, {|a|valtype( a[2] )=='O' .and. a[2]:handle == hHandle} ) )
+   if (n := aScan( aList, {|a|valtype( a[2] )=='O' .and. a[2]:handle == hHandle} ) ) > 0
+      return( aList[n][2] )
+   endif
+return(nil)
+
+METHOD ChildFromId( nId ) CLASS TForm
+   local n
+   local aList := __objGetValueList( self )
+   if (n := aScan( aList, {|a|valtype( a[2] )=='O' .and. a[2]:Id == nId} ) ) > 0
       return( aList[n][2] )
    endif
 return(nil)
