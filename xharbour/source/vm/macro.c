@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.18 2003/04/11 17:13:09 ronpinkas Exp $
+ * $Id: macro.c,v 1.19 2003/04/17 09:28:34 paultucker Exp $
  */
 
 /*
@@ -1186,7 +1186,16 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_
       /* we are determining the type of expression (called from TYPE() function)
        */
       pSym = hb_dynsymFind( szSymbolName );
-      if( ! pSym )
+
+      if( pSym )
+      {
+         if( HB_MACRO_DATA->status & HB_MACRO_UDF && pSym->pSymbol->pFunPtr == NULL )
+         {
+            HB_MACRO_DATA->status |= HB_MACRO_UNKN_SYM;
+            HB_MACRO_DATA->status &= ~HB_MACRO_CONT;  /* don't run this pcode */
+         }
+      }
+      else
       {
          HB_MACRO_DATA->status |= HB_MACRO_UNKN_SYM;
          HB_MACRO_DATA->status &= ~HB_MACRO_CONT;  /* don't run this pcode */
@@ -1197,7 +1206,9 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_
       }
    }
    else
+   {
       pSym = hb_dynsymGet( szSymbolName );
+   }
 
    hb_compGenPCode1( HB_P_MPUSHSYM, HB_MACRO_PARAM );
    hb_compGenPCodeN( ( BYTE * ) &pSym, sizeof( pSym ), HB_MACRO_PARAM );
@@ -1470,7 +1481,7 @@ void hb_compGenPushDouble( double dNumber, BYTE bWidth, BYTE bDec, HB_MACRO_DECL
    hb_compGenPCode1( HB_P_PUSHDOUBLE, HB_MACRO_PARAM );
 #ifdef BIG_ENDIAN
    hb_compGenPCodeN( ( BYTE * ) &dLENumber, sizeof( double ), HB_MACRO_PARAM );
-#else   
+#else
    hb_compGenPCodeN( ( BYTE * ) &dNumber, sizeof( double ), HB_MACRO_PARAM );
 #endif
    hb_compGenPCode1( bWidth, HB_MACRO_PARAM );
