@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.18 2002/07/27 23:11:36 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.19 2002/07/30 18:10:31 ronpinkas Exp $
  */
 
 /*
@@ -524,6 +524,7 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
    ULONG ulIndex;
    unsigned int uiSize = 0, uiMemberSize;
    unsigned char cShift;
+   unsigned int uiPad;
 
    for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
    {
@@ -628,7 +629,7 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
 
       if( uiSize )
       {
-         unsigned int uiPad = ( ( uiMemberSize < uiAlign ) ? uiMemberSize : uiAlign );
+         uiPad = ( ( uiMemberSize < uiAlign ) ? uiMemberSize : uiAlign );
 
          if( ( cShift = ( uiSize % uiPad ) ) > 0 )
          {
@@ -636,9 +637,10 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
          }
       }
 
-      //printf( "Size: %i Offset: %i\n", uiMemberSize, uiSize );
-
       uiSize += uiMemberSize;
+
+      //printf( "#%lu Size: %u Align: %u Pad: %u Shift %i Size: %u\n", ulIndex, uiMemberSize, uiAlign, uiPad, cShift, uiSize );
+
    }
 
    if( ( cShift = ( uiSize % uiAlign ) ) > 0 )
@@ -646,13 +648,15 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
       uiSize += ( uiAlign - cShift );
    }
 
+   //printf( "#%lu Size: %u Align: %u Pad: %u Shift %i Size: %u\n", ulIndex, uiMemberSize, uiAlign, uiPad, cShift, uiSize );
+
    return uiSize;
 }
 
 HB_FUNC( HB_SIZEOFCSTRUCTURE )
 {
    PHB_ITEM aDef = hb_param( 1, HB_IT_ARRAY );
-   PHB_ITEM pAlign = hb_param( 1, HB_IT_INTEGER );
+   PHB_ITEM pAlign = hb_param( 2, HB_IT_INTEGER );
    unsigned int uiAlign;
 
    if( aDef )
@@ -856,7 +860,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
             }
             else
             {
-               *( (char *) ( Buffer + uiOffset ) ) = NULL;
+               *( (char *) ( Buffer + uiOffset ) ) = 0;
             }
             break;
 
@@ -867,7 +871,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
             }
             else
             {
-               *( (unsigned char *) ( Buffer + uiOffset ) ) = NULL;
+               *( (unsigned char *) ( Buffer + uiOffset ) ) = 0;
             }
             break;
 
@@ -900,7 +904,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
             {
-               *( (short *) ( Buffer + uiOffset ) ) = NULL;
+               *( (short *) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
@@ -920,7 +924,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
             {
-               *( (unsigned short *) ( Buffer + uiOffset ) ) = NULL;
+               *( (unsigned short *) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
@@ -976,7 +980,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
             {
-               *( (int *) ( Buffer + uiOffset ) ) = NULL;
+               *( (int *) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
@@ -1000,7 +1004,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
             {
-               *( (unsigned int *) ( Buffer + uiOffset ) ) = NULL;
+               *( (unsigned int *) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
@@ -1070,7 +1074,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
             {
-               *( (long *) ( Buffer + uiOffset ) ) = NULL;
+               *( (long *) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
@@ -1094,7 +1098,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
             {
-               *( (unsigned long *) ( Buffer + uiOffset ) ) = NULL;
+               *( (unsigned long *) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
@@ -1154,11 +1158,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
          case CTYPE_FLOAT : // float
             if( ( pBaseVar->pItems + ulIndex  )->type )
             {
-               *( (double *) ( Buffer + uiOffset ) ) = (float) ( pBaseVar->pItems + ulIndex  )->item.asDouble.value;
+               *( (float *) ( Buffer + uiOffset ) ) = (float) ( pBaseVar->pItems + ulIndex  )->item.asDouble.value;
             }
             else
             {
-               *( (double *) ( Buffer + uiOffset ) ) = NULL;
+               *( (float *) ( Buffer + uiOffset ) ) = 0;
             }
             break;
 
@@ -1180,7 +1184,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
             }
             else
             {
-               *( (double *) ( Buffer + uiOffset ) ) = NULL;
+               *( (double *) ( Buffer + uiOffset ) ) = 0;
             }
             break;
 

@@ -65,7 +65,7 @@ STATIC PROCEDURE MsWord()
 
    LOCAL oWord, oText
 
-   oWord := CreateObject( "Word.Application" )
+   oWord := GetObject( "Word.Application" )
 
    IF Ole2TxtError() != "S_OK"
       Alert( "ERROR! Word not avialable." )

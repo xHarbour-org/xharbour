@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.330 2002/08/02 22:33:52 lculik Exp $
+ * $Id: ChangeLog,v 1.331 2002/08/05 18:04:21 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -13,6 +13,7 @@
     * Minor trace info.
   * source/vm/arrayshb.c
     ! Fixed type in HB_FUNC( HB_SIZEOFCSTRUCTURE ) which caused the alingment to always be 4, regardless of passed paramater.
+    ! Fixed few compiler warnings regarding using NULL as a 0.
 
   * source/rtl/win32ole.prg
   * tests/testole.prg
