@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.98 2003/08/16 01:55:48 jonnymind Exp $
+* $Id: thread.c,v 1.99 2003/08/16 02:09:10 jonnymind Exp $
 */
 
 /*
@@ -397,7 +397,7 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    PHB_ITEM *pPos;
    /* Free each element of the stack */
    if ( pStack != &hb_stack ) {
-      for( pPos = pStack; pPos < pStack; pPos++)
+      for( pPos = pStack->pItems; pPos < pStack->pPos; pPos++)
       {
          if( HB_IS_COMPLEX( *pPos ) )
          {
