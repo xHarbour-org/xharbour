@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.11 2004/05/09 20:51:15 ronpinkas Exp $
+ * $Id: simplex.c,v 1.12 2005/02/17 00:56:32 ronpinkas Exp $
  */
 
 /*
@@ -164,6 +164,9 @@ static int  aiHold[4];
 static int  iReturn = 0;
 static int  aiReturn[4];
 
+/* Rules matching. */
+static unsigned int iRule, iMatched = 0;
+
 static int  iRet;
 
 /* NewLine Support. */
@@ -197,6 +200,8 @@ int yyleng;
 #define LEX_CASE(x)
 #define STREAM_OPEN(x)
 #define STREAM_APPEND(x) sPair[ iPairLen++ ] = x
+
+void SimpLex_CheckWords( void );
 
 #include SLX_RULES
 
@@ -258,7 +263,6 @@ static int acReturn[256];
 static int Reduce( int iToken );
 int SimpLex_GetNextToken( void );
 int SimpLex_CheckToken( void );
-void SimpLex_CheckWords( void );
 
 /* Indexing System. */
 static void GenTrees( void );
@@ -966,20 +970,23 @@ static int Reduce( int iToken )
    }
    else
    {
-      register unsigned int i = (unsigned int)(aRuleNodes[ iToken ].iMin), iMax = (unsigned int)(aRuleNodes[ iToken ].iMax);
-      register unsigned int iTentative = 0, iMatched = 1;
+      register unsigned int iMax = (unsigned int)(aRuleNodes[ iToken ].iMax);
+      register unsigned int iTentative = 0;
 
-      DEBUG_INFO( printf(  "Scaning Prospects %i-%i at Pos: 0 for Token: %i\n", i, iMax -1, iToken ) );
+      iRule = (unsigned int)(aRuleNodes[ iToken ].iMin);
+      iMatched = 1;
+
+      DEBUG_INFO( printf(  "Scaning Prospects %i-%i at Pos: 0 for Token: %i\n", iRule, iMax -1, iToken ) );
 
       {
         FoundProspect :
 
          DEBUG_INFO( printf( "Prospect of %i Tokens - Testing Token: %i\n", iMatched, iToken ) );
 
-         if( iMatched == MAX_MATCH || aiRules[i][iMatched] == 0 )
+         if( iMatched == MAX_MATCH || aiRules[iRule][iMatched] == 0 )
          {
-            DEBUG_INFO( printf( "Saving Tentative %i - Found match of %i Tokens at Token: %i\n", i, iMatched, iToken ) );
-            iTentative = i;
+            DEBUG_INFO( printf( "Saving Tentative %i - Found match of %i Tokens at Token: %i\n", iRule, iMatched, iToken ) );
+            iTentative = iRule;
          }
          else
          {
@@ -1016,14 +1023,14 @@ static int Reduce( int iToken )
                iLastToken = iToken;
             }
 
-            if( aiRules[i][iMatched] == iToken )
+            if( aiRules[iRule][iMatched] == iToken )
             {
                /* Continue... Still a prospect. */
                DEBUG_INFO( printf( "Accepted Token: %i - Continue with this Rule...\n", iToken ) );
                iMatched++;
                goto FoundProspect;
             }
-            else if( aiRules[i][iMatched] > iToken )
+            else if( aiRules[iRule][iMatched] > iToken )
             {
                DEBUG_INFO( printf( "Rejected Token: %i - Giving up...\n", iToken ) );
                aiHold[iHold++] = iToken;
@@ -1036,7 +1043,7 @@ static int Reduce( int iToken )
             }
          }
 
-         if( i < iMax )
+         if( iRule < iMax )
          {
             register unsigned int j = 1;
 
@@ -1044,7 +1051,7 @@ static int Reduce( int iToken )
 
             while( j < iMatched )
             {
-               if( aiRules[i][j] != aiRules[i+1][j] )
+               if( aiRules[iRule][j] != aiRules[iRule + 1][j] )
                {
                   break;
                }
@@ -1057,7 +1064,7 @@ static int Reduce( int iToken )
             else
             {
                DEBUG_INFO( printf( "Accepted Next Rule...\n" ) );
-               i++;
+               iRule++;
                goto FoundProspect;
             }
          }
@@ -1073,10 +1080,10 @@ static int Reduce( int iToken )
       {
          DEBUG_INFO( printf( "Processing Tentative: %i\n", iTentative ) );
 
-         while( iMatched > 1 && aiRules[i][iMatched - 1] && aiRules[iTentative][iMatched - 1] == 0 )
+         while( iMatched > 1 && aiRules[iRule][iMatched - 1] && aiRules[iTentative][iMatched - 1] == 0 )
          {
-            DEBUG_INFO( printf( "Reclaimed Token: %i\n", aiRules[i][iMatched - 1] ) );
-            aiHold[iHold++] = aiRules[i][iMatched - 1];
+            DEBUG_INFO( printf( "Reclaimed Token: %i\n", aiRules[iRule][iMatched - 1] ) );
+            aiHold[iHold++] = aiRules[iRule][iMatched - 1];
             iMatched--;
          }
 
@@ -1112,12 +1119,12 @@ static int Reduce( int iToken )
          while( iMatched > 1 )
          {
             iMatched--;
-            DEBUG_INFO( printf( "Pushing: %i\n", aiRules[i][iMatched] ) );
-            aiHold[iHold++] = aiRules[i][iMatched];
+            DEBUG_INFO( printf( "Pushing: %i\n", aiRules[iRule][iMatched] ) );
+            aiHold[iHold++] = aiRules[iRule][iMatched];
          }
 
-         DEBUG_INFO( printf( "Returning Shifted Left: %i\n", aiRules[i][0] ) );
-         return aiRules[i][0];
+         DEBUG_INFO( printf( "Returning Shifted Left: %i\n", aiRules[iRule][0] ) );
+         return aiRules[iRule][0];
       }
    }
 }
@@ -1317,7 +1324,7 @@ void SimpLex_CheckWords( void )
 
             /* Saving this pointer of the input stream, we might have to get here again. */
             szBaseBuffer = s_szBuffer; iBaseSize = iSize;
-            DEBUG_INFO( printf( "Saved Buffer Postion: %i at: [%s]\n", iBaseSize, szBaseBuffer ) );
+            DEBUG_INFO( printf( "Saved Buffer Position: %i at: [%s]\n", iBaseSize, szBaseBuffer ) );
 
             /* No White Space after last Token! */
             if( iHold || iPairToken )
@@ -1361,7 +1368,7 @@ void SimpLex_CheckWords( void )
             /* Saving Token Length. */
             iSavedLen = iLen;
 
-            DEBUG_INFO( printf( "Saved Buffer Postion: %i at: [%s] Len: %i\n", iBaseSize, szBaseBuffer, iSavedLen ) );
+            DEBUG_INFO( printf( "Saved Buffer Position: %i at: [%s] Len: %i\n", iBaseSize, szBaseBuffer, iSavedLen ) );
          }
 
          /* i may have been increased above - don't want to read next token if it won't get used! */
@@ -1417,7 +1424,7 @@ void SimpLex_CheckWords( void )
 
    if( iTentative > -1 )
    {
-      DEBUG_INFO( printf(  "Reducing %s Pattern: %i [%s]\n", sDesc, iTentative, aCheck[iTentative].sWord ) );
+      DEBUG_INFO( printf(  "Reducing %s Pattern: %i [%s] as: %i\n", sDesc, iTentative, aCheck[iTentative].sWord, aCheck[ iTentative ].iToken ) );
 
       bIgnoreWords = TRUE;
 

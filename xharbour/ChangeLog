@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3871 2005/02/26 01:22:34 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3872 2005/02/26 02:11:14 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-26 01:42 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * include/simplex.c
+    * iRule and iMatched of Match() now exported to lex definitions source.
+  * source/compiler/harbour.slx
+    + Added hack for the special case of FIELD, QSELF, IIF, or _GET_ used as an Identifier, followed by a reserved word.
+
 2005-02-26 09:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   + dmcdll.def
   + hrbdll.dc

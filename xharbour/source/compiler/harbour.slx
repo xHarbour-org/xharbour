@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.57 2004/11/21 21:43:45 druzus Exp $
+ * $Id: harbour.slx,v 1.58 2005/02/26 01:23:00 ronpinkas Exp $
  */
 
 /*
@@ -732,7 +732,50 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    extern int yyleng;
 
    char* tmpPtr;
-   int   iRet;
+   int   iElement;
+
+   /*
+      Hack to work around these tokens which may be folowed by a RESERVED WORD, and thus revert to IDENTIFIER.
+      Example:
+
+         FOR i := Field TO 9
+
+      At this point here, sToken and yytext point to 'To', we must revert yytext top the correct IDENTIFIER value.
+      The next token will be a RESERVED WORD which will not require its literal value.
+
+      The only TOKENS that may exhibit this issue are: FIELD, QSELF, IIF and GET - note they are the only ones to
+      not have a rule for a trailing IDENTIFIER.
+
+      Not very nice, but it works - hb_compIdentifierNew() utilizes unique values with sharing logic.
+    */
+   if( iMatched == 1 && ( aiRules[iRule][0] == FIELD || aiRules[iRule][0] == QSELF || aiRules[iRule][0] == IIF || aiRules[iRule][0] == GET ) )
+   {
+      SimpLex_CheckWords();
+
+      if( iRet  )
+      {
+         switch( aiRules[iRule][0] )
+         {
+            case FIELD:
+              yytext = hb_compIdentifierNew( "FIELD", TRUE );
+              break;
+
+            case QSELF:
+              yytext = hb_compIdentifierNew( "QSELF", TRUE );
+              break;
+
+            case IIF:
+              yytext = hb_compIdentifierNew( "IIF", TRUE );
+              break;
+
+            case GET:
+              yytext = hb_compIdentifierNew( "_GET_", TRUE );
+              break;
+         }
+
+         return iRet;
+      }
+   }
 
    yytext = szToken;
    yyleng = (int) iTokenLen;
@@ -752,11 +795,11 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
                    iLastToken == IDENTIFIER ||  iLastToken == MACROVAR || iLastToken == MACROTEXT ||
                    iLastToken == ')' || iLastToken == ']' || iLastToken == '}' )
                {
-                  iRet = BITAND + DONT_REDUCE;
+                  iElement = BITAND + DONT_REDUCE;
                }
                else
                {
-                  iRet = '&';
+                  iElement = '&';
                }
             }
             /* No '.' so Simple Macro. */
@@ -767,7 +810,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
                yyleng--;
 
                yylval.string = hb_compIdentifierNew( yytext, TRUE );
-               iRet = MACROVAR;
+               iElement = MACROVAR;
             }
             else if( tmpPtr == yytext + yyleng - 1 )
             {
@@ -779,7 +822,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
                yytext[yyleng] = '\0';
 
                yylval.string = hb_compIdentifierNew( yytext, TRUE );
-               iRet = MACROVAR;
+               iElement = MACROVAR;
             }
             else
             {
@@ -787,7 +830,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
                yytext = hb_compIdentifierNew( yytext, TRUE );
                */
                yylval.string = hb_strdup( yytext );
-               iRet = MACROTEXT;
+               iElement = MACROTEXT;
             }
          }
          else
@@ -796,7 +839,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
             yytext = hb_compIdentifierNew( yytext, TRUE );
             */
             yylval.string = hb_strdup( yytext );
-            iRet = MACROTEXT;
+            iElement = MACROTEXT;
          }
       }
       else
@@ -815,14 +858,14 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
          {
             DEBUG_INFO( printf( "*** iDentifier = %i - Holding %s\n", iIdentifier, yytext ) );
             sIdOnHold = hb_compIdentifierNew( yytext, TRUE );
-            iRet = _ID_ON_HOLD;
+            iElement = _ID_ON_HOLD;
          }
          else
          {
             iIdentifier++;
             DEBUG_INFO( printf( "Primary Identifier %s Increased to: %i\n", yytext, iIdentifier ) );
             yylval.string = hb_compIdentifierNew( yytext, TRUE );
-            iRet = IDENTIFIER;
+            iElement = IDENTIFIER;
          }
       }
    }
@@ -837,14 +880,14 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       yylval.string = (char*) hb_xgrab( TOKEN_SIZE );
       yylval.string[0] = 0;
 
-      iRet = hb_comp_SLX_Str2Num( yytext, &lNumber, &dNumber, &iDec, &iWidth );
+      iElement = hb_comp_SLX_Str2Num( yytext, &lNumber, &dNumber, &iDec, &iWidth );
 
       if( !isdigit( (BYTE) yytext[0] ) && !( yytext[0] == '.' && isdigit( (BYTE) yytext[1] ) ) )
       {
          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_SYNTAX, yytext, NULL );
          return yytext[0];
       }
-      else if ( iRet == NUM_DOUBLE )
+      else if ( iElement == NUM_DOUBLE )
       {
          yylval.valDouble.dNumber = dNumber;
          yylval.valDouble.bDec = iDec;
@@ -855,19 +898,19 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       {
          yylval.valInteger.iNumber = ( int ) lNumber;
          yylval.valInteger.szValue = yytext;
-         iRet = NUM_INTEGER;
+         iElement = NUM_INTEGER;
       }
       else
       {
          yylval.valLong.lNumber = lNumber;
          yylval.valLong.szValue = yytext;
       }
-      iRet += DONT_REDUCE;
+      iElement += DONT_REDUCE;
    }
 
-   DEBUG_INFO( printf(  "Element \"%s\" is %i\n", szToken, iRet ) );
+   DEBUG_INFO( printf(  "Element \"%s\" is %i\n", szToken, iElement ) );
 
-   return iRet;
+   return iElement;
 }
 
 static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
@@ -891,7 +934,8 @@ static int hb_comp_SLX_CustomAction( int x )
 
       if( iLastToken == NUM_INTEGER || iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == LITERAL ||
           iLastToken == IDENTIFIER ||  iLastToken == MACROVAR || iLastToken == MACROTEXT ||
-          iLastToken == ')' || iLastToken == ']' || iLastToken == '}' )
+          iLastToken == ')' || iLastToken == ']' || iLastToken == '}' ||
+          iLastToken == FIELD || iLastToken == QSELF || iLastToken == IIF || iLastToken == GET )
       {
          return ( (-x) + (HB_AFTER_EXP) ) + DONT_REDUCE;
       }
