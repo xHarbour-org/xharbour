@@ -1,5 +1,5 @@
 /*
- * $Id: posdiff.c,v 1.2 2002/04/14 05:10:58 walito Exp $
+ * $Id: posdiff.c,v 1.1 2003/03/04 21:04:46 lculik Exp $
  */
 
 /*
@@ -118,16 +118,10 @@ HB_FUNC (POSDIFF)
       return;
     }
     
-    if (sStrLen1 != sStrLen2)
-    {
-      hb_retnl ((sStrLen1 < sStrLen2 ? sStrLen1 : sStrLen2)+1);
-      return;
-    }
-    
     pc1 = pcString1+sIgnore;
     pc2 = pcString2+sIgnore;
 
-    while (pc1 < pcString1+sStrLen1)
+    while ((pc1 < pcString1+sStrLen1) && (pc2 < pcString2+sStrLen2))
     {
       if (*pc1 != *pc2)
       {
@@ -138,8 +132,15 @@ HB_FUNC (POSDIFF)
       pc2++;
     }
 
+    if (sStrLen1 != sStrLen2)
+    {
+      hb_retnl ((sStrLen1 < sStrLen2 ? sStrLen1 : sStrLen2)+1);
+    }
+    else
+    {
     hb_retnl (0);
-
+    }
+    return;
   }
   else /* (ISCHAR (1) && ISCHAR (2)) */
   {

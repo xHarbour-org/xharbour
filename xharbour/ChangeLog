@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3245 2004/07/30 22:14:11 maurifull Exp $
+ * $Id: ChangeLog,v 1.3246 2004/07/31 00:34:51 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-07-31 12:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * contrib/libct/posdiff.c
+  + contrib/libct/tests/posdiff.prg
+    ! Committed Martin Vogel's fix and test for POSDIFF() function.
 
 2004-07-30 21:25 UTC-0300 Mauricio Abre <maurifull@datafull.com>
   * source/rtl/gtalleg/ssf.h
