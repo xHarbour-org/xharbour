@@ -29,7 +29,7 @@ Properties:
    nAlign         -> [READ ONLY] Alignment attribute of the C Structure.
    SizeOf         -> [READ ONLY] The equivalent of C' sizeof( STRUCTURE ).
    nId            -> [READ ONLY] Unique ID of this Structure.
-   InternalBuffer -> [READ ONLY] String reprentation of the C Structure memory image.
+   InternalBuffer -> [READ ONLY] String representation of the C Structure memory image.
 
    [xMember] -> Each Structure Member is represented by a given Property of the same name.
 
@@ -39,12 +39,12 @@ Methods:
 
    Reset           -> Initializes all Structure Member properties to NIL.
 
-   Buffer( [New] ) -> Optionaly SET the InternalBuffer to a new image, which will automatically
+   Buffer( [New] ) -> Optionally SET the InternalBuffer to a new image, which will automatically
                       call the DeValue() Method to reflect the change in Member Properties.
 
                       Return a copy of the InternalBuffer.
 
-   Value           -> Return a newly calculated C Strucure Image which and record it into InternalBuffer.
+   Value           -> Return a newly calculated C Structure Image which and record it into InternalBuffer.
 
    DeValue         -> Calculates new values for all Member Properties to reflect the current image of
                       the C Structure from the InternalBuffer.
@@ -65,7 +65,7 @@ PRG Support Functions:
 
 
    HB_CStructure( cStructure, aStructure, nAlign )     -> Creates a new Instance of a C Structure Class for the
-                                                          given defintions. If such Structure was already defined
+                                                          given definitions. If such Structure was already defined
                                                           it will instanciate an object of the pre-existing class,
                                                           otherwise it will create new Class matching the definitions
                                                           and will instanciate the new class.
@@ -76,13 +76,13 @@ PRG Support Functions:
 
                                                           Return new object instance of the specified C Structure class.
 
-  HB_SizeOfCStructure( acTypes, nAlign )               -> Return the eqivalent of C' sizeof( STRUCTURE ) for the given specs.
+  HB_SizeOfCStructure( acTypes, nAlign )               -> Return the equivalent of C' sizeof( STRUCTURE ) for the given specs.
 
   HB_ArrayToStructure( aValues, acTypes, nAlign )      -> Return a String representation of the C Structure memory image
-                                                          for the given values in array aVales based on given defintions.
+                                                          for the given values in array aValues based on given definitions.
 
   HB_StructureToArray( Buffer, acTypes, nAlign )       -> Return an Array calculated from the given C Structure memory image
-                                                          based on given defintions.
+                                                          based on given definitions.
 
 
 
@@ -90,4 +90,4 @@ C Support Functions:
 --------------------
 
   unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
-  -> Return the eqivalent of C' sizeof( STRUCTURE ) for the given defintions.
+  -> Return the equivalent of C' sizeof( STRUCTURE ) for the given definitions.
