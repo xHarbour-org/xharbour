@@ -8142,22 +8142,30 @@ FUNCTION PP_PreProText( sLines, asLines )
    nOpen  := 0
    nClose := 0
    WHILE ( nOpen := nAtSkipStr( Chr(10), sLines, nOpen + 1 ) ) > 0
-      aAdd( asLines, SubStr( sLines, nClose + 1, nOpen - ( nClose + 1 ) ) )
+      aAdd( asLines, RTrim( LTrim( SubStr( sLines, nClose + 1, nOpen - ( nClose + 1 ) ) ) ) )
       nClose := nOpen
    ENDDO
    IF Len( sLines ) > nClose
-      aAdd( asLines, SubStr( sLines, nClose + 1 ) )
+      aAdd( asLines, RTrim( LTrim( SubStr( sLines, nClose + 1 ) ) ) )
    ENDIF
 
-   sLines := ""
    nLines := Len( asLines )
    FOR nLine := 1 TO nLines
-      IF Left( asLines[nLine], 1 ) == '*'
-         LOOP
-      ENDIF
+      DO WHILE Empty( asLines[nLine] ) .OR. Left( asLines[nLine], 1 ) == '*'
+         aDel( asLines, nLine )
+         nLines--
+         aSize( asLines, nLines )
+      ENDDO
 
       nOpen := nAtSkipStr( "&&", asLines[nLine] )
       IF nOpen > 0
+         IF nOpen == 1
+            aDel( asLines, nLine )
+            nLine--
+            nLines--
+            aSize( asLines, nLines )
+            LOOP
+         ENDIF
          sTemp := Left( asLines[nLine], nOpen - 1 )
       ELSE
          sTemp := asLines[nLine]
@@ -8165,10 +8173,33 @@ FUNCTION PP_PreProText( sLines, asLines )
 
       nOpen := nAtSkipStr( "//", sTemp )
       IF nOpen > 0
+         IF nOpen == 1
+            aDel( asLines, nLine )
+            nLine--
+            nLines--
+            aSize( asLines, nLines )
+            LOOP
+         ENDIF
          sTemp := Left( sTemp, nOpen - 1 )
       ENDIF
 
+      asLines[nLine] := sTemp
+   NEXT
+
+   sLines := ""
+   FOR nLine := 1 TO nLines
+      sTemp := asLines[nLine]
+
+      DO WHILE Right( sTemp, 1 ) == ';'
+         aDel( asLines, nLine )
+         nLines--
+         aSize( asLines, nLines )
+         // nLine now points to the next line.
+         sTemp := Left( sTemp, Len( sTemp ) - 1 ) + asLines[nLine]
+      ENDDO
+
       sTemp := PP_PreProLine( sTemp )
+
       sLines += sTemp
       IF nLine < nLines
          sLines += ";"
