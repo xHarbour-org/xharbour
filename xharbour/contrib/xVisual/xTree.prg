@@ -1,5 +1,5 @@
 /*
- * $Id: xTree.prg,v 1.12 2002/10/28 17:23:59 what32 Exp $
+ * $Id: xTree.prg,v 1.13 2002/10/28 23:39:04 ronpinkas Exp $
  */
 
 /*
@@ -79,7 +79,7 @@ return(o)
 
 METHOD OnChange( oItem ) CLASS TreeObj
 
-   LOCAL n := aScan( ::Parent:Parent:ObjInspect:Objects, {|o|o:Name == oItem:Caption} )
+   LOCAL n := aScan( ::Parent:Parent:ObjInspect:Objects, {|o|o:handle == oItem:cargo} )
 
    IF n > 0
       ::Parent:Parent:ObjInspect:ComboBox1:SetCurSel( n - 1 )

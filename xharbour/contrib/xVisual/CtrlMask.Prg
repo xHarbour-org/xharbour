@@ -1,5 +1,5 @@
 /*
- * $Id: CtrlMask.Prg,v 1.34 2002/10/29 15:39:23 what32 Exp $
+ * $Id: CtrlMask.Prg,v 1.35 2002/10/29 23:50:10 what32 Exp $
  */
 
 /*
@@ -120,7 +120,6 @@ CLASS oCtrlMask FROM TWinControl
    METHOD MoveCtrl()
    METHOD Refresh()
    METHOD ChangeInspector()
-   METHOD OnUserMsg()
    METHOD IsFocused()
 ENDCLASS
 
@@ -255,7 +254,7 @@ METHOD OnKeyDown( wParam, lParam )
                   ::aSelected := {{ ::aSiblings[n], aclone( aRect ), 0, 0, {}, {} } }   // handle,rect,anchorX,anchorY,aHot
                   InvalidateRect( ::Parent:Handle ,, .F. )
 
-                  ::PostMessage( WM_USER + 1, 0 )
+                  ::ChangeInspector( 0 )
 
                ENDIF
             ENDIF
@@ -551,17 +550,6 @@ METHOD OnLButtonDown( wParam, x, y )
    ENDIF
 
    // ToolTips and Inspector selection
-   IF lFound
-      ::ChangeInspector( 0 )
-
-      ::HintWindow:Activate(1)
-      ::HintWindow:TrackHint(1)
-      ::lHintActive := .T.
-
-   ELSE
-      // Only if MOUSE Click, NOT simulated
-      ::ChangeInspector( 1 )
-   ENDIF
 
    hDC := GetDC( ::Handle )
    SetTextColor( hDC, RGB( 255, 255, 128 ) )
@@ -582,20 +570,23 @@ METHOD OnLButtonDown( wParam, x, y )
   
    UpdateWindow( ::Parent:handle )
      
-   
+   IF wParam != NIL
+   IF lFound
+      ::ChangeInspector( 0 )
+
+      ::HintWindow:Activate(1)
+      ::HintWindow:TrackHint(1)
+      ::lHintActive := .T.
+
+   ELSE
+      // Only if MOUSE Click, NOT simulated
+      ::ChangeInspector( 1 )
+   ENDIF
+   ENDIF
    RETURN( NIL )
 
 *-----------------------------------------------------------------------------*
 
-METHOD OnUserMsg( nMsg, nwParam, nlParam)
-
-   IF nMsg == WM_USER + 1
-      ::ChangeInspector( nwParam )
-   ENDIF
-
-RETURN( nil )
-
-*-----------------------------------------------------------------------------*
 
 METHOD ChangeInspector( n )
 
@@ -857,8 +848,8 @@ METHOD OnLButtonUp( wParam, x, y )
             ENDIF
          NEXT
       ENDIF
-
       InvalidateRect( ::Handle,, .F. )
+
    ENDIF
 
    ReleaseDc( ::Handle, hDC )
