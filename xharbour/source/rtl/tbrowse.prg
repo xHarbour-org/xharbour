@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.24 2003/02/06 05:13:11 walito Exp $
+ * $Id: tbrowse.prg,v 1.25 2003/02/06 19:34:15 andijahja Exp $
  */
 
 /*
@@ -399,7 +399,19 @@ METHOD Configure( nMode ) CLASS TBrowse
          exit
       endif
    NEXT
-
+   
+   // if all column footers are empty but a footer seperator character was specified 
+   // then draw footer, this is consistent with Clipper
+   IF !EMPTY(::cFootSep)
+     ::lFootSep := .T.
+   ENDIF
+   
+   // if all column headers are empty but a header seperator character was specified 
+   // then draw header, this is consistent with Clipper
+   IF !EMPTY(::cHeadSep)
+     ::lHeadSep := .T.
+   ENDIF
+  
    ::nHeaderHeight := 0
    ::nFooterHeight := 0
 
