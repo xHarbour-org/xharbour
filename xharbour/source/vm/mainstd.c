@@ -1,5 +1,5 @@
 /*
- * $Id: mainstd.c,v 1.3 2003/03/14 22:23:29 ronpinkas Exp $
+ * $Id: mainstd.c,v 1.4 2003/11/22 01:41:10 ronpinkas Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 #include "hbapi.h"
 #include "hbvm.h"
 
+HB_EXTERN_BEGIN
 #if defined(__MINGW32__)
 int _CRT_glob = 0;
 #endif
@@ -76,4 +77,4 @@ char ** __crt0_glob_function( char * _arg )
    return 0;
 }
 #endif
-
+HB_EXTERN_END

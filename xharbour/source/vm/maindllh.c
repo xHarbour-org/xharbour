@@ -1,5 +1,5 @@
 /*
- * $Id: maindllh.c,v 1.4 2001/12/28 22:01:34 andijahja Exp $
+ * $Id: maindllh.c,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbapiitm.h"
 
 #if defined(HB_OS_WIN_32)
-
+HB_EXTERN_BEGIN
 BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ("DllEntryPoint(%p, %p, %d)", hInstance, fdwReason,
@@ -82,5 +82,5 @@ BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID
 
    return TRUE;
 }
-
+HB_EXTERN_END
 #endif

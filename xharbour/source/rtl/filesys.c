@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.83 2004/04/02 10:43:26 srobert Exp $
+ * $Id: filesys.c,v 1.85 2004/04/02 21:28:37 jonnymind Exp $
  */
 
 /*
@@ -1620,7 +1620,7 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
    HB_THREAD_STUB
    FHANDLE hFileHandle;
 
-   #if defined(HB_FS_FILE_IO)
+   #if defined(HB_FS_FILE_IO) && !defined(X__WIN32__)
       int oflag;
       unsigned pmode;
    #endif
@@ -1968,7 +1968,7 @@ ULONG   HB_EXPORT hb_fsReadLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCou
 
    #if defined(X__WIN32__)
       {
-         BOOL bError;
+         // BOOL bError;
 
          // allowing async cancelation here
          HB_TEST_CANCEL_ENABLE_ASYN

@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.6 2003/05/26 20:37:14 ronpinkas Exp $
+ * $Id: maindllp.c,v 1.7 2004/03/17 02:29:01 druzus Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
 #include "hbtypes.h"
 
 #if defined( HB_OS_WIN_32 )
-
+HB_EXTERN_BEGIN
 BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
    HB_TRACE( HB_TR_DEBUG, ( "DllEntryPoint( %p, %p, %d )", hInstance, fdwReason,
@@ -1031,4 +1031,5 @@ ULONG hb_xsize( void * pMem )                  /* returns the size of an allocat
 
    return 0;
 }
+HB_EXTERN_END
 #endif

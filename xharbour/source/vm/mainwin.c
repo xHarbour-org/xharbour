@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.12 2003/12/15 23:11:57 peterrees Exp $
+ * $Id: mainwin.c,v 1.13 2003/12/23 02:49:37 peterrees Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 #define MAX_ARGS 64
 
 #if defined(HB_OS_WIN_32)
-
+HB_EXTERN_BEGIN
 
 int argc = 0;
 char * argv[ MAX_ARGS ];  //23/12/2003 3:40p.m. change from 20 to 64
@@ -172,5 +172,5 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 #if defined(__WATCOMC__)
 void HB_EXPORT hb_froceLinkMain() {}
 #endif
-
+HB_EXTERN_END
 #endif
