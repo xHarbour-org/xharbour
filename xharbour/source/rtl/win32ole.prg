@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.36 2003/12/10 18:30:23 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.37 2004/01/04 03:57:38 ronpinkas Exp $
  */
 
 /*
@@ -121,12 +121,12 @@ RETURN TOleAuto():GetActiveObject( cString )
       WINOLEAUTAPI VarR8FromDec(DECIMAL *pdecIn, DOUBLE *pdblOut);
    #endif
 
-   static HRESULT s_nOleError = 0;
+   static HRESULT  s_nOleError;
    static HB_ITEM  OleAuto;
 
-   static PHB_DYNS s_pSym_OleAuto = NULL;
-   static PHB_DYNS s_pSym_hObj    = NULL;
-   static PHB_DYNS s_pSym_New     = NULL;
+   static PHB_DYNS s_pSym_OleAuto;
+   static PHB_DYNS s_pSym_hObj;
+   static PHB_DYNS s_pSym_New;
 
    static char *s_OleRefFlags = NULL;
 
@@ -135,7 +135,8 @@ RETURN TOleAuto():GetActiveObject( cString )
       s_nOleError = OleInitialize( NULL );
 
       s_pSym_OleAuto = hb_dynsymFindName( "TOLEAUTO" );
-      s_pSym_New  = hb_dynsymFindName( "NEW" );
+      s_pSym_New     = hb_dynsymFindName( "NEW" );      
+      s_pSym_hObj    = hb_dynsymFindName( "HOBJ" );;
    }
 
    HB_FUNC( OLE_UNINITIALIZE )
@@ -1037,11 +1038,6 @@ RETURN uObj
 
                  if( strcmp( hb_objGetClsName( uParam ), "TOLEAUTO" ) == 0 )
                  {
-                    if( s_pSym_hObj == NULL )
-                    {
-                      s_pSym_hObj = hb_dynsymFindName( "HOBJ" );
-                    }
-
                     if( s_pSym_hObj )
                     {
                        hb_vmPushSymbol( s_pSym_hObj->pSymbol );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2205 2004/02/02 15:50:19 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.2206 2004/02/02 19:32:23 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-02-02 16:44 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * bin/bld.bat
+    * Include hbzip.lib in MSVC libs list only if exists.
+
+  * include/hbinit.h
+    ! Fixed MSVC HB_INIT_SYMBOLS_END macro to return 0 (MSVC 7 compatability).
+
+  * source/rtl/win32ole.prg
+    * Minor optimization
 
 2004-02-02 11:33 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbapigt.h

@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.7 2003/06/23 18:50:57 ronpinkas Exp $
+ * $Id: hbinit.h,v 1.8 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -154,7 +154,7 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
       static int func( void ) \
       { \
          hb_vmProcessSymbols( symbols, (USHORT) ( sizeof( symbols ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER ); \
-         return 1; \
+         return 0; \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
