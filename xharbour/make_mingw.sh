@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: make_mingw.sh,v 1.1 2003/01/10 22:17:54 jonnymind Exp $
+# $Id: make_mingw.sh,v 1.2 2003/01/12 22:50:13 jonnymind Exp $
 #
 
 # ---------------------------------------------------------------
@@ -14,10 +14,10 @@
 # See doc/license.txt for licensing terms.
 # ---------------------------------------------------------------
 
-#if [ -z "$HB_ARCHITECTURE" ]; then export HB_ARCHITECTURE=w32; fi
-#if [ -z "$HB_COMPILER" ]; then export HB_COMPILER=mingw32; fi
-#if [ -z "$HB_GPM_MOUSE" ]; then export HB_GPM_MOUSE=no; fi
-#if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtw32; fi
+if [ -z "$HB_ARCHITECTURE" ]; then export HB_ARCHITECTURE=w32; fi
+if [ -z "$HB_COMPILER" ]; then export HB_COMPILER=mingw32; fi
+if [ -z "$HB_GPM_MOUSE" ]; then export HB_GPM_MOUSE=no; fi
+if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtwin; fi
 
 # export PRG_USR=
 # export C_USR=
@@ -53,7 +53,7 @@ if [ -z "$HB_ARCHITECTURE" ] || [ -z "$HB_COMPILER" ]; then
    echo
    echo "    HB_ARCHITECTURE:"
    echo "      - dos   (HB_GT_LIB=gtdos by default)"
-   echo "      - w32   (HB_GT_LIB=gtw32 by default)"
+   echo "      - w32   (HB_GT_LIB=gtwin by default)"
    echo "      - linux (HB_GT_LIB=gtstd by default)"
    echo "      - os2   (HB_GT_LIB=gtos2 by default)"
    echo

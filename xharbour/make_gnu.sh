@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $Id: make_gnu.sh,v 1.3 2003/01/10 16:12:59 jonnymind Exp $
+# $Id: make_gnu.sh,v 1.4 2003/01/12 22:50:13 jonnymind Exp $
 #
 
 # ---------------------------------------------------------------
@@ -18,6 +18,7 @@ if [ -z "$HB_ARCHITECTURE" ]; then export HB_ARCHITECTURE=linux; fi
 if [ -z "$HB_COMPILER" ]; then export HB_COMPILER=gcc; fi
 if [ -z "$HB_GPM_MOUSE" ]; then export HB_GPM_MOUSE=yes; fi
 if [ -z "$HB_GT_LIB" ]; then export HB_GT_LIB=gtsln; fi
+if [ -z "$HB_MULTI_GT" ]; then export HB_MULTI_GT=yes; fi
 
 # export PRG_USR=
 # export C_USR=
@@ -101,4 +102,8 @@ else
    # Start the GNU make system
    export HB_MT=MT
    make $*
+
+   if [ "$*" = "clean" ]; then
+      find . -type d -name "$HB_ARCHITECTURE" | xargs rmdir 2> /dev/null
+   fi
 fi

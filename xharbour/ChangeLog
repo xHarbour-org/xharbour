@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1022 2003/05/16 04:10:24 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1023 2003/05/16 18:40:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,161 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-05-16 21:40 UTC+0200 Przemyslaw Czerpak <druzus@polbox.com>
+  + include/hbapicdp.h
+  * source/Makefile
+  + source/codepage
+  + source/codepage/CVS
+  + source/codepage/Makefile
+  + source/codepage/cdp_tpl.c
+  + source/codepage/cdpesdos.c
+  + source/codepage/cdpeswin.c
+  + source/codepage/cdpgedos.c
+  + source/codepage/cdpgewin.c
+  + source/codepage/cdpla850.c
+  + source/codepage/cdppl852.c
+  + source/codepage/cdppliso.c
+  + source/codepage/cdpplmaz.c
+  + source/codepage/cdpru866.c
+  + source/codepage/cdprukoi.c
+  + source/codepage/cdpruwin.c
+  + source/rtl/cdpapi.c
+  * source/rtl/Makefile
+  * source/rtl/is.c
+  * source/rtl/strcase.c
+  * source/rtl/transfrm.c
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+    + codepage support added. The code borrowed from Harbour, many thanks
+    to Alexander S.Kresin <alex@belacy.belgorod.su> for his work.
+
+  * xharbour/config/linux/gcc.cf
+  * xharbour/include/thread.h
+  * xharbour/source/vm/thread.c
+  * xharbour/source/vm/fm.c
+    * added macro HB_SAFE_ALLOC for this compiler which has thread safe
+      version of malloc/free functions (if set hb_allocMutex is disabled)
+
+  + xharbour/source/rtl/gtnul
+  + xharbour/source/rtl/gtnul/Makefile
+  + xharbour/source/rtl/gtnul/gtnul.c
+    + new GT added - it has two function:
+	- it's necesary for multi GT programs
+        - it can be used as a NULL GT without any input/ouput as a system
+	  daemon (only outstd()/outerr() works)
+
+  * xharbour/source/rtl/gt.c
+    + new .prg function HB_GT_VERSION() which returns GT name.
+
+  * xharbour/source/rtl/gtcrs/Makefile
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  + xharbour/source/rtl/gtcrs/gtcrs.h
+  + xharbour/source/rtl/gtcrs/chrmap.c
+  + xharbour/source/rtl/gtcrs/hb-charmap.def
+  - xharbour/source/rtl/gtcrs/kbdcrs.c
+  - xharbour/source/rtl/gtcrs/mousecrs.c
+    * new GTCRS - there is a chance that it makes some problems for other
+      then ncurses implementation of curses so I'm waiting for reports.
+      I plan to add yet another GT less powerful but basic curses
+      oriented so it will be better portable to other *nixes
+
+  * xharbour/config/bsd/gcc.cf
+  * xharbour/config/bsd/global.cf
+  * xharbour/config/darwin/gcc.cf
+  * xharbour/config/darwin/global.cf
+  * xharbour/config/dos/bcc16.cf
+  * xharbour/config/dos/djgpp.cf
+  * xharbour/config/dos/global.cf
+  * xharbour/config/dos/rsx32.cf
+  * xharbour/config/dos/watcom.cf
+  * xharbour/config/linux/gcc.cf
+  * xharbour/config/linux/global.cf
+  * xharbour/config/os2/global.cf
+  * xharbour/config/w32/bcc32.cf
+  * xharbour/config/w32/gcc.cf
+  * xharbour/config/w32/global.cf
+  * xharbour/config/w32/mingw32.cf
+  * xharbour/config/w32/msvc.cf
+  * xharbour/config/w32/rsxnt.cf
+  * xharbour/config/w32/watcom.cf
+  * xharbour/include/hbapigt.h
+  * xharbour/source/rtl/console.c
+  * xharbour/source/rtl/gtQTc/Makefile
+  * xharbour/source/rtl/gtQTc/gtQTc.cpp
+  * xharbour/source/rtl/gtQTc/mouseQTc.c
+  * xharbour/source/rtl/gt_tpl/Makefile
+  * xharbour/source/rtl/gt_tpl/gt_tpl.c
+  * xharbour/source/rtl/gt_tpl/mousetpl.c
+  * xharbour/source/rtl/gtcgi/Makefile
+  * xharbour/source/rtl/gtcgi/gtcgi.c
+  * xharbour/source/rtl/gtcgi/mousecgi.c
+  * xharbour/source/rtl/gtcrs/Makefile
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+  * xharbour/source/rtl/gtdos/Makefile
+  * xharbour/source/rtl/gtdos/gtdos.c
+  * xharbour/source/rtl/gtdos/mousedos.c
+  * xharbour/source/rtl/gtos2/Makefile
+  * xharbour/source/rtl/gtos2/gtos2.c
+  * xharbour/source/rtl/gtos2/mouseos2.c
+  * xharbour/source/rtl/gtpca/Makefile
+  * xharbour/source/rtl/gtpca/gtpca.c
+  * xharbour/source/rtl/gtpca/kbdos2.gcc
+  * xharbour/source/rtl/gtpca/mousepca.c
+  * xharbour/source/rtl/gtsln/Makefile
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtsln/gtsln.h
+  * xharbour/source/rtl/gtsln/kbsln.c
+  * xharbour/source/rtl/gtsln/keytrans.c
+  * xharbour/source/rtl/gtsln/mousesln.c
+  * xharbour/source/rtl/gtsln/termtype.c
+  * xharbour/source/rtl/gtstd/Makefile
+  * xharbour/source/rtl/gtstd/gtstd.c
+  * xharbour/source/rtl/gtstd/mousestd.c
+  * xharbour/source/rtl/gtwin/Makefile
+  * xharbour/source/rtl/gtwin/gtwin.c
+  * xharbour/source/rtl/gtwin/mousewin.c
+    + New MULTI GT mode added. Now you can link your applications with
+      more then one GT and choose it at runtime by switch //GT:<gtname>
+      ex.:
+        ./myprog //gt:sln
+        ./myprog //gt:crs
+        ./myprog //gt:pca
+        ./myprog //gt:nul
+      or by setting environment variables HB_GT=<gtname>
+      to make xHarbour binaries with MULTI GT you have to set environment
+      variable HB_MULTI_GT=yes
+      then if you link your apps with static libraries you always have to 
+      link with gtnul and optionally with other gt libs you need.
+      GTNUL is basic lib. It has to have all GT features. Other GTs may
+      not have all function implemented on some platforms. My main idea
+      was to allow developers adding platform specific GT extension without
+      necessary of changing all GTs.
+      I've tested it under Linux and it works correctly for:
+      gtcrs, gtsln, gtpca, gtstd, gtcgi and gtnul (gt_tpl too ;-)).
+      I added support for MULTI GT for gtwin too, but it has to be checked
+      by someone who use Windows because now I cannot even compile it
+      (I don't have windows access at this moment). I hope it'll work
+      but maybe I made some typos.
+      TODO:
+        add MULTI GT support for gtdos, gtos2 and gtQTc. I have to ask
+        developers to do that - it's rather hard for me because I don't
+        use this platform. Now all the works is very easy - you only
+        have to change all functions with hb_gt_ and hb_mouse_ prefixes
+        to HB_GT_FUNC(gt_<...>) and HB_GT_FUNC(mouse_<...>) then
+        add initialization code (see tail of gt_tpl.c)
+      I've change a lot of code so It have to be intensively tested on
+      different platforms.
+      
+  * xharbour/source/rtl/seconds.c
+    * the symbol CLK_TCK which is mentioned as obsolescent in POSIX-1996
+      replaced by sysconf(_SC_CLK_TCK)
+
+  * xharbour/make_gnu.sh
+  * xharbour/make_mingw.sh
+  * xharbour/bin/!pack_src.bat
+  + xharbour/bin/!pack_src.sh
+    * some cleanups.
 2003-05-16 11:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbclass.ch
     + Added support for syntax: MESSAGE <MsgName>[(...)] PROCEDURE <ProcName>[(...)]
