@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.29 2004/03/21 15:55:04 druzus Exp $
+ * $Id: adsfunc.c,v 1.30 2004/03/24 08:02:06 brianhays Exp $
  */
 
 /*
@@ -1740,7 +1740,7 @@ HB_FUNC( ADSVERSION )
    hb_retc(ucVersion);
 }
 
-#ifdef ADS_REQUIRE_VERSION6
+#if ADS_REQUIRE_VERSION >= 6
 
 HB_FUNC( ADSGETNUMACTIVELINKS )         // requires 6.2 !
 {
@@ -2095,5 +2095,5 @@ HB_FUNC( ADSCOPYTABLECONTENTS )
       hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, " ADSCOPYTABLECONTENTS" );
 }
 
-#endif   /* ADS_REQUIRE_VERSION6  */
+#endif   /* ADS_REQUIRE_VERSION >= 6  */
 /*  Please add all-version functions above this block */

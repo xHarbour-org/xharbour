@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.4 2003/05/26 11:10:01 lculik Exp $
+ * $Id: rddads.h,v 1.5 2004/02/16 00:39:26 brianhays Exp $
  */
 
 /*
@@ -49,6 +49,8 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#define ADS_REQUIRE_VERSION 6
 
 #include "hbapirdd.h"
 #include "ace.h"

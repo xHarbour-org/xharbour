@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2662 2004/03/26 11:18:24 patrickmast Exp $
+ * $Id: ChangeLog,v 1.2663 2004/03/26 13:35:34 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-26 14:04 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * contrib/rdd_ads/adsfunc.c
+    + added #define ADS_REQUIRE_VERSION 6
+  * contrib/rdd_ads/rddads.h
+    * Converted #ifdef ADS_REQUIRE_VERSION6 to #if ADS_REQUIRE_VERSION >= 6
+
+  /* As per agreement with Brian Hays, now, user can define the required
+     Version Number as a numeric value - Default is 6 */
 
 2004-03-26 14:38 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbf1.c
