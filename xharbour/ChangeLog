@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3886 2005/02/27 17:10:47 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3887 2005/02/27 21:27:39 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-28 03:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbinit.h
+    * simplified the startup code definitions:
+       HARBOUR_STRICT_ANSI_C // disable any startup code
+       __GNUC__              // use GCC constructor function attribute
+       HB_STATIC_STARTUP     // which means C++ initialization default for
+                             // __cplusplus mode
+       HB_PRAGMA_STARTUP     // which means #pragma startup initialization
+       HB_MSC_STARTUP        // which means MSC #pragma initialization
+                             // for standard C mode (C++ not detected)
+
+  * xharbour/include/hbmath.h
+    * do not use HB_MATH_HANDLER as default for MINGW as far as we won't
+      have found why it does not work correctly.
+
+  * xharbour/include/hbrddntx.h
+    * some modification for new DBFNTX I'm workin on
+
+  * xharbour/include/hbsetup.h
+    * added auto detection for LINUX, SUNOS and HPUX - this code
+      should also be cleaned to give deterministic results
+    
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * some minor modifications
+    ! fixed counting EOF and other "out of scope" records in ordKeyPos()
+    ! disable extended filters when indexing with WHILE/REST/USECURRENT
+      flags.
+
 2005-02-28 04:25 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/vm/maindll.c
   * source/vm/maindllh.c

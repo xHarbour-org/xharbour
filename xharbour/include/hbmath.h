@@ -1,5 +1,5 @@
 /*
- * $Id: hbmath.h,v 1.10 2005/02/15 21:06:00 andijahja Exp $
+ * $Id: hbmath.h,v 1.11 2005/02/24 10:44:03 andijahja Exp $
  */
 
 /*
@@ -89,7 +89,12 @@ HB_EXTERN_BEGIN
             #define exception _exception
          #endif
       #endif
+    /* it seems that MinGW has some problem with MATH HANDLER
+       use HB_MATH_ERRNO instead */
+/*
    #elif ( defined(__MINGW32__) || defined(__DMC__) )
+*/
+   #elif defined(__DMC__)
       #if !defined(HB_MATH_ERRNO)
          #define HB_MATH_HANDLER
       #endif
@@ -104,8 +109,7 @@ HB_EXTERN_BEGIN
    #endif
 #endif
 
-#if !defined(HB_MATH_HANDLER) && defined(__GNUC__) && \
-    ( defined(HB_OS_LINUX) || defined(HB_OS_UNIX) )
+#if !defined(HB_MATH_HANDLER) && defined(__GNUC__) /* && defined(HB_OS_UNIX) */
    #define HB_MATH_ERRNO
 #endif
 

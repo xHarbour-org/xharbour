@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.20 2004/11/21 21:43:38 druzus Exp $
+ * $Id: hbrddntx.h,v 1.21 2005/02/14 21:14:01 druzus Exp $
  */
 
 /*
@@ -64,14 +64,17 @@
 HB_EXTERN_BEGIN
 
 /* DBFNTX default extensions */
-#define NTX_INDEXEXT                              ".ntx"
+#define NTX_INDEXEXT                             ".ntx"
 
 /* DBFNTX constants declarations */
 
-#define TOP_RECORD                                                      1
-#define BTTM_RECORD                                                     2
-#define PREV_RECORD                                                     3
-#define NEXT_RECORD                                                     4
+#define TOP_RECORD                                    1
+#define BTTM_RECORD                                   2
+#define PREV_RECORD                                   3
+#define NEXT_RECORD                                   4
+
+#define NTX_IGNORE_REC_NUM                        0x0UL
+#define NTX_MAX_REC_NUM                    0xFFFFFFFFUL
 
 #define NTX_MAX_KEY          256      /* Max len of key */
 #define NTXBLOCKSIZE         1024     /* Size of block in NTX file */
@@ -89,38 +92,34 @@ struct _NTXINDEX;
 typedef struct _KEYINFO
 {
    /* PHB_ITEM pItem; */
-   LONG     Tag;
-   LONG     Xtra;
+   ULONG    Tag;
+   ULONG    Xtra;
    char     key[ 1 ]; /* value of key */
 } KEYINFO;
-
 typedef KEYINFO * LPKEYINFO;
 
 typedef struct _TREE_STACK
 {
-   LONG     page;
+   ULONG    page;
    SHORT    ikey;
 }  TREE_STACK;
-
 typedef TREE_STACK * LPTREESTACK;
 
 typedef struct HB_PAGEINFO_STRU
 {
-   LONG      Page;
+   ULONG     Page;
    BOOL      Changed;
    BOOL      lBusy;
    USHORT    uiKeys;
    SHORT     CurKey;
    char*     buffer;
 } HB_PAGEINFO;
-
 typedef HB_PAGEINFO * LPPAGEINFO;
-
 
 typedef struct _TAGINFO
 {
    char *     TagName;
-   LONG       TagRoot;
+   int        TagRoot;  /* tag number */
    char *     KeyExpr;
    char *     ForExpr;
    PHB_ITEM   pKeyItem;
@@ -134,12 +133,12 @@ typedef struct _TAGINFO
    BOOL       TagChanged;
    BOOL       TagBOF;
    BOOL       TagEOF;
-   BOOL       NewRoot;
+//   BOOL       NewRoot;
    BOOL       Memory;
    BYTE       KeyType;
    BYTE       OptFlags;
-   LONG       TagBlock;
-   LONG       RootBlock;
+   ULONG      TagBlock;       /* next free page ??? */
+   ULONG      RootBlock;      /* root page offset */
    USHORT     nField;
    USHORT     KeyLength;
    USHORT     KeyDec;
