@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2733 2004/04/03 03:28:10 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.2734 2004/04/03 11:46:40 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,15 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-04-03 09:12 UTC-0500 Sylvain Robert <s.robert/at/videotron.ca>
+  * source/rtl/filesys.c
+    * hb_fsCreate() set the error to _doserrno if possible for MSVC
+
 2004-04-03 13:58 UTC+0200 Giancarlo Niccolai <antispam [at] niccolai/dot/ ws>
-  * include/hbapi.h 
-  * source/vm/garbage.c 
+  * include/hbapi.h
+  * source/vm/garbage.c
   * source/vm/memvars.c
   * source/vm/thread.c
     + added hb_memvarsIsMemvarRefMT to reference local stack memvars in GC
       Mark loop.
     ! fixed GC marking of memvars under MT.
-    
+
 2004-04-02 19:39 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/fastitem.c
 
