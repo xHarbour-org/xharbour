@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3257 2004/08/02 19:17:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.3258 2004/08/02 20:11:00 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-03 00:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbsetup.h
+    + Added a temporary hack to bypass the problem with missing snprintf()
+      in DJGPP versions <= 2.03.
 
 2004-08-02 22:05 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/rtl/gtdos/gtdos.c

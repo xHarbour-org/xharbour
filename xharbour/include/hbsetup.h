@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.19 2004/03/21 02:44:36 ronpinkas Exp $
+ * $Id: hbsetup.h,v 1.20 2004/06/12 13:23:09 druzus Exp $
  */
 
 /*
@@ -255,6 +255,7 @@
       #define OS_OPT_DELIMITER_LIST     "/-"
       #define OS_EOL_LEN                2  /* # of bytes in End of Line marker */
    #else
+      #define HOST_OS_UNIX_COMPATIBLE
       #define OS_UNIX_COMPATIBLE
       #define OS_PATH_LIST_SEPARATOR    ':'
       #define OS_PATH_DELIMITER         '/'
@@ -365,6 +366,12 @@
 */
 #ifdef __DJGPP__
    #include "hbfixdj.h"
+
+   /* Substitute snprintf() by sprintf() for DJGPP <= 2.03.
+    * This is a temporary hack, should implement a C99 snprintf() ourselves. */
+   #if ( __DJGPP__ < 2 || ( __DJGPP__ == 2 && __DJGPP_MINOR__ <= 3 ) )
+      #define snprintf(s, len, args...) sprintf( (s), ##args )
+   #endif
 #endif
 
 
