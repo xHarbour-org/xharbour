@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.59 2003/12/18 21:12:44 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.60 2004/01/12 19:13:30 paultucker Exp $
  */
 
 /*
@@ -1635,8 +1635,6 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
          * bFreeReq = FALSE;
    }
 
-
-
    return buffer;
 }
 
@@ -1688,7 +1686,7 @@ char HB_EXPORT * hb_itemPadConv( PHB_ITEM pItem, char * buffer, ULONG * pulSize 
       #ifndef HB_LONG_LONG_OFF
       else if( HB_IS_LONGLONG( pItem ) )
       {
-         sprintf( buffer, "%Ld", hb_itemGetNLL( pItem ) );
+         sprintf( buffer, "%I64d", hb_itemGetNLL( pItem ) );
          szText = buffer;
          *pulSize = strlen( szText );
       }
