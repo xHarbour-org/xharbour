@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.100 2004/04/21 15:28:41 lculik Exp $
+ * $Id: filesys.c,v 1.101 2004/04/28 18:30:22 druzus Exp $
  */
 
 /*
@@ -2060,7 +2060,9 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
    USHORT Flags = convert_seek_flags( uiFlags );
 
    #if defined(HB_OS_OS2)
-      APIRET ret
+   {
+      APIRET ret;
+
       /* This DOS hack creates 2GB file size limit, Druzus */
       if( lOffset < 0 && Flags == SEEK_SET )
       {
@@ -2083,6 +2085,7 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
             ulPos = 0;
          }
       }
+   }
    #elif defined(HB_WIN32_IO)
       /* This DOS hack creates 2GB file size limit, Druzus */
       if( lOffset < 0 && Flags == SEEK_SET )
@@ -2121,7 +2124,7 @@ ULONG   HB_EXPORT hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiFlags )
          }
       }
    #endif
-}
+   }
 #else
    hb_fsSetError( 25 );
    ulPos = 0;

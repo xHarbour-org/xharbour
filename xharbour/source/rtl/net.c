@@ -1,5 +1,5 @@
 /*
- * $Id: net.c,v 1.6 2003/11/16 00:58:33 likewolf Exp $
+ * $Id: net.c,v 1.7 2003/12/20 11:12:04 lf_sfnet Exp $
  */
 
 /*
@@ -70,10 +70,14 @@
 
    #include "hb_io.h"
 
+   /* 25/03/2004 - <maurilio.longo@libero.it>
+      not needed anymore as of GCC 3.2.2
+
    #if defined(__EMX__)
       #include <emx/syscalls.h>
       #define gethostname __gethostname
    #endif
+   */
 
    #define MAXGETHOSTNAME 256      /* should be enough for a host name */
 
@@ -118,9 +122,9 @@ HB_FUNC( NETNAME )
       }
    #elif defined(__WATCOMC__)
 
-         char * pszValue; 
+         char * pszValue;
          pszValue = hb_getenv( "COMPUTERNAME" );
-         
+
          hb_retcAdopt( pszValue );
    #else
       {

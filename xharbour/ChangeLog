@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2871 2004/05/04 16:24:11 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.2872 2004/05/04 16:34:53 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-04 18:43 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/filesys.c
+     ! fixed a syntax typo on OS/2 section around line 2063
+   * source/rtl/net.c
+     ! removed _gethostname #define, not anymore needed using Innotek GCC 3.2.2
 
 2004-05-04 18:33 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * contrib/libct/fcopy.prg
