@@ -65,9 +65,9 @@ HB_FUNC ( POSTMESSAGE )
   char *cText ;
 
   if (ISBYREF(4)) {
-     cText = hb_strdup( hb_parc(4) ) ;
-     //cText = (char*) hb_xgrab( hb_parcsiz(4) );
-     //hb_xmemcpy( *cText, hb_parc(4), hb_parcsiz(4) );
+     //cText = hb_strdup( hb_parc(4) ) ;
+     cText = (char*) hb_xgrab( hb_parcsiz(4) );
+     hb_xmemcpy( cText, hb_parc(4), hb_parcsiz(4) );
   }
 
 
@@ -104,9 +104,9 @@ HB_FUNC ( SENDMESSAGE )
 
 
   if (ISBYREF(4)) {
-     cText = hb_strdup( hb_parc(4) ) ;
-     //cText = (char*) hb_xgrab( hb_parcsiz(4) );
-     //hb_xmemcpy( *cText, hb_parc(4), hb_parcsiz(4) );
+     //cText = hb_strdup( hb_parc(4) ) ;
+     cText = (char*) hb_xgrab( hb_parcsiz(4) );
+     hb_xmemcpy( cText, hb_parc(4), hb_parcsiz(4) );
   }
 
 

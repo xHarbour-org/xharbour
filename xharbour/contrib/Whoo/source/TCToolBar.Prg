@@ -1,5 +1,5 @@
 /*
- * $Id: TCToolBar.Prg,v 1.29 2002/11/11 23:18:02 what32 Exp $
+ * $Id: TCToolBar.Prg,v 1.30 2002/11/12 00:51:40 what32 Exp $
  */
 /*
  * xHarbour Project source code:
@@ -38,10 +38,25 @@
 #Include "winlview.ch"
 #include "classex.ch"
 
+GLOBAL EXTERNAL Application
+
 pragma pack(4)
 
 IMPORT C STRUCTURE RECT
 IMPORT C STRUCTURE NMHDR
+
+typedef struct {;
+    UINT cbSize;
+    DWORD dwMask;
+    int idCommand;
+    int iImage;
+    BYTE fsState;
+    BYTE fsStyle;
+    WORD cx;
+    LONG lParam; //DWORD_PTR lParam;
+    LPTSTR pszText;
+    int cchText;
+} TBBUTTONINFO
 
 typedef struct _TBBUTTON {;
     int iBitmap;
@@ -75,7 +90,6 @@ typedef struct {;
     HINSTANCE hinst;
     UINT      uflags;
 } TOOLTIPTEXT
-
 
 CLASS TToolBar FROM TCustomControl
 
@@ -320,9 +334,10 @@ CLASS ToolButton
    DATA Parent     PROTECTED
    DATA oStruct    PROTECTED
 
-   PROPERTY Id READ ::oStruct:idCommand WRITE SetId DEFAULT 0
+   PROPERTY Id READ oStruct:idCommand WRITE SetId DEFAULT 0
+   
    PROPERTY Caption READ FCaption WRITE SetText
-
+   PROPERTY Style   READ FStyle   WRITE SetStyle
    DATA Hint
   
    DATA OnClick
@@ -334,6 +349,7 @@ CLASS ToolButton
    METHOD SetText(cText) INLINE ::FCaption := cText
 
    METHOD SetId( n )     INLINE ::FId := n, ::oStruct:idCommand := n, Self
+   METHOD SetStyle()
 ENDCLASS
 
 
@@ -357,4 +373,22 @@ METHOD Create( oParent ) CLASS ToolButton
 
    oParent:Add( Self )
 
+RETURN Self
+
+METHOD SetStyle( n ) CLASS ToolButton
+
+   LOCAL tbb IS TBBUTTONINFO
+
+//   LOCAL TmpBuffer
+   
+   tbb:cbSize := tbb:SizeOf()
+   tbb:dwMask := TBIF_STYLE
+   
+//   TmpBuffer := tbb:value
+//   SendMessage( ::Parent:Handle, TB_GETBUTTONINFO, ::Id,  @TmpBuffer )
+//   tbb:Buffer( TmpBuffer )
+
+   tbb:fsStyle := n
+   SendMessage( ::Parent:Handle, TB_SETBUTTONINFO, ::Id,  tbb:value )
+   Application:ProcessMessages()
 RETURN Self
