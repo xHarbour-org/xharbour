@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2007 2004/01/06 23:19:59 peterrees Exp $
+ * $Id: ChangeLog,v 1.2008 2004/01/06 23:56:02 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-01-07 15:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/inkey.c
+    + SETINKEYBEFOREBLOCK()
+    + SETINKEYAFTERBLOCK()
+        Codeblock that can be set to be called inside INKEY() - before & after
+  * doc/en/input.txt
+    + documentation for SETINKEYBEFOREBLOCK() & SETINKEYAFTERBLOCK()
+
 2004-01-07 12:51 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/memoedit.prg
   * source/rtl/teditor.prg
