@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.4 2002/04/28 20:18:43 lculik Exp $
+ * $Id: console.c,v 1.5 2002/04/28 21:57:33 lculik Exp $
  */
 
 /*
@@ -265,7 +265,8 @@ static void hb_conOutAlt( char * pStr, ULONG ulLen )
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }
 
-   if( hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR )
+   if( ( hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR ) ||
+       ( hb_set.HB_SET_PRINTER &&  hb_set.hb_set_winhan != FS_ERROR ) )
    {
       /* Print to printer if SET PRINTER ON and valid printer file */
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
@@ -285,7 +286,8 @@ static void hb_conOutDev( char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutDev(%s, %lu)", pStr, ulLen));
 
-   if( hb_set.hb_set_printhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 )
+   if( (hb_set.hb_set_printhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 ) ||
+       ( hb_set.hb_set_winhan != FS_ERROR && hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 ) )
    {
       /* Display to printer if SET DEVICE TO PRINTER and valid printer file */
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
@@ -346,7 +348,8 @@ HB_FUNC( QOUT )
 {
    hb_conOutAlt( s_szCrLf, CRLF_BUFFER_LEN - 1 );
 
-   if( hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR )
+   if( (hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR ) || 
+   (hb_set.HB_SET_PRINTER && hb_set.hb_set_winhan != FS_ERROR ))
    {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       USHORT uiCount;
@@ -372,7 +375,8 @@ HB_FUNC( QOUT )
 
 HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
 {
-   if( hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_printhan != FS_ERROR )
+   if( (hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_printhan != FS_ERROR ) ||
+       (hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 && hb_set.hb_set_winhan != FS_ERROR ))
    {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       if (!hb_set.hb_set_winprinter)
