@@ -1,7 +1,7 @@
 ***********************************************************
 * bkgtest.prg
 *
-* $Id: idletest.prg,v 1.1 2003/12/18 14:47:54 jonnymind Exp $
+* $Id: bkgtest.prg,v 1.1 2003/12/19 01:41:13 fsgiudice Exp $
 *
 * This test demonstrates usage of BACKGROUND functions that are an extension of IDLE functions;
 * this is a variant of idle functions that runs only on idle state (as inkey(0) does)
@@ -21,6 +21,9 @@ PROCEDURE Main()
    nId2 := HB_IdleAdd( { @idleFunc(), 11, "FromArray"} )
    nId3 := HB_BackgroundAdd( { @CheckFunc() } )
    nId4 := HB_BackgroundAdd( { @TimerFunc() } )
+   HB_BackgroundAdd( { @Counter1Func() } )
+   HB_BackgroundAdd( { @Counter2Func() } )
+   HB_BackgroundAdd( { @Counter3Func() } )
 
    SET COLOR TO w+/B
    CLEAR SCREEN
@@ -30,6 +33,8 @@ PROCEDURE Main()
    @4,10 SAY "will make some text to flash."
    @5,10 SAY "Background functions show timer and check time elapsed."
    @6,10 SAY "After 20 seconds this program will be forcely quitted."
+
+   //@8,10 SAY lRun
 
    @20,10 SAY "Press ESC key to terminate"
    //Inkey( 0 )
@@ -88,5 +93,44 @@ PROCEDURE TimerFunc()
      cTime := cNow
      @ 15, 60 SAY "Time: " + cTime
   ENDIF
+
+RETURN
+
+PROCEDURE Counter1Func()
+  STATIC nCount
+
+  IF nCount == NIL
+     nCount := 0
+  ENDIF
+  //IF nCount % 10 == 0
+     @ 16, 60 SAY "Count1: " + Str( nCount )
+  //ENDIF
+  nCount++
+
+RETURN
+
+PROCEDURE Counter2Func()
+  STATIC nCount
+
+  IF nCount == NIL
+     nCount := 0
+  ENDIF
+  //IF nCount % 10 == 0
+     @ 17, 60 SAY "Count2: " + Str( nCount )
+  //ENDIF
+  nCount++
+
+RETURN
+
+PROCEDURE Counter3Func()
+  STATIC nCount
+
+  IF nCount == NIL
+     nCount := 0
+  ENDIF
+  //IF nCount % 10 == 0
+     @ 18, 60 SAY "Count3: " + Str( nCount )
+  //ENDIF
+  nCount++
 
 RETURN

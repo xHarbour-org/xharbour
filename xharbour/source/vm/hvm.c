@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.297 2003/12/18 21:12:44 ronpinkas Exp $
+ * $Id: hvm.c,v 1.298 2003/12/19 01:32:39 fsgiudice Exp $
  */
 
 /*
@@ -852,12 +852,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
       if ( hb_set.HB_SET_BACKGROUNDTASKS )
       {
-         static unsigned short s_iCancel = 0;
-
-         if( ++s_iCancel == 65535 )
+         static unsigned short s_iBackground = 0;
+         // Run background functions every 5000 vm exec
+         if( ++s_iBackground == 5000 )
          {
             //hb_idleRun();
             hb_backgroundRun();
+            s_iBackground = 0;
          }
       }
 
