@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.7 2002/01/26 20:16:18 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.8 2002/01/27 22:30:07 ronpinkas Exp $
  */
 
 /*
@@ -2024,7 +2024,7 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
 
                      hb_compGenPCode4( HB_P_LOCALNEARSETSTR, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
 
-                     hb_compGenPCodeN( pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, FALSE );
+                     hb_compGenPCodeN( ( unsigned char * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, FALSE );
 
                      HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
 
@@ -2090,7 +2090,7 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
 
                      hb_compGenPCode4( HB_P_LOCALNEARSETSTR, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
 
-                     hb_compGenPCodeN( pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, FALSE );
+                     hb_compGenPCodeN( ( unsigned char * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, FALSE );
 
                      return pSelf;
                   }

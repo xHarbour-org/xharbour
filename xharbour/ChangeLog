@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.57 2002/01/29 04:38:11 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.58 2002/01/29 07:19:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-01-29 00:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * make_b32.bat
+  * make_vc.bat
+    + Added auto creation of production folders.
+
+  * include/hbexprb.c
+    * Added explicit type conversion.
 
 2002-01-28 23:18 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/Makefile
