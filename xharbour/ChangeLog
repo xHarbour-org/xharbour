@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.567 2002/12/31 18:47:49 lculik Exp $
+ * $Id: ChangeLog,v 1.568 2003/01/01 18:17:53 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-01-01 21:51 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * source/vm/garbage.c
+    + Added InetCRLF() function in inet module, just a shortcut nice to have.
 
 2003-01-01 19:10 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * source/vm/garbage.c
-    ! Now lock on hb_gcGripGet/Drop are working again. 
+    ! Now lock on hb_gcGripGet/Drop are working again.
 
 2002-12-31 16:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/vm/thread.c
