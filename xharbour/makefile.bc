@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.132 2004/12/25 12:09:32 ptsarenko Exp $
+# $Id: makefile.bc,v 1.133 2004/12/25 17:24:38 patrickmast Exp $
 #
 
 #
@@ -867,7 +867,8 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpeswin.obj \
    $(OBJ_DIR)\cpgedos.obj \
    $(OBJ_DIR)\cpgewin.obj \
-   $(OBJ_DIR)\cpitdos.obj \
+   $(OBJ_DIR)\cpit437.obj \
+   $(OBJ_DIR)\cpit850.obj \
    $(OBJ_DIR)\cpitisb.obj \
    $(OBJ_DIR)\cpitiso.obj \
    $(OBJ_DIR)\cpltwin.obj \
@@ -3025,7 +3026,10 @@ $(OBJ_DIR)\cpgedos.obj : $(CODEPAGE_DIR)\cpgedos.c
 $(OBJ_DIR)\cpgewin.obj : $(CODEPAGE_DIR)\cpgewin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\cpitdos.obj : $(CODEPAGE_DIR)\cpitdos.c
+$(OBJ_DIR)\cpit437.obj : $(CODEPAGE_DIR)\cpit437.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(OBJ_DIR)\cpit850.obj : $(CODEPAGE_DIR)\cpit850.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\cpitisb.obj : $(CODEPAGE_DIR)\cpitisb.c

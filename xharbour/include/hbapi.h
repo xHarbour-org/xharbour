@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.149 2004/12/01 00:50:58 peterrees Exp $
+ * $Id: hbapi.h,v 1.150 2004/12/11 00:43:02 druzus Exp $
  */
 
 /*
@@ -114,6 +114,7 @@ HB_EXTERN_BEGIN
 #define HB_IS_ORDERABLE( p )  ( ( p )->type & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) )
 #define HB_IS_COMPLEX( p )    ( ( p )->type & HB_IT_COMPLEX )
 #define HB_IS_SIMPLE( p )     ( ( p )->type & ( HB_IT_NIL | HB_IT_NUMERIC | HB_IT_DATE | HB_IT_LOGICAL ) )
+#define HB_IS_BADITEM( p )    ( ( p )->type & HB_IT_COMPLEX && ( p )->type & ~( HB_IT_COMPLEX | HB_IT_MEMOFLAG ) )
 
 #define HB_IS_NUMBER_INT( p ) HB_IS_NUMINT( p )
 #define HB_IT_NUMERINT        HB_IT_NUMINT

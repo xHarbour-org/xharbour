@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.10 2004/09/21 04:09:20 druzus Exp $
+ * $Id: hbstr.c,v 1.11 2004/11/21 21:43:43 druzus Exp $
  */
 
 /*
@@ -400,9 +400,9 @@ double HB_EXPORT hb_numInt( double dNum )
 
 static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG * lVal, double * dVal, int * piDec, int * piWidth )
 {
-   BOOL fDbl = FALSE, fDec = FALSE, fNeg = FALSE, fHex = FALSE;
+   BOOL fDbl = FALSE, fDec = FALSE, fNeg, fHex = FALSE;
    ULONG ulPos = 0;
-   int c, iWidth = 0, iDec = 0, iDecR = 0;
+   int c, iWidth, iDec = 0, iDecR = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_str2number(%d, %p, %lu, %p, %p, %p, %p)", (int) fPCode, szNum, ulLen, lVal, dVal, piDec, piWidth ));
 

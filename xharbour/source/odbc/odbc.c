@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.23 2004/12/25 14:00:00 ptsarenko Exp $
+ * $Id: odbc.c,v 1.23 2004/12/25 12:09:40 ptsarenko Exp $
  */
 
 /*
@@ -358,14 +358,12 @@ HB_FUNC( SQLROWCOUN )
     SQLLEN  iRowCountPtr = hb_parni( 2 );
     WORD    wResult      = SQLRowCount( ( HSTMT ) hb_parnl( 1 ),
                                         &iRowCountPtr );
-
     if( wResult == SQL_SUCCESS || wResult == SQL_SUCCESS_WITH_INFO )
     {
        hb_stornl( ( LONG ) iRowCountPtr, 2 );
     }
 
     hb_retni( wResult );
-
 }
 
 HB_FUNC( SQLGETINFO ) // hDbc, nType, @cResult

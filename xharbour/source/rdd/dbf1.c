@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.101 2004/12/14 00:15:37 druzus Exp $
+ * $Id: dbf1.c,v 1.102 2004/12/16 22:36:13 druzus Exp $
  */
 
 /*
@@ -2096,7 +2096,7 @@ static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType
             USHORT uiFields;
             BYTE *pResult ;
             HB_ITEM itItem = HB_ITEM_NIL ;
-            ULONG uiLength;
+            ULONG ulLength;
             ULONG ulPrevRec = 0;
             BOOL bDeleted;
             if( pArea->ulRecNo != ulRecNo )
@@ -2104,49 +2104,47 @@ static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType
                ulPrevRec = pArea->ulRecNo;
                SELF_GOTO( ( AREAP ) pArea, ulRecNo );
             }
-            SELF_DELETED( ( AREAP ) pArea, &bDeleted );  // No need to allow for == FAILURE here
+            SELF_DELETED( ( AREAP ) pArea, &bDeleted );  /* No need to allow for == FAILURE here */
 
             if ( uiInfoType == DBRI_RAWRECORD || uiInfoType == DBRI_RAWDATA )
             {
-               uiLength = pArea->uiRecordLen;
-               pResult = (BYTE *) hb_xgrab( uiLength + 1 ) ;  // Allow final '\0' placed by hb_itemPutCPtr
-                                                              // Assume xgrab ok - no memory checking
-               memcpy( pResult, pArea->pRecord, uiLength ) ;
+               ulLength = pArea->uiRecordLen;
+               pResult = (BYTE *) hb_xgrab( ulLength + 1 ) ;  /* Allow final '\0' placed by hb_itemPutCPtr */
+                                                              /* Assume xgrab ok - no memory checking */
+               memcpy( pResult, pArea->pRecord, ulLength ) ;
             }
             else
             {
                pResult = NULL;
-               uiLength = 0;
+               ulLength = 0;
             }
 
             if ( uiInfoType == DBRI_RAWMEMOS || uiInfoType == DBRI_RAWDATA )
             {
-               // Must start uiFields @ 1 because SELF_GETVALUE() expects it
-               for ( uiFields= 1 ; uiFields <= pArea->uiFieldCount ; uiFields++ )
+               for ( uiFields = 0; uiFields < pArea->uiFieldCount ; uiFields++ )
                {
-                  if ( pArea->lpFields[ uiFields - 1 ].uiType == HB_IT_MEMO )
+                  if ( pArea->lpFields[ uiFields ].uiType == HB_IT_MEMO )
                   {
-                     ULONG uiFieldLen ;
-                     SELF_GETVALUE(  (AREAP ) pArea, uiFields, &itItem );
-                     uiFieldLen = itItem.item.asString.length ;
-                     if ( uiFieldLen )
+                     /* uiFields in SELF_GETVALUE() 1 based */
+                     if ( SELF_GETVALUE( ( AREAP ) pArea, uiFields + 1, &itItem ) == SUCCESS &&
+                          HB_IS_STRING( &itItem ) && itItem.item.asString.length > 0 )
                      {
                         if ( pResult )
                         {
-                           pResult = (BYTE *) hb_xrealloc( pResult, uiLength+ 1 + uiFieldLen ) ; // Assume xgrab ok - no memory checking
+                           pResult = (BYTE *) hb_xrealloc( pResult, ulLength + 1 + itItem.item.asString.length ); /* Assume xgrab ok - no memory checking */
                         }
                         else
                         {
-                           pResult = (BYTE *) hb_xgrab( uiFieldLen + 1 ) ;  // Assume xgrab ok - no memory checking
+                           pResult = (BYTE *) hb_xgrab( itItem.item.asString.length + 1 );  /* Assume xgrab ok - no memory checking */
                         }
-                        memcpy( pResult + uiLength, itItem.item.asString.value, uiFieldLen );
-                        uiLength += uiFieldLen;
+                        memcpy( pResult + ulLength, itItem.item.asString.value, itItem.item.asString.length );
+                        ulLength += itItem.item.asString.length;
                      }
                   }
                }
             }
             hb_itemClear( &itItem );
-            hb_itemPutCPtr( pInfo, (char *) pResult, uiLength ) ;
+            hb_itemPutCPtr( pInfo, (char *) pResult, ulLength );
 
             if( ulPrevRec != 0 )
             {

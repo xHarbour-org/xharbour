@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.65 2004/09/21 12:52:59 druzus Exp $
+ * $Id: fm.c,v 1.66 2004/11/21 21:44:27 druzus Exp $
  */
 
 /*
@@ -96,10 +96,10 @@
 #  undef HB_FM_WIN32_ALLOC
 #endif
 
-#ifdef HB_PARANOID_MEM_CHECK
-   HB_ITEM itmMemStat;
-   char *pszMemStat = "This is static text for paranoid mem test.";
-   BOOL bParanoidMemInit = FALSE;
+#ifdef HB_FM_WIN32_ALLOC
+#  define malloc( n )         (void *) LocalAlloc( LMEM_FIXED, ( n ) )
+#  define realloc( p, n )     (void *) LocalReAlloc( (HLOCAL) ( p ), ( n ), LMEM_MOVEABLE )
+#  define free( p )           LocalFree( (HLOCAL) ( p ) )
 #endif
 
 #if defined(HB_FM_STATISTICS) && !defined(HB_TR_LEVEL)
@@ -108,6 +108,9 @@
 
 #ifdef HB_FM_STATISTICS
 #include <time.h>
+#ifndef HB_MEMFILER
+#  define HB_MEMFILER  0xff
+#endif
 #define HB_MEMINFO_SIGNATURE 0x19730403
 
 typedef struct _HB_MEMINFO
@@ -140,47 +143,6 @@ static PHB_MEMINFO s_pLastBlock = NULL;
 
 #endif
 
-#ifdef HB_PARANOID_MEM_CHECK
-void hb_paraniodMemInit( void *pMem, ULONG ulSize )
-{
-   void *pTmp;
-
-   if( !bParanoidMemInit )
-   {
-      itmMemStat.type = HB_IT_STRING;
-      itmMemStat.item.asString.pulHolders = ( HB_COUNTER * ) malloc( sizeof( HB_COUNTER ) );
-      *( itmMemStat.item.asString.pulHolders ) = 1;
-      itmMemStat.item.asString.bStatic = FALSE;
-      itmMemStat.item.asString.length  = strlen(pszMemStat);
-      itmMemStat.item.asString.value   = pszMemStat;
-
-      bParanoidMemInit = TRUE;
-   }
-   ( char * ) pTmp = ( char * ) pMem + ulSize - sizeof(HB_ITEM);
-   while( pTmp >= pMem )
-   {
-      memcpy(pTmp, &itmMemStat, sizeof(HB_ITEM));
-      ( char * ) pTmp -= sizeof(HB_ITEM);
-   }
-   //memset(pMem, 0, ulSize);
-}
-
-void hb_paraniodMemCheck( void *pMem )
-{
-   static BOOL bLoop = FALSE;
-
-   if( ! bLoop &&
-       ( pMem == pszMemStat ||
-         pMem == itmMemStat.item.asString.pulHolders ||
-         itmMemStat.item.asString.pulHolders == NULL ||
-         *( itmMemStat.item.asString.pulHolders ) != 1 ) )
-   {
-      bLoop = TRUE;
-      hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xfree(%p) [Paranoid Test] Pointer Overflow '%s'", (char *) pMem, (char *) pMem );
-   }
-}
-#endif
-
 /* allocates fixed memory, do *not* exits on failure */
 void HB_EXPORT * hb_xalloc( ULONG ulSize )
 {
@@ -203,11 +165,7 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
 
    HB_CRITICAL_LOCK( hb_allocMutex );
 
-#ifdef HB_FM_WIN32_ALLOC
-   pMem = (void *) LocalAlloc( LMEM_FIXED, ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
-#else
    pMem = malloc( ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
-#endif
 
    if( ! pMem )
    {
@@ -288,7 +246,7 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    HB_CRITICAL_UNLOCK( hb_allocMutex );
 
 #ifdef HB_PARANOID_MEM_CHECK
-   hb_paraniodMemInit( ( char * ) pMem + HB_MEMINFO_SIZE, ulSize );
+   memset( ( char * ) pMem + HB_MEMINFO_SIZE, HB_MEMFILER, ulSize );
 #endif
    return ( char * ) pMem + HB_MEMINFO_SIZE;
 
@@ -298,11 +256,7 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    HB_CRITICAL_LOCK( hb_allocMutex );
 #endif
 
-#ifdef HB_FM_WIN32_ALLOC
-   pMem = (void *) LocalAlloc( LMEM_FIXED, ulSize );
-#else
    pMem = malloc( ulSize );
-#endif
 
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
@@ -330,11 +284,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 
    HB_CRITICAL_LOCK( hb_allocMutex );
 
-#ifdef HB_FM_WIN32_ALLOC
-   pMem = (void *) LocalAlloc( LMEM_FIXED, ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
-#else
    pMem = malloc( ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
-#endif
 
    if( ! pMem )
    {
@@ -416,7 +366,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    HB_CRITICAL_UNLOCK( hb_allocMutex );
 
 #ifdef HB_PARANOID_MEM_CHECK
-   hb_paraniodMemInit( ( char * ) pMem + HB_MEMINFO_SIZE, ulSize );
+   memset( ( char * ) pMem + HB_MEMINFO_SIZE, HB_MEMFILER, ulSize );
 #endif
    return ( char * ) pMem + HB_MEMINFO_SIZE;
 
@@ -426,11 +376,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    HB_CRITICAL_LOCK( hb_allocMutex );
 #endif
 
-#ifdef HB_FM_WIN32_ALLOC
-   pMem = (void *) LocalAlloc( LMEM_FIXED, ulSize );
-#else
    pMem = malloc( ulSize );
-#endif
 
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
@@ -486,9 +432,20 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    }
    HB_PUT_LONG( ( ( BYTE * ) pMem ) + ulMemSize, 0 );
 
-#ifdef HB_FM_WIN32_ALLOC
-   pMem = (void *) LocalReAlloc( (HLOCAL) pMemBlock,
-          ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ), LMEM_MOVEABLE );
+#ifdef HB_PARANOID_MEM_CHECK
+   pMem = malloc( ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
+   if ( pMem )
+   {
+      if ( ulSize > ulMemSize )
+      {
+         memcpy( pMem, pMemBlock, ulMemSize + HB_MEMINFO_SIZE );
+         memset( ( char * ) pMem + HB_MEMINFO_SIZE + ulMemSize, HB_MEMFILER, ulSize - ulMemSize );
+      }
+      else
+         memcpy( pMem, pMemBlock, ulSize + HB_MEMINFO_SIZE );
+   }
+   memset( pMemBlock, HB_MEMFILER, ulMemSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
+   free( pMemBlock );
 #else
    pMem = realloc( pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
 #endif
@@ -531,10 +488,6 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 
    HB_CRITICAL_UNLOCK( hb_allocMutex );
 
-#ifdef HB_PARANOID_MEM_CHECK
-   if( ulSize > ulMemSize )
-      hb_paraniodMemInit( ( char * ) pMem + HB_MEMINFO_SIZE + ulMemSize, ulSize - ulMemSize );
-#endif
    return ( char * ) pMem + HB_MEMINFO_SIZE;
 
 #else
@@ -556,11 +509,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    HB_CRITICAL_LOCK( hb_allocMutex );
 #endif
 
-#ifdef HB_FM_WIN32_ALLOC
-   pMem = (void *) LocalReAlloc( (HLOCAL) pMem, ulSize, LMEM_MOVEABLE );
-#else
    pMem = realloc( pMem, ulSize );
-#endif
 
 #ifndef HB_SAFE_ALLOC
    HB_CRITICAL_UNLOCK( hb_allocMutex );
@@ -590,9 +539,6 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
    {
       PHB_MEMINFO pMemBlock = ( PHB_MEMINFO ) ( ( char * ) pMem - HB_MEMINFO_SIZE );
 
-#ifdef HB_PARANOID_MEM_CHECK
-      hb_paraniodMemCheck( pMem );
-#endif
       if( pMemBlock->ulSignature != HB_MEMINFO_SIGNATURE )
       {
          //printf( "hb_xfree() Invalid Pointer %p %s", (char *) pMem, (char *) pMem );
@@ -631,11 +577,10 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       pMemBlock->ulSignature = 0;
       HB_PUT_LONG( ( ( BYTE * ) pMem ) + pMemBlock->ulSize, 0 );
 
-#ifdef HB_FM_WIN32_ALLOC
-      LocalFree( (HLOCAL) pMemBlock );
-#else
-      free( ( void * ) pMemBlock );
+#ifdef HB_PARANOID_MEM_CHECK
+      memset( pMemBlock, HB_MEMFILER, pMemBlock->ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
 #endif
+      free( ( void * ) pMemBlock );
       HB_CRITICAL_UNLOCK( hb_allocMutex );
    }
    else
@@ -657,11 +602,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       HB_CRITICAL_LOCK( hb_allocMutex );
 #endif
 
-#ifdef HB_FM_WIN32_ALLOC
-      LocalFree( (HLOCAL) pMem );
-#else
       free( pMem );
-#endif
 
 #ifndef HB_SAFE_ALLOC
       HB_CRITICAL_UNLOCK( hb_allocMutex );

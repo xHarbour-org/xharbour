@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.69 2004/12/05 01:11:04 druzus Exp $
+# $Id: xharbour.spec,v 1.70 2004/12/15 13:39:30 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -326,6 +326,10 @@ do
      make -r -i install)
 done
 
+[ "%{?_without_gtsln:1}" ] && rm -f $HB_LIB_INSTALL/libgtsln.a
+[ "%{?_with_odbc:1}" ]     || rm -f $HB_LIB_INSTALL/libhbodbc.a
+[ "%{?_with_allegro:1}" ]  || rm -f $HB_LIB_INSTALL/libgtalleg.a
+
 # Keep the size of the binaries to a minimim.
 strip $HB_BIN_INSTALL/harbour
 # Keep the size of the libraries to a minimim.
@@ -354,10 +358,6 @@ export C_USR="-DHB_FM_STATISTICS_OFF -O3"
 EOF
 chmod 755 $RPM_BUILD_ROOT/etc/profile.d/harb.sh
 fi
-
-[ "%{?_without_gtsln:1}" ] && rm -f $HB_LIB_INSTALL/libgtsln.a
-[ "%{?_with_odbc:1}" ]     || rm -f $HB_LIB_INSTALL/libhbodbc.a
-[ "%{?_with_allegro:1}" ]  || rm -f $HB_LIB_INSTALL/libgtalleg.a
 
 # check if we should rebuild tools with shared libs
 if [ "%{!?_with_static:1}" ]

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.136 2004/11/23 17:04:21 lf_sfnet Exp $
+ * $Id: dbcmd.c,v 1.137 2004/12/16 22:36:13 druzus Exp $
  */
 
 /*
@@ -1503,7 +1503,7 @@ HB_FUNC( DBCREATE )
       }
    }
 
-   if( hb_rddGetTempAlias( szAliasTmp ) )
+   if( hb_rddGetTempAlias( szAliasTmp ) == FAILURE )
    {
       hb_xfree( pFileName );
       hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBCREATE" );
@@ -4809,8 +4809,10 @@ HB_FUNC( __RDDGETTEMPALIAS )
    HB_THREAD_STUB
    char szAliasTmp[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
 
-   hb_rddGetTempAlias( szAliasTmp );
-   hb_retc( szAliasTmp );
+   if ( hb_rddGetTempAlias( szAliasTmp ) == FAILURE )
+      hb_ret();
+   else
+      hb_retc( szAliasTmp );
 }
 
 HB_FUNC( DBSKIPPER )

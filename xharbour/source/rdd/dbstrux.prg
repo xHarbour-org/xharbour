@@ -1,5 +1,5 @@
 /*
- * $Id: dbstrux.prg,v 1.3 2003/03/08 01:30:46 horacioroldan Exp $
+ * $Id: dbstrux.prg,v 1.4 2004/08/24 00:30:24 druzus Exp $
  */
 
 /*
@@ -74,7 +74,6 @@ FUNCTION __dbCopyXStruct( cFileName )
       cTmpAlias := __rddGetTempAlias()
 
       dbSelectArea( 0 )
-      // __dbCreate( cFileName, NIL, NIL, .F., NIL )
       __dbCreate( cFileName, NIL, NIL, .F., cTmpAlias )
 
       AEval( aStruct, {| aField | iif( aField[ DBS_TYPE ] == "C" .AND. aField[ DBS_LEN ] > 255, ;
@@ -103,7 +102,7 @@ FUNCTION __dbCopyXStruct( cFileName )
 
    RETURN .T.
 
-FUNCTION __dbCreate( cFileName, cFileFrom, cRDDName, lNew, cAlias )
+FUNCTION __dbCreate( cFileName, cFileFrom, cRDDName, lNew, cAlias, cdpId )
    LOCAL nOldArea := Select()
    LOCAL aStruct := {}
    LOCAL oError
@@ -147,7 +146,7 @@ FUNCTION __dbCreate( cFileName, cFileFrom, cRDDName, lNew, cAlias )
               aField[ DBS_DEC ] := 0 ), NIL ) } )
 
          dbCreate( cFileName, aStruct, cRDDName )
-         dbUseArea( lNew, cRDDName, cFileName, cAlias )
+         dbUseArea( lNew, cRDDName, cFileName, cAlias,,, cdpId )
 
       ENDIF
 

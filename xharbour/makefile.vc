@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.138 2004/12/25 11:33:53 ptsarenko Exp $
+# $Id: makefile.vc,v 1.138 2004/12/25 12:09:33 ptsarenko Exp $
 #
 
 #
@@ -599,7 +599,8 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpeswin.obj \
    $(OBJ_DIR)\cpgedos.obj \
    $(OBJ_DIR)\cpgewin.obj \
-   $(OBJ_DIR)\cpitdos.obj \
+   $(OBJ_DIR)\cpit437.obj \
+   $(OBJ_DIR)\cpit850.obj \
    $(OBJ_DIR)\cpitisb.obj \
    $(OBJ_DIR)\cpitiso.obj \
    $(OBJ_DIR)\cpltwin.obj \

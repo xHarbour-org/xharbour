@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.15 2004/12/19 14:00:00 ptsarenko Exp $
+ * $Id: hbapicdp.h,v 1.15 2004/12/19 11:34:06 ptsarenko Exp $
  */
 
 /*
@@ -70,6 +70,11 @@ HB_EXTERN_BEGIN
                                        }
 #define HB_CODEPAGE_ANNOUNCE( id )     HB_FUNC( HB_CODEPAGE_##id ) {}
 
+#define HB_CODEPAGE_INIT( id )         HB_CODEPAGE_ANNOUNCE( id ); \
+                                       HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_##id ) \
+                                       hb_cdpRegister( &s_codepage ); \
+                                       HB_CALL_ON_STARTUP_END( hb_codepage_Init_##id )
+
 typedef struct _HB_UNITABLE
 {
    char     *uniID;
@@ -87,30 +92,30 @@ typedef struct _HB_MULTICHAR
 
 typedef struct _HB_CODEPAGE
 {
-   char *        id;
-   char *        uniID;
-   PHB_UNITABLE  uniTable;
-   int           nChars;
-   char *        CharsUpper;
-   char *        CharsLower;
-   BOOL          lLatin;
-   BOOL          lAccEqual;
-   BOOL          lAccInterleave;
-   BOOL          lSort;
-   BYTE *        s_chars;
-   BYTE *        s_upper;
-   BYTE *        s_lower;
-   BYTE *        s_accent;
-   int           nMulti;
-   PHB_MULTICHAR multi;
-} HB_CODEPAGE, *PHB_CODEPAGE;
+   char *         id;
+   char *         uniID;
+   PHB_UNITABLE   uniTable;
+   int            nChars;
+   char *         CharsUpper;
+   char *         CharsLower;
+   BOOL           lLatin;
+   BOOL           lAccEqual;
+   BOOL           lAccInterleave;
+   BOOL           lSort;
+   BYTE *         s_chars;
+   BYTE *         s_upper;
+   BYTE *         s_lower;
+   BYTE *         s_accent;
+   int            nMulti;
+   PHB_MULTICHAR  multi;
+} HB_CODEPAGE, * PHB_CODEPAGE;
 
 extern BOOL HB_EXPORT hb_cdpRegister( PHB_CODEPAGE );
-extern char HB_EXPORT * hb_cdpSelectID( char * );
+extern char * HB_EXPORT hb_cdpSelectID( char * );
 extern PHB_CODEPAGE HB_EXPORT hb_cdpSelect( PHB_CODEPAGE );
 extern PHB_CODEPAGE HB_EXPORT hb_cdpFind( char * );
 extern void HB_EXPORT hb_cdpTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE );
-extern void HB_EXPORT hb_cdpnTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE, UINT );
+extern void HB_EXPORT hb_cdpnTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE, unsigned int );
 extern int HB_EXPORT hb_cdpcmp( char*, char*, ULONG, PHB_CODEPAGE, ULONG* );
 extern int HB_EXPORT hb_cdpchrcmp( char, char, PHB_CODEPAGE );
 extern void HB_EXPORT hb_cdpReleaseAll( void );
@@ -119,19 +124,17 @@ extern USHORT HB_EXPORT hb_cdpGetU16( PHB_CODEPAGE, BYTE );
 extern BOOL HB_EXPORT hb_cdpGetFromUTF8( PHB_CODEPAGE cdp, BYTE ch, int * n, USHORT * uc );
 extern ULONG HB_EXPORT hb_cdpStrnToUTF( PHB_CODEPAGE, BYTE*, ULONG, BYTE* );
 extern ULONG HB_EXPORT hb_cdpStrnToU16( PHB_CODEPAGE, BYTE*, ULONG, BYTE* );
-extern PHB_CODEPAGE s_cdpage;
-#define hb_cdp_page s_cdpage
 
-extern PHB_CODEPAGE s_cdpage;
-
-#define hb_cdp_page s_cdpage
+extern PHB_CODEPAGE hb_cdp_page;
 
 #define CPID_437        "cp437"
+#define CPID_737        "cp737"
 #define CPID_850        "cp850"
 #define CPID_852        "cp852"
 #define CPID_866        "cp866"
 #define CPID_1250       "cp1250"
 #define CPID_1251       "cp1251"
+#define CPID_1253       "cp1253"
 #define CPID_1257       "cp1257"
 #define CPID_8859_1     "iso8859-1"
 #define CPID_8859_1B    "iso8859-1b"
@@ -140,11 +143,13 @@ extern PHB_CODEPAGE s_cdpage;
 #define CPID_KOI_8U     "koi-8u"
 #define CPID_MAZ        "plmaz"
 #define UNITB_437       &hb_uniTbl_437
+#define UNITB_737       &hb_uniTbl_737
 #define UNITB_850       &hb_uniTbl_850
 #define UNITB_852       &hb_uniTbl_852
 #define UNITB_866       &hb_uniTbl_866
 #define UNITB_1250      &hb_uniTbl_1250
 #define UNITB_1251      &hb_uniTbl_1251
+#define UNITB_1253      &hb_uniTbl_1253
 #define UNITB_1257      &hb_uniTbl_1257
 #define UNITB_8859_1    &hb_uniTbl_8859_1
 #define UNITB_8859_1B   &hb_uniTbl_8859_1b
@@ -155,11 +160,13 @@ extern PHB_CODEPAGE s_cdpage;
 #define UNITB_UNDEF     NULL /* ((PHB_UNITABLE) (-1)) */
 
 extern HB_UNITABLE hb_uniTbl_437;
+extern HB_UNITABLE hb_uniTbl_737;
 extern HB_UNITABLE hb_uniTbl_850;
 extern HB_UNITABLE hb_uniTbl_852;
 extern HB_UNITABLE hb_uniTbl_866;
 extern HB_UNITABLE hb_uniTbl_1250;
 extern HB_UNITABLE hb_uniTbl_1251;
+extern HB_UNITABLE hb_uniTbl_1253;
 extern HB_UNITABLE hb_uniTbl_1257;
 extern HB_UNITABLE hb_uniTbl_8859_1;
 extern HB_UNITABLE hb_uniTbl_8859_1b;

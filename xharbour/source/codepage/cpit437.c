@@ -1,14 +1,12 @@
 /*
- * $Id: cpitdos.c,v 1.1 2004/11/21 21:43:42 druzus Exp $
+ * $Id: cpdos437.c,v 1.2 2004/12/21 14:44:31 mauriliolongo Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Spanish MS-DOS )
+ * National Collation Support Module ( Italian MS-DOS cp 437 )
  *
- * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
- * www - http://www.harbour-project.org
- * Spanish MS-DOS support by Antonio Linares <alinares@fivetechsoft.com>
+ * Copyright 2004 Maurilio Longo - <maurilio.longo@libero.it>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,13 +51,13 @@
 
 /* Language name: Italian */
 /* ISO language code (2 chars): IT */
-/* Codepage: 850 */
+/* Codepage: 437 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  31    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  36    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
@@ -84,17 +82,17 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "ITDOS",
-    CPID_850, UNITB_850, NUMBER_OF_CHARACTERS,
-    "A†BCDEÇFGHI°JKLMNO¢PQRSTU£VWXYZ",
-    "a†bcdeÇfghi°jklmno¢pqrstu£vwxyz",
+static HB_CODEPAGE s_codepage = { "IT437",
+    CPID_437, UNITB_437, NUMBER_OF_CHARACTERS,
+    "AÖ†BCDEäÇFGHIç°JKLMNOï¢PQRSTUó£VWXYZ",
+    "aÖ†bcdeäÇfghiç°jklmnoï¢pqrstuó£vwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( ITDOS );
+HB_CODEPAGE_ANNOUNCE( IT437 );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_ITDOS )
+HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_IT437 )
    hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_ITDOS )
+HB_CALL_ON_STARTUP_END( hb_codepage_Init_IT437 )
 #if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_ITDOS
+   #pragma startup hb_codepage_Init_IT437
 #endif

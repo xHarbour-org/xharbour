@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.170 2004/12/14 00:15:38 druzus Exp $
+ * $Id$
  */
 
 /*
@@ -4953,7 +4953,6 @@ static BOOL hb_cdxCurKeyRefresh( CDXAREAP pArea, LPCDXTAG pTag )
          /* not found, create new key from DBF and if differs seek again */
          if ( !fBuf || memcmp( buf, pKey->val, pKey->len ) != 0 )
          {
-            fBuf = TRUE;
             memcpy( buf, pKey->val, pKey->len );
             hb_cdxTagKeyFind( pTag, pKey );
          }
@@ -6435,7 +6434,7 @@ static ERRCODE hb_cdxPack( CDXAREAP pArea )
 
    if ( SUPER_PACK( ( AREAP ) pArea ) == SUCCESS )
    {
-      return hb_cdxOrderListRebuild( pArea );
+      return SELF_ORDLSTREBUILD( ( AREAP ) pArea );
    }
    else
       return FAILURE;
@@ -6456,7 +6455,7 @@ static ERRCODE hb_cdxZap ( CDXAREAP pArea )
 
    if ( SUPER_ZAP( ( AREAP ) pArea ) == SUCCESS )
    {
-      return hb_cdxOrderListRebuild( pArea );
+      return SELF_ORDLSTREBUILD( ( AREAP ) pArea );
    }
    else
       return FAILURE;
@@ -7502,7 +7501,7 @@ static ERRCODE hb_cdxClearScope( CDXAREAP pArea )
 
    if ( pTag )
    {
-      /* resolve any pending scopes first */
+      /* resolve any pending scope relations first */
       if( pArea->lpdbPendingRel && pArea->lpdbPendingRel->isScoped )
          SELF_FORCEREL( ( AREAP ) pArea );
       hb_cdxTagClearScope( pTag, 0);
@@ -7539,7 +7538,7 @@ static ERRCODE hb_cdxScopeInfo( CDXAREAP pArea, USHORT nScope, PHB_ITEM pItem )
    {
       PHB_ITEM *pScope;
 
-      /* resolve any pending scopes first */
+      /* resolve any pending scope relations first */
       if( pArea->lpdbPendingRel && pArea->lpdbPendingRel->isScoped )
          SELF_FORCEREL( ( AREAP ) pArea );
 
@@ -7571,7 +7570,7 @@ static ERRCODE hb_cdxSetScope( CDXAREAP pArea, LPDBORDSCOPEINFO sInfo )
 
    if ( pTag )
    {
-      /* resolve any pending scopes first */
+      /* resolve any pending scope relations first */
       if( pArea->lpdbPendingRel && pArea->lpdbPendingRel->isScoped )
          SELF_FORCEREL( ( AREAP ) pArea );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: left.c,v 1.8 2003/07/18 21:42:35 andijahja Exp $
+ * $Id: left.c,v 1.9 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ HB_FUNC( LEFT )
       else if( (ULONG) lLeft >= ulLen )
       {
          /* No need to retain the 1st parameter - Recycle. */
-         hb_itemReturn( pText );
+         hb_itemReturnCopy( pText );
          return;
       }
 

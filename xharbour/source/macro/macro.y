@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.14 2004/05/24 07:34:01 ronpinkas Exp $
+ * $Id: macro.y,v 1.15 2004/11/21 21:43:47 druzus Exp $
  */
 
 /*
@@ -94,10 +94,6 @@ static int s_iPending = 0;
          [vszakats] */
       void __yy_memcpy ( char*, const char*, unsigned int ); /* to satisfy Borland compiler */
    #endif
-#endif
-
-#ifdef __GNUC__
-#undef __GNUC__
 #endif
 
 /* yacc/lex related definitions

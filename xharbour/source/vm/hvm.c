@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.426 2004/12/03 17:17:45 ronpinkas Exp $
+ * $Id: hvm.c,v 1.427 2004/12/11 00:43:04 druzus Exp $
  */
 
 /*
@@ -3852,7 +3852,7 @@ static void hb_vmMinus( void )
          hb_xmemset( szNewString + ulLen1 + ulLen2, ' ', pItem1->item.asString.length - ulLen1 );
          szNewString[ ulNewLen ] = '\0';
 
-         HB_TRACE( HB_TR_DEBUG, ( "Released hb_vmMinus() Created \"%s\"", pNewString ) );
+         HB_TRACE( HB_TR_DEBUG, ( "Released hb_vmMinus() Created \"%s\"", szNewString ) );
 
          hb_itemReleaseString( pItem1 );
          //pItem1->type = HB_IT_STRING;

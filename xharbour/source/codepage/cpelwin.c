@@ -1,12 +1,14 @@
 /*
- * $Id: cpdos437.c,v 1.1 2004/12/21 13:51:49 mauriliolongo Exp $
+ * $Id: cdpelwin.c,v 1.1 2004/05/21 09:34:26 alkresin Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Italian MS-DOS cp 437 )
+ * National Collation Support Module ( Greek WIN )
  *
- * Copyright 2004 Maurilio Longo - <maurilio.longo@libero.it>
+ * Copyright 2004 Pete Dionisopoulos <pete_westg@yahoo.gr>
+ * www - http://www.harbour-project.org
+ * v1.0 2004 Panayotis (Pete) Dionysopoulos <pete_westg@yahoo.gr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,31 +51,31 @@
  *
  */
 
-/* Language name: Italian */
-/* ISO language code (2 chars): IT */
-/* Codepage: 437 */
+/* Language name: Greek WIN*/
+/* ISO language code (2 chars): EL */
+/* Codepage: ANSI (1253) */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  36    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  32    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
-#define IS_LATIN               1    /* Should be 1, if the national alphabet
+#define IS_LATIN               0    /* Should be 1, if the national alphabet
                                        is based on Latin */
-#define ACCENTED_EQUAL         0    /* Should be 1, if accented character
+#define ACCENTED_EQUAL         1    /* Should be 1, if accented character 
                                        has the same weight as appropriate
                                        unaccented. */
 #define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
                                        sort after their unaccented counterparts
-                                       only if the unaccented versions of all
-                                       characters being compared are the same
+                                       only if the unaccented versions of all 
+                                       characters being compared are the same 
                                        ( interleaving ) */
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-      a~Ä
+    a~Ä
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -82,17 +84,13 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "ITDOS437",
-    CPID_437, UNITB_437, NUMBER_OF_CHARACTERS,
-    "AÖ†BCDEäÇFGHIç°JKLMNOï¢PQRSTUó£VWXYZ",
-    "aÖ†bcdeäÇfghiç°jklmnoï¢pqrstuó£vwxyz",
-    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0,NULL,NULL,NULL,NULL,0,NULL };
+static HB_CODEPAGE s_codepage = { "ELWIN",
+    CPID_1253, UNITB_1253, NUMBER_OF_CHARACTERS,
+    "¡~¢¬√ƒ≈∏∆«~π»…~∫ ÀÃÕŒœ~º–—””‘’~æ÷◊ÿŸ~ø","·~‹‚„‰Â~›ÊÁ~ﬁËÈ~ﬂÍÎÏÌÓÔ~¸ÒÛÚÙı~˝ˆ˜¯˘~˛",
+    IS_LATIN,ACCENTED_EQUAL,ACCENTED_INTERLEAVED,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( ITDOS437 );
+HB_CODEPAGE_INIT( ELWIN );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_ITDOS437 )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_ITDOS437 )
-#if defined(HB_STATIC_STARTUP) || ( (! defined(__GNUC__)) && (! defined(_MSC_VER)) )
-   #pragma startup hb_codepage_Init_ITDOS437
+#if ! defined(__GNUC__) && ! defined(_MSC_VER)
+   #pragma startup hb_codepage_Init_ELWIN
 #endif

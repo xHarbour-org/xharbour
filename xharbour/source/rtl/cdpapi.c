@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.16 2004/05/12 02:25:29 druzus Exp $
+ * $Id: cdpapi.c,v 1.17 2004/06/04 00:18:09 druzus Exp $
  */
 
 /*
@@ -99,7 +99,7 @@ HB_UNITABLE hb_uniTbl_437 = { CPID_437, NUMBER_OF_CHARS, FALSE, uniCodes };
 
 static HB_CODEPAGE  s_en_codepage = { "EN",CPID_437,UNITB_437,0,NULL,NULL,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 static PHB_CODEPAGE s_cdpList[ HB_CDP_MAX_ ];
-PHB_CODEPAGE s_cdpage = &s_en_codepage;
+PHB_CODEPAGE hb_cdp_page = &s_en_codepage;
 
 
 static int u16toutf8( BYTE *szUTF8, USHORT uc )
@@ -244,7 +244,7 @@ static int hb_cdpFindPos( char * pszID )
 
 BOOL HB_EXPORT hb_cdpRegister( PHB_CODEPAGE cdpage )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_codepageRegister(%p)", cdpage));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdpRegister(%p)", cdpage));
 
    if( cdpage )
    {
@@ -404,13 +404,13 @@ PHB_CODEPAGE HB_EXPORT hb_cdpFind( char * pszID )
 
 PHB_CODEPAGE HB_EXPORT hb_cdpSelect( PHB_CODEPAGE cdpage )
 {
-   PHB_CODEPAGE cdpOld = s_cdpage;
+   PHB_CODEPAGE cdpOld = hb_cdp_page;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdpSelect(%p)", cdpage));
 
    if( cdpage )
    {
-      s_cdpage = cdpage;
+      hb_cdp_page = cdpage;
    }
 
    return cdpOld;
@@ -418,7 +418,7 @@ PHB_CODEPAGE HB_EXPORT hb_cdpSelect( PHB_CODEPAGE cdpage )
 
 char HB_EXPORT * hb_cdpSelectID( char * pszID )
 {
-   char * pszIDOld = s_cdpage->id;
+   char * pszIDOld = hb_cdp_page->id;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdpSelectID(%s)", pszID));
 
@@ -436,7 +436,8 @@ void HB_EXPORT hb_cdpTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpO
       int nAddLower = (cdpIn->lLatin)? 6:0;
       for( ; *psz; psz++ )
       {
-         if( ( ( n = (int)cdpIn->s_chars[ ((int)*psz)&255 ] ) != 0 ) &&
+         n = (int)cdpIn->s_chars[ ((int)*psz)&255 ];
+         if( n != 0 &&
              ( n <= cdpOut->nChars || ( n > (cdpOut->nChars+nAddLower) &&
                n <= (cdpOut->nChars*2+nAddLower) ) ) )
          {
@@ -451,14 +452,15 @@ void HB_EXPORT hb_cdpTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpO
 void HB_EXPORT hb_cdpnTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpOut, UINT nChars )
 {
    int n;
-   UINT i;
+   unsigned int i;
 
    if( cdpIn != cdpOut && cdpIn->nChars == cdpOut->nChars )
    {
       int nAddLower = (cdpIn->lLatin)? 6:0;
       for( i=0; i<nChars; i++,psz++ )
       {
-         if( ( ( n = (int)cdpIn->s_chars[ ((int)*psz)&255 ] ) != 0 ) &&
+         n = (int)cdpIn->s_chars[ ((int)*psz)&255 ];
+         if( n != 0 &&
              ( n <= cdpOut->nChars || ( n > (cdpOut->nChars+nAddLower) &&
                n <= (cdpOut->nChars*2+nAddLower) ) ) )
          {
@@ -710,18 +712,18 @@ void HB_EXPORT hb_cdpReleaseAll( void )
 
 HB_FUNC( HB_SETCODEPAGE )
 {
-   hb_retc( s_cdpage->id );
+   hb_retc( hb_cdp_page->id );
 
    if( ISCHAR(1) )
-      hb_cdpSelectID( hb_parcx( 1 ) );
+      hb_cdpSelectID( hb_parc( 1 ) );
 }
 
 HB_FUNC( HB_TRANSLATE )
 {
    char *szResult;
-   char *szIn = hb_parcx(1);
-   char *szIdIn = hb_parcx(2);
-   char *szIdOut = hb_parcx(3);
+   char *szIn = hb_parc(1);
+   char *szIdIn = hb_parc(2);
+   char *szIdOut = hb_parc(3);
    int  ilen;
    PHB_CODEPAGE cdpIn;
    PHB_CODEPAGE cdpOut;
@@ -729,8 +731,8 @@ HB_FUNC( HB_TRANSLATE )
    if( szIn )
    {
       ilen = hb_parclen(1);
-      cdpIn  = ( szIdIn )? hb_cdpFind( szIdIn ):s_cdpage;
-      cdpOut = ( szIdOut )? hb_cdpFind( szIdOut ):s_cdpage;
+      cdpIn  = ( szIdIn )? hb_cdpFind( szIdIn ):hb_cdp_page;
+      cdpOut = ( szIdOut )? hb_cdpFind( szIdOut ):hb_cdp_page;
       szResult = (char*) hb_xgrab( ilen + 1 );
       memcpy( szResult, szIn, ilen );
       szResult[ ilen ] = '\0';

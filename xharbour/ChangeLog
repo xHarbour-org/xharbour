@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3696 2004/12/26 12:26:01 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.3697 2004/12/27 11:06:04 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,90 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-12-28 07:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  - xharbour/source/codepage/cpdos437.c
+  - xharbour/source/codepage/cpitdos.c
+  + xharbour/source/codepage/cpit437.c
+  + xharbour/source/codepage/cpit850.c
+  + xharbour/source/codepage/cpeldos.c
+  + xharbour/source/codepage/cpelwin.c
+  + xharbour/source/codepage/uc1253.c
+  + xharbour/source/codepage/uc737.c
+  * xharbour/include/hbapicdp.h
+  * xharbour/source/codepage/Makefile
+  * xharbour/makefile.bc
+  * xharbour/makefile.nt
+  * xharbour/makefile.vc
+  * xharbour/makefile.wc
+    * renamed to keep other CP file name convention
+    + added Greek CPs
+
+  * xharbour/xharbour.spec
+    * minor modification
+
+  * xharbour/include/hbapi.h
+    + added HB_IS_BADITEM() macro
+
+  * xharbour/include/hbapirdd.h
+    * formatting
+
+  * xharbour/include/hbmath.h
+    * small modification for older Watcom versions
+
+  * xharbour/source/common/hbstr.c
+    * removed unnecessary initialization to avoid BCC warnings
+
+  * xharbour/source/macro/macro.y
+    * removed hack for GCC and old Bison versions
+
+  * xharbour/source/odbc/odbc.c
+    * formatting
+
+  * xharbour/source/rdd/dbcmd.c
+    * minor fix
+
+  * xharbour/source/rdd/dbf1.c
+    * small fix for non character memo data in DBRI_RAWMEMOS|DBRI_RAWDATA
+
+  * xharbour/source/rdd/dbsort.prg
+    * fix borrowed from Harbour and one record tables - it's a hack
+      and the proper fix I'll done when I'll write new DBF sort code
+
+  * xharbour/source/rdd/dbstrux.prg
+  * xharbour/source/rdd/workarea.c
+    * formatting and minor corrections
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * minor fixes and formatting
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * synchronized with Harbour and all Alexander's fixes
+
+  * xharbour/source/rtl/left.c
+  * xharbour/source/rtl/strpeek.c
+    * fixed improper use of hb_itemReturn() when hb_itemReturnCopy should
+      be used - IMHO this API function should be agreed in Harbour and
+      xHarbour, now the same name is used for different actions in both
+      projects what could cause bad side effects in 3-rd party libs - even
+      inside core xHarbour code hb_itemReturn() was badly used like in
+      Harbour
+
+  * xharbour/source/rtl/cdpapi.c
+    * formatting
+
+  * xharbour/source/vm/fastitem.c
+    * check for HB_IS_BADITEM inside hb_itemClear() when compiled with
+      HB_PARANOID_MEM_CHECK for debugging
+
+  * xharbour/source/vm/fm.c
+    * HB_PARANOID_MEM_CHECK changed to force reallocations in hb_xrealloc
+      and fill allocated and freed memory with HB_MEMFILER (0xff by default)
+
+  * xharbour/source/vm/hvm.c
+    * minor fix in HB_TR_DEBUG message
 
 2004-12-27 12:10 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/vm/arrays.c

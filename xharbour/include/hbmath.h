@@ -1,5 +1,5 @@
 /*
- * $Id: hbmath.h,v 1.7 2004/05/24 10:31:44 jonnymind Exp $
+ * $Id: hbmath.h,v 1.8 2004/07/04 04:54:19 ronpinkas Exp $
  */
 
 /*
@@ -73,7 +73,9 @@ HB_EXTERN_BEGIN
 #ifndef HB_NO_MATH_HANDLER
    #if defined(__WATCOMC__)
       #define HB_MATH_HANDLER
-      #define exception _exception
+      #if (__WATCOMC__ > 1000) && defined(__cplusplus)
+         #define exception _exception
+      #endif
    #elif defined(__BORLANDC__)
       #if (__BORLANDC__ == 1328) && defined(__cplusplus)
          /* NOTE: There seem to be a bug in Borland C++ 5.3 C++ mode which prevents

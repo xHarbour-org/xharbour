@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.20 2004/11/02 20:45:52 guerra000 Exp $
+ * $Id: hbapirdd.h,v 1.21 2004/11/21 21:43:37 druzus Exp $
  */
 
 /*
@@ -581,7 +581,6 @@ typedef USHORT ( * DBENTRYP_I2   )( PHB_ITEM p1, PHB_ITEM p2 );
 
 typedef struct _RDDFUNCS
 {
-
    /* Movement and positioning methods */
 
    DBENTRYP_BP   bof;               /* Determine logical beginning of file. */

@@ -1,5 +1,5 @@
 /*
- * $Id: strpeek.c,v 1.1 2003/06/19 00:07:59 druzus Exp $
+ * $Id: strpeek.c,v 1.2 2003/06/19 08:52:40 druzus Exp $
  */
 
 /*
@@ -88,12 +88,12 @@ HB_FUNC( STRPOKE )
       if( ulPos > 0 && ulPos < pText->item.asString.length )
       {
          char * pszNew = (char *) hb_xgrab( ulLen );
-	 memcpy( pszNew, pszText, ulLen );
-	 pszNew[ ulPos - 1 ] = (char) (hb_parnl( 3 ) & 0xff);
+         memcpy( pszNew, pszText, ulLen );
+         pszNew[ ulPos - 1 ] = (char) (hb_parni( 3 ) & 0xff);
          hb_retclenAdopt( pszNew, ulLen );
       }
       else
-         hb_itemReturn( pText );
+         hb_itemReturnCopy( pText );
    }
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "STRPOKE", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
