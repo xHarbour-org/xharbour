@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.26 2004/04/12 21:03:09 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.27 2004/04/12 21:05:32 ronpinkas Exp $
  */
 
 /*
@@ -548,7 +548,7 @@ STATIC Function DeValue( lAdopt )
       xProperty := aValues[ HB_EnumIndex() ]
    NEXT
 
-RETURN aValues
+RETURN QSelf()
 
 //---------------------------------------------------------------------------//
 STATIC Function ArrayMethod()

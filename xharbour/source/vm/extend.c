@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.42 2004/03/18 04:05:27 ronpinkas Exp $
+ * $Id: extend.c,v 1.43 2004/04/28 18:31:22 druzus Exp $
  */
 
 /*
@@ -963,6 +963,34 @@ void HB_EXPORT hb_storclen( char * szText, ULONG ulLen, int iParam, ... )
       else if( bByRef || iParam == -1 )
       {
          hb_itemPutCL( pItem, szText, ulLen );
+      }
+   }
+}
+
+void HB_EXPORT hb_storclenAdopt( char * szText, ULONG ulLen, int iParam, ... )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_storclen(%s, %lu, %d, ...)", szText, ulLen, iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? &(HB_VM_STACK.Return) : hb_stackItemFromBase( iParam );
+      BOOL bByRef = HB_IS_BYREF( pItem );
+
+      if( bByRef  )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_ARRAY( pItem ) )
+      {
+         va_list va;
+         va_start( va, iParam );
+         hb_itemPutCPtr( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), szText, ulLen );
+         va_end( va );
+      }
+      else if( bByRef || iParam == -1 )
+      {
+         hb_itemPutCPtr( pItem, szText, ulLen );
       }
    }
 }

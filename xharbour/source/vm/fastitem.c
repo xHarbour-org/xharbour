@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.69 2004/04/14 10:32:14 druzus Exp $
+ * $Id: fastitem.c,v 1.70 2004/04/28 22:24:52 ronpinkas Exp $
  */
 
 /*
@@ -550,7 +550,6 @@ PHB_ITEM HB_EXPORT hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
    pItem->item.asString.value[ ulLen ] = '\0';
-
 
    return pItem;
 }
