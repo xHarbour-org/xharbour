@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.38 2003/07/04 16:21:28 jonnymind Exp $
+ * $Id: dbcmd.c,v 1.39 2003/07/17 03:08:24 andijahja Exp $
  */
 
 /*
@@ -1949,6 +1949,8 @@ HB_FUNC( DBSELECTAREA )
          uiNewArea = atoi( szAlias );
       else if( ulLen == 1 && toupper( szAlias[ 0 ] ) >= 'A' && toupper( szAlias[ 0 ] ) <= 'K' )
          uiNewArea = toupper( szAlias[ 0 ] ) - 'A' + 1;
+      else if( ulLen == 1 && toupper( szAlias[ 0 ] ) == 'M' )
+         uiNewArea = 0;
       else
       {
          if( ( uiNewArea = hb_rddSelect( szAlias ) ) == 0 )

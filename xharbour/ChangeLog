@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1279 2003/07/22 16:47:21 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.1280 2003/07/22 18:24:07 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2003-07-22 21:15 UTC-0300 Marcelo Lombardo <lombardo@uol.com.br>
+  * source/rdd/dbcmd.c
+    ! Fixed dbSelectArea() so it accepts the Alias "M" as M->
+
 2003-07-22 15:30 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/rtl/transfrm.c
-    ! Fixed the problem with @E and negative numbers. 
+    ! Fixed the problem with @E and negative numbers.
       local nValue := -134.24
       msginfo( Val( AllTrim( Transform( nValue, "@E 99,999.99" ) ) ) )
       msginfo( Val( AllTrim( Transform( nValue, "@E99,999.99" ) ) ) )
