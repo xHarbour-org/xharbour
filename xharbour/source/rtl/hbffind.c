@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.22 2004/04/02 11:14:06 srobert Exp $
+ * $Id: hbffind.c,v 1.23 2004/04/05 02:29:31 druzus Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.22 2004/04/02 11:14:06 srobert Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.23 2004/04/05 02:29:31 druzus Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -167,37 +167,6 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.22 2004/04/02 11:14:06 srobert Exp $" )
 
 /* Internal funtion , Convert Windows Error Values to Dos Error Values */
 #ifdef HB_OS_WIN_32
-int WintoDosError( ULONG lError)
-{
-   int iReturn;
-   switch( lError ) {
-   case ERROR_ALREADY_EXISTS:
-      iReturn = 5;
-      break;
-   case ERROR_FILE_NOT_FOUND:
-      iReturn = 2;
-      break;
-   case ERROR_PATH_NOT_FOUND:
-      iReturn = 3;
-      break;
-   case  ERROR_TOO_MANY_OPEN_FILES:
-      iReturn = 4;
-      break;
-   case ERROR_INVALID_HANDLE:
-      iReturn = 6;
-      break;
-   case 25:
-      iReturn = 25;
-      break;
-
-   default:
-//      iReturn=0;
-      iReturn = ( int ) lError ;
-      break;
-      }
-
-   return iReturn;
-}
 
 FILETIME GetOldesFile( const char * szPath)
 {
@@ -672,24 +641,19 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
 #if defined(HB_OS_DOS)
    {
       PHB_FFIND_INFO info;
-      errno = 0;
 
       ffind->info = ( void * ) hb_xgrab( sizeof( HB_FFIND_INFO ) );
       info = ( PHB_FFIND_INFO ) ffind->info;
 
       tzset();
 
+      errno = 0;
       #if !defined(__WATCOMC__)
           bFound = ( findfirst( pszFileName, &info->entry, ( USHORT ) hb_fsAttrToRaw( uiAttr ) ) == 0 );
       #else
           bFound = ( info->hHandle = _findfirst( pszFileName, &info->entry )  != -1 );
       #endif
-
-      #if defined(__DJGPP__) || defined(__RSX32__)
-        errno = GnuErrtoDosErr( errno );
-      #endif
-
-      hb_fsSetError( errno );
+      hb_fsSetIOError( bFound, 0 );
    }
 #elif defined(HB_OS_OS2)
    {
@@ -710,14 +674,15 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
                              sizeof( info->entry ),
                              &info->findCount,
                              FIL_STANDARD ) == NO_ERROR && info->findCount > 0;
+      hb_fsSetIOError( bFound, 0 );
    }
 #elif defined(HB_OS_WIN_32)
   {
     PHB_FFIND_INFO info;
-    errno = 0;
     ffind->info = ( void * ) hb_xgrab( sizeof( HB_FFIND_INFO ) );
     info = ( PHB_FFIND_INFO ) ffind->info;
 
+    errno = 0;
     if ( uiAttr == HB_FA_LABEL )
     {
       DWORD dwSysFlags;
@@ -789,15 +754,10 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
             }
           }
         }
-        else
-        {
-          // bFound = FALSE;
-          errno = WintoDosError( GetLastError() );
-          hb_fsSetError( errno );
-        }
         hb_xfree(pFileName) ;
       }
     }
+    hb_fsSetIOError( bFound, 0 );
   }
 #elif defined(HB_OS_UNIX)
    {
@@ -857,6 +817,7 @@ PHB_FFIND HB_EXPORT hb_fsFindFirst( const char * pszFileName, USHORT uiAttr )
             }
          }
       }
+      hb_fsSetIOError( bFound, 0 );
    }
 #elif defined(HB_OS_MAC)
    {
@@ -900,24 +861,20 @@ BOOL HB_EXPORT hb_fsFindNext( PHB_FFIND ffind )
       #else
           bFound = ( _findnext( info->hHandle,&info->entry ) != -1 );
       #endif
+      hb_fsSetIOError( bFound, 0 );
 
-      #if defined(__DJGPP__) || defined(__RSX32__)
-        errno = GnuErrtoDosErr( errno );
-      #endif
-
-      hb_fsSetError( errno );
    }
 #elif defined(HB_OS_OS2)
    {
       bFound = DosFindNext( info->hFindFile, &info->entry, sizeof( info->entry ), &info->findCount ) == NO_ERROR &&
                             info->findCount > 0;
+      hb_fsSetIOError( bFound, 0 );
    }
 #elif defined(HB_OS_WIN_32)
    {
       errno = 0 ;
       bFound = FALSE;
-
-      while( FindNextFile( info->hFindFile, &info->pFindFileData ) )
+      if( FindNextFile( info->hFindFile, &info->pFindFileData ) )
       {
          if( info->dwAttr == 0 ||
              ( info->pFindFileData.dwFileAttributes == 0 ) ||
@@ -928,15 +885,9 @@ BOOL HB_EXPORT hb_fsFindNext( PHB_FFIND ffind )
              ( info->dwAttr & info->pFindFileData.dwFileAttributes ))
          {
             bFound = TRUE;
-            break;
-         }
-         else
-         {
-            errno = WintoDosError(GetLastError()) ;
-            hb_fsSetError( errno );
-            break;
          }
       }
+      hb_fsSetIOError( bFound, 0 );
    }
 #elif defined(HB_OS_UNIX)
    {
@@ -949,8 +900,8 @@ BOOL HB_EXPORT hb_fsFindNext( PHB_FFIND ffind )
             break;
          }
       }
+      hb_fsSetIOError( bFound, 0 );
    }
-
 #elif defined(HB_OS_MAC)
    {
       /* TODO */

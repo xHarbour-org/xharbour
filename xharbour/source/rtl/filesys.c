@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.90 2004/04/05 02:29:31 druzus Exp $
+ * $Id: filesys.c,v 1.91 2004/04/05 11:21:38 druzus Exp $
  */
 
 /*
@@ -708,9 +708,9 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       pFilename, fhStdin, fhStdout, fhStderr));
 
 #if defined(OS_UNIX_COMPATIBLE) || ( defined( HB_OS_WIN_32 ) && ! defined( HB_WIN32_IO) )
-   {
+{
 #ifndef MAXFD
-    #define MAXFD		1024
+   #define MAXFD       1024
 #endif
    FHANDLE hPipeIn[2], hPipeOut[2], hPipeErr[2];
    FHANDLE hNull;
@@ -977,7 +977,6 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
    }
    #endif
 }
-
 #elif defined( HB_WIN32_IO )
 {
    STARTUPINFO si;
@@ -1202,6 +1201,7 @@ ret_close_1:
    HB_SYMBOL_UNUSED( fhStdin );
    HB_SYMBOL_UNUSED( fhStdout );
    HB_SYMBOL_UNUSED( fhStderr );
+   HB_SYMBOL_UNUSED( bBackground );
 
    hb_fsSetError( FS_ERROR );
 
