@@ -16,7 +16,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.20 2004/02/19 23:46:37 jonnymind Exp $
+/* $Id: teditor.prg,v 1.21 2004/02/28 13:33:55 vouchcac Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -169,16 +169,20 @@ CLASS HBEditor
    METHOD  PageDown()
    METHOD  Bottom()
    METHOD  GoBottom()
+
    METHOD  Up()
    METHOD  PageUp()
    METHOD  Top()
    METHOD  GoTop()
-   MESSAGE Right() METHOD _Right()
+
+   METHOD  Right()
    METHOD  WordRight()
-   MESSAGE End()   METHOD _End()
-   MESSAGE Left()  METHOD _Left()
+   METHOD  End()
+
+   METHOD  Left()
    METHOD  WordLeft()
    METHOD  Home()
+
    METHOD  K_Ascii()
    METHOD  K_Return()
    METHOD  K_Del()
@@ -572,7 +576,7 @@ METHOD GoTop() CLASS HBEditor
 //
 //-------------------------------------------------------------------//
 
-METHOD _Right() CLASS HBEditor
+METHOD Right() CLASS HBEditor
 
    if ::Col() == ::nRight
       if ::nCol <= iif( ::lWordWrap, ::nWordWrapCol, ::LineLen( ::nRow ) )
@@ -621,7 +625,7 @@ METHOD WordRight() CLASS HBEditor
 
 //-------------------------------------------------------------------//
 
-METHOD _End() CLASS HBEditor
+METHOD End() CLASS HBEditor
 
    // Empty lines have 0 len
    ::nCol      := Max( ::LineLen( ::nRow ) + 1, 1 )
@@ -634,7 +638,7 @@ METHOD _End() CLASS HBEditor
 
 //-------------------------------------------------------------------//
 
-METHOD _Left() CLASS HBEditor
+METHOD Left() CLASS HBEditor
 
    if ::Col() == ::nLeft
       if ::nCol > 1
@@ -752,13 +756,13 @@ METHOD MoveCursor( nKey ) CLASS HBEditor
       case K_END
          ::End()
          exit
-
+/*
       case K_CTRL_END
          ::Bottom()
          exit
-
+*/
       default
-         RETURN .F.
+         return .F.
 
    end
 
@@ -823,8 +827,8 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
             case K_CTRL_Y
                ::lDirty := .T.
-               if ::naTextLen > 1 .AND. ::nRow < ::naTextLen
 
+               if ::naTextLen > 1 .AND. ::nRow < ::naTextLen
                   ::RemoveLine( ::nRow )
                   ::RefreshWindow()
                   ::Home()
@@ -838,19 +842,55 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                exit
 
             case K_DOWN
+               ::Down()
+               exit
+
             case K_PGDN
+               ::PageDown()
+               exit
+ 
             case K_CTRL_PGDN
+               ::GoBottom()
+               exit
+
             case K_UP
+               ::Up()
+               exit
+
             case K_PGUP
+               ::PageUp()
+               exit
+
             case K_CTRL_PGUP
+               ::GoTop()
+               exit
+
             case K_RIGHT
+               ::Right()
+               exit
+
             case K_CTRL_RIGHT
+               ::WordRight()
+               exit
+
             case K_LEFT
+               ::Left()
+               exit
+
             case K_CTRL_LEFT
+               ::WordLeft()
+               exit
+
             case K_HOME
+               ::Home()
+               exit
+
             case K_CTRL_HOME
+               ::Top()
+               exit
+
             case K_END
-               ::MoveCursor( nKey )
+               ::End()
                exit
 
             case K_ESC
@@ -1349,10 +1389,8 @@ return Self
 //
 METHOD InsertLine( cLine, lSoftCR, nRow ) CLASS HBEditor
 
-//   ::AddLine()
    ::naTextLen++
    AIns( ::aText, nRow, HBTextLine():New( cLine, lSoftCR ), .T. )
-//   ::aText[ nRow ] := HBTextLine():New( cLine, lSoftCR )
 
 return Self
 
@@ -1362,7 +1400,7 @@ return Self
 //
 METHOD RemoveLine( nRow ) CLASS HBEditor
 
-    ADel( ::aText, nRow, .T. )
+   ADel( ::aText, nRow, .T. )
    ::naTextLen--
 
 return Self

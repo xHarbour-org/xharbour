@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.4 2004/01/29 14:25:59 likewolf Exp $
+ * $Id: tbrwtext.prg,v 1.5 2004/02/20 02:29:14 likewolf Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ CLASS TBrwText FROM HBEditor
    ASSIGN colorSpec(cClr) INLINE ::cColorSpec:=cClr
 
    METHOD   New(nTop, nLeft, nBottom, nRight, cFileName, cColor)
-
+/*
    METHOD   GoTop()           // Methods available on a standard TBrowse, needed to handle a HBEditor like a TBrowse
    METHOD   GoBottom()
    METHOD   Up()
@@ -85,6 +85,7 @@ CLASS TBrwText FROM HBEditor
    METHOD   Right()
    METHOD   PageUp()
    METHOD   PageDown()
+*/
    METHOD   RefreshAll()
    METHOD   RefreshCurrent()
    METHOD   ForceStable() INLINE NIL
@@ -119,7 +120,7 @@ METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor) CLASS TBrwText
 
 return Self
 
-
+/*
 METHOD GoTop() CLASS TBrwText
    ::MoveCursor(K_CTRL_PGUP)
 return Self
@@ -158,7 +159,7 @@ return Self
 METHOD PageDown() CLASS TBrwText
    ::MoveCursor(K_PGDN)
 return Self
-
+*/
 
 METHOD RefreshAll() CLASS TBrwText
    ::RefreshWindow()
