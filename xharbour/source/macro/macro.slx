@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.12 2003/12/04 09:26:54 druzus Exp $
+ * $Id: macro.slx,v 1.13 2003/12/12 20:36:49 ronpinkas Exp $
  */
 
 /*
@@ -458,7 +458,7 @@ void * hb_compFlexNew( HB_MACRO_PTR pNewMacro )
    pYYLVAL = NULL;
    pMacro = pNewMacro;
 
-   { iLen = 0; iHold = 0; iReturn = 0; bNewLine = TRUE; bIgnoreWords = FALSE; }
+   { iLastToken = 0; iLen = 0; iHold = 0; iReturn = 0; bNewLine = TRUE; bIgnoreWords = FALSE; }
 
    DEBUG_INFO( printf( "*** New Macro: >>>%s<<< Len: %i\n", pMacro->string, pMacro->length ) );
    //TraceLog( NULL, "*** New Macro: >>>%s<<< Len: %i\n", pMacro->string, pMacro->length );
