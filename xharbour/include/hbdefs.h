@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.65 2005/02/24 10:44:03 andijahja Exp $
+ * $Id: hbdefs.h,v 1.66 2005/02/27 07:41:21 andijahja Exp $
  */
 
 /*
@@ -203,7 +203,7 @@
       #endif
    #endif
 
-   #if !defined(LONGLONG_MIN)
+   #if !defined(ULONGLONG_MAX)
       #if defined(_UI64_MAX)
          #define ULONGLONG_MAX      _UI64_MAX
       #elif defined(ULLONG_MAX)
