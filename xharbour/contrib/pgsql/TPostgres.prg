@@ -57,6 +57,7 @@ CLASS TPQServer
     DATA     lTrans
     DATA     lError
     DATA     cError
+    DATA     lallCols  INIT .T.
    
     METHOD   New( cHost, cDatabase, cUser, cPass, nPort )
     METHOD   Destroy()  INLINE PQClose(::pDb)
@@ -143,7 +144,7 @@ RETURN nil
 METHOD Query( cQuery ) CLASS TPQserver
     Local oQuery
     
-    oQuery := TPQquery():New(::pDB, cQuery)
+    oQuery := TPQquery():New(::pDB, cQuery, ::lallCols)
 RETURN oQuery
 
     
@@ -365,6 +366,7 @@ CLASS TPQQuery
     DATA     lBof
     DATA     lEof
     DATA     lClosed
+    DATA     lallCols INIT .T.
 
     DATA     cQuery
     DATA     nRecno
@@ -375,7 +377,7 @@ CLASS TPQQuery
     DATA     aKeys
     DATA     aTables
 
-    METHOD   New( pDB, cQuery )
+    METHOD   New( pDB, cQuery, lallCols )
     METHOD   Destroy()          
     METHOD   Close()            INLINE ::Destroy()
 
@@ -415,11 +417,12 @@ CLASS TPQQuery
 ENDCLASS
 
 
-METHOD New( pDB, cQuery ) CLASS TPQquery
+METHOD New( pDB, cQuery, lallCols ) CLASS TPQquery
     ::pDB := pDB
     ::cQuery := RemoveSpaces(cQuery)
     ::aKeys := NIL
     ::lClosed := .F.    
+    ::lallCols := lallCols
     
     ::Refresh()        
 RETURN self
@@ -790,18 +793,18 @@ METHOD Append( oRow ) CLASS TPQquery
                 
         cQuery := 'INSERT INTO ' + ::aTables[1] + '('
         For i := 1 to oRow:FCount()
-//            if oRow:changed(i)
+            if ::lallCols .or. oRow:changed(i)
                 lChanged := .t.
                 cQuery += oRow:Fieldname(i) + ','
-//            end                
+            end                
         Next
 
         cQuery := Left( cQuery, len(cQuery) - 1 ) +  ') VALUES (' 
 
         For i := 1 to oRow:FCount()
-//            if oRow:Changed(i)
+            if ::lallCols .or. oRow:Changed(i)
                 cQuery += DataToSql(oRow:FieldGet(i)) + ','
-//            end                
+            end                
         Next
         
         cQuery := Left( cQuery, len(cQuery) - 1  ) + ')'
@@ -855,10 +858,10 @@ METHOD Update(oRow) CLASS TPQquery
                 
         cQuery := 'UPDATE ' + ::aTables[1] + ' SET '
         For i := 1 to oRow:FCount()
-//            if oRow:Changed(i)
+            if ::lallcols .or. oRow:Changed(i)
                 lChanged := .t.
                 cQuery += oRow:Fieldname(i) + ' = ' + DataToSql(oRow:FieldGet(i)) + ','
-//            end                
+            end                
         Next
         
         if ! (cWhere == '') .and. lChanged
