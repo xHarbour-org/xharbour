@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.13 2003/11/22 15:10:22 jonnymind Exp $
+ * $Id: Changelog,v 1.14 2003/11/28 16:05:40 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-29 00:59 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * tipclienthttp.prg
+    + Added fields ::nReplyCode and ::cReplyDesc for easier
+      access to HTTP reply codes.
 
 2003-11-22 18:13 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * contrib/tip/tipclient.prg

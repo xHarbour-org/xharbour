@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclienthttp.prg,v 1.3 2003/11/05 11:06:41 jonnymind Exp $
+* $Id: tipclienthttp.prg,v 1.4 2003/11/22 15:10:22 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -17,6 +17,8 @@
 CLASS tIPClientHTTP FROM tIPClient
    DATA cMethod
    DATA nVersion
+   DATA nReplyCode
+   DATA cReplyDescr
    DATA nSubversion
    DATA bChunked
    DATA hHeaders     INIT  {=>}
@@ -52,7 +54,8 @@ METHOD PostRequest( cQuery, cPostData ) CLASS tIPClientHTTP
    InetSendAll( ::SocketCon, "POST " + cQuery + " HTTP/1.1" + ::cCRLF )
    InetSendAll( ::SocketCon, "Host: " + ::oUrl:cServer + ::cCRLF )
    InetSendAll( ::SocketCon, "Connection: close" + ::cCRLF )
-   InetSendAll( ::SocketCon, "Content-Length: " + ::oUrl:cServer + ::cCRLF )
+   InetSendAll( ::SocketCon, "Content-Length: " + ;
+         LTrim(Str( Len( cPostData ) ) ) + ::cCRLF )
    InetSendAll( ::SocketCon, ::cCRLF )
    IF InetErrorCode( ::SocketCon  ) ==  0
       InetSendAll( ::SocketCon, cPostData )
@@ -73,15 +76,19 @@ METHOD ReadHeaders() CLASS tIPClientHTTP
    ENDIF
 
    // Get Protocol version
-   aVersion := HB_Regex( "^HTTP/(.)\.(.)", cLine )
+   aVersion := HB_Regex( "^HTTP/(.)\.(.) ([0-9][0-9][0-9]) +(.*)$", cLine )
    ::cReply := cLine
 
    IF aVersion == NIL
       ::nVersion := 0
       ::nSubvesion := 9
+      ::nReplyCode := 0
+      ::cReplyDescr := ""
    ELSE
       ::nVersion := Val(aVersion[2])
       ::nSubversion := Val( aVersion[3] )
+      ::nReplyCode := val( aVersion[4] )
+      ::cReplyDescr := aVersion[5]
    ENDIF
 
    ::nLength := -1
