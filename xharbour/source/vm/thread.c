@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.70 2003/04/21 03:05:20 jonnymind Exp $
+* $Id: thread.c,v 1.71 2003/04/21 17:40:52 jonnymind Exp $
 */
 
 /*
@@ -250,8 +250,7 @@ HB_STACK *hb_threadUnlinkStack( HB_STACK* pStack )
       char errdat[64];
 
       sprintf( errdat, "Stack not found for Thread %ld",  (long) pStack->th_id );
-      //hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadUnlinkStack", 0 );
-      printf( "\r\n%s\r\n", errdat );
+      hb_errRT_BASE_SubstR( EG_CORRUPTION, 10001, errdat, "hb_threadUnlinkStack", 0 );
    }
 
    return p;
@@ -616,9 +615,9 @@ void hb_threadSubscribeIdle( HB_IDLE_FUNC pFunc )
    HB_STACK_UNLOCK;
 
    // here we can allow cancellation
-   //HB_TEST_CANCEL_ENABLE_ASYN;
+   HB_TEST_CANCEL_ENABLE_ASYN;
    WaitForSingleObject( hb_idleQueueRes.Cond, INFINITE );
-   //HB_DISABLE_ASYN_CANC;
+   HB_DISABLE_ASYN_CANC;
    
    HB_STACK_LOCK;
    HB_CRITICAL_LOCK( hb_idleQueueRes.Mutex );
@@ -727,7 +726,7 @@ void hb_threadTerminator( void *pData )
    HB_CRITICAL_UNLOCK( hb_mutexMutex );
 
    hb_threadDestroyStack( _pStack_ );
-
+   
    /* we are out of business */
    HB_CRITICAL_LOCK( hb_runningStacks.Mutex );
    hb_runningStacks.content.asLong--;
@@ -759,10 +758,10 @@ void hb_rawMutexForceUnlock( void * mtx )
    volatile HB_STACK *_pStack_ = (HB_STACK *) Cargo;
    /* Sets the cancellation handler so small delays in
    cancellation do not cause segfault or memory leaks */
-   _pStack_->th_id = HB_CURRENT_THREAD();
 #ifdef HB_OS_WIN_32
    TlsSetValue( hb_dwCurrentStack, _pStack_ );
 #else
+   _pStack_->th_id = HB_CURRENT_THREAD();
    pthread_setspecific( hb_pkCurrentStack, Cargo );
    pthread_cleanup_push( hb_threadTerminator, NULL );
    /* wait for the father to be done */
@@ -939,16 +938,16 @@ HB_FUNC( STARTTHREAD )
       return;
    }
 
-   HB_CRITICAL_LOCK( hb_threadStackMutex );
-
-   pStack = hb_threadCreateStack( 0 ); // we don't know thread ID now
+   // Create the stack here to avoid cross locking of alloc mutex
+   pStack = hb_threadCreateStack( 0 ); 
    pStack->uiParams = hb_pcount();
    pStack->bIsMethod = bIsMethod;
+ 
+   HB_CRITICAL_LOCK( hb_threadStackMutex );
    hb_threadFillStack( pStack, pArgs );
    hb_threadLinkStack( pStack );
 
    /* Forbid usage of stack before that VM takes care of it */
-
 #if defined(HB_OS_WIN_32)
    if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (void *) pStack , CREATE_SUSPENDED, &th_id ) ) != NULL )
 #else
@@ -961,9 +960,6 @@ HB_FUNC( STARTTHREAD )
       /* Under windws, we put the handle after creation */
 #if defined(HB_OS_WIN_32)
       pStack->th_h = th_h;
-#endif
-
-#if defined(HB_OS_WIN_32)
       ResumeThread( th_h );
 #endif
       hb_retnl( (long) th_id );
@@ -1015,8 +1011,9 @@ HB_FUNC( STOPTHREAD )
       stack->bCanceled = TRUE;
       HB_CRITICAL_UNLOCK( hb_cancelMutex );
       
+      HB_TEST_CANCEL_ENABLE_ASYN;
       WaitForSingleObject( stack->th_h, INFINITE );
-
+      HB_DISABLE_ASYN_CANC;   
    #endif
 
    /* Notify mutex before to leave */
@@ -1575,6 +1572,7 @@ void hb_threadWaitAll()
          nanosleep( &nanosecs, NULL );
       #endif
       HB_STACK_LOCK;
+      HB_CRITICAL_LOCK( hb_threadStackMutex );
    }
    HB_CRITICAL_UNLOCK( hb_threadStackMutex );
 }
