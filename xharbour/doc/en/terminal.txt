@@ -1,5 +1,5 @@
 /*
- * $Id: terminal.txt,v 1.13 2001/05/15 13:02:05 vszakats Exp $
+ * $Id: terminal.txt,v 1.1.1.1 2001/12/21 10:49:11 ronpinkas Exp $
  */
 
 /*
@@ -20,8 +20,11 @@
  * Copyright 1999 David G. Holm <dholm@jsd-llc.com>
  *    Documentation for: DEVOUTPICT()
  *
- * Copyright 2000 Luiz Rafael Culik <culik@sl.conex.net>
+ * Copyright 2000 Luiz Rafael Culik <culikr@uol.com.br>
  *    Documentation for: EJECT,MAXROW(),MAXCOL(),ROW(),COL(),PROW(),PCOL()
+ *
+ * Copyright 2003 Luiz Rafael Culik <culikr@uol.com.br>
+ *    Documentation for: DEVOUT(),DEVPOS()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -854,5 +857,116 @@
  *      Library is rtl
  *  $SEEALSO$
  *      COL(),ROW(),MAXCOL()
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      DEVOUT()
+ *  $CATEGORY$
+ *      GT
+ *  $ONELINER$
+ *      Write a value to the current device
+ *  $SYNTAX$
+ *      DEVOUT(<exp>, [<cColorString>], [<nRow>, <nCol>] ) --> NIL
+ *  $ARGUMENTS$
+ *
+ *      <exp> is the value to display.
+ *
+ *      <cColorString> is an optional argument that defines the display
+ *      color of <exp>.  If the current DEVICE setting is SCREEN, the output is
+ *      displayed in the specified color.
+ *
+ *      If not specified, <exp> is displayed as the standard color of the
+ *      current system color as defined by SETCOLOR().  <cColorString> is a
+ *      character expression containing the standard color setting.  If you want
+ *      to specify a literal color setting, enclose it in quote marks.
+ *
+ *      <nRow> and <nCol> are optional parameters that specify in what position to
+ *      write the text, if not specified, the interbal Values for Row and Column
+ *      are used.
+ *  $RETURNS$
+ *      This function always return NIL
+ *  $DESCRIPTION$
+ *      DEVOUT() is a full-screen display function that writes the value of a
+ *      single expression to the current device at the current cursor or
+ *      printhead position.  
+ *  $EXAMPLES$
+ *      DEVOUT("Hello there", "BG+/B",10,10)
+ *       //
+ *      @ 10, 10 SAY "Hello there" COLOR "BG+/B"
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This Functions is Ca-Clipper compliant
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Library is RTL
+ *  $SEEALSO$
+ *      COL(),DEVPOS(),QOUT(),ROW(),SETPOS() 
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      DEVPOS()
+ *  $CATEGORY$
+ *      GT
+ *  $ONELINER$
+ *      Move the cursor or printhead to a new position depending on the current device
+ *  $SYNTAX$
+ *      DEVPOS(<nRow>, <nCol>) --> NIL
+ *  $ARGUMENTS$
+ *      <nRow> and <nCol> are the new row and column positions of the
+ *      cursor or printhead.
+ *  $RETURNS$
+ *      DEVPOS() always returns NIL.
+ *  $DESCRIPTION$
+ *      DEVPOS() is an environment function that moves the screen or printhead
+ *      depending on the current DEVICE.  If DEVICE is SET to SCREEN, DEVPOS()
+ *      behaves like SETPOS(), moves the cursor to the specified location, and
+ *      updates ROW() and COL() with the new cursor position.
+ *
+ *      If DEVICE is SET to PRINTER, DEVPOS() moves the printhead instead.  It
+ *      does this by sending the number of linefeed and/or formfeed characters
+ *      to the printer, and advancing the printhead to the new position.  If the
+ *      current SET MARGIN value is greater than zero, it is added to <nCol>.
+ *      The printhead is then advanced to the specified <nRow> and <nCol>
+ *      position and PROW() and PCOL() are updated.  If either <nRow> or <nCol>
+ *      are less than the current PROW() and PCOL() values, the printhead is
+ *      moved according to the following special rules:
+ *
+ *      .  If <nRow> is less than PROW(), an automatic EJECT (CHR(12)) is
+ *         sent to the printer followed by the number of linefeed characters
+ *         (CHR(10)) required to position the printhead on <nRow> of the
+ *         following page.
+ *
+ *      .  If <nCol> including the current SET MARGIN value is less than
+ *         PCOL(), a carriage return character (CHR(13)) and the number of space
+ *         characters required to position the printhead at <nCol> are sent to
+ *         the printer.
+ *
+ *      To circumvent these rules, use SETPRC() to reset PROW() and PCOL() to
+ *      new values before using DEVPOS().  See the SETPRC() discussion for more
+ *      information.
+ *
+ *      If the printer is redirected to a file using the SET PRINTER command,
+ *      DEVPOS() updates the file instead of the printer.
+ *
+ *  $EXAMPLES$
+ *      DEVPOS(5,5)
+ *      DEVOUT("HELLO WORLD")
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This Functions is Ca-Clipper compliant
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      Library is RTL
+ *  $SEEALSO$
+ *      COL(),DEVOUT(),QOUT(),ROW(),SETPOS() 
  *  $END$
  */
