@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.4 2003/04/07 18:20:21 jonnymind Exp $
+ * $Id: Changelog,v 1.5 2003/04/07 22:05:29 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,7 +9,45 @@
 */
 
 
-2003-04-00 00:04 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+2003-04-08 20:30 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_image.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_label.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_layout.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_pane.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk.h
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_container.c
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_framewnd.c
+    ! Changed internal architecture of the widgets so that
+      they are able to be "aligned" in their owners.
+
+
+  * contrib/xwt/src/image.prg
+    ! Using now property XWT_PROP_IMAGE to set the image
+      (instead of XWT_PROP_TEXT)
+
+  * contrib/xwt/src/menuitem.prg
+  * contrib/xwt/src/xwt_gtk/xwt_gtk_menuitem.c
+    ! Menuitems are now supporting inline description images,
+      and are ready to support accelerator labels.
+
+  * contrib/xwt/src/grid.prg
+  + contrib/xwt/src/xwt_gtk/xwt_gtk_grid.c
+    + Added GRID widget support.
+
+  * contrib/xwt/include/xwt.ch
+    + Added properties to manage the grid widget
+
+  * contrib/xwt/src/xwt_api.c
+    + Added handling of properties for girds
+
+  * contrib/xwt/test/xwt_test.prg
+  + contrib/xwt/test/valley.png
+    + Added tests for the new features (grid, alignment
+      and icons for menu items).
+
+
+2003-04-08 00:04 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
   * include/xwt.ch
   * src/grid.prg
     * Internal driver is coded (still missing GTK implementation)
