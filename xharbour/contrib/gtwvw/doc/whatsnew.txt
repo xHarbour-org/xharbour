@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt,v 1.3 2005/01/13 10:33:28 bdj Exp $
+ * $Id: whatsnew.txt,v 1.4 2005/01/14 04:43:01 bdj Exp $
  */
 
 /*
@@ -15,6 +15,11 @@
  *
  * Budyanto Dj. <budyanto@centrin.net.id>
  */
+
+2005/01/14
+  + contrib/gtwvw/samples/cbtest1.prg
+  + contrib/gtwvw/samples/cbtest2.prg
+    * Samples on how to use GTWVW combobox.
 
  2005/01/13:
  * gtwvw.c
