@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.165 2002/04/23 05:01:40 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.166 2002/04/24 00:28:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-04-24 04:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
+  * source/rtl/devoutp.prg
+    ! More compliant with Cli**er for certain types of data.
+      Now only accept character, memo, numeric, date and logical
+      types of data.
+      Any other types of data is ignored.
 
 2002-04-23 17:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c
