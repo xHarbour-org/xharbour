@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.106 2003/12/22 04:55:32 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.107 2003/12/29 22:29:53 ronpinkas Exp $
  */
 
 /*
@@ -2670,7 +2670,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
   *(ptro + *lenres) = '\0';
 
   //printf( "%s\n", ptro );
-  s_bArray = ( isalnum( (int) sKey[0] ) || "])}._", sKey[0] );
+  s_bArray = isalnum( (int) sKey[0] ) || strchr( "])}._", sKey[0] );
   strotrim( ptro, 2 ); // Removing excess spaces.
   //printf( "%s\n", ptro );
 
