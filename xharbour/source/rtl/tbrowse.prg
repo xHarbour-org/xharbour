@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.80 2004/07/13 04:55:17 guerra000 Exp $
+ * $Id: tbrowse.prg,v 1.81 2004/07/15 23:57:16 paultucker Exp $
  */
 
 /*
@@ -1659,8 +1659,9 @@ METHOD CheckRowPos() CLASS TBrowse
       EndIf
    EndIf
 
-   If lReset   // So repositioning was required !
+   // TraceLog( 'Browser: RowPos, nAvail, lReset, RecsToSkip', ::RowPos, nAvail, lReset, ::nRecsToSkip )
 
+   If lReset   // So repositioning was required !
       // nNewRowPos and nLastRetrieved have to be updated
       // as we will entering phase 2 of stabilization
       //
@@ -2751,6 +2752,7 @@ METHOD TApplyKey( nKey, oBrowse ) CLASS tBrowse
 
 Method HitTest( mrow,mcol ) CLASS TBROWSE
    LOCAL i, nVisCol, lHitHeader := .f.
+   LOCAL nColPos
 
    ::mRowPos := ::rowPos
    ::mColPos := ::colPos
@@ -2772,19 +2774,29 @@ Method HitTest( mrow,mcol ) CLASS TBROWSE
    nVisCol := len( ::aColumnsSep )
 
    if nVisCol == 0
-      ::mColPos := 1
+      nColPos := 1
 
    elseif mcol >= ::aColumnsSep[ nVisCol ]
-      ::mColPos := nVisCol + 1
+      nColPos := nVisCol + 1
 
    else
       for i := 1 to nVisCol
          if mcol < ::aColumnsSep[ i ]
-            ::mColPos := i
+            nColPos := i
             exit
          endif
       next
    endif
+
+   if ::nFrozenCols > 0 .and. nColPos <= ::nFrozenCols
+      // Do Nothing
+   elseif ::nFrozenCols > 0 .and. nColPos > ::nFrozenCols
+      nColPos := ::LeftVisible + nColPos - ::nFrozenCols - 1
+   else
+      nColPos := ::LeftVisible + nColPos - 1
+   endif
+
+   ::mColPos := nColPos
 
    Return if( lHitHeader, HTHEADING, HTCELL )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3160 2004/07/15 23:57:01 paultucker Exp $
+ * $Id: ChangeLog,v 1.3161 2004/07/16 01:35:06 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2004-07-16 08:45 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * source/rtl/tbrowse.prg
+    !HitTest( oBrowse, nRow, nCol )
+    Now properly adjusts the ::mColPos.
+	
 2004-07-15 20:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/checkbox.prg
   * source/rtl/pushbtn.prg
