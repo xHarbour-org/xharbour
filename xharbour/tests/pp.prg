@@ -9540,7 +9540,7 @@ PROCEDURE PP_Warning( cMsg )
    ? cMsg
 RETURN
 
-FUNCTION Version
+Static FUNCTION Version
 
 RETURN s_cVer
 

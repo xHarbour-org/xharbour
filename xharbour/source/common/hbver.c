@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.10 2004/01/16 22:23:47 paultucker Exp $
+ * $Id: hbver.c,v 1.11 2004/01/16 22:57:14 paultucker Exp $
  */
 
 /*
@@ -98,13 +98,14 @@
 
 char * hb_verPlatform( void )
 {
-   char * pszPlatform;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_verPlatform()"));
+   char szName[128];
 
    /* NOTE: Must be larger than 128, which is the maximum size of
             osVer.szCSDVersion (Win32). [vszakats] */
-   pszPlatform = ( char * ) hb_xgrab( 256 );
+   char *szPlatform = ( char * ) hb_xgrab( 256 );
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_verPlatform()"));
 
 #if defined(HB_OS_DOS)
 
@@ -114,7 +115,7 @@ char * hb_verPlatform( void )
       regs.h.ah = 0x30;
       HB_DOS_INT86( 0x21, &regs, &regs );
 
-      sprintf( pszPlatform, "DOS %d.%02d", regs.h.al, regs.h.ah );
+      sprintf( szPlatform, "DOS %d.%02d", regs.h.al, regs.h.ah );
 
       /* Host OS detection: Windows 2.x, 3.x, 95/98 */
 
@@ -124,14 +125,16 @@ char * hb_verPlatform( void )
 
          if( regs.h.al != 0x00 && regs.h.al != 0x80 )
          {
-            char szHost[ 128 ];
-
             if( regs.h.al == 0x01 || regs.h.al == 0xFF )
-               sprintf( szHost, " (Windows 2.x)" );
+            {
+               sprintf( szName, " (Windows 2.x)" );
+            }
             else
-               sprintf( szHost, " (Windows %d.%02d)", regs.h.al, regs.h.ah );
+            {
+               sprintf( szName, " (Windows %d.%02d)", regs.h.al, regs.h.ah );
+            }
 
-            strcat( pszPlatform, szHost );
+            strcat( szPlatform, szName );
          }
       }
 
@@ -142,7 +145,9 @@ char * hb_verPlatform( void )
          HB_DOS_INT86( 0x21, &regs, &regs );
 
          if( regs.HB_XREGS.bx == 0x3205 )
-            strcat( pszPlatform, " (Windows NT/2000)" );
+         {
+            strcat( szPlatform, " (Windows NT/2000)" );
+         }
       }
 
       /* Host OS detection: OS/2 */
@@ -153,14 +158,16 @@ char * hb_verPlatform( void )
 
          if( regs.h.al >= 10 )
          {
-            char szHost[ 128 ];
-
             if( regs.h.al == 20 && regs.h.ah > 20 )
-               sprintf( szHost, " (OS/2 %d.%02d)", regs.h.ah / 10, regs.h.ah % 10 );
+            {
+               sprintf( szName, " (OS/2 %d.%02d)", regs.h.ah / 10, regs.h.ah % 10 );
+            }
             else
-               sprintf( szHost, " (OS/2 %d.%02d)", regs.h.al / 10, regs.h.ah );
+            {
+               sprintf( szName, " (OS/2 %d.%02d)", regs.h.al / 10, regs.h.ah );
+            }
 
-            strcat( pszPlatform, szHost );
+            strcat( szPlatform, szName );
          }
       }
    }
@@ -168,7 +175,7 @@ char * hb_verPlatform( void )
 #elif defined(HB_OS_OS2)
 
    {
-      unsigned LONG aulQSV[ QSV_MAX ] = { 0 };
+      ULONG aulQSV[ QSV_MAX ] = { 0 };
       APIRET rc;
 
       rc = DosQuerySysInfo( 1L, QSV_MAX, ( void * ) aulQSV, sizeof( ULONG ) * QSV_MAX );
@@ -178,16 +185,20 @@ char * hb_verPlatform( void )
          /* is this OS/2 2.x ? */
          if( aulQSV[ QSV_VERSION_MINOR - 1 ] < 30 )
          {
-            sprintf( pszPlatform, "OS/2 %ld.%02ld",
+            sprintf( szPlatform, "OS/2 %ld.%02ld",
                aulQSV[ QSV_VERSION_MAJOR - 1 ] / 10,
                aulQSV[ QSV_VERSION_MINOR - 1 ] );
          }
          else
-            sprintf( pszPlatform, "OS/2 %2.2f",
+         {
+            sprintf( szPlatform, "OS/2 %2.2f",
                ( float ) aulQSV[ QSV_VERSION_MINOR - 1 ] / 10 );
+         }
       }
       else
-         sprintf( pszPlatform, "OS/2" );
+      {
+         sprintf( szPlatform, "OS/2" );
+      }
    }
 
 #elif defined(HB_OS_WIN_32)
@@ -199,31 +210,45 @@ char * hb_verPlatform( void )
 
       if( GetVersionEx( &osVer ) )
       {
-         char * pszName = "Windows";
+         strcpy( szName, "Windows" );
 
          switch( osVer.dwPlatformId )
          {
             case VER_PLATFORM_WIN32_WINDOWS:
 
                if( osVer.dwMajorVersion == 4 && osVer.dwMinorVersion < 10 )
-                  pszName = "Windows 95";
+               {
+                  strcat( szName, " 95" );
+               }
                else if( osVer.dwMajorVersion == 4 && osVer.dwMinorVersion == 10 )
-                  pszName = "Windows 98";
+               {
+                  strcat( szName, " 98" );
+               }
                else
-                  pszName = "Windows ME";
+               {
+                  strcat( szName, " ME" );
+               }
 
                break;
 
             case VER_PLATFORM_WIN32_NT:
 
                if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 2 )
-                  pszName = "Windows Server 2003";
+               {
+                  strcat( szName, " Server 2003" );
+               }
                else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 1 )
-                  pszName = "Windows XP";
+               {
+                  strcat( szName, " XP" );
+               }
                else if( osVer.dwMajorVersion == 5 )
-                  pszName = "Windows 2000";
+               {
+                  strcat( szName, " 2000" );
+               }
                else
-                  pszName = "Windows NT";
+               {
+                  strcat( szName, " NT" );
+               }
 
                /* test for specific product on Windows NT 4.0 SP6 and later */
 
@@ -232,8 +257,7 @@ char * hb_verPlatform( void )
 
                   osVerEx.dwOSVersionInfoSize = sizeof( osVerEx );
 
-                           /* this should not be required, but it seems */
-                           /* the Windows GetVersionEx decl is incorrect */
+                                    /* Windows decl error? */
                   if( GetVersionEx( ( LPOSVERSIONINFOA ) &osVerEx ) )
                   {
                      /* workstation type */
@@ -241,11 +265,17 @@ char * hb_verPlatform( void )
                      if( osVerEx.wProductType == VER_NT_WORKSTATION )
                      {
                         if( osVerEx.dwMajorVersion == 4 )
-                           strcat( pszName, " Workstation 4.0" );
+                        {
+                           strcat( szName, " Workstation 4.0" );
+                        }
                         else if( osVerEx.wSuiteMask & VER_SUITE_PERSONAL )
-                           strcat( pszName, " Home Edition" );
+                        {
+                           strcat( szName, " Home Edition" );
+                        }
                         else
-                           strcat( pszName, " Professional" );
+                        {
+                           strcat( szName, " Professional" );
+                        }
                      }
 
                      /* server type */
@@ -255,31 +285,49 @@ char * hb_verPlatform( void )
                         if( osVerEx.dwMajorVersion == 5 && osVerEx.dwMinorVersion == 2 )
                         {
                            if( osVerEx.wSuiteMask & VER_SUITE_DATACENTER )
-                              strcat( pszName, " Datacenter Edition" );
+                           {
+                              strcat( szName, " Datacenter Edition" );
+                           }
                            else if( osVerEx.wSuiteMask & VER_SUITE_ENTERPRISE )
-                              strcat( pszName, " Enterprise Edition" );
+                           {
+                              strcat( szName, " Enterprise Edition" );
+                           }
                            else if( osVerEx.wSuiteMask == VER_SUITE_BLADE )
-                              strcat( pszName, " Web Edition" );
+                           {
+                              strcat( szName, " Web Edition" );
+                           }
                            else
-                              strcat( pszName, " Standard Edition" );
+                           {
+                              strcat( szName, " Standard Edition" );
+                           }
                         }
 
                         else if( osVerEx.dwMajorVersion == 5 && osVerEx.dwMinorVersion == 0 )
                         {
                            if( osVerEx.wSuiteMask & VER_SUITE_DATACENTER )
-                              strcat( pszName, " Datacenter Server" );
+                           {
+                              strcat( szName, " Datacenter Server" );
+                           }
                            else if( osVerEx.wSuiteMask & VER_SUITE_ENTERPRISE )
-                              strcat( pszName, " Advanced Server" );
+                           {
+                              strcat( szName, " Advanced Server" );
+                           }
                            else
-                              strcat( pszName, " Server" );
+                           {
+                              strcat( szName, " Server" );
+                           }
                         }
 
                         else
                         {
                            if( osVerEx.wSuiteMask & VER_SUITE_ENTERPRISE )
-                              strcat( pszName, " Server 4.0, Enterprise Edition" );
+                           {
+                              strcat( szName, " Server 4.0, Enterprise Edition" );
+                           }
                            else
-                              strcat( pszName, " Server 4.0" );
+                           {
+                              strcat( szName, " Server 4.0" );
+                           }
                         }
                      }
                   }
@@ -288,19 +336,18 @@ char * hb_verPlatform( void )
                break;
 
             case VER_PLATFORM_WIN32s:
-               pszName = "Windows 32s";
+               strcat( szName, " 32s" );
                break;
 
             case VER_PLATFORM_WIN32_CE:
-               pszName = "Windows CE";
+               strcat( szName, " CE" );
                break;
          }
 
-         sprintf( pszPlatform, "%s %lu.%02lu.%04d",
-            pszName,
-            ( ULONG ) osVer.dwMajorVersion,
-            ( ULONG ) osVer.dwMinorVersion,
-            ( USHORT ) LOWORD( osVer.dwBuildNumber ) );
+         sprintf( szPlatform, "%s %lu.%02lu.%04d", szName,
+                              ( ULONG ) osVer.dwMajorVersion,
+                              ( ULONG ) osVer.dwMinorVersion,
+                              ( USHORT ) LOWORD( osVer.dwBuildNumber ) );
 
          /* Add service pack/other info */
 
@@ -313,13 +360,15 @@ char * hb_verPlatform( void )
 
             if( osVer.szCSDVersion[ i ] != '\0' )
             {
-               strcat( pszPlatform, " " );
-               strcat( pszPlatform, osVer.szCSDVersion + i );
+               strcat( szPlatform, " " );
+               strcat( szPlatform, osVer.szCSDVersion + i );
             }
          }
       }
       else
-         sprintf( pszPlatform, "Windows" );
+      {
+         sprintf( szPlatform, "Windows" );
+      }
    }
 
 #elif defined(HB_OS_UNIX)
@@ -328,25 +377,24 @@ char * hb_verPlatform( void )
       struct utsname un;
 
       uname( &un );
-
-      sprintf( pszPlatform, "%s %s", un.sysname, un.release );
+      sprintf( szPlatform, "%s %s", un.sysname, un.release );
    }
 
 #elif defined(HB_OS_MAC)
 
    {
-      strcpy( pszPlatform, "MacOS compatible" );
+      strcpy( szPlatform, "MacOS compatible" );
    }
 
 #else
 
    {
-      strcpy( pszPlatform, "(unknown)" );
+      strcpy( szPlatform, "(unknown)" );
    }
 
 #endif
 
-   return pszPlatform;
+   return szPlatform;
 }
 
 /* NOTE: The caller must free the returned buffer. [vszakats] */
@@ -354,7 +402,7 @@ char * hb_verPlatform( void )
 char * hb_verCompiler( void )
 {
    char * pszCompiler;
-   char * pszName;
+   char * szName;
    int iVerMajor;
    int iVerMinor;
 
@@ -371,9 +419,9 @@ char * hb_verCompiler( void )
    #endif
 
    if( iVerMajor >= 300 )
-      pszName = "IBM Visual Age C++";
+      szName = "IBM Visual Age C++";
    else
-      pszName = "IBM C++";
+      szName = "IBM C++";
 
    iVerMajor /= 100;
    iVerMinor = iVerMajor % 100;
@@ -381,9 +429,9 @@ char * hb_verCompiler( void )
 #elif defined(_MSC_VER)
 
    #if (_MSC_VER >= 800)
-      pszName = "Microsoft Visual C/C++";
+      szName = "Microsoft Visual C/C++";
    #else
-      pszName = "Microsoft C/C++";
+      szName = "Microsoft C/C++";
    #endif
 
    iVerMajor = _MSC_VER / 100;
@@ -391,7 +439,7 @@ char * hb_verCompiler( void )
 
 #elif defined(__BORLANDC__)
 
-   pszName = "Borland C++";
+   szName = "Borland C++";
    #if (__BORLANDC__ == 1040) /* Version 3.1 */
       iVerMajor = 3;
       iVerMinor = 1;
@@ -405,38 +453,38 @@ char * hb_verCompiler( void )
 
 #elif defined(__TURBOC__)
 
-   pszName = "Borland Turbo C";
+   szName = "Borland Turbo C";
    iVerMajor = __TURBOC__ >> 8;
    iVerMinor = __TURBOC__ & 0xFF;
 
 #elif defined(__MPW__)
 
-   pszName = "MPW C";
+   szName = "MPW C";
    iVerMajor = __MPW__ / 100;
    iVerMinor = __MPW__ % 100;
 
 #elif defined(__WATCOMC__)
 
-   pszName = "Watcom C/C++";
+   szName = "Watcom C/C++";
    iVerMajor = __WATCOMC__ / 100;
    iVerMinor = __WATCOMC__ % 100;
 
 #elif defined(__GNUC__)
 
    #if defined(__DJGPP__)
-      pszName = "Delorie GNU C";
+      szName = "Delorie GNU C";
    #elif defined(__CYGWIN__)
-      pszName = "Cygnus Cygwin GNU C";
+      szName = "Cygnus Cygwin GNU C";
    #elif defined(__MINGW32__)
-      pszName = "Cygnus MinGW GNU C";
+      szName = "Cygnus MinGW GNU C";
    #elif defined(__RSX32__)
-      pszName = "EMX/RSXNT/DOS GNU C";
+      szName = "EMX/RSXNT/DOS GNU C";
    #elif defined(__RSXNT__)
-      pszName = "EMX/RSXNT/Win32 GNU C";
+      szName = "EMX/RSXNT/Win32 GNU C";
    #elif defined(__EMX__)
-      pszName = "EMX GNU C";
+      szName = "EMX GNU C";
    #else
-      pszName = "GNU C";
+      szName = "GNU C";
    #endif
 
    iVerMajor = __GNUC__;
@@ -444,14 +492,14 @@ char * hb_verCompiler( void )
 
 #else
 
-   pszName = ( char * ) NULL;
+   szName = ( char * ) NULL;
    iVerMajor = 0;
    iVerMinor = 0;
 
 #endif
 
-   if( pszName )
-      sprintf( pszCompiler, "%s %hd.%hd", pszName, iVerMajor, iVerMinor );
+   if( szName )
+      sprintf( pszCompiler, "%s %hd.%hd", szName, iVerMajor, iVerMinor );
    else
       strcpy( pszCompiler, "(unknown)" );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.119 2004/01/17 01:53:11 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.120 2004/01/18 02:21:25 ronpinkas Exp $
  */
 
 /*
@@ -409,13 +409,13 @@ void hb_pp_Free( void )
 
 char * hb_ppPlatform( void )
 {
-   char *szPlatform = (char *) hb_xgrab( 256 );
-   char szName[256];
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_verPlatform()"));
+   char szName[128];
 
    /* NOTE: Must be larger than 128, which is the maximum size of
             osVer.szCSDVersion (Win32). [vszakats] */
+   char *szPlatform = ( char * ) hb_xgrab( 256 );
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_ppPlatform()"));
 
 #if defined(HB_OS_DOS)
 
@@ -435,18 +435,16 @@ char * hb_ppPlatform( void )
 
          if( regs.h.al != 0x00 && regs.h.al != 0x80 )
          {
-            char szHost[ 128 ];
-
             if( regs.h.al == 0x01 || regs.h.al == 0xFF )
             {
-               sprintf( szHost, " (Windows 2.x)" );
+               sprintf( szName, " (Windows 2.x)" );
             }
             else
             {
-               sprintf( szHost, " (Windows %d.%02d)", regs.h.al, regs.h.ah );
+               sprintf( szName, " (Windows %d.%02d)", regs.h.al, regs.h.ah );
             }
 
-            strcat( szPlatform, szHost );
+            strcat( szPlatform, szName );
          }
       }
 
@@ -470,18 +468,16 @@ char * hb_ppPlatform( void )
 
          if( regs.h.al >= 10 )
          {
-            char szHost[ 128 ];
-
             if( regs.h.al == 20 && regs.h.ah > 20 )
             {
-               sprintf( szHost, " (OS/2 %d.%02d)", regs.h.ah / 10, regs.h.ah % 10 );
+               sprintf( szName, " (OS/2 %d.%02d)", regs.h.ah / 10, regs.h.ah % 10 );
             }
             else
             {
-               sprintf( szHost, " (OS/2 %d.%02d)", regs.h.al / 10, regs.h.ah );
+               sprintf( szName, " (OS/2 %d.%02d)", regs.h.al / 10, regs.h.ah );
             }
 
-            strcat( szPlatform, szHost );
+            strcat( szPlatform, szName );
          }
       }
    }
@@ -499,11 +495,14 @@ char * hb_ppPlatform( void )
          /* is this OS/2 2.x ? */
          if( aulQSV[ QSV_VERSION_MINOR - 1 ] < 30 )
          {
-            sprintf( szPlatform, "OS/2 %ld.%02ld", aulQSV[ QSV_VERSION_MAJOR - 1 ] / 10, aulQSV[ QSV_VERSION_MINOR - 1 ] );
+            sprintf( szPlatform, "OS/2 %ld.%02ld",
+               aulQSV[ QSV_VERSION_MAJOR - 1 ] / 10,
+               aulQSV[ QSV_VERSION_MINOR - 1 ] );
          }
          else
          {
-            sprintf( szPlatform, "OS/2 %2.2f", ( float ) aulQSV[ QSV_VERSION_MINOR - 1 ] / 10 );
+            sprintf( szPlatform, "OS/2 %2.2f",
+               ( float ) aulQSV[ QSV_VERSION_MINOR - 1 ] / 10 );
          }
       }
       else
@@ -529,15 +528,15 @@ char * hb_ppPlatform( void )
 
                if( osVer.dwMajorVersion == 4 && osVer.dwMinorVersion < 10 )
                {
-                  strcpy( szName, "Windows 95" );
+                  strcat( szName, " 95" );
                }
                else if( osVer.dwMajorVersion == 4 && osVer.dwMinorVersion == 10 )
                {
-                  strcpy( szName, "Windows 98" );
+                  strcat( szName, " 98" );
                }
                else
                {
-                  strcpy( szName,  "Windows ME" );
+                  strcat( szName, " ME" );
                }
 
                break;
@@ -546,29 +545,29 @@ char * hb_ppPlatform( void )
 
                if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 2 )
                {
-                  strcpy( szName, "Windows Server 2003" );
+                  strcat( szName, " Server 2003" );
                }
                else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 1 )
                {
-                  strcpy( szName, "Windows XP" );
+                  strcat( szName, " XP" );
                }
                else if( osVer.dwMajorVersion == 5 )
                {
-                  strcpy( szName, "Windows 2000" );
+                  strcat( szName, " 2000" );
                }
                else
                {
-                  strcpy( szName, "Windows NT" );
+                  strcat( szName, " NT" );
                }
 
                /* test for specific product on Windows NT 4.0 SP6 and later */
 
                {
-                  HBOSVERSIONINFOEX osVerEx; /* NOTE */
+                  HBOSVERSIONINFOEX osVerEx;  /* NOTE */
 
                   osVerEx.dwOSVersionInfoSize = sizeof( osVerEx );
 
-                                    /* Windows decl error */
+                                    /* Windows decl error? */
                   if( GetVersionEx( ( LPOSVERSIONINFO ) &osVerEx ) )
                   {
                      /* workstation type */
@@ -647,15 +646,18 @@ char * hb_ppPlatform( void )
                break;
 
             case VER_PLATFORM_WIN32s:
-               strcat( szName, "Windows 32s" );
+               strcat( szName, " 32s" );
                break;
 
             case VER_PLATFORM_WIN32_CE:
-               strcat( szName,  "Windows CE" );
+               strcat( szName, " CE" );
                break;
          }
 
-         sprintf( szPlatform, "%s %lu.%02lu.%04d", szName, ( ULONG ) osVer.dwMajorVersion, ( ULONG ) osVer.dwMinorVersion, ( USHORT ) LOWORD( osVer.dwBuildNumber ) );
+         sprintf( szPlatform, "%s %lu.%02lu.%04d", szName, 
+                              ( ULONG ) osVer.dwMajorVersion,
+                              ( ULONG ) osVer.dwMinorVersion,
+                              ( USHORT ) LOWORD( osVer.dwBuildNumber ) );
 
          /* Add service pack/other info */
 
@@ -675,7 +677,7 @@ char * hb_ppPlatform( void )
       }
       else
       {
-         sprintf( szPlatform, "Windows" );
+         strcpy( szPlatform, "Windows" );
       }
    }
 
