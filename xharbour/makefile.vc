@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.17 2002/09/18 02:34:59 ronpinkas Exp $
+# $Id: makefile.vc,v 1.18 2002/10/22 21:10:06 paultucker Exp $
 #
 
 #
@@ -611,7 +611,6 @@ DEBUG_LIB_OBJS = \
    $(OBJ_DIR)\debugger.obj \
    $(OBJ_DIR)\dbgtarr.obj \
    $(OBJ_DIR)\dbgtobj.obj \
-   $(OBJ_DIR)\dbghelp.obj \
    $(OBJ_DIR)\tbrwtext.obj \
    $(OBJ_DIR)\dbgwa.obj
 
