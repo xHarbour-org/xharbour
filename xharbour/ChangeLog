@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.121 2002/03/18 04:57:07 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.122 2002/03/18 16:00:47 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-03-18 14:10 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+  * include/getexit.ch
+    + Added few missing defines for recent Luiz's post.
+
+  * source/rtl/tgetlist.prg
+    * Corrcted formatting.
 
 2002-03-18 12:56 UTC-0300 Luiz Rafael Culik<culikr@uol.com.br>
    * source/rtl/menuto.prg
@@ -31,7 +38,7 @@
     % minor fix to Clip53 classes
   * include/hbgetcmt.ch
     * Added the @ Get... Tbrowse command
-    
+
 2002-03-16 22:42 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * include/hbtrace.h
   * source/rtl/trace.c
