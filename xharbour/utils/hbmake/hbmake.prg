@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.27 2002/07/08 02:08:04 lculik Exp $
+ * $Id: hbmake.prg,v 1.28 2002/07/10 00:55:42 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -2321,6 +2321,7 @@ FUNC crtlibmakfile( cFile )
     LOCAL cDefHarOpts := ""
     LOCAL cObjDir     := 'obj' + Space( 20 )
     LOCAL lCompMod := .f.
+    LOCAL lInstallLibrary  := .f.
     LOCAL x
     LOCAL y
     LOCAL nPos as numeric
@@ -2365,8 +2366,9 @@ FUNC crtlibmakfile( cFile )
     @  8, 40 GET lCompMod checkbox caption "compile module only"                                                     
     @  9,  1 SAY "User Defines "                                                  GET cUserDef     PICT "@s15"       
     @  9, 40 SAY "User include Path"                                              GET cUserInclude PICT "@s15"
-
+    @ 10,  1 GET lInstallLibrary checkbox caption "Install Library to xharbour Lib Directory"
     READ
+
 
     IF !Empty( cUserDef )
 
@@ -2647,16 +2649,16 @@ FUNC crtlibmakfile( cFile )
 
         IF At( "linux", Getenv( "HB_ARCHITECTURE" ) ) > 0 .or. cOs == "Linux"
 
-            Fwrite( nLinkHandle, "PROJECT = " + Alltrim( cfwhpath ) + ".a " + CRLF )
+            Fwrite( nLinkHandle, "PROJECT = " + if(lInstallLibrary,"$(BHC)\lib\","")+Alltrim( cfwhpath ) + ".a " + CRLF )
 
         ELSE
 
-            Fwrite( nLinkHandle, "PROJECT = " + Alltrim( Lower( cfwhpath ) ) + ".a " + CRLF )
+            Fwrite( nLinkHandle, "PROJECT = " + if(lInstallLibrary,"$(BHC)\lib\","")+Alltrim( Lower( cfwhpath ) ) + ".a " + CRLF )
 
         ENDIF
     ELSE
 
-        Fwrite( nLinkHandle, "PROJECT = " + Alltrim( Lower( cfwhpath ) ) + ".lib " + CRLF )
+        Fwrite( nLinkHandle, "PROJECT = " + if(lInstallLibrary,"$(BHC)\lib\","")+ Alltrim( Lower( cfwhpath ) ) + ".lib " + CRLF )
 
     ENDIF
 
@@ -2738,11 +2740,11 @@ FUNC crtlibmakfile( cFile )
 
             IF Len( aObjsc ) < 1
 
-                Fwrite( nLinkHandle, + " $(OB) " + CRLF )
+                Fwrite( nLinkHandle, + " $(OBC) " + CRLF )
 
             ELSE
 
-                Aeval( aObjsc, { | x, i | nWriteFiles ++, If( i <> Len( aobjsc ), Fwrite( nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+                Aeval( aObjsc, { | x, i | nWriteFiles ++, If( i <> Len( aobjsc ), Fwrite( nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( nLinkHandle, " " + Alltrim( x ) + " $(OBC) " + CRLF ) ) } )
 
             ENDIF
 
@@ -2760,7 +2762,7 @@ FUNC crtlibmakfile( cFile )
 
             ELSE
 
-                Aeval( aCs, { | x, i | nWriteFiles ++, If( i <> Len( aCs ), Fwrite( nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( nLinkHandle, " " + Alltrim( x ) + " $(OB) " + CRLF ) ) } )
+                Aeval( aCs, { | x, i | nWriteFiles ++, If( i <> Len( aCs ), Fwrite( nLinkHandle, ' ' + Alltrim( x ) + If( nWriteFiles % 10 == 0, " //" + CRLF, "" ) ), Fwrite( nLinkHandle, " " + Alltrim( x ) + " $(CF) " + CRLF ) ) } )
 
             ENDIF
 
@@ -2776,7 +2778,7 @@ FUNC crtlibmakfile( cFile )
     IF lBcc
 
         Fwrite( nLinkHandle, "CFLAG1 =  -OS $(CFLAGS) -d -L$(BHC)\lib;$(FWH)\lib -c" + CRLF )
-        Fwrite( nLinkHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include" + CRLF )
+        Fwrite( nLinkHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include;"+Alltrim( cUserInclude ) + CRLF )
         Fwrite( nLinkHandle, "RFLAGS = " + CRLF )
         Fwrite( nLinkHandle, "LFLAGS = /P32 /0" + CRLF )
         Fwrite( nLinkHandle, "IFLAGS = " + CRLF )
@@ -2790,7 +2792,7 @@ FUNC crtlibmakfile( cFile )
     ELSEIF lVcc
 
         Fwrite( nLinkHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" + CRLF )
-        Fwrite( nLinkHandle, "CFLAG2 =  -c" + CRLF )
+        Fwrite( nLinkHandle, "CFLAG2 =  -c -I"+Alltrim( cUserInclude ) + CRLF )
         Fwrite( nLinkHandle, "RFLAGS = " + CRLF )
         Fwrite( nLinkHandle, "LFLAGS = " + CRLF )
         Fwrite( nLinkHandle, "IFLAGS = " + CRLF )
