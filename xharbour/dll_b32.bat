@@ -1,6 +1,6 @@
 @echo off
 REM
-REM $Id: dll_b32.bat,v 1.5 2004/05/01 03:57:44 lculik Exp $
+REM $Id: dll_b32.bat,v 1.6 2005/03/03 14:16:44 andijahja Exp $
 REM
 REM 旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
 REM � This is a batch file to create harbour.dll 넴
@@ -23,7 +23,7 @@ if not exist lib\b32 md lib\b32
 :BUILD_OK
 
 if exist hdll.tmp del hdll.tmp
-if exist bin\b32\harbour.dll implib lib\b32\harbour.lib bin\b32\harbour.dll > nul
+if exist bin\b32\harbour.lib copy bin\b32\harbour.lib lib > nul
 if exist bin\b32\harbour.dll copy bin\b32\harbour.dll lib > nul
 if exist bin\b32\harbour.dll copy bin\b32\harbour.dll tests > nul
 if exist lib\b32\harbour.lib copy lib\b32\harbour.lib lib > nul

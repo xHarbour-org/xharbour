@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.87 2005/02/27 17:10:53 ronpinkas Exp $
+# $Id: hrbdll.bc,v 1.88 2005/03/03 14:16:44 andijahja Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -91,7 +91,7 @@ HBTESTDLL_EXE   = $(BIN_DIR)\hbtestdll.exe
 HBMAKEDLL_EXE   = $(BIN_DIR)\hbmakedll.exe
 HBDOCDLL_EXE    = $(BIN_DIR)\hbdocdll.exe
 XBSCRIPTDLL_EXE = $(BIN_DIR)\xbscriptdll.exe
-HRBDLL_LIB      = lib\b32\harbour.lib
+HRBDLL_LIB      = $(BIN_DIR)\harbour.lib
 
 CC_CMD  = $(CC) $(CLIBFLAGS) -o$@ $**
 HRB_CMD = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
@@ -1260,7 +1260,7 @@ $(HARBOUR_DLL)  : \
 !endif
   echo. import32.lib                     + >> hdll.tmp
   echo. uuid.lib                           >> hdll.tmp
-  ILINK32 -aa -Tpd -Gn @hdll.tmp
+  ILINK32 -aa -Tpd -Gn -Gi @hdll.tmp
 
 # 旼컴컴컴컴컴컴컴컴컴컴커
 # � object file creation 넴
