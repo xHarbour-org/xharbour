@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tiputils.c,v 1.8 2004/05/17 15:18:03 jonnymind Exp $
+* $Id: tiputils.c,v 1.9 2004/05/20 14:14:08 srobert Exp $
 ************************************************/
 
 #include "hbapi.h"
@@ -597,6 +597,7 @@ HB_FUNC( TIP_FILEMIMETYPE )
       {
          magic_type = s_findFileMimeType( fileIn );
       }
+      hb_fsClose( fileIn );
    }
    else
    {
