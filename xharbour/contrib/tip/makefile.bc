@@ -1,9 +1,9 @@
 #
-# $Id: makefile2.bc,v 1.1 2002/06/30 19:48:56 lculik Exp $
+# $Id: makefile.bc,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
 #
 
 #
-# Makefile for Zlib library for Borland C/C++ 3.x, 4.x, 5.x compilers
+# Makefile for TIP library for Borland C/C++ 3.x, 4.x, 5.x compilers
 #
 .autodepend
 
@@ -14,29 +14,9 @@ ID = impdef
 #       I'll leave it to TASM until a better solution is found
 AS = tasm
 
-BIN_DIR = \..\..\bin
-OBJ_DIR = \..\..\obj
-LIB_DIR = \..\..\lib
-
-COMMON_LIB   = $(LIB_DIR)\common.lib
-DBFCDX_LIB   = $(LIB_DIR)\dbfcdx.lib
-DBFNTX_LIB   = $(LIB_DIR)\dbfntx.lib
-DEBUG_LIB    = $(LIB_DIR)\debug.lib
-LANG_LIB     = $(LIB_DIR)\lang.lib
-MACRO_LIB    = $(LIB_DIR)\macro.lib
-NULSYS_LIB   = $(LIB_DIR)\nulsys.lib
-PP_LIB       = $(LIB_DIR)\pp.lib
-RDD_LIB      = $(LIB_DIR)\rdd.lib
-RTL_LIB      = $(LIB_DIR)\rtl.lib
-VM_LIB       = $(LIB_DIR)\vm.lib
-GTWIN_LIB    = $(LIB_DIR)\gtwin.lib
-SAMPLES_LIB  = $(LIB_DIR)\samples.lib
-HB_GT_LIB    = $(GTWIN_LIB)
-
-
-!if !$d(BCC_NOOPTIM)
-CFLAGS = -O2- $(CFLAGS)
-!endif
+BIN_DIR = ..\..\bin
+OBJ_DIR = obj
+LIB_DIR = .
 
 #
 # Directory macros. These should never have to change.
@@ -54,41 +34,76 @@ LDFLAGS        = $(LDFLAGS)
 # Macros to access our library names
 #
 
-all: hbtip.lib
+HBTIP_LIB= hbtip.lib
 
 HBTIP_OBJS=\
-   $(OBJ_DIR)\tipclientftp.prg\
-   $(OBJ_DIR)\tipclienthttp.prg\
-   $(OBJ_DIR)\tipclientpop.prg\
-   $(OBJ_DIR)\tipclient.prg\
-   $(OBJ_DIR)\tipclientsmtp.prg\
-   $(OBJ_DIR)\tipcredentials.prg\
-   $(OBJ_DIR)\tipurl.prg\
-   $(OBJ_DIR)\tiputils.prg\
+   $(OBJ_DIR)\tipclientftp.obj\
+   $(OBJ_DIR)\tipclienthttp.obj\
+   $(OBJ_DIR)\tipclientpop.obj\
+   $(OBJ_DIR)\tipclient.obj\
+   $(OBJ_DIR)\tipclientsmtp.obj\
+   $(OBJ_DIR)\tipcredentials.obj\
+   $(OBJ_DIR)\tipurl.obj\
+   $(OBJ_DIR)\tiputils.obj\
+
+all: $(HBTIP_LIB)
+
+$(HBTIP_LIB): $(HBTIP_OBJS)
 
 
-hbtip.lib: $(HBTIP_OBJS)
+$(OBJ_DIR)\tipclientftp.c: tipclientftp.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-   echo. $(CFLAGS)  > make.tmp
-   echo. -M -e$(hbtip.lib) >> make.tmp
-   echo. -I$(INCLUDE_DIR) >> make.tmp
-   echo. $(PP_LIB) >> make.tmp
-   echo. $(COMMON_LIB) >> make.tmp
-   echo. $(VM_LIB) >> make.tmp
-   echo. $(RTL_LIB) >> make.tmp
-   echo. $(HB_GT_LIB) >> make.tmp
-   echo. $(LANG_LIB) >> make.tmp
-   echo. $(RDD_LIB) >> make.tmp
-   echo. $(MACRO_LIB) >> make.tmp
-   echo. $(DBFNTX_LIB) >> make.tmp
-   echo. $(DBFCDX_LIB) >> make.tmp
-   echo. $(SAMPLES_LIB) >> make.tmp
-   $(CC) @make.tmp
-   del make.tmp
+$(OBJ_DIR)\tipclienthttp.c: tipclienthttp.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\tipclientpop.c: tipclientpop.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\tipclientsmtp.c: tipclientsmtp.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\tipclient.c: tipclient.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\tipcredentials.c: tipcredentials.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\tipurl.c: tipurl.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\tiputils.c: tiputils.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 
-#$(OBJ_DIR)\test.c : $(ZLIB_DIR)\test.prg
-#   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+$(OBJ_DIR)\tipclientftp.obj: $(OBJ_DIR)\tipclientftp.c
+   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
+   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
 
-#$(OBJ_DIR)\test.obj : $(OBJ_DIR)\test.c
-#   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
+$(OBJ_DIR)\tipclienthttp.obj: $(OBJ_DIR)\tipclienthttp.c
+   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
+   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\tipclientpop.obj: $(OBJ_DIR)\tipclientpop.c
+   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
+   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\tipclientsmtp.obj: $(OBJ_DIR)\tipclientsmtp.c
+   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
+   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\tipclient.obj: $(OBJ_DIR)\tipclient.c
+   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
+   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\tipcredentials.obj: $(OBJ_DIR)\tipcredentials.c
+   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
+   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\tipurl.obj: $(OBJ_DIR)\tipurl.c
+   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
+   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\tiputils.obj: $(OBJ_DIR)\tiputils.c
+   $(CC) -u -c $(CLIBFLAGS) -o$@ $**
+   tlib $(HBTIP_LIB) $(ARFLAGS) -+$@,,

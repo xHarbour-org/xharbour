@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id$
+* $Id: tipclienthttp.prg,v 1.1 2003/02/22 16:44:46 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -90,12 +90,12 @@ RETURN .T.
 
 
 METHOD Read( nLen ) CLASS tIPClientHTTP
-   LOCAL cData, nPos
+   LOCAL cData, nPos, cLine
 
    IF .not. ::bInitialized
       ::bInitialized := .T.
       IF .not. ::GetRequest( ::oUrl:BuildQuery() )
-         RETURN .F.
+         RETURN NIL
       ENDIF
    ENDIF
 
@@ -105,13 +105,13 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
       IF .not. Empty( cLine )
          IF cLine == "0"
             InetRecvLine( ::SocketCon, @nPos, 16 )
-            bEof := .T.
-            RETURN
+            ::bEof := .T.
+            RETURN NIL
          ELSE
             ::nLength := IP_HexToDec( cLine ) + ::nRead
          ENDIF
       ELSE
-         RETURN  /* Temporary failure? */
+         RETURN  NIL
       ENDIF
    ENDIF
 
