@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.42 2003/06/12 21:53:36 andijahja Exp $
+ * $Id: genc.c,v 1.43 2003/06/18 08:57:01 ronpinkas Exp $
  */
 
 /*
@@ -350,7 +350,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension, char *szSour
       }
 
       fprintf( yyc, "\nHB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n"
-                    "#if defined(_MSC_VER)\n"
+                    "#if defined(HB_STATIC_STARTUP)\n"
+                    "   #pragma startup hb_vm_SymbolInit_%s%s\n"
+                    "#elif defined(_MSC_VER)\n"
                     "   #if _MSC_VER >= 1010\n"
                     /* [pt] First version of MSC I have that supports this */
                     /* is msvc4.1 (which is msc 10.10) */
