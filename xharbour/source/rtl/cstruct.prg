@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.28 2004/05/19 07:25:58 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.29 2004/05/20 21:09:22 ronpinkas Exp $
  */
 
 /*
@@ -582,7 +582,7 @@ RETURN QSelf()
 STATIC Function Pointer( nNewPointer, lAdopt )
 
    IF nNewPointer != NIL
-      QSelf():Buffer( HB_Pointer2String( nNewPointer, :SizeOf ), lAdopt )
+      QSelf():Buffer( HB_Pointer2String( nNewPointer, QSelf():SizeOf ), lAdopt )
    ENDIF
 
 RETURN QSelf()
