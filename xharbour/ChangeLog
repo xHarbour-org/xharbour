@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.747 2003/02/20 15:31:56 lculik Exp $
+ * $Id: ChangeLog,v 1.748 2003/02/20 15:50:37 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2003-02-19 12:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+2003-02-20 14:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+  * source/rtl/pushbtn.prg
+   ! Fixed minor compilation Error IIF(( to IIF(
+
+2003-02-20 12:50 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * source/rtl/pushbtn.prg
     source/rtl/scrollbr.prg
     ! Source code reformatted
 
-2003-02-19 12:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
+2003-02-20 12:30 UTC-0300 Luiz Rafael Culik <culikr@uol.com.br>
   * contrib/mysql/tsqlbrw.prg
     % optimize to use Switch insted of Do case where possible
 
