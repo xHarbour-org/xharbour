@@ -1,17 +1,24 @@
 PROCEDURE Main()
 
+   LOCAL Number := HB_RegexComp( "[0-9].?[0-9]*" )
    LOCAL Identifier := HB_RegexComp( "[_a-zA-Z][_a-zA-Z0-9]*" )
-   LOCAL acExp := { "Amount + Tax", "Total" }
+   LOCAL acExp := { "3.14 * R ^ 2", "Total" }, cExp
 
    CLS
 
-   IF acExp[1] HAS Identifier
-      ? "Found an Identifier in:", acExp[1]
-   ENDIF
+   FOR EACH cExp IN acExp
+      ? "Scanning:", "'" + cExp + "'"
 
-   IF acExp[2] LIKE Identifier
-      ? acExp[2], "is a valid Identifier."
-   ENDIF
+      IF cExp HAS Number
+         ? "   ", "Found a Number."
+      ENDIF
+
+      IF cExp LIKE Identifier
+         ? "   ", '<' + cExp + '>', "is a valid Identifier."
+      ENDIF
+
+      ?
+   NEXT
 
 RETURN
 
