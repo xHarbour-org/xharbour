@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.7 2005/02/13 01:22:45 ronpinkas Exp $
+ * $Id: win32prn.prg,v 1.8 2005/02/15 22:05:37 andijahja Exp $
  */
 
 /*
@@ -900,14 +900,6 @@ HB_FUNC_STATIC( DRAWBITMAP ) {
 
 static int CALLBACK FontEnumCallBack(LOGFONT *lplf, TEXTMETRIC *lpntm, DWORD FontType, LPVOID pArray )
 {
-#if defined( __WRITE_FONT_INFO_TO_FILE__ )
-    fprintf( pArray,"%s,%s,%s,%u\n",
-       lplf->lfFaceName,
-       lplf->lfPitchAndFamily && FIXED_PITCH?"1":"0",
-       FontType && TRUETYPE_FONTTYPE?"1":"0",
-       lpntm->tmCharSet );
-
-#else
     HB_ITEM SubItems;
 
     SubItems.type = HB_IT_NIL;
@@ -918,7 +910,7 @@ static int CALLBACK FontEnumCallBack(LOGFONT *lplf, TEXTMETRIC *lpntm, DWORD Fon
     hb_itemPutL(  hb_arrayGetItemPtr( &SubItems, 3 ), FontType && TRUETYPE_FONTTYPE         );
     hb_itemPutNL( hb_arrayGetItemPtr( &SubItems, 4 ), lpntm->tmCharSet                      );
     hb_arrayAddForward( (PHB_ITEM) pArray, &SubItems);
-#endif
+
     return(TRUE);
 }
 
@@ -926,65 +918,22 @@ HB_FUNC_STATIC( ENUMFONTS )
 {
   BOOL Result = FALSE ;
   HDC hDC = (HDC) hb_parnl(1) ;
-#if defined( __WRITE_FONT_INFO_TO_FILE__ )
-  FILE *hFontList = fopen("font.lst","wb");
-  PHB_ITEM pFonts;
-  HB_ITEM FontListFile ;
-  HB_ITEM Separator;
-  USHORT ui, uiLen;
-#endif
+
   if (hDC)
   {
     HB_ITEM Array;
+
     Array.type = HB_IT_NIL;
     hb_arrayNew( &Array, 0 );
-#if defined( __WRITE_FONT_INFO_TO_FILE__ )
-    EnumFonts(hDC, (LPCTSTR) NULL, (FONTENUMPROC) FontEnumCallBack, (LPARAM) hFontList );
-    fclose( hFontList );
-    FontListFile.type = HB_IT_NIL;
-    Separator.type = HB_IT_NIL;
-    hb_itemPutC( &Separator, "," );
-    hb_itemPutC( &FontListFile, "font.lst" );
-    pFonts = hb_itemDoC( "FPARSEEX", 2, &FontListFile, &Separator );
-    uiLen = pFonts->item.asArray.value->ulLen;
-    for( ui = 0; ui < uiLen; ui ++ )
-    {
-       HB_ITEM SubItems;
-       PHB_ITEM pFontDesc = hb_arrayGetItemPtr( pFonts, ui + 1 );
-       char *szTemp;
 
-       SubItems.type = HB_IT_NIL;
-       hb_arrayNew( &SubItems, 4 );
-
-       szTemp = hb_arrayGetC( pFontDesc, 1 );
-       hb_itemPutC( hb_arrayGetItemPtr( &SubItems, 1 ), szTemp );
-       hb_xfree( szTemp );
-
-       szTemp = hb_arrayGetC( pFontDesc, 2 );
-       hb_itemPutL( hb_arrayGetItemPtr( &SubItems, 2 ), szTemp[0] == '1' );
-       hb_xfree( szTemp );
-
-       szTemp = hb_arrayGetC( pFontDesc, 3 );
-       hb_itemPutL( hb_arrayGetItemPtr( &SubItems, 3 ), szTemp[0] == '1' );
-       hb_xfree( szTemp );
-
-       szTemp = hb_arrayGetC( pFontDesc, 4 );
-       hb_itemPutNL( hb_arrayGetItemPtr( &SubItems, 4 ), atol( szTemp ) );
-       hb_xfree( szTemp );
-
-       hb_arrayAddForward( &Array, &SubItems);
-    }
-    hb_itemClear( &Separator );
-    hb_itemClear( &FontListFile );
-    hb_itemRelease( pFonts );
-    remove( "font.lst" );
-#else
     EnumFonts(hDC, (LPCTSTR) NULL, (FONTENUMPROC) FontEnumCallBack, (LPARAM) &Array);
-#endif
+
     hb_itemReturn( &Array) ;
+
     Result = TRUE ;
   }
-  if (!Result)
+
+  if( !Result )
   {
     hb_ret() ;
   }
