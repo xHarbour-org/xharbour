@@ -1,5 +1,5 @@
 /*
- * $Id: memofile.c,v 1.4 2002/12/19 18:15:35 ronpinkas Exp $
+ * $Id: memofile.c,v 1.5 2003/01/05 06:50:36 ronpinkas Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ HB_FUNC( MEMOREAD )
       {
          ULONG ulSize = hb_fsSeek( fhnd, 0, FS_END );
 
-         if( ulSize != 0 )
+         if( ulSize )
          {
             BYTE * pbyBuffer;
 
@@ -100,6 +100,7 @@ HB_FUNC( MEMOREAD )
          }
          else
          {
+            hb_fsClose( fhnd );
             hb_retc( "" );
          }
       }
