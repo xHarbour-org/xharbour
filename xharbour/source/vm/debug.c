@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.10 2004/02/03 20:05:27 andijahja Exp $
+ * $Id: debug.c,v 1.11 2004/02/25 15:10:56 lculik Exp $
  */
 
 /*
@@ -61,26 +61,24 @@
  * $End$ */
 static void AddToArray( PHB_ITEM pItem, PHB_ITEM pReturn, ULONG ulPos )
 {
-   PHB_ITEM pTemp;
+   HB_ITEM Temp;
 
    HB_TRACE(HB_TR_DEBUG, ("AddToArray(%p, %p, %lu)", pItem, pReturn, ulPos));
 
    if( pItem->type == HB_IT_SYMBOL )
    {                                            /* Symbol is pushed as text */
-      pTemp = hb_itemNew( NULL );               /* Create temporary string */
+	 (&Temp)->type = HB_IT_STRING;
+      (&Temp)->item.asString.length = strlen( pItem->item.asSymbol.value->szName ) + 2;
+      (&Temp)->item.asString.value = ( char * ) hb_xgrab( (&Temp)->item.asString.length + 1 );
 
-	  pTemp->type = HB_IT_STRING;
-      pTemp->item.asString.length = strlen( pItem->item.asSymbol.value->szName ) + 2;
-      pTemp->item.asString.value = ( char * ) hb_xgrab( pTemp->item.asString.length + 1 );
+      sprintf( (&Temp)->item.asString.value, "[%s]", pItem->item.asSymbol.value->szName );
 
-      sprintf( pTemp->item.asString.value, "[%s]", pItem->item.asSymbol.value->szName );
+      (&Temp)->item.asString.puiHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
+      *( (&Temp)->item.asString.puiHolders ) = 1;
+      (&Temp)->item.asString.bStatic         = FALSE;
 
-      pTemp->item.asString.puiHolders      = (ULONG*) hb_xgrab( sizeof( ULONG ) );
-      *( pTemp->item.asString.puiHolders ) = 1;
-      pTemp->item.asString.bStatic         = FALSE;
-
-      hb_arraySet( pReturn, ulPos, pTemp );
-      hb_itemRelease( pTemp );                  /* Get rid of temporary str.*/
+      hb_arraySetForward( pReturn, ulPos, &Temp );
+      // hb_itemRelease( pTemp );               /* Get rid of temporary str.*/
    }
    else                                         /* Normal types             */
    {
@@ -118,20 +116,21 @@ HB_FUNC( HB_DBG_VMSTKGCOUNT )
  * $End$ */
 HB_FUNC( HB_DBG_VMSTKGLIST )
 {
-   PHB_ITEM pReturn;
+   HB_ITEM Return;
    PHB_ITEM * pItem;
 
    USHORT uiLen = hb_stackLenGlobal();
    USHORT uiPos = 1;
 
-   pReturn = hb_itemArrayNew( uiLen );           /* Create a transfer array  */
+   Return.type = HB_IT_NIL;
+   hb_arrayNew( &Return, uiLen );           /* Create a transfer array  */
 
    for( pItem = HB_VM_STACK.pItems; pItem <= HB_VM_STACK.pPos; pItem++ )
    {
-      AddToArray( *pItem, pReturn, uiPos++ );
+      AddToArray( *pItem, &Return, uiPos++ );
    }
 
-   hb_itemRelease( hb_itemReturn( pReturn ) );
+   hb_itemReturn( &Return );
 }
 
 /* $Doc$
@@ -174,21 +173,22 @@ HB_FUNC( HB_DBG_VMSTKLCOUNT )
  * $End$ */
 HB_FUNC( HB_DBG_VMSTKLLIST )
 {
-   PHB_ITEM pReturn;
+   HB_ITEM Return;
    PHB_ITEM * pItem;
    PHB_ITEM * pBase = HB_VM_STACK.pItems + hb_stackBaseItem()->item.asSymbol.stackbase;
 
    USHORT uiLen = hb_stackLen( 1 );
    USHORT uiPos = 1;
 
-   pReturn = hb_itemArrayNew( uiLen );           /* Create a transfer array  */
+   Return.type = HB_IT_NIL;
+   hb_arrayNew( &Return, uiLen );           /* Create a transfer array  */
 
    for( pItem = pBase; pItem < HB_VM_STACK.pBase; pItem++ )
    {
-      AddToArray( *pItem, pReturn, uiPos++ );
+      AddToArray( *pItem, &Return, uiPos++ );
    }
 
-   hb_itemRelease( hb_itemReturn( pReturn ) );
+   hb_itemReturn( &Return );
 }
 
 /* $Doc$
@@ -202,7 +202,7 @@ HB_FUNC( HB_DBG_VMPARLLIST )
 {
    int iLevel = hb_parni( 1 ) + 1;
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
-   PHB_ITEM pReturn;
+   HB_ITEM Return;
    PHB_ITEM * pItem;
    USHORT uiLen, uiPos = 1;
 
@@ -217,14 +217,15 @@ HB_FUNC( HB_DBG_VMPARLLIST )
       uiLen -= 256;
    }
 
-   pReturn = hb_itemArrayNew( uiLen );           /* Create a transfer array  */
+   Return.type = HB_IT_NIL;
+   hb_arrayNew( &Return, uiLen );           /* Create a transfer array  */
 
    for( pItem = pBase + 2; uiLen--; pItem++ )
    {
-      AddToArray( *pItem, pReturn, uiPos++ );
+      AddToArray( *pItem, &Return, uiPos++ );
    }
 
-   hb_itemRelease( hb_itemReturn( pReturn ) );
+   hb_itemReturn( &Return );
 }
 
 static void hb_dbgStop(void)

@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.74 2004/02/21 04:45:20 ronpinkas Exp $
+ * $Id: garbage.c,v 1.75 2004/02/22 07:36:18 jonnymind Exp $
  */
 
 /*
@@ -757,7 +757,7 @@ HB_EXPORT void hb_gcCollectAll( BOOL bForce )
 */
 void hb_gcReleaseAll( void )
 {
-   HB_GARBAGE_PTR pAlloc, pDelete;
+   HB_GARBAGE_PTR pDelete;
 
    HB_TRACE( HB_TR_INFO, ( "hb_gcReleaseAll()" ) );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.46 2004/02/16 12:28:45 andijahja Exp $
+ * $Id: gtwin.c,v 1.47 2004/02/17 18:44:15 andijahja Exp $
  */
 
 /*
@@ -221,11 +221,15 @@ static void HB_GT_FUNC(gt_xSetCursorStyle( void ))
     case SC_NORMAL:
     default:
         cci.bVisible = TRUE;
+#ifndef HB_GTWIN_NORMAL_CURSOR
         cci.dwSize = 25;  /* this was 12, but when used in full screen dos window
                              cursor state is erratic  - doesn't turn off, etc.
 			     09-10-2002 druzus: I hope now it's OK.
 			     09-14-2003 ptucker:Not really....
                                         Make your case before changing this */
+#else
+        cci.dwSize = 12;
+#endif
         break;
     }
     s_usOldCurStyle = s_usCursorStyle;

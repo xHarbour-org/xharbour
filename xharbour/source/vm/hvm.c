@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.346 2004/03/03 19:37:56 mlombardo Exp $
+ * $Id: hvm.c,v 1.347 2004/03/05 22:37:58 ronpinkas Exp $
  */
 
 /*
@@ -2259,10 +2259,14 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               PHB_ITEM pAdd = hb_itemPutNI( NULL, ( int ) iAdd );
-               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLocal, pAdd );
+               HB_ITEM Add;
+               PHB_ITEM pResult;
 
-               hb_itemRelease( pAdd );
+               Add.type = HB_IT_NIL;
+               hb_itemPutNI( &Add, ( int ) iAdd );
+               pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLocal, &Add );
+
+               hb_itemClear( &Add );
 
                if( pResult )
                {
@@ -2402,18 +2406,21 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               PHB_ITEM pAdd = hb_itemPutNI( NULL, ( int ) iAdd );
+               HB_ITEM Add;
                PHB_ITEM pResult;
 
+               Add.type = HB_IT_NIL;
+               hb_itemPutNI( &Add, ( int ) iAdd );
+
                if( iAdd>0 )
-                  pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pTop, pAdd );
+                  pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pTop, &Add );
                else
                {
-                  pAdd->item.asInteger.value *= -1 ;
-                  pResult = hb_errRT_BASE_Subst( EG_ARG, 1082, NULL, "-", 2, pTop, pAdd );
+                  (&Add)->item.asInteger.value *= -1 ;
+                  pResult = hb_errRT_BASE_Subst( EG_ARG, 1082, NULL, "-", 2, pTop, &Add );
                }
 
-               hb_itemRelease( pAdd );
+               hb_itemClear( &Add );
 
                if( pResult )
                {
@@ -2466,7 +2473,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LEFT") );
          {
             USHORT iNewLen = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
-            PHB_ITEM pString = hb_stackItemFromTop( -1 ), pTmp;
+            PHB_ITEM pString = hb_stackItemFromTop( -1 );
             char *sString;
 
             if( HB_IS_STRING( pString ) )
@@ -2505,8 +2512,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               hb_errRT_BASE_SubstR( EG_ARG, 1124, NULL, "LEFT", 2, pString, ( pTmp = hb_itemPutNI( NULL, iNewLen ) ) );
-               hb_itemRelease( pTmp );
+               HB_ITEM Tmp;
+               Tmp.type = HB_IT_NIL;
+               hb_errRT_BASE_SubstR( EG_ARG, 1124, NULL, "LEFT", 2, pString, hb_itemPutNI( &Tmp, iNewLen ) );
+               hb_itemClear( &Tmp );
             }
 
             w += 3;
