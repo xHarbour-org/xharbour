@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.8 2003/12/14 22:17:36 peterrees Exp $
+ * $Id: mainwin.c,v 1.9 2003/12/14 22:38:57 peterrees Exp $
  */
 
 /*
@@ -153,7 +153,7 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 
    hb_vmInit( TRUE );
 
-   LocalFree( pArgs );
+//   LocalFree( pArgs );  // 15/12/2003 3:21p.m. Peter Rees: removed as causes problem with Win9X
 
    return hb_vmQuit();
 }
