@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.53 2004/01/27 09:56:11 likewolf Exp $
+ * $Id: fm.c,v 1.54 2004/02/03 19:02:30 druzus Exp $
  */
 
 /*
@@ -240,7 +240,7 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    ( ( PHB_MEMINFO ) pMem )->ulSize = ulSize;  /* size of the memory block */
 
    {
-      ULONG *pSig = (ULONG *)( ( ( unsigned char * ) pMem ) + ulSize + sizeof(HB_MEMINFO) );
+      ULONG *pSig = (ULONG *)( ( ( BYTE * ) pMem ) + ulSize + sizeof(HB_MEMINFO) );
       *pSig = HB_MEMINFO_SIGNATURE;
    }
 
@@ -372,7 +372,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    ( ( PHB_MEMINFO ) pMem )->ulSize = ulSize;  /* size of the memory block */
 
    {
-      ULONG *pSig = (ULONG *)( ( ( unsigned char * ) pMem ) + ulSize + sizeof(HB_MEMINFO) );
+      ULONG *pSig = (ULONG *)( ( ( BYTE * ) pMem ) + ulSize + sizeof(HB_MEMINFO) );
       *pSig = HB_MEMINFO_SIGNATURE;
    }
 
@@ -494,7 +494,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 
    ulMemSize = pMemBlock->ulSize;
 
-   pSig = (ULONG *)( ( ( unsigned char * ) pMem ) + ulMemSize );
+   pSig = (ULONG *)( ( ( BYTE * ) pMem ) + ulMemSize );
 
    if( *pSig != HB_MEMINFO_SIGNATURE )
    {
@@ -524,7 +524,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 
    ( ( PHB_MEMINFO ) pMem )->ulSize = ulSize;  /* size of the memory block */
    {
-      ULONG *pSig = (ULONG *)( ( ( unsigned char * ) pMem ) + ulSize + sizeof(HB_MEMINFO) );
+      ULONG *pSig = (ULONG *)( ( ( BYTE * ) pMem ) + ulSize + sizeof(HB_MEMINFO) );
       *pSig = HB_MEMINFO_SIGNATURE;
    }
 
@@ -621,7 +621,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
          hb_errInternal( HB_EI_XFREEINV, "hb_xfree() Invalid Pointer %p %s", (char *) pMem, (char *) pMem );
       }
 
-      pSig  = (ULONG *)( ( ( unsigned char * ) pMem ) + pMemBlock->ulSize );
+      pSig  = (ULONG *)( ( ( BYTE * ) pMem ) + pMemBlock->ulSize );
 
       if( *pSig != HB_MEMINFO_SIGNATURE )
       {
@@ -730,8 +730,8 @@ char * hb_mem2str( void * pMem, UINT uiSize )
 {
 #define HB_MAX_MEM2STR_BLOCK 256
 
-   static unsigned char cBuffer[2*HB_MAX_MEM2STR_BLOCK+1]; /* multiplied by 2 to allow hex format */
-   unsigned char *cMem = (unsigned char*)pMem;
+   static BYTE cBuffer[2*HB_MAX_MEM2STR_BLOCK+1]; /* multiplied by 2 to allow hex format */
+   BYTE *cMem = (BYTE*) pMem;
    UINT uiIndex, uiPrintable;
 
    if( uiSize > HB_MAX_MEM2STR_BLOCK )

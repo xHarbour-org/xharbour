@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.12 2003/11/18 00:57:26 fsgiudice Exp $
+ * $Id: eval.c,v 1.13 2003/12/07 00:10:07 jonnymind Exp $
  */
 
 /*
@@ -252,7 +252,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
                va_end( va );
             }
 
-            hb_vmDo( ( unsigned short ) ulPCount );
+            hb_vmDo( ( USHORT ) ulPCount );
 
             pResult = hb_itemNew( NULL );
             hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
@@ -282,7 +282,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
             va_end( va );
          }
 
-         hb_vmSend( ( unsigned short ) ulPCount );
+         hb_vmSend( ( USHORT ) ulPCount );
 
          pResult = hb_itemNew( NULL );
          hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
@@ -306,7 +306,7 @@ PHB_ITEM hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
             va_end( va );
          }
 
-         hb_vmDo( ( unsigned short ) ulPCount );
+         hb_vmDo( ( USHORT ) ulPCount );
 
          pResult = hb_itemNew( NULL );
          hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
@@ -363,7 +363,7 @@ PHB_ITEM hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
             va_end( va );
          }
 
-         hb_vmDo( ( unsigned short ) ulPCount );
+         hb_vmDo( ( USHORT ) ulPCount );
 
          pResult = hb_itemNew( NULL );
          hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
@@ -408,7 +408,7 @@ void hb_evalBlock1( PHB_ITEM pCodeBlock, PHB_ITEM pParam )
 void hb_evalBlock( PHB_ITEM pCodeBlock, ... )
 {
    va_list args;
-   unsigned int uiParams = 0;
+   UINT uiParams = 0;
    PHB_ITEM pParam;
 
    hb_vmPushSymbol( &hb_symEval );

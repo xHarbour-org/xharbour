@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.83 2003/12/15 02:35:37 jonnymind Exp $
+ * $Id: arrays.c,v 1.84 2004/01/11 14:03:39 andijahja Exp $
  */
 
 /*
@@ -494,7 +494,7 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
    }
    else if( HB_IS_STRING( pArray ) && ulIndex > 0 && ulIndex <= pArray->item.asString.length )
    {
-      unsigned char cChar = pArray->item.asString.value[ ulIndex - 1 ];
+      BYTE cChar = pArray->item.asString.value[ ulIndex - 1 ];
 
       pItem->type = HB_IT_STRING;
       pItem->item.asString.value   = hb_vm_acAscii[ cChar ];

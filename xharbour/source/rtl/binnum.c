@@ -1,5 +1,5 @@
 /*
- * $Id: binnum.c,v 1.3 2002/12/05 01:19:11 ronpinkas Exp $
+ * $Id: binnum.c,v 1.4 2003/03/07 10:36:01 likewolf Exp $
  */
 
 /*
@@ -87,7 +87,7 @@ HB_FUNC( BIN2L )
       }
       else
       {
-         unsigned char Temp[4];
+         BYTE Temp[4];
 
          Temp[0] = Temp[1] = Temp[2] = Temp[3] = '\0';
 

@@ -1,5 +1,5 @@
 /*
- * $Id: fstemp.c,v 1.7 2003/11/20 23:47:36 druzus Exp $
+ * $Id: fstemp.c,v 1.8 2003/11/27 21:44:54 likewolf Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
       }
    }
 
-   hb_fsSetError( (unsigned short) FS_ERROR );
+   hb_fsSetError( (USHORT) FS_ERROR );
    return FS_ERROR;
 }
 #else

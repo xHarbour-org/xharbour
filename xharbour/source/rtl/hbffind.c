@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.14 2004/01/12 21:05:03 paultucker Exp $
+ * $Id: hbffind.c,v 1.15 2004/01/27 21:18:21 peterrees Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.14 2004/01/12 21:05:03 paultucker Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.15 2004/01/27 21:18:21 peterrees Exp $" )
 
 /* ------------------------------------------------------------- */
 
@@ -167,7 +167,7 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.14 2004/01/12 21:05:03 paultucker Exp $" )
 
 /* Internal funtion , Convert Windows Error Values to Dos Error Values */
 #ifdef HB_OS_WIN_32
-int WintoDosError( unsigned long lError)
+int WintoDosError( ULONG lError)
 {
    int iReturn;
    switch( lError ) {

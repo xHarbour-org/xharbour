@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.10 2004/01/28 14:45:40 druzus Exp $
+ * $Id: cdpapi.c,v 1.11 2004/01/28 22:02:37 druzus Exp $
  */
 
 /*
@@ -102,7 +102,7 @@ static PHB_CODEPAGE s_cdpList[ HB_CDP_MAX_ ];
 PHB_CODEPAGE s_cdpage = &s_en_codepage;
 
 
-static int u16toutf8( unsigned char *szUTF8, USHORT uc )
+static int u16toutf8( BYTE *szUTF8, USHORT uc )
 {
    int n;
 
@@ -133,7 +133,7 @@ static int u16toutf8( unsigned char *szUTF8, USHORT uc )
    return n;
 }
 
-static int utf8tou16( unsigned char *szUTF8, USHORT *uc )
+static int utf8tou16( BYTE *szUTF8, USHORT *uc )
 {
    int n = 1, m = 1;
    ULONG u32;
@@ -403,10 +403,10 @@ void HB_EXPORT hb_cdpTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpO
    }
 }
 
-void HB_EXPORT hb_cdpnTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpOut, unsigned int nChars )
+void HB_EXPORT hb_cdpnTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpOut, UINT nChars )
 {
    int n;
-   unsigned int i;
+   UINT i;
 
    if( cdpIn != cdpOut && cdpIn->nChars == cdpOut->nChars )
    {

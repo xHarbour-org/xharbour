@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.319 2004/02/13 07:13:33 ronpinkas Exp $
+ * $Id: hvm.c,v 1.320 2004/02/14 00:22:08 ronpinkas Exp $
  */
 
 /*
@@ -352,7 +352,7 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
 
 #ifndef HB_THREAD_SUPPORT
   /* background function counter */
-  static unsigned short s_iBackground = 0;
+  static USHORT s_iBackground = 0;
 #endif
 
 // Initialize ErrorBlock() and __SetHelpK()
@@ -886,7 +886,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 #ifndef HB_GUI
       if(( hb_set.HB_SET_CANCEL ) || ( hb_set.HB_SET_DEBUG ))
       {
-         static unsigned short s_iCancel = 0;
+         static USHORT s_iCancel = 0;
 
          if( ++s_iCancel == 65535 )
          {
@@ -1639,7 +1639,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             break;
 
          case HB_P_LINEOFFSET:
-            hb_stackBaseItem()->item.asSymbol.lineno = s_iBaseLine + (unsigned char) pCode[ w + 1 ];
+            hb_stackBaseItem()->item.asSymbol.lineno = s_iBaseLine + (BYTE) pCode[ w + 1 ];
 
             if( s_bDebugging && s_bDebugShowLines )
             {
@@ -2238,7 +2238,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else if( HB_IS_STRING( pLocal ) && pLocal->item.asString.length == 1 )
             {
-               pLocal->item.asString.value = hb_vm_acAscii[ (unsigned char) ( pLocal->item.asString.value[0] + iAdd ) ];
+               pLocal->item.asString.value = hb_vm_acAscii[ (BYTE) ( pLocal->item.asString.value[0] + iAdd ) ];
                break;
             }
             else if( HB_IS_DOUBLE( pLocal ) )
@@ -2453,7 +2453,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_LEFT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LEFT") );
          {
-            unsigned short iNewLen = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
+            USHORT iNewLen = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
             PHB_ITEM pString = hb_stackItemFromTop( -1 ), pTmp;
             char *sString;
 
@@ -2503,7 +2503,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_RIGHT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_RIGHT") );
          {
-            unsigned short iNewLen = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
+            USHORT iNewLen = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
             PHB_ITEM pString = hb_stackItemFromTop( -1 );
             char *sString;
 
@@ -3370,7 +3370,7 @@ static void hb_vmPlus( void )
    {
       double dNumber2 = hb_vmPopNumber();
 
-      pItem1->item.asString.value = hb_vm_acAscii[ (unsigned char) ( hb_itemGetND( pItem1 ) + dNumber2 ) ];
+      pItem1->item.asString.value = hb_vm_acAscii[ (BYTE) ( hb_itemGetND( pItem1 ) + dNumber2 ) ];
 
       if( pItem1->type != HB_IT_STRING )
       {
@@ -3477,7 +3477,7 @@ static void hb_vmMinus( void )
    {
       double dNumber2 = hb_vmPopNumber();
 
-      pItem1->item.asString.value = hb_vm_acAscii[ (unsigned char) ( hb_itemGetND( pItem1 ) - dNumber2 ) ];
+      pItem1->item.asString.value = hb_vm_acAscii[ (BYTE) ( hb_itemGetND( pItem1 ) - dNumber2 ) ];
 
       if( pItem1->type != HB_IT_STRING )
       {
@@ -3772,7 +3772,7 @@ static void hb_vmInc( void )
 
    if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
    {
-      pItem->item.asString.value = hb_vm_acAscii[ (unsigned char) ( pItem->item.asString.value[0] + 1 ) ];
+      pItem->item.asString.value = hb_vm_acAscii[ (BYTE) ( pItem->item.asString.value[0] + 1 ) ];
    }
    else if( HB_IS_DATE( pItem ) )
    {
@@ -3834,7 +3834,7 @@ static void hb_vmDec( void )
 
    if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
    {
-      pItem->item.asString.value = hb_vm_acAscii[ (unsigned char) ( pItem->item.asString.value[0] - 1 ) ];
+      pItem->item.asString.value = hb_vm_acAscii[ (BYTE) ( pItem->item.asString.value[0] - 1 ) ];
    }
    else if( HB_IS_DATE( pItem ) )
    {
@@ -4756,11 +4756,11 @@ static void hb_vmArrayPush( void )
       {
          if( pArray->item.asString.bStatic )
          {
-            pArray->item.asString.value = hb_vm_acAscii[ (unsigned char) ( pArray->item.asString.value[lIndex] ) ];
+            pArray->item.asString.value = hb_vm_acAscii[ (BYTE) ( pArray->item.asString.value[lIndex] ) ];
          }
          else
          {
-            unsigned char cChar = pArray->item.asString.value[lIndex];
+            BYTE cChar = pArray->item.asString.value[lIndex];
 
             hb_itemReleaseString( pArray );
 
@@ -7678,7 +7678,7 @@ void hb_vmRequestCancel( void )
    {
       char buffer[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 2 ];
       int i = 1, i2;
-      unsigned short uLine;
+      USHORT uLine;
 
       hb_conOutErr( hb_conNewLine(), 0 );
       sprintf( buffer, "Cancelled at: %s (%i)", hb_stackBaseItem()->item.asSymbol.value->szName, hb_stackBaseItem()->item.asSymbol.lineno );
@@ -8175,7 +8175,7 @@ HB_FUNC( HB_RESTOREBLOCK )
             PHB_ITEM pSelf = hb_param( 2, HB_IT_ARRAY );
 
             Block.type = HB_IT_BLOCK;
-            Block.item.asBlock.value = hb_codeblockMacroNew( (unsigned char *) ( PCode.item.asString.value ), ( USHORT )PCode.item.asString.length );
+            Block.item.asBlock.value = hb_codeblockMacroNew( (BYTE *) ( PCode.item.asString.value ), ( USHORT )PCode.item.asString.length );
             Block.item.asBlock.value->uLen = (USHORT) PCode.item.asString.length;
             Block.item.asBlock.value->pSymbols = pModuleSymbols->pModuleSymbols;
             Block.item.asBlock.paramcnt = ParamCount.item.asInteger.value;

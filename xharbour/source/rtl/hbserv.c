@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.5 2003/12/03 13:01:23 mauriliolongo Exp $
+* $Id: hbserv.c,v 1.6 2003/12/11 11:22:11 mlombardo Exp $
 */
 
 /*
@@ -97,9 +97,9 @@ into abstract HB_SIGNAL; os specific implementation must provide the
 s_sigTable containing all the available translations */
 
 typedef struct {
-   unsigned int sig;
-   unsigned int subsig;
-   unsigned int translated;
+   UINT sig;
+   UINT subsig;
+   UINT translated;
 } S_TUPLE;
 
 static int s_translateSignal( UINT sig, UINT subsig );

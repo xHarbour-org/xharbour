@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.68 2004/02/08 04:31:39 walito Exp $
+ * $Id: dbfntx1.c,v 1.69 2004/02/09 18:00:36 druzus Exp $
  */
 
 /*
@@ -275,20 +275,20 @@ static void commonError( NTXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, cha
 static void hb_IncString( NTXAREAP pArea, char* s, int slen )
 {
    char *ptr;
-   unsigned int nsymb;
+   UINT nsymb;
 
    for( ptr=s+slen-1;ptr>=s;ptr-- )
    {
-      nsymb = (unsigned int) *ptr;
+      nsymb = (UINT) *ptr;
       if( nsymb < 255 )
       {
-         unsigned int n1, i;
-         if( pArea->cdPage->lSort && ( n1 = (unsigned int)pArea->cdPage->s_chars[ nsymb ] ) != 0 )
+         UINT n1, i;
+         if( pArea->cdPage->lSort && ( n1 = (UINT) pArea->cdPage->s_chars[ nsymb ] ) != 0 )
          {
             n1 ++;
             for( i=0; i<255; i++ )
             {
-               if( n1 == (unsigned int)pArea->cdPage->s_chars[ i ] )
+               if( n1 == (UINT) pArea->cdPage->s_chars[ i ] )
                {
                   *ptr = (char) i;
                   break;

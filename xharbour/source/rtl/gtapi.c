@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.24 2004/02/07 11:41:01 druzus Exp $
+ * $Id: gtapi.c,v 1.25 2004/02/07 20:06:35 andijahja Exp $
  */
 
 /*
@@ -282,10 +282,10 @@ USHORT HB_EXPORT hb_gtBoxD( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
       if( Left != Right )
          Ret = hb_gt_BoxD( Top, Left, Bottom, Right, ( BYTE * ) _B_DOUBLE, ( BYTE ) s_pColor[ s_uiColorIndex ] );
       else
-         Ret = hb_gt_VertLine( Left, Top, Bottom, (unsigned char) HB_B_DOUBLE_V, ( BYTE ) s_pColor[ s_uiColorIndex ] );
+         Ret = hb_gt_VertLine( Left, Top, Bottom, (BYTE) HB_B_DOUBLE_V, ( BYTE ) s_pColor[ s_uiColorIndex ] );
    }
    else
-      Ret = hb_gt_HorizLine( Top, Left, Right, (unsigned char) HB_B_DOUBLE_H, ( BYTE ) s_pColor[ s_uiColorIndex ] );
+      Ret = hb_gt_HorizLine( Top, Left, Right, (BYTE) HB_B_DOUBLE_H, ( BYTE ) s_pColor[ s_uiColorIndex ] );
 
    hb_gtSetPosContext( HB_MAX(Top,0) + 1, HB_MAX(Left,0) + 1, HB_GT_SET_POS_AFTER );
 
@@ -301,10 +301,10 @@ USHORT HB_EXPORT hb_gtBoxS( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right )
       if( Left != Right )
          Ret = hb_gt_BoxS( Top, Left, Bottom, Right, ( BYTE * ) _B_SINGLE, ( BYTE ) s_pColor[ s_uiColorIndex ] );
       else
-         Ret = hb_gt_VertLine( Left, Top, Bottom, (unsigned char) HB_B_SINGLE_V, ( BYTE ) s_pColor[ s_uiColorIndex ] );
+         Ret = hb_gt_VertLine( Left, Top, Bottom, (BYTE) HB_B_SINGLE_V, ( BYTE ) s_pColor[ s_uiColorIndex ] );
    }
    else
-      Ret = hb_gt_HorizLine( Top, Left, Right, (unsigned char) HB_B_SINGLE_H, ( BYTE ) s_pColor[ s_uiColorIndex ] );
+      Ret = hb_gt_HorizLine( Top, Left, Right, (BYTE) HB_B_SINGLE_H, ( BYTE ) s_pColor[ s_uiColorIndex ] );
 
    hb_gtSetPosContext( HB_MAX(Top,0) + 1, HB_MAX(Left,0) + 1, HB_GT_SET_POS_AFTER );
 

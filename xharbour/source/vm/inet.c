@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.38 2003/12/07 13:35:02 jonnymind Exp $
+* $Id: inet.c,v 1.39 2004/01/23 10:10:37 andijahja Exp $
 */
 
 /*
@@ -190,7 +190,7 @@ struct hostent *hb_getHosts( char *name, HB_SOCKET_STRUCT *Socket )
 
    /* let's see if name is an IP address; not necessary on linux */
    #if defined(HB_OS_WIN_32)
-   unsigned long ulAddr;
+   ULONG ulAddr;
 
    ulAddr = inet_addr( name );
    if( ulAddr == INADDR_NONE )
@@ -232,7 +232,7 @@ void hb_socketSetNonBlocking( HB_SOCKET_STRUCT *Socket )
 {
 
 #ifdef HB_OS_WIN_32
-   unsigned long mode = 1;
+   ULONG mode = 1;
    ioctlsocket( Socket->com,  FIONBIO, &mode );
 
 #else
@@ -1580,7 +1580,7 @@ HB_FUNC( INETACCEPT )
    #if defined(HB_OS_WIN_32)
       int Len;
    #else
-      unsigned int Len;
+      UINT Len;
    #endif
 
    if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN )
@@ -1722,7 +1722,7 @@ HB_FUNC( INETCONNECT )
 
    Socket->remote.sin_family = AF_INET;
    Socket->remote.sin_port= iPort;
-   Socket->remote.sin_addr.s_addr = (*(unsigned int *)Host->h_addr_list[0]);
+   Socket->remote.sin_addr.s_addr = (*(UINT *)Host->h_addr_list[0]);
 
    HB_STACK_UNLOCK;
    HB_TEST_CANCEL_ENABLE_ASYN;

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.125 2004/02/10 06:43:17 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.126 2004/02/11 17:34:37 ronpinkas Exp $
  */
 
 /*
@@ -1464,7 +1464,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
   char exppatt[ MAX_NAME ], expreal[ 5 ] = "\1  0";
   char lastchar = '@', exptype;
   char * ptr, * ptrtmp;
-  unsigned int uiOpenBrackets = 0;
+  UINT uiOpenBrackets = 0;
   char *pOpen = NULL;
   BOOL bMarkers = FALSE;
   int mplen = strlen( mpatt ), rplen;
@@ -1555,7 +1555,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
         }
         else
         {
-           if( (unsigned char) lastchar == 255 )
+           if( (BYTE) lastchar == 255 )
            {
               hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_TOO_MANY_MARKERS, NULL, NULL );
            }
@@ -1663,7 +1663,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            rmlen = i - ipos + 1;
 
            /* Convert match marker into inner format */
-           lastchar = (lastchar == 'Z' ) ? 'a' : ( (char) ( (unsigned char) lastchar + 1 ) );
+           lastchar = (lastchar == 'Z' ) ? 'a' : ( (char) ( (BYTE) lastchar + 1 ) );
 
            expreal[1] = lastchar;
            expreal[2] = exptype;
@@ -4299,7 +4299,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
             {
                if( s_Repeate )
                {
-                  unsigned char cMarkerCount = '0', cGroupCount = '0';
+                  BYTE cMarkerCount = '0', cGroupCount = '0';
 
                   lennew = ptr2 - ptr - 1;
 

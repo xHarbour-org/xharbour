@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.55 2003/11/26 21:58:35 jonnymind Exp $
+ * $Id: fastitem.c,v 1.56 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -104,7 +104,13 @@ void HB_EXPORT hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
    }
 
    /* Forward. */
-   memcpy( pDest, pSource, sizeof( HB_ITEM ) );
+   // memcpy( pDest, pSource, sizeof( HB_ITEM ) );
+   _asm {
+      mov edi, pDest;
+      mov esi, pSource;
+      mov ecx, 6;  /* sizeof( HB_ITEM ) = 24 bytes / 4 = 6 */
+      rep movsd;
+   }
 
    #ifndef HB_ARRAY_USE_COUNTER
       if( HB_IS_ARRAY( pSource ) && pSource->item.asArray.value )
@@ -292,7 +298,13 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       }
    }
 
-   memcpy( pDest, pSource, sizeof( HB_ITEM ) );
+   // memcpy( pDest, pSource, sizeof( HB_ITEM ) );
+   _asm {
+      mov edi, pDest;
+      mov esi, pSource;
+      mov ecx, 6;  /* sizeof( HB_ITEM ) = 24 bytes / 4 = 6 */
+      rep movsd;
+   }
 
    if( HB_IS_STRING( pSource ) )
    {
@@ -347,7 +359,7 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, char * szText )
    else if( szText[1] == '\0' )
    {
       pItem->item.asString.length  = 1;
-      pItem->item.asString.value   = hb_vm_acAscii[ (unsigned char) ( szText[0] ) ];
+      pItem->item.asString.value   = hb_vm_acAscii[ (BYTE) ( szText[0] ) ];
       pItem->item.asString.bStatic = TRUE;
    }
    else
@@ -392,7 +404,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, char * szText, ULONG ulLen )
    else if( ulLen == 1 )
    {
       pItem->item.asString.length  = 1;
-      pItem->item.asString.value   = hb_vm_acAscii[ (unsigned char) ( szText[0] ) ];
+      pItem->item.asString.value   = hb_vm_acAscii[ (BYTE) ( szText[0] ) ];
       pItem->item.asString.bStatic = TRUE;
    }
    else

@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.14 2003/09/15 19:28:05 jonnymind Exp $
+ * $Id: philes.c,v 1.15 2003/11/11 20:20:54 ronpinkas Exp $
  */
 
 /*
@@ -241,7 +241,7 @@ HB_FUNC( HB_F_EOF )
    }
    else
    {
-      hb_fsSetError( (unsigned short) FS_ERROR );
+      hb_fsSetError( (USHORT) FS_ERROR );
       hb_retl( TRUE );
    }
 }

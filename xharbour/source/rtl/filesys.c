@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.65 2004/01/17 22:15:53 andijahja Exp $
+ * $Id: filesys.c,v 1.66 2004/02/03 01:05:52 lculik Exp $
  */
 
 /*
@@ -636,7 +636,7 @@ FHANDLE HB_EXPORT hb_fsPOpen( BYTE * pFilename, BYTE * pMode )
    HB_SYMBOL_UNUSED( pFilename );
    HB_SYMBOL_UNUSED( pMode );
 
-   hb_fsSetError( (unsigned short) FS_ERROR );
+   hb_fsSetError( (USHORT) FS_ERROR );
 
 #endif
 
@@ -2474,7 +2474,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
       switch( uiMode & FL_MASK )
       {
          case FL_LOCK:
-            bResult = ( locking( hFileHandle, _LK_LOCK, ulLength ) == 0 );
+            bResult = ( locking( hFileHandle, _LK_NBLCK, ulLength ) == 0 );
             break;
 
          case FL_UNLOCK:
@@ -2936,8 +2936,8 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
    {
       /* 'unsigned int' _have to_ be used in Watcom
        */
-      unsigned int uiSave;
-      unsigned int uiTotal;
+      UINT uiSave;
+      UINT uiTotal;
 
       /* 1 = A:, 2 = B:, 3 = C:, etc
        * _dos_*() functions don't set 'errno'
@@ -2975,8 +2975,8 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
       else
       {
          _chdrive( uiSave );
-         uiResult = (unsigned short) FS_ERROR;
-         hb_fsSetError( (unsigned short) FS_ERROR );
+         uiResult = (USHORT) FS_ERROR;
+         hb_fsSetError( (USHORT) FS_ERROR );
       }
       HB_DISABLE_ASYN_CANC
 
@@ -3018,8 +3018,8 @@ USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
    {
       /* 'unsigned int' _have to_ be used in Watcom
        */
-      unsigned int uiSave;
-      unsigned int uiTotal;
+      UINT uiSave;
+      UINT uiTotal;
 
       /* 1=  A:, 2 = B:, 3 = C:, etc
        * _dos_*() functions don't set 'errno'
@@ -3050,8 +3050,8 @@ USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
       }
       else
       {
-         uiResult = (unsigned short) FS_ERROR;
-         hb_fsSetError( (unsigned short) FS_ERROR );
+         uiResult = (USHORT) FS_ERROR;
+         hb_fsSetError( (USHORT) FS_ERROR );
       }
 
       _chdrive( uiSave );
@@ -3154,7 +3154,7 @@ FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_fsExtOpen(%s, %s, %hu, %p, %p)", (char*) pFilename, (char*) pDefExt, uiFlags, pPaths, pError));
 
-   hb_fsSetError( (unsigned short) FS_ERROR );
+   hb_fsSetError( (USHORT) FS_ERROR );
 
    HB_SYMBOL_UNUSED( pFilename );
    HB_SYMBOL_UNUSED( pDefExt );

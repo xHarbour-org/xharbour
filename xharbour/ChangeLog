@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2280 2004/02/13 20:12:27 druzus Exp $
+ * $Id: ChangeLog,v 1.2281 2004/02/14 00:22:04 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,52 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-14 08:20 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * source/common/hbfhnd.c
+  * source/common/reserved.c
+  * source/pp/ppcore.c
+  * source/vm/hvm.c
+  * source/vm/arrays.c
+  * source/vm/arrayshb.c
+  * source/vm/classes.c
+  * source/vm/eval.c
+  * source/vm/fastitem.c
+  * source/vm/fm.c
+  * source/vm/inet.c
+  * source/vm/runner.c
+  * source/vm/thread.c
+  * source/rtl/binnum.c
+  * source/rtl/cdpapi.c
+  * source/rtl/chrasc.c
+  * source/rtl/filesys.c
+  * source/rtl/fssize.c
+  * source/rtl/fstemp.c
+  * source/rtl/gtapi.c
+  * source/rtl/hbcomprs.c
+  * source/rtl/hbcrypt.c
+  * source/rtl/hbffind.c
+  * source/rtl/hbserv.c
+  * source/rtl/is.c
+  * source/rtl/philes.c
+  * source/rtl/regex.c
+  * source/rtl/set.c
+  * source/rtl/strcase.c
+  * source/rtl/tprinter.c
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtalleg/ssf.c
+  * source/rdd/dbfntx/dbfntx1.c
+    ! changes to using xHarbour typedefs:
+      unsigned char  -> BYTE
+      unsigned int   -> UINT
+      unsigned short -> USHORT
+      unsigned long  -> ULONG
+      and so the corresponding PTR typedef
+
+    /*
+    IMHO, we have to agree to one simple convention in xHarbour coding
+    practice, ie. always use typedefs as per xHarbour API.
+    */
 
 2004-02-13 16:25 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/hvm.c

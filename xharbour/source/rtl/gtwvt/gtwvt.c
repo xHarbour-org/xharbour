@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.68 2004/02/09 18:00:38 druzus Exp $
+ * $Id: gtwvt.c,v 1.69 2004/02/13 09:22:47 andijahja Exp $
  */
 
 /*
@@ -564,9 +564,9 @@ void HB_GT_FUNC( gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
 {
   SHORT         usSaveRow, usSaveCol;
   // UINT          uiSize;
-  unsigned char ucBlank[ WVT_CHAR_BUFFER ], ucBuff[ WVT_CHAR_BUFFER * 2 ] ;
-  unsigned char * fpBlank ;
-  unsigned char * fpBuff  ;
+  BYTE ucBlank[ WVT_CHAR_BUFFER ], ucBuff[ WVT_CHAR_BUFFER * 2 ] ;
+  BYTE * fpBlank ;
+  BYTE * fpBuff  ;
   int           iLength = ( usRight - usLeft ) + 1;
   int           iCount, iColOld, iColNew, iColSize;
   BOOL          bMalloc = FALSE;
@@ -575,8 +575,8 @@ void HB_GT_FUNC( gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
 
   if ( iLength > WVT_CHAR_BUFFER )
   { // Avoid allocating memory if possible
-    fpBlank = ( unsigned char * ) hb_xgrab( iLength );
-    fpBuff  = ( unsigned char * ) hb_xgrab( iLength * 2 );  //*2 room for attribs
+    fpBlank = ( BYTE * ) hb_xgrab( iLength );
+    fpBuff  = ( BYTE * ) hb_xgrab( iLength * 2 );  //*2 room for attribs
     bMalloc = TRUE;
   }
   else
@@ -3655,7 +3655,7 @@ HB_FUNC( WVT_PROCESSMESSAGES )
 
 HB_FUNC( WVT_GETTITLE )
 {
-  unsigned char ucText[ 1024 ];
+  BYTE ucText[ 1024 ];
 
   hb_wvt_gtGetWindowTitle( ( char* ) ucText, 1023 );
 

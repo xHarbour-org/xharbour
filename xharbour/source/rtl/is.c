@@ -1,5 +1,5 @@
 /*
- * $Id: is.c,v 1.3 2003/05/28 11:59:05 druzus Exp $
+ * $Id: is.c,v 1.4 2003/06/19 00:07:59 druzus Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ HB_FUNC( ISALPHA )
 
    if( szString != NULL )
    {
-      if( isalpha( ( unsigned char ) * szString ) )
+      if( isalpha( ( BYTE ) * szString ) )
          hb_retl( TRUE );
 #ifndef HB_CDP_SUPPORT_OFF
       else if( s_cdpage->nChars && szString[0] && 
@@ -88,7 +88,7 @@ HB_FUNC( ISDIGIT )
    char * szString = hb_parc( 1 );
 
    if( szString != NULL )
-      hb_retl( isdigit( ( unsigned char ) * szString ) );
+      hb_retl( isdigit( ( BYTE ) * szString ) );
    else
       hb_retl( FALSE );
 }
@@ -101,7 +101,7 @@ HB_FUNC( ISUPPER )
 
    if( szString != NULL )
    {
-      if( isupper( ( unsigned char ) * szString ) )
+      if( isupper( ( BYTE ) * szString ) )
          hb_retl( TRUE );
 #ifndef HB_CDP_SUPPORT_OFF
       else if( s_cdpage->nChars && szString[0] && strchr( s_cdpage->CharsUpper, *szString ) )
@@ -122,7 +122,7 @@ HB_FUNC( ISLOWER )
 
    if( szString != NULL )
    {
-      if( islower( ( unsigned char ) * szString ) )
+      if( islower( ( BYTE ) * szString ) )
          hb_retl( TRUE );
 #ifndef HB_CDP_SUPPORT_OFF
       else if( s_cdpage->nChars && szString[0] && strchr( s_cdpage->CharsLower, *szString ) )

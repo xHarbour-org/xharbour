@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.35 2004/01/10 10:21:48 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.36 2004/01/23 10:06:23 andijahja Exp $
  */
 
 /*
@@ -636,14 +636,14 @@ HB_FUNC( HB_ATOKENS )
    }
 }
 
-unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
+UINT SizeOfCStructure( PHB_ITEM aDef, UINT uiAlign )
 {
    PHB_BASEARRAY pBaseDef = aDef->item.asArray.value;
    ULONG ulLen = pBaseDef->ulLen;
    ULONG ulIndex;
-   unsigned int uiSize = 0, uiMemberSize;
-   unsigned char cShift;
-   unsigned int uiPad;
+   UINT uiSize = 0, uiMemberSize;
+   BYTE cShift;
+   UINT uiPad;
 
    for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
    {
@@ -731,7 +731,7 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
                {
                   hb_objSendMsg( pStructure, "SizeOf", 0 );
 
-                  uiMemberSize = (unsigned int) hb_itemGetNL( &HB_VM_STACK.Return );
+                  uiMemberSize = (UINT) hb_itemGetNL( &HB_VM_STACK.Return );
                }
                else
                {
@@ -777,13 +777,13 @@ HB_FUNC( HB_SIZEOFCSTRUCTURE )
 {
    PHB_ITEM aDef = hb_param( 1, HB_IT_ARRAY );
    PHB_ITEM pAlign = hb_param( 2, HB_IT_INTEGER );
-   unsigned int uiAlign;
+   UINT uiAlign;
 
    if( aDef )
    {
       if( pAlign )
       {
-         uiAlign = (unsigned char) pAlign->item.asInteger.value;
+         uiAlign = (BYTE) pAlign->item.asInteger.value;
       }
       else
       {
@@ -798,15 +798,15 @@ HB_FUNC( HB_SIZEOFCSTRUCTURE )
    }
 }
 
-BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, unsigned int * puiSize )
+BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, UINT uiAlign, UINT * puiSize )
 {
    PHB_BASEARRAY pBaseVar = aVar->item.asArray.value;
    PHB_BASEARRAY pBaseDef = aDef->item.asArray.value;
    ULONG ulLen = pBaseDef->ulLen;
    ULONG ulIndex;
    BYTE  *Buffer;
-   unsigned int uiOffset = 0, uiMemberSize;
-   unsigned char cShift;
+   UINT uiOffset = 0, uiMemberSize;
+   BYTE cShift;
 
    *puiSize = SizeOfCStructure( aDef, uiAlign ) ;
 
@@ -944,7 +944,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
                {
                   hb_objSendMsg( pStructure, "SizeOf", 0 );
 
-                  uiMemberSize = (unsigned int) hb_itemGetNL( &HB_VM_STACK.Return );
+                  uiMemberSize = (UINT) hb_itemGetNL( &HB_VM_STACK.Return );
                }
                else
                {
@@ -962,7 +962,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
       if( uiOffset )
       {
-         unsigned int uiPad = ( ( uiMemberSize < uiAlign ) ? uiMemberSize : uiAlign );
+         UINT uiPad = ( ( uiMemberSize < uiAlign ) ? uiMemberSize : uiAlign );
 
          if( ( cShift = ( uiOffset % uiPad ) ) > 0 )
          {
@@ -988,11 +988,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
          case CTYPE_UNSIGNED_CHAR : // unsigned char
             if( ( pBaseVar->pItems + ulIndex  )->type )
             {
-               *( (unsigned char *) ( Buffer + uiOffset ) ) = (unsigned char) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+               *( (BYTE*) ( Buffer + uiOffset ) ) = (BYTE) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
             }
             else
             {
-               *( (unsigned char *) ( Buffer + uiOffset ) ) = 0;
+               *( (BYTE*) ( Buffer + uiOffset ) ) = 0;
             }
             break;
 
@@ -1010,11 +1010,11 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
          case CTYPE_UNSIGNED_CHAR_PTR : // unsigned char *
             if( ( pBaseVar->pItems + ulIndex  )->type )
             {
-               *( (unsigned char **) ( Buffer + uiOffset ) ) = (unsigned char *) ( ( pBaseVar->pItems + ulIndex  )->item.asString.value );
+               *( (BYTE **) ( Buffer + uiOffset ) ) = (BYTE *) ( ( pBaseVar->pItems + ulIndex  )->item.asString.value );
             }
             else
             {
-               *( (unsigned char **) ( Buffer + uiOffset ) ) = NULL;
+               *( (BYTE **) ( Buffer + uiOffset ) ) = NULL;
             }
             break;
 
@@ -1045,19 +1045,19 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
          case CTYPE_UNSIGNED_SHORT : // unsigned short
             if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_INTEGER )
             {
-               *( (unsigned short *) ( Buffer + uiOffset ) ) = (unsigned short) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+               *( (USHORT *) ( Buffer + uiOffset ) ) = (USHORT) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_LONG )
             {
-               *( (unsigned short *) ( Buffer + uiOffset ) ) = (unsigned short) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+               *( (USHORT *) ( Buffer + uiOffset ) ) = (USHORT) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_DOUBLE )
             {
-               *( (unsigned short *) ( Buffer + uiOffset ) ) = (unsigned short) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
+               *( (USHORT *) ( Buffer + uiOffset ) ) = (USHORT) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
             {
-               *( (unsigned short *) ( Buffer + uiOffset ) ) = 0;
+               *( (USHORT *) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
@@ -1105,19 +1105,19 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
          case CTYPE_UNSIGNED_INT : // unsigned int
             if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_INTEGER )
             {
-               *( (unsigned int *) ( Buffer + uiOffset ) ) = (unsigned int) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+               *( (UINT *) ( Buffer + uiOffset ) ) = (UINT) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_LONG )
             {
-               *( (unsigned int *) ( Buffer + uiOffset ) ) = (unsigned int) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+               *( (UINT *) ( Buffer + uiOffset ) ) = (UINT) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_DOUBLE )
             {
-               *( (unsigned int *) ( Buffer + uiOffset ) ) = (unsigned int) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
+               *( (UINT *) ( Buffer + uiOffset ) ) = (UINT) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
             {
-               *( (unsigned int *) ( Buffer + uiOffset ) ) = 0;
+               *( (UINT *) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
@@ -1166,19 +1166,19 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
          case CTYPE_UNSIGNED_LONG : // unsigned long
             if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_INTEGER )
             {
-               *( (unsigned long *) ( Buffer + uiOffset ) ) = (unsigned long) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
+               *( (ULONG *) ( Buffer + uiOffset ) ) = (ULONG) ( ( pBaseVar->pItems + ulIndex  )->item.asInteger.value );
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_LONG )
             {
-               *( (unsigned long *) ( Buffer + uiOffset ) ) = (unsigned long) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
+               *( (ULONG *) ( Buffer + uiOffset ) ) = (ULONG) ( ( pBaseVar->pItems + ulIndex  )->item.asLong.value );
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_DOUBLE )
             {
-               *( (unsigned long *) ( Buffer + uiOffset ) ) = (unsigned long) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
+               *( (ULONG *) ( Buffer + uiOffset ) ) = (ULONG) ( ( pBaseVar->pItems + ulIndex  )->item.asDouble.value );
             }
             else if( ( pBaseVar->pItems + ulIndex  )->type == HB_IT_NIL )
             {
-               *( (unsigned long *) ( Buffer + uiOffset ) ) = 0;
+               *( (ULONG *) ( Buffer + uiOffset ) ) = 0;
             }
             else
             {
@@ -1306,13 +1306,13 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
 
    if( aVar && aDef )
    {
-      unsigned int uiSize;
-      unsigned int uiAlign;
+      UINT uiSize;
+      UINT uiAlign;
       BYTE *Buffer;
 
       if( pAlign )
       {
-         uiAlign = (unsigned char) pAlign->item.asInteger.value;
+         uiAlign = (BYTE) pAlign->item.asInteger.value;
       }
       else
       {
@@ -1329,13 +1329,13 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
    }
 }
 
-PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BOOL bAdoptNested )
+PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, UINT uiAlign, BOOL bAdoptNested )
 {
    PHB_BASEARRAY pBaseDef = aDef->item.asArray.value;
    ULONG ulLen = pBaseDef->ulLen;
    ULONG ulIndex;
-   unsigned int uiOffset, uiMemberSize;
-   unsigned char cShift;
+   UINT uiOffset, uiMemberSize;
+   BYTE cShift;
    PHB_ITEM pRet = hb_itemNew( NULL );
    PHB_BASEARRAY pBaseVar;
 
@@ -1425,7 +1425,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
                {
                   hb_objSendMsg( pStructure, "SizeOf", 0 );
 
-                  uiMemberSize = (unsigned int) hb_itemGetNL( &HB_VM_STACK.Return );
+                  uiMemberSize = (UINT) hb_itemGetNL( &HB_VM_STACK.Return );
                }
                else
                {
@@ -1443,7 +1443,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
 
       if( uiOffset )
       {
-         unsigned int uiPad = ( ( uiMemberSize < uiAlign ) ? uiMemberSize : uiAlign );
+         UINT uiPad = ( ( uiMemberSize < uiAlign ) ? uiMemberSize : uiAlign );
 
          if( ( cShift = ( uiOffset % uiPad ) ) > 0 )
          {
@@ -1464,7 +1464,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
             break;
 
          case CTYPE_UNSIGNED_CHAR : // unsigned char
-            hb_itemPutNI( pBaseVar->pItems + ulIndex , (int) *( (unsigned char *) ( Buffer + uiOffset ) ) );
+            hb_itemPutNI( pBaseVar->pItems + ulIndex , (int) *( (BYTE *) ( Buffer + uiOffset ) ) );
             break;
 
          case CTYPE_CHAR_PTR : // char *
@@ -1472,7 +1472,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
             break;
 
          case CTYPE_UNSIGNED_CHAR_PTR : // unsigned char *
-            hb_itemPutC( pBaseVar->pItems + ulIndex , (char *) *( (unsigned char **) ( Buffer + uiOffset ) ) );
+            hb_itemPutC( pBaseVar->pItems + ulIndex , (char *) *( (BYTE **) ( Buffer + uiOffset ) ) );
             break;
 
          case CTYPE_SHORT : // short
@@ -1480,7 +1480,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
             break;
 
          case CTYPE_UNSIGNED_SHORT : // unsigned short
-            hb_itemPutNI( pBaseVar->pItems + ulIndex , (short) *( (unsigned short *) ( Buffer + uiOffset ) ) );
+            hb_itemPutNI( pBaseVar->pItems + ulIndex , (short) *( (USHORT *) ( Buffer + uiOffset ) ) );
             break;
 
          case CTYPE_SHORT_PTR : // short *
@@ -1493,7 +1493,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
             break;
 
          case CTYPE_UNSIGNED_INT : // unsigned int
-            hb_itemPutNI( pBaseVar->pItems + ulIndex , (int) *( (unsigned int *) ( Buffer + uiOffset ) ) );
+            hb_itemPutNI( pBaseVar->pItems + ulIndex , (int) *( (UINT *) ( Buffer + uiOffset ) ) );
             break;
 
          case CTYPE_INT_PTR : // int *
@@ -1506,7 +1506,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
             break;
 
          case CTYPE_UNSIGNED_LONG : // unsigned long
-            hb_itemPutNL( pBaseVar->pItems + ulIndex , (long) *( (unsigned long *) ( Buffer + uiOffset ) ) );
+            hb_itemPutNL( pBaseVar->pItems + ulIndex , (long) *( (ULONG  *) ( Buffer + uiOffset ) ) );
             break;
 
          case CTYPE_LONG_PTR : // long *
@@ -1535,13 +1535,13 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
          {
             PHB_ITEM pID = hb_itemPutNI( NULL, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
             PHB_ITEM pStructure = hb_itemDoC( "HB_CSTRUCTUREFROMID", 1, pID );
-            unsigned int uiNestedSize /*, uiNestedAlign */ ;
+            UINT uiNestedSize /*, uiNestedAlign */ ;
 
             hb_objSendMsg( pStructure, "NALIGN", 0 );
             // uiNestedAlign = ( &(HB_VM_STACK.Return) )->item.asInteger.value;
 
             hb_objSendMsg( pStructure, "SizeOf", 0 );
-            uiNestedSize = (unsigned int) hb_itemGetNL( &HB_VM_STACK.Return );
+            uiNestedSize = (UINT) hb_itemGetNL( &HB_VM_STACK.Return );
 
             //TraceLog( NULL, "* NestedSize: %i Offset: %i\n", uiNestedSize, uiOffset );
 
@@ -1584,7 +1584,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
 
                   //TraceLog( NULL, "Before Devalue\n" );
 
-                  hb_itemPutCRawStatic( pInternalBuffer, (char *) (unsigned char *)( Buffer + uiOffset ), uiNestedSize );
+                  hb_itemPutCRawStatic( pInternalBuffer, (char *) (BYTE *)( Buffer + uiOffset ), uiNestedSize );
 
                   hb_objSendMsg( pStructure, "DEVALUE", 1, &Adopt );
 
@@ -1624,11 +1624,11 @@ HB_FUNC( HB_STRUCTURETOARRAY )
    {
       PHB_ITEM pRet;
       BYTE  *Buffer = (BYTE *) Structure->item.asString.value;
-      unsigned int uiAlign;
+      UINT uiAlign;
 
       if( pAlign )
       {
-         uiAlign = (unsigned char) pAlign->item.asInteger.value;
+         uiAlign = (BYTE) pAlign->item.asInteger.value;
       }
       else
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcompress.c,v 1.11 2003/10/01 04:39:39 ronpinkas Exp $
+ * $Id: hbcomprs.c,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
  */
 
 /*
@@ -496,7 +496,7 @@ local const config configuration_table[10] = {
 /* ========================================================================= */
 
 /* ========================================================================= */
-int HB_EXPORT deflateSetDictionary ( z_streamp strm,  const Bytef * dictionary,  unsigned int dictLength)
+int HB_EXPORT deflateSetDictionary ( z_streamp strm,  const Bytef * dictionary,  UINT dictLength)
 {
     deflate_state *s;
     uInt length = dictLength;
@@ -612,7 +612,7 @@ int HB_EXPORT deflateParams( z_streamp strm, int level, int strategy)
  * IN assertion: the stream state is correct and there is enough room in
  * pending_buf.
  */
-local void putShortMSB ( deflate_state *s, unsigned int b)
+local void putShortMSB ( deflate_state *s, UINT b)
 {
     put_byte(s, (Byte)(b >> 8));
     put_byte(s, (Byte)(b & 0xff));
@@ -976,7 +976,7 @@ local uInt longest_match( deflate_state *s, IPos cur_match )
          * or if the match length is less than 2:
          */
 #if (defined(UNALIGNED_OK) && MAX_MATCH == 258)
-        /* This code assumes sizeof(unsigned short) == 2. Do not use
+        /* This code assumes sizeof(USHORT) == 2. Do not use
          * UNALIGNED_OK if your compiler uses a different size.
          */
         if (*(ushf*)(match+best_len-1) != scan_end ||
@@ -3991,9 +3991,9 @@ int r)
 
 int s_hb_compress_error;
 
-unsigned long hb_destBuflen( unsigned long srclen )
+ULONG hb_destBuflen( ULONG srclen )
 {
-   unsigned long ret = srclen;
+   ULONG ret = srclen;
 
    ret += ret / 100*15 + 12;
    if ( srclen % 100 != 0 ) ret+=15;

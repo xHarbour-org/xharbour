@@ -1,5 +1,5 @@
 /*
- * $Id: fssize.c,v 1.1.1.1 2001/12/21 10:41:35 ronpinkas Exp $
+ * $Id: fssize.c,v 1.2 2003/11/11 20:20:54 ronpinkas Exp $
  */
 
 /*
@@ -95,7 +95,7 @@ ULONG hb_fsFSize( BYTE * pszFileName, BOOL bUseDirEntry )
       }
    }
 
-   hb_fsSetError( (unsigned short) FS_ERROR );
+   hb_fsSetError( (USHORT) FS_ERROR );
    return 0;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: reserved.c,v 1.1.1.1 2001/12/21 10:44:32 ronpinkas Exp $
+ * $Id: reserved.c,v 1.2 2003/09/03 01:17:43 andijahja Exp $
  */
 
 /*
@@ -129,7 +129,7 @@ static const char * s_szReservedFun[] = {
 char * hb_compReservedName( char * szName )
 {
 #if(!defined( HB_RESERVED_OFF ))
-   unsigned int wNum = 0;
+   UINT wNum = 0;
    int iFound = 1;
 
    while( wNum < RESERVED_FUNCTIONS && iFound )

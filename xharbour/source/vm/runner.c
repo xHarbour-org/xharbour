@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.18 2003/12/01 20:06:19 ronpinkas Exp $
+ * $Id: runner.c,v 1.19 2003/12/07 00:10:07 jonnymind Exp $
  */
 
 /*
@@ -670,7 +670,7 @@ static ULONG hb_hrbFindSymbol( char * szName, PHB_DYNF pDynFunc, ULONG ulLoaded 
 
 static int hb_hrbFileReadHead( FHANDLE file, char * szFileName )
 {
-   unsigned char szHead[] = { (unsigned char)192,'H','R','B' }, szBuf[4];
+   BYTE szHead[] = { (BYTE)192,'H','R','B' }, szBuf[4];
    char cInt[ 2 ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_hrbFileReadHead(%p)", file ));

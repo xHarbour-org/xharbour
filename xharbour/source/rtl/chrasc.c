@@ -1,5 +1,5 @@
 /*
- * $Id: chrasc.c,v 1.11 2003/07/18 21:42:35 andijahja Exp $
+ * $Id: chrasc.c,v 1.12 2003/12/18 21:12:43 ronpinkas Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ HB_FUNC( CHR )
                can be divided by 256 but it's not zero, in this case it
                will return an empty string instead of a Chr(0). [vszakats] */
 
-      hb_retclenAdoptRawStatic( hb_vm_acAscii[ (unsigned char) hb_parnl( 1 ) ], 1 );
+      hb_retclenAdoptRawStatic( hb_vm_acAscii[ (BYTE) hb_parnl( 1 ) ], 1 );
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.39 2004/01/27 03:06:59 ronpinkas Exp $
+ * $Id: set.c,v 1.40 2004/01/28 16:42:18 jonnymind Exp $
  */
 
 /*
@@ -647,7 +647,7 @@ HB_FUNC( SET )
          if( args > 1 )
          {
             BOOL flag = FALSE;
-            unsigned int i;
+            UINT i;
             int ch, year = 0;
 
             hb_set.HB_SET_DATEFORMAT = set_string( pArg2, hb_set.HB_SET_DATEFORMAT );

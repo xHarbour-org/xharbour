@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.93 2004/01/30 18:12:17 ronpinkas Exp $
+ * $Id: classes.c,v 1.94 2004/02/13 07:13:33 ronpinkas Exp $
  */
 
 /*
@@ -2273,7 +2273,7 @@ HB_FUNC( __CLSMODMSG )
 
                   pClass->pMethods[ uiAt ].pFunction = hb___msgEvalInline;
                   hb_arrayAdd( pClass->pInlines, pBlock );
-                  pClass->pMethods[ uiAt ].uiData = (unsigned short) pClass->pInlines->item.asArray.value->ulLen;
+                  pClass->pMethods[ uiAt ].uiData = (USHORT) pClass->pInlines->item.asArray.value->ulLen;
                }
             }
          }
@@ -2436,7 +2436,7 @@ PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *sMsg, ULONG ulArg, ... )
 
       if( ulArg )
       {
-         unsigned long i;
+         ULONG i;
 
          va_list ap;
 

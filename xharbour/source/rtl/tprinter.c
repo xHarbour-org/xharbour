@@ -72,7 +72,7 @@ BOOL hb_PrinterExists(LPTSTR pPrinterName) {
   DWORD Flags = PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS;
   PRINTER_INFO_4 *buffer4, *pPrinterEnum4;
   HANDLE hPrinter ;
-  unsigned long needed = 0 , returned=0, a;
+  ULONG needed = 0 , returned=0, a;
   HB_TRACE(HB_TR_DEBUG, ("hb_PrinterExists(%s)", pPrinterName));
   if (!strchr( pPrinterName, OS_PATH_LIST_SEPARATOR ) &&
      (hb_strnicmp(pPrinterName,"lpt1",4)!=0) &&
@@ -147,7 +147,7 @@ HB_FUNC(GETDEFAULTPRINTER)
 BOOL hb_GetPrinterNameByPort( LPTSTR pPrinterName, LPDWORD pdwBufferSize,LPTSTR pPortName )
 {
   BOOL Result = FALSE, bFound = FALSE ;
-  unsigned long needed, returned, a;
+  ULONG needed, returned, a;
   PRINTER_INFO_5 *pPrinterEnum,*buffer;
 
   HB_TRACE(HB_TR_DEBUG, ("hb_GetPrinterNameByPort(%s,%s)",pPrinterName, pPortName));
@@ -241,7 +241,7 @@ HB_FUNC(GETPRINTERS) {
   PRINTER_INFO_4 *buffer4, *pPrinterEnum4;
   PRINTER_INFO_5 *buffer, *pPrinterEnum;
   PRINTER_INFO_2 *pPrinterInfo2 ;
-  unsigned long needed = 0 , returned=0, a;
+  ULONG needed = 0 , returned=0, a;
   PHB_ITEM pSubItems, pFile, pPort ;
   PHB_ITEM pArrayPrinter = hb_itemArrayNew( 0 );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ssf.c,v 1.4 2004/01/28 04:14:34 maurifull Exp $
+ * $Id: ssf.c,v 1.5 2004/01/29 21:40:10 andijahja Exp $
  */
 
 /*
@@ -59,6 +59,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "hbapi.h"
 #include "ssf.h"
 #include "fixedth.sfc"
 
@@ -74,21 +75,21 @@ ssfFont *ssfDefaultFont = &ssfFixedThinFont;
 #define fRight2 points[6]
 #define fBottom2 points[7]
 
-void ssfSetFontSize(ssfFont *sfont, unsigned short fsize)
+void ssfSetFontSize(ssfFont *sfont, USHORT fsize)
 {
    fSize = fsize;
 }
 
-unsigned short ssfDrawChar(AL_BITMAP *dst, ssfFont *sfont, char c, int x, int y, int color)
+USHORT ssfDrawChar(AL_BITMAP *dst, ssfFont *sfont, char c, int x, int y, int color)
 {
-   unsigned char p;
+   BYTE p;
    int i, j, thick;
    ssfGlyph charGlyph;
    ssfFrame charFrame;
    int points[8];
    float fScale;
 
-   p = (unsigned char) c;
+   p = (BYTE) c;
    charGlyph = *sfont->chars[p];
    fScale = (float) ((float) sfont->fsize / (float) 65535);
 

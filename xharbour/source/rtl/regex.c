@@ -102,13 +102,13 @@ Returns:     pointer to the contiguous block of data
 const unsigned char *
 pcre_maketables(void)
 {
-unsigned char *yield, *p;
+BYTE *yield, *p;
 int i;
 
 #ifndef DFTABLES
-yield = (unsigned char*)(pcre_malloc)(tables_length);
+yield = (BYTE*)(pcre_malloc)(tables_length);
 #else
-yield = (unsigned char*)malloc(tables_length);
+yield = (BYTE*)malloc(tables_length);
 #endif
 
 if (yield == NULL) return NULL;
@@ -989,7 +989,7 @@ This file is #included in the compilation of pcre.c to build the default
 character tables which are used when no tables are passed to the compile
 function. */
 
-static unsigned char pcre_default_tables[] = {
+static BYTE pcre_default_tables[] = {
 
 /* This table is a lower casing table. */
 
@@ -3387,7 +3387,7 @@ int bracount = 0;
 int top_backref = 0;
 int branch_extra = 0;
 int branch_newextra;
-unsigned int brastackptr = 0;
+UINT brastackptr = 0;
 size_t size;
 uschar *code;
 const uschar *ptr;
@@ -6354,7 +6354,7 @@ HB_FUNC( HB_ATX )
    regex_t re;
    regmatch_t aMatches[REGEX_MAX_GROUPS];
    int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
-   unsigned long ulLen;
+   ULONG ulLen;
 
    PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
@@ -6544,7 +6544,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
          }
 
          case 1: // HB_P_LIKE
-           return aMatches[0].rm_so == 0 && (unsigned long) (aMatches[0].rm_eo) == pString->item.asString.length;
+           return aMatches[0].rm_so == 0 && (ULONG) (aMatches[0].rm_eo) == pString->item.asString.length;
 
          case 2: // HB_P_MATCH
            return TRUE;
