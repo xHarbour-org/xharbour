@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.4 2004/11/21 21:43:46 druzus Exp $
+ * $Id: files.c,v 1.7 2004/12/20 16:48:43 mlombardo Exp $
  */
 
 /*
@@ -89,7 +89,7 @@
       #include <dir.h>
     #endif
 #endif
-#if defined( __GNUC__ ) && !defined( __MINGW32__ )
+#if defined(OS_UNIX_COMPATIBLE) || (defined(__GNUC__) && !defined(__MINGW32__))
    #include <sys/types.h>
    #include <sys/stat.h>
    #include <fcntl.h>

@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.15 2004/11/21 21:43:47 druzus Exp $
+ * $Id: macro.y,v 1.16 2004/12/28 06:39:19 druzus Exp $
  */
 
 /*
@@ -163,6 +163,12 @@ extern void yyerror( char * ); /* parsing error management function */
 int yylex( YYSTYPE *, HB_MACRO_PTR );
 %}
 
+%{
+#ifdef __WATCOMC__
+/* disable warnings for unreachable code */
+#pragma warning 13 9
+#endif
+%}
 
 %token IDENTIFIER NIL NUM_DOUBLE INASSIGN NUM_LONG
 %token IIF IF LITERAL TRUEVALUE FALSEVALUE
@@ -979,6 +985,11 @@ IfInline   : IIF '(' Expression ',' EmptyExpression ','
            ;
 
 %%
+
+#ifdef __WATCOMC__
+/* enable warnings for unreachable code */
+#pragma warning 13 1
+#endif
 
 /*
  ** ------------------------------------------------------------------------ **
