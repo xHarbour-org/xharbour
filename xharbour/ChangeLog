@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1858 2003/12/12 15:04:35 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1859 2003/12/12 20:11:07 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-12 12:36 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * source/macro/macro.slx
+     % Removed support for _ID_ON_HOLD (not needed).
+   * source/vm/macro.c
+     * Added 3rd param (int iLen) to hb_macroParse(), and optimized calls to use it.
+       /* This also fix a minor bug when passed string might not have a numm termination. */
 
 2003-12-12 21:00 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/config/w32/dir.cf

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.11 2003/11/22 09:33:33 ronpinkas Exp $
+ * $Id: macro.slx,v 1.12 2003/12/04 09:26:54 druzus Exp $
  */
 
 /*
@@ -186,11 +186,6 @@ LANGUAGE_WORDS_ARE {
 #define HB_ID_QSELF     LEX_CUSTOM_ACTION - 5
 #define HB_ID_IIF       LEX_CUSTOM_ACTION - 6
 
-#define HB_ID_ON_HOLD    LEX_CUSTOM_ACTION -  7
-
-/* When 2 identifiers are correct syntax like in class declaration, we have to temporarily store the 2nd identifier. */
-#define _ID_ON_HOLD       913
-
 LANGUAGE_RULES_ARE {
 		    /* This _FIELD_ is NOT at BOL wants only ->. */
                     IF_SEQUENCE_IS( FIELD       , ALIASOP     , 0      , 0          ) PASS_THROUGH(),
@@ -207,9 +202,7 @@ LANGUAGE_RULES_ARE {
 
                     IF_SEQUENCE_IS( '&'         , '\''        , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR  , 0        ),
                     IF_SEQUENCE_IS( '&'         , '"'         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR  , 0        ),
-                    IF_SEQUENCE_IS( '&'         , '['         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR  , 0        ),
-
-                    IF_SEQUENCE_IS( _ID_ON_HOLD , 0           , 0      , 0          ) REDUCE_TO( HB_ID_ON_HOLD      , 0                   )
+                    IF_SEQUENCE_IS( '&'         , '['         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR  , 0        )
                    };
 
 /* -------------------------------------------------  End of Language Definitions. ------------------------------------------------ */
@@ -320,17 +313,8 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
             yyleng = YYLEX_PARAM->uiNameLen;
          }
 
-         if( iLastToken > 255 )
-         {
-            DEBUG_INFO( printf( "*** Holding %s\n", yytext ) );
-            sIdOnHold = hb_strdup( yytext );
-            iRet = _ID_ON_HOLD;
-         }
-         else
-         {
-            pYYLVAL->string = hb_strdup( yytext );
-            iRet = IDENTIFIER;
-         }
+         pYYLVAL->string = hb_strdup( yytext );
+         iRet = IDENTIFIER;
       }
    }
    else
@@ -461,11 +445,6 @@ static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char 
 	 hb_macroError( EG_SYNTAX, YYLEX_PARAM );
          return 0;
 
-      case HB_ID_ON_HOLD :
-         pYYLVAL->string = sIdOnHold;
-         DEBUG_INFO( printf( "RELEASED ID_ON_HOLD: %s\n", sIdOnHold ) );
-         return IDENTIFIER;
-
       default:
          printf( "ERROR! [MACRO.SLX] - No Handler for Custom Action %i\n", x );
 	 return 0;
@@ -481,7 +460,9 @@ void * hb_compFlexNew( HB_MACRO_PTR pNewMacro )
 
    { iLen = 0; iHold = 0; iReturn = 0; bNewLine = TRUE; bIgnoreWords = FALSE; }
 
-   DEBUG_INFO( printf( "*** New Macro: %s\n", pMacro->string ) );
+   DEBUG_INFO( printf( "*** New Macro: >>>%s<<< Len: %i\n", pMacro->string, pMacro->length ) );
+   //TraceLog( NULL, "*** New Macro: >>>%s<<< Len: %i\n", pMacro->string, pMacro->length );
+
    return yy_bytes_buffer( pMacro->string, pMacro->length );
 }
 

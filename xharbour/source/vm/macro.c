@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.32 2003/11/30 13:20:47 jonnymind Exp $
+ * $Id: macro.c,v 1.33 2003/12/07 00:10:07 jonnymind Exp $
  */
 
 /*
@@ -85,18 +85,18 @@ static void hb_compMemvarCheck( char * szVarName, HB_MACRO_DECL );
  * 'iFlag' - specifies if compiled code should generate pcodes either for push
  *    operation (for example: var :=&macro) or for pop operation (&macro :=var)
  */
-static int hb_macroParse( HB_MACRO_PTR pMacro, char * szString )
+static int hb_macroParse( HB_MACRO_PTR pMacro, char * szString, int iLen )
 {
    /* update the current status for logical shortcuts */
    hb_comp_bShortCuts = pMacro->supported & HB_SM_SHORTCUTS;
 
    /* initialize the input buffer - it will be scanned by lex */
    pMacro->string = szString;
-   pMacro->length = strlen( szString );
+   pMacro->length = iLen;
    pMacro->pos    = 0;
    pMacro->bShortCuts = hb_comp_bShortCuts;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_macroParse(%p, %s)", pMacro, szString));
+   HB_TRACE(HB_TR_DEBUG, ("hb_macroParse(%p, %s, %i)", pMacro, szString, iLen));
 
    /* initialize the output (pcode) buffer - it will be filled by yacc */
    pMacro->pCodeInfo = (HB_PCODE_INFO_PTR ) hb_xgrab( sizeof( HB_PCODE_INFO ) );
@@ -104,8 +104,6 @@ static int hb_macroParse( HB_MACRO_PTR pMacro, char * szString )
    pMacro->pCodeInfo->lPCodePos  = 0;
    pMacro->pCodeInfo->pLocals    = NULL;
    pMacro->pCodeInfo->pPrev      = NULL;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_macroParse.(%p, %s)", pMacro, szString));
 
    pMacro->pCodeInfo->pCode      = ( BYTE * ) hb_xgrab( HB_PCODE_SIZE );
 
@@ -494,6 +492,8 @@ void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
       HB_MACRO struMacro;
       int iStatus;
       char * szString = pItem->item.asString.value;
+      int iLen = pItem->item.asString.length;
+
 #ifdef HB_MACRO_STATEMENTS
       char * pText;
       char * pOut;
@@ -549,10 +549,11 @@ void hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
 
          hb_pp_ParseExpression( ptr, pOut );
          szString = pText;
+         iLen = strlen( szString );
       }
 #endif
 
-      iStatus = hb_macroParse( &struMacro, szString );
+      iStatus = hb_macroParse( &struMacro, szString, iLen );
 
 #ifndef HB_THREAD_SUPPORT
       if( iContext && ( ( hb_vm_iExtraParamsIndex == HB_MAX_MACRO_ARGS ) || ( hb_vm_iExtraElementsIndex >= HB_MAX_MACRO_ARGS ) ) )
@@ -643,18 +644,12 @@ void hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
       }
       ulLen++;
 
-      if( ulLen < pItem->item.asString.length )
-      {
-         // Terminate to avoid trailing spaces.
-         szString[ulLen] = '\0';
-      }
-
       struMacro.Flags      = HB_MACRO_GEN_POP;
       struMacro.uiNameLen  = HB_SYMBOL_NAME_LEN;
       struMacro.status     = HB_MACRO_CONT;
       struMacro.supported  = (flags & HB_SM_RT_MACRO) ? s_macroFlags : flags;
 
-      iStatus = hb_macroParse( &struMacro, szString );
+      iStatus = hb_macroParse( &struMacro, szString, ulLen );
 
       hb_stackPop();    /* remove compiled string */
 
@@ -665,12 +660,6 @@ void hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
       else
       {
          hb_macroSyntaxError( &struMacro );
-      }
-
-      if( ulLen < pItem->item.asString.length )
-      {
-         // Restore the original space.
-         szString[ulLen] = ' ';
       }
    }
 }
@@ -719,7 +708,8 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
    {
       /* grab memory for "alias->var"
       */
-      char * szString = ( char * ) hb_xgrab( pAlias->item.asString.length + pVar->item.asString.length + 3 );
+      int iLen = pAlias->item.asString.length + 2 + pVar->item.asString.length;
+      char * szString = ( char * ) hb_xgrab( iLen + 1 );
       HB_MACRO struMacro;
       int iStatus;
 
@@ -727,13 +717,13 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
       szString[ pAlias->item.asString.length ]     = '-';
       szString[ pAlias->item.asString.length + 1 ] = '>';
       memcpy( szString + pAlias->item.asString.length + 2, pVar->item.asString.value, pVar->item.asString.length );
-      szString[ pAlias->item.asString.length + 2 + pVar->item.asString.length ] = '\0';
+      szString[ iLen ] = '\0';
 
       struMacro.Flags      = iFlag;
       struMacro.uiNameLen  = HB_SYMBOL_NAME_LEN;
       struMacro.status     = HB_MACRO_CONT;
       struMacro.supported  = (bSupported & HB_SM_RT_MACRO) ? s_macroFlags : bSupported;
-      iStatus = hb_macroParse( &struMacro, szString );
+      iStatus = hb_macroParse( &struMacro, szString, iLen );
       hb_xfree( szString );
       struMacro.string = NULL;
 
@@ -745,7 +735,9 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
          hb_macroEvaluate( &struMacro );
       }
       else
+      {
          hb_macroSyntaxError( &struMacro );
+      }
    }
    else if( hb_macroCheckParam( pVar ) )
    {
@@ -760,7 +752,7 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
       struMacro.uiNameLen  = HB_SYMBOL_NAME_LEN;
       struMacro.status     = HB_MACRO_CONT;
       struMacro.supported  = (bSupported & HB_SM_RT_MACRO) ? s_macroFlags : bSupported;
-      iStatus = hb_macroParse( &struMacro, szString );
+      iStatus = hb_macroParse( &struMacro, szString, pVar->item.asString.length );
 
       hb_stackPop();    /* remove compiled string */
 
@@ -808,7 +800,8 @@ HB_MACRO_PTR hb_macroCompile( char * szString )
    pMacro->status     = HB_MACRO_CONT;
    pMacro->supported  = s_macroFlags;
 
-   iStatus = hb_macroParse( pMacro, szString );
+   iStatus = hb_macroParse( pMacro, szString, strlen( szString ) );
+
    if( ! ( iStatus == HB_MACRO_OK && ( pMacro->status & HB_MACRO_CONT ) ) )
    {
       hb_macroDelete( pMacro );
@@ -910,14 +903,13 @@ char * hb_macroGetType( PHB_ITEM pItem, BYTE flags )
    {
       HB_MACRO struMacro;
       int iStatus;
-      char * szString = pItem->item.asString.value;
 
       struMacro.Flags      = HB_MACRO_GEN_PUSH | HB_MACRO_GEN_TYPE;
       struMacro.uiNameLen  = HB_SYMBOL_NAME_LEN;
       struMacro.status     = HB_MACRO_CONT;
       struMacro.supported  = (flags & HB_SM_RT_MACRO) ? s_macroFlags : flags;
 
-      iStatus = hb_macroParse( &struMacro, szString );
+      iStatus = hb_macroParse( &struMacro, pItem->item.asString.value, pItem->item.asString.length );
 
       if( iStatus == HB_MACRO_OK )
       {
