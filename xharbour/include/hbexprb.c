@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.87 2004/11/26 17:36:48 druzus Exp $
+ * $Id: hbexprb.c,v 1.88 2005/01/02 03:31:12 guerra000 Exp $
  */
 
 /*
@@ -3026,7 +3026,7 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                            else
                            {
                               ULONG ulBufferLen;
-                              BYTE * pBuffer = hb_compHideString( hb_comp_iHidden, ( BYTE * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, &ulBufferLen );
+                              BYTE * pBuffer = hb_compHideString( hb_comp_iHidden, ( char * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, &ulBufferLen );
 
                               hb_compGenPCode4( HB_P_LOCALNEARSETSTRHIDDEN, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
                               hb_compGenPCode3( ( BYTE ) hb_comp_iHidden, HB_LOBYTE( ulBufferLen ), HB_HIBYTE( ulBufferLen ), FALSE );
@@ -3109,7 +3109,7 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                            else
                            {
                               ULONG ulBufferLen;
-                              BYTE * pBuffer = hb_compHideString( hb_comp_iHidden, ( BYTE * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, &ulBufferLen );
+                              BYTE * pBuffer = hb_compHideString( hb_comp_iHidden, ( char * ) pSelf->value.asOperator.pRight->value.asString.string, ( ULONG ) iLen, &ulBufferLen );
 
                               hb_compGenPCode4( HB_P_LOCALNEARSETSTRHIDDEN, ( BYTE ) iLocal, HB_LOBYTE( iLen ), HB_HIBYTE( iLen ), FALSE );
                               hb_compGenPCode3( ( BYTE ) hb_comp_iHidden, HB_LOBYTE( ulBufferLen ), HB_HIBYTE( ulBufferLen ), FALSE );
