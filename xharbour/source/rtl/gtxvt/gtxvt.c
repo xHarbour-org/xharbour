@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.14 2004/01/15 13:48:27 jonnymind Exp $
+ * $Id: gtxvt.c,v 1.15 2004/01/17 15:12:28 jonnymind Exp $
  */
 
 /*
@@ -1850,7 +1850,7 @@ static void xvt_windowDrawBox( PXWND_DEF wnd, int col, int row, int boxchar )
       case HB_GTXVT_DBL_R_SNG_T:
          segs[0].x1 = basex;
          segs[0].y1 = basey + celly/2-1;
-         segs[0].x2 = basex + cellx/2+1;
+         segs[0].x2 = basex + cellx/2;
          segs[0].y2 = segs[0].y1;
 
          segs[1].x1 = segs[0].x1;
@@ -1858,7 +1858,7 @@ static void xvt_windowDrawBox( PXWND_DEF wnd, int col, int row, int boxchar )
          segs[1].x2 = segs[0].x2;
          segs[1].y2 = segs[1].y1;
 
-         segs[2].x1 = basex + cellx/2+1;
+         segs[2].x1 = basex + cellx/2;
          segs[2].y1 = basey + celly/2-1;
          segs[2].x2 = segs[2].x1;
          segs[2].y2 = basey + celly;
@@ -1907,7 +1907,7 @@ static void xvt_windowDrawBox( PXWND_DEF wnd, int col, int row, int boxchar )
       case HB_GTXVT_DBL_R_SNG_B:
          segs[0].x1 = basex;
          segs[0].y1 = basey + celly/2-1;
-         segs[0].x2 = basex + cellx/2+1;
+         segs[0].x2 = basex + cellx/2;
          segs[0].y2 = segs[0].y1;
 
          segs[1].x1 = segs[0].x1;
@@ -1915,7 +1915,7 @@ static void xvt_windowDrawBox( PXWND_DEF wnd, int col, int row, int boxchar )
          segs[1].x2 = segs[0].x2;
          segs[1].y2 = segs[1].y1;
 
-         segs[2].x1 = basex + cellx/2+1;
+         segs[2].x1 = basex + cellx/2;
          segs[2].y1 = basey;
          segs[2].x2 = segs[2].x1;
          segs[2].y2 = basey + celly/2+1;
