@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.12 2004/09/06 19:25:43 mlombardo Exp $
+# $Id: hrbdll.wc,v 1.13 2004/09/19 03:58:59 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -1169,9 +1169,6 @@ $(OBJ_DIR)\minmax.obj : $(RTL_DIR)\minmax.c
 $(OBJ_DIR)\memofile.obj : $(RTL_DIR)\memofile.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
-$(OBJ_DIR)\memoline.obj : $(RTL_DIR)\memoline.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
-
 $(OBJ_DIR)\memoedit.c : $(RTL_DIR)\memoedit.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
@@ -1194,12 +1191,6 @@ $(OBJ_DIR)\mpostolc.obj : $(RTL_DIR)\mpostolc.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\mlctopos.obj : $(RTL_DIR)\mlctopos.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
-
-$(OBJ_DIR)\mlcount.obj : $(RTL_DIR)\mlcount.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
-
-$(OBJ_DIR)\mlpos.obj : $(RTL_DIR)\mlpos.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(OBJ_DIR)\mod.obj : $(RTL_DIR)\mod.c

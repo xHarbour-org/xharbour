@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.15 2004/09/06 19:25:45 mlombardo Exp $
+# $Id: makefile.wc,v 1.16 2004/09/19 03:59:00 kaddath Exp $
 #
 
 #
@@ -342,7 +342,6 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\memofile.obj \
    $(RTL_OBJ_DIR)\txtline.obj \
    $(RTL_OBJ_DIR)\minmax.obj \
-   $(RTL_OBJ_DIR)\mlpos.obj \
    $(RTL_OBJ_DIR)\mlctopos.obj \
    $(RTL_OBJ_DIR)\mpostolc.obj \
    $(RTL_OBJ_DIR)\mod.obj \
@@ -1879,9 +1878,6 @@ $(RTL_OBJ_DIR)\menuto.c : $(RTL_DIR)\menuto.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\menuto.obj : $(RTL_OBJ_DIR)\menuto.c
-   $(CC) $(CLIBFLAGS) -fo$@ $**
-
-$(RTL_OBJ_DIR)\mlpos.obj : $(RTL_DIR)\mlpos.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
 
 $(RTL_OBJ_DIR)\mpostolc.obj : $(RTL_DIR)\mpostolc.c
@@ -3549,4 +3545,3 @@ $(OBJ_DIR)\prb_stak.obj : $(OBJ_DIR)\prb_stak.c
 
 $(OBJ_DIR)\hbmlang.obj : $(HBMAKE_DIR)\hbmlang.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
-

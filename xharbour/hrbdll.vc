@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.44 2004/09/06 19:25:43 mlombardo Exp $
+# $Id: hrbdll.vc,v 1.45 2004/09/19 03:58:59 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -153,7 +153,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\txtline.obj \
   $(OBJ_DIR)\minmax.obj \
   $(OBJ_DIR)\mlctopos.obj \
-  $(OBJ_DIR)\mlpos.obj \
   $(OBJ_DIR)\mpostolc.obj \
   $(OBJ_DIR)\mod.obj \
   $(OBJ_DIR)\mouseapi.obj \
@@ -1223,9 +1222,6 @@ $(OBJ_DIR)\mpostolc.obj : $(RTL_DIR)\mpostolc.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\mlctopos.obj : $(RTL_DIR)\mlctopos.c
-   $(CC) $(CLIBFLAGS) /Fo$@ $**
-
-$(OBJ_DIR)\mlpos.obj : $(RTL_DIR)\mlpos.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\mod.obj : $(RTL_DIR)\mod.c

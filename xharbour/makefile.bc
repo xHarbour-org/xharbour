@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.110 2004/09/06 19:25:43 mlombardo Exp $
+# $Id: makefile.bc,v 1.111 2004/09/19 03:58:59 kaddath Exp $
 #
 
 #
@@ -414,10 +414,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\math.obj \
    $(RTL_OBJ_DIR)\maxrow.obj \
    $(RTL_OBJ_DIR)\memofile.obj \
-#   $(RTL_OBJ_DIR)\memoline.obj \
    $(RTL_OBJ_DIR)\minmax.obj \
-#   $(RTL_OBJ_DIR)\mlcount.obj \
-   $(RTL_OBJ_DIR)\mlpos.obj \
    $(RTL_OBJ_DIR)\mlctopos.obj \
    $(RTL_OBJ_DIR)\mpostolc.obj \
    $(RTL_OBJ_DIR)\mod.obj \
@@ -2102,9 +2099,6 @@ $(RTL_OBJ_DIR)\minmax.obj : $(RTL_DIR)\minmax.c
 $(RTL_OBJ_DIR)\memofile.obj : $(RTL_DIR)\memofile.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(RTL_OBJ_DIR)\memoline.obj : $(RTL_DIR)\memoline.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
 $(RTL_OBJ_DIR)\memoedit.c : $(RTL_DIR)\memoedit.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
@@ -2121,12 +2115,6 @@ $(RTL_OBJ_DIR)\menuto.c : $(RTL_DIR)\menuto.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
 $(RTL_OBJ_DIR)\menuto.obj : $(RTL_OBJ_DIR)\menuto.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
-$(RTL_OBJ_DIR)\mlcount.obj : $(RTL_DIR)\mlcount.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
-
-$(RTL_OBJ_DIR)\mlpos.obj : $(RTL_DIR)\mlpos.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(RTL_OBJ_DIR)\mpostolc.obj : $(RTL_DIR)\mpostolc.c

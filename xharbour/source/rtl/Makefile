@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.54 2004/08/02 20:11:13 lf_sfnet Exp $
+# $Id: Makefile,v 1.55 2004/09/06 19:25:53 mlombardo Exp $
 #
 
 ROOT = ../../
@@ -78,7 +78,6 @@ C_SOURCES=\
         txtline.c   \
         minmax.c     \
         mlctopos.c   \
-        mlpos.c      \
         mod.c        \
         mouseapi.c   \
         mousex.c     \
@@ -226,4 +225,3 @@ DIRS=$(HB_GT_LIBS)
 
 include $(TOP)$(ROOT)config/lib.cf
 include $(TOP)$(ROOT)config/dir.cf
-

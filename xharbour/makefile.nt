@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.92 2004/09/06 19:25:44 mlombardo Exp $
+# $Id: makefile.nt,v 1.93 2004/09/19 03:58:59 kaddath Exp $
 #
 
 #
@@ -425,7 +425,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\txtline.obj \
    $(OBJ_DIR)$(MT)\minmax.obj \
    $(OBJ_DIR)$(MT)\mlctopos.obj \
-   $(OBJ_DIR)$(MT)\mlpos.obj \
    $(OBJ_DIR)$(MT)\mod.obj \
    $(OBJ_DIR)$(MT)\mouseapi.obj \
    $(OBJ_DIR)$(MT)\mousex.obj \

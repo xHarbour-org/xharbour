@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3478 2004/09/30 01:16:11 modalsist Exp $
+ * $Id: ChangeLog,v 1.3479 2004/09/30 02:09:17 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-30 11:10 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * hrbdll.bc
+  * hrvdll.vc
+  * hrbdll.wc
+  * makefine.bc
+  * makefile.nt
+  * makefile.vc
+  * makefile.wc
+  * source/rtl/Makefile
+    ! Removed mlpos.c, memoline.c and mlcount.c
+  * source/rtl/txtline.c
+    + Added MLPOS() function
+    ! Fixed TAB handling
+    ! Fixed empty line return string in memoline()
+    ! Fixed mlcount() with empty lines
+  * source/rtl/memoline.c
+  * source/rtl/mlcount.c
+  * source/rtl/mlpos.c
+    - Files removed from CVS
+
+    / * Now memo functions behaves 100% like Clipper
+        All above bugs reported by Brian Hays's
+        test routine - Thanks, Brian!
+    */
 
 2004-09-29 21:04 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rdd/dbcmd.c
@@ -16,7 +41,7 @@
 2004-09-29 22:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils/hbmake/hbmake.prg
   * utils/hbmake/hbmutils.prg
-    ! Fixed a bug introduced by me at previous hbmake version. Now hbmake 
+    ! Fixed a bug introduced by me at previous hbmake version. Now hbmake
       return to respect the source name length for more than 12 characters.
 
 2004-09-29 13:49 UTC-0800 Ron Pinkas <ron at xharbour.com>
