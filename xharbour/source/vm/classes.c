@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.22 2002/10/04 18:24:25 ronpinkas Exp $
+ * $Id: classes.c,v 1.23 2002/10/05 08:16:43 ronpinkas Exp $
  */
 
 /*
@@ -1572,8 +1572,9 @@ HB_FUNC( __CLSDELMSG )
 
             if( pFunc == hb___msgEvalInline )      /* INLINE method deleted    */
             {
-               hb_arrayDel( pClass->pInlines, pClass->pMethods[ uiAt ].uiData );
-                                                   /* Delete INLINE block      */
+               // Can NOT be deleted or else refernce by number to other Inline blocks will break.
+               //hb_arrayDel( pClass->pInlines, pClass->pMethods[ uiAt ].uiData );
+               hb_itemClear( pClass->pInlines->item.asArray.value->pItems + pClass->pMethods[ uiAt ].uiData - 1  );
             }
                                                 /* Move messages            */
             while( pClass->pMethods[ uiAt ].pMessage && uiAt != uiLimit )
@@ -1777,8 +1778,9 @@ HB_FUNC( __CLSMODMSG )
                   if( pFunc ) // Convert to Method.
                   {
                      pClass->pMethods[ uiAt ].pFunction = pFunc;
-                     hb_arrayDel( pClass->pInlines, pClass->pMethods[ uiAt ].uiData );
-                     hb_arraySize( pClass->pInlines, pClass->pInlines->item.asArray.value->ulLen - 1 );
+
+                     // Clear the inline - can NOT be deleted or else refrence by number to other Inline methods will break.
+                     hb_itemClear( pClass->pInlines->item.asArray.value->pItems + pClass->pMethods[ uiAt ].uiData - 1  );
                   }
                   else
                   {
