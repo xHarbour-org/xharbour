@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.9 2004/02/21 04:45:19 ronpinkas Exp $
+* $Id: hbserv.c,v 1.10 2004/02/26 04:56:55 mlombardo Exp $
 */
 
 /*
@@ -748,7 +748,7 @@ HB_FUNC( HB_STARTSERVICE )
 * Been called. C version useful for internal api
 */
 
-HB_EXPORT BOOL hb_isService()
+BOOL HB_EXPORT hb_isService()
 {
    return sb_isService;
 }
@@ -758,7 +758,7 @@ HB_EXPORT BOOL hb_isService()
 * Called from hb_vmQuit()
 */
 
-HB_EXPORT void hb_seriviceExit()
+void HB_EXPORT hb_seriviceExit()
 {
    if( !sp_hooks == NULL )
    {

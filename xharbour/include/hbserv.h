@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.ch,v 1.1 2003/11/24 15:15:25 lf_sfnet Exp $
+* $Id: hbserv.h,v 1.1 2004/02/26 04:56:56 mlombardo Exp $
 */
 
 /*
@@ -55,6 +55,6 @@
 #ifndef HB_SERVICE_CH
 #include "hbserv.ch"
 #endif
-BOOL hb_isService( void );
-void hb_seriviceExit( void );
+BOOL HB_EXPORT hb_isService( void );
+void HB_EXPORT hb_seriviceExit( void );
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2412 2004/02/27 16:00:52 andijahja Exp $
+ * $Id: ChangeLog,v 1.2413 2004/02/27 16:45:37 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2004-02-28 05:00 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * include/hbapifs.h
+  * source/rtl/direct.c
+    + PHB_ITEM hb_fsDirectory( char*, char*, BOOL, BOOL ) for access
+      from C level.
+    % make Directory() function to call hb_directory()
+
+  * include/hbserv.h
+  * source/rtl/hbserv.c
+    ! fixes on function declaration.
+
 2004-02-27 23:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   * source/rtl/direct.c
     ! minor correction on previous changes when skleton passed is "*.*"

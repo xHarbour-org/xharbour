@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.15 2004/02/27 16:01:11 andijahja Exp $
+ * $Id: direct.c,v 1.16 2004/02/27 16:45:38 andijahja Exp $
  */
 
 /*
@@ -122,15 +122,10 @@
    #define HB_DIR_ALL_FILES_MASK        "*.*"
 #endif
 
-HB_FUNC( DIRECTORY )
+PHB_ITEM HB_EXPORT hb_fsDirectory( char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath )
 {
-   PHB_ITEM  pDirSpec = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM  pAttributes = hb_param( 2, HB_IT_STRING );
-   BYTE *    szDirSpec ;
    USHORT    uiMask;
-   BOOL      bDirOnly = hb_parl(3);
-   BOOL      bFullPath = hb_parl(4);
-
+   BYTE      *szDirSpec;
 /*
 #if defined(__MINGW32__) || ( defined(_MSC_VER) && _MSC_VER >= 910 )
    PHB_ITEM pEightDotThree = hb_param( 3, HB_IT_LOGICAL );
@@ -141,10 +136,10 @@ HB_FUNC( DIRECTORY )
 #endif
 */
 
-   HB_ITEM pDir;
+   PHB_ITEM pDir;
    PHB_FFIND ffind;
-   BOOL bAlloc = FALSE;
    PHB_FNAME fDirSpec = NULL;
+   BOOL bAlloc = FALSE;
    BYTE *pCurDir;
    char cCurDsk;
 
@@ -163,34 +158,42 @@ HB_FUNC( DIRECTORY )
           | HB_FA_ENCRYPTED
           | HB_FA_VOLCOMP;
 
-   hb_arrayNew( &pDir, 0 );
+   pDir = hb_itemNew( NULL );
+   hb_arrayNew( pDir, 0 );
 
    if ( bDirOnly )
    {
-      if( !pAttributes )
+      if( !szAttributes )
       {
-         pAttributes = hb_itemNew( NULL );
-         hb_itemPutC( pAttributes, "D" );
-         bAlloc = TRUE;
+         szAttributes = "D";
       }
       else
       {
-         if ( pAttributes->item.asString.value != "D" )
-            pAttributes->item.asString.value = "D";
+         if ( szAttributes != "D" )
+         {
+            szAttributes = "D";
+         }
       }
    }
 
-   if( pAttributes && pAttributes->item.asString.length > 0 )
-      if ( ( uiMask |= hb_fsAttrEncode( pAttributes->item.asString.value ) ) & HB_FA_LABEL )
+   if( szAttributes && strlen( szAttributes ) > 0 )
+   {
+      if ( ( uiMask |= hb_fsAttrEncode( szAttributes ) ) & HB_FA_LABEL )
       {
          /* NOTE: This is Clipper Doc compatible. (not operationally) */
          uiMask = HB_FA_LABEL;
       }
+   }
 
-
-   szDirSpec = pDirSpec ?
-               hb_fileNameConv( hb_strdup( ( char * ) pDirSpec->item.asString.value ) ) :
-               (BYTE *) HB_DIR_ALL_FILES_MASK;
+   if ( szSkleton && strlen( szSkleton ) > 0 )
+   {
+      szDirSpec = (BYTE *) hb_fileNameConv( hb_strdup( szSkleton ) );
+      bAlloc = TRUE;
+   }
+   else
+   {
+      szDirSpec = (BYTE *) HB_DIR_ALL_FILES_MASK;
+   }
 
    if ( bDirOnly || bFullPath )
    {
@@ -263,7 +266,7 @@ HB_FUNC( DIRECTORY )
 
             if( bAddEntry )
             {
-               hb_arrayAddForward( &pDir, &pSubarray );
+               hb_arrayAddForward( pDir, &pSubarray );
             }
             else
             {
@@ -280,26 +283,27 @@ HB_FUNC( DIRECTORY )
 
    }
 
-   hb_itemForwardValue( &(HB_VM_STACK).Return, &pDir );
-
    if ( bDirOnly || bFullPath )
    {
       hb_fsChDrv( (BYTE ) cCurDsk );
       hb_fsChDir( pCurDir );
    }
 
-   if ( pDirSpec )
-   {
-      hb_xfree( szDirSpec );
-   }
-
-   if ( bAlloc )
-   {
-      hb_itemRelease( pAttributes );
-   }
-
    if ( fDirSpec != NULL )
    {
       hb_xfree( fDirSpec );
    }
+
+   if( bAlloc )
+   {
+      hb_xfree( szDirSpec );
+   }
+
+   return ( pDir );
+}
+
+HB_FUNC( DIRECTORY )
+{
+   PHB_ITEM pDir = hb_fsDirectory( hb_parc(1), hb_parc(2), hb_parl(3), hb_parl(4) );
+   hb_itemRelease( hb_itemReturn( pDir ) );
 }
