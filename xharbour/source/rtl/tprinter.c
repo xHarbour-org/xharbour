@@ -90,10 +90,12 @@ BOOL hb_PrinterExists(LPTSTR pPrinterName) {
       EnumPrinters(Flags,NULL,4,(LPBYTE) NULL,0,&needed,&returned) ;
       if (needed > 0) {
         pPrinterEnum4 = buffer4 = ( PRINTER_INFO_4 * ) hb_xgrab( needed ) ;
-        if (EnumPrinters(Flags,NULL,4,(LPBYTE)  pPrinterEnum4,needed,&needed,&returned))
-          for ( a = 0 ; !Result && a < returned ; a++, pPrinterEnum4++)
-            Result= (strcmp((const char *) pPrinterName, (const char *) pPrinterEnum4->pPrinterName)==0) ;
-        hb_xfree(buffer4) ;
+        if (pPrinterEnum4) {
+          if (EnumPrinters(Flags,NULL,4,(LPBYTE)  pPrinterEnum4,needed,&needed,&returned))
+            for ( a = 0 ; !Result && a < returned ; a++, pPrinterEnum4++)
+              Result= (strcmp((const char *) pPrinterName, (const char *) pPrinterEnum4->pPrinterName)==0) ;
+          hb_xfree(buffer4) ;
+        }
       }
     }
     else if ( OpenPrinter( (char *) pPrinterName, &hPrinter, NULL)) {
@@ -253,68 +255,73 @@ HB_FUNC(GETPRINTERS) {
     EnumPrinters(Flags,NULL,4,(LPBYTE) NULL,0,&needed,&returned) ;
     if (needed > 0) {
       pPrinterEnum4 = buffer4 = ( PRINTER_INFO_4 * ) hb_xgrab( needed ) ;
-      if (EnumPrinters(Flags,NULL,4,(LPBYTE)  pPrinterEnum4,needed,&needed,&returned)) {
-        if (bPrinterNamesOnly ) {
-          for ( a = 0 ; a < returned ; a++, pPrinterEnum4++) {
-            pFile = hb_itemPutC( NULL, pPrinterEnum4->pPrinterName );
-            hb_arrayAdd( pArrayPrinter , pFile );
-            hb_itemRelease( pFile ) ;
-          }
-        }
-        else {
-          for ( a = 0 ; a < returned ; a++, pPrinterEnum4++) {
-            pSubItems = hb_itemArrayNew( 2 );
-            pFile = hb_itemPutC( NULL, pPrinterEnum4->pPrinterName );
-            if (OpenPrinter(pPrinterEnum4->pPrinterName, &hPrinter, NULL)) {
-              GetPrinter(hPrinter, 2, NULL, 0, &needed);
-              pPrinterInfo2 = ( PRINTER_INFO_2 * ) hb_xgrab( needed ) ;
-              if (GetPrinter(hPrinter,2,(LPBYTE) pPrinterInfo2, needed,&needed))
-                pPort = hb_itemPutC( NULL,pPrinterInfo2->pPortName );
-              else
-                pPort = hb_itemPutC( NULL,"Error" );
-              hb_xfree(pPrinterInfo2) ;
-              CloseHandle(hPrinter) ;
+      if (pPrinterEnum4) {
+        if (EnumPrinters(Flags,NULL,4,(LPBYTE)  pPrinterEnum4,needed,&needed,&returned)) {
+          if (bPrinterNamesOnly ) {
+            for ( a = 0 ; a < returned ; a++, pPrinterEnum4++) {
+              pFile = hb_itemPutC( NULL, pPrinterEnum4->pPrinterName );
+              hb_arrayAdd( pArrayPrinter , pFile );
+              hb_itemRelease( pFile ) ;
             }
-            else
-              pPort = hb_itemPutC( NULL,"Error" );
-
-            hb_arraySet( pSubItems , 1 , pFile ) ;
-            hb_arraySet( pSubItems , 2 , pPort ) ;
-            hb_arrayAdd( pArrayPrinter , pSubItems );
-            hb_itemRelease( pFile ) ;
-            hb_itemRelease( pPort ) ;
-            hb_itemRelease( pSubItems );
+          }
+          else {
+            for ( a = 0 ; a < returned ; a++, pPrinterEnum4++) {
+              if (OpenPrinter(pPrinterEnum4->pPrinterName, &hPrinter, NULL)) {
+                GetPrinter(hPrinter, 2, NULL, 0, &needed);
+                if (needed>0) {
+                  pPrinterInfo2 = ( PRINTER_INFO_2 * ) hb_xgrab( needed ) ;
+                  if (pPrinterInfo2 ) {
+                    pFile = hb_itemPutC( NULL, pPrinterEnum4->pPrinterName );
+                    pSubItems = hb_itemArrayNew( 2 );
+                    if (GetPrinter(hPrinter,2,(LPBYTE) pPrinterInfo2, needed,&needed))
+                      pPort = hb_itemPutC( NULL,pPrinterInfo2->pPortName );
+                    else
+                      pPort = hb_itemPutC( NULL,"Error" );
+                    hb_arraySet( pSubItems , 1 , pFile ) ;
+                    hb_arraySet( pSubItems , 2 , pPort ) ;
+                    hb_arrayAdd( pArrayPrinter , pSubItems );
+                    hb_itemRelease( pFile ) ;
+                    hb_itemRelease( pPort ) ;
+                    hb_itemRelease( pSubItems );
+                    hb_xfree(pPrinterInfo2) ;
+                  }
+                }
+                CloseHandle(hPrinter) ;
+              }
+            }
           }
         }
+        hb_xfree(buffer4) ;
       }
-      hb_xfree(buffer4) ;
     }
   }
   else {
     EnumPrinters( Flags,NULL,5,(LPBYTE) buffer,0,&needed,&returned );
     if( needed > 0 ) {
       pPrinterEnum = buffer = ( PRINTER_INFO_5 * ) hb_xgrab( needed ) ;
-      if ( EnumPrinters(Flags, NULL , 5 , (LPBYTE) buffer , needed , &needed , &returned ) ) {
-        for ( a = 0 ; a < returned ; a++, pPrinterEnum++) {
-          if (bPrinterNamesOnly ) {
-            pFile = hb_itemPutC( NULL, pPrinterEnum->pPrinterName );
-            hb_arrayAdd( pArrayPrinter , pFile );
-            hb_itemRelease( pFile ) ;
-          }
-          else {
-            pSubItems = hb_itemArrayNew( 2 );
-            pFile = hb_itemPutC( NULL, pPrinterEnum->pPrinterName );
-            pPort = hb_itemPutC( NULL,pPrinterEnum->pPortName );
-            hb_arraySet( pSubItems , 1 , pFile ) ;
-            hb_arraySet( pSubItems , 2 , pPort ) ;
-            hb_arrayAdd( pArrayPrinter , pSubItems );
-            hb_itemRelease( pFile ) ;
-            hb_itemRelease( pPort ) ;
-            hb_itemRelease( pSubItems );
+      if (pPrinterEnum) {
+        if ( EnumPrinters(Flags, NULL , 5 , (LPBYTE) buffer , needed , &needed , &returned ) ) {
+          for ( a = 0 ; a < returned ; a++, pPrinterEnum++) {
+            if (bPrinterNamesOnly ) {
+              pFile = hb_itemPutC( NULL, pPrinterEnum->pPrinterName );
+              hb_arrayAdd( pArrayPrinter , pFile );
+              hb_itemRelease( pFile ) ;
+            }
+            else {
+              pSubItems = hb_itemArrayNew( 2 );
+              pFile = hb_itemPutC( NULL, pPrinterEnum->pPrinterName );
+              pPort = hb_itemPutC( NULL,pPrinterEnum->pPortName );
+              hb_arraySet( pSubItems , 1 , pFile ) ;
+              hb_arraySet( pSubItems , 2 , pPort ) ;
+              hb_arrayAdd( pArrayPrinter , pSubItems );
+              hb_itemRelease( pFile ) ;
+              hb_itemRelease( pPort ) ;
+              hb_itemRelease( pSubItems );
+            }
           }
         }
+        hb_xfree(buffer) ;
       }
-      hb_xfree(buffer) ;
     }
   }
   hb_itemRelease( hb_itemReturn( pArrayPrinter ) );
