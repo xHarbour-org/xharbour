@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3393 2004/09/03 01:34:43 druzus Exp $
+ * $Id: ChangeLog,v 1.3394 2004/09/03 02:32:59 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-09-03 00:00 UTC-0800 Ron Pinkas <ron at xharbour.com>
+  * source/rtl/regex.c
+    ! Fixed HB_AtX() by circumventing an odd bug in in regex engine (not adding offset when found string in in relative position 0)
+      /* TODO need to check other RegEx search functions and apply same hack. */
+    * Corrected 4th param to be inclusive end position.
+    * Corrected but in returned 3rd BYREF (was adding offset)
+  * tests/tstregex.prg
+    * Minor correction
+  * source/vm/arrayshb.c
+    ! Fixed typo in hb_ArrayToStructure()
+  * utils/xbscript/xbscript.prg
+    * Untracked revison
+
 2004-09-03 14:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * /source/rdd/dbffpt/dbffpt1.c
     +  added support for #define HB_FPT_USE_READLOCK & #define HB_FPT_NO_READLOCK

@@ -864,7 +864,6 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
    LOCAL aPresetProc := s_aProc
 
    s_aProc := aProc
-   nBlocks := Len( aProc[2] )
 
    //TraceLog( "DOING: " + aProc[1] )
 
@@ -949,6 +948,8 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
    bErrHandler := ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures ) } )
 
+   // Do NOT optimize, can NOT use FOR EACH!!!
+   nBlocks := Len( aProc[2] )
    FOR nBlock := 1 TO nBlocks
       aCode := aBlocks[nBlock]
       OpCode  := aCode[2]

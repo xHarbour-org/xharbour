@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.50 2004/08/26 08:00:33 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.51 2004/08/29 17:12:06 paultucker Exp $
  */
 
 /*
@@ -840,7 +840,7 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
       {
          case CTYPE_CHAR : // char
          case CTYPE_UNSIGNED_CHAR : // unsigned char
-            if( ( pBaseVar->pItems + ulIndex  )->type && ( pBaseVar->pItems + ulIndex  )->type != HB_IT_INTEGER )
+            if( ( pBaseVar->pItems + ulIndex  )->type && ! HB_IS_NUMERIC( pBaseVar->pItems + ulIndex  ) )
             {
                hb_errRT_BASE( EG_ARG, 2023, NULL, "ArrayToStructure", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
                return NULL;

@@ -6359,13 +6359,10 @@ HB_FUNC( HB_ATX )
    PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
    PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
-   PHB_ITEM pStart = hb_param( 4, HB_IT_INTEGER );
-   PHB_ITEM pEnd = hb_param( 5, HB_IT_INTEGER );
+   int iStart = hb_parni(4), iEnd = hb_parni(5);
 
-   if( pRegEx && pString )
+   if( pRegEx && pString && iStart <= pString->item.asString.length )
    {
-      int iOffset;
-
       if( pRegEx->item.asString.length > 3 && memcmp( pRegEx->item.asString.value, "***", 3 ) == 0 )
       {
          pReg = (regex_t *) ( pRegEx->item.asString.value + 3 );
@@ -6390,32 +6387,27 @@ HB_FUNC( HB_ATX )
 
       if( pReg )
       {
-         if( pStart || pEnd )
+         if( iStart || iEnd )
          {
             EFlags |= REG_STARTEND;
-            aMatches[0].rm_so = 0;
-            aMatches[0].rm_eo = pString->item.asString.length;
+            aMatches[0].rm_so = iStart > 1 ? iStart - 1 : 0;
+            aMatches[0].rm_eo = iEnd > 0 && iEnd < pString->item.asString.length ? iEnd : pString->item.asString.length;
          }
-
-         if( pStart && pStart->item.asInteger.value > 0 && pStart->item.asInteger.value <= aMatches[0].rm_eo )
-         {
-            aMatches[0].rm_so = pStart->item.asInteger.value - 1;
-         }
-
-         if( pEnd && pEnd->item.asInteger.value > 0 && aMatches[0].rm_so + pEnd->item.asInteger.value <= aMatches[0].rm_eo )
-         {
-            aMatches[0].rm_eo = aMatches[0].rm_so + pEnd->item.asInteger.value;
-         }
-
-         iOffset = aMatches[0].rm_so;
 
          if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
          {
+            // Very STARNGE bug if string is found at position 0 regex "forgets" to add the offset!!!
+            if( iStart && aMatches[0].rm_so == 0 )
+            {
+               aMatches[0].rm_so += iStart - 1;
+               aMatches[0].rm_eo += iStart - 1;
+            }
+
             ulLen = aMatches[0].rm_eo - aMatches[0].rm_so;
 
             if( hb_pcount() > 3 )
             {
-               hb_stornl( aMatches[0].rm_so + iOffset + 1, 4 );
+               hb_stornl( aMatches[0].rm_so + 1, 4 );
             }
 
             if( hb_pcount() > 4 )
