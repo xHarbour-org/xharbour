@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.27 2004/02/23 08:31:57 andijahja Exp $
+ * $Id: transfrm.c,v 1.28 2004/03/05 13:26:04 andijahja Exp $
  */
 
 /*
@@ -215,10 +215,32 @@ HB_FUNC( TRANSFORM )
          char * szExp = pValue->item.asString.value;
          ULONG  ulExpLen = pValue->item.asString.length;
          ULONG  ulExpPos = 0;
+         char * szPicNew = NULL;
 
          char szPicDate[ 11 ];
          BOOL bAnyPic = FALSE;
          BOOL bFound  = FALSE;
+
+         /* ================================================================= */
+         /* HACKS !                                                           */
+         /* To solve Transform ( "1234567890", "@9" )                         */
+         /* ================================================================= */
+         if ( szPic[0] == '9' && strlen( szPic ) - 1 <  ulExpLen )
+         {
+            ULONG ii;
+
+            szPicNew = (char*) hb_xgrab( ulExpLen + 1 );
+
+            hb_xmemset( szPicNew, '\0', ulExpLen + 1 );
+
+            for ( ii = 0; ii < ulExpLen; ii ++ )
+            {
+               szPicNew[ ii ] = '9';
+            }
+
+            szPic = szPicNew;
+            ulPicLen = strlen( szPic );
+         }
 
          /* Grab enough */
          /* Support date function for strings */
@@ -427,6 +449,11 @@ HB_FUNC( TRANSFORM )
            szResult[ 0 ] = szPicDate[ 0 ];
            szResult[ 1 ] = szPicDate[ 1 ];
          }
+
+         if ( szPicNew )
+         {
+            hb_xfree( szPicNew );
+         }
       }
 
       // Must precede HB_IS_NUMERIC() because a DATE is also NUMERIC!
@@ -491,6 +518,7 @@ HB_FUNC( TRANSFORM )
          char *   szStr;
          char     cPic;
          char     szPicDate[ 11 ];
+         char *   szPicNew = NULL;
 
          HB_ITEM Number;
          HB_ITEM Width;
@@ -502,6 +530,27 @@ HB_FUNC( TRANSFORM )
 
          dValue = hb_itemGetND( pValue );
          hb_itemGetNLen( pValue, &iOrigWidth, &iOrigDec );
+
+         /* ================================================================= */
+         /* HACKS !                                                           */
+         /* To solve Transform ( 1234567890, "@9" )                           */
+         /* ================================================================= */
+         if ( szPic[0] == '9' && (int) strlen( szPic ) - 1 < iOrigWidth )
+         {
+            int ii;
+
+            szPicNew = (char*) hb_xgrab( iOrigWidth + 1 );
+
+            hb_xmemset( szPicNew, '\0', iOrigWidth + 1 );
+
+            for ( ii = 0; ii < iOrigWidth; ii ++ )
+            {
+               szPicNew[ ii ] = '9';
+            }
+
+            szPic = szPicNew;
+            ulPicLen = strlen( szPic );
+         }
 
          /* Support date function for numbers */
          if( uiPicFlags & PF_DATE )
@@ -759,6 +808,9 @@ HB_FUNC( TRANSFORM )
          {
             ulResultPos = 0;
          }
+
+         if ( szPicNew )
+            hb_xfree ( szPicNew );
       }
 
       /* ======================================================= */
