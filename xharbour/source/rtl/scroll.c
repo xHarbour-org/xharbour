@@ -1,5 +1,5 @@
 /*
- * $Id: scroll.c,v 1.4 2003/09/22 19:15:40 ronpinkas Exp $
+ * $Id: scroll.c,v 1.5 2004/03/08 20:03:19 fsgiudice Exp $
  */
 
 /*
@@ -50,9 +50,13 @@
  *
  */
 
+//-------------------------------------------------------------------//
+
 #include "hbapi.h"
 #include "hbapigt.h"
 
+//-------------------------------------------------------------------//
+//
 /* Scrolls a screen region */
 
 HB_FUNC( SCROLL )
@@ -130,3 +134,17 @@ HB_FUNC( SCROLL )
                 hb_parni( 5 ),   /* Defaults to zero on bad type */
                 hb_parni( 6 ) ); /* Defaults to zero on bad type */
 }
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( SCROLLFIXED )
+{
+   hb_gtScroll( ( USHORT ) hb_parni( 1 ),
+                ( USHORT ) hb_parni( 2 ),
+                ( USHORT ) hb_parni( 3 ),
+                ( USHORT ) hb_parni( 4 ),
+                hb_parni( 5 ),   /* Defaults to zero on bad type */
+                hb_parni( 6 ) ); /* Defaults to zero on bad type */
+}
+
+//-------------------------------------------------------------------//
