@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.143 2003/12/15 02:35:37 jonnymind Exp $
+* $Id: thread.c,v 1.144 2003/12/15 04:03:29 jonnymind Exp $
 */
 
 /*
@@ -98,7 +98,7 @@
 /**************************************************************/
 
 #if defined( HB_THREAD_TLS_KEYWORD )
-   #if defined(__GNUC__) || defined( __BORLANDC__ )
+   #if __GNUC__ >= 3 || defined( __BORLANDC__ )
    HB_STACK __thread  *hb_thread_stack;
    #elif defined( _MSVC_VER )
    HB_STACK __declspec(thread) *hb_thread_stack;
@@ -183,11 +183,11 @@ void hb_threadInit( void )
          pthread_setspecific( hb_pkCurrentStack, (void *)&hb_stack );
       #endif
    #else
-      #if !defined( __GNUC__ )
+      #if ! defined( HB_THREAD_TLS_BUG )
          hb_thread_stack = &hb_stack;
       #endif
    #endif
-   
+
 }
 
 void hb_threadExit( void )

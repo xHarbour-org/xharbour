@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1880 2003/12/15 02:35:36 jonnymind Exp $
+ * $Id: ChangeLog,v 1.1881 2003/12/15 04:03:25 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-15 07:06 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * source/vm/thread.c
+  * include/thread.h
+    ! Compilation of __thread keyword allowed only for gcc >= 3
+    + Added macro
+       -DHB_THREAD_TLS_BUG
+    Without it, the compilation of -DHB_THREAD_TLS_KEYWORD is exactly
+    like on windows, that is, faster. Platforms having the GCC bug must
+    add this define to avoid immediate Seg fault.
 
 2003-12-15 05:02 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * source/vm/thread.c
@@ -29,7 +39,7 @@
       This change is now available only with
          -DHB_THREAD_TLS_KEYWORD
       defined
-      
+
 
 2003-12-14 12:27 UTC+0100 Przemyslaw Czerpak <druzus@polbox.com>
   * xharbour/contrib/libct/Makefile

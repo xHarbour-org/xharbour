@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.73 2003/12/06 17:40:53 jonnymind Exp $
+* $Id: thread.h,v 1.74 2003/12/15 02:35:37 jonnymind Exp $
 */
 
 /*
@@ -481,21 +481,21 @@ typedef struct tag_HB_SHARED_RESOURCE
 #else
 
    /* Use __thread keyword where available */
-   #if defined( __GNUC__ )
-   #if defined( HB_THREAD_OPTIMIZE_STACK ) && ! defined( HB_NO_DEFAULT_STACK_MACROS )
-      #define HB_THREAD_STUB\
-         HB_STACK *_pStack_ = ( ((unsigned long)&hb_thread_stack) & 0xf0000000) == 0xf0000000 ? &hb_stack : hb_thread_stack;
-      #define HB_VM_STACK (*_pStack_)
-   #else
-      #define HB_VM_STACK (*( ( ((unsigned long)&hb_thread_stack) & 0xf0000000)==0xf0000000 ? &hb_stack : hb_thread_stack ))
-      #define HB_THREAD_STUB
-   #endif
+   #if __GNUC__ >= 3 && defined( HB_THREAD_TLS_BUG )
+      #if defined( HB_THREAD_OPTIMIZE_STACK ) && ! defined( HB_NO_DEFAULT_STACK_MACROS )
+         #define HB_THREAD_STUB\
+            HB_STACK *_pStack_ = ( ((unsigned long)&hb_thread_stack) & 0xf0000000) == 0xf0000000 ? &hb_stack : hb_thread_stack;
+         #define HB_VM_STACK (*_pStack_)
+      #else
+         #define HB_VM_STACK (*( ( ((unsigned long)&hb_thread_stack) & 0xf0000000)==0xf0000000 ? &hb_stack : hb_thread_stack ))
+         #define HB_THREAD_STUB
+      #endif
    #else
       #define HB_VM_STACK ( *hb_thread_stack )
       #define HB_THREAD_STUB
    #endif
 
-   #if defined(__GNUC__) || defined( __BORLANDC__ )
+   #if __GNUC__ >= 3 || defined( __BORLANDC__ )
       extern HB_STACK __thread *hb_thread_stack;
    #elif defined( _MSVC_VER )
       extern HB_STACK __declspec(thread) *hb_thread_stack;
