@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.63 2004/03/24 02:55:37 vouchcac Exp $
+ * $Id: tbrowse.prg,v 1.64 2004/03/24 15:37:08 vouchcac Exp $
  */
 
 /*
@@ -151,13 +151,13 @@ CLASS TBrowse
    ASSIGN colPos(nColPos)     INLINE ::lConfigured := .f., ::nColPos := if( nColPos == nil, ::nColPos, nColPos )
 
    ACCESS nBottom             INLINE ::nwBottom +  iif(::cBorder=="",0,1)
-   ASSIGN nBottom( nBottom )  INLINE ::nwBottom := nBottom - iif(::cBorder=="",0,1), ::lConfigured := .f.
+   ASSIGN nBottom( nBottom )  INLINE ::lConfigured := .f., ::nwBottom := nBottom - iif(::cBorder=="",0,1)
    ACCESS nLeft               INLINE ::nwLeft   -  iif(::cBorder=="",0,1)
-   ASSIGN nLeft( nLeft )      INLINE ::nwLeft   := nLeft   + iif(::cBorder=="",0,1), ::lConfigured := .f.
+   ASSIGN nLeft( nLeft )      INLINE ::lConfigured := .f., ::nwLeft   := nLeft   + iif(::cBorder=="",0,1)
    ACCESS nRight              INLINE ::nwRight  +  iif(::cBorder=="",0,1)
-   ASSIGN nRight( nRight )    INLINE ::nwRight  := nRight  - iif(::cBorder=="",0,1), ::lConfigured := .f.
+   ASSIGN nRight( nRight )    INLINE ::lConfigured := .f., ::nwRight  := nRight  - iif(::cBorder=="",0,1)
    ACCESS nTop                INLINE ::nwTop    -  iif(::cBorder=="",0,1)
-   ASSIGN nTop( nTop )        INLINE ::nwTop    := nTop    + iif(::cBorder=="",0,1), ::lConfigured := .f.
+   ASSIGN nTop( nTop )        INLINE ::lConfigured := .f., ::nwTop    := nTop    + iif(::cBorder=="",0,1)
 
    ACCESS colSep  INLINE ::cColSep        // Column separator character
    ASSIGN colSep( cColSep )   INLINE ::lConfigured := .f., ::cColSep  := cColSep
@@ -202,8 +202,7 @@ CLASS TBrowse
    METHOD Invalidate()                    // Forces entire redraw during next stabilization
    METHOD RefreshAll()                    // Causes all data to be recalculated during the next stabilize
    METHOD RefreshCurrent() INLINE;        // Causes the current row to be refilled and repainted on next stabilize
-          If( ! Empty( ::aRedraw ), ::aRedraw[ ::RowPos ] := .T., Nil ), ;
-          ::aRedraw[ ::RowPos ] := .T., ::stable := .F., Self
+          If( ! Empty( ::aRedraw ), ::aRedraw[ ::RowPos ] := .T., Nil ), ::stable := .F., Self
    METHOD Stabilize()                     // Performs incremental stabilization
 
 #ifdef HB_COMPAT_C53
