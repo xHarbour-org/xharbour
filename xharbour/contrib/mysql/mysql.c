@@ -1,5 +1,5 @@
 /*
- * $Id: mysql.c,v 1.2 2003/02/06 05:20:46 walito Exp $
+ * $Id: mysql.c,v 1.3 2003/02/18 17:15:43 lculik Exp $
  */
 
 /*
@@ -267,6 +267,10 @@ HB_FUNC(SQLGETERR) // char *mysql_error(MYSQL *);
    _retc((char *)mysql_error((MYSQL *)_parnl(1)));
 }
 
+HB_FUNC(SQLGETERRNO)
+{
+   _retnl(mysql_errno((MYSQL *)_parnl(1)));
+} 
 
 HB_FUNC(SQLLISTDB) // MYSQL_RES * mysql_list_dbs(MYSQL *, char * wild);
 {
