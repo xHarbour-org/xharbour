@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.305 2004/01/21 13:44:19 walito Exp $
+ * $Id: hvm.c,v 1.306 2004/01/21 17:24:50 ronpinkas Exp $
  */
 
 /*
@@ -3741,7 +3741,7 @@ static void hb_vmInc( void )
          pItem->item.asLong.value++;
       }
 #ifndef HB_LONG_LONG_OFF
-      else if( HB_IS_LONGLONG( pItem ) ) //&& pItem->item.asLongLong.value < LONGLONG_MAX )
+      else if( HB_IS_LONGLONG( pItem ) && pItem->item.asLongLong.value < LONGLONG_MAX )
       {
          pItem->item.asLongLong.value++;
       }
@@ -3794,16 +3794,16 @@ static void hb_vmDec( void )
    }
    else if( HB_IS_NUMBER_INT( pItem  ) )
    {
-      if( HB_IS_INTEGER( pItem ) )
+      if( HB_IS_INTEGER( pItem ) && pItem->item.asInteger.value > SHRT_MIN )
       {
          pItem->item.asInteger.value--;
       }
-      else if( HB_IS_LONG( pItem ) )
+      else if( HB_IS_LONG( pItem ) && pItem->item.asLong.value > LONG_MIN )
       {
          pItem->item.asLong.value--;
       }
 #ifndef HB_LONG_LONG_OFF
-      else if( HB_IS_LONGLONG( pItem ) )
+      else if( HB_IS_LONGLONG( pItem ) && pItem->item.asLongLong.value > LONGLONG_MIN )
       {
          pItem->item.asLongLong.value--;
       }
