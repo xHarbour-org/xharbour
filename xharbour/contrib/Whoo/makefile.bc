@@ -1,7 +1,6 @@
 # Global paths
 #
 HBR_DIR=..\..
-BCC_DIR=e:\bcc55
 WHO_DIR=.
 WH_DIR=..\what32
 

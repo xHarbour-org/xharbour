@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.8 2002/10/22 17:24:20 what32 Exp $
+ * $Id: ChangeLog,v 1.9 2002/11/05 03:11:18 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-11-04 21:51 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
+   * makefile.bc
+   * env/bccWin32.Mak
+     - Removed BCC_DIR hard coded refernces to BCC32 - Path and standard .cfg file will work.
 
 2002-11-04 22:10 UTC -0500 Paul Tucker <ptucker@sympatico.ca>
   + makefile.vc
