@@ -35,9 +35,16 @@ Return Nil
 Function TstFnc(nMode, nCol, oTBR)
 Local nRet := DE_CONT
 
-  If nMode == -1 // EXTENSION: Initialization mode
-    oTBR:colorSpec := "n/bg,w/n,r/bg,w+/bg,w+/gr"
-  ElseIf LastKey() == K_ESC .Or. LastKey() == K_ENTER
-    nRet := DE_ABORT
+  Do Case
+    Case nMode == -1 // EXTENSION: Initialization mode
+      oTBR:colorSpec := "n/bg,w/n,r/bg,w+/bg,w+/gr"
+    Case LastKey() == K_ESC
+      nRet := DE_ABORT
+    Case LastKey() == K_SPACE .And. nCol > 1
+      SetCursor(1)
+      @ Row(), Col() Get &(oTBR:getColumn(nCol):heading)
+      Read
+      SetCursor(0)
+      Clear TypeAhead
   End
 Return nRet

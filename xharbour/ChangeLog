@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1837 2003/12/09 02:46:59 maurifull Exp $
+ * $Id: ChangeLog,v 1.1838 2003/12/09 02:53:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-12-09 00:00 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * tests/dbedit.prg
+    + Added temporary GET testing, future dbedit() will do it by itself
 
 2003-12-08 18:53 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/rtl/hblog.prg
