@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.36 2002/12/30 19:44:00 ronpinkas Exp $
+ * $Id: garbage.c,v 1.37 2002/12/30 21:24:09 ronpinkas Exp $
  */
 
 /*
@@ -265,7 +265,7 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
 {
    HB_GARBAGE_PTR pAlloc;
 
-   #ifdef HB_THREAD_SUPPORT
+   #if defined( HB_THREAD_SUPPORT ) && defined( HB_OS_WIN32 )
       HB_CRITICAL_LOCK( s_CriticalMutex );
    #endif
 
@@ -304,7 +304,7 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
          pItem->type = HB_IT_NIL;
       }
 
-      #ifdef HB_THREAD_SUPPORT
+      #if defined( HB_THREAD_SUPPORT ) && defined( HB_OS_WIN32 )
          HB_CRITICAL_UNLOCK( s_CriticalMutex );
       #endif
 
@@ -312,7 +312,7 @@ HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
    }
    else
    {
-      #ifdef HB_THREAD_SUPPORT
+      #if defined( HB_THREAD_SUPPORT ) && defined( HB_OS_WIN32 )
          HB_CRITICAL_UNLOCK( s_CriticalMutex );
       #endif
 
@@ -332,7 +332,7 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
       return;
    }
 
-   #ifdef HB_THREAD_SUPPORT
+   #if defined( HB_THREAD_SUPPORT ) && defined( HB_OS_WIN32 )
       HB_CRITICAL_LOCK( s_CriticalMutex );
    #endif
 
@@ -356,7 +356,7 @@ void hb_gcGripDrop( HB_ITEM_PTR pItem )
       HB_GARBAGE_FREE( pAlloc );
    }
 
-   #ifdef HB_THREAD_SUPPORT
+   #if defined( HB_THREAD_SUPPORT ) && defined( HB_OS_WIN32 )
       HB_CRITICAL_UNLOCK( s_CriticalMutex );
    #endif
 }

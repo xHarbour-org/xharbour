@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.25 2002/12/30 06:53:00 ronpinkas Exp $
+* $Id: thread.c,v 1.26 2002/12/30 08:17:15 ronpinkas Exp $
 */
 
 /*
@@ -75,7 +75,6 @@
 
 HB_THREAD_CONTEXT *hb_ht_context;
 HB_CRITICAL_T hb_threadContextMutex;
-HB_LWR_MUTEX hb_internal_monitor;
 HB_THREAD_CONTEXT *last_context;
 
 void hb_threadCreateContext( void )
@@ -233,7 +232,6 @@ void hb_threadDestroyContextFromHandle( HB_THREAD_HANDLE th_h )
 
     if( p )
     {
-        //printf( "*Destroying: %p\n", p );
 
         /*unlink the stack*/
         if ( prev )
@@ -318,13 +316,13 @@ HB_THREAD_CONTEXT *hb_threadGetCurrentContext( void )
     {
         return p;
     }
+
 }
 
 void hb_threadInit( void )
 {
     hb_ht_context = NULL;
     HB_CRITICAL_INIT( hb_threadContextMutex );
-    HB_CRITICAL_INIT( hb_internal_monitor.Critical );
     last_context = NULL;
 }
 
@@ -344,7 +342,6 @@ void hb_threadExit( void )
     }
 
     HB_CRITICAL_DESTROY( hb_threadContextMutex );
-    HB_CRITICAL_DESTROY( hb_internal_monitor.Critical );
 }
 
 #ifdef HB_OS_WIN_32
@@ -595,7 +592,13 @@ HB_FUNC( STARTTHREAD )
 
 HB_FUNC( STOPTHREAD )
 {
-    HB_THREAD_HANDLE th = (HB_THREAD_HANDLE) hb_parnl( 1 );
+    HB_MUTEX_STRUCT *Mutex;
+    HB_THREAD_HANDLE th;
+    PHB_ITEM pMutex;
+
+    th = (HB_THREAD_HANDLE) hb_parnl( 1 );
+    pMutex = hb_param( 2, HB_IT_STRING );
+
 
     if( ! ISNUM( 1 ) )
     {
@@ -608,9 +611,29 @@ HB_FUNC( STOPTHREAD )
 
     #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
        pthread_cancel( th );
+       /* Notify mutex before to join */
+       if( pMutex != NULL )
+       {
+           Mutex = (HB_MUTEX_STRUCT *)  pMutex->item.asString.value;
+           while( Mutex->waiting  > 0)
+           {
+               HB_COND_SIGNAL( Mutex->cond );
+               Mutex->waiting--;
+           }
+       }
        pthread_join( th, 0 );
     #else
        TerminateThread( th, 0);
+       /* Notify mutex before to join */
+       if( pMutex != NULL )
+       {
+           Mutex = (HB_MUTEX_STRUCT *)  pMutex->item.asString.value;
+           while( Mutex->waiting  > 0)
+           {
+               HB_COND_SIGNAL( Mutex->cond );
+               Mutex->waiting--;
+           }
+       }
        WaitForSingleObject( th, INFINITE );
     #endif
 
@@ -690,9 +713,10 @@ HB_FUNC( CREATEMUTEX )
 
 HB_FUNC( DESTROYMUTEX )
 {
-    HB_MUTEX_STRUCT *mutex;
+    HB_MUTEX_STRUCT *Mutex;
+    PHB_ITEM pMutex = hb_param( 1, HB_IT_STRING );
 
-    if( ! ISPOINTER( 1 ) )
+    if( pMutex == NULL )
     {
         PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "DESTROYMUTEX", 1, pArgs );
@@ -700,23 +724,24 @@ HB_FUNC( DESTROYMUTEX )
         return;
     }
 
-    mutex = (HB_MUTEX_STRUCT *) hb_parptr( 1 );
+    Mutex = (HB_MUTEX_STRUCT *)  pMutex->item.asString.value;
 
-    while( mutex->lock_count )
+    while( Mutex->lock_count )
     {
-        HB_MUTEX_UNLOCK( mutex->mutex );
-        mutex->lock_count--;
+        HB_MUTEX_UNLOCK( Mutex->mutex );
+        Mutex->lock_count--;
     }
 
-    HB_MUTEX_DESTROY( mutex->mutex );
-    HB_COND_DESTROY( mutex->cond );
+    HB_MUTEX_DESTROY( Mutex->mutex );
+    HB_COND_DESTROY( Mutex->cond );
 }
 
 HB_FUNC( MUTEXLOCK )
 {
-    HB_MUTEX_STRUCT *mt;
+    HB_MUTEX_STRUCT *Mutex;
+    PHB_ITEM pMutex = hb_param( 1, HB_IT_STRING );
 
-    if( ! ISPOINTER( 1 ) )
+    if( pMutex == NULL )
     {
         PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXLOCK", 1, pArgs );
@@ -724,26 +749,27 @@ HB_FUNC( MUTEXLOCK )
         return;
     }
 
-    mt = (HB_MUTEX_STRUCT *) hb_parptr( 1 );
+    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
 
-    if( mt->locker == HB_CURRENT_THREAD_HANDLE() )
+    if( Mutex->locker == HB_CURRENT_THREAD_HANDLE() )
     {
-        mt->lock_count ++;
+        Mutex->lock_count ++;
     }
     else
     {
-        HB_MUTEX_LOCK( mt->mutex );
+        HB_MUTEX_LOCK( Mutex->mutex );
 
-        mt->locker = HB_CURRENT_THREAD_HANDLE();
-        mt->lock_count = 1;
+        Mutex->locker = HB_CURRENT_THREAD_HANDLE();
+        Mutex->lock_count = 1;
     }
 }
 
 HB_FUNC( MUTEXUNLOCK )
 {
-    HB_MUTEX_STRUCT *mt;
+    HB_MUTEX_STRUCT *Mutex;
+    PHB_ITEM pMutex = hb_param( 1, HB_IT_STRING );
 
-    if( ! ISPOINTER( 1 ) )
+    if( pMutex == NULL )
     {
         PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXUNLOCK", 1, pArgs );
@@ -751,16 +777,16 @@ HB_FUNC( MUTEXUNLOCK )
         return;
     }
 
-    mt = (HB_MUTEX_STRUCT *) hb_parptr( 1 );
+    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
 
-    if( mt->locker == HB_CURRENT_THREAD_HANDLE() )
+    if( Mutex->locker == HB_CURRENT_THREAD_HANDLE() )
     {
-        mt->lock_count --;
+        Mutex->lock_count --;
 
-        if( mt->lock_count == 0 )
+        if( Mutex->lock_count == 0 )
         {
-            mt->locker = 0;
-            HB_MUTEX_UNLOCK( mt->mutex );
+            Mutex->locker = 0;
+            HB_MUTEX_UNLOCK( Mutex->mutex );
         }
     }
 }
@@ -769,10 +795,12 @@ HB_FUNC( SUBSCRIBE )
 {
     int lc;
     int islocked;
-    HB_MUTEX_STRUCT *mt;
+
+    HB_MUTEX_STRUCT *Mutex;
+    PHB_ITEM pMutex = hb_param( 1, HB_IT_STRING );
 
     /* Parameter error checking */
-    if( ( ! ISPOINTER( 1 ) ) || ( hb_pcount() == 2 && ! ISNUM(2)) )
+    if( pMutex == NULL || ( hb_pcount() == 2 && ! ISNUM(2)) )
     {
         PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SUBSCRIBE", 1, pArgs );
@@ -780,58 +808,58 @@ HB_FUNC( SUBSCRIBE )
         return;
     }
 
-    mt = (HB_MUTEX_STRUCT *) hb_parptr( 1 );
+    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
 
-    if( mt->locker != HB_CURRENT_THREAD_HANDLE() )
+    if( Mutex->locker != HB_CURRENT_THREAD_HANDLE() )
     {
         islocked = 0;
-        HB_MUTEX_LOCK( mt->mutex );
+        HB_MUTEX_LOCK( Mutex->mutex );
     }
     else
     {
         islocked = 1;
     }
 
-    mt->locker = 0;
-    lc = mt->lock_count;
-    mt->lock_count = 0;
+    Mutex->locker = 0;
+    lc = Mutex->lock_count;
+    Mutex->lock_count = 0;
 
-    mt->waiting ++;
+    Mutex->waiting ++;
 
-    if( mt->waiting > 0 )
+    if( Mutex->waiting > 0 )
     {
         if ( hb_pcount() == 1 )
         {
-            HB_COND_WAIT( mt->cond, mt->mutex );
+            HB_COND_WAIT( Mutex->cond, Mutex->mutex );
         }
         else
         {
-            int wt = mt->waiting;
+            int wt = Mutex->waiting;
 
-            HB_COND_WAITTIME( mt->cond, mt->mutex, hb_parnl( 2 ) );
+            HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, hb_parnl( 2 ) );
 
-            if ( wt == mt->waiting )
+            if ( wt == Mutex->waiting )
             {
-                 mt->waiting --;
+                 Mutex->waiting --;
             }
         }
     }
 
     // Prepare return value
-    mt->lock_count = lc;
+    Mutex->lock_count = lc;
 
     if( ! islocked )
     {
-        HB_MUTEX_UNLOCK( mt->mutex );
+        HB_MUTEX_UNLOCK( Mutex->mutex );
     }
     else
     {
-        mt->locker = HB_CURRENT_THREAD_HANDLE();
+        Mutex->locker = HB_CURRENT_THREAD_HANDLE();
     }
 
-    if( mt->event_object )
+    if( Mutex->event_object )
     {
-        hb_itemReturn( mt->event_object );
+        hb_itemReturn( Mutex->event_object );
     }
     else
     {
@@ -843,10 +871,11 @@ HB_FUNC( SUBSCRIBENOW )
 {
     int lc;
     int islocked;
-    HB_MUTEX_STRUCT *mt;
+    HB_MUTEX_STRUCT *Mutex;
+    PHB_ITEM pMutex = hb_param( 1, HB_IT_STRING );
 
     /* Parameter error checking */
-    if( ( ! ISPOINTER( 1 ) ) || ( hb_pcount() == 2 && ! ISNUM(2)) )
+    if( pMutex == NULL || ( hb_pcount() == 2 && ! ISNUM(2)) )
     {
         PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "SUBSCRIBENOW", 1, pArgs );
@@ -854,65 +883,65 @@ HB_FUNC( SUBSCRIBENOW )
         return;
     }
 
-    mt = (HB_MUTEX_STRUCT *) hb_parptr( 1 );
+    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
 
-    if( mt->locker != HB_CURRENT_THREAD_HANDLE() )
+    if( Mutex->locker != HB_CURRENT_THREAD_HANDLE() )
     {
         islocked = 0;
-        HB_MUTEX_LOCK( mt->mutex );
+        HB_MUTEX_LOCK( Mutex->mutex );
     }
     else
     {
         islocked = 1;
     }
 
-    mt->locker = 0;
-    lc = mt->lock_count;
-    mt->lock_count = 0;
+    Mutex->locker = 0;
+    lc = Mutex->lock_count;
+    Mutex->lock_count = 0;
 
-    mt->event_object = NULL;
-    mt->waiting++;
+    Mutex->event_object = NULL;
+    Mutex->waiting++;
 
-    if( mt->waiting <= 0 )
+    if( Mutex->waiting <= 0 )
     {
-        mt->waiting = 1;
+        Mutex->waiting = 1;
     }
     else
     {
-        mt->waiting++;
+        Mutex->waiting++;
     }
 
     if( hb_pcount() == 1 )
     {
-        HB_COND_WAIT( mt->cond, mt->mutex );
+        HB_COND_WAIT( Mutex->cond, Mutex->mutex );
     }
     else
     {
-        int wt = mt->waiting;
+        int wt = Mutex->waiting;
 
-        HB_COND_WAITTIME( mt->cond, mt->mutex, hb_parnl( 2 ) );
+        HB_COND_WAITTIME( Mutex->cond, Mutex->mutex, hb_parnl( 2 ) );
 
-        if( wt == mt->waiting )
+        if( wt == Mutex->waiting )
         {
-            mt->waiting --;
+            Mutex->waiting --;
         }
     }
 
     // Prepare return value
-    mt->lock_count = lc;
+    Mutex->lock_count = lc;
 
     if( ! islocked )
     {
-        HB_MUTEX_UNLOCK( mt->mutex );
+        HB_MUTEX_UNLOCK( Mutex->mutex );
     }
     else
     {
-        mt->locker = HB_CURRENT_THREAD_HANDLE();
+        Mutex->locker = HB_CURRENT_THREAD_HANDLE();
     }
 
-    if( mt->event_object )
+    if( Mutex->event_object )
     {
-        hb_itemReturn( mt->event_object );
+        hb_itemReturn( Mutex->event_object );
     }
     else
     {
@@ -922,10 +951,11 @@ HB_FUNC( SUBSCRIBENOW )
 
 HB_FUNC( NOTIFY )
 {
-    HB_MUTEX_STRUCT *mt;
-
+    HB_MUTEX_STRUCT *Mutex;
+    PHB_ITEM pMutex = hb_param( 1, HB_IT_STRING );
+    
     /* Parameter error checking */
-    if( ! ISPOINTER( 1 ) )
+    if( pMutex == NULL )
     {
         PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "NOTIFY", 1, pArgs );
@@ -933,32 +963,33 @@ HB_FUNC( NOTIFY )
         return;
     }
 
-    mt = (HB_MUTEX_STRUCT *) hb_parptr( 1 );
+    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
 
     if( hb_pcount() == 2 )
     {
-        mt->event_object = hb_itemNew( NULL );
-        hb_itemCopy( mt->event_object, hb_param( 2, HB_IT_ANY ));
+        Mutex->event_object = hb_itemNew( NULL );
+        hb_itemCopy( Mutex->event_object, hb_param( 2, HB_IT_ANY ));
     }
     else
     {
-        mt->event_object = NULL;
+        Mutex->event_object = NULL;
     }
 
-    if( mt->waiting > 0 )
+    if( Mutex->waiting > 0 )
     {
-        HB_COND_SIGNAL( mt->cond );
+        HB_COND_SIGNAL( Mutex->cond );
     }
 
-    mt->waiting--;
+    Mutex->waiting--;
 }
 
 HB_FUNC( NOTIFYALL )
 {
-    HB_MUTEX_STRUCT *mt;
+    HB_MUTEX_STRUCT *Mutex;
+    PHB_ITEM pMutex = hb_param( 1, HB_IT_STRING );
 
     /* Parameter error checking */
-    if( ! ISPOINTER( 1 ) )
+    if( pMutex == NULL )
     {
         PHB_ITEM pArgs = hb_arrayFromParams( HB_VM_STACK.pBase );
         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "NOTIFYALL", 1, pArgs );
@@ -966,22 +997,22 @@ HB_FUNC( NOTIFYALL )
         return;
     }
 
-    mt = (HB_MUTEX_STRUCT *) hb_parptr( 1 );
+    Mutex = (HB_MUTEX_STRUCT *) pMutex->item.asString.value;
 
     if( hb_pcount() == 2 )
     {
-        mt->event_object = hb_itemNew( NULL );
-        hb_itemCopy( mt->event_object, hb_param( 2, HB_IT_ANY ));
+        Mutex->event_object = hb_itemNew( NULL );
+        hb_itemCopy( Mutex->event_object, hb_param( 2, HB_IT_ANY ));
     }
     else
     {
-        mt->event_object = NULL;
+        Mutex->event_object = NULL;
     }
 
-    while( mt->waiting  > 0)
+    while( Mutex->waiting  > 0)
     {
-        HB_COND_SIGNAL( mt->cond );
-        mt->waiting--;
+        HB_COND_SIGNAL( Mutex->cond );
+        Mutex->waiting--;
     }
 }
 
@@ -1036,6 +1067,9 @@ void hb_SignalObjectAndWait( HB_COND_T hToSignal, HB_MUTEX_T hToWaitFor, DWORD d
 }
 #endif
 
+/*
+JC1: This should be reactivated if we want flat mutex
+
 void hb_threadLock( HB_LWR_MUTEX *lpMutex )
 {
    if ( lpMutex->Locker == HB_CURRENT_THREAD() )
@@ -1063,7 +1097,7 @@ void hb_threadUnlock( HB_LWR_MUTEX *lpMutex )
       }
    }
 }
-
+*/
 /*****************************************************/
 /* Forbid mutex management                           */
 

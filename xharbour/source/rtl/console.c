@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.21 2002/12/29 08:32:41 ronpinkas Exp $
+ * $Id: console.c,v 1.22 2002/12/29 20:59:56 jonnymind Exp $
  */
 
 /*
@@ -92,7 +92,7 @@ static int    s_iFilenoStdout;
 static int    s_iFilenoStderr;
 
 #ifdef HB_THREAD_SUPPORT
-   HB_LWR_MUTEX s_ConsoleMutex;
+   HB_CRITICAL_T s_ConsoleMutex;
 #endif
 
 void hb_conInit( void )
@@ -100,9 +100,7 @@ void hb_conInit( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_conInit()"));
 
    #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_INIT( s_ConsoleMutex.Critical );
-      s_ConsoleMutex.nCount = 0;
-      s_ConsoleMutex.Locker = 0;
+      HB_CRITICAL_INIT( s_ConsoleMutex );
    #endif
 
 #if defined(OS_UNIX_COMPATIBLE) && !defined(HB_EOL_CRLF)
@@ -175,7 +173,7 @@ void hb_conRelease( void )
    s_bInit = FALSE;
 
    #ifdef HB_THREAD_SUPPORT
-       HB_CRITICAL_DESTROY( s_ConsoleMutex.Critical );
+       HB_CRITICAL_DESTROY( s_ConsoleMutex );
    #endif
 }
 
@@ -349,7 +347,7 @@ HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadLock( &s_ConsoleMutex );
+         HB_CRITICAL_LOCK( s_ConsoleMutex );
       }
    #endif
 
@@ -363,7 +361,7 @@ HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadUnlock( &s_ConsoleMutex );
+         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
       }
    #endif
 }
@@ -376,7 +374,7 @@ HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadLock( &s_ConsoleMutex );
+         HB_CRITICAL_LOCK( s_ConsoleMutex );
       }
    #endif
 
@@ -390,7 +388,7 @@ HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadUnlock( &s_ConsoleMutex );
+         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
       }
    #endif
 }
@@ -403,7 +401,7 @@ HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or pri
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadLock( &s_ConsoleMutex );
+         HB_CRITICAL_LOCK( s_ConsoleMutex );
       }
    #endif
 
@@ -419,7 +417,7 @@ HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or pri
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadUnlock( &s_ConsoleMutex );
+         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
       }
    #endif
 }
@@ -429,7 +427,7 @@ HB_FUNC( QOUT )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadLock( &s_ConsoleMutex );
+         HB_CRITICAL_LOCK( s_ConsoleMutex );
       }
    #endif
 
@@ -462,7 +460,7 @@ HB_FUNC( QOUT )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadUnlock( &s_ConsoleMutex );
+         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
       }
    #endif
 }
@@ -472,7 +470,7 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadLock( &s_ConsoleMutex );
+         HB_CRITICAL_LOCK( s_ConsoleMutex );
       }
    #endif
 
@@ -494,7 +492,7 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadUnlock( &s_ConsoleMutex );
+         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
       }
    #endif
 }
@@ -608,7 +606,7 @@ HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadLock( &s_ConsoleMutex );
+         HB_CRITICAL_LOCK( s_ConsoleMutex );
       }
    #endif
 
@@ -620,7 +618,7 @@ HB_FUNC( DEVPOS ) /* Sets the screen and/or printer position */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadUnlock( &s_ConsoleMutex );
+         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
       }
    #endif
 }
@@ -630,7 +628,7 @@ HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadLock( &s_ConsoleMutex );
+         HB_CRITICAL_LOCK( s_ConsoleMutex );
       }
    #endif
 
@@ -643,7 +641,7 @@ HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadUnlock( &s_ConsoleMutex );
+         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
       }
    #endif
 }
@@ -653,7 +651,7 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadLock( &s_ConsoleMutex );
+         HB_CRITICAL_LOCK( s_ConsoleMutex );
       }
    #endif
 
@@ -681,7 +679,7 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadUnlock( &s_ConsoleMutex );
+         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
       }
    #endif
 }
@@ -695,7 +693,7 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadLock( &s_ConsoleMutex );
+         HB_CRITICAL_LOCK( s_ConsoleMutex );
       }
    #endif
 
@@ -728,7 +726,7 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadUnlock( &s_ConsoleMutex );
+         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
       }
    #endif
 }
@@ -746,7 +744,7 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadLock( &s_ConsoleMutex );
+         HB_CRITICAL_LOCK( s_ConsoleMutex );
       }
    #endif
 
@@ -781,7 +779,7 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadUnlock( &s_ConsoleMutex );
+         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
       }
    #endif
 }
@@ -791,7 +789,7 @@ HB_FUNC( HBCONSOLELOCK )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadLock( &s_ConsoleMutex );
+         HB_CRITICAL_LOCK( s_ConsoleMutex );
       }
    #endif
 }
@@ -801,7 +799,7 @@ HB_FUNC( HBCONSOLEUNLOCK )
    #ifdef HB_THREAD_SUPPORT
       if( hb_ht_context )
       {
-         hb_threadUnlock( &s_ConsoleMutex );
+         HB_CRITICAL_UNLOCK( s_ConsoleMutex );
       }
    #endif
 }

@@ -30,9 +30,11 @@ PROCEDURE Main()
 
     @ 13, 10 SAY 'Cycle over, stopping Monitor     '
 
+    *StopThread( MonitorHandle, Mutex )
     StopThread( MonitorHandle )
-
     WaitforThreads()
+    DestroyMutex( Mutex )
+    @ 14, 10 SAY 'Program over     '
 
     @ 24, 00
 
@@ -46,9 +48,8 @@ PROCEDURE ThreadFunc( nRow, cName, nMax, Mutex )
       WaitForThis( nRow ) // calling a proc inside a thread
    NEXT
 
-   @ nRow, 10 SAY cName + ': DONE '+ space(20)
-
    Notify( Mutex, cName )
+   @ nRow, 10 SAY cName + ': DONE '+ space(20)
 
 RETURN
 

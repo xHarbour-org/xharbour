@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.17 2002/12/30 05:05:01 ronpinkas Exp $
+* $Id: thread.h,v 1.18 2002/12/30 19:43:59 ronpinkas Exp $
 */
 
 /*
@@ -100,17 +100,21 @@
     #define HB_THREAD_T                 pthread_t
     #define HB_THREAD_HANDLE            pthread_t
 
-    #define HB_CRITICAL_T               pthread_mutex_t
-    #define HB_CRITICAL_INIT( x )       pthread_mutex_init( &(x), NULL )
-    #define HB_CRITICAL_DESTROY( x )    pthread_mutex_destroy( &(x) )
-    #define HB_CRITICAL_LOCK( x )       pthread_mutex_lock( &(x) )
-    #define HB_CRITICAL_UNLOCK( x )     pthread_mutex_unlock( &(x) )
-
     #define HB_MUTEX_T                  pthread_mutex_t
     #define HB_MUTEX_INIT( x )          pthread_mutex_init( &(x), NULL )
     #define HB_MUTEX_DESTROY( x )       pthread_mutex_destroy( &(x) )
     #define HB_MUTEX_LOCK( x )          pthread_mutex_lock( &(x) )
     #define HB_MUTEX_UNLOCK( x )        pthread_mutex_unlock( &(x) )
+
+/** JC1:
+    To reactivate flat unix mutex, uncomment this section and comment HB_CRITICAL_T delarations below
+
+    #define HB_CRITICAL_T                  pthread_mutex_t
+    #define HB_CRITICAL_INIT( x )          pthread_mutex_init( &(x), NULL )
+    #define HB_CRITICAL_DESTROY( x )       pthread_mutex_destroy( &(x) )
+    #define HB_CRITICAL_LOCK( x )          pthread_mutex_lock( &(x) )
+    #define HB_CRITICAL_UNLOCK( x )        pthread_mutex_unlock( &(x) )
+**/
 
     #define HB_COND_T                   pthread_cond_t
     #define HB_COND_INIT( x )           pthread_cond_init( &(x), NULL )
@@ -169,25 +173,18 @@ typedef struct tag_HB_THREAD_PARAM
 typedef struct tag_HB_LWR_MUTEX
 {
     HB_THREAD_T Locker;
+/**JC: Warning; this is a test change */
+#if defined(HB_OS_WIN32)
     HB_CRITICAL_T Critical;
+#else
+    HB_MUTEX_T Critical;
+#endif
     int nCount;
 } HB_LWR_MUTEX;
-
-/* Forbidder mutex for xharbour */
-typedef struct tag_HB_FORBID_MUTEX
-{
-    HB_CRITICAL_T Control;
-    long lCount;
-} HB_FORBID_MUTEX;
 
 
 extern HB_STACK hb_stack_general;
 extern HB_THREAD_CONTEXT *hb_ht_context;
-/* Monitor for sync access to the context library */
-extern HB_CRITICAL_T hb_threadContextMutex;
-
-/* Monitor for sync useage of sequential VM processing */
-extern HB_LWR_MUTEX hb_internal_monitor;
 
 extern void hb_threadCreateContext( void );
 extern void hb_threadDestroyContext( void );
@@ -197,12 +194,68 @@ extern void hb_threadExit( void );
 extern HB_THREAD_CONTEXT *hb_threadGetCurrentContext( void );
 
 /* LWRM management */
+
+/* JC1: If we want flat mutex, this section should be uncommented
 extern void hb_threadLock( HB_LWR_MUTEX *m );
 extern void hb_threadUnlock( HB_LWR_MUTEX *m );
+*/
+
+/** AUTO reentrant mutex if using UNIX */
+/** JC1:
+    To reactivate flat unix mutex, Comment this section */
+#if !defined( HB_OS_WIN_32 )
+    #define HB_CRITICAL_T               HB_LWR_MUTEX
+    #define HB_CRITICAL_INIT( x )       \
+            { \
+               HB_MUTEX_INIT( x.Critical );    \
+               x.Locker = 0; \
+               x.nCount = 0; \
+            }
+
+    #define HB_CRITICAL_DESTROY( x )    HB_MUTEX_DESTROY( x.Critical )
+    #define HB_CRITICAL_LOCK( lpMutex )  \
+         { \
+            if ( lpMutex.Locker == HB_CURRENT_THREAD() )\
+            {\
+               lpMutex.nCount++;\
+            }\
+            else\
+            {\
+               HB_MUTEX_LOCK( lpMutex.Critical );\
+               lpMutex.nCount = 1;\
+               lpMutex.Locker = HB_CURRENT_THREAD();\
+            }\
+         }
+
+    #define HB_CRITICAL_UNLOCK( lpMutex ) \
+         {\
+            if ( lpMutex.Locker == HB_CURRENT_THREAD() )\
+            {\
+               lpMutex.nCount--;\
+               if ( lpMutex.nCount == 0 )\
+               {\
+                  lpMutex.Locker = 0;\
+                  HB_MUTEX_UNLOCK( lpMutex.Critical );\
+               }\
+            }\
+         }
+
+#endif
+
+/* Monitor for sync access to the context library */
+extern HB_CRITICAL_T hb_threadContextMutex;
+
+/* Forbidder mutex for xharbour */
+typedef struct tag_HB_FORBID_MUTEX
+{
+    HB_CRITICAL_T Control;
+    long lCount;
+} HB_FORBID_MUTEX;
 
 /* Forbidden mutex management */
 void hb_threadForbidenInit( HB_FORBID_MUTEX *Forbid );
 void hb_threadForbidenDestroy( HB_FORBID_MUTEX *Forbid );
 extern void hb_threadForbid( HB_FORBID_MUTEX * );
 extern void hb_threadAllow( HB_FORBID_MUTEX * );
+
 #endif

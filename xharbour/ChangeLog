@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.562 2002/12/30 19:53:39 horacioroldan Exp $
+ * $Id: ChangeLog,v 1.563 2002/12/31 00:58:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-12-31 08:05 UTC+0100 Giancarlo Niccolai <gian@niccolai.ws>
+
+  * include/thread.h
+    * Default HB_CRITICAL_LOCK for nonwindows systems has become Light
+      Weight Reentrant Mutex
+    * LWR lockinig Implemented as a macro
+      (you should make clean after update)
+
+  * source/rtl/console.c
+    * Using HB_CRITICAL_LOCK for locking console, as it is now defined
+      to be always reentrant.
+
+  * source/vm/garbage.c
+    * Using HB_CRITICAL_LOCK to lock GC, as it is now defined to be always
+      reentrant.
+    % Under linux, do not lock hb_gcGripGet/hb_gcGripDrop. This is a temporary
+      hack:is working but we must find out why this lock causes deadlocks
+      AND possibly sigsev, while removing it deadlock is gone and seg faults
+      are far less. Under windows this to be working, so I left that alone.
+
+  * source/vm/thread.c
+    ! Now mutex at PRG level are working again: CreateMutex() LockMutex() etc
+      are working again now.
+    + Now StopThread() can be given an optional second parameter that is a
+      mutex on which the target thread might be subscribing, so to release
+      it more cleanly. Just a finesse, but is nice to have it.
+
+  * tests/mtcomplex.prg
+    * The second StopThread() has been updated to use the new grammar.
 
 2002-12-30 16:56 UTC-0800 Ron Pinkas <ron@ronpinkas.com>
   * source/vm/arrayshb.c
