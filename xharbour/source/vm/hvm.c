@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.214 2003/06/20 18:25:39 ronpinkas Exp $
+ * $Id: hvm.c,v 1.216 2003/06/21 07:36:04 ronpinkas Exp $
  */
 
 /*
@@ -216,7 +216,7 @@ extern void hb_clsSetModule( USHORT uiClass );
    ULONG hb_ulOpcodesCalls[ HB_P_LAST_PCODE ]; /* array to profile opcodes calls */
    ULONG hb_ulOpcodesTime[ HB_P_LAST_PCODE ]; /* array to profile opcodes consumed time */
 
-   extern void hb_mthAddTime( void *, ULONG ); /* profiler from classes.c */
+   extern void hb_mthAddTime( PMETHOD, ULONG ); /* profiler from classes.c */
 #endif
 
 BOOL hb_bTracePrgCalls = FALSE; /* prg tracing is off */
