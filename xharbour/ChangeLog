@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1538 2003/10/01 18:00:22 paultucker Exp $
+ * $Id: ChangeLog,v 1.1539 2003/10/01 19:22:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -13,7 +13,7 @@
    * hrbdll.vc
    * tests/vcdll.bat
      - Removed all settings and settings' dependancy.
-     + Added missinf pplib modules.
+     + Added missing pplib modules.
 
 2003-10-01 14:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
    * source/rtl/dbdelim.prg
