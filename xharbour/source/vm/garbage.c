@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.12 2002/03/11 22:58:40 ronpinkas Exp $
+ * $Id: garbage.c,v 1.13 2002/03/15 04:24:21 ronpinkas Exp $
  */
 
 /*
@@ -392,6 +392,7 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asBlock.value;
       --pAlloc;
 
+      /* Check this block only if it was not checked yet */
       if( pAlloc->used == s_uUsedFlag )
       {
          HB_CODEBLOCK_PTR pCBlock = pItem->item.asBlock.value;
@@ -453,37 +454,30 @@ void hb_gcCollectAll( void )
          pAlloc = s_pLockedBlock;
          do
          {
-            // if not refrenced yet.
-            if( pAlloc->used == s_uUsedFlag )
+            /* it is not very elegant method but it works well */
+            if( pAlloc->pFunc == hb_gcGripRelease )
             {
-               /* it is not very elegant method but it works well */
-               if( pAlloc->pFunc == hb_gcGripRelease )
-               {
-                  hb_gcItemRef( ( HB_ITEM_PTR ) ( pAlloc + 1 ) );
-               }
-               else if( pAlloc->pFunc == hb_arrayReleaseGarbage )
-               {
-                  HB_ITEM FakedItem;
-
-                  (&FakedItem)->type = HB_IT_ARRAY;
-                  (&FakedItem)->item.asArray.value = ( PHB_BASEARRAY )( pAlloc + 1 );
-
-                  hb_gcItemRef( &FakedItem );
-               }
-               else if( pAlloc->pFunc == hb_codeblockDeleteGarbage )
-               {
-                  HB_ITEM FakedItem;
-
-                  (&FakedItem)->type = HB_IT_BLOCK;
-                  (&FakedItem)->item.asBlock.value = ( PHB_CODEBLOCK )( pAlloc + 1 );
-
-                  hb_gcItemRef( &FakedItem );
-               }
-               else
-               {
-                  pAlloc->used ^= HB_GC_USED_FLAG;
-               }
+               hb_gcItemRef( ( HB_ITEM_PTR ) ( pAlloc + 1 ) );
             }
+            else if( pAlloc->pFunc == hb_arrayReleaseGarbage )
+            {
+               HB_ITEM FakedItem;
+
+               (&FakedItem)->type = HB_IT_ARRAY;
+               (&FakedItem)->item.asArray.value = ( PHB_BASEARRAY )( pAlloc + 1 );
+
+               hb_gcItemRef( &FakedItem );
+            }
+            else if( pAlloc->pFunc == hb_codeblockDeleteGarbage )
+            {
+               HB_ITEM FakedItem;
+
+               (&FakedItem)->type = HB_IT_BLOCK;
+               (&FakedItem)->item.asBlock.value = ( PHB_CODEBLOCK )( pAlloc + 1 );
+
+               hb_gcItemRef( &FakedItem );
+            }
+
             pAlloc = pAlloc->pNext;
 
          } while ( s_pLockedBlock != pAlloc );
@@ -497,8 +491,10 @@ void hb_gcCollectAll( void )
       {
          if( s_pCurrBlock->used == s_uUsedFlag )
          {
-           /* call the cleanup function */
+           /* Mark for deletion. */
            s_pCurrBlock->used |= HB_GC_DELETE;
+
+           /* call the cleanup function. */
            if( s_pCurrBlock->pFunc )
            {
               HB_TRACE( HB_TR_INFO, ( "Cleanup, %p", s_pCurrBlock ) );
