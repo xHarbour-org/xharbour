@@ -806,7 +806,7 @@ FUNCTION PP_ExecProcID( nProc, aParams )
     s_xRet := NIL
     s_aParams := aParams
 
-    TraceLog()
+    //TraceLog()
 
     PP_ExecProcedure( s_aProcedures, nProc )
 
