@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.62 2004/02/05 12:44:17 andijahja Exp $
+ * $Id: genc.c,v 1.63 2004/02/06 12:55:17 andijahja Exp $
  */
 
 /*
@@ -850,7 +850,7 @@ static void hb_compGenCCheckInLineStatic( char *str )
 
       while( ( pCode = strchr( str, ')' ) ) == NULL && ++i < ulLen ) {}
 
-      *( pCode - 1 ) = '\0';
+      *pCode = '\0';
 
       pStatSymCurrent = hb_compCStatSymList( pStatSymCurrent, pTmp );
 
