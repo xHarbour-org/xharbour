@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.7 2003/02/18 17:15:41 lculik Exp $
+ * $Id: tmysql.prg,v 1.8 2003/02/20 02:33:15 lculik Exp $
  */
 
  /*
@@ -238,9 +238,9 @@ METHOD MakePrimaryKeyWhere() CLASS TMySQLRow
 
          // if a part of a primary key has been changed, use original value
          if ::aDirty[ HB_EnumIndex() ]
-            cWhere += ClipValue2SQL( ::aOldValue[ HB_EnumIndex() ] )
+            cWhere += ClipValue2SQL( ::aOldValue[ HB_EnumIndex() ], aField[ MYSQL_FS_TYPE ] )
          else
-            cWhere += ClipValue2SQL( ::aRow[ HB_EnumIndex() ] )
+            cWhere += ClipValue2SQL( ::aRow[ HB_EnumIndex() ], aField[ MYSQL_FS_TYPE ] )
          endif
 
          cWhere += " AND "
@@ -470,7 +470,7 @@ return ::nCurRow - nOldRow
 METHOD GetRow( nRow, loRow, lSkip ) CLASS TMySQLQuery
 
    local cType, xField
-   local cDateFormat := Lower( Set( 4 ) )
+//   local cDateFormat := Lower( Set( 4 ) )
 
    default loRow to ::loRow
    default nRow  to ::nCurRow
@@ -541,7 +541,7 @@ METHOD GetRow( nRow, loRow, lSkip ) CLASS TMySQLQuery
                case "D"
                   if Empty(xField)
                      xField := CToD( "" )
-
+/*
                   elseif cDateFormat = 'mm-dd-yyyy' // USA
                      xField := ctod(substr(xField,6,2)+"-"+right(xField,2,0)+ "-" + Left(xField, 4))
 
@@ -564,7 +564,10 @@ METHOD GetRow( nRow, loRow, lSkip ) CLASS TMySQLQuery
                      xField :=  ctod(substr(xField,6,2)+"/"+right(xField,2,0)+ "/" + Left(xField, 4))
                   else
                      xField := "''"
-
+*/
+                  else
+                     // MySQL Date format YYYY-MM-DD
+                     xField := SToD( Left( xField, 4 ) + substr( xField, 6, 2 ) + right( xField, 2 ) )
                   endif
                   exit
 
@@ -1105,7 +1108,7 @@ METHOD MakePrimaryKeyWhere() CLASS TMySQLTable
 
          // if a part of a primary key has been changed, use original value
 
-            cWhere += ClipValue2SQL( ::aOldValue[ HB_EnumIndex() ]  )
+            cWhere += ClipValue2SQL( ::aOldValue[ HB_EnumIndex() ], ::FieldType(HB_EnumIndex()) )
 
          cWhere += " AND "
       endif
@@ -1530,7 +1533,7 @@ return aStruct
 static function ClipValue2SQL(Value, cType)
 
    local cValue := ""
-   local cDateFormat := Lower( Set( 4 ) )
+//   local cDateFormat := Lower( Set( 4 ) )
 
    Default cType to ValType( Value )
 
@@ -1542,7 +1545,9 @@ static function ClipValue2SQL(Value, cType)
 
       case "D"
          if !Empty( Value )
-
+            // MySQL dates are like YYYY-MM-DD or YYYYMMDD
+            cValue := "'" + Transform( Dtos( Value ), "@R 9999-99-99" ) + "'"
+/*
             if cDateFormat == 'mm-dd-yyyy' // USA
                cValue := "'"+PadL(Month(Value), 2, "0") + '-'+ PadL(Day(Value), 2, "0") + "-" + Str(Year(Value), 4) + "'"
             elseif  cDateFormat == 'dd/mm/yyyy' // BRITISH ou FRENCH
@@ -1559,7 +1564,7 @@ static function ClipValue2SQL(Value, cType)
             elseif cDateFormat == 'mm/dd/yyyy' // AMERICAN
                cValue := "'"+Str(Year(Value), 4)     + "/" + PadL(Month(Value), 2, "0") + "/" + PadL(Day(Value), 2, "0") + "'"
             endif
-
+*/
          else
             cValue := "''"
          endif
