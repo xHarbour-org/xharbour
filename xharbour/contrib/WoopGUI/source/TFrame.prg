@@ -42,7 +42,7 @@ CLASS TFrame FROM TWindow
     METHOD SetTitle( cTitle ) INLINE ::SetValue( cTitle )
 
     METHOD OnCreate()
-    METHOD OnDestroy()
+    METHOD OnDestroy() VIRTUAL
     METHOD WindowProc()
 
     // Hidden methods
@@ -127,13 +127,6 @@ METHOD OnCreate() CLASS TFrame
    ENDIF
 RETURN nRet
 
-
-METHOD OnDestroy() CLASS TFrame
-   LOCAL nRet := -1
-   WG_DebugTrace( "TFrame:OnDestroy()", "Self", Self )
-   PostQuitMessage( 0 )
-   nRet := 0
-RETURN nRet
 
 METHOD WindowProc( nMsg, wParam, lParam ) CLASS TFrame
    LOCAL nRet := -1

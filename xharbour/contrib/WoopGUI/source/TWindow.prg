@@ -193,7 +193,7 @@ CLASS TWindow FROM TWindowBase
     METHOD OnNotify()                       VIRTUAL // FSG - to be implemented
 
 //    METHOD OnPaint()                        VIRTUAL // FSG - to be implemented
-
+   METHOD OnGetMinMaxInfo()                 VIRTUAL
    METHOD OnPaint()                 ;
           INLINE ;
             ::hDC := BeginPaint(::nHandle, ::cPaint),     ;
@@ -643,6 +643,8 @@ METHOD WindowProc( nMsg, wParam, lParam ) CLASS TWindow
        *  Any method can return nil to get the default message processing.
        */
       DO CASE
+         CASE nMsg == WM_GETMINMAXINFO
+              ::OnGetMinMaxInfo(lParam)
          CASE nMsg == WM_ACTIVATE
               WG_DebugTrace( "TWindow:WindowProc() - WM_ACTIVATE - ::OnActivate", "Self", Self )
               nRet := ::OnActivate(wParam, lParam)
@@ -964,7 +966,6 @@ FUNCTION W_WndEvents( hWnd, nMsg, wParam, lParam )
          *CASE nMsg == WM_EXITSIZEMOVE
          *CASE nMsg == WM_GETFONT
          *CASE nMsg == WM_GETICON
-         *CASE nMsg == WM_GETMINMAXINFO
          *CASE nMsg == WM_GETTEXT
          *CASE nMsg == WM_GETTEXTLENGTH
          *CASE nMsg == WM_INPUTLANGCHANGE
