@@ -1,5 +1,5 @@
 /*
- * $Id: todbc.prg,v 1.3 2003/10/13 03:37:28 lculik Exp $
+ * $Id: todbc.prg,v 1.5 2005/01/08 20:57:14 ptsarenko Exp $
  */
 /*
  * Harbour Project source code:
@@ -143,7 +143,7 @@ CLASS TODBC FROM HBClass
    METHOD CLOSE()
 
    METHOD LoadData()
-   METHOD ClearData()
+   METHOD ClearData() INLINE ( AEVAL(::Fields, {|oField| oField:Value := nil}) )
    METHOD FieldByName( cField )
 
    METHOD Fetch( nFetchType, nOffSet )
@@ -404,6 +404,14 @@ METHOD Open() CLASS TODBC
 
         ::nRecCount := len(::aRecordSet)
     
+      ELSE
+
+         if ::First() == SQL_SUCCESS
+            ::nRecCount := 1
+         else
+            ::nRecCount := 0
+         endif
+
       ENDIF
 
       // Newly opened recordset - we are on first row
@@ -551,7 +559,8 @@ METHOD Fetch( nFetchType, nOffset ) CLASS TODBC
      ENDCASE
 
    ELSE           // apearently we don't have
-     nResult := SQLFetch( ::hStmt /*, nFetchType, nOffSet */)
+//     nResult := SQLFetch( ::hStmt /*, nFetchType, nOffSet */)
+     nResult := SQLExtende( ::hStmt, nFetchType, nOffSet, @nRows, 0 )
        
    ENDIF
 
@@ -576,6 +585,9 @@ METHOD NEXT () CLASS TODBC
    nResult := ::Fetch( SQL_FETCH_NEXT, 1 )
    if nResult == SQL_SUCCESS
      ::nRecno := ::nRecno + 1
+     if ::nRecNo > ::nRecCount
+        ::nRecCount := ::nRecNo
+     endif
    elseif ( nResult == SQL_NO_DATA_FOUND ) .AND. ( ::nRecNo==::nRecCount ) // permit skip on last row, so that EOF() can work properly
      ::nRecno := ::nRecno + 1
    else
@@ -741,55 +753,44 @@ METHOD LoadData(nPos) CLASS TODBC
      ELSE
      
         SQLGetData( ::hStmt, ::Fields[ i ]:FieldID, SQL_CHAR, len( uData ), @uData)
+        nType := ::Fields[ i ]:DataType
 
-     ENDIF
-     nType := ::Fields[ i ]:DataType
 
-     do case
-     case nType == SQL_LONGVARCHAR
-        uData := AllTrim( uData )
+        do case
+        case nType == SQL_LONGVARCHAR
+           uData := AllTrim( uData )
 
-     case nType == SQL_CHAR .or. nType == SQL_VARCHAR .or. nType == SQL_NVARCHAR
-        uData := PadR( uData, ::Fields[ i ]:DataSize )
+        case nType == SQL_CHAR .or. nType == SQL_VARCHAR .or. nType == SQL_NVARCHAR
+           uData := PadR( uData, ::Fields[ i ]:DataSize )
 
-     case nType == SQL_TIMESTAMP .or. nType == SQL_DATE
-        uData := stod( substr(uData,1,4) + substr(uData,6,2) + substr(uData,9,2) )
+        case nType == SQL_TIMESTAMP .or. nType == SQL_DATE
+           uData := stod( substr(uData,1,4) + substr(uData,6,2) + substr(uData,9,2) )
 
-     case nType == SQL_BIT .or. nType == SQL_SMALLINT
-        uData = Val( uData ) == 1
+        case nType == SQL_BIT
+           uData = Val( uData ) == 1
 
-     case  nType == SQL_NUMERIC;
+        case nType == SQL_NUMERIC;
          .or. nType == SQL_DECIMAL;
          .or. nType == SQL_DOUBLE;
-         .or. nType == SQL_INTEGER;
+         .or. nType == SQL_TINYINT;
+         .or. nType == SQL_SMALLINT;
          .or. nType == SQL_INTEGER;
          .or. nType == SQL_FLOAT;
          .or. nType == SQL_REAL
-         IF VALTYPE(UDATA) =="C" 
-            udata := strtran(uData,",",".")
-            uData := Round( Val(uData), ::Fields[ i ]:DataSize )
-         ENDIF      
+            IF VALTYPE(uData) =="C" 
+               uData := strtran(uData,",",".")
+               uData := Round( Val(uData), ::Fields[ i ]:DataSize )
+            ENDIF      
             uData := SetNumLen( uData, ::Fields[ i ]:DataSize ,::Fields[ i ]:DataDecs   )
        
-     endcase
+        endcase
+
+     ENDIF
      
-   ::Fields[ i ]:Value := uData
+     ::Fields[ i ]:Value := uData
    
    next
    
-
-RETURN ( NIL )
-
-/*-----------------------------------------------------------------------*/
-// Clears the Fields collection
-
-METHOD ClearData() CLASS TODBC
-
-   LOCAL i
-
-   FOR i := 1 TO len( ::Fields )
-      ::Fields[ i ] :Value := NIL
-   NEXT
 
 RETURN ( NIL )
 

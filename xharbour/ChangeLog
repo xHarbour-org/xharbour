@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3718 2005/01/06 12:17:26 modalsist Exp $
+ * $Id: ChangeLog,v 1.3720 2005/01/08 13:00:00 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-08 13:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  ! Changelog
+    ! Restored 1.3714 entries
+  ! source/odbc/todbc.prg
+    ! Fixed :LoadData() method and data fetch for non-cached recordsets
+      Thanks to EMG and Gianluca Piemonte
 
 2006-01-07 06:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gtwin/gtwin.c
@@ -43,6 +50,10 @@
 2005-01-04 23:20 UTC-300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/ct/diskutil.prg
     ! Fixed FileValid() function. Thanks to Fabio Nery for report.
+
+2005-01-04 17:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  * source/rtl/gtapi.c
+    % hb_gtWrite and hb_gtWriteAt optimization
 
 2005-01-04 02:20 UTC-300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/vm/memvars.c
