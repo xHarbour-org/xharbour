@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2003 Giancarlo Niccolai
-* $Id: tipmail.prg,v 1.1 2003/12/02 04:08:07 jonnymind Exp $
+* $Id: tipmail.prg,v 1.2 2003/12/06 15:08:10 lculik Exp $
 ************************************************/
 
 #include "hbclass.ch"
@@ -101,6 +101,7 @@ METHOD SetBody( cBody ) CLASS TipMail
    ::hHeaders[ "Content-Length" ] := Ltrim( Str( Len( cBody ) ) )
 RETURN .T.
 
+
 METHOD GetBody() CLASS TipMail
    IF ::cBody == NIL
       RETURN NIL
@@ -108,7 +109,6 @@ METHOD GetBody() CLASS TipMail
       RETURN ::oEncoder:Decode( ::cBody )
    ENDIF
 RETURN ::cBody
-
 
 
 METHOD GetFieldPart( cPart ) CLASS TipMail
@@ -231,9 +231,9 @@ METHOD ToString() CLASS TipMail
    LOCAL cRet := ""
 
    // this is a multipart message; we need a boundary
-	 IF Len( ::aAttachments ) > 0
-	   ::hHeaders["Mime-Version"] :="1.0"
-	 endif	
+    IF Len( ::aAttachments ) > 0
+      ::hHeaders["Mime-Version"] :="1.0"
+    endif
 
    IF Len( ::aAttachments ) > 0
       //Reset failing content type
@@ -275,9 +275,9 @@ METHOD ToString() CLASS TipMail
    IF "Subject" IN ::hHeaders
       cRet+= "Subject: "+ ::hHeaders[ "Subject"] + e"\r\n"
    ENDIF
-	 IF Len( ::aAttachments ) > 0
-	   cRet+= "Mime-Version:" + ::hHeaders["Mime-Version"] + e"\r\n"
-	 endif	
+    IF Len( ::aAttachments ) > 0
+      cRet+= "Mime-Version:" + ::hHeaders["Mime-Version"] + e"\r\n"
+    endif
 
    FOR i := 1 TO Len( ::hHeaders )
       cElem := Lower(HGetKeyAt( ::hHeaders, i ))
@@ -424,8 +424,14 @@ METHOD FromString( cMail, cBoundary, nPos ) CLASS TipMail
          ENDIF
          // I must stay on the boundary found by the subsection to
          // enter in this part of the loop again.
+
       ELSE
-         nPos := nLinePos + 2
+         //nPos := nLinePos + 2
+         /* 04/05/2004 - <maurilio.longo@libero.it>
+            Instead of testing every single line of mail until we find next boundary, if there is a boundary we
+            jump to it immediatly, this saves thousands of EOL test and makes splitting of a string fast
+         */
+         nPos := iif( ! Empty(cSubBoundary), At("--" + cSubBoundary, cMail, nPos ), iif( ! Empty(cBoundary), At("--" + cBoundary, cMail, nPos ), nLinePos + 2 ))
       ENDIF
 
       nLinePos := At( e"\r\n", cMail, nPos )

@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.29 2004/03/23 10:00:31 mauriliolongo Exp $
+ * $Id: Changelog,v 1.30 2004/04/05 13:32:47 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-05-04 16:45 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * Rules.make
+    + added C_USR=-DTCPV40HDRS to use 16/32 tcp/ip stack on OS/2 (standard on OS/2 until eComStation and v5.x)
+  * ticlientpop.prg
+    * changed the way a mail gets ::Retreived(), so much faster now.
+    + Added Top(), Noop() and UIDL() methods
+  * tipmail.prg
+    * changed ::fromstring() method where it looks for multipart messages, now it is so fast you simply can't
+      follow it anymore, hope it is still correct though :) (I've done several tests and I'm using it in
+      an in-house utility, so should be ok)
 
 2004-04-05 15:40 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/tin.it>
   * Makefile

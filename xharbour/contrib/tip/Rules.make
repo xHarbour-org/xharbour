@@ -1,6 +1,6 @@
 #
 # Rules for making a generic xharbour library or program
-# $Id: Rules.make,v 1.7 2004/02/07 16:03:12 jonnymind Exp $
+# $Id: Rules.make,v 1.8 2004/03/23 10:00:31 mauriliolongo Exp $
 #
 # (C) Giancarlo Niccolai 2003
 #
@@ -75,6 +75,7 @@ ifeq ($(HB_ARCHITECTURE),OS2)
    endif	
    GT_LIBS=-l$(HB_GT_LIB) -lsocket
    EXE_EXT=.exe
+   C_USR=-DTCPV40HDRS 
 endif
 
 
