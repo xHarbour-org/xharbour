@@ -137,7 +137,7 @@ FUNCTION FT_CALENDAR (nRow, nCol, cColor, lShadow, lShowHelp)
 
  IF lShadow
     @nRow-1,nCol-1 to nRow+2, nCol+15
-    FT_SHADOW( nRow-1, nCol-1, nRow+2, nCol+15 )
+    hb_shadow( nRow-1, nCol-1, nRow+2, nCol+15 )
  ENDIF
 
  IF lShowHelp

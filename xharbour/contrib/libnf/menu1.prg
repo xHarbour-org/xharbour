@@ -392,7 +392,7 @@ FUNCTION FT_MENU1( aBar, aOptions, aColors, nTopRow, lShadow )
       SETCOLOR( cCurrent )
       @  nTopRow, aBarCol[nHpos] SAY aBar[nHpos]
       IF lShadow == NIL .OR. lShadow
-         FT_SHADOW( nTopRow+1, aBoxLoc[nHpos], LEN(aChoices[nHpos,1])+nTopRow+2, aBarWidth[nHpos]+3+aBoxLoc[nHpos] )
+         hb_shadow( nTopRow+1, aBoxLoc[nHpos], LEN(aChoices[nHpos,1])+nTopRow+2, aBarWidth[nHpos]+3+aBoxLoc[nHpos] )
       ENDIF
       SETCOLOR( cBorder )
       @  nTopRow+1, aBoxLoc[nHpos], LEN(aChoices[nHpos,1])+nTopRow+2, aBarWidth[nHpos]+3+aBoxLoc[nHpos] BOX "赏缓纪群 "
@@ -462,7 +462,7 @@ STATIC FUNCTION _ftBailOut( cBorder, cBox )
    nOldCursor := SETCURSOR( SCNONE )
    sOldScreen := SAVESCREEN(nMaxRow/2-1, 24, nMaxRow/2+2, 55)
    cOldColor := SETCOLOR( cBorder )
-   FT_SHADOW( nMaxRow/2-1, 24, nMaxRow/2+2, 55 )
+   hb_shadow( nMaxRow/2-1, 24, nMaxRow/2+2, 55 )
    @ nMaxRow/2-1, 24, nMaxRow/2+2, 55 BOX "赏缓纪群 "
    SETCOLOR( cBox )
    @ nMaxRow/2,  26 SAY "Press ESCape To Confirm Exit"
