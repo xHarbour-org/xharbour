@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.47 2003/02/12 13:23:49 lculik Exp $
+ * $Id: hbmake.prg,v 1.48 2003/02/23 22:15:41 lculik Exp $
  */
 /*
  * Harbour Project source code:
@@ -1122,9 +1122,9 @@ FUNC CreateMakeFile( cFile )
    @ 12,  1 GET lExternalLib checkbox caption s_aLangMessages[ 40 ] style "[o ]"
    @ 12, 40 GET lXFwh checkbox caption "Xharbour FWH" style "[o ]"
    @ 13,  1 SAY "Resource file Name"                                           GET CResName
-   @ 13,  1 SAY s_aLangMessages[ 43 ]                                            GET nFilestoAdd  PICT "99"   VALID nFilestoAdd > 0
-   @ 14,  1 GET lMt checkbox caption s_aLangMessages[ 44 ] style "[o ]"
-   @ 14, 40 SAY s_aLangMessages[ 46 ] GET nWarningLevel Pict "9"
+   @ 14,  1 SAY s_aLangMessages[ 43 ] GET nFilestoAdd  PICT "99"   VALID nFilestoAdd > 0
+   @ 15,  1 GET lMt checkbox caption s_aLangMessages[ 44 ] style "[o ]"
+   @ 15, 40 SAY s_aLangMessages[ 46 ] GET nWarningLevel Pict "9"
    READ
 
    IF ! Empty( cUserDef )
