@@ -15,7 +15,7 @@ METHOD New( oParent ) CLASS TPanel
    ::WndProc   := 'FormProc'
    ::Msgs      := -1
    ::FrameWnd  := .F.
-   ::Style     := WS_POPUP + WS_CAPTION + DS_MODALFRAME + WS_VISIBLE + DS_ABSALIGN
+   ::Style     := WS_OVERLAPPEDWINDOW
    ::FormType  := RCF_DIALOG
    ::lRegister := .f.
    ::lControl  := .F.
