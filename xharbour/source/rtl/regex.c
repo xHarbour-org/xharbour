@@ -6642,9 +6642,11 @@ int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase )
       strncpy( sRegEx, "(?i)", 4 );
       iLenResult = 4;
    }
-
-   strncpy( sRegEx, "\\b", 2 );
-   iLenResult = 2;
+   else
+   {
+      strncpy( sRegEx, "\\b", 2 );
+      iLenResult = 2;
+   }
 
    for( i = 0; i < iLen; i++ )
    {
