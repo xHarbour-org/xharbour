@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2184 2004/01/30 08:49:17 paultucker Exp $
+ * $Id: ChangeLog,v 1.2185 2004/01/30 09:42:17 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-01-30 13:55 UTC-0300 Mauricio Abre <maurifull@datafull.com>
+  * source/rtl/gtalleg/ssf.h
+  * source/rtl/gtalleg/gtalleg.c
+    ! Don't try X Windows modes if Allegro was compiled only for FB use
+
 2004-01-30 16:40 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
    * source/rdd/dbf1.c
    * source/rdd/dbcmd.c

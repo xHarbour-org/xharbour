@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.8 2004/01/30 02:06:31 druzus Exp $
+ * $Id: gtalleg.c,v 1.9 2004/01/30 02:29:48 maurifull Exp $
  */
 
 /*
@@ -971,7 +971,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
    iHeight = s_byFontSize * usRows;
    if ( usRows > 11 && usCols > 23 && usRows < 129 && usCols < 257 )
    {
-#if defined(ALLEGRO_UNIX) | defined(ALLEGRO_LINUX)
+#if defined(AL_GFX_XWINDOWS)
       HB_TRACE(HB_TR_DEBUG, ("trying X DGA2 mode"));
       iRet = al_set_gfx_mode( AL_GFX_XDGA2, iWidth, iHeight, 0, 0 );
       if ( iRet != 0 )

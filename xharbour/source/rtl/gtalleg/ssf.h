@@ -1,5 +1,5 @@
 /*
- * $Id: ssf.h,v 1.4 2004/01/22 02:58:01 maurifull Exp $
+ * $Id: ssf.h,v 1.5 2004/01/28 04:14:34 maurifull Exp $
  */
 
 /*
@@ -66,9 +66,11 @@
 #ifndef AL_GFX_NONE
 #define AL_GFX_NONE GFX_NONE
 #define AL_GFX_SAFE GFX_SAFE
+#ifdef GFX_XWINDOWS
 #define AL_GFX_XDGA GFX_XDGA
 #define AL_GFX_XDGA2 GFX_XDGA2
 #define AL_GFX_XWINDOWS GFX_XWINDOWS
+#endif
 #define AL_GFX_VBEAF GFX_VBEAF
 #define AL_GFX_FBCON GFX_FBCON
 #define AL_GFX_AUTODETECT_WINDOWED GFX_AUTODETECT_WINDOWED
