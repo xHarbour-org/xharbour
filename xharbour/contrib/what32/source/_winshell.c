@@ -204,13 +204,11 @@ HB_FUNC( EXTRACTICONEX )
 //-----------------------------------------------------------------------------
 // SHSTDAPI_(int) SHFileOperationA(LPSHFILEOPSTRUCTA lpFileOp);
 
-/*
 HB_FUNC( SHFILEOPERATION )
 {
-   hb_retni( SHFileOperation( (LPSHFILEOPSTRUCTA) hb_parc( 1 ) ) ) ;
+   SHFILEOPSTRUCT *sfo = (SHFILEOPSTRUCT *) hb_param(1, HB_IT_STRING)->item.asString.value;
+   hb_retni( SHFileOperation( sfo ) ) ;
 }
-
-*/
 
 //-----------------------------------------------------------------------------
 // SHSTDAPI_(void) SHFreeNameMappings(HANDLE hNameMappings);
