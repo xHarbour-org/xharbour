@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.84 2004/07/27 22:35:29 kaddath Exp $
+ * $Id: tbrowse.prg,v 1.85 2004/08/04 12:34:07 mauriliolongo Exp $
  */
 
 /*
@@ -236,6 +236,7 @@ CLASS TBrowse
    METHOD CheckRowsToBeRedrawn()
    METHOD CheckRowPos()
    METHOD AColInfo()
+   METHOD PerformStabilization()          // "Real" stabilization procedure
 
    DATA aRect                             // The rectangle specified with ColorRect()
    DATA aRectColor                        // The color positions to use in the rectangle specified with ColorRect()
@@ -278,7 +279,6 @@ CLASS TBrowse
    DATA aColsInfo                         // Columns configuration array
    DATA nVisWidth                         // Visible width of Browser
    DATA lConfigured                       // Specifies whether tBrowse is already configured or not
-   DATA lForceStable                      // if .T. ::Stabilize() doesn't exit at every stage of stabilization
 
    DATA cSpacePre                         // Blank Space prior to first column
    DATA cSpaceLast                        // Blank space after the last column
@@ -372,7 +372,6 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::cSpaceLast      := ''
    ::cSpaceWidth     := ''
    ::lRect           := .f.
-   ::lForceStable    := .F.
 
    Return Self
 
@@ -1680,16 +1679,17 @@ METHOD CheckRowPos() CLASS TBrowse
 //-------------------------------------------------------------------//
 
 METHOD ForceStable() CLASS TBrowse
-
-   ::lForceStable := .T.
-   ::Stabilize()
-   ::lForceStable := .F.
-
+   ::PerformStabilization( .T. )
    Return self
 
 //-------------------------------------------------------------------//
 
 METHOD Stabilize() CLASS TBrowse
+   Return ::PerformStabilization( .F. )
+
+//-------------------------------------------------------------------//
+
+METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    LOCAL nOldCursor                    // Current shape of cursor (which I remove before stabilization)
    LOCAL colorSpec
    LOCAL nRowToDraw
@@ -1763,13 +1763,13 @@ METHOD Stabilize() CLASS TBrowse
          // Exit first stage of stabilization
          //
          SetCursor( nOldCursor )
-         if ! ::lForceStable
+         if ! lForceStable
             return .F.
          endif
 
       endif
 
-      if ! ::lForceStable
+      if ! lForceStable
          //  Draw browse row-by-row
          //
          if ( nRowToDraw := ascan( ::aRedraw, .t. ) ) <> 0

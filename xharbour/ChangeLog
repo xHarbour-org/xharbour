@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3273 2004/08/04 23:25:09 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.3274 2004/08/04 23:50:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-08-04 19:46 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/tbrowse.prg
+    * ::ForceStable() and ::Stabilize() are now "front ends" for
+      ::PerformStabilization(), which receives lForceStable flag,
+      instead using a "global variable" (instance).
 
 2004-08-04 16:50 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * include/hbclass.ch
