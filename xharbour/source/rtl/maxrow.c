@@ -1,5 +1,5 @@
 /*
- * $Id: maxrow.c,v 1.1.1.1 2001/12/21 10:41:48 ronpinkas Exp $
+ * $Id: maxrow.c,v 1.3 2004/10/23 23:00:00 oh1 Exp $
  */
 
 /*
@@ -8,8 +8,12 @@
  *
  * Copyright 1999 David G. Holm <dholm@jsd-llc.com>
  * www - http://www.harbour-project.org
+ *
  * 2004 ptucker added support for 'viewport' size
- * 
+ *
+ * Copyright 2004 Henryk Olkowski <oh1@op.pl>
+ *    Modify for CT3 Windows API
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2, or (at your option)
@@ -55,12 +59,27 @@
 #include "hbapigt.h"
 #include "gtinfo.ch"
 
+/****************************************************************************/
 HB_FUNC( MAXROW ) /* Return the maximum screen row number (zero origin) */
 {
+   if( hb_pcount() >= 1 && ISLOG( 1 ) && hb_parl( 1 ) )
+      hb_retni( hb_ctMaxRow( TRUE ) );
+   else
+      hb_retni( hb_gtMaxRow() );
+/*
    hb_retni( hb_parl(1) ? hb_gt_info(GTI_VIEWMAXHEIGHT,FALSE,0,NULL) : hb_gtMaxRow() );
+*/
 }
 
+/****************************************************************************/
 HB_FUNC( MAXCOL ) /* Return the maximum screen column number (zero origin) */
 {
+   if( hb_pcount() >= 1 && ISLOG( 1 ) && hb_parl( 1 ) )
+      hb_retni( hb_ctMaxCol( TRUE ) );
+   else
+      hb_retni( hb_gtMaxCol() );
+/*
    hb_retni( hb_parl(1) ? hb_gt_info(GTI_VIEWMAXWIDTH,FALSE,0,NULL) : hb_gtMaxCol() );
+*/
 }
+/****************************************************************************/

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.69 2004/09/21 02:40:40 paultucker Exp $
+ * $Id: gtwin.c,v 1.73 2004/10/23 23:00:00 paultucker Exp $
  */
 
 /*
@@ -1033,7 +1033,7 @@ void HB_GT_FUNC(gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT 
         BYTE * fpBlank = ( BYTE * ) hb_xgrab( iLength );
         BYTE * fpBuff = ( BYTE * ) hb_xgrab( iLength * 2 );
 
-        memset( fpBlank, ' ', iLength );
+        memset( fpBlank, hb_ctGetClearB(), iLength );
 
         iColOld = iColNew = usLeft;
         iColSize = iLength -1;
@@ -2349,8 +2349,8 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
          else
          {
             return GetConsoleTitle( (char *) vpParam, iParam );
-         }   
-      }   
+         }
+      }
 
       case GTI_VIEWMAXHEIGHT:
       {

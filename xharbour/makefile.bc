@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.116 2004/10/22 14:28:48 paultucker Exp $
+# $Id: makefile.bc,v 1.118 2004/10/23 23:00:00 oh1 Exp $
 #
 
 #
@@ -906,6 +906,7 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\ctpad.obj \
    $(CT_OBJ_DIR)\ctset.obj \
    $(CT_OBJ_DIR)\ctstr.obj \
+   $(CT_OBJ_DIR)\ctwin.obj \
    $(CT_OBJ_DIR)\dbftools.obj \
    $(CT_OBJ_DIR)\disk.obj \
    $(CT_OBJ_DIR)\exponent.obj \
@@ -918,6 +919,7 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\num1.obj \
    $(CT_OBJ_DIR)\numat.obj \
    $(CT_OBJ_DIR)\numlohi.obj \
+   $(CT_OBJ_DIR)\pack.obj \
    $(CT_OBJ_DIR)\pos1.obj \
    $(CT_OBJ_DIR)\pos2.obj \
    $(CT_OBJ_DIR)\posdiff.obj \
@@ -927,6 +929,7 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\remove.obj \
    $(CT_OBJ_DIR)\replace.obj \
    $(CT_OBJ_DIR)\screen1.obj \
+   $(CT_OBJ_DIR)\setclear.obj \
    $(CT_OBJ_DIR)\settime.obj \
    $(CT_OBJ_DIR)\strdiff.obj \
    $(CT_OBJ_DIR)\strswap.obj \
@@ -941,7 +944,6 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\color.obj \
    $(CT_OBJ_DIR)\ct.obj \
    $(CT_OBJ_DIR)\ctmisc.obj \
-   $(CT_OBJ_DIR)\ctwin.obj \
    $(CT_OBJ_DIR)\datetime.obj \
    $(CT_OBJ_DIR)\dattime2.obj \
    $(CT_OBJ_DIR)\dattime3.obj \
@@ -3252,6 +3254,9 @@ $(CT_OBJ_DIR)\numlohi.obj : $(CT_DIR)\numlohi.c
 $(CT_OBJ_DIR)\ctpad.obj : $(CT_DIR)\ctpad.c
   $(CC) $(CLIBFLAGS) -o$@ $**
 
+$(CT_OBJ_DIR)\pack.obj : $(CT_DIR)\pack.c
+  $(CC) $(CLIBFLAGS) -o$@ $**
+
 $(CT_OBJ_DIR)\pos1.obj : $(CT_DIR)\pos1.c
   $(CC) $(CLIBFLAGS) -o$@ $**
 
@@ -3277,6 +3282,9 @@ $(CT_OBJ_DIR)\replace.obj : $(CT_DIR)\replace.c
   $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(CT_OBJ_DIR)\screen1.obj : $(CT_DIR)\screen1.c
+  $(CC) $(CLIBFLAGS) -o$@ $**
+
+$(CT_OBJ_DIR)\setclear.obj : $(CT_DIR)\setclear.c
   $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(CT_OBJ_DIR)\settime.obj : $(CT_DIR)\settime.c
@@ -3336,10 +3344,7 @@ $(CT_OBJ_DIR)\cttime.c : $(CT_DIR)\cttime.prg
 $(CT_OBJ_DIR)\cttime.obj : $(CT_OBJ_DIR)\cttime.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(CT_OBJ_DIR)\ctwin.c : $(CT_DIR)\ctwin.prg
-   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
-
-$(CT_OBJ_DIR)\ctwin.obj : $(CT_OBJ_DIR)\ctwin.c
+$(CT_OBJ_DIR)\ctwin.obj : $(CT_DIR)\ctwin.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 $(CT_OBJ_DIR)\datetime.c : $(CT_DIR)\datetime.prg

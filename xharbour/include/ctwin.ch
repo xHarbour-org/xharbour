@@ -2,6 +2,8 @@
 *        Translations for CTWIN library                   *
 ***********************************************************
 
+#xcommand CTWINON =>
+/*
 #xcommand CTWINON =>;
  #xtranslate ACHOICE(       =>   ctw_ACHOICE(        ;;
  #xtranslate COL()          =>   ctw_COL()           ;;
@@ -24,8 +26,10 @@
  #xtranslate TBROWSENEW(    =>   ctw_TBROWSENEW(     ;;
  #xtranslate TBROWSEDB(     =>   ctw_TBROWSEDB(      ;;
  #xtranslate __AtPrompt(    =>   ctw___AtPrompt(
+*/
 
-
+#xcommand CTWINOFF =>
+/*
 #xcommand CTWINOFF =>;
  #xuntranslate ACHOICE(       => ;;
  #xuntranslate COL()          => ;;
@@ -48,3 +52,4 @@
  #xuntranslate TBROWSENEW(    => ;;
  #xuntranslate TBROWSEDB(     => ;;
  #xuntranslate __AtPrompt(    =>
+*/

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.123 2004/10/22 14:34:41 paultucker Exp $
+# $Id: makefile.vc,v 1.125 2004/10/23 23:00:00 oh1 Exp $
 #
 
 #
@@ -1081,6 +1081,7 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\bit1.obj \
    $(OBJ_DIR)$(MT)\bit2.obj \
    $(OBJ_DIR)$(MT)\bit3.obj \
+   $(OBJ_DIR)$(MT)\blank.obj \
    $(OBJ_DIR)$(MT)\charevod.obj \
    $(OBJ_DIR)$(MT)\charlist.obj \
    $(OBJ_DIR)$(MT)\charmirr.obj \
@@ -1101,18 +1102,21 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\ctpad.obj \
    $(OBJ_DIR)$(MT)\ctset.obj \
    $(OBJ_DIR)$(MT)\ctstr.obj \
+   $(OBJ_DIR)$(MT)\ctwin.obj \
    $(OBJ_DIR)$(MT)\dbftools.obj \
    $(OBJ_DIR)$(MT)\disk.obj \
    $(OBJ_DIR)$(MT)\exponent.obj \
    $(OBJ_DIR)$(MT)\files.obj \
    $(OBJ_DIR)$(MT)\finan.obj \
    $(OBJ_DIR)$(MT)\ftoc.obj \
+   $(OBJ_DIR)$(MT)\getsecrt.obj \
    $(OBJ_DIR)$(MT)\justify.obj \
    $(OBJ_DIR)$(MT)\keyset.obj \
    $(OBJ_DIR)$(MT)\misc1.obj \
    $(OBJ_DIR)$(MT)\num1.obj \
    $(OBJ_DIR)$(MT)\numat.obj \
    $(OBJ_DIR)$(MT)\numlohi.obj \
+   $(OBJ_DIR)$(MT)\pack.obj \
    $(OBJ_DIR)$(MT)\pos1.obj \
    $(OBJ_DIR)$(MT)\pos2.obj \
    $(OBJ_DIR)$(MT)\posdiff.obj \
@@ -1122,6 +1126,7 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\remove.obj \
    $(OBJ_DIR)$(MT)\replace.obj \
    $(OBJ_DIR)$(MT)\screen1.obj \
+   $(OBJ_DIR)$(MT)\setclear.obj \
    $(OBJ_DIR)$(MT)\settime.obj \
    $(OBJ_DIR)$(MT)\strdiff.obj \
    $(OBJ_DIR)$(MT)\strswap.obj \
@@ -1137,7 +1142,6 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\ct.obj \
    $(OBJ_DIR)$(MT)\ctmisc.obj \
    $(OBJ_DIR)$(MT)\cttime.obj \
-   $(OBJ_DIR)$(MT)\ctwin.obj \
    $(OBJ_DIR)$(MT)\datetime.obj \
    $(OBJ_DIR)$(MT)\dattime2.obj \
    $(OBJ_DIR)$(MT)\dattime3.obj \

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2004/03/04 00:27:39 likewolf Exp $
+# $Id: Makefile,v 1.1 2004/08/25 17:03:01 lf_sfnet Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -87,6 +87,7 @@ PRG_SOURCES=\
 	trig.prg \
 	valpos.prg \
 	video.prg \
+   wmove.prg \
 	wordone.prg \
 	wordonly.prg \
 	wordrepl.prg \
@@ -125,4 +126,3 @@ endif
 include $(TOP)$(ROOT)config/bin.cf
 
 endif
-

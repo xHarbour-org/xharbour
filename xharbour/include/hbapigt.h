@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.34 2004/08/06 02:25:35 maurifull Exp $
+ * $Id: hbapigt.h,v 1.36 2004/10/23 23:00:00 oh1 Exp $
  */
 
 /*
@@ -316,6 +316,73 @@ extern USHORT HB_EXPORT hb_gtFlushCursor( void );
 extern USHORT HB_EXPORT hb_gtSetColor( HB_GT_RGB * color );
 extern USHORT HB_EXPORT hb_gtGetColor( HB_GT_RGB * color );
 extern USHORT HB_EXPORT hb_gtSetBorder( HB_GT_RGB * color );
+
+/* New CT3 Windows GT API calls (oh1) */
+
+typedef struct _hb_gt_wnd
+{
+   SHORT           NCur;               // Window Number
+   SHORT           ShadowA;            // Windows Shadow Attribute
+
+   SHORT           BFRow;              // Wboard First Screen Row
+   SHORT           BFCol;              // Wboard First Screen Col
+   SHORT           BLRow;              // Wboard Last Screen Row
+   SHORT           BLCol;              // Wboard Last Screen Col
+
+   SHORT           WFRow;              // First Window Row
+   SHORT           WFCol;              // First Window Col
+   SHORT           WLRow;              // Last Window Row
+   SHORT           WLCol;              // Last Window Col
+   SHORT           WNRow;              // Number of Row
+   SHORT           WNCol;              // Number of Columns
+
+   void *          BufWB;              // Window Background Buffer
+   void *          BufWF;              // Window Foreground Buffer
+   void *          BufSB;              // Shadow Bottom Buffer
+   void *          BufSR;              // Shadow Right Buffer
+
+   SHORT           UFRow;              // Used First Window Row
+   SHORT           UFCol;              // Used First Window Column
+   SHORT           ULRow;              // Used Last Window Row
+   SHORT           ULCol;              // Used Last Window Column
+
+   SHORT           iRow;               // Current Row in Used Window Area
+   SHORT           iCol;               // Current Column in Used Window Area
+   BOOL            ScNone;             // Cursor invisible (out bounds)
+
+   USHORT          s_uiCursorStyle;    // GT API
+   USHORT          s_uiColorIndex;
+   int *           s_pColor;
+   HB_GT_GOBJECT * hb_gt_gobjects;
+   HB_GT_GOBJECT * hb_gt_gobjects_end;
+} HB_CT_WND;
+
+extern SHORT      HB_EXPORT hb_ctGetClearA( void );
+extern SHORT      HB_EXPORT hb_ctGetClearB( void );
+extern SHORT      HB_EXPORT hb_ctSetClearA( SHORT nClearA );
+extern SHORT      HB_EXPORT hb_ctSetClearB( SHORT nClearB );
+extern int        HB_EXPORT hb_ctSetCurColor( int iColor );
+extern SHORT      HB_EXPORT hb_ctSetPos( SHORT iRow, SHORT iCol );
+extern SHORT      HB_EXPORT hb_ctShadow( SHORT iTop, SHORT iLeft, SHORT iBottom, SHORT iRight, BYTE byAttr );
+extern SHORT      HB_EXPORT hb_ctMaxCol( BOOL lMode );
+extern SHORT      HB_EXPORT hb_ctMaxRow( BOOL lMode );
+extern SHORT      HB_EXPORT hb_ctWAClose( void );
+extern SHORT      HB_EXPORT hb_ctWBoard( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
+extern SHORT      HB_EXPORT hb_ctWCenter( BOOL WCen );
+extern SHORT      HB_EXPORT hb_ctWClose( void );
+extern HB_CT_WND* HB_EXPORT hb_ctWCurrent( void );
+extern SHORT      HB_EXPORT hb_ctWFormat( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
+extern void       HB_EXPORT hb_ctWFree( HB_CT_WND * wnd );
+extern void       HB_EXPORT hb_ctWMode( BOOL MFRow, BOOL MFCol, BOOL MLRow, BOOL MLCol );
+extern SHORT      HB_EXPORT hb_ctWMove( SHORT FRow, SHORT FCol );
+extern HB_CT_WND* HB_EXPORT hb_ctWNew( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
+extern SHORT      HB_EXPORT hb_ctWNum( void );
+extern SHORT      HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol, BOOL lDel );
+extern SHORT      HB_EXPORT hb_ctWSelect( SHORT iwnd );
+extern BOOL       HB_EXPORT hb_ctWSetMove( BOOL Mode );
+extern SHORT      HB_EXPORT hb_ctWSetShadow( SHORT nAttr );
+extern void       HB_EXPORT hb_ctWStack( SHORT ** Stac, SHORT * SMax );
+extern SHORT      HB_EXPORT hb_ctWStep( SHORT nRow, SHORT nCol );
 
 /* Private interface listed below. these are common to all platforms */
 
