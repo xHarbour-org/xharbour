@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.6 2003/11/28 10:39:25 jonnymind Exp $
+ * $Id: mainwin.c,v 1.7 2003/12/01 23:50:13 druzus Exp $
  */
 
 /*
@@ -69,10 +69,9 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
                     LPSTR lpCmdLine,          /* pointer to command line */
                     int iCmdShow )            /* show state of window */
 {
-   LPSTR pArgs = ( LPSTR ) LocalAlloc( LMEM_FIXED, strlen( lpCmdLine ) + 1 ), pArg = pArgs;
+   LPSTR pStart, pArgs = ( LPSTR ) LocalAlloc( LMEM_FIXED, strlen( lpCmdLine ) + 1 ), pArg = pArgs;
    char szAppName[ 250 ];
-
-   strcpy( pArgs, lpCmdLine );
+   BOOL bInQuotedParam;
 
    HB_TRACE(HB_TR_DEBUG, ("WinMain(%p, %p, %s, %d)", hInstance, hPrevInstance, lpCmdLine, iCmdShow));
 
@@ -83,41 +82,69 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
    hb_iCmdShow = iCmdShow;
 
    GetModuleFileName( hInstance, szAppName, 249 );
-   argv[ 0 ] = szAppName;
+   argv[ argc++ ] = szAppName;
 
-   if( * pArgs != 0 )
+   while (*lpCmdLine )
    {
-      argv[ ++argc ] = pArgs;
-   }
-
-   while( *pArg != 0 )
-   {
-      if( *pArg == ' ' )
-      {
-         *pArg++ = 0;
-         argc++;
-
-         while( *pArg == ' ' )
+     while (*lpCmdLine== ' ')  // Skip over any white space
+     {
+       lpCmdLine++ ;
+     }
+     if (*lpCmdLine)
+     {
+       pStart= NULL ;
+       bInQuotedParam= FALSE;
+       while (*lpCmdLine)
+       {
+         if (*lpCmdLine == '"')
          {
-            pArg++;
+           lpCmdLine++;
+           if ( bInQuotedParam )
+           {
+             *pArg = '\0';
+             if (pStart == NULL)
+             {
+               pStart = pArg;
+             }
+             pArg++;
+             break ;
+           }
+           else
+           {
+             bInQuotedParam = TRUE ;
+           }
          }
-
-         if( *pArg != 0 )
+         else if (*lpCmdLine== ' ')
          {
-            argv[ argc ] = pArg++;
+           if ( bInQuotedParam )
+           {
+             *pArg = *lpCmdLine++ ;
+             if (pStart == NULL)
+             {
+               pStart = pArg;
+             }
+             pArg++;
+           }
+           else
+           {
+             *pArg++ = '\0';
+             lpCmdLine++ ;
+             break ;
+           }
          }
          else
          {
-            argc--;
+           *pArg = *lpCmdLine++ ;
+           if (pStart == NULL)
+           {
+             pStart = pArg;
+           }
+           pArg++;
          }
-      }
-      else
-      {
-         pArg++;
-      }
+       }
+       argv[ argc++ ] = pStart ;
+     }
    }
-
-   argc++;
 
    hb_cmdargInit( argc, argv );
 
