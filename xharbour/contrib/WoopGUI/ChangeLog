@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6 2002/09/07 06:48:22 what32 Exp $
+ * $Id: ChangeLog,v 1.7 2002/09/07 22:13:30 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-09-07 22:01 UTC-0300 Augusto Infante <systems@quesoro.com>
+  * source/twindow.prg
+    * Modified Method OnPain to call beginPain creating hDC and calling Paint.
+    + Method Paint.
 
 2002-09-07 23:59 UTC +0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * source/CWindow.c
