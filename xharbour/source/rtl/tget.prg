@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.45 2003/04/30 07:11:56 ronpinkas Exp $
+ * $Id: tget.prg,v 1.46 2003/05/01 14:12:17 patrickmast Exp $
  */
 
 /*
@@ -378,8 +378,8 @@ METHOD Display( lForced ) CLASS Get
       xBuffer := SubStr( xBuffer, 1, ::DecPos - 2 ) + "-." + SubStr( xBuffer, ::DecPos + 1 )
    ENDIF
 
-   IF::HasScroll() .and. ::Pos != NIL
-      IF::nDispLen > 8
+   IF ::HasScroll() .and. ::Pos != NIL
+      IF ::nDispLen > 8
          ::nDispPos := Max( 1, Min( ::Pos - ::nDispLen + 4, ::nMaxLen - ::nDispLen + 1 ) )
       ELSE
          ::nDispPos := Max( 1, Min( ::Pos - int( ::nDispLen / 2 ), ::nMaxLen - ::nDispLen + 1 ) )
@@ -482,6 +482,7 @@ METHOD SetFocus() CLASS Get
    ::Original   := ::VarGet()
    ::type       := ValType( ::Original )
    ::buffer     := ::PutMask( ::VarGet(), .f. )
+   ::Picture    := ::cPicture
    ::changed    := .f.
    ::clear      := ( "K" IN ::cPicFunc .or. ::type == "N")
 //   ::nMaxLen    := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
@@ -718,6 +719,10 @@ METHOD overstrike( cChar ) CLASS Get
       ::buffer := ::PutMask( ::VarGet(), .t. )
    endif
 
+   if ::pos == 0
+      ::pos = 1
+   endif
+
    do while ! ::IsEditable( ::pos ) .and. ::pos <= ::nMaxEdit
       ::pos++
    enddo
@@ -782,6 +787,10 @@ METHOD Insert( cChar ) CLASS Get
    if ! ::lEdit
       ::lEdit  := .t.
       ::buffer := ::PutMask( ::VarGet(), .t. )
+   endif
+
+   if ::pos == 0
+      ::pos = 1
    endif
 
    do while ! ::IsEditable( ::pos ) .and. ::pos <= ::nMaxEdit
@@ -1134,7 +1143,7 @@ METHOD Input( cChar ) CLASS Get
          exit
 
       case "#"
-         if ! IsDigit( cChar ) .and. !( cChar == " " ) .and. !( cChar IN "+-" )
+         if ! IsDigit( cChar ) .and. !( cChar == " " ) .and. !( cChar IN ".+-" )
             cChar := ""
          endif
          exit
