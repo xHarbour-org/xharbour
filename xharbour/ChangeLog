@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3856 2005/02/22 11:00:07 jonnymind Exp $
+ * $Id: ChangeLog,v 1.3857 2005/02/22 22:26:39 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-02-22 18:45 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * xharbour/contrib/rdd_ads/adsmgmnt.c
+  * xharbour/contrib/rdd_ads/ads.ch
+    + Implemented AdsMgServerType() to determine OS ADS is running on
 
 2005-02-22 22:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/common/expropt2.c

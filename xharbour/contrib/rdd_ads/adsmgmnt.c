@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.5 2003/11/02 02:57:47 toninhofwi Exp $
+ * $Id: adsmgmnt.c,v 1.6 2004/03/18 04:07:29 ronpinkas Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ HB_FUNC( ADSMGCONNECT )
       //                                       ADSHANDLE   *phMgmtHandle );
       */
 
-   hb_retnl( AdsMgConnect( (UNSIGNED8 *) hb_parcx(1), (UNSIGNED8 *) hb_parcx(2), (UNSIGNED8 *) hb_parcx(3), &hMgmtHandle) );
+   hb_retnl( AdsMgConnect( (UNSIGNED8 *) hb_parcx(1), (UNSIGNED8 *) hb_parcx(2), (UNSIGNED8 *) hb_parcx(3), &hMgmtHandle ) );
 }
 
 HB_FUNC( ADSMGDISCONNECT )
@@ -84,7 +84,7 @@ HB_FUNC( ADSMGGETINSTALLINFO )
 {
    UNSIGNED32  ulRetVal;
    UNSIGNED16  usStructSize;
-   ADS_MGMT_INSTALL_INFO   stInstallInfo;
+   ADS_MGMT_INSTALL_INFO  stInstallInfo;
 
    usStructSize = sizeof( ADS_MGMT_INSTALL_INFO );
    ulRetVal = AdsMgGetInstallInfo( hMgmtHandle, &stInstallInfo, &usStructSize );
@@ -236,9 +236,9 @@ HB_FUNC( ADSMGGETACTIVITYINFO )
 
 HB_FUNC( ADSMGGETCOMMSTATS )
 {
-   UNSIGNED32  ulRetVal ;
+   UNSIGNED32  ulRetVal;
    UNSIGNED16  usStructSize;
-   ADS_MGMT_COMM_STATS     stCommStats;
+   ADS_MGMT_COMM_STATS  stCommStats;
 
    usStructSize = sizeof( ADS_MGMT_COMM_STATS );
    ulRetVal = AdsMgGetCommStats( hMgmtHandle, &stCommStats, &usStructSize );
@@ -266,7 +266,7 @@ HB_FUNC( ADSMGGETCOMMSTATS )
    }
    else
    {
-      hb_ret(  );
+      hb_ret();
    }
 
 }
@@ -322,7 +322,7 @@ HB_FUNC( ADSMGGETCONFIGINFO )
          hb_stornl( stConfigValues.ulStatDumpInterval     , -1, 7 );  /* statistics dump interval      */
          hb_stornl( stConfigValues.ulErrorLogMax          , -1, 8 );  /* max size of error log         */
          hb_stornl( stConfigValues.ulNumTPSHeaderElems    , -1, 9 );  /* number TPS header elems       */
-         hb_stornl( stConfigValues.ulNumTPSVisibilityElems,-1, 10);  /* number TPS vis elems          */
+         hb_stornl( stConfigValues.ulNumTPSVisibilityElems, -1, 10);  /* number TPS vis elems          */
          hb_stornl( stConfigValues.ulNumTPSMemoTransElems , -1, 11);  /* number TPS memo elems         */
          hb_stornl( stConfigValues.usNumReceiveECBs       , -1, 12);  /* number rcv ECBs (NLM only)    */
          hb_stornl( stConfigValues.usNumSendECBs          , -1, 13);  /* number send ECBs (NLM only)   */
@@ -338,10 +338,10 @@ HB_FUNC( ADSMGGETCONFIGINFO )
          hb_storni( stConfigValues.ucReserved4            , -1, 23);  /* reserved                      */
          hb_stornl( stConfigValues.usSendIPPort           , -1, 24);  /* NT Service IP send port #     */
          hb_stornl( stConfigValues.usReceiveIPPort        , -1, 25);  /* NT Service IP rcv port #      */
-         /* hb_stornl( stConfigValues.usReserved5            , -1, 26);   reserved                     */
+      /* hb_stornl( stConfigValues.usReserved5            , -1, 26);   reserved                     */
 
-      }else
-      if ( iOption == 1 )
+      }
+      else if ( iOption == 1 )
       {
          hb_reta( 13 );
          hb_stornd( stConfigMemory.ulTotalConfigMem      , -1, 1 );  /* Total mem taken by cfg params */
@@ -362,18 +362,18 @@ HB_FUNC( ADSMGGETCONFIGINFO )
    }
    else
    {
-      hb_ret(  );
+      hb_ret();
    }
 }
 
 HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
 {
 
-   UNSIGNED32  ulRetVal ;
-   UNSIGNED16  ulMaxUsers = 100 ;        /* needed for array memory allocation; caller can set with 2nd arg */
+   UNSIGNED32  ulRetVal;
+   UNSIGNED16  ulMaxUsers = 100;        /* needed for array memory allocation; caller can set with 2nd arg */
    UNSIGNED16  ulCount;
    UNSIGNED16  usStructSize = sizeof( ADS_MGMT_USER_INFO );
-   ADS_MGMT_USER_INFO*  pastUserInfo;
+   ADS_MGMT_USER_INFO * pastUserInfo;
 /*
 //   ADS_MGMT_USER_INFO  astUserInfo[MAX_NUM_USERS];
 // bh:  Enhancement:  Get # of tables from ADS_MGMT_ACTIVITY_INFO.stUsers instead of set size
@@ -407,7 +407,7 @@ HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
       hb_reta( ulMaxUsers );
       for ( ulCount = 0; ulCount < ulMaxUsers; ulCount++ )
       {
-         hb_storc ( (char *) pastUserInfo[ulCount].aucUserName , -1, ulCount+1);
+         hb_storc( (char *) pastUserInfo[ulCount].aucUserName , -1, ulCount+1 );
       }
    }
    else
@@ -438,11 +438,11 @@ HB_FUNC( ADSMGGETLOCKOWNER )
    //
    // returns the advantage error code if it fails
    //
-   UNSIGNED32  ulRetVal ;
+   UNSIGNED32  ulRetVal;
    UNSIGNED16  usStructSize = sizeof( ADS_MGMT_USER_INFO );
    UNSIGNED16  pusLockType;
    ADS_MGMT_USER_INFO * pstUserInfo;
-   pstUserInfo = (ADS_MGMT_USER_INFO *) hb_xgrab( sizeof( ADS_MGMT_USER_INFO ));
+   pstUserInfo = (ADS_MGMT_USER_INFO *) hb_xgrab( sizeof( ADS_MGMT_USER_INFO ) );
 
    ulRetVal = AdsMgGetLockOwner( hMgmtHandle,
                                  (UNSIGNED8 *) hb_parcx( 1 ),
@@ -450,7 +450,7 @@ HB_FUNC( ADSMGGETLOCKOWNER )
                                  pstUserInfo,
                                  &usStructSize,
                                  &pusLockType);
-   if (ulRetVal== AE_SUCCESS)
+   if ( ulRetVal== AE_SUCCESS )
    {
        hb_reta(5);
        hb_storc ( (char *)  pstUserInfo->aucUserName , -1, 1); /* Machine name under NT */
@@ -461,7 +461,23 @@ HB_FUNC( ADSMGGETLOCKOWNER )
    }
    else
    {
-       hb_retnl ( ulRetVal );
+       hb_retnl( ulRetVal );
+   }
+}
+
+HB_FUNC( ADSMGGETSERVERTYPE )   /* Determine OS ADS is running on; see ADS_MGMT_* constants */
+{
+   UNSIGNED32  ulRetVal;
+   UNSIGNED16  usServerType;
+
+   ulRetVal = AdsMgGetServerType( hMgmtHandle, &usServerType );
+   if ( ulRetVal == AE_SUCCESS )
+   {
+      hb_retnl( usServerType );
+   }
+   else
+   {
+      hb_retnl( 0 );
    }
 }
 
@@ -489,18 +505,11 @@ HB_FUNC( ADSMGGETLOCKS )
    AdsMgGetLocks();
 }
 
-HB_FUNC( ADSMGGETSERVERTYPE )
-{
-   UNSIGNED32              ulRetVal = AE_SUCCESS;
-   AdsMgGetServerType();
-}
-
 HB_FUNC( ADSMGGETWORKERTHREADACTIVITY )
 {
    UNSIGNED32              ulRetVal = AE_SUCCESS;
    AdsMgGetWorkerThreadActivity();
 }
-
 
 HB_FUNC( ADSMGKILLUSER )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: ads.ch,v 1.4 2003/11/30 12:23:59 lculik Exp $
+ * $Id: ads.ch,v 1.5 2004/06/10 06:39:40 brianhays Exp $
  */
 
 /*
@@ -85,13 +85,25 @@
       => AdsSetFileType( if( upper( <(x)> ) == "NTX", 1,              ;
                          if( upper( <(x)> ) == "CDX", 2, 3 ) ) )
 
-#command SET SERVER LOCAL   => AdsSetServerType ( 1 )
-#command SET SERVER REMOTE  => AdsSetServerType ( 2 )
+#command SET SERVER LOCAL   => AdsSetServerType( 1 )
+#command SET SERVER REMOTE  => AdsSetServerType( 2 )
 
 /* Server type constants for ORing with AdsSetServerType() */
 #define ADS_LOCAL_SERVER         1
 #define ADS_REMOTE_SERVER        2
 #define ADS_AIS_SERVER           4
+
+/*
+ * Constants for AdsMgGetServerType
+ * Note ADS_MGMT_NETWARE_SERVER remains for backwards compatibility only
+ */
+#define ADS_MGMT_NETWARE_SERVER           1
+#define ADS_MGMT_NETWARE4_OR_OLDER_SERVER 1
+#define ADS_MGMT_NT_SERVER                2
+#define ADS_MGMT_LOCAL_SERVER             3
+#define ADS_MGMT_WIN9X_SERVER             4
+#define ADS_MGMT_NETWARE5_OR_NEWER_SERVER 5
+#define ADS_MGMT_LINUX_SERVER             6
 
 /*
    If you want to limit your app to use an ADS version
@@ -113,7 +125,6 @@
       -DADS_REQUIRE_VERSION=5
 
 */
-
 
 #command SET AXS LOCKING <x:ON,OFF>                                   ;
       => AdsLocking( if( upper( <(x)> ) == "ON", .t., .f. )  )
