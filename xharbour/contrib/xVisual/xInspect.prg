@@ -48,6 +48,7 @@ ENDCLASS
 METHOD SetBrowserData(oObj) CLASS ObjInspect
    local n,c
    ::Browser:source := ACLONE(oObj:PropList)
+   ASort( ::Browser:source,,, {|x,y| x[1] < y[1] } )
    aeval(::Browser:source,{|a|a[2]:=__objSendMsg( oObj, a[1] )} )
    ::Browser:RefreshAll()
 return(self)
@@ -70,15 +71,18 @@ METHOD OnCreate() CLASS ObjInspect
   ::Browser:=TBrowser():Init( aProp )
   ::Browser:Create( ::InspTabs:Properties:handle,  0, 0,;
                                                  ::InspTabs:Properties:ClientRect()[3],;
-                                                 ::InspTabs:Properties:ClientRect()[4],,WS_EX_CLIENTEDGE )
+                                                 ::InspTabs:Properties:ClientRect()[4],;
+                                                 WS_CHILD+WS_VISIBLE+WS_VSCROLL,;
+                                                 WS_EX_CLIENTEDGE )
   ::Browser:wantHScroll:=.F.
   oCol1:=whColumn():Init( 'Property', {|oCol,oB,n| asString(oB:source[n,1]) } ,DT_LEFT,85)
   oCol1:VertAlign   :=TA_CENTER
   oCol1:fgColor:= GetSysColor(COLOR_WINDOWTEXT)
-
-  oCol2:=whColumn():INIT( 'Value'   , {|oCol,oB,n| asString(oB:source[n,2]) } ,DT_LEFT,80)
+  oCol1:Style  := 0
+  
+  oCol2:=whColumn():INIT( 'Value'   , {|oCol,oB,n| asString(oB:source[n,2]) } ,DT_LEFT,81)
   oCol2:VertAlign   :=TA_CENTER
-  oCol2:fgColor:= GetSysColor(COLOR_WINDOWTEXT)
+  oCol2:fgColor:= RGB(0,0,128)
 
   ::Browser:addColumn(oCol1)
   ::Browser:addColumn(oCol2)

@@ -36,13 +36,20 @@ METHOD New( oParent ) CLASS TForm
    ::lControl  := .F.
    ::ExStyle   := IFNIL(::ExStyle,0,::ExStyle)
    
-   ::PropList  := { { 'Name',    },;
-                    { 'Caption', },;
-                    { 'Left',    },;
-                    { 'Top',     },;
-                    { 'Width',   },;
-                    { 'Height',  },;
-                    { 'Style',   } }
+   ::PropList  := { { 'Name',       },;
+                    { 'Caption',    },;
+                    { 'ResName',    },;
+                    { 'Contraints', },;
+                    { 'ExStyle',    },;
+                    { 'Font',       },;
+                    { 'Color',      },;
+                    { 'Cursor',     },;
+                    { 'Icon',       },;
+                    { 'Left',       },;
+                    { 'Top',        },;
+                    { 'Width',      },;
+                    { 'Height',     },;
+                    { 'Style',      } }
 
    RETURN( super:New( oParent ) )
 
