@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.7 2002/10/12 00:38:25 horacioroldan Exp $
+ * $Id: hbrddcdx.h,v 1.8 2002/11/13 18:45:50 horacioroldan Exp $
  */
 
 /*
@@ -161,6 +161,8 @@ typedef struct _CDXTAG
    struct    _CDXTAG * pNext;
    BOOL       AscendKey;        /* ascending/descending order flag */
    BOOL       UniqueKey;        /* unique order flag */
+   BOOL       Temporary;
+   BOOL       Custom;
    BOOL       TagChanged;
    BOOL       TagBOF;
    BOOL       TagEOF;
