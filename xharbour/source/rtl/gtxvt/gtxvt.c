@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.c,v 1.38 2004/06/09 06:22:15 bdj Exp $
+ * $Id: gtxvt.c,v 1.39 2004/06/09 14:29:04 jonnymind Exp $
  */
 
 /*
@@ -390,6 +390,7 @@ static ULONG s_clipsize = 0;
 /** Font request cache **/
 static int s_fontReqSize = XVT_DEFAULT_FONT_HEIGHT;
 static int s_fontReqWidth = XVT_DEFAULT_FONT_WIDTH;
+static char s_fontReqName[XVT_FONTNAME_SIZE];
 
 /**********************************************************************
 *                                                                     *
@@ -863,8 +864,8 @@ static PXWND_DEF xvt_windowCreate( Display *dpy, PXVT_BUFFER buf, PXVT_STATUS st
 
 
    // load the standard font
-   xfs = xvt_fontNew( dpy, XVT_DEFAULT_FONT_NAME, XVT_DEFAULT_FONT_WEIGHT,
-                  XVT_DEFAULT_FONT_HEIGHT, NULL );
+   xfs = xvt_fontNew( dpy, s_fontReqName, XVT_DEFAULT_FONT_WEIGHT,
+                  s_fontReqSize, NULL );
    if ( xfs == NULL )
    {
       hb_errInternal( EG_CREATE, "Can't load '%s' defualt font", XVT_DEFAULT_FONT_NAME, NULL );
@@ -1031,7 +1032,7 @@ static XFontStruct * xvt_fontNew( Display *dpy, char *fontFace, char *weight, in
    char fontString[150];
    XFontStruct *xfs;
 
-   snprintf( fontString, 149, "-*-%s-%s-r-normal--%d-*-*-*-*-*-%s",
+   snprintf( fontString, 149, "-*-%s-%s-r-normal-*-%d-*-*-*-*-*-%s",
       fontFace, weight, size, encoding == NULL ? "*-*" : encoding);
 
    xfs = XLoadQueryFont( dpy, fontString );
@@ -1043,12 +1044,17 @@ static XFontStruct * xvt_fontNew( Display *dpy, char *fontFace, char *weight, in
 /*************** Sets a font into an existing window **************************/
 static void xvt_windowSetFont( PXWND_DEF wnd, XFontStruct * xfs )
 {
-   wnd->xfs = xfs;
-   wnd->fontHeight = xfs->max_bounds.ascent + xfs->max_bounds.descent;
-   wnd->fontWidth = xfs->max_bounds.rbearing - xfs->min_bounds.lbearing;
+   
+   wnd->fontHeight =  xfs->ascent+ xfs->descent;
+   wnd->fontWidth = xfs->max_bounds.width;
    wnd->width = wnd->buffer->cols * wnd->fontWidth;
    wnd->height = wnd->buffer->rows * wnd->fontHeight;
-
+   /*
+   if ( wnd->xfs != 0 )
+       XFreeFont( wnd->dpy, wnd->xfs );
+   */    
+   wnd->xfs = xfs;
+   xvt_windowSetCursor( wnd );
    if ( wnd->gc != NULL )
    {
       XSetFont( wnd->dpy, wnd->gc, wnd->xfs->fid );
@@ -2772,13 +2778,7 @@ static void xvt_processMessages( PXWND_DEF wnd )
       // wait for app input
       //usleep( 25000 );
       timeout.tv_sec = 0;
-      if ( s_wnd == NULL )
-      {
-         timeout.tv_usec = 25000;
-      }
-      else {
-         timeout.tv_usec = 0;
-      }
+      timeout.tv_usec = 2500;
 
       FD_SET(streamUpdate[0], &updateSet );
       bLoop = TRUE;
@@ -2890,8 +2890,11 @@ static void xvt_processMessages( PXWND_DEF wnd )
                s_fontReqWidth = (int) usData;
                read( streamUpdate[0], &usData, sizeof( usData ) );
                s_fontReqSize = (int) usData;
+               
+               read( streamUpdate[0], &usData, sizeof( usData ) );
+               read( streamUpdate[0], s_fontReqName, usData );
 
-               xfs = xvt_fontNew( wnd->dpy, XVT_DEFAULT_FONT_NAME,
+               xfs = xvt_fontNew( wnd->dpy, s_fontReqName,
                   XVT_DEFAULT_FONT_WEIGHT,
                   s_fontReqSize, NULL );
                if ( xfs )
@@ -2920,7 +2923,7 @@ static void xvt_processMessages( PXWND_DEF wnd )
          wnd->status->mouseDblClick2TO--;
       }
 
-      if ( ++count == 10 ) {
+      if ( ++count == 100 ) {
          s_cursorState = s_cursorState ? 0: 1;
          xvt_cursorPaint( wnd );
          count = 0;
@@ -3263,7 +3266,8 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
    s_iStdIn  = iFilenoStdin;
    s_iStdOut = iFilenoStdout;
    s_iStdErr = iFilenoStderr;
-
+   strcpy( s_fontReqName, XVT_DEFAULT_FONT_NAME );
+   
    // In case of a fatal error, immediately stops
    //s_Xdisplay = XOpenDisplay( NULL );
 
@@ -4373,8 +4377,6 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
    int iOldValue;
    USHORT appMsg;
 
-   HB_SYMBOL_UNUSED( vpParam );
-
    switch ( iMsgType )
    {
       case GTI_ISGRAPHIC:
@@ -4396,7 +4398,7 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
          if ( bUpdate )
          {
             //send requst to change width
-            hb_gtSetMode( s_buffer->rows, iParam / XVT_DEFAULT_FONT_WIDTH );
+            hb_gtSetMode( s_buffer->rows, iParam / iOldValue );
             if ( s_wnd != 0 || s_childPid != 0 )
             {
                appMsg = XVT_ICM_RESIZE;
@@ -4415,13 +4417,13 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
          // else, use our local image.
          else
          {
-            iOldValue = s_buffer->rows * XVT_DEFAULT_FONT_HEIGHT;
+            iOldValue = s_buffer->rows * s_fontReqSize;
          }
 
          if ( bUpdate )
          {
             //send requst to change width
-            hb_gtSetMode( iParam / XVT_DEFAULT_FONT_HEIGHT, s_buffer->cols );
+            hb_gtSetMode( iParam / iOldValue, s_buffer->cols );
             if ( s_wnd != 0 || s_childPid != 0 )
             {
                appMsg = XVT_ICM_RESIZE;
@@ -4446,17 +4448,23 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
 
          if ( bUpdate )
          {
+            s_fontReqSize = iParam;
             //send requst to change width
             if ( s_wnd != 0 || s_childPid != 0 )
             {
-               s_fontReqSize = iParam;
 
                appMsg = XVT_ICM_FONTSIZE;
                write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+               
                appMsg = (USHORT) s_fontReqWidth;
                write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+               
                appMsg = (USHORT) s_fontReqSize;
                write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+               
+               appMsg = (USHORT) strlen( s_fontReqName );
+               write( streamUpdate[1], &appMsg, sizeof( appMsg ) );
+               write( streamUpdate[1], s_fontReqName, appMsg );
             }
          }
       return iOldValue;
@@ -4477,6 +4485,14 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
             s_fontReqWidth = iParam;
          }
       return iOldValue;
+      
+      case GTI_FONTNAME:
+         if ( bUpdate )
+         {
+            strncpy(s_fontReqName, (char *) vpParam, XVT_FONTNAME_SIZE );
+            return 1;
+         }
+      return -1;
 
       case GTI_DESKTOPDEPTH:
          return -1;

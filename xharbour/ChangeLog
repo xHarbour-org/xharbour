@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.3109 2004/06/23 21:59:10 likewolf Exp $
+ * $Id: ChangeLog,v 1.3110 2004/06/24 05:29:49 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-06-28 16:11 UTC-0300 Giancarlo Niccolai <antispam /at/ niccolai "dot" ws>
+  * contrib/tip/tipclient.prg
+  * contrib/tip/tipclienthttp.prg
+    ! Fixed HTTP/1.1 support (was working but sometimes imprecise)
+    ! Fixed Read() and ReadToFile() method; Using InetRecv() instead of
+      InetRecvAll().
+
+  * contrib/tip/tests/httpadvtest.prg
+    ! Fixed a leftover of an old variable.
+
+  * source/rtl/gx.c
+  * include/gtinfo.ch
+    + Added experimental support to change font in graphical GTs with the
+      GT_FONTNAME GtInfo option.
+
+  * source/rtl/gtxvt/gtxvt.c
+  * source/rtl/gtxvt/gtxvt.h
+    + Added GTInfo support for GT_FONTNAME option; plz. other interested
+      developers have a look and add similar support.
+
+  * tests/Makefile
+    ! More compliancy with lastests building models.
 
 2004-06-23 22:28 UTC-0800 Ron Pinkas <ron at xharbour.com>
   * Taged as Beta-1

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.h,v 1.10 2004/02/19 23:43:09 jonnymind Exp $
+ * $Id: gtxvt.h,v 1.11 2004/06/09 14:29:06 jonnymind Exp $
  */
 
 /*
@@ -125,6 +125,7 @@ typedef USHORT HB_GT_CELLTYPE;
 #define XVT_MAX_BUTTONS        8
 #define CLIP_KEY_COUNT       122
 #define XVT_BOX_CHARS         50
+#define XVT_FONTNAME_SIZE     40
 
 /************************************************************************/
 /* XVT intercommunication protocol XVT_ICM                              */

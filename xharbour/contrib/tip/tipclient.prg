@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclient.prg,v 1.10 2004/02/07 13:04:02 lculik Exp $
+* $Id: tipclient.prg,v 1.11 2004/02/07 16:03:12 jonnymind Exp $
 ************************************************/
 /* 2004-01-13
   Enhaced tip cliente to conenct to secure smtp servers by Luiz Rafael Culik
@@ -132,7 +132,7 @@ RETURN .T.
 
 
 METHOD Read( nLen ) CLASS tIPClient
-   LOCAL cStr, cStr1
+   LOCAL cStr0, cStr1
 
    IF ::nLength > 0 .and. ::nLength == ::nRead
       RETURN NIL
@@ -145,18 +145,18 @@ METHOD Read( nLen ) CLASS tIPClient
    IF Empty( nLen ) .or. nLen < 0
       // read till end of stream
       cStr1 := Space( 1024 )
-      cStr := ""
+      cStr0 := ""
       ::nLastRead := InetRecvAll( ::SocketCon, @cStr1, 1024 )
       DO WHILE ::nLastRead > 0
          ::nRead += ::nLastRead
-         cStr += Substr( cStr1, 1, ::nLastRead )
-         ::nLastRead := InetRecvAll( ::SocketCon, @cStr1, 1024 )
+         cStr0 += Substr( cStr1, 1, ::nLastRead )
+         ::nLastRead := InetRecv( ::SocketCon, @cStr1, 1024 )
       ENDDO
       ::bEof := .T.
    ELSE
       // read an amount of data
-      cStr := Space( nLen )
-      ::nLastRead := InetRecvAll( ::SocketCon, @cStr, nLen )
+      cStr0 := Space( nLen )
+      ::nLastRead := InetRecv( ::SocketCon, @cStr0, @nLen )
       IF ::nLastRead <= 0
          ::bEof := .T.
          RETURN NIL
@@ -165,9 +165,9 @@ METHOD Read( nLen ) CLASS tIPClient
       IF ::nRead == ::nLength
          ::bEof := .T.
       ENDIF
-      cStr := Substr( cStr, 1, ::nLastRead )
+      cStr0 := Substr( cStr0, 1, ::nLastRead )
    ENDIF
-RETURN cStr
+RETURN cStr0
 
 
 
@@ -183,11 +183,15 @@ METHOD ReadToFile( cFile, nMode ) CLASS tIPClient
    DO WHILE InetErrorCode( ::SocketCon ) == 0 .and. .not. ::bEof
 
       cData := ::Read( 1024 )
-      IF HB_IsLogical(cData) .and. cData == .F.
+      IF cData == NIL
          IF nFout != NIL
             Fclose( nFout )
          ENDIF
-         RETURN .F.
+         IF InetErrorCode( ::SocketCon ) > 0
+            RETURN .F.
+         ELSE
+            RETURN .T.
+         ENDIF
       ENDIF
 
       IF nFout == NIL

@@ -2,7 +2,7 @@
 * TIP test
 * HTTP Advanced operations Test
 *
-* $Id: ftpadvtest.prg,v 1.2 2003/11/20 17:10:43 jonnymind Exp $
+* $Id: httpadvtest.prg,v 1.1 2003/11/22 15:10:33 jonnymind Exp $
 *****/
 
 PROCEDURE MAIN( cUrl )
@@ -29,13 +29,13 @@ PROCEDURE MAIN( cUrl )
       ? "Connection eshtablished"
       ? "Retreiving", oUrl:cPath, oUrl:cFile, oUrl:cQuery
 
-      IF oCon:GetRequest( oUrl:cPath )
+      IF oCon:Get( oUrl:cPath )
          ? "Get Sucessful"
          FOR i := 1 to Len( oCon:hHeaders )
             ? HGetkeyAt( oCon:hHeaders, i ) +":", HGetValueAt( oCon:hHeaders, i )
          NEXT
       ELSE
-         ? "Get failure (server reply:", oCon:cReply + ")"
+         ? "Get failure (server reply:", oCon:cReply , ")"
       ENDIF
 
       oCon:Close()

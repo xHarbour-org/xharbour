@@ -4,7 +4,7 @@
 * Class oriented Internet protocol library
 *
 * (C) 2002 Giancarlo Niccolai
-* $Id: tipclienthttp.prg,v 1.12 2004/05/07 12:24:59 jonnymind Exp $
+* $Id: tipclienthttp.prg,v 1.13 2004/05/12 09:09:31 jonnymind Exp $
 ************************************************/
 #include "hbclass.ch"
 #include "tip.ch"
@@ -126,8 +126,8 @@ METHOD StandardFields() CLASS tIPClientHTTP
       InetSendAll( ::SocketCon, "Authorization: Basic " +;
           oEncoder:Encode(  ::oUrl:cUserID + ":" + ::oUrl:cPassword ) + ::cCRLF )
    ENDIF
-          
-   
+
+
    // send cookies
    IF ! Empty( ::hCookies )
       InetSendAll( ::SocketCon, "Cookie: " )
@@ -192,13 +192,16 @@ METHOD ReadHeaders() CLASS tIPClientHTTP
 
       DO CASE
 
-         CASE lower( aHead[1] ) == "content-length:"
+         // RFC 2068 forces to discard content length on chunked encoding
+         CASE lower( aHead[1] ) == "content-length:" .and. .not. ::bChunked
             cLine := Substr( cLine, 16 )
             ::nLength := Val( cLine )
 
+         // as above
          CASE lower( aHead[1] ) == "transfer-encoding:"
             IF At( "chunked", lower( cLine ) ) > 0
                ::bChunked := .T.
+               ::nLength := -1
             ENDIF
 
          CASE lower( aHead[1] ) == "set-cookie:"
@@ -221,7 +224,7 @@ RETURN .T.
 
 
 METHOD Read( nLen ) CLASS tIPClientHTTP
-   LOCAL cData, nPos, cLine
+   LOCAL cData, nPos, cLine, aHead
 
    IF .not. ::bInitialized
       ::bInitialized := .T.
@@ -230,29 +233,59 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
       ENDIF
    ENDIF
 
-   /* On HTTP/1.1 protocol, content lenght can be in hex format before each chunk */
-   IF ::nLength == -1 .and. ::nVersion >= 1 .and. ::nSubversion >= 1 .and. ::bChunked
-      cLine := InetRecvLine( ::SocketCon, @nPos, 16 )
-      IF .not. Empty( cLine )
-         IF cLine == "0"
-            InetRecvLine( ::SocketCon, @nPos, 16 )
-            ::bEof := .T.
-            RETURN NIL
-         ELSE
-            ::nLength := HB_HexToNum( cLine ) + ::nRead
-         ENDIF
-      ELSE
-         RETURN  NIL
+   /* On HTTP/1.1 protocol, content lenght can be in hex format before each chunk.
+      The chunk header is read each time nLength is -1; While reading the chunk,
+      nLenght is set to nRead plus the expected chunk size. After reading the
+      chunk, the footer is discarded, and nLenght is reset to -1.
+   */
+   IF ::nLength == -1 .and. ::bChunked
+      cLine := InetRecvLine( ::SocketCon, @nPos, 1024 )
+
+      IF Empty( cLine )
+         RETURN NIL
       ENDIF
+
+      // if this is the last chunk ...
+      IF cLine == "0"
+
+         // read the footers.
+         cLine := InetRecvLine( ::SocketCon, @nPos, 1024 )
+         DO WHILE .not. Empty( cLine )
+            // add Headers to footers
+            aHead := HB_RegexSplit( ":", cLine,,, 1 )
+            IF aHead != NIL
+               ::hHeaders[ aHead[1] ] := LTrim(aHead[2])
+            ENDIF
+
+            cLine := InetRecvLine( ::SocketCon, @nPos, 1024 )
+         ENDDO
+
+         // we are done
+         ::bEof := .T.
+         RETURN NIL
+      ENDIF
+
+      // A normal chunk here
+
+      // Remove the extensions
+      nPos := at( ";", cLine )
+      IF nPos > 0
+         cLine := Substr( cLine, 1, nPos - 1 )
+      ENDIF
+
+      // Convert to length
+      // Set length so that super::Read reads in at max cLine bytes.
+      ::nLength := HB_HexToNum( cLine ) + ::nRead
+
    ENDIF
 
+   // nLen is normalized by super:read()
    cData := ::super:Read( nLen )
-   IF ::bEof .and. ::nVersion >= 1 .and. ::nSubversion >= 1 .and. ::bChunked
-      /* ...and after a sucessful read, we could have read up to chunk Lenght. */
+
+   // If bEof is set with chunked encoding, this means that the whole chunk has been read;
+   IF ::bEof .and. ::bChunked
       ::bEof := .F.
       ::nLength := -1
-      /* removing following CRLF */
-      InetRecvLine( ::SocketCon, @nPos, 16 )
    ENDIF
 
 RETURN cData

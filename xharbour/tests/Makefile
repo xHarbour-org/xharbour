@@ -1,7 +1,7 @@
 # xHarbour project
 # Demo makefile for GNU MAKE in tests/ subdir
 #
-# $Id: Makefile,v 1.24 2004/05/24 10:31:45 jonnymind Exp $
+# $Id: Makefile,v 1.25 2004/05/28 18:51:22 likewolf Exp $
 #
 # Copyright 2003 Giancarlo Niccolai
 #
@@ -43,27 +43,31 @@ ifeq ($(HB_ARCHITECTURE),linux)
 endif
 
 ifeq ($(HB_UNIX),yes)
-   ifeq ($(HB_GT_LIB),gtxvt)
-      GT_LIBS=-lgtxvt -lX11 -L/usr/X11R6/lib
+   ifeq ($(HB_MULTI_GT),yes)
+      GT_LIBS=-lgtxvt -lX11 -L/usr/X11R6/lib -lslang -lncurses -lgpm
    else
-     ifeq ($(HB_GT_LIB),gtsln)
-       GT_LIBS=-lgtsln -lslang
-     else
-       ifeq ($(HB_GT_LIB),gtcgi)
-          GT_LIBS=-lgtcgi
-       else
-          ifeq ($(HB_GT_LIB),gtnul)
-             GT_LIBS=-lgtnul
-          else
-	     ifeq ($(HB_GT_LIB),gtstd)
-	        GT_LIBS=-lgtstd
-	     else
-	        HB_GT_LIB=gtcrs
-	        GT_LIBS=-lgtcrs -lncurses
-	     endif
-	  endif
-       endif
-     endif
+      ifeq ($(HB_GT_LIB),gtxvt)
+         GT_LIBS=-lgtxvt -lX11 -L/usr/X11R6/lib
+      else
+         ifeq ($(HB_GT_LIB),gtsln)
+            GT_LIBS=-lgtsln -lslang
+         else
+            ifeq ($(HB_GT_LIB),gtcgi)
+               GT_LIBS=-lgtcgi
+            else
+               ifeq ($(HB_GT_LIB),gtnul)
+                  GT_LIBS=-lgtnul
+               else
+	          ifeq ($(HB_GT_LIB),gtstd)
+	             GT_LIBS=-lgtstd
+	         else
+	             HB_GT_LIB=gtcrs
+	             GT_LIBS=-lgtcrs -lncurses
+	         endif
+	       endif
+            endif
+         endif
+      endif
    endif
    EXE_EXT=
    
@@ -103,10 +107,11 @@ else
 endif
 
 ifeq ($(HB_MULTI_GT),yes)
-   GT_LIBS += -lgtnul
+   ALL_LIBS = -lxharbour $(GT_LIBS) -lm $(EXTRA_LIBS)
+else
+   ALL_LIBS = -ldebug $(MTLIBS) -lpp -llang -lcommon $(GT_LIBS) -lm $(EXTRA_LIBS)
 endif
 
-ALL_LIBS = -ldebug $(MTLIBS) -lpp -llang -lcommon $(GT_LIBS) -lm $(EXTRA_LIBS)
 ifeq ($(HB_ARCHITECTURE),darwin)
    LD_LIBS = $(ALL_LIBS) $(ALL_LIBS)
 else

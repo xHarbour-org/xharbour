@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.11 2004/02/23 10:01:42 andijahja Exp $
+ * $Id: gx.c,v 1.12 2004/05/25 20:27:22 druzus Exp $
  */
 
 /*
@@ -231,8 +231,8 @@ HB_FUNC( GTINFO )
    /* Parameter error */
    if ( pInfo == NULL )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "GTINFO", 2,
-         hb_paramError( 1 ), hb_paramError( 2 ) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "GTINFO", 3,
+         hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
       return;
    }
 
@@ -245,8 +245,9 @@ HB_FUNC( GTINFO )
    else
    {
       /* Parameter void * still unused, for future developement. */
+      char *param = hb_parc(3);
       hb_retni( HB_GT_FUNC( gt_info( hb_itemGetNI( pInfo ), TRUE,
-            hb_itemGetNI( pSet ), NULL ) ) );
+            hb_itemGetNI( pSet ), param ) ) );
    }
 
 }

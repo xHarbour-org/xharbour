@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.3 2004/02/16 16:11:19 jonnymind Exp $
+ * $Id: gtinfo.ch,v 1.4 2004/05/25 20:27:22 druzus Exp $
  */
 
 /*
@@ -73,6 +73,7 @@
 #define GTI_DESKTOPCOLS   21  /* Get Size of desktop in character cols */
 #define GTI_FONTWEIGHT    22  /* Get/set the weight of the font used in application */
 #define GTI_FONTQUALITY   23  /* Get/set quality of font rendering in the appl. */
+#define GTI_FONTNAME      24  /* Set-only font name */
 
 #define GTI_INPUTFD       30  /* Get Standard input steream of application/GT */
 #define GTI_OUTPUTFD      31  /* Get Standard output steream of application/GT */
