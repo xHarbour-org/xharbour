@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.9 2002/01/22 00:23:28 ronpinkas Exp $
+ * $Id: classes.c,v 1.10 2002/01/27 09:01:57 ronpinkas Exp $
  */
 
 /*
@@ -113,8 +113,7 @@
  "/"     = __OpDivide
  "%"     = __OpMod
  "^"     = __OpPower
- "**"    = __OpMod (currently it's different from "^", but this is not in sync,
-                    with Clipper syntax, where these two are synonims)
+ "**"    = __OpPower
  "++"    = __OpInc
  "--"    = __OpDec
  "=="    = __OpEqual
@@ -1027,7 +1026,7 @@ HB_FUNC( __CLSADDMSG )
       else if (strcmp("^",hb_parc(2)) == 0)
          pMessage = hb_dynsymGet( "__OpPower") ;
       else if (strcmp("**",hb_parc(2)) == 0)
-         pMessage = hb_dynsymGet( "__OpMod"  ) ;
+         pMessage = hb_dynsymGet( "__OpPower"  ) ;
       else if (strcmp("++",hb_parc(2)) == 0)
          pMessage = hb_dynsymGet( "__OpInc"  ) ;
       else if (strcmp("--",hb_parc(2)) == 0)

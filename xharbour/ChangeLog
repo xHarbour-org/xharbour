@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.76 2002/02/02 10:50:46 lculik Exp $
+ * $Id: ChangeLog,v 1.77 2002/02/04 05:24:40 horacioroldan Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2002-02-04 23:10 UTC+0100 JFL (mafact) <jfl@mafact.com>
+   * source/vm/hvm.c
+   * source/vm/classes.c
+     ! fixed bug where object overloading was using modulus in place of power
+       for "**" expression
+       
 2002-02-04 02:23 UTC-0300 Horacio Roldan <harbour_ar@yahoo.com.ar>
    * source/rdd/dbf1.c
      ! fixed bug with flags in hb_dbfGoTo

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.36 2002/01/31 02:20:28 ronpinkas Exp $
+ * $Id: hvm.c,v 1.37 2002/01/31 05:40:18 ronpinkas Exp $
  */
 
 /*
@@ -2393,8 +2393,8 @@ static void hb_vmPower( void )
 
    else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpPower" ) )
       hb_vmOperatorCall( pItem1, pItem2, "__OPPOWER" );
-   else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpMod" ) )
-      hb_vmOperatorCall( pItem1, pItem2, "__OPMOD" );
+   /* else if( HB_IS_OBJECT( pItem1 ) && hb_objHasMsg( pItem1, "__OpMod" ) )
+      hb_vmOperatorCall( pItem1, pItem2, "__OPMOD" ); JFL 02/2002 */
    else
    {
       PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1088, NULL, "^", 2, pItem1, pItem2 );
@@ -4387,9 +4387,9 @@ static void hb_vmPushAliasedVar( PHB_SYMB pSym )
          int iCmp = strncmp( szAlias, "MEMVAR", 4 );
 
          if( iCmp == 0 )
-		 {
+                 {
             iCmp = strncmp( szAlias, "MEMVAR", pAlias->item.asString.length );
-		 }
+                 }
 
          if( iCmp == 0 )
          {  /* MEMVAR-> or MEMVA-> or MEMV-> */
@@ -4399,10 +4399,10 @@ static void hb_vmPushAliasedVar( PHB_SYMB pSym )
          {  /* field variable */
             iCmp = strncmp( szAlias, "FIELD", 4 );
 
-			if( iCmp == 0 )
-			{
+                        if( iCmp == 0 )
+                        {
                iCmp = strncmp( szAlias, "FIELD", pAlias->item.asString.length );
-			}
+                        }
 
             if( iCmp == 0 )
             {  /* FIELD-> */
@@ -4415,7 +4415,7 @@ static void hb_vmPushAliasedVar( PHB_SYMB pSym )
          }
       }
 
-	  hb_xfree( szAlias );
+          hb_xfree( szAlias );
    }
    else
    {
