@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.46 2003/09/25 02:02:31 paultucker Exp $
+# $Id: makefile.nt,v 1.47 2003/10/09 05:31:53 paultucker Exp $
 #
 
 #
@@ -447,7 +447,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\substr.obj \
    $(OBJ_DIR)$(MT)\teditorl.obj \
    $(OBJ_DIR)$(MT)\tone.obj \
-   $(OBJ_DIR)$(MT)\tprint.obj \
    $(OBJ_DIR)$(MT)\tprinter.obj \
    $(OBJ_DIR)$(MT)\trace.obj \
    $(OBJ_DIR)$(MT)\transfrm.obj \

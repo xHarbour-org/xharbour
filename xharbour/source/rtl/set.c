@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.31 2003/10/08 06:54:39 peterrees Exp $
+ * $Id: set.c,v 1.32 2003/10/09 18:48:29 peterrees Exp $
  */
 
 /*
@@ -237,7 +237,7 @@ static void close_binary( FHANDLE handle )
       hb_fsSetError( user_ferror );
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
       if (hb_set.hb_set_winprinter && (hb_set.hb_set_printhan == handle) && s_PrintFileName[0]) {
-        hb_PrintFileRaw(s_PrinterName, s_PrintFileName, hb_set.hb_set_printerjob ? hb_set.hb_set_printerjob : s_PrintFileName) ;
+         hb_PrintFileRaw( (BYTE *)s_PrinterName, (BYTE *)s_PrintFileName, (BYTE *)( hb_set.hb_set_printerjob ? hb_set.hb_set_printerjob : s_PrintFileName)) ;
         hb_fsDelete((BYTE *) s_PrintFileName )  ;
       }
 #endif
@@ -262,7 +262,6 @@ static void close_text( FHANDLE handle )
 
 static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_set_enum set_specifier )
 {
-   char *pFile ;
    USHORT user_ferror;
    FHANDLE handle;
    PHB_FNAME pFilename;
@@ -306,7 +305,7 @@ static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_s
           TCHAR cTempDir[_POSIX_PATH_MAX + 1] ;
           GetTempPath((DWORD) _POSIX_PATH_MAX, cTempDir);  // We must use temp file as in WTS/Citrix/Network
           if (!GetTempFileName(cTempDir, "xht", 0,path)) { //  using PrinterName+'.prn' will not work
-             hb_fsSetError(GetLastError()) ;
+             hb_fsSetError( ( USHORT ) GetLastError()) ; /* TODO: Change Errors to Long from Short */
              hb_errRT_TERM( EG_CREATE, 2014, NULL, path, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY );
           }
         }

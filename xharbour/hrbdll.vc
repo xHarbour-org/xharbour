@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.18 2003/09/23 21:36:51 paultucker Exp $
+# $Id: hrbdll.vc,v 1.19 2003/10/01 19:22:32 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -196,7 +196,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\substr.obj \
   $(OBJ_DIR)\teditorl.obj \
   $(OBJ_DIR)\tone.obj \
-  $(OBJ_DIR)\tprint.obj \
   $(OBJ_DIR)\tprinter.obj \
   $(OBJ_DIR)\trace.obj \
   $(OBJ_DIR)\transfrm.obj \
@@ -1705,9 +1704,6 @@ $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
-   $(CC) $(CLIBFLAGS) /Fo$@ $**
-
-$(OBJ_DIR)\tprint.obj : $(RTL_DIR)\tprint.c
    $(CC) $(CLIBFLAGS) /Fo$@ $**
 
 $(OBJ_DIR)\tprinter.obj : $(RTL_DIR)\tprinter.c
