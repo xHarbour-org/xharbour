@@ -222,45 +222,40 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
                 ( ( uiMask & HB_FA_LABEL     ) == 0 && ( ffind->attr & HB_FA_LABEL     ) != 0 ) ||
                 ( ( uiMask & HB_FA_DIRECTORY ) == 0 && ( ffind->attr & HB_FA_DIRECTORY ) != 0 ) ))
          {
-            HB_ITEM pSubarray;
+            HB_ITEM Subarray;
             char buffer[ 32 ];
             BOOL bAddEntry;
 
-            hb_arrayNew( &pSubarray, 0 );
+            hb_arrayNew( &Subarray, 0 );
 
             if ( bFullPath )
             {
                char *szFullName = hb_xstrcpy(NULL,fDirSpec->szPath?fDirSpec->szPath:"",ffind->szName,NULL);
-               hb_arrayAddForward( &pSubarray, hb_itemPutC( &Filename, szFullName ) );
+               hb_arrayAddForward( &Subarray, hb_itemPutC( &Filename, szFullName ) );
                hb_xfree( szFullName );
             }
             else
             {
-               hb_arrayAddForward( &pSubarray, hb_itemPutC( &Filename, ffind->szName ) );
+               hb_arrayAddForward( &Subarray, hb_itemPutC( &Filename, ffind->szName ) );
             }
          #ifndef HB_LONG_LONG_OFF
-            hb_arrayAddForward( &pSubarray, hb_itemPutNLL( &Size, ffind->size ) );
+            hb_arrayAddForward( &Subarray, hb_itemPutNLL( &Size, ffind->size ) );
          #else
-            hb_arrayAddForward( &pSubarray, hb_itemPutNL( &Size, ffind->size ) );
+            hb_arrayAddForward( &Subarray, hb_itemPutNL( &Size, ffind->size ) );
          #endif
-            hb_arrayAddForward( &pSubarray, hb_itemPutDL( &Date, ffind->lDate ) );
-            hb_arrayAddForward( &pSubarray, hb_itemPutC( &Time, ffind->szTime ) );
-            hb_arrayAddForward( &pSubarray, hb_itemPutC( &Attr, hb_fsAttrDecode( ffind->attr, buffer ) ) );
+            hb_arrayAddForward( &Subarray, hb_itemPutDL( &Date, ffind->lDate ) );
+            hb_arrayAddForward( &Subarray, hb_itemPutC( &Time, ffind->szTime ) );
+            hb_arrayAddForward( &Subarray, hb_itemPutC( &Attr, hb_fsAttrDecode( ffind->attr, buffer ) ) );
 
             /* Don't exit when array limit is reached */
             bAddEntry = bDirOnly ? hb_fsIsDirectory( ( BYTE * ) ffind->szName ) : TRUE;
 
             if( bAddEntry )
             {
-               hb_arrayAddForward( pDir, &pSubarray );
+               hb_arrayAddForward( pDir, &Subarray );
             }
-            else
-            {
-               if ( bDirOnly )
-               {
-                  hb_itemClear( &pSubarray );
-               }
-            }
+
+            hb_itemClear( &Subarray );
          }
       }
       while( hb_fsFindNext( ffind ) );
