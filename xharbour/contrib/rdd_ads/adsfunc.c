@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.27 2004/02/17 07:01:50 paultucker Exp $
+ * $Id: adsfunc.c,v 1.28 2004/03/18 04:07:29 ronpinkas Exp $
  */
 
 /*
@@ -208,7 +208,7 @@ HB_FUNC( ADSGETSERVERTIME )
 
    SIGNED32 plTime = 0;
 
-   ADSHANDLE hConnect = ISNUM( 1 ) ? hb_parnl( 1 ) : adsConnectHandle;
+   ADSHANDLE hConnect = ISNUM( 1 ) ? (ADSHANDLE) hb_parnl( 1 ) : adsConnectHandle;
 
    ulRetVal = AdsGetServerTime( hConnect, pucDateBuf, &pusDateBufLen, &plTime, pucTimeBuf, &pusTimeBufLen );
 

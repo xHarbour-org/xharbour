@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.23 2004/02/03 14:01:13 druzus Exp $
+# $Id: gcc.cf,v 1.24 2004/03/18 21:46:53 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -15,7 +15,7 @@ CC_OUT = -o
 CPPFLAGS = -fsigned-char -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 # We are under linux
 #CFLAGS = -DHB_OS_LINUX -Wall -std=gnu99
-CFLAGS = -DHB_OS_LINUX -Wall
+CFLAGS = -DHB_OS_LINUX -Wall -W
 
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX

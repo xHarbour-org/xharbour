@@ -1,5 +1,5 @@
 /*
- * $Id: keytrans.c,v 1.2 2002/09/20 19:18:18 map Exp $
+ * $Id: keytrans.c,v 1.3 2003/05/16 19:52:11 druzus Exp $
  */
 
 /*
@@ -380,11 +380,11 @@ static void HB_GT_FUNC(gt_SortKeyTranslationTable( void ))
 {
    int i, j, min, KeyTmp[ 2 ];
 
-   for ( i = 0; i < ( KeyTranslationTableSize - 1 ); i++ )
+   for ( i = 0; i < ( (int) KeyTranslationTableSize - 1 ); i++ )
    {
       min = i;
 
-      for ( j = i + 1; j < KeyTranslationTableSize; j++ )
+      for ( j = i + 1; j < (int) KeyTranslationTableSize; j++ )
       {
          if ( KeyTranslationTable[ j ][ 0 ] < KeyTranslationTable[ min ][ 0 ] )
             min = j;
@@ -452,7 +452,7 @@ int HB_GT_FUNC(gt_SetKeyInKeyTranslationTable( int SlangKey, int ClipKey ))
    if ( ( SlangKey >= KeyTranslationTable[ 0 ][ 0 ] ) &&
         ( SlangKey <= KeyTranslationTable[ KeyTranslationTableSize - 1 ][ 0 ] ) )
    {
-      for ( i = 0; i < KeyTranslationTableSize; i++ )
+      for ( i = 0; i < (int) KeyTranslationTableSize; i++ )
       {
          if ( SlangKey == KeyTranslationTable[ i ][ 0 ] )
             KeyTranslationTable[ i ][ 1 ] = ClipKey;

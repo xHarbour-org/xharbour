@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.19 2004/02/09 18:00:37 druzus Exp $
+ * $Id: gtsln.c,v 1.20 2004/02/18 21:35:56 druzus Exp $
  */
 
 /*
@@ -153,15 +153,17 @@ static BOOL s_bUse_Alt_Char_Hack = FALSE;
 
 /* clipboard support */
 static char *s_clipboard = NULL;
-static int s_clipsize = 0;
+static ULONG s_clipsize = 0;
 
 /* *********************************************************************** */
 
 volatile BOOL hb_gt_sln_bScreen_Size_Changed = FALSE;
 
 /* window's resize handler */
-static void sigwinch_handler( int sig )
+static void sigwinch_handler( int iSig )
 {
+    HB_SYMBOL_UNUSED( iSig );
+
     hb_gt_sln_bScreen_Size_Changed = TRUE;
     SLsignal( SIGWINCH, sigwinch_handler );
 }
@@ -410,6 +412,9 @@ BOOL HB_GT_FUNC(gt_AdjustPos( BYTE * pStr, ULONG ulLen ))
     }
 
     HB_GT_FUNC(gt_SetPos( row, col, HB_GT_SET_POS_AFTER ));
+#else
+    HB_SYMBOL_UNUSED( pStr );
+    HB_SYMBOL_UNUSED( ulLen );
 #endif
     return TRUE;
 }
@@ -559,7 +564,7 @@ void HB_GT_FUNC(gt_Puts( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE * pbyStr,
     if( ulLen > 0 )
         SLsmg_write_raw( pScr, ulLen );
 
-    if( uiCol + ulLen >= SLtt_Screen_Cols )
+    if( uiCol + ulLen >= (ULONG) SLtt_Screen_Cols )
         if( s_uiDispCount == 0 )
         {
             SLsmg_refresh();

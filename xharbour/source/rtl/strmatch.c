@@ -1,5 +1,5 @@
 /*
- * $Id: strmatch.c,v 1.3 2004/03/16 14:39:23 druzus Exp $
+ * $Id: strmatch.c,v 1.4 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
 
 #include "regex.h"
 
+#if 0  /* disabled to eliminate warnings */
 static BOOL hb_strMatchDOS( const char * pszString, const char * pszMask )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strMatchDOS(%s, %s)", pszString, pszMask));
@@ -111,6 +112,7 @@ static BOOL hb_strMatchDOS( const char * pszString, const char * pszMask )
 
    return ! ( ( *pszMask != '\0' && *pszString == '\0' && *pszMask != '*') || ( *pszMask == '\0' && *pszString != '\0' ) );
 }
+#endif
 
 BOOL HB_EXPORT hb_strMatchRegExp( const char * szString, const char * szMask )
 {

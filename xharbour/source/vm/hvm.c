@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.360 2004/03/17 08:29:45 ronpinkas Exp $
+ * $Id: hvm.c,v 1.361 2004/03/20 00:27:21 ronpinkas Exp $
  */
 
 /*
@@ -2756,7 +2756,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPVARIABLE") );
          {
             USHORT uiParams;
-            PHB_DYNS pDyn;
 
             uiParams = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
 

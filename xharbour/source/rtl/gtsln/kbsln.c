@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.10 2003/10/19 18:03:29 lculik Exp $
+ * $Id: kbsln.c,v 1.11 2003/10/22 01:04:21 lculik Exp $
  */
 
 /*
@@ -335,7 +335,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
             return( 0 );
 #endif
     /* user AbortKey break */
-    if( ch == s_hb_gt_Abort_key )
+    if( (int) ch == s_hb_gt_Abort_key )
         return( HB_BREAK_FLAG );
 
     SLang_ungetkey( ch );
@@ -351,18 +351,18 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
     if( InDeadState )
     {
         InDeadState = FALSE;
-        if( ch == hb_DeadKey ) /* double press Dead key */
+        if( (int) ch == hb_DeadKey ) /* double press Dead key */
             return( ch );
         if( ch < 256 )  /* is this needed ??? */
         {
             int i;
             for( i=0; i < ( int ) s_convKDeadKeys[ 0 ]; i++ )
-                if( ( int ) s_convKDeadKeys[ 2 * i + 1 ] == ch )
+                if( ( int ) s_convKDeadKeys[ 2 * i + 1 ] == (int) ch )
                     return( ( int ) s_convKDeadKeys[ 2 * i + 2 ] );
         }
         return( 0 );
     }
-    else if( ch == hb_DeadKey )
+    else if( (int) ch == hb_DeadKey )
     {
         /* entering Dead key state */
         InDeadState = TRUE;

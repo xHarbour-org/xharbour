@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.97 2004/03/20 03:14:53 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.98 2004/03/20 22:12:07 paultucker Exp $
  */
 
 /*
@@ -3813,13 +3813,13 @@ HB_FUNC( ORDSCOPE )
 HB_FUNC( DBRELATION )  /* (<nRelation>) --> cLinkExp */
 {
    HB_THREAD_STUB
-   char cExprBuff[ 256 ];  /*TODO: Correct buffer size initialization ??*/
+   char szExprBuff[ 256 ];  /*TODO: Correct buffer size initialization ??*/
 
-   cExprBuff[ 0 ] = 0;
+   szExprBuff[ 0 ] = 0;
    if( s_pCurrArea )
-      SELF_RELTEXT( ( AREAP ) s_pCurrArea->pArea, hb_parni(1), &cExprBuff ) ;
+      SELF_RELTEXT( ( AREAP ) s_pCurrArea->pArea, hb_parni(1), szExprBuff ) ;
 
-   hb_retc(cExprBuff);
+   hb_retc(szExprBuff);
 }
 
 HB_FUNC( DBRSELECT )  /* (<nRelation>) --> nWorkArea */

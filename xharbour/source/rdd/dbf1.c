@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.65 2004/03/02 00:28:18 druzus Exp $
+ * $Id: dbf1.c,v 1.66 2004/03/18 21:34:54 druzus Exp $
  */
 
 /*
@@ -2760,9 +2760,9 @@ static ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
       pArea->ulRecCount = hb_dbfCalcRecCount( pArea );
    }
 
-   HB_PUT_LE_ULONG( &dbfHeader.ulRecCount, pArea->ulRecCount );
-   HB_PUT_LE_USHORT( &dbfHeader.uiHeaderLen, pArea->uiHeaderLen );
-   HB_PUT_LE_USHORT( &dbfHeader.uiRecordLen, pArea->uiRecordLen );
+   HB_PUT_LE_ULONG( dbfHeader.ulRecCount, pArea->ulRecCount );
+   HB_PUT_LE_USHORT( dbfHeader.uiHeaderLen, pArea->uiHeaderLen );
+   HB_PUT_LE_USHORT( dbfHeader.uiRecordLen, pArea->uiRecordLen );
    hb_fsSeek( pArea->hDataFile, 0, FS_SET );
    hb_fsWrite( pArea->hDataFile, ( BYTE * ) &dbfHeader, sizeof( DBFHEADER ) );
    pArea->fUpdateHeader = FALSE;

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.72 2004/03/16 21:31:37 lf_sfnet Exp $
+ * $Id: filesys.c,v 1.73 2004/03/20 23:24:47 druzus Exp $
  */
 
 /*
@@ -151,20 +151,6 @@
 
 #endif
 
-#if defined(__WATCOMC__)
-   #include <sys/stat.h>
-   #include <share.h>
-   #include <fcntl.h>
-   #include <direct.h>
-   #include <errno.h>
-   #include <dos.h>
-
-   #if !defined(HAVE_POSIX_IO)
-      #define HAVE_POSIX_IO
-   #endif
-   #define ftruncate chsize
-#endif
-
 #if defined(__BORLANDC__) || defined(__IBMCPP__) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__WATCOMC__)
    #include <sys/stat.h>
    #include <share.h>
@@ -175,6 +161,8 @@
       #include <dir.h>
       #include <dos.h>
       #include <windows.h>
+   #elif defined(__BORLANDC__)
+      #include <dos.h>
    #endif
 
    #if defined(_MSC_VER) || defined(__MINGW32__)
@@ -357,7 +345,7 @@ static int convert_open_flags( USHORT uiFlags )
       HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_RDWR\n"));
    }
 
-#if ! defined(HB_FS_SOPEN) && ! defined( HB_OS_LINUX )
+#if ! defined(HB_FS_SOPEN) && ! defined( HB_OS_UNIX )
    /* shared flags */
    if( ( uiFlags & FO_DENYREAD ) == FO_DENYREAD )
    {
@@ -939,10 +927,9 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       argv[2] = ( char * ) pFilename;
       argv[3] = ( char * ) 0; */
       // drop uncontrolled streams
-      if ( bBackground )
-      {
-         hNull = open("/dev/null", O_RDWR);
-      }
+
+      /* Initialize hNull to make compiler happy ;-) */
+      hNull = bBackground ? open("/dev/null", O_RDWR) : FS_ERROR;
 
       // does father wants to control us?
       if ( fhStdin != NULL )
@@ -990,8 +977,23 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       /*
       for( hNull = 3; hNull < MAXFD; ++hNull )
          close(hNull);
+      */
 
       // ????
+      /*
+       * This disable SUID and SGID, I added it for security to hb_fsPOpen
+       * Just simply program can work using seteuid()/setegid() to access
+       * database file what can cause that users cannot access database
+       * file directly - only from program. When you run external program
+       * with setuid(geteuid())/setgid(getegid()) then it inherits UID and
+       * GID so is able to operate with their privileges. If this external
+       * program is called without absolute path (beginning from "/") then
+       * user can set his own PATH variable or change directory before
+       * running xHarbour binaries to take control over EUID/EGID resources
+       * Take a decision is it's important - maybe it should be set
+       * by a parameter? Druzus.
+       */
+      /*
       setuid(getuid());
       setgid(getgid());*/
 
@@ -1514,12 +1516,6 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
       hFileHandle=HandleToLong(hFile);
    }
 
-#elif defined(HAVE_POSIX_IO) && ! defined(__IBMCPP__) && ! defined(_MSC_VER)
-
-   errno = 0;
-   hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
-   hb_fsSetError( errno );
-
 #elif defined(_MSC_VER)
 
    {
@@ -1548,8 +1544,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
       hb_fsSetError( errno );
    }
 
-#elif defined(__MINGW32__) || defined(__IBMCPP__)
-
+#elif defined(HAVE_POSIX_IO) && defined(HB_FS_SOPEN)
    {
       int iShare = SH_DENYNO;
 
@@ -1572,9 +1567,18 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
          hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
 
       HB_DISABLE_ASYN_CANC
-
       hb_fsSetError( errno );
    }
+#elif defined(HAVE_POSIX_IO)
+
+   // allowing async cancelation here
+   HB_TEST_CANCEL_ENABLE_ASYN
+
+   errno = 0;
+   hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
+
+   HB_DISABLE_ASYN_CANC
+   hb_fsSetError( errno );
 
 #else
 

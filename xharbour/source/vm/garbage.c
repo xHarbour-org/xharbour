@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.75 2004/02/22 07:36:18 jonnymind Exp $
+ * $Id: garbage.c,v 1.76 2004/03/05 23:00:05 andijahja Exp $
  */
 
 /*
@@ -88,7 +88,7 @@ static HB_GARBAGE_PTR s_pLockedBlock = NULL;
 #endif
 
 /* marks if block releasing is requested during garbage collecting */
-volatile static BOOL s_bCollecting = FALSE;
+static volatile BOOL s_bCollecting = FALSE;
 
 /* Signify ReleaseAll Processing is taking place. */
 static BOOL s_bReleaseAll = FALSE;

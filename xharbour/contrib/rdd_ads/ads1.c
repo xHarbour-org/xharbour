@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.31 2004/02/22 00:47:04 brianhays Exp $
+ * $Id: ads1.c,v 1.32 2004/03/02 00:28:18 druzus Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ HB_INIT_SYMBOLS_END( ads1__InitSymbols )
    #pragma startup ads1__InitSymbols
 #endif
 
-static RDDFUNCS adsSuper = { NULL };
+static RDDFUNCS adsSuper;
 
 void adsSetListener_callback( HB_set_enum setting, HB_set_listener_enum when )
 {

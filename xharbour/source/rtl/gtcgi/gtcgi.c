@@ -1,5 +1,5 @@
 /*
- * $Id: gtcgi.c,v 1.12 2004/02/16 12:28:45 andijahja Exp $
+ * $Id: gtcgi.c,v 1.13 2004/02/17 18:44:14 andijahja Exp $
  */
 
 /*
@@ -148,7 +148,7 @@ BOOL HB_GT_FUNC(gt_AdjustPos( BYTE * pStr, ULONG ulLen ))
    USHORT row = s_iRow;
    USHORT col = s_iCol;
    ULONG ulCount;
-   BOOL bCrLfSeq;
+   BOOL bCrLfSeq = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_AdjustPos(%s, %lu)", pStr, ulLen ));
 

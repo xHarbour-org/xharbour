@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.13 2004/03/18 03:58:36 ronpinkas Exp $
+ * $Id: cdpapi.c,v 1.14 2004/03/18 21:34:54 druzus Exp $
  */
 
 /*
@@ -133,6 +133,7 @@ static int u16toutf8( BYTE *szUTF8, USHORT uc )
    return n;
 }
 
+#if 0  /* currently unused, it will in the future */
 static int utf8tou16( BYTE *szUTF8, USHORT *uc )
 {
    int n = 1, m = 1;
@@ -180,6 +181,7 @@ static int utf8tou16( BYTE *szUTF8, USHORT *uc )
    *uc = (USHORT) u32;
    return n;
 }
+#endif
 
 static int hb_cdpFindPos( char * pszID )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.21 2004/03/15 12:45:25 druzus Exp $
+ * $Id: workarea.c,v 1.22 2004/03/20 23:24:46 druzus Exp $
  */
 
 /*
@@ -147,7 +147,7 @@ ERRCODE hb_waSkip( AREAP pArea, LONG lToSkip )
  */
 ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
 {
-   BOOL fTop, fBottom, fOutOfRange, fDeleted;
+   BOOL fBottom, fDeleted;
    PHB_ITEM pResult;
    ERRCODE uiError;
 
@@ -161,19 +161,11 @@ ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
       The implied purpose of hb_waSkipFilter is to get off of a "bad" record
       after a skip was performed, NOT to skip lToSkip filtered records.
    */
-   lUpDown = ( lUpDown > 0  ?  1 : -1 );
+   lUpDown = ( lUpDown < 0  ? -1 : 1 );
 
-   fTop = pArea->fTop;
    fBottom = pArea->fBottom;
-   fOutOfRange = FALSE;
-   while( TRUE )
+   while ( !pArea->fBof && !pArea->fEof )
    {
-      if( pArea->fBof || pArea->fEof )
-      {
-         fOutOfRange = TRUE;
-         break;
-      }
-
       /* SET FILTER TO */
       if( pArea->dbfi.itmCobExpr )
       {
@@ -200,32 +192,6 @@ ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
       break;
    }
 
-#if 0
-   if( fOutOfRange )
-   {
-      /*
-         TODO: these calls to SELF_GOTO are redundant; in most cases
-         we are already at EOF from the skips above, and GO 0 is not necessary.
-         We should take a closer look at these. --BH
-      */
-
-      if( fTop && lUpDown > 0 )
-         uiError = SELF_GOTO( pArea, 0 );
-      else if( fBottom && lUpDown < 0 )
-         uiError = SELF_GOTO( pArea, 0 );
-      else if( lUpDown < 0 )
-      {
-         pArea->fEof = FALSE;
-         uiError = SELF_GOTOP( pArea );
-         pArea->fBof = TRUE;
-      }
-      else
-      {
-         uiError = SELF_GOTO( pArea, 0 );
-         pArea->fBof = FALSE;
-      }
-   }
-#else
    /*
     * The only one situation when we should repos is backward skipping
     * if we are at BOTTOM position (it's SKIPFILTER called from GOBOTTOM)
@@ -243,7 +209,6 @@ ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
          pArea->fBof = TRUE;
       }
    }
-#endif
    else
    {
       uiError = SUCCESS;

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.110 2004/03/11 00:43:48 ronpinkas Exp $
+ * $Id: classes.c,v 1.111 2004/03/18 04:05:27 ronpinkas Exp $
  */
 
 /*
@@ -2045,16 +2045,12 @@ HB_FUNC( __CLSDELMSG )
  */
 HB_FUNC( __CLSINST )
 {
-   HB_ITEM pSelf ;
+   HB_ITEM itmSelf ;
 
-   pSelf.type = HB_IT_NIL;
+   itmSelf.type = HB_IT_NIL;
 
-   hb_clsInst( ( USHORT ) hb_parni( 1 ), &pSelf );
-
-   if( &pSelf )
-   {
-      hb_itemReturn( &pSelf );
-   }
+   hb_clsInst( ( USHORT ) hb_parni( 1 ), &itmSelf );
+   hb_itemReturn( &itmSelf );
 }
 
 /*

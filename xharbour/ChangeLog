@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2618 2004/03/21 12:01:23 likewolf Exp $
+ * $Id: ChangeLog,v 1.2619 2004/03/21 12:19:58 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-03-21 17:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/config/dos/watcom.cf
+    * divided compilation flags for easier manipulating in special builds
+
+  * xharbour/config/linux/gcc.cf
+    + -W added to report some warnings
+
+  * xharbour/source/rtl/cdpapi.c
+    * utf8tou16() temporary disabled to avoid warning
+
+  * xharbour/source/rtl/gtcgi/gtcgi.c
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtsln/kbsln.c
+  * xharbour/source/rtl/gtsln/keytrans.c
+  * xharbour/source/rtl/strmatch.c
+  * xharbour/source/vm/classes.c
+  * xharbour/source/vm/garbage.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/workarea.c
+  * xharbour/contrib/rdd_ads/adsfunc.c
+  * xharbour/contrib/rdd_ads/ads1.c
+
+    * warning fixes
+
+  * xharbour/source/rtl/filesys.c
+    * fixed some warnings
+    ! fixed hb_fsOpen for OpenWatcom. It doesn't respect shared flags
+      at all. I change the order of #if code and some definition.
+      Most of them was redundant and cause that is was hard to understand
+      what each compiler should do - side effect of such situation cause
+      that some sompilers may not use shared flags at all (f.e. OpenWatcom)
+      I hope I don't break anything but this should be extensively tested
+      on all platforms.
 
 2004-03-21 15:30 UTC+0300 Phil Krylov <phil@newstar.rinet.ru>
   * source/debug/debugger.prg
