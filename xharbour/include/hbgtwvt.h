@@ -1,4 +1,8 @@
 /*
+ * $Id: hbgtwvt.h,v 1.0 2003/12/22 01:18:59 peterrees Exp $
+ */
+
+/*
  * xHarbour Project source code:
  * Video subsystem grwvt exported functions header file
  * Copyright 2003 Peter Rees <peter@rees.co.nz>
