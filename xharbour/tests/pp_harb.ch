@@ -2530,7 +2530,7 @@
             }
             else
             {
-               s_pDynList = hb_xrealloc( (void *) s_pDynList, ( s_iDyn + 1 ) * sizeof( DYN_PROC ) );
+               s_pDynList = (DYN_PROC *) hb_xrealloc( (void *) s_pDynList, ( s_iDyn + 1 ) * sizeof( DYN_PROC ) );
 
                s_pDynList[s_iDyn].pAsm  = pDynFunc;
                s_pDynList[s_iDyn].pcode = pcode;
