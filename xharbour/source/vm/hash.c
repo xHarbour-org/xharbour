@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.34 2004/09/28 09:44:36 likewolf Exp $
+ * $Id: hash.c,v 1.35 2004/11/21 21:44:27 druzus Exp $
  */
 
 /*
@@ -1185,7 +1185,7 @@ void HB_EXPORT hb_hashPreallocate( PHB_ITEM pHash, ULONG ulNewLen )
    ulAlloc = pBaseHash->ulAllocated;
    ulLen = pBaseHash->ulLen;
 
-   if( ulLen < ulNewLen )
+   if( ulLen > ulNewLen )
    {
       ulNewLen = ulLen;
    }
@@ -2248,8 +2248,8 @@ HB_FUNC( HCLONE )
 
    if( ! pHash )
    {
-      hb_errRT_BASE( EG_ARG, 2017, NULL, "HCLONE", 2,
-      hb_paramError( 1 ), hb_paramError( 2 ));
+      hb_errRT_BASE( EG_ARG, 2017, NULL, "HCLONE", 1, hb_paramError( 1 ) );
+      return;
    }
 
    Clone.type = HB_IT_NIL;
@@ -2269,17 +2269,19 @@ HB_FUNC( HCOPY )
 
    if ( pSource == NULL || pDest == NULL )
    {
-      hb_errRT_BASE( EG_ARG, 2017, NULL, "HCOPY", 3,
-      hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ));
+      hb_errRT_BASE( EG_ARG, 2017, NULL, "HCOPY", 5,
+         hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), 
+         hb_paramError( 4 ), hb_paramError( 5 ) );
+      return;
    }
 
    ulLen   = hb_hashLen(pSource);
    ulStart = pStart == NULL ? 1 : hb_itemGetNL( pStart );
    ulCount = pEnd   == NULL ? ulLen - ulStart + 1 : (ULONG) hb_itemGetNL( pEnd );
 
-   if ( ulStart < 1 ||  ulCount <= 0 || ulStart + ulCount > ulLen)
-   {
-   }
+//   if ( ulStart < 1 ||  ulCount <= 0 || ulStart + ulCount > ulLen)
+//   {
+//   }
 
    hb_hashMerge( pDest, pSource, ulStart, ulCount, pBlock );
 
@@ -2296,7 +2298,8 @@ HB_FUNC( HMERGE )
    if ( pSource == NULL || pDest == NULL )
    {
       hb_errRT_BASE( EG_ARG, 2017, NULL, "HMERGE", 5,
-      hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
+         hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
+      return;
    }
 
    hb_hashMerge( pDest, pSource, 1, hb_hashLen(pSource), pBlock );
@@ -2342,7 +2345,7 @@ HB_FUNC( HSETCASEMATCH )
    else
    {
       hb_errRT_BASE( EG_ARG, 2017, NULL, "HSETCASEMATCH", 2,
-      hb_paramError( 1 ), hb_paramError( 2 ));
+         hb_paramError( 1 ), hb_paramError( 2 ));
    }
 }
 
@@ -2353,7 +2356,7 @@ HB_FUNC( HGETCASEMATCH )
    if( ! pHash )
    {
          hb_errRT_BASE( EG_ARG, 2017, NULL, "HGETCASEMATCH", 2,
-         hb_paramError( 1 ), hb_paramError( 2 ));
+            hb_paramError( 1 ), hb_paramError( 2 ));
    }
    else
    {
@@ -2377,7 +2380,7 @@ HB_FUNC( HSETAUTOADD )
    else
    {
          hb_errRT_BASE( EG_ARG, 2017, NULL, "HSETAUTOADD", 1,
-         hb_paramError( 1 ));
+            hb_paramError( 1 ));
    }
 }
 
@@ -2389,7 +2392,7 @@ HB_FUNC( HGETAUTOADD )
    if( ! pHash )
    {
          hb_errRT_BASE( EG_ARG, 2017, NULL, "HGETAUTOADD", 1,
-         hb_paramError( 1 ));
+            hb_paramError( 1 ));
    }
    else
    {
