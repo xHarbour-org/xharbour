@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.132 2004/11/21 21:44:25 druzus Exp $
+ * $Id: classes.c,v 1.133 2004/11/26 17:46:32 druzus Exp $
  */
 
 /*
@@ -1214,10 +1214,12 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
    {
       return hb___msgClsFullSel;
    }
+   /* Eval message for blocks is handled at VM level.
    else if( pMsg == s_msgEval )
    {
       return hb___msgEval;
    }
+   */
    else if( pMsg == s_msgClsParent )
    {
       return hb___msgClsParent;
@@ -3628,6 +3630,8 @@ static HARBOUR hb___msgEvalInline( void )
  *
  * Internal function for the internal EVAL method.
  */
+#if 0
+// Eval message for blocks is handled at VM level.
 static HARBOUR hb___msgEval( void )
 {
    HB_THREAD_STUB
@@ -3650,6 +3654,7 @@ static HARBOUR hb___msgEval( void )
       hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, NULL, "EVAL", 0 );
    }
 }
+#endif
 
 /*
  * __msgSuper()
