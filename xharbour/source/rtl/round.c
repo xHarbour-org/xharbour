@@ -1,5 +1,5 @@
 /*
- * $Id: round.c,v 1.4 2003/07/13 22:21:25 andijahja Exp $
+ * $Id: round.c,v 1.5 2003/07/18 21:42:35 andijahja Exp $
  */
 
 /*
@@ -95,9 +95,15 @@ double hb_numRound( double dResult, int iDec )
       if( iDec == 0 )
       {
          if( dResult < 0.0 )
+         {
             dResult = ceil( dResult - 0.5 );
+            if ( dResult == -0 )
+               dResult = 0;
+         }
          else
+         {
             dResult = floor( dResult + 0.5 );
+         }
       }
       else if( iDec < 0 )
       {
