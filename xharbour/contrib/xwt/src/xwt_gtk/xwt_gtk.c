@@ -4,7 +4,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.24 2003/10/09 23:18:34 jonnymind Exp $
+   $Id: xwt_gtk.c,v 1.25 2003/10/09 23:57:23 jonnymind Exp $
 
    Global declarations, common functions
 
@@ -545,11 +545,19 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          }
       return FALSE;
 
+      case XWT_PROP_UPDATE:
+         if( wWidget->type == XWT_TYPE_BROWSE )
+         {
+            return xwt_gtk_browse_set_content( wWidget );
+         }
+      return FALSE;
+
       case XWT_PROP_TITLES:
          if( wWidget->type == XWT_TYPE_TREELIST )
          {
             return xwt_gtk_treelist_set_columns( wWidget, prop->value.data );
          }
+
       return FALSE;
 
       case XWT_PROP_COLUMNS:
@@ -566,25 +574,26 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
                   GINT_TO_POINTER( prop->value.number ) );
          }
       return FALSE;
-            case XWT_PROP_FONT:
+
+      case XWT_PROP_FONT:
       {
          PangoFontDescription *font_desc =  pango_font_description_from_string(prop->value.font);
-	 switch( wWidget->type )
-        {
+         switch( wWidget->type )
+         {
             case XWT_TYPE_BUTTON:
             case XWT_TYPE_TOGGLEBUTTON:
             case XWT_TYPE_RADIOBUTTON:
             case XWT_TYPE_CHECKBOX:
-	    {
-	
-//	        GtkWidget *child = gtk_bin_get_child(GTK_BIN(wSelf));
-//                style = gtk_widget_get_modifier_style(child);
-//                style -> font_desc = font_desc;
-//	        gtk_widget_modify_style(GTK_WIDGET(child) , style);
-		gtk_widget_modify_font(GTK_WIDGET(gtk_bin_get_child ( GTK_BIN(wSelf) ) ),font_desc);
-		pango_font_description_free (font_desc);
-	    }
-		break;
+            {
+
+      //	        GtkWidget *child = gtk_bin_get_child(GTK_BIN(wSelf));
+      //                style = gtk_widget_get_modifier_style(child);
+      //                style -> font_desc = font_desc;
+      //	        gtk_widget_modify_style(GTK_WIDGET(child) , style);
+            gtk_widget_modify_font(GTK_WIDGET(gtk_bin_get_child ( GTK_BIN(wSelf) ) ),font_desc);
+            pango_font_description_free (font_desc);
+            }
+            break;
             case XWT_TYPE_LABEL:
 	    {
 /*	        style = gtk_widget_get_modifier_style(wMain);
@@ -594,9 +603,9 @@ BOOL xwt_drv_set_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
 */
 		gtk_widget_modify_font(GTK_WIDGET(wMain),font_desc);
 		pango_font_description_free (font_desc);
-	
+
 		break;
-	}	
+	}
             case XWT_TYPE_MENUITEM:
 	    {
 	       PXWT_GTK_MENUITEM itm = (PXWT_GTK_MENUITEM) wWidget->widget_data;
@@ -1072,17 +1081,19 @@ BOOL xwt_drv_create( PXWT_WIDGET xwtData )
       case XWT_TYPE_MENU:    return xwt_gtk_createMenu( xwtData );
       case XWT_TYPE_MENUITEM:return xwt_gtk_createMenuItem( xwtData );
       case XWT_TYPE_TEXTBOX: return xwt_gtk_createTextbox( xwtData );
-      case XWT_TYPE_IMAGE:  return xwt_gtk_createImage( xwtData );
+      case XWT_TYPE_IMAGE:   return xwt_gtk_createImage( xwtData );
       case XWT_TYPE_LAYOUT:  return xwt_gtk_createLayout( xwtData );
-      case XWT_TYPE_GRID:  return xwt_gtk_createGrid( xwtData );
-      case XWT_TYPE_VIEWPORT:  return xwt_gtk_createViewPort( xwtData );
-      case XWT_TYPE_RADIOBUTTON:  return xwt_gtk_createRadioButton( xwtData );
-      case XWT_TYPE_CHECKBOX:  return xwt_gtk_createCheckbox( xwtData );
-      case XWT_TYPE_FILESEL:  return xwt_gtk_createFileSelection( xwtData );
-      case XWT_TYPE_SPLITTER:  return xwt_gtk_createSplitter( xwtData );
-      case XWT_TYPE_TOGGLEBUTTON:  return xwt_gtk_createToggleButton( xwtData );
-      case XWT_TYPE_TREELIST: return xwt_gtk_createTreelist( xwtData );
-      case XWT_TYPE_FONTSEL: return xwt_gtk_createFontSelection( xwtData );
+      case XWT_TYPE_GRID:    return xwt_gtk_createGrid( xwtData );
+      case XWT_TYPE_VIEWPORT:    return xwt_gtk_createViewPort( xwtData );
+      case XWT_TYPE_RADIOBUTTON: return xwt_gtk_createRadioButton( xwtData );
+      case XWT_TYPE_CHECKBOX:    return xwt_gtk_createCheckbox( xwtData );
+      case XWT_TYPE_FILESEL:     return xwt_gtk_createFileSelection( xwtData );
+      case XWT_TYPE_SPLITTER:    return xwt_gtk_createSplitter( xwtData );
+      case XWT_TYPE_TOGGLEBUTTON: return xwt_gtk_createToggleButton( xwtData );
+      case XWT_TYPE_TREELIST:    return xwt_gtk_createTreelist( xwtData );
+      case XWT_TYPE_BROWSE:      return xwt_gtk_createBrowse( xwtData );
+      case XWT_TYPE_FONTSEL:     return xwt_gtk_createFontSelection( xwtData );
+
    }
    return FALSE;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.43 2003/10/13 11:53:47 jonnymind Exp $
+ * $Id: Changelog,v 1.44 2003/10/14 23:11:59 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2003-11-08 01:41 UTC+0100 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
+  * include/xwtcmd.ch
+    ! fixed a mispelling
+
+  * include/xwt.ch
+  * src/xwt_api.c
+  * src/xwt_gtk/xwt_gtk.c
+  * src/xwt_gtk/xwt_gtk.h
+  + src/bcolumn.prg
+  + src/browse.prg
+  + src/xwt_gtk_browse.c
+    + Added the HBR TBrowse like widget. It is basically a table whose cells
+      can be rendered using codeblocks and also executable arrays. Both
+      visualization and update can be managed with a powerfull yet simple
+      callback system.
+      There still a little more to do (like i.e. live setting change
+      management), but the system is already useable. With a minimal effort,
+      it could be applied to a DBEDIT.
+      Have a look, it is worth.
+
+  * src/xwt_gtk/xwt_gtk_treelist.c
 
 2003-10-15 01:10 UTC+0200 Giancarlo Niccolai <antispam /at/ niccolai [dot] ws>
   * contrib/xwt/makefile.bc

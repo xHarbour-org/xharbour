@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwtcmd.ch,v 1.6 2003/08/30 10:01:17 jonnymind Exp $
+   $Id: xwtcmd.ch,v 1.7 2003/08/31 20:02:36 xthefull Exp $
 
    Definitions
 */
@@ -37,7 +37,7 @@
 #xcommand DEFINE LABEL <oLabel> [ TEXT <cText> ] [ MOVE <x>,<y> ] [ OF <oParent> ] [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>];
           => <oLabel> := XWTLabel():New( <cText>, <x>, <y>, <oParent>, <(cFont)>,<nSize>,<(clr)>)
 
-#xcommand @ <x>,<y> LABEL <oLabel> [ TEXT <cText> ] [ OF <oParent> ] [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>;
+#xcommand @ <x>,<y> LABEL <oLabel> [ TEXT <cText> ] [ OF <oParent> ] [FONT <cFont>] [SIZE <nSize>] [COLOR <clr>];
           => <oLabel> := XWTLabel():New( <cText>, <x>, <y>, <oParent>, <(cFont)>,<nSize>,<(clr)>)
 
 // TextBox -------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.14 2003/08/27 20:53:07 lculik Exp $
+   $Id: xwt_api.c,v 1.15 2003/10/09 23:18:33 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -181,7 +181,9 @@ HB_FUNC( XWT_CREATE )
 
    xwtData->type = hb_parni( 2 );
    xwtData->owner = pSelf->item.asArray.value;
-   
+   /* Forbid releasing of the owner. */
+   hb_gcLock( xwtData->owner );
+
    if ( xwt_drv_create( xwtData ) )
    {
       hb_retptr( xwtData );
@@ -199,14 +201,20 @@ HB_FUNC( XWT_DESTROY )
 {
    PHB_ITEM pSelf = hb_param( 1, HB_IT_POINTER );
    PXWT_WIDGET wSelf;
+
    /* Unready driver widget? */
-   if ( pSelf == NULL ) 
-   { 
+   if ( pSelf == NULL )
+   {
       hb_retl( FALSE );
       return;
    }
-   
+
    wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
+
+   /* release owner so it can be destroyed */
+   hb_gcUnlock( wSelf->owner );
+
+   /* Destruction sequence in drivers will not touch the owner */
    hb_retl( xwt_drv_destroy( wSelf ) );
 }
 
@@ -216,14 +224,14 @@ HB_FUNC( XWT_SETPROPERTY )
    PHB_ITEM pSelf = hb_param( 1, HB_IT_POINTER );
    PXWT_WIDGET wSelf;
    XWT_PROPERTY prop;
-   
+
    /* Unready driver widget? */
-   if ( pSelf == NULL ) 
-   { 
+   if ( pSelf == NULL )
+   {
       hb_retl( FALSE );
       return;
    }
-   
+
    wSelf = (PXWT_WIDGET) pSelf->item.asPointer.value;
 
    prop.type = hb_parni( 2 );
@@ -244,6 +252,7 @@ HB_FUNC( XWT_SETPROPERTY )
       case XWT_PROP_SECSHRINK:
       case XWT_PROP_BOX:
       case XWT_PROP_STATUS:
+      case XWT_PROP_UPDATE:
          prop.value.setting = hb_parl( 3 );
       break;
 
@@ -308,19 +317,19 @@ HB_FUNC( XWT_SETPROPERTY )
       case XWT_PROP_FGCOLOR:
          prop.color.fg = hb_parc( 3 );
       break;
-      
+
       case XWT_PROP_BGCOLOR:
          prop.color.bg = hb_parc( 3 );
       break;
-      
+
       case XWT_PROP_BASECOLOR:
          prop.color.base = hb_parc( 3 );
       break;
-      
+
       case XWT_PROP_TEXTCOLOR:
          prop.color.text = hb_parc( 3 );
       break;
-      
+
       //Array
       case XWT_PROP_SETMENUBAR:
       case XWT_PROP_RSTMENUBAR:

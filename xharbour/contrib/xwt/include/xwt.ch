@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt.ch,v 1.20 2003/08/27 20:53:44 lculik Exp $
+   $Id: xwt.ch,v 1.21 2003/09/02 22:51:30 lculik Exp $
 
    Definitions
 */
@@ -102,6 +102,9 @@
 
 #define XWT_PROP_FONTNAME        140
 
+// Global widget management status
+#define XWT_PROP_UPDATE    200  // boolean (ready or not)
+
 /* Fake properties */
 #define XWT_PROP_SETMENUBAR 1000 // PHB_ITEM (HB_IT_ARRAY) in data
 #define XWT_PROP_RSTMENUBAR 1001 // idem
@@ -173,6 +176,7 @@
 #define XWT_TYPE_SPLITTER 70
 #define XWT_TYPE_TREEITEM 80
 #define XWT_TYPE_TREELIST 81
+#define XWT_TYPE_BROWSE   82
 #define XWT_TYPE_FONTSEL  90
 
 // Container of Widgets ---------------------------

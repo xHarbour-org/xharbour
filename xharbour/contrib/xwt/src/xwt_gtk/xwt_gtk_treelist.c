@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_treelist.c,v 1.1 2003/06/05 17:06:22 jonnymind Exp $
+   $Id: xwt_gtk_treelist.c,v 1.2 2003/06/08 14:05:36 jonnymind Exp $
 
    GTK interface - management of checkbox widget
 */
@@ -56,7 +56,7 @@ static void xwt_gtk_renderItem( GtkTreeViewColumn *tree_column,
 static void cell_edited(
       GtkWidget *widget, gchar *arg1, gchar *arg2, gpointer cb_data )
 {
-   PXWT_WIDGET xwtData = (PXWT_WIDGET *) cb_data;
+   PXWT_WIDGET xwtData = (PXWT_WIDGET) cb_data;
    XWT_GTK_MAKESELF( xwtData->owner );
    // just a test for now
    xwt_rise_event( &Self, XWT_E_CLICKED, 0 );

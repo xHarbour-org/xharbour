@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.h,v 1.14 2003/07/23 15:58:10 lculik Exp $
+   $Id: xwt_gtk.h,v 1.15 2003/09/04 20:26:24 xthefull Exp $
 
    GTK interface
 */
@@ -191,6 +191,7 @@ BOOL xwt_gtk_createCheckbox( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createSplitter( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createToggleButton( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createTreelist( PXWT_WIDGET wSelf );
+BOOL xwt_gtk_createBrowse( PXWT_WIDGET wSelf );
 BOOL xwt_gtk_createFontSelection( PXWT_WIDGET wSelf );
 
 void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray );
@@ -217,6 +218,9 @@ BOOL xwt_gtk_treelist_set_content( PXWT_WIDGET xwtData, PHB_ITEM pContent );
 BOOL xwt_gtk_treelist_set_columns( PXWT_WIDGET xwtData, PHB_ITEM pCols );
 BOOL xwt_gtk_treelist_create_columns( PXWT_WIDGET xwtData, int nCols );
 BOOL xwt_gtk_treelist_set_colattr( PXWT_WIDGET xwtData, char *prop, void *data );
+
+/* In the browse model, all the data we need is in the owner (XWTBrowse). */
+BOOL xwt_gtk_browse_set_content( PXWT_WIDGET xwtData );
 
 /*** Putting a widget in a frame ****/
 GtkWidget *xwt_gtk_enframe( GtkWidget *framed );
