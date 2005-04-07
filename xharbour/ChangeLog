@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4014 2005/04/06 21:11:50 andijahja Exp $
+ * $Id: ChangeLog,v 1.4015 2005/04/07 07:49:20 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-08 03:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * make_tgz.sh
+    ! Fixes for DJGPP.
+  * contrib/htmllib/Makefile
+  + contrib/htmllib/include/Makefile
+    ! Headers and libraries need to be installed from different Makefiles.
+      You can't include both lib.cf and header.cf (which was a long
+      persisting bug here).
 
 2005-04-07 14:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/gtwvw.c

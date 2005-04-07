@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.45 2005/03/13 12:44:13 likewolf Exp $
+# $Id: make_tgz.sh,v 1.46 2005/03/13 13:33:55 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -41,8 +41,8 @@ if [ -z "$HB_ARCHITECTURE" ]; then
             *dos)   hb_arch="dos" ;;
             *bsd)   hb_arch="bsd" ;;
         esac
-        export HB_ARCHITECTURE="$hb_arch"
     fi
+    export HB_ARCHITECTURE="$hb_arch"
 fi
 
 if [ -z "$HB_COMPILER" ]; then
@@ -134,6 +134,7 @@ case "$HB_ARCHITECTURE" in
     linux)  hb_contrib="htmllib libmisc libnf rdd_ads" ;;
     bsd)    hb_contrib="htmllib libmisc libnf" ;;
     darwin) hb_contrib="htmllib libmisc libnf" ;;
+    dos)    hb_contrib="htmllib libmisc libnf" ;;
 esac
 
 # Set other platform-specific build options
@@ -190,7 +191,8 @@ for l in ${hb_contrib}
 do
     (cd "contrib/$l"
      $MAKE -r clean
-     $MAKE -r)
+     $MAKE -r
+    )
 done
 
 # install
@@ -199,9 +201,9 @@ rm -fR "${HB_INST_PREF}"
 export _DEFAULT_BIN_DIR=$HB_BIN_INSTALL
 export _DEFAULT_INC_DIR=$HB_INC_INSTALL
 export _DEFAULT_LIB_DIR=$HB_LIB_INSTALL
-export HB_BIN_INSTALL="$HB_INST_PREF/$HB_BIN_INSTALL"
-export HB_INC_INSTALL="$HB_INST_PREF/$HB_INC_INSTALL"
-export HB_LIB_INSTALL="$HB_INST_PREF/$HB_LIB_INSTALL"
+export HB_BIN_INSTALL="$HB_INST_PREF$HB_BIN_INSTALL"
+export HB_INC_INSTALL="$HB_INST_PREF$HB_INC_INSTALL"
+export HB_LIB_INSTALL="$HB_INST_PREF$HB_LIB_INSTALL"
 
 mkdir -p $HB_BIN_INSTALL
 mkdir -p $HB_INC_INSTALL
