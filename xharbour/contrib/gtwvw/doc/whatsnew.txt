@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt,v 1.5 2005/01/14 06:16:47 bdj Exp $
+ * $Id: whatsnew.txt,v 1.6 2005/02/20 17:05:55 bdj Exp $
  */
 
 /*
@@ -15,6 +15,37 @@
  *
  * Budyanto Dj. <budyanto@centrin.net.id>
  */
+
+
+2005/04/07:
+ * gtwvw.c
+   ! bugfix:: gt_Puts(): truncate a too long string in case of MainCoord Mode.
+
+2005-03-31 04:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/gtwvw/hbgtwvw.h
+    ! minor modification for __DMC__
+
+2005-02-27 21:10 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
+  * contrib/gtwvw/gtwvw.c
+    * some files i overlooked for the recent changes
+    (
+    * move initialization for __DMC__ to hbinit.h
+    + HB_CPP_STARTUP, to write initialization of CPP the common way
+    + HB_MSC_STARTUP, to write initialization of MSVC the current way
+    )
+
+2005/02/24:
+  * contrib/gtwvw/hbgtwvw.h
+  * contrib/gtwvw/gtwvw.c
+    * changes to enable compilation with DigitalMars C++ (aka
+      Symantec C++ : http://www.digitalmars.com). Was abandoned
+      by Symantec some time ago and enjoy further development
+      from DigitalMars. It is another speedy compiler for xHarbour.
+
+2005/02/22:
+ Changes by Andi Jahja:
+ * gtwvw.c
+   * initialization in var declaration, to avoid warnings.
 
 2005/02/20:
  Changes by Andi Jahja:

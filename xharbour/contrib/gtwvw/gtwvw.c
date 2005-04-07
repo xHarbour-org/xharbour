@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.12 2005/02/24 10:44:02 andijahja Exp $
+ * $Id: gtwvw.c,v 1.13 2005/02/27 14:14:15 andijahja Exp $
  */
 
 /*
@@ -804,6 +804,13 @@ void HB_GT_FUNC( gt_Puts( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE *pbyStr,
   {
 
     hb_wvw_GTFUNCPrologue(2, &usRow, &usCol, NULL, NULL);
+
+    /* GTAPI didn't check string length properly in case of MainCoord Mode,
+       so we must cut it here now */
+    if (usCol+ulLen-1 > (ULONG) s_pWindows[ s_usCurWindow ]->COLS-1)
+    {
+      ulLen -= (usCol+ulLen-1) - (s_pWindows[ s_usCurWindow ]->COLS-1);
+    }
   }
 
   hb_wvw_gt_vPuts( s_pWindows[ s_usCurWindow ], usRow, usCol, byAttr, pbyStr, ulLen );
