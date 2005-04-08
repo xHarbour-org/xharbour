@@ -1,5 +1,5 @@
 #
-# $Id$
+# $Id: Makefile,v 1.1 2005/04/07 23:19:13 likewolf Exp $
 #
 
 ROOT = ../../../
@@ -12,4 +12,4 @@ PRG_HEADERS=\
 	forms.ch \
 	lowfiles.ch \
  
-include $(TOP)$(ROOT)config/lib.cf
+include $(TOP)$(ROOT)config/header.cf
