@@ -2057,25 +2057,14 @@
 
         #include "hbpcode.h"
 
-        typedef union
-        {
-           BYTE *   pAsmData;                           /* The assembler bytes      */
-           PHB_FUNC pFunPtr;                            /* The (dynamic) harbour
-                                                           function                 */
-        } ASM_CALL, * PASM_CALL;
-
         typedef struct
         {
            int iID;
-           PASM_CALL pDynFunc;
-           BYTE *pcode;
+           PHB_PCODEFUNC pDynFunc;
            PHB_DYNS pDynSym;
            PHB_FUNC pPresetFunc;
+           HB_SYMBOLSCOPE cPresetScope;
         } DYN_PROC;
-
-        HB_EXTERN_BEGIN
-        extern PASM_CALL hb_hrbAsmCreateFun( PHB_SYMB pSymbols, BYTE * pCode ); /* Create a dynamic function*/
-        HB_EXTERN_END
 
         static DYN_PROC *s_pDynList;
         static int s_iDyn = 0;
@@ -2084,10 +2073,11 @@
         HB_FUNC( PP_GENDYNPROCEDURES )
         {
            PHB_ITEM pProcedures = hb_param( 1, HB_IT_ARRAY );
-           static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1;
+           //C functions added after (_INITSTATICS) symbol
+           static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1 - 9;
            int iProcedures, iProcedure, iBase = s_iDyn;
 
-           PASM_CALL pDynFunc;
+           PHB_PCODEFUNC pDynFunc;
            PHB_DYNS pDynSym;
            DYN_PROC *pDynList;
 
@@ -2174,19 +2164,24 @@
 
               pcode[30] = HB_P_ENDPROC;
 
-              pDynFunc = hb_hrbAsmCreateFun( symbols, pcode );
+              pDynFunc = (PHB_PCODEFUNC) hb_xgrab( sizeof( HB_PCODEFUNC ) );
+
+              pDynFunc->pCode = pcode;
+              pDynFunc->pSymbols = symbols;
+              pDynFunc->pGlobals = NULL;
 
               pDynSym = hb_dynsymGet( sFunctionName );
               //TraceLog( NULL, "Dyn: %p %s\n", pDynSym, sFunctionName );
 
               pDynList[ iBase + iProcedure ].iID         = iProcedure;
               pDynList[ iBase + iProcedure ].pDynFunc    = pDynFunc;
-              pDynList[ iBase + iProcedure ].pcode       = pcode;
               pDynList[ iBase + iProcedure ].pDynSym     = pDynSym;
               pDynList[ iBase + iProcedure ].pPresetFunc = pDynSym->pSymbol->value.pFunPtr;
+              pDynList[ iBase + iProcedure ].cPresetScope = pDynSym->pSymbol->cScope;
 
-              pDynSym->pSymbol->value.pFunPtr = pDynFunc->pFunPtr;
-              pDynSym->pFunPtr = pDynFunc->pFunPtr;
+              pDynSym->pSymbol->value.pFunPtr = (PHB_FUNC) pDynFunc;
+              pDynSym->pSymbol->cScope |= HB_FS_PCODEFUNC;
+              pDynSym->pFunPtr = (PHB_FUNC) pDynFunc;
            }
 
            //hb_retptr( (void *) pDynList );
@@ -2230,13 +2225,14 @@
               #ifdef AX
                 TraceLog( NULL, "Release #%i ID: %i, Dyn: '%s' %p, %p, %p\n", i, pDynList[i].iID, pDynList[i].pDynSym->pSymbol->szName,
                                  pDynList[i].pDynFunc,
-                                 pDynList[i].pcode,
+                                 pDynList[i].pDynFunc->pCode,
                                  pDynList[i].pDynSym->pSymbol->value.pFunPtr );
               #endif
 
-              if( pDynList[i].pDynSym->pSymbol->value.pFunPtr == pDynList[i].pDynFunc->pFunPtr )
+              if( pDynList[i].pDynSym->pSymbol->value.pFunPtr == (PHB_FUNC) pDynList[i].pDynFunc )
               {
                  pDynList[i].pDynSym->pSymbol->value.pFunPtr = pDynList[i].pPresetFunc ;
+                 pDynList[i].pDynSym->pSymbol->cScope = pDynList[i].cPresetScope ;
                  pDynList[i].pDynSym->pFunPtr = pDynList[i].pPresetFunc ;
               }
               else
@@ -2244,9 +2240,8 @@
                  TraceLog( NULL, "*** FUNCTION MISMATCH ***\n" );
               }
 
-              hb_xfree( (void *) ( pDynList[i].pDynFunc->pFunPtr ) );
+              hb_xfree( (void *) ( pDynList[i].pDynFunc->pCode ) );
               hb_xfree( (void *) ( pDynList[i].pDynFunc ) );
-              hb_xfree( (void *) ( pDynList[i].pcode ) );
            }
 
            if( iBase )

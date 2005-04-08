@@ -435,7 +435,7 @@ STATIC s_aEnumerations := {}, s_anEnumerator := {}, s_anForEachStartingBlock := 
 #ifndef REVISION
   #define REVISION .0
 #endif
-STATIC s_cVer := "1.0.RC12" + Stringify( REVISION )
+STATIC s_cVer := "1.0.RC13" + Stringify( REVISION )
 
 #ifdef __HARBOUR__
    STATIC s_sAppPath
