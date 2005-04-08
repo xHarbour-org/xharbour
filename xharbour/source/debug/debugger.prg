@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.55 2005/02/04 19:05:36 likewolf Exp $
+ * $Id: debugger.prg,v 1.56 2005/02/14 19:55:09 likewolf Exp $
  */
 
 /*
@@ -60,6 +60,14 @@
          redirection, and is also slower. [vszakats] */
 
 //#pragma -es0
+
+
+#pragma BEGINDUMP
+
+#include "hbapigt.h"
+
+#pragma ENDDUMP
+
 
 #include "hbclass.ch"
 #include "hbmemvar.ch"
@@ -334,7 +342,7 @@ CLASS TDebugger
    DATA   cImage
    DATA   cAppImage, nAppRow, nAppCol, cAppColors, nAppCursor
    DATA   nAppLastKey, bAppInkeyAfter, bAppInkeyBefore, bAppClassScope
-   DATA   nAppDirCase, nAppFileCase, nAppTypeAhead
+   DATA   nAppCTWindow, nAppDirCase, nAppFileCase, nAppTypeAhead
    DATA   nMaxRow, nMaxCol
    DATA   aBreakPoints
    DATA   aCallStack    //stack of procedures with debug info
@@ -2122,6 +2130,13 @@ METHOD RestoreAppScreen() CLASS TDebugger
   ::cImage := SaveScreen()
   DispBegin()
   RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cAppImage )
+  IF !Empty( ::nAppCTWindow )
+    /* Don't link libct automatically... */
+    HB_INLINE( ::nAppCTWindow )
+    {
+       hb_ctWSelect( hb_parni( 1 ) );
+    }
+  ENDIF
   SetPos( ::nAppRow, ::nAppCol )
   SetColor( ::cAppColors )
   SetCursor( ::nAppCursor )
@@ -2161,10 +2176,20 @@ METHOD SaveAppScreen( lRestore ) CLASS TDebugger
     lRestore := .T.
   ENDIF
   DispBegin()
-  ::cAppImage  := SaveScreen()
+ 
+  /* Get cursor coordinates INSIDE ct window */
   ::nAppRow    := Row()
   ::nAppCol    := Col()
   ::cAppColors := SetColor()
+
+  /* We don't want to auto-link libct... */
+  ::nAppCTWindow := HB_INLINE()
+  {
+     hb_retni( hb_ctWSelect( -1 ) );
+     hb_ctWSelect( 0 );
+  }
+  
+  ::cAppImage  := SaveScreen()
   ::nAppCursor := SetCursor( SC_NONE )
   IF lRestore
     RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cImage )
@@ -3581,3 +3606,4 @@ STATIC FUNCTION getdbginput( nTop, nLeft, uValue, bValid, cColor )
 
 RETURN uTemp
 #endif
+
