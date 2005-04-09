@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.191 2005/03/31 03:51:15 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.192 2005/04/05 00:32:08 druzus Exp $
  */
 
 /*
@@ -5004,8 +5004,9 @@ static LPCDXTAG hb_cdxFindTag( CDXAREAP pArea, PHB_ITEM pTagItem,
 {
    LPCDXTAG pTag = NULL;
    USHORT uiTag = 0, uiFind = 0;
-   LPCDXINDEX pIndex, pBagIndex;
+   LPCDXINDEX pIndex;
    char szName[ CDX_MAXTAGNAMELEN + 1 ];
+   BOOL fBag;
 
    szName[ 0 ] = '\0';
    if ( HB_IS_STRING( pTagItem ) )
@@ -5017,36 +5018,29 @@ static LPCDXTAG hb_cdxFindTag( CDXAREAP pArea, PHB_ITEM pTagItem,
    {
       uiFind = hb_itemGetNI( pTagItem );
    }
-   pIndex = pArea->lpIndexes;
+   fBag = hb_itemGetCLen( pBagItem ) > 0;
+   pIndex = fBag ? hb_cdxFindBag( pArea, hb_itemGetCPtr( pBagItem ) ) : pArea->lpIndexes;
 
    if ( pIndex && ( uiFind != 0 || szName[ 0 ] ) )
    {
-      if ( pBagItem && HB_IS_STRING( pBagItem ) && pBagItem->item.asString.length > 0 )
-         pBagIndex = hb_cdxFindBag( pArea, pBagItem->item.asString.value );
-      else
-         pBagIndex = NULL;
-
-      while ( pIndex )
+      do
       {
          pTag = pIndex->TagList;
          while ( pTag )
          {
             uiTag++;
-            if ( ( ! pBagIndex || pBagIndex == pIndex ) &&
-                 ( uiFind != 0 ? uiTag == uiFind : !hb_stricmp( pTag->szName, szName ) ) )
+            if ( ( uiFind != 0 ? uiTag == uiFind : !hb_stricmp( pTag->szName, szName ) ) )
                break;
             pTag = pTag->pNext;
          }
-         if ( pTag || pBagIndex == pIndex )
+         if ( pTag || fBag )
             break;
          pIndex = pIndex->pNext;
-      }
-      if ( !pTag )
-         uiTag = 0;
+      } while ( pIndex );
    }
 
    if ( puiTag )
-      *puiTag = uiTag;
+      *puiTag = pTag ? uiTag : 0;
 
    return pTag;
 }

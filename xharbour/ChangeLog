@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4018 2005/04/08 10:56:23 likewolf Exp $
+ * $Id: ChangeLog,v 1.4019 2005/04/08 12:54:56 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,44 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-09 19:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapirdd.h
+  * xharbour/source/rdd/dbcmd.c
+    + added hb_rddAllocWorkAreaAlias() function which should be
+      used in RDD instead of calling hb_dynsymGet(),... which was
+      not MT safe and moved the VM/RDD internals to RDD code.
+      This is only partial modification. In the full solution
+      RDD should call SUPER_OPEN() which will make all necessary
+      sets for xHarbour VM and RDD should not know anything about
+      it. I'll implement it soon.
+    * strip leading spaces from given alias expression and use
+      the same rules for alias IDs as for other symbols (cut at
+      first space) - Brian I remember about the problems with
+      bad ID field names but before we implement sth we should
+      clean current code to know any bad side effects.
+
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/contrib/rdd_ads/adsfunc.c
+  * xharbour/source/rdd/dbf1.c
+    * use hb_rddAllocWorkAreaAlias()
+
+  * xharbour/source/common/hbstr.c
+    ! fixed space triming in hb_strncpyUpperTrim() and hb_strncpyTrim()
+      when the given source string was longer then destination buffer
+      and has internal spaces at the destination buffer size.
+
+  * xharbour/source/rdd/workarea.c
+    ! fixed GPF when closing WA without atomAlias set
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * make the tag selecting SIX compatible. First it was COMIX
+      compatible: for functions which uses <xTag>, <cBag> as parameter
+      when <xTag> was numeric the <cBag> was always ignore.
+      Then I was trying to mix it with SIX and support both syntax
+      but it does not make sense and simply reduce the flexibility
+      of using ord*() functions for user. The SIX syntax is much better
+      and the COMIX/CL5.3 is wrong.
 
 2005-04-08 17:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * contrib/htmllib/include/Makefile

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.113 2005/03/31 03:28:40 druzus Exp $
+ * $Id: dbf1.c,v 1.114 2005/04/05 00:32:07 druzus Exp $
  */
 
 /*
@@ -2260,14 +2260,11 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfOpen(%p, %p)", pArea, pOpenInfo));
 
-   pArea->atomAlias = hb_dynsymGet( ( char * ) pOpenInfo->atomAlias );
-
-   if( ( ( PHB_DYNS ) pArea->atomAlias )->hArea )
+   pArea->atomAlias = hb_rddAllocWorkAreaAlias( ( char * ) pOpenInfo->atomAlias, ( int ) pOpenInfo->uiArea );
+   if( ! pArea->atomAlias )
    {
-      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, ( char * ) pOpenInfo->atomAlias );
       return FAILURE;
    }
-   ( ( PHB_DYNS ) pArea->atomAlias )->hArea = pOpenInfo->uiArea;
 
    if ( !pArea->bLockType )
    {

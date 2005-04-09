@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.36 2005/03/31 03:28:40 druzus Exp $
+ * $Id: workarea.c,v 1.37 2005/04/06 13:28:13 druzus Exp $
  */
 
 /*
@@ -551,7 +551,9 @@ ERRCODE hb_waClose( AREAP pArea )
       hb_rddIterateWorkAreas ( hb_waCloseAux, pArea->uiArea );
    }
 
-   ( ( PHB_DYNS ) pArea->atomAlias )->hArea = 0;
+   if( pArea->atomAlias )
+      ( ( PHB_DYNS ) pArea->atomAlias )->hArea = 0;
+
    return SUCCESS;
 }
 

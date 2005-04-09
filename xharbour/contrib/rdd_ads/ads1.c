@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.61 2005/04/03 13:30:00 ptsarenko Exp $
+ * $Id: ads1.c,v 1.61 2005/04/03 10:39:29 ptsarenko Exp $
  */
 
 /*
@@ -2139,17 +2139,11 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       pArea->szDataFileName = (char *) hb_xgrab( strlen( (char *) ( pOpenInfo->abName ) ) + 1 );
       strcpy( pArea->szDataFileName, ( char * ) ( pOpenInfo->abName ) );
 
-      pArea->atomAlias = hb_dynsymGet( ( char * ) ( pOpenInfo->atomAlias ) );
-
-      //TraceLog( NULL, "Dyn: %p\n", pArea->atomAlias );
-
-      if( ( ( PHB_DYNS ) pArea->atomAlias )->hArea )
+      pArea->atomAlias = hb_rddAllocWorkAreaAlias( ( char * ) pOpenInfo->atomAlias, ( int ) pOpenInfo->uiArea );
+      if( ! pArea->atomAlias )
       {
-         hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, ( char * ) pOpenInfo->atomAlias );
          return FAILURE;
       }
-
-      ( ( PHB_DYNS ) pArea->atomAlias )->hArea = pOpenInfo->uiArea;
       pArea->hStatement = 0;
       pArea->hOrdCurrent = 0;
 

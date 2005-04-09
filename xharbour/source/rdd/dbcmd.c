@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.144 2005/02/27 14:14:15 andijahja Exp $
+ * $Id: dbcmd.c,v 1.145 2005/03/31 03:28:39 druzus Exp $
  */
 
 /*
@@ -452,30 +452,84 @@ ERRCODE HB_EXPORT hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNC
 }
 
 /*
- * Find a WorkArea by the alias or return 0 without raising an Error.
+ * check if a given name can be used as alias expression
  */
-static USHORT hb_rddSelect( char * szAlias )
+static ERRCODE hb_rddVerifyAliasName( char * szAlias )
 {
-   PHB_DYNS pSymAlias;
+   char c;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddSelect(%s)", szAlias));
-
-   pSymAlias = hb_dynsymFindName( szAlias );
-
-   if( pSymAlias && pSymAlias->hArea )
+   while( *szAlias == ' ' )
    {
-      return ( USHORT ) pSymAlias->hArea;
+      szAlias++;
+   }
+   c = *szAlias;
+   if( c >= 'a' && c <= 'z' )
+   {
+      c -= 'a' - 'A';
+   }
+   if( ( c >= 'A' && c <= 'Z' ) || c == '_' )
+   {
+      return SUCCESS;
+   }
+   return FAILURE;
+}
+
+/*
+ * Find a WorkArea by the alias, return FAILURE if not found
+ */
+static ERRCODE hb_rddGetAliasNumber( char * szAlias, int * iArea )
+{
+   BOOL fOneLetter;
+   char c;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddGetAliasNumber(%s, %p)", szAlias, iArea));
+
+   while ( *szAlias == ' ' )
+   {
+      szAlias++;
+   }
+   c = szAlias[ 0 ];
+   if ( c >= 'a' && c <= 'z' )
+   {
+      c -= 'a' - 'A';
+   }
+
+   fOneLetter = c && ( szAlias[ 1 ] == 0 || szAlias[ 1 ] == ' ' );
+
+   if( c >= '0' && c <= '9' )
+   {
+      *iArea = atoi( szAlias );
+   }
+   else if ( fOneLetter && c >= 'A' && c <= 'K' )
+   {
+      *iArea = c - 'A' + 1;
+   }
+   else if ( fOneLetter && c == 'M' )
+   {
+      *iArea = 0;
    }
    else
    {
-      return 0;
+      PHB_DYNS pSymAlias = hb_dynsymFindName( szAlias );
+
+      if( pSymAlias && pSymAlias->hArea )
+      {
+         *iArea = pSymAlias->hArea;
+      }
+      else
+      {
+         *iArea = 0;
+         return FAILURE;
+      }
    }
+
+   return SUCCESS;
 }
 
 /*
  * Return the next free WorkArea for later use.
  */
-static void hb_rddSelectFirstAvailable( void )
+static ERRCODE hb_rddSelectFirstAvailable( void )
 {
    HB_THREAD_STUB
    USHORT uiArea;
@@ -492,6 +546,7 @@ static void hb_rddSelectFirstAvailable( void )
    }
    HB_SET_WA( uiArea );
    UNLOCK_AREA
+   return SUCCESS;
 }
 
 /*
@@ -766,6 +821,49 @@ USHORT HB_EXPORT hb_rddInsertAreaNode( char *szDriver )
 }
 
 /*
+ * allocate and return atomAlias for new workarea or NULL if alias already exist
+ */
+void * HB_EXPORT hb_rddAllocWorkAreaAlias( char * szAlias, int iArea )
+{
+   PHB_DYNS pSymAlias;
+   int iDummyArea;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddAllocWorkAreaAlias(%s, %d)", szAlias, iArea));
+
+   /* Verify if the alias name is valid symbol */
+   if( hb_rddVerifyAliasName( szAlias ) != SUCCESS )
+   {
+      hb_errRT_DBCMD( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias );
+      return NULL;
+   }
+   /* Verify if the alias is already in use */
+   if( hb_rddGetAliasNumber( szAlias, &iDummyArea ) == SUCCESS )
+   {
+      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
+      return NULL;
+   }
+
+   LOCK_AREA
+   pSymAlias = hb_dynsymGet( szAlias );
+   if ( pSymAlias->hArea )
+   {
+      pSymAlias = NULL;
+   }
+   else
+   {
+      pSymAlias->hArea = iArea;
+   }
+   UNLOCK_AREA
+
+   if ( ! pSymAlias )
+   {
+      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
+   }
+
+   return pSymAlias;
+}
+
+/*
  * Return the current WorkArea number.
  */
 int HB_EXPORT hb_rddGetCurrentWorkAreaNumber( void )
@@ -787,7 +885,14 @@ ERRCODE HB_EXPORT hb_rddSelectWorkAreaNumber( int iArea )
    HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectWorkAreaNumber(%d)", iArea));
 
    LOCK_AREA
-   HB_SET_WA( iArea );
+   if ( iArea < 1 || iArea > HARBOUR_MAX_RDD_AREA_NUM )
+   {
+      HB_SET_WA( 0 );
+   }
+   else
+   {
+      HB_SET_WA( iArea );
+   }
    UNLOCK_AREA
 
    return ( HB_CURRENT_WA == NULL ) ? FAILURE : SUCCESS;
@@ -811,7 +916,7 @@ ERRCODE HB_EXPORT hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
    {
       szName = pSymAlias->pDynSym->pSymbol->szName;
 
-      if( strlen( szName ) == 1 && toupper( szName[ 0 ] ) >= 'A' && toupper( szName[ 0 ] ) <= 'K' )
+      if( szName[ 0 ] && ! szName[ 1 ] && toupper( szName[ 0 ] ) >= 'A' && toupper( szName[ 0 ] ) <= 'K' )
       {
          bResult = hb_rddSelectWorkAreaNumber( toupper( szName[ 0 ] ) - 'A' + 1 );
       }
@@ -851,63 +956,42 @@ ERRCODE HB_EXPORT hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
 /*
  * Select a WorkArea by the name.
  */
-ERRCODE HB_EXPORT hb_rddSelectWorkAreaAlias( char * szName )
+ERRCODE HB_EXPORT hb_rddSelectWorkAreaAlias( char * szAlias )
 {
    ERRCODE bResult;
-   ULONG ulLen;
-   PHB_DYNS pSymArea;
-   USHORT uiAction;
-   HB_ITEM_PTR pError;
+   int iArea;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectWorkAreaAlias(%s)", szName));
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectWorkAreaAlias(%s)", szAlias));
 
-   ulLen = strlen( szName );
+   bResult = hb_rddGetAliasNumber( szAlias, &iArea );
 
-   if( ulLen >= 1 && toupper( szName[ 0 ] ) > '0' && toupper( szName[ 0 ] ) <= '9' )
+   if ( bResult == FAILURE )
    {
-      bResult = hb_rddSelectWorkAreaNumber( atoi( szName ) );
-   }
-   else if( ulLen == 1 && toupper( szName[ 0 ] ) >= 'A' && toupper( szName[ 0 ] ) <= 'K' )
-   {
-      bResult = hb_rddSelectWorkAreaNumber( toupper( szName[ 0 ] ) - 'A' + 1 );
-   }
-   else
-   {
-      pSymArea = hb_dynsymFindName( szName );
+      /*
+       * generate an error with retry possibility
+       * (user created error handler can open a missing database)
+       */
+      HB_ITEM_PTR pError = hb_errRT_New( ES_ERROR, NULL, EG_NOALIAS, EDBCMD_NOALIAS, NULL, szAlias, 0, EF_CANRETRY );
 
-      if( pSymArea && pSymArea->hArea )
+      do
       {
-         bResult = hb_rddSelectWorkAreaNumber( pSymArea->hArea );
-      }
-      else
-      {
-         /*
-          * generate an error with retry possibility
-          * (user created error handler can open a missing database)
-          */
-         uiAction = E_RETRY;
-         pError = hb_errRT_New( ES_ERROR, NULL, EG_NOALIAS, EDBCMD_NOALIAS, NULL, szName, 0, EF_CANRETRY );
-
-         bResult = FAILURE;
-
-         while( uiAction == E_RETRY )
+         if( hb_errLaunch( pError ) != E_RETRY )
          {
-            uiAction = hb_errLaunch( pError );
-
-            if( uiAction == E_RETRY )
-            {
-               pSymArea = hb_dynsymFindName( szName );
-
-               if( pSymArea && pSymArea->hArea )
-               {
-                  bResult = hb_rddSelectWorkAreaNumber( pSymArea->hArea );
-                  uiAction = E_DEFAULT;
-               }
-            }
+            break;
          }
-
-         hb_itemRelease( pError );
+         bResult = hb_rddGetAliasNumber( szAlias, &iArea );
       }
+      while( bResult == FAILURE );
+
+      hb_itemRelease( pError );
+   }
+
+   if ( bResult == SUCCESS )
+   {
+      if( iArea < 1 || iArea > HARBOUR_MAX_RDD_AREA_NUM )
+         bResult = hb_rddSelectFirstAvailable();
+      else
+         bResult = hb_rddSelectWorkAreaNumber( iArea );
    }
 
    return bResult;
@@ -916,7 +1000,7 @@ ERRCODE HB_EXPORT hb_rddSelectWorkAreaAlias( char * szName )
 /*
  *  Function for getting current workarea pointer
  */
-void HB_EXPORT * hb_rddGetCurrentWorkAreaPointer( void )
+void * HB_EXPORT hb_rddGetCurrentWorkAreaPointer( void )
 {
    HB_THREAD_STUB
 
@@ -1480,29 +1564,24 @@ HB_FUNC( DBCREATE )
       szDriver = s_szDefDriver;
    }
 
+   bOpen = ISLOG( 4 );
+   bCurr = bOpen && !hb_parl( 4 );
+
    pFileName = hb_fsFNameSplit( szFileName );
 
-   szAlias[0] = szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH ] = '\0';
-   if( ISCHAR(5) )
+   if ( bOpen )
    {
-      strncat( szAlias, hb_parc( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
-   }
-
-   uiLen = strlen( szAlias );
-
-   if( uiLen == 0 )
-   {
-      strncat( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
-   }
-   else if( uiLen == 1 )
-   {
-      /* Alias with a single letter. Only are valid 'L' and > 'M' */
-      if( toupper( szAlias[ 0 ] ) < 'N' && toupper( szAlias[ 0 ] ) != 'L' )
+      hb_strncpyUpperTrim( szAlias, hb_parcx( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+      if ( ! szAlias[0] )
+      {
+         hb_strncpyUpperTrim( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
+      }
+      /* Verify if the alias name is valid symbol */
+      if( hb_rddVerifyAliasName( szAlias ) != SUCCESS )
       {
          hb_xfree( pFileName );
-         hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
-         //hb_errRT_BASE( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
-         //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
+         hb_errRT_DBCMD( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias );
+         /* hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" ); */
          return;
       }
    }
@@ -1511,13 +1590,19 @@ HB_FUNC( DBCREATE )
    {
       hb_xfree( pFileName );
       hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBCREATE" );
-      //hb_errRT_BASE( EG_ARG, EDBCMD_DUPALIAS, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
-      //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
       return;
    }
-   if( !ISLOG( 4 ) )
+
+   if ( bCurr )
    {
-      bOpen = bCurr = FALSE;
+       /* If current WorkArea is used then close it */
+      if( HB_CURRENT_WA )
+      {
+         hb_rddReleaseCurrentArea();
+      }
+   }
+   else
+   {
       /*
        * 0 means chose first available in hb_rddInsertAreaNode()
        * This hack is necessary to avoid race condition in MT
@@ -1525,25 +1610,17 @@ HB_FUNC( DBCREATE )
        */
       hb_rddSelectWorkAreaNumber( 0 );
    }
-   else
+   if ( bOpen )
    {
-      bOpen = TRUE;
-      if( hb_parl( 4 ) )
+      int iArea;
+      /* Verify if the alias is already in use */
+      if( hb_rddGetAliasNumber( szAlias, &iArea ) == SUCCESS )
       {
-         bCurr = FALSE;
-         /* see note above */
-         hb_rddSelectWorkAreaNumber( 0 );
-      }
-      else
-      {
-         bCurr = TRUE;
-         if( HB_CURRENT_WA )       /* If current WorkArea is used then close it */
-         {
-            hb_rddReleaseCurrentArea();
-         }
+         hb_xfree( pFileName );
+         hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
+         return;
       }
    }
-
    /* Create a new WorkArea node */
    if( ! hb_rddInsertAreaNode( szDriver ) )
    {
@@ -1580,10 +1657,13 @@ HB_FUNC( DBCREATE )
    pInfo.fReadonly = FALSE;
    pInfo.cdpId = codePageId;
 
-   // pArea->atomAlias = hb_dynsymGet( ( char * ) szAlias );
-   pArea->atomAlias = hb_dynsymGet( ( char * ) szAliasTmp );
-   ( ( PHB_DYNS ) pArea->atomAlias )->hArea = pArea->uiArea;
-
+   pArea->atomAlias = hb_rddAllocWorkAreaAlias( szAliasTmp, ( int ) pArea->uiArea );
+   if( ! pArea->atomAlias )
+   {
+      hb_rddReleaseCurrentArea();
+      hb_rddSelectWorkAreaNumber( uiPrevArea );
+      return;
+   }
    if( SELF_CREATEFIELDS( pArea, pStruct ) == FAILURE )
    {
       hb_rddReleaseCurrentArea();
@@ -2161,44 +2241,26 @@ HB_FUNC( DBSEEK )
 
 HB_FUNC( DBSELECTAREA )
 {
-   LONG ulNewArea;
 
    if( ISCHAR( 1 ) )
    {
-      char *szAlias = hb_parc( 1 );
-      USHORT ulLen = strlen( szAlias );
+      hb_rddSelectWorkAreaAlias( hb_parc( 1 ) );
+      hb_rddGetCurrentWorkAreaNumber();
+   }
+   else
+   {
+      LONG lNewArea = hb_parnl( 1 );
 
-      if( ulLen >= 1 && szAlias[ 0 ] >= '0' && szAlias[ 0 ] <= '9' )
+      if( lNewArea < 1 || lNewArea > HARBOUR_MAX_RDD_AREA_NUM )
       {
-         ulNewArea = atoi( szAlias );
-      }
-      else if( ulLen == 1 && toupper( szAlias[ 0 ] ) >= 'A' && toupper( szAlias[ 0 ] ) <= 'K' )
-      {
-         ulNewArea = toupper( szAlias[ 0 ] ) - 'A' + 1;
-      }
-      else if( ulLen == 1 && toupper( szAlias[ 0 ] ) == 'M' )
-      {
-         ulNewArea = 0;
+         hb_rddSelectFirstAvailable();
       }
       else
       {
-         hb_rddSelectWorkAreaAlias( szAlias );
-         ulNewArea = hb_rddGetCurrentWorkAreaNumber();
+         hb_rddSelectWorkAreaNumber( lNewArea );
       }
    }
-   else
-   {
-      ulNewArea = hb_parnl( 1 );
-   }
 
-   if( ulNewArea < 1 || ulNewArea > HARBOUR_MAX_RDD_AREA_NUM )
-   {
-      hb_rddSelectFirstAvailable();
-   }
-   else
-   {
-      hb_rddSelectWorkAreaNumber( ulNewArea );
-   }
 }
 
 HB_FUNC( __DBSETFOUND )
@@ -2367,13 +2429,13 @@ HB_FUNC( DBUSEAREA )
    HB_THREAD_STUB
    char * szDriver;
    char szFileName[ _POSIX_PATH_MAX + 1 ];
-   USHORT uiLen;
    DBOPENINFO pInfo;
    PHB_FNAME pFileName;
    BYTE * codePageId = (BYTE*) hb_parc(7);
    char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
    AREAP pArea;
+   int iArea;
 
    s_bNetError = FALSE;
 
@@ -2402,33 +2464,21 @@ HB_FUNC( DBUSEAREA )
 
    hb_strncpy( szFileName, hb_parc( 3 ), _POSIX_PATH_MAX );
    pFileName = hb_fsFNameSplit( szFileName );
-   hb_strncpy( szAlias, hb_parcx( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
+   hb_strncpyUpperTrim( szAlias, hb_parcx( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
    if( ! *szAlias )
    {
-      hb_strncpy( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
+      hb_strncpyUpperTrim( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
    }
 
-   uiLen = strlen( szAlias );
-   if( szAlias[ 0 ] >= '0' && szAlias[ 0 ] <= '9' )
+   /* Verify if the alias name is valid symbol */
+   if( hb_rddVerifyAliasName( szAlias ) != SUCCESS )
    {
       hb_xfree( pFileName );
       hb_errRT_DBCMD( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias );
       return;
    }
-
-   if( uiLen == 1 )
-   {
-      /* Alias with a single letter. Only are valid 'L' and > 'M' */
-      if( toupper( szAlias[ 0 ] ) < 'N' && toupper( szAlias[ 0 ] ) != 'L' )
-      {
-         hb_xfree( pFileName );
-         hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
-         return;
-      }
-   }
-
    /* Verify if the alias is already in use */
-   if( hb_rddSelect( szAlias ) )
+   if( hb_rddGetAliasNumber( szAlias, &iArea ) == SUCCESS )
    {
       hb_xfree( pFileName );
       hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
@@ -3644,20 +3694,20 @@ HB_FUNC( SELECT )
    else
    {
       char * szAlias = hb_parc( 1 );
-      ULONG ulLen = szAlias ? strlen( szAlias ) : 0;
+      int iArea = 0;
 
-      if( ulLen == 0 )
+      if( szAlias )
       {
-         hb_retni( 0 );
+#ifdef HB_C52_STRICT
+         /*
+          * I do not like this Clipper behavior, in some constructions
+          * programmer may use "<aliasNum>" in some others not. [Druzus]
+          */
+         if( hb_rddVerifyAliasName( szAlias ) == SUCCESS )
+#endif
+            hb_rddGetAliasNumber( szAlias, &iArea );
       }
-      else if( ulLen == 1 && toupper( szAlias[ 0 ] ) >= 'A' && toupper( szAlias[ 0 ] ) <= 'K' )
-      {
-         hb_retni( toupper( szAlias[ 0 ] ) - 'A' + 1 );
-      }
-      else
-      {
-         hb_retni( hb_rddSelect( szAlias ) );
-      }
+      hb_retni( iArea );
    }
 }
 
@@ -3843,14 +3893,12 @@ HB_FUNC( DBSETRELATION )
       {
          USHORT uiArea = hb_rddGetCurrentWorkAreaNumber();
 
-         szAlias = hb_parcx( 1 );
-         hb_rddSelectWorkAreaAlias( szAlias );
+         hb_rddSelectWorkAreaAlias( hb_parcx( 1 ) );
          if( hb_vmRequestQuery() )
          {
             return;
          }
          uiChildArea = hb_rddGetCurrentWorkAreaNumber();
-
          hb_rddSelectWorkAreaNumber( uiArea );
       }
 
@@ -4355,6 +4403,13 @@ static AREAP GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, 
    PHB_FNAME  pFileName;
    DBOPENINFO pInfo;
    char szFile[ _POSIX_PATH_MAX + 1 ];
+   char szAliasTmp[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
+
+   if( hb_rddGetTempAlias( szAliasTmp ) == FAILURE )
+   {
+      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBAPP" );
+      return NULL;
+   }
 
    pOldArea = HB_CURRENT_WA;
    uiOldArea = pOldArea->uiArea;
@@ -4376,7 +4431,7 @@ static AREAP GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, 
    /* Fill pInfo structure */
    memset( &pInfo, 0, sizeof(DBOPENINFO) );
    pInfo.uiArea = uiNewArea;
-   pInfo.atomAlias = ( BYTE * ) "__TMPAREA";
+   pInfo.atomAlias = ( BYTE * ) szAliasTmp;
    /* It doesn't seem to be Clipper compatible */
    /*
    pInfo.fShared = createIt ? FALSE : !hb_set.HB_SET_EXCLUSIVE;
@@ -4478,9 +4533,15 @@ static AREAP GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, 
       }
 
       /* now create a new table based on the current Area's record layout */
-      pNewArea->atomAlias = hb_dynsymGet( ( char * ) pInfo.atomAlias );
-      ( ( PHB_DYNS ) pNewArea->atomAlias )->hArea = pNewArea->uiArea;
-
+      pNewArea->atomAlias = hb_rddAllocWorkAreaAlias( ( char * ) pInfo.atomAlias,
+                                                      ( int ) pNewArea->uiArea );
+      if( !pNewArea->atomAlias )
+      {
+         hb_itemRelease( pFieldArray );
+         hb_rddReleaseCurrentArea();
+         hb_rddSelectWorkAreaNumber( uiOldArea );
+         return NULL;
+      }
       if( SELF_CREATEFIELDS( pNewArea, pFieldArray ) == FAILURE ||
           SELF_CREATE( pNewArea, &pInfo ) == FAILURE )
       {
@@ -4710,6 +4771,7 @@ HB_FUNC( DBUSEAREAD )
    char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
    AREAP pArea;
+   int iArea;
 
    hb_rddCheck();
 
@@ -4755,27 +4817,15 @@ HB_FUNC( DBUSEAREAD )
 
    hb_xfree( pFileName );
 
-   uiLen = strlen( szAlias );
-   if( szAlias[ 0 ] >= '0' && szAlias[ 0 ] <= '9' )
+   /* Verify if the alias name is valid symbol */
+   if( hb_rddVerifyAliasName( szAlias ) != SUCCESS )
    {
       hb_errRT_DBCMD( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias );
       return;
    }
-
-   if( uiLen == 1 )
+   /* Verify if the alias is already in use */
+   if( hb_rddGetAliasNumber( szAlias, &iArea ) == SUCCESS )
    {
-      /* Alias with a single letter. Only are valid 'L' and > 'M' */
-      if( toupper( szAlias[ 0 ] ) < 'N' && toupper( szAlias[ 0 ] ) != 'L' )
-      {
-         hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
-         return;
-      }
-   }
-
-   // Verify if the alias is already in use
-   if( hb_rddSelect( szAlias ) )
-   {
-      hb_xfree( pFileName );
       hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
       return;
    }
@@ -4807,28 +4857,20 @@ HB_FUNC( DBUSEAREAD )
 
 ERRCODE hb_rddGetTempAlias( char * szAliasTmp )
 {
-   int i;
+   int i, iArea;
 
-   // szAliasTmp[0] = '\0';
    for ( i = 1 ; i < 1000 ; i++ )
    {
       sprintf( szAliasTmp, "HBTMP%3.3i", i);
 
-      if ( ! hb_rddSelect( szAliasTmp ) )
+      if( hb_rddGetAliasNumber( szAliasTmp, &iArea ) != SUCCESS )
       {
-         break;
+         return SUCCESS;
       }
    }
 
-   if ( i >= 1000 )
-   {
-      szAliasTmp[0] = '\0';
-      return FAILURE;
-   }
-   else
-   {
-      return SUCCESS;
-   }
+   szAliasTmp[0] = '\0';
+   return FAILURE;
 }
 
 HB_FUNC( __RDDGETTEMPALIAS )

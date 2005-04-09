@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.16 2005/03/31 14:34:03 andijahja Exp $
+ * $Id: hbstr.c,v 1.17 2005/04/01 20:16:27 andijahja Exp $
  */
 
 /*
@@ -728,22 +728,26 @@ HB_EXPORT char * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLe
 HB_EXPORT char * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG ulLen )
 {
    char *pBuf = pDest;
-   LONG lSLen = strlen( pSource );
+   ULONG ulSLen;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strncpyUpperTrim(%p, %s, %lu)", pDest, pSource, ulLen));
 
+   ulSLen = strlen( pSource );
+   if ( ulSLen > ulLen )
+      ulSLen = ulLen;
+
    pDest[ ulLen ] ='\0';
 
-   while( lSLen && pSource[ lSLen - 1 ] == ' ')
+   while( ulSLen && pSource[ ulSLen - 1 ] == ' ')
    {
-      lSLen--;
+      ulSLen--;
    }
 
    /* some compilers impliment toupper as a macro, and this has side effects! */
    /* *pDest++ = toupper( *pSource++ ); */
-   while( ulLen && lSLen && (*pDest++ = toupper( *pSource )) != '\0' )
+   while( ulLen && ulSLen && (*pDest++ = toupper( *pSource )) != '\0' )
    {
-      lSLen--;
+      ulSLen--;
       ulLen--;
       pSource++;
    }
@@ -764,22 +768,26 @@ HB_EXPORT char * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG 
 HB_EXPORT char * hb_strncpyTrim( char * pDest, const char * pSource, ULONG ulLen )
 {
    char *pBuf = pDest;
-   LONG lSLen = strlen( pSource );
+   ULONG ulSLen;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strncpyTrim(%p, %s, %lu)", pDest, pSource, ulLen));
 
+   ulSLen = strlen( pSource );
+   if ( ulSLen > ulLen )
+      ulSLen = ulLen;
+
    pDest[ ulLen ] ='\0';
 
-   while( lSLen && pSource[ lSLen - 1 ] == ' ')
+   while( ulSLen && pSource[ ulSLen - 1 ] == ' ')
    {
-      lSLen--;
+      ulSLen--;
    }
 
    /* some compilers impliment toupper as a macro, and this has side effects! */
    /* *pDest++ = toupper( *pSource++ ); */
-   while( ulLen && lSLen && ( *pDest++ = *pSource++ ) != '\0' )
+   while( ulLen && ulSLen && ( *pDest++ = *pSource++ ) != '\0' )
    {
-      lSLen--;
+      ulSLen--;
       ulLen--;
    }
 

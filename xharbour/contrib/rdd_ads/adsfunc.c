@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.51 2005/03/17 20:24:02 ptsarenko Exp $
+ * $Id: adsfunc.c,v 1.52 2005/03/31 03:12:47 druzus Exp $
  */
 
 /*
@@ -1353,13 +1353,11 @@ HB_FUNC( ADSCREATESQLSTATEMENT )
            {
               strcpy( szAlias, "ADSSQL" );
            }
-           pArea->atomAlias = hb_dynsymGet( szAlias );
-           if( ( ( PHB_DYNS ) pArea->atomAlias )->hArea )
+           pArea->atomAlias = hb_rddAllocWorkAreaAlias( szAlias, hb_rddGetCurrentWorkAreaNumber() );
+           if( ! pArea->atomAlias )
            {
-              hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
               hb_retl( 0 );
            }
-           ( ( PHB_DYNS ) pArea->atomAlias )->hArea = hb_rddGetCurrentWorkAreaNumber();
            if( ISNUM( 2 ) )
            {
               usTableType = hb_parni( 2 );
