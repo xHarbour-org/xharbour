@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.77 2005/02/27 16:59:45 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.78 2005/03/31 14:34:06 andijahja Exp $
  */
 
 /*
@@ -2586,6 +2586,9 @@ Try          : TRY
                    */
                   hb_compGenJumpHere( $<lNumber>2 );
                   $<lNumber>$ = hb_compSequenceEnd();
+                  hb_compExprDelete( hb_compExprGenStatement( hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( "HB_RESETTRY", TRUE ) ), NULL ) ) );
+                  hb_compGenJump( 0 );
+
                }
                Catch
                {
@@ -2603,25 +2606,34 @@ Try          : TRY
                    * There is no line number after HB_P_SEQEND in case no
                    * RECOVER clause is used
                    */
-                  hb_compGenJumpThere( $<lNumber>5, hb_comp_functions.pLast->lPCodePos );
+                  hb_compGenJumpThere( $<lNumber>5, $<lNumber>5 + 3 );
 
-                  /* only if there is no CATCH clause */
-                  if( ! $<lNumber>6 )
+                  /* Only if there is CATCH clause */
+                  if( $<lNumber>6 )
                   {
+                     hb_compGenJumpThere( $<lNumber>5 + 9, hb_comp_functions.pLast->lPCodePos );
+                  }
+                  else
+                  {
+                     // Remove the unconditional jump after end of seq.
+                     hb_comp_functions.pLast->lPCodePos -= 4;
                      --hb_comp_wSeqCounter;  /* CATCH is also considered as end of sequence */
                   }
 
                   //hb_compSequenceFinish( $<lNumber>2, $<iNumber>4 );
                   hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
 
-                  hb_compExprDelete( hb_compExprGenStatement( hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( "HB_RESETTRY", TRUE ) ), NULL ) ) );
-
                   s_iControlLevel--;
                }
              ;
 
 Catch        : /* no recover */  { $<lNumber>$ = 0; }
-             | CatchError Crlf { $<lNumber>$ = $<lNumber>1; } EmptyStats
+             | CatchError Crlf
+               {
+                 $<lNumber>$ = $<lNumber>1;
+                 hb_compExprDelete( hb_compExprGenStatement( hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( "HB_RESETTRY", TRUE ) ), NULL ) ) );
+               }
+               EmptyStats
              ;
 
 CatchError   : CATCH IdentName

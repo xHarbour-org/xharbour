@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4019 2005/04/08 12:54:56 likewolf Exp $
+ * $Id: ChangeLog,v 1.4020 2005/04/09 17:12:56 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-10 12:17 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbapirdd.h
+  * source/rdd/dbcmd.c
+    * Corrected usage of HB_EXPORT with compounded types.
+
+  * source/compiler/harbour.sly
+    ! Fixed and optimized handling of ErroBlock() reset in CATCH clause.
 
 2005-04-09 19:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbapirdd.h

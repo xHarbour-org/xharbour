@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.145 2005/03/31 03:28:39 druzus Exp $
+ * $Id: dbcmd.c,v 1.146 2005/04/09 17:13:07 druzus Exp $
  */
 
 /*
@@ -823,7 +823,7 @@ USHORT HB_EXPORT hb_rddInsertAreaNode( char *szDriver )
 /*
  * allocate and return atomAlias for new workarea or NULL if alias already exist
  */
-void * HB_EXPORT hb_rddAllocWorkAreaAlias( char * szAlias, int iArea )
+HB_EXPORT void * hb_rddAllocWorkAreaAlias( char * szAlias, int iArea )
 {
    PHB_DYNS pSymAlias;
    int iDummyArea;
@@ -1000,7 +1000,7 @@ ERRCODE HB_EXPORT hb_rddSelectWorkAreaAlias( char * szAlias )
 /*
  *  Function for getting current workarea pointer
  */
-void * HB_EXPORT hb_rddGetCurrentWorkAreaPointer( void )
+HB_EXPORT void * hb_rddGetCurrentWorkAreaPointer( void )
 {
    HB_THREAD_STUB
 

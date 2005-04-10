@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.23 2005/03/31 03:15:17 druzus Exp $
+ * $Id: hbapirdd.h,v 1.24 2005/04/09 17:13:07 druzus Exp $
  */
 
 /*
@@ -71,20 +71,20 @@ HB_EXTERN_BEGIN
 
 /* RDD virtual machine integration functions */
 
-extern USHORT  HB_EXPORT hb_rddInsertAreaNode( char *szDriver );
-extern USHORT  HB_EXPORT hb_rddGetCurrentFieldPos( char * szName );
-extern void *  HB_EXPORT hb_rddAllocWorkAreaAlias( char * szAlias, int iArea );
-extern int     HB_EXPORT hb_rddGetCurrentWorkAreaNumber( void );
-extern void *  HB_EXPORT hb_rddGetCurrentWorkAreaPointer( void );
-extern ERRCODE HB_EXPORT hb_rddSelectWorkAreaAlias( char * szAlias );
-extern ERRCODE HB_EXPORT hb_rddSelectWorkAreaNumber( int iArea );
-extern ERRCODE HB_EXPORT hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias );
-extern ERRCODE HB_EXPORT hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
-extern ERRCODE HB_EXPORT hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
-extern ERRCODE HB_EXPORT hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
-extern ERRCODE HB_EXPORT hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
-extern void    HB_EXPORT hb_rddShutDown( void );
-extern void    HB_EXPORT hb_rddReleaseCurrentArea( void );
+extern HB_EXPORT USHORT  hb_rddInsertAreaNode( char *szDriver );
+extern HB_EXPORT USHORT  hb_rddGetCurrentFieldPos( char * szName );
+extern HB_EXPORT void *  hb_rddAllocWorkAreaAlias( char * szAlias, int iArea );
+extern HB_EXPORT int     hb_rddGetCurrentWorkAreaNumber( void );
+extern HB_EXPORT void *  hb_rddGetCurrentWorkAreaPointer( void );
+extern HB_EXPORT ERRCODE hb_rddSelectWorkAreaAlias( char * szAlias );
+extern HB_EXPORT ERRCODE hb_rddSelectWorkAreaNumber( int iArea );
+extern HB_EXPORT ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias );
+extern HB_EXPORT ERRCODE hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
+extern HB_EXPORT ERRCODE hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
+extern HB_EXPORT ERRCODE hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
+extern HB_EXPORT ERRCODE hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol );
+extern HB_EXPORT void    hb_rddShutDown( void );
+extern HB_EXPORT void    hb_rddReleaseCurrentArea( void );
 
 
 
