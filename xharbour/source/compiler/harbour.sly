@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.78 2005/03/31 14:34:06 andijahja Exp $
+ * $Id: harbour.sly,v 1.79 2005/04/10 19:18:53 ronpinkas Exp $
  */
 
 /*
@@ -2611,7 +2611,14 @@ Try          : TRY
                   /* Only if there is CATCH clause */
                   if( $<lNumber>6 )
                   {
-                     hb_compGenJumpThere( $<lNumber>5 + 9, hb_comp_functions.pLast->lPCodePos );
+                     if( hb_comp_functions.pLast->pCode[$<lNumber>5 + 8] == HB_P_JUMPFAR )
+                     {
+                       hb_compGenJumpThere( $<lNumber>5 + 9, hb_comp_functions.pLast->lPCodePos );
+                     }
+                     else
+                     {
+                       hb_compGenJumpThere( $<lNumber>5 + 10, hb_comp_functions.pLast->lPCodePos );
+                     }
                   }
                   else
                   {
@@ -2630,8 +2637,8 @@ Try          : TRY
 Catch        : /* no recover */  { $<lNumber>$ = 0; }
              | CatchError Crlf
                {
-                 $<lNumber>$ = $<lNumber>1;
                  hb_compExprDelete( hb_compExprGenStatement( hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( "HB_RESETTRY", TRUE ) ), NULL ) ) );
+                 $<lNumber>$ = $<lNumber>1;
                }
                EmptyStats
              ;
