@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.49 2004/08/29 00:52:12 ronpinkas Exp $
+ * $Id: macro.c,v 1.50 2004/11/21 21:44:29 druzus Exp $
  */
 
 /*
@@ -846,7 +846,8 @@ HB_MACRO_PTR HB_EXPORT hb_macroCompile( char * szString )
    if( ! ( iStatus == HB_MACRO_OK && ( pMacro->status & HB_MACRO_CONT ) ) )
    {
       hb_macroDelete( pMacro );
-      hb_xfree( pMacro );
+      // Since it have HB_MACRO_DEALLOCATE flag, hb_macroDelete releases it.
+      // hb_xfree( pMacro );
       pMacro = NULL;
    }
 
