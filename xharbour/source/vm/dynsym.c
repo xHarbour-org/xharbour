@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.21 2005/04/06 13:28:16 druzus Exp $
+ * $Id: dynsym.c,v 1.22 2005/04/11 01:46:35 druzus Exp $
  */
 
 /*
@@ -128,25 +128,34 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
    if( pDynSym )            /* If name exists */
    {
-      if( pSymbol->value.pFunPtr && ! pDynSym->pFunPtr 
-   /* reenabled - it's still wrong, Druzus */
-#if 1 /* see note below */
-         /* register only non static functions */
-          && ! ( pSymbol->cScope & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == HB_FS_STATIC
-#endif
-        ) /* The DynSym existed without function pointer */
+      if( pSymbol->value.pFunPtr && pDynSym->pFunPtr == NULL )
       {
-         /* free runtime allocated symbols */
-         if ( ( pDynSym->pSymbol->cScope & HB_FS_ALLOCATED ) == HB_FS_ALLOCATED )
+        #if 1
+         /* reenabled - it's still wrong, Druzus */
+         /* see note below */
+         /* register only non static functions */
+         if( ( pSymbol->cScope & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == HB_FS_STATIC )
          {
-            hb_xfree( pDynSym->pSymbol->szName );
-            hb_xfree( pDynSym->pSymbol );
+            //TraceLog( NULL, "Rejecting: %s in %s\n", pSymbol->szName, pModuleSymbols->szModuleName);
          }
-         pDynSym->pFunPtr = pSymbol->value.pFunPtr;  /* but had no function ptr assigned */
-         pDynSym->pSymbol = pSymbol;
-         pDynSym->ulCalls = 0; /* profiler support */
-         pDynSym->ulTime  = 0; /* profiler support */
-         pDynSym->ulRecurse = 0;
+        #endif
+         else
+         {
+           /* The DynSym existed without function pointer */
+
+           /* free runtime allocated symbols */
+           if ( ( pDynSym->pSymbol->cScope & HB_FS_ALLOCATED ) == HB_FS_ALLOCATED )
+           {
+              hb_xfree( pDynSym->pSymbol->szName );
+              hb_xfree( pDynSym->pSymbol );
+           }
+
+           pDynSym->pFunPtr = pSymbol->value.pFunPtr;  /* but had no function ptr assigned */
+           pDynSym->pSymbol = pSymbol;
+           pDynSym->ulCalls = 0; /* profiler support */
+           pDynSym->ulTime  = 0; /* profiler support */
+           pDynSym->ulRecurse = 0;
+        }
       }
 
       if( pSymbol->pDynSym == (PHB_DYNS) 1 && pDynSym->pModuleSymbols == NULL )
@@ -199,7 +208,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
     * and this code is not necessary but I decide to left it here
     * disabled at least for debugging.
     */
-   if( pSymbol->value.pFunPtr && 
+   if( pSymbol->value.pFunPtr &&
        ( pSymbol->cScope & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == HB_FS_STATIC )
    {
       /*
@@ -210,10 +219,13 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
        * accessible _ONLY_ from their modules.
        * So we will clone this symbol.
        */
+      //TraceLog( NULL, "Cloned: %s in %s\n", pSymbol->szName, pModuleSymbols->szModuleName);
+
       pSymbol->pDynSym = pDynSym;  /* place a pointer to DynSym in original symbol */
       pSymbol = hb_symbolNew( pSymbol->szName ); /* clone the symbol */
    }
 #endif
+
    pDynSym->pFunPtr = pSymbol->value.pFunPtr; /* place the pointer function at DynSym */
 
    if( pSymbol->pDynSym == (PHB_DYNS) 1 )
@@ -234,7 +246,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
    return pDynSym;
 }
 
-PHB_DYNS HB_EXPORT hb_dynsymGet( char * szName )  /* finds and creates a symbol if not found */
+HB_EXPORT PHB_DYNS hb_dynsymGet( char * szName )  /* finds and creates a symbol if not found */
 {
    HB_THREAD_STUB
    PHB_DYNS pDynSym;
