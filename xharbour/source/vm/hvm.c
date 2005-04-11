@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.451 2005/04/06 14:48:13 snaiperis Exp $
+ * $Id: hvm.c,v 1.452 2005/04/11 01:46:35 druzus Exp $
  */
 
 /*
@@ -8477,7 +8477,7 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols i
       }
 #endif
       /*if( ( hSymScope & ( HB_FS_INITEXIT | HB_FS_STATIC ) ) == 0 )*/
-      if( hSymScope & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR ) )
+      if( hSymScope & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR | HB_FS_FIRST ) )
       {
          hb_dynsymNew( pSymbol, pNewSymbols );
       }
