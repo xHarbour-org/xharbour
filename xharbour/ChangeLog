@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4023 2005/04/11 01:46:28 druzus Exp $
+ * $Id: ChangeLog,v 1.4024 2005/04/11 01:52:22 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-11 00:46 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    * Fix to WideToAnsi() when converted string is empty or invalid.
 
 2005-04-10 18:51 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/compiler/harbour.sly

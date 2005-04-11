@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.78 2005/03/22 01:13:14 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.79 2005/03/23 21:33:35 ronpinkas Exp $
  */
 
 /*
@@ -413,8 +413,16 @@ RETURN xRet
      char *cString;
      int nConvertedLen = WideCharToMultiByte( CP_ACP, 0, wString, -1, NULL, 0, NULL, NULL );
 
-     cString = (char *) hb_xgrab( nConvertedLen );
-     WideCharToMultiByte( CP_ACP, 0, wString, -1, cString, nConvertedLen, NULL, NULL );
+     if( nConvertedLen )
+     {
+        cString = (char *) hb_xgrab( nConvertedLen );
+        WideCharToMultiByte( CP_ACP, 0, wString, -1, cString, nConvertedLen, NULL, NULL );
+     }
+     else
+     {
+        cString = (char *) hb_xgrab( 1 );
+        cString[0] = '\0';
+     }
 
      //wprintf( L"\nWide: '%s'\n", wString );
      //printf( "\nAnsi: '%s'\n", cString );

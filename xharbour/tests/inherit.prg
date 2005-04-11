@@ -1,5 +1,5 @@
 //
-// $Id: inherit.prg,v 1.1.1.1 2001/12/21 10:45:52 ronpinkas Exp $
+// $Id: inherit.prg,v 1.2 2004/01/29 14:26:00 likewolf Exp $
 //
 
 #include "set.ch"
@@ -18,6 +18,9 @@
  *
  * Placed in the public domain
  */
+
+#xtranslate Debug(<x,...>) => TraceLog( ValToPrg( <x> ) )
+#xtranslate Default( <IsNil>, <Value> ) => IIF( <IsNil> == NIL, <Value>, <IsNil> )
 
 function Main()
 
@@ -216,6 +219,7 @@ function Read()
       QOut( "DosFile:Read : No file open" )
    elseif ::cMode != "R"
       QOut( "File ", ::cFileName, " not open for reading" )
+      BREAK
    elseif !::lEoF
 
       if Len(::cBlock) == 0                     // Read new block
@@ -269,8 +273,9 @@ function WriteLn( xTxt, lCRLF )
       QOut( "DosFile:Write : No file open" )
    elseif ::cMode != 'W'
       QOut( "File ", ::cFileName," not opened for writing" )
+      BREAK
    else
-      cBlock := ToChar( xTxt )                  // Convert to string
+      cBlock := CStr( xTxt )                  // Convert to string
       if Default( lCRLF, .T. )
          cBlock += Chr(10)+Chr(13)
       endif
@@ -302,6 +307,7 @@ static function Goto( nLine )
       QOut( "DosFile:Goto : No file open" )
    elseif  ::cMode != "R"
       QOut( "File ", ::cFileName, " not open for reading" )
+      BREAK
    else
       ::lEoF   := .F.                           // Clear (old) End of file
       ::nLine  := 0                             // Start at beginning
