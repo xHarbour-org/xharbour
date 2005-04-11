@@ -1,5 +1,5 @@
 /*
- * $Id: genhrb.c,v 1.1.1.1 2001/12/21 10:43:50 ronpinkas Exp $
+ * $Id: genhrb.c,v 1.2 2002/06/19 21:52:48 ronpinkas Exp $
  */
 
 /*
@@ -37,6 +37,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    char szFileName[ _POSIX_PATH_MAX ];
    PFUNCTION pFunc /*= hb_comp_functions.pFirst */;
    PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
+   HB_SYMBOLSCOPE hSymScope;
    ULONG lPCodePos;
    LONG lSymbols;
    ULONG ulCodeLength;
@@ -82,10 +83,10 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    {
       fputs( pSym->szName, yyc );
       fputc( 0, yyc );
-      if( pSym->cScope != HB_FS_MESSAGE )
-         fputc( pSym->cScope, yyc );
-      else
-         fputc( 0, yyc );
+      hSymScope = pSym->cScope;
+      if( ( hSymScope & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) != 0 )
+         hSymScope &= ~HB_FS_PUBLIC;
+      fputc( hSymScope, yyc );
 
       /* specify the function address if it is a defined function or a
          external called function */

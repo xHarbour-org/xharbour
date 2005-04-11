@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.450 2005/04/06 13:28:17 druzus Exp $
+ * $Id: hvm.c,v 1.451 2005/04/06 14:48:13 snaiperis Exp $
  */
 
 /*
@@ -8462,13 +8462,22 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols i
 
       //printf( "Module: '%s' Sym: '%s' Scope: %i\n", sModule, pSymbol->szName, hSymScope );
 
-      if( ( ! s_pSymStart ) && ( hSymScope & HB_FS_FIRST && ! (  hSymScope & HB_FS_INITEXIT ) ) )
+      if( !s_pSymStart && ( hSymScope & HB_FS_FIRST && ! ( hSymScope & HB_FS_INITEXIT ) ) )
       {
          s_pSymStart = pSymbol;  /* first public defined symbol to start execution */
          //printf( "Startup: '%s' Func: %p\n", pSymbol->szName, pSymbol->pFunPtr );
       }
 
-      if( hSymScope & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR | HB_FS_FIRST ) )
+      /* Enable this code to see static functions which are registered in global dynsym table */
+#if 0
+      if( ( ( hSymScope & ( HB_FS_INITEXIT | HB_FS_STATIC ) ) != 0 ) &&
+          ( ( hSymScope & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR ) ) != 0 ) )
+      {
+         printf("\r\nRegistring: [%s](%02x)[%s]", pSymbol->szName, hSymScope, sModule ); fflush(stdout);
+      }
+#endif
+      /*if( ( hSymScope & ( HB_FS_INITEXIT | HB_FS_STATIC ) ) == 0 )*/
+      if( hSymScope & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR ) )
       {
          hb_dynsymNew( pSymbol, pNewSymbols );
       }
@@ -9080,7 +9089,8 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols
 
       pNewSymbols->hScope |= hSymScope;
 
-      if( ( hSymScope == HB_FS_PUBLIC ) || ( hSymScope & ( HB_FS_MESSAGE | HB_FS_MEMVAR | HB_FS_FIRST ) ) )
+      /* if( ( hSymScope == HB_FS_PUBLIC ) || ( hSymScope & ( HB_FS_MESSAGE | HB_FS_MEMVAR | HB_FS_FIRST ) ) ) */
+      if( ( hSymScope & ( HB_FS_INITEXIT | HB_FS_STATIC ) ) == 0 )
       {
          PHB_DYNS pDynSym;
 

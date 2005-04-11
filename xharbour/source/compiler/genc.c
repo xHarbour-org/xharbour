@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.96 2005/04/06 02:18:04 andijahja Exp $
+ * $Id: genc.c,v 1.97 2005/04/06 21:12:43 andijahja Exp $
  */
 
 /*
@@ -106,7 +106,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    PVAR pGlobal, pDelete;
    short iLocalGlobals = 0, iGlobals = 0;
 
-   BOOL bIsPublicFunction ;
+   BOOL bIsStaticFunction ;
    BOOL bIsInitFunction   ;
    BOOL bIsExitFunction   ;
    BOOL bIsStaticVariable ;
@@ -235,11 +235,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       /* write functions prototypes for PRG defined functions */
       while( pFunc )
       {
+         bIsStaticFunction = ( pFunc->cScope & HB_FS_STATIC ) ;
          bIsInitFunction   = ( pFunc->cScope & HB_FS_INIT ) ;
          bIsExitFunction   = ( pFunc->cScope & HB_FS_EXIT ) ;
          bIsStaticVariable = ( pFunc == hb_comp_pInitFunc ) ;
          bIsGlobalVariable = ( pFunc == hb_comp_pGlobalsFunc ) ;
-         bIsPublicFunction = ( pFunc->cScope == HB_FS_PUBLIC ) ;
 
          if( pFunc->cScope & HB_FS_CRITICAL )
          {
@@ -247,9 +247,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          }
 
          /* Is it a PUBLIC FUNCTION/PROCEDURE */
-         if ( bIsPublicFunction )
+         if ( bIsStaticFunction )
          {
-            fprintf( yyc, "HB_FUNC( %s );\n", pFunc->szName );
+            fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pFunc->szName );
          }
          /* Is it a STATIC$ */
          else if ( bIsStaticVariable )
@@ -274,7 +274,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          /* Then it must be a STATIC FUNCTION/PROCEDURE */
          else
          {
-            fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pFunc->szName );
+            fprintf( yyc, "HB_FUNC( %s );\n", pFunc->szName );
          }
 
          pFunc = pFunc->pNext;
@@ -407,38 +407,18 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             if( pSym->cScope & HB_FS_STATIC )
             {
                fprintf( yyc, "HB_FS_STATIC" );
-
-               if( pSym->cScope & HB_FS_PUBLIC )
-               {
-                  fprintf( yyc, " | HB_FS_PUBLIC" );
-               }
             }
             else if( pSym->cScope & HB_FS_INIT )
             {
                fprintf( yyc, "HB_FS_INIT" );
-
-               if( pSym->cScope & HB_FS_PUBLIC )
-               {
-                  fprintf( yyc, " | HB_FS_PUBLIC" );
-               }
             }
             else if( pSym->cScope & HB_FS_EXIT )
             {
                fprintf( yyc, "HB_FS_EXIT" );
-
-               if( pSym->cScope & HB_FS_PUBLIC )
-               {
-                  fprintf( yyc, " | HB_FS_PUBLIC" );
-               }
             }
             else if ( hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_STATIC ) )
             {
                fprintf( yyc, "HB_FS_STATIC" );
-
-               if( pSym->cScope & HB_FS_PUBLIC )
-               {
-                  fprintf( yyc, " | HB_FS_PUBLIC" );
-               }
             }
             else
             {
@@ -574,16 +554,16 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             fprintf( hb_comp_pCodeList, "[%s]\n", pFunc->szName );
          }
 
+         bIsStaticFunction = ( pFunc->cScope & HB_FS_STATIC ) ;
          bIsInitFunction   = ( pFunc->cScope & HB_FS_INIT ) ;
          bIsExitFunction   = ( pFunc->cScope & HB_FS_EXIT ) ;
          bIsStaticVariable = ( pFunc == hb_comp_pInitFunc ) ;
          bIsGlobalVariable = ( pFunc == hb_comp_pGlobalsFunc ) ;
-         bIsPublicFunction = ( pFunc->cScope == HB_FS_PUBLIC ) ;
 
          /* Is it a PUBLIC FUNCTION/PROCEDURE */
-         if ( bIsPublicFunction )
+         if ( bIsStaticFunction )
          {
-            fprintf( yyc, "HB_FUNC( %s )", pFunc->szName );
+            fprintf( yyc, "HB_FUNC_STATIC( %s )", pFunc->szName );
          }
          /* Is it STATICS$ */
          else if( bIsStaticVariable )
@@ -608,7 +588,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          /* Then it must be a STATIC FUNCTION/PROCEDURE */
          else
          {
-            fprintf( yyc, "HB_FUNC_STATIC( %s )", pFunc->szName );
+            fprintf( yyc, "HB_FUNC( %s )", pFunc->szName );
          }
 
          fprintf( yyc, "\n{\n   static const BYTE pcode[] =\n   {\n" );

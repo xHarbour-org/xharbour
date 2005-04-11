@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.49 2005/03/31 04:02:25 druzus Exp $
+ * $Id: extend.c,v 1.50 2005/04/06 14:48:13 snaiperis Exp $
  */
 
 /*
@@ -952,14 +952,18 @@ void HB_EXPORT hb_retnllen( LONG lNumber, int iWidth )
 
 /* NEW function - to return a pointer to a harbour level */
 #undef hb_retptr
-void hb_retptr( void *voidPtr )
+void HB_EXPORT hb_retptr( void * voidPtr )
 {
+   HB_TRACE(HB_TR_DEBUG, ("hb_retptr(%p)", voidPtr));
+
    hb_itemPutPtr( &(HB_VM_STACK.Return), voidPtr );
 }
 
 #undef hb_retptrGC
-void hb_retptrGC( void *voidPtr )
+void HB_EXPORT hb_retptrGC( void * voidPtr )
 {
+   HB_TRACE(HB_TR_DEBUG, ("hb_retptrGC(%p)", voidPtr));
+
    hb_itemPutPtrGC( &(HB_VM_STACK.Return), voidPtr );
 }
 

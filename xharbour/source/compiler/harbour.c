@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.102 2005/04/02 01:57:18 andijahja Exp $
+ * $Id: harbour.c,v 1.103 2005/04/02 21:13:49 andijahja Exp $
  */
 
 /*
@@ -1854,7 +1854,7 @@ PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, BOOL bFunction
       pSym = ( PCOMSYMBOL ) hb_xgrab( sizeof( COMSYMBOL ) );
 
       pSym->szName = szSymbolName;
-      pSym->cScope = 0; /* HB_FS_PUBLIC; */
+      pSym->cScope = HB_FS_PUBLIC;
       pSym->cType = hb_comp_cVarType;
       pSym->pNext = NULL;
       pSym->bFunc = bFunction;
@@ -2005,13 +2005,13 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    }
    else
    {
-      // There is not a symbol on the symbol table for this function name yet.
+      /* There is not a symbol on the symbol table for this function name yet. */
       pSym = hb_compSymbolAdd( szFunName, NULL, TRUE );
 
       if( pSym )
       {
-         // Intentionally '=' instead of '|=' - Don't assume PUBLIC.
-         pSym->cScope = cScope;
+         /* HB_FS_PUBLIC should have the lowest priority and can be covered by other symbols */
+         pSym->cScope |= cScope;
       }
    }
 
@@ -2122,7 +2122,7 @@ void hb_compAnnounce( char * szFunName )
       /* create a new procedure
        */
       pSym = hb_compSymbolAdd( szFunName, NULL, TRUE );
-      pSym->cScope = HB_FS_PUBLIC;
+      /* pSym->cScope = HB_FS_PUBLIC; // already is */
 
       pFunc = hb_compFunctionNew( szFunName, HB_FS_PUBLIC );
       pFunc->bFlags |= FUN_PROCEDURE;
@@ -4056,7 +4056,7 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias )
 
       if( bAlias )
       {
-         pSym->cScope |= HB_FS_PUBLIC;
+         pSym->cScope |= HB_FS_MEMVAR; /* HB_FS_PUBLIC can be hidden by HB_FS_STATIC */
       }
    }
    else
@@ -4065,8 +4065,6 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias )
 
       if( bFunction )
       {
-         // Don't make any assumption about the Scope of the Function.
-         pSym->cScope = 0;
          hb_compFunCallAdd( szSymbolName );
       }
    }

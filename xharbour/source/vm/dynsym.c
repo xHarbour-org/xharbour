@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.20 2005/03/31 04:02:22 druzus Exp $
+ * $Id: dynsym.c,v 1.21 2005/04/06 13:28:16 druzus Exp $
  */
 
 /*
@@ -129,9 +129,10 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
    if( pDynSym )            /* If name exists */
    {
       if( pSymbol->value.pFunPtr && ! pDynSym->pFunPtr 
-#if 0 /* see note below */
+   /* reenabled - it's still wrong, Druzus */
+#if 1 /* see note below */
          /* register only non static functions */
-          && ! pSymbol->cScope & ( HB_FS_STATIC | HB_FS_PUBLIC ) == HB_FS_STATIC
+          && ! ( pSymbol->cScope & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == HB_FS_STATIC
 #endif
         ) /* The DynSym existed without function pointer */
       {
@@ -192,14 +193,14 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
    pDynSym->ulTime         = 0; /* profiler support */
    pDynSym->ulRecurse      = 0;
 
-#if 0
+#if 1
    /* now the compiler creates separate symbols for functions and
     * fields/memvars/aliases so we should not have any problem here
     * and this code is not necessary but I decide to left it here
     * disabled at least for debugging.
     */
    if( pSymbol->value.pFunPtr && 
-       pSymbol->cScope & ( HB_FS_STATIC | HB_FS_PUBLIC ) == HB_FS_STATIC )
+       ( pSymbol->cScope & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == HB_FS_STATIC )
    {
       /*
        * This symbol points to static function - we cannot register
