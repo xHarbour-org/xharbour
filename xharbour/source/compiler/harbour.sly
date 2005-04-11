@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.79 2005/04/10 19:18:53 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.80 2005/04/10 21:28:24 ronpinkas Exp $
  */
 
 /*
@@ -2611,19 +2611,21 @@ Try          : TRY
                   /* Only if there is CATCH clause */
                   if( $<lNumber>6 )
                   {
-                     if( hb_comp_functions.pLast->pCode[$<lNumber>5 + 8] == HB_P_JUMPFAR )
+                     if( hb_comp_functions.pLast->pCode[ $<lNumber>5 + 8 ] == HB_P_JUMPFAR )
                      {
-                       hb_compGenJumpThere( $<lNumber>5 + 9, hb_comp_functions.pLast->lPCodePos );
+                       hb_compGenJumpHere( $<lNumber>5 + 9 );
                      }
                      else
                      {
-                       hb_compGenJumpThere( $<lNumber>5 + 10, hb_comp_functions.pLast->lPCodePos );
+                       hb_compGenJumpHere( $<lNumber>5 + 10 );
                      }
                   }
                   else
                   {
                      // Remove the unconditional jump after end of seq.
+                     hb_comp_functions.pLast->iJumps--;
                      hb_comp_functions.pLast->lPCodePos -= 4;
+
                      --hb_comp_wSeqCounter;  /* CATCH is also considered as end of sequence */
                   }
 
