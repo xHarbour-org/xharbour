@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.34 2005/04/06 03:57:58 mlombardo Exp $
+ * $Id: runner.c,v 1.35 2005/04/11 01:46:36 druzus Exp $
  */
 
 /*
@@ -653,7 +653,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
          pSymRead[ ul ].pDynSym = NULL;
 
          /* temporary hack for old HRB modules I'll remove it in some time, Druzus */
-         if ( ( pSymRead[ ul ].cScope & ( HB_FS_STATIC || HB_FS_INITEXIT ) ) == 0 )
+         if ( ( pSymRead[ ul ].cScope & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == 0 )
             pSymRead[ ul ].cScope |= HB_FS_PUBLIC;
 
          if ( pHrbBody->ulSymStart == -1 && pSymRead[ ul ].cScope & HB_FS_FIRST && ! ( pSymRead[ ul ].cScope & HB_FS_INITEXIT ) )
