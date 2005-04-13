@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.17 2005/04/01 20:16:27 andijahja Exp $
+ * $Id: hbstr.c,v 1.18 2005/04/09 17:13:07 druzus Exp $
  */
 
 /*
@@ -820,6 +820,7 @@ HB_EXPORT char *hb_stripOutComments( char* buffer )
          {
             if( buffer [ i + 1 ] == '*' )
             {
+	       i ++;
                while ( ++ i < ui )
                {
                   if ( buffer [ i ] == '*' && buffer [ i + 1 ] == '/' )
