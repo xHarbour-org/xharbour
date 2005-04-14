@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.158 2005/03/31 03:15:15 druzus Exp $
+ * $Id: hbapi.h,v 1.159 2005/04/06 13:28:12 druzus Exp $
  */
 
 /*
@@ -163,6 +163,8 @@ HB_EXTERN_BEGIN
                      (p)->item.asLong.length = HB_LONG_LENGTH( v ); \
                   } \
                } while ( 0 )
+
+#define HB_ITEM_NEW(hb)  HB_ITEM hb = HB_ITEM_NIL
 
 typedef struct _HB_VALUE
 {

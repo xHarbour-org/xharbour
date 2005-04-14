@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.146 2005/04/09 17:13:07 druzus Exp $
+ * $Id: dbcmd.c,v 1.147 2005/04/10 19:18:53 ronpinkas Exp $
  */
 
 /*
@@ -84,27 +84,8 @@ HB_FUNC_EXTERN( _SDF );
 HB_FUNC_EXTERN( _DELIM );
 HB_FUNC_EXTERN( RDDSYS );
 
-#define __PRG_SOURCE__ __FILE__
-HB_FUNC_EXTERN( FPARSEEX );
-#undef HB_PRG_PCODE_VER
-#define HB_PRG_PCODE_VER HB_PCODE_VER
-HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_DBCMD )
-{ "FPARSEEX", HB_FS_PUBLIC, {HB_FUNCNAME( FPARSEEX )}, NULL }
-HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_DBCMD )
-
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_vm_SymbolInit_DBCMD
-#elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
-   #else
-      #pragma data_seg( "XIY" )
-   #endif
-   static HB_$INITSYM hb_vm_auto_SymbolInit_DBCMD = hb_vm_SymbolInit_DBCMD;
-   #pragma data_seg()
-#endif
-
+extern BOOL file_read ( FILE *stream, char *string, int *iCharCount );
+extern void hb_ParseLine( PHB_ITEM pReturn, char * szText, int iDelimiter, int * iWord );
 
 static char s_szDefDriver[HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1] = ""; /* Default RDD name */
 static LPRDDNODE * s_RddList = NULL;   /* Registered RDDs */
@@ -1209,7 +1190,7 @@ HB_FUNC( AFIELDS )
    HB_THREAD_STUB
 
    PHB_ITEM pName, pType, pLen, pDec;
-   HB_ITEM Item;
+   HB_ITEM_NEW ( Item );
    USHORT uiFields, uiArrayLen, uiCount;
    AREAP pArea = HB_CURRENT_WA;
 
@@ -1230,7 +1211,6 @@ HB_FUNC( AFIELDS )
    }
 
    uiArrayLen = 0;
-   Item.type = HB_IT_NIL;
    SELF_FIELDCOUNT( pArea, &uiFields );
    if( pName )
    {
@@ -1634,8 +1614,7 @@ HB_FUNC( DBCREATE )
 
    if( ! pFileName->szExtension )
    {
-      HB_ITEM extItm;
-      extItm.type = HB_IT_NIL;
+      HB_ITEM_NEW( extItm );
       SELF_INFO( pArea, DBI_TABLEEXT, &extItm );
       if( HB_IS_STRING( &extItm ) )
       {
@@ -2322,16 +2301,14 @@ static void hb_dbfStructure( PHB_ITEM pStruct )
 {
    HB_THREAD_STUB
 
-   HB_ITEM Item, Data;
+   HB_ITEM_NEW (Item );
+   HB_ITEM_NEW ( Data );
    USHORT uiFields, uiCount;
    AREAP pArea = HB_CURRENT_WA;
 
    if( pArea )
    {
       SELF_FIELDCOUNT( pArea, &uiFields );
-
-      Data.type = HB_IT_NIL;
-      Item.type = HB_IT_NIL;
 
       hb_arrayNew( pStruct, 0 );
 
@@ -2369,10 +2346,9 @@ HB_FUNC( DBSTRUCT )
 HB_FUNC( DBTABLEEXT )
 {
    HB_THREAD_STUB
-   HB_ITEM Item;
+   HB_ITEM_NEW( Item );
    AREAP pArea = HB_CURRENT_WA;
 
-   Item.type = HB_IT_NIL;
    hb_itemPutC( &Item, "" );
 
    if( !pArea )
@@ -2506,8 +2482,7 @@ HB_FUNC( DBUSEAREA )
 
    if( ! pFileName->szExtension )
    {
-      HB_ITEM extItm;
-      extItm.type = HB_IT_NIL;
+      HB_ITEM_NEW( extItm );
       SELF_INFO( pArea, DBI_TABLEEXT, &extItm );
       if( HB_IS_STRING( &extItm ) )
       {
@@ -2589,8 +2564,7 @@ HB_FUNC( FIELDDEC )
 
       if( ( uiIndex = hb_parni( 1 ) ) > 0 )
       {
-         HB_ITEM Item;
-         Item.type = HB_IT_NIL;
+         HB_ITEM_NEW( Item );
 
          if( SELF_FIELDINFO( pArea, uiIndex, DBS_DEC, &Item ) == SUCCESS)
          {
@@ -2606,11 +2580,10 @@ HB_FUNC( FIELDDEC )
 HB_FUNC( FIELDGET )
 {
    HB_THREAD_STUB
-   HB_ITEM Item;
+   HB_ITEM_NEW( Item );
    USHORT uiField, uiFields;
    AREAP pArea = HB_CURRENT_WA;
 
-   Item.type = HB_IT_NIL;
    uiField = hb_parni( 1 );
 
    if( pArea && uiField )
@@ -2633,8 +2606,8 @@ HB_FUNC( FIELDLEN )
       USHORT uiIndex;
       if( ( uiIndex = hb_parni( 1 ) ) > 0 )
       {
-         HB_ITEM Item;
-         Item.type = HB_IT_NIL;
+         HB_ITEM_NEW( Item );
+
          if( SELF_FIELDINFO( pArea, uiIndex, DBS_LEN, &Item ) == SUCCESS )
          {
             hb_itemForwardValue( hb_stackReturnItem(), &Item );
@@ -2727,8 +2700,7 @@ HB_FUNC( FIELDTYPE )
 
       if( ( uiIndex = hb_parni( 1 ) ) > 0 )
       {
-         HB_ITEM Item;
-         Item.type = HB_IT_NIL;
+         HB_ITEM_NEW( Item );
 
          if( SELF_FIELDINFO( pArea, uiIndex, DBS_TYPE, &Item ) == SUCCESS )
          {
@@ -2780,8 +2752,7 @@ HB_FUNC( HEADER )
       hb_retni( 0 );
    else
    {
-      HB_ITEM RecSize;
-      RecSize.type = HB_IT_NIL;
+      HB_ITEM_NEW( RecSize );
       SELF_INFO( pArea, DBI_GETHEADERSIZE, &RecSize );
       hb_itemForwardValue( hb_stackReturnItem(), &RecSize );
    }
@@ -3566,9 +3537,7 @@ HB_FUNC( RDDLIST )
 {
    HB_THREAD_STUB
    USHORT uiType, uiCount;
-   HB_ITEM Name;
-
-   Name.type = HB_IT_NIL;
+   HB_ITEM_NEW( Name );
 
    hb_rddCheck();
    hb_arrayNew( hb_stackReturnItem(), 0 );
@@ -3639,10 +3608,9 @@ HB_FUNC( RECCOUNT )
 HB_FUNC( RECNO )
 {
    HB_THREAD_STUB
-   HB_ITEM RecNo;
+   HB_ITEM_NEW( RecNo );
    AREAP pArea = HB_CURRENT_WA;
 
-   RecNo.type = HB_IT_NIL;
    hb_itemPutNL( &RecNo, 0 );
    if( pArea )
       SELF_RECNO( pArea, &RecNo );
@@ -3652,12 +3620,11 @@ HB_FUNC( RECNO )
 HB_FUNC( RECSIZE )
 {
    HB_THREAD_STUB
-   HB_ITEM RecSize;
+   HB_ITEM_NEW( RecSize );
    AREAP pArea = HB_CURRENT_WA;
 
    if( pArea )
    {
-      RecSize.type = HB_IT_NIL;
       SELF_INFO( pArea, DBI_GETRECSIZE, &RecSize );
       hb_itemForwardValue( hb_stackReturnItem(), &RecSize );
    }
@@ -3806,9 +3773,8 @@ HB_FUNC( ORDSCOPE )
    if ( pArea )
    {
       DBORDSCOPEINFO sInfo;
-      HB_ITEM ScopeValue;
+      HB_ITEM_NEW( ScopeValue );
 
-      ScopeValue.type = HB_IT_NIL;
       sInfo.nScope = hb_parni( 1 );
 
       SELF_SCOPEINFO( pArea, sInfo.nScope, &ScopeValue );
@@ -4087,8 +4053,8 @@ HB_FUNC( DBINFO )
    if( pArea )
    {
       PHB_ITEM pType, pInfo;
-      HB_ITEM Temp;
-      Temp.type = HB_IT_NIL;
+      HB_ITEM_NEW( Temp );
+
       pType = hb_param( 1 , HB_IT_NUMERIC );
       if( pType )
       {
@@ -4158,9 +4124,8 @@ HB_FUNC( DBFIELDINFO )
    {
       USHORT uiFields, uiIndex;
       PHB_ITEM pType, pInfo;
-      HB_ITEM Temp;
+      HB_ITEM_NEW( Temp );
 
-      Temp.type = HB_IT_NIL;
       pType = hb_param( 1 , HB_IT_NUMERIC );
       uiIndex = hb_parni( 2 );
       if( pType &&
@@ -4191,8 +4156,8 @@ HB_FUNC( DBRECORDINFO )
    if( pArea )
    {
       PHB_ITEM pType, pRecNo, pInfo;
-      HB_ITEM Temp;
-      Temp.type = HB_IT_NIL;
+      HB_ITEM_NEW( Temp );
+
       pType = hb_param( 1 , HB_IT_NUMERIC );
       pRecNo = hb_param( 2 , HB_IT_NUMERIC );
       if( pType )
@@ -4371,9 +4336,8 @@ static BOOL IsFieldIn( char * fieldName, PHB_ITEM pFields )
 
 static void AddField( AREAP pArea, PHB_ITEM pFieldArray, USHORT uiCount )
 {
-   HB_ITEM Item, Data;
-   Item.type = HB_IT_NIL;
-   Data.type = HB_IT_NIL;
+   HB_ITEM_NEW( Item );
+   HB_ITEM_NEW( Data );
 
    hb_arrayNew( &Item, 4 );
 
@@ -4446,8 +4410,8 @@ static AREAP GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, 
    pFileName = hb_fsFNameSplit( szFile );
    if( ! pFileName->szExtension )
    {
-      HB_ITEM extItm;
-      extItm.type = HB_IT_NIL;
+      HB_ITEM_NEW( extItm );
+
       SELF_INFO( pOldArea, DBI_TABLEEXT, &extItm );
       if( HB_IS_STRING( &extItm ) )
       {
@@ -4521,8 +4485,8 @@ static AREAP GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, 
          pRDDNode = hb_rddFindNode( szDriver, NULL );  // find the RDD
          if ( pRDDNode )
          {
-            HB_ITEM tableItm;
-            tableItm.type = HB_IT_NIL;
+            HB_ITEM_NEW( tableItm );
+
             hb_itemPutCL( &tableItm, szFileName, strlen( szFile ) );
             if( SELF_EXISTS( pRDDNode, &tableItm, NULL ) )
             {
@@ -4591,10 +4555,9 @@ static AREAP GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, 
 static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields )
 {
    USHORT i, f;
-   HB_ITEM fieldValue;
+   HB_ITEM_NEW( fieldValue );
    char * szName;
 
-   fieldValue.type = HB_IT_NIL;
    szName = ( char * ) hb_xgrab( ( ( AREAP ) pAreaTo)->uiMaxFieldNameLength + 1 );
 
    for( i = 0; i < pAreaTo->uiFieldCount; i++ )
@@ -4947,92 +4910,103 @@ HB_FUNC( DBSKIPPER )
 // Import values from delimited text file
 static void hb_AppendToDb( PHB_ITEM pDelimitedFile, PHB_ITEM pDelimiter )
 {
+   #ifndef MAX_READ
+      #define MAX_READ 4096
+   #endif
+
    HB_THREAD_STUB
 
    if ( pDelimitedFile )
    {
       AREAP pArea = HB_CURRENT_WA;
-      // Getting return value from FARSEEX()
-      PHB_ITEM pContent = hb_itemDoC( "FPARSEEX", 2, pDelimitedFile, pDelimiter );
-
-      ULONG ulContent = pContent->item.asArray.value->ulLen;
-      HB_ITEM Structure;
+      FILE *inFile;
+      ULONG ulContent;
+      HB_ITEM_NEW( Structure );
+      HB_ITEM_NEW( TextArray );
       USHORT uiStruct;
-      ULONG ulData;
+      char* string = (char*) hb_xgrab( MAX_READ + 1 );
+      int iCharCount = 0;
+      BYTE nByte = (BYTE) pDelimiter->item.asString.value[0];
 
-      Structure.type = HB_IT_NIL;
       hb_dbfStructure( &Structure );
       uiStruct = ( USHORT ) (&Structure)->item.asArray.value->ulLen;
 
-      if ( ulContent > 0 )
+      /* Open delimited file */
+      inFile = fopen( pDelimitedFile->item.asString.value, "r" );
+
+      while ( file_read ( inFile, string, &iCharCount ) )
       {
-         for ( ulData = 0; ulData < ulContent; ulData ++ )
+         USHORT ui;
+         int iWord = 0;
+         USHORT uiField;
+
+         hb_arrayNew( &TextArray, 0 );
+         hb_ParseLine( &TextArray, string, nByte, &iWord );
+
+         ulContent = (&TextArray)->item.asArray.value->ulLen;
+         uiField = ( ulContent < uiStruct ) ? ulContent : uiStruct;
+
+         s_bNetError = FALSE;
+
+         if( SELF_APPEND( pArea, TRUE ) == FAILURE )
          {
-            PHB_ITEM pData = hb_arrayGetItemPtr( pContent, ulData + 1 );
-            USHORT uiData = ( USHORT ) pData->item.asArray.value->ulLen;
-            USHORT uiField = ( uiData < uiStruct ) ? uiData : uiStruct;
-            USHORT ui;
-
-            s_bNetError = FALSE;
-
-            if( SELF_APPEND( pArea, TRUE ) == FAILURE )
+            s_bNetError = TRUE;
+         }
+         else
+         {
+            for ( ui = 0; ui < uiField ; ui ++ )
             {
-               s_bNetError = TRUE;
-            }
-            else
-            {
-               for ( ui = 0; ui < uiField ; ui ++ )
+               HB_ITEM_NEW( FieldValue );
+               PHB_ITEM pFieldInfo = hb_arrayGetItemPtr( &Structure, ui + 1 );
+               char *cBuffer = hb_arrayGetC( &TextArray, ui + 1 );
+               char *cFieldType = hb_arrayGetC( pFieldInfo, 2 );
+
+               /* Create PHB_ITEM to be FIELDPUTted */
+               switch( cFieldType[0] )
                {
-                  HB_ITEM FieldValue;
-                  PHB_ITEM pFieldInfo = hb_arrayGetItemPtr( &Structure, ui + 1 );
-                  char *cBuffer = hb_arrayGetC( pData, ui + 1 );
-                  char *cFieldType = hb_arrayGetC( pFieldInfo, 2 );
+                  /* It's a DATE field */
+                  case 'D':
+                     hb_itemPutDS( &FieldValue, cBuffer );
+                     break;
 
-                  ( &FieldValue )->type = HB_IT_NIL;
-
-                  /* Create PHB_ITEM to be FIELDPUTted */
-                  switch( cFieldType[0] )
+                  /* It's a LOGICAL field '*/
+                  case 'L':
                   {
-                     /* It's a DATE field */
-                     case 'D':
-                        hb_itemPutDS( &FieldValue, cBuffer );
-                        break;
-
-                     /* It's a LOGICAL field '*/
-                     case 'L':
-                     {
-                        BOOL bTrue;
-                        hb_strupr( cBuffer );
-                        bTrue = ( cBuffer[0] == 'T' );
-                        hb_itemPutL( &FieldValue, bTrue );
-                        break;
-                     }
-
-                     /* It's a NUMERIC field */
-                     case 'N':
-                        hb_itemPutND( &FieldValue, hb_strVal( cBuffer, strlen( cBuffer ) ) );
-                        break;
-
-                     /* It's a CHARACTER field */
-                     default:
-                        hb_itemPutC( &FieldValue, cBuffer );
-                        break;
+                     BOOL bTrue;
+                     hb_strupr( cBuffer );
+                     bTrue = ( cBuffer[0] == 'T' );
+                     hb_itemPutL( &FieldValue, bTrue );
+                     break;
                   }
 
-                  /* FieldPut */
-                  SELF_PUTVALUE( pArea, ui + 1, &FieldValue );
+                  /* It's a NUMERIC field */
+                  case 'N':
+                     hb_itemPutND( &FieldValue, hb_strVal( cBuffer, strlen( cBuffer ) ) );
+                     break;
 
-                  /* Clean Ups */
-                  hb_itemClear( &FieldValue );
-                  hb_xfree( cBuffer );
-                  hb_xfree( cFieldType );
+                  /* It's a CHARACTER field */
+                  default:
+                     hb_itemPutC( &FieldValue, cBuffer );
+                     break;
                }
+
+               /* FieldPut */
+               SELF_PUTVALUE( pArea, ui + 1, &FieldValue );
+
+               /* Clean Ups */
+               hb_itemClear( &FieldValue );
+               hb_xfree( cBuffer );
+               hb_xfree( cFieldType );
             }
          }
       }
+
+      hb_xfree( string );
+      fclose( inFile );
+
       /* Clean Ups */
       hb_itemClear( &Structure );
-      hb_itemRelease( pContent );
+      hb_itemClear( &TextArray );
    }
 }
 
@@ -5154,7 +5128,7 @@ static void hb_Dbf2Text( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
    int iSepLen;
    USHORT uiFields = 0;
    USHORT ui;
-   HB_ITEM Tmp;
+   HB_ITEM_NEW( Tmp );
    BOOL bWriteSep = FALSE;
 
    BOOL bEof = TRUE;
@@ -5184,8 +5158,6 @@ static void hb_Dbf2Text( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
    }
 
    SELF_FIELDCOUNT( pArea, &uiFields );
-
-   Tmp.type = HB_IT_NIL;
 
    while ( hb___Eval( pWhile ) && ( nCount == -1 || nCount > 0 ) )
    {
@@ -5404,8 +5376,8 @@ HB_FUNC( __DBDELIM )
             else
             {
                // DBGOTO( lStart )
-               HB_ITEM pGoto;
-               pGoto.type = HB_IT_NIL;
+               HB_ITEM_NEW( pGoto );
+
                hb_itemPutNL( &pGoto, lStart );
                SELF_GOTOID( pArea, &pGoto );
                // Clean up
@@ -5422,12 +5394,8 @@ HB_FUNC( __DBDELIM )
       else
       {
          // Container to pass to AppendToDb()
-         HB_ITEM pDelimitedFile;
-         HB_ITEM pSep;
-
-         // NIL them at the first place
-         pDelimitedFile.type = HB_IT_NIL;
-         pSep.type = HB_IT_NIL;
+         HB_ITEM_NEW( pDelimitedFile );
+         HB_ITEM_NEW( pSep );
 
          // Try to open the delimited text file
          do
@@ -5467,7 +5435,7 @@ HB_FUNC( __DBDELIM )
             pError = NULL;
          }
 
-         // We don't need this handle as the process is done in FPARSEEX()
+         // We don't need this handle as in thie module
          hb_fsClose( handle );
 
          // Assign value to HB_ITEM
@@ -5489,5 +5457,3 @@ HB_FUNC( __DBDELIM )
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "__DBDELIM" );
    }
 }
-
-

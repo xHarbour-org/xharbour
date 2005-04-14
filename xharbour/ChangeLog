@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4028 2005/04/12 11:26:43 druzus Exp $
+ * $Id: ChangeLog,v 1.4029 2005/04/13 21:04:06 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-14 11:25 UTC+0700 Andi Jahja <andijahja@xharbour.com>
+  * source/rdd/dbcmd.c
+    ! fix bugs in __DBDELIM when appending from large textfile due to
+      accumulation of array which may exceed memory buffer.
+      This is a temporary solution until RDDSDF is implemented.
+
+  * source/rtl/fparse.c
+    ! make function file_read()	public.
+
+  * include/hbapi.h
+    + #define HB_ITEM_NEW(hb)  HB_ITEM hb = HB_ITEM_NIL for short cut.
+      IMO, it is more efficient than writing:
+      .-----
+      | HB_ITEM hb;
+      | (&hb)->type = HB_IT_NIL;
+      `-----
+      and also, avoid overlook in "NIL-ing" HB_ITEM before usage.
+
+  * source/compiler/genc.c
+    ! some fixes on writing symbol entries. The following codes generate
+      incorrect C output:
+      .----------
+      | PROCEDURE MAIN()
+      |    TEST()
+      |    RETURN
+      |
+      | #pragma begindump
+      | #include "hbapi.h"
+      | HB_FUNC( TEST )	{}
+      | #pragma enddump
+       `---------
 
 2005-04-14 04:05 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * source/common/hbstr.c

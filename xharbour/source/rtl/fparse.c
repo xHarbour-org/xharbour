@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.11 2004/03/20 10:44:34 andijahja Exp $
+ * $Id: fparse.c,v 1.12 2004/03/30 22:47:23 druzus Exp $
  */
 
 /*
@@ -85,7 +85,7 @@ void hb_ParseLine( PHB_ITEM pReturn, char * szText, int iDelimiter, int * iWord 
 
       if ( iLen > 0 )
       {
-          HB_ITEM Temp;
+          HB_ITEM_NEW( Temp );
           int i = 0, word_count = 0 ;
           /* booked enough memory */
           char *szResult = (char*) hb_xgrab( iLen + 1 );
@@ -105,8 +105,6 @@ void hb_ParseLine( PHB_ITEM pReturn, char * szText, int iDelimiter, int * iWord 
 
           iLen = strlen( szText );
 #endif
-
-          Temp.type = HB_IT_NIL;
 
           while( i < iLen )
           {
@@ -322,7 +320,7 @@ static char ** hb_tokensplit ( char *string, BYTE delimiter, int iCharCount, int
 }
 
 //----------------------------------------------------------------------------//
-static BOOL file_read ( FILE *stream, char *string, int *iCharCount )
+BOOL file_read ( FILE *stream, char *string, int *iCharCount )
 {
    int ch, cnbr = 0;
 
@@ -361,7 +359,8 @@ HB_FUNC( FPARSE )
    FILE *inFile ;
    PHB_ITEM pSrc = hb_param(1, HB_IT_STRING);
    PHB_ITEM pDelim = hb_param(2, HB_IT_STRING);
-   HB_ITEM Array, Item;
+   HB_ITEM_NEW( Array );
+   HB_ITEM_NEW( Item );
    char *string ;
    char **tokens;
    int iToken, iCharCount = 0;
@@ -394,14 +393,10 @@ HB_FUNC( FPARSE )
    nByte = pDelim ? (BYTE) pDelim->item.asString.value[0] : (BYTE) 44;
 
    /* the main array */
-   Array.type = HB_IT_NIL;
    hb_arrayNew( &Array, 0 );
 
    /* book memory for line to read */
    string = (char*) hb_xgrab( MAX_READ + 1 );
-
-   /* container for parsed line */
-   Item.type = HB_IT_NIL;
 
    /* read the file until EOF */
    while ( file_read ( inFile, string, &iCharCount ) )
@@ -443,7 +438,8 @@ HB_FUNC( FPARSEEX )
    FILE *inFile ;
    PHB_ITEM pSrc = hb_param(1, HB_IT_STRING);
    PHB_ITEM pDelim = hb_param(2, HB_IT_STRING);
-   HB_ITEM Array, SubArray;
+   HB_ITEM_NEW( Array );
+   HB_ITEM_NEW( SubArray );
    char *string ;
    int iCharCount = 0;
    BYTE nByte;
@@ -475,11 +471,7 @@ HB_FUNC( FPARSEEX )
    nByte = pDelim ? (BYTE) pDelim->item.asString.value[0] : (BYTE) 44;
 
    /* the main array */
-   Array.type = HB_IT_NIL;
    hb_arrayNew( &Array, 0 );
-
-   /* the sub array */
-   SubArray.type = HB_IT_NIL;
 
    /* book memory for line to read */
    string = (char*) hb_xgrab( MAX_READ + 1 );
@@ -668,10 +660,9 @@ HB_FUNC( FCHARCOUNT )
 //----------------------------------------------------------------------------//
 HB_FUNC( FPARSELINE )
 {
-   HB_ITEM Return;
+   HB_ITEM_NEW( Return );
    int iWords = 0;
 
-   ( &Return )->type = HB_IT_NIL;
    hb_arrayNew( &Return, 0 );
 
    if ( ISCHAR(1) )
