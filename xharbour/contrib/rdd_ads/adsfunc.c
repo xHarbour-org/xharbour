@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.52 2005/03/31 03:12:47 druzus Exp $
+ * $Id: adsfunc.c,v 1.53 2005/04/09 17:13:07 druzus Exp $
  */
 
 /*
@@ -2275,6 +2275,55 @@ HB_FUNC( ADSCOPYTABLECONTENTS )
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSCOPYTABLECONTENTS" );
+}
+
+
+HB_FUNC( ADSDIRECTORY )
+{
+   UNSIGNED32 ulRetVal;
+   UNSIGNED8  ucFileName[ ADS_MAX_TABLE_NAME ];
+   UNSIGNED16 usFileNameLen;
+   SIGNED32   sHandle = 0;
+   PHB_ITEM   pitmDir, pitmFileName;
+
+
+   pitmDir = hb_itemNew( NULL );
+   hb_arrayNew( pitmDir, 0 );
+
+   usFileNameLen = ADS_MAX_TABLE_NAME;
+   ulRetVal = AdsFindFirstTable( adsConnectHandle, ( UNSIGNED8* ) ( ISCHAR( 1 ) ? hb_parcx( 1 ) : "" ), ucFileName, &usFileNameLen, &sHandle );
+   if ( ulRetVal == AE_SUCCESS || ulRetVal == AE_NO_FILE_FOUND ) 
+   {
+      do {
+         pitmFileName = hb_itemPutCL( NULL, ucFileName, usFileNameLen );
+         hb_arrayAddForward( pitmDir, pitmFileName );
+
+         usFileNameLen = ADS_MAX_TABLE_NAME;
+         ulRetVal = AdsFindNextTable( adsConnectHandle, sHandle, ucFileName, &usFileNameLen );
+      } while( ulRetVal == AE_SUCCESS );
+
+      AdsFindClose( adsConnectHandle, sHandle );
+   }
+   hb_itemRelease( hb_itemReturn( pitmDir ) );
+}
+
+
+HB_FUNC( ADSCHECKEXISTENCE )
+{
+   UNSIGNED16 usExist;
+
+   hb_retl( AdsCheckExistence( adsConnectHandle, ( UNSIGNED8* ) hb_parcx( 1 ), &usExist ) == AE_SUCCESS && usExist );
+}
+
+
+// Function is not documented, but exists in ace32.dll  version 6.x, 7.x
+UNSIGNED32 ENTRYPOINT AdsDeleteFile( ADSHANDLE hConnection, UNSIGNED8* pucFileName );
+
+HB_FUNC( ADSDELETEFILE )
+{
+   UNSIGNED16 usExist;
+
+   hb_retl( AdsDeleteFile( adsConnectHandle, ( UNSIGNED8* ) hb_parcx( 1 ) ) == AE_SUCCESS );
 }
 
 #endif   /* ADS_REQUIRE_VERSION >= 6  */
