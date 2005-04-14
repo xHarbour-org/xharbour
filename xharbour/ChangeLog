@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4029 2005/04/13 21:04:06 andijahja Exp $
+ * $Id: ChangeLog,v 1.4030 2005/04/14 04:40:51 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-13 22:57 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rdd/dbcmd.c
+  * source/rtl/dbdelim.prg
+    * Reverted to use prg code for __dbDelim
+    + Added prg level AppendToDb()
+
+  * hrbdll.bc
+  * hrbdll.vc
+  * makefile.bc
+  * makefile.nt
+  * makefile.vc
+    * Added source/rtl/dbdelim.prg
+
+  /* NOTE: Other make files should be updated. */
 
 2005-04-14 11:25 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * source/rdd/dbcmd.c

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.147 2005/04/10 19:18:53 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.148 2005/04/14 04:41:09 andijahja Exp $
  */
 
 /*
@@ -83,9 +83,6 @@ HB_FUNC_EXTERN( _DBF );
 HB_FUNC_EXTERN( _SDF );
 HB_FUNC_EXTERN( _DELIM );
 HB_FUNC_EXTERN( RDDSYS );
-
-extern BOOL file_read ( FILE *stream, char *string, int *iCharCount );
-extern void hb_ParseLine( PHB_ITEM pReturn, char * szText, int iDelimiter, int * iWord );
 
 static char s_szDefDriver[HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1] = ""; /* Default RDD name */
 static LPRDDNODE * s_RddList = NULL;   /* Registered RDDs */
@@ -3194,7 +3191,7 @@ HB_FUNC( ORDFINDREC )
       pOrderInfo.atomBagName = NULL;
       pOrderInfo.itmNewVal = hb_param( 1 , HB_IT_NUMERIC );
       pOrderInfo.itmResult = hb_itemPutL( NULL, FALSE );
-      SELF_ORDINFO( pArea, hb_parl( 2 ) ? DBOI_FINDRECCONT : 
+      SELF_ORDINFO( pArea, hb_parl( 2 ) ? DBOI_FINDRECCONT :
                                           DBOI_FINDREC, &pOrderInfo );
       hb_itemReturn( pOrderInfo.itmResult );
       hb_itemRelease( pOrderInfo.itmResult );
@@ -4904,112 +4901,6 @@ HB_FUNC( DBSKIPPER )
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSKIPPER" );
 }
 
-/*
-  AJ: Added 2004-03-10
-*/
-// Import values from delimited text file
-static void hb_AppendToDb( PHB_ITEM pDelimitedFile, PHB_ITEM pDelimiter )
-{
-   #ifndef MAX_READ
-      #define MAX_READ 4096
-   #endif
-
-   HB_THREAD_STUB
-
-   if ( pDelimitedFile )
-   {
-      AREAP pArea = HB_CURRENT_WA;
-      FILE *inFile;
-      ULONG ulContent;
-      HB_ITEM_NEW( Structure );
-      HB_ITEM_NEW( TextArray );
-      USHORT uiStruct;
-      char* string = (char*) hb_xgrab( MAX_READ + 1 );
-      int iCharCount = 0;
-      BYTE nByte = (BYTE) pDelimiter->item.asString.value[0];
-
-      hb_dbfStructure( &Structure );
-      uiStruct = ( USHORT ) (&Structure)->item.asArray.value->ulLen;
-
-      /* Open delimited file */
-      inFile = fopen( pDelimitedFile->item.asString.value, "r" );
-
-      while ( file_read ( inFile, string, &iCharCount ) )
-      {
-         USHORT ui;
-         int iWord = 0;
-         USHORT uiField;
-
-         hb_arrayNew( &TextArray, 0 );
-         hb_ParseLine( &TextArray, string, nByte, &iWord );
-
-         ulContent = (&TextArray)->item.asArray.value->ulLen;
-         uiField = ( ulContent < uiStruct ) ? ulContent : uiStruct;
-
-         s_bNetError = FALSE;
-
-         if( SELF_APPEND( pArea, TRUE ) == FAILURE )
-         {
-            s_bNetError = TRUE;
-         }
-         else
-         {
-            for ( ui = 0; ui < uiField ; ui ++ )
-            {
-               HB_ITEM_NEW( FieldValue );
-               PHB_ITEM pFieldInfo = hb_arrayGetItemPtr( &Structure, ui + 1 );
-               char *cBuffer = hb_arrayGetC( &TextArray, ui + 1 );
-               char *cFieldType = hb_arrayGetC( pFieldInfo, 2 );
-
-               /* Create PHB_ITEM to be FIELDPUTted */
-               switch( cFieldType[0] )
-               {
-                  /* It's a DATE field */
-                  case 'D':
-                     hb_itemPutDS( &FieldValue, cBuffer );
-                     break;
-
-                  /* It's a LOGICAL field '*/
-                  case 'L':
-                  {
-                     BOOL bTrue;
-                     hb_strupr( cBuffer );
-                     bTrue = ( cBuffer[0] == 'T' );
-                     hb_itemPutL( &FieldValue, bTrue );
-                     break;
-                  }
-
-                  /* It's a NUMERIC field */
-                  case 'N':
-                     hb_itemPutND( &FieldValue, hb_strVal( cBuffer, strlen( cBuffer ) ) );
-                     break;
-
-                  /* It's a CHARACTER field */
-                  default:
-                     hb_itemPutC( &FieldValue, cBuffer );
-                     break;
-               }
-
-               /* FieldPut */
-               SELF_PUTVALUE( pArea, ui + 1, &FieldValue );
-
-               /* Clean Ups */
-               hb_itemClear( &FieldValue );
-               hb_xfree( cBuffer );
-               hb_xfree( cFieldType );
-            }
-         }
-      }
-
-      hb_xfree( string );
-      fclose( inFile );
-
-      /* Clean Ups */
-      hb_itemClear( &Structure );
-      hb_itemClear( &TextArray );
-   }
-}
-
 // Escaping delimited strings. Need to be cleaned/optimized/improved
 static char *hb_strescape( char *szInput, int lLen, char *cDelim )
 {
@@ -5053,7 +4944,7 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
 
          szStrEsc = hb_strescape( pValue->item.asString.value, pValue->item.asString.length, cDelim );
          szString = hb_xstrcpy( NULL,cDelim,szStrEsc,cDelim,NULL);
-         
+
          // FWrite( handle, szString )
          hb_fsWriteLarge( handle, (BYTE*) szString, strlen( szString ) );
 
@@ -5118,12 +5009,22 @@ static BOOL hb___Eval( PHB_ITEM pItem )
    return TRUE;
 }
 
-// Export DBF content to text file
-static void hb_Dbf2Text( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
-                        char *cDelim, FHANDLE handle, BYTE *cSep, int nCount )
+HB_FUNC( DBF2TEXT )
 {
    HB_THREAD_STUB
+
+   PHB_ITEM pWhile  = hb_param( 1, HB_IT_BLOCK );
+   PHB_ITEM pFor    = hb_param( 2, HB_IT_BLOCK );
+   PHB_ITEM pFields = hb_param( 1, HB_IT_ARRAY );
+
+   char *cDelim   = hb_parc( 4 );
+   FHANDLE handle = (FHANDLE) hb_parnl(5);
+   BYTE *cSep     = (BYTE *) hb_parc( 6 );
+   int nCount     = (int) hb_parnl( 7 );
+
    AREAP pArea = HB_CURRENT_WA;
+
+   // Export DBF content to text file
 
    int iSepLen;
    USHORT uiFields = 0;
@@ -5237,223 +5138,4 @@ static void hb_Dbf2Text( PHB_ITEM pWhile, PHB_ITEM pFor, PHB_ITEM pFields,
 
    // Writing EOF
    hb_fsWriteLarge( handle, (BYTE*) "\x1A", 1 );
-}
-
-/*
-   AJ: 2004-03-12
-   This concludes removal of the entire PRG codes for __DBDELIM()
-*/
-HB_FUNC( __DBDELIM )
-{
-   HB_THREAD_STUB
-   AREAP pArea = HB_CURRENT_WA;
-
-   if( pArea )
-   {
-      PHB_ITEM pError = NULL;
-      BOOL bExport = hb_parl( 1 );
-      char *cFileName = hb_parcx( 2 );
-      PHB_ITEM pDelimArg = hb_param( 3, HB_IT_STRING );
-      PHB_ITEM pFields = hb_param( 4, HB_IT_ARRAY );
-      PHB_ITEM pFor = hb_param( 5, HB_IT_BLOCK );
-      PHB_ITEM pWhile = hb_param( 6, HB_IT_BLOCK );
-      PHB_ITEM pNext = hb_param( 7, HB_IT_NUMERIC );
-      PHB_ITEM pRecord = hb_param( 8, HB_IT_NUMERIC );
-      PHB_ITEM pRest = hb_param( 9, HB_IT_LOGICAL );
-
-      PHB_FNAME pFileName;
-      FHANDLE handle;
-      LONG lStart, lCount;
-      char cSeparator[] = ",";
-      char cDelim[] = "\"";
-      char szFileName[ _POSIX_PATH_MAX + 1 ];
-
-      BOOL bRetry;
-
-      if( pDelimArg )
-      {
-         if( toupper( pDelimArg->item.asString.value[0] ) == 'B' &&
-             toupper( pDelimArg->item.asString.value[1] ) == 'L' &&
-             toupper( pDelimArg->item.asString.value[2] ) == 'A' &&
-             toupper( pDelimArg->item.asString.value[3] ) == 'N' &&
-             toupper( pDelimArg->item.asString.value[4] ) == 'K' &&
-             pDelimArg->item.asString.value[5] == '\0' )
-         {
-            cDelim[0] = '\0';
-            cSeparator[0] = ' ';
-         }
-         else
-         {
-            cDelim[0] = pDelimArg->item.asString.value[0];
-         }
-      }
-
-      // Process the file name argument.
-      pFileName = hb_fsFNameSplit( cFileName );
-
-      if ( ! pFileName->szExtension )
-      {
-         // No file name extension, so provide the default.
-         pFileName->szExtension = ".txt";
-      }
-
-      hb_fsFNameMerge( szFileName, pFileName );
-
-      // Immediately cleared things, don't want it no more
-      hb_xfree( pFileName );
-
-      // Determine where to start and how many records to process.
-      if( pRecord )
-      {
-        // The RECORD clause has the highest priority.
-         lStart = hb_parnl( 8 );
-         lCount = 1;
-      }
-      else if ( pNext )
-      {
-         // The NEXT clause has the next highest priority.
-         lStart = -1;
-         lCount = hb_parnl( 7 );
-      }
-      else if ( pWhile || ( pRest && pRest->item.asLogical.value ) )
-      {
-         // The WHILE and REST clauses have equal priority.
-         lStart = -1;
-         lCount = -1;
-      }
-      else
-      {
-         // Followed by the FOR clause or the ALL clause.
-         lStart = 0;
-         lCount = -1;
-      }
-
-      // COPY TO DELIMITED
-      if ( bExport )
-      {
-         // Try to create text file
-         do
-         {
-            handle = hb_fsCreate( (BYTE*) szFileName, FC_NORMAL );
-
-            if( handle == F_ERROR )
-            {
-               if( pError == NULL )
-               {
-                  pError = hb_errNew();
-                  hb_errPutSeverity( pError, ES_ERROR );
-                  hb_errPutGenCode( pError, EG_CREATE );
-                  hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
-                  hb_errPutSubCode( pError, 1002 ); // Where is the Macro ?
-                  hb_errPutFileName( pError, szFileName );
-                  hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
-                  hb_errPutSubSystem( pError, "DELIM" );
-               }
-
-               hb_errPutOsCode( pError, hb_fsError() );
-               bRetry = hb_errLaunch( pError );
-            }
-            else
-            {
-               bRetry = FALSE;
-            }
-         } while( bRetry );
-
-         if( pError )
-         {
-            hb_itemRelease( pError );
-            pError = NULL;
-         }
-
-         if ( lStart > -1 )
-         {
-            // Only reposition if a starting record was specified or implied.
-            if ( lStart == 0 )
-            {
-               // DBGOTOP()
-               SELF_GOTOP( pArea );
-            }
-            else
-            {
-               // DBGOTO( lStart )
-               HB_ITEM_NEW( pGoto );
-
-               hb_itemPutNL( &pGoto, lStart );
-               SELF_GOTOID( pArea, &pGoto );
-               // Clean up
-               hb_itemClear( &pGoto );
-            }
-         }
-
-         // Doing things now
-         hb_Dbf2Text( pWhile, pFor, pFields, cDelim, handle, ( BYTE *)cSeparator, lCount );
-
-         hb_fsClose( handle );
-      }
-      // APPEND FROM DELIMITED
-      else
-      {
-         // Container to pass to AppendToDb()
-         HB_ITEM_NEW( pDelimitedFile );
-         HB_ITEM_NEW( pSep );
-
-         // Try to open the delimited text file
-         do
-         {
-            handle = hb_fsOpen( (BYTE*) szFileName, FO_READ | FO_COMPAT );
-
-            // Booo error in opening file
-            if( handle == F_ERROR )
-            {
-               // Only create object once in this loop
-               if( pError == NULL )
-               {
-                  pError = hb_errNew();
-                  hb_errPutSeverity( pError, ES_ERROR );
-                  hb_errPutGenCode( pError, EG_OPEN );
-                  hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_OPEN ) );
-                  hb_errPutSubCode( pError, 1001 ); // Where is the Macro ?
-                  hb_errPutFileName( pError, szFileName );
-                  hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
-                  hb_errPutSubSystem( pError, "DELIM" );
-               }
-
-               hb_errPutOsCode( pError, hb_fsError() );
-
-               // Execute the error handler
-               bRetry = hb_errLaunch( pError );
-            }
-            else
-            {
-               bRetry = FALSE;
-            }
-         } while( bRetry );
-
-         if( pError )
-         {
-            hb_itemRelease( pError );
-            pError = NULL;
-         }
-
-         // We don't need this handle as in thie module
-         hb_fsClose( handle );
-
-         // Assign value to HB_ITEM
-         hb_itemPutC( &pSep, (char*) cSeparator );
-         hb_itemPutC( &pDelimitedFile, szFileName );
-
-         // The Job is being done here
-         hb_AppendToDb( &pDelimitedFile, &pSep );
-
-         // Clean ups
-         hb_itemClear( &pSep );
-         hb_itemClear( &pDelimitedFile );
-      }
-      // We are Done!
-   }
-   else
-   {
-      // No workarea to do the job
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "__DBDELIM" );
-   }
 }

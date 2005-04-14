@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.11 2004/03/10 19:24:56 andijahja Exp $
+ * $Id: dbdelim.prg,v 1.12 2004/03/12 19:32:54 andijahja Exp $
  */
 
 /*
@@ -52,16 +52,11 @@
  *
  */
 
-#ifdef __USE_OLD__
-/*
-   AJ: 2004-03-12
-   Move the entire codes to dbcmd.c
-*/
 #include "hbcommon.ch"
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.11 2004/03/10 19:24:56 andijahja Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.12 2004/03/12 19:32:54 andijahja Exp $" )
 
 PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest )
 
@@ -160,5 +155,47 @@ STATIC FUNCTION __dbDelimErr( genCode, subCode, cFileName )
    oErr:fileName   := cFileName
    oErr:osCode     := FERROR()
 
-   Return oErr
-#endif
+RETURN oErr
+
+PROCEDURE AppendToDb( cFile, cDelimiter )
+
+   LOCAL hFile := FOpen( cFile, FO_READ )
+   LOCAL sLine, aEol := { Chr(13) + Chr(10), Chr(10) }
+   LOCAL aValues, nFields, cValue
+
+   WHILE HB_FReadLine( hFile, @sLine, aEol ) == 0
+      aValues := HB_aTokens( sLine, ',', .T. )
+      nFields := Min( Len( aValues ), FCount() )
+
+      IF nFields > 0
+         APPEND BLANK
+      ELSE
+         LOOP
+      ENDIF
+
+      FOR EACH cValue IN aValues
+         IF cValue[1] == '"'
+            cValue := SubStr( cValue, 2, Len( cValue ) - 2 )
+         ENDIF
+
+         SWITCH ValType( FieldGet( HB_EnumIndex() ) )
+            CASE 'D'
+               FieldPut( HB_EnumIndex(), STOD( cValue ) )
+               EXIT
+
+            CASE 'N'
+               FieldPut( HB_EnumIndex(), Val( cValue ) )
+               EXIT
+
+            CASE 'L'
+               FieldPut( HB_EnumIndex(), Upper( cValue[1] ) == 'T' )
+               EXIT
+
+            CASE 'C'
+               FieldPut( HB_EnumIndex(), cValue )
+               EXIT
+         END
+      NEXT
+   END
+
+RETURN

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.147 2005/03/10 03:54:57 paultucker Exp $
+# $Id: makefile.vc,v 1.148 2005/03/31 06:11:17 guerra000 Exp $
 #
 
 #
@@ -470,6 +470,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\color53.obj \
    $(OBJ_DIR)$(MT)\cstr.obj \
    $(OBJ_DIR)$(MT)\cstruct.obj \
+   $(OBJ_DIR)$(MT)\dbdelim.obj \
    $(OBJ_DIR)$(MT)\dbedit.obj \
    $(OBJ_DIR)$(MT)\dbsdf.obj \
    $(OBJ_DIR)$(MT)\devoutp.obj \

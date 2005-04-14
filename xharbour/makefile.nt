@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.127 2005/03/24 05:10:12 paultucker Exp $
+# $Id: makefile.nt,v 1.128 2005/03/31 06:11:17 guerra000 Exp $
 #
 
 #
@@ -138,7 +138,7 @@ HBPDF_DIR    =contrib\pdflib
 #
 # C compiler definition and C flags. These should never have to change.
 #
- 
+
 AS           =ML
 C_FLAGSNMT   =-Ogt2yb1p -FD -GA -GB -Gs -TP -W3 -nologo -I$(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
 C_FLAGS      =$(HB_MT) $(C_FLAGSNMT)
@@ -507,6 +507,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\color53.obj \
    $(OBJ_DIR)$(MT)\cstr.obj \
    $(OBJ_DIR)$(MT)\cstruct.obj \
+   $(OBJ_DIR)$(MT)\dbdelim.obj \
    $(OBJ_DIR)$(MT)\dbedit.obj \
    $(OBJ_DIR)$(MT)\dbsdf.obj \
    $(OBJ_DIR)$(MT)\devoutp.obj \
