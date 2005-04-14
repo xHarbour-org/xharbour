@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.192 2005/04/05 00:32:08 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.193 2005/04/09 17:13:08 druzus Exp $
  */
 
 /*
@@ -7020,6 +7020,9 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          return FAILURE;
       }
    }
+
+   SELF_GOTO( ( AREAP ) pArea, ulRecNo );
+
    /*
     * abBagName -> cBag, atomBagName -> cTag
     * The following scheme implemented:
@@ -7136,7 +7139,6 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          hb_cdxDestroyExp( pKeyExp );
          if ( pForExp != NULL )
             hb_cdxDestroyExp( pForExp );
-         SELF_GOTO( ( AREAP ) pArea, ulRecNo );
          return FAILURE;
       }
    }
@@ -8519,7 +8521,6 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
             ulStartRec = pArea->lpdbOrdCondInfo->lStartRecno;
          else
             ulStartRec = pArea->ulRecNo;
-
          if ( pArea->lpdbOrdCondInfo->lNextCount > 0 )
             ulNextCount = pArea->lpdbOrdCondInfo->lNextCount;
       }
@@ -8689,7 +8690,6 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
 
       pArea->uiTag = uiSaveTag;
    }
-   pTag->pIndex->pArea->ulRecNo = 0;
 #ifndef HB_CDP_SUPPORT_OFF
    hb_cdp_page = cdpTmp;
 #endif

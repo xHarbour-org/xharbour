@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4033 2005/04/14 11:45:50 snaiperis Exp $
+ * $Id: ChangeLog,v 1.4034 2005/04/14 11:56:50 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-14 19:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * in indexing set starting record if not given by user to current
+      record
 
 2005-04-14 07:50 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * hrbdll.vc
