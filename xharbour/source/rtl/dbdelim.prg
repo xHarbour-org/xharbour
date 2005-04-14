@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.12 2004/03/12 19:32:54 andijahja Exp $
+ * $Id: dbdelim.prg,v 1.13 2005/04/14 05:58:36 ronpinkas Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.12 2004/03/12 19:32:54 andijahja Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.13 2005/04/14 05:58:36 ronpinkas Exp $" )
 
 PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest )
 
@@ -164,7 +164,7 @@ PROCEDURE AppendToDb( cFile, cDelimiter )
    LOCAL aValues, nFields, cValue
 
    WHILE HB_FReadLine( hFile, @sLine, aEol ) == 0
-      aValues := HB_aTokens( sLine, ',', .T. )
+      aValues := HB_aTokens( sLine, cDelimiter, .T. )
       nFields := Min( Len( aValues ), FCount() )
 
       IF nFields > 0
