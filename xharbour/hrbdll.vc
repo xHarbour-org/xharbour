@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.72 2005/04/02 01:44:51 andijahja Exp $
+# $Id: hrbdll.vc,v 1.73 2005/04/14 05:58:30 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -745,10 +745,10 @@ CLEAN:
    -@if exist $(HBDOCDLL_EXE) del $(HBDOCDLL_EXE) >nul
    -@if exist $(XBSCRIPTDLL_EXE) del $(XBSCRIPTDLL_EXE) >nul
    -@if exist $(HARBOUR_DLL) del $(HARBOUR_DLL) >nul
-   -@if exist $(XHARBOUR_EXE) del $(XHARBOUR_EXE) >nul
-   -@if exist $(XHARBOURDLL_EXE) del $(XHARBOURDLL_EXE) >nul
-   -@if exist $(XHARBOUR_DLL) del $(XHARBOUR_DLL) >nul
-   -@if exist $(XHARBOUR_LIB) del $(XHARBOUR_LIB) >nul
+   -@if not $(XHARBOUR_EXE).==. do if exist $(XHARBOUR_EXE) del $(XHARBOUR_EXE) >nul
+   -@if not $(XHARBOURDLL_EXE).==. do if exist $(XHARBOURDLL_EXE) del $(XHARBOURDLL_EXE) >nul
+   -@if not $(XHARBOUR_DLL).==. do if exist $(XHARBOUR_DLL) del $(XHARBOUR_DLL) >nul
+   -@if not $(XHARBOUR_LIB).==. do if exist $(XHARBOUR_LIB) del $(XHARBOUR_LIB) >nul
    -@if exist $(LIB_DIR)\harbour.exp  del $(LIB_DIR)\harbour.exp >nul
    -@if exist $(LIB_DIR)\xharbour.exp del $(LIB_DIR)\xharbour.exp >nul
    -@if exist $(OBJ_DIR)\*.obj del $(OBJ_DIR)\*.obj >nul
