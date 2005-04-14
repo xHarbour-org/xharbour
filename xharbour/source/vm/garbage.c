@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.81 2004/04/03 11:47:11 jonnymind Exp $
+ * $Id: garbage.c,v 1.82 2005/03/22 18:24:51 druzus Exp $
  */
 
 /*
@@ -870,6 +870,15 @@ void hb_gcInit( void )
     hb_gc_bReleaseAll = FALSE;
     s_uUsedFlag = HB_GC_USED_FLAG;
     s_uAllocated = 0;
+}
+
+BOOL hb_gcSetCollecting( BOOL bCollecting )
+{
+   BOOL bPreset = s_bCollecting;
+
+   s_bCollecting = bCollecting;
+
+   return bPreset;
 }
 
 /* service a single garbage collector step

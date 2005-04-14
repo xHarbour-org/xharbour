@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.159 2005/04/06 13:28:12 druzus Exp $
+ * $Id: hbapi.h,v 1.160 2005/04/14 04:41:08 andijahja Exp $
  */
 
 /*
@@ -223,6 +223,7 @@ extern HB_EXPORT void   hb_gcCollectAll( BOOL bForce ); /* checks if all memory 
 extern void   hb_gcReleaseAll( void ); /* release all memory blocks unconditionally */
 extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers passed memory block pointer */
 extern void   hb_gcInit( void );
+extern BOOL   hb_gcSetCollecting( BOOL bCollecting );
 
 extern void   HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
 extern void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as used */

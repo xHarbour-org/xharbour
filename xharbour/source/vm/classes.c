@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.135 2005/03/02 14:23:48 andijahja Exp $
+ * $Id: classes.c,v 1.136 2005/03/31 04:02:22 druzus Exp $
  */
 
 /*
@@ -4100,6 +4100,9 @@ void hb_clsFinalize( PHB_ITEM pObject )
       if( pClass->pDestructor && ( *( HB_VM_STACK.pBase ) )->item.asSymbol.uiSuperClass == 0 &&
           strcmp( ( *( HB_VM_STACK.pBase ) )->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
       {
+         // To DISABLE GC here where no refernce to this object will cause GPF for double release!
+         BOOL bCollecting = hb_gcSetCollecting( TRUE );
+
          HB_ITEM SavedReturn;
          PHB_FUNC pDestructor = pClass->pDestructor;
 
@@ -4115,6 +4118,8 @@ void hb_clsFinalize( PHB_ITEM pObject )
 
          // Restore the prior Return Value if any.
          hb_itemForwardValue( &( HB_VM_STACK.Return ), &SavedReturn );
+
+         hb_gcSetCollecting( bCollecting );
       }
    }
 }
