@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4034 2005/04/14 11:56:50 paultucker Exp $
+ * $Id: ChangeLog,v 1.4035 2005/04/14 17:30:16 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-14 17:17 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/ct/screen3.prg
+    + Added SaveCursor() and RestCursor()
+      /* Please review, based only on documentation - I never used these functions. */
+
+  * utils/xbscript/xbs_harb.ch
+    * Synched with changes in genc.c
 
 2005-04-14 19:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
@@ -21,7 +29,7 @@
 2005-04-14 14:45 UTC+0300 Mindaugas Kavaliauskas <dbtopas at @ at dbtopas.lt>
   * xharbour/contrib/rdd_ads/adsfunc.c
     + Added AdsDirectory(), AdsCheckExistence() and AdsDeleteFile(). Usefull
-      for managing server side temporary files. Connection should be 
+      for managing server side temporary files. Connection should be
       established to use these functions.
 
 2005-04-14 02:14 UTC-0800 Ron Pinkas <Ron in xHarbour.com>

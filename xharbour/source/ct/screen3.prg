@@ -1,5 +1,5 @@
 /*
- * $Id: screen3.prg,v 1.1 2004/11/29 23:30:00 ptsarenko Exp $
+ * $Id: screen3.prg,v 1.1 2004/11/29 22:11:31 ptsarenko Exp $
  */
 
 /*
@@ -322,3 +322,11 @@ FUNCTION CLEOL( nRow, nCol )
   ClearEol( nRow, nCol, xAttr, xChar )
 
 RETURN ( "" )
+
+FUNCTION SaveCursor()
+RETURN ( Row() << 16 ) | ( SetCursor() << 8 ) | Col()
+
+FUNCTION RestCursor( nSavedCursor )
+   SetPos( nSavedCursor >> 16, nSavedCursor & 0x0000FF )
+   SetCursor( ( nSavedCursor & 0x00FF00 ) >> 8 )
+RETURN ""

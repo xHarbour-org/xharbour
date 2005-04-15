@@ -2074,7 +2074,8 @@
         {
            PHB_ITEM pProcedures = hb_param( 1, HB_IT_ARRAY );
            //C functions added after (_INITSTATICS) symbol
-           static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1 - 9;
+           // Reverted!
+           static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1;// - 9;
            int iProcedures, iProcedure, iBase = s_iDyn;
 
            PHB_PCODEFUNC pDynFunc;
