@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.205 2005/03/20 16:07:39 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.207 2005/03/31 14:34:07 andijahja Exp $
  */
 
 /*
@@ -179,19 +179,19 @@ int hb_pp_NextToken( char** pLine, char *sToken );
 #define HB_PP_MAX_NESTED_OPTIONALS 32
 
 /* Ron Pinkas added 2000-01-24 */
-#define IS_2CHAR_OPERATOR( p ) ( p[0] && p[1] && ( strncmp( p, ":=", 2 ) == 0 || \
-                                                   strncmp( p, "+=", 2 ) == 0 || \
-                                                   strncmp( p, "-=", 2 ) == 0 || \
-                                                   strncmp( p, "*=", 2 ) == 0 || \
-                                                   strncmp( p, "/=", 2 ) == 0 || \
-                                                   strncmp( p, "^=", 2 ) == 0 || \
-                                                   strncmp( p, "==", 2 ) == 0 || \
-                                                   strncmp( p, "<>", 2 ) == 0 || \
-                                                   strncmp( p, "<=", 2 ) == 0 || \
-                                                   strncmp( p, ">=", 2 ) == 0 || \
-                                                   strncmp( p, "++", 2 ) == 0 || \
-                                                   strncmp( p, "--", 2 ) == 0 || \
-                                                   strncmp( p, "->", 2 ) == 0      ) )
+#define IS_2CHAR_OPERATOR( p ) ( (p)[0] && (p)[1] && ( strncmp( p, ":=", 2 ) == 0 || \
+                                                       strncmp( p, "+=", 2 ) == 0 || \
+                                                       strncmp( p, "-=", 2 ) == 0 || \
+                                                       strncmp( p, "*=", 2 ) == 0 || \
+                                                       strncmp( p, "/=", 2 ) == 0 || \
+                                                       strncmp( p, "^=", 2 ) == 0 || \
+                                                       strncmp( p, "==", 2 ) == 0 || \
+                                                       strncmp( p, "<>", 2 ) == 0 || \
+                                                       strncmp( p, "<=", 2 ) == 0 || \
+                                                       strncmp( p, ">=", 2 ) == 0 || \
+                                                       strncmp( p, "++", 2 ) == 0 || \
+                                                       strncmp( p, "--", 2 ) == 0 || \
+                                                       strncmp( p, "->", 2 ) == 0      ) )
 /* END, Ron Pinkas added 2000-01-24 */
 
 
@@ -3541,19 +3541,24 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
 
            if( ipos > 1 )
            {
-               if( *(exppatt+2) == '5' )       /*  ----  Minimal match marker  */
-               {
-                  if( IsIdentifier( expreal ) )
-                  {
-                     //printf( "Accepted ID: >%s<\n", expreal );
-                     *ptri += lenreal;
-                  }
-               }
-               else if( isExpres( expreal, *(exppatt+2) ) )
-               {
-                  //printf( "Accepted: >%s<\n", expreal );
-                  *ptri += lenreal;
-               }
+              if( IS_2CHAR_OPERATOR( *( ptri ) + ipos - 2 ) )
+              {
+                 // We can never accept the 2nd half of 2 chars operator.
+                 //printf( "Skip 2Char Op: %s\n", *( ptri ) + ipos - 2 );
+              }
+              else if( *(exppatt+2) == '5' )       /*  ----  Minimal match marker  */
+              {
+                 if( IsIdentifier( expreal ) )
+                 {
+                    //printf( "Accepted ID: >%s<\n", expreal );
+                    *ptri += lenreal;
+                 }
+              }
+              else if( isExpres( expreal, *(exppatt+2) ) )
+              {
+                 //printf( "Accepted: >%s<\n", expreal );
+                 *ptri += lenreal;
+              }
            }
            else
            {

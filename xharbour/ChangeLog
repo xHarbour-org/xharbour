@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4036 2005/04/15 00:18:10 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4037 2005/04/15 01:20:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-14 21:14 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/pp/ppcore.c
+    ! Fixed WorkMarkers() to NOT accept expression to the left of a matched stopper
+      if the matched stopper is the 2nd. char of a 2 chars operator.
 
 2005-04-14 18:20 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/arrayshb.c
