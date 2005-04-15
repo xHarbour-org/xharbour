@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.53 2005/04/09 17:13:07 druzus Exp $
+ * $Id: adsfunc.c,v 1.55 2005/04/15 20:00:00 ptsarenko Exp $
  */
 
 /*
@@ -2017,7 +2017,7 @@ HB_FUNC( ADSDDCREATE )
 {
    UNSIGNED32 ulRetVal;
    UNSIGNED8  *pucDictionaryPath = (UNSIGNED8 *) hb_parcx( 1 );
-   UNSIGNED16 usEncrypt          = ISNUM( 2 ) ? hb_parnl( 0 ) : 0;
+   UNSIGNED16 usEncrypt          = (UNSIGNED16) ISNUM( 2 ) ? hb_parnl( 0 ) : 0;
    UNSIGNED8  *pucDescription    = ISCHAR( 3 ) ? (UNSIGNED8 *) hb_parcx( 3 ) : NULL;
 
    ulRetVal = AdsDDCreate( ( UNSIGNED8 *)pucDictionaryPath,
@@ -2295,7 +2295,7 @@ HB_FUNC( ADSDIRECTORY )
    if ( ulRetVal == AE_SUCCESS || ulRetVal == AE_NO_FILE_FOUND ) 
    {
       do {
-         pitmFileName = hb_itemPutCL( NULL, ucFileName, usFileNameLen );
+         pitmFileName = hb_itemPutCL( NULL, (char *) ucFileName, usFileNameLen );
          hb_arrayAddForward( pitmDir, pitmFileName );
 
          usFileNameLen = ADS_MAX_TABLE_NAME;
