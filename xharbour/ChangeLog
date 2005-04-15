@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4039 2005/04/15 20:00:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4039 2005/04/15 16:58:34 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-15 15:28 UTC-0800 Augusto Infante <august@xharbour.com>
+  * contrib/rdd_ads/adsmgmnt.c
+    + HB_FUNC( ADSMGKILLUSER )
+    + HB_FUNC( ADSMGGETHANDLE )
+      Will Return Mg. connection handle to avoid reconnecting the same user
+      i.e.
+      IF AdsMgGetHandle() == 0
+         AdsMgConnect()
+      ENDIF
 
 2005-04-15 20:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * contrib/rdd_ads/adsfunc.c
@@ -81,7 +91,7 @@
       This is a temporary solution until RDDSDF is implemented.
 
   * source/rtl/fparse.c
-    ! make function file_read()	public.
+    ! make function file_read()  public.
 
   * include/hbapi.h
     + #define HB_ITEM_NEW(hb)  HB_ITEM hb = HB_ITEM_NIL for short cut.
@@ -102,7 +112,7 @@
       |
       | #pragma begindump
       | #include "hbapi.h"
-      | HB_FUNC( TEST )	{}
+      | HB_FUNC( TEST ) {}
       | #pragma enddump
        `---------
 

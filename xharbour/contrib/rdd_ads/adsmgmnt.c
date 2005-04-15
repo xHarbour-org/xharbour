@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.6 2004/03/18 04:07:29 ronpinkas Exp $
+ * $Id: adsmgmnt.c,v 1.7 2005/02/23 02:50:31 kaddath Exp $
  */
 
 /*
@@ -421,7 +421,7 @@ HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
 
 HB_FUNC( ADSMGGETLOCKOWNER )
 {
-   // UNSIGNED32	AdsMgGetLockOwner  (ADSHANDLE hMgmtConnect,
+   // UNSIGNED32  AdsMgGetLockOwner  (ADSHANDLE hMgmtConnect,
    //                                     UNSIGNED8 *pucTableName,
    //                                     UNSIGNED32 ulRecordNumber,
    //                                     ADS_MGMT_USER_INFO *pstUserInfo,
@@ -457,7 +457,7 @@ HB_FUNC( ADSMGGETLOCKOWNER )
        hb_stornl( (UNSIGNED16) pstUserInfo->usConnNumber, -1, 2); /* NetWare conn # (NLM only) */
        hb_storc ( (char *) pstUserInfo->aucAuthUserName, -1, 3); /* logon name with Data Dictionary */
        hb_storc ( (char *) pstUserInfo->aucAddress, -1, 4); /* IP adddress */
-       hb_stornl( pusLockType, -1, 5);						/* type of lock */
+       hb_stornl( pusLockType, -1, 5);                /* type of lock */
    }
    else
    {
@@ -517,3 +517,12 @@ HB_FUNC( ADSMGKILLUSER )
    AdsMgKillUser();
 }
 */
+HB_FUNC( ADSMGKILLUSER )
+{
+   AdsMgKillUser( hMgmtHandle, (UNSIGNED8 *) hb_parc(1), (UNSIGNED16) hb_parnl(2) );
+}
+
+HB_FUNC( ADSMGGETHANDLE )
+{
+   hb_retnl( (LONG) hMgmtHandle );
+}
