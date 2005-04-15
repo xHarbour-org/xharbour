@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.53 2004/11/21 21:44:25 druzus Exp $
+ * $Id: arrayshb.c,v 1.54 2005/02/26 15:16:50 andijahja Exp $
  */
 
 /*
@@ -613,6 +613,7 @@ HB_FUNC( HB_ATOKENS )
       char cDelimiter = pDelim ? pDelim->item.asString.value[0] : 32;
       size_t i, iOffset = 0;
       BOOL bSkipStrings = hb_parl( 3 );
+      BOOL bDoubleQuoteOnly = hb_parl( 4 );
 
       Token.type = HB_IT_NIL;
       HB_VM_STACK.Return.type = HB_IT_NIL;
@@ -621,7 +622,7 @@ HB_FUNC( HB_ATOKENS )
       for( i = 0; i < pLine->item.asString.length; i++ )
       {
          if( bSkipStrings && ( pLine->item.asString.value[i] == '"'
-                               || pLine->item.asString.value[i] == '\'' ) )
+                               || ( bDoubleQuoteOnly == FALSE && pLine->item.asString.value[i] == '\'' ) ) )
          {
             char cTerminator = pLine->item.asString.value[i];
 
