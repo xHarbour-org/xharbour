@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.37 2005/04/06 13:28:13 druzus Exp $
+ * $Id: workarea.c,v 1.38 2005/04/09 17:13:08 druzus Exp $
  */
 
 /*
@@ -618,6 +618,10 @@ ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_itemPutC( pItem, szAlias );
          break;
       }
+
+      case DBI_RM_SUPPORTED;
+         hb_itemPutL( pItem, FALSE );
+         break;
 
       case DBI_DB_VERSION:
          hb_itemPutC( pItem, "" );

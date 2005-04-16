@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4039 2005/04/15 16:58:34 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4040 2005/04/15 22:38:07 what32 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-16 02:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/Makefile
+    + added dbdelim.prg
+
+  * xharbour/include/dbinfo.ch
+    + added some DBI_RM_* actions for dbInfo. It's a initial job
+      to give some basic common to RDD record map filters interface
+      this is work in progress and it can be changed in the future
+
+  * xharbour/source/rdd/workarea.c
+    + added DBI_RM_SUPPORTED to WA info method (returns FALSE by default)
 
 2005-04-15 15:28 UTC-0800 Augusto Infante <august@xharbour.com>
   * contrib/rdd_ads/adsmgmnt.c

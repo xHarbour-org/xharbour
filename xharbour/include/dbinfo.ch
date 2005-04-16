@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.10 2005/02/04 01:11:54 druzus Exp $
+ * $Id: dbinfo.ch,v 1.11 2005/03/31 03:15:15 druzus Exp $
  */
 
 /*
@@ -188,7 +188,15 @@
 #define DBI_PASSWORD            131  /* Set workarea password */
 #define DBI_ISENCRYPTED         132  /* The database is encrypted */
 
-#define DBI_USER               1000  /* User-defined DBI_ constants */
+/* RECORD MAP (RM) support */
+#define DBI_RM_SUPPORTED        150  /* has WA RDD record map support? */
+#define DBI_RM_CREATE           151  /* create new empty work area record map */
+#define DBI_RM_REMOVE           152  /* remove active work area record map */
+#define DBI_RM_CLEAR            153  /* remove all records from WA record map */
+#define DBI_RM_FILL             154  /* add all records to WA record map */
+#define DBI_RM_ADD              155  /* add record to work area record map */
+#define DBI_RM_DROP             156  /* remove record from work area record map */
+#define DBI_RM_TEST             157  /* test if record is set in WA record map */
 
 /* BLOB support - definitions for internal use by BLOB.CH */
 #define DBI_BLOB_DIRECT_EXPORT  201
@@ -207,6 +215,9 @@
 #define DBI_BLOB_OFFSET         212
 #define DBI_BLOB_RECOVER        213
 
+#define DBI_USER               1000  /* User-defined DBI_ constants */
+
+/* extended dbFieldInfo() actions */
 #define DBS_BLOB_GET            201  /* This is internal definition */
 #define DBS_BLOB_LEN            202
 #define DBS_BLOB_OFFSET         203
