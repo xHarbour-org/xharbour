@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.60 2005/02/11 20:52:41 guerra000 Exp $
+# $Id: Makefile,v 1.61 2005/03/31 06:13:40 guerra000 Exp $
 #
 
 ROOT = ../../
@@ -158,6 +158,7 @@ PRG_SOURCES=\
         cstr.prg     \
         cstruct.prg  \
         dbedit.prg   \
+        dbdelim.prg  \
         dbsdf.prg    \
         devoutp.prg  \
         dircmd.prg   \
