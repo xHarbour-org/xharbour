@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.25 2004/11/21 21:44:19 druzus Exp $
+ * $Id: hbsrlraw.c,v 1.26 2004/12/31 11:56:10 druzus Exp $
  */
 
 /*
@@ -157,6 +157,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
    switch( pItem->type )
    {
       case HB_IT_STRING:
+      case HB_IT_MEMOFLAG | HB_IT_STRING:
          ulRet = (ULONG) (pItem->item.asString.length + 9);
          cRet = (BYTE *) hb_xgrab( ulRet );
          cRet[0] = (BYTE) 'C';
@@ -189,7 +190,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
 
       case HB_IT_DOUBLE:
          ulRet = 2 + sizeof( double );
-         cRet = (BYTE *)hb_xgrab( ulRet );
+        cRet = (BYTE *)hb_xgrab( ulRet );
          cRet[0] = (BYTE)'N';
          cRet[1] = (BYTE)'D';
          memcpy( cRet + 2, &(pItem->item.asDouble.value), sizeof( double ) );

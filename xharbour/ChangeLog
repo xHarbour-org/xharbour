@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4040 2005/04/15 22:38:07 what32 Exp $
+ * $Id: ChangeLog,v 1.4041 2005/04/16 00:46:41 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-16 21:20 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/rtl/hbsrlraw.c
+    ! Fixed HB_Serialize( ALIAS->MEMO_FIELD )
 
 2005-04-16 02:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/Makefile
@@ -312,7 +316,7 @@
   * include/hbsetup.h
     ! restore deleted define for __DMC__
 
-2004-06-04 00:40 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+2004-04-06 00:40 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
   * include/hbdefs.h
     + Added new HB_PCODEFUNC structure
   * include/hbvmpub.h
