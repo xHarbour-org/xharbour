@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.10 2004/11/21 21:43:17 druzus Exp $
+# $Id: pack_src.sh,v 1.11 2005/01/12 16:36:05 druzus Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -133,6 +133,7 @@ for d in ${HB_DB_DRVEXT}
 do
   $hb_collect source/rdd/$d/Makefile
   $hb_collect source/rdd/$d/*.[ch]
+  $hb_collect source/rdd/$d/*.ch
   $hb_collect source/rdd/$d/*.prg
 done
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4043 2005/04/18 04:37:02 bdj Exp $
+ * $Id: ChangeLog,v 1.4044 2005/04/18 06:28:00 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-18 20:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/pack_src.sh
+    * small modification in packing external RDD drivers
+
+  * xharbour/source/rtl/is.c
+    * minor modification use hb_parc() instead of hb_parcx() - this
+      code was designed to work with hb_parc and checks for NULL value
+
+  * xharbour/include/hbdefs.h
+    + added new macro: HB_MACRO2STRING() which converts defined macro
+      to string value. F.e.:
+         #define HB_SOME_SWITCH  SOME_VALUE
+         char * szSomeValue = HB_MACRO2STRING( HB_SOME_SWITCH );
+      szSomeValue is initialized with "SOME_VALUE"
+
+  * xharbour/source/rdd/dbfcdx/Makefile
+  * xharbour/source/rdd/dbfcdx/dbfcdx0.prg
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    + added compile time macro HB_SIXCDX which builds DBFCDX in SIX
+      compatible mode - generated RDD name is "SIXCDX" - it is less
+      efficient then standard mode but it's a work around for some of
+      SIX bugs - it alows to share CDX indexes with SIX. I do not suggest
+      to use "SIXCDX" as default. It's only for compatibility with Clipper
+      SIX3 driver when it shares indexes with xHarbour application.
+      With standard DBFCDX SIX3 GPFs on compressed trailing spaces in
+      the key values. To create "SIXCDX" you have to set HB_SIXCDX.
+      You can make it by -DHB_SIXCDX compiler switch. For GNU make
+      it's enough to set environment variable HB_SIXCDX=yes
 
 2005-04-18 13:30 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * source/rtl/gtwvt/gtwvt.c

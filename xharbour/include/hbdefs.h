@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.70 2005/04/02 21:13:46 andijahja Exp $
+ * $Id: hbdefs.h,v 1.71 2005/04/06 03:57:57 mlombardo Exp $
  */
 
 /*
@@ -952,6 +952,8 @@ typedef long HB_PTRDIFF;
    #define HB_DBL_LIM_INT64(d)      ( (HB_MAXDBL) -UINT64_MAXDBL / 2 - 1 <= (HB_MAXDBL) (d) && (HB_MAXDBL) (d) <= (HB_MAXDBL) UINT64_MAXDBL / 2 )
 #endif
 
+#define HB_MACRO2STRING( macro )    HB_MACRO2STRING_( macro )
+#define HB_MACRO2STRING_( macro )   #macro
 
 #define HB_SYMBOL_UNUSED( symbol )  ( void ) symbol
 

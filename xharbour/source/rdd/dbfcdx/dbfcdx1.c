@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.193 2005/04/09 17:13:08 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.194 2005/04/14 17:30:39 druzus Exp $
  */
 
 /*
@@ -55,8 +55,11 @@
  */
 
 #define HB_CDX_CLIP_AUTOPEN
-#define HB_CDX_PACKTRAIL
 #define HB_CDX_NEW_SORT
+
+#if !defined( HB_SIXCDX )
+#  define HB_CDX_PACKTRAIL
+#endif
 
 
 #define HB_CDX_DBGCODE
@@ -281,6 +284,44 @@ static RDDFUNCS cdxTable =
    ( DBENTRYP_SVP )   hb_cdxWhoCares
 };
 
+#if defined( HB_SIXCDX )
+
+HB_FUNC( _SIXCDX ) {;}
+
+HB_FUNC( SIXCDX_GETFUNCTABLE )
+{
+   RDDFUNCS * pTable;
+   USHORT * uiCount;
+
+   uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
+   pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
+
+   HB_TRACE(HB_TR_DEBUG, ("SIXCDX_GETFUNCTABLE(%i, %p)", uiCount, pTable));
+
+   if ( pTable )
+   {
+      SHORT iRet;
+
+      if ( uiCount )
+         * uiCount = RDDFUNCSCOUNT;
+      iRet = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFFPT" );
+      if ( iRet == FAILURE )
+         iRet = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFDBT" );
+      if ( iRet == FAILURE )
+         iRet = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBF" );
+      hb_retni( iRet );
+   }
+   else
+      hb_retni( FAILURE );
+}
+
+
+HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
+{ "_SIXCDX",             HB_FS_PUBLIC, {HB_FUNCNAME( _SIXCDX )}, NULL },
+{ "SIXCDX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( SIXCDX_GETFUNCTABLE )}, NULL }
+HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
+
+#else
 
 HB_FUNC( _DBFCDX ) {;}
 
@@ -317,6 +358,8 @@ HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
 { "DBFCDX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBFCDX_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
 
+#endif
+
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup dbfcdx1__InitSymbols
 #elif defined(HB_MSC_STARTUP)
@@ -329,6 +372,7 @@ HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
    static HB_$INITSYM hb_vm_auto_dbfcdx1__InitSymbols = dbfcdx1__InitSymbols;
    #pragma data_seg()
 #endif
+
 
 #ifdef HB_CDX_DSPDBG_INFO
 static void hb_cdxDspTags( LPCDXINDEX pIndex )
@@ -6642,7 +6686,11 @@ static ERRCODE hb_cdxSysName( CDXAREAP pArea, BYTE * pBuffer )
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxSysName(%p, %p)", pArea, pBuffer));
    HB_SYMBOL_UNUSED( pArea );
 
+#if defined( HB_SIXCDX )
+   strncpy( ( char * ) pBuffer, "SIXCDX", 7  /* HARBOUR_MAX_RDD_DRIVERNAME_LENGTH */ );
+#else
    strncpy( ( char * ) pBuffer, "DBFCDX", 7  /* HARBOUR_MAX_RDD_DRIVERNAME_LENGTH */ );
+#endif
    return SUCCESS;
 }
 

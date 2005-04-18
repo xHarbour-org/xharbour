@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx0.prg,v 1.4 2003/09/08 19:18:45 druzus Exp $
+ * $Id: dbfcdx0.prg,v 1.5 2003/11/04 08:31:03 druzus Exp $
  */
 
 /*
@@ -53,6 +53,21 @@
 
 #include "rddsys.ch"
 
+#ifdef HB_SIXCDX
+
+ANNOUNCE SIXCDX
+
+procedure SIXCDXInit
+
+   REQUEST _SIXCDX
+
+   rddRegister( "DBF", RDT_FULL )
+   rddRegister( "SIXCDX", RDT_FULL )
+
+return
+
+#else
+
 ANNOUNCE DBFCDX
 
 procedure DBFCDXInit
@@ -63,3 +78,5 @@ procedure DBFCDXInit
    rddRegister( "DBFCDX", RDT_FULL )
 
 return
+
+#endif
