@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt,v 1.6 2005/02/20 17:05:55 bdj Exp $
+ * $Id: whatsnew.txt,v 1.7 2005/04/07 07:49:20 bdj Exp $
  */
 
 /*
@@ -16,6 +16,9 @@
  * Budyanto Dj. <budyanto@centrin.net.id>
  */
 
+2005/04/18:
+ * gtwvw.c
+   ! hb_wvw_gtSetFont() gave wrong return value when it failed.
 
 2005/04/07:
  * gtwvw.c

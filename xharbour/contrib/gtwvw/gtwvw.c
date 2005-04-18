@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.13 2005/02/27 14:14:15 andijahja Exp $
+ * $Id: gtwvw.c,v 1.14 2005/04/07 07:48:49 bdj Exp $
  */
 
 /*
@@ -7035,7 +7035,7 @@ int HB_EXPORT hb_wvw_gtGetWindowTitle( USHORT usWinNum, char *title, int length 
 BOOL HB_EXPORT hb_wvw_gtSetFont( USHORT usWinNum, char *fontFace, int height, int width, int Bold, int Quality )
 {
   int   size;
-  BOOL  bResult = TRUE ;
+  BOOL  bResult = FALSE ;
   HFONT hFont   = hb_wvw_gtGetFont( fontFace, height, width, Bold, Quality, s_pWindows[usWinNum]->CodePage );
   WIN_DATA * pWindowData = s_pWindows[ usWinNum ];
 

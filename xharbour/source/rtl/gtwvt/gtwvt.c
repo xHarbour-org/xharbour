@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.148 2005/02/27 11:56:07 andijahja Exp $
+ * $Id: gtwvt.c,v 1.149 2005/04/18 04:37:00 bdj Exp $
  */
 
 /*
@@ -3453,7 +3453,7 @@ int HB_EXPORT hb_wvt_gtGetWindowTitle( char *title, int length )
 BOOL HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold, int Quality )
 {
   int   size;
-  BOOL  bResult = TRUE ;
+  BOOL  bResult = FALSE ;
   HFONT hFont   = hb_wvt_gtGetFont( fontFace, height, width, Bold, Quality, _s.CodePage );
 
   // make sure the font could actually be created
