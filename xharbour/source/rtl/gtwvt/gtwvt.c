@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.147 2005/02/24 10:44:09 andijahja Exp $
+ * $Id: gtwvt.c,v 1.148 2005/02/27 11:56:07 andijahja Exp $
  */
 
 /*
@@ -3462,7 +3462,7 @@ BOOL HB_EXPORT hb_wvt_gtSetFont( char *fontFace, int height, int width, int Bold
   {
     // make sure that the font  will fit inside the
     // window with the current _s.ROWS and _s.COLS setting
-//    if ( hb_wvt_gtValidWindowSize( _GetScreenHeight(),_GetScreenWidth(), hFont, width ) )
+    if ( hb_wvt_gtValidWindowSize( _GetScreenHeight(),_GetScreenWidth(), hFont, width ) )
     {
       _s.fontHeight  = height;
       _s.fontWidth   = width;
