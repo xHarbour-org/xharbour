@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4046 2005/04/19 18:49:21 druzus Exp $
+ * $Id: ChangeLog,v 1.4047 2005/04/19 21:39:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-19 23:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/config/global.cf
+  + xharbour/source/rdd/hsx/Makefile
+  + xharbour/source/rdd/hsx/cftsfunc.c
+  + xharbour/source/rdd/hsx/hsx.c
+  + xharbour/tests/hsxtest.prg
+    + HSX is new Full Text Search library binary compatible with
+      SIX3 HiPer-SEEK indexing and CFTS (Clipper Fast Text Search)
+      library. It can creates HSX index on variable character keys,
+      for example you can index single or group of fields (also
+      MEMO ones) and then search for any phrases in indexed data.
+      You may find more information in the NET. Look at www.clipx.net
+      for CFTS NG and/or SIX3 HiPrer-SEEK.
+      All functions from both libraries are implemented, new extensions
+      added and known bugs in original versions fixed. It is also ready
+      for full integration with RDD and automatic updated like normal
+      indexes. I'll add such possibilities when I'll implement triggers.
+      It should be soon.
 
 2005-04-19 14:38 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/dbdelim.prg
