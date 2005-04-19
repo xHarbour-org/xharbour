@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.15 2005/04/15 01:21:40 ronpinkas Exp $
+ * $Id: dbdelim.prg,v 1.16 2005/04/19 21:39:25 ronpinkas Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.15 2005/04/15 01:21:40 ronpinkas Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.16 2005/04/19 21:39:25 ronpinkas Exp $" )
 
 PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest )
 
@@ -161,23 +161,27 @@ PROCEDURE AppendToDb( cFile, cDelimiter )
 
    LOCAL hFile := FOpen( cFile, FO_READ )
    LOCAL sLine, aEol := { Chr(13) + Chr(10), Chr(10) }
-   LOCAL aValues, nFields, cValue
+   LOCAL nEOF, aValues, nFields, cValue, nLen
 
-   WHILE HB_FReadLine( hFile, @sLine, aEol ) == 0
+   WHILE .T.
+      nEOF := HB_FReadLine( hFile, @sLine, aEol )
+
       aValues := HB_aTokens( sLine, cDelimiter, .T., .T. )
       nFields := Min( Len( aValues ), FCount() )
 
-      IF nFields > 0
-         APPEND BLANK
-      ELSE
-         LOOP
-      ENDIF
+      APPEND BLANK
 
       FOR EACH cValue IN aValues
          cValue := AllTrim( cValue )
 
          IF cValue[1] == '"'
-            cValue := SubStr( cValue, 2, Len( cValue ) - 2 )
+            nLen := At( '"', cValue, 2 ) - 2
+
+            IF nLen >= 0
+               cValue := SubStr( cValue, 2, nLen )
+            ELSE
+               cValue := SubStr( cValue, 2 )
+            ENDIF
          ENDIF
 
          SWITCH ValType( FieldGet( HB_EnumIndex() ) )
@@ -198,6 +202,10 @@ PROCEDURE AppendToDb( cFile, cDelimiter )
                EXIT
          END
       NEXT
+
+      IF nEOF == -1
+         EXIT
+      ENDIF
    END
 
 RETURN
