@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4044 2005/04/18 06:28:00 bdj Exp $
+ * $Id: ChangeLog,v 1.4045 2005/04/18 19:24:51 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-19 20:43 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbdefs.h
+    ! fixed typo - should be USHRT_MAX not USHORT_MAX
+
+  * xharbour/include/dbinfo.ch
+    + added DBI_RM_COUNT
+  * xharbour/source/rdd/dbfcdx/Makefile
+    * minor modification to avoid passing -DHB_SIXCDX twice
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx0.prg
+    * added 'init' to SIXCDX register procedure - it's not standard
+      RDD and VM will not register it automatically.
+  
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    ! fixed bug when using codepage translation and the empty string
+      is passed as field value
+  * xharbour/source/rtl/gtwin/gtwin.c
+    * cover the ASM and inp()/out() instructions for TONE by HB_ARCH_32BIT
+      macro.
+      Paul this code:
+         /* If Windows NT or NT2k, use wNtTone, which provides TONE()
+            reset sequence support (new) */
+         else if( s_osv.dwPlatformId == VER_PLATFORM_WIN32_NT )
+      should be IMHO replaced by simple:
+         else
+      to avoid future modifications for new Windows version. Beep()
+      is documented MSWin API function. Only on Win9x/ME it ignores
+      given parameters so only this platforms should be explicitly
+      served by gt_w9xTone() other should use: gt_wNtTone()
+      If I'm right can you change it in the nearest commit you will
+      make?
 
 2005-04-18 20:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/pack_src.sh

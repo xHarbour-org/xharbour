@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.71 2005/04/06 03:57:57 mlombardo Exp $
+ * $Id: hbdefs.h,v 1.72 2005/04/18 19:26:43 druzus Exp $
  */
 
 /*
@@ -244,11 +244,11 @@
  * below are some hacks which don't have to be true on some machines
  * please update it if necessary
  */
-#if ULONG_MAX > UINT_MAX && UINT_MAX > USHORT_MAX
+#if ULONG_MAX > UINT_MAX && UINT_MAX > USHRT_MAX
 #  define HB_ARCH_64BIT
-#elif ULONG_MAX == UINT_MAX && UINT_MAX > USHORT_MAX
+#elif ULONG_MAX == UINT_MAX && UINT_MAX > USHRT_MAX
 #  define HB_ARCH_32BIT
-#elif ULONG_MAX > UINT_MAX && UINT_MAX == USHORT_MAX
+#elif ULONG_MAX > UINT_MAX && UINT_MAX == USHRT_MAX
 #  define HB_ARCH_16BIT
 #endif
 

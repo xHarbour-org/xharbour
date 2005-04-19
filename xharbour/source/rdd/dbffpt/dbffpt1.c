@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.38 2005/02/27 11:56:04 andijahja Exp $
+ * $Id: dbffpt1.c,v 1.39 2005/02/28 10:17:31 andijahja Exp $
  */
 
 /*
@@ -1911,7 +1911,7 @@ static ERRCODE hb_fptPutMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       ulLen = pItem->item.asString.length;
       bBufPtr = ( BYTE *) pItem->item.asString.value;
 #ifndef HB_CDP_SUPPORT_OFF
-      if ( pArea->cdPage != hb_cdp_page )
+      if ( ulLen > 0 && pArea->cdPage != hb_cdp_page )
       {
          bBufAlloc = ( BYTE * ) hb_xgrab( ulLen );
          memcpy( bBufAlloc, bBufPtr, ulLen );

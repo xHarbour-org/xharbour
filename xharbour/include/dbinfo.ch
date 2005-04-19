@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.11 2005/03/31 03:15:15 druzus Exp $
+ * $Id: dbinfo.ch,v 1.12 2005/04/16 00:47:08 druzus Exp $
  */
 
 /*
@@ -197,6 +197,7 @@
 #define DBI_RM_ADD              155  /* add record to work area record map */
 #define DBI_RM_DROP             156  /* remove record from work area record map */
 #define DBI_RM_TEST             157  /* test if record is set in WA record map */
+#define DBI_RM_COUNT            158  /* number of records set in record map */
 
 /* BLOB support - definitions for internal use by BLOB.CH */
 #define DBI_BLOB_DIRECT_EXPORT  201

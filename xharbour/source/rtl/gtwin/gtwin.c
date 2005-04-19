@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.89 2005/03/18 13:09:44 paultucker Exp $
+ * $Id: gtwin.c,v 1.90 2005/03/30 21:30:54 andijahja Exp $
  */
 
 /*
@@ -1998,7 +1998,9 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 
 /* *********************************************************************** */
 
-#if defined(__BORLANDC__) || defined(_MSC_VER) || defined(__WATCOMC__) || defined(__MINGW32__)
+#if defined( HB_ARCH_32BIT ) && \
+    ( defined(__BORLANDC__) || defined(_MSC_VER) || \
+      defined(__WATCOMC__) || defined(__MINGW32__) )
 static int hb_Inp9x( USHORT usPort )
 {
    USHORT usVal;
@@ -2178,7 +2180,9 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
     /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
     if( s_osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
     {
-       #if defined( __BORLANDC__ ) || defined( _MSC_VER ) || defined( __WATCOMC__ )  || defined(__MINGW32__)
+       #if defined( HB_ARCH_32BIT ) && \
+           ( defined( __BORLANDC__ ) || defined( _MSC_VER ) || \
+             defined( __WATCOMC__ )  || defined(__MINGW32__) )
           HB_GT_FUNC(gt_w9xTone( dFrequency, dDuration ));
        #else
           HB_GT_FUNC(gt_wNtTone( dFrequency, dDuration ));

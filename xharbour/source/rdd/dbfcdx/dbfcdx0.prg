@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx0.prg,v 1.5 2003/11/04 08:31:03 druzus Exp $
+ * $Id: dbfcdx0.prg,v 1.6 2005/04/18 19:26:53 druzus Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 
 ANNOUNCE SIXCDX
 
-procedure SIXCDXInit
+init procedure SIXCDXInit
 
    REQUEST _SIXCDX
 
