@@ -5200,7 +5200,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
   LOCAL sExp, sTemp, Counter, sPad, sToken, sList
   LOCAL sNextLine, sNextToken, sLastToken, sJustToken, sJustNext, cLastChar
-  LOCAL s1, s2, s4, s5, sNext1, sNext2, sNext4, sNext5, nLen, nNextLen
+  LOCAL s1, s2, s4, s5, sNext1, sNext2, sNext3, sNext4, sNext5, nLen, nNextLen
   LOCAL sWorkLine, sPrimaryStopper, nStoppers, nStopper, sStopLine, sStopper
   LOCAL sMultiStopper, nSpaceAt, sNextStopper, cChar
   LOCAL aExp
@@ -5735,10 +5735,14 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
      sJustNext := RTrim( sNextToken )
      nNextLen := Len( sJustNext )
+
      sNext1 := Left( sJustNext, 1 )
-     sNext2 := sNext4 := sNext5 := ""
+     sNext2 := sNExt3 := sNext4 := sNext5 := ""
+
      IF nNextLen == 2
         sNext2 := sJustNext
+     ELSEIF nNextLen == 3
+        sNext3 := Upper( sJustNext )
      ELSEIF nNextLen == 4
         sNext4 := Upper( sJustNext )
      ELSEIF nNextLen == 5
@@ -5788,7 +5792,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                  s_bArrayPrefix := .F.
               #endif
            ENDIF
-        ELSEIF sNext2 $ "->\:=\==\!=\<>\>=\<=\+=\-=\*=\/=\^=\**\%="
+        ELSEIF sNext2 $ "->\:=\==\!=\<>\>=\<=\+=\-=\*=\/=\^=\**\%=\IN"
            sExp           += sNextToken
            sLine          := sNextLine
            #ifdef USE_C_BOOST
@@ -5799,9 +5803,22 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            LOOP
         ENDIF
 
+     ELSEIF nNextLen == 3
+
+        IF sNext3 == "HAS"
+           sExp           += sNextToken
+           sLine          := sNextLine
+           #ifdef USE_C_BOOST
+              SetArrayPrefix( .F. )
+           #else
+              s_bArrayPrefix := .F.
+           #endif
+           LOOP
+        ENDIF
+
      ELSEIF nNextLen == 4
 
-        IF sNext4 == ".OR."
+        IF sNext4 == ".OR." .OR. sNext4 == "LIKE"
            sExp           += sNextToken
            sLine          := sNextLine
            #ifdef USE_C_BOOST

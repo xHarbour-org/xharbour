@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.14 2005/04/14 06:14:39 ronpinkas Exp $
+ * $Id: dbdelim.prg,v 1.15 2005/04/15 01:21:40 ronpinkas Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.14 2005/04/14 06:14:39 ronpinkas Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.15 2005/04/15 01:21:40 ronpinkas Exp $" )
 
 PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest )
 
@@ -174,6 +174,8 @@ PROCEDURE AppendToDb( cFile, cDelimiter )
       ENDIF
 
       FOR EACH cValue IN aValues
+         cValue := AllTrim( cValue )
+
          IF cValue[1] == '"'
             cValue := SubStr( cValue, 2, Len( cValue ) - 2 )
          ENDIF

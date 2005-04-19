@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4045 2005/04/18 19:24:51 druzus Exp $
+ * $Id: ChangeLog,v 1.4046 2005/04/19 18:49:21 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-19 14:38 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/dbdelim.prg
+    * Added missing AllTrim() before processing each value.
+
+  * utils/xbscript/xbscript.prg
+    * Added support for IN, HAS, LIKE operators in NextExp()
 
 2005-04-19 20:43 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbdefs.h
@@ -20,7 +27,7 @@
   * xharbour/source/rdd/dbfcdx/dbfcdx0.prg
     * added 'init' to SIXCDX register procedure - it's not standard
       RDD and VM will not register it automatically.
-  
+
   * xharbour/source/rdd/dbffpt/dbffpt1.c
     ! fixed bug when using codepage translation and the empty string
       is passed as field value
