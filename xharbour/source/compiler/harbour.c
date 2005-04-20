@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.103 2005/04/02 21:13:49 andijahja Exp $
+ * $Id: harbour.c,v 1.104 2005/04/11 01:46:34 druzus Exp $
  */
 
 /*
@@ -283,15 +283,22 @@ extern int iEndDump;
 
 #define MAX_MEM_COMMAND_LINE 10240
 
+// Used in hb_compAutoOpen()
+int  ArgC = 0;
+char **ArgV;
+
 /* ************************************************************************* */
 
 int main( int argc, char * argv[] )
-
 {
    int iStatus = EXIT_SUCCESS;
    int i;
    BOOL bAnyFiles;
    char *szBuildInfo;
+
+   // Stored for later use in hb_compAutoOpen().
+   ArgC = argc;
+   ArgV = (char **) argv;
 
    hb_comp_pOutPath = NULL;
 
@@ -2104,8 +2111,8 @@ void hb_compAnnounce( char * szFunName )
    PFUNCTION pFunc;
 
    pFunc = hb_compFunctionFind( szFunName );
-   if( pFunc )
 
+   if( pFunc )
    {
       /* there is a function/procedure defined already - ANNOUNCEd procedure
        * have to be a public symbol - check if existing symbol is public
@@ -2117,11 +2124,9 @@ void hb_compAnnounce( char * szFunName )
    }
    else
    {
-      PCOMSYMBOL pSym;
-
       /* create a new procedure
        */
-      pSym = hb_compSymbolAdd( szFunName, NULL, TRUE );
+      hb_compSymbolAdd( szFunName, NULL, TRUE );
       /* pSym->cScope = HB_FS_PUBLIC; // already is */
 
       pFunc = hb_compFunctionNew( szFunName, HB_FS_PUBLIC );
@@ -4429,7 +4434,7 @@ static void hb_compOptimizeJumps( void )
          if( bForward )
          {
             /* Only if points to code beyond the current fix. */
-            if( pJumps[ iJump ] < pNOOPs[ iNOOP ] && 
+            if( pJumps[ iJump ] < pNOOPs[ iNOOP ] &&
                 ( ULONG ) ( pJumps[ iJump ] + piShifts[ iJump ] + ulOffset ) > pNOOPs[ iNOOP ] )
             {
                /* Increasing Shift Counter for this Jump. */
@@ -4444,7 +4449,7 @@ static void hb_compOptimizeJumps( void )
                the current NOOP. */
 
             /* Only if points to code beyond the current fix. */
-            if( pJumps[ iJump ] > pNOOPs[ iNOOP ] && 
+            if( pJumps[ iJump ] > pNOOPs[ iNOOP ] &&
                 ( ULONG ) ( pJumps[ iJump ] + piShifts[ iJump ] + ulOffset ) < pNOOPs[ iNOOP ] )
             {
                /* Decreasing Shift Counter for this Jump. */
@@ -5504,6 +5509,8 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
             }
 
             hb_pp_Init();
+
+            hb_compChkDefines( ArgC, ArgV );
 
             /*
               yyrestart( yyin );
