@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4051 2005/04/20 21:31:46 andijahja Exp $
+ * $Id: ChangeLog,v 1.4052 2005/04/20 23:28:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -12,7 +12,6 @@
   * include/hbpcode.h
   * source/compiler/genc.c
   * source/compiler/hbpcode.c
-  * include/hbsetup.h
   * source/compiler/hbfix.c
     + Added: HB_P_TRYBEGIN, HB_P_TRYEND, HB_P_TRYRECOVER
 
@@ -32,6 +31,9 @@
 
   * source/rtl/terror.prg
     - Removed no longer needed HB_SetTry() and HB_ResetTry()
+
+  * include/hbsetup.h
+    * Increased HB_PCODE_VER to 6
 
   /*
      Above change dramitacally improves speed of TRY/CATCH/END and exceptions handling.
