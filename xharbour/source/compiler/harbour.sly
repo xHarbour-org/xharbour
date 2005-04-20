@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.80 2005/04/10 21:28:24 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.81 2005/04/11 01:52:42 ronpinkas Exp $
  */
 
 /*
@@ -2495,6 +2495,7 @@ WithObject   : WITHOBJ Expression {
 
 BeginSeq   : BEGINSEQ {
                          ++hb_comp_wSeqCounter;
+
                          $<lNumber>$ = hb_compSequenceBegin();
 
                          if( s_iControlLevel++ == 0 )
@@ -2569,9 +2570,9 @@ RecoverUsing : RECOVERUSING IdentName
 
 Try          : TRY
                {
-                  ++hb_comp_wSeqCounter; $<lNumber>$ = hb_compSequenceBegin();
+                  ++hb_comp_wSeqCounter;
 
-                  hb_compExprDelete( hb_compExprGenStatement( hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( "HB_SETTRY", TRUE ) ), NULL ) ) );
+                  $<lNumber>$ = hb_compTryBegin();
 
                   if( s_iControlLevel++ == 0 )
                   {
@@ -2581,19 +2582,16 @@ Try          : TRY
                Crlf
                EmptyStats
                {
-                  /* Set jump address for HB_P_SEQBEGIN opcode - this address
+                  /* Set jump address for HB_P_TRYBEGIN opcode - this address
                    * will be used in BREAK code if there is no RECOVER clause
                    */
                   hb_compGenJumpHere( $<lNumber>2 );
-                  $<lNumber>$ = hb_compSequenceEnd();
-                  hb_compExprDelete( hb_compExprGenStatement( hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( "HB_RESETTRY", TRUE ) ), NULL ) ) );
-                  hb_compGenJump( 0 );
-
+                  $<lNumber>$ = hb_compTryEnd();
                }
                Catch
                {
                   /* Replace END address with RECOVER address in
-                   * HB_P_SEQBEGIN opcode if there is RECOVER clause
+                   * HB_P_TRYBEGIN opcode if there is RECOVER clause
                    */
                   if( $<lNumber>6 )
                   {
@@ -2603,33 +2601,18 @@ Try          : TRY
                END
                {
                   /* Fix END address
-                   * There is no line number after HB_P_SEQEND in case no
-                   * RECOVER clause is used
+                   * There is no line number after HB_P_TRYEND in case no
+                   * CATCH clause is used
                    */
-                  hb_compGenJumpThere( $<lNumber>5, $<lNumber>5 + 3 );
+                  hb_compGenJumpThere( $<lNumber>5, hb_comp_functions.pLast->lPCodePos );
 
                   /* Only if there is CATCH clause */
-                  if( $<lNumber>6 )
+                  if( ! $<lNumber>6 )
                   {
-                     if( hb_comp_functions.pLast->pCode[ $<lNumber>5 + 8 ] == HB_P_JUMPFAR )
-                     {
-                       hb_compGenJumpHere( $<lNumber>5 + 9 );
-                     }
-                     else
-                     {
-                       hb_compGenJumpHere( $<lNumber>5 + 10 );
-                     }
-                  }
-                  else
-                  {
-                     // Remove the unconditional jump after end of seq.
-                     hb_comp_functions.pLast->iJumps--;
-                     hb_comp_functions.pLast->lPCodePos -= 4;
-
                      --hb_comp_wSeqCounter;  /* CATCH is also considered as end of sequence */
                   }
 
-                  //hb_compSequenceFinish( $<lNumber>2, $<iNumber>4 );
+                  //hb_compTryFinish( $<lNumber>2, $<iNumber>4 );
                   hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
 
                   s_iControlLevel--;
@@ -2639,7 +2622,6 @@ Try          : TRY
 Catch        : /* no recover */  { $<lNumber>$ = 0; }
              | CatchError Crlf
                {
-                 hb_compExprDelete( hb_compExprGenStatement( hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( "HB_RESETTRY", TRUE ) ), NULL ) ) );
                  $<lNumber>$ = $<lNumber>1;
                }
                EmptyStats
@@ -2651,7 +2633,7 @@ CatchError   : CATCH IdentName
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
                   --hb_comp_wSeqCounter;
                   hb_compLinePush();
-                  hb_compGenPCode1( HB_P_SEQRECOVER );
+                  hb_compGenPCode1( HB_P_TRYRECOVER );
                   hb_compGenPopVar( $2 );
                }
              | CATCH
@@ -2660,7 +2642,7 @@ CatchError   : CATCH IdentName
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
                   --hb_comp_wSeqCounter;
                   hb_compLinePush();
-                  hb_compGenPCode2( HB_P_SEQRECOVER, HB_P_POP, ( BOOL ) 0 );
+                  hb_compGenPCode2( HB_P_TRYRECOVER, HB_P_POP, ( BOOL ) 0 );
                }
              ;
 

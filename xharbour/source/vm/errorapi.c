@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.54 2005/03/31 04:02:23 druzus Exp $
+ * $Id: errorapi.c,v 1.55 2005/04/04 05:56:49 ronpinkas Exp $
  */
 
 /*
@@ -117,10 +117,14 @@ static PHB_DYNS s_pDynErrorNew;
 #endif
 
 extern HB_SET_STRUCT hb_set;
+
 #if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN_5 )
-#include "hbserv.h"
-// extern BOOL hb_isService(void);
+   #include "hbserv.h"
+   // extern BOOL hb_isService(void);
 #endif
+
+extern int hb_vm_iTry;
+
 HB_FUNC_EXTERN( ERRORNEW );
 
 PHB_ITEM HB_EXPORT hb_errPutModuleName( PHB_ITEM pError, const char * szModuleName );
@@ -147,23 +151,14 @@ HB_FUNC( ERRORBLOCK )
 {
    HB_THREAD_STUB
 
-   HB_ITEM oldError;
    PHB_ITEM pNewErrorBlock = hb_param( 1, HB_IT_BLOCK );
 
-   /* initialize an item
-    * NOTE: hb_itemClear() cannot be used to initialize an item because
-    * memory occupied by the item can contain garbage bits
-   */
-
-   ( &oldError )->type = HB_IT_NIL;
-   hb_itemCopy( &oldError, s_errorBlock );
+   hb_itemCopy( &(HB_VM_STACK.Return), s_errorBlock );
 
    if( pNewErrorBlock )
    {
       hb_itemCopy( s_errorBlock, pNewErrorBlock );
    }
-
-   hb_itemReturn( &oldError );
 }
 
 /* set new low-level error launcher (C function) and return
@@ -320,7 +315,14 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
       /* Launch the error handler: "lResult := EVAL( ErrorBlock(), oError )" */
       s_iLaunchCount++;
 
-      if( s_errorHandler )
+
+      if( hb_vm_iTry )
+      {
+         hb_vmRequestBreak( pError );
+         s_iLaunchCount--;
+         return E_BREAK;
+      }
+      else if( s_errorHandler )
       {
          /* there is a low-level error handler defined - use it instead
           * of normal Harbour-level one
@@ -488,7 +490,13 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
       /* Launch the error handler: "xResult := EVAL( ErrorBlock(), oError )" */
       s_iLaunchCount++;
 
-      if( s_errorHandler )
+      if( hb_vm_iTry )
+      {
+         hb_vmRequestBreak( pError );
+         s_iLaunchCount--;
+         return NULL;
+      }
+      else if( s_errorHandler )
       {
          /* there is a low-level error handler defined - use it instead
           * of normal Harbour-level one
@@ -1227,6 +1235,21 @@ HB_FUNC( __ERRRT_SBASE )
                          hb_parcx( 4 ),
                          ( USHORT ) hb_parni( 5 ),
                          hb_param( 6, HB_IT_ANY ) );
+}
+
+
+HB_FUNC( THROW )
+{
+   PHB_ITEM pError = hb_param( 1, HB_IT_ANY );
+
+   if( HB_IS_OBJECT( pError ) )
+   {
+      hb_errLaunch( pError );
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 9101, NULL, "THROW", 1, hb_paramError( 1 ) );
+   }
 }
 
 USHORT HB_EXPORT hb_errRT_BASE( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... )

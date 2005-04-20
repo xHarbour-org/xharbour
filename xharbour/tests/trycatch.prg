@@ -5,7 +5,7 @@ FUNCTION Main()
    TRY
       ? "start"
 
-      Throw( ErrorNew( "MySys", 1001, "MyOperation", "My Description", { "MyArg" } ) )
+      Throw( ErrorNew( "MySys", 0, 1001, "MyOperation", "My Description", { "MyArg" } ) )
 
       ? "Success"
    CATCH e

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.104 2005/04/11 01:46:34 druzus Exp $
+ * $Id: harbour.c,v 1.105 2005/04/20 03:20:40 ronpinkas Exp $
  */
 
 /*
@@ -2979,6 +2979,14 @@ void hb_compGenJumpThere( ULONG ulFrom, ULONG ulTo )
             bOptimize = FALSE;
             break;
 
+         case HB_P_TRYBEGIN :
+            bOptimize = FALSE;
+            break;
+
+         case HB_P_TRYEND :
+            bOptimize = FALSE;
+            break;
+
          default:
             /* printf( "\rPCode: %i", pCode[ ( ULONG ) ulFrom - 1 ] ); */
             hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_JUMP_NOT_FOUND, NULL, NULL );
@@ -3045,6 +3053,14 @@ void hb_compGenJumpThere( ULONG ulFrom, ULONG ulTo )
             break;
 
          case HB_P_SEQEND :
+            bOptimize = FALSE;
+            break;
+
+         case HB_P_TRYBEGIN :
+            bOptimize = FALSE;
+            break;
+
+         case HB_P_TRYEND :
             bOptimize = FALSE;
             break;
 
@@ -4534,6 +4550,36 @@ ULONG hb_compSequenceBegin( void )
 ULONG hb_compSequenceEnd( void )
 {
    hb_compGenPCode4( HB_P_SEQEND, 0, 0, 0, ( BOOL ) 0 );
+
+   hb_compPrepareOptimize();
+
+   return hb_comp_functions.pLast->lPCodePos - 3;
+}
+
+/* Generate the opcode to open TRY/END tryuence
+ * This code is simmilar to JUMP opcode - the offset will be filled with
+ * - either the address of HB_P_TRYEND opcode if there is no RECOVER clause
+ * - or the address of RECOVER code
+ */
+ULONG hb_compTryBegin( void )
+{
+   hb_compGenPCode4( HB_P_TRYBEGIN, 0, 0, 0, ( BOOL ) 0 );
+
+   hb_compPrepareOptimize();
+
+   return hb_comp_functions.pLast->lPCodePos - 3;
+}
+
+/* Generate the opcode to close TRY/END tryuence
+ * This code is simmilar to JUMP opcode - the offset will be filled with
+ * the address of first line after END TRYUENCE
+ * This opcode will be executed if recover code was not requested (as the
+ * last statement in code beetwen BEGIN ... RECOVER) or if BREAK was requested
+ * and there was no matching RECOVER clause.
+ */
+ULONG hb_compTryEnd( void )
+{
+   hb_compGenPCode4( HB_P_TRYEND, 0, 0, 0, ( BOOL ) 0 );
 
    hb_compPrepareOptimize();
 

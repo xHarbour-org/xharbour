@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.15 2005/02/11 20:54:16 guerra000 Exp $
+ * $Id: terror.prg,v 1.16 2005/04/04 05:56:49 ronpinkas Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ FUNCTION ErrorNew( SubSystem, GenCode, SubCode, Operation, Description, Args, Mo
    STATIC lInErr := .F., s_oClass
    LOCAL oErr
 
-   //TraceLog( SubSystem, SubCode, Operation, Description, Args, ModuleName )
+   //TraceLog( SubSystem, GenCode, SubCode, Operation, Description, Args, ModuleName, ProcName, ProcLine )
 
    // Avoid RECURSIVE Errors.
    IF lInErr
@@ -153,36 +153,3 @@ FUNCTION ErrorNew( SubSystem, GenCode, SubCode, Operation, Description, Args, Mo
    lInErr := .F.
 
 RETURN oErr
-
-#ifndef HB_THREAD_SUPPORT
-
-PROCEDURE HB_SetTry()
-
-   aAdd( s_aErrHandlers, ErrorBlock( {|e| Break(e) } ) )
-
-RETURN
-
-PROCEDURE HB_ResetTry()
-
-   ErrorBlock( s_aErrHandlers[-1] )
-   aSize( s_aErrHandlers, Len( s_aErrHandlers ) - 1 )
-
-RETURN
-
-#else
-
-PROCEDURE HB_SetTry()
-
-   aAdd( HB_threadGetTryErrorArray(), ErrorBlock( {|e| Break(e) } ) )
-
-RETURN
-
-PROCEDURE HB_ResetTry()
-   LOCAL aTryErrHandlers := HB_threadGetTryErrorArray()
-
-   ErrorBlock( aTryErrHandlers[-1] )
-   aSize( aTryErrHandlers, Len( aTryErrHandlers ) - 1 )
-
-RETURN
-
-#endif

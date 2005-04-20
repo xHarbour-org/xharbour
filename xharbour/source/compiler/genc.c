@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.99 2005/04/14 04:41:08 andijahja Exp $
+ * $Id: genc.c,v 1.100 2005/04/20 21:32:17 andijahja Exp $
  */
 
 /*
@@ -3454,6 +3454,52 @@ static HB_GENC_FUNC( hb_p_localnearsetstrhidden )
    return ( USHORT ) ( lPCodePos - ulStart );
 }
 
+static HB_GENC_FUNC( hb_p_trybegin )
+{
+   fprintf( cargo->yyc, "\tHB_P_TRYBEGIN, %i, %i, %i,",
+            pFunc->pCode[ lPCodePos + 1 ],
+            pFunc->pCode[ lPCodePos + 2 ],
+            pFunc->pCode[ lPCodePos + 3 ] );
+   if( cargo->bVerbose )
+   {
+      LONG lOffset = HB_PCODE_MKINT24( &( pFunc->pCode[ lPCodePos + 1 ] ) );
+      fprintf( cargo->yyc, "\t/* %li (abs: %08li) */", lOffset, lPCodePos + lOffset );
+   }
+   fprintf( cargo->yyc, "\n" );
+   return 4;
+}
+
+static HB_GENC_FUNC( hb_p_tryend )
+{
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "/* %05li */ ", lPCodePos );
+   }
+   else
+   {
+      fprintf( cargo->yyc, "\t" );
+   }
+   fprintf( cargo->yyc, "HB_P_TRYEND, %i, %i, %i,",
+            pFunc->pCode[ lPCodePos + 1 ],
+            pFunc->pCode[ lPCodePos + 2 ],
+            pFunc->pCode[ lPCodePos + 3 ] );
+   if( cargo->bVerbose )
+   {
+      LONG lOffset = HB_PCODE_MKINT24( &( pFunc->pCode[ lPCodePos + 1 ] ) );
+      fprintf( cargo->yyc, "\t/* %li (abs: %08li) */", lOffset, lPCodePos + lOffset );
+   }
+   fprintf( cargo->yyc, "\n" );
+   return 4;
+}
+
+static HB_GENC_FUNC( hb_p_tryrecover )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_TRYRECOVER,\n" );
+   return 1;
+}
 
 /* NOTE: The order of functions has to match the order of opcodes
  *       mnemonics
@@ -3622,7 +3668,10 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_pushwith,
    hb_p_pushlonglong,
    hb_p_pushstrhidden,
-   hb_p_localnearsetstrhidden
+   hb_p_localnearsetstrhidden,
+   hb_p_trybegin,
+   hb_p_tryend,
+   hb_p_tryrecover
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.452 2005/04/11 01:46:35 druzus Exp $
+ * $Id: hvm.c,v 1.453 2005/04/11 01:52:41 druzus Exp $
  */
 
 /*
@@ -391,6 +391,8 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
    /* static, for now */
    BOOL hb_vm_bQuitRequest = FALSE;
 #endif
+
+int hb_vm_iTry = 0;
 
 static int s_iBaseLine;
 
@@ -1971,6 +1973,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
 
+         case HB_P_TRYBEGIN:
+           hb_vm_iTry++;
+
          case HB_P_SEQBEGIN:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEQBEGIN") );
 
@@ -2025,6 +2030,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             break;
          }
 
+         case HB_P_TRYEND:
+           hb_vm_iTry--;
+
          case HB_P_SEQEND:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEQEND") );
 
@@ -2056,6 +2064,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             w += HB_PCODE_MKINT24( &pCode[ w + 1 ] );;
             break;
          }
+
+         case HB_P_TRYRECOVER:
+           hb_vm_iTry--;
 
          case HB_P_SEQRECOVER:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEQRECOVER") );

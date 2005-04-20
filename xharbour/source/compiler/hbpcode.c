@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.34 2005/01/02 03:31:13 guerra000 Exp $
+ * $Id: hbpcode.c,v 1.35 2005/03/31 14:34:06 andijahja Exp $
  */
 
 /*
@@ -210,11 +210,14 @@ static char *pCodeList[] =
     "HB_P_BITSHIFTR",             /* 155 */
     "HB_P_BITSHIFTL",             /* 156 */
     "HB_P_LARGEFRAME",            /* 157 */
-    "HB_P_PUSHWITH",              /* 158 pushes QWith for the current procedure/method */
-    "HB_P_PUSHLONGLONG",          /* 159 places 64bit integer number on the virtual machine stack */
-    "HB_P_PUSHSTRHIDDEN",         /* 160 places a "hidden" string on the virtual machine stack */
-    "HB_P_LOCALNEARSETSTRHIDDEN", /* 161 Set specified "hidden" string into specified local without using the stack.*/
-    "HB_P_LAST_PCODE"             /* 162 this defines the number of defined pcodes */
+    "HB_P_PUSHWITH",              /* 158 */
+    "HB_P_PUSHLONGLONG",          /* 159 */
+    "HB_P_PUSHSTRHIDDEN",         /* 160 */
+    "HB_P_LOCALNEARSETSTRHIDDEN", /* 161 */
+    "HB_P_TRYBEGIN",              /* 162 */
+    "HB_P_TRYEND",                /* 163 */
+    "HB_P_TRYRECOVER",            /* 164 */
+    "HB_P_LAST_PCODE"             /* 165 this defines the number of defined pcodes */
 };
 
 static BYTE s_pcode_len[] = {
@@ -381,7 +384,10 @@ static BYTE s_pcode_len[] = {
    1,        /* HB_P_PUSHWITH,             */
    9,        /* HB_P_PUSHLONGLONG          */
    0,        /* HB_P_PUSHSTRHIDDEN,        */
-   0         /* HB_P_LOCALNEARSETSTRHIDDEN */
+   0,        /* HB_P_LOCALNEARSETSTRHIDDEN */
+   4,        /* HB_P_TRYBEGIN,             */
+   4,        /* HB_P_TRYEND,               */
+   1         /* HB_P_TRYECOVER,            */
 };
 
 extern BOOL hb_comp_iGenVarList;

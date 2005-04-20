@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.h,v 1.23 2004/11/21 21:43:38 druzus Exp $
+ * $Id: hbpcode.h,v 1.24 2005/01/02 03:31:12 guerra000 Exp $
  */
 
 /*
@@ -225,9 +225,12 @@ typedef enum
    HB_P_PUSHLONGLONG,          /* 159 places 64bit integer number on the virtual machine stack */
    HB_P_PUSHSTRHIDDEN,         /* 160 places a "hidden" string on the virtual machine stack */
    HB_P_LOCALNEARSETSTRHIDDEN, /* 161 Set specified "hidden" string into specified local without using the stack.*/
+   HB_P_TRYBEGIN,              /* 162 TRY */
+   HB_P_TRYEND,                /* 163 END <TRY>*/
+   HB_P_TRYRECOVER,            /* 164 CATCH */
 
 /* NOTE: This have to be the last definition */
-   HB_P_LAST_PCODE             /* 162 this defines the number of defined pcodes */
+   HB_P_LAST_PCODE             /* 165 this defines the number of defined pcodes */
 } HB_PCODE;
 
 #endif /* HB_PCODE_H_ */
