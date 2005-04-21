@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hsx.c,v 1.1 2005/04/19 21:43:30 druzus Exp $
  */
 
 /*
@@ -256,6 +256,12 @@
 #define HSX_RDDFAILURE     -25   /* RDD error */
 
 #define HSX_FILEEXT     ".hsx"
+
+/* exclusive mode emulation on POSIX systems */
+#ifdef OS_UNIX_COMPATIBLE
+#define HSX_EXLUSIVE_LOCKPOS              0x7fffffffUL
+#define HSX_EXLUSIVE_LOCKSIZE             1UL
+#endif
 
 #define HSXMAXKEY_SIZE  3     /* maximum key size */
 #define HSXDEFKEY_SIZE  2     /* default key size */
@@ -537,6 +543,14 @@ static int hb_hsxCompile( char * szExpr, PHB_ITEM * pExpr )
    return HSX_SUCCESS;
 }
 
+#ifdef HSX_EXLUSIVE_LOCKPOS
+static BOOL hb_hsxAccess( FHANDLE hFile, BOOL fShared, BOOL fReadonly )
+{
+   return hb_fsLockLarge( hFile, HSX_EXLUSIVE_LOCKPOS, HSX_EXLUSIVE_LOCKSIZE,
+             FL_LOCK | ( fShared || fReadonly ? FLX_SHARED : FLX_EXCLUSIVE ) );
+}
+#endif
+
 static int hb_hsxEval( int iHandle, PHB_ITEM pExpr, BYTE *pKey, BOOL *fDeleted )
 {
    LPHSXINFO pHSX = hb_hsxGetPointer( iHandle );
@@ -713,7 +727,7 @@ static int hb_hsxHdrRead( int iHandle )
    /* update the record counter */
    hb_hsxGetRecCount( pHSX );
 
-   return HSX_SUCCESS;
+   return iResult;
 }
 
 static int hb_hsxRead( int iHandle, ULONG ulRecord, BYTE ** pRecPtr )
@@ -1247,6 +1261,7 @@ static int hb_hsxVerify( int iHandle, BYTE * szText, ULONG ulLen,
          case HSX_VERIFY_END:
             iResult = hb_hsxStrCmp( szSub, ulSub, szText + ulLen - ulSub, ulSub,
                                     pHSX->fIgnoreCase, pHSX->iFilterType );
+            break;
          case HSX_VERIFY_AND:
             iResult = HSX_SUCCESS;
             for ( ul = 0; ul < ulSub && iResult == HSX_SUCCESS; ul++ )
@@ -1260,6 +1275,7 @@ static int hb_hsxVerify( int iHandle, BYTE * szText, ULONG ulLen,
                                        pHSX->fIgnoreCase, pHSX->iFilterType );
                ul = ull;
             }
+            break;
 /*
          case HSX_VERIFY_OR:
             iResult = HSX_SUCCESSFALSE;
@@ -1274,6 +1290,7 @@ static int hb_hsxVerify( int iHandle, BYTE * szText, ULONG ulLen,
                                        pHSX->fIgnoreCase, pHSX->iFilterType );
                ul = ull;
             }
+            break;
 */
          case HSX_VERIFY_PHRASE:
          default:
@@ -1376,6 +1393,13 @@ static int hb_hsxCreate( char * szFile, int iBufSize, int iKeySize,
    }
 
    hFile = hb_spCreate( ( BYTE * ) szFileName, FC_NORMAL );
+#ifdef HSX_EXLUSIVE_LOCKPOS
+   if ( hFile != FS_ERROR && ! hb_hsxAccess( hFile, FALSE, FALSE ) )
+   {
+      hb_fsClose( hFile );
+      hFile = FS_ERROR;
+   }
+#endif
    if ( hFile == FS_ERROR )
    {
       if ( pExpr )
@@ -1452,6 +1476,13 @@ static int hb_hsxOpen( char * szFile, int iBufSize, int iMode )
              ( fShared ? FO_DENYNONE : FO_EXCLUSIVE );
 
    hFile = hb_spOpen( ( BYTE * ) szFileName, uiFlags );
+#ifdef HSX_EXLUSIVE_LOCKPOS
+   if ( hFile != FS_ERROR && ! hb_hsxAccess( hFile, fShared, fReadonly ) )
+   {
+      hb_fsClose( hFile );
+      hFile = FS_ERROR;
+   }
+#endif
    if ( hFile == FS_ERROR )
       return HSX_OPENERR;
 
@@ -1557,7 +1588,7 @@ static int hb_hsxFilter( int iHandle, BYTE * pSeek, ULONG ulSeek,
    LPHSXINFO pHSX = hb_hsxGetPointer( iHandle );
    BOOL fDestroyExpr = FALSE, fValid;
    int iResult = HSX_SUCCESS;
-   ERRCODE errCode = SUCCESS;
+   ERRCODE errCode;
    ULONG ulRecNo = 0, ulRec;
    PHB_ITEM pItem;
 

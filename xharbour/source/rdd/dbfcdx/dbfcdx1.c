@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.194 2005/04/14 17:30:39 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.195 2005/04/18 19:26:53 druzus Exp $
  */
 
 /*
@@ -8583,6 +8583,9 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
 
       if ( fDirectRead )
          pSort->pRecBuff = (BYTE *) hb_xgrab( pArea->uiRecordLen * iRecBufSize );
+
+      if ( ulStartRec == 0 && pArea->uiTag == 0 )
+         ulStartRec = 1;
 
       if ( ulStartRec == 0 )
       {

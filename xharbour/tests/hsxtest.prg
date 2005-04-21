@@ -27,7 +27,7 @@ PROCEDURE Main()
    if dbinfo( DBI_RM_SUPPORTED )
       /* if yest then let set filter for all records with 'SHERMAN'
          word and look at them in browser */
-      HS_FILTER( "test" , "SHERMAN" )
+      HS_FILTER( hs, "SHERMAN" )
       dbgotop()
       browse()
    endif

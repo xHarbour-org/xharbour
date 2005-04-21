@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4054 2005/04/21 01:30:44 andijahja Exp $
+ * $Id: ChangeLog,v 1.4055 2005/04/21 10:10:05 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-21 21:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * force fixed start record for whole database indexes
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * implemented RT error for some type of currupted indexes.
+
+  * xharbour/source/rdd/hsx/hsx.c
+    + added emulation of exclusive mode for POSIX systems
+      (the same trick as for DBF)
+    ! fixes sent by Andy. Thanks.
+
+  * xharbour/tests/hsxtest.prg
+    * minor modifications to not not reopen hsx index
+      in hs_filter() but use handler to already open one
+
 2005-04-21 16:45 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * source/compiler/genc.c
     + allow processing PRG file with only C codes in dump areas.
