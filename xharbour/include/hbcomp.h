@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.34 2005/03/15 21:39:27 andijahja Exp $
+ * $Id: hbcomp.h,v 1.35 2005/03/31 03:15:17 druzus Exp $
  */
 
 /*
@@ -377,6 +377,11 @@ extern void hb_compGenPushAliasedVar( char *, BOOL, char *, LONG );
 extern void hb_compGenPopAliasedVar( char *, BOOL, char *, LONG );
 extern void hb_compGenPushFunRef( char * );
 extern void hb_compGenSwitchCase( LONG );         /* generates the pcode to push switchcase value on the virtual machine stack */
+
+extern ULONG hb_compSequenceBegin( void ); /* Generate the opcode to open BEGIN/END sequence */
+extern ULONG hb_compSequenceEnd( void );  /* Generate the opcode to close BEGIN/END sequence */
+extern ULONG hb_compTryBegin( void ); /* Generate the opcode to open TRY/END tryuence */
+extern ULONG hb_compTryEnd( void );  /* Generate the opcode to close TRY/END tryuence */
 
 extern void hb_compGenPCode1( BYTE );             /* generates 1 byte of pcode */
 extern void hb_compGenPData1( BYTE );             /* generates 1 byte of pcode argument */
