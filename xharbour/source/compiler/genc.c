@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.100 2005/04/20 21:32:17 andijahja Exp $
+ * $Id: genc.c,v 1.101 2005/04/20 23:29:52 ronpinkas Exp $
  */
 
 /*
@@ -658,7 +658,67 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    }
    else
    {
-      fprintf( yyc, "/* Empty source file */\n\n" );
+      /*
+         We do not have an ordinary PRG code in file
+      */
+
+      BOOL bInline = (pInline && pInline->pCode);
+
+      if ( bInline )
+      {
+         hb_compGenCInLineSymbol();
+      }
+
+      /*
+        We have functions in dump areas
+      */
+
+      if ( pStatSymb )
+      {
+         fprintf( yyc, "#include \"hbvmpub.h\"\n" );
+
+         if( hb_comp_iGenCOutput != HB_COMPGENC_COMPACT )
+         {
+            fprintf( yyc, "#include \"hbpcode.h\"\n" );
+         }
+
+         fprintf( yyc, "#include \"hbinit.h\"\n\n" );
+         fprintf( yyc, "#define __PRG_SOURCE__ \"%s\"\n\n", hb_comp_PrgFileName );
+
+         fprintf( yyc, "#undef HB_PRG_PCODE_VER\n" );
+         fprintf( yyc, "#define HB_PRG_PCODE_VER %i\n\n", (int) HB_PCODE_VER );
+
+         hb_compGenCAddProtos( yyc );
+
+         hb_compWriteGlobalFunc( yyc, &iLocalGlobals, &iGlobals, FALSE );
+
+         fprintf( yyc, "\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_%s%s )\n", hb_comp_szPrefix, hb_comp_FileAsSymbol );
+
+         if( pStatSymb )
+         {
+            hb_compWriteExternEntries( yyc, bSymFIRST, FALSE );
+         }
+
+         /*
+            End of initialization codes
+         */
+         hb_writeEndInit( yyc );
+
+         hb_compWriteDeclareGlobal( yyc, FALSE );
+
+      }
+
+      if ( bInline )
+      {
+         hb_compGenCInLine( yyc );
+      }
+      else
+      {
+         if( !pStatSymb )
+         {
+            fprintf( yyc, "/* Empty source file */\n\n" );
+         }
+      }
    }
 
    fclose( yyc );
