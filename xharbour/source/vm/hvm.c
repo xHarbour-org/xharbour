@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.453 2005/04/11 01:52:41 druzus Exp $
+ * $Id: hvm.c,v 1.454 2005/04/20 23:29:55 ronpinkas Exp $
  */
 
 /*
@@ -394,6 +394,10 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
 
 int hb_vm_iTry = 0;
 
+#ifdef HB_USE_BREAKBLOCK
+   PHB_ITEM hb_vm_BreakBlock = NULL;
+#endif
+
 static int s_iBaseLine;
 
 static   HB_ITEM  s_aGlobals;         /* Harbour array to hold all application global variables */
@@ -426,6 +430,20 @@ void hb_vmDoInitClip( void )
       hb_vmPushNil();
       hb_vmDo(0);
    }
+
+   #ifdef HB_USE_BREAKBLOCK
+      pDynSym = hb_dynsymFind( "__BREAKBLOCK" );
+
+      if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
+      {
+         hb_vmPushSymbol( pDynSym->pSymbol );
+         hb_vmPushNil();
+         hb_vmDo(0);
+
+         hb_vm_BreakBlock = hb_itemNew( NULL );
+         hb_itemForwardValue( hb_vm_BreakBlock, &( hb_stack.Return ) );
+      }
+   #endif
 }
 
 // Initialize DBFCDX and DBFNTX if linked.
@@ -576,19 +594,19 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
       }
    #endif
 
-   /* Call functions that initializes static variables
-    * Static variables have to be initialized before any INIT functions
-    * because INIT function can use static variables.
-    */
-
-   HB_TRACE( HB_TR_INFO, ("InitStatics" ) );
-   hb_vmDoInitStatics();
-
    HB_TRACE( HB_TR_INFO, ("InitClip" ) );
    hb_vmDoInitClip(); // Initialize ErrorBlock() and __SetHelpK()
 
    //printf( "Before InitRdd\n" );
+   HB_TRACE( HB_TR_INFO, ("InitRdd" ) );
    hb_vmDoInitRdd();  // Initialize DBFCDX and DBFNTX if linked.
+
+   /* Call functions that initializes static variables
+    * Static variables have to be initialized before any INIT functions
+    * because INIT function can use static variables.
+    */
+   HB_TRACE( HB_TR_INFO, ("InitStatics" ) );
+   hb_vmDoInitStatics();
 
    //printf( "Before InitFunctions\n" );
    HB_TRACE( HB_TR_INFO, ("InitFunctions" ) );
@@ -892,6 +910,10 @@ int HB_EXPORT hb_vmQuit( void )
    hb_threadExit();
    //printf("After thread exit\n" );
 #endif
+
+   #ifdef HB_USE_BREAKBLOCK
+      hb_itemRelease( hb_vm_BreakBlock );
+   #endif
 
    /* hb_dynsymLog(); */
 

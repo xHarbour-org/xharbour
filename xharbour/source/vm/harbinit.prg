@@ -1,5 +1,5 @@
 /*
- * $Id: harbinit.prg,v 1.3 2003/06/07 19:34:57 lculik Exp $
+ * $Id: harbinit.prg,v 1.4 2003/06/07 21:26:22 ronpinkas Exp $
  */
 
 /*
@@ -79,10 +79,13 @@ PROCEDURE ClipInit
    /* NOTE: In Clipper __SETHELPK() is called *after* ERRORSYS(). */
    __SetHelpK()
 
-   RETURN
+RETURN
 
 PROCEDURE __SetHelpK()
 
    SET KEY K_F1 TO __XHELP
 
-   RETURN
+RETURN
+
+FUNCTION __BreakBlock()
+RETURN {|e| Break(e) }

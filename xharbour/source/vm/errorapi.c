@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.55 2005/04/04 05:56:49 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.56 2005/04/20 23:29:54 ronpinkas Exp $
  */
 
 /*
@@ -101,7 +101,7 @@ static PHB_DYNS s_pDynErrorNew;
 /* In MT, this data is held in the stack */
 #ifndef HB_THREAD_SUPPORT
    static HB_ERROR_INFO_PTR s_errorHandler = NULL;
-   static HB_ITEM_PTR s_errorBlock;
+   static PHB_ITEM s_errorBlock;
    static int     s_iLaunchCount = 0;
    static USHORT  s_uiErrorDOS = 0; /* The value of DOSERROR() */
 #else
@@ -124,6 +124,9 @@ extern HB_SET_STRUCT hb_set;
 #endif
 
 extern int hb_vm_iTry;
+#ifdef HB_USE_BREAKBLOCK
+   extern PHB_ITEM hb_vm_BreakBlock;
+#endif   
 
 HB_FUNC_EXTERN( ERRORNEW );
 
@@ -153,7 +156,19 @@ HB_FUNC( ERRORBLOCK )
 
    PHB_ITEM pNewErrorBlock = hb_param( 1, HB_IT_BLOCK );
 
-   hb_itemCopy( &(HB_VM_STACK.Return), s_errorBlock );
+   if( hb_vm_iTry )
+   {
+      #ifdef HB_USE_BREAKBLOCK
+         hb_itemCopy( &(HB_VM_STACK.Return), hb_vm_BreakBlock );
+      #else
+         hb_errRT_BASE( EG_UNSUPPORTED, 0, NULL, "ERRORBLOCK", HB_MIN( hb_pcount(), 2 ), hb_paramError( 1 ), hb_paramError( 2 ) );
+         return;
+      #endif
+   }
+   else
+   {
+      hb_itemCopy( &(HB_VM_STACK.Return), s_errorBlock );
+   }
 
    if( pNewErrorBlock )
    {
@@ -1236,7 +1251,6 @@ HB_FUNC( __ERRRT_SBASE )
                          ( USHORT ) hb_parni( 5 ),
                          hb_param( 6, HB_IT_ANY ) );
 }
-
 
 HB_FUNC( THROW )
 {

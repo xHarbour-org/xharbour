@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4056 2005/04/21 19:46:15 druzus Exp $
+ * $Id: ChangeLog,v 1.4057 2005/04/21 22:53:44 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-21 16:23 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/harbinit.prg
+    + Added __BreakBlock()
+  * source/vm/errorapi.c
+    * Generate a R/T error if ErrorBlock() is called within a TRY/END code
+      or use hb_vm_BreakBlock if HB_USE_BREAKBLOCK is defined.
+  * source/vm/hvm.c
+    + Added PHB_ITEM hb_vm_BreakBlock if HB_USE_BREAKBLOCK is defined
+    + Added initialization of hb_vm_BreakBlock in hb_vmDoInitClip()
+      if HB_USE_BREAKBLOCK is defined
+    ! Fixed call to hb_vmDoInitClip() to PRECEDE call to hb_vmDoInitStatics(),
+      or else any error in statics assignments code doesn't have any error handler.
 
 2005-04-21 17:51 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/vm/arrayshb.c
