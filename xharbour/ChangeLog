@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4055 2005/04/21 10:10:05 andijahja Exp $
+ * $Id: ChangeLog,v 1.4056 2005/04/21 19:46:15 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-21 17:51 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/vm/arrayshb.c
+    + Function RASCAN (Reverse AScan) added.
 
 2005-04-21 21:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

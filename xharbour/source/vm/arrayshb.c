@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.54 2005/02/26 15:16:50 andijahja Exp $
+ * $Id: arrayshb.c,v 1.55 2005/04/15 01:21:41 ronpinkas Exp $
  */
 
 /*
@@ -1934,4 +1934,174 @@ HB_FUNC( HB_STRUCTURETOARRAY )
    {
       hb_errRT_BASE( EG_ARG, 2023, NULL, "StructureToArray", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
+}
+
+HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
+{
+   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pValue = hb_param( 2, HB_IT_ANY );
+
+   if( pArray && pValue )
+   {
+      PHB_ITEM pItems;
+      ULONG ulLen;
+      ULONG ulStart;
+      ULONG ulCount;
+      BOOL bExact = hb_parl( 5 );
+
+      pItems = pArray->item.asArray.value->pItems;
+      ulLen = pArray->item.asArray.value->ulLen;
+
+      /* sanitize scan range */
+      if( ISNUM( 3 ) && hb_parni( 3 ) >= 1 )
+      {
+         ulStart = hb_parni( 3 );
+      }
+      else
+      {
+         ulStart = ulLen;
+      }
+
+      if( ulStart > ulLen )
+      {
+         hb_retnl( 0 );
+         return;
+      }
+
+      if( ISNUM( 4 ) && ( ( ULONG ) hb_parni( 4 ) <= ulStart ) )
+      {
+         ulCount = hb_parni( 4 );
+      }
+      else
+      {
+         ulCount = ulStart;
+      }
+
+      if( ulCount > ulStart )
+      {
+         ulCount = ulStart;
+      }
+
+      /* Make separate search loops for different types to find, so that
+         the loop can be faster. */
+
+      if( HB_IS_BLOCK( pValue ) )
+      {
+
+         for( ulStart--; ulCount > 0; ulCount--, ulStart-- )
+         {
+            hb_vmPushSymbol( &hb_symEval );
+            hb_vmPush( pValue );
+
+            hb_vmPush( pItems + ulStart );
+            hb_vmPushLong( ulStart + 1 );
+            hb_vmSend( 2 );
+
+            if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) && HB_VM_STACK.Return.item.asLogical.value )
+            {
+               hb_retnl( ulStart + 1 );             // arrays start from 1
+               return;
+            }
+         }
+      }
+      else if( HB_IS_STRING( pValue ) ) // Must precede HB_IS_NUMERIC()
+      {
+         // Might be Char type, switch to Numeric context if the Array first element is Numeric.
+         if( HB_IS_NUMERIC( pValue ) && HB_IS_NUMERIC( pItems ) )
+         {
+            goto NumericContext;
+         }
+
+         for( ulStart--; ulCount > 0; ulCount--, ulStart-- )
+         {
+            PHB_ITEM pItem = pItems + ulStart;
+
+            /* NOTE: The order of the pItem and pValue parameters passed to
+                     hb_itemStrCmp() is significant, please don't change it. [vszakats] */
+            if( HB_IS_STRING( pItem ) && hb_itemStrCmp( pItem, pValue, bExact ) == 0 )
+            {
+               hb_retnl( ulStart + 1 );             // arrays start from 1
+               return;
+            }
+         }
+      }
+      else if( pValue->type == HB_IT_DATE ) // Must precede HB_IS_NUMERIC()
+      {
+         LONG lValue = pValue->item.asDate.value;
+
+         for( ulStart--; ulCount > 0; ulCount--, ulStart-- )
+         {
+            PHB_ITEM pItem = pItems + ulStart;
+
+            if( pItem->type == HB_IT_DATE && pItem->item.asDate.value == lValue )
+            {
+               hb_retnl( ulStart + 1 );             // arrays start from 1
+               return;
+            }
+         }
+      }
+      else if( HB_IS_NUMERIC( pValue ) )
+      {
+         NumericContext:
+         {
+            double dValue = hb_itemGetND( pValue );
+
+            for( ulStart--; ulCount > 0; ulCount--, ulStart-- )
+            {
+               PHB_ITEM pItem = pItems + ulStart;
+
+               HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %d", pItem, dValue ) );
+
+               if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue )
+               {
+                  hb_retnl( ulStart + 1 );          // arrays start from 1
+                  return;
+               }
+            }
+         }
+      }
+      else if( HB_IS_LOGICAL( pValue ) )
+      {
+         BOOL bValue = hb_itemGetL( pValue );
+
+         for( ulStart--; ulCount > 0; ulCount--, ulStart-- )
+         {
+            PHB_ITEM pItem = pItems + ulStart;
+
+            if( HB_IS_LOGICAL( pItem ) && hb_itemGetL( pItem ) == bValue )
+            {
+               hb_retnl( ulStart + 1 );             // arrays start from 1
+               return;
+            }
+         }
+      }
+      else if( HB_IS_NIL( pValue ) )
+      {
+         for( ulStart--; ulCount > 0; ulCount--, ulStart-- )
+         {
+            if( HB_IS_NIL( pItems + ulStart ) )
+            {
+               hb_retnl( ulStart + 1 );             // arrays start from 1
+               return;
+            }
+         }
+      }
+      else if( bExact && pValue->type == HB_IT_ARRAY )
+      {
+         for( ulStart--; ulCount > 0; ulCount--, ulStart-- )
+         {
+            PHB_ITEM pItem = pItems + ulStart;
+
+            HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %p", pItem, pValue->item.asArray.value ) );
+
+            if( pItem->type == HB_IT_ARRAY && pItem->item.asArray.value == pValue->item.asArray.value )
+            {
+               hb_retnl( ulStart + 1 );             // arrays start from 1
+               return;
+            }
+         }
+      }
+   }
+
+   hb_retnl( 0 );
 }
