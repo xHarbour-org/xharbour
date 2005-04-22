@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4058 2005/04/21 23:23:55 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4059 2005/04/22 04:30:53 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-22 09:48 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/errorapi.c
+    * Fixed GPF trap I introduced yesterday in HB_FUNC( THROW ).
 
 2005-04-22 06:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.56 2005/04/20 23:29:54 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.57 2005/04/21 23:24:05 ronpinkas Exp $
  */
 
 /*
@@ -126,7 +126,7 @@ extern HB_SET_STRUCT hb_set;
 extern int hb_vm_iTry;
 #ifdef HB_USE_BREAKBLOCK
    extern PHB_ITEM hb_vm_BreakBlock;
-#endif   
+#endif
 
 HB_FUNC_EXTERN( ERRORNEW );
 
@@ -1258,7 +1258,11 @@ HB_FUNC( THROW )
 
    if( HB_IS_OBJECT( pError ) )
    {
+      pError = hb_itemNew( pError );
+
       hb_errLaunch( pError );
+
+      hb_itemRelease( pError );
    }
    else
    {
