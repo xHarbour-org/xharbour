@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4059 2005/04/22 04:30:53 druzus Exp $
+ * $Id: ChangeLog,v 1.4060 2005/04/22 16:48:37 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-22 13:18 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/vm/arrayshb.c
+    + Added missing #include "hbvm.h"
+    ! Fixed bug: RASCAN({"A","BC","D"},"B") now works.
+    + Added sixth parameter: lAllowChar, for support single-byte/numeric
+      conversion (default .F., as Clipper behavior).
+  * source/vm/arrays.c
+    ! Fixed bug: ASCAN({"A","BC"},"B") now works.
+    * hb_arrayScan is ready to support "lAllowChar". Not yet implemented,
+      but we only need to change a single variable value.
 
 2005-04-22 09:48 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/errorapi.c

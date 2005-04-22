@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.55 2005/04/15 01:21:41 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.56 2005/04/21 22:53:51 guerra000 Exp $
  */
 
 /*
@@ -60,6 +60,7 @@
 #include <ctype.h>
 
 #include "hbapi.h"
+#include "hbvm.h"
 #include "hbfast.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
@@ -1948,6 +1949,7 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
       ULONG ulStart;
       ULONG ulCount;
       BOOL bExact = hb_parl( 5 );
+      BOOL bAllowChar = hb_parl( 6 );
 
       pItems = pArray->item.asArray.value->pItems;
       ulLen = pArray->item.asArray.value->ulLen;
@@ -2006,22 +2008,44 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
       }
       else if( HB_IS_STRING( pValue ) ) // Must precede HB_IS_NUMERIC()
       {
-         // Might be Char type, switch to Numeric context if the Array first element is Numeric.
-         if( HB_IS_NUMERIC( pValue ) && HB_IS_NUMERIC( pItems ) )
+         if( ! bAllowChar || ! HB_IS_NUMERIC( pValue ) )
          {
-            goto NumericContext;
-         }
-
-         for( ulStart--; ulCount > 0; ulCount--, ulStart-- )
-         {
-            PHB_ITEM pItem = pItems + ulStart;
-
-            /* NOTE: The order of the pItem and pValue parameters passed to
-                     hb_itemStrCmp() is significant, please don't change it. [vszakats] */
-            if( HB_IS_STRING( pItem ) && hb_itemStrCmp( pItem, pValue, bExact ) == 0 )
+            for( ulStart--; ulCount > 0; ulCount--, ulStart-- )
             {
-               hb_retnl( ulStart + 1 );             // arrays start from 1
-               return;
+               PHB_ITEM pItem = pItems + ulStart;
+
+               /* NOTE: The order of the pItem and pValue parameters passed to
+                        hb_itemStrCmp() is significant, please don't change it. [vszakats] */
+               if( HB_IS_STRING( pItem ) && hb_itemStrCmp( pItem, pValue, bExact ) == 0 )
+               {
+                  hb_retnl( ulStart + 1 );             // arrays start from 1
+                  return;
+               }
+            }
+         }
+         else
+         {
+            double dValue = hb_itemGetND( pValue );
+
+            for( ulStart--; ulCount > 0; ulCount--, ulStart-- )
+            {
+               PHB_ITEM pItem = pItems + ulStart;
+
+               /* NOTE: The order of the pItem and pValue parameters passed to
+                        hb_itemStrCmp() is significant, please don't change it. [vszakats] */
+               if( HB_IS_STRING( pItem ) )
+               {
+                  if( hb_itemStrCmp( pItem, pValue, bExact ) == 0 )
+                  {
+                     hb_retnl( ulStart + 1 );          // arrays start from 1
+                     return;
+                  }
+               }
+               else if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue )
+               {
+                  hb_retnl( ulStart + 1 );             // arrays start from 1
+                  return;
+               }
             }
          }
       }
@@ -2042,21 +2066,18 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
       }
       else if( HB_IS_NUMERIC( pValue ) )
       {
-         NumericContext:
+         double dValue = hb_itemGetND( pValue );
+
+         for( ulStart--; ulCount > 0; ulCount--, ulStart-- )
          {
-            double dValue = hb_itemGetND( pValue );
+            PHB_ITEM pItem = pItems + ulStart;
 
-            for( ulStart--; ulCount > 0; ulCount--, ulStart-- )
+            HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %d", pItem, dValue ) );
+
+            if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue && ( bAllowChar || ! HB_IS_STRING( pItem ) ) )
             {
-               PHB_ITEM pItem = pItems + ulStart;
-
-               HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %d", pItem, dValue ) );
-
-               if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue )
-               {
-                  hb_retnl( ulStart + 1 );          // arrays start from 1
-                  return;
-               }
+               hb_retnl( ulStart + 1 );             // arrays start from 1
+               return;
             }
          }
       }

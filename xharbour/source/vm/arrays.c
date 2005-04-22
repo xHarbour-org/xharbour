@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.116 2005/03/09 07:16:28 andijahja Exp $
+ * $Id: arrays.c,v 1.117 2005/03/31 04:02:20 druzus Exp $
  */
 
 /*
@@ -824,6 +824,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       ULONG ulLen;
       ULONG ulStart;
       ULONG ulCount;
+      BOOL bAllowChar = 0;  // TO DO! Receive it as parameter
 
       /* Select array type */
       if( pArray->type == HB_IT_ARRAY )
@@ -930,21 +931,41 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       }
       else if( HB_IS_STRING( pValue ) ) // Must precede HB_IS_NUMERIC()
       {
-         // Might be Char type, switch to Numeric context if the Array first element is Numeric.
-         if( HB_IS_NUMERIC( pValue ) && HB_IS_NUMERIC( pItems ) )
+         if( ! bAllowChar || ! HB_IS_NUMERIC( pValue ) )
          {
-            goto NumericContext;
-         }
-
-         for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
-         {
-            PHB_ITEM pItem = pItems + ulStart;
-
-            /* NOTE: The order of the pItem and pValue parameters passed to
-                     hb_itemStrCmp() is significant, please don't change it. [vszakats] */
-            if( HB_IS_STRING( pItem ) && hb_itemStrCmp( pItem, pValue, bExact ) == 0 )
+            for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
             {
-               return ulStart + 1;
+               PHB_ITEM pItem = pItems + ulStart;
+
+               /* NOTE: The order of the pItem and pValue parameters passed to
+                        hb_itemStrCmp() is significant, please don't change it. [vszakats] */
+               if( HB_IS_STRING( pItem ) && hb_itemStrCmp( pItem, pValue, bExact ) == 0 )
+               {
+                  return ulStart + 1;
+               }
+            }
+         }
+         else
+         {
+            double dValue = hb_itemGetND( pValue );
+
+            for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
+            {
+               PHB_ITEM pItem = pItems + ulStart;
+
+               /* NOTE: The order of the pItem and pValue parameters passed to
+                        hb_itemStrCmp() is significant, please don't change it. [vszakats] */
+               if( HB_IS_STRING( pItem ) )
+               {
+                  if( hb_itemStrCmp( pItem, pValue, bExact ) == 0 )
+                  {
+                     return ulStart + 1;
+                  }
+               }
+               else if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue )
+               {
+                  return ulStart + 1;
+               }
             }
          }
       }
@@ -964,20 +985,17 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       }
       else if( HB_IS_NUMERIC( pValue ) )
       {
-         NumericContext:
+         double dValue = hb_itemGetND( pValue );
+
+         for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
          {
-            double dValue = hb_itemGetND( pValue );
+            PHB_ITEM pItem = pItems + ulStart;
 
-            for( ulStart--; ulCount > 0; ulCount--, ulStart++ )
+            HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %d", pItem, dValue ) );
+
+            if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue && ( bAllowChar || ! HB_IS_STRING( pItem ) ) )
             {
-               PHB_ITEM pItem = pItems + ulStart;
-
-               HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %d", pItem, dValue ) );
-
-               if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue )
-               {
-                  return ulStart + 1;
-               }
+               return ulStart + 1;
             }
          }
       }
