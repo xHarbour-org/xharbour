@@ -1,5 +1,5 @@
 /*
- * $Id: ttable.prg,v 1.4 2003/07/24 11:02:19 toninhofwi Exp $
+ * $Id: ttable.prg,v 1.6 2005/04/22 21:30:00 ptsarenko Exp $
  */
 
 /*
@@ -69,6 +69,7 @@
 #include "common.ch"
 #include "inkey.ch"
 #include "dbinfo.ch"
+#include "error.ch"
 #define COMPILE(c) &("{||" + c + "}")
 
 //request DBFCDX
@@ -782,7 +783,10 @@ CLASS HBTable
    METHOD AddField( f, t, l, d )
    METHOD Gentable()
 
+   ERROR HANDLER OnError()
+
 ENDCLASS
+
 
    //---------------------
    //  Constructor...
@@ -1470,6 +1474,39 @@ PROCEDURE Gentable() CLASS HBTable
 
    DBCREATE( ::cDbf, ::aStruc, ::Driver )
 RETURN 
+
+
+METHOD OnError( uParam ) CLASS HBTable
+
+   LOCAL cMsg := __GetMessage()
+   LOCAL nPos
+   LOCAL uRet, oErr
+
+   if uParam <> nil .and. LEFT( cMsg, 1 ) == '_'
+      cMsg := SubStr( cMsg, 2 )
+   endif
+   nPos := (::Alias)->( FieldPos(cMsg) )
+
+   if nPos <> 0
+      uRet := (::Alias)->( if(uParam == nil, FieldGet(nPos), FieldPut(nPos, uParam)) )
+   else
+
+      oErr := ErrorNew()
+      oErr:Args          := { Self, cMsg, uParam }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "Invalid class member"
+      oErr:GenCode       := EG_NOVARMETHOD
+      oErr:Operation     := "HBTable:" + cMsg
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := -1
+      oErr:SubSystem     := "HBTable"
+      uRet := Eval( ErrorBlock(), oErr )
+
+   endif
+
+   RETURN uRet
 
 
 CLASS HBOrder

@@ -1,6 +1,6 @@
 //NOTEST
 /*
- * $Id: tstprag.prg,v 1.4 2000/04/04 09:04:39 vszel Exp $
+ * $Id: tstprag.prg,v 1.1.1.2 2005/04/22 21:30:00 ptsarenko Exp $
  */
 
 #pragma TracePragmas=On
@@ -45,5 +45,9 @@ function Main()
 
 /* Pragmas with bad values will cause an error  */
 #pragma WarningLevel=8
+
+#pragma TEXTHIDDEN(1)
+? "This is a hidden text"
+#pragma TEXTHIDDEN(0)
 
 return nil
