@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.195 2005/04/18 19:26:53 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.196 2005/04/21 19:46:38 druzus Exp $
  */
 
 /*
@@ -5018,13 +5018,13 @@ static USHORT hb_cdxGetTagNumber( CDXAREAP pArea, LPCDXTAG pFindTag )
 {
    USHORT uiTag = 0;
    LPCDXTAG pTag = NULL;
-   LPCDXINDEX pCdx = pArea->lpIndexes;
+   LPCDXINDEX pIndex = pArea->lpIndexes;
 
    if ( pFindTag )
    {
-      while ( pCdx && ( pTag != pFindTag ) )
+      while ( pIndex && ( pTag != pFindTag ) )
       {
-         pTag = pCdx->TagList;
+         pTag = pIndex->TagList;
          while ( pTag )
          {
             uiTag++;
@@ -5032,7 +5032,7 @@ static USHORT hb_cdxGetTagNumber( CDXAREAP pArea, LPCDXTAG pFindTag )
                break;
             pTag = pTag->pNext;
          }
-         pCdx = pCdx->pNext;
+         pIndex = pIndex->pNext;
       }
       if ( !pTag )
          uiTag = 0;
@@ -5047,23 +5047,47 @@ static LPCDXTAG hb_cdxFindTag( CDXAREAP pArea, PHB_ITEM pTagItem,
                                PHB_ITEM pBagItem, USHORT *puiTag )
 {
    LPCDXTAG pTag = NULL;
-   USHORT uiTag = 0, uiFind = 0;
+   USHORT uiTag = 0, uiFind = 0, uiBag = 0;
+   ULONG ulLen;
    LPCDXINDEX pIndex;
    char szName[ CDX_MAXTAGNAMELEN + 1 ];
    BOOL fBag;
 
+   fBag = hb_itemGetCLen( pBagItem ) > 0;
+
+#if defined( HB_SIXCDX )
+   if ( !fBag )
+      uiBag = hb_itemGetNI( pBagItem );
+   else if ( !pTagItem )
+      pTagItem = pBagItem;
+#endif
+
+   ulLen = hb_itemGetCLen( pTagItem );
    szName[ 0 ] = '\0';
-   if ( HB_IS_STRING( pTagItem ) )
+   if ( ulLen > 0 )
    {
-      hb_strncpyUpperTrim( szName, pTagItem->item.asString.value,
-                  HB_MIN( pTagItem->item.asString.length, CDX_MAXTAGNAMELEN ) );
+      hb_strncpyUpperTrim( szName, hb_itemGetCPtr( pTagItem ),
+                           HB_MIN( ulLen, CDX_MAXTAGNAMELEN ) );
    }
-   else if ( HB_IS_NUMERIC( pTagItem ) )
+   else
    {
       uiFind = hb_itemGetNI( pTagItem );
+#if !defined( HB_SIXCDX )
+      fBag = FALSE;
+#endif
    }
-   fBag = hb_itemGetCLen( pBagItem ) > 0;
-   pIndex = fBag ? hb_cdxFindBag( pArea, hb_itemGetCPtr( pBagItem ) ) : pArea->lpIndexes;
+
+   if ( uiBag > 0 )
+   {
+      fBag = TRUE;
+      pIndex = pArea->lpIndexes;
+      while ( pIndex && --uiBag )
+         pIndex = pIndex->pNext;
+   }
+   else
+   {
+      pIndex = fBag ? hb_cdxFindBag( pArea, hb_itemGetCPtr( pBagItem ) ) : pArea->lpIndexes;
+   }
 
    if ( pIndex && ( uiFind != 0 || szName[ 0 ] ) )
    {
@@ -5084,7 +5108,16 @@ static LPCDXTAG hb_cdxFindTag( CDXAREAP pArea, PHB_ITEM pTagItem,
    }
 
    if ( puiTag )
-      *puiTag = pTag ? uiTag : 0;
+   {
+      if ( !pTag )
+         *puiTag = 0;
+#if !defined( HB_SIXCDX )
+      else if ( fBag )
+         *puiTag = hb_cdxGetTagNumber( pArea, pTag );
+#endif
+      else         
+         *puiTag = uiTag;
+   }
 
    return pTag;
 }
@@ -6893,9 +6926,15 @@ static ERRCODE hb_cdxOrderListFocus( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
    if ( pTag )
       pOrderInfo->itmResult = hb_itemPutC( pOrderInfo->itmResult, pTag->szName );
 
+#if defined( HB_SIXCDX )
+   if ( pOrderInfo->itmOrder || pOrderInfo->atomBagName )
+#else
    if ( pOrderInfo->itmOrder )
+#endif
+   {
       hb_cdxFindTag( pArea, pOrderInfo->itmOrder, pOrderInfo->atomBagName, &(pArea->uiTag) );
       /* TODO: RTerror if not found? */
+   }
 
    return SUCCESS;
 }
@@ -7282,7 +7321,11 @@ static ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
    if ( ! pArea->lpIndexes )
       return SUCCESS;
 
+#if defined( HB_SIXCDX )
+   if ( pOrderInfo->itmOrder || pOrderInfo->atomBagName )
+#else
    if ( pOrderInfo->itmOrder )
+#endif
    {
       pTag = hb_cdxFindTag( pArea, pOrderInfo->itmOrder, pOrderInfo->atomBagName, NULL );
       if ( pTag )
@@ -7398,8 +7441,14 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
+#if defined( HB_SIXCDX )
+   if ( pOrderInfo->itmOrder || pOrderInfo->atomBagName )
+#else
    if ( pOrderInfo->itmOrder )
+#endif
+   {
       pTag = hb_cdxFindTag( pArea, pOrderInfo->itmOrder, pOrderInfo->atomBagName, &uiTag );
+   }
    else
    {
       uiTag = pArea->uiTag;
@@ -8522,6 +8571,7 @@ static void hb_cdxTagEmptyIndex( LPCDXTAG pTag )
 static void hb_cdxTagDoIndex( LPCDXTAG pTag )
 {
    LPCDXAREA pArea = pTag->pIndex->pArea;
+   ULONG ulRecCount;
 #ifndef HB_CDP_SUPPORT_OFF
    /* TODO: this hack is not thread safe, hb_cdp_page has to be thread specific */
    PHB_CODEPAGE cdpTmp = hb_cdp_page;
@@ -8532,27 +8582,27 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
    {
       hb_cdxTagEmptyIndex( pTag );
    }
-   else
+   else if ( SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount ) != FAILURE )
    {
       LPCDXSORTINFO pSort;
-      PHB_ITEM pForItem, pWhileItem, pEvalItem, pItem;
-      USHORT uiSaveTag = pArea->uiTag;
-      ULONG ulStartRec = 0, ulNextCount = 0,
-            ulRecNo, ulRecCount;
+      PHB_ITEM pForItem, pWhileItem = NULL, pEvalItem = NULL, pItem = NULL;
+      USHORT uiSaveTag = pArea->uiTag, uiTag;
+      ULONG ulStartRec = 0, ulNextCount = 0, ulRecNo;
       BOOL fDirectRead, fUseFilert = FALSE;
-      LONG lStep;
+      LONG lStep = 0;
       BYTE * pSaveRecBuff = pArea->pRecord, cTemp[8];
       int iRecBuff = 0, iRecBufSize = USHRT_MAX / pArea->uiRecordLen, iRec;
 
-      if ( pTag->nField )
-         pItem = hb_itemNew( NULL );
-      else
-         pItem = NULL;
-      SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount );
       pArea->pSort = pSort = hb_cdxSortNew( pTag, ulRecCount );
       pForItem = pTag->pForItem;
-      pEvalItem = ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->itmCobEval : NULL);
-      pWhileItem = ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->itmCobWhile : NULL);
+      if ( pArea->lpdbOrdCondInfo )
+      {
+         pEvalItem = pArea->lpdbOrdCondInfo->itmCobEval;
+         pWhileItem = pArea->lpdbOrdCondInfo->itmCobWhile;
+         lStep = pArea->lpdbOrdCondInfo->lStep;
+      }
+      if ( pTag->nField )
+         pItem = hb_itemNew( NULL );
 
       if ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll )
       {
@@ -8577,14 +8627,15 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
          pArea->uiTag = 0;
       }
 
+      uiTag = pArea->uiTag;
       fDirectRead = !hb_set.HB_SET_STRICTREAD && !pArea->lpdbRelations &&
                     ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll ||
-                      pArea->uiTag == 0 ) && pSort;
+                      uiTag == 0 ) && pSort;
 
       if ( fDirectRead )
          pSort->pRecBuff = (BYTE *) hb_xgrab( pArea->uiRecordLen * iRecBufSize );
 
-      if ( ulStartRec == 0 && pArea->uiTag == 0 )
+      if ( ulStartRec == 0 && uiTag == 0 )
          ulStartRec = 1;
 
       if ( ulStartRec == 0 )
@@ -8598,7 +8649,6 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
             SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
       }
 
-      lStep = pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->lStep : 0;
       ulRecNo = pArea->ulRecNo;
 
       if ( ulNextCount && ulRecCount >= ulRecNo + ulNextCount )
@@ -8705,17 +8755,20 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
 
          if( ulNextCount > 0 )
          {
-            if ( --ulNextCount == 0 )
+            if( --ulNextCount == 0 )
                break;
          }
 
-         if ( fDirectRead )
+         if( fDirectRead )
             ulRecNo++;
-         else if ( SELF_SKIPRAW( ( AREAP ) pArea, 1 ) == FAILURE ||
-                    ( fUseFilert  &&
-                      SELF_SKIPFILTER( ( AREAP ) pArea, 1 ) == FAILURE ) )
-            break;
-
+         else
+         {
+            if( SELF_SKIPRAW( ( AREAP ) pArea, 1 ) == FAILURE )
+               break;
+            if( fUseFilert && SELF_SKIPFILTER( ( AREAP ) pArea, 1 ) == FAILURE )
+               break;
+            ulRecNo = pArea->ulRecNo;
+         }
       } while ( TRUE );
 
       if ( pSort )
@@ -8729,6 +8782,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
       }
       if ( pTag->nField )
          hb_itemRelease( pItem );
+
       if ( fDirectRead )
       {
          pArea->pRecord = pSaveRecBuff;

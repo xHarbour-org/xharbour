@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.148 2005/04/14 04:41:09 andijahja Exp $
+ * $Id: dbcmd.c,v 1.149 2005/04/14 05:58:35 ronpinkas Exp $
  */
 
 /*
@@ -1435,30 +1435,6 @@ HB_FUNC( DBCOMMITALL )
    hb_rddSelectWorkAreaNumber( uiArea );
 }
 
-HB_FUNC( __DBCONTINUE )
-{
-   HB_THREAD_STUB
-   AREAP pArea = HB_CURRENT_WA;
-
-   if( !pArea )
-   {
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBCONTINUE" );
-      return;
-   }
-
-   if( !pArea->dbsi.itmCobFor )
-      return;
-
-   pArea->fFound = FALSE;
-   while( !pArea->fFound )
-   {
-      SELF_SKIP( pArea, 1 );
-      if( pArea->fEof )
-         return;
-      pArea->fFound = hb_itemGetL( hb_vmEvalBlock( pArea->dbsi.itmCobFor ) );
-   }
-}
-
 HB_FUNC( DBCREATE )
 {
    HB_THREAD_STUB
@@ -1777,10 +1753,10 @@ HB_FUNC( DBGOTOP )
 HB_FUNC( __DBLOCATE )
 {
    HB_THREAD_STUB
-   PHB_ITEM pFor, pNewFor, pWhile, pNext, pRecord, pRest, pNewRest;
    DBSCOPEINFO pScopeInfo;
-   ULONG lNext;
-   BOOL bFor, bWhile;
+   PHB_ITEM pFor, pWhile, pNext, pRecord, pRest;
+   LONG lNext = 1;
+   BOOL fEof;
    AREAP pArea = HB_CURRENT_WA;
 
    if( !pArea )
@@ -1790,284 +1766,54 @@ HB_FUNC( __DBLOCATE )
    }
 
    pArea->fFound = FALSE;
-   memset( &pScopeInfo, 0, sizeof( DBSCOPEINFO ) );
    pFor     = hb_param( 1, HB_IT_BLOCK );
    pWhile   = hb_param( 2, HB_IT_BLOCK );
    pNext    = hb_param( 3, HB_IT_NUMERIC );
    pRecord  = hb_param( 4, HB_IT_NUMERIC );
    pRest    = hb_param( 5, HB_IT_LOGICAL );
-   pNewRest = NULL;
 
-   if( pWhile )
-   {
-      pNewRest = hb_itemPutL( pNewRest, TRUE );
-      pScopeInfo.fRest = pNewRest;
-   }
+   memset( &pScopeInfo, 0, sizeof( DBSCOPEINFO ) );
+   pScopeInfo.itmCobFor = pFor;
 
-   if( !pFor )
-   {
-      pNewFor = hb_itemPutL( NULL, TRUE );
-   }
-   else
-   {
-      pNewFor = hb_itemNew( pFor );
-   }
-
-   pScopeInfo.itmCobFor = pNewFor;
-
-   if( !pRest )
-   {
-      pNewRest = hb_itemPutL( pNewRest, FALSE );
-      pScopeInfo.fRest = pNewRest;
-   }
-
-   SELF_SETLOCATE( pArea, &pScopeInfo );
-   pArea->fFound = FALSE;
+   if ( SELF_SETLOCATE( pArea, &pScopeInfo ) == FAILURE )
+      return;
 
    if( pRecord )
    {
-      SELF_GOTOID( pArea, pRecord );
-
-      if( pArea->fEof )
-      {
-         goto ExitLocate ;
-      }
-
-      if( hb_itemType( pWhile ) == HB_IT_BLOCK )
-      {
-         bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
-      }
-      else
-      {
-         bWhile = TRUE;
-      }
-
-      if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
-      {
-         bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
-         pArea->fFound = ( bWhile && bFor );
-      }
-      else
-      {
-         pArea->fFound = ( bWhile && hb_itemGetL( pNewFor ) );
-      }
-   }
-   else if( pWhile )
-   {
-      if( hb_itemType( pWhile ) == HB_IT_BLOCK )
-      {
-         bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
-      }
-      else
-      {
-         bWhile = TRUE;
-      }
-
-      if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
-      {
-         bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
-      }
-      else
-      {
-         bFor = hb_itemGetL( pNewFor );
-      }
-
-      if( pNext )
-         lNext = hb_parnl( 3 );
-      else
-         lNext = 0xffffffffu;  /* maxed out */
-
-      while( !pArea->fEof && lNext-- != 0 && bWhile && !bFor )
-      {
-         SELF_SKIP( pArea, 1 );
-
-         if( pArea->fEof )
-         {
-            bFor = FALSE;
-         }
-         else
-         {
-            if( hb_itemType( pWhile ) == HB_IT_BLOCK )
-            {
-               bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
-            }
-            else
-            {
-               bWhile = TRUE;
-            }
-
-            if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
-            {
-               bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
-            }
-            else
-            {
-               bFor = hb_itemGetL( pNewFor );
-            }
-         }
-      }
-      pArea->fFound = bFor;
+      if( SELF_GOTOID( pArea, pRecord ) == FAILURE )
+         return;
    }
    else if( pNext )
    {
-      lNext = hb_parnl( 3 );
-
-      if( pArea->fEof || lNext <= 0 )
-      {
-         goto ExitLocate ;
-      }
-
-      if( hb_itemType( pWhile ) == HB_IT_BLOCK )
-      {
-         bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
-      }
-      else
-      {
-         bWhile = TRUE;
-      }
-
-      if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
-      {
-         bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
-      }
-      else
-      {
-         bFor = hb_itemGetL( pNewFor );
-      }
-
-      while( !pArea->fEof && lNext-- > 0 && bWhile && !bFor )
-      {
-         SELF_SKIP( pArea, 1 );
-
-         if( pArea->fEof  )
-         {
-            bFor = FALSE;
-         }
-         else
-         {
-            if( hb_itemType( pWhile ) == HB_IT_BLOCK )
-            {
-               bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
-            }
-            else
-            {
-               bWhile = TRUE;
-            }
-
-            if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
-            {
-               bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
-            }
-            else
-            {
-               bFor = hb_itemGetL( pNewFor );
-            }
-         }
-      }
-      pArea->fFound = bFor;
+      lNext = 1;
    }
-   else if( hb_itemGetL( pRest ) )
+   else if( !pWhile && !hb_itemGetL( pRest ) )
    {
-      if( pArea->fEof )
-      {
-         goto ExitLocate ;
-      }
-      if( hb_itemType( pWhile ) == HB_IT_BLOCK )
-      {
-         bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
-      }
-      else
-      {
-         bWhile = TRUE;
-      }
-
-      if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
-      {
-         bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
-      }
-      else
-      {
-         bFor = hb_itemGetL( pNewFor );
-      }
-
-      while( !pArea->fEof && bWhile && !bFor )
-      {
-         SELF_SKIP( pArea, 1 );
-
-         if( pArea->fEof  )
-         {
-            bFor = FALSE;
-         }
-         else
-         {
-            if( hb_itemType( pWhile ) == HB_IT_BLOCK )
-            {
-               bWhile = hb_itemGetL( hb_vmEvalBlock( pWhile ) );
-            }
-            else
-            {
-               bWhile = TRUE;
-            }
-
-            if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
-            {
-               bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
-            }
-            else
-            {
-               bFor = hb_itemGetL( pNewFor );
-            }
-         }
-      }
-
-      pArea->fFound = bFor;
+      if( SELF_GOTOP( pArea ) == FAILURE )
+         return;
    }
-   else
+
+   if( !pNext || lNext > 0 )
    {
-      SELF_GOTOP( pArea );
+      if ( SELF_EOF( pArea, &fEof ) == FAILURE )
+         return;
 
-      if( pArea->fEof )
+      while( !fEof )
       {
-         goto ExitLocate ;
-      }
-
-      if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
-      {
-         bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
-      }
-      else
-      {
-         bFor = hb_itemGetL( pNewFor );
-      }
-
-      while( !pArea->fEof && !bFor )
-      {
-         SELF_SKIP( pArea, 1 );
-
-         if( pArea->fEof )
+         if( pWhile && ! hb_itemGetL( hb_vmEvalBlock( pWhile ) ) )
+            break;
+         if( !pFor || hb_itemGetL( hb_vmEvalBlock( pFor ) ) )
          {
-            bFor = FALSE;
+            pArea->fFound = TRUE;
+            break;
          }
-         else
-         {
-            if( hb_itemType( pNewFor ) == HB_IT_BLOCK )
-            {
-               bFor = hb_itemGetL( hb_vmEvalBlock( pNewFor ) );
-            }
-            else
-            {
-               bFor = hb_itemGetL( pNewFor );
-            }
-         }
+         if( pRecord || ( pNext && --lNext < 1 ) )
+            break;
+         if( SELF_SKIP( pArea, 1 ) == FAILURE )
+            break;
       }
-
-      pArea->fFound = bFor;
    }
-
-ExitLocate :
-   /* Release items */
-   hb_itemRelease( pNewFor );
-   hb_itemRelease( pNewRest );
+   return;
 }
 
 HB_FUNC( __DBSETLOCATE )
@@ -2086,6 +1832,31 @@ HB_FUNC( __DBSETLOCATE )
          pScopeInfo.itmCobFor = pLocate;
          SELF_SETLOCATE( pArea, &pScopeInfo );
       }
+   }
+}
+
+HB_FUNC( __DBCONTINUE )
+{
+   HB_THREAD_STUB
+   AREAP pArea = HB_CURRENT_WA;
+
+   if( !pArea )
+   {
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBCONTINUE" );
+      return;
+   }
+
+   if( !pArea->dbsi.itmCobFor )
+      return;
+
+   pArea->fFound = FALSE;
+   while( !pArea->fFound )
+   {
+      if ( SELF_SKIP( pArea, 1 ) == FAILURE )
+         return;
+      if( pArea->fEof )
+         return;
+      pArea->fFound = hb_itemGetL( hb_vmEvalBlock( pArea->dbsi.itmCobFor ) );
    }
 }
 

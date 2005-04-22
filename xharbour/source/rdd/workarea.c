@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.39 2005/04/16 00:47:08 druzus Exp $
+ * $Id: workarea.c,v 1.40 2005/04/16 00:48:45 druzus Exp $
  */
 
 /*
@@ -744,62 +744,49 @@ ERRCODE hb_waSysName( AREAP pArea, BYTE * pBuffer )
  */
 ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
 {
-   BOOL bFor, bWhile;
-   LONG lNext;
+   LONG lNext = 1;
+   BOOL fEof;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waEval(%p, %p)", pArea, pEvalInfo));
 
-   lNext = 0;
    if( pEvalInfo->dbsci.itmRecID )
    {
-      SELF_GOTO( pArea, hb_itemGetNL( pEvalInfo->dbsci.itmRecID ) );
-      if( !pArea->fEof )
-      {
-         if( pEvalInfo->dbsci.itmCobWhile )
-            bWhile = hb_itemGetL( hb_vmEvalBlock( pEvalInfo->dbsci.itmCobWhile ) );
-         else
-            bWhile = TRUE;
-
-         if( pEvalInfo->dbsci.itmCobFor )
-            bFor = hb_itemGetL( hb_vmEvalBlock( pEvalInfo->dbsci.itmCobFor ) );
-         else
-            bFor = TRUE;
-
-         if( bWhile && bFor )
-            hb_vmEvalBlock( pEvalInfo->itmBlock );
-      }
-      return SUCCESS;
+      if( SELF_GOTOID( pArea, pEvalInfo->dbsci.itmRecID ) == FAILURE )
+         return FAILURE;
    }
-
-   if( !pEvalInfo->dbsci.itmCobWhile &&
-         (!pEvalInfo->dbsci.fRest || !hb_itemGetL( pEvalInfo->dbsci.fRest ) ) &&
-         !pEvalInfo->dbsci.lNext )
-      SELF_GOTOP( pArea );
-
-   if( pEvalInfo->dbsci.lNext )
+   else if( pEvalInfo->dbsci.lNext )
+   {
       lNext = hb_itemGetNL( pEvalInfo->dbsci.lNext );
+   }
+   else if( !pEvalInfo->dbsci.itmCobWhile &&
+            !hb_itemGetL( pEvalInfo->dbsci.fRest ) )
+   {
+      if( SELF_GOTOP( pArea ) == FAILURE )
+         return FAILURE;
+   }
 
    if( !pEvalInfo->dbsci.lNext || lNext > 0 )
    {
-      bFor = TRUE;
-      while( !pArea->fEof )
+      if ( SELF_EOF( pArea, &fEof ) == FAILURE )
+         return FAILURE;
+
+      while( !fEof )
       {
-         if( pEvalInfo->dbsci.itmCobWhile )
-         {
-            if ( ! hb_itemGetL( hb_vmEvalBlock( pEvalInfo->dbsci.itmCobWhile ) ) )
-               break;
-         }
-
-         if( pEvalInfo->dbsci.itmCobFor )
-            bFor = hb_itemGetL( hb_vmEvalBlock( pEvalInfo->dbsci.itmCobFor ) );
-
-         if( bFor )
-            hb_vmEvalBlock( pEvalInfo->itmBlock );
-
-         if( pEvalInfo->dbsci.lNext && --lNext < 1 )
+         if( pEvalInfo->dbsci.itmCobWhile &&
+             ! hb_itemGetL( hb_vmEvalBlock( pEvalInfo->dbsci.itmCobWhile ) ) )
             break;
 
-         SELF_SKIP( pArea, 1 );
+         if( ! pEvalInfo->dbsci.itmCobFor ||
+             hb_itemGetL( hb_vmEvalBlock( pEvalInfo->dbsci.itmCobFor ) ) )
+            hb_vmEvalBlock( pEvalInfo->itmBlock );
+
+         if( pEvalInfo->dbsci.itmRecID || ( pEvalInfo->dbsci.lNext && --lNext < 1 ) )
+            break;
+
+         if( SELF_SKIP( pArea, 1 ) == FAILURE )
+            return FAILURE;
+         if ( SELF_EOF( pArea, &fEof ) == FAILURE )
+            return FAILURE;
       }
    }
 
@@ -1254,15 +1241,14 @@ ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waEvalBlock(%p, %p)", pArea, pBlock));
 
-   if( ! pArea->valResult )
-      pArea->valResult = hb_itemNew( NULL );
-
    iCurrArea = hb_rddGetCurrentWorkAreaNumber();
    if ( iCurrArea != pArea->uiArea )
       hb_rddSelectWorkAreaNumber( pArea->uiArea );
    else
       iCurrArea = 0;
 
+   if( ! pArea->valResult )
+      pArea->valResult = hb_itemNew( NULL );
    hb_itemCopy( pArea->valResult, hb_vmEvalBlockOrMacro( pBlock ) );
 
    if ( iCurrArea )

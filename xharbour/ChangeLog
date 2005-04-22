@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4057 2005/04/21 22:53:44 guerra000 Exp $
+ * $Id: ChangeLog,v 1.4058 2005/04/21 23:23:55 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-22 06:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    + the order/tag selection is SIX compatible when compiled in
+      SIXCDX and COMIX compatible in DBFCDX
+
+  * xharbour/source/rdd/dbcmd.c
+    ! fixed recently reported problem in __DBLOCATE and some others
+      I've found. I cut 80% percent of code from this function - I hope
+      that I haven't introduced new ones.
+
+  * xharbour/source/rdd/workarea.c
+    * simplified hb_waEval() method
 
 2005-04-21 16:23 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/harbinit.prg
