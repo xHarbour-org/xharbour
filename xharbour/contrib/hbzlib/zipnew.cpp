@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.22 2004/07/27 02:29:08 lculik Exp $
+ * $Id: zipnew.cpp,v 1.23 2005/03/18 22:35:30 andijahja Exp $
  */
 
 /*
@@ -475,10 +475,18 @@ int hb___GetNumberofFilestoUnzip( char *szFile )
    SpanCallback span;
 
    szZip.SetSpanCallback( &span );
-
+   try {
    szZip.Open( szFile, pZipI.iReadOnly ? CZipArchive::zipOpenReadOnly : CZipArchive::zipOpen, 0 );
    iNumberOfFiles = szZip.GetCount( );
    szZip.Close( );
+   }
+   catch ( CZipException &e )
+   {
+      if ( e.m_iCause == CZipException::badZipFile  || e.m_iCause == CZipException::cdirNotFound )
+      {
+      iNumberOfFiles = -1;
+      }
+   }
 
    return iNumberOfFiles;
 }
@@ -677,7 +685,11 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
                }
             }
 
-            catch ( CZipException )   {}
+            catch ( CZipException&  e )
+            {
+                  szZip.CloseFile( NULL, true);
+/*            szZip.CloseNewFile(true);*/
+            }
 
             if ( bChange )
             {
@@ -861,7 +873,10 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
                }
             }
 
-            catch ( CZipException )   {}
+            catch ( CZipException&  e )
+            {
+                  szZip.CloseFile( NULL, true);
+            }
          }
       }
    }
@@ -1098,10 +1113,11 @@ BOOL bChange=FALSE;
             }
             
         }
-    catch (CZipException &e)
-	{
-      iCause=e.m_iCause       ;
-	}
+        catch ( CZipException&  e )
+        {
+           szZip.CloseFile( NULL, true);
+           iCause=e.m_iCause       ;
+        }
         if(bChange) {
         bChange=FALSE;
 //        szPath=NULL;

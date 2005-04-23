@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.39 2004/05/26 10:34:35 lculik Exp $
+ * $Id: zip.c,v 1.40 2004/07/27 02:29:08 lculik Exp $
  */
 
 /*
@@ -101,7 +101,7 @@ static void ResetAttribs()
    hb_itemClear( &FileToZip );
 }
 
-static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption )
+static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption)
 {
    int ul;
    char * szEntry;
@@ -125,6 +125,27 @@ static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption
          bOkAdd = hb_strMatchRegExp( (const char *) szEntry, (const char *) sRegEx );
       }
 
+      if ( !bOkAdd )      
+      {
+         PHB_FNAME pFileName = hb_fsFNameSplit( szEntry );
+
+         if( pFileName->szName )
+         {
+            char *szFile = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );
+            pFileName->szPath = "";
+            hb_fsFNameMerge( szFile, pFileName );
+            bOkAdd =  ( hb_stricmp(szSkleton,szFile) ==0  ? 1 : 0 );
+            hb_xfree(szFile);
+            if ( !bOkAdd )
+            {
+               bOkAdd =  ( hb_stricmp(szSkleton,szEntry ) ==0  ? 1 : 0 );
+            }
+
+         }
+         hb_xfree( pFileName );         
+      }
+
+
       if ( bOkAdd )
       {
          if ( uiOption == 1 )
@@ -136,6 +157,9 @@ static void UnzipCreateArray( char *szZipFileName, char *szSkleton, int uiOption
             hb_arrayAddForward( &DelZip, hb_itemPutC( &Temp, szEntry ) );
          }
       }
+
+      
+
       hb_xfree( szEntry );
    }
 
