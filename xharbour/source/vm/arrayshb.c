@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.56 2005/04/21 22:53:51 guerra000 Exp $
+ * $Id: arrayshb.c,v 1.57 2005/04/22 18:36:08 guerra000 Exp $
  */
 
 /*
@@ -405,11 +405,12 @@ HB_FUNC( ASCAN )
 
    if( pArray && pValue )
    {
-      ULONG ulStart = hb_parnl( 3 );
-      ULONG ulCount = hb_parnl( 4 );
-      BOOL bExact   = hb_parl( 5 );
+      ULONG ulStart   = hb_parnl( 3 );
+      ULONG ulCount   = hb_parnl( 4 );
+      BOOL bExact     = hb_parl( 5 );
+      BOOL bAllowChar = hb_parl( 6 );
 
-      hb_retnl( hb_arrayScan( pArray, pValue, ISNUM( 3 ) ? &ulStart : NULL, ISNUM( 4 ) ? &ulCount : NULL, bExact ) );
+      hb_retnl( hb_arrayScan( pArray, pValue, ISNUM( 3 ) ? &ulStart : NULL, ISNUM( 4 ) ? &ulCount : NULL, bExact, bAllowChar ) );
    }
    else
    {
@@ -2072,8 +2073,6 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
          {
             PHB_ITEM pItem = pItems + ulStart;
 
-            HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %d", pItem, dValue ) );
-
             if( HB_IS_NUMERIC( pItem ) && hb_itemGetND( pItem ) == dValue && ( bAllowChar || ! HB_IS_STRING( pItem ) ) )
             {
                hb_retnl( ulStart + 1 );             // arrays start from 1
@@ -2112,8 +2111,6 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
          for( ulStart--; ulCount > 0; ulCount--, ulStart-- )
          {
             PHB_ITEM pItem = pItems + ulStart;
-
-            HB_TRACE( HB_TR_INFO, ( "hb_arrayScan() %p, %p", pItem, pValue->item.asArray.value ) );
 
             if( pItem->type == HB_IT_ARRAY && pItem->item.asArray.value == pValue->item.asArray.value )
             {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.160 2005/04/14 04:41:08 andijahja Exp $
+ * $Id: hbapi.h,v 1.161 2005/04/14 09:15:06 ronpinkas Exp $
  */
 
 /*
@@ -431,7 +431,7 @@ HB_EXPORT       extern char * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, cha
 extern LONG     HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date value contained in an array element, as a LONG integer */
 extern USHORT   HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the type of an array item */
 extern void     HB_EXPORT hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCount ); /* fill an array with a given item */
-extern ULONG    HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount, BOOL bExact ); /* scan an array for a given item, or until code-block item returns TRUE */
+extern ULONG    HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount, BOOL bExact, BOOL bAllowChar ); /* scan an array for a given item, or until code-block item returns TRUE */
 extern BOOL     HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * pulCount ); /* execute a code-block for every element of an array item */
 extern BOOL     HB_EXPORT hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pulStart, ULONG * pulCount, ULONG * pulTarget ); /* copy items from one array to another */
 extern PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pArray, PHB_NESTED_CLONED pClonedList ); /* returns a duplicate of an existing array, including all nested items */

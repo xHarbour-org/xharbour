@@ -1,5 +1,5 @@
 /*
- * $Id: pdfhbdoc.c,v 1.4 2001/04/12 18:24:40 dholm Exp $
+ * $Id: pdfhbdoc.c,v 1.1 2004/07/02 04:32:29 lculik Exp $
  */
 
 /*
@@ -325,7 +325,7 @@ HB_FUNC(HB_PDFBOOKMARK)
    PHB_ITEM pBlock = hb_param( 3, HB_IT_BLOCK );
 
    TempArray.type = HB_IT_NIL;
-   uiPos = hb_arrayScan( &pArray, pBlock, NULL, NULL, 0 );
+   uiPos = hb_arrayScan( &pArray, pBlock, NULL, NULL, 0, 0 );
 
    if ( uiPos > 0 )
    {

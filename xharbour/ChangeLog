@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4062 2005/04/22 21:30:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4062 2005/04/22 18:41:28 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-22 23:47 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * contrib/pdflib/pdfhbdoc.c
+  * include/hbapi.h
+  * source/vm/arrays.c
+  * source/vm/arrayshb.c
+  * source/vm/hash.c
+  * source/vm/hvm.c
+    + Added support for bAllowChar parameter in hb_arrayScan(), which
+      allows to manage single-byte strings as numbers in array scans.
+  * doc/en/hb_api.txt
+  * doc/en/array.txt
+  * doc/es/array.txt
+  * doc/hash.txt
+    + Added documentation for RASCAN and "bAllowChar" parameter.
+  * include/hbextern.ch
+  * utils/xbscript/xbscript.prg
+    + Added some RASCAN implicit calls.
 
 2005-04-22 21:30 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * source/rtl/ttable.prg

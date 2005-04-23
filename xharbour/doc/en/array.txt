@@ -1,5 +1,5 @@
 /*
- * $Id: array.txt,v 1.13 2000/06/20 02:21:06 lculik Exp $
+ * $Id: array.txt,v 1.1.1.1 2001/12/21 10:48:10 ronpinkas Exp $
  */
 
 /*
@@ -300,7 +300,7 @@
  *  $ONELINER$
  *      Scan array elements for a specified condition
  *  $SYNTAX$
- *      ASCAN( <aTarget>, <xSearch>, [<nStart>], [<nCount>] ) --> nStoppedAt
+ *      ASCAN( <aTarget>, <xSearch>, [<nStart>], [<nCount>], [<lExact>], [<lAllowChar>] ) --> nStoppedAt
  *  $ARGUMENTS$
  *      <aTarget>   Name of array to be scanned.
  *
@@ -309,6 +309,13 @@
  *      <nStart>    Beginning subscript position at which to start the search.
  *
  *      <nCount>    Number of elements to scan with <aTarget>.
+ *
+ *      <lExact>    If lExact is TRUE, it will scan for an exact matching
+ *                  string. If lExact if FALSE, the exact comparsion will
+ *                  depend of the SET EXACT condition.
+ *
+ *      <lAllowChar>   This flag indicates if single-byte strings can be
+ *                     considered as numeric values.
  *  $RETURNS$
  *      <nStoppedAt> A numeric value of subscript position where <xSearch>
  *      was found.
@@ -337,11 +344,11 @@
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
- *      This function is not CA-Clipper compatible. Clipper ASCAN() is affected by the SET EXACT ON/OFF Condition
+ *      This function has xHarbour extensions.
  *  $FILES$
  *      Library is vm
  *  $SEEALSO$
- *      AEVAL()
+ *      RASCAN(), AEVAL()
  *  $END$
  */
 
@@ -474,10 +481,12 @@
  *      original array <aSource>
  *  $EXAMPLES$
  *      LOCAL aOne, aTwo
- *      aOne := {"Harbour"," is ","POWER"}
- *      aTwo := ACLONE(aOne)       // Result: aTwo is {1, 2, 3}
- *      aOne[1] := "The Harbour Compiler"              // Result: aOne is {99, 2, 3}
- *                                 // aTwo is still {1, 2, 3}
+ *      aOne := {"xHarbour"," is ","POWER"}
+ *      aTwo := ACLONE(aOne)
+ *      // Result: aTwo is {"xHarbour"," is ","POWER"}
+ *      aOne[1] := "The xHarbour Compiler"
+ *      // Result: aOne is {"The xHarbour Compiler"," is ","POWER"}
+ *      //         aTwo is still {"xHarbour"," is ","POWER"}
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
@@ -549,5 +558,65 @@
  *      Library is vm
  *  $SEEALSO$
  *      ASCAN(),EVAL(),SORT
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      RASCAN()
+ *  $CATEGORY$
+ *      Array
+ *  $ONELINER$
+ *      Scan in reverse order array elements for a specified condition
+ *  $SYNTAX$
+ *      ASCAN( <aTarget>, <xSearch>, [<nStart>], [<nCount>], [<lExact>], [<lAllowChar>] ) --> nStoppedAt
+ *  $ARGUMENTS$
+ *      <aTarget>   Name of array to be scanned.
+ *
+ *      <xSearch>   Expression to search for in <aTarget>
+ *
+ *      <nStart>    Beginning subscript position at which to start the search.
+ *
+ *      <nCount>    Number of elements to scan with <aTarget>.
+ *
+ *      <lExact>    If lExact is TRUE, it will scan for an exact matching
+ *                  string. If lExact if FALSE, the exact comparsion will
+ *                  depend of the SET EXACT condition.
+ *
+ *      <lAllowChar>   This flag indicates if single-byte strings can be
+ *                     considered as numeric values.
+ *  $RETURNS$
+ *      <nStoppedAt> A numeric value of subscript position where <xSearch>
+ *      was found.
+ *  $DESCRIPTION$
+ *      This function scan the content of array named <aTarget> for the
+ *      value of <xSearch>, from the last to the first items of the array.
+ *      The return value is the position in the array <aTarget> in which
+ *      <xSearch> was found. If it was not found, the return value will be 0.
+ *
+ *      If specified, the beginning subscript position at which to start
+ *      scanning may be set with the value passed as <nStart>. The default
+ *      is the last item.
+ *
+ *      If specified, the number of array elements to scan may be set with
+ *      the value passed as <nCount>. The default is the number of elements
+ *      in the array <aTarget>.
+ *
+ *      If <xSearch> is a code block, the operation of the function is
+ *      slightly different. Each array subscript pointer reference is
+ *      passed to the code block to be evaluated. The scanning routine
+ *      will continue until the value obtained from the code block is a
+ *      logical true (.T.) or until the end of the array has been reached.
+ *  $EXAMPLES$
+ *      aDir:=Directory("*.prg")
+ *      AScan(aDir,,,{|x,y| x[1]="Test.prg"})
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is a xHarbour extension.
+ *  $FILES$
+ *      Library is vm
+ *  $SEEALSO$
+ *      ASCAN()
  *  $END$
  */

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.117 2005/03/31 04:02:20 druzus Exp $
+ * $Id: arrays.c,v 1.118 2005/04/22 18:36:09 guerra000 Exp $
  */
 
 /*
@@ -814,7 +814,7 @@ void HB_EXPORT hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, UL
    }
 }
 
-ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount, BOOL bExact )
+ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount, BOOL bExact, BOOL bAllowChar )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayScan(%p, %p, %p, %p)", pArray, pValue, pulStart, pulCount, bExact));
 
@@ -824,7 +824,6 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       ULONG ulLen;
       ULONG ulStart;
       ULONG ulCount;
-      BOOL bAllowChar = 0;  // TO DO! Receive it as parameter
 
       /* Select array type */
       if( pArray->type == HB_IT_ARRAY )
@@ -881,11 +880,11 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 
          ulStart -= ulTotal;
 
-         ulPos = hb_arrayScan( pItems, pValue, &ulStart, &ulCount, bExact );
+         ulPos = hb_arrayScan( pItems, pValue, &ulStart, &ulCount, bExact, bAllowChar );
 
          while( ulCount > pItems->item.asHash.value->ulTotalLen && ulPos == 0 )
          {
-            ulPos = hb_arrayScan( pItems, pValue, NULL, &ulCount, bExact );
+            ulPos = hb_arrayScan( pItems, pValue, NULL, &ulCount, bExact, bAllowChar );
             if ( ulPos == 0 )
             {
                ulCount -= pItems->item.asHash.value->ulTotalLen;
@@ -896,7 +895,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
 
          if ( ulPos == 0 )
          {
-            ulPos = hb_arrayScan( pItems, pValue, NULL, &ulCount, bExact );
+            ulPos = hb_arrayScan( pItems, pValue, NULL, &ulCount, bExact, bAllowChar );
          }
 
          return ulPos+ulTotal;

@@ -1,5 +1,5 @@
 /*
- * $Id: hb_api.txt,v 1.4 2001/04/01 13:40:49 april Exp $
+ * $Id: hb_api.txt,v 1.1.1.1 2001/12/21 10:48:25 ronpinkas Exp $
  */
 
 /*
@@ -2461,16 +2461,30 @@
  *      C Prototype
  *
  *      #include <hbapi.h>
- *      hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount ) --> ( ULONG )ulResult
+ *      hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG *
+pulCount, BOOL bExact, BOOL bAllowChar ) --> ( ULONG )ulResult
  *  $ARGUMENTS$
- *      <pArray>
+ *      <pArray>       Array to scan
  *
- *      <pValue>
+ *      <pValue>       Value to search for.
  *
- *      <pulStart>
+ *      <pulStart>     Pointer to a ULONG number, which represents the number
+ *                     of item for start to scan. If pulStart is NULL,
+ *                     hb_arrayScan will start from the first item.
  *
- *      <pulCount>
+ *      <pulCount>     Pointer to a ULONG number, which represents the number
+ *                     of items to scan. If pulCount is NULL, hb_arrayScan
+ *                     will scan from pulStart to the end of the array.
+ *
+ *      <bExact>       If bExact is TRUE, it will scan for an exact matching
+ *                     string. If bExact if FALSE, the exact comparsion will
+ *                     depend of the hb_set.HB_SET_EXACT value.
+ *
+ *      <bAllowChar>   This flag indicates if single-byte strings can be
+ *                     considered as numeric values.
  *  $RETURNS$
+ *      The number of item on the array where pValue was found (array items
+ *      starts to count from 1). If not found, returns 0.
  *
  *  $DESCRIPTION$
  *

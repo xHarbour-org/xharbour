@@ -1,5 +1,5 @@
 /*
- * $Id: hbextern.ch,v 1.11 2004/01/29 14:26:00 likewolf Exp $
+ * $Id: hbextern.ch,v 1.12 2004/08/24 08:32:38 ronpinkas Exp $
  */
 
 /*
@@ -265,6 +265,7 @@ EXTERNAL PROW
 EXTERNAL QOUT
 EXTERNAL QQOUT
 EXTERNAL RANGECHECK /* Undocumented but always required */
+EXTERNAL RASCAN
 EXTERNAL RAT
 EXTERNAL RDDLIST
 EXTERNAL RDDNAME

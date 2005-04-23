@@ -1,5 +1,5 @@
 /*
- * $Id: array.txt,v 1.2 2001/07/30 13:39:30 ckedem Exp $
+ * $Id: array.txt,v 1.1.1.1 2001/12/21 10:49:20 ronpinkas Exp $
  */
 
 /*
@@ -361,7 +361,8 @@
  *      Busca en un array por un valor o hasta que el block devuelva .T.
  *  $SYNTAX$
  *      ASCAN( <aDestino>, <xBuscar>,
- *             [<nInicio>], [<nContador>] ) --> nParadoEn
+ *             [<nInicio>], [<nContador>],
+ *             [<lExacto>], [<lAceptarCaract>] ) --> nParadoEn
  *  $ARGUMENTS$
  *      <aDestino> es el nombre del array a examinar
  *
@@ -370,6 +371,15 @@
  *      <nInicio> es la posición a la cual comenzar la búsqueda
  *
  *      <nContador> es el número de elementos a examinar
+ *
+ *      <lExacto> Si <lExacto> es VERDADERO, ASCAN buscará for una cadena
+ *                de caracteres que sea exactamente igual. Si <lExacto> es
+ *                FALSO, la comparación de cadenas de caracteres dependerá
+ *                del estado de SET EXACT.
+ *
+ *      <lAceptarCaract>  Esta bandera indica si las cadenas de sólo un 
+ *                        caracter pueden ser consideradas como valores
+ *                        numéricos.
  *  $RETURNS$
  *      ASCAN() retorna un valor numérico <nParadoEn>, de la posición donde
  *      <xBuscar> fué encontrada.
@@ -403,13 +413,12 @@
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
- *      Esta función no es compatible con CA-Clipper . La función ASCAN() de
- *      Clipper es afectada por la condición  SET EXACT ON/OFF
+ *      Esta función contiene extensiones de xHarbour.
  *  $FILES$
  *      El código fuente está en arrays.c
  *      La librería asociada es vm
  *  $SEEALSO$
- *      AEVAL(), EVAL()
+ *      RASCAN(), AEVAL()
  *  $END$
  */
 
@@ -654,5 +663,78 @@
  *      La librería asociada es vm
  *  $SEEALSO$
  *      ASCAN(),EVAL(),SORT
+ *  $END$
+ */
+
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      RASCAN()
+ *  $CATEGORY$
+ *      ARRAY
+ *  $ONELINER$
+ *      Busca en un array en órden por un valor o hasta que el codeblock
+ *      devuelva .T.
+ *  $SYNTAX$
+ *      RASCAN( <aDestino>, <xBuscar>,
+ *              [<nInicio>], [<nContador>],
+ *              [<lExacto>], [<lAceptarCaract>] ) --> nParadoEn
+ *  $ARGUMENTS$
+ *      <aDestino> es el nombre del array a examinar
+ *
+ *      <xBuscar> es la expresión a encontrar en <aDestino>
+ *
+ *      <nInicio> es la posición a la cual comenzar la búsqueda
+ *
+ *      <nContador> es el número de elementos a examinar
+ *
+ *      <lExacto> Si <lExacto> es VERDADERO, RASCAN buscará for una cadena
+ *                de caracteres que sea exactamente igual. Si <lExacto> es
+ *                FALSO, la comparación de cadenas de caracteres dependerá
+ *                del estado de SET EXACT.
+ *
+ *      <lAceptarCaract>  Esta bandera indica si las cadenas de sólo un 
+ *                        caracter pueden ser consideradas como valores
+ *                        numéricos.
+ *  $RETURNS$
+ *      RASCAN() retorna un valor numérico <nParadoEn>, de la posición donde
+ *      <xBuscar> fué encontrada.
+ *  $DESCRIPTION$
+ *      Esta función examina en órden inverso, es decir, del último al
+ *      primer elemento, el contenido de un array llamado <aDestino>, en
+ *      busca del valor de <xBuscar>. El valor devuelto es la posición en
+ *      el array <aDestino> en el cual <xBuscar> fue encontrada. Si esta
+ *      expresión no es encontrada el valor retornado es cero.
+ *
+ *      Si es especificada, la posición de inicio al cual comenzar la búsqueda
+ *      puede ser establecida con el valor pasado en <nInicio>. Por defecto
+ *      es el último elemento del array.
+ *
+ *      Si es especificado, el número de elementos del array a examinar puede
+ *      ser establecido con el valor pasado en <nContador>. Por defecto es el
+ *      número total de elementos en el array <aDestino>.
+ *
+ *      Si <xBuscar> es un bloque de código, la operación de la función es
+ *      ligeramente diferente. Cada referencia del subindice del array es
+ *      pasada al bloque de código para ser evaluada. La rutina de búsqueda
+ *      continuará hasta que el valor obtenido del bloque de código sea
+ *      verdadero (.T.) ó hasta que el final del array haya sido alcanzado.
+ *  $EXAMPLES$
+ *      *  El siguiente ejemplo utiliza una función de biblioteca para llenar
+ *         el array aDir con los nombres de archivos en el directorio actual.
+ *         Posteriormente, busca si entre ellos esta presente el archivo
+ *         test.prg, devuelve cero si no esta, ó mayor de cero si está.
+ *
+ *         LOCAL aDir := DIRECTORY( "*.*")
+ *         ? ASCAN( aDir,,,{|x,y| x[1] == "test.prg" } )
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      Esta función es una extensión de xHarbour.
+ *  $FILES$
+ *      El código fuente está en arrays.c
+ *      La librería asociada es vm
+ *  $SEEALSO$
+ *      RASCAN()
  *  $END$
  */

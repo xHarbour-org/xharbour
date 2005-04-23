@@ -687,7 +687,7 @@ This document is pretty complete, and will change marginally.
  *         ----------------------------------------------------------------------
  *      
  *      
- *      FUNCTION HScan( hSource, xCode, [nStart], [nCount], [bExact] ) --> nPos
+ *      FUNCTION HScan( hSource, xCode, [nStart], [nCount], [bExact], [bAllowChar] ) --> nPos
  *      -----------------------------------------------------------------------
  *      
  *      Searches for xCode among the values of hSource (keys are ignored).
@@ -699,6 +699,9 @@ This document is pretty complete, and will change marginally.
  *      
  *      If bExact is provided and xCode is a string, then EXACT string match
  *      mode is set ON or OFF according with bExact (defaults to .T.).
+ *
+ *      The bAllowChar flag indicates if single-byte strings can be considered
+ *      as numeric values.
  *      
  *      A codeblock may be also provided as xCode, in which case HScan passes
  *      each element of hSource to codeblock, until it evaluates to .T.

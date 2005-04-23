@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.37 2004/12/17 13:15:47 jonnymind Exp $
+ * $Id: hash.c,v 1.38 2005/03/22 01:13:15 ronpinkas Exp $
  */
 
 /*
@@ -2193,11 +2193,12 @@ HB_FUNC( HSCAN )
 
    if( pHash && pValue )
    {
-      ULONG ulStart = hb_parnl( 3 );
-      ULONG ulCount = hb_parnl( 4 );
-      BOOL bExact   = hb_parl( 5 );
+      ULONG ulStart   = hb_parnl( 3 );
+      ULONG ulCount   = hb_parnl( 4 );
+      BOOL bExact     = hb_parl( 5 );
+      BOOL bAllowChar = hb_parl( 6 );
 
-      hb_retnl( hb_arrayScan( pHash, pValue, ISNUM( 3 ) ? &ulStart : NULL, ISNUM( 4 ) ? &ulCount : NULL, bExact ) );
+      hb_retnl( hb_arrayScan( pHash, pValue, ISNUM( 3 ) ? &ulStart : NULL, ISNUM( 4 ) ? &ulCount : NULL, bExact, bAllowChar ) );
    }
    else
    {
