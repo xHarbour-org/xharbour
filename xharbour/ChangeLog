@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4065 2005/04/24 11:25:09 druzus Exp $
+ * $Id: ChangeLog,v 1.4066 2005/04/24 18:35:35 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-24 14:33 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/achoice.prg
+    ! Now not scroll more rows than items on screen.
 
 2005-04-24 20:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbcmd.c

@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.25 2005/01/09 23:19:31 ronpinkas Exp $
+ * $Id: achoice.prg,v 1.26 2005/03/31 16:23:38 guerra000 Exp $
  */
 
 /*
@@ -128,9 +128,11 @@ METHOD New( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, 
    ::lUserFunc := ( VALTYPE( ::uUserFunc ) IN "CBM" .AND. ! EMPTY( ::uUserFunc ) )
 
    IF ::nItems != 0
+      DispBegin()
       ::nArraySize := 0
       ::ValidateArray()
       ::DrawRows( 0, ::nBottom - ::nTop, .T. )
+      DispEnd()
    ENDIF
 RETURN Self
 
@@ -340,6 +342,7 @@ METHOD MoveCursor( nMove, nDirection, nMoveScreen ) CLASS TAChoice
 LOCAL nBounce := 0
 LOCAL nLastFirstRow := ::nFirstRow
 LOCAL nSize := ::nBottom - ::nTop
+LOCAL nBottom
 
    IF ::nItems == 0
       RETURN .F.
@@ -368,15 +371,16 @@ LOCAL nSize := ::nBottom - ::nTop
       ENDIF
    ENDDO
    ::nFirstRow := Max( Min( Max( Min( ::nFirstRow, ::nOption ), ::nOption - nSize ), ::nItems - nSize ), 1 )
+   nBottom := Min( ::nTop + ::nItems - 1, ::nBottom )
    IF nBounce != 2
       IF ::nFirstRow != nLastFirstRow
          IF ABS( ::nFirstRow - nLastFirstRow ) > nSize
             ::DrawRows( 0, nSize, .T. )
          ELSEIF ::nFirstRow < nLastFirstRow
-            Scroll( ::nTop, ::nLeft, ::nBottom, ::nRight, ::nFirstRow - nLastFirstRow )
+            ScrollFixed( ::nTop, ::nLeft, nBottom, ::nRight, ::nFirstRow - nLastFirstRow )
             ::DrawRows( 0, nLastFirstRow - ::nFirstRow - 1, .T. )
          ELSE
-            Scroll( ::nTop, ::nLeft, ::nBottom, ::nRight, ::nFirstRow - nLastFirstRow )
+            ScrollFixed( ::nTop, ::nLeft, nBottom, ::nRight, ::nFirstRow - nLastFirstRow )
             ::DrawRows( nSize - ( ::nFirstRow - nLastFirstRow ) + 1, nSize, .T. )
          ENDIF
       ENDIF
@@ -386,6 +390,7 @@ RETURN ( nBounce != 2 )
 
 METHOD DrawRows( nFrom, nTo, lHilite ) CLASS TAChoice
 LOCAL nCurOption
+   DispBegin()
    DO WHILE nFrom <= nTo
       nCurOption := ::nFirstRow + nFrom
       IF nCurOption > ::nItems
@@ -402,6 +407,7 @@ LOCAL nCurOption
    ENDDO
    SetPos( ::nTop + ::nOption - ::nFirstRow, ::nLeft )
    ColorSelect( CLR_STANDARD )
+   DispEnd()
 RETURN nil
 
 METHOD HitTest( nRow, nCol ) CLASS TAChoice
