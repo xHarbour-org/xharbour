@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.196 2005/04/21 19:46:38 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.197 2005/04/22 04:30:59 druzus Exp $
  */
 
 /*
@@ -57,7 +57,11 @@
 #define HB_CDX_CLIP_AUTOPEN
 #define HB_CDX_NEW_SORT
 
-#if !defined( HB_SIXCDX )
+#  define HB_CDX_SIXTAG
+
+#if defined( HB_SIXCDX )
+#  define HB_CDX_SIXTAG
+#else
 #  define HB_CDX_PACKTRAIL
 #endif
 
@@ -5055,7 +5059,7 @@ static LPCDXTAG hb_cdxFindTag( CDXAREAP pArea, PHB_ITEM pTagItem,
 
    fBag = hb_itemGetCLen( pBagItem ) > 0;
 
-#if defined( HB_SIXCDX )
+#if defined( HB_CDX_SIXTAG )
    if ( !fBag )
       uiBag = hb_itemGetNI( pBagItem );
    else if ( !pTagItem )
@@ -5072,7 +5076,7 @@ static LPCDXTAG hb_cdxFindTag( CDXAREAP pArea, PHB_ITEM pTagItem,
    else
    {
       uiFind = hb_itemGetNI( pTagItem );
-#if !defined( HB_SIXCDX )
+#if !defined( HB_CDX_SIXTAG )
       fBag = FALSE;
 #endif
    }
@@ -5111,10 +5115,10 @@ static LPCDXTAG hb_cdxFindTag( CDXAREAP pArea, PHB_ITEM pTagItem,
    {
       if ( !pTag )
          *puiTag = 0;
-#if !defined( HB_SIXCDX )
+/* #if !defined( HB_CDX_SIXTAG ) */
       else if ( fBag )
          *puiTag = hb_cdxGetTagNumber( pArea, pTag );
-#endif
+/* #endif */
       else         
          *puiTag = uiTag;
    }
@@ -6926,7 +6930,7 @@ static ERRCODE hb_cdxOrderListFocus( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
    if ( pTag )
       pOrderInfo->itmResult = hb_itemPutC( pOrderInfo->itmResult, pTag->szName );
 
-#if defined( HB_SIXCDX )
+#if defined( HB_CDX_SIXTAG )
    if ( pOrderInfo->itmOrder || pOrderInfo->atomBagName )
 #else
    if ( pOrderInfo->itmOrder )
@@ -7321,7 +7325,7 @@ static ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
    if ( ! pArea->lpIndexes )
       return SUCCESS;
 
-#if defined( HB_SIXCDX )
+#if defined( HB_CDX_SIXTAG )
    if ( pOrderInfo->itmOrder || pOrderInfo->atomBagName )
 #else
    if ( pOrderInfo->itmOrder )
@@ -7441,7 +7445,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-#if defined( HB_SIXCDX )
+#if defined( HB_CDX_SIXTAG )
    if ( pOrderInfo->itmOrder || pOrderInfo->atomBagName )
 #else
    if ( pOrderInfo->itmOrder )
@@ -7694,42 +7698,46 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
       case DBOI_SCOPETOP:
          if ( pTag )
          {
-            hb_cdxTagGetScope( pTag, 0, pOrderInfo->itmResult );
+            if ( pOrderInfo->itmResult )
+               hb_cdxTagGetScope( pTag, 0, pOrderInfo->itmResult );
             if ( pOrderInfo->itmNewVal )
                hb_cdxTagSetScope( pTag, 0, pOrderInfo->itmNewVal );
          }
-         else
+         else if ( pOrderInfo->itmResult )
             hb_itemClear( pOrderInfo->itmResult );
          break;
 
       case DBOI_SCOPEBOTTOM:
          if ( pTag )
          {
-            hb_cdxTagGetScope( pTag, 1, pOrderInfo->itmResult );
+            if ( pOrderInfo->itmResult )
+               hb_cdxTagGetScope( pTag, 1, pOrderInfo->itmResult );
             if ( pOrderInfo->itmNewVal )
                hb_cdxTagSetScope( pTag, 1, pOrderInfo->itmNewVal );
          }
-         else
+         else if ( pOrderInfo->itmResult )
             hb_itemClear( pOrderInfo->itmResult );
          break;
 
       case DBOI_SCOPETOPCLEAR:
          if ( pTag )
          {
-            hb_cdxTagGetScope( pTag, 0, pOrderInfo->itmResult );
+            if ( pOrderInfo->itmResult )
+               hb_cdxTagGetScope( pTag, 0, pOrderInfo->itmResult );
             hb_cdxTagClearScope( pTag, 0);
          }
-         else
+         else if ( pOrderInfo->itmResult )
             hb_itemClear( pOrderInfo->itmResult );
          break;
 
       case DBOI_SCOPEBOTTOMCLEAR:
          if ( pTag )
          {
-            hb_cdxTagGetScope( pTag, 1, pOrderInfo->itmResult );
+            if ( pOrderInfo->itmResult )
+               hb_cdxTagGetScope( pTag, 1, pOrderInfo->itmResult );
             hb_cdxTagClearScope( pTag, 1);
          }
-         else
+         else if ( pOrderInfo->itmResult )
             hb_itemClear( pOrderInfo->itmResult );
          break;
 

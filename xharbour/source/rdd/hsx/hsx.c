@@ -1,5 +1,5 @@
 /*
- * $Id: hsx.c,v 1.1 2005/04/19 21:43:30 druzus Exp $
+ * $Id: hsx.c,v 1.2 2005/04/21 19:46:41 druzus Exp $
  */
 
 /*
@@ -269,7 +269,7 @@
 
 #define HSXDEFFILTER    1     /* default character filter */
 
-#define HSXHEADER_LEN   512
+#define HSXHEADER_LEN   512L
 #define HSXKEYEXP_LEN   ( 512 - sizeof( HSXHEADER ) )
 #define HSXMINBUF_LEN   512L        /* minimum buffer size */
 #define HSXMAXBUF_LEN   64536L      /* maximum buffer size */
@@ -1344,6 +1344,7 @@ static int hb_hsxCreate( char * szFile, int iBufSize, int iKeySize,
                          BOOL fIgnoreCase, int iFilter, PHB_ITEM pExpr )
 {
    char szFileName[ _POSIX_PATH_MAX + 1 ], *szExpr = NULL;
+   PHB_ITEM pKeyExpr;
    PHB_FNAME pFileName;
    ULONG ulBufSize;
    USHORT uiRecordSize;
@@ -1382,14 +1383,14 @@ static int hb_hsxCreate( char * szFile, int iBufSize, int iKeySize,
       if ( hb_itemGetCLen( pExpr ) > 0 )
       {
          szExpr = hb_itemGetCPtr( pExpr );
-         iRetVal = hb_hsxCompile( szExpr, &pExpr );
+         iRetVal = hb_hsxCompile( szExpr, &pKeyExpr );
          if ( iRetVal != HSX_SUCCESS )
             return iRetVal;
       }
       else if ( hb_itemType( pExpr ) == HB_IT_BLOCK )
-         pExpr = hb_itemNew( pExpr );
+         pKeyExpr = hb_itemNew( pExpr );
       else
-         pExpr = NULL;
+         pKeyExpr = NULL;
    }
 
    hFile = hb_spCreate( ( BYTE * ) szFileName, FC_NORMAL );
@@ -1402,8 +1403,8 @@ static int hb_hsxCreate( char * szFile, int iBufSize, int iKeySize,
 #endif
    if ( hFile == FS_ERROR )
    {
-      if ( pExpr )
-         hb_hsxExpDestroy( pExpr );
+      if ( pKeyExpr )
+         hb_hsxExpDestroy( pKeyExpr );
       return HSX_CREATEFAIL;
    }
 
@@ -1417,7 +1418,7 @@ static int hb_hsxCreate( char * szFile, int iBufSize, int iKeySize,
    pHSX->fShared = FALSE;
    pHSX->fReadonly = FALSE;
    pHSX->szKeyExpr = szExpr ? hb_strdup( szExpr ) : NULL;
-   pHSX->pKeyItem = pExpr;
+   pHSX->pKeyItem = pKeyExpr;
    pHSX->pBuffer = ( BYTE * ) hb_xalloc( ulBufSize * uiRecordSize );
    if ( pHSX->pBuffer == NULL )
    {

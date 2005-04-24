@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.149 2005/04/14 05:58:35 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.150 2005/04/22 04:30:59 druzus Exp $
  */
 
 /*
@@ -3540,28 +3540,29 @@ HB_FUNC( ORDSCOPE )
 
    if ( pArea )
    {
-      DBORDSCOPEINFO sInfo;
-      HB_ITEM_NEW( ScopeValue );
+      DBORDERINFO pInfo;
+      USHORT uiAction;
+      int iScope = hb_parni( 1 );
 
-      sInfo.nScope = hb_parni( 1 );
-
-      SELF_SCOPEINFO( pArea, sInfo.nScope, &ScopeValue );
-
-      if ( hb_pcount() > 1 )
+      pInfo.itmOrder = NULL;
+      pInfo.atomBagName = NULL;
+      pInfo.itmResult = hb_itemNew( NULL );
+      pInfo.itmNewVal = NULL;
+      uiAction = ( iScope == 0 ) ? DBOI_SCOPETOP : DBOI_SCOPEBOTTOM;
+      if( hb_pcount() > 1 )
       {
-         if ( ISNIL( 2 ) )                /* explicitly passed NIL, clear it */
-            sInfo.scopeValue = NULL;
+         if( ISNIL( 2 ) )
+            uiAction = ( iScope == 0 ) ? DBOI_SCOPETOPCLEAR : DBOI_SCOPEBOTTOMCLEAR;
          else
-            sInfo.scopeValue = hb_param( 2, HB_IT_ANY) ;
-
-         /* rdd must not alter the scopeValue item -- it's not a copy */
-         SELF_SETSCOPE( pArea, (LPDBORDSCOPEINFO) &sInfo );
-
-         /* Clipper compatible - I'm not sure it's good to emulate it, Druzus */
-         if ( ISNIL( 2 ) )
-            hb_itemPutL( &ScopeValue, TRUE );
+            pInfo.itmNewVal = hb_param( 2, HB_IT_ANY);
       }
-      hb_itemForwardValue( hb_stackReturnItem(), &ScopeValue );
+      SELF_ORDINFO( pArea, uiAction, &pInfo );
+      /* this is only for strict Clipper compatibility - IMHO it's a bug */
+      if( hb_pcount() > 1 && ISNIL( 2 ) )
+         hb_retl( TRUE );
+      else
+         hb_itemReturn( pInfo.itmResult );
+      hb_itemRelease( pInfo.itmResult );
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDSCOPE" );
@@ -3570,14 +3571,14 @@ HB_FUNC( ORDSCOPE )
 HB_FUNC( DBRELATION )  /* (<nRelation>) --> cLinkExp */
 {
    HB_THREAD_STUB
-   char szExprBuff[ 256 ];  /*TODO: Correct buffer size initialization ??*/
+   char szExprBuff[ HARBOUR_MAX_RDD_RELTEXT_LENGTH + 1 ];
    AREAP pArea = HB_CURRENT_WA;
 
    szExprBuff[ 0 ] = 0;
    if( pArea )
       SELF_RELTEXT( pArea, hb_parni(1), szExprBuff ) ;
 
-   hb_retc(szExprBuff);
+   hb_retc( szExprBuff );
 }
 
 HB_FUNC( DBRSELECT )  /* (<nRelation>) --> nWorkArea */

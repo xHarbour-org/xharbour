@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.40 2005/04/16 00:48:45 druzus Exp $
+ * $Id: workarea.c,v 1.41 2005/04/22 04:30:59 druzus Exp $
  */
 
 /*
@@ -645,11 +645,11 @@ ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 ERRCODE hb_waOrderInfo( AREAP pArea, USHORT index, LPDBORDERINFO param )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_waOrderInfo(%p, %hu, %p)", pArea, index, param));
+
    HB_SYMBOL_UNUSED( pArea );
    HB_SYMBOL_UNUSED( index );
+   HB_SYMBOL_UNUSED( param );
 
-   if ( param->itmResult )
-      hb_itemRelease( param->itmResult );
    hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "ORDERINFO" );
    return FAILURE;
 }
@@ -710,6 +710,7 @@ ERRCODE hb_waRelease( AREAP pArea )
    if( pArea->valResult )
       hb_itemRelease( pArea->valResult );
    if( pArea->lpdbOrdCondInfo )
+      /* intentionally direct call not a method */
       hb_waOrderCondition( pArea,NULL );
    hb_xfree( pArea );
    return SUCCESS;
@@ -827,7 +828,16 @@ ERRCODE hb_waChildEnd( AREAP pArea, LPDBRELINFO pRelInfo )
    HB_TRACE(HB_TR_DEBUG, ("hb_waChildEnd(%p, %p)", pArea, pRelInfo));
 
    if ( pRelInfo->isScoped )
-      SELF_CLEARSCOPE( pArea );
+   {
+      DBORDERINFO pInfo;
+      pInfo.itmOrder = NULL;
+      pInfo.atomBagName = NULL;
+      pInfo.itmResult = hb_itemNew( NULL );
+      pInfo.itmNewVal = NULL;
+      SELF_ORDINFO( pArea, DBOI_SCOPETOPCLEAR, &pInfo );
+      SELF_ORDINFO( pArea, DBOI_SCOPEBOTTOMCLEAR, &pInfo );
+      hb_itemRelease( pInfo.itmResult );
+   }
 
    pArea->uiParents--;
    return SUCCESS;
@@ -947,24 +957,31 @@ ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
    *  Check the current order
    */
 
+   memset( &pInfo, 0, sizeof( DBORDERINFO ) );
    pInfo.itmResult = hb_itemPutNI( NULL, 0 );
-   pInfo.itmOrder = NULL;
    SELF_ORDINFO( pArea, DBOI_NUMBER, &pInfo );
    iOrder = hb_itemGetNI( pInfo.itmResult );
    hb_itemRelease( pInfo.itmResult );
 
    if( iOrder != 0 )
    {
-      if ( pRelInfo->isScoped )
+      if( pRelInfo->isScoped )
       {
-         DBORDSCOPEINFO sInfo;
+         DBORDERINFO pInfo;
+         ERRCODE errCode;
 
-         sInfo.scopeValue = pResult;
-         sInfo.nScope = 0;
-         if ( SELF_SETSCOPE( pArea, (LPDBORDSCOPEINFO) &sInfo ) == FAILURE )
-            return FAILURE;
-         sInfo.nScope = 1;
-         if ( SELF_SETSCOPE( pArea, (LPDBORDSCOPEINFO) &sInfo ) == FAILURE )
+         pInfo.itmOrder = NULL;
+         pInfo.atomBagName = NULL;
+         pInfo.itmResult = hb_itemNew( NULL );
+         pInfo.itmNewVal = pResult;
+
+         errCode = SELF_ORDINFO( pArea, DBOI_SCOPETOP, &pInfo );
+         if( errCode != FAILURE )
+            errCode = SELF_ORDINFO( pArea, DBOI_SCOPEBOTTOM, &pInfo );
+
+         hb_itemRelease( pInfo.itmResult );
+
+         if( errCode == FAILURE )
             return FAILURE;
       }
       if( SELF_SEEK( pArea, 0, pResult, 0 ) == SUCCESS )
@@ -1003,7 +1020,8 @@ ERRCODE hb_waRelText( AREAP pArea, USHORT uiRelNo, void * pExpr )
    {
       if ( uiIndex++ == uiRelNo )
       {
-         strcpy(pBuf, lpdbRelations->abKey->item.asString.value );
+         hb_strncpy( pBuf, hb_itemGetCPtr( lpdbRelations->abKey ),
+                     HARBOUR_MAX_RDD_RELTEXT_LENGTH );
          break;
          /* TODO: Verify buffer size is big enough ?? */
       }

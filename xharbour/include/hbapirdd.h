@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.24 2005/04/09 17:13:07 druzus Exp $
+ * $Id: hbapirdd.h,v 1.25 2005/04/10 19:18:53 ronpinkas Exp $
  */
 
 /*
@@ -59,15 +59,16 @@
 
 HB_EXTERN_BEGIN
 
-#define HARBOUR_MAX_RDD_DRIVERNAME_LENGTH       32
+#define HARBOUR_MAX_RDD_DRIVERNAME_LENGTH          32
 
 #ifndef HARBOUR_MAX_RDD_ALIAS_LENGTH
    #define HARBOUR_MAX_RDD_ALIAS_LENGTH            32
 #endif
 
-
 /* #define HARBOUR_MAX_RDD_FIELDNAME_LENGTH        32 */
 #define HARBOUR_MAX_RDD_AREA_NUM                65535
+
+#define HARBOUR_MAX_RDD_RELTEXT_LENGTH            256
 
 /* RDD virtual machine integration functions */
 

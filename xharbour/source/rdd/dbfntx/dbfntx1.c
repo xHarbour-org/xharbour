@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.103 2005/04/06 13:28:14 druzus Exp $
+ * $Id: dbfntx1.c,v 1.104 2005/04/21 19:46:40 druzus Exp $
  */
 
 /*
@@ -1387,7 +1387,8 @@ static void hb_ntxIndexFree( LPNTXINDEX pIndex )
          hb_ntxDestroyExp( pTag->pKeyItem );
       if( pTag->pForItem )
          hb_ntxDestroyExp( pTag->pForItem );
-
+      if( pTag->HotKeyInfo )
+         hb_ntxKeyFree( pTag->HotKeyInfo );
       hb_ntxKeyFree( pTag->CurKeyInfo );
       hb_ntxTagClearScope( pTag, 0 );
       hb_ntxTagClearScope( pTag, 1 );
@@ -3120,7 +3121,7 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                pKey = hb_ntxEvalKey( NULL, pTag );
                InIndex = ( pTag->pForItem == NULL || hb_ntxEvalCond( pArea, pTag->pForItem, TRUE ) );
                if( pArea->fNtxAppend || fAppend || InIndex != pTag->InIndex ||
-                   hb_ntxValCompare( pTag, pTag->CurKeyInfo->key, pTag->KeyLength,
+                   hb_ntxValCompare( pTag, pTag->HotKeyInfo->key, pTag->KeyLength,
                                      pKey->key, pTag->KeyLength, TRUE ) )
                {
                   if ( ! hb_ntxIndexLockWrite( pTag ) )
@@ -3131,20 +3132,17 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                   }
                   if( !pArea->fNtxAppend && !fAppend && pTag->InIndex )
                   {
-                     LPKEYINFO pKeyOld = hb_ntxKeyNew( pTag->CurKeyInfo, pTag->KeyLength );
-
-                     if ( hb_ntxTagKeyDel( pTag, pKeyOld ) )
+                     if ( hb_ntxTagKeyDel( pTag, pTag->HotKeyInfo ) )
                      {
                         if( ( !pArea->fShared || pTag->Memory  ) && pTag->keyCount &&
-                            hb_ntxKeyInScope( pTag, pKeyOld ) )
+                            hb_ntxKeyInScope( pTag, pTag->HotKeyInfo ) )
                            pTag->keyCount--;
                      }
                      else
                      {
-                        printf( "\n\rntxGoCold: Cannot find current key. %ld",pKeyOld->Xtra );
+                        printf( "\n\rntxGoCold: Cannot find current key. %ld",pTag->HotKeyInfo->Xtra );
                         fflush(stdout);
                      }
-                     hb_ntxKeyFree( pKeyOld );
                   }
                   if( InIndex )
                   {
@@ -3185,7 +3183,7 @@ static ERRCODE ntxGoHot( NTXAREAP pArea )
          pTag = pArea->lpNtxTag;
          while( pTag )
          {
-            hb_ntxEvalKey( pTag->CurKeyInfo, pTag );
+            pTag->HotKeyInfo = hb_ntxEvalKey( pTag->HotKeyInfo, pTag );
             pTag->InIndex = ( pTag->pForItem == NULL || hb_ntxEvalCond( pArea, pTag->pForItem, TRUE ) );
             pTag = pTag->pNext;
          }
@@ -3636,7 +3634,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             break;
          case DBOI_ISDESC:
             hb_itemPutL( pInfo->itmResult, pTag->fUsrDescend );
-            if ( pInfo->itmNewVal && hb_itemType( pInfo->itmNewVal ) == HB_IT_LOGICAL )
+            if( pInfo->itmNewVal && hb_itemType( pInfo->itmNewVal ) == HB_IT_LOGICAL )
                pTag->fUsrDescend = hb_itemGetL( pInfo->itmNewVal );
             break;
          case DBOI_UNIQUE:
@@ -3646,21 +3644,25 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             hb_itemPutL( pInfo->itmResult, pTag->Custom );
             break;
          case DBOI_SCOPETOP:
-            hb_ntxTagGetScope( pTag, 0, pInfo->itmResult );
-            if ( pInfo->itmNewVal )
+            if( pInfo->itmResult )
+               hb_ntxTagGetScope( pTag, 0, pInfo->itmResult );
+            if( pInfo->itmNewVal )
                hb_ntxTagSetScope( pTag, 0, pInfo->itmNewVal );
             break;
          case DBOI_SCOPEBOTTOM:
-            hb_ntxTagGetScope( pTag, 1, pInfo->itmResult );
-            if ( pInfo->itmNewVal )
+            if( pInfo->itmResult )
+               hb_ntxTagGetScope( pTag, 1, pInfo->itmResult );
+            if( pInfo->itmNewVal )
                hb_ntxTagSetScope( pTag, 1, pInfo->itmNewVal );
             break;
          case DBOI_SCOPETOPCLEAR:
-            hb_ntxTagGetScope( pTag, 0, pInfo->itmResult );
+            if( pInfo->itmResult )
+               hb_ntxTagGetScope( pTag, 0, pInfo->itmResult );
             hb_ntxTagClearScope( pTag, 0 );
             break;
          case DBOI_SCOPEBOTTOMCLEAR:
-            hb_ntxTagGetScope( pTag, 1, pInfo->itmResult );
+            if( pInfo->itmResult )
+               hb_ntxTagGetScope( pTag, 1, pInfo->itmResult );
             hb_ntxTagClearScope( pTag, 1 );
             break;
          case DBOI_KEYADD:
@@ -3681,7 +3683,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             hb_itemPutNI( pInfo->itmResult, pTag->KeyLength );
             break;
          case DBOI_KEYVAL:
-            if ( hb_ntxCurKeyRefresh( pTag ) )
+            if( hb_ntxCurKeyRefresh( pTag ) )
                hb_ntxKeyGetItem( pInfo->itmResult, pTag->CurKeyInfo, pTag, TRUE );
             else
                hb_itemClear( pInfo->itmResult );
@@ -3692,7 +3694,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             break;
       }
    }
-   else
+   else if( pInfo->itmResult )
    {
       switch( uiIndex )
       {
@@ -3704,7 +3706,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             break;
          }
          case DBOI_POSITION:
-            if ( pInfo->itmNewVal && hb_itemType( pInfo->itmNewVal ) & HB_IT_NUMERIC )
+            if( pInfo->itmNewVal && hb_itemType( pInfo->itmNewVal ) & HB_IT_NUMERIC )
                hb_itemPutL( pInfo->itmResult, SELF_GOTO( ( AREAP ) pArea, 
                               hb_itemGetNL( pInfo->itmNewVal ) ) == SUCCESS );
             else

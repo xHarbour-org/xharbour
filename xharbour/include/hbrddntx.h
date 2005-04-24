@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.23 2005/02/28 02:13:24 druzus Exp $
+ * $Id: hbrddntx.h,v 1.24 2005/03/31 03:15:18 druzus Exp $
  */
 
 /*
@@ -169,6 +169,7 @@ typedef struct _TAGINFO
    ULONG      ulPageLast;
    ULONG      ulPagesStart;
    LPKEYINFO  CurKeyInfo;
+   LPKEYINFO  HotKeyInfo;
    LPPAGEINFO pages;
    BOOL       InIndex;
    char*      buffer;

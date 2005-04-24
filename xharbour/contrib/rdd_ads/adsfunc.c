@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.55 2005/04/15 20:00:00 ptsarenko Exp $
+ * $Id: adsfunc.c,v 1.55 2005/04/15 16:58:52 ptsarenko Exp $
  */
 
 /*
@@ -2321,8 +2321,6 @@ UNSIGNED32 ENTRYPOINT AdsDeleteFile( ADSHANDLE hConnection, UNSIGNED8* pucFileNa
 
 HB_FUNC( ADSDELETEFILE )
 {
-   UNSIGNED16 usExist;
-
    hb_retl( AdsDeleteFile( adsConnectHandle, ( UNSIGNED8* ) hb_parcx( 1 ) ) == AE_SUCCESS );
 }
 

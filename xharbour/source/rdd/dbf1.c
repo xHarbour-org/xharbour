@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.114 2005/04/05 00:32:07 druzus Exp $
+ * $Id: dbf1.c,v 1.115 2005/04/09 17:13:07 druzus Exp $
  */
 
 /*
@@ -1306,13 +1306,6 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 static ERRCODE hb_dbfGetVarLen( DBFAREAP pArea, USHORT uiIndex, ULONG * pLength )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfGetVarLen(%p, %hu, %p)", pArea, uiIndex, pLength));
-
-   if( pArea->lpdbPendingRel )
-      SELF_FORCEREL( ( AREAP ) pArea );
-
-   /* Read record */
-   if( !pArea->fValidBuffer && !hb_dbfReadRecord( pArea ) )
-      return FAILURE;
 
    * pLength = pArea->lpFields[ uiIndex - 1 ].uiLen;
 

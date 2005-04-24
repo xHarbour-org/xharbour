@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.74 2004/12/28 06:39:23 druzus Exp $
+ * $Id: fastitem.c,v 1.75 2005/03/31 04:02:25 druzus Exp $
  */
 
 /*
@@ -173,7 +173,7 @@ void HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem )
 
 void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
 {
-   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemClear(%p) type: %i", pItem, pItem->type ) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemClear(%p) type: %i", pItem, pItem ? pItem->type : 0 ) );
 
 #if defined( HB_FM_STATISTICS ) && defined( HB_PARANOID_MEM_CHECK )
    if( HB_IS_BADITEM( pItem ) )

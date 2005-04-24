@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.61 2005/04/03 10:39:29 ptsarenko Exp $
+ * $Id: ads1.c,v 1.62 2005/04/09 17:13:07 druzus Exp $
  */
 
 /*
@@ -175,7 +175,6 @@ static void adsSetSend( void )
    AdsSetExact( hb_set.HB_SET_EXACT );
    AdsSetSearchPath( (UNSIGNED8*) hb_set.HB_SET_PATH );
 }
-
 
 static void commonError( ADSAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char * filename, USHORT uiFlags )
 {
@@ -381,6 +380,171 @@ void FoxToDbl
    }
 
 } /* FoxToDbl */
+
+static void adsScopeGet( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem )
+{
+   UNSIGNED8  pucScope[ ADS_MAX_KEY_LENGTH+1 ];
+   UNSIGNED16 pusBufLen = ADS_MAX_KEY_LENGTH;
+   UNSIGNED32 ulRetVal;
+   UNSIGNED16 pus16KeyType = 0;
+
+   HB_TRACE(HB_TR_DEBUG, ("adsScopeGet(%p, %hu, %p)", pArea, nScope, pItem));
+
+   if( pArea->hOrdCurrent )
+   {
+      /*ADS top/bottom are 1,2 instead of 0,1*/
+      nScope = ( nScope == 0 ) ? ADS_TOP : ADS_BOTTOM; 
+
+      ulRetVal = AdsGetScope( pArea->hOrdCurrent, (UNSIGNED16) nScope, pucScope, &pusBufLen );
+
+      if( ulRetVal == AE_NO_SCOPE )
+      {
+         hb_itemClear( pItem );
+      }
+      else if( ulRetVal == AE_SUCCESS )
+      {
+         AdsGetKeyType( pArea->hOrdCurrent, &pus16KeyType );
+         switch( pus16KeyType )
+         {
+            case ADS_STRING:
+               hb_itemPutCL( pItem, ( char * ) pucScope, pusBufLen );
+               break;
+
+            case ADS_NUMERIC:
+            {
+               double nValue;
+               FoxToDbl( pucScope, &nValue );
+               hb_itemPutND( pItem, nValue );
+               break;
+            }
+            case ADS_DATE:
+            {
+               if ( pArea->iFileType == ADS_NTX )
+               {
+                  hb_itemPutDS( pItem, (char*) pucScope );
+               }
+               else
+               {         /* ADS_CDX, ADS_ADT */
+                  double nValue;
+                  FoxToDbl( pucScope, &nValue );
+                  hb_itemPutDL( pItem, (long)nValue );
+               }
+               break;
+            }
+
+            case ADS_LOGICAL:
+               hb_itemPutL( pItem, (int) *pucScope );
+               break;
+
+            default:
+               hb_itemClear( pItem );
+            /*
+               TODO: ADS_RAW Currently unsupported
+                 Returns nil; Throw an error re unsupported type ?
+               case ADS_RAW:
+            */
+         }
+      }
+   }
+}
+
+static ERRCODE adsScopeSet( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem )
+{
+   UNSIGNED16 usDataType = ADS_STRINGKEY ;
+   /* BOOL bTypeError ; */
+   UNSIGNED8 *pucScope;
+   HB_TRACE(HB_TR_DEBUG, ("adsSetScope(%p, %p)", pArea, sInfo));
+
+   if( pArea->hOrdCurrent )
+   {
+      nScope = ( nScope == 0 ) ? ADS_TOP : ADS_BOTTOM; 
+      if( pItem )
+      {
+         UNSIGNED16 pus16KeyType = 0;
+         AdsGetKeyType( pArea->hOrdCurrent, &pus16KeyType );
+
+         /* make sure passed item has same type as index */
+         switch( pus16KeyType )
+         {
+            case ADS_STRING:
+               if( pItem->type == HB_IT_STRING )
+               {
+                  /* bTypeError = FALSE; */
+                  if( adsOEM )
+                  {
+                     usDataType = ADS_RAWKEY;
+                  }
+                  pucScope = (UNSIGNED8*) hb_itemGetCPtr( pItem );
+                  AdsSetScope( pArea->hOrdCurrent, nScope,
+                     (UNSIGNED8*) pucScope,
+                     (UNSIGNED16) hb_itemGetCLen( pItem ), usDataType );
+               }
+               break;
+
+            case ADS_NUMERIC:
+            {
+               if( pItem->type & HB_IT_NUMERIC )
+               {
+                  double dTemp;
+                  /* bTypeError = FALSE; */
+                  dTemp = hb_itemGetND( pItem );
+                  usDataType = ADS_DOUBLEKEY ;
+                  AdsSetScope( pArea->hOrdCurrent, nScope,
+                     (UNSIGNED8*) &dTemp,
+                     (UNSIGNED16) sizeof( dTemp ), usDataType );
+               }
+               break;
+            }
+
+            case ADS_DATE:
+               if( pItem->type == HB_IT_DATE )
+               {
+                  double dTemp;
+                  /* bTypeError = FALSE; */
+                  dTemp = hb_itemGetDL( pItem ) ;
+                  usDataType = ADS_DOUBLEKEY ;
+                  AdsSetScope( pArea->hOrdCurrent, nScope,
+                      (UNSIGNED8*) &dTemp,
+                      (UNSIGNED16) sizeof( dTemp ), usDataType );
+               }
+               break;
+/*                  bTypeError = FALSE;
+  TODO: needs adsDateFormat, confirm it's DTOS if possible, else convert
+hb_errRT_DBCMD( EG_ARG, EDBCMD_REL_BADPARAMETER, NULL, "ORDSCOPE" );
+*/
+
+/*            case ADS_LOGICAL:
+               if( pItem->type == HB_IT_LOGICAL )
+               {
+                  bTypeError = FALSE;
+                  if( hb_itemGetL( pItem ) )
+                  {
+                     pucScope[0] = 1;
+                     pucScope[1] = 0;
+                  }
+               }
+               break;
+*/
+         }
+/*          if( bTypeError  ) */
+/*          { */
+/*   TODO       Error in type !!  */
+
+/*          } */
+
+      }
+      else
+      {
+         AdsClearScope( pArea->hOrdCurrent, nScope );
+      }
+
+      return SUCCESS;
+   }
+   else
+   {
+      return FAILURE;
+   }
+}
 
 
 static BOOL hb_adsUnLockAllRecords( ADSAREAP pArea )
@@ -3131,9 +3295,16 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
       case DBOI_SCOPETOP :
          if( pArea->hOrdCurrent )
          {
-            adsScopeInfo( pArea, 0, pOrderInfo->itmResult );
+            if( pOrderInfo->itmResult )
+            {
+               adsScopeGet( pArea, 0, pOrderInfo->itmResult );
+            }
+            if( pOrderInfo->itmNewVal )
+            {
+               adsScopeGet( pArea, 0, pOrderInfo->itmNewVal );
+            }
          }
-         else
+         else if( pOrderInfo->itmResult )
          {
             hb_itemClear( pOrderInfo->itmResult );
          }
@@ -3142,29 +3313,48 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
       case DBOI_SCOPEBOTTOM :
          if( pArea->hOrdCurrent )
          {
-            adsScopeInfo( pArea, 1, pOrderInfo->itmResult ) ;
+            if( pOrderInfo->itmResult )
+            {
+               adsScopeGet( pArea, 1, pOrderInfo->itmResult );
+            }
+            if( pOrderInfo->itmNewVal )
+            {
+               adsScopeGet( pArea, 1, pOrderInfo->itmNewVal );
+            }
          }
-         else
+         else if( pOrderInfo->itmResult )
          {
             hb_itemClear( pOrderInfo->itmResult );
          }
          break;
 
       case DBOI_SCOPETOPCLEAR :
-         hb_itemPutC( pOrderInfo->itmResult, "" );
          if( pArea->hOrdCurrent )
          {
-            adsScopeInfo(  pArea, 0, pOrderInfo->itmResult ) ;
-            AdsClearScope( phIndex, (UNSIGNED16) 1 );  /* ADS scopes are 1/2 instead of 0/1 */
+            if( pOrderInfo->itmResult )
+            {
+               adsScopeGet( pArea, 0, pOrderInfo->itmResult ) ;
+            }
+            AdsClearScope( phIndex, ADS_TOP );  /* ADS scopes are 1/2 instead of 0/1 */
+         }
+         else if( pOrderInfo->itmResult )
+         {
+            hb_itemClear( pOrderInfo->itmResult );
          }
          break;
 
       case DBOI_SCOPEBOTTOMCLEAR :
-         hb_itemPutC( pOrderInfo->itmResult, "" );
          if( pArea->hOrdCurrent )
          {
-            adsScopeInfo( pArea, 1, pOrderInfo->itmResult ) ;
-            AdsClearScope( phIndex, (UNSIGNED16) 2 );
+            if( pOrderInfo->itmResult )
+            {
+               adsScopeGet( pArea, 1, pOrderInfo->itmResult ) ;
+            }
+            AdsClearScope( phIndex, ADS_BOTTOM );
+         }
+         else if( pOrderInfo->itmResult )
+         {
+            hb_itemClear( pOrderInfo->itmResult );
          }
          break;
 
@@ -3255,8 +3445,8 @@ static ERRCODE adsClearScope( ADSAREAP pArea )
 
    if( pArea->hOrdCurrent )
    {
-      AdsClearScope( pArea->hOrdCurrent, (UNSIGNED16) 1 );  /* ADS scopes are 1/2 instead of 0/1 */
-      AdsClearScope( pArea->hOrdCurrent, (UNSIGNED16) 2 );  /* ADS scopes are 1/2 instead of 0/1 */
+      AdsClearScope( pArea->hOrdCurrent, ADS_TOP );
+      AdsClearScope( pArea->hOrdCurrent, ADS_BOTTOM );
    }
 
    return SUCCESS;
@@ -3267,67 +3457,10 @@ static ERRCODE adsClearScope( ADSAREAP pArea )
 
 static ERRCODE adsScopeInfo( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem )
 {
-   UNSIGNED8  pucScope[ ADS_MAX_KEY_LENGTH+1 ];
-   UNSIGNED16 pusBufLen = ADS_MAX_KEY_LENGTH;
-   UNSIGNED32 ulRetVal;
-   UNSIGNED16 pus16KeyType = 0;
-
    HB_TRACE(HB_TR_DEBUG, ("adsScopeInfo(%p, %hu, %p)", pArea, nScope, pItem));
 
-   if( pArea->hOrdCurrent )
-   {
-      /*ADS top/bottom are 1,2 instead of 0,1*/
-      ulRetVal = AdsGetScope( pArea->hOrdCurrent, (UNSIGNED16) nScope + 1, pucScope, &pusBufLen );
+   adsScopeGet( pArea, nScope, pItem );
 
-      if( ulRetVal == AE_NO_SCOPE )
-      {
-         hb_itemClear( pItem );
-      }
-      else if( ulRetVal == AE_SUCCESS )
-      {
-         AdsGetKeyType( pArea->hOrdCurrent, &pus16KeyType );
-         switch( pus16KeyType )
-         {
-            case ADS_STRING:
-               hb_itemPutCL( pItem, ( char * ) pucScope, pusBufLen );
-               break;
-
-            case ADS_NUMERIC:
-            {
-               double nValue;
-               FoxToDbl( pucScope, &nValue );
-               hb_itemPutND( pItem, nValue );
-               break;
-            }
-            case ADS_DATE:
-            {
-               if ( pArea->iFileType == ADS_NTX )
-               {
-                  hb_itemPutDS( pItem, (char*) pucScope );
-               }
-               else
-               {         /* ADS_CDX, ADS_ADT */
-                  double nValue;
-                  FoxToDbl( pucScope, &nValue );
-                  hb_itemPutDL( pItem, (long)nValue );
-               }
-               break;
-            }
-
-            case ADS_LOGICAL:
-               hb_itemPutL( pItem, (int) *pucScope );
-               break;
-
-            default:
-               hb_itemClear( pItem );
-            /*
-               TODO: ADS_RAW Currently unsupported
-                 Returns nil; Throw an error re unsupported type ?
-               case ADS_RAW:
-            */
-         }
-      }
-   }
    return SUCCESS;
 }
 
@@ -3376,99 +3509,9 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
 
 static ERRCODE adsSetScope( ADSAREAP pArea, LPDBORDSCOPEINFO sInfo )
 {
-   UNSIGNED16 usDataType = ADS_STRINGKEY ;
-   /* BOOL bTypeError ; */
-   UNSIGNED8 *pucScope;
    HB_TRACE(HB_TR_DEBUG, ("adsSetScope(%p, %p)", pArea, sInfo));
 
-   if( pArea->hOrdCurrent )
-   {
-      if( sInfo->scopeValue )
-      {
-         UNSIGNED16 pus16KeyType = 0;
-         AdsGetKeyType( pArea->hOrdCurrent, &pus16KeyType );
-
-         /* make sure passed item has same type as index */
-         switch( pus16KeyType )
-         {
-            case ADS_STRING:
-               if( sInfo->scopeValue->type == HB_IT_STRING )
-               {
-                  /* bTypeError = FALSE; */
-                  if( adsOEM )
-                  {
-                     usDataType = ADS_RAWKEY;
-                  }
-                  pucScope = (UNSIGNED8*) hb_itemGetCPtr( sInfo->scopeValue );
-                  AdsSetScope( pArea->hOrdCurrent, (sInfo->nScope + 1), /*ADS top/bottom are 1,2 instead of 0,1*/
-                     (UNSIGNED8*) pucScope,
-                     (UNSIGNED16) hb_itemGetCLen( sInfo->scopeValue ), usDataType );
-               }
-               break;
-
-            case ADS_NUMERIC:
-            {
-               if( sInfo->scopeValue->type & HB_IT_NUMERIC )
-               {
-                  double dTemp;
-                  /* bTypeError = FALSE; */
-                  dTemp = hb_itemGetND( sInfo->scopeValue );
-                  usDataType = ADS_DOUBLEKEY ;
-                  AdsSetScope( pArea->hOrdCurrent, (sInfo->nScope + 1), /*ADS top/bottom are 1,2 instead of 0,1*/
-                     (UNSIGNED8*) &dTemp,
-                     (UNSIGNED16) sizeof( dTemp ), usDataType );
-               }
-               break;
-            }
-
-            case ADS_DATE:
-               if( sInfo->scopeValue->type == HB_IT_DATE )
-               {
-                  double dTemp;
-                  /* bTypeError = FALSE; */
-                  dTemp = hb_itemGetDL( sInfo->scopeValue ) ;
-                  usDataType = ADS_DOUBLEKEY ;
-                  AdsSetScope( pArea->hOrdCurrent, (sInfo->nScope + 1),
-                      (UNSIGNED8*) &dTemp,
-                      (UNSIGNED16) sizeof( dTemp ), usDataType );
-               }
-               break;
-/*                  bTypeError = FALSE;
-  TODO: needs adsDateFormat, confirm it's DTOS if possible, else convert
-hb_errRT_DBCMD( EG_ARG, EDBCMD_REL_BADPARAMETER, NULL, "ORDSCOPE" );
-*/
-
-/*            case ADS_LOGICAL:
-               if( sInfo->scopeValue->type == HB_IT_LOGICAL )
-               {
-                  bTypeError = FALSE;
-                  if( hb_itemGetL( sInfo->scopeValue ) )
-                  {
-                     pucScope[0] = 1;
-                     pucScope[1] = 0;
-                  }
-               }
-               break;
-*/
-         }
-/*          if( bTypeError  ) */
-/*          { */
-/*   TODO       Error in type !!  */
-
-/*          } */
-
-      }
-      else
-      {
-         AdsClearScope( pArea->hOrdCurrent, (UNSIGNED16) sInfo->nScope + 1 );
-      }
-
-      return SUCCESS;
-   }
-   else
-   {
-      return FAILURE;
-   }
+   return adsScopeSet( pArea, sInfo->nScope, sInfo->scopeValue );
 }
 
 #define  adsSkipScope             NULL

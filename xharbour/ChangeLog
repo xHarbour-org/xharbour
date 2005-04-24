@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4063 2005/04/23 06:51:29 guerra000 Exp $
+ * $Id: ChangeLog,v 1.4064 2005/04/23 16:20:36 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,52 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-24 13:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+    * added full ord scope support by DBOI_* interface.
+      Now the used method can be freed.
+      Brian please check me - sorry I cannot well test it.
+  * xharbour/contrib/rdd_ads/adsfunc.c
+    * removed unused variable
+    
+  * xharbour/include/hbapirdd.h
+    + added HARBOUR_MAX_RDD_RELTEXT_LENGTH to avoid possible buffer
+      overflow in DBRELATION() function - RDD should respect this value
+      in RELTEXT() method
+
+  * xharbour/source/rdd/dbcmd.c
+    + added HARBOUR_MAX_RDD_RELTEXT_LENGTH to avoid possible buffer
+      overflow in DBRELATION() function - RDD should respect this value
+      in RELTEXT() method
+    * ordScope() changed to use DBOI_*() interface
+
+  * xharbour/source/rdd/dbf1.c
+    * removed GOCOLD()/FORCEREL() from hb_dbfGetVarLen() it's not necessary
+      for simple fileds because their size is taken from pArea->lpFields
+
+  * xharbour/source/rdd/workarea.c
+    ! fixed possible GPF in hb_waOrderInfo() when called with bad DBOI_*
+      parameter
+    ! hb_waRelText() respects HARBOUR_MAX_RDD_RELTEXT_LENGTH
+    * changed scoped relations to use DBOI_* interface for scopes
+    
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * modified the tag selection for SIXCDX - now when only bag is given
+      (without tag) SIXCDX looks for tag with the same name as given bag.
+
+  * xharbour/include/hbrddntx.h
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! fixed GOCOLD() - it should not use current key buffer for previous
+      key value - potential source of different problems.
+
+  * xharbour/source/rdd/hsx/hsx.c
+    * minor modification - nothing has been changed it was a workaround
+      for some possible bug in C compiler optimization.
+
+  * xharbour/source/vm/fastitem.c
+    ! fixed debug message in hb_itemClear() - it was causing GPF
+      when hb_itemClear() was called with NULL parameter
 
 2005-04-23 13:20 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   * contrib/hbzlib/zip.c
