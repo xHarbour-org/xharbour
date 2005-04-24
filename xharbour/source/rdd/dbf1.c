@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.115 2005/04/09 17:13:07 druzus Exp $
+ * $Id: dbf1.c,v 1.116 2005/04/24 11:25:39 druzus Exp $
  */
 
 /*
@@ -1163,7 +1163,6 @@ static ERRCODE hb_dbfGetRec( DBFAREAP pArea, BYTE ** pBuffer )
 static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 {
    LPFIELD pField;
-   char szBuffer[ 256 ];
    BOOL bError;
    PHB_ITEM pError;
 
@@ -1203,6 +1202,7 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          }
          else
          {
+            char szBuffer[ 9 ];
             memcpy( szBuffer, pArea->pRecord + pArea->pFieldOffset[ uiIndex ], 8 );
             szBuffer[ 8 ] = 0;
             hb_itemPutDS( pItem, szBuffer );

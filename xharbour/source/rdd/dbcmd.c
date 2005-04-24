@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.150 2005/04/22 04:30:59 druzus Exp $
+ * $Id: dbcmd.c,v 1.151 2005/04/24 11:25:38 druzus Exp $
  */
 
 /*
@@ -1795,11 +1795,12 @@ HB_FUNC( __DBLOCATE )
 
    if( !pNext || lNext > 0 )
    {
-      if ( SELF_EOF( pArea, &fEof ) == FAILURE )
-         return;
-
-      while( !fEof )
+      do
       {
+         if( SELF_EOF( pArea, &fEof ) == FAILURE )
+            break;
+         if( fEof )
+            break;
          if( pWhile && ! hb_itemGetL( hb_vmEvalBlock( pWhile ) ) )
             break;
          if( !pFor || hb_itemGetL( hb_vmEvalBlock( pFor ) ) )
@@ -1809,9 +1810,8 @@ HB_FUNC( __DBLOCATE )
          }
          if( pRecord || ( pNext && --lNext < 1 ) )
             break;
-         if( SELF_SKIP( pArea, 1 ) == FAILURE )
-            break;
       }
+      while( SELF_SKIP( pArea, 1 ) != FAILURE );
    }
    return;
 }

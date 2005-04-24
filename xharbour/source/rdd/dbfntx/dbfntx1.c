@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.104 2005/04/21 19:46:40 druzus Exp $
+ * $Id: dbfntx1.c,v 1.105 2005/04/24 11:25:41 druzus Exp $
  */
 
 /*
@@ -3571,7 +3571,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
          return SUCCESS;
       }
       case DBOI_ORDERCOUNT:
-         if( pInfo->atomBagName && (char*) hb_itemGetCPtr( pInfo->atomBagName ) )
+         if( pInfo->atomBagName && hb_itemGetCPtr( pInfo->atomBagName ) )
          {
             hb_itemPutNI( pInfo->itmResult, pArea->lpNtxTag ? 1 : 0 );
          }
