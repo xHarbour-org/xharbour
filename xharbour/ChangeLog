@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4068 2005/04/25 01:16:59 andijahja Exp $
+ * $Id: ChangeLog,v 1.4069 2005/04/25 02:08:39 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-25 21:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/pack_src.bat
+  * xharbour/bin/pack_src.sh
+    + added HSX library
+
+  * xharbour/config/w32/bcc32.cf
+    * use the same optimization flag as in makefile.bc
+
+  * xharbour/source/rdd/hsx/hsx.c
+    ! fixed bug - the maximum size of key expression stored in HSX header
+      was calculated one byte longer then it should be.
+      IMHO it should also fix BCC and MSC problem reported by Andi.
+      It was my bug and optimization flags only exploited it.
 
 2005-04-25 09:10 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * utils/hbtest/hbtest.prg

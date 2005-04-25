@@ -1,5 +1,5 @@
 /*
- * $Id: hsx.c,v 1.2 2005/04/21 19:46:41 druzus Exp $
+ * $Id: hsx.c,v 1.3 2005/04/24 11:25:42 druzus Exp $
  */
 
 /*
@@ -535,7 +535,7 @@ static int hb_hsxCompile( char * szExpr, PHB_ITEM * pExpr )
    }
    else
    {
-      HB_MACRO_PTR pMacro = hb_macroCompile( ( char * ) pExpr );
+      HB_MACRO_PTR pMacro = hb_macroCompile( szExpr );
       if( !pMacro )
          return HSX_BADPARMS;
       *pExpr = hb_itemPutPtr( NULL, ( void * ) pMacro );
@@ -642,7 +642,7 @@ static int hb_hsxHdrFlush( int iHandle )
 
       memset( pHeader->keyExpression, 0, HSXKEYEXP_LEN + 1 );
       if ( pHSX->szKeyExpr )
-         hb_strncpy( ( char * ) pHeader->keyExpression, pHSX->szKeyExpr, HSXKEYEXP_LEN + 1 );
+         hb_strncpy( ( char * ) pHeader->keyExpression, pHSX->szKeyExpr, HSXKEYEXP_LEN );
 
       if ( hb_fsSeek( pHSX->hFile, 0, FS_SET ) != 0 )
          return HSX_BADHDRWRITE;
@@ -719,7 +719,7 @@ static int hb_hsxHdrRead( int iHandle )
 
    if ( pHeader->keyExpression[0] >= ' ' )
    {
-      headrBuf[ HSXHEADER_LEN ] = '\0';
+      headrBuf[ HSXHEADER_LEN - 1 ] = '\0';
       pHSX->szKeyExpr = hb_strdup( ( char * ) pHeader->keyExpression );
       iResult = hb_hsxCompile( pHSX->szKeyExpr, &pHSX->pKeyItem );
    }
@@ -1343,8 +1343,8 @@ static int hb_hsxDestroy( int iHandle )
 static int hb_hsxCreate( char * szFile, int iBufSize, int iKeySize,
                          BOOL fIgnoreCase, int iFilter, PHB_ITEM pExpr )
 {
-   char szFileName[ _POSIX_PATH_MAX + 1 ], *szExpr = NULL;
-   PHB_ITEM pKeyExpr;
+   char szFileName[ _POSIX_PATH_MAX + 1 ], * szExpr = NULL;
+   PHB_ITEM pKeyExpr = NULL;
    PHB_FNAME pFileName;
    ULONG ulBufSize;
    USHORT uiRecordSize;
@@ -1389,8 +1389,6 @@ static int hb_hsxCreate( char * szFile, int iBufSize, int iKeySize,
       }
       else if ( hb_itemType( pExpr ) == HB_IT_BLOCK )
          pKeyExpr = hb_itemNew( pExpr );
-      else
-         pKeyExpr = NULL;
    }
 
    hFile = hb_spCreate( ( BYTE * ) szFileName, FC_NORMAL );
@@ -1417,7 +1415,8 @@ static int hb_hsxCreate( char * szFile, int iBufSize, int iKeySize,
    pHSX->szFileName = hb_strdup( szFileName );
    pHSX->fShared = FALSE;
    pHSX->fReadonly = FALSE;
-   pHSX->szKeyExpr = szExpr ? hb_strdup( szExpr ) : NULL;
+   if ( szExpr )
+      pHSX->szKeyExpr = hb_strdup( szExpr );
    pHSX->pKeyItem = pKeyExpr;
    pHSX->pBuffer = ( BYTE * ) hb_xalloc( ulBufSize * uiRecordSize );
    if ( pHSX->pBuffer == NULL )
