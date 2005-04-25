@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4067 2005/04/24 19:35:19 guerra000 Exp $
+ * $Id: ChangeLog,v 1.4068 2005/04/25 01:16:59 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-25 09:10 UTC+0700 Andi Jahja <andijahja@xharbour.com>
+  * utils/hbtest/hbtest.prg
+    ! changed parameter passed to __MvSave() and __MvRestore() to conform
+      with current syntax.
 
 2005-04-25 08:15 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * source/vm/memvars.c
