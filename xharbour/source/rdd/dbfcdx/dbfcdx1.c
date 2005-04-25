@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.197 2005/04/22 04:30:59 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.198 2005/04/24 11:25:40 druzus Exp $
  */
 
 /*
@@ -225,7 +225,7 @@ static RDDFUNCS cdxTable =
 
    ( DBENTRYP_OI )    hb_cdxOrderListAdd,
    ( DBENTRYP_V )     hb_cdxOrderListClear,
-   ( DBENTRYP_VP )    hb_cdxOrderListDelete,
+   ( DBENTRYP_OI )    hb_cdxOrderListDelete,
    ( DBENTRYP_OI )    hb_cdxOrderListFocus,
    ( DBENTRYP_V )     hb_cdxOrderListRebuild,
    ( DBENTRYP_VOI )   hb_cdxOrderCondition,
@@ -6911,7 +6911,7 @@ static ERRCODE hb_cdxOrderListClear( CDXAREAP pArea )
 }
 
 /* TODO: in the future, now there is no API call to SELF_ORDLSTDELETE */
-/* ( DBENTRYP_VP )    hb_cdxOrderListDelete : NULL */
+/* ( DBENTRYP_OI )    hb_cdxOrderListDelete : NULL */
 
 /* ( DBENTRYP_OI )    hb_cdxOrderListFocus */
 static ERRCODE hb_cdxOrderListFocus( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )

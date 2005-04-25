@@ -1,10 +1,55 @@
- * $Id: ChangeLog,v 1.4071 2005/04/25 16:38:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.4071 2005/04/25 19:41:54 modalsist Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-26 01:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapirdd.h
+    ! fixed orderListDelete method declaration - should be:
+      DBENTRYP_OI not DBENTRYP_VP
+
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+  * xharbour/include/hbrddwrk.h
+    * updated for proper orderListDelete declaration
+
+  * xharbour/source/rdd/dbf1.c
+    * updated for proper orderListDelete declaration
+    * {PUT,GET}REC() method changed to skip DELETE byte - I'm not
+      100% it's Clipper compatible. Can someone check it?
+      Anyhow IMHO it should not be appended to record buffer
+      when data is transfered between RDDs
+    * TRANSREC() method modified for proper whole record
+      coping. I'll add yet field by filed coping and will move
+      this code to workarea.c as default TRANSREC() implementation
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * copy the new key in GOCOLD to curkey - it may reduce one key
+      evaluation in some cases
+
+  * xharbour/source/rdd/dbcmd.c
+    ! replaced direct access to pArea->f[EB]of, pArea->fFound with proper
+      method call - direct access does not respect pending relations.
+      Not everything can be fixed yet - I will have to implement
+      SKIPSCOPE() to make it clean. Direct access also doesn't respect
+      late evaluation of previous operations - some RDD may want to use
+      it - for sure I will need it in NETRDD
+
+  * xharbour/source/rdd/workarea.c
+    + added some comments
+    * some other code made more simple
+    
+  * xharbour/source/common/hbstr.c
+    * optimized hb_stricmp()
+    ! fixed possible overflow in hb_strncpyUpperTrim(), hb_strncpyTrim()
+
+  * xharbour/source/rtl/strings.c
+    * fixed and optimized hb_strnicmp()
 
 2005-04-25 16:38 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils/hbmake/hbmake.prg

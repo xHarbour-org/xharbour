@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.105 2005/04/24 11:25:41 druzus Exp $
+ * $Id: dbfntx1.c,v 1.106 2005/04/24 18:35:53 druzus Exp $
  */
 
 /*
@@ -3153,6 +3153,7 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                            pTag->keyCount++;
                      }
                   }
+                  hb_ntxKeyCopy( pTag->CurKeyInfo, pKey, pTag->KeyLength );
                   hb_ntxIndexUnLockWrite( pTag );
                }
                hb_ntxKeyFree( pKey );

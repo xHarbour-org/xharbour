@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.62 2005/04/09 17:13:07 druzus Exp $
+ * $Id: ads1.c,v 1.63 2005/04/24 11:25:37 druzus Exp $
  */
 
 /*
@@ -3774,7 +3774,7 @@ static RDDFUNCS adsTable = { ( DBENTRYP_BP ) adsBof,
                              ( DBENTRYP_VR ) adsSetRel,
                              ( DBENTRYP_OI ) adsOrderListAdd,
                              ( DBENTRYP_V ) adsOrderListClear,
-                             ( DBENTRYP_VP ) adsOrderListDelete,
+                             ( DBENTRYP_OI ) adsOrderListDelete,
                              ( DBENTRYP_OI ) adsOrderListFocus,
                              ( DBENTRYP_V ) adsOrderListRebuild,
                              ( DBENTRYP_VOI ) adsOrderCondition,

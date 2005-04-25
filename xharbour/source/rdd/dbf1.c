@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.116 2005/04/24 11:25:39 druzus Exp $
+ * $Id: dbf1.c,v 1.117 2005/04/24 18:35:52 druzus Exp $
  */
 
 /*
@@ -163,7 +163,7 @@ static RDDFUNCS dbfTable = { ( DBENTRYP_BP ) hb_dbfBof,
                              ( DBENTRYP_VR ) hb_dbfSetRel,
                              ( DBENTRYP_OI ) hb_dbfOrderListAdd,
                              ( DBENTRYP_V ) hb_dbfOrderListClear,
-                             ( DBENTRYP_VP ) hb_dbfOrderListDelete,
+                             ( DBENTRYP_OI ) hb_dbfOrderListDelete,
                              ( DBENTRYP_OI ) hb_dbfOrderListFocus,
                              ( DBENTRYP_V ) hb_dbfOrderListRebuild,
                              ( DBENTRYP_VOI ) hb_dbfOrderCondition,
@@ -1133,7 +1133,7 @@ static ERRCODE hb_dbfGetRec( DBFAREAP pArea, BYTE ** pBuffer )
 
    if ( pBuffer != NULL )
    {
-      *pBuffer = pArea->pRecord;
+      *pBuffer = pArea->pRecord + 1;
    }
    else
    {
@@ -1385,7 +1385,7 @@ static ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer )
          return FAILURE;
 
       /* Copy data to buffer */
-      memcpy( pArea->pRecord, pBuffer, pArea->uiRecordLen );
+      memcpy( pArea->pRecord + 1, pBuffer, pArea->uiRecordLen );
    }
    else /* if( pArea->fRecordChanged ) */
    {
@@ -2845,30 +2845,35 @@ static ERRCODE hb_dbfTrans( DBFAREAP pArea, LPDBTRANSINFO pTransInfo )
 static ERRCODE hb_dbfTransRec( DBFAREAP pArea, LPDBTRANSINFO pTransInfo )
 {
    BOOL bDeleted;
+   BYTE *pRecord;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfTransRec(%p, %p)", pArea, pTransInfo));
 
-   if( pTransInfo->uiFlags & DBTF_PUTREC )
+   if( pTransInfo->uiFlags & DBTF_MATCH && pTransInfo->uiFlags & DBTF_PUTREC )
    {
-      /* Append a new record */
-      if( SELF_APPEND( ( AREAP ) pTransInfo->lpaDest, TRUE ) == FAILURE )
-         return FAILURE;
-
-      /* Read record */
-      if( !pArea->fValidBuffer && !hb_dbfReadRecord( pArea ) )
-         return FAILURE;
-
-      /* Copy record */
-      if( SELF_PUTREC( ( AREAP ) pTransInfo->lpaDest, pArea->pRecord ) == FAILURE )
-         return FAILURE;
-
       /* Record deleted? */
       if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
          return FAILURE;
 
+      if( SELF_GETREC( ( AREAP ) pTransInfo->lpaDest, &pRecord ) == FAILURE )
+         return FAILURE;
+
+      /* Append a new record */
+      if( SELF_APPEND( ( AREAP ) pTransInfo->lpaDest, TRUE ) == FAILURE )
+         return FAILURE;
+
+      /* Copy record */
+      if( SELF_PUTREC( ( AREAP ) pTransInfo->lpaDest, pRecord ) == FAILURE )
+      {
+         SELF_DELETE( ( AREAP ) pTransInfo->lpaDest );
+         return FAILURE;
+      }
+
       /* Delete the new record */
       if( bDeleted )
          return SELF_DELETE( ( AREAP ) pTransInfo->lpaDest );
+      else
+         return SUCCESS;
    }
    return SUPER_TRANSREC( ( AREAP ) pArea, pTransInfo );
 }

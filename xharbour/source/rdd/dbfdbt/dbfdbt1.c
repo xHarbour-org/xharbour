@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.20 2005/03/31 03:57:11 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.21 2005/04/05 22:26:07 druzus Exp $
  */
 
 /*
@@ -154,7 +154,7 @@ static RDDFUNCS dbtTable =
 
    ( DBENTRYP_OI )    hb_dbtOrderListAdd,
    ( DBENTRYP_V )     hb_dbtOrderListClear,
-   ( DBENTRYP_VP )    hb_dbtOrderListDelete,
+   ( DBENTRYP_OI )    hb_dbtOrderListDelete,
    ( DBENTRYP_OI )    hb_dbtOrderListFocus,
    ( DBENTRYP_V )     hb_dbtOrderListRebuild,
    ( DBENTRYP_VOI )   hb_dbtOrderCondition,

@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.39 2005/02/28 10:17:31 andijahja Exp $
+ * $Id: dbffpt1.c,v 1.40 2005/04/19 18:49:57 druzus Exp $
  */
 
 /*
@@ -163,7 +163,7 @@ static RDDFUNCS fptTable =
 
    ( DBENTRYP_OI )    hb_fptOrderListAdd,
    ( DBENTRYP_V )     hb_fptOrderListClear,
-   ( DBENTRYP_VP )    hb_fptOrderListDelete,
+   ( DBENTRYP_OI )    hb_fptOrderListDelete,
    ( DBENTRYP_OI )    hb_fptOrderListFocus,
    ( DBENTRYP_V )     hb_fptOrderListRebuild,
    ( DBENTRYP_VOI )   hb_fptOrderCondition,

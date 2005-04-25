@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.25 2005/04/10 19:18:53 ronpinkas Exp $
+ * $Id: hbapirdd.h,v 1.26 2005/04/24 11:25:38 druzus Exp $
  */
 
 /*
@@ -575,7 +575,7 @@ typedef USHORT ( * DBENTRYP_ISI  )( AREAP area, PHB_ITEM p1, USHORT p2, PHB_ITEM
 typedef USHORT ( * DBENTRYP_BIB  )( AREAP area, BOOL p1, PHB_ITEM p2, BOOL p3 );
 typedef USHORT ( * DBENTRYP_VPL  )( AREAP area, void * p1, LONG p2 );
 typedef USHORT ( * DBENTRYP_VPLP )( AREAP area, void * p1, LONG * p2 );
-typedef USHORT ( * DBENTRYP_LSP  )( AREAP area, LONG p1, USHORT * p2 );
+typedef USHORT ( * DBENTRYP_LSP  )( AREAP area, LONG p1, BOOL * p2 );
 
 /* this methods DO USE take a Workarea but an RDDNODE */
 
@@ -665,7 +665,7 @@ typedef struct _RDDFUNCS
 
    DBENTRYP_OI   orderListAdd;      /*  */
    DBENTRYP_V    orderListClear;    /*  */
-   DBENTRYP_VP   orderListDelete;   /*  */
+   DBENTRYP_OI   orderListDelete;   /*  */
    DBENTRYP_OI   orderListFocus;    /*  */
    DBENTRYP_V    orderListRebuild;  /*  */
    DBENTRYP_VOI  orderCondition;    /*  */

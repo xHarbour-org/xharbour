@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddwrk.h,v 1.2 2003/07/23 12:35:57 druzus Exp $
+ * $Id: hbrddwrk.h,v 1.3 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -122,7 +122,7 @@ extern ERRCODE hb_waRelText( AREAP pArea, USHORT uiRelNo, void * pExpr );
 extern ERRCODE hb_waSetRel( AREAP pArea, LPDBRELINFO pRelInfo );
 #define hb_waOrderListAdd                   ( DBENTRYP_OI ) hb_waUnsupported
 #define hb_waOrderListClear                                 hb_waUnsupported
-#define hb_waOrderListDelete                ( DBENTRYP_VP ) hb_waUnsupported
+#define hb_waOrderListDelete                ( DBENTRYP_OI ) hb_waUnsupported
 #define hb_waOrderListFocus                 ( DBENTRYP_OI ) hb_waUnsupported
 #define hb_waOrderListRebuild                               hb_waUnsupported
 extern ERRCODE hb_waOrderCondition( AREAP pArea, LPDBORDERCONDINFO param );

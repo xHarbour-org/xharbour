@@ -1,5 +1,5 @@
 /*
- * $Id: strings.c,v 1.1.1.1 2001/12/21 10:41:50 ronpinkas Exp $
+ * $Id: strings.c,v 1.2 2004/09/18 20:16:43 ronpinkas Exp $
  */
 
 /*
@@ -71,34 +71,24 @@ HB_EXPORT BOOL hb_strEmpty( const char * szText, ULONG ulLen )
 
 HB_EXPORT int hb_strnicmp( const char * s1, const char * s2, ULONG count )
 {
+   ULONG ulCount;
    int rc = 0;
-   ULONG l1;
-   ULONG l2;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strnicmp(%s, %s, %lu)", s1, s2, count));
 
-   l1 = strlen( s1 );
-   l2 = strlen( s2 );
-   if( l1 > count )
-      l1 = count;
-   count = ( l1 < l2 ? l1 : l2 );
-
-   while( rc == 0 && count > 0 )
+   for( ulCount = 0; ulCount < count; ulCount++ )
    {
-      char c1 = toupper( *s1 );
-      char c2 = toupper( *s2 );
-
-      s1++;
-      s2++;
+      unsigned char c1 = toupper( (unsigned char) s1[ ulCount ] );
+      unsigned char c2 = toupper( (unsigned char) s2[ ulCount ] );
 
       if( c1 != c2 )
+      {
          rc = ( c1 < c2 ? -1 : 1 );
-
-      count--;
+         break;
+      }
+      else if ( !c1 )
+         break;
    }
-
-   if( rc == 0 && l1 != l2 )
-      rc = ( l1 < l2 ? -1 : 1 );
 
    return rc;
 }

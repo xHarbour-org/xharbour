@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.18 2005/04/09 17:13:07 druzus Exp $
+ * $Id: hbstr.c,v 1.19 2005/04/13 21:05:36 andijahja Exp $
  */
 
 /*
@@ -128,33 +128,25 @@ char HB_EXPORT * hb_strdup( const char * pszText )
 
 HB_EXPORT int hb_stricmp( const char * s1, const char * s2 )
 {
-   int rc = 0;
-   ULONG l1;
-   ULONG l2;
-   ULONG count;
+   int rc = 0, c1, c2;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stricmp(%s, %s)", s1, s2));
 
-   l1 = strlen( s1 );
-   l2 = strlen( s2 );
-   count = ( l1 < l2 ? l1 : l2 );
-
-   while( rc == 0 && count > 0 )
+   do
    {
-      char c1 = toupper( *s1 );
-      char c2 = toupper( *s2 );
+      c1 = toupper( (unsigned char) *s1 );
+      c2 = toupper( (unsigned char) *s2 );
 
       s1++;
       s2++;
 
       if( c1 != c2 )
+      {
          rc = ( c1 < c2 ? -1 : 1 );
-
-      count--;
+         break;
+      }
    }
-
-   if( rc == 0 && l1 != l2 )
-      rc = ( l1 < l2 ? -1 : 1 );
+   while ( c1 );
 
    return rc;
 }
@@ -732,16 +724,17 @@ HB_EXPORT char * hb_strncpyUpperTrim( char * pDest, const char * pSource, ULONG 
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strncpyUpperTrim(%p, %s, %lu)", pDest, pSource, ulLen));
 
-   ulSLen = strlen( pSource );
-   if ( ulSLen > ulLen )
-      ulSLen = ulLen;
-
-   pDest[ ulLen ] ='\0';
-
+   ulSLen = 0;
+   while ( ulSLen < ulLen && pSource[ ulSLen ] )
+   {
+      ulSLen++;
+   }
    while( ulSLen && pSource[ ulSLen - 1 ] == ' ')
    {
       ulSLen--;
    }
+
+   pDest[ ulLen ] = '\0';
 
    /* some compilers impliment toupper as a macro, and this has side effects! */
    /* *pDest++ = toupper( *pSource++ ); */
@@ -772,16 +765,17 @@ HB_EXPORT char * hb_strncpyTrim( char * pDest, const char * pSource, ULONG ulLen
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strncpyTrim(%p, %s, %lu)", pDest, pSource, ulLen));
 
-   ulSLen = strlen( pSource );
-   if ( ulSLen > ulLen )
-      ulSLen = ulLen;
-
-   pDest[ ulLen ] ='\0';
-
-   while( ulSLen && pSource[ ulSLen - 1 ] == ' ')
+   ulSLen = 0;
+   while( ulSLen < ulLen && pSource[ ulSLen ] )
+   {
+      ulSLen++;
+   }
+   while( ulSLen && pSource[ ulSLen - 1 ] == ' ' )
    {
       ulSLen--;
    }
+
+   pDest[ ulLen ] ='\0';
 
    /* some compilers impliment toupper as a macro, and this has side effects! */
    /* *pDest++ = toupper( *pSource++ ); */

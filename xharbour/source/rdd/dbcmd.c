@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.151 2005/04/24 11:25:38 druzus Exp $
+ * $Id: dbcmd.c,v 1.152 2005/04/24 18:35:52 druzus Exp $
  */
 
 /*
@@ -1839,6 +1839,7 @@ HB_FUNC( __DBCONTINUE )
 {
    HB_THREAD_STUB
    AREAP pArea = HB_CURRENT_WA;
+   BOOL fEof;
 
    if( !pArea )
    {
@@ -1854,7 +1855,9 @@ HB_FUNC( __DBCONTINUE )
    {
       if ( SELF_SKIP( pArea, 1 ) == FAILURE )
          return;
-      if( pArea->fEof )
+      if( SELF_EOF( pArea, &fEof ) == FAILURE )
+         return;
+      if( fEof )
          return;
       pArea->fFound = hb_itemGetL( hb_vmEvalBlock( pArea->dbsi.itmCobFor ) );
    }
@@ -1961,7 +1964,7 @@ HB_FUNC( DBSEEK )
 {
    HB_THREAD_STUB
    PHB_ITEM pKey;
-   BOOL bSoftSeek, bFindLast;
+   BOOL bSoftSeek, bFindLast, fFound;
    AREAP pArea = HB_CURRENT_WA;
 
    if( pArea )
@@ -1973,8 +1976,11 @@ HB_FUNC( DBSEEK )
          bFindLast = ISLOG( 3 ) ? hb_parl( 3 ) : FALSE;
          if( SELF_SEEK( pArea, bSoftSeek, pKey, bFindLast ) == SUCCESS )
          {
-            hb_retl( pArea->fFound );
-            return;
+            if( SELF_FOUND( pArea, &fFound ) != FAILURE )
+            {
+               hb_retl( fFound );
+               return;
+            }
          }
       }
       else
@@ -4359,7 +4365,7 @@ static ERRCODE rddMoveRecords( char *cAreaFrom, char *cAreaTo, PHB_ITEM pFields,
    AREAP      pAreaFrom, pAreaTo, pAreaRelease = NULL;
    USHORT     uiCurrAreaSaved = hb_rddGetCurrentWorkAreaNumber();
    AREAP      pCurrArea = HB_CURRENT_WA;
-   BOOL       bDeleted = FALSE;
+   BOOL       bDeleted = FALSE, fEof = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("rddMoveRecords(%s, %s, %p, %p, %p, %d, %lu, %d, %s )",
             cAreaFrom, cAreaTo, pFields, pFor, pWhile, lNext, lRec, bRest, cDriver));
@@ -4420,12 +4426,12 @@ static ERRCODE rddMoveRecords( char *cAreaFrom, char *cAreaTo, PHB_ITEM pFields,
    }
 
    /*move those records assuming we are positioned on one.*/
-   while ( ! pAreaFrom->fEof )
+   while( SELF_EOF( pAreaFrom, &fEof ) != FAILURE )
    {
-      if ( pWhile && ! hb_itemGetL( hb_vmEvalBlock( pWhile ) ) )
-      {
+      if( fEof )
          break;
-      }
+      if ( pWhile && ! hb_itemGetL( hb_vmEvalBlock( pWhile ) ) )
+         break;
       if ( !pFor || hb_itemGetL( hb_vmEvalBlock( pFor ) ) )
       {
          hb_rddSelectWorkAreaNumber( pAreaTo->uiArea );
@@ -4640,7 +4646,8 @@ HB_FUNC( DBSKIPPER )
          while( nSkipped < nRecs )
          {
             SELF_SKIP( pArea, 1 );
-            if( pArea->fEof )
+            SELF_EOF( pArea, &bBEof );
+            if( bBEof )
             {
                SELF_SKIP( pArea, -1 );
                nRecs = nSkipped ;
@@ -4656,7 +4663,8 @@ HB_FUNC( DBSKIPPER )
          while( nSkipped > nRecs )
          {
             SELF_SKIP( pArea, -1 );
-            if( pArea->fBof )
+            SELF_BOF( pArea, &bBEof );
+            if( bBEof )
             {
                nRecs = nSkipped ;
             }

@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.41 2005/04/22 04:30:59 druzus Exp $
+ * $Id: workarea.c,v 1.42 2005/04/24 11:25:40 druzus Exp $
  */
 
 /*
@@ -163,7 +163,9 @@ ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
    */
    lUpDown = ( lUpDown < 0  ? -1 : 1 );
 
+   /* remember if we are here after SLEF_GOTOP() */
    fBottom = pArea->fBottom;
+
    while ( !pArea->fBof && !pArea->fEof )
    {
       /* SET FILTER TO */
@@ -172,6 +174,7 @@ ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
          pResult = hb_vmEvalBlock( pArea->dbfi.itmCobExpr );
          if( HB_IS_LOGICAL( pResult ) && !hb_itemGetL( pResult ) )
          {
+            
             if ( SELF_SKIPRAW( pArea, lUpDown ) != SUCCESS )
                return FAILURE;
             continue;
@@ -201,6 +204,15 @@ ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
    {
       if ( fBottom )
       {
+         /* GOTO EOF (phantom) record - 
+            this is the only one place where GOTO is used by xHarbour
+            directly and RDD which does not operate on numbers should
+            serve this method only as SELF_GOEOF() synonym. If it's a
+            problem then we can remove this if and always use SELF_GOTOP()
+            but it also means second table scan if all records filtered
+            are out of filter so I do not want to do that. I will prefer
+            explicit add SELF_GOEOF() method
+          */
          uiError = SELF_GOTO( pArea, 0 );
       }
       else
@@ -944,6 +956,7 @@ ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
    int iCurrArea;
    PHB_ITEM pResult;
    DBORDERINFO pInfo;
+   ERRCODE errCode;
    int iOrder;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waRelEval(%p, %p)", pArea, pRelInfo));
@@ -959,47 +972,34 @@ ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
 
    memset( &pInfo, 0, sizeof( DBORDERINFO ) );
    pInfo.itmResult = hb_itemPutNI( NULL, 0 );
-   SELF_ORDINFO( pArea, DBOI_NUMBER, &pInfo );
+   errCode = SELF_ORDINFO( pArea, DBOI_NUMBER, &pInfo );
    iOrder = hb_itemGetNI( pInfo.itmResult );
+
+   if( errCode != FAILURE )
+   {
+      if( iOrder != 0 )
+      {
+         if( pRelInfo->isScoped )
+         {
+            pInfo.itmNewVal = pResult;
+            errCode = SELF_ORDINFO( pArea, DBOI_SCOPETOP, &pInfo );
+            if( errCode != FAILURE )
+               errCode = SELF_ORDINFO( pArea, DBOI_SCOPEBOTTOM, &pInfo );
+         }
+         if( errCode != FAILURE )
+            errCode = SELF_SEEK( pArea, 0, pResult, 0 );
+      }
+      else
+      {
+         /*
+         *  If current order equals to zero, use GOTOID instead of SEEK
+         */
+         errCode = SELF_GOTOID( pArea, pResult );
+      }
+   }
    hb_itemRelease( pInfo.itmResult );
 
-   if( iOrder != 0 )
-   {
-      if( pRelInfo->isScoped )
-      {
-         DBORDERINFO pInfo;
-         ERRCODE errCode;
-
-         pInfo.itmOrder = NULL;
-         pInfo.atomBagName = NULL;
-         pInfo.itmResult = hb_itemNew( NULL );
-         pInfo.itmNewVal = pResult;
-
-         errCode = SELF_ORDINFO( pArea, DBOI_SCOPETOP, &pInfo );
-         if( errCode != FAILURE )
-            errCode = SELF_ORDINFO( pArea, DBOI_SCOPEBOTTOM, &pInfo );
-
-         hb_itemRelease( pInfo.itmResult );
-
-         if( errCode == FAILURE )
-            return FAILURE;
-      }
-      if( SELF_SEEK( pArea, 0, pResult, 0 ) == SUCCESS )
-         return SUCCESS;
-      else
-         return FAILURE;
-   }
-   else
-   {
-      /*
-      *  If current order equals to zero, use GOTO instead of SEEK
-      */
-
-      if( SELF_GOTO( pArea, hb_itemGetNI( pResult ) ) == SUCCESS )
-         return SUCCESS;
-      else
-         return FAILURE;
-   }
+   return errCode;
 }
 
 /*
@@ -1009,25 +1009,23 @@ ERRCODE hb_waRelText( AREAP pArea, USHORT uiRelNo, void * pExpr )
 {
    LPDBRELINFO lpdbRelations;
    USHORT uiIndex = 1;
-   char* pBuf = (char*) pExpr;  /*TODO: Why is the string buffer declared as void*? This creates casting hassles.*/
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waRelText(%p, %hu, %p)", pArea, uiRelNo, pExpr));
 
-   *pBuf = 0;
    lpdbRelations = pArea->lpdbRelations;
 
    while( lpdbRelations )
    {
       if ( uiIndex++ == uiRelNo )
       {
-         hb_strncpy( pBuf, hb_itemGetCPtr( lpdbRelations->abKey ),
+         hb_strncpy( ( char* ) pExpr, hb_itemGetCPtr( lpdbRelations->abKey ),
                      HARBOUR_MAX_RDD_RELTEXT_LENGTH );
-         break;
-         /* TODO: Verify buffer size is big enough ?? */
+         return SUCCESS;
       }
       lpdbRelations = lpdbRelations->lpdbriNext;
    }
-   return *pBuf ? SUCCESS : FAILURE ;
+   * ( char * ) pExpr = 0;
+   return FAILURE;
 }
 
 /*
