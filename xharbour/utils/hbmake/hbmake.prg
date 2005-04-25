@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.143 2005/03/31 16:55:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.144 2005/04/25 16:13:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -69,7 +69,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion := "1.143"
+STATIC s_cHbMakeVersion := "1.144"
 STATIC s_lPrint          := .F.
 STATIC s_aDefines        := {}
 STATIC s_aBuildOrder     := {}
@@ -664,7 +664,7 @@ FUNCTION ParseMakeFile( cFile )
 
    FT_FUSE()  // Close the opened file & release memory
 
-   IF s_lExtended .AND. ! lCfgFound
+   IF s_lExtended .AND. (!lCfgFound .or. s_lForce)
 
       IF s_lBcc
          BuildBorCfgFile()
@@ -1118,7 +1118,7 @@ FUNCTION CompileFiles()
                      @  4, 16 SAY s_aCs[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aCs ) )   // Changed s_aPrgs to s_aCs, Ath 2004-06-08
                      nFile ++
-                     // Outstd( cComm )
+                     //Outstd( cComm )
                      setpos(9,0)
                      __RUN( (cComm) )
                      cErrText := Memoread( (s_cLog) )
@@ -4258,10 +4258,10 @@ RETURN NIL
 *-------------------------
 FUNCTION BuildBorCfgFile()
 *-------------------------
-   LOCAL cCfg := GetHarbourDir() + '\bin\harbour.cfg'
-   LOCAL nCfg
+LOCAL cCfg := GetHarbourDir() + '\bin\harbour.cfg'
+LOCAL nCfg
 
-   IF !File( cCfg )
+   IF !File( cCfg ) .or. s_lForce 
 
       nCfg := FCreate( cCfg )
 
@@ -4278,8 +4278,9 @@ FUNCTION BuildBorCfgFile()
       endif
 
       FWrite( nCfg, "CC=BCC32" + CRLF )
-      FWrite( nCfg, "CFLAGS= -c " + Replacemacros( "-I$(BHC)\include -OS $(CFLAGS) -d -L$(BHC)\lib" ) + CRLF )
-      FWrite( nCfg, "VERBOSE=NO" + CRLF )
+//    FWrite( nCfg, "CFLAGS= -c " + Replacemacros( "-I$(BHC)\include -OS $(CFLAGS) -d -L$(BHC)\lib" ) + CRLF )
+      FWrite( nCfg, "CFLAGS= -c " + Replacemacros( "-I$(BHC)\include $(CFLAGS) -d -L$(BHC)\lib" ) + CRLF )
+      FWrite( nCfg, "VERBOSE=YES" + CRLF )
       FWrite( nCfg, "DELTMP=YES" + CRLF )
       FClose( nCfg )
    ENDIF
@@ -4292,9 +4293,8 @@ FUNCTION BuildMSCCfgfile()
    LOCAL cCfg := GetHarbourDir() + '\bin\harbour.cfg'
    LOCAL nCfg
 
-//   IF ! File( GetMakeDir() + '\bin\harbour.cfg' )
-   IF ! File( cCfg )
-//      nCfg := FCreate( GetMakeDir() + '\bin\harbour.cfg' )
+   IF !File( cCfg )  .or. s_lForce
+
       nCfg := FCreate( cCfg )
 
       if nCfg = F_ERROR
@@ -4311,7 +4311,7 @@ FUNCTION BuildMSCCfgfile()
 
       FWrite( nCfg, "CC=cl" + CRLF )
       FWrite( nCfg, "CFLAGS= -c " + Replacemacros( "-I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" ) + CRLF )
-      FWrite( nCfg, "VERBOSE=NO" + CRLF )
+      FWrite( nCfg, "VERBOSE=YES" + CRLF )
       FWrite( nCfg, "DELTMP=YES" + CRLF )
       FClose( nCfg )
    ENDIF
@@ -4325,7 +4325,7 @@ FUNCTION BuildPellesCfgFile()
    LOCAL cCfg := GetHarbourDir() + '\bin\harbour.cfg'
    LOCAL nCfg
 
-   IF !File( cCfg )
+   IF !File( cCfg )  .or. s_lForce
 
       nCfg := FCreate( cCfg )
 
@@ -4343,7 +4343,7 @@ FUNCTION BuildPellesCfgFile()
 
       FWrite( nCfg, "CC=POCC" + CRLF )
       FWrite( nCfg, "CFLAGS= " + ReplaceMacros( "-I$(INCLUDE_DIR) -Tx86-coff -W1 $(C_USR) $(CFLAGS)" ) + CRLF )
-      FWrite( nCfg, "VERBOSE=NO" + CRLF )
+      FWrite( nCfg, "VERBOSE=YES" + CRLF )
       FWrite( nCfg, "DELTMP=YES" + CRLF )
       FClose( nCfg )
    ENDIF
@@ -4357,7 +4357,6 @@ FUNCTION Buildgcccfgfile()
 *-------------------------
    LOCAL cCfg 
    LOCAL nCfg
-//   LOCAL cDir := GetMakeDir()
    LOCAL cDir := GetHarbourDir()
    LOCAL cBhc := Alltrim( Strtran( replacemacros( '$(BHC)' ), '\', '/' ) )
 
@@ -4365,7 +4364,7 @@ FUNCTION Buildgcccfgfile()
 
    cCfg := cDir + '\bin\harbour.cfg'
 
-   IF ! File( cCfg  )
+   IF !File( cCfg ) .or. s_lForce
 
       nCfg := FCreate( cCfg )
 
@@ -4383,7 +4382,7 @@ FUNCTION Buildgcccfgfile()
 
       FWrite( nCfg, "CC=gcc" + CRLF )
       FWrite( nCfg, "CFLAGS= -c " + Replacemacros( "-I" + cBhc + "/include $(C_USR)  -L" + cBhc + "/lib" ) + CRLF )
-      FWrite( nCfg, "VERBOSE=NO" + CRLF )
+      FWrite( nCfg, "VERBOSE=YES" + CRLF )
       FWrite( nCfg, "DELTMP=YES" + CRLF )
       FClose( nCfg )
    ENDIF
@@ -4396,7 +4395,8 @@ FUNCTION BuildGccCfgFileL()
    LOCAL cCfg := '/etc/harbour.cfg'
    LOCAL nCfg
 
-   IF ! File( cCfg )
+   IF !File( cCfg )  .or. s_lForce
+
       nCfg := FCreate( cCfg )
 
       if nCfg = F_ERROR

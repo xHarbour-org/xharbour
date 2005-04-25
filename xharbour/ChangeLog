@@ -1,12 +1,17 @@
-/*
- * $Id: ChangeLog,v 1.4069 2005/04/25 02:08:39 andijahja Exp $
- */
+ * $Id: ChangeLog,v 1.4071 2005/04/25 16:38:00 modalsist Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-25 16:38 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * utils/hbmake/hbmake.prg
+    ! changed to recreate the harbour.cfg file at each time that use "-f"
+      to force rebuild all prgs. At this way the harbour.cfg will be always
+      updated. The option VERBOSE was changed to YES to all C compilers also.
+      For Borland C++ compiler the "-OS" flag was removed because it's duplicated.
 
 2005-04-25 21:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/pack_src.bat
