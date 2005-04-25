@@ -29,20 +29,23 @@ FUNCTION Main()
    PRIVATE mdDate     := Date()
    PRIVATE mlLogicalT := .F.
    PRIVATE mlLogicalF := .T.
+   PRIVATE mcLongerNa := "Ten chars var name"
 
-   SAVE TO memfile ALL
-   SAVE TO memsome ALL LIKE "mnDouble*"
+   SAVE TO memfile ALL EXTENDED
+   SAVE TO memsome ALL LIKE "mnDouble*" EXTENDED
 
    CLEAR MEMORY
 
-   SAVE TO memempt ALL
+   SAVE TO memempt ALL EXTENDED
 
    PRIVATE mxStayHere := "CONST"
 
-   RESTORE FROM memfile ADDITIVE
+   RESTORE FROM memfile ADDITIVE EXTENDED
 
    ? mxStayHere
-   ? mcLongerNa /* Can't restore the part of the name beyond the tenth char */
+   ? mcLongerNameThen10Chars
+   ? mcLongerNa // Can't restore the part of the name beyond the tenth char
+                // Now restore-able with "EXTENDED" flag
    ? mcString
    ? mnDouble
    ? mnDoubleH
@@ -52,10 +55,12 @@ FUNCTION Main()
    ? mlLogicalF
    ? mlLogicalT
 
-   RESTORE FROM memfile
+   RESTORE FROM memfile EXTENDED
 
 // ? mxStayHere
-   ? mcLongerNa /* Can't restore the part of the name beyond the tenth char */
+   ? mcLongerNameThen10Chars
+   ? mcLongerNa // Can't restore the part of the name beyond the tenth char
+                // Now restore-able with "EXTENDED" flag
    ? mcString
    ? mnDouble
    ? mnDoubleH
@@ -65,7 +70,7 @@ FUNCTION Main()
    ? mlLogicalF
    ? mlLogicalT
 
-   ? __MRestore( "memfile", .F., .F., "mndouble*", .T. )
+   ? __MRestore( "memfile", .F., .T., "mndouble*", .T. )
    ? mnDouble
    ? mnDoubleH
    ? __mvScope("mnInt")

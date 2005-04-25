@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4066 2005/04/24 18:35:35 druzus Exp $
+ * $Id: ChangeLog,v 1.4067 2005/04/24 19:35:19 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,48 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-25 08:15 UTC+0700 Andi Jahja <andijahja@xharbour.com>
+  * source/vm/memvars.c
+  * source/pp/pptable.c
+    + additional flags on SAVE/RESTORE FROM *.mem; Possible commands:
+      + save to mymem all like mylongvariable* extended
+      + save all except mylongvariable2 to mymem extended
+      + save to mymem all except mylongvariable2 extended
+      + save to mymem all extended
+      + restore from mymem additive extended
+      + restore from mymem extended
+
+      "EXTENDED" flags works on xHarbour flavor ie. memvar names with more than
+       10 chars length ie. MYVARIABLE_MORE_THAN_10
+       Default length is HB_SYMBOL_NAME_LEN (64 by default)
+       Variable saved with "EXTENDED" must be restore with "EXTENDED" too.
+
+       WARNING:
+       __MVRESTORE syntax now changed as folows:
+       __MVRESTORE( cMemFile, lAdditive, lLongName, cMask, lIncludeMask )
+       lLongName ( default := .F. ) is inserted as 3rd argument.
+
+  * tests/memfile.prg
+    ! Modify __MvRestore() to use current syntax
+
+  + tests/memfilex.prg
+    ! test program for saving/restoring long-name public variables to/from
+      mem file.
+
+  * source/rtl/philes.c
+    ! CURDIR[X]() now respects parameter eg. CURDIR("D:")
+      Hopefully this will not have bad effect on OS with no drive letter
+
+  * contrib/libnf/caplock.c
+  * contrib/libnf/numlock.c
+  * contrib/libnf/alt.c
+  * contrib/libnf/ctrl.c
+  * contrib/libnf/shift.c
+  * contrib/libnf/chdir.c
+  * contrib/libnf/rmdir.c
+  * contrib/libnf/mkdir.c
+    ! enable functions for __WIN32__
 
 2005-04-24 14:33 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/achoice.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.98 2005/03/22 01:13:17 ronpinkas Exp $
+ * $Id: memvars.c,v 1.99 2005/03/31 04:02:30 druzus Exp $
  */
 
 /*
@@ -1919,6 +1919,7 @@ typedef struct
 {
    char * pszMask;
    BOOL bIncludeMask;
+   BOOL bLongName;
    BYTE * buffer;
    FHANDLE fhnd;
    regex_t re;
@@ -1933,8 +1934,23 @@ static HB_DYNS_FUNC( hb_memvarSave )
    BOOL bIncludeMask = ( ( MEMVARSAVE_CARGO * ) Cargo )->bIncludeMask;
    BYTE * buffer     = ( ( MEMVARSAVE_CARGO * ) Cargo )->buffer;
    FHANDLE fhnd      = ( ( MEMVARSAVE_CARGO * ) Cargo )->fhnd;
+   BOOL bLongName    = ( ( MEMVARSAVE_CARGO * ) Cargo )->bLongName;
+   UINT	uMemLen	     = 10;
+   UINT	uMLen	     = HB_MEM_REC_LEN;
 
    regmatch_t aMatches[1];
+
+   /* xHarbour extended feature, restore variables with 64 chars long */
+   if( bLongName )
+   {
+      uMemLen = HB_SYMBOL_NAME_LEN;
+      uMLen = HB_SYMBOL_NAME_LEN + 22;
+      /*
+      Why 22 ? I don't know :-( It just came from simple math ie.
+      For 10-char-length, HB_MEM_REC_LEN is 32. So, 22 bytes are considered
+      spared/reserved. Current implementation only utilizes 3 bytes.
+      */
+   }
 
    /* NOTE: Harbour name lengths are not limited, but the .MEM file
             structure is not flexible enough to allow for it.
@@ -1953,35 +1969,34 @@ static HB_DYNS_FUNC( hb_memvarSave )
       {
          /* NOTE: Clipper will not initialize the record buffer with
                   zeros, so they will look trashed. [vszakats] */
-         memset( buffer, 0, HB_MEM_REC_LEN );
 
-         /* NOTE: Save only the first 10 characters of the name */
-         strncpy( ( char * ) buffer, pDynSymbol->pSymbol->szName, 10 );
-         buffer[ 10 ] = '\0';
+         memset( buffer, 0, uMLen );
+         strncpy( ( char * ) buffer, pDynSymbol->pSymbol->szName, uMemLen );
+         buffer[ uMemLen ] = '\0';
 
          if( HB_IS_STRING( pItem ) && ( pItem->item.asString.length + 1 ) <= SHRT_MAX )
          {
             /* Store the closing zero byte, too */
             USHORT uiLength = ( USHORT ) ( pItem->item.asString.length + 1 );
 
-            buffer[ 11 ] = 'C' + 128;
-            buffer[ 16 ] = HB_LOBYTE( uiLength );
-            buffer[ 17 ] = HB_HIBYTE( uiLength );
+            buffer[ uMemLen + 1 ] = 'C' + 128;
+            buffer[ uMemLen + 6 ] = HB_LOBYTE( uiLength );
+            buffer[ uMemLen + 7 ] = HB_HIBYTE( uiLength );
 
-            hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
+            hb_fsWrite( fhnd, buffer, uMLen );
             hb_fsWrite( fhnd, ( BYTE * ) pItem->item.asString.value, uiLength );
          }
          else if( HB_IS_DATE( pItem ) )
          {
             BYTE byNum[ sizeof( double ) ];
 
-            buffer[ 11 ] = 'D' + 128;
-            buffer[ 16 ] = 1;
-            buffer[ 17 ] = 0;
+            buffer[ uMemLen + 1 ] = 'D' + 128;
+            buffer[ uMemLen + 6 ] = 1;
+            buffer[ uMemLen + 7 ] = 0;
 
             HB_PUT_LE_DOUBLE( byNum, ( double ) pItem->item.asDate.value );
 
-            hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
+            hb_fsWrite( fhnd, buffer, uMLen );
             hb_fsWrite( fhnd, byNum, sizeof( byNum ) );
          }
          else if( HB_IS_NUMERIC( pItem ) )
@@ -1992,36 +2007,37 @@ static HB_DYNS_FUNC( hb_memvarSave )
 
             hb_itemGetNLen( pItem, &iWidth, &iDec );
 
-            buffer[ 11 ] = 'N' + 128;
+            buffer[ uMemLen + 1 ] = 'N' + 128;
 #ifdef HB_C52_STRICT
 /* NOTE: This is the buggy, but fully CA-Cl*pper compatible method. [vszakats] */
-            buffer[ 16 ] = ( BYTE ) iWidth + ( HB_IS_DOUBLE( pItem ) ? iDec + 1 : 0 );
+            buffer[ uMemLen + 6 ] = ( BYTE ) iWidth + ( HB_IS_DOUBLE( pItem ) ? iDec + 1 : 0 );
 #else
 /* NOTE: This would be the correct method, but Clipper is buggy here. [vszakats] */
-            buffer[ 16 ] = ( BYTE ) iWidth + ( iDec == 0 ? 0 : iDec + 1 );
+            buffer[ uMemLen + 6 ] = ( BYTE ) iWidth + ( iDec == 0 ? 0 : iDec + 1 );
 #endif
-            buffer[ 17 ] = ( BYTE ) iDec;
+            buffer[ uMemLen + 7 ] = ( BYTE ) iDec;
 
             HB_PUT_LE_DOUBLE( byNum, hb_itemGetND( pItem ) );
 
-            hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
+            hb_fsWrite( fhnd, buffer, uMLen );
             hb_fsWrite( fhnd, byNum, sizeof( byNum ) );
          }
          else if( HB_IS_LOGICAL( pItem ) )
          {
             BYTE byLogical[ 1 ];
 
-            buffer[ 11 ] = 'L' + 128;
-            buffer[ 16 ] = sizeof( BYTE );
-            buffer[ 17 ] = 0;
+            buffer[ uMemLen + 1 ] = 'L' + 128;
+            buffer[ uMemLen + 6 ] = sizeof( BYTE );
+            buffer[ uMemLen + 7 ] = 0;
 
             byLogical[ 0 ] = hb_itemGetL( pItem ) ? 1 : 0;
 
-            hb_fsWrite( fhnd, buffer, HB_MEM_REC_LEN );
+            hb_fsWrite( fhnd, buffer, uMLen );
             hb_fsWrite( fhnd, byLogical, sizeof( BYTE ) );
          }
       }
    }
+
    return TRUE;
 }
 
@@ -2030,18 +2046,26 @@ HB_FUNC( __MVSAVE )
    HB_THREAD_STUB
 
    /* Clipper also checks for the number of arguments here */
-   if( hb_pcount() == 3 && ISCHAR( 1 ) && ISCHAR( 2 ) && ISLOG( 3 ) )
+   if( hb_pcount() == 4 && ISCHAR( 1 ) && ISCHAR( 2 ) && ISLOG( 3 ) && ISLOG( 4 ) )
    {
       PHB_FNAME pFileName;
       char szFileName[ _POSIX_PATH_MAX + 1 ];
       FHANDLE fhnd;
+      UINT uLen = HB_MEM_REC_LEN;
+
+      if( hb_parl( 4 ) )
+      {
+         uLen =  HB_SYMBOL_NAME_LEN + 22;
+      }
 
       /* Generate filename */
 
       pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
 
       if( pFileName->szExtension == NULL )
+      {
          pFileName->szExtension = ".mem";
+      }
 
       hb_fsFNameMerge( szFileName, pFileName );
       hb_xfree( pFileName );
@@ -2053,19 +2077,21 @@ HB_FUNC( __MVSAVE )
          USHORT uiAction = hb_errRT_BASE_Ext1( EG_CREATE, 2006, NULL, szFileName, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
 
          if( uiAction == E_DEFAULT || uiAction == E_BREAK )
+	 {
             break;
+	 }
       }
 
       if( fhnd != FS_ERROR )
       {
-         BYTE buffer[ HB_MEM_REC_LEN ];
          MEMVARSAVE_CARGO msc;
          // Arbitary value, *SHOULD* be long enough.
          char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
 
          msc.pszMask      = hb_parcx( 2 );
          msc.bIncludeMask = hb_parl( 3 );
-         msc.buffer       = buffer;
+         msc.bLongName    = hb_parl( 4 );
+         msc.buffer       = (BYTE *) hb_xgrab( uLen );
          msc.fhnd         = fhnd;
 
          Wild2RegEx( (char *) (msc.pszMask), sRegEx, FALSE );
@@ -2080,10 +2106,12 @@ HB_FUNC( __MVSAVE )
 
          regfree( &msc.re );
 
-         buffer[ 0 ] = '\x1A';
-         hb_fsWrite( fhnd, buffer, 1 );
+         msc.buffer[ 0 ] = '\x1A';
+         hb_fsWrite( fhnd, msc.buffer, 1 );
 
          hb_fsClose( fhnd );
+
+         hb_xfree( msc.buffer );
       }
    }
    else
@@ -2102,20 +2130,37 @@ HB_FUNC( __MVRESTORE )
    HB_THREAD_STUB
 
    /* Clipper checks for the number of arguments here here, but we cannot
-      in Harbour since we have two optional parameters as an extension. */
-   if( ISCHAR( 1 ) && ISLOG( 2 ) )
+      in Harbour since we have two optional parameters as an extension.
+      We make it three for restoring long-name variables (AJ:2005/04/25)
+   */
+   if( ISCHAR( 1 ) && ISLOG( 2 ) && ISLOG(3) )
    {
       PHB_FNAME pFileName;
       char szFileName[ _POSIX_PATH_MAX + 1 ];
       FHANDLE fhnd;
 
       BOOL bAdditive = hb_parl( 2 );
+      BOOL bLongName = hb_parl( 3 );
+      UINT uLen = HB_MEM_REC_LEN;
+      UINT uMemLen = 10;
 
       /* Clear all memory variables if not ADDITIVE */
 
       if( ! bAdditive )
       {
          hb_dynsymEval( hb_memvarClear, NULL );
+      }
+
+      /* xHarbour extended feature, save variables with 64 chars long */
+      if( bLongName )
+      {
+         uLen = HB_SYMBOL_NAME_LEN + 22;
+         uMemLen = HB_SYMBOL_NAME_LEN;
+         /*
+         Why 22 ? I don't know :-( It just came from simple math ie.
+         For 10-char-length, HB_MEM_REC_LEN is 32. So, 22 bytes are considered
+         spared/reserved. Current implementation only utilizes 3 bytes.
+         */
       }
 
       /* Generate filename */
@@ -2149,9 +2194,9 @@ HB_FUNC( __MVRESTORE )
 
       if( fhnd != FS_ERROR )
       {
-         char * pszMask = ISCHAR( 3 ) ? hb_parc( 3 ) : ( char * ) "*";
-         BOOL bIncludeMask = ISCHAR( 4 ) ? hb_parl( 4 ) : TRUE;
-         BYTE buffer[ HB_MEM_REC_LEN ];
+         char * pszMask = ISCHAR( 4 ) ? hb_parc( 4 ) : ( char * ) "*";
+         BOOL bIncludeMask = ISLOG( 5 ) ? hb_parl( 5 ) : TRUE;
+         BYTE *buffer = (BYTE *) hb_xgrab( uLen );
 
          // Arbitary value which should be big enough.
          char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
@@ -2171,11 +2216,11 @@ HB_FUNC( __MVRESTORE )
             hb_errInternal( 9100, "Invalid mask passed as MEMVAR filter '%s' -> '%s'\n", (char *) pszMask, sRegEx );
          }
 
-         while( hb_fsRead( fhnd, buffer, HB_MEM_REC_LEN ) == HB_MEM_REC_LEN )
+         while( hb_fsRead( fhnd, buffer, uLen ) == uLen )
          {
-            USHORT uiType = ( USHORT ) ( buffer[ 11 ] - 128 );
-            USHORT uiWidth = ( USHORT ) buffer[ 16 ];
-            USHORT uiDec = ( USHORT ) buffer[ 17 ];
+            USHORT uiType = ( USHORT ) ( buffer[ 1 + uMemLen ] - 128 );
+            USHORT uiWidth = ( USHORT ) buffer[ 6 + uMemLen  ];
+            USHORT uiDec = ( USHORT ) buffer[ 7 + uMemLen  ];
             BOOL bMatch;
 
             hb_itemPutC( &Name, ( char * ) buffer );
@@ -2284,6 +2329,9 @@ HB_FUNC( __MVRESTORE )
          regfree( &re );
 
          hb_fsClose( fhnd );
+
+	 if( buffer )
+           hb_xfree( buffer );
       }
       else
       {
@@ -2292,7 +2340,7 @@ HB_FUNC( __MVRESTORE )
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 2007, NULL, "__MRESTORE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      hb_errRT_BASE( EG_ARG, 2007, NULL, "__MRESTORE", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
    }
 }
 

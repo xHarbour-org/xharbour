@@ -1,5 +1,5 @@
 /*
- * $Id: ctrl.c,v 1.1 2000/04/22 02:10:10 lculik Exp $
+ * $Id: ctrl.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
  */
 
 /*
@@ -61,6 +61,11 @@
 
 #include <hbapi.h>
 
+#if defined(__WIN32__)
+   #include <windows.h>
+   #define HB_VK_CONTROL        0x11
+#endif
+
 HB_FUNC( FT_CTRL )
 {
 #if defined(HB_OS_DOS)
@@ -69,5 +74,13 @@ HB_FUNC( FT_CTRL )
       hb_retl( ( int ) ( ( *( char * ) 0x00400017 ) & 0x4 ) );
       return;
    }
+#elif defined(__WIN32__)
+
+   BYTE kbBuffer[ 256 ];
+
+   GetKeyboardState( kbBuffer );
+
+   hb_retl( kbBuffer[ HB_VK_CONTROL ] & 0x01 );
+
 #endif
 }

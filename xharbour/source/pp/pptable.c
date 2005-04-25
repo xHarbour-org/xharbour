@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.52 2005/03/06 23:43:20 andijahja Exp $
+ * $Id: pptable.c,v 1.53 2005/04/20 23:29:54 ronpinkas Exp $
  */
 
 /*
@@ -300,12 +300,12 @@ void hb_pp_Table( void )
    static COMMANDS sC___131 = {0,"RELEASE","ALL","__MVRelease('*', .t.)",&sC___130 };
    static COMMANDS sC___132 = {0,"RELEASE","ALL LIKE \1A00","__MVRelease( \1A10, .t. )",&sC___131 };
    static COMMANDS sC___133 = {0,"RELEASE","ALL EXCEPT \1A00","__MVRelease( \1A10, .f. )",&sC___132 };
-   static COMMANDS sC___134 = {0,"RESTORE","\16FROM \1A40\17 \16\1B20 ADDITIVE>\17","__MVRestore( \1A30, \1B50 )",&sC___133 };
+   static COMMANDS sC___134 = {0,"RESTORE","\16FROM \1A40\17 \16\1B20 ADDITIVE>\17 \16\1C20 EXTENDED>\17","__MVRestore( \1A30, \1B50, \1C50 )",&sC___133 };
    static COMMANDS sC___135 = {0,"SAVE","ALL LIKE \1A00 TO \1B40","__MVSave( \1B30, \1A30, .t. )",&sC___134 };
-   static COMMANDS sC___136 = {0,"SAVE","TO \1A40 ALL LIKE \1B00","__MVSave( \1A30, \1B30, .t. )",&sC___135 };
-   static COMMANDS sC___137 = {0,"SAVE","ALL EXCEPT \1A00 TO \1B40","__MVSave( \1B30, \1A30, .f. )",&sC___136 };
-   static COMMANDS sC___138 = {0,"SAVE","TO \1A40 ALL EXCEPT \1B00","__MVSave( \1A30, \1B30, .f. )",&sC___137 };
-   static COMMANDS sC___139 = {0,"SAVE","\16TO \1A40\17 \16ALL\17","__MVSave( \1A30, '*', .t. )",&sC___138 };
+   static COMMANDS sC___136 = {0,"SAVE","TO \1A40 ALL LIKE \1B40 \16\1C20 EXTENDED>\17","__MVSave( \1A30, \1B30, .t., \1C50 )",&sC___135 };
+   static COMMANDS sC___137 = {0,"SAVE","ALL EXCEPT \1A00 TO \1B40 \16\1C20 EXTENDED>\17","__MVSave( \1B30, \1A30, .f., \1C50 )",&sC___136 };
+   static COMMANDS sC___138 = {0,"SAVE","TO \1A40 ALL EXCEPT \1B00 \16\1C20 EXTENDED>\17","__MVSave( \1A30, \1B30, .f., \1C50 )",&sC___137 };
+   static COMMANDS sC___139 = {0,"SAVE","\16TO \1A40\17 \16ALL\17 \16\1C20 EXTENDED>\17","__MVSave( \1A30, '*', .t., \1C50 )",&sC___138 };
    static COMMANDS sC___140 = {0,"ERASE","\1A40","FErase( \1A30 )",&sC___139 };
    static COMMANDS sC___141 = {0,"DELETE","FILE \1A40","FErase( \1A30 )",&sC___140 };
    static COMMANDS sC___142 = {0,"RENAME","\1A40 TO \1B40","FRename( \1A30, \1B30 )",&sC___141 };

@@ -1,5 +1,5 @@
 /*
- * $Id: rmdir.c,v 1.2 2004/03/18 03:46:55 ronpinkas Exp $
+ * $Id: rmdir.c,v 1.3 2004/12/15 13:39:34 druzus Exp $
  */
 
 /* File......: RMDIR.ASM
@@ -79,9 +79,13 @@ End
 
 /* This is the New one Rewriten in C*/
 
-#include "extend.h"
 #if defined(HB_OS_DOS)
+#include "extend.h"
 #include "dos.h"
+#elif defined(__WIN32__)
+#include "hbapi.h"
+#include "hbapifs.h"
+#include <windows.h>
 #endif
 
 HB_FUNC(FT_RMDIR)
@@ -98,5 +102,19 @@ HB_FUNC(FT_RMDIR)
    HB_DOS_INT86X(0x21,&regs,&regs,&sregs);
    Status=regs.HB_XREGS.ax;
    hb_retni(Status);
+#elif defined(__WIN32__)
+   UINT iResult;
+
+   hb_fsRmDir( (BYTE *) hb_parcx(1) );
+
+   iResult = (UINT) GetLastError();
+
+   if( iResult != 0 && iResult != 3 && iResult != 5 && iResult != 16 )
+   {
+      iResult = 99;
+   }
+
+   hb_retni( iResult );
 #endif
 }
+

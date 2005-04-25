@@ -1,5 +1,5 @@
 /*
- * $Id: mkdir.c,v 1.3 2004/12/15 13:39:33 druzus Exp $
+ * $Id: mkdir.c,v 1.4 2005/01/09 06:08:24 likewolf Exp $
  */
 
 /*; File......: MKDIR.ASM
@@ -88,6 +88,10 @@ End
       #include <errno.h>
       #include <sys/stat.h>
    #endif
+#elif defined( __WIN32__ )
+   #include "hbapi.h"
+   #include "hbapifs.h"
+   #include <windows.h>
 #endif
 
 HB_FUNC( FT_MKDIR )
@@ -107,7 +111,7 @@ HB_FUNC( FT_MKDIR )
       char *path = hb_parcx( 1 );
       union REGS regs;
       struct SREGS sregs;
-      
+
       segread( &sregs );
       regs.h.ah = 0x39;
       sregs.ds = FP_SEG( path );
@@ -116,5 +120,22 @@ HB_FUNC( FT_MKDIR )
       Status = regs.HB_XREGS.ax;
       hb_retni( Status );
    #endif
+#elif defined( __WIN32__ )
+   UINT iResult;
+
+   hb_fsMkDir( (BYTE *) hb_parcx(1) );
+
+   iResult = (UINT) GetLastError();
+
+   if (iResult == ERROR_ALREADY_EXISTS)
+   {
+      iResult = 5;
+   }
+   else if (iResult == ERROR_BAD_PATHNAME)
+   {
+      iResult = 99;
+   }
+
+   hb_retni( iResult );
 #endif
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: chdir.c,v 1.3 2004/12/15 13:39:33 druzus Exp $
+ * $Id: chdir.c,v 1.4 2005/01/09 06:08:24 likewolf Exp $
  */
 
 /* File......: CHDIR.ASM
@@ -77,14 +77,16 @@ End
 */
 /* This is the New one Rewriten in C*/
 
-#include "extend.h"
-
 #if defined( HB_OS_DOS )
+   #include "extend.h"
    #include <dos.h>
    #if defined( __DJGPP__ )
       #include <errno.h>
       #include <unistd.h>
    #endif
+#elif defined( __WIN32__ )
+   #include "hbapi.h"
+   #include "hbapifs.h"
 #endif
 
 HB_FUNC( FT_CHDIR )
@@ -104,16 +106,27 @@ HB_FUNC( FT_CHDIR )
       char *path = hb_parcx(1);
       union REGS regs;
       struct SREGS sregs;
-      
+
       regs.h.ah = 0x3B;
-      
+
       segread( &sregs );
       sregs.ds = FP_SEG( path );
       regs.HB_XREGS.dx = FP_OFF( path );
-      
+
       HB_DOS_INT86X( 0x21, &regs, &regs, &sregs);
       Status = regs.HB_XREGS.ax;
       hb_retni( Status );
    #endif
+#elif defined( __WIN32__ )
+   PHB_ITEM pDir = hb_param( 1, HB_IT_STRING );
+   BOOL bResult;
+
+   if ( pDir && strlen( pDir->item.asString.value ) > 0 )
+   {
+      bResult = hb_fsChDir( (BYTE *) pDir->item.asString.value );
+   }
+
+   hb_retl( bResult );
+
 #endif
 }

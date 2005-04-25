@@ -1,5 +1,5 @@
 /*
- * $Id: shift.c,v 1.1 2000/04/22 11:10:53 lculik Exp $
+ * $Id: shift.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
  */
 
 /*
@@ -61,6 +61,11 @@
 
 #include <hbapi.h>
 
+#if defined(__WIN32__)
+   #include <windows.h>
+   #define HB_VK_SHIFT  0x10
+#endif
+
 HB_FUNC(FT_SHIFT )
 {
 #if defined(HB_OS_DOS)
@@ -70,5 +75,13 @@ HB_FUNC(FT_SHIFT )
 
    return;
    }
+#elif defined(__WIN32__)
+
+   BYTE kbBuffer[ 256 ];
+
+   GetKeyboardState( kbBuffer );
+
+   hb_retl( kbBuffer[ HB_VK_SHIFT ] & 0x01 );
+
 #endif
 }

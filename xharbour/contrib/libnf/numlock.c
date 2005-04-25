@@ -1,5 +1,5 @@
 /*
- * $Id: numlock.c,v 1.2 2002/04/15 04:35:29 walito Exp $
+ * $Id: numlock.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
  */
 
 /*
@@ -77,6 +77,10 @@
 
 #define status_byte ( *( char * ) ( 0x00400017 ) )
 
+#if defined(__WIN32__)
+   extern BOOL ft_SetKeyBoardState( USHORT uKey, BOOL bOn, BOOL *bCurrentStatus );
+#endif
+
 HB_FUNC(FT_NUMLOCK)
 {
 #if defined(HB_OS_DOS)
@@ -92,5 +96,10 @@ HB_FUNC(FT_NUMLOCK)
    }
    return;
 
+#elif defined(__WIN32__)
+   #define HB_VK_NUMLOCK        0x90
+   BOOL bCurrentStatus;
+   ft_SetKeyBoardState( HB_VK_NUMLOCK, hb_parl(1), &bCurrentStatus );
+   hb_retl( bCurrentStatus );
 #endif
 }

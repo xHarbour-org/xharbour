@@ -1,5 +1,5 @@
 /*
- * $Id: caplock.c,v 1.2 2002/04/15 04:34:24 walito Exp $
+ * $Id: caplock.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
  */
 
 /*
@@ -64,11 +64,45 @@
 
 #include <hbapi.h>
 
+#if defined(__WIN32__)
+   #include <windows.h>
+
+   BOOL ft_SetKeyBoardState( USHORT uKey, BOOL bOn, BOOL *bCurrentStatus )
+   {
+      BYTE kbBuffer[ 256 ];
+      BOOL bRetval;
+
+      GetKeyboardState( kbBuffer );
+
+      if( kbBuffer[ uKey ] & 0x01 )
+      {
+	 *bCurrentStatus = TRUE;
+         if( !bOn)
+         {
+            kbBuffer[ uKey ] = 0;
+         }
+      }
+      else
+      {
+	 *bCurrentStatus = FALSE;
+         if( bOn)
+         {
+            kbBuffer[ uKey ] = 1;
+         }
+      }
+
+      bRetval = SetKeyboardState( kbBuffer );
+
+      return bRetval;
+
+   }
+#endif
+
 #define status_byte ( *( unsigned char * ) ( 0x00400017 ) )
 
 HB_FUNC(FT_CAPLOCK)
 {
-#if defined(HB_OS_DOS) 
+#if defined(HB_OS_DOS)
    {
    hb_retl( ( int ) ( status_byte & 0x40 ) );
 
@@ -81,5 +115,10 @@ HB_FUNC(FT_CAPLOCK)
    }
    return;
    }
+#elif defined(__WIN32__)
+   #define HB_VK_CAPITAL        0x14
+   BOOL bCurrentStatus;
+   ft_SetKeyBoardState( HB_VK_CAPITAL, hb_parl(1), &bCurrentStatus );
+   hb_retl( bCurrentStatus );
 #endif
 }

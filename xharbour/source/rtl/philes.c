@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.26 2005/01/26 21:46:36 druzus Exp $
+ * $Id: philes.c,v 1.27 2005/03/30 21:30:51 andijahja Exp $
  */
 
 /*
@@ -253,11 +253,28 @@ HB_FUNC( CURDIR )
 {
    USHORT uiErrorOld = hb_fsError();
    BYTE * pbyBuffer = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
+   PHB_ITEM pDrv = hb_param( 1, HB_IT_STRING );
+   BYTE cCurDrv = hb_fsCurDrv();
+   BYTE cDrv;
 
-   hb_fsCurDirBuff( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-      ( USHORT )( toupper( *hb_parcx( 1 ) ) - 'A' ) : hb_fsCurDrv(), pbyBuffer, _POSIX_PATH_MAX + 1 );
+   if( pDrv && hb_parclen( 1 ) > 0 )
+   {
+      cDrv = (BYTE) ( toupper( pDrv->item.asString.value[0] ) - 'A');
+      if( cDrv != cCurDrv )
+      {
+         hb_fsChDrv( cDrv );
+      }
+   }
+   else
+   {
+      cDrv = cCurDrv;
+   }
+
+   hb_fsCurDirBuff( cDrv, pbyBuffer, _POSIX_PATH_MAX + 1 );
 
    hb_retcAdopt( ( char * ) pbyBuffer );
+
+   hb_fsChDrv( cCurDrv );
 
    hb_fsSetError( uiErrorOld );
 }
@@ -281,9 +298,28 @@ HB_FUNC( CURDIRX )
 {
    USHORT uiErrorOld = hb_fsError();
    BYTE * pbyBuffer = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
-   hb_fsCurDirBuffEx( ( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 ) ?
-      ( USHORT )( toupper( *hb_parcx( 1 ) ) - 'A' ) : hb_fsCurDrv(), pbyBuffer, _POSIX_PATH_MAX + 1 );
+   PHB_ITEM pDrv = hb_param( 1, HB_IT_STRING );
+   BYTE cCurDrv = hb_fsCurDrv();
+   BYTE cDrv;
+
+   if( pDrv && hb_parclen( 1 ) > 0 )
+   {
+      cDrv = (BYTE) ( toupper( pDrv->item.asString.value[0] ) - 'A');
+      if( cDrv != cCurDrv )
+      {
+         hb_fsChDrv( cDrv );
+      }
+   }
+   else
+   {
+      cDrv = cCurDrv;
+   }
+
+   hb_fsCurDirBuffEx( cDrv, pbyBuffer, _POSIX_PATH_MAX + 1 );
+
    hb_retcAdopt( ( char * ) pbyBuffer );
+
+   hb_fsChDrv( cCurDrv );
 
    hb_fsSetError( uiErrorOld );
 }
