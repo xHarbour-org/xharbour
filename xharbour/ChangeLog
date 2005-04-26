@@ -1,10 +1,22 @@
- * $Id: ChangeLog,v 1.4076 2005/04/26 05:42:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4077 2005/04/26 07:25:05 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-04-26 17:10 UTC+0700 Andi Jahja <andijahja@xharbour.com>
+  * contrib/libnf/makefile.bc
+  * contrib/libnf/makefile.vc
+  * contrib/libnf/makefile.wc
+  + contrib/libnf/fttext.c
+    + xHarbour version of Nanforum Toolkit text file handler.
+    NOTE: There is an inconvenient behaviour (IMHO) in FT_FDELETE() but the
+    functionality is currently the same with the original 16-bit version.
+    Perhaps we should revise it someday.
+
+  * contrib/libnf/chdir.c
+    ! modify return value as per original version
 
 2005-04-26 00:24 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/errorapi.c

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.3 2003/10/10 13:33:51 paultucker Exp $
+# $Id: makefile.vc,v 1.4 2005/03/06 19:22:09 paultucker Exp $
 #
 
 #
@@ -153,6 +153,7 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\getver.obj \
    $(OBJ_DIR)\ftattr.obj \
    $(OBJ_DIR)\dispc.obj \
+   $(OBJ_DIR)\fttext.obj \
    \
    $(OBJ_DIR)\aading.obj \
    $(OBJ_DIR)\aavg.obj \

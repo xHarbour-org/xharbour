@@ -1,5 +1,5 @@
 /*
- * $Id: chdir.c,v 1.4 2005/01/09 06:08:24 likewolf Exp $
+ * $Id: chdir.c,v 1.5 2005/04/25 01:17:15 andijahja Exp $
  */
 
 /* File......: CHDIR.ASM
@@ -87,6 +87,7 @@ End
 #elif defined( __WIN32__ )
    #include "hbapi.h"
    #include "hbapifs.h"
+   #include <windows.h>
 #endif
 
 HB_FUNC( FT_CHDIR )
@@ -120,13 +121,21 @@ HB_FUNC( FT_CHDIR )
 #elif defined( __WIN32__ )
    PHB_ITEM pDir = hb_param( 1, HB_IT_STRING );
    BOOL bResult;
+   int iRet = 0;
+   DWORD dError;
 
    if ( pDir && strlen( pDir->item.asString.value ) > 0 )
    {
       bResult = hb_fsChDir( (BYTE *) pDir->item.asString.value );
+      if ( !bResult )
+      {
+         dError = GetLastError();
+         printf("dError=%i\n", dError);
+         iRet = ( dError == ERROR_PATH_NOT_FOUND ) ? 3 : 99;
+      }
    }
 
-   hb_retl( bResult );
+   hb_retni( iRet );
 
 #endif
 }

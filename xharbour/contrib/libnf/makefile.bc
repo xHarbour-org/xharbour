@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.1 2003/10/09 05:31:55 paultucker Exp $
+# $Id: makefile.bc,v 1.2 2004/01/28 13:25:30 lculik Exp $
 #
 
 #
@@ -112,6 +112,7 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\getver.obj \
    $(OBJ_DIR)\ftattr.obj \
    $(OBJ_DIR)\dispc.obj \
+   $(OBJ_DIR)\fttext.obj \
    \
    $(OBJ_DIR)\aading.obj \
    $(OBJ_DIR)\aavg.obj \
@@ -326,6 +327,10 @@ $(OBJ_DIR)\ftattr.obj : $(TOOLS_DIR)\ftattr.c
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\dispc.obj : $(TOOLS_DIR)\dispc.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\fttext.obj : $(TOOLS_DIR)\fttext.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
