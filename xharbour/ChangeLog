@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4074 2005/04/26 04:12:08 andijahja Exp $
+ * $Id: ChangeLog,v 1.4075 2005/04/26 05:37:57 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -14,7 +14,7 @@
   * include/hbvm.h
   * source/vm/hvm.c
     + Added PHB_ITEM pPrevErrBlock to struct _HB_SEQUENCE
-    + Added logic to set/restore ErrorBlock
+    + Added logic to set/restore ErrorBlock in TRY/END
 
   * tests/trycatch.prg
     * Modified to test mixing TRY/END along with BEGIN SEQUENCE and ErrorBlock()
