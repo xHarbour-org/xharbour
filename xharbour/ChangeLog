@@ -1,10 +1,23 @@
- * $Id: ChangeLog,v 1.4073 2005/04/26 02:59:25 andijahja Exp $
+ * $Id: ChangeLog,v 1.4074 2005/04/26 04:12:08 andijahja Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-25 22:36 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbapierr.h
+  * source/vm/errorapi.c
+    + Added PHB_ITEM hb_errorBlock( PHB_ITEM pNewErrorBlock )
+    * Reverted ErrorBlock() to NOT care about hb_vm_iTries
+  * include/hbvm.h
+  * source/vm/hvm.c
+    + Added PHB_ITEM pPrevErrBlock to struct _HB_SEQUENCE
+    + Added logic to set/restore ErrorBlock
+
+  * tests/trycatch.prg
+    * Modified to test mixing TRY/END along with BEGIN SEQUENCE and ErrorBlock()
 
 2005-04-26 11:10 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * contrib/libnf/caplock.c
@@ -53,7 +66,7 @@
   * xharbour/source/rdd/workarea.c
     + added some comments
     * some other code made more simple
-    
+
   * xharbour/source/common/hbstr.c
     * optimized hb_stricmp()
     ! fixed possible overflow in hb_strncpyUpperTrim(), hb_strncpyTrim()
@@ -148,7 +161,7 @@
       Brian please check me - sorry I cannot well test it.
   * xharbour/contrib/rdd_ads/adsfunc.c
     * removed unused variable
-    
+
   * xharbour/include/hbapirdd.h
     + added HARBOUR_MAX_RDD_RELTEXT_LENGTH to avoid possible buffer
       overflow in DBRELATION() function - RDD should respect this value
@@ -169,7 +182,7 @@
       parameter
     ! hb_waRelText() respects HARBOUR_MAX_RDD_RELTEXT_LENGTH
     * changed scoped relations to use DBOI_* interface for scopes
-    
+
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
     * modified the tag selection for SIXCDX - now when only bag is given
       (without tag) SIXCDX looks for tag with the same name as given bag.

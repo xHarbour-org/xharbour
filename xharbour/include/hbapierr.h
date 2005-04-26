@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.11 2005/02/25 10:43:46 andijahja Exp $
+ * $Id: hbapierr.h,v 1.12 2005/03/31 03:15:16 druzus Exp $
  */
 
 /*
@@ -193,6 +193,7 @@ typedef struct HB_ERROR_INFO_
 
 /*  set/get current error handler */
 extern HB_ERROR_INFO_PTR HB_EXPORT hb_errorHandler( HB_ERROR_INFO_PTR pNewHandler );
+extern PHB_ITEM hb_errorBlock( PHB_ITEM pNewErrorBlock );
 
 HB_EXTERN_END
 

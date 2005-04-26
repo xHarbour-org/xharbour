@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.24 2005/02/27 21:28:25 andijahja Exp $
+ * $Id: hbvm.h,v 1.25 2005/03/31 03:15:19 druzus Exp $
  */
 
 /*
@@ -62,6 +62,7 @@ typedef struct _HB_SEQUENCE
    ULONG lRecover;
    UINT wEnumCollectionCounter;
    UINT wWithObjectCounter;
+   PHB_ITEM pPrevErrBlock;
    struct _HB_SEQUENCE *pPrev;
 } HB_SEQUENCE, *PHB_SEQUENCE;
 

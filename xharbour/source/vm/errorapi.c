@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.57 2005/04/21 23:24:05 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.58 2005/04/22 16:49:01 ronpinkas Exp $
  */
 
 /*
@@ -156,24 +156,26 @@ HB_FUNC( ERRORBLOCK )
 
    PHB_ITEM pNewErrorBlock = hb_param( 1, HB_IT_BLOCK );
 
-   if( hb_vm_iTry )
-   {
-      #ifdef HB_USE_BREAKBLOCK
-         hb_itemCopy( &(HB_VM_STACK.Return), hb_vm_BreakBlock );
-      #else
-         hb_errRT_BASE( EG_UNSUPPORTED, 0, NULL, "ERRORBLOCK", HB_MIN( hb_pcount(), 2 ), hb_paramError( 1 ), hb_paramError( 2 ) );
-         return;
-      #endif
-   }
-   else
-   {
-      hb_itemCopy( &(HB_VM_STACK.Return), s_errorBlock );
-   }
+   hb_itemCopy( &(HB_VM_STACK.Return), s_errorBlock );
 
    if( pNewErrorBlock )
    {
       hb_itemCopy( s_errorBlock, pNewErrorBlock );
    }
+}
+
+PHB_ITEM hb_errorBlock( PHB_ITEM pNewErrorBlock )
+{
+   HB_THREAD_STUB
+
+   PHB_ITEM pReturn = hb_itemNew( s_errorBlock );
+
+   if( pNewErrorBlock )
+   {
+      hb_itemCopy( s_errorBlock, pNewErrorBlock );
+   }
+
+   return pReturn;
 }
 
 /* set new low-level error launcher (C function) and return
@@ -182,10 +184,14 @@ HB_FUNC( ERRORBLOCK )
 HB_ERROR_INFO_PTR HB_EXPORT hb_errorHandler( HB_ERROR_INFO_PTR pNewHandler )
 {
    HB_THREAD_STUB
+
    HB_ERROR_INFO_PTR pOld = s_errorHandler;
 
    if( pNewHandler )
+   {
       pNewHandler->Previous = s_errorHandler;
+   }
+
    s_errorHandler = pNewHandler;
 
    return pOld;

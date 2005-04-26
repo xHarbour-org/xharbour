@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.13 2004/04/08 13:26:54 druzus Exp $
+ * $Id: debug.c,v 1.14 2004/04/14 10:32:14 druzus Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 #include "hbfast.h"
 #include "hbapiitm.h"
 #include "hbstack.h"
+#include "hbapierr.h"
 
 /* $Doc$
  * $FuncName$     AddToArray( <pItem>, <pReturn>, <uiPos> )
@@ -242,16 +243,29 @@ HB_FUNC( HB_DBG_VMVARLGET )
    {
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
    }
+
    if( iLocal > SHRT_MAX )
    {
       hb_dbgStop();
       iLocal -= USHRT_MAX;
       iLocal--;
    }
+
    if( iLocal >= 0 )
+   {
      hb_itemCopy( &(HB_VM_STACK.Return), hb_itemUnRef( *(pBase + 1 + iLocal) ) );
+   }
    else
-     hb_itemCopy( &(HB_VM_STACK.Return), hb_codeblockGetVar( *(pBase+1), ( LONG ) iLocal ) );
+   {
+     if( HB_IS_BLOCK( *(pBase+1) ) )
+     {
+        hb_itemCopy( &(HB_VM_STACK.Return), hb_codeblockGetVar( *(pBase+1), ( LONG ) iLocal ) );
+     }
+     else
+     {
+        hb_errRT_BASE( EG_ARG, 9999, NULL, "HB_DBG_VMVARLGET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+     }
+   }
 }
 
 HB_FUNC( HB_DBG_VMVARLSET )

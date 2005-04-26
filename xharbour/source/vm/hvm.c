@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.455 2005/04/21 23:24:05 ronpinkas Exp $
+ * $Id: hvm.c,v 1.456 2005/04/23 06:52:18 guerra000 Exp $
  */
 
 /*
@@ -394,9 +394,7 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
 
 int hb_vm_iTry = 0;
 
-#ifdef HB_USE_BREAKBLOCK
-   PHB_ITEM hb_vm_BreakBlock = NULL;
-#endif
+PHB_ITEM hb_vm_BreakBlock = NULL;
 
 static int s_iBaseLine;
 
@@ -431,19 +429,17 @@ void hb_vmDoInitClip( void )
       hb_vmDo(0);
    }
 
-   #ifdef HB_USE_BREAKBLOCK
-      pDynSym = hb_dynsymFind( "__BREAKBLOCK" );
+   pDynSym = hb_dynsymFind( "__BREAKBLOCK" );
 
-      if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
-      {
-         hb_vmPushSymbol( pDynSym->pSymbol );
-         hb_vmPushNil();
-         hb_vmDo(0);
+   if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
+   {
+      hb_vmPushSymbol( pDynSym->pSymbol );
+      hb_vmPushNil();
+      hb_vmDo(0);
 
-         hb_vm_BreakBlock = hb_itemNew( NULL );
-         hb_itemForwardValue( hb_vm_BreakBlock, &( hb_stack.Return ) );
-      }
-   #endif
+      hb_vm_BreakBlock = hb_itemNew( NULL );
+      hb_itemForwardValue( hb_vm_BreakBlock, &( hb_stack.Return ) );
+   }
 }
 
 // Initialize DBFCDX and DBFNTX if linked.
@@ -911,9 +907,7 @@ int HB_EXPORT hb_vmQuit( void )
    //printf("After thread exit\n" );
 #endif
 
-   #ifdef HB_USE_BREAKBLOCK
-      hb_itemRelease( hb_vm_BreakBlock );
-   #endif
+   hb_itemRelease( hb_vm_BreakBlock );
 
    /* hb_dynsymLog(); */
 
@@ -1996,7 +1990,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
 
          case HB_P_TRYBEGIN:
-           hb_vm_iTry++;
+            hb_vm_iTry++;
+
+            // Intentionally FALL through.
 
          case HB_P_SEQBEGIN:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEQBEGIN") );
@@ -2045,6 +2041,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             pSequence->wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
             pSequence->wWithObjectCounter     = hb_vm_wWithObjectCounter;
 
+            if( curPCode == HB_P_TRYBEGIN )
+            {
+               pSequence->pPrevErrBlock = hb_errorBlock( hb_vm_BreakBlock );
+            }
+
             pSequence->pPrev = hb_vm_pSequence;
             hb_vm_pSequence = pSequence;
 
@@ -2053,7 +2054,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          }
 
          case HB_P_TRYEND:
-           hb_vm_iTry--;
+            hb_vm_iTry--;
+
+            hb_itemRelease( hb_errorBlock( hb_vm_pSequence->pPrevErrBlock ) );
+            hb_itemRelease( hb_vm_pSequence->pPrevErrBlock );
+
+            // Intentionally FALL through.
 
          case HB_P_SEQEND:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEQEND") );
@@ -2088,7 +2094,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          }
 
          case HB_P_TRYRECOVER:
-           hb_vm_iTry--;
+            hb_vm_iTry--;
+
+            hb_itemRelease( hb_errorBlock( hb_vm_pSequence->pPrevErrBlock ) );
+            hb_itemRelease( hb_vm_pSequence->pPrevErrBlock );
+
+            // Intentionally FALL through.
 
          case HB_P_SEQRECOVER:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEQRECOVER") );
@@ -3537,67 +3548,64 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       }
       #endif
 
-      if( s_uiActionRequest )
+      if( s_uiActionRequest & HB_BREAK_REQUESTED )
       {
-         if( s_uiActionRequest & HB_BREAK_REQUESTED )
+         if( bCanRecover )
          {
-            if( bCanRecover )
-            {
-                // Reset FOR EACH.
-                while( hb_vm_wEnumCollectionCounter > hb_vm_pSequence->wEnumCollectionCounter )
-                {
-                   hb_vm_wEnumCollectionCounter--;
-                   hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
-                   hb_itemClear( hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] );
-                   hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
-                }
+             // Reset FOR EACH.
+             while( hb_vm_wEnumCollectionCounter > hb_vm_pSequence->wEnumCollectionCounter )
+             {
+                hb_vm_wEnumCollectionCounter--;
+                hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
+                hb_itemClear( hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] );
+                hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
+             }
 
-                // Reset WITH OBJECT.
-                while( hb_vm_wWithObjectCounter > hb_vm_pSequence->wWithObjectCounter )
-                {
-                   --hb_vm_wWithObjectCounter;
-                   hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
-                }
+             // Reset WITH OBJECT.
+             while( hb_vm_wWithObjectCounter > hb_vm_pSequence->wWithObjectCounter )
+             {
+                --hb_vm_wWithObjectCounter;
+                hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
+             }
 
-               /*
-                * There is the BEGIN/END sequence deifined in current
-                * procedure/function - use it to continue opcodes execution
-                */
+            /*
+             * There is the BEGIN/END sequence deifined in current
+             * procedure/function - use it to continue opcodes execution
+             */
 
-               /*
-                * remove all items placed on the stack after BEGIN code
-                */
-               hb_stackRemove( hb_vm_pSequence->lBase );
-               w = hb_vm_pSequence->lRecover;
+            /*
+             * remove all items placed on the stack after BEGIN code
+             */
+            hb_stackRemove( hb_vm_pSequence->lBase );
+            w = hb_vm_pSequence->lRecover;
 
-               /*
-                * leave the SEQUENCE envelope on the stack - it will
-                * be popped either in RECOVER or END opcode
-                */
-               s_uiActionRequest = 0;
-            }
-            else
-            {
-               break;
-            }
-         }
-         else if( s_uiActionRequest & HB_QUIT_REQUESTED )
-         {
-            #ifdef HB_THREAD_SUPPORT
-               /* Generalize quit request so that the whole VM is affected */
-               hb_vm_bQuitRequest = TRUE;
-            #endif
-
-            break;
-         }
-         else if( s_uiActionRequest & HB_ENDPROC_REQUESTED )
-         {
-            /* request to stop current procedure was issued
-             * (from macro evaluation)
+            /*
+             * leave the SEQUENCE envelope on the stack - it will
+             * be popped either in RECOVER or END opcode
              */
             s_uiActionRequest = 0;
+         }
+         else
+         {
             break;
          }
+      }
+      else if( s_uiActionRequest & HB_QUIT_REQUESTED )
+      {
+         #ifdef HB_THREAD_SUPPORT
+            /* Generalize quit request so that the whole VM is affected */
+            hb_vm_bQuitRequest = TRUE;
+         #endif
+
+         break;
+      }
+      else if( s_uiActionRequest & HB_ENDPROC_REQUESTED )
+      {
+         /* request to stop current procedure was issued
+          * (from macro evaluation)
+          */
+         s_uiActionRequest = 0;
+         break;
       }
 
       /* JC1: now we can safely test for cancellation & tell garbage we are ready*/
