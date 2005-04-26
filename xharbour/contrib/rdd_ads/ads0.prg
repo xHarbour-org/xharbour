@@ -1,5 +1,5 @@
 /*
- * $Id: ads0.prg,v 1.2 2001/06/04 21:46:23 dholm Exp $
+ * $Id: ads0.prg,v 1.1 2002/07/11 02:57:52 lculik Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 
 ANNOUNCE ADS
 
-init procedure ADSInit
+procedure ADSInit
 
    REQUEST _ADS
 

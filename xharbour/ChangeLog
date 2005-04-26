@@ -1,10 +1,50 @@
- * $Id: ChangeLog,v 1.4077 2005/04/26 07:25:05 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4078 2005/04/26 10:04:43 andijahja Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-26 14:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/vm/hvm.c
+    ! fixed initialization order. We cannot run any unknown .prg code
+      before hb_vmDoInitStatics() because if it uses static variables
+      then it will GPF. I understand we need some error system enabled
+      when hb_vmDoInitStatics() is executed. So I added the function
+      hb_vmDoInitError() which set it. This is the note I left in
+      Source code:
+      /*
+       * TODO: replace it by our own minimum error system: f.e __ERRORBLOCK
+       * for which we will be sure that it does not use any static variable
+       * references. ErrorSys can be replaced by user and it is not safe to
+       * set it here. This is only temporary solution to the moment we create
+       * very small and basic error system which will be set when static
+       * variable are initialized to report any error which can appear in
+       * this process (very seldom situation because code for static
+       * initialization is limited). The real erro block will be set
+       * by CLIPInit function [druzus].
+       */
+      I would like to ask someone familaiar with current error handlers
+      to write very simply error handler which will be set by __ERRORBLOCK()
+      It should not use any upperlevel subsystems. It will be ideal if it'd
+      use only console and/or basic traclog output without additional .prg
+      code.
+    * restored previous version of s_uiActionRequest checking in main
+      hvm look - Ron you replaced single check for if( s_uiActionRequest )
+      with three if( s_uiActionRequest & ... ) this has noticeable
+      performance interaction - it's a main VM loop and we have 3 if's
+      instead of one in 99.9% of situation because s_uiActionRequest is set
+      very seldom (break, quit)
+    + added: SIXCDXINIT, RMDBFCDXINIT, ADSINIT to rdd initialization.
+
+  * xharbour/contrib/rdd_ads/ads0.prg
+  * xharbour/source/rdd/dbfcdx/dbfcdx0.prg
+    * removed 'init' from the RDD init procedures - it will be called by VM.
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * minor cleanups - no effect at runtime.
+
 2005-04-26 17:10 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * contrib/libnf/makefile.bc
   * contrib/libnf/makefile.vc

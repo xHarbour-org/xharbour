@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.106 2005/04/24 18:35:53 druzus Exp $
+ * $Id: dbfntx1.c,v 1.107 2005/04/25 23:11:06 druzus Exp $
  */
 
 /*
@@ -1264,7 +1264,7 @@ static ERRCODE hb_ntxHeaderLoad( LPNTXINDEX pIndex , char *szTagName )
    pTag->fUsrDescend = !pTag->AscendKey;
    pTag->KeyType = hb_ntxGetKeyType( pTag );
 
-   pTag->CurKeyInfo = hb_ntxKeyNew( NULL,pTag->KeyLength );
+   pTag->CurKeyInfo = hb_ntxKeyNew( NULL, pTag->KeyLength );
    pTag->stackSize  = NTX_STACKSIZE;
    pTag->stack = (LPTREESTACK) hb_xgrab( sizeof(TREE_STACK) * NTX_STACKSIZE );
 
@@ -2884,7 +2884,6 @@ static ERRCODE ntxGoBottom( NTXAREAP pArea )
    else
    {
       retval = SELF_GOTO( ( AREAP ) pArea, pArea->lpCurTag->CurKeyInfo->Xtra );
-
       if ( retval != FAILURE && pArea->fPositioned )
          retval = SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
    }
@@ -3153,7 +3152,6 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                            pTag->keyCount++;
                      }
                   }
-                  hb_ntxKeyCopy( pTag->CurKeyInfo, pKey, pTag->KeyLength );
                   hb_ntxIndexUnLockWrite( pTag );
                }
                hb_ntxKeyFree( pKey );

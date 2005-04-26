@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.456 2005/04/23 06:52:18 guerra000 Exp $
+ * $Id: hvm.c,v 1.457 2005/04/26 05:38:04 ronpinkas Exp $
  */
 
 /*
@@ -152,38 +152,6 @@
 #endif
 
 static void hb_vmClassError( int uiParams, char *szClassName, char *szMsg );
-
-static BYTE * hb_vmUnhideString( BYTE * pSource, ULONG ulSize )
-{
-   BYTE * pBuffer;
-   BYTE uiType = *pSource;
-   // ULONG ulBufferLen = HB_PCODE_MKUSHORT( &( pSource[ 1 ] ) );
-
-   pBuffer = (BYTE *) hb_xgrab( HB_MAX( ulSize, 1 ) );
-   pSource += 3;
-
-   switch( uiType )
-   {
-      case 1:      // Simple XOR 0xf3
-         {
-            BYTE * pTarget = pBuffer;
-
-            while( ulSize )
-            {
-               *pTarget++ = ( *pSource++ ) ^ 0xf3;
-               ulSize--;
-            }
-         }
-         break;
-
-      default:     // No decode
-         memcpy( pBuffer, pSource, ulSize );
-         break;
-
-   }
-
-   return pBuffer;
-}
 
 HB_FUNC_EXTERN( SYSINIT );
 
@@ -417,10 +385,53 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
   static ULONG s_ulBackground = 0;
 #endif
 
-// Initialize ErrorBlock() and __SetHelpK()
-void hb_vmDoInitClip( void )
+static BYTE * hb_vmUnhideString( BYTE * pSource, ULONG ulSize )
 {
-   PHB_DYNS pDynSym = hb_dynsymFind( "CLIPINIT" );
+   BYTE * pBuffer;
+   BYTE uiType = *pSource;
+   // ULONG ulBufferLen = HB_PCODE_MKUSHORT( &( pSource[ 1 ] ) );
+
+   pBuffer = (BYTE *) hb_xgrab( HB_MAX( ulSize, 1 ) );
+   pSource += 3;
+
+   switch( uiType )
+   {
+      case 1:      // Simple XOR 0xf3
+         {
+            BYTE * pTarget = pBuffer;
+
+            while( ulSize )
+            {
+               *pTarget++ = ( *pSource++ ) ^ 0xf3;
+               ulSize--;
+            }
+         }
+         break;
+
+      default:     // No decode
+         memcpy( pBuffer, pSource, ulSize );
+         break;
+
+   }
+
+   return pBuffer;
+}
+
+/* Initialize Error system */
+static void hb_vmDoInitError( void )
+{
+   /*
+    * TODO: replace it by our own minimum error system: f.e __ERRORBLOCK
+    * for which we will be sure that it does not use any static variable
+    * references. ErrorSys can be replaced by user and it is not safe to
+    * set it here. This is only temporary solution to the moment we create
+    * very small and basic error system which will be set when static
+    * variable are initialized to report any error which can appear in
+    * this process (very seldom situation because code for static
+    * initialization is limited). The real erro block will be set
+    * by CLIPInit function [druzus].
+    */
+   PHB_DYNS pDynSym = hb_dynsymFind( "ERRORSYS" );
 
    if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
    {
@@ -436,14 +447,26 @@ void hb_vmDoInitClip( void )
       hb_vmPushSymbol( pDynSym->pSymbol );
       hb_vmPushNil();
       hb_vmDo(0);
-
       hb_vm_BreakBlock = hb_itemNew( NULL );
       hb_itemForwardValue( hb_vm_BreakBlock, &( hb_stack.Return ) );
    }
 }
 
-// Initialize DBFCDX and DBFNTX if linked.
-void hb_vmDoInitRdd( void )
+/* Initialize ErrorBlock() and __SetHelpK() */
+static void hb_vmDoInitClip( void )
+{
+   PHB_DYNS pDynSym = hb_dynsymFind( "CLIPINIT" );
+
+   if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
+   {
+      hb_vmPushSymbol( pDynSym->pSymbol );
+      hb_vmPushNil();
+      hb_vmDo(0);
+   }
+}
+
+/* Initialize DBFCDX and DBFNTX if linked. */
+static void hb_vmDoInitRdd( void )
 {
    PHB_DYNS pDynSym;
    int i;
@@ -451,6 +474,9 @@ void hb_vmDoInitRdd( void )
                         "DBFFPTINIT",
                         "DBFNTXINIT",
                         "DBFCDXINIT",
+                        "SIXCDXINIT",
+                        "RMDBFCDXINIT",
+                        "ADSINIT",
                         "RDDINIT",
                         NULL };
 
@@ -590,12 +616,12 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
       }
    #endif
 
-   HB_TRACE( HB_TR_INFO, ("InitClip" ) );
-   hb_vmDoInitClip(); // Initialize ErrorBlock() and __SetHelpK()
-
-   //printf( "Before InitRdd\n" );
-   HB_TRACE( HB_TR_INFO, ("InitRdd" ) );
-   hb_vmDoInitRdd();  // Initialize DBFCDX and DBFNTX if linked.
+   /* Intitialize basic error system to report errors which can appear
+    * in InitStatics, the real (full feature) error block will be installed
+    * in InitClip()
+    */
+   HB_TRACE( HB_TR_INFO, ("InitError" ) );
+   hb_vmDoInitError();
 
    /* Call functions that initializes static variables
     * Static variables have to be initialized before any INIT functions
@@ -603,6 +629,13 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
     */
    HB_TRACE( HB_TR_INFO, ("InitStatics" ) );
    hb_vmDoInitStatics();
+
+   HB_TRACE( HB_TR_INFO, ("InitClip" ) );
+   hb_vmDoInitClip(); // Initialize ErrorBlock() and __SetHelpK()
+
+   //printf( "Before InitRdd\n" );
+   HB_TRACE( HB_TR_INFO, ("InitRdd" ) );
+   hb_vmDoInitRdd();  // Initialize DBFCDX and DBFNTX if linked.
 
    //printf( "Before InitFunctions\n" );
    HB_TRACE( HB_TR_INFO, ("InitFunctions" ) );
@@ -3548,64 +3581,67 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       }
       #endif
 
-      if( s_uiActionRequest & HB_BREAK_REQUESTED )
+      if( s_uiActionRequest )
       {
-         if( bCanRecover )
+         if( s_uiActionRequest & HB_BREAK_REQUESTED )
          {
-             // Reset FOR EACH.
-             while( hb_vm_wEnumCollectionCounter > hb_vm_pSequence->wEnumCollectionCounter )
-             {
-                hb_vm_wEnumCollectionCounter--;
-                hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
-                hb_itemClear( hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] );
-                hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
-             }
+            if( bCanRecover )
+            {
+                // Reset FOR EACH.
+                while( hb_vm_wEnumCollectionCounter > hb_vm_pSequence->wEnumCollectionCounter )
+                {
+                   hb_vm_wEnumCollectionCounter--;
+                   hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
+                   hb_itemClear( hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] );
+                   hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
+                }
 
-             // Reset WITH OBJECT.
-             while( hb_vm_wWithObjectCounter > hb_vm_pSequence->wWithObjectCounter )
-             {
-                --hb_vm_wWithObjectCounter;
-                hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
-             }
+                // Reset WITH OBJECT.
+                while( hb_vm_wWithObjectCounter > hb_vm_pSequence->wWithObjectCounter )
+                {
+                   --hb_vm_wWithObjectCounter;
+                   hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
+                }
 
-            /*
-             * There is the BEGIN/END sequence deifined in current
-             * procedure/function - use it to continue opcodes execution
-             */
+               /*
+                * There is the BEGIN/END sequence deifined in current
+                * procedure/function - use it to continue opcodes execution
+                */
 
-            /*
-             * remove all items placed on the stack after BEGIN code
-             */
-            hb_stackRemove( hb_vm_pSequence->lBase );
-            w = hb_vm_pSequence->lRecover;
+               /*
+                * remove all items placed on the stack after BEGIN code
+                */
+               hb_stackRemove( hb_vm_pSequence->lBase );
+               w = hb_vm_pSequence->lRecover;
 
-            /*
-             * leave the SEQUENCE envelope on the stack - it will
-             * be popped either in RECOVER or END opcode
-             */
-            s_uiActionRequest = 0;
+               /*
+                * leave the SEQUENCE envelope on the stack - it will
+                * be popped either in RECOVER or END opcode
+                */
+               s_uiActionRequest = 0;
+            }
+            else
+            {
+               break;
+            }
          }
-         else
+         else if( s_uiActionRequest & HB_QUIT_REQUESTED )
          {
+            #ifdef HB_THREAD_SUPPORT
+               /* Generalize quit request so that the whole VM is affected */
+               hb_vm_bQuitRequest = TRUE;
+            #endif
+
             break;
          }
-      }
-      else if( s_uiActionRequest & HB_QUIT_REQUESTED )
-      {
-         #ifdef HB_THREAD_SUPPORT
-            /* Generalize quit request so that the whole VM is affected */
-            hb_vm_bQuitRequest = TRUE;
-         #endif
-
-         break;
-      }
-      else if( s_uiActionRequest & HB_ENDPROC_REQUESTED )
-      {
-         /* request to stop current procedure was issued
-          * (from macro evaluation)
-          */
-         s_uiActionRequest = 0;
-         break;
+         else if( s_uiActionRequest & HB_ENDPROC_REQUESTED )
+         {
+            /* request to stop current procedure was issued
+             * (from macro evaluation)
+             */
+            s_uiActionRequest = 0;
+            break;
+         }
       }
 
       /* JC1: now we can safely test for cancellation & tell garbage we are ready*/
