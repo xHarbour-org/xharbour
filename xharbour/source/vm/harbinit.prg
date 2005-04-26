@@ -1,5 +1,5 @@
 /*
- * $Id: harbinit.prg,v 1.5 2005/04/21 23:24:05 ronpinkas Exp $
+ * $Id: harbinit.prg,v 1.6 2005/04/26 17:29:25 ronpinkas Exp $
  */
 
 /*
@@ -121,6 +121,6 @@ PROCEDURE __MinimalErrorHandler( oError )
 
    OutStd( cError )
 
-   BREAK oError
+   QUIT
 
 RETURN

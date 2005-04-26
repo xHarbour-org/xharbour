@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.457 2005/04/26 05:38:04 ronpinkas Exp $
+ * $Id: hvm.c,v 1.458 2005/04/26 12:26:00 druzus Exp $
  */
 
 /*
@@ -431,13 +431,17 @@ static void hb_vmDoInitError( void )
     * initialization is limited). The real erro block will be set
     * by CLIPInit function [druzus].
     */
-   PHB_DYNS pDynSym = hb_dynsymFind( "ERRORSYS" );
+   PHB_DYNS pDynSym = hb_dynsymFind( "__ERRORBLOCK" );
 
    if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
    {
       hb_vmPushSymbol( pDynSym->pSymbol );
       hb_vmPushNil();
       hb_vmDo(0);
+   }
+   else
+   {
+      hb_errInternal( HB_EI_ERRUNRECOV, "Error! missing __ErrorBlock()", NULL, NULL );
    }
 
    pDynSym = hb_dynsymFind( "__BREAKBLOCK" );
@@ -449,6 +453,10 @@ static void hb_vmDoInitError( void )
       hb_vmDo(0);
       hb_vm_BreakBlock = hb_itemNew( NULL );
       hb_itemForwardValue( hb_vm_BreakBlock, &( hb_stack.Return ) );
+   }
+   else
+   {
+      hb_errInternal( HB_EI_ERRUNRECOV, "Error! missing __BreakBlock()", NULL, NULL );
    }
 }
 
