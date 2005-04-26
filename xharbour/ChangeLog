@@ -1,10 +1,22 @@
- * $Id: ChangeLog,v 1.4078 2005/04/26 10:04:43 andijahja Exp $
+ * $Id: ChangeLog,v 1.4079 2005/04/26 12:25:25 druzus Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-26 10:26 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/harbinit.prg
+    + Added __ErrorBlock()
+    + Added __MinimalErrorHandler()
+  * source/vm/hvm.c
+    * hb_vmDoInitError() now calls __Errorlock() instead of ErrorSys()
+
+  /*
+     This provides minimal handling for STATIC initialization errors.
+     After static Initialization ClipInit() is called to set normal ErrorSys.
+   */
 
 2005-04-26 14:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/vm/hvm.c

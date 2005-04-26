@@ -1,5 +1,5 @@
 /*
- * $Id: harbinit.prg,v 1.4 2003/06/07 21:26:22 ronpinkas Exp $
+ * $Id: harbinit.prg,v 1.5 2005/04/21 23:24:05 ronpinkas Exp $
  */
 
 /*
@@ -89,3 +89,38 @@ RETURN
 
 FUNCTION __BreakBlock()
 RETURN {|e| Break(e) }
+
+FUNCTION __ErrorBlock( oError )
+RETURN {|e| __MinimalErrorHandler(e) }
+
+PROCEDURE __MinimalErrorHandler( oError )
+
+   #ifdef __PLATFORM__Windows
+      #define EOL Chr(13) + Chr(10)
+   #else
+      #define EOL Chr(10)
+   #endif
+
+   LOCAL cError := "Error!" + EOL
+
+   IF ValType( oError:Operation ) == 'C'
+      cError += "Operation: " + oError:Operation + EOL
+   ENDIF
+   IF ValType( oError:Description ) == 'C'
+      cError += "Description: " + oError:Description + EOL
+   ENDIF
+   IF ValType( oError:ModuleName ) == 'C'
+      cError += "Source: " + oError:ModuleName + EOL
+   ENDIF
+   IF ValType( oError:ProcName ) == 'C'
+      cError += "Procedure: " + oError:ProcName + EOL
+   ENDIF
+   IF ValType( oError:ProcLine ) == 'N'
+      cError += "Line: " + LTrim( Str( oError:ProcLine ) ) + EOL
+   ENDIF
+
+   OutStd( cError )
+
+   BREAK oError
+
+RETURN
