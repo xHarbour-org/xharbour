@@ -2,16 +2,16 @@ FUNCTION Main()
 
    LOCAL e, bPrevious
 
-   bPrevious := ErrorBlock( {|oErr| QOut( "Outer Handler:", oErr:Operation, oErr:Description ) } )
+   bPrevious := ErrorBlock( {|oErr| QOut( "Outer Handler:", oErr:Operation, oErr:Description ), Break() } )
 
    TRY
       ? "start"
 
-      // Test using BEGIN SEQUENCE nested inside a TRY section.
-      bPrevious := ErrorBlock( {|oErr| QOut( "Inner Handler:",  oErr:Operation, oErr:Description ) } )
+      // Test using BEGIN SEQUENCE with custom ErrorBlock() inside a TRY section.
+      bPrevious := ErrorBlock( {|oErr| IIF( oErr:CanSubStitute, 0, Break() ) } )
 
       BEGIN SEQUENCE
-         Eval( ErrorBlock(), ErrorNew( "MySys", 0, 1001, "MyOperation", "My Description", { "MyArg" } ) )
+         ? 3 / 0
       END
 
       ErrorBlock( bPrevious )
@@ -25,6 +25,6 @@ FUNCTION Main()
 
    Eval( ErrorBLock(), ErrorNew( "MySys", 0, 1001, "MyOperation", "My Description", { "MyArg" } ) )
 
-   ? "Done"
+   ? "Oops!!!"
 
 RETURN 0

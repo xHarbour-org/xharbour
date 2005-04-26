@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.58 2005/04/22 16:49:01 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.59 2005/04/26 05:38:04 ronpinkas Exp $
  */
 
 /*
@@ -124,9 +124,7 @@ extern HB_SET_STRUCT hb_set;
 #endif
 
 extern int hb_vm_iTry;
-#ifdef HB_USE_BREAKBLOCK
-   extern PHB_ITEM hb_vm_BreakBlock;
-#endif
+extern PHB_ITEM hb_vm_BreakBlock;
 
 HB_FUNC_EXTERN( ERRORNEW );
 
@@ -337,7 +335,7 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
       s_iLaunchCount++;
 
 
-      if( hb_vm_iTry )
+      if( hb_vm_iTry && s_errorBlock->item.asBlock.value == hb_vm_BreakBlock->item.asBlock.value )
       {
          hb_vmRequestBreak( pError );
          s_iLaunchCount--;
@@ -511,7 +509,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
       /* Launch the error handler: "xResult := EVAL( ErrorBlock(), oError )" */
       s_iLaunchCount++;
 
-      if( hb_vm_iTry )
+      if( hb_vm_iTry && s_errorBlock->item.asBlock.value == hb_vm_BreakBlock->item.asBlock.value )
       {
          hb_vmRequestBreak( pError );
          s_iLaunchCount--;
@@ -1260,15 +1258,20 @@ HB_FUNC( __ERRRT_SBASE )
 
 HB_FUNC( THROW )
 {
-   PHB_ITEM pError = hb_param( 1, HB_IT_ANY );
+   PHB_ITEM pError = hb_param( 1, HB_IT_ANY ), pResult;
 
    if( HB_IS_OBJECT( pError ) )
    {
       pError = hb_itemNew( pError );
 
-      hb_errLaunch( pError );
+      pResult = hb_errLaunchSubst( pError );
 
       hb_itemRelease( pError );
+
+      if( pResult )
+      {
+         hb_itemRelease( hb_itemReturn( pResult ) );
+      }
    }
    else
    {
