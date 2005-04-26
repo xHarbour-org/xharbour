@@ -1,5 +1,5 @@
 /*
- * $Id: caplock.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
+ * $Id: caplock.c,v 1.2 2005/04/25 01:17:15 andijahja Exp $
  */
 
 /*
@@ -67,7 +67,7 @@
 #if defined(__WIN32__)
    #include <windows.h>
 
-   BOOL ft_SetKeyBoardState( USHORT uKey, BOOL bOn, BOOL *bCurrentStatus )
+   BOOL ft_SetKeyBoardState( USHORT uKey, BOOL bOn, BOOL *bCurrentStatus, BOOL bParam )
    {
       BYTE kbBuffer[ 256 ];
       BOOL bRetval;
@@ -76,7 +76,7 @@
 
       if( kbBuffer[ uKey ] & 0x01 )
       {
-	 *bCurrentStatus = TRUE;
+         *bCurrentStatus = TRUE;
          if( !bOn)
          {
             kbBuffer[ uKey ] = 0;
@@ -84,14 +84,15 @@
       }
       else
       {
-	 *bCurrentStatus = FALSE;
+         *bCurrentStatus = FALSE;
          if( bOn)
          {
             kbBuffer[ uKey ] = 1;
          }
       }
 
-      bRetval = SetKeyboardState( kbBuffer );
+      if( bParam )
+         bRetval = SetKeyboardState( kbBuffer );
 
       return bRetval;
 
@@ -118,7 +119,8 @@ HB_FUNC(FT_CAPLOCK)
 #elif defined(__WIN32__)
    #define HB_VK_CAPITAL        0x14
    BOOL bCurrentStatus;
-   ft_SetKeyBoardState( HB_VK_CAPITAL, hb_parl(1), &bCurrentStatus );
+   BOOL bParam = ISLOG(1);
+   ft_SetKeyBoardState( HB_VK_CAPITAL, hb_parl(1), &bCurrentStatus, bParam );
    hb_retl( bCurrentStatus );
 #endif
 }

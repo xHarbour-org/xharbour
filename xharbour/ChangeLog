@@ -1,10 +1,16 @@
- * $Id: ChangeLog,v 1.4072 2005/04/25 23:10:31 druzus Exp $
+ * $Id: ChangeLog,v 1.4073 2005/04/26 02:59:25 andijahja Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-26 11:10 UTC+0700 Andi Jahja <andijahja@xharbour.com>
+  * contrib/libnf/caplock.c
+  * contrib/libnf/numlock.c
+    ! update state only when argment passed (only return status
+      when no argument passed)
 
 2005-04-26 09:50 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * source/pp/pptable.c
