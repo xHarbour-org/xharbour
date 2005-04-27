@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.99 2005/03/31 04:02:30 druzus Exp $
+ * $Id: memvars.c,v 1.100 2005/04/25 01:17:16 andijahja Exp $
  */
 
 /*
@@ -2046,14 +2046,14 @@ HB_FUNC( __MVSAVE )
    HB_THREAD_STUB
 
    /* Clipper also checks for the number of arguments here */
-   if( hb_pcount() == 4 && ISCHAR( 1 ) && ISCHAR( 2 ) && ISLOG( 3 ) && ISLOG( 4 ) )
+   if( hb_pcount() == 3 && ISCHAR( 1 ) && ISCHAR( 2 ) && ISLOG( 3 ) )
    {
       PHB_FNAME pFileName;
       char szFileName[ _POSIX_PATH_MAX + 1 ];
       FHANDLE fhnd;
       UINT uLen = HB_MEM_REC_LEN;
 
-      if( hb_parl( 4 ) )
+      if( ISLOG( 4 ) && hb_parl( 4 ) )
       {
          uLen =  HB_SYMBOL_NAME_LEN + 22;
       }
@@ -2133,14 +2133,14 @@ HB_FUNC( __MVRESTORE )
       in Harbour since we have two optional parameters as an extension.
       We make it three for restoring long-name variables (AJ:2005/04/25)
    */
-   if( ISCHAR( 1 ) && ISLOG( 2 ) && ISLOG(3) )
+   if( ISCHAR( 1 ) && ISLOG( 2 ) )
    {
       PHB_FNAME pFileName;
       char szFileName[ _POSIX_PATH_MAX + 1 ];
       FHANDLE fhnd;
 
       BOOL bAdditive = hb_parl( 2 );
-      BOOL bLongName = hb_parl( 3 );
+      BOOL bLongName = ISLOG(3) ? hb_parl( 3 ) : FALSE;
       UINT uLen = HB_MEM_REC_LEN;
       UINT uMemLen = 10;
 
@@ -2340,7 +2340,7 @@ HB_FUNC( __MVRESTORE )
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 2007, NULL, "__MRESTORE", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
+      hb_errRT_BASE( EG_ARG, 2007, NULL, "__MRESTORE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 }
 

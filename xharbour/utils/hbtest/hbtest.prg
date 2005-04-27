@@ -1,5 +1,5 @@
 /*
- * $Id: hbtest.prg,v 1.11 2005/03/06 00:53:05 andijahja Exp $
+ * $Id: hbtest.prg,v 1.12 2005/04/25 02:09:48 andijahja Exp $
  */
 
 /*
@@ -174,7 +174,7 @@ STATIC FUNCTION Main_LAST()
 
    TEST_LINE( MEMVARBLOCK( "mcString" )           , "{||...}"                                         )
 #ifndef __XPP__
-   TEST_LINE( __MRestore()                        , "E BASE 2007 Argument error __MRESTORE A:3:U:NIL;U:NIL;U:NIL ")
+   TEST_LINE( __MRestore()                        , "E BASE 2007 Argument error __MRESTORE A:2:U:NIL;U:NIL " )
 #endif
    TEST_LINE( MEMVARBLOCK( "mcString" )           , "{||...}"                                         )
 #ifndef __XPP__
@@ -183,7 +183,7 @@ STATIC FUNCTION Main_LAST()
 #endif
    TEST_LINE( MEMVARBLOCK( "mcString" )           , NIL                                               )
 #ifndef __XPP__
-   TEST_LINE( __MSave( BADFNAME(), "*", .T., .F. ) , "E BASE 2006 Create error " + BADFNAME() + " A:3:C:" + BADFNAME() + ";C:*;L:.T. F:DR")
+   TEST_LINE( __MSave( BADFNAME(), "*", .T. ) , "E BASE 2006 Create error " + BADFNAME() + " A:3:C:" + BADFNAME() + ";C:*;L:.T. F:DR")
 #endif
 
    RETURN NIL
