@@ -1,10 +1,17 @@
- * $Id: ChangeLog,v 1.4083 2005/04/27 18:38:28 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4084 2005/04/27 20:20:16 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-28 03:40 UTC+0700 Andi Jahja <andijahja@xharbour.com>
+  * contrib/libnf/fttext.c
+    ! reverted usage of static buffer
+    ! Add error trapper when file operations are performed in an area
+      where no file is opened.
+    ! Modify behaviour of FT_FDELETE() to a more convenient one.
 
 2005-04-27 13:19 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbpcode.h
