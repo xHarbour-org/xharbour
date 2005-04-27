@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.64 2005/03/31 14:34:04 andijahja Exp $
+ * $Id: harbour.slx,v 1.65 2005/04/01 20:16:31 andijahja Exp $
  */
 
 /*
@@ -299,6 +299,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "EXIT{WS}PROCEDURE"               ) AS_TOKEN( HB_EXIT_PROC     ),
                          LEX_WORD( "EXTERNAL"                        ) AS_TOKEN( HB_WANTS_ID  - EXTERN           ),
                          LEX_WORD( "FIELD"                           ) AS_TOKEN( HB_WANTS_ID  - FIELD            ),
+                         LEX_WORD( "FINALLY"                         ) AS_TOKEN( HB_WANTS_EOL - FINALLY          ),
                          LEX_WORD( "FOR"                             ) AS_TOKEN( HB_WANTS_VAR - FOR              ),
                          LEX_WORD( "FOR{WS}EACH"                     ) AS_TOKEN( FOREACH                         ),
                          LEX_WORD( "FUNCTION"                        ) AS_TOKEN( HB_WANTS_ID  - FUNCTION         ),

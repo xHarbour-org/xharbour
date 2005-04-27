@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.101 2005/04/20 23:29:52 ronpinkas Exp $
+ * $Id: genc.c,v 1.102 2005/04/21 10:10:16 andijahja Exp $
  */
 
 /*
@@ -3554,10 +3554,44 @@ static HB_GENC_FUNC( hb_p_tryend )
 
 static HB_GENC_FUNC( hb_p_tryrecover )
 {
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "/* %05li */ ", lPCodePos );
+   }
+   else
+   {
+      fprintf( cargo->yyc, "\t" );
+   }
+   fprintf( cargo->yyc, "HB_P_TRYRECOVER, %i, %i, %i,",
+            pFunc->pCode[ lPCodePos + 1 ],
+            pFunc->pCode[ lPCodePos + 2 ],
+            pFunc->pCode[ lPCodePos + 3 ] );
+   if( cargo->bVerbose )
+   {
+      LONG lOffset = HB_PCODE_MKINT24( &( pFunc->pCode[ lPCodePos + 1 ] ) );
+      fprintf( cargo->yyc, "\t/* %li (abs: %08li) */", lOffset, lPCodePos + lOffset );
+   }
+   fprintf( cargo->yyc, "\n" );
+   return 4;
+}
+
+static HB_GENC_FUNC( hb_p_finally )
+{
    HB_SYMBOL_UNUSED( pFunc );
    HB_SYMBOL_UNUSED( lPCodePos );
 
-   fprintf( cargo->yyc, "\tHB_P_TRYRECOVER,\n" );
+   --cargo->iNestedCodeblock;
+   fprintf( cargo->yyc, "\tHB_P_FINALLY,\n" );
+   return 1;
+}
+
+static HB_GENC_FUNC( hb_p_endfinally )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   --cargo->iNestedCodeblock;
+   fprintf( cargo->yyc, "\tHB_P_ENDFINALLY,\n" );
    return 1;
 }
 
@@ -3731,7 +3765,9 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_localnearsetstrhidden,
    hb_p_trybegin,
    hb_p_tryend,
-   hb_p_tryrecover
+   hb_p_tryrecover,
+   hb_p_finally,
+   hb_p_endfinally
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

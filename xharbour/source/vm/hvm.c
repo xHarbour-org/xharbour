@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.458 2005/04/26 12:26:00 druzus Exp $
+ * $Id: hvm.c,v 1.459 2005/04/26 17:29:25 ronpinkas Exp $
  */
 
 /*
@@ -339,6 +339,7 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
    UINT     hb_vm_wEnumCollectionCounter = 0; // Initialized in hb_vmInit()
 
    PHB_SEQUENCE hb_vm_pSequence;
+   PHB_FINALLY  hb_vm_pFinally;
 
    /* Request for some action - stop processing of opcodes
    */
@@ -355,6 +356,8 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
 
    #define hb_vm_pSequence (HB_VM_STACK.pSequence)
    #define s_uiActionRequest  (HB_VM_STACK.uiActionRequest)
+
+   #define hb_vm_pFinally (HB_VM_STACK.pFinally)
 
    /* static, for now */
    BOOL hb_vm_bQuitRequest = FALSE;
@@ -545,6 +548,8 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    #ifndef HB_THREAD_SUPPORT
       hb_vm_pSequence = NULL;
       s_uiActionRequest = 0;
+
+      hb_vm_pFinally = NULL;
    #endif
 
 #ifndef HB_THREAD_SUPPORT
@@ -972,6 +977,15 @@ int HB_EXPORT hb_vmQuit( void )
       hb_xfree( (void *) pFree );
    }
 
+   while( hb_vm_pFinally )
+   {
+      PHB_FINALLY pFree = hb_vm_pFinally;
+
+      hb_vm_pFinally = hb_vm_pFinally->pPrev;
+
+      hb_xfree( (void *) pFree );
+   }
+
    hb_xexit();
    //printf("After xexit\n" );
 
@@ -1032,8 +1046,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       }
    #endif
 
-   while( ( curPCode = pCode[ w ] ) != HB_P_ENDPROC )
+   do
    {
+      curPCode = pCode[ w ];
 
       #ifndef HB_NO_PROFILER
          if( hb_bProfiler )
@@ -2140,6 +2155,23 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_itemRelease( hb_errorBlock( hb_vm_pSequence->pPrevErrBlock ) );
             hb_itemRelease( hb_vm_pSequence->pPrevErrBlock );
 
+            if( HB_PCODE_MKINT24( &pCode[ w + 1 ] ) )
+            {
+               PHB_FINALLY pFinally = hb_xgrab( sizeof( HB_FINALLY ) );
+
+
+               pFinally->lFinally = w + HB_PCODE_MKINT24( &pCode[ w + 1 ] );
+               pFinally->bDeferred = FALSE;
+               pFinally->pPrev = hb_vm_pFinally;
+
+               hb_vm_pFinally = pFinally;
+
+               #ifdef DEBUG_FINALLY
+                  printf( "Finally at: %li\n", pFinally->lFinally );
+               #endif
+            }
+
+            w += 3;
             // Intentionally FALL through.
 
          case HB_P_SEQRECOVER:
@@ -2168,6 +2200,42 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             w++;
             break;
          }
+
+         case HB_P_FINALLY:
+           if( hb_vm_pFinally )
+           {
+              hb_vm_pFinally->bDeferred = TRUE;
+
+              #ifdef DEBUG_FINALLY
+                 printf( "Finally after CATCH:\n" );
+              #endif
+           }
+
+           w++;
+           break;
+
+         case HB_P_ENDFINALLY:
+           if( hb_vm_pFinally )
+           {
+              PHB_FINALLY pFree = hb_vm_pFinally;
+
+              if( hb_vm_pFinally->bDeferred )
+              {
+                 s_uiActionRequest = hb_vm_pFinally->uiActionRequest;
+
+                 #ifdef DEBUG_FINALLY
+                    printf( "Restored Deferred Action %i:\n", s_uiActionRequest );
+                 #endif
+              }
+
+              hb_vm_pFinally = hb_vm_pFinally->pPrev;
+              hb_xfree( (void *) pFree );
+           }
+           else
+           {
+              w++;
+           }
+           break;
 
          /* Jumps */
 
@@ -3575,6 +3643,20 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             w++;
             break;
 
+         case HB_P_ENDPROC:
+            if( hb_vm_pFinally )
+            {
+               #ifdef DEBUG_FINALLY
+                  printf( "DEFER RETURN - go to %i\n", hb_vm_pFinally->lFinally );
+               #endif
+
+               hb_vm_pFinally->bDeferred = TRUE;
+               hb_vm_pFinally->uiActionRequest = HB_ENDPROC_REQUESTED;
+               w = hb_vm_pFinally->lFinally;
+               curPCode = HB_P_NOOP;
+            }
+            break;
+
          default:
             /* TODO: Include to failing pcode in the error message */
             hb_errInternal( HB_EI_VMBADOPCODE, NULL, NULL, NULL );
@@ -3593,7 +3675,18 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       {
          if( s_uiActionRequest & HB_BREAK_REQUESTED )
          {
-            if( bCanRecover )
+            if( hb_vm_pFinally )
+            {
+               #ifdef DEBUG_FINALLY
+                  printf( "DEFER BREAK - go to %i\n", hb_vm_pFinally->lFinally );
+               #endif
+
+               hb_vm_pFinally->bDeferred = TRUE;
+               hb_vm_pFinally->uiActionRequest = HB_BREAK_REQUESTED;
+               w = hb_vm_pFinally->lFinally;
+               s_uiActionRequest = 0;
+            }
+            else if( bCanRecover )
             {
                 // Reset FOR EACH.
                 while( hb_vm_wEnumCollectionCounter > hb_vm_pSequence->wEnumCollectionCounter )
@@ -3647,8 +3740,22 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /* request to stop current procedure was issued
              * (from macro evaluation)
              */
-            s_uiActionRequest = 0;
-            break;
+            if( hb_vm_pFinally )
+            {
+               #ifdef DEBUG_FINALLY
+                  printf( "DEFER RETURN - go to %i\n", hb_vm_pFinally->lFinally );
+               #endif
+
+               hb_vm_pFinally->bDeferred = TRUE;
+               hb_vm_pFinally->uiActionRequest = HB_ENDPROC_REQUESTED;
+               w = hb_vm_pFinally->lFinally;
+               s_uiActionRequest = 0;
+            }
+            else
+            {
+               s_uiActionRequest = 0;
+               break;
+            }
          }
       }
 
@@ -3663,7 +3770,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          }
          HB_VM_STACK.iPcodeCount++;
       #endif
+
    }
+   while( curPCode != HB_P_ENDPROC );
 
    /* No cancellation here */
    HB_DISABLE_ASYN_CANC;

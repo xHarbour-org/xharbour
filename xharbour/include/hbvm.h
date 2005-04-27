@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.25 2005/03/31 03:15:19 druzus Exp $
+ * $Id: hbvm.h,v 1.26 2005/04/26 05:38:04 ronpinkas Exp $
  */
 
 /*
@@ -65,6 +65,15 @@ typedef struct _HB_SEQUENCE
    PHB_ITEM pPrevErrBlock;
    struct _HB_SEQUENCE *pPrev;
 } HB_SEQUENCE, *PHB_SEQUENCE;
+
+typedef struct _HB_FINALLY
+{
+   ULONG  lFinally;
+   USHORT uiActionRequest;
+   BOOL   bDeferred;
+
+   struct _HB_FINALLY *pPrev;
+} HB_FINALLY, *PHB_FINALLY;
 
 HB_EXTERN_BEGIN
 

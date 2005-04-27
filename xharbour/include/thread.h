@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.103 2005/02/24 10:44:03 andijahja Exp $
+* $Id: thread.h,v 1.104 2005/03/14 20:34:22 andijahja Exp $
 */
 
 /*
@@ -487,6 +487,8 @@ typedef struct tag_HB_STACK
 
    /* BEGIN SEQUENCE [RECOVER] END*/
    struct _HB_SEQUENCE *pSequence;
+
+   struct _HB_FINALLY *pFinally;
 
    /* FS api error system */
    USHORT uiErrorLast;

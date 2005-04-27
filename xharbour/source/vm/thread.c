@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.186 2005/03/14 20:34:23 andijahja Exp $
+* $Id: thread.c,v 1.187 2005/03/31 04:02:31 druzus Exp $
 */
 
 /*
@@ -376,6 +376,8 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
 
    tc->pSequence = NULL;
 
+   tc->pFinally = NULL;
+
    /* Dynsym Thread Specific table. */
    tc->uiClosestDynSym = 0;
    tc->pDynItems = NULL;
@@ -568,6 +570,15 @@ void hb_threadDestroyStack( HB_STACK *pStack )
          PHB_SEQUENCE pFree = pStack->pSequence;
 
          pStack->pSequence = pStack->pSequence->pPrev;
+
+         hb_xfree( (void *) pFree );
+      }
+
+      while( pStack->pFinally )
+      {
+         PHB_FINALLY pFree = pStack->pFinally;
+
+         pStack->pFinally = pStack->pFinally->pPrev;
 
          hb_xfree( (void *) pFree );
       }

@@ -1,10 +1,37 @@
- * $Id: ChangeLog,v 1.4083 2005/04/27 02:59:12 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4083 2005/04/27 18:38:28 ptsarenko Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-27 13:19 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbpcode.h
+  * source/compiler/hbpcode.c
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+    + Added HB_P_FINALLY, and HB_P_ENDFINALLY
+
+  * include/hbvm.h
+  * include/thread.h
+  * source/vm/hvm.c
+  * source/vm/thread.c
+    + Added hb_vm_pFinally
+
+  * source/compiler/harbour.c
+    - Removed wrong comment.
+
+
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    + Added support for FINALLY syntax
+
+  * include/hbsetup.h
+    * Increased HB_PCODE_VER to 7
+
+  * tests\finalize.prg
+    + New test of FINALLY syntax.
 
 2005-04-27 22:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * contrib/rdd_ads/ads1.c

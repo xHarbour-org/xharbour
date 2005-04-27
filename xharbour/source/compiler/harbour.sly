@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.81 2005/04/11 01:52:42 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.82 2005/04/20 23:29:54 ronpinkas Exp $
  */
 
 /*
@@ -135,6 +135,7 @@ extern int hb_compStaticGetPos( char *, PFUNCTION ); /* return if passed name is
 extern int hb_compFieldGetPos( char *, PFUNCTION );  /* return if passed name is a field variable */
 extern int hb_compMemvarGetPos( char *, PFUNCTION ); /* return if passed name is a memvar variable */
 extern USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName );
+extern void hb_compPrepareOptimize( void );
 
 extern char * hb_comp_SLX_LastBlock( BOOL bReset );
 
@@ -189,6 +190,7 @@ static void hb_compDebugStart( void ) { };
 %token CRITICAL CRITICAL_STATIC
 %token CBMARKER
 %token BITAND BITOR BITXOR BITSHIFTR BITSHIFTL
+%token FINALLY
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
@@ -2598,17 +2600,38 @@ Try          : TRY
                      hb_compGenJumpThere( $<lNumber>2, $<lNumber>6 );
                   }
                }
+               Finally
+               {
+                 //printf( "Value: %i\n", $<lNumber>8 );
+               }
                END
                {
                   /* Fix END address
                    * There is no line number after HB_P_TRYEND in case no
                    * CATCH clause is used
                    */
-                  hb_compGenJumpThere( $<lNumber>5, hb_comp_functions.pLast->lPCodePos );
-
-                  /* Only if there is CATCH clause */
-                  if( ! $<lNumber>6 )
+                  if( $<lNumber>8 )
                   {
+                     //printf( "Finalized END to %li\n", $<lNumber>8 + 1 );
+                     hb_compGenJumpThere( $<lNumber>5, $<lNumber>8 + 1 );
+
+                     if( $<lNumber>6 )
+                     {
+                        //printf( "Recover to %li\n", $<lNumber>8 );
+                        hb_compGenJumpThere( $<lNumber>6 + 1, $<lNumber>8 );
+
+                        hb_compGenPCode1( HB_P_ENDFINALLY );
+                     }
+                  }
+                  else
+                  {
+                     //printf( "END to %li\n", hb_comp_functions.pLast->lPCodePos );
+                     hb_compGenJumpThere( $<lNumber>5, hb_comp_functions.pLast->lPCodePos );
+                  }
+
+                  if( $<lNumber>6 == 0 )
+                  {
+                     /* Only if there is no CATCH clause */
                      --hb_comp_wSeqCounter;  /* CATCH is also considered as end of sequence */
                   }
 
@@ -2632,8 +2655,9 @@ CatchError   : CATCH IdentName
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
                   --hb_comp_wSeqCounter;
-                  hb_compLinePush();
-                  hb_compGenPCode1( HB_P_TRYRECOVER );
+                  //hb_compLinePush();
+                  hb_compGenPCode4( HB_P_TRYRECOVER, 0, 0, 0, TRUE );
+                  hb_compPrepareOptimize();
                   hb_compGenPopVar( $2 );
                }
              | CATCH
@@ -2641,9 +2665,20 @@ CatchError   : CATCH IdentName
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
                   --hb_comp_wSeqCounter;
-                  hb_compLinePush();
-                  hb_compGenPCode2( HB_P_TRYRECOVER, HB_P_POP, ( BOOL ) 0 );
+                  //hb_compLinePush();
+                  hb_compGenPCode4( HB_P_TRYRECOVER, 0, 0, 0, TRUE );
+                  hb_compPrepareOptimize();
+                  hb_compGenPCode1( HB_P_POP );
                }
+             ;
+
+Finally      : /* no finally */ { $<lNumber>$ = 0; }
+             | FINALLY Crlf
+               {
+                  $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
+                  hb_compGenPCode1( HB_P_FINALLY );
+               }
+               EmptyStats { $<lNumber>$ = $<lNumber>3; }
              ;
 
 /* NOTE: In Clipper all variables used in DO .. WITH are passed by reference

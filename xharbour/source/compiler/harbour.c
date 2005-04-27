@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.105 2005/04/20 03:20:40 ronpinkas Exp $
+ * $Id: harbour.c,v 1.106 2005/04/20 23:29:53 ronpinkas Exp $
  */
 
 /*
@@ -132,7 +132,7 @@ static int hb_compProcessRSPFile( char *, int, char * argv[] ); /* process respo
 
 /* int hb_compSort_ULONG( ULONG * ulLeft, ULONG * ulRight ); */
 static void hb_compOptimizeJumps( void );
-static void hb_compPrepareOptimize( void );
+void hb_compPrepareOptimize( void );
 static void hb_compOptimizeFrames( PFUNCTION pFunc );
 
 static void hb_compDeclaredInit( void );
@@ -2772,10 +2772,7 @@ void hb_compNOOPadd( PFUNCTION pFunc, ULONG ulPos )
    }
 }
 
-/* NOTE: To disable jump optimization, just make this function a dummy one.
- [vszakats] */
-
-static void hb_compPrepareOptimize()
+void hb_compPrepareOptimize()
 {
    hb_comp_functions.pLast->iJumps++;
 
@@ -2972,18 +2969,10 @@ void hb_compGenJumpThere( ULONG ulFrom, ULONG ulTo )
             break;
 
          case HB_P_SEQBEGIN :
-            bOptimize = FALSE;
-            break;
-
          case HB_P_SEQEND :
-            bOptimize = FALSE;
-            break;
-
          case HB_P_TRYBEGIN :
-            bOptimize = FALSE;
-            break;
-
          case HB_P_TRYEND :
+         case HB_P_TRYRECOVER :
             bOptimize = FALSE;
             break;
 
@@ -3049,18 +3038,10 @@ void hb_compGenJumpThere( ULONG ulFrom, ULONG ulTo )
             break;
 
          case HB_P_SEQBEGIN :
-            bOptimize = FALSE;
-            break;
-
          case HB_P_SEQEND :
-            bOptimize = FALSE;
-            break;
-
          case HB_P_TRYBEGIN :
-            bOptimize = FALSE;
-            break;
-
          case HB_P_TRYEND :
+         case HB_P_TRYRECOVER :
             bOptimize = FALSE;
             break;
 
