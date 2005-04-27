@@ -462,7 +462,9 @@ TRY syntax:
       ...
       [THROW( <Exp> )]
       ...
-   CATCH <Id>
+   [CATCH [<CatcherVar>]]
+      ...
+   [FINALLY]
       ...
    END
 
@@ -470,8 +472,17 @@ The above is very similar to Clipper BEGIN SEQ, BREAK(), RECOVER USING, END,
 but is more inline with more "modern" languages, and dismisses the need to
 worry about Error Codeblock.
 
-IN operator:
-------------
+CATCH is optional, and <CatcherVar> is optional, even when CATCH is used.
+
+FINALLY is optional, and if specified code within the FINALLY section is
+guranteed to be executed after the TRY section has been executed, and the
+CATCH section if activated, unless the CATCH section throws an UNHANDLED
+Error. This means that the FINALLY section will be executed even if the CATCH
+section re-throws the error, or attempt to RETURN. In such cases the requested
+operation which forces OUT of the the TRY section will be deffered until AFTER
+the FINALLY section has been completed.
+
+IN operator: ------------
 
    <Exp> IN <Array_or_StringExp> => .T./.F.
 

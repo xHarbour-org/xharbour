@@ -1,10 +1,17 @@
- * $Id: ChangeLog,v 1.4084 2005/04/27 20:20:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4085 2005/04/27 20:42:18 andijahja Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-27 14:21 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * xdiff.txt
+    + Added info about FINALLY syntax
+  - tests/finalize.prg
+  + tests/finally.prg
+    * renamed
 
 2005-04-28 03:40 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * contrib/libnf/fttext.c

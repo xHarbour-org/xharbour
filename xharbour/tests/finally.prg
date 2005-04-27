@@ -14,6 +14,10 @@ PROCEDURE Main()
       ? "Test 3"
       Test3()
       ?
+
+      ? "Test 4"
+      Test4()
+      ?
    CATCH oErr
       ? "Outer Caught:", oErr:Operation
    END
@@ -42,6 +46,20 @@ PROCEDURE Test2()
 
    TRY
       ? "Trying"
+   FINALLY
+      ? "Finalized"
+   END
+
+   ? "Tested OK"
+
+RETURN
+
+PROCEDURE Test3()
+
+   LOCAL oErr
+
+   TRY
+      ? "Trying"
       ? "Throwing"
       Throw( ErrorNew( "Finalize Test", 0, 0, "Forced Error" ) )
    CATCH oErr
@@ -53,11 +71,11 @@ PROCEDURE Test2()
       ? "Finalized"
    END
 
-   ? "Oops, should have returned after Finalize."
+   ? "Oops, should have returned after the FINALLY."
 
 RETURN
 
-PROCEDURE Test3()
+PROCEDURE Test4()
 
    LOCAL oErr
 
@@ -74,6 +92,6 @@ PROCEDURE Test3()
       ? "Finalized"
    END
 
-   ? "Oops, should have returned after Re-Throw."
+   ? "Oops, should have Re-Throw, after the FINALLY."
 
 RETURN
