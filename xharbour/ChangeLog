@@ -1,10 +1,16 @@
- * $Id: ChangeLog,v 1.4081 2005/04/27 00:01:45 druzus Exp $
+ * $Id: ChangeLog,v 1.4083 2005/04/27 02:59:12 ptsarenko Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-27 22:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  * contrib/rdd_ads/ads1.c
+  * contrib/rdd_ads/adsfunc.c
+    * removed conversion into OEM charset for Ads version 5.x
+      because AdsGetFieldRaw() is not supported by ACE 5.x
 
 2005-04-27 10:00 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * contrib/libnf/fttext.c

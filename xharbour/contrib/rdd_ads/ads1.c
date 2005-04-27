@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.64 2005/04/25 23:11:00 druzus Exp $
+ * $Id: ads1.c,v 1.66 2005/04/27 22:00:00 ptsarenko Exp $
  */
 
 /*
@@ -76,8 +76,10 @@ static ERRCODE adsScopeInfo( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem );
 static ERRCODE adsSetScope(  ADSAREAP pArea, LPDBORDSCOPEINFO sInfo );
 static int iSetListenerHandle;
 
+#if ADS_REQUIRE_VERSION >= 6
 void hb_oemansi(char* pcString, LONG lLen);
 void hb_ansioem(char* pcString, LONG lLen);
+#endif
 
 HB_FUNC( _ADS );
 HB_FUNC( ADS_GETFUNCTABLE );
@@ -86,7 +88,9 @@ extern int adsFileType;                 /* current global setting */
 extern int adsLockType;
 extern int adsRights;
 extern int adsCharType;
+#if ADS_REQUIRE_VERSION >= 6
 extern BOOL adsOEM;
+#endif
 extern BOOL bTestRecLocks;
 extern BOOL bDictionary;
 extern ADSHANDLE adsConnectHandle;
@@ -470,10 +474,12 @@ static ERRCODE adsScopeSet( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem )
                if( pItem->type == HB_IT_STRING )
                {
                   /* bTypeError = FALSE; */
+#if ADS_REQUIRE_VERSION >= 6
                   if( adsOEM )
                   {
                      usDataType = ADS_RAWKEY;
                   }
+#endif
                   pucScope = (UNSIGNED8*) hb_itemGetCPtr( pItem );
                   AdsSetScope( pArea->hOrdCurrent, nScope,
                      (UNSIGNED8*) pucScope,
@@ -814,10 +820,17 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
    {
       if( hb_itemType( pKey ) == HB_IT_STRING )
       {
+#if ADS_REQUIRE_VERSION >= 6
          AdsSeekLast( pArea->hOrdCurrent, (UNSIGNED8*) hb_itemGetCPtr( pKey ),
                     (UNSIGNED16) hb_itemGetCLen( pKey ),
                     (adsOEM ? ADS_RAWKEY : ADS_STRINGKEY),
                     (UNSIGNED16*) &(pArea->fFound) );
+#else
+         AdsSeekLast( pArea->hOrdCurrent, (UNSIGNED8*) hb_itemGetCPtr( pKey ),
+                    (UNSIGNED16) hb_itemGetCLen( pKey ),
+                    ADS_STRINGKEY,
+                    (UNSIGNED16*) &(pArea->fFound) );
+#endif
       }
       else if( hb_itemType( pKey ) & HB_IT_NUMERIC )
       {
@@ -846,9 +859,15 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
    {
       if( hb_itemType( pKey ) == HB_IT_STRING )
       {
+#if ADS_REQUIRE_VERSION >= 6
          AdsSeek( pArea->hOrdCurrent, (UNSIGNED8*) hb_itemGetCPtr( pKey ),
                   (UNSIGNED16) hb_itemGetCLen( pKey ),
                   (adsOEM ? ADS_RAWKEY : ADS_STRINGKEY), usSeekType, (UNSIGNED16*) &(pArea->fFound) );
+#else
+         AdsSeek( pArea->hOrdCurrent, (UNSIGNED8*) hb_itemGetCPtr( pKey ),
+                  (UNSIGNED16) hb_itemGetCLen( pKey ),
+                  ADS_STRINGKEY, usSeekType, (UNSIGNED16*) &(pArea->fFound) );
+#endif
       }
       else if( hb_itemType( pKey ) & HB_IT_NUMERIC )
       {
@@ -1477,6 +1496,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    {
       case HB_IT_STRING:
          pulLength = pArea->maxFieldLen;
+#if ADS_REQUIRE_VERSION >= 6
          if( adsOEM )
          {
             AdsAtEOF( pArea->hTable, (UNSIGNED16 *)&(pArea->fEof) );
@@ -1489,7 +1509,9 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                AdsGetFieldRaw( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &pulLength );
             }
          }
-         else if( AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD )
+         else
+#endif
+         if( AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &pulLength, ADS_NONE ) == AE_NO_CURRENT_RECORD )
          {
             memset( pBuffer, ' ', pField->uiLen );
             pArea->fEof = TRUE;
@@ -1592,10 +1614,12 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                  pulLen++;                 /* make room for NULL */
                  pucBuf = (UNSIGNED8*) hb_xgrab( pulLen );
                  AdsGetString( pArea->hTable, ADSFIELD( uiIndex ), pucBuf, &pulLen, ADS_NONE );
+#if ADS_REQUIRE_VERSION >= 6
                  if( adsOEM )
                  {
                     hb_ansioem( ( char * ) pucBuf, pulLen);
                  }
+#endif
                  hb_itemPutCL( pItem, ( char * ) pucBuf, pulLen );
                  hb_xfree( pucBuf );
               }
@@ -1716,11 +1740,13 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                uiCount = pField->uiLen;
             }
 
+#if ADS_REQUIRE_VERSION >= 6
             if( adsOEM )
             {
                ulRetVal = AdsSetFieldRaw( pArea->hTable, ADSFIELD( uiIndex ), (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
             }
             else
+#endif
             {
                ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ), (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
             }
@@ -1766,10 +1792,12 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
             bTypeError = FALSE;
             uiCount = ( USHORT ) hb_itemGetCLen( pItem );
+#if ADS_REQUIRE_VERSION >= 6
             if( adsOEM )
             {
                hb_oemansi( hb_itemGetCPtr( pItem ), uiCount );
             }
+#endif
             ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
             (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
          }
@@ -3487,10 +3515,12 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
 
       if( bValidExpr != FALSE )
       {
+#if ADS_REQUIRE_VERSION >= 6
          if( adsOEM )
          {
             hb_oemansi( pucFilter, hb_itemGetCLen( pFilterInfo->abFilterText ) );
          }
+#endif
          if( hb_set.HB_SET_OPTIMIZE )
          {
             ulRetVal = AdsSetAOF( pArea->hTable, (UNSIGNED8*) pucFilter, usResolve );

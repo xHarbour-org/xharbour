@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.55 2005/04/15 16:58:52 ptsarenko Exp $
+ * $Id: adsfunc.c,v 1.57 2005/04/27 22:00:00 ptsarenko Exp $
  */
 
 /*
@@ -73,7 +73,9 @@ int adsFileType = ADS_CDX;
 int adsLockType = ADS_PROPRIETARY_LOCKING;
 int adsRights = 1;
 int adsCharType = ADS_ANSI;
+#if ADS_REQUIRE_VERSION >= 6
 BOOL adsOEM = FALSE;
+#endif
 ADSHANDLE adsConnectHandle = 0;
 BOOL bDictionary = FALSE;               /* Use Data Dictionary? */
 BOOL bTestRecLocks = FALSE;             /* Debug Implicit locks */
@@ -82,6 +84,7 @@ BOOL bTestRecLocks = FALSE;             /* Debug Implicit locks */
 static HB_ITEM s_itmCobCallBack = HB_ITEM_NIL;
 #endif
 
+#if ADS_REQUIRE_VERSION >= 6
 void hb_oemansi( char* pcString, LONG lLen )
 {
 #if defined(HB_OS_WIN_32)
@@ -107,6 +110,7 @@ void hb_ansioem( char* pcString, LONG lLen )
    HB_SYMBOL_UNUSED( lLen );
 #endif
 }
+#endif
 
 HB_FUNC( ADSTESTRECLOCKS )              /* Debug Implicit locks Set/Get call */
 {
@@ -367,10 +371,12 @@ HB_FUNC( ADSSETCHARTYPE )
       {
          adsCharType = charType;
       }
+#if ADS_REQUIRE_VERSION >= 6
       if( ISLOG( 2 ) )
       {
          adsOEM = hb_parnl( 2 );
       }
+#endif
    }
    hb_retni( oldType );
    return;
@@ -808,10 +814,12 @@ HB_FUNC( ADSEVALAOF )
    if( pArea && ISCHAR( 1 ) )
    {
       pucFilter = hb_parcx( 1 );
+#if ADS_REQUIRE_VERSION >= 6
       if( adsOEM )
       {
          hb_oemansi( pucFilter, hb_parclen( 1 ) );
       }
+#endif
 
       AdsEvalAOF( pArea->hTable, (UNSIGNED8*) pucFilter, &pusOptLevel );
       hb_retni( pusOptLevel );
@@ -870,20 +878,24 @@ HB_FUNC( ADSGETAOF )
          ulRetVal = AdsGetAOF( pArea->hTable, pucFilter2, &pusLen );
          if( ulRetVal == AE_SUCCESS )
          {
+#if ADS_REQUIRE_VERSION >= 6
             if( adsOEM )
             {
                hb_ansioem( (char *) pucFilter2, pusLen );
             }
+#endif
             hb_retc( (char *) pucFilter2 );
          }
          hb_xfree( pucFilter2 );
       }
       else if( ulRetVal == AE_SUCCESS )
       {
+#if ADS_REQUIRE_VERSION >= 6
          if( adsOEM )
          {
             hb_ansioem( (char *) pucFilter, pusLen );
          }
+#endif
          hb_retc( (char *) pucFilter );
       }
 
@@ -1050,10 +1062,12 @@ HB_FUNC( ADSSETAOF )
    else if( pArea )
    {
       pucFilter = hb_parcx( 1 );
+#if ADS_REQUIRE_VERSION >= 6
       if( adsOEM )
       {
          hb_oemansi( pucFilter, hb_parclen( 1 ) );
       }
+#endif
       if( hb_pcount() > 1 )
       {
          usResolve = hb_parni( 2 );
@@ -1096,10 +1110,12 @@ HB_FUNC( ADSGETFILTER )
          ulRetVal = AdsGetFilter( pArea->hTable, pucFilter2, &pusLen );
          if( ulRetVal == AE_SUCCESS )
          {
+#if ADS_REQUIRE_VERSION >= 6
             if( adsOEM )
             {
                hb_ansioem( (char *) pucFilter2, pusLen );
             }
+#endif
             hb_retc( (char *) pucFilter2 );
          }
          else
@@ -1110,10 +1126,12 @@ HB_FUNC( ADSGETFILTER )
       }
       else if( ulRetVal == AE_SUCCESS )
       {
+#if ADS_REQUIRE_VERSION >= 6
          if( adsOEM )
          {
             hb_ansioem( (char *) pucFilter, pusLen );
          }
+#endif
          hb_retc( (char *) pucFilter );
       }
       else
@@ -1396,10 +1414,12 @@ HB_FUNC( ADSEXECUTESQLDIRECT )
                         && pArea->hStatement && ISCHAR( 1 ) )
    {
       char * pucStmt = hb_parcx( 1 );
+#if ADS_REQUIRE_VERSION >= 6
       if( adsOEM )
       {
          hb_oemansi( pucStmt, hb_parclen( 1 ) );
       }
+#endif
       ulRetVal = AdsExecuteSQLDirect( pArea->hStatement, (UNSIGNED8 *) pucStmt, &hCursor );
       if( ulRetVal == AE_SUCCESS )
       {
@@ -1436,10 +1456,12 @@ HB_FUNC( ADSPREPARESQL )
                         && pArea->hStatement && ISCHAR( 1 ) )
    {
       char * pucStmt = hb_parcx( 1 );
+#if ADS_REQUIRE_VERSION >= 6
       if( adsOEM )
       {
          hb_oemansi( pucStmt, hb_parclen( 1 ) );
       }
+#endif
       ulRetVal = AdsPrepareSQL( pArea->hStatement, (UNSIGNED8 *) pucStmt );
       if( ulRetVal == AE_SUCCESS )
       {
