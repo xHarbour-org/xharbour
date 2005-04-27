@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.63 2005/04/24 11:25:37 druzus Exp $
+ * $Id: ads1.c,v 1.64 2005/04/25 23:11:00 druzus Exp $
  */
 
 /*
@@ -3301,7 +3301,7 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
             }
             if( pOrderInfo->itmNewVal )
             {
-               adsScopeGet( pArea, 0, pOrderInfo->itmNewVal );
+               adsScopeSet( pArea, 0, pOrderInfo->itmNewVal );
             }
          }
          else if( pOrderInfo->itmResult )
@@ -3319,7 +3319,7 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
             }
             if( pOrderInfo->itmNewVal )
             {
-               adsScopeGet( pArea, 1, pOrderInfo->itmNewVal );
+               adsScopeSet( pArea, 1, pOrderInfo->itmNewVal );
             }
          }
          else if( pOrderInfo->itmResult )

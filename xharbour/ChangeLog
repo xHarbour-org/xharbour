@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4079 2005/04/26 12:25:25 druzus Exp $
+ * $Id: ChangeLog,v 1.4080 2005/04/26 17:28:30 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-27 02:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+    ! fixed scope settings by DBOI_* interface.
 
 2005-04-26 10:26 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/harbinit.prg
