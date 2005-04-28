@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.459 2005/04/26 17:29:25 ronpinkas Exp $
+ * $Id: hvm.c,v 1.460 2005/04/27 20:20:28 ronpinkas Exp $
  */
 
 /*
@@ -2157,8 +2157,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( HB_PCODE_MKINT24( &pCode[ w + 1 ] ) )
             {
-               PHB_FINALLY pFinally = hb_xgrab( sizeof( HB_FINALLY ) );
-
+               PHB_FINALLY pFinally = (PHB_FINALLY) hb_xgrab( sizeof( HB_FINALLY ) );
 
                pFinally->lFinally = w + HB_PCODE_MKINT24( &pCode[ w + 1 ] );
                pFinally->bDeferred = FALSE;

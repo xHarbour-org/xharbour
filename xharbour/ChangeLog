@@ -1,10 +1,18 @@
- * $Id: ChangeLog,v 1.4087 2005/04/27 22:14:45 andijahja Exp $
+ * $Id: ChangeLog,v 1.4088 2005/04/28 10:26:23 andijahja Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2004-04-28 15:20 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/memvars.c
+    ! Fixed PARAMETERS command with MT
+      /* Thanks to Fabio Uggeri */
+  * source/vm/hvm.c
+    ! Missing cast to MSVC
+
 2005-04-28 17:23 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * source/vm/memvars.c
     ! typo causing RT error on SAVE command

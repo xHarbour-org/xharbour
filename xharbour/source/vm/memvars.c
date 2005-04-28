@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.101 2005/04/27 22:15:53 andijahja Exp $
+ * $Id: memvars.c,v 1.102 2005/04/28 10:26:47 andijahja Exp $
  */
 
 /*
@@ -940,13 +940,21 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
    }
 }
 
-/*
- */
 void hb_memvarNewParameter( PHB_SYMB pSymbol, PHB_ITEM pValue )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_memvarNewParameter(%p, %p)", pSymbol, pValue));
+   HB_THREAD_STUB
 
-   hb_memvarCreateFromDynSymbol( pSymbol->pDynSym, HB_MV_PRIVATE, pValue );
+   PHB_DYNS pDyn;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarNewParameter(%p, %p)", pSymbol,pValue));
+   #ifdef HB_THREAD_SUPPORT
+      // we must find the thread specific name
+      pDyn = s_memvarThGetName( pSymbol->szName, &HB_VM_STACK );
+   #else
+      pDyn = ( PHB_DYNS ) pSymbol->pDynSym;
+   #endif
+
+   hb_memvarCreateFromDynSymbol( pDyn, HB_MV_PRIVATE, pValue );
 }
 
 char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
