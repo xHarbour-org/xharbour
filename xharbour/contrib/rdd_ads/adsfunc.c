@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.57 2005/04/27 22:00:00 ptsarenko Exp $
+ * $Id: adsfunc.c,v 1.57 2005/04/27 18:38:47 ptsarenko Exp $
  */
 
 /*
@@ -229,6 +229,25 @@ HB_FUNC( ADSGETCONNECTIONTYPE )
       pusConnectType = AE_NO_CONNECTION;
    }
    hb_retnl( pusConnectType );
+}
+
+HB_FUNC( ADSUNLOCKRECORD )
+{
+   UNSIGNED32 ulRetVal;
+   ADSAREAP   pArea;
+
+   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+
+   if( pArea )
+   {
+      ulRetVal = AdsUnlockRecord( pArea->hTable, hb_parnl(1) );
+      if( ulRetVal == AE_SUCCESS )
+      {
+          hb_retl( TRUE );
+          return;
+      }
+   }
+   hb_retl( FALSE );
 }
 
 HB_FUNC( ADSGETTABLECONTYPE )
@@ -1856,7 +1875,7 @@ HB_FUNC( ADSCACHERECORDS )
 
    if( !pArea || ulRetVal != AE_SUCCESS )
    {
- 	  hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSCACHERECORDS" );
+     hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSCACHERECORDS" );
    }
 
    hb_retl( ulRetVal );
@@ -2190,11 +2209,11 @@ HB_FUNC( ADSDDGETUSERPROPERTY )
 }
 /*
    Verify if a username/password combination is valid for this database
-   Call : 	 ADSTESTLOGIN(serverpath,servertypes,username,password,options,
+   Call :    ADSTESTLOGIN(serverpath,servertypes,username,password,options,
                           [userproperty,buffer,bufferlength])
    Returns : True if login succeeds
 
-   Notes: 	 This creates a temporary connection only during the execution of this
+   Notes:    This creates a temporary connection only during the execution of this
              function, without disturbing the stored one for any existing connection
 
              If the optional last 3 parameters are supplied, then it queries the
