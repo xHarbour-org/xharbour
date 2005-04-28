@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.100 2005/04/25 01:17:16 andijahja Exp $
+ * $Id: memvars.c,v 1.101 2005/04/27 22:15:53 andijahja Exp $
  */
 
 /*
@@ -2046,7 +2046,7 @@ HB_FUNC( __MVSAVE )
    HB_THREAD_STUB
 
    /* Clipper also checks for the number of arguments here */
-   if( hb_pcount() == 3 && ISCHAR( 1 ) && ISCHAR( 2 ) && ISLOG( 3 ) )
+   if( hb_pcount() >= 3 && ISCHAR( 1 ) && ISCHAR( 2 ) && ISLOG( 3 ) )
    {
       PHB_FNAME pFileName;
       char szFileName[ _POSIX_PATH_MAX + 1 ];

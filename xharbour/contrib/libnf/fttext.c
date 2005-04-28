@@ -1,5 +1,5 @@
 /*
- * $Id: fttext.c,v 1.2 2005/04/27 02:59:37 andijahja Exp $
+ * $Id: fttext.c,v 1.3 2005/04/27 20:42:40 andijahja Exp $
  */
 
 /*
@@ -180,6 +180,7 @@ HB_FUNC( FT_FBOF );
 HB_FUNC( FT_FEOF );
 HB_FUNC( FT_FGOTO );
 HB_FUNC( FT_FDELETE );
+HB_FUNC( FT_FBUFFERSIZE );
 
 /* routines internal to this module */
 static int _findeol( BYTE *buf, int buf_len );
@@ -187,7 +188,7 @@ static int _findeol( BYTE *buf, int buf_len );
 
 static int _ins_buff( int bytes );
 static int _del_buff( int bytes );
-static int _writeLine( char * theData, int iDataLen );
+static int _writeLine( char * theData, ULONG iDataLen );
 static LONG _ft_skip( LONG recs );
 
 /* arrays used by the text workareas */
@@ -204,9 +205,60 @@ static int  error   [TEXT_WORKAREAS];
 static char *crlf   [TEXT_WORKAREAS];
 static int icrlf    [TEXT_WORKAREAS];
 
+static ULONG uBuffSize = 0;
+
 /* standard macros */
 #define __max(a,b)  (((a) > (b)) ? (a) : (b))
 #define __min(a,b)  (((a) < (b)) ? (a) : (b))
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *     FT_FBUFFERSIZE()
+ *  $CATEGORY$
+ *     File I/O
+ *  $ONELINER$
+ *     Assign new buffer size dor use by the FT_F* functions
+ *  $SYNTAX$
+ *
+ *     FT_FBUFFERSIZE( [ <nNewBuff> ] ) -> nOldBuff | 4096
+ *
+ *  $ARGUMENTS$
+ *
+ *     ^b<nNewBuff>^n is new buffer size to be use for file read/write
+ *      operation
+ *
+ *  $RETURNS$
+ *
+ *      Previously set buffer
+ *
+ *  $DESCRIPTION$
+ *
+ *  $EXAMPLES$
+ *
+ *     #include "fileio.ch"
+ *
+ *     // use 10K buffer for read/write
+ *     ft_fBufferSize( 10240 )
+ *
+ *  $SEEALSO$
+ *
+ *  $END$
+ */
+
+HB_FUNC( FT_FBUFFERSIZE )
+{
+   ULONG uNewBuff = hb_parnl( 1 );
+   ULONG uOldBuff = uBuffSize;
+
+   if ( uOldBuff == 0 )
+   {
+      uOldBuff = BUFFSIZE;
+   }
+
+   uBuffSize = uNewBuff;
+
+   hb_retnl( uOldBuff );
+}
 
 /*  $DOC$
  *  $FUNCNAME$
@@ -277,6 +329,11 @@ HB_FUNC( FT_FUSE )
 
    error[area] = 0;
 
+   if ( uBuffSize == 0 )
+   {
+      uBuffSize = BUFFSIZE;
+   }
+
    if ( ISCHAR(1) )
    {
       handles[area] = hb_fsOpen( (BYTE*) hb_parcx(1), attr ) ;
@@ -299,7 +356,7 @@ HB_FUNC( FT_FUSE )
 
       offset[area] = 0 ;
       recno[area] = 1;
-      lastbyte[area] = hb_fsSeek( handles[area], 0L, SEEK_END );
+      lastbyte[area] = (LONG) hb_fsSeekLarge( handles[area], 0L, SEEK_END );
       hb_retni( handles[area] );
    }
    else
@@ -607,10 +664,10 @@ HB_FUNC( FT_FRECNO )
 
 HB_FUNC( FT_FGOBOTTOM )
 {
-   int  x;
-   int  len;
-   LONG loc;
-   BYTE *ftBuff = (BYTE*) hb_xgrab( BUFFSIZE );
+   ULONG x;
+   ULONG len;
+   LONG  loc;
+   BYTE  *ftBuff = (BYTE*) hb_xgrab( uBuffSize );
 
    if ( last_rec[area] != 0 )
    {
@@ -623,12 +680,12 @@ HB_FUNC( FT_FGOBOTTOM )
 
       do
       {
-         hb_fsSeek( handles[area], offset[area], SEEK_SET );
-         len = hb_fsRead( handles[area], ftBuff, BUFFSIZE );
+         hb_fsSeekLarge( handles[area], offset[area], SEEK_SET );
+         len = hb_fsReadLarge( handles[area], ftBuff, uBuffSize );
          for ( x = 0; x < len; x++ )
          {
             if ( ((*(ftBuff + x) == 13) && (*(ftBuff + x + 1) == 10)) ||
-                 (*(ftBuff + x) == 10) || ( x - loc > BUFFSIZE ) )
+                 (*(ftBuff + x) == 10) || ( (ULONG) (x - loc) > uBuffSize ) )
             {
                recno[area]++;
                x++;
@@ -637,7 +694,7 @@ HB_FUNC( FT_FGOBOTTOM )
          }
          offset[area] += loc;
 
-      } while ( len == BUFFSIZE );
+      } while ( len == uBuffSize );
 
       last_rec[area] = --recno[area];
       last_off[area] = offset[area];
@@ -782,9 +839,9 @@ HB_FUNC( FT_FSKIP )
 
 HB_FUNC( FT_FREADLN )
 {
-   int  x;
-   LONG read;
-   BYTE *ftBuff = (BYTE*) hb_xgrab( BUFFSIZE );
+   ULONG x;
+   ULONG read;
+   BYTE *ftBuff = (BYTE*) hb_xgrab( uBuffSize );
 
    if( handles[area] == 0 )
    {
@@ -793,13 +850,13 @@ HB_FUNC( FT_FREADLN )
       return;
    }
 
-   hb_fsSeek( handles[area], offset[area], SEEK_SET );
-   read = hb_fsRead( handles[area], ftBuff, BUFFSIZE );
+   hb_fsSeekLarge( handles[area], offset[area], SEEK_SET );
+   read = hb_fsReadLarge( handles[area], ftBuff, uBuffSize );
 
-   for ( x = 0; x < BUFFSIZE; x++ )
+   for ( x = 0; x < uBuffSize; x++ )
    {
       if ( ((*(ftBuff + x) == 13) && (*(ftBuff + x + 1) == 10)) ||
-           (*(ftBuff + x) == 26) || (*(ftBuff + x) == 10) || ( x >= (int)read) )
+           (*(ftBuff + x) == 26) || (*(ftBuff + x) == 10) || ( x >= read) )
       {
          break;
       }
@@ -873,12 +930,12 @@ HB_FUNC( FT_FREADLN )
 HB_FUNC( FT_FWRITELN )
 {
    char *theData  = hb_parcx( 1 );
-   int   iDataLen = hb_parclen( 1 );
+   ULONG iDataLen = hb_parclen( 1 );
    int   lInsert  = ( ISLOG( 2 ) ? hb_parl( 2 ) : 0 );
    int   err;
-   int   iLineLen = 0;
-   int   iRead, iEOL;
-   BYTE *ftBuff = (BYTE*) hb_xgrab( BUFFSIZE );
+   ULONG iLineLen = 0;
+   ULONG iRead, iEOL;
+   BYTE *ftBuff = (BYTE*) hb_xgrab( uBuffSize );
 
    if( handles[area] == 0 )
    {
@@ -888,7 +945,7 @@ HB_FUNC( FT_FWRITELN )
    }
 
    /* position file pointer to insertion point */
-   hb_fsSeek( handles[area], offset[area], SEEK_SET );
+   hb_fsSeekLarge( handles[area], offset[area], SEEK_SET );
 
    if( lInsert )
    {
@@ -897,7 +954,7 @@ HB_FUNC( FT_FWRITELN )
 
       if( !err )
       {
-         hb_fsSeek( handles[area], offset[area], SEEK_SET );
+         hb_fsSeekLarge( handles[area], offset[area], SEEK_SET );
          err = _writeLine( theData, iDataLen );
       }
    }
@@ -907,7 +964,7 @@ HB_FUNC( FT_FWRITELN )
       /* find length of current line, loop if longer than ftBuff */
       do
       {
-         iRead = hb_fsRead( handles[area], ftBuff, BUFFSIZE );
+         iRead = hb_fsReadLarge( handles[area], ftBuff, uBuffSize );
          iEOL  = _findeol( ftBuff, iRead );
 
          if( iEOL == 0 )
@@ -919,7 +976,7 @@ HB_FUNC( FT_FWRITELN )
             iLineLen += iEOL;
             break;
          }
-      } while( iRead == BUFFSIZE );
+      } while( iRead == uBuffSize );
 
       if( (iDataLen+2) <= iLineLen )
       {
@@ -927,7 +984,7 @@ HB_FUNC( FT_FWRITELN )
          _del_buff( iLineLen - iDataLen );
 
          /* write the new record's contents */
-         hb_fsWrite( handles[area], (BYTE*) theData, iDataLen );
+         hb_fsWriteLarge( handles[area], (BYTE*) theData, iDataLen );
       }
       else
       {
@@ -935,7 +992,7 @@ HB_FUNC( FT_FWRITELN )
          _ins_buff( iDataLen - iLineLen );
 
          /* write the new record's contents */
-         hb_fsWrite( handles[area], (BYTE*) theData, iDataLen );
+         hb_fsWriteLarge( handles[area], (BYTE*) theData, iDataLen );
       }
 
       error[area] = hb_fsError();
@@ -991,12 +1048,13 @@ HB_FUNC( FT_FWRITELN )
 
 HB_FUNC( FT_FDELETE )
 {
-   int  iBytesRead ;
+   int  iSkip       ;
+   ULONG iBytesRead ;
    LONG srcPtr     ;
    LONG destPtr    ;
    LONG cur_rec = recno[area];
    LONG cur_off = offset[area];
-   BYTE *ftBuff = (BYTE*) hb_xgrab( BUFFSIZE );
+   BYTE *ftBuff = (BYTE*) hb_xgrab( uBuffSize );
 
    if( handles[area] == 0 )
    {
@@ -1009,22 +1067,47 @@ HB_FUNC( FT_FDELETE )
    destPtr = offset[area] ;
 
    /* skip over deleted records, point to first 'to be retained' record */
-   _ft_skip( ( ISNUM( 1 ) ? hb_parni( 1 ) : 1 ) ) ;
-   srcPtr = hb_fsSeek( handles[area], offset[area], SEEK_SET );
+   iSkip = ( ISNUM( 1 ) ? hb_parni( 1 ) : 1 ) ;
+
+   if( last_rec[area] > 1 )
+   {
+      _ft_skip( iSkip );
+   }
+
+   srcPtr = (LONG) hb_fsSeekLarge( handles[area], offset[area], SEEK_SET );
 
    /* buffer read retained data, write atop old data */
-   do
+   if( last_rec[area] > 1 )
    {
-      hb_fsSeek( handles[area], srcPtr, SEEK_SET );
-      iBytesRead  = hb_fsRead( handles[area], ftBuff , BUFFSIZE );   /* now read in a big glob */
-      srcPtr  += iBytesRead;
-      hb_fsSeek( handles[area], destPtr, SEEK_SET );
-      destPtr += hb_fsWrite( handles[area], ftBuff, iBytesRead );
-   }  while( iBytesRead > 0 );
+      do
+      {
+         hb_fsSeekLarge( handles[area], srcPtr, SEEK_SET );
+         iBytesRead  = hb_fsReadLarge( handles[area], ftBuff , uBuffSize );   /* now read in a big glob */
+         srcPtr  += iBytesRead;
+         hb_fsSeekLarge( handles[area], destPtr, SEEK_SET );
+         destPtr += hb_fsWriteLarge( handles[area], ftBuff, iBytesRead );
+      }  while( iBytesRead > 0 );
 
-   /* move DOS EOF marker */
-   hb_fsSeek( handles[area],  srcPtr, SEEK_SET );
-   hb_fsWrite( handles[area], (BYTE*) 26, 1  );
+      /* move DOS EOF marker */
+      hb_fsSeekLarge( handles[area],  srcPtr, SEEK_SET );
+      hb_fsWriteLarge( handles[area], (BYTE*) 26, 1 );
+   }
+   else
+   {
+      /* move DOS EOF marker */
+      LONG x = (LONG) hb_fsSeekLarge( handles[area], 0, SEEK_END );
+      LONG y;
+
+      hb_fsSeekLarge( handles[area],  0, 0 );
+
+      for( y = 1; y <= x; y ++)
+      {
+         hb_fsWriteLarge( handles[area], (BYTE *) 0, 1  );
+      }
+
+      hb_fsSeekLarge( handles[area], 0, 0 );
+      hb_fsWriteLarge( handles[area], (BYTE*) 26, 1 );
+   }
 
    error[area] = hb_fsError();
 
@@ -1033,7 +1116,7 @@ HB_FUNC( FT_FDELETE )
    offset[area]= cur_off;
 
    /* re_calc EOF */
-   lastbyte[area] = hb_fsSeek( handles[area], 0L, SEEK_END );
+   lastbyte[area] = (LONG) hb_fsSeekLarge( handles[area], 0L, SEEK_END );
    _ft_skip( 0 );
 
    /* restore pointers again */
@@ -1113,7 +1196,7 @@ HB_FUNC( FT_FAPPEND )
    int   no_lines = ( ISNUM( 1 ) ? hb_parni( 1 ) : 1 );
    int   iRead;
    int   iByteCount;
-   BYTE *ftBuff = (BYTE*) hb_xgrab( BUFFSIZE );
+   BYTE *ftBuff = (BYTE*) hb_xgrab( uBuffSize );
 
    if( handles[area] == 0 )
    {
@@ -1130,8 +1213,8 @@ HB_FUNC( FT_FAPPEND )
 
    /* find end of record */
 
-   hb_fsSeek( handles[area], offset[area], SEEK_SET );
-   iRead = hb_fsRead( handles[area], ftBuff, BUFFSIZE );   /* now read in a big glob */
+   hb_fsSeekLarge( handles[area], offset[area], SEEK_SET );
+   iRead = hb_fsReadLarge( handles[area], ftBuff, uBuffSize );   /* now read in a big glob */
 
    /* determine if CRLF pair exists, if not, add one */
 
@@ -1140,32 +1223,32 @@ HB_FUNC( FT_FAPPEND )
 
    if( iByteCount == 0 )
    {
-      hb_fsSeek( handles[area], 0, SEEK_END );
+      hb_fsSeekLarge( handles[area], 0, SEEK_END );
    }
    else
    {
-      offset[area] = hb_fsSeek( handles[area], offset[area] + iByteCount, SEEK_SET );
+      offset[area] = (LONG) hb_fsSeekLarge( handles[area], offset[area] + iByteCount, SEEK_SET );
       recno[area]++;
       no_lines--;
    }
 
    while( no_lines-- )
    {
-      if( hb_fsWrite( handles[area], (BYTE *) crlf[area], icrlf[area] ) != icrlf[area] )
+      if( hb_fsWriteLarge( handles[area], (BYTE *) crlf[area], icrlf[area] ) != (ULONG) icrlf[area] )
       {
          error[area] = hb_fsError();
          break;
       }
 
       recno[area]++;
-      offset[area] = hb_fsSeek( handles[area], 0, SEEK_CUR );
+      offset[area] = (LONG) hb_fsSeekLarge( handles[area], 0, SEEK_CUR );
       no_lines--;
-    }
+   }
 
    if( !error[area] )
    {
       /* move DOS eof marker */
-      hb_fsWrite( handles[area], (BYTE*) crlf[area], 0 );
+      hb_fsWriteLarge( handles[area], (BYTE*) crlf[area], 0 );
       error[area] = hb_fsError();
    }
 
@@ -1244,7 +1327,7 @@ HB_FUNC( FT_FINSERT )
    {
       while( no_lines-- )
       {
-         if( hb_fsWrite( handles[area], (BYTE*) crlf[area], icrlf[area] ) != icrlf[area] )
+         if( hb_fsWriteLarge( handles[area], (BYTE*) crlf[area], icrlf[area] ) != (ULONG) icrlf[area] )
          {
             error[area] = hb_fsError();
             err = 0;
@@ -1517,18 +1600,18 @@ HB_FUNC( FT_FGOTO )
 /* deletes xxx bytes from the current file, beginning at the current record */
 static int _del_buff( int iLen )
 {
-   BYTE *ftBuff = (BYTE*) hb_xgrab( BUFFSIZE );
+   BYTE *ftBuff = (BYTE*) hb_xgrab( uBuffSize );
    LONG  fpRead, fpWrite;
-   int   WriteLen;
-   int   SaveLen;
+   ULONG WriteLen;
+   ULONG SaveLen;
 
    /* initialize file pointers */
    fpWrite = offset[area];
    fpRead  = offset[area] + iLen;
 
    /* do initial load of buffer */
-   hb_fsSeek( handles[area], fpRead, SEEK_SET );
-   WriteLen = hb_fsRead( handles[area], ftBuff, BUFFSIZE );
+   hb_fsSeekLarge( handles[area], fpRead, SEEK_SET );
+   WriteLen = hb_fsReadLarge( handles[area], ftBuff, uBuffSize );
    fpRead += WriteLen;
 
    error[area] = 0;
@@ -1536,13 +1619,13 @@ static int _del_buff( int iLen )
    while( WriteLen > 0 )
    {
       /* position to beginning of write area */
-      hb_fsSeek( handles[area], fpWrite, SEEK_SET );
-      SaveLen = hb_fsWrite( handles[area], (BYTE*) ftBuff, WriteLen );
+      hb_fsSeekLarge( handles[area], fpWrite, SEEK_SET );
+      SaveLen = hb_fsWriteLarge( handles[area], (BYTE*) ftBuff, WriteLen );
 
       /* move write pointer */
       fpWrite += SaveLen;
 
-      if(  SaveLen != WriteLen )
+      if( SaveLen != WriteLen )
       {
          /* error, fetch errcode and quit */
          error[area] = hb_fsError();
@@ -1550,18 +1633,18 @@ static int _del_buff( int iLen )
       }
 
       /* return to read area and read another buffer */
-      hb_fsSeek( handles[area], fpRead, SEEK_SET );
-      WriteLen = hb_fsRead( handles[area], ftBuff, BUFFSIZE );
+      hb_fsSeekLarge( handles[area], fpRead, SEEK_SET );
+      WriteLen = hb_fsReadLarge( handles[area], ftBuff, uBuffSize );
       fpRead  += WriteLen;
-    }
+   }
 
    /* store length in bytes, set EOF marker for DOS */
-   lastbyte[area] = hb_fsSeek( handles[area], fpWrite, SEEK_SET );
-   hb_fsWrite( handles[area], (BYTE*) ftBuff, 0 );
+   lastbyte[area] = (LONG) hb_fsSeekLarge( handles[area], fpWrite, SEEK_SET );
+   hb_fsWriteLarge( handles[area], (BYTE*) ftBuff, 0 );
 
    /* clear last_rec so next gobot will recount the records */
    last_rec[area] = 0L;
-   hb_fsSeek( handles[area], offset[area], SEEK_SET );
+   hb_fsSeekLarge( handles[area], offset[area], SEEK_SET );
 
    hb_xfree( ftBuff );
 
@@ -1571,16 +1654,16 @@ static int _del_buff( int iLen )
 
 /*컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴*/
 /* writes a line of data to the file, including the terminating CRLF */
-static int _writeLine( char * theData, int iDataLen )
+static int _writeLine( char * theData, ULONG iDataLen )
 {
    int err = 0;
 
-   if( !( hb_fsWrite( handles[area], (BYTE*) theData, iDataLen ) == iDataLen ) )
+   if( !( hb_fsWriteLarge( handles[area], (BYTE*) theData, iDataLen ) == iDataLen ) )
    {
       err = 1;
       error[area] = hb_fsError();
    }
-   else if( !( hb_fsWrite( handles[area], (BYTE*) crlf[area], icrlf[area] ) == icrlf[area] ) )
+   else if( !( hb_fsWriteLarge( handles[area], (BYTE*) crlf[area], icrlf[area] ) == (ULONG) icrlf[area] ) )
    {
       err = 1;
       error[area] = hb_fsError();
@@ -1598,17 +1681,17 @@ static int _writeLine( char * theData, int iDataLen )
      write to them before they mean anything */
 static int _ins_buff( int iLen )
 {
-   BYTE *ReadBuff  = (BYTE *) hb_xgrab(BUFFSIZE);
-   BYTE *WriteBuff = (BYTE *) hb_xgrab(BUFFSIZE);
+   BYTE *ReadBuff  = (BYTE *) hb_xgrab(uBuffSize);
+   BYTE *WriteBuff = (BYTE *) hb_xgrab(uBuffSize);
    BYTE *SaveBuff;
-   LONG  fpRead, fpWrite;
+   ULONG fpRead, fpWrite;
    int   WriteLen, ReadLen;
    int   SaveLen;
    int   iLenRemaining = iLen;
 
    /* set target move distance, this allows iLen to be greater than
-      BUFFSIZE */
-   iLen = __min( iLenRemaining, BUFFSIZE );
+      uBuffSize */
+   iLen = __min( (ULONG) iLenRemaining, uBuffSize );
    iLenRemaining -= iLen;
 
    /* initialize file pointers */
@@ -1616,11 +1699,11 @@ static int _ins_buff( int iLen )
    fpWrite= offset[area] + iLen;
 
    /* do initial load of both buffers */
-   hb_fsSeek( handles[area], fpRead, SEEK_SET );
-   WriteLen = hb_fsRead( handles[area], WriteBuff, BUFFSIZE );
+   hb_fsSeekLarge( handles[area], fpRead, SEEK_SET );
+   WriteLen = hb_fsReadLarge( handles[area], WriteBuff, uBuffSize );
    fpRead += WriteLen;
 
-   ReadLen = hb_fsRead( handles[area], ReadBuff, BUFFSIZE );
+   ReadLen = hb_fsReadLarge( handles[area], ReadBuff, uBuffSize );
    fpRead += ReadLen;
 
    error[area] = 0;
@@ -1630,13 +1713,13 @@ static int _ins_buff( int iLen )
       while( WriteLen > 0 )
       {
         /* position to beginning of write area */
-        if( hb_fsSeek( handles[area], fpWrite, SEEK_SET ) != (ULONG) fpWrite )
+        if( hb_fsSeekLarge( handles[area], fpWrite, SEEK_SET ) != fpWrite )
         {
           error[area] = hb_fsError();
           break;
         }
 
-        SaveLen = hb_fsWrite( handles[area], WriteBuff, WriteLen );
+        SaveLen = hb_fsWriteLarge( handles[area], WriteBuff, WriteLen );
 
         if( !SaveLen )
         {
@@ -1662,22 +1745,22 @@ static int _ins_buff( int iLen )
          WriteLen  = ReadLen  ;
 
          /* return to read area and read another buffer */
-         hb_fsSeek( handles[area], fpRead, SEEK_SET );
-         ReadLen = hb_fsRead( handles[area], ReadBuff, BUFFSIZE );
+         hb_fsSeekLarge( handles[area], fpRead, SEEK_SET );
+         ReadLen = hb_fsReadLarge( handles[area], ReadBuff, uBuffSize );
          fpRead += ReadLen;
       }
 
-      iLen = __min( iLenRemaining, BUFFSIZE );
+      iLen = __min( (ULONG) iLenRemaining, uBuffSize );
       iLenRemaining -= iLen;
    }
 
    /* store length in bytes, set EOF marker for DOS */
-   lastbyte[area] = hb_fsSeek( handles[area], fpWrite, SEEK_SET );
-   hb_fsWrite( handles[area], WriteBuff, 0 );
+   lastbyte[area] = (LONG) hb_fsSeekLarge( handles[area], fpWrite, SEEK_SET );
+   hb_fsWriteLarge( handles[area], WriteBuff, 0 );
 
    /* clear last_rec so next gobot will recount the records */
    last_rec[area] = 0L;
-   hb_fsSeek( handles[area], offset[area], SEEK_SET );
+   hb_fsSeekLarge( handles[area], offset[area], SEEK_SET );
 
    hb_xfree( ReadBuff  );
    hb_xfree( WriteBuff );
@@ -1697,17 +1780,17 @@ static LONG _ft_skip( LONG recs )
    LONG read_len;
    LONG x, y;
    int i = 0;
-   BYTE *ftBuff = (BYTE*) hb_xgrab( BUFFSIZE );
+   BYTE *ftBuff = (BYTE*) hb_xgrab( uBuffSize );
 
    if ( recs > 0 )
    {
       for (y = 0; y < recs; y++ )
       {
-         hb_fsSeek( handles[area], offset[area], SEEK_SET );
-         read_len = hb_fsRead( handles[area], ftBuff, BUFFSIZE );
+         hb_fsSeekLarge( handles[area], offset[area], SEEK_SET );
+         read_len = hb_fsReadLarge( handles[area], ftBuff, uBuffSize );
          for (x = 0; x < read_len; x++ )
          {
-            if ((*(ftBuff + x) == 13) && (*(ftBuff + x + 1) == 10)) 
+            if ((*(ftBuff + x) == 13) && (*(ftBuff + x + 1) == 10))
             {
                i = 0;
                break;
@@ -1738,30 +1821,36 @@ static LONG _ft_skip( LONG recs )
 
       if ( (recno[area] - recs) < 1 )
       {
+         hb_xfree( ftBuff );
          return( 1 );
       }
 
       for (y = recs; y > 0; y-- )
       {
-         if ( offset[area] - BUFFSIZE < 0L )
+         if ( (LONG) (offset[area] - uBuffSize) < 0L )
          {
             read_pos = 0;
             read_len = (size_t)offset[area];
          }
          else
          {
-            read_pos = (size_t)(offset[area] - BUFFSIZE);
-            read_len = BUFFSIZE;
+            read_pos = (size_t)(offset[area] - uBuffSize);
+            read_len = uBuffSize;
          }
 
-         hb_fsSeek( handles[area], read_pos, SEEK_SET );
-         read_len = hb_fsRead( handles[area], ftBuff, ( USHORT )read_len );
+         hb_fsSeekLarge( handles[area], read_pos, SEEK_SET );
+         read_len = hb_fsReadLarge( handles[area], ftBuff, ( USHORT )read_len );
 
          for (x = read_len - 4; x >= 0; x-- )
          {
-            if ( ((*(ftBuff + x) == 13) && (*(ftBuff + x + 1) == 10)) ||
-                 (*(ftBuff + x) == 10) )
+            if ((*(ftBuff + x) == 13) && (*(ftBuff + x + 1) == 10))
             {
+               i = 0;
+               break;
+            }
+            else if (*(ftBuff + x) == 10)
+            {
+               i = 1;
                break;
             }
          }
@@ -1832,4 +1921,3 @@ _findbol()  -  In-line assembler routine to parse a buffer
 //{
 //   return( 0 );
 //}     /* end _findbol() */
-
