@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4089 2005/04/28 18:22:00 mlombardo Exp $
+ * $Id: ChangeLog,v 1.4090 2005/04/28 21:48:32 lculik Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-28 17:40 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/classes.c
+    + Added support for explictly calling ::__Destructor() and ::__OnError()
 
 2005-04-28 18:45 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   * xharbour.spec

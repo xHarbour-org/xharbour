@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.136 2005/03/31 04:02:22 druzus Exp $
+ * $Id: classes.c,v 1.137 2005/04/14 09:15:08 ronpinkas Exp $
  */
 
 /*
@@ -1707,10 +1707,12 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             break;
 
          case HB_OO_MSG_ONERROR:
+            pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
             pClass->pFunError = ( PHB_FUNC ) pFunc_or_BlockPointer;
             break;
 
          case HB_OO_MSG_DESTRUCTOR:
+            pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
             pClass->pDestructor = ( PHB_FUNC ) pFunc_or_BlockPointer;
             break;
 
