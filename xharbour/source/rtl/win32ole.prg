@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.80 2005/04/11 07:47:59 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.81 2005/04/29 00:52:28 ronpinkas Exp $
  */
 
 /*
@@ -1299,7 +1299,7 @@ RETURN xRet
         s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                              DispID,
                                              (REFIID) &IID_NULL,
-                                             0,
+                                             LOCALE_USER_DEFAULT,
                                              DISPATCH_PROPERTYPUTREF,
                                              pDispParams,
                                              NULL,    // No return value
@@ -1317,7 +1317,7 @@ RETURN xRet
      s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                           DispID,
                                           (REFIID) &IID_NULL,
-                                          0,
+                                          LOCALE_USER_DEFAULT,
                                           DISPATCH_PROPERTYPUT,
                                           pDispParams,
                                           NULL,    // No return value
@@ -1334,7 +1334,7 @@ RETURN xRet
      s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                           DispID,
                                           (REFIID) &IID_NULL,
-                                          0,
+                                          LOCALE_USER_DEFAULT,
                                           DISPATCH_METHOD,
                                           pDispParams,
                                           &RetVal,
@@ -1351,7 +1351,7 @@ RETURN xRet
      s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                           DispID,
                                           (REFIID) &IID_NULL,
-                                          0,
+                                          LOCALE_USER_DEFAULT,
                                           DISPATCH_PROPERTYGET,
                                           pDispParams,
                                           &RetVal,
