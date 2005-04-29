@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.59 2005/02/17 19:14:28 guerra000 Exp $
+/* $Id: teditor.prg,v 1.60 2005/04/01 02:02:40 guerra000 Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.59 2005/02/17 19:14:28 guerra000 Exp $
+/* $Id: teditor.prg,v 1.60 2005/04/01 02:02:40 guerra000 Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -245,7 +245,6 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
    IF HB_IsNumeric( nLineLength ) .AND. nLineLength <= 0
       nLineLength := NIL
    ENDIF
-
    // fix setcolor() to value at New() call
    ::cColorSpec := setcolor()
 
@@ -256,12 +255,12 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
    if chr( 141 ) $ cString
        acsn := chr( 32 ) + chr( 141 ) + chr( 10 )
        cString := STRTRAN( cString, acsn, " " )
-
        acsn := chr( 141 ) + chr( 10 )
        cString := STRTRAN( cString, acsn, " " )
-   endif
 
+   endif
    ::aText := Text2Array( cString, nLineLength )
+
    ::naTextLen := Len( ::aText )
 
    if ::naTextLen == 0
@@ -1744,9 +1743,9 @@ METHOD GetText() CLASS HBEditor
    LOCAL cEOL := HB_OSNewLine()
 
    if ::lWordWrap
-      AEval( ::aText, {| cItem | cString += cItem:cText + iif( cItem:lSoftCR, "", cEOL )},, ::naTextLen - 1 )
+      AEval( ::aText, {| cItem | cString += cItem:cText + iif( cItem:lSoftCR, "", cEOL )},,::naTextLen - 1)
    else
-      AEval( ::aText, {| cItem | cString += cItem:cText + cEOL},, ::naTextLen - 1 )
+      AEval( ::aText, {| cItem | cString += cItem:cText + cEOL},, ::naTextLen - 1)
    endif
 
    // Last line does not need a cEOL delimiter
@@ -1909,6 +1908,7 @@ STATIC function Text2Array( cString, nWordWrapCol )
    LOCAL nFirstSpace
    LOCAL cSplittedLine
    LOCAL nTokPos := 0
+   LOCAL cTemp,lTokenized:=.f.
 
    nTokNum := 1
    aArray  := {}
@@ -1919,6 +1919,8 @@ STATIC function Text2Array( cString, nWordWrapCol )
    // __StrTkPtr() needs that string to be tokenized be terminated with a token delimiter
    if ! Right( cString, Len( cEOL ) ) == cEOL
       cString += cEOL
+      //GAD so we don't add a blank line by accident at the end of this.
+      lTokenized:=.t.
    endif
 
    nRetLen := 0
@@ -1935,7 +1937,6 @@ STATIC function Text2Array( cString, nWordWrapCol )
    while nRetLen < ncSLen
       /* TOFIX: Note that __StrToken is not able to cope with delimiters longer than one char */
       // Dos - OS/2 - Windows have CRLF as EOL
-      //
       if nEOLLen > 1
          cLine := StrTran( __StrTkPtr( @cString, @nTokPos, cEOL ), SubStr( cEOL, 2 ), "" )
       else
@@ -1953,7 +1954,7 @@ STATIC function Text2Array( cString, nWordWrapCol )
                   cSplittedLine := Left( cLine, nFirstSpace  )
                   cLine := SubStr( cLine, nFirstSpace + 1 )
                else
-                  cSplittedLine := Left( cLine, nWordWrapCol ) + " "
+                  cSplittedLine := Left( cLine, nWordWrapCol )
                   cLine := SubStr( cLine, nWordWrapCol + 1 )
                endif
 
@@ -1973,6 +1974,11 @@ STATIC function Text2Array( cString, nWordWrapCol )
       endif
 
    enddo
+   //If string ends with EOL delimeters we have to add it here.
+   if !lTokenized .AND. right( cString, nEOLLen ) == cEOL
+      AAdd( aArray, HBTextLine():New( , .F. ) )
+   endif
+
 
 return aArray
 

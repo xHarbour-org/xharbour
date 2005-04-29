@@ -1,10 +1,17 @@
- * $Id: ChangeLog,v 1.4091 2005/04/29 00:41:22 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4092 2005/04/29 00:52:20 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-04-29 10:10 UTC-0400 Gerald Drouillard <gerald@drouillard.ca>
+  * source/rtl/memoedit.prg
+    ! removed strtran tabs=>space(1), nTabSize should handle this if needed
+  * source/rtl/teditor.prg
+    ! fix problem with long strings that do not have a space in them and word wrap is on.  A space was being added by the line parsing
+    ! fix problem with string not ending in a eol.  The string returned would have an extra line.
 
 2005-04-28 17:49 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg

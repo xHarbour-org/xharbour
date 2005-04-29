@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.29 2004/09/13 11:12:03 lf_sfnet Exp $
+ * $Id: memoedit.prg,v 1.31 2004/11/30 21:59:05 ath1 Exp $
  */
 
 /*
@@ -408,7 +408,7 @@ FUNCTION MemoEdit(cString,;
 
    // Original MemoEdit() converts Tabs into spaces;
    //
-   oEd := TMemoEditor():New( StrTran( cString, Chr( K_TAB ), Space( 1 ) ), nTop, nLeft, nBottom, nRight, ;
+   oEd := TMemoEditor():New( cString, nTop, nLeft, nBottom, nRight, ;
               lEditMode, nLineLength, nTabSize, nTextBuffRow, nTextBuffColumn, nWindowRow, nWindowColumn )
 
    oEd:ProcName := ProcName( 1 )
