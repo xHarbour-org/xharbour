@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.3 2004/09/14 12:26:59 srobert Exp $
+ * $Id: client.prg,v 1.4 2005/04/30 15:14:29 lculik Exp $
  */
 
 /*
@@ -347,13 +347,13 @@ METHOD InetSendAll( SocketCon, nLen, size ) CLASS tIPClient
 Local nRet 
 
     if ::lTrace
-       fWrite(::nHandle, [ Parametros recebidos na funcao InetSendAll  : SocketCon ] +cStr(SocketCon) + [  size  ] +cStr(size) + [  nLen  ] + cstr(nlen)  +hb_osnewline())
+       fWrite(::nHandle, [ Parameters recieved  on function InetSendAll  : SocketCon ] +cStr(SocketCon) + [  size  ] +cStr(size) + [  nLen  ] + cstr(nlen)  +hb_osnewline())
     endif
 
     nRet := InetSendAll( SocketCon, nLen, size )
 
     if ::lTrace
-       fWrite(::nHandle, [ Dados retornado por InetSendAll: nRet  ] +cstr(nRet) +hb_osnewline())
+       fWrite(::nHandle, [ Data returned from the server on  InetSendAll: nRet  ] +cstr(nRet) +hb_osnewline())
     endif
 Return nRet
 
@@ -361,13 +361,13 @@ METHOD InetCount( SocketCon ) CLASS tIPClient
 Local nRet
 
     if ::lTrace
-       fWrite(::nHandle, [ Parametros recebidos na funcao InetCount  : SocketCon ] +cStr(socketcon)+hb_osnewline() )
+       fWrite(::nHandle, [ Parameters recieved  on function InetCount  : SocketCon ] +cStr(socketcon)+hb_osnewline() )
     endif
 
     nRet:= InetCount( SocketCon )
 
     if ::lTrace
-       fWrite(::nHandle, [Dados recebidos em InetCount : nRet  ] +cStr(nRet)+hb_osnewline)
+       fWrite(::nHandle, [Data returned from the server on  InetCount : nRet  ] +cStr(nRet)+hb_osnewline)
     endif
 Return nRet
 
@@ -375,13 +375,13 @@ METHOD InetRecv( SocketCon, cStr1, len) CLASS tIPClient
 Local nRet
 
     if ::lTrace
-       fWrite(::nHandle, [Parametros recebidos na funcao InetRecv para receber dados :  : SocketCon ] +cStr(SocketCon)+ [ cStr1 ]+cStr1+[ len ]+cstr(len) +hb_osnewline())
+       fWrite(::nHandle, [Parameters recieved on function InetRecv to recieve data :  : SocketCon ] +cStr(SocketCon)+ [ cStr1 ]+cStr1+[ len ]+cstr(len) +hb_osnewline())
     endif
 
     nRet:= InetRecv( SocketCon, @cStr1, len )
 
     if ::lTrace
-       fWrite(::nHandle, [ Dados recebidos em InetRecv:  nRet  ]+ cstr(nret) + [ cStr1 ] + if(valtype( cStr1) == "U","NIL",cstr1)+ hb_osnewline())
+       fWrite(::nHandle, [ Data returned from the server on  InetRecv:  nRet  ]+ cstr(nret) + [ cStr1 ] + if(valtype( cStr1) == "U","NIL",cstr1)+ hb_osnewline())
     endif
 Return nRet
 
@@ -391,13 +391,13 @@ METHOD InetRecvLine( SocketCon, nLen, size ) CLASS tIPClient
 Local cRet :=""
 
     if ::lTrace
-       fWrite(::nHandle, [ Parametros recebidos na funcao InetRecvLine para receber dados : SocketCon ] +cstr(SocketCon)+ [ nLen ]+cstr(nlen)+ [ size ]+cstr(size) +hb_osnewline() )
+       fWrite(::nHandle, [ Parameters recieved on function InetRecvLine to recieve data : SocketCon ] +cstr(SocketCon)+ [ nLen ]+cstr(nlen)+ [ size ]+cstr(size) +hb_osnewline() )
     endif
 
     cRet := InetRecvLine( SocketCon, @nLen, size )
 
     if ::lTrace
-       fWrite(::nHandle, [ Dados recebidos em InetRecv : cRet  ] + if(valtype( cRet) == "U","NIL",cRet)  +hb_osnewline())
+       fWrite(::nHandle, [ Data returned from the server on  InetRecv : cRet  ] + if(valtype( cRet) == "U","NIL",cRet)  +hb_osnewline())
     endif
 Return cRet
 
@@ -405,13 +405,13 @@ METHOD InetRecvAll( SocketCon, cStr1, len) CLASS tIPClient
 Local nRet
 
     if ::lTrace
-       fWrite(::nHandle, [Parametros recebidos na funcao InetRecvAll para receber dados:  Parametros recebidos : SocketCon ] +cStr(SocketCon) +  [  cStr1  ]+ cStr1 +[  len  ] +cstr(len) +hb_osnewline())
+       fWrite(::nHandle, [Parameters recieved on function InetRecvAll to recieve data:  Parametros recebidos : SocketCon ] +cStr(SocketCon) +  [  cStr1  ]+ cStr1 +[  len  ] +cstr(len) +hb_osnewline())
     endif
 
      InetRecvAll( SocketCon, @cStr1, len )
 
     if ::lTrace
-       fWrite(::nHandle, [  Dados recebidos em InetRecvAll : cStr1  ] +if(valtype( cStr1) == "U","NIL",cstr1) +hb_osnewline())
+       fWrite(::nHandle, [  Data returned from the server on  InetRecvAll : cStr1  ] +if(valtype( cStr1) == "U","NIL",cstr1) +hb_osnewline())
     endif
 Return self
 
@@ -419,20 +419,20 @@ METHOD InetErrorCode(SocketCon)
 Local nRet := 0
 
     if ::lTrace
-       fWrite(::nHandle, [Parametros recebidos na funcao InetErrorCode:  SocketCon ] +cStr(SocketCon) +hb_osnewline())
+       fWrite(::nHandle, [Parameters recieved on function InetErrorCode:  SocketCon ] +cStr(SocketCon) +hb_osnewline())
     endif
 
     nRet := InetErrorCode( ::SocketCon )
 
     if ::lTrace
-       fWrite(::nHandle, [ Dados recebidos em InetErrorCode:  nRet  ]+ cstr(nret) + hb_osnewline())
+       fWrite(::nHandle, [ Data returned from the server on  InetErrorCode:  nRet  ]+ cstr(nret) + hb_osnewline())
     endif
 
 Return nRet
 
 METHOD InetConnect( cServer, nPort, SocketCon )
     if ::lTrace
-       fWrite(::nHandle, [Parametros recebidos na funcao InetConnect:  Server ] +cServer + [ Port ] +cStr( nPort ) + [SocketCon ] +cStr(SocketCon) + hb_osnewline())
+       fWrite(::nHandle, [Parameters recieved on function InetConnect:  Server ] +cServer + [ Port ] +cStr( nPort ) + [SocketCon ] +cStr(SocketCon) + hb_osnewline())
     endif
 
    InetConnect( cServer, nPort, SocketCon )
