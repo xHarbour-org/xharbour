@@ -1,5 +1,5 @@
 /*
- * $Id: popcln.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
+ * $Id: popcln.prg,v 1.2 2005/04/05 13:42:48 mauriliolongo Exp $
  */
 
 /*
@@ -77,9 +77,25 @@ CLASS tIPClientPOP FROM tIPClient
 ENDCLASS
 
 
-METHOD New() CLASS tIPClientPOP
+METHOD New(lTrace) CLASS tIPClientPOP
+   local cFile :="pop3"
+   local n := 0
+
    ::nDefaultPort := 110
    ::nConnTimeout := 10000
+   ::lTrace:= lTrace
+
+   if ::ltrace
+      if !file("pop3.log")
+         ::nHandle := fcreate("pop3.log")
+      else
+         while file(cFile+alltrim(str(n,2))+".log")
+           n++
+         enddo
+         ::nHandle := fcreate(cFile+alltrim(str(n,2))+".log")
+      endif        
+   endif
+
 RETURN Self
 
 
@@ -94,9 +110,9 @@ METHOD Open() CLASS tIPClientPOP
 
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
    IF ::GetOk()
-      InetSendAll( ::SocketCon, "USER " + ::oUrl:cUserid + ::cCRLF )
+      ::InetSendall( ::SocketCon, "USER " + ::oUrl:cUserid + ::cCRLF )
       IF ::GetOK()
-         InetSendAll( ::SocketCon, "PASS " + ::oUrl:cPassword + ::cCRLF )
+         ::InetSendall( ::SocketCon, "PASS " + ::oUrl:cPassword + ::cCRLF )
          IF ::GetOK()
             RETURN .T.
          ENDIF
@@ -108,33 +124,37 @@ RETURN .F.
 METHOD GetOk() CLASS tIPClientPOP
    LOCAL nLen
 
-   ::cReply := InetRecvLine( ::SocketCon, @nLen, 128 )
-   IF InetErrorCode( ::SocketCon ) != 0 .or. ::cReply[1] != '+'
+   ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 128 )
+   IF ::InetErrorCode( ::SocketCon ) != 0 .or. ::cReply[1] != '+'
       RETURN .F.
    ENDIF
 RETURN .T.
 
 
 METHOD Noop() CLASS tIPClientPOP
-   InetSendAll( ::SocketCon, "NOOP" + ::cCRLF )
+   ::InetSendall( ::SocketCon, "NOOP" + ::cCRLF )
 RETURN ::GetOk()
 
 
 METHOD Close() CLASS tIPClientPOP
    InetSetTimeOut( ::SocketCon, ::nConnTimeout )
+   if ::ltrace
+      fClose(::nHandle)
+   endif
+
    ::Quit()
 RETURN ::super:Close()
 
 
 METHOD Quit() CLASS tIPClientPOP
-   InetSendAll( ::SocketCon, "QUIT" + ::cCRLF )
+   ::InetSendall( ::SocketCon, "QUIT" + ::cCRLF )
 RETURN ::GetOk()
 
 
 METHOD Stat() CLASS tIPClientPOP
    LOCAL nRead
-   InetSendAll( ::SocketCon, "STAT" + ::cCRLF )
-RETURN InetRecvLine( ::SocketCon, @nRead, 128)
+   ::InetSendall( ::SocketCon, "STAT" + ::cCRLF )
+RETURN ::InetRecvLine( ::SocketCon, @nRead, 128)
 
 
 METHOD Read( nLen ) CLASS tIPClientPOP
@@ -159,14 +179,14 @@ METHOD Top( nMsgId ) CLASS tIPClientPOP
    LOCAL nPos
    LOCAL cStr, cRet
 
-   InetSendAll( ::SocketCon, "TOP " + Str( nMsgId ) + " 0 " + ::cCRLF )
+   ::InetSendall( ::SocketCon, "TOP " + Str( nMsgId ) + " 0 " + ::cCRLF )
    IF .not. ::GetOk()
       RETURN NIL
    ENDIF
 
    cRet := ""
-   DO WHILE cStr != "." .and. InetErrorCode( ::SocketCon ) == 0
-      cStr := InetRecvLine( ::SocketCon, @nPos, 256 )
+   DO WHILE cStr != "." .and. ::InetErrorCode( ::SocketCon ) == 0
+      cStr := ::InetRecvLine( ::SocketCon, @nPos, 256 )
       IF cStr != "."
          cRet += cStr + ::cCRLF
       ELSE
@@ -175,7 +195,7 @@ METHOD Top( nMsgId ) CLASS tIPClientPOP
 
    ENDDO
 
-   IF InetErrorCode( ::SocketCon ) != 0
+   IF ::InetErrorCode( ::SocketCon ) != 0
       RETURN NIL
    ENDIF
 
@@ -187,14 +207,14 @@ METHOD List() CLASS tIPClientPOP
    LOCAL nPos
    LOCAL cStr, cRet
 
-   InetSendAll( ::SocketCon, "LIST" + ::cCRLF )
+   ::InetSendall( ::SocketCon, "LIST" + ::cCRLF )
    IF .not. ::GetOk()
       RETURN NIL
    ENDIF
 
    cRet := ""
-   DO WHILE cStr != "." .and. InetErrorCode( ::SocketCon ) == 0
-      cStr := InetRecvLine( ::SocketCon, @nPos, 256 )
+   DO WHILE cStr != "." .and. ::InetErrorCode( ::SocketCon ) == 0
+      cStr := ::InetRecvLine( ::SocketCon, @nPos, 256 )
       IF cStr != "."
          cRet += cStr + ::cCRLF
       ELSE
@@ -203,7 +223,7 @@ METHOD List() CLASS tIPClientPOP
 
    ENDDO
 
-   IF InetErrorCode( ::SocketCon ) != 0
+   IF ::InetErrorCode( ::SocketCon ) != 0
       RETURN NIL
    ENDIF
 
@@ -217,9 +237,9 @@ METHOD UIDL( nMsgId ) CLASS tIPClientPOP
    LOCAL cStr, cRet
 
    IF ! Empty( nMsgId )
-      InetSendAll( ::SocketCon, "UIDL " + Str( nMsgId ) + ::cCRLF )
+      ::InetSendall( ::SocketCon, "UIDL " + Str( nMsgId ) + ::cCRLF )
    ELSE
-      InetSendAll( ::SocketCon, "UIDL" + ::cCRLF )
+      ::InetSendall( ::SocketCon, "UIDL" + ::cCRLF )
    ENDIF
 
    IF .not. ::GetOk()
@@ -234,8 +254,8 @@ METHOD UIDL( nMsgId ) CLASS tIPClientPOP
    ELSE
 
       cRet := ""
-      DO WHILE cStr != "." .and. InetErrorCode( ::SocketCon ) == 0
-         cStr := InetRecvLine( ::SocketCon, @nPos, 256 )
+      DO WHILE cStr != "." .and. ::InetErrorCode( ::SocketCon ) == 0
+         cStr := ::InetRecvLine( ::SocketCon, @nPos, 256 )
          IF cStr != "."
             cRet += cStr + ::cCRLF
          ELSE
@@ -246,7 +266,7 @@ METHOD UIDL( nMsgId ) CLASS tIPClientPOP
 
    ENDIF
 
-   IF InetErrorCode( ::SocketCon ) != 0
+   IF ::InetErrorCode( ::SocketCon ) != 0
       RETURN NIL
    ENDIF
 
@@ -258,7 +278,7 @@ METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
    LOCAL cStr, cRet, nRetLen, cBuffer, nRead
 
    IF .not. ::bInitialized
-      InetSendAll( ::SocketCon, "RETR "+ Str( nId ) + ::cCRLF )
+      ::InetSendall( ::SocketCon, "RETR "+ Str( nId ) + ::cCRLF )
       IF .not. ::GetOk()
          ::bEof := .T.
          RETURN NIL
@@ -268,8 +288,8 @@ METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
 
    /* old code, one char at a time, slow
    cRet := ""
-   DO WHILE InetErrorCode( ::SocketCon ) == 0
-      cStr := InetRecvLine( ::SocketCon, @nPos, 1024 )
+   DO WHILE ::InetErrorCode( ::SocketCon ) == 0
+      cStr := ::InetRecvLine( ::SocketCon, @nPos, 1024 )
       IF cStr != NIL
          IF cStr == "."
             ::bEof := .T.
@@ -291,7 +311,7 @@ METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
       Instead of receiving a single char at a time until after we have the full mail, let's receive as
       much as we can and stop when we reach EOM (end of mail :)) sequence. This way is _a lot_ faster
    */
-   DO WHILE InetErrorCode( ::SocketCon ) == 0 .AND. ! ::bEof
+   DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .AND. ! ::bEof
 
       cBuffer := Space(1024)
 
@@ -314,7 +334,7 @@ METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
 
    ENDDO
 
-   IF InetErrorCode( ::SocketCon ) != 0
+   IF ::InetErrorCode( ::SocketCon ) != 0
       RETURN NIL
    ENDIF
 
@@ -325,6 +345,6 @@ RETURN cRet
 
 
 METHOD Delete( nId ) CLASS tIPClientPOP
-   InetSendAll( ::SocketCon, "DELE " + AllTrim( Str( nId ) ) +  ::cCRLF )
+   ::InetSendall( ::SocketCon, "DELE " + AllTrim( Str( nId ) ) +  ::cCRLF )
 RETURN ::GetOk()
 

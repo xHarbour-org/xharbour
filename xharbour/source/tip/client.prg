@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
+ * $Id: client.prg,v 1.3 2004/09/14 12:26:59 srobert Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #include "hbclass.ch"
 #include "fileio.ch"
 #include "tip.ch"
-
+#include "common.ch"
 /**
 * Inet Client class
 */
@@ -70,6 +70,8 @@ CLASS tIPClient
    DATA oCredentials    //credential needed to access the service
    DATA nStatus         //basic status
    DATA SocketCon
+   Data lTrace
+   Data nHandle
 
    /* Input stream length */
    DATA nLength
@@ -102,26 +104,34 @@ CLASS tIPClient
    METHOD Reset()
    METHOD Close()
    METHOD Data( cData )
+   /* New Methods */
+   METHOD InetRecv( SocketCon, cStr1, len)
+   METHOD InetRecvLine( SocketCon, nLen, size )
+   METHOD InetRecvAll( SocketCon, cStr1, nLen )
+   METHOD InetCount( SocketCon )
+   METHOD InetSendAll( SocketCon,  cData , nLen )
+   METHOD InetErrorCode(SocketCon)
+   METHOD InetConnect( cServer, nPort, SocketCon )
 ENDCLASS
 
 
-METHOD New( oUrl, oCredentials ) CLASS tIPClient
+METHOD New( oUrl, oCredentials,lTrace ) CLASS tIPClient
    LOCAL oRet
-
+   Default lTrace to .F.
    IF .not. ::bInitSocks
       InetInit()
       ::bInitSocks := .T.
    ENDIF
-
+   
    DO CASE
       CASE oUrl:cProto == "http"
-         oRet := tIPClientHTTP():New()
+         oRet := tIPClientHTTP():New(lTrace)
       CASE oUrl:cProto == "pop"
-         oRet := tIPClientPOP():New()
+         oRet := tIPClientPOP():New(lTrace)
       CASE oUrl:cProto == "smtp"
-         oRet := tIPClientSMTP():New()
+         oRet := tIPClientSMTP():New(lTrace)
       CASE oUrl:cProto == "ftp"
-         oRet := tIPClientFTP():New()
+         oRet := tIPClientFTP():New(lTrace)
    ENDCASE
 
    IF Empty( oRet )
@@ -137,7 +147,7 @@ METHOD New( oUrl, oCredentials ) CLASS tIPClient
    oRet:nRead := 0
    oRet:nLastRead := 0
    oRet:bEof := .F.
-
+   oRet:lTRace := lTRace
 RETURN oRet
 
 METHOD Open( cUrl ) CLASS tIPClient
@@ -156,8 +166,8 @@ METHOD Open( cUrl ) CLASS tIPClient
    ::SocketCon := InetCreate()
 
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
-   InetConnect( ::oUrl:cServer, nPort, ::SocketCon )
-   IF InetErrorCode( ::SocketCon ) != 0
+   ::InetConnect( ::oUrl:cServer, nPort, ::SocketCon )
+   IF ::InetErrorCode( ::SocketCon ) != 0
       RETURN .F.
    ENDIF
 RETURN .T.
@@ -192,11 +202,11 @@ METHOD Read( nLen ) CLASS tIPClient
       // read till end of stream
       cStr1 := Space( 1024 )
       cStr0 := ""
-      ::nLastRead := InetRecv( ::SocketCon, @cStr1, 1024 )
+      ::nLastRead := ::InetRecv( ::SocketCon, @cStr1, 1024 )
       DO WHILE ::nLastRead > 0
          ::nRead += ::nLastRead
          cStr0 += Substr( cStr1, 1, ::nLastRead )
-         ::nLastRead := InetRecv( ::SocketCon, @cStr1, 1024 )
+         ::nLastRead := ::InetRecv( ::SocketCon, @cStr1, 1024 )
       ENDDO
       ::bEof := .T.
    ELSE
@@ -206,8 +216,8 @@ METHOD Read( nLen ) CLASS tIPClient
 // S.R. if len of file is less than 1024 InetRecvAll return 0
 //      ::nLastRead := InetRecvAll( ::SocketCon, @cStr0, nLen )
 
-      InetRecvAll( ::SocketCon, @cStr0, nLen )
-      ::nLastRead := InetCount( ::SocketCon )
+      ::InetRecvAll( ::SocketCon, @cStr0, nLen )
+      ::nLastRead := ::InetCount( ::SocketCon )
       ::nRead += ::nLastRead
 
       IF ::nLastRead != nLen
@@ -234,13 +244,13 @@ METHOD ReadToFile( cFile, nMode ) CLASS tIPClient
    ENDIF
 
    ::nStatus := 1
-   DO WHILE InetErrorCode( ::SocketCon ) == 0 .and. .not. ::bEof
+   DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .and. .not. ::bEof
       cData := ::Read( 1024 )
       IF cData == NIL
          IF nFout != NIL
             Fclose( nFout )
          ENDIF
-         IF InetErrorCode( ::SocketCon ) > 0
+         IF ::InetErrorCode( ::SocketCon ) > 0
             RETURN .F.
          ELSE
             RETURN .T.
@@ -313,11 +323,11 @@ RETURN .T.
 
 
 METHOD Data( cData ) CLASS tIPClient
-   InetSendAll( ::SocketCon, "DATA" + ::cCRLF )
+   ::InetSendall( ::SocketCon, "DATA" + ::cCRLF )
    IF .not. ::GetOk()
       RETURN .F.
    ENDIF
-   InetSendAll(::SocketCon, cData + ::cCRLF + "." + ::cCRLF )
+   ::InetSendall(::SocketCon, cData + ::cCRLF + "." + ::cCRLF )
 RETURN ::GetOk()
 
 METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
@@ -326,9 +336,104 @@ METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
       nLen := Len( cData )
    ENDIF
 
-   ::nLastWrite := InetSendAll( ::SocketCon,  cData , nLen )
+   ::nLastWrite := ::InetSendall( ::SocketCon,  cData , nLen )
    IF .not. Empty( bCommit ) .and. bCommit
       ::Commit()
    ENDIF
 
 RETURN ::nLastWrite
+METHOD InetSendAll( SocketCon, nLen, size ) CLASS tIPClient
+
+Local nRet 
+
+    if ::lTrace
+       fWrite(::nHandle, [ Parametros recebidos na funcao InetSendAll  : SocketCon ] +cStr(SocketCon) + [  size  ] +cStr(size) + [  nLen  ] + cstr(nlen)  +hb_osnewline())
+    endif
+
+    nRet := InetSendAll( SocketCon, nLen, size )
+
+    if ::lTrace
+       fWrite(::nHandle, [ Dados retornado por InetSendAll: nRet  ] +cstr(nRet) +hb_osnewline())
+    endif
+Return nRet
+
+METHOD InetCount( SocketCon ) CLASS tIPClient
+Local nRet
+
+    if ::lTrace
+       fWrite(::nHandle, [ Parametros recebidos na funcao InetCount  : SocketCon ] +cStr(socketcon)+hb_osnewline() )
+    endif
+
+    nRet:= InetCount( SocketCon )
+
+    if ::lTrace
+       fWrite(::nHandle, [Dados recebidos em InetCount : nRet  ] +cStr(nRet)+hb_osnewline)
+    endif
+Return nRet
+
+METHOD InetRecv( SocketCon, cStr1, len) CLASS tIPClient
+Local nRet
+
+    if ::lTrace
+       fWrite(::nHandle, [Parametros recebidos na funcao InetRecv para receber dados :  : SocketCon ] +cStr(SocketCon)+ [ cStr1 ]+cStr1+[ len ]+cstr(len) +hb_osnewline())
+    endif
+
+    nRet:= InetRecv( SocketCon, @cStr1, len )
+
+    if ::lTrace
+       fWrite(::nHandle, [ Dados recebidos em InetRecv:  nRet  ]+ cstr(nret) + [ cStr1 ] + if(valtype( cStr1) == "U","NIL",cstr1)+ hb_osnewline())
+    endif
+Return nRet
+
+
+METHOD InetRecvLine( SocketCon, nLen, size ) CLASS tIPClient
+
+Local cRet :=""
+
+    if ::lTrace
+       fWrite(::nHandle, [ Parametros recebidos na funcao InetRecvLine para receber dados : SocketCon ] +cstr(SocketCon)+ [ nLen ]+cstr(nlen)+ [ size ]+cstr(size) +hb_osnewline() )
+    endif
+
+    cRet := InetRecvLine( SocketCon, @nLen, size )
+
+    if ::lTrace
+       fWrite(::nHandle, [ Dados recebidos em InetRecv : cRet  ] + if(valtype( cRet) == "U","NIL",cRet)  +hb_osnewline())
+    endif
+Return cRet
+
+METHOD InetRecvAll( SocketCon, cStr1, len) CLASS tIPClient
+Local nRet
+
+    if ::lTrace
+       fWrite(::nHandle, [Parametros recebidos na funcao InetRecvAll para receber dados:  Parametros recebidos : SocketCon ] +cStr(SocketCon) +  [  cStr1  ]+ cStr1 +[  len  ] +cstr(len) +hb_osnewline())
+    endif
+
+     InetRecvAll( SocketCon, @cStr1, len )
+
+    if ::lTrace
+       fWrite(::nHandle, [  Dados recebidos em InetRecvAll : cStr1  ] +if(valtype( cStr1) == "U","NIL",cstr1) +hb_osnewline())
+    endif
+Return self
+
+METHOD InetErrorCode(SocketCon)
+Local nRet := 0
+
+    if ::lTrace
+       fWrite(::nHandle, [Parametros recebidos na funcao InetErrorCode:  SocketCon ] +cStr(SocketCon) +hb_osnewline())
+    endif
+
+    nRet := InetErrorCode( ::SocketCon )
+
+    if ::lTrace
+       fWrite(::nHandle, [ Dados recebidos em InetErrorCode:  nRet  ]+ cstr(nret) + hb_osnewline())
+    endif
+
+Return nRet
+
+METHOD InetConnect( cServer, nPort, SocketCon )
+    if ::lTrace
+       fWrite(::nHandle, [Parametros recebidos na funcao InetConnect:  Server ] +cServer + [ Port ] +cStr( nPort ) + [SocketCon ] +cStr(SocketCon) + hb_osnewline())
+    endif
+
+   InetConnect( cServer, nPort, SocketCon )
+Return Nil

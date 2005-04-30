@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4093 2005/04/29 14:23:18 gdrouillard Exp $
+ * $Id: ChangeLog,v 1.4094 2005/04/29 16:49:18 guerra000 Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -6,9 +6,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2005-04-30 12:00 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
+  * source/rtl/tgetlist.prg
+    ! fixed problem on getprevalidate method, that was forcing the display of get object, when oget:control is valid
+     
+
 2005-04-29 11:49 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/win32ole.prg
     * Changed 0 to LOCALE_USER_DEFAULT on Invoke() calls.
+
+2005-04-29 11:40 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
+  * make_deb.sh
+  * debian/*.*
+    ! updated files and rules to generate debian .deb package
 
 2005-04-29 10:10 UTC-0400 Gerald Drouillard <gerald@drouillard.ca>
   * source/rtl/memoedit.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.37 2004/06/30 11:14:37 jonnymind Exp $
+ * $Id: Changelog,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-  
+
+2005-04-29 12:00 Luiz Rafael Culik <culikr@brturbo.com>
+  * client.prg
+  * smtpcln.prg
+  * ftpcln.prg
+  * popcln.prg
+  * httpcln.prg
+    !added code to create trace of inet functions
+    !all inet* functions call is replace by an method of same name
+    
 2004-06-03 12:40 UTC+0200 Giancarlo Niccolai <gian@niccolai.ws>
   * tipclient.prg
     ! Using (now properly) InetReadAll to read data slices.

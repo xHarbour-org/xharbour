@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.29 2004/10/26 01:59:01 ronpinkas Exp $
+ * $Id: tgetlist.prg,v 1.30 2004/11/08 18:58:10 ronpinkas Exp $
  */
 
 /*
@@ -569,11 +569,11 @@ METHOD GetPreValidate() CLASS HBGetList
       lWhen := Eval( oGet:PreBlock, oGet, aMsg )
       if !( VALTYPE( oGet:Control ) == "O" ) .AND. !lWhen
         oGet:Display()
-      elseif ValType( xValue ) != ValType( oGet:VarGet() ) .or.;
-           oGet:VarGet() != xValue
-         oGet:VarPut( oGet:VarGet() )
-      else
-         oGet:Display()
+//      elseif ValType( xValue ) != ValType( oGet:VarGet() ) .or.;
+//           oGet:VarGet() != xValue
+//         oGet:VarPut( oGet:VarGet() )
+//      else
+//         oGet:Display()
       endif
 #else
       lWhen := Eval( oGet:PreBlock, oGet )

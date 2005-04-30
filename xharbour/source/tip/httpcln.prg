@@ -1,5 +1,5 @@
 /*
- * $Id: tipmail.prg,v 1.26 2004/04/08 13:26:53 druzus Exp $
+ * $Id: httpcln.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
  */
 
 /*
@@ -83,10 +83,12 @@ HIDDEN:
 
 ENDCLASS
 
-METHOD New() CLASS tIPClientHTTP
+METHOD New(lTrace) CLASS tIPClientHTTP
    ::nDefaultPort := 80
    ::nConnTimeout := 5000
    ::bChunked := .F.
+   ::lTrace := .f.
+
    HSetCaseMatch( ::hHeaders, .F. )
 RETURN Self
 
@@ -96,10 +98,10 @@ METHOD Get( cQuery ) CLASS tIPClientHTTP
       cQuery := ::oUrl:BuildQuery()
    ENDIF
 
-   InetSendAll( ::SocketCon, "GET " + cQuery + " HTTP/1.1" + ::cCRLF )
+   ::InetSendall( ::SocketCon, "GET " + cQuery + " HTTP/1.1" + ::cCRLF )
    ::StandardFields()
-   InetSendAll( ::SocketCon, ::cCRLF )
-   IF InetErrorCode( ::SocketCon ) ==  0
+   ::InetSendall( ::SocketCon, ::cCRLF )
+   IF ::InetErrorCode( ::SocketCon ) ==  0
       RETURN ::ReadHeaders()
    ENDIF
 RETURN .F.
@@ -134,21 +136,21 @@ METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
       cQuery := ::oUrl:BuildQuery()
    ENDIF
 
-   InetSendAll( ::SocketCon, "POST " + cQuery + " HTTP/1.1" + ::cCRLF )
+   ::InetSendall( ::SocketCon, "POST " + cQuery + " HTTP/1.1" + ::cCRLF )
    ::StandardFields()
 
    IF .not. "Content-Type" IN ::hFields
-      InetSendAll( ::SocketCon, e"Content-Type: application/x-www-form-urlencoded\r\n" )
+      ::InetSendall( ::SocketCon, e"Content-Type: application/x-www-form-urlencoded\r\n" )
    ENDIF
 
-   InetSendAll( ::SocketCon, "Content-Length: " + ;
+   ::InetSendall( ::SocketCon, "Content-Length: " + ;
          LTrim(Str( Len( cData ) ) ) + ::cCRLF )
 
    // End of header
-   InetSendAll( ::SocketCon, ::cCRLF )
+   ::InetSendall( ::SocketCon, ::cCRLF )
 
-   IF InetErrorCode( ::SocketCon  ) ==  0
-      InetSendAll( ::SocketCon, cData )
+   IF ::InetErrorCode( ::SocketCon  ) ==  0
+      ::InetSendall( ::SocketCon, cData )
       ::bInitialized := .T.
       RETURN ::ReadHeaders()
    ENDIF
@@ -159,34 +161,34 @@ METHOD StandardFields() CLASS tIPClientHTTP
    LOCAL iCount
    LOCAL oEncoder
 
-   InetSendAll( ::SocketCon, "Host: " + ::oUrl:cServer + ::cCRLF )
-   InetSendAll( ::SocketCon, "User-agent: " + ::cUserAgent + ::cCRLF )
-   InetSendAll( ::SocketCon, "Connection: close" + ::cCRLF )
+   ::InetSendall( ::SocketCon, "Host: " + ::oUrl:cServer + ::cCRLF )
+   ::InetSendall( ::SocketCon, "User-agent: " + ::cUserAgent + ::cCRLF )
+   ::InetSendall( ::SocketCon, "Connection: close" + ::cCRLF )
 
    // Perform a basic authentication request
    IF ::cAuthMode == "Basic" .and. .not. ("Authorization" in ::hFields)
       oEncoder := TIPEncoderBase64():New()
       oEncoder:bHttpExcept := .T.
-      InetSendAll( ::SocketCon, "Authorization: Basic " +;
+      ::InetSendall( ::SocketCon, "Authorization: Basic " +;
           oEncoder:Encode(  ::oUrl:cUserID + ":" + ::oUrl:cPassword ) + ::cCRLF )
    ENDIF
 
 
    // send cookies
    IF ! Empty( ::hCookies )
-      InetSendAll( ::SocketCon, "Cookie: " )
+      ::InetSendall( ::SocketCon, "Cookie: " )
       FOR iCount := 1 TO Len( ::hCookies ) - 1
-         InetSendAll( ::SocketCon, HGetKeyAt( ::hCookies, iCount ) +;
+         ::InetSendall( ::SocketCon, HGetKeyAt( ::hCookies, iCount ) +;
             "=" + HGetValueAt( ::hCookies, iCount ) +"; ")
       NEXT
       iCount = Len( ::hCookies )
-      InetSendAll( ::SocketCon, HGetKeyAt( ::hCookies, iCount ) +;
+      ::InetSendall( ::SocketCon, HGetKeyAt( ::hCookies, iCount ) +;
          "=" + HGetValueAt( ::hCookies, iCount ) + ::cCRLF)
    ENDIF
 
    //Send optional Fields
    FOR iCount := 1 TO Len( ::hFields )
-      InetSendAll( ::SocketCon, HGetKeyAt( ::hFields, iCount ) +;
+      ::InetSendall( ::SocketCon, HGetKeyAt( ::hFields, iCount ) +;
          ": " + HGetValueAt( ::hFields, iCount ) + ::cCRLF )
    NEXT
 
@@ -199,7 +201,7 @@ METHOD ReadHeaders() CLASS tIPClientHTTP
    LOCAL aHead, aCookie, cCookie
 
    // Now reads the fields and set the content lenght
-   cLine := InetRecvLine( ::SocketCon, @nPos, 500 )
+   cLine := ::InetRecvLine( ::SocketCon, @nPos, 500 )
    IF Empty( cLine )
       // In case of timeout or error on receiving
       RETURN .F.
@@ -223,12 +225,12 @@ METHOD ReadHeaders() CLASS tIPClientHTTP
 
    ::nLength := -1
    ::bChunked := .F.
-   cLine := InetRecvLine( ::SocketCon, @nPos, 500 )
+   cLine := ::InetRecvLine( ::SocketCon, @nPos, 500 )
 
-   DO WHILE InetErrorCode( ::SocketCon ) == 0 .and. .not. Empty( cLine )
+   DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .and. .not. Empty( cLine )
       aHead := HB_RegexSplit( ":", cLine,,, 1 )
       IF aHead == NIL .or. Len( aHead ) != 2
-         cLine := InetRecvLine( ::SocketCon, @nPos, 500 )
+         cLine := ::InetRecvLine( ::SocketCon, @nPos, 500 )
          LOOP
       ENDIF
 
@@ -258,10 +260,10 @@ METHOD ReadHeaders() CLASS tIPClientHTTP
             NEXT
 
       ENDCASE
-      cLine := InetRecvLine( ::SocketCon, @nPos, 500 )
+      cLine := ::InetRecvLine( ::SocketCon, @nPos, 500 )
    ENDDO
 
-   IF InetErrorCode( ::SocketCon ) != 0
+   IF ::InetErrorCode( ::SocketCon ) != 0
       RETURN .F.
    ENDIF
 RETURN .T.
@@ -283,7 +285,7 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
       chunk, the footer is discarded, and nLenght is reset to -1.
    */
    IF ::nLength == -1 .and. ::bChunked
-      cLine := InetRecvLine( ::SocketCon, @nPos, 1024 )
+      cLine := ::InetRecvLine( ::SocketCon, @nPos, 1024 )
 
       IF Empty( cLine )
          RETURN NIL
@@ -293,7 +295,7 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
       IF cLine == "0"
 
          // read the footers.
-         cLine := InetRecvLine( ::SocketCon, @nPos, 1024 )
+         cLine := ::InetRecvLine( ::SocketCon, @nPos, 1024 )
          DO WHILE .not. Empty( cLine )
             // add Headers to footers
             aHead := HB_RegexSplit( ":", cLine,,, 1 )
@@ -301,7 +303,7 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
                ::hHeaders[ aHead[1] ] := LTrim(aHead[2])
             ENDIF
 
-            cLine := InetRecvLine( ::SocketCon, @nPos, 1024 )
+            cLine := ::InetRecvLine( ::SocketCon, @nPos, 1024 )
          ENDDO
 
          // we are done
