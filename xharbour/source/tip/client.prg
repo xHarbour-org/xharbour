@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.4 2005/04/30 15:14:29 lculik Exp $
+ * $Id: client.prg,v 1.5 2005/04/30 15:41:57 lculik Exp $
  */
 
 /*
@@ -367,7 +367,7 @@ Local nRet
     nRet:= InetCount( SocketCon )
 
     if ::lTrace
-       fWrite(::nHandle, [Data returned from the server on  InetCount : nRet  ] +cStr(nRet)+hb_osnewline)
+       fWrite(::nHandle, [Data returned from the server on  InetCount : nRet  ] +cStr(nRet)+hb_osnewline())
     endif
 Return nRet
 
