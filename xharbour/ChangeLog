@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4094 2005/04/29 16:49:18 guerra000 Exp $
+ * $Id: ChangeLog,v 1.4095 2005/04/30 15:13:59 lculik Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -6,11 +6,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-05-02 17.15 UTC+0700 Andi Jahja <andijahja@xharbour.com>
+  * contrib/libnf/fttext.c
+    ! total reworked version using xHarbour array implementation.
 
 2005-04-30 12:00 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   * source/rtl/tgetlist.prg
     ! fixed problem on getprevalidate method, that was forcing the display of get object, when oget:control is valid
-     
 
 2005-04-29 11:49 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/win32ole.prg
@@ -95,7 +97,6 @@
 
   * source/compiler/harbour.c
     - Removed wrong comment.
-
 
   * source/compiler/harbour.slx
   * source/compiler/harbour.sly
