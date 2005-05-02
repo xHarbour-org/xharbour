@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4095 2005/04/30 15:13:59 lculik Exp $
+ * $Id: ChangeLog,v 1.4096 2005/05/02 10:18:16 andijahja Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-02 13:00 UTC-0400 Gerald Drouillard <gerald@drouillard.ca>
+  * source/rtl/tbrowse.prg
+    ! Fix: display issue when ::colPos is set when ::leftvisible>::nFrozenCols
 
 2005-05-02 17.15 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * contrib/libnf/fttext.c
