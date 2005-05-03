@@ -1,5 +1,5 @@
 /*
- * $Id: fttext.c,v 1.5 2005/05/02 10:18:42 andijahja Exp $
+ * $Id: fttext.c,v 1.6 2005/05/03 02:06:24 andijahja Exp $
  */
 
 /*
@@ -425,7 +425,7 @@ HB_FUNC( FT_FSELECT )
          {
             iSelect = pTmp->iArea;
             nCurrent = pTmp->nCurrent;
-            pCurFile = pTmp;
+            pCurFile = pTmp->bActive ? pTmp : NULL ;
          }
       }
       else if ( ISCHAR(1) )
@@ -465,7 +465,7 @@ HB_FUNC( FT_FSELECT )
          {
             iSelect = pTmp->iArea;
             nCurrent = pTmp->nCurrent;
-            pCurFile = pTmp;
+            pCurFile = pTmp->bActive ? pTmp : NULL ;
          }
       }
    }
@@ -854,6 +854,7 @@ HB_FUNC( FT_FDELETED )
 HB_FUNC( FT_FCLOSE )
 {
    PFT_FFILE pTmp = NULL;
+   int iOldSelect = iSelect;
 
    if ( ISCHAR(1) )
    {
@@ -873,12 +874,12 @@ HB_FUNC( FT_FCLOSE )
    {
       if ( pTmp->bActive )
       {
+         iSelect = pTmp->iArea;
+         pCurFile = pTmp;
          HB_FUNCNAME( FT_FFLUSH )();
          pTmp->bActive = FALSE;
-         iSelect = 0;
          *(pTmp->szFileName) = 0;
          *(pTmp->szAlias) = 0;
-         pCurFile = NULL;
          hb_retl( TRUE );
       }
       else
@@ -890,6 +891,13 @@ HB_FUNC( FT_FCLOSE )
    {
       hb_retl( FALSE );
    }
+
+   if( iSelect != iOldSelect )
+   {
+      iSelect = iOldSelect;
+   }
+
+   pCurFile = NULL;
 }
 
 //------------------------------------------------------------------------------
