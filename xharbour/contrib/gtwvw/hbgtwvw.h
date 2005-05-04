@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h,v 1.5 2005/02/24 10:44:02 andijahja Exp $
+ * $Id: hbgtwvw.h,v 1.6 2005/03/30 21:28:46 andijahja Exp $
  */
 
 /*
@@ -220,7 +220,7 @@
    #define CCM_FIRST               0x2000      // Common control shared messages
    #define CCM_SETBKCOLOR          (CCM_FIRST + 1) // lParam is bkColor
    #define PBM_SETBKCOLOR          CCM_SETBKCOLOR  // lParam = bkColor
-   #define PBM_SETBARCOLOR         (WM_USER+9)		// lParam = bar color
+   #define PBM_SETBARCOLOR         (WM_USER+9)     // lParam = bar color
    #define PBM_GETRANGE            (WM_USER+7)  // wParam = return (TRUE ? low : high). lParam = PPBRANGE or NULL
    #define PBM_GETPOS              (WM_USER+8)
 
@@ -456,6 +456,7 @@ BOOL   HB_EXPORT hb_wvw_gtSetCentreWindow( USHORT usWinNum, BOOL bCentre, BOOL b
 void   HB_EXPORT hb_wvw_gtResetWindow( USHORT usWinNum );
 BOOL   HB_EXPORT hb_wvw_gtSetCodePage( USHORT usWinNum, int iCodePage );
 int    HB_EXPORT hb_wvw_gtGetLastMenuEvent( USHORT usWinNum );
+int    HB_EXPORT hb_wvw_gtSetLastMenuEvent( USHORT usWinNum, int iLastMenuEvent );
 void   HB_EXPORT hb_wvw_gtSetWindowTitle( USHORT usWinNum, char * title );
 DWORD  HB_EXPORT hb_wvw_gtSetWindowIcon( USHORT usWinNum, int icon, char *lpicon );
 DWORD  HB_EXPORT hb_wvw_gtSetWindowIconFromFile( USHORT usWinNum, char *icon );

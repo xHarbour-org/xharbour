@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.14 2005/04/07 07:48:49 bdj Exp $
+ * $Id: gtwvw.c,v 1.15 2005/04/18 06:27:59 bdj Exp $
  */
 
 /*
@@ -6978,6 +6978,15 @@ int HB_EXPORT hb_wvw_gtGetLastMenuEvent( USHORT usWinNum )
 
 /*-------------------------------------------------------------------*/
 
+int HB_EXPORT hb_wvw_gtSetLastMenuEvent( USHORT usWinNum, int iLastMenuEvent )
+{
+  int iRetval = s_pWindows[usWinNum]->LastMenuEvent;
+  s_pWindows[usWinNum]->LastMenuEvent = iLastMenuEvent;
+  return( iRetval );
+}
+
+/*-------------------------------------------------------------------*/
+
 void HB_EXPORT hb_wvw_gtSetWindowTitle( USHORT usWinNum, char * title )
 {
   SetWindowText( s_pWindows[usWinNum]->hWnd, title );
@@ -7668,6 +7677,14 @@ HB_FUNC( WVW_GETLASTMENUEVENT )
 {
   USHORT usWinNum = WVW_WHICH_WINDOW;
   hb_retni( hb_wvw_gtGetLastMenuEvent( usWinNum ) ) ;
+}
+
+/*-------------------------------------------------------------------*/
+
+HB_FUNC( WVW_SETLASTMENUEVENT )
+{
+  USHORT usWinNum = WVW_WHICH_WINDOW;
+  hb_retni( hb_wvw_gtSetLastMenuEvent( usWinNum, hb_parni(2) ) );
 }
 
 /*-------------------------------------------------------------------*/
