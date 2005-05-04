@@ -1498,9 +1498,11 @@ STATIC function GetParagraph( oSelf, nRow )
       if oSelf:naTextLen <= 0 // V@
          exit
       endif
-      IF Len( cLine ) > 0 .and. cLine[ -1 ] != " "
+      //GAD  This is not needed and will corrupt long lines that do not have any spaces with wordwrap on.
+/*      IF Len( cLine ) > 0 .and. cLine[ -1 ] != " "
          cLine += " "
       ENDIF
+*/
    enddo
 
    // Last line, or only one line
@@ -1592,7 +1594,8 @@ METHOD SplitLine( nRow ) CLASS HBEditor
       // A necessity because xHarbour does not insert the SoftCarriage and then we are unable to keep
       // trace of where the line break was while reformatting
       //
-      if right( cSplittedLine,1 ) <> " "
+//GAD
+      if right( cSplittedLine,1 ) <> " " .AND. nFirstSpace>1
          cSplittedLine += " "
       endif
       // We must not trim the line as split occurs next to a space
@@ -1944,8 +1947,8 @@ STATIC function Text2Array( cString, nWordWrapCol )
       endif
       nRetLen += Len( cLine ) + nEOLLen
 
-      if nWordWrapCol != NIL .AND. Len( cLine ) > nWordWrapCol
-         while !Empty( cLine )
+      if !empty(nWordWrapCol) .AND. Len( cLine ) > nWordWrapCol
+         while .T.
             // Split line at nWordWrapCol boundary
             if Len( cLine ) > nWordWrapCol
 
@@ -1957,8 +1960,7 @@ STATIC function Text2Array( cString, nWordWrapCol )
                   cSplittedLine := Left( cLine, nWordWrapCol )
                   cLine := SubStr( cLine, nWordWrapCol + 1 )
                endif
-
-               AAdd( aArray, HBTextLine():New( cSplittedLine, ! Empty( cLine ) ) )
+               AAdd( aArray, HBTextLine():New( cSplittedLine, .T. ) )
             else
                // remainder of line is shorter than split point
                AAdd( aArray, HBTextLine():New( cLine, .F. ) )
