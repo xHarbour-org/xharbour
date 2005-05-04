@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.112 2005/03/31 04:02:28 druzus Exp $
+ * $Id: itemapi.c,v 1.113 2005/04/06 14:48:14 snaiperis Exp $
  */
 
 /*
@@ -1941,34 +1941,32 @@ PHB_ITEM HB_EXPORT hb_itemPutNInt( PHB_ITEM pItem, HB_LONG lNumber )
 {
    if( HB_LIM_INT( lNumber ) )
    {
-      hb_itemPutNI( pItem, ( int ) lNumber );
+      return hb_itemPutNI( pItem, ( int ) lNumber );
    }
    else
    {
 #ifdef HB_LONG_LONG_OFF
-      hb_itemPutNL( pItem, ( LONG ) lNumber );
+      return hb_itemPutNL( pItem, ( LONG ) lNumber );
 #else
-      hb_itemPutNLL( pItem, ( LONGLONG ) lNumber );
+      return hb_itemPutNLL( pItem, ( LONGLONG ) lNumber );
 #endif
    }
-   return pItem;
 }
 
 PHB_ITEM HB_EXPORT hb_itemPutNIntLen( PHB_ITEM pItem, HB_LONG lNumber, int iWidth )
 {
    if( HB_LIM_INT( lNumber ) )
    {
-      hb_itemPutNILen( pItem, ( int ) lNumber, iWidth );
+      return hb_itemPutNILen( pItem, ( int ) lNumber, iWidth );
    }
    else
    {
 #ifdef HB_LONG_LONG_OFF
-      hb_itemPutNLLen( pItem, ( LONG ) lNumber, iWidth );
+      return hb_itemPutNLLen( pItem, ( LONG ) lNumber, iWidth );
 #else
-      hb_itemPutNLLLen( pItem, ( LONGLONG ) lNumber, iWidth );
+      return hb_itemPutNLLLen( pItem, ( LONGLONG ) lNumber, iWidth );
 #endif
    }
-   return pItem;
 }
 
 HB_LONG HB_EXPORT hb_itemGetNInt( PHB_ITEM pItem )

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.152 2005/04/24 18:35:52 druzus Exp $
+ * $Id: dbcmd.c,v 1.153 2005/04/25 23:11:02 druzus Exp $
  */
 
 /*
@@ -1287,6 +1287,7 @@ HB_FUNC( DBEVAL )
 
    if( pArea )
    {
+      memset( &pEvalInfo, 0, sizeof( DBEVALINFO ) );
       pEvalInfo.itmBlock = hb_param( 1, HB_IT_BLOCK );
       if( !pEvalInfo.itmBlock )
       {
@@ -1920,7 +1921,7 @@ HB_FUNC( DBRLOCK )
    if( pArea )
    {
       dbLockInfo.itmRecID = hb_param( 1, HB_IT_ANY );
-      if( !dbLockInfo.itmRecID || !HB_IS_NUMERIC( dbLockInfo.itmRecID ) )
+      if( !dbLockInfo.itmRecID || ISNIL( 1 ) )
          dbLockInfo.uiMethod = DBLM_EXCLUSIVE;
       else
          dbLockInfo.uiMethod = DBLM_MULTIPLE;
@@ -3554,20 +3555,29 @@ HB_FUNC( ORDSCOPE )
       pInfo.atomBagName = NULL;
       pInfo.itmResult = hb_itemNew( NULL );
       pInfo.itmNewVal = NULL;
-      uiAction = ( iScope == 0 ) ? DBOI_SCOPETOP : DBOI_SCOPEBOTTOM;
-      if( hb_pcount() > 1 )
+      if ( iScope == 2 )
       {
-         if( ISNIL( 2 ) )
-            uiAction = ( iScope == 0 ) ? DBOI_SCOPETOPCLEAR : DBOI_SCOPEBOTTOMCLEAR;
-         else
+         if ( hb_pcount() > 1 && !ISNIL( 2 ) )
+         {
+            uiAction = DBOI_SCOPESET;
             pInfo.itmNewVal = hb_param( 2, HB_IT_ANY);
+         }
+         else
+            uiAction = DBOI_SCOPECLEAR;
+      }
+      else
+      {
+         uiAction = ( iScope == 0 ) ? DBOI_SCOPETOP : DBOI_SCOPEBOTTOM;
+         if( hb_pcount() > 1 )
+         {
+            if( ISNIL( 2 ) )
+               uiAction = ( iScope == 0 ) ? DBOI_SCOPETOPCLEAR : DBOI_SCOPEBOTTOMCLEAR;
+            else
+               pInfo.itmNewVal = hb_param( 2, HB_IT_ANY);
+         }
       }
       SELF_ORDINFO( pArea, uiAction, &pInfo );
-      /* this is only for strict Clipper compatibility - IMHO it's a bug */
-      if( hb_pcount() > 1 && ISNIL( 2 ) )
-         hb_retl( TRUE );
-      else
-         hb_itemReturn( pInfo.itmResult );
+      hb_itemReturn( pInfo.itmResult );
       hb_itemRelease( pInfo.itmResult );
    }
    else
@@ -3723,7 +3733,7 @@ HB_FUNC( __DBARRANGE )
       dbSortInfo.dbtri.dbsci.itmCobWhile = hb_param( 4, HB_IT_BLOCK );
       dbSortInfo.dbtri.dbsci.lpstrWhile = NULL;
       dbSortInfo.dbtri.dbsci.lNext = hb_param( 5, HB_IT_NUMERIC );
-      dbSortInfo.dbtri.dbsci.itmRecID = hb_param( 6, HB_IT_NUMERIC );
+      dbSortInfo.dbtri.dbsci.itmRecID = ISNIL( 6 ) ? NULL : hb_param( 6, HB_IT_ANY );
       dbSortInfo.dbtri.dbsci.fRest = hb_param( 7, HB_IT_LOGICAL );
       dbSortInfo.dbtri.dbsci.fIgnoreFilter = dbSortInfo.dbtri.dbsci.fLast =
       dbSortInfo.dbtri.dbsci.fIgnoreDuplicates = FALSE;

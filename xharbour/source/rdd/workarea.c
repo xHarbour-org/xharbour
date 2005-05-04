@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.42 2005/04/24 11:25:40 druzus Exp $
+ * $Id: workarea.c,v 1.43 2005/04/25 23:11:03 druzus Exp $
  */
 
 /*
@@ -953,7 +953,6 @@ ERRCODE hb_waRelArea( AREAP pArea, USHORT uiRelNo, void * pRelArea )
  */
 ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
 {
-   int iCurrArea;
    PHB_ITEM pResult;
    DBORDERINFO pInfo;
    ERRCODE errCode;
@@ -961,43 +960,46 @@ ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waRelEval(%p, %p)", pArea, pRelInfo));
 
-   iCurrArea = hb_rddGetCurrentWorkAreaNumber();
-   hb_rddSelectWorkAreaNumber( pRelInfo->lpaParent->uiArea );
-   pResult = hb_vmEvalBlock( pRelInfo->itmCobExpr );
-   hb_rddSelectWorkAreaNumber( iCurrArea );
+   errCode = SELF_EVALBLOCK( pRelInfo->lpaParent, pRelInfo->itmCobExpr );
 
-   /*
-   *  Check the current order
-   */
-
-   memset( &pInfo, 0, sizeof( DBORDERINFO ) );
-   pInfo.itmResult = hb_itemPutNI( NULL, 0 );
-   errCode = SELF_ORDINFO( pArea, DBOI_NUMBER, &pInfo );
-   iOrder = hb_itemGetNI( pInfo.itmResult );
-
-   if( errCode != FAILURE )
+   if( errCode == SUCCESS )
    {
-      if( iOrder != 0 )
+      /*
+       *  Check the current order
+       */
+      pResult = pArea->valResult;
+      pArea->valResult = NULL;
+      memset( &pInfo, 0, sizeof( DBORDERINFO ) );
+      pInfo.itmResult = hb_itemPutNI( NULL, 0 );
+      errCode = SELF_ORDINFO( pArea, DBOI_NUMBER, &pInfo );
+
+      if( errCode == SUCCESS )
       {
-         if( pRelInfo->isScoped )
+         iOrder = hb_itemGetNI( pInfo.itmResult );
+         if( iOrder != 0 )
          {
-            pInfo.itmNewVal = pResult;
-            errCode = SELF_ORDINFO( pArea, DBOI_SCOPETOP, &pInfo );
-            if( errCode != FAILURE )
-               errCode = SELF_ORDINFO( pArea, DBOI_SCOPEBOTTOM, &pInfo );
+            if( pRelInfo->isScoped )
+            {
+               pInfo.itmNewVal = pResult;
+               errCode = SELF_ORDINFO( pArea, DBOI_SCOPETOP, &pInfo );
+               if( errCode == SUCCESS )
+                  errCode = SELF_ORDINFO( pArea, DBOI_SCOPEBOTTOM, &pInfo );
+            }
+            if( errCode == SUCCESS )
+               errCode = SELF_SEEK( pArea, 0, pResult, 0 );
          }
-         if( errCode != FAILURE )
-            errCode = SELF_SEEK( pArea, 0, pResult, 0 );
+         else
+         {
+            /*
+             *  If current order equals to zero, use GOTOID instead of SEEK
+             */
+            //errCode = SELF_GOTOID( pArea, pResult );
+            errCode = SELF_GOTO( pArea, hb_itemGetNL( pResult ) );
+         }
       }
-      else
-      {
-         /*
-         *  If current order equals to zero, use GOTOID instead of SEEK
-         */
-         errCode = SELF_GOTOID( pArea, pResult );
-      }
+      hb_itemRelease( pInfo.itmResult );
+      hb_itemRelease( pResult );
    }
-   hb_itemRelease( pInfo.itmResult );
 
    return errCode;
 }

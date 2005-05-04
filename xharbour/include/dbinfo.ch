@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.12 2005/04/16 00:47:08 druzus Exp $
+ * $Id: dbinfo.ch,v 1.13 2005/04/19 18:49:56 druzus Exp $
  */
 
 /*
@@ -90,7 +90,6 @@
 #define DBOI_SCOPEBOTTOM          40  /* Get or Set the scope botto        */
 #define DBOI_SCOPETOPCLEAR        41  /* Clear the scope top               */
 #define DBOI_SCOPEBOTTOMCLEAR     42  /* Clear the scope bottom            */
-
 #define DBOI_CUSTOM               45  /* Is this a Custom Index?           */
 #define DBOI_SKIPUNIQUE           46  /* Was a skip to adjacent unique Key successful?   */
 
@@ -123,6 +122,8 @@
 #define DBOI_FINDREC             107  /* find given record in a Tag beginning from TOP */
 #define DBOI_FINDRECCONT         108  /* find given record in a Tag beginning from current position */
 #define DBOI_EVALSTEP            109  /* eval step (EVERY) used in index command */
+#define DBOI_SCOPESET            110  /* set both scopes */
+#define DBOI_SCOPECLEAR          111  /* clear both scopes */
 
 /* Return values for DBOI_OPTLEVEL */
 #define DBOI_OPTIMIZED_NONE       0
@@ -185,7 +186,7 @@
 #define DBI_LOCKSCHEME          128  /* Locking scheme used by RDD */
 #define DBI_ISREADONLY          129  /* Was the file opened readonly? */
 #define DBI_ROLLBACK            130  /* Rollback changes made to current record */
-#define DBI_PASSWORD            131  /* Set workarea password */
+#define DBI_PASSWORD            131  /* Workarea password */
 #define DBI_ISENCRYPTED         132  /* The database is encrypted */
 
 /* RECORD MAP (RM) support */

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.198 2005/04/24 11:25:40 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.199 2005/04/25 23:11:04 druzus Exp $
  */
 
 /*
@@ -8145,7 +8145,7 @@ static void hb_cdxSortWritePage( LPCDXSORTINFO pSort )
       pSort->szTempFileName = hb_strdup( ( char * ) szName );
    }
    pSort->pSwapPage[ pSort->ulCurPage ].ulKeys = pSort->ulKeys;
-   pSort->pSwapPage[ pSort->ulCurPage ].nOffset = hb_fsSeekLarge( pSort->hTempFile, 0, SEEK_END );
+   pSort->pSwapPage[ pSort->ulCurPage ].nOffset = hb_fsSeekLarge( pSort->hTempFile, 0, FS_END );
    if ( hb_fsWriteLarge( pSort->hTempFile, pSort->pKeyPool, ulSize ) != ulSize )
    {
       hb_errInternal( 9999, "hb_cdxSortWritePage: Write error in temporary file.", "", "" );

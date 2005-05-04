@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.26 2005/04/26 05:38:04 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.27 2005/04/27 20:20:26 ronpinkas Exp $
  */
 
 /*
@@ -117,7 +117,7 @@ HB_EXPORT extern void    hb_vmPush( PHB_ITEM pItem );     /* pushes a generic it
 HB_EXPORT extern void    hb_vmPushNil( void );            /* in this case it places nil at self */
 HB_EXPORT extern void    hb_vmPushNumber( double dNumber, int iDec ); /* pushes a number on to the stack and decides if it is SHORT, LONG or double */
 HB_EXPORT extern void    hb_vmPushInteger( int iNumber ); /* pushes a integer number onto the stack */
-HB_EXPORT extern void    hb_vmPushLong( long lNumber ); /* pushes a LONG number onto the stack */
+HB_EXPORT extern void    hb_vmPushLong( LONG lNumber ); /* pushes a LONG number onto the stack */
 HB_EXPORT extern void    hb_vmPushLongLong( HB_LONG lNumber ); /* pushes a long long number onto the stack */
 HB_EXPORT extern void    hb_vmPushDouble( double lNumber, int iDec ); /* pushes a double number onto the stack */
 HB_EXPORT extern void    hb_vmPushLogical( BOOL bValue );    /* pushes a logical value onto the stack */

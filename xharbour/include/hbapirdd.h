@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.26 2005/04/24 11:25:38 druzus Exp $
+ * $Id: hbapirdd.h,v 1.27 2005/04/25 23:11:01 druzus Exp $
  */
 
 /*
@@ -200,9 +200,9 @@ typedef struct _DBORDERCONDINFO
    PHB_ITEM itmCobWhile;
    PHB_ITEM itmCobEval;
    LONG     lStep;
-   LONG     lStartRecno;
+   LONG     lStartRecno;   /* it should be itmStartRecID for real record IDENTITY support */
    LONG     lNextCount;
-   LONG     lRecno;
+   LONG     lRecno;     /* it should be itmRecID for real record IDENTITY support */
    BOOL     fRest;
    BOOL     fDescending;
 /* BOOL     fScoped; */
@@ -274,7 +274,7 @@ typedef struct
    PHB_ITEM itmCobWhile; /* Code Block representation of a WHILE clause */
    PHB_ITEM lpstrWhile;  /* String representation of a WHILE clause */
    PHB_ITEM lNext;       /* NEXT record */
-   PHB_ITEM itmRecID;
+   PHB_ITEM itmRecID;    /* single record ID */
    PHB_ITEM fRest;       /* TRUE if start from the current record */
    BOOL     fIgnoreFilter;
    BOOL     fIncludeDeleted;

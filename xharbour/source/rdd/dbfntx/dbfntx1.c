@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.107 2005/04/25 23:11:06 druzus Exp $
+ * $Id: dbfntx1.c,v 1.108 2005/04/26 12:25:58 druzus Exp $
  */
 
 /*
@@ -885,9 +885,9 @@ static void hb_ntxPageCheckKeys( LPPAGEINFO pPage, LPTAGINFO pTag, int iPos, int
          i = -1;
       if ( i > 0 )
       {
-         printf("uiKeys=%d(%d/%d), (%d)[%s]>(%d)[%s]\r\n", pPage->uiKeys, iPos, iType,
-                u - 1, hb_ntxGetKeyVal( pPage, u - 1 ),
-                u, hb_ntxGetKeyVal( pPage, u ) );
+         printf("\r\nuiKeys=%d(%d/%d), (%d)[%.*s]>(%d)[%.*s]", pPage->uiKeys, iPos, iType,
+                u - 1, pTag->KeyLength, hb_ntxGetKeyVal( pPage, u - 1 ),
+                u, pTag->KeyLength, hb_ntxGetKeyVal( pPage, u ) );
          fflush(stdout);
          hb_errInternal( 9999, "hb_ntxPageCheckKeys: keys sorted wrong.", "", "" );
       }
@@ -1879,16 +1879,8 @@ static BOOL hb_ntxTagKeyFind( LPTAGINFO pTag, LPKEYINFO pKey, USHORT uiLen )
       pPage = hb_ntxPageLoad( pTag, ulPage );
       if ( ! pPage )
          return FALSE;
-      if( pPage->uiKeys == 0 )
-      {
-         iKey = 0;
-         ulPage = 0;
-      }
-      else
-      {
-         iKey = hb_ntxPageKeyFind( pTag, pPage, pKey->key, uiLen, fNext, &fStop );
-         ulPage = hb_ntxGetKeyPage( pPage, iKey );
-      }
+      iKey = hb_ntxPageKeyFind( pTag, pPage, pKey->key, uiLen, fNext, &fStop );
+      ulPage = hb_ntxGetKeyPage( pPage, iKey );
       hb_ntxTagSetPageStack( pTag, pPage->Page, iKey );
    } while ( ulPage != 0 );
 
@@ -2091,7 +2083,7 @@ static LPKEYINFO hb_ntxPageSplit( LPTAGINFO pTag, LPPAGEINFO pPage,
  * join two neighbour pages and update the parent page key
  */
 static void hb_ntxPageJoin( LPTAGINFO pTag, LPPAGEINFO pBasePage, USHORT uiPos,
-                             LPPAGEINFO pFirst, LPPAGEINFO pLast )
+                            LPPAGEINFO pFirst, LPPAGEINFO pLast )
 {
    USHORT uiLen = pTag->KeyLength + 8, i;
 
@@ -2399,6 +2391,16 @@ static BOOL hb_ntxTagKeyDel( LPTAGINFO pTag, LPKEYINFO pKey )
       else
          break;
       iLevel--;
+   }
+
+   if ( pPage->uiKeys == 0 && pPage->Page == pTag->RootBlock )
+   {
+      ulPage = hb_ntxGetKeyPage( pPage, 0 );
+      if ( ulPage != 0 )
+      {
+         pTag->RootBlock = ulPage;
+         hb_ntxPageFree( pTag, pPage );
+      }
    }
    hb_ntxPageRelease( pTag, pPage );
    pTag->stackLevel = 0;
@@ -3330,7 +3332,6 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
 
    HB_TRACE(HB_TR_DEBUG, ("ntxOrderCreate(%p, %p)", pArea, pOrderInfo));
 
-   /* printf( "\nntxOrderCreate - 0\n" ); */
    if( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 

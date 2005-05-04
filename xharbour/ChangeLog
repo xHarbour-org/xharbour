@@ -1,10 +1,56 @@
- * $Id: ChangeLog,v 1.4096 2005/05/02 10:18:16 andijahja Exp $
+ * $Id: ChangeLog,v 1.4097 2005/05/02 17:04:38 gdrouillard Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-04 13:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/dbinfo.ch
+    + added DBOI_SCOPESET, DBOI_SCOPECLEAR
+  * xharbour/include/hbapirdd.h
+    * some comments added about using Clipper's concept of RecID
+      which could be nonnumerical value in some RDDs
+
+  * xharbour/include/hbvm.h
+    * minor modification: long replaced by LONG
+
+  * xharbour/source/rdd/dbcmd.c
+    ! clear unused fields in DBEVALINFO
+    ! respect non numeric RecID in RLOCK()
+    ! respect non numeric RecID in __DBARRANGE()
+    + added 2 as parameter in ordScope() - it sets both scope
+      the return value depends on RDD - ordScope() itself does not
+      try to force it now
+
+  * xharbour/source/rdd/workarea.c
+    * use SELF_EVALBLOCK() method to evaluate relation block
+    ! use SELF_GOTO() method instead of SELF_GOTOID() - it fixes bad
+      .prg code which sets bad relations without active indexes but
+      it breaks using non numeric RecIDs. I will have to make some
+      test in Clipper to found its exact behavior then discuss this
+      problem in devel list
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * use FS_END instead of SEEK_END in hb_fsSeek() to avoid problems
+      on platforms which may use differ lseek() values.
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! fixed problem reported by Budyanto - it was caused by unfinished
+      code for operating on empty (without keys) pages - my fault. I do
+      not know if Clipper can work with such pages. It will be necessary
+      to make some tests though now I added freeing the empty root page
+      when it's not a leaf. Support for empty pages is necessary for
+      indexes which have nonsymmetric leaf and branch nodes, key values
+      are also stored in branches and the index tree has to be well balanced
+      (f.e. NSX) this is the reason I implement it as base for future NSX RDD
+
+  * xharbour/source/vm/itemapi.c
+    ! fixed hb_itemPutNInt() and hb_itemPutNIntLen() to work like
+      other hb_itemPut*() functions - it should return new item when
+      NULL was passed as first parameter. This also fix GPF in SKIPEVAL
+      in DBFCDX
 
 2005-05-02 13:00 UTC-0400 Gerald Drouillard <gerald@drouillard.ca>
   * source/rtl/tbrowse.prg
