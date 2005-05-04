@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.43 2005/04/25 23:11:03 druzus Exp $
+ * $Id: workarea.c,v 1.44 2005/05/04 11:39:52 druzus Exp $
  */
 
 /*
@@ -967,8 +967,8 @@ ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
       /*
        *  Check the current order
        */
-      pResult = pArea->valResult;
-      pArea->valResult = NULL;
+      pResult = pRelInfo->lpaParent->valResult;
+      pRelInfo->lpaParent->valResult = NULL;
       memset( &pInfo, 0, sizeof( DBORDERINFO ) );
       pInfo.itmResult = hb_itemPutNI( NULL, 0 );
       errCode = SELF_ORDINFO( pArea, DBOI_NUMBER, &pInfo );
@@ -986,7 +986,7 @@ ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
                   errCode = SELF_ORDINFO( pArea, DBOI_SCOPEBOTTOM, &pInfo );
             }
             if( errCode == SUCCESS )
-               errCode = SELF_SEEK( pArea, 0, pResult, 0 );
+               errCode = SELF_SEEK( pArea, FALSE, pResult, FALSE );
          }
          else
          {
