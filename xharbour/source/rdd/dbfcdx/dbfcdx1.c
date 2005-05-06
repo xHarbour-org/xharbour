@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.199 2005/04/25 23:11:04 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.200 2005/05/04 11:39:52 druzus Exp $
  */
 
 /*
@@ -56,8 +56,6 @@
 
 #define HB_CDX_CLIP_AUTOPEN
 #define HB_CDX_NEW_SORT
-
-#  define HB_CDX_SIXTAG
 
 #if defined( HB_SIXCDX )
 #  define HB_CDX_SIXTAG
@@ -7719,12 +7717,25 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
             hb_itemClear( pOrderInfo->itmResult );
          break;
 
+      case DBOI_SCOPESET:
+         if ( pTag )
+         {
+            if ( pOrderInfo->itmNewVal )
+            {
+               hb_cdxTagSetScope( pTag, 0, pOrderInfo->itmNewVal );
+               hb_cdxTagSetScope( pTag, 1, pOrderInfo->itmNewVal );
+            }
+         }
+         if ( pOrderInfo->itmResult )
+            hb_itemClear( pOrderInfo->itmResult );
+         break;
+
       case DBOI_SCOPETOPCLEAR:
          if ( pTag )
          {
             if ( pOrderInfo->itmResult )
                hb_cdxTagGetScope( pTag, 0, pOrderInfo->itmResult );
-            hb_cdxTagClearScope( pTag, 0);
+            hb_cdxTagClearScope( pTag, 0 );
          }
          else if ( pOrderInfo->itmResult )
             hb_itemClear( pOrderInfo->itmResult );
@@ -7735,9 +7746,19 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
          {
             if ( pOrderInfo->itmResult )
                hb_cdxTagGetScope( pTag, 1, pOrderInfo->itmResult );
-            hb_cdxTagClearScope( pTag, 1);
+            hb_cdxTagClearScope( pTag, 1 );
          }
          else if ( pOrderInfo->itmResult )
+            hb_itemClear( pOrderInfo->itmResult );
+         break;
+
+      case DBOI_SCOPECLEAR:
+         if ( pTag )
+         {
+            hb_cdxTagClearScope( pTag, 0 );
+            hb_cdxTagClearScope( pTag, 1 );
+         }
+         if ( pOrderInfo->itmResult )
             hb_itemClear( pOrderInfo->itmResult );
          break;
 
@@ -7823,23 +7844,7 @@ static ERRCODE hb_cdxClearFilter( CDXAREAP pArea )
 }
 
 /* ( DBENTRYP_V )     hb_cdxClearLocate     : NULL */
-
-/* ( DBENTRYP_V )     hb_cdxClearScope */
-static ERRCODE hb_cdxClearScope( CDXAREAP pArea )
-{
-   LPCDXTAG pTag;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxClearScope(%p)", pArea));
-
-   pTag = hb_cdxGetActiveTag( pArea );
-
-   if ( pTag )
-   {
-      hb_cdxTagClearScope( pTag, 0);
-      hb_cdxTagClearScope( pTag, 1);
-   }
-   return SUCCESS;
-}
+/* ( DBENTRYP_V )     hb_cdxClearScope      : NULL */
 
 /* ( DBENTRYP_VPLP )  hb_cdxCountScope */
 static ERRCODE hb_cdxCountScope( CDXAREAP pArea, void * pPtr, LONG * plRec )
@@ -7854,21 +7859,7 @@ static ERRCODE hb_cdxCountScope( CDXAREAP pArea, void * pPtr, LONG * plRec )
 }
 
 /* ( DBENTRYP_I )     hb_cdxFilterText      : NULL */
-
-/* ( DBENTRYP_SI )    hb_cdxScopeInfo */
-static ERRCODE hb_cdxScopeInfo( CDXAREAP pArea, USHORT nScope, PHB_ITEM pItem )
-{
-   LPCDXTAG pTag;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxScopeInfo(%p, %hu, %p)", pArea, nScope, pItem));
-
-   pTag = hb_cdxGetActiveTag( pArea );
-   if ( pTag )
-      hb_cdxTagGetScope( pTag, nScope, pItem );
-   else
-      hb_itemClear( pItem );
-   return SUCCESS;
-}
+/* ( DBENTRYP_SI )    hb_cdxScopeInfo       : NULL */
 
 /* ( DBENTRYP_VFI )   hb_cdxSetFilter */
 static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo )
@@ -7878,33 +7869,7 @@ static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo )
 }
 
 /* ( DBENTRYP_VLO )   hb_cdxSetLocate       : NULL */
-
-/* ( DBENTRYP_VOS )   hb_cdxSetScope */
-static ERRCODE hb_cdxSetScope( CDXAREAP pArea, LPDBORDSCOPEINFO sInfo )
-{
-   LPCDXTAG pTag;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxSetScope(%p, %p)", pArea, sInfo));
-
-   pTag = hb_cdxGetActiveTag( pArea );
-
-   if ( pTag )
-   {
-      if ( sInfo->scopeValue )
-         hb_cdxTagSetScope( pTag, sInfo->nScope, sInfo->scopeValue );
-      else
-         hb_cdxTagClearScope( pTag, sInfo->nScope );
-   }
-   else
-   {
-      /* TODO: !!!
-       * RT error: hb_cdxSetScope: workarea not indexed
-       */
-   }
-
-   return SUCCESS;
-}
-
+/* ( DBENTRYP_VOS )   hb_cdxSetScope        : NULL */
 /* ( DBENTRYP_VPL )   hb_cdxSkipScope       : NULL */
 
 /* ( DBENTRYP_P )     hb_cdxCompile         : NULL */

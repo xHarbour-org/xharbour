@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.24 2005/03/31 03:15:18 druzus Exp $
+ * $Id: hbrddntx.h,v 1.25 2005/04/24 11:25:38 druzus Exp $
  */
 
 /*
@@ -408,13 +408,13 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
          /* Some information about index */
 #define ntxClearFilter           NULL
 #define ntxClearLocate           NULL
-static ERRCODE ntxClearScope( NTXAREAP pArea );
+#define ntxClearScope            NULL
 #define ntxCountScope            NULL
 #define ntxFilterText            NULL
-static ERRCODE ntxScopeInfo( NTXAREAP pArea, USHORT nScope, PHB_ITEM pItem );
+#define ntxScopeInfo             NULL
 #define ntxSetFilter             NULL
 #define ntxSetLocate             NULL
-static ERRCODE ntxSetScope( NTXAREAP pArea, LPDBORDSCOPEINFO sInfo );
+#define ntxSetScope              NULL
 #define ntxSkipScope             NULL
 #define ntxCompile               NULL
 #define ntxError                 NULL

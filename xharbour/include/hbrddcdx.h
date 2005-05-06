@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.40 2005/02/14 21:14:00 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.41 2005/03/31 03:15:18 druzus Exp $
  */
 
 /*
@@ -614,13 +614,13 @@ static ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo );
 static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrderInfo );
 static ERRCODE hb_cdxClearFilter( CDXAREAP pArea );
 #define hb_cdxClearLocate                          NULL
-static ERRCODE hb_cdxClearScope( CDXAREAP pArea );
+#define hb_cdxClearScope                           NULL
 static ERRCODE hb_cdxCountScope( CDXAREAP pArea, void * pPtr, LONG * plRec );
 #define hb_cdxFilterText                           NULL
-static ERRCODE hb_cdxScopeInfo( CDXAREAP pArea, USHORT nScope, PHB_ITEM pItem );
+#define hb_cdxScopeInfo                            NULL
 static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo );
 #define hb_cdxSetLocate                            NULL
-static ERRCODE hb_cdxSetScope( CDXAREAP pArea, LPDBORDSCOPEINFO sInfo );
+#define hb_cdxSetScope                             NULL
 #define hb_cdxSkipScope                            NULL
 #define hb_cdxCompile                              NULL
 #define hb_cdxError                                NULL

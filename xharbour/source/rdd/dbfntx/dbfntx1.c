@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.108 2005/04/26 12:25:58 druzus Exp $
+ * $Id: dbfntx1.c,v 1.109 2005/05/04 11:39:54 druzus Exp $
  */
 
 /*
@@ -3655,6 +3655,15 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             if( pInfo->itmNewVal )
                hb_ntxTagSetScope( pTag, 1, pInfo->itmNewVal );
             break;
+         case DBOI_SCOPESET:
+            if ( pInfo->itmNewVal )
+            {
+               hb_ntxTagSetScope( pTag, 0, pInfo->itmNewVal );
+               hb_ntxTagSetScope( pTag, 1, pInfo->itmNewVal );
+            }
+            if ( pInfo->itmResult )
+               hb_itemClear( pInfo->itmResult );
+            break;
          case DBOI_SCOPETOPCLEAR:
             if( pInfo->itmResult )
                hb_ntxTagGetScope( pTag, 0, pInfo->itmResult );
@@ -3665,6 +3674,11 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
                hb_ntxTagGetScope( pTag, 1, pInfo->itmResult );
             hb_ntxTagClearScope( pTag, 1 );
             break;
+         case DBOI_SCOPECLEAR:
+            hb_ntxTagClearScope( pTag, 0 );
+            hb_ntxTagClearScope( pTag, 1 );
+            if ( pInfo->itmResult )
+               hb_itemClear( pInfo->itmResult );
          case DBOI_KEYADD:
             hb_itemPutL( pInfo->itmResult, hb_ntxOrdKeyAdd( pTag ) );
             break;
@@ -3725,10 +3739,12 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             hb_itemPutL( pInfo->itmResult, FALSE );
             break;
          case DBOI_KEYVAL:
-         case DBOI_SCOPETOP :
-         case DBOI_SCOPEBOTTOM :
-         case DBOI_SCOPETOPCLEAR :
-         case DBOI_SCOPEBOTTOMCLEAR :
+         case DBOI_SCOPETOP:
+         case DBOI_SCOPEBOTTOM:
+         case DBOI_SCOPESET:
+         case DBOI_SCOPETOPCLEAR:
+         case DBOI_SCOPEBOTTOMCLEAR:
+         case DBOI_SCOPECLEAR:
             hb_itemClear( pInfo->itmResult );
             break;
          case DBOI_KEYSIZE:
@@ -3742,41 +3758,6 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
          default:
             hb_itemPutC( pInfo->itmResult, "" );
       }
-   }
-   return SUCCESS;
-}
-
-static ERRCODE ntxClearScope( NTXAREAP pArea )
-{
-   HB_TRACE(HB_TR_DEBUG, ("ntxClearScope(%p)", pArea ));
-   if( pArea->lpCurTag )
-   {
-      hb_ntxTagClearScope( pArea->lpCurTag, 0 );
-      hb_ntxTagClearScope( pArea->lpCurTag, 1 );
-   }
-   return SUCCESS;
-}
-
-static ERRCODE ntxScopeInfo( NTXAREAP pArea, USHORT nScope, PHB_ITEM pItem )
-{
-   HB_TRACE(HB_TR_DEBUG, ("ntxScopeInfo(%p, %hu, %p)", pArea, nScope, pItem));
-
-   if ( pArea->lpCurTag )
-      hb_ntxTagGetScope( pArea->lpCurTag, nScope, pItem );
-   else
-      hb_itemClear( pItem );
-
-   return SUCCESS;
-}
-
-static ERRCODE ntxSetScope( NTXAREAP pArea, LPDBORDSCOPEINFO sInfo )
-{
-   if( pArea->lpCurTag )
-   {
-      if ( sInfo->scopeValue )
-         hb_ntxTagSetScope( pArea->lpCurTag, sInfo->nScope, sInfo->scopeValue );
-      else
-         hb_ntxTagClearScope( pArea->lpCurTag, sInfo->nScope );
    }
    return SUCCESS;
 }
@@ -4019,13 +4000,13 @@ static RDDFUNCS ntxTable = { ntxBof,
                              ( DBENTRYP_OII ) ntxOrderInfo,
                              ntxClearFilter,
                              ntxClearLocate,
-                             ( DBENTRYP_V ) ntxClearScope,
+                             ntxClearScope,
                              ntxCountScope,
                              ntxFilterText,
-                             ( DBENTRYP_SI ) ntxScopeInfo,
+                             ntxScopeInfo,
                              ntxSetFilter,
                              ntxSetLocate,
-                             ( DBENTRYP_VOS ) ntxSetScope,
+                             ntxSetScope,
                              ntxSkipScope,
                              ntxCompile,
                              ntxError,

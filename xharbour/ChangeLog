@@ -1,10 +1,21 @@
- * $Id: ChangeLog,v 1.4102 2005/05/06 00:41:26 lculik Exp $
+ * $Id: ChangeLog,v 1.4103 2005/05/06 03:48:22 bdj Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-07 01:43 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/include/hbrddcdx.h
+  * xharbour/include/hbrddntx.h
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    + added support for DBOI_SCOPESET, DBOI_SCOPECLEAR
+    - removed SELF_CLEARSCOPE(), SELF_SETSCOPE(), SELF_SCOPEINFO()
+      methods - they will be used in the future for scoped navigation
+    * set default tag selection to be COMIX/CLIPMORE compatible
 
 2005-05-06 10:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * source/rtl/gtwvt/gtwvt.h

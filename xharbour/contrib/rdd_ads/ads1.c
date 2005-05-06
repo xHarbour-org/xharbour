@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.66 2005/04/27 22:00:00 ptsarenko Exp $
+ * $Id: ads1.c,v 1.66 2005/04/27 18:38:47 ptsarenko Exp $
  */
 
 /*
@@ -72,8 +72,6 @@
 #define __PRG_SOURCE__ __FILE__
 
 static ERRCODE adsRecCount(  ADSAREAP pArea, ULONG * pRecCount );
-static ERRCODE adsScopeInfo( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem );
-static ERRCODE adsSetScope(  ADSAREAP pArea, LPDBORDSCOPEINFO sInfo );
 static int iSetListenerHandle;
 
 #if ADS_REQUIRE_VERSION >= 6
@@ -3356,6 +3354,21 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          }
          break;
 
+      case DBOI_SCOPESET :
+         if( pArea->hOrdCurrent )
+         {
+            if( pOrderInfo->itmNewVal )
+            {
+               adsScopeSet( pArea, 0, pOrderInfo->itmNewVal );
+               adsScopeSet( pArea, 1, pOrderInfo->itmNewVal );
+            }
+         }
+         if( pOrderInfo->itmResult )
+         {
+            hb_itemClear( pOrderInfo->itmResult );
+         }
+         break;
+
       case DBOI_SCOPETOPCLEAR :
          if( pArea->hOrdCurrent )
          {
@@ -3381,6 +3394,18 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
             AdsClearScope( phIndex, ADS_BOTTOM );
          }
          else if( pOrderInfo->itmResult )
+         {
+            hb_itemClear( pOrderInfo->itmResult );
+         }
+         break;
+
+      case DBOI_SCOPECLEAR :
+         if( pArea->hOrdCurrent )
+         {
+            AdsClearScope( phIndex, ADS_TOP );  /* ADS scopes are 1/2 instead of 0/1 */
+            AdsClearScope( phIndex, ADS_BOTTOM );
+         }
+         if( pOrderInfo->itmResult )
          {
             hb_itemClear( pOrderInfo->itmResult );
          }
@@ -3482,15 +3507,7 @@ static ERRCODE adsClearScope( ADSAREAP pArea )
 
 #define  adsCountScope            NULL
 #define  adsFilterText            NULL
-
-static ERRCODE adsScopeInfo( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem )
-{
-   HB_TRACE(HB_TR_DEBUG, ("adsScopeInfo(%p, %hu, %p)", pArea, nScope, pItem));
-
-   adsScopeGet( pArea, nScope, pItem );
-
-   return SUCCESS;
-}
+#define  adsScopeInfo             NULL
 
 static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
 {
@@ -3536,14 +3553,7 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
 }
 
 #define  adsSetLocate             NULL
-
-static ERRCODE adsSetScope( ADSAREAP pArea, LPDBORDSCOPEINFO sInfo )
-{
-   HB_TRACE(HB_TR_DEBUG, ("adsSetScope(%p, %p)", pArea, sInfo));
-
-   return adsScopeSet( pArea, sInfo->nScope, sInfo->scopeValue );
-}
-
+#define  adsSetScope              NULL
 #define  adsSkipScope             NULL
 #define  adsCompile               NULL
 #define  adsError                 NULL
