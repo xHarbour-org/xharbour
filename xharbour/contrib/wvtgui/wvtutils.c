@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.1 2005/02/06 15:52:30 fsgiudice Exp $
+ * $Id: wvtutils.c,v 1.2 2005/02/24 10:44:03 andijahja Exp $
  */
 
 /*
@@ -861,6 +861,13 @@ HB_FUNC( WVT_ENABLEMENUITEM )
 HB_FUNC( WVT_GETLASTMENUEVENT )
 {
   hb_retni( hb_wvt_gtGetLastMenuEvent() ) ;
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_SETLASTMENUEVENT )
+{
+  hb_retni( hb_wvt_gtSetLastMenuEvent( hb_parni(1) ) );
 }
 
 //-------------------------------------------------------------------//

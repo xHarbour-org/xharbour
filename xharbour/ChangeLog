@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4101 2005/05/04 19:50:01 druzus Exp $
+ * $Id: ChangeLog,v 1.4102 2005/05/06 00:41:26 lculik Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -6,9 +6,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-05-06 10:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * source/rtl/gtwvt/gtwvt.h
+  * source/rtl/gtwvt/gtwvt.c
+    + hb_wvt_gtSetLastMenuEvent()
+
+  * contrib/gtwvt/wvtutils.c
+    + WVT_SETLASTMENUEVENT() callable from .prg
+
 2005-05-05 21:35 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   * source/rtl/dbedit.prg
-    ! fixed problem when UDF Return DE_ABORT, but not quit dbedit. reported by Nelson Ota   
+    ! fixed problem when UDF Return DE_ABORT, but not quit dbedit. reported by Nelson Ota
 
   * source/ct/dattime3.prg
     ! fixed Parameter validating (using now DEFAULT command insted of an forced check of if valtype(var) =="U"

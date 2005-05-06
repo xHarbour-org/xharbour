@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.149 2005/04/18 04:37:00 bdj Exp $
+ * $Id: gtwvt.c,v 1.150 2005/04/18 06:27:57 bdj Exp $
  */
 
 /*
@@ -3394,6 +3394,15 @@ BOOL HB_EXPORT hb_wvt_gtSetCodePage( int iCodePage )
 int HB_EXPORT hb_wvt_gtGetLastMenuEvent( void )
 {
   return( _s.LastMenuEvent );
+}
+
+//-------------------------------------------------------------------//
+
+int HB_EXPORT hb_wvt_gtSetLastMenuEvent( int iLastMenuEvent )
+{
+  int iRetval = _s.LastMenuEvent;
+  _s.LastMenuEvent = iLastMenuEvent;
+  return( iRetval );
 }
 
 //-------------------------------------------------------------------//
