@@ -1,5 +1,5 @@
 /*
- * $Id: dattime3.prg,v 1.4 2004/06/21 01:20:09 modalsist Exp $
+ * $Id: dattime3.prg,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  */
 
 /*
@@ -65,44 +65,25 @@ FUNCTION ShowTime( nRow , nCol , lHideSeconds , cColor , lTwelve , lAmPm  )
 ***************************************************************************
    Local nColMax
 
-   IF valtype(nRow)=="U" .and.;
-      valtype(nCol)=="U" .and.;
-      valtype(lHideSeconds)=="U" .and.;
-      valtype(cColor)=="U" .and.;
-      valtype(lTwelve)=="U" .and.;
-      valtype(lAmPm)=="U"
+   IF valtype(nRow)==NIL .and.;
+      valtype(nCol)==NIL .and.;
+      valtype(lHideSeconds)==NIL .and.;
+      valtype(cColor)==NIL .and.;
+      valtype(lTwelve)==NIL .and.;
+      valtype(lAmPm)==NIL
 
       hb_ShowTimeOff()
 
    ELSE
 
-      IF valtype(nRow)=="U"
-         nRow := Row()
-      ENDIF
+      default nrow         TO row()
+      default nCol         TO  Col()    
+      default lHideSeconds TO .F.
+      default cColor       TO setcolor()
+      default lTwelve      TO .F.
+      default lAmPm        TO .F.
+ 
 
-      IF valtype(nCol)=="U"
-         nCol := Col()
-      ENDIF
-
-      IF valtype(lHideSeconds)=="U"
-         lHideSeconds := .F.
-      ENDIF
-
-      IF valtype(cColor)=="U"
-         cColor := setcolor()
-      ENDIF
-
-      IF valtype(lTwelve)=="U"
-         lTwelve := .F.
-      ENDIF
-
-      IF valtype(lAmPm)=="U"
-         lAmPm := .F.
-      ENDIF
-
-      IF !lTwelve
-         lAmPm := .F.
-      ENDIF
 
       IF nRow < 0
          nRow := 0

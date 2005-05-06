@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.25 2005/01/10 00:20:34 guerra000 Exp $
+ * $Id: dbedit.prg,v 1.26 2005/04/04 05:56:49 ronpinkas Exp $
  */
 
 /*
@@ -289,6 +289,10 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs, cHdr, nIndex
     oTBR:stabilize()
     oTBR:hilite()
     nRet := _DoUserFunc(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
+    If nRet == DE_ABORT
+      Exit
+    End
+
 #else
     // xHarbour without 5.3 extensions code
     Switch nKey
@@ -348,6 +352,11 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs, cHdr, nIndex
        oTBR:hilite()
        nRet := _DoUserFunc(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
     End
+
+    If nRet == DE_ABORT
+      Exit
+    End
+
 #endif
 
     // userfunc could delete recs...
