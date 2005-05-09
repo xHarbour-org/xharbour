@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.21 2005/03/30 21:29:18 andijahja Exp $
+ * $Id: hbinit.h,v 1.22 2005/05/09 10:04:09 druzus Exp $
  */
 
 /*
@@ -60,6 +60,7 @@ HB_EXTERN_BEGIN
 extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics symbols initialization */
 
 #if defined(_MSC_VER) && !defined(_WIN64) && \
+    !defined(__LCC__) && !defined(__POCC__) && !defined(__XCC__) && \
     !defined(HARBOUR_STRICT_ANSI_C) && !defined(HB_STATIC_STARTUP) && \
     !defined(HB_PRAGMA_STARTUP) && !defined(HB_MSC_STARTUP)
 
@@ -190,7 +191,7 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
       static int static_int_##func = func();
 
 #elif defined(HB_PRAGMA_STARTUP) || \
-      defined(__BORLANDC__) || defined(__LCC__) || defined(__POCC__)
+      defined(__BORLANDC__) || defined(__LCC__) || defined(__POCC__) || defined(__XCC__)
 
    #if defined(HB_MSC_STARTUP)
       #error Wrong macros set for startup code - clean your make/env settings.

@@ -1,10 +1,15 @@
- * $Id: ChangeLog,v 1.4104 2005/05/06 23:44:45 druzus Exp $
+ * $Id: ChangeLog,v 1.4105 2005/05/09 10:03:16 druzus Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-09 14:05 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbinit.h
+    ! added workaround for XCC/POCC/LCC compilers which set _MSC_VER
+      macro
 
 2005-05-09 12:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbapi.h
