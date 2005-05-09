@@ -1,10 +1,26 @@
- * $Id: ChangeLog,v 1.4103 2005/05/06 03:48:22 bdj Exp $
+ * $Id: ChangeLog,v 1.4104 2005/05/06 23:44:45 druzus Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-09 12:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapi.h
+  * xharbour/include/hbapigt.h
+  * xharbour/source/compiler/harbour.c
+  * xharbour/source/rtl/console.c
+  * xharbour/source/rtl/gtapi.c
+    * changed char * parameter into const char * in hb_conOutAlt(),
+      hb_conOutStd(), hb_conOutErr(), hb_gtAdjustPos()
+
+  * xharbour/include/hbinit.h
+    * just small reorganization of _WIN64 and comments added. The
+      functional logic not changed.
+
+  * xharbour/include/hbvmpub.h
+    * indenting
 
 2005-05-07 01:43 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/rdd_ads/ads1.c

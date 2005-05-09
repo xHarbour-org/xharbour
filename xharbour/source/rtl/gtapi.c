@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.54 2005/01/04 17:00:00 ptsarenko Exp $
+ * $Id: gtapi.c,v 1.54 2005/01/04 15:09:12 ptsarenko Exp $
  */
 
 /*
@@ -305,7 +305,7 @@ int HB_EXPORT hb_gtReadKey( HB_inkey_enum eventmask )
 }
 
 /****************************************************************************/
-void HB_EXPORT hb_gtAdjustPos( int iHandle, char * pStr, ULONG ulLen )
+void HB_EXPORT hb_gtAdjustPos( int iHandle, const char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtAdjustPos()"));
 

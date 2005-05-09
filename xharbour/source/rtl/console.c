@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.54 2004/11/07 21:12:54 guerra000 Exp $
+ * $Id: console.c,v 1.55 2005/03/31 03:58:50 druzus Exp $
  */
 /*
  * Harbour Project source code:
@@ -244,10 +244,10 @@ HB_FUNC( HB_OSNEWLINE )
 }
 
 /****************************************************************************/
-typedef void hb_out_func_typedef( char *, ULONG );
+typedef void hb_out_func_typedef( const char *, ULONG );
 
 /* Output an item to STDOUT */
-void hb_conOutStd( char * pStr, ULONG ulLen )
+void hb_conOutStd( const char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutStd(%s, %lu)", pStr, ulLen));
 
@@ -265,14 +265,14 @@ void hb_conOutStd( char * pStr, ULONG ulLen )
 
    if( s_bInit )
    {
-      hb_gtAdjustPos( (int)s_iFilenoStdout, pStr, ulLen );
+      hb_gtAdjustPos( (int) s_iFilenoStdout, pStr, ulLen );
       hb_gtPostExt();
    }
 }
 
 /****************************************************************************/
 /* Output an item to STDERR */
-void HB_EXPORT hb_conOutErr( char * pStr, ULONG ulLen )
+void HB_EXPORT hb_conOutErr( const char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutErr(%s, %lu)", pStr, ulLen));
 
@@ -301,7 +301,7 @@ void HB_EXPORT hb_conOutErr( char * pStr, ULONG ulLen )
 
 /****************************************************************************/
 /* Output an item to the screen and/or printer and/or alternate */
-void hb_conOutAlt( char * pStr, ULONG ulLen )
+void hb_conOutAlt( const char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutAlt(%s, %lu)", pStr, ulLen));
 
@@ -337,7 +337,7 @@ void hb_conOutAlt( char * pStr, ULONG ulLen )
 
 /****************************************************************************/
 /* Output an item to the screen and/or printer */
-static void hb_conOutDev( char * pStr, ULONG ulLen )
+static void hb_conOutDev( const char * pStr, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conOutDev(%s, %lu)", pStr, ulLen));
 

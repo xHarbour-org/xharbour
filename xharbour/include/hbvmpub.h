@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.34 2005/04/06 03:57:57 mlombardo Exp $
+ * $Id: hbvmpub.h,v 1.35 2005/04/06 13:28:13 druzus Exp $
  */
 
 /*
@@ -231,8 +231,8 @@
 
     typedef struct _HB_BASEARRAY
     {
-       PHB_ITEM pItems;       /* pointer to the array items */
-       ULONG    ulLen;        /* number of items in the array */
+       PHB_ITEM   pItems;       /* pointer to the array items */
+       ULONG      ulLen;        /* number of items in the array */
        HB_COUNTER ulHolders;    /* number of holders of this array */
        USHORT     uiClass;      /* offset to the classes base if it is an object */
        USHORT     uiPrevCls;    /* for fixing after access super */

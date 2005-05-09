@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.38 2004/11/23 17:04:20 lf_sfnet Exp $
+ * $Id: hbapigt.h,v 1.39 2004/11/26 21:58:23 druzus Exp $
  */
 
 /*
@@ -232,7 +232,7 @@ extern HB_GT_COLDEF hb_gt_gcoldefs[ HB_GT_COLDEF_COUNT ];
 
 extern void   hb_gtInit( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr );
 extern void   hb_gtExit( void );
-extern void   HB_EXPORT hb_gtAdjustPos( int iHandle, char * pStr, ULONG ulLen );
+extern void   HB_EXPORT hb_gtAdjustPos( int iHandle, const char * pStr, ULONG ulLen );
 extern USHORT HB_EXPORT hb_gtBox( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight, BYTE * pbyFrame );
 extern USHORT HB_EXPORT hb_gtBoxD( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
 extern USHORT HB_EXPORT hb_gtBoxS( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );

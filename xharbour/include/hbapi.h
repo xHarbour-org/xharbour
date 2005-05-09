@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.161 2005/04/14 09:15:06 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.162 2005/04/23 06:52:17 guerra000 Exp $
  */
 
 /*
@@ -591,9 +591,9 @@ extern          PHB_ITEM hb_memvarDetachLocal( HB_ITEM_PTR pLocal ); /* Detach a
 extern void     hb_conInit( void ); /* initialize the console API system */
 extern void     hb_conRelease( void ); /* release the console API system */
 extern char     HB_EXPORT *hb_conNewLine( void ); /* retrieve a pointer to a static buffer containing new-line characters */
-extern void     hb_conOutAlt( char * pStr, ULONG ulLen ); /* output an string to console and/or printer/alternative device/file */
-extern void     hb_conOutStd( char * pStr, ULONG ulLen ); /* output an string to STDOUT */
-extern void     HB_EXPORT hb_conOutErr( char * pStr, ULONG ulLen ); /* output an string to STDERR */
+extern void     hb_conOutAlt( const char * pStr, ULONG ulLen ); /* output an string to console and/or printer/alternative device/file */
+extern void     hb_conOutStd( const char * pStr, ULONG ulLen ); /* output an string to STDOUT */
+extern void     HB_EXPORT hb_conOutErr( const char * pStr, ULONG ulLen ); /* output an string to STDERR */
 extern USHORT   hb_conSetCursor( BOOL bSetCursor, USHORT usNewCursor ); /* retrieve and optionally set cursor shape */
 extern char *   hb_conSetColor( char * szColor ); /* retrieve and optionally set console color */
 extern void     hb_conXSaveRestRelease( void ); /* release the save/restore API */

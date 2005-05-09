@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.106 2005/04/20 23:29:53 ronpinkas Exp $
+ * $Id: harbour.c,v 1.107 2005/04/27 20:20:27 ronpinkas Exp $
  */
 
 /*
@@ -554,7 +554,7 @@ ULONG hb_xquery( USHORT uiMode )
 }
 #endif
 
-void hb_conOutErr( char * pStr, ULONG ulLen )
+void hb_conOutErr( const char * pStr, ULONG ulLen )
 {
    HB_SYMBOL_UNUSED( ulLen );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.20 2005/03/24 06:24:33 ronpinkas Exp $
+ * $Id: hbinit.h,v 1.21 2005/03/30 21:29:18 andijahja Exp $
  */
 
 /*
@@ -59,6 +59,30 @@ HB_EXTERN_BEGIN
 
 extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics symbols initialization */
 
+#if defined(_MSC_VER) && !defined(_WIN64) && \
+    !defined(HARBOUR_STRICT_ANSI_C) && !defined(HB_STATIC_STARTUP) && \
+    !defined(HB_PRAGMA_STARTUP) && !defined(HB_MSC_STARTUP)
+
+   /* In order to maintain compatibility with other products, MSVC should
+      always use this startup.  If you know that you can use HB_STATIC_STARTUP
+      below, then all you need to do is define HB_STATIC_STARTUP to the
+      compiler.
+
+      Sat 07 Maj 2005 02:46:38 CEST
+      This is only necessary when you want to create binary libs using
+      MSC in C++ mode (-TP switch) and later this binaries will be linked
+      by standard C linker with [x]Harbour programs. I strongly suggest
+      to for 3-rd party developers to use MSC in standard C mode to create
+      libraries which can be used with standard C compilers. This will
+      eliminate the problem and we will be able to set C++ initialization
+      as default for MSC in C++ mode. Druzus.
+   */
+
+   #define HB_MSC_STARTUP
+
+#endif
+
+
 #if defined(HARBOUR_STRICT_ANSI_C)
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
@@ -101,17 +125,7 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_CALL_ON_STARTUP_END( func ) \
       }
 
-#elif ( defined(HB_MSC_STARTUP) || defined( _MSC_VER ) ) && ! ( defined( HB_STATIC_STARTUP ) || defined(__XCC__) || defined(__POCC__) || defined(__DMC__) )
-
-   /* In order to maintain compatibility with other products, MSVC should
-      always use this startup.  If you know that you can use HB_STATIC_STARTUP
-      below, then all you need to do is define HB_STATIC STARTUP to the
-      compiler.
-   */
-
-   #if !defined(HB_MSC_STARTUP)
-      #define HB_MSC_STARTUP
-   #endif
+#elif defined(HB_MSC_STARTUP)
 
    typedef int (* HB_$INITSYM)( void );
 
@@ -147,7 +161,12 @@ extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static HB_SYMB symbols[] = {
 
+   /* this allows any macros to be preprocessed first
+      so that token pasting is handled correctly */
    #define HB_INIT_SYMBOLS_END( func ) \
+           _HB_INIT_SYMBOLS_END( func )
+
+   #define _HB_INIT_SYMBOLS_END( func ) \
       }; \
       static int func( void ) \
       { \
