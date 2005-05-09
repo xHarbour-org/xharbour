@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.1 2005/02/06 15:52:30 fsgiudice Exp $
+ * $Id: wvtcore.c,v 1.2 2005/02/24 10:44:03 andijahja Exp $
  */
 
 /*
@@ -147,6 +147,7 @@ HB_EXPORT BOOL hb_wvt_DrawImage( HDC hdc, int x1, int y1, int wd, int ht, char *
         {
           CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
           OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, ( LPVOID* )&iPicture );
+
           if ( iPicture )
           {
             iPicture->lpVtbl->get_Width( iPicture,&lWidth );
@@ -1651,6 +1652,27 @@ HB_FUNC( WVT_DRAWOUTLINEEX )
 HB_FUNC( WVT_LOADPICTURE )
 {
    IPicture * iPicture = hb_wvt_gtLoadPicture( hb_parcx( 2 ) );
+   BOOL       bResult  = FALSE;
+   int        iSlot    = hb_parni( 1 ) - 1 ;
+
+   if ( iPicture )
+   {
+      if ( _s->iPicture[ iSlot ] )
+      {
+         hb_wvt_gtDestroyPicture( _s->iPicture[ iSlot ] );
+      }
+
+      _s->iPicture[ iSlot ] = iPicture;
+      bResult = TRUE;
+   }
+   hb_retl( bResult );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_LOADPICTUREFROMRESOURCE )
+{
+   IPicture * iPicture = hb_wvt_gtLoadPictureFromResource( hb_parcx( 2 ),hb_parcx( 3 ) );
    BOOL       bResult  = FALSE;
    int        iSlot    = hb_parni( 1 ) - 1 ;
 

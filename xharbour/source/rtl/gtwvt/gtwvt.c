@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.150 2005/04/18 06:27:57 bdj Exp $
+ * $Id: gtwvt.c,v 1.151 2005/05/06 03:47:46 bdj Exp $
  */
 
 /*
@@ -1849,7 +1849,10 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       USHORT      irow;
       RECT        updateRect, rcRect;
 
-      GetUpdateRect( hWnd, &updateRect, FALSE );
+      if ( ! GetUpdateRect( hWnd, &updateRect, FALSE ) )
+      {
+         return ( 0 );
+      }
       /* WARNING!!!
        * the GetUpdateRect call MUST be made BEFORE the BeginPaint call, since
        * BeginPaint resets the update rectangle - don't move it or nothing is drawn!
@@ -2222,6 +2225,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       return( 0 );
     }
 
+
     case WM_SYSCHAR:
     {
       if ( !bIgnoreWM_SYSCHAR )
@@ -2257,6 +2261,7 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
             c = K_ALT_9 ;
             break;
           case 11:
+
             c = K_ALT_0 ;
             break;
           case 13:
@@ -3560,6 +3565,39 @@ BOOL HB_EXPORT hb_wvt_gtEnableShortCuts( BOOL bEnable )
 }
 
 //-------------------------------------------------------------------//
+//
+//               Courtesy - Augusto Infante - Thanks
+//
+IPicture * HB_EXPORT hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR cSection )
+{
+   HRSRC    res;
+   IPicture *iPicture = NULL; // = ( IPicture* ) malloc( sizeof( IPicture ) );
+
+   res = FindResource( ( HINSTANCE ) hb_hInstance, cResource, cSection );
+   if ( res )
+   {
+      IStream *iStream  = NULL;
+      HGLOBAL mem       = LoadResource( GetModuleHandle( NULL ), res );
+      void    *data     = LockResource( mem );
+      size_t  nFileSize = SizeofResource( GetModuleHandle( NULL ), res );
+      HGLOBAL hGlobal   = GlobalAlloc( GMEM_MOVEABLE, nFileSize );
+      LPVOID  pvData    = GlobalLock( hGlobal );
+
+      memcpy( pvData, data, nFileSize );
+
+      GlobalUnlock( hGlobal );
+
+      CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
+
+      OleLoadPicture( iStream, nFileSize, TRUE, ( REFIID ) &IID_IPicture, ( LPVOID* ) &iPicture );
+
+      FreeResource( mem );
+   }
+
+   return iPicture;
+}
+
+//--------------------------------------------------------------------//
 
 IPicture * HB_EXPORT hb_wvt_gtLoadPicture( char * image )
 {
@@ -3586,6 +3624,7 @@ IPicture * HB_EXPORT hb_wvt_gtLoadPicture( char * image )
         {
           CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
           OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, ( LPVOID* ) &iPicture );
+          //iStream->release()
           if ( iPicture )
           {
             Result = iPicture;
@@ -3659,6 +3698,33 @@ BOOL HB_EXPORT hb_wvt_gtRenderPicture( int x1, int y1, int wd, int ht, IPicture 
 
     SelectClipRgn( _s.hdc, NULL );
     DeleteObject( hrgn1 );
+
+    if ( _s.bGui )
+    {
+       x  = c;
+       y  = r;
+       xe = c + toc - 1;
+       ye = r + tor - 1;
+
+       GetViewportOrgEx( _s.hGuiDC, &lpp );
+
+       hrgn1 = CreateRectRgn( c+lpp.x, r+lpp.y, xe+lpp.x, ye+lpp.y );
+       SelectClipRgn( _s.hGuiDC, hrgn1 );
+
+       while ( x < xe )
+       {
+         while ( y < ye )
+         {
+           iPicture->lpVtbl->Render( iPicture, _s.hGuiDC, x, y, dc, dr, 0, lHeight, lWidth, -lHeight, NULL );
+           y += dr;
+         }
+         y =  r;
+         x += dc;
+       }
+
+       SelectClipRgn( _s.hGuiDC, NULL );
+       DeleteObject( hrgn1 );
+    }
 
     bResult = TRUE ;
   }

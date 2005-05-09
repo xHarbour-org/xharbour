@@ -1,5 +1,5 @@
 /*
- * $Id: wvtpaint.prg,v 1.1 2005/01/22 15:21:12 lf_sfnet Exp $
+ * $Id: wvtpaint.prg,v 1.1 2005/02/06 15:52:30 fsgiudice Exp $
  */
 
 /*
@@ -123,13 +123,12 @@ if ( nBlocks := len( aBlocks ) ) > 0
             // If refreshing rectangle's top is less than objects' bottom
             // and left is less than objects' right
             //
-            if !( tlbr_[ 1 ] <= aBlocks[ i,3,4 ] .and. ; // top   < bottom
-                  tlbr_[ 3 ] >= aBlocks[ i,3,2 ] .and. ; // bootm > top
+            if !( tlbr_[ 1 ] <= aBlocks[ i,3,4 ] .and. ; // top   <= bottom
+                  tlbr_[ 3 ] >= aBlocks[ i,3,2 ] .and. ; // bootm >= top
                   tlbr_[ 2 ] <= aBlocks[ i,3,5 ] .and. ; // left  < right
                   tlbr_[ 4 ] >= aBlocks[ i,3,3 ]       ) // right > left
                lExe := .f.
             endif
-
          endcase
       endif
 

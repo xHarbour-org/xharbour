@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.2 2005/02/24 10:44:03 andijahja Exp $
+ * $Id: wvtutils.c,v 1.3 2005/05/06 03:48:22 bdj Exp $
  */
 
 /*
@@ -1614,7 +1614,7 @@ HB_FUNC( WVT_CBSETCURSEL )
 //
 HB_FUNC( WVT_DLGSETICON )
 {
-   HICON hIcon = NULL;
+   HICON hIcon;
 
    if ( ISNUM( 2 ) )
    {
@@ -1896,8 +1896,8 @@ HB_FUNC( WIN_LOADICON )
 //
 //  Win_LoadImage( ncImage, nSource ) -> hImage
 //    nSource == 0 ResourceIdByNumber
-//    nSource == 0 ResourceIdByName
-//    nSource == 0 ImageFromDiskFile
+//    nSource == 1 ResourceIdByName
+//    nSource == 2 ImageFromDiskFile
 //
 HB_FUNC( WIN_LOADIMAGE )
 {

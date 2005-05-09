@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.1 2005/02/06 15:52:30 fsgiudice Exp $
+ * $Id: hbgtwvt.h,v 1.2 2005/02/24 10:44:02 andijahja Exp $
  */
 
 /*
@@ -118,11 +118,11 @@
 #define WVT_DEFAULT_ROWS      25
 #define WVT_DEFAULT_COLS      80
 
-#define WVT_PICTURES_MAX      20
-#define WVT_FONTS_MAX         20
-#define WVT_PENS_MAX          20
-#define WVT_DLGML_MAX         20
-#define WVT_DLGMD_MAX         20
+#define WVT_PICTURES_MAX      50
+#define WVT_FONTS_MAX         50
+#define WVT_PENS_MAX          50
+#define WVT_DLGML_MAX         50
+#define WVT_DLGMD_MAX         50
 
 //-------------------------------------------------------------------//
 
@@ -302,6 +302,7 @@ BOOL   HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent );
 BOOL   HB_EXPORT hb_wvt_gtEnableShortCuts( BOOL bEnable );
 void   HB_EXPORT hb_wvt_gtAddCharToInputQueue( int data );
 IPicture * HB_EXPORT hb_wvt_gtLoadPicture( char * image );
+IPicture * HB_EXPORT hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR cSection );
 BOOL   HB_EXPORT hb_wvt_gtRenderPicture( int x1, int y1, int wd, int ht, IPicture * iPicture );
 BOOL   HB_EXPORT hb_wvt_gtDestroyPicture( IPicture * iPicture );
 COLORREF HB_EXPORT hb_wvt_gtGetColorData( int iIndex );
