@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4106 2005/05/09 12:10:36 druzus Exp $
+ * $Id: ChangeLog,v 1.4107 2005/05/09 18:49:44 vouchcac Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -6,11 +6,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-05-09 17:46 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/hvm.c
+    ! Fixed GPF trap in hb_vmPlus() (support for strings)
+    * Corrected HB_P_ADDINT support for strings to retain string context.
+
 2005-05-09 23:30 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * xharbour/source/rtl/gtwvt/gtwvt.c
     + IPicture * HB_EXPORT hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR cSection )
       Now images can be loaded from resources also, thanks Augusto Infante.
-   
+
   * xharbour/source/rtl/gtwvt/gtwvt.h
     ! #define WVT_PICTURES_MAX      50
       #define WVT_FONTS_MAX         50
@@ -31,7 +36,7 @@
       The above values were 20 and now increased to 50 to accomodate more dialogs and pictures.
 
    * xharbour/contrib/wvtgui/wvtcore.c
-     + Wvt_LoadPictureFromResource() 
+     + Wvt_LoadPictureFromResource()
        Prg level function to load pictures from resource file linked with the application.
 
 2005-05-09 14:05 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)

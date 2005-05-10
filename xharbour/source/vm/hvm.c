@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.460 2005/04/27 20:20:28 ronpinkas Exp $
+ * $Id: hvm.c,v 1.461 2005/04/28 18:22:44 mlombardo Exp $
  */
 
 /*
@@ -2716,11 +2716,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                }
             }
 
-            if( !HB_IS_DOUBLE( pLocal ) )
+            if( ! HB_IS_DOUBLE( pLocal ) )
             {
                pLocal->type = HB_IT_DOUBLE;
                pLocal->item.asDouble.decimal = 0;
             }
+
             pLocal->item.asDouble.value = dNewVal;
             pLocal->item.asDouble.length = HB_DBL_LENGTH( dNewVal );
             break;
@@ -2869,11 +2870,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else if( HB_IS_STRING( pTop ) && pTop->item.asString.length == 1 )
             {
-               HB_LONG lVal = iAdd + ( BYTE ) pTop->item.asString.value[0];
-               hb_itemClear( pTop );
-               pTop->type = HB_IT_LONG;
-               pTop->item.asLong.value  = lVal;
-               pTop->item.asLong.length = 10;
+               pTop->item.asString.value = hb_vm_acAscii[ (BYTE) ( pTop->item.asString.value[0] + iAdd ) ];
                break;
             }
             else if( HB_IS_OBJECT( pTop ) )
@@ -2931,6 +2928,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                pTop->type = HB_IT_DOUBLE;
                pTop->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
             }
+
             pTop->item.asDouble.value = dNewVal;
             pTop->item.asDouble.length = HB_DBL_LENGTH( dNewVal );
             break;
@@ -3953,16 +3951,14 @@ static void hb_vmPlus( void )
    */
    else if( ( HB_IS_STRING( pItem1 ) || HB_IS_STRING( pItem2 ) ) && ( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) ) )
    {
-      double dNumber2 = hb_vmPopNumber();
+      BYTE bByte = (BYTE) ( hb_itemGetND( pItem1 ) + hb_vmPopNumber() );
 
-      pItem1->item.asString.value = hb_vm_acAscii[ (BYTE) ( hb_itemGetND( pItem1 ) + dNumber2 ) ];
+      hb_itemClear( pItem1 );
 
-      if( pItem1->type != HB_IT_STRING )
-      {
-         pItem1->type = HB_IT_STRING;
-         pItem1->item.asString.bStatic = TRUE;
-         pItem1->item.asString.length = 1;
-      }
+      pItem1->type = HB_IT_STRING;
+      pItem1->item.asString.value = hb_vm_acAscii[ bByte ];
+      pItem1->item.asString.bStatic = TRUE;
+      pItem1->item.asString.length = 1;
    }
    else if( ( HB_IS_DATE( pItem1 ) || HB_IS_DATE( pItem2 ) ) && ( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) ) )
    {
@@ -3973,10 +3969,15 @@ static void hb_vmPlus( void )
       HB_LONG lNumber2 = hb_vmPopHBLong();
       HB_LONG lNumber1 = hb_vmPopHBLong();
       HB_LONG lResult = lNumber1 + lNumber2;
-      if ( lNumber2 >= 0 ? lResult >= lNumber1 : lResult < lNumber1 )
+
+      if( lNumber2 >= 0 ? lResult >= lNumber1 : lResult < lNumber1 )
+      {
          hb_vmPushNumInt( lResult );
+      }
       else
+      {
          hb_vmPushDouble( ( double ) lNumber1 + ( double ) lNumber2, 0 );
+      }
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
