@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.201 2005/05/06 23:44:58 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.202 2005/05/10 10:22:27 druzus Exp $
  */
 
 /*
@@ -5612,7 +5612,7 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
 /*
  * evaluate given C function in given scope
  */
-ULONG hb_cdxDBOIScopeEval( LPCDXTAG pTag, HB_EVALSCOPE_FUNC pFunc, void *pParam, PHB_ITEM pItemLo, PHB_ITEM pItemHi )
+static ULONG hb_cdxDBOIScopeEval( LPCDXTAG pTag, HB_EVALSCOPE_FUNC pFunc, void *pParam, PHB_ITEM pItemLo, PHB_ITEM pItemHi )
 {
    ULONG ulCount = 0, ulLen = ( ULONG ) pTag->uiLen;
    LPCDXKEY pCurKey = hb_cdxKeyCopy( NULL, pTag->CurKey ),

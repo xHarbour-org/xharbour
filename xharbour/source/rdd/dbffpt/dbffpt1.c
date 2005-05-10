@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.40 2005/04/19 18:49:57 druzus Exp $
+ * $Id: dbffpt1.c,v 1.41 2005/04/25 23:11:05 druzus Exp $
  */
 
 /*
@@ -2186,6 +2186,8 @@ static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_errPutGenCode( pError, uiErrorG );
          hb_errPutDescription( pError, hb_langDGetErrorDesc( uiErrorG ) );
          hb_errPutSubCode( pError, uiError );
+         hb_errPutOsCode( pError, hb_fsError() );
+         hb_errPutFileName( pError, pArea->szMemoFileName );
          hb_errPutFlags( pError, EF_CANDEFAULT );
          SELF_ERROR( ( AREAP ) pArea, pError );
          hb_itemRelease( pError );
@@ -2247,6 +2249,8 @@ static ERRCODE hb_fptPutValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_errPutGenCode( pError, uiErrorG );
          hb_errPutDescription( pError, hb_langDGetErrorDesc( uiErrorG ) );
          hb_errPutSubCode( pError, uiError );
+         hb_errPutOsCode( pError, hb_fsError() );
+         hb_errPutFileName( pError, pArea->szMemoFileName );
          hb_errPutFlags( pError, EF_CANDEFAULT );
          SELF_ERROR( ( AREAP ) pArea, pError );
          hb_itemRelease( pError );
@@ -2288,6 +2292,7 @@ static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo )
                hb_errPutGenCode( pError, EG_CREATE );
                hb_errPutSubCode( pError, EDBF_CREATE_DBF );
                hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CREATE ) );
+               hb_errPutOsCode( pError, hb_fsError() );
                hb_errPutFileName( pError, ( char * ) pCreateInfo->abName );
                hb_errPutFlags( pError, EF_CANRETRY );
             }
@@ -2377,6 +2382,7 @@ static ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo )
             hb_errPutGenCode( pError, EG_OPEN );
             hb_errPutSubCode( pError, EDBF_OPEN_DBF );
             hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_OPEN ) );
+            hb_errPutOsCode( pError, hb_fsError() );
             hb_errPutFileName( pError, ( char * ) pOpenInfo->abName );
             hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
          }

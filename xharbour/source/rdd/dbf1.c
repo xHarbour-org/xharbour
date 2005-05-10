@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.118 2005/04/25 23:11:03 druzus Exp $
+ * $Id: dbf1.c,v 1.119 2005/05/10 10:22:27 druzus Exp $
  */
 
 /*
@@ -1149,6 +1149,8 @@ static ERRCODE hb_dbfGetRec( DBFAREAP pArea, BYTE ** pBuffer )
          hb_errPutGenCode( pError, EG_READ );
          hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READ ) );
          hb_errPutSubCode( pError, EDBF_READ );
+         hb_errPutOsCode( pError, hb_fsError() );
+         hb_errPutFileName( pError, pArea->szDataFileName );
          SELF_ERROR( ( AREAP ) pArea, pError );
          hb_itemRelease( pError );
          return FAILURE;
