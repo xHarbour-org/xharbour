@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.154 2005/05/04 11:39:51 druzus Exp $
+ * $Id: dbcmd.c,v 1.155 2005/05/10 10:22:27 druzus Exp $
  */
 
 /*
@@ -4222,7 +4222,7 @@ static AREAP GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, 
       if( pFields )
       {
          USHORT i;
-         char *ptr, szSrcField;
+         char *ptr, *szSrcField;
          char *szFieldName = ( char * ) hb_xgrab( pOldArea->uiMaxFieldNameLength + 1 );
 
          uiFields = ( USHORT ) hb_arrayLen( pFields );

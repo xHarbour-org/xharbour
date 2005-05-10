@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4108 2005/05/10 00:46:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4109 2005/05/10 10:22:22 druzus Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-10 09:46 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * xharbour/source/rdd/dbcmd.c
+    * Corrected typo in recent commit
 
 2005-05-10 12:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbcmd.c
