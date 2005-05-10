@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.200 2005/05/04 11:39:52 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.201 2005/05/06 23:44:58 druzus Exp $
  */
 
 /*
@@ -8544,36 +8544,48 @@ static void hb_cdxTagEmptyIndex( LPCDXTAG pTag )
 static void hb_cdxTagDoIndex( LPCDXTAG pTag )
 {
    LPCDXAREA pArea = pTag->pIndex->pArea;
-   ULONG ulRecCount;
+   PHB_ITEM pForItem, pWhileItem = NULL, pEvalItem = NULL, pItem = NULL;
+   ULONG ulRecCount, ulRecNo = pArea->ulRecNo;
+   LONG lStep = 0;
 #ifndef HB_CDP_SUPPORT_OFF
    /* TODO: this hack is not thread safe, hb_cdp_page has to be thread specific */
    PHB_CODEPAGE cdpTmp = hb_cdp_page;
    hb_cdp_page = pArea->cdPage;
 #endif
 
+   if ( pArea->lpdbOrdCondInfo )
+   {
+      pEvalItem = pArea->lpdbOrdCondInfo->itmCobEval;
+      pWhileItem = pArea->lpdbOrdCondInfo->itmCobWhile;
+      lStep = pArea->lpdbOrdCondInfo->lStep;
+   }
+
+#if defined( HB_SIXCDX )
+   if ( ( pTag->OptFlags & CDX_TYPE_STRUCTURE ) == 0 && pEvalItem )
+   {
+      SELF_GOTO( ( AREAP ) pArea, 0 );
+      if ( !hb_cdxEvalCond( pArea, pEvalItem, FALSE ) )
+      {
+         SELF_GOTO( ( AREAP ) pArea, ulRecNo );
+         return;
+      }
+   }
+#endif
    if ( ( pTag->OptFlags & CDX_TYPE_STRUCTURE ) || pTag->Custom )
    {
       hb_cdxTagEmptyIndex( pTag );
    }
-   else if ( SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount ) != FAILURE )
+   else if ( SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount ) == SUCCESS )
    {
       LPCDXSORTINFO pSort;
-      PHB_ITEM pForItem, pWhileItem = NULL, pEvalItem = NULL, pItem = NULL;
       USHORT uiSaveTag = pArea->uiTag, uiTag;
-      ULONG ulStartRec = 0, ulNextCount = 0, ulRecNo;
+      ULONG ulStartRec = 0, ulNextCount = 0;
       BOOL fDirectRead, fUseFilert = FALSE;
-      LONG lStep = 0;
       BYTE * pSaveRecBuff = pArea->pRecord, cTemp[8];
       int iRecBuff = 0, iRecBufSize = USHRT_MAX / pArea->uiRecordLen, iRec;
 
       pArea->pSort = pSort = hb_cdxSortNew( pTag, ulRecCount );
       pForItem = pTag->pForItem;
-      if ( pArea->lpdbOrdCondInfo )
-      {
-         pEvalItem = pArea->lpdbOrdCondInfo->itmCobEval;
-         pWhileItem = pArea->lpdbOrdCondInfo->itmCobWhile;
-         lStep = pArea->lpdbOrdCondInfo->lStep;
-      }
       if ( pTag->nField )
          pItem = hb_itemNew( NULL );
 
@@ -8591,7 +8603,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
          if ( pArea->lpdbOrdCondInfo->lStartRecno )
             ulStartRec = pArea->lpdbOrdCondInfo->lStartRecno;
          else
-            ulStartRec = pArea->ulRecNo;
+            ulStartRec = ulRecNo;
          if ( pArea->lpdbOrdCondInfo->lNextCount > 0 )
             ulNextCount = pArea->lpdbOrdCondInfo->lNextCount;
       }
@@ -8627,7 +8639,6 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
       if ( ulNextCount && ulRecCount >= ulRecNo + ulNextCount )
          ulRecCount = ulRecNo + ulNextCount - 1;
 
-      /* pArea->fBof = TRUE; */
       do
       {
          if ( ulRecNo > ulRecCount )
@@ -8660,6 +8671,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
             iRecBuff++;
          }
 
+#if !defined( HB_SIXCDX )
          if ( pEvalItem )
          {
             if ( lStep >= pArea->lpdbOrdCondInfo->lStep )
@@ -8670,7 +8682,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
             }
             ++lStep;
          }
-         /* pArea->fBof = FALSE; */
+#endif
 
          if ( pWhileItem && !hb_cdxEvalCond( NULL, pWhileItem, FALSE ) )
             break;
@@ -8732,6 +8744,19 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
                break;
          }
 
+#if defined( HB_SIXCDX )
+         if ( pEvalItem )
+         {
+            if ( lStep >= pArea->lpdbOrdCondInfo->lStep )
+            {
+               lStep = 0;
+               if ( !hb_cdxEvalCond( pArea, pEvalItem, FALSE ) )
+                  break;
+            }
+            ++lStep;
+         }
+#endif
+
          if( fDirectRead )
             ulRecNo++;
          else
@@ -8761,13 +8786,26 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
          pArea->pRecord = pSaveRecBuff;
          SELF_GOTO( ( AREAP ) pArea, ulRecNo );
       }
+      pArea->uiTag = uiSaveTag;
 
+#if !defined( HB_SIXCDX )
       if ( pEvalItem && lStep )
+      {
          /* pArea->fEof = TRUE; */
          hb_cdxEvalCond( pArea, pEvalItem, FALSE );
-
-      pArea->uiTag = uiSaveTag;
+      }
+#endif
    }
+
+#if defined( HB_SIXCDX )
+   if ( pEvalItem )
+   {
+      SELF_GOTO( ( AREAP ) pArea, 0 );
+      pArea->fBof = FALSE;
+      hb_cdxEvalCond( pArea, pEvalItem, FALSE );
+   }
+#endif
+
 #ifndef HB_CDP_SUPPORT_OFF
    hb_cdp_page = cdpTmp;
 #endif

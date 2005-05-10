@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx0.prg,v 1.8 2005/04/26 12:25:58 druzus Exp $
+ * $Id$
  */
 
 /*
@@ -53,13 +53,13 @@
 
 #include "rddsys.ch"
 
-ANNOUNCE DBFCDX
+ANNOUNCE SIXCDX
 
-procedure DBFCDXInit
+procedure SIXCDXInit
 
-   REQUEST _DBFCDX
+   REQUEST _SIXCDX
 
    rddRegister( "DBF", RDT_FULL )
-   rddRegister( "DBFCDX", RDT_FULL )
+   rddRegister( "SIXCDX", RDT_FULL )
 
 return

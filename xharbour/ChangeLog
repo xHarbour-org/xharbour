@@ -1,10 +1,36 @@
- * $Id: ChangeLog,v 1.4107 2005/05/09 18:49:44 vouchcac Exp $
+ * $Id: ChangeLog,v 1.4108 2005/05/10 00:46:37 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-10 12:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbf1.c
+    * strip trailing spaces from field name in COPY FIELDS ... TO
+      Clipper makes the same.
+
+  * xharbour/source/rdd/dbfcdx/Makefile
+  * xharbour/source/rdd/dbfcdx/dbfcdx0.prg
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  + xharbour/source/rdd/dbfcdx/sixcdx0.prg
+  + xharbour/source/rdd/dbfcdx/sixcdx1.c
+    + added SIXCDX as separate file for easier compilation - sixcdx1.c
+      includes dbfcdx1.c so the code was not copied
+    * implemented exact SIXCDX EVERY evaluation when index is created
+      in SIXCDX (DBFCDX still uses COMIX one) documented by SIX so the
+      following code will works:
+         FUNCTION Progress()
+         IF Bof()
+             // Show Progress screen - always called at beginning
+         ELSEIF Eof()
+             // Restore screen
+         ELSEIF
+             // Show index progression - always called at the end
+         ENDIF
+         RETURN( NIL )
 
 2005-05-09 17:46 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/hvm.c

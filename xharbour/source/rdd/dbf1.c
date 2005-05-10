@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.117 2005/04/24 18:35:52 druzus Exp $
+ * $Id: dbf1.c,v 1.118 2005/04/25 23:11:03 druzus Exp $
  */
 
 /*
@@ -1651,7 +1651,21 @@ static ERRCODE hb_dbfRecNo( DBFAREAP pArea, PHB_ITEM pRecNo )
 
    if( pArea->lpdbPendingRel )
       SELF_FORCEREL( ( AREAP ) pArea );
-   hb_itemPutNLLen( pRecNo, pArea->ulRecNo, 7 );
+
+#ifdef HB_C52_STRICT
+   /* this is for strict Clipper compatibility but IMHO Clipper should not
+      do that and always set fixed size independent to the record number */
+   if ( pArea->ulRecNo < 10000000 )
+   {
+      hb_itemPutNLLen( pRecNo, pArea->ulRecNo, 7 );
+   }
+   else
+   {
+      hb_itemPutNLLen( pRecNo, pArea->ulRecNo, 10 );
+   }
+#else
+   hb_itemPutNInt( pRecNo, pArea->ulRecNo );
+#endif
    return SUCCESS;
 }
 

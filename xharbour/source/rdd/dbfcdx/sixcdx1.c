@@ -1,13 +1,12 @@
 /*
- * $Id: dbfcdx0.prg,v 1.8 2005/04/26 12:25:58 druzus Exp $
+ * $Id$
  */
 
 /*
- * Harbour Project source code:
- * DBFCDX RDD (ver.2)
+ * xHarbour Project source code:
+ * SIXCDX RDD
  *
- * Copyright 1999 Bruno Cantero <bruno@issnet.net>
- * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
+ * Copyright 2005 Przemyslaw Czerpak <druzus@priv.onet.pl>
  * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -51,15 +50,6 @@
  *
  */
 
-#include "rddsys.ch"
+#define HB_SIXCDX
 
-ANNOUNCE DBFCDX
-
-procedure DBFCDXInit
-
-   REQUEST _DBFCDX
-
-   rddRegister( "DBF", RDT_FULL )
-   rddRegister( "DBFCDX", RDT_FULL )
-
-return
+#include "dbfcdx1.c"

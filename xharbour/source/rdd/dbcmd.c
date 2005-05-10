@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.153 2005/04/25 23:11:02 druzus Exp $
+ * $Id: dbcmd.c,v 1.154 2005/05/04 11:39:51 druzus Exp $
  */
 
 /*
@@ -4222,26 +4222,29 @@ static AREAP GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, 
       if( pFields )
       {
          USHORT i;
-         char *ptr;
+         char *ptr, szSrcField;
          char *szFieldName = ( char * ) hb_xgrab( pOldArea->uiMaxFieldNameLength + 1 );
 
          uiFields = ( USHORT ) hb_arrayLen( pFields );
-         for( i = 0; i < uiFields; i++ )
+         for( i = 1; i <= uiFields; i++ )
          {
-            PHB_ITEM pField = pFields->item.asArray.value->pItems + i;
-            ptr = strrchr( (char *) pField->item.asString.value, '>' );
-            if( ptr && ptr > (char *) pField->item.asString.value && *(ptr-1) == '-' )
+            szSrcField = hb_arrayGetCPtr( pFields, i );
+            if( szSrcField )
             {
-               ptr++;
-            }
-            else
-            {
-               ptr = (char *) pField->item.asString.value;
-            }
-            hb_strncpyUpper( szFieldName, ptr, strlen( ptr ) );
-            if( ( uiCount = hb_rddFieldIndex( pOldArea, szFieldName ) ) != 0 )
-            {
-               AddField( pOldArea, pFieldArray, uiCount );
+               ptr = strrchr( szSrcField, '>' );
+               if ( ptr && ptr > szSrcField && *( ptr - 1 ) == '-' )
+               {
+                  ptr++;
+               }
+               else
+               {
+                  ptr = szSrcField;
+               }
+               hb_strncpyUpperTrim( szFieldName, ptr, pOldArea->uiMaxFieldNameLength );
+               if( ( uiCount = hb_rddFieldIndex( pOldArea, szFieldName ) ) != 0 )
+               {
+                  AddField( pOldArea, pFieldArray, uiCount );
+               }
             }
          }
          hb_xfree( szFieldName );
