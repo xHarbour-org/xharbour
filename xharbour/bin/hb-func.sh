@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.51 2005/02/26 15:28:04 likewolf Exp $
+# $Id: hb-func.sh,v 1.52 2005/03/13 12:44:31 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -156,6 +156,11 @@ export HB_COMPILER="${HB_COMPILER}"
 # be sure that ${name} binaries are in your path
 export PATH="\${HB_BIN_INSTALL}${hb_path_separator}${CCPATH}\${PATH}"
 
+if [ "\${HB_COMPILER}" == "gpp" ]; then
+   HB_CC="g++"
+else
+   HB_CC="gcc"
+fi
 
 if [ \$# = 0 ]; then
     echo "syntax: \$0 [<options,...>] <file>[.prg|.o]
@@ -403,16 +408,16 @@ hb_link()
     fi
     if [ -n "\${HB_LNK_REQ}" ] || [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
         hb_lnk_request > \${_TMP_FILE_} && \\
-        ${CCPREFIX}gcc "\$@" \${CC_OPT} "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        ${CCPREFIX}\${HB_CC} "\$@" \${CC_OPT} "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     else
-        ${CCPREFIX}gcc "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        ${CCPREFIX}\${HB_CC} "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     fi
 }
 
 hb_cmp()
 {
     hb_cc "\$@" && \\
-    ${CCPREFIX}gcc -c \${CC_OPT} "\${FOUTC}" -o "\${FOUTO}" \${GCC_PATHS} && \\
+    ${CCPREFIX}\${HB_CC} -c \${CC_OPT} "\${FOUTC}" -o "\${FOUTO}" \${GCC_PATHS} && \\
     rm -f "\${FOUTC}"
 }
 

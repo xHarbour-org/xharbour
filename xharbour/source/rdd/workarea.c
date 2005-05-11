@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.44 2005/05/04 11:39:52 druzus Exp $
+ * $Id: workarea.c,v 1.45 2005/05/04 19:50:11 druzus Exp $
  */
 
 /*
@@ -1220,9 +1220,6 @@ ERRCODE hb_waCompile( AREAP pArea, BYTE * pExpr )
    pMacro = hb_macroCompile( ( char * ) pExpr );
    if( pMacro )
    {
-      if( ! pArea->valResult )
-         pArea->valResult = hb_itemNew( NULL );
-
       pArea->valResult = hb_itemPutPtr( pArea->valResult, ( void * ) pMacro );
       return SUCCESS;
    }
@@ -1255,6 +1252,7 @@ ERRCODE hb_waError( AREAP pArea, PHB_ITEM pError )
  */
 ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock )
 {
+   PHB_ITEM pItem;
    int iCurrArea;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waEvalBlock(%p, %p)", pArea, pBlock));
@@ -1265,9 +1263,10 @@ ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock )
    else
       iCurrArea = 0;
 
+   pItem = hb_vmEvalBlockOrMacro( pBlock );
    if( ! pArea->valResult )
       pArea->valResult = hb_itemNew( NULL );
-   hb_itemCopy( pArea->valResult, hb_vmEvalBlockOrMacro( pBlock ) );
+   hb_itemCopy( pArea->valResult, pItem );
 
    if ( iCurrArea )
       hb_rddSelectWorkAreaNumber( iCurrArea );

@@ -1,10 +1,19 @@
- * $Id: ChangeLog,v 1.4110 2005/05/10 16:47:40 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4111 2005/05/10 20:55:31 druzus Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-11 15:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/postinst.sh
+    + added support for g++ in xhb* scripts
+  * xharbour/source/rdd/workarea.c
+    ! fixed problem with recursive call to SELF_EVALBLOCK() method.
+      In new RDD API I'll add 'PHB_ITEM pResult' to this method to
+      avoid this problem.
 
 2005-05-10 22:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbf1.c

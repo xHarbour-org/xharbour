@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: postinst.sh,v 1.15 2005/01/21 18:41:38 druzus Exp $
+# $Id: postinst.sh,v 1.16 2005/01/30 06:45:44 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -35,7 +35,8 @@ else
 fi
 . ${hb_root}/bin/hb-func.sh
 
-if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "mingw32" ] || [ "$HB_COMPILER" = "djgpp" ]
+if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "gpp" ] || \
+   [ "$HB_COMPILER" = "mingw32" ] || [ "$HB_COMPILER" = "djgpp" ]
 then
     RANLIB=""
     MAKE=make
@@ -53,7 +54,8 @@ then
         install -c -m 755 "${hb_root}/bin/hb-mkslib.sh" "${HB_BIN_INSTALL}/hb-mkslib"
     fi
     mk_hbtools "${HB_BIN_INSTALL}" "$@"
-    if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "mingw32" ]; then
+    if [ "$HB_COMPILER" = "gcc" ] || [ "$HB_COMPILER" = "gpp" ] || \
+       [ "$HB_COMPILER" = "mingw32" ]; then
         mk_hblibso "${hb_root}"
     fi
     # build fm lib with memory statistic
