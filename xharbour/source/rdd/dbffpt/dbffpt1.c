@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.41 2005/04/25 23:11:05 druzus Exp $
+ * $Id: dbffpt1.c,v 1.42 2005/05/10 20:56:12 druzus Exp $
  */
 
 /*
@@ -54,12 +54,10 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-#if defined( HB_FPT_NO_READLOCK ) && !defined( HB_FPT_USE_READLOCK )
-  #define HB_FPT_USE_READLOCK
-#endif
-
-#ifndef HB_FPT_USE_READLOCK
- #define HB_FPT_SAFE
+#if defined( HB_FPT_NO_READLOCK )
+#  undef HB_MEMO_SAFELOCK
+#else
+/*#  define HB_MEMO_SAFELOCK */
 #endif
 
 #include "hbapi.h"
@@ -267,59 +265,22 @@ HB_INIT_SYMBOLS_END( dbffpt1__InitSymbols )
 #  pragma data_seg()
 #endif
 
+#ifdef HB_MEMO_SAFELOCK
 static ERRCODE hb_fptIsDbLocked( FPTAREAP pArea, BOOL *bLocked )
 {
+   ERRCODE errCode = SUCCESS;
    HB_ITEM recItm = HB_ITEM_NIL, resultItm = HB_ITEM_NIL;
 
    if ( pArea->fShared && !pArea->fFLocked && !pArea->fRecordChanged )
    {
-      if ( SELF_RECINFO( ( AREAP ) pArea, &recItm, DBRI_LOCKED, &resultItm ) == FAILURE )
-         return FAILURE;
-      *bLocked = hb_itemGetL( &resultItm );
+      errCode = SELF_RECINFO( ( AREAP ) pArea, &recItm, DBRI_LOCKED, &resultItm );
+      if ( errCode == SUCCESS )
+         *bLocked = hb_itemGetL( &resultItm );
    }
    else
       *bLocked = TRUE;
 
-   return SUCCESS;
-}
-#if defined( HB_FPT_USE_READLOCK )
-/*
- * Read Lock for Memo
- */
-static BOOL hb_fptReadLock( FPTAREAP pArea, ULONG uiIndex, ULONG *pulOffset )
-{
-   BOOL fRet= TRUE ;
-#ifndef HB_FPT_NO_READLOCK
-   if ( pArea->fShared && !pArea->fFLocked )  // and we are not open EXCLUSIVE or FILELOCKED
-   {
-      *pulOffset = pArea->uiMemoBlockSize *  hb_dbfGetMemoBlock( (DBFAREAP) pArea, uiIndex - 1 ) ;
-      if ( *pulOffset )    // There is something in the memo so lock it
-      {
-         do
-         {
-            fRet = hb_fsLock( pArea->hMemoFile, *pulOffset, pArea->uiMemoBlockSize,
-                              FL_LOCK | FLX_SHARED | FLX_WAIT );
-         } while ( !fRet );
-      }
-   }
-   else
-#endif
-   {
-      *pulOffset = 0 ;
-   }
-   return fRet ;
-}
-
-/*
- * Read UnLock for Memo
- */
-static BOOL hb_fptReadUnLock( FPTAREAP pArea, ULONG ulOffset )
-{
-   if ( ulOffset )
-   {
-     hb_fsLock( pArea->hMemoFile, ulOffset, pArea->uiMemoBlockSize, FL_UNLOCK );
-   }
-   return TRUE ;
+   return errCode;
 }
 #endif
 
@@ -2075,48 +2036,39 @@ static ERRCODE hb_fptGetVarLen( FPTAREAP pArea, USHORT uiIndex, ULONG * pLength 
        pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
    {
       ERRCODE uiError;
+
+#ifdef HB_MEMO_SAFELOCK
       BOOL bLocked, bDeleted;
-#if defined( HB_FPT_USE_READLOCK )
-      ULONG ulOffset;
-#endif
 
-      if ( hb_fptIsDbLocked( pArea, &bLocked ) == FAILURE )
-         return FAILURE;
+      *pLength = 0;
+      uiError = hb_fptIsDbLocked( pArea, &bLocked );
+      if( uiError != SUCCESS )
+         return uiError;
 
-#if defined( HB_FPT_USE_READLOCK )
-      if ( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
-         return FAILURE;
-
-      if ( bLocked || hb_fptReadLock( pArea, uiIndex, &ulOffset ) )
-#else
-      if ( bLocked || hb_fptFileLockSh( pArea, TRUE ) )
-#endif
+      if( !hb_fptFileLockSh( pArea, TRUE ) )
       {
-#ifdef HB_FPT_SAFE
-         /* Force read record? */
-         if ( !bLocked )
-            pArea->fValidBuffer = FALSE;
-
-         /* update any pending relations and reread record if necessary */
-         uiError = SELF_DELETED( ( AREAP ) pArea, &bDeleted );
-         if ( uiError == SUCCESS )
-#endif
-            *pLength = hb_fptGetMemoLen( pArea, uiIndex - 1 );
-
-         if ( !bLocked )
-         {
-#if defined( HB_FPT_USE_READLOCK )
-            hb_fptReadUnLock( pArea, ulOffset ) ;
-#else
-            hb_fptFileUnLock( pArea );
-#endif
-         }
+         uiError = FAILURE;
       }
       else
       {
-         *pLength = 0;
-         uiError = FAILURE;
+         /* Force read record? */
+         if( !bLocked )
+            pArea->fValidBuffer = FALSE;
+         /* update any pending relations and reread record if necessary */
+         uiError = SELF_DELETED( ( AREAP ) pArea, &bDeleted );
+         if ( uiError == SUCCESS )
+            *pLength = hb_fptGetMemoLen( pArea, uiIndex - 1 );
+         hb_fptFileUnLock( pArea );
       }
+#else
+      BOOL bDeleted;
+      /* update any pending relations and reread record if necessary */
+      uiError = SELF_DELETED( ( AREAP ) pArea, &bDeleted );
+      if( uiError == SUCCESS )
+         *pLength = hb_fptGetMemoLen( pArea, uiIndex - 1 );
+      else
+         *pLength = 0;
+#endif
       return uiError;
    }
 
@@ -2136,49 +2088,43 @@ static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
        pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
    {
       ERRCODE uiError;
+#ifdef HB_MEMO_SAFELOCK
       BOOL bLocked, bDeleted;
-#if defined( HB_FPT_USE_READLOCK )
-      ULONG ulOffset;
-#endif
 
-      if ( hb_fptIsDbLocked( pArea, &bLocked ) == FAILURE )
-         return FAILURE;
+      uiError = hb_fptIsDbLocked( pArea, &bLocked );
+      if( uiError != SUCCESS )
+         return uiError;
 
-#if defined( HB_FPT_USE_READLOCK )
-      if ( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
-         return FAILURE;
-
-      if ( bLocked || hb_fptReadLock( pArea, uiIndex, &ulOffset ) )
-#else
-      if ( bLocked || hb_fptFileLockSh( pArea, TRUE ) )
-#endif
-      {
-#ifdef HB_FPT_SAFE
-         /* Force read record? */
-         if ( !bLocked )
-            pArea->fValidBuffer = FALSE;
-         /* update any pending relations and reread record if necessary */
-         uiError = SELF_DELETED( ( AREAP ) pArea, &bDeleted );
-
-         if ( uiError == SUCCESS )
-#endif
-            uiError = hb_fptGetMemo( pArea, uiIndex - 1, pItem );
-
-         if ( !bLocked )
-         {
-#if defined( HB_FPT_USE_READLOCK )
-            hb_fptReadUnLock( pArea, ulOffset ) ;
-#else
-            hb_fptFileUnLock( pArea );
-#endif
-         }
-      }
-      else
+      if( !hb_fptFileLockSh( pArea, TRUE ) )
       {
          uiError = EDBF_LOCK;
       }
+      else
+      {
+         /* Force read record? */
+         if( !bLocked )
+            pArea->fValidBuffer = FALSE;
+         /* update any pending relations and reread record if necessary */
+         uiError = SELF_DELETED( ( AREAP ) pArea, &bDeleted );
+         if( uiError != SUCCESS )
+         {
+            hb_fptFileUnLock( pArea );
+            return uiError;
+         }
+         uiError = hb_fptGetMemo( pArea, uiIndex - 1, pItem );
+         hb_fptFileUnLock( pArea );
+      }
+#else
+      BOOL bDeleted;
 
-      if ( uiError != SUCCESS )
+      /* update any pending relations and reread record if necessary */
+      uiError = SELF_DELETED( ( AREAP ) pArea, &bDeleted );
+      if( uiError != SUCCESS )
+         return uiError;
+      uiError = hb_fptGetMemo( pArea, uiIndex - 1, pItem );
+#endif
+
+      if( uiError != SUCCESS )
       {
          PHB_ITEM pError = hb_errNew();
          ERRCODE uiErrorG = hb_dbfGetEGcode( uiError );
@@ -2195,8 +2141,8 @@ static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       }
       return SUCCESS;
    }
-   else
-      return SUPER_GETVALUE( ( AREAP ) pArea, uiIndex, pItem );
+
+   return SUPER_GETVALUE( ( AREAP ) pArea, uiIndex, pItem );
 }
 
 /*
@@ -2214,30 +2160,41 @@ static ERRCODE hb_fptPutValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
        pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
    {
       /* update any pending relations and reread record if necessary */
-      if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
-         return FAILURE;
+      uiError = SELF_DELETED( ( AREAP ) pArea, &bDeleted );
+      if( uiError != SUCCESS )
+         return uiError;
 
       if( !pArea->fPositioned )
          return SUCCESS;
 
       /* Buffer is hot? */
-      if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == FAILURE )
-         return FAILURE;
-
-      if( hb_fptFileLockEx( pArea, TRUE ) )
+      if( !pArea->fRecordChanged )
       {
-         uiError = hb_fptPutMemo( pArea, uiIndex -1, pItem );
-#if defined( HB_FPT_SAFE )
-         if( uiError == SUCCESS )
-            /* Force writer record to eliminate race condition */
-            if ( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
-               return FAILURE;
-#endif
-         hb_fptFileUnLock( pArea );
+         uiError = SELF_GOHOT( ( AREAP ) pArea );
+         if ( uiError != SUCCESS )
+            return uiError;
+      }
+
+      if( !hb_fptFileLockEx( pArea, TRUE ) )
+      {
+         uiError = EDBF_LOCK;
       }
       else
       {
-         uiError = EDBF_LOCK;
+         uiError = hb_fptPutMemo( pArea, uiIndex -1, pItem );
+#if defined( HB_MEMO_SAFELOCK )
+         if( uiError == SUCCESS )
+         {
+            /* Force writer record to eliminate race condition */
+            uiError = SELF_GOCOLD( ( AREAP ) pArea );
+            if( uiError != SUCCESS )
+            {
+               hb_fptFileUnLock( pArea );
+               return uiError;
+            }
+         }
+#endif
+         hb_fptFileUnLock( pArea );
       }
 
       if( uiError != SUCCESS )
@@ -2258,6 +2215,7 @@ static ERRCODE hb_fptPutValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       }
       return SUCCESS;
    }
+
    return SUPER_PUTVALUE( ( AREAP ) pArea, uiIndex, pItem);
 }
 
@@ -2530,8 +2488,7 @@ static ERRCODE hb_fptInfo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_BLOB_ROOT_UNLOCK:
-         hb_fptFileUnLock( pArea );
-         hb_itemClear( pItem );
+         hb_itemPutL( pItem, hb_fptFileUnLock( pArea ) );
          break;
 
       case DBI_BLOB_DIRECT_LEN:
@@ -2563,64 +2520,26 @@ static ERRCODE hb_fptFieldInfo( FPTAREAP pArea, USHORT uiIndex, USHORT uiType, P
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
        pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
    {
-      BOOL bLocked;
-#if defined( HB_FPT_USE_READLOCK )
-      ULONG ulOffset;
-#endif
       switch( uiType )
       {
          case DBS_BLOB_GET:
+            /* TODO: !!! pItem := { <nStart>, <nCount> } */
+            return SUCCESS;
          case DBS_BLOB_LEN:
+            hb_itemPutNL( pItem, hb_fptGetMemoLen( pArea, uiIndex - 1 ) );
+            return SUCCESS;
          case DBS_BLOB_OFFSET:
+            hb_itemPutNL( pItem, pArea->uiMemoBlockSize *
+                          hb_dbfGetMemoBlock( (DBFAREAP) pArea, uiIndex - 1 ) );
+            return SUCCESS;
          case DBS_BLOB_POINTER:
+            hb_itemPutNL( pItem,
+                          hb_dbfGetMemoBlock( (DBFAREAP) pArea, uiIndex - 1 ) );
+            return SUCCESS;
          case DBS_BLOB_TYPE:
-            break;
-         default:
-            return SUPER_FIELDINFO( ( AREAP ) pArea, uiIndex, uiType, pItem );
-      }
-
-      if ( hb_fptIsDbLocked( pArea, &bLocked ) == FAILURE )
-         return FAILURE;
-
-#if defined( HB_FPT_USE_READLOCK )
-      if ( bLocked || hb_fptReadLock( pArea, uiIndex, &ulOffset ) )
-#else
-      if ( bLocked || hb_fptFileLockSh( pArea, TRUE ) )
-#endif
-      {
-         switch( uiType )
-         {
-            case DBS_BLOB_GET:
-               /* TODO: !!! pItem := { <nStart>, <nCount> } */
-               break;
-            case DBS_BLOB_LEN:
-               hb_itemPutNL( pItem, hb_fptGetMemoLen( pArea, uiIndex - 1 ) );
-               break;
-            case DBS_BLOB_OFFSET:
-               hb_itemPutNL( pItem, pArea->uiMemoBlockSize *
-                             hb_dbfGetMemoBlock( (DBFAREAP) pArea, uiIndex - 1 ) );
-               break;
-            case DBS_BLOB_POINTER:
-               hb_itemPutNL( pItem,
-                             hb_dbfGetMemoBlock( (DBFAREAP) pArea, uiIndex - 1 ) );
-               break;
-            case DBS_BLOB_TYPE:
-               hb_itemPutC( pItem, hb_fptGetMemoType( pArea, uiIndex - 1 ) );
-               break;
-         }
-         if ( !bLocked )
-         {
-#if defined( HB_FPT_USE_READLOCK )
-            hb_fptReadUnLock( pArea, ulOffset ) ;
-#else
-            hb_fptFileUnLock( pArea );
-#endif
-         }
+            hb_itemPutC( pItem, hb_fptGetMemoType( pArea, uiIndex - 1 ) );
+            return SUCCESS;
       }
    }
-   else
-   {
-      return SUPER_FIELDINFO( ( AREAP ) pArea, uiIndex, uiType, pItem );
-   }
-   return SUCCESS;
+   return SUPER_FIELDINFO( ( AREAP ) pArea, uiIndex, uiType, pItem );
 }

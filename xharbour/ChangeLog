@@ -1,10 +1,30 @@
- * $Id: ChangeLog,v 1.4111 2005/05/10 20:55:31 druzus Exp $
+ * $Id: ChangeLog,v 1.4112 2005/05/11 13:09:18 druzus Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-12 02:45 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbrdddbt.h
+  * xharbour/include/hbrddfpt.h
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * changed locking mode to be more friendly for DOS/Windows
+      Now you can chose two version of locks. When compiled with:
+      -DHB_MEMO_SAFELOCK special slower mode is used but you can
+      be sure that you always access proper data. All read and
+      write operation are covered by locks.
+      Without -DHB_MEMO_SAFELOCK standard Clipper compatible locks
+      are used where only WRITE operations are covered by locks
+      and if user wants to be sure he access proper MEMO values
+      then he should make FLOCK or RLOCK on current record. This
+      is default mode (now). if the files are accessed localy then
+      the locking overhead is minimal so the HB_MEMO_SAFELOCK
+      should be default for *nixes in the future.
+      When we add rddInfo() method I'll make locking mode user
+      switchable at runtime - now I do not want to create yet
+      another global set
 
 2005-05-11 15:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/hb-func.sh

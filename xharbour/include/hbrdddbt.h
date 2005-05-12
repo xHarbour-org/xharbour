@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbt.h,v 1.5 2003/11/22 03:33:57 ronpinkas Exp $
+ * $Id: hbrdddbt.h,v 1.6 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -68,8 +68,8 @@ HB_EXTERN_BEGIN
 /* MEMO constants and defaults */
 #define DBT_MEMOEXT                             ".dbt"
 #define DBT_BLOCKSIZE                              512
-#define DBT_LOCKPOS                        0x00000001L
-#define DBT_LOCKSIZE                       0x7FFFFFFFL
+#define DBT_LOCKPOS                        0x00000000L
+#define DBT_LOCKSIZE                       0x00000001L
 
 /*
  *  DBFDBT WORKAREA

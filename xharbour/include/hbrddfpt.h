@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.12 2004/09/03 08:14:16 druzus Exp $
+ * $Id: hbrddfpt.h,v 1.13 2004/11/21 21:43:38 druzus Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ HB_EXTERN_BEGIN
 /* MEMO constants and defaults */
 #define FPT_MEMOEXT                          ".fpt"
 #define FPT_LOCKPOS                     0x00000000L
-#define FPT_LOCKSIZE                    0x7FFFFFFFL
+#define FPT_LOCKSIZE                    0x00000001L
 #define FPT_DEFBLOCKSIZE                         64
 #define SIX_ITEM_BUFSIZE                         14
 #define FLEX_ITEM_BUFSIZE                         8
