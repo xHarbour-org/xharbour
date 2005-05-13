@@ -1,5 +1,5 @@
 /*
- * $Id: expropt2.c,v 1.8 2004/11/21 21:43:43 druzus Exp $
+ * $Id: expropt2.c,v 1.9 2005/02/22 22:27:07 druzus Exp $
  */
 
 /*
@@ -160,6 +160,10 @@ HB_EXPR_PTR hb_compExprReduceDiv( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
                   pSelf->value.asNum.bWidth = HB_DEFAULT_WIDTH;
                   pSelf->value.asNum.bDec = HB_DEFAULT_DECIMALS;
                }
+               else
+               {
+                  break;
+               }
             }
             else
             {
@@ -168,6 +172,10 @@ HB_EXPR_PTR hb_compExprReduceDiv( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
                   pSelf->value.asNum.dVal = ( double ) pLeft->value.asNum.lVal / pRight->value.asNum.dVal;
                   pSelf->value.asNum.bWidth = HB_DEFAULT_WIDTH;
                   pSelf->value.asNum.bDec = HB_DEFAULT_DECIMALS;
+               }
+               else
+               {
+                  break;
                }
             }
 
