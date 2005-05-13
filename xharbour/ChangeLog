@@ -1,10 +1,16 @@
- * $Id: ChangeLog,v 1.4113 2005/05/12 00:39:12 druzus Exp $
+ * $Id: ChangeLog,v 1.4114 2005/05/13 01:29:53 jabrecer Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-13 18:25 UTC-0300 Walter Negro <anegro /at/ overnet.com.ar>
+   * source/common/expropt2.c
+      ! Fix bug in hb_compExprReduceDiv() in this situation:
+         DOUBLE / 0 or LONG / 0.0
+Reported by Rafa Carmona (TheFull)
 
 2005-05-12 17:57 UTC-0800 Tony Bretado <jabrecer@yahoo.com>
   * source/rtl/achoice.prg
