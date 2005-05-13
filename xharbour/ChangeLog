@@ -1,10 +1,17 @@
- * $Id: ChangeLog,v 1.4112 2005/05/11 13:09:18 druzus Exp $
+ * $Id: ChangeLog,v 1.4113 2005/05/12 00:39:12 druzus Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-12 17:57 UTC-0800 Tony Bretado <jabrecer@yahoo.com>
+  * source/rtl/achoice.prg
+    ! I found that Clipper Hilites the current item AFTER calling;
+      the user defined function
+    ! Also I found that Clipper calls the UDF in the begining ONLY;
+      if the UDF returns a value different than 0
 
 2005-05-12 02:45 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbrdddbt.h

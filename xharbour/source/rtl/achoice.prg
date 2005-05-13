@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.26 2005/03/31 16:23:38 guerra000 Exp $
+ * $Id: achoice.prg,v 1.25 2005/01/09 23:19:31 ronpinkas Exp $
  */
 
 /*
@@ -131,7 +131,7 @@ METHOD New( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, 
       DispBegin()
       ::nArraySize := 0
       ::ValidateArray()
-      ::DrawRows( 0, ::nBottom - ::nTop, .T. )
+      ::DrawRows( 0, ::nBottom - ::nTop, .F. )
       DispEnd()
    ENDIF
 RETURN Self
@@ -140,6 +140,7 @@ METHOD Loop( nMode ) CLASS TAChoice
 LOCAL nRet, nUserMode, lNoItems
 LOCAL nKey, bAction, nSize, nAux
 LOCAL nSaveCsr := SetCursor( SC_NONE )
+local lFirstTime := .t.
 
    nSize := ::nBottom - ::nTop
 
@@ -153,7 +154,7 @@ LOCAL nSaveCsr := SetCursor( SC_NONE )
 
       // Refresh?
       IF nMode == AC_REDRAW
-         ::DrawRows( 0, nSize, .T. )
+         ::DrawRows( 0, nSize, .F. )
       ENDIF
 
       // What will do?
@@ -169,7 +170,9 @@ LOCAL nSaveCsr := SetCursor( SC_NONE )
          nMode := AC_GOTO
       ELSEIF nUserMode == AC_IDLE
          // AC_IDLE state was processed by user's function. Wait for a key
+         ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .T. )
          nKey := INKEY( 0 )
+         ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F. )
          nUserMode := AC_EXCEPT
          nMode := AC_GOTO
       ELSE
@@ -282,8 +285,21 @@ LOCAL nSaveCsr := SetCursor( SC_NONE )
 
       END
 
+
       IF ::lUserFunc .AND. nUserMode != AC_NO_USER_FUNCTION
-         nMode := Do( ::uUserFunc, nUserMode, ::nOption, ::nOption - ::nFirstRow )
+         If lFirstTime
+            lFirstTime := .f.
+            If nUserMode == AC_IDLE
+               nMode := AC_CONT
+            Else
+               nMode := Do( ::uUserFunc, nUserMode, ::nOption, ::nOption - ::nFirstRow )
+            Endif
+
+         Else
+            nMode := Do( ::uUserFunc, nUserMode, ::nOption, ::nOption - ::nFirstRow )
+
+         Endif
+
          IF nMode < 0 .OR. nMode > AC_MAXVALUE
             nMode := AC_CONT
          ENDIF
@@ -291,6 +307,7 @@ LOCAL nSaveCsr := SetCursor( SC_NONE )
             nMode := AC_ABORT
          ENDIF
       ENDIF
+
 
       IF nMode == AC_SELECT
          nRet := ::nOption
@@ -347,7 +364,7 @@ LOCAL nBottom
    IF ::nItems == 0
       RETURN .F.
    ENDIF
-   ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F. )
+   ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F., .f.)
    ::nFirstRow := Max( Min( ::nFirstRow + nMoveScreen, ::nItems - nSize ), 1 )
    DO WHILE nBounce < 2
       ::nOption += nMove
@@ -384,12 +401,13 @@ LOCAL nBottom
             ::DrawRows( nSize - ( ::nFirstRow - nLastFirstRow ) + 1, nSize, .T. )
          ENDIF
       ENDIF
-      ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .T. )
+      ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F., .f.)
    ENDIF
 RETURN ( nBounce != 2 )
 
-METHOD DrawRows( nFrom, nTo, lHilite ) CLASS TAChoice
+METHOD DrawRows( nFrom, nTo, lHilite, lOut ) CLASS TAChoice
 LOCAL nCurOption
+   lOut := if(lOut == Nil, .t., lOut)
    DispBegin()
    DO WHILE nFrom <= nTo
       nCurOption := ::nFirstRow + nFrom
@@ -402,7 +420,9 @@ LOCAL nCurOption
       ELSE
          ColorSelect( CLR_UNSELECTED )
       ENDIF
-      DispOutAt( ::nTop + nFrom, ::nLeft, PadR( ::acItems[ ::nFirstRow + nFrom ], ::nRight - ::nLeft + 1 ) )
+      If lOut
+         DispOutAt( ::nTop + nFrom, ::nLeft, PadR( ::acItems[ ::nFirstRow + nFrom ], ::nRight - ::nLeft + 1 ) )
+      EndIf
       nFrom++
    ENDDO
    SetPos( ::nTop + ::nOption - ::nFirstRow, ::nLeft )
