@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.39 2004/12/28 07:16:12 druzus Exp $
+ * $Id: transfrm.c,v 1.40 2005/03/19 13:09:26 andijahja Exp $
  */
 
 /*
@@ -522,9 +522,9 @@ HB_FUNC( TRANSFORM )
          char     szPicDate[ 11 ];
          char *   szPicNew = NULL;
 
-         HB_ITEM Number;
-         HB_ITEM Width;
-         HB_ITEM Dec;
+         HB_ITEM_NEW ( Number );
+         HB_ITEM_NEW ( Width );
+         HB_ITEM_NEW ( Dec );
 
          BOOL     bFound = FALSE;
          BOOL     bInit  = FALSE;
@@ -619,10 +619,6 @@ HB_FUNC( TRANSFORM )
             iWidth = iOrigWidth;                       /* Push original width      */
             iDec = iOrigDec;                           /* Push original decimals   */
          }
-
-         Number.type = HB_IT_NIL;
-         Width.type = HB_IT_NIL;
-         Dec.type = HB_IT_NIL;
 
          szStr = hb_itemStr(
             hb_itemPutNDLen( &Number, dPush, -1, iDec ),
@@ -725,6 +721,7 @@ HB_FUNC( TRANSFORM )
                                  PR_PARNEGWOS prevails. */
 
             {
+               BOOL bDollarSign = FALSE;
                for( iCount = 0; ( ULONG ) iCount < i; iCount++ )
                    /* Permit to detect overflow when picture init with mask */
                {
@@ -745,10 +742,21 @@ HB_FUNC( TRANSFORM )
                   {
                      if( !isdigit( ( BYTE ) szResult[ iCount ] ) ||
                             ( szResult[ iCount ] == '0' && !isdigit( ( BYTE ) szPic[ iCount ] ) ) )
+                     {
+                        bDollarSign = ( szPic[ iCount ] == '$' );
                         break;
+                     }
                   }
                }
-               *szResult       = '(';
+               if ( bDollarSign )
+               {
+                 szResult[0] = '$';
+                 szResult[1] = '(';
+               }
+               else
+               {
+                 *szResult = '(';
+               }
                szResult[ i++ ] = ')';
             }
 
@@ -780,10 +788,33 @@ HB_FUNC( TRANSFORM )
                            if( szResult[ iCount ] != ' ' )
                            {
                               if( iCount > 0 )
+                              {
                                  szResult[ iCount - 1 ] = '(';
+                              }
                               else
-                                 *szResult       = '(';
+                              {
+                                 if (szPic[ iCount ] != '$')
+                                 {
+                                    *szResult = '(';
+                                 }
+                                 else
+                                 {
+                                    ULONG u = 0;
+                                    *szResult = '$';
+                                    while ( TRUE )
+                                    {
+                                       ++ u;
+                                       if ( szResult [iCount + u ] != ' ' )
+                                       {
+                                          szResult[ iCount + u - 1 ] = '(';
+                                          break;
+                                       }
 
+                                       if ( ( iCount + u ) > i )
+                                          break;
+                                    }
+                                 }
+                              }
                               break;
                            }
                         }
