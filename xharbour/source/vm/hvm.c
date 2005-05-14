@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.461 2005/04/28 18:22:44 mlombardo Exp $
+ * $Id: hvm.c,v 1.462 2005/05/10 00:47:02 ronpinkas Exp $
  */
 
 /*
@@ -1091,14 +1091,26 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          ulBGMaxExecutions = ( hb_set.HB_SET_BACKGROUNDTICK ? hb_set.HB_SET_BACKGROUNDTICK : 1000 );
          if( ulBGMaxExecutions < (++s_ulBackground) )
          {
+            PHB_ITEM pSavedReturn = hb_itemNew( NULL );
+
+            hb_itemForwardValue( pSavedReturn, &(HB_VM_STACK.Return) );
+
             hb_backgroundRun();
             s_ulBackground = 0;
+
+            hb_itemRelease( hb_itemReturn( pSavedReturn ) );
          }
       #else
          // Run background functions every unlock period
          if( HB_VM_STACK.iPcodeCount == HB_VM_UNLOCK_PERIOD )
          {
+            PHB_ITEM pSavedReturn = hb_itemNew( NULL );
+
+            hb_itemForwardValue( pSavedReturn, &(HB_VM_STACK.Return) );
+
             hb_backgroundRun();
+
+            hb_itemRelease( hb_itemReturn( pSavedReturn ) );
          }
       #endif
       }

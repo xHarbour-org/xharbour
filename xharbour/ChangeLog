@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4115 2005/05/13 21:36:09 walito Exp $
+ * $Id: ChangeLog,v 1.4116 2005/05/14 02:29:51 kaddath Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -6,13 +6,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-05-14 11:50 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/hvm.c
+    ! Fixed background tasks logic to prserve value of HB_VM_STACK.Return
+
 2005-05-13 1:26 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
    * source/rtl/transfrm.c
      ! Fixed bug in handling @( and @) pictures in combination with $.
        All credits to the fix go to Andi Jahja (I'm just commiting on his behalf)
      ? Transform( -5, "@(Z $###,##9.99" )
      ? Transform( -10, "@)Z $###,##9.99" )
-     ? Transform( -20, "@Z $###,##9.99" ) 
+     ? Transform( -20, "@Z $###,##9.99" )
 
 2005-05-13 18:25 UTC-0300 Walter Negro <anegro /at/ overnet.com.ar>
    * source/common/expropt2.c
