@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.92 2005/05/15 01:41:27 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.93 2005/05/15 18:12:35 ronpinkas Exp $
  */
 
 /*
@@ -1252,6 +1252,29 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             else if( pSelf->value.asList.pExprList->ExprType == HB_ET_SEND )
             {
                pSelf->value.asList.pExprList->value.asMessage.bByRef = TRUE;
+            }
+            else if( pSelf->value.asList.pExprList->ExprType == HB_ET_ALIASVAR )
+            {
+               int iCmpLen = strlen( pSelf->value.asList.pExprList->value.asAlias.pAlias->value.asSymbol );
+
+               if( iCmpLen > 1 && iCmpLen < 4 )
+               {
+                 iCmpLen = 4;
+               }
+
+               if( strncmp( pSelf->value.asList.pExprList->value.asAlias.pAlias->value.asSymbol, "MEMVAR", iCmpLen ) == 0 )
+               {
+                  HB_EXPR_PTR pDelete = pSelf->value.asList.pExprList;
+
+                  pSelf->value.asList.pExprList = pSelf->value.asList.pExprList->value.asAlias.pVar;
+
+                  pDelete->value.asAlias.pVar = NULL;
+
+                  HB_EXPR_PCODE1( hb_compExprDelete, pDelete );
+
+                  pSelf->value.asList.pExprList->ExprType = HB_ET_VARREF;
+                  bRemoveRef = TRUE;
+               }
             }
          #endif
 

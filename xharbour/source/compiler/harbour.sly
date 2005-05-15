@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.82 2005/04/20 23:29:54 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.83 2005/04/27 20:20:27 ronpinkas Exp $
  */
 
 /*
@@ -868,7 +868,7 @@ Argument   :  EmptyExpression          { $$ = $1; }
                                                {
                                                   $$ = $2->value.asAlias.pVar;
 
-                                                  $2->value.asAlias.pAlias = NULL;
+                                                  $2->value.asAlias.pVar = NULL;
                                                   hb_compExprDelete( $2 );
 
                                                   if( $$->ExprType == HB_ET_MACRO )
