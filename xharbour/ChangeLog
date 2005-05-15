@@ -1,10 +1,15 @@
- * $Id: ChangeLog,v 1.4117 2005/05/14 18:51:40 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4118 2005/05/15 01:41:18 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-15 11:11 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbexprb.c
+  * source/compiler/exproptb.c
+    * Missing declaration of hb_compFieldGetPos()
 
 2005-05-14 18:40 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbexprb.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.91 2005/03/31 14:34:02 andijahja Exp $
+ * $Id: hbexprb.c,v 1.92 2005/05/15 01:41:27 ronpinkas Exp $
  */
 
 /*
@@ -67,6 +67,7 @@
 extern int hb_compLocalGetPos( char * szVarName );
 extern int hb_compStaticGetPos( char *, PFUNCTION );
 extern USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName );
+extern int hb_compFieldGetPos( char *, PFUNCTION );
 
 /* memory allocation
  */
