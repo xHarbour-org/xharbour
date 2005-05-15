@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.90 2005/01/03 16:59:15 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.91 2005/03/31 14:34:02 andijahja Exp $
  */
 
 /*
@@ -1172,8 +1172,10 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                       hb_compStaticGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pLast ) ||
                       hb_compVariableGetPos( hb_comp_pGlobals, pSelf->value.asList.pExprList->value.asSymbol ) ||
                       hb_compMemvarGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pLast ) ||
+                      hb_compFieldGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pLast ) ||
                       ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pFirst ) ) ||
-                      ( hb_comp_bStartProc == FALSE && hb_compMemvarGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pFirst ) ) )
+                      ( hb_comp_bStartProc == FALSE && hb_compMemvarGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pFirst ) ) ||
+                      ( hb_comp_bStartProc == FALSE && hb_compFieldGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pFirst ) ) )
                   {
                      // Declared var - do not change context.
                   }
