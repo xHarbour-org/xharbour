@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.95 2005/03/01 21:23:29 andijahja Exp $
+ * $Id: tget.prg,v 1.96 2005/03/04 02:25:48 kaddath Exp $
  */
 
 /*
@@ -780,6 +780,11 @@ METHOD Untransform( cBuffer ) CLASS Get
             if "R" IN ::cPicFunc
                lUntransform := Empty( ::buffer )
             endif
+
+            if ":" IN ::cPicture
+               lUntransform := .T.
+            endif
+
             if lUntransform
                cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + ;
                           StrTran( SubStr( cBuffer, ::FirstEditable( ), ;
