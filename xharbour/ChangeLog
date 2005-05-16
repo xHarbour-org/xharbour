@@ -1,10 +1,18 @@
- * $Id: ChangeLog,v 1.4119 2005/05/15 18:12:19 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4120 2005/05/15 22:15:27 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-16 21:25 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/wvtgui/hbgtwvt.h
+    ! missing function declaration hb_wvt_gtSetLastMenuEvent()
+  * source/rtl/gtwvt.h
+    ! typo: hb_wvw_gtSetLastMenuEvent() --> hb_wvt_gtSetLastMenuEvent()
+  * ChangeLog
+    ! minor typo in my last change entry
 
 2005-05-15 15:14 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbexprb.c
@@ -193,7 +201,7 @@ Reported by Rafa Carmona (TheFull)
   * source/rtl/gtwvt/gtwvt.c
     + hb_wvt_gtSetLastMenuEvent()
 
-  * contrib/gtwvt/wvtutils.c
+  * contrib/wvtgui/wvtutils.c
     + WVT_SETLASTMENUEVENT() callable from .prg
 
 2005-05-05 21:35 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
