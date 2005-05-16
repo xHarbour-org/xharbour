@@ -2,11 +2,10 @@
 *        Translations for CTWIN library                   *
 ***********************************************************
 
-#xcommand CTWINON =>
-/*
 #xcommand CTWINON =>;
  #xtranslate ACHOICE(       =>   ctw_ACHOICE(        ;;
  #xtranslate COL()          =>   ctw_COL()           ;;
+ #xtranslate COLORWIN(      =>   ctw_COLORWIN(       ;;
  #xtranslate DEVOUT(        =>   ctw_DEVOUT(         ;;
  #xtranslate DEVOUTPICT(    =>   ctw_DEVOUTPICT(     ;;
  #xtranslate DEVPOS(        =>   ctw_DEVPOS(         ;;
@@ -16,8 +15,8 @@
  #xtranslate MAXCOL(        =>   ctw_MAXCOL(         ;;
  #xtranslate MAXROW(        =>   ctw_MAXROW(         ;;
  #xtranslate MEMOEDIT(      =>   ctw_MEMOEDIT(       ;;
- #xtranslate QOUT(          =>   ctw_QOUT(           ;;
  #xtranslate QQOUT(         =>   ctw_QQOUT(          ;;
+ #xtranslate QOUT(          =>   ctw_QOUT(           ;;
  #xtranslate RESTSCREEN(    =>   ctw_RESTSCREEN(     ;;
  #xtranslate ROW()          =>   ctw_ROW()           ;;
  #xtranslate SAVESCREEN(    =>   ctw_SAVESCREEN(     ;;
@@ -26,13 +25,12 @@
  #xtranslate TBROWSENEW(    =>   ctw_TBROWSENEW(     ;;
  #xtranslate TBROWSEDB(     =>   ctw_TBROWSEDB(      ;;
  #xtranslate __AtPrompt(    =>   ctw___AtPrompt(
-*/
 
-#xcommand CTWINOFF =>
-/*
+
 #xcommand CTWINOFF =>;
  #xuntranslate ACHOICE(       => ;;
  #xuntranslate COL()          => ;;
+ #xuntranslate COLORWIN(      => ;;
  #xuntranslate DEVOUT(        => ;;
  #xuntranslate DEVOUTPICT(    => ;;
  #xuntranslate DEVPOS(        => ;;
@@ -42,8 +40,8 @@
  #xuntranslate MAXCOL(        => ;;
  #xuntranslate MAXROW(        => ;;
  #xuntranslate MEMOEDIT(      => ;;
- #xuntranslate QOUT(          => ;;
  #xuntranslate QQOUT(         => ;;
+ #xuntranslate QOUT(          => ;;
  #xuntranslate RESTSCREEN(    => ;;
  #xuntranslate ROW()          => ;;
  #xuntranslate SAVESCREEN(    => ;;
@@ -52,4 +50,3 @@
  #xuntranslate TBROWSENEW(    => ;;
  #xuntranslate TBROWSEDB(     => ;;
  #xuntranslate __AtPrompt(    =>
-*/

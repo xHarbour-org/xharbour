@@ -1,12 +1,12 @@
 ********************************************************************
 *   Library   CTWIN  ver 0.92                                      *
-*   Emulation off windows functions from CA Tools                  *
+*   Emulation off windows functions from CA Tolls                  *
 *   write by Adam Lubszczyk    alubszcz@rsw.pl                     *
 ********************************************************************
 /*
- * $Id: CTWIN.PRG,v 1.1 2004/10/23 23:25:14 oh1 Exp $
+ * $Id: ctwin.prg,v 1.5 2004/01/29 17:28:45 lculik Exp $
  */
- 
+
 /*
  * Harbour Project source code:
  *   CT3 Windows Like functions
@@ -95,6 +95,21 @@ STATIC ctw_WBOX_Type := {;
 
 
 *********************************************
+* Function....: CTW_ColorWin( nT, nL, nB, nR, xAtt, xOldAtt)
+* Author......: Tony Bretado
+* Date Created: 8/27/03             2:33PM
+*********************************************
+FUNCTION CTW_ColorWin( nT, nL, nB, nR, xAtt, xOldAtt)
+   IF ctw_CURRENT == 0
+      ColorWin( nT, nL, nB, nR, xAtt, xOldAtt)
+
+   ELSE
+      ctw_WINDOWS[ctw_CURRENT]:colorWin( nT, nL, nB, nR, xAtt, xOldAtt)
+
+   ENDIF
+RETURN Nil
+
+*********************************************
 * Function....: ctw_memoedit(cString, nTop, nLeft, nBottom, nRight, lEditMode, cUserFunction, ;
 *                  nLineLength, nTabSize, nTextBufferRow, nTextBufferColumn, nWindowRow, nWindowColumn)
 * Author......: Tony Bretado
@@ -134,11 +149,11 @@ RETURN cRet
 * Date Created: 8/27/03             2:33PM
 *********************************************
 FUNCTION ctw_RESTSCREEN( nT, nL, nB, nR, cScr)
-   IF ctw_CURRENT == 0
-     RESTSCREEN( nT, nL, nB, nR, cScr)
-   ELSE
-     ctw_WINDOWS[ctw_CURRENT]:RestScreen( nT, nL, nB, nR, cScr)
-   ENDIF
+ IF ctw_CURRENT == 0
+   RESTSCREEN( nT, nL, nB, nR, cScr)
+ ELSE
+   ctw_WINDOWS[ctw_CURRENT]:RestScreen( nT, nL, nB, nR, cScr)
+ ENDIF
 RETURN Nil
 
 ********************************************
@@ -774,6 +789,7 @@ CLASS TctWIN
             nLineLength, nTabSize, nTextBufferRow, nTextBufferColumn, nWindowRow, nWindowColumn)
  METHOD WinShadow()
  METHOD ColorShadow()
+ METHOD ColorWin( nT, nL, nB, nR, xAtt, xOldAtt)
 ENDCLASS
 
 *********************************************
@@ -816,7 +832,7 @@ Method ColorShadow( nTop, nLeft, nBottom, nRight, xAtt) CLASS TctWin
 
    // Replace an specific Attribute?
    For n := 1 to len(cEven)
-      If substr(cEven, n , 1) $ (xAtt + xAtt2)
+      If substr(cEven, n , 1) $ (xAtt + xAtt2) .or. left(token(ntocolor(asc(substr(cEven, n , 1)), .t.), '/,', 1), 1) == 'N'
          cBuff += xAtt2
 
       Else
@@ -1069,50 +1085,50 @@ METHOD QQout(xVal) CLASS TctWIN
 
  IF SET(_SET_CONSOLE)                      // jesli takze CONSOLE
     lDev := SET(_SET_DEVICE , "SCREEN")    // tylko SCREEN
-    IF pCR == 0 .and. pLF == 0
-       pp := 0
-    ELSEIF pCR == 0 .or. pLF == 0
-       pp := MAX(pCR,pLF)
-    ELSE
-       pp := MIN(pCR,pLF)
-    ENDIF
+   IF pCR == 0 .and. pLF == 0
+      pp := 0
+   ELSEIF pCR == 0 .or. pLF == 0
+      pp := MAX(pCR,pLF)
+   ELSE
+      pp := MIN(pCR,pLF)
+   ENDIF
 
-    DO WHILE nLen > 0
-      IF pp == 0
-         IF nLen > nRest
+   DO WHILE nLen > 0
+     IF pp == 0
+        IF nLen > nRest
            ::DEVOUT(LEFT(cVal,nRest))
-            ::ct__CR()
-            ::ct__LF()
-            cVal := SUBSTR(cVal,nRest +1)
-            nLen := LEN(cVal)
-            nRest := ::UsedR - ::UsedL + 1
-         ELSE
-            ::DEVOUT(cVal)
+           ::ct__CR()
+           ::ct__LF()
+           cVal := SUBSTR(cVal,nRest +1)
+           nLen := LEN(cVal)
+           nRest := ::UsedR - ::UsedL + 1
+        ELSE
+           ::DEVOUT(cVal)
            nLen := 0
-         ENDIF  //nLen > nRest
-      ELSE //pp == 0
+        ENDIF  //nLen > nRest
+     ELSE //pp == 0
          ::DEVOUT(SUBSTR(cVal,1,pp-1))
-         cCode := SUBSTR(cVal,pp,1)
-         cVal := SUBSTR(cVal,pp+1)
-         IF cCode == cCR
-            ::ct__CR()
-         ELSE
-            ::ct__LF()
-         ENDIF //cCode == cCR
-         nLen := LEN(cVal)
-         pCR := AT( cCR ,cVal)
-         pLF := AT( cLF ,cVal)
-         IF pCR == 0 .and. pLF == 0
-            pp := 0
-         ELSEIF pCR == 0 .or. pLF == 0
-            pp := MAX(pCR,pLF)
-         ELSE
-            pp := MIN(pCR,pLF)
-         ENDIF
-         nRest := ::UsedR - COL() + 1
-      ENDIF  //pp == 0
-    ENDDO    //nLen > 0
-    SET(_SET_DEVICE, lDev)
+        cCode := SUBSTR(cVal,pp,1)
+        cVal := SUBSTR(cVal,pp+1)
+        IF cCode == cCR
+           ::ct__CR()
+        ELSE
+           ::ct__LF()
+        ENDIF //cCode == cCR
+        nLen := LEN(cVal)
+        pCR := AT( cCR ,cVal)
+        pLF := AT( cLF ,cVal)
+        IF pCR == 0 .and. pLF == 0
+           pp := 0
+        ELSEIF pCR == 0 .or. pLF == 0
+           pp := MAX(pCR,pLF)
+        ELSE
+           pp := MIN(pCR,pLF)
+        ENDIF
+        nRest := ::UsedR - COL() + 1
+     ENDIF  //pp == 0
+   ENDDO    //nLen > 0
+   SET(_SET_DEVICE, lDev)
  ENDIF
 
 RETURN NIL
@@ -1144,6 +1160,7 @@ RETURN NIL
 ****************
 METHOD New(nT,nL,nB,nR) CLASS TctWIN
  LOCAL lMax:=.F.
+
  IF nT==NIL .or. nL==NIL .or. nB==NIL .or. nR==NIL
     lMax:=.T.
  ENDIF
@@ -1271,6 +1288,7 @@ RETURN NIL
 METHOD RestoreFG() CLASS TctWIN
   DISPBEGIN()
   RESTSCREEN(::PosT ,::PosL ,::PosB ,::PosR ,::cSaveData)
+  ::WinShadow()
   DISPEND()
 RETURN NIL
 *************
@@ -1405,7 +1423,6 @@ RETURN NIL
 ************
 METHOD SetPos(nT,nL) CLASS TctWIN
 LOCAL nTop, nLeft
-
  nTop := ::UsedT + nT
  IF nTop < ::PosT
    nTop := ::PosT
@@ -1540,5 +1557,44 @@ METHOD DispBox(nT,nL,nB,nR,cnStr,cColor) CLASS TctWIN
  DISPBOX(nT,nL,nB,nR,cnStr,cColor)
 
 RETURN NIL
+
+******************************************
+* Method......: ColorWin( nT, nL, nB, nR, xAtt, xOldAtt)
+* Author......: Tony Bretado
+* Date Created: 11/17/2004     8:13PM
+* Notes.......:
+******************************************
+METHOD ColorWin( nT, nL, nB, nR, xAtt, xOldAtt) CLASS TctWIN
+   // Top
+   If nT == Nil
+      nT := ctw_WINDOWS[ctw_CURRENT]:UsedT
+   Else
+      nT += ctw_WINDOWS[ctw_CURRENT]:UsedT
+   EndIF
+
+   // Left
+   If nL == Nil
+      nL := ctw_WINDOWS[ctw_CURRENT]:UsedL
+   Else
+      nL += ctw_WINDOWS[ctw_CURRENT]:UsedL
+   EndIF
+
+   // Bottom
+   If nB == Nil
+      nB := ctw_WINDOWS[ctw_CURRENT]:UsedB
+   Else
+      nB += ctw_WINDOWS[ctw_CURRENT]:UsedT
+   EndIF
+
+   // Right
+   If nR == Nil
+      nR := ctw_WINDOWS[ctw_CURRENT]:UsedR
+   Else
+      nR += ctw_WINDOWS[ctw_CURRENT]:UsedL
+   EndIF
+
+   ColorWin( nT, nL, nB, nR, xAtt, xOldAtt)
+
+   return Self
 
 **********************
