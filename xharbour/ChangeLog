@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4121 2005/05/16 14:29:14 bdj Exp $
+ * $Id: ChangeLog,v 1.4122 2005/05/16 20:27:43 jabrecer Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -6,12 +6,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-05-16 14:23 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * contrib/rdd_ads/ads1.c
+    ! Fixed GPF trap in adsSetFilter()
+
 2005-05-16 13:18 UTC-0800 Tony Bretado <jabrecer@yahoo.com>
   * include/ctwin.ch
     ! Re-Activation of commands CTWINON and CTWINOFF
     + Added suport for colorwin
   * source/ct/alt/ctwin.prg
-
 
 2005-05-16 21:25 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/wvtgui/hbgtwvt.h

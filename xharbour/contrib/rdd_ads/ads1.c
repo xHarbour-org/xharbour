@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.66 2005/04/27 18:38:47 ptsarenko Exp $
+ * $Id: ads1.c,v 1.67 2005/05/06 23:44:56 druzus Exp $
  */
 
 /*
@@ -395,7 +395,7 @@ static void adsScopeGet( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem )
    if( pArea->hOrdCurrent )
    {
       /*ADS top/bottom are 1,2 instead of 0,1*/
-      nScope = ( nScope == 0 ) ? ADS_TOP : ADS_BOTTOM; 
+      nScope = ( nScope == 0 ) ? ADS_TOP : ADS_BOTTOM;
 
       ulRetVal = AdsGetScope( pArea->hOrdCurrent, (UNSIGNED16) nScope, pucScope, &pusBufLen );
 
@@ -459,7 +459,7 @@ static ERRCODE adsScopeSet( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem )
 
    if( pArea->hOrdCurrent )
    {
-      nScope = ( nScope == 0 ) ? ADS_TOP : ADS_BOTTOM; 
+      nScope = ( nScope == 0 ) ? ADS_TOP : ADS_BOTTOM;
       if( pItem )
       {
          UNSIGNED16 pus16KeyType = 0;
@@ -3236,7 +3236,7 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
 
       case DBOI_BAGEXT:
          hb_itemPutC( pOrderInfo->itmResult,
-                      ( ( pArea->iFileType == ADS_ADT ) ? ".adi" : 
+                      ( ( pArea->iFileType == ADS_ADT ) ? ".adi" :
                         ( pArea->iFileType == ADS_CDX ) ? ".cdx" : ".ntx" ) );
          break;
 
@@ -3530,11 +3530,14 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
 
       AdsIsExprValid( pArea->hTable, (UNSIGNED8*) pucFilter, &bValidExpr );
 
-      if( bValidExpr != FALSE )
+      if( bValidExpr )
       {
 #if ADS_REQUIRE_VERSION >= 6
          if( adsOEM )
          {
+            // hb_oemansi() transform inplace, we need writable buffer!
+            pucFilter = hb_strdup( pucFilter );
+
             hb_oemansi( pucFilter, hb_itemGetCLen( pFilterInfo->abFilterText ) );
          }
 #endif
@@ -3546,9 +3549,14 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
          {
             ulRetVal = AdsSetFilter( pArea->hTable, (UNSIGNED8*) pucFilter );
          }
-      }     /* else let SUPER handle filtering */
 
+         if( adsOEM )
+         {
+             hb_xfree( (void *) pucFilter );
+         }
+      }     /* else let SUPER handle filtering */
    }
+
    return ulRetVal == AE_SUCCESS ? SUCCESS : FAILURE;
 }
 
