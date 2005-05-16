@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.gc,v 1.5 2005/03/03 14:16:45 andijahja Exp $
+# $Id: hrbdll.gc,v 1.8 2005/04/02 01:44:51 andijahja Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -205,6 +205,7 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/color53.o \
    $(OBJ_DIR)/cstr.o \
    $(OBJ_DIR)/cstruct.o \
+   $(OBJ_DIR)/dbdelim.o \
    $(OBJ_DIR)/dbedit.o \
    $(OBJ_DIR)/dbsdf.o \
    $(OBJ_DIR)/devoutp.o \
@@ -682,6 +683,12 @@ $(OBJ_DIR)/dates.o : $(RTL_DIR)/dates.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/dateshb.o : $(RTL_DIR)/dateshb.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/dbdelim.c : $(RTL_DIR)/dbdelim.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/dbdelim.o : $(OBJ_DIR)/dbdelim.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/dbedit.c : $(RTL_DIR)/dbedit.prg

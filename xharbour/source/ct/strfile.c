@@ -1,5 +1,5 @@
 /*
- * $Id: strfile.c,v 1.1 2004/11/28 15:29:31 ptsarenko Exp $
+ * $Id: strfile.c,v 1.2 2005/01/11 08:44:08 druzus Exp $
  */
 
 /*
@@ -145,7 +145,7 @@ LONG ct_StrFile( BYTE *pFileName, BYTE *pcStr, LONG sLen, BOOL bOverwrite, LONG 
          hb_fsSeek(hFile, 0, FS_END);
       }
 
-      lWrite = hb_fsWrite(hFile, pcStr, sLen);
+      lWrite = hb_fsWrite(hFile, pcStr, (USHORT) sLen);
       if( (lWrite == sLen) && bOpen && bTrunc)
       {         
          hb_fsWrite(hFile, NULL, 0);
@@ -187,7 +187,7 @@ HB_FUNC (FILESTR)
          BOOL bCtrlZ = (ISLOG(4) ? hb_parl(4) : 0 );
          char * pCtrlZ;
 
-         lLength = hb_fsRead(hFile, (BYTE *) pcResult, lLength);
+         lLength = hb_fsRead(hFile, (BYTE *) pcResult, (USHORT) lLength);
 
          if( bCtrlZ )
          {

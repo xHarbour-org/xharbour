@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.pc,v 1.5 2005/03/02 21:59:30 andijahja Exp $
+# $Id: makefile.pc,v 1.8 2005/04/02 01:44:54 andijahja Exp $
 # makefile for PellesC compiler
 #
 
@@ -445,6 +445,7 @@ NF_LIB_OBJS = \
    \
    $(NF_OBJ_DIR)\dispc.obj \
    $(NF_OBJ_DIR)\ftattr.obj \
+   $(NF_OBJ_DIR)\fttext.obj \
    $(NF_OBJ_DIR)\dfile.obj
 
 HARBOUR_EXE_OBJS = \
@@ -1019,6 +1020,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\browse.obj \
    $(RTL_OBJ_DIR)\checkbox.obj \
    $(RTL_OBJ_DIR)\cstr.obj \
+   $(RTL_OBJ_DIR)\dbdelim.obj \
    $(RTL_OBJ_DIR)\dbedit.obj \
    $(RTL_OBJ_DIR)\dbsdf.obj \
    $(RTL_OBJ_DIR)\devoutp.obj \
@@ -1417,6 +1419,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\browse.obj   >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\checkbox.obj >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\cstr.obj     >> poccrtl.rsp
+   $(ECHO) $(RTL_OBJ_DIR)\dbdelim.obj  >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dbedit.obj   >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dbsdf.obj    >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\devoutp.obj  >> poccrtl.rsp
@@ -2154,6 +2157,12 @@ $(RTL_OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\dbdelim.c : $(RTL_DIR)\dbdelim.prg
+   $(HARBOUR_CMD)
+
+$(RTL_OBJ_DIR)\dbdelim.obj : $(RTL_OBJ_DIR)\dbdelim.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\dbedit.c : $(RTL_DIR)\dbedit.prg
@@ -4404,6 +4413,9 @@ $(NF_OBJ_DIR)\ftattr.obj : $(NF_DIR)\ftattr.c
    $(CC_CMD)
 
 $(NF_OBJ_DIR)\dispc.obj : $(NF_DIR)\dispc.c
+   $(CC_CMD)
+
+$(NF_OBJ_DIR)\fttext.obj : $(NF_DIR)\fttext.c
    $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿

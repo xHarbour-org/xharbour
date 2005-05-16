@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.41 2005/02/11 20:51:01 guerra000 Exp $
+# $Id: makefile.wc,v 1.44 2005/04/02 01:44:54 andijahja Exp $
 #
 
 #
@@ -420,6 +420,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\color53.obj \
    $(RTL_OBJ_DIR)\cstr.obj \
    $(RTL_OBJ_DIR)\cstruct.obj \
+   $(RTL_OBJ_DIR)\dbdelim.obj \
    $(RTL_OBJ_DIR)\dbedit.obj \
    $(RTL_OBJ_DIR)\dbsdf.obj \
    $(RTL_OBJ_DIR)\devoutp.obj \
@@ -1670,6 +1671,12 @@ $(RTL_OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\dbdelim.c : $(RTL_DIR)\dbdelim.prg
+   $(HRB_CMD)
+
+$(RTL_OBJ_DIR)\dbdelim.obj : $(RTL_OBJ_DIR)\dbdelim.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\dbedit.c : $(RTL_DIR)\dbedit.prg

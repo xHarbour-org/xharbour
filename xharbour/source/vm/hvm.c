@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.462 2005/05/10 00:47:02 ronpinkas Exp $
+ * $Id: hvm.c,v 1.463 2005/05/14 18:51:46 ronpinkas Exp $
  */
 
 /*
@@ -1905,8 +1905,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                }
                else
                {
-                  HB_ITEM hbIndex;
-                  hbIndex.type = HB_IT_NIL;
+                  HB_ITEM_NEW( hbIndex );
                   hb_itemPutCRawStatic( &hbIndex, szIndex, strlen( szIndex ) );
 
                   if ( hb_hashScan( pSelf, &hbIndex , &ulPos ) )
@@ -2712,10 +2711,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                LocalNearAddIntError :
                {
-                  HB_ITEM Add;
+                  HB_ITEM_NEW( Add );
                   PHB_ITEM pResult;
 
-                  Add.type = HB_IT_NIL;
                   hb_itemPutNI( &Add, ( int ) iAdd );
                   pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLocal, &Add );
 
@@ -2909,10 +2907,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                AddIntError :
                {
-                  HB_ITEM Add;
+                  HB_ITEM_NEW( Add );
                   PHB_ITEM pResult;
 
-                  Add.type = HB_IT_NIL;
                   hb_itemPutNI( &Add, ( int ) iAdd );
 
                   if( iAdd > 0 )
@@ -3018,8 +3015,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               HB_ITEM Tmp;
-               Tmp.type = HB_IT_NIL;
+               HB_ITEM_NEW( Tmp );
                hb_errRT_BASE_SubstR( EG_ARG, 1124, NULL, "LEFT", 2, pString, hb_itemPutNI( &Tmp, iNewLen ) );
             }
 
@@ -4006,12 +4002,10 @@ static void hb_vmPlus( void )
    else if( HB_IS_HASH( pItem1 ) && HB_IS_HASH( pItem2 ) )
    {
       ULONG ulLen = pItem2->item.asHash.value->ulTotalLen;
-      HB_ITEM hbNum;
-      HB_ITEM HashResult;
+      HB_ITEM_NEW( hbNum );
+      HB_ITEM_NEW( HashResult );
 
-      HashResult.type = HB_IT_NIL;
       hb_hashClone( pItem1, &HashResult );
-      hbNum.type = HB_IT_NIL;
       hb_itemPutNI( &hbNum, 0 ); // normal merge mode
 
       hb_hashMerge( &HashResult, pItem2, 1, ulLen, &hbNum );
@@ -4127,12 +4121,10 @@ static void hb_vmMinus( void )
    else if( HB_IS_HASH( pItem1 ) && HB_IS_HASH( pItem2 ) )
    {
       ULONG ulLen = pItem2->item.asHash.value->ulTotalLen;
-      HB_ITEM hbNum;
-      HB_ITEM HashResult;
+      HB_ITEM_NEW( hbNum );
+      HB_ITEM_NEW( HashResult );
 
-      HashResult.type = HB_IT_NIL;
       hb_hashClone( pItem1, &HashResult );
-      hbNum.type = HB_IT_NIL;
       hb_itemPutNI( &hbNum, 3 ); // NOT mode
 
       hb_hashMerge( &HashResult, pItem2, 1, ulLen, &hbNum );
@@ -4144,10 +4136,9 @@ static void hb_vmMinus( void )
    {
       ULONG ulLen = pItem2->item.asArray.value->ulLen;
       ULONG ulPos;
-      HB_ITEM HashResult;
+      HB_ITEM_NEW( HashResult );
       PHB_ITEM pRef = pItem2->item.asArray.value->pItems;
 
-      HashResult.type = HB_IT_NIL;
       hb_hashClone( pItem1, &HashResult );
       while( ulLen > 0 )
       {
@@ -4166,9 +4157,8 @@ static void hb_vmMinus( void )
       pItem2->type & ( HB_IT_NUMERIC | HB_IT_STRING | HB_IT_DATE ) ) )
    {
       ULONG ulPos;
-      HB_ITEM HashResult;
+      HB_ITEM_NEW( HashResult );
 
-      HashResult.type = HB_IT_NIL;
       if ( hb_hashScan( pItem1, pItem2, &ulPos ) )
       {
          hb_hashClone( pItem1, &HashResult );
@@ -4248,8 +4238,13 @@ static void hb_vmDivide( void )
 
       if( dDivisor == 0.0 )
       {
+#if 0
          PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1340, NULL, "/", 2, pItem1, pItem2 );
-
+#else
+         HB_ITEM_NEW( p1 );
+         HB_ITEM_NEW( p2 );
+         PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1340, NULL, "/", 2, &p1, &p2 );
+#endif
          if( pResult )
          {
             hb_stackPop();
@@ -4311,7 +4306,13 @@ static void hb_vmModulus( void )
 
       if ( lDivisor == 0 )
       {
+#if 0
          PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1341, NULL, "%", 2, pItem1, pItem2 );
+#else
+         HB_ITEM_NEW( p1 );
+         HB_ITEM_NEW( p2 );
+         PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1341, NULL, "%", 2, &p1, &p2 );
+#endif
 
          if( pResult )
          {
@@ -4340,8 +4341,14 @@ static void hb_vmModulus( void )
 
       if( dDivisor == 0.0 )
       {
+#if 0
          PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1341, NULL, "%", 2, pItem1, pItem2 );
+#else
+         HB_ITEM_NEW( p1 );
+         HB_ITEM_NEW( p2 );
+         PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1341, NULL, "%", 2, &p1, &p2 );
 
+#endif
          if( pResult )
          {
             hb_stackPop();
@@ -5010,10 +5017,8 @@ static void hb_vmInstringOrArray( void )
       {
          if( hb_hashScan( pItem2, pItem1->item.asHash.value->pKeys, &ulPos ) )
          {
-            HB_ITEM hbV1;
+            HB_ITEM_NEW( hbV1 );
             PHB_ITEM pV2 = hb_hashGetValueAt( pItem2, ulPos );
-
-            hbV1.type = HB_IT_NIL;
 
             hb_itemCopy( &hbV1, hb_hashGetValueAt( pItem1, 1) );
             hb_stackPop();
@@ -5711,7 +5716,7 @@ static void hb_vmArrayPush( void )
    if( HB_IS_HASH( pArray ) && HB_IS_ORDERABLE( pIndex ) )
    {
       ULONG ulPos;
-      HB_ITEM hbElem;
+      HB_ITEM_NEW( hbElem );
 
       if( ! hb_hashScan(pArray, pIndex, &ulPos ) )
       {
@@ -5719,7 +5724,6 @@ static void hb_vmArrayPush( void )
          return;
       }
 
-      hbElem.type = HB_IT_NIL;
       hb_hashGet( pArray, ulPos, &hbElem );
 
       hb_stackPop();
@@ -5816,9 +5820,7 @@ static void hb_vmArrayPush( void )
             /* this is a constant array { 1, 2, 3 } - we cannot use
              * the optimization here
             */
-            HB_ITEM item;
-
-            ( &item )->type = HB_IT_NIL;
+            HB_ITEM_NEW( item );
 
             hb_arrayGet( pArray, lIndex, &item );
 
@@ -6127,11 +6129,9 @@ static void hb_vmArrayDim( USHORT uiDimensions ) /* generates an uiDimensions Ar
 {
    HB_THREAD_STUB
 
-   HB_ITEM itArray;
+   HB_ITEM_NEW( itArray );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayDim(%hu)", uiDimensions));
-
-   itArray.type = HB_IT_NIL;
 
    hb_vmArrayNew( &itArray, uiDimensions );
 
@@ -6149,12 +6149,11 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
 {
    HB_THREAD_STUB
 
-   HB_ITEM itArray;
+   HB_ITEM_NEW( itArray );
    ULONG ulPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayGen(%lu)", ulElements));
 
-   itArray.type = HB_IT_NIL;
    hb_arrayNew( &itArray, ulElements );
 
    for( ulPos = 0; ulPos < ulElements; ulPos++ )
@@ -6202,7 +6201,7 @@ static void hb_vmArrayNew( PHB_ITEM pArray, USHORT uiDimension )
          break;
 
       case HB_IT_LONG:
-         ulElements = pDim->item.asLong.value;
+         ulElements = (ULONG) pDim->item.asLong.value;
          break;
 
       case HB_IT_DOUBLE:
@@ -6605,12 +6604,11 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
 static void hb_vmClassError( int uiParams, char *szClassName, char *szMsg )
 {
    char sDesc[128];
-   HB_ITEM ArgsArray;
+   HB_ITEM_NEW( ArgsArray );
    PHB_ITEM pArgsArray;
 
    // Should be optimized by rewriting hb_arrayFrom*() to accept Pointer to use.
    pArgsArray = hb_arrayFromStack( uiParams );
-   ArgsArray.type = HB_IT_NIL;
    hb_itemForwardValue( &ArgsArray, pArgsArray );
    hb_itemRelease( pArgsArray );
 
@@ -6754,15 +6752,13 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
             if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
             {
-               HB_ITEM RealSelf;
+               HB_ITEM_NEW( RealSelf );
                USHORT nPos;
                USHORT uiClass;
 
                //printf( "\n VmSend Method: %s \n", pSym->szName );
                uiClass = pSelfBase->uiClass;
                pItem->item.asSymbol.uiSuperClass = uiClass;
-
-               RealSelf.type = HB_IT_NIL;
 
                //TraceLog( NULL, "pRealSelf %p pItems %p\n", pRealSelf, pSelfBase->pItems );
 
@@ -6839,8 +6835,8 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          }
          else
          {
-            HB_ITEM hbIndex;
-            hbIndex.type = HB_IT_NIL;
+            HB_ITEM_NEW( hbIndex );
+
             hb_itemPutCRawStatic( &hbIndex, szIndex, strlen( szIndex ) );
 
             if ( hb_hashScan( pSelf, &hbIndex , &ulPos ) )
@@ -7300,11 +7296,9 @@ static void hb_vmDebuggerEndProc( void )
 {
    HB_THREAD_STUB
 
-   HB_ITEM item;
+   HB_ITEM_NEW( item );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDebuggerEndProc()"));
-
-   ( &item )->type = HB_IT_NIL;
 
    hb_itemForwardValue( &item, &(HB_VM_STACK.Return) ); /* saves the previous returned value */
 
@@ -7875,7 +7869,11 @@ static void hb_vmPushAliasedField( PHB_SYMB pSym )
       PHB_ITEM pFName = hb_itemNew( NULL );
 
       hb_itemPutC( pFName, pSym->szName );
+#if 0
       hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 2, pAlias, pFName );
+#else
+      hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, pAlias );
+#endif
       hb_itemRelease( pFName );
    }
    else
@@ -9476,11 +9474,9 @@ HB_FUNC( HB_RESTOREBLOCK )
    if ( pBlockAsArray )
    {
       PSYMBOLS pModuleSymbols;
-      HB_ITEM ModuleName, PCode, ParamCount;
-
-      ModuleName.type = HB_IT_NIL;
-      PCode.type = HB_IT_NIL;
-      ParamCount.type = HB_IT_NIL;
+      HB_ITEM_NEW( ModuleName );
+      HB_ITEM_NEW( PCode );
+      HB_ITEM_NEW( ParamCount );
 
       hb_arrayGet( pBlockAsArray, 1, &ModuleName );
       hb_arrayGet( pBlockAsArray, 2, &PCode );

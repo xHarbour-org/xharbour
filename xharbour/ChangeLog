@@ -1,10 +1,62 @@
- * $Id: ChangeLog,v 1.4122 2005/05/16 20:27:43 jabrecer Exp $
+ * $Id: ChangeLog,v 1.4123 2005/05/16 21:24:54 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-17 04.40 UTC+0700 Andi Jahja <andijahja@xharbour.com>
+  * hrbdll.dc
+  * hrbdll.gc
+  * hrbdll.pc
+  * hrbdll.wc
+  * makefile.dc
+  * makefile.gc
+  * makefile.pc
+  * makefile.wc
+    ! updated.
+
+  * contrib/libnf/fttext.c
+    ! some minor enhancements
+
+  * source/rtl/str.c
+    ! hb_retc() + hb_xfree() -> hb_retcAdopt()
+
+  * utils/hbtest/rt_trans.prg
+    ! change expected results per current xHarbour corrections on Clipper
+      bugs (IMO) on return value of transform() line 432 and 433
+  * utils/hbtest/rt_str.prg
+    ! per Clipper: Str(Val("-..")) == "0.0", not " 0.0"
+                   Str(Val("-.0")) == "0.0", not " 0.0"
+      the expected results for xHarbour changed accordingly.
+  * source/vm/arrayshb.c
+  * source/vm/hvm.c
+    ! RT error message on error 1340/1341/1065 to conform with Clipper ones.
+      This reduces hbtest.exe's failures to 13.
+
+  * source/compiler/genc.c
+    * enable INIT/EXIT PROCEDURE written in C dump.
+    * fix compilation error in a fragment like:
+      .---
+      | PROCEDURE MAIN()
+      | RETURN
+      | #PRAGMA BEGINDUMP
+      | #include "hbapi.h"
+      | #ifdef __INCLUDE_THIS__
+      | HB_FUNC( FOO ) {;}
+      | #endif
+      | #PRAGMA ENDDUMP
+      `---
+
+  * source/rtl/tget.prg
+    ! fix bug on get picture "@R 99:99" as reported by Luiz
+
+  * contrib/libnf/dispc.c
+  * source/ct/ctwin.c
+  * source/ct/settime.c
+  * source/ct/strfile.c
+    ! type castings
 
 2005-05-16 14:23 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * contrib/rdd_ads/ads1.c

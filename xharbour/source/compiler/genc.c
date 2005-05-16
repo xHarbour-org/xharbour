@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.102 2005/04/21 10:10:16 andijahja Exp $
+ * $Id: genc.c,v 1.101 2005/04/20 23:29:52 ronpinkas Exp $
  */
 
 /*
@@ -49,7 +49,7 @@ static BOOL hb_compCStaticSymbolFound( char* szSymbol, int iOption );
 static BOOL hb_compSymbFound( char* szSymbol );
 static void hb_compWriteGlobalFunc( FILE *yyc, short *iLocalGlobals, short * iGlobals, BOOL );
 static void hb_compWriteDeclareGlobal( FILE *yyc, BOOL );
-static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL );
+static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL, BOOL );
 /* struct to hold symbol names of c-in-line static functions */
 typedef struct _SSYMLIST
 {
@@ -92,6 +92,8 @@ FILE *hb_comp_pCodeList = NULL;
 
 #define HB_PROTO_FUNC_STATIC  1
 #define HB_PROTO_FUNC_PUBLIC  2
+#define HB_PROTO_FUNC_INIT    3
+#define HB_PROTO_FUNC_EXIT    4
 
 void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* generates the C language output */
 {
@@ -316,11 +318,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             }
             else
             {
-               if( hb_compCStaticSymbolFound( pFunc->szName, HB_PROTO_FUNC_PUBLIC ) )
-               {
-                  fprintf( yyc, "HB_FUNC( %s );\n", pFunc->szName );
-               }
-               else
+               if( !hb_compCStaticSymbolFound( pFunc->szName, HB_PROTO_FUNC_PUBLIC ) )
                {
                   fprintf( yyc, "HB_FUNC_EXTERN( %s );\n", pFunc->szName );
                }
@@ -369,7 +367,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       /* writes the symbol table */
       /* Generate the wrapper that will initialize local symbol table
        */
-
       fprintf( yyc, "\n#undef HB_PRG_PCODE_VER\n" );
       fprintf( yyc, "#define HB_PRG_PCODE_VER %i\n", (int) HB_PCODE_VER );
 
@@ -490,7 +487,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       */
       if( pStatSymb )
       {
-         bSymFIRST = hb_compWriteExternEntries( yyc, bSymFIRST, TRUE );
+         hb_compWriteExternEntries( yyc, bSymFIRST, TRUE, TRUE );
       }
 
       /*
@@ -683,29 +680,13 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          }
 
          fprintf( yyc, "#include \"hbinit.h\"\n\n" );
-         fprintf( yyc, "#define __PRG_SOURCE__ \"%s\"\n\n", hb_comp_PrgFileName );
-
-         fprintf( yyc, "#undef HB_PRG_PCODE_VER\n" );
-         fprintf( yyc, "#define HB_PRG_PCODE_VER %i\n\n", (int) HB_PCODE_VER );
 
          hb_compGenCAddProtos( yyc );
 
-         hb_compWriteGlobalFunc( yyc, &iLocalGlobals, &iGlobals, FALSE );
-
-         fprintf( yyc, "\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_%s%s )\n", hb_comp_szPrefix, hb_comp_FileAsSymbol );
-
-         if( pStatSymb )
+         if ( hb_compWriteExternEntries( yyc, bSymFIRST, FALSE, FALSE ) )
          {
-            hb_compWriteExternEntries( yyc, bSymFIRST, FALSE );
+            hb_writeEndInit( yyc );
          }
-
-         /*
-            End of initialization codes
-         */
-         hb_writeEndInit( yyc );
-
-         hb_compWriteDeclareGlobal( yyc, FALSE );
-
       }
 
       if ( bInline )
@@ -829,7 +810,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 /*
    Write symbol entries to intialized on startup
 */
-static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine )
+static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine, BOOL bPrg )
 {
    BOOL bStartFunc = FALSE;
    BOOL bBegin = FALSE;
@@ -842,40 +823,59 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine 
 
    while( pTemp )
    {
-      BOOL bWrite;
-
-      if( !hb_compFunctionFind( pTemp->szName ) && !hb_compSymbFound( pTemp->szName ) )
+      if( !hb_compFunctionFind( pTemp->szName ) && !hb_compSymbFound( pTemp->szName ) && ( pTemp->Type & ( HB_PROTO_FUNC_PUBLIC | HB_PROTO_FUNC_EXIT | HB_PROTO_FUNC_INIT ) ) )
       {
-         switch ( pTemp->Type )
+         if( bNewLine && !bBegin )
          {
-            case HB_PROTO_FUNC_STATIC:
-               bWrite = (!hb_compCStaticSymbolFound( pTemp->szName, HB_PROTO_FUNC_STATIC ) && !hb_compCStaticSymbolFound( pTemp->szName, HB_PROTO_FUNC_PUBLIC ));
-               if( bWrite )
-               {
-                  if( bNewLine && !bBegin )
-                  {
-                     bBegin = TRUE;
-                     strcat( szEntries, ",\n" );
-                  }
-                  hb_xstrcat( szEntries, "{ \"",pTemp->szName,"\", HB_FS_STATIC, {HB_FUNCNAME( ",pTemp->szName," )}, (PHB_DYNS) 1 },\n", NULL );
-               }
-               break;
-            case HB_PROTO_FUNC_PUBLIC:
+            bBegin = TRUE;
+            strcat( szEntries, ",\n" );
+         }
+
+         if( !bNewLine && !bBegin )
+         {
+            char szVer[5];
+            bBegin = TRUE;
+            sprintf( szVer,"%i", HB_PCODE_VER );
+            hb_xstrcat( szEntries,
+               "\n#define __PRG_SOURCE__ \"",hb_comp_PrgFileName,"\"\n\n",
+               "#undef HB_PRG_PCODE_VER\n",
+               "#define HB_PRG_PCODE_VER ", szVer,"\n",
+               "\nHB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_",hb_comp_szPrefix,hb_comp_FileAsSymbol," )\n", NULL );
+         }
+
+         if ( bPrg )
+         {
+            if ( hb_compFunCallFind( pTemp->szName ) )
             {
-               if( bNewLine && !bBegin )
-               {
-                  bBegin = TRUE;
-                  strcat( szEntries, ",\n" );
-               }
                hb_xstrcat( szEntries, "{ \"",pTemp->szName,"\", HB_FS_PUBLIC", NULL );
-               if( !bSymFIRST && !bStartFunc && !hb_comp_bNoStartUp )
+
+               if( !bSymFIRST && !hb_comp_bNoStartUp && !bStartFunc )
                {
                   bStartFunc = TRUE;
                   strcat( szEntries, " | HB_FS_FIRST" );
                }
+
                hb_xstrcat( szEntries, ", {HB_FUNCNAME( ",pTemp->szName," )}, (PHB_DYNS) 1 },\n", NULL );
             }
-            break;
+         }
+         else
+         {
+            if( !bSymFIRST && !hb_comp_bNoStartUp && !bStartFunc  )
+            {
+               bStartFunc = TRUE;
+               hb_xstrcat( szEntries, "{ \"",pTemp->szName,"\", HB_FS_PUBLIC", NULL );
+               strcat( szEntries, " | HB_FS_FIRST" );
+               hb_xstrcat( szEntries, ", {HB_FUNCNAME( ",pTemp->szName," )}, (PHB_DYNS) 1 },\n", NULL );
+            }
+         }
+
+         if( pTemp->Type == HB_PROTO_FUNC_EXIT )
+         {
+            hb_xstrcat( szEntries, "{ \"",pTemp->szName,"$\", HB_FS_EXIT, {HB_EXIT_FUNCNAME( ",pTemp->szName," )}, (PHB_DYNS) 1 },\n", NULL );
+         }
+         else if( pTemp->Type == HB_PROTO_FUNC_INIT )
+         {
+            hb_xstrcat( szEntries, "{ \"",pTemp->szName,"$\", HB_FS_INIT, {HB_INIT_FUNCNAME( ",pTemp->szName," )}, (PHB_DYNS) 1 },\n", NULL );
          }
       }
 
@@ -888,7 +888,11 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine 
    {
       szEntries[ul - 2 ] = '\0';
    }
-   fprintf( yyc, szEntries );
+
+   if( bPrg || bStartFunc )
+   {
+      fprintf( yyc, szEntries );
+   }
 
    hb_xfree( szEntries );
    return ( bStartFunc );
@@ -906,7 +910,7 @@ static void hb_compWriteDeclareGlobal( FILE *yyc, BOOL bWriteVar )
       {
          if( pGlobal->szAlias == NULL )
          {
-            fprintf( yyc, "HB_ITEM %s = { 0, { { 0 } } };\n", pGlobal->szName );
+            fprintf( yyc, "HB_ITEM_NEW( %s );\n", pGlobal->szName );
          }
          else
          {
@@ -974,7 +978,15 @@ static void hb_compGenCAddProtos( FILE *yyc )
    {
       if( !hb_compFunctionFind( pTemp->szName ) )
       {
-         if ( pTemp->Type == HB_PROTO_FUNC_STATIC && !hb_compSymbFound( pTemp->szName ) )
+         if ( pTemp->Type == HB_PROTO_FUNC_EXIT )
+         {
+            fprintf( yyc, "HB_FUNC_EXIT( %s );\n",pTemp->szName);
+         }
+         else if ( pTemp->Type == HB_PROTO_FUNC_INIT )
+         {
+            fprintf( yyc, "HB_FUNC_INIT( %s );\n",pTemp->szName);
+         }
+         else if ( pTemp->Type == HB_PROTO_FUNC_STATIC && !hb_compSymbFound( pTemp->szName ) )
          {
             fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pTemp->szName );
          }
@@ -1124,7 +1136,7 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
                 sInline[3] == 'E' )
       {
          sInline += 4;
-   continue;
+         continue;
       }
       /* If it is a HB_FUNC_PTR then skip it */
       else if ( sInline[0] == '_' &&
@@ -1155,7 +1167,27 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
                 sInline[4] == 'C' )
       {
          sInline += 5;
-   continue;
+         continue;
+      }
+      /* If it is a HB_FUNC_EXIT */
+      else if ( sInline[0] == '_' &&
+                sInline[1] == 'E' &&
+                sInline[2] == 'X' &&
+                sInline[3] == 'I' &&
+                sInline[4] == 'T' )
+      {
+         iOption = HB_PROTO_FUNC_EXIT;
+         sInline += 5;
+      }
+      /* If it is a HB_FUNC_INIT */
+      else if ( sInline[0] == '_' &&
+                sInline[1] == 'I' &&
+                sInline[2] == 'N' &&
+                sInline[3] == 'I' &&
+                sInline[4] == 'T' )
+      {
+         iOption = HB_PROTO_FUNC_INIT;
+         sInline += 5;
       }
       /* If it is a HB_FUNC_STATIC we want it */
       else if ( sInline[0] == '_' &&

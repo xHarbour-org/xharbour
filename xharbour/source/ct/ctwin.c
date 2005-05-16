@@ -1,5 +1,5 @@
 /*
- * $Id: ctwin.c,v 1.2 2004/10/24 17:59:27 druzus Exp $
+ * $Id: ctwin.c,v 1.3 2004/11/02 22:10:31 oh1 Exp $
  */
 
 /*
@@ -159,7 +159,7 @@ HB_FUNC( WBOX )     /* Places a frame around the active window */
    }
    for( ; j < 8; j++ ) cBox2[ j ] = c;
 
-   if( ( i % 8 ) < 4 && j < 9 ) cBox2[ j++ ] = hb_ctGetClearB();
+   if( ( i % 8 ) < 4 && j < 9 ) cBox2[ j++ ] = (char) hb_ctGetClearB();
    cBox2[ j ] = '\0';
 
    if( wnd->ULRow - wnd->UFRow <= 1 || wnd->ULCol - wnd->UFCol <= 1 )

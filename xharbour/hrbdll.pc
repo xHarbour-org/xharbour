@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.pc,v 1.5 2005/03/03 14:16:45 andijahja Exp $
+# $Id: hrbdll.pc,v 1.8 2005/04/02 01:44:51 andijahja Exp $
 # makefile for creating Harbour.dll with PellesC compiler
 #
 
@@ -265,6 +265,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\browse.obj \
    $(OBJ_DIR)\checkbox.obj \
    $(OBJ_DIR)\cstr.obj \
+   $(OBJ_DIR)\dbdelim.obj \
    $(OBJ_DIR)\dbedit.obj \
    $(OBJ_DIR)\dbsdf.obj \
    $(OBJ_DIR)\devoutp.obj \
@@ -755,6 +756,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\browse.obj     >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\checkbox.obj   >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cstr.obj       >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\dbdelim.obj    >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dbedit.obj     >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dbsdf.obj      >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\devoutp.obj    >> harbourdll.rsp
@@ -1202,6 +1204,12 @@ $(OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dbdelim.c : $(RTL_DIR)\dbdelim.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\dbdelim.obj : $(OBJ_DIR)\dbdelim.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbedit.c : $(RTL_DIR)\dbedit.prg

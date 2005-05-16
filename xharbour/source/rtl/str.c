@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.14 2004/03/29 21:53:05 srobert Exp $
+ * $Id: str.c,v 1.15 2004/05/09 23:40:05 druzus Exp $
  */
 
 /*
@@ -118,17 +118,15 @@ HB_FUNC( STR )
 
       if( szResult )
       {
-         if ( ! bLtrim )
+         if ( bLtrim )
          {
-            hb_retcAdopt( szResult );
+            while (HB_ISSPACE(*szResult))
+            {
+               strcpy(szResult,szResult+1);
+            }
          }
-         else
-         {
-            ULONG ulLen = strlen( szResult );
-            char * szTrimmed = hb_strLTrim( szResult, &ulLen );
-            hb_retc( szTrimmed );
-            hb_xfree( szResult );
-         }
+
+         hb_retcAdopt( szResult );
       }
       else if ( ( pWidth ) && ( pDec ) && ( hb_itemGetNI( pWidth ) - ( hb_itemGetNI( pDec ) + 1) == 0 ) )
       {
@@ -136,8 +134,7 @@ HB_FUNC( STR )
         char *szTemp = (char *) hb_xgrab( iLen + 1  ) ;
         hb_xmemset( szTemp, 0 , iLen + 1 );
         hb_xmemset( szTemp, '*', iLen );
-        hb_retc( szTemp ) ;
-        hb_xfree( szTemp ) ;
+        hb_retcAdopt( szTemp ) ;
       }
       else
       {

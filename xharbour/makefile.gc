@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.6 2005/03/02 21:59:30 andijahja Exp $
+# $Id: makefile.gc,v 1.9 2005/04/02 01:44:53 andijahja Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -701,6 +701,7 @@ $(NF_LIB) : \
    $(NANFOR_OBJ_DIR)/mkdir.o \
    $(NANFOR_OBJ_DIR)/getver.o \
    $(NANFOR_OBJ_DIR)/dispc.o \
+   $(NANFOR_OBJ_DIR)/fttext.o \
    $(NANFOR_OBJ_DIR)/ftattr.o \
    $(NANFOR_OBJ_DIR)/dfile.o \
    \
@@ -1335,6 +1336,9 @@ $(NANFOR_OBJ_DIR)/ftattr.o : $(NANFOR_DIR)/ftattr.c
 	$(CC_CMD)
 
 $(NANFOR_OBJ_DIR)/dispc.o : $(NANFOR_DIR)/dispc.c
+	$(CC_CMD)
+
+$(NANFOR_OBJ_DIR)/fttext.o : $(NANFOR_DIR)/fttext.c
 	$(CC_CMD)
 
 
@@ -2559,6 +2563,7 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/color53.o \
    $(RTL_OBJ_DIR)/cstr.o \
    $(RTL_OBJ_DIR)/cstruct.o \
+   $(RTL_OBJ_DIR)/dbdelim.o \
    $(RTL_OBJ_DIR)/dbedit.o \
    $(RTL_OBJ_DIR)/dbsdf.o \
    $(RTL_OBJ_DIR)/devoutp.o \
@@ -2738,6 +2743,12 @@ $(RTL_OBJ_DIR)/dates.o : $(RTL_DIR)/dates.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/dateshb.o : $(RTL_DIR)/dateshb.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/dbdelim.c : $(RTL_DIR)/dbdelim.prg
+	$(HARBOUR_CMD)
+
+$(RTL_OBJ_DIR)/dbdelim.o : $(RTL_OBJ_DIR)/dbdelim.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/dbedit.c : $(RTL_DIR)/dbedit.prg

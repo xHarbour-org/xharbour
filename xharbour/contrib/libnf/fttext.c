@@ -1,5 +1,5 @@
 /*
- * $Id: fttext.c,v 1.6 2005/05/03 02:06:24 andijahja Exp $
+ * $Id: fttext.c,v 1.7 2005/05/03 02:47:51 andijahja Exp $
  */
 
 /*
@@ -9,7 +9,7 @@
  * Ideas by Brice de Ganahl and Steve Larsen
  * Total rework using xHarbour array implementation by Andi Jahja
  *
- * Copyright 2005 Andi Jahja <andijahja@xharboiur.com>
+ * Copyright 2005 Andi Jahja <andijahja@xharbour.com>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -64,8 +64,10 @@
 #undef HB_PRG_PCODE_VER
 #define HB_PRG_PCODE_VER HB_PCODE_VER
 
-HB_FUNC( FT_FNEW );
 HB_FUNC( FT_FUSE );
+HB_FUNC( FT_FSEEK );
+HB_FUNC( FT_FRSEEK );
+HB_FUNC( FT_FNEW );
 HB_FUNC( FT_FARRAY );
 HB_FUNC( FT_FACTIVE );
 HB_FUNC( FT_FBUFFERSIZE );
@@ -94,11 +96,17 @@ HB_FUNC( FT_FREADLN_EX );
 HB_FUNC( FT_FDELETED );
 HB_FUNC( FT_FCLOSE );
 HB_FUNC( FT_FCLOSEALL );
+
+HB_FUNC_EXTERN( ASCAN );
+HB_FUNC_EXTERN( RASCAN );
+
 HB_FUNC_INIT( FT_FINIT );
 HB_FUNC_EXIT( FT_FEXIT );
 
 HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_FTEXT )
 { "FT_FUSE", HB_FS_PUBLIC, {HB_FUNCNAME( FT_FUSE )}, (PHB_DYNS) 1 },
+{ "ASCAN", HB_FS_PUBLIC, {HB_FUNCNAME( ASCAN )}, NULL },
+{ "RASCAN", HB_FS_PUBLIC, {HB_FUNCNAME( RASCAN )}, NULL },
 { "FT_FINIT$", HB_FS_INIT, {HB_INIT_FUNCNAME( FT_FINIT )}, (PHB_DYNS) 1 },
 { "FT_FEXIT$", HB_FS_EXIT, {HB_EXIT_FUNCNAME( FT_FEXIT )}, (PHB_DYNS) 1 }
 HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_FTEXT )
@@ -147,48 +155,6 @@ static ULONG ft_flinecount ( FILE * );
 #endif
 #define DELETION_MARK ""
 #define MAX_READ 4096
-//------------------------------------------------------------------------------
-HB_FUNC( FT_FNEW )
-{
-   PHB_ITEM pNew = hb_param( 1, HB_IT_STRING );
-   FILE *inFile;
-
-   if( pNew && pNew->item.asString.length > 0 )
-   {
-      PHB_ITEM pUse;
-      HB_ITEM_NEW( fTmp );
-      HB_ITEM_NEW( fMode );
-
-      inFile = fopen( hb_parcx(1), "wb" );
-
-      if(!inFile)
-      {
-         hb_retl( FALSE );
-         return;
-      }
-      fclose( inFile );
-
-      hb_itemPutC( &fTmp, hb_parcx(1) );
-      hb_itemPutNI( &fMode, FO_READWRITE );
-
-      pUse = hb_itemDoC( "FT_FUSE", 2, &fTmp, &fMode );
-
-      if( pUse )
-      {
-         hb_itemRelease( hb_itemReturn( pUse ) );
-         hb_itemClear( &fTmp );
-         hb_itemClear( &fMode );
-      }
-      else
-      {
-         hb_retl( FALSE );
-      }
-   }
-   else
-   {
-      hb_retl( FALSE );
-   }
-}
 
 //------------------------------------------------------------------------------
 HB_FUNC( FT_FUSE )
@@ -201,11 +167,11 @@ HB_FUNC( FT_FUSE )
    #endif
 
    PHB_ITEM pInFile = hb_param( 1, HB_IT_STRING  );
-   PFT_FFILE pTemp;
-   BOOL bNewFile = FALSE;
 
    if( pInFile && pInFile->item.asString.length > 0 && iSelect > 0 )
    {
+      PFT_FFILE pTemp;
+      BOOL bNewFile = FALSE;
       HB_ITEM_NEW( pArray );
       PFT_FFILE pLast;
       HB_ITEM_NEW( pTmp );
@@ -362,6 +328,113 @@ HB_FUNC( FT_FUSE )
 }
 
 //------------------------------------------------------------------------------
+HB_FUNC( FT_FSEEK )
+{
+   PHB_ITEM pSeek = hb_param( 1, HB_IT_STRING );
+
+   if ( pCurFile && pSeek )
+   {
+      PHB_ITEM pResult = hb_itemDoC( "ASCAN", 2, &(pCurFile->pArray), pSeek );
+
+      if( pResult )
+      {
+         nCurrent = hb_itemGetNL( pResult );
+         
+         hb_retl( nCurrent > 0 );
+
+         if( !nCurrent )
+         {
+            nCurrent = (&(pCurFile->pArray))->item.asArray.value->ulLen + 1;
+         }
+
+         pCurFile->nCurrent = nCurrent;
+
+         hb_itemRelease( pResult );
+
+         return;
+      }
+   }
+
+   hb_retl( FALSE );
+}
+
+//------------------------------------------------------------------------------
+HB_FUNC( FT_FRSEEK )
+{
+   PHB_ITEM pSeek = hb_param( 1, HB_IT_STRING );
+
+   if ( pCurFile && pSeek )
+   {
+      PHB_ITEM pResult = hb_itemDoC( "RASCAN", 2, &(pCurFile->pArray), pSeek );
+
+      if( pResult )
+      {
+         nCurrent = hb_itemGetNL( pResult );
+
+         hb_retl( nCurrent > 0 );
+
+         if( !nCurrent )
+         {
+            nCurrent = (&(pCurFile->pArray))->item.asArray.value->ulLen + 1;
+         }
+
+         pCurFile->nCurrent = nCurrent;
+
+         hb_itemRelease( pResult );
+
+         return;
+      }
+   }
+
+   hb_retl( FALSE );
+}
+
+//------------------------------------------------------------------------------
+HB_FUNC( FT_FNEW )
+{
+   PHB_ITEM pNew = hb_param( 1, HB_IT_STRING );
+
+   if( pNew && pNew->item.asString.length > 0 )
+   {
+      FILE *inFile;
+      PHB_ITEM pUse;
+      HB_ITEM_NEW( fTmp );
+      HB_ITEM_NEW( fMode );
+
+      inFile = fopen( hb_parcx(1), "wb" );
+
+      if(!inFile)
+      {
+         hb_retl( FALSE );
+         return;
+      }
+
+      fclose( inFile );
+
+      pUse = hb_itemDoC( "FT_FUSE",
+         2,
+         hb_itemPutC( &fTmp, hb_parcx(1) ),
+         hb_itemPutNI( &fMode, FO_READWRITE ) );
+
+      hb_itemClear( &fTmp );
+      hb_itemClear( &fMode );
+
+      if( pUse )
+      {
+         hb_itemRelease( hb_itemReturn( pUse ) );
+      }
+      else
+      {
+         hb_retl( FALSE );
+      }
+   }
+   else
+   {
+      hb_retl( FALSE );
+   }
+}
+
+//------------------------------------------------------------------------------
 HB_FUNC ( FT_FARRAY )
 {
    if( pCurFile )
@@ -404,7 +477,6 @@ HB_FUNC ( FT_FSETNEWLINE )
 HB_FUNC( FT_FSELECT )
 {
    PHB_ITEM pSelect = hb_param( 1, HB_IT_ANY );
-   PFT_FFILE pTmp;
 
    hb_retni( iSelect );
 
@@ -413,8 +485,7 @@ HB_FUNC( FT_FSELECT )
       if( ISNUM( 1 ) )
       {
          int iNewSelect = hb_parnl( 1 );
-
-         pTmp = ft_fseekAlias( iNewSelect );
+         PFT_FFILE pTmp = ft_fseekAlias( iNewSelect );
 
          if ( pTmp == NULL )
          {
@@ -430,7 +501,7 @@ HB_FUNC( FT_FSELECT )
       }
       else if ( ISCHAR(1) )
       {
-         pTmp = ft_fseekArea( hb_parcx( 1 ) );
+         PFT_FFILE pTmp = ft_fseekArea( hb_parcx( 1 ) );
 
          if( pTmp == NULL )
          {
@@ -653,20 +724,20 @@ HB_FUNC( FT_FRECALL )
 HB_FUNC( FT_FAPPEND )
 {
    LONG lAppend = ISNUM(1) ? hb_parnl(1) : 1;
-   char *szAppend = ISCHAR(2) ? hb_parcx(2) : "";
 
    if( lAppend > 0 && pCurFile && pCurFile->bWrite )
    {
       HB_ITEM_NEW( Tmp );
       LONG lStart;
+      char *szAppend = ISCHAR(2) ? hb_parcx(2) : "";
 
       for( lStart = 1; lStart <= lAppend ; lStart ++ )
       {
          hb_arrayAddForward( &(pCurFile->pArray), hb_itemPutC(&Tmp, szAppend ) );
          hb_arrayAddForward( &(pCurFile->pOrigin), hb_itemPutC(&Tmp, szAppend ) );
-         nCurrent ++;
       }
 
+      nCurrent = (&(pCurFile->pArray))->item.asArray.value->ulLen;
       pCurFile->nCurrent = nCurrent;
       pCurFile->bChange = TRUE;
 
@@ -856,7 +927,7 @@ HB_FUNC( FT_FCLOSE )
    PFT_FFILE pTmp = NULL;
    int iOldSelect = iSelect;
 
-   if ( ISCHAR(1) )
+   if ( ISCHAR( 1 ) )
    {
       pTmp = ft_fseekArea( hb_parcx( 1 ) );
    }
@@ -865,7 +936,7 @@ HB_FUNC( FT_FCLOSE )
       int iSeek = hb_parni( 1 );
       pTmp = ft_fseekAlias( iSeek );
    }
-   else if ( ISNIL(1) )
+   else if ( ISNIL( 1 ) )
    {
       pTmp = ft_fseekAlias( iSelect );
    }
@@ -885,6 +956,11 @@ HB_FUNC( FT_FCLOSE )
       else
       {
          hb_retl( FALSE );
+      }
+
+      if( !ft_fseekActive() )
+      {
+         HB_FUNCNAME( FT_FCLOSEALL )();
       }
    }
    else

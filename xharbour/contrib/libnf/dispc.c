@@ -1,5 +1,5 @@
 /*
- * $Id: dispc.c,v 1.4 2004/12/01 00:53:02 peterrees Exp $
+ * $Id: dispc.c,v 1.5 2005/02/19 10:08:39 andijahja Exp $
  */
 
 /*
@@ -100,7 +100,7 @@ char kstr[25];              /* terminate key string                */
 int  keylist[24];           /* terminate key list                  */
 int  keytype;               /* K_STRING or K_LIST                  */
 
-int isallocated;            /* if buffers were allocated           */
+BOOL isallocated;            /* if buffers were allocated           */
 char *buffer;               /* file buffer pointer                 */
 char *lbuff;                /* line buffer pointer                 */
 char *vseg;                 /* video segment variable              */
@@ -653,7 +653,7 @@ HB_FUNC( _FT_DFINIT )
 
 HB_FUNC ( _FT_DFCLOS )
 {
-  if (isallocated == TRUE)
+  if (isallocated)
     {
       if (buffer != NULL) hb_xfree(buffer); /* free up allocated buffer memory */
       if (lbuff != NULL)  hb_xfree(lbuff);
@@ -730,7 +730,7 @@ HB_FUNC( FT_DISPFILE )
     int ch;
 
     /* make sure buffers were allocated and file was opened */
-    if (isallocated == TRUE && infile > 0)
+    if (isallocated && infile > 0)
       {
         done    = NO;
         refresh = YES;

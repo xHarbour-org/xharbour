@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.dc,v 1.3 2005/03/02 21:59:30 andijahja Exp $
+# $Id: makefile.dc,v 1.7 2005/04/02 01:44:53 andijahja Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -388,6 +388,7 @@ NF_LIB_OBJS = \
    $(NF_OBJ_DIR)\getver.obj \
    \
    $(NF_OBJ_DIR)\dispc.obj \
+   $(NF_OBJ_DIR)\fttext.obj \
    $(NF_OBJ_DIR)\ftattr.obj \
    $(NF_OBJ_DIR)\dfile.obj
 
@@ -963,6 +964,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\browse.obj \
    $(RTL_OBJ_DIR)\checkbox.obj \
    $(RTL_OBJ_DIR)\cstr.obj \
+   $(RTL_OBJ_DIR)\dbdelim.obj \
    $(RTL_OBJ_DIR)\dbedit.obj \
    $(RTL_OBJ_DIR)\dbsdf.obj \
    $(RTL_OBJ_DIR)\devoutp.obj \
@@ -1292,6 +1294,7 @@ $(NF_LIB) : $(NF_LIB_OBJS)
    $(ECHO) $(NF_OBJ_DIR)\mkdir.obj >> nf.rsp
    $(ECHO) $(NF_OBJ_DIR)\getver.obj >> nf.rsp
    $(ECHO) $(NF_OBJ_DIR)\dispc.obj >> nf.rsp
+   $(ECHO) $(NF_OBJ_DIR)\fttext.obj >> nf.rsp
    $(ECHO) $(NF_OBJ_DIR)\ftattr.obj >> nf.rsp
    $(ECHO) $(NF_OBJ_DIR)\dfile.obj >> nf.rsp
    $(DMLIB) -c $(NF_LIB) @nf.rsp
@@ -1568,6 +1571,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\browse.obj   >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\checkbox.obj >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\cstr.obj     >> dmcrtl.rsp
+   $(ECHO) $(RTL_OBJ_DIR)\dbdelim.obj  >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dbedit.obj   >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dbsdf.obj    >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\devoutp.obj  >> dmcrtl.rsp
@@ -2305,6 +2309,12 @@ $(RTL_OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\dbdelim.c : $(RTL_DIR)\dbdelim.prg
+   $(HARBOUR_CMD)
+
+$(RTL_OBJ_DIR)\dbdelim.obj : $(RTL_OBJ_DIR)\dbdelim.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\dbedit.c : $(RTL_DIR)\dbedit.prg
@@ -4555,6 +4565,9 @@ $(NF_OBJ_DIR)\ftattr.obj : $(NF_DIR)\ftattr.c
    $(CC_CMD)
 
 $(NF_OBJ_DIR)\dispc.obj : $(NF_DIR)\dispc.c
+   $(CC_CMD)
+
+$(NF_OBJ_DIR)\fttext.obj : $(NF_DIR)\fttext.c
    $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿

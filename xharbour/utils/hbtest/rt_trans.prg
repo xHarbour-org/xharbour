@@ -1,5 +1,5 @@
 /*
- * $Id: rt_trans.prg,v 1.1.1.1 2001/12/21 10:44:54 ronpinkas Exp $
+ * $Id: rt_trans.prg,v 1.2 2003/07/18 03:17:54 andijahja Exp $
  */
 
 /*
@@ -429,8 +429,8 @@ FUNCTION Main_TRANS()
    TEST_LINE( Transform(10, "@BZ $99999")                  , "$   10"                      )
    TEST_LINE( Transform(10, "@BX $99999")                  , "$   10"                      )
    TEST_LINE( Transform(0, "@BZX $99999")                  , "      "                      )
-   TEST_LINE( Transform(-10, "@B(X $99999")                , "(10) DB   "                  )
-   TEST_LINE( Transform(-10, "@(X $99999")                 , "(   10) DB"                  )
+   TEST_LINE( Transform(-10, "@B(X $99999")                , "$(  10) DB"                  )
+   TEST_LINE( Transform(-10, "@(X $99999")                 , "$(  10) DB"                  )
    TEST_LINE( Transform(0, "@B(X $99999")                  , "$    0"                      )
    TEST_LINE( Transform(0, "@B(ZX $99999")                 , "      "                      )
 

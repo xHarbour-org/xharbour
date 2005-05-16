@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.57 2005/04/22 18:36:08 guerra000 Exp $
+ * $Id: arrayshb.c,v 1.58 2005/04/23 06:52:18 guerra000 Exp $
  */
 
 /*
@@ -198,7 +198,21 @@ HB_FUNC( ASIZE )
 #ifdef HB_COMPAT_C53 /* From CA-Cl*pper 5.3a */
    else
    {
+#if 0
       hb_errRT_BASE( EG_ARG, 2023, NULL, "ASIZE", HB_MIN( hb_pcount(), 2 ), hb_paramError( 1 ), hb_paramError( 2 ) );
+#else
+      if ( hb_pcount() == 0 )
+      {
+         HB_ITEM_NEW( Err1 );
+         HB_ITEM_NEW( Err2 );
+
+         hb_errRT_BASE( EG_ARG, 2023, NULL, "ASIZE", 2, &Err1, &Err2 );
+      }
+      else
+      {
+         hb_errRT_BASE( EG_ARG, 2023, NULL, "ASIZE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
+#endif
    }
 #endif
 }
@@ -296,10 +310,11 @@ HB_FUNC( ADEL )
 HB_FUNC( AFILL )
 {
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pValue = NULL;
 
    if( pArray )
    {
-      PHB_ITEM pValue = hb_param( 2, HB_IT_ANY );
+      pValue = hb_param( 2, HB_IT_ANY );
 
       if( pValue )
       {
@@ -393,8 +408,17 @@ HB_FUNC( AFILL )
                thrown by AEVAL().  [vszakats] */
         hb_errRT_BASE( EG_ARG, 2017, NULL, "AEVAL", HB_MIN( hb_pcount(), 4 ), hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
       #else
+#if 0
         hb_errRT_BASE( EG_ARG, 9999, NULL, "AFILL", HB_MIN( hb_pcount(), 4 ), hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
+#else
+        HB_ITEM_NEW( Err1 );
+        HB_ITEM_NEW( Err2 );
+        HB_ITEM_NEW( Err3 );
+        HB_ITEM_NEW( Err4 );
+
+        hb_errRT_BASE( EG_ARG, 9999, NULL, "AFILL", 4, pArray ? hb_paramError( 1 ) : &Err1, pValue ? hb_paramError( 2 ) : &Err2, &Err3, &Err4 );
       #endif
+#endif
    }
 }
 
@@ -448,7 +472,10 @@ HB_FUNC( AEVAL )
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 2017, NULL, "AEVAL", HB_MIN( hb_pcount(), 4 ), hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
+      HB_ITEM_NEW( Err1 );
+      HB_ITEM_NEW( Err2 );
+
+      hb_errRT_BASE( EG_ARG, 2017, NULL, "AEVAL", 4, pArray ? hb_paramError( 1 ) : &Err1, pBlock ? hb_paramError( 2 ) : &Err2, hb_paramError( 3 ), hb_paramError( 4 ) );
    }
 }
 
@@ -576,9 +603,7 @@ HB_FUNC( HB_AEXPRESSIONS )
          case ',' :
             if( iParans == 0 && iArrays == 0 && iIndexs == 0 )
             {
-               HB_ITEM Exp;
-
-               Exp.type = HB_IT_NIL;
+               HB_ITEM_NEW ( Exp );
 
                hb_arrayAddForward( &(HB_VM_STACK).Return, hb_itemPutCL( &Exp, pLine->item.asString.value + iOffset, i - iOffset ) );
                iOffset = i + 1;
@@ -595,9 +620,7 @@ HB_FUNC( HB_AEXPRESSIONS )
 
    if( iOffset < pLine->item.asString.length - 1 )
    {
-      HB_ITEM Exp;
-
-      Exp.type = HB_IT_NIL;
+      HB_ITEM_NEW ( Exp );
 
       hb_arrayAddForward( &(HB_VM_STACK).Return, hb_itemPutCL( &Exp, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
 
@@ -611,13 +634,12 @@ HB_FUNC( HB_ATOKENS )
 
    if( pLine )
    {
-      HB_ITEM Token;
+      HB_ITEM_NEW ( Token );
       char cDelimiter = pDelim ? pDelim->item.asString.value[0] : 32;
       size_t i, iOffset = 0;
       BOOL bSkipStrings = hb_parl( 3 );
       BOOL bDoubleQuoteOnly = hb_parl( 4 );
 
-      Token.type = HB_IT_NIL;
       HB_VM_STACK.Return.type = HB_IT_NIL;
       hb_arrayNew( &(HB_VM_STACK.Return), 0 );
 
@@ -734,9 +756,8 @@ unsigned int SizeOfCStructure( PHB_ITEM aDef, unsigned int uiAlign )
 
          default:
          {
-            HB_ITEM ID;
+            HB_ITEM_NEW ( ID );
 
-            ID.type = HB_IT_NIL;
             hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
 
             if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value >= CTYPE_STRUCTURE_PTR )
@@ -977,10 +998,9 @@ BYTE * ArrayToStructure( PHB_ITEM aVar, PHB_ITEM aDef, unsigned int uiAlign, uns
 
          default:
          {
-            HB_ITEM ID;
+            HB_ITEM_NEW ( ID );
 
-             ID.type = HB_IT_NIL;
-             hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
+            hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
 
             if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value >= CTYPE_STRUCTURE_PTR )
             {
@@ -1664,10 +1684,9 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
 
          default:
          {
-            HB_ITEM ID;
+            HB_ITEM_NEW ( ID );
 
-             ID.type = HB_IT_NIL;
-             hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
+            hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
 
             if( ( pBaseDef->pItems + ulIndex )->item.asInteger.value > CTYPE_STRUCTURE_PTR )
             {
@@ -1816,11 +1835,10 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
 
          default:
          {
-            HB_ITEM ID;
+            HB_ITEM_NEW ( ID );
             PHB_ITEM pStructure;
             unsigned int uiNestedSize /*, uiNestedAlign */ ;
 
-            ID.type = HB_IT_NIL;
             hb_itemPutNI( &ID, ( pBaseDef->pItems + ulIndex )->item.asInteger.value );
 
             pStructure = hb_itemDoC( "HB_CSTRUCTUREFROMID", 1, &ID );

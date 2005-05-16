@@ -1,5 +1,5 @@
 /*
- * $Id: settime.c,v 1.2 2004/11/24 12:01:22 modalsist Exp $
+ * $Id: settime.c,v 1.3 2005/01/30 21:58:03 druzus Exp $
  *
  * xHarbour Project source code:
  * CT3 Date & Time supplementary functions:
@@ -78,14 +78,14 @@ HB_FUNC ( SETNEWDATE )
 #if defined(HB_OS_WIN_32)
 {
    WORD wNewYear,wNewMonth,wNewDay,wNewDayOfWeek;
-   BOOL lMode;
+   // BOOL lMode;
    SYSTEMTIME st;
 
    wNewYear = hb_parni(1);
    wNewMonth = hb_parni(2);
    wNewDay = hb_parni(3);
    wNewDayOfWeek = hb_parni(4);
-   lMode = hb_parl(5);
+   // lMode = hb_parl(5);
 
    GetLocalTime(&st) ;
 
@@ -127,13 +127,13 @@ HB_FUNC ( SETNEWTIME )
 #if defined(HB_OS_WIN_32)
 {
    WORD wNewHour,wNewMin,wNewSec;
-   BOOL lMode;
+   // BOOL lMode;
    SYSTEMTIME st ;
 
    wNewHour = (WORD) hb_parni(1);
    wNewMin = (WORD) hb_parni(2);
    wNewSec = (WORD) hb_parni(3);
-   lMode = (BOOL) hb_parl(4);
+   // lMode = (BOOL) hb_parl(4);
 
    GetLocalTime(&st) ;
 
@@ -142,7 +142,7 @@ HB_FUNC ( SETNEWTIME )
    st.wSecond = wNewSec ;
 
    hb_retl ( SetLocalTime(&st) );
-}   
+}
 #elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
 /* stime exists only in SVr4, SVID, X/OPEN and Linux */
 {
