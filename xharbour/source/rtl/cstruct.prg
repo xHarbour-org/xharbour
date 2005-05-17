@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.38 2005/03/08 17:47:01 mauriliolongo Exp $
+ * $Id: cstruct.prg,v 1.39 2005/03/09 01:51:56 ronpinkas Exp $
  */
 
 /*
@@ -618,6 +618,11 @@ STATIC Function AsString()
 
    FOR EACH cChar IN QSelf()
       IF HB_EnumIndex() > nLen
+         EXIT
+      ENDIF
+
+      IF cChar == 0
+         cString := Left( cString, HB_EnumIndex() - 1 )
          EXIT
       ENDIF
 
