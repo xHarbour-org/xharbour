@@ -1,5 +1,5 @@
 /*
- * $Id: dattime3.prg,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: dattime3.prg,v 1.3 2005/05/17 12:30:00 modalsist Exp $
  */
 
 /*
@@ -9,9 +9,9 @@
  * SETDATE, SETTIME, SHOWTIME, TIMEVALID
  *
  * Copyright 2003 Carlos Eduardo Brock <brock_carlos@yahoo.com.br>
- * Author of any supplementary functions to ShowTime().
+ * Author of ShowTime supplementary functions.
  *
- * Copyright 2004 Eduardo Fernandes <eduardo@modalsistemas.com.br>
+ * Copyright 2005 Eduardo Fernandes <modalsist@yahoo.com.br>
  * Author of SetDate, SetTime, TimeValid and WaitPeriod.
  * Author, in conjointly with Carlos Eduardo Brock, of ShowTime.
  *
@@ -58,32 +58,36 @@
  *
  */
 #include "common.ch"
-STATIC aH_Timers := {}, nHandle, lHandle
 
-***************************************************************************
+STATIC aH_Timers := {}
+STATIC nHandle
+STATIC lHandle
+
+*--------------------------------------------------------------------------
 FUNCTION ShowTime( nRow , nCol , lHideSeconds , cColor , lTwelve , lAmPm  )
-***************************************************************************
+*--------------------------------------------------------------------------
    Local nColMax
 
-   IF valtype(nRow)==NIL .and.;
-      valtype(nCol)==NIL .and.;
-      valtype(lHideSeconds)==NIL .and.;
-      valtype(cColor)==NIL .and.;
-      valtype(lTwelve)==NIL .and.;
-      valtype(lAmPm)==NIL
+   IF valtype(nRow)=="U" .and.;
+      valtype(nCol)=="U" .and.;
+      valtype(lHideSeconds)=="U" .and.;
+      valtype(cColor)=="U" .and.;
+      valtype(lTwelve)=="U" .and.;
+      valtype(lAmPm)=="U"
 
-      hb_ShowTimeOff()
-
+      if nHandle != NIL
+         hb_ShowTimeOff()
+      endif
+      
    ELSE
 
       default nrow         TO row()
-      default nCol         TO  Col()    
+      default nCol         TO Col()    
       default lHideSeconds TO .F.
       default cColor       TO setcolor()
       default lTwelve      TO .F.
       default lAmPm        TO .F.
  
-
 
       IF nRow < 0
          nRow := 0
@@ -104,19 +108,21 @@ FUNCTION ShowTime( nRow , nCol , lHideSeconds , cColor , lTwelve , lAmPm  )
 
 RETURN ""
 
-
+*-------------------------------
 STATIC FUNCTION hb_ShowTimeOff()
-// supplementary showtime FUNCTION
+*-------------------------------
+
    hb_ShowTimeEvent( "*", .F. )
 
 RETURN NIL
 
+*---------------------------------------------------------------------------------------
 STATIC FUNCTION hb_ShowTimeClock( nRow, nCol , cColor , lHideSeconds , lTwelve , lAmPm )
-// supplementary showtime FUNCTION
-   Local cTime := ""
-   Local cShowTime := ""
-   Local cHour := ""
-   Local cAmPm
+*---------------------------------------------------------------------------------------
+Local cTime := ""
+Local cShowTime := ""
+Local cHour := ""
+Local cAmPm
 
    IF cTime <> Time()
 
@@ -142,9 +148,10 @@ STATIC FUNCTION hb_ShowTimeClock( nRow, nCol , cColor , lHideSeconds , lTwelve ,
 
 RETURN NIL
 
+*----------------------------------------------------------------
 STATIC FUNCTION hb_ShowTimeEvent( cIDName, lActiv, bCode, nTime )
-// supplementary showtime FUNCTION
-   Local nHPos
+*----------------------------------------------------------------
+Local nHPos
 
    IF ValType( cIDName ) == "U" .AND. ValType( lActiv ) == "U"
       RETURN lHandle
@@ -165,7 +172,7 @@ STATIC FUNCTION hb_ShowTimeEvent( cIDName, lActiv, bCode, nTime )
 
       nHPos := 0
 
-      IF ! lActiv
+      IF !lActiv
          HB_IdleDel( nHandle )
          lHandle := .F.
          nHandle := NIL
@@ -196,9 +203,11 @@ STATIC FUNCTION hb_ShowTimeEvent( cIDName, lActiv, bCode, nTime )
 
 RETURN lHandle
 
-STATIC FUNCTION hb_ShowTime_Eval_Event( )
-   Local nI, nC := Col(), nR := Row()
-   STATIC nCont := 0
+*---------------------------------------
+STATIC FUNCTION hb_ShowTime_Eval_Event()
+*---------------------------------------
+Local nI, nC := Col(), nR := Row()
+STATIC nCont := 0
 
    nCont ++
    For nI := 1 To Len( aH_Timers )
@@ -216,9 +225,10 @@ STATIC FUNCTION hb_ShowTime_Eval_Event( )
 
 RETURN NIL
 
+*------------------------------------------
 STATIC FUNCTION hb_ShowTimeProxExc( nTime )
-// Showtime FUNCTION sypplementary
-   Local cNext, nSec, cDays, dData := Date()
+*------------------------------------------
+Local cNext, nSec, cDays, dData := Date()
 
    IF valtype(nTime)=="U"
       nTime := 0
@@ -237,9 +247,9 @@ STATIC FUNCTION hb_ShowTimeProxExc( nTime )
 RETURN cNext
 
 
-*********************************
+*--------------------------------
 FUNCTION SetDate( dDate , lMode )
-*********************************
+*--------------------------------
    Local nYear,nMonth,nDay,nDoW,lRet := .F.
 
    IF valtype( lMode ) != "L"
@@ -256,9 +266,9 @@ FUNCTION SetDate( dDate , lMode )
 
 RETURN lRet
 
-*********************************
+*-------------------------------
 FUNCTION SetTime( cTime, lMode )
-*********************************
+*-------------------------------
    Local nNewHour,nNewMin,nNewSec,lRet := .F.
 
    IF valtype( lMode ) != "L"
@@ -275,9 +285,9 @@ FUNCTION SetTime( cTime, lMode )
 RETURN lRet
 
 
-***************************
+*--------------------------
 FUNCTION TimeValid( cTime )
-***************************
+*--------------------------
    Local nHour,nMin,nSec
    Local cHour,cMin,cSec
 

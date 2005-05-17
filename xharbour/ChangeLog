@@ -1,10 +1,15 @@
- * $Id: ChangeLog,v 1.4123 2005/05/16 21:24:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4125 2005/05/17 13:12:00 modalsist Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-17 13:08 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/ct/dattime3.prg
+  ! fix in showtime() function that was not disabling when we call
+    showtime() without arguments.
 
 2005-05-17 04.40 UTC+0700 Andi Jahja <andijahja@xharbour.com>
   * hrbdll.dc
