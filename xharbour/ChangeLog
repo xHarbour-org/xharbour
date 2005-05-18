@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4125 2005/05/17 16:11:44 modalsist Exp $
+ * $Id: ChangeLog,v 1.4126 2005/05/17 23:51:59 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-18 11:10 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/compiler/harbour.slx
+    ! Fixed silly, long stamding, quiet bug.
 
 2005-05-17 16:51 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/cstruct.prg

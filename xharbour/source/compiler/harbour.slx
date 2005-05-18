@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.65 2005/04/01 20:16:31 andijahja Exp $
+ * $Id: harbour.slx,v 1.66 2005/04/27 20:20:27 ronpinkas Exp $
  */
 
 /*
@@ -836,10 +836,9 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
             else if( ( tmpPtr = strchr( yytext, '.' ) ) == NULL ) /* Left Search. */
             {
                /* Remove the '&'. */
-               yytext++;
                yyleng--;
 
-               yylval.string = hb_compIdentifierNew( yytext, TRUE );
+               yylval.string = hb_compIdentifierNew( yytext + 1, TRUE );
                iElement = MACROVAR;
             }
             else if( tmpPtr == yytext + yyleng - 1 )
@@ -847,11 +846,10 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
                /* The only '.' is last char, so Simple Macro. */
 
                /* Remove the '&' and the '.' */
-               yytext++;
                yyleng -= 2;
-               yytext[yyleng] = '\0';
+               yytext[yyleng + 1] = '\0';
 
-               yylval.string = hb_compIdentifierNew( yytext, TRUE );
+               yylval.string = hb_compIdentifierNew( yytext + 1, TRUE );
                iElement = MACROVAR;
             }
             else
