@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.110 2005/05/06 23:45:07 druzus Exp $
+ * $Id: dbfntx1.c,v 1.111 2005/05/19 02:20:17 druzus Exp $
  */
 
 /*
@@ -736,7 +736,7 @@ static BOOL hb_ntxInBottomScope( LPTAGINFO pTag, char* key )
  */
 static BOOL hb_ntxKeyInScope( LPTAGINFO pTag, LPKEYINFO pKey )
 {
-   return hb_ntxInTopScope( pTag, pKey->key ) && 
+   return hb_ntxInTopScope( pTag, pKey->key ) &&
           hb_ntxInBottomScope( pTag, pKey->key );
 }
 
@@ -842,13 +842,13 @@ static void hb_ntxTagRefreshScope( LPTAGINFO pTag )
    if ( hb_itemType( pTag->top.scopeItem ) == HB_IT_BLOCK )
    {
       pItem = hb_vmEvalBlock( pTag->top.scopeItem );
-      pTag->top.scopeKey = hb_ntxKeyPutItem( pTag->top.scopeKey, pItem, 
+      pTag->top.scopeKey = hb_ntxKeyPutItem( pTag->top.scopeKey, pItem,
                pTag->top.scopeKey->Xtra, pTag, TRUE, &pTag->top.scopeKeyLen );
    }
    if ( hb_itemType( pTag->bottom.scopeItem ) == HB_IT_BLOCK )
    {
       pItem = hb_vmEvalBlock( pTag->bottom.scopeItem );
-      pTag->bottom.scopeKey = hb_ntxKeyPutItem( pTag->bottom.scopeKey, pItem, 
+      pTag->bottom.scopeKey = hb_ntxKeyPutItem( pTag->bottom.scopeKey, pItem,
          pTag->bottom.scopeKey->Xtra, pTag, TRUE, &pTag->bottom.scopeKeyLen );
    }
 }
@@ -878,7 +878,7 @@ static void hb_ntxPageCheckKeys( LPPAGEINFO pPage, LPTAGINFO pTag, int iPos, int
 
    for ( u = 1; u < pPage->uiKeys; u++ )
    {
-      i = hb_ntxValCompare( pTag, 
+      i = hb_ntxValCompare( pTag,
                             hb_ntxGetKeyVal( pPage, u - 1 ), pTag->KeyLength,
                             hb_ntxGetKeyVal( pPage, u ), pTag->KeyLength, TRUE );
       if( !pTag->AscendKey )
@@ -1184,7 +1184,7 @@ static ERRCODE hb_ntxHeaderRead( LPNTXINDEX pIndex )
    usVersion = HB_GET_LE_UINT16( Header.version );
    ulRootPage = HB_GET_LE_UINT32( Header.root );
    pIndex->NextAvail = HB_GET_LE_UINT32( Header.next_page );
-   if ( pIndex->Version != usVersion || 
+   if ( pIndex->Version != usVersion ||
         ulRootPage != pIndex->CompoundTag->RootBlock )
    {
       hb_ntxDiscardBuffers( pIndex->CompoundTag );
@@ -1466,7 +1466,7 @@ static BOOL hb_ntxIndexLockWrite( LPTAGINFO pTag )
    LPNTXINDEX pIndex = pTag->Owner;
    BOOL fOK;
 
-   if ( pIndex->fReadonly )
+   if ( pIndex->Owner->fReadonly )
       hb_errInternal( 9101, "hb_ntxIndexLockWrite: readonly index.", "", "" );
    if ( pIndex->lockRead )
       hb_errInternal( 9105, "hb_ntxIndexLockWrite: writeLock after readLock.", "", "" );
@@ -2585,7 +2585,7 @@ static LPTAGINFO hb_ntxFindTag( NTXAREAP pArea, PHB_ITEM lpOrder )
             pTag = pTag->pNext;
          } while( pTag );
       }
-      else 
+      else
       {
          int iNum = hb_itemGetNI( lpOrder ), iCount = 0;
          while ( pTag && ++iCount != iNum )
@@ -2740,7 +2740,7 @@ static BOOL hb_ntxOrdSkipUnique( LPTAGINFO pTag, LONG lDir )
                hb_ntxTagSkipPrev( pTag );
             fOut = pTag->TagEOF || pTag->TagBOF;
          }
-         while ( !fOut && hb_ntxValCompare( pTag, 
+         while ( !fOut && hb_ntxValCompare( pTag,
                                        pTag->CurKeyInfo->key, pTag->KeyLength,
                                        keyVal, pTag->KeyLength, TRUE ) == 0 );
       }
@@ -2991,7 +2991,7 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pItem, BOOL fFi
          else if ( ! hb_ntxInTopScope( pArea->lpCurTag, pArea->lpCurTag->CurKeyInfo->key ) )
          {
             hb_ntxTagGoTop( pArea->lpCurTag );
-            if ( pArea->lpCurTag->CurKeyInfo->Xtra == 0 || 
+            if ( pArea->lpCurTag->CurKeyInfo->Xtra == 0 ||
                  pArea->lpCurTag->TagEOF )
                fEOF = TRUE;
          }
@@ -3014,7 +3014,7 @@ static ERRCODE ntxSeek( NTXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pItem, BOOL fFi
             }
          }
       }
-      if( retval != FAILURE && ( fEOF || 
+      if( retval != FAILURE && ( fEOF ||
           !hb_ntxKeyInScope( pArea->lpCurTag, pArea->lpCurTag->CurKeyInfo ) ) )
       {
          retval = SELF_GOTO( ( AREAP ) pArea, 0 );
@@ -3705,7 +3705,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
                hb_itemClear( pInfo->itmResult );
             break;
          case DBOI_SKIPUNIQUE:
-            hb_itemPutL( pInfo->itmResult, hb_ntxOrdSkipUnique( pTag, 
+            hb_itemPutL( pInfo->itmResult, hb_ntxOrdSkipUnique( pTag,
                                           hb_itemGetNL( pInfo->itmNewVal ) ) );
             break;
       }
@@ -3723,7 +3723,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
          }
          case DBOI_POSITION:
             if( pInfo->itmNewVal && hb_itemType( pInfo->itmNewVal ) & HB_IT_NUMERIC )
-               hb_itemPutL( pInfo->itmResult, SELF_GOTO( ( AREAP ) pArea, 
+               hb_itemPutL( pInfo->itmResult, SELF_GOTO( ( AREAP ) pArea,
                               hb_itemGetNL( pInfo->itmNewVal ) ) == SUCCESS );
             else
                SELF_RECNO( ( AREAP ) pArea, pInfo->itmResult );
@@ -4683,8 +4683,8 @@ static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, SHORT* numRecinBuf,
       {
          ULONG ulBufLen = pArea->uiRecordLen  * 10;
          hb_fsSeekLarge( pArea->hDataFile,
-                         ( HB_FOFFSET ) pArea->uiHeaderLen + 
-                         ( HB_FOFFSET ) pArea->uiRecordLen * 
+                         ( HB_FOFFSET ) pArea->uiHeaderLen +
+                         ( HB_FOFFSET ) pArea->uiRecordLen *
                          ( HB_FOFFSET ) ( ulRecNo - 1 ), FS_SET );
          hb_fsReadLarge( pArea->hDataFile, readBuffer, ulBufLen );
       }
@@ -4703,7 +4703,7 @@ static BOOL hb_ntxReadBuf( NTXAREAP pArea, BYTE* readBuffer, SHORT* numRecinBuf,
       if( lpdbOrdCondInfo->fUseCurrent && pArea->fEof )
          return FALSE;
 
-      if( lpdbOrdCondInfo->itmCobWhile && 
+      if( lpdbOrdCondInfo->itmCobWhile &&
           !hb_ntxEvalCond( pArea, lpdbOrdCondInfo->itmCobWhile, FALSE ) )
          return FALSE;
 
