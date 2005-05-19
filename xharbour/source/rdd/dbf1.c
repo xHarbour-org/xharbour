@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.119 2005/05/10 10:22:27 druzus Exp $
+ * $Id: dbf1.c,v 1.120 2005/05/10 20:55:44 druzus Exp $
  */
 
 /*
@@ -1133,7 +1133,7 @@ static ERRCODE hb_dbfGetRec( DBFAREAP pArea, BYTE ** pBuffer )
 
    if ( pBuffer != NULL )
    {
-      *pBuffer = pArea->pRecord + 1;
+      *pBuffer = pArea->pRecord;
    }
    else
    {
@@ -1387,7 +1387,7 @@ static ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer )
          return FAILURE;
 
       /* Copy data to buffer */
-      memcpy( pArea->pRecord + 1, pBuffer, pArea->uiRecordLen );
+      memcpy( pArea->pRecord, pBuffer, pArea->uiRecordLen );
    }
    else /* if( pArea->fRecordChanged ) */
    {

@@ -1,10 +1,46 @@
- * $Id: ChangeLog,v 1.4126 2005/05/17 23:51:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4127 2005/05/18 18:11:21 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-19 04:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapifs.h
+  * xharbour/source/rtl/filesys.c
+  * xharbour/source/rtl/philes.c
+    + added DISABLEWAITLOCKS( [ <lNewSet> ] ) -> <lOldSet>
+      which disable waiting locks in Windows
+      It is workaround for delay problem which appears in Windows network
+      server but for sure it's not sth what should be done on xHarbour
+      level. Maybe somewhere in the future MS fix it. For samba it is
+      possible to create a hack with the cost of strict compatibility.
+
+  * xharbour/source/rdd/dbf1.c
+    ! reverted last modification in PUTREC()/GETREC() method which
+      broke the DBF SORT() method - they will have to wait to the
+      moment when I'll rewrite DBF SORT().
+
+  * xharbour/include/hbrddcdx.h
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! set the key/for expression to Clipper limit (255) bytes.
+      It is possible in CDX but it breaks documented limit which is 220
+      due to limitation in IDX header. In fact Clipper allows 256 bytes
+      but I do not want to make it because some other drivers may need
+      trailing 0 byte in stored expression.
+    ! added error message when someone wants to create new tag in index
+      open in read only mode - it avoids infinite locking in POSIX systems.
+    ! when new index is created with ADDITIVE clause and it is production
+      index then always keep it as first - CL53 compatible.
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! added error message when someone wants to write to index open in
+      read only mode - it avoids infinite locking in POSIX systems.
+
+  * xharbour/include/hbrddfpt.h
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * minor cleanup in last modification
 
 2005-05-18 11:10 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/compiler/harbour.slx

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.202 2005/05/10 10:22:27 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.203 2005/05/10 20:55:45 druzus Exp $
  */
 
 /*
@@ -896,7 +896,7 @@ static BOOL hb_cdxEvalSeekCond( LPCDXTAG pTag, PHB_ITEM pCondItem )
  */
 static USHORT hb_cdxFieldIndex( CDXAREAP pArea, char * cExpr )
 {
-   char szKeyExpr[ CDX_MAXKEY + 1 ],
+   char szKeyExpr[ CDX_MAXEXP + 1 ],
         szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
    int i, j, l, n = 0;
 
@@ -905,7 +905,7 @@ static USHORT hb_cdxFieldIndex( CDXAREAP pArea, char * cExpr )
    else
       l = 0;
 
-   hb_strncpyUpperTrim( szKeyExpr, cExpr, CDX_MAXKEY );
+   hb_strncpyUpperTrim( szKeyExpr, cExpr, CDX_MAXEXP );
 
    /*
     * strip the _FIELD-> and FIELD-> prefix, it could be nested so repeat
@@ -1441,6 +1441,8 @@ static BOOL hb_cdxIndexLockWrite( LPCDXINDEX pIndex )
 {
    BOOL ret;
 
+   if ( pIndex->fReadonly )
+      hb_errInternal( 9101, "hb_cdxIndexLockWrite: readonly index.", "", "" );
    if ( pIndex->lockRead )
       hb_errInternal( 9105, "hb_cdxIndexLockWrite: writeLock after readLock.", "", "" );
    if ( pIndex->lockWrite > 0 )
@@ -3621,8 +3623,8 @@ static void hb_cdxTagLoad( LPCDXTAG pTag )
    pTag->Custom    = ( pTag->OptFlags & CDX_TYPE_CUSTOM ) != 0;
    pTag->AscendKey = pTag->UsrAscend = ( HB_GET_LE_UINT16( tagHeader.ascendFlg ) == 0 );
    pTag->UsrUnique = FALSE;
-   pTag->KeyExpr   = ( char * ) hb_xgrab( CDX_MAXKEY + 1 );
-   hb_strncpyTrim( pTag->KeyExpr, ( const char * ) tagHeader.keyExpPool, CDX_MAXKEY );
+   pTag->KeyExpr   = ( char * ) hb_xgrab( CDX_MAXEXP + 1 );
+   hb_strncpyTrim( pTag->KeyExpr, ( const char * ) tagHeader.keyExpPool, CDX_MAXEXP );
 
    if ( pTag->OptFlags & CDX_TYPE_STRUCTURE || ! *pTag->KeyExpr )
       return;
@@ -3649,9 +3651,9 @@ static void hb_cdxTagLoad( LPCDXTAG pTag )
    /* Check if there is a FOR expression: pTag->OptFlags & CDX_TYPE_FORFILTER */
    if ( tagHeader.keyExpPool[ uiForPos ] != 0 )
    {
-      pTag->ForExpr = ( char * ) hb_xgrab( CDX_MAXKEY + 1 );
+      pTag->ForExpr = ( char * ) hb_xgrab( CDX_MAXEXP + 1 );
       hb_strncpyTrim( pTag->ForExpr, ( const char * ) tagHeader.keyExpPool +
-                      uiForPos, CDX_MAXKEY );
+                      uiForPos, CDX_MAXEXP );
       if ( SELF_COMPILE( ( AREAP ) pTag->pIndex->pArea, ( BYTE * ) pTag->ForExpr ) == FAILURE )
          pTag->RootBlock = 0; /* To force RT error - index corrupted */
       else
@@ -4604,15 +4606,15 @@ static LPCDXTAG hb_cdxIndexCreateTag( BOOL fStruct, LPCDXINDEX pIndex,
       hb_cdxMakeSortTab( pTag->pIndex->pArea );
    if ( KeyExp != NULL )
    {
-      pTag->KeyExpr = ( char * ) hb_xgrab( CDX_MAXKEY + 1 );
-      hb_strncpyTrim( pTag->KeyExpr, KeyExp, CDX_MAXKEY );
+      pTag->KeyExpr = ( char * ) hb_xgrab( CDX_MAXEXP + 1 );
+      hb_strncpyTrim( pTag->KeyExpr, KeyExp, CDX_MAXEXP );
       pTag->nField = hb_cdxFieldIndex( pTag->pIndex->pArea, pTag->KeyExpr );
    }
    pTag->pKeyItem = pKeyItem;
    if ( ForExp != NULL )
    {
-      pTag->ForExpr = ( char * ) hb_xgrab( CDX_MAXKEY + 1 );
-      hb_strncpyTrim( pTag->ForExpr, ForExp, CDX_MAXKEY );
+      pTag->ForExpr = ( char * ) hb_xgrab( CDX_MAXEXP + 1 );
+      hb_strncpyTrim( pTag->ForExpr, ForExp, CDX_MAXEXP );
    }
    pTag->pForItem = pForItem;
    pTag->AscendKey = pTag->UsrAscend = fAscnd;
@@ -6997,7 +6999,7 @@ static ERRCODE hb_cdxOrderListRebuild( CDXAREAP pArea )
 static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
 {
    ULONG ulRecNo;
-   BOOL fNewFile, fOpenedIndex;
+   BOOL fNewFile, fOpenedIndex, fProd = FALSE;
    PHB_ITEM pKeyExp, pForExp, pResult;
    char szCpndTagName[ CDX_MAXTAGNAMELEN + 1 ], szTagName[ CDX_MAXTAGNAMELEN + 1 ];
    char szFileName[ _POSIX_PATH_MAX + 1 ], szSpFile[ _POSIX_PATH_MAX + 1 ];
@@ -7253,7 +7255,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    }
 
    /* Update DBF header */
-   if ( !pArea->fHasTags )
+   if ( !pArea->fHasTags && !fOpenedIndex )
    {
       PHB_FNAME pFileName;
       pFileName = hb_fsFNameSplit( pArea->szDataFileName );
@@ -7261,7 +7263,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       hb_xfree( pFileName );
       if ( hb_stricmp( szFileName, szCpndTagName ) == 0 )
       {
-         pArea->fHasTags = TRUE;
+         pArea->fHasTags = fProd = TRUE;
 #ifdef HB_CDX_CLIP_AUTOPEN
          if ( !pArea->fReadonly && hb_set.HB_SET_AUTOPEN )
 #else
@@ -7289,8 +7291,11 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    hb_cdxIndexUnLockWrite( pIndex );
    if ( !fOpenedIndex )
    {
-      if ( pArea->lpIndexes == NULL )
+      if ( fProd || pArea->lpIndexes == NULL )
+      {
+         pIndex->pNext = pArea->lpIndexes;
          pArea->lpIndexes = pIndex;
+      }
       else
       {
          LPCDXINDEX pIndexTmp = pArea->lpIndexes;
@@ -7991,7 +7996,7 @@ static void hb_cdxSortAddNodeKey( LPCDXSORTINFO pSort, int iLevel, BYTE *pKeyVal
    pPage = pSort->NodeList[ iLevel ];
    if ( iLevel == 0 )
    {
-      while ( pKeyVal[ iLen - iTrl - 1 ] == pSort->bTrl && iTrl < iLen )
+      while ( iTrl < iLen && pKeyVal[ iLen - iTrl - 1 ] == pSort->bTrl )
       {
          iTrl++;
       }

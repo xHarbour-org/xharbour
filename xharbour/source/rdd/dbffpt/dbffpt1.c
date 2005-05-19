@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.42 2005/05/10 20:56:12 druzus Exp $
+ * $Id: dbffpt1.c,v 1.43 2005/05/12 00:39:24 druzus Exp $
  */
 
 /*
@@ -1043,7 +1043,7 @@ static char * hb_fptGetMemoType( FPTAREAP pArea, USHORT uiIndex )
       case FPTIT_TEXT:
          return "M";
       case FPTIT_PICT:
-      case FPTIT_FLEX_COMPCH:
+      case FPTIT_FLEX_COMPRCH:
          return "C";
    }
    return "U";
@@ -1389,17 +1389,17 @@ static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       if( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &fptBlock,
                                  sizeof( FPTBLOCK ) ) != sizeof( FPTBLOCK ) )
       {
-         ulSize = 0;
+         ulSize = ulType = 0;
       }
       else
       {
          ulSize = HB_GET_BE_UINT32( fptBlock.size );
+         ulType = HB_GET_BE_UINT32( fptBlock.type );
       }
 
-      ulType = HB_GET_BE_UINT32( fptBlock.type );
       pBuffer = ( BYTE * ) hb_xgrab( HB_MAX( ulSize + 1, 8 ) );
       memset( pBuffer, '\0', 8);
-      if ( hb_fsReadLarge( pArea->hMemoFile, pBuffer, ulSize ) != ulSize )
+      if ( ulSize != 0 && hb_fsReadLarge( pArea->hMemoFile, pBuffer, ulSize ) != ulSize )
       {
          errCode = EDBF_READ;
       }
@@ -2045,7 +2045,7 @@ static ERRCODE hb_fptGetVarLen( FPTAREAP pArea, USHORT uiIndex, ULONG * pLength 
       if( uiError != SUCCESS )
          return uiError;
 
-      if( !hb_fptFileLockSh( pArea, TRUE ) )
+      if( !bLocked && !hb_fptFileLockSh( pArea, TRUE ) )
       {
          uiError = FAILURE;
       }
@@ -2056,9 +2056,10 @@ static ERRCODE hb_fptGetVarLen( FPTAREAP pArea, USHORT uiIndex, ULONG * pLength 
             pArea->fValidBuffer = FALSE;
          /* update any pending relations and reread record if necessary */
          uiError = SELF_DELETED( ( AREAP ) pArea, &bDeleted );
-         if ( uiError == SUCCESS )
+         if( uiError == SUCCESS )
             *pLength = hb_fptGetMemoLen( pArea, uiIndex - 1 );
-         hb_fptFileUnLock( pArea );
+         if( !bLocked )
+            hb_fptFileUnLock( pArea );
       }
 #else
       BOOL bDeleted;
@@ -2095,7 +2096,7 @@ static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       if( uiError != SUCCESS )
          return uiError;
 
-      if( !hb_fptFileLockSh( pArea, TRUE ) )
+      if( !bLocked && !hb_fptFileLockSh( pArea, TRUE ) )
       {
          uiError = EDBF_LOCK;
       }
@@ -2108,11 +2109,13 @@ static ERRCODE hb_fptGetValue( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          uiError = SELF_DELETED( ( AREAP ) pArea, &bDeleted );
          if( uiError != SUCCESS )
          {
-            hb_fptFileUnLock( pArea );
+            if( !bLocked )
+               hb_fptFileUnLock( pArea );
             return uiError;
          }
          uiError = hb_fptGetMemo( pArea, uiIndex - 1, pItem );
-         hb_fptFileUnLock( pArea );
+         if( !bLocked )
+            hb_fptFileUnLock( pArea );
       }
 #else
       BOOL bDeleted;

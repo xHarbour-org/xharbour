@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.13 2004/11/21 21:43:38 druzus Exp $
+ * $Id: hbrddfpt.h,v 1.14 2005/05/12 00:39:24 druzus Exp $
  */
 
 /*
@@ -118,7 +118,13 @@ HB_EXTERN_BEGIN
 #define FPTIT_FLEX_ULONG   0x03F7   // 1015 *
 #define FPTIT_FLEX_DOUBLE  0x03F8   // 1016
 #define FPTIT_FLEX_LDOUBLE 0x03F9   // 1017 *
-#define FPTIT_FLEX_COMPCH  0x03FA   // 1018 *
+#define FPTIT_FLEX_COMPRCH 0x03FA   // 1018 *
+
+/* Flex II types */
+#define FPTIT_FLEX_DBLITEM 0x2710   // 10000 14-bytes Clipper double item
+#define FPTIT_FLEX_LOGICAL 0x2711   // 10001 4-bytes logical value 
+#define FPTIT_FLEX_NULSTR  0x2722   // 10002 empty string
+
 
 #define FPTIT_FLEXAR_NIL    0x00
 #define FPTIT_FLEXAR_STR    0x07

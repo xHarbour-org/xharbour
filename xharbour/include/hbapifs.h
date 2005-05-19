@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.39 2004/09/21 02:52:34 druzus Exp $
+ * $Id: hbapifs.h,v 1.40 2004/11/21 21:43:36 druzus Exp $
  */
 
 /*
@@ -214,6 +214,8 @@ extern BYTE      HB_EXPORT * hb_filecase ( char * ); /* Convert string to enviro
 
 extern char      HB_EXPORT * hb_fileTrim( BYTE * szFile) ; /* Caller must free the buffer returned */
 extern BYTE HB_EXPORT * hb_fileNameConv(char *str) ;
+
+extern BOOL HB_EXPORT hb_fsDisableWaitLocks( int iSet );
 
 #ifdef HB_OS_WIN_32
    extern int WintoDosError( ULONG lError);

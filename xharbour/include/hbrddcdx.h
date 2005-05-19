@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.41 2005/03/31 03:15:18 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.42 2005/05/06 23:44:57 druzus Exp $
  */
 
 /*
@@ -67,6 +67,7 @@ HB_EXTERN_BEGIN
 /* CDX constants and defaults */
 #define CDX_INDEXEXT                              ".cdx"
 #define CDX_MAXKEY                                  240
+#define CDX_MAXEXP                                  255
 #define CDX_MAXTAGNAMELEN                            10
 #define CDX_PAGELEN                                 512
 #define CDX_HEADERLEN                              1024

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.144 2005/03/31 03:58:51 druzus Exp $
+ * $Id: filesys.c,v 1.145 2005/04/05 22:26:09 druzus Exp $
  */
 
 /*
@@ -327,6 +327,8 @@
 #else
    #define HB_FS_LARGE_OPTIMIZED
 #endif
+
+static BOOL s_fUseWaitLocks = TRUE;
 
 #if defined(HB_FS_FILE_IO)
 
@@ -2274,7 +2276,7 @@ BOOL HB_EXPORT    hb_fsLock   ( FHANDLE hFileHandle, ULONG ulStart,
               memset( &sOlap, 0, sizeof( OVERLAPPED ) ) ;
               sOlap.Offset = ( ULONG ) ulStart ;
               dwFlags = ( uiMode & FLX_SHARED ) ? 0 : LOCKFILE_EXCLUSIVE_LOCK ;
-              if ( !( uiMode & FLX_WAIT ) )
+              if ( !s_fUseWaitLocks || !( uiMode & FLX_WAIT ) )
               {
                  dwFlags |= LOCKFILE_FAIL_IMMEDIATELY ;
               }
@@ -2496,8 +2498,11 @@ BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
                OVERLAPPED sOlap ;
                DWORD dwFlags ;
 
-               dwFlags = ( ( uiMode & FLX_SHARED ) ? 0 : LOCKFILE_EXCLUSIVE_LOCK ) |
-                         ( ( uiMode & FLX_WAIT ) ? 0 : LOCKFILE_FAIL_IMMEDIATELY );
+               dwFlags = ( ( uiMode & FLX_SHARED ) ? 0 : LOCKFILE_EXCLUSIVE_LOCK );
+               if ( !s_fUseWaitLocks || !( uiMode & FLX_WAIT ) )
+               {
+                  dwFlags |= LOCKFILE_FAIL_IMMEDIATELY ;
+               }
 
                memset( &sOlap, 0, sizeof( OVERLAPPED ) );
                sOlap.Offset = dwOffsetLo;
@@ -3552,4 +3557,15 @@ BYTE HB_EXPORT * hb_fileNameConv( char *str ) {
          hb_strUpper( str, ulDirLen );
    }
    return (( BYTE * ) str);
+}
+
+BOOL HB_EXPORT hb_fsDisableWaitLocks( int iSet )
+{
+   BOOL fRetVal = s_fUseWaitLocks;
+
+   if ( iSet >= 0 )
+   {
+      s_fUseWaitLocks = ( iSet == 0 );
+   }
+   return fRetVal;
 }
