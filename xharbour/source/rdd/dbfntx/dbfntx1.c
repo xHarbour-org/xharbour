@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.111 2005/05/19 02:20:17 druzus Exp $
+ * $Id: dbfntx1.c,v 1.112 2005/05/19 02:40:01 ronpinkas Exp $
  */
 
 /*
@@ -1466,8 +1466,10 @@ static BOOL hb_ntxIndexLockWrite( LPTAGINFO pTag )
    LPNTXINDEX pIndex = pTag->Owner;
    BOOL fOK;
 
-   if ( pIndex->Owner->fReadonly )
+/*
+   if ( pIndex->fReadonly )
       hb_errInternal( 9101, "hb_ntxIndexLockWrite: readonly index.", "", "" );
+*/
    if ( pIndex->lockRead )
       hb_errInternal( 9105, "hb_ntxIndexLockWrite: writeLock after readLock.", "", "" );
 

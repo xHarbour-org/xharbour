@@ -1,10 +1,16 @@
- * $Id: ChangeLog,v 1.4128 2005/05/19 02:19:55 druzus Exp $
+ * $Id: ChangeLog,v 1.4129 2005/05/19 02:39:46 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-19 04:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! commented out last modification - it cannot be committed
+      without some deeper modifications which I do not want to
+      commit in release freeze state.
 
 2005-05-18 19:38 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rdd/dbfntx/dbfntx1.c
