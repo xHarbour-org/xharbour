@@ -1,6 +1,6 @@
 /*
  *
- * $Id$
+ * $Id: simple.prg,v 1.4 2004/04/30 18:23:35 rodrigo_moreno Exp $
  *
  */
 
@@ -9,10 +9,10 @@
 Function main()
     Local oServer, oQuery, oRow, i, x, aTables, aStruct, aKey
 
-    Local cHost := '192.168.1.20'
+    Local cHost := 'localhost'
     Local cDatabase := 'test'
-    Local cUser := 'rodrigo'
-    Local cPass := 'moreno'
+    Local cUser := 'user'
+    Local cPass := 'pass'
     Local cQuery
     
     oServer := TPQServer():New(cHost, cDatabase, cUser, cPass)
@@ -21,6 +21,9 @@ Function main()
         ? oServer:Error()
         quit
     end
+    
+    oServer:SetVerbosity(2)
+    oServer:traceon('lixo.log')
 
     ? 'Tables...'
     

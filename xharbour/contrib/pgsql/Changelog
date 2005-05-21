@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.33 2005/02/08 14:11:17 rodrigo_moreno Exp $
+ * $Id: Changelog,v 1.34 2005/03/12 19:17:36 rodrigo_moreno Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,53 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-21 11:45 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
+  * xharbour/contrib/pgsql/TPostgres.prg
+    + Add 3 new methods, traceOn(), TraceOff(), SetVerbosity()
+  * xharbour/contrib/pgsql/postgres.c
+    + Add New Functions:
+        PQcreatetrace
+        PQclosetrace
+        PQtrace
+        PQuntrace
+        PQseterrorverbosity
+        PQprotocolversion
+        PQserverversion
+        PQclientencoding
+        PQsetclientencoding
+        PQsetdblogin
+        PQdb
+        PQuser
+        PQpass
+        PQhost
+        PQport
+        PQtty
+        PQoptions
+        PQoidvalue
+        PQoidstatus
+        PQbinarytuples
+        PQftable
+        PQftype
+        PQfname
+        PQfmod
+        PQfsize
+        PQgetisnull
+        PQfnumber
+        PQntuples
+        PQnfields
+        PQgetcancel
+        PQcancel
+        PQfreecancel
+        PQsetnonblocking
+        PQisnonblocking    
+        lo_Unlink
+        lo_Import
+        lo_Export
+  * xharbour/contrib/pgsql/tests/test.prg
+  * xharbour/contrib/pgsql/tests/async.prg
+  * xharbour/contrib/pgsql/tests/simple.prg
+    + Add more samples of using new functions    
 
 2005-03-12 12:20 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   * xharbour/contrib/pgsql/TPostgres.prg

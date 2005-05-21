@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.18 2005/01/13 16:06:56 rodrigo_moreno Exp $
+ * $Id: postgres.c,v 1.19 2005/03/12 19:17:37 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -69,6 +69,7 @@
 #define INT2OID			21
 #define INT4OID			23
 #define TEXTOID			25
+#define OIDOID			26
 #define FLOAT4OID               700
 #define FLOAT8OID               701
 #define CASHOID                 790                                                                
@@ -83,6 +84,14 @@
 #define VARBITOID	        1562
 #define NUMERICOID		1700
 
+#define INV_WRITE		0x00020000
+#define INV_READ		0x00040000
+
+
+/* 
+ * Connection handling functions 
+ */
+
 HB_FUNC(PQCONNECT)
 {
     char        conninfo[128];
@@ -96,6 +105,28 @@ HB_FUNC(PQCONNECT)
     hb_retptr( conn );
 }
 
+HB_FUNC(PQSETDBLOGIN)
+{
+    const char *pghost;
+    const char *pgport;
+    const char *pgoptions;
+    const char *pgtty;
+    const char *dbName;
+    const char *login;
+    const char *pwd;
+                                         
+    pghost    = hb_parcx(1);   
+    pgport    = hb_parcx(2);   
+    pgoptions = hb_parcx(3);
+    pgtty     = hb_parcx(4);    
+    dbName    = hb_parcx(5);   
+    login     = hb_parcx(6);    
+    pwd       = hb_parcx(8);      
+                                         
+    if (hb_pcount() == 7)
+        hb_retptr( ( PGconn * ) PQsetdbLogin( pghost, pgport, pgoptions, pgtty, dbName, login, pwd) );
+}   
+                    
 HB_FUNC(PQCLOSE)
 {
     if (hb_parinfo(1))
@@ -107,6 +138,76 @@ HB_FUNC(PQRESET)
     if (hb_parinfo(1))
         PQreset(( PGconn * ) hb_parptr(1));
 }
+
+HB_FUNC(PQPROTOCOLVERSION)
+{
+    if (hb_parinfo(1))
+        hb_retni(PQprotocolVersion(( PGconn * ) hb_parptr(1)));
+}
+
+HB_FUNC(PQSERVERVERSION)
+{
+    if (hb_parinfo(1))
+        hb_retni(PQserverVersion(( PGconn * ) hb_parptr(1)));
+}
+
+HB_FUNC(PQCLIENTENCODING)
+{
+    if (hb_parinfo(1))
+        hb_retni(PQclientEncoding(( PGconn * ) hb_parptr(1)));
+}
+
+HB_FUNC(PQSETCLIENTENCODING)
+{
+    if (hb_pcount() == 2)
+        hb_retni(PQsetClientEncoding(( PGconn * ) hb_parptr(1), hb_parcx(2)));
+}
+    
+HB_FUNC(PQDB)
+{   
+    if (hb_parinfo(1))
+        hb_retc(PQdb( ( PGconn * ) hb_parptr(1) ));
+}
+        
+HB_FUNC(PQUSER)
+{
+    if (hb_parinfo(1))
+       hb_retc(PQuser( ( PGconn * ) hb_parptr(1) ));
+}
+            
+HB_FUNC(PQPASS)
+{
+    if (hb_parinfo(1))
+        hb_retc(PQpass( ( PGconn * ) hb_parptr(1) ));
+}
+            
+HB_FUNC(PQHOST)
+{
+    if (hb_parinfo(1))
+        hb_retc(PQhost( ( PGconn * ) hb_parptr(1) ));
+}
+            
+HB_FUNC(PQPORT)
+{
+    if (hb_parinfo(1))
+        hb_retc(PQport( ( PGconn * ) hb_parptr(1) ));
+}
+            
+HB_FUNC(PQTTY)
+{
+    if (hb_parinfo(1))
+        hb_retc(PQtty( ( PGconn * ) hb_parptr(1) ));
+}
+            
+HB_FUNC(PQOPTIONS)
+{
+    if (hb_parinfo(1))
+        hb_retc(PQoptions( ( PGconn * ) hb_parptr(1) ));
+}
+
+/* 
+ * Query handling functions 
+ */
 
 HB_FUNC(PQCLEAR)
 {
@@ -290,6 +391,10 @@ HB_FUNC(PQMETADATA)
                         case INT4OID:
                                 strcpy(buf, "integer");
                                 break;
+
+                        case OIDOID:
+                                strcpy(buf, "bigint");
+                                break;
         
                         case INT8OID:
                                 strcpy(buf, "bigint");
@@ -460,15 +565,81 @@ HB_FUNC(PQUNESCAPEBYTEA)
 }
 
 
+HB_FUNC(PQOIDVALUE)
+{
+    if (hb_parinfo(1))
+        hb_retnl( ( Oid ) PQoidValue(( PGresult * ) hb_parptr(1) ));
+}
 
+HB_FUNC(PQOIDSTATUS)
+{
+    if (hb_parinfo(1))
+        hb_retc( PQoidStatus(( PGresult * ) hb_parptr(1) ));
+}
 
-/* Asynchronous functions 
- * ----------------------
- *
- * With this functions, we can send multiples queries using the PQsendQuery, just separate by ";".
- * Use PQgetResult to return result pointer, but use PQconsumeInput once and PQisbusy to check if there is result
- *
-*/
+HB_FUNC(PQBINARYTUPLES)
+{
+    if (hb_parinfo(1))
+        hb_retl( PQbinaryTuples(( PGresult * ) hb_parptr(1) ));
+}
+
+HB_FUNC(PQFTABLE)
+{
+    if (hb_pcount() == 2)
+        hb_retnl( ( Oid ) PQftable(( PGresult * ) hb_parptr(1), hb_parni(2) - 1 ));
+}
+
+HB_FUNC(PQFTYPE)
+{
+    if (hb_pcount() == 2)
+        hb_retnl( ( Oid ) PQftype(( PGresult * ) hb_parptr(1), hb_parni(2) - 1 ));
+}
+
+HB_FUNC(PQFNAME)
+{
+    if (hb_pcount() == 2)
+        hb_retc( PQfname(( PGresult * ) hb_parptr(1), hb_parni(2) - 1 ));
+}
+
+HB_FUNC(PQFMOD)
+{
+    if (hb_pcount() == 2)
+        hb_retni( PQfmod(( PGresult * ) hb_parptr(1), hb_parni(2) - 1 ));
+}
+
+HB_FUNC(PQFSIZE)
+{
+    if (hb_pcount() == 2)
+        hb_retni( PQfsize(( PGresult * ) hb_parptr(1), hb_parni(2) - 1 ));
+}
+
+HB_FUNC(PQGETISNULL)
+{
+    if (hb_pcount() == 3)
+        hb_retl( PQgetisnull(( PGresult * ) hb_parptr(1), hb_parni(2) - 1 , hb_parni(3) - 1));
+}
+
+HB_FUNC(PQFNUMBER)
+{
+    if (hb_pcount() == 2)
+        hb_retni( PQfnumber(( PGresult * ) hb_parptr(1), hb_parcx(2) ) + 1);
+}
+
+HB_FUNC(PQNTUPLES)
+{
+    if (hb_parinfo(1))
+        hb_retnl( PQntuples(( PGresult * ) hb_parptr(1) ));
+}
+
+HB_FUNC(PQNFIELDS)
+{
+    if (hb_parinfo(1))
+        hb_retnl( PQnfields(( PGresult * ) hb_parptr(1) ));
+}
+
+/* 
+ * Asynchronous functions 
+ */
 
 HB_FUNC(PQSENDQUERY)
 {
@@ -512,7 +683,7 @@ HB_FUNC(PQISBUSY)
     hb_retl( res );        
 }
 
-HB_FUNC(PQREQUESTCANCEL)
+HB_FUNC(PQREQUESTCANCEL) /* deprecated */
 {
     int res = 0;        
 
@@ -522,3 +693,190 @@ HB_FUNC(PQREQUESTCANCEL)
     hb_retl( res );        
 }
 
+
+HB_FUNC(PQFLUSH)
+{
+    if (hb_parinfo(1))
+        hb_retni( PQflush(( PGconn * ) hb_parptr(1)) );
+}
+
+
+HB_FUNC(PQGETCANCEL)
+{
+    if (hb_parinfo(1))
+        hb_retptr( ( PGcancel * ) PQgetCancel( ( PGconn * ) hb_parptr(1) ) );
+}        
+
+HB_FUNC(PQCANCEL)
+{
+    char errbuf[256];
+    int ret = 0;
+
+    if (hb_parinfo(1))
+        if (PQcancel( ( PGcancel * ) hb_parptr(1), errbuf, 255) == 1)
+        {
+            ret = 1;                
+            hb_storc( errbuf, 2 );
+        }            
+        
+    hb_retl(ret);            
+}        
+
+HB_FUNC(PQFREECANCEL)
+{
+    if (hb_parinfo(1))
+        PQfreeCancel( ( PGcancel * ) hb_parptr(1) ) ;
+}        
+
+HB_FUNC(PQSETNONBLOCKING)
+{
+    if (hb_pcount() == 2)
+        hb_retl( PQsetnonblocking( ( PGconn * ) hb_parptr(1), hb_parl(2) ) );
+}
+
+HB_FUNC(PQISNONBLOCKING)
+{
+    if (hb_parinfo(1))
+        hb_retl( PQisnonblocking( ( PGconn * ) hb_parptr(1) ) );
+}
+
+/* 
+ * Trace Connection handling functions 
+ */
+
+HB_FUNC(PQCREATETRACE)
+{
+    FILE * pFile;
+
+    if (hb_parinfo(1))
+    {
+        pFile = fopen( hb_parcx(1), "w+b");
+    
+        if (pFile != NULL)
+            hb_retptr( ( FILE * ) pFile );
+    }            
+}
+
+HB_FUNC(PQCLOSETRACE)
+{
+    if (hb_parinfo(1))
+        fclose( ( FILE * ) hb_parptr(1) );
+}
+
+HB_FUNC(PQTRACE)
+{
+    if (hb_pcount() == 2)
+        PQtrace( ( PGconn * ) hb_parptr(1), ( FILE * ) hb_parptr(2) );
+}
+
+HB_FUNC(PQUNTRACE)
+{
+    if (hb_parinfo(1))
+        PQuntrace( ( PGconn * ) hb_parptr(1) );
+}
+
+HB_FUNC(PQSETERRORVERBOSITY)
+{
+    /* PQERRORS_TERSE   0
+       PQERRORS_DEFAULT 1
+       PQERRORS_VERBOSE 2
+    */
+    
+    if (hb_pcount() == 2)
+        hb_retni( ( PGVerbosity ) PQsetErrorVerbosity( ( PGconn * ) hb_parptr(1), ( PGVerbosity ) hb_parni(2) ) );
+}
+
+
+/* 
+ * Large Object functions 
+ */
+
+
+HB_FUNC(LO_IMPORT)
+{
+    if (hb_pcount() == 2)
+        hb_retnl( ( Oid ) lo_import( ( PGconn * ) hb_parptr(1), hb_parcx(2) ) );
+}
+
+HB_FUNC(LO_EXPORT)
+{
+    int ret = 0; 
+    
+    if (hb_pcount() == 3)
+    {
+        ret = lo_export( ( PGconn * ) hb_parptr(1), ( Oid ) hb_parnl(2), hb_parcx(3) );
+
+        if (ret != 1)
+            ret = 0;
+    }            
+
+    hb_retl(ret);        
+}
+
+HB_FUNC(LO_UNLINK)
+{   
+    int ret = 0; 
+           
+    if (hb_pcount() == 2)
+    {
+        ret = lo_unlink( ( PGconn * ) hb_parptr(1), ( Oid ) hb_parnl(2) );        
+        
+        if (ret != 1)
+            ret = 0;
+    }            
+
+    hb_retl(ret);        
+}
+
+/*
+
+TODO: Implement Full Large Objects Support
+TODO: Implement Prepared Query handling
+
+extern int	lo_open(PGconn *conn, Oid lobjId, int mode);
+extern int	lo_close(PGconn *conn, int fd);
+extern int	lo_read(PGconn *conn, int fd, char *buf, size_t len);
+extern int	lo_write(PGconn *conn, int fd, char *buf, size_t len);
+extern int	lo_lseek(PGconn *conn, int fd, int offset, int whence);
+extern Oid	lo_creat(PGconn *conn, int mode);
+extern int	lo_tell(PGconn *conn, int fd);
+
+PGresult *PQprepare(PGconn *conn,
+                    const char *stmtName,
+                    const char *query,
+                    int nParams,
+                    const Oid *paramTypes);
+  
+  
+PGresult *PQexecPrepared(PGconn *conn,
+                         const char *stmtName,
+                         int nParams,
+                         const char * const *paramValues,
+                         const int *paramLengths,
+                         const int *paramFormats,
+                         int resultFormat);
+                         
+int PQsendQueryParams(PGconn *conn,
+                      const char *command,
+                      int nParams,
+                      const Oid *paramTypes,
+                      const char * const *paramValues,
+                      const int *paramLengths,
+                      const int *paramFormats,
+                      int resultFormat);
+                      
+int PQsendPrepare(PGconn *conn,
+                  const char *stmtName,
+                  const char *query,
+                  int nParams,
+                  const Oid *paramTypes);
+                  
+int PQsendQueryPrepared(PGconn *conn,
+                        const char *stmtName,
+                        int nParams,
+                        const char * const *paramValues,
+                        const int *paramLengths,
+                        const int *paramFormats,
+                        int resultFormat);                                                                                     
+                                                
+*/                    

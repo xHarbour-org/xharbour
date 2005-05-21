@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.35 2005/02/08 14:11:17 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.36 2005/03/12 19:17:37 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -61,6 +61,8 @@ CLASS TPQServer
     DATA     Schema    INIT 'public'
     DATA     lError    INIT .F.
     DATA     cError    INIT ''
+    DATA     lTrace    INIT .F.
+    DATA     pTrace   
    
     METHOD   New( cHost, cDatabase, cUser, cPass, nPort, Schema )
     METHOD   Destroy()            
@@ -83,6 +85,9 @@ CLASS TPQServer
     METHOD   TableStruct( cTable )
     METHOD   CreateTable( cTable, aStruct )
     METHOD   DeleteTable( cTable  )
+    METHOD   TraceOn(cFile)
+    METHOD   TraceOff()
+    METHOD   SetVerbosity(num)    INLINE PQsetErrorVerbosity( ::pDb, iif( num >= 0 .and. num <= 2, num, 1 )  )
 
     //DESTRUCTOR Destroy
 ENDCLASS
@@ -114,6 +119,7 @@ RETURN self
 
 
 METHOD Destroy() CLASS TPQserver
+    ::TraceOff()
     PQClose(::pDb)    
 RETURN nil
 
@@ -412,7 +418,7 @@ METHOD CreateTable( cTable, aStruct ) CLASS TPQserver
 RETURN result
 
 
-METHOD DeleteTable( cTable  ) CLASS TPQserver
+METHOD DeleteTable( cTable ) CLASS TPQserver
     Local result := .T.
     Local res
 
@@ -429,6 +435,26 @@ METHOD DeleteTable( cTable  ) CLASS TPQserver
     
     PQclear(res)
 RETURN result
+
+
+METHOD TraceOn( cFile ) CLASS TPQserver
+    ::pTrace := PQcreatetrace( cFile )
+    
+    if ::pTrace != NIL
+        PQtrace( ::pDb, ::pTrace )
+        ::lTrace := .t.
+    endif                
+RETURN nil
+
+
+METHOD TraceOff() CLASS TPQserver
+    if ::pTrace != NIL
+        PQuntrace( ::pDb )
+        PQclosetrace( ::pTrace )    
+    endif
+    
+    ::lTrace := .f.                
+RETURN nil
 
 
 
@@ -701,6 +727,7 @@ RETURN .T.
 METHOD Goto( nRecno ) CLASS TPQquery    
     if nRecno > 0 .and. nRecno <= ::nLastrec
         ::nRecno := nRecno
+        ::lEof := .F.
     end
 RETURN .T.    
     

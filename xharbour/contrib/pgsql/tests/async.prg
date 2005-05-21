@@ -1,27 +1,52 @@
 /* 
- * $Id$
+ * $Id: async.prg,v 1.3 2004/05/02 22:41:11 rodrigo_moreno Exp $
  *
  * This sample show howto use asynchronous/nonblocking queries
  *
  */
 
 Function main()
-    Local conn, res, aTemp, i, xTime
+    Local conn
     
     CLEAR SCREEN
         
-    ? "Connect", conn := PQConnect('test', '192.168.0.1', 'postgres', 'pass', 5432)
+    ? "Connect", conn := PQConnect('test', 'localhost', 'user', 'pass', 5432)
                 
     ? "Conection status", PQerrorMessage(conn), PQstatus(conn)
+                
+    Query( conn, 'SELECT codigo, descri FROM client limit 100', .f. )                
+    Query( conn, 'SELECT codigo, descri FROM fornec limit 100', .f. )                
+    Query( conn, 'SELECT pedido, vlrped FROM pedido', .t. )                
+
+    PQclose(conn)
+
+    return nil
+
+Procedure Query( conn, cQuery, lCancel )    
+    Local pCancel, cErrMsg := space(30)
+    Local res, aTemp, i, x, y, xTime
     
-    ? "PQSendQuery", PQsendQuery(conn, 'SELECT * FROM huge_table limit 5000')
+    ? "PQSendQuery", PQsendQuery(conn, cQuery)
 
     xTime := time()
-
-    do while lastkey() != 27
+    CLEAR TYPEAHEAD
+    
+    do while inkey() != 27
         DevPos(Row(), 20)
         DevOut("Processing: " + Elaptime(xtime, time()))
-        inkey(5)
+
+        inkey(1)
+        
+        if lCancel
+            if .t.
+                pCancel := PQgetCancel(conn)
+                ? "Canceled: ", PQcancel( pCancel, @cErrMsg ), cErrMsg
+                PQfreeCancel(pCancel)
+                
+            else 
+                ? PQrequestCancel(conn) // Deprecated
+            endif
+        endif
         
         if PQconsumeInput(conn)
             if ! PQisBusy(conn)
@@ -30,7 +55,7 @@ Function main()
         endif                
     enddo        
     
-    if lastkey() != 27
+    if inkey() != 27
         ? "PQgetResult", valtoprg(res := PQgetResult(conn))
     
         for x := 1 to PQlastrec(res)
@@ -44,8 +69,4 @@ Function main()
     else        
         ? "Canceling Query", PQrequestCancel(conn)
     endif
-            
-    PQclose(conn)
-
-    return nil
-    
+Return
