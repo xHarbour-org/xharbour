@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4130 2005/05/19 02:54:40 druzus Exp $
+ * $Id: ChangeLog,v 1.4131 2005/05/20 14:35:01 lculik Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-20 18:29 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbclass.ch
+    ! Fixed rules for CLASS[]METHOD
 
 2005-05-20 11:20 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   * source/rtl/errorsys.prg
