@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.56 2005/02/14 19:55:09 likewolf Exp $
+ * $Id: debugger.prg,v 1.57 2005/04/08 10:56:43 likewolf Exp $
  */
 
 /*
@@ -2202,12 +2202,12 @@ METHOD SaveAppScreen( lRestore ) CLASS TDebugger
     ::oWndCommand:Resize( ::nMaxRow - 5, 0, ::nMaxRow - 1, ::nMaxCol )
     ::oGetListCommand:oGet:Row := ::oWndCommand:nBottom - 1
     ::oGetListCommand:oGet:Col := ::oWndCommand:nLeft + 3
+    ::oBrwStack:nRight := ::nMaxCol - 1
+    ::oBrwStack:nBottom := ::nMaxRow - 7
+    ::oBrwStack:nLeft := ::nMaxCol - 14
+    ::oBrwStack:nTop := 2
     IF ::oWndStack != NIL
       nRight -= 16
-      ::oBrwStack:nRight := ::nMaxCol - 1
-      ::oBrwStack:nBottom := ::nMaxRow - 7
-      ::oBrwStack:nLeft := nRight + 2
-      ::oBrwStack:nTop := 2
       ::oWndStack:Resize( , nRight + 1, ::nMaxRow - 6, ::nMaxCol )
     ENDIF
     IF ::oWndVars != NIL
