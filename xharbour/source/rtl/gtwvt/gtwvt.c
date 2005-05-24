@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.151 2005/05/06 03:47:46 bdj Exp $
+ * $Id: gtwvt.c,v 1.152 2005/05/09 18:35:01 vouchcac Exp $
  */
 
 /*
@@ -530,6 +530,7 @@ void HB_GT_FUNC( gt_Puts( USHORT usRow, USHORT usCol, BYTE byAttr, BYTE *pbyStr,
 {
   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Puts( %hu, %hu, %d, %p, %lu )", usRow, usCol, ( int ) byAttr, pbyStr, ulLen ) );
   hb_wvt_gtSetStringInTextBuffer( (SHORT) usCol, (SHORT) usRow, byAttr, pbyStr, (SHORT) ulLen );
+  // TraceLog( "TraceLog.log", "%i %i %i %s %i \n", usCol, usRow, byAttr, pbyStr, ulLen );
 #ifdef WVT_DEBUG
   nCountPuts++;
 #endif
@@ -702,6 +703,7 @@ void HB_GT_FUNC( gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
     iColNew -= iCols;
     iColSize += iCols;
   }
+
   // use the ScrollWindowEx() where possible ( Optimised for Terminal Server )
   // if both iCols & iRows are ZERO then the entire area is to be cleared and
   // there is no advantage in using ScrollWindowEx()
@@ -719,27 +721,70 @@ void HB_GT_FUNC( gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
 
   usSaveCol = HB_GT_FUNC( gt_Col() ) ;
   usSaveRow = HB_GT_FUNC( gt_Row() ) ;
-  for( iCount = ( iRows >= 0 ? usTop : usBottom );
-       ( iRows >= 0 ? iCount <= usBottom : iCount >= usTop );
-       ( iRows >= 0 ? iCount++ : iCount-- ) )
+
+  if ( !iRows )
   {
-      int iRowPos = iCount + iRows;
-
-
-      /* Read the text to be scrolled into the current row */
-      if( ( iRows || iCols ) && iRowPos <= usBottom && iRowPos >= usTop )
-      {
-        HB_GT_FUNC( gt_GetText( iRowPos, iColOld, iRowPos, iColOld + iColSize, fpBuff ) );
-      }
-
-      /* Blank the scroll region in the current row */
+    for( iCount = usTop; iCount <= usBottom; iCount++ )
+    {
       HB_GT_FUNC( gt_Puts( iCount, usLeft, byAttr, fpBlank, iLength ) );
-
-      /* Write the scrolled text to the current row */
-      if( ( iRows || iCols ) && iRowPos <= usBottom && iRowPos >= usTop )
+    }
+  }
+  else
+  {
+    if ( iRows > 0 )
+    {
+      for( iCount = usTop; iCount <= usBottom; iCount++ )
       {
-        HB_GT_FUNC( gt_PutText( iCount, iColNew, iCount, iColNew + iColSize, fpBuff ) );
+        int  iRowPos = iCount + iRows;
+        BOOL bShould = ( ( iRows || iCols ) && iRowPos <= usBottom && iRowPos >= usTop );
+
+        /* Read the text to be scrolled into the current row */
+        if( bShould )
+        {
+          HB_GT_FUNC( gt_GetText( iRowPos, iColOld, iRowPos, iColOld + iColSize, fpBuff ) );
+        }
+
+        /* Blank the scroll region in the current row */
+        //  HB_GT_FUNC( gt_Puts( iCount, usLeft, byAttr, fpBlank, iLength ) );
+
+        /* Write the scrolled text to the current row */
+        if( bShould )
+        {
+          HB_GT_FUNC( gt_PutText( iCount, iColNew, iCount, iColNew + iColSize, fpBuff ) );
+        }
       }
+      for( iCount = 0; iCount < iRows; iCount++ )
+      {
+        HB_GT_FUNC( gt_Puts( ( usBottom + iCount ), usLeft, byAttr, fpBlank, iLength ) );
+      }
+    }
+    else
+    {
+      for( iCount = usBottom; iCount >= usTop; iCount-- )
+      {
+        int iRowPos = iCount + iRows;
+        BOOL bShould = ( iRows || iCols ) && iRowPos <= usBottom && iRowPos >= usTop ;
+
+        /* Read the text to be scrolled into the current row */
+        if( bShould )
+        {
+          HB_GT_FUNC( gt_GetText( iRowPos, iColOld, iRowPos, iColOld + iColSize, fpBuff ) );
+        }
+
+        /* Blank the scroll region in the current row */
+        // HB_GT_FUNC( gt_Puts( iCount, usLeft, byAttr, fpBlank, iLength ) );
+
+        /* Write the scrolled text to the current row */
+        if( bShould )
+        {
+          HB_GT_FUNC( gt_PutText( iCount, iColNew, iCount, iColNew + iColSize, fpBuff ) );
+        }
+      }
+      for( iCount = 0; iCount > iRows; iCount-- )
+      {
+        HB_GT_FUNC( gt_Puts( ( usTop + iCount ), usLeft, byAttr, fpBlank, iLength ) );
+      }
+    }
   }
   HB_GT_FUNC( gt_SetPos( usSaveRow, usSaveCol, HB_GT_SET_POS_AFTER ) );
 
@@ -4632,6 +4677,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
 
       case WM_CLOSE:
       {
+
          EndDialog( hDlg, IDCANCEL );
          bReturn = FALSE;
       }
