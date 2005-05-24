@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4135 2005/05/24 21:19:37 lculik Exp $
+ * $Id: ChangeLog,v 1.4136 2005/05/24 22:25:31 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -19,6 +19,12 @@
   * source/compiler/hbslex.c
   * source/macro/macroslx.c
     * Updated MAX_STREAM_STARTER and MAX_STREAM_TERMINATOR
+
+2005-05-25 03:05 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    ! void HB_GT_FUNC( gt_Scroll() )
+      Optimizations. Now the function is much faster than earlier avoiding the unnecessary
+      calls to blank the rows which were being copied from preceeding or succeeding rows. 
 
 2005-05-24 18:10 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   * contrib/libmisc/dates2.c
