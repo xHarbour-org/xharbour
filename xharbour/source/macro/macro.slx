@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.20 2005/01/09 01:41:05 ronpinkas Exp $
+ * $Id: macro.slx,v 1.21 2005/02/17 00:56:32 ronpinkas Exp $
  */
 
 /*
@@ -76,8 +76,113 @@
    #define YY_INPUT( buf, result, max_size ) result = 0;
 
 #undef STREAM_EXCEPTION
+/* See implementation of STREAM_APPEND below!
    #define STREAM_EXCEPTION( sPair, cChar ) \
            hb_macroError( EG_SYNTAX, YYLEX_PARAM );
+*/
+
+// Not needed at all - save space.
+#define STREAM_EXCEPTION( sPair, cChar )
+
+#undef STREAM_APPEND
+   #define STREAM_APPEND(x) \
+      \
+      if( sStart[0] == 'E' ) \
+      { \
+         if( x == '\\' ) \
+         { \
+            switch( *szBuffer ) \
+            { \
+               case '\\' : \
+               case '"'  : \
+               case '\'' : \
+                  sPair [ iPairLen++ ] = *szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               case 'n' : \
+                  sPair [ iPairLen++ ] = '\n'; \
+                  szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               case 't' : \
+                  sPair [ iPairLen++ ] = '\t'; \
+                  szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               case 'b' : \
+                  sPair [ iPairLen++ ] = '\b'; \
+                  szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               case 'r' : \
+                  sPair [ iPairLen++ ] = '\r'; \
+                  szBuffer++; \
+                  iSize--; \
+                  break; \
+               \
+               default :\
+                  sPair[ iPairLen++ ] = x; \
+            } \
+         } \
+         else \
+         { \
+            sPair[ iPairLen++ ] = x; \
+         } \
+      } \
+      else \
+      { \
+         char *sClose, cTermLen; \
+         \
+         if( sStart[1] == '\0' ) \
+         { \
+            sClose = strchr( szBuffer, sTerm[0] ); \
+            cTermLen = 1; \
+         } \
+         else \
+         { \
+            sClose = strstr( szBuffer, sTerm ); \
+            \
+            if( sClose == NULL ) \
+            { \
+               szBuffer--; iSize++; \
+               sClose = strchr( szBuffer, ']' ); \
+               cTermLen = 1; \
+            } \
+            else \
+            { \
+               cTermLen = 2; \
+            } \
+         } \
+         \
+         if( sClose ) \
+         { \
+            szBuffer--; iSize++; \
+            \
+            strncpy( sPair, szBuffer, sClose - szBuffer ); \
+            sPair[ sClose - szBuffer ] = '\0'; \
+            s_szBuffer = sClose + cTermLen; \
+            iSize -= s_szBuffer - szBuffer; \
+            pYYLVAL->string = hb_strdup( sPair ); \
+            \
+            /*printf( "Lit: <%s>, Rest: <%s>\n", sPair, s_szBuffer );*/ \
+            iPairToken = 0; \
+            return LITERAL + DONT_REDUCE ; \
+         } \
+         else \
+         { \
+            szBuffer--; \
+            szBuffer[strlen(szBuffer)-1] = '\0'; \
+            hb_macroError( EG_SYNTAX, YYLEX_PARAM ); \
+            pYYLVAL->string = hb_strdup( szBuffer ); \
+            iSize = 0; \
+            iPairToken = 0; \
+            return LITERAL + DONT_REDUCE; \
+         } \
+      }
 
 #undef IF_BELONG_LEFT
    #define IF_BELONG_LEFT(chr) if( iLastToken == IDENTIFIER || iLastToken == ']' || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' || \
@@ -129,7 +234,8 @@ ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
 DEFINE_STREAM_AS_ONE_OF_THESE {
                                 START_WITH("\"")     END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT),
                                 START_WITH("'")      END_WITH("'")    STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT),
-                                START_WITH("[")      END_WITH("]" )   STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_LIT_ACT)
+                                START_WITH("[")      END_WITH("]" )   STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(TRUE ) AS_PAIR_TOKEN(HB_LIT_ACT),
+                                START_WITH("E\"")    END_WITH("\"" )  STOP_IF_ONE_OF_THESE("\n") TEST_LEFT(FALSE) AS_PAIR_TOKEN(HB_LIT_ACT)
                               };
 
 START_NEW_LINE_IF_ONE_OF_THESE( "\n;" );

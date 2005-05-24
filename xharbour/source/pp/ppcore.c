@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.207 2005/03/31 14:34:07 andijahja Exp $
+ * $Id: ppcore.c,v 1.208 2005/04/15 04:16:04 ronpinkas Exp $
  */
 
 /*
@@ -162,7 +162,7 @@ int hb_pp_NextToken( char** pLine, char *sToken );
 #define ISID( c )  ( isalpha( ( BYTE ) c ) || ( c ) == '_' || ( c ) > 0x7E )
 #define ISNAME( c )  ( isalnum( ( BYTE ) c ) || ( c ) == '_' || ( c ) > 0x7E )
 /** Added by Giancarlo Niccolai 2003-06-20 */
-#define IS_ESC_STRING( c ) ( toupper( c ) == 'E' && (&c)[1] == '\"' )
+#define IS_ESC_STRING( c ) ( toupper( c ) == 'E' && (&c)[1] == '"' )
 /** END **/
 #define MAX_NAME     255
 #define MAX_EXP      4096
@@ -3852,7 +3852,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
       }
    }
 
-   State = ( **ptri == '\'' || **ptri == '\"' || **ptri == '[' ) ? STATE_EXPRES : STATE_ID;
+   State = ( **ptri == '\'' || **ptri == '\"' || **ptri == '[' || IS_ESC_STRING( **ptri ) ) ? STATE_EXPRES : STATE_ID;
    //State = STATE_EXPRES;
 
    while( **ptri != '\0' && !rez && lens < maxrez )
@@ -3892,7 +3892,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                }
 
                /* Modified by Giancarlo Niccolai 2003-06-20 */
-               if( **ptri == '"' && ( !bEsc || (*ptri)[-1] != '\\'  ))
+               if( **ptri == '"' && ( bEsc == FALSE || (*ptri)[-1] != '\\'  ))
                {
                   break;
                }

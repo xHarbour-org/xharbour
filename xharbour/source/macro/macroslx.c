@@ -1,5 +1,5 @@
 /*
- * $Id: macroslx.c,v 1.6 2005/01/09 01:41:05 ronpinkas Exp $
+ * $Id: macroslx.c,v 1.7 2005/01/11 23:53:44 likewolf Exp $
  */
 
 /*
@@ -68,8 +68,8 @@
 #include "hbdefs.h"
 
 #define MAX_STREAM                              16384 /* Max length of in-line LITERAL */
-#define MAX_STREAM_STARTER                          2
-#define MAX_STREAM_TERMINATOR                       2
+#define MAX_STREAM_STARTER                          3 /* "E\"" */
+#define MAX_STREAM_TERMINATOR                       2 /* ""\"   */
 #define MAX_STREAM_EXCLUSIONS                       2
 
 #define TOKEN_SIZE             HB_SYMBOL_NAME_LEN + 1

@@ -1,10 +1,24 @@
- * $Id: ChangeLog,v 1.4134 2005/05/24 21:05:38 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4135 2005/05/24 21:19:37 lculik Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-24 15:24 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/pp/ppcore.c
+    ! Fixed support for extended strings (E"...") in getExpReal()
+
+  * source/compiler/harbour.slx
+    * Removed redundant ','
+
+  * source/macro/macro.slx
+    + Added support for extended strings (E"..." )
+
+  * source/compiler/hbslex.c
+  * source/macro/macroslx.c
+    * Updated MAX_STREAM_STARTER and MAX_STREAM_TERMINATOR
 
 2005-05-24 18:10 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   * contrib/libmisc/dates2.c
