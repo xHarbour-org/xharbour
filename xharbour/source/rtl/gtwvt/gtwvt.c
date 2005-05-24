@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.152 2005/05/09 18:35:01 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.153 2005/05/24 22:36:22 vouchcac Exp $
  */
 
 /*
@@ -742,14 +742,6 @@ void HB_GT_FUNC( gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
         if( bShould )
         {
           HB_GT_FUNC( gt_GetText( iRowPos, iColOld, iRowPos, iColOld + iColSize, fpBuff ) );
-        }
-
-        /* Blank the scroll region in the current row */
-        //  HB_GT_FUNC( gt_Puts( iCount, usLeft, byAttr, fpBlank, iLength ) );
-
-        /* Write the scrolled text to the current row */
-        if( bShould )
-        {
           HB_GT_FUNC( gt_PutText( iCount, iColNew, iCount, iColNew + iColSize, fpBuff ) );
         }
       }
@@ -769,14 +761,6 @@ void HB_GT_FUNC( gt_Scroll( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
         if( bShould )
         {
           HB_GT_FUNC( gt_GetText( iRowPos, iColOld, iRowPos, iColOld + iColSize, fpBuff ) );
-        }
-
-        /* Blank the scroll region in the current row */
-        // HB_GT_FUNC( gt_Puts( iCount, usLeft, byAttr, fpBlank, iLength ) );
-
-        /* Write the scrolled text to the current row */
-        if( bShould )
-        {
           HB_GT_FUNC( gt_PutText( iCount, iColNew, iCount, iColNew + iColSize, fpBuff ) );
         }
       }
