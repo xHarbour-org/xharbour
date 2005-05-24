@@ -1,5 +1,5 @@
 /*
- * $Id: dates2.c,v 1.2 2004/03/06 02:32:37 andijahja Exp $
+ * $Id: dates2.c,v 1.3 2004/11/21 21:43:18 druzus Exp $
  */
 
 /*
@@ -103,18 +103,6 @@ static int hb_doy( int iYear, int iMonth, int iDay )
    return iDoy + iDay;
 }
 
-static int hb_wom( int iYear, int iMonth, int iDay )
-{
-   int iWom;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_wom(%d, %d, %d)", iYear, iMonth, iDay));
-
-   iWom = iDay + hb_dateDOW( iYear, iMonth, 1 ) - 1;
-   if( iWom > 0 )
-      return ( iWom - hb_dateDOW( iYear, iMonth, iDay ) ) / 7 + 1;
-   else
-      return 0;
-}
 
 static int hb_woy( int iYear, int iMonth, int iDay, BOOL bISO )
 {
@@ -229,20 +217,6 @@ HB_FUNC( BOM )
       hb_retdl( 0 );
 }
 
-HB_FUNC( WOM )
-{
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
-
-   if( pDate )
-   {
-      int iYear, iMonth, iDay;
-
-      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
-      hb_retni( hb_wom( iYear, iMonth, iDay ) );
-   }
-   else
-      hb_retni( 0 );
-}
 
 HB_FUNC( DOY )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: datetime.c,v 1.1 2005/01/14 20:00:00 ptsarenko Exp $
+ * $Id: datetime.c,v 1.1 2005/01/14 19:22:17 ptsarenko Exp $
  */
 
 /*
@@ -49,6 +49,18 @@
  * If you write modifications of your own for Harbour, it is your choice
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
+ *
+ */
+
+
+/*
+ * The following parts are Copyright of the individual authors.
+ * www - http://www.harbour-project.org
+ *
+ * Copyright 1999 Jose Lalin <dezac@corevia.com>
+ *   Wom()
+ *
+ * See doc/license.txt for licensing terms.
  *
  */
 
@@ -171,4 +183,33 @@ HB_FUNC( EOY )
    {
       hb_retdl( 0 );
    }
+}
+
+
+static int hb_wom( int iYear, int iMonth, int iDay )
+{
+   int iWom;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_wom(%d, %d, %d)", iYear, iMonth, iDay));
+
+   iWom = iDay + hb_dateDOW( iYear, iMonth, 1 ) - 1;
+   if( iWom > 0 )
+      return ( iWom - hb_dateDOW( iYear, iMonth, iDay ) ) / 7 + 1;
+   else
+      return 0;
+}
+
+HB_FUNC( WOM )
+{
+   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+
+   if( pDate )
+   {
+      int iYear, iMonth, iDay;
+
+      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
+      hb_retni( hb_wom( iYear, iMonth, iDay ) );
+   }
+   else
+      hb_retni( 0 );
 }
