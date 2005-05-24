@@ -1,5 +1,5 @@
 /*
- * $Id: do.c,v 1.2 2003/12/07 00:10:07 jonnymind Exp $
+ * $Id: do.c,v 1.3 2004/02/23 08:31:57 andijahja Exp $
  */
 
 /*
@@ -66,7 +66,6 @@ HB_FUNC( DO )
    {
       PHB_DYNS pDynSym;
 
-      hb_dynsymLock();
       pDynSym = hb_dynsymFindName( pItem->item.asString.value );
 
       if( pDynSym )
@@ -75,8 +74,6 @@ HB_FUNC( DO )
          USHORT uiParam;
 
          hb_vmPushSymbol( pDynSym->pSymbol );
-
-         hb_dynsymUnlock();
 
          hb_vmPushNil();
 
@@ -91,8 +88,6 @@ HB_FUNC( DO )
       else
       {
          PHB_ITEM pArgsArray;
-
-         hb_dynsymUnlock();
 
          pArgsArray = hb_arrayFromParams( HB_VM_STACK.pBase );
 

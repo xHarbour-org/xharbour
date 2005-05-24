@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.35 2005/04/11 01:46:36 druzus Exp $
+ * $Id: runner.c,v 1.36 2005/04/12 11:26:52 druzus Exp $
  */
 
 /*
@@ -571,7 +571,6 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
    {
       PHB_DYNS pDyn;
 
-      hb_dynsymLock();
       pDyn = hb_dynsymFind( pHrbBody->pDynFunc[ ul ].szName );
 
       if( pDyn && pDyn->pFunPtr && pDyn->pFunPtr == ( PHB_FUNC ) pHrbBody->pDynFunc[ ul ].pCodeFunc )
@@ -580,7 +579,7 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
          pDyn->pFunPtr = NULL;
          pDyn->pSymbol->value.pFunPtr = NULL;
       }
-      hb_dynsymUnlock();
+
       hb_xfree( pHrbBody->pDynFunc[ ul ].pCodeFunc );
       hb_xfree( pHrbBody->pDynFunc[ ul ].pCode );
       hb_xfree( pHrbBody->pDynFunc[ ul ].szName );
@@ -726,7 +725,6 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
          {
             //printf( "External\n" );
 
-            hb_dynsymLock();
             pDynSym = hb_dynsymFind( pSymRead[ ul ].szName );
 
             //printf( "Found: %p\n", pDynSym );
@@ -734,13 +732,10 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
             if( pDynSym )
             {
                pSymRead[ ul ].value.pFunPtr = pDynSym->pFunPtr;
-               hb_dynsymUnlock();
             }
             else
             {
                char szName[21];
-
-               hb_dynsymUnlock();
 
                strncpy( szName, pSymRead[ ul ].szName, 20 );
 

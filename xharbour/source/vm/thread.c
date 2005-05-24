@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.187 2005/03/31 04:02:31 druzus Exp $
+* $Id: thread.c,v 1.188 2005/04/27 20:20:29 ronpinkas Exp $
 */
 
 /*
@@ -858,19 +858,13 @@ void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv )
    #endif
 
    // call errorsys() to initialize errorblock
-   hb_dynsymLock();
    pExecSym = hb_dynsymFind( "ERRORSYS" );
 
    if( pExecSym )
    {
       hb_vmPushSymbol( pExecSym->pSymbol );
-      hb_dynsymUnlock();
       hb_vmPushNil();
       hb_vmDo(0);
-   }
-   else
-   {
-      hb_dynsymLock();
    }
 
    if( _pStack_->bIsMethod )
@@ -1582,12 +1576,10 @@ HB_FUNC( STARTTHREAD )
    if ( pPointer->type == HB_IT_POINTER )
    {
       pFunc =  (PHB_FUNC) hb_itemGetPtr( pPointer );
-      hb_dynsymLock();
       pExecSym = hb_dynsymFindFromFunction( pFunc );
 
       if( pExecSym == NULL )
       {
-         hb_dynsymUnlock();
          hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "STARTTHREAD", 1, hb_paramError( 1 ) );
          hb_itemRelease( pArgs );
          return;
@@ -1597,7 +1589,6 @@ HB_FUNC( STARTTHREAD )
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
       pPointer->item.asSymbol.uiSuperClass = 0;
-      hb_dynsymUnlock();
    }
    /* Is it an object? */
    else if( hb_pcount() >= 2 && pPointer->type == HB_IT_OBJECT )
@@ -1639,12 +1630,10 @@ HB_FUNC( STARTTHREAD )
    /* Is it a function name? */
    else if( pPointer->type == HB_IT_STRING )
    {
-      hb_dynsymLock();
       pExecSym = hb_dynsymFindName( pPointer->item.asString.value );
 
       if( ! pExecSym )
       {
-         hb_dynsymUnlock();
          hb_errRT_BASE( EG_NOFUNC, 1001, NULL, pPointer->item.asString.value, 1, pArgs );
          hb_itemRelease( pArgs );
          return;
@@ -1653,7 +1642,6 @@ HB_FUNC( STARTTHREAD )
       pPointer->type = HB_IT_SYMBOL;
       pPointer->item.asSymbol.value = pExecSym->pSymbol;
       pPointer->item.asSymbol.uiSuperClass = 0;
-      hb_dynsymUnlock();
    }
    /* Is it a code block? */
    else if( pPointer->type != HB_IT_BLOCK )

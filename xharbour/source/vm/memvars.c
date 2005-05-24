@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.102 2005/04/28 10:26:47 andijahja Exp $
+ * $Id: memvars.c,v 1.103 2005/04/28 18:22:46 mlombardo Exp $
  */
 
 /*
@@ -973,7 +973,6 @@ char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
    itName.item.asString.bStatic = TRUE;
    itName.item.asString.pulHolders = NULL;
 
-   hb_dynsymLock();
    pDynVar = hb_memvarFindSymbol( &itName );
 
    if( pDynVar )
@@ -986,7 +985,6 @@ char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
          /* variable contains some data
           */
          HB_ITEM_PTR pItem = s_globalTable[ pDynVar->hMemvar ].pVarItem;
-         hb_dynsymUnlock();
 
          if( HB_IS_BYREF( pItem ) )
          {
@@ -999,14 +997,6 @@ char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
             *pulLen = pItem->item.asString.length;
          }
       }
-      else
-      {
-         hb_dynsymUnlock();
-      }
-   }
-   else
-   {
-      hb_dynsymUnlock();
    }
 
    return szValue;
@@ -1760,20 +1750,19 @@ HB_FUNC( __MVEXIST )
    HB_ITEM_PTR pName = hb_param( 1, HB_IT_STRING );
    PHB_DYNS pDyn = NULL;
 
-   hb_dynsymLock();
    hb_retl( pName && ( ( pDyn = hb_memvarFindSymbol( pName ) ) != NULL ) && pDyn->hMemvar );
-   hb_dynsymUnlock();
 }
 
 HB_FUNC( __MVGET )
 {
+   HB_THREAD_STUB
+
    HB_ITEM_PTR pName = hb_param( 1, HB_IT_STRING );
 
    if( pName )
    {
       HB_DYNS_PTR pDynVar;
 
-      hb_dynsymLock();
       pDynVar = hb_memvarFindSymbol( pName );
 
       if( pDynVar )
@@ -1782,7 +1771,6 @@ HB_FUNC( __MVGET )
          PHB_SYMB pSymbol;
 
          pSymbol = pDynVar->pSymbol;
-         hb_dynsymUnlock();
 
          ( &retValue )->type = HB_IT_NIL;
          hb_memvarGetValue( &retValue, pSymbol );
@@ -1797,8 +1785,6 @@ HB_FUNC( __MVGET )
          /* Generate an error with retry possibility
           * (user created error handler can create this variable)
           */
-         hb_dynsymUnlock();
-
 
          pError = hb_errRT_New( ES_ERROR, NULL, EG_NOVAR, 1003,
                                  NULL, pName->item.asString.value, 0, EF_CANRETRY );
@@ -1809,26 +1795,15 @@ HB_FUNC( __MVGET )
 
             if( uiAction == E_RETRY )
             {
-               hb_dynsymLock();
                pDynVar = hb_memvarFindSymbol( pName );
 
                if( pDynVar )
                {
-                  HB_ITEM retValue;
                   PHB_SYMB pSymbol = pDynVar->pSymbol;
 
-                  hb_dynsymUnlock();
-                  ( &retValue )->type = HB_IT_NIL;
-
-                  hb_memvarGetValue( &retValue, pSymbol );
-
-                  hb_itemReturn( &retValue );
+                  hb_memvarGetValue( &( HB_VM_STACK.Return ), pSymbol );
 
                   uiAction = E_DEFAULT;
-               }
-               else
-               {
-                  hb_dynsymUnlock();
                }
             }
          }
@@ -1870,7 +1845,6 @@ HB_FUNC( __MVPUT )
        */
       HB_DYNS_PTR pDynVar;
 
-      hb_dynsymLock();
       pDynVar = hb_memvarFindSymbol( pName );
 
       if( pDynVar )
@@ -1878,13 +1852,11 @@ HB_FUNC( __MVPUT )
          /* variable was declared somwhere - assign a new value
           */
          PHB_SYMB pSymbol = pDynVar->pSymbol;
-         hb_dynsymUnlock();
          hb_memvarSetValue( pSymbol, pValue );
       }
       else
       {
          PHB_DYNS pDyn;
-         hb_dynsymUnlock();
 
          /* attempt to assign a value to undeclared variable
           * create the PRIVATE one
@@ -2300,22 +2272,18 @@ HB_FUNC( __MVRESTORE )
                /* the first parameter is a string with not empty variable name */
                HB_DYNS_PTR pDynVar;
 
-               hb_dynsymLock();
                pDynVar = hb_memvarFindSymbol( &Name );
 
                if( pDynVar )
                {
                   /* variable was declared somwhere - assign a new value */
                   PHB_SYMB pSymbol = pDynVar->pSymbol;
-                  hb_dynsymUnlock();
 
                   hb_memvarSetValue( pSymbol, &Item );
                }
                else
                {
                   PHB_DYNS pDyn;
-
-                  hb_dynsymUnlock();
 
                   /* attempt to assign a value to undeclared variable create the PRIVATE one */
                   #ifdef HB_THREAD_SUPPORT
@@ -2419,18 +2387,15 @@ HB_HANDLE hb_memvarGetVarHandle( char *szName )
       sprintf( szNewName, ":TH:%d:%s", HB_VM_STACK.th_vm_id, szName );
    #endif
 
-   hb_dynsymLock();
    pDyn = hb_dynsymFindName( szName );
 
    if( pDyn != NULL )
    {
       HB_HANDLE hHand = pDyn->hMemvar;
-      hb_dynsymUnlock();
       return hHand;
    }
    else
    {
-      hb_dynsymUnlock();
       return 0; /* invalid handle */
    }
 }

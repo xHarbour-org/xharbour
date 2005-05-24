@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.463 2005/05/14 18:51:46 ronpinkas Exp $
+ * $Id: hvm.c,v 1.464 2005/05/16 21:45:41 andijahja Exp $
  */
 
 /*
@@ -5751,9 +5751,7 @@ static void hb_vmArrayPush( void )
    else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) &&
             strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
    {
-      hb_dynsymLock();
       hb_vmPushSymbol( hb_dynsymGetCase( pIndex->item.asString.value )->pSymbol );
-      hb_dynsymUnlock();
       hb_itemPushForward( pArray );
 
       hb_vmSend( 0 );
@@ -5989,9 +5987,7 @@ static void hb_vmArrayPop( void )
 
          // Recycle pValue as Message.
          pValue->type = HB_IT_SYMBOL;
-         hb_dynsymLock();
          pValue->item.asSymbol.value = hb_dynsymGetCase( szMessage )->pSymbol;
-         hb_dynsymUnlock();
          pValue->item.asSymbol.stackbase = HB_VM_STACK.pPos - 3 - HB_VM_STACK.pItems;
          pValue->item.asSymbol.uiSuperClass = 0;
 
@@ -6002,9 +5998,7 @@ static void hb_vmArrayPop( void )
 
          hb_vmSend( 1 );
       #else
-         hb_dynsymLock();
          hb_vmPushSymbol( hb_dynsymGetCase( szMessage )->pSymbol );
-         hb_dynsymUnlock();
          hb_vmPush( pArray );
          hb_vmPush( pValue );
 
@@ -6247,9 +6241,7 @@ void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSymbol, P
    HB_TRACE(HB_TR_DEBUG, ("hb_vmOperatorCall(%p, %p, %s)", pObjItem, pMsgItem, szSymbol));
 
    ItemMsg.type = HB_IT_SYMBOL;
-   hb_dynsymLock();
    ItemMsg.item.asSymbol.value = hb_dynsymFind( szSymbol )->pSymbol;
-   hb_dynsymUnlock();
    ItemMsg.item.asSymbol.stackbase = hb_stackTopOffset();
    ItemMsg.item.asSymbol.uiSuperClass = 0;
 
@@ -6293,9 +6285,7 @@ void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmOperatorCallUnary(%p, %s)", pObjItem, szSymbol));
 
    ItemMsg.type = HB_IT_SYMBOL;
-   hb_dynsymLock();
    ItemMsg.item.asSymbol.value = hb_dynsymFind( szSymbol )->pSymbol;
-   hb_dynsymUnlock();
    ItemMsg.item.asSymbol.stackbase = hb_stackTopOffset();
    ItemMsg.item.asSymbol.uiSuperClass = 0;
 
@@ -7166,9 +7156,7 @@ static void hb_vmModuleName( char * szModuleName ) /* PRG and function name info
    /* Cache __DBGENTRY symbol to speed everything up */
    if ( !s_pSymDbgEntry )
    {
-      hb_dynsymLock();
       s_pSymDbgEntry = hb_dynsymFind( "__DBGENTRY" )->pSymbol;
-      hb_dynsymUnlock();
    }
 
    hb_vmPushSymbol( s_pSymDbgEntry );
@@ -9298,9 +9286,7 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols
       {
          PHB_DYNS pDynSym;
 
-         hb_dynsymLock();
          pDynSym= hb_dynsymFind( pSymbol->szName );
-         hb_dynsymUnlock();
 
          if( pDynSym && pDynSym->pFunPtr && pSymbol->value.pFunPtr )
          {
@@ -9356,9 +9342,7 @@ HB_FUNC( HB_FUNCPTR )
    {
       char *sSym = hb_strUpperCopy( pParam->item.asString.value, pParam->item.asString.length );
 
-      hb_dynsymLock();
       pDynSym = hb_dynsymFind( sSym );
-      hb_dynsymUnlock();
 
       if( pDynSym )
       {

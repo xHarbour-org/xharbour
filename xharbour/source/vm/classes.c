@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.137 2005/04/14 09:15:08 ronpinkas Exp $
+ * $Id: classes.c,v 1.138 2005/04/29 00:41:29 ronpinkas Exp $
  */
 
 /*
@@ -1384,19 +1384,14 @@ HB_EXPORT PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, char *szString )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_objHasMsg(%p, %s)", pObject, szString));
 
-   hb_dynsymLock();
    pDynSym = hb_dynsymFindName( szString );
 
    if( pDynSym )
    {
-      pSymbol = pDynSym->pSymbol;
-      hb_dynsymUnlock();
-
-      return hb_objGetMthd( pObject, pSymbol, FALSE, NULL, FALSE );
+      return hb_objGetMthd( pObject, pDynSym->pSymbol, FALSE, NULL, FALSE );
    }
    else
    {
-      hb_dynsymUnlock();
       return 0;
    }
 }
@@ -2643,13 +2638,11 @@ PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *sMsg, ULONG ulArg, ... )
 
    //printf( "%s %p\n", sMsg, pMsgSym );
 
-   hb_dynsymLock();
    pMsgSym = hb_dynsymFindName( sMsg );
 
    if( pMsgSym )
    {
       pSymbol = pMsgSym->pSymbol;
-      hb_dynsymUnlock();
 
       hb_vmPushSymbol( pSymbol );
       hb_vmPush( pObj );
@@ -2674,7 +2667,6 @@ PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *sMsg, ULONG ulArg, ... )
    }
    else
    {
-      hb_dynsymUnlock();
       hb_errRT_BASE( EG_ARG, 3000, NULL, "__ObjSendMsg()", 0 );
    }
 
@@ -2724,7 +2716,6 @@ HB_FUNC( __OBJSENDMSG )
                     /*hb_dynsymFindName( hb_parcx(2) );*/
       PHB_DYNS pMsg ;
 
-      hb_dynsymLock();
       pMsg = hb_dynsymGet( hb_parcx(2) );
 
       if( pMsg )
@@ -2732,7 +2723,6 @@ HB_FUNC( __OBJSENDMSG )
          USHORT uiParam;
 
          hb_vmPushSymbol( pMsg->pSymbol );      /* Push char symbol as message  */
-         hb_dynsymUnlock();
 
          hb_vmPush( pObject );               /* Push object */
 
@@ -2743,9 +2733,6 @@ HB_FUNC( __OBJSENDMSG )
          }
 
          hb_vmSend( ( USHORT ) ( uiPCount - 2 ) );             /* Execute message */
-      }
-      else {
-         hb_dynsymUnlock();
       }
    }
    else
@@ -2772,7 +2759,6 @@ HB_FUNC( __OBJSENDMSGCASE )
                     /*hb_dynsymFindName( hb_parcx(2) );*/
       PHB_DYNS pMsg;
 
-      hb_dynsymLock();
       pMsg  = hb_dynsymGetCase( hb_parcx(2) );
 
       if( pMsg )
@@ -2780,7 +2766,6 @@ HB_FUNC( __OBJSENDMSGCASE )
          USHORT uiParam;
 
          hb_vmPushSymbol( pMsg->pSymbol );      /* Push char symbol as message  */
-         hb_dynsymUnlock();
 
          hb_vmPush( pObject );               /* Push object */
 
@@ -2791,10 +2776,6 @@ HB_FUNC( __OBJSENDMSGCASE )
          }
 
          hb_vmSend( ( USHORT ) ( uiPCount - 2 ) );             /* Execute message */
-      }
-      else
-      {
-         hb_dynsymUnlock();
       }
    }
    else
@@ -2818,7 +2799,6 @@ HB_FUNC( __CLSINSTSUPER )
       char *szString = hb_parcx( 1 );
       PHB_DYNS pDynSym;
 
-      hb_dynsymLock();
       pDynSym = hb_dynsymFind( szString );
 
       if( pDynSym )                             /* Find function            */
@@ -2826,7 +2806,6 @@ HB_FUNC( __CLSINSTSUPER )
          USHORT uiClass;
 
          hb_vmPushSymbol( pDynSym->pSymbol );        /* Push function name       */
-         hb_dynsymUnlock();
 
          hb_vmPushNil();
          hb_vmDo( 0 );                         /* Execute super class      */
@@ -2844,8 +2823,6 @@ HB_FUNC( __CLSINSTSUPER )
          }
          else
          {
-            hb_dynsymUnlock();
-
             hb_errRT_BASE( EG_ARG, 3002, "Super class does not return an object", "__CLSINSTSUPER", 1, hb_param(1, HB_IT_ANY ) );
          }
       }

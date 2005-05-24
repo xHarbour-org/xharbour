@@ -1,10 +1,31 @@
- * $Id: ChangeLog,v 1.4132 2005/05/21 01:30:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4133 2005/05/23 16:04:49 lf_sfnet Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-24 14:04 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/classes.c
+  * source/vm/do.c
+  * source/vm/dynlibhb.c
+  * source/vm/errorapi.c
+  * source/vm/hvm.c
+  * source/vm/macro.c
+  * source/vm/memvars.c
+  * source/vm/runner.c
+  * source/vm/thread.c
+    * Removed all calls to hb_dynsymLock() and hb_dynsymUnlock() as pere recent agreement.
+
+  * source/vm/eval.c
+    * Fixed, optimized and simplified HB_FUNC( HB_EXECFROMARRAY ) and hb_execFromArray( PHB_ITEM pFirst )
+      /* please report any issues */
+
+  * source/vm/memvars.c
+    % Optimized HB_ITEM RetValue to &( HB_VM_STACK.Return )
+
+  /* Because this change involved bulk manual cut operations, it must be tested heavily! */
 
 2005-05-23 18:10 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/source/debug/debugger.prg

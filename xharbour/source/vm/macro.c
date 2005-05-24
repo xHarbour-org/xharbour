@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.50 2004/11/21 21:44:29 druzus Exp $
+ * $Id: macro.c,v 1.51 2005/04/11 18:37:40 guerra000 Exp $
  */
 
 /*
@@ -887,13 +887,11 @@ void HB_EXPORT hb_macroPushSymbol( HB_ITEM_PTR pItem )
          /* NOTE: checking for valid function name (valid pointer) is done
           * in hb_vmDo()
           */
-         hb_dynsymLock();
          pDynSym = hb_dynsymGet( szString );
 
          hb_stackPop();    /* remove compiled string */
 
          hb_vmPushSymbol( pDynSym->pSymbol );  /* push compiled symbol instead of a string */
-         hb_dynsymUnlock();
 
          if( bNewBuffer )
          {
@@ -1295,8 +1293,6 @@ void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
 {
    HB_DYNS_PTR pSym;
 
-   hb_dynsymLock();
-
    if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_TYPE )
    {
       /* we are determining the type of expression (called from TYPE() function)
@@ -1319,8 +1315,8 @@ void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
       HB_PUT_PTR( byBuf, pSym );
       hb_compGenPCodeN( byBuf, sizeof( pSym ), HB_MACRO_PARAM );
    }
+
    /* hb_compGenPCodeN( ( BYTE * ) &pSym, sizeof( pSym ), HB_MACRO_PARAM ); */
-   hb_dynsymUnlock();
 }
 
 /* generates the pcode to push a symbol on the virtual machine stack */
@@ -1331,7 +1327,6 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_
    HB_SYMBOL_UNUSED( bFunction );
    HB_SYMBOL_UNUSED( bAlias );
 
-   hb_dynsymLock();
    if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_TYPE )
    {
       /* we are determining the type of expression (called from TYPE() function)
@@ -1368,8 +1363,8 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_
       HB_PUT_PTR( byBuf, pSym );
       hb_compGenPCodeN( byBuf, sizeof( pSym ), HB_MACRO_PARAM );
    }
+
    /* hb_compGenPCodeN( ( BYTE * ) &pSym, sizeof( pSym ), HB_MACRO_PARAM ); */
-   hb_dynsymUnlock();
 }
 
 /* generates the pcode to push integer number on the virtual machine stack */
@@ -1415,7 +1410,6 @@ void hb_compGenMessage( char * szMsgName, HB_MACRO_DECL )
     */
    HB_DYNS_PTR pSym;
 
-   hb_dynsymLock();
    pSym = hb_dynsymGet( szMsgName );
 
    hb_compGenPCode1( HB_P_MMESSAGE, HB_MACRO_PARAM );
@@ -1425,8 +1419,8 @@ void hb_compGenMessage( char * szMsgName, HB_MACRO_DECL )
       HB_PUT_PTR( byBuf, pSym );
       hb_compGenPCodeN( byBuf, sizeof( pSym ), HB_MACRO_PARAM );
    }
+
    /* hb_compGenPCodeN( ( BYTE * ) &pSym, sizeof( pSym ), HB_MACRO_PARAM ); */
-   hb_dynsymUnlock();
 }
 
 /* generates an underscore-symbol name for a data assignment */
