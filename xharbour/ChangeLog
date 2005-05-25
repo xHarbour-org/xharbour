@@ -1,10 +1,24 @@
- * $Id: ChangeLog,v 1.4136 2005/05/24 22:25:31 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4137 2005/05/24 22:45:50 vouchcac Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-25 15:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbcmd.c
+    * generate error for bad trailing characters in ALIAS expression
+      (Clipper compatible)
+    * add EF_CANDEFAULT to BAD/DUP ALIAS errors (Clipper compatible)
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fix ordKeyCount() in descending indexes when not SCOPE/FILTER
+      was active.
+
+  * xharbour/source/rtl/errorsys.prg
+    ! temporary fix for dump of screen contents in some GTs
+      We will need new GTs method to make it well.
 
 2005-05-24 15:24 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/pp/ppcore.c

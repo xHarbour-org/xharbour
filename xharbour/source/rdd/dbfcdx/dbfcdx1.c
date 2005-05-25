@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.203 2005/05/10 20:55:45 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.204 2005/05/19 02:20:15 druzus Exp $
  */
 
 /*
@@ -5697,7 +5697,10 @@ static LONG hb_cdxDBOIKeyCount( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
       {
          LPCDXPAGE pPage;
          pCurKey = hb_cdxKeyCopy( NULL, pTag->CurKey );
-         hb_cdxTagGoTop( pTag );
+         if ( pTag->UsrAscend )
+            hb_cdxTagGoTop( pTag );
+         else
+            hb_cdxTagGoBottom( pTag );
          pPage = pTag->RootPage;
          while ( pPage->Child )
             pPage = pPage->Child;

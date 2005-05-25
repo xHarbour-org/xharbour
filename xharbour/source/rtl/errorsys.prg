@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.45 2005/03/09 05:35:25 andijahja Exp $
+ * $Id: errorsys.prg,v 1.46 2005/05/20 14:35:24 lculik Exp $
  */
 
 /*
@@ -64,7 +64,6 @@
 #include "common.ch"
 #include "error.ch"
 #include "fileio.ch"
-#define  CRLF HB_OsNewLine()
 
 PROCEDURE ErrorSys
 
@@ -231,8 +230,11 @@ STATIC FUNCTION LogError( oerr )
      LOCAL aLogFile    := SET( _SET_ERRORLOG )
      LOCAL cLogFile    := aLogFile[1]
      LOCAL lAppendLog  := aLogFile[2]
-     LOCAL nRange      := ( Maxcol() + 1 ) * 2
      LOCAL nStart      := 1
+     LOCAL nCellSize
+     LOCAL nRange
+     LOCAL nCols
+     LOCAL nRows
      LOCAL nFhandle
      LOCAL nCount
      LOCAL nMemHandle
@@ -251,7 +253,9 @@ STATIC FUNCTION LogError( oerr )
      LOCAL nBytes
      LOCAL nMemCount
 
-     IF MaxCol() > 0
+     nCols := MaxCol()
+     IF nCols > 0
+        nRows := MaxRow()
         cScreen := Savescreen()
      ENDIF
      //Alert( 'An error occured, Information will be ;written to error.log' )
@@ -334,8 +338,8 @@ STATIC FUNCTION LogError( oerr )
         //FWriteLine( nHandle, "" )
 
         FWriteLine( nHandle, "" )
-        IF MaxCol() > 0
-            FWriteLine( nHandle, Padc( 'Detailed Work Area Items', Maxcol(), "=" ) )
+        IF nCols > 0
+            FWriteLine( nHandle, Padc( 'Detailed Work Area Items', nCols, "=" ) )
         ELSE
             FWriteLine( nHandle, 'Detailed Work Area Items ' )
         ENDIF
@@ -357,8 +361,8 @@ STATIC FUNCTION LogError( oerr )
         ENDIF
 
         FWriteLine( nHandle, "" )
-        IF MaxCol() > 0
-            FWriteLine( nHandle, Padc( " Internal Error Handling Information  ", Maxcol(), "+" ) )
+        IF nCols > 0
+            FWriteLine( nHandle, Padc( " Internal Error Handling Information  ", nCols, "+" ) )
         ELSE
             FWriteLine( nHandle, " Internal Error Handling Information  " )
         ENDIF
@@ -391,22 +395,24 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, "" )
         FWriteLine( nHandle, "" )
 
-        IF MaxCol() > 0
-            FWriteLine( nHandle, Padc( " Video Screen Dump ", Maxcol(), "#" ) )
+        IF valtype( cScreen ) == "C"
+            FWriteLine( nHandle, Padc( " Video Screen Dump ", nCols, "#" ) )
             FWriteLine( nHandle, "" )
             //FWriteLine( nHandle, "" )
-            FWriteLine( nHandle, "+" + Replicate( '-', Maxcol() + 1 ) + "+" )
+            FWriteLine( nHandle, "+" + Replicate( '-', nCols + 1 ) + "+" )
             //FWriteLine( nHandle, "" )
-            For nCount := 1 To Maxrow() + 1
+            nCellSize := len( Savescreen( 0, 0, 0, 0 ) )
+            nRange := ( nCols + 1 ) * nCellSize
+            For nCount := 1 To nRows + 1
                cOutString := ''
                cSubString := Substr( cScreen, nStart, nRange )
-               For nForLoop := 1 To nRange step 2
+               For nForLoop := 1 To nRange step nCellSize
                   cOutString += Substr( cSubString, nForLoop, 1 )
                Next
                FWriteLine( nHandle, "|" + cOutString + "|" )
                nStart += nRange
             Next
-            FWriteLine( nHandle, "+" + Replicate( '-', Maxcol() + 1 ) + "+" )
+            FWriteLine( nHandle, "+" + Replicate( '-', nCols + 1 ) + "+" )
             FWriteLine( nHandle, "" )
             FWriteLine( nHandle, "" )
         ELSE
@@ -415,7 +421,7 @@ STATIC FUNCTION LogError( oerr )
 
 
         /*
-        FWriteLine( nHandle, padc(" Available Memory Variables ",maxcol(),'+') )
+        FWriteLine( nHandle, padc(" Available Memory Variables ",nCols,'+') )
         FWriteLine( nHandle, "" )
         Save All Like * To errormem
         nMemHandle := Fopen( 'errormem.mem', FO_READWRITE )
@@ -484,10 +490,8 @@ Return cr
 
 STATIC FUNCTION FWriteLine( nh, c )
 
-     Fwrite( nh, c )
-     Fwrite( nh, CRLF )
-//     Fwrite( nh, Chr( 10 ) )
-     //HB_OutDebug( c + Chr( 13 ) + Chr( 10 ) )
+   Fwrite( nh, c + HB_OsNewLine() )
+   //HB_OutDebug( c + HB_OsNewLine() )
 Return nil
 
 STATIC FUNCTION Arguments( oErr )

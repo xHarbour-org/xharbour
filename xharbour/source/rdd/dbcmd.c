@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.155 2005/05/10 10:22:27 druzus Exp $
+ * $Id: dbcmd.c,v 1.156 2005/05/10 16:48:14 ronpinkas Exp $
  */
 
 /*
@@ -447,6 +447,16 @@ static ERRCODE hb_rddVerifyAliasName( char * szAlias )
    }
    if( ( c >= 'A' && c <= 'Z' ) || c == '_' )
    {
+      c = *(++szAlias);
+      while( c != 0 && c != ' ' )
+      {
+         if( c != '_' && ! ( c >= '0' && c <= '9' ) &&
+             ! ( c >= 'A' && c <= 'Z' ) && ! ( c >= 'a' && c <= 'z' ) )
+         {
+            return FAILURE;
+         }
+         c = *(++szAlias);
+      }
       return SUCCESS;
    }
    return FAILURE;
@@ -811,13 +821,13 @@ HB_EXPORT void * hb_rddAllocWorkAreaAlias( char * szAlias, int iArea )
    /* Verify if the alias name is valid symbol */
    if( hb_rddVerifyAliasName( szAlias ) != SUCCESS )
    {
-      hb_errRT_DBCMD( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias );
+      hb_errRT_DBCMD_Ext( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias, EF_CANDEFAULT );
       return NULL;
    }
    /* Verify if the alias is already in use */
    if( hb_rddGetAliasNumber( szAlias, &iDummyArea ) == SUCCESS )
    {
-      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
+      hb_errRT_DBCMD_Ext( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias, EF_CANDEFAULT );
       return NULL;
    }
 
@@ -835,7 +845,7 @@ HB_EXPORT void * hb_rddAllocWorkAreaAlias( char * szAlias, int iArea )
 
    if ( ! pSymAlias )
    {
-      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
+      hb_errRT_DBCMD_Ext( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias, EF_CANDEFAULT );
    }
 
    return pSymAlias;
@@ -1534,7 +1544,7 @@ HB_FUNC( DBCREATE )
       if( hb_rddVerifyAliasName( szAlias ) != SUCCESS )
       {
          hb_xfree( pFileName );
-         hb_errRT_DBCMD( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias );
+         hb_errRT_DBCMD_Ext( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias, EF_CANDEFAULT );
          /* hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" ); */
          return;
       }
@@ -1543,7 +1553,7 @@ HB_FUNC( DBCREATE )
    if( hb_rddGetTempAlias( szAliasTmp ) == FAILURE )
    {
       hb_xfree( pFileName );
-      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBCREATE" );
+      hb_errRT_DBCMD_Ext( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias, EF_CANDEFAULT );
       return;
    }
 
@@ -1571,7 +1581,7 @@ HB_FUNC( DBCREATE )
       if( hb_rddGetAliasNumber( szAlias, &iArea ) == SUCCESS )
       {
          hb_xfree( pFileName );
-         hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
+         hb_errRT_DBCMD_Ext( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias, EF_CANDEFAULT );
          return;
       }
    }
@@ -2221,20 +2231,25 @@ HB_FUNC( DBUSEAREA )
       hb_strncpyUpperTrim( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
    }
 
+   /* This code is not Clipper compatible - I'll remove it as soon as
+      3-rd party RDD begin to use hb_rddAllocWorkAreaAlias() or better
+      SUPER_OPEN() which will also makes this job */
+#if 1
    /* Verify if the alias name is valid symbol */
    if( hb_rddVerifyAliasName( szAlias ) != SUCCESS )
    {
       hb_xfree( pFileName );
-      hb_errRT_DBCMD( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias );
+      hb_errRT_DBCMD_Ext( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias, EF_CANDEFAULT );
       return;
    }
    /* Verify if the alias is already in use */
    if( hb_rddGetAliasNumber( szAlias, &iArea ) == SUCCESS )
    {
       hb_xfree( pFileName );
-      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
+      hb_errRT_DBCMD_Ext( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias, EF_CANDEFAULT );
       return;
    }
+#endif
 
    /* New area? */
    if( hb_parl( 1 ) )
@@ -4571,13 +4586,13 @@ HB_FUNC( DBUSEAREAD )
    /* Verify if the alias name is valid symbol */
    if( hb_rddVerifyAliasName( szAlias ) != SUCCESS )
    {
-      hb_errRT_DBCMD( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias );
+      hb_errRT_DBCMD_Ext( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias, EF_CANDEFAULT );
       return;
    }
    /* Verify if the alias is already in use */
    if( hb_rddGetAliasNumber( szAlias, &iArea ) == SUCCESS )
    {
-      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias );
+      hb_errRT_DBCMD_Ext( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias, EF_CANDEFAULT );
       return;
    }
 
