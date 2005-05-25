@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.20 2005/03/31 04:02:24 druzus Exp $
+ * $Id: eval.c,v 1.21 2005/05/24 21:05:56 ronpinkas Exp $
  */
 
 /*
@@ -643,6 +643,8 @@ HB_FUNC( HB_EXECFROMARRAY )
       hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_ExecFromArray", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
       return;
    }
+
+   hb_vmPushSymbol( pSymbol );
 
    if ( pSelf )
    {
