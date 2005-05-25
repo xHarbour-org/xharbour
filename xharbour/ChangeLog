@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4137 2005/05/24 22:45:50 vouchcac Exp $
+ * $Id: ChangeLog,v 1.4138 2005/05/25 13:17:50 druzus Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-25 15:35 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/vm/classes.c
+    * removed unused pSymbol from hb_objHasMsg()
 
 2005-05-25 15:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbcmd.c

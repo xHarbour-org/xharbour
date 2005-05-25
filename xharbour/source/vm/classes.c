@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.138 2005/04/29 00:41:29 ronpinkas Exp $
+ * $Id: classes.c,v 1.139 2005/05/24 21:05:55 ronpinkas Exp $
  */
 
 /*
@@ -1379,8 +1379,6 @@ HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
 HB_EXPORT PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, char *szString )
 {
    PHB_DYNS pDynSym;
-   PHB_SYMB pSymbol;
-
 
    HB_TRACE(HB_TR_DEBUG, ("hb_objHasMsg(%p, %s)", pObject, szString));
 
