@@ -1,10 +1,28 @@
- * $Id: ChangeLog,v 1.4139 2005/05/25 14:06:12 druzus Exp $
+ * $Id: ChangeLog,v 1.4140 2005/05/25 20:16:46 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-26 14:30 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
+  + contrib\htmllib\help\html.ng
+  + contrib\htmllib\website\website.zip
+  + contrib\htmllib\example\userform.prg
+  + contrib\htmllib\example\testhtm.prg
+  + contrib\htmllib\example\bldsite.prg
+  + contrib\htmllib\example\addbook.dbf
+  + contrib\htmllib\example\website.ch
+  + contrib\htmllib\example\fixing.dbf
+  + contrib\htmllib\example\counter.prg
+  + contrib\htmllib\example\testcgi.prg
+  + contrib\htmllib\example\generror.prg
+  + contrib\htmllib\example\addbook.prg
+  + contrib\htmllib\example\counter.dat
+  + contrib\htmllib\example\website.ini
+    ! added htmllib examples and doc to cvs
+
 
 2005-05-25 13:15 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/eval.c
