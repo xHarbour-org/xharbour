@@ -1,10 +1,13 @@
- * $Id: ChangeLog,v 1.4140 2005/05/25 20:16:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4141 2005/05/26 17:25:30 lculik Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-05-27 07:10 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/ct/files.c
+    - added missing FindClose( hFind ) in FILESIZE()
 
 2005-05-26 14:30 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   + contrib\htmllib\help\html.ng

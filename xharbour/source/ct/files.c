@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.8 2005/01/30 21:58:03 druzus Exp $
+ * $Id: files.c,v 1.9 2005/02/12 19:54:02 druzus Exp $
  */
 
 /*
@@ -488,6 +488,7 @@ HB_FUNC( FILESIZE )
             {
                hb_retnl( -1 );
             }
+            FindClose( hFind );
          }
     else
     {
