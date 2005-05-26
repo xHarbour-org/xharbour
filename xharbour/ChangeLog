@@ -1,10 +1,15 @@
- * $Id: ChangeLog,v 1.4141 2005/05/26 17:25:30 lculik Exp $
+ * $Id: ChangeLog,v 1.4142 2005/05/26 19:09:40 peterrees Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-27 00:35 UTC+0300 Phil Krylov <phil a t newstat.rinet.ru>
+  * source/rtl/binnumx.c
+    ! Fixed BIN2U() to return unsigned numbers for values >= 0x80000000.
+
 2005-05-27 07:10 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/ct/files.c
     - added missing FindClose( hFind ) in FILESIZE()
@@ -276,6 +281,12 @@
          DOUBLE / 0 or LONG / 0.0
 Reported by Rafa Carmona (TheFull)
 
+<<<<<<< ChangeLog
+2005-04-08 17:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * contrib/Makefile
+    + Added building of gtwvw and wvtgui on Windows, rdd_ads on Linux.
+
+=======
 2005-05-12 17:57 UTC-0800 Tony Bretado <jabrecer@yahoo.com>
   * source/rtl/achoice.prg
     ! I found that Clipper Hilites the current item AFTER calling;
@@ -1121,6 +1132,7 @@ Reported by Rafa Carmona (TheFull)
       You can make it by -DHB_SIXCDX compiler switch. For GNU make
       it's enough to set environment variable HB_SIXCDX=yes
 
+>>>>>>> 1.4114
 2005-04-18 13:30 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * source/rtl/gtwvt/gtwvt.c
   * contrib/gtwvw/gtwvw.c
