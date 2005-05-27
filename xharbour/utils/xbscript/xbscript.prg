@@ -443,11 +443,11 @@ STATIC s_cVer := "1.0.RC13" + Stringify( REVISION )
 #endif
 
 //--------------------------------------------------------------//
-#ifdef __HARBOUR__
-  STATIC PROCEDURE Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
-#else
+//#ifdef __HARBOUR__
+//  STATIC PROCEDURE Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
+//#else
   PROCEDURE Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
-#endif
+//#endif
 
    LOCAL sIncludePath, nNext, sPath, sSwitch := ""
    LOCAL nAt, sParams, sPPOExt, aParams := {}
