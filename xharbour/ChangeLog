@@ -1,10 +1,46 @@
- * $Id: ChangeLog,v 1.4145 2005/05/27 01:47:47 lculik Exp $
+ * $Id: ChangeLog,v 1.4146 2005/05/27 03:06:19 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-27 15:14 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    + Added parser support for hashes syntax.
+
+  * source/macro/macro.slx
+  * source/macro/macro.y
+    + Added macro parser support for hashes syntax.
+    + added macro parser support for IN, HAS, and LIKE operators.
+
+  * source/pp/pptable.c
+    - Removed #translate rules for Hashes (now native support in parsers).
+
+  * source/pp/ppcore.c
+    * Modified SearnRep() to NOT set 'Group Character' for markers NOT same as the processed 'expppatt'
+      This fixes code like this:
+         #xcommand MEMBER <cName> [, <cNameN>] ;
+                   [ INIT <uValue> ]       ;
+                 => ;
+                   _TSTRUCT_:<cName> := <uValue> [; _TSTRUCT_:<cNameN> := <uValue> ]
+
+         MEMBER Mem1, Mem2, Mem3 INIT "String"
+
+    /* WARNING: These kind of changes are very sensative - please report any problem ASAP!!! */
+
+  * source/rtl/cstr.prg
+    * Reverted ValToPrgExp() to use { ... => ... } syntax, as macro compiler now supports it.
+    % Optimized ValToPrg() for Hashes.
+
+  * source/rtl/tobject.prg
+    - Deffed out TAssociativeArray() - superceded by Hash()
+  * include/assocarr.ch
+    * Commented out, as TAssociativeArray() is superceded by Hashes.
+
+  /* NOTE: PRG Code using TAssociativeArray() will need to be modified to use Hash() instead!!! */
 
 2005-05-26 20:05 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/cstr.prg

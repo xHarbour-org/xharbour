@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.16 2004/12/28 06:39:19 druzus Exp $
+ * $Id: macro.y,v 1.17 2005/01/30 21:58:04 druzus Exp $
  */
 
 /*
@@ -175,6 +175,7 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 %token AND OR NOT EQ NE1 NE2 INC DEC ALIASOP SELF
 %token LE GE FIELD MACROVAR MACROTEXT
 %token PLUSEQ MINUSEQ MULTEQ DIVEQ POWER EXPEQ MODEQ
+%token HASHOP
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
@@ -189,7 +190,7 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 %right  AND
 %right  NOT
 /*relational operators*/
-%right  '=' '<' '>' EQ NE1 NE2 LE GE '$'
+%right  '=' '<' '>' EQ NE1 NE2 LE GE '$' LIKE MATCH
 /*mathematical operators*/
 %right  '+' '-'
 %right  '*' '/' '%'
@@ -233,7 +234,7 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 %type <asExpr>  FieldAlias FieldVarAlias
 %type <asExpr>  PostOp
 %type <asExpr>  WithData WithMethod
-
+%type <asExpr>  Hash HashList
 %%
 
 Main : Expression '\n'  {
@@ -362,6 +363,14 @@ Array      : '{' ArgList '}'     {
                                       s_iPending--;
                                    }
                                  }
+           ;
+
+Hash       : '{' HashList '}'         { $$ = hb_compExprNewFunCall( hb_compExprNewFunName( hb_strdup( "HASH" ) ), $2, HB_MACRO_PARAM ); }
+           ;
+
+HashList   : /* nothing => nil */ HASHOP /* nothing => nil */    { $$ = NULL; }
+           | Expression HASHOP EmptyExpression                   { $$ = hb_compExprAddListExpr( hb_compExprNewArgList( $1 ), $3 ); }
+           | HashList ',' EmptyExpression HASHOP EmptyExpression { $$ = hb_compExprAddListExpr( hb_compExprAddListExpr( $1, $3 ), $5 ); }
            ;
 
 /* Literal array access
@@ -540,6 +549,7 @@ ObjectData  : NumValue ':' IDENTIFIER        { $$ = hb_compExprNewSend( $1, $3 )
             | Logical ':' IDENTIFIER         { $$ = hb_compExprNewSend( $1, $3 ); }
             | SelfValue ':' IDENTIFIER       { $$ = hb_compExprNewSend( $1, $3 ); }
             | Array ':' IDENTIFIER           { $$ = hb_compExprNewSend( $1, $3 ); }
+            | Hash ':' IDENTIFIER            { $$ = hb_compExprNewSend( $1, $3 ); }
             | ArrayAt ':' IDENTIFIER         { $$ = hb_compExprNewSend( $1, $3 ); }
             | Variable ':' IDENTIFIER        { $$ = hb_compExprNewSend( $1, $3 ); }
             | AliasVar ':' IDENTIFIER        { $$ = hb_compExprNewSend( $1, $3 ); }
@@ -586,6 +596,7 @@ SimpleExpression :
            | Logical                          { $$ = $1; }
            | SelfValue                        { $$ = $1; }
            | Array                            { $$ = $1; }
+           | Hash                             { $$ = $1; }
            | ArrayAt                          { $$ = $1; }
            | AliasVar                         { $$ = $1; }
            | MacroVar                         { $$ = $1; }
@@ -653,6 +664,7 @@ ExprPostOp  : NumValue     PostOp %prec POST  { $$ = $2; }
             | Logical      PostOp %prec POST  { $$ = $2; }
             | SelfValue    PostOp %prec POST  { $$ = $2; }
             | Array        PostOp %prec POST  { $$ = $2; }
+            | Hash         PostOp %prec POST  { $$ = $2; }
             | ArrayAt      PostOp %prec POST  { $$ = $2; }
             | Variable     PostOp %prec POST  { $$ = $2; }
             | MacroVar     PostOp %prec POST  { $$ = $2; }
@@ -685,6 +697,7 @@ ExprAssign  : NumValue     INASSIGN Expression   { $$ = hb_compExprAssign( $1, $
             | Logical      INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | SelfValue    INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | Array        INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
+            | Hash         INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | ArrayAt      INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | Variable     INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | MacroVar     INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
@@ -708,6 +721,7 @@ ExprPlusEq  : NumValue     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_
             | Logical      PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | SelfValue    PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Array        PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | Hash         PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ArrayAt      PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Variable     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | MacroVar     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -731,6 +745,7 @@ ExprMinusEq : NumValue     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb
             | Logical      MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | SelfValue    MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Array        MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | Hash         MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ArrayAt      MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Variable     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | MacroVar     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -754,6 +769,7 @@ ExprMultEq  : NumValue     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_
             | Logical      MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
             | SelfValue    MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Array        MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | Hash         MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ArrayAt      MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Variable     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
             | MacroVar     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -777,6 +793,7 @@ ExprDivEq   : NumValue     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_c
             | Logical      DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
             | SelfValue    DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Array        DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | Hash         DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ArrayAt      DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Variable     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
             | MacroVar     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -800,6 +817,7 @@ ExprModEq   : NumValue     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_c
             | Logical      MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
             | SelfValue    MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Array        MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | Hash         MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ArrayAt      MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Variable     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
             | MacroVar     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -823,6 +841,7 @@ ExprExpEq   : NumValue     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_c
             | Logical      EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
             | SelfValue    EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Array        EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | Hash         EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
             | ArrayAt      EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Variable     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
             | MacroVar     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -859,15 +878,17 @@ ExprBool    : Expression AND Expression   { $$ = hb_compExprSetOperand( hb_compE
             | Expression OR  Expression   { $$ = hb_compExprSetOperand( hb_compExprNewOr( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
-ExprRelation: Expression EQ  Expression   { $$ = hb_compExprSetOperand( hb_compExprNewEQ( $1 ), $3, HB_MACRO_PARAM ); }
-            | Expression '<' Expression   { $$ = hb_compExprSetOperand( hb_compExprNewLT( $1 ), $3, HB_MACRO_PARAM ); }
-            | Expression '>' Expression   { $$ = hb_compExprSetOperand( hb_compExprNewGT( $1 ), $3, HB_MACRO_PARAM ); }
-            | Expression LE  Expression   { $$ = hb_compExprSetOperand( hb_compExprNewLE( $1 ), $3, HB_MACRO_PARAM ); }
-            | Expression GE  Expression   { $$ = hb_compExprSetOperand( hb_compExprNewGE( $1 ), $3, HB_MACRO_PARAM ); }
-            | Expression NE1 Expression   { $$ = hb_compExprSetOperand( hb_compExprNewNE( $1 ), $3, HB_MACRO_PARAM ); }
-            | Expression NE2 Expression   { $$ = hb_compExprSetOperand( hb_compExprNewNE( $1 ), $3, HB_MACRO_PARAM ); }
-            | Expression '$' Expression   { $$ = hb_compExprSetOperand( hb_compExprNewIN( $1 ), $3, HB_MACRO_PARAM ); }
-            | Expression '=' Expression   { $$ = hb_compExprSetOperand( hb_compExprNewEqual( $1 ), $3, HB_MACRO_PARAM ); }
+ExprRelation: Expression EQ    Expression   { $$ = hb_compExprSetOperand( hb_compExprNewEQ( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression '<'   Expression   { $$ = hb_compExprSetOperand( hb_compExprNewLT( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression '>'   Expression   { $$ = hb_compExprSetOperand( hb_compExprNewGT( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression LE    Expression   { $$ = hb_compExprSetOperand( hb_compExprNewLE( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression GE    Expression   { $$ = hb_compExprSetOperand( hb_compExprNewGE( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression NE1   Expression   { $$ = hb_compExprSetOperand( hb_compExprNewNE( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression NE2   Expression   { $$ = hb_compExprSetOperand( hb_compExprNewNE( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression '$'   Expression   { $$ = hb_compExprSetOperand( hb_compExprNewIN( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression '='   Expression   { $$ = hb_compExprSetOperand( hb_compExprNewEqual( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression LIKE  Expression   { $$ = hb_compExprSetOperand( hb_compExprNewLike( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression MATCH Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMatch( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
 ArrayIndex : IndexList ']'                   { $$ = $1; }

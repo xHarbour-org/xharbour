@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.208 2005/04/15 04:16:04 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.209 2005/05/24 22:25:42 ronpinkas Exp $
  */
 
 /*
@@ -206,6 +206,7 @@ static BOOL s_bReplacePat = TRUE, s_bNewLine = FALSE;
 static int  s_numBrackets;
 static char s_groupchar;
 static char s_prevchar;
+static int  s_aIsOptional[ 256 - 'A' ];
 
 int *      hb_pp_aCondCompile = NULL;
 int        hb_pp_nCondCompile = 0;
@@ -1783,7 +1784,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
   int i = 0, ipos, ifou;
   int explen, rmlen;
   char exppatt[ MAX_NAME ], expreal[ 5 ] = "\1  0";
-  char lastchar = '@', exptype;
+  char lastchar = 'A' - 1, exptype;
   char * ptr, * ptrtmp;
   UINT uiOpenBrackets = 0;
   char *pOpen = NULL;
@@ -2006,7 +2007,9 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            exptype = '0';
            ptr = mpatt + i;
 
-           //printf( "Find Marker: >%.*s< In: Len: %i %.*s\n", explen, exppatt, mlen - ( ptr - mpatt ), mlen - ( ptr - mpatt ), ptr );
+           s_aIsOptional[ lastchar - 'A' ] = uiOpenBrackets;
+
+           //printf( "Find Marker: %c Optional: %i >%.*s< In: Len: %i %.*s\n", lastchar, uiOpenBrackets, explen, exppatt, mlen - ( ptr - mpatt ), mlen - ( ptr - mpatt ), ptr );
 
            // Find if SAME Marker Name is used again in the remainder of the Match Rule.
            while( ( ifou = AtSkipStringsInRules( exppatt, explen, ptr, mlen - ( ptr - mpatt ) ) ) > 0 )
@@ -2960,7 +2963,7 @@ static int WorkCommand( char * ptri, char * ptro, COMMANDS * stcmd )
   lenres = hb_pp_strocpy( ptro, stcmd->value );   /* Copying result pattern */
   ptrmp = hb_strdup( stcmd->mpatt );                      /* Pointer to a match pattern */
   s_Repeate = 0;
-  s_groupchar = '@';
+  s_groupchar = 'A' - 1;
 
   rez = CommandStuff( ptrmp, ptri, ptro, &lenres, TRUE, stcmd->com_or_xcom, stcmd->name );
 
@@ -2988,7 +2991,7 @@ static int WorkTranslate( char * ptri, char * ptro, COMMANDS * sttra, int * lens
   lenres = hb_pp_strocpy( ptro, sttra->value );
   ptrmp = hb_strdup( sttra->mpatt );
   s_Repeate = 0;
-  s_groupchar = '@';
+  s_groupchar = 'A' - 1;
 
   rez = CommandStuff( ptrmp, ptri, ptro, &lenres, FALSE, sttra->com_or_xcom, sttra->name );
 
@@ -5333,12 +5336,12 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
                      for( i = 0; i < lennew; i++ )
                      {
-                        if( *( expnew + i ) == '\1' )
+                        if( *( expnew + i ) == '\1' && *( expnew + i + 1 ) == exppatt[1] )
                         {
                            *( expnew + i + 3 ) = s_groupchar;
 
                            #ifdef DEBUG_MARKERS
-                              printf( "   Group char: %s\n", ( expnew + i + 3 ) );
+                              printf( "   cMarker: %c Group char: %s\n", exppatt[1], ( expnew + i + 3 ) );
                            #endif
 
                            i += 4;
@@ -5529,7 +5532,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
             }
 
             #ifdef DEBUG_MARKERS
-               printf( "Repeate: %i lastchar: '%c' '%c'\n", s_Repeate, lastchar, *(ptrOut + ifou + 2) );
+               printf( "Marker: %c Repeate: %i lastchar: '%c' '%c' Optional: %i\n", exppatt[1], s_Repeate, lastchar, *(ptrOut + ifou + 2), s_aIsOptional[ exppatt[1] - 'A' ] );
             #endif
 
             // Ron Pinkas added [s_Repeate &&] 2002-04-26

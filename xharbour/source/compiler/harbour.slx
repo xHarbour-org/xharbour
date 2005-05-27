@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.67 2005/05/18 18:11:50 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.68 2005/05/24 22:25:41 ronpinkas Exp $
  */
 
 /*
@@ -78,6 +78,7 @@
                       x == DEC       || \
                       x == MINUSEQ   || \
                       x == ALIASOP   || \
+                      x == HASHOP    || \
                       x == MULTEQ    || \
                       x == POWER     || \
                       x == DIVEQ     || \
@@ -184,6 +185,7 @@ SELF_CONTAINED_WORDS_ARE {
                            LEX_WORD( ":="    ) AS_TOKEN( INASSIGN   ),
                            LEX_WORD( "::"    ) AS_TOKEN( HB_SELF    ),
                            LEX_WORD( "=="    ) AS_TOKEN( EQ         + DONT_REDUCE ),
+                           LEX_WORD( "=>"    ) AS_TOKEN( HASHOP     + DONT_REDUCE ),
                            LEX_WORD( "<<"    ) AS_TOKEN( BITSHIFTL  + DONT_REDUCE ),
                            LEX_WORD( "<="    ) AS_TOKEN( LE         + DONT_REDUCE ),
                            LEX_WORD( "<>"    ) AS_TOKEN( NE2        + DONT_REDUCE ),

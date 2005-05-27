@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.21 2005/02/17 00:56:32 ronpinkas Exp $
+ * $Id: macro.slx,v 1.22 2005/05/24 22:25:41 ronpinkas Exp $
  */
 
 /*
@@ -227,6 +227,8 @@ ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
 				     LEX_DELIMITER( '$' ) AS_TOKEN( '$'   + DONT_REDUCE )
 				   };
 
+#define HB_AFTER_EXP     LEX_CUSTOM_ACTION - 2560 /* IN, LIKE, MATCH */
+
 /* Intermediate Token, needs CustomAction. */
 #define HB_LIT_ACT    LEX_CUSTOM_ACTION - 1
 
@@ -249,6 +251,7 @@ SELF_CONTAINED_WORDS_ARE {
                            LEX_WORD( ":="    ) AS_TOKEN( INASSIGN + DONT_REDUCE ),
                            LEX_WORD( "::"    ) AS_TOKEN( HB_SELF    ),
                            LEX_WORD( "=="    ) AS_TOKEN( EQ       + DONT_REDUCE ),
+                           LEX_WORD( "=>"    ) AS_TOKEN( HASHOP   + DONT_REDUCE ),
                            LEX_WORD( "<>"    ) AS_TOKEN( NE2      + DONT_REDUCE ),
                            LEX_WORD( "<="    ) AS_TOKEN( LE       + DONT_REDUCE ),
                            LEX_WORD( ">="    ) AS_TOKEN( GE       + DONT_REDUCE ),
@@ -275,8 +278,11 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( ".T."       ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE  ),
                      LEX_WORD( ".Y."       ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE  ),
                      LEX_WORD( "FIELD"     ) AS_TOKEN( FIELD       ),
+                     LEX_WORD( "HAS"       ) AS_TOKEN( HB_AFTER_EXP - MATCH      ),
                      LEX_WORD( "IF"        ) AS_TOKEN( IIF         ),
                      LEX_WORD( "IIF"       ) AS_TOKEN( IIF         ),
+                     LEX_WORD( "IN"        ) AS_TOKEN( HB_AFTER_EXP - '$'        ),
+                     LEX_WORD( "LIKE"      ) AS_TOKEN( HB_AFTER_EXP - LIKE       ),
                      LEX_WORD( "NIL"       ) AS_TOKEN( NIL        + DONT_REDUCE  ),
                      LEX_WORD( "QSELF"     ) AS_TOKEN( QSELF       ),
                   /* LEX_WORD( "SELF"      ) AS_TOKEN( SELF        ), */
@@ -465,6 +471,25 @@ static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, in
 static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char *sToken )
 {
    HB_SYMBOL_UNUSED( sToken );
+
+   if( x < HB_AFTER_EXP )
+   {
+      bIgnoreWords = FALSE;
+
+      if( iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == LITERAL ||
+          iLastToken == IDENTIFIER ||  iLastToken == MACROVAR || iLastToken == MACROTEXT ||
+          iLastToken == ')' || iLastToken == ']' || iLastToken == '}' ||
+          iLastToken == FIELD || iLastToken == QSELF || iLastToken == IIF )
+      {
+         return ( (-x) + (HB_AFTER_EXP) ) + DONT_REDUCE;
+      }
+      else
+      {
+         pYYLVAL->string = hb_strdup( sToken );
+         DEBUG_INFO( printf( "HB_AFTER_EXP, Identifier %s\n", sToken ) );
+         return IDENTIFIER;
+      }
+   }
 
    switch ( x )
    {

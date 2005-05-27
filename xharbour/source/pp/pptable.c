@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.54 2005/04/25 01:17:15 andijahja Exp $
+ * $Id: pptable.c,v 1.55 2005/04/26 02:59:37 andijahja Exp $
  */
 
 /*
@@ -504,11 +504,9 @@ void hb_pp_Table( void )
    static COMMANDS sC___280 = {0,"SET","EOL \1A00","Set( _SET_EOL, \1A00 )",&sC___279 };
 #endif
 
-   static COMMANDS sT___01 = {0,"{","\1A00 => \1B00 \16,\1C00 => \1D00\17 }", "Hash(\1A00,\1B00\16,\1C00,\1D00\17)",NULL };
-   static COMMANDS sT___02 = {0,"{"," => }", "Hash()",&sT___01 };
-   static COMMANDS sT___03 = {0,"_GET_","(\1A00,\1B00 )","_GET_(\1A00,\1B00,NIL,NIL,NIL )",&sT___02 };
-   static COMMANDS sT___04 = {0,"_GET_","(\1A00,\1B00,\1C00 )","_GET_(\1A00,\1B00,\1C00,NIL,NIL )",&sT___03 };
-   static COMMANDS sT___05 = {0,"_GET_","(\1A00,\1B00,\1C00,\1D00 )","_GET_(\1A00,\1B00,\1C00,\1D00,NIL )",&sT___04 };
+   static COMMANDS sT___01 = {0,"_GET_","(\1A00,\1B00 )","_GET_(\1A00,\1B00,NIL,NIL,NIL )",NULL };
+   static COMMANDS sT___02 = {0,"_GET_","(\1A00,\1B00,\1C00 )","_GET_(\1A00,\1B00,\1C00,NIL,NIL )",&sT___01 };
+   static COMMANDS sT___03 = {0,"_GET_","(\1A00,\1B00,\1C00,\1D00 )","_GET_(\1A00,\1B00,\1C00,\1D00,NIL )",&sT___02 };
 
 #if defined( HB_COMPAT_C53 )
    hb_pp_topCommand = &sC___280;
@@ -517,5 +515,5 @@ void hb_pp_Table( void )
 #endif
 
    hb_pp_topDefine = &sD___70;
-   hb_pp_topTranslate = &sT___05;
+   hb_pp_topTranslate = &sT___03;
 }
