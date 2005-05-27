@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4144 2005/05/26 20:39:39 likewolf Exp $
+ * $Id: ChangeLog,v 1.4145 2005/05/27 01:47:47 lculik Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -6,12 +6,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-05-26 20:05 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/cstr.prg
+    ! Fixed ValToPrgExp() support for hashes.
+
 2005-05-26 14:30 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   * utils/xbscript/xbscript.prg
     ! change starting procedure to 'PROCEDURE MAIN()' instead of uncommon
       (if not erroneus) 'STATIC PROCEDURE MAIN()'.
       (i think this commit didn't reach cvs, or has been overwriten)
-      
+
 2005-05-27 00:35 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/rtl/binnumx.c
     ! Fixed BIN2U() to return unsigned numbers for values >= 0x80000000.
