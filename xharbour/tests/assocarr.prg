@@ -1,10 +1,8 @@
-#include "assocarr.ch"
-
 PROCEDURE Main()
 
-    LOCAL aaContact  := TAssociativeArray()
-    LOCAL aaSalary   := TAssociativeArray()
-    LOCAL aaEmployee := TAssociativeArray()
+    LOCAL aaContact  := Hash()
+    LOCAL aaSalary   := Hash()
+    LOCAL aaEmployee := Hash()
     LOCAL cKey, cSubKey, oErr
 
     // Array Syntax.
@@ -40,7 +38,7 @@ PROCEDURE Main()
     // Keys extraction.
     FOR EACH cKey IN aaEmployee:Keys
 
-       IF aaEmployee[ cKey ]:ClassName == "TASSOCIATIVEARRAY"
+       IF ValType( aaEmployee[ cKey ] ) == "H"
           ?
           ? cKey
           ? "-------"

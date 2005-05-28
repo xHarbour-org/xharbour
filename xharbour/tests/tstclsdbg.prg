@@ -9,7 +9,7 @@
 *
 * (C) 2003 Francesco Saverio Giudice
 *
-* $Id: tstclsdbg.prg,v 1.2 2003/11/12 21:51:32 fsgiudice Exp $
+* $Id: tstclsdbg.prg,v 1.3 2003/11/14 23:17:31 ronpinkas Exp $
 *
 
 #include "common.ch"
@@ -19,8 +19,8 @@
 
 PROCEDURE Main( cNoWait )
 
-  LOCAL a := TAssociativeArray()
-  LOCAL b := TAssociativeArray()
+  LOCAL a := Hash()
+  LOCAL b := Hash()
   LOCAL h := Hash()
   LOCAL t
   LOCAL lWait := TRUE
@@ -120,7 +120,7 @@ PROCEDURE Main( cNoWait )
   IF lWait THEN Write( "Press any key to continue" )
   IF lWait THEN Inkey( 0 )
   Write( "" )
-  Write( "Display the object TASSOCIATIVEARRAY itself" )
+  Write( "Display the object HASH itself" )
   Write( HB_DumpVar( a, TRUE ) )
   Write( "" )
   IF lWait THEN Write( "Press any key to end" )
@@ -164,14 +164,14 @@ CLASS Test FROM TestParent
  HIDDEN:
    DATA lVar6 INIT FALSE
    DATA nVar7
-   DATA aVar3 INIT TAssociativeArray()
+   DATA aVar3 INIT Hash()
 
    METHOD MyHiddenMethod()      INLINE Self  // On dump look at inline method type
 
 ENDCLASS
 
 METHOD Test( nInt ) CLASS Test
-   ::aVar3 := TAssociativeArray()
+   ::aVar3 := Hash()
    ::nVar7 := nInt
 RETURN Self
 
@@ -193,4 +193,3 @@ STATIC PROCEDURE Write( x )
   OutStd( x )
   HB_OutDebug( x )
 RETURN
-

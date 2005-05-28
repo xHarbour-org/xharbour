@@ -1,5 +1,3 @@
-//#translate { <Property1> \=> <Value1> [, <PropertyN> \=> <ValueN> ] } => TAssociativeArray( { { <Property1>, <Value1> } [, { <PropertyN> \=> <ValueN> } ] } )
-
 PROCEDURE Main()
 
    LOCAL cMacro := "cVar", aVar, xByRef
@@ -22,4 +20,3 @@ FUNCTION Test( xParam )
    xParam := "Ok :-)"
 
 RETURN NIL
-

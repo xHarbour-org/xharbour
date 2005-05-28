@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.209 2005/05/24 22:25:42 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.210 2005/05/27 22:19:51 ronpinkas Exp $
  */
 
 /*
@@ -270,7 +270,8 @@ char * hb_pp_szWarnings[] =
 {
    "1Redefinition or duplicate definition of #define %s",
    "1No directives in command definitions file",
-   "1No markers in repeatable group [%s] - group will never be used."
+   "1No markers in repeatable group [%s] - group will never be used.",
+   "\'%s\'"
 };
 
 void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
@@ -1155,6 +1156,11 @@ int hb_pp_ParseDirective( char * sLine )
      {
        /* --- #error  --- */
        hb_compGenError( hb_pp_szErrors, 'E', HB_PP_ERR_EXPLICIT, sLine, NULL );
+     }
+     else if( i >= 4 && i <= 7 && memcmp( sDirective, "WARNING", i ) == 0 )
+     {
+       /* --- #warning  --- */
+       hb_compGenWarning( hb_pp_szWarnings, 'I', HB_PP_WARN_EXPLICIT, sLine, NULL );
      }
      else if( i == 4 && memcmp( sDirective, "LINE", 4 ) == 0 )
      {

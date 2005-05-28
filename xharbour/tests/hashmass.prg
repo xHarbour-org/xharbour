@@ -6,7 +6,7 @@
 * This test demonstrates limits and advantages of
 * hashes.
 *
-* $Id: hashmass.prg,v 1.6 2003/11/26 14:03:15 jonnymind Exp $
+* $Id: hashmass.prg,v 1.7 2003/11/26 23:12:42 jonnymind Exp $
 *
 
 PROCEDURE Main()
@@ -14,8 +14,6 @@ PROCEDURE Main()
    LOCAL nSecs
    LOCAL nRow := 1
    LOCAL hHash
-
-   //LOCAL aaArr := TAssociativeArray()
 
    SET COLOR TO w+/b
    Clear Screen
@@ -152,34 +150,6 @@ PROCEDURE Main()
 
    @nRow++,5 SAY "    Done   "
    @nRow+2,0
-
-   /*
-   @5,5 SAY "TAssociativeArray Test"
-   aaArr["aaa"] := 'a'
-   aaArr["yyy"] := "Elemento"
-   aaArr["kkk"] := "Inserting"
-
-   nSecs := Seconds()
-   FOR i := 1 TO 10000
-      IF I % 500 == 0
-         @4,5 say Str(i)
-      ENDIF
-      aaArr[ RandStr(5) ]:= i
-   NEXT
-   @5,100 SAY "TASS Inserting " + Str( Seconds() - nSecs )
-
-   nSecs := Seconds()
-   FOR i := 1 TO 1000000
-      IF I % 500 == 0
-         @6,5 say Str(i)
-      ENDIF
-      IF aaArr[ "kkk" ] != "Inserting"
-         //? "ERROR!"
-         //EXIT
-      ENDIF
-   NEXT
-   @7,5 SAY "TASS Retreiving " + Str( Seconds() - nSecs )
-   */
 
 RETURN
 

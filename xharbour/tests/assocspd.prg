@@ -1,6 +1,6 @@
 PROCEDURE Main()
 
-    LOCAL MyAssocArray1 := TAssociativeArray()
+    LOCAL MyAssocArray1 := Hash()
     LOCAL oErr := ErrorNew()
     LOCAL Counter, nStart := Seconds()
 
@@ -10,7 +10,7 @@ PROCEDURE Main()
     NEXT
     ? Seconds() - nStart
 
-    // Dynamic property OOP Syntax (about 40% faster)
+    // Dynamic property OOP Syntax (about 20% slower)
     nStart := Seconds()
     FOR Counter := 1 TO 100000
        MyAssocArray1:Description := "John"

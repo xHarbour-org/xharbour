@@ -1,10 +1,30 @@
- * $Id: ChangeLog,v 1.4146 2005/05/27 03:06:19 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4147 2005/05/27 22:19:12 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-27 22:35 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hberrors.h
+  * source/pp/ppcore.c
+    + Added support for directive #warning.
+
+  * include/assocarr.ch
+    + Added #warning for deprecated file.
+    + Added #translate TAssociativeArray() => Hash()
+
+  * source/rtl/tobject.prg
+    + Added TAssociativeArray() as wrapper for Hash() when no paramaters passed,
+      throw error otherwise.
+
+  * tests/assocarr.prg
+  * tests/assocspd.prg
+  * tests/macroref.prg
+  * tests/tstclsdbg.prg
+  * tests/hashmass.prg
+    * Removed TAssociativeArray()/modified to use Hash()
 
 2005-05-27 15:14 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/compiler/harbour.slx
