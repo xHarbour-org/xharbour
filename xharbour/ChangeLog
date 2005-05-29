@@ -1,10 +1,25 @@
- * $Id: ChangeLog,v 1.4147 2005/05/27 22:19:12 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4148 2005/05/28 05:36:06 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-28 23:02 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/compiler/harbour.sly
+    ( Minor formatting.
+
+  * source/pp/ppcore.c
+    ! Fixed bug introduced with last change:
+        #xcommand TEST <uVar1> := <uVal1> [, <uVarN> := <uValN> ] => <uVar1> := <uVal1> [ ; <uVarN> := <uValN> ]
+        TEST Var1 := Var1(), Var2 := Var2(), Var3 := Var3()
+    ! Fixed long standing bug, accepting multiple values for non repetable result pattern.
+
+  * utils/xbscript/xbscript.prg
+    * Modiified PPOut() to return .F. if multiple values must be used with non repeatble result.
+    * Modfied MatchRule() to check return value of PPOut()
+    * Simplified logic of marking match pattern as repeatable.
 
 2005-05-27 22:35 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hberrors.h

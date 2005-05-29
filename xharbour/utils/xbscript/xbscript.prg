@@ -4038,6 +4038,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
    LOCAL aaRevertMarkers := {}
    LOCAL nBackup, nLevel, bTestDependant
    LOCAL bErrHandler := ErrorBlock()
+   LOCAL sPPO
 
    nRules   := Len( aRules )
 
@@ -4113,12 +4114,25 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
             sWorkLine := ""
          ENDIF
 
-         sLine := ( PPOut( aResults[nRule], aMarkers ) + sPad + sWorkLine )
+         sPPO := PPOut( aResults[nRule], aMarkers )
+
          IF bDbgMatch
-            ? "TRANSLATED to:", sLine
+            IF ValType( sLine ) == 'C'
+               ? "TRANSLATED to:", sPPO
+            ELSE
+               ? "Output failed! Continue with next rule."
+            ENDIF
+
             WAIT
          ENDIF
-         RETURN nRule
+
+         IF ValType( sPPO ) == 'C'
+            sLine := sPPO + sPad + sWorkLine
+            RETURN nRule
+         ELSE
+            // Continue with next rule.
+            LOOP
+         ENDIF
       ENDIF
 
       aMarkers  := aResults[nRule][3]
@@ -4477,12 +4491,26 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                ENDIF
 
                IF nMatch > nMatches
-                  sLine := ( PPOut( aResults[nRule], aMarkers ) + sPad + sWorkLine )
+                  sPPO := PPOut( aResults[nRule], aMarkers )
+
                   IF bDbgMatch
-                     ? "Skipped optionals and TRANSLATED to:", sLine
+                     IF ValType( sLine ) == 'C'
+                        ? "Skipped optionals and TRANSLATED to:", sPPO
+                     ELSE
+                        ? "Output failed! Continue with next rule."
+                     ENDIF
+
                      WAIT
                   ENDIF
-                  RETURN nRule
+
+                  IF ValType( sPPO ) == 'C'
+                     sLine := sPPO + sPad + sWorkLine
+                     RETURN nRule
+                  ELSE
+                     // Continue with next rule.
+                     bNext := .T.
+                     EXIT
+                  ENDIF
                ELSE
                   // Must consider this match a failure because End of input but NOT end of rule - REVERT if OPTIONAL.
                   IF aMP[2] <> 0
@@ -4603,12 +4631,26 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   sWorkLine := ""
                ENDIF
 
-               sLine := ( PPOut( aResults[nRule], aMarkers ) + sPad + sWorkLine )
+               sPPO := PPOut( aResults[nRule], aMarkers )
+
                IF bDbgMatch
-                  ? "TRANSLATED to:", sLine
+                  IF ValType( sLine ) == 'C'
+                     ? "TRANSLATED to:", sPPO
+                  ELSE
+                     ? "Output failed! Continue with next rule."
+                  ENDIF
+
                   WAIT
                ENDIF
-               RETURN nRule
+
+               IF ValType( sPPO ) == 'C'
+                  sLine := sPPO + sPad + sWorkLine
+                  RETURN nRule
+               ELSE
+                  // Continue with next rule.
+                  bNext := .T.
+                  EXIT
+               ENDIF
             ELSE
                IF bDbgMatch
                   ? "Accepted:", sToken, xMarker
@@ -4696,12 +4738,26 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      sWorkLine := ""
                   ENDIF
 
-                  sLine := ( PPOut( aResults[nRule], aMarkers ) + sWorkLine )
+                  sPPO := PPOut( aResults[nRule], aMarkers )
+
                   IF bDbgMatch
-                     ? "TRANSLATED to:", sLine
+                     IF ValType( sLine ) == 'C'
+                        ? "TRANSLATED to:", sPPO
+                     ELSE
+                        ? "Output failed! Continue with next rule."
+                     ENDIF
+
                      WAIT
                   ENDIF
-                  RETURN nRule
+
+                  IF ValType( sPPO ) == 'C'
+                     sLine := sPPO + sPad + sWorkLine
+                     RETURN nRule
+                  ELSE
+                     // Continue with next rule.
+                     bNext := .T.
+                     EXIT
+                  ENDIF
                ELSE
                   /* Top of Nested optional, maybe last in its parrent group. */
                   IF aMP[2] > 1
@@ -4906,13 +4962,25 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
          ENDIF
       ENDIF
 
-      sLine := ( PPOut( aResults[nRule], aMarkers ) )
+      sPPO := PPOut( aResults[nRule], aMarkers )
+
       IF bDbgMatch
-         ? "TRANSLATED to:", sLine
+         IF ValType( sLine ) == 'C'
+            ? "TRANSLATED to:", sPPO
+         ELSE
+            ? "Output failed! Continue with next rule."
+         ENDIF
+
          WAIT
       ENDIF
-      RETURN nRule
 
+      IF ValType( sPPO ) == 'C'
+         sLine := sPPO
+         RETURN nRule
+      ELSE
+         // Continue with next rule.
+         //LOOP
+      ENDIF
    ENDDO
 
    Eval( ErrorBlock(), ErrorNew( [PP], 3010, [Match-Rule], [Logic Failure],  ) )
@@ -5943,7 +6011,7 @@ RETURN IIF( cType == 'A', aExp, sExp )
 
 //--------------------------------------------------------------//
 
-STATIC FUNCTION PPOut( aResults, aMarkers )
+STATIC FUNCTION PPOut( aResults, aMarkers, sLine, nRule )
 
   LOCAL Counter, nResults, sResult := "", nMarker, nMatches, nMatch
   LOCAL xValue, nRepeats := 0, nDependee, nGroupStart, sDumb, aBackUp := aClone( aMarkers )
@@ -6030,6 +6098,11 @@ STATIC FUNCTION PPOut( aResults, aMarkers )
 
            IF ValType( aResults[1][Counter][2] ) == 'N'
               xValue := aMarkers[ aResults[1][Counter][2] ]
+
+              IF ValType( xValue ) == 'A' .AND. Len( xValue ) > 1
+                 //TraceLog( "Too many values for non repeatable result pattern!", Counter )
+                 RETURN .F.
+              ENDIF
            ELSE
               sResult += aResults[1][Counter][2]
               LOOP
@@ -7492,25 +7565,31 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
          IF ValType( nMarker ) == 'N'
             nTempMP := 0
+
             WHILE ( nTempMP := aScan( aRule[2], {|aMP| aMP[1] == nMarker .OR. aMP[1] - 1000 == nMarker }, nTempMP + 1 ) ) > 0
                nMP := nTempMP
-               WHILE aRule[2][nMP][2] < 0
-                  IF aRule[2][nMP][1] >= 0
 
-                     /* Mark as Repeatable. */
-                     IF aRule[2][nMP][1] < 1000
-                        aRule[2][nMP][1] += ( 1000 )
-                        //? "Flagged:", nMP, "As:", aRule[2][nMP][1]
+               // Clipper compatible - only repeatable if explictly used as repeatable in result, or is missing in result!
+               #if 0
+                  WHILE aRule[2][nMP][2] < 0
+                     IF aRule[2][nMP][1] >= 0
+
+                        /* Mark as Repeatable. */
+                        IF aRule[2][nMP][1] < 1000
+                           aRule[2][nMP][1] += 1000
+                           //? "   Flagged:", nMP, "As:", aRule[2][nMP][1]
+                        ENDIF
                      ENDIF
-                  ENDIF
 
-                  nMP--
-               ENDDO
+                     nMP--
+                  ENDDO
+               #endif
+
                IF aRule[2][nMP][2] == 0
                   TraceLog( "Warning - Result #" + Str( Counter ) + " marked REPEATABLE but root #" + Str( nMarker ) + " is not OPTIONAL!", sRuleCopy )
                   //aRule[2][nMP][2] := 1
                ELSEIF aRule[2][nMP][1] < 1000
-                  aRule[2][nMP][1] += ( 1000 )
+                  aRule[2][nMP][1] += 1000
                   //? "Flagged:", nMP, "As:", aRule[2][nMP][1]
                ENDIF
             ENDDO
@@ -7997,7 +8076,7 @@ STATIC FUNCTION CompileToCCH( sSource )
       nRules := Len( aRules )
 
       FOR nRule := 1 TO nRules
-         aRule  := aRules[nRule]
+         aRule := aRules[nRule]
 
          FWrite( hCCH, "aAdd( " + sRulesArray + ", { '" + aRule[1] + "' " )
 
@@ -8011,23 +8090,28 @@ STATIC FUNCTION CompileToCCH( sSource )
             FWrite( hCCH, ", " )
          ELSE
             FWrite( hCCH, ", { " )
+
             FOR nMatch := 1 TO nMatches
                aMatch := aRule[2][nMatch] //{ nId, nOptional, sAnchor, cType, aWords }
                FWrite( hCCH, "{ " + Str( aMatch[1], 4) + ", " + Str(aMatch[2],3) + ", " + IF( aMatch[3] == NIL, "NIL", "'" + aMatch[3] + "'" ) + ", " + IF( aMatch[4] == NIL, "NIL", "'" + aMatch[4] + "'" ) + ", " )
+
                IF aMatch[5] == NIL
                   FWrite( hCCH, "NIL" )
                ELSE
                   aWords := aMatch[5]
                   nWords := Len( aWords )
                   FWrite( hCCH, "{ " )
+
                   FOR nWord := 1 TO nWords
                      FWrite( hCCH, "'" + aWords[nWord] + "'" )
                      IF nWord < nWords
                         FWrite( hCCH, ", " )
                      ENDIF
                   NEXT
+
                   FWrite( hCCH, " }" )
                ENDIF
+
                FWrite( hCCH, " }" )
 
                IF nMatch < nMatches
@@ -8053,7 +8137,6 @@ STATIC FUNCTION CompileToCCH( sSource )
    FWrite( hCCH, CRLF + "FUNCTION InitResults()" + CRLF )
 
    FOR Counter := 1 TO 3
-
       IF Counter == 1
          aResults      := aDefResults
          sResultsArray := "aDefResults"
@@ -8071,7 +8154,7 @@ STATIC FUNCTION CompileToCCH( sSource )
       nResults := Len( aResults )
 
       FOR nResult := 1 TO nResults
-         aResult  := aResults[nResult]
+         aResult := aResults[nResult]
 
          FWrite( hCCH, "aAdd( " + sResultsArray + ", { " )
 

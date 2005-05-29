@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.84 2005/05/15 22:15:50 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.85 2005/05/27 22:19:46 ronpinkas Exp $
  */
 
 /*
@@ -1319,17 +1319,17 @@ ExprBool    : Expression AND  Expression   { $$ = hb_compExprSetOperand( hb_comp
             | Expression OR   Expression   { $$ = hb_compExprSetOperand( hb_compExprNewOr( $1 ), $3 ); }
             ;
 
-ExprRelation: Expression EQ  Expression   { $$ = hb_compExprSetOperand( hb_compExprNewEQ( $1 ), $3 ); }
-            | Expression '<' Expression   { $$ = hb_compExprSetOperand( hb_compExprNewLT( $1 ), $3 ); }
-            | Expression '>' Expression   { $$ = hb_compExprSetOperand( hb_compExprNewGT( $1 ), $3 ); }
-            | Expression LE  Expression   { $$ = hb_compExprSetOperand( hb_compExprNewLE( $1 ), $3 ); }
-            | Expression GE  Expression   { $$ = hb_compExprSetOperand( hb_compExprNewGE( $1 ), $3 ); }
-            | Expression NE1 Expression   { $$ = hb_compExprSetOperand( hb_compExprNewNE( $1 ), $3 ); }
-            | Expression NE2 Expression   { $$ = hb_compExprSetOperand( hb_compExprNewNE( $1 ), $3 ); }
-            | Expression '$' Expression   { $$ = hb_compExprSetOperand( hb_compExprNewIN( $1 ), $3 ); }
-            | Expression '=' Expression   { $$ = hb_compExprSetOperand( hb_compExprNewEqual( $1 ), $3 ); }
-            | Expression LIKE Expression { $$ = hb_compExprSetOperand( hb_compExprNewLike( $1 ), $3 ); }
-            | Expression MATCH Expression { $$ = hb_compExprSetOperand( hb_compExprNewMatch( $1 ), $3 ); }
+ExprRelation: Expression EQ    Expression  { $$ = hb_compExprSetOperand( hb_compExprNewEQ( $1 ), $3 ); }
+            | Expression '<'   Expression  { $$ = hb_compExprSetOperand( hb_compExprNewLT( $1 ), $3 ); }
+            | Expression '>'   Expression  { $$ = hb_compExprSetOperand( hb_compExprNewGT( $1 ), $3 ); }
+            | Expression LE    Expression  { $$ = hb_compExprSetOperand( hb_compExprNewLE( $1 ), $3 ); }
+            | Expression GE    Expression  { $$ = hb_compExprSetOperand( hb_compExprNewGE( $1 ), $3 ); }
+            | Expression NE1   Expression  { $$ = hb_compExprSetOperand( hb_compExprNewNE( $1 ), $3 ); }
+            | Expression NE2   Expression  { $$ = hb_compExprSetOperand( hb_compExprNewNE( $1 ), $3 ); }
+            | Expression '$'   Expression  { $$ = hb_compExprSetOperand( hb_compExprNewIN( $1 ), $3 ); }
+            | Expression '='   Expression  { $$ = hb_compExprSetOperand( hb_compExprNewEqual( $1 ), $3 ); }
+            | Expression LIKE  Expression  { $$ = hb_compExprSetOperand( hb_compExprNewLike( $1 ), $3 ); }
+            | Expression MATCH Expression  { $$ = hb_compExprSetOperand( hb_compExprNewMatch( $1 ), $3 ); }
             ;
 
 ArrayIndex : IndexList ']'                   { $$ = $1; }

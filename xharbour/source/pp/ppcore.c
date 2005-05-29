@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.210 2005/05/27 22:19:51 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.211 2005/05/28 05:36:18 ronpinkas Exp $
  */
 
 /*
@@ -194,6 +194,8 @@ int hb_pp_NextToken( char** pLine, char *sToken );
                                                        strncmp( p, "->", 2 ) == 0      ) )
 /* END, Ron Pinkas added 2000-01-24 */
 
+#define MARKER_OPTIONAL 1
+#define MARKER_REPEATABLE 2
 
 static int  s_kolAddDefs = 0;
 static int  s_kolAddComs = 0;
@@ -2013,8 +2015,6 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            exptype = '0';
            ptr = mpatt + i;
 
-           s_aIsOptional[ lastchar - 'A' ] = uiOpenBrackets;
-
            //printf( "Find Marker: %c Optional: %i >%.*s< In: Len: %i %.*s\n", lastchar, uiOpenBrackets, explen, exppatt, mlen - ( ptr - mpatt ), mlen - ( ptr - mpatt ), ptr );
 
            // Find if SAME Marker Name is used again in the remainder of the Match Rule.
@@ -2960,20 +2960,16 @@ static int WorkCommand( char * ptri, char * ptro, COMMANDS * stcmd )
 {
   int rez;
   int lenres;
-  char * ptrmp;
 
   HB_TRACE(HB_TR_DEBUG, ("WorkCommand(%s, %s, %p)", ptri, ptro, stcmd));
 
   //printf( "Command Key: '%s' MP: '%s' RP: >%s< Against: '%s'\n", stcmd->name, stcmd->mpatt, stcmd->value , ptri );
 
   lenres = hb_pp_strocpy( ptro, stcmd->value );   /* Copying result pattern */
-  ptrmp = hb_strdup( stcmd->mpatt );                      /* Pointer to a match pattern */
   s_Repeate = 0;
   s_groupchar = 'A' - 1;
 
-  rez = CommandStuff( ptrmp, ptri, ptro, &lenres, TRUE, stcmd->com_or_xcom, stcmd->name );
-
-  hb_xfree( ptrmp );
+  rez = CommandStuff( stcmd->mpatt, ptri, ptro, &lenres, TRUE, stcmd->com_or_xcom, stcmd->name );
 
   if( rez >= 0 )
   {
@@ -2988,20 +2984,16 @@ static int WorkTranslate( char * ptri, char * ptro, COMMANDS * sttra, int * lens
 {
   int rez;
   int lenres;
-  char * ptrmp;
 
   HB_TRACE(HB_TR_DEBUG, ("WorkTranslate(%s, %s, %p, %p)", ptri, ptro, sttra, lens));
 
   //printf( "Translate Key: '%s' MP: '%s' RP: >%s< Against: '%s'\n", sttra->name, sttra->mpatt, sttra->value , ptri );
 
   lenres = hb_pp_strocpy( ptro, sttra->value );
-  ptrmp = hb_strdup( sttra->mpatt );
   s_Repeate = 0;
   s_groupchar = 'A' - 1;
 
-  rez = CommandStuff( ptrmp, ptri, ptro, &lenres, FALSE, sttra->com_or_xcom, sttra->name );
-
-  hb_xfree( ptrmp );
+  rez = CommandStuff( sttra->mpatt, ptri, ptro, &lenres, FALSE, sttra->com_or_xcom, sttra->name );
 
   if( rez >= 0 )
   {
@@ -3026,6 +3018,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
   //printf( "MP: >%s< Input: >%s<\n", ptrmp, ptri ) ;
 
   s_numBrackets = 0;
+
   HB_SKIPTABSPACES( ptri );
 
   if( ptrmp == NULL )
@@ -3037,6 +3030,112 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
   }
   else
   {
+     int iOptional = 0, iRepeatable;
+     char *Marker, *Result;
+     BOOL bRepeatable;
+
+     //printf( "MP: >%s< RP: >%s<\n", ptrmp, ptro );
+     ptr = ptrmp;
+
+     while( ptr[0] )
+     {
+        switch( ptr[0] )
+        {
+           case '\16' :
+             iOptional++;
+             ptr++;
+             continue;
+
+           case '\17' :
+             iOptional--;
+             ptr++;
+             continue;
+
+           case '\1' :
+             Marker = ptr + 1;
+             break;
+
+           default:
+             ptr++;
+             continue;
+        }
+
+        ptr = ptro;
+        Result = NULL;
+        iRepeatable = 0;
+        bRepeatable = FALSE;
+
+        while( ptr[0] )
+        {
+           switch( ptr[0] )
+           {
+              case '\16' :
+                iRepeatable++;
+                ptr++;
+                continue;
+
+              case '\17' :
+                iRepeatable--;
+                ptr++;
+                continue;
+
+              case '\1' :
+                if( Marker[0] == ptr[1] )
+                {
+                   Result = ptr + 1;
+                   break;
+                }
+
+                ptr += 4;
+                continue;
+
+              default:
+                ptr++;
+                continue;
+           }
+
+           // If just 1 instance in result in NOT REPEATABLE, then as a whole Clipper considers the Marker it NOT Repetable!
+           if( iRepeatable == 0 )
+           {
+              break;
+           }
+           else
+           {
+              bRepeatable = TRUE;
+           }
+
+           ptr += 4;
+        }
+
+        s_aIsOptional[ Marker[0] - 'A' ] = 0;
+
+        if( Result && Marker[0] == Result[0] )
+        {
+           //printf( "Marker: %c Optional: %i Repeatable %i\n", Marker[0], iOptional, bRepeatable );
+
+           if( bRepeatable )
+           {
+              s_aIsOptional[ Marker[0] - 'A' ] = MARKER_REPEATABLE ;
+           }
+           else if( iOptional )
+           {
+              s_aIsOptional[ Marker[0] - 'A' ] = MARKER_OPTIONAL ;
+           }
+        }
+        else
+        {
+           //printf( "Marker: %c not used\n", Marker[0] );
+
+           if( iOptional )
+           {
+              // Clipper compatible - Not used optional marker is considered repetable!
+              s_aIsOptional[ Marker[0] - 'A' ] = MARKER_REPEATABLE ;
+           }
+        }
+
+        ptr = Marker + 3;
+     }
+
      while( *ptri != '\0' && !endTranslation )
      {
         HB_SKIPTABSPACES( ptrmp );
@@ -3211,15 +3310,8 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
           //printf( "\nCommandStuff->WorkMarkers: >%s< MP: >%s<\n", ptri, ptrmp );
 
           pTemp = ptrmp;
-          if( WorkMarkers( &ptrmp, &ptri, ptro, lenres, com_or_xcom ) )
-          {
-             if( s_Repeate && s_aIsRepeate[ s_Repeate - 1 ] == FALSE )
-             {
-                pTemp[2] = 'X';
-                //printf( "Flaged USED and NON Repeatable: %i %i\n", s_Repeate, s_aIsRepeate[ s_Repeate - 1 ] );
-             }
-          }
-          else
+
+          if( ! WorkMarkers( &ptrmp, &ptri, ptro, lenres, com_or_xcom ) )
           {
              //printf( "Failed!\n" );
 
@@ -3450,10 +3542,12 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
 
   //printf( "WorkMarkers( '%s', '%s', '%s', %i, %i) %i\n", *ptrmp, *ptri, ptro, *lenres, com_or_xcom, s_numBrackets );
 
-  if( (*ptrmp)[2] == 'X' )
+  //printf( "Work %c >%s< at >%s<\n", (*ptrmp)[1], *ptrmp, *ptri );
+
+  if( s_aIsOptional[ (*ptrmp)[1] - 'A' ] < 0 )
   {
      // USED and NON repeatable - can't match anything!
-     //printf( "Rejected USED and NON Repetable >%s<\n", *ptrmp );
+     //printf( "Rejected %c USED and NON Repetable >%s< at >%s<\n", (*ptrmp)[1], *ptrmp, *ptri );
      return 0;
   }
 
@@ -5170,6 +5264,21 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
    {
       *( ptro + *lenres ) = '\0';
    }
+   else
+   {
+      if( s_bReplacePat )
+      {
+         if( s_aIsOptional[ exppatt[1] - 'A' ] != MARKER_REPEATABLE )
+         {
+            //printf( "*** MARK NON REPEATABLE USED: %c s_aIsRepeate[]: %i\n", exppatt[1],s_Repeate && s_aIsRepeate[ s_Repeate - 1 ] );
+
+            if( s_aIsOptional[ exppatt[1] - 'A' ] > 0 )
+            {
+               s_aIsOptional[ exppatt[1] - 'A' ] = -( s_aIsOptional[ exppatt[1] - 'A' ] );
+            }
+         }
+      }
+   }
 
    while( ( ifou = md_strAt( exppatt, ( *( exppatt + 1 ) ) ? 2 : 1, ptrOut, FALSE, FALSE, TRUE, FALSE )) > 0 ) /* ??? */
    {
@@ -5342,12 +5451,12 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
 
                      for( i = 0; i < lennew; i++ )
                      {
-                        if( *( expnew + i ) == '\1' && *( expnew + i + 1 ) == exppatt[1] )
+                        if( *( expnew + i ) == '\1' )
                         {
                            *( expnew + i + 3 ) = s_groupchar;
 
                            #ifdef DEBUG_MARKERS
-                              printf( "   cMarker: %c Group char: %s\n", exppatt[1], ( expnew + i + 3 ) );
+                              printf( "   cMarker: %c Group char: %c\n", exppatt[1], ( expnew + i + 3 ) );
                            #endif
 
                            i += 4;
@@ -5410,7 +5519,7 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                      }
 
                      // Maybe the group was instanciated already and since this is Non Repeatable we don't need to instanciate again.
-                     if( ! rezs )
+                     if( !rezs )
                      {
                         // Flagging all markers (EXCEPT the non repeatable that we'll be instanciated) in Repeatable group as Instanciated.
                         for( i = 0; i < lennew; i++ )
@@ -5537,8 +5646,13 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                lastchar = *(ptrOut + ifou + 2);
             }
 
+            if( s_aIsOptional[ exppatt[1] - 'A' ] != MARKER_REPEATABLE )
+            {
+               lastchar = *(ptrOut + ifou + 2);
+            }
+
             #ifdef DEBUG_MARKERS
-               printf( "Marker: %c Repeate: %i lastchar: '%c' '%c' Optional: %i\n", exppatt[1], s_Repeate, lastchar, *(ptrOut + ifou + 2), s_aIsOptional[ exppatt[1] - 'A' ] );
+               printf( "Marker: %c Repeatable: %i Repeate: %i lastchar: '%c' '%c' Optional: %i\n", exppatt[1], s_aIsOptional[ exppatt[1] - 'A' ], s_Repeate, lastchar, *(ptrOut + ifou + 2), s_aIsOptional[ exppatt[1] - 'A' ] );
             #endif
 
             // Ron Pinkas added [s_Repeate &&] 2002-04-26
