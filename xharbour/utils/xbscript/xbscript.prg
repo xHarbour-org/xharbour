@@ -4039,6 +4039,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
    LOCAL nBackup, nLevel, bTestDependant
    LOCAL bErrHandler := ErrorBlock()
    LOCAL sPPO
+   LOCAL aRule, aMatchers
 
    nRules   := Len( aRules )
 
@@ -4088,6 +4089,8 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
          nRule := Counter
       ENDIF
 
+      aRule     := aRules[nRule]
+      aMatchers := aRule[2]
       sWorkLine := sLine
 
       IF bDbgMatch
@@ -4095,10 +4098,10 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
          WAIT
       ENDIF
 
-      IF aRules[nRule][2] == NIL
+      IF aMatchers == NIL
          nMatches := 0
       ELSE
-         nMatches := Len( aRules[nRule][2] )
+         nMatches := Len( aMatchers )
       ENDIF
 
       IF nMatches == 0
@@ -4114,7 +4117,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
             sWorkLine := ""
          ENDIF
 
-         sPPO := PPOut( aResults[nRule], aMarkers )
+         sPPO := PPOut( aResults[nRule], aMarkers, aMatchers )
 
          IF bDbgMatch
             IF ValType( sLine ) == 'C'
@@ -4141,13 +4144,13 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
       ENDIF
 
       nMatch    := 1
-      aMP       := aRules[nRule][2][1]
+      aMP       := aMatchers[1]
       nOptional := 0
       bNext     := .F.
 
       DO WHILE .T. //! ( sWorkLine == '' )
 
-         aMP       := aRules[nRule][2][nMatch]
+         aMP       := aMatchers[nMatch]
 
          nMarkerId := aMP[1]
          sAnchor   := aMP[3]
@@ -4184,7 +4187,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   nOptional := Abs( aMP[2] )
                   nMatch++
                   WHILE nMatch <= nMatches
-                     aMP := aRules[nRule][2][nMatch]
+                     aMP := aMatchers[nMatch]
                      IF ( aMP[2] >= 0 ) .AND. ( aMP[2] <= nOptional )
                         EXIT
                      ENDIF
@@ -4241,7 +4244,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   WHILE ( nSpaceAt := At( ' ', sStopper ) ) > 0
                      sNextStopper := Left( sStopper, nSpaceAt - 1 )
 
-                     IF aRules[nRule][3]
+                     IF aRule[3]
                         nLen := 64
                      ELSE
                         nLen := Max( 4, Len( sToken ) )
@@ -4259,7 +4262,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      ENDIF
                   ENDDO
 
-                  IF aRules[nRule][3]
+                  IF aRule[3]
                      nLen := 64
                   ELSE
                      nLen := Max( 4, Len( sToken ) )
@@ -4287,14 +4290,14 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                       /* Rewind to beging of same level and then search for the stopper match */
                       WHILE nMatch > 1
                          nMatch--
-                         IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
+                         IF Abs( aMatchers[nMatch][2] ) < nOPtional
                             nMatch++
                             EXIT
                          ENDIF
                       ENDDO
 
                       // Added June-1-2003 (yes I know it's a commented section.)
-                      IF nMatch == 1 .AND. aRules[nRule][2][nMatch][2] == 0
+                      IF nMatch == 1 .AND. aMatchers[nMatch][2] == 0
                          nMatch++
                       ENDIF
                   #endif
@@ -4302,7 +4305,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   /* Now search for the stopper. */
                   WHILE nMatch < nMatches
                      nMatch++
-                     aMP := aRules[nRule][2][nMatch]
+                     aMP := aMatchers[nMatch]
 
                      IF aMP[3] == NIL .AND. aMP[4] == ':'
                       #ifdef __XHARBOUR__
@@ -4367,7 +4370,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
 
          IF ( sAnchor == NIL .OR. sMultiStopper != NIL .OR. ;
               ( ( ( sToken := NextToken( @sWorkLine ) ) != NIL  .AND. ( DropTrailingWS( @sToken, @sPad ), nLen := Max( 4, Len( sToken ) ), Upper( sToken ) == Left( sAnchor, nLen ) ) ) ) ) ;
-            .AND. ( nMarkerId == 0 .OR. ( sAnchor == NIL .AND. sMultiStopper != NIL ) .OR. ( ( xMarker := NextExp( @sWorkLine, cType, aList, sNextAnchor, aRules[nRule][3] ) ) != NIL ) )
+            .AND. ( nMarkerId == 0 .OR. ( sAnchor == NIL .AND. sMultiStopper != NIL ) .OR. ( ( xMarker := NextExp( @sWorkLine, cType, aList, sNextAnchor, aRule[3] ) ) != NIL ) )
 
             IF sMultiStopper != NIL
                IF sAnchor == NIL
@@ -4470,7 +4473,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                bTestDependant := .T.
                nTemp := Abs( aMP[2] )
                WHILE ++nMatch <= nMatches
-                  nLevel := aRules[nRule][2][nMatch][2]
+                  nLevel := aMatchers[nMatch][2]
 
                   // Non Optional.
                   IF nLevel == 0
@@ -4491,7 +4494,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                ENDIF
 
                IF nMatch > nMatches
-                  sPPO := PPOut( aResults[nRule], aMarkers )
+                  sPPO := PPOut( aResults[nRule], aMarkers, aMatchers )
 
                   IF bDbgMatch
                      IF ValType( sLine ) == 'C'
@@ -4520,7 +4523,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      nTemp := Abs( aMP[2] )
                      WHILE nMatch < nMatches
                         nMatch++
-                        aMP := aRules[nRule][2][nMatch]
+                        aMP := aMatchers[nMatch]
                         IF ( aMP[2] < 0 ) .AND. ( Abs( aMP[2] ) < nTemp )
                            EXIT
                         ENDIF
@@ -4574,8 +4577,8 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                ENDIF
 
                /* We reached the end of current optional group - Rewind, to 1st optional at same level. */
-               IF nMatch == nMatches .OR. ( aRules[nRule][2][nMatch + 1][2] >= 0 .AND. aRules[nRule][2][nMatch + 1][2] <= Abs( aMP[2] ) ) .OR. ;
-                                          ( aRules[nRule][2][nMatch + 1][2] < 0 .AND. abs( aRules[nRule][2][nMatch + 1][2] ) < Abs( aMP[2] ) )
+               IF nMatch == nMatches .OR. ( aMatchers[nMatch + 1][2] >= 0 .AND. aMatchers[nMatch + 1][2] <= Abs( aMP[2] ) ) .OR. ;
+                                          ( aMatchers[nMatch + 1][2] < 0 .AND. abs( aMatchers[nMatch + 1][2] ) < Abs( aMP[2] ) )
 
                   /* Current level */
                   nOptional := Abs( aMP[2] )
@@ -4588,14 +4591,14 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      // Now rewind.
                      WHILE nMatch > 1
                         nMatch--
-                        IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
+                        IF Abs( aMatchers[nMatch][2] ) < nOPtional
                            nMatch++
                            EXIT
                         ENDIF
                      ENDDO
                   ENDIF
                   // Added June-1-2003
-                  IF nMatch == 1 .AND. aRules[nRule][2][nMatch][2] == 0
+                  IF nMatch == 1 .AND. aMatchers[nMatch][2] == 0
                      nMatch++
                   ENDIF
 
@@ -4631,7 +4634,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   sWorkLine := ""
                ENDIF
 
-               sPPO := PPOut( aResults[nRule], aMarkers )
+               sPPO := PPOut( aResults[nRule], aMarkers, aMatchers )
 
                IF bDbgMatch
                   IF ValType( sLine ) == 'C'
@@ -4706,13 +4709,13 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                         //nOptional--
                         WHILE nMatch > 1
                            nMatch--
-                           IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
+                           IF Abs( aMatchers[nMatch][2] ) < nOPtional
                               nMatch++
                               EXIT
                            ENDIF
                         ENDDO
                         // Added June-1-2003
-                        IF nMatch == 1 .AND. aRules[nRule][2][nMatch][2] == 0
+                        IF nMatch == 1 .AND. aMatchers[nMatch][2] == 0
                            nMatch++
                         ENDIF
 
@@ -4738,7 +4741,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      sWorkLine := ""
                   ENDIF
 
-                  sPPO := PPOut( aResults[nRule], aMarkers )
+                  sPPO := PPOut( aResults[nRule], aMarkers, aMatchers )
 
                   IF bDbgMatch
                      IF ValType( sLine ) == 'C'
@@ -4764,23 +4767,23 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                      /* Skip dependents and nested optionals, if any. */
                      nTemp := aMP[2]
                      nMatch++
-                     WHILE ( nMatch <= nMatches ) .AND. ( Abs( aRules[nRule][2][nMatch][2] ) >= nTemp )
+                     WHILE ( nMatch <= nMatches ) .AND. ( Abs( aMatchers[nMatch][2] ) >= nTemp )
                         nMatch++
                      ENDDO
 
                      // End of rule or reached end of parrent group.
-                     IF nMatch > nMatches .OR. aRules[nRule][2][nMatch][2] >= 0 .OR. nTemp + aRules[nRule][2][nMatch][2] > 1
+                     IF nMatch > nMatches .OR. aMatchers[nMatch][2] >= 0 .OR. nTemp + aMatchers[nMatch][2] > 1
                         /* Upper level optional should be accepted - rewind to top of parent group. */
                         //nOptional--
                         WHILE nMatch > 1
                            nMatch--
-                           IF Abs( aRules[nRule][2][nMatch][2] ) < nOPtional
+                           IF Abs( aMatchers[nMatch][2] ) < nOPtional
                               nMatch++
                               EXIT
                            ENDIF
                         ENDDO
                         // Added June-1-2003
-                        IF nMatch == 1 .AND. aRules[nRule][2][nMatch][2] == 0
+                        IF nMatch == 1 .AND. aMatchers[nMatch][2] == 0
                            nMatch++
                         ENDIF
 
@@ -4791,7 +4794,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                         ENDIF
 
                         LOOP
-                     ELSEIF aRules[nRule][2][nMatch][2] < 0
+                     ELSEIF aMatchers[nMatch][2] < 0
                         // More optionals of the upper level - try to continue matching.
                         IF bDbgMatch
                            ? "Resuming optionals of upper group at match:", nMatch
@@ -4809,7 +4812,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                   bRepeatableMatched := aMP[1] > 1000 .AND. aMarkers[ aMP[1] - 1000 ] != NIL //.AND. Len( aMarkers[ aMP[1] - 1000 ] ) > 0
                   WHILE nMatch < nMatches
                      nMatch++
-                     aMP := aRules[nRule][2][nMatch]
+                     aMP := aMatchers[nMatch]
                      IF ( aMP[2] < 0 ) .AND. ( Abs( aMP[2] ) < nOptional )
                         EXIT
                      ENDIF
@@ -4942,7 +4945,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
             //nOptional := aMP[2] // Commented 2001-08-15
             WHILE nMatch < nMatches
                nMatch++
-               aMP := aRules[nRule][2][nMatch]
+               aMP := aMatchers[nMatch]
                IF ( aMP[2] == 0 )
                   EXIT
                ENDIF
@@ -4962,7 +4965,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
          ENDIF
       ENDIF
 
-      sPPO := PPOut( aResults[nRule], aMarkers )
+      sPPO := PPOut( aResults[nRule], aMarkers, aMatchers )
 
       IF bDbgMatch
          IF ValType( sLine ) == 'C'
@@ -6011,7 +6014,7 @@ RETURN IIF( cType == 'A', aExp, sExp )
 
 //--------------------------------------------------------------//
 
-STATIC FUNCTION PPOut( aResults, aMarkers, sLine, nRule )
+STATIC FUNCTION PPOut( aResults, aMarkers, aMatchers )
 
   LOCAL Counter, nResults, sResult := "", nMarker, nMatches, nMatch
   LOCAL xValue, nRepeats := 0, nDependee, nGroupStart, sDumb, aBackUp := aClone( aMarkers )
@@ -6099,7 +6102,7 @@ STATIC FUNCTION PPOut( aResults, aMarkers, sLine, nRule )
            IF ValType( aResults[1][Counter][2] ) == 'N'
               xValue := aMarkers[ aResults[1][Counter][2] ]
 
-              IF ValType( xValue ) == 'A' .AND. Len( xValue ) > 1
+              IF aMatchers[aResults[1][Counter][2]][4] != 'A' .AND. ValType( xValue ) == 'A' .AND. Len( xValue ) > 1
                  //TraceLog( "Too many values for non repeatable result pattern!", Counter )
                  RETURN .F.
               ENDIF
