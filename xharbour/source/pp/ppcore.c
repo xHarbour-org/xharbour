@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.211 2005/05/28 05:36:18 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.213 2005/05/29 06:05:29 ronpinkas Exp $
  */
 
 /*
@@ -194,8 +194,10 @@ int hb_pp_NextToken( char** pLine, char *sToken );
                                                        strncmp( p, "->", 2 ) == 0      ) )
 /* END, Ron Pinkas added 2000-01-24 */
 
-#define MARKER_OPTIONAL 1
-#define MARKER_REPEATABLE 2
+#define MARKER_OPTIONAL    1
+#define MARKER_REPEATABLE  2
+
+#define MARKER_USED       64
 
 static int  s_kolAddDefs = 0;
 static int  s_kolAddComs = 0;
@@ -208,7 +210,7 @@ static BOOL s_bReplacePat = TRUE, s_bNewLine = FALSE;
 static int  s_numBrackets;
 static char s_groupchar;
 static char s_prevchar;
-static int  s_aIsOptional[ 256 - 'A' ];
+static int  s_aMatchers[ 256 - 'A' ];
 
 int *      hb_pp_aCondCompile = NULL;
 int        hb_pp_nCondCompile = 0;
@@ -3106,7 +3108,12 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
            ptr += 4;
         }
 
-        s_aIsOptional[ Marker[0] - 'A' ] = 0;
+        s_aMatchers[ Marker[0] - 'A' ] = 0;
+
+        if( iOptional )
+        {
+           s_aMatchers[ Marker[0] - 'A' ] |= MARKER_OPTIONAL ;
+        }
 
         if( Result && Marker[0] == Result[0] )
         {
@@ -3114,11 +3121,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
 
            if( bRepeatable )
            {
-              s_aIsOptional[ Marker[0] - 'A' ] = MARKER_REPEATABLE ;
-           }
-           else if( iOptional )
-           {
-              s_aIsOptional[ Marker[0] - 'A' ] = MARKER_OPTIONAL ;
+              s_aMatchers[ Marker[0] - 'A' ] |= MARKER_REPEATABLE ;
            }
         }
         else
@@ -3128,7 +3131,7 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
            if( iOptional )
            {
               // Clipper compatible - Not used optional marker is considered repetable!
-              s_aIsOptional[ Marker[0] - 'A' ] = MARKER_REPEATABLE ;
+              s_aMatchers[ Marker[0] - 'A' ] |= MARKER_REPEATABLE ;
            }
         }
 
@@ -3541,7 +3544,7 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
 
   //printf( "Work %c >%s< at >%s<\n", (*ptrmp)[1], *ptrmp, *ptri );
 
-  if( s_aIsOptional[ (*ptrmp)[1] - 'A' ] < 0 )
+  if( s_aMatchers[ (*ptrmp)[1] - 'A' ] & MARKER_USED )
   {
      // USED and NON repeatable - can't match anything!
      //printf( "Rejected %c USED and NON Repetable >%s< at >%s<\n", (*ptrmp)[1], *ptrmp, *ptri );
@@ -5265,14 +5268,10 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
    {
       if( s_bReplacePat )
       {
-         if( s_aIsOptional[ exppatt[1] - 'A' ] != MARKER_REPEATABLE )
+         if( ! ( s_aMatchers[ exppatt[1] - 'A' ] & MARKER_REPEATABLE ) )
          {
             //printf( "*** MARK NON REPEATABLE USED: %c s_aIsRepeate[]: %i\n", exppatt[1],s_Repeate && s_aIsRepeate[ s_Repeate - 1 ] );
-
-            if( s_aIsOptional[ exppatt[1] - 'A' ] > 0 )
-            {
-               s_aIsOptional[ exppatt[1] - 'A' ] = -( s_aIsOptional[ exppatt[1] - 'A' ] );
-            }
+            s_aMatchers[ exppatt[1] - 'A' ] |= MARKER_USED;
          }
       }
    }
@@ -5643,13 +5642,13 @@ static void SearnRep( char * exppatt, char * expreal, int lenreal, char * ptro, 
                lastchar = *(ptrOut + ifou + 2);
             }
 
-            if( s_aIsOptional[ exppatt[1] - 'A' ] != MARKER_REPEATABLE )
+            if( ! ( s_aMatchers[ exppatt[1] - 'A' ] & MARKER_REPEATABLE ) )
             {
                lastchar = *(ptrOut + ifou + 2);
             }
 
             #ifdef DEBUG_MARKERS
-               printf( "Marker: %c Repeatable: %i Repeate: %i lastchar: '%c' '%c' Optional: %i\n", exppatt[1], s_aIsOptional[ exppatt[1] - 'A' ], s_Repeate, lastchar, *(ptrOut + ifou + 2), s_aIsOptional[ exppatt[1] - 'A' ] );
+               printf( "Marker: %c Repeatable: %i Repeate: %i lastchar: '%c' '%c' Optional: %i\n", exppatt[1], s_aMatchers[ exppatt[1] - 'A' ], s_Repeate, lastchar, *(ptrOut + ifou + 2), s_aMatchers[ exppatt[1] - 'A' ] );
             #endif
 
             // Ron Pinkas added [s_Repeate &&] 2002-04-26
