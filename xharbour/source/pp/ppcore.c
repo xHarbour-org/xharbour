@@ -3011,7 +3011,6 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
   int ipos;
   char * lastopti[ HB_PP_MAX_NESTED_OPTIONALS ], * strtopti = NULL, * strtptri = NULL;
   char * ptri = inputLine, * ptr, tmpname[ MAX_NAME ];
-  char *pTemp;
 
   HB_TRACE(HB_TR_DEBUG, ("CommandStuff(%s, %s, %s, %p, %i, %i)", ptrmp, inputLine, ptro, lenres, com_or_tra, com_or_xcom));
 
@@ -3308,8 +3307,6 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
           }
 
           //printf( "\nCommandStuff->WorkMarkers: >%s< MP: >%s<\n", ptri, ptrmp );
-
-          pTemp = ptrmp;
 
           if( ! WorkMarkers( &ptrmp, &ptri, ptro, lenres, com_or_xcom ) )
           {
