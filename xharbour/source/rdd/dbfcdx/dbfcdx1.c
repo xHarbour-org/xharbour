@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.204 2005/05/19 02:20:15 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.205 2005/05/25 13:18:00 druzus Exp $
  */
 
 /*
@@ -442,19 +442,22 @@ static void hb_cdxErrInternal( char * szMsg )
 static ERRCODE hb_cdxErrorRT( CDXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char * filename, USHORT uiOsCode, USHORT uiFlags )
 {
    PHB_ITEM pError;
-   ERRCODE iRet;
+   ERRCODE iRet = FAILURE;
 
-   pError = hb_errNew();
-   hb_errPutGenCode( pError, uiGenCode );
-   hb_errPutSubCode( pError, uiSubCode );
-   hb_errPutOsCode( pError, uiOsCode );
-   hb_errPutDescription( pError, hb_langDGetErrorDesc( uiGenCode ) );
-   if ( filename )
-      hb_errPutFileName( pError, filename );
-   if ( uiFlags )
-      hb_errPutFlags( pError, uiFlags );
-   iRet = SELF_ERROR( ( AREAP ) pArea, pError );
-   hb_errRelease( pError );
+   if ( hb_vmRequestQuery() == 0 )
+   {
+      pError = hb_errNew();
+      hb_errPutGenCode( pError, uiGenCode );
+      hb_errPutSubCode( pError, uiSubCode );
+      hb_errPutOsCode( pError, uiOsCode );
+      hb_errPutDescription( pError, hb_langDGetErrorDesc( uiGenCode ) );
+      if ( filename )
+         hb_errPutFileName( pError, filename );
+      if ( uiFlags )
+         hb_errPutFlags( pError, uiFlags );
+      iRet = SELF_ERROR( ( AREAP ) pArea, pError );
+      hb_errRelease( pError );
+   }
    return iRet;
 }
 
@@ -6649,6 +6652,8 @@ static ERRCODE hb_cdxClose( CDXAREAP pArea )
  */
 static ERRCODE hb_cdxOpen( CDXAREAP pArea, LPDBOPENINFO pOpenInfo )
 {
+   ERRCODE errCode = SUCCESS;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxOpen(%p, %p)", pArea, pOpenInfo));
 
    if ( !pArea->bLockType )
@@ -6671,23 +6676,28 @@ static ERRCODE hb_cdxOpen( CDXAREAP pArea, LPDBOPENINFO pOpenInfo )
 #endif
    {
       char szFileName[ _POSIX_PATH_MAX + 1 ], szSpFile[ _POSIX_PATH_MAX + 1 ];
-      DBORDERINFO pOrderInfo;
 
       hb_cdxCreateFName( pArea, NULL, szFileName, NULL );
-
       if ( hb_spFile( ( BYTE * ) szFileName, ( BYTE * ) szSpFile ) )
       {
+         DBORDERINFO pOrderInfo;
+
          pOrderInfo.itmResult = hb_itemPutNI( NULL, 0 );
          pOrderInfo.atomBagName = hb_itemPutC( NULL, szSpFile );
+         pOrderInfo.itmNewVal = NULL;
          pOrderInfo.itmOrder  = NULL;
-         SELF_ORDLSTADD( ( AREAP ) pArea, &pOrderInfo );
-         pOrderInfo.itmOrder  = hb_itemPutNI( NULL, hb_set.HB_SET_AUTORDER );
-         SELF_ORDLSTFOCUS( ( AREAP ) pArea, &pOrderInfo );
+         errCode = SELF_ORDLSTADD( ( AREAP ) pArea, &pOrderInfo );
+         if( errCode == SUCCESS )
+         {
+            pOrderInfo.itmOrder  = hb_itemPutNI( NULL, hb_set.HB_SET_AUTORDER );
+            errCode = SELF_ORDLSTFOCUS( ( AREAP ) pArea, &pOrderInfo );
+         }
          hb_itemRelease( pOrderInfo.atomBagName );
          hb_itemRelease( pOrderInfo.itmOrder );
          hb_itemRelease( pOrderInfo.itmResult );
 
-         SELF_GOTOP( ( AREAP ) pArea );
+         if( errCode == SUCCESS )
+            errCode = SELF_GOTOP( ( AREAP ) pArea );
       }
       else
       {
@@ -6699,7 +6709,7 @@ static ERRCODE hb_cdxOpen( CDXAREAP pArea, LPDBOPENINFO pOpenInfo )
       pArea->fHasTags = FALSE;
    }
 
-   return SUCCESS;
+   return errCode;
 }
 
 /* ( DBENTRYP_V )     hb_cdxRelease         : NULL */
