@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4153 2005/05/30 17:32:04 druzus Exp $
+ * $Id: ChangeLog,v 1.4154 2005/05/31 21:42:16 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -6,6 +6,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-05-31 18:50 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
+  * make_rpm.sh
+    ! minor updated on X11 detection packages(some distro is XFree86-devel other xfree86-devel and others xorg-devel)
+    
 2005-05-31 14:41 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/persist.prg
     + Added logic to start with default values of clean object in ::LoadFromText()

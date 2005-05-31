@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.26 2005/04/01 16:19:47 druzus Exp $
+# $Id: make_rpm.sh,v 1.27 2005/04/01 17:02:26 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -128,7 +128,7 @@ if ! test_reqrpm "slang-devel"
 then
     INST_PARAM="${INST_PARAM} --without gtsln"
 fi
-if ! test_reqrpm "XFree86-devel"
+if ! test_reqrpm "XFree86-devel" || ! test_reqrpm "xfree86-devel" || ! test_reqrpm "xorg-devel"
 then
     INST_PARAM="${INST_PARAM} --without x11"
 fi
