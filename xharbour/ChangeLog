@@ -1,10 +1,15 @@
- * $Id: ChangeLog,v 1.4154 2005/05/31 21:42:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4155 2005/05/31 21:47:34 lculik Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-31 15:06 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * contrib/rdd_ads/ads1.c
+    ! added missing #define guard for ADS versions < 6 in adsSetFilter()
+    ! incremented numeric fields from 20 to 32 to match ADS specs
 
 2005-05-31 18:50 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   * make_rpm.sh

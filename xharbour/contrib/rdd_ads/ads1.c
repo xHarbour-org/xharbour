@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.67 2005/05/06 23:44:56 druzus Exp $
+ * $Id: ads1.c,v 1.68 2005/05/16 21:24:58 ronpinkas Exp $
  */
 
 /*
@@ -1163,7 +1163,7 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
          case 'N':
             pFieldInfo.uiType = HB_IT_LONG;
 
-            if( uiLen > 20 )
+            if( uiLen > 32 )
             {
                return FAILURE;
             }
@@ -3549,11 +3549,12 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
          {
             ulRetVal = AdsSetFilter( pArea->hTable, (UNSIGNED8*) pucFilter );
          }
-
+#if ADS_REQUIRE_VERSION >= 6
          if( adsOEM )
          {
              hb_xfree( (void *) pucFilter );
          }
+#endif
       }     /* else let SUPER handle filtering */
    }
 
