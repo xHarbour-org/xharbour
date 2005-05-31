@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.19 2004/01/11 20:35:29 peterrees Exp $
+ * $Id: persist.prg,v 1.20 2004/05/07 23:05:14 peterrees Exp $
  */
 
 /*
@@ -86,30 +86,48 @@ ENDCLASS
 METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
 
    EXTERN HB_RestoreBlock
+
    LOCAL aLines, nLines, nLine := 1, cLine
    LOCAL lStart := .T., aObjects := {}, nObjectLevel := 0
    LOCAL nAt
-   LOCAL cVersion2:= "// HBPersistent Ver 2.0"
+   LOCAL cVersion2 := "// HBPersistent Ver 2.0"
+   LOCAL xProperty
+
    MEMVAR oObject
-   PRIVATE oObject := QSelf()
+   PRIVATE oObject := __ClsInst( QSelf():ClassH )
+
+   // Start with defalt values of clean instance.
+   FOR EACH xProperty IN Self
+      xProperty := oObject[ HB_EnumIndex() ]
+   NEXT
+
+   // To support macros down below.
+   oObject := QSelf()
+
    IF lIgnoreBadIVars == nil
       lIgnoreBadIVars := .f.
    ENDIF
-   aLines := ArrayFromLFString(cObjectText)
-   nLines := LEN(aLines)
-   IF LEFT(cObjectText, LEN(cVersion2)) == cVersion2
+
+   aLines := ArrayFromLFString( cObjectText )
+   nLines := Len( aLines )
+
+   IF Left( cObjectText, Len( cVersion2 ) ) == cVersion2
       nLine  := 2
    ELSE
       FOR nLine := 1 TO nLines
-         cLine := LTRIM(aLines[nLine])
+         cLine := LTrim( aLines[nLine] )
+
          IF cLine[1] == ':'
             nAt := At( '=', cLine )
+
             IF nAt > 1
               cLine[ nAt - 1] := ':'
             ENDIF
+
             aLines[nLine]:= cLine
          ENDIF
       NEXT nLine
+
       nLine  := 1
    ENDIF
 
@@ -122,6 +140,7 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
       ENDIF
 
       //TraceLog( cLine )
+
       DO CASE
          CASE Left( cLine, 2 ) == "::"
             cLine := "oObject" + SubStr( cLine, 2 )

@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4152 2005/05/29 16:51:32 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4153 2005/05/30 17:32:04 druzus Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-31 14:41 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/persist.prg
+    + Added logic to start with default values of clean object in ::LoadFromText()
 
 2005-05-30 19:35 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
