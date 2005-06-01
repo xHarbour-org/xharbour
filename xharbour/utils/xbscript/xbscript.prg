@@ -1993,16 +1993,11 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ENDIF
                ELSE
                   nAt := At( '=', sBlock )
-                  IF nAt > 1 .AND. SubStr( sBlock, nAt - 1, 1 ) != ':' .AND. SubStr( sBlock, nAt + 1, 1 ) != '='
-                     nAt--
-                     FOR nPos := 1 TO nAt
-                        cChr := SubStr( sBlock, nPos, 1 )
-                        IF ! ( IsAlpha( cChr ) .OR. IsDigit( cChr ) .OR. cChr $ "[]:&._ " )
-                           EXIT
-                        ENDIF
-                     NEXT
-                     IF nPos > nAt
-                        sBlock := Left( sBlock, nAt ) + ":" + SubStr( sBlock, nPos )
+                  IF nAt > 1 .AND. ( ! SubStr( sBlock, nAt - 1, 1 ) $ ":-+*/^%<>!" ) .AND. ( ! SubStr( sBlock, nAt + 1, 1 ) $ "=>" )
+                     nPos := At( ":=", sBlock )
+
+                     IF nPos == 0 .OR. nPos > nAt
+                        sBlock := Left( sBlock, nAt - 1 ) + ":" + SubStr( sBlock, nAt )
                      ENDIF
                   ENDIF
                ENDIF

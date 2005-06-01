@@ -1,10 +1,20 @@
- * $Id: ChangeLog,v 1.4156 2005/05/31 22:08:39 kaddath Exp $
+ * $Id: ChangeLog,v 1.4157 2005/06/01 02:09:19 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-06-01 08:25 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbextern.ch
+    + Added missing Hash functions.
+  * utils/xbscript/xbs_harb.ch
+    * Correxted missing \ prefix to \ char in C string
+  * utils/xbscript/xbscript.prg
+    * Corrected and optimized parsing of '=' as assignment.
+  * include/hbver.h
+    * Refreshed.
 
 2005-05-31 19:05 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/compiler/harbour.slx
