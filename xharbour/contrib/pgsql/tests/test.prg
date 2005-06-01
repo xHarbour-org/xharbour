@@ -8,8 +8,8 @@
 
 Function main()
     Local conn, res, aTemp, i, x,y, pFile
-    Local cDb := 'flimax'
-    Local cUser := 'sysadm'
+    Local cDb := 'test'
+    Local cUser := 'user'
     Local cPass := 'pass'
     
     CLEAR SCREEN
