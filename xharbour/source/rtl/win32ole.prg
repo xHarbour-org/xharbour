@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.81 2005/04/29 00:52:28 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.82 2005/04/29 16:49:45 guerra000 Exp $
  */
 
 /*
@@ -364,7 +364,7 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-
+  #if 0
   static LPWSTR AnsiToWide( LPSTR cString )
   {
      UINT uLen;
@@ -389,6 +389,7 @@ RETURN xRet
 
      return wString;
   }
+  #endif
 
   static BSTR AnsiToSysString( LPSTR cString )
   {
@@ -983,6 +984,7 @@ RETURN xRet
 
   //---------------------------------------------------------------------------//
 
+  #if 0
   HB_FUNC_STATIC( OLESHOWEXCEPTION )
   {
      if( (LONG) s_nOleError == DISP_E_EXCEPTION )
@@ -998,6 +1000,7 @@ RETURN xRet
         hb_xfree( description );
      }
   }
+  #endif
 
   //---------------------------------------------------------------------------//
 
