@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.76 2005/04/05 22:25:42 druzus Exp $
+# $Id: xharbour.spec,v 1.77 2005/04/28 21:48:39 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -54,7 +54,7 @@
 
 %define name     xharbour
 %define dname    xHarbour
-%define version  0.99.41
+%define version  0.99.50
 %define releasen 0
 %define hb_pref  xhb
 %define hb_arch  export HB_ARCHITECTURE=linux
@@ -434,7 +434,7 @@ return nil
 
 druzus@uran:~/tmp$ %{hb_pref}cmp foo
 xHarbour Compiler build 0.80.0 (SimpLex)
-Copyright 1999-2003, http://www.xharbour.org http://www.harbour-project.org/
+Copyright 1999-2005, http://www.xharbour.org http://www.harbour-project.org/
 Compiling 'foo.prg'...
 Lines 5, Functions/Procedures 2
 Generating C source output to 'foo.c'... Done.
@@ -456,7 +456,7 @@ return nil
 
 druzus@uran:~/tmp$ %{hb_pref}mk foo
 xHarbour Compiler build 0.80.0 (SimpLex)
-Copyright 1999-2003, http://www.xharbour.org http://www.harbour-project.org/
+Copyright 1999-2005, http://www.xharbour.org http://www.harbour-project.org/
 Compiling 'foo.prg'...
 Lines 5, Functions/Procedures 2
 Generating C source output to 'foo.c'... Done.

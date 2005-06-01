@@ -1,10 +1,29 @@
- * $Id: ChangeLog,v 1.4155 2005/05/31 21:47:34 lculik Exp $
+ * $Id: ChangeLog,v 1.4156 2005/05/31 22:08:39 kaddath Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-05-31 19:05 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    * Minor formatting
+
+  * source/macro/macro.slx
+  * source/macro/macro.y
+    + Added support for BIT OPERATORS
+
+  * utils/xbscript/xbs_harb.ch
+  * utils/xbscript/xbscript.prg
+    + Added support for BIT OPERATORS
+
+  * include/hbver.h
+  * xharbour.spec
+  * bin/pack_bin.bat
+  * bin/pack_src.bat
+    * Prepared for 0.99.50
 
 2005-05-31 15:06 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * contrib/rdd_ads/ads1.c
@@ -14,7 +33,7 @@
 2005-05-31 18:50 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   * make_rpm.sh
     ! minor updated on X11 detection packages(some distro is XFree86-devel other xfree86-devel and others xorg-devel)
-    
+
 2005-05-31 14:41 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/persist.prg
     + Added logic to start with default values of clean object in ::LoadFromText()

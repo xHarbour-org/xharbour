@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.22 2005/05/24 22:25:41 ronpinkas Exp $
+ * $Id: macro.slx,v 1.23 2005/05/27 22:19:47 ronpinkas Exp $
  */
 
 /*
@@ -202,35 +202,38 @@ void * yy_bytes_buffer( char * pBuffer, int iBufSize );
 /* Delimiters. */
 ACCEPT_TOKEN_AND_DROP_DELIMITER_IF_ONE_OF_THESE( " \t" );
 
+#define HB_CHK_BLOCK    LEX_CUSTOM_ACTION - 1
+
 ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
-				     LEX_DELIMITER( ',' ) AS_TOKEN( ','   + DONT_REDUCE ),
-				     LEX_DELIMITER( '(' ) AS_TOKEN( '(' ),
-				     LEX_DELIMITER( ')' ) AS_TOKEN( ')' ),
-				     LEX_DELIMITER( '[' ) AS_TOKEN( '[' ),
-				     LEX_DELIMITER( ']' ) AS_TOKEN( ']'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '}' ) AS_TOKEN( '}'   + DONT_REDUCE ),
-				     LEX_DELIMITER( ':' ) AS_TOKEN( ':' ),
-				     LEX_DELIMITER( '=' ) AS_TOKEN( '='   + DONT_REDUCE ),
-				     LEX_DELIMITER( '#' ) AS_TOKEN( NE1   + DONT_REDUCE ),
-				     LEX_DELIMITER( '@' ) AS_TOKEN( '@'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '<' ) AS_TOKEN( '<'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '>' ) AS_TOKEN( '>'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '!' ) AS_TOKEN( NOT   + DONT_REDUCE ),
-				     LEX_DELIMITER( '{' ) AS_TOKEN( '{'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '|' ) AS_TOKEN( '|'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '^' ) AS_TOKEN( POWER + DONT_REDUCE ),
-				     LEX_DELIMITER( '%' ) AS_TOKEN( '%'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '*' ) AS_TOKEN( '*'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '/' ) AS_TOKEN( '/'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '+' ) AS_TOKEN( '+'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '-' ) AS_TOKEN( '-'   + DONT_REDUCE ),
-				     LEX_DELIMITER( '$' ) AS_TOKEN( '$'   + DONT_REDUCE )
+                                     LEX_DELIMITER( ','  ) AS_TOKEN( ','   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '('  ) AS_TOKEN( '(' ),
+                                     LEX_DELIMITER( ')'  ) AS_TOKEN( ')' ),
+                                     LEX_DELIMITER( '['  ) AS_TOKEN( '[' ),
+                                     LEX_DELIMITER( ']'  ) AS_TOKEN( ']'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '}'  ) AS_TOKEN( '}'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( ':'  ) AS_TOKEN( ':' ),
+                                     LEX_DELIMITER( '='  ) AS_TOKEN( '='   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '#'  ) AS_TOKEN( NE1   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '@'  ) AS_TOKEN( '@'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '<'  ) AS_TOKEN( '<'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '>'  ) AS_TOKEN( '>'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '!'  ) AS_TOKEN( NOT   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '{'  ) AS_TOKEN( HB_CHK_BLOCK ),
+                                     LEX_DELIMITER( '\\' ) AS_TOKEN( CBMARKER + DONT_REDUCE ), /* CodeBlock Marker '|' converted to '\' */
+                                     LEX_DELIMITER( '|'  ) AS_TOKEN( BITOR    + DONT_REDUCE ),
+                                     LEX_DELIMITER( '^'  ) AS_TOKEN( POWER + DONT_REDUCE ),
+                                     LEX_DELIMITER( '%'  ) AS_TOKEN( '%'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '*'  ) AS_TOKEN( '*'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '/'  ) AS_TOKEN( '/'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '+'  ) AS_TOKEN( '+'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '-'  ) AS_TOKEN( '-'   + DONT_REDUCE ),
+                                     LEX_DELIMITER( '$'  ) AS_TOKEN( '$'   + DONT_REDUCE )
 				   };
 
 #define HB_AFTER_EXP     LEX_CUSTOM_ACTION - 2560 /* IN, LIKE, MATCH */
 
 /* Intermediate Token, needs CustomAction. */
-#define HB_LIT_ACT    LEX_CUSTOM_ACTION - 1
+#define HB_LIT_ACT    LEX_CUSTOM_ACTION - 2
 
 /* Stream Pairs. */
 DEFINE_STREAM_AS_ONE_OF_THESE {
@@ -242,7 +245,7 @@ DEFINE_STREAM_AS_ONE_OF_THESE {
 
 START_NEW_LINE_IF_ONE_OF_THESE( "\n;" );
 
-#define HB_SELF         LEX_CUSTOM_ACTION - 2
+#define HB_SELF         LEX_CUSTOM_ACTION - 3
 
 SELF_CONTAINED_WORDS_ARE {
                            LEX_WORD( ".AND." ) AS_TOKEN( AND      + DONT_REDUCE ),
@@ -252,9 +255,11 @@ SELF_CONTAINED_WORDS_ARE {
                            LEX_WORD( "::"    ) AS_TOKEN( HB_SELF    ),
                            LEX_WORD( "=="    ) AS_TOKEN( EQ       + DONT_REDUCE ),
                            LEX_WORD( "=>"    ) AS_TOKEN( HASHOP   + DONT_REDUCE ),
+                           LEX_WORD( "<<"    ) AS_TOKEN( BITSHIFTL  + DONT_REDUCE ),
                            LEX_WORD( "<>"    ) AS_TOKEN( NE2      + DONT_REDUCE ),
                            LEX_WORD( "<="    ) AS_TOKEN( LE       + DONT_REDUCE ),
                            LEX_WORD( ">="    ) AS_TOKEN( GE       + DONT_REDUCE ),
+                           LEX_WORD( ">>"    ) AS_TOKEN( BITSHIFTR  + DONT_REDUCE ),
                            LEX_WORD( "!="    ) AS_TOKEN( NE2      + DONT_REDUCE ),
                            LEX_WORD( "++"    ) AS_TOKEN( INC      + DONT_REDUCE ),
                            LEX_WORD( "+="    ) AS_TOKEN( PLUSEQ   + DONT_REDUCE ),
@@ -265,6 +270,7 @@ SELF_CONTAINED_WORDS_ARE {
                            LEX_WORD( "**"    ) AS_TOKEN( POWER    + DONT_REDUCE ),
                            LEX_WORD( "/="    ) AS_TOKEN( DIVEQ    + DONT_REDUCE ),
                            LEX_WORD( "^="    ) AS_TOKEN( EXPEQ    + DONT_REDUCE ),
+                           LEX_WORD( "^^"    ) AS_TOKEN( BITXOR   + DONT_REDUCE ),
                            LEX_WORD( "%="    ) AS_TOKEN( MODEQ    + DONT_REDUCE )
                          };
 
@@ -290,11 +296,11 @@ LANGUAGE_WORDS_ARE {
                    };
 
 /* When reservered words are used as Identifier. */
-#define HB_MACRO_ERR      LEX_CUSTOM_ACTION - 3
+#define HB_MACRO_ERR      LEX_CUSTOM_ACTION - 4
 
-#define HB_ID_FIELD     LEX_CUSTOM_ACTION - 4
-#define HB_ID_QSELF     LEX_CUSTOM_ACTION - 5
-#define HB_ID_IIF       LEX_CUSTOM_ACTION - 6
+#define HB_ID_FIELD     LEX_CUSTOM_ACTION - 5
+#define HB_ID_QSELF     LEX_CUSTOM_ACTION - 6
+#define HB_ID_IIF       LEX_CUSTOM_ACTION - 7
 
 LANGUAGE_RULES_ARE {
 		    /* This _FIELD_ is NOT at BOL wants only ->. */
@@ -377,7 +383,16 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
             /* Maybe just the Macro Operator. */
             if( yyleng == 1 )
             {
-               iRet = '&';
+               if( iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == LITERAL ||
+                   iLastToken == IDENTIFIER ||  iLastToken == MACROVAR || iLastToken == MACROTEXT ||
+                   iLastToken == ')' || iLastToken == ']' || iLastToken == '}' )
+               {
+                  iRet = BITAND + DONT_REDUCE;
+               }
+               else
+               {
+                  iRet = '&' + DONT_REDUCE;
+               }
             }
             /* No '.' so Simple Macro. */
             else if( ( tmpPtr = strchr( yytext, '.' ) ) == NULL ) /* Left Search. */
@@ -470,6 +485,8 @@ static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, in
 
 static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char *sToken )
 {
+   char *pTmp;
+
    HB_SYMBOL_UNUSED( sToken );
 
    if( x < HB_AFTER_EXP )
@@ -493,6 +510,36 @@ static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char 
 
    switch ( x )
    {
+      case HB_CHK_BLOCK :
+         pTmp = (char *) s_szBuffer;
+
+         /* Skip White Space. */
+         while( isspace( (BYTE) *pTmp ) )
+         {
+            pTmp++;
+         }
+
+         if( *pTmp == '|' )
+         {
+            *pTmp = '\\';
+
+            pTmp++;
+
+            while( *pTmp  )
+            {
+               if( *pTmp == '|' )
+               {
+                  *pTmp = '\\';
+                  pTmp++;
+                  break;
+               }
+
+               pTmp++;
+            }
+         }
+
+         return '{' + DONT_REDUCE;
+
       case HB_LIT_ACT :
          pYYLVAL->string = hb_strdup( sPair );
          return LITERAL + DONT_REDUCE ;

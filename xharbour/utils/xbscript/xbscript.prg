@@ -5023,7 +5023,7 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
 
          s2 := Left( sLine, 2 )
 
-         IF s2 $ "++\--\->\:=\==\!=\<>\>=\<=\+=\-=\*=\^=\**\/=\%="
+         IF s2 $ "++\--\->\:=\==\!=\<>\>=\<=\+=\-=\*=\^=\**\/=\%=\=>\^^\<<\>>"
 
             sReturn := s2
 
@@ -5038,6 +5038,19 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
             ELSE
                sReturn := Left( sLine, nClose + 2 )
             ENDIF
+
+            BREAK
+
+         ELSEIF s2 $ "0x\0X"
+            sReturn := s2
+
+            FOR Counter := 3TO nLen
+               s1 := SubStr( sLine, Counter, 1 )
+               IF ! ( IsDigit( s1 ) .OR. s1 $ "abcdefABCDEF" )
+                  EXIT
+               ENDIF
+               sReturn += s1
+            NEXT
 
             BREAK
 
@@ -5472,7 +5485,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            sExp += sToken
            LOOP
 
-        ELSEIF s1 == "&"
+        ELSEIF s1 == "&" .AND. s1 == sToken // No white space.
            sExp += sToken
 
            IF sNext1 == '('
@@ -5531,6 +5544,10 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            ENDIF
 
            // Continue  2nd level checks below.
+
+        ELSEIF s1 == "&" // Followed by white space.
+           sExp += sToken
+           LOOP
 
         ELSEIF s1 == '('
            sExp += sToken
@@ -5850,6 +5867,8 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               s_bArrayPrefix := .F.
            #endif
            LOOP
+        ELSEIF sNext1 == "&" .AND. Len( sNextToken ) > 1 // & folowed bt white space.
+           LOOP
         ENDIF
 
      ELSEIF nNextLen == 2
@@ -5864,7 +5883,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                  s_bArrayPrefix := .F.
               #endif
            ENDIF
-        ELSEIF sNext2 $ "->\:=\==\!=\<>\>=\<=\+=\-=\*=\/=\^=\**\%=\IN"
+        ELSEIF sNext2 $ "->\:=\==\!=\<>\>=\<=\+=\-=\*=\/=\^=\**\%=\IN\=>\^^\>>\<<"
            sExp           += sNextToken
            sLine          := sNextLine
            #ifdef USE_C_BOOST

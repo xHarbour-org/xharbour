@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.85 2005/05/27 22:19:46 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.86 2005/05/29 06:03:41 ronpinkas Exp $
  */
 
 /*
@@ -212,12 +212,12 @@ static void hb_compDebugStart( void ) { };
 /* Bitwise */
 %right BITOR
 %right BITXOR
-%right  BITAND
+%right BITAND
 
 /*relational operators*/
 %right  '=' '<' '>' EQ NE1 NE2 LE GE '$' LIKE MATCH
 
-/* Bitwise */
+/* Bit shift */
 %right BITSHIFTR BITSHIFTL
 
 /*mathematical operators*/
@@ -1302,15 +1302,15 @@ ExprOperEq  : ExprPlusEq        { $$ = $1; }
             | ExprExpEq         { $$ = $1; }
             ;
 
-ExprMath    : Expression '+' Expression       { $$ = hb_compExprSetOperand( hb_compExprNewPlus( $1 ), $3 ); }
-            | Expression '-' Expression       { $$ = hb_compExprSetOperand( hb_compExprNewMinus( $1 ), $3 ); }
-            | Expression '*' Expression       { $$ = hb_compExprSetOperand( hb_compExprNewMult( $1 ), $3 ); }
-            | Expression '/' Expression       { $$ = hb_compExprSetOperand( hb_compExprNewDiv( $1 ), $3 ); }
-            | Expression '%' Expression       { $$ = hb_compExprSetOperand( hb_compExprNewMod( $1 ), $3 ); }
-            | Expression POWER Expression     { $$ = hb_compExprSetOperand( hb_compExprNewPower( $1 ), $3 ); }
-            | Expression BITAND Expression    { $$ = hb_compExprSetOperand( hb_compExprNewBitAnd( $1 ), $3 ); }
-            | Expression BITOR Expression     { $$ = hb_compExprSetOperand( hb_compExprNewBitOr( $1 ), $3 ); }
-            | Expression BITXOR Expression    { $$ = hb_compExprSetOperand( hb_compExprNewBitXOr( $1 ), $3 ); }
+ExprMath    : Expression '+'       Expression { $$ = hb_compExprSetOperand( hb_compExprNewPlus( $1 ), $3 ); }
+            | Expression '-'       Expression { $$ = hb_compExprSetOperand( hb_compExprNewMinus( $1 ), $3 ); }
+            | Expression '*'       Expression { $$ = hb_compExprSetOperand( hb_compExprNewMult( $1 ), $3 ); }
+            | Expression '/'       Expression { $$ = hb_compExprSetOperand( hb_compExprNewDiv( $1 ), $3 ); }
+            | Expression '%'       Expression { $$ = hb_compExprSetOperand( hb_compExprNewMod( $1 ), $3 ); }
+            | Expression POWER     Expression { $$ = hb_compExprSetOperand( hb_compExprNewPower( $1 ), $3 ); }
+            | Expression BITAND    Expression { $$ = hb_compExprSetOperand( hb_compExprNewBitAnd( $1 ), $3 ); }
+            | Expression BITOR     Expression { $$ = hb_compExprSetOperand( hb_compExprNewBitOr( $1 ), $3 ); }
+            | Expression BITXOR    Expression { $$ = hb_compExprSetOperand( hb_compExprNewBitXOr( $1 ), $3 ); }
             | Expression BITSHIFTR Expression { $$ = hb_compExprSetOperand( hb_compExprNewBitShiftR( $1 ), $3 ); }
             | Expression BITSHIFTL Expression { $$ = hb_compExprSetOperand( hb_compExprNewBitShiftL( $1 ), $3 ); }
             ;

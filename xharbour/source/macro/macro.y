@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.17 2005/01/30 21:58:04 druzus Exp $
+ * $Id: macro.y,v 1.18 2005/05/27 22:19:47 ronpinkas Exp $
  */
 
 /*
@@ -176,28 +176,44 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 %token LE GE FIELD MACROVAR MACROTEXT
 %token PLUSEQ MINUSEQ MULTEQ DIVEQ POWER EXPEQ MODEQ
 %token HASHOP
+%token CBMARKER
+%token BITAND BITOR BITXOR BITSHIFTR BITSHIFTL
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
 %left  POST
+
 /*assigment - from right to left*/
 %right INASSIGN
 %right  PLUSEQ MINUSEQ
 %right  MULTEQ DIVEQ MODEQ
 %right  EXPEQ
+
 /*logical operators*/
 %right  OR
 %right  AND
 %right  NOT
+
+/* Bitwise */
+%right BITOR
+%right BITXOR
+%right BITAND
+
 /*relational operators*/
 %right  '=' '<' '>' EQ NE1 NE2 LE GE '$' LIKE MATCH
+
+/* Bit shift */
+%right BITSHIFTR BITSHIFTL
+
 /*mathematical operators*/
 %right  '+' '-'
 %right  '*' '/' '%'
 %right  POWER
 %right UNARY
+
 /*preincrement and predecrement*/
 %right  PRE
+
 /*special operators*/
 %right  ALIASOP '&' '@'
 %right ','
@@ -866,12 +882,17 @@ ExprOperEq  : ExprPlusEq      { $$ = $1; }
             | ExprExpEq       { $$ = $1; }
             ;
 
-ExprMath    : Expression '+' Expression     { $$ = hb_compExprSetOperand( hb_compExprNewPlus( $1 ), $3, HB_MACRO_PARAM ); }
-            | Expression '-' Expression     { $$ = hb_compExprSetOperand( hb_compExprNewMinus( $1 ), $3, HB_MACRO_PARAM ); }
-            | Expression '*' Expression     { $$ = hb_compExprSetOperand( hb_compExprNewMult( $1 ), $3, HB_MACRO_PARAM ); }
-            | Expression '/' Expression     { $$ = hb_compExprSetOperand( hb_compExprNewDiv( $1 ), $3, HB_MACRO_PARAM ); }
-            | Expression '%' Expression     { $$ = hb_compExprSetOperand( hb_compExprNewMod( $1 ), $3, HB_MACRO_PARAM ); }
-            | Expression POWER Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPower( $1 ), $3, HB_MACRO_PARAM ); }
+ExprMath    : Expression '+'       Expression { $$ = hb_compExprSetOperand( hb_compExprNewPlus( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression '-'       Expression { $$ = hb_compExprSetOperand( hb_compExprNewMinus( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression '*'       Expression { $$ = hb_compExprSetOperand( hb_compExprNewMult( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression '/'       Expression { $$ = hb_compExprSetOperand( hb_compExprNewDiv( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression '%'       Expression { $$ = hb_compExprSetOperand( hb_compExprNewMod( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression POWER     Expression { $$ = hb_compExprSetOperand( hb_compExprNewPower( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression BITAND    Expression { $$ = hb_compExprSetOperand( hb_compExprNewBitAnd( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression BITOR     Expression { $$ = hb_compExprSetOperand( hb_compExprNewBitOr( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression BITXOR    Expression { $$ = hb_compExprSetOperand( hb_compExprNewBitXOr( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression BITSHIFTR Expression { $$ = hb_compExprSetOperand( hb_compExprNewBitShiftR( $1 ), $3, HB_MACRO_PARAM ); }
+            | Expression BITSHIFTL Expression { $$ = hb_compExprSetOperand( hb_compExprNewBitShiftL( $1 ), $3, HB_MACRO_PARAM ); }
             ;
 
 ExprBool    : Expression AND Expression   { $$ = hb_compExprSetOperand( hb_compExprNewAnd( $1 ), $3, HB_MACRO_PARAM ); }
@@ -902,7 +923,7 @@ IndexList  : '[' Expression               { $$ = hb_compExprNewArrayAt( $<asExpr
            | IndexList ']' '[' Expression { $$ = hb_compExprNewArrayAt( $1, $4, HB_MACRO_PARAM ); }
            ;
 
-CodeBlock  : '{' '|'
+CodeBlock  : '{' CBMARKER
                   {
                     $$ = hb_compExprNewCodeBlock();
 
@@ -911,7 +932,7 @@ CodeBlock  : '{' '|'
                        s_Pending[ s_iPending++ ] = $$;
                     }
                   }
-             BlockNoVar '|' BlockExpList '}'
+             BlockNoVar CBMARKER BlockExpList '}'
                   {
                     $$ = $<asExpr>3;
 
@@ -920,7 +941,7 @@ CodeBlock  : '{' '|'
                        s_iPending--;
                     }
                   }
-           | '{' '|'
+           | '{' CBMARKER
                   {
                     $$ = hb_compExprNewCodeBlock();
 
@@ -929,7 +950,7 @@ CodeBlock  : '{' '|'
                        s_Pending[ s_iPending++ ] = $$;
                     }
                   }
-             BlockVarList '|' BlockExpList '}'
+             BlockVarList CBMARKER BlockExpList '}'
                   {
                     $$ = $<asExpr>3;
 

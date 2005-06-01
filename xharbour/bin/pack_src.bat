@@ -1,11 +1,11 @@
 @echo off
 rem
-rem $Id: pack_src.bat,v 1.7 2005/03/23 22:24:54 ronpinkas Exp $
+rem $Id: pack_src.bat,v 1.8 2005/04/25 19:22:13 druzus Exp $
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
 
-set hb_ver=0.99.4
+set hb_ver=0.99.50
 
 if '%TZ%' == '' set TZ=PST8PDT
 
@@ -294,4 +294,3 @@ rem CONTRIB\LIBNF
 %hb_archbin% %hb_archopt%  %hb_filename% contrib/libnf/*.ch
 %hb_archbin% %hb_archopt%  %hb_filename% contrib/libnf/include/*.h
 %hb_archbin% %hb_archopt%  %hb_filename% contrib/libnf/include/*.ch
-

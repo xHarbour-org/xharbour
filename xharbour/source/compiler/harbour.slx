@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.68 2005/05/24 22:25:41 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.69 2005/05/27 22:19:46 ronpinkas Exp $
  */
 
 /*
@@ -143,7 +143,7 @@ ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
                                      LEX_DELIMITER( '<'  ) AS_TOKEN( '<'      + DONT_REDUCE ),
                                      LEX_DELIMITER( '>'  ) AS_TOKEN( '>'      + DONT_REDUCE ),
                                      LEX_DELIMITER( '!'  ) AS_TOKEN( NOT      + DONT_REDUCE ),
-                                     LEX_DELIMITER( '{'  ) AS_TOKEN( HB_CHK_BLOCK        ),
+                                     LEX_DELIMITER( '{'  ) AS_TOKEN( HB_CHK_BLOCK ),
                                      LEX_DELIMITER( '\\' ) AS_TOKEN( CBMARKER + DONT_REDUCE ), /* CodeBlock Marker '|' converted to '\' */
                                      LEX_DELIMITER( '|'  ) AS_TOKEN( BITOR    + DONT_REDUCE ),
                                      LEX_DELIMITER( '^'  ) AS_TOKEN( POWER    + DONT_REDUCE ),

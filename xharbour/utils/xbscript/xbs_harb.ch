@@ -1392,7 +1392,7 @@
             s2[0] = sLine[0];
             s2[1] = sLine[1];
 
-            if( strstr( "++\\--\\->\\:=\\==\\!=\\<>\\>=\\<=\\+=\\-=\\*=\\^=\\**\\/=\\%=", (char*) s2 ) )
+            if( strstr( "++\\--\\->\\:=\\==\\!=\\<>\\>=\\<=\\+=\\-=\\*=\\^=\\**\\/=\\%=\=>\^^\<<\>>", (char*) s2 ) )
             {
                sReturn[0] = s2[0];
                sReturn[1] = s2[1];
@@ -1414,6 +1414,21 @@
                   sReturn[( pTmp - sLine ) + 2] = '\0';
                }
 
+               goto Done;
+            }
+            else if( s2[0] == '0' && s2[1] == 'x' )
+            {
+               sReturn[0] = '0';
+               sReturn[1] = 'x';
+
+               Counter = 2;
+               while( isdigit( (BYTE) sLine[Counter] ) || ( sLine[Counter] >= 'a' && sLine[Counter] <= 'f' ) || ( sLine[Counter] >= 'A' && sLine[Counter] <= 'F' ) )
+               {
+                  sReturn[Counter] = sLine[Counter];
+                  Counter++;
+               }
+
+               sReturn[Counter] = '\0';
                goto Done;
             }
             else if( s2[0] == 'E' && s2[1] == '"' )
