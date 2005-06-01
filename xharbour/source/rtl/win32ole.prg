@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.82 2005/04/29 16:49:45 guerra000 Exp $
+ * $Id: win32ole.prg,v 1.83 2005/06/01 15:35:20 ronpinkas Exp $
  */
 
 /*
@@ -984,8 +984,7 @@ RETURN xRet
 
   //---------------------------------------------------------------------------//
 
-  #if 0
-  HB_FUNC_STATIC( OLESHOWEXCEPTION )
+  HB_FUNC( OLESHOWEXCEPTION )
   {
      if( (LONG) s_nOleError == DISP_E_EXCEPTION )
      {
@@ -1000,7 +999,6 @@ RETURN xRet
         hb_xfree( description );
      }
   }
-  #endif
 
   //---------------------------------------------------------------------------//
 
