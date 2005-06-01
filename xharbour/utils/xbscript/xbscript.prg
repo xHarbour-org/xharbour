@@ -5485,7 +5485,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            sExp += sToken
            LOOP
 
-        ELSEIF s1 == "&" .AND. s1 == sToken // No white space.
+        ELSEIF s1 == "&" .AND. s1 == sToken .OR. sNext1 == '(' // No white space, or paretesized.
            sExp += sToken
 
            IF sNext1 == '('
