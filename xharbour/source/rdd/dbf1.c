@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.120 2005/05/10 20:55:44 druzus Exp $
+ * $Id: dbf1.c,v 1.121 2005/05/19 02:20:15 druzus Exp $
  */
 
 /*
@@ -1183,11 +1183,21 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    switch( pField->uiType )
    {
       case HB_IT_STRING:
-         hb_itemPutCL( pItem, ( char * ) pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
-                       pField->uiLen );
 #ifndef HB_CDP_SUPPORT_OFF
-         hb_cdpnTranslate( pItem->item.asString.value, pArea->cdPage, hb_cdp_page, pField->uiLen );
+         if( pArea->cdPage != hb_cdp_page )
+         {
+            char * pVal = ( char * ) hb_xgrab( pField->uiLen + 1 );
+            memcpy( pVal, pArea->pRecord + pArea->pFieldOffset[ uiIndex ], pField->uiLen );
+            pVal[ pField->uiLen ] = '\0';
+            hb_cdpnTranslate( pVal, pArea->cdPage, hb_cdp_page, pField->uiLen );
+            hb_itemPutCPtr( pItem, pVal, pField->uiLen );
+         }
+         else
 #endif
+         {
+            hb_itemPutCL( pItem, ( char * ) pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
+                          pField->uiLen );
+         }
          break;
 
       case HB_IT_LOGICAL:

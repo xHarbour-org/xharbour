@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.61 2005/03/06 23:43:21 andijahja Exp $
+ * $Id: set.c,v 1.62 2005/03/31 06:13:40 guerra000 Exp $
  */
 
 /*
@@ -1653,7 +1653,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_SCOREBOARD = TRUE;
    hb_set.HB_SET_SCROLLBREAK = TRUE;
    hb_set.HB_SET_SOFTSEEK = FALSE;
-   hb_set.HB_SET_OPTIMIZE = FALSE;
+   hb_set.HB_SET_OPTIMIZE = TRUE;
    hb_set.HB_SET_FORCEOPT = FALSE;
    hb_set.HB_SET_STRICTREAD = FALSE;
    hb_set.HB_SET_HARDCOMMIT = TRUE;

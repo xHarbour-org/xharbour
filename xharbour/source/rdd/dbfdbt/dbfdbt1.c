@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.21 2005/04/05 22:26:07 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.22 2005/04/25 23:11:05 druzus Exp $
  */
 
 /*
@@ -357,14 +357,14 @@ static void hb_dbtGetMemo( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       ulBlock = hb_dbfGetMemoBlock( ( DBFAREAP ) pArea, uiIndex );
       hb_fsSeekLarge( pArea->hMemoFile, ( HB_FOFFSET ) ulBlock * DBT_BLOCKSIZE, FS_SET );
       hb_fsReadLarge( pArea->hMemoFile, pBuffer, ulSize );
+#ifndef HB_CDP_SUPPORT_OFF
+      hb_cdpnTranslate( ( char * ) pBuffer, pArea->cdPage, hb_cdp_page, ulSize );
+#endif
    }
    else
       *pBuffer = '\0';
 
    hb_itemPutCPtr( pItem, ( char * ) pBuffer, ulSize );
-#ifndef HB_CDP_SUPPORT_OFF
-   hb_cdpnTranslate( pItem->item.asString.value, pArea->cdPage, hb_cdp_page, ulSize );
-#endif
    hb_itemSetCMemo( pItem );
 }
 
@@ -374,41 +374,70 @@ static void hb_dbtGetMemo( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 static void hb_dbtWriteMemo( DBTAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULONG ulLen,
                              ULONG * ulStoredBlock )
 {
-   BYTE pBlock[ DBT_BLOCKSIZE ], pBuff[4];
+   BYTE pAddr[4];
    BOOL bNewBlock;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbtWriteMemo(%p, %lu, %p, %lu, %p)", pArea, ulBlock, pItem,
                            ulLen, ulStoredBlock));
 
-   memset( pBlock, 0x1A, DBT_BLOCKSIZE );
    bNewBlock = !( ulBlock && ulLen < DBT_BLOCKSIZE - 1 );
    if( bNewBlock )
    {
       /* Get next block from header */
       hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
-      hb_fsRead( pArea->hMemoFile, pBuff, 4 );
-      ulBlock = HB_GET_LE_UINT32( pBuff );
+      hb_fsRead( pArea->hMemoFile, pAddr, 4 );
+      ulBlock = HB_GET_LE_UINT32( pAddr );
    }
    * ulStoredBlock = ulBlock;
 
-#ifndef HB_CDP_SUPPORT_OFF
-   hb_cdpnTranslate( pItem->item.asString.value, hb_cdp_page, pArea->cdPage, ulLen );
-#endif
-   /* Write memo data and eof mark */
    hb_fsSeekLarge( pArea->hMemoFile, ( HB_FOFFSET ) ulBlock * DBT_BLOCKSIZE, FS_SET );
-   hb_fsWriteLarge( pArea->hMemoFile, ( BYTE * ) pItem->item.asString.value, ulLen );
-   hb_fsWrite( pArea->hMemoFile, pBlock, ( DBT_BLOCKSIZE - ( USHORT ) ( ulLen % DBT_BLOCKSIZE ) ) );
-   pArea->fMemoFlush = TRUE;
 #ifndef HB_CDP_SUPPORT_OFF
-   hb_cdpnTranslate( pItem->item.asString.value, pArea->cdPage, hb_cdp_page, ulLen );
+   if( hb_cdp_page != pArea->cdPage )
+   {
+      BYTE * pBuff = ( BYTE * ) hb_xalloc( ulLen + 1 );
+
+      if( pBuff )
+      {
+         memcpy( pBuff, pItem->item.asString.value, ulLen );
+         pBuff[ ulLen ] = 0x1A;
+         hb_cdpnTranslate( ( char * ) pBuff, hb_cdp_page, pArea->cdPage, ulLen );
+         hb_fsWriteLarge( pArea->hMemoFile, pBuff, ulLen + 1 );
+         hb_xfree( pBuff );
+      }
+      else
+      {
+         BYTE pBlock[ DBT_BLOCKSIZE ], *pSrc = ( BYTE * ) pItem->item.asString.value;
+         ULONG ulWritten = 0, ulRest;
+
+         do
+         {
+            ulRest = HB_MIN( ulLen - ulWritten, DBT_BLOCKSIZE );
+            memcpy( pBlock, pSrc + ulWritten, ulRest );
+            memset( pBlock + ulRest, 0x1A, DBT_BLOCKSIZE - ulRest );
+            hb_cdpnTranslate( ( char * ) pBlock, hb_cdp_page, pArea->cdPage, ulRest );
+            hb_fsWrite( pArea->hMemoFile, pBlock, DBT_BLOCKSIZE );
+            ulWritten += DBT_BLOCKSIZE;
+         }
+         while ( ulWritten <= ulLen );
+      }
+   }
+   else
+#else
+   {
+      BYTE pBlock[ DBT_BLOCKSIZE ];
+      memset( pBlock, 0x1A, DBT_BLOCKSIZE );
+      hb_fsWriteLarge( pArea->hMemoFile, ( BYTE * ) pItem->item.asString.value, ulLen );
+      hb_fsWrite( pArea->hMemoFile, pBlock, ( DBT_BLOCKSIZE - ( USHORT ) ( ulLen % DBT_BLOCKSIZE ) ) );
+   }
 #endif
+   pArea->fMemoFlush = TRUE;
 
    if( bNewBlock )
    {
       ulBlock += ( ulLen / DBT_BLOCKSIZE ) + 1;
-      HB_PUT_LE_UINT32( pBuff, ulBlock );
+      HB_PUT_LE_UINT32( pAddr, ulBlock );
       hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
-      hb_fsWrite( pArea->hMemoFile, pBuff, 4 );
+      hb_fsWrite( pArea->hMemoFile, pAddr, 4 );
       pArea->fMemoFlush = TRUE;
    }
 }

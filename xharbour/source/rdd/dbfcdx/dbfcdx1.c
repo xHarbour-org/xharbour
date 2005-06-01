@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.205 2005/05/25 13:18:00 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.206 2005/05/30 17:32:12 druzus Exp $
  */
 
 /*
@@ -761,13 +761,21 @@ static PHB_ITEM hb_cdxKeyGetItem( LPCDXKEY pKey, PHB_ITEM pItem, LPCDXTAG pTag, 
       switch( pTag->uiType )
       {
          case 'C':
-            pItem = hb_itemPutCL( pItem, ( char * ) pKey->val, pKey->len );
 #ifndef HB_CDP_SUPPORT_OFF
-            if ( fTrans )
-               hb_cdpnTranslate( pItem->item.asString.value,
-                                 pTag->pIndex->pArea->cdPage, hb_cdp_page,
-                                 pItem->item.asString.length );
+            if( fTrans && pTag->pIndex->pArea->cdPage != hb_cdp_page )
+            {
+               char * pVal = ( char * ) hb_xgrab( pKey->len + 1 );
+               memcpy( pVal, pKey->val, pKey->len );
+               pVal[ pKey->len ] = '\0';
+               hb_cdpnTranslate( pVal, pTag->pIndex->pArea->cdPage, hb_cdp_page,
+                                 pKey->len );
+               pItem = hb_itemPutCPtr( pItem, pVal, pKey->len );
+            }
+            else
 #endif
+            {
+               pItem = hb_itemPutCL( pItem, ( char * ) pKey->val, pKey->len );
+            }
             break;
          case 'N':
             HB_ORD2DBL( pKey->val, &d );
@@ -8631,7 +8639,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
       }
 
       uiTag = pArea->uiTag;
-      fDirectRead = !hb_set.HB_SET_STRICTREAD && !pArea->lpdbRelations &&
+      fDirectRead = !hb_set.HB_SET_STRICTREAD && /* !pArea->lpdbRelations && */
                     ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll ||
                       uiTag == 0 ) && pSort;
 
@@ -8686,6 +8694,9 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
             pArea->fValidBuffer = TRUE;
             pArea->ulRecNo = ulRecNo;
             pArea->fDeleted = ( pArea->pRecord[ 0 ] == '*' );
+            /* Force relational movement in child WorkAreas */
+            if( pArea->lpdbRelations )
+               SELF_SYNCCHILDREN( ( AREAP ) pArea );
             iRecBuff++;
          }
 

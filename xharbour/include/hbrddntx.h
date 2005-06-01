@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.25 2005/04/24 11:25:38 druzus Exp $
+ * $Id: hbrddntx.h,v 1.26 2005/05/06 23:44:58 druzus Exp $
  */
 
 /*
@@ -196,7 +196,16 @@ typedef struct _NTXINDEX
 
 typedef NTXINDEX * LPNTXINDEX;
 
-/* Internal structures used by saving file */
+/* for index creation */
+typedef struct
+{
+   HB_FOFFSET  nOffset;    /* offset in temporary file */
+   ULONG       ulKeys;     /* number of keys in page */
+   ULONG       ulKeyBuf;   /* number of keys in memory buffer */
+   ULONG       ulCurKey;   /* current key in memory buffer */
+   BYTE *      pKeyPool;   /* memory buffer */
+} NTXSWAPPAGE;
+typedef NTXSWAPPAGE * LPNTXSWAPPAGE;
 
 typedef struct _NTXHEADER    /* Header of NTX file */
 {
@@ -222,7 +231,30 @@ typedef struct _NTXHEADER    /* Header of NTX file */
 
 typedef NTXHEADER * LPNTXHEADER;
 
-struct _NTXAREA;
+typedef struct
+{
+   LPTAGINFO pTag;             /* current Tag */
+   FHANDLE  hTempFile;        /* handle to temporary file */
+   char *   szTempFileName;   /* temporary file name */
+   int      keyLen;           /* key length */
+   BOOL     fUnique;          /* TRUE if index is unique */
+   ULONG    ulMaxRec;         /* the highest record number */
+   ULONG    ulTotKeys;        /* total number of keys indexed */
+   ULONG    ulKeys;           /* keys in curently created page */
+   ULONG    ulPages;          /* number of pages */
+   ULONG    ulCurPage;        /* current page */
+   ULONG    ulPgKeys;         /* maximum number of key in page memory buffer */
+   ULONG    ulMaxKey;         /* maximum number of keys in single page */
+   BYTE *   pKeyPool;         /* memory buffer for current page then for pages */
+   LPNTXSWAPPAGE pSwapPage;   /* list of pages */
+   LPPAGEINFO NodeList[ NTX_STACKSIZE ];   /* Stack of pages */
+   ULONG    ulFirst;
+   ULONG *  pSortedPages;
+   BYTE     pLastKey[ NTX_MAX_KEY ]; /* last key val */
+   ULONG    ulLastRec;
+   BYTE *   pRecBuff;
+} NTXSORTINFO;
+typedef NTXSORTINFO * LPNTXSORTINFO;
 
 /*
  *  DBF WORKAREA
@@ -312,9 +344,10 @@ typedef struct _NTXAREA
    *  example.
    */
 
-   LPTAGINFO lpCurTag;           /* Pointer to current order */
-   LPTAGINFO lpNtxTag;           /* Pointer to tags list */
-   BOOL fNtxAppend;              /* TRUE if new record is added */
+   LPTAGINFO      lpCurTag;      /* Pointer to current order */
+   LPTAGINFO      lpNtxTag;      /* Pointer to tags list */
+   BOOL           fNtxAppend;    /* TRUE if new record is added */
+   LPNTXSORTINFO  pSort;         /* Index build structure */
 
 } NTXAREA;
 

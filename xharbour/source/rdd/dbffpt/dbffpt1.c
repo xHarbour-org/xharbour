@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.43 2005/05/12 00:39:24 druzus Exp $
+ * $Id: dbffpt1.c,v 1.44 2005/05/19 02:20:17 druzus Exp $
  */
 
 /*
@@ -1092,10 +1092,10 @@ static ERRCODE hb_fptReadSixItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBuf
             (*pbMemoBuf) += SIX_ITEM_BUFSIZE;
             if ( bBufEnd - (*pbMemoBuf) >= ( LONG ) ulLen )
             {
-               hb_itemPutCL( pItem, ( char *) (*pbMemoBuf), ulLen );
 #ifndef HB_CDP_SUPPORT_OFF
-               hb_cdpnTranslate( pItem->item.asString.value, pArea->cdPage, hb_cdp_page, ulLen );
+               hb_cdpnTranslate( ( char *) (*pbMemoBuf), pArea->cdPage, hb_cdp_page, ulLen );
 #endif
+               hb_itemPutCL( pItem, ( char *) (*pbMemoBuf), ulLen );
             }
             else
             {
@@ -1312,11 +1312,11 @@ static ERRCODE hb_fptReadFlexItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBu
             *pbMemoBuf += 2;
             if ( bBufEnd - (*pbMemoBuf) >= ( LONG ) ulLen )
             {
+#ifndef HB_CDP_SUPPORT_OFF
+               hb_cdpnTranslate( ( char *) *pbMemoBuf, pArea->cdPage, hb_cdp_page, ulLen );
+#endif
                hb_itemPutCL( pItem, ( char *) *pbMemoBuf, ulLen );
                *pbMemoBuf += ulLen;
-#ifndef HB_CDP_SUPPORT_OFF
-               hb_cdpnTranslate( pItem->item.asString.value, pArea->cdPage, hb_cdp_page, ulLen );
-#endif
             }
             else
             {

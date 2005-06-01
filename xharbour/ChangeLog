@@ -1,10 +1,43 @@
- * $Id: ChangeLog,v 1.4159 2005/06/01 15:35:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4160 2005/06/01 16:59:46 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-06-01 20:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbrddcdx.h
+    * typo in comment corrected
+
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    ! fixed GPF when automatic codepage translation is set
+      and one byte character field retrieve
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed GPF when automatic codepage translation is set
+      and one byte character field retrieve
+    * Do not disable read ahead buffer when relation are set
+      It may interacts with some strange code but it is Clipper
+      compatible and if someone needs previous behavior should
+      use SET STRICTREAD switch.
+
+  * xharbour/include/hbrddntx.h
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * rewritten from scratch indexing code - it should work on
+      any hardware (little/big endian, 32/64bit, strict alignment),
+      keep the natural order of keys with the same value, works much
+      faster for any type of data and use limited memory buffer.
+    + added support for DBOI_KEYSINCLUDED
+    * the same modification as above in DBFCDX
+
+  * xharbour/source/rtl/set.c
+    * SET OPTIMIZE is ON by default now
+
+  * include/hbver.h
+    * Refreshed.
 
 2005-06-01 10:00 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg
