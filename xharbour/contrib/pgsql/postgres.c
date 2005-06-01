@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.19 2005/03/12 19:17:37 rodrigo_moreno Exp $
+ * $Id: postgres.c,v 1.20 2005/05/21 14:48:38 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -87,6 +87,9 @@
 #define INV_WRITE		0x00020000
 #define INV_READ		0x00040000
 
+#ifndef HB_PGVERSION
+#define HB_PGVERSION   0x0800
+#endif
 
 /* 
  * Connection handling functions 
@@ -143,12 +146,6 @@ HB_FUNC(PQPROTOCOLVERSION)
 {
     if (hb_parinfo(1))
         hb_retni(PQprotocolVersion(( PGconn * ) hb_parptr(1)));
-}
-
-HB_FUNC(PQSERVERVERSION)
-{
-    if (hb_parinfo(1))
-        hb_retni(PQserverVersion(( PGconn * ) hb_parptr(1)));
 }
 
 HB_FUNC(PQCLIENTENCODING)
@@ -701,33 +698,6 @@ HB_FUNC(PQFLUSH)
 }
 
 
-HB_FUNC(PQGETCANCEL)
-{
-    if (hb_parinfo(1))
-        hb_retptr( ( PGcancel * ) PQgetCancel( ( PGconn * ) hb_parptr(1) ) );
-}        
-
-HB_FUNC(PQCANCEL)
-{
-    char errbuf[256];
-    int ret = 0;
-
-    if (hb_parinfo(1))
-        if (PQcancel( ( PGcancel * ) hb_parptr(1), errbuf, 255) == 1)
-        {
-            ret = 1;                
-            hb_storc( errbuf, 2 );
-        }            
-        
-    hb_retl(ret);            
-}        
-
-HB_FUNC(PQFREECANCEL)
-{
-    if (hb_parinfo(1))
-        PQfreeCancel( ( PGcancel * ) hb_parptr(1) ) ;
-}        
-
 HB_FUNC(PQSETNONBLOCKING)
 {
     if (hb_pcount() == 2)
@@ -827,6 +797,46 @@ HB_FUNC(LO_UNLINK)
 
     hb_retl(ret);        
 }
+
+
+
+#if HB_PGVERSION >= 0x0800
+
+HB_FUNC(PQSERVERVERSION)
+{
+    if (hb_parinfo(1))
+        hb_retni(PQserverVersion(( PGconn * ) hb_parptr(1)));
+}
+
+HB_FUNC(PQGETCANCEL)
+{
+    if (hb_parinfo(1))
+        hb_retptr( ( PGcancel * ) PQgetCancel( ( PGconn * ) hb_parptr(1) ) );
+}        
+
+HB_FUNC(PQCANCEL)
+{
+    char errbuf[256];
+    int ret = 0;
+
+    if (hb_parinfo(1))
+        if (PQcancel( ( PGcancel * ) hb_parptr(1), errbuf, 255) == 1)
+        {
+            ret = 1;                
+            hb_storc( errbuf, 2 );
+        }            
+        
+    hb_retl(ret);            
+}        
+
+HB_FUNC(PQFREECANCEL)
+{
+    if (hb_parinfo(1))
+        PQfreeCancel( ( PGcancel * ) hb_parptr(1) ) ;
+}        
+
+#endif
+
 
 /*
 
