@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4161 2005/06/01 18:24:37 druzus Exp $
+ * $Id: ChangeLog,v 1.4162 2005/06/02 00:43:36 druzus Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-06-01 18:00 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbver.h
+    * Refreshed.
 
 2005-06-02 02:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/make_rpm.sh
