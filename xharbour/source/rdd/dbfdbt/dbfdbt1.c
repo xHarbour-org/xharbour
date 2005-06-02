@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.22 2005/04/25 23:11:05 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.23 2005/06/01 18:24:52 druzus Exp $
  */
 
 /*
@@ -422,14 +422,13 @@ static void hb_dbtWriteMemo( DBTAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULON
       }
    }
    else
-#else
+#endif
    {
       BYTE pBlock[ DBT_BLOCKSIZE ];
       memset( pBlock, 0x1A, DBT_BLOCKSIZE );
       hb_fsWriteLarge( pArea->hMemoFile, ( BYTE * ) pItem->item.asString.value, ulLen );
       hb_fsWrite( pArea->hMemoFile, pBlock, ( DBT_BLOCKSIZE - ( USHORT ) ( ulLen % DBT_BLOCKSIZE ) ) );
    }
-#endif
    pArea->fMemoFlush = TRUE;
 
    if( bNewBlock )

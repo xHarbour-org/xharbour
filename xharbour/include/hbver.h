@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.h,v 1.62 2005/06/02 01:02:30 ronpinkas Exp $
+ * $Id: hbver.h,v 1.63 2005/06/02 01:14:10 druzus Exp $
  */
 
 /*
@@ -63,7 +63,7 @@
 
 
 #define HB_VER_LENTRY   "2005-06-02 03:12 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)"
-#define HB_VER_CHLCVS   "ChangeLog,v 1.4164"
+#define HB_VER_CHLCVS   "ChangeLog,v 1.4165"
 #define HB_VER_C_USR    ""
 #define HB_VER_L_USR    ""
 #define HB_VER_PRG_USR  ""
