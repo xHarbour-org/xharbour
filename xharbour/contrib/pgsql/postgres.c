@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.20 2005/05/21 14:48:38 rodrigo_moreno Exp $
+ * $Id: postgres.c,v 1.22 2005/06/01 23:32:20 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -88,7 +88,11 @@
 #define INV_READ		0x00040000
 
 #ifndef HB_PGVERSION
-#define HB_PGVERSION   0x0800
+#  ifdef PG_DIAG_INTERNAL_POSITION
+#     define HB_PGVERSION   0x0800
+#  else
+#     define HB_PGVERSION   0x0700
+#  endif
 #endif
 
 /* 
@@ -889,4 +893,4 @@ int PQsendQueryPrepared(PGconn *conn,
                         const int *paramFormats,
                         int resultFormat);                                                                                     
                                                 
-*/                    
+*/

@@ -1,10 +1,16 @@
- * $Id: ChangeLog,v 1.4162 2005/06/02 00:43:36 druzus Exp $
+ * $Id: ChangeLog,v 1.4163 2005/06/02 01:02:29 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-06-02 03:12 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/pgsql/postgres.c
+    * added temporary hack for autodetection postgers version
+  * include/hbver.h
+    * Refreshed.
 
 2005-06-01 18:00 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbver.h
