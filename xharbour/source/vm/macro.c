@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.51 2005/04/11 18:37:40 guerra000 Exp $
+ * $Id: macro.c,v 1.52 2005/05/24 21:05:58 ronpinkas Exp $
  */
 
 /*
@@ -579,6 +579,11 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
          szString = pText;
          iLen = strlen( szString );
       }
+#else
+      if( pItem->item.asString.bStatic )
+      {
+         szString = hb_strdup( szString );
+      }
 #endif
 
       iStatus = hb_macroParse( &struMacro, szString, iLen );
@@ -597,6 +602,11 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
       {
         hb_xfree( pText );
         hb_xfree( pOut );
+      }
+#else
+      if( pItem->item.asString.bStatic )
+      {
+        hb_xfree( (void *) szString );
       }
 #endif
 
@@ -666,7 +676,14 @@ void HB_EXPORT hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
       int iStatus;
       ULONG ulLen = pItem->item.asString.length;
 
-      szString = pItem->item.asString.value;
+      if( pItem->item.asString.bStatic )
+      {
+         szString = hb_strdup( pItem->item.asString.value );
+      }
+      else
+      {
+         szString = pItem->item.asString.value;
+      }
 
       ulLen--;
       while( szString[ulLen] == ' ' )
@@ -681,6 +698,11 @@ void HB_EXPORT hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
       struMacro.supported  = (flags & HB_SM_RT_MACRO) ? s_macroFlags : flags;
 
       iStatus = hb_macroParse( &struMacro, szString, ulLen );
+
+      if( pItem->item.asString.bStatic )
+      {
+         hb_xfree( (void *) szString );
+      }
 
       hb_stackPop();    /* remove compiled string */
 
@@ -757,7 +779,7 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
 
       iStatus = hb_macroParse( &struMacro, szString, iLen );
 
-      hb_xfree( szString );
+      hb_xfree( (void *) szString );
       struMacro.string = NULL;
 
       hb_stackPop();    /* remove compiled variable name */
@@ -779,13 +801,28 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
        */
       HB_MACRO struMacro;
       int iStatus;
-      char * szString = pVar->item.asString.value;
+      char * szString;
 
       struMacro.Flags      = iFlag | HB_MACRO_GEN_ALIASED;
       struMacro.uiNameLen  = HB_SYMBOL_NAME_LEN;
       struMacro.status     = HB_MACRO_CONT;
       struMacro.supported  = (bSupported & HB_SM_RT_MACRO) ? s_macroFlags : bSupported;
+
+      if( pVar->item.asString.bStatic )
+      {
+         szString = hb_strdup( pVar->item.asString.value );
+      }
+      else
+      {
+         szString = pVar->item.asString.value;
+      }
+
       iStatus = hb_macroParse( &struMacro, szString, pVar->item.asString.length );
+
+      if( pVar->item.asString.bStatic )
+      {
+         hb_xfree( (void *) szString );
+      }
 
       hb_stackPop();    /* remove compiled string */
 
@@ -841,7 +878,11 @@ HB_MACRO_PTR HB_EXPORT hb_macroCompile( char * szString )
    pMacro->status     = HB_MACRO_CONT;
    pMacro->supported  = s_macroFlags;
 
+   szString = (char *) hb_strdup( szString );
+
    iStatus = hb_macroParse( pMacro, szString, strlen( szString ) );
+
+   hb_xfree( (void *) szString );
 
    if( ! ( iStatus == HB_MACRO_OK && ( pMacro->status & HB_MACRO_CONT ) ) )
    {
@@ -895,14 +936,14 @@ void HB_EXPORT hb_macroPushSymbol( HB_ITEM_PTR pItem )
 
          if( bNewBuffer )
          {
-            hb_xfree( szString );   /* free space allocated in hb_macroTextSubst */
+            hb_xfree( (void *) szString );   /* free space allocated in hb_macroTextSubst */
          }
       }
       else
       {
          if( bNewBuffer )
          {
-            hb_xfree( szString );   /* free space allocated in hb_macroTextSubst */
+            hb_xfree( (void *) szString );   /* free space allocated in hb_macroTextSubst */
          }
 
          // Recycle
@@ -954,13 +995,28 @@ char HB_EXPORT * hb_macroGetType( PHB_ITEM pItem, BYTE flags )
    {
       HB_MACRO struMacro;
       int iStatus;
+      char *szString;
 
       struMacro.Flags      = HB_MACRO_GEN_PUSH | HB_MACRO_GEN_TYPE;
       struMacro.uiNameLen  = HB_SYMBOL_NAME_LEN;
       struMacro.status     = HB_MACRO_CONT;
       struMacro.supported  = (flags & HB_SM_RT_MACRO) ? s_macroFlags : flags;
 
+      if( pItem->item.asString.bStatic )
+      {
+         szString = hb_strdup( pItem->item.asString.value );
+      }
+      else
+      {
+         szString = pItem->item.asString.value;
+      }
+
       iStatus = hb_macroParse( &struMacro, pItem->item.asString.value, pItem->item.asString.length );
+
+      if( pItem->item.asString.bStatic )
+      {
+         hb_xfree( (void *) szString );
+      }
 
       if( iStatus == HB_MACRO_OK )
       {
