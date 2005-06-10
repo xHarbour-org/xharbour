@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4167 2005/06/10 00:57:35 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.4168 2005/06/10 04:00:52 peterrees Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-06-10 16:03 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/console.c
+    + close_binary() added missing cast
+
 2005-06-10 16:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/console.c
     + close_binary() for HB_OS_WIN_32 check for zero length file
