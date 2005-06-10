@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.57 2005/04/27 18:38:47 ptsarenko Exp $
+ * $Id: adsfunc.c,v 1.58 2005/04/28 20:37:02 what32 Exp $
  */
 
 /*
@@ -1631,7 +1631,6 @@ HB_FUNC( ADSCONVERTTABLE )
    {
       hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSCONVERTTABLE" );
    }
-
 }
 
 #if !defined( ADS_LINUX )
@@ -2306,16 +2305,24 @@ HB_FUNC( ADSCOPYTABLECONTENTS )
                                              pDest->hTable,
                                              ADS_IGNOREFILTERS );
             if( ulRetVal == AE_SUCCESS )
+            {
                hb_retl( 1 );
+            }
             else
+            {
                hb_retl( 0 );
+            }
          }
       }
       else
+      {
          hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSCOPYTABLECONTENTS" );
+      }
    }
    else
+   {
       hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSCOPYTABLECONTENTS" );
+   }
 }
 
 
@@ -2363,6 +2370,40 @@ UNSIGNED32 ENTRYPOINT AdsDeleteFile( ADSHANDLE hConnection, UNSIGNED8* pucFileNa
 HB_FUNC( ADSDELETEFILE )
 {
    hb_retl( AdsDeleteFile( adsConnectHandle, ( UNSIGNED8* ) hb_parcx( 1 ) ) == AE_SUCCESS );
+}
+
+
+HB_FUNC( ADSSTMTSETTABLEPASSWORD )
+{
+   ADSAREAP pArea;
+   UNSIGNED32 ulRetVal;
+   char * pucTableName = hb_parcx( 1 );
+   char * pucPassword = hb_parcx( 2 );
+
+   if( !pucTableName || ( strlen( pucTableName ) == 0 ) || !pucPassword || ( strlen( pucPassword ) == 0 ) )
+   {
+      hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSSTMTSETTABLEPASSWORD" );
+      hb_retni( 0 );
+   }
+
+   if( !adsConnectHandle )
+   {
+      hb_errRT_DBCMD( NULL, AE_NO_CONNECTION, NULL, "AE_NO_CONNECTION" );
+      hb_retni( 0 );
+   }
+
+   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+
+   if( pArea )
+   {
+      ulRetVal = AdsStmtSetTablePassword( pArea->hStatement, ( UNSIGNED8 * ) pucTableName, ( UNSIGNED8 * ) pucPassword );
+      hb_retni( ulRetVal );
+   }
+   else
+   {
+      hb_errRT_DBCMD( EG_NOTABLE, 2001, NULL, "ADSSTMTSETTABLEPASSWORD" );
+   }
+
 }
 
 #endif   /* ADS_REQUIRE_VERSION >= 6  */
