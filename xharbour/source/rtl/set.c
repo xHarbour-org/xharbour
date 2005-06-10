@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.63 2005/06/01 18:24:53 druzus Exp $
+ * $Id: set.c,v 1.64 2005/06/10 03:59:39 peterrees Exp $
  */
 
 /*
@@ -252,7 +252,7 @@ static void close_binary( FHANDLE handle )
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
       if ( hb_set.hb_set_winprinter && ( hb_set.hb_set_printhan == handle ) && s_PrintFileName[0] )
       {
-         if ( hb_fsFSize( s_PrintFileName, FALSE ) > 0 )
+         if ( hb_fsFSize( (BYTE *) s_PrintFileName, FALSE ) > 0 )
          {
             hb_PrintFileRaw( (BYTE *) s_PrinterName, (BYTE *) s_PrintFileName,
                             (BYTE *) ( hb_set.hb_set_printerjob ? hb_set.hb_set_printerjob : s_PrintFileName ) ) ;
