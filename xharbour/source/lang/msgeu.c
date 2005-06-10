@@ -1,5 +1,5 @@
 /*
- * $Id: msgeu.c,v 1.5 2005/02/28 10:17:30 andijahja Exp $
+ * $Id: msgeu.c,v 1.6 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -49,7 +49,7 @@ static HB_LANG s_lang =
       "English",                   /* Name (in native language) */
       "EU",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.5 $ $Date: 2005/02/28 10:17:30 $",         /* Version */
+      "$Revision: 1.6 $ $Date: 2005/03/06 19:22:03 $",         /* Version */
 
       /* Month names */
 
@@ -145,6 +145,7 @@ static HB_LANG s_lang =
       "array dimension",
       "ez da taula",
       "baldintza-sententzia",
+      "Invalid self",
 
       /* Internal error names */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: msghr852.c,v 1.6 2005/02/28 10:17:30 andijahja Exp $
+ * $Id: msghr852.c,v 1.7 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ static HB_LANG s_lang =
       "Hrvatski",                  /* Name (in native language) */
       "HR",                        /* RFC ID */
       "852",                       /* Codepage */
-      "$Revision: 1.6 $ $Date: 2005/02/28 10:17:30 $",         /* Version */
+      "$Revision: 1.7 $ $Date: 2005/03/06 19:22:03 $",         /* Version */
 
       /* Month names */
 
@@ -164,6 +164,7 @@ static HB_LANG s_lang =
        "dimenzija matrice",
        "nije matrica",
        "uvjetan",
+       "Invalid self",
 
        /* Internal error names */
 

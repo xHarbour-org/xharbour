@@ -1,10 +1,87 @@
- * $Id: ChangeLog,v 1.4168 2005/06/10 04:00:52 peterrees Exp $
+ * $Id: ChangeLog,v 1.4169 2005/06/10 04:06:02 peterrees Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-06-10 15:50 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/error.ch
+  * include/hblang.ch
+  * source/lang/msg_tpl.c
+  * source/lang/msgbgwin.c
+  * source/lang/msgby866.c
+  * source/lang/msgbywin.c
+  * source/lang/msgca.c
+  * source/lang/msgcs852.c
+  * source/lang/msgcsiso.c
+  * source/lang/msgcskam.c
+  * source/lang/msgcswin.c
+  * source/lang/msgde.c
+  * source/lang/msgdewin.c
+  * source/lang/msgen.c
+  * source/lang/msgeo.c
+  * source/lang/msges.c
+  * source/lang/msgeswin.c
+  * source/lang/msgeu.c
+  * source/lang/msgfr.c
+  * source/lang/msggl.c
+  * source/lang/msghe862.c
+  * source/lang/msghewin.c
+  * source/lang/msghr1250.c
+  * source/lang/msghr437.c
+  * source/lang/msghr852.c
+  * source/lang/msghriso.c
+  * source/lang/msghu852.c
+  * source/lang/msghucwi.c
+  * source/lang/msghuwin.c
+  * source/lang/msgid.c
+  * source/lang/msgis850.c
+  * source/lang/msgit.c
+  * source/lang/msgko.c
+  * source/lang/msgltwin.c
+  * source/lang/msgnl.c
+  * source/lang/msgpl852.c
+  * source/lang/msgpliso.c
+  * source/lang/msgplmaz.c
+  * source/lang/msgplwin.c
+  * source/lang/msgpt.c
+  * source/lang/msgro.c
+  * source/lang/msgru866.c
+  * source/lang/msgrukoi.c
+  * source/lang/msgruwin.c
+  * source/lang/msgsl852.c
+  * source/lang/msgsliso.c
+  * source/lang/msgslwin.c
+  * source/lang/msgsr852.c
+  * source/lang/msgsriso.c
+  * source/lang/msgsrwin.c
+  * source/lang/msgua866.c
+  * source/lang/msguakoi.c
+  * source/lang/msguawin.c
+  * source/lang/msgzhb5.c
+  * source/lang/msgzhgb.c
+    + Added EG_BADSELF -> "Invalid self" error.
+
+  * include/hbclass.ch
+    * Corrected to use return value of :ConstructorCall()
+  * source/rtl/tclass.prg
+    * Corrected to return value of the constructor call in :ConstructorCall().
+    * Corrected to NOT call :New() unless it's a declared constructor.
+    + Added Alert() warning when no constructor found, yet arguments passed.
+
+  * source/vm/hvm.c
+    + Added logic to detect invalid, or switched 'Self' object in hb_vmSend()
+      and raise subtituable a RT Error.
+
+     /*
+        Clipper ignores the return value of constructors, and we cloned it. But
+        I find it extremly dangerous to silently override programmer code. Now
+        we'll detect such condition and throw an error. Additional benefit is
+        that now the programmer CAN SWITCH the self value, in error handling.
+      */
+
 2005-06-10 16:03 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/console.c
     + close_binary() added missing cast

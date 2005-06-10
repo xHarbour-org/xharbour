@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.464 2005/05/16 21:45:41 andijahja Exp $
+ * $Id: hvm.c,v 1.465 2005/05/24 21:05:56 ronpinkas Exp $
  */
 
 /*
@@ -1208,7 +1208,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1088, NULL, ">>", 2, pItem1, pItem2 );
+               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1600, NULL, ">>", 2, pItem1, pItem2 );
 
                if( pResult )
                {
@@ -1252,7 +1252,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1088, NULL, "<<", 2, pItem1, pItem2 );
+               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1601, NULL, "<<", 2, pItem1, pItem2 );
 
                if( pResult )
                {
@@ -1557,7 +1557,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type != HB_IT_ARRAY && hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type != HB_IT_STRING )
             {
-               hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), hb_itemPutNI( * HB_VM_STACK.pPos, 1 ) );
+               hb_errRT_BASE( EG_ARG, 1602, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), hb_itemPutNI( * HB_VM_STACK.pPos, 1 ) );
             }
 
             hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] = hb_itemUnRef( hb_stackItemFromTop( -1 ) );
@@ -1820,7 +1820,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               hb_errRT_BASE( EG_ARG, 1081, NULL, "__ClsSetModule()", 1, pClassHandle );
+               hb_errRT_BASE( EG_ARG, 1603, NULL, "__ClsSetModule()", 1, pClassHandle );
             }
 
             hb_stackPop(); //pClassHandle.
@@ -2963,7 +2963,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               hb_vmPush( hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "SWITCH", 1, pTop ) );
+               hb_vmPush( hb_errRT_BASE_Subst( EG_ARG, 1604, NULL, "SWITCH", 1, pTop ) );
             }
 
             w += 5;
@@ -6900,7 +6900,24 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       // Constructor must ALWAYS return Self.
       if( bConstructor )
       {
-         hb_itemForwardValue( &(HB_VM_STACK.Return), pSelf );
+         //hb_itemForwardValue( &(HB_VM_STACK.Return ), pSelf );
+
+         if( ( ! HB_IS_OBJECT( &( HB_VM_STACK.Return ) ) ) || pSelf->item.asArray.value != HB_VM_STACK.Return.item.asArray.value )
+         {
+            PHB_ITEM pNewSelf = hb_itemNew( &( HB_VM_STACK.Return ) );
+            PHB_ITEM pResult  = hb_errRT_BASE_Subst( EG_BADSELF, 1605, NULL, pSym->szName, 2, pSelf, pNewSelf );
+
+            hb_itemRelease( pNewSelf );
+
+            if( pResult )
+            {
+               hb_itemRelease( hb_itemReturn( pResult ) );
+            }
+            else
+            {
+               hb_itemForwardValue( &(HB_VM_STACK.Return ), pSelf );
+            }
+         }
       }
    }
    else if ( ! HB_IS_HASH( pSelf ) )
@@ -9360,7 +9377,7 @@ HB_FUNC( HB_FUNCPTR )
    }
    else
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_FuncPtr", 1, hb_paramError( 1 ) );
+      hb_errRT_BASE_SubstR( EG_ARG, 1606, NULL, "HB_FuncPtr", 1, hb_paramError( 1 ) );
    }
 }
 

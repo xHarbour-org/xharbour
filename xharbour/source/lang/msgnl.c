@@ -1,5 +1,5 @@
 /*
- * $Id: msgnl.c,v 1.1 2000/04/14 20:01:21 vszel Exp $
+ * $Id: msgnl.c,v 1.1.1.1 2001/12/21 10:43:37 ronpinkas Exp $
  */
 
 /* Language Support Module */
@@ -88,5 +88,6 @@ char *hb_errorsGeneric[] =
    "array access",
    "array assign",
    "not an array",
-   "conditional"
+   "conditional",
+   "Invalid self"
 };

@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.14 2004/07/29 23:55:59 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.15 2005/04/04 05:56:49 ronpinkas Exp $
  */
 
 /*
@@ -499,17 +499,18 @@ STATIC FUNCTION ConstructorCall( oClass, aParams )
      IF nPos > 0
         // Exec method - i have found the constructor in this class
         //TraceLog( "Search this class constructor:", aConstrMethods[ nPos ][HB_OO_DATA_SYMBOL] )
-        HB_ExecFromArray( oClass, aConstrMethods[ nPos ][ HB_OO_DATA_SYMBOL ], aParams )
+        RETURN HB_ExecFromArray( oClass, aConstrMethods[ nPos ][ HB_OO_DATA_SYMBOL ], aParams )
      ELSE
         // Get LAST constructor from parent (NOTE: this can be a default and faster way,
         // but i prefer check rightly before)
         IF !Empty( aConstrMethods )
            //TraceLog( "Search parent class constructor:", aTail( aConstrMethods )[HB_OO_DATA_SYMBOL] )
-           HB_ExecFromArray( oClass, aTail( aConstrMethods )[ HB_OO_DATA_SYMBOL ], aParams )
+           RETURN HB_ExecFromArray( oClass, aConstrMethods[-1][ HB_OO_DATA_SYMBOL ], aParams )
         ELSE
            //TraceLog( "Call new default constructor:", "NEW" )
            // If i have no constructor i call NEW method that is defined is HBOBJECT class
-           HB_ExecFromArray( oClass, "NEW", aParams )
+           //HB_ExecFromArray( oClass, "NEW", aParams )
+           Alert( "Warning! Class function '" + oClass:ClassName + "' called with arguments, but no constructor found." )
         ENDIF
      ENDIF
 

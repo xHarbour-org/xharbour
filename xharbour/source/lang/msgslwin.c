@@ -1,5 +1,5 @@
 /*
- * $Id: msgslwin.c,v 1.3 2005/02/28 10:17:30 andijahja Exp $
+ * $Id: msgslwin.c,v 1.4 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -49,7 +49,7 @@ static HB_LANG s_lang =
       "Slovenšèina",              /* Name (in native language) */
       "SL",                       /* RFC ID */
       "1250",                     /* Codepage */
-      "$Revision: 1.3 $ $Date: 2005/02/28 10:17:30 $",     /* Version */
+      "$Revision: 1.4 $ $Date: 2005/03/06 19:22:03 $",     /* Version */
 
       /* Month names */
 
@@ -145,6 +145,7 @@ static HB_LANG s_lang =
       "array dimension",
       "not an array",
       "conditional",
+      "Invalid self",
 
       /* Internal error names */
 

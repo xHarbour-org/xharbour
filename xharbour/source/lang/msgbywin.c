@@ -1,5 +1,5 @@
 /*
- * $Id: msgbywin.c,v 1.2 2005/02/28 10:17:29 andijahja Exp $
+ * $Id: msgbywin.c,v 1.3 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Беларуская ",               /* Name (in native language) */
       "BY",                        /* RFC ID */
       "1251",                      /* Codepage */
-      "$Revision: 1.2 $ $Date: 2005/02/28 10:17:29 $",         /* Version */
+      "$Revision: 1.3 $ $Date: 2005/03/06 19:22:03 $",         /* Version */
 
       /* Month names */
 
@@ -162,6 +162,7 @@ static HB_LANG s_lang =
       "надання масіў",
       "не масіў",
       "параўнанне",
+      "Invalid self",
 
 
       /* Internal error names */

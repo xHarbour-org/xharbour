@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.29 2005/03/15 18:02:51 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.30 2005/05/21 01:30:44 ronpinkas Exp $
  */
 
 /*
@@ -851,7 +851,7 @@ s_oClass:AddInline( <(op)>, {|Self, <cArg> | <Code> }, HBCLSCHOICE( .F., <.expor
                       endif ;;
                       oClassInstance := __clsInst( s_oClass:hClass );;
                       IF PCount() > 0 ;;
-                         s_oClass:ConstructorCall( oClassInstance, hb_aparams() ) ;;
+                         RETURN s_oClass:ConstructorCall( oClassInstance, hb_aparams() ) ;;
                       ENDIF ;;
                       return oClassInstance AS CLASS _CLASS_NAME_ ;;
                       #undef  _CLASS_MODE_ ;;
@@ -863,7 +863,7 @@ s_oClass:AddInline( <(op)>, {|Self, <cArg> | <Code> }, HBCLSCHOICE( .F., <.expor
                       endif ;;
                       oClassInstance := __clsInst( s_oClass:hClass );;
                       IF PCount() > 0 ;;
-                         s_oClass:ConstructorCall( oClassInstance, hb_aparams() ) ;;
+                         RETURN s_oClass:ConstructorCall( oClassInstance, hb_aparams() ) ;;
                       ENDIF ;;
                       return oClassInstance AS CLASS _CLASS_NAME_ ;;
                       #undef  _CLASS_MODE_ ;;

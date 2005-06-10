@@ -1,5 +1,5 @@
 /*
- * $Id: msges.c,v 1.9 2005/02/28 10:17:30 andijahja Exp $
+ * $Id: msges.c,v 1.10 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Espa¤ol",                   /* Name (in native language) */
       "ES",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.9 $ $Date: 2005/02/28 10:17:30 $",         /* Version */
+      "$Revision: 1.10 $ $Date: 2005/03/06 19:22:03 $",         /* Version */
 
       /* Month names */
 
@@ -162,6 +162,7 @@ static HB_LANG s_lang =
       "dimensi¢n del array",
       "no es un array",
       "conditional",
+      "Invalid self",
 
       /* Internal error names */
 

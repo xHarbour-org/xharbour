@@ -1,5 +1,5 @@
 /*
- * $Id: msguawin.c,v 1.2 2005/02/28 10:17:30 andijahja Exp $
+ * $Id: msguawin.c,v 1.3 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Український",               /* Name (in native language) */
       "UA",                        /* RFC ID */
       "1251",                      /* Codepage */
-      "$Revision: 1.2 $ $Date: 2005/02/28 10:17:30 $",         /* Version */
+      "$Revision: 1.3 $ $Date: 2005/03/06 19:22:03 $",         /* Version */
 
       /* Month names */
 
@@ -162,6 +162,7 @@ static HB_LANG s_lang =
       "присвоювання масива",
       "не масив",
       "порівняння",
+      "Invalid self",
 
 
       /* Internal error names */

@@ -1,5 +1,5 @@
 /*
- * $Id: msghr1250.c,v 1.2 2005/02/28 10:17:30 andijahja Exp $
+ * $Id: msghr1250.c,v 1.3 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ static HB_LANG s_lang =
       "Hrvatski",                  /* Name (in native language) */
       "HR",                        /* RFC ID */
       "1250",                      /* Codepage */
-      "$Revision: 1.2 $ $Date: 2005/02/28 10:17:30 $",         /* Version */
+      "$Revision: 1.3 $ $Date: 2005/03/06 19:22:03 $",         /* Version */
 
       /* Month names */
 
@@ -97,16 +97,16 @@ static HB_LANG s_lang =
 
       /* CA-Cl*pper compatible natmsg items */
 
-      "Datot.baze podat. # Zapisi     Zadnja prom.    Vel.", 
+      "Datot.baze podat. # Zapisi     Zadnja prom.    Vel.",
       "Želite još primjera?",
       "Str.Br.",
-      "** Podzbroj **", 
+      "** Podzbroj **",
       "* Podpodzbroj *",
-      "*** Zbroj ***", 
+      "*** Zbroj ***",
       "Ins",
       "   ",
       "Pogrešan podatak",
-      "Raspon: ", 
+      "Raspon: ",
       " - ",
       "D/N",
       "POGREŠAN IZRAZ",
@@ -164,6 +164,7 @@ static HB_LANG s_lang =
       "dimenzija matrice",
       "nije matrica",
       "uvjetan",
+      "Invalid self",
 
       /* Internal error names */
 

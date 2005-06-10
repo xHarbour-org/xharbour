@@ -1,5 +1,5 @@
 /*
- * $Id: msgeswin.c,v 1.4 2005/02/28 10:17:30 andijahja Exp $
+ * $Id: msgeswin.c,v 1.5 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ static HB_LANG s_lang =
       "Español ANSI",              /* Name (in native language) */
       "ESWIN",                     /* RFC ID */
       "ANSI",                      /* Codepage */
-      "$Revision: 1.4 $ $Date: 2005/02/28 10:17:30 $",         /* Version */
+      "$Revision: 1.5 $ $Date: 2005/03/06 19:22:03 $",         /* Version */
 
       /* Month names */
 
@@ -163,6 +163,7 @@ static HB_LANG s_lang =
       "dimensión del array",
       "no es un array",
       "conditional",
+      "Invalid self",
 
       /* Internal error names */
 

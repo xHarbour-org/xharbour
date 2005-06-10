@@ -1,5 +1,5 @@
 /*
- * $Id: msgfr.c,v 1.7 2005/02/28 10:17:30 andijahja Exp $
+ * $Id: msgfr.c,v 1.8 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "fran‡ais",                  /* Name (in native language) */
       "FR",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.7 $ $Date: 2005/02/28 10:17:30 $",         /* Version */
+      "$Revision: 1.8 $ $Date: 2005/03/06 19:22:03 $",         /* Version */
 
       /* Month names */
 
@@ -162,6 +162,7 @@ static HB_LANG s_lang =
       "array dimension",
       "not an array",
       "conditional",
+      "Invalid self",
 
       /* Internal error names */
 
