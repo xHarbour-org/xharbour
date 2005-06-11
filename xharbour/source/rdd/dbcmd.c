@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.156 2005/05/10 16:48:14 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.157 2005/05/25 13:17:59 druzus Exp $
  */
 
 /*
@@ -4823,7 +4823,7 @@ HB_FUNC( DBF2TEXT )
 
    PHB_ITEM pWhile  = hb_param( 1, HB_IT_BLOCK );
    PHB_ITEM pFor    = hb_param( 2, HB_IT_BLOCK );
-   PHB_ITEM pFields = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pFields = hb_param( 3, HB_IT_ARRAY );
 
    char *cDelim   = hb_parc( 4 );
    FHANDLE handle = (FHANDLE) hb_parnl(5);
