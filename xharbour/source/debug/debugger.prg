@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.57 2005/04/08 10:56:43 likewolf Exp $
+ * $Id: debugger.prg,v 1.58 2005/05/23 16:05:08 lf_sfnet Exp $
  */
 
 /*
@@ -340,7 +340,7 @@ CLASS TDebugger
    DATA   oWndCode, oWndCommand, oWndStack, oWndVars
    DATA   oBar, oBrwText, cPrgName, oBrwStack, oBrwVars, aVars
    DATA   cImage
-   DATA   cAppImage, nAppRow, nAppCol, cAppColors, nAppCursor
+   DATA   cAppImage, nAppRow, nAppCol, cAppColors, nAppCursor, nAppDispCount
    DATA   nAppLastKey, bAppInkeyAfter, bAppInkeyBefore, bAppClassScope
    DATA   nAppCTWindow, nAppDirCase, nAppFileCase, nAppTypeAhead
    DATA   nMaxRow, nMaxCol
@@ -2127,6 +2127,8 @@ RETURN self
 
 
 METHOD RestoreAppScreen() CLASS TDebugger
+  LOCAL i
+  
   ::cImage := SaveScreen()
   DispBegin()
   RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cAppImage )
@@ -2141,6 +2143,9 @@ METHOD RestoreAppScreen() CLASS TDebugger
   SetColor( ::cAppColors )
   SetCursor( ::nAppCursor )
   DispEnd()
+  FOR i := 1 TO ::nAppDispCount
+    DispBegin()
+  NEXT
 return nil
 
 
@@ -2170,11 +2175,17 @@ return nil
 
 
 METHOD SaveAppScreen( lRestore ) CLASS TDebugger
-  LOCAL nRight, nTop
+  LOCAL nRight, nTop, i
   
   IF lRestore == NIL
     lRestore := .T.
   ENDIF
+
+  ::nAppDispCount := DispCount()
+  FOR i := 1 TO ::nAppDispCount
+    DispEnd()
+  NEXT
+  
   DispBegin()
  
   /* Get cursor coordinates INSIDE ct window */
