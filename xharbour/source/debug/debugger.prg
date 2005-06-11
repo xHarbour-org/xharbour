@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.58 2005/05/23 16:05:08 lf_sfnet Exp $
+ * $Id: debugger.prg,v 1.59 2005/06/11 09:15:38 likewolf Exp $
  */
 
 /*
@@ -2324,7 +2324,7 @@ METHOD SaveSettings() CLASS TDebugger
 
       if ! Empty( ::aBreakPoints )
          for n := 1 to Len( ::aBreakPoints )
-            cInfo += "BP " + AllTrim( Str( ::aBreakPoints[ n ][ 1 ], , 0 ) ) + " " + ;
+            cInfo += "BP " + AllTrim( Str( ::aBreakPoints[ n ][ 1 ] ) ) + " " + ;
                      AllTrim( ::aBreakPoints[ n ][ 2 ] ) + HB_OsNewLine()
          next
       endif
