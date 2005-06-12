@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4172 2005/06/11 10:43:54 likewolf Exp $
+ * $Id: ChangeLog,v 1.4173 2005/06/11 22:27:11 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-06-12 09:51 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/hvm.c
+    * Added missing check on s_uiActionRequest to yesterday's change in hb_vmSend()
 
 2005-06-11 15:26 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * xharbour/source/rdd/dbcmd.c

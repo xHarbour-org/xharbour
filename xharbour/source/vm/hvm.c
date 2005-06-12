@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.465 2005/05/24 21:05:56 ronpinkas Exp $
+ * $Id: hvm.c,v 1.466 2005/06/10 22:51:38 ronpinkas Exp $
  */
 
 /*
@@ -6902,20 +6902,23 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       {
          //hb_itemForwardValue( &(HB_VM_STACK.Return ), pSelf );
 
-         if( ( ! HB_IS_OBJECT( &( HB_VM_STACK.Return ) ) ) || pSelf->item.asArray.value != HB_VM_STACK.Return.item.asArray.value )
+         if( s_uiActionRequest == 0 )
          {
-            PHB_ITEM pNewSelf = hb_itemNew( &( HB_VM_STACK.Return ) );
-            PHB_ITEM pResult  = hb_errRT_BASE_Subst( EG_BADSELF, 1605, NULL, pSym->szName, 2, pSelf, pNewSelf );
-
-            hb_itemRelease( pNewSelf );
-
-            if( pResult )
+            if( ( ! HB_IS_OBJECT( &( HB_VM_STACK.Return ) ) ) || pSelf->item.asArray.value != HB_VM_STACK.Return.item.asArray.value )
             {
-               hb_itemRelease( hb_itemReturn( pResult ) );
-            }
-            else
-            {
-               hb_itemForwardValue( &(HB_VM_STACK.Return ), pSelf );
+               PHB_ITEM pNewSelf = hb_itemNew( &( HB_VM_STACK.Return ) );
+               PHB_ITEM pResult  = hb_errRT_BASE_Subst( EG_BADSELF, 1605, NULL, pSym->szName, 2, pSelf, pNewSelf );
+
+               hb_itemRelease( pNewSelf );
+
+               if( pResult )
+               {
+                  hb_itemRelease( hb_itemReturn( pResult ) );
+               }
+               else
+               {
+                  hb_itemForwardValue( &(HB_VM_STACK.Return ), pSelf );
+               }
             }
          }
       }
