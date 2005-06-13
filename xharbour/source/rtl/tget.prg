@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.96 2005/03/04 02:25:48 kaddath Exp $
+ * $Id: tget.prg,v 1.97 2005/05/16 21:56:38 andijahja Exp $
  */
 
 /*
@@ -449,18 +449,18 @@ METHOD Display( lForced ) CLASS Get
    IF xBuffer != NIL .and. ( lForced .or. ( ::nDispPos != ::nOldPos ) )
       DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ),;
                  Substr( xBuffer, ::nDispPos, ::nDispLen ), ;
-                 hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ) )
+                 hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ), .T. )
       IF ! ( ::cDelimit == NIL )
-         DispOutAt( ::Row, ::Col, Substr( ::cDelimit, 1, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ) )
-         DispOutAt( ::Row, ::Col + ::nDispLen + 1, Substr( ::cDelimit, 2, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ) )
+         DispOutAt( ::Row, ::Col, Substr( ::cDelimit, 1, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ), .T. )
+         DispOutAt( ::Row, ::Col + ::nDispLen + 1, Substr( ::cDelimit, 2, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ), .T. )
       ENDIF
    ENDIF
 
    IF !Empty( ::Caption )
      cCaption := StrTran( ::Caption, "&", "" )
-     DispOutAt( ::Row, ::Col - Len( cCaption ) - 1, cCaption, cClrCap )
+     DispOutAt( ::Row, ::Col - Len( cCaption ) - 1, cCaption, cClrCap, .T. )
      IF "&" $ ::Caption
-       DispOutAt( ::Row, ::Col - Len( cCaption ) - 2 + At( "&", ::Caption ), cCaption[At( "&", ::Caption )], cClrAcc )
+       DispOutAt( ::Row, ::Col - Len( cCaption ) - 2 + At( "&", ::Caption ), cCaption[At( "&", ::Caption )], cClrAcc, .T. )
      ENDIF
    ENDIF
 

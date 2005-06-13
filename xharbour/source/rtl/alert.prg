@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.14 2004/09/16 15:26:48 modalsist Exp $
+ * $Id: alert.prg,v 1.15 2005/03/19 00:30:55 andijahja Exp $
  */
 
 /*
@@ -145,7 +145,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
          DEFAULT
             xMessage := "NIL"
       END
-        
+
       DO WHILE ( nPos := At( ';', xMessage ) ) != 0
          AAdd( aSay, Left( xMessage, nPos - 1 ) )
          xMessage := SubStr( xMessage, nPos + 1 )
@@ -189,9 +189,9 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
       cColorHigh := "W+/B" // second pair color (Options buttons)
    ELSE
 
-      /* NOTE: Clipper Alert does not handle second color pair properly. 
+      /* NOTE: Clipper Alert does not handle second color pair properly.
                If we inform the second color pair, xHarbour alert will consider it.
-               if we not inform the second color pair, then xHarbour alert will behave 
+               if we not inform the second color pair, then xHarbour alert will behave
                like Clipper.  2004/Sep/16 - Eduardo Fernandes <modalsist> */
 
       cColor11 := cColor12 := cColor21 := cColor22 := ""
@@ -206,9 +206,9 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
          cColorPair1 := cColorStr
          cColorPair2 := ""
       endif
-      
+
       nSlash := At("/",cColorPair1)
-      
+
       if nSlash > 1
          cColor11 := SubStr( cColorPair1,1,nSlash-1)
          cColor12 := SubStr( cColorPair1,nSlash+1)
@@ -216,39 +216,39 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
          cColor11 := cColorPair1
          cColor12 := "R"
       endif
-      
+
       if ColorValid(cColor11) .and. ColorValid(cColor12)
 
-        // if color pair is passed in numeric format, then we need to convert for 
-        // letter format to avoid blinking in some circumstances. 
+        // if color pair is passed in numeric format, then we need to convert for
+        // letter format to avoid blinking in some circumstances.
         if IsDigit( cColor11 )
            cColor11 := COLORLETTER( cColor11 )
-        endif   
+        endif
 
         cColorNorm := cColor11
 
-        if !empty(cColor12) 
+        if !empty(cColor12)
 
             if IsDigit( cColor12 )
                cColor12 := COLORLETTER( cColor12 )
-            endif   
+            endif
 
             cColorNorm := cColor11+"/"+cColor12
 
-        endif   
+        endif
 
       else
          cColor11 := "W+"
          cColor12 := "R"
          cColorNorm := cColor11+"/"+cColor12
       endif
-      
 
-      // if second color pair exist, then xHarbour alert will handle properly. 
+
+      // if second color pair exist, then xHarbour alert will handle properly.
       if !empty( cColorPair2 )
-      
+
          nSlash := At("/",cColorPair2)
-      
+
          if nSlash > 1
             cColor21 := SubStr( cColorPair2,1,nSlash-1)
             cColor22 := SubStr( cColorPair2,nSlash+1)
@@ -261,7 +261,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
             if IsDigit( cColor21 )
                cColor21 := COLORLETTER( cColor21 )
-            endif   
+            endif
 
             cColorHigh := cColor21
 
@@ -269,30 +269,30 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
                 if IsDigit( cColor22 )
                    cColor22 := COLORLETTER( cColor22 )
-                endif   
+                endif
 
                 // extracting color attributes from background color.
                 cColor22 := StrTran( cColor22, "+", "" )
                 cColor22 := StrTran( cColor22, "*", "" )
                 cColorHigh := cColor21+"/"+cColor22
 
-            endif   
+            endif
 
          else
             cColorHigh := "W+/B"
          endif
-         
+
       else // if does not exist the second color pair, xHarbour alert will behave like Clipper
          if empty(cColor11) .or. empty(cColor12)
             cColor11 := "B"
             cColor12 := "W+"
-         else   
+         else
             cColor11 := StrTran( cColor11, "+", "" )
             cColor11 := StrTran( cColor11, "*", "" )
          endif
          cColorHigh := cColor12+"/"+cColor11
       endif
-      
+
    ENDIF
 
    IF nDelay == NIL
@@ -418,7 +418,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
          FOR EACH cEval IN aOptionsOK
             DispOutAt( nInitRow + nCount + 2, aPos[ HB_EnumIndex() ], " " + cEval + " ", cColorNorm )
          NEXT
-         DispOutAt( nInitRow + nCount + 2, aPos[ nChoice ], " " + aOptionsOK[ nChoice ] + " ", cColorHigh )
+         DispOutAt( nInitRow + nCount + 2, aPos[ nChoice ], " " + aOptionsOK[ nChoice ] + " ", cColorHigh, TRUE )
 
          nKey := Inkey( nDelay, INKEY_ALL )
 

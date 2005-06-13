@@ -1,10 +1,33 @@
- * $Id: ChangeLog,v 1.4173 2005/06/11 22:27:11 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4174 2005/06/12 16:52:21 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-06-13 14:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * include/hbapigt.h
+    +hb_gtWriteAt() definition updated for BOOL bSetPos
+  * source/rtl/console.c
+    +static BOOL s_DispOutAtSetPos = FALSE
+      used to set the default behaviour of DISPOUTAT()
+      for cursor position
+    +HB_FUNC( DISPOUTATSETPOS ) to set/return
+      value of s_DispOutAtSetPos
+    +DISPOUTAT() 5th parameter to determine if
+      cursor position is updated. If parameter not passed
+      value of new static s_DispOutAtSetPos used
+  * source/rtl/gtapi.c
+    +added parameter bSetPos to hb_gtWriteAt() which
+        determines if cursor pos is updated
+  * source/rtl/alert.prg
+  * source/rtl/menuto.prg
+  * source/rtl/tget.prg
+    + alter call to DispoutAt() to added .T. for cursor
+      where necessary
+  * source/clipsamp/gauge.c
+  * source/clipsamp/status.c
+  * utils/hbmake/hbmlang.c
 
 2005-06-12 09:51 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/hvm.c

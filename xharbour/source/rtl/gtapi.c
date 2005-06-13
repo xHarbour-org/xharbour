@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.54 2005/01/04 15:09:12 ptsarenko Exp $
+ * $Id: gtapi.c,v 1.55 2005/05/09 10:04:13 druzus Exp $
  */
 
 /*
@@ -1333,7 +1333,7 @@ USHORT HB_EXPORT hb_gtWrite( BYTE * pStr, ULONG ulLength )
 
 /****************************************************************************/
 USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr,
-                               ULONG ulLength )
+                               ULONG ulLength, BOOL bSetPos )
 {
    SHORT p_WFRow = ct_BFRow, p_WFCol = ct_BFCol;
 
@@ -1371,20 +1371,22 @@ USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pStr,
          uiRow -= ct_BFRow - p_WFRow;
          uiCol -= ct_BFCol - p_WFCol;
       }
-
-      /* Finally, save the new cursor position, even if off-screen */
-      hb_gtSetPosContext( uiRow - ct_UFRow,
-                          uiCol + ( SHORT ) ulLength - ct_UFCol,
-                          HB_GT_SET_POS_AFTER );
-
-      /* Test End of line */
-      if ( ct_WMax > 1 && s_Width > 0 && s_iCol > ct_ULCol )
+      if ( bSetPos )
       {
-         if ( s_iRow < ct_ULRow )
-            hb_gtSetPosContext( s_iRow - ct_UFRow + 1, 0, HB_GT_SET_POS_AFTER );
-         else
-            hb_gtSetPosContext( s_iRow - ct_UFRow , ct_ULCol - ct_UFCol,
-                                HB_GT_SET_POS_AFTER );
+         /* Finally, save the new cursor position, even if off-screen */
+         hb_gtSetPosContext( uiRow - ct_UFRow,
+                             uiCol + ( SHORT ) ulLength - ct_UFCol,
+                             HB_GT_SET_POS_AFTER );
+
+         /* Test End of line */
+         if ( ct_WMax > 1 && s_Width > 0 && s_iCol > ct_ULCol )
+         {
+            if ( s_iRow < ct_ULRow )
+               hb_gtSetPosContext( s_iRow - ct_UFRow + 1, 0, HB_GT_SET_POS_AFTER );
+            else
+               hb_gtSetPosContext( s_iRow - ct_UFRow , ct_ULCol - ct_UFCol,
+                                   HB_GT_SET_POS_AFTER );
+         }
       }
       hb_gtDispEnd();
    }

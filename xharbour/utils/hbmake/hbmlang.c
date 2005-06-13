@@ -1,5 +1,5 @@
 /*
- * $Id: hbmlang.c,v 1.2 2002/11/09 00:50:09 lculik Exp $
+ * $Id: hbmlang.c,v 1.3 2005/03/31 04:03:10 druzus Exp $
  */
 /*
  * Harbour Project source code:
@@ -61,7 +61,7 @@ HB_FUNC(GETUSERLANG)
 #if defined(HB_OS_WIN_32) && (!defined(__RSXNT__)) && (!defined(__CYGWIN__))
 
    {
-   
+
       LANGID pLang=GetSystemDefaultLangID();
 
       switch(pLang) {
@@ -74,16 +74,16 @@ HB_FUNC(GETUSERLANG)
 
          break;
 
-         case 0x0409 : 
-         case 0x0809 : 
-         case 0x0c09 : 
-         case 0x1009 : 
-         case 0x1409 : 
-         case 0x1809 : 
-         case 0x1c09 : 
-         case 0x2009 : 
-         case 0x2409 : 
-         case 0x2809 : 
+         case 0x0409 :
+         case 0x0809 :
+         case 0x0c09 :
+         case 0x1009 :
+         case 0x1409 :
+         case 0x1809 :
+         case 0x1c09 :
+         case 0x2009 :
+         case 0x2409 :
+         case 0x2809 :
          case 0x2c09 :
          {
             lRet=2;
@@ -92,43 +92,43 @@ HB_FUNC(GETUSERLANG)
          break;
 
          case 0x040a :
-         case 0x080a :   
-         case 0x0c0a :   
-         case 0x100a :   
-         case 0x140a :   
-         case 0x180a :   
-         case 0x1c0a :   
-         case 0x200a :   
-         case 0x240a :   
-         case 0x280a :   
-         case 0x2c0a :   
-         case 0x300a :   
-         case 0x340a :   
-         case 0x380a :   
-         case 0x3c0a :   
-         case 0x400a :   
-         case 0x440a :   
-         case 0x480a :   
-         case 0x4c0a :   
+         case 0x080a :
+         case 0x0c0a :
+         case 0x100a :
+         case 0x140a :
+         case 0x180a :
+         case 0x1c0a :
+         case 0x200a :
+         case 0x240a :
+         case 0x280a :
+         case 0x2c0a :
+         case 0x300a :
+         case 0x340a :
+         case 0x380a :
+         case 0x3c0a :
+         case 0x400a :
+         case 0x440a :
+         case 0x480a :
+         case 0x4c0a :
          case 0x500a :
          {
             lRet=3;
-         }        
+         }
          break;
 
       default:
 
       lRet=2;
 
-      break; 
+      break;
 
-      }                  
+      }
 
    }
 #else
    lRet = 2 ;
 #endif
-     hb_retnl( lRet ); 
+     hb_retnl( lRet );
 }
 
 
@@ -191,8 +191,8 @@ HB_FUNC( GAUGENEW )
    hb_itemArrayPut( pReturn, B_BARCOLOR, pItem );
    hb_itemRelease( pItem );
 
-   pItem = hb_itemPutL( NULL, !( ISNUM( B_RIGHT ) && 
-                                 ISNUM( B_LEFT ) && 
+   pItem = hb_itemPutL( NULL, !( ISNUM( B_RIGHT ) &&
+                                 ISNUM( B_LEFT ) &&
                                  ( hb_parni( B_RIGHT ) < hb_parni( B_LEFT ) + 9 ) ) );
    hb_itemArrayPut( pReturn, B_DISPLAYNUM, pItem );
    hb_itemRelease( pItem );
@@ -238,7 +238,7 @@ HB_FUNC( GAUGEDISPLAY )
 
       if( hb_arrayGetL( pArray, B_DISPLAYNUM ) )
          hb_gtWriteAt( (USHORT) hb_arrayGetNL( pArray, B_TOP ),
-                       iCenter, ( BYTE * ) "[      ]", 8 );
+                       iCenter, ( BYTE * ) "[      ]", 8, TRUE );
 
       hb_gtSetColorStr( szOldColor );
 
@@ -284,7 +284,7 @@ static void hb_gaugeUpdate( PHB_ITEM pArray, float fPercent )
 //    sprintf( szPct, "%3.0f\%", fPercent * 100 );
       sprintf( szPct, "%3.0f%%", fPercent * 100 );
       hb_gtWriteAt( (USHORT) hb_arrayGetNL( pArray, B_TOP ),
-                    (USHORT) iCenter + 2, (BYTE *) szPct, 4 );
+                    (USHORT) iCenter + 2, (BYTE *) szPct, 4, TRUE );
    }
 
    hb_gtBox( hb_arrayGetNL( pArray, B_TOP ) + 1, hb_arrayGetNL( pArray, B_LEFT ) + 1,

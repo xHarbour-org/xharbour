@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.39 2004/11/26 21:58:23 druzus Exp $
+ * $Id: hbapigt.h,v 1.40 2005/05/09 10:04:08 druzus Exp $
  */
 
 /*
@@ -270,7 +270,7 @@ extern USHORT HB_EXPORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMode 
 extern USHORT HB_EXPORT hb_gtSetSnowFlag( BOOL bNoSnow );
 extern void   HB_EXPORT hb_gtTone( double dFrequency, double dDuration );
 extern USHORT HB_EXPORT hb_gtWrite( BYTE * pbyStr, ULONG ulLen );
-extern USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pbyStr, ULONG ulLen );
+extern USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pbyStr, ULONG ulLen, BOOL bSetPos );
 extern USHORT HB_EXPORT hb_gtWriteCon( BYTE * pbyStr, ULONG ulLen );
 extern int    HB_EXPORT hb_gtCurrentColor( void );
 extern int    HB_EXPORT hb_gtIndexedColor( int idx );

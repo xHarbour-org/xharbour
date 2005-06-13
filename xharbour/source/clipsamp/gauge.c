@@ -1,5 +1,5 @@
 /*
- * $Id: gauge.c,v 1.4 2004/03/07 21:42:51 andijahja Exp $
+ * $Id: gauge.c,v 1.5 2004/03/18 03:54:43 ronpinkas Exp $
  */
 
 /*
@@ -139,7 +139,7 @@ HB_FUNC( GAUGEDISPLAY )
 
       if( hb_arrayGetL( pArray, B_DISPLAYNUM ) )
          hb_gtWriteAt( (USHORT) hb_arrayGetNL( pArray, B_TOP ),
-                       iCenter, ( BYTE * ) "[      ]", 8 );
+                       iCenter, ( BYTE * ) "[      ]", 8, TRUE );
 
       hb_gtSetColorStr( szOldColor );
 
@@ -185,7 +185,7 @@ static void hb_gaugeUpdate( PHB_ITEM pArray, float fPercent )
 //    sprintf( szPct, "%3.0f\%", fPercent * 100 );
       sprintf( szPct, "%3.0f%%", fPercent * 100 );
       hb_gtWriteAt( (USHORT) hb_arrayGetNL( pArray, B_TOP ),
-                    (USHORT) iCenter + 2, (BYTE *) szPct, 4 );
+                    (USHORT) iCenter + 2, (BYTE *) szPct, 4, TRUE );
    }
 
    hb_gtBox( hb_arrayGetNL( pArray, B_TOP ) + 1, hb_arrayGetNL( pArray, B_LEFT ) + 1,

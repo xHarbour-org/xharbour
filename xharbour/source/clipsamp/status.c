@@ -1,5 +1,5 @@
 /*
- * $Id: status.c,v 1.2 2003/12/04 09:26:54 druzus Exp $
+ * $Id: status.c,v 1.3 2004/03/18 03:54:43 ronpinkas Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ HB_FUNC( STATUSUPDATE )
       hb_gtSetColorStr( hb_arrayGetCPtr( pArray, ST_COLOR ) );
       hb_gtWriteAt( (USHORT) hb_arrayGetNL( pArray, ST_ROW ),
                     (USHORT) hb_arrayGetNL( pArray, ST_COL ),
-                    ( BYTE * ) szDisplay + lCurrent - 1, 1 );
+                    ( BYTE * ) szDisplay + lCurrent - 1, 1, TRUE );
 
       hb_gtSetColorStr( (char*) szOldColor );
       hb_itemRelease( pCurrent );

@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.55 2005/03/31 03:58:50 druzus Exp $
+ * $Id: console.c,v 1.56 2005/05/09 10:04:12 druzus Exp $
  */
 /*
  * Harbour Project source code:
@@ -128,7 +128,7 @@ static int    s_iFilenoStdout;
 static int    s_iFilenoStderr;
 
 #endif
-
+static BOOL s_DispOutAtSetPos = TRUE ;
 extern BOOL hb_set_SetPrinterStart( void );
 extern void hb_set_SetPrinterStop( void );
 
@@ -674,10 +674,10 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
 HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position, but is not affected by SET ALTERNATE */
 {
    HB_THREAD_STUB
-
+   BOOL bSetPos = ISLOG( 5 ) ? hb_parl( 5 ) : s_DispOutAtSetPos ;
    char * pszString = NULL;
    ULONG ulLen;
-   BOOL bFreeReq = FALSE;
+   BOOL bFreeReq = FALSE ;
 
    HB_CONSOLE_SAFE_LOCK
 
@@ -690,7 +690,7 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
 
       pszString = hb_itemString( hb_param( 3, HB_IT_ANY ), &ulLen, &bFreeReq );
 
-      hb_gtWriteAt( hb_parni( 1 ), hb_parni( 2 ), ( BYTE * ) pszString, ulLen );
+      hb_gtWriteAt( hb_parni( 1 ), hb_parni( 2 ), ( BYTE * ) pszString, ulLen, bSetPos );
 
       hb_gtSetColorStr( szOldColor );
    }
@@ -698,7 +698,7 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
    {
       pszString = hb_itemString( hb_param( 3, HB_IT_ANY ), &ulLen, &bFreeReq );
 
-      hb_gtWriteAt( hb_parni( 1 ), hb_parni( 2 ), ( BYTE * ) pszString, ulLen );
+      hb_gtWriteAt( hb_parni( 1 ), hb_parni( 2 ), ( BYTE * ) pszString, ulLen, bSetPos );
 
    }
 
@@ -709,6 +709,16 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
       hb_xfree( pszString );
    }
 
+}
+
+HB_FUNC( DISPOUTATSETPOS )
+{
+   HB_THREAD_STUB
+    hb_retl( s_DispOutAtSetPos ) ;
+    if ( ISLOG( 1 ) )
+    {
+       s_DispOutAtSetPos = hb_parl( 1 ) ;
+    }
 }
 
 /****************************************************************************/
