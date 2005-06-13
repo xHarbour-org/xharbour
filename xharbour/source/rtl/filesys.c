@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.145 2005/04/05 22:26:09 druzus Exp $
+ * $Id: filesys.c,v 1.146 2005/05/19 02:20:18 druzus Exp $
  */
 
 /*
@@ -2198,7 +2198,7 @@ void HB_EXPORT    hb_fsCommit( FHANDLE hFileHandle )
    /* NOTE: close() functions releases all lock regardles if it is an
     * original or duplicated file handle
    */
-   #if defined(_POSIX_SYNCHRONIZED_IO)
+   #if defined(_POSIX_SYNCHRONIZED_IO) && _POSIX_SYNCHRONIZED_IO + 0 > 0
       /* faster - flushes data buffers only, without updating directory info
       */
       hb_fsSetIOError( fdatasync( hFileHandle ) == 0, 0 );
