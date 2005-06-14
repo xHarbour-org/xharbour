@@ -1,15 +1,20 @@
 /*
- * $Id: howtobsd.txt,v 1.1 2001/12/05 21:04:28 dholm Exp $
+ * $Id: howtobsd.txt,v 1.1.1.1 2001/12/21 10:48:07 ronpinkas Exp $
  */
 
 HOW TO CONFIGURE BSD TO BUILD HARBOUR
 -------------------------------------
 
 First, you'll need a FreeBSD 4.4 developer installation. Then you'll need
-to install bison and gmake. If you installed the ports collection, then all
-you need to do to install bison and gmake is to run the following commands,
-which may require that you run su first to get the correct permissions.
+to install bash, bison, and gmake. If you installed the ports collection,
+then all you need to do to install bash, bison, and gmake is to run the
+following commands, which may require that you run su first to get the
+correct permissions.
 
+   cd /usr/ports/shells/bash
+   make
+   make install
+   make clean
    cd /usr/ports/devel/bison
    make
    make install
@@ -33,5 +38,9 @@ Then read the doc/gmake.txt file for generic GNU make instructions and the
 specific Harbour settings needed for BSD. When you want to build Harbour,
 be sure to run 'gmake -r' at the command line instead of 'make -r'.
 
+Actually, the simplest way is to run make_gnu.sh which configures all the
+setting automatically.
+
 David G. Holm <dholm@jsd-llc.com>
+Phil Krylov <phil a t newstar.rinet.ru>
 

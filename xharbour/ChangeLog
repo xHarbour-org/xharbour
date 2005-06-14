@@ -1,10 +1,16 @@
- * $Id: ChangeLog,v 1.4175 2005/06/13 02:02:27 peterrees Exp $
+ * $Id: ChangeLog,v 1.4176 2005/06/13 21:44:50 likewolf Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-06-14 11:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * make_gnu.sh
+    ! Fixed double slashes.
+  * doc/howtobsd.sh
+    + Added bash as a requirement.
 
 2005-06-14 01:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/rtl/filesys.c
