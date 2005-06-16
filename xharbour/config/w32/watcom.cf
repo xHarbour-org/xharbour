@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.22 2005/01/11 23:53:43 likewolf Exp $
+# $Id: watcom.cf,v 1.23 2005/02/18 21:20:04 druzus Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -28,6 +28,19 @@ endif
 
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
+endif
+
+ifeq ($(HB_LIBCOMP_MT),)
+#always add thread support if not compiling a lib and using vmmt
+ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+CPPFLAGS+= -DHB_THREAD_SUPPORT
+endif
+else
+#Add thread support to lib compilation only if compiling a _mt lib
+ifeq ($(HB_LIBCOMP_MT),YES)
+CPPFLAGS+= -DHB_THREAD_SUPPORT
+HB_MT_FLAGS = -DHB_THREAD_SUPPORT
+endif
 endif
 
 # work arround to DOS command line size limit
