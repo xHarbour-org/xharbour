@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.60 2005/04/26 07:25:46 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.61 2005/05/24 21:05:56 ronpinkas Exp $
  */
 
 /*
@@ -335,13 +335,7 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
       s_iLaunchCount++;
 
 
-      if( hb_vm_iTry && s_errorBlock->item.asBlock.value == hb_vm_BreakBlock->item.asBlock.value )
-      {
-         hb_vmRequestBreak( pError );
-         s_iLaunchCount--;
-         return E_BREAK;
-      }
-      else if( s_errorHandler )
+      if( s_errorHandler )
       {
          /* there is a low-level error handler defined - use it instead
           * of normal Harbour-level one
@@ -350,6 +344,12 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
          s_errorHandler->ErrorBlock = s_errorBlock;
          pResult = (s_errorHandler->Func)( s_errorHandler );
          s_errorHandler->Error = NULL;
+      }
+      else if( hb_vm_iTry && s_errorBlock->item.asBlock.value == hb_vm_BreakBlock->item.asBlock.value )
+      {
+         hb_vmRequestBreak( pError );
+         s_iLaunchCount--;
+         return E_BREAK;
       }
       else
       {
@@ -509,13 +509,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
       /* Launch the error handler: "xResult := EVAL( ErrorBlock(), oError )" */
       s_iLaunchCount++;
 
-      if( hb_vm_iTry && s_errorBlock->item.asBlock.value == hb_vm_BreakBlock->item.asBlock.value )
-      {
-         hb_vmRequestBreak( pError );
-         s_iLaunchCount--;
-         return NULL;
-      }
-      else if( s_errorHandler )
+      if( s_errorHandler )
       {
          /* there is a low-level error handler defined - use it instead
           * of normal Harbour-level one
@@ -524,6 +518,12 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
          s_errorHandler->ErrorBlock = s_errorBlock;
          pResult = ( s_errorHandler->Func )( s_errorHandler );
          s_errorHandler->Error = NULL;
+      }
+      else if( hb_vm_iTry && s_errorBlock->item.asBlock.value == hb_vm_BreakBlock->item.asBlock.value )
+      {
+         hb_vmRequestBreak( pError );
+         s_iLaunchCount--;
+         return NULL;
       }
       else
       {

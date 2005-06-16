@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4178 2005/06/15 00:00:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.4178 2005/06/16 01:09:23 modalsist Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -6,10 +6,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-06-15 22:56 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/errorapi.c
+    * Moved checks for s_errorHandler to precede check on hb_vm_iTry
+
 2005-06-15 21:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils/hbmake/hbmutils.prg
   * utils/hbmake/hbmake.prg
-  ! Version 1.145 - Fixed to create obj directory if it does not exist 
+  ! Version 1.145 - Fixed to create obj directory if it does not exist
     before compile a makefile. Better "harbour.cfg" file management.
 
 2005-06-14 11:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
