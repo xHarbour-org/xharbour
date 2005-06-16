@@ -1,5 +1,5 @@
 /*
- * $Id: hbmutils.prg,v 1.41 2005/02/17 00:00:00 modalsist Exp $
+ * $Id: hbmutils.prg,v 1.42 2005/06/15 00:00:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:

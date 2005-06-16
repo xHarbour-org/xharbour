@@ -1,6 +1,7 @@
 /*
- * $Id: hbmake.prg,v 1.144 2005/04/25 16:13:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.145 2005/06/15 00:00:00 modalsist Exp $
  */
+
 /*
  * xHarbour Project source code:
  * hbmake.prg xHarbour make utility main file
@@ -69,7 +70,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion := "1.144"
+STATIC s_cHbMakeVersion  := "1.145"
 STATIC s_lPrint          := .F.
 STATIC s_aDefines        := {}
 STATIC s_aBuildOrder     := {}
@@ -91,9 +92,9 @@ STATIC s_cMakeFileName   := "makefile.lnk"
 STATIC s_cLinkCommands   := ""
 STATIC s_lBcc            := .T.  // Borland C compiler
 STATIC s_lPcc            := .F.  // Pelles C compiler
-STATIC s_lGcc            := .F.  // GNU/MinGw C Compiler
-STATIC s_lMSVcc          := .F.  // MSVC copiler
-STATIC s_lForce          := .F.
+STATIC s_lGcc            := .F.  // GNU/MinGW C compiler
+STATIC s_lMSVcc          := .F.  // Microsoft Visual C compiler
+STATIC s_lForce          := .F.  // "-f" flag
 STATIC s_lLinux          := .F.
 STATIC s_szProject       := ""
 STATIC s_lLibrary        := .F.
@@ -119,7 +120,9 @@ STATIC s_nFilesToAdd     := 5
 STATIC s_nWarningLevel   := 0
 STATIC s_AppName         := ""
 STATIC s_lAsDll          := .F.
-STATIC s_cMsg            := ""
+STATIC s_cAlertMsg       := ""
+STATIC s_cHbCfgFileName  := "harbour.cfg"   // don't change this file name.
+STATIC s_cObjDir         := "obj"
 
 *---------------------------------------------
 FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
@@ -158,12 +161,26 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    s_cDefLang := IIF( s_nLang == 1, "PT", IIF( s_nLang == 2, "EN", "ES" ) )
    s_aLangMessages := BuildLangArray( s_cDefLang )
 
+
    IF PCount() == 0 .or. ;
       "/?" IN cMakeParams .or. ;
       "-?" IN cMakeParams .or. ;
       "/h" IN cMakeParams .or. ;
       "-h" IN cMakeParams 
       ShowHelp()
+      RETURN NIL
+   ENDIF
+
+   IF Empty( GetHarbourDir() )
+      IF s_nLang=1
+         s_cAlertMsg := "Hbmake necessita do xharbour bin no path."
+      ELSEIF s_nLang=3
+         s_cAlertMsg := "Hbmake necessita de lo xharbour bin en lo path."
+      ELSE
+         s_cAlertMsg := "Hbmake need of the xharbour bin in the path."
+      ENDIF
+      alert( s_cAlertMsg )
+      RUN( "PATH" )
       RETURN NIL
    ENDIF
 
@@ -208,13 +225,13 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    IF Len( aFile ) > 1
       IF s_nLang=1
-         s_cMsg :="Arquivo definido mais que uma vez."
+         s_cAlertMsg :="Arquivo definido mais que uma vez."
       ELSEIF s_nLang=3
-         s_cMsg:="Fichero definido m†s que una vez."
+         s_cAlertMsg:="Fichero definido m†s que una vez."
       ELSE
-         s_cMsg:="File defined more than once."
+         s_cAlertMsg:="File defined more than once."
       ENDIF
-      alert( s_cMsg )
+      alert( s_cAlertMsg )
       RETURN NIL
    ENDIF
 
@@ -226,13 +243,13 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    IF Empty(cFile)
       IF s_nLang=1
-         s_cMsg := "Nome de arquivo inv†lido."
+         s_cAlertMsg := "Nome de arquivo inv†lido."
       ELSEIF s_nLang=3
-         s_cMsg := "Nombre de fichero invalido."
+         s_cAlertMsg := "Nombre de fichero invalido."
       ELSE
-         s_cMsg := "Invalid file name."
+         s_cAlertMsg := "Invalid file name."
       ENDIF
-      alert( s_cMsg )
+      alert( s_cAlertMsg )
       RETURN NIL
    ENDIF
 
@@ -242,13 +259,13 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    IF s_lForce .and. !File( cFile )
       IF s_nLang=1
-         s_cMsg := "Arquivo <"+cFile+"> n∆o encontrado."
+         s_cAlertMsg := "Arquivo <"+cFile+"> n∆o encontrado."
       ELSEIF s_nLang=3
-         s_cMsg := "Fichero <"+cFile+"> no encontrado."
+         s_cAlertMsg := "Fichero <"+cFile+"> no encontrado."
       ELSE
-         s_cMsg := "File <"+cFile+"> not found."
+         s_cAlertMsg := "File <"+cFile+"> not found."
       ENDIF
-      alert( s_cMsg )
+      alert( s_cAlertMsg )
       RETURN NIL
    ENDIF
 
@@ -282,14 +299,14 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    IF !ParseMakeFile( cFile )
 
       IF s_nLang = 1      // brazilian portuguese 
-         s_cMsg := "<"+cFile+ "> n∆o pode ser aberto. FERROR("+Ltrim(Str(FError()))+"). O HbMake ser† fechado."
+         s_cAlertMsg := "<"+cFile+ "> n∆o pode ser aberto. FERROR("+Ltrim(Str(FError()))+"). O HbMake ser† fechado."
       ELSEIF s_nLang = 3  // spanish
-         s_cMsg := "<"+cFile + "> no pode ser abierto. FERROR("+Ltrim(Str(FError()))+"). Lo HbMake ser† cerrado."
+         s_cAlertMsg := "<"+cFile + "> no pode ser abierto. FERROR("+Ltrim(Str(FError()))+"). Lo HbMake ser† cerrado."
       ELSE                // english
-         s_cMsg := "<"+cFile + "> cannot be openned. FERROR("+Ltrim(Str(FError()))+"). The HbMake will be closed."
+         s_cAlertMsg := "<"+cFile + "> cannot be openned. FERROR("+Ltrim(Str(FError()))+"). The HbMake will be closed."
       ENDIF
 
-      Alert( s_cMsg )
+      Alert( s_cAlertMsg )
 
       RETURN NIL
 
@@ -300,6 +317,10 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    ENDIF
 
    set cursor off
+
+   IF !IsDirectory( s_cObjDir )
+      MakeDir( s_cObjDir )
+   ENDIF
 
    IF s_lForce
       CompileFiles()
@@ -452,7 +473,7 @@ FUNCTION ParseMakeFile( cFile )
                       AAdd( s_aMacros, { aTemp[ 1 ], Strtran( Replacemacros( aTemp[ 2 ] ), "\", "/" ) } )
 
                       x++
-                   ELSE
+                  ELSE
 
                      IF aTemp[ 1 ] == "MT" .AND. aTemp[ 2 ] == "YES"
                         s_lMt := .T.
@@ -525,12 +546,17 @@ FUNCTION ParseMakeFile( cFile )
 
             ENDIF
 
+
             IF aTemp[ 1 ] == "COMPRESS"
                s_lCompress := "YES" IN aTemp[ 2 ]
             ENDIF
 
             IF aTemp[ 1 ] == "EXTERNALLIB"
                s_lExternalLib := "YES" IN aTemp[ 2 ]
+            ENDIF
+
+            IF aTemp[ 1 ] == "SRC02"  // obj dir
+               s_cObjDir := aTemp[ 2 ]
             ENDIF
 
             IF aTemp[ 1 ] == "PROJECT"
@@ -566,7 +592,7 @@ FUNCTION ParseMakeFile( cFile )
             IF aTemp[ 1 ] == "PRGFILES"
                s_aPrgs     := ListAsArray2( replacemacros( aTemp[ 2 ] ), " " )
                s_lExtended := .T.
-               lCfgFound := Findharbourcfg( @cCfg )
+               lCfgFound := FindHarbourCfg( @cCfg )
             ENDIF
 
             IF aTemp[ 1 ] == "PRGFILE"
@@ -669,13 +695,13 @@ FUNCTION ParseMakeFile( cFile )
       IF s_lBcc
          BuildBorCfgFile()
       ELSEIF s_lMSVcc
-         Buildmsccfgfile()
+         BuildMscCfgFile()
       ELSEIF s_lPcc
          BuildPellesCfgFile()
-      ELSEIF s_lGcc .AND. ! lLinux
-         Buildgcccfgfile()
+      ELSEIF s_lGcc .AND. !lLinux
+         BuildGccCfgFile()
       ELSEIF s_lGcc .AND. lLinux
-         BuildGccCfgFilel()
+         BuildGccCfgFileL()
       ENDIF
 
    ENDIF
@@ -857,13 +883,13 @@ FUNCTION SetBuild()
 
       if s_nMakeFileHandle = F_ERROR
          IF s_nLang = 1      // brazilian portuguese 
-            s_cMsg := "<"+s_cMakeFileName + "> n∆o pode ser criado."
+            s_cAlertMsg := "<"+s_cMakeFileName + "> n∆o pode ser criado."
          ELSEIF s_nLang = 3  // spanish
-            s_cMsg := "<"+s_cMakeFileName + "> no pode ser criado."
+            s_cAlertMsg := "<"+s_cMakeFileName + "> no pode ser criado."
          ELSE                // english
-            s_cMsg := "<"+s_cMakeFileName + "> cannot be created."
+            s_cAlertMsg := "<"+s_cMakeFileName + "> cannot be created."
          ENDIF
-         Alert( s_cMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
+         Alert( s_cAlertMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
          RETURN NIL
       endif
 
@@ -988,7 +1014,7 @@ FUNCTION CompileFiles()
                      set cursor on
                      QUIT
                   ELSE
-                     // Ferase( (s_cLog) )
+                     // Ferase( s_cLog )
                   ENDIF
 
                   cComm := cOld
@@ -1128,7 +1154,7 @@ FUNCTION CompileFiles()
                         set cursor on
                         QUIT
                      ELSE
-                        // FErase( (s_cLog) )
+                        // FErase( s_cLog )
                       ENDIF
                      lEnd     := 'Error F' $   cErrText
 
@@ -1203,7 +1229,7 @@ FUNCTION CompileFiles()
                      set cursor on
                      QUIT
                   ELSE
-                     //FErase( (s_cLog) )
+                     //FErase( s_cLog )
                   ENDIF
 
                   cComm := cOld
@@ -1341,7 +1367,7 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL cMedPath     := Space( 200 )
    LOCAL cApolloPath  := Space( 200 )
 
-   LOCAL cObjDir      := "obj" + Space( 20 )
+   LOCAL cObjDir      := s_cObjDir + space( 20 )
    LOCAL lAutoMemvar  := .F.
    LOCAL lVarIsMemvar := .F.
    LOCAL lDebug       := .F.
@@ -1455,14 +1481,14 @@ FUNCTION CreateMakeFile( cFile )
             CLS
 
             IF s_nLang = 1      // brazilian portuguese
-               s_cMsg := "<"+cFile + "> n∆o pode ser aberto para ediá∆o."
+               s_cAlertMsg := "<"+cFile + "> n∆o pode ser aberto para ediá∆o."
             ELSEIF s_nLang = 3  // spanish
-               s_cMsg := "<"+cFile + "> no pode ser abierto para edici¢n."
+               s_cAlertMsg := "<"+cFile + "> no pode ser abierto para edici¢n."
             ELSE                // english
-               s_cMsg := "<"+cFile + "> cannot be openned for edition."
+               s_cAlertMsg := "<"+cFile + "> cannot be openned for edition."
             ENDIF
 
-            Alert( s_cMsg+" FERROR ("+LTrim(Str(FError()))+")" )
+            Alert( s_cAlertMsg+" FERROR ("+LTrim(Str(FError()))+")" )
 
             RETURN NIL
          else
@@ -1506,7 +1532,8 @@ FUNCTION CreateMakeFile( cFile )
          s_nWarningLevel := oMake:cWarningLevel
          cTopFile        := PadR(oMake:cTopModule,50," ")
          cResName        := PadR(oMake:cRes,200)
-
+         s_cObjDir       := oMake:cObj
+         cObjDir         := s_cObjDir + space(20)
 
          if !s_lRecursive
             s_lRecursive := oMake:lRecurse
@@ -1518,14 +1545,14 @@ FUNCTION CreateMakeFile( cFile )
             CLS
 
             IF s_nLang=1 // PT-BR
-               s_cMsg := "N∆o h† nenhum prg na pasta "+CurDir()+". Use o modo recursivo -r" 
+               s_cAlertMsg := "N∆o h† nenhum prg na pasta "+CurDir()+". Use o modo recursivo -r" 
             ELSEIF s_nLang=3 // Spanish
-               s_cMsg := "No hay ning£n prg en la carpeta "+CurDir()+". Use lo modo recursivo -r"
+               s_cAlertMsg := "No hay ning£n prg en la carpeta "+CurDir()+". Use lo modo recursivo -r"
             ELSE
-               s_cMsg := "Does not have any prg in "+CurDir()+" folder. Use the recursive mode -r"
+               s_cAlertMsg := "Does not have any prg in "+CurDir()+" folder. Use the recursive mode -r"
             ENDIF
 
-            Alert( s_cMsg )
+            Alert( s_cAlertMsg )
 
             SetColor("W/N,N/W")
             CLS
@@ -1546,14 +1573,14 @@ FUNCTION CreateMakeFile( cFile )
             CLS
 
             IF s_nLang = 1      // brazilian portuguese
-               s_cMsg := "<"+cFile + "> n∆o pode ser aberto para ediá∆o."
+               s_cAlertMsg := "<"+cFile + "> n∆o pode ser aberto para ediá∆o."
             ELSEIF s_nLang = 3  // spanish
-               s_cMsg := "<"+cFile + "> no pode ser abierto para edici¢n."
+               s_cAlertMsg := "<"+cFile + "> no pode ser abierto para edici¢n."
             ELSE                // english
-               s_cMsg := "<"+cFile + "> cannot be openned for edition."
+               s_cAlertMsg := "<"+cFile + "> cannot be openned for edition."
             ENDIF
 
-            Alert( s_cMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
+            Alert( s_cAlertMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
 
             RETURN NIL
 
@@ -1572,14 +1599,14 @@ FUNCTION CreateMakeFile( cFile )
             CLS
 
             IF s_nLang=1 // PT-BR
-               s_cMsg := "N∆o h† nenhum prg na pasta "+CurDir()+". Use o modo recursivo -r" 
+               s_cAlertMsg := "N∆o h† nenhum prg na pasta "+CurDir()+". Use o modo recursivo -r" 
             ELSEIF s_nLang=3 // Spanish
-               s_cMsg := "No hay ning£n prg en la carpeta "+CurDir()+". Use lo modo recursivo -r"
+               s_cAlertMsg := "No hay ning£n prg en la carpeta "+CurDir()+". Use lo modo recursivo -r"
             ELSE
-               s_cMsg := "Does not have any prg in "+CurDir()+" folder. Use the recursive mode -r"
+               s_cAlertMsg := "Does not have any prg in "+CurDir()+" folder. Use the recursive mode -r"
             ENDIF
 
-            Alert( s_cMsg )
+            Alert( s_cAlertMsg )
             SetColor("W/N,N/W")
             CLS
             set cursor on
@@ -1596,14 +1623,14 @@ FUNCTION CreateMakeFile( cFile )
             CLS
 
             IF s_nLang = 1      // brazilian portuguese
-               s_cMsg := "<"+cFile + "> n∆o pode ser criado."
+               s_cAlertMsg := "<"+cFile + "> n∆o pode ser criado."
             ELSEIF s_nLang = 3  // spanish
-               s_cMsg := "<"+cFile + "> no pode ser criado."
+               s_cAlertMsg := "<"+cFile + "> no pode ser criado."
             ELSE                // english
-               s_cMsg := "<"+cFile + "> cannot be created."
+               s_cAlertMsg := "<"+cFile + "> cannot be created."
             ENDIF
 
-            Alert( s_cMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
+            Alert( s_cAlertMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
 
             RETURN NIL
 
@@ -1629,14 +1656,14 @@ FUNCTION CreateMakeFile( cFile )
          CLS
 
          IF s_nLang = 1      // brazilian portuguese
-            s_cMsg := "<"+cFile + "> n∆o pode ser criado."
+            s_cAlertMsg := "<"+cFile + "> n∆o pode ser criado."
          ELSEIF s_nLang = 3  // spanish
-            s_cMsg := "<"+cFile + "> no pode ser criado."
+            s_cAlertMsg := "<"+cFile + "> no pode ser criado."
          ELSE                // english
-            s_cMsg := "<"+cFile + "> cannot be created."
+            s_cAlertMsg := "<"+cFile + "> cannot be created."
          ENDIF
 
-         Alert( s_cMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
+         Alert( s_cAlertMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
 
          RETURN NIL
 
@@ -1778,11 +1805,8 @@ FUNCTION CreateMakeFile( cFile )
 
    IF ! Empty( cObjDir )
 
-      IF DirChange( cObjDir ) != 0
+      IF !IsDirectory( cObjDir )
          MakeDir( cObjDir )
-      ELSE
-   //    DirChange( '..' ) 
-         DirChange( cCurrentDir )
       ENDIF
 
    ENDIF
@@ -1922,16 +1946,16 @@ FUNCTION CreateMakeFile( cFile )
    IF nLenaSrc == 0 
 
       IF s_nLang=1 // PT-BR
-         s_cMsg := "Nenhum prg foi encontrado." 
+         s_cAlertMsg := "Nenhum prg foi encontrado." 
       ELSEIF s_nLang=3 // Spanish
-         s_cMsg := "Ning£n prg foi encontrado."
+         s_cAlertMsg := "Ning£n prg foi encontrado."
       ELSE
-         s_cMsg := "No one prg were found."
+         s_cAlertMsg := "No one prg were found."
       ENDIF
 
       lCancelMake := .T.
 
-      Alert( s_cMsg )
+      Alert( s_cAlertMsg )
 
    ENDIF
 
@@ -1947,18 +1971,18 @@ FUNCTION CreateMakeFile( cFile )
       Attention( s_aLangMessages[ 41 ], 22 )
 
       if s_nLang=1
-         s_cMsg := "Selecione os PRGs a compilar"
+         s_cAlertMsg := "Selecione os PRGs a compilar"
       elseif s_nLang=3
-         s_cMsg := "Seleccione los PRG a compilar"
+         s_cAlertMsg := "Seleccione los PRG a compilar"
       else
-         s_cMsg := "Select the PRG files to compile"
+         s_cAlertMsg := "Select the PRG files to compile"
       endif
 
 
       IF nOption !=2 // not create a makefile
-         pickarry( 11, 15, 20, 64, aInFiles, aOutFiles ,ArrayAJoin( { oMake:aPrgs, oMake:aCs } ), .T., s_cMsg )
+         pickarry( 11, 15, 20, 64, aInFiles, aOutFiles ,ArrayAJoin( { oMake:aPrgs, oMake:aCs } ), .T., s_cAlertMsg )
       ELSE
-         pickarry( 11, 15, 20, 64, aInFiles, aOutFiles, {}, .T., s_cMsg )
+         pickarry( 11, 15, 20, 64, aInFiles, aOutFiles, {}, .T., s_cAlertMsg )
       ENDIF
 
 
@@ -1988,14 +2012,14 @@ FUNCTION CreateMakeFile( cFile )
       cTopFile := ""
 
       IF s_nLang=1 // PT
-         s_cMsg := "Nenhum PRG foi selecionado."
+         s_cAlertMsg := "Nenhum PRG foi selecionado."
       ELSEIF s_nLang=3
-         s_cMsg := "Ning£m PRG foi seleccionado."
+         s_cAlertMsg := "Ning£m PRG foi seleccionado."
       ELSE
-         s_cMsg := "No one PRG were selected."
+         s_cAlertMsg := "No one PRG were selected."
       ENDIF
 
-      Alert( s_cMsg )
+      Alert( s_cAlertMsg )
 
    endif
 
@@ -2003,14 +2027,14 @@ FUNCTION CreateMakeFile( cFile )
    WHILE Len( aSelFiles ) > 1
 
       IF s_nLang=1 // PT
-         s_cMsg := "Informe o PRG principal da sua aplicaá∆o:"
+         s_cAlertMsg := "Informe o PRG principal da sua aplicaá∆o:"
       ELSEIF s_nLang=3
-         s_cMsg := "Informe o PRG principale de su aplicacion:"
+         s_cAlertMsg := "Informe o PRG principale de su aplicacion:"
       ELSE
-         s_cMsg := "Inform the main PRG of your application:"
+         s_cAlertMsg := "Inform the main PRG of your application:"
       ENDIF
 
-      @ 15,01 say s_cMsg Get cTopFile pict "@S35" valid !empty(cTopFile)
+      @ 15,01 say s_cAlertMsg Get cTopFile pict "@S35" valid !empty(cTopFile)
       READ
 
       if LastKey()=27
@@ -2024,13 +2048,13 @@ FUNCTION CreateMakeFile( cFile )
 
       IF !File( alltrim(cTopFile) )
          IF s_nLang=1 // PT
-            s_cMsg := "Arquivo "+alltrim(cTopFile)+" n∆o encontrado."+iif(s_lRecursive," O flag -r est† ativo. Informe o subdir tambÇm se o PRG principal estiver dentro dele.","")
+            s_cAlertMsg := "Arquivo "+alltrim(cTopFile)+" n∆o encontrado."+iif(s_lRecursive," O flag -r est† ativo. Informe o subdir tambÇm se o PRG principal estiver dentro dele.","")
          ELSEIF s_nLang=3
-            s_cMsg := "Fichero "+alltrim(cTopFile)+" no encontrado."+iif(s_lRecursive," Lo flag -r esta activado. Informe lo subdir tambiÇn si lo PRG principale est†s dentro dele.","")
+            s_cAlertMsg := "Fichero "+alltrim(cTopFile)+" no encontrado."+iif(s_lRecursive," Lo flag -r esta activado. Informe lo subdir tambiÇn si lo PRG principale est†s dentro dele.","")
          ELSE
-            s_cMsg := "File "+alltrim(cTopFile)+" not found."+iif(s_lRecursive," The flag -r is active. Inform the subdir also if the main PRG is within it.","")
+            s_cAlertMsg := "File "+alltrim(cTopFile)+" not found."+iif(s_lRecursive," The flag -r is active. Inform the subdir also if the main PRG is within it.","")
          ENDIF
-         Alert( s_cMsg )
+         Alert( s_cAlertMsg )
       ELSE
          EXIT
       ENDIF
@@ -2050,31 +2074,31 @@ FUNCTION CreateMakeFile( cFile )
       endif
 
       IF s_nLang == 1 // PT
-         s_cMsg := '<Espaáo> para selecionar. <Enter> para continuar o processo.'
+         s_cAlertMsg := '<Espaáo> para selecionar. <Enter> para continuar o processo.'
       ELSEIF s_nLang == 2
-         s_cMsg := '<Spacebar> to select. <Enter> to continue process'
+         s_cAlertMsg := '<Spacebar> to select. <Enter> to continue process'
       ELSEIF s_nLang == 3
-         s_cMsg := '<Espacio> para seleccionar. <Enter> para continuar o proceso.'
+         s_cAlertMsg := '<Espacio> para seleccionar. <Enter> para continuar o proceso.'
       ENDIF
 
-      Attention( s_cMsg, 22 )
+      Attention( s_cAlertMsg, 22 )
 
       AEval( aLibs, { | x | AAdd( aLibsIn, x[ 1 ] ) } )
       AEval( aLibs, { | x | AAdd( aLibsOut, x[ 2 ] ) } )
 
       if s_nLang=1
-         s_cMsg := "Selecione as LIBs externas a compilar"
+         s_cAlertMsg := "Selecione as LIBs externas a compilar"
       elseif s_nLang=3
-         s_cMsg := "Seleccione las LIB externas a compilar"
+         s_cAlertMsg := "Seleccione las LIB externas a compilar"
       else
-         s_cMsg := "Select the external LIBs to compile"
+         s_cAlertMsg := "Select the external LIBs to compile"
       endif
 
 
       IF nOption != 2 // not create makefile
-         pickarry( 11, 15, 20, 64, aLibsIn, aLibsOut ,oMake:aExtLibs, .T. , s_cMsg, .T. )
+         pickarry( 11, 15, 20, 64, aLibsIn, aLibsOut ,oMake:aExtLibs, .T. , s_cAlertMsg, .T. )
       ELSE
-         pickarry( 11, 15, 20, 64, aLibsIn, aLibsOut ,{}, .T., s_cMsg, .T. )
+         pickarry( 11, 15, 20, 64, aLibsIn, aLibsOut ,{}, .T., s_cAlertMsg, .T. )
       ENDIF
 
    ENDIF
@@ -2685,12 +2709,12 @@ FUNCTION CreateMakeFile( cFile )
    IF !lCancelMake
 
       IF s_nLang == 1 .OR. s_nLang == 3
-         s_cMsg := "Compilar app ? (S/N) "
+         s_cAlertMsg := "Compilar app ? (S/N) "
       ELSE // English
-         s_cMsg := "Build app ? (Y/N) "
+         s_cAlertMsg := "Build app ? (Y/N) "
       ENDIF
 
-      @ 20,5 Say s_cMsg Get cBuild PICT "!" Valid cBuild $ iif(s_nLang=2,"YN","SN")
+      @ 20,5 Say s_cAlertMsg Get cBuild PICT "!" Valid cBuild $ iif(s_nLang=2,"YN","SN")
       READ
 
       IF ( cBuild == "S" .or. cBuild == "Y" )
@@ -2700,14 +2724,14 @@ FUNCTION CreateMakeFile( cFile )
          ELSE
 
             IF s_nLang == 1
-               s_cMsg := "Foráar recompilaá∆o para todos PRGs </f> ? (S/N) "
+               s_cAlertMsg := "Foráar recompilaá∆o para todos PRGs </f> ? (S/N) "
             ELSEIF s_nLang == 3 // Spanish
-               s_cMsg := "Forzar recompilaci¢n para todos los PRGs </f> ? (S/N) "
+               s_cAlertMsg := "Forzar recompilaci¢n para todos los PRGs </f> ? (S/N) "
             ELSE // English
-               s_cMsg := "Force recompiling for all PRGs </f> ? (Y/N) "
+               s_cAlertMsg := "Force recompiling for all PRGs </f> ? (Y/N) "
             ENDIF
 
-            @ 21,5 Say s_cMsg Get cBuildForced PICT "!" Valid cBuildForced $ iif(s_nLang=2,"YN","SN")
+            @ 21,5 Say s_cAlertMsg Get cBuildForced PICT "!" Valid cBuildForced $ iif(s_nLang=2,"YN","SN")
             READ
 
          ENDIF
@@ -2965,7 +2989,7 @@ FUNCTION CompileUpdatedFiles()
                         set cursor on
                         QUIT
                      ELSE
-                        // FErase( (s_cLog) )
+                        // FErase( s_cLog )
                      ENDIF
 
                      cComm := cOld
@@ -3088,7 +3112,7 @@ FUNCTION CompileUpdatedFiles()
                         set cursor on
                         QUIT
                      ELSE
-                        // FErase( (s_cLog) )
+                        // FErase( s_cLog )
                      ENDIF
 
                      cComm := cOld
@@ -3163,7 +3187,7 @@ FUNCTION CompileUpdatedFiles()
                         set cursor on
                         QUIT
                      ELSE
-                        // FErase( (s_cLog) )
+                        // FErase( s_cLog )
                      ENDIF
 
                      cComm := cOld
@@ -3293,7 +3317,7 @@ FUNCTION CreateLibMakeFile( cFile )
    LOCAL lDebug          := .F.
    LOCAL lSupressline    := .F.
    LOCAL cHarbourFlags   := ""
-   LOCAL cObjDir         := 'obj' + Space( 20 )
+   LOCAL cObjDir         := s_cObjDir + space( 20 )
    LOCAL lCompMod        := .F.
    LOCAL lInstallLib     := .F.
    LOCAL x
@@ -3320,13 +3344,13 @@ FUNCTION CreateLibMakeFile( cFile )
 
    IF nLenaSrc == 0 .AND. !s_lRecursive
       IF s_nLang == 1 // Portuguese-BR
-         s_cMsg := "N∆o h† prg na pasta "+curdir()
+         s_cAlertMsg := "N∆o h† prg na pasta "+curdir()
       ELSEIF s_nLang == 3 // Spanish
-         s_cMsg := "No hay ning£n prg en la carpeta "+curdir()
+         s_cAlertMsg := "No hay ning£n prg en la carpeta "+curdir()
       ELSE
-         s_cMsg := "Have not any prg in "+curdir()+" folder."
+         s_cAlertMsg := "Have not any prg in "+curdir()+" folder."
       ENDIF
-      Alert( s_cMsg )
+      Alert( s_cAlertMsg )
       RETURN NIL
    ENDIF
 
@@ -3356,14 +3380,14 @@ FUNCTION CreateLibMakeFile( cFile )
             CLS
 
             IF s_nLang = 1      // brazilian portuguese
-               s_cMsg := "<"+cFile + "> n∆o pode ser aberto para ediá∆o."
+               s_cAlertMsg := "<"+cFile + "> n∆o pode ser aberto para ediá∆o."
             ELSEIF s_nLang = 3  // spanish
-               s_cMsg := "<"+cFile + "> no pode ser abierto para edici¢n."
+               s_cAlertMsg := "<"+cFile + "> no pode ser abierto para edici¢n."
             ELSE                // english
-               s_cMsg := "<"+cFile + "> cannot be openned for edition."
+               s_cAlertMsg := "<"+cFile + "> cannot be openned for edition."
             ENDIF
 
-            Alert( s_cMsg+" FERROR ("+LTrim(Str(FError()))+")" )
+            Alert( s_cAlertMsg+" FERROR ("+LTrim(Str(FError()))+")" )
 
             RETURN NIL
          else
@@ -3405,14 +3429,14 @@ FUNCTION CreateLibMakeFile( cFile )
             CLS
 
             IF s_nLang=1 // PT-BR
-               s_cMsg := "N∆o h† nenhum prg na pasta "+CurDir()+". Use o modo recursivo -r" 
+               s_cAlertMsg := "N∆o h† nenhum prg na pasta "+CurDir()+". Use o modo recursivo -r" 
             ELSEIF s_nLang=3 // Spanish
-               s_cMsg := "No hay ning£n prg en la carpeta "+CurDir()+". Use lo modo recursivo -r"
+               s_cAlertMsg := "No hay ning£n prg en la carpeta "+CurDir()+". Use lo modo recursivo -r"
             ELSE
-               s_cMsg := "Does not have any prg in "+CurDir()+" folder. Use the recursive mode -r"
+               s_cAlertMsg := "Does not have any prg in "+CurDir()+" folder. Use the recursive mode -r"
             ENDIF
 
-            Alert( s_cMsg )
+            Alert( s_cAlertMsg )
 
             SetColor("W/N,N/W")
             CLS
@@ -3433,14 +3457,14 @@ FUNCTION CreateLibMakeFile( cFile )
             CLS
 
             IF s_nLang = 1      // brazilian portuguese
-               s_cMsg := "<"+cFile + "> n∆o pode ser aberto para ediá∆o."
+               s_cAlertMsg := "<"+cFile + "> n∆o pode ser aberto para ediá∆o."
             ELSEIF s_nLang = 3  // spanish
-               s_cMsg := "<"+cFile + "> no pode ser abierto para edici¢n."
+               s_cAlertMsg := "<"+cFile + "> no pode ser abierto para edici¢n."
             ELSE                // english
-               s_cMsg := "<"+cFile + "> cannot be openned for edition."
+               s_cAlertMsg := "<"+cFile + "> cannot be openned for edition."
             ENDIF
 
-            Alert( s_cMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
+            Alert( s_cAlertMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
 
             RETURN NIL
 
@@ -3459,14 +3483,14 @@ FUNCTION CreateLibMakeFile( cFile )
             CLS
 
             IF s_nLang=1 // PT-BR
-               s_cMsg := "N∆o h† nenhum prg na pasta "+CurDir()+". Use o modo recursivo -r" 
+               s_cAlertMsg := "N∆o h† nenhum prg na pasta "+CurDir()+". Use o modo recursivo -r" 
             ELSEIF s_nLang=3 // Spanish
-               s_cMsg := "No hay ning£n prg en la carpeta "+CurDir()+". Use lo modo recursivo -r"
+               s_cAlertMsg := "No hay ning£n prg en la carpeta "+CurDir()+". Use lo modo recursivo -r"
             ELSE
-               s_cMsg := "Does not have any prg in "+CurDir()+" folder. Use the recursive mode -r"
+               s_cAlertMsg := "Does not have any prg in "+CurDir()+" folder. Use the recursive mode -r"
             ENDIF
 
-            Alert( s_cMsg )
+            Alert( s_cAlertMsg )
             SetColor("W/N,N/W")
             CLS
             set cursor on
@@ -3483,14 +3507,14 @@ FUNCTION CreateLibMakeFile( cFile )
             CLS
 
             IF s_nLang = 1      // brazilian portuguese
-               s_cMsg := "<"+cFile + "> n∆o pode ser criado."
+               s_cAlertMsg := "<"+cFile + "> n∆o pode ser criado."
             ELSEIF s_nLang = 3  // spanish
-               s_cMsg := "<"+cFile + "> no pode ser criado."
+               s_cAlertMsg := "<"+cFile + "> no pode ser criado."
             ELSE                // english
-               s_cMsg := "<"+cFile + "> cannot be created."
+               s_cAlertMsg := "<"+cFile + "> cannot be created."
             ENDIF
 
-            Alert( s_cMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
+            Alert( s_cAlertMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
 
             RETURN NIL
 
@@ -3515,14 +3539,14 @@ FUNCTION CreateLibMakeFile( cFile )
          CLS
 
          IF s_nLang = 1      // brazilian portuguese
-            s_cMsg := "<"+cFile + "> n∆o pode ser criado."
+            s_cAlertMsg := "<"+cFile + "> n∆o pode ser criado."
          ELSEIF s_nLang = 3  // spanish
-            s_cMsg := "<"+cFile + "> no pode ser criado."
+            s_cAlertMsg := "<"+cFile + "> no pode ser criado."
          ELSE                // english
-            s_cMsg := "<"+cFile + "> cannot be created."
+            s_cAlertMsg := "<"+cFile + "> cannot be created."
          ENDIF
 
-         Alert( s_cMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
+         Alert( s_cAlertMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
 
          RETURN NIL
 
@@ -3587,10 +3611,8 @@ FUNCTION CreateLibMakeFile( cFile )
 
    IF ! Empty( cObjDir )
 
-      IF DirChange( cObjDir ) != 0
+      IF !IsDirectory( cObjDir )
          MakeDir( cObjDir )
-      ELSE
-         DirChange( '..' )
       ENDIF
 
    ENDIF
@@ -3705,11 +3727,11 @@ FUNCTION CreateLibMakeFile( cFile )
 
 
    if s_nLang=1
-      s_cMsg := "Selecione os PRGs a compilar"
+      s_cAlertMsg := "Selecione os PRGs a compilar"
    elseif s_nLang=3
-      s_cMsg := "Seleccione los PRG a compilar"
+      s_cAlertMsg := "Seleccione los PRG a compilar"
    else
-      s_cMsg := "Select the PRG files to compile"
+      s_cAlertMsg := "Select the PRG files to compile"
    endif
 
    aInFiles := GetSourceFiles( s_lRecursive, s_lGcc, cOS )
@@ -3720,9 +3742,9 @@ FUNCTION CreateLibMakeFile( cFile )
 
 
    IF nOption !=2 // not create a makefile
-      pickarry( 10, 15, 19, 64, aInFiles, aOutFiles, ArrayAJoin( { oMake:aPrgs, oMake:aCs } ), .T., s_cMsg )
+      pickarry( 10, 15, 19, 64, aInFiles, aOutFiles, ArrayAJoin( { oMake:aPrgs, oMake:aCs } ), .T., s_cAlertMsg )
    ELSE
-      pickarry( 10, 15, 19, 64, aInFiles, aOutFiles, {}, .T., s_cMsg )
+      pickarry( 10, 15, 19, 64, aInFiles, aOutFiles, {}, .T., s_cAlertMsg )
    ENDIF
 
 
@@ -3997,12 +4019,12 @@ FUNCTION CreateLibMakeFile( cFile )
    if !lCancelMake
 
    IF s_nLang == 1 .OR. s_nLang == 3
-      s_cMsg := "Compilar lib ? (S/N) "
+      s_cAlertMsg := "Compilar lib ? (S/N) "
    ELSE // English
-      s_cMsg := "Build lib ? (Y/N) "
+      s_cAlertMsg := "Build lib ? (Y/N) "
    ENDIF
 
-   @ 20,5 Say s_cMsg Get cBuild PICT "!" Valid cBuild $ iif(s_nLang=2,"YN","SN")
+   @ 20,5 Say s_cAlertMsg Get cBuild PICT "!" Valid cBuild $ iif(s_nLang=2,"YN","SN")
    READ
 
    IF cBuild == "S" .OR. cBuild == "Y"
@@ -4043,13 +4065,13 @@ FUNCTION SetLibBuild()
 
    if s_nMakeFileHandle = F_ERROR
       IF s_nLang = 1      // brazilian portuguese 
-         s_cMsg := "<"+s_cMakeFileName + "> n∆o pode ser criado."
+         s_cAlertMsg := "<"+s_cMakeFileName + "> n∆o pode ser criado."
       ELSEIF s_nLang = 3  // spanish
-         s_cMsg := "<"+s_cMakeFileName + "> no pode ser criado."
+         s_cAlertMsg := "<"+s_cMakeFileName + "> no pode ser criado."
       ELSE                // english
-         s_cMsg := "<"+s_cMakeFileName + "> cannot be created."
+         s_cAlertMsg := "<"+s_cMakeFileName + "> cannot be created."
       ENDIF
-      Alert( s_cMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
+      Alert( s_cAlertMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
       RETURN NIL
    endif
 
@@ -4258,7 +4280,7 @@ RETURN NIL
 *-------------------------
 FUNCTION BuildBorCfgFile()
 *-------------------------
-LOCAL cCfg := GetHarbourDir() + '\bin\harbour.cfg'
+LOCAL cCfg := GetHarbourDir() + '\bin\'+s_cHbCfgFileName
 LOCAL nCfg
 
    IF !File( cCfg ) .or. s_lForce 
@@ -4267,13 +4289,13 @@ LOCAL nCfg
 
       if nCfg = F_ERROR
          IF s_nLang = 1      // brazilian portuguese 
-            s_cMsg := cCfg + " n∆o pode ser criado."
+            s_cAlertMsg := cCfg + " n∆o pode ser criado."
          ELSEIF s_nLang = 3  // spanish
-            s_cMsg := cCfg + " no pode ser criado."
+            s_cAlertMsg := cCfg + " no pode ser criado."
          ELSE                // english
-            s_cMsg := cCfg + " cannot be created."
+            s_cAlertMsg := cCfg + " cannot be created."
          ENDIF
-         Alert( s_cMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
+         Alert( s_cAlertMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
          RETURN NIL
       endif
 
@@ -4288,9 +4310,9 @@ LOCAL nCfg
 RETURN NIL
 
 *-------------------------
-FUNCTION BuildMSCCfgfile()
+FUNCTION BuildMscCfgFile()
 *-------------------------
-   LOCAL cCfg := GetHarbourDir() + '\bin\harbour.cfg'
+   LOCAL cCfg := GetHarbourDir() + '\bin\'+s_cHbCfgFileName
    LOCAL nCfg
 
    IF !File( cCfg )  .or. s_lForce
@@ -4299,13 +4321,13 @@ FUNCTION BuildMSCCfgfile()
 
       if nCfg = F_ERROR
          IF s_nLang = 1      // brazilian portuguese 
-            s_cMsg := cCfg + " n∆o pode ser criado."
+            s_cAlertMsg := cCfg + " n∆o pode ser criado."
          ELSEIF s_nLang = 3  // spanish
-            s_cMsg := cCfg + " no pode ser criado."
+            s_cAlertMsg := cCfg + " no pode ser criado."
          ELSE                // english
-            s_cMsg := cCfg + " cannot be created."
+            s_cAlertMsg := cCfg + " cannot be created."
          ENDIF
-         Alert( s_cMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
+         Alert( s_cAlertMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
          RETURN NIL
       endif
 
@@ -4322,7 +4344,7 @@ RETURN NIL
 *----------------------------
 FUNCTION BuildPellesCfgFile()
 *----------------------------
-   LOCAL cCfg := GetHarbourDir() + '\bin\harbour.cfg'
+   LOCAL cCfg := GetHarbourDir() + '\bin\'+s_cHbCfgFileName
    LOCAL nCfg
 
    IF !File( cCfg )  .or. s_lForce
@@ -4331,13 +4353,13 @@ FUNCTION BuildPellesCfgFile()
 
       if nCfg = F_ERROR
          IF s_nLang = 1      // brazilian portuguese 
-            s_cMsg := cCfg + " n∆o pode ser criado."
+            s_cAlertMsg := cCfg + " n∆o pode ser criado."
          ELSEIF s_nLang = 3  // spanish
-            s_cMsg := cCfg + " no pode ser criado."
+            s_cAlertMsg := cCfg + " no pode ser criado."
          ELSE                // english
-            s_cMsg := cCfg + " cannot be created."
+            s_cAlertMsg := cCfg + " cannot be created."
          ENDIF
-         Alert( s_cMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
+         Alert( s_cAlertMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
          RETURN NIL
       endif
 
@@ -4353,7 +4375,7 @@ RETURN NIL
 
 
 *-------------------------
-FUNCTION Buildgcccfgfile()
+FUNCTION BuildGccCfgFile()
 *-------------------------
    LOCAL cCfg 
    LOCAL nCfg
@@ -4362,7 +4384,7 @@ FUNCTION Buildgcccfgfile()
 
    cDir := Strtran( cDir, '/', '\' )
 
-   cCfg := cDir + '\bin\harbour.cfg'
+   cCfg := cDir + '\bin\'+s_cHbCfgFileName
 
    IF !File( cCfg ) .or. s_lForce
 
@@ -4370,13 +4392,13 @@ FUNCTION Buildgcccfgfile()
 
       if nCfg = F_ERROR
          IF s_nLang = 1      // brazilian portuguese 
-            s_cMsg := cCfg + " n∆o pode ser criado."
+            s_cAlertMsg := cCfg + " n∆o pode ser criado."
          ELSEIF s_nLang = 3  // spanish
-            s_cMsg := cCfg + " no pode ser criado."
+            s_cAlertMsg := cCfg + " no pode ser criado."
          ELSE                // english
-            s_cMsg := cCfg + " cannot be created."
+            s_cAlertMsg := cCfg + " cannot be created."
          ENDIF
-         Alert( s_cMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
+         Alert( s_cAlertMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
          RETURN NIL
       endif
 
@@ -4392,7 +4414,7 @@ RETURN NIL
 *--------------------------
 FUNCTION BuildGccCfgFileL()
 *--------------------------
-   LOCAL cCfg := '/etc/harbour.cfg'
+   LOCAL cCfg := '/etc/'+s_cHbCfgFileName
    LOCAL nCfg
 
    IF !File( cCfg )  .or. s_lForce
@@ -4401,13 +4423,13 @@ FUNCTION BuildGccCfgFileL()
 
       if nCfg = F_ERROR
          IF s_nLang = 1      // brazilian portuguese 
-            s_cMsg := cCfg + " n∆o pode ser criado."
+            s_cAlertMsg := cCfg + " n∆o pode ser criado."
          ELSEIF s_nLang = 3  // spanish
-            s_cMsg := cCfg + " no pode ser criado."
+            s_cAlertMsg := cCfg + " no pode ser criado."
          ELSE                // english
-            s_cMsg := cCfg + " cannot be created."
+            s_cAlertMsg := cCfg + " cannot be created."
          ENDIF
-         Alert( s_cMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
+         Alert( s_cAlertMsg+" FERROR ("+Ltrim(Str(FError()))+")" )
          RETURN NIL
       endif
 
@@ -4421,7 +4443,7 @@ FUNCTION BuildGccCfgFileL()
 RETURN NIL
 
 *------------------------------
-FUNCTION Findharbourcfg( cCfg )
+FUNCTION FindHarbourCfg( cCfg )
 *------------------------------
 
    LOCAL cPath AS STRING := ''
@@ -4437,7 +4459,7 @@ FUNCTION Findharbourcfg( cCfg )
 
       FOR nPos := 1 TO Len( aEnv )
 
-         IF File( aEnv[ nPos ] + '\harbour.cfg' )
+         IF File( aEnv[ nPos ] + '\'+s_cHbCfgFileName )
             cPath  := aEnv[ nPos ]
             lFound := .T.
             EXIT
@@ -4447,16 +4469,16 @@ FUNCTION Findharbourcfg( cCfg )
 
    ELSE
 
-      IF File( '/etc/harbour.cfg' )
+      IF File( '/etc/'+s_cHbCfgFileName )
          lFound := .T.
-         cPath  := '/etc/harbour.cfg'
+         cPath  := '/etc/'+s_cHbCfgFileName
       ENDIF
 
-      IF ! lfound
+      IF !lFound
 
-         IF File( '/usr/local/etc/harbour.cfg' )
+         IF File( '/usr/local/etc/'+s_cHbCfgFileName )
             lFound := .T.
-            cPath  := '/usr/local/etc/harbour.cfg'
+            cPath  := '/usr/local/etc/'+s_cHbCfgFileName
          ENDIF
 
       ENDIF
@@ -4471,17 +4493,18 @@ RETURN lFound
 FUNCTION TestforPrg( cFile )
 *---------------------------
 
-   LOCAL aFiles AS ARRAY := {}
-   LOCAL cPath AS STRING := ''
-   LOCAL cTest AS STRING := ""
+   LOCAL aFiles AS ARRAY  := {}
+   LOCAL cPath AS STRING  := ''
+   LOCAL cTest AS STRING  := ""
    LOCAL cDrive AS STRING := ""
-   LOCAL cExt AS STRING := ""
-   LOCAL cItem AS STRING := ""
+   LOCAL cExt AS STRING   := ""
+   LOCAL cItem AS STRING  := ""
    LOCAL aDir AS ARRAY
    LOCAL nPos AS NUMERIC
    LOCAL nFiles AS NUMERIC
 
    hb_FNAMESPLIT( cFile, @cPath, @cTest, @cExt, @cDrive )
+
    cExt := Substr( cExt, 2 )
    aDir := Directory( cTest + '.*' )
 

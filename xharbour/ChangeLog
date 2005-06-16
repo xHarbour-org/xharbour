@@ -1,10 +1,16 @@
- * $Id: ChangeLog,v 1.4176 2005/06/13 21:44:50 likewolf Exp $
+ * $Id: ChangeLog,v 1.4178 2005/06/15 00:00:00 modalsist Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-06-15 21:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * utils/hbmake/hbmutils.prg
+  * utils/hbmake/hbmake.prg
+  ! Version 1.145 - Fixed to create obj directory if it does not exist 
+    before compile a makefile. Better "harbour.cfg" file management.
 
 2005-06-14 11:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * make_gnu.sh
@@ -1129,10 +1135,11 @@ Reported by Rafa Carmona (TheFull)
 
 2005-04-25 16:38 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils/hbmake/hbmake.prg
-    ! changed to recreate the harbour.cfg file at each time that use "-f"
-      to force rebuild all prgs. At this way the harbour.cfg will be always
-      updated. The option VERBOSE was changed to YES to all C compilers also.
-      For Borland C++ compiler the "-OS" flag was removed because it's duplicated.
+    ! Version 1.144 - Changed to recreate the harbour.cfg file at each time
+      that use "-f" to force rebuild all prgs. At this way the harbour.cfg will
+      be always updated. The option VERBOSE was changed to YES to all C compilers
+      also. For Borland C++ compiler the "-OS" flag was removed because it's
+      duplicated.
 
 2005-04-25 21:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/pack_src.bat
@@ -2002,10 +2009,9 @@ Reported by Rafa Carmona (TheFull)
 
 2005-03-31 17:17 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * xharbour/utils/hbmake.prg
-    * Changed to version 1.143.
   * xharbour/utils/pickarry.prg
-    ! Fixed a bug that was duplicating lines after select one prg in list
-      with fews prgs.
+    ! Version 1.143 - Fixed a bug that was duplicating lines after
+      select one prg in list with fews prgs.
 
 2005-04-01 02:45 UTC+0700 Andi Jahja <xharbour@cbn.net.id>
   + source/compiler/xharbour.prg
@@ -2659,8 +2665,8 @@ Reported by Rafa Carmona (TheFull)
 2005-03-14 12:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * /utils/hbmake.prg
   * /utils/hbmutils.prg
-    + added a question to force recompiling all prgs or no.
-    + start work to add Pelles C compiler, but this is still in progress.
+    + Version 1.142 - added a question to force recompiling all prgs or no.
+    + Start work to add Pelles C compiler, but this is still in progress.
   * /source/ct/disk.c
     + added Volume() and GetVolInfo() functions. By now, these functions are
       working only for Windows platform. The GetVolInfo() return the volume
