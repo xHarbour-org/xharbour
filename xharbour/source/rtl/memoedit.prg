@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.31 2004/11/30 21:59:05 ath1 Exp $
+ * $Id: memoedit.prg,v 1.32 2005/04/29 14:23:45 gdrouillard Exp $
  */
 
 /*
@@ -358,7 +358,7 @@ METHOD xDo( nStatus ) CLASS TMemoEditor
    LOCAL nCurCur := SetCursor()
    LOCAL xRes
 
-   xRes := Do( ::xUserFunction, nStatus, ::nRow, ::nCol - 1 )
+   xRes := Do( ::xUserFunction, nStatus, ::nRow, ::nCol - 1, Self )
 
    ::SetPos( nCurRow, nCurCol )
    SetCursor( nCurCur )
