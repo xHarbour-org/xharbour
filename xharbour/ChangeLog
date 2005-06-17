@@ -1,10 +1,18 @@
- * $Id: ChangeLog,v 1.4181 2005/06/16 23:38:08 peterrees Exp $
+ * $Id: ChangeLog,v 1.4182 2005/06/17 17:03:39 lculik Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-06-17 21:30 UTC+0200 Henryk Olkowski <oh1@op.pl>
+  * include/hbexprb.c
+    ! Fixed compiler bug:
+      Compile: harbour test.prg /w4/A/GC0/M/N/W/Q0/ES2
+       procedure test()
+        m->alfa[1]:=1  //  Warning W0001  Ambiguous reference: 'ALFA'
+       return
+
 2005-06-17 14:10 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   * contrib/htmllib/oframe.prg
     !minor fix
@@ -195,9 +203,7 @@
 
 2005-06-02 03:12 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/pgsql/postgres.c
-    * added temporary hack for autodetection postgers version
-  * include/hbver.h
-    * Refreshed.
+    * added temporary hack for autodetection postgers version * include/hbver.h * Refreshed.
 
 2005-06-01 18:00 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbver.h
