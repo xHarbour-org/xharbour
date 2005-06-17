@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.104 2005/03/14 20:34:22 andijahja Exp $
+* $Id: thread.h,v 1.105 2005/04/27 20:20:26 ronpinkas Exp $
 */
 
 /*
@@ -294,13 +294,22 @@ extern PPVOID hb_dwCurrentStack;
    /* Darwin 7.0.0 has only pthread_mutexattr_settype() */
    #define pthread_mutexattr_setkind_np pthread_mutexattr_settype
 #else
+
+   #ifdef HB_OS_HPUX
+   #define pthread_mutexattr_setkind_np pthread_mutexattr_settype
+   #else 
    /* ODD: this definition is missing on some linux headers;
       we should remove it when this bug is fixed */
    int pthread_mutexattr_setkind_np( pthread_mutexattr_t * attr, int kind );
+   #endif
 #endif
 
    /* Some Unices (e.g., FreeBSD 4.8) don't have this define: */
    #ifdef HB_OS_BSD
+      #define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
+   #endif
+
+   #ifdef HB_OS_HPUX
       #define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
    #endif
 

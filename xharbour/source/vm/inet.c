@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.51 2004/12/09 13:47:46 mauriliolongo Exp $
+* $Id: inet.c,v 1.52 2005/01/10 18:45:41 druzus Exp $
 */
 
 /*
@@ -88,6 +88,12 @@
    #define socklen_t int
 #endif
 
+#if defined( HB_OS_HPUX )
+char * hstrerror( int ierr )
+{
+   return( sprintf( "error %i", ierr ) );
+}
+#endif
 
 #ifdef HB_OS_LINUX
 #include <signal.h>

@@ -1,10 +1,18 @@
- * $Id: ChangeLog,v 1.4180 2005/06/16 14:14:17 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.4181 2005/06/16 23:38:08 peterrees Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-06-17 14:10 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
+  * contrib/htmllib/oframe.prg
+    !minor fix
+  * include/thread.h
+    source/vm/thread.c
+    source/vm/inet.c
+    ! minor fix to allow compile in MT on HPUX
+
 2005-06-17 11:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/memoedit.prg
     + METHOD xDo() - added Self as 4th paramater to UserFunction
