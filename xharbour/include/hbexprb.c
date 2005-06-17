@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.93 2005/05/15 18:12:35 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.94 2005/05/15 22:15:49 ronpinkas Exp $
  */
 
 /*
@@ -1253,6 +1253,12 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             {
                pSelf->value.asList.pExprList->value.asMessage.bByRef = TRUE;
             }
+/***************** Removed (Henryk Olkowski 17.06.2005) **********************************
+       //   Compile: harbour test.prg /w4/A/GC0/M/N/W/Q0/ES2
+       //      procedure test()
+       //      m->alfa[1]:=1  //  Warning W0001  Ambiguous reference: 'ALFA'
+       //      return
+       //
             else if( pSelf->value.asList.pExprList->ExprType == HB_ET_ALIASVAR )
             {
                int iCmpLen = strlen( pSelf->value.asList.pExprList->value.asAlias.pAlias->value.asSymbol );
@@ -1276,6 +1282,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                   bRemoveRef = TRUE;
                }
             }
+*****************************************************************************/
          #endif
 
             HB_EXPR_USE( pSelf->value.asList.pExprList, HB_EA_PUSH_PCODE );
