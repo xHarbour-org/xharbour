@@ -1,5 +1,5 @@
 /*
- * $Id: oframe.prg,v 1.1 2003/02/23 23:15:17 lculik Exp $
+ * $Id: oframe.prg,v 1.2 2004/02/11 10:43:37 lculik Exp $
  */
 
 /*
@@ -219,11 +219,11 @@ METHOD Frame( cName, cURL, lBorder, lResize, lScrolling, ;
    ENDIF
 
    IF marginwidth != NIL
-      cStr += " MARGINWIDTH='" + NTRIM( marginwidth ) + "'"
+      cStr += " MARGINWIDTH= " + NTRIM( marginwidth ) 
    ENDIF
 
    IF marginheight != NIL
-      cStr += "MARGINHEIGHT=" + NTRIM( marginwidth )
+      cStr += " MARGINHEIGHT= " + NTRIM( marginheight )
    ENDIF
 
    cStr += ">" + CRLF()
