@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt,v 1.8 2005/04/18 06:28:00 bdj Exp $
+ * $Id: whatsnew.txt,v 1.9 2005/05/04 16:47:28 bdj Exp $
  */
 
 /*
@@ -15,6 +15,10 @@
  *
  * Budyanto Dj. <budyanto@centrin.net.id>
  */
+
+2005/06/19
+ * gtwvw.c
+   + wvw_xbshow() to show/hide scrollbar, code by Julio Cesar Cantillo Molina.
 
 2005/04/27
  * hbgtwvw.h

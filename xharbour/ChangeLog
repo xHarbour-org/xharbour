@@ -1,10 +1,18 @@
- * $Id: ChangeLog,v 1.4182 2005/06/17 17:03:39 lculik Exp $
+ * $Id: ChangeLog,v 1.4183 2005/06/17 19:27:51 oh1 Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2005-06-19 23:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+  * contrib/gtwvw/doc/whatsnew.txt
+    + wvw_xbshow() to show/hide scrollbar,
+      code by Julio Cesar Cantillo Molina.
+
 2005-06-17 21:30 UTC+0200 Henryk Olkowski <oh1@op.pl>
   * include/hbexprb.c
     ! Fixed compiler bug:
@@ -28,9 +36,9 @@
 2005-06-16 16:10 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/bin/bld.bat
     * for OpenWatcom and mingw32:
-	   * added MT support
-	   * added HB_MULTI_GT support
-	   * added ct and tip
+      * added MT support
+      * added HB_MULTI_GT support
+      * added ct and tip
   * xharbour/config/w32/watcom.cf
     * added HB_THREAD_SUPPORT for OpenWatcom
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.15 2005/04/18 06:27:59 bdj Exp $
+ * $Id: gtwvw.c,v 1.16 2005/05/04 16:47:21 bdj Exp $
  */
 
 /*
@@ -13914,6 +13914,33 @@ HB_FUNC( WVW_XBENABLE)
 
    hb_retl( EnableScrollBar( hWndXB, SB_CTL, uiFlags ) );
 }
+
+
+/*WVW_XBshow( [nWinNum], nXBid, lShow )
+ *show/hide scrollbar nXBid in window nWinNum (default to topmost window)
+ *nXBid is the handle of the scrolbar
+ *lShow: .T. shows the scrolbar (default)
+ *       .F. hides the scrolbar
+ *returns .t. if successful
+ */
+HB_FUNC( WVW_XBSHOW )
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+   UINT uiXBid = (UINT) ( ISNIL( 2 ) ? 0 : hb_parni( 2 ) );
+   BOOL bShow = (BOOL) ( ISLOG( 3 ) ? hb_parl( 3 ) : TRUE );
+   byte bStyle;
+   HWND hWndXB = uiXBid == 0 ? NULL : FindControlHandle(usWinNum, WVW_CONTROL_SCROLLBAR, uiXBid, &bStyle );
+
+   if (uiXBid==0 || hWndXB==NULL)
+   {
+     hb_retl( FALSE );
+     return;
+   }
+
+   hb_retl( ShowScrollBar( hWndXB, SB_CTL, bShow ) );
+}
+
+
 
 /*-------------------------------------------------------------------*/
 /* SCROLLBAR ends                                                    */
