@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4183 2005/06/17 19:27:51 oh1 Exp $
+ * $Id: ChangeLog,v 1.4184 2005/06/19 16:47:39 bdj Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -6,6 +6,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2005-06-20 19:29 UTC-0800 Tony Bretado <jabrecer@yahoo.com>
+  * source/rtl/gtwvt/gtwvt.c
+    * Reverted latest optimization due to scroll bug
 
 2005-06-19 23:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/gtwvw.c
