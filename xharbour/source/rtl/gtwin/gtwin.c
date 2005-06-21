@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.90 2005/03/30 21:30:54 andijahja Exp $
+ * $Id: gtwin.c,v 1.91 2005/04/19 18:49:59 druzus Exp $
  */
 
 /*
@@ -84,6 +84,7 @@
 #include "hbapi.h"
 #include "hbapigt.h"
 #include "hbapifs.h"
+#include "hbapierr.h"
 #include "hbset.h"
 #include "hbvm.h"
 #include "inkey.ch"
@@ -451,15 +452,15 @@ static void HB_GT_FUNC(gt_xScreenUpdate( void ))
             srWin.Bottom = ( SHORT ) s_usUpdtBottom;
             srWin.Right  = ( SHORT ) s_usUpdtRight;
 
+            s_usUpdtTop = _GetScreenHeight();
+            s_usUpdtLeft = _GetScreenWidth();
+            s_usUpdtBottom = s_usUpdtRight = 0;
+
             WriteConsoleOutput( s_HOutput,         /* output handle */
                                 s_pCharInfoScreen, /* data to write */
                                 coSize,            /* col/row size of source buffer */
                                 coDest,            /* upper-left cell to write data from in src */
                                 &srWin );          /* screen buffer rect to write data to */
-
-            s_usUpdtTop = _GetScreenHeight();
-            s_usUpdtLeft = _GetScreenWidth();
-            s_usUpdtBottom = s_usUpdtRight = 0;
         }
 
         if ( s_usOldCurStyle != s_usCursorStyle &&
@@ -589,6 +590,7 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
     s_uiDispCount = 0;
     s_usOldCurStyle = s_usCursorStyle = SC_NORMAL;
 
+    /* initialize code page translation */
     for ( i = 0; i < 256; i++ )
     {
         s_charTransRev[ i ] = ( BYTE ) i;
@@ -604,6 +606,10 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 #ifdef HB_MULTI_GT
         AllocConsole(); /* It is a Windows app without a console, so we create one */
         s_HInput = GetStdHandle( STD_INPUT_HANDLE );
+        if( s_HInput == INVALID_HANDLE_VALUE )
+        {
+            hb_errInternal( 10001, "Can't allocate console", "", "" );
+        }
 #else
         if( hb_dynsymFindName( "__DBGENTRY" ) ) /* the debugger is linked */
         {
@@ -1917,6 +1923,12 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                {
                   ch = clipKey->key;
                }
+            }
+
+            /* national codepage translation */
+            if( ch > 0 && ch <= 255 )
+            {
+	         ch = s_keyTrans[ ch ];
             }
          }
       }

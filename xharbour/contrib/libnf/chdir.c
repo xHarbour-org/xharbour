@@ -1,5 +1,5 @@
 /*
- * $Id: chdir.c,v 1.5 2005/04/25 01:17:15 andijahja Exp $
+ * $Id: chdir.c,v 1.6 2005/04/26 10:07:40 andijahja Exp $
  */
 
 /* File......: CHDIR.ASM
@@ -77,6 +77,9 @@ End
 */
 /* This is the New one Rewriten in C*/
 
+#include "hbapi.h"
+#include "hbapifs.h"
+
 #if defined( HB_OS_DOS )
    #include "extend.h"
    #include <dos.h>
@@ -85,8 +88,6 @@ End
       #include <unistd.h>
    #endif
 #elif defined( __WIN32__ )
-   #include "hbapi.h"
-   #include "hbapifs.h"
    #include <windows.h>
 #endif
 

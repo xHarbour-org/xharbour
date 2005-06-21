@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.12 2005/04/18 19:26:40 druzus Exp $
+# $Id: pack_src.sh,v 1.13 2005/04/25 19:22:14 druzus Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -318,6 +318,20 @@ $hb_collect contrib/libnf/*.prg
 $hb_collect contrib/libnf/*.ch
 $hb_collect contrib/libnf/include/*.h
 $hb_collect contrib/libnf/include/*.ch
+
+# CONTRIB\LIBMISC
+$hb_collect contrib/libmisc/Makefile
+$hb_collect contrib/libmisc/*.[ch]
+$hb_collect contrib/libmisc/*.prg
+$hb_collect contrib/libmisc/*.ch
+
+# CONTRIB\HTMLLIB
+$hb_collect contrib/htmllib/Makefile
+$hb_collect contrib/htmllib/*.prg
+$hb_collect contrib/htmllib/example/*.*
+$hb_collect contrib/htmllib/help/*.*
+$hb_collect contrib/htmllib/include/Makefile
+$hb_collect contrib/htmllib/include/*.ch
 
 }
 

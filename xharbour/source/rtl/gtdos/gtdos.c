@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.25 2004/10/24 09:35:25 oh1 Exp $
+ * $Id: gtdos.c,v 1.26 2004/11/25 05:11:57 guerra000 Exp $
  */
 
 /*
@@ -91,6 +91,7 @@
 #include "hbapi.h"
 #include "hbapigt.h"
 #include "hbapifs.h"
+#include "hbapicdp.h"
 #include "hbset.h" /* For Ctrl+Break handling */
 #include "hbvm.h" /* For Ctrl+Break handling */
 #include "inkey.ch"
@@ -160,6 +161,10 @@ static ULONG s_clipsize = 0;
 static BOOL s_bBreak; /* Used to signal Ctrl+Break to hb_inkeyPoll() */
 static USHORT s_uiDispCount;
 
+static BYTE s_charTransRev[ 256 ];
+static BYTE s_charTrans[ 256 ];
+static BYTE s_keyTrans[ 256 ];
+
 static int s_iStdIn, s_iStdOut, s_iStdErr;
 
 #if defined(__RSX32__)
@@ -212,6 +217,8 @@ static void HB_GT_FUNC(gt_CtrlBrkRestore( void ))
 
 void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))
 {
+   int i;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
    /*
@@ -227,6 +234,14 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
    s_bBreak = FALSE;
    s_uiDispCount = 0;
+
+   /* initialize code page translation */
+   for( i = 0; i < 256; i++ )
+   {
+      s_charTransRev[ i ] = ( BYTE ) i;
+      s_charTrans[ i ] = ( BYTE ) i;
+      s_keyTrans[ i ] = ( BYTE ) i;
+   }
 
    /* Set the Ctrl+Break handler [vszakats] */
 
@@ -456,6 +471,10 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
       case 395:  /* Alt + F11 */
       case 396:  /* Alt + F12 */
          ch = 349 - ch;
+   }
+   if( ch > 0 && ch <= 255 )
+   {
+      ch = s_keyTrans[ ch ];
    }
 
    return ch;
@@ -695,16 +714,16 @@ static void hb_gt_xGetXY( USHORT cRow, USHORT cCol, BYTE * attr, BYTE * ch )
    {
      if( scrnVirtual )
      {
-        char *p;
+        BYTE *p;
         p = hb_gt_ScreenPtr( cRow, cCol );
-        *ch = *p;
+        *ch = s_charTransRev[ *p ];
         *attr = *( p + 1 );
      }
      else
      {
-        short ch_attr;
+        USHORT ch_attr;
         gettext( cCol + 1, cRow + 1, cCol + 1, cRow + 1, &ch_attr );
-        *ch = ch_attr >> 8;
+        *ch = s_charTransRev[ ch_attr >> 8 ];
         *attr = ch_attr & 0xFF;
      }
    }
@@ -712,9 +731,9 @@ static void hb_gt_xGetXY( USHORT cRow, USHORT cCol, BYTE * attr, BYTE * ch )
    {
      if( scrnVirtual )
      {
-        char *p;
+        BYTE *p;
         p = hb_gt_ScreenPtr( cRow, cCol );
-        *ch = *p;
+        *ch = s_charTransRev[ *p ];
         *attr = *( p + 1 );
      }
      else
@@ -722,15 +741,15 @@ static void hb_gt_xGetXY( USHORT cRow, USHORT cCol, BYTE * attr, BYTE * ch )
         int nCh, nAttr;
 	
         ScreenGetChar( &nCh, &nAttr, cCol, cRow );
-	*ch = nCh;
+	*ch = s_charTransRev[ nCh & 0xFF ];
 	*attr = nAttr;
      }
    }
 #else
    {
-     char FAR *p;
+     BYTE FAR *p;
      p = hb_gt_ScreenPtr( cRow, cCol );
-     *ch = *p;
+     *ch = s_charTransRev[ *p ];
      *attr = *( p + 1 );
    }
 #endif
@@ -744,15 +763,15 @@ static void hb_gt_xPutch( USHORT cRow, USHORT cCol, BYTE attr, BYTE ch )
    {
      if( scrnVirtual )
      {
-        char *p;
+        BYTE *p;
         p          = hb_gt_ScreenPtr( cRow, cCol );
-        *p         = ch;
+        *p         = s_charTrans[ ch ];
         *( p + 1 ) = attr;
      }
      else
      {
-        LONG ch_attr;
-        ch_attr = ( ch << 8 ) | attr;
+        USHORT ch_attr;
+        ch_attr = ( s_charTrans[ ch ] << 8 ) | attr;
         puttext( cCol + 1, cRow + 1, cCol + 1, cRow + 1, &ch_attr );
      }
    }
@@ -760,18 +779,18 @@ static void hb_gt_xPutch( USHORT cRow, USHORT cCol, BYTE attr, BYTE ch )
    {
      if( scrnVirtual )
      {
-        char *p;
+        BYTE *p;
         p          = hb_gt_ScreenPtr( cRow, cCol );
-        *p         = ch;
+        *p         = s_charTrans[ ch ];
         *( p + 1 ) = attr;
      }
      else
-        ScreenPutChar( ch, attr, cCol, cRow );
+        ScreenPutChar( s_charTrans[ ch ], attr, cCol, cRow );
    }
 #else
    {
      USHORT FAR * p = (USHORT FAR *) hb_gt_ScreenPtr( cRow, cCol );
-     *p = (attr << 8) + ch;
+     *p = ( attr << 8 ) + s_charTrans[ ch ];
    }
 #endif
 }
@@ -788,9 +807,9 @@ void HB_GT_FUNC(gt_Puts( USHORT cRow, USHORT cCol, BYTE attr, BYTE *str, ULONG l
      {
         for( i=0; i<len; i++ )
         {
-          char *p;
+          BYTE *p;
           p          = hb_gt_ScreenPtr( cRow, cCol++ );
-          *p         = str[ i ];
+          *p         = s_charTrans[ str[ i ] ];
           *( p + 1 ) = attr;
         }
      else
@@ -807,7 +826,7 @@ void HB_GT_FUNC(gt_Puts( USHORT cRow, USHORT cCol, BYTE attr, BYTE *str, ULONG l
         ptr = ch_attr = hb_xgrab( i << 1 );
         while( i-- )
           {
-             *ptr++ = *str++;
+             *ptr++ = s_charTrans[ *str++ ];
              *ptr++ = attr;
           }
         i = len - 1; /* We want end position, not next cursor position */
@@ -841,13 +860,13 @@ void HB_GT_FUNC(gt_Puts( USHORT cRow, USHORT cCol, BYTE attr, BYTE *str, ULONG l
       {
         if( scrnVirtual )
         {
-           char *p;
+           BYTE *p;
            p          = hb_gt_ScreenPtr( cRow, cCol++ );
-           *p         = str[ i ];
+           *p         = s_charTrans[ str[ i ] ];
            *( p + 1 ) = attr;
         }
         else
-           ScreenPutChar( str[ i ], attr, cCol++, cRow );
+           ScreenPutChar( s_charTrans[ str[ i ] ], attr, cCol++, cRow );
       }
    }
 #else
@@ -858,7 +877,7 @@ void HB_GT_FUNC(gt_Puts( USHORT cRow, USHORT cCol, BYTE attr, BYTE *str, ULONG l
       p = (USHORT FAR *) hb_gt_ScreenPtr( cRow, cCol );
       while( len-- )
       {
-         *p++ = byAttr + (*str++);
+         *p++ = byAttr + s_charTrans[ (*str++) ];
       }
    }
 #endif
@@ -891,7 +910,18 @@ void HB_GT_FUNC(gt_GetText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
           }
      }
      else
-        gettext( usLeft + 1, usTop + 1, usRight + 1, usBottom + 1, dest );
+     {
+        if( usTop <= usBottom && usLeft <= usRight )
+        {
+           ULONG usCount = ( usBottom - usTop + 1 ) * ( usRight - usLeft + 1 );
+           gettext( usLeft + 1, usTop + 1, usRight + 1, usBottom + 1, dest );
+           while( usCount-- )
+           {
+              *dest = s_charTransRev[ *dest ];
+              dest += 2;
+           }
+        }
+     }
    }
 #else
    {
@@ -929,7 +959,21 @@ void HB_GT_FUNC(gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
           }
      }
      else
-        puttext( usLeft + 1, usTop + 1, usRight + 1, usBottom + 1, srce );
+     {
+        if( usTop <= usBottom && usLeft <= usRight )
+        {
+           ULONG usCount = ( usBottom - usTop + 1 ) * ( usRight - usLeft + 1 );
+           BYTE * buf, * ptr;
+           ptr = buf = ( BYTE * ) hb_xgrab( usCount );
+           while( usCount-- )
+           {
+              *ptr++ = s_charTrans[ *srce++ ];
+              *ptr++ = *srce++;
+           }
+           puttext( usLeft + 1, usTop + 1, usRight + 1, usBottom + 1, buf );
+           hb_xfree( buf );
+        }
+     }
    }
 #else
    {
@@ -1223,9 +1267,9 @@ void HB_GT_FUNC(gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byCh
      {
         while( nLength-- )
         {
-           char *p;
+           BYTE *p;
            p          = hb_gt_ScreenPtr( uiRow, uiCol++ );
-           *p         = byChar;
+           *p         = s_charTrans[ byChar ];
            *( p + 1 ) = byAttr;
         }
      else
@@ -1243,7 +1287,7 @@ void HB_GT_FUNC(gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byCh
         ptr = ch_attr = hb_xgrab( i * 2 );
         while( i-- )
           {
-            *ptr++ = byChar;
+            *ptr++ = s_charTrans[ byChar ];
             *ptr++ = byAttr;
           }
         i = nLength - 1; /* We want end position, not next cursor position */
@@ -1275,19 +1319,19 @@ void HB_GT_FUNC(gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byCh
       {
          if( scrnVirtual )
          {
-            char *p;
+            BYTE *p;
             p          = hb_gt_ScreenPtr( uiRow, uiCol++ );
-            *p         = byChar;
+            *p         = s_charTrans[ byChar ];
             *( p + 1 ) = byAttr;
          }
          else
-            ScreenPutChar( byChar, byAttr, uiCol++, uiRow );
+            ScreenPutChar( s_charTrans[ byChar ], byAttr, uiCol++, uiRow );
       }
    }
 #else
    {
       USHORT FAR *p;
-      USHORT byte = (byAttr << 8) + byChar;
+      USHORT byte = ( byAttr << 8 ) + s_charTrans[ byChar ];
 
       p = (USHORT FAR *) hb_gt_ScreenPtr( uiRow, uiCol );
       while( nLength-- )
@@ -1727,6 +1771,91 @@ void HB_GT_FUNC(gt_OutStd( BYTE * pbyStr, ULONG ulLen ))
 void HB_GT_FUNC(gt_OutErr( BYTE * pbyStr, ULONG ulLen ))
 {
     hb_fsWriteLarge( s_iStdOut, ( BYTE * ) pbyStr, ulLen );
+}
+
+/* *********************************************************************** */
+
+void HB_GT_FUNC( gt_SetDispCP( char *pszTermCDP, char *pszHostCDP, BOOL bBox ) )
+{
+   int i;
+
+   HB_SYMBOL_UNUSED( bBox );
+
+   for ( i = 0; i < 256; i++ )
+   {
+      s_charTrans[ i ] = ( BYTE ) i;
+   }
+
+#ifndef HB_CDP_SUPPORT_OFF
+   if ( !pszHostCDP || !*pszHostCDP )
+   {
+      pszHostCDP = hb_cdp_page->id;
+   }
+
+   if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
+   {
+      PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
+                   cdpHost = hb_cdpFind( pszHostCDP );
+      if ( cdpTerm && cdpHost && cdpTerm != cdpHost &&
+           cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
+      {
+         for ( i = 0; i < cdpHost->nChars; i++ )
+         {
+            s_charTrans[ ( BYTE ) cdpHost->CharsUpper[ i ] ] =
+                         ( BYTE ) cdpTerm->CharsUpper[ i ];
+            s_charTrans[ ( BYTE ) cdpHost->CharsLower[ i ] ] =
+                         ( BYTE ) cdpTerm->CharsLower[ i ];
+         }
+      }
+   }
+#else
+   HB_SYMBOL_UNUSED( pszTermCDP );
+   HB_SYMBOL_UNUSED( pszHostCDP );
+#endif
+   for ( i = 0; i < 256; i++ )
+   {
+      s_charTransRev[ s_charTrans[ i ] ] = ( BYTE ) i;
+   }
+
+}
+
+/* *********************************************************************** */
+
+void HB_GT_FUNC( gt_SetKeyCP( char *pszTermCDP, char *pszHostCDP ) )
+{
+   int i;
+
+   for ( i = 0; i < 256; i++ )
+   {
+      s_keyTrans[ i ] = ( BYTE ) i;
+   }
+
+#ifndef HB_CDP_SUPPORT_OFF
+   if ( !pszHostCDP || !*pszHostCDP )
+   {
+      pszHostCDP = hb_cdp_page->id;
+   }
+
+   if ( pszTermCDP && pszHostCDP && *pszTermCDP && *pszHostCDP )
+   {
+      PHB_CODEPAGE cdpTerm = hb_cdpFind( pszTermCDP ),
+                   cdpHost = hb_cdpFind( pszHostCDP );
+      if ( cdpTerm && cdpHost && cdpTerm != cdpHost &&
+           cdpTerm->nChars && cdpTerm->nChars == cdpHost->nChars )
+      {
+         for ( i = 0; i < cdpHost->nChars; i++ )
+         {
+            s_keyTrans[ ( BYTE ) cdpHost->CharsUpper[ i ] ] =
+                        ( BYTE ) cdpTerm->CharsUpper[ i ];
+            s_keyTrans[ ( BYTE ) cdpHost->CharsLower[ i ] ] =
+                        ( BYTE ) cdpTerm->CharsLower[ i ];
+         }
+      }
+   }
+#else
+   HB_SYMBOL_UNUSED( pszTermCDP );
+   HB_SYMBOL_UNUSED( pszHostCDP );
+#endif
 }
 
 /* ************************** Clipboard support ********************************** */

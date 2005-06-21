@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2004/08/27 05:42:17 paultucker Exp $
+# $Id: Makefile,v 1.4 2004/11/01 05:38:08 likewolf Exp $
 #
 
 ROOT = ../
@@ -35,7 +35,6 @@ else
 
 DIRS=\
 	htmllib \
-	hbzlib \
 	libmisc \
 	libnf \
 

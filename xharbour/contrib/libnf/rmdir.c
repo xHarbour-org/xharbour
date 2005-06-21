@@ -1,5 +1,5 @@
 /*
- * $Id: rmdir.c,v 1.3 2004/12/15 13:39:34 druzus Exp $
+ * $Id: rmdir.c,v 1.4 2005/04/25 01:17:15 andijahja Exp $
  */
 
 /* File......: RMDIR.ASM
@@ -79,12 +79,13 @@ End
 
 /* This is the New one Rewriten in C*/
 
+#include "hbapi.h"
+#include "hbapifs.h"
+
 #if defined(HB_OS_DOS)
 #include "extend.h"
 #include "dos.h"
 #elif defined(__WIN32__)
-#include "hbapi.h"
-#include "hbapifs.h"
 #include <windows.h>
 #endif
 

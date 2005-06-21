@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.113 2005/05/19 02:54:45 druzus Exp $
+ * $Id: dbfntx1.c,v 1.114 2005/06/01 18:24:53 druzus Exp $
  */
 
 /*
@@ -2954,7 +2954,7 @@ static ERRCODE ntxGoTop( NTXAREAP pArea )
 
 static ERRCODE ntxSeek( NTXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pItem, BOOL fFindLast )
 {
-   HB_TRACE(HB_TR_DEBUG, ("ntxSeek(%p, %d, %p, %d)", pArea, fSoftSeek, pKey, fFindLast));
+   HB_TRACE(HB_TR_DEBUG, ("ntxSeek(%p, %d, %p, %d)", pArea, fSoftSeek, pItem, fFindLast));
 
    /* TODO: remove this - temporary hack for checking clipper compatibility */
 /*

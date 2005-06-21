@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4184 2005/06/19 16:47:39 bdj Exp $
+ * $Id: ChangeLog,v 1.4185 2005/06/21 02:31:39 jabrecer Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -6,6 +6,26 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-06-21 22:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/pack_src.sh
+    + added libmisc and htmllib
+      still dis script should be replace by global one which packs
+      the whole _clean_ CVS tree.
+  * xharbour/contrib/Makefile
+    - removed hbzlib from DOS compilation - it uses non 8+3
+      file names what breaks DOS compilation
+  * xharbour/contrib/libmisc/Makefile
+    - removed unused: DIRS=tests
+  * xharbour/contrib/libnf/chdir.c
+  * xharbour/contrib/libnf/rmdir.c
+    ! fixed DOS compilation - "hbapi.h" has to be always included
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! fixed HB_TRACE(...) message
+  * xharbour/source/rtl/gtdos/gtdos.c
+    + added support for HB_SETTERMCP()
+  * xharbour/source/rtl/gtwin/gtwin.c
+    * restored keyboard translation set by HB_SETTERMCP()
+      It was removed by someone or I forgot to commit it in the past
 
 2005-06-20 19:29 UTC-0800 Tony Bretado <jabrecer@yahoo.com>
   * source/rtl/gtwvt/gtwvt.c
