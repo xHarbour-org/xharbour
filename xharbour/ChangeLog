@@ -1,10 +1,134 @@
- * $Id: ChangeLog,v 1.4185 2005/06/21 02:31:39 jabrecer Exp $
+ * $Id: ChangeLog,v 1.4186 2005/06/21 20:19:15 druzus Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-06-22 13:35 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/config/linux/gcc.cf
+    * spell correction in comment
+
+  * xharbour/contrib/rdd_ads/ads1.c
+    ! fixed HB_TRACE() debug message
+
+  * xharbour/contrib/rdd_ads/adsfunc.c
+    ! replaced NULL in error message by 0 for some pedantic C++
+      compilers
+
+  * xharbour/include/dbinfo.ch
+    + added new DBOI_* switches:
+         DBOI_BAGCOUNT       - number of open order bags
+         DBOI_BAGNUMBER      - bag position in bag list
+         DBOI_ISMULTITAG     - does RDD support multi tag in index file
+         DBOI_ISSORTRECNO    - is record number part of key in sorting
+         DBOI_LARGEFILE      - is large file size (>=4GB) supported
+         DBOI_FREEZE         - freeze order updating
+         DBOI_WARM           - restore order updating
+         DBOI_CHGONLY        - update only existing keys
+         DBOI_SHARED         - is index open in shared mode
+         DBOI_ISREADONLY     - is index open in readonly mode
+         DBOI_WRITELOCK      - get/set index write lock
+         DBOI_READLOCK       - get/set index read lock
+         DBOI_UPDATECOUNTER  - get/set update index counter
+
+  * xharbour/include/hbapi.h
+    + added hb_strndup() and hb_strnlen() functions (they works just
+      like GCC ones and greatly simplify operation on possible
+      unterminated strings
+    + added hb_put_ieee754() and hb_get_ieee754() functions. They
+      store/retrieve IEEE754 little endian double values on any machine
+      type even if they have different native double representations.
+      These functions can be used on such platforms to keep strict binary
+      compatibility (f.e. when databases/indexes are shared between
+      different systems or user wants to use common .hrb files.
+    + added hb_put_ord_ieee754() and hb_get_ord_ieee754() - they store/
+      retrieve modified IEEE754 double values used by some index formats
+      like CDX and NSX - they are also platform independent and will work
+      even if natively different double format is used.
+    + added hb_get_rev_double()/hb_get_std_double() for machines with
+      strict alignment when C compilers does not support C extenssion
+      used in GCC macros.
+    + added hb_get_le_int64(), hb_get_le_uint64(), hb_put_le_uint64()
+      for compilation with HB_LONG_LONG_OFF - these functions store/
+      retrieve 64bit integer values converting them from/to double.
+
+  * xharbour/include/hbdefs.h
+    + added missing macros for non GCC compilers for double conversions
+    + added HB_FORCE_IEEE754_DOUBLE macro which force to store double
+      value not in platform native form but always as IEEE754 in PCODE
+      and databases/indexes.
+      Now we cover all possible platforms also for non GCC compilers.
+
+  * xharbour/include/hbapirdd.h
+    + prototype for HB_EVALSCOPE_FUNC moved from hbrddcdx.h to make it
+      common also for other RDDs
+
+  * xharbour/include/hbdbferr.h
+    + added some missing error codes
+
+  * xharbour/include/hbrddcdx.h
+    - prototype for HB_EVALSCOPE_FUNC moved from hbapirdd.h to make it
+      common also for other RDDs
+
+  * xharbour/include/hbrddntx.h
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+     ! fixed typo in indexing tables with active relations
+     + added optional support for multitag indexes
+     + added support for optional binding record number with index
+       key value what eliminates very uneficient behavior of in standard
+       NTX files when there is a lot of duplicated keys
+     + added optional support for large files up to 4 TB
+     Enabling any of the above features cause that indexes cannot be
+     read by Clipper which does not support them.
+     Multi tag format is mostly binary compatible with CLIP CTX one but
+     I added some extensions which should be ported to CLIP for save
+     concurrent access and index modifications - maybe I'll do that in
+     some spare time.
+     Indexes with bound record number have the same foramt and can be
+     read by Clipper but should not be modified - to avoid any porblems
+     with such unexpected modifications I set one bit in NTX header what
+     cause that Clipper cannot open them.
+     + change internal procedures to eliminate any linear scanning and
+       always use optimal algorithms if possible (two minor modification
+       has to be implemented yet and I'll do that ASAP). Now DBFNTX is
+       very good base to implement DBFNSX.
+     + added ordDestroy(), ORDLISTDELETE() method to close single order
+       bag
+     + implemented SIX3 like tag thermometer flags
+     + implemented all DBOI_* actions
+     + added missing RT errors and eliminate most of internal errors
+     + added rest of missing DBFCDX functionality like:
+       ordFindRec(), ordSeekEval(), ordSeekRegEx(), ordSeekWild(),
+       ordSkipUnique() ...
+       and added new one so far supported only by SIX3 in SIXCDX/SIXNSX
+       Clipper RDDs. Our DBFCDX will have to be updated to also support
+       it - now DBFNTX has most features and IMHO is finished so I plan
+       to make only bug fixes and update it for new RDDINFO interface.
+       I really need this functionality - I do not want to create a set
+       of NTX*() functions to enable/disable/control new features.
+       So I'll begin to extend RDD API ASAP.
+
+  * xharbour/source/rtl/seconds.c
+     + added real secondsCPU() support for WinNT
+  * xharbour/source/common/Makefile
+     + hbarch.c
+  * xharbour/source/common/hbstr.c
+      + added hb_strndup() and hb_strnlen()
+  + xharbour/source/common/hbarch.c
+    + added hb_strndup(), hb_strnlen(),
+      hb_put_ieee754(), hb_get_ieee754(),
+      hb_put_ord_ieee754(), hb_get_ord_ieee754(),
+      hb_get_rev_double(), hb_get_std_double(),
+      hb_get_le_int64(), hb_get_le_uint64(), hb_put_le_uint64()
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    + casting and some minor modifications
+
+  * xharbour/tests/skipeval.prg
+    * small modification for database reusing when there is no production
+      index support in RDD
 
 2005-06-21 22:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/pack_src.sh
