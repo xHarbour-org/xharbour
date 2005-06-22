@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.68 2005/05/16 21:24:58 ronpinkas Exp $
+ * $Id: ads1.c,v 1.69 2005/05/31 22:08:58 kaddath Exp $
  */
 
 /*
@@ -455,7 +455,7 @@ static ERRCODE adsScopeSet( ADSAREAP pArea, USHORT nScope, PHB_ITEM pItem )
    UNSIGNED16 usDataType = ADS_STRINGKEY ;
    /* BOOL bTypeError ; */
    UNSIGNED8 *pucScope;
-   HB_TRACE(HB_TR_DEBUG, ("adsSetScope(%p, %p)", pArea, sInfo));
+   HB_TRACE(HB_TR_DEBUG, ("adsScopeSet(%p, %hu, %p)", pArea, nScope, pItem));
 
    if( pArea->hOrdCurrent )
    {

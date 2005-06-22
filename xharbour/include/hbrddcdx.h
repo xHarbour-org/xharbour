@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.43 2005/05/19 02:20:15 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.44 2005/06/01 18:24:51 druzus Exp $
  */
 
 /*
@@ -185,7 +185,6 @@ HB_EXTERN_BEGIN
    sx_freeze() set NOUPDATE_RYO
                   indexOpt |= CDX_TYPE_TEMPORARY | CDX_TYPE_CUSTOM;
 */
-typedef void ( * HB_EVALSCOPE_FUNC )( ULONG, BYTE *, ULONG, void * );
 
 /* CDX index node strucutres */
 /* Compact Index Header Record */

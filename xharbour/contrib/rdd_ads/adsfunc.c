@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.58 2005/04/28 20:37:02 what32 Exp $
+ * $Id: adsfunc.c,v 1.59 2005/06/10 00:57:36 toninhofwi Exp $
  */
 
 /*
@@ -2388,7 +2388,7 @@ HB_FUNC( ADSSTMTSETTABLEPASSWORD )
 
    if( !adsConnectHandle )
    {
-      hb_errRT_DBCMD( NULL, AE_NO_CONNECTION, NULL, "AE_NO_CONNECTION" );
+      hb_errRT_DBCMD( EG_NOTABLE, AE_NO_CONNECTION, NULL, "AE_NO_CONNECTION" );
       hb_retni( 0 );
    }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.27 2005/04/25 23:11:01 druzus Exp $
+ * $Id: hbapirdd.h,v 1.28 2005/05/04 11:39:51 druzus Exp $
  */
 
 /*
@@ -488,6 +488,11 @@ typedef struct _FIELD
 
 typedef FIELD * LPFIELD;
 
+/*
+ * prototype for function to evaluate against index keys
+ * only for local RDDs (DBFNTX, DBFCDX, ...)
+ */
+typedef void ( * HB_EVALSCOPE_FUNC )( ULONG, BYTE *, ULONG, void * );
 
 
 /*--------------------* WORKAREA structure *----------------------*/

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.26 2005/05/06 23:44:58 druzus Exp $
+ * $Id: hbrddntx.h,v 1.27 2005/06/01 18:24:51 druzus Exp $
  */
 
 /*
@@ -68,30 +68,99 @@ HB_EXTERN_BEGIN
 
 /* DBFNTX constants declarations */
 
-#define TOP_RECORD                                    1
-#define BTTM_RECORD                                   2
-#define PREV_RECORD                                   3
-#define NEXT_RECORD                                   4
-
 #define NTX_IGNORE_REC_NUM                        0x0UL
 #define NTX_MAX_REC_NUM                    0xFFFFFFFFUL
 
 #define NTX_DUMMYNODE                      0xFFFFFFFFUL
 
-#define NTX_FLAG_DEFALUT         0x06
-#define NTX_FLAG_FORITEM         0x01
-#define NTX_FLAG_CUSTOM          0x08
-#define NTX_FLAG_TEMPORARY       0x10
-#define NTX_FLAG_EXTLOCK         0x20
-#define NTX_FLAG_MASK            0x3F
+#define NTX_FLAG_DEFALUT         0x0006
+#define NTX_FLAG_OLDDEFALUT      0x0003
+#define NTX_FLAG_FORITEM         0x0001
+#define NTX_FLAG_TEMPORARY       0x0008
+#define NTX_FLAG_EXTLOCK         0x0010
+#define NTX_FLAG_SORTRECNO       0x0100
+#define NTX_FLAG_LARGEFILE       0x0200
+#define NTX_FLAG_MASK            0x031F
+/* TODO:
+#define NTX_FLAG_CUSTOM          0x0020
+#define NTX_FLAG_CHGONLY         0x0040
+#define NTX_FLAG_TEMPLATE        0x0080
+#define NTX_FLAG_COMPOUND        0x4000
+*/
 
+#define CTX_SIGNATURE            0x9591
+#define CTX_FLAG_MASK            0x0200
+#define CTX_MAX_TAGS                 63
 
-#define NTX_MAX_KEY           256      /* Max len of key */
-#define NTXBLOCKSIZE         1024      /* Size of block in NTX file */
-#define NTX_MAX_TAGNAME        12      /* Max len of tag name */
-#define NTX_HDR_UNUSED        473      /* the unused part of header */
-#define NTX_PAGES_PER_TAG      32
-#define NTX_STACKSIZE          32
+#define NTX_MAX_KEY                     256     /* Max len of key */
+#define NTX_MAX_EXP                     256     /* Max len of KEY/FOR expression */
+#define NTXBLOCKBITS                     10     /* Size of NTX block in bits */
+#define NTXBLOCKSIZE      (1<<NTXBLOCKBITS)     /* Size of block in NTX file */
+#define NTX_MAX_TAGNAME                  10     /* Max len of tag name */
+#define NTX_TAGITEMSIZE                  16     /* Size of tag item in CTX header */
+#define NTX_HDR_UNUSED                  473     /* the unused part of header */
+#define NTX_PAGES_PER_TAG                 8
+#define NTX_STACKSIZE                    32	/* Maximum page stack size */
+
+/* index file structures - defined as BYTEs to avoid alignment problems */
+
+typedef struct _NTXHEADER     /* Header of NTX file */
+{
+   BYTE  type[2];
+   BYTE  version[2];
+   BYTE  root[4];
+   BYTE  next_page[4];
+   BYTE  item_size[2];
+   BYTE  key_size[2];
+   BYTE  key_dec[2];
+   BYTE  max_item[2];
+   BYTE  half_page[2];
+   BYTE  key_expr[ NTX_MAX_EXP ];
+   BYTE  unique[1];
+   BYTE  unknown1[1];
+   BYTE  descend[1];
+   BYTE  unknown2[1];
+   BYTE  for_expr[ NTX_MAX_EXP ];
+   BYTE  tag_name[ NTX_MAX_TAGNAME + 2 ];
+   BYTE  custom[1];
+   BYTE  unused[ NTX_HDR_UNUSED ];
+} NTXHEADER;
+typedef NTXHEADER * LPNTXHEADER;
+
+typedef struct _CTXTAGITEM    /* TAG item in compound NTX (CTX) header */
+{
+   BYTE  tag_name[ NTX_MAX_TAGNAME + 2 ];
+   BYTE  tag_header[ 4 ];
+} CTXTAGITEM;
+typedef CTXTAGITEM * LPCTXTAGITEM;
+
+typedef struct _CTXHEADER     /* Header of xHarbour CTX file */
+{
+   BYTE  type[ 2 ];     /* 0x9591 LE */
+   BYTE  ntags[ 2 ];    /* number of tag entries MAX63 */
+   BYTE  version[ 4 ];  /* update counter LE */
+   BYTE  freepage[ 4 ]; /* first free page in index file */
+   BYTE  filesize[ 4 ]; /* size of index file in pages */
+   BYTE  tags[ CTX_MAX_TAGS * NTX_TAGITEMSIZE ];
+} CTXHEADER;
+typedef CTXHEADER * LPCTXHEADER;
+
+#if 0
+/* original CLIP CTX file header - for information only it's binary
+   compatible so both RDD can read the same file but it's not safe
+   to use CLIP for writing when the file is open by xHarbour.
+   In spare time I'll update CLIP to respect my extensions and send
+   patches to Rust - hope they will be included in CLIP.
+*/
+typedef struct _CTXHEADER     /* Header of CLIP CTX file */
+{
+   BYTE  type[ 2 ];     /* 0x9591 in LE */
+   BYTE  ntags[ 1 ];    /* number of tag entries */
+   BYTE  unused[ 13 ];
+   CTX_TAG tags[ 63 ];
+} CTXHEADER
+#endif
+
 
 /* forward declarations
  */
@@ -115,13 +184,19 @@ typedef struct _TREE_STACK
 }  TREE_STACK;
 typedef TREE_STACK * LPTREESTACK;
 
-typedef struct HB_PAGEINFO_STRU
+typedef struct _HB_PAGEINFO
 {
-   ULONG     Page;
-   BOOL      Changed;
-   int       iUsed;
-   USHORT    uiKeys;
-   char*     buffer;
+   ULONG    Page;
+   BOOL     Changed;
+   int      iUsed;
+   USHORT   uiKeys;
+   struct  _HB_PAGEINFO * pNext;
+   struct  _HB_PAGEINFO * pPrev;
+#ifdef HB_NTX_EXTERNAL_PAGEBUFFER
+   char *   buffer;
+#else
+   char     buffer[ NTXBLOCKSIZE ];
+#endif
 } HB_PAGEINFO;
 typedef HB_PAGEINFO * LPPAGEINFO;
 
@@ -135,65 +210,81 @@ typedef HB_NTXSCOPE * PHB_NTXSCOPE;
 
 typedef struct _TAGINFO
 {
-   char *     TagName;
-   char *     KeyExpr;
-   char *     ForExpr;
-   PHB_ITEM   pKeyItem;
-   PHB_ITEM   pForItem;
+   char *      TagName;
+   char *      KeyExpr;
+   char *      ForExpr;
+   PHB_ITEM    pKeyItem;
+   PHB_ITEM    pForItem;
    HB_NTXSCOPE top;
    HB_NTXSCOPE bottom;
-   BOOL       fTagName;
-   BOOL       fUsrDescend;
-   BOOL       AscendKey;
-   BOOL       UniqueKey;
-   BOOL       Custom;
-   BOOL       TagChanged;
-   BOOL       TagBOF;
-   BOOL       TagEOF;
-   BOOL       Memory;
-   BYTE       KeyType;
-   BYTE       OptFlags;
-   ULONG      TagBlock;       /* next free page ??? */
-   ULONG      RootBlock;      /* root page offset */
-   USHORT     nField;
-   USHORT     KeyLength;
-   USHORT     KeyDec;
-   USHORT     MaxKeys;
+   BOOL        fRemoved;
+   BOOL        fSortRec;
+   BOOL        fTagName;      /* remove */
+   BOOL        fUsrDescend;
+   BOOL        AscendKey;
+   BOOL        UniqueKey;
+   BOOL        Custom;
+   BOOL        Frozen;
+   BOOL        ChgOnly;
+   BOOL        Partial;
+   BOOL        Templete;
+   BOOL        HdrChanged;
+   BOOL        TagBOF;
+   BOOL        TagEOF;
+   BYTE        KeyType;
+   ULONG       HeadBlock;
+   ULONG       RootBlock;
+   USHORT      nField;
+   USHORT      KeyLength;
+   USHORT      KeyDec;
+   USHORT      MaxKeys;
    LPTREESTACK stack;
-   USHORT     stackSize;
-   USHORT     stackDepth;
-   USHORT     stackLevel;
-   ULONG      keyCount;
-   ULONG      ulPagesDepth;
-   ULONG      ulPages;
-   ULONG      ulPageLast;
-   ULONG      ulPagesStart;
-   LPKEYINFO  CurKeyInfo;
-   LPKEYINFO  HotKeyInfo;
-   LPPAGEINFO pages;
-   BOOL       InIndex;
-   char*      buffer;
-   struct    _NTXINDEX * Owner;
-   struct    _TAGINFO * pNext;
-} TAGINFO;
+   USHORT      stackSize;
+   USHORT      stackLevel;
+   ULONG       keyCount;
+   LPKEYINFO   CurKeyInfo;
+   LPKEYINFO   HotKeyInfo;
+   BOOL        HotFor;
 
+   struct     _NTXINDEX * Owner;
+//   struct     _TAGINFO * pNext;
+} TAGINFO;
 typedef TAGINFO * LPTAGINFO;
 
 typedef struct _NTXINDEX
 {
    char *      IndexName;
-   ULONG       NextAvail;
    USHORT      Version;       /* The index VERSION filed to signal index updates for other stations */
+   ULONG       NextAvail;
+   ULONG       TagBlock;      /* Index attr, next free page */
    struct     _NTXAREA * Owner;
    FHANDLE     DiskFile;
+   BOOL        fReadonly;
+   BOOL        fShared;
    BOOL        fFlush;
+   BOOL        LargeFile;
+   BOOL        Changed;
+   BOOL        Update;
+   BOOL        Compound;
    HB_FOFFSET  ulLockPos;     /* readlock position for CL53 lock scheme */
    int         lockWrite;     /* number of write lock set */
    int         lockRead;      /* number of read lock set */
-   LPTAGINFO   CompoundTag;
+
+   BYTE *      HeaderBuff;    /* TODO: make it member */
+   BOOL        fValidHeader;
+   int         iTags;
+   LPTAGINFO * lpTags;
+
+   ULONG       ulPages;
+   ULONG       ulPageLast;
+   ULONG       ulPagesDepth;
+   LPPAGEINFO *pages;
+   LPPAGEINFO  pChanged;
+   LPPAGEINFO  pFirst;
+   LPPAGEINFO  pLast;
+
    struct     _NTXINDEX * pNext;   /* The next index in the list */
 } NTXINDEX;
-
 typedef NTXINDEX * LPNTXINDEX;
 
 /* for index creation */
@@ -206,30 +297,6 @@ typedef struct
    BYTE *      pKeyPool;   /* memory buffer */
 } NTXSWAPPAGE;
 typedef NTXSWAPPAGE * LPNTXSWAPPAGE;
-
-typedef struct _NTXHEADER    /* Header of NTX file */
-{
-   BYTE  type[2];
-   BYTE  version[2];
-   BYTE  root[4];
-   BYTE  next_page[4];
-   BYTE  item_size[2];
-   BYTE  key_size[2];
-   BYTE  key_dec[2];
-   BYTE  max_item[2];
-   BYTE  half_page[2];
-   BYTE  key_expr[ NTX_MAX_KEY ];
-   BYTE  unique[1];
-   BYTE  unknown1[1];
-   BYTE  descend[1];
-   BYTE  unknown2[1];
-   BYTE  for_expr[ NTX_MAX_KEY ];
-   BYTE  tag_name[ NTX_MAX_TAGNAME ];
-   BYTE  custom[1];
-   BYTE  unused[ NTX_HDR_UNUSED ];
-} NTXHEADER;
-
-typedef NTXHEADER * LPNTXHEADER;
 
 typedef struct
 {
@@ -344,13 +411,13 @@ typedef struct _NTXAREA
    *  example.
    */
 
+   LPNTXINDEX     lpIndexes;     /* Pointer to list of indexes */
    LPTAGINFO      lpCurTag;      /* Pointer to current order */
-   LPTAGINFO      lpNtxTag;      /* Pointer to tags list */
+//   LPTAGINFO      lpNtxTag;      /* Pointer to tags list */
    BOOL           fNtxAppend;    /* TRUE if new record is added */
    LPNTXSORTINFO  pSort;         /* Index build structure */
 
 } NTXAREA;
-
 typedef NTXAREA * LPNTXAREA;
 
 #ifndef NTXAREAP
@@ -427,18 +494,14 @@ static ERRCODE ntxZap( NTXAREAP pArea );
 #define ntxrelText               NULL
 #define ntxsetRel                NULL
 static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo );
-         /* Open next index */
 static ERRCODE ntxOrderListClear( NTXAREAP pArea );
-         /* Close all indexes */
-#define ntxOrderListDelete       NULL
+static ERRCODE ntxOrderListDelete( NTXAREAP pArea, LPDBORDERINFO pOrderInfo );
 static ERRCODE ntxOrderListFocus( NTXAREAP pArea, LPDBORDERINFO pOrderInfo );
 static ERRCODE ntxOrderListRebuild( NTXAREAP pArea );
 static ERRCODE ntxOrderCondition( NTXAREAP area, LPDBORDERCONDINFO pOrdCondInfo );
 static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo );
-         /* Create new Index */
-#define ntxOrderDestroy          NULL
+static ERRCODE ntxOrderDestroy( NTXAREAP pArea, LPDBORDERINFO pOrderInfo );
 static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo );
-         /* Some information about index */
 #define ntxClearFilter           NULL
 #define ntxClearLocate           NULL
 #define ntxClearScope            NULL

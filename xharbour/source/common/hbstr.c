@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.19 2005/04/13 21:05:36 andijahja Exp $
+ * $Id: hbstr.c,v 1.20 2005/04/25 23:11:01 druzus Exp $
  */
 
 /*
@@ -116,14 +116,48 @@ char HB_EXPORT * hb_strupr( char * pszText )
 char HB_EXPORT * hb_strdup( const char * pszText )
 {
    char * pszDup;
-   int iLen = strlen( pszText ) + 1;
+   ULONG ulLen = strlen( pszText ) + 1;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_strdup(%s, %i)", pszText, iLen));
+   HB_TRACE(HB_TR_DEBUG, ("hb_strdup(%s, %ld)", pszText, ulLen));
 
-   pszDup = ( char * ) hb_xgrab( iLen );
-   memcpy( pszDup, pszText, iLen );
+   pszDup = ( char * ) hb_xgrab( ulLen );
+   memcpy( pszDup, pszText, ulLen );
 
    return pszDup;
+}
+
+char HB_EXPORT * hb_strndup( const char * pszText, ULONG ulLen )
+{
+   char * pszDup;
+   ULONG ul;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strndup(%s, %ld)", pszText, ulLen));
+
+   ul = 0;
+   pszDup = ( char * ) pszText;
+   while( ulLen-- && *pszDup++ )
+   {
+      ++ul;
+   }
+
+   pszDup = ( char * ) hb_xgrab( ul + 1 );
+   memcpy( pszDup, pszText, ul );
+   pszDup[ ul ] = '\0';
+
+   return pszDup;
+}
+
+ULONG HB_EXPORT hb_strnlen( const char * pszText, ULONG ulLen )
+{
+   ULONG ul = 0;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strnlen(%s, %ld)", pszText, ulLen));
+
+   while( ulLen-- && *pszText++ )
+   {
+      ++ul;
+   }
+   return ul;
 }
 
 HB_EXPORT int hb_stricmp( const char * s1, const char * s2 )

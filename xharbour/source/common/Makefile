@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:44:34 ronpinkas Exp $
+# $Id: Makefile,v 1.2 2003/03/21 21:52:33 ronpinkas Exp $
 #
 
 ROOT = ../../
@@ -12,6 +12,7 @@ C_SOURCES=\
 	hbstr.c \
 	hbtrace.c \
 	hbver.c \
+	hbarch.c \
 	reserved.c \
 	expropt1.c \
 	expropt2.c \

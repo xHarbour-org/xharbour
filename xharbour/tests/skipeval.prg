@@ -19,6 +19,7 @@ if empty(bld)
   dbcommit()
 else
   USE _tst
+  SET INDEX TO _tst
 endif
 ordsetfocus(1)
 ? indexkey(), ordsetfocus()

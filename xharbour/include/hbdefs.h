@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.72 2005/04/18 19:26:43 druzus Exp $
+ * $Id: hbdefs.h,v 1.73 2005/04/19 18:49:56 druzus Exp $
  */
 
 /*
@@ -599,6 +599,114 @@ typedef long HB_PTRDIFF;
 #  define   HB_GET_PTR( p )         ( ( void * ) HB_GET_LONG( p ) )
 #endif
 
+/* Macros to store/retrive double value */
+#if defined( __GNUC__ )
+#  define HB_GET_REV_DOUBLE( p )    \
+       ( { \
+            union { \
+               double dbl; \
+               BYTE buffer[ 8 ]; \
+            } u; \
+            u.buffer[ 0 ] = (( BYTE * )( p ))[ 7 ]; \
+            u.buffer[ 1 ] = (( BYTE * )( p ))[ 6 ]; \
+            u.buffer[ 2 ] = (( BYTE * )( p ))[ 5 ]; \
+            u.buffer[ 3 ] = (( BYTE * )( p ))[ 4 ]; \
+            u.buffer[ 4 ] = (( BYTE * )( p ))[ 3 ]; \
+            u.buffer[ 5 ] = (( BYTE * )( p ))[ 2 ]; \
+            u.buffer[ 6 ] = (( BYTE * )( p ))[ 1 ]; \
+            u.buffer[ 7 ] = (( BYTE * )( p ))[ 0 ]; \
+            u.dbl; \
+         } )
+#  define HB_GET_STD_DOUBLE( p )    \
+       ( { \
+            union { \
+               double dbl; \
+               BYTE buffer[ 8 ]; \
+            } u; \
+            u.buffer[ 0 ] = (( BYTE * )( p ))[ 0 ]; \
+            u.buffer[ 1 ] = (( BYTE * )( p ))[ 1 ]; \
+            u.buffer[ 2 ] = (( BYTE * )( p ))[ 2 ]; \
+            u.buffer[ 3 ] = (( BYTE * )( p ))[ 3 ]; \
+            u.buffer[ 4 ] = (( BYTE * )( p ))[ 4 ]; \
+            u.buffer[ 5 ] = (( BYTE * )( p ))[ 5 ]; \
+            u.buffer[ 6 ] = (( BYTE * )( p ))[ 6 ]; \
+            u.buffer[ 7 ] = (( BYTE * )( p ))[ 7 ]; \
+            u.dbl; \
+         } )
+#else
+#  define HB_GET_REV_DOUBLE( p )    hb_get_rev_double( ( BYTE * ) ( p ) )
+#  define HB_GET_STD_DOUBLE( p )    hb_get_std_double( ( BYTE * ) ( p ) )
+#endif
+
+#define HB_PUT_REV_DOUBLE( p, d )    \
+         do { \
+            union { \
+               double dbl; \
+               BYTE buffer[ 8 ]; \
+            } u; \
+            u.dbl = ( d ); \
+            (( BYTE * )( p ))[ 7 ] = u.buffer[ 0 ]; \
+            (( BYTE * )( p ))[ 6 ] = u.buffer[ 1 ]; \
+            (( BYTE * )( p ))[ 5 ] = u.buffer[ 2 ]; \
+            (( BYTE * )( p ))[ 4 ] = u.buffer[ 3 ]; \
+            (( BYTE * )( p ))[ 3 ] = u.buffer[ 4 ]; \
+            (( BYTE * )( p ))[ 2 ] = u.buffer[ 5 ]; \
+            (( BYTE * )( p ))[ 1 ] = u.buffer[ 6 ]; \
+            (( BYTE * )( p ))[ 0 ] = u.buffer[ 7 ]; \
+         } while ( 0 )
+#define HB_PUT_STD_DOUBLE( p, d )    \
+         do { \
+            union { \
+               double dbl; \
+               BYTE buffer[ 8 ]; \
+            } u; \
+            u.dbl = ( d ); \
+            (( BYTE * )( p ))[ 0 ] = u.buffer[ 0 ]; \
+            (( BYTE * )( p ))[ 1 ] = u.buffer[ 1 ]; \
+            (( BYTE * )( p ))[ 2 ] = u.buffer[ 2 ]; \
+            (( BYTE * )( p ))[ 3 ] = u.buffer[ 3 ]; \
+            (( BYTE * )( p ))[ 4 ] = u.buffer[ 4 ]; \
+            (( BYTE * )( p ))[ 5 ] = u.buffer[ 5 ]; \
+            (( BYTE * )( p ))[ 6 ] = u.buffer[ 6 ]; \
+            (( BYTE * )( p ))[ 7 ] = u.buffer[ 7 ]; \
+         } while ( 0 )
+
+/*
+ * HB_FORCE_IEEE754_DOUBLE will can be used on platforms which use differ
+ * double format and we want to force storing double number as IEEE754
+ * double value for sharing binary data (f.e. PCODE in .hrb files or CDX
+ * indexes or DBFs with "B" fields.
+ */
+#if defined( HB_FORCE_IEEE754_DOUBLE )
+
+#  define HB_GET_LE_DOUBLE( p )     hb_get_ieee754( ( BYTE * ) ( p ) )
+#  define HB_PUT_LE_DOUBLE( p, d )  hb_put_ieee754( ( BYTE * ) ( p ), ( d ) )
+#  define HB_DBL2ORD( d, o )        hb_put_ord_ieee754( ( o ), *( d ) )
+#  define HB_ORD2DBL( o, d )  do { \
+                                 *d = hb_get_ord_ieee754( ( BYTE * ) ( o ) ); \
+                              } while( 0 )
+
+#elif defined( HB_STRICT_ALIGNMENT )
+
+#  if defined( HB_LITTLE_ENDIAN )
+#     define HB_GET_LE_DOUBLE( p )     HB_GET_STD_DOUBLE( ( p ) )
+#     define HB_PUT_LE_DOUBLE( p, d )  HB_PUT_STD_DOUBLE( ( p ), ( d ) )
+#  elif defined( HB_BIG_ENDIAN )
+#     define HB_GET_LE_DOUBLE( p )     HB_GET_REV_DOUBLE( ( p ) )
+#     define HB_PUT_LE_DOUBLE( p, d )  HB_PUT_REV_DOUBLE( ( p ), ( d ) )
+#  endif
+
+#else
+
+#  if defined( HB_LITTLE_ENDIAN )
+#     define HB_GET_LE_DOUBLE( p )     ( *( double * )( p ) )
+#     define HB_PUT_LE_DOUBLE( p, d )  ( *( double * )( p ) = ( double ) ( d ) )
+#  elif defined( HB_BIG_ENDIAN )
+#     define HB_GET_LE_DOUBLE( p )     HB_GET_REV_DOUBLE( ( p ) )
+#     define HB_PUT_LE_DOUBLE( p, d )  HB_PUT_REV_DOUBLE( ( p ), ( d ) )
+#  endif
+
+#endif
 
 /* Now the rest of endian macros */
 #if defined( HB_STRICT_ALIGNMENT ) || !defined( HB_LITTLE_ENDIAN )
@@ -740,6 +848,7 @@ typedef long HB_PTRDIFF;
    #define HB_USHORT_TO_LE( w )     HB_USHORT_FROM_LE( w )
    #define HB_ULONG_TO_LE( l )      HB_ULONG_FROM_LE( l )
 
+#  ifndef HB_FORCE_IEEE754_DOUBLE
    #define HB_ORD2DBL( o, d )       do { \
       if ( ( ( BYTE * ) ( o ) )[ 0 ] & 0x80 ) { \
          ( ( BYTE * ) ( d ) )[ 0 ] = ( ( BYTE * ) ( o ) )[ 0 ]; \
@@ -781,66 +890,7 @@ typedef long HB_PTRDIFF;
          ( ( BYTE * ) ( o ) )[ 6 ] = ( ( BYTE * ) ( d ) )[ 6 ] ^ ( BYTE ) 0xFF; \
          ( ( BYTE * ) ( o ) )[ 7 ] = ( ( BYTE * ) ( d ) )[ 7 ] ^ ( BYTE ) 0xFF; \
       } } while ( 0 )
-
-/*
-   #define HB_ORD2DBL( o, d )       do { \
-         *( double * )( d ) = *( double * )( o ); \
-         if ( ( ( BYTE * ) ( d ) )[ 0 ] & 0x80 ) { \
-            ( ( BYTE * ) ( d ) )[ 0 ] ^= 0x80; \
-         } else { \
-            ( ( UINT32 * ) ( d ) )[ 0 ] ^= 0xFFFFFFFFL; \
-            ( ( UINT32 * ) ( d ) )[ 1 ] ^= 0xFFFFFFFFL; \
-         } } while ( 0 )
-   #define HB_DBL2ORD( d, o )       do { \
-         *( double * )( o ) = *( double * )( d ); \
-         if ( *( double * )( o ) >= 0.0 ) { \
-            ( ( BYTE * ) ( o ) )[ 0 ] ^= 0x80; \
-         } else { \
-            ( ( UINT32 * ) ( o ) )[ 0 ] ^= 0xFFFFFFFFL; \
-            ( ( UINT32 * ) ( o ) )[ 1 ] ^= 0xFFFFFFFFL; \
-         } } while ( 0 )
-*/
-
-#if defined( __GNUC__ )
-/* Be careful with double conversion. Some machines can use mixed form
-   (Little/Big) for BYTE ORDER and WORD ORDER or even completely differ
-   internal representation */
-
-   #define HB_GET_LE_DOUBLE( p )    \
-       ( { \
-            union { \
-               double dbl; \
-               BYTE buffer[ 8 ]; \
-            } u; \
-            u.buffer[ 0 ] = (( BYTE * )( p ))[ 7 ]; \
-            u.buffer[ 1 ] = (( BYTE * )( p ))[ 6 ]; \
-            u.buffer[ 2 ] = (( BYTE * )( p ))[ 5 ]; \
-            u.buffer[ 3 ] = (( BYTE * )( p ))[ 4 ]; \
-            u.buffer[ 4 ] = (( BYTE * )( p ))[ 3 ]; \
-            u.buffer[ 5 ] = (( BYTE * )( p ))[ 2 ]; \
-            u.buffer[ 6 ] = (( BYTE * )( p ))[ 1 ]; \
-            u.buffer[ 7 ] = (( BYTE * )( p ))[ 0 ]; \
-            u.dbl; \
-         } )
-   #define HB_PUT_LE_DOUBLE( p, d )    \
-         do { \
-            union { \
-               double dbl; \
-               BYTE buffer[ 8 ]; \
-            } u; \
-            u.dbl = ( d ); \
-            (( BYTE * )( p ))[ 7 ] = u.buffer[ 0 ]; \
-            (( BYTE * )( p ))[ 6 ] = u.buffer[ 1 ]; \
-            (( BYTE * )( p ))[ 5 ] = u.buffer[ 2 ]; \
-            (( BYTE * )( p ))[ 4 ] = u.buffer[ 3 ]; \
-            (( BYTE * )( p ))[ 3 ] = u.buffer[ 4 ]; \
-            (( BYTE * )( p ))[ 2 ] = u.buffer[ 5 ]; \
-            (( BYTE * )( p ))[ 1 ] = u.buffer[ 6 ]; \
-            (( BYTE * )( p ))[ 0 ] = u.buffer[ 7 ]; \
-         } while ( 0 )
-#else
-   #error Little-Endian IEEE 754 double type conversion unimplemented with a non-GCC compiler
-#endif
+#  endif
 
 #else /* HB_LITTLE_ENDIAN */
       /* We use Little-Endian here */
@@ -856,14 +906,12 @@ typedef long HB_PTRDIFF;
 
 #  endif
 
-   #define HB_GET_LE_DOUBLE( p )    ( *( double * )( p ) )
-   #define HB_PUT_LE_DOUBLE( p, d ) ( *( double * )( p ) = ( double ) ( d ) )
-
    #define HB_USHORT_FROM_LE( w )   ( ( USHORT )( w ) )
    #define HB_ULONG_FROM_LE( l )    ( ( ULONG )( l ) )
    #define HB_USHORT_TO_LE( w )     ( ( USHORT )( w ) )
    #define HB_ULONG_TO_LE( l )      ( ( ULONG )( l ) )
 
+#  ifndef HB_FORCE_IEEE754_DOUBLE
    #define HB_ORD2DBL( o, d )       do { \
       if ( ( ( BYTE * ) ( o ) )[ 0 ] & 0x80 ) { \
          ( ( BYTE * ) ( d ) )[ 0 ] = ( ( BYTE * ) ( o ) )[ 7 ]; \
@@ -905,6 +953,7 @@ typedef long HB_PTRDIFF;
          ( ( BYTE * ) ( o ) )[ 6 ] = ( ( BYTE * ) ( d ) )[ 1 ] ^ ( BYTE ) 0xFF; \
          ( ( BYTE * ) ( o ) )[ 7 ] = ( ( BYTE * ) ( d ) )[ 0 ] ^ ( BYTE ) 0xFF; \
       } } while ( 0 )
+#  endif
 
 #endif
 
@@ -934,22 +983,17 @@ typedef long HB_PTRDIFF;
    #undef HB_PCODE_MKLONGLONG
    #undef HB_PCODE_MKULONGLONG
    #undef HB_DBL_LIM_INT64
-   #define UINT64_MAXDBL            ( (( double ) UINT32_MAX + 1.0) * (( double ) UINT32_MAX + 1.0) - 1 )
-   #define HB_GET_LE_INT64( p )     ( ( double ) HB_GET_LE_UINT32( p ) + \
-                                      ( double ) HB_GET_LE_UINT32( p + 4 ) * UINT32_MAX - \
-                                      ((( BYTE * )( p ))[7] & 0x80 ? UINT64_MAXDBL : 0 ) )
-   #define HB_GET_LE_UINT64( p )    ( ( double ) HB_GET_LE_UINT32( p ) + \
-                                      ( double ) HB_GET_LE_UINT32( p + 4 ) * UINT32_MAX )
-   #define HB_PUT_LE_UINT64( p, w ) do { \
-                                       double _d = ( double ) ( w ); \
-                                       if ( _d < 0 ) \
-                                          _d += UINT64_MAXDBL; \
-                                       HB_PUT_LE_UINT32( p, ( UINT32 ) _d ); \
-                                       HB_PUT_LE_UINT32( p + 4, ( UINT32 ) ( _d / ( double ) UINT32_MAX ) ); \
-                                    } while ( 0 )
+   #define UINT64_MAXDBL               ( (( double ) UINT32_MAX + 1.0) * \
+                                         (( double ) UINT32_MAX + 1.0) - 1.0 )
+   #define HB_GET_LE_INT64( p )        hb_get_le_int64( ( BYTE * ) ( p ) )
+   #define HB_GET_LE_UINT64( p )       hb_get_le_uint64( ( BYTE * ) ( p ) )
+   #define HB_PUT_LE_UINT64( p, d )    hb_put_le_uint64( ( BYTE * ) ( p ), \
+                                                         ( double ) ( d ) )
    #define HB_PCODE_MKLONGLONG( p )    (( double ) HB_GET_LE_INT64( p ))
    #define HB_PCODE_MKULONGLONG( p )   (( double ) HB_GET_LE_UINT64( p ))
-   #define HB_DBL_LIM_INT64(d)      ( (HB_MAXDBL) -UINT64_MAXDBL / 2 - 1 <= (HB_MAXDBL) (d) && (HB_MAXDBL) (d) <= (HB_MAXDBL) UINT64_MAXDBL / 2 )
+   #define HB_DBL_LIM_INT64(d)         ( (HB_MAXDBL) -UINT64_MAXDBL / 2 - 1 <= \
+                                         (HB_MAXDBL) (d) && (HB_MAXDBL) (d) <= \
+                                         (HB_MAXDBL) UINT64_MAXDBL / 2 )
 #endif
 
 #define HB_MACRO2STRING( macro )    HB_MACRO2STRING_( macro )

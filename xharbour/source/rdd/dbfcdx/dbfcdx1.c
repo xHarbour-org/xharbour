@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.206 2005/05/30 17:32:12 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.207 2005/06/01 18:24:52 druzus Exp $
  */
 
 /*
@@ -4908,7 +4908,7 @@ static void hb_cdxCreateFName( CDXAREAP pArea, char * szBagName,
                                char * szFileName, char * szBaseName )
 {
    PHB_FNAME pFileName;
-   BOOL fName = szBagName && strlen( szBagName ) > 0;
+   BOOL fName = szBagName && *szBagName;
    char * szExt = NULL;
 
    pFileName = hb_fsFNameSplit( fName ? szBagName : pArea->szDataFileName );
@@ -6012,7 +6012,7 @@ static BOOL hb_cdxDBOIFindRec( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulRecNo, BOO
 
    if ( pTag && ulRecNo )
    {
-      if( fCont && pArea->lpdbPendingRel && pArea->lpdbPendingRel->isScoped )
+      if( pArea->lpdbPendingRel && pArea->lpdbPendingRel->isScoped )
          SELF_FORCEREL( ( AREAP ) pArea );
 
       hb_cdxIndexLockRead( pTag->pIndex );
@@ -6699,13 +6699,12 @@ static ERRCODE hb_cdxOpen( CDXAREAP pArea, LPDBOPENINFO pOpenInfo )
          {
             pOrderInfo.itmOrder  = hb_itemPutNI( NULL, hb_set.HB_SET_AUTORDER );
             errCode = SELF_ORDLSTFOCUS( ( AREAP ) pArea, &pOrderInfo );
+            if( errCode == SUCCESS )
+               errCode = SELF_GOTOP( ( AREAP ) pArea );
          }
          hb_itemRelease( pOrderInfo.atomBagName );
          hb_itemRelease( pOrderInfo.itmOrder );
          hb_itemRelease( pOrderInfo.itmResult );
-
-         if( errCode == SUCCESS )
-            errCode = SELF_GOTOP( ( AREAP ) pArea );
       }
       else
       {
@@ -6823,30 +6822,20 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
    hb_cdxCreateFName( pArea, hb_itemGetCPtr( pOrderInfo->atomBagName ),
                       szFileName, szBaseName );
 
-   if ( strlen( szBaseName ) == 0 )
+   if ( ! szBaseName[0] )
       return FAILURE;
 
-   if ( pArea->lpIndexes != NULL )
+   pIndex = hb_cdxFindBag( pArea, szFileName );
+
+   if ( pIndex )
    {
-      pIndex = pArea->lpIndexes;
-      while ( pIndex && ( hb_stricmp( szBaseName, pIndex->pCompound->szName ) != 0 ) )
-         pIndex = pIndex->pNext;
-      if ( pIndex )
+       /* index already open, do nothing */
+      if ( ! pArea->uiTag )
       {
-         /*
-          * index already open, do nothing
-          * TODO: the full pathname should be compared when APIs are available
-          *       ??? I'm not sure, it breaks upper lewel API if we have
-          *       two Bags with the same name. But we can close the old bag
-          *       and open the new one - 10/05/2003 Druzus
-          */
-         if ( ! pArea->uiTag )
-         {
-            pArea->uiTag = hb_cdxGetTagNumber( pArea, pIndex->TagList );
-            SELF_GOTOP( ( AREAP ) pArea );
-         }
-         return FAILURE;
+         pArea->uiTag = hb_cdxGetTagNumber( pArea, pIndex->TagList );
+         SELF_GOTOP( ( AREAP ) pArea );
       }
+      return SUCCESS;
    }
 
    uiFlags = ( pArea->fReadonly ? FO_READ : FO_READWRITE ) |
@@ -6860,7 +6849,7 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
                                    hb_fsError(), EF_CANRETRY | EF_CANDEFAULT ) == E_RETRY );
       else
       {
-         if ( hb_fsSeekLarge( hFile, 0, FS_END ) <= sizeof( CDXTAGHEADER ) )
+         if ( hb_fsSeekLarge( hFile, 0, FS_END ) <= ( HB_FOFFSET ) sizeof( CDXTAGHEADER ) )
          {
             hb_fsClose( hFile );
             hFile = FS_ERROR;
@@ -7146,7 +7135,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    hb_cdxCreateFName( pArea, ( char * ) pOrderInfo->abBagName,
                       szFileName, szCpndTagName );
 
-   if ( pOrderInfo->atomBagName && strlen( ( char * ) pOrderInfo->atomBagName ) > 0 )
+   if ( pOrderInfo->atomBagName && pOrderInfo->atomBagName[0] )
    {
       hb_strncpyUpperTrim( szTagName, ( char * ) pOrderInfo->atomBagName, CDX_MAXTAGNAMELEN );
       fNewFile = FALSE;
@@ -7225,7 +7214,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          {
             /* TODO: check if index file is not corrupted */
             /* cut corrupted files */
-            fNewFile = ( hb_fsSeekLarge( hFile, 0, FS_END ) <= sizeof( CDXTAGHEADER ) );
+            fNewFile = ( hb_fsSeekLarge( hFile, 0, FS_END ) <= ( HB_FOFFSET ) sizeof( CDXTAGHEADER ) );
          }
          if ( !fNewFile )
          {

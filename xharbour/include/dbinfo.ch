@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.13 2005/04/19 18:49:56 druzus Exp $
+ * $Id: dbinfo.ch,v 1.14 2005/05/04 11:39:51 druzus Exp $
  */
 
 /*
@@ -124,6 +124,22 @@
 #define DBOI_EVALSTEP            109  /* eval step (EVERY) used in index command */
 #define DBOI_SCOPESET            110  /* set both scopes */
 #define DBOI_SCOPECLEAR          111  /* clear both scopes */
+
+#define DBOI_BAGCOUNT            112  /* number of open order bags */
+#define DBOI_BAGNUMBER           113  /* bag position in bag list */
+#define DBOI_ISMULTITAG          114  /* does RDD support multi tag in index file */
+#define DBOI_ISSORTRECNO         115  /* is record number part of key in sorting */
+#define DBOI_LARGEFILE           116  /* is large file size (>=4GB) supported */
+#define DBOI_FREEZE              117  /* freeze order updating */
+#define DBOI_WARM                118  /* restore order updating */
+#define DBOI_CHGONLY             119  /* update only existing keys */
+#define DBOI_SHARED              120  /* is index open in shared mode */
+#define DBOI_ISREADONLY          121  /* is index open in readonly mode */
+
+#define DBOI_WRITELOCK           122  /* get/set index write lock */
+#define DBOI_READLOCK            123  /* get/set index read lock */
+
+#define DBOI_UPDATECOUNTER       124  /* get/set update index counter */
 
 /* Return values for DBOI_OPTLEVEL */
 #define DBOI_OPTIMIZED_NONE       0

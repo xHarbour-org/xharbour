@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.162 2005/04/23 06:52:17 guerra000 Exp $
+ * $Id: hbapi.h,v 1.163 2005/05/09 10:04:05 druzus Exp $
  */
 
 /*
@@ -461,6 +461,8 @@ extern int      HB_EXPORT hb_stricmp( const char * s1, const char * s2 ); /* com
 extern int      HB_EXPORT hb_strnicmp( const char * s1, const char * s2, ULONG ulLen ); /* compare two string without regards to case, limited by length */
 extern char     HB_EXPORT * hb_strupr( char * pszText ); /* convert a string in-place to upper-case */
 extern char     HB_EXPORT * hb_strdup( const char * pszText ); /* returns a pointer to a newly allocated copy of the source string */
+extern char     HB_EXPORT * hb_strndup( const char * pszText, ULONG ulLen ); /* returns a pointer to a newly allocated copy of the source string not longer then ulLen */
+extern ULONG    HB_EXPORT hb_strnlen( const char * pszText, ULONG ulLen ); /* like strlen() but result is limited to ulLen */
 extern char     HB_EXPORT * hb_xstrcat( char *dest, const char *src, ... ); /* Concatenates multiple strings into a single result */
 extern char     HB_EXPORT * hb_xstrcpy( char *szDest, const char *szSrc, ...); /* Concatenates multiple strings into a single result */
 extern BOOL     HB_EXPORT hb_compStrToNum( const char* szNum, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth );  /* converts string to number, sets iDec, iWidth and returns TRUE if results is double, used by compiler */
@@ -489,6 +491,18 @@ extern ULONG    HB_EXPORT hb_strRTrimLen( const char * szText, ULONG ulLen, BOOL
 extern double   HB_EXPORT hb_numRound( double dResult, int iDec ); /* round a number to a specific number of digits */
 extern double   HB_EXPORT hb_numInt( double dNum ); /* take the integer part of the number */
 
+/* architecture dependent number conversions */
+extern void     HB_EXPORT hb_put_ieee754( BYTE * ptr, double d );
+extern double   HB_EXPORT hb_get_ieee754( BYTE * ptr );
+extern void     HB_EXPORT hb_put_ord_ieee754( BYTE * ptr, double d );
+extern double   HB_EXPORT hb_get_ord_ieee754( BYTE * ptr );
+extern double   HB_EXPORT hb_get_rev_double( BYTE * ptr );
+extern double   HB_EXPORT hb_get_std_double( BYTE * ptr );
+#if defined( HB_LONG_LONG_OFF )
+   extern double   HB_EXPORT hb_get_le_int64( BYTE * ptr );
+   extern double   HB_EXPORT hb_get_le_uint64( BYTE * ptr );
+   extern void     HB_EXPORT hb_put_le_uint64( BYTE * ptr, double d );
+#endif
 
 /* class management */
 extern HB_EXPORT BOOL     hb_clsIsParent( USHORT uiClass, char * szParentName ); /* is a class handle inherited from szParentName Class ? */
