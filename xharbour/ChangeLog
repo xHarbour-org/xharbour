@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4186 2005/06/21 20:19:15 druzus Exp $
+ * $Id: ChangeLog,v 1.4187 2005/06/22 12:26:50 druzus Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-06-23 22:50 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * xharbour/source/tip/ftpcln.prg
+    ! fixed GetReply() method  
 
 2005-06-22 13:35 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/config/linux/gcc.cf

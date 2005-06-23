@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.5 2005/04/14 19:16:06 gdrouillard Exp $
+ * $Id: ftpcln.prg,v 1.6 2005/04/30 15:14:29 lculik Exp $
  */
 
 /*
@@ -143,26 +143,30 @@ METHOD Open() CLASS tIPClientFTP
       ENDIF
    ENDIF
 RETURN .F.
+
 METHOD GetReply() CLASS tIPClientFTP
    LOCAL nLen
-   LOCAL cRep := ""
+   LOCAL cRep
 
    ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 128 )
-   ::cReply := cRep
+   
+   cRep := ::cReply
+   
+   IF cRep == NIL
+      RETURN .F.
+   ENDIF
+
+   // now, if the reply has a '-' as fourth character, we need to proceed...
    DO WHILE .not. Empty(cRep) .and. cRep[4] == '-'
+      ::cReplay := ::InetRecvLine( ::SocketCon, @nLen, 128 )
+      cRep += IIf(ValType(::cReply) == "C", ::cReply, "")
+   ENDDO
 
-      cRep := ::InetRecvLine( ::SocketCon, @nLen, 128 )
-     ::cReply += IIf(ValType(cRep) == "C", cRep, "")
-
-   enddo
-
-// 4 and 5 are error codes
-//RETURN !(Empty(::cReply) .Or. (InetErrorCode( ::SocketCon ) != 0) .or.(::cReply[1] >= '4'))
+   // 4 and 5 are error codes
    IF ::InetErrorCode( ::SocketCon ) != 0 .or. ::cReply[1] >= '4'
       RETURN .F.
    ENDIF
 RETURN .T.
-
 
 METHOD Pasv() CLASS tIPClientFTP
    LOCAL aRep
