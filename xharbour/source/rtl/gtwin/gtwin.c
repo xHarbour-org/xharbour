@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.91 2005/04/19 18:49:59 druzus Exp $
+ * $Id: gtwin.c,v 1.92 2005/06/21 20:19:51 druzus Exp $
  */
 
 /*
@@ -1675,7 +1675,9 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                }
             }
          }
+         hb_idleState( FALSE );
       } while (altisdown);
+      hb_idleReset();
    }
 
    /* Only process one keyboard event at a time. */

@@ -1,10 +1,15 @@
- * $Id: ChangeLog,v 1.4187 2005/06/22 12:26:50 druzus Exp $
+ * $Id: ChangeLog,v 1.4188 2005/06/23 20:51:25 lf_sfnet Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-06-29 10:11 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/rtl/gtwin/gtwin.c
+    ! Added hb_idleState() call to prevent 100% CPU usage while Alt key is
+      down. Fix provided by Valery Belorustcev.
 
 2005-06-23 22:50 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/source/tip/ftpcln.prg
