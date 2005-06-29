@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.152 2005/05/09 18:35:01 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.155 2005/06/21 02:25:01 jabrecer Exp $
  */
 
 /*
@@ -3084,7 +3084,7 @@ static void gt_hbInitStatics( void )
 void HB_EXPORT hb_wvt_gtAddCharToInputQueue ( int data )
 {
   int iNextPos;
-  iNextPos = ( _s.keyPointerIn >= WVT_CHAR_QUEUE_SIZE ) ? 0 : _s.keyPointerIn+1 ;
+  iNextPos = ( _s.keyPointerIn >= WVT_CHAR_QUEUE_SIZE - 1 ) ? 0 : _s.keyPointerIn+1 ;
   if ( iNextPos != _s.keyPointerOut ) // Stop accepting characters once the buffer is full
   {
     _s.Keys[ _s.keyPointerIn ] = data ;
@@ -3099,7 +3099,7 @@ static BOOL hb_wvt_gtGetCharFromInputQueue ( int *c )
   int iNextPos;
   BOOL bRet = FALSE;
   *c = 0;
-  iNextPos = ( _s.keyPointerOut >= WVT_CHAR_QUEUE_SIZE ) ? 0 : _s.keyPointerOut+1 ;
+  iNextPos = ( _s.keyPointerOut >= WVT_CHAR_QUEUE_SIZE - 1 ) ? 0 : _s.keyPointerOut+1 ;
   if ( iNextPos != _s.keyPointerIn )  // No more events in queue ??
   {
     *c = _s.Keys[ iNextPos ] ;
