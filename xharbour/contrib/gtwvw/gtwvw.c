@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.16 2005/05/04 16:47:21 bdj Exp $
+ * $Id: gtwvw.c,v 1.17 2005/06/19 16:47:36 bdj Exp $
  */
 
 /*
@@ -4913,7 +4913,7 @@ void HB_EXPORT hb_wvw_gtAddCharToInputQueue ( int data )
 {
   int iNextPos;
 
-  iNextPos = ( s_pWindows[ s_usNumWindows-1 ]->keyPointerIn >= WVW_CHAR_QUEUE_SIZE ) ? 0 : s_pWindows[ s_usNumWindows-1 ]->keyPointerIn+1 ;
+  iNextPos = ( s_pWindows[ s_usNumWindows-1 ]->keyPointerIn >= WVW_CHAR_QUEUE_SIZE - 1 ) ? 0 : s_pWindows[ s_usNumWindows-1 ]->keyPointerIn+1 ;
   if ( iNextPos != s_pWindows[ s_usNumWindows-1 ]->keyPointerOut )
   {
     s_pWindows[ s_usNumWindows-1 ]->Keys[ s_pWindows[ s_usNumWindows-1 ]->keyPointerIn ] = data ;
@@ -4929,7 +4929,7 @@ static BOOL hb_wvw_gtGetCharFromInputQueue ( int *c )
   BOOL bRet = FALSE;
 
   *c = 0;
-  iNextPos = ( s_pWindows[ s_usNumWindows-1 ]->keyPointerOut >= WVW_CHAR_QUEUE_SIZE ) ? 0 : s_pWindows[ s_usNumWindows-1 ]->keyPointerOut+1 ;
+  iNextPos = ( s_pWindows[ s_usNumWindows-1 ]->keyPointerOut >= WVW_CHAR_QUEUE_SIZE - 1 ) ? 0 : s_pWindows[ s_usNumWindows-1 ]->keyPointerOut+1 ;
   if ( iNextPos != s_pWindows[ s_usNumWindows-1 ]->keyPointerIn )
   {
     *c = s_pWindows[ s_usNumWindows-1 ]->Keys[ iNextPos ] ;

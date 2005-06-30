@@ -1,10 +1,17 @@
- * $Id: ChangeLog,v 1.4189 2005/06/29 06:14:57 likewolf Exp $
+ * $Id: ChangeLog,v 1.4190 2005/06/29 21:40:35 peterrees Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-06-30 23:10 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+    ! Fix calculation of iNextPos in hb_wvw_gtAddCharToInputQueue()
+      and hb_wvw_gtGetCharFromInputQueue(). Resolves problem
+      reported of lost input characters.
+      Many Thanks to Peter Rees.
+
 2005-06-30 09:40 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/gtwvt/gtwvt/c
     * Fix calculation of iNextPos in hb_wvt_gtAddCharToInputQueue()
