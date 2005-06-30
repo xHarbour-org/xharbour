@@ -1,5 +1,5 @@
 /*
- * $Id: expropt2.c,v 1.9 2005/02/22 22:27:07 druzus Exp $
+ * $Id: expropt2.c,v 1.10 2005/05/13 21:27:27 walito Exp $
  */
 
 /*
@@ -238,7 +238,7 @@ HB_EXPR_PTR hb_compExprReduceMult( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
          {
             pSelf->value.asNum.dVal = pLeft->value.asNum.dVal * pRight->value.asNum.dVal;
             pSelf->value.asNum.bWidth = HB_DEFAULT_WIDTH;
-            if ( pLeft->value.asNum.bDec == HB_DEFAULT_DECIMALS || 
+            if ( pLeft->value.asNum.bDec == HB_DEFAULT_DECIMALS ||
                  pRight->value.asNum.bDec == HB_DEFAULT_DECIMALS )
                pSelf->value.asNum.bDec = HB_DEFAULT_DECIMALS;
             else
@@ -1277,20 +1277,28 @@ HB_EXPR_PTR hb_compExprListStrip( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
 {
    if( pSelf->ExprType == HB_ET_LIST )
    {
-      ULONG ulCount = hb_compExprListLen( pSelf );
-
-      if( ulCount == 1 && pSelf->value.asList.pExprList->ExprType <= HB_ET_VARIABLE )
+      if( hb_compExprListLen( pSelf ) == 1 )
       {
-         /* replace the list with a simple expression
-          *  ( EXPR ) -> EXPR
-         */
-         HB_EXPR_PTR pExpr = pSelf;
+         // Right recurse
+         if( pSelf->value.asList.pExprList->ExprType == HB_ET_LIST && hb_compExprListLen( pSelf->value.asList.pExprList ) == 1 )
+         {
+            pSelf->value.asList.pExprList = hb_compExprListStrip( pSelf->value.asList.pExprList, HB_MACRO_PARAM );
+         }
 
-         pSelf = pSelf->value.asList.pExprList;
-         pExpr->value.asList.pExprList = NULL;
-         hb_compExprFree( pExpr, HB_MACRO_PARAM );
+         if( pSelf->value.asList.pExprList->ExprType <= HB_ET_VARIABLE )
+         {
+            /* replace the list with a simple expression
+             *  ( EXPR ) -> EXPR
+             */
+            HB_EXPR_PTR pExpr = pSelf;
+
+            pSelf = pSelf->value.asList.pExprList;
+            pExpr->value.asList.pExprList = NULL;
+            hb_compExprFree( pExpr, HB_MACRO_PARAM );
+         }
       }
    }
+
    return pSelf;
 }
 

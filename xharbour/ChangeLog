@@ -1,10 +1,22 @@
- * $Id: ChangeLog,v 1.4190 2005/06/29 21:40:35 peterrees Exp $
+ * $Id: ChangeLog,v 1.4191 2005/06/30 16:09:25 bdj Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-06-30 16:50 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/common/expropt2.c
+    ! Fixed hb_compExprListStrip() to be right recursive.
+
+  * source/pp/pptable.c
+    + Added: #xtranslate _GET_( ( <x> ) => _GET_( <x>
+      /*
+         Parenthesis should have no significance in any valid LValue (if I'm not mistaken?)
+         so this corrects parse errors on @ x, y, GET ( exp )
+      */
+
 2005-06-30 23:10 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/gtwvw.c
     ! Fix calculation of iNextPos in hb_wvw_gtAddCharToInputQueue()
