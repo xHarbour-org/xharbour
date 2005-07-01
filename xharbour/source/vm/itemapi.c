@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.113 2005/04/06 14:48:14 snaiperis Exp $
+ * $Id: itemapi.c,v 1.114 2005/05/04 11:39:55 druzus Exp $
  */
 
 /*
@@ -1172,8 +1172,14 @@ PHB_ITEM HB_EXPORT hb_itemUnRefOnce( PHB_ITEM pItem )
                   Array.type = HB_IT_ARRAY;
                   Array.item.asArray.value = pItem->item.asRefer.BasePtr.pBaseArray;
 
-                  Index.type = HB_IT_LONG;
-                  Index.item.asLong.value = pItem->item.asRefer.value + 1;
+                  #ifdef HB_ARRAY_USE_COUNTER
+                     Array.item.asArray.value->ulHolders++;
+                  #else
+                      hb_arrayRegisterHolder( Array.item.asArray.value, (void *) &Array );
+                  #endif
+
+                  Index.type = HB_IT_NIL;
+                  hb_itemPutNL( &Index, pItem->item.asRefer.value + 1 );
 
                   hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, &Array, &Index );
                }
