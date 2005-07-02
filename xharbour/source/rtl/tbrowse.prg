@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.104 2005/04/01 06:09:49 guerra000 Exp $
+ * $Id: tbrowse.prg,v 1.105 2005/05/02 17:05:06 gdrouillard Exp $
  */
 
 /*
@@ -104,7 +104,11 @@
 #define o_SepWidth        9   // Width of the Separator
 #define o_DefColor       10   // Array with index of color
 #define o_SetWidth       11   // If True, only SetFrozen can change o_Width
+/* 02/july/2005 - <maurilio.longo@libero.it>
+                  removed, not really needed, but still present inside ::aColsInfo,
+                  as a NIL value
 #define o_Blank          12   // Spaces corresponding to o_Width
+*/
 #define o_lColSep        13   // Should column separator be drawn
 #define o_ScrColPos      14   // Temporary column position on screen
 
@@ -508,7 +512,6 @@ METHOD Configure( nMode ) CLASS TBrowse
             aCol[ o_Pict ] := '@D'
          endif
 
-         aCol[ o_Blank ]   := space( aCol[ o_Width ] )
          aCol[ o_lColSep ] := aCol[ o_Width ] > 0
       endif
 
@@ -676,9 +679,9 @@ METHOD AColInfo( oCol,lAdd ) CLASS Tbrowse
 
    if ! lAdd  .and. HB_ISOBJECT( oCol ) .and. ( valtype( oCol:block ) == 'B' )
       aCol := { oCol, valtype( Eval( oCol:block )), ::SetColumnWidth( oCol ),;
-                '', '', '', 0, '', 0, oCol:DefColor, .f., '', .t., 0 }
+                '', '', '', 0, '', 0, oCol:DefColor, .f., NIL, .t., 0 }
    else
-      aCol := { oCol, '', 0, '', '', '', 0, '', 0, {}, .f., '', .t., 0 }
+      aCol := { oCol, '', 0, '', '', '', 0, '', 0, {}, .f., NIL, .t., 0 }
    endif
 
    Return aCol
@@ -2085,6 +2088,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
    LOCAL nCol, nRow2Fill, nLeftColPos
    LOCAL nRowsToSkip, nSkipped
    LOCAL lAllRows
+   LOCAL cColBlanks                 // Enough Space()s to fill a column
 
    colorSpec  := ::aColorSpec[ 1 ]
    nColFrom   := iif( ::nFrozenCols > 0, 1, ::leftVisible )
@@ -2199,11 +2203,13 @@ METHOD DrawARow( nRow ) CLASS TBrowse
                nCol := ::leftVisible
             endif
 
+            cColBlanks := Space( ::aColsInfo[ nCol, o_Width ] )
+
             // Let's find column color once per column
             if ::aColsInfo[ nCol, o_Obj ]:ColorBlock == NIL
                cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aColsInfo[ nCol, o_DefColor ], TBC_CLR_STANDARD ) - 1 )
             else
-               cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( Eval( ::aColsInfo[ nCol, o_Obj ]:ColorBlock, ::aColsInfo[ nCol, o_Blank ] ), TBC_CLR_STANDARD ) - 1 )
+               cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( Eval( ::aColsInfo[ nCol, o_Obj ]:ColorBlock, cColBlanks ), TBC_CLR_STANDARD ) - 1 )
             endif
 
             // Paint all remainig rows up to ::rowcount
@@ -2217,7 +2223,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
                      DevPos(nRow2Fill + ::nRowData, nLeftColPos)
                   endif
 
-                  DispOut( ::aColsInfo[ nCol,o_Blank ], cColor )
+                  DispOut( cColBlanks, cColor )
 
                   if nCol < ::rightVisible .and. ::aColsInfo[ nCol,o_lColSep ]
                      DispOut( ::aColsInfo[ nCol + 1, o_ColSep ], ColorSpec )
@@ -2230,7 +2236,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
                      DevPos( nRow2Fill + ::nRowData, nLeftColPos )
                   endif
 
-                  DispOut( ::aColsInfo[ nCol, o_Blank ], cColor )
+                  DispOut( cColBlanks, cColor )
 
                   if nCol < ::rightVisible .and. ::aColsInfo[ nCol,o_lColSep ]
                      DispOut( ::aColsInfo[ nCol + 1, o_ColSep ], ColorSpec )

@@ -1,10 +1,16 @@
- * $Id: ChangeLog,v 1.4192 2005/06/30 23:51:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4193 2005/07/01 03:34:09 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-07-02 12:06 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/tbrowse.prg
+    ! removed o_Blank item inside ::aColsInfo, it was needed only in one
+      place inside code and was not correclty updated in many places where
+      it should have been.
 
 2005-06-30 20:33 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/itemapi.c
