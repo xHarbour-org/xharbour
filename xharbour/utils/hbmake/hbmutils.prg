@@ -1,5 +1,5 @@
 /*
- * $Id: hbmutils.prg,v 1.42 2005/06/15 00:00:00 modalsist Exp $
+ * $Id: hbmutils.prg,v 1.43 2005/07/02 18:30:00 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -232,21 +232,25 @@ RETURN ( aDir )
 FUNCTION GetHarbourDir()
 *-----------------------
 
-   LOCAL cPath   := ''
-   LOCAL cEnv    := GETE( "PATH" )
-   LOCAL aEnv    := HB_ATokens( cEnv, ";" )
-   LOCAL nPos
-   LOCAL cCurEnv := ""
+    LOCAL cPath   := ''
+    LOCAL cEnv    := GETE( "PATH" )
+    LOCAL lLinux  := "LINUX" in upper(OS())
+    LOCAL aEnv    := HB_ATokens( cEnv, iif(lLinux,":",";") )
+    LOCAL cCurEnv := ""
+    LOCAL cBar    := iif( lLinux, "/" , "\" )
+    LOCAL HBSTRG  := ""
 
-   FOR EACH cCurEnv IN aEnv
+    hbstrg := IIF ( lLinux,  "harbour" , "harbour.exe" )
 
-      IF FILE( cCurEnv + '\harbour.exe' ) .OR. FILE( UPPER( cCurEnv ) + '\HARBOUR.EXE' )
-         cPath := cCurEnv
-         cPath := LEFT( cPath, RAT( '\', cPath ) - 1 )
-         EXIT
-      ENDIF
+    FOR EACH cCurEnv IN aEnv
 
-   NEXT
+        IF FILE( cCurEnv + cBar + hbstrg ) .OR. FILE( UPPER( cCurEnv ) + cBar + upper(hbstrg) )
+           cPath := cCurEnv
+           cPath := LEFT( cPath, RAT( cBar, cPath ) - 1 )
+           EXIT
+        ENDIF
+
+    NEXT
 
 RETURN cPath
 
@@ -257,7 +261,6 @@ FUNCTION GetBccDir()
    LOCAL cPath   := ''
    LOCAL cEnv    := GETE( "PATH" )
    LOCAL aEnv    := HB_ATokens( cEnv, ";" )
-   LOCAL nPos
    LOCAL cCurEnv := ""
 
    FOR EACH cCurEnv IN aEnv
@@ -279,7 +282,6 @@ FUNCTION GetVccDir()
    LOCAL cPath   := ''
    LOCAL cEnv    := GETE( "PATH" )
    LOCAL aEnv    := HB_ATokens( cEnv, ";" )
-   LOCAL nPos
    LOCAL cCurEnv := ""
 
    FOR EACH cCurEnv IN aEnv
@@ -301,7 +303,6 @@ FUNCTION GetPccDir()
    LOCAL cPath   := ''
    LOCAL cEnv    := GETE( "PATH" )
    LOCAL aEnv    := HB_ATokens( cEnv, ";" )
-   LOCAL nPos
    LOCAL cCurEnv := ""
 
    FOR EACH cCurEnv IN aEnv

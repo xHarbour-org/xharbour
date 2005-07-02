@@ -1,10 +1,15 @@
- * $Id: ChangeLog,v 1.4193 2005/07/01 03:34:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4195 2005/07/02 18:30:00 modalsist Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-07-02 18:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * utils/hbmake/hbmutils.prg
+    ! fixed GetHarbourDir() function that was not working in Linux.
+      Thanks to Itamar M. Lins by help.
 
 2005-07-02 12:06 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/tbrowse.prg
