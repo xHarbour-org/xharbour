@@ -1,5 +1,5 @@
 /*
- * $Id: set.ch,v 1.16 2004/09/06 19:25:52 mlombardo Exp $
+ * $Id: set.ch,v 1.17 2005/03/06 23:43:20 andijahja Exp $
  */
 
 /*
@@ -136,6 +136,6 @@
 #define _SET_ERRORLOG        119 /* Harbour extension */
 
 #define HB_SET_BASE        100
-#define HB_SET_COUNT       15
+#define HB_SET_COUNT       20
 
 #endif /* _SET_CH */
