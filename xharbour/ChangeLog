@@ -1,10 +1,18 @@
- * $Id: ChangeLog,v 1.4196 2005/07/04 12:19:26 likewolf Exp $
+ * $Id: ChangeLog,v 1.4198 2005/07/05 15:40:00 modalsist Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-07-05 15:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * utils/hbmake/hbmake.prg
+    * version 1.146. Changed to clean the *.map and *.tds map files after
+      compiling, if you use Borland C/C++. Changed *.out log filename to
+      *.log for better knowledge. If you disable "generate pre-processed
+      output file /p" option, the hbmake will erase all *.ppo files after
+      compiling.
 
 2005-07-05 12:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/rtl/gtwin/gtwin.c
