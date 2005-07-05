@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.92 2005/06/21 20:19:51 druzus Exp $
+ * $Id: gtwin.c,v 1.93 2005/06/29 06:15:03 likewolf Exp $
  */
 
 /*
@@ -1556,6 +1556,9 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
       int altnum = 0;
 
       /* Check for keyboard input */
+      /* FIXME: This altisdown loop gives us 100% CPU usage when Alt key is
+       * down. Przemek suggests to handle Alt-NumPad in separate gt_ReadKey()
+       * calls to resolve it. */
       do
       {
          s_cNumRead = 0;
@@ -1675,9 +1678,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                }
             }
          }
-         hb_idleState( FALSE );
       } while (altisdown);
-      hb_idleReset();
    }
 
    /* Only process one keyboard event at a time. */
