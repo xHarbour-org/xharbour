@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.36 2005/03/12 19:17:37 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.37 2005/05/21 14:48:38 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -315,15 +315,15 @@ METHOD TableStruct( cTable ) CLASS TPQserver
                     nSize := 15
                 endif
 
-            elseif 'real' $ cType 
+            elseif 'real' $ cType .or. 'float4' $ cType 
                 cType := 'N'
                 nSize := 15
                 nDec  :=  4
                 
-            elseif 'double precision' $ cType
+            elseif 'double precision' $ cType .or. 'float8' $ cType 
                 cType := 'N'
-                nSize := 15
-                nDec  := 8
+                nSize := 19
+                nDec  := 9
                 
             elseif 'money' $ cType               
                 cType := 'N'
@@ -629,15 +629,15 @@ METHOD Refresh(lQuery) CLASS TPQquery
                         nSize := 15
                     endif        
         
-                elseif 'real' $ cType 
+                elseif 'real' $ cType .or. 'float4' $ cType 
                     cType := 'N'
                     nSize := 15
                     nDec  :=  4
                 
-                elseif 'double precision' $ cType
+                elseif 'double precision' $ cType .or. 'float8' $ cType 
                     cType := 'N'
-                    nSize := 15
-                    nDec  := 8
+                    nSize := 19
+                    nDec  := 9
                 
                 elseif 'money' $ cType               
                     cType := 'N'
