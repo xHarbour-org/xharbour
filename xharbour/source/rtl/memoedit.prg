@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.32 2005/04/29 14:23:45 gdrouillard Exp $
+ * $Id: memoedit.prg,v 1.33 2005/06/16 23:38:15 peterrees Exp $
  */
 
 /*
@@ -421,7 +421,7 @@ FUNCTION MemoEdit(cString,;
    if ! ISLOGICAL( cUserFunction ) .OR. cUserFunction == .T.
       oEd:Edit()
       if oEd:lSaved
-         cString := oEd:GetText()
+         cString := oEd:GetText( .T. )  // Clipper inserts Soft CR
       endif
    endif
 

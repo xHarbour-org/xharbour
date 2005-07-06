@@ -1,10 +1,18 @@
- * $Id: ChangeLog,v 1.4198 2005/07/05 15:40:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.4198 2005/07/05 18:57:07 modalsist Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-07-07 09:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/teditor.prg
+    * ::GetText( lSoftCR ) method accepts parameter so Soft CR
+        can be inserted in returned text
+  * source/rtl/memoedit.prg
+    * make the return value of memoedit() function Clipper
+      compatible by inserting Soft CR characters.
+
 
 2005-07-05 15:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils/hbmake/hbmake.prg

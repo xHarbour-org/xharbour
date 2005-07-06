@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.60 2005/04/01 02:02:40 guerra000 Exp $
+/* $Id: teditor.prg,v 1.62 2005/05/04 19:13:16 gdrouillard Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.60 2005/04/01 02:02:40 guerra000 Exp $
+/* $Id: teditor.prg,v 1.62 2005/05/04 19:13:16 gdrouillard Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -165,7 +165,7 @@ CLASS HBEditor
    METHOD  GotoLine( nRow )                                 // Put line nRow at cursor position
    METHOD  GotoCol( nCol )                                  // Put line nCol at cursor position
    METHOD  GotoPos( nRow, nCol, lForceRefresh )
-   METHOD  GetText()                                        // Returns aText as a string ( for MemoEdit() )
+   METHOD  GetText( lSoftCR )                               // Returns aText as a string ( for MemoEdit() )
    METHOD  DelText()                                        // Clear aText
    METHOD  AddText( cString )                               // Add text at the cursor
    METHOD  GetTextIndex()                                   // Return current cursor position in text.
@@ -1740,13 +1740,16 @@ return Self
 //
 // Converts an array of text lines to a String
 //
-METHOD GetText() CLASS HBEditor
+METHOD GetText( lSoftCr ) CLASS HBEditor
 
-   LOCAL cString := ""
+   LOCAL cString := "", cSoft:= ""
    LOCAL cEOL := HB_OSNewLine()
-
+   DEFAULT lSoftCr TO .F.
+   if lSoftCr
+      cSoft:= CHR( 141 ) + CHR( 10 )
+   endif
    if ::lWordWrap
-      AEval( ::aText, {| cItem | cString += cItem:cText + iif( cItem:lSoftCR, "", cEOL )},,::naTextLen - 1)
+      AEval( ::aText, {| cItem | cString += cItem:cText + iif( cItem:lSoftCR, cSoft, cEOL )},,::naTextLen - 1)
    else
       AEval( ::aText, {| cItem | cString += cItem:cText + cEOL},, ::naTextLen - 1)
    endif
