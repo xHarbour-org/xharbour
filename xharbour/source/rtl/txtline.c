@@ -1,5 +1,5 @@
 /*
- * $Id: txtline.c,v 1.2 2004/09/30 14:16:29 mlombardo Exp $
+ * $Id: txtline.c,v 1.3 2005/03/31 03:58:52 druzus Exp $
  */
 
 /*
@@ -328,10 +328,10 @@ HB_FUNC( MLCOUNT )
    {
       hb_readLine( pszString+ulStartOffset, ulTextLen - ulStartOffset, ulLineSize, uiTabLen, bWrap, Term, iTermSizes, uiTerms, &bFound, &bEOF, &lEnd, &ulEndOffset );
       ulStartOffset += ulEndOffset;
-      if( !((!bFound) &&  bEOF && lEnd == -1L ) )   
-      { 
+      if( !((!bFound) &&  bEOF && lEnd == -1L ) )
+      {
          ulLines++;
-      } 
+      }
    }
 
    if( ulCurLength > 0 )
@@ -355,7 +355,7 @@ HB_FUNC( MEMOLINE )
    BOOL  bLongLines    = ISLOG( 6 ) ? hb_parl( 6 ) : 0;
    ULONG ulTextLen     = hb_parclen( 1 );
    ULONG ulLines       = 0;
-   ULONG ulStartOffset = 0;
+   ULONG ulStartOffset = ISNUM( 7 ) ? hb_parnl( 7 ) : 0;
    ULONG ulEndOffset;
    LONG lEnd;
    BOOL bFound, bEOF = FALSE, bLineFound = FALSE;
@@ -364,8 +364,11 @@ HB_FUNC( MEMOLINE )
    int * iTermSizes;
    HB_ITEM Opt;
    PHB_ITEM pTerm1;
-   char * szRet; 
-
+   char * szRet;
+   if ( ulStartOffset > 0 )
+   {
+       ulStartOffset-- ;     // Convert to "C" array position from xHarbour string pos
+   }
    if( ulLineSize < 4 || (bLongLines ? 0 : ulLineSize > 254) )
    {
       ulLineSize = 79;
@@ -415,17 +418,17 @@ HB_FUNC( MEMOLINE )
       uiTerms       = 1;
    }
 
-   szRet = (char *) hb_xgrab( ulLineSize + 1 ); 
+   szRet = (char *) hb_xgrab( ulLineSize + 1 );
    memset( szRet, ' ', ulLineSize );
    szRet[ulLineSize] = HB_CHAR_NUL;
 
-   while( !bEOF )
+   while( !bEOF && !bLineFound )
    {
       hb_readLine( pszString+ulStartOffset, ulTextLen - ulStartOffset, ulLineSize, uiTabLen, bWrap, Term, iTermSizes, uiTerms, &bFound, &bEOF, &lEnd, &ulEndOffset );
-      if( !((!bFound) &&  bEOF && lEnd == -1L ) )    
-      { 
+      if( !((!bFound) &&  bEOF && lEnd == -1L ) )
+      {
          ulLines++;
-      } 
+      }
       if (ulLines == ulLineNumber)
       {
          LONG lPos, lSpAdded = 0;
@@ -443,26 +446,28 @@ HB_FUNC( MEMOLINE )
          }
          hb_retclenAdopt( szRet, ulLineSize );
          bLineFound = TRUE;
-         break;
+//         break;
       }
-      ulStartOffset += ulEndOffset;
+      ulStartOffset = bEOF ? ulTextLen : ulStartOffset + ulEndOffset;
    }
 
    if( ulLines+1 < ulLineNumber )
    {
+      ulStartOffset = ulTextLen;
       hb_retc( "" );
-      hb_xfree( szRet ); 
+      hb_xfree( szRet );
    }
    else if( !bLineFound)
    {
-      hb_retclenAdopt( szRet, ulLineSize );  
+      ulStartOffset = ulTextLen;
+      hb_retclenAdopt( szRet, ulLineSize );
    }
-
+   hb_stornl(  ulStartOffset + 1 , 7 ) ;  // add 1 to change from "C" array pos to xHarbour string pos
    hb_xfree( Term );
    hb_xfree( iTermSizes );
 }
 
-HB_FUNC( MLPOS ) 
+HB_FUNC( MLPOS )
 {
    char * pszString    = hb_parcx( 1 );
    ULONG ulLineSize    = ISNUM( 2 ) ? hb_parni( 2 ) : 79;
@@ -534,13 +539,13 @@ HB_FUNC( MLPOS )
    while( !bEOF )
    {
       hb_readLine( pszString+ulStartOffset, ulTextLen - ulStartOffset, ulLineSize, uiTabLen, bWrap, Term, iTermSizes, uiTerms, &bFound, &bEOF, &lEnd, &ulEndOffset );
-      if( !((!bFound) &&  bEOF && lEnd == -1L ) )    
-      { 
+      if( !((!bFound) &&  bEOF && lEnd == -1L ) )
+      {
          ulLines++;
-      } 
+      }
       if (ulLines == ulLineNumber)
       {
-         hb_retni( ulStartOffset + 1 ); 
+         hb_retni( ulStartOffset + 1 );
          bLineFound = TRUE;
          break;
       }
@@ -549,10 +554,10 @@ HB_FUNC( MLPOS )
 
    if( !bLineFound)
    {
-      hb_retni( ulTextLen ); 
+      hb_retni( ulTextLen );
    }
 
    hb_xfree( Term );
    hb_xfree( iTermSizes );
 }
- 
+
