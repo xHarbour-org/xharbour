@@ -113,7 +113,7 @@
            ::nCompiledLines     := 0
            ::nProcs             := 0
            ::nNextStartProc     := 1
-	   ::nID                := 0
+           ::nID                := 0
         ELSE
            ::nNextStartProc := nProcID + 1
         ENDIF
@@ -218,7 +218,7 @@
         IF ::nProcs > 0
            #ifdef AX
              IF Len( ::aScriptHostGlobals ) > 0
-                bRecoveryBlock := PP_RecoveryBlock( {|oErr| ResolveSiteGlobals( oErr, oErr:Args ) } )
+                bRecoveryBlock := PP_RecoveryBlock( {|oErr| ResolveSiteGlobals( @oErr, oErr:Args ) } )
              ENDIF
            #endif
 
@@ -261,7 +261,7 @@
          LOCAL bRecoveryBlock
 
          IF Len( ::aScriptHostGlobals ) > 0
-            bRecoveryBlock := PP_RecoveryBlock( {|oErr| ResolveSiteGlobals( oErr ) } )
+            bRecoveryBlock := PP_RecoveryBlock( {|oErr| ResolveSiteGlobals( @oErr ) } )
          ENDIF
        #endif
 
