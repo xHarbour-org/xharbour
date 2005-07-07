@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.105 2005/05/02 17:05:06 gdrouillard Exp $
+ * $Id: tbrowse.prg,v 1.106 2005/07/02 10:09:48 mauriliolongo Exp $
  */
 
 /*
@@ -224,8 +224,8 @@ CLASS TBrowse
    METHOD Hilite()                        // Highlights the current cell
    METHOD Invalidate()                    // Forces entire redraw during next stabilization
    METHOD RefreshAll()                    // Causes all data to be recalculated during the next stabilize
-   METHOD RefreshCurrent() INLINE;        // Causes the current row to be refilled and repainted on next stabilize
-          If( ! Empty( ::aRedraw ), ::aRedraw[ ::RowPos ] := .T., Nil ), ::stable := .F., Self
+   METHOD RefreshCurrent()                // Causes the current row to be refilled and repainted on next stabilize
+          
    METHOD Stabilize()                     // Performs incremental stabilization
 
 #ifdef HB_COMPAT_C53
@@ -247,7 +247,6 @@ CLASS TBrowse
    METHOD PosCursor()                     // Positions the cursor to the beginning of the call, used only when autolite==.F.
    METHOD LeftDetermine()                 // Determine leftmost unfrozen column in display
    METHOD DispCell( nRow, nCol, nColor )  // Displays a single cell and returns position of first char of displayed value if needed
-   METHOD DispCellPos( nRow, nCol, nColor )  // Calculates the cursor's position and displays a cell
    METHOD HowManyCol()                    // Counts how many cols can be displayed
    METHOD RedrawHeaders( nWidth )         // Repaints TBrowse Headers
    METHOD Moved()                         // Every time a movement key is issued I need to reset certain properties
@@ -447,42 +446,16 @@ METHOD Configure( nMode ) CLASS TBrowse
       ::nColPos := ::nColumns
    endif
 
+   ::nHeaderHeight := 0
+   ::nFooterHeight := 0
+
    if nMode < 2 .or. ::lNeverDisplayed
       ::lHeaders     := .F.
       ::lFooters     := .F.
       ::lColHeadSep  := .F.
       ::lColFootSep  := .F.
       ::lRedrawFrame := .T.
-
-      // Are there column headers/footers/separators to paint ?
-      FOR EACH aCol IN ::aColsInfo
-         if ! Empty( aCol[ o_Heading ] )
-            ::lHeaders := .T.
-         endif
-         if ! Empty( aCol[ o_Footing ] )
-            ::lFooters := .T.
-         endif
-         /* as soon as we find one, we stop testing aCol[o_Obj]:XX to speed things up */
-         if ! ::lColHeadSep .AND. ! Empty( aCol[ o_Obj ]:HeadSep )
-            ::lColHeadSep := .T.
-         endif
-         if ! ::lColFootSep .AND. ! Empty( aCol[ o_Obj ]:FootSep )
-            ::lColFootSep := .T.
-         endif
-      NEXT
-
-      // Are there column footers to paint ?
-      FOR EACH aCol IN ::aColsInfo
-         if ! Empty( aCol[ o_Footing ] )
-            ::lFooters := .T.
-            exit
-         endif
-      NEXT
-
    endif
-
-   ::nHeaderHeight := 0
-   ::nFooterHeight := 0
 
    // Find out highest header and footer
    FOR EACH aCol IN ::aColsInfo
@@ -519,6 +492,23 @@ METHOD Configure( nMode ) CLASS TBrowse
          aCol[ o_ColSep    ] := iif( aCol[ o_Obj ]:ColSep != NIL, aCol[ o_Obj ]:ColSep, ::ColSep )
       endif
 
+      if nMode < 2 .or. ::lNeverDisplayed
+         // Are there column headers/footers/separators to paint ?
+         if ! Empty( aCol[ o_Heading ] )
+            ::lHeaders := .T.
+         endif
+         if ! Empty( aCol[ o_Footing ] )
+            ::lFooters := .T.
+         endif
+         /* as soon as we find one, we stop testing aCol[o_Obj]:XX to speed things up */
+         if ! ::lColHeadSep .AND. ! Empty( aCol[ o_Obj ]:HeadSep )
+            ::lColHeadSep := .T.
+         endif
+         if ! ::lColFootSep .AND. ! Empty( aCol[ o_Obj ]:FootSep )
+            ::lColFootSep := .T.
+         endif
+      endif
+
       if ::lHeaders .AND. !Empty( aCol[ o_Heading ] )
          nHeight := Len( aCol[ o_Heading ] ) - Len( StrTran( aCol[ o_Heading ], ";" ) ) + 1
 
@@ -536,6 +526,7 @@ METHOD Configure( nMode ) CLASS TBrowse
          endif
 
       endif
+
    next
 
    if empty( ::aColorSpec )
@@ -1735,15 +1726,6 @@ METHOD ColorRect( aRect, aRectColor ) CLASS TBrowse
    ::stable := .F.
    ::ForceStable()
 
-   // If the cursor is located inside the colored area,
-   // draws it as unselected (with the :colorRect colors).
-   If ::lRect .AND. ! Empty( ::aRedraw )
-      If ::colPos >= ::aRect[ 2 ] .and. ::colPos <= ::aRect[ 4 ] .and. ;
-         ::rowPos >= ::aRect[ 1 ] .and. ::rowPos <= ::aRect[ 3 ]
-         ::DispCellPos( ::rowPos, ::colPos, 1 )
-      endif
-   endif
-
 Return Self
 
 //-------------------------------------------------------------------//
@@ -2429,7 +2411,7 @@ METHOD DispCell( nRow, nColumn, nColor ) CLASS TBrowse
       nRow <= ::aRect[ 3 ] .AND. nColumn <= ::aRect[ 4 ]
 
       cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aRectColor, nColor ) - 1 )
-      cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aRectColor, TBC_CLR_STANDARD ) - 1 )
+      cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, TBC_CLR_STANDARD ) - 1 )
 
    else
       if oCol:ColorBlock == NIL
@@ -2494,35 +2476,29 @@ Return nNotLeftCol
 
 //-------------------------------------------------------------------//
 
-METHOD DispCellPos( nRow, nColumn, nColor ) CLASS TBrowse
+METHOD RefreshCurrent() CLASS TBrowse
 
-Local nOldRow := Row()
-Local nOldCol := Col()
-Local nColScrn, nCol, uRet
+   local i
 
-   nColScrn := ::nwLeft + LEN( ::cSpacePre )
+   if ! Empty( ::aRedraw )
 
-   nCol := if( ::nFrozenCols == 0, ::LeftVisible, 1 )
+      ::aRedraw[ ::RowPos ] := .T.
 
-   do while nCol < nColumn
-      nColScrn += ::aColsInfo[ nCol, o_Width ]
-      if ::aColsInfo[ nCol, o_lColSep ]
-         nColScrn += LEN( ::aColsInfo[ nCol + 1, o_ColSep ] )
-      endif
-      if nCol == ::nFrozenCols
-         nCol := ::leftVisible
-      else
-         nCol++
-      endif
-   enddo
+      if ::lRect
+         for i := ::aRect[ 1 ] to ::aRect[ 3 ]
+            ::aRedraw[ i ] := .T.
+         next
+      endif   
+      ::lRect := .F.
+      ::aRect := {}
+      ::aRectColor := {}
+ 
+   endif
 
-   DevPos( nRow + ::nRowData, nColScrn )
+   ::stable := .F.
 
-   uRet := ::DispCell( nRow, nColumn, nColor )
+Return Self
 
-   DevPos( nOldRow, nOldCol )
-
-return uRet
 
 //-------------------------------------------------------------------//
 //
