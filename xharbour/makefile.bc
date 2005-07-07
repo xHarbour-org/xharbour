@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.147 2005/04/02 01:44:51 andijahja Exp $
+# $Id: makefile.bc,v 1.148 2005/04/14 05:58:30 ronpinkas Exp $
 #
 
 #
@@ -3746,6 +3746,7 @@ $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
    $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
+   $(ECHO) $(CT_LIB) >> make.tmp
    $(CC) @make.tmp
    $(DEL) make.tmp
 
