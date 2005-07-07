@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4201 2005/07/07 07:27:09 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4202 2005/07/07 10:00:35 lf_sfnet Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -6,13 +6,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-07-07 10:32 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * utils/xbscript/xbscript.prg
+    * Added EXTERN SIN,COS (whole CT should be added to hbextern.ch)
+
 2005-07-07 11:45 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/source/rtl/tbrowse.prg
     * ::ColorRect management fixed to be more C53b compatible
-	 * ::DispCellPos removed it was buggy and useless
-	 * ::RefreshCurrent now reset ::ColorRect as C53b does
-	 * ::Configure code flow wrongly checked oCol:footing
-	 * thanks to Maurilio Longo for testing the modifications
+    * ::DispCellPos removed it was buggy and useless
+    * ::RefreshCurrent now reset ::ColorRect as C53b does
+    * ::Configure code flow wrongly checked oCol:footing
+    * thanks to Maurilio Longo for testing the modifications
 
 2005-07-07 00:26 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbs_harb.ch

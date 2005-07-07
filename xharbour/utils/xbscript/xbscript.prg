@@ -90,6 +90,8 @@
       EXTERN CreateObject
       EXTERN GetActiveObject
 
+      EXTERN SIN, COS
+      
       #ifdef SQL
          REQUEST SQLRDD
          REQUEST SR_ODBC
