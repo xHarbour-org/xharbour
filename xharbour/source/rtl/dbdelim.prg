@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.16 2005/04/19 21:39:25 ronpinkas Exp $
+ * $Id: dbdelim.prg,v 1.17 2005/04/19 23:19:47 ronpinkas Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.16 2005/04/19 21:39:25 ronpinkas Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.17 2005/04/19 23:19:47 ronpinkas Exp $" )
 
 PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest )
 
@@ -129,13 +129,12 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
       ENDIF
    ELSE
       // APPEND FROM DELIMITED
-      handle := FOPEN( cFileName )
+      handle := FOPEN( cFileName, FO_READ + FO_SHARED )
       IF handle == F_ERROR
          Eval( ErrorBlock(), __dbDelimErr( EG_OPEN, 1001, cFileName ) )
       ELSE
 
-         FClose( handle )
-         AppendToDb( cFileName, cSeparator )
+         AppendToDb( cFileName, cSeparator, handle )
 
       endif
    endif
@@ -157,55 +156,65 @@ STATIC FUNCTION __dbDelimErr( genCode, subCode, cFileName )
 
 RETURN oErr
 
-PROCEDURE AppendToDb( cFile, cDelimiter )
+PROCEDURE AppendToDb( cFile, cDelimiter, hFile )
 
-   LOCAL hFile := FOpen( cFile, FO_READ )
    LOCAL sLine, aEol := { Chr(13) + Chr(10), Chr(10) }
    LOCAL nEOF, aValues, nFields, cValue, nLen
 
-   WHILE .T.
-      nEOF := HB_FReadLine( hFile, @sLine, aEol )
+   IF hFile == NIL
+      hFile := FOpen( cFile, FO_READ + FO_SHARED )
+   ENDIF
 
-      aValues := HB_aTokens( sLine, cDelimiter, .T., .T. )
-      nFields := Min( Len( aValues ), FCount() )
+   IF hFile != F_ERROR
+      WHILE .T.
+         nEOF := HB_FReadLine( hFile, @sLine, aEol )
 
-      APPEND BLANK
+         aValues := HB_aTokens( sLine, cDelimiter, .T., .T. )
+         nFields := Min( Len( aValues ), FCount() )
 
-      FOR EACH cValue IN aValues
-         cValue := AllTrim( cValue )
-
-         IF cValue[1] == '"'
-            nLen := At( '"', cValue, 2 ) - 2
-
-            IF nLen >= 0
-               cValue := SubStr( cValue, 2, nLen )
-            ELSE
-               cValue := SubStr( cValue, 2 )
-            ENDIF
+         APPEND BLANK
+         IF NETERR()
+            EXIT
          ENDIF
 
-         SWITCH ValType( FieldGet( HB_EnumIndex() ) )
-            CASE 'D'
-               FieldPut( HB_EnumIndex(), STOD( cValue ) )
-               EXIT
+         FOR EACH cValue IN aValues
+            cValue := AllTrim( cValue )
 
-            CASE 'N'
-               FieldPut( HB_EnumIndex(), Val( cValue ) )
-               EXIT
+            IF cValue[1] == '"'
+               nLen := At( '"', cValue, 2 ) - 2
 
-            CASE 'L'
-               FieldPut( HB_EnumIndex(), Upper( cValue[1] ) == 'T' )
-               EXIT
+               IF nLen >= 0
+                  cValue := SubStr( cValue, 2, nLen )
+               ELSE
+                  cValue := SubStr( cValue, 2 )
+               ENDIF
+            ENDIF
 
-            CASE 'C'
-               FieldPut( HB_EnumIndex(), cValue )
-               EXIT
-         END
-      NEXT
+            SWITCH ValType( FieldGet( HB_EnumIndex() ) )
+               CASE 'D'
+                  FieldPut( HB_EnumIndex(), STOD( cValue ) )
+                  EXIT
 
-      IF nEOF == -1
-         EXIT
-      ENDIF
-   END
+               CASE 'N'
+                  FieldPut( HB_EnumIndex(), Val( cValue ) )
+                  EXIT
+
+               CASE 'L'
+                  FieldPut( HB_EnumIndex(), Upper( cValue[1] ) == 'T' )
+                  EXIT
+
+               CASE 'C'
+                  FieldPut( HB_EnumIndex(), cValue )
+                  EXIT
+            END
+         NEXT
+
+         IF nEOF == -1
+            EXIT
+         ENDIF
+      ENDDO
+
+      FCLOSE( hFile )
+   ENDIF
 
 RETURN

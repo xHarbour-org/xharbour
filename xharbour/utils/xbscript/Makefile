@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2004/05/20 21:09:22 ronpinkas Exp $
+# $Id: Makefile,v 1.2 2004/05/21 02:27:56 druzus Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -26,6 +26,7 @@ LIBS=\
 	macro \
 	pp \
 	common \
+	ct \
 
 ifeq ($(HB_ARCHITECTURE),OS2)
 LIBS += socket 
