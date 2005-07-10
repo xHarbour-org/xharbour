@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.103 2005/04/28 18:22:46 mlombardo Exp $
+ * $Id: memvars.c,v 1.104 2005/05/24 21:05:58 ronpinkas Exp $
  */
 
 /*
@@ -90,7 +90,7 @@
 #include "hbmemvar.ch"
 #include "hbset.h"
 #include "hbvm.h"
-
+#include "classes.h"
 #include "regex.h"
 
 //JC1: under threads, we need this to be in thread stack
@@ -156,7 +156,7 @@ static void hb_memvarAddPrivate( PHB_DYNS );
 static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR );
 void hb_memvarReleasePublic( PHB_ITEM pMemVar );
 
-extern void hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM ); /* call an overloaded operator */
+extern void hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM, int ); /* call an overloaded operator */
 
 #ifndef HB_THREAD_SUPPORT
 void hb_memvarsInit( void )
@@ -734,12 +734,12 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
             pSetItem = hb_itemUnRef( pSetItem );
          }
 
-         if( HB_IS_OBJECT( pSetItem ) && hb_objHasMsg( pSetItem, "__OpAssign" ) )
+         if( HB_IS_OBJECT( pSetItem ) && (hb_objGetOpOver( pSetItem ) & HB_CLASS_OP_ASSIGN ) )
          {
             // hb_vmOperatorCall() will POP 2 arguments.
-            hb_vmPushNil();
-            hb_vmPushNil();
-            hb_vmOperatorCall( pSetItem, pItem, "__OPASSIGN", NULL );
+            /* hb_vmPushNil(); */
+            /* hb_vmPushNil(); */
+            hb_vmOperatorCall( pSetItem, pItem, "__OPASSIGN", NULL, 0 );
          }
          else
          {

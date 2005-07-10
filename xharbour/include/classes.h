@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.14 2004/07/28 22:28:34 ronpinkas Exp $
+ * $Id: classes.h,v 1.15 2004/08/14 07:57:53 ronpinkas Exp $
  */
 
 /*
@@ -55,6 +55,33 @@
 
 HB_EXTERN_BEGIN
 
+#define HB_CLASS_OP_PLUS            ( ( ULONG ) 0x00000001 )
+#define HB_CLASS_OP_MINUS           ( ( ULONG ) 0x00000002 )
+#define HB_CLASS_OP_MULT            ( ( ULONG ) 0x00000004 )
+#define HB_CLASS_OP_DIVIDE          ( ( ULONG ) 0x00000008 )
+#define HB_CLASS_OP_MOD             ( ( ULONG ) 0x00000010 )
+#define HB_CLASS_OP_POWER           ( ( ULONG ) 0x00000020 )
+#define HB_CLASS_OP_INC             ( ( ULONG ) 0x00000040 )
+#define HB_CLASS_OP_DEC             ( ( ULONG ) 0x00000080 )
+#define HB_CLASS_OP_EQUAL           ( ( ULONG ) 0x00000100 )
+#define HB_CLASS_OP_NOTEQUAL        ( ( ULONG ) 0x00000200 )
+#define HB_CLASS_OP_LESS            ( ( ULONG ) 0x00000400 )
+#define HB_CLASS_OP_LESSEQUAL       ( ( ULONG ) 0x00000800 )
+#define HB_CLASS_OP_GREATER         ( ( ULONG ) 0x00001000 )
+#define HB_CLASS_OP_GREATEREQUAL    ( ( ULONG ) 0x00002000 )
+#define HB_CLASS_OP_ASSIGN          ( ( ULONG ) 0x00004000 )
+#define HB_CLASS_OP_INSTRING        ( ( ULONG ) 0x00008000 )
+#define HB_CLASS_OP_NOT             ( ( ULONG ) 0x00010000 )
+#define HB_CLASS_OP_AND             ( ( ULONG ) 0x00020000 )
+#define HB_CLASS_OP_OR              ( ( ULONG ) 0x00040000 )
+#define HB_CLASS_OP_ARRAYINDEX      ( ( ULONG ) 0x00080000 )
+#define HB_CLASS_OP_BITAND          ( ( ULONG ) 0x00100000 )
+#define HB_CLASS_OP_BITOR           ( ( ULONG ) 0x00200000 )
+#define HB_CLASS_OP_BITXOR          ( ( ULONG ) 0x00400000 )
+#define HB_CLASS_OP_BITSHIFTR       ( ( ULONG ) 0x00800000 )
+#define HB_CLASS_OP_BITSHIFTL       ( ( ULONG ) 0x01000000 )
+
+
 typedef struct hb_class_method
 {
    PHB_DYNS pMessage;            /* Method Symbolic name */
@@ -74,18 +101,39 @@ typedef struct hb_class_method
 
 typedef struct
 {
+   USHORT   uiData;
+   USHORT   uiAt;
+   PHB_ITEM pInitValue;
+} CLSDINIT, * PCLSDINIT;
+
+typedef struct
+{
+   PHB_DYNS pMessage;
+   USHORT   uiAt;
+} METHDYN, * PMETHDYN;
+
+typedef struct
+{
    char *   szName;         /* Class name */
    USHORT   uiDatas;        /* Total Data Counter */
    USHORT   uiDataFirst;    /* First uiData from this class */
    PMETHOD  pMethods;
    USHORT   uiMethods;      /* Total Method initialised Counter */
-   USHORT   uiHashKey;
+   USHORT   uiReserved;
    USHORT   uiDatasShared;  /* Total shared Class data within Class data */
+   USHORT   uiScope;
    PHB_ITEM pClassDatas;    /* Harbour Array for ClassDatas and shared */
    PHB_ITEM pInlines;       /* Array for inline codeblocks */
    PHB_FUNC pFunError;      /* error handler for not defined messages */
    PHB_FUNC pDestructor;    /* Destructor */
    PSYMBOLS pModuleSymbols;
+   ULONG    fOpOver;        /* Flags for Operators overload */
+   USHORT   uiDataInitiated;
+   USHORT   uiFriends;
+   PCLSDINIT pInitValues;
+   PMETHDYN pMethDyn;
+   USHORT * pFriends;
+   
 } CLASS, * PCLASS;
 
 extern HB_SYMB  hb_symDestructor;
@@ -100,6 +148,7 @@ extern HB_EXPORT PCLASS hb_clsClassesArray( void );
 extern HB_EXPORT USHORT hb_clsMaxClasses( void );
 
 extern HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
+extern HB_EXPORT ULONG   hb_objGetOpOver( PHB_ITEM pObject );
 
 void * hb_mthRequested( void );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.118 2005/04/22 18:36:09 guerra000 Exp $
+ * $Id: arrays.c,v 1.119 2005/04/23 06:52:17 guerra000 Exp $
  */
 
 /*
@@ -1390,9 +1390,17 @@ BOOL HB_EXPORT hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pul
    }
 }
 
-PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedList )
+
+PHB_ITEM hb_arrayClone2( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedList )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayClone(%p, %p)", pSrcArray, pClonedList));
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayClone2(%p, %p)", pSrcArray, pClonedList));
+
+   return hb_arrayCloneEx( pSrcArray, hb_itemNew( NULL ), pClonedList );
+}
+
+PHB_ITEM hb_arrayCloneEx( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, PHB_NESTED_CLONED pClonedList )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayCloneEx(%p, %p, %p)", pSrcArray, pDstArray, pClonedList));
 
    if( pSrcArray->type == HB_IT_ARRAY )
    {
@@ -1400,11 +1408,9 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
       PHB_BASEARRAY pDstBaseArray;
       ULONG ulSrcLen = pSrcBaseArray->ulLen;
       ULONG ulCount;
-      PHB_ITEM pDstArray;
       PHB_NESTED_CLONED pCloned;
       BOOL bTop;
 
-      pDstArray = hb_itemNew( NULL );
       hb_arrayNew( pDstArray, ulSrcLen );
 
       if( pClonedList == NULL )
@@ -1507,13 +1513,17 @@ PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedL
             hb_xfree( pCloned );
          }
       }
+   }
+   return pDstArray;
+}
 
-      return pDstArray;
-   }
-   else
+PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pSrcArray, PHB_NESTED_CLONED pClonedList )
+{
+   if( pSrcArray->type == HB_IT_ARRAY && pSrcArray->item.asArray.value->uiClass == 0 )
    {
-      return hb_itemNew( NULL );
+      return hb_arrayClone2( pSrcArray, pClonedList );
    }
+   return hb_objClone( pSrcArray );
 }
 
 PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )

@@ -1,5 +1,5 @@
 /*
- * $Id: hboo.ch,v 1.5 2003/11/10 00:59:32 fsgiudice Exp $
+ * $Id: hboo.ch,v 1.6 2004/03/03 11:41:10 ronpinkas Exp $
  */
 
 /*
@@ -83,6 +83,11 @@
 #define HB_OO_CLSTP_CLASS     128 /* The related message is a superobject call, uidata is the superclass handle
                                      pInitValue contain one superclass object instance (absolutely needed for Inline msg and class data) */
 #define HB_OO_CLSTP_SUPER     256 /* The related message is inherited from a superclass */
+#define HB_OO_CLSTP_CLASSCTOR 512
+
+#define HB_OO_CLS_INSTANCED     1 /* The class was instanced one time almost */
+#define HB_OO_CLS_CLASSCTOR   512
+
 
 /* Message types */
 #define HB_OO_MSG_METHOD        0
@@ -97,6 +102,7 @@
 #define HB_OO_PROPERTY          8
 #define HB_OO_MSG_PROPERTY      HB_OO_MSG_DATA      + HB_OO_PROPERTY // Auto management of DATA.
 #define HB_OO_MSG_CLASSPROPERTY HB_OO_MSG_CLASSDATA + HB_OO_PROPERTY // Auto management of CLASSDATA.
+#define HB_OO_MSG_DELEGATE     11
 
 /* Data */
 #define HB_OO_DATA_SYMBOL       1
@@ -114,12 +120,17 @@
 /* Method */
 #define HB_OO_MTHD_SYMBOL       1
 #define HB_OO_MTHD_PFUNCTION    2
+#define HB_OO_MTHD_DELEGNAME    2
 #define HB_OO_MTHD_SCOPE        3
 #define HB_OO_MTHD_PERSISTENT   4
+#define HB_OO_MTHD_DELEGOBJ     5
 
 /* ClassMethod */ /* for the future */
 #define HB_OO_CLSM_SYMBOL       1
 #define HB_OO_CLSM_PFUNCTION    2
 #define HB_OO_CLSM_SCOPE        3
+
+#define HB_OO_MCLSCTOR_INSTANCE 1
+#define HB_OO_MCLSCTOR_CLONE    2
 
 #endif /* HB_OO_CH_ */

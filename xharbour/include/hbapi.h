@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.163 2005/05/09 10:04:05 druzus Exp $
+ * $Id: hbapi.h,v 1.164 2005/06/22 15:29:53 druzus Exp $
  */
 
 /*
@@ -435,6 +435,8 @@ extern ULONG    HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG 
 extern BOOL     HB_EXPORT hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * pulCount ); /* execute a code-block for every element of an array item */
 extern BOOL     HB_EXPORT hb_arrayCopy( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, ULONG * pulStart, ULONG * pulCount, ULONG * pulTarget ); /* copy items from one array to another */
 extern PHB_ITEM HB_EXPORT hb_arrayClone( PHB_ITEM pArray, PHB_NESTED_CLONED pClonedList ); /* returns a duplicate of an existing array, including all nested items */
+extern PHB_ITEM HB_EXPORT hb_arrayClone2( PHB_ITEM pArray, PHB_NESTED_CLONED pClonedList ); /* returns a duplicate of an existing array, including all nested items */
+extern PHB_ITEM HB_EXPORT hb_arrayCloneEx( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, PHB_NESTED_CLONED pClonedList ); /* returns a duplicate of an existing array, including all nested items */
 extern BOOL     HB_EXPORT hb_arraySort( PHB_ITEM pArray, ULONG * pulStart, ULONG * pulCount, PHB_ITEM pBlock ); /* sorts an array item */
 extern PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen ); /* Creates and returns an Array of n Elements from the Eval Stack - Does NOT pop the items. */
 extern PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase ); /* Creates and returns an Array of Generic Parameters for specified base symbol. */
@@ -442,6 +444,8 @@ extern PHB_ITEM HB_EXPORT hb_arrayFromParamsLocked( PHB_ITEM *pBase ); /* Create
 #ifndef HB_LONG_LONG_OFF
 extern LONGLONG HB_EXPORT hb_arrayGetNLL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the long long int value contained on an array element */
 #endif
+
+extern PHB_ITEM HB_EXPORT hb_objClone( PHB_ITEM pObject ); /* returns a duplicate of an existing array, including all nested items */
 
 #ifndef HB_ARRAY_USE_COUNTER
    extern void hb_arrayReleaseHolder( PHB_BASEARRAY pBaseArray, void *pOwner );
