@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4206 2005/07/10 03:42:35 lculik Exp $
+ * $Id: ChangeLog,v 1.4207 2005/07/10 05:06:29 walito Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -16,6 +16,13 @@
   * source/vm/hvm.c
   * source/vm/memvars.c
     + New object engine
+
+2005-07-08 19:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/dbdelim.prg
+   ! close file after append from.
+
+  * xharbour/utils/xbscript/Makefile
+   + added CT lib
 
 2005-07-10 00:40 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
 
