@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.46 2005/05/20 14:35:24 lculik Exp $
+ * $Id: errorsys.prg,v 1.47 2005/05/25 13:18:01 druzus Exp $
  */
 
 /*
@@ -460,7 +460,7 @@ STATIC FUNCTION LogError( oerr )
         Fclose( nMemHandle )
         Ferase( 'errormem.mem' )
         */
-        Fclose( nFhandle )
+        Fclose( nhandle )
      Endif
 
 Return .f.
