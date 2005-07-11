@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4207 2005/07/10 05:06:29 walito Exp $
+ * $Id: ChangeLog,v 1.4208 2005/07/10 18:21:09 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-07-11 16:15 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/teditor.prg
+    * handle K_CTRL_N as per Clipper to insert a line in
+      memoEdit()
 
 2005-07-10 02:00 UTC-300 Walter Negro <anegro-AT-overnet.com.ar>
   * include/classes.h

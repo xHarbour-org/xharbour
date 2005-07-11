@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.62 2005/05/04 19:13:16 gdrouillard Exp $
+/* $Id: teditor.prg,v 1.63 2005/07/06 21:32:35 peterrees Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.62 2005/05/04 19:13:16 gdrouillard Exp $
+/* $Id: teditor.prg,v 1.63 2005/07/06 21:32:35 peterrees Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -614,7 +614,15 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                ::lExitEdit := .T.
                SetCursor( ::nOrigCursor )   // restore original cursor saved at startup
                exit
-
+            case K_CTRL_N
+            if ::lEditAllow  // Clipper compatibility
+               ::lDirty := .T.
+               ::Home()
+               ::InsertLine( "", .F., ::nRow )
+               ::RefreshLine()
+               ::RefreshWindow()
+            endif
+               exit
             case K_CTRL_Y
             if ::lEditAllow  // Clipper compatibility
                ::lDirty := .T.
