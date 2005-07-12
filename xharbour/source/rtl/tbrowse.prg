@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.106 2005/07/02 10:09:48 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.107 2005/07/07 10:00:58 lf_sfnet Exp $
  */
 
 /*
@@ -225,7 +225,7 @@ CLASS TBrowse
    METHOD Invalidate()                    // Forces entire redraw during next stabilization
    METHOD RefreshAll()                    // Causes all data to be recalculated during the next stabilize
    METHOD RefreshCurrent()                // Causes the current row to be refilled and repainted on next stabilize
-          
+
    METHOD Stabilize()                     // Performs incremental stabilization
 
 #ifdef HB_COMPAT_C53
@@ -1518,7 +1518,7 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
          if ::nFrozenCols > 0 .and. n == ::nFrozenCols + 1
             n := ::leftVisible
          endif
-         DevPos( ::nwTop, ::aColsInfo[ n, o_ScrColPos ] )
+         setPos( ::nwTop, ::aColsInfo[ n, o_ScrColPos ] )
 
          ::WriteMLineText( ::aColsInfo[ n, o_Heading ], ;
                            ::aColsInfo[ n, o_Width ], .T., ;
@@ -1672,7 +1672,7 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
          if ::nFrozenCols > 0 .and. n == ::nFrozenCols + 1
             n := ::leftVisible
          endif
-         DevPos( ::nwBottom, ::aColsInfo[ n, o_ScrColPos ] )
+         setPos( ::nwBottom, ::aColsInfo[ n, o_ScrColPos ] )
 
          ::WriteMLineText( ::aColsInfo[ n, o_Footing ], ;
                            ::aColsInfo[ n, o_Width ], .F., ;
@@ -2135,7 +2135,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
             next
 
          else      //  ::nFrozenCols > 0
-            DevPos( nRow + ::nRowData, ::nwLeft )
+            setPos( nRow + ::nRowData, ::nwLeft )
 
             for nCol := nColFrom to ::rightVisible
                if nCol == ::nFrozenCols + 1
@@ -2202,7 +2202,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
                   if nCol == nColFrom
                      DispOutAt( nRow2Fill + ::nRowData, nLeftColPos, ::cSpacePre, ColorSpec )
                   else
-                     DevPos(nRow2Fill + ::nRowData, nLeftColPos)
+                     setPos(nRow2Fill + ::nRowData, nLeftColPos)
                   endif
 
                   DispOut( cColBlanks, cColor )
@@ -2215,7 +2215,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
                   if nCol == ::leftVisible
                      DispOutAt( nRow2Fill + ::nRowData, nLeftColPos, ::cSpacePre, ColorSpec )
                   else
-                     DevPos( nRow2Fill + ::nRowData, nLeftColPos )
+                     setPos( nRow2Fill + ::nRowData, nLeftColPos )
                   endif
 
                   DispOut( cColBlanks, cColor )
@@ -2488,11 +2488,11 @@ METHOD RefreshCurrent() CLASS TBrowse
          for i := ::aRect[ 1 ] to ::aRect[ 3 ]
             ::aRedraw[ i ] := .T.
          next
-      endif   
+      endif
       ::lRect := .F.
       ::aRect := {}
       ::aRectColor := {}
- 
+
    endif
 
    ::stable := .F.
@@ -2588,11 +2588,11 @@ METHOD WriteMLineText( cStr, nPadLen, lHeader, cColor ) CLASS TBrowse
          cS := cStr
 
          for n := ::nHeaderHeight to 1 step -1
-            DevPos( nRow + n - 1, nCol )
+            setPos( nRow + n - 1, nCol )
             DispOut( PadR( __StrToken( @cS, n, ";" ), nPadLen ), cColor )
          next
 
-         DevPos( nRow, nCol + nPadLen )
+         setPos( nRow, nCol + nPadLen )
 
       endif
 
@@ -2611,11 +2611,11 @@ METHOD WriteMLineText( cStr, nPadLen, lHeader, cColor ) CLASS TBrowse
          cS := cStr + ";"
 
          for n := 0 to ( ::nFooterHeight - 1 )
-            DevPos( nRow - n, nCol )
+            setPos( nRow - n, nCol )
             DispOut( PadR( __StrToken( @cS, ::nFooterHeight - n, ";" ), nPadLen ), cColor )
          next
 
-         DevPos( nRow, nCol + nPadLen )
+         setPos( nRow, nCol + nPadLen )
 
       endif
 
