@@ -1,10 +1,15 @@
- * $Id: ChangeLog,v 1.4211 2005/07/12 17:34:32 gdrouillard Exp $
+ * $Id: ChangeLog,v 1.4212 2005/07/13 16:13:19 bdj Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-07-13 16:00 UTC-0300 Mauricio Abre <mgabre@gmail.com>
+  * source/rtl/gtalleg/ssf.h
+  * source/rtl/gtalleg/gtalleg.c
+    ! Don't try to set linux FB console mode if allegro doesn't have support
 
 2005-07-13 23:15 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/wvtgui/wvtutils.c

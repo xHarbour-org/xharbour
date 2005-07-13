@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.35 2004/11/25 17:07:25 maurifull Exp $
+ * $Id: gtalleg.c,v 1.36 2005/02/27 11:56:05 andijahja Exp $
  */
 
 /*
@@ -1135,7 +1135,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
          iRet = al_set_gfx_mode( AL_GFX_VBEAF, iWidth, iHeight, 0, 0 );
       }
 #endif
-#if defined(ALLEGRO_UNIX) | defined(ALLEGRO_LINUX)
+#if defined(ALLEGRO_UNIX) | defined(ALLEGRO_LINUX) && defined(AL_GFX_FBCON)
       if ( iRet != 0 )
       {
 #ifdef DEBUG
