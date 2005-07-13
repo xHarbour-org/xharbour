@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.3 2005/05/06 03:48:22 bdj Exp $
+ * $Id: wvtutils.c,v 1.4 2005/05/09 18:34:27 vouchcac Exp $
  */
 
 /*
@@ -617,7 +617,7 @@ HB_FUNC( WVT_SETICON )
 {
    if ( ISNUM( 1 ) || ISCHAR( 2 ) )
    {
-      hb_retnl( hb_wvt_gtSetWindowIcon( hb_parni( 1 ), hb_parcx( 2 ) ) ) ;
+      hb_retnl( hb_wvt_gtSetWindowIcon( hb_parni( 1 ), hb_parc( 2 ) ) ) ;
    }
    else
    {
