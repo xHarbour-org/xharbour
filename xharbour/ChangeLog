@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4212 2005/07/13 16:13:19 bdj Exp $
+ * $Id: ChangeLog,v 1.4213 2005/07/13 19:12:10 maurifull Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -19,6 +19,13 @@
   * source/rtl/tbrowse.prg
     ! replace calls to devpos() with setpos() to maintain clipper
         compatability.
+
+2005-07-12 01:20 UTC-300 Walter Negro <anegro-AT-overnet.com.ar>
+  * tests/friendly.prg
+  * tests/friendl2.prg
+    + Test of friendly class
+  * tests/delegate.prg
+    + Test of delegate messages
 
 2005-07-11 01:40 UTC-300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/vm/classes.c
