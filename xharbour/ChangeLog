@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4216 2005/07/16 03:04:11 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4217 2005/07/16 03:17:32 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-07-15 23:06 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbexprb.c
+    * Commented out recent RIGHT side optimization, because order is SIGNIFICANT for NON numerics!
 
 2005-07-15 20:16 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbexprb.c
