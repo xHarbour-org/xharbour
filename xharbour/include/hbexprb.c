@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.95 2005/06/17 19:17:36 oh1 Exp $
+ * $Id: hbexprb.c,v 1.96 2005/07/16 03:04:26 ronpinkas Exp $
  */
 
 /*
@@ -3040,9 +3040,6 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
 
                //printf( "*** Optimize Right! ***\n" );
 
-               // Always PLUS when reversing arguments.
-               pPlus->ExprType = HB_EO_PLUSEQ;
-
                // Switch arguments
                if( pPlus->ExprType == HB_EO_PLUS )
                {
@@ -3053,6 +3050,9 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                   // Must negate when switched right ( y - x => x + -y )
                   pPlus->value.asOperator.pRight = hb_compExprNewNegate( pPlus->value.asOperator.pLeft );
                }
+
+               // Always PLUS when reversing arguments.
+               pPlus->ExprType = HB_EO_PLUSEQ;
 
                pPlus->value.asOperator.pLeft = pLVar;
 

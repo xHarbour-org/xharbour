@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.101 2005/04/20 23:29:52 ronpinkas Exp $
+ * $Id: genc.c,v 1.104 2005/05/16 21:45:40 andijahja Exp $
  */
 
 /*
@@ -2939,7 +2939,7 @@ static HB_GENC_FUNC( hb_p_localnearaddint )
       }
       else
       {
-         fprintf( cargo->yyc, "\t/* %s %i*/", hb_compLocalVariableFind( pFunc, iVar )->szName, iVar );
+         fprintf( cargo->yyc, "\t/* %s %i*/", hb_compLocalVariableFind( pFunc, iVar )->szName, HB_PCODE_MKSHORT( &( pFunc->pCode[ lPCodePos + 2 ] ) ) );
       }
    }
 

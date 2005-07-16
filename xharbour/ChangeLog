@@ -1,10 +1,16 @@
- * $Id: ChangeLog,v 1.4215 2005/07/15 04:49:33 walito Exp $
+ * $Id: ChangeLog,v 1.4216 2005/07/16 03:04:11 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-07-15 20:16 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbexprb.c
+    * Fixed minor (but very important) typo in recent commit.
+  * source/compiler/genc.c
+    * Improved verbosity of HB_P_LOCALNEARADDINT
 
 2005-07-15 20:03 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbexprop.h
