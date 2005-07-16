@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.97 2005/07/16 03:17:59 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.98 2005/07/16 06:07:30 ronpinkas Exp $
  */
 
 /*
@@ -3033,38 +3033,38 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                pSelf = pPlus;
 
             }
-            #if 0 // Order is SIGNIFICANT for NON numerics!!!
-               else if( pPlus->value.asOperator.pRight->ExprType == HB_ET_VARIABLE &&
-                        pPlus->value.asOperator.pRight->value.asSymbol == pSelf->value.asOperator.pLeft->value.asSymbol )
+            // Order is SIGNIFICANT for NON numerics!!!
+            else if( pPlus->value.asOperator.pRight->ExprType == HB_ET_VARIABLE &&
+                     pPlus->value.asOperator.pRight->value.asSymbol == pSelf->value.asOperator.pLeft->value.asSymbol &&
+                     pPlus->value.asOperator.pLeft->ExprType == HB_ET_NUMERIC )
+            {
+               HB_EXPR_PTR pLVar = pPlus->value.asOperator.pRight;
+
+               //printf( "*** Optimize Right! ***\n" );
+
+               // Switch arguments
+               if( pPlus->ExprType == HB_EO_PLUS )
                {
-                  HB_EXPR_PTR pLVar = pPlus->value.asOperator.pRight;
-
-                  //printf( "*** Optimize Right! ***\n" );
-
-                  // Switch arguments
-                  if( pPlus->ExprType == HB_EO_PLUS )
-                  {
-                     pPlus->value.asOperator.pRight = pPlus->value.asOperator.pLeft;
-                  }
-                  else
-                  {
-                     // Must negate when switched right ( y - x => x + -y )
-                     pPlus->value.asOperator.pRight = hb_compExprNewNegate( pPlus->value.asOperator.pLeft );
-                  }
-
-                  // Always PLUS when reversing arguments.
-                  pPlus->ExprType = HB_EO_PLUSEQ;
-
-                  pPlus->value.asOperator.pLeft = pLVar;
-
-                  // Free outer.
-                  pSelf->value.asOperator.pRight = NULL;
-                  hb_compExprFree( pSelf, HB_MACRO_PARAM );
-
-                  // Optimized.
-                  pSelf = pPlus;
+                  pPlus->value.asOperator.pRight = pPlus->value.asOperator.pLeft;
                }
-            #endif
+               else
+               {
+                  // Must negate when switched right ( y - x => x + -y )
+                  pPlus->value.asOperator.pRight = hb_compExprNewNegate( pPlus->value.asOperator.pLeft );
+               }
+
+               // Always PLUS when reversing arguments.
+               pPlus->ExprType = HB_EO_PLUSEQ;
+
+               pPlus->value.asOperator.pLeft = pLVar;
+
+               // Free outer.
+               pSelf->value.asOperator.pRight = NULL;
+               hb_compExprFree( pSelf, HB_MACRO_PARAM );
+
+               // Optimized.
+               pSelf = pPlus;
+            }
          }
          break;
 
