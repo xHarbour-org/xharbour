@@ -1,10 +1,37 @@
- * $Id: ChangeLog,v 1.4214 2005/07/14 20:41:04 walito Exp $
+ * $Id: ChangeLog,v 1.4215 2005/07/15 04:49:33 walito Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-07-15 20:03 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbexprop.h
+  * source/common/expropt2.c
+    + Added: HB_EXPR_PTR hb_compExprListStripSingle( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
+  * include/hbexprb.c
+    + Added generic optimization:
+         x := x + y -> x += y
+         x := y + x -> x += y
+         x := x - y -> x -= y
+         x := y - x -> x += -y
+     /*
+        Due to subsequent optimization of LOCAL += INT and LOCAL -= INT
+        this results in significant optimization of code like:
+
+        LOCAL n1 := 1
+
+        n1 := n1 + 2
+
+        n1 := 2 + n1
+
+        n1 := ( n1 + 3 )
+
+        n1 := ( ( 4 - (n1) ) )
+
+        This also paves the way for a generic HB_P_LOCALNEARADD.
+      */
 
 2005-07-15 01:50 UTC-300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/rtl/tclass.prg

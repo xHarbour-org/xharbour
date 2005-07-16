@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.94 2005/05/15 22:15:49 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.95 2005/06/17 19:17:36 oh1 Exp $
  */
 
 /*
@@ -2996,8 +2996,74 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
    {
       case HB_EA_REDUCE:
          pSelf->value.asOperator.pLeft  = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_REDUCE ), HB_MACRO_PARAM );
-         pSelf->value.asOperator.pRight = hb_compExprListStrip( HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_REDUCE ), HB_MACRO_PARAM );
+         pSelf->value.asOperator.pRight = hb_compExprListStripSingle( HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_REDUCE ), HB_MACRO_PARAM );
+
          HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_LVALUE );
+
+         /*
+            Optimize x := x + y -> x += y
+          */
+
+         if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE &&
+             ( pSelf->value.asOperator.pRight->ExprType == HB_EO_PLUS || pSelf->value.asOperator.pRight->ExprType == HB_EO_MINUS ) )
+         {
+            HB_EXPR_PTR pPlus = pSelf->value.asOperator.pRight;
+
+            //printf( "Var: '%s' assign PLUS\n", pSelf->value.asOperator.pLeft->value.asSymbol );
+
+            if( pPlus->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE &&
+                pPlus->value.asOperator.pLeft->value.asSymbol == pSelf->value.asOperator.pLeft->value.asSymbol )
+            {
+               //printf( "*** Optimize Left! ***\n" );
+
+               if( pPlus->ExprType == HB_EO_PLUS )
+               {
+                  pPlus->ExprType = HB_EO_PLUSEQ;
+               }
+               else
+               {
+                  pPlus->ExprType = HB_EO_MINUSEQ;
+               }
+
+               // Free outer.
+               pSelf->value.asOperator.pRight = NULL;
+               hb_compExprFree( pSelf, HB_MACRO_PARAM );
+
+               // Optimized.
+               pSelf = pPlus;
+
+            }
+            else if( pPlus->value.asOperator.pRight->ExprType == HB_ET_VARIABLE &&
+                     pPlus->value.asOperator.pRight->value.asSymbol == pSelf->value.asOperator.pLeft->value.asSymbol )
+            {
+               HB_EXPR_PTR pLVar = pPlus->value.asOperator.pRight;
+
+               //printf( "*** Optimize Right! ***\n" );
+
+               // Always PLUS when reversing arguments.
+               pPlus->ExprType = HB_EO_PLUSEQ;
+
+               // Switch arguments
+               if( pPlus->ExprType == HB_EO_PLUS )
+               {
+                  pPlus->value.asOperator.pRight = pPlus->value.asOperator.pLeft;
+               }
+               else
+               {
+                  // Must negate when switched right ( y - x => x + -y )
+                  pPlus->value.asOperator.pRight = hb_compExprNewNegate( pPlus->value.asOperator.pLeft );
+               }
+
+               pPlus->value.asOperator.pLeft = pLVar;
+
+               // Free outer.
+               pSelf->value.asOperator.pRight = NULL;
+               hb_compExprFree( pSelf, HB_MACRO_PARAM );
+
+               // Optimized.
+               pSelf = pPlus;
+            }
+         }
          break;
 
       case HB_EA_ARRAY_AT:

@@ -1,5 +1,5 @@
 /*
- * $Id: expropt2.c,v 1.10 2005/05/13 21:27:27 walito Exp $
+ * $Id: expropt2.c,v 1.11 2005/06/30 23:51:46 ronpinkas Exp $
  */
 
 /*
@@ -1296,6 +1296,26 @@ HB_EXPR_PTR hb_compExprListStrip( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
             pExpr->value.asList.pExprList = NULL;
             hb_compExprFree( pExpr, HB_MACRO_PARAM );
          }
+      }
+   }
+
+   return pSelf;
+}
+
+HB_EXPR_PTR hb_compExprListStripSingle( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
+{
+   if( pSelf->ExprType == HB_ET_LIST )
+   {
+      if( hb_compExprListLen( pSelf ) == 1 )
+      {
+         /* replace the single element with a simple expression
+          *  ( EXPR ) -> EXPR
+          */
+         HB_EXPR_PTR pExpr = pSelf;
+
+         pSelf = hb_compExprListStripSingle( pSelf->value.asList.pExprList, HB_MACRO_PARAM  );
+         pExpr->value.asList.pExprList = NULL;
+         hb_compExprFree( pExpr, HB_MACRO_PARAM );
       }
    }
 

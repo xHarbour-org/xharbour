@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.13 2004/10/27 05:27:36 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.14 2004/11/21 21:43:38 druzus Exp $
  */
 
 /*
@@ -386,6 +386,7 @@ int hb_compExprType( HB_EXPR_PTR );
 void hb_compExprFree( HB_EXPR_PTR, HB_MACRO_DECL );
 void hb_compExprErrorType( HB_EXPR_PTR, HB_MACRO_DECL );
 HB_EXPR_PTR hb_compExprListStrip( HB_EXPR_PTR, HB_MACRO_DECL );
+HB_EXPR_PTR hb_compExprListStripSingle( HB_EXPR_PTR, HB_MACRO_DECL );
 BOOL hb_compExprCheckMacroVar( char * );
 void hb_compExprCBVarDel( HB_CBVAR_PTR );
 HB_EXPR_PTR hb_compExprReducePlusStrings( HB_EXPR_PTR, HB_EXPR_PTR, HB_MACRO_DECL );
