@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.467 2005/06/12 16:52:24 ronpinkas Exp $
+ * $Id: hvm.c,v 1.468 2005/07/10 05:07:08 walito Exp $
  */
 
 /*
@@ -2696,8 +2696,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   Add.item.asInteger.value = iAdd;
                   Add.item.asInteger.length = 10;
 
-                  // hb_vmOperatorCall() will POP 2 arguments but we only have 1 argument on the Stack.
-                  //hb_vmPushNil();
                   hb_vmOperatorCall( pLocal, &Add, "__OPPLUS", NULL, 1 );
                }
                else
@@ -2752,8 +2750,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                if( HB_IS_OBJECT( pLocal ) && (hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN ) )
                {
-                  // hb_vmOperatorCall() will POP 2 arguments.
-                  //hb_vmPushNil();
                   hb_vmPushInteger( iNewVal );
                   hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 1 );
 
@@ -2788,8 +2784,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                if( HB_IS_OBJECT( pLocal ) && (hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN ) )
                {
-                  // hb_vmOperatorCall() will POP 2 arguments.
-                  //hb_vmPushNil();
                   hb_itemPushStaticString( ( char * ) ( pCode ) + w + 4, ( ULONG ) ( uiSize - 1 ) );
                   hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 1 );
 
@@ -2828,8 +2822,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( HB_IS_OBJECT( pLocal ) && hb_objHasMsg( pLocal, "__OpAssign" ) )
             {
-               // hb_vmOperatorCall() will POP 2 arguments.
-               //hb_vmPushNil();
                hb_vmPushString( (char *) pBuffer, ulSize - 1 );
                hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 1 );
             }
@@ -2893,8 +2885,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   Add.item.asInteger.value = iAdd;
                   Add.item.asInteger.length = 10;
 
-                  // hb_vmOperatorCall() will POP 2 arguments but we only have 1 argument on the Stack.
-                  //hb_vmPushNil();
                   hb_vmOperatorCall( pTop, &Add, "__OPPLUS", NULL, 1 );
                }
                else
@@ -3196,8 +3186,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( HB_IS_OBJECT( (*pGlobals)[ iGlobal ] ) && (hb_objGetOpOver( (*pGlobals)[ iGlobal ] ) & HB_CLASS_OP_ASSIGN ) )
             {
-               // hb_vmOperatorCall() will POP 2 arguments but we only have 1 argument on the Stack.
-               //hb_vmPushNil();
                hb_vmOperatorCall( (*pGlobals)[ iGlobal ], *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 1 );
             }
             else
@@ -6277,7 +6265,7 @@ void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSymbol, P
     * NOTE: for performance reason we could have avoided pop of the second argument.
     * and recycle it with the return value, but that would be WRONG in case of Argument BYREF.
     */
-   hb_vmPush( &(HB_VM_STACK.Return) );
+   hb_itemPushForward( &(HB_VM_STACK.Return) );
 }
 
 void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol )
@@ -6301,11 +6289,12 @@ void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol )
 
    hb_vmSend( 0 );
 
-   /* Pop passed argument.
-    * NOTE: for performance reason we don't pop it and we don't push the
-    * return value. We can replace the last element with the new value.
+   /* Push return value on the stack
+    * NOTE: for performance reason we could have avoided pop of the argument.
+    * and recycle it with the return value, but that would be WRONG in case of Argument BYREF.
     */
-   hb_itemForwardValue( pObjItem, &(HB_VM_STACK.Return) );
+   hb_stackPop();
+   hb_itemPushForward( &(HB_VM_STACK.Return) );
 }
 
 /* ------------------------------- */
@@ -8507,8 +8496,6 @@ static void hb_vmPopLocal( SHORT iLocal )
 
    if( HB_IS_OBJECT( pLocal ) && (hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN ) )
    {
-      // hb_vmOperatorCall() will POP 2 arguments but we only have 1 argument on the Stack.
-      //hb_vmPushNil();
       hb_vmOperatorCall( pLocal, pVal, "__OPASSIGN", NULL, 1 );
    }
    else
@@ -8538,8 +8525,6 @@ static void hb_vmPopStatic( USHORT uiStatic )
 
    if( HB_IS_OBJECT( pStatic ) && (hb_objGetOpOver( pStatic ) & HB_CLASS_OP_ASSIGN ) )
    {
-      // hb_vmOperatorCall() will POP 2 arguments but we only have 1 argument on the Stack.
-      //hb_vmPushNil();
       hb_vmOperatorCall( pStatic, pVal, "__OPASSIGN", NULL, 1 );
    }
    else
