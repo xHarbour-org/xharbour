@@ -1,10 +1,30 @@
- * $Id: ChangeLog,v 1.4219 2005/07/16 17:50:58 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4220 2005/07/16 19:06:04 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-07-16 17:08 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbapi.h
+  * xharbour/include/hbapiitm.h
+    * Cleanup related to usage of HB_EXPORT and addition of folowing itemapi.c new functions
+  * source/vm/itemapi.c
+   + HB_EXPORT double hb_itemGetNDDec( PHB_ITEM pItem, int * piDec )
+   + HB_EXPORT PHB_ITEM hb_itemPutNDDec( PHB_ITEM pItem, double dNumber, int iDec )
+   + HB_EXPORT PHB_ITEM hb_itemPutHBLong( PHB_ITEM pItem, HB_LONG lNumber )
+   + HB_EXPORT PHB_ITEM hb_itemPutNumType( PHB_ITEM pItem, double dNumber, int iDec, int iType1, int iType2 )
+
+  * source/vm/hvm.c
+    * Modified hb_vmOperatorCall() to accept optional pointer to result, instead of pushing result to stack.
+    * Modified hb_vmPlus() to use explicit arguments and result pointer, rather than the stack.
+      /* This is in preparation of adding new generic HB_P_LOCALNEARADD */
+
+  * include/hbclass.ch
+    * Made ARG <xArg> optional.
+  * tests/overload.prg
+    + Added tests for ++ and --
 
 2005-07-16 12:05 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/hvm.c

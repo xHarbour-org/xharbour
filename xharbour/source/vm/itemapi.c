@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.114 2005/05/04 11:39:55 druzus Exp $
+ * $Id: itemapi.c,v 1.115 2005/07/01 03:34:13 ronpinkas Exp $
  */
 
 /*
@@ -515,6 +515,50 @@ double HB_EXPORT hb_itemGetND( PHB_ITEM pItem )
    return 0;
 }
 
+HB_EXPORT double hb_itemGetNDDec( PHB_ITEM pItem, int * piDec )
+{
+
+   double dNumber;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemGetNDDec(%p)", piDec));
+
+   switch( pItem->type )
+   {
+      case HB_IT_INTEGER:
+         dNumber = ( double ) pItem->item.asInteger.value;
+         *piDec = 0;
+         break;
+
+      case HB_IT_LONG:
+         dNumber = ( double ) pItem->item.asLong.value;
+         *piDec = 0;
+         break;
+
+      case HB_IT_DOUBLE:
+         dNumber = pItem->item.asDouble.value;
+         *piDec = pItem->item.asDouble.decimal;
+         break;
+
+      case HB_IT_DATE:
+         dNumber = (double) pItem->item.asDate.value;
+         *piDec = 0;
+         break;
+
+      case HB_IT_STRING:
+         dNumber = (double) ( BYTE ) pItem->item.asString.value[0];
+         hb_itemReleaseString( pItem );
+         *piDec = 0;
+         break;
+
+      default:
+         dNumber = 0;  /* To avoid GCC -O2 warning */
+         hb_errInternal( HB_EI_VMPOPINVITEM, NULL, "hb_vmPopDouble()", NULL );
+         break;
+   }
+
+   return dNumber;
+}
+
 int HB_EXPORT hb_itemGetNI( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetNI(%p)", pItem));
@@ -731,6 +775,41 @@ PHB_ITEM HB_EXPORT hb_itemPutND( PHB_ITEM pItem, double dNumber )
    pItem->type = HB_IT_DOUBLE;
    pItem->item.asDouble.length = HB_DBL_LENGTH( dNumber );
    pItem->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
+   pItem->item.asDouble.value = dNumber;
+
+   return pItem;
+}
+
+HB_EXPORT PHB_ITEM hb_itemPutNDDec( PHB_ITEM pItem, double dNumber, int iDec )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutND(%p, %lf)", pItem, dNumber));
+
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_DOUBLE;
+   pItem->item.asDouble.length = HB_DBL_LENGTH( dNumber );
+
+
+   if( iDec == HB_DEFAULT_DECIMALS )
+   {
+      pItem->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
+   }
+   else
+   {
+      pItem->item.asDouble.decimal = iDec;
+   }
+
    pItem->item.asDouble.value = dNumber;
 
    return pItem;
@@ -2008,4 +2087,49 @@ HB_LONG HB_EXPORT hb_itemGetNInt( PHB_ITEM pItem )
    }
 
    return 0;
+}
+
+HB_EXPORT PHB_ITEM hb_itemPutHBLong( PHB_ITEM pItem, HB_LONG lNumber )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutHBLong( %p, %" PFHL "d)", pItem, lNumber));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_LONG;
+   pItem->item.asLong.value = lNumber;
+   pItem->item.asLong.length = HB_LONG_LENGTH( lNumber );
+
+   return pItem;
+}
+
+HB_EXPORT PHB_ITEM hb_itemPutNumType( PHB_ITEM pItem, double dNumber, int iDec, int iType1, int iType2 )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemPutNumType( %p, %lf, %d, %i, %i)", pItem, dNumber, iDec, iType1, iType2));
+
+   if( iDec || iType1 & HB_IT_DOUBLE || iType2 & HB_IT_DOUBLE )
+   {
+      return hb_itemPutNDDec( pItem, dNumber, iDec );
+   }
+   else if ( HB_DBL_LIM_INT( dNumber ) )
+   {
+      return hb_itemPutNI( pItem, ( int ) dNumber );
+   }
+   else if ( HB_DBL_LIM_LONG( dNumber ) )
+   {
+      return hb_itemPutHBLong( pItem, ( HB_LONG ) dNumber );
+   }
+   else
+   {
+      return hb_itemPutND( pItem, dNumber );
+   }
 }
