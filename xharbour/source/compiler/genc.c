@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.104 2005/05/16 21:45:40 andijahja Exp $
+ * $Id: genc.c,v 1.105 2005/07/16 03:17:59 ronpinkas Exp $
  */
 
 /*
@@ -3627,6 +3627,39 @@ static HB_GENC_FUNC( hb_p_endfinally )
    return 1;
 }
 
+static HB_GENC_FUNC( hb_p_localnearadd )
+{
+   fprintf( cargo->yyc, "\tHB_P_LOCALNEARADD, %i,",
+                        pFunc->pCode[ lPCodePos + 1 ] );
+
+   if( cargo->bVerbose )
+   {
+      int iVar = (int) (signed char) pFunc->pCode[ lPCodePos + 1 ];
+
+      if( cargo->iNestedCodeblock )
+      {
+         /* we are accesing variables within a codeblock */
+         /* the names of codeblock variable are lost     */
+         if( iVar < 0 )
+         {
+            fprintf( cargo->yyc, "\t/* localvar%i */", -iVar );
+         }
+         else
+         {
+            fprintf( cargo->yyc, "\t/* codeblockvar%i */", iVar );
+         }
+      }
+      else
+      {
+         fprintf( cargo->yyc, "\t/* %s */", hb_compLocalVariableFind( pFunc, iVar )->szName );
+      }
+   }
+
+   fprintf( cargo->yyc, "\n" );
+
+   return 2;
+}
+
 /* NOTE: The order of functions has to match the order of opcodes
  *       mnemonics
  */
@@ -3799,7 +3832,8 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_tryend,
    hb_p_tryrecover,
    hb_p_finally,
-   hb_p_endfinally
+   hb_p_endfinally,
+   hb_p_localnearadd
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

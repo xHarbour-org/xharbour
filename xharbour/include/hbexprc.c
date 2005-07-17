@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.14 2004/06/29 22:14:11 ronpinkas Exp $
+ * $Id: hbexprc.c,v 1.15 2005/03/31 14:34:03 andijahja Exp $
  */
 
 /*
@@ -200,21 +200,33 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
          {
-            if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
-                pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
-                pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 &&
-                pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
+            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
             {
-               iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
-
-               if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+               if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
+                   pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
+                   pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 &&
+                   pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
                {
+                  iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
+
                   if( bOpEq == HB_P_MINUS )
                   {
                      iIncrement = -iIncrement;
                   }
 
                   hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+
+                  HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
+                  return;
+               }
+
+               if( bOpEq == HB_P_PLUS )
+               {
+                  HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+
+                  HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_LOCALNEARADD, ( BYTE ) iLocal, ( BOOL ) 0 );
+
                   HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
 
                   return;
@@ -321,21 +333,31 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
          {
-            if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
-                pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
-                pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 &&
-                pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
+            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
             {
-               iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
+               if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
+                   pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
+                   pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 &&
+                   pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
 
-               if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
                {
+                  iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
+
                   if( bOpEq == HB_P_MINUS )
                   {
                      iIncrement = -iIncrement;
                   }
 
                   hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+
+                  return;
+               }
+
+               if( bOpEq == HB_P_PLUS )
+               {
+                  HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+
+                  HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_LOCALNEARADD, ( BYTE ) iLocal, ( BOOL ) 0 );
 
                   return;
                }

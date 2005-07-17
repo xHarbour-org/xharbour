@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.469 2005/07/16 19:06:13 ronpinkas Exp $
+ * $Id: hvm.c,v 1.470 2005/07/17 00:10:19 ronpinkas Exp $
  */
 
 /*
@@ -2637,6 +2637,18 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             w += 2;  /* only first two bytes are used */
             break;
 
+         case HB_P_LOCALNEARADD:
+         {
+            PHB_ITEM pLocal = hb_itemUnRef( hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] ) );
+
+            hb_vmPlus( pLocal, hb_stackItemFromTop( -1 ), pLocal );
+
+            hb_stackPop();
+
+            w += 2;
+            break;
+         }
+
          case HB_P_LOCALNEARADDINT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARADDINT") );
          {
@@ -4001,7 +4013,7 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
       if( pErrResult )
       {
          hb_itemForwardValue( pResult, pErrResult );
-         hb_itemRelease( pResult );
+         hb_itemRelease( pErrResult );
       }
    }
 }

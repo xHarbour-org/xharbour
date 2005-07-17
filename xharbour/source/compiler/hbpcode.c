@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.36 2005/04/20 23:29:54 ronpinkas Exp $
+ * $Id: hbpcode.c,v 1.37 2005/04/27 20:20:28 ronpinkas Exp $
  */
 
 /*
@@ -219,7 +219,8 @@ static char *pCodeList[] =
     "HB_P_TRYRECOVER",            /* 164 */
     "HB_P_ENDFINALLY",            /* 165 */
     "HB_P_FINALLY",               /* 166 */
-    "HB_P_LAST_PCODE"             /* 167 this defines the number of defined pcodes */
+    "HB_P_LOCALNEARADD",          /* 167 */
+    "HB_P_LAST_PCODE"             /* 168 this defines the number of defined pcodes */
 };
 
 static BYTE s_pcode_len[] = {
@@ -391,7 +392,8 @@ static BYTE s_pcode_len[] = {
    4,        /* HB_P_TRYEND,               */
    4,        /* HB_P_TRYRECOVER,           */
    1,        /* HB_P_FINALLY,              */
-   1         /* HB_P_ENDFINALLY,           */
+   1,        /* HB_P_ENDFINALLY,           */
+   2,        /* HB_P_LOCALNEARADD          */
 };
 
 extern BOOL hb_comp_iGenVarList;
