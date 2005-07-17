@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.142 2005/07/11 04:34:55 walito Exp $
+ * $Id: classes.c,v 1.143 2005/07/17 16:42:43 ronpinkas Exp $
  */
 
 /*
@@ -1844,6 +1844,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
                if( bCheckPrefix && pMessage->pSymbol->szName[ 0 ] == '_' )
                {
                   pNewMeth->pFunction = hb___msgSetClsData;
+                  pClass->uiDatasShared++;
                }
                else
                {
@@ -2127,7 +2128,7 @@ HB_FUNC( __CLSNEW )
       ULONG nLenClsDatas = 0;
       ULONG nLenInlines = 0;
       ULONG nLenDatas = hb_parni( 2 );
-      PCLASS   pSprCls;
+      PCLASS   pSprCls = NULL; // To void incorrect warning
       PMETHOD  pNewMethod;
       PMETHOD  pSprMethod;
       USHORT   uiInit = 0, uiAt = 0;
@@ -2436,12 +2437,10 @@ HB_FUNC( __CLSINST )
  */
 static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
 {
-
    if( uiClass <= s_uiClasses )
    {
       PCLASS   pClass = s_pClasses + ( uiClass - 1 );
       USHORT   uiAt;
-      BOOL     bClassCtor = FALSE;
 
       hb_arrayNew( pSelf, pClass->uiDatas );
 
@@ -2586,14 +2585,13 @@ static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
 
       if( pClass->uiScope & HB_OO_CLSTP_CLASSCTOR )
       {
-         PMETHOD pMethod  = pClass->pMethods;
-         USHORT uiAt      = pClass->uiMethods + 1;
-         PHB_ITEM pArray  = hb_itemArrayNew( 3 );
+         PMETHOD pMethod = pClass->pMethods;
+         PHB_ITEM pArray = hb_itemArrayNew( 3 );
 
          hb_itemPutNI( hb_arrayGetItemPtr( pArray, 3 ), HB_OO_MCLSCTOR_INSTANCE );
          hb_arraySetForward( pArray, 1, pSelf );
 
-         for( ; --uiAt; pMethod++ )
+         for( uiAt = pClass->uiMethods + 1; --uiAt; pMethod++ )
          {
             if( pMethod->uiScope & HB_OO_CLSTP_CLASSCTOR )
             {
