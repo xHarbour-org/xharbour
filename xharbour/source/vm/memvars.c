@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.104 2005/05/24 21:05:58 ronpinkas Exp $
+ * $Id: memvars.c,v 1.105 2005/07/10 05:07:10 walito Exp $
  */
 
 /*
@@ -156,7 +156,7 @@ static void hb_memvarAddPrivate( PHB_DYNS );
 static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR );
 void hb_memvarReleasePublic( PHB_ITEM pMemVar );
 
-extern void hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM, int ); /* call an overloaded operator */
+extern void hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM, int, PHB_ITEM ); /* call an overloaded operator */
 
 #ifndef HB_THREAD_SUPPORT
 void hb_memvarsInit( void )
@@ -739,7 +739,7 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
             // hb_vmOperatorCall() will POP 2 arguments.
             /* hb_vmPushNil(); */
             /* hb_vmPushNil(); */
-            hb_vmOperatorCall( pSetItem, pItem, "__OPASSIGN", NULL, 0 );
+            hb_vmOperatorCall( pSetItem, pItem, "__OPASSIGN", NULL, 0, pSetItem );
          }
          else
          {
