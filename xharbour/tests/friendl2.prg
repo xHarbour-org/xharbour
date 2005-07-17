@@ -1,5 +1,5 @@
 //
-// $Id: friendl2.prg,v 1.0 2004/03/06 13:20:32 jonnymind Exp $
+// $Id: friendl2.prg,v 1.1 2005/07/12 04:19:31 walito Exp $
 //
 
 ***********
@@ -21,7 +21,7 @@ METHOD New( oCall ) CLASS Two
    ::oCall := oCall
    // This class is friends with One
    __ClsFriendly( One(), Self )
-RETURN
+RETURN Self
 
 METHOD Testing() CLASS Two
    ::oCall:Test( ::Classname() )
@@ -37,7 +37,7 @@ ENDCLASS
 
 METHOD New( oCall ) CLASS Three
    ::oCall := oCall
-RETURN
+RETURN Self
 
 METHOD Testing() CLASS Three
    ::oCall:Test( ::Classname() )
