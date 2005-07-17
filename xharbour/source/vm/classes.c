@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.141 2005/07/10 05:07:07 walito Exp $
+ * $Id: classes.c,v 1.142 2005/07/11 04:34:55 walito Exp $
  */
 
 /*
@@ -2586,7 +2586,6 @@ static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
 
       if( pClass->uiScope & HB_OO_CLSTP_CLASSCTOR )
       {
-         HB_THREAD_STUB
          PMETHOD pMethod  = pClass->pMethods;
          USHORT uiAt      = pClass->uiMethods + 1;
          PHB_ITEM pArray  = hb_itemArrayNew( 3 );
@@ -2800,8 +2799,6 @@ HB_FUNC( __OBJHASMSG )
 
 HB_EXPORT PHB_ITEM hb_objClone( PHB_ITEM pSrcObject )
 {
-   HB_THREAD_STUB
-
    if( pSrcObject && HB_IS_OBJECT( pSrcObject ) )
    {
       PHB_ITEM pDstObject = hb_arrayClone2( pSrcObject, NULL ) ;
@@ -4610,7 +4607,7 @@ HB_FUNC( __CLSGETIVARNAMESANDVALUES )
             {
                hb_arrayNew( &SubArray, 2 );
                hb_itemPutC( hb_arrayGetItemPtr( &SubArray, 1), pMeth->pMessage->pSymbol->szName );
-               
+
                pTemp = hb_arrayGetItemPtr( pObject, pMeth->uiData );
                if( pTemp )
                {
@@ -4850,7 +4847,7 @@ HB_FUNC( __CLSFRIENDLY )   // __ClsFriend( oObj, oFriend )
    HB_THREAD_STUB
    PHB_ITEM pObj    = hb_param( 1, HB_IT_OBJECT );
    PHB_ITEM pFriend = hb_param( 2, HB_IT_OBJECT );
-   
+
    if( HB_IS_OBJECT( pObj ) && HB_IS_OBJECT( pFriend ) )
    {
       USHORT uiClsObj    = pObj->item.asArray.value->uiClass;
@@ -4859,7 +4856,7 @@ HB_FUNC( __CLSFRIENDLY )   // __ClsFriend( oObj, oFriend )
       if( uiClsObj <= s_uiClasses && uiClsFriend <= s_uiClasses )
       {
          PCLASS pClsObj = s_pClasses + uiClsObj - 1;
-         
+
          if( pClsObj->pFriends )
          {
             pClsObj->pFriends = (USHORT *) hb_xrealloc( pClsObj->pFriends, sizeof(USHORT) * (pClsObj->uiFriends + 1) );
@@ -4872,23 +4869,23 @@ HB_FUNC( __CLSFRIENDLY )   // __ClsFriend( oObj, oFriend )
          pClsObj->uiFriends++;
       }
    }
-   
+
    if( HB_IS_OBJECT( pObj ) )
    {
       USHORT uiClsObj = pObj->item.asArray.value->uiClass;
-      
+
       if( uiClsObj <= s_uiClasses )
       {
          PCLASS pClsObj = s_pClasses + uiClsObj - 1;
 
          hb_reta( pClsObj->uiFriends );
-         
+
          if( pClsObj->uiFriends )
          {
             PHB_ITEM pArray = hb_param( -1, HB_IT_ANY );
             PHB_ITEM pHClass = hb_itemPutNI( NULL, 0);
             USHORT ui;
-            
+
             for( ui = 1; ui <= pClsObj->uiFriends; ui++ )
             {
                hb_itemPutNI( pHClass, pClsObj->pFriends[ ui-1 ] );

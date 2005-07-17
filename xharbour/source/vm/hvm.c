@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.470 2005/07/17 00:10:19 ronpinkas Exp $
+ * $Id: hvm.c,v 1.471 2005/07/17 01:59:57 ronpinkas Exp $
  */
 
 /*
@@ -3901,8 +3901,6 @@ static void hb_vmNegate( void )
 
 static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
 {
-   HB_THREAD_STUB
-
    HB_TRACE( HB_TR_DEBUG, ( "hb_vmPlus()" ) );
 
    // Must be first because STRING (length 1) qualifies as NUMERIC!
