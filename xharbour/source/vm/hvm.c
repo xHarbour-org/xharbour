@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.471 2005/07/17 01:59:57 ronpinkas Exp $
+ * $Id: hvm.c,v 1.472 2005/07/17 16:42:43 ronpinkas Exp $
  */
 
 /*
@@ -3903,6 +3903,8 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_vmPlus()" ) );
 
+   //printf( "Left: %i, Right: %i\n", pLeft->type, pRight->type );
+
    // Must be first because STRING (length 1) qualifies as NUMERIC!
    if( HB_IS_STRING( pLeft ) && HB_IS_STRING( pRight ) )
    {
@@ -3980,7 +3982,7 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
          hb_itemPutNDDec( pResult, ( double ) lNumber1 + ( double ) lNumber2, 0 );
       }
    }
-   else if( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pLeft ) )
+   else if( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) )
    {
       int iDec1, iDec2, iType1 = pLeft->type, iType2 = pRight->type;
       double dNumber1 = hb_itemGetNDDec( pLeft, &iDec1 );

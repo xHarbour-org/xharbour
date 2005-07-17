@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.115 2005/07/01 03:34:13 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.116 2005/07/17 00:10:20 ronpinkas Exp $
  */
 
 /*
@@ -546,13 +546,12 @@ HB_EXPORT double hb_itemGetNDDec( PHB_ITEM pItem, int * piDec )
 
       case HB_IT_STRING:
          dNumber = (double) ( BYTE ) pItem->item.asString.value[0];
-         hb_itemReleaseString( pItem );
          *piDec = 0;
          break;
 
       default:
          dNumber = 0;  /* To avoid GCC -O2 warning */
-         hb_errInternal( HB_EI_VMPOPINVITEM, NULL, "hb_vmPopDouble()", NULL );
+         hb_errInternal( HB_EI_VMPOPINVITEM, NULL, "hb_itemGetNDDec()", NULL );
          break;
    }
 
