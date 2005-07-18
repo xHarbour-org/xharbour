@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.86 2005/05/29 06:03:41 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.87 2005/06/01 02:09:27 ronpinkas Exp $
  */
 
 /*
@@ -2377,7 +2377,7 @@ ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
                   hb_compLinePush();
                   hb_compDebugStart();
                   ++hb_comp_wForCounter;              /* 5 */
-                  $<asExpr>$ = hb_compExprGenStatement( hb_compExprAssign( $2, $4 ) );
+                  $<asExpr>$ = hb_compExprGenStatement( hb_compExprAssign( hb_compExprClone( $2 ), $4 ) );
                }
              TO Expression StepExpr                   /* 6  7  8 */
                {
@@ -2447,11 +2447,17 @@ ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
 
                   hb_compGenJump( $<lNumber>9 - hb_comp_functions.pLast->lPCodePos );
                   hb_compGenJumpHere( $<lNumber>11 );
+
                   hb_compLoopEnd();
+
+                  hb_compExprDelete( $2 );
                   hb_compExprDelete( $7 );
-                  hb_compExprDelete( $<asExpr>5 ); /* deletes $5, $2, $4 */
+                  hb_compExprDelete( $<asExpr>5 ); /* deletes $5, hb_compExprClone( $2 ), $4 */
                   if( $<asExpr>8 )
+                  {
                      hb_compExprDelete( $<asExpr>8 );
+                  }
+
                   hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
                }
            ;

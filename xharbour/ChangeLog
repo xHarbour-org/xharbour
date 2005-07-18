@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4224 2005/07/17 17:39:44 walito Exp $
+ * $Id: ChangeLog,v 1.4225 2005/07/17 18:28:57 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-07-18 10:37 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/compiler/harbour.sly
+    ! Fixed gpf trap related to LOOP control variable optimized in hb_compExprUseAssign()
 
 2005-07-17 11:28 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/hvm.c
