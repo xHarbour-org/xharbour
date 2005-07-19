@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.107 2005/07/07 10:00:58 lf_sfnet Exp $
+ * $Id: tbrowse.prg,v 1.108 2005/07/12 17:35:37 gdrouillard Exp $
  */
 
 /*
@@ -251,6 +251,7 @@ CLASS TBrowse
    METHOD RedrawHeaders( nWidth )         // Repaints TBrowse Headers
    METHOD Moved()                         // Every time a movement key is issued I need to reset certain properties
                                           // of TBrowse, I do these settings inside this method
+   METHOD EvalSkipBlock( nSkip )          // Eval skip block
 
    METHOD WriteMLineText( cStr, nPadLen, lHeader, cColor ) // Writes a multi-line text where ";" is a line break, lHeader
                                                            // is .T. if it is a header and not a footer
@@ -1038,7 +1039,7 @@ METHOD GoBottom() CLASS TBrowse
    Eval( ::goBottomBlock )
 
    //   Skip back from last record as many records as TBrowse can hold
-   nToTop := Abs( EvalSkipBlock( ::SkipBlock, - ( ::RowCount - 1 ) ) )
+   nToTop := Abs( ::EvalSkipBlock( - ( ::RowCount - 1 ) ) )
 
    //   From top of TBrowse new row position is nToTop + 1 records away
    ::nNewRowPos := nToTop + 1
@@ -1057,7 +1058,7 @@ METHOD GoTop() CLASS TBrowse
    ::Moved()
 
    Eval( ::goTopBlock )
-   Eval( ::skipBlock,0 ) // required for compatibility
+   ::EvalSkipBlock( 0 ) // required for compatibility
    ::nLastRetrieved := 1
    ::nNewRowPos     := 1
    ::RefreshAll()
@@ -1755,7 +1756,7 @@ METHOD CheckRowPos() CLASS TBrowse
       If ::RowPos # 1     // No repositioning is required if current
                           // cursor row is one
 
-         nAvail := Eval( ::SkipBlock, 0 - ::RowPos - 1 )
+         nAvail := ::EvalSkipBlock( 0 - ::RowPos - 1 )
 
          // You should reposition only if there are too few records
          // available or there are more than sufficient records
@@ -1765,7 +1766,7 @@ METHOD CheckRowPos() CLASS TBrowse
 
          // Place back the data source pointer to where it was
          //
-         Eval( ::SkipBlock, 0 - nAvail )
+         ::EvalSkipBlock( 0 - nAvail )
 
       EndIf
    EndIf
@@ -1913,7 +1914,7 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       // If I'm not already under cursor I have to set data source to cursor position
       //
       if ::nLastRetrieved <> ::nNewRowPos
-         EvalSkipBlock( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
+         ::EvalSkipBlock( ::nNewRowPos - ::nLastRetrieved )
          ::nLastRetrieved := ::nNewRowPos
       endif
 
@@ -1952,11 +1953,11 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
       // I have to set data source to cursor position
       //
       if ::nLastRetrieved <> ::nNewRowPos
-         EvalSkipBlock( ::SkipBlock, ::nNewRowPos - ::nLastRetrieved )
+         ::EvalSkipBlock( ::nNewRowPos - ::nLastRetrieved )
          ::nLastRetrieved := ::nNewRowPos
       endif
 
-      nRecsSkipped := EvalSkipBlock( ::SkipBlock, ::nRecsToSkip )
+      nRecsSkipped := ::EvalSkipBlock( ::nRecsToSkip )
 
       // I've tried to move past top or bottom margin
       //
@@ -2094,7 +2095,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
       if nRow <> ::nLastRetrieved
 
          nRowsToSkip := nRow - ::nLastRetrieved
-         nSkipped := EvalSkipBlock( ::SkipBlock, nRowsToSkip )
+         nSkipped := ::EvalSkipBlock( nRowsToSkip )
 
          if nSkipped != nRowsToSkip
 
@@ -2827,9 +2828,9 @@ METHOD SetStyle( nMode, lSetting ) CLASS TBROWSE
 
 //---------------------------------------------------------------------//
 
-static Function EvalSkipBlock( bBlock, nSkip )
+METHOD EvalSkipBlock( nSkip ) CLASS TBROWSE
    LOCAL lSign   := nSkip >= 0
-   LOCAL nSkiped := Eval( bBlock, nSkip )
+   LOCAL nSkiped := Eval( ::SkipBlock, nSkip )
 
    if ( lSign .and. nSkiped < 0 ) .or. ( !lSign .and. nSkiped > 0 )
       nSkiped := 0
