@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.108 2005/07/12 17:35:37 gdrouillard Exp $
+ * $Id: tbrowse.prg,v 1.109 2005/07/19 09:59:38 lf_sfnet Exp $
  */
 
 /*
@@ -1299,6 +1299,18 @@ METHOD Moved() CLASS TBrowse
    endif
 
    Return Self
+
+//---------------------------------------------------------------------//
+
+METHOD EvalSkipBlock( nSkip ) CLASS TBROWSE
+   LOCAL lSign   := nSkip >= 0
+   LOCAL nSkiped := Eval( ::SkipBlock, nSkip )
+
+   if ( lSign .and. nSkiped < 0 ) .or. ( !lSign .and. nSkiped > 0 )
+      nSkiped := 0
+   endif
+
+   Return nSkiped
 
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
@@ -2825,18 +2837,6 @@ METHOD SetStyle( nMode, lSetting ) CLASS TBROWSE
    ENDIF
 
    Return lRet
-
-//---------------------------------------------------------------------//
-
-METHOD EvalSkipBlock( nSkip ) CLASS TBROWSE
-   LOCAL lSign   := nSkip >= 0
-   LOCAL nSkiped := Eval( ::SkipBlock, nSkip )
-
-   if ( lSign .and. nSkiped < 0 ) .or. ( !lSign .and. nSkiped > 0 )
-      nSkiped := 0
-   endif
-
-   Return nSkiped
 
 //-------------------------------------------------------------------//
 
