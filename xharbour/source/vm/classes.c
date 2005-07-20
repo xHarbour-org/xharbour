@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.143 2005/07/17 16:42:43 ronpinkas Exp $
+ * $Id: classes.c,v 1.144 2005/07/17 17:33:06 walito Exp $
  */
 
 /*
@@ -3697,7 +3697,7 @@ static HARBOUR hb___msgClsSel( void )
       Return.type = HB_IT_NIL;
       hb_arrayNew( &Return, uiAt );
                                                 /* Create a transfer array  */
-      for( uiAt++; --uiAt; uiAt++ )
+      for( uiAt++; --uiAt; pMeth++ )
       {
          if( ( nParam == HB_MSGLISTALL ) ||
              ( ( nParam == HB_MSGLISTCLASS ) &&
