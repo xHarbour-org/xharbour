@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.20 2004/08/29 18:30:29 lf_sfnet Exp $
+# $Id: Makefile,v 1.21 2005/01/22 15:49:17 lf_sfnet Exp $
 #
 
 ROOT = ../
@@ -96,6 +96,7 @@ PRG_HEADERS=\
 	hbsetup.ch   \
 	hbserv.ch    \
 	hbstruct.ch  \
+	hbver.ch     \
 	inkey.ch     \
 	memoedit.ch  \
 	ord.ch       \
