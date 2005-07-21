@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.105 2005/07/10 05:07:10 walito Exp $
+ * $Id: memvars.c,v 1.106 2005/07/17 16:20:52 ronpinkas Exp $
  */
 
 /*
@@ -2042,6 +2042,10 @@ HB_FUNC( __MVSAVE )
 
       pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
 
+      if( pFileName->szPath == NULL )
+      {
+         pFileName->szPath = hb_set.HB_SET_DEFAULT;
+      }
       if( pFileName->szExtension == NULL )
       {
          pFileName->szExtension = ".mem";
@@ -2196,7 +2200,7 @@ HB_FUNC( __MVRESTORE )
             hb_errInternal( 9100, "Invalid mask passed as MEMVAR filter '%s' -> '%s'\n", (char *) pszMask, sRegEx );
          }
 
-         while( hb_fsRead( fhnd, buffer, uLen ) == uLen )
+         while( hb_fsRead( fhnd, buffer, uLen ) == ( USHORT ) uLen )
          {
             USHORT uiType = ( USHORT ) ( buffer[ 1 + uMemLen ] - 128 );
             USHORT uiWidth = ( USHORT ) buffer[ 6 + uMemLen  ];
