@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.4 2005/05/09 18:34:27 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.5 2005/07/13 16:13:14 bdj Exp $
  */
 
 /*
@@ -121,8 +121,8 @@ HB_FUNC( WVT_UTILS )
 //
 HB_FUNC( WVT_CHOOSEFONT )
 {
-   CHOOSEFONT  cf;
-   LOGFONT     lf;
+   CHOOSEFONT  cf = { 0 };
+   LOGFONT     lf = { 0 };
    LONG        PointSize = 0;
 
    if ( ! ISNIL( 2 ) )
@@ -258,8 +258,8 @@ HB_FUNC( WVT_SETTOOLTIPACTIVE )
 //
 HB_FUNC( WVT_SETTOOLTIP )
 {
-   TOOLINFO ti;
-   POINT    xy;
+   TOOLINFO ti = { 0 };
+   POINT    xy = { 0 };
    int      iTop, iLeft, iBottom, iRight;
 
    if ( ! _s->bToolTipActive )
@@ -312,7 +312,7 @@ HB_FUNC( WVT_SETTOOLTIPTEXT )
 
 HB_FUNC( WVT_SETTOOLTIPMARGIN )
 {
-   RECT rc;
+   RECT rc = { 0 };
 
    rc.left   = hb_parni( 2 );
    rc.top    = hb_parni( 1 );
@@ -437,7 +437,7 @@ HB_FUNC( WVT_KILLTIMER )
 
 HB_FUNC( WVT_SETONTOP )
 {
-   RECT rect;
+   RECT rect = { 0 };
 
    GetWindowRect( _s->hWnd, &rect );
 
@@ -453,7 +453,7 @@ HB_FUNC( WVT_SETONTOP )
 
 HB_FUNC( WVT_SETASNORMAL )
 {
-   RECT rect;
+   RECT rect = { 0 };
 
    GetWindowRect( _s->hWnd, &rect );
 
@@ -483,7 +483,7 @@ HB_FUNC( WVT_MAXIMIZE )
 
 HB_FUNC( WVT_SETMOUSEPOS )
 {
-   POINT xy;
+   POINT xy = { 0 };
 
    xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
 
@@ -683,7 +683,7 @@ HB_FUNC( WVT_GETXYFROMROWCOL )
 {
    HB_ITEM  aXY;
    HB_ITEM  temp;
-   POINT    xy;
+   POINT    xy = { 0 };
 
    xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
 
@@ -1113,8 +1113,8 @@ HB_FUNC( WVT_KEYBOARD )
 
 HB_FUNC( WVT_INVALIDATERECT )
 {
-   RECT  rc;
-   POINT xy;
+   RECT  rc = { 0 };
+   POINT xy = { 0 };
 
    xy           = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
    rc.top       = xy.y;
@@ -1139,7 +1139,7 @@ HB_FUNC( WVT_CLIENTTOSCREEN )
 {
    HB_ITEM  aXY;
    HB_ITEM  temp;
-   POINT    xy;
+   POINT    xy = { 0 };
 
    xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
 
@@ -1160,7 +1160,7 @@ HB_FUNC( WVT_CLIENTTOSCREEN )
 
 HB_FUNC( WVT_GETCURSORPOS )
  {
-    POINT    xy;
+    POINT    xy = { 0 };
     HB_ITEM  info;
     HB_ITEM  temp;
 
@@ -1181,7 +1181,7 @@ HB_FUNC( WVT_GETCURSORPOS )
 
 HB_FUNC( WVT_TRACKPOPUPMENU )
 {
-   POINT xy;
+   POINT xy = { 0 };
 
    GetCursorPos( &xy );
 
@@ -1932,7 +1932,7 @@ HB_FUNC( WIN_LOADIMAGE )
 
 HB_FUNC( WIN_GETCLIENTRECT )
 {
-   RECT     rc;
+   RECT     rc = { 0 };
    HB_ITEM  info;
    HB_ITEM  temp;
 
@@ -1986,7 +1986,7 @@ HB_FUNC( WIN_RECTANGLE )
 
 HB_FUNC( WIN_CREATEBRUSH )
 {
-   LOGBRUSH lb;
+   LOGBRUSH lb = { 0 };
 
    lb.lbStyle = hb_parni( 1 );
    lb.lbColor = ISNIL( 2 ) ? RGB( 0,0,0 ) : ( COLORREF ) hb_parnl( 2 ) ;
@@ -2001,7 +2001,7 @@ HB_FUNC( WIN_CREATEBRUSH )
 //
 HB_FUNC( WIN_DRAWTEXT )
 {
-   RECT rc;
+   RECT rc = { 0 };
 
    rc.left   = hb_parni( 3,1 );
    rc.top    = hb_parni( 3,2 );

@@ -1,10 +1,17 @@
- * $Id: ChangeLog,v 1.4230 2005/07/20 22:17:46 likewolf Exp $
+ * $Id: ChangeLog,v 1.4231 2005/07/21 00:11:04 peterrees Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-07-22 14:20 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
+  * source/rtl/gtwvt/gtwvt.c
+    contrib/gtwvw/gtwvt.c
+    contrib/wvtwin/wvtcore.c
+    contrib/wvtwin/wvtutils.c
+    ! all Windows structures like RECT/POINT/LOGFONT/LOGBRUSH now are initialized to an empty structure.
+
 2005-07-21 12:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/vm/memvars.c
     * in HB_FUNC( __MVSAVE ) add support for SET DEFAULT

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.2 2005/02/24 10:44:03 andijahja Exp $
+ * $Id: wvtcore.c,v 1.3 2005/05/09 18:34:26 vouchcac Exp $
  */
 
 /*
@@ -128,7 +128,7 @@ HB_EXPORT BOOL hb_wvt_DrawImage( HDC hdc, int x1, int y1, int wd, int ht, char *
   int      tor =  0 ;
   int      toc =  0 ;
   HRGN     hrgn1;
-  POINT    lpp;
+  POINT    lpp = { 0 };
   BOOL     bResult = FALSE;
 
   hFile = CreateFile( image, GENERIC_READ, 0, NULL, OPEN_EXISTING,
@@ -470,7 +470,7 @@ HB_FUNC( WVT_SETPEN )
 HB_FUNC( WVT_SETBRUSH )
 {
    HBRUSH   hBrush;
-   LOGBRUSH lb;
+   LOGBRUSH lb = { 0 };
 
    if ( ISNIL( 1 ) )
    {
@@ -505,8 +505,8 @@ HB_FUNC( WVT_SETBRUSH )
 //
 HB_FUNC( WVT_DRAWBOXGET )
 {
-   POINT xy;
-   POINT yz;
+   POINT xy = { 0 };
+   POINT yz = { 0 };
 
    xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
    yz = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ) + hb_parni( 3 ), hb_parni( 1 ) + 1 );
@@ -596,7 +596,7 @@ HB_FUNC( WVT_DRAWBOXGROUPRAISED )
 //
 HB_FUNC( WVT_DRAWIMAGE )
 {
-   POINT xy;
+   POINT xy = { 0 };
    int   iLeft, iTop, iRight, iBottom;
 
    xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
@@ -630,9 +630,9 @@ HB_FUNC( WVT_DRAWIMAGE )
 //
 HB_FUNC( WVT_DRAWLABEL )
 {
-   POINT    xy;
+   POINT    xy = { 0 };
    HFONT    hFont;
-   LOGFONT  logfont;
+   LOGFONT  logfont = { 0 };
 
    logfont.lfEscapement     = ( ISNIL(  5 ) ? 0 : ( hb_parni( 5 ) * 10 ) );
    logfont.lfOrientation    = 0;
@@ -685,7 +685,7 @@ HB_FUNC( WVT_DRAWLABEL )
 HB_FUNC( WVT_DRAWOUTLINE )
 {
    HPEN  hPen;
-   POINT xy;
+   POINT xy = { 0 };
    int   iTop, iLeft, iBottom, iRight;
 
    xy      = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
@@ -1005,7 +1005,7 @@ HB_FUNC( WVT_DRAWFOCUSRECT )
    int iLeft   = ( _s->PTEXTSIZE.x * hb_parni( 2 ) ) + hb_parni( 5,2 );
    int iBottom = ( _s->PTEXTSIZE.y * ( hb_parni( 3 ) + 1 ) ) - 1 + hb_parni( 5,3 );
    int iRight  = ( _s->PTEXTSIZE.x * ( hb_parni( 4 ) + 1 ) ) - 1 + hb_parni( 5,4 );
-   RECT rc;
+   RECT rc = { 0 };
 
    rc.left   = iLeft;
    rc.top    = iTop;
@@ -1029,7 +1029,7 @@ HB_FUNC( WVT_DRAWCOLORRECT )
    int iLeft   = ( _s->PTEXTSIZE.x * hb_parni( 2 ) ) + hb_parni( 5,2 );
    int iBottom = ( _s->PTEXTSIZE.y * ( hb_parni( 3 ) + 1 ) ) - 1 + hb_parni( 5,3 );
    int iRight  = ( _s->PTEXTSIZE.x * ( hb_parni( 4 ) + 1 ) ) - 1 + hb_parni( 5,4 );
-   RECT rc;
+   RECT rc = { 0 };
    HBRUSH hBrush;
 
    hBrush = CreateSolidBrush( ( COLORREF ) hb_parnl( 6 ) );
@@ -1148,14 +1148,14 @@ HB_FUNC( WVT_DRAWGRIDVERT )
 //
 HB_FUNC( WVT_DRAWBUTTON )
 {
-   SIZE     sz;
-   POINT    xy;
-   RECT     rc;
+   SIZE     sz = { 0 };
+   POINT    xy = { 0 };
+   RECT     rc = { 0 };
    int      iTop, iLeft, iBottom, iRight;
    int      iAlign;
    int      iTextHeight /*, iTextWidth */ ;
    int      iImageWidth, iImageHeight;
-   LOGBRUSH lb;
+   LOGBRUSH lb = { 0 };
    HBRUSH   hBrush;
    IPicture *iPicture;
 
@@ -1297,7 +1297,7 @@ HB_FUNC( WVT_DRAWSTATUSBAR )
    int   iPanels   = hb_parni( 1 );
    int   i, iNext;
    int   iTop, iLeft, iBottom, iRight;
-   POINT xy;
+   POINT xy = { 0 };
 
    iNext = 0;
 
@@ -1362,7 +1362,7 @@ HB_FUNC( WVT_DRAWSTATUSBAR )
 //
 HB_FUNC( WVT_DRAWPICTURE )
 {
-   POINT    xy;
+   POINT    xy = { 0 };
    int      iTop, iLeft, iBottom, iRight;
    int      iSlot   = hb_parni( 5 ) - 1;
 
@@ -1389,7 +1389,7 @@ HB_FUNC( WVT_DRAWPICTURE )
 //
 HB_FUNC( WVT_DRAWLABELEX )
 {
-   POINT    xy;
+   POINT    xy = { 0 };
    int      iSlot = hb_parni( 7 ) - 1;
 
    if ( _s->hUserFonts[ iSlot ] )
@@ -1424,7 +1424,7 @@ HB_FUNC( WVT_DRAWLABELEX )
 //
 HB_FUNC( WVT_DRAWLINEEX )
 {
-   POINT    xy;
+   POINT    xy = { 0 };
    int      iTop, iLeft, iBottom, iRight, iOffset ;
    int      iOrient, iFormat, iAlign ;
    int      x, y;
@@ -1618,7 +1618,7 @@ HB_FUNC( WVT_DRAWLINEEX )
 //
 HB_FUNC( WVT_DRAWOUTLINEEX )
 {
-   POINT xy;
+   POINT xy = { 0 };
    int   iTop, iLeft, iBottom, iRight;
    int   iSlot = hb_parni( 5 ) - 1;
 
@@ -1696,7 +1696,7 @@ HB_FUNC( WVT_LOADPICTUREFROMRESOURCE )
 //
 HB_FUNC( WVT_LOADFONT )
 {
-   LOGFONT  logfont;
+   LOGFONT  logfont = { 0 };
    int      iSlot = hb_parni( 1 ) - 1;
    HFONT    hFont;
 
@@ -1767,7 +1767,7 @@ HB_FUNC( WVT_LOADPEN )
 HB_FUNC( WVT_SAVESCREEN )
 {
    HBITMAP  hBmp, oldBmp;
-   POINT    xy;
+   POINT    xy = { 0 };
    int      iTop, iLeft, iBottom, iRight, iWidth, iHeight;
    HB_ITEM  info;
    HB_ITEM  temp;
@@ -1807,7 +1807,7 @@ HB_FUNC( WVT_SAVESCREEN )
 //
 HB_FUNC( WVT_RESTSCREEN )
 {
-   POINT   xy;
+   POINT   xy = { 0 };
    int     iTop, iLeft, iBottom, iRight, iWidth, iHeight;
    HBITMAP hBmp;
 
@@ -1879,7 +1879,7 @@ HB_FUNC( WVT_RESTSCREEN )
 //
 HB_FUNC( WVT_CREATEFONT )
 {
-   LOGFONT  logfont;
+   LOGFONT  logfont = { 0 };
    HFONT    hFont;
 
    logfont.lfEscapement     = ( ISNIL( 10 ) ? 0 : ( hb_parni( 10 ) * 10 ) );
@@ -1915,12 +1915,12 @@ HB_FUNC( WVT_CREATEFONT )
 //
 HB_FUNC( WVT_DRAWLABELOBJ )
 {
-   POINT    xy;
-   RECT     rect;
+   POINT    xy = { 0 };
+   RECT     rect = { 0 };
    int      iTop, iLeft, iBottom, iRight, x, y;
    int      iAlignHorz, iAlignVert, iAlignH, iAlignV;
    UINT     uiOptions;
-   SIZE     sz;
+   SIZE     sz = { 0 };
 
    xy           = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
    iTop         = xy.y;
@@ -2061,7 +2061,7 @@ HB_FUNC( WVT_DRAWSCROLLBUTTON )
    int iRight  = ( _s->PTEXTSIZE.x * ( hb_parni( 4 ) + 1 ) ) - 1 + hb_parni( 5,4 );
 
    POINT    * Point;
-   POINT    xy;
+   POINT    xy = { 0 };
    int      iHeight, iOff;
    BOOL     bDepressed = ISNIL( 7 ) ? FALSE : hb_parl( 7 ) ;
 
@@ -2263,7 +2263,7 @@ HB_FUNC( WVT_DRAWSHADEDRECT )
    if ( _s->hMSImg32 )
    {
       TRIVERTEX     vert[ 2 ] ;
-      GRADIENT_RECT gRect ;
+      GRADIENT_RECT gRect = { 0 };
 
       int iTop        = ( _s->PTEXTSIZE.y * hb_parni( 1 ) ) + hb_parni( 5,1 );
       int iLeft       = ( _s->PTEXTSIZE.x * hb_parni( 2 ) ) + hb_parni( 5,2 );
@@ -2315,7 +2315,7 @@ HB_FUNC( WVT_DRAWTEXTBOX )
    int iAlignHorz   = ( ISNIL( 7 ) ? 0 : hb_parni( 7 ) );
    int iAlignH ;
 
-   RECT     rc;
+   RECT     rc = { 0 };
 
    switch ( iAlignHorz )
    {
@@ -2375,8 +2375,8 @@ HB_FUNC( WVT_DRAWPROGRESSBAR )
    BOOL     bVertical, bImage;
    COLORREF crBarColor;
    HBRUSH   hBrush;
-   LOGBRUSH lb;
-   RECT     rc;
+   LOGBRUSH lb = { 0 };
+   RECT     rc = { 0 };
 
    iPercent   = hb_parni( 6 );
    bImage     = ISNIL(  9 ) ? FALSE : TRUE ;
