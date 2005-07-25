@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.98 2005/07/16 06:07:30 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.99 2005/07/16 17:51:28 ronpinkas Exp $
  */
 
 /*
@@ -3036,26 +3036,15 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
             // Order is SIGNIFICANT for NON numerics!!!
             else if( pPlus->value.asOperator.pRight->ExprType == HB_ET_VARIABLE &&
                      pPlus->value.asOperator.pRight->value.asSymbol == pSelf->value.asOperator.pLeft->value.asSymbol &&
-                     pPlus->value.asOperator.pLeft->ExprType == HB_ET_NUMERIC )
+                     pPlus->value.asOperator.pLeft->ExprType == HB_ET_NUMERIC &&
+                     pPlus->ExprType == HB_EO_PLUS )
             {
                HB_EXPR_PTR pLVar = pPlus->value.asOperator.pRight;
 
                //printf( "*** Optimize Right! ***\n" );
 
-               // Switch arguments
-               if( pPlus->ExprType == HB_EO_PLUS )
-               {
-                  pPlus->value.asOperator.pRight = pPlus->value.asOperator.pLeft;
-               }
-               else
-               {
-                  // Must negate when switched right ( y - x => x + -y )
-                  pPlus->value.asOperator.pRight = hb_compExprNewNegate( pPlus->value.asOperator.pLeft );
-               }
-
-               // Always PLUS when reversing arguments.
                pPlus->ExprType = HB_EO_PLUSEQ;
-
+               pPlus->value.asOperator.pRight = pPlus->value.asOperator.pLeft;
                pPlus->value.asOperator.pLeft = pLVar;
 
                // Free outer.

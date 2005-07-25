@@ -1,4 +1,4 @@
- * $Id: ChangeLog,v 1.4232 2005/07/22 17:26:51 lculik Exp $
+ * $Id: ChangeLog,v 1.4233 2005/07/25 05:15:44 walito Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
@@ -6,6 +6,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-07-25 07:55 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbexprb.c
+    * Corrected right hand optimization of negtive values into +=
+ 
 2005-07-25 02:10 UTC-300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/vm/classes.c
     ! Clear old hack in my code for Classname and classh.
@@ -40,9 +44,9 @@
 2005-07-19 12:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/source/rtl/tbrowse.prg
     * changed EvalSkipBlock from static function to protected method and
-	 * changed all EvalSkipBlock( ::skipBlock, n ) and Eval( ::skipBlock, n )
-	 * to ::EvalSkipBlock( n ).
-	 * This is the first step to try to optimize tbrowse record reads.
+    * changed all EvalSkipBlock( ::skipBlock, n ) and Eval( ::skipBlock, n )
+    * to ::EvalSkipBlock( n ).
+    * This is the first step to try to optimize tbrowse record reads.
 
 2005-07-18 10:37 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/compiler/harbour.sly
