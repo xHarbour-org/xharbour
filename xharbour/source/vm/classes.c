@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.144 2005/07/17 17:33:06 walito Exp $
+ * $Id: classes.c,v 1.145 2005/07/20 03:18:34 walito Exp $
  */
 
 /*
@@ -182,10 +182,6 @@
 /* #include <windows.h> */
 
 //#define DEBUG_HASH
-
-#define BUCKET                   5
-#define BASE_METHODS   BUCKET * 20  /* Incerement unit of number of messages */
-#define HASH_KEY       ( BASE_METHODS / BUCKET )
 
 #if ( defined(HB_OPT_CON) || defined(HB_OPT_GUI) ) && !defined(HB_NO_PROFILER)
    #define HB_NO_PROFILER
@@ -1209,25 +1205,6 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
    if( uiClass && uiClass <= s_uiClasses )
    {
       PCLASS pClass;
-
-      if( pMsg == s_msgClassName || pMsg == s_msgClassH )
-      {
-         (HB_VM_STACK.pMethod) = NULL;
-
-         if( bConstructor )
-         {
-            *bConstructor = FALSE;
-         }
-
-         if( pMsg == s_msgClassName )
-         {
-            return hb___msgClsName;
-         }
-         else if( pMsg == s_msgClassH )
-         {
-            return hb___msgClsH;
-         }
-      }
 
       pClass  = s_pClasses + ( uiClass - 1 );
 
@@ -2301,7 +2278,7 @@ HB_FUNC( __CLSNEW )
    {
       pNewCls->uiDatas = ( USHORT ) hb_parni( 2 );
 
-      HB_TRACE(HB_TR_DEBUG, ( "Class '%s' Known: %i Datas: %i Extras %i HashKey: %i Bucket %i\n", pNewCls->szName, uiKnownMethods, pNewCls->uiDatas, hb_parni(3), pNewCls->uiHashKey, BUCKET ) );
+      HB_TRACE(HB_TR_DEBUG, ( "Class '%s' Known: %i Datas: %i Extras %i\n", pNewCls->szName, uiKnownMethods, pNewCls->uiDatas, hb_parni(3) ) );
 
       if( uiKnownMethods == 0 )
       {
