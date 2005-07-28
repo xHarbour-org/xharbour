@@ -1,10 +1,22 @@
- * $Id: ChangeLog,v 1.4234 2005/07/25 14:56:53 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4235 2005/07/28 04:56:51 marcosgambeta Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-07-28 08:35 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/common/expropt1.c
+    * Corrected string descriptions for error reporting.
+  * source/compiler/harbour.sly
+    % Rewrote (and optimized) _Get_ to use LValue.
+  * source/pp/pptable.c
+    - Removed #translate of _GET_ added on June-30-2005 (now properly handled by parser).
+
+  * tests/testget.prg
+  * tests/tstgetar.prg
+    * Minor refinments.
 
 2005-07-28 01:54 UTC-0300 Marcos Gambeta <marcosgambeta@yahoo.com.br>
   * utils/hbmake/hbmake.prg

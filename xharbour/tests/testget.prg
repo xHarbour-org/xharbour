@@ -1,4 +1,4 @@
-Procedure Main()
+PROCEDURE Main()
 
    LOCAL   GetList := {}, cVar := "Hello"
    MEMVAR  aVar, nIndex, cMacro
@@ -44,4 +44,3 @@ Procedure Main()
 #endif
 
 RETURN
-

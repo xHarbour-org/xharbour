@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.15 2004/11/21 21:43:42 druzus Exp $
+ * $Id: expropt1.c,v 1.16 2005/03/31 14:34:03 andijahja Exp $
  */
 
 /*
@@ -75,64 +75,69 @@
 #include "hbexemem.h"
 
 static char * s_OperTable[] = {
-   "",
-   "NIL",
-   "Numeric",
-   "String",
-   "Codeblock",
-   "Logical",
-   "SELF",
-   "Array",
-   "@",
-   "@",
-   "IIF",
-   ",",
-   ",",
-   "[",
-   "&",
-   "()",
-   "->",
-   "->",
-   ":",
-   "",      /* symbol */
-   "",      /* alias */
-   "",      /* RunTime variable */
-   "",      /* variable */
-   "++",      /* post-operators -> lowest precedence */
-   "--",
-   ":=",       /* assigments */
-   "+=",
-   "-=",
-   "*=",
-   "/=",
-   "%=",
-   "^=",
-   ".OR.",           /* logical operators */
-   ".AND.",
-   ".NOT.",
-   "=",        /* relational operators */
-   "==",
-   "<",
-   ">",
-   "<=",
-   ">=",
-   "!=",
-   "$",
-   "+",      /* addition */
-   "-",
-   "*",      /* multiple */
-   "/",
-   "%",
-   "^",
-   "&",
-   "|",
-   "^^",
-   ">>",
-   "<<",
-   "-",    /* sign operator */
-   "++",
-   "--"
-};
+   "",             /* HB_ET_NONE      */
+   "Dummy",        /* HB_ET_DUMMY     */
+   "NIL",          /* HB_ET_NIL       */
+   "Numeric",      /* HB_ET_NUMERIC   */
+   "String",       /* HB_ET_STRING    */
+   "Codeblock",    /* HB_ET_CODEBLOCK */
+   "Logical",      /* HB_ET_LOGICAL   */
+   "SELF",         /* HB_ET_SELF      */
+   "Array",        /* HB_ET_ARRAY     */
+   "@",            /* HB_ET_VARREF    */
+   "@M->",         /* HB_ET_MEMVARREF */
+   "@Func()",      /* HB_ET_FUNREF    */
+   "IIF",          /* HB_ET_IIF       */
+   ",",            /* HB_ET_LIST      */
+   ",",            /* HB_ET_ARGLIST   */
+   "Array[]",      /* HB_ET_ARRAYAT   */
+   "&",            /* HB_ET_MACRO     */
+   "()",           /* HB_ET_FUNCALL   */
+   "->",           /* HB_ET_ALIASVAR  */
+   "()->",         /* HB_ET_ALIASEXPR */
+   ":",            /* HB_ET_SEND      */
+   "WITH:",        /* HB_ET_WITHSEND  */
+   "",             /* HB_ET_FUNNAME   */
+   "",             /* HB_ET_ALIAS     */
+   "",             /* HB_ET_RTVAR     */
+   "",             /* HB_ET_VARIABLE  */
+   "++",           /* HB_EO_POSTINC   */
+   "--",           /* HB_EO_POSTDEC   */
+   ":=",           /* HB_EO_ASSIGN    */
+   "+=",           /* HB_EO_PLUSEQ    */
+   "-=",           /* HB_EO_MINUSEQ   */
+   "*=",           /* HB_EO_MULTEQ    */
+   "/=",           /* HB_EO_DIVEQ     */
+   "%=",           /* HB_EO_MODEQ     */
+   "^=",           /* HB_EO_EXPEQ     */
+   ".OR.",         /* HB_EO_OR        */
+   ".AND.",        /* HB_EO_AND       */
+   ".NOT.",        /* HB_EO_NOT       */
+   "=",            /* HB_EO_EQUAL     */
+   "==",           /* HB_EO_EQ        */
+   "<",            /* HB_EO_LT        */
+   ">",            /* HB_EO_GT        */
+   "<=",           /* HB_EO_LE        */
+   ">=",           /* HB_EO_GE        */
+   "!=",           /* HB_EO_NE        */
+   "$",            /* HB_EO_IN        */
+   "LIKE"          /* HB_EO_LIKE      */
+   "MATCH"         /* HB_EO_MATCH     */
+   "+",            /* HB_EO_PLUS      */
+   "-",            /* HB_EO_MINUS     */
+   "*",            /* HB_EO_MULT      */
+   "/",            /* HB_EO_DIV       */
+   "%",            /* HB_EO_MOD       */
+   "^",            /* HB_EO_POWER     */
+   "&",            /* HB_EO_BITAND    */
+   "|",            /* HB_EO_BITOR     */
+   "^^",           /* HB_EO_BITXOR    */
+   ">>",           /* HB_EO_BITSHIFTR */
+   "<<",           /* HB_EO_BITSHIFTL */
+   "-",            /* HB_EO_NEGATE    */
+   "++",           /* HB_EO_PREINC    */
+   "--"            /* HB_EO_PREDEC    */   
+};                 
 
 /* ************************************************************************* */
 

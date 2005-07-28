@@ -1,7 +1,8 @@
-Procedure Main()
+PROCEDURE Main()
 
    LOCAL aVar := { { 1, "Hello", 3 } }, aVar2 := { "@!" }
-
+   
+   MEMVAR GetList, cVar1, cMacro, cMacro1
    PRIVATE cVar1 := { { "Macro", "Macro1" } }, cMacro := "cVar", cMacro1 := "cVar1"
 
    CLS
@@ -19,5 +20,6 @@ Procedure Main()
    @ 18,10 GET &cMacro.1[1,1]
 
    @ 20,10 GET &cMacro1[1,2]
-
+   READ
+   
 Return

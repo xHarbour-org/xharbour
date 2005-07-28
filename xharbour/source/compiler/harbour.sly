@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.87 2005/06/01 02:09:27 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.88 2005/07/18 17:38:50 ronpinkas Exp $
  */
 
 /*
@@ -122,7 +122,7 @@ static PTR_LOOPEXIT hb_comp_pLoops = NULL;
 static HB_RTVAR_PTR hb_comp_rtvars = NULL;
 
 static BOOL bTrancuateBaseArray = FALSE;
-static HB_EXPR_PTR pGetArgList = NULL, pBaseArrayName = NULL, pGetVarArray;
+static HB_EXPR_PTR pGetArgList, pBaseArrayName = NULL, pGetVarArray;
 
 static int s_iBlock = 0;
 static BOOL s_bBlockMacro = FALSE, s_bBlockDeclared = FALSE, s_bSetGet;
@@ -277,7 +277,7 @@ static void hb_compDebugStart( void ) { };
 %type <asExpr>  DimIndex DimList
 %type <asExpr>  FieldAlias FieldVarAlias
 %type <asExpr>  PostOp
-%type <asExpr>  Get GetVar GetA GetVarArray GetArgList
+%type <asExpr>  Get GetArgList
 %type <asExpr>  Constant
 %type <iNumber> SwitchCases
 %type <asExpr>  Hash HashList
@@ -314,11 +314,11 @@ Line       : LINE NUM_INTEGER LITERAL Crlf
            ;
 
 ProcReq    : PROCREQ CompTimeStr ')' Crlf {}
-	   ;
+           ;
 
 CompTimeStr: LITERAL { hb_compAutoOpenAdd( $1 ); }
-	   | LITERAL '+' LITERAL { char szFileName[ _POSIX_PATH_MAX ]; sprintf( szFileName, "%s%s", $1, $3 ); hb_compAutoOpenAdd( szFileName ); }
-	   ;
+           | LITERAL '+' LITERAL { char szFileName[ _POSIX_PATH_MAX ]; sprintf( szFileName, "%s%s", $1, $3 ); hb_compAutoOpenAdd( szFileName ); }
+           ;
 
 Function   : FunScope FUNCTION  IdentName { hb_comp_cVarType = ' '; hb_compFunctionAdd( $3, ( HB_SYMBOLSCOPE ) $1, 0 ); } Params Crlf
              {
@@ -357,7 +357,7 @@ Params     :                                                         { $$ = 0; }
            ;
 
 AsType     : /* not specified */           { hb_comp_cVarType = ' '; }
-	   | StrongType
+           | StrongType
            ;
 
 StrongType : AS_NUMERIC                    { hb_comp_cVarType = 'N'; }
@@ -369,7 +369,7 @@ StrongType : AS_NUMERIC                    { hb_comp_cVarType = 'N'; }
            | AS_CLASS IdentName            { hb_comp_cVarType = 'S'; hb_comp_szFromClass = $2; }
            | AS_ENUM IdentName             { hb_comp_cVarType = 'E'; hb_comp_szFromEnum = $2; }
            | AS_VARIANT                    { hb_comp_cVarType = ' '; }
-	   | AsArray
+           | AsArray
            ;
 
 AsArray    : AS_ARRAY                      { hb_comp_cVarType = 'A'; }
@@ -439,8 +439,8 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
            | RETURN  {  hb_compLinePushIfInside(); hb_comp_cVarType = ' '; }
              Expression Crlf
                      {
-		        hb_comp_cCastType = hb_comp_cVarType;
-		        hb_comp_cVarType = ' ';
+                        hb_comp_cCastType = hb_comp_cVarType;
+                        hb_comp_cVarType = ' ';
 
                         if( hb_comp_wSeqCounter )
                         {
@@ -615,13 +615,13 @@ ArrayAtAlias : ArrayAt ALIASOP      { $$ = $1; }
 Variable    : IdentName         {
                                   $$ = hb_compExprNewVar( $1 );
                                   if( s_iBlock )
-				  {
+                                  {
                                      s_bBlockDeclared = ( s_bBlockDeclared ||
                                                           hb_compLocalGetPos( $1 ) ||
                                                           hb_compStaticGetPos( $1, hb_comp_functions.pLast ) ||
                                                           hb_compVariableGetPos( hb_comp_pGlobals, $1 ) ||
                                                           ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( $1, hb_comp_functions.pFirst ) ) );
-				  }
+                                  }
                                 }
 ;
 
@@ -632,20 +632,20 @@ VarAlias    : IdentName ALIASOP      { $$ = hb_compExprNewAlias( $1 ); }
  */
 MacroVar    : MACROVAR        { $$ = hb_compExprNewMacro( NULL, '&', $1 );
                                 if( s_iBlock )
-				{
+                                {
                                    s_bBlockDeclared = ( s_bBlockDeclared ||
                                                         hb_compLocalGetPos( $1 ) ||
                                                         hb_compStaticGetPos( $1, hb_comp_functions.pLast ) ||
                                                         hb_compVariableGetPos( hb_comp_pGlobals, $1 ) ||
                                                         ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( $1, hb_comp_functions.pFirst ) ) );
                                    s_bBlockMacro = TRUE;
-				}
+                                }
                               }
             | MacroText       { // Was: MACROTEXT befvore optimization.
                                 //$$ = hb_compExprNewMacro( NULL, 0, $1 );
                                 $$ = $1;
                               }
-	    ;
+            ;
 
 MacroText   : MACROTEXT {
                            HB_EXPR_PTR pPlus = NULL, pLeft = NULL, pRight;
@@ -853,7 +853,6 @@ FunCall    : IdentName '(' ArgList ')' { $$ = hb_compExprNewFunCall( hb_compExpr
            | MacroVar '(' ArgList ')'  { $$ = hb_compExprNewFunCall( $1, $3 ); }
            | MacroExpr '(' ArgList ')' { $$ = hb_compExprNewFunCall( $1, $3 ); }
            | Get                       { $$ = $1; }
-           | GetA                      { $$ = $1; }
            | IIFInline                 { $$ = $1; }
            ;
 
@@ -1043,9 +1042,9 @@ SimpleExpression :
            ;
 
 Expression : Variable         { $$ = $1; }
-	   | SimpleExpression { $$ = $1; }
-	   | PareExpList      { $$ = $1; }
-	   | Variable         { hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
+           | SimpleExpression { $$ = $1; }
+           | PareExpList      { $$ = $1; }
+           | Variable         { hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
            | PareExpList      { hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
            ;
 
@@ -1343,227 +1342,305 @@ IndexList  : '[' Expression               { $$ = hb_compExprNewArrayAt( $<asExpr
            | IndexList ']' '[' Expression { $$ = hb_compExprNewArrayAt( $1, $4 ); }
            ;
 
-_Get_      : GET { pBaseArrayName    = NULL; }
+_Get_      : GET { pBaseArrayName = NULL; pGetVarArray = NULL; pGetArgList = NULL; }
            ;
 
-Get        : _Get_ GetVar ','
-	     {
-		if( s_bSetGet )
-		{
-		   HB_EXPR_PTR pSetGetBlock, pGetVar = $2, pIsNil, pIfList, pIIF;
+Get        : _Get_ LValue ','
+               { /* $4 */
+                  $2 = hb_compExprListStripSingle( $2, NULL );
 
-                   pIsNil       = hb_compExprSetOperand( hb_compExprNewEQ( hb_compExprNewVar( "_1" ) ), hb_compExprNewNil() );
+                  switch( $2->ExprType )
+                  {
+                     case HB_ET_VARIABLE:
+                     case HB_ET_ALIASVAR:
+                     case HB_ET_SEND:
+                     case HB_ET_WITHSEND:
+                     {
+                        BOOL bSetGet;
 
-		   pIfList      = hb_compExprNewList( pIsNil );
-		   pIfList      = hb_compExprAddListExpr( pIfList, pGetVar );
-		   pIfList      = hb_compExprAddListExpr( pIfList, hb_compExprAssign( hb_compExprClone( pGetVar ), hb_compExprNewVar( "_1" ) ) );
+                        if( $2->ExprType == HB_ET_VARIABLE )
+                        {
+                           bSetGet = ( hb_compLocalGetPos( $2->value.asSymbol ) ||
+                                       hb_compStaticGetPos( $2->value.asSymbol, hb_comp_functions.pLast ) ||
+                                       hb_compVariableGetPos( hb_comp_pGlobals, $2->value.asSymbol ) ||
+                                       ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( $2->value.asSymbol, hb_comp_functions.pFirst ) ) ||
+                                       hb_compMemvarGetPos( $2->value.asSymbol, hb_comp_functions.pLast ) ||
+                                       hb_compFieldGetPos( $2->value.asSymbol, hb_comp_functions.pLast ) );
+                        }
+                        else
+                        {
+                           bSetGet = TRUE;
+                        }
 
-		   pIIF         = hb_compExprNewIIF( pIfList );
+                        if( bSetGet )
+                        {
+                           HB_EXPR_PTR pSetGetBlock, pGetVar = $2, pIsNil, pIfList, pIIF;
+                   
+                           pIsNil       = hb_compExprSetOperand( hb_compExprNewEQ( hb_compExprNewVar( "_1" ) ), hb_compExprNewNil() );
+                   
+                           pIfList      = hb_compExprNewList( pIsNil );
+                           pIfList      = hb_compExprAddListExpr( pIfList, pGetVar );
+                           pIfList      = hb_compExprAddListExpr( pIfList, hb_compExprAssign( hb_compExprClone( pGetVar ), hb_compExprNewVar( "_1" ) ) );
+                   
+                           pIIF         = hb_compExprNewIIF( pIfList );
+                   
+                           pSetGetBlock = hb_compExprNewCodeBlock();
+                           pSetGetBlock = hb_compExprCBVarAdd( pSetGetBlock, "_1", ' ' );
+                   
+                           hb_compExprAddListExpr( pSetGetBlock, pIIF );
+                   
+                           pGetArgList = hb_compExprNewArgList( pSetGetBlock );
+                        }
+                        else
+                        {
+                           pGetArgList = hb_compExprNewArgList( hb_compExprNewNil() );
+                        }
 
-		   pSetGetBlock = hb_compExprNewCodeBlock();
-		   pSetGetBlock = hb_compExprCBVarAdd( pSetGetBlock, "_1", ' ' );
+                        break;
+                     }
+   
+                     case HB_ET_MACRO:
+                        pGetArgList = hb_compExprNewArgList( hb_compExprNewNil() );
 
-		   hb_compExprAddListExpr( pSetGetBlock, pIIF );
+                        break;
+   
+                     case HB_ET_ARRAYAT:
+                     {
+                        HB_EXPR_PTR pArrayVar;
 
-                   pGetArgList  = hb_compExprNewArgList( pSetGetBlock );
-                }
-		else
-		{
-                   pGetArgList = hb_compExprNewArgList( hb_compExprNewNil() );
-		}
-	     }
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $5 ) ; /* Var Name   */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $8 ) ; /* Picture    */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $11 ); /* ValidBlock */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $14 ); /* WhenBlock  */ }
-	     GetAExt ')'
-             { $$ = hb_compExprNewFunCall( hb_compExprNewFunName( "__GET"), pGetArgList ); pGetArgList = NULL; }
+                        bTrancuateBaseArray = TRUE;                        
+      
+                        pGetVarArray = HB_EXPR_USE( $2, HB_EA_REDUCE );
+            
+                        pArrayVar = pGetVarArray->value.asList.pExprList;
 
-           | _Get_ MACROVAR ',' { pGetArgList = hb_compExprNewArgList( hb_compExprNewNil() ); }
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, hb_compExprNewVar( $2 ) ) ; /* Var Name   */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $8 ) ; /* Picture    */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $11 ); /* ValidBlock */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $14 ); /* WhenBlock  */ }
-	     GetAExt ')'
-             { $$ = hb_compExprNewFunCall( hb_compExprNewFunName( "__GET"), pGetArgList ); pGetArgList = NULL; }
+                        while( pArrayVar->ExprType == HB_ET_ARRAYAT )
+                        {
+                           pArrayVar = pArrayVar->value.asList.pExprList;
+                        }
 
-           | _Get_ MacroText ',' { pGetArgList = hb_compExprNewArgList( hb_compExprNewNil() ); }
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $2->value.asMacro.pExprList ) ; /* Var Name   */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $8 ) ; /* Picture    */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $11 ); /* ValidBlock */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $14 ); /* WhenBlock  */ }
-	     GetAExt ')'
-             { $$ = hb_compExprNewFunCall( hb_compExprNewFunName( "__GET"), pGetArgList ); pGetArgList = NULL; }
+                        if( pArrayVar->ExprType == HB_ET_MACRO )
+                        {
+                           if( pArrayVar->value.asMacro.pExprList )
+                           {
+                              pBaseArrayName = pArrayVar->value.asMacro.pExprList;
+                           }
+                           else
+                           {
+                              if( pArrayVar->value.asMacro.cMacroOp )
+                              {
+                                 //printf( "MacroVar: '%s'\n", pArrayVar->value.asMacro.szMacro );
+                                 pBaseArrayName = hb_compExprNewVar( pArrayVar->value.asMacro.szMacro );
+                              }
+                              else
+                              {
+                                 //printf( "MacroText: '%s'\n", pArray->value.asMacro.szMacro );
+                                 pBaseArrayName = hb_compExprNewString( pArrayVar->value.asMacro.szMacro );
+                              }
+                           }
 
-           | _Get_ MacroExpr ',' { pGetArgList = hb_compExprNewArgList( hb_compExprNewNil() ); }
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $5 ) ; /* Var Name   */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $8 ) ; /* Picture    */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $11 ); /* ValidBlock */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $14 ); /* WhenBlock  */ }
-	     GetAExt ')'
-             {
-		/* TODO: Clipper allways error, but we can handle simple macros or macros with no declared symbols!!! */
-                //hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_GET_COMPLEX_MACRO, NULL, NULL );
-                $$ = hb_compExprNewFunCall( hb_compExprNewFunName( "__GET"), pGetArgList ); pGetArgList = NULL;
-             }
-	   ;
+                           $2 = hb_compExprNewNil();
+                        }
+                        else
+                        {
+                           $2 = hb_compExprAddListExpr( hb_compExprNewCodeBlock(), pArrayVar );
+                        }
 
-GetVar     : Variable
-             {
-		s_bSetGet = ( hb_compLocalGetPos( $1->value.asSymbol ) ||
-                              hb_compStaticGetPos( $1->value.asSymbol, hb_comp_functions.pLast ) ||
-                              hb_compVariableGetPos( hb_comp_pGlobals, $1->value.asSymbol ) ||
-                              ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( $1->value.asSymbol, hb_comp_functions.pFirst ) ) ||
-		              hb_compMemvarGetPos( $1->value.asSymbol, hb_comp_functions.pLast ) ||
-		              hb_compFieldGetPos( $1->value.asSymbol, hb_comp_functions.pLast ) );
-	        $$ = $1;
-	     }
-	   | AliasVar              { s_bSetGet = TRUE; $$ = $1; }
-	   | ObjectData            { s_bSetGet = TRUE; $$ = $1; }
-           | WithData              { s_bSetGet = TRUE; $$ = $1; }
-	   ;
+                        pGetArgList  = hb_compExprNewArgList( $2 );
+
+                        break;
+                     }
+
+                     default:
+                        hb_compErrorLValue( $2 );
+                  }
+               }
+
+             EmptyExpression 
+               { /* $6 */
+                  HB_EXPR_PTR pVarName;
+   
+                  switch( $2->ExprType )
+                  {
+                     case HB_ET_VARIABLE:
+                     case HB_ET_ALIASVAR:
+                     case HB_ET_SEND:
+                     case HB_ET_WITHSEND:
+                        pVarName = $5;
+
+                        break;
+   
+                     case HB_ET_MACRO:
+                     {
+                        if( $2->value.asMacro.cMacroOp == '&' )
+                        {
+                           pVarName = hb_compExprNewVar( $2->value.asMacro.szMacro );
+                        }
+                        else if( $2->value.asMacro.szMacro )
+                        {
+                           pVarName = $2->value.asMacro.pExprList;
+                        }
+                        else
+                        {
+                           /* 
+                              Clipper allways error, but we can handle simple macros or macros with no declared symbols!!!
+                              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_GET_COMPLEX_MACRO, NULL, NULL );
+                            */
+                           pVarName = $5;
+                        }
+                      
+                        break;
+                     }
+   
+                     /* HB_ET_ARRAYAT */
+                     case HB_ET_CODEBLOCK:
+                     case HB_ET_NIL: 
+                     {
+                        pVarName = pBaseArrayName ? pBaseArrayName : $5;
+                        bTrancuateBaseArray = FALSE;
+   
+                        break;
+                     }
+   
+                     default:
+                        hb_compErrorLValue( $2 );
+                        return 0;
+                  }
+   
+                  hb_compExprAddListExpr( pGetArgList, pVarName ); /* Var Name   */ 
+               } 
+
+             ',' EmptyExpression 
+               { /* $9 */
+                  hb_compExprAddListExpr( pGetArgList, $8 ); /* Picture    */ 
+               }
+
+             ',' EmptyExpression 
+               { /* $12 */
+                  hb_compExprAddListExpr( pGetArgList, $11 ); /* ValidBlock */ 
+               }
+
+             ',' EmptyExpression 
+               { /* $15 */
+                  hb_compExprAddListExpr( pGetArgList, $14 ); /* WhenBlock  */ 
+   
+                  if( pGetVarArray )
+                  {
+                    HB_EXPR_PTR pArrayVar, pIndex;
+               
+                    // We need to scan the Array backwards and build a list of the Index Expressions.
+                    pArrayVar = HB_EXPR_USE( pGetVarArray->value.asList.pExprList, HB_EA_REDUCE );
+                    pIndex = HB_EXPR_USE( pGetVarArray->value.asList.pIndex, HB_EA_REDUCE );
+                    pIndex->pNext = NULL;
+         
+                    while( pArrayVar->ExprType == HB_ET_ARRAYAT )
+                    {
+                       pArrayVar->value.asList.pIndex->pNext = pIndex;
+                       pIndex = pArrayVar->value.asList.pIndex;
+                       pArrayVar = pArrayVar->value.asList.pExprList;
+                    }
+         
+                    pIndex = hb_compExprNewList( pIndex );
+         
+                    /* Array with Index Expressions as 6th parameter */
+                    hb_compExprAddListExpr( pGetArgList, hb_compExprNewArray( pIndex ) );
+                  }
+               }
+
+             GetAExt ')'
+               { /* $17 */
+                  HB_EXPR_PTR pGetFunction;
+   
+                  if( pGetVarArray && pGetVarArray->ExprType == HB_ET_ARRAYAT )
+                  {
+                     pGetFunction = hb_compExprNewFunName( "__GETA");
+                  }
+                  else
+                  {
+                     pGetFunction = hb_compExprNewFunName( "__GET");
+                  }
+   
+                  $$ = hb_compExprNewFunCall( pGetFunction, pGetArgList );
+               }
+           ;
 
 GetArgList : Argument                     { $$ = hb_compExprAddListExpr( pGetArgList, $1 ); }
            | GetArgList ',' Argument      { $$ = hb_compExprAddListExpr( pGetArgList, $3 ); }
            ;
 
-GetA       : _Get_ GetVarArray { pGetArgList = hb_compExprNewArgList( $2 ); bTrancuateBaseArray = TRUE;  } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, ( pBaseArrayName ? pBaseArrayName : $5 ) ); bTrancuateBaseArray = FALSE; /* Var Name */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $8 ) ; /* Picture    */ } ','
-             EmptyExpression { hb_compExprAddListExpr( pGetArgList, $11 ); /* ValidBlock */ } ','
-             EmptyExpression {
-                               HB_EXPR_PTR pArrayVar, pIndex;
-
-                               hb_compExprAddListExpr( pGetArgList, $14 ); /* WhenBlock  */
-
-                               // We need to scan the pGetVarArray backwards and build a list of the Index Expressions.
-                               pArrayVar = HB_EXPR_USE( pGetVarArray->value.asList.pExprList, HB_EA_REDUCE );
-                               pIndex = HB_EXPR_USE( pGetVarArray->value.asList.pIndex, HB_EA_REDUCE );
-                               pIndex->pNext = NULL;
-
-                               while( pArrayVar->ExprType == HB_ET_ARRAYAT )
-                               {
-                                  pArrayVar->value.asList.pIndex->pNext = pIndex;
-                                  pIndex = pArrayVar->value.asList.pIndex;
-                                  pArrayVar = pArrayVar->value.asList.pExprList;
-                               }
-
-                               pIndex = hb_compExprNewList( pIndex );
-
-                               hb_compExprAddListExpr( pGetArgList, hb_compExprNewArray( pIndex ) ); /* Array with Index Expressions as 6th parameter */
-                             }
-	     GetAExt ')'     { $$ = hb_compExprNewFunCall( hb_compExprNewFunName( "__GETA"), pGetArgList ); pGetArgList = NULL; }
-	   ;
-
-GetVarArray : Variable   ArrayIndex { pGetVarArray = $2; $$ = hb_compExprAddListExpr( hb_compExprNewCodeBlock(), $1 ); }
-            | ObjectData ArrayIndex { pGetVarArray = $2; $$ = hb_compExprAddListExpr( hb_compExprNewCodeBlock(), $1 ); }
-            | WithData   ArrayIndex { pGetVarArray = $2; $$ = hb_compExprAddListExpr( hb_compExprNewCodeBlock(), $1 ); }
-            | AliasVar   ArrayIndex { pGetVarArray = $2; $$ = hb_compExprAddListExpr( hb_compExprNewCodeBlock(), $1 ); }
-            | MacroVar   ArrayIndex {
-                                      pGetVarArray = $2;
-
-                                      $$ = hb_compExprNewNil();
-
-                                      if( $1->value.asMacro.pExprList )
-                                      {
-                                        pBaseArrayName = $1->value.asMacro.pExprList;
-                                      }
-                                      else
-                                      {
-                                        if( $1->value.asMacro.cMacroOp )
-                                        {
-                                          //printf( "MacroVar: '%s'\n", $1->value.asMacro.szMacro );
-                                          pBaseArrayName = hb_compExprNewVar( $1->value.asMacro.szMacro );
-                                        }
-                                        else
-                                        {
-                                          //printf( "MacroText: '%s'\n", $1->value.asMacro.szMacro );
-                                          pBaseArrayName = hb_compExprNewString( $1->value.asMacro.szMacro );
-                                        }
-                                      }
-                                    }
-            | MacroExpr ArrayIndex  {
-                                      pGetVarArray = $2;
-
-                                      $$ = hb_compExprNewNil();
-
-                                      pBaseArrayName = $1->value.asMacro.pExprList;
-                                    }
-	    ;
-
-GetAExt   : { /* Nothing*/ }
-	  | ',' GetArgList
-	  ;
+GetAExt    : { /* Nothing*/ }
+           | ',' GetArgList
+           ;
 
 CodeBlock  : '{' CBMARKER { s_iBlock++; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockNoVar CBMARKER BlockExpList '}'
-                     {
-                       if( s_bBlockMacro )
-		       {
-			  if( pBlockSimple && pBlockSimple->ExprType == HB_ET_MACRO && pBlockSimple->value.asMacro.SubType == HB_ET_MACRO_VAR )
-			  {
-			     HB_EXPR_PTR pMacroVar, pBlockString;
+     {
+        if( s_bBlockMacro )
+        {
+           if( pBlockSimple && pBlockSimple->ExprType == HB_ET_MACRO && pBlockSimple->value.asMacro.SubType == HB_ET_MACRO_VAR )
+           {
+              HB_EXPR_PTR pMacroVar, pBlockString;
 
-			     pMacroVar    = hb_compExprNewVar( pBlockSimple->value.asMacro.szMacro );
-			     pBlockString = hb_compExprNewString( "{||" );
-			     pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), pMacroVar );
-			     pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), hb_compExprNewString( "}" ) );
-		             $<asExpr>$   = hb_compExprNewMacro( pBlockString, 0, NULL );
-			  }
-                          else if( s_bBlockDeclared )
-			  {
-                             hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BLOCK, NULL, NULL );
-                             $<asExpr>$ = $<asExpr>3;
-			  }
-			  else
-			  {
-		             $<asExpr>$ = hb_compExprNewMacro( hb_compExprNewString( hb_comp_SLX_LastBlock( FALSE ) ), 0, NULL );
-			  }
-		       }
-		       else
-		       {
-                          $$ = $<asExpr>3;
-                       }
+              pMacroVar    = hb_compExprNewVar( pBlockSimple->value.asMacro.szMacro );
+              pBlockString = hb_compExprNewString( "{||" );
+              pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), pMacroVar );
+              pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), hb_compExprNewString( "}" ) );
+              $<asExpr>$   = hb_compExprNewMacro( pBlockString, 0, NULL );
+           }
+           else if( s_bBlockDeclared )
+           {
+              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BLOCK, NULL, NULL );
+              $<asExpr>$ = $<asExpr>3;
+           }
+           else
+           {
+              $<asExpr>$ = hb_compExprNewMacro( hb_compExprNewString( hb_comp_SLX_LastBlock( FALSE ) ), 0, NULL );
+           }
+        }
+        else
+        {
+           $$ = $<asExpr>3;
+        }
 
-                       if( --s_iBlock == 0 )
-                       {
-                          hb_comp_SLX_LastBlock( TRUE ); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
-                       }
-		     }
+        if( --s_iBlock == 0 )
+        {
+           hb_comp_SLX_LastBlock( TRUE ); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
+        }
+     }
 
            | '{' CBMARKER { s_iBlock++; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockVarList CBMARKER BlockExpList '}'
-                     {
-                       if( s_bBlockMacro )
-		       {
-			  if( pBlockSimple && pBlockSimple->ExprType == HB_ET_MACRO && pBlockSimple->value.asMacro.SubType == HB_ET_MACRO_VAR )
-			  {
-			     HB_EXPR_PTR pMacroVar, pBlockString;
+     {
+        if( s_bBlockMacro )
+        {
+           if( pBlockSimple && pBlockSimple->ExprType == HB_ET_MACRO && pBlockSimple->value.asMacro.SubType == HB_ET_MACRO_VAR )
+           {
+              HB_EXPR_PTR pMacroVar, pBlockString;
 
-			     pMacroVar    = hb_compExprNewVar( pBlockSimple->value.asMacro.szMacro );
-			     pBlockString = hb_compExprNewString( "{||" );
-			     pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), pMacroVar );
-			     pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), hb_compExprNewString( "}" ) );
-		             $<asExpr>$   = hb_compExprNewMacro( pBlockString, 0, NULL );
-			  }
-                          else if( s_bBlockDeclared )
-			  {
-                             hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BLOCK, NULL, NULL );
-                             $<asExpr>$ = $<asExpr>3;
-			  }
-			  else
-			  {
-		             $<asExpr>$ = hb_compExprNewMacro( hb_compExprNewString( hb_comp_SLX_LastBlock( FALSE ) ), 0, NULL );
-			  }
-		       }
-		       else
-		       {
-                          $$ = $<asExpr>3;
-                       }
+              pMacroVar    = hb_compExprNewVar( pBlockSimple->value.asMacro.szMacro );
+              pBlockString = hb_compExprNewString( "{||" );
+              pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), pMacroVar );
+              pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), hb_compExprNewString( "}" ) );
+              $<asExpr>$   = hb_compExprNewMacro( pBlockString, 0, NULL );
+           }
+           else if( s_bBlockDeclared )
+           {
+              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BLOCK, NULL, NULL );
+              $<asExpr>$ = $<asExpr>3;
+           }
+           else
+           {
+              $<asExpr>$ = hb_compExprNewMacro( hb_compExprNewString( hb_comp_SLX_LastBlock( FALSE ) ), 0, NULL );
+           }
+        }
+        else
+        {
+           $$ = $<asExpr>3;
+        }
 
-                       if( --s_iBlock == 0 )
-                       {
-                          hb_comp_SLX_LastBlock( TRUE ); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
-                       }
-		     }
+        if( --s_iBlock == 0 )
+        {
+           hb_comp_SLX_LastBlock( TRUE ); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
+        }
+     }
            ;
 
 CodeBlock2 : '<' BITOR { hb_compCodeBlockStart(); hb_comp_iVarScope = VS_PARAMETER; } ParamList BITOR Crlf
@@ -1711,8 +1788,8 @@ VarDef     : IdentName AsType { hb_compVariableAdd( $1, hb_comp_cVarType ); }
                               }
              INASSIGN {hb_comp_cVarType = ' ';} Expression
                {
-		  hb_comp_cCastType = hb_comp_cVarType;
-		  hb_comp_cVarType = ' ';
+                  hb_comp_cCastType = hb_comp_cVarType;
+                  hb_comp_cVarType = ' ';
 
                   hb_comp_iVarScope = $<iNumber>3;
 
@@ -1779,7 +1856,7 @@ MemvarList : IdentName AsType                     { hb_compVariableAdd( $1, hb_c
 Declaration: DECLARE IdentName '(' { hb_compDeclaredAdd( $2 ); hb_comp_szDeclaredFun = $2; } DecList ')' AsType Crlf
              {
                if( hb_comp_pLastDeclared )
-	       {
+               {
                  hb_comp_pLastDeclared->cType = hb_comp_cVarType;
 
                  if ( toupper( hb_comp_cVarType ) == 'S' )
@@ -1794,7 +1871,8 @@ Declaration: DECLARE IdentName '(' { hb_compDeclaredAdd( $2 ); hb_comp_szDeclare
                    /* Resetting */
                    hb_comp_szFromClass = NULL;
                  }
-	       }
+               }
+               
                hb_comp_szDeclaredFun = NULL;
                hb_comp_cVarType = ' ';
                hb_comp_iVarScope = VS_NONE;
@@ -1806,8 +1884,8 @@ Declaration: DECLARE IdentName '(' { hb_compDeclaredAdd( $2 ); hb_comp_szDeclare
            ;
 
 DecDataList: DecData
-	   | DecDataList ',' DecData
-	   ;
+           | DecDataList ',' DecData
+           ;
 
 ClassInfo  : DecMethod
            | ClassInfo DecMethod
@@ -1844,10 +1922,14 @@ DecData    : IdentName { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastCl
                  PCOMCLASS pClass;
                  char * szSetData = ( char * ) hb_xgrab( strlen( $1 ) + 2 );
 
-		 /* List Type overrides if exists. */
-		 if( hb_comp_cDataListType ) hb_comp_cVarType = hb_comp_cDataListType;
+                 /* List Type overrides if exists. */
+                 if( hb_comp_cDataListType ) 
+                 {
+                    hb_comp_cVarType = hb_comp_cDataListType;
+                 }   
 
                  hb_comp_pLastMethod->cType = hb_comp_cVarType;
+                 
                  if ( toupper( hb_comp_cVarType ) == 'S' )
                  {
                    pClass = hb_compClassFind( hb_comp_szFromClass );
@@ -1859,7 +1941,9 @@ DecData    : IdentName { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastCl
                    }
                  }
                  else
+                 {
                    pClass = NULL;
+                 }
 
                  sprintf( szSetData, "_%s", $1 );
 
@@ -1887,7 +1971,7 @@ DecData    : IdentName { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastCl
 
 DecList    : /* Nothing */ {}
            | FormalList
-	   | OptList
+           | OptList
            | FormalList ',' OptList
            ;
 
@@ -1905,7 +1989,7 @@ OptList    : OPTIONAL IdentName AsType                               { hb_compDe
            | OptList ',' OPTIONAL IdentName AsType                   { hb_compDeclaredParameterAdd( $4, hb_comp_cVarType + VT_OFFSET_OPTIONAL ); }
            | OptList ',' OPTIONAL '@' IdentName AsType               { hb_compDeclaredParameterAdd( $5, hb_comp_cVarType + VT_OFFSET_OPTIONAL + VT_OFFSET_BYREF ); }
            | OptList ',' OPTIONAL '@' IdentName '(' DummyArgList ')' { hb_compDeclaredParameterAdd( $5, hb_comp_cVarType + VT_OFFSET_OPTIONAL + VT_OFFSET_BYREF ); }
-	   ;
+           ;
 
 EnumDef     : ENUM IdentName { hb_compEnumAdd( $2 ); } INASSIGN EnumMembers
             ;
@@ -3328,4 +3412,3 @@ static void hb_compVariableDim( char * szName, HB_EXPR_PTR pInitValue )
      hb_compExprDelete( hb_compExprGenPop( hb_compExprNewVar( szName ) ) );
   }
 }
-

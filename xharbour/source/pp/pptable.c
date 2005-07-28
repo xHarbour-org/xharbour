@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.56 2005/05/27 22:19:51 ronpinkas Exp $
+ * $Id: pptable.c,v 1.57 2005/06/30 23:51:46 ronpinkas Exp $
  */
 
 /*
@@ -507,7 +507,6 @@ void hb_pp_Table( void )
    static COMMANDS sT___01 = {1,"_GET_","(\1A00,\1B00 )","_GET_(\1A00,\1B00,NIL,NIL,NIL )",NULL };
    static COMMANDS sT___02 = {1,"_GET_","(\1A00,\1B00,\1C00 )","_GET_(\1A00,\1B00,\1C00,NIL,NIL )",&sT___01 };
    static COMMANDS sT___03 = {1,"_GET_","(\1A00,\1B00,\1C00,\1D00 )","_GET_(\1A00,\1B00,\1C00,\1D00,NIL )",&sT___02 };
-   static COMMANDS sT___04 = {1,"_GET_","((\1A00 )","_GET_(\1A00",&sT___03 };
 
 #if defined( HB_COMPAT_C53 )
    hb_pp_topCommand = &sC___280;
@@ -516,5 +515,5 @@ void hb_pp_Table( void )
 #endif
 
    hb_pp_topDefine = &sD___70;
-   hb_pp_topTranslate = &sT___04;
+   hb_pp_topTranslate = &sT___03;
 }
