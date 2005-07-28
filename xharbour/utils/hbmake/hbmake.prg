@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.146 2005/07/05 14:41:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.146 2005/07/05 18:57:17 modalsist Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion  := "1.146"
+STATIC s_cHbMakeVersion  := "1.147"
 STATIC s_lPrint          := .F.
 STATIC s_aDefines        := {}
 STATIC s_aBuildOrder     := {}
@@ -1385,6 +1385,7 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL lWhat32      := .F.
    LOCAL lGtWvt       := .F.
    LOCAL lXwt         := .F.
+   LOCAL lxHGtk       := .F.
 
    LOCAL lRddAds      := .F.
    LOCAL lMediator    := .F.
@@ -1399,6 +1400,7 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL cC4WPath     := Space( 200 )
    LOCAL cMiniPath    := Space( 200 )
    LOCAL cHwPath      := Space( 200 )
+   LOCAL cxHGPath     := Space( 200 )
 
    LOCAL cMedPath     := Space( 200 )
    LOCAL cApolloPath  := Space( 200 )
@@ -1549,12 +1551,21 @@ FUNCTION CreateMakeFile( cFile )
          lCompMod        := oMake:lCompMod
          s_lGenppo         := oMake:lGenppo
          cRdd            := IIF( oMake:lRddAds, "RddAds", IIF( oMake:lMediator, "Mediator", "None" ) )
-         cGuiLib         := IIF( oMake:lFwh, "FWH", IIF( oMake:lMini , "MINIGUI",IIF(oMake:lWhoo, "WHOO",  IIF( oMake:lCw, "C4W", IIF( oMake:lHwGui, "HWGUI",IIF( oMake:lGtWvt, "GTWVT", IIF( oMake:lXWt, "XWT", IIF( oMake:lWhat32, "WHAT32","" ) ) ) ) ) ) ) )
+         cGuiLib         := IIF( oMake:lFwh   , "FWH", ;
+                            IIF( oMake:lMini  , "MINIGUI", ;
+                            IIF( oMake:lWhoo  , "WHOO", ;
+                            IIF( oMake:lCw    , "C4W", ;
+                            IIF( oMake:lHwGui , "HWGUI", ;
+                            IIF( oMake:lGtWvt , "GTWVT", ;
+                            IIF( oMake:lXWt   , "XWT", ;
+                            IIF( oMake:lWhat32, "WHAT32", ;
+                            IIF( oMake:lxHGtk , "XHGTK", "" ) ) ) ) ) ) ) ) )
          cFwhpath        := padr(oMake:cFmc,200)
          cApolloPath     := padr(oMake:cFmc,200)
          cC4WPath        := padr(oMake:cFmc,200)
          cMiniPath       := padr(oMake:cFmc,200)
          cHwPath         := padr(oMake:cFmc,200)
+         cxHGPath        := padr(oMake:cFmc,200)
          cMedpath        := padr(oMake:cMedpath,200)
          cAppName        := PadR(oMake:cAppLibName,20," ")
          s_cAppName      := oMake:cAppLibName
@@ -1725,7 +1736,7 @@ FUNCTION CreateMakeFile( cFile )
 //   @ 01,47,06,52 get cCompiler LISTBOX { "BCC", "MSVC", "GCC", "POCC" } MESSAGE s_aLangMessages[ 50 ] STATE OsSpec(getlist,2,@cCompiler) DROPDOWN
    @ 01,47,06,52 get cCompiler LISTBOX { "BCC", "MSVC", "GCC" } MESSAGE s_aLangMessages[ 50 ] STATE OsSpec(getlist,2,@cCompiler) DROPDOWN
    @ 01,56       say s_aLangMessages[ 30 ]
-   @ 01,68,10,78 get cGuiLib ListBox { "None","C4W","FWH","GTWVT","HWGUI","MINIGUI","XWT","WHAT32","WHOO"} state OsSpec(getlist,3,@cGuiLib) DROPDOWN  When CheckCompiler(cOS) message s_aLangMessages[ 51 ]
+   @ 01,68,10,78 get cGuiLib ListBox { "None","C4W","FWH","GTWVT","HWGUI","MINIGUI","XWT","WHAT32","WHOO","XHGTK"} state OsSpec(getlist,3,@cGuiLib) DROPDOWN  When CheckCompiler(cOS) message s_aLangMessages[ 51 ]
    @ 02,01       say s_aLangMessages[ 48 ]
    @ 02,16,08,26 get cRdd ListBox { "None","RddAds","Mediator","Apollo"}  WHEN cOS == "Win32" .or. cOS == "Linux" DROPDOWN message s_aLangMessages[ 52 ]
    @ 02,30       get s_lCompress CheckBox  caption s_aLangMessages[ 53 ] style "[X ]" message s_aLangMessages[ 54 ]
@@ -1758,6 +1769,7 @@ FUNCTION CreateMakeFile( cFile )
    lWhat32   := "WHAT32"   IN alltrim(cGuiLib)
    lGtWvt    := "GTWVT"    IN alltrim(cGuiLib)
    lXwt      := "XWT"      IN alltrim(cGuiLib)
+   lxHGtk    := "XHGTK"    IN alltrim(cGuiLib)
 
    lRddAds   := "RddAds"   IN cRdd
    lMediator := "Mediator" IN cRdd
@@ -1778,6 +1790,8 @@ FUNCTION CreateMakeFile( cFile )
       @  3, 40 SAY "MiniGui path" GET cMiniPath PICT "@s25"
    ELSEIF lHwGui
       @  3, 40 SAY "HwGUI path" GET cHwPath PICT "@s25"
+   ELSEIF lxHGtk
+      @  3, 40 SAY "xHGtk path" GET cxHGPath PICT "@s25"
    ENDIF
 
    IF lMediator
@@ -2229,6 +2243,8 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, "WHOO = " + CRLF )
    ELSEIF lWhat32
       FWrite( s_nMakeFileHandle, "WHAT32 = " + CRLF )
+   ELSEIF lxHGtk
+      FWrite( s_nMakeFileHandle, "XHGTK = " + CRLF )
    ENDIF
 
    IF lMediator
@@ -2239,7 +2255,7 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, "APOLLO = " + alltrim(cApolloPath) + CRLF )
    ENDIF
 
-   FWrite( s_nMakeFileHandle, "GUI = " + iif(lWhoo .or. lFwh .or. lC4W .or. lMinigui .or. lGtWvt .or. lHwGui .or. lXwt .or. lWhat32 , "YES", "NO" ) + CRLF )
+   FWrite( s_nMakeFileHandle, "GUI = " + iif(lWhoo .or. lFwh .or. lC4W .or. lMinigui .or. lGtWvt .or. lHwGui .or. lXwt .or. lWhat32 .or. lxHGtk, "YES", "NO" ) + CRLF )
    FWrite( s_nMakeFileHandle, "MT = " + IIF( s_lMt, "YES", "NO" ) + CRLF )
 
    FOR x := 1 TO Len( s_aMacros )
@@ -2596,7 +2612,7 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LINKER = ilink32" + CRLF )
       FWrite( s_nMakeFileHandle, " " + CRLF )
-      FWrite( s_nMakeFileHandle, "ALLOBJ = " + IIF( ( lWhoo .OR. lWhat32 .OR. lFwh .OR. lMinigui .OR. lHwgui .or. lGtWvt .or. lXwt ), "c0w32.obj", if(s_lAsDll,"c0d32.obj","c0x32.obj" )) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
+      FWrite( s_nMakeFileHandle, "ALLOBJ = " + IIF( ( lWhoo .OR. lWhat32 .OR. lFwh .OR. lMinigui .OR. lHwgui .or. lGtWvt .or. lXwt .or. lxHGtk ), "c0w32.obj", if(s_lAsDll,"c0d32.obj","c0x32.obj" )) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       FWrite( s_nMakeFileHandle, "ALLRES = $(RESDEPEN)" + CRLF )
       FWrite( s_nMakeFileHandle, "ALLLIB = $(LIBFILES) import32.lib " + IIF( s_lMt,"cw32mt.lib", "cw32.lib" )+ CRLF )
       FWrite( s_nMakeFileHandle, ".autodepend" + CRLF )
@@ -2633,7 +2649,7 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, "CFLAG2 = " + IIF(  "Linux" IN cOS, "-L$(HB_LIB_INSTALL)", " -L$(BHC)/lib" )  + CRLF )
 
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
-      FWrite( s_nMakeFileHandle, "LFLAGS =" + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + if(lXwt,"-gtcgi " , "-gtcrs "), "$(CFLAG2)") + iif(lXwt,"`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt","") + CRLF )
+      FWrite( s_nMakeFileHandle, "LFLAGS =" + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + if(lXwt,"-gtcgi " , "-gtcrs "), "$(CFLAG2)") + iif(lXwt,"`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt","") + iif( lxHGtk, "`pkg-config --libs gtk+-2.0 libglade-2.0` -lxhgtk ","") + CRLF )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LINKER = "+ IIF(lusexhb,"xhblnk","gcc") + CRLF )
       FWrite( s_nMakeFileHandle, " " + CRLF )

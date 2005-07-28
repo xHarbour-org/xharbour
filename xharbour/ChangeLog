@@ -1,10 +1,16 @@
- * $Id: ChangeLog,v 1.4233 2005/07/25 05:15:44 walito Exp $
+ * $Id: ChangeLog,v 1.4234 2005/07/25 14:56:53 ronpinkas Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-07-28 01:54 UTC-0300 Marcos Gambeta <marcosgambeta@yahoo.com.br>
+  * utils/hbmake/hbmake.prg
+  * utils/hbmake/tmake.prg
+    * version 1.147: added the library xHGtk (http://sourceforge.net/projects/xhgtk/).
+      Contribution from Itamar M. Lins Jr.
 
 2005-07-25 07:55 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbexprb.c
