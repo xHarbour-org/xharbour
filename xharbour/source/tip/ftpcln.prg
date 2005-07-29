@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.6 2005/04/30 15:14:29 lculik Exp $
+ * $Id: ftpcln.prg,v 1.7 2005/06/23 20:51:46 lf_sfnet Exp $
  */
 
 /*
@@ -158,7 +158,7 @@ METHOD GetReply() CLASS tIPClientFTP
 
    // now, if the reply has a '-' as fourth character, we need to proceed...
    DO WHILE .not. Empty(cRep) .and. cRep[4] == '-'
-      ::cReplay := ::InetRecvLine( ::SocketCon, @nLen, 128 )
+      ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 128 )
       cRep += IIf(ValType(::cReply) == "C", ::cReply, "")
    ENDDO
 
