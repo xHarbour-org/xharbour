@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.97 2005/05/16 21:56:38 andijahja Exp $
+ * $Id: tget.prg,v 1.99 2005/07/30 00:00:00 modalsist Exp $
  */
 
 /*
@@ -659,7 +659,6 @@ METHOD VarPut( xValue, lReFormat ) CLASS Get
          ::Picture( ::cPicture )
       endif
    endif
-
 return xValue
 
 //---------------------------------------------------------------------------//
@@ -718,7 +717,6 @@ METHOD Untransform( cBuffer ) CLASS Get
          For each cChar in ::cPicMask
             cMaskDel += if( (cChar IN "ANX9#!"), " ", "X" )
          Next
-
          cBuffer := StrDel( cBuffer, cMaskDel )
          cBuffer += Substr( ::xVarGet, Len( cBuffer ) + 1 )
       else
@@ -777,6 +775,12 @@ METHOD Untransform( cBuffer ) CLASS Get
                        SubStr( cBuffer, ::LastEditable() + 1 )
 
          else
+/*
+2005/07/30 - Eduardo Fernandes <modalsist@yahoo.com.br>
+The two IFs bellow was disabled because cause wrong get value if we type
+a numeric var greater than 999 in the picture "@R 9,999.99".
+Added: lUntransform := ( "R" IN ::cPicFunc )
+
             if "R" IN ::cPicFunc
                lUntransform := Empty( ::buffer )
             endif
@@ -784,6 +788,8 @@ METHOD Untransform( cBuffer ) CLASS Get
             if ":" IN ::cPicture
                lUntransform := .T.
             endif
+*/
+            lUntransform := ( "R" IN ::cPicFunc )
 
             if lUntransform
                cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + ;
@@ -792,6 +798,7 @@ METHOD Untransform( cBuffer ) CLASS Get
                                            ",", " " ) + ;
                           SubStr( cBuffer, ::LastEditable() + 1 )
             endif
+
          endif
 
          for nFor := ::FirstEditable( ) to ::LastEditable( )
@@ -861,7 +868,6 @@ METHOD Untransform( cBuffer ) CLASS Get
       exit
 
    end
-
 return xValue
 
 //---------------------------------------------------------------------------//
@@ -1341,7 +1347,6 @@ METHOD Input( cChar ) CLASS Get
          cChar := Transform( cChar, cPic )
       end
    endif
-
 return cChar
 
 //---------------------------------------------------------------------------//

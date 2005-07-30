@@ -1,10 +1,14 @@
- * $Id: ChangeLog,v 1.4235 2005/07/28 04:56:51 marcosgambeta Exp $
+ * $Id: ChangeLog,v 1.4237 2005/07/30 00:00:00 modalsist Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-07-30 10:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    * Fixed return value when use "@R 999,999.99" picture.
 
 2005-07-28 08:35 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/common/expropt1.c
