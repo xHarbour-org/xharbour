@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.146 2005/07/05 18:57:17 modalsist Exp $
+ * $Id: hbmake.prg,v 1.148 2005/07/30 00:00:00 modalsist Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion  := "1.147"
+STATIC s_cHbMakeVersion  := "1.148"
 STATIC s_lPrint          := .F.
 STATIC s_aDefines        := {}
 STATIC s_aBuildOrder     := {}
@@ -113,7 +113,7 @@ STATIC s_cDefLang
 STATIC s_cLog            := ""   // log file name.
 STATIC s_cMap            := ""   // map file name. For borland c
 STATIC s_cTds            := ""   // state file name. For borland c
-STATIC s_lGenPpo                 // don't initilize this var
+STATIC s_lGenppo         := .F.
 STATIC s_nLang           := 2    // language. default is english
 STATIC s_lMt             := .F.
 STATIC s_cUserDefine     := ""
@@ -299,6 +299,10 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
          CreateMakeFile( cFile )
       ENDIF
 
+      if !s_lGenppo
+         Delete_ppo()
+      endif
+
       RETURN NIL
 
    endif
@@ -373,14 +377,8 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       FErase( s_cTds ) 
    endif
 
-   if valtype(s_lGenPpo)=="L"
-      if !s_lGenPpo
-         aPpo := directory( "*.ppo" )
-         nPos:=0
-         for nPos := 1 to Len( aPpo )
-             FErase( aPpo[nPos,1] )
-         next
-      endif
+   if !s_lGenppo
+      Delete_ppo()
    endif
 
    set cursor on
@@ -1549,7 +1547,7 @@ FUNCTION CreateMakeFile( cFile )
          lDebug          := oMake:ldebug
          lSupressline    := oMake:lSupressline
          lCompMod        := oMake:lCompMod
-         s_lGenppo         := oMake:lGenppo
+         s_lGenppo       := oMake:lGenppo
          cRdd            := IIF( oMake:lRddAds, "RddAds", IIF( oMake:lMediator, "Mediator", "None" ) )
          cGuiLib         := IIF( oMake:lFwh   , "FWH", ;
                             IIF( oMake:lMini  , "MINIGUI", ;
@@ -1815,7 +1813,7 @@ FUNCTION CreateMakeFile( cFile )
    @ 06, 40 GET lVarIsMemVar checkbox caption s_aLangMessages[ 33 ] style "[X ]"
    @ 07, 01 GET lDebug       checkbox caption s_aLangMessages[ 34 ] style "[X ]"
    @ 07, 40 GET lSupressLine checkbox caption s_aLangMessages[ 35 ] style "[X ]"
-   @ 08, 01 GET s_lGenPPO      checkbox caption s_aLangMessages[ 36 ] style "[X ]"
+   @ 08, 01 GET s_lGenppo    checkbox caption s_aLangMessages[ 36 ] style "[X ]"
    @ 08, 40 GET lCompMod     checkbox caption s_aLangMessages[ 37 ] style "[X ]"
    @ 09, 01 SAY s_aLangMessages[ 38 ] GET s_cUserDefine PICT "@s23"
    @ 09, 40 SAY s_aLangMessages[ 39 ] GET s_cUserInclude PICT "@s18"
@@ -3471,7 +3469,7 @@ FUNCTION CreateLibMakeFile( cFile )
          lDebug          := oMake:ldebug
          lSupressline    := oMake:lSupressline
          lCompMod        := oMake:lCompMod
-         s_lGenPPO         := oMake:lGenppo
+         s_lGenppo       := oMake:lGenppo
          lInstallLib     := oMake:lInstallLib
          s_cUserInclude  := PadR(oMake:cUserInclude,200," ")
          s_cUserDefine      := PadR(oMake:cUserDef,200," ")
@@ -3641,7 +3639,7 @@ FUNCTION CreateLibMakeFile( cFile )
    @ 06,40 GET lVarIsMemvar  checkbox caption s_aLangMessages[ 33 ] style "[X ]"
    @ 07,01 GET lDebug        checkbox caption s_aLangMessages[ 34 ] style "[X ]"
    @ 07,40 GET lSupressLine  checkbox caption s_aLangMessages[ 35 ] style "[X ]"
-   @ 08,01 GET s_lGenPPO       checkbox caption s_aLangMessages[ 36 ] style "[X ]"
+   @ 08,01 GET s_lGenppo     checkbox caption s_aLangMessages[ 36 ] style "[X ]"
    @ 08,40 GET lCompMod      checkbox caption s_aLangMessages[ 37 ] style "[X ]"
    @ 09,01 SAY s_aLangMessages[ 38 ] GET s_cUserDefine PICT "@s23"
    @ 09,40 SAY s_aLangMessages[ 39 ] GET s_cUserInclude PICT "@s18"
@@ -3716,7 +3714,7 @@ FUNCTION CreateLibMakeFile( cFile )
       cHarbourFlags += " -l "
    ENDIF
 
-   IF s_lGenPPO
+   IF s_lGenppo
       cHarbourFlags += " -p "
    ENDIF
 
@@ -5248,3 +5246,21 @@ RETURN .T.
 FUNCTION HBMakeVersion()
 *-----------------------
 RETURN (s_cHbMakeVersion)
+
+*--------------------
+FUNCTION Delete_ppo()
+*--------------------
+LOCAL nPos,aFiles
+
+ if valtype(s_lGenppo)=="L" .AND. !s_lGenppo
+
+    aFiles := directory( "*.ppo" )
+
+    for nPos := 1 to Len( aFiles )
+        FErase( aFiles[nPos,1] )
+    next
+
+ endif
+
+RETURN NIL
+
