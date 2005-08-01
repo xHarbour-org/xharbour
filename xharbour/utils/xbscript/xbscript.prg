@@ -445,11 +445,19 @@ STATIC s_cVer := "1.0.RC13" + Stringify( REVISION )
 #endif
 
 //--------------------------------------------------------------//
-//#ifdef __HARBOUR__
-//  STATIC PROCEDURE Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
-//#else
+#define _USE_APPMAIN_
+#ifdef __CLIP__
+   #undef _USE_APPMAIN_
+#endif
+#ifdef FlagShip
+   #undef _USE_APPMAIN_
+#endif
+
+#ifdef _USE_APPMAIN_
+  PROCEDURE _AppMain( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
+#else
   PROCEDURE Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
-//#endif
+#endif
 
    LOCAL sIncludePath, nNext, sPath, sSwitch := ""
    LOCAL nAt, sParams, sPPOExt, aParams := {}

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.40 2004/11/21 21:43:36 druzus Exp $
+ * $Id: hbapifs.h,v 1.41 2005/05/19 02:20:15 druzus Exp $
  */
 
 /*
@@ -83,9 +83,13 @@ typedef int    FHANDLE;
 /* Extended file open mode flags */
 #define FXO_TRUNCATE  0x0100   /* Create (truncate if exists) */
 #define FXO_APPEND    0x0200   /* Create (append if exists)   */
+#define FXO_UNIQUE    0x0400   /* Create unique file FO_EXCL ??? */
 #define FXO_FORCEEXT  0x0800   /* Force default extension     */
 #define FXO_DEFAULTS  0x1000   /* Use SET command defaults    */
 #define FXO_DEVICERAW 0x2000   /* Open devices in raw mode    */
+/* xHarbour extension */
+#define FXO_SHARELOCK 0x4000   /* emulate DOS SH_DENY* mode in POSIX OS */
+#define FXO_COPYNAME  0x8000   /* copy final szPath into pFilename */
 
 /* File attributes flags */
 #define HB_FA_ALL               0
@@ -160,10 +164,19 @@ int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait );
 #define hb_fsFLock( h, s, l )   hb_fsLock( h, s, l, FL_LOCK )
 #define hb_fsFUnlock( h, s, l ) hb_fsLock( h, s, l, FL_UNLOCK )
 
+#if defined( OS_UNIX_COMPATIBLE ) && !defined( HB_USE_SHARELOCKS_OFF )
+#  define HB_USE_SHARELOCKS
+#  define HB_SHARELOCK_POS          0x7fffffffUL
+#  define HB_SHARELOCK_SIZE         0x1UL
+#endif
+
+#define HB_DRIVE_LENGTH_MAX   10
+#define HB_MAX_FILE_EXT       10
+
 /* Filename support */
 typedef struct
 {
-   char   szBuffer[ _POSIX_PATH_MAX + 3 + 10 ]; /* TOFIX: +10 is for the drive letter support, and should be changed to some manifest constant */
+   char   szBuffer[ _POSIX_PATH_MAX + HB_DRIVE_LENGTH_MAX + 4 ];
    char * szPath;
    char * szName;
    char * szExtension;
@@ -180,7 +193,8 @@ typedef struct _HB_PATHNAMES
    struct _HB_PATHNAMES * pNext;
 } HB_PATHNAMES;
 
-extern void    HB_EXPORT hb_fsAddSearchPath( char * szPath, HB_PATHNAMES * * pSearchList );
+extern void    HB_EXPORT hb_fsAddSearchPath( char * szPath, HB_PATHNAMES ** pSearchList );
+extern void    HB_EXPORT hb_fsFreeSearchPath( HB_PATHNAMES * pSearchList );
 
 extern BOOL    HB_EXPORT hb_spFile( BYTE * pFilename, BYTE * pRetPath );
 extern FHANDLE HB_EXPORT hb_spOpen( BYTE * pFilename, USHORT uiFlags );

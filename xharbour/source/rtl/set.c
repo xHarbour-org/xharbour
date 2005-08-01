@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.64 2005/06/10 03:59:39 peterrees Exp $
+ * $Id: set.c,v 1.65 2005/06/10 04:05:33 peterrees Exp $
  */
 
 /*
@@ -89,26 +89,11 @@ char s_PrintFileName[ _POSIX_PATH_MAX + 1 ], s_PrinterName[ _POSIX_PATH_MAX + 1 
 BOOL s_isDefaultPrinterDevice;    // Printer is the default device
 static void hb_setFreeSetPath( void )
 {
-   /* Free all set paths */
-   HB_PATHNAMES * curPath = sp_set_path;
-   HB_PATHNAMES * nextPath;
-
    if( sp_set_path )
    {
-      /* Only the first path holds an allocated string.
-         All of the other paths in the list are part of
-         that first string. */
-      hb_xfree( sp_set_path->szPath );
+      hb_fsFreeSearchPath( sp_set_path );
+      sp_set_path = NULL;
    }
-
-   while( curPath )
-   {
-      nextPath = curPath->pNext;
-      hb_xfree( curPath );
-      curPath = nextPath;
-   }
-
-   sp_set_path = NULL;
 }
 
 HB_EXPORT HB_SET_STRUCT *hb_GetSetStructPtr( void )

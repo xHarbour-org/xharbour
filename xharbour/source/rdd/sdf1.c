@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.8 2005/02/27 11:56:02 andijahja Exp $
+ * $Id: sdf1.c,v 1.9 2005/02/28 10:17:31 andijahja Exp $
  */
 
 /*
@@ -178,6 +178,7 @@ static RDDFUNCS sdfTable = { hb_sdfBof,
                              hb_sdfExit,
                              hb_sdfDrop,
                              hb_sdfExists,
+                             hb_sdfRddInfo,
                              hb_sdfWhoCares
                            };
 

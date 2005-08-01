@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.14 2005/05/04 11:39:51 druzus Exp $
+ * $Id: dbinfo.ch,v 1.15 2005/06/22 15:29:53 druzus Exp $
  */
 
 /*
@@ -52,6 +52,53 @@
 
 #ifndef HB_DBINFO_CH_
 #define HB_DBINFO_CH_
+
+/*
+   Constants for SELF_RDDINFO ()
+*/
+
+#define RDDI_ISDBF                1    /* Does this RDD support DBFs? */
+#define RDDI_CANPUTREC            2    /* Can this RDD Put Records? */
+#define RDDI_DELIMITER            3    /* The field delimiter (as a string) */
+#define RDDI_SEPARATOR            4    /* The record separator (as a string) */
+
+#define RDDI_TABLEEXT             5    /* Default data file's file extension */
+#define RDDI_MEMOEXT              6    /* Default memo file's file extension */
+#define RDDI_ORDBAGEXT            7    /* Default multi tag index's file extension */
+#define RDDI_ORDEREXT             8    /* default single tag index's file extension */
+#define RDDI_ORDSTRUCTEXT         9    /* default single tag index's file extension */
+
+#define RDDI_LOCAL                10   /* Local file access? */
+#define RDDI_REMOTE               11   /* Remote table access? */
+#define RDDI_CONNECTION           12   /* Get/Set default connection */
+#define RDDI_TABLETYPE            13   /* Type of table file */
+#define RDDI_MEMOTYPE             14   /* Type of MEMO file: DBT, SMT, FPT(FP,SIX3,FLEXIII) */
+#define RDDI_LARGEFILE            15   /* Is large file size (>=4GB) supported */
+#define RDDI_LOCKSCHEME           16   /* Locking scheme used by RDD */
+#define RDDI_RECORDMAP            17   /* Does RDD support record map functionality? */
+#define RDDI_ENCRYPTION           18   /* Does RDD support encryption */
+#define RDDI_TRIGGERS             19   /* Get/Set default trigger function */
+#define RDDI_AUTOLOCK             20   /* automatic locking on update */
+
+/* index parameters */
+#define RDDI_STRUCTORD            21   /* Are structural indexes supported */
+#define RDDI_STRICTREAD           22   /* Flag for avoiding RDD hierarchy and using a bigger buffer when indexing */
+#define RDDI_STRICTSTRUCT         23   /* Flag for strict structural order checking */
+#define RDDI_OPTIMIZE             24   /* Flag for whether to use query optimization */
+#define RDDI_FORCEOPT             25   /* Flag for forcing linear optimization */
+#define RDDI_AUTOOPEN             26   /* Flag for automatically opening structural indexes */
+#define RDDI_AUTOORDER            27   /* When a structural index is opened, the order to be set */
+#define RDDI_AUTOSHARE            28   /* When a network is detected, open the index shared, otherwise open exclusively */
+#define RDDI_MULTITAG             29   /* Does RDD support multi tag in index file */
+#define RDDI_SORTRECNO            30   /* Is record number part of key in sorting */
+#define RDDI_MULTIKEY             31   /* Does custom orders support repeated keys? */
+
+/* memo parameters */
+#define RDDI_MEMOBLOCKSIZE        32   /* Memo File's block size */
+#define RDDI_MEMOGCTYPE           33   /* type of garbage collector used by GC */
+#define RDDI_MEMOREADLOCK         34   /* use read lock in memo file access */
+#define RDDI_MEMOREUSE            35   /* reuse free space on write */
+
 
 /*
    Constants for SELF_ORDINFO ()
@@ -130,16 +177,15 @@
 #define DBOI_ISMULTITAG          114  /* does RDD support multi tag in index file */
 #define DBOI_ISSORTRECNO         115  /* is record number part of key in sorting */
 #define DBOI_LARGEFILE           116  /* is large file size (>=4GB) supported */
-#define DBOI_FREEZE              117  /* freeze order updating */
-#define DBOI_WARM                118  /* restore order updating */
+#define DBOI_TEMPLATE            117  /* order with free user keys */
+#define DBOI_MULTIKEY            118  /* custom order with multikeys */
 #define DBOI_CHGONLY             119  /* update only existing keys */
-#define DBOI_SHARED              120  /* is index open in shared mode */
-#define DBOI_ISREADONLY          121  /* is index open in readonly mode */
-
-#define DBOI_WRITELOCK           122  /* get/set index write lock */
+#define DBOI_PARTIAL             120  /* is index partially updated */
+#define DBOI_SHARED              121  /* is index open in shared mode */
+#define DBOI_ISREADONLY          122  /* is index open in readonly mode */
 #define DBOI_READLOCK            123  /* get/set index read lock */
-
-#define DBOI_UPDATECOUNTER       124  /* get/set update index counter */
+#define DBOI_WRITELOCK           124  /* get/set index write lock */
+#define DBOI_UPDATECOUNTER       125  /* get/set update index counter */
 
 /* Return values for DBOI_OPTLEVEL */
 #define DBOI_OPTIMIZED_NONE       0
@@ -204,6 +250,8 @@
 #define DBI_ROLLBACK            130  /* Rollback changes made to current record */
 #define DBI_PASSWORD            131  /* Workarea password */
 #define DBI_ISENCRYPTED         132  /* The database is encrypted */
+#define DBI_MEMOTYPE            133  /* Type of MEMO file: DBT, SMT, FPT */
+#define DBI_SEPARATOR           134  /* The record separator (as a string) */
 
 /* RECORD MAP (RM) support */
 #define DBI_RM_SUPPORTED        150  /* has WA RDD record map support? */

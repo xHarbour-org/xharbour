@@ -1,5 +1,5 @@
  /*
- * $Id: fstemp.c,v 1.19 2005/01/10 18:45:34 druzus Exp $
+ * $Id: fstemp.c,v 1.20 2005/03/31 03:58:51 druzus Exp $
  */
 
 /*
@@ -123,7 +123,7 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
    {
       if( hb_fsTempName( pszName, pszDir, pszPrefix ) )
       {
-          FHANDLE fhnd = hb_fsCreateEx( pszName, uiAttr, FO_EXCLUSIVE | FO_EXCL);
+          FHANDLE fhnd = hb_fsCreateEx( pszName, uiAttr, FO_EXCLUSIVE | FO_EXCL );
 
           /* This function may fail, if the generated filename got
              used between generation and the file creation. */
@@ -232,7 +232,7 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
             pszName[ iLen++ ] = n + ( n > 9 ? 'a' - 10 : '0' );
          }
          hb_fileNameConv( ( char * ) pszName );
-         fd = hb_fsCreateEx( pszName, uiAttr, FO_EXCLUSIVE | FO_EXCL);
+         fd = hb_fsCreateEx( pszName, uiAttr, FO_EXCLUSIVE | FO_EXCL );
       }
 #if !defined(__WATCOMC__) && ( defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) )
       else

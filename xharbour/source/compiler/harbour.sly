@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.88 2005/07/18 17:38:50 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.89 2005/07/28 15:37:29 ronpinkas Exp $
  */
 
 /*
@@ -125,7 +125,7 @@ static BOOL bTrancuateBaseArray = FALSE;
 static HB_EXPR_PTR pGetArgList, pBaseArrayName = NULL, pGetVarArray;
 
 static int s_iBlock = 0;
-static BOOL s_bBlockMacro = FALSE, s_bBlockDeclared = FALSE, s_bSetGet;
+static BOOL s_bBlockMacro = FALSE, s_bBlockDeclared = FALSE;
 static HB_EXPR_PTR pBlockSimple;
 
 static int s_iLastControlLine = 0, s_iControlLevel = 0;

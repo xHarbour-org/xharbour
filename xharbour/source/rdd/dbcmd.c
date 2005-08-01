@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.157 2005/05/25 13:17:59 druzus Exp $
+ * $Id: dbcmd.c,v 1.158 2005/06/11 22:27:24 ronpinkas Exp $
  */
 
 /*
@@ -190,6 +190,27 @@ static ERRCODE hb_waUnsupported( AREAP pArea )
 }
 
 /*
+ * Raise a runtime error if an method is not defined.
+ */
+static ERRCODE hb_waRddUnsupported( LPRDDNODE pRDD )
+{
+   PHB_ITEM pError;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_waRDDUnsupported(%p)", pRDD));
+
+   pError = hb_errNew();
+   hb_errPutGenCode( pError, EG_UNSUPPORTED );
+   hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_UNSUPPORTED ) );
+
+   hb_errPutSeverity( pError, ES_ERROR );
+   hb_errPutSubSystem( pError, pRDD->szName );
+   hb_errLaunch( pError );
+   hb_itemRelease( pError );
+
+   return FAILURE;
+}
+
+/*
  * The default virtual method table for all WorkAreas.
  */
 static RDDFUNCS waTable = { hb_waBof,
@@ -286,9 +307,19 @@ static RDDFUNCS waTable = { hb_waBof,
                             hb_rddExit,
                             hb_rddDrop,
                             hb_rddExists,
+                            hb_rddInfo,
                             hb_waWhoCares
                            };
 
+/*
+ * Get RDD node poionter
+ */
+LPRDDNODE HB_EXPORT hb_rddGetNode( USHORT uiNode )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddGetNode(%hu)", uiNode));
+
+   return uiNode < s_uiRddMax ? s_RddList[ uiNode ] : NULL;
+}
 
 /*
  * Find a RDD node.
@@ -355,8 +386,9 @@ static int hb_rddRegister( char * szDriver, USHORT uiType )
    hb_vmPushPointer( ( void * ) &uiFunctions );
    hb_vmPushPointer( ( void * ) &pRddNewNode->pTable );
    hb_vmPushPointer( ( void * ) &pRddNewNode->pSuperTable );
-   hb_vmDo( 3 );
-   if ( hb_parni( -1 ) != SUCCESS )
+   hb_vmPushInteger( s_uiRddMax );
+   hb_vmDo( 4 );
+   if( hb_parni( -1 ) != SUCCESS )
    {
       hb_xfree( pRddNewNode );         /* Delete de new RDD node */
       return 3;                        /* Invalid FUNCTABLE */
@@ -436,28 +468,31 @@ static ERRCODE hb_rddVerifyAliasName( char * szAlias )
 {
    char c;
 
-   while( *szAlias == ' ' )
+   if( szAlias )
    {
-      szAlias++;
-   }
-   c = *szAlias;
-   if( c >= 'a' && c <= 'z' )
-   {
-      c -= 'a' - 'A';
-   }
-   if( ( c >= 'A' && c <= 'Z' ) || c == '_' )
-   {
-      c = *(++szAlias);
-      while( c != 0 && c != ' ' )
+      while( *szAlias == ' ' )
       {
-         if( c != '_' && ! ( c >= '0' && c <= '9' ) &&
-             ! ( c >= 'A' && c <= 'Z' ) && ! ( c >= 'a' && c <= 'z' ) )
-         {
-            return FAILURE;
-         }
-         c = *(++szAlias);
+         szAlias++;
       }
-      return SUCCESS;
+      c = *szAlias;
+      if( c >= 'a' && c <= 'z' )
+      {
+         c -= 'a' - 'A';
+      }
+      if( ( c >= 'A' && c <= 'Z' ) || c == '_' )
+      {
+         c = *(++szAlias);
+         while( c != 0 && c != ' ' )
+         {
+            if( c != '_' && ! ( c >= '0' && c <= '9' ) &&
+                ! ( c >= 'A' && c <= 'Z' ) && ! ( c >= 'a' && c <= 'z' ) )
+            {
+               return FAILURE;
+            }
+            c = *(++szAlias);
+         }
+         return SUCCESS;
+      }
    }
    return FAILURE;
 }
@@ -595,8 +630,8 @@ void HB_EXPORT hb_rddReleaseCurrentArea( void )
       return;
    }
 
-   SELF_CLOSE( ( AREAP ) pArea );
-   SELF_RELEASE( ( AREAP ) pArea );
+   SELF_CLOSE( pArea );
+   SELF_RELEASE( pArea );
 
    LOCK_AREA
 
@@ -833,7 +868,7 @@ HB_EXPORT void * hb_rddAllocWorkAreaAlias( char * szAlias, int iArea )
 
    LOCK_AREA
    pSymAlias = hb_dynsymGet( szAlias );
-   if ( pSymAlias->hArea )
+   if( pSymAlias->hArea )
    {
       pSymAlias = NULL;
    }
@@ -843,7 +878,7 @@ HB_EXPORT void * hb_rddAllocWorkAreaAlias( char * szAlias, int iArea )
    }
    UNLOCK_AREA
 
-   if ( ! pSymAlias )
+   if( ! pSymAlias )
    {
       hb_errRT_DBCMD_Ext( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias, EF_CANDEFAULT );
    }
@@ -998,32 +1033,9 @@ HB_EXPORT void * hb_rddGetCurrentWorkAreaPointer( void )
 }
 
 /*
- * Find a field. ###
- */
-USHORT hb_rddFieldIndex( AREAP pArea, char * szName )
-{
-   USHORT uiCount;
-   LPFIELD pField;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddFieldIndex(%s)", szName));
-
-   uiCount = 0;
-   pField = pArea->lpFields;
-
-   while( pField )
-   {
-      ++uiCount;
-      if( strcmp( szName, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName ) == 0 )
-         return uiCount;
-      pField = pField->lpfNext;
-   }
-   return 0;
-}
-
-/*
  * call a pCallBack function with all open workareas ###
  */
-ERRCODE HB_EXPORT hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data )
+ERRCODE HB_EXPORT hb_rddIterateWorkAreas( WACALLBACK pCallBack, int data )
 {
    USHORT uiIndex;
 
@@ -1042,29 +1054,178 @@ ERRCODE HB_EXPORT hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data )
 }
 
 /*
+ * Find a field index by symbol
+ */
+USHORT HB_EXPORT hb_rddFieldSymIndex( AREAP pArea, PHB_SYMB pFieldSymbol )
+{
+   USHORT uiCount = 0;
+   LPFIELD pField;
+   PHB_DYNS pDynSym;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddFieldSymIndex(%p, %p)", pArea, pFieldSymbol));
+
+   pDynSym = pFieldSymbol->pDynSym;
+   pField = pArea->lpFields;
+   while( pField )
+   {
+      if( ( PHB_DYNS ) pField->sym == pDynSym )
+      {
+         return uiCount;
+      }
+      ++uiCount;
+      pField = pField->lpfNext;
+   }
+   return 0;
+}
+
+/*
+ * Find a field index by name
+ */
+USHORT HB_EXPORT hb_rddFieldNameIndex( AREAP pArea, char * szName )
+{
+   PHB_DYNS pFieldSym;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddFieldNameIndex(%p, %s)", pArea, szName));
+
+   pFieldSym = hb_dynsymFindName( szName );
+   if( pFieldSym )
+   {
+      USHORT uiCount = 0;
+      LPFIELD pField = pArea->lpFields;
+      while( pField )
+      {
+         ++uiCount;
+         if( ( PHB_DYNS ) pField->sym == pFieldSym )
+            return uiCount;
+         pField = pField->lpfNext;
+      }
+   }
+   return 0;
+}
+
+/*
+ * Find a field index by name
+ */
+USHORT HB_EXPORT hb_rddFieldIndex( AREAP pArea, char * szName )
+{
+   USHORT uiCount = 0;
+   LPFIELD pField;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddFieldIndex(%p, %s)", pArea, szName));
+
+   pField = pArea->lpFields;
+   while( pField )
+   {
+      ++uiCount;
+      if( strcmp( szName, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName ) == 0 )
+         return uiCount;
+      pField = pField->lpfNext;
+   }
+   return 0;
+}
+
+/*
+ * find a field expression index, this function strips _FIELD->, FIELD->,
+ * alias-> prefixes
+ */
+USHORT HB_EXPORT hb_rddFieldExpIndex( AREAP pArea, char * szField, BOOL fHash )
+{
+   int n;
+
+   while( *szField == ' ' )
+   {
+      ++szField;
+   }
+
+   if( strchr( szField, '>' ) != NULL )
+   {
+      char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
+      int i, j, l;
+
+      n = 0;
+      if ( SELF_ALIAS( pArea, ( BYTE * ) szAlias ) == SUCCESS )
+         l = strlen( szAlias );
+      else
+         l = 0;
+
+      /*
+       * strip the _FIELD-> and FIELD-> prefix, it could be nested
+       * so repeat this process until all prefixes will be removed
+       */
+      do
+      {
+         j = n;
+         if( hb_strnicmp( &szField[ n ], "FIELD", 5 ) == 0 )
+            i = 5;
+         else if( hb_strnicmp( &szField[ n ], "_FIELD", 6 ) == 0 )
+            i = 6;
+         else if( l > 0 && hb_strnicmp( &szField[ n ], szAlias, l ) == 0 )
+            i = l;
+         else
+            i = 0;
+
+         if( i > 0 )
+         {
+            i = n + 5;
+            while( szField[ i ] == ' ' )
+               i++;
+            if( szField[ i ] == '-' && szField[ i + 1 ] == '>' )
+            {
+               n = i + 2;
+               while( szField[ n ] == ' ' )
+                  n++;
+            }
+         }
+      }
+      while ( n != j );
+      szField = &szField[ n ];
+   }
+
+   n = strlen( szField );
+   while( szField[ n - 1 ] == ' ' )
+   {
+      --n;
+   }
+
+   if( n )
+   {
+      if( fHash )
+      {
+         return hb_rddFieldNameIndex( pArea, szField );
+      }
+      else
+      {
+         char szSym[ HB_SYMBOL_NAME_LEN + 1 ];
+
+         hb_strncpyUpperTrim( szSym, szField, HB_SYMBOL_NAME_LEN );
+         return hb_rddFieldIndex( pArea, szSym );
+      }
+   }
+   return 0;
+}
+
+/*
  * Obtain the current value of a field.
  */
 ERRCODE HB_EXPORT hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
    HB_THREAD_STUB
-   LPFIELD pField;
-   USHORT uiField;
    AREAP pArea = HB_CURRENT_WA;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddFieldGet(%p, %p)", pItem, pFieldSymbol));
 
    if( pArea )
    {
-      uiField = 1;
-      pField = pArea->lpFields;
+      USHORT uiField = 1;
+      LPFIELD pField = pArea->lpFields;
       while( pField )
       {
          if( ( PHB_DYNS ) pField->sym == pFieldSymbol->pDynSym )
          {
             return SELF_GETVALUE( pArea, uiField, pItem );
          }
+         ++uiField;
          pField = pField->lpfNext;
-         uiField++;
       }
    }
    return FAILURE;
@@ -1076,24 +1237,22 @@ ERRCODE HB_EXPORT hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 ERRCODE HB_EXPORT hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
    HB_THREAD_STUB
-   LPFIELD pField;
-   USHORT uiField;
    AREAP pArea = HB_CURRENT_WA;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddFieldPut(%p, %p)", pItem, pFieldSymbol));
 
    if( pArea )
    {
-      uiField = 1;
-      pField = pArea->lpFields;
+      USHORT uiField = 1;
+      LPFIELD pField = pArea->lpFields;
       while( pField )
       {
          if( ( PHB_DYNS ) pField->sym == pFieldSymbol->pDynSym )
          {
             return SELF_PUTVALUE( pArea, uiField, pItem );
          }
+         ++uiField;
          pField = pField->lpfNext;
-         uiField++;
       }
    }
    return FAILURE;
@@ -1195,9 +1354,7 @@ ERRCODE HB_EXPORT hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol 
 HB_FUNC( AFIELDS )
 {
    HB_THREAD_STUB
-
    PHB_ITEM pName, pType, pLen, pDec;
-   HB_ITEM_NEW ( Item );
    USHORT uiFields, uiArrayLen, uiCount;
    AREAP pArea = HB_CURRENT_WA;
 
@@ -1224,10 +1381,10 @@ HB_FUNC( AFIELDS )
       uiArrayLen = ( USHORT ) hb_arrayLen( pName );
       if( uiArrayLen > uiFields )
          uiArrayLen = uiFields;
-      for( uiCount = 1; uiCount <= uiArrayLen; uiCount++ )
+      for( uiCount = 1; uiCount <= uiArrayLen; ++uiCount )
       {
-         SELF_FIELDINFO( pArea, uiCount, DBS_NAME, &Item );
-         hb_arraySetForward( pName, uiCount, &Item );
+         SELF_FIELDINFO( pArea, uiCount, DBS_NAME,
+                         hb_arrayGetItemPtr( pName, uiCount ) );
       }
    }
    if( pType )
@@ -1235,10 +1392,10 @@ HB_FUNC( AFIELDS )
       uiArrayLen = ( USHORT ) hb_arrayLen( pType );
       if( uiArrayLen > uiFields )
          uiArrayLen = uiFields;
-      for( uiCount = 1; uiCount <= uiArrayLen; uiCount++ )
+      for( uiCount = 1; uiCount <= uiArrayLen; ++uiCount )
       {
-         SELF_FIELDINFO( pArea, uiCount, DBS_TYPE, &Item );
-         hb_arraySetForward( pType, uiCount, &Item );
+         SELF_FIELDINFO( pArea, uiCount, DBS_TYPE,
+                         hb_arrayGetItemPtr( pType, uiCount ) );
       }
    }
    if( pLen )
@@ -1246,10 +1403,10 @@ HB_FUNC( AFIELDS )
       uiArrayLen = ( USHORT ) hb_arrayLen( pLen );
       if( uiArrayLen > uiFields )
          uiArrayLen = uiFields;
-      for( uiCount = 1; uiCount <= uiArrayLen; uiCount++ )
+      for( uiCount = 1; uiCount <= uiArrayLen; ++uiCount )
       {
-         SELF_FIELDINFO( pArea, uiCount, DBS_LEN, &Item );
-         hb_arraySetForward( pLen, uiCount, &Item );
+         SELF_FIELDINFO( pArea, uiCount, DBS_LEN,
+                         hb_arrayGetItemPtr( pLen, uiCount ) );
       }
    }
    if( pDec )
@@ -1257,10 +1414,10 @@ HB_FUNC( AFIELDS )
       uiArrayLen = ( USHORT ) hb_arrayLen( pDec );
       if( uiArrayLen > uiFields )
          uiArrayLen = uiFields;
-      for( uiCount = 1; uiCount <= uiArrayLen; uiCount++ )
+      for( uiCount = 1; uiCount <= uiArrayLen; ++uiCount )
       {
-         SELF_FIELDINFO( pArea, uiCount, DBS_DEC, &Item );
-         hb_arraySetForward( pDec, uiCount, &Item );
+         SELF_FIELDINFO( pArea, uiCount, DBS_DEC,
+                         hb_arrayGetItemPtr( pDec, uiCount ) );
       }
    }
 
@@ -1437,7 +1594,7 @@ HB_FUNC( DBCOMMITALL )
    USHORT uiArea = hb_rddGetCurrentWorkAreaNumber(), uiIndex;
 
    LOCK_AREA
-   for ( uiIndex = 1; uiIndex < s_uiWaMax; uiIndex++ )
+   for ( uiIndex = 1; uiIndex < s_uiWaMax; ++uiIndex )
    {
       hb_rddSelectWorkAreaNumber( s_WaList[ uiIndex ]->uiArea );
       SELF_FLUSH( HB_CURRENT_WA );
@@ -1446,81 +1603,22 @@ HB_FUNC( DBCOMMITALL )
    hb_rddSelectWorkAreaNumber( uiArea );
 }
 
-HB_FUNC( DBCREATE )
+static ERRCODE hb_rddOpenTable( char * szFileName,  char * szDriver,
+                                USHORT uiArea, char *szAlias,
+                                BOOL fShared, BOOL fReadonly,
+                                char * szCpId, ULONG ulConnection )
 {
-   HB_THREAD_STUB
-   char * szDriver;
    char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
-   char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
-   char szAliasTmp[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
-   char szFileName[ _POSIX_PATH_MAX + 1 ], szSavedFileName[ _POSIX_PATH_MAX + 1 ];
-   USHORT uiSize, uiLen, uiPrevArea;
    DBOPENINFO pInfo;
-   PHB_FNAME pFileName;
-   PHB_ITEM pStruct, pFieldDesc;
-   BOOL bOpen, bCurr;
-   BYTE * codePageId = (BYTE*) hb_parc(6);
+   ERRCODE errCode;
+   USHORT uiPrevArea;
    AREAP pArea;
-
-   hb_ret();
 
    s_bNetError = FALSE;
 
-   szFileName[0] = szFileName[_POSIX_PATH_MAX] = '\0';
-   if ( ISCHAR( 1 ) )
+   if( szDriver && szDriver[ 0 ] )
    {
-      strncpy( szFileName, hb_parc( 1 ), _POSIX_PATH_MAX );
-   }
-   pStruct = hb_param( 2 , HB_IT_ARRAY );
-
-   if( pStruct )
-   {
-      uiLen = ( USHORT ) hb_arrayLen( pStruct );
-   }
-   else
-   {
-      uiLen = 0;
-   }
-
-   if( ( strlen( szFileName ) == 0 ) || uiLen == 0 )
-   {
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE" );
-      //hb_errRT_BASE( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
-      //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
-      return;
-   }
-
-   for( uiSize = 0; uiSize < uiLen; uiSize++ )
-   {
-      pFieldDesc = hb_arrayGetItemPtr( pStruct, uiSize + 1 );
-
-      if( hb_arrayLen( pFieldDesc ) < 4 )
-      {
-         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE" );
-         //hb_errRT_BASE( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
-         //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
-
-         return;
-      }
-
-      /* Validate items types of fields */
-      if( !( hb_arrayGetType( pFieldDesc, 1 ) & HB_IT_STRING ) ||
-          !( hb_arrayGetType( pFieldDesc, 2 ) & HB_IT_STRING ) ||
-          !( hb_arrayGetType( pFieldDesc, 3 ) & HB_IT_NUMERIC ) ||
-          !( hb_arrayGetType( pFieldDesc, 4 ) & HB_IT_NUMERIC ) )
-      {
-         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE" );
-         //hb_errRT_BASE( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
-         //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
-         return;
-      }
-   }
-
-   uiPrevArea = hb_rddGetCurrentWorkAreaNumber();
-
-   if( hb_parclen( 3 ) > 0 )
-   {
-      hb_strncpyUpper( szDriverBuffer, hb_parc( 3 ), HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
+      hb_strncpyUpper( szDriverBuffer, szDriver, HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
       szDriver = szDriverBuffer;
    }
    else
@@ -1528,163 +1626,166 @@ HB_FUNC( DBCREATE )
       szDriver = s_szDefDriver;
    }
 
-   bOpen = ISLOG( 4 );
-   bCurr = bOpen && !hb_parl( 4 );
+   uiPrevArea = hb_rddGetCurrentWorkAreaNumber();
 
-   pFileName = hb_fsFNameSplit( szFileName );
-
-   if ( bOpen )
+   /*
+    * 0 means chose first available in hb_rddInsertAreaNode()
+    * This hack is necessary to avoid race condition in MT
+    * if we don't want to lock whole RDD subsystem, Druzus
+    */
+   hb_rddSelectWorkAreaNumber( uiArea );
+   if( uiArea )
    {
-      hb_strncpyUpperTrim( szAlias, hb_parcx( 5 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
-      if ( ! szAlias[0] )
-      {
-         hb_strncpyUpperTrim( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
-      }
-      /* Verify if the alias name is valid symbol */
-      if( hb_rddVerifyAliasName( szAlias ) != SUCCESS )
-      {
-         hb_xfree( pFileName );
-         hb_errRT_DBCMD_Ext( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias, EF_CANDEFAULT );
-         /* hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" ); */
-         return;
-      }
+      hb_rddReleaseCurrentArea();
    }
 
-   if( hb_rddGetTempAlias( szAliasTmp ) == FAILURE )
-   {
-      hb_xfree( pFileName );
-      hb_errRT_DBCMD_Ext( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias, EF_CANDEFAULT );
-      return;
-   }
+   s_bNetError = TRUE;
 
-   if ( bCurr )
-   {
-       /* If current WorkArea is used then close it */
-      if( HB_CURRENT_WA )
-      {
-         hb_rddReleaseCurrentArea();
-      }
-   }
-   else
-   {
-      /*
-       * 0 means chose first available in hb_rddInsertAreaNode()
-       * This hack is necessary to avoid race condition in MT
-       * if we don't want to lock whole RDD subsystem, Druzus
-       */
-      hb_rddSelectWorkAreaNumber( 0 );
-   }
-   if ( bOpen )
-   {
-      int iArea;
-      /* Verify if the alias is already in use */
-      if( hb_rddGetAliasNumber( szAlias, &iArea ) == SUCCESS )
-      {
-         hb_xfree( pFileName );
-         hb_errRT_DBCMD_Ext( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias, EF_CANDEFAULT );
-         return;
-      }
-   }
    /* Create a new WorkArea node */
    if( ! hb_rddInsertAreaNode( szDriver ) )
    {
-      hb_xfree( pFileName );
-      hb_errRT_DBCMD( EG_CREATE, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
-      //hb_errRT_BASE( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
-      //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
-      return;
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREA" );
+      return FAILURE;
    }
-   pArea = HB_CURRENT_WA;
-
-   if( ! pFileName->szExtension )
-   {
-      HB_ITEM_NEW( extItm );
-      SELF_INFO( pArea, DBI_TABLEEXT, &extItm );
-      if( HB_IS_STRING( &extItm ) )
-      {
-         strncat( szFileName, extItm.item.asString.value, _POSIX_PATH_MAX - strlen( szFileName ) );
-      }
-      hb_itemClear( &extItm );
-   }
-
-   hb_xfree( pFileName );
-
-   /* Save filename for later use */
-   strcpy( szSavedFileName, szFileName );
-
+   pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+   
    /* Fill pInfo structure */
    pInfo.uiArea = pArea->uiArea;
    pInfo.abName = ( BYTE * ) szFileName;
-   pInfo.atomAlias = ( BYTE * ) szAliasTmp;
-   pInfo.fShared = FALSE;
-   pInfo.fReadonly = FALSE;
-   pInfo.cdpId = codePageId;
+   pInfo.atomAlias = ( BYTE * ) szAlias;
+   pInfo.fShared = fShared;
+   pInfo.fReadonly = fReadonly;
+   pInfo.cdpId = ( BYTE * ) szCpId;
+   pInfo.ulConnection = ulConnection;
+   pInfo.lpdbHeader = NULL;
 
-   pArea->atomAlias = hb_rddAllocWorkAreaAlias( szAliasTmp, ( int ) pArea->uiArea );
-   if( ! pArea->atomAlias )
+   /* Open file */
+   errCode = SELF_OPEN( pArea, &pInfo );
+
+   if( errCode != SUCCESS )
    {
       hb_rddReleaseCurrentArea();
       hb_rddSelectWorkAreaNumber( uiPrevArea );
-      return;
-   }
-   if( SELF_CREATEFIELDS( pArea, pStruct ) == FAILURE )
-   {
-      hb_rddReleaseCurrentArea();
-      hb_rddSelectWorkAreaNumber( uiPrevArea );
-      hb_errRT_DBCMD( EG_CREATE, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
-      //hb_errRT_BASE( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE", 6, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ),
-      //               hb_paramError( 4 ), hb_paramError( 5 ), hb_paramError( 6 ) );
-      return;
    }
 
-   if( SELF_CREATE( pArea, &pInfo ) == FAILURE )
-   {
-      hb_rddReleaseCurrentArea();
-      hb_rddSelectWorkAreaNumber( uiPrevArea );
-      return;
-   }
+   s_bNetError = errCode != SUCCESS;
 
-   hb_rddReleaseCurrentArea();
+   return errCode;
+}
 
-   if( ! bOpen )
+static ERRCODE hb_rddCreateTable( char * szFileName, PHB_ITEM pStruct,
+                                  char * szDriver,
+                                  BOOL fKeepOpen, USHORT uiArea, char *szAlias,
+                                  char * szCpId, ULONG ulConnection )
+{
+   char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
+   DBOPENINFO pInfo;
+   ERRCODE errCode;
+   USHORT uiPrevArea;
+   AREAP pArea;
+
+   if( szDriver && szDriver[ 0 ] )
    {
-      hb_rddSelectWorkAreaNumber( uiPrevArea );
+      hb_strncpyUpper( szDriverBuffer, szDriver, HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
+      szDriver = szDriverBuffer;
    }
    else
    {
-      if ( !bCurr )
-      {
-         /*
-          * 0 means chose first available in hb_rddInsertAreaNode()
-          * This hack is necessary to avoid race condition in MT
-          * if we don't want to lock whole RDD subsystem, Druzus
-          */
-         hb_rddSelectWorkAreaNumber( 0 );
-      }
-      bOpen = FALSE;
-      if( hb_rddInsertAreaNode( szDriver ) )
-      {
-         pArea = HB_CURRENT_WA;
-
-         pInfo.uiArea = pArea->uiArea;
-         pInfo.abName = ( BYTE * ) szSavedFileName;
-         pInfo.atomAlias = ( BYTE * ) szAlias;
-         pInfo.fShared = !hb_set.HB_SET_EXCLUSIVE;
-         pInfo.fReadonly = FALSE;
-         pInfo.cdpId = codePageId;
-
-         bOpen = ( SELF_OPEN( pArea, &pInfo ) == SUCCESS );
-         if ( !bOpen )
-         {
-            hb_rddReleaseCurrentArea();
-         }
-      }
-      if ( !bOpen )
-      {
-         s_bNetError = TRUE;           /* Temp fix! What about other types of errors? */
-      }
-      hb_retl( bOpen );
+      szDriver = s_szDefDriver;
    }
+
+   uiPrevArea = hb_rddGetCurrentWorkAreaNumber();
+
+   /*
+    * 0 means chose first available in hb_rddInsertAreaNode()
+    * This hack is necessary to avoid race condition in MT
+    * if we don't want to lock whole RDD subsystem, Druzus
+    */
+   hb_rddSelectWorkAreaNumber( uiArea );
+   if( uiArea )
+   {
+      hb_rddReleaseCurrentArea();
+   }
+
+   s_bNetError = TRUE;
+
+   /* Create a new WorkArea node */
+   if( ! hb_rddInsertAreaNode( szDriver ) )
+   {
+      hb_errRT_DBCMD( EG_CREATE, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
+      return FAILURE;
+   }
+   pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+   
+   /* Fill pInfo structure */
+   pInfo.uiArea = pArea->uiArea;
+   pInfo.abName = ( BYTE * ) szFileName;
+   pInfo.atomAlias = ( BYTE * ) szAlias;
+   pInfo.fShared = FALSE;
+   pInfo.fReadonly = FALSE;
+   pInfo.cdpId = ( BYTE * ) szCpId;
+   pInfo.ulConnection = ulConnection;
+   pInfo.lpdbHeader = NULL;
+
+   errCode = SELF_CREATEFIELDS( pArea, pStruct );
+   if( errCode == SUCCESS )
+      errCode = SELF_CREATE( pArea, &pInfo );
+
+   if( !fKeepOpen || errCode != SUCCESS )
+   {
+      hb_rddReleaseCurrentArea();
+      hb_rddSelectWorkAreaNumber( uiPrevArea );
+   }
+
+   s_bNetError = errCode != SUCCESS;
+
+   return errCode;
+}
+
+HB_FUNC( DBCREATE )
+{
+   char * szFileName;
+   USHORT uiSize, uiLen;
+   PHB_ITEM pStruct, pFieldDesc;
+   BOOL fKeepOpen, fCurrArea;
+
+   /*
+    * NOTE: 4-th and 5-th parameters are undocumented Clipper ones
+    * 4-th is boolean flag indicating if file should stay open and
+    * 5-th is alias - if not given then WA is open without alias
+    */
+
+   szFileName = hb_parc( 1 );
+   pStruct = hb_param( 2 , HB_IT_ARRAY );
+   fKeepOpen = ISLOG( 4 );
+   fCurrArea = fKeepOpen && !hb_parl( 4 );
+
+   if( !pStruct || !szFileName || !szFileName[ 0 ] )
+   {
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE" );
+      return;
+   }
+   uiLen = ( USHORT ) hb_arrayLen( pStruct );
+
+   for( uiSize = 1; uiSize <= uiLen; ++uiSize )
+   {
+      pFieldDesc = hb_arrayGetItemPtr( pStruct, uiSize );
+
+      /* Validate items types of fields */
+      if( hb_arrayLen( pFieldDesc ) < 4 ||
+          !( hb_arrayGetType( pFieldDesc, 1 ) & HB_IT_STRING ) ||
+          !( hb_arrayGetType( pFieldDesc, 2 ) & HB_IT_STRING ) ||
+          !( hb_arrayGetType( pFieldDesc, 3 ) & HB_IT_NUMERIC ) ||
+          !( hb_arrayGetType( pFieldDesc, 4 ) & HB_IT_NUMERIC ) )
+      {
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE" );
+         return;
+      }
+   }
+
+   hb_rddCreateTable( szFileName, pStruct, hb_parc( 3 ), fKeepOpen,
+                      fCurrArea ? hb_rddGetCurrentWorkAreaNumber() : 0,
+                      hb_parc( 5 ), hb_parc( 6 ), hb_parnl( 7 ) );
 }
 
 HB_FUNC( DBDELETE )
@@ -2082,38 +2183,29 @@ HB_FUNC( DBSKIP )
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBSKIP" );
 }
 
-static void hb_dbfStructure( PHB_ITEM pStruct )
+static void hb_fldStructure( AREAP pArea, USHORT uiField, PHB_ITEM pField )
 {
-   HB_THREAD_STUB
+   hb_arrayNew( pField, 4 );
 
-   HB_ITEM_NEW (Item );
-   HB_ITEM_NEW ( Data );
+   SELF_FIELDINFO( pArea, uiField, DBS_NAME, hb_arrayGetItemPtr( pField, 1 ) );
+   SELF_FIELDINFO( pArea, uiField, DBS_TYPE, hb_arrayGetItemPtr( pField, 2 ) );
+   SELF_FIELDINFO( pArea, uiField, DBS_LEN,  hb_arrayGetItemPtr( pField, 3 ) );
+   SELF_FIELDINFO( pArea, uiField, DBS_DEC,  hb_arrayGetItemPtr( pField, 4 ) );
+}
+
+static void hb_tblStructure( AREAP pArea, PHB_ITEM pStruct )
+{
    USHORT uiFields, uiCount;
-   AREAP pArea = HB_CURRENT_WA;
 
-   if( pArea )
+   if( SELF_FIELDCOUNT( pArea, &uiFields ) == SUCCESS )
    {
-      SELF_FIELDCOUNT( pArea, &uiFields );
-
-      hb_arrayNew( pStruct, 0 );
-
-      for( uiCount = 1; uiCount <= uiFields; uiCount++ )
+      if( hb_arraySize( pStruct, uiFields ) )
       {
-         hb_arrayNew( &Item, 4 );
-
-         SELF_FIELDINFO( pArea, uiCount, DBS_NAME, &Data );
-         hb_arraySetForward( &Item, 1, &Data );
-
-         SELF_FIELDINFO( pArea, uiCount, DBS_TYPE, &Data );
-         hb_arraySetForward( &Item, 2, &Data );
-
-         SELF_FIELDINFO( pArea, uiCount, DBS_LEN, &Data );
-         hb_arraySetForward( &Item, 3, &Data );
-
-         SELF_FIELDINFO( pArea, uiCount, DBS_DEC, &Data );
-         hb_arraySetForward( &Item, 4, &Data );
-
-         hb_arrayAddForward( pStruct, &Item );
+         for( uiCount = 1; uiCount <= uiFields; ++uiCount )
+         {
+            hb_fldStructure( pArea, uiCount,
+                             hb_arrayGetItemPtr( pStruct, uiCount ) );
+         }
       }
    }
 }
@@ -2121,9 +2213,14 @@ static void hb_dbfStructure( PHB_ITEM pStruct )
 HB_FUNC( DBSTRUCT )
 {
    PHB_ITEM pStruct;
+   AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    pStruct = hb_itemNew( NULL );
-   hb_dbfStructure( pStruct );
+   hb_arrayNew( pStruct, 0 );
+   if( pArea )
+   {
+      hb_tblStructure( pArea, pStruct );
+   }
    hb_itemReturn( pStruct );
    hb_itemRelease( pStruct );
 }
@@ -2176,7 +2273,7 @@ HB_FUNC( DBUNLOCKALL )
    USHORT uiArea = hb_rddGetCurrentWorkAreaNumber(), uiIndex;
 
    LOCK_AREA
-   for ( uiIndex = 1; uiIndex < s_uiWaMax; uiIndex++ )
+   for ( uiIndex = 1; uiIndex < s_uiWaMax; ++uiIndex )
    {
       hb_rddSelectWorkAreaNumber( s_WaList[ uiIndex ]->uiArea );
       SELF_UNLOCK( HB_CURRENT_WA, 0 );
@@ -2187,116 +2284,21 @@ HB_FUNC( DBUNLOCKALL )
 
 HB_FUNC( DBUSEAREA )
 {
-   HB_THREAD_STUB
-   char * szDriver;
-   char szFileName[ _POSIX_PATH_MAX + 1 ];
-   DBOPENINFO pInfo;
-   PHB_FNAME pFileName;
-   BYTE * codePageId = (BYTE*) hb_parc(7);
-   char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
-   char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
-   AREAP pArea;
-   int iArea;
+   char * szFileName;
 
-   s_bNetError = FALSE;
+   szFileName = hb_parc( 3 );
 
-   /* New area? */
-   if( ! hb_parl( 1 ) && HB_CURRENT_WA )
-   {
-      /* If current WorkArea is in use then close it */
-      hb_rddReleaseCurrentArea();
-   }
-
-   if( hb_parclen( 2 ) > 0 )
-   {
-      hb_strncpyUpper( szDriverBuffer, hb_parc( 2 ), HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
-      szDriver = szDriverBuffer;
-   }
-   else
-   {
-      szDriver = s_szDefDriver;
-   }
-
-   if( hb_parclen( 3 ) == 0 )
+   if( !szFileName || !szFileName[ 0 ] )
    {
       hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREA" );
       return;
    }
 
-   hb_strncpy( szFileName, hb_parc( 3 ), _POSIX_PATH_MAX );
-   pFileName = hb_fsFNameSplit( szFileName );
-   hb_strncpyUpperTrim( szAlias, hb_parcx( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
-   if( ! *szAlias )
-   {
-      hb_strncpyUpperTrim( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
-   }
-
-   /* This code is not Clipper compatible - I'll remove it as soon as
-      3-rd party RDD begin to use hb_rddAllocWorkAreaAlias() or better
-      SUPER_OPEN() which will also makes this job */
-#if 1
-   /* Verify if the alias name is valid symbol */
-   if( hb_rddVerifyAliasName( szAlias ) != SUCCESS )
-   {
-      hb_xfree( pFileName );
-      hb_errRT_DBCMD_Ext( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias, EF_CANDEFAULT );
-      return;
-   }
-   /* Verify if the alias is already in use */
-   if( hb_rddGetAliasNumber( szAlias, &iArea ) == SUCCESS )
-   {
-      hb_xfree( pFileName );
-      hb_errRT_DBCMD_Ext( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias, EF_CANDEFAULT );
-      return;
-   }
-#endif
-
-   /* New area? */
-   if( hb_parl( 1 ) )
-   {
-      /*
-       * 0 means chose first available in hb_rddInsertAreaNode()
-       * This hack is necessary to avoid race condition in MT
-       * if we don't want to lock whole RDD subsystem, Druzus
-       */
-      hb_rddSelectWorkAreaNumber( 0 );
-   }
-   /* Create a new WorkArea node */
-   if( ! hb_rddInsertAreaNode( szDriver ) )
-   {
-      hb_xfree( pFileName );
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBUSEAREA" );
-      return;
-   }
-   pArea = HB_CURRENT_WA;
-
-   if( ! pFileName->szExtension )
-   {
-      HB_ITEM_NEW( extItm );
-      SELF_INFO( pArea, DBI_TABLEEXT, &extItm );
-      if( HB_IS_STRING( &extItm ) )
-      {
-         hb_strncat( szFileName, extItm.item.asString.value, _POSIX_PATH_MAX );
-      }
-      hb_itemClear( &extItm );
-   }
-   hb_xfree( pFileName );
-
-   /* Fill pInfo structure */
-   pInfo.uiArea = pArea->uiArea;
-   pInfo.abName = ( BYTE * ) szFileName;
-   pInfo.atomAlias = ( BYTE * ) szAlias;
-   pInfo.fShared = ISLOG( 5 ) ? hb_parl( 5 ) : !hb_set.HB_SET_EXCLUSIVE;
-   pInfo.fReadonly = ISLOG( 6 ) ? hb_parl( 6 ) : FALSE;
-   pInfo.cdpId = codePageId;
-
-   /* Open file */
-   if( SELF_OPEN( pArea, &pInfo ) == FAILURE )
-   {
-      s_bNetError = TRUE;           /* Temp fix! What about other types of errors? */
-      hb_rddReleaseCurrentArea();
-      return;
-   }
+   hb_rddOpenTable( szFileName, hb_parc( 2 ),
+                    hb_parl( 1 ) ? 0 : hb_rddGetCurrentWorkAreaNumber(),
+                    hb_parc( 4 ),
+                    ISLOG( 5 ) ? hb_parl( 5 ) : !hb_set.HB_SET_EXCLUSIVE,
+                    hb_parl( 6 ), hb_parc( 7 ), hb_parnl( 8 ) );
 }
 
 HB_FUNC( __DBZAP )
@@ -2604,19 +2606,24 @@ HB_FUNC( LUPDATE )
    HB_THREAD_STUB
    AREAP pArea = HB_CURRENT_WA;
 
-   if( !pArea )
-      hb_itemPutDS( hb_stackReturnItem(), "" );
+   if( pArea )
+   {
+      HB_ITEM_NEW( Item );
+      SELF_INFO( pArea, DBI_LASTUPDATE, &Item );
+      hb_itemForwardValue( hb_stackReturnItem(), &Item );
+   }
    else
-      SELF_INFO( pArea, DBI_LASTUPDATE, hb_stackReturnItem() );
+      hb_retds( "" );
 }
 
 HB_FUNC( NETERR )
 {
    HB_THREAD_STUB
-   if( ISLOG( 1 ) )
-      s_bNetError = hb_parl( 1 );
 
    hb_retl( s_bNetError );
+
+   if( ISLOG( 1 ) )
+      s_bNetError = hb_parl( 1 );
 }
 
 HB_FUNC( ORDBAGEXT )
@@ -2690,96 +2697,69 @@ HB_FUNC( ORDCONDSET )
 {
    HB_THREAD_STUB
    LPDBORDERCONDINFO lpdbOrdCondInfo;
-   ULONG ulLen;
    PHB_ITEM pItem;
    AREAP pArea = HB_CURRENT_WA;
 
    if( pArea )
    {
       lpdbOrdCondInfo = ( LPDBORDERCONDINFO ) hb_xgrab( sizeof( DBORDERCONDINFO ) );
-      ulLen = hb_parclen( 1 );
-      if( ulLen > 0 )
-      {
-         lpdbOrdCondInfo->abFor = ( BYTE * ) hb_xgrab( ulLen + 1 );
-         strcpy( ( char * ) lpdbOrdCondInfo->abFor, hb_parc( 1 ) );
-      }
-      else
-      {
-         lpdbOrdCondInfo->abFor = NULL;
-      }
-
+      lpdbOrdCondInfo->abFor = hb_parclen( 1 ) > 0 ?
+                               ( BYTE * ) hb_strdup( hb_parc( 1 ) ) : NULL;
       pItem = hb_param( 2, HB_IT_BLOCK );
-      if( pItem )
-      {
-         lpdbOrdCondInfo->itmCobFor = hb_itemNew( NULL );
-         hb_itemCopy( lpdbOrdCondInfo->itmCobFor, pItem );
-      }
-      else
-      {
-         lpdbOrdCondInfo->itmCobFor = NULL;
-      }
+      lpdbOrdCondInfo->itmCobFor = pItem ? hb_itemNew( pItem ) : NULL;
 
-      if( ISLOG( 3 ) )
-         lpdbOrdCondInfo->fAll = hb_parl( 3 );
-      else
-         lpdbOrdCondInfo->fAll = TRUE;
+      lpdbOrdCondInfo->fAll = !ISLOG( 3 ) || hb_parl( 3 );
 
-      ulLen = hb_parclen( 17 );
-      if( ulLen > 0 )
-      {
-         lpdbOrdCondInfo->abWhile = ( BYTE * ) hb_xgrab( ulLen + 1 );
-         strcpy( ( char * ) lpdbOrdCondInfo->abWhile, hb_parc( 17 ) );
-      }
-      else
-      {
-         lpdbOrdCondInfo->abWhile = NULL;
-      }
-
+      lpdbOrdCondInfo->abWhile = hb_parclen( 17 ) > 0 ?
+                                 ( BYTE * ) hb_strdup( hb_parc( 17 ) ) : NULL;
       pItem = hb_param( 4, HB_IT_BLOCK );
-      if( pItem )
-      {
-         lpdbOrdCondInfo->itmCobWhile = hb_itemNew( NULL );
-         hb_itemCopy( lpdbOrdCondInfo->itmCobWhile, pItem );
-      }
-      else
-         lpdbOrdCondInfo->itmCobWhile = NULL;
+      lpdbOrdCondInfo->itmCobWhile = pItem ? hb_itemNew( pItem ) : NULL;
 
       pItem = hb_param( 5, HB_IT_BLOCK );
-      if( pItem )
-      {
-         lpdbOrdCondInfo->itmCobEval = hb_itemNew( NULL );
-         hb_itemCopy( lpdbOrdCondInfo->itmCobEval, pItem );
-      }
-      else
-         lpdbOrdCondInfo->itmCobEval = NULL;
+      lpdbOrdCondInfo->itmCobEval = pItem ? hb_itemNew( pItem ) : NULL;
 
-      lpdbOrdCondInfo->lStep       = hb_parnl( 6 );
-      lpdbOrdCondInfo->lStartRecno = hb_parnl( 7 );
-      lpdbOrdCondInfo->lNextCount  = hb_parnl( 8 );
-      lpdbOrdCondInfo->lRecno      = hb_parnl( 9 );
-      lpdbOrdCondInfo->fRest       = hb_parl( 10 );
-      lpdbOrdCondInfo->fDescending = hb_parl( 11 );
-      /* 12th parameter is always nil */
-      lpdbOrdCondInfo->fAdditive   = hb_parl( 13 );
-      lpdbOrdCondInfo->fUseCurrent = hb_parl( 14 );
-      lpdbOrdCondInfo->fCustom     = hb_parl( 15 );
-      lpdbOrdCondInfo->fNoOptimize = hb_parl( 16 );
-
-      /* lpdbOrdCondInfo->fTemporary  = hb_parl( 18 ); */
-      /* lpdbOrdCondInfo->fUseFilter  = hb_parl( 19 ); */
+      lpdbOrdCondInfo->lStep         = hb_parnl( 6 );
+      lpdbOrdCondInfo->itmStartRecID = ISNIL( 7 ) ? NULL : hb_itemNew( hb_param( 7, HB_IT_ANY ) );
+      lpdbOrdCondInfo->lNextCount    = hb_parnl( 8 );
+      lpdbOrdCondInfo->itmRecID      = ISNIL( 9 ) ? NULL : hb_itemNew( hb_param( 9, HB_IT_ANY ) );
+      lpdbOrdCondInfo->fRest         = hb_parl( 10 );
+      lpdbOrdCondInfo->fDescending   = hb_parl( 11 );
+      /* 12th parameter is always nil in CL5.3, in CL5.2 it's compound flag */
+      lpdbOrdCondInfo->fCompound     = hb_parl( 12 );
+      lpdbOrdCondInfo->fAdditive     = hb_parl( 13 );
+      lpdbOrdCondInfo->fUseCurrent   = hb_parl( 14 );
+      lpdbOrdCondInfo->fCustom       = hb_parl( 15 );
+      lpdbOrdCondInfo->fNoOptimize   = hb_parl( 16 );
+      /* 18th parameter in[x]Harbour is MEMORY flag added by Alexander for
+         DBFNTX, so far it was served in hacked way inside SELF_ORDSETCOND()
+         so it was working only if this method was called from ORDCONDSET()
+         function. I also do not like the idea that it was called MEMORY.
+         It should be RDD decision how such index will be served on low
+         level and it should be IMHO called TEMPORARY - if RDD wants then
+         it can make it fully in memory or in temporary file which will
+         be removed on index close operation */
+      lpdbOrdCondInfo->fTemporary    = hb_parl( 18 );
+      /* 19th parameter is CL5.2 USEFILTER parameter which means
+         that RDD should respect SET FILTER and SET DELETE flag */
+      lpdbOrdCondInfo->fUseFilter    = hb_parl( 19 );
+      /* 20th parameter is xHarbour extenstion and informs RDD that
+         index is not shared between other clients */
+      lpdbOrdCondInfo->fExclusive    = hb_parl( 20 );
 
       if( lpdbOrdCondInfo->itmCobWhile )
          lpdbOrdCondInfo->fRest = TRUE;
-      if( lpdbOrdCondInfo->lNextCount || lpdbOrdCondInfo->lRecno ||
-               lpdbOrdCondInfo->fRest || lpdbOrdCondInfo->fUseCurrent )
+      if( lpdbOrdCondInfo->lNextCount || lpdbOrdCondInfo->itmRecID ||
+               lpdbOrdCondInfo->fRest || lpdbOrdCondInfo->fUseCurrent ||
+          lpdbOrdCondInfo->fUseFilter )
          lpdbOrdCondInfo->fAll = FALSE;
 
       lpdbOrdCondInfo->fActive = !lpdbOrdCondInfo->fAll ||
                lpdbOrdCondInfo->abFor || lpdbOrdCondInfo->itmCobFor ||
                lpdbOrdCondInfo->abWhile || lpdbOrdCondInfo->itmCobWhile ||
-               lpdbOrdCondInfo->fNoOptimize || lpdbOrdCondInfo->itmCobEval;
+               lpdbOrdCondInfo->fNoOptimize || lpdbOrdCondInfo->itmCobEval ||
+               lpdbOrdCondInfo->fTemporary;
 
-      /* lpdbOrdCondInfo->fScoped  = !lpdbOrdCondInfo->fAll; */
+      lpdbOrdCondInfo->fScoped  = !lpdbOrdCondInfo->fAll;
       lpdbOrdCondInfo->lpvCargo = NULL;
 
       hb_retl( SELF_ORDSETCOND( pArea, lpdbOrdCondInfo ) == SUCCESS );
@@ -2817,6 +2797,24 @@ HB_FUNC( ORDCREATE )
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDCREATE" );
 }
 
+HB_FUNC( ORDBAGCLEAR )
+{
+   HB_THREAD_STUB
+   DBORDERINFO pOrderInfo;
+   AREAP pArea = HB_CURRENT_WA;
+
+   if( pArea )
+   {
+      pOrderInfo.itmOrder = NULL;
+      pOrderInfo.atomBagName = hb_param( 1, HB_IT_STRING );
+      if( !pOrderInfo.atomBagName )
+         pOrderInfo.atomBagName = hb_param( 1, HB_IT_NUMERIC );
+      hb_retl( SELF_ORDLSTDELETE( pArea, &pOrderInfo ) == SUCCESS );
+   }
+   else
+      hb_retl( FALSE );
+}
+
 HB_FUNC( ORDDESTROY )
 {
    HB_THREAD_STUB
@@ -2829,8 +2827,10 @@ HB_FUNC( ORDDESTROY )
       if( !pOrderInfo.itmOrder )
          pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
       pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
-      SELF_ORDDESTROY( pArea, &pOrderInfo );
+      hb_retl( SELF_ORDDESTROY( pArea, &pOrderInfo ) == SUCCESS );
    }
+   else
+      hb_retl( FALSE );
 }
 
 HB_FUNC( ORDFOR )
@@ -2843,7 +2843,7 @@ HB_FUNC( ORDFOR )
    {
       if ( ISNUM(1) || ISNIL(1) )
       {
-         if ( hb_parnl(1) == 0 || ISNIL(1) )          /* if NIL or ask for 0, use current order  */
+         if ( hb_parni(1) == 0 || ISNIL(1) )          /* if NIL or ask for 0, use current order  */
             pOrderInfo.itmOrder  = NULL;
          else
             pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
@@ -3332,7 +3332,7 @@ HB_FUNC( RDDLIST )
    hb_rddCheck();
    hb_arrayNew( hb_stackReturnItem(), 0 );
    uiType = hb_parni( 1 );       /* 0 all types of RDD's */
-   for ( uiCount = 0; uiCount < s_uiRddMax; uiCount++ )
+   for( uiCount = 0; uiCount < s_uiRddMax; ++uiCount )
    {
       if( ( uiType == 0 ) || ( s_RddList[ uiCount ]->uiType == uiType ) )
       {
@@ -3410,11 +3410,11 @@ HB_FUNC( RECNO )
 HB_FUNC( RECSIZE )
 {
    HB_THREAD_STUB
-   HB_ITEM_NEW( RecSize );
    AREAP pArea = HB_CURRENT_WA;
 
    if( pArea )
    {
+      HB_ITEM_NEW( RecSize );
       SELF_INFO( pArea, DBI_GETRECSIZE, &RecSize );
       hb_itemForwardValue( hb_stackReturnItem(), &RecSize );
    }
@@ -3714,17 +3714,17 @@ HB_FUNC( __DBARRANGE )
          dbSortInfo.dbtri.uiItemCount = ( USHORT ) hb_arrayLen( pStruct );
          if( dbSortInfo.dbtri.uiItemCount > 0 )
          {
-            pFields = hb_itemNew( NULL );
             dbSortInfo.dbtri.lpTransItems = ( LPDBTRANSITEM )
                                             hb_xgrab( dbSortInfo.dbtri.uiItemCount *
                                                       sizeof( DBTRANSITEM ) );
-            for( uiCount = 0; uiCount < dbSortInfo.dbtri.uiItemCount; uiCount++ )
+            for( uiCount = 0; uiCount < dbSortInfo.dbtri.uiItemCount; ++uiCount )
             {
-               if( hb_arrayGet( pStruct, uiCount + 1, pFields ) && HB_IS_ARRAY( pFields ) &&
-                   ( USHORT ) hb_arrayLen( pFields ) > 0 )
+               pFields = hb_arrayGetItemPtr( pStruct, uiCount + 1 );
+               if( HB_IS_ARRAY( pFields ) && hb_arrayLen( pFields ) > 0 )
                {
-                  dbSortInfo.dbtri.lpTransItems[ uiCount ].uiSource = hb_rddFieldIndex( pArea, hb_arrayGetCPtr( pFields, 1 ) );
-                  dbSortInfo.dbtri.lpTransItems[ uiCount ].uiDest = dbSortInfo.dbtri.lpTransItems[ uiCount ].uiSource;
+                  dbSortInfo.dbtri.lpTransItems[ uiCount ].uiSource =
+                  dbSortInfo.dbtri.lpTransItems[ uiCount ].uiDest =
+                     hb_rddFieldIndex( pArea, hb_arrayGetCPtr( pFields, 1 ) );
                }
                else
                {
@@ -3733,7 +3733,6 @@ HB_FUNC( __DBARRANGE )
                   break;
                }
             }
-            hb_itemRelease( pFields );
          }
       }
       else
@@ -3763,13 +3762,13 @@ HB_FUNC( __DBARRANGE )
       {
          dbSortInfo.lpdbsItem = ( LPDBSORTITEM ) hb_xgrab( dbSortInfo.uiItemCount * sizeof( DBSORTITEM ) );
          ulSize = 0;
-         for( uiCount = 1; uiCount <= dbSortInfo.uiItemCount; uiCount++ )
+         for( uiCount = 1; uiCount <= dbSortInfo.uiItemCount; ++uiCount )
          {
             if( hb_arrayGetCLen( pFields, uiCount ) > ulSize )
                ulSize = hb_arrayGetCLen( pFields, uiCount );
          }
          szFieldLine = ( char * ) hb_xgrab( ulSize + 1 );
-         for( uiCount = 0; uiCount < dbSortInfo.uiItemCount; uiCount++ )
+         for( uiCount = 0; uiCount < dbSortInfo.uiItemCount; ++uiCount )
          {
             dbSortInfo.lpdbsItem[ uiCount ].uiFlags = 0;
             hb_strncpyUpper( szFieldLine, hb_arrayGetCPtr( pFields, uiCount + 1 ),
@@ -3852,22 +3851,19 @@ HB_FUNC( DBINFO )
 
    if( pArea )
    {
-      PHB_ITEM pType, pInfo;
-      HB_ITEM_NEW( Temp );
+      PHB_ITEM pIndex;
 
-      pType = hb_param( 1 , HB_IT_NUMERIC );
-      if( pType )
+      pIndex = hb_param( 1, HB_IT_NUMERIC );
+      if( pIndex )
       {
-         pInfo = hb_param( 2 , HB_IT_ANY );
-         if( pInfo )
-         {
-            hb_itemCopy( &Temp, pInfo );
-         }
-         SELF_INFO( pArea, hb_itemGetNI( pType ), &Temp );
-         hb_itemForwardValue( hb_stackReturnItem(), &Temp );
-         return;
+         PHB_ITEM pInfo = hb_itemNew( hb_param( 2, HB_IT_ANY ) );
+
+         SELF_INFO( pArea, hb_itemGetNI( pIndex ), pInfo );
+         hb_itemReturn( pInfo );
+         hb_itemRelease( pInfo );
       }
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_DBINFOBADPARAMETER, NULL, "DBINFO" );
+      else
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBINFOBADPARAMETER, NULL, "DBINFO" );
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBINFO" );
@@ -3904,12 +3900,11 @@ HB_FUNC( DBORDERINFO )
          SELF_ORDINFO( pArea, hb_itemGetNI( pType ), &pOrderInfo );
          hb_itemReturn( pOrderInfo.itmResult );
          hb_itemRelease( pOrderInfo.itmResult );
-
          if( bDeleteItem )
             hb_itemRelease( pOrderInfo.itmNewVal );
-         return;
       }
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBORDERINFO" );
+      else
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBORDERINFO" );
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBORDERINFO" );
@@ -3923,26 +3918,21 @@ HB_FUNC( DBFIELDINFO )
    if( pArea )
    {
       USHORT uiFields, uiIndex;
-      PHB_ITEM pType, pInfo;
-      HB_ITEM_NEW( Temp );
+      PHB_ITEM pType;
 
       pType = hb_param( 1 , HB_IT_NUMERIC );
       uiIndex = hb_parni( 2 );
-      if( pType &&
-          SELF_FIELDCOUNT( pArea, &uiFields ) == SUCCESS &&
+      if( pType && SELF_FIELDCOUNT( pArea, &uiFields ) == SUCCESS &&
           uiIndex > 0 && uiIndex <= uiFields )
       {
-         pInfo = hb_param( 3 , HB_IT_ANY );
-         if( pInfo )
-         {
-            hb_itemCopy( &Temp, pInfo );
-         }
+         PHB_ITEM pInfo = hb_itemNew( hb_param( 3, HB_IT_ANY ) );
 
-         SELF_FIELDINFO( pArea, uiIndex, hb_itemGetNI( pType ), &Temp );
-         hb_itemForwardValue( hb_stackReturnItem(), &Temp );
-         return;
+         SELF_FIELDINFO( pArea, uiIndex, hb_itemGetNI( pType ), pInfo );
+         hb_itemReturn( pInfo );
+         hb_itemRelease( pInfo );
       }
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBFIELDINFO" );
+      else
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBFIELDINFO" );
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBFIELDINFO" );
@@ -3955,23 +3945,20 @@ HB_FUNC( DBRECORDINFO )
 
    if( pArea )
    {
-      PHB_ITEM pType, pRecNo, pInfo;
-      HB_ITEM_NEW( Temp );
+      PHB_ITEM pType, pRecNo;
 
-      pType = hb_param( 1 , HB_IT_NUMERIC );
-      pRecNo = hb_param( 2 , HB_IT_NUMERIC );
+      pType = hb_param( 1, HB_IT_NUMERIC );
+      pRecNo = hb_param( 2, HB_IT_ANY );
       if( pType )
       {
-         pInfo = hb_param( 3 , HB_IT_ANY );
-         if( pInfo )
-         {
-            hb_itemCopy( &Temp, pInfo );
-         }
-         SELF_RECINFO( pArea, pRecNo, hb_itemGetNI( pType ), &Temp );
-         hb_itemForwardValue( hb_stackReturnItem(), &Temp );
-         return;
+         PHB_ITEM pInfo = hb_itemNew( hb_param( 3, HB_IT_ANY ) );
+
+         SELF_RECINFO( pArea, pRecNo, hb_itemGetNI( pType ), pInfo );
+         hb_itemReturn( pInfo );
+         hb_itemRelease( pInfo );
       }
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_INFOBADPARAMETER, NULL, "DBRECORDINFO" );
+      else
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_INFOBADPARAMETER, NULL, "DBRECORDINFO" );
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBRECORDINFO" );
@@ -3984,20 +3971,17 @@ HB_FUNC( DBFILEGET )
 
    if( pArea )
    {
-      PHB_ITEM pFileName, pMode;
-      char szFileName[ _POSIX_PATH_MAX + 1 ];
       USHORT uiFields, uiIndex;
-      szFileName[ 0 ] = szFileName[ _POSIX_PATH_MAX ] = '\0';
+      PHB_ITEM pMode;
+
       uiIndex = hb_parni( 1 );
-      pFileName = hb_param( 2 , HB_IT_STRING );
-      pMode = hb_param( 3 , HB_IT_NUMERIC );
-      if( pFileName && pMode &&
+      pMode = hb_param( 3, HB_IT_NUMERIC );
+      if( pMode && hb_parclen( 2 ) > 0 &&
           SELF_FIELDCOUNT( pArea, &uiFields ) == SUCCESS &&
           uiIndex > 0 && uiIndex <= uiFields )
       {
-         strncat( szFileName, pFileName->item.asString.value, _POSIX_PATH_MAX );
-         hb_retl( SELF_GETVALUEFILE( pArea, uiIndex, szFileName,
-                                     hb_itemGetNI( pMode ) ) );
+         hb_retl( SELF_GETVALUEFILE( pArea, uiIndex, hb_parc( 2 ),
+                                     hb_itemGetNI( pMode ) ) == SUCCESS );
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBFILEGETBADPARAMETER, NULL, "DBFILEGET" );
@@ -4015,19 +3999,14 @@ HB_FUNC( DBFILEPUT )
 
    if( pArea )
    {
-      PHB_ITEM pFileName;
-      char szFileName[ _POSIX_PATH_MAX + 1 ];
       USHORT uiFields, uiIndex;
 
-      szFileName[ 0 ] = szFileName[ _POSIX_PATH_MAX ] = '\0';
       uiIndex = hb_parni( 1 );
-      pFileName = hb_param( 2 , HB_IT_STRING );
-      if( pFileName &&
+      if( hb_parclen( 2 ) > 0 &&
           SELF_FIELDCOUNT( pArea, &uiFields ) == SUCCESS &&
           uiIndex > 0 && uiIndex <= uiFields )
       {
-         strncat( szFileName, pFileName->item.asString.value, _POSIX_PATH_MAX );
-         hb_retl( SELF_PUTVALUEFILE( pArea, uiIndex, szFileName ) );
+         hb_retl( SELF_PUTVALUEFILE( pArea, uiIndex, hb_parc( 2 ) ) == SUCCESS );
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBFILEPUTBADPARAMETER, NULL, "DBFILEPUT" );
@@ -4040,594 +4019,357 @@ HB_FUNC( DBFILEPUT )
 #endif
 
 /*******************************************/
-/* here we have the NEW Database level functions DBDROP & DBEXISTS */
+/* here we have the NEW RDD level functions DBDROP, DBEXISTS, RDDINFO */
 HB_FUNC( DBDROP )
 {
    HB_THREAD_STUB
-  LPRDDNODE  pRDDNode;
-  USHORT     uiRddID;
-  char      *szDriver;
+   LPRDDNODE  pRDDNode;
+   USHORT     uiRddID;
+   char      *szDriver;
 
-  if ( ISCHAR( 2 ) ) /* we have a VIA RDD parameter */
-    szDriver = hb_parc( 2 );
-  else
-    szDriver = s_szDefDriver;
+   szDriver = hb_parc( 3 );
+   if( !szDriver ) /* no VIA RDD parameter, use default */
+   {
+      szDriver = s_szDefDriver;
+   }
 
-  pRDDNode = hb_rddFindNode( szDriver, &uiRddID );  // find the RDD
+   pRDDNode = hb_rddFindNode( szDriver, &uiRddID );  /* find the RDDNODE */
 
-  if ( !pRDDNode )
-  {
-    hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBDROP" );
-    return;
-  }
+   if ( !pRDDNode )
+   {
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBDROP" );
+      return;
+   }
 
-  if ( SELF_DROP( pRDDNode, hb_param( 1, HB_IT_STRING )) == 0 )
-  {
-     hb_retl( TRUE );
-  }
-  else
-  {
-     hb_retl( FALSE );
-  }
+   hb_retl( SELF_DROP( pRDDNode, hb_param( 1, HB_IT_STRING ),
+                                 hb_param( 2, HB_IT_STRING ) ) == SUCCESS );
 }
 
 HB_FUNC( DBEXISTS )
 {
    HB_THREAD_STUB
-  LPRDDNODE  pRDDNode;
-  USHORT     uiRddID;
-  char * szDriver;
+   LPRDDNODE  pRDDNode;
+   USHORT     uiRddID;
+   char * szDriver;
 
-  if ( ISCHAR( 3 ) ) /* we have a VIA RDD parameter */
-    szDriver = hb_parc( 3 );
-  else
-    szDriver = s_szDefDriver;
-
-  pRDDNode = hb_rddFindNode( szDriver, &uiRddID );  // find the RDD
-
-  if ( !pRDDNode )
-  {
-    hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBEXISTS" );
-    return;
-  }
-
-  if( SELF_EXISTS( pRDDNode, ISCHAR( 1 ) ? hb_param( 1, HB_IT_STRING ) : NULL, ISCHAR( 2 ) ? hb_param( 2, HB_IT_STRING ) : NULL ) )
-  {
-     hb_retl( TRUE );
-  }
-  else
-  {
-     hb_retl( FALSE );
-  }
-}
-
-/*******************************************/
-/* as we are in C, the code is upside down,
-   find __SBAPP & __DBCOPY at the bottom
-*/
-
-// check if the field is on the Fields Array
-static BOOL IsFieldIn( char * fieldName, PHB_ITEM pFields )
-{
-  USHORT i, j, uiFields = ( USHORT ) hb_arrayLen( pFields );
-  char *ptr;
-  BOOL lresult;
-
-  for ( i=0; i<uiFields; i++ )
-  {
-    PHB_ITEM pField = pFields->item.asArray.value->pItems + i;
-    ptr = strrchr( (char *)pField->item.asString.value,'>' );
-    if( ptr && ptr > (char *)pField->item.asString.value && *(ptr-1)=='-' )
-       ptr ++;
-    else
-       ptr = (char *)pField->item.asString.value;
-    lresult = TRUE;
-    for( j=0;*ptr;j++,ptr++ )
-        if( *(fieldName+j) != toupper(*ptr) )
-        {
-           lresult = FALSE;
-           break;
-        }
-    if ( lresult )
-      return TRUE;
-  }
-  return FALSE;
-}
-
-static void AddField( AREAP pArea, PHB_ITEM pFieldArray, USHORT uiCount )
-{
-   HB_ITEM_NEW( Item );
-   HB_ITEM_NEW( Data );
-
-   hb_arrayNew( &Item, 4 );
-
-   SELF_FIELDINFO( pArea, uiCount, DBS_NAME, &Data );
-   hb_arraySetForward( &Item, 1, &Data );
-
-   SELF_FIELDINFO( pArea, uiCount, DBS_TYPE, &Data );
-   hb_arraySetForward( &Item, 2, &Data );
-
-   SELF_FIELDINFO( pArea, uiCount, DBS_LEN, &Data );
-   hb_arraySetForward( &Item, 3, &Data );
-
-   SELF_FIELDINFO( pArea, uiCount, DBS_DEC, &Data );
-   hb_arraySetForward( &Item, 4, &Data );
-
-   hb_arrayAddForward( pFieldArray, &Item );
-}
-
-/*   create a new AREANODE and open its Area
-   If the file exists it will be deleted & a new one created
-*/
-static AREAP GetTheOtherArea( char *szDriver, char * szFileName, BOOL createIt, PHB_ITEM pFields )
-{
-   HB_THREAD_STUB
-   AREAP      pNewArea, pOldArea;
-   USHORT     uiOldArea, uiNewArea;
-   PHB_FNAME  pFileName;
-   DBOPENINFO pInfo;
-   char szFile[ _POSIX_PATH_MAX + 1 ];
-   char szAliasTmp[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
-
-   if( hb_rddGetTempAlias( szAliasTmp ) == FAILURE )
-   {
-      hb_errRT_DBCMD( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, "DBAPP" );
-      return NULL;
-   }
-
-   pOldArea = HB_CURRENT_WA;
-   uiOldArea = pOldArea->uiArea;
-   /*
-    * 0 means chose first available in hb_rddInsertAreaNode()
-    * This hack is necessary to avoid race condition in MT
-    * if we don't want to lock whole RDD subsystem, Druzus
-    */
-   hb_rddSelectWorkAreaNumber( 0 );
-   /* create new area */
-   if ( ! hb_rddInsertAreaNode( szDriver ) )
-   {
-      hb_rddSelectWorkAreaNumber( uiOldArea );
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBAPP" );
-      return NULL;
-   }
-   pNewArea = HB_CURRENT_WA;
-   uiNewArea = pNewArea->uiArea;
-   /* Fill pInfo structure */
-   memset( &pInfo, 0, sizeof(DBOPENINFO) );
-   pInfo.uiArea = uiNewArea;
-   pInfo.atomAlias = ( BYTE * ) szAliasTmp;
-   /* It doesn't seem to be Clipper compatible */
-   /*
-   pInfo.fShared = createIt ? FALSE : !hb_set.HB_SET_EXCLUSIVE;
-   pInfo.fReadonly = !createIt;
-   */
-   pInfo.fShared = pInfo.fReadonly = !createIt;
-
-   strncpy( szFile, szFileName, _POSIX_PATH_MAX );
-   szFile[ _POSIX_PATH_MAX ] = '\0';
-
-   /* check the extension */
-   pFileName = hb_fsFNameSplit( szFile );
-   if( ! pFileName->szExtension )
-   {
-      HB_ITEM_NEW( extItm );
-
-      SELF_INFO( pOldArea, DBI_TABLEEXT, &extItm );
-      if( HB_IS_STRING( &extItm ) )
-      {
-         strncat( szFile, extItm.item.asString.value, _POSIX_PATH_MAX - strlen( szFile ) );
-      }
-      hb_itemClear( &extItm );
-   }
-   hb_xfree( pFileName );
-
-   pInfo.abName = ( BYTE * ) szFile;
-
-   if ( createIt )
-   {
-      PHB_ITEM pFieldArray;
-      USHORT uiFields, uiCount;
-
-      /* get the table structure */
-      SELF_FIELDCOUNT( pOldArea, &uiFields );
-
-      pFieldArray = hb_itemNew( NULL );
-      hb_arrayNew( pFieldArray, 0 );
-
-      if( pFields )
-      {
-         USHORT i;
-         char *ptr, *szSrcField;
-         char *szFieldName = ( char * ) hb_xgrab( pOldArea->uiMaxFieldNameLength + 1 );
-
-         uiFields = ( USHORT ) hb_arrayLen( pFields );
-         for( i = 1; i <= uiFields; i++ )
-         {
-            szSrcField = hb_arrayGetCPtr( pFields, i );
-            if( szSrcField )
-            {
-               ptr = strrchr( szSrcField, '>' );
-               if ( ptr && ptr > szSrcField && *( ptr - 1 ) == '-' )
-               {
-                  ptr++;
-               }
-               else
-               {
-                  ptr = szSrcField;
-               }
-               hb_strncpyUpperTrim( szFieldName, ptr, pOldArea->uiMaxFieldNameLength );
-               if( ( uiCount = hb_rddFieldIndex( pOldArea, szFieldName ) ) != 0 )
-               {
-                  AddField( pOldArea, pFieldArray, uiCount );
-               }
-            }
-         }
-         hb_xfree( szFieldName );
-      }
-      else
-      {
-         for( uiCount = 1; uiCount <= uiFields; uiCount++ )
-         {
-            /*if ( !pFields || IsFieldIn( (( PHB_DYNS )(pOldArea->lpFields + (uiCount-1))->sym )->pSymbol->szName,  pFields )) */
-            AddField( pOldArea, pFieldArray, uiCount );
-         }
-      }
-
-      if( ! hb_arrayLen( pFieldArray ) )
-      {
-         hb_itemRelease( pFieldArray );
-         hb_rddReleaseCurrentArea();
-         hb_rddSelectWorkAreaNumber( uiOldArea );
-         hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBCREATE" );
-         return NULL;
-      }
-
-      /* check for table existence and if true, drop it */
-      {
-         LPRDDNODE pRDDNode;
-         pRDDNode = hb_rddFindNode( szDriver, NULL );  // find the RDD
-         if ( pRDDNode )
-         {
-            HB_ITEM_NEW( tableItm );
-
-            hb_itemPutCL( &tableItm, szFileName, strlen( szFile ) );
-            if( SELF_EXISTS( pRDDNode, &tableItm, NULL ) )
-            {
-               SELF_DROP( pRDDNode, &tableItm );
-            }
-            hb_itemClear( &tableItm );
-         }
-      }
-
-      /* now create a new table based on the current Area's record layout */
-      pNewArea->atomAlias = hb_rddAllocWorkAreaAlias( ( char * ) pInfo.atomAlias,
-                                                      ( int ) pNewArea->uiArea );
-      if( !pNewArea->atomAlias )
-      {
-         hb_itemRelease( pFieldArray );
-         hb_rddReleaseCurrentArea();
-         hb_rddSelectWorkAreaNumber( uiOldArea );
-         return NULL;
-      }
-      if( SELF_CREATEFIELDS( pNewArea, pFieldArray ) == FAILURE ||
-          SELF_CREATE( pNewArea, &pInfo ) == FAILURE )
-      {
-         hb_itemRelease( pFieldArray );
-         hb_rddReleaseCurrentArea();
-         hb_rddSelectWorkAreaNumber( uiOldArea );
-         hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBAPP" );
-         return NULL;
-      }
-      hb_itemRelease( pFieldArray );
-
-      /* clear the new AREA before reopen it */
-      hb_rddReleaseCurrentArea();
-      /*
-       * 0 means chose first available in hb_rddInsertAreaNode()
-       * This hack is necessary to avoid race condition in MT
-       * if we don't want to lock whole RDD subsystem, Druzus
-       */
-      hb_rddSelectWorkAreaNumber( 0 );
-      if ( ! hb_rddInsertAreaNode( szDriver ) )
-      {
-         hb_rddSelectWorkAreaNumber( uiOldArea );
-         hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBAPP" );
-         return NULL;
-      }
-      pNewArea = HB_CURRENT_WA;
-      uiNewArea = pNewArea->uiArea;
-      pInfo.uiArea = uiNewArea;
-   }
-
-   /* open it */
-   if( SELF_OPEN( pNewArea, &pInfo ) == FAILURE )
-   {
-      hb_rddReleaseCurrentArea();
-      hb_rddSelectWorkAreaNumber( uiOldArea );
-      if ( hb_vmRequestQuery() == 0 )
-      {
-         hb_errRT_DBCMD( EG_OPEN, 0, NULL, "DBAPP" ); /* Could not open it */
-      }
-      return NULL;
-   }
-   hb_rddSelectWorkAreaNumber( uiOldArea );
-   return pNewArea;
-}
-
-/* move the Field Data between areas by name */
-static void rddMoveFields( AREAP pAreaFrom, AREAP pAreaTo, PHB_ITEM pFields )
-{
-   USHORT i, f;
-   HB_ITEM_NEW( fieldValue );
-   char * szName;
-
-   szName = ( char * ) hb_xgrab( ( ( AREAP ) pAreaTo)->uiMaxFieldNameLength + 1 );
-
-   for( i = 0; i < pAreaTo->uiFieldCount; i++ )
-   {
-      SELF_FIELDNAME( ( AREAP ) pAreaTo, i + 1, szName );
-      /* field in the list?*/
-      if ( pFields == NULL || IsFieldIn( szName, pFields ) )
-      {
-         f = hb_rddFieldIndex( pAreaFrom, szName );
-         if ( f )
-         {
-            hb_rddSelectWorkAreaNumber( pAreaFrom->uiArea );
-            SELF_GETVALUE( pAreaFrom, f, &fieldValue );
-            hb_rddSelectWorkAreaNumber( pAreaTo->uiArea );
-            SELF_PUTVALUE( pAreaTo, i + 1, &fieldValue );
-         }
-      }
-   }
-   hb_xfree( szName );
-   hb_itemClear( &fieldValue );
-}
-
-/*move the records, filtering if apropiate*/
-static ERRCODE rddMoveRecords( char *cAreaFrom, char *cAreaTo, PHB_ITEM pFields,
-                               PHB_ITEM pFor, PHB_ITEM pWhile, LONG lNext,
-                               ULONG lRec, BOOL bRest, char *cDriver )
-{
-   HB_THREAD_STUB
-   char     * szDriver;
-   AREAP      pAreaFrom, pAreaTo, pAreaRelease = NULL;
-   USHORT     uiCurrAreaSaved = hb_rddGetCurrentWorkAreaNumber();
-   AREAP      pCurrArea = HB_CURRENT_WA;
-   BOOL       bDeleted = FALSE, fEof = FALSE;
-
-   HB_TRACE(HB_TR_DEBUG, ("rddMoveRecords(%s, %s, %p, %p, %p, %d, %lu, %d, %s )",
-            cAreaFrom, cAreaTo, pFields, pFor, pWhile, lNext, lRec, bRest, cDriver));
-
-   if ( !pCurrArea )   /*We need a current Area to APPEND TO or FROM*/
-   {
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBAPP" );
-      return EG_NOTABLE;
-   }
-
-   /*get the RDD Driver to use for the "other" Area*/
-   if ( cDriver )
-   {
-      szDriver = cDriver;
-   }
-   else
+   szDriver = hb_parc( 3 );
+   if( !szDriver ) /* no VIA RDD parameter, use default */
    {
       szDriver = s_szDefDriver;
    }
-   if ( (!cAreaFrom) == (!cAreaTo) )          /*One File is needed*/
+
+   pRDDNode = hb_rddFindNode( szDriver, &uiRddID );  // find the RDD
+
+   if ( !pRDDNode )
    {
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBAPP" );
-      return EG_ARG;
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBEXISTS" );
+      return;
    }
-   if ( pFields && hb_arrayLen( pFields ) == 0 )  /*no field clause?*/
+
+   hb_retl( SELF_EXISTS( pRDDNode, hb_param( 1, HB_IT_STRING ),
+                                   hb_param( 2, HB_IT_STRING ) ) == SUCCESS );
+}
+
+HB_FUNC( RDDINFO )
+{
+   LPRDDNODE  pRDDNode;
+   USHORT     uiRddID;
+   ULONG      ulConnection;
+   PHB_ITEM   pIndex, pParam;
+   char      *szDriver;
+
+   szDriver = hb_parc( 3 );
+   if( !szDriver ) /* no VIA RDD parameter, use default */
    {
-      pFields = NULL;
+      szDriver = s_szDefDriver;
    }
-   pAreaFrom = pAreaTo = pCurrArea;
-   if( cAreaTo )  /*it's a COPY TO*/
+   ulConnection = hb_parnl( 4 );
+
+   pRDDNode = hb_rddFindNode( szDriver, &uiRddID );  /* find the RDDNODE */
+   pIndex = hb_param( 1, HB_IT_NUMERIC );
+   pParam = hb_param( 2, HB_IT_ANY );
+
+   if( pRDDNode && pIndex )
    {
-      pAreaRelease = pAreaTo = GetTheOtherArea( szDriver, cAreaTo, TRUE, pFields );
+      PHB_ITEM pInfo = hb_itemNew( pParam );
+      SELF_RDDINFO( pRDDNode, hb_itemGetNI( pIndex ), ulConnection, pInfo );
+      hb_itemReturn( pInfo );
+      hb_itemRelease( pInfo );
    }
-   else if( cAreaFrom )       /*it's an APPEND FROM*/
-   {                          /*make it current*/
-      pAreaRelease = pAreaFrom = GetTheOtherArea( szDriver, cAreaFrom, FALSE, NULL );
-      if( hb_vmRequestQuery() )
+   else
+   {
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "RDDINFO" );
+   }
+}
+
+
+static ERRCODE hb_dbTransStruct( AREAP lpaSource, AREAP lpaDest,
+                                 LPDBTRANSINFO lpdbTransInfo,
+                                 PHB_ITEM *pStruct, PHB_ITEM pFields )
+{
+   USHORT uiFields, uiSize, uiCount, uiPosSrc, uiPosDst, uiSizeSrc, uiSizeDst;
+   ERRCODE errCode;
+   char * szField;
+   BOOL fAll;
+
+   errCode = SELF_FIELDCOUNT( lpaSource, &uiSizeSrc );
+   if( errCode != SUCCESS )
+      return errCode;
+
+   if( lpaDest )
+   {
+      errCode = SELF_FIELDCOUNT( lpaDest, &uiSizeDst );
+      if( errCode != SUCCESS )
+         return errCode;
+      uiSize = HB_MIN( uiSizeDst, uiSizeSrc );
+   }
+   else
+   {
+      uiSize = uiSizeDst = uiSizeSrc;
+   }
+
+   if( !uiSize )
+      return FAILURE;
+   if( hb_itemType( pFields ) & HB_IT_ARRAY )
+   {
+      uiFields = ( USHORT ) hb_arrayLen( pFields );
+      if( uiFields )
+         uiSize = uiFields;
+   }
+   else
+      uiFields = 0;
+
+   fAll = ( uiSizeDst == uiSizeSrc );
+
+   lpdbTransInfo->lpaSource    = lpaSource;
+   lpdbTransInfo->lpaDest      = lpaDest;
+   lpdbTransInfo->lpTransItems = ( LPDBTRANSITEM )
+                                    hb_xgrab( uiSize * sizeof( DBTRANSITEM ) );
+
+   if( !lpaDest )
+   {
+      *pStruct = hb_itemNew( NULL );
+      hb_arrayNew( *pStruct, 0 );
+   }
+
+   if( uiFields == 0 )
+   {
+      if( lpaDest )
       {
-         return EG_NOTABLE;
-      }
-   }
-   /* one or the other but never none */
-   if ( ! pAreaRelease )
-   {
-      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBAPP" );
-      return EG_NOTABLE;
-   }
-
-   hb_rddSelectWorkAreaNumber( pAreaFrom->uiArea );
-
-   if( lRec > 0 )
-   {                                      /* only one record */
-      SELF_GOTO( pAreaFrom, lRec );       /* go there */
-   }
-   else if( ! pWhile && ! bRest && ! lNext )  /* these two stay current */
-   {
-      SELF_GOTOP( pAreaFrom );        /* else start from the top */
-   }
-
-   /*move those records assuming we are positioned on one.*/
-   while( SELF_EOF( pAreaFrom, &fEof ) != FAILURE )
-   {
-      if( fEof )
-         break;
-      if ( pWhile && ! hb_itemGetL( hb_vmEvalBlock( pWhile ) ) )
-         break;
-      if ( !pFor || hb_itemGetL( hb_vmEvalBlock( pFor ) ) )
-      {
-         hb_rddSelectWorkAreaNumber( pAreaTo->uiArea );
-         SELF_APPEND( pAreaTo, FALSE );      /*put a new one on TO Area*/
-         SELF_DELETED( pAreaFrom, &bDeleted );
-         if ( bDeleted ) /* is original record deleted ? */
+         PHB_ITEM pItem = hb_itemNew( NULL );
+         uiSize = 0;
+         uiFields = HB_MIN( uiSizeDst, uiSizeSrc );
+         for( uiCount = 1; uiCount <= uiFields; ++uiCount )
          {
-         	SELF_DELETE( pAreaTo ); /* delete the new record */
+            SELF_FIELDINFO( lpaSource, uiCount, DBS_NAME, pItem );
+            szField = hb_itemGetCPtr( pItem );
+            uiPosDst = hb_rddFieldExpIndex( lpaDest, szField, TRUE );
+            if( uiPosDst != uiCount )
+               fAll = FALSE;
+            if( uiPosDst )
+            {
+               lpdbTransInfo->lpTransItems[ uiSize ].uiSource = uiCount;
+               lpdbTransInfo->lpTransItems[ uiSize++ ].uiDest = uiPosDst;
+            }
          }
-         rddMoveFields( pAreaFrom, pAreaTo, pFields ); /*move the data*/
-         hb_rddSelectWorkAreaNumber( pAreaFrom->uiArea );
+         hb_itemRelease( pItem );
       }
-      if ( lNext > 0 )
+      else
       {
-         if ( --lNext == 0 )
+         hb_tblStructure( lpaSource, *pStruct );
+         uiSize = ( USHORT ) hb_arrayLen( *pStruct );
+         for( uiCount = 0; uiCount < uiSize; ++uiCount )
          {
-            break;
+            lpdbTransInfo->lpTransItems[ uiCount ].uiSource =
+            lpdbTransInfo->lpTransItems[ uiCount ].uiDest = uiCount + 1;
          }
       }
-      else if ( lRec != 0 ) /* only the one record? */
+   }
+   else
+   {
+      uiSize = 0;
+      for( uiCount = 1; uiCount <= uiFields; ++uiCount )
       {
-         break;
+         szField = hb_arrayGetCPtr( pFields, uiCount );
+         if( szField )
+         {
+            uiPosSrc = hb_rddFieldExpIndex( lpaSource, szField, TRUE );
+            if( !uiPosSrc )
+               continue;
+            if( lpaDest )
+               uiPosDst = hb_rddFieldExpIndex( lpaDest, szField, TRUE );
+            else
+               uiPosDst = uiSize + 1;
+            if( uiPosDst )
+            {
+               if( uiPosSrc != uiPosDst )
+                  fAll = FALSE;
+               lpdbTransInfo->lpTransItems[ uiSize ].uiSource = uiPosSrc;
+               lpdbTransInfo->lpTransItems[ uiSize++ ].uiDest = uiPosDst;
+               if( !lpaDest )
+               {
+                  hb_arraySize( *pStruct, uiSize );
+                  hb_fldStructure( lpaSource, uiPosSrc,
+                                   hb_arrayGetItemPtr( *pStruct, uiSize ) );
+               }
+            }
+         }
       }
-      SELF_SKIP( pAreaFrom, 1L );  /*get the next one*/
    }
 
-   /*Close the File*/
-   hb_rddSelectWorkAreaNumber( pAreaRelease->uiArea );
-   hb_rddReleaseCurrentArea();
-   hb_rddSelectWorkAreaNumber( uiCurrAreaSaved );
-   return SUCCESS;
+   if( uiSize != uiSizeSrc )
+      fAll = FALSE;
+
+   lpdbTransInfo->uiFlags = fAll ? DBTF_MATCH : 0;
+   lpdbTransInfo->uiItemCount = uiSize;
+
+   return uiSize ? SUCCESS : FAILURE;
+}
+
+static ERRCODE hb_rddTransRecords( AREAP pArea,
+                                   char *szFileName, char *szDriver,
+                                   ULONG ulConnection,
+                                   PHB_ITEM pFields, BOOL fExport,
+                                   PHB_ITEM pCobFor, PHB_ITEM pStrFor,
+                                   PHB_ITEM pCobWhile, PHB_ITEM pStrWhile,
+                                   PHB_ITEM pNext, PHB_ITEM pRecID,
+                                   PHB_ITEM pRest )
+{
+   AREAP lpaSource, lpaDest, lpaClose = NULL;
+   DBTRANSINFO dbTransInfo;
+   USHORT uiPrevArea;
+   PHB_ITEM pStruct = NULL;
+   ERRCODE errCode;
+
+   memset( &dbTransInfo, 0, sizeof( DBTRANSINFO ) );
+   uiPrevArea = hb_rddGetCurrentWorkAreaNumber();
+
+   if( fExport )
+   {
+      lpaSource = pArea;
+      errCode = hb_dbTransStruct( lpaSource, NULL, &dbTransInfo,
+                                  &pStruct, pFields );
+      if( errCode == SUCCESS )
+      {
+         errCode = hb_rddCreateTable( szFileName, pStruct, szDriver,
+                                      TRUE, 0, "", NULL, ulConnection );
+         if( errCode == SUCCESS )
+         {
+            dbTransInfo.lpaDest = lpaClose = lpaDest =
+                                 ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+         }
+      }
+   }
+   else
+   {
+      lpaDest = pArea;
+      errCode = hb_rddOpenTable( szFileName, szDriver, 0, "", TRUE, TRUE,
+                                 NULL, ulConnection );
+      if( errCode == SUCCESS )
+      {
+         lpaClose = lpaSource = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+         errCode = hb_dbTransStruct( lpaSource, lpaDest, &dbTransInfo,
+                                     &pStruct, pFields );
+      }
+   }
+
+   if( errCode == SUCCESS )
+   {
+      hb_rddSelectWorkAreaNumber( lpaSource->uiArea );
+
+      dbTransInfo.dbsci.itmCobFor   = pCobFor;
+      dbTransInfo.dbsci.lpstrFor    = pStrFor;
+      dbTransInfo.dbsci.itmCobWhile = pCobWhile;
+      dbTransInfo.dbsci.lpstrWhile  = pStrWhile;
+      dbTransInfo.dbsci.lNext       = pNext;
+      dbTransInfo.dbsci.itmRecID    = pRecID;
+      dbTransInfo.dbsci.fRest       = pRest;
+
+      dbTransInfo.dbsci.fIgnoreFilter     = TRUE;
+      dbTransInfo.dbsci.fIncludeDeleted   = TRUE;
+      dbTransInfo.dbsci.fLast             = FALSE;
+      dbTransInfo.dbsci.fIgnoreDuplicates = FALSE;
+
+      errCode = SELF_TRANS( lpaSource, &dbTransInfo );
+   }
+
+   if( dbTransInfo.lpTransItems )
+      hb_xfree( dbTransInfo.lpTransItems );
+   if( pStruct )
+      hb_itemRelease( pStruct );
+   if( lpaClose )
+   {
+      hb_rddSelectWorkAreaNumber( lpaClose->uiArea );
+      hb_rddReleaseCurrentArea();
+   }
+   hb_rddSelectWorkAreaNumber( uiPrevArea );
+
+   return errCode;
 }
 
 HB_FUNC( __DBAPP )
 {
-  if( ISCHAR( 1 ) )
-  {
-    rddMoveRecords(  hb_parcx( 1 ),               /* File From */
-                     NULL,                        /* TO current area */
-                     hb_param( 2, HB_IT_ARRAY ),  /* Fields */
-                     hb_param( 3, HB_IT_BLOCK ),  /* For */
-                     hb_param( 4, HB_IT_BLOCK ),  /* While */
-                     hb_parnl( 5 ),               /* Next */ /* Defaults to zero on bad type */
-                     hb_parnl( 6 ),               /* Record */ /* Defaults to zero on bad type */
-                     hb_parl( 7 ),                /* Rest */ /* Defaults to zero on bad type */
-                     hb_parc( 8 ) );              /* RDD */
-  }
+   if( ISCHAR( 1 ) )
+   {
+      AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+      if( pArea )
+      {
+         hb_rddTransRecords( pArea,
+               hb_parc( 1 ),                  /* file name */
+               hb_parc( 8 ),                  /* RDD */
+               hb_parnl( 9 ),                 /* connection */
+               hb_param( 2, HB_IT_ARRAY ),    /* Fields */
+               FALSE,                         /* Export? */
+               hb_param( 3, HB_IT_BLOCK ),    /* cobFor */
+               NULL,                          /* lpStrFor */
+               hb_param( 4, HB_IT_BLOCK ),    /* cobWhile */
+               NULL,                          /* lpStrWhile */
+               hb_param( 5, HB_IT_NUMERIC ),  /* Next */
+               ISNIL( 6 ) ? NULL : hb_param( 6, HB_IT_ANY ),   /* RecID */
+               hb_param( 7, HB_IT_LOGICAL ) );/* Rest */
+      }
+      else
+      {
+         hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "APPEND FROM" );
+      }
+   }
 }
 
 HB_FUNC( __DBCOPY )
 {
-  if( ISCHAR( 1 ) )
-  {
-    rddMoveRecords(  NULL,                        /* fro CURRENT Area */
-                     hb_parcx( 1 ),               /* To File */
-                     hb_param( 2, HB_IT_ARRAY ),  /* Fields */
-                     hb_param( 3, HB_IT_BLOCK ),  /* For */
-                     hb_param( 4, HB_IT_BLOCK ),  /* While */
-                     hb_parnl( 5 ),               /* Next */ /* Defaults to zero on bad type */
-                     hb_parnl( 6 ),               /* Record */ /* Defaults to zero on bad type */
-                     hb_parl( 7 ),                /* Rest */ /* Defaults to zero on bad type */
-                     hb_parc( 8 ) );              /* RDD */
-  }
-}
-
-HB_FUNC( DBUSEAREAD )
-{
-   HB_THREAD_STUB
-   char * szDriver;
-   char szFileName[ _POSIX_PATH_MAX + 1 ];
-   USHORT uiLen;
-   DBOPENINFO pInfo;
-   PHB_FNAME pFileName;
-   BYTE * codePageId = (BYTE*) hb_parc(7);
-   char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
-   char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
-   AREAP pArea;
-   int iArea;
-
-   hb_rddCheck();
-
-   s_bNetError = FALSE;
-
-   /* New area? */
-   if( hb_parl( 1 ) )
+   if( ISCHAR( 1 ) )
    {
-      hb_rddSelectFirstAvailable();
-   }
-   else if( HB_CURRENT_WA )   /* If current WorkArea is in use then close it */
-   {
-      hb_rddReleaseCurrentArea();
-   }
-
-   uiLen = ( USHORT ) hb_parclen( 2 );
-   if( uiLen > 0 )
-   {
-      if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
-         uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
-
-      hb_strncpyUpper( szDriverBuffer, hb_parc( 2 ), uiLen );
-      szDriver = szDriverBuffer;
-   }
-   else
-      szDriver = s_szDefDriver;
-
-   if( hb_parclen(3) == 0 )
-   {
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_USE_BADPARAMETER, NULL, "DBUSEAREAD" );
-      return;
-   }
-
-   strncpy( szFileName, hb_parcx( 3 ), _POSIX_PATH_MAX );
-   szFileName[ _POSIX_PATH_MAX ] = '\0';
-
-   pFileName = hb_fsFNameSplit( szFileName );
-   strncpy( szAlias, hb_parcx( 4 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
-   szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH ] = '\0';
-
-   if( strlen( szAlias ) == 0 )
-      strncpy( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
-
-   hb_xfree( pFileName );
-
-   /* Verify if the alias name is valid symbol */
-   if( hb_rddVerifyAliasName( szAlias ) != SUCCESS )
-   {
-      hb_errRT_DBCMD_Ext( EG_BADALIAS, EDBCMD_BADALIAS, NULL, szAlias, EF_CANDEFAULT );
-      return;
-   }
-   /* Verify if the alias is already in use */
-   if( hb_rddGetAliasNumber( szAlias, &iArea ) == SUCCESS )
-   {
-      hb_errRT_DBCMD_Ext( EG_DUPALIAS, EDBCMD_DUPALIAS, NULL, szAlias, EF_CANDEFAULT );
-      return;
-   }
-
-   /* Create a new WorkArea node */
-   if( !hb_rddInsertAreaNode( szDriver ) )
-   {
-      hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBUSEAREAD" );
-      return;
-   }
-   pArea = HB_CURRENT_WA;
-
-   /* Fill pInfo structure */
-   pInfo.uiArea = pArea->uiArea;
-   pInfo.abName = ( BYTE * ) szFileName;
-   pInfo.atomAlias = ( BYTE * ) szAlias;
-   pInfo.fShared = ISLOG( 5 ) ? hb_parl( 5 ) : !hb_set.HB_SET_EXCLUSIVE;
-   pInfo.fReadonly = ISLOG( 6 ) ? hb_parl( 6 ) : FALSE;
-   pInfo.cdpId = codePageId;
-
-   /* Open file */
-   if( SELF_OPEN( pArea, &pInfo ) == FAILURE )
-   {
-      s_bNetError = TRUE;           /* Temp fix! What about other types of errors? */
-      hb_rddReleaseCurrentArea();
-      return;
+      AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+      if( pArea )
+      {
+         hb_rddTransRecords( pArea,
+               hb_parc( 1 ),                  /* file name */
+               hb_parc( 8 ),                  /* RDD */
+               hb_parnl( 9 ),                 /* connection */
+               hb_param( 2, HB_IT_ARRAY ),    /* Fields */
+               TRUE,                          /* Export? */
+               hb_param( 3, HB_IT_BLOCK ),    /* cobFor */
+               NULL,                          /* lpStrFor */
+               hb_param( 4, HB_IT_BLOCK ),    /* cobWhile */
+               NULL,                          /* lpStrWhile */
+               hb_param( 5, HB_IT_NUMERIC ),  /* Next */
+               ISNIL( 6 ) ? NULL : hb_param( 6, HB_IT_ANY ),   /* RecID */
+               hb_param( 7, HB_IT_LOGICAL ) );/* Rest */
+      }
+      else
+      {
+         hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "COPY TO" );
+      }
    }
 }
 
-ERRCODE hb_rddGetTempAlias( char * szAliasTmp )
+ERRCODE HB_EXPORT hb_rddGetTempAlias( char * szAliasTmp )
 {
    int i, iArea;
 
-   for ( i = 1 ; i < 1000 ; i++ )
+   for( i = 1 ; i < 1000 ; i++ )
    {
-      sprintf( szAliasTmp, "HBTMP%3.3i", i);
+      sprintf( szAliasTmp, "__HBTMP%03i", i);
 
       if( hb_rddGetAliasNumber( szAliasTmp, &iArea ) != SUCCESS )
       {
@@ -4644,10 +4386,10 @@ HB_FUNC( __RDDGETTEMPALIAS )
    HB_THREAD_STUB
    char szAliasTmp[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
 
-   if ( hb_rddGetTempAlias( szAliasTmp ) == FAILURE )
-      hb_ret();
-   else
+   if ( hb_rddGetTempAlias( szAliasTmp ) == SUCCESS )
       hb_retc( szAliasTmp );
+   else
+      hb_ret();
 }
 
 HB_FUNC( DBSKIPPER )
@@ -4656,7 +4398,8 @@ HB_FUNC( DBSKIPPER )
    AREAP pArea = HB_CURRENT_WA;
 
    if( pArea )
-   {  LONG nSkipped    = 0;
+   {
+      LONG nSkipped    = 0;
       LONG nRecs       = 1;
       BOOL bBEof       = TRUE;
       if( hb_pcount() > 0 )
@@ -4702,7 +4445,6 @@ HB_FUNC( DBSKIPPER )
             }
          }
       }
-
       hb_retnl( nSkipped );
    }
    else
@@ -4802,21 +4544,6 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
    return TRUE;
 }
 
-// Eval( bBlock )
-static BOOL hb___Eval( PHB_ITEM pItem )
-{
-   HB_THREAD_STUB
-
-   if( pItem )
-   {
-      hb_vmPushSymbol( &hb_symEval );
-      hb_vmPush( pItem );
-      hb_vmDo( 0 );
-      return hb_stackReturnItem()->item.asLogical.value ;
-   }
-   return TRUE;
-}
-
 HB_FUNC( DBF2TEXT )
 {
    HB_THREAD_STUB
@@ -4868,23 +4595,24 @@ HB_FUNC( DBF2TEXT )
 
    SELF_FIELDCOUNT( pArea, &uiFields );
 
-   while ( hb___Eval( pWhile ) && ( nCount == -1 || nCount > 0 ) )
+   while( ( nCount == -1 || nCount > 0 ) &&
+          ( !pWhile || hb_itemGetL( hb_vmEvalBlock( pWhile ) ) ) )
    {
       // While !BOF() .AND. !EOF()
       SELF_EOF( pArea, &bEof );
       SELF_BOF( pArea, &bBof );
 
-      if ( bEof || bBof )
+      if( bEof || bBof )
       {
          break;
       }
 
       // For condition is met
       // if For is NULL, hb__Eval returns TRUE
-      if ( hb___Eval ( pFor ) )
+      if( !pFor || hb_itemGetL( hb_vmEvalBlock( pFor ) ) )
       {
          // User does not request fields, copy all fields
-         if ( bNoFieldPassed )
+         if( bNoFieldPassed )
          {
             for ( ui = 1; ui <= uiFields; ui ++ )
             {

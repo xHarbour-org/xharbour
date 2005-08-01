@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.44 2005/06/01 18:24:51 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.45 2005/06/22 15:29:54 druzus Exp $
  */
 
 /*
@@ -373,7 +373,7 @@ typedef struct _CDXINDEX
    FHANDLE     hFile;         /* Index file handle */
    struct _CDXAREA  * pArea;  /* Parent WorkArea */
    struct _CDXINDEX * pNext;  /* The next index in the list */
-   LPCDXTAG    pCompound;     /* Compound Tag (index of tags) */
+   LPCDXTAG    pCompound;     /* Compound tag */
    LPCDXTAG    TagList;       /* List of tags in index file */
    BOOL        fShared;       /* Shared file */
    BOOL        fReadonly;     /* Read only file */
@@ -638,6 +638,7 @@ static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo );
 #define hb_cdxExit                                 NULL
 #define hb_cdxDrop                                 NULL
 #define hb_cdxExists                               NULL
+static ERRCODE hb_cdxRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem );
 #define hb_cdxWhoCares                             NULL
 
 HB_EXTERN_END

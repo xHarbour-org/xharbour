@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.45 2005/05/04 19:50:11 druzus Exp $
+ * $Id: workarea.c,v 1.46 2005/05/11 13:09:30 druzus Exp $
  */
 
 /*
@@ -276,9 +276,9 @@ ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
    uiItems = ( USHORT ) hb_arrayLen( pStruct );
    SELF_SETFIELDEXTENT( pArea, uiItems );
 
-   pFieldInfo.uiTypeExtended = 0;
    for( uiCount = 0; uiCount < uiItems; uiCount++ )
    {
+      pFieldInfo.uiTypeExtended = 0;
       pFieldDesc = hb_arrayGetItemPtr( pStruct, uiCount + 1 );
       pFieldInfo.atomName = ( BYTE * ) hb_arrayGetCPtr( pFieldDesc, 1 );
       iData = hb_arrayGetNI( pFieldDesc, 3 );
@@ -584,6 +584,15 @@ ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_itemPutL( pItem, FALSE );
          break;
 
+      /*
+       * IMHO better to return FAILURE to notice that it's not supported
+       */
+      case DBI_GETDELIMITER:
+      case DBI_SETDELIMITER:
+      case DBI_SEPARATOR:
+         hb_itemPutC( pItem, "" );
+         return FAILURE;
+
       case DBI_CHILDCOUNT:
       {
          LPDBRELINFO lpdbRelations = pArea->lpdbRelations;
@@ -682,6 +691,25 @@ ERRCODE hb_waNewArea( AREAP pArea )
    return SUCCESS;
 }
 
+/*
+ * Open a data store in the WorkArea.
+ * Like in Clipper it's also mapped as Create() method at WA level
+ */
+ERRCODE hb_waOpen( AREAP pArea, LPDBOPENINFO pInfo )
+{
+   if( !pArea->atomAlias && pInfo->atomAlias && pInfo->atomAlias[ 0 ] )
+   {
+      pArea->atomAlias = hb_rddAllocWorkAreaAlias( ( char * ) pInfo->atomAlias,
+                                                   ( int ) pInfo->uiArea );
+      if( ! pArea->atomAlias )
+      {
+         SELF_CLOSE( ( AREAP ) pArea );
+         return FAILURE;
+      }
+   }
+   return SUCCESS;
+}
+
 ERRCODE hb_waOrderCondition( AREAP pArea, LPDBORDERCONDINFO param )
 {
    if( pArea->lpdbOrdCondInfo )
@@ -701,6 +729,14 @@ ERRCODE hb_waOrderCondition( AREAP pArea, LPDBORDERCONDINFO param )
       if( pArea->lpdbOrdCondInfo->itmCobEval )
       {
          hb_itemRelease( pArea->lpdbOrdCondInfo->itmCobEval );
+      }
+      if( pArea->lpdbOrdCondInfo->itmStartRecID )
+      {
+         hb_itemRelease( pArea->lpdbOrdCondInfo->itmStartRecID );
+      }
+      if( pArea->lpdbOrdCondInfo->itmRecID )
+      {
+         hb_itemRelease( pArea->lpdbOrdCondInfo->itmRecID );
       }
       hb_xfree( pArea->lpdbOrdCondInfo );
    }
@@ -778,13 +814,18 @@ ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
          return FAILURE;
    }
 
+   /* TODO: use SKIPSCOPE() method and fRest parameter */
+
    if( !pEvalInfo->dbsci.lNext || lNext > 0 )
    {
-      if ( SELF_EOF( pArea, &fEof ) == FAILURE )
-         return FAILURE;
-
-      while( !fEof )
+      while( TRUE )
       {
+         if( SELF_EOF( pArea, &fEof ) == FAILURE )
+            return FAILURE;
+
+         if( fEof )
+            break;
+
          if( pEvalInfo->dbsci.itmCobWhile &&
              ! hb_itemGetL( hb_vmEvalBlock( pEvalInfo->dbsci.itmCobWhile ) ) )
             break;
@@ -798,8 +839,6 @@ ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
 
          if( SELF_SKIP( pArea, 1 ) == FAILURE )
             return FAILURE;
-         if ( SELF_EOF( pArea, &fEof ) == FAILURE )
-            return FAILURE;
       }
    }
 
@@ -811,11 +850,58 @@ ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
  */
 ERRCODE hb_waTrans( AREAP pArea, LPDBTRANSINFO pTransInfo )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waTrans(%p, %p)", pArea, pTransInfo));
-   HB_SYMBOL_UNUSED( pArea );
-   HB_SYMBOL_UNUSED( pTransInfo );
+   LONG lNext = 1;
+   BOOL fEof;
 
-   printf( "\nTODO: hb_waTrans()\n" );
+   HB_TRACE(HB_TR_DEBUG, ("hb_waTrans(%p, %p)", pArea, pTransInfo));
+
+   if( pTransInfo->dbsci.itmRecID )
+   {
+      if( SELF_GOTOID( pArea, pTransInfo->dbsci.itmRecID ) == FAILURE )
+         return FAILURE;
+   }
+   else if( pTransInfo->dbsci.lNext )
+   {
+      lNext = hb_itemGetNL( pTransInfo->dbsci.lNext );
+   }
+   else if( !pTransInfo->dbsci.itmCobWhile &&
+            !hb_itemGetL( pTransInfo->dbsci.fRest ) )
+   {
+      if( SELF_GOTOP( pArea ) == FAILURE )
+         return FAILURE;
+   }
+
+   /* TODO: use SKIPSCOPE() method and fRest parameter */
+
+   if( !pTransInfo->dbsci.lNext || lNext > 0 )
+   {
+      while( TRUE )
+      {
+         if( SELF_EOF( pArea, &fEof ) == FAILURE )
+            return FAILURE;
+
+         if( fEof )
+            break;
+
+         if( pTransInfo->dbsci.itmCobWhile &&
+             ! hb_itemGetL( hb_vmEvalBlock( pTransInfo->dbsci.itmCobWhile ) ) )
+            break;
+
+         if( ! pTransInfo->dbsci.itmCobFor ||
+             hb_itemGetL( hb_vmEvalBlock( pTransInfo->dbsci.itmCobFor ) ) )
+         {
+            if( SELF_TRANSREC( pArea, pTransInfo ) == FAILURE )
+               return FAILURE;
+         }
+
+         if( pTransInfo->dbsci.itmRecID || ( pTransInfo->dbsci.lNext && --lNext < 1 ) )
+            break;
+
+         if( SELF_SKIP( pArea, 1 ) == FAILURE )
+            return FAILURE;
+      }
+   }
+
    return SUCCESS;
 }
 
@@ -824,11 +910,69 @@ ERRCODE hb_waTrans( AREAP pArea, LPDBTRANSINFO pTransInfo )
  */
 ERRCODE hb_waTransRec( AREAP pArea, LPDBTRANSINFO pTransInfo )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waTransRec(%p, %p)", pArea, pTransInfo));
-   HB_SYMBOL_UNUSED( pArea );
-   HB_SYMBOL_UNUSED( pTransInfo );
+   BOOL bDeleted;
+   BYTE *pRecord;
+   ERRCODE errCode;
 
-   printf( "\nTODO: hb_waTransRec()\n" );
+   HB_TRACE(HB_TR_DEBUG, ("hb_waTransRec(%p, %p)", pArea, pTransInfo));
+
+   /* Record deleted? */
+   errCode = SELF_DELETED( ( AREAP ) pArea, &bDeleted );
+   if( errCode != SUCCESS )
+      return errCode;
+
+   if( pTransInfo->uiFlags & DBTF_MATCH && pTransInfo->uiFlags & DBTF_PUTREC )
+   {
+      errCode = SELF_GETREC( ( AREAP ) pArea, &pRecord );
+      if( errCode != SUCCESS )
+         return errCode;
+
+      /* Append a new record */
+      errCode = SELF_APPEND( ( AREAP ) pTransInfo->lpaDest, TRUE );
+      if( errCode != SUCCESS )
+         return errCode;
+
+      /* Copy record */
+      errCode = SELF_PUTREC( ( AREAP ) pTransInfo->lpaDest, pRecord );
+   }
+   else
+   {
+      PHB_ITEM pItem = hb_itemNew( NULL );
+      LPDBTRANSITEM pTransItem;
+      USHORT uiCount = 0;
+
+      /* Append a new record */
+      errCode = SELF_APPEND( ( AREAP ) pTransInfo->lpaDest, TRUE );
+      if( errCode != SUCCESS )
+         return errCode;
+
+      pTransItem = pTransInfo->lpTransItems;
+      for( uiCount = pTransInfo->uiItemCount; uiCount; --uiCount )
+      {
+         errCode = SELF_GETVALUE( ( AREAP ) pArea,
+                                  pTransItem->uiSource, pItem );
+         if( errCode != SUCCESS )
+            break;
+         errCode = SELF_PUTVALUE( ( AREAP ) pTransInfo->lpaDest,
+                                  pTransItem->uiDest, pItem );
+         if( errCode != SUCCESS )
+            break;
+         ++pTransItem;
+      }
+      hb_itemRelease( pItem );
+   }
+
+   /* Delete the new record if copy fail */
+   if( errCode != SUCCESS )
+   {
+      SELF_DELETE( ( AREAP ) pTransInfo->lpaDest );
+      return errCode;
+   }
+
+   /* Delete the new record */
+   if( bDeleted )
+      return SELF_DELETE( ( AREAP ) pTransInfo->lpaDest );
+
    return SUCCESS;
 }
 
@@ -839,7 +983,7 @@ ERRCODE hb_waChildEnd( AREAP pArea, LPDBRELINFO pRelInfo )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_waChildEnd(%p, %p)", pArea, pRelInfo));
 
-   if ( pRelInfo->isScoped )
+   if( pRelInfo->isScoped )
    {
       DBORDERINFO pInfo;
       pInfo.itmOrder = NULL;
@@ -991,9 +1135,16 @@ ERRCODE hb_waRelEval( AREAP pArea, LPDBRELINFO pRelInfo )
          else
          {
             /*
-             *  If current order equals to zero, use GOTOID instead of SEEK
+             * If current order equals to zero, use GOTOID instead of SEEK
+             * Unfortunately it interacts with buggy .prg code which returns
+             * non numerical values from relation expression and RDD accepts
+             * only numerical record ID. In such case SELF_GOTO() works like
+             * SELF_GOEOF() but SELF_GOTOID() reports error. So for Clipper
+             * compatibility SELF_GOTO() is used here but if RDD can use
+             * non numerical record IDs then this method should be overloaded
+             * to use SELF_GOTOID(), [druzus]
              */
-            //errCode = SELF_GOTOID( pArea, pResult );
+            /* errCode = SELF_GOTOID( pArea, pResult ); */
             errCode = SELF_GOTO( pArea, hb_itemGetNL( pResult ) );
          }
       }
@@ -1237,7 +1388,7 @@ ERRCODE hb_waError( AREAP pArea, PHB_ITEM pError )
    HB_TRACE(HB_TR_DEBUG, ("hb_waError(%p, %p)", pArea, pError));
 
    szRddName = ( char * ) hb_xgrab( HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 );
-   if( ( pArea )->lprfsHost->sysName )
+   if( pArea && pArea->lprfsHost->sysName )
       SELF_SYSNAME( pArea, ( BYTE * ) szRddName );
    else
       strcpy( szRddName, "???DRIVER" );
@@ -1272,4 +1423,124 @@ ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock )
       hb_rddSelectWorkAreaNumber( iCurrArea );
 
    return hb_vmRequestQuery() ? FAILURE : SUCCESS;
+}
+
+/*
+ * RDD info
+ */
+extern ERRCODE hb_rddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnection, PHB_ITEM pItem )
+{
+   BOOL fResult;
+   int iResult;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnection, pItem));
+
+   HB_SYMBOL_UNUSED( pRDD );
+   HB_SYMBOL_UNUSED( ulConnection );
+
+   switch( uiIndex )
+   {
+      case RDDI_ISDBF:
+      case RDDI_CANPUTREC:
+      case RDDI_LOCAL:
+      case RDDI_REMOTE:
+      case RDDI_RECORDMAP:
+      case RDDI_ENCRYPTION:
+      case RDDI_TRIGGERS:
+      case RDDI_AUTOLOCK:
+      case RDDI_STRUCTORD:
+      case RDDI_LARGEFILE:
+      case RDDI_MULTITAG:
+      case RDDI_SORTRECNO:
+      case RDDI_MULTIKEY:
+         hb_itemPutL( pItem, FALSE );
+         break;
+
+      case RDDI_CONNECTION:
+      case RDDI_TABLETYPE:
+      case RDDI_MEMOTYPE:
+         hb_itemPutNI( pItem, 0 );
+         break;
+
+      case RDDI_STRICTREAD:
+         fResult = hb_set.HB_SET_STRICTREAD;
+         if( hb_itemType( pItem ) == HB_IT_LOGICAL )
+            hb_set.HB_SET_STRICTREAD = hb_itemGetL( pItem );
+         hb_itemPutL( pItem, fResult );
+         break;
+      case RDDI_OPTIMIZE:
+         fResult = hb_set.HB_SET_OPTIMIZE;
+         if( hb_itemType( pItem ) == HB_IT_LOGICAL )
+            hb_set.HB_SET_OPTIMIZE = hb_itemGetL( pItem );
+         hb_itemPutL( pItem, fResult );
+         break;
+      case RDDI_FORCEOPT:
+         fResult = hb_set.HB_SET_FORCEOPT;
+         if( hb_itemType( pItem ) == HB_IT_LOGICAL )
+            hb_set.HB_SET_FORCEOPT = hb_itemGetL( pItem );
+         hb_itemPutL( pItem, fResult );
+         break;
+      case RDDI_AUTOOPEN:
+         fResult = hb_set.HB_SET_AUTOPEN;
+         if( hb_itemType( pItem ) == HB_IT_LOGICAL )
+            hb_set.HB_SET_AUTOPEN = hb_itemGetL( pItem );
+         hb_itemPutL( pItem, fResult );
+         break;
+      case RDDI_AUTOORDER:
+         fResult = hb_set.HB_SET_AUTORDER;
+         if( hb_itemType( pItem ) == HB_IT_LOGICAL )
+            hb_set.HB_SET_AUTORDER = hb_itemGetL( pItem );
+         hb_itemPutL( pItem, fResult );
+         break;
+      case RDDI_AUTOSHARE:
+         fResult = hb_set.HB_SET_AUTOSHARE;
+         if( hb_itemType( pItem ) == HB_IT_LOGICAL )
+            hb_set.HB_SET_AUTOSHARE = hb_itemGetL( pItem );
+         hb_itemPutL( pItem, fResult );
+         break;
+      case RDDI_LOCKSCHEME:
+         iResult = hb_set.HB_SET_DBFLOCKSCHEME;
+         if( hb_itemType( pItem ) & HB_IT_NUMERIC )
+            hb_set.HB_SET_DBFLOCKSCHEME = hb_itemGetNI( pItem );
+         hb_itemPutNI( pItem, iResult );
+         break;
+      case RDDI_MEMOBLOCKSIZE:
+         iResult = hb_set.HB_SET_MBLOCKSIZE;
+         if( hb_itemType( pItem ) & HB_IT_NUMERIC )
+            hb_set.HB_SET_MBLOCKSIZE = hb_itemGetNI( pItem );
+         hb_itemPutNI( pItem, iResult );
+         break;
+      case RDDI_MEMOEXT:
+         if( hb_itemType( pItem ) & HB_IT_STRING )
+         {
+            if( hb_set.HB_SET_MFILEEXT )
+            {
+               hb_itemPutC( pItem, hb_set.HB_SET_MFILEEXT );
+               hb_xfree( hb_set.HB_SET_MFILEEXT );
+            }
+            else
+            {
+               hb_itemPutC( pItem, "" );
+            }
+            hb_set.HB_SET_MFILEEXT = hb_strdup( hb_itemGetCPtr( pItem ) );
+            break;
+         }
+         else if( hb_set.HB_SET_MFILEEXT )
+         {
+            hb_itemPutC( pItem, hb_set.HB_SET_MFILEEXT );
+            break;
+         }
+      case RDDI_TABLEEXT:
+      case RDDI_ORDBAGEXT:
+      case RDDI_ORDEREXT:
+      case RDDI_ORDSTRUCTEXT:
+      case RDDI_DELIMITER:
+      case RDDI_SEPARATOR:
+         hb_itemPutC( pItem, "" );
+         /* no break - return FAILURE */
+
+      default:
+         return FAILURE;
+   }
+   return SUCCESS;
 }

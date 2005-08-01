@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.27 2005/06/01 18:24:51 druzus Exp $
+ * $Id: hbrddntx.h,v 1.28 2005/06/22 15:29:54 druzus Exp $
  */
 
 /*
@@ -76,20 +76,17 @@ HB_EXTERN_BEGIN
 #define NTX_FLAG_DEFALUT         0x0006
 #define NTX_FLAG_OLDDEFALUT      0x0003
 #define NTX_FLAG_FORITEM         0x0001
-#define NTX_FLAG_TEMPORARY       0x0008
+#define NTX_FLAG_PARTIAL         0x0008
 #define NTX_FLAG_EXTLOCK         0x0010
-#define NTX_FLAG_SORTRECNO       0x0100
-#define NTX_FLAG_LARGEFILE       0x0200
-#define NTX_FLAG_MASK            0x031F
-/* TODO:
 #define NTX_FLAG_CUSTOM          0x0020
 #define NTX_FLAG_CHGONLY         0x0040
 #define NTX_FLAG_TEMPLATE        0x0080
-#define NTX_FLAG_COMPOUND        0x4000
-*/
+#define NTX_FLAG_SORTRECNO       0x0100
+#define NTX_FLAG_LARGEFILE       0x0200
+#define NTX_FLAG_MULTIKEY        0x0400
+#define NTX_FLAG_COMPOUND        0x8000
+#define NTX_FLAG_MASK            0x87FF
 
-#define CTX_SIGNATURE            0x9591
-#define CTX_FLAG_MASK            0x0200
 #define CTX_MAX_TAGS                 63
 
 #define NTX_MAX_KEY                     256     /* Max len of key */
@@ -217,23 +214,27 @@ typedef struct _TAGINFO
    PHB_ITEM    pForItem;
    HB_NTXSCOPE top;
    HB_NTXSCOPE bottom;
-   BOOL        fRemoved;
-   BOOL        fSortRec;
+
    BOOL        fTagName;      /* remove */
    BOOL        fUsrDescend;
    BOOL        AscendKey;
    BOOL        UniqueKey;
+
+   BOOL        Signature;
+
    BOOL        Custom;
-   BOOL        Frozen;
    BOOL        ChgOnly;
    BOOL        Partial;
-   BOOL        Templete;
+   BOOL        Template;
+   BOOL        MultiKey;
+   BOOL        fSortRec;
+
    BOOL        HdrChanged;
    BOOL        TagBOF;
    BOOL        TagEOF;
-   BYTE        KeyType;
    ULONG       HeadBlock;
    ULONG       RootBlock;
+   BYTE        KeyType;
    USHORT      nField;
    USHORT      KeyLength;
    USHORT      KeyDec;
@@ -247,18 +248,19 @@ typedef struct _TAGINFO
    BOOL        HotFor;
 
    struct     _NTXINDEX * Owner;
-//   struct     _TAGINFO * pNext;
 } TAGINFO;
 typedef TAGINFO * LPTAGINFO;
 
 typedef struct _NTXINDEX
 {
    char *      IndexName;
+   char *      RealName;
    USHORT      Version;       /* The index VERSION filed to signal index updates for other stations */
    ULONG       NextAvail;
    ULONG       TagBlock;      /* Index attr, next free page */
    struct     _NTXAREA * Owner;
    FHANDLE     DiskFile;
+   BOOL        fDelete;       /* delete on close flag */
    BOOL        fReadonly;
    BOOL        fShared;
    BOOL        fFlush;
@@ -266,6 +268,7 @@ typedef struct _NTXINDEX
    BOOL        Changed;
    BOOL        Update;
    BOOL        Compound;
+   BOOL        Production;    /* Production index */
    HB_FOFFSET  ulLockPos;     /* readlock position for CL53 lock scheme */
    int         lockWrite;     /* number of write lock set */
    int         lockRead;      /* number of read lock set */
@@ -313,13 +316,19 @@ typedef struct
    ULONG    ulPgKeys;         /* maximum number of key in page memory buffer */
    ULONG    ulMaxKey;         /* maximum number of keys in single page */
    BYTE *   pKeyPool;         /* memory buffer for current page then for pages */
+   BYTE *   pStartKey;        /* begining of key pool after sorting */
    LPNTXSWAPPAGE pSwapPage;   /* list of pages */
    LPPAGEINFO NodeList[ NTX_STACKSIZE ];   /* Stack of pages */
    ULONG    ulFirst;
    ULONG *  pSortedPages;
    BYTE     pLastKey[ NTX_MAX_KEY ]; /* last key val */
    ULONG    ulLastRec;
-   BYTE *   pRecBuff;
+
+   BYTE *   pBuffIO;          /* index IO buffer */
+   ULONG    ulSizeIO;         /* size of IO buffer in index pages */
+   ULONG    ulPagesIO;        /* number of index pages in buffer */
+   ULONG    ulFirstIO;        /* first page in buffer */
+   ULONG    ulLastIO;         /* last page in buffer */
 } NTXSORTINFO;
 typedef NTXSORTINFO * LPNTXSORTINFO;
 
@@ -413,7 +422,6 @@ typedef struct _NTXAREA
 
    LPNTXINDEX     lpIndexes;     /* Pointer to list of indexes */
    LPTAGINFO      lpCurTag;      /* Pointer to current order */
-//   LPTAGINFO      lpNtxTag;      /* Pointer to tags list */
    BOOL           fNtxAppend;    /* TRUE if new record is added */
    LPNTXSORTINFO  pSort;         /* Index build structure */
 
@@ -472,7 +480,7 @@ static ERRCODE ntxClose( NTXAREAP pArea );
 #define ntxCreate                NULL
 #define ntxInfo                  NULL
 #define ntxNewArea               NULL
-#define ntxOpen                  NULL
+static ERRCODE ntxOpen( NTXAREAP pArea, LPDBOPENINFO pOpenInfo );
 #define ntxRelease               NULL
 static ERRCODE ntxStructSize( NTXAREAP pArea, USHORT * uiSize );
 static ERRCODE ntxSysName( NTXAREAP pArea, BYTE * pBuffer );
@@ -498,7 +506,7 @@ static ERRCODE ntxOrderListClear( NTXAREAP pArea );
 static ERRCODE ntxOrderListDelete( NTXAREAP pArea, LPDBORDERINFO pOrderInfo );
 static ERRCODE ntxOrderListFocus( NTXAREAP pArea, LPDBORDERINFO pOrderInfo );
 static ERRCODE ntxOrderListRebuild( NTXAREAP pArea );
-static ERRCODE ntxOrderCondition( NTXAREAP area, LPDBORDERCONDINFO pOrdCondInfo );
+#define ntxOrderCondition        NULL
 static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo );
 static ERRCODE ntxOrderDestroy( NTXAREAP pArea, LPDBORDERINFO pOrderInfo );
 static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo );
@@ -528,6 +536,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
 #define ntxExit                  NULL
 #define ntxDrop                  NULL
 #define ntxExists                NULL
+static ERRCODE ntxRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem );
 #define ntxWhoCares              NULL
 
 HB_EXTERN_END

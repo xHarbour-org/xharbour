@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddwrk.h,v 1.3 2003/11/30 12:32:30 druzus Exp $
+ * $Id: hbrddwrk.h,v 1.4 2005/04/25 23:11:01 druzus Exp $
  */
 
 /*
@@ -96,10 +96,11 @@ extern ERRCODE hb_waFieldName( AREAP pArea, USHORT uiIndex, void * szName );
 extern ERRCODE hb_waSetFieldExtent( AREAP pArea, USHORT uiFieldExtent );
 extern ERRCODE hb_waAlias( AREAP pArea, BYTE * szAlias );
 extern ERRCODE hb_waClose( AREAP pArea );
-#define hb_waCreate                         ( DBENTRYP_VP ) hb_waUnsupported
+/* Like in Clipper map CREATE() method at work area level to OPEN() */
+#define hb_waCreate                                         hb_waOpen
 extern ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
 extern ERRCODE hb_waNewArea( AREAP pArea );
-#define hb_waOpen                           ( DBENTRYP_VP ) hb_waUnsupported
+extern ERRCODE hb_waOpen( AREAP pArea, LPDBOPENINFO pInfo );
 extern ERRCODE hb_waRelease( AREAP pArea );
 extern ERRCODE hb_waStructSize( AREAP pArea, USHORT * uiSize );
 extern ERRCODE hb_waSysName( AREAP pArea, BYTE * pBuffer );
@@ -154,9 +155,10 @@ extern ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock );
 #define hb_waReadDBHeader                                   hb_waUnsupported
 #define hb_waWriteDBHeader                                  hb_waUnsupported
 
-#define hb_rddExit                         (DBENTRYP_I0)    NULL
-#define hb_rddDrop                         (DBENTRYP_I1)    hb_waUnsupported
-#define hb_rddExists                       (DBENTRYP_I2)    hb_waUnsupported
+#define hb_rddExit                         (DBENTRYP_R)     NULL
+#define hb_rddDrop                         (DBENTRYP_RVV)   hb_waRddUnsupported
+#define hb_rddExists                       (DBENTRYP_RVV)   hb_waRddUnsupported
+extern ERRCODE hb_rddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnection, PHB_ITEM pItem );
 
 #define hb_waWhoCares                      ( DBENTRYP_SVP ) hb_waUnsupported
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.44 2005/05/19 02:20:17 druzus Exp $
+ * $Id: dbffpt1.c,v 1.45 2005/06/01 18:24:53 druzus Exp $
  */
 
 /*
@@ -77,6 +77,10 @@
 #  undef HB_PRG_PCODE_VER
 #  define HB_PRG_PCODE_VER HB_PCODE_VER
 #endif
+
+static char   s_szMemoFileExt[ HB_MAX_FILE_EXT + 1 ] = "";
+static USHORT s_uiMemoBlockSize = 0;
+static BYTE   s_bMemoType = 0;
 
 static RDDFUNCS fptSuper;
 static RDDFUNCS fptTable =
@@ -214,9 +218,10 @@ static RDDFUNCS fptTable =
 
 
    /* non WorkArea functions       */
-   ( DBENTRYP_I0 )    hb_fptExit,
-   ( DBENTRYP_I1 )    hb_fptDrop,
-   ( DBENTRYP_I2 )    hb_fptExists,
+   ( DBENTRYP_R )     hb_fptExit,
+   ( DBENTRYP_RVV )   hb_fptDrop,
+   ( DBENTRYP_RVV )   hb_fptExists,
+   ( DBENTRYP_RSLV )  hb_fptRddInfo,
 
    /* Special and reserved methods */
 
@@ -2233,18 +2238,33 @@ static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo )
 {
    FPTHEADER fptHeader;
    ULONG ulNextBlock, ulSize, ulLen;
-   BOOL bRetry;
-   PHB_ITEM pError;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fptCreateMemFile(%p, %p)", pArea, pCreateInfo));
 
    if( pCreateInfo )
    {
-      pError = NULL;
+      PHB_ITEM pError = NULL, pItem;
+      USHORT uiSize = 0, uiType = 0;
+      BOOL bRetry;
+
+      pItem = hb_itemPutNI( NULL, 0 );
+      if( SELF_INFO( ( AREAP ) pArea, DBI_MEMOBLOCKSIZE, pItem ) == SUCCESS )
+         uiSize = hb_itemGetNI( pItem );
+      hb_itemPutNI( pItem, 0 );
+      if( SELF_INFO( ( AREAP ) pArea, DBI_MEMOTYPE, pItem ) == SUCCESS )
+         uiType = hb_itemGetNI( pItem );
+      hb_itemRelease( pItem );
+
+      pArea->uiMemoBlockSize = uiSize ? uiSize : FPT_DEFBLOCKSIZE;
+      pArea->bMemoType = uiType ? uiType : MEMO_FPT_HB; /* MEMO_FPT_SIX; */
+
       /* Try create */
       do
       {
-         pArea->hMemoFile = hb_spCreate( pCreateInfo->abName, FC_NORMAL );
+         pArea->hMemoFile = hb_fsExtOpen( pCreateInfo->abName, NULL,
+                                          FO_READWRITE | FO_EXCLUSIVE | FXO_TRUNCATE |
+                                          FXO_DEFAULTS | FXO_SHARELOCK,
+                                          NULL, pError );
          if( pArea->hMemoFile == FS_ERROR )
          {
             if( !pError )
@@ -2272,12 +2292,6 @@ static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo )
       hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
 
    memset( &fptHeader, 0, sizeof( FPTHEADER ) );
-   pArea->uiMemoBlockSize = ( hb_set.HB_SET_MBLOCKSIZE > 0 &&
-                              hb_set.HB_SET_MBLOCKSIZE < 0xFFFF ) ?
-                            hb_set.HB_SET_MBLOCKSIZE : FPT_DEFBLOCKSIZE;
-   pArea->bMemoType = MEMO_FPT_HB;
-   //pArea->bMemoType = MEMO_FPT_SIX;
-
    ulNextBlock = ( sizeof( FPTHEADER ) + pArea->uiMemoBlockSize - 1 ) / pArea->uiMemoBlockSize;
    HB_PUT_BE_UINT32( fptHeader.nextBlock, ulNextBlock );
    HB_PUT_BE_UINT16( fptHeader.blockSize, pArea->uiMemoBlockSize );
@@ -2334,7 +2348,9 @@ static ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo )
    /* Try open */
    do
    {
-      pArea->hMemoFile = hb_spOpen( pOpenInfo->abName, uiFlags );
+      pArea->hMemoFile = hb_fsExtOpen( pOpenInfo->abName, NULL, uiFlags |
+                                       FXO_DEFAULTS | FXO_SHARELOCK,
+                                       NULL, pError );
       if( pArea->hMemoFile == FS_ERROR )
       {
          if( !pError )
@@ -2459,7 +2475,7 @@ static ERRCODE hb_fptInfo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    switch( uiIndex )
    {
       case DBI_MEMOEXT:
-         if ( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
+         if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
          {
             PHB_FNAME pFileName;
 
@@ -2469,11 +2485,31 @@ static ERRCODE hb_fptInfo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          }
          else
          {
-            hb_itemPutC( pItem, ( hb_set.HB_SET_MFILEEXT &&
-                                  strlen( hb_set.HB_SET_MFILEEXT ) > 0 ) ?
-                                 hb_set.HB_SET_MFILEEXT :
-                                 FPT_MEMOEXT );
+            if( s_szMemoFileExt[ 0 ] )
+               hb_itemPutC( pItem, s_szMemoFileExt );
+            else if( hb_set.HB_SET_MFILEEXT && hb_set.HB_SET_MFILEEXT[ 0 ] )
+               hb_itemPutC( pItem, hb_set.HB_SET_MFILEEXT );
+            else
+               hb_itemPutC( pItem, FPT_MEMOEXT );
          }
+         break;
+
+      case DBI_MEMOBLOCKSIZE:
+         if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
+            hb_itemPutNI( pItem, pArea->uiMemoBlockSize );
+         else if( s_uiMemoBlockSize )
+            hb_itemPutNI( pItem, s_uiMemoBlockSize );
+         else if( hb_set.HB_SET_MBLOCKSIZE > 0 && hb_set.HB_SET_MBLOCKSIZE < 0xFFFF )
+            hb_itemPutNI( pItem, hb_set.HB_SET_MBLOCKSIZE );
+         else
+            hb_itemPutNI( pItem, FPT_DEFBLOCKSIZE );
+         break;
+
+      case DBI_MEMOTYPE:
+         if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
+            hb_itemPutNI( pItem, pArea->bMemoType );
+         else
+            hb_itemPutNI( pItem, s_bMemoType ? s_bMemoType : MEMO_FPT_HB );
          break;
 
       /* case DBI_RDD_VERSION */
@@ -2545,4 +2581,78 @@ static ERRCODE hb_fptFieldInfo( FPTAREAP pArea, USHORT uiIndex, USHORT uiType, P
       }
    }
    return SUPER_FIELDINFO( ( AREAP ) pArea, uiIndex, uiType, pItem );
+}
+
+/*
+ * Retrieve (set) information about RDD
+ * ( DBENTRYP_RSLV )   hb_fptFieldInfo
+ */
+static ERRCODE hb_fptRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_fptRddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnect, pItem));
+
+   switch( uiIndex )
+   {
+      case RDDI_MEMOEXT:
+      {
+         char * szMemoExt = hb_strdup( s_szMemoFileExt[ 0 ] ? s_szMemoFileExt :
+        	( hb_set.HB_SET_MFILEEXT && hb_set.HB_SET_MFILEEXT[ 0 ] ) ?
+                  hb_set.HB_SET_MFILEEXT : FPT_MEMOEXT ), * szNew;
+         szNew = hb_itemGetCPtr( pItem );
+         if( szNew[0] == '.' && szNew[1] )
+            hb_strncpy( s_szMemoFileExt, hb_itemGetCPtr( pItem ), HB_MAX_FILE_EXT );
+         hb_itemPutCPtr( pItem, szMemoExt, strlen( szMemoExt ) );
+         break;
+      }
+      case RDDI_MEMOBLOCKSIZE:
+      {
+         USHORT uiSize = hb_itemGetNI( pItem );
+
+         if( s_uiMemoBlockSize )
+            hb_itemPutNI( pItem, s_uiMemoBlockSize );
+         else if( hb_set.HB_SET_MBLOCKSIZE > 0 && hb_set.HB_SET_MBLOCKSIZE < 0xFFFF )
+            hb_itemPutNI( pItem, hb_set.HB_SET_MBLOCKSIZE );
+         else
+            hb_itemPutNI( pItem, FPT_DEFBLOCKSIZE );
+
+         if( uiSize )
+            s_uiMemoBlockSize = uiSize;
+         break;
+      }
+      case RDDI_MEMOTYPE:
+      {
+         USHORT uiType = hb_itemGetNI( pItem );
+
+         hb_itemPutNI( pItem, s_bMemoType ? s_bMemoType : MEMO_FPT_HB );
+         switch( uiType )
+         {
+            case MEMO_FPT_HB:
+            case MEMO_FPT_SIX:
+            case MEMO_FPT_SIXHB:
+            case MEMO_FPT_FLEX:
+            case MEMO_FPT_CLIP:
+               s_bMemoType = uiType;
+         }
+         break;
+      }
+
+      case RDDI_MEMOGCTYPE:
+         hb_itemPutNI( pItem, 0 );
+         break;
+      case RDDI_MEMOREADLOCK:
+#if defined( HB_MEMO_SAFELOCK )
+         hb_itemPutL( pItem, TRUE );
+#else
+         hb_itemPutL( pItem, FALSE );
+#endif
+         break;
+      case RDDI_MEMOREUSE:
+         hb_itemPutL( pItem, TRUE );
+         break;
+
+      default:
+         return SUPER_RDDINFO( pRDD, uiIndex, ulConnect, pItem );
+   }
+
+   return SUCCESS;
 }

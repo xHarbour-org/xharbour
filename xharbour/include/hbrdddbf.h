@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.18 2005/02/14 21:14:01 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.19 2005/03/31 03:15:18 druzus Exp $
  */
 
 /*
@@ -105,11 +105,6 @@ HB_EXTERN_BEGIN
 #define IDX_LOCKPOOL_VFP                  0UL
 #define IDX_LOCKPOOL_CL53EXT              0x00010000UL
 #define IDX_LOCKPOOL_XHB64                0UL
-
-#ifdef OS_UNIX_COMPATIBLE
-#define DBF_EXLUSIVE_LOCKPOS              0x7fffffffUL
-#define DBF_EXLUSIVE_LOCKSIZE             1UL
-#endif
 
 /*
  *  DBF WORKAREA
@@ -253,7 +248,7 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea );
 #define hb_dbfPackRec                              NULL
 static ERRCODE hb_dbfSort( DBFAREAP pArea, LPDBSORTINFO pSortInfo );
 static ERRCODE hb_dbfTrans( DBFAREAP pArea, LPDBTRANSINFO pTransInfo );
-static ERRCODE hb_dbfTransRec( DBFAREAP pArea, LPDBTRANSINFO pTransInfo );
+#define hb_dbfTransRec                             NULL
 static ERRCODE hb_dbfZap( DBFAREAP pArea );
 static ERRCODE hb_dbfChildEnd( DBFAREAP pArea, LPDBRELINFO pRelInfo );
 static ERRCODE hb_dbfChildStart( DBFAREAP pArea, LPDBRELINFO pRelInfo );
@@ -298,14 +293,15 @@ static ERRCODE hb_dbfOpenMemFile( DBFAREAP pArea, LPDBOPENINFO pOpenInfo );
 static ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea );
 static ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea );
 
-#define hb_dbfExit                         NULL
-static ERRCODE hb_dbfDrop( PHB_ITEM pItemTable );
+#define hb_dbfExit                                 NULL
+static ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex );
+static ERRCODE hb_dbfExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex );
+static ERRCODE hb_dbfRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem );
 
 #define hb_dbfWhoCares                             NULL
 
 #endif /* HB_EXTERNAL_RDDDBF_USE */
 
-extern BOOL HB_EXPORT  hb_dbfExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex );
 extern ULONG HB_EXPORT hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex );
 extern void  HB_EXPORT hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock );
 extern ERRCODE HB_EXPORT hb_dbfGetEGcode( ERRCODE errCode );

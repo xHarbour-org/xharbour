@@ -1,5 +1,5 @@
 /*
- * $Id: hsx.c,v 1.3 2005/04/24 11:25:42 druzus Exp $
+ * $Id: hsx.c,v 1.4 2005/04/25 19:22:15 druzus Exp $
  */
 
 /*
@@ -256,12 +256,6 @@
 #define HSX_RDDFAILURE     -25   /* RDD error */
 
 #define HSX_FILEEXT     ".hsx"
-
-/* exclusive mode emulation on POSIX systems */
-#ifdef OS_UNIX_COMPATIBLE
-#define HSX_EXLUSIVE_LOCKPOS              0x7fffffffUL
-#define HSX_EXLUSIVE_LOCKSIZE             1UL
-#endif
 
 #define HSXMAXKEY_SIZE  3     /* maximum key size */
 #define HSXDEFKEY_SIZE  2     /* default key size */
@@ -542,14 +536,6 @@ static int hb_hsxCompile( char * szExpr, PHB_ITEM * pExpr )
    }
    return HSX_SUCCESS;
 }
-
-#ifdef HSX_EXLUSIVE_LOCKPOS
-static BOOL hb_hsxAccess( FHANDLE hFile, BOOL fShared, BOOL fReadonly )
-{
-   return hb_fsLockLarge( hFile, HSX_EXLUSIVE_LOCKPOS, HSX_EXLUSIVE_LOCKSIZE,
-             FL_LOCK | ( fShared || fReadonly ? FLX_SHARED : FLX_EXCLUSIVE ) );
-}
-#endif
 
 static int hb_hsxEval( int iHandle, PHB_ITEM pExpr, BYTE *pKey, BOOL *fDeleted )
 {
@@ -1345,7 +1331,6 @@ static int hb_hsxCreate( char * szFile, int iBufSize, int iKeySize,
 {
    char szFileName[ _POSIX_PATH_MAX + 1 ], * szExpr = NULL;
    PHB_ITEM pKeyExpr = NULL;
-   PHB_FNAME pFileName;
    ULONG ulBufSize;
    USHORT uiRecordSize;
    LPHSXINFO pHSX;
@@ -1355,11 +1340,7 @@ static int hb_hsxCreate( char * szFile, int iBufSize, int iKeySize,
    if ( !szFile || ! *szFile )
       return HSX_BADPARMS;
 
-   pFileName = hb_fsFNameSplit( szFile );
-   if( ! pFileName->szExtension )
-      pFileName->szExtension = HSX_FILEEXT;
-   hb_fsFNameMerge( szFileName, pFileName );
-   hb_xfree( pFileName );
+   hb_strncpy( szFileName, szFile, _POSIX_PATH_MAX );
 
    if ( iKeySize < 1 || iKeySize > HSXMAXKEY_SIZE )
       iKeySize = HSXDEFKEY_SIZE;
@@ -1391,15 +1372,12 @@ static int hb_hsxCreate( char * szFile, int iBufSize, int iKeySize,
          pKeyExpr = hb_itemNew( pExpr );
    }
 
-   hFile = hb_spCreate( ( BYTE * ) szFileName, FC_NORMAL );
-#ifdef HSX_EXLUSIVE_LOCKPOS
-   if ( hFile != FS_ERROR && ! hb_hsxAccess( hFile, FALSE, FALSE ) )
-   {
-      hb_fsClose( hFile );
-      hFile = FS_ERROR;
-   }
-#endif
-   if ( hFile == FS_ERROR )
+   hFile = hb_fsExtOpen( ( BYTE * ) szFileName, ( BYTE * ) HSX_FILEEXT,
+                         FO_READWRITE | FO_EXCLUSIVE | FXO_TRUNCATE |
+                         FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
+                         NULL, NULL );
+
+   if( hFile == FS_ERROR )
    {
       if ( pKeyExpr )
          hb_hsxExpDestroy( pKeyExpr );
@@ -1440,7 +1418,6 @@ static int hb_hsxCreate( char * szFile, int iBufSize, int iKeySize,
 static int hb_hsxOpen( char * szFile, int iBufSize, int iMode )
 {
    char szFileName[ _POSIX_PATH_MAX + 1 ];
-   PHB_FNAME pFileName;
    BOOL fShared, fReadonly;
    FHANDLE hFile;
    ULONG ulBufSize;
@@ -1451,11 +1428,7 @@ static int hb_hsxOpen( char * szFile, int iBufSize, int iMode )
    if ( !szFile || ! *szFile )
       return HSX_BADPARMS;
 
-   pFileName = hb_fsFNameSplit( szFile );
-   if( ! pFileName->szExtension )
-      pFileName->szExtension = HSX_FILEEXT;
-   hb_fsFNameMerge( szFileName, pFileName );
-   hb_xfree( pFileName );
+   hb_strncpy( szFileName, szFile, _POSIX_PATH_MAX );
 
    ulBufSize = iBufSize * 1024;
    if ( ulBufSize == 0 )
@@ -1475,14 +1448,10 @@ static int hb_hsxOpen( char * szFile, int iBufSize, int iMode )
    uiFlags = ( fReadonly ? FO_READ : FO_READWRITE ) |
              ( fShared ? FO_DENYNONE : FO_EXCLUSIVE );
 
-   hFile = hb_spOpen( ( BYTE * ) szFileName, uiFlags );
-#ifdef HSX_EXLUSIVE_LOCKPOS
-   if ( hFile != FS_ERROR && ! hb_hsxAccess( hFile, fShared, fReadonly ) )
-   {
-      hb_fsClose( hFile );
-      hFile = FS_ERROR;
-   }
-#endif
+   hFile = hb_fsExtOpen( ( BYTE * ) szFileName, ( BYTE * ) HSX_FILEEXT,
+                         uiFlags | FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
+                         NULL, NULL );
+
    if ( hFile == FS_ERROR )
       return HSX_OPENERR;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.61 2005/05/24 21:05:56 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.62 2005/06/16 05:57:48 ronpinkas Exp $
  */
 
 /*
@@ -251,8 +251,8 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_errNew()"));
 
    if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym &&
-      (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 &&
-      (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
+       (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 &&
+       (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
    {
       szModuleName = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName;
    }
@@ -604,7 +604,7 @@ char HB_EXPORT * hb_errGetDescription( PHB_ITEM pError )
    hb_vmPush( pError );
    hb_vmSend( 0 );
 
-   return HB_VM_STACK.Return.item.asString.value;
+   return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
 }
 
 PHB_ITEM HB_EXPORT hb_errPutDescription( PHB_ITEM pError, const char * szDescription )
@@ -632,7 +632,7 @@ char HB_EXPORT * hb_errGetFileName( PHB_ITEM pError )
    hb_vmPush( pError );
    hb_vmSend( 0 );
 
-   return HB_VM_STACK.Return.item.asString.value;
+   return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
 }
 
 PHB_ITEM HB_EXPORT hb_errPutFileName( PHB_ITEM pError, const char * szFileName )
@@ -691,7 +691,7 @@ char HB_EXPORT * hb_errGetOperation( PHB_ITEM pError )
    hb_vmPush( pError );
    hb_vmSend( 0 );
 
-   return HB_VM_STACK.Return.item.asString.value;
+   return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
 }
 
 PHB_ITEM HB_EXPORT hb_errPutOperation( PHB_ITEM pError, const char * szOperation )
@@ -791,7 +791,7 @@ char HB_EXPORT * hb_errGetSubSystem( PHB_ITEM pError )
    hb_vmPush( pError );
    hb_vmSend( 0 );
 
-   return HB_VM_STACK.Return.item.asString.value ;
+   return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
 }
 
 PHB_ITEM HB_EXPORT hb_errPutSubSystem( PHB_ITEM pError, const char * szSubSystem )
@@ -816,7 +816,7 @@ char HB_EXPORT * hb_errGetProcName( PHB_ITEM pError )
    hb_vmPush( pError );
    hb_vmSend( 0 );
 
-   return HB_VM_STACK.Return.item.asString.value ;
+   return hb_itemGetCPtr( &(HB_VM_STACK.Return) );
 }
 
 PHB_ITEM HB_EXPORT hb_errPutProcName( PHB_ITEM pError, const char * szProcName )

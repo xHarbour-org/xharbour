@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.23 2005/06/01 18:24:52 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.24 2005/06/02 01:47:25 druzus Exp $
  */
 
 /*
@@ -70,6 +70,8 @@
 #  undef HB_PRG_PCODE_VER
 #  define HB_PRG_PCODE_VER HB_PCODE_VER
 #endif
+
+static char   s_szMemoExt[ HB_MAX_FILE_EXT + 1 ] = DBT_MEMOEXT;
 
 static RDDFUNCS dbtSuper;
 static RDDFUNCS dbtTable =
@@ -207,9 +209,10 @@ static RDDFUNCS dbtTable =
 
 
    /* non WorkArea functions       */
-   ( DBENTRYP_I0 )    hb_dbtExit,
-   ( DBENTRYP_I1 )    hb_dbtDrop,
-   ( DBENTRYP_I2 )    hb_dbtExists,
+   ( DBENTRYP_R )     hb_dbtExit,
+   ( DBENTRYP_RVV )   hb_dbtDrop,
+   ( DBENTRYP_RVV )   hb_dbtExists,
+   ( DBENTRYP_RSLV )  hb_dbtRddInfo,
 
    /* Special and reserved methods */
 
@@ -510,11 +513,15 @@ static ERRCODE hb_dbtInfo( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    switch( uiIndex )
    {
       case DBI_MEMOEXT:
-         hb_itemPutC( pItem, DBT_MEMOEXT );
+         hb_itemPutC( pItem, s_szMemoExt );
          break;
 
       case DBI_MEMOBLOCKSIZE:
          hb_itemPutNI( pItem, DBT_BLOCKSIZE );
+         break;
+
+      case DBI_MEMOTYPE:
+         hb_itemPutNI( pItem, 0 );
          break;
 
       /* case DBI_RDD_VERSION */
@@ -676,7 +683,10 @@ static ERRCODE hb_dbtCreateMemFile( DBTAREAP pArea, LPDBOPENINFO pCreateInfo )
       /* Try create */
       do
       {
-         pArea->hMemoFile = hb_spCreate( pCreateInfo->abName, FC_NORMAL );
+         pArea->hMemoFile = hb_fsExtOpen( pCreateInfo->abName, NULL,
+                                          FO_READWRITE | FO_EXCLUSIVE | FXO_TRUNCATE |
+                                          FXO_DEFAULTS | FXO_SHARELOCK,
+                                          NULL, pError );
          if( pArea->hMemoFile == FS_ERROR )
          {
             if( !pError )
@@ -733,7 +743,9 @@ static ERRCODE hb_dbtOpenMemFile( DBTAREAP pArea, LPDBOPENINFO pOpenInfo )
    /* Try open */
    do
    {
-      pArea->hMemoFile = hb_spOpen( pOpenInfo->abName, uiFlags );
+      pArea->hMemoFile = hb_fsExtOpen( pOpenInfo->abName, NULL, uiFlags |
+                                       FXO_DEFAULTS | FXO_SHARELOCK,
+                                       NULL, pError );
       if( pArea->hMemoFile == FS_ERROR )
       {
          if( !pError )
@@ -791,4 +803,45 @@ static ERRCODE hb_dbtWriteDBHeader( DBTAREAP pArea )
       pArea->bVersion = 0x83;
    }
    return SUPER_WRITEDBHEADER( ( AREAP ) pArea );
+}
+
+/*
+ * Retrieve (set) information about RDD
+ * ( DBENTRYP_RSLV )   hb_dbtFieldInfo
+ */
+static ERRCODE hb_dbtRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbtRddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnect, pItem));
+
+   switch( uiIndex )
+   {
+      case RDDI_MEMOEXT:
+      {
+         char * szMemoExt = hb_strdup( s_szMemoExt ), *szNew;
+
+         szNew = hb_itemGetCPtr( pItem );
+         if( szNew[0] == '.' && szNew[1] )
+            hb_strncpy( s_szMemoExt, szNew, HB_MAX_FILE_EXT );
+         hb_itemPutCPtr( pItem, szMemoExt, strlen( szMemoExt ) );
+         break;
+      }
+      case RDDI_MEMOBLOCKSIZE:
+         hb_itemPutNI( pItem, DBT_BLOCKSIZE );
+         break;
+
+      case RDDI_MEMOTYPE:
+      case RDDI_MEMOGCTYPE:
+         hb_itemPutNI( pItem, 0 );
+         break;
+
+      case RDDI_MEMOREADLOCK:
+      case RDDI_MEMOREUSE:
+         hb_itemPutL( pItem, FALSE );
+         break;
+
+      default:
+         return SUPER_RDDINFO( pRDD, uiIndex, ulConnect, pItem );
+   }
+
+   return SUCCESS;
 }

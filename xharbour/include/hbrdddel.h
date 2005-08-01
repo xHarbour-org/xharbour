@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddel.h,v 1.2 2003/09/08 12:56:52 druzus Exp $
+ * $Id: hbrdddel.h,v 1.3 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -155,6 +155,7 @@ HB_EXTERN_BEGIN
 #define hb_delimExit                                 NULL
 #define hb_delimDrop                                 NULL
 #define hb_delimExists                               NULL
+#define hb_delimRddInfo                              NULL
 #define hb_delimWhoCares                             NULL
 
 HB_EXTERN_END

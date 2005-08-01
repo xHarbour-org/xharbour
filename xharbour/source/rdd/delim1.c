@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.8 2005/02/27 11:56:02 andijahja Exp $
+ * $Id: delim1.c,v 1.9 2005/02/28 10:17:31 andijahja Exp $
  */
 
 /*
@@ -178,6 +178,7 @@ static RDDFUNCS delimTable = { hb_delimBof,
                                hb_delimExit,
                                hb_delimDrop,
                                hb_delimExists,
+                               hb_delimRddInfo,
                                hb_delimWhoCares
                              };
 

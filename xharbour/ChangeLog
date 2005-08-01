@@ -1,10 +1,306 @@
- * $Id: ChangeLog,v 1.4239 2005/08/01 13:51:37 jacekp Exp $
+/*
+ * $Id: ChangeLog,v 1.4240 2005/08/01 16:09:57 bdj Exp $
+ */
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-02 00:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+    + store RDD ID in static variable
+    + allow ACE library to select default alias to not force xHarbour
+      convention which can be incompatible with ADS
+    * keep database open after CREATE() method - Clipper compatible
+    + modified to keep compatibility with base RDD modifications
+    + added basic RDDINFO() support - please add other actions
+      TODO: RDDDROP() and RDDEXISTS() should use ADS API
+
+  * xharbour/include/dbinfo.ch
+    + added RDDI_* definitions for non workarea RDDINFO() method,
+         RDDI_ISDBF         - Does this RDD support DBFs?
+         RDDI_CANPUTREC     - Can this RDD Put Records?
+         RDDI_DELIMITER     - The field delimiter (as a string)
+         RDDI_SEPARATOR     - The record separator (as a string)
+
+         RDDI_TABLEEXT      - Default data file's file extension
+         RDDI_MEMOEXT       - Default memo file's file extension
+         RDDI_ORDBAGEXT     - Default multi tag index's file extension
+         RDDI_ORDEREXT      - default single tag index's file extension
+         RDDI_ORDSTRUCTEXT  - default single tag index's file extension
+
+         RDDI_LOCAL         - Local file access?
+         RDDI_REMOTE        - Remote table access?
+         RDDI_CONNECTION    - Get/Set default connection
+         RDDI_TABLETYPE     - Type of table file
+         RDDI_MEMOTYPE      - Type of MEMO file: DBT, SMT, FPT(FP,SIX3,FLEXIII)
+         RDDI_LARGEFILE     - Is large file size (>=4GB) supported
+         RDDI_LOCKSCHEME    - Locking scheme used by RDD
+         RDDI_RECORDMAP     - Does RDD support record map functionality?
+         RDDI_ENCRYPTION    - Does RDD support encryption
+         RDDI_TRIGGERS      - Get/Set default trigger function
+         RDDI_AUTOLOCK      - automatic locking on update
+
+         RDDI_STRUCTORD     - Are structural indexes supported
+         RDDI_STRICTREAD    - Flag for avoiding RDD hierarchy and using a bigger buffer when indexing
+         RDDI_STRICTSTRUCT  - Flag for strict structural order checking
+         RDDI_OPTIMIZE      - Flag for whether to use query optimization
+         RDDI_FORCEOPT      - Flag for forcing linear optimization
+         RDDI_AUTOOPEN      - Flag for automatically opening structural indexes
+         RDDI_AUTOORDER     - When a structural index is opened, the order to be set
+         RDDI_AUTOSHARE     - When a network is detected, open the index shared, otherwise open exclusively
+         RDDI_MULTITAG      - Does RDD support multi tag in index file
+         RDDI_SORTRECNO     - Is record number part of key in sorting
+         RDDI_MULTIKEY      - Does custom orders support repeated keys?
+
+         RDDI_MEMOBLOCKSIZE - Memo File's block size
+         RDDI_MEMOGCTYPE    - type of garbage collector used by GC
+         RDDI_MEMOREADLOCK  - use read lock in memo file access
+         RDDI_MEMOREUSE     - reuse free space on write
+
+      Please add other RDDI_* actions if necessary, f.e. transaction
+      control or some specific operation for remote RDD like setting
+      connection parameters
+
+    + added some new DBOI_* and DBI_* definitions:
+         DBOI_TEMPLATE           - order with free user keys
+         DBOI_MULTIKEY           - custom order with multikeys
+         DBOI_PARTIAL            - is index partially updated
+         DBOI_SHARED             - is index open in shared mode
+         DBOI_ISREADONLY         - is index open in readonly mode
+         DBOI_WRITELOCK          - get/set index write lock
+         DBOI_UPDATECOUNTER      - get/set update index counter
+         DBI_MEMOTYPE            - Type of MEMO file: DBT, SMT, FPT
+         DBI_SEPARATOR           - The record separator (as a string)
+
+  * xharbour/include/hbapifs.h
+    + added FXO_UNIQUE (Clipper compatible), FXO_SHARELOCK (emulate
+      DOS SH_DENY* mode in POSIX OS) and FXO_COPYNAME (copy final szPath
+      into pFilename in hb_fsExtOpen - to reduce overhead in xHarbour
+      error system in comparison to Clipper static one)
+    + added HB_USE_SHARELOCKS[_OFF]/HB_SHARELOCK_POS/HB_SHARELOCK_SIZE
+      macros to control DOS SH_DENY* mode emulation in POSIX systems
+    + added HB_DRIVE_LENGTH_MAX and HB_MAX_FILE_EXT macros
+    + added hb_fsFreeSearchPath() function
+
+  * xharbour/include/hbapirdd.h
+    + added ulConnection member to DBOPENINFO structure
+    * changed LONG lStartRecno, lRecno to PHB_ITEM itmStartRecID, itmRecID
+      in DBORDERCONDINFO for full RecID support
+    + added fScoped, fCompound, fUseFilter, fTemporary, fExclusive members
+      to DBORDERCONDINFO structure
+    + added lpvCargo to DBFILTERINFO structure
+    * changed non WA methods' (RDDNODE methods) type definitions from
+      DBENTRYP_I[0-2] to DBENTRYP_R*
+    + added RDDNODE parameter to non WA methods
+    + added RDDINFO() method
+    + added hb_rddGetNode( USHORT uiNode ) function
+
+  * xharbour/include/hbrddcdx.h
+    + added RDDINFO() method
+
+  * xharbour/include/hbrdddbf.h
+    + added TRANSREC() method
+    - removed DBF_EXLUSIVE_LOCKPOS/DBF_EXLUSIVE_LOCKSIZE - no longer
+      necessary, replaced by global HB_SHARELOCK_POS/HB_SHARELOCK_SIZE
+      used in hb_fsExtOpen()
+    + added RDDINFO() method
+    + modified to keep compatibility with base RDD modifications
+
+  * xharbour/include/hbrdddbt.h
+  * xharbour/include/hbrddfpt.h
+  * xharbour/include/hbrdddel.h
+  * xharbour/include/hbrddsdf.h
+    + added RDDINFO() method
+
+  * xharbour/include/hbrddwrk.h
+    + added default OPEN() method - it should be called by RDD as supper
+      method from OPEN() on success - Clipper compatible
+    + added default CREATE() method - as above
+
+  * xharbour/source/common/hbarch.c
+    ! casting for some compilers which does not support
+      UINT64 -> double conversion
+
+  * xharbour/source/common/hbfsapi.c
+    + added hb_fsFreeSearchPath()
+    * changed hb_fsFNameSplit() to respect HB_DRIVE_LENGTH_MAX and
+      fixed some possible buffer overflow
+
+  * xharbour/source/pp/pptable.c
+    * added exteneded INDEX ON parameters (TEMPORARY/EXCLUSIVE/FILTERON)
+
+  * xharbour/source/compiler/harbour.sly
+    - removed unused s_bSetGet
+
+  * xharbour/source/rdd/dbcmd.c
+    + added non WA method hb_waRddUnsupported()
+    + added RDDINFO() function
+    + added hb_rddGetNode( USHORT uiNode ) function
+    + send RDD ID as forth parameter to *_GETFUNCTABLE()
+    + added support for empty aliases (Clipper compatible)
+    + added hb_rddFieldSymIndex()
+    + added hb_rddFieldNameIndex() - like hb_rddFieldIndex() but it
+      uses hb_dynsymFindName() to hash filed name
+    + added hb_rddFieldExpIndex() - check if expression is a single
+      field name in given WA (strips aliases and [_]FILED->) and return
+      field number or 0
+    + added hb_rddOpenTable() and hb_rddCreateTable()
+    + added hb_fldStructure(), hb_tblStructure()
+    + added hb_rddTransRecords()
+    * changed __DBAPP() and __DBCOPY() to use hb_rddTransRecords()
+      old code removed, current one should be much faster and can
+      be optimized by RDD to execute on server side
+    * modified 4-th anf 5-th parameters in DBCREATE to be Clipper compatible
+    + added empty alias support in DBCREATE()/DBUSEAREA()
+    + do not make any modifications in given file name and alias in
+      DBCREATE() and DBUSEAREA() - it should be done by RDD inf necessary
+    - removed DBUSEAREAD() - it's no longer necessary
+    % optimized AFIELDS(), DBSTRUCT(), 
+    ! fixed return value when NETERR() called with logical parameter
+    + added support for new parameters in ORDCONDSET() the full syntax is:
+      ordCondSet( cFor, bFor, lAll, bWhile, bEval, ;
+                  nStep, xStart, nNext, xRecord, lRest,
+                  lDescend, lCompound, lAdditive, lCurrent, lCustom,
+                  lNoOptimize, cWhile, lTemporary, lUseFilter, lExclusive )
+      or
+         INDEX ON ... [MEMORY|TEMPORARY] [EXCLUSIVE] [FILTERON]
+    + added ORDBAGCLEAR() - close selected indexes by calling ORDLSTDELETE()
+      RDD method
+    * ORDDESTROY() returns TRUE (when SUCCESS) or FALSE now
+    * updated DBDROP() and DBEXISTS()
+
+  * xharbour/source/rdd/dbf1.c
+    * use hb_fsExtOpen() only to open/create files (Clipper compatible)
+    * call SUPER_OPEN()/SUPER_CREATE() in OPEN()/CREATE() methods
+    * make all necessary modifications to given file names (code removed
+      from dbUseArea()/dbCreate()) if nexessary in OPEN()/CREATE() methods
+    + added RDDINFO() method
+    + added support for switchable table extension
+    - removed hb_dbfTransRec() - new default WA implementation for this
+      method is enough
+    * reimplemented DBEXISTS() and DBDROP() - now to remove table with its
+      memofile(s) and production indexe(s) is enough to call:
+         dbDrop( cTable )
+      to remove index only:
+         dbDrop( cTable, cIndex )
+      (DBF RDD ignores in such case cTable paramter but other RDDs may
+      need it)
+      To check if table exists use:
+         dbExists( cTable )
+      and to check if index exists use:
+         dbExists( cTable, cIndex )
+      (as above DBF RDD ignores cTable)
+
+  * xharbour/source/rdd/delim1.c
+  * xharbour/source/rdd/sdf1.c
+    + added RDDINFO() method
+
+  * xharbour/source/rdd/workarea.c
+    + added default OPEN() method - it should be called by RDD as supper
+      method from OPEN() on success - Clipper compatible
+    + added default CREATE() method - as above
+    + added TRANS() method
+    + added TRANSREC() method
+    + added RDDINFO() method with default actions for already defined
+      RDDI_* values
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    + added RDDINFO() method
+    * use hb_fsExtOpen() only to open/create files
+    + modified to keep compatibility with base RDD modifications
+
+  * xharbour/include/hbrddntx.h
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    - removed hack in ORDCONDINFO() method - no longer necessary due to
+      new members in DBORDERCONDINFO structure
+    + added RDDINFO() method
+    + added full support for structural and production indexes
+      (AUTOOPEN/AUTOORDER)
+    + added write buffer in indexing and tuned memory buffer size - it
+      should speedup a little bit indexing
+    + added EXCLUSIVE and temporary indexes
+         if you want to create custom index which will be deleted when
+         closed (by dbCloseArea()/ordDestroy()/ordBagClear()) then just
+         simply make:
+            index on <exp> tag <tagName> memory
+         and DBFNTX create index in exclusive mode in local temporary
+         file or in memory
+         See also new ordCondSet() parameters
+         Indexes open in exclusive mode will work much faster then in
+         shared one because index locking and concurrent file access
+         checking is eliminated
+    + added support for SIX3 like index thermometer
+    + added support for template indexes
+    + adde multikey custom indexes (the same key and record can be
+      stored more then once)
+    * use hb_fsExtOpen() only to open/create files
+    + modified to keep compatibility with base RDD modifications
+    + added switchable index file extension (.ntx by default)
+         rddInfo( RDDI_ORDBAGEXT, [<cNewExt>] ) -> <cOldExt>
+    + added switchable record number sorting in index files (off by default)
+         rddInfo( RDDI_SORTRECNO, <lSort> ) -> <lOldVal>
+      This option bound index key with record number like in CDX format.
+      It means that all keys are always unique what resolves the performance
+      problem with inefficient index update or positioning after GOTO in
+      standard NTX
+    + added switchable large file support (up to 4 TB) (off by default)
+         rddInfo( RDDI_LARGEFILE, <lLarge> ) -> <lOldVal>
+      It increase maximum file size from 4GB to 4TB but such indexes cannot
+      be read by standard Clipper RDDs
+    + added switchable multitag support (on by default)
+         rddInfo( RDDI_MULTITAG, <lMultiTag> ) -> <lOldVal>
+    + added switchable production index support (off by default)
+         rddInfo( RDDI_STRUCTORD, <lStruct> ) -> <lOldVal>
+      Now DBFNTX can be tuned by user, f.e. by the following code
+      at application startup change DBFNTX behavior to exactly the same
+      as DBFCDX with all DBFCDX features and some other not implemented
+      yet in DBFCDX. User should notice only one difference. The index
+      file will be longer and of course not binary compatible (they
+      still uses NTX format)
+         rddSetDefault( "DBFNTX" )
+         rddInfo( RDDI_ORDBAGEXT, ".cdx" )
+         rddInfo( RDDI_MULTITAG, .t. )
+         rddInfo( RDDI_STRUCTORD, .t. )
+         rddInfo( RDDI_SORTRECNO, .t. )
+      I would like to ask other developers and xharbour users using DBFCDX
+      in their programs to make some test with this code. If you notice
+      any difference to DBFCDX (other then file size and RDD name ;-))
+      please inform me.
+      Now DBFNTX is finished for me (maybe I'll add some minor modification
+      and of course any bug fixing). DBFCDX should be updated also (many
+      of new features is missing now) but I haven't decided when I'll do
+      that - maybe I'll implement DBFNSX first.
+
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * use hb_fsExtOpen() only to open/create files
+    + added switchable memo file extension
+
+  * xharbour/source/rdd/hsx/hsx.c
+    * use hb_fsExtOpen() only to open/create files
+
+  * xharbour/source/rtl/filesys.c
+    * common for all compilers create/open flag translation
+    + implemented hb_fsExtOpen() - it should be full Clipper
+      compatible with some minor extensions
+      Local RDDs should use only this function to open/create files
+
+  * xharbour/source/rtl/fstemp.c
+    * formatting
+
+  * xharbour/source/rtl/set.c
+    * use hb_fsFreeSearchPath()
+
+  * xharbour/source/vm/errorapi.c
+    ! fix GPF when user code change type of some error object items
+
+  * xharbour/utils/xbscript/xbscript.prg
+    * renamed Main() function to _AppMain() - this undocumented Clipper
+      feature supported by xHarbour should resolve the problem with name
+      conflict when Main() is used by evaluated script
 
 2005-08-01 23:15 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/gtwvw.c

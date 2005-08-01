@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbt.h,v 1.6 2003/11/30 12:32:30 druzus Exp $
+ * $Id: hbrdddbt.h,v 1.7 2005/05/12 00:39:24 druzus Exp $
  */
 
 /*
@@ -186,6 +186,7 @@ static ERRCODE hb_dbtWriteDBHeader( DBTAREAP pArea );
 #define hb_dbtExit                                 NULL
 #define hb_dbtDrop                                 NULL
 #define hb_dbtExists                               NULL
+static ERRCODE hb_dbtRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem );
 #define hb_dbtWhoCares                             NULL
 
 HB_EXTERN_END

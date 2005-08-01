@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbarch.c,v 1.1 2005/06/22 15:30:16 druzus Exp $
  */
 
 /*
@@ -130,8 +130,8 @@ double HB_EXPORT hb_get_ieee754( BYTE * ptr )
 
    l1 = HB_GET_LE_UINT32( ptr );
    l2 = HB_GET_LE_UINT32( ptr + 4 );
-   iSig = ( l2 >> ( HB_MANTISSA_BITS + HB_EXPONENT_BITS - 32 ) ) & 1;
-   iExp = ( ( l2 >> ( HB_MANTISSA_BITS - 32 ) ) & HB_EXPONENT_MASK );
+   iSig = ( int ) ( l2 >> ( HB_MANTISSA_BITS + HB_EXPONENT_BITS - 32 ) ) & 1;
+   iExp = ( int ) ( ( l2 >> ( HB_MANTISSA_BITS - 32 ) ) & HB_EXPONENT_MASK );
    l2 &= ( ( UINT32 ) 1 << ( HB_MANTISSA_BITS - 32 ) ) - 1;
 
    if( ( l1 | l2 | iExp ) != 0 )
@@ -145,13 +145,17 @@ double HB_EXPORT hb_get_ieee754( BYTE * ptr )
    HB_TRACE(HB_TR_DEBUG, ("hb_get_ieee754(%p)", ptr));
 
    ll = HB_GET_LE_UINT64( ptr );
-   iSig = ( ll >> ( HB_MANTISSA_BITS + HB_EXPONENT_BITS ) ) & 1;
-   iExp = ( ( ll >> HB_MANTISSA_BITS ) & HB_EXPONENT_MASK );
+   iSig = ( int ) ( ll >> ( HB_MANTISSA_BITS + HB_EXPONENT_BITS ) ) & 1;
+   iExp = ( int ) ( ( ll >> HB_MANTISSA_BITS ) & HB_EXPONENT_MASK );
    ll &= HB_MANTISSA_MASK;
    if( ( ll | iExp ) != 0 )
       ll |= ( UINT64 ) 1 << HB_MANTISSA_BITS;
-   return ldexp( iSig ? -( double ) ll : ( double ) ll, iExp -
-                 HB_MANTISSA_BITS - HB_EXPONENT_ADD );
+   /* the casting form UINT64 to INT64 is necessary for some
+      compilers which does not support UINT64 -> double conversion
+      It will not change results because there is only up to 53bits
+      set in mantissa */
+   return ldexp( iSig ? -( double ) ( INT64 ) ll : ( double ) ( INT64 ) ll,
+                 iExp - HB_MANTISSA_BITS - HB_EXPONENT_ADD );
 #endif
 }
 

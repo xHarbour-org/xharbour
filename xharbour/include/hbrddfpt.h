@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.14 2005/05/12 00:39:24 druzus Exp $
+ * $Id: hbrddfpt.h,v 1.15 2005/05/19 02:20:15 druzus Exp $
  */
 
 /*
@@ -311,6 +311,7 @@ static ERRCODE hb_fptWriteDBHeader( FPTAREAP pArea );
 #define hb_fptExit                                 NULL
 #define hb_fptDrop                                 NULL
 #define hb_fptExists                               NULL
+static ERRCODE hb_fptRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem );
 #define hb_fptWhoCares                             NULL
 
 HB_EXTERN_END

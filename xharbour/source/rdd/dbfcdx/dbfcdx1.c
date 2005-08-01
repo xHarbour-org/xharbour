@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.207 2005/06/01 18:24:52 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.208 2005/06/22 15:30:36 druzus Exp $
  */
 
 /*
@@ -140,6 +140,10 @@ static int hb_cdxPageRootSplit( LPCDXPAGE pPage );
 /* free create index structur */
 static void hb_cdxSortFree( LPCDXSORTINFO pSort );
 
+
+static char   s_szIndexExt[ HB_MAX_FILE_EXT + 1 ] = CDX_INDEXEXT;
+static USHORT s_uiRddId;
+
 static RDDFUNCS cdxSuper;
 static RDDFUNCS cdxTable =
 {
@@ -276,9 +280,10 @@ static RDDFUNCS cdxTable =
 
 
    /* non WorkArea functions       */
-   ( DBENTRYP_I0 )    hb_cdxExit,
-   ( DBENTRYP_I1 )    hb_cdxDrop,
-   ( DBENTRYP_I2 )    hb_cdxExists,
+   ( DBENTRYP_R )     hb_cdxExit,
+   ( DBENTRYP_RVV )   hb_cdxDrop,
+   ( DBENTRYP_RVV )   hb_cdxExists,
+   ( DBENTRYP_RSLV )  hb_cdxRddInfo,
 
 
    /* Special and reserved methods */
@@ -293,25 +298,34 @@ HB_FUNC( _SIXCDX ) {;}
 HB_FUNC( SIXCDX_GETFUNCTABLE )
 {
    RDDFUNCS * pTable;
-   USHORT * uiCount;
+   USHORT * uiCount, uiRddId;
 
    uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
    pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
+   uiRddId = hb_parni( 4 );
 
    HB_TRACE(HB_TR_DEBUG, ("SIXCDX_GETFUNCTABLE(%i, %p)", uiCount, pTable));
 
    if ( pTable )
    {
-      SHORT iRet;
+      ERRCODE errCode;
 
       if ( uiCount )
          * uiCount = RDDFUNCSCOUNT;
-      iRet = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFFPT" );
-      if ( iRet == FAILURE )
-         iRet = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFDBT" );
-      if ( iRet == FAILURE )
-         iRet = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBF" );
-      hb_retni( iRet );
+      errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFFPT" );
+      if ( errCode != SUCCESS )
+         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFDBT" );
+      if ( errCode != SUCCESS )
+         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBF" );
+      hb_retni( errCode );
+      if ( errCode == SUCCESS )
+      {
+         /*
+          * we successfully register our RDD so now we can initialize it
+          * You may think that this place is RDD init statement, Druzus
+          */
+         s_uiRddId = uiRddId;
+      }
    }
    else
       hb_retni( FAILURE );
@@ -330,25 +344,34 @@ HB_FUNC( _DBFCDX ) {;}
 HB_FUNC( DBFCDX_GETFUNCTABLE )
 {
    RDDFUNCS * pTable;
-   USHORT * uiCount;
+   USHORT * uiCount, uiRddId;
 
    uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
    pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
+   uiRddId = hb_parni( 4 );
 
    HB_TRACE(HB_TR_DEBUG, ("DBFCDX_GETFUNCTABLE(%i, %p)", uiCount, pTable));
 
    if ( pTable )
    {
-      SHORT iRet;
+      ERRCODE errCode;
 
       if ( uiCount )
          * uiCount = RDDFUNCSCOUNT;
-      iRet = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFFPT" );
-      if ( iRet == FAILURE )
-         iRet = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFDBT" );
-      if ( iRet == FAILURE )
-         iRet = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBF" );
-      hb_retni( iRet );
+      errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFFPT" );
+      if ( errCode != SUCCESS )
+         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFDBT" );
+      if ( errCode != SUCCESS )
+         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBF" );
+      if ( errCode == SUCCESS )
+      {
+         /*
+          * we successfully register our RDD so now we can initialize it
+          * You may think that this place is RDD init statement, Druzus
+          */
+         s_uiRddId = uiRddId;
+      }
+      hb_retni( errCode );
    }
    else
       hb_retni( FAILURE );
@@ -6683,15 +6706,15 @@ static ERRCODE hb_cdxOpen( CDXAREAP pArea, LPDBOPENINFO pOpenInfo )
    if ( pArea->fHasTags && hb_set.HB_SET_AUTOPEN )
 #endif
    {
-      char szFileName[ _POSIX_PATH_MAX + 1 ], szSpFile[ _POSIX_PATH_MAX + 1 ];
+      char szFileName[ _POSIX_PATH_MAX + 1 ];
 
       hb_cdxCreateFName( pArea, NULL, szFileName, NULL );
-      if ( hb_spFile( ( BYTE * ) szFileName, ( BYTE * ) szSpFile ) )
+      if ( hb_spFile( ( BYTE * ) szFileName, NULL ) )
       {
          DBORDERINFO pOrderInfo;
 
          pOrderInfo.itmResult = hb_itemPutNI( NULL, 0 );
-         pOrderInfo.atomBagName = hb_itemPutC( NULL, szSpFile );
+         pOrderInfo.atomBagName = hb_itemPutC( NULL, szFileName );
          pOrderInfo.itmNewVal = NULL;
          pOrderInfo.itmOrder  = NULL;
          errCode = SELF_ORDLSTADD( ( AREAP ) pArea, &pOrderInfo );
@@ -6807,7 +6830,7 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
    USHORT uiFlags;
    FHANDLE hFile;
    char szBaseName[ CDX_MAXTAGNAMELEN ];
-   char szSpFile[ _POSIX_PATH_MAX + 1 ], szFileName[ _POSIX_PATH_MAX + 1 ];
+   char szFileName[ _POSIX_PATH_MAX + 1 ];
    LPCDXINDEX pIndex, * pIndexPtr;
    BOOL bRetry;
 
@@ -6842,19 +6865,20 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
              ( pArea->fShared ? FO_DENYNONE : FO_EXCLUSIVE );
    do
    {
-      hb_spFile( ( BYTE * ) szFileName, ( BYTE * ) szSpFile );
-      hFile = hb_spOpen( ( BYTE * ) szSpFile , uiFlags );
-      if ( hFile == FS_ERROR )
-         bRetry = ( hb_cdxErrorRT( pArea, EG_OPEN, 1003, szSpFile,
+      hFile = hb_fsExtOpen( ( BYTE * ) szFileName, NULL, uiFlags |
+                            FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
+                            NULL, NULL );
+      if( hFile == FS_ERROR )
+         bRetry = ( hb_cdxErrorRT( pArea, EG_OPEN, 1003, szFileName,
                                    hb_fsError(), EF_CANRETRY | EF_CANDEFAULT ) == E_RETRY );
       else
       {
-         if ( hb_fsSeekLarge( hFile, 0, FS_END ) <= ( HB_FOFFSET ) sizeof( CDXTAGHEADER ) )
+         if( hb_fsSeekLarge( hFile, 0, FS_END ) <= ( HB_FOFFSET ) sizeof( CDXTAGHEADER ) )
          {
             hb_fsClose( hFile );
             hFile = FS_ERROR;
             hb_cdxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT,
-                           szSpFile, hb_fsError(), EF_CANDEFAULT );
+                           szFileName, hb_fsError(), EF_CANDEFAULT );
          }
          bRetry = FALSE;
       }
@@ -6870,7 +6894,7 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
    pIndex->hFile      = hFile;
    pIndex->fShared    = pArea->fShared;
    pIndex->fReadonly  = pArea->fReadonly;
-   pIndex->szFileName = hb_strdup( szSpFile );
+   pIndex->szFileName = hb_strdup( szFileName );
 
    pIndexPtr = &pArea->lpIndexes;
    while ( *pIndexPtr != NULL )
@@ -6883,7 +6907,7 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
       *pIndexPtr = NULL;
       hb_cdxIndexFree( pIndex );
       hb_cdxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT,
-                     szSpFile, hb_fsError(), EF_CANDEFAULT );
+                     szFileName, hb_fsError(), EF_CANDEFAULT );
       return FAILURE;
    }
 
@@ -7012,7 +7036,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    BOOL fNewFile, fOpenedIndex, fProd = FALSE;
    PHB_ITEM pKeyExp, pForExp, pResult;
    char szCpndTagName[ CDX_MAXTAGNAMELEN + 1 ], szTagName[ CDX_MAXTAGNAMELEN + 1 ];
-   char szFileName[ _POSIX_PATH_MAX + 1 ], szSpFile[ _POSIX_PATH_MAX + 1 ];
+   char szFileName[ _POSIX_PATH_MAX + 1 ];
    LPCDXINDEX pIndex;
    LPCDXTAG pTag;
    USHORT uiLen;
@@ -7180,25 +7204,20 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
 
       do
       {
-         if ( ! hb_spFile( ( BYTE * ) szFileName, ( BYTE * ) szSpFile ) )
-         {
-            fNewFile = TRUE;
-         }
-
-         if ( fNewFile )
-         {
-            hFile = hb_spCreate( ( BYTE * ) szSpFile, FC_NORMAL );
-         }
-         else
-         {
-            hFile = hb_spOpen( ( BYTE * ) szSpFile,
-                               FO_READWRITE | ( pArea->fShared ? FO_DENYNONE : FO_EXCLUSIVE ) );
-         }
-         if ( hFile == FS_ERROR )
-            bRetry = ( hb_cdxErrorRT( pArea, EG_CREATE, EDBF_CREATE, szSpFile,
+         hFile = hb_fsExtOpen( ( BYTE * ) szFileName, NULL, FO_READWRITE |
+                               ( pArea->fShared ? FO_DENYNONE : FO_EXCLUSIVE ) |
+                               ( fNewFile ? FXO_TRUNCATE : FXO_APPEND ) |
+                               FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
+                               NULL, NULL );
+         if( hFile == FS_ERROR )
+            bRetry = ( hb_cdxErrorRT( pArea, EG_CREATE, EDBF_CREATE, szFileName,
                                       hb_fsError(), EF_CANRETRY | EF_CANDEFAULT ) == E_RETRY );
          else
+         {
             bRetry = FALSE;
+            if ( !fNewFile )
+               fNewFile = ( hb_fsSeekLarge( hFile, 0, FS_END ) == 0 );
+         }
 
       } while ( bRetry );
 
@@ -7208,14 +7227,8 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          pIndex->hFile      = hFile;
          pIndex->fShared    = pArea->fShared;
          pIndex->fReadonly  = FALSE;
-         pIndex->szFileName = hb_strdup( szSpFile );
+         pIndex->szFileName = hb_strdup( szFileName );
 
-         if ( !fNewFile )
-         {
-            /* TODO: check if index file is not corrupted */
-            /* cut corrupted files */
-            fNewFile = ( hb_fsSeekLarge( hFile, 0, FS_END ) <= ( HB_FOFFSET ) sizeof( CDXTAGHEADER ) );
-         }
          if ( !fNewFile )
          {
             /* index file is corrupted? */
@@ -7227,7 +7240,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
                hb_fsClose( hFile );
                hFile = FS_ERROR;
                hb_cdxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT,
-                              szSpFile, hb_fsError(), EF_CANDEFAULT );
+                              szFileName, hb_fsError(), EF_CANDEFAULT );
                */
                hb_cdxIndexFreeTags( pIndex );
                fNewFile = TRUE;
@@ -7411,7 +7424,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
    switch( uiIndex )
    {
       case DBOI_BAGEXT:
-         pOrderInfo->itmResult = hb_itemPutC( pOrderInfo->itmResult, CDX_INDEXEXT );
+         pOrderInfo->itmResult = hb_itemPutC( pOrderInfo->itmResult, s_szIndexExt );
          return SUCCESS;
       case DBOI_EVALSTEP:
          pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult,
@@ -7642,10 +7655,6 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
       case DBOI_FULLPATH:
          pOrderInfo->itmResult = hb_itemPutC( pOrderInfo->itmResult, pTag ? pTag->pIndex->szFileName : "" );
-         break;
-
-      case DBOI_BAGEXT:
-         pOrderInfo->itmResult = hb_itemPutC( pOrderInfo->itmResult, CDX_INDEXEXT );
          break;
 
       case DBOI_FILEHANDLE:
@@ -7904,6 +7913,44 @@ static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo )
 /* ( DBENTRYP_V )     hb_cdxReadDBHeader    : NULL */
 /* ( DBENTRYP_V )     hb_cdxWriteDBHeader   : NULL */
 /* ( DBENTRYP_SVP )   hb_cdxWhoCares        : NULL */
+
+/*
+ * Retrieve (set) information about RDD
+ * ( DBENTRYP_RSLV )   hb_fptFieldInfo
+ */
+static ERRCODE hb_cdxRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxRddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnect, pItem));
+
+   switch( uiIndex )
+   {
+      case RDDI_ORDBAGEXT:
+      case RDDI_ORDEREXT:
+      case RDDI_ORDSTRUCTEXT:
+      {
+         char * szIndexExt = hb_strdup( s_szIndexExt ), *szNew;
+
+         szNew = hb_itemGetCPtr( pItem );
+         if( szNew[0] == '.' && szNew[1] )
+            hb_strncpy( s_szIndexExt, szNew, HB_MAX_FILE_EXT );
+         hb_itemPutCPtr( pItem, szIndexExt, strlen( szIndexExt ) );
+         break;
+      }
+
+      case RDDI_MULTITAG:
+      case RDDI_SORTRECNO:
+      case RDDI_STRUCTORD:
+      case RDDI_MULTIKEY:
+         hb_itemPutL( pItem, TRUE );
+         break;
+
+      default:
+         return SUPER_RDDINFO( pRDD, uiIndex, ulConnect, pItem );
+
+   }
+
+   return SUCCESS;
+}
 
 
 
@@ -8593,9 +8640,9 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
    else if ( SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount ) == SUCCESS )
    {
       LPCDXSORTINFO pSort;
-      USHORT uiSaveTag = pArea->uiTag, uiTag;
+      USHORT uiSaveTag = pArea->uiTag;
       ULONG ulStartRec = 0, ulNextCount = 0;
-      BOOL fDirectRead, fUseFilert = FALSE;
+      BOOL fDirectRead, fUseFilter = FALSE;
       BYTE * pSaveRecBuff = pArea->pRecord, cTemp[8];
       int iRecBuff = 0, iRecBufSize = USHRT_MAX / pArea->uiRecordLen, iRec;
 
@@ -8608,34 +8655,40 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
       {
          pArea->uiTag = 0;
       }
-      else if ( pArea->lpdbOrdCondInfo->lRecno )
+      else
       {
-         ulStartRec = pArea->lpdbOrdCondInfo->lRecno;
-         ulNextCount = 1;
+         if( pArea->lpdbOrdCondInfo->itmRecID )
+            ulStartRec = hb_itemGetNL( pArea->lpdbOrdCondInfo->itmRecID );
+         if ( ulStartRec )
+         {
+            ulNextCount = 1;
+         }
+         else if ( pArea->lpdbOrdCondInfo->fRest || pArea->lpdbOrdCondInfo->lNextCount > 0 )
+         {
+            if( pArea->lpdbOrdCondInfo->itmStartRecID )
+               ulStartRec = hb_itemGetNL( pArea->lpdbOrdCondInfo->itmStartRecID );
+            if( !ulStartRec )
+               ulStartRec = ulRecNo;
+            if( pArea->lpdbOrdCondInfo->lNextCount > 0 )
+               ulNextCount = pArea->lpdbOrdCondInfo->lNextCount;
+         }
+         else if( pArea->lpdbOrdCondInfo->fUseFilter )
+         {
+            fUseFilter = TRUE;
+         }
+         else if ( !pArea->lpdbOrdCondInfo->fUseCurrent )
+         {
+            pArea->uiTag = 0;
+         }
       }
-      else if ( pArea->lpdbOrdCondInfo->fRest || pArea->lpdbOrdCondInfo->lNextCount > 0 )
-      {
-         if ( pArea->lpdbOrdCondInfo->lStartRecno )
-            ulStartRec = pArea->lpdbOrdCondInfo->lStartRecno;
-         else
-            ulStartRec = ulRecNo;
-         if ( pArea->lpdbOrdCondInfo->lNextCount > 0 )
-            ulNextCount = pArea->lpdbOrdCondInfo->lNextCount;
-      }
-      else if ( !pArea->lpdbOrdCondInfo->fUseCurrent )
-      {
-         pArea->uiTag = 0;
-      }
-
-      uiTag = pArea->uiTag;
       fDirectRead = !hb_set.HB_SET_STRICTREAD && /* !pArea->lpdbRelations && */
                     ( !pArea->lpdbOrdCondInfo || pArea->lpdbOrdCondInfo->fAll ||
-                      uiTag == 0 ) && pSort;
+                      ( pArea->uiTag == 0 && !fUseFilter ) ) && pSort;
 
       if ( fDirectRead )
          pSort->pRecBuff = (BYTE *) hb_xgrab( pArea->uiRecordLen * iRecBufSize );
 
-      if ( ulStartRec == 0 && uiTag == 0 )
+      if ( ulStartRec == 0 && pArea->uiTag == 0 )
          ulStartRec = 1;
 
       if ( ulStartRec == 0 )
@@ -8645,7 +8698,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
       else
       {
          SELF_GOTO( ( AREAP ) pArea, ulStartRec );
-         if ( fUseFilert )
+         if ( fUseFilter )
             SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
       }
 
@@ -8781,7 +8834,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag )
          {
             if( SELF_SKIPRAW( ( AREAP ) pArea, 1 ) == FAILURE )
                break;
-            if( fUseFilert && SELF_SKIPFILTER( ( AREAP ) pArea, 1 ) == FAILURE )
+            if( fUseFilter && SELF_SKIPFILTER( ( AREAP ) pArea, 1 ) == FAILURE )
                break;
             ulRecNo = pArea->ulRecNo;
          }

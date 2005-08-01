@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.28 2005/05/04 11:39:51 druzus Exp $
+ * $Id: hbapirdd.h,v 1.29 2005/06/22 15:29:54 druzus Exp $
  */
 
 /*
@@ -178,6 +178,7 @@ typedef struct
    BOOL   fShared;         /* Share mode of the data store */
    BOOL   fReadonly;       /* Readonly mode of the data store */
    BYTE * cdpId;           /* Id of a codepage */
+   ULONG  ulConnection;    /* connection handler for RDDs which support it */
    void * lpdbHeader;      /* Pointer to a header of the data store */
 } DBOPENINFO;
 
@@ -200,19 +201,21 @@ typedef struct _DBORDERCONDINFO
    PHB_ITEM itmCobWhile;
    PHB_ITEM itmCobEval;
    LONG     lStep;
-   LONG     lStartRecno;   /* it should be itmStartRecID for real record IDENTITY support */
+   PHB_ITEM itmStartRecID;
    LONG     lNextCount;
-   LONG     lRecno;     /* it should be itmRecID for real record IDENTITY support */
+   PHB_ITEM itmRecID;
    BOOL     fRest;
    BOOL     fDescending;
-/* BOOL     fScoped; */
+   BOOL     fScoped;
    BOOL     fAll;
    BOOL     fAdditive;
    BOOL     fUseCurrent;
    BOOL     fCustom;
    BOOL     fNoOptimize;
-/* BOOL     fTemporary; */
-/* BOOL     fUseFilter; */
+   BOOL     fCompound;
+   BOOL     fUseFilter;
+   BOOL     fTemporary;
+   BOOL     fExclusive;
    void *   lpvCargo;
 } DBORDERCONDINFO;
 
@@ -276,10 +279,10 @@ typedef struct
    PHB_ITEM lNext;       /* NEXT record */
    PHB_ITEM itmRecID;    /* single record ID */
    PHB_ITEM fRest;       /* TRUE if start from the current record */
-   BOOL     fIgnoreFilter;
-   BOOL     fIncludeDeleted;
-   BOOL     fLast;
-   BOOL     fIgnoreDuplicates;
+   BOOL     fIgnoreFilter;       /* process should ignore any filter condition */
+   BOOL     fIncludeDeleted;     /* process should include deleted records */
+   BOOL     fLast;               /* last record of the current scope required */
+   BOOL     fIgnoreDuplicates;   /* process should ignore duplicate key value */
 } DBSCOPEINFO;
 
 typedef DBSCOPEINFO * LPDBSCOPEINFO;
@@ -312,7 +315,8 @@ typedef struct
 {
    PHB_ITEM itmCobExpr;       /* Block representation of the FILTER expression */
    PHB_ITEM abFilterText;     /* String representation of FILTER expression */
-   BOOL     fFilter;
+   BOOL     fFilter;          /* flag to indicate that filter is active */
+   void     *lpvCargo;        /* RDD specific extended filter info */
 } DBFILTERINFO;
 
 typedef DBFILTERINFO * LPDBFILTERINFO;
@@ -356,6 +360,10 @@ typedef struct
 
 typedef DBEVALINFO * LPDBEVALINFO;
 
+/*
+ * NOTE: If your redefine EVAL() method then you may use itmBlock as
+ * string ITEM to make some operations on server side of remote RDD.
+ */
 
 
 /*
@@ -584,9 +592,9 @@ typedef USHORT ( * DBENTRYP_LSP  )( AREAP area, LONG p1, BOOL * p2 );
 
 /* this methods DO USE take a Workarea but an RDDNODE */
 
-typedef USHORT ( * DBENTRYP_I0   )( void );
-typedef USHORT ( * DBENTRYP_I1   )( PHB_ITEM p1 );
-typedef USHORT ( * DBENTRYP_I2   )( PHB_ITEM p1, PHB_ITEM p2 );
+typedef USHORT ( * DBENTRYP_R    )( struct _RDDNODE * pRDD );
+typedef USHORT ( * DBENTRYP_RVV  )( struct _RDDNODE * pRDD, PHB_ITEM p1, PHB_ITEM p2 );
+typedef USHORT ( * DBENTRYP_RSLV )( struct _RDDNODE * pRDD, USHORT index, ULONG p1, PHB_ITEM p2 );
 /*--------------------* Virtual Method Table *----------------------*/
 
 typedef struct _RDDFUNCS
@@ -723,9 +731,10 @@ typedef struct _RDDFUNCS
 
 
    /* non WorkArea functions       */
-   DBENTRYP_I0   exit;              /*  */
-   DBENTRYP_I1   drop;              /* remove table */
-   DBENTRYP_I2   exists;            /* check if table exist */
+   DBENTRYP_R    exit;              /* unregister RDD */
+   DBENTRYP_RVV  drop;              /* remove table */
+   DBENTRYP_RVV  exists;            /* check if table exist */
+   DBENTRYP_RSLV rddInfo;           /* RDD info */
 
    /* Special and reserved methods */
 
@@ -741,11 +750,12 @@ typedef RDDFUNCS * PRDDFUNCS;
 typedef struct _RDDNODE
 {
    char szName[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ]; /* Name of RDD */
-   USHORT uiType;                                        /* Type of RDD */
-   RDDFUNCS pTable;                                      /* Table of functions */
-   RDDFUNCS pSuperTable;                                 /* Table of super functions */
-   USHORT uiAreaSize;                                    /* Size of the WorkArea */
-   struct _RDDNODE * pNext;                              /* Next RDD in the list */
+   USHORT   uiType;           /* Type of RDD */
+   RDDFUNCS pTable;           /* Table of functions */
+   RDDFUNCS pSuperTable;      /* Table of super functions */
+   USHORT   uiAreaSize;       /* Size of the WorkArea */
+   void     *lpvCargo;        /* RDD specific extended data, if used then
+                                 RDD should free it in EXIT() non WA method */
 } RDDNODE;
 
 typedef RDDNODE * LPRDDNODE;
@@ -902,11 +912,13 @@ typedef RDDNODE * LPRDDNODE;
 #define SELF_GETDELIM(w, fp)            ((*(w)->lprfsHost->info)(w, DBI_GETDELIMITER, fp))
 #define SELF_TABLEEXT(w, fp)            ((*(w)->lprfsHost->info)(w, DBI_TABLEEXT, fp))
 
+#define SELF_RDDNODE(w)                 hb_rddGetNode((w)->rddID)
 
 /* non WorkArea functions */
-#define SELF_EXIT(r)                    ((*(r)->pTable.exit)())
-#define SELF_DROP(r, i)                 ((*(r)->pTable.drop)(i))
-#define SELF_EXISTS(r, it, ii)          ((*(r)->pTable.exists)(it,ii))
+#define SELF_EXIT(r)                    ((*(r)->pTable.exit)(r))
+#define SELF_DROP(r, it, ii)            ((*(r)->pTable.drop)(r, it, ii))
+#define SELF_EXISTS(r, it, ii)          ((*(r)->pTable.exists)(r, it, ii))
+#define SELF_RDDINFO(r, i, l, g)        ((*(r)->pTable.rddInfo)(r, i, l, g))
 
 
 /*--------------------* SUPER Methods *------------------------*/
@@ -1062,23 +1074,28 @@ typedef RDDNODE * LPRDDNODE;
 #define SUPER_TABLEEXT(w, fp)           ((*(SUPERTABLE)->info)(w, DBI_TABLEEXT, fp))
 
 /* non WorkArea functions */
-#define SUPER_EXIT()                    ((*(SUPERTABLE)->exit)())
-#define SUPER_DROP(i)                   ((*(SUPERTABLE)->drop)(i))
-#define SUPER_EXISTS(it, ii)            ((*(SUPERTABLE)->exists)(it, ii))
+#define SUPER_EXIT(r)                   ((*(SUPERTABLE)->exit)(r))
+#define SUPER_DROP(r, it, ii)           ((*(SUPERTABLE)->drop)(r, it, ii))
+#define SUPER_EXISTS(r, it, ii)         ((*(SUPERTABLE)->exists)(r, it, ii))
+#define SUPER_RDDINFO(r, i, l, g)       ((*(SUPERTABLE)->rddInfo)(r, i, l, g))
 
 /*
  *  PROTOTYPES
  *  ----------
  */
-extern ERRCODE HB_EXPORT hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNCS pSuperTable, BYTE * szDrvName );
-extern ERRCODE HB_EXPORT hb_rddDisinherit( BYTE * drvName );
-extern USHORT  HB_EXPORT hb_rddExtendType( USHORT fieldType );
-extern USHORT  HB_EXPORT hb_rddFieldType( USHORT extendType );
+extern ERRCODE   HB_EXPORT hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNCS pSuperTable, BYTE * szDrvName );
+extern ERRCODE   HB_EXPORT hb_rddDisinherit( BYTE * drvName );
+extern USHORT    HB_EXPORT hb_rddExtendType( USHORT fieldType );
+extern USHORT    HB_EXPORT hb_rddFieldType( USHORT extendType );
+extern LPRDDNODE HB_EXPORT hb_rddGetNode( USHORT uiNode );
 
 typedef short (* WACALLBACK )( AREA *, int );
 extern ERRCODE HB_EXPORT hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data );
-USHORT hb_rddFieldIndex( AREAP pArea, char * szName );
-ERRCODE hb_rddGetTempAlias( char * szAliasTmp );
+extern USHORT  HB_EXPORT hb_rddFieldSymIndex( AREAP pArea, PHB_SYMB pFieldSymbol );
+extern USHORT  HB_EXPORT hb_rddFieldNameIndex( AREAP pArea, char * szName );
+extern USHORT  HB_EXPORT hb_rddFieldIndex( AREAP pArea, char * szName );
+extern USHORT  HB_EXPORT hb_rddFieldExpIndex( AREAP pArea, char * szField, BOOL fHash );
+extern ERRCODE HB_EXPORT hb_rddGetTempAlias( char * szAliasTmp );
 
 HB_EXTERN_END
 

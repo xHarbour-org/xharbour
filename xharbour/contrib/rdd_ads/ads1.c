@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.69 2005/05/31 22:08:58 kaddath Exp $
+ * $Id: ads1.c,v 1.70 2005/06/22 15:29:14 druzus Exp $
  */
 
 /*
@@ -73,6 +73,7 @@
 
 static ERRCODE adsRecCount(  ADSAREAP pArea, ULONG * pRecCount );
 static int iSetListenerHandle;
+static USHORT s_uiRddId;
 
 #if ADS_REQUIRE_VERSION >= 6
 void hb_oemansi(char* pcString, LONG lLen);
@@ -1002,7 +1003,7 @@ static ERRCODE adsSkip( ADSAREAP pArea, LONG lToSkip )
          lCount--;
       }
 
-      /* Update Bof and Eof flags int the way as Clipper do, Druzus. */
+      /* Update Bof and Eof flags int the way as Clipper does, Druzus. */
       if( lUnit < 0 )
          pArea->fEof = FALSE;
       else /* if( lUnit > 0 ) */
@@ -1079,7 +1080,7 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
    HB_TRACE(HB_TR_DEBUG, ("adsCreateFields(%p, %p)", pArea, pStruct));
 
    uiItems = ( USHORT ) hb_arrayLen( pStruct );
-   SELF_SETFIELDEXTENT( (AREAP)pArea, uiItems );
+   SELF_SETFIELDEXTENT( ( AREAP ) pArea, uiItems );
 
    for( uiCount = 0; uiCount < uiItems; uiCount++ )
    {
@@ -1087,29 +1088,16 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
       pFieldDesc = hb_arrayGetItemPtr( pStruct, uiCount + 1 );
       pFieldInfo.atomName = ( BYTE * ) hb_arrayGetCPtr( pFieldDesc, 1 );
       iData = hb_arrayGetNI( pFieldDesc, 3 );
-
-      //TraceLog( NULL, "Field: '%s'\n", pFieldInfo.atomName );
-
       if( iData < 0 )
-      {
          iData = 0;
-      }
-
       uiLen = pFieldInfo.uiLen = ( USHORT ) iData;
       iData = hb_arrayGetNI( pFieldDesc, 4 );
-
       if( iData < 0 )
-      {
          iData = 0;
-      }
-
       uiDec = ( USHORT ) iData;
       pFieldInfo.uiDec = 0;
       szFieldType = hb_arrayGetCPtr( pFieldDesc, 2 );
       iData = toupper( szFieldType[ 0 ] );
-
-      /* printf( "\nadsCreateFields-0 %s",szFieldType ); */
-
       switch( iData )
       {
          case 'C':
@@ -1700,7 +1688,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_errRT_DBCMD( EG_LOCK, ulRetVal, "Lock Required by TestRecLocks", "ADSISRECORDLOCKED" );
       }
 
-      if( !pbLocked  )
+      if( !pbLocked )
       {
          commonError( pArea, EG_UNLOCKED, EDBF_UNLOCKED, NULL, 0 );
          //hb_errRT_DBCMD( EG_LOCK, EDBF_UNLOCKED, "Record not locked", "adsPutValue" );
@@ -1985,8 +1973,7 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
 
    HB_TRACE(HB_TR_DEBUG, ("adsCreate(%p, %p)", pArea, pCreateInfo));
 
-   pArea->szDataFileName = (char *) hb_xgrab( strlen( (char *) pCreateInfo->abName ) + 1 );
-   strcpy( pArea->szDataFileName, ( char * ) pCreateInfo->abName );
+   pArea->szDataFileName = hb_strdup( ( char * ) pCreateInfo->abName );
 
    /* uiLen = length of buffer for all field definition info times number of fields.
       For extended types cType may be up to 6 chars, and
@@ -2117,11 +2104,11 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
      pField++;
    }
    /* printf( "\n%s",(char*)ucfieldDefs ); */
-   uRetVal = AdsCreateTable( 0, pCreateInfo->abName, NULL, adsFileType, adsCharType,
-                    adsLockType, adsRights,
-                    hb_set.HB_SET_MBLOCKSIZE,
-                    ucfieldDefs, &hTable );
-
+   uRetVal = AdsCreateTable( 0, pCreateInfo->abName, pCreateInfo->atomAlias,
+                             adsFileType, adsCharType,
+                             adsLockType, adsRights,
+                             hb_set.HB_SET_MBLOCKSIZE,
+                             ucfieldDefs, &hTable );
    hb_xfree( ucfieldDefs );
 
    if( uRetVal != AE_SUCCESS )
@@ -2129,9 +2116,21 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
       AdsShowError( (UNSIGNED8 *) "Error" );
       return FAILURE;
    }
-   AdsCloseTable( hTable );  /* TODO: it would be nice if a parameter could be passed in to allow this to stay open to support the 4th parameter of dbCreate. As is, we have to close it here, then re-open it. */
+   /* 
+    * In Clipper CREATE() keeps darabase open on success [druzus]
+    */
+   pArea->hTable    = hTable;
+   pArea->fShared   = FALSE;  /* pCreateInfo->fShared; */
+   pArea->fReadonly = FALSE;  /* pCreateInfo->fReadonly */
 
-   return SUCCESS;
+   /* If successful call SUPER_CREATE to finish system jobs */
+   if( SUPER_CREATE( ( AREAP ) pArea, pCreateInfo ) != SUCCESS )
+   {
+      SELF_CLOSE( ( AREAP ) pArea );
+      return FAILURE;
+   }
+
+   return SELF_GOTOP( ( AREAP ) pArea );
 }
 
 static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
@@ -2319,65 +2318,63 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       /* See adsGettValue() for why we don't use pArea->uiMaxFieldNameLength here */
    UNSIGNED16 pusBufLen, pusType, pusDecimals;
    DBFIELDINFO dbFieldInfo;
+   char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
 
    //TraceLog( NULL, "Open '%s'\n", pOpenInfo->abName );
 
    HB_TRACE(HB_TR_DEBUG, ("adsOpen(%p)", pArea));
 
-   if( pOpenInfo->atomAlias )
+   // When opening the file, first try with the correct settings for Advantage Data Dictionary
+   // if bDictionary was set
+   if( bDictionary )
    {
-      pArea->szDataFileName = (char *) hb_xgrab( strlen( (char *) ( pOpenInfo->abName ) ) + 1 );
-      strcpy( pArea->szDataFileName, ( char * ) ( pOpenInfo->abName ) );
-
-      pArea->atomAlias = hb_rddAllocWorkAreaAlias( ( char * ) pOpenInfo->atomAlias, ( int ) pOpenInfo->uiArea );
-      if( ! pArea->atomAlias )
-      {
-         return FAILURE;
-      }
-      pArea->hStatement = 0;
-      pArea->hOrdCurrent = 0;
-
-      // When opening the file, first try with the correct settings for Advantage Data Dictionary
-      // if bDictionary was set
-      if( bDictionary )
-      {
-         ulRetVal = AdsOpenTable( adsConnectHandle, pOpenInfo->abName, pOpenInfo->atomAlias,
-                  ADS_DEFAULT, adsCharType, adsLockType, adsRights,
-                  ( (pOpenInfo->fShared) ? ADS_SHARED : ADS_EXCLUSIVE ) |
-                  ( (pOpenInfo->fReadonly) ? ADS_READONLY : ADS_DEFAULT ),
-                   &hTable );
-             if( ulRetVal != AE_SUCCESS )
-             {
-                AdsGetLastError( &ulLastErr, aucError, &usLength );
-             }
-      }
-
-      // If the Advantage Data Dictionary open fails with an error indicating that this table is not
-      // in the dictionary, OR if we are not using a dictionary at all, try the open with standard settings.
-      // This change allows the use of a Dictionary, and non Dictionary temp files at the same time.
-      if( !bDictionary || ulLastErr == 5132L )
-      {
-         ulRetVal = AdsOpenTable( 0, pOpenInfo->abName, pOpenInfo->atomAlias,
-                  pArea->iFileType, adsCharType, adsLockType, adsRights,
-                  ( (pOpenInfo->fShared) ? ADS_SHARED : ADS_EXCLUSIVE ) |
-                  ( (pOpenInfo->fReadonly) ? ADS_READONLY : ADS_DEFAULT ),
-                   &hTable );
-      }
-
-      if( ulRetVal != AE_SUCCESS )
-      {
-         if( ulRetVal != 1001 && ulRetVal != 7008 )     /* 1001 and 7008 are standard ADS Open Errors that will usually be sharing issues */
-         {
-            commonError( pArea, EG_OPEN, ( USHORT ) ulRetVal, ( char * ) pOpenInfo->abName, 0 );
-         }
-
-         return FAILURE;                /* just set neterr  */
-      }
-
-      pArea->hTable    = hTable;
-      pArea->fShared   = pOpenInfo->fShared;
-      pArea->fReadonly = pOpenInfo->fReadonly;
+      ulRetVal = AdsOpenTable( adsConnectHandle, pOpenInfo->abName, pOpenInfo->atomAlias,
+               ADS_DEFAULT, adsCharType, adsLockType, adsRights,
+               ( (pOpenInfo->fShared) ? ADS_SHARED : ADS_EXCLUSIVE ) |
+               ( (pOpenInfo->fReadonly) ? ADS_READONLY : ADS_DEFAULT ),
+                &hTable );
+          if( ulRetVal != AE_SUCCESS )
+          {
+             AdsGetLastError( &ulLastErr, aucError, &usLength );
+          }
    }
+
+   // If the Advantage Data Dictionary open fails with an error indicating that this table is not
+   // in the dictionary, OR if we are not using a dictionary at all, try the open with standard settings.
+   // This change allows the use of a Dictionary, and non Dictionary temp files at the same time.
+   if( !bDictionary || ulLastErr == 5132L )
+   {
+      ulRetVal = AdsOpenTable( 0, pOpenInfo->abName, pOpenInfo->atomAlias,
+               pArea->iFileType, adsCharType, adsLockType, adsRights,
+               ( (pOpenInfo->fShared) ? ADS_SHARED : ADS_EXCLUSIVE ) |
+               ( (pOpenInfo->fReadonly) ? ADS_READONLY : ADS_DEFAULT ),
+                &hTable );
+   }
+
+   if( ulRetVal != AE_SUCCESS )
+   {
+      if( ulRetVal != 1001 && ulRetVal != 7008 )     /* 1001 and 7008 are standard ADS Open Errors that will usually be sharing issues */
+      {
+         commonError( pArea, EG_OPEN, ( USHORT ) ulRetVal, ( char * ) pOpenInfo->abName, 0 );
+      }
+
+      return FAILURE;                /* just set neterr  */
+   }
+
+   /* Set default alias if necessary */
+   if( !pOpenInfo->atomAlias )
+   {
+      UNSIGNED16 uiAliasLen = HARBOUR_MAX_RDD_ALIAS_LENGTH;
+      AdsGetTableAlias( hTable, (UNSIGNED8 *) szAlias, &uiAliasLen );
+      pOpenInfo->atomAlias = ( BYTE * ) szAlias;
+   }
+
+   pArea->szDataFileName = hb_strdup( (char *) ( pOpenInfo->abName ) );
+   pArea->hStatement     = 0;
+   pArea->hOrdCurrent    = 0;
+   pArea->hTable         = hTable;
+   pArea->fShared        = pOpenInfo->fShared;
+   pArea->fReadonly      = pOpenInfo->fReadonly;
 
    //TraceLog( NULL, "Before count: %i \n", uiFields );
    SELF_FIELDCOUNT( ( AREAP ) pArea, &uiFields );
@@ -2473,7 +2470,10 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
          }
       }
 
-      SELF_ADDFIELD( ( AREAP ) pArea, &dbFieldInfo );
+      if( SELF_ADDFIELD( ( AREAP ) pArea, &dbFieldInfo ) == FAILURE )
+      {
+         return FAILURE;
+      }
    }
 
    /* Alloc buffer. Extended types may require 24 bytes */
@@ -2490,6 +2490,13 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
    }
 
    pArea->ulRecCount = ulRecCount;
+
+   /* If successful call SUPER_OPEN to finish system jobs */
+   if( SUPER_OPEN( ( AREAP ) pArea, pOpenInfo ) == FAILURE )
+   {
+      SELF_CLOSE( ( AREAP ) pArea );
+      return FAILURE;
+   }
 
    return SELF_GOTOP( ( AREAP ) pArea );
 }
@@ -3707,40 +3714,6 @@ static ERRCODE adsUnLock( ADSAREAP pArea, ULONG lRecNo )
    return SUCCESS;
 }
 
-static ERRCODE adsDrop( PHB_ITEM pItemTable )
-{
-  char * pBuffer;
-  char szFileName[ _POSIX_PATH_MAX + 1 ];
-
-  pBuffer = hb_itemGetCPtr( pItemTable );
-  strcpy( szFileName, pBuffer );
-
-  if( !strchr( szFileName, '.' ) )
-  {
-    strcat( szFileName, ( ( adsFileType == ADS_ADT ) ? ".adt" : ".dbf" ) );
-  }
-
-  return hb_fsDelete( (BYTE *) szFileName );
-}
-
-/* returns 1 if exists, 0 else */
-BOOL adsExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex )
-{
-  char szFileName[ _POSIX_PATH_MAX + 1 ];
-  char * pBuffer;
-
-  pBuffer = hb_itemGetCPtr( pItemIndex != NULL ? pItemIndex : pItemTable );
-  strcpy( szFileName, pBuffer );
-
-  if( pItemTable && !strchr( szFileName, '.' ) )
-  {
-    strcat( szFileName, ( ( adsFileType == ADS_ADT ) ? ".adt" : ".dbf" ) );
-  }
-
-  return hb_fsFile( (BYTE *) szFileName );
-}
-
-
 #define  adsCloseMemFile          NULL
 #define  adsCreateMemFile         NULL
 #define  adsGetValueFile          NULL
@@ -3749,16 +3722,91 @@ BOOL adsExists( PHB_ITEM pItemTable, PHB_ITEM pItemIndex )
 #define  adsReadDBHeader          NULL
 #define  adsWriteDBHeader         NULL
 
-static ERRCODE adsExit( void )
+
+static ERRCODE adsDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable )
 {
+   char * pBuffer;
+   char szFileName[ _POSIX_PATH_MAX + 1 ];
+
+   HB_SYMBOL_UNUSED( pRDD );
+
+   pBuffer = hb_itemGetCPtr( pItemTable );
+   strcpy( szFileName, pBuffer );
+
+   if( !strchr( szFileName, '.' ) )
+   {
+      strcat( szFileName, ( ( adsFileType == ADS_ADT ) ? ".adt" : ".dbf" ) );
+   }
+
+   return hb_fsDelete( (BYTE *) szFileName ) ? SUCCESS : FAILURE;
+}
+
+static ERRCODE adsExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex )
+{
+   char szFileName[ _POSIX_PATH_MAX + 1 ];
+   char * pBuffer;
+
+   HB_SYMBOL_UNUSED( pRDD );
+
+   pBuffer = hb_itemGetCPtr( pItemIndex != NULL ? pItemIndex : pItemTable );
+   strcpy( szFileName, pBuffer );
+
+   if( pItemTable && !strchr( szFileName, '.' ) )
+   {
+      strcat( szFileName, ( ( adsFileType == ADS_ADT ) ? ".adt" : ".dbf" ) );
+   }
+
+   return hb_fsFile( (BYTE *) szFileName ) ? SUCCESS : FAILURE;
+}
+
+static ERRCODE adsExit( LPRDDNODE pRDD )
+{
+   HB_SYMBOL_UNUSED( pRDD );
+
    AdsApplicationExit();
    if( iSetListenerHandle )
    {
       hb_setListenerRemove( iSetListenerHandle ) ;
    }
+   s_uiRddId = 0;
+
+   /* free pRDD->lpvCargo if necessary */
 
    return SUCCESS;
 }
+
+static ERRCODE adsRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem )
+{
+   HB_TRACE(HB_TR_DEBUG, ("adsRddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnect, pItem));
+
+   switch( uiIndex )
+   {
+      case RDDI_REMOTE:
+         hb_itemPutL( pItem, TRUE );
+         break;
+
+      case RDDI_CONNECTION:
+      {
+         ULONG ulNewConnection = 0;
+
+         if( hb_itemType( pItem ) & HB_IT_NUMERIC )
+         {
+            ulNewConnection = hb_itemGetNL( pItem );
+         }
+         hb_itemPutNL( pItem, ulConnect ? ulConnect : adsConnectHandle );
+         if( ulNewConnection )
+         {
+            adsConnectHandle = ulNewConnection;
+         }
+         break;
+      }
+      default:
+         return SUPER_RDDINFO( pRDD, uiIndex, ulConnect, pItem );
+   }
+
+   return SUCCESS;
+}
+
 
 #define  adsWhoCares              NULL
 
@@ -3853,32 +3901,42 @@ static RDDFUNCS adsTable = { ( DBENTRYP_BP ) adsBof,
                              ( DBENTRYP_SVP ) adsPutValueFile,
                              ( DBENTRYP_V ) adsReadDBHeader,
                              ( DBENTRYP_V ) adsWriteDBHeader,
-                             ( DBENTRYP_I0 ) adsExit,
-                             ( DBENTRYP_I1 ) adsDrop,
-                             ( DBENTRYP_I2 ) adsExists,
+                             ( DBENTRYP_R ) adsExit,
+                             ( DBENTRYP_RVV ) adsDrop,
+                             ( DBENTRYP_RVV ) adsExists,
+                             ( DBENTRYP_RSLV ) adsRddInfo,
                              ( DBENTRYP_SVP ) adsWhoCares
                            };
 
-HB_FUNC( _ADS )
-{
-}
+HB_FUNC( _ADS ) { ; }
 
 HB_FUNC( ADS_GETFUNCTABLE )
 {
    RDDFUNCS * pTable;
-   USHORT * uiCount;
+   USHORT * uiCount, uiRddId;
 
    uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
    * uiCount = RDDFUNCSCOUNT;
    pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
+   uiRddId = hb_parni( 4 );
 
    HB_TRACE(HB_TR_DEBUG, ("ADS_GETFUNCTABLE(%i, %p)", *uiCount, pTable));
 
    if( pTable )
    {
-      adsSetSend();
-      iSetListenerHandle = hb_setListenerAdd( adsSetListener_callback );
-      hb_retni( hb_rddInherit( pTable, &adsTable, &adsSuper, 0 ) );
+      ERRCODE errCode = hb_rddInherit( pTable, &adsTable, &adsSuper, 0 );
+
+      if ( errCode == SUCCESS )
+      {
+         /*
+          * we successfully register our RDD so now we can initialize it
+          * You may think that this place is RDD init statement, Druzus
+          */
+         s_uiRddId = uiRddId;
+         adsSetSend();
+         iSetListenerHandle = hb_setListenerAdd( adsSetListener_callback );
+      }
+      hb_retni( errCode );
    }
    else
    {

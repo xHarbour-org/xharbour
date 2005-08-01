@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.146 2005/05/19 02:20:18 druzus Exp $
+ * $Id: filesys.c,v 1.147 2005/06/13 21:45:08 likewolf Exp $
  */
 
 /*
@@ -111,6 +111,7 @@
 
 #include "hbapi.h"
 #include "hbapifs.h"
+#include "hbapierr.h"
 #include "hb_io.h"
 #include "hbset.h"
 
@@ -154,7 +155,7 @@
    #if !defined(HAVE_POSIX_IO)
       #define HAVE_POSIX_IO
    #endif
-#elif defined(__GNUC__) || defined( HB_OS_UNIX )
+#elif defined(__GNUC__) || defined(HB_OS_UNIX)
    #include <sys/types.h>
    #include <sys/stat.h>
    #include <fcntl.h>
@@ -175,24 +176,18 @@
 
 #if defined(HB_OS_HPUX)
    extern int fdatasync(int fildes);
-#endif
-
-#if defined(HB_OS_DOS)
+#elif defined(HB_OS_DOS)
    #include <dos.h>
-#endif
-
-#if defined( HB_WIN32_IO )
+#elif defined(HB_OS_OS2)
+   #include <sys/signal.h>
+   #include <sys/process.h>
+   #include <sys/wait.h>
+#elif defined( HB_WIN32_IO )
    #include <windows.h>
 
    #if ( defined(__DMC__) || defined( _MSC_VER ) || defined( __LCC__ ) ) && !defined( INVALID_SET_FILE_POINTER )
       #define INVALID_SET_FILE_POINTER ((DWORD)-1)
    #endif
-#endif
-
-#ifdef HB_OS_OS2
-   #include <sys/signal.h>
-   #include <sys/process.h>
-   #include <sys/wait.h>
 #endif
 
 /* 27/08/2004 - <maurilio.longo@libero.it>
@@ -210,24 +205,26 @@
 */
 
 #if defined( __DJGPP__ )
-   #define HB_FS_GETDRIVE(n) ( n = getdisk() )
-   #define HB_FS_SETDRIVE(n) ( setdisk( n ) )
+   #define HB_FS_GETDRIVE(n)  do { n = getdisk(); } while( 0 )
+   #define HB_FS_SETDRIVE(n)  setdisk( n )
 
 #elif defined( __WATCOMC__ )
-   #define HB_FS_GETDRIVE(n) ( _dos_getdrive( &( n ) ), --( n ) )
-   #define HB_FS_SETDRIVE(n) \
-   do { \
-      UINT uiDummy; \
-      _dos_setdrive( ( n ) + 1, &uiDummy ); \
-   } while( 0 );
+   #define HB_FS_GETDRIVE(n)  do { _dos_getdrive( &( n ) ); --( n ); } while( 0 )
+   #define HB_FS_SETDRIVE(n)  do { \
+                                 UINT uiDummy; \
+                                 _dos_setdrive( ( n ) + 1, &uiDummy ); \
+                              } while( 0 )
 
 #elif defined(HB_OS_OS2)
-   #define HB_FS_GETDRIVE(n) ( n = _getdrive() - 65 )
-   #define HB_FS_SETDRIVE(n) ( _chdrive( ( n ) + 65 ) )
+   #define HB_FS_GETDRIVE(n)  do { n = _getdrive() - 'A'; } while( 0 )
+   #define HB_FS_SETDRIVE(n)  _chdrive( ( n ) + 'A' )
 
 #else
-   #define HB_FS_GETDRIVE(n) ( ( ( n = _getdrive() ) < 65 ) ? --( n ) : ( (n) -= 65 ) )
-   #define HB_FS_SETDRIVE(n) ( _chdrive( ( n ) + 1 ) )
+   #define HB_FS_GETDRIVE(n)  do { \
+                                 n = _getdrive(); \
+                                 n -= ( ( n ) < 'A' ) ? 1 : 'A'; \
+                              } while( 0 )
+   #define HB_FS_SETDRIVE(n)  _chdrive( ( n ) + 1 )
 
 #endif
 
@@ -239,79 +236,8 @@
    #define O_LARGEFILE  0       /* O_LARGEFILE is used for LFS in 32-bit Linux */
 #endif
 
-#ifndef S_IEXEC
-   #define S_IEXEC      0x0040  /* owner may execute <directory search> */
-#endif
 
-#ifndef S_IRWXU
-   #define S_IRWXU      (S_IRUSR | S_IWUSR | S_IXUSR)
-#endif
-
-#ifndef S_IRUSR
-   #define S_IRUSR      0x0100  /* owner may read */
-#endif
-
-#ifndef S_IWUSR
-   #define S_IWUSR      0x0080  /* owner may write */
-#endif
-
-#ifndef S_IXUSR
-   #define S_IXUSR      0x0040  /* owner may execute <directory search> */
-#endif
-
-#ifndef S_IRWXG
-    #define S_IRWXG     (S_IRGRP | S_IWGRP | S_IXGRP)
-#endif
-
-#ifndef     S_IRGRP
-    #define     S_IRGRP 0x00020 /* read permission, group */
-#endif
-
-#ifndef     S_IWGRP
-    #define     S_IWGRP 0x00010 /* write permission, grougroup */
-#endif
-
-#ifndef     S_IXGRP
-    #define     S_IXGRP 0x00008/* execute/search permission, group */
-#endif
-
-#ifndef     S_IRWXO
-    #define     S_IRWXO    (S_IROTH | S_IWOTH | S_IXOTH)
-#endif
-
-#ifndef     S_IROTH
-    #define     S_IROTH 0x00004 /* read permission, other */
-#endif
-
-#ifndef     S_IWOTH
-    #define     S_IWOTH 0x00002 /* write permission, other */
-#endif
-
-#ifndef     S_IXOTH
-    #define     S_IXOTH 0x00001/* execute/search permission, other */
-#endif
-
-#ifndef SH_COMPAT
-   #define SH_COMPAT    0x00    /* Compatibility */
-#endif
-
-#ifndef SH_DENYRW
-   #define SH_DENYRW    0x10    /* Deny read/write */
-#endif
-
-#ifndef SH_DENYWR
-   #define SH_DENYWR    0x20    /* Deny write */
-#endif
-
-#ifndef SH_DENYRD
-   #define SH_DENYRD    0x30    /* Deny read */
-#endif
-
-#ifndef SH_DENYNO
-   #define SH_DENYNO    0x40    /* Deny nothing */
-#endif
-
-#if defined(HAVE_POSIX_IO) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__LCC__) || defined(__DMC__)
+#if defined(HAVE_POSIX_IO) || defined( HB_WIN32_IO ) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__LCC__) || defined(__DMC__)
 /* Only compilers with Posix or Posix-like I/O support are supported */
    #define HB_FS_FILE_IO
 #endif
@@ -366,7 +292,7 @@ HANDLE DostoWinHandle( FHANDLE fHandle)
 {
    HANDLE hHandle = (HANDLE) LongToHandle( fHandle );
 
-   switch (fHandle)
+   switch( fHandle )
    {
       case 0:
         return GetStdHandle(STD_INPUT_HANDLE);
@@ -377,18 +303,79 @@ HANDLE DostoWinHandle( FHANDLE fHandle)
       case 2:
         return GetStdHandle(STD_ERROR_HANDLE);
 
-      default :
+      default:
         return hHandle;
    }
 }
 
-static void convert_create_flags( BOOL fCreate, USHORT uiAttr, USHORT uiFlags,
-                                  DWORD *dwMode, DWORD *dwShare, DWORD *dwAttr )
+static void convert_open_flags( BOOL fCreate, USHORT uiAttr, USHORT uiFlags,
+                                DWORD *dwMode, DWORD *dwShare,
+                                DWORD *dwCreat, DWORD *dwAttr )
 {
-   if ( fCreate )
+   if( fCreate )
    {
+      *dwCreat = CREATE_ALWAYS;
       *dwMode = GENERIC_READ | GENERIC_WRITE;
+   }
+   else
+   {
+      if( uiFlags & FO_CREAT )
+      {
+         if( uiFlags & FO_EXCL )
+            *dwCreat = CREATE_NEW;
+         else if( uiFlags & FO_TRUNC )
+            *dwCreat = CREATE_ALWAYS;
+         else
+            *dwCreat = OPEN_ALWAYS;
+      }
+      else if( uiFlags & FO_TRUNC )
+      {
+         *dwCreat = TRUNCATE_EXISTING;
+      }
+      else
+      {
+         *dwCreat = OPEN_EXISTING;
+      }
 
+      *dwMode = 0;
+      switch( uiFlags & ( FO_READ | FO_WRITE | FO_READWRITE ) )
+      {
+         case FO_READWRITE:
+            *dwMode |= GENERIC_READ | GENERIC_WRITE;
+            break;
+         case FO_WRITE:
+            *dwMode |= GENERIC_WRITE;
+            break;
+         case FO_READ:
+            *dwMode |= GENERIC_READ;
+            break;
+      }
+   }
+
+   /* shared flags */
+   switch( uiFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE | FO_DENYNONE ) )
+   {
+      case FO_DENYREAD:
+         *dwShare = FILE_SHARE_WRITE;
+         break;
+      case FO_DENYWRITE:
+         *dwShare = FILE_SHARE_READ;
+         break;
+      case FO_EXCLUSIVE:
+         *dwShare = 0;
+         break;
+      default:
+         *dwShare = FILE_SHARE_WRITE | FILE_SHARE_READ;
+         break;
+   }
+
+   /* file attributes flags */
+   if( uiAttr == FC_NORMAL )
+   {
+      *dwAttr = FILE_ATTRIBUTE_NORMAL;
+   }
+   else
+   {
       *dwAttr = FILE_ATTRIBUTE_ARCHIVE;
       if( uiAttr & FC_READONLY )
          *dwAttr |= FILE_ATTRIBUTE_READONLY;
@@ -397,199 +384,118 @@ static void convert_create_flags( BOOL fCreate, USHORT uiAttr, USHORT uiFlags,
       if( uiAttr & FC_SYSTEM )
          *dwAttr |= FILE_ATTRIBUTE_SYSTEM;
    }
+}
+
+#else
+
+static void convert_open_flags( BOOL fCreate, USHORT uiAttr, USHORT uiFlags,
+                                int *flags, unsigned *mode,
+                                int *share, int *attr )
+{
+   HB_TRACE(HB_TR_DEBUG, ("convert_open_flags(%d, %hu, %hu, %p, %p, %p, %p)", fCreate, uiAttr, uiFlags, flags, mode, share, attr));
+
+   /* file access mode */
+#if defined( HB_OS_UNIX )
+   *mode = ( uiAttr & FC_HIDDEN ) ? S_IRUSR : ( S_IRUSR | S_IRGRP | S_IROTH );
+   if( !( uiAttr & FC_READONLY ) )
+   {
+      if( *mode & S_IRUSR ) *mode |= S_IWUSR;
+      if( *mode & S_IRGRP ) *mode |= S_IWGRP;
+      if( *mode & S_IROTH ) *mode |= S_IWOTH;
+   }
+   if( uiAttr & FC_SYSTEM )
+   {
+      if( *mode & S_IRUSR ) *mode |= S_IXUSR;
+      if( *mode & S_IRGRP ) *mode |= S_IXGRP;
+      if( *mode & S_IROTH ) *mode |= S_IXOTH;
+   }
+#else
+   *mode = S_IREAD | 
+           ( ( uiAttr & FC_READONLY ) ? 0 : S_IWRITE ) |
+           ( ( uiAttr & FC_SYSTEM ) ? S_IEXEC : 0 );
+#endif
+
+   /* dos file attributes */
+#if defined(HB_FS_DOSATTR)
+   if( uiAttr == FC_NORMAL )
+   {
+      *attr = _A_NORMAL;
+   }
    else
    {
-      *dwMode = 0;
-      switch( uiFlags & 3 )
+      *attr = _A_ARCH;
+      if( uiAttr & FC_READONLY )
+         *attr |= _A_READONLY;
+      if( uiAttr & FC_HIDDEN )
+         *attr |= _A_HIDDEN;
+      if( uiAttr & FC_SYSTEM )
+         *attr |= _A_SYSTEM;
+   }
+#else
+   *attr = 0;
+#endif
+
+   if( fCreate )
+   {
+      *flags = O_RDWR | O_CREAT | O_TRUNC | O_BINARY | O_LARGEFILE |
+               ( ( uiFlags & FO_EXCL ) ? O_EXCL : 0 );
+   }
+   else
+   {
+      *attr = 0;
+      *flags = O_BINARY | O_LARGEFILE;
+      switch( uiFlags & ( FO_READ | FO_WRITE | FO_READWRITE ) )
       {
-         case  FO_READWRITE :
-            *dwMode |= GENERIC_READ | GENERIC_WRITE;
+         case FO_READ:
+            *flags |= O_RDONLY;
             break;
          case FO_WRITE:
-            *dwMode |= GENERIC_WRITE;
+            *flags |= O_WRONLY;
             break;
-         case FO_READ :
-            *dwMode |= GENERIC_READ;
+         case FO_READWRITE:
+            *flags |= O_RDWR;
+            break;
+         default:
+            /* this should not happen and it's here to force default OS behavior */
+            *flags |= ( O_RDONLY | O_WRONLY | O_RDWR );
             break;
       }
-      *dwAttr = FILE_ATTRIBUTE_NORMAL;
+
+      if( uiFlags & FO_CREAT ) *flags |= O_CREAT;
+      if( uiFlags & FO_TRUNC ) *flags |= O_TRUNC;
+      if( uiFlags & FO_EXCL  ) *flags |= O_EXCL;
    }
 
-   /* shared flags */
-   *dwShare = FILE_SHARE_WRITE | FILE_SHARE_READ;
-
-   switch ( uiFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE | FO_DENYNONE ) )
-   {
-      case FO_DENYREAD :
-         *dwShare = FILE_SHARE_WRITE;
-         break;
-      case FO_DENYWRITE :
-         *dwShare = FILE_SHARE_READ;
-         break;
-      case FO_EXCLUSIVE:
-         *dwShare = 0;
-         break;
-   }
-}
-
-#else
-
-/* Convert HARBOUR flags to IO subsystem flags */
-static int convert_open_flags( USHORT uiFlags )
-{
-   /* by default FO_READ + FO_COMPAT is set */
-   int result_flags = 0;
-
-   HB_TRACE(HB_TR_DEBUG, ("convert_open_flags(%hu)", uiFlags));
-
-   result_flags |= O_BINARY | O_LARGEFILE;
-   HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_BINARY | O_LARGEFILE\n"));
-
-#if defined(HB_FS_SOPEN)
-   if( ( uiFlags & ( FO_WRITE | FO_READWRITE ) ) == FO_READ )
-   {
-      result_flags |= O_RDONLY;
-      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_RDONLY\n"));
-   }
-#else
-   if( ( uiFlags & ( FO_WRITE | FO_READWRITE ) ) == FO_READ )
-   {
-      result_flags |= ( O_RDONLY | SH_COMPAT );
-      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_RDONLY SH_COMPAT\n"));
-   }
-#endif
-
-   /* read & write flags */
-   if( uiFlags & FO_WRITE )
-   {
-      result_flags |= O_WRONLY;
-      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_WRONLY\n"));
-   }
-
-   if( uiFlags & FO_READWRITE )
-   {
-      result_flags |= O_RDWR;
-      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_RDWR\n"));
-   }
-
-#if ! defined(HB_FS_SOPEN) && ! defined( HB_OS_UNIX )
-   /* shared flags */
+   /* shared flags (HB_FS_SOPEN) */
+#if defined(_MSC_VER) || defined(__DMC__)
    if( ( uiFlags & FO_DENYREAD ) == FO_DENYREAD )
-   {
-      result_flags |= SH_DENYRD;
-      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added SH_DENYRD\n"));
-   }
-
+      *share = _SH_DENYRD;
    else if( uiFlags & FO_EXCLUSIVE )
-   {
-      result_flags |= SH_DENYRW;
-      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added SH_DENYRW\n"));
-   }
-
+      *share = _SH_DENYRW;
    else if( uiFlags & FO_DENYWRITE )
-   {
-      result_flags |= SH_DENYWR;
-      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added SH_DENYWR\n"));
-   }
-
-   if( uiFlags & FO_DENYNONE )
-   {
-      result_flags |= SH_DENYNO;
-      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added SH_DENYNO\n"));
-   }
-
-   if( uiFlags & FO_SHARED )
-   {
-      result_flags |= SH_DENYNO;
-      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added SH_DENYNO\n"));
-   }
+      *share = _SH_DENYWR;
+   else if( uiFlags & FO_DENYNONE )
+      *share = _SH_DENYNO;
+   else
+      *share = _SH_COMPAT;
+#elif !defined( HB_OS_UNIX )
+   if( ( uiFlags & FO_DENYREAD ) == FO_DENYREAD )
+      *share = SH_DENYRD;
+   else if( uiFlags & FO_EXCLUSIVE )
+      *share = SH_DENYRW;
+   else if( uiFlags & FO_DENYWRITE )
+      *share = SH_DENYWR;
+   else if( uiFlags & FO_DENYNONE )
+      *share = SH_DENYNO;
+   else
+      *share = SH_COMPAT;
+#else
+   *share = 0;
 #endif
 
-   if( uiFlags & FO_CREAT )
-   {
-      result_flags |= O_CREAT;
-      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_CREAT\n"));
-   }
+   HB_TRACE(HB_TR_INFO, ("convert_open_flags: flags=0x%04x, mode=0x%04x, share=0x%04x, attr=0x%04x", *flags, *mode, *share, *attr));
 
-   if( uiFlags & FO_TRUNC )
-   {
-      result_flags |= O_TRUNC;
-      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_TRUNC\n"));
-   }
-
-   if( uiFlags & FO_EXCL )
-   {
-      result_flags |= O_EXCL;
-      HB_TRACE(HB_TR_INFO, ("convert_open_flags: added O_EXCL\n"));
-   }
-
-   HB_TRACE(HB_TR_INFO, ("convert_open_flags: result is 0x%04x\n", result_flags));
-
-   return result_flags;
 }
-
-static unsigned convert_pmode_flags( USHORT uiFlags )
-{
-   unsigned result_pmode;
-
-   HB_TRACE(HB_TR_DEBUG, ("convert_pmode_flags(%hu)", uiFlags));
-
-   /* by default FC_NORMAL is set */
-
-   //JC1: sorry, but at least under unix is more sensible to
-   // create files without the X attribute
-
-   if( uiFlags & FC_HIDDEN )
-   {
-      result_pmode = S_IRUSR;
-   }
-   else
-   {
-      result_pmode = S_IRUSR | S_IRGRP |  S_IROTH;
-   }
-
-   if( !( uiFlags & FC_READONLY) )
-   {
-      if( result_pmode & S_IRUSR )  result_pmode |= S_IWUSR;
-      if( result_pmode & S_IRGRP )  result_pmode |= S_IWGRP;
-      if( result_pmode & S_IROTH )  result_pmode |= S_IWOTH;
-   }
-
-
-   // JC1: give executable attribute where read is available
-   if( uiFlags & FC_SYSTEM )
-   {
-      if( result_pmode & S_IRUSR )  result_pmode |= S_IXUSR;
-      if( result_pmode & S_IRGRP )  result_pmode |= S_IXGRP;
-      if( result_pmode & S_IROTH )  result_pmode |= S_IXOTH;
-   }
-
-   HB_TRACE(HB_TR_INFO, ("convert_pmode_flags: 0x%04x\n", result_pmode));
-
-   return result_pmode;
-}
-
-static void convert_create_flags( USHORT uiFlags, int * result_flags, unsigned * result_pmode )
-{
-   HB_TRACE(HB_TR_DEBUG, ("convert_create_flags(%hu, %p, %p)", uiFlags, result_flags, result_pmode));
-
-   /* by default FC_NORMAL is set */
-   *result_flags = O_BINARY | O_CREAT | O_TRUNC | O_RDWR | O_LARGEFILE;
-   *result_pmode = convert_pmode_flags( uiFlags );
-
-   HB_TRACE(HB_TR_INFO, ("convert_create_flags: 0x%04x, 0x%04x\n", *result_flags, *result_pmode));
-}
-
-static void convert_create_flags_ex( USHORT uiAttr, USHORT uiFlags, int * result_flags, unsigned * result_pmode )
-{
-   HB_TRACE(HB_TR_DEBUG, ("convert_create_flags_ex(%hu, %hu, %p, %p)", uiAttr, uiFlags, result_flags, result_pmode));
-
-   convert_create_flags( uiAttr, result_flags, result_pmode );
-   *result_flags |= convert_open_flags( uiFlags );
-
-   HB_TRACE(HB_TR_INFO, ("convert_create_flags_ex: 0x%04x, 0x%04x\n", *result_flags, *result_pmode));
-}
-
 #endif
 
 static int convert_seek_flags( USHORT uiFlags )
@@ -1480,7 +1386,7 @@ int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait )
    HB_SYMBOL_UNUSED( bWait );
 
    hb_fsSetError( (USHORT) FS_ERROR );
-
+   iRetStatus = -1;
 #endif
 
    return iRetStatus;
@@ -1560,78 +1466,39 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 
 #if defined(HB_WIN32_IO)
    {
-      DWORD dwMode, dwShare, dwAttr;
+      DWORD dwMode, dwShare, dwCreat, dwAttr;
       HANDLE hFile;
 
-      convert_create_flags( FALSE, 0, uiFlags, &dwMode, &dwShare, &dwAttr );
+      convert_open_flags( FALSE, FC_NORMAL, uiFlags, &dwMode, &dwShare, &dwCreat, &dwAttr );
 
       hFile = ( HANDLE ) CreateFile( ( char * ) pFilename, dwMode, dwShare,
-                                     NULL, OPEN_EXISTING, dwAttr, NULL );
+                                     NULL, dwCreat, dwAttr, NULL );
 
       hb_fsSetIOError( hFile != ( HANDLE ) INVALID_HANDLE_VALUE, 0 );
 
       hFileHandle = HandleToLong(hFile);
    }
-#elif defined(_MSC_VER) || defined(__DMC__)
+#elif defined(HB_FS_FILE_IO)
    {
-      int iShare = _SH_DENYNO;
+      int flags, share, attr;
+      unsigned mode;
 
-      if( ( uiFlags & FO_DENYREAD ) == FO_DENYREAD )
-      {
-         iShare = _SH_DENYRD;
-      }
-      else if( uiFlags & FO_EXCLUSIVE )
-      {
-         iShare = _SH_DENYRW;
-      }
-      else if( uiFlags & FO_DENYWRITE )
-      {
-         iShare = _SH_DENYWR;
-      }
-
-      if( iShare )
-      {
-         hFileHandle = _sopen( ( char * ) pFilename, convert_open_flags( uiFlags ), iShare );
-      }
+      convert_open_flags( FALSE, FC_NORMAL, uiFlags, &flags, &mode, &share, &attr );
+#if defined(_MSC_VER) || defined(__DMC__)
+      if( share )
+         hFileHandle = _sopen( ( char * ) pFilename, flags, share, mode );
       else
-      {
-         hFileHandle = _open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
-      }
-      hb_fsSetIOError( hFileHandle != FS_ERROR, 0 );
-   }
+         hFileHandle = _open( ( char * ) pFilename, flags, mode );
 #elif defined(HB_FS_SOPEN)
-   {
-      int iShare = SH_DENYNO;
-
-      if( ( uiFlags & FO_DENYREAD ) == FO_DENYREAD )
-      {
-         iShare = SH_DENYRD;
-      }
-      else if( uiFlags & FO_EXCLUSIVE )
-      {
-         iShare = SH_DENYRW;
-      }
-      else if( uiFlags & FO_DENYWRITE )
-      {
-         iShare = SH_DENYWR;
-      }
-
-      if( iShare )
-      {
-         hFileHandle = sopen( ( char * ) pFilename, convert_open_flags( uiFlags ), iShare );
-      }
+      if( share )
+         hFileHandle = sopen( ( char * ) pFilename, flags, share, mode );
       else
-      {
-         hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ) );
-      }
+         hFileHandle = open( ( char * ) pFilename, flags, mode );
+#else
+      hFileHandle = open( ( char * ) pFilename, flags | share, mode );
+#endif
       hb_fsSetIOError( hFileHandle != FS_ERROR, 0 );
    }
-#elif defined(HAVE_POSIX_IO)
-
-   hFileHandle = open( ( char * ) pFilename, convert_open_flags( uiFlags ),
-                                             convert_pmode_flags( 0 ) );
-   hb_fsSetIOError( hFileHandle != FS_ERROR, 0 );
-
 #else
 
    hFileHandle = FS_ERROR;
@@ -1652,11 +1519,6 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
    HB_THREAD_STUB
    FHANDLE hFileHandle;
 
-   #if defined(HB_FS_FILE_IO) && !defined(HB_WIN32_IO)
-      int oflag;
-      unsigned pmode;
-   #endif
-
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCreate(%p, %hu)", pFilename, uiAttr));
 
    pFilename = (BYTE*)hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
@@ -1667,25 +1529,33 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 
 #if defined(HB_WIN32_IO)
    {
-      DWORD dwMode, dwShare, dwAttr;
+      DWORD dwMode, dwShare, dwCreat, dwAttr;
       HANDLE hFile;
 
-      convert_create_flags( TRUE, uiAttr, FO_EXCLUSIVE, &dwMode, &dwShare, &dwAttr );
+      convert_open_flags( TRUE, uiAttr, FO_EXCLUSIVE, &dwMode, &dwShare, &dwCreat, &dwAttr );
 
       hFile = ( HANDLE ) CreateFile( ( char * ) pFilename, dwMode, dwShare,
-                                     NULL, CREATE_ALWAYS, dwAttr, NULL );
+                                     NULL, dwCreat, dwAttr, NULL );
 
       hb_fsSetIOError( hFile != ( HANDLE ) INVALID_HANDLE_VALUE, 0 );
 
       hFileHandle = HandleToLong(hFile);
    }
 #elif defined(HB_FS_FILE_IO)
+   {
+      int flags, share, attr;
+      unsigned mode;
+      convert_open_flags( TRUE, uiAttr, FO_EXCLUSIVE, &flags, &mode, &share, &attr );
 
-   convert_create_flags( uiAttr, &oflag, &pmode );
-
-   hFileHandle = open( ( char * ) pFilename, oflag, pmode );
-   hb_fsSetIOError( hFileHandle != FS_ERROR, 0 );
-
+#if defined(HB_FS_DOSCREAT)
+      hFileHandle = _creat( ( char * ) pFilename, attr );
+#elif defined(HB_FS_SOPEN)
+      hFileHandle = open( ( char * ) pFilename, flags, mode );
+#else
+      hFileHandle = open( ( char * ) pFilename, flags | share, mode );
+#endif
+      hb_fsSetIOError( hFileHandle != FS_ERROR, 0 );
+   }
 #else
 
    hFileHandle = FS_ERROR;
@@ -1722,13 +1592,13 @@ FHANDLE HB_EXPORT hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags
 
 #if defined( HB_WIN32_IO )
    {
-      DWORD dwMode, dwShare, dwAttr;
+      DWORD dwMode, dwShare, dwCreat, dwAttr;
       HANDLE hFile;
 
-      convert_create_flags( TRUE, uiAttr, uiFlags, &dwMode, &dwShare, &dwAttr );
+      convert_open_flags( TRUE, uiAttr, uiFlags, &dwMode, &dwShare, &dwCreat, &dwAttr );
 
       hFile = ( HANDLE ) CreateFile( ( char * ) pFilename, dwMode, dwShare,
-                                     NULL, CREATE_ALWAYS, dwAttr, NULL );
+                                     NULL, dwCreat, dwAttr, NULL );
 
       hb_fsSetIOError( hFile != ( HANDLE ) INVALID_HANDLE_VALUE, 0 );
 
@@ -1736,12 +1606,15 @@ FHANDLE HB_EXPORT hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags
    }
 #elif defined(HB_FS_FILE_IO)
    {
-      int oflag;
-      unsigned pmode;
+      int flags, share, attr;
+      unsigned mode;
+      convert_open_flags( TRUE, uiAttr, uiFlags, &flags, &mode, &share, &attr );
 
-      convert_create_flags_ex( uiAttr, uiFlags, &oflag, &pmode );
-
-      hFileHandle = open( ( char * ) pFilename, oflag, pmode );
+#if defined(HB_FS_SOPEN)
+      hFileHandle = open( ( char * ) pFilename, flags, mode );
+#else
+      hFileHandle = open( ( char * ) pFilename, flags | share, mode );
+#endif
       hb_fsSetIOError( hFileHandle != FS_ERROR, 0 );
    }
 #else
@@ -3280,19 +3153,167 @@ BYTE   HB_EXPORT  hb_fsCurDrv( void )
 /* TODO: Implement hb_fsExtOpen */
 
 FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
-                      USHORT uiFlags, BYTE * pPaths, PHB_ITEM pError )
+                                 USHORT uiExFlags, BYTE * pPaths,
+                                 PHB_ITEM pError )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsExtOpen(%s, %s, %hu, %p, %p)", (char*) pFilename, (char*) pDefExt, uiFlags, pPaths, pError));
+   HB_PATHNAMES *pSearchPath = NULL, *pNextPath;
+   PHB_FNAME pFilepath;
+   FHANDLE hFile;
+   BOOL fIsFile = FALSE;
+   BYTE * szPath;
+   USHORT uiFlags;
 
-   hb_fsSetError( (USHORT) FS_ERROR );
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsExtOpen(%s, %s, %hu, %p, %p)", pFilename, pDefExt, uiExFlags, pPaths, pError));
 
-   HB_SYMBOL_UNUSED( pFilename );
-   HB_SYMBOL_UNUSED( pDefExt );
-   HB_SYMBOL_UNUSED( uiFlags );
-   HB_SYMBOL_UNUSED( pPaths );
-   HB_SYMBOL_UNUSED( pError );
+/*
+   #define FXO_TRUNCATE  0x0100   // Create (truncate if exists)
+   #define FXO_APPEND    0x0200   // Create (append if exists)
+   #define FXO_UNIQUE    0x0400   // Create unique file FO_EXCL ???
+   #define FXO_FORCEEXT  0x0800   // Force default extension
+   #define FXO_DEFAULTS  0x1000   // Use SET command defaults
+   #define FXO_DEVICERAW 0x2000   // Open devices in raw mode
+   // xHarbour extension 
+   #define FXO_SHARELOCK 0x4000   // emulate DOS SH_DENY* mode in POSIX OS
+   #define FXO_COPYNAME  0x8000   // copy final szPath into pFilename
 
-   return hb_fsError();
+   hb_errGetFileName( pError );
+*/
+
+   szPath = (BYTE *) hb_xgrab( _POSIX_PATH_MAX + 1 );
+
+   uiFlags = uiExFlags & 0xff;
+   if( uiExFlags & ( FXO_TRUNCATE | FXO_APPEND | FXO_UNIQUE ) )
+   {
+      uiFlags |= FO_CREAT;
+      if( uiExFlags & FXO_UNIQUE )
+         uiFlags |= FO_EXCL;
+#if !defined( HB_USE_SHARELOCKS )
+      else if( uiExFlags & FXO_TRUNCATE )
+         uiFlags |= FO_TRUNC;
+#endif
+   }
+
+   pFilepath = hb_fsFNameSplit( ( char * ) pFilename );
+
+   if( pDefExt && ( ( uiExFlags & FXO_FORCEEXT ) || !pFilepath->szExtension ) )
+   {
+      pFilepath->szExtension = ( char * ) pDefExt;
+   }
+
+   if( pFilepath->szPath )
+   {
+      hb_fsFNameMerge( ( char * ) szPath, pFilepath );
+   }
+   else if( uiExFlags & FXO_DEFAULTS )
+   {
+      if( hb_set.HB_SET_DEFAULT )
+      {
+         pFilepath->szPath = hb_set.HB_SET_DEFAULT;
+         hb_fsFNameMerge( ( char * ) szPath, pFilepath );
+         fIsFile = hb_fsFile( szPath );
+      }
+      if( !fIsFile && hb_set.HB_SET_PATH )
+      {
+         pNextPath = hb_setGetFirstSetPath();
+         while( !fIsFile && pNextPath )
+         {
+            pFilepath->szPath = pNextPath->szPath;
+            hb_fsFNameMerge( ( char * ) szPath, pFilepath );
+            fIsFile = hb_fsFile( szPath );
+            pNextPath = pNextPath->pNext;
+         }
+      }
+      if( !fIsFile )
+      {
+         pFilepath->szPath = hb_set.HB_SET_DEFAULT ? hb_set.HB_SET_DEFAULT : NULL;
+         hb_fsFNameMerge( ( char * ) szPath, pFilepath );
+      }
+   }
+   else if( pPaths )
+   {
+      hb_fsAddSearchPath( ( char * ) pPaths, &pSearchPath );
+      pNextPath = pSearchPath;
+      while( !fIsFile && pNextPath );
+      {
+         pFilepath->szPath = pNextPath->szPath;
+         hb_fsFNameMerge( ( char * ) szPath, pFilepath );
+         fIsFile = hb_fsFile( szPath );
+         pNextPath = pNextPath->pNext;
+      }
+      if( !fIsFile )
+      {
+         pFilepath->szPath = NULL;
+         hb_fsFNameMerge( ( char * ) szPath, pFilepath );
+      }
+   }
+   else
+   {
+      hb_fsFNameMerge( ( char * ) szPath, pFilepath );
+   }
+   hb_xfree( pFilepath );
+
+   hFile = hb_fsOpen( szPath, uiFlags );
+
+#if defined( HB_USE_SHARELOCKS )
+   if( hFile != FS_ERROR && uiExFlags & FXO_SHARELOCK )
+   {
+      USHORT uiLock;
+      if( ( uiFlags & ( FO_READ | FO_WRITE | FO_READWRITE ) ) == FO_READ ||
+          ( uiFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE ) ) == 0 )
+         uiLock = FL_LOCK | FLX_SHARED;
+      else
+         uiLock = FL_LOCK | FLX_EXCLUSIVE;
+
+      if( !hb_fsLockLarge( hFile, HB_SHARELOCK_POS, HB_SHARELOCK_SIZE, uiLock ) )
+      {
+         hb_fsClose( hFile );
+         hFile = FS_ERROR;
+         /*
+          * fix for neterr() support and Clipper compatibility,
+          * should be revised with a better multi platform solution.
+          */
+         hb_fsSetError( ( uiExFlags & FXO_TRUNCATE ) ? 5 : 32 );
+      }
+      else if( uiExFlags & FXO_TRUNCATE )
+      {
+         /* truncate the file only if properly locked */
+         hb_fsSeek( hFile, 0, FS_SET );
+         hb_fsWrite( hFile, NULL, 0 );
+         if( hb_fsError() != 0 )
+         {
+            hb_fsClose( hFile );
+            hFile = FS_ERROR;
+            hb_fsSetError( 5 );
+         }
+      }
+   }
+#elif 1
+   /*
+    * Temporary fix for neterr() support and Clipper compatibility,
+    * should be revised with a better solution.
+    */
+   if( ( uiExFlags & ( FXO_TRUNCATE | FXO_APPEND | FXO_UNIQUE ) ) == 0 &&
+       hb_fsError() == 5 )
+   {
+      hb_fsSetError( 32 );
+   }
+#endif
+
+   if( pError )
+   {
+      hb_errPutFileName( pError, ( char * ) szPath );
+      if( hFile == FS_ERROR )
+      {
+         hb_errPutOsCode( pError, hb_fsError() );
+         hb_errPutGenCode( pError, ( uiExFlags & FXO_TRUNCATE ) ? EG_CREATE : EG_OPEN );
+      }
+   }
+
+   if( uiExFlags & FXO_COPYNAME && hFile != FS_ERROR )
+      strcpy( ( char * ) pFilename, ( char * ) szPath );
+
+   hb_xfree( szPath );
+   return hFile;
 }
 
 BOOL HB_EXPORT hb_fsEof( FHANDLE hFileHandle )
