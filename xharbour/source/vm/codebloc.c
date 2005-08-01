@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.47 2004/12/31 11:56:10 druzus Exp $
+ * $Id: codebloc.c,v 1.48 2005/03/10 02:41:45 ronpinkas Exp $
  */
 
 /*
@@ -194,7 +194,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
    return pCBlock;
 }
 
-HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
+HB_EXPORT HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
 {
    HB_CODEBLOCK_PTR pCBlock;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.165 2005/07/10 05:07:05 walito Exp $
+ * $Id: hbapi.h,v 1.166 2005/07/17 00:10:19 ronpinkas Exp $
  */
 
 /*
@@ -582,7 +582,7 @@ extern PHB_SYMB HB_EXPORT hb_symbolNew( char * szName ); /* create a new symbol 
 
 /* Codeblock management */
 extern HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer, USHORT uiLocals, USHORT * pLocalPosTable, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* create a code-block */
-extern HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen );
+extern HB_EXPORT HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen );
 extern void     hb_codeblockDelete( HB_ITEM_PTR pItem ); /* delete a codeblock */
 extern PHB_ITEM hb_codeblockGetVar( PHB_ITEM pItem, LONG iItemPos ); /* get local variable referenced in a codeblock */
 extern PHB_ITEM hb_codeblockGetRef( HB_CODEBLOCK_PTR pCBlock, PHB_ITEM pRefer ); /* get local variable passed by reference */

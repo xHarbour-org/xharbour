@@ -1,10 +1,16 @@
- * $Id: ChangeLog,v 1.4238 2005/07/30 00:00:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.4238 2005/07/31 01:26:05 modalsist Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-01 15:50 UTC+0200 Jacek Potempa (Jacek.Potempa@otc.pl)
+  * xharbour/source/vm/codebloc.c
+  * xharbour/include/hbapi.h
+       * Added HB_EXPORT to hb_codeblockMacroNew() definition and declaration.
+       * Change required to access this function from outside of harbour.dll
 
 2005-07-30 22:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utilse/hbmake/hbmake.prg
