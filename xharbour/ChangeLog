@@ -1,10 +1,15 @@
- * $Id: ChangeLog,v 1.4238 2005/07/31 01:26:05 modalsist Exp $
+ * $Id: ChangeLog,v 1.4239 2005/08/01 13:51:37 jacekp Exp $
 
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-01 23:15 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+  * source/rtl/gtwvt/gtwvt.c
+    ! Fix resource leak in gtResetWindowSize(). A severe bug for Win98.
 
 2005-08-01 15:50 UTC+0200 Jacek Potempa (Jacek.Potempa@otc.pl)
   * xharbour/source/vm/codebloc.c
@@ -42,7 +47,7 @@
 2005-07-25 07:55 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbexprb.c
     * Corrected right hand optimization of negtive values into +=
- 
+
 2005-07-25 02:10 UTC-300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/vm/classes.c
     ! Clear old hack in my code for Classname and classh.

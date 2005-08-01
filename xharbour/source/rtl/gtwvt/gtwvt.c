@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.155 2005/06/21 02:25:01 jabrecer Exp $
+ * $Id: gtwvt.c,v 1.156 2005/06/29 21:40:41 peterrees Exp $
  */
 
 /*
@@ -1634,14 +1634,21 @@ static void hb_wvt_gtResetWindowSize( HWND hWnd )
   //
   hdc      = GetDC( hWnd );
   hFont    = hb_wvt_gtGetFont( _s.fontFace, _s.fontHeight, _s.fontWidth, _s.fontWeight, _s.fontQuality, _s.CodePage );
+
+  if ( _s.hFont )
+  {
+    DeleteObject( _s.hFont );
+  }
+
   _s.hFont = hFont ;
   hOldFont = ( HFONT ) SelectObject( hdc, hFont );
-  if ( hOldFont )
-  {
-    DeleteObject( hOldFont );
-  }
+  //if ( hOldFont )
+  //{
+  //  DeleteObject( hOldFont );
+  //}
   GetTextMetrics( hdc, &tm );
   SetTextCharacterExtra( hdc,0 ); // do not add extra char spacing even if bold
+  SelectObject( hdc, hOldFont );
   ReleaseDC( hWnd, hdc );
 
   // we will need to use the font size to handle the transformations from
