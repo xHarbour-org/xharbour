@@ -1,5 +1,5 @@
 /*
- * $Id: winos.prg,v 1.4 2005/02/15 22:48:45 andijahja Exp $
+ * $Id: winos.prg,v 1.5 2005/03/10 23:41:17 andijahja Exp $
  */
 
 /*
@@ -104,6 +104,9 @@ FUNCTION OS_ISWIN2003()
   RETURN( .F. )
 
 FUNCTION OS_ISWTSCLIENT()
+  RETURN( .F. )
+
+FUNCTION OS_ISWIN2000_OR_LATER()
   RETURN( .F. )
 
 FUNCTION OS_VERSIONINFO()
@@ -266,6 +269,13 @@ HB_FUNC( OS_ISWTSCLIENT )
     iResult = GetSystemMetrics(SM_REMOTESESSION) ;
   }
   hb_retl( iResult );
+}
+
+HB_FUNC( OS_ISWIN2000_OR_LATER )
+{
+  OSVERSIONINFO osvi;
+  getwinver( &osvi );
+  hb_retl( osvi.dwMajorVersion >= 5 );
 }
 
 HB_FUNC( OS_VERSIONINFO )

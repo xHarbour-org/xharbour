@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.28 2005/03/19 13:51:07 andijahja Exp $
+ * $Id: hbver.c,v 1.29 2005/03/31 14:34:03 andijahja Exp $
  */
 
 /*
@@ -403,7 +403,7 @@ char * hb_verPlatform( void )
    return szPlatform;
 }
 
-BOOL hb_iswinnt(void)
+BOOL HB_EXPORT hb_iswinnt(void)
 {
 #if defined(HB_OS_WIN_32)
 
