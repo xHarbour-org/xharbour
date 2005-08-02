@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.116 2005/06/22 15:30:47 druzus Exp $
+ * $Id: dbfntx1.c,v 1.117 2005/08/01 22:21:11 druzus Exp $
  */
 
 /*
@@ -123,11 +123,11 @@
 
 /* #define HB_NTX_NOMULTITAG */
 
-#define HB_NTX_EXTERNAL_PAGEBUFFER
+/* #define HB_NTX_EXTERNAL_PAGEBUFFER */
 
+/*
 #define HB_NTX_DEBUG
 #define HB_NTX_DEBUG_EXT
-/*
 #define HB_NTX_DEBUG_DISP
 */
 
@@ -1877,7 +1877,6 @@ static ERRCODE hb_ntxIndexHeaderRead( LPNTXINDEX pIndex )
       ULONG ulVersion, ulNext;
       USHORT usTags;
 
-
       usTags = HB_GET_LE_UINT16( lpCTX->ntags );
       ulVersion = HB_GET_LE_UINT32( lpCTX->version );
       ulNext = HB_GET_LE_UINT32( lpCTX->freepage );
@@ -1895,6 +1894,8 @@ static ERRCODE hb_ntxIndexHeaderRead( LPNTXINDEX pIndex )
          {
             pIndex->lpTags[ i ]->HeadBlock =
                      hb_ntxIndexTagFind( lpCTX, pIndex->lpTags[ i ]->TagName );
+            if( !pIndex->lpTags[ i ]->HeadBlock )
+               pIndex->lpTags[ i ]->RootBlock = 0;
          }
       }
 #endif
@@ -3777,31 +3778,21 @@ static BOOL hb_ntxOrdSkipWild( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pWildItm 
 static BOOL hb_ntxOrdSkipRegEx( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pRegExItm )
 {
    NTXAREAP pArea = pTag->Owner->Owner;
-   regex_t re, *pReg;
+   BOOL fFound = FALSE, fFree;
+   regex_t *pReg = NULL;
    regmatch_t aMatches[1];
-   int CFlags = REG_EXTENDED, EFlags = 0;
-   char *szMask = hb_itemGetCPtr( pRegExItm );
-   BOOL fFound = FALSE, fFree = FALSE;
+   int EFlags = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_ntxOrdSkipRegEx(%p, %d, %p)", pTag, fForward, pRegExItm));
 
-   if( pTag->KeyType != 'C' || !szMask || !*szMask )
+   if( pTag->KeyType == 'C' )
+      pReg = hb_getregex( pRegExItm, FALSE, FALSE, &fFree );
+
+   if( !pReg )
    {
       if( SELF_SKIP( ( AREAP ) pArea, fForward ? 1 : -1 ) != SUCCESS )
          return FALSE;
       return fForward ? !pArea->fEof : !pArea->fBof;
-   }
-
-   if( hb_isregexstring( pRegExItm ) )
-   {
-      pReg = (regex_t *) ( szMask + 3 );
-   }
-   else
-   {
-      if( regcomp( &re, szMask, CFlags ) != 0 )
-         return FALSE;
-      pReg = &re;
-      fFree = TRUE;
    }
 
    if( pArea->lpdbPendingRel )
@@ -3860,7 +3851,7 @@ static BOOL hb_ntxOrdSkipRegEx( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pRegExIt
       pArea->fEof = FALSE;
 
    if( fFree )
-      regfree( pReg );
+      hb_freeregex( pReg );
 
    return fFound;
 }
@@ -5230,7 +5221,8 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                for( i = 0; i < pIndex->iTags; i++ )
                {
                   pTag = pIndex->lpTags[ i ];
-                  if( pTag->Custom || !pTag->HeadBlock || ( fAppend && pTag->ChgOnly ) )
+                  if( pTag->Custom || ( pTag->Owner->Compound && !pTag->HeadBlock ) ||
+                      ( fAppend && pTag->ChgOnly ) )
                      continue;
 
                   pKey = hb_ntxEvalKey( NULL, pTag );
@@ -5266,7 +5258,8 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                            break;
                         }
                         fLck = TRUE;
-                        if( !pTag->HeadBlock )
+                        if( ( pTag->Owner->Compound && !pTag->HeadBlock ) ||
+                            !pTag->RootBlock )
                            fAdd = fDel = FALSE;
                      }
                      if( fDel )
@@ -5852,7 +5845,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       pIndexPtr = &(*pIndexPtr)->pNext;
 
    /* It should not happen, reintrance? */
-   if( *pIndexPtr )
+   if( !*pIndexPtr )
       return FAILURE;
    
    if( errCode != SUCCESS )

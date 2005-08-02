@@ -220,8 +220,6 @@ PCRE_DL_IMPORT extern void  (*pcre_free)(void *);
 
 /* Functions */
 
-#define hb_isregexstring( x )  ( ( x->item.asString.length > 3 && memcmp( x->item.asString.value, "***", 3 ) == 0 ) )
-
 extern pcre *pcre_compile(const char *, int, const char **, int *,
               const unsigned char *);
 extern int  pcre_copy_substring(const char *, int *, int, int, char *, int);
@@ -663,6 +661,10 @@ typedef struct {
 } regmatch_t;
 
 /* The functions */
+
+#define hb_isregexstring( x )  ( ( x->item.asString.length > 3 && memcmp( x->item.asString.value, "***", 3 ) == 0 ) )
+extern HB_EXPORT regex_t * hb_getregex( PHB_ITEM pRegEx, BOOL lIgnCase, BOOL lNL, BOOL *fFree );
+extern void HB_EXPORT hb_freeregex( regex_t *pReg );
 
 extern int regcomp(regex_t *, const char *, int);
 extern int regexec(regex_t *, const char *, size_t, regmatch_t *, int);

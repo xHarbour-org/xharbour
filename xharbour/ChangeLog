@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4240 2005/08/01 16:09:57 bdj Exp $
+ * $Id: ChangeLog,v 1.4241 2005/08/01 22:14:36 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-02 12:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/regex.h
+  * xharbour/source/rtl/regex.c
+    ! changed to respect strict alignment
+    + added hb_getregex() and hb_freeregex() functions
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * changed to use hb_getregex()/hb_freeregex()
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * changed to use hb_getregex()/hb_freeregex()
+    * disabled debug code
+    ! fixed two typo in index update code
 
 2005-08-02 00:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/rdd_ads/ads1.c

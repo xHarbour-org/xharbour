@@ -6345,102 +6345,56 @@ else
 
 /* Ron Pinkas - Begin of additions. */
 
-HB_FUNC( HB_ATX )
-{
-#ifdef HB_API_MACROS
-   HB_THREAD_STUB
+/*
+ * It will be good to separate RegEx internals from xHarbour API
+ * and define our own meta functions so C modules which use regex
+ * will not have to include regex.h and we will be free to make
+ * any modifications in internal structures (also use native
+ * platform regex library which exists in most of *nixes), Druzus
+ */
+#if !defined( HB_ALLOC_ALIGNMENT ) || ( HB_ALLOC_ALIGNMENT + 1 == 1 )
+#  define HB_ALLOC_ALIGNMENT     8
 #endif
-   #define REGEX_MAX_GROUPS 16
-   regex_t re, *pReg ;
-   regmatch_t aMatches[REGEX_MAX_GROUPS];
-   int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
-   ULONG ulLen;
 
-   PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
-   PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
-   ULONG ulStart = hb_parnl(4), ulEnd = hb_parnl(5);
+regex_t * HB_EXPORT hb_getregex( PHB_ITEM pRegEx, BOOL lIgnCase, BOOL lNL, BOOL *fFree )
+{
+   char * szRegEx = hb_itemGetCPtr( pRegEx );
+   regex_t * pRetReg = NULL;
 
-   if( pRegEx && pString && ulStart <= pString->item.asString.length )
+   *fFree = FALSE;
+   if( szRegEx && *szRegEx )
    {
-      if ( hb_isregexstring( pRegEx ) ) // ( pRegEx->item.asString.length > 3 && memcmp( pRegEx->item.asString.value, "***", 3 ) == 0 )
+      if( memcmp( szRegEx, "***", 3 ) == 0 )
       {
-         pReg = (regex_t *) ( pRegEx->item.asString.value + 3 );
-         pReg->re_pcre = (pcre *) ( ( BYTE * ) pReg + sizeof( regex_t ) );
+         pRetReg = (regex_t *) ( szRegEx + HB_ALLOC_ALIGNMENT );
+         pRetReg->re_pcre = (pcre *) ( ( BYTE * ) pRetReg + sizeof( regex_t ) );
       }
       else
       {
-         if( regcomp( &re, pRegEx->item.asString.value, CFlags ) == 0 )
-         {
-            if( pCaseSensitive && pCaseSensitive->item.asLogical.value == ( int ) FALSE )
-            {
-               CFlags |= REG_ICASE;
-            }
+         int CFlags = REG_EXTENDED | ( lIgnCase ? REG_ICASE : 0 ) |
+                      ( lNL ? REG_NEWLINE : 0 );
 
-            pReg = &re;
+         pRetReg = ( regex_t * ) hb_xgrab( sizeof( regex_t ) );
+         if( regcomp( pRetReg, szRegEx, CFlags ) == 0 )
+         {
+            *fFree = TRUE;
          }
          else
          {
-            pReg = NULL;
-         }
-      }
-
-      if( pReg )
-      {
-         if( ulStart || ulEnd )
-         {
-            EFlags |= REG_STARTEND;
-            aMatches[0].rm_so = ulStart > 1 ? ulStart - 1 : 0;
-            aMatches[0].rm_eo = ulEnd > 0 && ulEnd < pString->item.asString.length ? ulEnd : pString->item.asString.length;
-         }
-
-         if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
-         {
-            // Very STARNGE bug if string is found at position 0 regex "forgets" to add the offset!!!
-            if( ulStart && aMatches[0].rm_so == 0 )
-            {
-               aMatches[0].rm_so += ulStart - 1;
-               aMatches[0].rm_eo += ulStart - 1;
-            }
-
-            ulLen = aMatches[0].rm_eo - aMatches[0].rm_so;
-
-            if( hb_pcount() > 3 )
-            {
-               hb_stornl( aMatches[0].rm_so + 1, 4 );
-            }
-
-            if( hb_pcount() > 4 )
-            {
-               hb_stornl( aMatches[0].rm_eo - aMatches[0].rm_so, 5 );
-            }
-
-            hb_retclen( pString->item.asString.value + aMatches[0].rm_so, ulLen );
-
-            if( pReg == &re )
-            {
-               regfree( &re );
-            }
-
-            return;
-         }
-
-         if( pReg == &re )
-         {
-            regfree( &re );
+            hb_xfree( pRetReg );
+            pRetReg = NULL;
+            hb_errRT_BASE_SubstR( EG_ARG, 3012, "Invalid Regular expression", "Regex subsystem", 1, pRegEx );
          }
       }
    }
 
-   if( hb_pcount() > 3 )
-   {
-      hb_stornl( 0, 4 );
-   }
+   return pRetReg;
+}
 
-   if( hb_pcount() > 4 )
-   {
-      hb_stornl( 0, 5 );
-   }
+void HB_EXPORT hb_freeregex( regex_t *pReg )
+{
+   regfree( pReg );
+   hb_xfree( pReg );
 }
 
 /*
@@ -6457,10 +6411,9 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       #define REGEX_MAX_GROUPS 16
    #endif
 
-   regex_t re;
    regex_t *pReg;
    regmatch_t aMatches[REGEX_MAX_GROUPS];
-   int CFlags = REG_EXTENDED, EFlags = 0;//REG_BACKR;
+   int EFlags = 0;//REG_BACKR;
    int i, iMatches = 0;
    int iMaxMatch = REGEX_MAX_GROUPS;
 
@@ -6474,39 +6427,26 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       pString = hb_param( 2, HB_IT_STRING );
    }
 
-   if( pRegEx == NULL || pString == NULL || ( pRegEx != NULL && pRegEx->type != HB_IT_STRING) || ( pString != NULL && pString->type != HB_IT_STRING ) )
+   if( pRegEx == NULL || pString == NULL ||
+       !HB_IS_STRING( pRegEx ) || !HB_IS_STRING( pString ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameters", "Regex subsystem", 4, pRegEx, pString, hb_paramError( 3 ), hb_paramError( 4 ) );
       return FALSE;
    }
 
+   pReg = hb_getregex( pRegEx,
+                       pCaseSensitive != NULL && !pCaseSensitive->item.asLogical.value,
+                       pNewLine != NULL && pNewLine->item.asLogical.value,
+                       &fFree );
+
    /* now check if it is a precompiled regex */
    if ( hb_isregexstring( pRegEx ) ) //( pRegEx->item.asString.length > 3 && memcmp( pRegEx->item.asString.value, "***", 3 ) == 0 )
    {
-      pReg = (regex_t *) ( pRegEx->item.asString.value + 3 );
-      pReg->re_pcre = (pcre *) ( ( BYTE * ) pReg + sizeof( regex_t ) );
-      aMatches[0].rm_eo = pRegEx->item.asString.length - 3;
+      aMatches[0].rm_eo = pRegEx->item.asString.length - 3 -
+                          ((real_pcre *) pReg->re_pcre)->size;
    }
    else
    {
-      if( pCaseSensitive != NULL && pCaseSensitive->item.asLogical.value == ( int )FALSE )
-      {
-         CFlags |= REG_ICASE;
-      }
-
-      if( pNewLine != NULL && pNewLine->item.asLogical.value == ( int )TRUE )
-      {
-         CFlags |= REG_NEWLINE;
-      }
-
-      if( regcomp( &re, pRegEx->item.asString.value, CFlags ) != 0 )
-      {
-         hb_errRT_BASE_SubstR( EG_ARG, 3012, "Invalid Regular expression", "Regex subsystem", 4, pRegEx, pString, hb_paramError( 3 ), hb_paramError( 4 ));
-         return FALSE;
-      }
-
-      pReg = &re;
-      fFree = TRUE;
       aMatches[0].rm_eo = pRegEx->item.asString.length;
    }
 
@@ -6549,7 +6489,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
             if( fFree )
             {
-               regfree( pReg );
+               hb_freeregex( pReg );
             }
 
             return TRUE;
@@ -6559,7 +6499,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             if( fFree )
             {
                //TraceLog( NULL, "%s like %s\n", pString->item.asString.value, pRegEx->item.asString.value );
-               regfree( pReg );
+               hb_freeregex( pReg );
             }
 
             return aMatches[0].rm_so == 0 && (ULONG) (aMatches[0].rm_eo) == pString->item.asString.length;
@@ -6568,7 +6508,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             if( fFree )
             {
                //TraceLog( NULL, ">%s< has >%s<\n", pString->item.asString.value, pRegEx->item.asString.value );
-               regfree( pReg );
+               hb_freeregex( pReg );
             }
 
             return TRUE;
@@ -6601,7 +6541,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
          if( fFree )
          {
-            regfree( pReg );
+            hb_freeregex( pReg );
          }
 
          return TRUE;
@@ -6650,7 +6590,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             }
 
             if ( fFree )
-               regfree( pReg );
+               hb_freeregex( pReg );
             return TRUE;
 
          }
@@ -6662,7 +6602,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       for request kind == 3 (split) */
    if ( fFree )
    {
-      regfree( pReg );
+      hb_freeregex( pReg );
    }
 
    if( cRequest == 3 )
@@ -6734,6 +6674,82 @@ HB_EXPORT int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase )
    sRegEx[ iLenResult ] = '\0';
 
    return iLenResult;
+}
+
+HB_FUNC( HB_ATX )
+{
+#ifdef HB_API_MACROS
+   HB_THREAD_STUB
+#endif
+   #define REGEX_MAX_GROUPS 16
+   regex_t *pReg ;
+   regmatch_t aMatches[REGEX_MAX_GROUPS];
+   int EFlags = 0;//REG_BACKR;
+   ULONG ulLen;
+   BOOL fFree;
+
+   PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
+   PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
+   ULONG ulStart = hb_parnl(4), ulEnd = hb_parnl(5);
+
+   if( pRegEx && pString && ulStart <= pString->item.asString.length )
+   {
+      pReg = hb_getregex( pRegEx,
+                          pCaseSensitive && ! pCaseSensitive->item.asLogical.value,
+                          FALSE, &fFree );
+      if( pReg )
+      {
+         if( ulStart || ulEnd )
+         {
+            EFlags |= REG_STARTEND;
+            aMatches[0].rm_so = ulStart > 1 ? ulStart - 1 : 0;
+            aMatches[0].rm_eo = ulEnd > 0 && ulEnd < pString->item.asString.length ? ulEnd : pString->item.asString.length;
+         }
+
+         if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
+         {
+            // Very STARNGE bug if string is found at position 0 regex "forgets" to add the offset!!!
+            if( ulStart && aMatches[0].rm_so == 0 )
+            {
+               aMatches[0].rm_so += ulStart - 1;
+               aMatches[0].rm_eo += ulStart - 1;
+            }
+
+            ulLen = aMatches[0].rm_eo - aMatches[0].rm_so;
+
+            if( hb_pcount() > 3 )
+            {
+               hb_stornl( aMatches[0].rm_so + 1, 4 );
+            }
+
+            if( hb_pcount() > 4 )
+            {
+               hb_stornl( aMatches[0].rm_eo - aMatches[0].rm_so, 5 );
+            }
+
+            hb_retclen( pString->item.asString.value + aMatches[0].rm_so, ulLen );
+
+            if( fFree )
+               hb_freeregex( pReg );
+
+            return;
+         }
+
+         if( fFree )
+            hb_freeregex( pReg );
+      }
+   }
+
+   if( hb_pcount() > 3 )
+   {
+      hb_stornl( 0, 4 );
+   }
+
+   if( hb_pcount() > 4 )
+   {
+      hb_stornl( 0, 5 );
+   }
 }
 
 HB_FUNC( WILD2REGEX )
@@ -6809,13 +6825,13 @@ HB_FUNC( HB_REGEXCOMP )
    if( regcomp( &re, pRegEx->item.asString.value, CFlags ) == 0 )
    {
       ULONG nSize = ((real_pcre *) re.re_pcre)->size;
-      cRegex = (char *) hb_xgrab( 3 + sizeof( re ) + nSize );
-      memcpy( cRegex + 3 + sizeof( re ), re.re_pcre, nSize );
+      cRegex = (char *) hb_xgrab( HB_ALLOC_ALIGNMENT + sizeof( re ) + nSize );
+      memcpy( cRegex + HB_ALLOC_ALIGNMENT + sizeof( re ), re.re_pcre, nSize );
       (pcre_free)(re.re_pcre);
-      re.re_pcre = (pcre *) ( cRegex + 3 + sizeof( re ) );
+      re.re_pcre = (pcre *) ( cRegex + HB_ALLOC_ALIGNMENT + sizeof( re ) );
       memcpy( cRegex, "***", 3 );
-      memcpy( cRegex + 3, &re, sizeof( re ) );
-      hb_retclenAdoptRaw( cRegex, 3 + sizeof( re ) + nSize );
+      memcpy( cRegex + HB_ALLOC_ALIGNMENT, &re, sizeof( re ) );
+      hb_retclenAdoptRaw( cRegex, HB_ALLOC_ALIGNMENT + sizeof( re ) + nSize );
    }
    else {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Invalid Regular expression",

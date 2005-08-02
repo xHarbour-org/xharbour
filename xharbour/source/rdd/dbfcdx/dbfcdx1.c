@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.208 2005/06/22 15:30:36 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.209 2005/08/01 22:20:15 druzus Exp $
  */
 
 /*
@@ -4861,9 +4861,10 @@ static void hb_cdxIndexFree( LPCDXINDEX pIndex )
    if ( pIndex->hFile != FS_ERROR )
       hb_fsClose( pIndex->hFile );
 
+#ifdef HB_CDX_DBGCODE
    if ( pIndex->fShared && ( pIndex->lockWrite || pIndex->lockRead ) )
       hb_errInternal( 9104, "hb_cdxIndexFree: index file still locked.", "", "" );
-#ifdef HB_CDX_DBGCODE
+
    if ( pIndex->WrLck || pIndex->RdLck )
       hb_errInternal( 9104, "hb_cdxIndexFree: index file still locked (*)", "", "" );
 #endif
@@ -5536,37 +5537,24 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
 static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
                                  PHB_ITEM pRegExItm )
 {
-   BOOL fFound = FALSE, fFirst = TRUE;
-   regex_t re, *pReg;
+   BOOL fFound = FALSE, fFirst = TRUE, fFree;
+   regex_t *pReg = NULL;
    regmatch_t aMatches[1];
-   int CFlags = REG_EXTENDED, EFlags = 0;
-   char *szMask = hb_itemGetCPtr( pRegExItm );
-   BOOL fFree = FALSE;
+   int EFlags = 0;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxDBOISkipRegEx(%p, %p, %i, %s)", pArea, pTag, fForward, szMask));
+   HB_TRACE(HB_TR_DEBUG, ("hb_cdxDBOISkipRegEx(%p, %p, %i, %p)", pArea, pTag, fForward, pRegExItm));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FALSE;
 
-   if ( ! pTag || pTag->uiType != 'C' || !szMask || !*szMask )
+   if( pTag && pTag->uiType == 'C' )
+      pReg = hb_getregex( pRegExItm, FALSE, FALSE, &fFree );
+
+   if( !pReg )
    {
       if ( SELF_SKIP( ( AREAP ) pArea, fForward ? 1 : -1 ) == FAILURE )
          return FALSE;
       return fForward ? pArea->fPositioned : !pArea->fBof;
-   }
-
-   if ( hb_isregexstring( pRegExItm ) )
-   {
-      pReg = (regex_t *) ( szMask + 3 );
-   }
-   else
-   {
-      if( regcomp( &re, szMask, CFlags ) != 0 )
-      {
-         return FALSE;
-      }
-      pReg = &re;
-      fFree = TRUE;
    }
 
    if( pArea->lpdbPendingRel )
@@ -5639,7 +5627,7 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
       pArea->fEof = FALSE;
 
    if( fFree )
-      regfree( pReg );
+      hb_freeregex( pReg );
 
    return fFound;
 }
