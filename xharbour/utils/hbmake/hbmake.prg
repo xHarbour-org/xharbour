@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.148 2005/07/30 00:00:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.147 2005/07/28 04:57:33 marcosgambeta Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion  := "1.148"
+STATIC s_cHbMakeVersion  := "1.147"
 STATIC s_lPrint          := .F.
 STATIC s_aDefines        := {}
 STATIC s_aBuildOrder     := {}
@@ -93,6 +93,7 @@ STATIC s_cLinkCommands   := ""
 STATIC s_lBcc            := .T.  // Borland C compiler (Default)
 STATIC s_lPcc            := .F.  // Pelles C compiler
 STATIC s_lGcc            := .F.  // GNU/MinGW C compiler
+STATIC s_lMingw          := .F.
 STATIC s_lMSVcc          := .F.  // Microsoft Visual C compiler
 STATIC s_lForce          := .F.  // "-f" flag
 STATIC s_lLinux          := .F.
@@ -113,7 +114,7 @@ STATIC s_cDefLang
 STATIC s_cLog            := ""   // log file name.
 STATIC s_cMap            := ""   // map file name. For borland c
 STATIC s_cTds            := ""   // state file name. For borland c
-STATIC s_lGenppo         := .F.
+STATIC s_lGenPpo                 // don't initilize this var
 STATIC s_nLang           := 2    // language. default is english
 STATIC s_lMt             := .F.
 STATIC s_cUserDefine     := ""
@@ -126,6 +127,7 @@ STATIC s_lAsDll          := .F.
 STATIC s_cAlertMsg       := ""
 STATIC s_cHbCfgFileName  := "harbour.cfg"   // don't change this file name.
 STATIC s_cObjDir         := "obj"
+STATIC s_lGui            := .F.
 
 *---------------------------------------------
 FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
@@ -302,7 +304,6 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       if !s_lGenppo
          Delete_ppo()
       endif
-
       RETURN NIL
 
    endif
@@ -416,6 +417,7 @@ FUNCTION ParseMakeFile( cFile )
    LOCAL x           := 1
    LOCAL ct
    LOCAL nFHandle
+   local cTrash :=""
 
 
    nFHandle := FT_FUSE( cFile, FO_READ )
@@ -873,14 +875,38 @@ FUNCTION ReplaceMacros( cMacros )
    LOCAL nCount       := 0
    LOCAL aTempMacros  := {}
    LOCAL aLocalMacros := {}
+   Local cLibPath := ""
+   Local cLibPath1 := ""
+   Local cLibPath2:= ""
 
+   IF "/LIBPATH2:" In cMAcros
+         cLibPath2 := "/LIBPATH2:"
+         cMacros :=strTRan(cMacros,cLibPath2,"cccccccccc ")
+   endif
+
+   IF "/LIBPATH1:" In cMAcros
+         cLibPath1 := "/LIBPATH1:"
+         cMacros :=strTRan(cMacros,cLibPath1,"bbbbbbbbbb ")
+   endif
+
+   IF "/LIBPATH:" In cMAcros
+         cLibPath := "/LIBPATH:"
+         cMacros :=strTRan(cMacros,cLibPath,"aaaaaaaaaa ")
+   endif
    aTempMacros := ListAsArray2( cMacros, " " )
    AEval( aTempMacros, { | xMacro | IIF(  "$" IN xMacro , ;
                          IIF(  ";" IN xMacro , ( aLocalMacros := ListAsArray2( xMacro, ";" ), ;
                          AEval( aLocalMacros, { | x | Findmacro( x, @cMacros ) } ) ), ;
                          Findmacro( xMacro, @cMacros ) ), ) } )
 
+  if !empty(cLibPath)
+     cMacros:=strtran(cMacros,"aaaaaaaaaa ","/LIBPATH:")
 
+     cMacros:=strtran(cMacros,"bbbbbbbbbb ","/LIBPATH:")
+
+     cMacros:=strtran(cMacros,"cccccccccc ","/LIBPATH:")
+
+  endif
 RETURN cmacros
 
 *------------------
@@ -894,6 +920,8 @@ FUNCTION SetBuild()
    LOCAL nCount
    LOCAL cCurrentRead := ''
    LOCAL cMacro
+   Local xInfo
+   local xItem
 
    cRead     := Alltrim( readln( @s_lEof ) )
    s_szProject := cRead
@@ -911,7 +939,7 @@ FUNCTION SetBuild()
 
    AEval( aMacro, { | xMacro |  IIF(  "$" IN xmacro , Findmacro( xMacro, @cRead ), ) } )
 
-   IF ! s_lLinux
+   IF ! s_lLinux .and. !s_lmingw
       s_cLinkCommands   := cRead + "  @" + s_cMakeFileName
       s_nMakeFileHandle := FCreate( s_cMakeFileName )
 
@@ -948,10 +976,17 @@ FUNCTION SetBuild()
                IF ! s_lGcc
 
                   IF ! s_lLinux
+                     if s_lMsVcc
+                        cRead := strtran(cRead,",","")
+                        cRead := strtran(cRead,"+","")
+                        xInfo := " -out:"
+                        xInfo += cRead
+                        cREad :=xInfo
+                     endif
                      FWrite( s_nMakeFileHandle, cRead + CRLF )
                   ENDIF
 
-               ELSEIF s_lGcc .AND. s_lLinux
+               ELSEIF s_lGcc .AND. s_lLinux .or. ( s_lGcc .AND. s_lMingw)
                   s_cLinkCommands += "-o " + cRead + " "
                ELSEIF s_lGcc .AND. ! s_lLinux .AND. At( '.exe', cread ) > 0
                   FWrite( s_nMakeFileHandle, "-o " + cRead + CRLF )
@@ -959,8 +994,27 @@ FUNCTION SetBuild()
 
             ELSE
 
-               IF ! s_lLinux
+               IF ! s_lLinux  
+                  if s_lMsVcc
+                  
+                  
+                     cRead := strtran(cRead,",","")
+                     cRead := strtran(cRead,"+","")
+//                     cRead := strtran(cRead," ", '"' +CRLF+'"')
+                      aTemp := ListAsArray2( cRead, " " )
+                      cRead :=""
+                      for each xItem in aTemp
+                         cRead +=xItem+CRLF
+                      NEXT
+                      cRead := substr(cRead,1,rat(CRLF,cRead)-1)
+                     
+                  endif
+                  if s_lMingw
+                     s_cLinkCommands += cRead + " "
+                  else
                   FWrite( s_nMakeFileHandle, cRead + CRLF )
+                  endif
+                  
                ELSE
                   s_cLinkCommands += cRead + " "
                ENDIF
@@ -973,9 +1027,13 @@ FUNCTION SetBuild()
 
    NEXT
 
-   IF !s_lLinux
+   IF !s_lLinux .and. s_lMingw
       FClose( s_nMakeFileHandle )
    ENDIF
+   if s_lMsVcc
+   s_cLinkCommands +=" /nologo " + IIF( s_lGui, "/SUBSYSTEM:WINDOWS"," /SUBSYSTEM:CONSOLE") + " /force:multiple "
+   endif
+   qout(s_cLinkCommands)
 
 RETURN NIL
 
@@ -1239,11 +1297,11 @@ FUNCTION CompileFiles()
                   IF llinux
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
                   ELSE
-                     if s_lMSVcc .or. s_lPcc
-                        cComm := Strtran( cComm, "-Fo$*", "/Fo" + Strtran( s_aObjs[ nPos ], '/', '\' ) )
-                     else
+//                     if s_lMSVcc .or. s_lPcc
+  //                      cComm := Strtran( cComm, "-Fo$*", "/Fo" + Strtran( s_aObjs[ nPos ], '/', '\' ) )
+    //                 else
                         cComm := Strtran( cComm, "o$*", "o" + Strtran( s_aObjs[ nPos ], '/', '\' ) )
-                     endif
+      //               endif
                   ENDIF
 
                   cComm := Strtran( cComm, "$**", cPrg )
@@ -1382,6 +1440,7 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL lWhoo        := .F.
    LOCAL lWhat32      := .F.
    LOCAL lGtWvt       := .F.
+   LOCAL lGtWvw       := .F.
    LOCAL lXwt         := .F.
    LOCAL lxHGtk       := .F.
 
@@ -1424,10 +1483,12 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL cAppName         := s_Appname + Space( 50 )
    LOCAL cDefBccLibs      := "bcc640.lib lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib dbffpt.lib dbfdbt.lib common.lib gtwin.lib codepage.lib ct.lib tip.lib"
    LOCAL cDefGccLibs      := "-lvm -lrtl -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -ldbfdbt -lcommon -lcodepage -lm"
+   LOCAL cDefGccLibsw     := "-lvm -lrtl -lgtwin -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -ldbfdbt -lcommon -lcodepage -lm"
    LOCAL cGccLibsOs2      := "-lvm -lrtl -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -ldbfdbt -lcommon -lcodepage -lm"
    LOCAL cDefLibGccLibs   := "-lvm -lrtl -lgtcrs -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -ldbfdbt -lcommon -lcodepage -lgtnul"
    LOCAL cDefBccLibsMt    := "bcc640mt.lib lang.lib vmmt.lib rtlmt.lib rddmt.lib macromt.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib  dbffptmt.lib dbfdbtmt.lib common.lib gtwin.lib codepage.lib ctmt.lib tipmt.lib"
    LOCAL cDefGccLibsMt    := "-lvmmt -lrtlmt -lgtdos -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -ldbfdbtmt -lcommon -lcodepage -lm"
+   LOCAL cDefGccLibsMtw    := "-lvmmt -lrtlmt -lgtwin -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -ldbfdbtmt -lcommon -lcodepage -lm"
    LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlmt -lgtos2 -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -ldbfdbtmt -lcommon -lcodepage -lm"
    LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlmt -lgtcrs -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -ldbfdbtmt -lcommon -lcodepage"
    LOCAL cHarbDll         := "bcc640.lib harbour.lib"
@@ -1548,6 +1609,7 @@ FUNCTION CreateMakeFile( cFile )
          lSupressline    := oMake:lSupressline
          lCompMod        := oMake:lCompMod
          s_lGenppo       := oMake:lGenppo
+         s_lGui          := oMake:lGui 
          cRdd            := IIF( oMake:lRddAds, "RddAds", IIF( oMake:lMediator, "Mediator", "None" ) )
          cGuiLib         := IIF( oMake:lFwh   , "FWH", ;
                             IIF( oMake:lMini  , "MINIGUI", ;
@@ -1555,9 +1617,10 @@ FUNCTION CreateMakeFile( cFile )
                             IIF( oMake:lCw    , "C4W", ;
                             IIF( oMake:lHwGui , "HWGUI", ;
                             IIF( oMake:lGtWvt , "GTWVT", ;
+                            IIF( oMake:lGtWvw , "GTWVW", ;
                             IIF( oMake:lXWt   , "XWT", ;
                             IIF( oMake:lWhat32, "WHAT32", ;
-                            IIF( oMake:lxHGtk , "XHGTK", "" ) ) ) ) ) ) ) ) )
+                            IIF( oMake:lxHGtk , "XHGTK", "" ) ) ) ) ) ) ) ) ) )
          cFwhpath        := padr(oMake:cFmc,200)
          cApolloPath     := padr(oMake:cFmc,200)
          cC4WPath        := padr(oMake:cFmc,200)
@@ -1732,9 +1795,9 @@ FUNCTION CreateMakeFile( cFile )
    @ 01,23       say s_aLangMessages[ 29 ]
 // POCC configuration still not ready.
 //   @ 01,47,06,52 get cCompiler LISTBOX { "BCC", "MSVC", "GCC", "POCC" } MESSAGE s_aLangMessages[ 50 ] STATE OsSpec(getlist,2,@cCompiler) DROPDOWN
-   @ 01,47,06,52 get cCompiler LISTBOX { "BCC", "MSVC", "GCC" } MESSAGE s_aLangMessages[ 50 ] STATE OsSpec(getlist,2,@cCompiler) DROPDOWN
+   @ 01,47,06,54 get cCompiler LISTBOX { "BCC", "MSVC", "GCC","MINGW" } MESSAGE s_aLangMessages[ 50 ] STATE OsSpec(getlist,2,@cCompiler) DROPDOWN
    @ 01,56       say s_aLangMessages[ 30 ]
-   @ 01,68,10,78 get cGuiLib ListBox { "None","C4W","FWH","GTWVT","HWGUI","MINIGUI","XWT","WHAT32","WHOO","XHGTK"} state OsSpec(getlist,3,@cGuiLib) DROPDOWN  When CheckCompiler(cOS) message s_aLangMessages[ 51 ]
+   @ 01,67,10,79 get cGuiLib ListBox { "None","C4W","FWH","GTWVT","GTWVW","HWGUI","MINIGUI","XWT","WHAT32","WHOO","XHGTK"} state OsSpec(getlist,3,@cGuiLib) DROPDOWN  When CheckCompiler(cOS) message s_aLangMessages[ 51 ]
    @ 02,01       say s_aLangMessages[ 48 ]
    @ 02,16,08,26 get cRdd ListBox { "None","RddAds","Mediator","Apollo"}  WHEN cOS == "Win32" .or. cOS == "Linux" DROPDOWN message s_aLangMessages[ 52 ]
    @ 02,30       get s_lCompress CheckBox  caption s_aLangMessages[ 53 ] style "[X ]" message s_aLangMessages[ 54 ]
@@ -1766,8 +1829,10 @@ FUNCTION CreateMakeFile( cFile )
    lWhoo     := "WHOO"     IN alltrim(cGuiLib)
    lWhat32   := "WHAT32"   IN alltrim(cGuiLib)
    lGtWvt    := "GTWVT"    IN alltrim(cGuiLib)
+   lGtWvw    := "GTWVW"    IN alltrim(cGuiLib)   
    lXwt      := "XWT"      IN alltrim(cGuiLib)
    lxHGtk    := "XHGTK"    IN alltrim(cGuiLib)
+   s_lGui := lWhoo .or. lFwh .or. lC4W .or. lMinigui .or. lGtWvt .or. lHwGui .or. lXwt .or. lWhat32 .or. lxHGtk .or. lGtWvw
 
    lRddAds   := "RddAds"   IN cRdd
    lMediator := "Mediator" IN cRdd
@@ -1813,7 +1878,7 @@ FUNCTION CreateMakeFile( cFile )
    @ 06, 40 GET lVarIsMemVar checkbox caption s_aLangMessages[ 33 ] style "[X ]"
    @ 07, 01 GET lDebug       checkbox caption s_aLangMessages[ 34 ] style "[X ]"
    @ 07, 40 GET lSupressLine checkbox caption s_aLangMessages[ 35 ] style "[X ]"
-   @ 08, 01 GET s_lGenppo    checkbox caption s_aLangMessages[ 36 ] style "[X ]"
+   @ 08, 01 GET s_lGenPPO      checkbox caption s_aLangMessages[ 36 ] style "[X ]"
    @ 08, 40 GET lCompMod     checkbox caption s_aLangMessages[ 37 ] style "[X ]"
    @ 09, 01 SAY s_aLangMessages[ 38 ] GET s_cUserDefine PICT "@s23"
    @ 09, 40 SAY s_aLangMessages[ 39 ] GET s_cUserInclude PICT "@s18"
@@ -1842,6 +1907,10 @@ FUNCTION CreateMakeFile( cFile )
    s_lMSVcc := "MSVC" IN cCompiler
    s_lGcc   := "GCC"  IN cCompiler
    s_lPcc   := "POCC" IN cCompiler
+   s_lMingw := "MINGW" IN cCompiler
+   if s_lMingw
+      s_lGcc := .T.
+   endif
 
    cObjDir  := Alltrim( cObjDir )
 
@@ -1894,10 +1963,12 @@ FUNCTION CreateMakeFile( cFile )
       cHarbourFlags    += " -b "
       cDefBccLibs      += " debug.lib "
       cDefGccLibs      += " -ldebug "
+      cDefGccLibsw      += " -ldebug "
       cGccLibsOs2      += " -ldebug "
       cDefLibGccLibs   += " -ldebug "
       cDefBccLibsMt    += " debug.lib "
       cDefGccLibsMt    += " -ldebug "
+      cDefGccLibsMtw    += " -ldebug "
       cGccLibsOs2Mt    += " -ldebug "
       cDefLibGccLibsMt += " -ldebug "
    ENDIF
@@ -2235,6 +2306,8 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, "HWGUI = " + alltrim(cHwPath) + CRLF )
    ELSEIF lGtwvt
       FWrite( s_nMakeFileHandle, "GTWVT = " + CRLF )
+   ELSEIF lGtwvw
+      FWrite( s_nMakeFileHandle, "GTWVW = " + CRLF )
    ELSEIF lXwt
       FWrite( s_nMakeFileHandle, "XWT = " + CRLF )
    ELSEIF lWhoo
@@ -2253,7 +2326,7 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, "APOLLO = " + alltrim(cApolloPath) + CRLF )
    ENDIF
 
-   FWrite( s_nMakeFileHandle, "GUI = " + iif(lWhoo .or. lFwh .or. lC4W .or. lMinigui .or. lGtWvt .or. lHwGui .or. lXwt .or. lWhat32 .or. lxHGtk, "YES", "NO" ) + CRLF )
+   FWrite( s_nMakeFileHandle, "GUI = " + iif(lWhoo .or. lFwh .or. lC4W .or. lMinigui .or. lGtWvt .or. lHwGui .or. lXwt .or. lWhat32 .or. lxHGtk .or. lGtWvw , "YES", "NO" ) + CRLF )
    FWrite( s_nMakeFileHandle, "MT = " + IIF( s_lMt, "YES", "NO" ) + CRLF )
 
    FOR x := 1 TO Len( s_aMacros )
@@ -2570,7 +2643,12 @@ FUNCTION CreateMakeFile( cFile )
             cDefBccLibs   := strtran(cDefBccLibs,"gtwin","gtwvt")
             cDefBccLibsMt := strtran(cDefBccLibsMt,"gtwin","gtwvt")
          endif
-         FWrite( s_nMakeFileHandle, "LIBFILES = " + iif( lGTWVT,"optgui",iif(!s_lasdll,"optcon","")) + iif( !s_lMt, "", "mt" ) + ".lib " + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         if lGtwvw
+            cDefBccLibs   := strtran(cDefBccLibs,"gtwin","gtwvw")
+            cDefBccLibsMt := strtran(cDefBccLibsMt,"gtwin","gtwvw")
+         endif
+
+         FWrite( s_nMakeFileHandle, "LIBFILES = " + iif( lGTWVT,"optgui.lib ",iif(!s_lasdll,"optcon.lib ","")) + iif( !s_lMt, "", "mt" )  + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ENDIF
 
    ELSEIF s_lGcc
@@ -2579,6 +2657,8 @@ FUNCTION CreateMakeFile( cFile )
          FWrite( s_nMakeFileHandle, "LIBFILES = " + IIF(lusexhb, cExtraLibs , "-Wl,--start-group " + IIF( ! s_lMt, cDefLibGccLibs, cDefLibGccLibsMt ) + " -Wl,--end-group " + cSystemLibs ) + CRLF )
       ELSEIF cOS == "OS/2"
          FWrite( s_nMakeFileHandle, "LIBFILES = " + IIF( ! s_lMt, cGccLibsOs2, cGccLibsOs2Mt ) + CRLF )
+      ELSEIF  "MINGW" IN cCompiler
+         FWrite( s_nMakeFileHandle, "LIBFILES = " + "-Wl,--start-group " + IIF( ! s_lMt, cDefGccLibsw, cDefGccLibsMtw ) + " -Wl,--end-group " + CRLF )
       ELSE
          FWrite( s_nMakeFileHandle, "LIBFILES = " + IIF( ! s_lMt, cDefGccLibs, cDefGccLibs ) + CRLF )
       ENDIF
@@ -2606,7 +2686,7 @@ FUNCTION CreateMakeFile( cFile )
 
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
 /* added "-x" flag to LFLAGS statment to suppress creation of map file and speed up link. */
-      FWrite( s_nMakeFileHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib -Gn -M -m -s -Tp"+ if(s_lasdll,"d","e") + " -x" + IIF( lFWH .or. lMiniGui .or. lWhoo .or. lHwgui .or. lGtWvt," -aa"," -ap") + IIF( lMinigui, " -L$(MINIGUI)\lib",IIF( lFwh, " -L$(FWH)\lib",IIF( lHwgui, " -L$(HWGUI)\lib","" ))) + CRLF )
+      FWrite( s_nMakeFileHandle, "LFLAGS = -L$(BCB)\lib\obj;$(BCB)\lib;$(BHC)\lib -Gn -M -m -s -Tp"+ if(s_lasdll,"d","e") + " -x" + IIF( lFWH .or. lMiniGui .or. lWhoo .or. lHwgui .or. lGtWvt .or. lGtWvw ," -aa"," -ap") + IIF( lMinigui, " -L$(MINIGUI)\lib",IIF( lFwh, " -L$(FWH)\lib",IIF( lHwgui, " -L$(HWGUI)\lib","" ))) + CRLF )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LINKER = ilink32" + CRLF )
       FWrite( s_nMakeFileHandle, " " + CRLF )
@@ -2620,13 +2700,13 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" +IIF( s_lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 =  -c" +" -I" + alltrim( s_cUserInclude ) + " " + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
-      FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(BCB)\lib;$(BHC)\lib;$(C4W)\lib /SUBSYSTEM:CONSOLE" +IIF(s_lMt, " /Nodefaultlib:LIBC "," /Nodefaultlib:LIBCMT " ) + CRLF )
+      FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(BCB)\lib /LIBPATH1:$(BHC)\lib /LIBPATH2:$(C4W)\lib"  +IIF(s_lMt, " /Nodefaultlib:LIBC "," /Nodefaultlib:LIBCMT " ) + CRLF )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LINKER = link" + CRLF )
       FWrite( s_nMakeFileHandle, " " + CRLF )
       FWrite( s_nMakeFileHandle, "ALLOBJ = " + IIF( lC4W, "$(C4W)\initc.obj", "" ) + "$(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       FWrite( s_nMakeFileHandle, "ALLRES = $(RESDEPEN)" + CRLF )
-      FWrite( s_nMakeFileHandle, "ALLLIB = $(LIBFILES) comdlg32.lib shell32.lib user32.lib gdi32.lib" + CRLF )
+      FWrite( s_nMakeFileHandle, "ALLLIB = $(LIBFILES) kernel32.lib user32.lib gdi32.lib winspool.lib comctl32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib mpr.lib vfw32.lib winmm.lib " + CRLF )
 
    ELSEIF s_lPcc
 
@@ -2644,7 +2724,7 @@ FUNCTION CreateMakeFile( cFile )
    ELSEIF s_lGcc
 
       FWrite( s_nMakeFileHandle, "CFLAG1 = " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude ),"")        + IIF(  "Linux" IN cOS, "-I/usr/include/xharbour", " -I$(BHC)/include" ) + " -c -Wall" + IIF( s_lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
-      FWrite( s_nMakeFileHandle, "CFLAG2 = " + IIF(  "Linux" IN cOS, "-L$(HB_LIB_INSTALL)", " -L$(BHC)/lib" )  + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG2 = " + IIF(  "Linux" IN cOS, "-L$(HB_LIB_INSTALL)", " -L$(BHC)/lib  -L$(BCB)/lib" )  + CRLF )
 
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LFLAGS =" + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + if(lXwt,"-gtcgi " , "-gtcrs "), "$(CFLAG2)") + iif(lXwt,"`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt","") + iif( lxHGtk, "`pkg-config --libs gtk+-2.0 libglade-2.0` -lxhgtk ","") + CRLF )
@@ -2653,7 +2733,7 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, " " + CRLF )
       FWrite( s_nMakeFileHandle, "ALLOBJ = $(OBJFILES) " + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       FWrite( s_nMakeFileHandle, "ALLRES = $(RESDEPEN) " + CRLF )
-      FWrite( s_nMakeFileHandle, "ALLLIB = $(LIBFILES) " + CRLF )
+      FWrite( s_nMakeFileHandle, "ALLLIB = $(LIBFILES) " +if(s_lMingw," -luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 -lole32 -loleaut32 -luuid -lmpr -lwsock32 -lws2_32 -lmapi32","") + CRLF )
       FWrite( s_nMakeFileHandle, ".autodepend" + CRLF )
 
    ENDIF
@@ -2719,12 +2799,11 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, "" + CRLF )
       FWrite( s_nMakeFileHandle, "$(PROJECT): $(CFILES) $(OBJFILES) $(RESDEPEN) $(DEFFILE)" + CRLF )
       FWrite( s_nMakeFileHandle, "    $(BCB)\BIN\$(LINKER) @&&! " + CRLF )
-      FWrite( s_nMakeFileHandle, "    $(LFLAGS)" + CRLF )
-      FWrite( s_nMakeFileHandle, "    $(ALLOBJ) " + CRLF )
-      FWrite( s_nMakeFileHandle, "    $(PROJECT)" + CRLF )
-      FWrite( s_nMakeFileHandle, "    $(PROJECTMAP)" + CRLF )
-      FWrite( s_nMakeFileHandle, "    $(ALLLIB) " + CRLF )
-      FWrite( s_nMakeFileHandle, "    $(DEFFILE) " + CRLF )
+      FWrite( s_nMakeFileHandle, "    $(LFLAGS) +" + CRLF )
+      FWrite( s_nMakeFileHandle, "    $(ALLOBJ), +" + CRLF )
+      FWrite( s_nMakeFileHandle, "    $(PROJECT),, +" + CRLF )
+      FWrite( s_nMakeFileHandle, "    $(ALLLIB), +" + CRLF )
+      FWrite( s_nMakeFileHandle, "    $(DEFFILE), +" + CRLF )
       FWrite( s_nMakeFileHandle, "    $(ALLRES) " + CRLF )
       FWrite( s_nMakeFileHandle, "! " + CRLF )
 
@@ -3469,7 +3548,7 @@ FUNCTION CreateLibMakeFile( cFile )
          lDebug          := oMake:ldebug
          lSupressline    := oMake:lSupressline
          lCompMod        := oMake:lCompMod
-         s_lGenppo       := oMake:lGenppo
+         s_lGenPPO         := oMake:lGenppo
          lInstallLib     := oMake:lInstallLib
          s_cUserInclude  := PadR(oMake:cUserInclude,200," ")
          s_cUserDefine      := PadR(oMake:cUserDef,200," ")
@@ -3628,7 +3707,7 @@ FUNCTION CreateLibMakeFile( cFile )
    @ 01,01 SAY s_aLangMessages[ 28 ]
    @ 01,17,06,24 get cOS listbox { "Win32", "OS/2", "Linux" } message s_aLangMessages[ 49 ] state OsSpec(getlist,1,@cOS)  DROPDOWN
    @ 01,30 SAY s_aLangMessages[ 29 ]
-   @ 01,54,06,59 get cCompiler listbox { "BCC", "MSVC", "GCC" }  message s_aLangMessages[ 50 ] state OsSpec(getlist,2,@cCompiler) DROPDOWN
+   @ 01,54,06,59 get cCompiler listbox { "BCC", "MSVC", "GCC","MINGW" }  message s_aLangMessages[ 50 ] state OsSpec(getlist,2,@cCompiler) DROPDOWN
 
    @ 03,01 SAY s_aLangMessages[ 59 ] GET cLibName PICT "@s15" message s_aLangMessages[ 58 ]
    @ 03,35 SAY s_aLangMessages[ 60 ] GET cObjDir  PICT "@s15"
@@ -3639,7 +3718,7 @@ FUNCTION CreateLibMakeFile( cFile )
    @ 06,40 GET lVarIsMemvar  checkbox caption s_aLangMessages[ 33 ] style "[X ]"
    @ 07,01 GET lDebug        checkbox caption s_aLangMessages[ 34 ] style "[X ]"
    @ 07,40 GET lSupressLine  checkbox caption s_aLangMessages[ 35 ] style "[X ]"
-   @ 08,01 GET s_lGenppo     checkbox caption s_aLangMessages[ 36 ] style "[X ]"
+   @ 08,01 GET s_lGenPPO       checkbox caption s_aLangMessages[ 36 ] style "[X ]"
    @ 08,40 GET lCompMod      checkbox caption s_aLangMessages[ 37 ] style "[X ]"
    @ 09,01 SAY s_aLangMessages[ 38 ] GET s_cUserDefine PICT "@s23"
    @ 09,40 SAY s_aLangMessages[ 39 ] GET s_cUserInclude PICT "@s18"
@@ -3665,7 +3744,10 @@ FUNCTION CreateLibMakeFile( cFile )
    s_lMSVcc :=  "MSVC" IN cCompiler
    s_lGcc   :=  "GCC"  IN cCompiler
    s_lPcc   :=  "POCC" IN cCompiler
-
+   s_lMingw  :=  "MINGW" IN cCompiler
+   if s_lMingw
+   s_lGcc := .T.
+   endif
    cObjDir := Alltrim( cObjDir )
 
    IF ! Empty( cObjDir )
@@ -3714,7 +3796,7 @@ FUNCTION CreateLibMakeFile( cFile )
       cHarbourFlags += " -l "
    ENDIF
 
-   IF s_lGenppo
+   IF s_lGenPPO
       cHarbourFlags += " -p "
    ENDIF
 
@@ -4376,7 +4458,7 @@ LOCAL nCfg
 
       FWrite( nCfg, "CC=BCC32" + CRLF )
 //    FWrite( nCfg, "CFLAGS= -c " + Replacemacros( "-I$(BHC)\include -OS $(CFLAGS) -d -L$(BHC)\lib" ) + CRLF )
-      FWrite( nCfg, "CFLAGS= -c " + Replacemacros( "-I$(BHC)\include $(CFLAGS) -d -L$(BHC)\lib" ) + CRLF )
+      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__ " + Replacemacros( "-I$(BHC)\include $(CFLAGS) -d -L$(BHC)\lib" ) + CRLF )
       FWrite( nCfg, "VERBOSE=YES" + CRLF )
       FWrite( nCfg, "DELTMP=YES" + CRLF )
       FClose( nCfg )
@@ -4407,7 +4489,7 @@ FUNCTION BuildMscCfgFile()
       endif
 
       FWrite( nCfg, "CC=cl" + CRLF )
-      FWrite( nCfg, "CFLAGS= -c " + Replacemacros( "-I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" ) + CRLF )
+      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__" + Replacemacros( "-I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" ) + CRLF )
       FWrite( nCfg, "VERBOSE=YES" + CRLF )
       FWrite( nCfg, "DELTMP=YES" + CRLF )
       FClose( nCfg )
@@ -4478,7 +4560,7 @@ FUNCTION BuildGccCfgFile()
       endif
 
       FWrite( nCfg, "CC=gcc" + CRLF )
-      FWrite( nCfg, "CFLAGS= -c " + Replacemacros( "-I" + cBhc + "/include $(C_USR)  -L" + cBhc + "/lib" ) + CRLF )
+      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__ " + Replacemacros( "-I" + cBhc + "/include $(C_USR)  -L" + cBhc + "/lib" ) + CRLF )
       FWrite( nCfg, "VERBOSE=YES" + CRLF )
       FWrite( nCfg, "DELTMP=YES" + CRLF )
       FClose( nCfg )
@@ -4722,6 +4804,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
    cParam := Strtran( cParam, "-gl", "-GL" )
    cParam := Strtran( cParam, "-g", "-G" )
    cParam := Strtran( cParam, "-v", "-V" )
+   cParam := Strtran( cParam, "-m", "-M" )
    cParam := Strtran( cParam, "-pc", "-PC" )
    cParam := Strtran( cParam, "-f", "-F" )
    cParam := Strtran( cParam, "-r", "-R" )
@@ -4774,6 +4857,7 @@ FUNCTION ShowHelp()
 
    OutStd( s_aLangMessages[ 15 ] + HB_OsNewLine() )
 // OutStd( s_aLangMessages[ 62 ] + HB_OsNewLine() ) // pocc syntax
+ OutStd( s_aLangMessages[ 62 ] + HB_OsNewLine() ) // pocc syntax
    OutStd( s_aLangMessages[ 16 ] + HB_OsNewLine() )
    OutStd( s_aLangMessages[ 17 ] + HB_OsNewLine() )
    OutStd( s_aLangMessages[ 18 ] + HB_OsNewLine() )
@@ -4821,6 +4905,7 @@ FUNCTION ProcessParameters( cParams )
       s_lGcc   := .F.
       s_lMSVcc := .F.
       s_lPcc   := .F.
+      s_lMingw := .F.
       cParams  := Strtran( cParams, "-B", "" )
    ENDIF
 
@@ -4831,6 +4916,7 @@ FUNCTION ProcessParameters( cParams )
       s_lMSVcc := .F.
       s_lPcc   := .F.
       s_lLinux := .T.
+      s_lMingw := .F.
       cParams  := Strtran( cParams, "-GL", "" )
    ENDIF
 
@@ -4840,6 +4926,7 @@ FUNCTION ProcessParameters( cParams )
       s_lGcc   := .T.
       s_lMSVcc := .F.
       s_lPcc   := .F.
+      s_lMingw := .F.
       cParams  := Strtran( cParams, "-G", "" )
    ENDIF
 
@@ -4858,7 +4945,16 @@ FUNCTION ProcessParameters( cParams )
       s_lGcc   := .F.
       s_lMSVcc := .F.
       s_lPcc   := .T.
+      s_lMingw := .F.
       cParams  := Strtran( cParams, "-PC", "" )
+   ENDIF
+   IF "-M" IN cParams
+      s_lBcc   := .F.
+      s_lGcc   := .T.
+      s_lMSVcc := .F.
+      s_lPcc   := .F.
+      s_lMingw := .T.
+      cParams  := Strtran( cParams, "-M", "" )
    ENDIF
 
    // Ignore warnings
@@ -4969,7 +5065,7 @@ FUNCTION BuildLangArray( cLang )
       AAdd( aLang, "Enviroment options" )
       AAdd( aLang, "Select the OS" )
       AAdd( aLang, "Select the C Compiler" )
-      AAdd( aLang, "Graphic Lib" )
+      AAdd( aLang, "Graph Lib" )
       AAdd( aLang, "xHarbour Options" )
       AAdd( aLang, "Automatic memvar declaration /a" )
       AAdd( aLang, "Variables are assumed M-> /v" )
@@ -5005,7 +5101,7 @@ FUNCTION BuildLangArray( cLang )
       AAdd( aLang, "Obj dir files:" )
       AAdd( aLang, "Install the lib at the xHarbour lib folder" )
 //      AAdd( aLang, "          /pc     Use POCC as C compiler" )
-
+      AAdd( aLang, "         /m     use GCC(mingw) as C compiler" )
    ELSEIF cLang == "ES"
 
       AAdd( aLang, "xHarbour Make Utility  -  version "+HbMakeVersion() )
@@ -5073,7 +5169,7 @@ FUNCTION BuildLangArray( cLang )
       AAdd( aLang, "Direct¢rio de los Obj:" )
       AAdd( aLang, "Alojar la lib en el direct¢rio lib de xHarbour" )
 //      AAdd( aLang, "          /pc     Usar POCC como compilador C" )
-
+      AAdd( aLang, "         /m     Usar GCC(mingw) como compilador C" )
    ELSEIF cLang == "PT"
 
       AAdd( aLang, "xHarbour Make Utility  -  versÆo "+HbMakeVersion() )
@@ -5105,7 +5201,7 @@ FUNCTION BuildLangArray( cLang )
       AAdd( aLang, "Op‡äes de Ambiente" )
       AAdd( aLang, "Selecione o SO" )
       AAdd( aLang, "Selecione Compilador C" )
-      AAdd( aLang, "Lib Gr fica" )
+      AAdd( aLang, "Lib Gr f." )
       AAdd( aLang, "Op‡äes do xHarbour" )
       AAdd( aLang, "Declara‡Æo Autom tica de Memvar /a" )
       AAdd( aLang, "Vari veis sÆo assumidas M-> /v" )
@@ -5141,7 +5237,7 @@ FUNCTION BuildLangArray( cLang )
       AAdd( aLang, "Diret¢rio dos Obj:" )
       AAdd( aLang, "Instalar a lib no diret¢rio lib do xHarbour" )
 //      AAdd( aLang, "         /pc    Usar POCC como compilador C" )
-
+      AAdd( aLang, "         /m     Usar GCC(mingw) como compilador C" )
    ENDIF
 
 RETURN aLang
@@ -5184,10 +5280,23 @@ FUNCTION ResetInternalVars()
    s_aResources    := {}
 // s_cMakeFileName := "makefile.lnk"
    s_cLinkCommands := ""
+   if s_lBcc
    s_lBcc          := .T.
    s_lGcc          := .F.
    s_lMSVcc        := .F.
    s_lPcc          := .F.
+   elseif s_lMSVcc
+   s_lBcc          := .F.
+   s_lGcc          := .F.
+   s_lMSVcc        := .T.
+   s_lPcc          := .F.
+   elseif s_lPcc
+   s_lBcc          := .F.
+   s_lGcc          := .F.
+   s_lMSVcc        := .F.
+   s_lPcc          := .T.
+
+   endif
    s_lForce        := .F.
    s_lLinux        := .F.
    s_szProject     := ""
@@ -5246,7 +5355,6 @@ RETURN .T.
 FUNCTION HBMakeVersion()
 *-----------------------
 RETURN (s_cHbMakeVersion)
-
 *--------------------
 FUNCTION Delete_ppo()
 *--------------------

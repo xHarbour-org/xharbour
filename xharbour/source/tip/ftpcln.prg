@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.7 2005/06/23 20:51:46 lf_sfnet Exp $
+ * $Id: ftpcln.prg,v 1.8 2005/07/29 19:44:23 lculik Exp $
  */
 
 /*
@@ -159,7 +159,7 @@ METHOD GetReply() CLASS tIPClientFTP
    // now, if the reply has a '-' as fourth character, we need to proceed...
    DO WHILE .not. Empty(cRep) .and. cRep[4] == '-'
       ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 128 )
-      cRep += IIf(ValType(::cReply) == "C", ::cReply, "")
+      cRep := IIf(ValType(::cReply) == "C", ::cReply, "")
    ENDDO
 
    // 4 and 5 are error codes
@@ -331,6 +331,7 @@ RETURN NIL
 
 
 METHOD Stor( cFile ) CLASS tIPClientFTP
+
    LOCAL nTimeout
 
    IF ::bUsePasv
@@ -341,6 +342,7 @@ METHOD Stor( cFile ) CLASS tIPClientFTP
    ENDIF
 
    ::InetSendall( ::SocketCon, "STOR " + cFile+ ::cCRLF )
+
 RETURN ::TransferStart()
 
 /*
@@ -377,55 +379,78 @@ METHOD Read( nLen ) CLASS tIPClientFTP
    LOCAL cRet
 
    IF .not. ::bInitialized
+
       IF .not. Empty( ::oUrl:cPath )
+
          IF .not. ::CWD( ::oUrl:cPath )
+
             ::bEof = .T.  // no data for this transaction
             RETURN .F.
+
          ENDIF
+
       ENDIF
+
       IF Empty( ::oUrl:cFile )
+
          RETURN ::List()
+
       ENDIF
 
       IF .not. ::Retr( ::oUrl:cFile )
+
          ::bEof = .T.  // no data for this transaction
          RETURN .F.
+
       ENDIF
+
       // now channel is open
       ::bInitialized := .T.
+
    ENDIF
 
    cRet := ::super:Read( nLen )
+
    IF cRet == NIL
+
       ::Commit()
       ::bEof := .T.
+
    ENDIF
+
 RETURN cRet
 
 *
 * FTP transfer wants commit only at end.
 *
 METHOD Write( cData, nLen ) CLASS tIPClientFTP
+
    IF .not. ::bInitialized
 
       IF Empty( ::oUrl:cFile )
+
          RETURN -1
+
       ENDIF
 
       IF .not. Empty( ::oUrl:cPath )
+
          IF .not. ::CWD( ::oUrl:cPath )
             RETURN -1
          ENDIF
+
       ENDIF
 
       IF .not. ::Stor( ::oUrl:cFile )
          RETURN -1
       ENDIF
+
       // now channel is open
       ::bInitialized := .T.
    ENDIF
 
 RETURN ::super:Write( cData, nLen, .F. )
+
 METHOD Retr( cFile,cLocalFile ) CLASS tIPClientFTP
    LOCAL nTimeout,cRet
 
@@ -437,28 +462,39 @@ METHOD Retr( cFile,cLocalFile ) CLASS tIPClientFTP
    ENDIF
 
    ::InetSendAll( ::SocketCon, "RETR " + cFile+ ::cCRLF )
-   cRet:=::ReadAuxPort(cLocalFile)
-   return(.t.)
 
-METHOD mget(cSpec) CLASS tIPClientFTP
+   IF ::TransferStart()
+      RETURN .T.
+   ENDIF
+
+RETURN .F.
+
+METHOD MGET( cSpec ) CLASS tIPClientFTP
+
    LOCAL cStr,cfile,x,y
-	IF cSpec=nil
-		cSpec:=''
+
+   IF cSpec == nil
+      cSpec := ''
 	ENDIF
+
    IF ::bUsePasv
       IF .not. ::Pasv()
          //::bUsePasv := .F.
          RETURN .F.
       ENDIF
    ENDIF
+
    ::InetSendAll( ::SocketCon, "NLST "+cSpec + ::cCRLF )
    cStr := ::ReadAuxPort()
+
    IF !empty(cStr)
-	y:=mlcount(cStr,255)
-	FOR x := 1 TO y
-		cFile:=trim(memoline(cStr,255,x))
-		::retr(cFile,cFile)
-	NEXT
+      y:=mlcount(cStr,255)
+
+      FOR x := 1 TO y
+         cFile := Trim( MemoLine( cStr, 255, x ) )
+         ::retr( cFile, cFile )
+      NEXT
+
    ENDIF
 
 	RETURN cStr

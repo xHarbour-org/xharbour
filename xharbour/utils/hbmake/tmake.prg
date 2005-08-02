@@ -1,5 +1,5 @@
 /*
- * $Id: tmake.prg,v 1.11 2005/01/18 00:39:33 modalsist Exp $
+ * $Id: tmake.prg,v 1.12 2005/07/28 04:57:33 marcosgambeta Exp $
  */
 
 /*
@@ -96,7 +96,9 @@ Data  lxFwh          init .F.
 Data  lCw            init .F.
 Data  lMini          init .F.
 Data  lHwgui         init .F.
+Data  lGui           Init .f.
 Data  lGtwvt         init .F.
+Data  lGtwvw         init .F.
 Data  lXWT           init .F.
 Data  lxHGtk         init .F.
 Data  lWhoo          init .F.
@@ -1180,6 +1182,11 @@ tracelog(aTemp[ 1 ], atemp[ 2 ])
                    ::lGtwvt :=.t.
                 endif
 
+                IF aTemp[ 1 ] == "GTWVW"
+                   ::cFMC:= ""
+                   ::lGtwvw :=.t.
+                endif
+
                 IF aTemp[ 1 ] == "XWT"
                    ::cFMC:= ""
                    ::lXWT :=.t.
@@ -1223,6 +1230,10 @@ tracelog(aTemp[ 1 ], atemp[ 2 ])
 
                 IF aTemp[ 1 ] == "MT"
                    ::lMt := "YES" IN aTemp[ 2 ]
+                endif
+
+                IF aTemp[ 1 ] == "GUI"
+                   ::lGUI := "YES" IN aTemp[ 2 ]
                 endif
 
                 IF aTemp[ 1 ] == "WARNINGLEVEL"
