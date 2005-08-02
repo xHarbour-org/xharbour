@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.147 2005/06/13 21:45:08 likewolf Exp $
+ * $Id: filesys.c,v 1.148 2005/08/01 22:21:42 druzus Exp $
  */
 
 /*
@@ -182,6 +182,10 @@
    #include <sys/signal.h>
    #include <sys/process.h>
    #include <sys/wait.h>
+   #include <share.h>
+   #ifndef SH_COMPAT
+      #define SH_COMPAT    0x0000
+   #endif
 #elif defined( HB_WIN32_IO )
    #include <windows.h>
 
@@ -410,7 +414,7 @@ static void convert_open_flags( BOOL fCreate, USHORT uiAttr, USHORT uiFlags,
       if( *mode & S_IROTH ) *mode |= S_IXOTH;
    }
 #else
-   *mode = S_IREAD | 
+   *mode = S_IREAD |
            ( ( uiAttr & FC_READONLY ) ? 0 : S_IWRITE ) |
            ( ( uiAttr & FC_SYSTEM ) ? S_IEXEC : 0 );
 #endif
@@ -3172,7 +3176,7 @@ FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
    #define FXO_FORCEEXT  0x0800   // Force default extension
    #define FXO_DEFAULTS  0x1000   // Use SET command defaults
    #define FXO_DEVICERAW 0x2000   // Open devices in raw mode
-   // xHarbour extension 
+   // xHarbour extension
    #define FXO_SHARELOCK 0x4000   // emulate DOS SH_DENY* mode in POSIX OS
    #define FXO_COPYNAME  0x8000   // copy final szPath into pFilename
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4241 2005/08/01 22:14:36 druzus Exp $
+ * $Id: ChangeLog,v 1.4242 2005/08/02 10:44:51 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-02 14:08 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/filesys.c
+    ! on OS/2 needs to include share.h
 
 2005-08-02 12:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/regex.h
@@ -172,7 +176,7 @@
     + do not make any modifications in given file name and alias in
       DBCREATE() and DBUSEAREA() - it should be done by RDD inf necessary
     - removed DBUSEAREAD() - it's no longer necessary
-    % optimized AFIELDS(), DBSTRUCT(), 
+    % optimized AFIELDS(), DBSTRUCT(),
     ! fixed return value when NETERR() called with logical parameter
     + added support for new parameters in ORDCONDSET() the full syntax is:
       ordCondSet( cFor, bFor, lAll, bWhile, bEval, ;
