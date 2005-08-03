@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.99 2005/07/30 00:00:00 modalsist Exp $
+ * $Id: tget.prg,v 2.00 2005/08/03 12:00:00 modalsist Exp $
  */
 
 /*
@@ -802,13 +802,10 @@ Added: lUntransform := ( "R" IN ::cPicFunc )
          endif
 
          for nFor := ::FirstEditable( ) to ::LastEditable( )
-            // cMaskDel += iif( ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == ".", " ", "X" )
-            if lUntransform
-               cMaskDel += iif( ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == ".", " ", "X" )
-            endif
-            if ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == "."
-               nPad ++
-            endif
+             cMaskDel += iif( ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == ".", " ", "X" )
+             if ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == "."
+                nPad ++
+             endif
          next
       endif
 
