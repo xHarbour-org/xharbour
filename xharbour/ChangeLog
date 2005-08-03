@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4244 2005/08/02 16:52:49 lculik Exp $
+ * $Id: ChangeLog,v 1.4245 2005/08/02 21:07:25 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-03 19:05 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/compiler/harbour.c
+    ! fixed possible GPF in double close international out file
+      Maybe it will also fix problem reported by Lorenzo
+
+  * xharbour/source/rdd/dbcmd.c
+    ! fixed alias stripping from field expression
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! fixed possible GPF when SELF_ORDLISTADD() fails in production
+      index aouto open procedure
+
+2005-08-03 18:35 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/compiler/harbour.c
+    ! fixed possible GPF in double close international out file
+      Maybe it will also fix problem reported by Lorenzo
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! fixed possible GPF when SELF_ORDLISTADD() fails in production
+      index aouto open procedure
+
 2005-08-03 09:05 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/common/hbver.c
   * include/hbapi.h

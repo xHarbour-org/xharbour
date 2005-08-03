@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.117 2005/08/01 22:21:11 druzus Exp $
+ * $Id: dbfntx1.c,v 1.118 2005/08/02 10:45:00 druzus Exp $
  */
 
 /*
@@ -5425,11 +5425,11 @@ static ERRCODE ntxOpen( NTXAREAP pArea, LPDBOPENINFO pOpenInfo )
          {
             pOrderInfo.itmOrder  = hb_itemPutNI( NULL, hb_set.HB_SET_AUTORDER );
             errCode = SELF_ORDLSTFOCUS( ( AREAP ) pArea, &pOrderInfo );
+            hb_itemRelease( pOrderInfo.itmOrder );
             if( errCode == SUCCESS )
                errCode = SELF_GOTOP( ( AREAP ) pArea );
          }
          hb_itemRelease( pOrderInfo.atomBagName );
-         hb_itemRelease( pOrderInfo.itmOrder );
          hb_itemRelease( pOrderInfo.itmResult );
       }
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.158 2005/06/11 22:27:24 ronpinkas Exp $
+ * $Id: dbcmd.c,v 1.159 2005/08/01 22:19:43 druzus Exp $
  */
 
 /*
@@ -1166,7 +1166,7 @@ USHORT HB_EXPORT hb_rddFieldExpIndex( AREAP pArea, char * szField, BOOL fHash )
 
          if( i > 0 )
          {
-            i = n + 5;
+            i += n;
             while( szField[ i ] == ' ' )
                i++;
             if( szField[ i ] == '-' && szField[ i + 1 ] == '>' )

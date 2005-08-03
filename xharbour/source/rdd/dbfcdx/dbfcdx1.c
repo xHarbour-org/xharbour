@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.209 2005/08/01 22:20:15 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.210 2005/08/02 10:44:59 druzus Exp $
  */
 
 /*
@@ -6710,11 +6710,11 @@ static ERRCODE hb_cdxOpen( CDXAREAP pArea, LPDBOPENINFO pOpenInfo )
          {
             pOrderInfo.itmOrder  = hb_itemPutNI( NULL, hb_set.HB_SET_AUTORDER );
             errCode = SELF_ORDLSTFOCUS( ( AREAP ) pArea, &pOrderInfo );
+            hb_itemRelease( pOrderInfo.itmOrder );
             if( errCode == SUCCESS )
                errCode = SELF_GOTOP( ( AREAP ) pArea );
          }
          hb_itemRelease( pOrderInfo.atomBagName );
-         hb_itemRelease( pOrderInfo.itmOrder );
          hb_itemRelease( pOrderInfo.itmResult );
       }
       else

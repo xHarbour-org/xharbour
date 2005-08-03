@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.107 2005/04/27 20:20:27 ronpinkas Exp $
+ * $Id: harbour.c,v 1.108 2005/05/09 10:04:10 druzus Exp $
  */
 
 /*
@@ -5111,14 +5111,17 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                   szHILName, NULL );
                iStatus = EXIT_FAILURE;
             }
-            // and write header
-            sprintf( head.signature, "\3HIL" );
-            sprintf( head.author, "The xharbour group" );
-            sprintf( head.language, HB_INTERNATIONAL_NAME );
-            sprintf( head.language_int, HB_INTERNATIONAL_NAME );
-            sprintf( head.language_code, HB_INTERNATIONAL_CODE );
-            head.entries = -1; // unknown
-            fwrite( &head, sizeof( head ), 1, hb_comp_HILfile );
+            else
+            {
+               // and write header
+               sprintf( head.signature, "\3HIL" );
+               sprintf( head.author, "The xharbour group" );
+               sprintf( head.language, HB_INTERNATIONAL_NAME );
+               sprintf( head.language_int, HB_INTERNATIONAL_NAME );
+               sprintf( head.language_code, HB_INTERNATIONAL_CODE );
+               head.entries = -1; // unknown
+               fwrite( &head, sizeof( head ), 1, hb_comp_HILfile );
+            }
          }
       }
 
@@ -5416,14 +5419,17 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
    if ( hb_comp_HILfile != NULL )
    {
       fclose( hb_comp_HILfile );
+      hb_comp_HILfile = NULL;
    }
    if ( hb_comp_szHILout != NULL )
    {
       fclose( hb_comp_HILfile );
+      hb_comp_szHILout = NULL;
    }
    if ( hb_comp_szHILout != NULL )
    {
       hb_xfree( hb_comp_szHILout );
+      hb_comp_szHILout = NULL;
    }
 
    hb_xfree( hb_comp_pFileName );
