@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4247 2005/08/03 17:37:37 modalsist Exp $
+ * $Id: ChangeLog,v 1.4249 2005/08/04 10:00:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-04 10:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * utils/hbmake/hbmake.prg
+    * version 1.150
+    ! fixed error in Borland C compiler introduced in 1.149 version. 
+    ! function showhelp() was reviewed to pause before end of help.  
+    + added hbmake_id() and hbmake_copyright() functions to show identification
+      at compile time.
+    + added /credits parameter.
 
 2005-08-04 13:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/compiler/harbour.c

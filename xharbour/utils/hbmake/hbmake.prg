@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.147 2005/07/28 04:57:33 marcosgambeta Exp $
+ * $Id: hbmake.prg,v 1.150 2005/08/03 16:54:06 modalsist Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion  := "1.147"
+STATIC s_cHbMakeVersion  := "1.150"
 STATIC s_lPrint          := .F.
 STATIC s_aDefines        := {}
 STATIC s_aBuildOrder     := {}
@@ -90,18 +90,19 @@ STATIC s_aResources      := {}
 STATIC s_nMakeFileHandle 
 STATIC s_cMakeFileName   := "makefile.lnk"
 STATIC s_cLinkCommands   := ""
-STATIC s_lBcc            := .T.  // Borland C compiler (Default)
-STATIC s_lPcc            := .F.  // Pelles C compiler
-STATIC s_lGcc            := .F.  // GNU/MinGW C compiler
-STATIC s_lMingw          := .F.
-STATIC s_lMSVcc          := .F.  // Microsoft Visual C compiler
-STATIC s_lForce          := .F.  // "-f" flag
 STATIC s_lLinux          := .F.
+STATIC s_lOS2            := .F.
+STATIC s_lWin32          := .F.
+STATIC s_lBcc            := .F.  // Borland C compiler
+STATIC s_lPcc            := .F.  // Pelles C compiler
+STATIC s_lMSVcc          := .F.  // Microsoft Visual C compiler
+STATIC s_lGcc            := .F.  // GNU/MinGW C compiler
+STATIC s_lMingw          := .F.  
+STATIC s_lForce          := .F.  // "-f" flag
 STATIC s_szProject       := ""
 STATIC s_lLibrary        := .F.
 STATIC s_lIgnoreErrors   := .F.
 STATIC s_lExtended       := .T.
-STATIC s_lOs2            := .F.
 STATIC s_lRecursive      := .F.
 STATIC s_lCancelRecursive:= .F.
 STATIC s_lEditMake       := .F.
@@ -114,8 +115,8 @@ STATIC s_cDefLang
 STATIC s_cLog            := ""   // log file name.
 STATIC s_cMap            := ""   // map file name. For borland c
 STATIC s_cTds            := ""   // state file name. For borland c
-STATIC s_lGenPpo                 // don't initilize this var
-STATIC s_nLang           := 2    // language. default is english
+STATIC s_lGenPpo         := .F.
+STATIC s_nLang           := 2    // default language is english
 STATIC s_lMt             := .F.
 STATIC s_cUserDefine     := ""
 STATIC s_cUserInclude    := ""
@@ -135,7 +136,6 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    LOCAL aFile       := {}
    LOCAL aDef        := {}
-   LOCAL cOS         := Os()
    LOCAL cMakeParams := ""
    LOCAL nLang       := GETUSERLANG()
    LOCAL nPos
@@ -168,7 +168,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    s_aLangMessages := BuildLangArray( s_cDefLang )
 
 
-   IF PCount() == 0 .or. ;
+   IF PCount() == 0 .or.;
       "/?" IN cMakeParams .or. ;
       "-?" IN cMakeParams .or. ;
       "/h" IN cMakeParams .or. ;
@@ -176,6 +176,12 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       ShowHelp()
       RETURN NIL
    ENDIF
+
+   IF "credits" IN lower(cMakeParams)
+      Hbmake_Credits()
+      RETURN NIL
+   ENDIF
+
 
    IF Empty( GetHarbourDir() )
       IF s_nLang=1
@@ -190,7 +196,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       RETURN NIL
    ENDIF
 
-   IF Upper( Os() ) == "WINDOWS XP"
+   IF Upper( OS() ) == "WINDOWS XP"
       s_cMakeFileName := "makefile.tmp"
    ENDIF
 
@@ -213,21 +219,24 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    // Assing Default C Compiler upon The OS 
 
-   IF "OS/2" IN  cOS
+   s_lOS2   := ( "OS/2" IN OS() )
+   s_lLinux := ( "LINUX" IN Upper( OS() ) )
+   s_lWin32 := ( "WINDOWS" IN Upper( OS() ) )
+
+   IF s_lOS2 .OR. s_lLinux
       s_lGcc   := .T.
-      s_lLinux := .F.
       s_lBcc   := .F.
       s_lPcc   := .F.
       s_lMSVcc := .F.
+      s_lMingw := .F.
+   ELSEIF s_lWin32
+      s_lGcc   := .F.
+      s_lBcc   := .T.
+      s_lPcc   := .F.
+      s_lMSVcc := .F.
+      s_lMingw := .F.
    ENDIF
 
-   IF "LINUX" IN Upper( cOS )
-      s_lGcc   := .T.
-      s_lLinux := .T.
-      s_lBcc   := .F.
-      s_lPcc   := .F.
-      s_lMSVcc := .F.
-   ENDIF
 
    IF Len( aFile ) > 1
       IF s_nLang=1
@@ -304,6 +313,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       if !s_lGenppo
          Delete_ppo()
       endif
+
       RETURN NIL
 
    endif
@@ -410,7 +420,7 @@ FUNCTION ParseMakeFile( cFile )
    LOCAL cCfg        := ""
    LOCAL lCfgFound   := .F.
    LOCAL aTempCFiles := {}
-   LOCAL lLinux      :=  'linux' IN  Lower( Os() )
+   LOCAL lLinux      :=  'linux' IN  Lower( OS() )
    LOCAL aLib
    LOCAL aLibx
    LOCAL lDjgpp      := "GNU C" in HB_COMPILER()
@@ -1027,13 +1037,23 @@ FUNCTION SetBuild()
 
    NEXT
 
-   IF !s_lLinux .and. s_lMingw
+   //IF !s_lLinux .and. s_lMingw
+   IF s_lWin32 .or. s_lOS2 .or. s_lMingw
       FClose( s_nMakeFileHandle )
    ENDIF
+
    if s_lMsVcc
-   s_cLinkCommands +=" /nologo " + IIF( s_lGui, "/SUBSYSTEM:WINDOWS"," /SUBSYSTEM:CONSOLE") + " /force:multiple "
+      s_cLinkCommands +=" /nologo " + IIF( s_lGui, "/SUBSYSTEM:WINDOWS"," /SUBSYSTEM:CONSOLE") + " /force:multiple "
    endif
-   qout(s_cLinkCommands)
+
+   qqout( HbMake_Id() )
+   qout( HbMake_Copyright() )
+
+   if s_lBcc
+      qout( version() )
+   else
+      qout(s_cLinkCommands)
+   endif
 
 RETURN NIL
 
@@ -1050,7 +1070,7 @@ FUNCTION CompileFiles()
    LOCAL aOrder   := ListAsArray2( s_aBuildOrder[ 2 ], " " )
    LOCAL lEnd     := .F.
    LOCAL xItem
-   LOCAL lLinux   :=  'linux' IN  Lower( Os() )
+   LOCAL lLinux   :=  s_lLinux
    LOCAL cPrg     := ''
    LOCAL cOrder   := ""
    LOCAL nFile    := 1
@@ -1093,7 +1113,7 @@ FUNCTION CompileFiles()
                      cComm := Strtran( cComm, "o$*", "o" + s_aCs[ nPos ] )
                   endif
                   cComm := Strtran( cComm, "$**", cPrg )
-                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
+                  cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                   Outstd( cComm )
                   Outstd( Hb_OsNewLine() )
                   setpos(9,0)
@@ -1102,7 +1122,7 @@ FUNCTION CompileFiles()
                   lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText
 
                   IF ! s_lIgnoreErrors .AND. lEnd
-                     IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit " +(s_cLog) ), __run( "Notepad " + (s_cLog) ) )
+                     IIF(  s_lLinux, __run( "mcedit " +(s_cLog) ), __run( "Notepad " + (s_cLog) ) )
                      set cursor on
                      QUIT
                   ELSE
@@ -1170,7 +1190,7 @@ FUNCTION CompileFiles()
                   ENDIF
 
                   cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
-                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
+                  cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                   Outstd( " " )
                   Outstd( cComm )
                   Outstd( Hb_OsNewLine() )
@@ -1231,7 +1251,7 @@ FUNCTION CompileFiles()
 
                      cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
 
-                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " "," >>"+ (s_cLog))
+                     cComm += IIF( s_lLinux ,  " "," >>"+ (s_cLog))
 
                      @  4, 16 SAY s_aCs[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aCs ) )   // Changed s_aPrgs to s_aCs, Ath 2004-06-08
@@ -1242,7 +1262,7 @@ FUNCTION CompileFiles()
                      cErrText := Memoread( (s_cLog) )
                      lEnd     := 'Error E' $   cErrText
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog)) )
+                        IIF(  s_lLinux, __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog)) )
                         set cursor on
                         QUIT
                      ELSE
@@ -1305,7 +1325,7 @@ FUNCTION CompileFiles()
                   ENDIF
 
                   cComm := Strtran( cComm, "$**", cPrg )
-                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
+                  cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," >>"+ (s_cLog))
 
                   @  4, 16 SAY cPrg
                   GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
@@ -1317,7 +1337,7 @@ FUNCTION CompileFiles()
                   lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText .or. "Error E" $ cErrText .or. "Error F" $ cErrText
 
                   IF ! s_lIgnoreErrors .AND. lEnd
-                     IIF(  "LINUX" IN Upper( Os() ), __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog)) )
+                     IIF(  s_lLinux, __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog)) )
                      set cursor on
                      QUIT
                   ELSE
@@ -1401,7 +1421,7 @@ FUNCTION PrintMacros()
 
    LOCAL nPos
 
-   Outstd( "HBMAKE - Version ", HBMakeVersion(), "CopyRight (c) 2000-2005 The xHarbour Project" + CRLF )
+   Outstd( HbMake_Id()+ " "+HbMake_Copyright()+ CRLF )
    Outstd( "" + CRLF )
    Outstd( "Macros:" + CRLF )
    AEval( s_aMacros, { | xItem | Outstd( "     " + xItem[ 1 ] + " = " + xItem[ 2 ] + CRLF ) } )
@@ -1449,8 +1469,8 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL lApollo      := .F.
 
 // LOCAL lMt          := .F.
-   LOCAL cOS          := IIF( "LINUX" IN UPPER( OS() ), "Linux", iif("OS/2" IN UPPER( OS() ),"OS/2","Win32") )
-   LOCAL cCompiler    := IIF( "LINUX" IN UPPER( OS() ) .or. s_lGcc, "GCC",iif(s_lPcc,"POCC",iif(s_lMSVcc,"MSVC","BCC")))
+   LOCAL cOS          := IIF( s_lLinux, "Linux", iif(s_lOS2,"OS/2","Win32") )
+   LOCAL cCompiler    := IIF( s_lLinux .OR. s_lGcc, "GCC",iif(s_lPcc,"POCC",iif(s_lMSVcc,"MSVC","BCC")))
 
    // External GUI Libs
    LOCAL cFwhPath     := Space( 200 )
@@ -1509,7 +1529,7 @@ FUNCTION CreateMakeFile( cFile )
 
    LOCAL cOldLib      := ""
    LOCAL cHtmlLib     := ""
-   LOCAL lLinux       := "linux" IN Lower( Os() )
+   LOCAL lLinux       := s_lLinux
    LOCAL nWriteFiles  := 0
    LOCAL cResName     := space(200)
    LOCAL aSelFiles
@@ -1787,7 +1807,7 @@ FUNCTION CreateMakeFile( cFile )
    Setcolor( 'w/b+,b+/w,w+/b,w/b+,w/b,w+/b' )
    @  0,  0, Maxrow(), Maxcol() BOX( Chr( 201 ) + Chr( 205 ) + Chr( 187 ) + Chr( 186 ) + Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 ) + Space( 1 ) )
 
-   Attention( "HbMake - v"+HbMakeVersion() + space(10)+s_aLangMessages[ 27 ], 0 )
+   Attention( HbMake_Id() + space(10)+s_aLangMessages[ 27 ], 0 )
 //   Attention( s_aLangMessages[ 27 ], 0 )
    Attention( s_aLangMessages[ 47 ], maxrow() )
    @ 01,01       say s_aLangMessages[ 28 ]
@@ -1797,7 +1817,7 @@ FUNCTION CreateMakeFile( cFile )
 //   @ 01,47,06,52 get cCompiler LISTBOX { "BCC", "MSVC", "GCC", "POCC" } MESSAGE s_aLangMessages[ 50 ] STATE OsSpec(getlist,2,@cCompiler) DROPDOWN
    @ 01,47,06,54 get cCompiler LISTBOX { "BCC", "MSVC", "GCC","MINGW" } MESSAGE s_aLangMessages[ 50 ] STATE OsSpec(getlist,2,@cCompiler) DROPDOWN
    @ 01,56       say s_aLangMessages[ 30 ]
-   @ 01,67,10,79 get cGuiLib ListBox { "None","C4W","FWH","GTWVT","GTWVW","HWGUI","MINIGUI","XWT","WHAT32","WHOO","XHGTK"} state OsSpec(getlist,3,@cGuiLib) DROPDOWN  When CheckCompiler(cOS) message s_aLangMessages[ 51 ]
+   @ 01,67,10,78 get cGuiLib ListBox { "None","C4W","FWH","GTWVT","GTWVW","HWGUI","MINIGUI","XWT","WHAT32","WHOO","XHGTK"} state OsSpec(getlist,3,@cGuiLib) DROPDOWN  When CheckCompiler(cOS) message s_aLangMessages[ 51 ]
    @ 02,01       say s_aLangMessages[ 48 ]
    @ 02,16,08,26 get cRdd ListBox { "None","RddAds","Mediator","Apollo"}  WHEN cOS == "Win32" .or. cOS == "Linux" DROPDOWN message s_aLangMessages[ 52 ]
    @ 02,30       get s_lCompress CheckBox  caption s_aLangMessages[ 53 ] style "[X ]" message s_aLangMessages[ 54 ]
@@ -1878,7 +1898,7 @@ FUNCTION CreateMakeFile( cFile )
    @ 06, 40 GET lVarIsMemVar checkbox caption s_aLangMessages[ 33 ] style "[X ]"
    @ 07, 01 GET lDebug       checkbox caption s_aLangMessages[ 34 ] style "[X ]"
    @ 07, 40 GET lSupressLine checkbox caption s_aLangMessages[ 35 ] style "[X ]"
-   @ 08, 01 GET s_lGenPPO      checkbox caption s_aLangMessages[ 36 ] style "[X ]"
+   @ 08, 01 GET s_lGenppo    checkbox caption s_aLangMessages[ 36 ] style "[X ]"
    @ 08, 40 GET lCompMod     checkbox caption s_aLangMessages[ 37 ] style "[X ]"
    @ 09, 01 SAY s_aLangMessages[ 38 ] GET s_cUserDefine PICT "@s23"
    @ 09, 40 SAY s_aLangMessages[ 39 ] GET s_cUserInclude PICT "@s18"
@@ -2224,7 +2244,7 @@ FUNCTION CreateMakeFile( cFile )
 
 #IFDEF HBM_USE_DEPENDS
    clear typeahead
-   Attention( "HBMake options", 16 )
+   Attention( "HbMake options", 16 )
    @ 17, 01 GET lScanIncludes checkbox     caption "Create #DEPENDS from #include" style "[X ]"
    // Provisions for recursive scanning
    @ 17, 40 GET lScanIncRecursive checkbox caption "Scan recursive" style "[X ]" //when lScanIncludes
@@ -2951,7 +2971,7 @@ FUNCTION ScanInclude( cFile, lRecursive, cExclExtent, aFiles)
            // Provisions for recursive scanning
            // Add current file to list, making it by default the first in the list
 
-           IF AT("WINDOWS" ,Upper( Os() ) ) > 0
+           IF s_lWin32
                IF AScan(aFiles, {| x | Lower( x ) == Lower( cFnam + cExt ) } ) = 0       // Case IN-sensitive!
                    AAdd(aFiles,  cFnam + cExt)
                ENDIF
@@ -3012,7 +3032,7 @@ FUNCTION ScanInclude( cFile, lRecursive, cExclExtent, aFiles)
                   ENDIF
                   IF Len(cInclude) > 0
                       // Still Ok, add to list?
-                      IF AT("WINDOWS" ,Upper( Os() ) ) > 0
+                      IF s_lWin32
                           IF AScan(aFiles, {| x | Lower( x ) == Lower( cInclude ) } ) = 0       // Case IN-sensitive!
                               AAdd(aFiles, (cInclude) )
                               // recursive scanning
@@ -3113,7 +3133,7 @@ FUNCTION CompileUpdatedFiles()
                         cComm := Strtran( cComm, "o$*", "o" + s_aCs[ nPos ] )
                      endif
                      cComm := Strtran( cComm, "$**", s_aPrgs[ nFiles ] )
-                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 , " > "+ (s_cLog)," >>"+ (s_cLog))
+                     cComm += IIF( s_lLinux , " > "+ (s_cLog)," >>"+ (s_cLog))
 
                      //                   Outstd( cComm )
                      //                   Outstd( Hb_OsNewLine() )
@@ -3123,7 +3143,7 @@ FUNCTION CompileUpdatedFiles()
                      lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        IIF(  "LINUX" IN Upper( Os() ) , __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog) ) )
+                        IIF(  s_lLinux , __run( "mcedit " + (s_cLog) ), __run( "Notepad " + (s_cLog) ) )
                         set cursor on
                         QUIT
                      ELSE
@@ -3177,7 +3197,7 @@ FUNCTION CompileUpdatedFiles()
                      cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
                   endif
                   cComm := Strtran( cComm, "$**", aCtocompile[ nFiles ] )
-                  cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
+                  cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                   Outstd( " " )
 
                   Outstd( cComm )
@@ -3234,7 +3254,7 @@ FUNCTION CompileUpdatedFiles()
                         cComm := Strtran( cComm, "o$*", "o" + s_aObjsc[ nPos ] )
                      endif
                      cComm := Strtran( cComm, "$**", s_aCs[ nFiles ] )
-                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
+                     cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                      @  4, 16 SAY s_aCs[ nFiles ]
                      GaugeUpdate( aGauge, nFile / Len( s_aCs ) )  // changed s_aPrgs to s_aCs Ath 2004-06-08
                      nFile ++
@@ -3246,7 +3266,7 @@ FUNCTION CompileUpdatedFiles()
                      lEnd     := 'Error E' $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        IIF(  "LINUX" IN Upper( Os() ) , __run( "mcedit "  + (s_cLog)), __run( "Notepad " + (s_cLog) ) )
+                        IIF(  s_lLinux , __run( "mcedit "  + (s_cLog)), __run( "Notepad " + (s_cLog) ) )
                         set cursor on
                         QUIT
                      ELSE
@@ -3310,7 +3330,7 @@ FUNCTION CompileUpdatedFiles()
                         cComm := Strtran( cComm, "o$*", "o" + s_aObjs[ nPos ] )
                      endif
                      cComm := Strtran( cComm, "$**", cPrg )
-                     cComm += IIF( AT("LINUX" ,upper( Os() ) ) >0 ,  " > "+ (s_cLog)," >>"+ (s_cLog))
+                     cComm += IIF( s_lLinux ,  " > "+ (s_cLog)," >>"+ (s_cLog))
                      @  4, 16 SAY cPrg
                      GaugeUpdate( aGauge, nFile / Len( s_aPrgs ) )
                      nFile ++     // moved from outside 'FOR EACH', Ath 2004-06-08
@@ -3321,7 +3341,7 @@ FUNCTION CompileUpdatedFiles()
                      lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText .or. "Error E" $ cErrText .or. "Error F" $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        IIF( "LINUX" IN Upper( Os() ) , __run( "mcedit " + (s_cLog) ), __run( "Notepad "  + (s_cLog) ) )
+                        IIF( s_lLinux , __run( "mcedit " + (s_cLog) ), __run( "Notepad "  + (s_cLog) ) )
                         set cursor on
                         QUIT
                      ELSE
@@ -3446,8 +3466,8 @@ FUNCTION CreateLibMakeFile( cFile )
 
    LOCAL aOutC     := {}
    LOCAL aSrcC     := Directory( "*.c" )
-   LOCAL cOS       := IIF( "LINUX" IN UPPER( OS() ), "Linux", "Win32")
-   LOCAL cCompiler := IIF( "LINUX" IN UPPER( OS() ), "GCC","BCC")
+   LOCAL cOS       := IIF( s_lLinux, "Linux", "Win32")
+   LOCAL cCompiler := IIF( s_lLinux, "GCC","BCC")
    LOCAL cLibName  := Padr( Left( cFile, At( '.', cFile ) - 1 ) ,40)
 
    LOCAL lAutomemvar     := .F.
@@ -3548,7 +3568,7 @@ FUNCTION CreateLibMakeFile( cFile )
          lDebug          := oMake:ldebug
          lSupressline    := oMake:lSupressline
          lCompMod        := oMake:lCompMod
-         s_lGenPPO         := oMake:lGenppo
+         s_lGenppo       := oMake:lGenppo
          lInstallLib     := oMake:lInstallLib
          s_cUserInclude  := PadR(oMake:cUserInclude,200," ")
          s_cUserDefine      := PadR(oMake:cUserDef,200," ")
@@ -3700,7 +3720,7 @@ FUNCTION CreateLibMakeFile( cFile )
    Setcolor( 'w/b+,b+/w,w+/b,w/b+,w/b,w+/b' )
    @  0,  0, Maxrow(), Maxcol() BOX( Chr( 201 ) + Chr( 205 ) + Chr( 187 ) + Chr( 186 ) + Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 ) + Space( 1 ) )
 //   Attention( s_aLangMessages[ 27 ], 0 )
-   Attention( "HbMake - v"+HbMakeVersion() + space(10)+s_aLangMessages[ 27 ], 0 )
+   Attention( HbMake_Id() + space(10)+s_aLangMessages[ 27 ], 0 )
 
    SET CURSOR OFF
 
@@ -3718,7 +3738,7 @@ FUNCTION CreateLibMakeFile( cFile )
    @ 06,40 GET lVarIsMemvar  checkbox caption s_aLangMessages[ 33 ] style "[X ]"
    @ 07,01 GET lDebug        checkbox caption s_aLangMessages[ 34 ] style "[X ]"
    @ 07,40 GET lSupressLine  checkbox caption s_aLangMessages[ 35 ] style "[X ]"
-   @ 08,01 GET s_lGenPPO       checkbox caption s_aLangMessages[ 36 ] style "[X ]"
+   @ 08,01 GET s_lGenppo     checkbox caption s_aLangMessages[ 36 ] style "[X ]"
    @ 08,40 GET lCompMod      checkbox caption s_aLangMessages[ 37 ] style "[X ]"
    @ 09,01 SAY s_aLangMessages[ 38 ] GET s_cUserDefine PICT "@s23"
    @ 09,40 SAY s_aLangMessages[ 39 ] GET s_cUserInclude PICT "@s18"
@@ -3744,7 +3764,7 @@ FUNCTION CreateLibMakeFile( cFile )
    s_lMSVcc :=  "MSVC" IN cCompiler
    s_lGcc   :=  "GCC"  IN cCompiler
    s_lPcc   :=  "POCC" IN cCompiler
-   s_lMingw  :=  "MINGW" IN cCompiler
+   s_lMingw :=  "MINGW" IN cCompiler
    if s_lMingw
    s_lGcc := .T.
    endif
@@ -3796,7 +3816,7 @@ FUNCTION CreateLibMakeFile( cFile )
       cHarbourFlags += " -l "
    ENDIF
 
-   IF s_lGenPPO
+   IF s_lGenppo
       cHarbourFlags += " -p "
    ENDIF
 
@@ -4102,13 +4122,13 @@ FUNCTION CreateLibMakeFile( cFile )
 
    ELSEIF s_lGcc
 
-      FWrite( s_nMakeFileHandle, "CFLAG1 = " + IIF( "linux" IN Lower( Os() ) , "-I/usr/include/xharbour", " -I$(BHC)/include" ) + " -c -Wall" + CRLF )
-      FWrite( s_nMakeFileHandle, "CFLAG2 = " + IIF( "linux" IN Lower( Os() ) , "-L /usr/lib/xharbour", " -L $(BHC)/lib" ) + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG1 = " + IIF( s_lLinux , "-I/usr/include/xharbour", " -I$(BHC)/include" ) + " -c -Wall" + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG2 = " + IIF( s_lLinux , "-L /usr/lib/xharbour", " -L $(BHC)/lib" ) + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
 
-      IF "linux" IN Lower( Getenv( "HB_ARCHITECTURE" ) )  .OR. cOS == "Linux" .OR.  "linux" IN Lower( Os() )
+      IF "linux" IN Lower( Getenv( "HB_ARCHITECTURE" ) )  .OR. cOS == "Linux" .OR. s_lLinux
          FWrite( s_nMakeFileHandle, "LINKER = ar -M " + CRLF )
       ELSE
          FWrite( s_nMakeFileHandle, "LINKER = ar -M " + CRLF )
@@ -4607,7 +4627,7 @@ FUNCTION FindHarbourCfg( cCfg )
    LOCAL lFound AS LOGICAL := .F.
    LOCAL cEnv AS STRING
    LOCAL aEnv as Array of String
-   LOCAL lLinux :=  'linux' IN Lower( Os() )
+   LOCAL lLinux :=  s_lLinux
    LOCAL nPos
 
    IF ! lLinux .OR. s_lOs2
@@ -4718,7 +4738,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
 
    IF ! Empty( cFile )
 
-      IF Left( cFile, 1 ) $ "- /?"
+      IF Left( cFile, 1 ) $ "- /?" .or. "credits" IN cFile
          cParam += cFile+" "
       ELSE
          cFile := cFile
@@ -4729,7 +4749,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
 
    IF ! Empty( p1 )
 
-      IF Left( p1, 1 ) $ "- /?"
+      IF Left( p1, 1 ) $ "- /?" .or. "credits" IN p1
          cParam += p1+" "
       ELSE
          cFile := p1
@@ -4822,55 +4842,6 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
    ENDIF
 
 RETURN cParam
-
-*------------------
-FUNCTION ShowHelp()
-*------------------
-
-   LOCAL cOS := Upper( Os() )
-   cls
-   OutStd( s_aLangMessages[ 1 ] + HB_OsNewLine() )
-   OutStd( "Copyright 2000-2005 Luiz Rafael Culik <culikr@uol.com.br>"  + HB_OsNewLine() )
-//   ? ""
-   OutStd( s_aLangMessages[ 2 ] + HB_OsNewLine() )
-//   ? ""
-   OutStd( s_aLangMessages[ 3 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 4 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 5 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 6 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 7 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 8 ] + HB_OsNewLine() )
-
-   IF  "OS/2" IN cOS
-      OutStd( s_aLangMessages[ 9 ] + HB_OsNewLine() )
-      OutStd( s_aLangMessages[ 10 ] + HB_OsNewLine() )
-      OutStd( s_aLangMessages[ 13 ] + HB_OsNewLine() )
-   ELSEIF  'LINUX' IN  cOS
-      OutStd( s_aLangMessages[ 9 ] + HB_OsNewLine() )
-      OutStd( s_aLangMessages[ 12 ] + HB_OsNewLine() )
-      OutStd( s_aLangMessages[ 14 ] + HB_OsNewLine() )
-   ELSE
-      OutStd( s_aLangMessages[ 11 ] + HB_OsNewLine() )
-      OutStd( s_aLangMessages[ 12 ] + HB_OsNewLine() )
-      OutStd( s_aLangMessages[ 13 ] + HB_OsNewLine() )
-   ENDIF
-
-   OutStd( s_aLangMessages[ 15 ] + HB_OsNewLine() )
-// OutStd( s_aLangMessages[ 62 ] + HB_OsNewLine() ) // pocc syntax
- OutStd( s_aLangMessages[ 62 ] + HB_OsNewLine() ) // pocc syntax
-   OutStd( s_aLangMessages[ 16 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 17 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 18 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 19 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 20 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 21 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 22 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 23 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 24 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 25 ] + HB_OsNewLine() )
-   OutStd( s_aLangMessages[ 26 ] + HB_OsNewLine() )
-
-RETURN NIL
 
 
 *------------------------------------
@@ -5029,14 +5000,14 @@ RETURN NIL
 *-------------------------------
 FUNCTION BuildLangArray( cLang )
 *-------------------------------
-
-   LOCAL aLang := {}
+LOCAL aLang := {}
 
    DEFAULT cLang TO "EN"
 
+   AAdd( aLang, HbMake_Id() )
+
    IF cLang == "EN"
 
-      AAdd( aLang, "xHarbour Make Utility - version "+HbMakeVersion() )
       AAdd( alang, "Syntax:  hbmake <cFile>.bc [options] - Example: hbmake hello.bc /ex")
       AAdd( aLang, "Options:  /e[x]   Create a new Makefile. If /ex is used it create a" )
       AAdd( aLang, "                  new make file in extended mode." )
@@ -5101,10 +5072,11 @@ FUNCTION BuildLangArray( cLang )
       AAdd( aLang, "Obj dir files:" )
       AAdd( aLang, "Install the lib at the xHarbour lib folder" )
 //      AAdd( aLang, "          /pc     Use POCC as C compiler" )
-      AAdd( aLang, "         /m     use GCC(mingw) as C compiler" )
+      AAdd( aLang, "          /m      use GCC(mingw) as C compiler" )
+      AAdd( aLang, "          /credits") 
+
    ELSEIF cLang == "ES"
 
-      AAdd( aLang, "xHarbour Make Utility  -  version "+HbMakeVersion() )
       AAdd( aLang, "Sintaxe:  hbmake <cArchivo>.bc [opciones] - Exemplo: hbmake hello.bc /ex")
       AAdd( aLang, "Opciones: /e[x]   Crea un Makefile nuevo. Si se usa /ex se crea un nuevo" )
       AAdd( aLang, "                  makefile en modo extendido." )
@@ -5126,10 +5098,10 @@ FUNCTION BuildLangArray( cLang )
       AAdd( aLang, "                        /r y /e[x]/el[x] pueden ser usados juntos" )
       AAdd( aLang, "                  Las opciones con + son los valores por omisi¢n" )
       AAdd( aLang, "                  El parametro -D puede aceptar multiplas macros en la misma" )
-      AAdd( aLang, "                  linea ou use uma macro por parametro -D" )
+      AAdd( aLang, "                  linea ou use una macro por parametro -D" )
       AAdd( aLang, "                  /l[LANGID] especifica una linguagem a ser utilizada por")
-      AAdd( aLang, "                   hbmake. LANGID = (EN/PT/ES). En sistemas Windows, O padr∆o")
-      AAdd( aLang, "                   es la linguagem do SO. Em OS/2, FreeBSD y LINUX ser† Ingles." )
+      AAdd( aLang, "                   hbmake. LANGID = (EN/PT/ES). En sistemas Windows, Lo padr¢n")
+      AAdd( aLang, "                   es la linguagem de SO. En OS/2, FreeBSD y LINUX ser†n InglÇs.")
       AAdd( aLang, "Opciones de Ambiente" )
       AAdd( aLang, "Seleccione SO" )
       AAdd( aLang, "Seleccione Compilador C" )
@@ -5169,10 +5141,11 @@ FUNCTION BuildLangArray( cLang )
       AAdd( aLang, "Direct¢rio de los Obj:" )
       AAdd( aLang, "Alojar la lib en el direct¢rio lib de xHarbour" )
 //      AAdd( aLang, "          /pc     Usar POCC como compilador C" )
-      AAdd( aLang, "         /m     Usar GCC(mingw) como compilador C" )
+      AAdd( aLang, "          /m      Usar GCC(mingw) como compilador C" )
+      AAdd( aLang, "          /credits") 
+
    ELSEIF cLang == "PT"
 
-      AAdd( aLang, "xHarbour Make Utility  -  vers∆o "+HbMakeVersion() )
       AAdd( aLang, "Sintaxe:  hbmake <arquivo>.bc [opá‰es] -  Exemplo: hbmake hello.bc /ex")
       AAdd( aLang, "Opá‰es:  /e[x]  Cria um Makefile novo. Se for usado /ex cria um makefile" )
       AAdd( aLang, "                em modo extendido." )
@@ -5238,6 +5211,8 @@ FUNCTION BuildLangArray( cLang )
       AAdd( aLang, "Instalar a lib no diret¢rio lib do xHarbour" )
 //      AAdd( aLang, "         /pc    Usar POCC como compilador C" )
       AAdd( aLang, "         /m     Usar GCC(mingw) como compilador C" )
+      AAdd( aLang, "         /credits") 
+
    ENDIF
 
 RETURN aLang
@@ -5351,10 +5326,6 @@ Local y := x
  x := !y
 RETURN .T.
 
-*-----------------------
-FUNCTION HBMakeVersion()
-*-----------------------
-RETURN (s_cHbMakeVersion)
 *--------------------
 FUNCTION Delete_ppo()
 *--------------------
@@ -5372,3 +5343,90 @@ LOCAL nPos,aFiles
 
 RETURN NIL
 
+*------------------
+FUNCTION ShowHelp()
+*------------------
+
+   LOCAL cOS := Upper( Os() )
+
+   CLS
+
+   OutStd( s_aLangMessages[ 1 ] + HB_OsNewLine() )
+   OutStd( HbMake_Copyright()  + HB_OsNewLine() )
+   OutStd( HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 2 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 3 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 4 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 5 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 6 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 7 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 8 ] + HB_OsNewLine() )
+
+   IF  "OS/2" IN cOS
+      OutStd( s_aLangMessages[ 9 ] + HB_OsNewLine() )
+      OutStd( s_aLangMessages[ 10 ] + HB_OsNewLine() )
+      OutStd( s_aLangMessages[ 13 ] + HB_OsNewLine() )
+   ELSEIF  'LINUX' IN  cOS
+      OutStd( s_aLangMessages[ 9 ] + HB_OsNewLine() )
+      OutStd( s_aLangMessages[ 12 ] + HB_OsNewLine() )
+      OutStd( s_aLangMessages[ 14 ] + HB_OsNewLine() )
+   ELSE
+      OutStd( s_aLangMessages[ 11 ] + HB_OsNewLine() )
+      OutStd( s_aLangMessages[ 12 ] + HB_OsNewLine() )
+      OutStd( s_aLangMessages[ 13 ] + HB_OsNewLine() )
+   ENDIF
+
+   OutStd( s_aLangMessages[ 15 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 62 ] + HB_OsNewLine() ) // pocc syntax
+   OutStd( s_aLangMessages[ 16 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 17 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 18 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 19 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 20 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 21 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 22 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 23 ] + HB_OsNewLine() )
+
+   setpos(maxrow()-1,0)
+   WAIT
+   setpos(maxrow(),0)
+
+   OutStd( s_aLangMessages[ 24 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 25 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 26 ] + HB_OsNewLine() )
+   OutStd( s_aLangMessages[ 63 ] + HB_OsNewLine() )
+
+RETURN NIL
+
+*-------------------
+FUNCTION HbMake_ID()
+*-------------------
+RETURN ( "HbMake v"+s_cHbMakeVersion+" - xHarbour Make Utility")
+
+*--------------------------
+FUNCTION HbMake_Copyright()
+*--------------------------
+RETURN ( "Copyright (C) 2000-2005 xHarbour project - http://www.xharbour.org")
+
+*------------------------
+FUNCTION HbMake_Credits()
+*------------------------
+local i,aCredits := {}
+
+ CLS
+
+ aadd( aCredits,"Credits:" )
+ aadd( aCredits," " )
+ aadd( aCredits,"Luiz Rafael Culik <culikr@uol.com.br>" )
+
+ qqout( HbMake_Id() )
+ qout( HbMake_copyright() )
+ qout( " ")
+
+ for i := 1 to Len( aCredits )
+     qout( aCredits[i] )
+ next
+
+ qout(" ")
+
+RETURN NIL
