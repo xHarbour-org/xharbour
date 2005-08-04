@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.108 2005/05/09 10:04:10 druzus Exp $
+ * $Id: harbour.c,v 1.109 2005/08/03 17:10:33 druzus Exp $
  */
 
 /*
@@ -5420,11 +5420,6 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
    {
       fclose( hb_comp_HILfile );
       hb_comp_HILfile = NULL;
-   }
-   if ( hb_comp_szHILout != NULL )
-   {
-      fclose( hb_comp_HILfile );
-      hb_comp_szHILout = NULL;
    }
    if ( hb_comp_szHILout != NULL )
    {

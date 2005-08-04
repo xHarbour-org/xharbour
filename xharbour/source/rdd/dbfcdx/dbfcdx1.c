@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.210 2005/08/02 10:44:59 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.211 2005/08/03 17:11:00 druzus Exp $
  */
 
 /*
@@ -6817,7 +6817,7 @@ static ERRCODE hb_cdxOrderListAdd( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
    USHORT uiFlags;
    FHANDLE hFile;
-   char szBaseName[ CDX_MAXTAGNAMELEN ];
+   char szBaseName[ CDX_MAXTAGNAMELEN + 1 ];
    char szFileName[ _POSIX_PATH_MAX + 1 ];
    LPCDXINDEX pIndex, * pIndexPtr;
    BOOL bRetry;

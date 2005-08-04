@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4247 2005/08/03 14:28:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.4247 2005/08/03 17:37:37 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-04 13:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/compiler/harbour.c
+    ! remove bad code I haven't noticed before - it should fix GPF
+      reported by Lorenzo
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed possible buffer overflow
+
+  * xharbour/source/rtl/gtxwc/gtxwc.c
+    * clean GC when GTXWC is closed
 
 2005-08-03 14:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
@@ -20,16 +31,6 @@
 
   * xharbour/source/rdd/dbcmd.c
     ! fixed alias stripping from field expression
-
-  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
-  * xharbour/source/rdd/dbfntx/dbfntx1.c
-    ! fixed possible GPF when SELF_ORDLISTADD() fails in production
-      index aouto open procedure
-
-2005-08-03 18:35 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
-  * xharbour/source/compiler/harbour.c
-    ! fixed possible GPF in double close international out file
-      Maybe it will also fix problem reported by Lorenzo
 
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
   * xharbour/source/rdd/dbfntx/dbfntx1.c

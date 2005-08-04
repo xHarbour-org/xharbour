@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.10 2005/02/06 20:35:42 druzus Exp $
+ * $Id: gtxwc.c,v 1.11 2005/03/31 04:01:49 druzus Exp $
  */
 
 /*
@@ -2908,6 +2908,11 @@ static void hb_xvt_gtDissConnectX( PXWND_DEF wnd )
       {
          XFreeFont( wnd->dpy, wnd->xfs );
          wnd->xfs = NULL;
+      }
+      if ( wnd->gc )
+      {
+        XFreeGC( wnd->dpy, wnd->gc );
+	wnd->gc = 0;
       }
       XCloseDisplay( wnd->dpy );
       wnd->dpy = NULL;
