@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.211 2005/08/03 17:11:00 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.212 2005/08/04 11:33:12 druzus Exp $
  */
 
 /*
@@ -923,56 +923,6 @@ static BOOL hb_cdxEvalSeekCond( LPCDXTAG pTag, PHB_ITEM pCondItem )
    hb_itemRelease( pKeyRec );
 
    return fRet;
-}
-
-/*
- * find field index for single field expressions
- */
-static USHORT hb_cdxFieldIndex( CDXAREAP pArea, char * cExpr )
-{
-   char szKeyExpr[ CDX_MAXEXP + 1 ],
-        szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
-   int i, j, l, n = 0;
-
-   if ( SELF_ALIAS( ( AREAP ) pArea, ( BYTE * ) szAlias ) == SUCCESS )
-      l = strlen( szAlias );
-   else
-      l = 0;
-
-   hb_strncpyUpperTrim( szKeyExpr, cExpr, CDX_MAXEXP );
-
-   /*
-    * strip the _FIELD-> and FIELD-> prefix, it could be nested so repeat
-    * this process until all prefixes will be removed
-    */
-   do
-   {
-      j = n;
-      if ( strncmp( &szKeyExpr[ n ], "FIELD", 5 ) == 0 )
-         i = 5;
-      else if ( strncmp( &szKeyExpr[ n ], "_FIELD", 6 ) == 0 )
-         i = 6;
-      else if ( l > 0 && strncmp( &szKeyExpr[ n ], szAlias, l ) == 0 )
-         i = l;
-      else
-         i = 0;
-
-      if ( i > 0 )
-      {
-         i = n + 5;
-         while ( szKeyExpr[ i ] == ' ' )
-            i++;
-         if ( szKeyExpr[ i ] == '-' && szKeyExpr[ i + 1 ] == '>' )
-         {
-            n = i + 2;
-            while ( szKeyExpr[ n ] == ' ' )
-               n++;
-         }
-      }
-   }
-   while ( n != j );
-
-   return hb_rddFieldIndex( ( AREAP ) pArea, &szKeyExpr[ n ] );
 }
 
 /*
@@ -3680,7 +3630,8 @@ static void hb_cdxTagLoad( LPCDXTAG pTag )
    if ( pTag->uiType == 'C' )
       hb_cdxMakeSortTab( pTag->pIndex->pArea );
 
-   pTag->nField = hb_cdxFieldIndex( pTag->pIndex->pArea, pTag->KeyExpr );
+   pTag->nField = hb_rddFieldExpIndex( ( AREAP ) pTag->pIndex->pArea,
+                                       pTag->KeyExpr );
 
    /* Check if there is a FOR expression: pTag->OptFlags & CDX_TYPE_FORFILTER */
    if ( tagHeader.keyExpPool[ uiForPos ] != 0 )
@@ -4642,7 +4593,8 @@ static LPCDXTAG hb_cdxIndexCreateTag( BOOL fStruct, LPCDXINDEX pIndex,
    {
       pTag->KeyExpr = ( char * ) hb_xgrab( CDX_MAXEXP + 1 );
       hb_strncpyTrim( pTag->KeyExpr, KeyExp, CDX_MAXEXP );
-      pTag->nField = hb_cdxFieldIndex( pTag->pIndex->pArea, pTag->KeyExpr );
+      pTag->nField = hb_rddFieldExpIndex( ( AREAP ) pTag->pIndex->pArea,
+                                          pTag->KeyExpr );
    }
    pTag->pKeyItem = pKeyItem;
    if ( ForExp != NULL )

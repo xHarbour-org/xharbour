@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.159 2005/08/01 22:19:43 druzus Exp $
+ * $Id: dbcmd.c,v 1.160 2005/08/03 17:10:50 druzus Exp $
  */
 
 /*
@@ -1054,56 +1054,6 @@ ERRCODE HB_EXPORT hb_rddIterateWorkAreas( WACALLBACK pCallBack, int data )
 }
 
 /*
- * Find a field index by symbol
- */
-USHORT HB_EXPORT hb_rddFieldSymIndex( AREAP pArea, PHB_SYMB pFieldSymbol )
-{
-   USHORT uiCount = 0;
-   LPFIELD pField;
-   PHB_DYNS pDynSym;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddFieldSymIndex(%p, %p)", pArea, pFieldSymbol));
-
-   pDynSym = pFieldSymbol->pDynSym;
-   pField = pArea->lpFields;
-   while( pField )
-   {
-      if( ( PHB_DYNS ) pField->sym == pDynSym )
-      {
-         return uiCount;
-      }
-      ++uiCount;
-      pField = pField->lpfNext;
-   }
-   return 0;
-}
-
-/*
- * Find a field index by name
- */
-USHORT HB_EXPORT hb_rddFieldNameIndex( AREAP pArea, char * szName )
-{
-   PHB_DYNS pFieldSym;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddFieldNameIndex(%p, %s)", pArea, szName));
-
-   pFieldSym = hb_dynsymFindName( szName );
-   if( pFieldSym )
-   {
-      USHORT uiCount = 0;
-      LPFIELD pField = pArea->lpFields;
-      while( pField )
-      {
-         ++uiCount;
-         if( ( PHB_DYNS ) pField->sym == pFieldSym )
-            return uiCount;
-         pField = pField->lpfNext;
-      }
-   }
-   return 0;
-}
-
-/*
  * Find a field index by name
  */
 USHORT HB_EXPORT hb_rddFieldIndex( AREAP pArea, char * szName )
@@ -1113,13 +1063,24 @@ USHORT HB_EXPORT hb_rddFieldIndex( AREAP pArea, char * szName )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddFieldIndex(%p, %s)", pArea, szName));
 
-   pField = pArea->lpFields;
-   while( pField )
+   while( HB_ISSPACE( *szName ) )
    {
-      ++uiCount;
-      if( strcmp( szName, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName ) == 0 )
-         return uiCount;
-      pField = pField->lpfNext;
+      ++szName;
+   }
+
+   if( *szName )
+   {
+      char szSym[ HB_SYMBOL_NAME_LEN + 1 ];
+      hb_strncpyUpperTrim( szSym, szName, HB_SYMBOL_NAME_LEN );
+
+      pField = pArea->lpFields;
+      while( pField )
+      {
+         ++uiCount;
+         if( strcmp( szSym, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName ) == 0 )
+            return uiCount;
+         pField = pField->lpfNext;
+      }
    }
    return 0;
 }
@@ -1128,11 +1089,11 @@ USHORT HB_EXPORT hb_rddFieldIndex( AREAP pArea, char * szName )
  * find a field expression index, this function strips _FIELD->, FIELD->,
  * alias-> prefixes
  */
-USHORT HB_EXPORT hb_rddFieldExpIndex( AREAP pArea, char * szField, BOOL fHash )
+USHORT HB_EXPORT hb_rddFieldExpIndex( AREAP pArea, char * szField )
 {
    int n;
 
-   while( *szField == ' ' )
+   while( HB_ISSPACE( *szField ) )
    {
       ++szField;
    }
@@ -1167,7 +1128,7 @@ USHORT HB_EXPORT hb_rddFieldExpIndex( AREAP pArea, char * szField, BOOL fHash )
          if( i > 0 )
          {
             i += n;
-            while( szField[ i ] == ' ' )
+            while( HB_ISSPACE( szField[ i ] ) )
                i++;
             if( szField[ i ] == '-' && szField[ i + 1 ] == '>' )
             {
@@ -1180,28 +1141,7 @@ USHORT HB_EXPORT hb_rddFieldExpIndex( AREAP pArea, char * szField, BOOL fHash )
       while ( n != j );
       szField = &szField[ n ];
    }
-
-   n = strlen( szField );
-   while( szField[ n - 1 ] == ' ' )
-   {
-      --n;
-   }
-
-   if( n )
-   {
-      if( fHash )
-      {
-         return hb_rddFieldNameIndex( pArea, szField );
-      }
-      else
-      {
-         char szSym[ HB_SYMBOL_NAME_LEN + 1 ];
-
-         hb_strncpyUpperTrim( szSym, szField, HB_SYMBOL_NAME_LEN );
-         return hb_rddFieldIndex( pArea, szSym );
-      }
-   }
-   return 0;
+   return hb_rddFieldIndex( pArea, szField );
 }
 
 /*
@@ -1218,9 +1158,11 @@ ERRCODE HB_EXPORT hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
    {
       USHORT uiField = 1;
       LPFIELD pField = pArea->lpFields;
+      PHB_DYNS pDynSym = pFieldSymbol->pDynSym;
+
       while( pField )
       {
-         if( ( PHB_DYNS ) pField->sym == pFieldSymbol->pDynSym )
+         if( ( PHB_DYNS ) pField->sym == pDynSym )
          {
             return SELF_GETVALUE( pArea, uiField, pItem );
          }
@@ -1245,9 +1187,11 @@ ERRCODE HB_EXPORT hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
    {
       USHORT uiField = 1;
       LPFIELD pField = pArea->lpFields;
+      PHB_DYNS pDynSym = pFieldSymbol->pDynSym;
+
       while( pField )
       {
-         if( ( PHB_DYNS ) pField->sym == pFieldSymbol->pDynSym )
+         if( ( PHB_DYNS ) pField->sym == pDynSym )
          {
             return SELF_PUTVALUE( pArea, uiField, pItem );
          }
@@ -2160,6 +2104,8 @@ HB_FUNC( DBSETFILTER )
             pFilterInfo.abFilterText = pText;
          else
             pFilterInfo.abFilterText = hb_itemPutC( NULL, "" );
+         pFilterInfo.fFilter = TRUE;
+         pFilterInfo.lpvCargo = NULL;
          SELF_SETFILTER( pArea, &pFilterInfo );
          if( !pText )
             hb_itemRelease( pFilterInfo.abFilterText );
@@ -2442,26 +2388,14 @@ HB_FUNC( FIELDPOS )
    HB_THREAD_STUB
    AREAP pArea = HB_CURRENT_WA;
 
-   if( pArea )
+   if( pArea && hb_parclen( 1 ) > 0 )
    {
-      int iLen = hb_parclen( 1 );
-
-      if( iLen > 0 )
-      {
-         /* char szName[ HARBOUR_MAX_RDD_FIELDNAME_LENGTH ]; */
-         char * szName;
-         if( iLen > (int) pArea->uiMaxFieldNameLength )
-         {
-            iLen = (int) pArea->uiMaxFieldNameLength;
-         }
-         szName = ( char * ) hb_xgrab( iLen + 1 );
-         hb_strncpyUpperTrim( szName, hb_parc( 1 ), iLen );
-         hb_retni( hb_rddFieldIndex( pArea, szName ) );
-         hb_xfree( szName );
-         return;
-      }
+      hb_retni( hb_rddFieldIndex( pArea, hb_parc( 1 ) ) );
    }
-   hb_retni( 0 );
+   else
+   {
+      hb_retni( 0 );
+   }
 }
 
 HB_FUNC( FIELDPUT )
@@ -3699,7 +3633,7 @@ HB_FUNC( __DBARRANGE )
    {
       USHORT uiNewArea, uiCount;
       ULONG ulSize;
-      char * szFieldLine, * szFieldName, * szPos;
+      char * szFieldLine, * szPos;
       PHB_ITEM pStruct, pFields;
       DBSORTINFO dbSortInfo;
 
@@ -3764,8 +3698,9 @@ HB_FUNC( __DBARRANGE )
          ulSize = 0;
          for( uiCount = 1; uiCount <= dbSortInfo.uiItemCount; ++uiCount )
          {
-            if( hb_arrayGetCLen( pFields, uiCount ) > ulSize )
-               ulSize = hb_arrayGetCLen( pFields, uiCount );
+            ULONG ulLine = hb_arrayGetCLen( pFields, uiCount );
+            if( ulLine > ulSize )
+               ulSize = ulLine;
          }
          szFieldLine = ( char * ) hb_xgrab( ulSize + 1 );
          for( uiCount = 0; uiCount < dbSortInfo.uiItemCount; ++uiCount )
@@ -3795,21 +3730,7 @@ HB_FUNC( __DBARRANGE )
                dbSortInfo.lpdbsItem[ uiCount ].uiFlags |= SF_ASCEND;
             }
 
-            szFieldName = szFieldLine;
-
-            while( szFieldName[ 0 ] == ' ' )
-            {
-               szFieldName++;
-            }
-
-            ulSize = strlen( szFieldName );
-            while( ulSize > 1 && szFieldName[ ulSize - 1 ] == ' ' )
-            {
-               ulSize --;
-               szFieldName[ ulSize ] = 0;
-            }
-
-            dbSortInfo.lpdbsItem[ uiCount ].uiField = hb_rddFieldIndex( pArea, szFieldName );
+            dbSortInfo.lpdbsItem[ uiCount ].uiField = hb_rddFieldIndex( pArea, szFieldLine );
 
             /* Field not found */
             if( dbSortInfo.lpdbsItem[ uiCount ].uiField == 0 )
@@ -4163,7 +4084,7 @@ static ERRCODE hb_dbTransStruct( AREAP lpaSource, AREAP lpaDest,
          {
             SELF_FIELDINFO( lpaSource, uiCount, DBS_NAME, pItem );
             szField = hb_itemGetCPtr( pItem );
-            uiPosDst = hb_rddFieldExpIndex( lpaDest, szField, TRUE );
+            uiPosDst = hb_rddFieldExpIndex( lpaDest, szField );
             if( uiPosDst != uiCount )
                fAll = FALSE;
             if( uiPosDst )
@@ -4193,11 +4114,11 @@ static ERRCODE hb_dbTransStruct( AREAP lpaSource, AREAP lpaDest,
          szField = hb_arrayGetCPtr( pFields, uiCount );
          if( szField )
          {
-            uiPosSrc = hb_rddFieldExpIndex( lpaSource, szField, TRUE );
+            uiPosSrc = hb_rddFieldExpIndex( lpaSource, szField );
             if( !uiPosSrc )
                continue;
             if( lpaDest )
-               uiPosDst = hb_rddFieldExpIndex( lpaDest, szField, TRUE );
+               uiPosDst = hb_rddFieldExpIndex( lpaDest, szField );
             else
                uiPosDst = uiSize + 1;
             if( uiPosDst )
@@ -4634,29 +4555,22 @@ HB_FUNC( DBF2TEXT )
 
             for ( uiItter = 1; uiItter <= uiFieldCopy; uiItter++ )
             {
-               char *szFieldName = hb_arrayGetC( pFields, uiItter );
-
-               if ( bWriteSep )
+               char * szFieldName = hb_arrayGetCPtr( pFields, uiItter );
+               if( szFieldName )
                {
-                  hb_fsWriteLarge( handle, cSep, iSepLen );
+                  int iPos = hb_rddFieldIndex( pArea, szFieldName );
+
+                  if( iPos )
+                  {
+                     if ( bWriteSep )
+                     {
+                        hb_fsWriteLarge( handle, cSep, iSepLen );
+                     }
+                     SELF_GETVALUE( pArea, iPos, &Tmp );
+                     bWriteSep = hb_ExportVar( handle, &Tmp, cDelim );
+                     hb_itemClear( &Tmp );
+                  }
                }
-
-               if ( szFieldName )
-               {
-                  int iFieldLen = strlen( szFieldName );
-                  char *szName = ( char * ) hb_xgrab( iFieldLen + 1 );
-                  int iPos;
-
-                  hb_strncpyUpperTrim( szName, szFieldName, iFieldLen );
-                  iPos = hb_rddFieldIndex( pArea, szName );
-                  hb_xfree( szName );
-
-                  SELF_GETVALUE( pArea, iPos, &Tmp );
-                  bWriteSep = hb_ExportVar( handle, &Tmp, cDelim );
-                  hb_itemClear( &Tmp );
-               }
-
-               hb_xfree( szFieldName );
             }
          }
          hb_fsWriteLarge( handle, (BYTE*) "\r\n", 2 );

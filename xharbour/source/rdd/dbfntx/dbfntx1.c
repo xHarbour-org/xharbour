@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.118 2005/08/02 10:45:00 druzus Exp $
+ * $Id: dbfntx1.c,v 1.119 2005/08/03 17:11:53 druzus Exp $
  */
 
 /*
@@ -1397,8 +1397,7 @@ static LPTAGINFO hb_ntxTagNew( LPNTXINDEX pIndex,
    {
       pTag->ForExpr = hb_strndup( szForExpr, NTX_MAX_EXP );
    }
-   pTag->nField = hb_rddFieldExpIndex( ( AREAP ) pIndex->Owner, 
-                                       pTag->KeyExpr, FALSE );
+   pTag->nField = hb_rddFieldExpIndex( ( AREAP ) pIndex->Owner, pTag->KeyExpr );
    pTag->pKeyItem = pKeyExpr;
    pTag->pForItem = pForExpr;
    pTag->AscendKey = fAscendKey;

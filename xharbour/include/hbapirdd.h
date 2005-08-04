@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.29 2005/06/22 15:29:54 druzus Exp $
+ * $Id: hbapirdd.h,v 1.30 2005/08/01 22:17:34 druzus Exp $
  */
 
 /*
@@ -1091,10 +1091,8 @@ extern LPRDDNODE HB_EXPORT hb_rddGetNode( USHORT uiNode );
 
 typedef short (* WACALLBACK )( AREA *, int );
 extern ERRCODE HB_EXPORT hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data );
-extern USHORT  HB_EXPORT hb_rddFieldSymIndex( AREAP pArea, PHB_SYMB pFieldSymbol );
-extern USHORT  HB_EXPORT hb_rddFieldNameIndex( AREAP pArea, char * szName );
 extern USHORT  HB_EXPORT hb_rddFieldIndex( AREAP pArea, char * szName );
-extern USHORT  HB_EXPORT hb_rddFieldExpIndex( AREAP pArea, char * szField, BOOL fHash );
+extern USHORT  HB_EXPORT hb_rddFieldExpIndex( AREAP pArea, char * szField );
 extern ERRCODE HB_EXPORT hb_rddGetTempAlias( char * szAliasTmp );
 
 HB_EXTERN_END

@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.15 2004/05/09 23:40:05 druzus Exp $
+ * $Id: str.c,v 1.16 2005/05/16 21:45:40 andijahja Exp $
  */
 
 /*
@@ -118,11 +118,17 @@ HB_FUNC( STR )
 
       if( szResult )
       {
-         if ( bLtrim )
+         if( bLtrim )
          {
-            while (HB_ISSPACE(*szResult))
+            int iLen = 0;
+
+            while( szResult[ iLen ] == ' ' )
             {
-               strcpy(szResult,szResult+1);
+               iLen++;
+            }
+            if( iLen )
+            {
+               memmove( szResult, szResult + iLen, strlen( szResult + iLen ) + 1 );
             }
          }
 

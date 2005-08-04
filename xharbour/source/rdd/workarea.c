@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.46 2005/05/11 13:09:30 druzus Exp $
+ * $Id: workarea.c,v 1.47 2005/08/01 22:19:47 druzus Exp $
  */
 
 /*
@@ -234,24 +234,25 @@ ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
  */
 ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
 {
-   ULONG ulSize;
    LPFIELD pField;
+   char szFieldName[ HB_SYMBOL_NAME_LEN + 1 ], *szPtr;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waAddField(%p, %p)", pArea, pFieldInfo));
 
    /* Validate the name of field */
-   ulSize = strlen( ( char * ) pFieldInfo->atomName );
-   hb_strLTrim( ( char * ) pFieldInfo->atomName, &ulSize );
-   ulSize = hb_strRTrimLen( ( char * ) pFieldInfo->atomName, ulSize, TRUE );
-   if( !ulSize )
+   szPtr = ( char * ) pFieldInfo->atomName;
+   while( HB_ISSPACE( *szPtr ) )
+   {
+      ++szPtr;
+   }
+   hb_strncpyUpperTrim( szFieldName, szPtr, HB_SYMBOL_NAME_LEN );
+   if( strlen( szFieldName ) == 0 )
       return FAILURE;
-   /* This line writes to the protected memory
-    pFieldInfo->atomName[ulSize] = '\0'; */
 
    pField = pArea->lpFields + pArea->uiFieldCount;
    if( pArea->uiFieldCount > 0 )
       ( ( LPFIELD ) ( pField - 1 ) )->lpfNext = pField;
-   pField->sym = ( void * ) hb_dynsymGet( ( char * ) pFieldInfo->atomName );
+   pField->sym = ( void * ) hb_dynsymGetCase( szFieldName );
    pField->uiType = pFieldInfo->uiType;
    pField->uiTypeExtended = pFieldInfo->uiTypeExtended;
    pField->uiLen = pFieldInfo->uiLen;
@@ -1317,6 +1318,7 @@ ERRCODE hb_waSetFilter( AREAP pArea, LPDBFILTERINFO pFilterInfo )
       pArea->dbfi.abFilterText = hb_itemNew( pFilterInfo->abFilterText );
    }
    pArea->dbfi.fFilter = TRUE;
+   pArea->dbfi.lpvCargo = pFilterInfo->lpvCargo;
 
    return SUCCESS;
 }

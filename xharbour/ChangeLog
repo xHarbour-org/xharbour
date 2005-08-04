@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4249 2005/08/04 10:00:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.4249 2005/08/04 13:00:26 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-05 01:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapirdd.h
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/workarea.c
+    - removed hb_rddFieldSymIndex(), hb_rddFieldNameIndex()
+    * changed hb_rddFieldExpIndex() - removed last parameter
+    * changed hb_rddFieldIndex() to strip leading and trailing
+      spaces and upper the give field name
+    + added support for embedded spaces in field name
+    * initialize lpvCargo in DBSETFILTER
+
+  * xharbour/source/rtl/str.c
+    * fixed possible GPF on some machines - strcpy() should not
+      operate on overlapped buffers
+
+  * xharbour/source/vm/dynsym.c
+    * minor speed improvement
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * use hb_rddFieldExpIndex() without the last parameter
 
 2005-08-04 10:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils/hbmake/hbmake.prg

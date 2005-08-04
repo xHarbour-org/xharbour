@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.22 2005/04/11 01:46:35 druzus Exp $
+ * $Id: dynsym.c,v 1.23 2005/04/11 22:40:14 ronpinkas Exp $
  */
 
 /*
@@ -257,31 +257,29 @@ HB_EXPORT PHB_DYNS hb_dynsymGet( char * szName )  /* finds and creates a symbol 
    /* make a copy as we may get a const string, then turn it to uppercase */
    /* NOTE: This block is optimized for speed [vszakats] */
    {
-      int iLen = strlen( szName );
+      int iLen = HB_SYMBOL_NAME_LEN;
       char * pDest = szUprName;
 
-      if( iLen > HB_SYMBOL_NAME_LEN )
-         iLen = HB_SYMBOL_NAME_LEN;
-
-      pDest[ iLen ] = '\0';
-      while( iLen-- )
+      do
       {
          char cChar = *szName++;
 
-         if( cChar >= 'a' && cChar <= 'z' )
+         if( !cChar || cChar == ' ' || cChar == '\t' )
+         {
+            break;
+         }
+         else if( cChar >= 'a' && cChar <= 'z' )
          {
             *pDest++ = cChar - ( 'a' - 'A' );
-         }
-         else if( cChar == ' ' || cChar == '\t' )
-         {
-            *pDest = '\0';
-            break;
          }
          else
          {
             *pDest++ = cChar;
          }
       }
+      while( --iLen );
+
+      *pDest = '\0';
    }
 
    /* JC1: Notice, locking this function MAY seem useless but it is not.
@@ -357,33 +355,29 @@ PHB_DYNS HB_EXPORT hb_dynsymFindName( char * szName )  /* finds a symbol */
    /* make a copy as we may get a const string, then turn it to uppercase */
    /* NOTE: This block is optimized for speed [vszakats] */
    {
-      int iLen = strlen( szName );
+      int iLen = HB_SYMBOL_NAME_LEN;
       char * pDest = szUprName;
 
-      if( iLen > HB_SYMBOL_NAME_LEN )
-      {
-         iLen = HB_SYMBOL_NAME_LEN;
-      }
-
-      pDest[ iLen ] = '\0';
-      while( iLen-- )
+      do
       {
          char cChar = *szName++;
 
-         if( cChar >= 'a' && cChar <= 'z' )
+         if( !cChar || cChar == ' ' || cChar == '\t' )
+         {
+            break;
+         }
+         else if( cChar >= 'a' && cChar <= 'z' )
          {
             *pDest++ = cChar - ( 'a' - 'A' );
-         }
-         else if( cChar == ' ' || cChar == '\t' )
-         {
-            *pDest = '\0';
-            break;
          }
          else
          {
             *pDest++ = cChar;
          }
       }
+      while( --iLen );
+
+      *pDest = '\0';
    }
 
    return hb_dynsymFind( szUprName );
