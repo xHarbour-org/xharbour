@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.30 2005/08/01 22:17:34 druzus Exp $
+ * $Id: hbapirdd.h,v 1.31 2005/08/04 23:54:10 druzus Exp $
  */
 
 /*
@@ -316,7 +316,7 @@ typedef struct
    PHB_ITEM itmCobExpr;       /* Block representation of the FILTER expression */
    PHB_ITEM abFilterText;     /* String representation of FILTER expression */
    BOOL     fFilter;          /* flag to indicate that filter is active */
-   void     *lpvCargo;        /* RDD specific extended filter info */
+   void *   lpvCargo;         /* RDD specific extended filter info */
 } DBFILTERINFO;
 
 typedef DBFILTERINFO * LPDBFILTERINFO;

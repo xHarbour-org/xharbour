@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.47 2005/08/01 22:19:47 druzus Exp $
+ * $Id: workarea.c,v 1.48 2005/08/04 23:54:11 druzus Exp $
  */
 
 /*
@@ -1318,7 +1318,6 @@ ERRCODE hb_waSetFilter( AREAP pArea, LPDBFILTERINFO pFilterInfo )
       pArea->dbfi.abFilterText = hb_itemNew( pFilterInfo->abFilterText );
    }
    pArea->dbfi.fFilter = TRUE;
-   pArea->dbfi.lpvCargo = pFilterInfo->lpvCargo;
 
    return SUCCESS;
 }

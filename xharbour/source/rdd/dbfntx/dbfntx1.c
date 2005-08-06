@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.119 2005/08/03 17:11:53 druzus Exp $
+ * $Id: dbfntx1.c,v 1.120 2005/08/04 23:54:12 druzus Exp $
  */
 
 /*
@@ -811,6 +811,10 @@ static void hb_ntxTagSetScope( LPTAGINFO pTag, USHORT nScope, PHB_ITEM pItem )
 
       pTag->keyCount = 0;
    }
+   else
+   {
+      hb_ntxTagClearScope( pTag, nScope );
+   }
 }
 
 /*
@@ -855,6 +859,20 @@ static void hb_ntxTagRefreshScope( LPTAGINFO pTag )
       pTag->bottom.scopeKey = hb_ntxKeyPutItem( pTag->bottom.scopeKey, pItem,
          pTag->bottom.scopeKey->Xtra, pTag, TRUE, &pTag->bottom.scopeKeyLen );
    }
+}
+
+/*
+ * an interface for fast check record number in record filter
+ */
+static BOOL hb_ntxCheckRecordScope( NTXAREAP pArea, ULONG ulRec )
+{
+   LONG lRecNo = ( LONG ) ulRec;
+
+   if ( SELF_COUNTSCOPE( ( AREAP ) pArea, NULL, &lRecNo ) == SUCCESS && lRecNo == 0 )
+   {
+      return FALSE;
+   }
+   return TRUE;
 }
 
 #ifdef HB_NTX_DEBUG
@@ -3119,6 +3137,34 @@ static BOOL hb_ntxCurKeyRefresh( LPTAGINFO pTag )
    return TRUE;
 }
 
+static void hb_ntxTagSkipFilter( LPTAGINFO pTag, BOOL fForward )
+{
+   BOOL fBack, fEof = fForward ? pTag->TagEOF : pTag->TagBOF;
+
+   fBack = pTag->fUsrDescend == pTag->AscendKey ? fForward : !fForward;
+
+   while( !fEof && !hb_ntxCheckRecordScope( pTag->Owner->Owner,
+                                            pTag->CurKeyInfo->Xtra ) )
+   {
+      if( fBack )
+         fEof = !hb_ntxTagPrevKey( pTag );
+      else
+         fEof = !hb_ntxTagNextKey( pTag );
+
+      if( !fEof && !hb_ntxKeyInScope( pTag, pTag->CurKeyInfo ) )
+      {
+         fEof = TRUE;
+      }
+   }
+   if( fEof )
+   {
+      if( fForward )
+         pTag->TagEOF = TRUE;
+      else
+         pTag->TagBOF = TRUE;
+   }
+}
+
 /*
  * go to the first visiable record in Tag
  */
@@ -3133,8 +3179,13 @@ static void hb_ntxTagGoTop( LPTAGINFO pTag )
    else
       hb_ntxTagTopKey( pTag );
 
-   pTag->TagBOF = pTag->TagEOF = pTag->CurKeyInfo->Xtra == 0 ||
-                                 !hb_ntxKeyInScope( pTag, pTag->CurKeyInfo );
+   pTag->TagEOF = pTag->CurKeyInfo->Xtra == 0 ||
+                  !hb_ntxKeyInScope( pTag, pTag->CurKeyInfo );
+
+   if( ! pTag->TagBOF && pTag->Owner->Owner->dbfi.fFilter )
+      hb_ntxTagSkipFilter( pTag, TRUE );
+
+   pTag->TagBOF = pTag->TagEOF;
 }
 
 /*
@@ -3151,8 +3202,13 @@ static void hb_ntxTagGoBottom( LPTAGINFO pTag )
    else
       hb_ntxTagBottomKey( pTag );
 
-   pTag->TagBOF = pTag->TagEOF = pTag->CurKeyInfo->Xtra == 0 ||
-                                 !hb_ntxKeyInScope( pTag, pTag->CurKeyInfo );
+   pTag->TagBOF = pTag->CurKeyInfo->Xtra == 0 ||
+                  !hb_ntxKeyInScope( pTag, pTag->CurKeyInfo );
+
+   if( ! pTag->TagBOF && pTag->Owner->Owner->dbfi.fFilter )
+      hb_ntxTagSkipFilter( pTag, FALSE );
+
+   pTag->TagEOF = pTag->TagBOF;
 }
 
 /*
@@ -3173,6 +3229,9 @@ static void hb_ntxTagSkipNext( LPTAGINFO pTag )
 
    if( ! pTag->TagEOF && ! hb_ntxKeyInScope( pTag, pTag->CurKeyInfo ) )
       pTag->TagEOF = TRUE;
+
+   if( ! pTag->TagEOF && pTag->Owner->Owner->dbfi.fFilter )
+      hb_ntxTagSkipFilter( pTag, TRUE );
 }
 
 /*
@@ -3193,6 +3252,9 @@ static void hb_ntxTagSkipPrev( LPTAGINFO pTag )
 
    if( ! pTag->TagBOF && ! hb_ntxKeyInScope( pTag, pTag->CurKeyInfo ) )
       pTag->TagBOF = TRUE;
+
+   if( ! pTag->TagBOF && pTag->Owner->Owner->dbfi.fFilter )
+      hb_ntxTagSkipFilter( pTag, FALSE );
 }
 
 /*
@@ -3460,7 +3522,8 @@ static ULONG hb_ntxOrdKeyCount( LPTAGINFO pTag )
    {
       hb_ntxTagRefreshScope( pTag );
 
-      if( pTag->top.scopeKeyLen || pTag->bottom.scopeKeyLen )
+      if( pTag->top.scopeKeyLen || pTag->bottom.scopeKeyLen ||
+          pTag->Owner->Owner->dbfi.fFilter )
       {
          hb_ntxTagGoTop( pTag );
          while( !pTag->TagEOF )
@@ -3491,7 +3554,8 @@ static ULONG hb_ntxOrdKeyNo( LPTAGINFO pTag )
       hb_ntxTagRefreshScope( pTag );
       if( hb_ntxCurKeyRefresh( pTag ) )
       {
-         if( pTag->top.scopeKeyLen || pTag->bottom.scopeKeyLen )
+         if( pTag->top.scopeKeyLen || pTag->bottom.scopeKeyLen ||
+             pTag->Owner->Owner->dbfi.fFilter )
          {
             if( hb_ntxKeyInScope( pTag, pTag->CurKeyInfo ) )
             {
@@ -3977,7 +4041,7 @@ static ULONG hb_ntxOrdScopeEval( LPTAGINFO pTag,
    hb_ntxTagGetScope( pTag, 0, pItemTop );
    hb_ntxTagGetScope( pTag, 1, pItemBottom );
    hb_ntxTagSetScope( pTag, 0, pItemLo );
-   hb_ntxTagSetScope( pTag, 0, pItemHi );
+   hb_ntxTagSetScope( pTag, 1, pItemHi );
 
    if( hb_ntxTagLockRead( pTag ) )
    {
@@ -3992,7 +4056,7 @@ static ULONG hb_ntxOrdScopeEval( LPTAGINFO pTag,
    }
 
    hb_ntxTagSetScope( pTag, 0, pItemTop );
-   hb_ntxTagSetScope( pTag, 0, pItemBottom );
+   hb_ntxTagSetScope( pTag, 1, pItemBottom );
    hb_itemRelease( pItemTop );
    hb_itemRelease( pItemBottom );
 
@@ -6437,6 +6501,17 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
    return SUCCESS;
 }
 
+static ERRCODE ntxCountScope( NTXAREAP pArea, void * pPtr, LONG * plRecNo )
+{
+   HB_TRACE(HB_TR_DEBUG, ("ntxCountScope(%p, %p, %p)", pArea, pPtr, plRecNo));
+
+   if ( pPtr == NULL )
+   {
+      return SUCCESS;
+   }
+   return SUPER_COUNTSCOPE( ( AREAP ) pArea, pPtr, plRecNo );
+}
+
 static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
    USHORT uiFlags;
@@ -6794,7 +6869,7 @@ static RDDFUNCS ntxTable = { ntxBof,
                              ntxClearFilter,
                              ntxClearLocate,
                              ntxClearScope,
-                             ntxCountScope,
+                             ( DBENTRYP_VPLP ) ntxCountScope,
                              ntxFilterText,
                              ntxScopeInfo,
                              ntxSetFilter,

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4249 2005/08/04 13:00:26 modalsist Exp $
+ * $Id: ChangeLog,v 1.4250 2005/08/04 23:54:03 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-06 21:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/dbinfo.ch
+    + added DBI_RM_HANDLE
+
+  * xharbour/include/hbapirdd.h
+    + formatting
+
+  * xharbour/include/hbrddntx.h
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    + added SELF_COUNTSCOPE()
+
+  * xharbour/source/rdd/workarea.c
+    * do not set lpvCargo in SETFILTER() - it should be done by
+      RDD if it need it
+
+  * xharbour/source/vm/hvm.c
+    + added RMDBFNTX initialization
 
 2005-08-05 01:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbapirdd.h

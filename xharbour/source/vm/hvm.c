@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.472 2005/07/17 16:42:43 ronpinkas Exp $
+ * $Id: hvm.c,v 1.473 2005/07/17 18:29:13 ronpinkas Exp $
  */
 
 /*
@@ -487,6 +487,7 @@ static void hb_vmDoInitRdd( void )
                         "DBFCDXINIT",
                         "SIXCDXINIT",
                         "RMDBFCDXINIT",
+                        "RMDBFNTXINIT",
                         "ADSINIT",
                         "RDDINIT",
                         NULL };
