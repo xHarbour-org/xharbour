@@ -445,19 +445,8 @@ STATIC s_cVer := "1.0.RC13" + Stringify( REVISION )
 #endif
 
 //--------------------------------------------------------------//
-#define _USE_APPMAIN_
-#ifdef __CLIP__
-   #undef _USE_APPMAIN_
-#endif
-#ifdef FlagShip
-   #undef _USE_APPMAIN_
-#endif
 
-#ifdef _USE_APPMAIN_
-  PROCEDURE _AppMain( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
-#else
-  PROCEDURE Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
-#endif
+PROCEDURE PP_Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
 
    LOCAL sIncludePath, nNext, sPath, sSwitch := ""
    LOCAL nAt, sParams, sPPOExt, aParams := {}
@@ -509,7 +498,7 @@ STATIC s_cVer := "1.0.RC13" + Stringify( REVISION )
       sSwitch += [    -R       = Run filename as a script.] + CRLF
       sSwitch += [    -U       = Use command definitions set in <ch-file> (or none).] + CRLF
 
-     	? sSwitch
+        ? sSwitch
       ?
       QUIT
    endif
@@ -9863,9 +9852,9 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile, nStartLine, sSou
          ENDIF
       ENDDO
 
-			IF nLine > nLines
-			 	EXIT
-			ENDIF
+         IF nLine > nLines
+             EXIT
+         ENDIF
 
       //TraceLog( nLine, nLines, sTemp )
 
@@ -10171,15 +10160,15 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
       Eval( bErrHandler, oError )
    END
 
-	 IF bPreset
+    IF bPreset
       s_aProcedures := aPresetProcedures
 
-			#ifdef __XHARBOUR__
+         #ifdef __XHARBOUR__
          #ifdef DYN
             PP_ReleaseDynProcedures( nPresetDyn )
          #endif
       #endif
-	 ENDIF
+    ENDIF
 
    ErrorBlock( bErrHandler )
 
@@ -10261,7 +10250,7 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
 
    //TraceLog( xRet )
 
-	 IF bPreset
+    IF bPreset
       s_aProcedures := aPresetProcedures
 
       #ifdef __XHARBOUR__
@@ -10269,7 +10258,7 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
             PP_ReleaseDynProcedures( nPresetDyn )
          #endif
       #endif
-	 ENDIF
+    ENDIF
 
 RETURN xRet
 

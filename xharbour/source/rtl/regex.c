@@ -6356,7 +6356,7 @@ else
 #  define HB_ALLOC_ALIGNMENT     8
 #endif
 
-regex_t * HB_EXPORT hb_getregex( PHB_ITEM pRegEx, BOOL lIgnCase, BOOL lNL, BOOL *fFree )
+HB_EXPORT regex_t * hb_getregex( PHB_ITEM pRegEx, BOOL lIgnCase, BOOL lNL, BOOL *fFree )
 {
    char * szRegEx = hb_itemGetCPtr( pRegEx );
    regex_t * pRetReg = NULL;

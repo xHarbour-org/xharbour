@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4253 2005/08/07 09:40:18 druzus Exp $
+ * $Id: ChangeLog,v 1.4254 2005/08/07 10:44:17 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-08-07 04:30 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/regex.c
+    * Corrected usage of HB_EXPORT
+
+  * utils/xbscript/xbscript.prg
+    * Renamed AppMain() to PP_Main() because we do not want it to be used as
+      startup procedure when used as a Librarry. The previous question about 
+      using STATIC Main() was simply an attempt to avoid possible conflict with
+      a Main PROCEDURE of an application linked with the lib.
+   
 2005-08-07 12:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/hbserv.c
     * do not use == for logical values - use them directly
