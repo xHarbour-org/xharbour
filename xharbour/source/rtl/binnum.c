@@ -1,5 +1,5 @@
 /*
- * $Id: binnum.c,v 1.8 2004/11/21 21:44:17 druzus Exp $
+ * $Id: binnum.c,v 1.9 2005/08/07 02:40:38 mlombardo Exp $
  */
 
 /*
@@ -94,8 +94,8 @@ HB_FUNC( I2BIN )
    {
       SHORT iValue = hb_parni( 1 );
 
-      szString[ 0 ] = ( iValue & 0x00FF );
-      szString[ 1 ] = ( iValue & 0xFF00 ) >> 8;
+      szString[ 0 ] = ( char )( ( iValue & 0x00FF ) );
+      szString[ 1 ] = ( char )( ( iValue & 0xFF00 ) >> 8 );
    }
    else
    {
@@ -114,10 +114,10 @@ HB_FUNC( L2BIN )
    {
       LONG lValue = hb_parnl( 1 );
 
-      szString[ 0 ] = (char)( lValue & 0x000000FF );
-      szString[ 1 ] = (char)( lValue & 0x0000FF00 ) >> 8;
-      szString[ 2 ] = (char)( lValue & 0x00FF0000 ) >> 16;
-      szString[ 3 ] = (char)( lValue & 0xFF000000 ) >> 24;
+      szString[ 0 ] = ( char )( ( lValue & 0x000000FF ) );
+      szString[ 1 ] = ( char )( ( lValue & 0x0000FF00 ) >> 8 );
+      szString[ 2 ] = ( char )( ( lValue & 0x00FF0000 ) >> 16 );
+      szString[ 3 ] = ( char )( ( lValue & 0xFF000000 ) >> 24 );
    }
    else
    {

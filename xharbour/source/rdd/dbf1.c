@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.123 2005/08/01 22:19:46 druzus Exp $
+ * $Id: dbf1.c,v 1.124 2005/08/07 02:40:37 mlombardo Exp $
  */
 
 /*
@@ -254,8 +254,8 @@ static ULONG hb_dbfCalcRecCount( DBFAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfCalcRecCount(%p)", pArea));
 
-   return (ULONG)( hb_fsSeekLarge( pArea->hDataFile, 0, FS_END ) - pArea->uiHeaderLen ) /
-            pArea->uiRecordLen;
+   return ( ULONG ) ( ( hb_fsSeekLarge( pArea->hDataFile, 0, FS_END ) -
+                        pArea->uiHeaderLen ) / pArea->uiRecordLen );
 }
 
 /*
