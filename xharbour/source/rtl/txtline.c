@@ -1,5 +1,5 @@
 /*
- * $Id: txtline.c,v 1.3 2005/03/31 03:58:52 druzus Exp $
+ * $Id: txtline.c,v 1.4 2005/07/07 01:21:24 peterrees Exp $
  */
 
 /*
@@ -193,7 +193,7 @@ HB_FUNC( HB_READLINE )
    }
 
    ulTextLen = hb_parclen(1);
-   uiTabLen  = hb_parclen(4);
+   uiTabLen  = (USHORT) hb_parclen(4);
 
    if( ISNUM( 6 ) )
    {
@@ -282,7 +282,7 @@ HB_FUNC( MLCOUNT )
 
    if( (ULONG)uiTabLen > ulLineSize )
    {
-      uiTabLen = ( ulLineSize - 1 > 0 ? ulLineSize - 1 : 1 );
+      uiTabLen = (USHORT) ( ulLineSize - 1 > 0 ? ulLineSize - 1 : 1 );
    }
 
    // Check for EOL police
@@ -376,7 +376,7 @@ HB_FUNC( MEMOLINE )
 
    if( (ULONG)uiTabLen > ulLineSize )
    {
-      uiTabLen = ( ulLineSize - 1 > 0 ? ulLineSize - 1 : 1 );
+      uiTabLen = (USHORT)( ulLineSize - 1 > 0 ? ulLineSize - 1 : 1 );
    }
 
    // Check for EOL police
@@ -494,7 +494,7 @@ HB_FUNC( MLPOS )
 
    if( (ULONG)uiTabLen > ulLineSize )
    {
-      uiTabLen = ( ulLineSize - 1 > 0 ? ulLineSize - 1 : 1 );
+      uiTabLen = (USHORT)( ulLineSize - 1 > 0 ? ulLineSize - 1 : 1 );
    }
 
    // Check for EOL police

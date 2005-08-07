@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.120 2005/08/04 23:54:12 druzus Exp $
+ * $Id: dbfntx1.c,v 1.121 2005/08/06 19:39:44 druzus Exp $
  */
 
 /*
@@ -448,7 +448,7 @@ static LPKEYINFO hb_ntxKeyPutItem( LPKEYINFO pKey, PHB_ITEM pItem, ULONG ulRecNo
             memcpy( pKey->key, pItem->item.asString.value, len );
             memset( pKey->key + len, ' ', pTag->KeyLength - len );
             if( puiLen )
-               *puiLen = len;
+               *puiLen = (USHORT)len;
          }
          else
          {
@@ -1770,7 +1770,7 @@ static void hb_ntxIndexFree( LPNTXINDEX pIndex )
       hb_fsClose( pIndex->DiskFile );
       if( pIndex->fDelete )
       {
-         hb_fsDelete( ( BYTE * ) ( pIndex->RealName ? 
+         hb_fsDelete( ( BYTE * ) ( pIndex->RealName ?
                                    pIndex->RealName : pIndex->IndexName ) );
       }
    }
@@ -1791,7 +1791,7 @@ static ERRCODE hb_ntxIndexHeaderSave( LPNTXINDEX pIndex )
       LPCTXHEADER lpCTX = ( LPCTXHEADER ) pIndex->HeaderBuff;
       int iSize = pIndex->Update ? NTXBLOCKSIZE : 16;
       USHORT type;
-      
+
       type = NTX_FLAG_COMPOUND | ( pIndex->LargeFile ? NTX_FLAG_LARGEFILE : 0 );
 
       pIndex->Version++;
@@ -4824,8 +4824,8 @@ static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag )
                if( iRec <= 0 )
                   break;
                hb_fsSeekLarge( pArea->hDataFile,
-                               ( HB_FOFFSET ) pArea->uiHeaderLen + 
-                               ( HB_FOFFSET ) ( ulRecNo - 1 ) * 
+                               ( HB_FOFFSET ) pArea->uiHeaderLen +
+                               ( HB_FOFFSET ) ( ulRecNo - 1 ) *
                                ( HB_FOFFSET ) pArea->uiRecordLen, FS_SET );
                hb_fsReadLarge( pArea->hDataFile, pSort->pBuffIO, pArea->uiRecordLen * iRec );
                iRecBuff = 0;
@@ -5399,7 +5399,7 @@ static ERRCODE ntxGoHot( NTXAREAP pArea )
                if( !pTag->Custom )
                {
                   pTag->HotKeyInfo = hb_ntxEvalKey( pTag->HotKeyInfo, pTag );
-                  pTag->HotFor = ( pTag->pForItem == NULL || 
+                  pTag->HotFor = ( pTag->pForItem == NULL ||
                               hb_ntxEvalCond( pArea, pTag->pForItem, TRUE ) );
                }
             }
@@ -5910,7 +5910,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
    /* It should not happen, reintrance? */
    if( !*pIndexPtr )
       return FAILURE;
-   
+
    if( errCode != SUCCESS )
    {
       *pIndexPtr = pIndex->pNext;
@@ -6376,7 +6376,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
          case DBOI_READLOCK:
             if( hb_itemType( pInfo->itmNewVal ) == HB_IT_LOGICAL )
             {
-               hb_itemPutL( pInfo->itmResult, 
+               hb_itemPutL( pInfo->itmResult,
                             hb_itemGetL( pInfo->itmNewVal ) ?
                                  hb_ntxIndexLockRead( pTag->Owner ) :
                                  hb_ntxIndexUnLockRead( pTag->Owner ) );
@@ -6389,7 +6389,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
          case DBOI_WRITELOCK:
             if( hb_itemType( pInfo->itmNewVal ) == HB_IT_LOGICAL )
             {
-               hb_itemPutL( pInfo->itmResult, 
+               hb_itemPutL( pInfo->itmResult,
                             hb_itemGetL( pInfo->itmNewVal ) ?
                                  hb_ntxIndexLockWrite( pTag->Owner, TRUE ) :
                                  hb_ntxIndexUnLockWrite( pTag->Owner ) );

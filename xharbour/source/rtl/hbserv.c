@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.25 2005/02/24 10:44:08 andijahja Exp $
+* $Id: hbserv.c,v 1.26 2005/03/31 03:58:51 druzus Exp $
 */
 
 /*
@@ -619,7 +619,7 @@ static void s_serviceSetHBSig( void )
    //sigfillset( &act.sa_mask );
    #endif
 
-   
+
    #ifdef HARBOUR_GCC_OS2
    act.sa_flags = SA_NOCLDSTOP;
    #else
@@ -783,7 +783,7 @@ HB_FUNC( HB_STARTSERVICE )
 
    // in windows, we just detach from console
    #ifdef HB_OS_WIN_32
-   if ( hb_parl(1) == TRUE )
+   if ( hb_parl(1) == 1L )
    {
       FreeConsole();
    }

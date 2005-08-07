@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.122 2005/06/01 18:24:51 druzus Exp $
+ * $Id: dbf1.c,v 1.123 2005/08/01 22:19:46 druzus Exp $
  */
 
 /*
@@ -254,7 +254,7 @@ static ULONG hb_dbfCalcRecCount( DBFAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfCalcRecCount(%p)", pArea));
 
-   return ( hb_fsSeekLarge( pArea->hDataFile, 0, FS_END ) - pArea->uiHeaderLen ) /
+   return (ULONG)( hb_fsSeekLarge( pArea->hDataFile, 0, FS_END ) - pArea->uiHeaderLen ) /
             pArea->uiRecordLen;
 }
 
@@ -1156,8 +1156,8 @@ static ERRCODE hb_dbfGetRec( DBFAREAP pArea, BYTE ** pBuffer )
    else
    {
       /* Read data from file */
-      hb_fsSeekLarge( pArea->hDataFile, ( HB_FOFFSET ) pArea->uiHeaderLen + 
-                      ( HB_FOFFSET ) ( pArea->ulRecNo - 1 ) * 
+      hb_fsSeekLarge( pArea->hDataFile, ( HB_FOFFSET ) pArea->uiHeaderLen +
+                      ( HB_FOFFSET ) ( pArea->ulRecNo - 1 ) *
                       ( HB_FOFFSET ) pArea->uiRecordLen, FS_SET );
       if( hb_fsRead( pArea->hDataFile, pArea->pRecord, pArea->uiRecordLen ) !=
           pArea->uiRecordLen )
@@ -1420,8 +1420,8 @@ static ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer )
    else /* if( pArea->fRecordChanged ) */
    {
       /* Write data to file */
-      hb_fsSeekLarge( pArea->hDataFile, ( HB_FOFFSET ) pArea->uiHeaderLen + 
-                      ( HB_FOFFSET ) ( pArea->ulRecNo - 1 ) * 
+      hb_fsSeekLarge( pArea->hDataFile, ( HB_FOFFSET ) pArea->uiHeaderLen +
+                      ( HB_FOFFSET ) ( pArea->ulRecNo - 1 ) *
                       ( HB_FOFFSET ) pArea->uiRecordLen, FS_SET );
       if( hb_fsWrite( pArea->hDataFile, pArea->pRecord, pArea->uiRecordLen ) !=
           pArea->uiRecordLen )
@@ -3416,7 +3416,7 @@ static ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
       /* Exclusive mode */
       /* Seek to logical eof and write eof mark */
       hb_fsSeekLarge( pArea->hDataFile, ( HB_FOFFSET ) pArea->uiHeaderLen +
-                      ( HB_FOFFSET ) pArea->uiRecordLen * 
+                      ( HB_FOFFSET ) pArea->uiRecordLen *
                       ( HB_FOFFSET ) pArea->ulRecCount, FS_SET );
       hb_fsWrite( pArea->hDataFile, ( BYTE * ) "\032", 1 );
       hb_fsWrite( pArea->hDataFile, NULL, 0 );

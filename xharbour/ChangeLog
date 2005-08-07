@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4250 2005/08/04 23:54:03 druzus Exp $
+ * $Id: ChangeLog,v 1.4251 2005/08/06 19:39:38 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-06 23:30 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * rdd\dbf1.c
+  * rdd\dbffpt\dbffpt1.c
+  * rdd\dbfntx\dbfntx1.c
+  * rtl\binnum.c
+  * rtl\hbserv.c
+  * rtl\readline.c
+  * rtl\txtline.c
+    ! Fixed MSVC warnings (some of them would be real bugs)
 
 2005-08-06 21:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/dbinfo.ch
@@ -51,8 +61,8 @@
 2005-08-04 10:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils/hbmake/hbmake.prg
     * version 1.150
-    ! fixed error in Borland C compiler introduced in 1.149 version. 
-    ! function showhelp() was reviewed to pause before end of help.  
+    ! fixed error in Borland C compiler introduced in 1.149 version.
+    ! function showhelp() was reviewed to pause before end of help.
     + added hbmake_id() and hbmake_copyright() functions to show identification
       at compile time.
     + added /credits parameter.
@@ -1870,7 +1880,7 @@ Reported by Rafa Carmona (TheFull)
   * xharbour.spec
     ! added missing libhsx.a
 
-2004-04-28 15:20 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+2005-04-28 15:20 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
   * source/memvars.c
     ! Fixed PARAMETERS command with MT
       /* Thanks to Fabio Uggeri */
@@ -2469,7 +2479,7 @@ Reported by Rafa Carmona (TheFull)
     ! uncomment hb_wvt_gtValidWindowSize() in hb_wvt_gtSetFont()
       so that wvt_setfont() will fail when it should.
 
-2004-04-16 21:20 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+2005-04-16 21:20 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
   * source/rtl/hbsrlraw.c
     ! Fixed HB_Serialize( ALIAS->MEMO_FIELD )
 
@@ -2777,7 +2787,7 @@ Reported by Rafa Carmona (TheFull)
   * include/hbsetup.h
     ! restore deleted define for __DMC__
 
-2004-04-06 00:40 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+2005-04-06 00:40 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
   * include/hbdefs.h
     + Added new HB_PCODEFUNC structure
   * include/hbvmpub.h

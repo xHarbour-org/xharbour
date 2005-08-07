@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.45 2005/06/01 18:24:53 druzus Exp $
+ * $Id: dbffpt1.c,v 1.46 2005/08/01 22:20:56 druzus Exp $
  */
 
 /*
@@ -564,7 +564,7 @@ static ERRCODE hb_fptGCfreeBlock( FPTAREAP pArea, LPMEMOGCTABLE pGCtable,
    {
       FPTBLOCK fptBlock;
 
-      hb_fsSeekLarge( pArea->hMemoFile, ( HB_FOFFSET ) ulOffset * 
+      hb_fsSeekLarge( pArea->hMemoFile, ( HB_FOFFSET ) ulOffset *
                       ( HB_FOFFSET ) pArea->uiMemoBlockSize, FS_SET );
       if( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &fptBlock,
                                  sizeof( FPTBLOCK ) ) == sizeof( FPTBLOCK ) )
@@ -2631,7 +2631,7 @@ static ERRCODE hb_fptRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, P
             case MEMO_FPT_SIXHB:
             case MEMO_FPT_FLEX:
             case MEMO_FPT_CLIP:
-               s_bMemoType = uiType;
+               s_bMemoType = (BYTE)uiType;
          }
          break;
       }

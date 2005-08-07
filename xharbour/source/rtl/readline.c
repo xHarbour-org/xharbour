@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.13 2004/10/22 14:29:06 paultucker Exp $
+ * $Id: readline.c,v 1.14 2005/04/04 05:56:49 ronpinkas Exp $
  */
 
 /*
@@ -61,14 +61,14 @@
 
 #define READING_BLOCK      4096
 
-BYTE * hb_fsReadLine( FHANDLE hFileHandle, USHORT *puiBuffLen, char ** Term, int * iTermSizes, USHORT iTerms, BOOL * bFound, BOOL *bEOF  )
+BYTE * hb_fsReadLine( FHANDLE hFileHandle, LONG *puiBuffLen, char ** Term, int * iTermSizes, USHORT iTerms, BOOL * bFound, BOOL *bEOF  )
 {
    USHORT uiPosTerm = 0, iPos, uiPosition;
-   USHORT nTries, uiSize;
-   LONG lRead = 0, lOffset;
+   USHORT nTries;
+   LONG lRead = 0, lOffset, uiSize;
    BYTE * pBuff;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLine(%p, %hu, %p, %p, %hu, %i, %i)", hFileHandle, *puiBuffLen, Term, iTermSizes, iTerms, *bFound, *bEOF ));
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLine(%p, %i, %p, %p, %hu, %i, %i)", hFileHandle, *puiBuffLen, Term, iTermSizes, iTerms, *bFound, *bEOF ));
 
    *bFound  = 0;
    *bEOF    = 0;
@@ -179,7 +179,7 @@ HB_FUNC( HB_FREADLINE )
    char ** Term;
    BYTE * pBuffer;
    int * iTermSizes;
-   USHORT uSize = (USHORT) hb_parni(4);
+   LONG uSize = (USHORT) hb_parnl(4);
    USHORT i, iTerms;
    BOOL bFound, bEOF;
 
