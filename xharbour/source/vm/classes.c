@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.146 2005/07/25 05:15:56 walito Exp $
+ * $Id: classes.c,v 1.147 2005/08/07 10:44:24 druzus Exp $
  */
 
 /*
@@ -920,6 +920,8 @@ HB_EXPORT USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
          default:
             uiClass = 0;
       }
+
+      return uiClass;
    }
 
    /* default value to current class object */
