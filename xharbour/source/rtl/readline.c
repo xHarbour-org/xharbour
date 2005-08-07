@@ -1,5 +1,5 @@
 /*
- * $Id: readline.c,v 1.14 2005/04/04 05:56:49 ronpinkas Exp $
+ * $Id: readline.c,v 1.15 2005/08/07 02:40:38 mlombardo Exp $
  */
 
 /*
@@ -61,40 +61,40 @@
 
 #define READING_BLOCK      4096
 
-BYTE * hb_fsReadLine( FHANDLE hFileHandle, LONG *puiBuffLen, char ** Term, int * iTermSizes, USHORT iTerms, BOOL * bFound, BOOL *bEOF  )
+BYTE * hb_fsReadLine( FHANDLE hFileHandle, LONG *plBuffLen, char ** Term, int * iTermSizes, USHORT iTerms, BOOL * bFound, BOOL *bEOF  )
 {
    USHORT uiPosTerm = 0, iPos, uiPosition;
    USHORT nTries;
-   LONG lRead = 0, lOffset, uiSize;
+   LONG lRead = 0, lOffset, lSize;
    BYTE * pBuff;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLine(%p, %i, %p, %p, %hu, %i, %i)", hFileHandle, *puiBuffLen, Term, iTermSizes, iTerms, *bFound, *bEOF ));
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsReadLine(%p, %ld, %p, %p, %hu, %i, %i)", hFileHandle, *plBuffLen, Term, iTermSizes, iTerms, *bFound, *bEOF ));
 
    *bFound  = 0;
    *bEOF    = 0;
    nTries   = 0;
    lOffset  = 0;
-   uiSize   = *puiBuffLen;
+   lSize   = *plBuffLen;
 
-   if( *puiBuffLen < 10 )
+   if( *plBuffLen < 10 )
    {
-      *puiBuffLen = READING_BLOCK;
+      *plBuffLen = READING_BLOCK;
    }
 
-   pBuff = (BYTE*) hb_xgrab( *puiBuffLen );
+   pBuff = (BYTE*) hb_xgrab( *plBuffLen );
 
    do
    {
       if(nTries>0)
       {
          /* pBuff can be enlarged to hold the line as needed.. */
-         uiSize = ( *puiBuffLen * (nTries + 1 ) ) + 1;
-         pBuff = (BYTE *) hb_xrealloc( pBuff, uiSize );
+         lSize = ( *plBuffLen * ( nTries + 1 ) ) + 1;
+         pBuff = (BYTE *) hb_xrealloc( pBuff, lSize );
          lOffset += lRead;
       }
 
       /* read from file */
-      lRead = hb_fsReadLarge( hFileHandle, pBuff + lOffset, uiSize-lOffset );
+      lRead = hb_fsReadLarge( hFileHandle, pBuff + lOffset, lSize-lOffset );
 
       /* scan the read buffer */
 
@@ -133,9 +133,9 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, LONG *puiBuffLen, char ** Term, int *
 
          if( *bFound )
          {
-            *puiBuffLen = lOffset + iPos - iTermSizes[ uiPosTerm ] + 1;
+            *plBuffLen = lOffset + iPos - iTermSizes[ uiPosTerm ] + 1;
 
-            pBuff[ *puiBuffLen ] = '\0';
+            pBuff[ *plBuffLen ] = '\0';
 
             /* Set handle pointer in the end of the line */
             hb_fsSeek( hFileHandle, (((lRead-((LONG)iPos)))*-1)+1, FS_RELATIVE );
@@ -150,12 +150,12 @@ BYTE * hb_fsReadLine( FHANDLE hFileHandle, LONG *puiBuffLen, char ** Term, int *
             if( nTries == 0 )
             {
                pBuff[0] = '\0';
-               *puiBuffLen = 0;
+               *plBuffLen = 0;
             }
             else
             {
                pBuff[ lOffset + lRead ] = '\0';
-               *puiBuffLen = ( USHORT ) lOffset + lRead;
+               *plBuffLen = lOffset + lRead;
             }
 
             *bEOF = 1;
@@ -179,7 +179,7 @@ HB_FUNC( HB_FREADLINE )
    char ** Term;
    BYTE * pBuffer;
    int * iTermSizes;
-   LONG uSize = (USHORT) hb_parnl(4);
+   LONG lSize = hb_parnl(4);
    USHORT i, iTerms;
    BOOL bFound, bEOF;
 
@@ -234,14 +234,14 @@ HB_FUNC( HB_FREADLINE )
       iTermSizes[0] = 2;
    }
 
-   if( uSize == 0 )
+   if( lSize == 0 )
    {
-      uSize = READING_BLOCK ;
+      lSize = READING_BLOCK ;
    }
 
-   pBuffer = hb_fsReadLine( hFileHandle, &uSize, Term, iTermSizes, iTerms, &bFound, &bEOF  );
+   pBuffer = hb_fsReadLine( hFileHandle, &lSize, Term, iTermSizes, iTerms, &bFound, &bEOF  );
 
-   hb_storclenAdopt( (char*) pBuffer, uSize, 2 );
+   hb_storclenAdopt( (char*) pBuffer, lSize, 2 );
    hb_retnl( bEOF ? -1 : 0 );
    hb_xfree( Term );
    hb_xfree( iTermSizes );

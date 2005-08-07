@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.145 2005/07/20 03:18:34 walito Exp $
+ * $Id: classes.c,v 1.146 2005/07/25 05:15:56 walito Exp $
  */
 
 /*
@@ -2299,7 +2299,7 @@ HB_FUNC( __CLSNEW )
       }
    }
 
-   HB_TRACE( HB_TR_DEBUG, ( "Finalized: '%s' Known: %i Key: %i\n", pNewCls->szName, uiKnownMethods, pNewCls->uiHashKey ) );
+   HB_TRACE( HB_TR_DEBUG, ( "Finalized: '%s' Known: %i\n", pNewCls->szName, uiKnownMethods ) );
 
    if( strcmp( pNewCls->szName, "ARRAY" ) == 0 )
    {

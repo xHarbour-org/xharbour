@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.26 2005/03/31 03:58:51 druzus Exp $
+* $Id: hbserv.c,v 1.27 2005/08/07 02:40:38 mlombardo Exp $
 */
 
 /*
@@ -783,7 +783,7 @@ HB_FUNC( HB_STARTSERVICE )
 
    // in windows, we just detach from console
    #ifdef HB_OS_WIN_32
-   if ( hb_parl(1) == 1L )
+   if ( hb_parl(1) )
    {
       FreeConsole();
    }

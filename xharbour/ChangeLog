@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4252 2005/08/07 02:40:30 mlombardo Exp $
+ * $Id: ChangeLog,v 1.4253 2005/08/07 09:40:18 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-07 12:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/hbserv.c
+    * do not use == for logical values - use them directly
+
+  * xharbour/source/rtl/readline.c
+    * keep [x]Harbour naming convention for typed variable
+    ! fixed compilation with HB_TRACE()
+
+  * xharbour/source/vm/classes.c
+    ! fixed compilation with HB_TRACE()
 
 2005-08-07 11:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbf1.c
