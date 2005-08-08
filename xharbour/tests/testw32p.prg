@@ -15,8 +15,9 @@
 #define WHITE          RGB( 0xC6,0xC6,0xC6 )
 
 FUNCTION Main()
-  LOCAL nPrn:=1
+  LOCAL nPrn:=1, cBMPFile:= SPACE( 40 )
   LOCAL aPrn:= GetPrinters()
+  LOCAL GetList:= {}
   CLS
   IF EMPTY(aPrn)
     Alert("No printers installed - Cannot continue")
@@ -25,15 +26,17 @@ FUNCTION Main()
   DO WHILE !EMPTY(nPrn)
     CLS
     @ 0,0 SAY 'Win32Prn() Class test program. Choose a printer to test'
-    @ 1,0 TO maxRow(),maxCol()
-    nPrn:= ACHOICE(2,1,maxRow()-1,maxCol()-1,aPrn,.T.,,nPrn)
+    @ 1,0 SAY 'Bitmap file name' GET cBMPFile PICT '@!K'
+    READ
+    @ 2,0 TO maxRow(),maxCol()
+    nPrn:= ACHOICE(3,1,maxRow()-1,maxCol()-1,aPrn,.T.,,nPrn)
     IF !EMPTY(nPrn)
-      PrnTest(aPrn[nPrn])
+        PrnTest(aPrn[nPrn], cBMPFile)
     ENDIF
   ENDDO
   RETURN(NIL)
 
-STATIC FUNCTION PrnTest(cPrinter)
+STATIC FUNCTION PrnTest(cPrinter, cBMPFile)
   LOCAL oPrinter:= Win32Prn():New(cPrinter), aFonts, x, nColFixed, nColTTF, nColCharSet
   oPrinter:Landscape:= .F.
   oPrinter:FormType := FORM_A4
@@ -110,10 +113,35 @@ STATIC FUNCTION PrnTest(cPrinter)
       oPrinter:Arc(200, oPrinter:PosY+100, 300, oPrinter:PosY+200)
       oPrinter:Ellipse(400, oPrinter:PosY+100, 500, oPrinter:PosY+200)
       oPrinter:FillRect(600, oPrinter:PosY+100, 700, oPrinter:PosY+200, RED)
+
+      PrintBitMap( oPrinter, cBMPFile )
+
       oPrinter:EndDoc()
     ENDIF
     oPrinter:Destroy()
   ENDIF
   RETURN(NIL)
 
+
+procedure PrintBitMap( oPrn, cBitFile )
+  LOCAL oBMP
+
+  IF EMPTY( cBitFile )
+    *
+  ELSEIF !FILE( cBitFile )
+    Alert( cBitFile + ' not found ' )
+  ELSE
+    oBMP:= Win32BMP():new()
+    IF oBmp:loadFile( cBitFile )
+
+      oBmp:Draw( oPrn,  { 200,200, 2000, 1500 } )
+
+      // Note: Can also use this method to print bitmap
+      //   oBmp:Rect:= { 200,2000, 2000, 1500 }
+      //   oPrn:DrawBitMap( oBmp )
+
+    ENDIF
+    oBMP:Destroy()
+  ENDIF
+  RETURN
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4256 2005/08/07 13:40:31 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4257 2005/08/08 00:46:13 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-08-08 14:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * tests/testw32p.prg
+    + added option to print BitMap file
 
 2005-08-08 02:45 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfntx/dbfntx1.c
@@ -33,10 +36,10 @@
 
   * utils/xbscript/xbscript.prg
     * Renamed AppMain() to PP_Main() because we do not want it to be used as
-      startup procedure when used as a Librarry. The previous question about 
+      startup procedure when used as a Librarry. The previous question about
       using STATIC Main() was simply an attempt to avoid possible conflict with
       a Main PROCEDURE of an application linked with the lib.
-   
+
 2005-08-07 12:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/hbserv.c
     * do not use == for logical values - use them directly
