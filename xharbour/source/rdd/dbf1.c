@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.124 2005/08/07 02:40:37 mlombardo Exp $
+ * $Id: dbf1.c,v 1.125 2005/08/07 09:40:25 druzus Exp $
  */
 
 /*
@@ -2608,15 +2608,12 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    /* Exit if error */
    if( errCode != SUCCESS )
    {
-      if( !pError )
-      {
-         pError = hb_errNew();
-         hb_errPutGenCode( pError, EG_CORRUPTION );
-         hb_errPutSubCode( pError, EDBF_CORRUPT );
-         hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CORRUPTION ) );
-         hb_errPutFileName( pError, pArea->szDataFileName );
-         hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
-      }
+      pError = hb_errNew();
+      hb_errPutGenCode( pError, EG_CORRUPTION );
+      hb_errPutSubCode( pError, EDBF_CORRUPT );
+      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CORRUPTION ) );
+      hb_errPutFileName( pError, pArea->szDataFileName );
+      hb_errPutFlags( pError, EF_CANRETRY | EF_CANDEFAULT );
       SELF_ERROR( ( AREAP ) pArea, pError );
       hb_itemRelease( pError );
       SELF_CLOSE( ( AREAP ) pArea );
@@ -3524,7 +3521,7 @@ static ERRCODE hb_dbfExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItem
    PHB_FNAME pFileName;
    BOOL fTable = FALSE;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbfExist(%p,%p,%p)", pRDD, pItemTable, pItemIndex));
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfExists(%p,%p,%p)", pRDD, pItemTable, pItemIndex));
 
    szFile = hb_itemGetCPtr( pItemIndex );
    if( !szFile[ 0 ] )

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.121 2005/08/06 19:39:44 druzus Exp $
+ * $Id: dbfntx1.c,v 1.122 2005/08/07 02:40:38 mlombardo Exp $
  */
 
 /*
@@ -448,7 +448,7 @@ static LPKEYINFO hb_ntxKeyPutItem( LPKEYINFO pKey, PHB_ITEM pItem, ULONG ulRecNo
             memcpy( pKey->key, pItem->item.asString.value, len );
             memset( pKey->key + len, ' ', pTag->KeyLength - len );
             if( puiLen )
-               *puiLen = (USHORT)len;
+               *puiLen = ( USHORT ) len;
          }
          else
          {
@@ -3182,7 +3182,7 @@ static void hb_ntxTagGoTop( LPTAGINFO pTag )
    pTag->TagEOF = pTag->CurKeyInfo->Xtra == 0 ||
                   !hb_ntxKeyInScope( pTag, pTag->CurKeyInfo );
 
-   if( ! pTag->TagBOF && pTag->Owner->Owner->dbfi.fFilter )
+   if( ! pTag->TagEOF && pTag->Owner->Owner->dbfi.fFilter )
       hb_ntxTagSkipFilter( pTag, TRUE );
 
    pTag->TagBOF = pTag->TagEOF;
@@ -3515,7 +3515,8 @@ static ULONG hb_ntxOrdKeyCount( LPTAGINFO pTag )
 {
    ULONG ulKeyCount = 0;
 
-   if( !pTag->Owner->fShared && pTag->keyCount )
+   if( !pTag->Owner->fShared && pTag->keyCount &&
+       !pTag->Owner->Owner->dbfi.fFilter )
       return pTag->keyCount;
 
    if( hb_ntxTagLockRead( pTag ) )
@@ -3536,7 +3537,8 @@ static ULONG hb_ntxOrdKeyCount( LPTAGINFO pTag )
       {
          ulKeyCount = hb_ntxPageCountKeys( pTag, 0 );
       }
-      pTag->keyCount = ulKeyCount;
+      if( !pTag->Owner->Owner->dbfi.fFilter )
+         pTag->keyCount = ulKeyCount;
       hb_ntxTagUnLockRead( pTag );
    }
    return ulKeyCount;
@@ -3924,7 +3926,7 @@ static BOOL hb_ntxOrdSkipRegEx( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pRegExIt
  * add key to custom tag (ordKeyAdd())
  * user key value is not implemented
  */
-static BOOL hb_ntxOrdKeyAdd( LPTAGINFO pTag )
+static BOOL hb_ntxOrdKeyAdd( LPTAGINFO pTag, PHB_ITEM pItem )
 {
    NTXAREAP pArea = pTag->Owner->Owner;
    BOOL fResult = FALSE;
@@ -3934,14 +3936,24 @@ static BOOL hb_ntxOrdKeyAdd( LPTAGINFO pTag )
        !hb_ntxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
       return FALSE;
 
-   pKey = hb_ntxEvalKey( NULL, pTag );
+   if( pTag->Template && pItem && hb_itemType( pItem ) != HB_IT_NIL )
+   {
+      if( pArea->lpdbPendingRel )
+         SELF_FORCEREL( ( AREAP ) pArea );
+      pKey = hb_ntxKeyPutItem( NULL, pItem, pArea->ulRecNo, pTag, FALSE, NULL );
+   }
+   else
+   {
+      pKey = hb_ntxEvalKey( NULL, pTag );
+   }
+
    if( hb_ntxTagLockWrite( pTag ) )
    {
       if( hb_ntxTagKeyAdd( pTag, pKey ) )
       {
          fResult = TRUE;
          if( !pTag->Owner->fShared && pTag->keyCount &&
-             hb_ntxKeyInScope( pTag, pTag->HotKeyInfo ) )
+             hb_ntxKeyInScope( pTag, pKey ) )
             pTag->keyCount++;
       }
       hb_ntxTagUnLockWrite( pTag );
@@ -3954,7 +3966,7 @@ static BOOL hb_ntxOrdKeyAdd( LPTAGINFO pTag )
  * del key from custom tag (ordKeyDel())
  * user key value is not implemented
  */
-static BOOL hb_ntxOrdKeyDel( LPTAGINFO pTag )
+static BOOL hb_ntxOrdKeyDel( LPTAGINFO pTag, PHB_ITEM pItem )
 {
    NTXAREAP pArea = pTag->Owner->Owner;
    BOOL fResult = FALSE;
@@ -3964,14 +3976,24 @@ static BOOL hb_ntxOrdKeyDel( LPTAGINFO pTag )
        !hb_ntxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
       return FALSE;
 
-   pKey = hb_ntxEvalKey( NULL, pTag );
+   if( pTag->Template && pItem && hb_itemType( pItem ) != HB_IT_NIL )
+   {
+      if( pArea->lpdbPendingRel )
+         SELF_FORCEREL( ( AREAP ) pArea );
+      pKey = hb_ntxKeyPutItem( NULL, pItem, pArea->ulRecNo, pTag, FALSE, NULL );
+   }
+   else
+   {
+      pKey = hb_ntxEvalKey( NULL, pTag );
+   }
+
    if( hb_ntxTagLockWrite( pTag ) )
    {
       if( hb_ntxTagKeyDel( pTag, pKey ) )
       {
          fResult = TRUE;
          if( !pTag->Owner->fShared && pTag->keyCount &&
-             hb_ntxKeyInScope( pTag, pTag->HotKeyInfo ) )
+             hb_ntxKeyInScope( pTag, pKey ) )
             pTag->keyCount--;
       }
       hb_ntxTagUnLockWrite( pTag );
@@ -6202,8 +6224,6 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
                      if( pTag->Custom ? ! fNewVal : fNewVal )
                      {
                         pTag->Custom = fNewVal;
-                        if( !pTag->Custom )
-                           pTag->MultiKey = FALSE;
                         pTag->Partial = TRUE;
                         pTag->ChgOnly = FALSE;
                         pTag->HdrChanged = TRUE;
@@ -6235,7 +6255,8 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             hb_itemPutL( pInfo->itmResult, pTag->ChgOnly );
             break;
          case DBOI_TEMPLATE:
-            if( hb_itemGetL( pInfo->itmNewVal ) )
+            if( hb_itemType( pInfo->itmNewVal ) == HB_IT_LOGICAL &&
+                hb_itemGetL( pInfo->itmNewVal ) )
             {
                if( hb_ntxTagLockWrite( pTag ) )
                {
@@ -6304,10 +6325,26 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             if( pInfo->itmResult )
                hb_itemClear( pInfo->itmResult );
          case DBOI_KEYADD:
-            hb_itemPutL( pInfo->itmResult, hb_ntxOrdKeyAdd( pTag ) );
+            if ( pTag->Custom )
+            {
+               hb_itemPutL( pInfo->itmResult,
+                            hb_ntxOrdKeyAdd( pTag, pInfo->itmNewVal ) );
+            }
+            else
+            {
+               hb_ntxErrorRT( pArea, 0, 1052, NULL, 0, 0 );
+            }
             break;
          case DBOI_KEYDELETE:
-            hb_itemPutL( pInfo->itmResult, hb_ntxOrdKeyDel( pTag ) );
+            if ( pTag->Custom )
+            {
+               hb_itemPutL( pInfo->itmResult,
+                            hb_ntxOrdKeyDel( pTag, pInfo->itmNewVal ) );
+            }
+            else
+            {
+               hb_ntxErrorRT( pArea, 0, 1052, NULL, 0, 0 );
+            }
             break;
          case DBOI_KEYTYPE:
             {

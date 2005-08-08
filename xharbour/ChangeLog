@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4255 2005/08/07 11:34:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4256 2005/08/07 13:40:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-08 02:45 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    + added missing checking for user value in ordKeyAdd()/ordKeyDel()
+      for template tags
+    ! fixed typo hb_ntxTagGoTop()
+
+  * xharbour/source/rdd/dbf1.c
+    * fixed function name in HB_TRACE
+    * removed redundant if() statement
+
+  * xharbour/source/vm/classes.c
+    * small modification which gives about 10% speed improvement
+      of hb_clsFindMethod() - division is one of the most consumed
+      operation - if it's possible replace it by bit shifting
 
 2005-08-07 0:37 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * xharbour/source/vm/classes.c

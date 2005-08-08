@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.147 2005/08/07 10:44:24 druzus Exp $
+ * $Id: classes.c,v 1.148 2005/08/07 13:40:36 ronpinkas Exp $
  */
 
 /*
@@ -1056,7 +1056,7 @@ static USHORT hb_clsFindMethod( PHB_DYNS pMsg, PCLASS pClass, int * piPos )
 
    while( iMin <= iMax )
    {
-      iPivot = ( iMin + iMax ) / 2;
+      iPivot = ( iMin + iMax ) >> 1;
 
       if( pMsg == pDict[ iPivot ].pMessage )
       {
@@ -1075,17 +1075,16 @@ static USHORT hb_clsFindMethod( PHB_DYNS pMsg, PCLASS pClass, int * piPos )
          iMin = iPivot + 1;
       }
    }
-   if( iMax < iPivot )
-   {
-      iPivot = iMax + 1;
-   }
-   else if( iMin > iPivot )
-   {
-      iPivot = iMin;
-   }
-
    if( piPos )
    {
+      if( iMax < iPivot )
+      {
+         iPivot = iMax + 1;
+      }
+      else if( iMin > iPivot )
+      {
+         iPivot = iMin;
+      }
       *piPos = iPivot;
    }
    return 0;
