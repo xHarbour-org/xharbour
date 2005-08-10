@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.37 2005/05/24 21:05:58 ronpinkas Exp $
+ * $Id: runner.c,v 1.38 2005/08/10 05:43:46 mlombardo Exp $
  */
 
 /*
@@ -72,7 +72,6 @@
 // extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
 
 /* TODO: Fill the error codes with valid ones (instead of 9999) */
-/* TOFIX: Change this assembler hack to something standard and portable */
 /* TOFIX: Fix the memory leak on error. */
 
 typedef struct
