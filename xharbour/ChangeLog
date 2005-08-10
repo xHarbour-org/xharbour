@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4257 2005/08/08 00:46:13 druzus Exp $
+ * $Id: ChangeLog,v 1.4258 2005/08/08 02:47:09 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-10 02:30 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/vm/runner.c
+    ! Fixed GPF trap caused by dynamic linker when an
+      .hrb module calls a function from another previously
+      loaded .hrb module
+
 2005-08-08 14:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * tests/testw32p.prg
     + added option to print BitMap file

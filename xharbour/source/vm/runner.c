@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.36 2005/04/12 11:26:52 druzus Exp $
+ * $Id: runner.c,v 1.37 2005/05/24 21:05:58 ronpinkas Exp $
  */
 
 /*
@@ -732,6 +732,10 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
             if( pDynSym )
             {
                pSymRead[ ul ].value.pFunPtr = pDynSym->pFunPtr;
+               if ( pDynSym->pSymbol->cScope & HB_FS_PCODEFUNC )
+               {
+                  pSymRead[ ul ].cScope |= HB_FS_PCODEFUNC;
+               }
             }
             else
             {
