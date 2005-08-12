@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.122 2005/08/07 02:40:38 mlombardo Exp $
+ * $Id: dbfntx1.c,v 1.123 2005/08/08 00:46:31 druzus Exp $
  */
 
 /*
@@ -5438,31 +5438,39 @@ static ERRCODE ntxGoHot( NTXAREAP pArea )
  */
 static ERRCODE ntxClose( NTXAREAP pArea )
 {
+   ERRCODE errCode;
+
    HB_TRACE(HB_TR_DEBUG, ("ntxClose(%p)", pArea));
 
    if( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-   if( pArea->pSort )
-   {
-      hb_ntxSortFree( pArea->pSort );
-      pArea->pSort = NULL;
-   }
+   errCode = SUPER_CLOSE( ( AREAP ) pArea );
 
-   SELF_ORDLSTCLEAR( ( AREAP ) pArea );
-   /* close also production indexes if any */
-   while( pArea->lpIndexes )
+   if( errCode == SUCCESS )
    {
-      LPNTXINDEX pIndex = pArea->lpIndexes;
-      pArea->lpIndexes = pIndex->pNext;
-      hb_ntxIndexFree( pIndex );
-   }
+      if( pArea->pSort )
+      {
+         hb_ntxSortFree( pArea->pSort );
+         pArea->pSort = NULL;
+      }
+
+      SELF_ORDLSTCLEAR( ( AREAP ) pArea );
+
+      /* close also production indexes if any */
+      while( pArea->lpIndexes )
+      {
+         LPNTXINDEX pIndex = pArea->lpIndexes;
+         pArea->lpIndexes = pIndex->pNext;
+         hb_ntxIndexFree( pIndex );
+      }
 
 #ifdef HB_NTX_DEBUG_DISP
-   printf("\r\n#reads=%ld, #writes=%ld\r\n", s_rdNO, s_wrNO ); fflush(stdout);
+      printf("\r\n#reads=%ld, #writes=%ld\r\n", s_rdNO, s_wrNO ); fflush(stdout);
 #endif
+   }
 
-   return SUPER_CLOSE( ( AREAP ) pArea );
+   return errCode;
 }
 
 /*

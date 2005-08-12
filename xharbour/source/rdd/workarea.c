@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.48 2005/08/04 23:54:11 druzus Exp $
+ * $Id: workarea.c,v 1.49 2005/08/06 19:39:44 druzus Exp $
  */
 
 /*
@@ -1333,17 +1333,13 @@ ERRCODE hb_waSetLocate( AREAP pArea, LPDBSCOPEINFO pScopeInfo )
    SELF_CLEARLOCATE( pArea );
 
    if( pScopeInfo->itmCobFor )
-   {
       pArea->dbsi.itmCobFor = hb_itemNew( pScopeInfo->itmCobFor );
-   }
 
    if( pScopeInfo->lpstrFor )
       pArea->dbsi.lpstrFor = hb_itemNew( pScopeInfo->lpstrFor );
 
    if( pScopeInfo->itmCobWhile )
-   {
       pArea->dbsi.itmCobWhile = hb_itemNew( pScopeInfo->itmCobWhile );
-   }
 
    if( pScopeInfo->lpstrWhile )
       pArea->dbsi.lpstrWhile = hb_itemNew( pScopeInfo->lpstrWhile );
@@ -1356,6 +1352,11 @@ ERRCODE hb_waSetLocate( AREAP pArea, LPDBSCOPEINFO pScopeInfo )
 
    if( pScopeInfo->fRest )
       pArea->dbsi.fRest = hb_itemNew( pScopeInfo->fRest );
+
+   pArea->dbsi.fIgnoreFilter     = pScopeInfo->fIgnoreFilter;
+   pArea->dbsi.fIncludeDeleted   = pScopeInfo->fIncludeDeleted;
+   pArea->dbsi.fLast             = pScopeInfo->fLast;
+   pArea->dbsi.fIgnoreDuplicates = pScopeInfo->fIgnoreDuplicates;
 
    return SUCCESS;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4258 2005/08/08 02:47:09 peterrees Exp $
+ * $Id: ChangeLog,v 1.4259 2005/08/10 05:43:42 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-12 04:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/hb-mkslib.sh
+
+  * xharbour/source/rdd/dbcmd.c
+    check the result from SELF_CLOSE() in dbCloseArea() if it returns
+    FAILURE then do not continue operation - it's necessary for SIX3
+    triggers implementation - user trigger code should be very careful
+    here and do not block closing WA on VM exit
+  ! fixed bug in APPEND FROM when the source database has exactly
+    the same fields but with differ size and RDD use optimized
+    (whole record) copping
+
+  * xharbour/source/rdd/workarea.c
+    ! set all flags in SET_LOCATE() method
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * first call SUPPER_CLOSE() and check the results for trigger
+      implementation
+  
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtcrs/gtcrs.h
+    * added K_MWFORWARD and K_MWBACKWARD
+
+  * xharbour/source/rtl/gtxwc/gtxwc.c
+    ! fixed fast mouse wheel movement - if you think that it will be useful
+      then we can add also K_MW[DBL|FAST]BACKWARD and K_MW[DBL|FAST]FORWARD
+      for fast mouse wheel moving - it will be enough to add this key codes
+      to mouseDblPressKeys replacing K_MWFORWARD and K_MWBACKWARD
 
 2005-08-10 02:30 UTC-3 Marcelo Lombardo <marcelo@xharbour.com.br>
   * source/vm/runner.c

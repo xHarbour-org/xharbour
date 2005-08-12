@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.11 2005/03/31 04:01:49 druzus Exp $
+ * $Id: gtxwc.c,v 1.12 2005/08/04 11:33:14 druzus Exp $
  */
 
 /*
@@ -72,7 +72,7 @@
 /* mouse button mapping into Clipper keycodes */
 static int mousePressKeys[ XVT_MAX_BUTTONS ]    = { K_LBUTTONDOWN, K_MBUTTONDOWN, K_RBUTTONDOWN, K_MWFORWARD, K_MWBACKWARD };
 static int mouseReleaseKeys[ XVT_MAX_BUTTONS ]  = { K_LBUTTONUP,   K_MBUTTONUP,   K_RBUTTONUP   };
-static int mouseDblPressKeys[ XVT_MAX_BUTTONS ] = { K_LDBLCLK,     K_MDBLCLK,     K_RDBLCLK     };
+static int mouseDblPressKeys[ XVT_MAX_BUTTONS ] = { K_LDBLCLK,     K_MDBLCLK,     K_RDBLCLK    , K_MWFORWARD, K_MWBACKWARD };
 
 typedef struct tag_ClipKeyCode {
     int key;
@@ -2911,8 +2911,8 @@ static void hb_xvt_gtDissConnectX( PXWND_DEF wnd )
       }
       if ( wnd->gc )
       {
-        XFreeGC( wnd->dpy, wnd->gc );
-	wnd->gc = 0;
+         XFreeGC( wnd->dpy, wnd->gc );
+         wnd->gc = 0;
       }
       XCloseDisplay( wnd->dpy );
       wnd->dpy = NULL;

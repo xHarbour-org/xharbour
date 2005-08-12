@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.54 2005/01/10 18:45:36 druzus Exp $
+ * $Id: gtcrs.c,v 1.55 2005/03/31 03:59:19 druzus Exp $
  */
 
 /*
@@ -131,7 +131,7 @@ typedef struct InOutBase {
    int is_mouse;
    int mButtons;
    int nTermMouseChars;
-   char cTermMouseBuf[3];
+   unsigned char cTermMouseBuf[3];
    mouseEvent mLastEvt;
 #ifdef HAVE_GPM_H
    Gpm_Connect Conn;
@@ -175,7 +175,7 @@ static InOutBase **s_ioBaseTab = NULL;
 static int s_iSize_ioBaseTab = 0;
 static int s_iActive_ioBase = -1;
 
-static void set_tmevt(char *cMBuf, mouseEvent *);
+static void set_tmevt(unsigned char *cMBuf, mouseEvent *);
 static int getMouseKey(mouseEvent *);
 static void destroy_ioBase(InOutBase *ioBase);
 static void sig_handler(int signo);
@@ -983,6 +983,16 @@ static int getMouseKey( mouseEvent * mEvt )
       mEvt->lrow = mEvt->row;
       mEvt->lcol = mEvt->col;
    }
+   else if ( mEvt->buttonstate & M_BUTTON_WHEELUP )
+   {
+      nKey = K_MWFORWARD;
+      mEvt->buttonstate &= ~M_BUTTON_WHEELUP;
+   }
+   else if ( mEvt->buttonstate & M_BUTTON_WHEELDOWN )
+   {
+      nKey = K_MWBACKWARD;
+      mEvt->buttonstate &= ~M_BUTTON_WHEELDOWN;
+   }
    else if ( mEvt->lbuttons != mEvt->buttonstate )
    {
       int butt = mEvt->lbuttons ^ mEvt->buttonstate;
@@ -1050,7 +1060,8 @@ static int getMouseKey( mouseEvent * mEvt )
 
 static void chk_mevtdblck( mouseEvent * mEvt )
 {
-   if ( mEvt->lbuttons != mEvt->buttonstate )
+   if ( ( mEvt->lbuttons & M_BUTTON_KEYMASK ) !=
+        ( mEvt->buttonstate & M_BUTTON_KEYMASK ) )
    {
       struct timeval tv;
 
@@ -1080,9 +1091,20 @@ static void chk_mevtdblck( mouseEvent * mEvt )
    }
 }
 
-static void set_tmevt( char *cMBuf, mouseEvent * mEvt )
+static void set_tmevt( unsigned char *cMBuf, mouseEvent * mEvt )
 {
-   switch ( cMBuf[0] & 0x3 )
+   if ( ( cMBuf[0] & 0x60 ) == 0x60 )
+   {
+      if ( ( cMBuf[0] & 0x63 ) == 0x60 )
+      {
+         mEvt->buttonstate |= M_BUTTON_WHEELUP;
+      }
+      else if ( ( cMBuf[0] & 0x63 ) == 0x61 )
+      {
+         mEvt->buttonstate |= M_BUTTON_WHEELDOWN;
+      }
+   }
+   else switch ( cMBuf[0] & 0x3 )
    {
       case 0x0:
          mEvt->buttonstate |= M_BUTTON_LEFT;
@@ -1094,7 +1116,7 @@ static void set_tmevt( char *cMBuf, mouseEvent * mEvt )
          mEvt->buttonstate |= M_BUTTON_RIGHT;
          break;
       case 0x3:
-         mEvt->buttonstate = 0;
+         mEvt->buttonstate &= ~(M_BUTTON_KEYMASK|M_BUTTON_DBLMASK);
          break;
    }
    mEvt->col = cMBuf[1] - 33;

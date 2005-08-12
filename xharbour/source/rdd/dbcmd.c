@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.160 2005/08/03 17:10:50 druzus Exp $
+ * $Id: dbcmd.c,v 1.161 2005/08/04 23:54:10 druzus Exp $
  */
 
 /*
@@ -630,7 +630,10 @@ void HB_EXPORT hb_rddReleaseCurrentArea( void )
       return;
    }
 
-   SELF_CLOSE( pArea );
+   if( SELF_CLOSE( pArea ) == FAILURE )
+   {
+      return;
+   }
    SELF_RELEASE( pArea );
 
    LOCK_AREA
@@ -788,6 +791,10 @@ USHORT HB_EXPORT hb_rddInsertAreaNode( char *szDriver )
          uiArea++;
       }
       HB_SET_WA( uiArea );
+   }
+   else if( s_pCurrArea )
+   {
+      return FALSE;
    }
 
    if ( s_uiCurrArea >= s_uiWaNumMax )
@@ -4141,6 +4148,44 @@ static ERRCODE hb_dbTransStruct( AREAP lpaSource, AREAP lpaDest,
    if( uiSize != uiSizeSrc )
       fAll = FALSE;
 
+   if( fAll && lpaDest )
+   {
+      PHB_ITEM pSrcItm = hb_itemNew( NULL ),
+               pDstItm = hb_itemNew( NULL );
+      /*
+       * if fAll is TRUE here then it means that all fields are included
+       * and they are on the same positions in both tables, so now check
+       * if their types and sizes are also equal
+       */
+      for( uiCount = 1; uiCount <= uiSize; ++uiCount )
+      {
+         SELF_FIELDINFO( lpaSource, uiCount, DBS_TYPE, pSrcItm );
+         SELF_FIELDINFO( lpaDest,   uiCount, DBS_TYPE, pDstItm );
+         if( hb_stricmp( hb_itemGetCPtr( pSrcItm ),
+                         hb_itemGetCPtr( pDstItm ) ) != 0 )
+         {
+            fAll = FALSE;
+            break;
+         }
+         SELF_FIELDINFO( lpaSource, uiCount, DBS_LEN, pSrcItm );
+         SELF_FIELDINFO( lpaDest,   uiCount, DBS_LEN, pDstItm );
+         if( hb_itemGetNL( pSrcItm ) != hb_itemGetNL( pDstItm ) )
+         {
+            fAll = FALSE;
+            break;
+         }
+         SELF_FIELDINFO( lpaSource, uiCount, DBS_DEC, pSrcItm );
+         SELF_FIELDINFO( lpaDest,   uiCount, DBS_DEC, pDstItm );
+         if( hb_itemGetNL( pSrcItm ) != hb_itemGetNL( pDstItm ) )
+         {
+            fAll = FALSE;
+            break;
+         }
+      }
+      hb_itemRelease( pSrcItm );
+      hb_itemRelease( pDstItm );
+   }
+
    lpdbTransInfo->uiFlags = fAll ? DBTF_MATCH : 0;
    lpdbTransInfo->uiItemCount = uiSize;
 
@@ -4159,7 +4204,6 @@ static ERRCODE hb_rddTransRecords( AREAP pArea,
    AREAP lpaSource, lpaDest, lpaClose = NULL;
    DBTRANSINFO dbTransInfo;
    USHORT uiPrevArea;
-   PHB_ITEM pStruct = NULL;
    ERRCODE errCode;
 
    memset( &dbTransInfo, 0, sizeof( DBTRANSINFO ) );
@@ -4167,6 +4211,8 @@ static ERRCODE hb_rddTransRecords( AREAP pArea,
 
    if( fExport )
    {
+      PHB_ITEM pStruct = NULL;
+
       lpaSource = pArea;
       errCode = hb_dbTransStruct( lpaSource, NULL, &dbTransInfo,
                                   &pStruct, pFields );
@@ -4180,6 +4226,8 @@ static ERRCODE hb_rddTransRecords( AREAP pArea,
                                  ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
          }
       }
+      if( pStruct )
+         hb_itemRelease( pStruct );
    }
    else
    {
@@ -4190,7 +4238,7 @@ static ERRCODE hb_rddTransRecords( AREAP pArea,
       {
          lpaClose = lpaSource = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
          errCode = hb_dbTransStruct( lpaSource, lpaDest, &dbTransInfo,
-                                     &pStruct, pFields );
+                                     NULL, pFields );
       }
    }
 
@@ -4216,8 +4264,6 @@ static ERRCODE hb_rddTransRecords( AREAP pArea,
 
    if( dbTransInfo.lpTransItems )
       hb_xfree( dbTransInfo.lpTransItems );
-   if( pStruct )
-      hb_itemRelease( pStruct );
    if( lpaClose )
    {
       hb_rddSelectWorkAreaNumber( lpaClose->uiArea );

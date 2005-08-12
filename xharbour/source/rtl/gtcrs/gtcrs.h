@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.h,v 1.16 2004/12/28 07:16:13 druzus Exp $
+ * $Id: gtcrs.h,v 1.17 2005/01/10 18:45:37 druzus Exp $
  */
 
 /*
@@ -209,12 +209,16 @@ extern int HB_GT_FUNC(gt_chrmapinit( int *piTransTbl, char *pszTerm ));
 #define EXKEY_PRTSCR	(28 | KEY_EXTDMASK)
 #define EXKEY_PAUSE	(29 | KEY_EXTDMASK)
 
-#define M_BUTTON_LEFT	0x01
-#define M_BUTTON_RIGHT	0x02
-#define M_BUTTON_MIDDLE	0x04
-#define M_BUTTON_LDBLCK	0x10
-#define M_BUTTON_RDBLCK	0x20
-#define M_BUTTON_MDBLCK	0x40
+#define M_BUTTON_LEFT      0x0001
+#define M_BUTTON_RIGHT	   0x0002
+#define M_BUTTON_MIDDLE	   0x0004
+#define M_BUTTON_LDBLCK	   0x0010
+#define M_BUTTON_RDBLCK	   0x0020
+#define M_BUTTON_MDBLCK	   0x0040
+#define M_BUTTON_WHEELUP   0x0100
+#define M_BUTTON_WHEELDOWN 0x0200
+#define M_BUTTON_KEYMASK   (M_BUTTON_LEFT | M_BUTTON_RIGHT | M_BUTTON_MIDDLE)
+#define M_BUTTON_DBLMASK   (M_BUTTON_LDBLCK | M_BUTTON_RDBLCK | M_BUTTON_MDBLCK)
 
 #define TIMEVAL_GET(tv)		gettimeofday(&(tv), NULL);
 #define TIMEVAL_LESS(tv1, tv2)	(((tv1).tv_sec == (tv2).tv_sec ) ?	\

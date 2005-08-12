@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.212 2005/08/04 11:33:12 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.213 2005/08/04 23:54:11 druzus Exp $
  */
 
 /*
@@ -6570,47 +6570,54 @@ static ERRCODE hb_cdxGoHot( CDXAREAP pArea )
  */
 static ERRCODE hb_cdxClose( CDXAREAP pArea )
 {
+   ERRCODE errCode;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxClose(%p)", pArea));
 
-   if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
+   if ( SELF_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-   if ( pArea->pSort )
-   {
-      hb_cdxSortFree( pArea->pSort );
-      pArea->pSort = NULL;
-   }
+   errCode = SUPER_CLOSE( ( AREAP ) pArea );
 
-   hb_cdxOrdListClear( pArea, TRUE, NULL );
-   if ( pArea->bCdxSortTab )
+   if( errCode == SUCCESS )
    {
-      hb_xfree( pArea->bCdxSortTab );
-      pArea->bCdxSortTab = NULL;
-   }
+      if ( pArea->pSort )
+      {
+         hb_cdxSortFree( pArea->pSort );
+         pArea->pSort = NULL;
+      }
+
+      hb_cdxOrdListClear( pArea, TRUE, NULL );
+      if ( pArea->bCdxSortTab )
+      {
+         hb_xfree( pArea->bCdxSortTab );
+         pArea->bCdxSortTab = NULL;
+      }
 #ifdef HB_CDX_DBGTIME
-   printf( "\r\ncdxTimeIntBld=%f, cdxTimeExtBld=%f, cdxTimeBld=%f\r\n"
-           "cdxTimeGetKey=%f, cdxTimeFreeKey=%f\r\n"
-           "cdxTimeExtBlc=%f, cdxTimeIntBlc=%f\r\n"
-           "cdxTimeIdxBld=%f\r\n"
-           "cdxTimeTotal=%f\r\n",
-           (double) cdxTimeIntBld / 1000000, (double) cdxTimeExtBld / 1000000,
-           (double) ( cdxTimeIntBld + cdxTimeExtBld ) / 1000000,
-           (double) cdxTimeGetKey / 1000000, (double) cdxTimeFreeKey / 1000000,
-           (double) cdxTimeIntBlc / 1000000, (double) cdxTimeExtBlc / 1000000,
-	   (double) cdxTimeIdxBld / 1000000,
-           (double) ( cdxTimeIntBld + cdxTimeExtBld + cdxTimeIdxBld +
-                      cdxTimeGetKey + cdxTimeFreeKey +
-                      cdxTimeExtBlc + cdxTimeIntBlc ) / 1000000 );
-   fflush(stdout);
-   cdxTimeIntBld = cdxTimeExtBld = 0;
+      printf( "\r\ncdxTimeIntBld=%f, cdxTimeExtBld=%f, cdxTimeBld=%f\r\n"
+              "cdxTimeGetKey=%f, cdxTimeFreeKey=%f\r\n"
+              "cdxTimeExtBlc=%f, cdxTimeIntBlc=%f\r\n"
+              "cdxTimeIdxBld=%f\r\n"
+              "cdxTimeTotal=%f\r\n",
+              (double) cdxTimeIntBld / 1000000, (double) cdxTimeExtBld / 1000000,
+              (double) ( cdxTimeIntBld + cdxTimeExtBld ) / 1000000,
+              (double) cdxTimeGetKey / 1000000, (double) cdxTimeFreeKey / 1000000,
+              (double) cdxTimeIntBlc / 1000000, (double) cdxTimeExtBlc / 1000000,
+              (double) cdxTimeIdxBld / 1000000,
+              (double) ( cdxTimeIntBld + cdxTimeExtBld + cdxTimeIdxBld +
+                         cdxTimeGetKey + cdxTimeFreeKey +
+                         cdxTimeExtBlc + cdxTimeIntBlc ) / 1000000 );
+      fflush(stdout);
+      cdxTimeIntBld = cdxTimeExtBld = 0;
 #endif
 #ifdef HB_CDX_DBGUPDT
-   printf( "\r\n#reads=%ld, #writes=%ld, stacksize=%d\r\n", cdxReadNO, cdxWriteNO, cdxStackSize );
-   fflush(stdout);
-   cdxReadNO = cdxWriteNO = 0;
+      printf( "\r\n#reads=%ld, #writes=%ld, stacksize=%d\r\n", cdxReadNO, cdxWriteNO, cdxStackSize );
+      fflush(stdout);
+      cdxReadNO = cdxWriteNO = 0;
 #endif
+   }
 
-   return SUPER_CLOSE( ( AREAP ) pArea );
+   return errCode;
 }
 
 /* ( DBENTRYP_VP )    hb_cdxCreate          : NULL */
