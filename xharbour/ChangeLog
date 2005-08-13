@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4259 2005/08/10 05:43:42 mlombardo Exp $
+ * $Id: ChangeLog,v 1.4260 2005/08/12 02:44:25 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-13 12:00 UTC-300 Walter Negro <anegro-AT-overnet.com.ar>
+  * include/hbapi.h
+    + hb_clsClassH() declaration.
+  * source/vm/classes.c
+    ! Fix bug in __ClsDelMsg() function.
+      Reported by Marek Paliwoda.
+    ! Fix problem in __ClsAddMsg when first parameter is Object.
+      hb_parni() can return incorrect values if parameter of function is
+      Array/Object and is not passed the second optional parameter
+      to hb_parni() to retrieve a position of array.
+      Reported by Marek Paliwoda.
+  + hb_clsClassH() return the uiClass for a PHB_ITEM passed.
+  * Reduction of redundant code using hb_clsClassH().
 
 2005-08-12 04:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/hb-mkslib.sh
