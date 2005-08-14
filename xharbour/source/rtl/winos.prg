@@ -1,5 +1,5 @@
 /*
- * $Id: winos.prg,v 1.5 2005/03/10 23:41:17 andijahja Exp $
+ * $Id: winos.prg,v 1.6 2005/08/02 21:06:43 peterrees Exp $
  */
 
 /*
@@ -101,6 +101,9 @@ FUNCTION OS_ISWINXP()
   RETURN( .F. )
 
 FUNCTION OS_ISWIN2003()
+  RETURN( .F. )
+
+FUNCTION OS_ISWINVISTA()
   RETURN( .F. )
 
 FUNCTION OS_ISWTSCLIENT()
@@ -253,6 +256,13 @@ HB_FUNC( OS_ISWIN2003 )
   OSVERSIONINFO osvi;
   getwinver( &osvi );
   hb_retl( osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2 );
+}
+
+HB_FUNC( OS_ISWINVISTA )
+{
+  OSVERSIONINFO osvi;
+  getwinver( &osvi );
+  hb_retl( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 );
 }
 
 HB_FUNC( OS_ISWTSCLIENT )

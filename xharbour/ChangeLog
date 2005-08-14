@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4260 2005/08/12 02:44:25 druzus Exp $
+ * $Id: ChangeLog,v 1.4261 2005/08/13 15:03:36 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-08-15 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/winos.prg
+    + HB_FUNC( OS_ISWINVISTA ), Detect if OS is Windows Vista
 
 2005-08-13 12:00 UTC-300 Walter Negro <anegro-AT-overnet.com.ar>
   * include/hbapi.h
@@ -41,7 +44,7 @@
   * xharbour/source/rdd/dbfntx/dbfntx1.c
     * first call SUPPER_CLOSE() and check the results for trigger
       implementation
-  
+
   * xharbour/source/rtl/gtcrs/gtcrs.c
   * xharbour/source/rtl/gtcrs/gtcrs.h
     * added K_MWFORWARD and K_MWBACKWARD
