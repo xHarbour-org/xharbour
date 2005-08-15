@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.8 2005/02/15 22:05:37 andijahja Exp $
+ * $Id: win32prn.prg,v 1.9 2005/03/17 07:02:48 ronpinkas Exp $
  */
 
 /*
@@ -129,7 +129,10 @@ CLASS WIN32PRN
                                                                 //     _OR_ ZERO ( 0 ) which uses the default width of the font
                                                                 //          for the nPointSize
                                                                 //   IF nWidth (or nDiv) is < 0 then Fixed font is emulated
+
   METHOD SetDefaultFont()
+  METHOD CreateFontAPI( cFont, nPointSize, nWide, nDiv, nBold, nUnder, nItalic, nCharSet )
+
   METHOD GetFonts()                                   // Returns array of { "FontName", lFixed, lTrueType, nCharSetRequired }
   METHOD Bold(nBoldWeight)
   METHOD UnderLine(lOn)
@@ -140,9 +143,14 @@ CLASS WIN32PRN
   METHOD SetPos(nX, nY)                               // **WARNING** : (Col,Row) _NOT_ (Row,Col)
   METHOD SetColor(nClrText, nClrPane, nAlign) INLINE (;
          ::TextColor:=nClrText, ::BkColor:=nClrPane, ::TextAlign:=nAlign,;
-         SetColor(::hPrinterDC, nClrText, nClrPane, nAlign) )
+         ::SetColorAPI( nClrText, nClrPane, nAlign) )
+  METHOD SetColorAPI(nClrText, nClrPane, nAlign)
+
   METHOD TextOut(cString, lNewLine, lUpdatePosX)
   METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX) // **WARNING** : (Col,Row) _NOT_ (Row,Col)
+  METHOD TextOutAPI( nPosX, nPosY, cString, nLen, nCharWidth )
+
+
   METHOD SetPen(nStyle, nWidth, nColor) INLINE (;
          ::PenStyle:=nStyle, ::PenWidth:=nWidth, ::PenColor:=nColor,;
          SetPen(::hPrinterDC, nStyle, nWidth, nColor) )
@@ -184,7 +192,7 @@ CLASS WIN32PRN
   VAR fBold           INIT 0      HIDDEN            // font darkness weight ( Bold). See wingdi.h or WIN SDK CreateFont() for valid values
   VAR fUnderLine      INIT .F.    HIDDEN            // UnderLine is on or off
   VAR fItalic         INIT .F.    HIDDEN            // Italic is on or off
-  VAR fCharSet        INIT 0      HIDDEN            // Default character set is OEM_CHARSET
+  VAR fCharSet        INIT 0      HIDDEN            // Default character set
 
   VAR PixelsPerInchY
   VAR PixelsPerInchX
@@ -352,13 +360,16 @@ METHOD SetFont(cFontName, nPointSize, nWidth, nBold, lUnderline, lItalic, nCharS
   IF nCharSet != NIL
     ::fCharSet := nCharSet
   ENDIF
-  IF (::SetFontOk:= CreateFont(::hPrinterDC, ::FontName, ::FontPointSize, ::FontWidth[1], ::FontWidth[2], ::fBold, ::fUnderLine, ::fItalic, ::fCharSet))
+  IF (::SetFontOk:= ::CreateFontAPI( ::FontName, ::FontPointSize, ::FontWidth[1], ::FontWidth[2], ::fBold, ::fUnderLine, ::fItalic, ::fCharSet))
     ::fCharWidth        := ::GetCharWidth()
     ::CharWidth:= ABS(::fCharWidth)
     ::CharHeight:= ::GetCharHeight()
   ENDIF
   ::FontName:= GetPrinterFontName(::hPrinterDC)  // Get the font name that Windows actually used
   RETURN(::SetFontOk)
+
+METHOD CreateFontAPI( cFont, nPointSize, nWide, nDiv, nBold, nUnder, nItalic, nCharSet ) CLASS WIN32PRN
+  RETURN( CreateFont(::hPrinterDC, cFont, nPointSize, nWide, nDiv, nBold, nUnder, nItalic, nCharSet))
 
 METHOD SetDefaultFont()
   RETURN(::SetFont("Courier New",12,{1, 10}, 0, .F., .F., 0))
@@ -417,7 +428,7 @@ METHOD SetPos(nPosX, nPosY) CLASS WIN32PRN
   RETURN(Result)
 
 METHOD TextOut(cString, lNewLine, lUpdatePosX) CLASS WIN32PRN
-  LOCAL Result:= .F., nPosX
+  LOCAL nPosX
   IF lUpdatePosX == NIL
      lUpdatePosX:=.T.
   ENDIF
@@ -434,7 +445,7 @@ METHOD TextOut(cString, lNewLine, lUpdatePosX) CLASS WIN32PRN
       ::NewLine()
     ENDIF
   ENDIF
-  RETURN(Result)
+  RETURN( .T. )
 
 METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX) CLASS WIN32PRN
   IF lNewLine == NIL
@@ -446,6 +457,9 @@ METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX) CLASS WIN32PRN
   ::SetPos(nPosX,nPosY)
   ::TextOut(cString, lNewLine, lUpdatePosX)
   RETURN(.T.)
+
+METHOD TextOutAPI( nPosX, nPosY, cString, nLen, nCharWidth ) CLASS WIN32PRN
+  RETURN( TextOut(::hPrinterDC, nPosX, nPosY, cString, nLen, nCharWidth) )
 
 METHOD GetCharWidth() CLASS WIN32PRN
   LOCAL nWidth:= 0
@@ -495,6 +509,9 @@ METHOD MaxRow() CLASS WIN32PRN
 
 METHOD MaxCol() CLASS WIN32PRN
   RETURN(INT(((::RightMargin-::LeftMargin)+1 ) / ::CharWidth) - 1)
+
+METHOD SetColorAPI(nClrText, nClrPane, nAlign) CLASS WIN32PRN
+  RETURN( SetColor( ::hPrinterDC, nClrText, nClrPane, nAlign) )
 
 // Bitmap class
 
@@ -762,7 +779,7 @@ HB_FUNC_STATIC( CREATEFONT )
   }
 
   hFont = CreateFont(iHeight, iWidth, 0, 0, iWeight, dwItalic, dwUnderLine, 0,
-        dwCharSet ? dwCharSet : OEM_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS, DRAFT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,  pszFont) ;
+        dwCharSet ? dwCharSet : DEFAULT_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS, DRAFT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,  pszFont) ;
   if (hFont)
   {
     Result = TRUE;
