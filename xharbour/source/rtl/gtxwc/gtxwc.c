@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.12 2005/08/04 11:33:14 druzus Exp $
+ * $Id: gtxwc.c,v 1.13 2005/08/12 02:44:26 druzus Exp $
  */
 
 /*
@@ -374,7 +374,7 @@ typedef struct tag_x_wnddef
    int col;
    int row;
    int cursorType;
-
+   
    /* last cursor position and shape */
    int lastCursorCol;
    int lastCursorRow;
@@ -428,6 +428,9 @@ static PXWND_DEF s_wnd = NULL;
 
 static BOOL s_forceRefresh;
 static BOOL s_cursorState = TRUE;
+static int s_cursorColor1 = 0x08;
+static int s_cursorColor2 = 0x70;
+static int s_cursorBlinkRate = 100;
 
 static int s_updateMode = XVT_SYNC_UPDATE;
 //static int s_updateMode = XVT_ASYNC_UPDATE;
@@ -454,17 +457,10 @@ static int s_errorHandler( Display *dpy, XErrorEvent *e )
 
 static void hb_xvt_sigHandler( int iSig )
 {
-   static int count = 0;
-
    HB_SYMBOL_UNUSED( iSig );
 
    if ( s_updateMode == XVT_ASYNC_UPDATE && s_wnd && s_wnd->fInit )
    {
-      if ( ++count == 10 )
-      {
-         s_cursorState = !s_cursorState;
-         count = 0;
-      }
       hb_xvt_gtProcessMessages( s_wnd );
    }
 }
@@ -2579,11 +2575,11 @@ static void hb_xvt_gtUpdateCursor( PXWND_DEF wnd )
          BYTE color;
          int index;
 
-         /* dispaly new cursor */
+         /* display new cursor */
          index = wnd->col +  wnd->row * wnd->cols;
          color = wnd->pColors[ index ];
-         wnd->pColors[ index ] = (color & 0x70) != 0x70 ?
-                                 0x70 | (color ^ 0x0f) : (color & 0x0f) | 0x08;
+         wnd->pColors[ index ] = (color & s_cursorColor2) != s_cursorColor2 ?
+                                 s_cursorColor2 | (color ^ 0x0f) : (color & 0x0f) | s_cursorColor1;
          hb_xvt_gtRepaintChar( wnd, wnd->col, wnd->row, wnd->col, wnd->row );
          wnd->pColors[ index ] = color;
       }
@@ -2663,6 +2659,13 @@ static void hb_xvt_gtUpdateSize( PXWND_DEF wnd )
 static void hb_xvt_gtProcessMessages( PXWND_DEF wnd )
 {
    XEvent evt;
+   static int count = 0;
+
+   if ( ++count == s_cursorBlinkRate )
+      {
+         s_cursorState = !s_cursorState;
+         count = 0;
+      }
 
    while ( XCheckMaskEvent( wnd->dpy, XVT_STD_MASK, &evt) )
    {
@@ -2836,7 +2839,7 @@ static PXWND_DEF hb_xvt_gtCreateWndDef( void )
    wnd->fWinResize = FALSE;
    wnd->hostCDP = hb_cdp_page;
    wnd->cursorType = SC_NORMAL;
-
+   
    /* Window Title */
    pFileName = hb_fsFNameSplit( hb_cmdargARGV()[0] );
    wnd->szTitle = hb_strdup( pFileName->szName );
@@ -4139,6 +4142,15 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
 
       case GTI_VIEWMAXHEIGHT:
          iRet = _GetScreenHeight();
+         break;
+      case GTI_XCURSORCOLOR1:
+         s_cursorColor1 = iParam;
+         break;
+      case GTI_XCURSORCOLOR2:
+         s_cursorColor2 = iParam;
+         break;
+      case GTI_XCURSORBLINKRATE:
+         s_cursorBlinkRate = iParam;
          break;
 
    }

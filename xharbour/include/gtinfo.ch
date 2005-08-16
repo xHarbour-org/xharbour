@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.12 2004/10/28 14:00:39 paultucker Exp $
+ * $Id: gtinfo.ch,v 1.13 2005/02/13 17:42:03 paultucker Exp $
  */
 
 /*
@@ -93,6 +93,10 @@
 
 #define GTI_VIEWPORTHEIGHT 36  /* Current viewport height:for current mode */
 #define GTI_VIEWPORTWIDTH  37  /* Current viewport width:either win or full scrn */
+
+#define GTI_XCURSORCOLOR1  38  
+#define GTI_XCURSORCOLOR2  39  
+#define GTI_XCURSORBLINKRATE 40
 
 /* these are used _by_ MaxRow/Col */
 #define GTI_WINDOW         0  /* Maximum window size ('window' in CT terms) */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4263 2005/08/15 02:17:26 peterrees Exp $
+ * $Id: ChangeLog,v 1.4264 2005/08/16 18:07:04 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-08-16 21:35 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * xharbour/include/gtinfo.ch
+    * added GTI_XCURSORCOLOR1, GTI_XCURSORCOLOR2, GTI_XCURSORBLINKRATE 
+	 * Under gtxwc cursor is a "colored" character, these settings help to
+	 * make it more visible.
+  * xharbour/source/rtl/gtxwc.c
+    * moved cursor blinking code to hb_xvt_gtProcessMessages
+	 * added logic to control cursor color and blink rate
+	 
 2005-08-16 14:50 UTC-0300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/vm/classes.c
     ! Fix bug in __CLSNEW.
