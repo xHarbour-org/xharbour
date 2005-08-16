@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.149 2005/08/08 00:46:32 druzus Exp $
+ * $Id: classes.c,v 1.150 2005/08/13 15:00:36 walito Exp $
  */
 
 /*
@@ -2068,7 +2068,6 @@ HB_FUNC( __CLSNEW )
          for( ; --j; pNewMethod++, pSprMethod++ )
          {
             uiAt = hb_clsFindMethod( pSprMethod->pMessage, pNewCls, &iPos );
-            pNewCls->uiMethods++;
 
             if( uiAt )
             {
@@ -2077,6 +2076,7 @@ HB_FUNC( __CLSNEW )
             }
             else
             {
+               pNewCls->uiMethods++;
                pNewMethod = pNewCls->pMethods + (USHORT) ulSize;
                hb_xmemcpy( pNewMethod, pSprMethod, sizeof( METHOD ) );
                ++ulSize;
