@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4264 2005/08/16 18:07:04 walito Exp $
+ * $Id: ChangeLog,v 1.4265 2005/08/16 19:35:14 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-36 17:20 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * source/rtl/hblog.prg
+    ! Fixed problem in which oldest log file wasn't being erased when maximum
+      number of backup files was reached.  Posting on behalf of Brian Hays.
 
 2005-08-16 21:35 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/include/gtinfo.ch

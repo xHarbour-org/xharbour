@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.19 2004/06/08 15:40:11 jonnymind Exp $
+* $Id: hblog.prg,v 1.20 2005/02/08 18:35:32 ronpinkas Exp $
 */
 
 /*
@@ -562,6 +562,9 @@ METHOD Send( nStyle, cMessage, cProgName, nPrio ) CLASS HB_LogFile
          FClose( ::nFileHandle )
 
          IF ::nBackup > 1
+            IF File( ::cFileName +"." + Padl( ::nBackup-1, 3,"0" ) )
+               FErase( ::cFileName +"." + Padl( ::nBackup-1, 3,"0" ) )
+            ENDIF
             FOR nCount := ::nBackup -1 TO 1 STEP -1
                FRename( ::cFileName +"." + Padl( nCount-1, 3,"0" ), ::cFileName + "." + Padl( nCount, 3,"0" ) )
             NEXT
