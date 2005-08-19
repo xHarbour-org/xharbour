@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4265 2005/08/16 19:35:14 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.4266 2005/08/17 00:22:08 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-08-19 11:13 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/pp/ppcore.c
+    * Fixed case of wrong transformation of '[' ']' to '"' '"' when cLastChar is '.' in getExpReal()
+
 2005-08-36 17:20 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * source/rtl/hblog.prg
     ! Fixed problem in which oldest log file wasn't being erased when maximum
@@ -15,13 +19,13 @@
 
 2005-08-16 21:35 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/include/gtinfo.ch
-    * added GTI_XCURSORCOLOR1, GTI_XCURSORCOLOR2, GTI_XCURSORBLINKRATE 
+    * added GTI_XCURSORCOLOR1, GTI_XCURSORCOLOR2, GTI_XCURSORBLINKRATE
 	 * Under gtxwc cursor is a "colored" character, these settings help to
 	 * make it more visible.
   * xharbour/source/rtl/gtxwc.c
     * moved cursor blinking code to hb_xvt_gtProcessMessages
 	 * added logic to control cursor color and blink rate
-	 
+
 2005-08-16 14:50 UTC-0300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/vm/classes.c
     ! Fix bug in __CLSNEW.

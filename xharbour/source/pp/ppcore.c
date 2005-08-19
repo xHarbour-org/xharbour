@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.213 2005/05/29 06:05:29 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.214 2005/05/29 14:34:27 ronpinkas Exp $
  */
 
 /*
@@ -4063,7 +4063,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
             State = ( StBr1 == 0 && StBr2 == 0 && StBr3 == 0 )? STATE_ID_END: STATE_BRACKET;
             continue;
          }
-         else if( **ptri == '[' /* ( see below 5-2-2001 && ( State == STATE_EXPRES || ( strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) )*/ )
+         else if( **ptri == '[' && cLastChar != '.' /* ( see below 5-2-2001 && ( State == STATE_EXPRES || ( strchr( ")]}.\"'", cLastChar ) == NULL && ! ISNAME( cLastChar ) ) )*/ )
          {
             char *pString;
 
