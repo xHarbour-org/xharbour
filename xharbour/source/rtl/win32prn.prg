@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.9 2005/03/17 07:02:48 ronpinkas Exp $
+ * $Id: win32prn.prg,v 1.10 2005/08/15 02:17:26 peterrees Exp $
  */
 
 /*
@@ -476,7 +476,7 @@ METHOD GetCharHeight() CLASS WIN32PRN
 METHOD GetTextWidth(cString) CLASS WIN32PRN
   LOCAL nWidth:= 0
   IF ::FontWidth[2] < 0 .AND. !EMPTY(::FontWidth[1])
-    nWidth:= LEN(cString) + MulDiv(::FontWidth[1], ::PixelsPerInchX,::FontWidth[2])
+    nWidth:= LEN(cString) * ::CharWidth
   ELSE
     nWidth:= GetTextSize(::hPrinterDC, cString, LEN(cString))  // Return Width in device units
   ENDIF
