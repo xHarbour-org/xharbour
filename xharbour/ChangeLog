@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4267 2005/08/19 18:13:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4269 2005/08/22 00:03:00 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-21 23:59 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    + created method DefColorToDisp( oCol:DefColor ) do return default array
+      of indexes if any index is out of scope. Clipper compatibility.
+    * changed method named DrawARow() to DrawRow() and method named AColInfo()
+      to ColInfoArray() for better knowledge. This last was confused with
+      ::aColsInfo data.
+    * changed defines named o_??? for better management.
+      All these changes are made after bug detected when I run tbdemo.prg
+      located in clipper\source. The previous version of tbrowse generate
+      a run time error if colorblock is called in column that data type is
+      not character. The other bug is related to defcolor of columns when
+      number of records is smaller than rows. 
+
 2005-08-22 09:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/win32prn.prg
     ! METHOD GetTextWidth(cString), fix width calculation
