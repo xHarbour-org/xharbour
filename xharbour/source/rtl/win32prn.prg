@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.11 2005/08/21 21:35:43 peterrees Exp $
+ * $Id: win32prn.prg,v 1.12 2005/08/23 04:02:51 peterrees Exp $
  */
 
 /*
@@ -79,6 +79,7 @@
 #else
 
 #include "hbclass.ch"
+#include "common.ch"
 
 // Cut from wingdi.h
 
@@ -110,6 +111,8 @@
 #define SCALINGFACTORX  114 // Scaling factor x
 #define SCALINGFACTORY  115 // Scaling factor y
 
+#define MM_TO_INCH 25.4
+
 CLASS WIN32PRN
 
   METHOD New(cPrinter)
@@ -131,7 +134,6 @@ CLASS WIN32PRN
                                                                 //   IF nWidth (or nDiv) is < 0 then Fixed font is emulated
 
   METHOD SetDefaultFont()
-  METHOD CreateFontAPI( cFont, nPointSize, nWide, nDiv, nBold, nUnder, nItalic, nCharSet )
 
   METHOD GetFonts()                                   // Returns array of { "FontName", lFixed, lTrueType, nCharSetRequired }
   METHOD Bold(nBoldWeight)
@@ -143,12 +145,10 @@ CLASS WIN32PRN
   METHOD SetPos(nX, nY)                               // **WARNING** : (Col,Row) _NOT_ (Row,Col)
   METHOD SetColor(nClrText, nClrPane, nAlign) INLINE (;
          ::TextColor:=nClrText, ::BkColor:=nClrPane, ::TextAlign:=nAlign,;
-         ::SetColorAPI( nClrText, nClrPane, nAlign) )
-  METHOD SetColorAPI(nClrText, nClrPane, nAlign)
+         SetColor( ::hPrinterDC, nClrText, nClrPane, nAlign) )
 
   METHOD TextOut(cString, lNewLine, lUpdatePosX)
   METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX) // **WARNING** : (Col,Row) _NOT_ (Row,Col)
-  METHOD TextOutAPI( nPosX, nPosY, cString, nLen, nCharWidth )
 
 
   METHOD SetPen(nStyle, nWidth, nColor) INLINE (;
@@ -171,6 +171,18 @@ CLASS WIN32PRN
   METHOD PCol()
   METHOD MaxRow()                  // Based on ::LineHeight & Form dimensions
   METHOD MaxCol()                  // Based on ::CharWidth & Form dimensions
+
+  METHOD MM_TO_POSX( nMm )      // Convert position on page from MM to pixel location Column
+  METHOD MM_TO_POSY( nMm )      //   "       "      "    "    "   "  "   "      "     Row
+  METHOD INCH_TO_POSX( nInch )  // Convert position on page from INCH to pixel location Column
+  METHOD INCH_TO_POSY( nInch )  //   "       "      "    "    "   "    "   "       "    Row
+
+  METHOD TextAtFont( nPosX, nPosY, cString, cFont, nPointSize,;     // Print text string at location
+                     nWidth, nBold, lUnderLine, lItalic, lNewLine,; // in specified font and color.
+                     lUpdatePosX, nColor )                          // Restore original font and colour
+                                                                    // after printing.
+  METHOD SetBkMode( nMode )  INLINE SetBkMode( ::hPrinterDc, nMode ) // OPAQUE= 2 or TRANSPARENT= 1
+                                                                     // Set Background mode
 
   VAR PrinterName    INIT ""
   VAR Printing       INIT .F.
@@ -360,16 +372,13 @@ METHOD SetFont(cFontName, nPointSize, nWidth, nBold, lUnderline, lItalic, nCharS
   IF nCharSet != NIL
     ::fCharSet := nCharSet
   ENDIF
-  IF (::SetFontOk:= ::CreateFontAPI( ::FontName, ::FontPointSize, ::FontWidth[1], ::FontWidth[2], ::fBold, ::fUnderLine, ::fItalic, ::fCharSet))
+  IF (::SetFontOk:= CreateFont( ::hPrinterDC, ::FontName, ::FontPointSize, ::FontWidth[1], ::FontWidth[2], ::fBold, ::fUnderLine, ::fItalic, ::fCharSet))
     ::fCharWidth        := ::GetCharWidth()
     ::CharWidth:= ABS(::fCharWidth)
     ::CharHeight:= ::GetCharHeight()
   ENDIF
   ::FontName:= GetPrinterFontName(::hPrinterDC)  // Get the font name that Windows actually used
   RETURN(::SetFontOk)
-
-METHOD CreateFontAPI( cFont, nPointSize, nWide, nDiv, nBold, nUnder, nItalic, nCharSet ) CLASS WIN32PRN
-  RETURN( CreateFont(::hPrinterDC, cFont, nPointSize, nWide, nDiv, nBold, nUnder, nItalic, nCharSet))
 
 METHOD SetDefaultFont()
   RETURN(::SetFont("Courier New",12,{1, 10}, 0, .F., .F., 0))
@@ -458,9 +467,6 @@ METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX) CLASS WIN32PRN
   ::TextOut(cString, lNewLine, lUpdatePosX)
   RETURN(.T.)
 
-METHOD TextOutAPI( nPosX, nPosY, cString, nLen, nCharWidth ) CLASS WIN32PRN
-  RETURN( TextOut(::hPrinterDC, nPosX, nPosY, cString, nLen, nCharWidth) )
-
 METHOD GetCharWidth() CLASS WIN32PRN
   LOCAL nWidth:= 0
   IF ::FontWidth[2] < 0 .AND. !EMPTY(::FontWidth[1])
@@ -510,8 +516,42 @@ METHOD MaxRow() CLASS WIN32PRN
 METHOD MaxCol() CLASS WIN32PRN
   RETURN(INT(((::RightMargin-::LeftMargin)+1 ) / ::CharWidth) - 1)
 
-METHOD SetColorAPI(nClrText, nClrPane, nAlign) CLASS WIN32PRN
-  RETURN( SetColor( ::hPrinterDC, nClrText, nClrPane, nAlign) )
+METHOD MM_TO_POSX( nMm ) CLASS WIN32PRN
+  RETURN( INT( ( ( nMM * ::PixelsPerInchX ) / MM_TO_INCH ) - ::LeftMargin ) )
+
+METHOD MM_TO_POSY( nMm ) CLASS WIN32PRN
+  RETURN( INT( ( ( nMM * ::PixelsPerInchY ) / MM_TO_INCH ) - ::TopMargin ) )
+
+METHOD INCH_TO_POSX( nInch ) CLASS WIN32PRN
+  RETURN( INT( ( nInch * ::PixelsPerInchX  ) - ::LeftMargin ) )
+
+METHOD INCH_TO_POSY( nInch ) CLASS WIN32PRN
+  RETURN( INT( ( nInch * ::PixelsPerInchY ) - ::TopMargin ) )
+
+METHOD TextAtFont( nPosX, nPosY, cString, cFont, nPointSize, nWidth, nBold, lUnderLine, lItalic, nCharSet, lNewLine, lUpdatePosX, nColor ) CLASS WIN32PRN
+  LOCAL lCreated:= .F., nDiv:= 0, cType
+  DEFAULT nPointSize TO ::FontPointSize
+  IF cFont != NIL
+      cType:= VALTYPE(nWidth)
+      IF cType='A'
+        nDiv  := nWidth[ 1 ]
+        nWidth:= nWidth[ 2 ]
+      ELSEIF cType='N' .AND. !EMPTY(nWidth)
+        nDiv:= 1
+      ENDIF
+      lCreated:= CreateFont( ::hPrinterDC, cFont, nPointSize, nDiv, nWidth, nBold, lUnderLine, lItalic, nCharSet )
+  ENDIF
+  IF nColor != NIL
+    nColor:= SetColor( ::hPrinterDC, nColor )
+  ENDIF
+  ::TextOutAt( nPosX, nPosY, cString, lNewLine, lUpdatePosX)
+  IF lCreated
+    ::SetFont()  // Reset font
+  ENDIF
+  IF nColor != NIL
+    SetColor( ::hPrinterDC, nColor )  // Reset Color
+  ENDIF
+  RETURN( .T. )
 
 // Bitmap class
 
@@ -1069,6 +1109,11 @@ HB_FUNC_STATIC( ELLIPSE )
    int y2 = hb_parni( 5 );
 
    hb_retl( Ellipse( hDC, x1, y1, x2, y2) );
+}
+
+HB_FUNC_STATIC( SETBKMODE )
+{
+  hb_retnl( SetBkMode( (HDC) hb_parnl( 1 ), hb_parnl( 2 ) ) ) ;
 }
 
 #pragma ENDDUMP
