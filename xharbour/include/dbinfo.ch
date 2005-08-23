@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.16 2005/08/01 22:17:34 druzus Exp $
+ * $Id: dbinfo.ch,v 1.17 2005/08/06 19:39:44 druzus Exp $
  */
 
 /*
@@ -168,12 +168,13 @@
 #define DBOI_SCOPEEVAL           106  /* skip through index evaluating given C function */
 #define DBOI_FINDREC             107  /* find given record in a Tag beginning from TOP */
 #define DBOI_FINDRECCONT         108  /* find given record in a Tag beginning from current position */
-#define DBOI_EVALSTEP            109  /* eval step (EVERY) used in index command */
-#define DBOI_SCOPESET            110  /* set both scopes */
-#define DBOI_SCOPECLEAR          111  /* clear both scopes */
+#define DBOI_SCOPESET            109  /* set both scopes */
+#define DBOI_SCOPECLEAR          110  /* clear both scopes */
 
-#define DBOI_BAGCOUNT            112  /* number of open order bags */
-#define DBOI_BAGNUMBER           113  /* bag position in bag list */
+#define DBOI_BAGCOUNT            111  /* number of open order bags */
+#define DBOI_BAGNUMBER           112  /* bag position in bag list */
+#define DBOI_BAGORDER            113  /* number of first order in a bag */
+
 #define DBOI_ISMULTITAG          114  /* does RDD support multi tag in index file */
 #define DBOI_ISSORTRECNO         115  /* is record number part of key in sorting */
 #define DBOI_LARGEFILE           116  /* is large file size (>=4GB) supported */
@@ -186,6 +187,11 @@
 #define DBOI_READLOCK            123  /* get/set index read lock */
 #define DBOI_WRITELOCK           124  /* get/set index write lock */
 #define DBOI_UPDATECOUNTER       125  /* get/set update index counter */
+
+#define DBOI_EVALSTEP            126  /* eval step (EVERY) used in index command */
+#define DBOI_ISREINDEX           127  /* Is reindex in process */
+#define DBOI_I_BAGNAME           128  /* created index name */
+#define DBOI_I_TAGNAME           129  /* created tag name */
 
 /* Return values for DBOI_OPTLEVEL */
 #define DBOI_OPTIMIZED_NONE       0

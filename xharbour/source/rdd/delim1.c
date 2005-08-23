@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.9 2005/02/28 10:17:31 andijahja Exp $
+ * $Id: delim1.c,v 1.10 2005/08/01 22:19:47 druzus Exp $
  */
 
 /*
@@ -116,6 +116,7 @@ static RDDFUNCS delimTable = { hb_delimBof,
                                hb_delimRecCount,
                                hb_delimRecInfo,
                                hb_delimRecNo,
+                               hb_delimRecId,
                                hb_delimSetFieldExtent,
                                hb_delimAlias,
                                hb_delimClose,
@@ -162,6 +163,7 @@ static RDDFUNCS delimTable = { hb_delimBof,
                                hb_delimSetLocate,
                                hb_delimSetScope,
                                hb_delimSkipScope,
+                               hb_delimLocate,
                                hb_delimCompile,
                                hb_delimError,
                                hb_delimEvalBlock,

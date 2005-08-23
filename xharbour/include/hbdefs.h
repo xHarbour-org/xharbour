@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.73 2005/04/19 18:49:56 druzus Exp $
+ * $Id: hbdefs.h,v 1.74 2005/06/22 15:29:54 druzus Exp $
  */
 
 /*
@@ -872,7 +872,8 @@ typedef long HB_PTRDIFF;
 
    #define HB_DBL2ORD( d, o )       do { \
       if ( *( double * )( d ) >= 0.0 ) { \
-      ( ( BYTE * ) ( o ) )[ 0 ] = ( ( BYTE * ) ( d ) )[ 0 ] ^ ( BYTE ) 0x80; \
+         if( *( double * )( d ) == -0.0 ) *( double * )( d ) = 0.0; \
+         ( ( BYTE * ) ( o ) )[ 0 ] = ( ( BYTE * ) ( d ) )[ 0 ] ^ ( BYTE ) 0x80; \
          ( ( BYTE * ) ( o ) )[ 1 ] = ( ( BYTE * ) ( d ) )[ 1 ]; \
          ( ( BYTE * ) ( o ) )[ 2 ] = ( ( BYTE * ) ( d ) )[ 2 ]; \
          ( ( BYTE * ) ( o ) )[ 3 ] = ( ( BYTE * ) ( d ) )[ 3 ]; \
@@ -935,7 +936,8 @@ typedef long HB_PTRDIFF;
 
    #define HB_DBL2ORD( d, o )       do { \
       if ( *( double * )( d ) >= 0.0 ) { \
-      ( ( BYTE * ) ( o ) )[ 0 ] = ( ( BYTE * ) ( d ) )[ 7 ] ^ ( BYTE ) 0x80; \
+         if( *( double * )( d ) == -0.0 ) *( double * )( d ) = 0.0; \
+         ( ( BYTE * ) ( o ) )[ 0 ] = ( ( BYTE * ) ( d ) )[ 7 ] ^ ( BYTE ) 0x80; \
          ( ( BYTE * ) ( o ) )[ 1 ] = ( ( BYTE * ) ( d ) )[ 6 ]; \
          ( ( BYTE * ) ( o ) )[ 2 ] = ( ( BYTE * ) ( d ) )[ 5 ]; \
          ( ( BYTE * ) ( o ) )[ 3 ] = ( ( BYTE * ) ( d ) )[ 4 ]; \

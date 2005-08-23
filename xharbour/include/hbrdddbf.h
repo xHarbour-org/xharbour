@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.19 2005/03/31 03:15:18 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.20 2005/08/01 22:17:34 druzus Exp $
  */
 
 /*
@@ -232,7 +232,8 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
 static ERRCODE hb_dbfRecall( DBFAREAP pArea );
 static ERRCODE hb_dbfRecCount( DBFAREAP pArea, ULONG * pRecCount );
 static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType, PHB_ITEM pInfo );
-static ERRCODE hb_dbfRecNo( DBFAREAP pArea, PHB_ITEM pRecNo );
+static ERRCODE hb_dbfRecNo( DBFAREAP pArea, ULONG * pRecNo );
+static ERRCODE hb_dbfRecId( DBFAREAP pArea, PHB_ITEM pRecNo );
 static ERRCODE hb_dbfSetFieldExtent( DBFAREAP pArea, USHORT uiFieldExtent );
 #define hb_dbfAlias                                NULL
 static ERRCODE hb_dbfClose( DBFAREAP pArea );
@@ -279,12 +280,13 @@ static ERRCODE hb_dbfSetFilter( DBFAREAP pArea, LPDBFILTERINFO pFilterInfo );
 #define hb_dbfSetLocate                            NULL
 #define hb_dbfSetScope                             NULL
 #define hb_dbfSkipScope                            NULL
+#define hb_dbfLocate                               NULL
 #define hb_dbfCompile                              NULL
 #define hb_dbfError                                NULL
 #define hb_dbfEvalBlock                            NULL
 static ERRCODE hb_dbfRawLock( DBFAREAP pArea, USHORT uiAction, ULONG lRecNo );
 static ERRCODE hb_dbfLock( DBFAREAP pArea, LPDBLOCKINFO pLockInfo );
-static ERRCODE hb_dbfUnLock( DBFAREAP pArea, ULONG ulRecNo );
+static ERRCODE hb_dbfUnLock( DBFAREAP pArea, PHB_ITEM pRecNo );
 #define hb_dbfCloseMemFile                         NULL
 static ERRCODE hb_dbfCreateMemFile( DBFAREAP pArea, LPDBOPENINFO pCreateInfo );
 #define hb_dbfGetValueFile                         NULL

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.123 2005/08/08 00:46:31 druzus Exp $
+ * $Id: dbfntx1.c,v 1.124 2005/08/12 02:44:26 druzus Exp $
  */
 
 /*
@@ -3338,8 +3338,8 @@ static void hb_ntxCreateFName( NTXAREAP pArea, char * szBagName, BOOL * fProd,
                                char * szFileName, char * szTagName )
 {
    PHB_FNAME pFileName;
+   PHB_ITEM pExt = NULL;
    BOOL fName = szBagName && *szBagName;
-   char * szExt = NULL;
 
    pFileName = hb_fsFNameSplit( fName ? szBagName : pArea->szDataFileName );
 
@@ -3352,19 +3352,18 @@ static void hb_ntxCreateFName( NTXAREAP pArea, char * szBagName, BOOL * fProd,
    {
       DBORDERINFO pExtInfo;
       memset( &pExtInfo, 0, sizeof( pExtInfo ) );
-      pExtInfo.itmResult = hb_itemPutC( NULL, "" );
+      pExt = pExtInfo.itmResult = hb_itemPutC( NULL, "" );
       if( SELF_ORDINFO( ( AREAP ) pArea, DBOI_BAGEXT, &pExtInfo ) == SUCCESS &&
           hb_itemGetCLen( pExtInfo.itmResult ) > 0 )
       {
-         pFileName->szExtension = szExt = hb_strdup( hb_itemGetCPtr( pExtInfo.itmResult ) );
+         pFileName->szExtension = hb_itemGetCPtr( pExtInfo.itmResult );
       }
-      hb_itemRelease( pExtInfo.itmResult );
    }
 
    hb_fsFNameMerge( szFileName, pFileName );
 
-   if( szExt )
-      hb_xfree( szExt );
+   if( pExt )
+      hb_itemRelease( pExt );
    if( fProd )
    {
       if( !fName )
@@ -3436,8 +3435,33 @@ static LPTAGINFO hb_ntxFindTag( NTXAREAP pArea, PHB_ITEM pTagItem,
       return pArea->lpCurTag;
 
    fBag = hb_itemGetCLen( pBagItem ) > 0;
-   pIndex = fBag ? hb_ntxFindBag( pArea, hb_itemGetCPtr( pBagItem ) ) :
-                   pArea->lpIndexes;
+   if( fBag )
+   {
+      if( hb_itemType( pTagItem ) & HB_IT_STRING )
+         pIndex = hb_ntxFindBag( pArea, hb_itemGetCPtr( pBagItem ) );
+      else
+         pIndex = pArea->lpIndexes;
+   }
+   else
+   {
+      int iBag = hb_itemGetNI( pBagItem );
+
+      pIndex = pArea->lpIndexes;
+      if( iBag > 0 )
+      {
+         fBag = TRUE;
+         while( pIndex )
+         {
+            if( --iBag == 0 )
+               break;
+            pIndex = pIndex->pNext;
+         }
+      }
+      else if( iBag < 0 )
+      {
+         pIndex = NULL;
+      }
+   }
    if( pIndex )
    {
       if( hb_itemType( pTagItem ) & HB_IT_STRING )
@@ -3463,6 +3487,7 @@ static LPTAGINFO hb_ntxFindTag( NTXAREAP pArea, PHB_ITEM pTagItem,
       else
       {
          int i = hb_itemGetNI( pTagItem ) - 1;
+
          if( i >= 0 )
          {
             if( fBag )
@@ -3571,7 +3596,7 @@ static ULONG hb_ntxOrdKeyNo( LPTAGINFO pTag )
          }
          else
          {
-            int iLevel = pTag->stackLevel, iKey;
+            int iLevel = pTag->stackLevel, iKey, iFirst = 1;
             LPPAGEINFO pPage;
             ULONG ulPage;
 
@@ -3580,7 +3605,8 @@ static ULONG hb_ntxOrdKeyNo( LPTAGINFO pTag )
                pPage = hb_ntxPageLoad( pTag, pTag->stack[ iLevel ].page );
                if( ! pPage )
                   break;
-               ulKeyNo += iKey = pTag->stack[ iLevel ].ikey;
+               ulKeyNo += iKey = pTag->stack[ iLevel ].ikey + iFirst;
+               iFirst = 0;
                while( --iKey >= 0 )
                {
                   ulPage = hb_ntxGetKeyPage( pPage, iKey );
@@ -3589,7 +3615,6 @@ static ULONG hb_ntxOrdKeyNo( LPTAGINFO pTag )
                }
                hb_ntxPageRelease( pTag, pPage );
             }
-            ulKeyNo++;
          }
       }
       hb_ntxTagUnLockRead( pTag );
@@ -4533,34 +4558,43 @@ static LPNTXSORTINFO hb_ntxSortNew( LPTAGINFO pTag, ULONG ulRecCount )
    return pSort;
 }
 
-static void hb_ntxSortFree( LPNTXSORTINFO pSort )
+static void hb_ntxSortFree( LPNTXSORTINFO pSort, BOOL fFull )
 {
    if( pSort->hTempFile != FS_ERROR )
    {
       hb_fsClose( pSort->hTempFile );
+      pSort->hTempFile = FS_ERROR;
    }
    if( pSort->szTempFileName )
    {
       hb_fsDelete( ( BYTE * )  pSort->szTempFileName );
       hb_xfree( pSort->szTempFileName );
+      pSort->szTempFileName = NULL;
    }
    if( pSort->pKeyPool )
    {
       hb_xfree( pSort->pKeyPool );
+      pSort->pKeyPool = NULL;
    }
    if( pSort->pSwapPage )
    {
       hb_xfree( pSort->pSwapPage );
+      pSort->pSwapPage = NULL;
    }
    if( pSort->pBuffIO )
    {
       hb_xfree( pSort->pBuffIO );
+      pSort->pBuffIO = NULL;
    }
    if( pSort->pSortedPages )
    {
       hb_xfree( pSort->pSortedPages );
+      pSort->pSortedPages = NULL;
    }
-   hb_xfree( pSort );
+   if( fFull )
+   {
+      hb_xfree( pSort );
+   }
 }
 
 static void hb_ntxSortOut( LPNTXSORTINFO pSort )
@@ -4679,7 +4713,7 @@ static void hb_ntxSortOut( LPNTXSORTINFO pSort )
    while( fNext );
 
    hb_ntxSortBufferFlush( pSort );
-   hb_ntxSortFree( pSort );
+   hb_ntxSortFree( pSort, FALSE );
 
    if( fBalance )
    {
@@ -4723,17 +4757,14 @@ static void hb_ntxSortOut( LPNTXSORTINFO pSort )
 /*
  * create tag in index file
  */
-static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag )
+static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag, BOOL fReindex )
 {
    LPNTXAREA pArea = pTag->Owner->Owner;
    PHB_ITEM pForItem, pWhileItem = NULL, pEvalItem = NULL, pItem = NULL;
    ULONG ulRecCount, ulRecNo = pArea->ulRecNo;
+   LPNTXSORTINFO pSort;
    LONG lStep = 0;
-   ERRCODE errCode;
-
-   errCode = SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount );
-   if( errCode != SUCCESS )
-      return errCode;
+   ERRCODE errCode = SUCCESS;
 
    if( pArea->lpdbOrdCondInfo )
    {
@@ -4741,17 +4772,36 @@ static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag )
       lStep = pArea->lpdbOrdCondInfo->lStep;
       pEvalItem = pArea->lpdbOrdCondInfo->itmCobEval;
    }
-   if( pTag->Custom || ulRecCount == 0 )
+
+   if( pTag->Custom )
    {
-      LPPAGEINFO pPage = hb_ntxPageNew( pTag, FALSE );
-      if( !pPage )
-         return FAILURE;
-      pTag->RootBlock = pPage->Page;
-      hb_ntxPageRelease( pTag, pPage );
+      ulRecCount = 0;
    }
    else
    {
-      LPNTXSORTINFO pSort;
+      errCode = SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount );
+      if( errCode != SUCCESS )
+         return errCode;
+   }
+   pArea->pSort = pSort = hb_ntxSortNew( pTag, ulRecCount );
+   pSort->fReindex = fReindex;
+
+   if( ulRecCount == 0 )
+   {
+      LPPAGEINFO pPage = hb_ntxPageNew( pTag, FALSE );
+
+      if( pPage )
+      {
+         pTag->RootBlock = pPage->Page;
+         hb_ntxPageRelease( pTag, pPage );
+      }
+      else
+      {
+         errCode = FAILURE;
+      }
+   }
+   else
+   {
       LPTAGINFO pSaveTag = pArea->lpCurTag;
       ULONG ulStartRec = 0, ulNextCount = 0;
       BOOL fDirectRead, fUseFilter = FALSE;
@@ -4764,7 +4814,6 @@ static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag )
       hb_cdp_page = pArea->cdPage;
 #endif
 
-      pArea->pSort = pSort = hb_ntxSortNew( pTag, ulRecCount );
       pForItem = pTag->pForItem;
       if( pTag->nField )
          pItem = hb_itemNew( NULL );
@@ -4954,9 +5003,7 @@ static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag )
 
       if( errCode == SUCCESS )
          hb_ntxSortOut( pSort );
-      else
-         hb_ntxSortFree( pSort );
-      pArea->pSort = NULL;
+
       if( pTag->nField )
          hb_itemRelease( pItem );
 
@@ -4965,6 +5012,10 @@ static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag )
       hb_cdp_page = cdpTmp;
 #endif
    }
+
+   hb_ntxSortFree( pSort, TRUE );
+   pArea->pSort = NULL;
+
    return errCode;
 }
 
@@ -4986,7 +5037,7 @@ static ERRCODE hb_ntxReIndex( LPNTXINDEX pIndex )
          LPTAGINFO pTag = pIndex->lpTags[ i ];
          pTag->HeadBlock = pTag->RootBlock = pTag->keyCount = 0;
          pTag->HdrChanged = TRUE;
-         errCode = hb_ntxTagCreate( pTag );
+         errCode = hb_ntxTagCreate( pTag, TRUE );
          if( errCode != SUCCESS )
             break;
       }
@@ -5451,7 +5502,7 @@ static ERRCODE ntxClose( NTXAREAP pArea )
    {
       if( pArea->pSort )
       {
-         hb_ntxSortFree( pArea->pSort );
+         hb_ntxSortFree( pArea->pSort, TRUE );
          pArea->pSort = NULL;
       }
 
@@ -5495,12 +5546,10 @@ static ERRCODE ntxOpen( NTXAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    HB_TRACE(HB_TR_DEBUG, ("ntxOpen(%p, %p)", pArea, pOpenInfo));
 
-   if( SUPER_OPEN( ( AREAP ) pArea, pOpenInfo ) == FAILURE )
-   {
-      return FAILURE;
-   }
+   errCode = SUPER_OPEN( ( AREAP ) pArea, pOpenInfo );
 
-   if( s_fStruct && ( s_fStrictStruct ? pArea->fHasTags : hb_set.HB_SET_AUTOPEN ) )
+   if( errCode == SUCCESS && s_fStruct &&
+       ( s_fStrictStruct ? pArea->fHasTags : hb_set.HB_SET_AUTOPEN ) )
    {
       char szFileName[ _POSIX_PATH_MAX + 1 ];
 
@@ -5928,7 +5977,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       if( errCode == SUCCESS )
       {
          pIndex->Update = pIndex->Changed = pTag->HdrChanged = TRUE;
-         errCode = hb_ntxTagCreate( pTag );
+         errCode = hb_ntxTagCreate( pTag, FALSE );
       }
       hb_ntxIndexUnLockWrite( pIndex );
    }
@@ -6055,6 +6104,18 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
          hb_itemPutNL( pInfo->itmResult,
                        pArea->pSort ? pArea->pSort->ulTotKeys : 0 );
          return SUCCESS;
+      case DBOI_I_TAGNAME:
+         hb_itemPutC( pInfo->itmResult,
+                      pArea->pSort ? pArea->pSort->pTag->TagName : NULL );
+         return SUCCESS;
+      case DBOI_I_BAGNAME:
+         hb_itemPutC( pInfo->itmResult, pArea->pSort ?
+                      pArea->pSort->pTag->Owner->IndexName : NULL );
+         return SUCCESS;
+      case DBOI_ISREINDEX:
+         hb_itemPutL( pInfo->itmResult,
+                      pArea->pSort ? pArea->pSort->fReindex : FALSE );
+         return SUCCESS;
       case DBOI_LOCKOFFSET:
       case DBOI_HPLOCKING:
       {
@@ -6108,15 +6169,42 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
 
          if( pIndexSeek )
          {
-            while( pIndex )
+            do
             {
                ++i;
                if( pIndex == pIndexSeek )
                   break;
                pIndex = pIndex->pNext;
             }
+            while( pIndex );
          }
-         hb_itemPutNI( pInfo->itmResult, i );
+         hb_itemPutNI( pInfo->itmResult, pIndex ? i : 0 );
+         return SUCCESS;
+      }
+      case DBOI_BAGORDER:
+      {
+         LPNTXINDEX pIndex = pArea->lpIndexes, pIndexSeek = NULL;
+         int i = 0;
+
+         if( hb_itemGetCLen( pInfo->atomBagName ) > 0 )
+            pIndexSeek = hb_ntxFindBag( pArea,
+                                        hb_itemGetCPtr( pInfo->atomBagName ) );
+         else
+            pIndexSeek = pIndex;
+
+         if( pIndexSeek )
+         {
+            ++i;
+            do
+            {
+               if( pIndex == pIndexSeek )
+                  break;
+               i += pIndex->iTags;
+               pIndex = pIndex->pNext;
+            }
+            while( pIndex );
+         }
+         hb_itemPutNI( pInfo->itmResult, pIndex ? i : 0 );
          return SUCCESS;
       }
    }
@@ -6365,6 +6453,9 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
          case DBOI_KEYSIZE:
             hb_itemPutNI( pInfo->itmResult, pTag->KeyLength );
             break;
+         case DBOI_KEYDEC:
+            hb_itemPutNI( pInfo->itmResult, pTag->KeyDec );
+            break;
          case DBOI_KEYVAL:
             if( hb_ntxCurKeyRefresh( pTag ) )
                hb_ntxKeyGetItem( pInfo->itmResult, pTag->CurKeyInfo, pTag, TRUE );
@@ -6483,7 +6574,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
                hb_itemPutL( pInfo->itmResult, SELF_GOTO( ( AREAP ) pArea,
                               hb_itemGetNL( pInfo->itmNewVal ) ) == SUCCESS );
             else
-               SELF_RECNO( ( AREAP ) pArea, pInfo->itmResult );
+               SELF_RECID( ( AREAP ) pArea, pInfo->itmResult );
             break;
          case DBOI_SKIPUNIQUE:
             hb_itemPutL( pInfo->itmResult, SELF_SKIP( ( AREAP ) pArea,
@@ -6530,6 +6621,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             hb_itemClear( pInfo->itmResult );
             break;
          case DBOI_KEYSIZE:
+         case DBOI_KEYDEC:
          case DBOI_NUMBER:
          case DBOI_ORDERCOUNT:
          case DBOI_SCOPEEVAL:
@@ -6575,8 +6667,8 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
    if( hb_itemGetCLen( pOrderInfo->atomBagName ) == 0 )
       return FAILURE;
 
-   hb_ntxCreateFName( pArea, hb_itemGetCPtr( pOrderInfo->atomBagName ), &fProd,
-                      szFileName, szTagName );
+   hb_ntxCreateFName( pArea, hb_itemGetCPtr( pOrderInfo->atomBagName ),
+                      &fProd, szFileName, szTagName );
 
    if( ! szTagName[0] )
       return FAILURE;
@@ -6597,7 +6689,7 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
                                NULL, NULL );
          if( hFile == FS_ERROR )
          {
-            fRetry = ( hb_ntxErrorRT( pArea, EG_OPEN, 1003, szFileName,
+            fRetry = ( hb_ntxErrorRT( pArea, EG_OPEN, EDBF_OPEN_INDEX, szFileName,
                      hb_fsError(), EF_CANRETRY | EF_CANDEFAULT ) == E_RETRY );
          }
       }
@@ -6875,6 +6967,7 @@ static RDDFUNCS ntxTable = { ntxBof,
                              ntxRecCount,
                              ntxRecInfo,
                              ntxRecNo,
+                             ntxRecId,
                              ntxSetFieldsExtent,
                              ntxAlias,
                              ( DBENTRYP_V ) ntxClose,
@@ -6921,6 +7014,7 @@ static RDDFUNCS ntxTable = { ntxBof,
                              ntxSetLocate,
                              ntxSetScope,
                              ntxSkipScope,
+                             ntxLocate,
                              ntxCompile,
                              ntxError,
                              ntxEvalBlock,

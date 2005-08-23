@@ -1,5 +1,5 @@
 /*
- * $Id: hsx.c,v 1.4 2005/04/25 19:22:15 druzus Exp $
+ * $Id: hsx.c,v 1.5 2005/08/01 22:21:29 druzus Exp $
  */
 
 /*
@@ -1510,12 +1510,7 @@ static int hb_hsxIndex( char * szFile, PHB_ITEM pExpr, int iKeySize, int iMode,
    errCode = SELF_RECCOUNT( pArea, &ulRecCount );
    if ( errCode != FAILURE && ulRecCount )
    {
-      PHB_ITEM pItem = hb_itemNew( NULL );
-      errCode = SELF_RECNO( pArea, pItem );
-      if ( errCode != FAILURE )
-         ulRecNo = hb_itemGetNL( pItem );
-      hb_itemRelease( pItem );
-
+      errCode = SELF_RECNO( pArea, &ulRecNo );
       if ( errCode != FAILURE )
       {
          for ( ulRec = 1; ulRec <= ulRecCount; ulRec++ )
@@ -1587,15 +1582,12 @@ static int hb_hsxFilter( int iHandle, BYTE * pSeek, ULONG ulSeek,
       }
    }
 
-   pItem = hb_itemNew( NULL );
-   errCode = SELF_RECNO( pArea, pItem );
-   if ( errCode != FAILURE )
-      ulRecNo = hb_itemGetNL( pItem );
-
+   errCode = SELF_RECNO( pArea, &ulRecNo );
    if ( errCode != FAILURE )
       iResult = hb_hsxSeekSet( iHandle, pSeek, ulSeek );
 
    fValid = TRUE;
+   pItem = hb_itemNew( NULL );
    while ( iResult == HSX_SUCCESS && errCode != FAILURE )
    {
       iResult = hb_hsxNext( iHandle, &ulRec );

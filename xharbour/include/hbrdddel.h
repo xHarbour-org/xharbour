@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddel.h,v 1.3 2003/11/30 12:32:30 druzus Exp $
+ * $Id: hbrdddel.h,v 1.4 2005/08/01 22:17:34 druzus Exp $
  */
 
 /*
@@ -93,6 +93,7 @@ HB_EXTERN_BEGIN
 #define hb_delimRecCount                             NULL
 #define hb_delimRecInfo                              NULL
 #define hb_delimRecNo                                NULL
+#define hb_delimRecId                                NULL
 #define hb_delimSetFieldExtent                       NULL
 #define hb_delimAlias                                NULL
 #define hb_delimClose                                NULL
@@ -139,6 +140,7 @@ HB_EXTERN_BEGIN
 #define hb_delimSetLocate                            NULL
 #define hb_delimSetScope                             NULL
 #define hb_delimSkipScope                            NULL
+#define hb_delimLocate                               NULL
 #define hb_delimCompile                              NULL
 #define hb_delimError                                NULL
 #define hb_delimEvalBlock                            NULL

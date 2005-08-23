@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddsdf.h,v 1.3 2003/11/30 12:32:30 druzus Exp $
+ * $Id: hbrddsdf.h,v 1.4 2005/08/01 22:17:35 druzus Exp $
  */
 
 /*
@@ -93,6 +93,7 @@ HB_EXTERN_BEGIN
 #define hb_sdfRecCount                             NULL
 #define hb_sdfRecInfo                              NULL
 #define hb_sdfRecNo                                NULL
+#define hb_sdfRecId                                NULL
 #define hb_sdfSetFieldExtent                       NULL
 #define hb_sdfAlias                                NULL
 #define hb_sdfClose                                NULL
@@ -139,6 +140,7 @@ HB_EXTERN_BEGIN
 #define hb_sdfSetLocate                            NULL
 #define hb_sdfSetScope                             NULL
 #define hb_sdfSkipScope                            NULL
+#define hb_sdfLocate                               NULL
 #define hb_sdfCompile                              NULL
 #define hb_sdfError                                NULL
 #define hb_sdfEvalBlock                            NULL

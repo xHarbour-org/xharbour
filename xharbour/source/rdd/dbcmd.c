@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.161 2005/08/04 23:54:10 druzus Exp $
+ * $Id: dbcmd.c,v 1.162 2005/08/12 02:44:26 druzus Exp $
  */
 
 /*
@@ -245,6 +245,7 @@ static RDDFUNCS waTable = { hb_waBof,
                             hb_waRecCount,
                             hb_waRecInfo,
                             hb_waRecNo,
+                            hb_waRecId,
                             hb_waSetFieldExtent,
                             hb_waAlias,
                             hb_waClose,
@@ -291,6 +292,7 @@ static RDDFUNCS waTable = { hb_waBof,
                             hb_waSetLocate,
                             hb_waSetScope,
                             hb_waSkipScope,
+                            hb_waLocate,
                             hb_waCompile,
                             hb_waError,
                             hb_waEvalBlock,
@@ -1816,10 +1818,7 @@ HB_FUNC( DBGOTOP )
 HB_FUNC( __DBLOCATE )
 {
    HB_THREAD_STUB
-   DBSCOPEINFO pScopeInfo;
-   PHB_ITEM pFor, pWhile, pNext, pRecord, pRest;
-   LONG lNext = 1;
-   BOOL fEof;
+   DBSCOPEINFO dbScopeInfo;
    AREAP pArea = HB_CURRENT_WA;
 
    if( !pArea )
@@ -1828,55 +1827,24 @@ HB_FUNC( __DBLOCATE )
       return;
    }
 
-   pArea->fFound = FALSE;
-   pFor     = hb_param( 1, HB_IT_BLOCK );
-   pWhile   = hb_param( 2, HB_IT_BLOCK );
-   pNext    = hb_param( 3, HB_IT_NUMERIC );
-   pRecord  = hb_param( 4, HB_IT_NUMERIC );
-   pRest    = hb_param( 5, HB_IT_LOGICAL );
+   dbScopeInfo.itmCobFor   = hb_param( 1, HB_IT_BLOCK );
+   dbScopeInfo.lpstrFor    = NULL;
+   dbScopeInfo.itmCobWhile = hb_param( 2, HB_IT_BLOCK );
+   dbScopeInfo.lpstrWhile  = NULL;
+   dbScopeInfo.lNext       = hb_param( 3, HB_IT_NUMERIC );
+   dbScopeInfo.itmRecID    = hb_param( 4, HB_IT_NUMERIC );
+   dbScopeInfo.fRest       = hb_param( 5, HB_IT_LOGICAL );
 
-   memset( &pScopeInfo, 0, sizeof( DBSCOPEINFO ) );
-   pScopeInfo.itmCobFor = pFor;
+   dbScopeInfo.fIgnoreFilter     = TRUE;
+   dbScopeInfo.fIncludeDeleted   = TRUE;
+   dbScopeInfo.fLast             = FALSE;
+   dbScopeInfo.fIgnoreDuplicates = FALSE;
+   dbScopeInfo.fBackword         = FALSE;
 
-   if ( SELF_SETLOCATE( pArea, &pScopeInfo ) == FAILURE )
-      return;
-
-   if( pRecord )
+   if ( SELF_SETLOCATE( pArea, &dbScopeInfo ) == SUCCESS )
    {
-      if( SELF_GOTOID( pArea, pRecord ) == FAILURE )
-         return;
+      SELF_LOCATE( pArea, FALSE );
    }
-   else if( pNext )
-   {
-      lNext = 1;
-   }
-   else if( !pWhile && !hb_itemGetL( pRest ) )
-   {
-      if( SELF_GOTOP( pArea ) == FAILURE )
-         return;
-   }
-
-   if( !pNext || lNext > 0 )
-   {
-      do
-      {
-         if( SELF_EOF( pArea, &fEof ) == FAILURE )
-            break;
-         if( fEof )
-            break;
-         if( pWhile && ! hb_itemGetL( hb_vmEvalBlock( pWhile ) ) )
-            break;
-         if( !pFor || hb_itemGetL( hb_vmEvalBlock( pFor ) ) )
-         {
-            pArea->fFound = TRUE;
-            break;
-         }
-         if( pRecord || ( pNext && --lNext < 1 ) )
-            break;
-      }
-      while( SELF_SKIP( pArea, 1 ) != FAILURE );
-   }
-   return;
 }
 
 HB_FUNC( __DBSETLOCATE )
@@ -1902,27 +1870,15 @@ HB_FUNC( __DBCONTINUE )
 {
    HB_THREAD_STUB
    AREAP pArea = HB_CURRENT_WA;
-   BOOL fEof;
 
-   if( !pArea )
+   if( pArea )
+   {
+      SELF_LOCATE( pArea, TRUE );
+   }
+   else
    {
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBCONTINUE" );
       return;
-   }
-
-   if( !pArea->dbsi.itmCobFor )
-      return;
-
-   pArea->fFound = FALSE;
-   while( !pArea->fFound )
-   {
-      if ( SELF_SKIP( pArea, 1 ) == FAILURE )
-         return;
-      if( SELF_EOF( pArea, &fEof ) == FAILURE )
-         return;
-      if( fEof )
-         return;
-      pArea->fFound = hb_itemGetL( hb_vmEvalBlock( pArea->dbsi.itmCobFor ) );
    }
 }
 
@@ -2018,7 +1974,7 @@ HB_FUNC( DBRUNLOCK )
    AREAP pArea = HB_CURRENT_WA;
 
    if( pArea )
-      SELF_UNLOCK( pArea, hb_parnl( 1 ) );
+      SELF_UNLOCK( pArea, hb_param( 1, HB_IT_ANY ) );
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBRUNLOCK" );
 }
@@ -2113,6 +2069,7 @@ HB_FUNC( DBSETFILTER )
             pFilterInfo.abFilterText = hb_itemPutC( NULL, "" );
          pFilterInfo.fFilter = TRUE;
          pFilterInfo.lpvCargo = NULL;
+         pFilterInfo.fOptimized = FALSE;
          SELF_SETFILTER( pArea, &pFilterInfo );
          if( !pText )
             hb_itemRelease( pFilterInfo.abFilterText );
@@ -2215,7 +2172,7 @@ HB_FUNC( DBUNLOCK )
    AREAP pArea = HB_CURRENT_WA;
 
    if( pArea )
-      SELF_UNLOCK( pArea, 0 );
+      SELF_UNLOCK( pArea, NULL );
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBUNLOCK" );
 }
@@ -2229,7 +2186,7 @@ HB_FUNC( DBUNLOCKALL )
    for ( uiIndex = 1; uiIndex < s_uiWaMax; ++uiIndex )
    {
       hb_rddSelectWorkAreaNumber( s_WaList[ uiIndex ]->uiArea );
-      SELF_UNLOCK( HB_CURRENT_WA, 0 );
+      SELF_UNLOCK( HB_CURRENT_WA, NULL );
    }
    UNLOCK_AREA
    hb_rddSelectWorkAreaNumber( uiArea );
@@ -2610,7 +2567,7 @@ HB_FUNC( ORDBAGNAME )
    {
       if ( ISNUM(1) || ISNIL(1) )
       {
-         if ( hb_parnl(1) == 0 || ISNIL(1) )          /* if NIL or ask for 0, use current order  */
+         if ( hb_parni(1) == 0 || ISNIL(1) )          /* if NIL or ask for 0, use current order  */
             pOrderInfo.itmOrder  = NULL;
          else
             pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
@@ -2820,7 +2777,7 @@ HB_FUNC( ORDKEY )
    {
       if ( ISNUM(1) || ISNIL(1) )
       {
-         if ( hb_parnl(1) == 0 || ISNIL(1) )          /* if NIL or ask for 0, use current order  */
+         if ( hb_parni(1) == 0 || ISNIL(1) )          /* if NIL or ask for 0, use current order  */
             pOrderInfo.itmOrder = NULL;
          else
             pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
@@ -3131,9 +3088,9 @@ HB_FUNC( ORDLISTADD )
       BOOL bFirst;
       /*  determine if there are existing orders; if not, this becomes the controlling order
       */
+      pOrderInfo.itmOrder = NULL;
       pOrderInfo.atomBagName = NULL;
       pOrderInfo.itmResult = hb_itemPutNI( NULL, 0 );
-      pOrderInfo.itmOrder = NULL;
       SELF_ORDINFO( pArea, DBOI_ORDERCOUNT, &pOrderInfo );
       bFirst = HB_IS_NUMERIC( pOrderInfo.itmResult ) &&
                hb_itemGetNI( pOrderInfo.itmResult ) == 0;
@@ -3149,9 +3106,9 @@ HB_FUNC( ORDLISTADD )
          return;
       }
 
-      if (SELF_ORDLSTADD( pArea, &pOrderInfo ) == SUCCESS )
+      if( SELF_ORDLSTADD( pArea, &pOrderInfo ) == SUCCESS )
       {
-         if ( bFirst )        /* set as controlling order and go top */
+         if( bFirst )        /* set as controlling order and go top */
          {
             pOrderInfo.itmOrder = hb_itemPutNI( NULL, 1 );
             SELF_ORDLSTFOCUS( pArea, &pOrderInfo );
@@ -3198,7 +3155,7 @@ HB_FUNC( ORDNAME )
    {
       if ( ISNUM(1) || ISNIL(1) )
       {
-         if ( hb_parnl(1) == 0 || ISNIL(1) )          /* if NIL or ask for 0, use current order  */
+         if ( hb_parni(1) == 0 || ISNIL(1) )          /* if NIL or ask for 0, use current order  */
             pOrderInfo.itmOrder  = NULL;
          else
             pOrderInfo.itmOrder = hb_param( 1, HB_IT_NUMERIC );
@@ -3229,7 +3186,7 @@ HB_FUNC( ORDNUMBER )
    {
       pOrderInfo.itmOrder = hb_param( 1, HB_IT_STRING );
       pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
-      if( !pOrderInfo.itmOrder && ! ISNIL(1))
+      if( !pOrderInfo.itmOrder && ! ISNIL(1) )
       {
          hb_errRT_DBCMD( EG_ARG, EDBCMD_REL_BADPARAMETER, NULL, "ORDNUMBER" );
          return;
@@ -3344,7 +3301,7 @@ HB_FUNC( RECNO )
 
    hb_itemPutNL( &RecNo, 0 );
    if( pArea )
-      SELF_RECNO( pArea, &RecNo );
+      SELF_RECID( pArea, &RecNo );
    hb_itemReturn( &RecNo );
 }
 
@@ -3620,7 +3577,8 @@ HB_FUNC( DBSETRELATION )
       dbRelations.lpaChild = pChildArea;
       dbRelations.itmCobExpr = hb_itemNew( hb_param( 2, HB_IT_BLOCK ) );
       dbRelations.abKey = hb_itemNew( hb_param( 3, HB_IT_STRING ) );
-      dbRelations.isScoped = ( hb_pcount() > 3 ) ? hb_parl( 4 ) : FALSE;
+      dbRelations.isScoped = hb_parl( 4 );
+      dbRelations.isOptimized = FALSE;
       dbRelations.lpdbriNext = NULL;
 
       SELF_SETREL( pArea, &dbRelations );
@@ -3690,8 +3648,10 @@ HB_FUNC( __DBARRANGE )
       dbSortInfo.dbtri.dbsci.lNext = hb_param( 5, HB_IT_NUMERIC );
       dbSortInfo.dbtri.dbsci.itmRecID = ISNIL( 6 ) ? NULL : hb_param( 6, HB_IT_ANY );
       dbSortInfo.dbtri.dbsci.fRest = hb_param( 7, HB_IT_LOGICAL );
-      dbSortInfo.dbtri.dbsci.fIgnoreFilter = dbSortInfo.dbtri.dbsci.fLast =
-      dbSortInfo.dbtri.dbsci.fIgnoreDuplicates = FALSE;
+      dbSortInfo.dbtri.dbsci.fIgnoreFilter =
+      dbSortInfo.dbtri.dbsci.fLast =
+      dbSortInfo.dbtri.dbsci.fIgnoreDuplicates =
+      dbSortInfo.dbtri.dbsci.fBackword = FALSE;
       dbSortInfo.dbtri.dbsci.fIncludeDeleted = TRUE;
 
       pFields = hb_param( 8, HB_IT_ARRAY );
@@ -3806,30 +3766,24 @@ HB_FUNC( DBORDERINFO )
    {
       PHB_ITEM pType;
       DBORDERINFO pOrderInfo;
-      BOOL bDeleteItem;
+
       pType = hb_param( 1 , HB_IT_NUMERIC );
       if( pType )
       {
-         pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
          /* atomBagName may be NIL */
+         pOrderInfo.atomBagName = hb_param( 2, HB_IT_STRING );
+         if( !pOrderInfo.atomBagName )
+            pOrderInfo.atomBagName = hb_param( 2, HB_IT_NUMERIC );
+
          pOrderInfo.itmOrder = hb_param( 3, HB_IT_STRING );
          if( !pOrderInfo.itmOrder )
             pOrderInfo.itmOrder = hb_param( 3, HB_IT_NUMERIC );
 
          pOrderInfo.itmNewVal = hb_param( 4 , HB_IT_ANY );
-         if( !pOrderInfo.itmNewVal )
-         {
-            pOrderInfo.itmNewVal = hb_itemNew( NULL );
-            bDeleteItem = TRUE;
-         }
-         else
-            bDeleteItem = FALSE;
          pOrderInfo.itmResult = hb_itemNew( NULL );
          SELF_ORDINFO( pArea, hb_itemGetNI( pType ), &pOrderInfo );
          hb_itemReturn( pOrderInfo.itmResult );
          hb_itemRelease( pOrderInfo.itmResult );
-         if( bDeleteItem )
-            hb_itemRelease( pOrderInfo.itmNewVal );
       }
       else
          hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBORDERINFO" );
@@ -4258,6 +4212,7 @@ static ERRCODE hb_rddTransRecords( AREAP pArea,
       dbTransInfo.dbsci.fIncludeDeleted   = TRUE;
       dbTransInfo.dbsci.fLast             = FALSE;
       dbTransInfo.dbsci.fIgnoreDuplicates = FALSE;
+      dbTransInfo.dbsci.fBackword         = FALSE;
 
       errCode = SELF_TRANS( lpaSource, &dbTransInfo );
    }

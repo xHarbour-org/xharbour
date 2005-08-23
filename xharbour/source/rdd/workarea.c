@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.49 2005/08/06 19:39:44 druzus Exp $
+ * $Id: workarea.c,v 1.50 2005/08/12 02:44:26 druzus Exp $
  */
 
 /*
@@ -168,6 +168,18 @@ ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
 
    while ( !pArea->fBof && !pArea->fEof )
    {
+      /* SET DELETED */
+      if( hb_set.HB_SET_DELETED )
+      {
+         SELF_DELETED( pArea, &fDeleted );
+         if( fDeleted )
+         {
+            if ( SELF_SKIPRAW( pArea, lUpDown ) != SUCCESS )
+               return FAILURE;
+            continue;
+         }
+      }
+
       /* SET FILTER TO */
       if( pArea->dbfi.itmCobExpr )
       {
@@ -181,17 +193,6 @@ ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
          }
       }
 
-      /* SET DELETED */
-      if( hb_set.HB_SET_DELETED )
-      {
-         SELF_DELETED( pArea, &fDeleted );
-         if( fDeleted )
-         {
-            if ( SELF_SKIPRAW( pArea, lUpDown ) != SUCCESS )
-               return FAILURE;
-            continue;
-         }
-      }
       break;
    }
 
@@ -847,6 +848,77 @@ ERRCODE hb_waEval( AREAP pArea, LPDBEVALINFO pEvalInfo )
 }
 
 /*
+ * Locate a record which pass given condition
+ */
+ERRCODE hb_waLocate( AREAP pArea, BOOL fContinue )
+{
+   LONG lNext = 1;
+   BOOL fEof;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_waEval(%p, %p)", pArea, pEvalInfo));
+
+   if( fContinue )
+   {
+      if( ! pArea->dbsi.itmCobFor )
+         return SUCCESS;
+
+      if ( SELF_SKIP( pArea, 1 ) == FAILURE )
+         return FAILURE;
+   }
+   else if( pArea->dbsi.itmRecID )
+   {
+      if( SELF_GOTOID( pArea, pArea->dbsi.itmRecID ) == FAILURE )
+         return FAILURE;
+   }
+   else if( pArea->dbsi.lNext )
+   {
+      lNext = hb_itemGetNL( pArea->dbsi.lNext );
+   }
+   else if( !pArea->dbsi.itmCobWhile &&
+            !hb_itemGetL( pArea->dbsi.fRest ) )
+   {
+      if( SELF_GOTOP( pArea ) == FAILURE )
+         return FAILURE;
+   }
+
+   pArea->fFound = FALSE;
+
+   /* TODO: use SKIPSCOPE() method and fRest parameter */
+
+   if( !pArea->dbsi.lNext || lNext > 0 )
+   {
+      while( TRUE )
+      {
+         if( SELF_EOF( pArea, &fEof ) == FAILURE )
+            return FAILURE;
+
+         if( fEof )
+            break;
+
+         if( !fContinue && pArea->dbsi.itmCobWhile &&
+             ! hb_itemGetL( hb_vmEvalBlock( pArea->dbsi.itmCobWhile ) ) )
+            break;
+
+         if( ! pArea->dbsi.itmCobFor ||
+             hb_itemGetL( hb_vmEvalBlock( pArea->dbsi.itmCobFor ) ) )
+         {
+            pArea->fFound = TRUE;
+            break;
+         }
+
+         if( !fContinue && 
+             ( pArea->dbsi.itmRecID || ( pArea->dbsi.lNext && --lNext < 1 ) ) )
+            break;
+
+         if( SELF_SKIP( pArea, 1 ) == FAILURE )
+            return FAILURE;
+      }
+   }
+
+   return SUCCESS;
+}
+
+/*
  * Copy one or more records from one WorkArea to another.
  */
 ERRCODE hb_waTrans( AREAP pArea, LPDBTRANSINFO pTransInfo )
@@ -1036,33 +1108,35 @@ ERRCODE hb_waSyncChildren( AREAP pArea )
  */
 ERRCODE hb_waClearRel( AREAP pArea )
 {
-   LPDBRELINFO lpdbRelation, lpdbRelPrev;
-   int iCurrArea;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_waClearRel(%p)", pArea ));
 
-   iCurrArea = hb_rddGetCurrentWorkAreaNumber();
-
    /* Free all relations */
-   lpdbRelation = pArea->lpdbRelations;
-   while( lpdbRelation )
+   if( pArea->lpdbRelations )
    {
-      hb_rddSelectWorkAreaNumber( lpdbRelation->lpaChild->uiArea );
-      SELF_CHILDEND( lpdbRelation->lpaChild, lpdbRelation );
-      hb_rddSelectWorkAreaNumber( iCurrArea );
+      int iCurrArea = hb_rddGetCurrentWorkAreaNumber();
 
-      if( lpdbRelation->itmCobExpr )
+      do
       {
-         hb_itemRelease( lpdbRelation->itmCobExpr );
-      }
-      if( lpdbRelation->abKey )
-         hb_itemRelease( lpdbRelation->abKey );
+         LPDBRELINFO lpdbRelation = pArea->lpdbRelations;
 
-      lpdbRelPrev = lpdbRelation;
-      lpdbRelation = lpdbRelation->lpdbriNext;
-      hb_xfree( lpdbRelPrev );
+         hb_rddSelectWorkAreaNumber( lpdbRelation->lpaChild->uiArea );
+         SELF_CHILDEND( lpdbRelation->lpaChild, lpdbRelation );
+         pArea->lpdbRelations = lpdbRelation->lpdbriNext;
+
+         if( lpdbRelation->itmCobExpr )
+         {
+            hb_itemRelease( lpdbRelation->itmCobExpr );
+         }
+         if( lpdbRelation->abKey )
+         {
+            hb_itemRelease( lpdbRelation->abKey );
+         }
+         hb_xfree( lpdbRelation );
+      }
+      while( pArea->lpdbRelations );
+
+      hb_rddSelectWorkAreaNumber( iCurrArea );
    }
-   pArea->lpdbRelations = NULL;
 
    return SUCCESS;
 }
@@ -1208,6 +1282,7 @@ ERRCODE hb_waSetRel( AREAP pArea, LPDBRELINFO lpdbRelInf )
    lpdbRelations->lpaChild = lpdbRelInf->lpaChild;
    lpdbRelations->itmCobExpr = lpdbRelInf->itmCobExpr;
    lpdbRelations->isScoped = lpdbRelInf->isScoped;
+   lpdbRelations->isOptimized = lpdbRelInf->isOptimized;
    lpdbRelations->abKey = lpdbRelInf->abKey;
    lpdbRelations->lpdbriNext = lpdbRelInf->lpdbriNext;
 
@@ -1317,6 +1392,7 @@ ERRCODE hb_waSetFilter( AREAP pArea, LPDBFILTERINFO pFilterInfo )
    {
       pArea->dbfi.abFilterText = hb_itemNew( pFilterInfo->abFilterText );
    }
+   pArea->dbfi.fOptimized = pArea->dbfi.fOptimized;
    pArea->dbfi.fFilter = TRUE;
 
    return SUCCESS;
@@ -1357,6 +1433,8 @@ ERRCODE hb_waSetLocate( AREAP pArea, LPDBSCOPEINFO pScopeInfo )
    pArea->dbsi.fIncludeDeleted   = pScopeInfo->fIncludeDeleted;
    pArea->dbsi.fLast             = pScopeInfo->fLast;
    pArea->dbsi.fIgnoreDuplicates = pScopeInfo->fIgnoreDuplicates;
+   pArea->dbsi.fBackword         = pScopeInfo->fBackword;
+   pArea->dbsi.fOptimized        = pScopeInfo->fOptimized;
 
    return SUCCESS;
 }

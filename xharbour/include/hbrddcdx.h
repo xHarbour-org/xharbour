@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.45 2005/06/22 15:29:54 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.46 2005/08/01 22:17:34 druzus Exp $
  */
 
 /*
@@ -412,6 +412,7 @@ typedef struct
    int      keyLen;           /* key length */
    BYTE     bTrl;             /* filler char for shorter keys */
    BOOL     fUnique;          /* TRUE if index is unique */
+   BOOL     fReindex;         /* TRUE if reindexing is in process */
    ULONG    ulMaxRec;         /* the highest record number */
    ULONG    ulTotKeys;        /* total number of keys indexed */
    ULONG    ulKeys;           /* keys in curently created page */
@@ -576,6 +577,7 @@ static ERRCODE hb_cdxGoHot( CDXAREAP pArea );
 #define hb_cdxRecCount                             NULL
 #define hb_cdxRecInfo                              NULL
 #define hb_cdxRecNo                                NULL
+#define hb_cdxRecId                                NULL
 #define hb_cdxSetFieldExtent                       NULL
 #define hb_cdxAlias                                NULL
 static ERRCODE hb_cdxClose( CDXAREAP pArea );
@@ -622,6 +624,7 @@ static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo );
 #define hb_cdxSetLocate                            NULL
 #define hb_cdxSetScope                             NULL
 #define hb_cdxSkipScope                            NULL
+#define hb_cdxLocate                               NULL
 #define hb_cdxCompile                              NULL
 #define hb_cdxError                                NULL
 #define hb_cdxEvalBlock                            NULL

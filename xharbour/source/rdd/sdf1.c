@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.9 2005/02/28 10:17:31 andijahja Exp $
+ * $Id: sdf1.c,v 1.10 2005/08/01 22:19:47 druzus Exp $
  */
 
 /*
@@ -116,6 +116,7 @@ static RDDFUNCS sdfTable = { hb_sdfBof,
                              hb_sdfRecCount,
                              hb_sdfRecInfo,
                              hb_sdfRecNo,
+                             hb_sdfRecId,
                              hb_sdfSetFieldExtent,
                              hb_sdfAlias,
                              hb_sdfClose,
@@ -162,6 +163,7 @@ static RDDFUNCS sdfTable = { hb_sdfBof,
                              hb_sdfSetLocate,
                              hb_sdfSetScope,
                              hb_sdfSkipScope,
+                             hb_sdfLocate,
                              hb_sdfCompile,
                              hb_sdfError,
                              hb_sdfEvalBlock,

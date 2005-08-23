@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4269 2005/08/22 03:07:52 modalsist Exp $
+ * $Id: ChangeLog,v 1.4270 2005/08/23 04:02:51 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,77 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-23 12:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapirdd.h
+    * changed {SELF|SUPER}_RECNO( AREAP, PHB_ITEM ) to
+      {SELF|SUPER}_RECNO( AREAP, ULONG *)
+    + added {SELF|SUPER}_RECID( AREAP, PHB_ITEM )
+    + added {SELF|SUPER}_LOCATE( AREAP, BOOL fContinue ) for
+      LOCATE/CONTINUE implementation on RDD level - it allows to
+      speedup these operation by RDD and resolve the problem with
+      external FOUND flag update
+    * changed {SELF|SUPER}_UNLOCK( AREAP, ULONG ) to
+      {SELF|SUPER}_UNLOCK( AREAP, PHB_ITEM ) - CL5.3 compatible.
+      It was the last functions when record number was used directly.
+      Now we can create full functional RDD with non numeric record IDs
+    + added fBackword and fOptimized fields to DBSCOPEINFO for RDDs
+      which may want to mark optimization status
+    + added fOptimized to DBFILTERINFO (as above)
+    + added isOptimized to DBRELINFO for RDDs which may want to mark
+      that relation is optimized on server side. It greatly simplify
+      relation implementation which can be resolved on both server and
+      xHarbour side and be set between differ RDD work areas.
+    + added PHB_ITEM abBlock to DBEVALINFO for RDD which may want to
+      pass given codeblock as string to server and evaluate it on
+      server side
+
+
+  * xharbour/include/classes.h
+    * small casting fixes for pedantic C++ compilers
+
+  * xharbour/include/dbinfo.ch
+    + added DBOI_BAGORDER (number of first order in a bag) for some
+      SIX3 sx_*() functions emulation.
+    + added DBOI_ISREINDEX, DBOI_I_BAGNAME, DBOI_I_TAGNAME (also SIX3)
+
+  * xharbour/include/hbdefs.h
+    ! fix HB_DBL2ORD() macro for -0.0 IEEE754 double conversion to index key
+
+  * xharbour/include/hbrddcdx.h
+  * xharbour/include/hbrdddbf.h
+  * xharbour/include/hbrdddbt.h
+  * xharbour/include/hbrdddel.h
+  * xharbour/include/hbrddfpt.h
+  * xharbour/include/hbrddntx.h
+  * xharbour/include/hbrddsdf.h
+  * xharbour/include/hbrddwrk.h
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/delim1.c
+  * xharbour/source/rdd/sdf1.c
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+  * xharbour/source/rdd/hsx/hsx.c
+  * xharbour/source/rdd/workarea.c
+    * updated for RDD modifications
+
+  * xharbour/source/rdd/dbcmd.c
+    * updated for RDD modifications
+    * __DBLOCATE() and __DBCONTINUE() now use SELF_LOCATE() method
+      (in SELF_SETLOCATE() now also other DBSCOPEINFO fields are set)
+    * DBORDERINF() now also to pass ordbag parameter as number - necessary
+      for SIX3 emulation in some functions.
+
+  * xharbour/source/rdd/workarea.c
+    * updated for RDD modifications
+    + added default WA LOCATE() method
+    ! fixed dangerous code (possible memory corruption on reentrance)
+      in CLEARREL() method
+
 2005-08-23 16:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/win32prn.prg
     ! METHOD Box(), altered to also support Rounded Rectangles

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.31 2005/08/04 23:54:10 druzus Exp $
+ * $Id: hbapirdd.h,v 1.32 2005/08/06 19:39:44 druzus Exp $
  */
 
 /*
@@ -283,10 +283,11 @@ typedef struct
    BOOL     fIncludeDeleted;     /* process should include deleted records */
    BOOL     fLast;               /* last record of the current scope required */
    BOOL     fIgnoreDuplicates;   /* process should ignore duplicate key value */
+   BOOL     fBackword;           /* skip backword */
+   BOOL     fOptimized;          /* Is (should be) scope optimized */
 } DBSCOPEINFO;
 
 typedef DBSCOPEINFO * LPDBSCOPEINFO;
-
 
 
 /*
@@ -304,7 +305,6 @@ typedef struct
 typedef DBORDSCOPEINFO * LPDBORDSCOPEINFO;
 
 
-
 /*
  *  DBFILTERINFO
  *  ------------
@@ -316,6 +316,7 @@ typedef struct
    PHB_ITEM itmCobExpr;       /* Block representation of the FILTER expression */
    PHB_ITEM abFilterText;     /* String representation of FILTER expression */
    BOOL     fFilter;          /* flag to indicate that filter is active */
+   BOOL     fOptimized;       /* Is (should be) filter optimized */
    void *   lpvCargo;         /* RDD specific extended filter info */
 } DBFILTERINFO;
 
@@ -334,6 +335,7 @@ typedef struct _DBRELINFO
    PHB_ITEM            itmCobExpr;   /* Block representation of the relational SEEK key */
    PHB_ITEM            abKey;        /* String representation of the relational SEEK key */
    BOOL                isScoped;     /* Is this relation scoped */
+   BOOL                isOptimized;  /* Is relation optimized */
    struct _AREA      * lpaParent;    /* The parent of this relation */
    struct _AREA      * lpaChild;     /* The parents children */
    struct _DBRELINFO * lpdbriNext;   /* Next child or parent */
@@ -354,8 +356,9 @@ typedef DBRELINFO * LPDBRELINFO;
 
 typedef struct
 {
-   PHB_ITEM    itmBlock;  /* The block to be evaluated */
-   DBSCOPEINFO dbsci;     /* Scope info that limits the evaluation */
+   PHB_ITEM    itmBlock;   /* The block to be evaluated */
+   PHB_ITEM    abBlock;    /* String representation of evaluated block */
+   DBSCOPEINFO dbsci;      /* Scope info that limits the evaluation */
 } DBEVALINFO;
 
 typedef DBEVALINFO * LPDBEVALINFO;
@@ -636,7 +639,8 @@ typedef struct _RDDFUNCS
    DBENTRYP_V    recall;            /* Undelete the current record. */
    DBENTRYP_ULP  reccount;          /* Obtain number of records in WorkArea. */
    DBENTRYP_ISI  recInfo;           /*  */
-   DBENTRYP_I    recno;             /* Obtain physical row number at current WorkArea cursor position. */
+   DBENTRYP_ULP  recno;             /* Obtain physical row number at current WorkArea cursor position. */
+   DBENTRYP_I    recid;             /* Obtain physical row ID at current WorkArea cursor position. */
    DBENTRYP_S    setFieldExtent;    /* Establish the extent of the array of fields for a WorkArea. */
 
 
@@ -699,6 +703,7 @@ typedef struct _RDDFUNCS
    DBENTRYP_VLO  setLocate;         /*-Set the locate scope for the specified WorkArea. */
    DBENTRYP_VOS  setScope;          /*  */
    DBENTRYP_VPL  skipScope;         /*  */
+   DBENTRYP_B    locate;            /* reposition cursor to postions set by setLocate */
 
 
    /* Miscellaneous */
@@ -712,7 +717,7 @@ typedef struct _RDDFUNCS
 
    DBENTRYP_VSP  rawlock;           /* Perform a lowlevel network lock in the specified WorkArea. */
    DBENTRYP_VL   lock;              /* Perform a network lock in the specified WorkArea. */
-   DBENTRYP_UL   unlock;            /* Release network locks in the specified WorkArea. */
+   DBENTRYP_I    unlock;            /* Release network locks in the specified WorkArea. */
 
 
    /* Memofile functions */
@@ -781,7 +786,7 @@ typedef RDDNODE * LPRDDNODE;
 /* Data management */
 
 #define SELF_ADDFIELD(w, ip)            ((*(w)->lprfsHost->addField)(w, ip))
-#define SELF_APPEND(w,l)                ((*(w)->lprfsHost->append)(w,l))
+#define SELF_APPEND(w, b)               ((*(w)->lprfsHost->append)(w, b))
 #define SELF_CREATEFIELDS(w, v)         ((*(w)->lprfsHost->createFields)(w, v))
 #define SELF_DELETE(w)                  ((*(w)->lprfsHost->deleterec)(w))
 #define SELF_DELETED(w, sp)             ((*(w)->lprfsHost->deleted)(w, sp))
@@ -798,9 +803,10 @@ typedef RDDNODE * LPRDDNODE;
 #define SELF_PUTVALUE(w, i, v)          ((*(w)->lprfsHost->putValue)(w, i, v))
 #define SELF_PUTREC(w, bp)              ((*(w)->lprfsHost->putRec)(w, bp))
 #define SELF_RECALL(w)                  ((*(w)->lprfsHost->recall)(w))
-#define SELF_RECCOUNT(w, sp)            ((*(w)->lprfsHost->reccount)(w, sp))
+#define SELF_RECCOUNT(w, lp)            ((*(w)->lprfsHost->reccount)(w, lp))
 #define SELF_RECINFO(w,v1,i,v2)         ((*(w)->lprfsHost->recInfo)(w,v1,i,v2))
-#define SELF_RECNO(w, i)                ((*(w)->lprfsHost->recno)(w, i))
+#define SELF_RECNO(w, lp)               ((*(w)->lprfsHost->recno)(w, lp))
+#define SELF_RECID(w, i)                ((*(w)->lprfsHost->recid)(w, i))
 #define SELF_SETFIELDEXTENT(w, s)       ((*(w)->lprfsHost->setFieldExtent)(w, s))
 
 
@@ -871,6 +877,7 @@ typedef RDDNODE * LPRDDNODE;
 #define SELF_SETLOCATE(w, ip)           ((*(w)->lprfsHost->setLocate)(w, ip))
 #define SELF_SETSCOPE(w, ip)            ((*(w)->lprfsHost->setScope)(w, ip))
 #define SELF_SKIPSCOPE(w, bp, l)        ((*(w)->lprfsHost->skipScope)(w, bp, l))
+#define SELF_LOCATE(w, b)               ((*(w)->lprfsHost->locate)(w, b))
 
 
 /* Miscellaneous */
@@ -885,7 +892,7 @@ typedef RDDNODE * LPRDDNODE;
 #define SELF_GETLOCKS(w, g)             ((*(w)->lprfsHost->info)(w, DBI_GETLOCKARRAY, g))
 #define SELF_RAWLOCK(w, i, l)           ((*(w)->lprfsHost->rawlock)(w, i, l))
 #define SELF_LOCK(w, sp)                ((*(w)->lprfsHost->lock)(w, sp))
-#define SELF_UNLOCK(w, l)               ((*(w)->lprfsHost->unlock)(w, l))
+#define SELF_UNLOCK(w, i)               ((*(w)->lprfsHost->unlock)(w, i))
 
 
 /* Memofile functions */
@@ -942,7 +949,7 @@ typedef RDDNODE * LPRDDNODE;
 /* Data management */
 
 #define SUPER_ADDFIELD(w, ip)           ((*(SUPERTABLE)->addField)(w, ip))
-#define SUPER_APPEND(w,l)               ((*(SUPERTABLE)->append)(w,l))
+#define SUPER_APPEND(w, b)              ((*(SUPERTABLE)->append)(w, b))
 #define SUPER_CREATEFIELDS(w, v)        ((*(SUPERTABLE)->createFields)(w, v))
 #define SUPER_DELETE(w)                 ((*(SUPERTABLE)->deleterec)(w))
 #define SUPER_DELETED(w, sp)            ((*(SUPERTABLE)->deleted)(w, sp))
@@ -959,9 +966,10 @@ typedef RDDNODE * LPRDDNODE;
 #define SUPER_PUTVALUE(w, i, v)         ((*(SUPERTABLE)->putValue)(w, i, v))
 #define SUPER_PUTREC(w, bp)             ((*(SUPERTABLE)->putRec)(w, bp))
 #define SUPER_RECALL(w)                 ((*(SUPERTABLE)->recall)(w))
-#define SUPER_RECCOUNT(w, sp)           ((*(SUPERTABLE)->reccount)(w, sp))
+#define SUPER_RECCOUNT(w, lp)           ((*(SUPERTABLE)->reccount)(w, lp))
 #define SUPER_RECINFO(w,v1,i,v2)        ((*(SUPERTABLE)->recInfo)(w,v1,i,v2))
-#define SUPER_RECNO(w, sp)              ((*(SUPERTABLE)->recno)(w, sp))
+#define SUPER_RECNO(w, lp)              ((*(SUPERTABLE)->recno)(w, lp))
+#define SUPER_RECID(w, i)               ((*(SUPERTABLE)->recid)(w, i))
 #define SUPER_SETFIELDEXTENT(w, s)      ((*(SUPERTABLE)->setFieldExtent)(w, s))
 
 
@@ -1032,6 +1040,7 @@ typedef RDDNODE * LPRDDNODE;
 #define SUPER_SETLOCATE(w, ip)          ((*(SUPERTABLE)->setLocate)(w, ip))
 #define SUPER_SETSCOPE(w, ip)           ((*(SUPERTABLE)->setScope)(w, ip))
 #define SUPER_SKIPSCOPE(w, bp, l)       ((*(SUPERTABLE)->skipScope)(w, bp, l))
+#define SUPER_LOCATE(w, b)              ((*(SUPERTABLE)->locate)(w, b))
 
 
 /* Miscellaneous */
@@ -1046,7 +1055,7 @@ typedef RDDNODE * LPRDDNODE;
 #define SUPER_GETLOCKS(w, g)            ((*(SUPERTABLE)->info)(w, DBI_GETLOCKARRAY, g))
 #define SUPER_RAWLOCK(w, i, l)          ((*(SUPERTABLE)->rawlock)(w, i, l))
 #define SUPER_LOCK(w, sp)               ((*(SUPERTABLE)->lock)(w, sp))
-#define SUPER_UNLOCK(w,l)               ((*(SUPERTABLE)->unlock)(w,l))
+#define SUPER_UNLOCK(w, i)              ((*(SUPERTABLE)->unlock)(w, i))
 
 
 /* Memofile functions */

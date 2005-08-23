@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.29 2005/08/01 22:17:35 druzus Exp $
+ * $Id: hbrddntx.h,v 1.30 2005/08/06 19:39:44 druzus Exp $
  */
 
 /*
@@ -308,6 +308,7 @@ typedef struct
    char *   szTempFileName;   /* temporary file name */
    int      keyLen;           /* key length */
    BOOL     fUnique;          /* TRUE if index is unique */
+   BOOL     fReindex;         /* TRUE if reindexing is in process */
    ULONG    ulMaxRec;         /* the highest record number */
    ULONG    ulTotKeys;        /* total number of keys indexed */
    ULONG    ulKeys;           /* keys in curently created page */
@@ -472,6 +473,7 @@ static ERRCODE ntxGoHot( NTXAREAP pArea );
 #define ntxRecCount              NULL
 #define ntxRecInfo               NULL
 #define ntxRecNo                 NULL
+#define ntxRecId                 NULL
 #define ntxSetFieldsExtent       NULL
 #define ntxAlias                 NULL
 static ERRCODE ntxClose( NTXAREAP pArea );
@@ -520,6 +522,7 @@ static ERRCODE ntxCountScope( NTXAREAP pArea, void * pPtr, LONG * plRecNo );
 #define ntxSetLocate             NULL
 #define ntxSetScope              NULL
 #define ntxSkipScope             NULL
+#define ntxLocate                NULL
 #define ntxCompile               NULL
 #define ntxError                 NULL
 #define ntxEvalBlock             NULL

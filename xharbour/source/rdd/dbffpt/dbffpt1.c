@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.46 2005/08/01 22:20:56 druzus Exp $
+ * $Id: dbffpt1.c,v 1.47 2005/08/07 02:40:38 mlombardo Exp $
  */
 
 /*
@@ -123,7 +123,8 @@ static RDDFUNCS fptTable =
    ( DBENTRYP_V )     hb_fptRecall,
    ( DBENTRYP_ULP )   hb_fptRecCount,
    ( DBENTRYP_ISI )   hb_fptRecInfo,
-   ( DBENTRYP_I )     hb_fptRecNo,
+   ( DBENTRYP_ULP )   hb_fptRecNo,
+   ( DBENTRYP_I )     hb_fptRecId,
    ( DBENTRYP_S )     hb_fptSetFieldExtent,
 
 
@@ -186,6 +187,7 @@ static RDDFUNCS fptTable =
    ( DBENTRYP_VLO )   hb_fptSetLocate,
    ( DBENTRYP_VOS )   hb_fptSetScope,
    ( DBENTRYP_VPL )   hb_fptSkipScope,
+   ( DBENTRYP_B )     hb_fptLocate,
 
 
    /* Miscellaneous */
@@ -199,7 +201,7 @@ static RDDFUNCS fptTable =
 
    ( DBENTRYP_VSP )   hb_fptRawLock,
    ( DBENTRYP_VL )    hb_fptLock,
-   ( DBENTRYP_UL )    hb_fptUnLock,
+   ( DBENTRYP_I )     hb_fptUnLock,
 
 
    /* Memofile functions */
@@ -1061,7 +1063,6 @@ static ERRCODE hb_fptReadSixItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBuf
 {
    USHORT usType;
    ULONG ulLen, i;
-   PHB_ITEM pNewItem;
    ERRCODE errCode = SUCCESS;
 
    ulLen = SIX_ITEM_BUFSIZE;
@@ -1120,18 +1121,15 @@ static ERRCODE hb_fptReadSixItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBuf
             }
             (*pbMemoBuf) += SIX_ITEM_BUFSIZE;
             hb_arrayNew( pItem, ulLen );
-            pNewItem = hb_itemNew( NULL );
             for ( i = 1 ; i <= ulLen ; i++ )
             {
-               errCode = hb_fptReadSixItem( pArea, pbMemoBuf, bBufEnd, pNewItem );
+               errCode = hb_fptReadSixItem( pArea, pbMemoBuf, bBufEnd,
+                                            hb_arrayGetItemPtr( pItem, i ) );
                if ( errCode != SUCCESS )
                {
                   break;
                }
-               hb_itemArrayPut( pItem, i, pNewItem );
-               hb_itemClear( pNewItem );
             }
-            hb_itemRelease( pNewItem );
             ulLen = 0;
             break;
          default:
@@ -1155,7 +1153,6 @@ static ERRCODE hb_fptReadFlexItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBu
 {
    BYTE usType;
    ULONG ulLen, i;
-   PHB_ITEM pNewItem;
    ERRCODE errCode = SUCCESS;
 
    if ( bRoot )
@@ -1342,18 +1339,15 @@ static ERRCODE hb_fptReadFlexItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBu
             if ( bBufEnd - (*pbMemoBuf) >= ( LONG ) ulLen )
             {
                hb_arrayNew( pItem, ulLen );
-               pNewItem = hb_itemNew( NULL );
                for ( i = 1 ; i <= ulLen ; i++ )
                {
-                  errCode = hb_fptReadFlexItem( pArea, pbMemoBuf, bBufEnd, pNewItem, FALSE );
+                  errCode = hb_fptReadFlexItem( pArea, pbMemoBuf, bBufEnd,
+                                    hb_arrayGetItemPtr( pItem, i ), FALSE );
                   if ( errCode != SUCCESS )
                   {
                      break;
                   }
-                  hb_itemArrayPut( pItem, i, pNewItem );
-                  hb_itemClear( pNewItem );
                }
-               hb_itemRelease( pNewItem );
             }
             else
             {
@@ -1402,7 +1396,12 @@ static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          ulType = HB_GET_BE_UINT32( fptBlock.type );
       }
 
-      pBuffer = ( BYTE * ) hb_xgrab( HB_MAX( ulSize + 1, 8 ) );
+      pBuffer = ( BYTE * ) hb_xalloc( HB_MAX( ulSize + 1, 8 ) );
+      if( !pBuffer )
+      {
+         /* in most cases this means that file is corrupted */
+         return EDBF_CORRUPT;
+      }
       memset( pBuffer, '\0', 8);
       if ( ulSize != 0 && hb_fsReadLarge( pArea->hMemoFile, pBuffer, ulSize ) != ulSize )
       {
@@ -1410,7 +1409,7 @@ static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       }
       else
       {
-         switch ( ulType )
+         switch( ulType )
          {
             case FPTIT_SIX_LNUM:
             case FPTIT_SIX_DNUM:

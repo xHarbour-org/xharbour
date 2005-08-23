@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbt.h,v 1.7 2005/05/12 00:39:24 druzus Exp $
+ * $Id: hbrdddbt.h,v 1.8 2005/08/01 22:17:34 druzus Exp $
  */
 
 /*
@@ -124,6 +124,7 @@ static ERRCODE hb_dbtPutValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
 #define hb_dbtRecCount                             NULL
 #define hb_dbtRecInfo                              NULL
 #define hb_dbtRecNo                                NULL
+#define hb_dbtRecId                                NULL
 #define hb_dbtSetFieldExtent                       NULL
 #define hb_dbtAlias                                NULL
 #define hb_dbtClose                                NULL
@@ -170,6 +171,7 @@ static ERRCODE hb_dbtSysName( DBTAREAP pArea, BYTE * pBuffer );
 #define hb_dbtSetLocate                            NULL
 #define hb_dbtSetScope                             NULL
 #define hb_dbtSkipScope                            NULL
+#define hb_dbtLocate                               NULL
 #define hb_dbtCompile                              NULL
 #define hb_dbtError                                NULL
 #define hb_dbtEvalBlock                            NULL

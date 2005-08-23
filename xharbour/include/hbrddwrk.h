@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddwrk.h,v 1.4 2005/04/25 23:11:01 druzus Exp $
+ * $Id: hbrddwrk.h,v 1.5 2005/08/01 22:17:35 druzus Exp $
  */
 
 /*
@@ -92,7 +92,8 @@ extern ERRCODE hb_waFieldName( AREAP pArea, USHORT uiIndex, void * szName );
 #define hb_waRecall                                         hb_waUnsupported
 #define hb_waRecCount                      ( DBENTRYP_ULP ) hb_waUnsupported
 #define hb_waRecInfo                       ( DBENTRYP_ISI ) hb_waUnsupported
-#define hb_waRecNo                           ( DBENTRYP_I ) hb_waUnsupported
+#define hb_waRecNo                         ( DBENTRYP_ULP ) hb_waUnsupported
+#define hb_waRecId                           ( DBENTRYP_I ) hb_waUnsupported
 extern ERRCODE hb_waSetFieldExtent( AREAP pArea, USHORT uiFieldExtent );
 extern ERRCODE hb_waAlias( AREAP pArea, BYTE * szAlias );
 extern ERRCODE hb_waClose( AREAP pArea );
@@ -139,14 +140,15 @@ extern ERRCODE hb_waFilterText( AREAP pArea, PHB_ITEM pFilter );
 #define hb_waScopeInfo                      ( DBENTRYP_SI ) hb_waUnsupported
 extern ERRCODE hb_waSetFilter( AREAP pArea, LPDBFILTERINFO pFilterInfo );
 extern ERRCODE hb_waSetLocate( AREAP pArea, LPDBSCOPEINFO pScopeInfo );
-#define hb_waSetScope                       ( DBENTRYP_VOS ) hb_waUnsupported
+#define hb_waSetScope                      ( DBENTRYP_VOS ) hb_waUnsupported
 #define hb_waSkipScope                     ( DBENTRYP_VPL ) hb_waUnsupported
+ERRCODE hb_waLocate( AREAP pArea, BOOL fContinue );
 extern ERRCODE hb_waCompile( AREAP pArea, BYTE * pExpr );
 extern ERRCODE hb_waError( AREAP pArea, PHB_ITEM pError );
 extern ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock );
 #define hb_waRawLock                       ( DBENTRYP_VSP ) hb_waUnsupported
 #define hb_waLock                           ( DBENTRYP_VL ) hb_waUnsupported
-#define hb_waUnLock                         ( DBENTRYP_UL ) hb_waUnsupported
+#define hb_waUnLock                          ( DBENTRYP_I ) hb_waUnsupported
 #define hb_waCloseMemFile                                   hb_waUnsupported
 #define hb_waCreateMemFile                  ( DBENTRYP_VP ) hb_waUnsupported
 #define hb_waGetValueFile                 ( DBENTRYP_SVPB ) hb_waUnsupported

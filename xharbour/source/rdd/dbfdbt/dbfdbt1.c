@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.24 2005/06/02 01:47:25 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.25 2005/08/01 22:20:39 druzus Exp $
  */
 
 /*
@@ -114,7 +114,8 @@ static RDDFUNCS dbtTable =
    ( DBENTRYP_V )     hb_dbtRecall,
    ( DBENTRYP_ULP )   hb_dbtRecCount,
    ( DBENTRYP_ISI )   hb_dbtRecInfo,
-   ( DBENTRYP_I )     hb_dbtRecNo,
+   ( DBENTRYP_ULP )   hb_dbtRecNo,
+   ( DBENTRYP_I )     hb_dbtRecId,
    ( DBENTRYP_S )     hb_dbtSetFieldExtent,
 
 
@@ -177,6 +178,7 @@ static RDDFUNCS dbtTable =
    ( DBENTRYP_VLO )   hb_dbtSetLocate,
    ( DBENTRYP_VOS )   hb_dbtSetScope,
    ( DBENTRYP_VPL )   hb_dbtSkipScope,
+   ( DBENTRYP_B )     hb_dbtLocate,
 
 
    /* Miscellaneous */
@@ -190,7 +192,7 @@ static RDDFUNCS dbtTable =
 
    ( DBENTRYP_VSP )   hb_dbtRawLock,
    ( DBENTRYP_VL )    hb_dbtLock,
-   ( DBENTRYP_UL )    hb_dbtUnLock,
+   ( DBENTRYP_I )     hb_dbtUnLock,
 
 
    /* Memofile functions */

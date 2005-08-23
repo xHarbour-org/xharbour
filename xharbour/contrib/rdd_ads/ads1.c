@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.70 2005/06/22 15:29:14 druzus Exp $
+ * $Id: ads1.c,v 1.71 2005/08/01 22:16:45 druzus Exp $
  */
 
 /*
@@ -1917,14 +1917,26 @@ static ERRCODE adsRecInfo( ADSAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType, P
 }
 
 
-static ERRCODE adsRecNo( ADSAREAP pArea, PHB_ITEM pRecNo )
+static ERRCODE adsRecNo( ADSAREAP pArea, ULONG * ulRecNo )
 {
-   HB_TRACE(HB_TR_DEBUG, ("adsRecNo(%p, %p)", pArea, pRecNo));
+   HB_TRACE(HB_TR_DEBUG, ("adsRecNo(%p, %p)", pArea, ulRecNo));
 
    AdsGetRecordNum( pArea->hTable, ADS_IGNOREFILTERS,
-         (UNSIGNED32 *)&(pArea->ulRecNo) );
-   hb_itemPutNL( pRecNo, pArea->ulRecNo );
+                    ( UNSIGNED32 * ) &( pArea->ulRecNo ) );
+   *ulRecNo = pArea->ulRecNo;
    return SUCCESS;
+}
+
+static ERRCODE adsRecId( ADSAREAP pArea, PHB_ITEM pRecNo )
+{
+   ERRCODE errCode;
+   ULONG ulRecNo;
+
+   HB_TRACE(HB_TR_DEBUG, ("adsRecId(%p, %p)", pArea, pRecNo));
+
+   errCode = SELF_RECNO( ( AREAP ) pArea, &ulRecNo );
+   hb_itemPutNL( pRecNo, ulRecNo );
+   return errCode;
 }
 
 static ERRCODE adsSetFieldExtent( ADSAREAP pArea, USHORT uiFieldExtent )
@@ -3571,6 +3583,7 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
 #define  adsSetLocate             NULL
 #define  adsSetScope              NULL
 #define  adsSkipScope             NULL
+#define  adsLocate                NULL
 #define  adsCompile               NULL
 #define  adsError                 NULL
 #define  adsEvalBlock             NULL
@@ -3686,32 +3699,21 @@ static ERRCODE adsLock( ADSAREAP pArea, LPDBLOCKINFO pLockInfo )
          return FAILURE;
    }
 
-   if( adsRawLock( pArea, uiAction, ulRecNo ) == SUCCESS )
-   {
-      pLockInfo->fResult = TRUE;
-   }
-   else
-   {
-      pLockInfo->fResult = FALSE;
-   }
-
+   pLockInfo->fResult = SELF_RAWLOCK( ( AREAP ) pArea, uiAction,
+                                      ulRecNo ) == SUCCESS;
    return SUCCESS;
 }
 
-static ERRCODE adsUnLock( ADSAREAP pArea, ULONG lRecNo )
+static ERRCODE adsUnLock( ADSAREAP pArea, PHB_ITEM pRecNo )
 {
-   HB_TRACE(HB_TR_DEBUG, ("adsUnLock(%p, %lu)", pArea, lRecNo));
+   ULONG ulRecNo;
 
-   if( lRecNo == 0 )
-   {
-      adsRawLock( pArea, FILE_UNLOCK, lRecNo );
-   }
-   else
-   {
-      adsRawLock( pArea, REC_UNLOCK, lRecNo );
-   }
+   HB_TRACE(HB_TR_DEBUG, ("adsUnLock(%p, %p)", pArea, pRecNo));
 
-   return SUCCESS;
+   ulRecNo = hb_itemGetNL( pRecNo );
+
+   return SELF_RAWLOCK( ( AREAP ) pArea,
+                        ulRecNo ? REC_UNLOCK : FILE_UNLOCK, ulRecNo );
 }
 
 #define  adsCloseMemFile          NULL
@@ -3841,7 +3843,8 @@ static RDDFUNCS adsTable = { ( DBENTRYP_BP ) adsBof,
                              ( DBENTRYP_V ) adsRecall,
                              ( DBENTRYP_ULP ) adsRecCount,
                              ( DBENTRYP_ISI ) adsRecInfo,
-                             ( DBENTRYP_I ) adsRecNo,
+                             ( DBENTRYP_ULP ) adsRecNo,
+                             ( DBENTRYP_I ) adsRecId,
                              ( DBENTRYP_S ) adsSetFieldExtent,
                              ( DBENTRYP_P ) adsAlias,
                              ( DBENTRYP_V ) adsClose,
@@ -3888,12 +3891,13 @@ static RDDFUNCS adsTable = { ( DBENTRYP_BP ) adsBof,
                              ( DBENTRYP_VLO ) adsSetLocate,
                              ( DBENTRYP_VOS ) adsSetScope,
                              ( DBENTRYP_VPL ) adsSkipScope,
+                             ( DBENTRYP_B ) adsLocate,
                              ( DBENTRYP_P ) adsCompile,
                              ( DBENTRYP_I ) adsError,
                              ( DBENTRYP_I ) adsEvalBlock,
                              ( DBENTRYP_VSP ) adsRawLock,
                              ( DBENTRYP_VL ) adsLock,
-                             ( DBENTRYP_UL ) adsUnLock,
+                             ( DBENTRYP_I ) adsUnLock,
                              ( DBENTRYP_V ) adsCloseMemFile,
                              ( DBENTRYP_VP ) adsCreateMemFile,
                              ( DBENTRYP_SVPB ) adsGetValueFile,
