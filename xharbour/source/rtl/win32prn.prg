@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.10 2005/08/15 02:17:26 peterrees Exp $
+ * $Id: win32prn.prg,v 1.11 2005/08/21 21:35:43 peterrees Exp $
  */
 
 /*
@@ -155,7 +155,7 @@ CLASS WIN32PRN
          ::PenStyle:=nStyle, ::PenWidth:=nWidth, ::PenColor:=nColor,;
          SetPen(::hPrinterDC, nStyle, nWidth, nColor) )
   METHOD Line(nX1, nY1, nX2, nY2) INLINE LineTo(::hPrinterDC, nX1, nY1, nX2, nY2)
-  METHOD Box(nX1, nY1, nX2, nY2) INLINE Rectangle(::hPrinterDC, nX1, nY1, nX2, nY2)
+  METHOD Box(nX1, nY1, nX2, nY2, nWidth, nHeight) INLINE Rectangle(::hPrinterDC, nX1, nY1, nX2, nY2, nWidth, nHeight)
   METHOD Arc(nX1, nY1, nX2, nY2) INLINE Arc(::hPrinterDC, nX1, nY1, nX2, nY2)
   METHOD Ellipse(nX1, nY1, nX2, nY2) INLINE Ellipse(::hPrinterDC, nX1, nY1, nX2, nY2)
   METHOD FillRect(nX1, nY1, nX2, nY2, nColor) INLINE FillRect(::hPrinterDC, nX1, nY1, nX2, nY2, nColor)
@@ -1037,8 +1037,16 @@ HB_FUNC_STATIC( RECTANGLE )
    int y1 = hb_parni( 3 );
    int x2 = hb_parni( 4 );
    int y2 = hb_parni( 5 );
-
-   hb_retl( Rectangle( hDC, x1, y1, x2, y2) );
+   int iWidth = hb_parni( 6 );
+   int iHeight = hb_parni( 7 );
+   if ( iWidth && iHeight )
+   {
+     hb_retl( RoundRect( hDC, x1, y1, x2, y2, iWidth, iHeight ) );
+   }
+   else
+   {
+     hb_retl( Rectangle( hDC, x1, y1, x2, y2) );
+   }
 }
 
 HB_FUNC_STATIC( ARC )
