@@ -103,7 +103,7 @@ STATIC FUNCTION PrnTest(cPrinter, cBMPFile)
       oPrinter:TextOut("Notice: UNDERLINE only prints correctly if there is a blank line after",.T.)
       oPrinter:TextOut("        it. This is because of ::LineHeight and the next line",.T.)
       oPrinter:TextOut("        printing over top of the underline. To avoid this happening",.T.)
-      oPrinter:TextOut("        you can to alter ::LineHeight")
+      oPrinter:TextOut("        you can to alter ::LineHeight or use a smaller font")
       oPrinter:NewLine()
       oPrinter:NewLine()
       oPrinter:SetFont('Lucida Console',18, 0)  // Large print
@@ -114,6 +114,10 @@ STATIC FUNCTION PrnTest(cPrinter, cBMPFile)
       oPrinter:Ellipse(400, oPrinter:PosY+100, 500, oPrinter:PosY+200)
       oPrinter:FillRect(600, oPrinter:PosY+100, 700, oPrinter:PosY+200, RED)
 
+//    To print a barcode;
+//    Replace 'BCod39HN' with your own bar code font or any other font
+//      oPrinter:TextAtFont( oPrinter:MM_TO_POSX( 30 ) , oPrinter:MM_TO_POSY(60 ), '1234567890', 'BCod39HN', 24, 0 )
+//
       PrintBitMap( oPrinter, cBMPFile )
 
       oPrinter:EndDoc()

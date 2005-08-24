@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4271 2005/08/23 10:59:00 druzus Exp $
+ * $Id: ChangeLog,v 1.4272 2005/08/23 21:56:44 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-08-25 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * tests/testw32p.prg
+    + added ( commented ) sample of TextOutFont() & MM_TOPOSX/Y()
+
 2005-08-24 09:45 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/win32prn.prg
     + METHOD MM_TO_POSX( nMm )  Conversion methods from mm on page
