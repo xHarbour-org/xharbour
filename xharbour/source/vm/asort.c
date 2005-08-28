@@ -1,5 +1,5 @@
 /*
- * $Id: asort.c,v 1.11 2004/04/03 01:51:02 ronpinkas Exp $
+ * $Id: asort.c,v 1.12 2004/12/02 03:26:20 druzus Exp $
  */
 
 /*
@@ -130,6 +130,8 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
       }
 
    #endif
+
+   HB_ITEM_LOCK( &pivot );
 
    if( p != lb )
    {
@@ -273,6 +275,8 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
          hb_arrayResetHolder( pivot.item.asArray.value, (void *) &pivot, (void *) ( pItems + j ) );
       }
    #endif
+
+   HB_ITEM_UNLOCK( &pivot );
 
    return j;
 }

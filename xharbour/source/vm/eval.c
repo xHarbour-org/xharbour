@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.21 2005/05/24 21:05:56 ronpinkas Exp $
+ * $Id: eval.c,v 1.22 2005/05/25 20:16:57 ronpinkas Exp $
  */
 
 /*
@@ -628,6 +628,7 @@ HB_FUNC( HB_EXECFROMARRAY )
       }
       else if ( HB_IS_BLOCK( pString ) )
       {
+         pSelf = pString;
          pSymbol = &hb_symEval;
          ulStart = 2;
       }

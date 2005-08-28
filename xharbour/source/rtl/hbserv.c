@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.27 2005/08/07 02:40:38 mlombardo Exp $
+* $Id: hbserv.c,v 1.28 2005/08/07 10:44:23 druzus Exp $
 */
 
 /*
@@ -80,6 +80,8 @@
 #ifdef __LCC__
 #define EXCEPTION_ILLEGAL_INSTRUCTION       STATUS_ILLEGAL_INSTRUCTION
 #endif
+
+extern PHB_FUNC pHVMFuncService;
 
 /**************************************************
 * Global definition, valid for all systems
@@ -780,6 +782,7 @@ HB_FUNC( HB_STARTSERVICE )
 
    // let's begin
    sb_isService = TRUE;
+   pHVMFuncService = (PHB_FUNC) &hb_isService;
 
    // in windows, we just detach from console
    #ifdef HB_OS_WIN_32
@@ -836,7 +839,7 @@ HB_FUNC( HB_ISSERVICE )
 * the service/daemon system.
 * The minimal thing to do is a hb_gcCollectAll(), because, generally, servers
 * are not interactive, so they tend to have garbage to collect.
-* Under windows, it peeks the pending mesasges and send the relevant ones
+* Under windows, it peeks the pending messages and send the relevant ones
 * (quit, user+1 and user+2) to our handling functions.
 */
 

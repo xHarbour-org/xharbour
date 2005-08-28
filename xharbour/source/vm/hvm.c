@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.473 2005/07/17 18:29:13 ronpinkas Exp $
+ * $Id: hvm.c,v 1.474 2005/08/06 19:39:45 druzus Exp $
  */
 
 /*
@@ -150,6 +150,8 @@
    /* DEBUG only*/
    #include <windows.h>
 #endif
+
+PHB_FUNC pHVMFuncService = NULL;
 
 static void hb_vmClassError( int uiParams, char *szClassName, char *szMsg );
 
@@ -837,7 +839,8 @@ int HB_EXPORT hb_vmQuit( void )
    hb_i18nExit();
 
 #if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN_5 )
-   hb_serviceExit();
+   if( pHVMFuncService )
+      pHVMFuncService();
 #endif
 
    if( hb_set.HB_SET_EOL )
