@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.474 2005/08/06 19:39:45 druzus Exp $
+ * $Id: hvm.c,v 1.475 2005/08/28 19:25:33 walito Exp $
  */
 
 /*
@@ -6817,30 +6817,33 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    {
       if ( uiParams == 1 )
       {
-         char * szIndex = hb_stackItemFromTop( -3 )->item.asSymbol.value->szName;
-         if ( *szIndex == '_' )
+         if ( pSym->szName[0] == '_' )
          {
-            hb_hashAddChar( pSelf, szIndex + 1, hb_stackItemFromTop( -1 ) );
+            hb_hashAddChar( pSelf, pSym->szName + 1, hb_stackItemFromTop( -1 ) );
+            hb_itemCopy( &(HB_VM_STACK.Return), hb_stackItemFromTop( -1 ) );
+         }
+         else
+         {
+            hb_vmClassError( uiParams, "HASH", pSym->szName );
          }
       }
       else if ( uiParams == 0)
       {
-         char * szIndex = hb_stackItemFromTop( -2 )->item.asSymbol.value->szName;
-
          ULONG ulPos;
-         if( strcmp( szIndex, "CLASSNAME" ) == 0 )
+
+         if( strcmp( pSym->szName, "CLASSNAME" ) == 0 )
          {
             hb_itemPutC( &(HB_VM_STACK.Return), "HASH" );
          }
-         else if( strcmp( szIndex, "CLASSH" ) == 0 )
+         else if( strcmp( pSym->szName, "CLASSH" ) == 0 )
          {
             hb_itemPutNI( &(HB_VM_STACK.Return), 0 );
          }
-         else if( strcmp( szIndex, "KEYS" ) == 0 )
+         else if( strcmp( pSym->szName, "KEYS" ) == 0 )
          {
             hb_hashGetKeys( &(HB_VM_STACK.Return), pSelf );
          }
-         else if( strcmp( szIndex, "VALUES" ) == 0 )
+         else if( strcmp( pSym->szName, "VALUES" ) == 0 )
          {
             hb_hashGetValues( &(HB_VM_STACK.Return), pSelf );
          }
@@ -6848,7 +6851,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          {
             HB_ITEM_NEW( hbIndex );
 
-            hb_itemPutCRawStatic( &hbIndex, szIndex, strlen( szIndex ) );
+            hb_itemPutCRawStatic( &hbIndex, pSym->szName, strlen( pSym->szName ) );
 
             if ( hb_hashScan( pSelf, &hbIndex , &ulPos ) )
             {
@@ -6856,9 +6859,13 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             }
             else
             {
-               hb_vmClassError( uiParams, "HASH", szIndex );
+               hb_vmClassError( uiParams, "HASH", pSym->szName );
             }
          }
+      }
+      else
+      {
+         hb_vmClassError( uiParams, "HASH", pSym->szName );
       }
    }
 

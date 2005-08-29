@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4273 2005/08/24 20:44:38 peterrees Exp $
+ * $Id: ChangeLog,v 1.4274 2005/08/28 19:28:42 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-29 10:16 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  *  source/vm/hvm.c
+     ! Fixed 2 minor bugs in hb_vmSend() related to Hash method calls
+       using Hash:Method( <params> ) syntax
 
 2005-08-28 16:30 UTC-0300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/vm/hbserv.c
