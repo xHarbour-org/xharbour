@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.150 2005/08/13 15:00:36 walito Exp $
+ * $Id: classes.c,v 1.151 2005/08/16 18:07:05 walito Exp $
  */
 
 /*
@@ -974,23 +974,15 @@ HB_EXPORT char * hb_objGetRealClsName( PHB_ITEM pObject, char * szName )
 
 HB_EXPORT ULONG hb_objGetOpOver( const PHB_ITEM pObject )
 {
-   USHORT uiClass;
+   USHORT uiClass = hb_objClassH( pObject );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetOpOver(%p)", pObject ));
 
-   if( HB_IS_ARRAY( pObject ) )
-   {
-      uiClass = pObject->item.asArray.value->uiClass;
-   }
-   else
-   {
-      uiClass = 0;
-   }
-
    if( uiClass && uiClass <= s_uiClasses )
    {
-      return (s_pClasses + ( uiClass - 1 ))->fOpOver;
+      return ( s_pClasses + ( uiClass - 1 ) )->fOpOver;
    }
+
    return 0;
 }
 
@@ -3124,6 +3116,7 @@ HB_EXPORT USHORT hb_objClassH( PHB_ITEM pObject )
       default:
          uiClass = 0;
    }
+
    return uiClass;
 }
 
