@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt,v 1.9 2005/05/04 16:47:28 bdj Exp $
+ * $Id: whatsnew.txt,v 1.10 2005/06/19 16:47:39 bdj Exp $
  */
 
 /*
@@ -15,6 +15,137 @@
  *
  * Budyanto Dj. <budyanto@centrin.net.id>
  */
+
+
+=========================================================================
+2005-08-30 23:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id> :: BEGIN
+
+=============
+MAXIMIZE MODE
+=============
+   Gtwvw now allows its`windows to be in MAXIMIZED mode.
+   Please notice, however, that there are some things need to be addressed when
+   implementing this mode.
+
+   To implement this mode, app should have a special callback function WVW_SIZE.
+   This function is called by Gtwvw AFTER a window size is changed, as when the
+   window is maximized or restored.
+
+   See the sample prog doc/maximize.prg on how to apply a simple WVW_SIZE function.
+
+   Some new/modified supporting functions in this area of interest:
+
+   + WVW_UNREACHEDBR( [nWinNum], [nBottomPixels], [nRightPixels] )
+     get unreached pixels below maxrow() to nBottomPixels
+     and on the right of maxcols() to nRightPixels.
+
+   + WVW_MAXMAXROW() : returns maximum possible maxrow()
+
+   + WVW_MAXMAXCOL() : returns maximum possible maxcol()
+
+   * WVW_MAXIMIZE()
+     ! This function now really maximizes the window, provided
+       user has the WVW_SIZE function.
+       (This is different with gtwvt's WVT_MAXIMIZE which really does a RESTORE).
+
+   + WVW_RESTORE()
+     * Restores a window
+
+   + WVW_ENABLEMAXIMIZE()
+     * Enables the Maximize/Restore button.
+
+
+==================
+WINDOW POSITIONING
+==================
+
+   Some new functions regarding window positioning:
+
+   + WVW_SETDEFCENTREWINDOW() to change default CentreWindow setting.
+     CentreWindow==.t. will cause subsequent opened windows be centered vertically and horizontally.
+
+   + WVW_SETDEFHCENTREWINDOW() to change default HCentreWindow setting.
+     HCentreWindow==.t. will cause subsequent opened windows be centered horizontally.
+
+   + WVW_SETDEFVCENTREWINDOW() to change default VCentreWindow setting.
+     VCentreWindow==.t. will cause subsequent opened windows be centered vertically.
+
+   * WVW_XREPOSWINDOW() now has an optional param lAnchored (default is .t.).
+     If it's .f. then subwindows will be positioned according to each CentreWindow setting.
+
+   /*
+   DefCentreWindow, DefHCentreWindow, DefVCentreWindow are default setting used when opening a new subwindow.
+   if DefCentreWindow == .t.
+      newly open subwindow will be placed centered both vertically and horizontally in respect to Main Window
+   else
+      if DefHCentreWindow == .t.
+         newly open subwindow will be horizontally centered in respect to Main Window
+      endif
+      if DefVCentreWindow == .t.
+         newly open subwindow will be vertically centered in respect to Main Window
+      endif
+   endif
+   */
+
+
+=========
+SCROLLBAR
+=========
+
+   Some changes regarding scrollbar:
+   ! fix problem of missed WM_LBUTTONUP causing "sticky" scrollbar
+   ! if "sticky" scrollbar still occurs, WM_CHAR will stop it
+   ! etc.
+
+   + WVW_XBinfo( [nWinNum], XBid )
+     return an array {nMin, nMax, nPageSize, nPos, nTrackPos } of scrollbar XBid
+     return an empty array {} if invalid parameter passed.
+
+   * WM_RBUTTON* on scrollbar is now disabled.
+
+
+========
+COMBOBOX
+========
+
+   * all arrow keys are now passed to parent window,
+     regardless of Ctrl, Alt, and Shift states.
+     (only in WVW_CB_KBD_CLIPPER)
+
+
+=============
+MISCELLANEOUS
+=============
+
+   * WVW_DRAWLABELOBJ() added aOffset optional parm
+
+   * gtWndProc handles unreached area "better"
+     will repaint it on maxcol()/maxrow() event
+
+   * WM_CLOSE on Main Window is now followed by K_ESC,
+     thus in a case where SETCANCEL() is .f. an app can still handle this event.
+
+2005-08-30 23:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id> :: END
+=========================================================================
+
+2005-08-01 23:15 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+  * source/rtl/gtwvt/gtwvt.c
+    ! Fix resource leak in gtResetWindowSize(). A severe bug for Win98.
+
+2005-07-22 14:20 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
+  * source/rtl/gtwvt/gtwvt.c
+    contrib/gtwvw/gtwvt.c
+    contrib/wvtwin/wvtcore.c
+    contrib/wvtwin/wvtutils.c
+    ! all Windows structures like RECT/POINT/LOGFONT/LOGBRUSH now are initialized to an empty structure.
+
+2005-06-30 23:10 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+ * contrib/gtwvw/gtwvw.c
+   ! Fix calculation of iNextPos in hb_wvw_gtAddCharToInputQueue()
+     and hb_wvw_gtGetCharFromInputQueue(). Resolves problem
+     reported of lost input characters.
+     Many Thanks to Peter Rees.
 
 2005/06/19
  * gtwvw.c

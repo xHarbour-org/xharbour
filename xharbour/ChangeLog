@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4276 2005/08/29 18:04:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4277 2005/08/30 16:30:21 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-30 23:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+  * contrib/gtwvw/hbgtwvw.h
+    + supporting Maximize mode
+    + new functions for centering window
+    + bugfix and enhancement on scrollbar
+
+  * contrib/gtwvw/doc/whatsnew.txt
+    Details of above changes.
+
+  + contrib/gtwvw/samples/maximize.prg
+    Sample of using Maximize mode in a gtwvw app.
+
 2005-08-30 13:30 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
   * source/rtl/copyfile.c
     ! Fixed problem reported by Rafa Carmona. Now use hb_spOpen instes of hb_fOpen
@@ -151,11 +165,11 @@
 2005-08-16 21:35 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * xharbour/include/gtinfo.ch
     * added GTI_XCURSORCOLOR1, GTI_XCURSORCOLOR2, GTI_XCURSORBLINKRATE
-	 * Under gtxwc cursor is a "colored" character, these settings help to
-	 * make it more visible.
+    * Under gtxwc cursor is a "colored" character, these settings help to
+    * make it more visible.
   * xharbour/source/rtl/gtxwc.c
     * moved cursor blinking code to hb_xvt_gtProcessMessages
-	 * added logic to control cursor color and blink rate
+    * added logic to control cursor color and blink rate
 
 2005-08-16 14:50 UTC-0300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/vm/classes.c

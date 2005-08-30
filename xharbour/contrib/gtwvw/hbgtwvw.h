@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h,v 1.6 2005/03/30 21:28:46 andijahja Exp $
+ * $Id: hbgtwvw.h,v 1.7 2005/05/04 16:47:22 bdj Exp $
  */
 
 /*
@@ -91,6 +91,7 @@
       #include <conio.h>
 
       #if !defined( __POCC__ )
+
          #if !defined( LONG_PTR )
             typedef __int64 LONG_PTR ;
             #ifndef SetWindowLongPtr
@@ -203,6 +204,7 @@
 #define BRIGHT_WHITE   RGB( 0xFF,0xFF,0xFF )
 
 /*-------------------------------------------------------------------*/
+
 #if defined(__DMC__)
 
    #define SBT_TOOLTIPS             0x0800
@@ -217,11 +219,11 @@
    #define TB_SETMAXTEXTROWS       (WM_USER + 60)
    #define PBS_VERTICAL            0x04
    #define PBS_SMOOTH              0x01
-   #define CCM_FIRST               0x2000      // Common control shared messages
-   #define CCM_SETBKCOLOR          (CCM_FIRST + 1) // lParam is bkColor
-   #define PBM_SETBKCOLOR          CCM_SETBKCOLOR  // lParam = bkColor
-   #define PBM_SETBARCOLOR         (WM_USER+9)     // lParam = bar color
-   #define PBM_GETRANGE            (WM_USER+7)  // wParam = return (TRUE ? low : high). lParam = PPBRANGE or NULL
+   #define CCM_FIRST               0x2000
+   #define CCM_SETBKCOLOR          (CCM_FIRST + 1)
+   #define PBM_SETBKCOLOR          CCM_SETBKCOLOR
+   #define PBM_SETBARCOLOR         (WM_USER+9)
+   #define PBM_GETRANGE            (WM_USER+7)
    #define PBM_GETPOS              (WM_USER+8)
 
    typedef DWORD UINT_PTR;
@@ -246,8 +248,8 @@
    } TRIVERTEX,*PTRIVERTEX,*LPTRIVERTEX;
 
    typedef struct tagINITCOMMONCONTROLSEX {
-          DWORD dwSize;             // size of this structure
-          DWORD dwICC;              // flags indicating which classes to be initialized
+          DWORD dwSize;
+          DWORD dwICC;
    } INITCOMMONCONTROLSEX, *LPINITCOMMONCONTROLSEX;
 
    WINCOMMCTRLAPI BOOL WINAPI InitCommonControlsEx(LPINITCOMMONCONTROLSEX);
@@ -359,6 +361,8 @@ typedef struct app_data
   PHB_DYNS  pSymWVW_MOUSE;             /* Stores pointer to WVW_MOUSE function     */
   PHB_DYNS  pSymWVW_MENUSELECT;        /* Stores pointer to WVW_MENUSELECT function*/
 
+  PHB_DYNS  pSymWVW_SIZE;              /* Stores pointer to WVW_SIZE function */
+
   PHB_DYNS  pSymWVW_INPUTFOCUS;        /* Stores pointer to WVW_INPUTFOCUS function*/
 
   PHB_DYNS  pSymWVW_TIMER;             /* Stores pointer to WVW_TIMER function     */
@@ -435,6 +439,11 @@ typedef struct win_data
   int       LastMenuEvent;             /* Last menu item selected */
   int       MenuKeyEvent;              /* User definable event number for windows menu command */
   BOOL      CentreWindow;              /* True if window is to be Reset into centre of window */
+
+  /* if CentreWindow is FALSE, two following settings are examined */
+  BOOL      HCentreWindow;             /* True if window is to be Reset into centre of window, horizontally */
+  BOOL      VCentreWindow;             /* True if window is to be Reset into centre of window, vertically */
+
   int       CodePage;                  /* Code page to use for display characters */
 
   BOOL      InvalidateWindow;          /* Flag for controlling whether to use ScrollWindowEx() */
