@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.112 2005/08/30 00:00:00 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.113 2005/08/30 16:05:00 modalsist Exp $
  */
 
 /*
@@ -241,8 +241,10 @@ The ACCESSES/ASSIGNS below are for ColorRect tests only
    ACCESS PhysRowTop INLINE ::nPhysRowTop
    ACCESS PhysRowBottom INLINE ::nPhysRowBottom
 
-   ACCESS ColRectTop INLINE IIF(LEN(::aColorRectArea)>0,::aColorRectArea[ COLORRECT_TOP ],0)
-   ACCESS ColRectBot INLINE IIF(LEN(::aColorRectArea)>0,::aColorRectArea[ COLORRECT_BOTTOM ],0)
+   ACCESS ColorRectTop    INLINE IIF(LEN(::aColorRectArea)>0,::aColorRectArea[ COLORRECT_TOP ],0)
+   ACCESS ColorRectLeft   INLINE IIF(LEN(::aColorRectArea)>0,::aColorRectArea[ COLORRECT_LEFT ],0)
+   ACCESS ColorRectBottom INLINE IIF(LEN(::aColorRectArea)>0,::aColorRectArea[ COLORRECT_BOTTOM ],0)
+   ACCESS ColorRectRight  INLINE IIF(LEN(::aColorRectArea)>0,::aColorRectArea[ COLORRECT_RIGHT ],0)
 
 /****************/
 
@@ -1958,24 +1960,29 @@ LOCAL i, nTop,nLeft,nBottom,nRight,lOK
       IF lOK
          IF valtype(nLeft)="N" .AND.  nLeft >= 1 .AND. nLeft <= ::nColumns
             lOK := .T.
+         ELSE
+            lOK := .F.
          ENDIF
 
          IF lOK
-            IF valtype(nBottom)="N" .AND.  nBottom >= 1 .AND. nBottom <= ::RowCount .AND. ( (nBottom-nTop) > 0 )
+            IF valtype(nBottom)="N" .AND.  nBottom >= 1 .AND. nBottom <= ::RowCount .AND. ( (nBottom-nTop) >= 0 )
                lOK := .T.
+            ELSE
+               lOK := .F.
             ENDIF
 
             IF lOK
-               IF valtype(nRight)="N" .AND. nRight >= 1 .AND. nRight <= ::nColumns .AND. ( (nRight - nLeft) > 0 )
+               IF valtype(nRight)="N" .AND. nRight >= 1 .AND. nRight <= ::nColumns .AND. ( (nRight - nLeft) >= 0 )
                   lOK := .T.
+               ELSE
+                  lOK := .F.
                ENDIF
             ENDIF
          ENDIF
       ENDIF
 
-      IF !lOK
-         ::ResetColorRectArea()
-      ELSE
+      IF lOK
+
 
          // If already exist aRect region, we need to refresh before.
          IF !Empty(::aColorRectArea)
