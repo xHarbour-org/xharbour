@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4281 2005/08/30 19:08:25 modalsist Exp $
+ * $Id: ChangeLog,v 1.4281 2005/08/31 11:16:29 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,49 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2005-08-31 13:25 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/pcre
+    + added directory to contain pcre library
+  * source/rtl/pcre/*
+    + chartables.c
+    + config.h
+    + dftables.c
+    + Makefile
+    + pcre.h
+    + pcreposix.c
+    + pcreposix.h
+    + pcre_compile.c
+    + pcre_config.c
+    + pcre_dfa_exec.c
+    + pcre_exec.c
+    + pcre_fullinfo.c
+    + pcre_get.c
+    + pcre_globals.c
+    + pcre_info.c
+    + pcre_internal.h
+    + pcre_maketables.c
+    + pcre_ord2utf8.c
+    + pcre_printint.c
+    + pcre_refcount.c
+    + pcre_scanner.h
+    + pcre_study.c
+    + pcre_tables.c
+    + pcre_try_flipped.c
+    + pcre_ucp_findchar.c
+    + pcre_valid_utf8.c
+    + pcre_version.c
+    + pcre_xclass.c
+    + ucp.h
+    + ucpinternal.h
+    + ucptable.c
+    + ucp_findchar.c
+    + Added pcre 6.3 files which are needed by xharbour regex support
+
 2005-08-31 08:05 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
-    ! fixed bug in down() and up() methods to skip records even if we 
-      call down/up before call stabilize, as Clipper's tbrowse. 
+    ! fixed bug in down() and up() methods to skip records even if we
+      call down/up before call stabilize, as Clipper's tbrowse.
       Bug reported by Gaby Zurbuchen.
 
 2005-08-30 16:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
