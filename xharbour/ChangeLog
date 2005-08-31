@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4280 2005/08/30 00:00:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.4281 2005/08/30 19:08:25 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-31 08:05 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    ! fixed bug in down() and up() methods to skip records even if we 
+      call down/up before call stabilize, as Clipper's tbrowse. 
+      Bug reported by Gaby Zurbuchen.
 
 2005-08-30 16:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg

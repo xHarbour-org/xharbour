@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.113 2005/08/30 16:05:00 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.114 2005/08/31 08:05:00 modalsist Exp $
  */
 
 /*
@@ -1101,7 +1101,7 @@ METHOD Down() CLASS TBrowse
 LOCAL nNewTop,nNewBottom
 
    ::Moved()
-   ::nRecsToSkip := 1
+   ::nRecsToSkip++
 
    ::RefreshColorRectCell()
 
@@ -1158,7 +1158,7 @@ METHOD Up() CLASS TBrowse
 LOCAL nNewTop,nNewBottom
 
    ::Moved()
-   ::nRecsToSkip := -1
+   ::nRecsToSkip--
 
    ::RefreshColorRectCell()
 
