@@ -12,6 +12,7 @@ PROCEDURE Main()
    ? cVar:Character:AsString
    ? cVar:Sub( 1, 3 )
 
+   cVar := "23"
    ? nVar + cVar
 
 RETURN

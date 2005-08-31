@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.476 2005/08/29 17:17:04 ronpinkas Exp $
+ * $Id: hvm.c,v 1.477 2005/08/29 18:04:19 ronpinkas Exp $
  */
 
 /*
@@ -3947,7 +3947,7 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
    /* Intentionally using HB_IS_NUMERIC() instead of HB_IS_NUMBER() on the right
       Clipper consider DATE + NUMBER => DATE and DATE + DATE => DATE
    */
-   else if( ( HB_IS_STRING( pLeft ) || HB_IS_STRING( pRight ) ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
+   else if( HB_IS_STRING( pLeft ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
    {
       BYTE bByte = (BYTE) ( hb_itemGetND( pLeft ) + hb_itemGetND( pRight ) );
 
@@ -3957,6 +3957,22 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
       pResult->item.asString.value = hb_vm_acAscii[ bByte ];
       pResult->item.asString.bStatic = TRUE;
       pResult->item.asString.length = 1;
+   }
+   else if( ( HB_IS_STRING( pRight ) && HB_IS_NUMERIC( pRight ) ) && HB_IS_NUMINT( pLeft ) )
+   {
+      HB_LONG lNumber1 = hb_itemGetNInt( pLeft );
+      HB_LONG lNumber2 = hb_itemGetNInt( pRight );
+      HB_LONG lResult = lNumber1 + lNumber2;
+
+      if( lNumber2 >= 0 ? lResult >= lNumber1 : lResult < lNumber1 )
+      {
+         hb_itemPutNInt( pResult, lResult );
+      }
+      else
+      {
+         hb_itemPutNDDec( pResult, ( double ) lNumber1 + ( double ) lNumber2, 0 );
+      }
+
    }
    else if( ( HB_IS_DATE( pLeft ) || HB_IS_DATE( pRight ) ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
    {
@@ -9539,6 +9555,20 @@ HB_FUNC( HB_NOMOUSE )
 
 HB_FUNC( HB_NOSTARTUPWINDOW )
 {
+}
+
+HB_FUNC( HB_RESETWITH )
+{
+   HB_THREAD_STUB
+
+   if( hb_pcount() >= 1 )
+   {
+      hb_itemForwardValue( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter - 1 ] ), hb_stackItemFromBase( 1 ) );
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 1607, NULL, "HB_RESETWITH", 0, NULL );
+   }
 }
 
 HB_FUNC( HB_WITHOBJECTCOUNTER )

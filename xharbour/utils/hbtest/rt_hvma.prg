@@ -1,5 +1,5 @@
 /*
- * $Id: rt_hvma.prg,v 1.3 2003/07/16 11:12:43 andijahja Exp $
+ * $Id: rt_hvma.prg,v 1.4 2005/03/20 02:13:45 andijahja Exp $
  */
 
 /*
@@ -69,7 +69,7 @@ FUNCTION Main_HVMA()
    TEST_LINE( scString + NIL                  , "E BASE 1081 Argument error + A:2:C:HELLO;U:NIL F:S" )
    TEST_LINE( scString - NIL                  , "E BASE 1082 Argument error - A:2:C:HELLO;U:NIL F:S" )
 
-   TEST_LINE( 1 + NIL                         , "E BASE 1081 Argument error + A:2:U:NIL;N:1 F:S")
+   TEST_LINE( 1 + NIL                         , "E BASE 1081 Argument error + A:2:N:1;U:NIL F:S")
    TEST_LINE( 1 - NIL                         , "E BASE 1082 Argument error - A:2:N:1;U:NIL F:S" )
 
    TEST_LINE( "A" - "B"                       , "AB"                               )

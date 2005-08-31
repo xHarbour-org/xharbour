@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.100 2005/07/25 14:57:21 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.101 2005/07/25 15:09:21 ronpinkas Exp $
  */
 
 /*
@@ -4379,6 +4379,7 @@ static HB_EXPR_FUNC( hb_compExprUsePlus )
       case HB_EA_LVALUE:
          hb_compErrorLValue( pSelf );
          break;
+
       case HB_EA_PUSH_PCODE:
          {
           #if defined( HB_MACRO_SUPPORT )
@@ -4396,12 +4397,14 @@ static HB_EXPR_FUNC( hb_compExprUsePlus )
                pValue = pSelf->value.asOperator.pLeft;
                iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
             }
+            #if 0 // Num + Date != Date + Num, and Num + String(1) != String(1) + Num
             else if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_NUMERIC && pSelf->value.asOperator.pLeft->value.asNum.NumType == HB_ET_LONG &&
                      pSelf->value.asOperator.pLeft->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pLeft->value.asNum.lVal <= 32767 )
             {
                pValue = pSelf->value.asOperator.pRight;
                iIncrement = ( short ) pSelf->value.asOperator.pLeft->value.asNum.lVal;
             }
+            #endif
 
             if( pValue )
             {
@@ -4474,6 +4477,7 @@ static HB_EXPR_FUNC( hb_compExprUseMinus )
       case HB_EA_LVALUE:
          hb_compErrorLValue( pSelf );
          break;
+
       case HB_EA_PUSH_PCODE:
          {
           #if defined( HB_MACRO_SUPPORT )

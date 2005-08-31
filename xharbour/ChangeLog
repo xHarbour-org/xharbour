@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4283 2005/08/31 14:32:36 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4284 2005/08/31 15:00:13 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-08-29 17:31 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbexprb.c
+  * source/compiler/exproptb.c
+    - Removed optimization of INT + <x> into <x> <INT> HB_P_ADDINT, in hb_compExprUsePlus()
+      because 1 + "A" is not same as "A" + 1
+
+  * source/vm/hvm.c
+    ! Fixed hb_vmPlus() to seperate handling of INT + <String(1)> from <String(1)> + <INT>
+
+  * utils/hbtest/rt_hvma.prg
+    * Corrected expected error to not modify arguments order for 1 + NIL
+
+  * tests/associat.prg
+    * Was not commited in my latest commit.
 
 
 2005-08-31 17:10 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
@@ -74,7 +89,10 @@
       call down/up before call stabilize, as Clipper's tbrowse.
       Bug reported by Gaby Zurbuchen.
 
->>>>>>> 1.4282
+2005-08-29 17:31 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/hvm.c
+    + Added prg level HB_ResetWith( <xNewWith> )
+
 2005-08-30 16:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
     ! Minor fix in ColorRect() method.
