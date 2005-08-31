@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4281 2005/08/31 11:16:29 modalsist Exp $
+ * $Id: ChangeLog,v 1.4282 2005/08/31 11:21:11 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2005-08-31 13:30 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/regex.c
+    * modified to use pcre/ contents
+  * include/regex.h
+    * modified to use pcre/ contents
+
+  /* NOTE: After this change all builds, apart from the OS/2 GCC one, are _BROKEN_
+           To make them work again build files needs to be updated to use
+           pcre/ and build its content as a library ( pcrepos.lib )
+  */
 
 2005-08-31 13:25 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/pcre
@@ -53,6 +64,7 @@
       call down/up before call stabilize, as Clipper's tbrowse.
       Bug reported by Gaby Zurbuchen.
 
+>>>>>>> 1.4282
 2005-08-30 16:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
     ! Minor fix in ColorRect() method.
