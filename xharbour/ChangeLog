@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4282 2005/08/31 11:21:11 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4283 2005/08/31 14:32:36 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2005-08-31 17:10 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * makefile.bc
+     * changed to work with new pcre 6.3 regex engine
+   * bin\bld.bat
+     * changed to add pcrepos.lib to built .exe files
+
+   /* NOTE: This win32 build seems to work fine, I don't have other
+            win32 compilers available, though.
+   */
 
 2005-08-31 13:30 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/regex.c
