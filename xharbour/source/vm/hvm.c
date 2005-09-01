@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.479 2005/09/01 18:39:18 ronpinkas Exp $
+ * $Id: hvm.c,v 1.480 2005/09/01 18:46:34 ronpinkas Exp $
  */
 
 /*
@@ -8504,7 +8504,7 @@ static void hb_vmPopLocal( SHORT iLocal )
       pLocal = hb_codeblockGetVar( hb_stackSelfItem(), iLocal ) ;
    }
 
-   if( ( IS_NUMBER( pLocal ) && IS_NUMBER( pVal ) ) || pLocal->type == pVal->type )
+   if( ( HB_IS_NUMBER( pLocal ) && HB_IS_NUMBER( pVal ) ) || pLocal->type == pVal->type )
    {
       hb_itemForwardValue( pLocal, pVal );
    }
