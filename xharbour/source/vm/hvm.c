@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.478 2005/08/31 16:09:21 ronpinkas Exp $
+ * $Id: hvm.c,v 1.479 2005/09/01 18:39:18 ronpinkas Exp $
  */
 
 /*
@@ -3181,7 +3181,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPGLOBAL") );
 
-            if( ( HB_IS_NUMERIC( (*pGlobals)[ iGlobal ] ) && HB_IS_NUMERIC( *( HB_VM_STACK.pPos - 1 ) ) ) ||
+            if( ( HB_IS_NUMBER( (*pGlobals)[ iGlobal ] ) && HB_IS_NUMBER( *( HB_VM_STACK.pPos - 1 ) ) ) ||
                 ( (*pGlobals)[ iGlobal ] )->type == ( *( HB_VM_STACK.pPos - 1 ) )->type )
             {
                hb_itemForwardValue( (*pGlobals)[ iGlobal ], *( HB_VM_STACK.pPos - 1 ) );
@@ -8504,7 +8504,7 @@ static void hb_vmPopLocal( SHORT iLocal )
       pLocal = hb_codeblockGetVar( hb_stackSelfItem(), iLocal ) ;
    }
 
-   if( ( HB_IS_NUMERIC( pLocal ) && HB_IS_NUMERIC( pVal ) ) || pLocal->type == pVal->type )
+   if( ( IS_NUMBER( pLocal ) && IS_NUMBER( pVal ) ) || pLocal->type == pVal->type )
    {
       hb_itemForwardValue( pLocal, pVal );
    }
@@ -8537,7 +8537,7 @@ static void hb_vmPopStatic( USHORT uiStatic )
 
    //TraceLog( NULL, "Assign Static: %i, Class: %s\n", uiStatic, hb_objGetClsName( pVal ) );
 
-   if( ( HB_IS_NUMERIC( pStatic ) && HB_IS_NUMERIC( pVal ) ) || pStatic->type == pVal->type )
+   if( ( HB_IS_NUMBER( pStatic ) && HB_IS_NUMBER( pVal ) ) || pStatic->type == pVal->type )
    {
       hb_itemForwardValue( pStatic, pVal );
    }

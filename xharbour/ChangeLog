@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4288 2005/09/01 13:04:15 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4289 2005/09/01 18:39:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,6 +10,7 @@
 
 2005-09-01 11:37 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/hvm.c
+    % Few optimizations related to hb_vmPushString() followed by hb_xfree()
     * [Hopefully] Completed support for operator overloading, including native types.
 
   /* NOTE: Operator Overloading
