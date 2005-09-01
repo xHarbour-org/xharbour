@@ -1,6 +1,7 @@
 #include "base64.h"
 #include "hbapi.h"
 #include "hbapifs.h"
+#define HB_THREAD_OPTIMIZE_STACK
 
 #define XTY62  '+'
 #define XTY63  '/'
@@ -111,6 +112,7 @@ unsigned char *Base64Decode(const char *pcszInput, unsigned int *puOutLen)
 
 HB_FUNC( HB_BASE64ENCODE )
 {
+   HB_THREAD_STUB
    const unsigned char *pcCode = hb_parcx( 1 ) ;
    unsigned int uCodeLen = hb_parni( 2 );
    char * szBase64Encode ;
@@ -121,6 +123,7 @@ HB_FUNC( HB_BASE64ENCODE )
 
 HB_FUNC( HB_BASE64DECODE )
 {
+   HB_THREAD_STUB
    const char *pcCode = hb_parcx( 1 ) ;
    unsigned int uCodeLen ;
    unsigned char * szBase64Encode ;
@@ -153,6 +156,7 @@ static char *filetoBuff(char *f,char *s)
 
 HB_FUNC( HB_BASE64ENCODEFILE )
 {
+   HB_THREAD_STUB
    char *szInFile = hb_parcx( 1 );
    char *szOutFile = hb_parcx( 2 ) ;
    const char *pcCode ;
@@ -176,6 +180,7 @@ HB_FUNC( HB_BASE64ENCODEFILE )
 
 HB_FUNC( HB_BASE64DECODEFILE )
 {
+   HB_THREAD_STUB
    char *szInFile = hb_parcx( 1 );
    char *szOutFile = hb_parcx( 2 ) ;
    const char *pcCode ;

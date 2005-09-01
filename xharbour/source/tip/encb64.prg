@@ -1,5 +1,5 @@
 /*
- * $Id: encb64.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
+ * $Id: encb64.prg,v 1.2 2005/01/09 23:19:31 ronpinkas Exp $
  */
 
 /*
@@ -58,6 +58,7 @@
 #include "hbapierr.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
+#define HB_THREAD_OPTIMIZE_STACK
 #enddump
 
 CLASS TIPEncoderBase64 FROM TIPEncoder
@@ -82,6 +83,7 @@ RETURN Self
 
 HB_FUNC( TIPENCODERBASE64_ENCODE )
 {
+   HB_THREAD_STUB
    char *cData = hb_parc(1);
    char *cRet;
    int nLen = hb_parclen(1);
@@ -213,6 +215,7 @@ HB_FUNC( TIPENCODERBASE64_ENCODE )
 #pragma BEGINDUMP
 HB_FUNC( TIPENCODERBASE64_DECODE )
 {
+   HB_THREAD_STUB
    char *cData = hb_parc(1);
    unsigned char *cRet;
    int nLen = hb_parclen(1);

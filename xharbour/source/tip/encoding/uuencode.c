@@ -2,6 +2,8 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 
+#define HB_THREAD_OPTIMIZE_STACK
+
 //Assume pInput!=NULL, iInputLen>0.
 char *UUEncode(unsigned char *pInput, unsigned int iInputLen)
 {
@@ -69,6 +71,7 @@ unsigned char* UUDecode(char *pszInput, unsigned int *pOutLen)
 
 HB_FUNC( HB_UUENCODE )
 {
+   HB_THREAD_STUB
    unsigned char *pcCode = hb_parcx( 1 ) ;
    unsigned int uCodeLen = hb_parni( 2 );
    char * szUUEncode ;
@@ -79,6 +82,7 @@ HB_FUNC( HB_UUENCODE )
 
 HB_FUNC( HB_UUDECODE )
 {
+   HB_THREAD_STUB
    unsigned char *pcCode = hb_parcx( 1 ) ;
    unsigned int uCodeLen ;
    unsigned char * szUUEncode ;
@@ -112,6 +116,7 @@ static char *filetoBuff(char *f,char *s)
 
 HB_FUNC( HB_UUENCODEFILE )
 {
+   HB_THREAD_STUB
    char *szInFile = hb_parcx( 1 );
    char *szOutFile = hb_parcx( 2 ) ;
    char *pcCode ;
@@ -135,6 +140,7 @@ HB_FUNC( HB_UUENCODEFILE )
 
 HB_FUNC( HB_UUDECODEFILE )
 {
+   HB_THREAD_STUB
    char *szInFile = hb_parcx( 1 );
    char *szOutFile = hb_parcx( 2 ) ;
    unsigned char *pcCode ;

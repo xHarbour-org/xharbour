@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4284 2005/08/31 15:00:13 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4285 2005/08/31 16:09:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-08-31 23:40 UTC-0300 Luiz Rafael Culik<culikr at uol.com.br>
+  * source/tip/encoding/base64.c
+  * source/tip/encoding/uuencode.c
+  * source/tip/encb64.prg
+    ! Fixed problem when doing base64 encoding on mt programs
+      Reported by Rodrigo Moreno
 
 2005-08-29 17:31 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbexprb.c
