@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.8 2004/09/29 16:19:08 mauriliolongo Exp $
+# $Id: gcc.cf,v 1.9 2004/10/31 13:15:46 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -16,7 +16,7 @@ CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
 # 26/03/2004 - <maurilio.longo@libero.it>
 # added -DTCPV40HDRS to compile with GCC 3.2.2 on OS/2 v4.0 with mixed 16/32 bit tcp/ip stack
 # to be removed if compiled on a tcp/ip stack >= 4.1 (eComStation, for example)
-CFLAGS = -DHB_OS_OS2 -Wall -O2 -DTCPV40HDRS
+CFLAGS = -DHB_OS_OS2 -Wall -fsigned-char -O2 -DTCPV40HDRS
 
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
@@ -94,23 +94,33 @@ LINKLIBS += -l$(HB_GT_LIB)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtos2/$(ARCH)
 LINKLIBS += -lgtos2
 else
+
+ifeq ($(HB_MULTI_GT),yes)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
 LINKLIBS += -lgtnul
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtos2/$(ARCH)
-LINKLIBS += -lgtos2
-endif
-endif
 endif
 
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+LINKLIBS += -l$(HB_GT_LIB)
+
+endif
+endif
+endif
 
 # Add all libraries specified in HB_USER_LIBS.
 LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
 LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 
 
+# New pcreposix library, at the end of all
+ifeq ($(findstring rtl,$(LIBS)),rtl)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH)
+LINKLIBS += -lpcrepos
+endif
+
 #LINKLIBS += -Wl,-)
 # statical linking with GCC 3.2.2 libc as not require its presence on user system
-LDFLAGS += $(LINKPATHS) -static -s
+LDFLAGS += $(LINKPATHS) -s
 
 ifeq ($(C_MAIN),)
 ifeq ($(HB_GT_LIB),os2pm)
