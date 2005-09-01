@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4287 2005/09/01 08:52:23 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4288 2005/09/01 13:04:15 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-01 11:37 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/hvm.c
+    * [Hopefully] Completed support for operator overloading, including native types.
+
+  /* NOTE: Operator Overloading
+           --------------------
+
+    1. When an operator has 2 arguments only the the LEFT side may overload the operation.
+
+    2. NATIVE COMPATABILITY of operands PRECEDEs Operator Overloading declarations.
+       This means that when the operation can be performed withOUT an error, overloading
+       is NOT intended to take place, and will be ignored.
+   */
 
 2005-09-01 15:04 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
   * source/rtl/Makefile

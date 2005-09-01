@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.477 2005/08/29 18:04:19 ronpinkas Exp $
+ * $Id: hvm.c,v 1.478 2005/08/31 16:09:21 ronpinkas Exp $
  */
 
 /*
@@ -2493,8 +2493,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             BYTE *pBuffer;
 
             pBuffer = hb_vmUnhideString( ( BYTE * ) ( pCode ) + w + 3, ulSize );
-            hb_vmPushString( (char *) pBuffer, ulSize - 1 );
-            hb_xfree( pBuffer );
+
+            hb_stackPush();
+            hb_itemPutCPtr( *( HB_VM_STACK.pPos - 1 ), (char *) pBuffer, ulSize - 1 );
 
             w += ( 6 + ulBufferLen );
             break;
@@ -2697,50 +2698,41 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                dNewVal = pLocal->item.asDouble.value + ( double ) iAdd;
             }
-            else if( HB_IS_OBJECT( pLocal ) )
+            else if( iAdd == 1 && ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_INC ) )
             {
-               if( iAdd == 1 && ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_INC ) )
-               {
-                  hb_vmOperatorCallUnary( pLocal, "__OPINC" );
-               }
-               else if( iAdd == -1 && ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_DEC ) )
-               {
-                  hb_vmOperatorCallUnary( pLocal, "__OPDEC" );
-               }
-               else if( ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_PLUS ) )
-               {
-                  HB_ITEM Add;
+               hb_vmOperatorCallUnary( pLocal, "__OPINC" );
+               break;
+            }
+            else if( iAdd == -1 && ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_DEC ) )
+            {
+               hb_vmOperatorCallUnary( pLocal, "__OPDEC" );
+               break;
+            }
+            else if( ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_PLUS ) )
+            {
+               HB_ITEM Add;
 
-                  Add.type = HB_IT_INTEGER;
-                  Add.item.asInteger.value = iAdd;
-                  Add.item.asInteger.length = 10;
+               Add.type = HB_IT_INTEGER;
+               Add.item.asInteger.value = iAdd;
+               Add.item.asInteger.length = 10;
 
-                  hb_vmOperatorCall( pLocal, &Add, "__OPPLUS", NULL, 0, NULL );
-               }
-               else
-               {
-                  goto LocalNearAddIntError;
-               }
-
+               hb_vmOperatorCall( pLocal, &Add, "__OPPLUS", NULL, 0, pLocal );
                break;
             }
             else
             {
-               LocalNearAddIntError :
+               HB_ITEM_NEW( Add );
+               PHB_ITEM pResult;
+
+               hb_itemPutNI( &Add, ( int ) iAdd );
+               pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLocal, &Add );
+
+               if( pResult )
                {
-                  HB_ITEM_NEW( Add );
-                  PHB_ITEM pResult;
-
-                  hb_itemPutNI( &Add, ( int ) iAdd );
-                  pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLocal, &Add );
-
-                  if( pResult )
-                  {
-                     hb_itemForwardValue( pLocal, pResult );
-                  }
-
-                  break;
+                  hb_itemForwardValue( pLocal, pResult );
                }
+
+               break;
             }
 
             if( ! HB_IS_DOUBLE( pLocal ) )
@@ -2765,20 +2757,17 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                pLocal = hb_itemUnRef( pLocal );
             }
 
-            if( HB_IS_COMPLEX( pLocal ) )
+            if( ( ! HB_IS_NUMBER( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
             {
-               if( HB_IS_OBJECT( pLocal ) && ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN ) )
-               {
-                  hb_vmPushInteger( iNewVal );
-                  hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 0, pLocal );
+               hb_vmPushInteger( iNewVal );
+               hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 0, pLocal );
 
-                  w += 4;
-                  break;
-               }
-               else
-               {
-                 hb_itemClear( pLocal );
-               }
+               w += 4;
+               break;
+            }
+            else
+            {
+              hb_itemClear( pLocal );
             }
 
             pLocal->type = HB_IT_INTEGER;
@@ -2799,20 +2788,17 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                pLocal = hb_itemUnRef( pLocal );
             }
 
-            if( HB_IS_COMPLEX( pLocal ) )
+            if( ( ! HB_IS_STRING( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
             {
-               if( HB_IS_OBJECT( pLocal ) && ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN ) )
-               {
-                  hb_itemPushStaticString( ( char * ) ( pCode ) + w + 4, ( ULONG ) ( uiSize - 1 ) );
-                  hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 0, pLocal );
+               hb_itemPushStaticString( ( char * ) ( pCode ) + w + 4, ( ULONG ) ( uiSize - 1 ) );
+               hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 0, pLocal );
 
-                  w += ( 4 + uiSize );
-                  break;
-               }
-               else
-               {
-                  hb_itemClear( pLocal );
-               }
+               w += ( 4 + uiSize );
+               break;
+            }
+            else
+            {
+               hb_itemClear( pLocal );
             }
 
             pLocal->type = HB_IT_STRING;
@@ -2839,17 +2825,17 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                pLocal = hb_itemUnRef( pLocal );
             }
 
-            if( HB_IS_OBJECT( pLocal ) && hb_objHasMsg( pLocal, "__OpAssign" ) )
+            if( ( ! HB_IS_STRING( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
             {
-               hb_vmPushString( (char *) pBuffer, ulSize - 1 );
+               hb_stackPush();
+               hb_itemPutCPtr( *( HB_VM_STACK.pPos - 1 ), (char *) pBuffer, ulSize - 1 );
+
                hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 0, pLocal );
             }
             else
             {
-               hb_itemPutCL( pLocal, (char *) pBuffer, ulSize - 1 );
+               hb_itemPutCPtr( pLocal, (char *) pBuffer, ulSize - 1 );
             }
-
-            hb_xfree( pBuffer );
 
             w += ( 7 + uiBufferLen );
             break;
@@ -2903,6 +2889,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                Add.item.asInteger.length = 10;
 
                hb_vmOperatorCall( pTop, &Add, "__OPPLUS", NULL, 0, pTop );
+               break;
             }
             else
             {
@@ -2933,7 +2920,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                }
             }
 
-            if( !HB_IS_DOUBLE( pTop ) )
+            if( ! HB_IS_DOUBLE( pTop ) )
             {
                pTop->type = HB_IT_DOUBLE;
                pTop->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
@@ -3194,7 +3181,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPGLOBAL") );
 
-            if( hb_objGetOpOver( (*pGlobals)[ iGlobal ] ) & HB_CLASS_OP_ASSIGN )
+            if( ( HB_IS_NUMERIC( (*pGlobals)[ iGlobal ] ) && HB_IS_NUMERIC( *( HB_VM_STACK.pPos - 1 ) ) ) ||
+                ( (*pGlobals)[ iGlobal ] )->type == ( *( HB_VM_STACK.pPos - 1 ) )->type )
+            {
+               hb_itemForwardValue( (*pGlobals)[ iGlobal ], *( HB_VM_STACK.pPos - 1 ) );
+            }
+            else if( hb_objGetOpOver( (*pGlobals)[ iGlobal ] ) & HB_CLASS_OP_ASSIGN )
             {
                hb_vmOperatorCall( (*pGlobals)[ iGlobal ], *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 0, (*pGlobals)[ iGlobal ] );
             }
@@ -7172,11 +7164,13 @@ static void hb_vmLocalName( USHORT uiLocal, char * szLocalName ) /* locals and p
 
    s_bDebugging = TRUE;
    s_bDebugShowLines = FALSE;
+
    hb_vmPushSymbol( s_pSymDbgEntry );
    hb_vmPushNil();
    hb_vmPushLongConst( HB_DBG_LOCALNAME );
    hb_vmPushLongConst( uiLocal );
    hb_vmPushString( szLocalName, strlen( szLocalName ) );
+
    s_bDebuggerIsWorking = TRUE;
    hb_vmDo( 3 );
    s_bDebuggerIsWorking = FALSE;
@@ -7191,12 +7185,14 @@ static void hb_vmStaticName( USHORT uiStatic, char * szStaticName ) /* statics v
 
    s_bDebugging = TRUE;
    s_bDebugShowLines = FALSE;
+
    hb_vmPushSymbol( s_pSymDbgEntry );
    hb_vmPushNil();
    hb_vmPushLongConst( HB_DBG_STATICNAME );
    hb_vmPushLongConst( HB_VM_STACK.iStatics );  /* current static frame */
    hb_vmPushLongConst( uiStatic );  /* variable index */
    hb_vmPushString( szStaticName, strlen( szStaticName ) );
+
    s_bDebuggerIsWorking = TRUE;
    hb_vmDo( 4 );
    s_bDebuggerIsWorking = FALSE;
@@ -7220,6 +7216,7 @@ static void hb_vmModuleName( char * szModuleName ) /* PRG and function name info
    hb_vmPushNil();
    hb_vmPushLongConst( HB_DBG_MODULENAME );
    hb_vmPushString( szModuleName, strlen( szModuleName ) );
+
    s_bDebuggerIsWorking = TRUE;
    hb_vmDo( 2 );
    s_bDebuggerIsWorking = FALSE;
@@ -8507,9 +8504,13 @@ static void hb_vmPopLocal( SHORT iLocal )
       pLocal = hb_codeblockGetVar( hb_stackSelfItem(), iLocal ) ;
    }
 
-   if( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
+   if( ( HB_IS_NUMERIC( pLocal ) && HB_IS_NUMERIC( pVal ) ) || pLocal->type == pVal->type )
    {
-      hb_vmOperatorCall( pLocal, pVal, "__OPASSIGN", NULL, 0, NULL );
+      hb_itemForwardValue( pLocal, pVal );
+   }
+   else if( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
+   {
+      hb_vmOperatorCall( pLocal, pVal, "__OPASSIGN", NULL, 0, pLocal );
    }
    else
    {
@@ -8536,9 +8537,13 @@ static void hb_vmPopStatic( USHORT uiStatic )
 
    //TraceLog( NULL, "Assign Static: %i, Class: %s\n", uiStatic, hb_objGetClsName( pVal ) );
 
-   if( hb_objGetOpOver( pStatic ) & HB_CLASS_OP_ASSIGN )
+   if( ( HB_IS_NUMERIC( pStatic ) && HB_IS_NUMERIC( pVal ) ) || pStatic->type == pVal->type )
    {
-      hb_vmOperatorCall( pStatic, pVal, "__OPASSIGN", NULL, 0, NULL );
+      hb_itemForwardValue( pStatic, pVal );
+   }
+   else if( hb_objGetOpOver( pStatic ) & HB_CLASS_OP_ASSIGN )
+   {
+      hb_vmOperatorCall( pStatic, pVal, "__OPASSIGN", NULL, 0, pStatic );
    }
    else
    {
