@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.pc,v 1.8 2005/04/02 01:44:51 andijahja Exp $
+# $Id: hrbdll.pc,v 1.9 2005/05/16 21:45:18 andijahja Exp $
 # makefile for creating Harbour.dll with PellesC compiler
 #
 
@@ -75,6 +75,7 @@ ODBC_DIR     = $(XHARBOUR_ROOT)\source\odbc
 PP_DIR       = $(XHARBOUR_ROOT)\source\pp
 VM_DIR       = $(XHARBOUR_ROOT)\source\vm
 RTL_DIR      = $(XHARBOUR_ROOT)\source\rtl
+PCREPOS_DIR  = $(XHARBOUR_ROOT)\source\rtl\pcre
 LANG_DIR     = $(XHARBOUR_ROOT)\source\lang
 RDD_DIR      = $(XHARBOUR_ROOT)\source\rdd
 
@@ -629,7 +630,31 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\spread.obj \
    $(OBJ_DIR)\setclear.obj \
    $(OBJ_DIR)\util.obj \
-   $(OBJ_DIR)\untext.obj
+   $(OBJ_DIR)\untext.obj \
+   \
+   $(OBJ_DIR)\chartables.obj \
+   $(OBJ_DIR)\pcreposix.obj \
+   $(OBJ_DIR)\pcre_compile.obj \
+   $(OBJ_DIR)\pcre_config.obj \
+   $(OBJ_DIR)\pcre_dfa_exec.obj \
+   $(OBJ_DIR)\pcre_exec.obj \
+   $(OBJ_DIR)\pcre_fullinfo.obj \
+   $(OBJ_DIR)\pcre_get.obj \
+   $(OBJ_DIR)\pcre_globals.obj \
+   $(OBJ_DIR)\pcre_info.obj \
+   $(OBJ_DIR)\pcre_maketables.obj \
+   $(OBJ_DIR)\pcre_ord2utf8.obj \
+   $(OBJ_DIR)\pcre_printint.obj \
+   $(OBJ_DIR)\pcre_refcount.obj \
+   $(OBJ_DIR)\pcre_study.obj \
+   $(OBJ_DIR)\pcre_tables.obj \
+   $(OBJ_DIR)\pcre_try_flipped.obj \
+   $(OBJ_DIR)\pcre_ucp_findchar.obj \
+   $(OBJ_DIR)\pcre_valid_utf8.obj \
+   $(OBJ_DIR)\pcre_version.obj \
+   $(OBJ_DIR)\pcre_xclass.obj \
+   $(OBJ_DIR)\ucp_findchar.obj
+   
 
 $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\abs.obj	      > harbourdll.rsp
@@ -1107,6 +1132,28 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\setclear.obj   >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\util.obj       >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\untext.obj     >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\chartables.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcreposix.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_compile.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_config.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_dfa_exec.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_exec.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_fullinfo.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_get.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_globals.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_info.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_maketables.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_ord2utf8.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_printint.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_refcount.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_study.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_tables.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_try_flipped.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_ucp_findchar.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_valid_utf8.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_version.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_xclass.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\ucp_findchar.obj  >> harbourdll.rsp
    $(ECHO) $(POCC_LIBRARY)           >> harbourdll.rsp
    $(POLINK) /OUT:$(HARBOUR_DLL) /IMPLIB:$(HRBDLL_LIB) $(LINKFLAGS) @harbourdll.rsp
    @if exist harbourdll.rsp $(DEL) harbourdll.rsp
@@ -2949,77 +2996,143 @@ $(OBJ_DIR)\util.c : $(CT_DIR)\util.prg
 $(OBJ_DIR)\util.obj : $(OBJ_DIR)\util.c
    $(CC_CMD)
 
+$(OBJ_DIR)\chartables.obj : $(PCREPOS_DIR)\chartables.c
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcreposix.obj : $(PCREPOS_DIR)\pcreposix.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_compile.obj : $(PCREPOS_DIR)\pcre_compile.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_config.obj : $(PCREPOS_DIR)\pcre_config.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_dfa_exec.obj : $(PCREPOS_DIR)\pcre_dfa_exec.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_exec.obj : $(PCREPOS_DIR)\pcre_exec.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_fullinfo.obj : $(PCREPOS_DIR)\pcre_fullinfo.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_get.obj : $(PCREPOS_DIR)\pcre_get.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_globals.obj : $(PCREPOS_DIR)\pcre_globals.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_info.obj : $(PCREPOS_DIR)\pcre_info.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_maketables.obj : $(PCREPOS_DIR)\pcre_maketables.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_ord2utf8.obj : $(PCREPOS_DIR)\pcre_ord2utf8.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_printint.obj : $(PCREPOS_DIR)\pcre_printint.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_refcount.obj : $(PCREPOS_DIR)\pcre_refcount.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_study.obj : $(PCREPOS_DIR)\pcre_study.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_tables.obj : $(PCREPOS_DIR)\pcre_tables.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_try_flipped.obj : $(PCREPOS_DIR)\pcre_try_flipped.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_ucp_findchar.obj : $(PCREPOS_DIR)\pcre_ucp_findchar.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_valid_utf8.obj : $(PCREPOS_DIR)\pcre_valid_utf8.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_version.obj : $(PCREPOS_DIR)\pcre_version.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\pcre_xclass.obj : $(PCREPOS_DIR)\pcre_xclass.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+$(OBJ_DIR)\ucp_findchar.obj : $(PCREPOS_DIR)\ucp_findchar.c 
+   $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
 # DEBUG
 $(OBJ_DIR)\dbgmenu.c : $(DEBUG_DIR)\dbgmenu.prg
 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)\dbgmenu.o : $(OBJ_DIR)\dbgmenu.c
+$(OBJ_DIR)\dbgmenu.obj : $(OBJ_DIR)\dbgmenu.c
 	$(CC_CMD)
 
 $(OBJ_DIR)\dbgtmenu.c : $(DEBUG_DIR)\dbgtmenu.prg
 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)\dbgtmenu.o : $(OBJ_DIR)\dbgtmenu.c
+$(OBJ_DIR)\dbgtmenu.obj : $(OBJ_DIR)\dbgtmenu.c
 	$(CC_CMD)
 
 $(OBJ_DIR)\dbgtmitm.c : $(DEBUG_DIR)\dbgtmitm.prg
 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)\dbgtmitm.o : $(OBJ_DIR)\dbgtmitm.c
+$(OBJ_DIR)\dbgtmitm.obj : $(OBJ_DIR)\dbgtmitm.c
 	$(CC_CMD)
 
 $(OBJ_DIR)\dbgtwin.c : $(DEBUG_DIR)\dbgtwin.prg
 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)\dbgtwin.o : $(OBJ_DIR)\dbgtwin.c
+$(OBJ_DIR)\dbgtwin.obj : $(OBJ_DIR)\dbgtwin.c
 	$(CC_CMD)
 
 $(OBJ_DIR)\debugger.c : $(DEBUG_DIR)\debugger.prg
 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)\debugger.o : $(OBJ_DIR)\debugger.c
+$(OBJ_DIR)\debugger.obj : $(OBJ_DIR)\debugger.c
 	$(CC_CMD)
 
 $(OBJ_DIR)\dbghelp.c : $(DEBUG_DIR)\dbghelp.prg
 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)\dbghelp.o : $(OBJ_DIR)\dbghelp.c
+$(OBJ_DIR)\dbghelp.obj : $(OBJ_DIR)\dbghelp.c
 	$(CC_CMD)
 
 $(OBJ_DIR)\tbrwtext.c : $(DEBUG_DIR)\tbrwtext.prg
 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)\tbrwtext.o : $(OBJ_DIR)\tbrwtext.c
+$(OBJ_DIR)\tbrwtext.obj : $(OBJ_DIR)\tbrwtext.c
 	$(CC_CMD)
 
 $(OBJ_DIR)\dbgtarr.c : $(DEBUG_DIR)\dbgtarr.prg
 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)\dbgtarr.o : $(OBJ_DIR)\dbgtarr.c
+$(OBJ_DIR)\dbgtarr.obj : $(OBJ_DIR)\dbgtarr.c
 	$(CC_CMD)
 
 $(OBJ_DIR)\dbgtobj.c : $(DEBUG_DIR)\dbgtobj.prg
 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)\dbgtobj.o : $(OBJ_DIR)\dbgtobj.c
+$(OBJ_DIR)\dbgtobj.obj : $(OBJ_DIR)\dbgtobj.c
 	$(CC_CMD)
 
 $(OBJ_DIR)\dbgwa.c : $(DEBUG_DIR)\dbgwa.prg
 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)\dbgwa.o : $(OBJ_DIR)\dbgwa.c
+$(OBJ_DIR)\dbgwa.obj : $(OBJ_DIR)\dbgwa.c
 	$(CC_CMD)
 
 $(OBJ_DIR)\dbgbrwsr.c : $(DEBUG_DIR)\dbgbrwsr.prg
 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)\dbgbrwsr.o : $(OBJ_DIR)\dbgbrwsr.c
+$(OBJ_DIR)\dbgbrwsr.obj : $(OBJ_DIR)\dbgbrwsr.c
 	$(CC_CMD)
 
 $(OBJ_DIR)\dbgaltd.c : $(DEBUG_DIR)\dbgaltd.prg
 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)\dbgaltd.o : $(OBJ_DIR)\dbgaltd.c
+$(OBJ_DIR)\dbgaltd.obj : $(OBJ_DIR)\dbgaltd.c
 	$(CC_CMD)
 
 

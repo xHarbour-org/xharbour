@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.148 2005/03/31 06:11:17 guerra000 Exp $
+# $Id: makefile.vc,v 1.149 2005/04/14 05:58:31 ronpinkas Exp $
 #
 
 #
@@ -97,6 +97,7 @@ ODBC_DIR     =source\odbc
 PP_DIR       =source\pp
 RDD_DIR      =source\rdd
 RTL_DIR      =source\rtl
+PCREPOS_DIR  =source\rtl\pcre
 TIP_DIR      =source\tip
 VM_DIR       =source\vm
 SAMPLES_DIR  =source\clipsamp
@@ -171,6 +172,7 @@ RDD_LIB          =$(LIB_DIR)\rdd.lib
 RDDMT_LIB        =$(LIB_DIR)\rdd$(MT).lib
 RTL_LIB          =$(LIB_DIR)\rtl.lib
 RTLMT_LIB        =$(LIB_DIR)\rtl$(MT).lib
+PCREPOS_LIB      =$(LIB_DIR)\pcrepos.lib
 TIP_LIB          =$(LIB_DIR)\tip.lib
 TIPMT_LIB        =$(LIB_DIR)\tip$(MT).lib
 SAMPLES_LIB      =$(LIB_DIR)\samples.lib
@@ -249,6 +251,7 @@ HB_GT_LIB = $(LIB_DIR)\$(HB_GT_LIB).lib
 
 LIBLIST = \
    $(RTL_LIB) \
+   $(PCREPOS_LIB) \
    $(COMMON_LIB) \
    $(CODEPAGE_LIB) \
    $(DEBUG_LIB) \
@@ -534,6 +537,37 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\winos.obj \
    $(OBJ_DIR)$(MT)\winreg.obj
 
+
+#
+# PCREPOS.LIB rules
+#
+
+{$(PCREPOS_DIR)}.c{$(OBJ_DIR)}.obj:
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -Fo$(OBJ_DIR)\ $<
+
+PCREPOS_LIB_OBJS = \
+   $(OBJ_DIR)\chartables.obj \
+   $(OBJ_DIR)\pcreposix.obj \
+   $(OBJ_DIR)\pcre_compile.obj \
+   $(OBJ_DIR)\pcre_config.obj \
+   $(OBJ_DIR)\pcre_dfa_exec.obj \
+   $(OBJ_DIR)\pcre_exec.obj \
+   $(OBJ_DIR)\pcre_fullinfo.obj \
+   $(OBJ_DIR)\pcre_get.obj \
+   $(OBJ_DIR)\pcre_globals.obj \
+   $(OBJ_DIR)\pcre_info.obj \
+   $(OBJ_DIR)\pcre_maketables.obj \
+   $(OBJ_DIR)\pcre_ord2utf8.obj \
+   $(OBJ_DIR)\pcre_printint.obj \
+   $(OBJ_DIR)\pcre_refcount.obj \
+   $(OBJ_DIR)\pcre_study.obj \
+   $(OBJ_DIR)\pcre_tables.obj \
+   $(OBJ_DIR)\pcre_try_flipped.obj \
+   $(OBJ_DIR)\pcre_ucp_findchar.obj \
+   $(OBJ_DIR)\pcre_valid_utf8.obj \
+   $(OBJ_DIR)\pcre_version.obj \
+   $(OBJ_DIR)\pcre_xclass.obj \
+   $(OBJ_DIR)\ucp_findchar.obj
 
 #
 # LANG.LIB rules
@@ -1526,6 +1560,9 @@ $(CTMT_LIB) : $(CT_LIB_OBJS)
 !else
 
 $(RTL_LIB) : $(RTL_LIB_OBJS)
+   lib /out:$@ $**
+
+$(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
    lib /out:$@ $**
 
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
