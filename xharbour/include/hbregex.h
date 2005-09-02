@@ -1,5 +1,5 @@
 /*
- * $Id: regex.h,v 1.7 2005/08/31 14:32:39 mauriliolongo Exp $
+ * $Id: hbregex.h,v 1.1 2005/09/02 18:29:21 druzus Exp $
  */
 
 /*
@@ -33,8 +33,13 @@
  */
 
 
-#include "../source/rtl/pcre/pcre_internal.h"
-#include "../source/rtl/pcre/pcreposix.h"
+#if ( defined(__XCC__) || defined(__LCC__) )
+   #include "..\source\rtl\pcre\pcre_internal.h"
+   #include "..\source\rtl\pcre\pcreposix.h"
+#else
+   #include "../source/rtl/pcre/pcre_internal.h"
+   #include "../source/rtl/pcre/pcreposix.h"
+#endif
 
 #include "hbapi.h"
 
