@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.9 2005/04/02 01:44:53 andijahja Exp $
+# $Id: makefile.gc,v 1.10 2005/05/16 21:45:18 andijahja Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -29,6 +29,7 @@ UNICODE_DIR  = $(HARBOUR_DIR)/contrib/unicode
 COMPILER_DIR = $(HARBOUR_DIR)/source/compiler
 DEBUG_DIR    = $(HARBOUR_DIR)/source/debug
 RTL_DIR      = $(HARBOUR_DIR)/source/rtl
+PCREPOS_DIR  = $(HARBOUR_DIR)/source/rtl/pcre
 TIP_DIR      = $(HARBOUR_DIR)/source/tip
 VM_DIR       = $(HARBOUR_DIR)/source/vm
 CODEPAGE_DIR = $(HARBOUR_DIR)/source/codepage
@@ -113,6 +114,7 @@ DBFDBT_LIB   = $(LIB_DIR)/libdbfdbt$(THREAD_MODE).a
 DBFFPT_LIB   = $(LIB_DIR)/libdbffpt$(THREAD_MODE).a
 DBFNTX_LIB   = $(LIB_DIR)/libdbfntx$(THREAD_MODE).a
 RTL_LIB      = $(LIB_DIR)/librtl$(THREAD_MODE).a
+PCREPOS_LIB  = $(LIB_DIR)/libpcrepos$(THREAD_MODE).a
 VM_LIB       = $(LIB_DIR)/libvm$(THREAD_MODE).a
 SAMPLES_LIB  = $(LIB_DIR)/libsamples$(THREAD_MODE).a
 RDD_LIB      = $(LIB_DIR)/librdd$(THREAD_MODE).a
@@ -141,6 +143,7 @@ HTML_LIB     = $(LIB_DIR)/libhtml.a
 LIB_TO_LINK = \
    $(COMMON_LIB) \
    $(PP_LIB) \
+   $(PCREPOS_LIB) \
    $(LANG_LIB) \
    $(MACRO_LIB) \
    $(DBFCDX_LIB) \
@@ -193,6 +196,7 @@ PROJECT += \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(RTL_LIB) \
+   $(PCREPOS_LIB) \
    $(VM_LIB) \
    $(SAMPLES_LIB) \
    $(RDD_LIB) \
@@ -488,6 +492,105 @@ $(OBJ_DIR)/url.c : $(TIP_DIR)/url.prg
 
 $(OBJ_DIR)/url.o : $(OBJ_DIR)/url.c
 	$(CC_CMD)
+
+#-------------------------------------------------------------------------------
+# libpcrepos.a
+#-------------------------------------------------------------------------------
+
+PCREPOS_LIB_OBJS = \
+   $(OBJ_DIR)\chartables.o \
+   $(OBJ_DIR)\pcreposix.o \
+   $(OBJ_DIR)\pcre_compile.o \
+   $(OBJ_DIR)\pcre_config.o \
+   $(OBJ_DIR)\pcre_dfa_exec.o \
+   $(OBJ_DIR)\pcre_exec.o \
+   $(OBJ_DIR)\pcre_fullinfo.o \
+   $(OBJ_DIR)\pcre_get.o \
+   $(OBJ_DIR)\pcre_globals.o \
+   $(OBJ_DIR)\pcre_info.o \
+   $(OBJ_DIR)\pcre_maketables.o \
+   $(OBJ_DIR)\pcre_ord2utf8.o \
+   $(OBJ_DIR)\pcre_printint.o \
+   $(OBJ_DIR)\pcre_refcount.o \
+   $(OBJ_DIR)\pcre_study.o \
+   $(OBJ_DIR)\pcre_tables.o \
+   $(OBJ_DIR)\pcre_try_flipped.o \
+   $(OBJ_DIR)\pcre_ucp_findchar.o \
+   $(OBJ_DIR)\pcre_valid_utf8.o \
+   $(OBJ_DIR)\pcre_version.o \
+   $(OBJ_DIR)\pcre_xclass.o \
+   $(OBJ_DIR)\ucp_findchar.o
+	$(AR_CMD)
+
+$(OBJ_DIR)/chartables.o : $(PCREPOS_DIR)/chartables.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/dftables.o : $(PCREPOS_DIR)/dftables.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcreposix.o : $(PCREPOS_DIR)/pcreposix.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_compile.o : $(PCREPOS_DIR)/pcre_compile.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_config.o : $(PCREPOS_DIR)/pcre_config.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_dfa_exec.o : $(PCREPOS_DIR)/pcre_dfa_exec.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_exec.o : $(PCREPOS_DIR)/pcre_exec.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_fullinfo.o : $(PCREPOS_DIR)/pcre_fullinfo.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_get.o : $(PCREPOS_DIR)/pcre_get.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_globals.o : $(PCREPOS_DIR)/pcre_globals.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_info.o : $(PCREPOS_DIR)/pcre_info.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_maketables.o : $(PCREPOS_DIR)/pcre_maketables.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_ord2utf8.o : $(PCREPOS_DIR)/pcre_ord2utf8.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_printint.o : $(PCREPOS_DIR)/pcre_printint.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_refcount.o : $(PCREPOS_DIR)/pcre_refcount.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_study.o : $(PCREPOS_DIR)/pcre_study.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_tables.o : $(PCREPOS_DIR)/pcre_tables.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_try_flipped.o : $(PCREPOS_DIR)/pcre_try_flipped.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_ucp_findchar.o : $(PCREPOS_DIR)/pcre_ucp_findchar.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_valid_utf8.o : $(PCREPOS_DIR)/pcre_valid_utf8.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_version.o : $(PCREPOS_DIR)/pcre_version.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/pcre_xclass.o : $(PCREPOS_DIR)/pcre_xclass.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
+$(OBJ_DIR)/ucp_findchar.o : $(PCREPOS_DIR)/ucp_findchar.c
+   $(CC) -I$(PCREPOS_DIR) $(CFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o $@ $^
+
 
 #-------------------------------------------------------------------------------
 # libmisc.a

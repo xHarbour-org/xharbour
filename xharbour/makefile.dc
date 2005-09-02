@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.dc,v 1.7 2005/04/02 01:44:53 andijahja Exp $
+# $Id: makefile.dc,v 1.8 2005/05/16 21:45:18 andijahja Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -81,6 +81,7 @@ DBFDBT_LIB   = $(LIB_DIR)\dbfdbt$(THREAD_MODE).lib
 DBFFPT_LIB   = $(LIB_DIR)\dbffpt$(THREAD_MODE).lib
 DBFNTX_LIB   = $(LIB_DIR)\dbfntx$(THREAD_MODE).lib
 RTL_LIB      = $(LIB_DIR)\rtl$(THREAD_MODE).lib
+PCREPOS_LIB  = $(LIB_DIR)\pcrepos$(THREAD_MODE).lib
 VM_LIB       = $(LIB_DIR)\vm$(THREAD_MODE).lib
 SAMPLES_LIB  = $(LIB_DIR)\samples$(THREAD_MODE).lib
 RDD_LIB      = $(LIB_DIR)\rdd$(THREAD_MODE).lib
@@ -170,6 +171,7 @@ PROJECT = \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(RTL_LIB) \
+   $(PCREPOS_LIB) \
    $(VM_LIB) \
    $(SAMPLES_LIB) \
    $(RDD_LIB) \
@@ -629,6 +631,35 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\setclear.obj \
    $(CT_OBJ_DIR)\util.obj \
    $(CT_OBJ_DIR)\untext.obj
+
+#
+# PCREPOS.LIB rules
+#
+
+PCREPOS_LIB_OBJS = \
+   $(OBJ_DIR)\chartables.obj \
+   $(OBJ_DIR)\pcreposix.obj \
+   $(OBJ_DIR)\pcre_compile.obj \
+   $(OBJ_DIR)\pcre_config.obj \
+   $(OBJ_DIR)\pcre_dfa_exec.obj \
+   $(OBJ_DIR)\pcre_exec.obj \
+   $(OBJ_DIR)\pcre_fullinfo.obj \
+   $(OBJ_DIR)\pcre_get.obj \
+   $(OBJ_DIR)\pcre_globals.obj \
+   $(OBJ_DIR)\pcre_info.obj \
+   $(OBJ_DIR)\pcre_maketables.obj \
+   $(OBJ_DIR)\pcre_ord2utf8.obj \
+   $(OBJ_DIR)\pcre_printint.obj \
+   $(OBJ_DIR)\pcre_refcount.obj \
+   $(OBJ_DIR)\pcre_study.obj \
+   $(OBJ_DIR)\pcre_tables.obj \
+   $(OBJ_DIR)\pcre_try_flipped.obj \
+   $(OBJ_DIR)\pcre_ucp_findchar.obj \
+   $(OBJ_DIR)\pcre_valid_utf8.obj \
+   $(OBJ_DIR)\pcre_version.obj \
+   $(OBJ_DIR)\pcre_xclass.obj \
+   $(OBJ_DIR)\ucp_findchar.obj
+
 
 NULSYS_LIB_OBJS = \
    $(OBJ_DIR)\nulsys.obj
@@ -1434,6 +1465,9 @@ $(DBFDBT_LIB) : $(DBFDBT_LIB_OBJS)
 $(RDD_LIB) : $(RDD_LIB_OBJS)
    $(DMCLIB_CMD)
 
+$(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
+   $(DMCLIB_CMD)
+
 $(OPTCON_LIB) : $(OPTCON_LIB_OBJS)
    $(DMCLIB_CMD)
 
@@ -1924,6 +1958,80 @@ $(RDD_OBJ_DIR)\rddsys.c : $(RDD_DIR)\rddsys.prg
 
 $(RDD_OBJ_DIR)\rddsys.obj : $(RDD_OBJ_DIR)\rddsys.c
    $(CC_CMD)
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ PCREPOS.LIB dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+$(OBJ_DIR)\chartables.obj : $(PCREPOS_DIR)\chartables.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\dftables.obj : $(PCREPOS_DIR)\dftables.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcreposix.obj : $(PCREPOS_DIR)\pcreposix.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_compile.obj : $(PCREPOS_DIR)\pcre_compile.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_config.obj : $(PCREPOS_DIR)\pcre_config.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_dfa_exec.obj : $(PCREPOS_DIR)\pcre_dfa_exec.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_exec.obj : $(PCREPOS_DIR)\pcre_exec.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_fullinfo.obj : $(PCREPOS_DIR)\pcre_fullinfo.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_get.obj : $(PCREPOS_DIR)\pcre_get.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_globals.obj : $(PCREPOS_DIR)\pcre_globals.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_info.obj : $(PCREPOS_DIR)\pcre_info.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_maketables.obj : $(PCREPOS_DIR)\pcre_maketables.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_ord2utf8.obj : $(PCREPOS_DIR)\pcre_ord2utf8.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_printint.obj : $(PCREPOS_DIR)\pcre_printint.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_refcount.obj : $(PCREPOS_DIR)\pcre_refcount.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_study.obj : $(PCREPOS_DIR)\pcre_study.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_tables.obj : $(PCREPOS_DIR)\pcre_tables.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_try_flipped.obj : $(PCREPOS_DIR)\pcre_try_flipped.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_ucp_findchar.obj : $(PCREPOS_DIR)\pcre_ucp_findchar.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_valid_utf8.obj : $(PCREPOS_DIR)\pcre_valid_utf8.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_version.obj : $(PCREPOS_DIR)\pcre_version.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\pcre_xclass.obj : $(PCREPOS_DIR)\pcre_xclass.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
+$(OBJ_DIR)\ucp_findchar.obj : $(PCREPOS_DIR)\ucp_findchar.c
+   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
+
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ SAMPLES.LIB dependencies ³Û

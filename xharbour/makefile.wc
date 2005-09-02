@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.44 2005/04/02 01:44:54 andijahja Exp $
+# $Id: makefile.wc,v 1.45 2005/05/16 21:45:19 andijahja Exp $
 #
 
 #
@@ -106,6 +106,7 @@ MACRO_DIR    = source\macro
 PP_DIR       = source\pp
 RDD_DIR      = source\rdd
 RTL_DIR      = source\rtl
+PCREPOS_DIR  = source\rtl\pcre
 TIP_DIR      = source\tip
 VM_DIR       = source\vm
 ODBC_DIR     = source\odbc
@@ -169,6 +170,7 @@ NULSYS_LIB     = $(LIB_DIR)\nulsys.lib
 PP_LIB         = $(LIB_DIR)\pp.lib
 RDD_LIB        = $(LIB_DIR)\rdd.lib
 RTL_LIB        = $(LIB_DIR)\rtl.lib
+PCREPOS_LIB    = $(LIB_DIR)\pcrepos.lib
 TIP_LIB        = $(LIB_DIR)\tip.lib
 VM_LIB         = $(LIB_DIR)\vm.lib
 ODBC_LIB       = $(LIB_DIR)\hbodbc.lib
@@ -483,6 +485,34 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\win32prn.obj \
    $(RTL_OBJ_DIR)\winos.obj \
    $(RTL_OBJ_DIR)\winreg.obj
+
+#
+# PCREPOS.LIB rules
+#
+
+PCREPOS_LIB_OBJS = \
+   $(OBJ_DIR)\chartables.obj \
+   $(OBJ_DIR)\pcreposix.obj \
+   $(OBJ_DIR)\pcre_compile.obj \
+   $(OBJ_DIR)\pcre_config.obj \
+   $(OBJ_DIR)\pcre_dfa_exec.obj \
+   $(OBJ_DIR)\pcre_exec.obj \
+   $(OBJ_DIR)\pcre_fullinfo.obj \
+   $(OBJ_DIR)\pcre_get.obj \
+   $(OBJ_DIR)\pcre_globals.obj \
+   $(OBJ_DIR)\pcre_info.obj \
+   $(OBJ_DIR)\pcre_maketables.obj \
+   $(OBJ_DIR)\pcre_ord2utf8.obj \
+   $(OBJ_DIR)\pcre_printint.obj \
+   $(OBJ_DIR)\pcre_refcount.obj \
+   $(OBJ_DIR)\pcre_study.obj \
+   $(OBJ_DIR)\pcre_tables.obj \
+   $(OBJ_DIR)\pcre_try_flipped.obj \
+   $(OBJ_DIR)\pcre_ucp_findchar.obj \
+   $(OBJ_DIR)\pcre_valid_utf8.obj \
+   $(OBJ_DIR)\pcre_version.obj \
+   $(OBJ_DIR)\pcre_xclass.obj \
+   $(OBJ_DIR)\ucp_findchar.obj
 
 #
 # LANG.LIB rules
@@ -1055,6 +1085,7 @@ ODBC_LIB_OBJS =       \
 
 PROJECT = \
    $(COMMON_LIB) \
+   $(PCREPOS_LIB) \
    $(PP_LIB) \
    $(HARBOUR_EXE) \
    $(VM_LIB) \
@@ -1117,6 +1148,9 @@ $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
     LIB386 /nologo /out:$@ $**
 
 $(PP_LIB) : $(PP_LIB_OBJS)
+    LIB386 /nologo /out:$@ $**
+
+$(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
     LIB386 /nologo /out:$@ $**
 
 $(CT_LIB) : $(CT_LIB_OBJS)
@@ -1339,6 +1373,79 @@ $(OBJ_DIR)\hbfunchk.obj : $(COMPILER_DIR)\hbfunchk.c
 
 $(OBJ_DIR)\calconst.obj : $(COMPILER_DIR)\calconst.c
    $(CC_CMD)
+
+#
+# PCREPOS.LIB dependencies
+#
+
+$(OBJ_DIR)\chartables.obj : $(PCREPOS_DIR)\chartables.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\dftables.obj : $(PCREPOS_DIR)\dftables.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcreposix.obj : $(PCREPOS_DIR)\pcreposix.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_compile.obj : $(PCREPOS_DIR)\pcre_compile.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_config.obj : $(PCREPOS_DIR)\pcre_config.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_dfa_exec.obj : $(PCREPOS_DIR)\pcre_dfa_exec.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_exec.obj : $(PCREPOS_DIR)\pcre_exec.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_fullinfo.obj : $(PCREPOS_DIR)\pcre_fullinfo.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_get.obj : $(PCREPOS_DIR)\pcre_get.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_globals.obj : $(PCREPOS_DIR)\pcre_globals.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_info.obj : $(PCREPOS_DIR)\pcre_info.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_maketables.obj : $(PCREPOS_DIR)\pcre_maketables.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_ord2utf8.obj : $(PCREPOS_DIR)\pcre_ord2utf8.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_printint.obj : $(PCREPOS_DIR)\pcre_printint.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_refcount.obj : $(PCREPOS_DIR)\pcre_refcount.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_study.obj : $(PCREPOS_DIR)\pcre_study.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_tables.obj : $(PCREPOS_DIR)\pcre_tables.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_try_flipped.obj : $(PCREPOS_DIR)\pcre_try_flipped.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_ucp_findchar.obj : $(PCREPOS_DIR)\pcre_ucp_findchar.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_valid_utf8.obj : $(PCREPOS_DIR)\pcre_valid_utf8.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_version.obj : $(PCREPOS_DIR)\pcre_version.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\pcre_xclass.obj : $(PCREPOS_DIR)\pcre_xclass.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+
+$(OBJ_DIR)\ucp_findchar.obj : $(PCREPOS_DIR)\ucp_findchar.c
+   $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
 
 #
 # RDD.LIB dependencies
