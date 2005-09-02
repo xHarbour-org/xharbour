@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.9 2004/10/31 13:15:46 druzus Exp $
+# $Id: gcc.cf,v 1.10 2005/09/01 08:52:25 mauriliolongo Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -84,8 +84,12 @@ LINKLIBS += -lrtl -lvm
 endif
 endif
 
-# Add the specified GT driver library
+# Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
+
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH)
+LINKLIBS += -lpcrepos
+
 ifeq ($(C_MAIN),)
 ifeq ($(HB_GT_LIB),os2pm)
 # Special handling for PM mode
@@ -107,16 +111,11 @@ endif
 endif
 endif
 
+
 # Add all libraries specified in HB_USER_LIBS.
 LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
 LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 
-
-# New pcreposix library, at the end of all
-ifeq ($(findstring rtl,$(LIBS)),rtl)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH)
-LINKLIBS += -lpcrepos
-endif
 
 #LINKLIBS += -Wl,-)
 # statical linking with GCC 3.2.2 libc as not require its presence on user system

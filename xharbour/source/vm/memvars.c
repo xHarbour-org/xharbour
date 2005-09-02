@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.106 2005/07/17 16:20:52 ronpinkas Exp $
+ * $Id: memvars.c,v 1.107 2005/07/21 00:11:24 peterrees Exp $
  */
 
 /*
@@ -91,7 +91,7 @@
 #include "hbset.h"
 #include "hbvm.h"
 #include "classes.h"
-#include "regex.h"
+#include "hbregex.h"
 
 //JC1: under threads, we need this to be in thread stack
 #ifndef HB_THREAD_SUPPORT
@@ -1170,21 +1170,20 @@ static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
  * procedure only.
  * The scope of released variables are specified using passed name's mask
  */
-static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
+static void hb_memvarReleaseWithMask( char *szRegEx, BOOL bInclude )
 {
    HB_THREAD_STUB
 
    ULONG ulBase = s_privateStackCnt;
    PHB_DYNS pDynVar;
 
-   regex_t re;
-   regmatch_t aMatches[1];
+   HB_REGEX RegEx;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_memvarReleaseWithMask(%s, %d)", sRegEx, (int) bInclude));
+   HB_TRACE(HB_TR_DEBUG, ("hb_memvarReleaseWithMask(%s, %d)", szRegEx, (int) bInclude));
 
-   if( regcomp( &re, sRegEx, REG_EXTENDED ) )
+   if( !hb_regexCompile( &RegEx, szRegEx, 0, 0 ) )
    {
-      hb_errInternal( 9100, "Invalid mask passed as MEMVAR filter '%s'\n", sRegEx, NULL );
+      hb_errInternal( 9100, "Invalid mask passed as MEMVAR filter '%s'\n", szRegEx, NULL );
    }
 
    while( ulBase > s_privateStackBase )
@@ -1203,7 +1202,7 @@ static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
 
          if( bInclude )
          {
-            if( regexec( &re, pDynVar->pSymbol->szName, 1, aMatches, 0 ) == 0 )
+            if( hb_regexMatch( &RegEx, pDynVar->pSymbol->szName, FALSE ) )
             {
                /* Wrong to reset - private may be used again in this procedure and counter maybecome negative!
                s_globalTable[ pDynVar->hMemvar ].counter = 0;
@@ -1219,7 +1218,7 @@ static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
                }
             }
          }
-         else if( regexec( &re, pDynVar->pSymbol->szName, 1, aMatches, 0 ) )
+         else if( hb_regexMatch( &RegEx, pDynVar->pSymbol->szName, FALSE ) )
          {
             /* Wrong to reset - private may be used again in this procedure and counter maybecome negative!
             s_globalTable[ pDynVar->hMemvar ].counter = 0;
@@ -1237,7 +1236,7 @@ static void hb_memvarReleaseWithMask( char *sRegEx, BOOL bInclude )
       }
    }
 
-   regfree( &re );
+   hb_regexFree( &RegEx );
 }
 
 /* Checks if passed dynamic symbol is a variable and returns its scope
@@ -1632,7 +1631,7 @@ HB_FUNC( __MVRELEASE )
    HB_THREAD_STUB
 
    // Arbitary value which should be big enough.
-   char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
+   char szRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
 
    int iCount = hb_pcount();
 
@@ -1658,9 +1657,9 @@ HB_FUNC( __MVRELEASE )
             bIncludeVar = TRUE;   /* delete all memvar variables */
          }
 
-         Wild2RegEx( (char *) (pMask->item.asString.value), (char *) sRegEx, FALSE );
+         Wild2RegEx( (char *) (pMask->item.asString.value), (char *) szRegEx, FALSE );
 
-         hb_memvarReleaseWithMask( sRegEx, bIncludeVar );
+         hb_memvarReleaseWithMask( szRegEx, bIncludeVar );
       }
    }
 }
@@ -1897,12 +1896,12 @@ HB_FUNC( __MVPUT )
 
 typedef struct
 {
-   char * pszMask;
-   BOOL bIncludeMask;
-   BOOL bLongName;
-   BYTE * buffer;
-   FHANDLE fhnd;
-   regex_t re;
+   char *   pszMask;
+   BOOL     bIncludeMask;
+   BOOL     bLongName;
+   BYTE *   buffer;
+   FHANDLE  fhnd;
+   HB_REGEX regEx;
 } MEMVARSAVE_CARGO;
 
 /* saves a variable to a mem file already open */
@@ -1917,8 +1916,6 @@ static HB_DYNS_FUNC( hb_memvarSave )
    BOOL bLongName    = ( ( MEMVARSAVE_CARGO * ) Cargo )->bLongName;
    UINT	uMemLen	     = 10;
    UINT	uMLen	     = HB_MEM_REC_LEN;
-
-   regmatch_t aMatches[1];
 
    /* xHarbour extended feature, restore variables with 64 chars long */
    if( bLongName )
@@ -1938,7 +1935,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
 
    if( pDynSymbol->hMemvar )
    {
-      BOOL bMatch = ( pszMask[ 0 ] == '*' || regexec( &( ( ( MEMVARSAVE_CARGO * ) Cargo )->re ), pDynSymbol->pSymbol->szName, 1, aMatches, 0 ) == 0 );
+      BOOL bMatch = ( pszMask[ 0 ] == '*' || hb_regexMatch( &( ( ( MEMVARSAVE_CARGO * ) Cargo )->regEx ), pDynSymbol->pSymbol->szName, FALSE ) );
 
       PHB_ITEM pItem;
 
@@ -2070,7 +2067,7 @@ HB_FUNC( __MVSAVE )
       {
          MEMVARSAVE_CARGO msc;
          // Arbitary value, *SHOULD* be long enough.
-         char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
+         char szRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
 
          msc.pszMask      = hb_parcx( 2 );
          msc.bIncludeMask = hb_parl( 3 );
@@ -2078,17 +2075,17 @@ HB_FUNC( __MVSAVE )
          msc.buffer       = (BYTE *) hb_xgrab( uLen );
          msc.fhnd         = fhnd;
 
-         Wild2RegEx( (char *) (msc.pszMask), sRegEx, FALSE );
+         Wild2RegEx( (char *) (msc.pszMask), szRegEx, FALSE );
 
-         if( regcomp( &msc.re, sRegEx, REG_EXTENDED ) )
+         if( !hb_regexCompile( &msc.regEx, szRegEx, 0, 0 ) )
          {
-            hb_errInternal( 9100, "Invalid mask passed as MEMVAR filter '%s' -> '%s'\n", (char *) (msc.pszMask), sRegEx );
+            hb_errInternal( 9100, "Invalid mask passed as MEMVAR filter '%s' -> '%s'\n", (char *) (msc.pszMask), szRegEx );
          }
 
          /* Walk through all visible memory variables and save each one */
          hb_dynsymEval( hb_memvarSave, ( void * ) &msc );
 
-         regfree( &msc.re );
+         hb_regexFree( &msc.regEx );
 
          msc.buffer[ 0 ] = '\x1A';
          hb_fsWrite( fhnd, msc.buffer, 1 );
@@ -2183,21 +2180,20 @@ HB_FUNC( __MVRESTORE )
          BYTE *buffer = (BYTE *) hb_xgrab( uLen );
 
          // Arbitary value which should be big enough.
-         char sRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
+         char szRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
 
          HB_ITEM Name, Item ;
 
-         regex_t re;
-         regmatch_t aMatches[1];
+         HB_REGEX RegEx;
 
          Item.type = HB_IT_NIL;
          Name.type = HB_IT_NIL;
 
-         Wild2RegEx( (char *) pszMask, (char *) sRegEx, FALSE );
+         Wild2RegEx( (char *) pszMask, (char *) szRegEx, FALSE );
 
-         if( regcomp( &re, sRegEx, REG_EXTENDED ) )
+         if( !hb_regexCompile( &RegEx, szRegEx, 0, 0 ) )
          {
-            hb_errInternal( 9100, "Invalid mask passed as MEMVAR filter '%s' -> '%s'\n", (char *) pszMask, sRegEx );
+            hb_errInternal( 9100, "Invalid mask passed as MEMVAR filter '%s' -> '%s'\n", (char *) pszMask, szRegEx );
          }
 
          while( hb_fsRead( fhnd, buffer, uLen ) == ( USHORT ) uLen )
@@ -2268,7 +2264,7 @@ HB_FUNC( __MVRESTORE )
                }
             }
 
-            bMatch = ( pszMask[ 0 ] == '*' || regexec( &re, (&Name)->item.asString.value, 1, aMatches, 0 ) == 0 );
+            bMatch = ( pszMask[ 0 ] == '*' || hb_regexMatch( &RegEx, (&Name)->item.asString.value, FALSE ) );
 
             /* Process it if it matches the passed mask */
             if( bIncludeMask ? bMatch : ! bMatch )
@@ -2306,7 +2302,7 @@ HB_FUNC( __MVRESTORE )
          hb_itemClear( &Item );
          hb_itemClear( &Name );
 
-         regfree( &re );
+         hb_regexFree( &RegEx );
 
          hb_fsClose( fhnd );
 

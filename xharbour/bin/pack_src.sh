@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.13 2005/04/25 19:22:14 druzus Exp $
+# $Id: pack_src.sh,v 1.14 2005/06/21 20:19:49 druzus Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -147,6 +147,10 @@ done
 $hb_collect source/rtl/Makefile
 $hb_collect source/rtl/*.[ch]
 $hb_collect source/rtl/*.prg
+
+# SOURCE\RTL\PCRE
+$hb_collect source/rtl/pcre/Makefile
+$hb_collect source/rtl/pcre/*.[ch]
 
 # SOURCE\RTL\GT_TPL
 $hb_collect source/rtl/gt_tpl/Makefile

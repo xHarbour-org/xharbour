@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.59 2005/06/10 00:57:36 toninhofwi Exp $
+ * $Id: adsfunc.c,v 1.60 2005/06/22 15:29:14 druzus Exp $
  */
 
 /*
@@ -236,7 +236,7 @@ HB_FUNC( ADSUNLOCKRECORD )
    UNSIGNED32 ulRetVal;
    ADSAREAP   pArea;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
 
    if( pArea )
    {
@@ -257,7 +257,7 @@ HB_FUNC( ADSGETTABLECONTYPE )
    ADSAREAP   pArea;
    ADSHANDLE  pTableConnectHandle = 0;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
 
    if( pArea )
    {
@@ -314,7 +314,7 @@ HB_FUNC( ADSISTABLELOCKED )
    UNSIGNED16 pbLocked = FALSE;
    ADSAREAP pArea;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       ulRetVal = AdsIsTableLocked( pArea->hTable, &pbLocked );
@@ -335,7 +335,7 @@ HB_FUNC( ADSISRECORDLOCKED )
    UNSIGNED16 pbLocked = FALSE;
    ADSAREAP pArea;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       if( ISNUM( 1 ) )
@@ -405,7 +405,7 @@ HB_FUNC( ADSSETCHARTYPE )
 HB_FUNC( ADSGETTABLECHARTYPE )
 {
    UNSIGNED16 usCharType;
-   ADSAREAP pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   ADSAREAP pArea = hb_rddGetADSWorkAreaPointer();
    AdsGetTableCharType( pArea->hTable, &usCharType );
    hb_retni( usCharType );
    return;
@@ -487,7 +487,7 @@ HB_FUNC( ADSBLOB2FILE )
       return;
    }
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    ulRetVal = AdsBinaryToFile( pArea->hTable, (UNSIGNED8*)szFieldName, (UNSIGNED8*)szFileName );
    if( ulRetVal == AE_SUCCESS )
    {
@@ -524,7 +524,7 @@ HB_FUNC( ADSFILE2BLOB )
       usBinaryType = ADS_BINARY;
    }
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    ulRetVal = AdsFileToBinary( pArea->hTable, (UNSIGNED8*)szFieldName, usBinaryType, (UNSIGNED8*)szFileName );
    if( ulRetVal == AE_SUCCESS )
    {
@@ -557,7 +557,7 @@ HB_FUNC( ADSKEYNO )
       return;
    }
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       if( pFilterOption )
@@ -637,7 +637,7 @@ HB_FUNC( ADSKEYCOUNT )
       return;
    }
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       if( pFilterOption != NULL )
@@ -728,7 +728,7 @@ HB_FUNC( ADSADDCUSTOMKEY )
    UNSIGNED8 ordNum;
    ADSHANDLE hIndex;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       if( hb_pcount() > 0 )
@@ -771,7 +771,7 @@ HB_FUNC( ADSDELETECUSTOMKEY )
    UNSIGNED8 ordNum;
    ADSHANDLE hIndex;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       if( hb_pcount() > 0 )
@@ -811,7 +811,7 @@ HB_FUNC( ADSCLEARAOF )
 {
    ADSAREAP pArea;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       AdsClearAOF( pArea->hTable );
@@ -829,7 +829,7 @@ HB_FUNC( ADSEVALAOF )
    char * pucFilter;
    UNSIGNED16 pusOptLevel;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea && ISCHAR( 1 ) )
    {
       pucFilter = hb_parcx( 1 );
@@ -858,7 +858,7 @@ HB_FUNC( ADSGETTABLEALIAS )
    UNSIGNED16 pusLen = HARBOUR_MAX_RDD_ALIAS_LENGTH + 1;
    UNSIGNED32 ulRetVal = FAILURE;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       ulRetVal = AdsGetTableAlias( pArea->hTable, pucAlias, &pusLen );
@@ -887,7 +887,7 @@ HB_FUNC( ADSGETAOF )
    UNSIGNED32 ulRetVal;
 
    hb_retc( "" );
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       ulRetVal = AdsGetAOF( pArea->hTable, pucFilter, &pusLen );
@@ -932,7 +932,7 @@ HB_FUNC( ADSGETAOFOPTLEVEL )
    UNSIGNED16 pusOptLevel;
    UNSIGNED32 ulRetVal;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       ulRetVal = AdsGetAOFOptLevel( pArea->hTable, &pusOptLevel, NULL, NULL );
@@ -953,7 +953,7 @@ HB_FUNC( ADSGETAOFNOOPT )
    UNSIGNED16 pusLen = HARBOUR_MAX_RDD_FILTER_LENGTH + 1;
    UNSIGNED32 ulRetVal;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       ulRetVal = AdsGetAOFOptLevel( pArea->hTable, &pusOptLevel, pucNonOpt, &pusLen );
@@ -995,7 +995,7 @@ HB_FUNC( ADSISRECORDINAOF )
    UNSIGNED16 bIsInAOF;
    UNSIGNED32 ulRetVal;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       if( hb_pcount() > 0 )
@@ -1025,7 +1025,7 @@ HB_FUNC( ADSISRECORDVALID )             // Does current record match any current
    BOOL bReturn = FALSE;
    PHB_ITEM pResult;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       if( pArea->fEof )
@@ -1055,7 +1055,7 @@ HB_FUNC( ADSREFRESHAOF )
 {
    ADSAREAP pArea;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       AdsRefreshAOF( pArea->hTable );
@@ -1073,7 +1073,7 @@ HB_FUNC( ADSSETAOF )
    UNSIGNED16 usResolve = ADS_RESOLVE_DYNAMIC ;  /* ADS_RESOLVE_IMMEDIATE */
    UNSIGNED32 ulRetVal;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( ! ISCHAR( 1 ) )
    {
       hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSSETAOF" );
@@ -1118,7 +1118,7 @@ HB_FUNC( ADSGETFILTER )
    UNSIGNED32 ulRetVal;
 
    hb_retc( "" );
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       ulRetVal = AdsGetFilter( pArea->hTable, pucFilter, &pusLen );
@@ -1174,7 +1174,7 @@ HB_FUNC( ADSENABLEENCRYPTION )
       hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSENABLEENCRYPTION" );
       return;
    }
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       ulRetVal = AdsEnableEncryption( pArea->hTable, ( UNSIGNED8 * ) pucPassword );
@@ -1191,7 +1191,7 @@ HB_FUNC( ADSDISABLEENCRYPTION )
    ADSAREAP pArea;
    UNSIGNED32 ulRetVal;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       ulRetVal = AdsDisableEncryption( pArea->hTable );
@@ -1208,7 +1208,7 @@ HB_FUNC( ADSENCRYPTTABLE )
    ADSAREAP pArea;
    UNSIGNED32 ulRetVal;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       ulRetVal = AdsEncryptTable( pArea->hTable );
@@ -1225,7 +1225,7 @@ HB_FUNC( ADSDECRYPTTABLE )
    ADSAREAP pArea;
    UNSIGNED32 ulRetVal;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       ulRetVal = AdsDecryptTable( pArea->hTable );
@@ -1242,7 +1242,7 @@ HB_FUNC( ADSENCRYPTRECORD )
    ADSAREAP pArea;
    UNSIGNED32 ulRetVal;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       ulRetVal = AdsEncryptRecord( pArea->hTable );
@@ -1259,7 +1259,7 @@ HB_FUNC( ADSDECRYPTRECORD )
    ADSAREAP pArea;
    UNSIGNED32 ulRetVal;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       ulRetVal = AdsDecryptRecord( pArea->hTable );
@@ -1276,7 +1276,7 @@ HB_FUNC( ADSISENCRYPTIONENABLED )
    ADSAREAP pArea;
    UNSIGNED16 usIsEnabled;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       AdsIsEncryptionEnabled( pArea->hTable, &usIsEnabled );
@@ -1293,7 +1293,7 @@ HB_FUNC( ADSISRECORDENCRYPTED )
    ADSAREAP pArea;
    UNSIGNED16 usIsEnabled;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       AdsIsRecordEncrypted( pArea->hTable, &usIsEnabled );
@@ -1310,7 +1310,7 @@ HB_FUNC( ADSISTABLEENCRYPTED )
    ADSAREAP pArea;
    UNSIGNED16 usIsEnabled;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       AdsIsTableEncrypted( pArea->hTable, &usIsEnabled );
@@ -1381,7 +1381,7 @@ HB_FUNC( ADSCREATESQLSTATEMENT )
         }
         else
         {
-           pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+           pArea = hb_rddGetADSWorkAreaPointer();
            if( ISCHAR( 1 ) )
            {
               strncpy( szAlias, hb_parcx( 1 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
@@ -1404,7 +1404,7 @@ HB_FUNC( ADSCREATESQLSTATEMENT )
               }
            }
            pArea->uiArea = hb_rddGetCurrentWorkAreaNumber();
-           pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+           pArea = hb_rddGetADSWorkAreaPointer();
            pArea->hStatement = adsStatementHandle;
            pArea->hTable = 0;
            pArea->hOrdCurrent = 0;
@@ -1429,7 +1429,7 @@ HB_FUNC( ADSEXECUTESQLDIRECT )
    ADSAREAP pArea;
    DBOPENINFO pInfo;
 
-   if( adsConnectHandle && ( pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer() ) != 0
+   if( adsConnectHandle && ( pArea = hb_rddGetADSWorkAreaPointer() ) != 0
                         && pArea->hStatement && ISCHAR( 1 ) )
    {
       char * pucStmt = hb_parcx( 1 );
@@ -1471,7 +1471,7 @@ HB_FUNC( ADSPREPARESQL )
    UNSIGNED32 ulRetVal;
    ADSAREAP pArea;
 
-   if( adsConnectHandle && ( pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer() ) != 0
+   if( adsConnectHandle && ( pArea = hb_rddGetADSWorkAreaPointer() ) != 0
                         && pArea->hStatement && ISCHAR( 1 ) )
    {
       char * pucStmt = hb_parcx( 1 );
@@ -1505,7 +1505,7 @@ HB_FUNC( ADSEXECUTESQL )
    ADSAREAP pArea;
    DBOPENINFO pInfo;
 
-   if( adsConnectHandle && ( pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer() ) != 0
+   if( adsConnectHandle && ( pArea = hb_rddGetADSWorkAreaPointer() ) != 0
                         && pArea->hStatement )
    {
       ulRetVal = AdsExecuteSQL( pArea->hStatement, &hCursor );
@@ -1549,7 +1549,7 @@ HB_FUNC( ADSREFRESHRECORD )
 {
    ADSAREAP pArea;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       AdsRefreshRecord( pArea->hTable );
@@ -1569,7 +1569,7 @@ HB_FUNC( ADSCOPYTABLE )
    UNSIGNED16 usFilterOption = ADS_RESPECTFILTERS;
    ADSHANDLE  hIndex ;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       if( ISCHAR( 1 ) )
@@ -1608,7 +1608,7 @@ HB_FUNC( ADSCONVERTTABLE )
    ADSAREAP pArea;
    UNSIGNED16 usTableType = ADS_ADT;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       if( ISCHAR( 1 ) )
@@ -1705,7 +1705,7 @@ HB_FUNC( ADSCLRCALLBACK )
 HB_FUNC( ADSISINDEXED )
 {
    ADSAREAP pArea;
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       hb_retl( pArea->hOrdCurrent );
@@ -1721,7 +1721,7 @@ HB_FUNC( ADSISEXPRVALID )               /* cExpr */
    ADSAREAP pArea;
    UNSIGNED16 bValidExpr = FALSE;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea && ISCHAR( 1 ) )
    {
       AdsIsExprValid( pArea->hTable, (UNSIGNED8*) hb_parc( 1 ), &bValidExpr );
@@ -1735,7 +1735,7 @@ HB_FUNC( ADSGETNUMINDEXES )              /* cExpr */
    ADSAREAP pArea;
    UNSIGNED16 pusCnt = 0;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       AdsGetNumIndexes( pArea->hTable, &pusCnt );
@@ -1866,7 +1866,7 @@ HB_FUNC( ADSCACHERECORDS )
 
    ulRetVal = FALSE;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       ulRetVal = AdsCacheRecords( pArea->hTable, hb_parni( 1 ) );
@@ -1891,7 +1891,7 @@ HB_FUNC( ADSREINDEX )
    UNSIGNED32 ulRetVal;
    ADSAREAP pArea;
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
    if( pArea )
    {
       ulRetVal = AdsReindex( pArea->hTable );
@@ -2293,12 +2293,12 @@ HB_FUNC( ADSCOPYTABLECONTENTS )
    UNSIGNED32 ulRetVal;
    char * szAlias = hb_parcx( 1 );
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer(); // Source
+   pArea = hb_rddGetADSWorkAreaPointer(); // Source
    if( pArea )
    {
       if( hb_rddSelectWorkAreaAlias( szAlias ) == SUCCESS )
       {
-         pDest = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer(); // Destination
+         pDest = hb_rddGetADSWorkAreaPointer(); // Destination
          if( pDest )
          {
             ulRetVal = AdsCopyTableContents( pArea->hTable,
@@ -2392,7 +2392,7 @@ HB_FUNC( ADSSTMTSETTABLEPASSWORD )
       hb_retni( 0 );
    }
 
-   pArea = (ADSAREAP) hb_rddGetCurrentWorkAreaPointer();
+   pArea = hb_rddGetADSWorkAreaPointer();
 
    if( pArea )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.54 2004/08/17 09:58:18 druzus Exp $
+ * $Id: direct.c,v 1.55 2004/11/21 21:44:17 druzus Exp $
  */
 
 /*
@@ -99,7 +99,7 @@
 #include "hbapifs.h"
 #include "hbapiitm.h"
 #include "hbfast.h"
-#include "regex.h"
+#include "hbregex.h"
 #include "hbtrace.h"
 #include "directry.ch"
 
@@ -267,16 +267,14 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
 
 static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BOOL bInit )
 {
-   static regex_t re;
+   static HB_REGEX RegEx;
    static BOOL bInitReg = FALSE;
    BOOL fResult = FALSE;
-   regmatch_t aMatches[1];
-   int CFlags = REG_EXTENDED, EFlags = 0;
 
    if ( bInit || !bInitReg )
    {
       /* compile only once here */
-      if( regcomp( &re, szMask, CFlags ) == 0 )
+      if( hb_regexCompile( &RegEx, szMask, 0, 0 ) )
       {
          bInitReg = TRUE;
       }
@@ -285,17 +283,14 @@ static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BO
    if( !szString && !szMask )
    {
       /* resetting initialization flag */
-      regfree( &re );
+      hb_regexFree( &RegEx );
       bInitReg = FALSE;
       return FALSE;
    }
 
    if( bInitReg )
    {
-      if ( regexec( &re, szString, 1, aMatches, EFlags ) == 0 )
-      {
-         fResult = aMatches[0].rm_so == 0 && aMatches[0].rm_eo == (int) strlen( szString );
-      }
+      fResult = hb_regexMatch( &RegEx, szString, TRUE );
    }
 
    return fResult;

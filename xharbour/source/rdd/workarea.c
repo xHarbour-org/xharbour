@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.50 2005/08/12 02:44:26 druzus Exp $
+ * $Id: workarea.c,v 1.51 2005/08/23 10:59:03 druzus Exp $
  */
 
 /*
@@ -855,7 +855,7 @@ ERRCODE hb_waLocate( AREAP pArea, BOOL fContinue )
    LONG lNext = 1;
    BOOL fEof;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_waEval(%p, %p)", pArea, pEvalInfo));
+   HB_TRACE(HB_TR_DEBUG, ("hb_waLocate(%p, %d)", pArea, fContinue));
 
    if( fContinue )
    {

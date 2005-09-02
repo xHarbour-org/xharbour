@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.21 2005/01/22 15:49:17 lf_sfnet Exp $
+# $Id: Makefile,v 1.22 2005/07/20 22:18:18 likewolf Exp $
 #
 
 ROOT = ../
@@ -56,7 +56,7 @@ C_HEADERS=\
 	hrbdll.h     \
 	inet.h       \
 	local.h      \
-	regex.h      \
+	hbregex.h    \
 	thread.h     \
 	classes.h    \
 	ct.h         \

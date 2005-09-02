@@ -87,6 +87,7 @@ fprintf(f,
   "This file contains the default tables for characters with codes less than\n"
   "128 (ASCII characters). These tables are used when no external tables are\n"
   "passed to PCRE. */\n\n"
+  "extern const unsigned char _pcre_default_tables[];\n"
   "const unsigned char _pcre_default_tables[] = {\n\n"
   "/* This table is a lower casing table. */\n\n");
 

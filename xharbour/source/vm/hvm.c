@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.480 2005/09/01 18:46:34 ronpinkas Exp $
+ * $Id: hvm.c,v 1.481 2005/09/01 18:48:49 ronpinkas Exp $
  */
 
 /*
@@ -2893,7 +2893,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               AddIntError :
                {
                   HB_ITEM_NEW( Add );
                   PHB_ITEM pResult;

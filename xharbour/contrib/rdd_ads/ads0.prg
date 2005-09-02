@@ -1,5 +1,5 @@
 /*
- * $Id: ads0.prg,v 1.1 2002/07/11 02:57:52 lculik Exp $
+ * $Id: ads0.prg,v 1.2 2005/04/26 12:25:58 druzus Exp $
  */
 
 /*
@@ -60,5 +60,8 @@ procedure ADSInit
    REQUEST _ADS
 
    rddRegister( "ADS", RDT_FULL )
+   rddRegister( "ADT", RDT_FULL )
+   rddRegister( "ADSCDX", RDT_FULL )
+   rddRegister( "ADSNTX", RDT_FULL )
 
 return

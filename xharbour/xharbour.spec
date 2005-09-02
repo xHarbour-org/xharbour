@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.78 2005/06/01 02:09:22 ronpinkas Exp $
+# $Id: xharbour.spec,v 1.79 2005/06/09 23:38:34 ronpinkas Exp $
 #
 
 # ---------------------------------------------------------------
@@ -562,6 +562,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/%{name}/librdd*.a
 %{_libdir}/%{name}/libhsx*.a
 %{_libdir}/%{name}/librtl*.a
+%{_libdir}/%{name}/libpcre*.a
 %{_libdir}/%{name}/libsamples.a
 %{_libdir}/%{name}/libvm*.a
 

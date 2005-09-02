@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4293 2005/09/02 15:46:11 paultucker Exp $
+ * $Id: ChangeLog,v 1.4294 2005/09/02 16:32:18 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,166 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-02 20:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/hb-func.sh
+  * xharbour/xharbour.spec
+  * xharbour/bin/pack_src.sh
+  * xharbour/config/bsd/gcc.cf
+  * xharbour/config/darwin/gcc.cf
+  * xharbour/config/dos/djgpp.cf
+  * xharbour/config/dos/rsx32.cf
+  * xharbour/config/dos/watcom.cf
+  * xharbour/config/hpux/gcc.cf
+  * xharbour/config/linux/gcc.cf
+  * xharbour/config/linux/owatcom.cf
+  * xharbour/config/os2/gcc.cf
+  * xharbour/config/sunos/gcc.cf
+  * xharbour/config/w32/gcc.cf
+  * xharbour/config/w32/mingw32.cf
+  * xharbour/config/w32/watcom.cf
+    + added lib pcrepos
+
+  * xharbour/contrib/rdd_ads/ads0.prg
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/contrib/rdd_ads/adsfunc.c
+  * xharbour/contrib/rdd_ads/rddads.h
+    + register ADS as three separate RDDs: ADSNTX, ADSCDX, ADT
+      (ADS RDD left for backward compatibility) -  they do not
+      need to set table type.
+    + synchronize SET_DECIMALS with ADS
+    + added support for relations between ADS and non ADS workareas
+      and ADS only relations which cannot be resolved by ADS
+    ! fixed index key conversion in ordscope() and ordkeyval()
+    + added support for ordRelKeyPos() (common RDD version of
+      AdsGetRelKeyPos()/AdsSetRelKeyPos()) and tuned the value calculated
+      for tables without indexes
+    ! fixed BOF/EOF/FOUND flag updating in child areas
+    * changed some internal logic basing on information about pending
+      relations and simplified ADS BOF updating
+    ! fixed SEEK LAST to work like in Clipper
+      TODO: the found flag should be updated to respect pending movement
+      forced by active filter on client side - it's still wrong.
+    * changed SELF_LOCK()/SELF_RAWLOCK() to use ACE API directly (basing
+      on documented behavior). It also resolve the problems with removing
+      implicit locks which are not reported by AdsGetNumLocks() and were
+      not unlocked.
+    + added explicit locking inside APPEND() operation - it resolve the
+      problem with automatic removing locks on appended records after
+      any record movement or updating by ACE library but can introduce
+      race condition - it should be consulted with ACE authors if it does.
+    + added some missing checking for lock (when bTestRecLocks set) in some
+      operation like DELETE()/RECALL()
+    - removed SELF_SKIPRAW(), SELF_ADDFILED(), SELF_FIELDEXTENT(),
+      SELF_CLEARSCOPE() methods
+    + added SELF_SKIPFILTER(), SELF_GETREC() and SELF_PUTREC() methods
+    + added methods for relations
+    + added support for _SET_AUTOORDER
+    + implement DBDROP(), DBEXISTS() with xHarbour file API - it should be
+      enough for most of installation but we should also have alternate
+      implementation with ACE API for remote file access when the resources
+      are not mapped to client computer
+    * read/write date values in Julian represenation if possible - this is
+      our internal representation so we reduce unnecessary conversions for
+      binary types and don't have to worry about _SET_DATEFORMAT setting
+    ! SELF_GETVARLEN() now returns the real memo item length
+    + added hb_rddGetADSWorkAreaPointer() to use instead of
+      hb_rddGetCurrentWorkAreaPointer() in all ADS*() functions. The
+      hb_rddGetADSWorkAreaPointer() returns NULL for non ADS* RDDs avoiding
+      possible memory corruption in xHarbour or ACE area when bad handles
+      or other AREA members were extracted/set
+    + added some RDDI_* actions in SELF_RDDINFO()
+    - removed unused members from ADS AREA
+    * some other minor modifications not I do not remember now ;-)
+
+  * xharbour/include/Makefile
+  - xharbour/include/regex.h
+  + xharbour/include/hbregex.h
+    * renamed regex.h to hbregex.h
+    + added prototypes for some basic xHarbour RegEx API
+
+  * xharbour/include/dbinfo.ch
+    + added DBOI_RELKEYPOS
+
+  * xharbour/include/hbrdddbf.h
+  * xharbour/source/rdd/dbf1.c
+    + added SELF_PACKREC() for compatibility with Clipper and easier
+      memopack implementation
+
+  * xharbour/source/compiler/genc.c
+    ! fixed generating symbol table when static function has the same name
+      as memvar
+
+  * xharbour/source/rdd/dbcmd.c
+    + added ORDRELKEYPOS() - common for all RDDs functions which supports
+      DBOI_RELKEYPOS which works like AdsGetRelKeyPos()/AdsSetRelKeyPos()
+      in ADS RDD. ORDRELKEYPOS( [<nGoToPos>] ) -> <nCurrPos> | NIL
+      is much less expensive then ordKeyNo()/ordKeyGoTo() combination
+      and should be used to implement vertical scope instead of these
+      functions.
+        ordRelKeyPos() called without parameters returns current position
+	in index (table) file in the range 0.0 to 1.0
+	ordRelKeyPos( <nPos> ) sets new position in index (table) file.
+	<nPos> should be in range 0.0 to 1.0
+
+  * xharbour/source/rdd/workarea.c
+    ! fixed typo in HB_TRACE message
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    + added support for DBOI_RELKEYPOS - ORDRELKEYPOS() returns in DBFCDX
+      exactly the same results as in ADSCDX when the same index file is
+      used also when scopes are used. It's unintentional side effect of
+      the simplest method I used for calculation.
+    * modified to use xHarbour RegEx API not the POSIX one
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    + added support for DBOI_RELKEYPOS - ORDRELKEYPOS() returns in DBFNTX
+      differ results then in ADSNTX. In ADS AdsGetRelKeyPos() doesn't give
+      valid results IMHO the same algorithm were used as for CDX format
+      which doesn't respect keys in interior nodes which are significant
+      in NTX format and the fact that the number of keys can be differ then
+      number of subpages - the effect is that it reach 1.0 much faster then
+      it should (we are not at EOF) and AdsSetRelKeyPos() cannot set position
+      to records which are not at the lowest level but chose the nearest
+      one.
+    * modified to use xHarbour RegEx API not the POSIX one
+
+  * xharbour/source/rtl/direct.c
+  * xharbour/source/rtl/strmatch.c
+  * xharbour/source/vm/memvars.c
+    * modified to use xHarbour RegEx API not the POSIX one
+
+  * xharbour/source/vm/hvm.c
+    - removed unused label
+
+  * xharbour/source/rtl/regex.c
+    + added basic xHarbour RegEx functions
+	BOOL hb_regexCompile( PHB_REGEX pRegEx, const char *szRegEx,
+			     int iCFlags, int iEFlags );
+	BOOL hb_regexGet( PHB_REGEX pRegEx, PHB_ITEM pRegExItm,
+			  int iCFlags, int iEFlags );
+	void hb_regexFree( PHB_REGEX pRegEx );
+	BOOL hb_regexMatch( PHB_REGEX pRegEx, const char *szString,
+			    BOOL fFull );
+      This is very basic set of function which allow to eliminate all
+      direct regex_t access in xHarbour core code. I will work on it
+      in the future adding missing functionality and eliminating POISX
+      meta layer.
+
+  * xharbour/source/rtl/Makefile
+  + xharbour/source/rtl/pcre/ChangeLog
+    + added changelog file to mark any modification of original PCRE file
+      for easier upgrading in the future
+
+  * xharbour/source/rtl/pcre/chartables.c
+  * xharbour/source/rtl/pcre/dftables.c
+    ! added missing extern declaration to satisfy C++ compilers
+
+  * xharbour/source/rtl/pcre/pcre_dfa_exec.c
+    * commented unused variables
+
+  * xharbour/source/rtl/pcre/pcreposix.c
+    ! fixed offset setting for first match when REG_STARTEND is used
 
 2005-09-02 13:40 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
    * source/tip/ftpcln.prg

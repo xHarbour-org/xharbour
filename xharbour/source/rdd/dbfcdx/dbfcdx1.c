@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.214 2005/08/12 02:44:26 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.215 2005/08/23 10:59:03 druzus Exp $
  */
 
 /*
@@ -80,7 +80,7 @@
 #include "hbrddcdx.h"
 #include "hbmath.h"
 #ifdef __XHARBOUR__
-#include "regex.h"
+#include "hbregex.h"
 #endif
 
 #ifndef HB_CDP_SUPPORT_OFF
@@ -1085,6 +1085,10 @@ static void hb_cdxTagGetScope( LPCDXTAG pTag, USHORT nScope, PHB_ITEM pItem )
 static void hb_cdxTagRefreshScope( LPCDXTAG pTag )
 {
    PHB_ITEM pItem;
+
+   if( pTag->pIndex->pArea->lpdbPendingRel &&
+       pTag->pIndex->pArea->lpdbPendingRel->isScoped )
+      SELF_FORCEREL( ( AREAP ) pTag->pIndex->pArea );
 
    if ( hb_itemType( pTag->topScope ) == HB_IT_BLOCK )
    {
@@ -4406,6 +4410,7 @@ static void hb_cdxTagGoTop( LPCDXTAG pTag )
    {
       if ( pTag->CurKey->rec == 0 || pTag->TagEOF || ! hb_cdxBottomScope( pTag ) )
       {
+         pTag->TagBOF = pTag->TagEOF = TRUE;
          pTag->CurKey->rec = 0;
          break;
       }
@@ -4439,6 +4444,7 @@ static void hb_cdxTagGoBottom( LPCDXTAG pTag )
    {
       if ( pTag->CurKey->rec == 0 || pTag->TagBOF || ! hb_cdxTopScope( pTag ) )
       {
+         pTag->TagBOF = pTag->TagEOF = TRUE;
          pTag->CurKey->rec = 0;
          break;
       }
@@ -5481,20 +5487,15 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
 static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
                                  PHB_ITEM pRegExItm )
 {
-   BOOL fFound = FALSE, fFirst = TRUE, fFree;
-   regex_t *pReg = NULL;
-   regmatch_t aMatches[1];
-   int EFlags = 0;
+   BOOL fFound = FALSE, fFirst = TRUE;
+   HB_REGEX RegEx;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxDBOISkipRegEx(%p, %p, %i, %p)", pArea, pTag, fForward, pRegExItm));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FALSE;
 
-   if( pTag && pTag->uiType == 'C' )
-      pReg = hb_getregex( pRegExItm, FALSE, FALSE, &fFree );
-
-   if( !pReg )
+   if( !pTag || pTag->uiType != 'C' || !hb_regexGet( &RegEx, pRegExItm, 0, 0 ) )
    {
       if ( SELF_SKIP( ( AREAP ) pArea, fForward ? 1 : -1 ) == FAILURE )
          return FALSE;
@@ -5520,12 +5521,12 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
          hb_cdxTagSkipNext( pTag );
       while ( !pTag->TagEOF )
       {
-         if( regexec( pReg, (const char *) pTag->CurKey->val, 1, aMatches, EFlags ) == 0 )
+         if( hb_regexMatch( &RegEx, (const char *) pTag->CurKey->val, FALSE ) )
          {
             ULONG ulRecNo = pArea->ulRecNo;
             SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
             if ( pArea->ulRecNo == ulRecNo ||
-                 regexec( pReg, (const char *) pTag->CurKey->val, 1, aMatches, EFlags ) == 0 )
+                 hb_regexMatch( &RegEx, (const char *) pTag->CurKey->val, FALSE ) )
             {
                fFound = TRUE;
                break;
@@ -5541,12 +5542,12 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
          hb_cdxTagSkipPrev( pTag );
       while ( !pTag->TagBOF )
       {
-         if( regexec( pReg, (const char *) pTag->CurKey->val, 1, aMatches, EFlags ) == 0 )
+         if( hb_regexMatch( &RegEx, (const char *) pTag->CurKey->val, FALSE ) )
          {
             ULONG ulRecNo = pArea->ulRecNo;
             SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
             if ( pArea->ulRecNo == ulRecNo ||
-                 regexec( pReg, (const char *) pTag->CurKey->val, 1, aMatches, EFlags ) == 0 )
+                 hb_regexMatch( &RegEx, (const char *) pTag->CurKey->val, FALSE ) )
             {
                fFound = TRUE;
                break;
@@ -5570,8 +5571,7 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
    else
       pArea->fEof = FALSE;
 
-   if( fFree )
-      hb_freeregex( pReg );
+   hb_regexFree( &RegEx );
 
    return fFound;
 }
@@ -5600,7 +5600,7 @@ static ULONG hb_cdxDBOIScopeEval( LPCDXTAG pTag, HB_EVALSCOPE_FUNC pFunc, void *
 
    hb_cdxIndexLockRead( pTag->pIndex );
    hb_cdxTagGoTop( pTag );
-   while ( !pTag->TagEOF && hb_cdxBottomScope( pTag ) )
+   while( !pTag->TagEOF )
    {
       pFunc( pTag->CurKey->rec, pTag->CurKey->val, ulLen, pParam );
       ulCount++;
@@ -5647,7 +5647,7 @@ static LONG hb_cdxDBOIKeyCount( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
       {
          pCurKey = hb_cdxKeyCopy( NULL, pTag->CurKey );
          hb_cdxTagGoTop( pTag );
-         while ( !pTag->TagEOF && hb_cdxBottomScope( pTag ) )
+         while ( !pTag->TagEOF )
          {
             if ( !fCheckFilter || hb_cdxCheckRecordFilter( pArea, pTag->CurKey->rec ) )
                ulKeyCount++;
@@ -5881,7 +5881,7 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
       {
          hb_cdxTagGoTop( pTag );
          if ( fCheckFilter )
-            while ( !pTag->TagBOF && !pTag->TagEOF && hb_cdxBottomScope( pTag ) )
+            while ( !pTag->TagEOF )
             {
                if ( hb_cdxCheckRecordFilter( pArea, pTag->CurKey->rec ) )
                {
@@ -5891,7 +5891,7 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
                hb_cdxTagSkipNext( pTag );
             }
          else
-            while ( !pTag->TagBOF && !pTag->TagEOF && hb_cdxBottomScope( pTag ) && --ulKeyCnt )
+            while( !pTag->TagEOF && --ulKeyCnt )
                hb_cdxTagSkipNext( pTag );
       }
       else
@@ -5954,6 +5954,278 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
    }
 
    return retval;
+}
+
+static double hb_cdxCountRelKeyPos( LPCDXPAGE pPage )
+{
+   return ( ( pPage->Child ? hb_cdxCountRelKeyPos( pPage->Child ) : 0.5 ) +
+            pPage->iCurKey ) / pPage->iKeys;
+}
+
+static BOOL hb_cdxGoToRelKeyPos( LPCDXPAGE pPage, double dPos )
+{
+   do
+   {
+      if( pPage->iKeys == 0 )
+         return FALSE;
+
+      pPage->iCurKey = ( SHORT ) ( dPos * pPage->iKeys );
+      if( pPage->iCurKey >= pPage->iKeys )
+         pPage->iCurKey = pPage->iKeys - 1;
+
+      if( ( pPage->PageType & CDX_NODE_LEAF ) != 0 )
+         break;
+
+      dPos = dPos * pPage->iKeys - pPage->iCurKey;
+      if( dPos < 0.0 )
+         dPos = 0.0;
+      else if( dPos >= 1.0 )
+         dPos = 1.0;
+
+      hb_cdxPageGetChild( pPage );
+      pPage = pPage->Child;
+   }
+   while( pPage );
+
+   return TRUE;
+}
+
+static double hb_cdxDBOIGetRelKeyPos( CDXAREAP pArea, LPCDXTAG pTag )
+{
+   ULONG ulRecNo = 0, ulRecCount = 0;
+   double dPos = 0.0;
+
+   /* resolve any pending relations */
+   SELF_RECNO( ( AREAP ) pArea, &ulRecNo );
+
+   if( !pArea->fPositioned )
+   {
+      if( ulRecNo > 1 )
+         dPos = 1.0;
+   }
+   else if( !pTag )
+   {
+      SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount );
+      if( ulRecCount != 0 )
+         dPos = ( 0.5 + ulRecNo ) / ulRecCount;
+   }
+   else
+   {
+      LPCDXKEY pKey;
+      double dStart, dStop, dFact = 0.0000000000001;
+      BOOL fOK = TRUE;
+
+      if( pTag->UsrAscend )
+      {
+         dStart = 0.0;
+         dStop = 1.0;
+      }
+      else
+      {
+         dStart = 1.0;
+         dStop = 0.0;
+      }
+
+      hb_cdxIndexLockRead( pTag->pIndex );
+      hb_cdxTagRefreshScope( pTag );
+
+      pKey = pTag->UsrAscend ? pTag->topScopeKey : pTag->bottomScopeKey;
+      if( pKey )
+      {
+         hb_cdxTagKeyFind( pTag, pKey );
+         if( pTag->CurKey->rec == 0 || pTag->TagEOF || ! hb_cdxBottomScope( pTag ) )
+            fOK = FALSE;
+         else
+            dStart = hb_cdxCountRelKeyPos( pTag->RootPage );
+      }
+      pKey = pTag->UsrAscend ? pTag->bottomScopeKey : pTag->topScopeKey;
+      if( pKey && fOK )
+      {
+         hb_cdxTagKeyFind( pTag, pKey );
+         if( pTag->CurKey->rec == 0 || pTag->TagBOF || ! hb_cdxTopScope( pTag ) )
+            fOK = FALSE;
+         else
+            dStop = hb_cdxCountRelKeyPos( pTag->RootPage );
+      }
+      if( fOK )
+      {
+         if( !pTag->UsrAscend )
+         {
+            double dTmp = dStart;
+            dStart = dStop;
+            dStop = dTmp;
+         }
+         pTag->fRePos = TRUE;
+         if( hb_cdxCurKeyRefresh( pArea, pTag ) &&
+             hb_cdxTopScope( pTag ) && hb_cdxBottomScope( pTag ) )
+         {
+            if( dStart >= dStop - dFact )
+               dPos = 0.5;
+            else
+            {
+               dPos = hb_cdxCountRelKeyPos( pTag->RootPage );
+               dPos = ( dPos - dStart ) / ( dStop - dStart );
+               if( !pTag->UsrAscend )
+                  dPos = 1.0 - dPos;
+               /* fix possible differences in FL representation */
+               if( dPos <= 0.0 )
+                  dPos = 0.0;
+               else if( dPos >= 1.0 )
+                  dPos = 1.0;
+            }
+         }
+      }
+      hb_cdxIndexUnLockRead( pTag->pIndex );
+   }
+
+   return dPos;
+}
+
+static void hb_cdxDBOISetRelKeyPos( CDXAREAP pArea, LPCDXTAG pTag, double dPos )
+{
+   if( !pTag )
+   {
+      if( dPos >= 1.0 )
+      {
+         SELF_GOBOTTOM( ( AREAP ) pArea );
+      }
+      else if( dPos <= 0.0 )
+      {
+         SELF_GOTOP( ( AREAP ) pArea );
+      }
+      else
+      {
+         ULONG ulRecCount, ulRecNo;
+         SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount );
+         ulRecNo = ( ULONG ) dPos * ulRecCount + 1;
+         if( ulRecNo >= ulRecCount )
+            ulRecNo = ulRecCount;
+         SELF_GOTO( ( AREAP ) pArea, ulRecNo );
+         SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
+         if( pArea->fEof )
+            SELF_GOTOP( ( AREAP ) pArea );
+      }
+   }
+   else
+   {
+      BOOL fForward = TRUE, fOK = TRUE, fTop = FALSE;
+      hb_cdxIndexLockRead( pTag->pIndex );
+      hb_cdxTagRefreshScope( pTag );
+
+      if( dPos >= 1.0 )
+      {
+         fForward = FALSE;
+      }
+      else if( dPos <= 0.0 )
+      {
+         fTop = TRUE;
+      }
+      else
+      {
+         LPCDXKEY pKey;
+         double dStart, dStop, dFact = 0.0000000000001;
+         BOOL fOK = TRUE;
+
+         if( pTag->UsrAscend )
+         {
+            dStart = 0.0;
+            dStop = 1.0;
+         }
+         else
+         {
+            dStart = 1.0;
+            dStop = 0.0;
+         }
+
+         pKey = pTag->UsrAscend ? pTag->topScopeKey : pTag->bottomScopeKey;
+         if( pKey )
+         {
+            hb_cdxTagKeyFind( pTag, pKey );
+            if( pTag->CurKey->rec == 0 || pTag->TagEOF || ! hb_cdxBottomScope( pTag ) )
+               fOK = FALSE;
+            else
+               dStart = hb_cdxCountRelKeyPos( pTag->RootPage );
+         }
+         pKey = pTag->UsrAscend ? pTag->bottomScopeKey : pTag->topScopeKey;
+         if( pKey && fOK )
+         {
+            hb_cdxTagKeyFind( pTag, pKey );
+            if( pTag->CurKey->rec == 0 || pTag->TagBOF || ! hb_cdxTopScope( pTag ) )
+               fOK = FALSE;
+            else
+               dStop = hb_cdxCountRelKeyPos( pTag->RootPage );
+         }
+         if( fOK )
+         {
+            if( !pTag->UsrAscend )
+            {
+               double dTmp = dStart;
+               dStart = dStop;
+               dStop = dTmp;
+               dPos = 1.0 - dPos;
+            }
+            if( dStart >= dStop - dFact )
+            {
+               fTop = TRUE;
+            }
+            else
+            {
+               dPos = dPos * ( dStop - dStart ) + dStart;
+               pTag->fRePos = FALSE;
+               hb_cdxTagOpen( pTag );
+               pTag->TagBOF = pTag->TagEOF = FALSE;
+               if( !hb_cdxGoToRelKeyPos( pTag->RootPage, dPos ) )
+               {
+                  fTop = TRUE;
+               }
+               else
+               {
+                  hb_cdxSetCurKey( pTag->RootPage );
+                  if( !hb_cdxTopScope( pTag ) )
+                     fTop = TRUE;
+                  else if( !hb_cdxBottomScope( pTag ) )
+                     fForward = FALSE;
+               }
+            }
+         }
+      }
+      if( !fOK )
+      {
+         SELF_GOTO( ( AREAP ) pArea, 0 );
+      }
+      else
+      {
+         if( fForward )
+         {
+            if( fTop )
+               hb_cdxTagGoTop( pTag );
+            while( !pTag->TagEOF )
+            {
+               if ( hb_cdxCheckRecordFilter( pArea, pTag->CurKey->rec ) )
+                  break;
+               hb_cdxTagSkipNext( pTag );
+            }
+            if( pTag->TagEOF && !fTop )
+               fForward = FALSE;
+         }
+         if( !fForward )
+         {
+            hb_cdxTagGoBottom( pTag );
+            while( !pTag->TagBOF )
+            {
+               if ( hb_cdxCheckRecordFilter( pArea, pTag->CurKey->rec ) )
+                  break;
+               hb_cdxTagSkipPrev( pTag );
+            }
+            if( pTag->TagBOF )
+            {
+               pTag->CurKey->rec = 0;
+            }
+         }
+         SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
+      }
+      hb_cdxIndexUnLockRead( pTag->pIndex );
+   }
 }
 
 /*
@@ -7381,8 +7653,8 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
          return SUCCESS;
 
       case DBOI_ISREINDEX:
-//         pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
-//                      pArea->pSort ? pArea->pSort->fReindex : FALSE );
+         pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
+                               pArea->pSort ? pArea->pSort->fReindex : FALSE );
          return SUCCESS;
 
       case DBOI_LOCKOFFSET:
@@ -7543,6 +7815,15 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
       case DBOI_KEYCOUNTRAW:
          pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult,
                                     hb_cdxDBOIKeyCount( pArea, pTag, FALSE ) );
+         break;
+
+      case DBOI_RELKEYPOS:
+         if ( pOrderInfo->itmNewVal && HB_IS_NUMERIC( pOrderInfo->itmNewVal ) )
+            hb_cdxDBOISetRelKeyPos( pArea, pTag, 
+                                    hb_itemGetND( pOrderInfo->itmNewVal ) );
+         else
+            pOrderInfo->itmResult = hb_itemPutND( pOrderInfo->itmResult,
+                                       hb_cdxDBOIGetRelKeyPos( pArea, pTag ) );
          break;
 
       case DBOI_FINDREC:

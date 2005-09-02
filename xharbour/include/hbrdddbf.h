@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.20 2005/08/01 22:17:34 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.21 2005/08/23 10:59:03 druzus Exp $
  */
 
 /*
@@ -246,7 +246,7 @@ static ERRCODE hb_dbfStructSize( DBFAREAP pArea, USHORT * uiSize );
 static ERRCODE hb_dbfSysName( DBFAREAP pArea, BYTE * pBuffer );
 #define hb_dbfEval                                 NULL
 static ERRCODE hb_dbfPack( DBFAREAP pArea );
-#define hb_dbfPackRec                              NULL
+static ERRCODE hb_dbfPackRec( DBFAREAP pArea, ULONG ulRecNo, BOOL *fWritten );
 static ERRCODE hb_dbfSort( DBFAREAP pArea, LPDBSORTINFO pSortInfo );
 static ERRCODE hb_dbfTrans( DBFAREAP pArea, LPDBTRANSINFO pTransInfo );
 #define hb_dbfTransRec                             NULL

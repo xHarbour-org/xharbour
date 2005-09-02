@@ -299,7 +299,7 @@ if (rc >= 0)
     pmatch[i].rm_eo = ovector[i*2+1];
 
     // Ron Pinkas - added to support REG_STARTEND
-    if( pmatch[i].rm_so > 0 ) {
+    if( pmatch[i].rm_so >= 0 ) {
       pmatch[i].rm_so += iStartOffset;
       pmatch[i].rm_eo += iStartOffset;
     }

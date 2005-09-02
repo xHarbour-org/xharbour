@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.126 2005/08/08 00:46:31 druzus Exp $
+ * $Id: dbf1.c,v 1.127 2005/08/23 10:59:03 druzus Exp $
  */
 
 /*
@@ -962,17 +962,24 @@ static ERRCODE hb_dbfSkipRaw( DBFAREAP pArea, LONG lToSkip )
 
    if( lToSkip == 0 )
    {
-      BOOL bBof, bEof;
+      if( pArea->fPositioned )
+      {
+         BOOL bBof, bEof;
 
-      /* Save flags */
-      bBof = pArea->fBof;
-      bEof = pArea->fEof;
+         /* Save flags */
+         bBof = pArea->fBof;
+         bEof = pArea->fEof;
 
-      uiError = SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo );
+         uiError = SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo );
 
-      /* Restore flags */
-      pArea->fBof = bBof;
-      pArea->fEof = bEof;
+         /* Restore flags */
+         pArea->fBof = bBof;
+         pArea->fEof = bEof;
+      }
+      else
+      {
+         uiError = SUCCESS;
+      }
    }
    else if( lToSkip < 0 && ( ULONG ) ( -lToSkip ) >= pArea->ulRecNo )
    {
@@ -1169,6 +1176,10 @@ static ERRCODE hb_dbfGetRec( DBFAREAP pArea, BYTE ** pBuffer )
 
    if( pBuffer != NULL )
    {
+      /* Read record */
+      if( !pArea->fValidBuffer && !hb_dbfReadRecord( pArea ) )
+         return FAILURE;
+
       *pBuffer = pArea->pRecord;
    }
    else
@@ -1429,6 +1440,12 @@ static ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer )
 
    if( pBuffer != NULL )
    {
+      if( pArea->lpdbPendingRel )
+         SELF_FORCEREL( ( AREAP ) pArea );
+
+      if( !pArea->fPositioned )
+         return SUCCESS;
+
       if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == FAILURE )
          return FAILURE;
 
@@ -1897,6 +1914,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    memset( pBuffer, 0, uiSize );
    pThisField = pBuffer;
 
+   /* Size for deleted flag */
    pArea->uiRecordLen = 1;
    pArea->bVersion = s_dbfVersion;
 
@@ -2727,12 +2745,40 @@ static ERRCODE hb_dbfSysName( DBFAREAP pArea, BYTE * pBuffer )
 }
 
 /*
+ * Pack helper function called for each packed record
+ */
+static ERRCODE hb_dbfPackRec( DBFAREAP pArea, ULONG ulRecNo, BOOL *fWritten )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfPackRec(%p, %lu, %p)", pArea, ulRecNo, fWritten));
+
+   if( pArea->fDeleted )
+   {
+      *fWritten = FALSE;
+   }
+   else
+   {
+      *fWritten = TRUE;
+      if( pArea->ulRecNo != ulRecNo )
+      {
+         pArea->ulRecNo = ulRecNo;
+         pArea->fRecordChanged = TRUE;
+         if( ! hb_dbfWriteRecord( pArea ) )
+            return FAILURE;
+      }
+   }
+
+   return SUCCESS;
+}
+
+
+/*
  * Remove records marked for deletion from a database.
  */
 static ERRCODE hb_dbfPack( DBFAREAP pArea )
 {
    ULONG ulRecIn, ulRecOut, ulEvery, ulUserEvery;
    PHB_ITEM pError, pBlock;
+   BOOL fWritten;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfPack(%p)", pArea));
 
@@ -2786,22 +2832,16 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
          if( ++ulEvery >= ulUserEvery )
          {
             ulEvery = 0;
-            hb_vmPushSymbol( &hb_symEval );
-            hb_vmPush( pBlock );
-            hb_vmDo( 0 );
+            hb_vmEvalBlock( pBlock );
          }
       }
 
-      /* Copy record */
-      if( !pArea->fDeleted )
+      if( SELF_PACKREC( ( AREAP ) pArea, ulRecOut + 1, &fWritten ) == FAILURE )
+         return FAILURE;
+
+      if( fWritten )
       {
          ulRecOut++;
-         if( ulRecIn != ulRecOut )
-         {
-            pArea->ulRecNo = ulRecOut;
-            pArea->fRecordChanged = TRUE;
-            hb_dbfWriteRecord( pArea );
-         }
       }
       ulRecIn++;
    }
@@ -2809,9 +2849,7 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
    /* Execute the Code Block for pending record */
    if( pBlock && ulEvery > 0 )
    {
-      hb_vmPushSymbol( &hb_symEval );
-      hb_vmPush( pBlock );
-      hb_vmDo( 0 );
+      hb_vmEvalBlock( pBlock );
    }
 
    if( pArea->ulRecCount != ulRecOut )
@@ -2819,6 +2857,7 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
       pArea->ulRecCount = ulRecOut;
       /* Force write new header */
       pArea->fUpdateHeader = TRUE;
+      SELF_WRITEDBHEADER( ( AREAP ) pArea );
    }
    return SELF_GOTO( ( AREAP ) pArea, 1 );
 }
@@ -2987,6 +3026,7 @@ static ERRCODE hb_dbfZap( DBFAREAP pArea )
 
    pArea->fUpdateHeader = TRUE;
    pArea->ulRecCount = 0;
+   SELF_WRITEDBHEADER( ( AREAP ) pArea );
    SELF_GOTO( ( AREAP ) pArea, 0 );
 
    /* Zap memo file */

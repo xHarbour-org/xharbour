@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.6 2004/03/26 21:57:01 ronpinkas Exp $
+ * $Id: rddads.h,v 1.7 2005/03/10 16:35:23 snaiperis Exp $
  */
 
 /*
@@ -99,19 +99,16 @@ typedef struct _ADSAREA_
    *  example.
    */
 
+   LPDBRELINFO lpdbPendingRel;   /* Pointer to parent rel struct */
+   BOOL fPositioned;             /* TRUE if we are not at phantom record */
+
    char * szDataFileName;        /* Name of data file */
    USHORT uiHeaderLen;           /* Size of header */
    USHORT uiRecordLen;           /* Size of record */
-   ULONG ulRecCount;             /* Total records */
    ULONG ulRecNo;                /* Current record */
-   BYTE bYear;                   /* Last update */
-   BYTE bMonth;
-   BYTE bDay;
-   USHORT * pFieldOffset;        /* Pointer to field offset array */
    BYTE * pRecord;               /* Buffer of record data */
-   ULONG maxFieldLen;
-   BOOL fValidBuffer;            /* State of buffer */
-   BOOL fRecordChanged;          /* Record changed */
+   ULONG maxFieldLen;            /* Max field length in table record */
+
    BOOL fShared;                 /* Shared file */
    BOOL fReadonly;               /* Read only file */
    BOOL fFLocked;                /* TRUE if file is locked */
@@ -122,6 +119,17 @@ typedef struct _ADSAREA_
 } ADSAREA;
 
 typedef ADSAREA * ADSAREAP;
+
+#define SELF_RESETREL( p )    if( pArea->lpdbPendingRel ) \
+                              { \
+                                 if( pArea->lpdbPendingRel->isScoped && \
+                                    !pArea->lpdbPendingRel->isOptimized ) \
+                                    SELF_FORCEREL( ( AREAP ) pArea ); \
+                                 else \
+                                    pArea->lpdbPendingRel = NULL; \
+                              }
+
+ADSAREAP hb_rddGetADSWorkAreaPointer( void );
 
 UNSIGNED32 ENTRYPOINT AdsSetFieldRaw( ADSHANDLE  hObj,
                                        UNSIGNED8  *pucFldName,

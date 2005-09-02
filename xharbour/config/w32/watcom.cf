@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.23 2005/02/18 21:20:04 druzus Exp $
+# $Id: watcom.cf,v 1.24 2005/06/16 14:14:27 lf_sfnet Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -23,24 +23,24 @@ CPPFLAGS = -j -w2 -d1 -5 -fp5 -s -onaehtzr -oi+ -ei -zp8 -zq -zt0 -mf -bt=NT
 
 CPPFLAGS += -i. -i$(TOP)include -iinclude
 ifeq ($(HB_LIB_COMPILE),)
-    CPPFLAGS += -i$(HB_INC_COMPILE)
+  CPPFLAGS += -i$(HB_INC_COMPILE)
 endif
 
 ifeq ($(HB_LEX),SIMPLEX)
-CFLAGS += -DSIMPLEX
+  CFLAGS += -DSIMPLEX
 endif
 
 ifeq ($(HB_LIBCOMP_MT),)
-#always add thread support if not compiling a lib and using vmmt
-ifeq ($(findstring vmmt,$(LIBS)),vmmt)
-CPPFLAGS+= -DHB_THREAD_SUPPORT
-endif
+  #always add thread support if not compiling a lib and using vmmt
+  ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+    CPPFLAGS+= -DHB_THREAD_SUPPORT
+  endif
 else
-#Add thread support to lib compilation only if compiling a _mt lib
-ifeq ($(HB_LIBCOMP_MT),YES)
-CPPFLAGS+= -DHB_THREAD_SUPPORT
-HB_MT_FLAGS = -DHB_THREAD_SUPPORT
-endif
+  #Add thread support to lib compilation only if compiling a _mt lib
+  ifeq ($(HB_LIBCOMP_MT),YES)
+    CPPFLAGS+= -DHB_THREAD_SUPPORT
+    HB_MT_FLAGS = -DHB_THREAD_SUPPORT
+  endif
 endif
 
 # work arround to DOS command line size limit
@@ -77,38 +77,48 @@ LDFLAGS = debug all OP osn=NT OP stack=65536 OP CASEEXACT
 HB_USER_LIBS := $(foreach lib, $(HB_USER_LIBS), $(subst \,/,$(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)))
 
 ifeq ($(HB_LIB_COMPILE),)
-LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst \,/,$(TOP)$(ROOT)contrib/$(lib)/$(ARCH)/$(subst lib,,$(lib))))
-LINKLIBS += $(foreach lib, $(LIBS), $(subst \,/,$(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)))
+  LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst \,/,$(TOP)$(ROOT)contrib/$(lib)/$(ARCH)/$(subst lib,,$(lib))))
+  LINKLIBS += $(foreach lib, $(LIBS), $(subst \,/,$(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)))
 else
-LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst \,/,$(HB_LIB_COMPILE)/$(lib)))
-LINKLIBS += $(foreach lib, $(LIBS), $(subst \,/,$(HB_LIB_COMPILE)/$(lib)))
+  LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst \,/,$(HB_LIB_COMPILE)/$(lib)))
+  LINKLIBS += $(foreach lib, $(LIBS), $(subst \,/,$(HB_LIB_COMPILE)/$(lib)))
 endif
 
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rdd,$(LIBS)),rdd)
-ifeq ($(HB_LIB_COMPILE),)
-RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst \,/,$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)/$(drv)))
-else
-RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst \,/,$(HB_LIB_COMPILE)/$(drv)))
-endif
+  ifeq ($(HB_LIB_COMPILE),)
+    RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst \,/,$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)/$(drv)))
+  else
+    RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst \,/,$(HB_LIB_COMPILE)/$(drv)))
+  endif
 endif
 
 ifeq ($(findstring rtl,$(LIBS)),rtl)
-ifeq ($(HB_LIB_COMPILE),)
-GTLIBS := $(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)/$(HB_GT_LIB)
-else
-GTLIBS := $(HB_LIB_COMPILE)/$(HB_GT_LIB)
-endif
-ifeq ($(HB_MULTI_GT),yes)
-GTLIBS += $(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)/gtnul
-endif
-ifneq ($(HB_DEFAULT_GT),$(HB_GT_LIB))
-ifneq ($(HB_DEFAULT_GT),)
-GTLIBS += $(TOP)$(ROOT)source/rtl/$(HB_DEFAULT_GT)/$(ARCH)/$(HB_DEFAULT_GT)
-endif
-endif
+  ifeq ($(HB_LIB_COMPILE),)
+    LINKLIBS += $(TOP)$(ROOT)source/rtl/pcre/$(ARCH)/pcrepos
+    GTLIBS := $(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)/$(HB_GT_LIB)
+    ifeq ($(HB_MULTI_GT),yes)
+      GTLIBS += $(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)/gtnul
+    endif
+  else
+    LINKLIBS += $(HB_LIB_COMPILE)/pcrepos
+    GTLIBS := $(HB_LIB_COMPILE)/$(HB_GT_LIB)
+    ifeq ($(HB_MULTI_GT),yes)
+      GTLIBS += $(HB_LIB_COMPILE)/gtnul
+    endif
+  endif
+  ifneq ($(HB_DEFAULT_GT),$(HB_GT_LIB))
+    ifneq ($(HB_DEFAULT_GT),)
+      ifeq ($(HB_LIB_COMPILE),)
+        GTLIBS += $(TOP)$(ROOT)source/rtl/$(HB_DEFAULT_GT)/$(ARCH)/$(HB_DEFAULT_GT)
+      else
+        GTLIBS += $(HB_LIB_COMPILE)/$(HB_DEFAULT_GT)
+      endif
+    endif
+  endif
 
-GTLIBS := $(subst \,/,$(GTLIBS))
+  GTLIBS := $(subst \,/,$(GTLIBS))
+  LINKLIBS := $(subst \,/,$(LINKLIBS))
 endif
 
 

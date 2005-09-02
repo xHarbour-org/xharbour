@@ -1,5 +1,5 @@
 #
-# $Id: rsx32.cf,v 1.4 2003/09/25 02:24:02 paultucker Exp $
+# $Id: rsx32.cf,v 1.5 2004/10/31 13:15:46 druzus Exp $
 #
 # GNU Make file for RSXNT for DOS target
 
@@ -42,8 +42,12 @@ LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$
 LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
 endif
 
-# Add the specified GT driver library
+# Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
+
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH)
+LINKLIBS += -lpcrepos
+
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
 LINKLIBS += -l$(HB_GT_LIB)
 ifeq ($(HB_MULTI_GT),yes)

@@ -1,5 +1,5 @@
 /*
- * $Id: strmatch.c,v 1.7 2004/08/04 14:48:11 druzus Exp $
+ * $Id: strmatch.c,v 1.8 2004/11/21 21:44:20 druzus Exp $
  */
 
 /*
@@ -53,8 +53,7 @@
 #include <ctype.h>
 
 #include "hbapi.h"
-
-#include "regex.h"
+#include "hbregex.h"
 
 #if 0  /* disabled to eliminate warnings */
 static BOOL hb_strMatchDOS( const char * pszString, const char * pszMask )
@@ -116,20 +115,15 @@ static BOOL hb_strMatchDOS( const char * pszString, const char * pszMask )
 
 BOOL HB_EXPORT hb_strMatchRegExp( const char * szString, const char * szMask )
 {
-   regex_t re;
-   regmatch_t aMatches[1];
-   int CFlags = REG_EXTENDED, EFlags = 0;
    BOOL fResult = FALSE;
+   HB_REGEX RegEx;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strMatchRegExp(%s, %s)", szString, szMask));
 
-   if( regcomp( &re, szMask, CFlags ) == 0 )
+   if( hb_regexCompile( &RegEx, szMask, 0, 0 ) )
    {
-      if( regexec( &re, szString, 1, aMatches, EFlags ) == 0 )
-      {
-         fResult = aMatches[0].rm_so == 0 && aMatches[0].rm_eo == (int) strlen( szString );
-      }
-      regfree( &re );
+      fResult = hb_regexMatch( &RegEx, szString, TRUE );
+      hb_regexFree( &RegEx );
    }
 
    return fResult;

@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.17 2005/08/06 19:39:44 druzus Exp $
+ * $Id: dbinfo.ch,v 1.18 2005/08/23 10:59:02 druzus Exp $
  */
 
 /*
@@ -192,6 +192,8 @@
 #define DBOI_ISREINDEX           127  /* Is reindex in process */
 #define DBOI_I_BAGNAME           128  /* created index name */
 #define DBOI_I_TAGNAME           129  /* created tag name */
+
+#define DBOI_RELKEYPOS           130  /* get/set relative key position (in range 0 - 1) */
 
 /* Return values for DBOI_OPTLEVEL */
 #define DBOI_OPTIMIZED_NONE       0

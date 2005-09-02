@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: regex.c,v 1.50 2005/08/31 14:32:39 mauriliolongo Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 
-#include "regex.h"
+#include "hbregex.h"
 
 /*
  * It will be good to separate RegEx internals from xHarbour API
@@ -70,6 +70,8 @@
 #if !defined( HB_ALLOC_ALIGNMENT ) || ( HB_ALLOC_ALIGNMENT + 1 == 1 )
 #  define HB_ALLOC_ALIGNMENT     8
 #endif
+
+#define hb_isregexstring( x )  ( ( x->item.asString.length > 3 && memcmp( x->item.asString.value, "***", 3 ) == 0 ) )
 
 HB_EXPORT regex_t * hb_getregex( PHB_ITEM pRegEx, BOOL lIgnCase, BOOL lNL, BOOL *fFree )
 {
@@ -110,6 +112,79 @@ void HB_EXPORT hb_freeregex( regex_t *pReg )
 {
    regfree( pReg );
    hb_xfree( pReg );
+}
+
+
+HB_EXPORT BOOL hb_regexCompile( PHB_REGEX pRegEx, const char *szRegEx, int iCFlags, int iEFlags )
+{
+   pRegEx->pReg    = NULL;
+   pRegEx->fFree   = FALSE;
+   pRegEx->iCFlags = REG_EXTENDED | iCFlags;
+   pRegEx->iEFlags = iEFlags;
+
+   if( szRegEx && *szRegEx )
+   {
+      pRegEx->pReg = ( regex_t * ) hb_xgrab( sizeof( regex_t ) );
+      if( regcomp( pRegEx->pReg, szRegEx, pRegEx->iCFlags ) == 0 )
+      {
+         pRegEx->fFree = TRUE;
+         return TRUE;
+      }
+      hb_xfree( pRegEx->pReg );
+      pRegEx->pReg = NULL;
+   }
+   return FALSE;
+}
+
+HB_EXPORT BOOL hb_regexGet( PHB_REGEX pRegEx, PHB_ITEM pRegExItm, int iCFlags, int iEFlags )
+{
+   char *szRegEx = hb_itemGetCPtr( pRegExItm );
+   BOOL fResult = FALSE;
+
+   if( szRegEx && *szRegEx )
+   {
+      if( memcmp( szRegEx, "***", 3 ) == 0 )
+      {
+         pRegEx->pReg = (regex_t *) ( szRegEx + HB_ALLOC_ALIGNMENT );
+         pRegEx->pReg->re_pcre = (pcre *) ( ( BYTE * ) pRegEx->pReg + sizeof( regex_t ) );
+         fResult = TRUE;
+      }
+      else
+      {
+         fResult = hb_regexCompile( pRegEx, hb_itemGetCPtr( pRegExItm ), iCFlags, iEFlags );
+      }
+   }
+   if( !fResult )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Invalid Regular expression", "Regex subsystem", 1, pRegExItm );
+      return FALSE;
+   }
+   return fResult;
+}
+
+HB_EXPORT void hb_regexFree( PHB_REGEX pRegEx )
+{
+   if( pRegEx )
+   {
+      if( pRegEx->fFree )
+      {
+         regfree( pRegEx->pReg );
+         hb_xfree( pRegEx->pReg );
+         pRegEx->pReg = NULL;
+         pRegEx->fFree = FALSE;
+      }
+   }
+}
+
+extern HB_EXPORT BOOL hb_regexMatch( PHB_REGEX pRegEx, const char *szString, BOOL fFull )
+{
+   BOOL fMatch;
+
+   fMatch = regexec( pRegEx->pReg, szString, 1, pRegEx->aMatches, pRegEx->iEFlags ) == 0;
+
+   return fMatch && ( !fFull ||
+            ( pRegEx->aMatches[0].rm_so == 0 &&
+              pRegEx->aMatches[0].rm_eo == (int) strlen( szString ) ) );
 }
 
 /*
@@ -424,13 +499,6 @@ HB_FUNC( HB_ATX )
 
          if( regexec( pReg, pString->item.asString.value, REGEX_MAX_GROUPS, aMatches, EFlags ) == 0 )
          {
-            // Very STARNGE bug if string is found at position 0 regex "forgets" to add the offset!!!
-            if( ulStart && aMatches[0].rm_so == 0 )
-            {
-               aMatches[0].rm_so += ulStart - 1;
-               aMatches[0].rm_eo += ulStart - 1;
-            }
-
             ulLen = aMatches[0].rm_eo - aMatches[0].rm_so;
 
             if( hb_pcount() > 3 )
@@ -561,5 +629,5 @@ HB_FUNC( HB_ISREGEXSTRING )
    HB_THREAD_STUB
 #endif
    PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
-  hb_retl( pRegEx && hb_isregexstring( pRegEx ) ) ;
+   hb_retl( pRegEx && hb_isregexstring( pRegEx ) );
 }

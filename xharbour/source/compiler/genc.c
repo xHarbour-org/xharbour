@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.105 2005/07/16 03:17:59 ronpinkas Exp $
+ * $Id: genc.c,v 1.106 2005/07/17 01:59:56 ronpinkas Exp $
  */
 
 /*
@@ -443,7 +443,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
             /* specify the function address if it is a defined function or an
                external called function */
-            if( hb_compFunctionFind( pSym->szName ) ) /* is it a function defined in this module */
+            if( pSym->bFunc && hb_compFunctionFind( pSym->szName ) ) /* is it a function defined in this module */
             {
                if( pSym->cScope & HB_FS_INIT )
                {
@@ -458,11 +458,14 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                   fprintf( yyc, ", {HB_FUNCNAME( %s )}, (PHB_DYNS) 1 }", pSym->szName );
                }
             }
-            else if ( hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_STATIC ) || hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_PUBLIC ) || hb_compInlineFind( pSym->szName ) )
+            else if( pSym->bFunc &&
+               ( hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_STATIC ) ||
+                 hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_PUBLIC ) ||
+                 hb_compInlineFind( pSym->szName ) ) )
             {
                fprintf( yyc, ", {HB_FUNCNAME( %s )}, (PHB_DYNS) 1 }", pSym->szName );
             }
-            else if( hb_compFunCallFind( pSym->szName ) ) /* is it a function called from this module */
+            else if( pSym->bFunc && hb_compFunCallFind( pSym->szName ) ) /* is it a function called from this module */
             {
                fprintf( yyc, ", {HB_FUNCNAME( %s )}, NULL }", pSym->szName );
             }

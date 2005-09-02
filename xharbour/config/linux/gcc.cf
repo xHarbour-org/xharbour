@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.33 2005/06/22 15:28:11 druzus Exp $
+# $Id: gcc.cf,v 1.34 2005/09/02 09:56:35 mauriliolongo Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -98,8 +98,11 @@ LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
 endif
 endif
 
-# Add the specified GT driver library
+# Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
+
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH)
+LINKLIBS += -lpcrepos
 
 ifeq ($(HB_MULTI_GT),yes)
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)

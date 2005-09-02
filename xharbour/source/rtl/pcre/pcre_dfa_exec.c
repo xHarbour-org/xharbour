@@ -1424,7 +1424,8 @@ for (;;)
       /*-----------------------------------------------------------------*/
       case OP_ONCE:
         {
-        const uschar *endcode;
+        /* commented unused variable, Druzus */
+        /* const uschar *endcode; */
         int local_offsets[2];
         int local_workspace[1000];
 
@@ -1446,7 +1447,8 @@ for (;;)
           const uschar *end_subpattern = code;
           int charcount = local_offsets[1] - local_offsets[0];
           int next_state_offset, repeat_state_offset;
-          BOOL is_repeated;
+          /* commented unused variable, Druzus */
+          /* BOOL is_repeated; */
 
           do { end_subpattern += GET(end_subpattern, 1); }
             while (*end_subpattern == OP_ALT);

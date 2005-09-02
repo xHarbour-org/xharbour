@@ -1,0 +1,28 @@
+/*
+ * $Id$
+ */
+
+/*
+ * xHarbour Project - http://www.xharbour.org
+ *
+ * Please left here information about any modifications to original
+ * PCRE files. It will make upgrading PCRE library much more easier
+ * and safer int the future.
+ *
+ *
+ * Use this format for the entry headers:
+ * YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+ * For example:
+ * 2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+ *
+ */
+
+2005-09-01 12:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  + ChangeLog
+    + added change log for PCRE files
+  * pcre_dfa_exec.c
+    * removed unused variables: is_repeated, endcode
+  * chartables.c
+  * dftables.c
+    * add extern declaration for _pcre_default_tables - some C++ compilers
+      may need it
