@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4295 2005/09/02 18:22:53 druzus Exp $
+ * $Id: ChangeLog,v 1.4296 2005/09/02 18:55:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-03 00:26 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/utils/xbscript/Makefile
+  * xharbour/utils/xbscript/xbscript.prg
+    * added _USE_APPMAIN_ macro for PP compilation as standalone
+      program for system/linkers which use differ order execution
+      of startup code then the order of linked files (f.e. GCC)
 
 2005-09-02 11:55 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbregex.h

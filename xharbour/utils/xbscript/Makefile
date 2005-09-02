@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2004/05/21 02:27:56 druzus Exp $
+# $Id: Makefile,v 1.3 2005/07/08 17:51:39 druzus Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -30,6 +30,10 @@ LIBS=\
 
 ifeq ($(HB_ARCHITECTURE),OS2)
 LIBS += socket 
+endif
+
+ifeq ($(findstring _USE_APPMAIN_,$(PRG_USR)),)
+PRG_USR+= -D_USE_APPMAIN_
 endif
 
 include $(TOP)$(ROOT)config/header.cf
