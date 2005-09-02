@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: regex.h,v 1.7 2005/08/31 14:32:39 mauriliolongo Exp $
  */
 
 /*
@@ -33,10 +33,10 @@
  */
 
 
-#include "..\source\rtl\pcre\config.h"
-#include "..\source\rtl\pcre\pcre.h"
-#include "..\source\rtl\pcre\pcre_internal.h"
-#include "..\source\rtl\pcre\pcreposix.h"
+#include "../source/rtl/pcre/config.h"
+#include "../source/rtl/pcre/pcre.h"
+#include "../source/rtl/pcre/pcre_internal.h"
+#include "../source/rtl/pcre/pcreposix.h"
 
 
 /* The functions */

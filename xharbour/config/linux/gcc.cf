@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.32 2005/04/05 01:59:47 druzus Exp $
+# $Id: gcc.cf,v 1.33 2005/06/22 15:28:11 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -50,6 +50,7 @@ LD_OUT = -o
 # Add all libraries specified in HB_USER_LIBS.
 LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
 LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
+
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
@@ -152,6 +153,12 @@ endif
 #ifeq ($(HB_MT),MT) - hurts because it force linking with this lib, try ldd
 ifeq ($(findstring vmmt,$(LIBS)),vmmt)
 LINKLIBS += -lpthread
+endif
+
+# New pcrepos library
+ifeq ($(findstring rtl,$(LIBS)),rtl)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH)
+LINKLIBS += -lpcrepos
 endif
 
 LINKLIBS += -lm -Wl,--end-group
