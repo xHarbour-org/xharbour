@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.8 2005/07/29 19:44:23 lculik Exp $
+ * $Id: ftpcln.prg,v 1.9 2005/08/02 16:54:04 lculik Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 
 #include "hbclass.ch"
 #include "tip.ch"
+#include "common.ch"
 
 /**
 * Inet service manager: ftp
@@ -90,7 +91,16 @@ CLASS tIPClientFTP FROM tIPClient
    METHOD ScanLength()
    METHOD ReadAuxPort()
 	method mget()
-
+	// Method bellow contributed by  Rafa Carmona
+	
+   METHOD LS( cSpec ) 
+   METHOD Rename( cFrom, cTo )
+   // new method for file upload
+   METHOD UpLoadFile( cLocalFile, cRemoteFile )
+   // new method to download file
+   METHOD DownLoadFile( cLocalFile, cRemoteFile ) 
+   // new method to create an directory on ftp server
+   METHOD MKD( cPath )
 ENDCLASS
 
 
@@ -258,6 +268,7 @@ RETURN .T.
 METHOD Commit() CLASS tIPClientFTP
    InetClose( ::SocketCon )
    ::SocketCon := ::SocketControl
+   ::bInitialized := .F.
    IF .not. ::GetReply()
       RETURN .F.
    ENDIF
@@ -275,6 +286,7 @@ RETURN .F.
 
 METHOD List(cSpec) CLASS tIPClientFTP
    LOCAL cStr
+   
 	IF cSpec=nil
 		cSpec:=''
 	else
@@ -295,7 +307,7 @@ METHOD List(cSpec) CLASS tIPClientFTP
 */
    ::InetSendAll( ::SocketCon, "LIST"+cSpec + ::cCRLF )
    cStr := ::ReadAuxPort()
-
+   ::bEof := .f.
 RETURN cStr
 
 METHOD ReadAuxPort(cLocalFile) CLASS tIPClientFTP
@@ -498,3 +510,120 @@ METHOD MGET( cSpec ) CLASS tIPClientFTP
    ENDIF
 
 	RETURN cStr
+
+METHOD UpLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
+
+   LOCAL cFileData
+   LOCAL lRet,nRet
+   LOCAL cPath := ""
+   LOCAL cFile := ""
+   Local cExt  := ""
+   
+   HB_FNameSplit( cLocalFile, @cPath, @cFile,@cExt  ) 
+   
+   DEFAULT cRemoteFile to cFile+cExt 
+   
+   cFileData := MemoRead(cLocalFile)   
+   ::bEof := .F.   
+   ::oUrl:cFile := cRemoteFile
+
+   nRet := ::Write( cFileData )
+   
+   IF nRet == -1
+      lRet := .F.         
+   ELSE
+      lRet := .T.
+   ENDIF
+     
+   ::Commit() // Close Passive conection of previus file
+   
+RETURN lRet   
+
+METHOD LS( cSpec ) CLASS tIPClientFTP
+
+    LOCAL cStr,cfile,x,y
+
+    IF cSpec == nil
+       cSpec := ''
+     ENDIF
+
+    IF ::bUsePasv
+    
+       IF .not. ::Pasv()
+       
+          //::bUsePasv := .F.
+          RETURN .F.
+          
+       ENDIF
+       
+    ENDIF
+
+    ::InetSendAll( ::SocketCon, "NLST "+cSpec + ::cCRLF )
+    cStr := ::ReadAuxPort()
+
+RETURN cStr
+
+/*Rename a traves del ftp */
+
+METHOD Rename( cFrom, cTo ) CLASS tIPClientFTP
+    Local lResult  := .F.
+
+    ::InetSendAll( ::SocketCon, "RNFR "+ cFrom + ::cCRLF )
+    
+    IF ::GetReply()
+    
+       ::InetSendAll( ::SocketCon, "RNTO "+ cTo + ::cCRLF )
+       lResult := ::GetReply()
+       
+    ENDIF
+
+Return lResult
+
+METHOD DownLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
+   LOCAL cFileData
+   LOCAL lRet,xRet 
+   LOCAL cPath
+   Local nHandle
+   LOCAL cFile
+   
+   DEFAULT cRemoteFile to cLocalFile   
+
+   ::bEof := .F.   
+   ::oUrl:cFile := cLocalFile
+
+   xRet := ::Read()
+
+   IF ISLOGICAL( xRet )
+
+      IF !xRet
+
+         lRet := .F.
+
+      ENDIF
+
+   ELSEIF ISCHARACTER( xRet )
+
+      IF EMPTY( XRET )
+
+         lRet := .F.
+
+      ELSE
+
+         nHandle := FCREATE( cLocalFile )
+         FWRITE( nHandle, xRet )
+         FCLOSE( nHandle )
+         lRet := .T.
+
+      ENDIF
+
+   ENDIF
+     
+   ::Commit() // Close Passive conection of previus file
+   
+RETURN lRet   
+
+// Create a new folder
+METHOD MKD( cPath ) CLASS tIPClientFTP
+   ::InetSendall( ::SocketCon, "MKD " + cPath + ::cCRLF )
+RETURN ::GetReply()
+

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4292 2005/09/02 09:58:01 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4293 2005/09/02 15:46:11 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-02 13:40 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+   * source/tip/ftpcln.prg
+      It include 5 new methods
+      Rename( cOld, cNew ) // to rename files on ftp server
+      Ls( spec ) // to list ftp server contents
+      UpLoadFile( cLocalFile, cRemoteFile )  // to upload files to server
+      DownLoadFile( cLocalFile, cRemoteFile )  // to download files to server
+      MKD( cPath )  // create an directory o ftp server
+   + tests/tiptest/uploadftp.prg 
+      ! sample demostrating how to upload files to ftp server
+   + tests/tiptest/dnldftp.prg      
 
 2005-09-02 11:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.bc (corrected)
