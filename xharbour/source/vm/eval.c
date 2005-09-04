@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.22 2005/05/25 20:16:57 ronpinkas Exp $
+ * $Id: eval.c,v 1.23 2005/08/28 19:25:33 walito Exp $
  */
 
 /*
@@ -523,7 +523,6 @@ HB_FUNC( HB_EXECFROMARRAY )
    PHB_ITEM pFirst = hb_param( 1, HB_IT_ANY );
    PHB_ITEM pArgs = NULL, pSelf = NULL, pString;
    PHB_DYNS pExecSym = NULL;
-   PHB_FUNC pFunc = NULL;
    ULONG i;
    ULONG ulLen, ulStart = 1;
    UINT uiPcount = hb_pcount();
@@ -536,14 +535,12 @@ HB_FUNC( HB_EXECFROMARRAY )
 
       if( pString->type == HB_IT_STRING )
       {
-         pFunc = (PHB_FUNC) hb_objHasMsg( pSelf, pString->item.asString.value );
+         pExecSym = hb_dynsymFindName( pString->item.asString.value );
       }
       else if( pString->type == HB_IT_POINTER )
       {
-         pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
+         pSymbol = (PHB_SYMB) hb_itemGetPtr( pString );
       }
-
-      pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
    }
    else if( HB_IS_OBJECT( pFirst ) && uiPcount == 3) /* hb_ExecFromArray( oObject, cMessage | pMessage, { params,... } )  */
    {
@@ -556,8 +553,7 @@ HB_FUNC( HB_EXECFROMARRAY )
       }
       else if( pString->type == HB_IT_POINTER )
       {
-         pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
-         pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
+         pSymbol = (PHB_SYMB) hb_itemGetPtr( pString );
       }
 
       pArgs = hb_param( 3, HB_IT_ARRAY );
@@ -573,13 +569,11 @@ HB_FUNC( HB_EXECFROMARRAY )
    }
    else if( pFirst->type == HB_IT_POINTER && uiPcount == 1)   /* hb_ExecFromArray( pFunc )  */
    {
-      pFunc = (PHB_FUNC) hb_itemGetPtr( pFirst );
-      pExecSym = hb_dynsymFindFromFunction( pFunc );
+      pSymbol = (PHB_SYMB) hb_itemGetPtr( pFirst );
    }
    else if( pFirst->type == HB_IT_POINTER && uiPcount == 2)   /* hb_ExecFromArray( pFunc, { params,... } )  */
    {
-      pFunc = (PHB_FUNC) hb_itemGetPtr( pFirst );
-      pExecSym = hb_dynsymFindFromFunction( pFunc );
+      pSymbol = (PHB_SYMB) hb_itemGetPtr( pFirst );
       pArgs = hb_param( 2, HB_IT_ARRAY );
    }
    else if ( HB_IS_BLOCK( pFirst ) && uiPcount == 1)       /* hb_ExecFromArray( bCode )  */
@@ -605,14 +599,13 @@ HB_FUNC( HB_EXECFROMARRAY )
 
          if( pString->type == HB_IT_STRING )
          {
-            pFunc = (PHB_FUNC) hb_objHasMsg( pSelf, pString->item.asString.value );
+            pExecSym = hb_dynsymFindName( pString->item.asString.value );
          }
          else if( pString->type == HB_IT_POINTER )
          {
-            pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
+            pSymbol = (PHB_SYMB) hb_itemGetPtr( pString );
          }
 
-         pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
          ulStart = 3;
       }
       else if( pString->type == HB_IT_STRING )
@@ -622,8 +615,7 @@ HB_FUNC( HB_EXECFROMARRAY )
       }
       else if( pString->type == HB_IT_POINTER )
       {
-         pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
-         pExecSym = hb_dynsymFindFromFunction( pFunc );
+         pSymbol = (PHB_SYMB) hb_itemGetPtr( pString );
          ulStart = 2;
       }
       else if ( HB_IS_BLOCK( pString ) )
@@ -696,7 +688,6 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
 {
    PHB_ITEM pArgs, pSelf = NULL, pString;
    PHB_DYNS pExecSym = NULL;
-   PHB_FUNC pFunc = NULL;
    ULONG i;
    ULONG ulLen, ulStart = 1;
    PHB_SYMB pSymbol = NULL;
@@ -716,14 +707,12 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
 
       if( pString->type == HB_IT_STRING )
       {
-         pFunc = (PHB_FUNC) hb_objHasMsg( pSelf, pString->item.asString.value );
+         pExecSym = hb_dynsymFindName( pString->item.asString.value );
       }
       else if( pString->type == HB_IT_POINTER )
       {
-         pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
+         pSymbol = (PHB_SYMB) hb_itemGetPtr( pString );
       }
-
-      pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
 
       ulStart = 3;
    }
@@ -734,8 +723,7 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
    }
    else if( pString->type == HB_IT_POINTER )
    {
-      pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
-      pExecSym = hb_dynsymFindFromFunction( pFunc );
+      pSymbol = (PHB_SYMB) hb_itemGetPtr( pString );
       ulStart = 2;
    }
    else if ( HB_IS_BLOCK( pString ) )
@@ -795,38 +783,34 @@ HB_FUNC( HB_EXEC )
 
    if ( pPointer->type == HB_IT_POINTER )
    {
-      PHB_FUNC pFunc = (PHB_FUNC) hb_itemGetPtr( pPointer );
       PHB_ITEM pSelf;
-      PHB_DYNS pExecSym = NULL;
+      PHB_SYMB pSymbol = (PHB_SYMB) hb_itemGetPtr( pPointer );
       int iParams;
 
-      if( hb_pcount() >= 2 )
+      if( pSymbol )
       {
-         if( HB_IS_OBJECT( *( HB_VM_STACK.pBase + 1 + 2 ) ) )
+         if( hb_pcount() >= 2 )
          {
-            pSelf = *( HB_VM_STACK.pBase + 1 + 2 );
-            pExecSym = hb_clsSymbolFromFunction( pSelf, pFunc );
+            if( HB_IS_OBJECT( *( HB_VM_STACK.pBase + 1 + 2 ) ) )
+            {
+               pSelf = *( HB_VM_STACK.pBase + 1 + 2 );
+            }
+            else
+            {
+               pSelf = NULL;
+            }
+   
+            iParams = hb_pcount() - 2;
          }
          else
          {
             pSelf = NULL;
+            iParams = 0;
+            hb_vmPushNil();
          }
 
-         iParams = hb_pcount() - 2;
       }
       else
-      {
-         pSelf = NULL;
-         iParams = 0;
-         hb_vmPushNil();
-      }
-
-      if( pSelf == NULL )
-      {
-         pExecSym = hb_dynsymFindFromFunction( pFunc );
-      }
-
-      if( pExecSym == NULL )
       {
          hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_Exec", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
          return;
@@ -836,7 +820,7 @@ HB_FUNC( HB_EXEC )
 
       // Changing the Pointer item to a Symbol Item, so that we don't have to re-push paramters.
       pPointer->type = HB_IT_SYMBOL;
-      pPointer->item.asSymbol.value = pExecSym->pSymbol;
+      pPointer->item.asSymbol.value = pSymbol;
       pPointer->item.asSymbol.stackbase = hb_stackTopOffset() - 2 - iParams;
       pPointer->item.asSymbol.uiSuperClass = 0;
 

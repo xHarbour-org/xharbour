@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.32 2005/07/10 05:07:06 walito Exp $
+ * $Id: hbclass.ch,v 1.33 2005/07/17 00:10:19 ronpinkas Exp $
  */
 
 /*
@@ -141,13 +141,16 @@ DECLARE HBClass ;
 #ifndef HB_CLS_CSY
 #ifndef HB_CLS_VO
 #ifndef HB_CLS_TOP
+#ifndef HB_CLS_XB
 
  /* IF NOTHING DECIDED BY THE PROGRAMER USE ALL */
 #define HB_CLS_FWO
 #define HB_CLS_CSY
 #define HB_CLS_VO
 #define HB_CLS_TOP
+#define HB_CLS_XB
 
+#endif
 #endif
 #endif
 #endif
@@ -504,6 +507,14 @@ DECLARE HBClass ;
 
 #endif
 
+
+/* XBASE SYNTAX */
+#ifdef HB_CLS_XB
+
+#xcommand SYNC METHOD <Name> [<*x*>] => METHOD <Name> SYNC [<x>]
+
+#endif
+
 #xcommand CLASSMETHOD <MethodName> [ <clsctor: CONSTRUCTOR> ] [ AS <type> ] [<export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<share: SHARED>] => ;
    _HB_MEMBER <MethodName>() [ AS <type> ];;
    s_oClass:AddClsMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.share.>, HB_OO_CLSTP_SHARED, 0 ) + iif( <.clsctor.>, HB_OO_CLSTP_CLASSCTOR, 0 ) );;
@@ -515,78 +526,78 @@ DECLARE HBClass ;
 #xcommand DESTRUCTOR <Name> [<*x*>] => METHOD <Name> [<x>]
 
 #ifdef STRICT_OO
-  #xcommand METHOD <MethodName> [ <ctor: CONSTRUCTOR> ] [ AS <type> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [_CLASS_DECLARATION_] ;
+  #xcommand METHOD <MethodName> [ <ctor: CONSTRUCTOR> ] [ AS <type> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] [_CLASS_DECLARATION_] ;
     [<persistent: PERSISTENT, PROPERTY>] [<ov: OVERRIDE>] => ;
     _HB_MEMBER <MethodName>() [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-    s_oClass:AddMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ), <.persistent.> );;
+    s_oClass:AddMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> );;
     #xcommand METHOD <MethodName> \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>;;
     #xcommand PROCEDURE <MethodName> \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>;;
     #xcommand METHOD <MethodName> \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>;;
     #xcommand PROCEDURE <MethodName> \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE \<ClassName> <MethodName>
 
-  #xcommand CLASSMETHOD <MethodName> [ <clsctod: CONSTRUCTOR> ] [ AS <type> ] [<export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<share: SHARED>] [_CLASS_DECLARATION_] => ;
+  #xcommand CLASSMETHOD <MethodName> [ <clsctod: CONSTRUCTOR> ] [ AS <type> ] [<export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<share: SHARED>] [<sync: SYNC>] [_CLASS_DECLARATION_] => ;
     _HB_MEMBER <MethodName>() [ AS <type> ];;
-    s_oClass:AddClsMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.share.>, HB_OO_CLSTP_SHARED, 0 ) + iif( <.clsctod.>, HB_OO_CLSTP_CLASSCTOR, 0 ) );;
+    s_oClass:AddClsMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.share.>, HB_OO_CLSTP_SHARED, 0 ) + iif( <.clsctod.>, HB_OO_CLSTP_CLASSCTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
     #xcommand METHOD <MethodName> \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>;;
     #xcommand PROCEDURE <MethodName> \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>;;
     #xcommand METHOD <MethodName> \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>;;
     #xcommand PROCEDURE <MethodName> \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE \<ClassName> <MethodName>
 #else
-  #xcommand METHOD <MethodName> [ <ctor: CONSTRUCTOR> ] [ AS <type> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [_CLASS_DECLARATION_] ;
+  #xcommand METHOD <MethodName> [ <ctor: CONSTRUCTOR> ] [ AS <type> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] [_CLASS_DECLARATION_] ;
     [<persistent: PERSISTENT, PROPERTY>] [<ov: OVERRIDE>] => ;
     _HB_MEMBER <MethodName>() [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-    s_oClass:AddMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ), <.persistent.> );;
+    s_oClass:AddMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> );;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>(\[\<anyParams>]);;
     #xcommand PROCEDURE <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>(\[\<anyParams>]);;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>(\[\<anyParams>]);;
     #xcommand PROCEDURE <MethodName> \[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE \<ClassName> <MethodName>(\[\<anyParams>])
 
-  #xcommand METHOD <MethodName>([<params,...>]) [ <ctor: CONSTRUCTOR> ] [ AS <type> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [_CLASS_DECLARATION_] ;
+  #xcommand METHOD <MethodName>([<params,...>]) [ <ctor: CONSTRUCTOR> ] [ AS <type> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] [_CLASS_DECLARATION_] ;
     [<persistent: PERSISTENT, PROPERTY>] [<ov: OVERRIDE>] => ;
     _HB_MEMBER <MethodName>([<params>]) [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-    s_oClass:AddMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ), <.persistent.> );;
+    s_oClass:AddMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> );;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>(\[\<anyParams>]);;
     #xcommand PROCEDURE <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>(\[\<anyParams>]);;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>(\[\<anyParams>]);;
     #xcommand PROCEDURE <MethodName> \[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE \<ClassName> <MethodName>(\[\<anyParams>])
 
-  #xcommand CLASSMETHOD <MethodName> [ <clsctor: CONSTRUCTOR> ] [ AS <type> ] [<export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<share: SHARED>] [_CLASS_DECLARATION_] => ;
+  #xcommand CLASSMETHOD <MethodName> [ <clsctor: CONSTRUCTOR> ] [ AS <type> ] [<export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<share: SHARED>] [<sync, SYNC>] [_CLASS_DECLARATION_] => ;
     _HB_MEMBER <MethodName>() [ AS <type> ];;
-    s_oClass:AddClsMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.share.>, HB_OO_CLSTP_SHARED, 0 ) + iif( <.clsctor.>, HB_OO_CLSTP_CLASSCTOR, 0 ) );;
+    s_oClass:AddClsMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.share.>, HB_OO_CLSTP_SHARED, 0 ) + iif( <.clsctor.>, HB_OO_CLSTP_CLASSCTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
     #xcommand METHOD <MethodName> \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>;;
     #xcommand PROCEDURE <MethodName> \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>;;
     #xcommand METHOD <MethodName> \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>;;
     #xcommand PROCEDURE <MethodName> \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE \<ClassName> <MethodName>
 
-  #xcommand CLASSMETHOD <MethodName>([<params,...>]) [ <clsctor: CONSTRUCTOR> ] [ AS <type> ] [<export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<share: SHARED>] [_CLASS_DECLARATION_] => ;
+  #xcommand CLASSMETHOD <MethodName>([<params,...>]) [ <clsctor: CONSTRUCTOR> ] [ AS <type> ] [<export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<share: SHARED>] [<sync: SYNC>] [_CLASS_DECLARATION_] => ;
     _HB_MEMBER <MethodName>() [ AS <type> ];;
-    s_oClass:AddClsMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.share.>, HB_OO_CLSTP_SHARED, 0 ) + iif( <.clsctor.>, HB_OO_CLSTP_CLASSCTOR, 0 ) );;
+    s_oClass:AddClsMethod( <(MethodName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.share.>, HB_OO_CLSTP_SHARED, 0 ) + iif( <.clsctor.>, HB_OO_CLSTP_CLASSCTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>(\[\<anyParams>]);;
     #xcommand PROCEDURE <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>(\[\<anyParams>]);;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>(\[\<anyParams>]);;
     #xcommand PROCEDURE <MethodName> \[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE \<ClassName> <MethodName>(\[\<anyParams>])
 #endif
 
-#xcommand METHOD <MethodName> [ AS <type> ] BLOCK <CodeBlock> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] ;
+#xcommand METHOD <MethodName> [ AS <type> ] BLOCK <CodeBlock> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] ;
    [<persistent: PERSISTENT, PROPERTY>] [<ov: OVERRIDE>] => ;
    _HB_MEMBER <MethodName>() [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-   s_oClass:AddInline( <(MethodName)>, <CodeBlock>, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ), <.persistent.> )
+   s_oClass:AddInline( <(MethodName)>, <CodeBlock>, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> )
 
-#xcommand METHOD <MethodName> [ AS <type> ] EXTERN <FuncName> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] ;
+#xcommand METHOD <MethodName> [ AS <type> ] EXTERN <FuncName> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] ;
    [<persistent: PERSISTENT, PROPERTY>] [<ov: OVERRIDE>] => ;
    _HB_MEMBER <MethodName>() [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-   s_oClass:AddMethod( <(MethodName)>, @<FuncName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ), <.persistent.> )
+   s_oClass:AddMethod( <(MethodName)>, @<FuncName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> )
 
-#xcommand METHOD <MethodName> [ AS <type> ] INLINE <Code,...> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] ;
+#xcommand METHOD <MethodName> [ AS <type> ] INLINE <Code,...> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] ;
    [<persistent: PERSISTENT, PROPERTY>] [<ov: OVERRIDE>] => ;
    _HB_MEMBER <MethodName>() [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-   s_oClass:AddInline( <(MethodName)>, {|Self | <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ), <.persistent.> )
+   s_oClass:AddInline( <(MethodName)>, {|Self | <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> )
 
 /* Must have secondary version with params because params are used in the block */
-#xcommand METHOD <MethodName>( [<params,...>] ) [ AS <type> ] INLINE <Code,...> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] ;
+#xcommand METHOD <MethodName>( [<params,...>] ) [ AS <type> ] INLINE <Code,...> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] ;
    [<persistent: PERSISTENT, PROPERTY>] [<ov: OVERRIDE>] => ;
    _HB_MEMBER <MethodName>([<params>]) [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-   s_oClass:AddInline( <(MethodName)>, {|Self [,<params>] | <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ), <.persistent.> )
+   s_oClass:AddInline( <(MethodName)>, {|Self [,<params>] | <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ), <.persistent.> )
 
 #xcommand METHOD <MethodName> [ AS <type> ] INLINE [Local <v>,] <Code,...> [<other>] => ;
           METHOD <MethodName> [ AS <type> ] BLOCK {|Self [,<v>] | <Code> } [<other>]
@@ -608,21 +619,21 @@ DECLARE HBClass ;
    s_oClass:AddVirtual( <(MethodName)> )
 
 #ifdef STRICT_OO
-  #xcommand METHOD <MethodName> [ AS <type> ] OPERATOR <op> [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<ov: OVERRIDE>] => ;
+  #xcommand METHOD <MethodName> [ AS <type> ] OPERATOR <op> [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] [<ov: OVERRIDE>] => ;
     _HB_MEMBER <MethodName>()  [ AS <type> ];;
-    s_oClass:AddMethod( <(op)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) ) ;;
+    s_oClass:AddMethod( <(op)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) ) ;;
     #xcommand METHOD <MethodName> \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName> ;;
     #xcommand METHOD <MethodName> \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>
 #else
-  #xcommand METHOD <MethodName> [ AS <type> ] OPERATOR <op> [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<ov: OVERRIDE>] => ;
+  #xcommand METHOD <MethodName> [ AS <type> ] OPERATOR <op> [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] [<ov: OVERRIDE>] => ;
     _HB_MEMBER <MethodName>()  [ AS <type> ];;
-    s_oClass:AddMethod( <(op)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) ) ;;
+    s_oClass:AddMethod( <(op)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) ) ;;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>(\[\<anyParams>]) ;;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>(\[\<anyParams>])
 
-  #xcommand METHOD <MethodName>( [<params,...>] ) [ AS <type> ] OPERATOR <op> [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<ov: OVERRIDE>] => ;
+  #xcommand METHOD <MethodName>( [<params,...>] ) [ AS <type> ] OPERATOR <op> [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] [<ov: OVERRIDE>] => ;
     _HB_MEMBER <MethodName>([<params>])  [ AS <type> ];;
-    s_oClass:AddMethod( <(op)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) ) ;;
+    s_oClass:AddMethod( <(op)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) ) ;;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>(\[\<anyParams>]);;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>(\[\<anyParams>])
 #endif
@@ -634,61 +645,61 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
 //oClass:AddInline( <(op)>, {|Self, <xArg> [,<lx>] | <Code> }, HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) )
 
 #ifdef STRICT_OO
-  #xcommand MESSAGE <MessageName> [ AS <type> ] METHOD <MethodName> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] => ;
+  #xcommand MESSAGE <MessageName> [ AS <type> ] METHOD <MethodName> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] => ;
      _HB_MEMBER <MessageName>() [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) );;
+     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
      #xcommand METHOD <MethodName> \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>;;
      #xcommand METHOD <MethodName> \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>
 #else
-  #xcommand MESSAGE <MessageName> [ AS <type> ] METHOD <MethodName> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] => ;
+  #xcommand MESSAGE <MessageName> [ AS <type> ] METHOD <MethodName> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] => ;
      _HB_MEMBER <MessageName>() [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) );;
+     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>(\[\<anyParams>]);;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>(\[\<anyParams>])
 
-  #xcommand MESSAGE <MessageName>([<MsgParams,...>]) [ AS <type> ] METHOD <MethodName> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] => ;
+  #xcommand MESSAGE <MessageName>([<MsgParams,...>]) [ AS <type> ] METHOD <MethodName> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] => ;
      _HB_MEMBER <MessageName>([<MsgParams>]) [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) );;
+     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>(\[\<anyParams>]);;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>(\[\<anyParams>])
 
-  #xcommand MESSAGE <MessageName> [ AS <type> ] METHOD <MethodName>([<MtdParams,...>]) [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] => ;
+  #xcommand MESSAGE <MessageName> [ AS <type> ] METHOD <MethodName>([<MtdParams,...>]) [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] => ;
      _HB_MEMBER <MessageName>([<MtdParams>]) [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) );;
+     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>(\[\<anyParams>]);;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>(\[\<anyParams>])
 
-  #xcommand MESSAGE <MessageName>([<MsgParams,...>]) [ AS <type> ] METHOD <MethodName>([<MtdParams,...>]) [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] => ;
+  #xcommand MESSAGE <MessageName>([<MsgParams,...>]) [ AS <type> ] METHOD <MethodName>([<MtdParams,...>]) [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] => ;
      _HB_MEMBER <MessageName>([<MtdParams>]) [<-MsgParams->] [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) );;
+     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>(\[\<anyParams>]);;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>(\[\<anyParams>])
 #endif
 
 #ifdef STRICT_OO
-  #xcommand MESSAGE <MessageName> [ AS <type> ] PROCEDURE <MethodName> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] => ;
+  #xcommand MESSAGE <MessageName> [ AS <type> ] PROCEDURE <MethodName> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] => ;
      _HB_MEMBER <MessageName>() [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) );;
+     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
      #xcommand PROCEDURE <MethodName> \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>
 #else
-  #xcommand MESSAGE <MessageName> [ AS <type> ] PROCEDURE <MethodName> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] => ;
+  #xcommand MESSAGE <MessageName> [ AS <type> ] PROCEDURE <MethodName> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] => ;
      _HB_MEMBER <MessageName>() [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) );;
+     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
     #xcommand PROCEDURE <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>(\[\<anyParams>])
 
-  #xcommand MESSAGE <MessageName>([<MsgParams,...>]) [ AS <type> ] PROCEDURE <MethodName> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] => ;
+  #xcommand MESSAGE <MessageName>([<MsgParams,...>]) [ AS <type> ] PROCEDURE <MethodName> [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] => ;
      _HB_MEMBER <MessageName>([<MsgParams>]) [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) );;
+     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
     #xcommand PROCEDURE <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>(\[\<anyParams>])
 
-  #xcommand MESSAGE <MessageName> [ AS <type> ] PROCEDURE <MethodName>([<MtdParams,...>]) [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] => ;
+  #xcommand MESSAGE <MessageName> [ AS <type> ] PROCEDURE <MethodName>([<MtdParams,...>]) [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] => ;
      _HB_MEMBER <MessageName>([<MtdParams>]) [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) );;
+     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
     #xcommand PROCEDURE <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>(\[\<anyParams>])
 
-  #xcommand MESSAGE <MessageName>([<MsgParams,...>]) [ AS <type> ] PROCEDURE <MethodName>([<MtdParams,...>]) [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] => ;
+  #xcommand MESSAGE <MessageName>([<MsgParams,...>]) [ AS <type> ] PROCEDURE <MethodName>([<MtdParams,...>]) [ <ctor: CONSTRUCTOR> ] [ <export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<sync: SYNC>] => ;
      _HB_MEMBER <MessageName>([<MtdParams>]) [<-MsgParams->] [<-ctor-> AS CLASS _CLASS_NAME_] [ AS <type> ];;
-     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) );;
+     s_oClass:AddMethod( <(MessageName)>, CLSMETH _CLASS_NAME_ <MethodName>(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.ctor.>, HB_OO_CLSTP_CTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
     #xcommand PROCEDURE <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>(\[\<anyParams>])
 #endif
 

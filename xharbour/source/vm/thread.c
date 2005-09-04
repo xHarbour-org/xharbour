@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.189 2005/05/24 21:05:58 ronpinkas Exp $
+* $Id: thread.c,v 1.190 2005/06/17 17:04:23 lculik Exp $
 */
 
 /*
@@ -318,6 +318,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->pPos   = tc->pItems;     /* points to the first stack item */
    tc->wItems = STACK_THREADHB_ITEMS;
    tc->pMethod = NULL;
+   tc->pSyncId = NULL;
    tc->Return.type = HB_IT_NIL;
    tc->bInUse = FALSE;
    tc->iPcodeCount = 0;
@@ -391,7 +392,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
 
    /* Initialization of dbcmd related variables */
    tc->uiCurrArea = 1;
-   tc->pCurrArea = 0;
+   tc->pCurrArea = NULL;
 
    /* Initialization of private and public memvars */
    hb_memvarsInit( tc );
@@ -561,6 +562,12 @@ void hb_threadDestroyStack( HB_STACK *pStack )
       hb_xfree( pStack->pCleanUp );
       hb_xfree( pStack->pCleanUpParam );
    #endif
+
+   // Free Sync method table
+   if( pStack->pSyncId )
+   {
+      hb_xfree( pStack->pSyncId );
+   }
 
    // Free only if we are not destroying the main stack
    if ( pStack != &hb_stack )
@@ -1552,7 +1559,7 @@ HB_FUNC( STARTTHREAD )
    PHB_ITEM pArgs;
    HB_THREAD_T th_id;
    PHB_DYNS pExecSym;
-   PHB_FUNC pFunc;
+   PHB_SYMB pSymbol;
    BOOL bIsMethod = FALSE;
    HB_STACK *pStack;
    PHB_THREAD_ID pThread;
@@ -1575,10 +1582,9 @@ HB_FUNC( STARTTHREAD )
    /* Is it a function pointer? */
    if ( pPointer->type == HB_IT_POINTER )
    {
-      pFunc =  (PHB_FUNC) hb_itemGetPtr( pPointer );
-      pExecSym = hb_dynsymFindFromFunction( pFunc );
+      pSymbol =  (PHB_SYMB) hb_itemGetPtr( pPointer );
 
-      if( pExecSym == NULL )
+      if( pSymbol == NULL )
       {
          hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "STARTTHREAD", 1, hb_paramError( 1 ) );
          hb_itemRelease( pArgs );
@@ -1587,7 +1593,7 @@ HB_FUNC( STARTTHREAD )
 
       // Converting it to its Symbol.
       pPointer->type = HB_IT_SYMBOL;
-      pPointer->item.asSymbol.value = pExecSym->pSymbol;
+      pPointer->item.asSymbol.value = pSymbol;
       pPointer->item.asSymbol.uiSuperClass = 0;
    }
    /* Is it an object? */
@@ -1597,21 +1603,25 @@ HB_FUNC( STARTTHREAD )
 
       if( pString->type == HB_IT_STRING )
       {
-         pFunc = (PHB_FUNC) hb_objHasMsg( pPointer, pString->item.asString.value );
+         pExecSym = hb_dynsymGet( pString->item.asString.value );
+
+         if( pExecSym )
+         {
+           pSymbol =  pExecSym->pSymbol;
+         }
       }
       else if( pString->type == HB_IT_POINTER )
       {
-         pFunc = (PHB_FUNC) hb_itemGetPtr( pString );
+         pSymbol =  (PHB_SYMB) hb_itemGetPtr( pString );
       }
       else
       {
          hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "StartThread", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+         hb_itemRelease( pArgs );
          return;
       }
 
-      pExecSym = hb_clsSymbolFromFunction( pPointer , pFunc );
-
-      if( pExecSym == NULL )
+      if( pExecSym == NULL && pSymbol == NULL )
       {
          hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "StartThread", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
          hb_itemRelease( pArgs );
@@ -1624,7 +1634,7 @@ HB_FUNC( STARTTHREAD )
       hb_itemSwap( pPointer, hb_arrayGetItemPtr( pArgs, 2 ) );
 
       pPointer->type = HB_IT_SYMBOL;
-      pPointer->item.asSymbol.value = pExecSym->pSymbol;
+      pPointer->item.asSymbol.value = pSymbol;
       pPointer->item.asSymbol.uiSuperClass = 0;
    }
    /* Is it a function name? */
@@ -1632,7 +1642,7 @@ HB_FUNC( STARTTHREAD )
    {
       pExecSym = hb_dynsymFindName( pPointer->item.asString.value );
 
-      if( ! pExecSym )
+      if( pExecSym == NULL )
       {
          hb_errRT_BASE( EG_NOFUNC, 1001, NULL, pPointer->item.asString.value, 1, pArgs );
          hb_itemRelease( pArgs );
@@ -2230,11 +2240,8 @@ HB_GARBAGE_FUNC( hb_threadMutexFinalize )
 /*
    Create a new mutex (marking it disposeable by the GC)
 */
-HB_FUNC( HB_MUTEXCREATE )
+PHB_ITEM hb_threadMutexCreate( PHB_ITEM pItem )
 {
-#if defined(HB_API_MACROS)
-   HB_THREAD_STUB
-#endif
    HB_MUTEX_STRUCT *mt;
 
    mt = (HB_MUTEX_STRUCT *)
@@ -2253,7 +2260,15 @@ HB_FUNC( HB_MUTEXCREATE )
 
    hb_threadLinkMutex( mt );
 
-   hb_retptrGC( mt );
+   return hb_itemPutPtrGC( pItem, (void *) mt );
+}
+
+HB_FUNC( HB_MUTEXCREATE )
+{
+#if defined(HB_API_MACROS)
+   HB_THREAD_STUB
+#endif
+   hb_threadMutexCreate( &HB_VM_STACK.Return );
 }
 
 /*
@@ -2269,19 +2284,20 @@ HB_FUNC( DESTROYMUTEX )
    Locks a mutex; locking is done by waiting for the mutex resource
    to become available. This wait is cancelable.
 */
-
-HB_FUNC( HB_MUTEXLOCK )
+BOOL hb_threadMutexLock( PHB_ITEM pItem, BOOL bError )
 {
 #if defined(HB_API_MACROS)
    HB_THREAD_STUB
 #endif
-
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_itemGetPtr( pItem );
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXLOCK", 1, hb_paramError(1) );
-      return;
+      if( bError )
+      {
+         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXLOCK", 1, hb_paramError(1) );
+      }
+      return FALSE;
    }
 
    if( HB_SAME_THREAD( Mutex->locker, HB_CURRENT_THREAD() ) )
@@ -2307,6 +2323,15 @@ HB_FUNC( HB_MUTEXLOCK )
 
       HB_STACK_LOCK;
    }
+   return TRUE;
+}
+
+HB_FUNC( HB_MUTEXLOCK )
+{
+#if defined(HB_API_MACROS)
+   HB_THREAD_STUB
+#endif
+   hb_retl( hb_threadMutexLock( hb_param( 1, HB_IT_POINTER ), TRUE ) );
 }
 
 
@@ -2314,15 +2339,12 @@ HB_FUNC( HB_MUTEXLOCK )
    Locks a mutex; locking is done by waiting for the mutex resource
    to become available with timeout. This wait is cancelable.
 */
-
-HB_FUNC( HB_MUTEXTIMEOUTLOCK )
+BOOL hb_threadMutexTimeOutLock( PHB_ITEM pItem, int iTimeOut, BOOL bError )
 {
 #if defined(HB_API_MACROS)
    HB_THREAD_STUB
 #endif
-
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
-   int iTimeOut = hb_parni(2);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_itemGetPtr( pItem );
 #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    DWORD dwTimeOut = (DWORD) iTimeOut;
 #else
@@ -2331,14 +2353,16 @@ HB_FUNC( HB_MUTEXTIMEOUTLOCK )
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE || iTimeOut < 0 )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXTIMEOUTLOCK", 2, hb_paramError(1), hb_paramError(2) );
-      return;
+      if( bError )
+      {
+         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXTIMEOUTLOCK", 2, hb_paramError(1), hb_paramError(2) );
+      }
+      return FALSE;
    }
 
    if( HB_SAME_THREAD( Mutex->locker, HB_CURRENT_THREAD() ) )
    {
       Mutex->lock_count ++;
-      hb_retl( TRUE );
    }
    else
    {
@@ -2365,61 +2389,95 @@ HB_FUNC( HB_MUTEXTIMEOUTLOCK )
       HB_CRITICAL_UNLOCK( Mutex->mutex );
 
       HB_STACK_LOCK;
-      hb_retl(bLock);
+      return bLock;
    }
+   return TRUE;
+}
+
+
+HB_FUNC( HB_MUTEXTIMEOUTLOCK )
+{
+#if defined(HB_API_MACROS)
+   HB_THREAD_STUB
+#endif
+   hb_retl( hb_threadMutexTimeOutLock( hb_param( 1, HB_IT_POINTER ), hb_parni(2), TRUE ) );
 }
 
 
 /*
    Try to lock a mutex; return immediately on failure.
 */
-HB_FUNC( HB_MUTEXTRYLOCK )
+BOOL hb_threadMutexTryLock( PHB_ITEM pItem, BOOL bError )
 {
 #if defined(HB_API_MACROS)
    HB_THREAD_STUB
 #endif
-
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_itemGetPtr( pItem );
+   BOOL bLock;
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXTRYLOCK", 1, hb_paramError(1) );
-      return;
+      if( bError )
+      {
+         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXTRYLOCK", 1, hb_paramError(1) );
+      }
+      return FALSE;
    }
 
    if( HB_SAME_THREAD( Mutex->locker, HB_CURRENT_THREAD() ) )
    {
       Mutex->lock_count ++;
-      hb_retl( TRUE );
+      bLock = TRUE;
    }
    else
    {
+      HB_STACK_UNLOCK;
+
       HB_CRITICAL_LOCK( Mutex->mutex );
+      HB_CLEANUP_PUSH( hb_rawMutexForceUnlock, Mutex->mutex );
+
       if ( Mutex->locker != 0 )
       {
-         hb_retl( FALSE );
+         bLock = FALSE;
       }
       else
       {
          Mutex->locker = HB_CURRENT_THREAD();
          Mutex->lock_count = 1;
-         hb_retl( TRUE );
+         bLock = TRUE;
       }
+
+      HB_CLEANUP_POP;
       HB_CRITICAL_UNLOCK( Mutex->mutex );
+
+      HB_STACK_LOCK;
    }
+   return bLock;
 }
+
+HB_FUNC( HB_MUTEXTRYLOCK )
+{
+#if defined(HB_API_MACROS)
+   HB_THREAD_STUB
+#endif
+   hb_retl( hb_threadMutexTryLock( hb_param( 1, HB_IT_POINTER ), TRUE ) );
+}
+
 
 /*
    Unlocks a mutex; this succeeds only if the calling thread is
    the owner of the mutex, else the call is ignored.
 */
-HB_FUNC( HB_MUTEXUNLOCK )
+void hb_threadMutexUnlock( PHB_ITEM pItem, BOOL bError )
 {
-   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
+   HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_itemGetPtr( pItem );
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXUNLOCK", 1, hb_paramError(1) );
+      if( bError )
+      {
+         hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "MUTEXUNLOCK", 1, hb_paramError(1) );
+      }
       return;
    }
 
@@ -2435,6 +2493,11 @@ HB_FUNC( HB_MUTEXUNLOCK )
       }
    }
    HB_CRITICAL_UNLOCK( Mutex->mutex );
+}
+
+HB_FUNC( HB_MUTEXUNLOCK )
+{
+   hb_threadMutexUnlock( hb_param( 1, HB_IT_POINTER ), TRUE );
 }
 
 
@@ -2459,6 +2522,9 @@ static void s_subscribeInternal( int mode )
          hb_paramError(1), hb_paramError(2), hb_paramError(3) );
       return;
    }
+   
+   /* Unlock SYNC methods locked */
+   hb_clsUnmutexSync();
 
    HB_STACK_UNLOCK;
    HB_CRITICAL_LOCK( Mutex->mutex );
@@ -2468,7 +2534,7 @@ static void s_subscribeInternal( int mode )
       hb_arraySize(  Mutex->aEventObjects, 0 );
    }
 
-   /* warining; does not checks if the current thread is holding the mutex */
+   /* warning; does not checks if the current thread is holding the mutex */
    Mutex->waiting ++;
 
    if ( hb_pcount() == 1 )
@@ -2518,8 +2584,10 @@ static void s_subscribeInternal( int mode )
    }
 
    HB_CRITICAL_UNLOCK( Mutex->mutex );
-
    HB_STACK_LOCK;
+
+   /* Lock SYNC methods */
+   hb_clsRemutexSync();
 }
 
 /*

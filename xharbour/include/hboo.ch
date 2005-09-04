@@ -1,5 +1,5 @@
 /*
- * $Id: hboo.ch,v 1.6 2004/03/03 11:41:10 ronpinkas Exp $
+ * $Id: hboo.ch,v 1.7 2005/07/10 05:07:06 walito Exp $
  */
 
 /*
@@ -84,6 +84,9 @@
                                      pInitValue contain one superclass object instance (absolutely needed for Inline msg and class data) */
 #define HB_OO_CLSTP_SUPER     256 /* The related message is inherited from a superclass */
 #define HB_OO_CLSTP_CLASSCTOR 512
+
+#define HB_OO_CLSTP_SYNC     1024
+#define HB_OO_CLSTP_SYMBOL   2048 /* The related pointer function is a PHB_SYMB */
 
 #define HB_OO_CLS_INSTANCED     1 /* The class was instanced one time almost */
 #define HB_OO_CLS_CLASSCTOR   512

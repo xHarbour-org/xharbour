@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.16 2005/07/10 05:07:05 walito Exp $
+ * $Id: classes.h,v 1.17 2005/08/23 10:59:02 druzus Exp $
  */
 
 /*
@@ -99,6 +99,12 @@ typedef struct hb_class_method
    USHORT   uiType;              /* Type value */
 } METHOD, * PMETHOD;
 
+typedef struct hb_class_sync
+{
+   USHORT   uiClass;
+   ULONG    ulCount;
+} SYNCID, * PSYNCID;
+
 typedef struct
 {
    USHORT   uiData;
@@ -133,6 +139,7 @@ typedef struct
    PCLSDINIT pInitValues;
    PMETHDYN pMethDyn;
    USHORT * pFriends;
+   PHB_ITEM pMtxSync;
    
 } CLASS, * PCLASS;
 

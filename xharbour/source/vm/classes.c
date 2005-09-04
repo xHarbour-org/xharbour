@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.151 2005/08/16 18:07:05 walito Exp $
+ * $Id: classes.c,v 1.152 2005/08/29 18:04:18 ronpinkas Exp $
  */
 
 /*
@@ -153,7 +153,6 @@
  "^^"    = __OpBitXor
  ">>"    = __OpBitShiftR
  "<<"    = __OpBitShiftL
- "->"    = __OpAlias
 
  *
  *
@@ -175,6 +174,10 @@
 #include "hboo.ch"
 #include "classes.h"
 #include "hashapi.h"
+
+#ifdef HB_THREAD_SUPPORT
+#include "thread.h"
+#endif
 
 #include <ctype.h>             /* For toupper() */
 
@@ -219,6 +222,7 @@ static void     hb_clsSaveMethod( PHB_DYNS pMsg, int iPivot, PCLASS pClass, USHO
 static void     hb_clsDelMethod( PCLASS pClass, int iPos, USHORT uiAt );
 
 static PMETHOD  hb_objGetpMthd( PHB_DYNS pMsg, USHORT uiClass );
+static PHB_FUNC hb_objHasMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *ppDynSym );
 
 
 BOOL            hb_clsIsParent( USHORT uiClass, char * szParentName );
@@ -275,6 +279,11 @@ static void hb_clsRelease( PCLASS pClass )
    if( pClass->pFriends )
    {
       hb_xfree( pClass->pFriends );
+   }
+
+   if( pClass->pMtxSync )
+   {
+      hb_itemRelease( pClass->pMtxSync );
    }
 
    hb_itemRelease( pClass->pClassDatas );
@@ -1085,10 +1094,17 @@ static void hb_clsDelMethod( PCLASS pClass, int iPos, USHORT uiAt )
  */
 HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
 {
-  return hb_objGetMthd( (PHB_ITEM) pObject, (PHB_SYMB) pMessage, TRUE, NULL, FALSE ) ;
+   BOOL bSymbol;
+   PHB_FUNC pFunc = hb_objGetMthd( (PHB_ITEM) pObject, (PHB_SYMB) pMessage, TRUE, NULL, FALSE, &bSymbol );
+   
+   if( bSymbol )
+   {
+      return ((PHB_SYMB) pFunc)->value.pFunPtr;
+   }
+   return pFunc;
 }
 
-HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend )
+HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend, BOOL *bSymbol )
 {
    USHORT uiClass;
    PHB_DYNS pMsg = pMessage->pDynSym;
@@ -1105,20 +1121,19 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
 
    if( uiClass && uiClass <= s_uiClasses )
    {
-      PCLASS pClass;
-
-      pClass  = s_pClasses + ( uiClass - 1 );
-
       pMethod = hb_objGetpMthd( pMsg, uiClass );
 
       if( pMethod )
       {
          pFunction = pMethod->pFunction;
 
+         *bSymbol  = (pMethod->uiScope & HB_OO_CLSTP_SYMBOL) > 0;
+
          if( ! hb_clsValidScope( pObject, pMethod, iOptimizedSend ) )
          {
             // Force NO execution incase error was bypassed.
             pFunction = hb___msgVirtual;
+            *bSymbol  = FALSE;
          }
 
          (HB_VM_STACK.pMethod) = pMethod ;
@@ -1282,19 +1297,39 @@ HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
  */
 HB_EXPORT PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, char *szString )
 {
+   return hb_objHasMessage( pObject, szString, NULL );
+}
+
+static PHB_FUNC hb_objHasMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *ppDynSym )
+{
    PHB_DYNS pDynSym;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_objHasMsg(%p, %s)", pObject, szString));
 
    pDynSym = hb_dynsymFindName( szString );
 
+   if( ppDynSym )
+   {
+      *ppDynSym = pDynSym;
+   }
+
    if( pDynSym )
    {
-      return hb_objGetMthd( pObject, pDynSym->pSymbol, FALSE, NULL, FALSE );
+      BOOL bSymbol;
+      PHB_FUNC pFunc = hb_objGetMthd( pObject, pDynSym->pSymbol, FALSE, NULL, FALSE, &bSymbol );
+
+      if( bSymbol )
+      {
+         return ((PHB_SYMB) pFunc)->value.pFunPtr;
+      }
+      else
+      {
+         return pFunc;
+      }
    }
    else
    {
-      return 0;
+      return NULL;
    }
 }
 
@@ -1567,7 +1602,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
       {
          case HB_OO_MSG_METHOD:
             pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
-            pNewMeth->uiScope = uiScope;
+            pNewMeth->uiScope = uiScope | HB_OO_CLSTP_SYMBOL;
             pNewMeth->uiData = 0;
             pClass->uiScope |= ( uiScope & HB_OO_CLSTP_CLASSCTOR );
             break;
@@ -1721,11 +1756,13 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
 
          case HB_OO_MSG_ONERROR:
             pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
-            pClass->pFunError = ( PHB_FUNC ) pFunc_or_BlockPointer;
+            pNewMeth->uiScope |= HB_OO_CLSTP_SYMBOL;
+            pClass->pFunError   = ( PHB_FUNC ) pFunc_or_BlockPointer;
             break;
 
          case HB_OO_MSG_DESTRUCTOR:
             pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
+            pNewMeth->uiScope |= HB_OO_CLSTP_SYMBOL;
             pClass->pDestructor = ( PHB_FUNC ) pFunc_or_BlockPointer;
             break;
 
@@ -1741,6 +1778,15 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             hb_errInternal( HB_EI_CLSINVMETHOD, NULL, "__clsAddMsg", NULL );
             break;
       }
+#ifdef HB_THREAD_SUPPORT
+      if( ( uiScope & HB_OO_CLSTP_SYNC ) && 
+          ( wType == HB_OO_MSG_METHOD || wType == HB_OO_MSG_INLINE ||
+            wType == HB_OO_MSG_DELEGATE ) && pClass->pMtxSync == NULL )
+      {
+         // Create mutex.
+         pClass->pMtxSync = hb_threadMutexCreate( NULL );
+      }
+#endif
    }
 }
 
@@ -1776,7 +1822,8 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
  *             HB_OO_CLSTP_CLASS         128 : message is the name of a superclass
  *             HB_OO_CLSTP_SUPER         256 : message is herited
  *             HB_OO_CLSTP_CLASSCTOR     512 : Class method constructor
- *             HB_OO_CLSTP_CLASSMETH    1024 : Class method
+ *             HB_OO_CLSTP_SYNC         1024 : Sync method
+ *             HB_OO_CLSTP_CLASSMETH    2048 : Class method
  */
 HB_FUNC( __CLSADDMSG )
 {
@@ -1804,9 +1851,22 @@ HB_FUNC( __CLSADDMSG )
    if( pFunc_or_BlockPointer == NULL )
    {
       pFunc_or_BlockPointer = hb_parptr( 3 );
+
+      if( pFunc_or_BlockPointer != NULL )
+      {
+         uiID = ((PHB_SYMB) pFunc_or_BlockPointer)->cScope;
+      }
+      else
+      {
+         //3 Alternate
+         uiID = hb_parni( 3 );
+      }
    }
-   //3 Alternate
-   uiID = hb_parni( 3 );
+   else
+   {
+      //3 Alternate
+      uiID = hb_parni( 3 );
+   }
 
    // 4
    wType = ( USHORT ) hb_parni( 4 );
@@ -1947,6 +2007,7 @@ HB_FUNC( __CLSNEW )
    pNewCls->pFriends = NULL;
    pNewCls->pFunError = NULL;
    pNewCls->pDestructor = NULL;
+   pNewCls->pMtxSync = NULL
 */
 
    //TraceLog( NULL, "-------------------- Class %s (%i)\n", pNewCls->szName, s_uiClasses + 1 );
@@ -3783,11 +3844,155 @@ void hb_mthAddTime( PMETHOD pMethod, ULONG ulClockTicks )
    #endif
 }
 
+#ifdef HB_THREAD_SUPPORT
+void hb_clsPutSyncID( USHORT uiClass )
+{
+   HB_THREAD_STUB
+
+   PSYNCID pSyncId = HB_VM_STACK.pSyncId;
+   ULONG ulCount;
+   
+   if( !pSyncId )
+   {
+      HB_VM_STACK.pSyncId = pSyncId = (PSYNCID) hb_xalloc( sizeof(SYNCID) * 2 );
+
+      pSyncId->uiClass = 0xFFFF;
+      pSyncId->ulCount = 2;
+      pSyncId++;
+
+      pSyncId->uiClass = uiClass;
+      pSyncId->ulCount = 1;
+   }
+   else
+   {
+      ULONG ulPos = 1;
+      ulCount = pSyncId->ulCount;
+      pSyncId++;
+
+      do
+      {
+         if( pSyncId->uiClass >= uiClass )
+         {
+            if( pSyncId->uiClass == uiClass )
+            {
+               pSyncId->ulCount++;
+               break;
+            }
+            else
+            {
+               HB_VM_STACK.pSyncId = pSyncId = (PSYNCID) hb_xrealloc( HB_VM_STACK.pSyncId, sizeof(SYNCID) * (ulCount + 1) );
+               pSyncId->ulCount++;
+
+               pSyncId += ulPos;
+
+               memmove( pSyncId + 1, pSyncId, sizeof(SYNCID) * (ulCount - ulPos) );
+   
+               pSyncId->uiClass = uiClass;
+               pSyncId->ulCount = 1;
+               break;
+            }
+         }
+         pSyncId++;
+         ulPos++;
+      } while ( ulPos < ulCount );
+      
+      if( ulPos == ulCount )
+      {
+         HB_VM_STACK.pSyncId = pSyncId = (PSYNCID) hb_xrealloc( HB_VM_STACK.pSyncId, sizeof(SYNCID) * (ulCount + 1) );
+         pSyncId->ulCount++;
+
+         pSyncId += ulPos;
+         
+         pSyncId->uiClass = uiClass;
+         pSyncId->ulCount = 1;
+      }
+   }
+
+   if( pSyncId->ulCount == 1 )
+   {
+      hb_threadMutexLock( (s_pClasses + uiClass - 1)->pMtxSync, FALSE );
+   }
+}
+
+ULONG hb_clsDelSyncID( USHORT uiClass )
+{
+   HB_THREAD_STUB
+
+   PSYNCID pSyncId = HB_VM_STACK.pSyncId;
+   ULONG ulCount, ulPos;
+
+   if( pSyncId )
+   {
+      ulCount = pSyncId->ulCount;
+      pSyncId++;
+      ulPos = 1;
+
+      while( ulCount < ulPos && pSyncId->uiClass < uiClass )
+      {
+         pSyncId++;
+         ulPos++;
+      }
+
+      if( pSyncId->uiClass == uiClass && pSyncId->ulCount > 0 )
+      {
+         ulCount = --pSyncId->ulCount;
+      }
+      else
+      {
+         ulCount = 0;
+      }
+   }
+
+   if( pSyncId->ulCount == 0 )
+   {
+      hb_threadMutexUnlock( (s_pClasses + uiClass - 1)->pMtxSync, FALSE );
+   }
+   return ulCount;
+}
+
+void hb_clsUnmutexSync( void )
+{
+   HB_THREAD_STUB
+
+   PSYNCID pSyncId = HB_VM_STACK.pSyncId;
+   ULONG ulCount = pSyncId->ulCount;
+   pSyncId++;
+   
+   while( --ulCount )
+   {
+      if( pSyncId->ulCount > 0 )
+      {
+         hb_threadMutexUnlock( (s_pClasses + pSyncId->uiClass - 1)->pMtxSync, FALSE);
+      }
+      pSyncId++;
+   }
+}
+
+void hb_clsRemutexSync( void )
+{
+   HB_THREAD_STUB
+
+   PSYNCID pSyncId = HB_VM_STACK.pSyncId;
+   ULONG ulCount = pSyncId->ulCount;
+   pSyncId++;
+   
+   while( --ulCount )
+   {
+      if( pSyncId->ulCount > 0 )
+      {
+         hb_threadMutexLock( (s_pClasses + pSyncId->uiClass - 1)->pMtxSync, FALSE );
+      }
+      pSyncId++;
+   }
+}
+
+#endif
+
 void hb_clsFinalize( PHB_ITEM pObject )
 {
    HB_THREAD_STUB
 
-   SHORT uiClass;
+   USHORT uiClass;
 
    if( HB_IS_OBJECT( pObject ) )
    {
@@ -3997,7 +4202,11 @@ HB_FUNC( HB_OBJMSGPTR )
 
    if( pObject && pString )
    {
-      hb_retptr( ( void * ) hb_objHasMsg( pObject, pString->item.asString.value ) );
+      PHB_DYNS pDynSym = NULL;
+      
+      hb_objHasMessage( pObject, pString->item.asString.value, &pDynSym );
+      
+      hb_retptr( ( void * ) pDynSym->pSymbol );
    }
    else
    {

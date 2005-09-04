@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.105 2005/04/27 20:20:26 ronpinkas Exp $
+* $Id: thread.h,v 1.106 2005/06/17 17:04:22 lculik Exp $
 */
 
 /*
@@ -442,6 +442,7 @@ typedef struct tag_HB_STACK
 
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
+   struct hb_class_sync * pSyncId;
 
    UINT th_vm_id;
 
@@ -792,6 +793,17 @@ extern HB_MUTEX_STRUCT *hb_threadUnlinkMutex( HB_MUTEX_STRUCT *mx );
 extern void hb_threadTerminator( void *pData );
 extern void hb_threadWaitForIdle( void );
 extern void hb_threadIdleEnd( void );
+extern PHB_ITEM hb_threadMutexCreate( PHB_ITEM pItem );
+extern void hb_threadMutexUnlock( PHB_ITEM pItem, BOOL bError );
+extern BOOL hb_threadMutexLock( PHB_ITEM pItem, BOOL bError );
+extern BOOL hb_threadMutexTimeOutLock( PHB_ITEM pItem, int iTimeOut, BOOL bError );
+extern BOOL hb_threadMutexTryLock( PHB_ITEM pItem, BOOL bError );
+
+/* Functions used to support SYNC methods */
+extern void hb_clsPutSyncID( USHORT uiClass );
+extern ULONG hb_clsDelSyncID( USHORT uiClass );
+extern void hb_clsUnmutexSync( void );
+extern void hb_clsRemutexSync( void );
 
 /* External functions used by thread as helper */
 extern void hb_memvarsInit( HB_STACK * );

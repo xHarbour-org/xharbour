@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.38 2005/08/10 05:43:46 mlombardo Exp $
+ * $Id: runner.c,v 1.39 2005/08/10 05:47:05 mlombardo Exp $
  */
 
 /*
@@ -589,14 +589,16 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
    /* We can NOT release the symbols or else the Dynamic-Symbols-Table will get corrupted!!!
     * The list as whole is NOT a candidate for possible recycling because the future hrb may be modified!
     * It is possible to recycle individual symbols but I'm not sure it's worth the efforts.
+    */
    for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )
    {
       //printf( "# %i/%i Freeing: >%s<\n", ul, pHrbBody->ulSymbols, pHrbBody->pSymRead[ ul ].szName );
 
-      hb_xfree( pHrbBody->pSymRead[ ul ].szName );
+      //hb_xfree( pHrbBody->pSymRead[ ul ].szName );
+      pHrbBody->pSymRead[ ul ].value.pFunPtr = NULL;
    }
-   hb_xfree( pHrbBody->pSymRead );
-   */
+   //hb_xfree( pHrbBody->pSymRead );
+   
 
    hb_xfree( pHrbBody->pDynFunc );
    hb_xfree( pHrbBody );

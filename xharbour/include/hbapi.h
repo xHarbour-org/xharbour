@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.168 2005/08/02 21:06:32 peterrees Exp $
+ * $Id: hbapi.h,v 1.169 2005/08/13 15:00:35 walito Exp $
  */
 
 /*
@@ -525,7 +525,7 @@ extern HB_EXPORT BOOL     hb_clsHasMsg( USHORT uiClass, char *szMsg );
 extern HB_EXPORT char *   hb_objGetClsName( PHB_ITEM pObject ); /* retrieves an object class name */
 extern HB_EXPORT char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szString  ); /* retrieves an object class name for a specific message */
 extern HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg ); /* returns the method pointer of a object class */
-extern HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend );
+extern HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend, BOOL *bSymbol );
 extern HB_EXPORT PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
 extern HB_EXPORT PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
 extern HB_EXPORT USHORT   hb_objClassH( PHB_ITEM pObj );

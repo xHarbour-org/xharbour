@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.481 2005/09/01 18:48:49 ronpinkas Exp $
+ * $Id: hvm.c,v 1.482 2005/09/02 18:31:00 druzus Exp $
  */
 
 /*
@@ -92,6 +92,7 @@
 #include "hbset.h"
 #include "inkey.ch"
 #include "classes.h"
+#include "hboo.ch"
 #include "hbdebug.ch"
 
 #include "hbi18n.h"
@@ -1690,8 +1691,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   if( HB_IS_OBJECT( pSelf ) && pSelf->item.asArray.value->uiPrevCls == 0 )
                   {
                      BOOL bConstructor;
+                     BOOL bSymbol;
 
-                     pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor, 1 );
+                     pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor, 1, &bSymbol );
 
                      if( pFunc == hb___msgGetData )
                      {
@@ -1739,8 +1741,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   if( HB_IS_OBJECT( pSelf ) && pSelf->item.asArray.value->uiPrevCls == 0 )
                   {
                      BOOL bConstructor;
+                     BOOL bSymbol;
 
-                     pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -3 )->item.asSymbol.value, FALSE, &bConstructor, 1 );
+                     pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -3 )->item.asSymbol.value, FALSE, &bConstructor, 1, &bSymbol );
 
                      if( pFunc == hb___msgSetData )
                      {
@@ -1844,9 +1847,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             if( HB_IS_OBJECT( pSelf ) )
             {
                BOOL bConstructor;
+               BOOL bSymbol;
                PHB_FUNC pFunc;
 
-               pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor, 2 );
+               pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor, 2, &bSymbol );
 
                if( pFunc == hb___msgGetData )
                {
@@ -4550,7 +4554,7 @@ static void hb_vmFuncPtr( void )  /* pushes a function address pointer. Removes 
 
    if( HB_IS_SYMBOL( pItem ) )
    {
-      pItem->item.asPointer.value = (void *) pItem->item.asSymbol.value->value.pFunPtr;
+      pItem->item.asPointer.value = (void *) pItem->item.asSymbol.value;
       pItem->item.asPointer.collect = FALSE;
       pItem->type = HB_IT_POINTER;
    }
@@ -6651,6 +6655,10 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    BOOL           lPopSuper = FALSE;
    int            iPresetBase = s_iBaseLine;
    BOOL           bConstructor = FALSE;
+   BOOL           bSymbol = FALSE;
+#ifdef HB_THREAD_SUPPORT
+   USHORT         uiClass = 0;
+#endif
 
    #ifndef HB_NO_PROFILER
       ULONG       ulClock = 0;
@@ -6721,14 +6729,17 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       pSelf = hb_itemUnRef( pSelf );
    }
 
-   if( HB_IS_BLOCK( pSelf ) && pSym == &hb_symEval )
+   if( HB_IS_BLOCK( pSelf ) )
    {
-      pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
-   }
-   else if( HB_IS_BLOCK( pSelf ) && strncmp( pSym->szName, "EVAL", 4 ) == 0 )
-   {
-      pSym = &hb_symEval;
-      pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
+      if( pSym == &( hb_symEval ) )
+      {
+         pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
+      }
+      else if( strncmp( pSym->szName, "EVAL", 4 ) == 0 )
+      {
+         pSym = &hb_symEval;
+         pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
+      }
    }
    else if( HB_IS_OBJECT( pSelf ) ||
             ( HB_IS_ARRAY( pSelf )   && hb_cls_uiArrayClass )     ||
@@ -6749,7 +6760,16 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       }
       else
       {
-         pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE );
+         pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE, &bSymbol );
+
+#ifdef HB_THREAD_SUPPORT
+         if( HB_VM_STACK.pMethod && (HB_VM_STACK.pMethod->uiScope & HB_OO_CLSTP_SYNC) )
+         {
+            uiClass = hb_objClassH( pSelf );
+            // Put uiClass in the SYNC methods list.
+            hb_clsPutSyncID( uiClass );
+         }
+#endif
 
          if( uiParams == 1 && pFunc == hb___msgGetData )
          {
@@ -6888,15 +6908,36 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       HB_TRACE( HB_TR_DEBUG, ("Calling: %s", pSym->szName));
 
       //TraceLog( NULL, "Doing %s\n", pSym->szName );
-      if ( pSym->cScope & HB_FS_PCODEFUNC )
+
+      if( bSymbol )
       {
-         /* Running pCode dynamic function from .HRB */
-         hb_vmExecute( ((PHB_PCODEFUNC)pFunc)->pCode, ((PHB_PCODEFUNC)pFunc)->pSymbols, ((PHB_PCODEFUNC)pFunc)->pGlobals );
+         PHB_SYMB pSymbol = (PHB_SYMB) pFunc;
+         pFunc = ((PHB_SYMB) pFunc)->value.pFunPtr;
+         
+         if( pFunc )
+         {
+            if( pSymbol->cScope & HB_FS_PCODEFUNC )
+            {
+               /* Running pCode dynamic function from .HRB */
+               hb_vmExecute( ((PHB_PCODEFUNC)pFunc)->pCode, ((PHB_PCODEFUNC)pFunc)->pSymbols, ((PHB_PCODEFUNC)pFunc)->pGlobals );
+            }
+            else
+            {
+               pFunc();
+            }
+         }
+         else
+         {
+            char *sClass = hb_objGetClsName( pSelf );
+            //TraceLog( NULL, "METHOD NOT FOUND!\n" );
+            hb_vmClassError( uiParams, sClass, pSym->szName );
+         }
       }
       else
       {
          pFunc();
       }
+
       //TraceLog( NULL, "Done\n" );
 
       HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
@@ -6924,6 +6965,14 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             hb_mthAddTime( pMethod, clock() - ulClock );
          }
       #endif
+
+#ifdef HB_THREAD_SUPPORT
+      if( uiClass )
+      {
+         // Delete uiClass from SYNC methods list.
+         hb_clsDelSyncID( uiClass );
+      }
+#endif
 
       // Constructor must ALWAYS return Self.
       if( bConstructor )
@@ -6953,10 +7002,9 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    }
    else if ( ! HB_IS_HASH( pSelf ) )
    {
-      char *sClass = hb_objGetClsName( pSelf );
-
       if( strncmp( pSym->szName, "CLASSNAME", strlen( pSym->szName ) < 4 ? 4 : strlen( pSym->szName ) ) == 0 )
       {
+         char *sClass = hb_objGetClsName( pSelf );
          hb_itemPutC( &(HB_VM_STACK.Return), sClass );
       }
       else if( strncmp( pSym->szName, "CLASSH", 6 ) == 0 )
@@ -6965,6 +7013,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       }
       else
       {
+         char *sClass = hb_objGetClsName( pSelf );
          //TraceLog( NULL, "METHOD NOT FOUND!\n" );
          hb_vmClassError( uiParams, sClass, pSym->szName );
       }
@@ -9028,7 +9077,7 @@ void HB_EXPORT hb_vmRequestReset( void )
 
 void hb_vmRequestDebug( void )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestCancel()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestDebug()"));
 
    s_bDebugRequest = TRUE;
 }
@@ -9376,7 +9425,7 @@ HB_FUNC( HB_FUNCPTR )
       if( pDynSym )
       {
          ( &(HB_VM_STACK.Return) )->type = HB_IT_POINTER;
-         ( &(HB_VM_STACK.Return) )->item.asPointer.value = (void *) pDynSym->pSymbol->value.pFunPtr;
+         ( &(HB_VM_STACK.Return) )->item.asPointer.value = (void *) pDynSym->pSymbol;
          ( &(HB_VM_STACK.Return) )->item.asPointer.collect = FALSE;
       }
       else
