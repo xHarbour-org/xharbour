@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4296 2005/09/02 18:55:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4297 2005/09/02 22:29:37 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-04 01:30 UTC-0300 Walter Negro <anegro-AT-overnet.com.ar>
+  include/classes.h
+  include/hbapi.h
+  include/hbclass.ch
+  include/hboo.ch
+  include/thread.h
+  source/vm/classes.c
+  source/vm/eval.c
+  source/vm/runner.c
+  source/vm/hvm.c
+  source/vm/thread.c
+    + SYNC Method support
+    ! Pointer to function save PHB_SYMB instead of PHB_FUNC for better compatibility
+      with .hrb files
+    + Mutex API available in C.
+      hb_threadMtexCreate, create the mutex with garbage collector.
+
+      + PHB_ITEM hb_threadMutexCreate( PHB_ITEM pItem )
+      + BOOL     hb_threadMutexLock( PHB_ITEM pMutex, BOOL bError )
+      + BOOL     hb_threadMutexTimeOutLock( PHB_ITEM pMutex, int iTimeOut, BOOL bError )
+      + BOOL     hb_threadMutexTryLock( PHB_ITEM pMutex, bError )
+      + BOOL     hb_threadMutexUnlock( PHB_ITEM pMutex, bError )
 
 2005-09-03 00:26 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/utils/xbscript/Makefile
