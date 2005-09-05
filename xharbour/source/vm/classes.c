@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.152 2005/08/29 18:04:18 ronpinkas Exp $
+ * $Id: classes.c,v 1.153 2005/09/04 04:29:01 walito Exp $
  */
 
 /*
@@ -1210,6 +1210,7 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
 
       if( lAllowErrFunc && pClass->pFunError )
       {
+         *bSymbol = (pClass->uiScope & HB_OO_CLS_ONERROR_SYMB ? TRUE : FALSE);
          return pClass->pFunError;
       }
    }
@@ -1756,14 +1757,16 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
 
          case HB_OO_MSG_ONERROR:
             pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
-            pNewMeth->uiScope |= HB_OO_CLSTP_SYMBOL;
+            pNewMeth->uiScope  |= HB_OO_CLSTP_SYMBOL;
             pClass->pFunError   = ( PHB_FUNC ) pFunc_or_BlockPointer;
+            pClass->uiScope    |= HB_OO_CLS_ONERROR_SYMB;
             break;
 
          case HB_OO_MSG_DESTRUCTOR:
             pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
-            pNewMeth->uiScope |= HB_OO_CLSTP_SYMBOL;
+            pNewMeth->uiScope  |= HB_OO_CLSTP_SYMBOL;
             pClass->pDestructor = ( PHB_FUNC ) pFunc_or_BlockPointer;
+            pClass->uiScope    |= HB_OO_CLS_DESTRUC_SYMB;
             break;
 
          case HB_OO_MSG_DELEGATE:
@@ -4021,9 +4024,15 @@ void hb_clsFinalize( PHB_ITEM pObject )
          SavedReturn.type = HB_IT_NIL;
          hb_itemForwardValue( &SavedReturn, &( HB_VM_STACK.Return ) );
 
-         hb_symDestructor.value.pFunPtr = pDestructor;
-
-         hb_vmPushSymbol( &hb_symDestructor );
+         if( pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
+         {
+            hb_vmPushSymbol( (PHB_SYMB) pDestructor );
+         }
+         else
+         {
+            hb_symDestructor.value.pFunPtr = pDestructor;
+            hb_vmPushSymbol( &hb_symDestructor );
+         }
          hb_vmPush( pObject ); // Do NOT Forward!!!
          hb_vmSend( 0 );
 

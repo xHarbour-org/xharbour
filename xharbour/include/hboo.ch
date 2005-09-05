@@ -1,5 +1,5 @@
 /*
- * $Id: hboo.ch,v 1.7 2005/07/10 05:07:06 walito Exp $
+ * $Id: hboo.ch,v 1.8 2005/09/04 04:29:00 walito Exp $
  */
 
 /*
@@ -88,8 +88,10 @@
 #define HB_OO_CLSTP_SYNC     1024
 #define HB_OO_CLSTP_SYMBOL   2048 /* The related pointer function is a PHB_SYMB */
 
-#define HB_OO_CLS_INSTANCED     1 /* The class was instanced one time almost */
-#define HB_OO_CLS_CLASSCTOR   512
+#define HB_OO_CLS_INSTANCED       1 /* The class was instanced one time almost */
+#define HB_OO_CLS_CLASSCTOR     512
+#define HB_OO_CLS_ONERROR_SYMB 2048
+#define HB_OO_CLS_DESTRUC_SYMB 4096 
 
 
 /* Message types */
