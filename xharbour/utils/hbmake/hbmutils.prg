@@ -1,5 +1,5 @@
 /*
- * $Id: hbmutils.prg,v 1.43 2005/07/02 18:30:00 modalsist Exp $
+ * $Id: hbmutils.prg,v 1.43 2005/07/02 21:37:04 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -588,6 +588,7 @@ FUNCTION GetInstaledLibs( clibs, lGcc )
    aadd(aDefLib,'vm'+ cSuffix)
    aadd(aDefLib,'vmmt'+ cSuffix)
    aadd(aDefLib,'ziparchive'+ cSuffix)
+   aadd(aDefLib,'pcrepos'+ cSuffix)   
 
 
    IF lGcc
