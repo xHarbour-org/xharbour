@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.154 2005/09/05 05:37:26 walito Exp $
+ * $Id: classes.c,v 1.155 2005/09/06 05:42:37 walito Exp $
  */
 
 /*
@@ -1096,7 +1096,7 @@ HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
 {
    BOOL bSymbol;
    PHB_FUNC pFunc = hb_objGetMthd( (PHB_ITEM) pObject, (PHB_SYMB) pMessage, TRUE, NULL, FALSE, &bSymbol );
-   
+
    if( bSymbol )
    {
       return ((PHB_SYMB) pFunc)->value.pFunPtr;
@@ -1782,7 +1782,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             break;
       }
 #ifdef HB_THREAD_SUPPORT
-      if( ( uiScope & HB_OO_CLSTP_SYNC ) && 
+      if( ( uiScope & HB_OO_CLSTP_SYNC ) &&
           ( wType == HB_OO_MSG_METHOD || wType == HB_OO_MSG_INLINE ||
             wType == HB_OO_MSG_DELEGATE ) && pClass->pMtxSync == NULL )
       {
@@ -2551,7 +2551,7 @@ HB_FUNC( __CLSMODMSG )
                case HB_OO_MSG_VIRTUAL:
                {
                   PHB_FUNC pFunc = (PHB_FUNC) hb_parptr( 3 );
-   
+
                   if( pFunc )
                   {
                      pMethod->pFunction = pFunc;
@@ -2561,7 +2561,7 @@ HB_FUNC( __CLSMODMSG )
                   else /* Convert to INLINE. */
                   {
                      PHB_ITEM pBlock = hb_param( 3, HB_IT_BLOCK );
-   
+
                      if( pBlock )
                      {
                         pMethod->pFunction = hb___msgEvalInline;
@@ -2580,17 +2580,17 @@ HB_FUNC( __CLSMODMSG )
                case HB_OO_MSG_INLINE:
                {
                   PHB_ITEM pBlock = hb_param( 3, HB_IT_BLOCK );
-   
+
                   if( pBlock == NULL )
                   {
                      PHB_FUNC pFunc = (PHB_FUNC) hb_parptr( 3 );
-   
+
                      if( pFunc ) // Convert to Method.
                      {
                         pMethod->pFunction = pFunc;
                         pMethod->uiScope   = uiScope | HB_OO_CLSTP_SYMBOL;
                         pMethod->uiType    = HB_OO_MSG_METHOD;
-   
+
                         // Clear the inline - can NOT be deleted or else refrence by number to other Inline methods will break.
                         hb_itemClear( pClass->pInlines->item.asArray.value->pItems + pMethod->uiData - 1  );
                      }
@@ -3885,7 +3885,7 @@ void hb_clsPutSyncID( USHORT uiClass )
 
    PSYNCID pSyncId = HB_VM_STACK.pSyncId;
    ULONG ulCount;
-   
+
    if( !pSyncId )
    {
       HB_VM_STACK.pSyncId = pSyncId = (PSYNCID) hb_xalloc( sizeof(SYNCID) * 2 );
@@ -3920,7 +3920,7 @@ void hb_clsPutSyncID( USHORT uiClass )
                pSyncId += ulPos;
 
                memmove( pSyncId + 1, pSyncId, sizeof(SYNCID) * (ulCount - ulPos) );
-   
+
                pSyncId->uiClass = uiClass;
                pSyncId->ulCount = 1;
                break;
@@ -3929,14 +3929,14 @@ void hb_clsPutSyncID( USHORT uiClass )
          pSyncId++;
          ulPos++;
       } while ( ulPos < ulCount );
-      
+
       if( ulPos == ulCount )
       {
          HB_VM_STACK.pSyncId = pSyncId = (PSYNCID) hb_xrealloc( HB_VM_STACK.pSyncId, sizeof(SYNCID) * (ulCount + 1) );
          pSyncId->ulCount++;
 
          pSyncId += ulPos;
-         
+
          pSyncId->uiClass = uiClass;
          pSyncId->ulCount = 1;
       }
@@ -3991,7 +3991,7 @@ void hb_clsUnmutexSync( void )
    PSYNCID pSyncId = HB_VM_STACK.pSyncId;
    ULONG ulCount = pSyncId->ulCount;
    pSyncId++;
-   
+
    while( --ulCount )
    {
       if( pSyncId->ulCount > 0 )
@@ -4009,7 +4009,7 @@ void hb_clsRemutexSync( void )
    PSYNCID pSyncId = HB_VM_STACK.pSyncId;
    ULONG ulCount = pSyncId->ulCount;
    pSyncId++;
-   
+
    while( --ulCount )
    {
       if( pSyncId->ulCount > 0 )
@@ -4055,15 +4055,18 @@ void hb_clsFinalize( PHB_ITEM pObject )
          SavedReturn.type = HB_IT_NIL;
          hb_itemForwardValue( &SavedReturn, &( HB_VM_STACK.Return ) );
 
+         #if 0
          if( pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
          {
             hb_vmPushSymbol( (PHB_SYMB) pDestructor );
          }
          else
+         #endif
          {
             hb_symDestructor.value.pFunPtr = pDestructor;
             hb_vmPushSymbol( &hb_symDestructor );
          }
+
          hb_vmPush( pObject ); // Do NOT Forward!!!
          hb_vmSend( 0 );
 
@@ -4243,9 +4246,9 @@ HB_FUNC( HB_OBJMSGPTR )
    if( pObject && pString )
    {
       PHB_DYNS pDynSym = NULL;
-      
+
       hb_objHasMessage( pObject, pString->item.asString.value, &pDynSym );
-      
+
       hb_retptr( ( void * ) pDynSym->pSymbol );
    }
    else

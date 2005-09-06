@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.482 2005/09/02 18:31:00 druzus Exp $
+ * $Id: hvm.c,v 1.483 2005/09/04 04:29:01 walito Exp $
  */
 
 /*
@@ -6757,6 +6757,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       if( pSym == &hb_symDestructor )
       {
          pFunc = pSym->value.pFunPtr;
+         bSymbol = TRUE;
       }
       else
       {
@@ -6913,7 +6914,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       {
          PHB_SYMB pSymbol = (PHB_SYMB) pFunc;
          pFunc = ((PHB_SYMB) pFunc)->value.pFunPtr;
-         
+
          if( pFunc )
          {
             if( pSymbol->cScope & HB_FS_PCODEFUNC )
