@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.155 2005/09/06 05:42:37 walito Exp $
+ * $Id: classes.c,v 1.156 2005/09/06 18:41:15 ronpinkas Exp $
  */
 
 /*
@@ -1318,6 +1318,11 @@ static PHB_FUNC hb_objHasMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *pp
    {
       BOOL bSymbol;
       PHB_FUNC pFunc = hb_objGetMthd( pObject, pDynSym->pSymbol, FALSE, NULL, FALSE, &bSymbol );
+
+      if( pFunc == NULL )
+      {
+         return NULL;
+      }
 
       if( bSymbol )
       {

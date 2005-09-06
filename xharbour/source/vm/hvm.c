@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.483 2005/09/04 04:29:01 walito Exp $
+ * $Id: hvm.c,v 1.484 2005/09/06 18:41:15 ronpinkas Exp $
  */
 
 /*
@@ -3732,6 +3732,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                hb_vm_bQuitRequest = TRUE;
             #endif
 
+            exit( hb_vmQuit() );
             break;
          }
          else if( s_uiActionRequest & HB_ENDPROC_REQUESTED )
