@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.153 2005/09/04 04:29:01 walito Exp $
+ * $Id: classes.c,v 1.154 2005/09/05 05:37:26 walito Exp $
  */
 
 /*
@@ -2533,62 +2533,93 @@ HB_FUNC( __CLSMODMSG )
       {
          PCLASS pClass = s_pClasses + ( uiClass - 1 );
          USHORT uiAt;
-         PMETHOD pMethod;
 
          uiAt = hb_clsFindMethod( pMsg, pClass, NULL );
 
          if( uiAt )
          {
+            PMETHOD  pMethod;
             PHB_FUNC pFunc;
+            USHORT   uiScope = ( USHORT ) ( ISNUM( 4 ) ? hb_parni( 4 ) : HB_OO_CLSTP_EXPORTED );
 
             pMethod = pClass->pMethods + uiAt - 1;
             pFunc   = pMethod->pFunction;
 
-            if( pFunc == hb___msgEvalInline )      /* INLINE method deleted    */
+            switch( pMethod->uiType )
             {
-               PHB_ITEM pBlock = hb_param( 3, HB_IT_BLOCK );
-
-               if( pBlock == NULL )
+               case HB_OO_MSG_METHOD:
+               case HB_OO_MSG_VIRTUAL:
                {
                   PHB_FUNC pFunc = (PHB_FUNC) hb_parptr( 3 );
-
-                  if( pFunc ) // Convert to Method.
+   
+                  if( pFunc )
                   {
                      pMethod->pFunction = pFunc;
-
-                     // Clear the inline - can NOT be deleted or else refrence by number to other Inline methods will break.
-                     hb_itemClear( pClass->pInlines->item.asArray.value->pItems + pMethod->uiData - 1  );
+                     pMethod->uiScope   = uiScope | HB_OO_CLSTP_SYMBOL;
+                     pMethod->uiType    = HB_OO_MSG_METHOD;
+                  }
+                  else /* Convert to INLINE. */
+                  {
+                     PHB_ITEM pBlock = hb_param( 3, HB_IT_BLOCK );
+   
+                     if( pBlock )
+                     {
+                        pMethod->pFunction = hb___msgEvalInline;
+                        pMethod->uiScope   = uiScope;
+                        hb_arrayAdd( pClass->pInlines, pBlock );
+                        pMethod->uiData    = (USHORT) pClass->pInlines->item.asArray.value->ulLen;
+                        pMethod->uiType    = HB_OO_MSG_INLINE;
+                     }
+                     else
+                     {
+                        hb_errRT_BASE( EG_ARG, 3000, NULL, "__CLSMODMSG", 0 );
+                     }
+                  }
+                  break;
+               }
+               case HB_OO_MSG_INLINE:
+               {
+                  PHB_ITEM pBlock = hb_param( 3, HB_IT_BLOCK );
+   
+                  if( pBlock == NULL )
+                  {
+                     PHB_FUNC pFunc = (PHB_FUNC) hb_parptr( 3 );
+   
+                     if( pFunc ) // Convert to Method.
+                     {
+                        pMethod->pFunction = pFunc;
+                        pMethod->uiScope   = uiScope | HB_OO_CLSTP_SYMBOL;
+                        pMethod->uiType    = HB_OO_MSG_METHOD;
+   
+                        // Clear the inline - can NOT be deleted or else refrence by number to other Inline methods will break.
+                        hb_itemClear( pClass->pInlines->item.asArray.value->pItems + pMethod->uiData - 1  );
+                     }
+                     else
+                     {
+                        hb_errRT_BASE( EG_ARG, 3000, NULL, "__CLSMODMSG", 0 );
+                     }
                   }
                   else
                   {
-                     hb_errRT_BASE( EG_ARG, 3000, NULL, "__CLSMODMSG", 0 );
+                     hb_arraySet( pClass->pInlines, pMethod->uiData, pBlock );
                   }
+                  break;
                }
-               else
-               {
-                  hb_arraySet( pClass->pInlines, pMethod->uiData, pBlock );
-               }
-            }
-            else if( ( pFunc == hb___msgSetData ) || ( pFunc == hb___msgGetData ) )
-            {                                      /* Not allowed for DATA     */
-               hb_errRT_BASE( EG_ARG, 3004, "Cannot modify a DATA item", "__CLSMODMSG", 0 );
-            }
-            else  /* Modify METHOD            */
-            {
-               PHB_FUNC pFunc = (PHB_FUNC) hb_parptr( 3 );
-
-               if( pFunc )
-               {
-                  pMethod->pFunction = pFunc;
-               }
-               else /* Convert to INLINE. */
-               {
-                  PHB_ITEM pBlock = hb_param( 3, HB_IT_BLOCK );
-
-                  pMethod->pFunction = hb___msgEvalInline;
-                  hb_arrayAdd( pClass->pInlines, pBlock );
-                  pMethod->uiData = (USHORT) pClass->pInlines->item.asArray.value->ulLen;
-               }
+               case HB_OO_MSG_DATA:
+                  hb_errRT_BASE( EG_ARG, 3004, "Cannot modify a DATA item", "__CLSMODMSG", 0 );
+                  break;
+               case HB_OO_MSG_CLASSDATA:
+                  hb_errRT_BASE( EG_ARG, 3004, "Cannot modify a CLASSDATA item", "__CLSMODMSG", 0 );
+                  break;
+               case HB_OO_MSG_SUPER:
+                  hb_errRT_BASE( EG_ARG, 3004, "Cannot modify a SUPER item", "__CLSMODMSG", 0 );
+                  break;
+               case HB_OO_MSG_ONERROR:
+                  hb_errRT_BASE( EG_ARG, 3004, "Cannot modify a ONERROR method", "__CLSMODMSG", 0 );
+                  break;
+               case HB_OO_MSG_DESTRUCTOR:
+                  hb_errRT_BASE( EG_ARG, 3004, "Cannot modify a DESTRUCTOR method", "__CLSMODMSG", 0 );
+                  break;
             }
          }
       }
