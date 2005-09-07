@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4304 2005/09/06 22:44:53 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4305 2005/09/07 05:14:01 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-09-07 16:30 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * bin/bld.bat
+    ! added pcrepos to mingw32 and cleaned the lib list
+	 ! added lib codepage to OpenWatcom DOS and W32
+	 ! added gtwvt in case of HB_MULTI_GT
+  * bin/hb-func.sh
+    ! link libpthread only in linux architecture
+  
 2005-09-07 02:00 UTC-0300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/vm/classes.c
   * source/vm/hvm.c
