@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.156 2005/09/06 18:41:15 ronpinkas Exp $
+ * $Id: classes.c,v 1.157 2005/09/06 22:45:42 ronpinkas Exp $
  */
 
 /*
@@ -4060,18 +4060,16 @@ void hb_clsFinalize( PHB_ITEM pObject )
          SavedReturn.type = HB_IT_NIL;
          hb_itemForwardValue( &SavedReturn, &( HB_VM_STACK.Return ) );
 
-         #if 0
          if( pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
          {
-            hb_vmPushSymbol( (PHB_SYMB) pDestructor );
+            hb_symDestructor.value.pFunPtr = ((PHB_SYMB) pDestructor)->value.pFunPtr;
+            hb_symDestructor.cScope = ((PHB_SYMB) pDestructor)->cScope;
          }
          else
-         #endif
          {
             hb_symDestructor.value.pFunPtr = pDestructor;
-            hb_vmPushSymbol( &hb_symDestructor );
          }
-
+         hb_vmPushSymbol( &hb_symDestructor );
          hb_vmPush( pObject ); // Do NOT Forward!!!
          hb_vmSend( 0 );
 

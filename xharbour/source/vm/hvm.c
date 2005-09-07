@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.484 2005/09/06 18:41:15 ronpinkas Exp $
+ * $Id: hvm.c,v 1.485 2005/09/06 22:45:42 ronpinkas Exp $
  */
 
 /*
@@ -6730,17 +6730,14 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       pSelf = hb_itemUnRef( pSelf );
    }
 
-   if( HB_IS_BLOCK( pSelf ) )
+   if( HB_IS_BLOCK( pSelf ) && pSym == &( hb_symEval ) )
    {
-      if( pSym == &( hb_symEval ) )
-      {
-         pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
-      }
-      else if( strncmp( pSym->szName, "EVAL", 4 ) == 0 )
-      {
-         pSym = &hb_symEval;
-         pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
-      }
+      pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
+   }
+   else if( HB_IS_BLOCK( pSelf ) && strncmp( pSym->szName, "EVAL", 4 ) == 0 )
+   {
+      pSym = &hb_symEval;
+      pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
    }
    else if( HB_IS_OBJECT( pSelf ) ||
             ( HB_IS_ARRAY( pSelf )   && hb_cls_uiArrayClass )     ||
@@ -6757,7 +6754,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
       if( pSym == &hb_symDestructor )
       {
-         pFunc = pSym->value.pFunPtr;
+         pFunc = (PHB_FUNC) pSym;
          bSymbol = TRUE;
       }
       else
