@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.157 2005/09/06 22:45:42 ronpinkas Exp $
+ * $Id: classes.c,v 1.158 2005/09/07 04:59:14 walito Exp $
  */
 
 /*
@@ -1616,6 +1616,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
          case HB_OO_MSG_DATA:
             pNewMeth->uiData = uiID;
             pNewMeth->uiScope = uiScope;
+            pNewMeth->uiScope &= ~((USHORT) HB_OO_CLSTP_SYMBOL);
 
             if( bCheckPrefix && pMessage->pSymbol->szName[ 0 ] == '_' )
             {
@@ -1668,6 +1669,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             pNewMeth->uiDataShared = pNewMeth->uiData ;
 
             pNewMeth->uiScope = uiScope;
+            pNewMeth->uiScope &= ~((USHORT) HB_OO_CLSTP_SYMBOL);
 
             if( ( USHORT ) pClass->pClassDatas->item.asArray.value->ulLen < pNewMeth->uiData )
             {
@@ -1743,6 +1745,8 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
          case HB_OO_MSG_INLINE:
             pNewMeth->uiData = ( USHORT ) pClass->pInlines->item.asArray.value->ulLen + 1 ;
             pNewMeth->uiScope = uiScope;
+            pNewMeth->uiScope &= ~((USHORT) HB_OO_CLSTP_SYMBOL);
+
             hb_arraySize( pClass->pInlines, pNewMeth->uiData );
             hb_arraySet( pClass->pInlines, pNewMeth->uiData, (PHB_ITEM) pFunc_or_BlockPointer );
             pNewMeth->pFunction = hb___msgEvalInline;
@@ -1750,6 +1754,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             break;
 
          case HB_OO_MSG_VIRTUAL:
+            pNewMeth->uiScope &= ~((USHORT) HB_OO_CLSTP_SYMBOL);
             pNewMeth->pFunction = hb___msgVirtual;
             break;
 
@@ -1757,6 +1762,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             pNewMeth->uiData = uiID;
             pNewMeth->uiSprClass = ( USHORT ) uiSprClass; /* store the super handle */
             pNewMeth->uiScope = uiScope;
+            pNewMeth->uiScope &= ~((USHORT) HB_OO_CLSTP_SYMBOL);
             pNewMeth->pFunction = hb___msgSuper;
             break;
 
@@ -1778,6 +1784,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             pNewMeth->uiData = uiID;  /* store the delegate uiAt */
             pNewMeth->pInitValue = hb_itemNew( pInit ); /* store the delegate handle */
             pNewMeth->uiScope = uiScope;
+            pNewMeth->uiScope &= ~((USHORT) HB_OO_CLSTP_SYMBOL);
             pNewMeth->pFunction = hb___msgDelegate;
             pClass->uiScope |= ( uiScope & HB_OO_CLSTP_CLASSCTOR );
             break;
@@ -2571,6 +2578,7 @@ HB_FUNC( __CLSMODMSG )
                      {
                         pMethod->pFunction = hb___msgEvalInline;
                         pMethod->uiScope   = uiScope;
+                        pMethod->uiScope  &= ~((USHORT) HB_OO_CLSTP_SYMBOL);
                         hb_arrayAdd( pClass->pInlines, pBlock );
                         pMethod->uiData    = (USHORT) pClass->pInlines->item.asArray.value->ulLen;
                         pMethod->uiType    = HB_OO_MSG_INLINE;
