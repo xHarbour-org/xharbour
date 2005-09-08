@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.9 2005/08/02 16:54:04 lculik Exp $
+ * $Id: ftpcln.prg,v 1.10 2005/09/02 16:32:18 lculik Exp $
  */
 
 /*
@@ -582,14 +582,19 @@ Return lResult
 METHOD DownLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
    LOCAL cFileData
    LOCAL lRet,xRet 
-   LOCAL cPath
+
    Local nHandle
-   LOCAL cFile
+   LOCAL cPath := ""
+   LOCAL cFile := ""
+   Local cExt  := ""
    
-   DEFAULT cRemoteFile to cLocalFile   
+   HB_FNameSplit( cLocalFile, @cPath, @cFile,@cExt  ) 
+
+   
+   DEFAULT cRemoteFile to cFile+cExt 
 
    ::bEof := .F.   
-   ::oUrl:cFile := cLocalFile
+   ::oUrl:cFile := cRemoteFile
 
    xRet := ::Read()
 

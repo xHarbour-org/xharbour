@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.26 2005/04/04 05:56:49 ronpinkas Exp $
+ * $Id: dbedit.prg,v 1.27 2005/05/06 00:41:35 lculik Exp $
  */
 
 /*
@@ -189,7 +189,8 @@ Local oTBR, oTBC, i, nRet := DE_REFRESH, nKey := Nil, bFun, nCrs, cHdr, nIndex
        ElseIf HB_ISSTRING(xFoot)
          oTBC:footing := xFoot
        End
-       If HB_ISARRAY( xPict )
+
+       If HB_ISARRAY( xPict ) .and. Len( xPict ) >= nIndex
          oTBC:picture := xPict[ nIndex ]
        ElseIf HB_ISSTRING( xPict )
          oTBC:picture := xPict

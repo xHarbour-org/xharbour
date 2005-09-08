@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4307 2005/09/07 15:30:31 walito Exp $
+ * $Id: ChangeLog,v 1.4308 2005/09/08 13:34:56 alexstrickland Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-08 20:40 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+   * source/tip/ftpcln.prg
+    ! minor change to downloadfile method()
+   * source/rtl/dbedit.prg
+    ! minor fix. Clipper allow picture array smaller then header array
 
 2005-09-08 13:30 UTC+0200 Alex Strickland <sscc@mweb.co.za>
   * source/rtl/hbxml.c
