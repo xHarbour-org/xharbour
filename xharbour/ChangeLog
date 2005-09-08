@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4306 2005/09/07 14:18:48 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.4307 2005/09/07 15:30:31 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-08 13:30 UTC+0200 Alex Strickland <sscc@mweb.co.za>
+  * source/rtl/hbxml.c
+    ! Replace hardcoded newline characters (unix) with the output from hb_conNewLine() in XML output.
 
 2005-09-07 12:20 UTC-300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/vm/classes.c
@@ -19,7 +23,7 @@
 	 ! added gtwvt in case of HB_MULTI_GT
   * bin/hb-func.sh
     ! link libpthread only in linux architecture
-  
+
 2005-09-07 02:00 UTC-0300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/vm/classes.c
   * source/vm/hvm.c
