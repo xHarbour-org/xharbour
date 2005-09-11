@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddsdf.h,v 1.4 2005/08/01 22:17:35 druzus Exp $
+ * $Id: hbrddsdf.h,v 1.5 2005/08/23 10:59:03 druzus Exp $
  */
 
 /*
@@ -154,6 +154,7 @@ HB_EXTERN_BEGIN
 #define hb_sdfPutValueFile                         NULL
 #define hb_sdfReadDBHeader                         NULL
 #define hb_sdfWriteDBHeader                        NULL
+#define hb_sdfInit                                 NULL
 #define hb_sdfExit                                 NULL
 #define hb_sdfDrop                                 NULL
 #define hb_sdfExists                               NULL

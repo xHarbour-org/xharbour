@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.51 2005/08/23 10:59:03 druzus Exp $
+ * $Id: workarea.c,v 1.52 2005/09/02 18:29:55 druzus Exp $
  */
 
 /*
@@ -1539,6 +1539,7 @@ extern ERRCODE hb_rddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnection, P
       case RDDI_CONNECTION:
       case RDDI_TABLETYPE:
       case RDDI_MEMOTYPE:
+      case RDDI_MEMOVERSION:
          hb_itemPutNI( pItem, 0 );
          break;
 

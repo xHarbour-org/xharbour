@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.39 2005/08/10 05:47:05 mlombardo Exp $
+ * $Id: runner.c,v 1.40 2005/09/04 04:29:01 walito Exp $
  */
 
 /*
@@ -76,9 +76,9 @@
 
 typedef struct
 {
-   char *     szName;                           /* Name of the function     */
-   PHB_PCODEFUNC pCodeFunc;                     /* Dynamic function info    */
-   BYTE *     pCode;                            /* P-code                   */
+   char *         szName;                       /* Name of the function     */
+   PHB_PCODEFUNC  pCodeFunc;                    /* Dynamic function info    */
+   BYTE *         pCode;                        /* P-code                   */
 } HB_DYNF, * PHB_DYNF;
 
 typedef struct
@@ -572,10 +572,8 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
 
       pDyn = hb_dynsymFind( pHrbBody->pDynFunc[ ul ].szName );
 
-      if( pDyn && pDyn->pFunPtr && pDyn->pFunPtr == ( PHB_FUNC ) pHrbBody->pDynFunc[ ul ].pCodeFunc )
+      if( pDyn && pDyn->pSymbol->value.pFunPtr == ( PHB_FUNC ) pHrbBody->pDynFunc[ ul ].pCodeFunc )
       {
-         //printf( "Reset >%s<\n", pHrbBody->pDynFunc[ ul ].szName );
-         pDyn->pFunPtr = NULL;
          pDyn->pSymbol->value.pFunPtr = NULL;
       }
 
@@ -732,8 +730,8 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
 
             if( pDynSym )
             {
-               pSymRead[ ul ].value.pFunPtr = pDynSym->pFunPtr;
-               if ( pDynSym->pSymbol->cScope & HB_FS_PCODEFUNC )
+               pSymRead[ ul ].value.pFunPtr = pDynSym->pSymbol->value.pFunPtr;
+               if( pDynSym->pSymbol->cScope & HB_FS_PCODEFUNC )
                {
                   pSymRead[ ul ].cScope |= HB_FS_PCODEFUNC;
                }

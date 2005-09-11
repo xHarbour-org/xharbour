@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.23 2005/04/11 22:40:14 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.24 2005/08/04 23:54:14 druzus Exp $
  */
 
 /*
@@ -128,9 +128,9 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
    if( pDynSym )            /* If name exists */
    {
-      if( pSymbol->value.pFunPtr && pDynSym->pFunPtr == NULL )
+      if( pSymbol->value.pFunPtr && pDynSym->pSymbol->value.pFunPtr == NULL )
       {
-        #if 1
+#if 1
          /* reenabled - it's still wrong, Druzus */
          /* see note below */
          /* register only non static functions */
@@ -138,19 +138,18 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
          {
             //TraceLog( NULL, "Rejecting: %s in %s\n", pSymbol->szName, pModuleSymbols->szModuleName);
          }
-        #endif
+#endif
          else
          {
            /* The DynSym existed without function pointer */
 
            /* free runtime allocated symbols */
-           if ( ( pDynSym->pSymbol->cScope & HB_FS_ALLOCATED ) == HB_FS_ALLOCATED )
+           if( ( pDynSym->pSymbol->cScope & HB_FS_ALLOCATED ) == HB_FS_ALLOCATED )
            {
               hb_xfree( pDynSym->pSymbol->szName );
               hb_xfree( pDynSym->pSymbol );
            }
 
-           pDynSym->pFunPtr = pSymbol->value.pFunPtr;  /* but had no function ptr assigned */
            pDynSym->pSymbol = pSymbol;
            pDynSym->ulCalls = 0; /* profiler support */
            pDynSym->ulTime  = 0; /* profiler support */
@@ -225,8 +224,6 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
       pSymbol = hb_symbolNew( pSymbol->szName ); /* clone the symbol */
    }
 #endif
-
-   pDynSym->pFunPtr = pSymbol->value.pFunPtr; /* place the pointer function at DynSym */
 
    if( pSymbol->pDynSym == (PHB_DYNS) 1 )
    {
@@ -395,9 +392,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
       s_pDynItems = ( PDYNHB_ITEM ) hb_xgrab( sizeof( DYNHB_ITEM ) );     /* Grab array */
       s_pDynItems->pDynSym = ( PHB_DYNS ) hb_xgrab( sizeof( HB_DYNS ) );
                 /* Always grab a first symbol. Never an empty bucket. *<1>* */
-      s_pDynItems->pDynSym->hMemvar = 0;
-      s_pDynItems->pDynSym->pSymbol = NULL;
-      s_pDynItems->pDynSym->pFunPtr = NULL;
+      memset( s_pDynItems->pDynSym, 0, sizeof( HB_DYNS ) );
 
       hb_dynsymUnlock();
       return NULL;
@@ -691,13 +686,13 @@ PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction( PHB_FUNC pFunc )
 {
    USHORT uiPos;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmFindSymbolFromFunction(%p)", pFunc ));
+   HB_TRACE(HB_TR_DEBUG, ("hb_dynsymFindFromFunction(%p)", pFunc ));
 
    hb_dynsymLock();
 
    for( uiPos = 0; uiPos < s_uiDynSymbols; uiPos++ )
    {
-      if( s_pDynItems[ uiPos ].pDynSym->pFunPtr == pFunc )
+      if( s_pDynItems[ uiPos ].pDynSym->pSymbol->value.pFunPtr == pFunc )
       {
          hb_dynsymUnlock();
          return s_pDynItems[ uiPos ].pDynSym;
@@ -807,7 +802,7 @@ HB_FUNC( __DYNSISFUN ) /* returns .t. if a symbol has a function/procedure point
 
    if( lIndex >= 1 && lIndex <= s_uiDynSymbols )
    {
-      hb_retl( s_pDynItems[ lIndex - 1 ].pDynSym->pFunPtr != NULL );
+      hb_retl( s_pDynItems[ lIndex - 1 ].pDynSym->pSymbol->value.pFunPtr != NULL );
    }
    else
    {
@@ -824,7 +819,8 @@ HB_FUNC( __DYNSGETPRF ) /* profiler: It returns an array with a function or proc
 #ifdef HB_API_MACROS
    HB_THREAD_STUB
 #endif
-   LONG lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
+   /* NOTE: This will return zero if the parameter is not numeric */
+   LONG lIndex = hb_parnl( 1 );
 
    hb_reta( 2 );
    hb_stornl( 0, -1, 1 );
@@ -834,7 +830,8 @@ HB_FUNC( __DYNSGETPRF ) /* profiler: It returns an array with a function or proc
 
    if( lIndex >= 1 && lIndex <= s_uiDynSymbols )
    {
-      if( s_pDynItems[ lIndex - 1 ].pDynSym->pFunPtr ) /* it is a function or procedure */
+       /* it is a function or procedure */
+      if( s_pDynItems[ lIndex - 1 ].pDynSym->pSymbol->value.pFunPtr )
       {
          hb_stornl( s_pDynItems[ lIndex - 1 ].pDynSym->ulCalls, -1, 1 );
          hb_stornl( s_pDynItems[ lIndex - 1 ].pDynSym->ulTime,  -1, 2 );

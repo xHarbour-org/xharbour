@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.79 2005/06/09 23:38:34 ronpinkas Exp $
+# $Id: xharbour.spec,v 1.80 2005/09/02 18:22:54 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -88,7 +88,7 @@ Summary(ru):    Свободный компилятор, совместимый с языком Clipper.
 Name:           %{name}
 Version:        %{version}
 Release:        %{releasen}%{platform}
-Copyright:      GPL (plus exception)
+License:        GPL (plus exception)
 Group:          Development/Languages
 Vendor:         %{hb_host}
 URL:            http://%{hb_host}/

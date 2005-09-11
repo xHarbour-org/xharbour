@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx0.prg,v 1.5 2003/09/08 19:18:45 druzus Exp $
+ * $Id: dbfntx0.prg,v 1.6 2005/01/30 21:19:24 druzus Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #include "error.ch"
 #include "rddsys.ch"
+#include "dbinfo.ch"
 
 ANNOUNCE DBFNTX
 
@@ -61,6 +62,7 @@ procedure DBFNTXInit
 
    rddRegister( "DBF", RDT_FULL )
    rddRegister( "DBFNTX", RDT_FULL )
+   rddInfo( RDDI_MEMOTYPE, DB_MEMO_DBT, "DBFNTX" )
 
 return
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4308 2005/09/08 13:34:56 alexstrickland Exp $
+ * $Id: ChangeLog,v 1.4309 2005/09/08 23:41:36 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,208 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-11 21:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/xharbour.spec
+    * changed "Copyright:" tag to "License:"
+
+  * xharbour/bin/hb-func.sh
+    * minor modification to pthread library - it's excluded for
+      DOS/W32/OS2 builds
+
+  * xharbour/include/hbvm.h
+    + added hb_vmPushItemRef() function
+
+  * xharbour/include/hbvmpub.h
+  * xharbour/source/vm/runner.c
+  * xharbour/source/vm/dynsym.c
+    + added pCodeFunc to value union in HB_SYMB structure
+    - removed pFunPtr from HB_DYNS - it was in practice unused and
+      only cause confusion
+
+  * xharbour/include/dbinfo.ch
+    + added RDDI_MEMOVERSION to set subversion in given memo type.
+      Now only used with FPT files - this switch allow to set type
+      of default FPT files created by xHarbour:
+         rddInfo( RDDI_MEMOVERSION, DB_MEMOEXT_FLEX )
+      cause that FPT files store non string items in FLEXIII compatible
+      format
+         rddInfo( RDDI_MEMOVERSION, DB_MEMOEXT_SIX )
+      cause that SIX3 comptible format will be used
+    + added DBI_MEMOVERSION
+    + added DBI_TABLETYPE - it sets default header format for newly
+      created DBF files - possible values are now: DB_DBF_STD and DB_DBF_VFP
+      Warning! DBSETDBFVERSION() function has been removed. Please replace
+      it by:
+         rddInfo( RDDI_TABLETYPE, DB_DBF_VFP )
+      this switch can be used separately for each DBF* RDDs so after:
+         rddInfo( RDDI_TABLETYPE, DB_DBF_VFP, "DBFCDX" )
+      only DBFCDX will create DBF files with VFP headers when others
+      will still use DB_DBF_STD
+    + added folowing defines to avoid direct use of numbers:
+         /* DBF TYPES */
+         #define DB_DBF_STD            0
+         #define DB_DBF_VFP            1
+
+         /* MEMO TYPES */
+         #define DB_MEMO_NONE          0
+         #define DB_MEMO_DBT           1
+         #define DB_MEMO_FPT           2
+         #define DB_MEMO_SMT           3
+
+         /* MEMO EXTENDED TYPES */
+         #define DB_MEMOVER_STD        1
+         #define DB_MEMOVER_SIX        2
+         #define DB_MEMOVER_FLEX       3
+         #define DB_MEMOVER_CLIP       4
+
+         /* ENCRYPTION TYPE */
+         #define DB_CRYPT_NONE         0
+         #define DB_CRYPT_SIX          1
+
+         /* LOCK SCHEMES */
+         #define DB_DBFLOCK_DEFAULT    0
+         #define DB_DBFLOCK_CLIP       1
+         #define DB_DBFLOCK_CL53       2
+         #define DB_DBFLOCK_VFP        3
+         #define DB_DBFLOCK_CL53EXT    4
+         #define DB_DBFLOCK_XHB64      5
+
+  * xharbour/include/hbapirdd.h
+  * xharbour/source/vm/itemapi.c
+    + added hb_itemUnShare() function which clone string buffer in
+      shared or static string items
+
+  * xharbour/include/hbapiitm.h
+    + added init() method. I didn't make it before because for RDD
+      initialization *_GETFUNCTABLE() is enough but now I needed
+      a function which can be inherited between different RDDs.
+      In DBF* RDDs you may see how it is used for private RDD data
+      stored in RDDNODE to keep some setting independently for each
+      RDD. With a small modification it can be changed to keep such
+      setting for each thread.
+    + added ISSUPER_INIT(wa) and ISSUPER_EXIT(wa) macros
+
+  * xharbour/include/hbset.h
+    - remove HB_SET_DBFLOCK_* definitions
+
+  * xharbour/include/hbsetup.h
+    + added HB_UNSHARE_REFERENCES macro - disabled by default
+      This is a note I left in this file:
+      /* ***********************************************************************
+       * This macros cause that string shared (and static) items are always
+       * unshared before pushing on VM stack if they are passed by reference.
+       * It's unnecessary to have it as long as you are not using buggy 3-rd party
+       * C code which writes directly to string buffer of items passed by reference
+       * without checking if the buffer is shared or static.
+       * Any 3-rd party code should always use xHarbour API function to store
+       * values in parameters passed by reference. But if someone doesn't want
+       * to do that and agree to update his code after modification in our VM
+       * which we can make at any time then he _must_ to make at least the
+       * following operation before writing to string buffer:
+       *    pItem = hb_intemUnShare( pItem );
+       * 
+       * In valid code this macro cause only slowness so it's disabled by default.
+       */
+
+  * xharbour/include/hbdbf.h
+    + added SMTFIELD structure for MEMO ITEM header stored in SMT
+      format.
+
+  * xharbour/include/hbrdddbf.h
+    + added DBFDATA structure to keep private RDD settings
+    * modified for SMT support
+    * updated for recent RDD modification
+    + added hb_dbfGetMemoData()/hb_dbfSetMemoData()
+
+  * xharbour/include/hbrddcdx.h
+  * xharbour/include/hbrdddbt.h
+  * xharbour/include/hbrdddel.h
+  * xharbour/include/hbrddfpt.h
+  * xharbour/include/hbrddntx.h
+  * xharbour/include/hbrddsdf.h
+  * xharbour/include/hbrddwrk.h
+  * xharbour/contrib/rdd_ads/ads1.c
+    * updated for recent RDD modification
+
+  * xharbour/source/vm/hvm.c
+    ! refix error messages I fixed in the past. Guys I do not have
+      time to check each commit. The hbtest was wrongly updated to
+      hide xHarbour bugs instead of cleaning them. I fixed some bugs
+      in error messages in our VM and hbtest begin to report it as
+      an error. But it does not mean that the fixes should be removed
+      to reduce number of errors reported by badly hacked version of
+      hbtest. In the past due to one hack I lost few trying to restore
+      original Clipper logic in VAL() when the problem was cause that
+      hbtest was hacked to not show bad results from old VAL() code.
+      I found it when I compiled hbtest by Clipper.
+      Please _only_ things which interacts with xHarbour extensions
+      or Clipper bugs can be changed in hbtest but _never_ hbtest
+      should be modified to hide bugs. Now it will show more errors
+      then before my commit but the results are Clipper compatible
+      and very important in many programs which needs real arguments
+      passed to error handler.
+    * cover code for string item unsharing when passed by reference
+      with macro HB_UNSHARE_REFERENCES
+
+  * xharbour/source/vm/arrays.c
+  * xharbour/source/vm/memvars.c
+    * cover code for string item unsharing when passed by reference
+      with macro HB_UNSHARE_REFERENCES
+
+  * xharbour/source/rtl/philes.c
+    * unshare given string item in FREAD() function
+
+  * xharbour/source/vm/macro.c
+    * replaced hb_dynsymFind_r() by hb_dynsymFind() - HB_DYNS symbols
+      cannot change their addresses at runtime or our while VM will not
+      work so it absolutely unnecessary to use hb_dynsymFind_r()
+
+  * xharbour/source/vm/thread.c
+    ! fixed possible GPF due to uninitialized variable
+
+  * xharbour/source/rdd/dbcmd.c
+    ! fixed internal error when DBCREATE() is called with empty array
+
+  * xharbour/source/rdd/dbf1.c
+    + added private RDD settings
+    * modified for SMT support
+    * updated for recent RDD modification
+    + added hb_dbfGetMemoData()/hb_dbfSetMemoData()
+
+  * xharbour/source/rdd/delim1.c
+  * xharbour/source/rdd/sdf1.c
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+    * updated for recent RDD modification
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    + added support for SMT and DBT files
+    * updated for recent RDD modification
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed the problem reported by Enrico and ordKeyCount()
+      used after dynamic unique flag change
+    * updated for recent RDD modification
+
+  * xharbour/source/rdd/rddsys.prg
+  * xharbour/source/rdd/dbfntx/dbfntx0.prg
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * changed default supper RDD in DBFNTX to DBFFPT and set MEMOTYPE to DBT
+    * updated for recent RDD modification
+
+   Now DBFDBT RDD is no longer necessary and DBFFPT should work with
+   any memo files: DBT, FPT and SMT. Please test it.
+   On open memo type should be recognized automatically.
+   For newly created file type of MEMO can by set by:
+      rddInfo( RDDI_MEMOTYPE, DB_MEMO_DBT [, <cRdd> ] )
+      rddInfo( RDDI_MEMOTYPE, DB_MEMO_FPT [, <cRdd> ] )
+      rddInfo( RDDI_MEMOTYPE, DB_MEMO_SMT [, <cRdd> ] )
+   For FPT memo files also subversion can be set with:
+      rddInfo( RDDI_MEMOVERSION, DB_MEMOEXT_FLEX [, <cRdd> ] )
+      rddInfo( RDDI_MEMOVERSION, DB_MEMOEXT_SIX [, <cRdd> ] )
+   Default memotype in DBFCDX is FPT(FLEX) and in DBFNTX DBT.
+   DBFFPT is noe requested by default in RDDSYS() instead of
+   DBFDBT which is no longer necessary.
+   Please test if everything is working OK.
 
 2005-09-08 20:40 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
    * source/tip/ftpcln.prg

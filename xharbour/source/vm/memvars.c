@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.107 2005/07/21 00:11:24 peterrees Exp $
+ * $Id: memvars.c,v 1.108 2005/09/02 18:31:00 druzus Exp $
  */
 
 /*
@@ -870,6 +870,7 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
             return;
          }
 
+#ifdef HB_UNSHARE_REFERENCES
          if( pReference->type & HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.pulHolders ) > 1 ) )
          {
             char *sString = (char*) hb_xgrab( pReference->item.asString.length + 1 );
@@ -887,7 +888,7 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
             pReference->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
             *( pReference->item.asString.pulHolders ) = 1;
          }
-
+#endif
          //TraceLog( NULL, "Ref to %s (%i) type: %i counter: %i\n", pMemvarSymb->szName, pDyn->hMemvar, pReference->type, s_globalTable[ pDyn->hMemvar ].counter );
 
          hb_itemClear( pItem );
@@ -918,6 +919,8 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
             {
                if( pDyn->hMemvar )
                {
+                  hb_itemClear( pItem );
+
                   /* value is already created */
                   pItem->type = HB_IT_BYREF | HB_IT_MEMVAR;
                   pItem->item.asMemvar.offset = 0;

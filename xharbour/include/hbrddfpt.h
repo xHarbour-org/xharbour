@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.16 2005/08/01 22:17:35 druzus Exp $
+ * $Id: hbrddfpt.h,v 1.17 2005/08/23 10:59:03 druzus Exp $
  */
 
 /*
@@ -66,10 +66,16 @@
 HB_EXTERN_BEGIN
 
 /* MEMO constants and defaults */
+#define DBT_MEMOEXT                          ".dbt"
 #define FPT_MEMOEXT                          ".fpt"
+#define SMT_MEMOEXT                          ".smt"
+#define DBT_DEFBLOCKSIZE                        512
+#define FPT_DEFBLOCKSIZE                         64
+#define SMT_DEFBLOCKSIZE                         32
+
 #define FPT_LOCKPOS                     0x00000000L
 #define FPT_LOCKSIZE                    0x00000001L
-#define FPT_DEFBLOCKSIZE                         64
+
 #define SIX_ITEM_BUFSIZE                         14
 #define FLEX_ITEM_BUFSIZE                         8
 #define MAX_SIXFREEBLOCKS                        82
@@ -77,12 +83,23 @@ HB_EXTERN_BEGIN
 #define FLEXGCPAGE_SIZE                        1010
 
 /* usMemoType */
+/*
 #define MEMO_DBT              1
 #define MEMO_FPT_HB           2
 #define MEMO_FPT_SIX          3
 #define MEMO_FPT_SIXHB        4
 #define MEMO_FPT_FLEX         5
 #define MEMO_FPT_CLIP         6
+*/
+
+/* SMT types */
+#define SMT_IT_NIL            0
+#define SMT_IT_CHAR           1
+#define SMT_IT_INT            2
+#define SMT_IT_DOUBLE         3
+#define SMT_IT_DATE           4
+#define SMT_IT_LOGICAL        5
+#define SMT_IT_ARRAY          6
 
 #define FPTIT_BINARY       0x0000
 #define FPTIT_PICT         0x0000      /* Picture */
@@ -148,8 +165,7 @@ HB_EXTERN_BEGIN
 typedef struct _FPTHEADER
 {
    BYTE  nextBlock[ 4 ];            /* Next free block in the file */
-   BYTE  reserved1[ 2 ];            /* */
-   BYTE  blockSize[ 2 ];            /* Size of block */
+   BYTE  blockSize[ 4 ];            /* Size of block */
    BYTE  signature1[ 10 ];          /* Signature: "SixMemo", "Harbour", "Made by CLIP"-overwrites next bytes*/
    BYTE  nGCitems[ 2 ];             /* number of GC items in reserved2 (max 82)*/
    BYTE  reserved2[ 492 ];          /* */
@@ -308,8 +324,9 @@ static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo );
 #define hb_fptGetValueFile                         NULL
 static ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo );
 #define hb_fptPutValueFile                         NULL
-static ERRCODE hb_fptReadDBHeader( FPTAREAP pArea );
-static ERRCODE hb_fptWriteDBHeader( FPTAREAP pArea );
+#define hb_fptReadDBHeader                         NULL
+#define hb_fptWriteDBHeader                        NULL
+#define hb_fptInit                                 NULL
 #define hb_fptExit                                 NULL
 #define hb_fptDrop                                 NULL
 #define hb_fptExists                               NULL

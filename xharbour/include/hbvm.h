@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.27 2005/04/27 20:20:26 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.28 2005/05/04 11:39:51 druzus Exp $
  */
 
 /*
@@ -126,6 +126,7 @@ HB_EXPORT extern void    hb_vmPushDate( LONG lDate );   /* pushes a LONG date on
 HB_EXPORT extern void    hb_vmPushSymbol( PHB_SYMB pSym ); /* pushes a function pointer onto the stack */
 HB_EXPORT extern void    hb_vmPushPointer( void * ); /* push an item of HB_IT_POINTER type */
 HB_EXPORT extern void    hb_vmPushBaseArray( PHB_BASEARRAY pBaseArray );
+HB_EXPORT extern void    hb_vmPushItemRef( PHB_ITEM pItem, PHB_ITEM * pItemRef[], int iPos );
 
 HB_EXPORT extern void hb_vmDoExitFunctions( void );
 HB_EXPORT extern PSYMBOLS hb_vmLastModule( void );

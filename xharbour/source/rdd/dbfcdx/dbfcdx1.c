@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.215 2005/08/23 10:59:03 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.216 2005/09/02 18:30:13 druzus Exp $
  */
 
 /*
@@ -138,9 +138,7 @@ static int hb_cdxPageRootSplit( LPCDXPAGE pPage );
 /* free create index structur */
 static void hb_cdxSortFree( LPCDXSORTINFO pSort );
 
-
-static char   s_szIndexExt[ HB_MAX_FILE_EXT + 1 ] = CDX_INDEXEXT;
-static USHORT s_uiRddId;
+static USHORT s_uiRddId = ( USHORT ) -1;
 
 static RDDFUNCS cdxSuper;
 static RDDFUNCS cdxTable =
@@ -280,6 +278,7 @@ static RDDFUNCS cdxTable =
 
 
    /* non WorkArea functions       */
+   ( DBENTRYP_R )     hb_cdxInit,
    ( DBENTRYP_R )     hb_cdxExit,
    ( DBENTRYP_RVV )   hb_cdxDrop,
    ( DBENTRYP_RVV )   hb_cdxExists,
@@ -6901,10 +6900,18 @@ static ERRCODE hb_cdxOpen( CDXAREAP pArea, LPDBOPENINFO pOpenInfo )
 
    if ( !pArea->bLockType )
    {
-      if ( hb_set.HB_SET_DBFLOCKSCHEME )
-         pArea->bLockType = hb_set.HB_SET_DBFLOCKSCHEME;
-      else
-         pArea->bLockType = HB_SET_DBFLOCK_VFP;
+      PHB_ITEM pItem = hb_itemNew( NULL );
+      if( SELF_INFO( ( AREAP ) pArea, DBI_LOCKSCHEME, pItem ) != SUCCESS )
+      {
+         hb_itemRelease( pItem );
+         return FAILURE;
+      }
+      pArea->bLockType = hb_itemGetNI( pItem );
+      hb_itemRelease( pItem );
+      if( pArea->bLockType == 0 )
+      {
+         pArea->bLockType = DB_DBFLOCK_VFP;
+      }
    }
    if ( SUPER_OPEN( ( AREAP ) pArea, pOpenInfo ) == FAILURE )
    {
@@ -7629,8 +7636,11 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
    switch( uiIndex )
    {
       case DBOI_BAGEXT:
-         pOrderInfo->itmResult = hb_itemPutC( pOrderInfo->itmResult, s_szIndexExt );
-         return SUCCESS;
+         if( pOrderInfo->itmResult )
+            hb_itemClear( pOrderInfo->itmResult );
+         else
+            pOrderInfo->itmResult = hb_itemNew( NULL );
+         return SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_ORDBAGEXT, 0, pOrderInfo->itmResult );
 
       case DBOI_EVALSTEP:
          pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult,
@@ -7939,7 +7949,8 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
          if ( pTag && pOrderInfo->itmNewVal && HB_IS_LOGICAL( pOrderInfo->itmNewVal ) && !pTag->UniqueKey )
          {
             pTag->UsrUnique = hb_itemGetL( pOrderInfo->itmNewVal );
-            pTag->curKeyState &= ~( CDX_CURKEY_RAWPOS | CDX_CURKEY_LOGPOS );
+            pTag->curKeyState &= ~( CDX_CURKEY_RAWPOS | CDX_CURKEY_LOGPOS |
+                                    CDX_CURKEY_RAWCNT | CDX_CURKEY_LOGCNT );
          }
          break;
 
@@ -8181,7 +8192,11 @@ static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo )
  */
 static ERRCODE hb_cdxRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem )
 {
+   LPDBFDATA pData;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxRddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnect, pItem));
+
+   pData = ( LPDBFDATA ) pRDD->lpvCargo;
 
    switch( uiIndex )
    {
@@ -8189,12 +8204,19 @@ static ERRCODE hb_cdxRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, P
       case RDDI_ORDEREXT:
       case RDDI_ORDSTRUCTEXT:
       {
-         char * szIndexExt = hb_strdup( s_szIndexExt ), *szNew;
+         char * szNew = hb_itemGetCPtr( pItem );
 
-         szNew = hb_itemGetCPtr( pItem );
          if( szNew[0] == '.' && szNew[1] )
-            hb_strncpy( s_szIndexExt, szNew, HB_MAX_FILE_EXT );
-         hb_itemPutCPtr( pItem, szIndexExt, strlen( szIndexExt ) );
+            szNew = hb_strdup( szNew );
+         else
+            szNew = NULL;
+
+         hb_itemPutC( pItem, pData->szIndexExt[ 0 ] ? pData->szIndexExt : CDX_INDEXEXT );
+         if( szNew )
+         {
+            hb_strncpy( pData->szIndexExt, szNew, HB_MAX_FILE_EXT );
+            hb_xfree( szNew );
+         }
          break;
       }
 

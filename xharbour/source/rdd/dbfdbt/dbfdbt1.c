@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.25 2005/08/01 22:20:39 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.26 2005/08/23 10:59:03 druzus Exp $
  */
 
 /*
@@ -70,8 +70,6 @@
 #  undef HB_PRG_PCODE_VER
 #  define HB_PRG_PCODE_VER HB_PCODE_VER
 #endif
-
-static char   s_szMemoExt[ HB_MAX_FILE_EXT + 1 ] = DBT_MEMOEXT;
 
 static RDDFUNCS dbtSuper;
 static RDDFUNCS dbtTable =
@@ -211,6 +209,7 @@ static RDDFUNCS dbtTable =
 
 
    /* non WorkArea functions       */
+   ( DBENTRYP_R )     hb_dbtInit,
    ( DBENTRYP_R )     hb_dbtExit,
    ( DBENTRYP_RVV )   hb_dbtDrop,
    ( DBENTRYP_RVV )   hb_dbtExists,
@@ -515,15 +514,33 @@ static ERRCODE hb_dbtInfo( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    switch( uiIndex )
    {
       case DBI_MEMOEXT:
-         hb_itemPutC( pItem, s_szMemoExt );
+         if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
+         {
+            PHB_FNAME pFileName;
+
+            pFileName = hb_fsFNameSplit( ( char * ) pArea->szMemoFileName );
+            hb_itemPutC( pItem, pFileName->szExtension );
+            hb_xfree( pFileName );
+         }
+         else
+         {
+            hb_itemClear( pItem );
+            return SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_MEMOEXT, 0, pItem );
+         }
          break;
 
       case DBI_MEMOBLOCKSIZE:
-         hb_itemPutNI( pItem, DBT_BLOCKSIZE );
+         if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
+            hb_itemPutNI( pItem, pArea->uiMemoBlockSize );
+         else
+            hb_itemPutNI( pItem, DBT_BLOCKSIZE );
          break;
 
       case DBI_MEMOTYPE:
-         hb_itemPutNI( pItem, 0 );
+         if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR )
+            hb_itemPutNI( pItem, pArea->bMemoType );
+         else
+            hb_itemPutNI( pItem, DB_MEMO_DBT );
          break;
 
       /* case DBI_RDD_VERSION */
@@ -777,37 +794,6 @@ static ERRCODE hb_dbtOpenMemFile( DBTAREAP pArea, LPDBOPENINFO pOpenInfo )
 /* ( DBENTRYP_SVP )   hb_dbtPutValueFile    : NULL */
 
 /*
- * Read the database file header record in the WorkArea.
- * ( DBENTRYP_V )     hb_dbtReadDBHeader
- */
-static ERRCODE hb_dbtReadDBHeader( DBTAREAP pArea )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbtReadHeader(%p)", pArea));
-
-   if( SUPER_READDBHEADER( ( AREAP ) pArea ) == FAILURE )
-      return FAILURE;
-// Set in SUPER() now 3/05/2004
-//   pArea->fHasMemo = ( pArea->bVersion == 0x83 );
-
-   return SUCCESS;
-}
-
-/*
- * Write the database file header record in the WorkArea.
- * ( DBENTRYP_V )     hb_dbtWriteDBHeader
- */
-static ERRCODE hb_dbtWriteDBHeader( DBTAREAP pArea )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbtWriteDBHeader(%p)", pArea));
-
-   if ( pArea->fHasMemo && pArea->bVersion != 0x30 && pArea->bVersion != 0x31 )
-   {
-      pArea->bVersion = 0x83;
-   }
-   return SUPER_WRITEDBHEADER( ( AREAP ) pArea );
-}
-
-/*
  * Retrieve (set) information about RDD
  * ( DBENTRYP_RSLV )   hb_dbtFieldInfo
  */
@@ -819,12 +805,20 @@ static ERRCODE hb_dbtRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, P
    {
       case RDDI_MEMOEXT:
       {
-         char * szMemoExt = hb_strdup( s_szMemoExt ), *szNew;
+         LPDBFDATA pData = ( LPDBFDATA ) pRDD->lpvCargo;
+         char *szNew = hb_itemGetCPtr( pItem );
 
-         szNew = hb_itemGetCPtr( pItem );
          if( szNew[0] == '.' && szNew[1] )
-            hb_strncpy( s_szMemoExt, szNew, HB_MAX_FILE_EXT );
-         hb_itemPutCPtr( pItem, szMemoExt, strlen( szMemoExt ) );
+            szNew = hb_strdup( szNew );
+         else
+            szNew = NULL;
+
+         hb_itemPutC( pItem, pData->szMemoExt[ 0 ] ? pData->szMemoExt : DBT_MEMOEXT );
+         if( szNew )
+         {
+            hb_strncpy( pData->szMemoExt, szNew, HB_MAX_FILE_EXT );
+            hb_xfree( szNew );
+         }
          break;
       }
       case RDDI_MEMOBLOCKSIZE:
@@ -832,6 +826,9 @@ static ERRCODE hb_dbtRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, P
          break;
 
       case RDDI_MEMOTYPE:
+         hb_itemPutNI( pItem, DB_MEMO_DBT );
+         break;
+
       case RDDI_MEMOGCTYPE:
          hb_itemPutNI( pItem, 0 );
          break;

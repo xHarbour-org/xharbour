@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddwrk.h,v 1.5 2005/08/01 22:17:35 druzus Exp $
+ * $Id: hbrddwrk.h,v 1.6 2005/08/23 10:59:03 druzus Exp $
  */
 
 /*
@@ -157,6 +157,7 @@ extern ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock );
 #define hb_waReadDBHeader                                   hb_waUnsupported
 #define hb_waWriteDBHeader                                  hb_waUnsupported
 
+#define hb_rddInit                         (DBENTRYP_R)     NULL
 #define hb_rddExit                         (DBENTRYP_R)     NULL
 #define hb_rddDrop                         (DBENTRYP_RVV)   hb_waRddUnsupported
 #define hb_rddExists                       (DBENTRYP_RVV)   hb_waRddUnsupported

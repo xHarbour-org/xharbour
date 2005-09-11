@@ -1,5 +1,5 @@
 /*
- * $Id: rddsys.prg,v 1.3 2003/09/10 21:35:46 druzus Exp $
+ * $Id: rddsys.prg,v 1.4 2005/01/30 21:19:24 druzus Exp $
  */
 
 /*
@@ -57,7 +57,7 @@ ANNOUNCE RDDSYS
 PROCEDURE RddInit
 
    REQUEST DBFNTX
-   REQUEST DBFDBT
+   REQUEST DBFFPT
 
    /* NOTE: Using this internal version of this functions, since at this
             point the DBFNTX RDD may not be registered, depending on the

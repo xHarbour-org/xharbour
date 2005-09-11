@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.485 2005/09/06 22:45:42 ronpinkas Exp $
+ * $Id: hvm.c,v 1.486 2005/09/07 04:59:14 walito Exp $
  */
 
 /*
@@ -2611,6 +2611,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                 pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
                 pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
 
+#ifdef HB_UNSHARE_REFERENCES
                 if( (*pGlobals)[ iGlobal ]->type & HB_IT_STRING && ( (*pGlobals)[ iGlobal ]->item.asString.bStatic || *( (*pGlobals)[ iGlobal ]->item.asString.pulHolders ) > 1 ) )
                 {
                    char *sString = (char*) hb_xgrab( (*pGlobals)[ iGlobal ]->item.asString.length + 1 );
@@ -2627,6 +2628,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                    (*pGlobals)[ iGlobal ]->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
                    *( (*pGlobals)[ iGlobal ]->item.asString.pulHolders ) = 1;
                 }
+#endif
 
                 hb_stackPush();
              }
@@ -4238,13 +4240,8 @@ static void hb_vmDivide( void )
 
       if( dDivisor == 0.0 )
       {
-#if 0
          PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1340, NULL, "/", 2, pItem1, pItem2 );
-#else
-         HB_ITEM_NEW( p1 );
-         HB_ITEM_NEW( p2 );
-         PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1340, NULL, "/", 2, &p1, &p2 );
-#endif
+
          if( pResult )
          {
             hb_stackPop();
@@ -4307,13 +4304,7 @@ static void hb_vmModulus( void )
 
       if ( lDivisor == 0 )
       {
-#if 0
          PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1341, NULL, "%", 2, pItem1, pItem2 );
-#else
-         HB_ITEM_NEW( p1 );
-         HB_ITEM_NEW( p2 );
-         PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1341, NULL, "%", 2, &p1, &p2 );
-#endif
 
          if( pResult )
          {
@@ -4342,14 +4333,8 @@ static void hb_vmModulus( void )
 
       if( dDivisor == 0.0 )
       {
-#if 0
          PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1341, NULL, "%", 2, pItem1, pItem2 );
-#else
-         HB_ITEM_NEW( p1 );
-         HB_ITEM_NEW( p2 );
-         PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ZERODIV, 1341, NULL, "%", 2, &p1, &p2 );
 
-#endif
          if( pResult )
          {
             hb_stackPop();
@@ -6204,7 +6189,7 @@ static void hb_vmArrayNew( PHB_ITEM pArray, USHORT uiDimension )
    pDim = hb_stackItemFromTop( - uiDimension );
 
    /* use the proper type of number of elements */
-   switch( pDim->type & ~HB_IT_BYREF )
+   switch( pDim->type )
    {
       case HB_IT_INTEGER:
          ulElements = ( ULONG ) pDim->item.asInteger.value;
@@ -6340,7 +6325,7 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
    /* NOTE: Clipper doesn't generate an error if an workarea specified
     * as numeric value cannot be selected
     */
-   switch( pAlias->type & ~HB_IT_BYREF )
+   switch( pAlias->type )
    {
       case HB_IT_INTEGER:
          /* Alias was used as integer value, for example: 4->field
@@ -6888,7 +6873,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       }
    }
 
-   if( pFunc  )
+   if( pFunc )
    {
       #ifndef HB_NO_PROFILER
          if( bProfiler )
@@ -7962,11 +7947,7 @@ static void hb_vmPushAliasedField( PHB_SYMB pSym )
       PHB_ITEM pFName = hb_itemNew( NULL );
 
       hb_itemPutC( pFName, pSym->szName );
-#if 0
       hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 2, pAlias, pFName );
-#else
-      hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, pAlias );
-#endif
       hb_itemRelease( pFName );
    }
    else
@@ -8099,6 +8080,7 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
 
       pLocal = *( HB_VM_STACK.pBase + iLocal + 1 );
 
+#ifdef HB_UNSHARE_REFERENCES
       if( pLocal->type & HB_IT_STRING && ( pLocal->item.asString.bStatic || *( pLocal->item.asString.pulHolders ) > 1 ) )
       {
          char *sString = (char*) hb_xgrab( pLocal->item.asString.length + 1 );
@@ -8115,6 +8097,7 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
          pLocal->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
          *( pLocal->item.asString.pulHolders ) = 1;
       }
+#endif
 
       pTop->item.asRefer.BasePtr.itemsbasePtr = &HB_VM_STACK.pItems;
    }
@@ -8159,26 +8142,31 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
    HB_THREAD_STUB
 
    HB_ITEM_PTR pTop = ( * HB_VM_STACK.pPos );
-   PHB_ITEM pReference = s_aStatics.item.asArray.value->pItems + HB_VM_STACK.iStatics + uiStatic - 1;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushStaticByRef(%hu)", uiStatic));
 
-   if( pReference->type & HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.pulHolders ) > 1 ) )
+#ifdef HB_UNSHARE_REFERENCES
    {
-      char *sString = (char*) hb_xgrab( pReference->item.asString.length + 1 );
+      PHB_ITEM pReference = s_aStatics.item.asArray.value->pItems + HB_VM_STACK.iStatics + uiStatic - 1;
 
-      memcpy( sString, pReference->item.asString.value, pReference->item.asString.length + 1 );
-
-      if( pReference->item.asString.bStatic == FALSE )
+      if( pReference->type & HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.pulHolders ) > 1 ) )
       {
-         hb_itemReleaseStringX( pReference );
-      }
+         char *sString = (char*) hb_xgrab( pReference->item.asString.length + 1 );
 
-      pReference->item.asString.value = sString;
-      pReference->item.asString.bStatic = FALSE;
-      pReference->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-      *( pReference->item.asString.pulHolders ) = 1;
+         memcpy( sString, pReference->item.asString.value, pReference->item.asString.length + 1 );
+
+         if( pReference->item.asString.bStatic == FALSE )
+         {
+            hb_itemReleaseStringX( pReference );
+         }
+
+         pReference->item.asString.value = sString;
+         pReference->item.asString.bStatic = FALSE;
+         pReference->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+         *( pReference->item.asString.pulHolders ) = 1;
+      }
    }
+#endif
 
    pTop->type = HB_IT_BYREF;
    /* we store the offset instead of a pointer to support a dynamic stack */
@@ -8319,7 +8307,7 @@ static double hb_vmPopNumber( void )
    pItem = hb_stackItemFromTop( -1 );
    hb_stackDec();
 
-   switch( pItem->type & ~HB_IT_BYREF )
+   switch( pItem->type )
    {
       case HB_IT_INTEGER:
          dNumber = ( double ) pItem->item.asInteger.value;
@@ -8367,7 +8355,7 @@ static HB_LONG hb_vmPopHBLong( void )
    pItem = hb_stackItemFromTop( -1 );
    hb_stackDec();
 
-   switch( pItem->type & ~HB_IT_BYREF )
+   switch( pItem->type )
    {
       case HB_IT_INTEGER:
          lNumber = ( HB_LONG ) pItem->item.asInteger.value;
@@ -9365,9 +9353,10 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols
 
          pDynSym= hb_dynsymFind( pSymbol->szName );
 
-         if( pDynSym && pDynSym->pFunPtr && pSymbol->value.pFunPtr )
+         if( pDynSym && pDynSym->pSymbol->value.pFunPtr && pSymbol->value.pFunPtr )
          {
-            pSymbol->value.pFunPtr = pDynSym->pFunPtr;
+            pSymbol->pDynSym = pDynSym;
+            pSymbol->value.pFunPtr = pDynSym->pSymbol->value.pFunPtr;
          }
          else
          {
@@ -9404,6 +9393,25 @@ HB_EXPORT void hb_vmPushBaseArray( PHB_BASEARRAY pBaseArray )
    #else
        hb_arrayRegisterHolder( pBaseArray, (void *) ( * HB_VM_STACK.pPos ) );
    #endif
+
+   hb_stackPush();
+}
+
+HB_EXPORT void hb_vmPushItemRef( PHB_ITEM pItem, PHB_ITEM * pItemRef[], int iPos )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushItemRef(%p, %p, %d)", pItem, pItemRef, iPos));
+
+#ifdef HB_UNSHARE_REFERENCES
+   pItem = hb_itemUnShare( pItem );
+#endif
+
+   ( * pItemRef )[ iPos ] = pItem;
+   ( * HB_VM_STACK.pPos )->type = HB_IT_BYREF;
+   ( * HB_VM_STACK.pPos )->item.asRefer.offset = -1;
+   ( * HB_VM_STACK.pPos )->item.asRefer.BasePtr.itemsbasePtr = pItemRef;
+   ( * HB_VM_STACK.pPos )->item.asRefer.value = iPos + 1;
 
    hb_stackPush();
 }

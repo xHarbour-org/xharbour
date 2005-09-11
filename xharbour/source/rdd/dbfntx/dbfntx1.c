@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.125 2005/08/23 10:59:04 druzus Exp $
+ * $Id: dbfntx1.c,v 1.126 2005/09/02 18:30:28 druzus Exp $
  */
 
 /*
@@ -181,7 +181,6 @@ HB_INIT_SYMBOLS_END( dbfntx1__InitSymbols )
 static RDDFUNCS ntxSuper;
 static USHORT s_uiRddId;
 
-static char s_szIndexExt[ HB_MAX_FILE_EXT + 1 ] = NTX_INDEXEXT;
 static BOOL s_fSortRecNo = FALSE;
 static BOOL s_fMultiKey = FALSE;
 static BOOL s_fStruct = FALSE;
@@ -1591,16 +1590,16 @@ static LPTAGINFO hb_ntxTagLoad( LPNTXINDEX pIndex, ULONG ulBlock,
       /* TODO: this breaks unlocking !!! */
       if( usType & NTX_FLAG_LARGEFILE )
       {
-         pIndex->Owner->bLockType = HB_SET_DBFLOCK_XHB64;
+         pIndex->Owner->bLockType = DB_DBFLOCK_XHB64;
       }
       else if( usType & NTX_FLAG_EXTLOCK )
       {
-         pIndex->Owner->bLockType = HB_SET_DBFLOCK_CL53EXT;
+         pIndex->Owner->bLockType = DB_DBFLOCK_CL53EXT;
       }
       else if( ! pIndex->Owner->bLockType )
       {
          pIndex->Owner->bLockType = usType & NTX_FLAG_EXTLOCK ?
-                           HB_SET_DBFLOCK_CL53EXT : HB_SET_DBFLOCK_CLIP;
+                           DB_DBFLOCK_CL53EXT : DB_DBFLOCK_CLIP;
       }
    }
    return pTag;
@@ -1705,7 +1704,7 @@ static ERRCODE hb_ntxTagHeaderSave( LPTAGINFO pTag )
    type = NTX_FLAG_DEFALUT |
       ( pTag->ForExpr ? NTX_FLAG_FORITEM : 0 ) |
       ( pTag->Partial ? NTX_FLAG_PARTIAL | NTX_FLAG_FORITEM : 0 ) |
-      ( pIndex->Owner->bLockType == HB_SET_DBFLOCK_CL53EXT ? NTX_FLAG_EXTLOCK : 0 ) |
+      ( pIndex->Owner->bLockType == DB_DBFLOCK_CL53EXT ? NTX_FLAG_EXTLOCK : 0 ) |
       ( pTag->Partial  ? NTX_FLAG_PARTIAL | NTX_FLAG_FORITEM : 0 ) |
       /* non CLipper flags */
       ( pTag->Custom   ? NTX_FLAG_CUSTOM : 0 ) |
@@ -6173,7 +6172,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       }
       else
       {
-         pIndex->LargeFile = ( pIndex->Owner->bLockType == HB_SET_DBFLOCK_XHB64 );
+         pIndex->LargeFile = ( pIndex->Owner->bLockType == DB_DBFLOCK_XHB64 );
       }
    }
 
@@ -6369,8 +6368,8 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
    switch( uiIndex )
    {
       case DBOI_BAGEXT:
-         hb_itemPutC( pInfo->itmResult, s_szIndexExt );
-         return SUCCESS;
+         hb_itemClear( pInfo->itmResult );
+         return SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_ORDBAGEXT, 0, pInfo->itmResult );
       case DBOI_EVALSTEP:
          hb_itemPutNL( pInfo->itmResult,
                   pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->lStep : 0 );
@@ -7190,7 +7189,11 @@ static ERRCODE ntxOrderListRebuild( NTXAREAP pArea )
 
 static ERRCODE ntxRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem )
 {
+   LPDBFDATA pData;
+
    HB_TRACE(HB_TR_DEBUG, ("ntxRddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnect, pItem));
+
+   pData = ( LPDBFDATA ) pRDD->lpvCargo;
 
    switch( uiIndex )
    {
@@ -7198,12 +7201,19 @@ static ERRCODE ntxRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_
       case RDDI_ORDEREXT:
       case RDDI_ORDSTRUCTEXT:
       {
-         char * szIndexExt = hb_strdup( s_szIndexExt ), *szNew;
+         char * szNew = hb_itemGetCPtr( pItem );
 
-         szNew = hb_itemGetCPtr( pItem );
          if( szNew[0] == '.' && szNew[1] )
-            hb_strncpy( s_szIndexExt, szNew, HB_MAX_FILE_EXT );
-         hb_itemPutCPtr( pItem, szIndexExt, strlen( szIndexExt ) );
+            szNew = hb_strdup( szNew );
+         else
+            szNew = NULL;
+
+         hb_itemPutC( pItem, pData->szIndexExt[ 0 ] ? pData->szIndexExt : NTX_INDEXEXT );
+         if( szNew )
+         {
+            hb_strncpy( pData->szIndexExt, szNew, HB_MAX_FILE_EXT );
+            hb_xfree( szNew );
+         }
          break;
       }
 
@@ -7358,6 +7368,7 @@ static RDDFUNCS ntxTable = { ntxBof,
                              ntxPutValueFile,
                              ntxReadDBHeader,
                              ntxWriteDBHeader,
+                             ntxInit,
                              ntxExit,
                              ntxDrop,
                              ntxExists,
@@ -7382,9 +7393,9 @@ HB_FUNC( DBFNTX_GETFUNCTABLE )
 
       if( uiCount )
          * uiCount = RDDFUNCSCOUNT;
-      errCode = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( BYTE * ) "DBFDBT" );
+      errCode = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( BYTE * ) "DBFFPT" );
       if( errCode != SUCCESS )
-         errCode = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( BYTE * ) "DBFFPT" );
+         errCode = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( BYTE * ) "DBFDBT" );
       if( errCode != SUCCESS )
          errCode = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( BYTE * ) "DBF" );
       if( errCode == SUCCESS )

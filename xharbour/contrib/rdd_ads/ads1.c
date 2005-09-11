@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.72 2005/08/23 10:59:02 druzus Exp $
+ * $Id: ads1.c,v 1.73 2005/09/02 18:29:03 druzus Exp $
  */
 
 /*
@@ -4078,6 +4078,8 @@ static ERRCODE adsExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemInd
    return hb_spFile( ( BYTE * ) szFileName, NULL ) ? SUCCESS : FAILURE;
 }
 
+#define  adsInit                  NULL
+
 static ERRCODE adsExit( LPRDDNODE pRDD )
 {
    HB_SYMBOL_UNUSED( pRDD );
@@ -4252,6 +4254,7 @@ static RDDFUNCS adsTable = { ( DBENTRYP_BP ) adsBof,
                              ( DBENTRYP_SVP ) adsPutValueFile,
                              ( DBENTRYP_V ) adsReadDBHeader,
                              ( DBENTRYP_V ) adsWriteDBHeader,
+                             ( DBENTRYP_R ) adsInit,
                              ( DBENTRYP_R ) adsExit,
                              ( DBENTRYP_RVV ) adsDrop,
                              ( DBENTRYP_RVV ) adsExists,

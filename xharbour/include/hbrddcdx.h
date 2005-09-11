@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.46 2005/08/01 22:17:34 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.47 2005/08/23 10:59:03 druzus Exp $
  */
 
 /*
@@ -476,42 +476,43 @@ typedef struct _CDXAREA
    *  example.
    */
 
-   FHANDLE hDataFile;            /* Data file handle */
-   FHANDLE hMemoFile;            /* Memo file handle */
-   USHORT uiHeaderLen;           /* Size of header */
-   USHORT uiRecordLen;           /* Size of record */
-   ULONG ulRecCount;             /* Total records */
-   char * szDataFileName;        /* Name of data file */
-   char * szMemoFileName;        /* Name of memo file */
-   USHORT uiMemoBlockSize;       /* Size of memo block */
-   BYTE bMemoType;               /* MEMO type used in DBF memo fields */
-   BOOL fHasMemo;                /* WorkArea with Memo fields */
-   BOOL fHasTags;                /* WorkArea with MDX or CDX index */
-   BOOL fDataFlush;              /* data was written to DBF and not commited */
-   BOOL fMemoFlush;              /* data was written to MEMO and not commited */
-   BYTE bVersion;                /* DBF version ID byte */
-   BYTE bCodePage;               /* DBF codepage ID */
-   BOOL fShared;                 /* Shared file */
-   BOOL fReadonly;               /* Read only file */
-   USHORT * pFieldOffset;        /* Pointer to field offset array */
-   BYTE * pRecord;               /* Buffer of record data */
-   BOOL fValidBuffer;            /* State of buffer */
-   BOOL fPositioned;             /* Positioned record */
-   ULONG ulRecNo;                /* Current record */
-   BOOL fRecordChanged;          /* Record changed */
-   BOOL fAppend;                 /* TRUE if new record is added */
-   BOOL fDeleted;                /* TRUE if record is deleted */
-   BOOL fEncrypted;              /* TRUE if record is encrypted */
-   BOOL fUpdateHeader;           /* Update header of file */
-   BOOL fFLocked;                /* TRUE if file is locked */
-   BOOL fHeaderLocked;           /* TRUE if DBF header is locked */
-   LPDBRELINFO lpdbPendingRel;   /* Pointer to parent rel struct */
-   BYTE bYear;                   /* Last update */
-   BYTE bMonth;
-   BYTE bDay;
-   BYTE bLockType;               /* Type of locking shemes */
-   ULONG * pLocksPos;            /* List of records locked */
-   ULONG ulNumLocksPos;          /* Number of records locked */
+   FHANDLE  hDataFile;              /* Data file handle */
+   FHANDLE  hMemoFile;              /* Memo file handle */
+   char *   szDataFileName;         /* Name of data file */
+   char *   szMemoFileName;         /* Name of memo file */
+   USHORT   uiHeaderLen;            /* Size of header */
+   USHORT   uiRecordLen;            /* Size of record */
+   USHORT   uiMemoBlockSize;        /* Size of memo block */
+   USHORT   uiMemoVersion;          /* MEMO file version */
+   DBFHEADER dbfHeader;             /* DBF header buffer */
+   BYTE     bTableType;             /* DBF type */
+   BYTE     bMemoType;              /* MEMO type used in DBF memo fields */
+   BYTE     bLockType;              /* Type of locking shemes */
+   BYTE     bCryptType;             /* Type of used encryption */
+   USHORT * pFieldOffset;           /* Pointer to field offset array */
+   BYTE *   pRecord;                /* Buffer of record data */
+   ULONG    ulRecCount;             /* Total records */
+   ULONG    ulRecNo;                /* Current record */
+   BOOL     fAutoInc;               /* WorkArea with auto increment fields */
+   BOOL     fHasMemo;               /* WorkArea with Memo fields */
+   BOOL     fHasTags;               /* WorkArea with MDX or CDX index */
+   BOOL     fDataFlush;             /* data was written to DBF and not commited */
+   BOOL     fMemoFlush;             /* data was written to MEMO and not commited */
+   BOOL     fShared;                /* Shared file */
+   BOOL     fReadonly;              /* Read only file */
+   BOOL     fValidBuffer;           /* State of buffer */
+   BOOL     fPositioned;            /* Positioned record */
+   BOOL     fRecordChanged;         /* Record changed */
+   BOOL     fAppend;                /* TRUE if new record is added */
+   BOOL     fDeleted;               /* TRUE if record is deleted */
+   BOOL     fEncrypted;             /* TRUE if record is encrypted */
+   BOOL     fTableEncrypted;        /* TRUE if table is encrypted */
+   BOOL     fUpdateHeader;          /* Update header of file */
+   BOOL     fFLocked;               /* TRUE if file is locked */
+   BOOL     fHeaderLocked;          /* TRUE if DBF header is locked */
+   LPDBRELINFO lpdbPendingRel;      /* Pointer to parent rel struct */
+   ULONG *  pLocksPos;              /* List of records locked */
+   ULONG    ulNumLocksPos;          /* Number of records locked */
 #ifndef HB_CDP_SUPPORT_OFF
    PHB_CODEPAGE cdPage;          /* Area's codepage pointer  */
 #endif
@@ -638,6 +639,7 @@ static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo );
 #define hb_cdxPutValueFile                         NULL
 #define hb_cdxReadDBHeader                         NULL
 #define hb_cdxWriteDBHeader                        NULL
+#define hb_cdxInit                                 NULL
 #define hb_cdxExit                                 NULL
 #define hb_cdxDrop                                 NULL
 #define hb_cdxExists                               NULL

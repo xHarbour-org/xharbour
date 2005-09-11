@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.37 2005/04/20 23:29:52 ronpinkas Exp $
+ * $Id: hbsetup.h,v 1.38 2005/04/27 20:20:26 ronpinkas Exp $
  */
 
 /*
@@ -132,10 +132,31 @@
 
 /* ***********************************************************************
  *
-*/
+ */
 #ifndef HB_ARRAY_USE_COUNTER_OFF
 #  define HB_ARRAY_USE_COUNTER
 #endif
+
+/* *********************************************************************** */
+
+/* ***********************************************************************
+ * This macros cause that string shared (and static) items are always
+ * unshared before pushing on VM stack if they are passed by reference.
+ * It's unnecessary to have it as long as you are not using buggy 3-rd party
+ * C code which writes directly to string buffer of items passed by reference
+ * without checking if the buffer is shared or static.
+ * Any 3-rd party code should always use xHarbour API function to store
+ * values in parameters passed by reference. But if someone doesn't want
+ * to do that and agree to update his code after modification in our VM
+ * which we can make at any time then he _must_ to make at least the
+ * following operation before writing to string buffer:
+ *    pItem = hb_intemUnShare( pItem );
+ * 
+ * In valid code this macro cause only slowness so it's disabled by default.
+ */
+
+/* #define HB_UNSHARE_REFERENCES */
+
 
 /* ***********************************************************************
  * Use native Windows memory allocation functions (HB_OS_WIN_32)

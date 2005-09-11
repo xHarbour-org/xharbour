@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.52 2005/05/24 21:05:58 ronpinkas Exp $
+ * $Id: macro.c,v 1.53 2005/06/09 23:38:37 ronpinkas Exp $
  */
 
 /*
@@ -1302,16 +1302,9 @@ static void hb_compMemvarCheck( char * szVarName, HB_MACRO_DECL )
       {
          if( hb_memvarScope( szVarName ) <= HB_MV_ERROR )
          {
-            #ifdef HB_THREAD_SUPPORT
-            HB_DYNS Dyn;
-            #endif
             PHB_DYNS pDyn;
 
-            #ifdef HB_THREAD_SUPPORT
-            pDyn = hb_dynsymFind_r( szVarName, &Dyn );
-            #else
             pDyn = hb_dynsymFind( szVarName );
-            #endif
 
             /* there is no memvar or field variable visible at this moment */
             if( pDyn == NULL )

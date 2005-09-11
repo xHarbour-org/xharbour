@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.190 2005/06/17 17:04:23 lculik Exp $
+* $Id: thread.c,v 1.191 2005/09/04 04:29:01 walito Exp $
 */
 
 /*
@@ -1559,7 +1559,7 @@ HB_FUNC( STARTTHREAD )
    PHB_ITEM pArgs;
    HB_THREAD_T th_id;
    PHB_DYNS pExecSym;
-   PHB_SYMB pSymbol;
+   PHB_SYMB pSymbol = NULL;
    BOOL bIsMethod = FALSE;
    HB_STACK *pStack;
    PHB_THREAD_ID pThread;
@@ -1582,7 +1582,7 @@ HB_FUNC( STARTTHREAD )
    /* Is it a function pointer? */
    if ( pPointer->type == HB_IT_POINTER )
    {
-      pSymbol =  (PHB_SYMB) hb_itemGetPtr( pPointer );
+      pSymbol = ( PHB_SYMB ) hb_itemGetPtr( pPointer );
 
       if( pSymbol == NULL )
       {
@@ -1603,7 +1603,7 @@ HB_FUNC( STARTTHREAD )
 
       if( pString->type == HB_IT_STRING )
       {
-         pExecSym = hb_dynsymGet( pString->item.asString.value );
+         pExecSym = hb_dynsymFindName( pString->item.asString.value );
 
          if( pExecSym )
          {
@@ -1612,16 +1612,10 @@ HB_FUNC( STARTTHREAD )
       }
       else if( pString->type == HB_IT_POINTER )
       {
-         pSymbol =  (PHB_SYMB) hb_itemGetPtr( pString );
-      }
-      else
-      {
-         hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "StartThread", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-         hb_itemRelease( pArgs );
-         return;
+         pSymbol = ( PHB_SYMB ) hb_itemGetPtr( pString );
       }
 
-      if( pExecSym == NULL && pSymbol == NULL )
+      if( pSymbol == NULL )
       {
          hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "StartThread", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
          hb_itemRelease( pArgs );

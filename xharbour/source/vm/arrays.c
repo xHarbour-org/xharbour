@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.119 2005/04/23 06:52:17 guerra000 Exp $
+ * $Id: arrays.c,v 1.120 2005/07/10 05:07:06 walito Exp $
  */
 
 /*
@@ -489,19 +489,8 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
 
    if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
+#ifdef HB_UNSHARE_REFERENCES
       PHB_ITEM pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
-
-      pItem->type = HB_IT_BYREF;
-
-      pItem->item.asRefer.value = ulIndex - 1;
-      pItem->item.asRefer.offset = 0;
-      pItem->item.asRefer.BasePtr.pBaseArray = pArray->item.asArray.value;
-
-      #ifdef HB_ARRAY_USE_COUNTER
-         pArray->item.asArray.value->ulHolders++;
-      #else
-          hb_arrayRegisterHolder( pArray->item.asArray.value, (void *) pItem );
-      #endif
 
       if( pElement->type == HB_IT_STRING && ( pElement->item.asString.bStatic || *( pElement->item.asString.pulHolders ) > 1 ) )
       {
@@ -517,6 +506,19 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
          pElement->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
          *( pElement->item.asString.pulHolders ) = 1;
       }
+#endif
+
+      pItem->type = HB_IT_BYREF;
+
+      pItem->item.asRefer.value = ulIndex - 1;
+      pItem->item.asRefer.offset = 0;
+      pItem->item.asRefer.BasePtr.pBaseArray = pArray->item.asArray.value;
+
+      #ifdef HB_ARRAY_USE_COUNTER
+         pArray->item.asArray.value->ulHolders++;
+      #else
+         hb_arrayRegisterHolder( pArray->item.asArray.value, (void *) pItem );
+      #endif
 
       return TRUE;
    }

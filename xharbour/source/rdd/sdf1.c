@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.10 2005/08/01 22:19:47 druzus Exp $
+ * $Id: sdf1.c,v 1.11 2005/08/23 10:59:03 druzus Exp $
  */
 
 /*
@@ -177,6 +177,7 @@ static RDDFUNCS sdfTable = { hb_sdfBof,
                              hb_sdfPutValueFile,
                              hb_sdfReadDBHeader,
                              hb_sdfWriteDBHeader,
+                             hb_sdfInit,
                              hb_sdfExit,
                              hb_sdfDrop,
                              hb_sdfExists,

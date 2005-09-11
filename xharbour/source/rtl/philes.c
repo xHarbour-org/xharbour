@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.28 2005/04/25 01:17:15 andijahja Exp $
+ * $Id: philes.c,v 1.29 2005/05/19 02:20:18 druzus Exp $
  */
 
 /*
@@ -110,9 +110,10 @@ HB_FUNC( HB_FCREATE )
  */
 HB_FUNC( FREAD )
 {
+   PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
    ULONG ulRead;
 
-   if( ISNUM( 1 ) && ISCHAR( 2 ) && ISBYREF( 2 ) && ISNUM( 3 ) )
+   if( ISNUM( 1 ) && pBuffer && ISBYREF( 2 ) && ISNUM( 3 ) )
    {
       ULONG ulOffset = hb_parnl( 4 );
 
@@ -126,7 +127,13 @@ HB_FUNC( FREAD )
       {
          /* NOTE: Warning, the read buffer will be directly modified,
                   this is normal here ! [vszakats] */
-         ulRead = hb_fsReadLarge( hb_parnl( 1 ), ( BYTE * ) hb_parcx( 2 ) + ulOffset, ulRead );
+
+         /* Unshare the item to avoid GPF on static buffers and changing
+            other items which shares this buffer. [druzus] */
+         pBuffer = hb_itemUnShare( pBuffer );
+
+         ulRead = hb_fsReadLarge( hb_parnl( 1 ),
+                     ( BYTE * ) hb_itemGetCPtr( pBuffer ) + ulOffset, ulRead );
       }
       else
       {

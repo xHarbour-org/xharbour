@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.54 2005/09/02 18:25:02 druzus Exp $
+# $Id: hb-func.sh,v 1.55 2005/09/07 14:19:44 lf_sfnet Exp $
 #
 
 # ---------------------------------------------------------------
@@ -260,8 +260,14 @@ esac
 
 SYSTEM_LIBS="${HB_SYS_LIBS}"
 # use pthread system library for MT programs
-if [ "\${HB_MT}" = "MT" ] && [ "\${HB_ARCHITECTURE}" = "linux" ]; then
-    SYSTEM_LIBS="-lpthread \${SYSTEM_LIBS}"
+if [ "\${HB_MT}" = "MT" ]; then
+    case "\${HB_ARCHITECTURE}" in
+        dos|w32|os2)
+            ;;
+        *)
+            SYSTEM_LIBS="-lpthread \${SYSTEM_LIBS}"
+            ;;
+    esac
 fi
 
 HB_GT_STAT=""

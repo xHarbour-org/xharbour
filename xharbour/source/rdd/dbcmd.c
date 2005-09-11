@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.163 2005/08/23 10:59:03 druzus Exp $
+ * $Id: dbcmd.c,v 1.164 2005/09/02 18:29:54 druzus Exp $
  */
 
 /*
@@ -306,6 +306,7 @@ static RDDFUNCS waTable = { hb_waBof,
                             hb_waPutValueFile,
                             hb_waReadDBHeader,
                             hb_waWriteDBHeader,
+                            hb_rddInit,
                             hb_rddExit,
                             hb_rddDrop,
                             hb_rddExists,
@@ -405,6 +406,11 @@ static int hb_rddRegister( char * szDriver, USHORT uiType )
       s_RddList = (LPRDDNODE *) hb_xrealloc( s_RddList, sizeof(LPRDDNODE) * ( s_uiRddMax + 1 ) );
 
    s_RddList[ s_uiRddMax++ ] = pRddNewNode;   /* Add the new RDD node */
+
+   if ( pRddNewNode->pTable.init != NULL )
+   {
+      SELF_INIT( pRddNewNode );
+   }
 
    return 0;                           /* Ok */
 }
@@ -751,7 +757,7 @@ void HB_EXPORT hb_rddShutDown( void )
       {
          if ( s_RddList[ uiCount ]->pTable.exit != NULL )
          {
-           SELF_EXIT( s_RddList[ uiCount ] );
+            SELF_EXIT( s_RddList[ uiCount ] );
          }
          hb_xfree( s_RddList[ uiCount ] );
       }
@@ -1713,7 +1719,8 @@ HB_FUNC( DBCREATE )
    fKeepOpen = ISLOG( 4 );
    fCurrArea = fKeepOpen && !hb_parl( 4 );
 
-   if( !pStruct || !szFileName || !szFileName[ 0 ] )
+   if( !pStruct || hb_arrayLen( pStruct ) == 0 ||
+       !szFileName || !szFileName[ 0 ] )
    {
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE" );
       return;
@@ -4060,8 +4067,7 @@ static ERRCODE hb_dbTransStruct( AREAP lpaSource, AREAP lpaDest,
       {
          PHB_ITEM pItem = hb_itemNew( NULL );
          uiSize = 0;
-         uiFields = HB_MIN( uiSizeDst, uiSizeSrc );
-         for( uiCount = 1; uiCount <= uiFields; ++uiCount )
+         for( uiCount = 1; uiCount <= uiSizeSrc; ++uiCount )
          {
             SELF_FIELDINFO( lpaSource, uiCount, DBS_NAME, pItem );
             szField = hb_itemGetCPtr( pItem );

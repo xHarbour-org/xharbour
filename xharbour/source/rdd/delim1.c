@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.10 2005/08/01 22:19:47 druzus Exp $
+ * $Id: delim1.c,v 1.11 2005/08/23 10:59:03 druzus Exp $
  */
 
 /*
@@ -177,6 +177,7 @@ static RDDFUNCS delimTable = { hb_delimBof,
                                hb_delimPutValueFile,
                                hb_delimReadDBHeader,
                                hb_delimWriteDBHeader,
+                               hb_delimInit,
                                hb_delimExit,
                                hb_delimDrop,
                                hb_delimExists,

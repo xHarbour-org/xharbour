@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.31 2005/02/14 21:14:01 druzus Exp $
+ * $Id: hbset.h,v 1.32 2005/03/06 23:43:20 andijahja Exp $
  */
 
 /*
@@ -236,13 +236,6 @@ typedef struct
 #define HB_SET_TRACESTACK_NONE    0
 #define HB_SET_TRACESTACK_CURRENT 1
 #define HB_SET_TRACESTACK_ALL     2
-
-#define HB_SET_DBFLOCK_DEFAULT    0
-#define HB_SET_DBFLOCK_CLIP       1
-#define HB_SET_DBFLOCK_CL53       2
-#define HB_SET_DBFLOCK_VFP        3
-#define HB_SET_DBFLOCK_CL53EXT    4
-#define HB_SET_DBFLOCK_XHB64      5
 
 // extern HB_EXPORT HB_SET_STRUCT hb_set;
 extern HB_SET_STRUCT hb_set;

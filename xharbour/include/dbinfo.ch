@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.18 2005/08/23 10:59:02 druzus Exp $
+ * $Id: dbinfo.ch,v 1.19 2005/09/02 18:29:21 druzus Exp $
  */
 
 /*
@@ -95,9 +95,10 @@
 
 /* memo parameters */
 #define RDDI_MEMOBLOCKSIZE        32   /* Memo File's block size */
-#define RDDI_MEMOGCTYPE           33   /* type of garbage collector used by GC */
-#define RDDI_MEMOREADLOCK         34   /* use read lock in memo file access */
-#define RDDI_MEMOREUSE            35   /* reuse free space on write */
+#define RDDI_MEMOVERSION          33   /* sub version of memo file */
+#define RDDI_MEMOGCTYPE           34   /* type of garbage collector used by GC */
+#define RDDI_MEMOREADLOCK         35   /* use read lock in memo file access */
+#define RDDI_MEMOREUSE            36   /* reuse free space on write */
 
 
 /*
@@ -260,6 +261,8 @@
 #define DBI_ISENCRYPTED         132  /* The database is encrypted */
 #define DBI_MEMOTYPE            133  /* Type of MEMO file: DBT, SMT, FPT */
 #define DBI_SEPARATOR           134  /* The record separator (as a string) */
+#define DBI_MEMOVERSION         135  /* sub version of memo file */
+#define DBI_TABLETYPE           136   /* Type of table file */
 
 /* RECORD MAP (RM) support */
 #define DBI_RM_SUPPORTED        150  /* has WA RDD record map support? */
@@ -301,5 +304,34 @@
 
 #define BLOB_EXPORT_APPEND      1
 #define BLOB_EXPORT_OVERWRITE   0
+
+/* DBF TYPES */
+#define DB_DBF_STD            0
+#define DB_DBF_VFP            1
+
+/* MEMO TYPES */
+#define DB_MEMO_NONE          0
+#define DB_MEMO_DBT           1
+#define DB_MEMO_FPT           2
+#define DB_MEMO_SMT           3
+
+/* MEMO EXTENDED TYPES */
+#define DB_MEMOVER_STD        1
+#define DB_MEMOVER_SIX        2
+#define DB_MEMOVER_FLEX       3
+#define DB_MEMOVER_CLIP       4
+
+/* ENCRYPTION TYPE */
+#define DB_CRYPT_NONE         0
+#define DB_CRYPT_SIX          1
+
+/* LOCK SCHEMES */
+#define DB_DBFLOCK_DEFAULT    0
+#define DB_DBFLOCK_CLIP       1
+#define DB_DBFLOCK_CL53       2
+#define DB_DBFLOCK_VFP        3
+#define DB_DBFLOCK_CL53EXT    4
+#define DB_DBFLOCK_XHB64      5
+
 
 #endif /* HB_DBINFO_CH_ */

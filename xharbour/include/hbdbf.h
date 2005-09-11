@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbf.h,v 1.7 2004/11/21 21:43:37 druzus Exp $
+ * $Id: hbdbf.h,v 1.8 2005/03/31 03:15:18 druzus Exp $
  */
 
 /*
@@ -98,6 +98,20 @@ typedef struct _DBFFIELD
 } DBFFIELD;
 
 typedef DBFFIELD * LPDBFFIELD;
+
+
+
+/* SMT MEMO field */
+
+typedef struct _SMTFIELD
+{
+   BYTE     type[2];
+   BYTE     length[4];
+   BYTE     block[4];
+} SMTFIELD;
+
+typedef SMTFIELD * LPSMTFIELD;
+
 
 HB_EXTERN_END
 

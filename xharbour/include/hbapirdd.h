@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.32 2005/08/06 19:39:44 druzus Exp $
+ * $Id: hbapirdd.h,v 1.33 2005/08/23 10:59:02 druzus Exp $
  */
 
 /*
@@ -736,6 +736,7 @@ typedef struct _RDDFUNCS
 
 
    /* non WorkArea functions       */
+   DBENTRYP_R    init;              /* init RDD after registration */
    DBENTRYP_R    exit;              /* unregister RDD */
    DBENTRYP_RVV  drop;              /* remove table */
    DBENTRYP_RVV  exists;            /* check if table exist */
@@ -922,6 +923,7 @@ typedef RDDNODE * LPRDDNODE;
 #define SELF_RDDNODE(w)                 hb_rddGetNode((w)->rddID)
 
 /* non WorkArea functions */
+#define SELF_INIT(r)                    ((*(r)->pTable.init)(r))
 #define SELF_EXIT(r)                    ((*(r)->pTable.exit)(r))
 #define SELF_DROP(r, it, ii)            ((*(r)->pTable.drop)(r, it, ii))
 #define SELF_EXISTS(r, it, ii)          ((*(r)->pTable.exists)(r, it, ii))
@@ -1083,10 +1085,14 @@ typedef RDDNODE * LPRDDNODE;
 #define SUPER_TABLEEXT(w, fp)           ((*(SUPERTABLE)->info)(w, DBI_TABLEEXT, fp))
 
 /* non WorkArea functions */
+#define SUPER_INIT(r)                   ((*(SUPERTABLE)->init)(r))
 #define SUPER_EXIT(r)                   ((*(SUPERTABLE)->exit)(r))
 #define SUPER_DROP(r, it, ii)           ((*(SUPERTABLE)->drop)(r, it, ii))
 #define SUPER_EXISTS(r, it, ii)         ((*(SUPERTABLE)->exists)(r, it, ii))
 #define SUPER_RDDINFO(r, i, l, g)       ((*(SUPERTABLE)->rddInfo)(r, i, l, g))
+
+#define ISSUPER_INIT(r)                 ((SUPERTABLE)->init != NULL)
+#define ISSUPER_EXIT(r)                 ((SUPERTABLE)->exit != NULL)
 
 /*
  *  PROTOTYPES

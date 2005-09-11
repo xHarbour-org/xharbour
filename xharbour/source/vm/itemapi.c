@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.116 2005/07/17 00:10:20 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.117 2005/07/17 18:29:14 ronpinkas Exp $
  */
 
 /*
@@ -1285,6 +1285,40 @@ PHB_ITEM HB_EXPORT hb_itemUnRefOnce( PHB_ITEM pItem )
 
    return pItem;
 }
+
+/* Internal API, not standard Clipper */
+/* De-references item passed by the reference */
+
+PHB_ITEM HB_EXPORT hb_itemUnShare( PHB_ITEM pItem )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemUnShare(%p)", pItem));
+
+   if( HB_IS_BYREF( pItem ) )
+   {
+      pItem = hb_itemUnRef( pItem );
+   }
+
+   if( HB_IS_STRING( pItem ) )
+   {
+      if( pItem->item.asString.bStatic || *( pItem->item.asString.pulHolders ) > 1 )
+      {
+         char *sString = ( char* ) hb_xgrab( pItem->item.asString.length + 1 );
+
+         memcpy( sString, pItem->item.asString.value, pItem->item.asString.length + 1 );
+         if( !pItem->item.asString.bStatic )
+         {
+            --*( pItem->item.asString.pulHolders );
+         }
+         pItem->item.asString.value = sString;
+         pItem->item.asString.bStatic = FALSE;
+         pItem->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+         *( pItem->item.asString.pulHolders ) = 1;
+      }
+   }
+
+   return pItem;
+}
+
 
 /* Internal API, not standard Clipper */
 

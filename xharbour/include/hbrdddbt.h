@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbt.h,v 1.8 2005/08/01 22:17:34 druzus Exp $
+ * $Id: hbrdddbt.h,v 1.9 2005/08/23 10:59:03 druzus Exp $
  */
 
 /*
@@ -183,8 +183,9 @@ static ERRCODE hb_dbtCreateMemFile( DBTAREAP pArea, LPDBOPENINFO pCreateInfo );
 #define hb_dbtGetValueFile                         NULL
 static ERRCODE hb_dbtOpenMemFile( DBTAREAP pArea, LPDBOPENINFO pOpenInfo );
 #define hb_dbtPutValueFile                         NULL
-static ERRCODE hb_dbtReadDBHeader( DBTAREAP pArea );
-static ERRCODE hb_dbtWriteDBHeader( DBTAREAP pArea );
+#define hb_dbtReadDBHeader                         NULL
+#define hb_dbtWriteDBHeader                        NULL
+#define hb_dbtInit                                 NULL
 #define hb_dbtExit                                 NULL
 #define hb_dbtDrop                                 NULL
 #define hb_dbtExists                               NULL
