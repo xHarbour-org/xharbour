@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.50 2005/08/31 14:32:39 mauriliolongo Exp $
+ * $Id: regex.c,v 1.51 2005/09/02 18:30:41 druzus Exp $
  */
 
 /*
@@ -147,6 +147,9 @@ HB_EXPORT BOOL hb_regexGet( PHB_REGEX pRegEx, PHB_ITEM pRegExItm, int iCFlags, i
       {
          pRegEx->pReg = (regex_t *) ( szRegEx + HB_ALLOC_ALIGNMENT );
          pRegEx->pReg->re_pcre = (pcre *) ( ( BYTE * ) pRegEx->pReg + sizeof( regex_t ) );
+         pRegEx->fFree   = FALSE;
+         pRegEx->iCFlags = REG_EXTENDED | iCFlags;
+         pRegEx->iEFlags = iEFlags;
          fResult = TRUE;
       }
       else
