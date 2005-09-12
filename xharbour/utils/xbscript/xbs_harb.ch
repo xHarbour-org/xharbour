@@ -2197,7 +2197,6 @@
 
               pDynSym->pSymbol->value.pFunPtr = (PHB_FUNC) pDynFunc;
               pDynSym->pSymbol->cScope |= HB_FS_PCODEFUNC;
-              pDynSym->pFunPtr = (PHB_FUNC) pDynFunc;
            }
 
            //hb_retptr( (void *) pDynList );
@@ -2249,7 +2248,6 @@
               {
                  pDynList[i].pDynSym->pSymbol->value.pFunPtr = pDynList[i].pPresetFunc ;
                  pDynList[i].pDynSym->pSymbol->cScope = pDynList[i].cPresetScope ;
-                 pDynList[i].pDynSym->pFunPtr = pDynList[i].pPresetFunc ;
               }
               else
               {
