@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.80 2005/09/02 18:22:54 druzus Exp $
+# $Id: xharbour.spec,v 1.81 2005/09/11 19:38:03 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -222,7 +222,7 @@ dos programas.
 Summary:        Clipper/Harbour/xBase compatible Pre-Processor, DOT prompt and interpreter
 Summary(pl):    Kompatybilny z Clipper/Harbour/xBase Preprocesor i interpreter
 Summary(ru):    Совместимый с Clipper/Harbour/xBase препроцессор и интерпретатор
-Copyright:      GPL
+License:        GPL
 Group:          Development/Languages
 Requires:       %{name} = %{version}
 
