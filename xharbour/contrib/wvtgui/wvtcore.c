@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.3 2005/05/09 18:34:26 vouchcac Exp $
+ * $Id: wvtcore.c,v 1.4 2005/07/22 17:23:21 lculik Exp $
  */
 
 /*
@@ -1472,6 +1472,10 @@ HB_FUNC( WVT_DRAWLINEEX )
          if ( iFormat == 0 || iFormat == 1 )  // Raised/Recessd
          {
             y = iBottom - 1;
+         }
+         else
+         {
+            y = iBottom;
          }
       }
       break;

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.20 2005/08/01 16:09:57 bdj Exp $
+ * $Id: gtwvw.c,v 1.21 2005/08/30 16:46:40 bdj Exp $
  */
 
 /*
@@ -12332,6 +12332,10 @@ HB_FUNC( WVW_DRAWLINEEX )
          if ( iFormat == 0 || iFormat == 1 )  /* Raised/Recessd */
          {
             y = iBottom - 1;
+         }
+         else
+         {
+            y = iBottom;
          }
       }
       break;

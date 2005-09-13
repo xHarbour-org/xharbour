@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4313 2005/09/12 16:54:49 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4314 2005/09/13 01:48:05 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-13 23:25 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+  * contrib/wvtgui/wvtcore.c
+    ! Missing code fixed in wv*_drawlineex(),
+      Thanks to Anatole Kolotovkin.
 
 2005-09-13 03:46 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/rdd_ads/ads1.c
@@ -278,8 +284,8 @@
 2005-09-07 16:30 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * bin/bld.bat
     ! added pcrepos to mingw32 and cleaned the lib list
-	 ! added lib codepage to OpenWatcom DOS and W32
-	 ! added gtwvt in case of HB_MULTI_GT
+    ! added lib codepage to OpenWatcom DOS and W32
+    ! added gtwvt in case of HB_MULTI_GT
   * bin/hb-func.sh
     ! link libpthread only in linux architecture
 
@@ -452,9 +458,9 @@
       and should be used to implement vertical scope instead of these
       functions.
         ordRelKeyPos() called without parameters returns current position
-	in index (table) file in the range 0.0 to 1.0
-	ordRelKeyPos( <nPos> ) sets new position in index (table) file.
-	<nPos> should be in range 0.0 to 1.0
+   in index (table) file in the range 0.0 to 1.0
+   ordRelKeyPos( <nPos> ) sets new position in index (table) file.
+   <nPos> should be in range 0.0 to 1.0
 
   * xharbour/source/rdd/workarea.c
     ! fixed typo in HB_TRACE message
@@ -488,13 +494,13 @@
 
   * xharbour/source/rtl/regex.c
     + added basic xHarbour RegEx functions
-	BOOL hb_regexCompile( PHB_REGEX pRegEx, const char *szRegEx,
-			     int iCFlags, int iEFlags );
-	BOOL hb_regexGet( PHB_REGEX pRegEx, PHB_ITEM pRegExItm,
-			  int iCFlags, int iEFlags );
-	void hb_regexFree( PHB_REGEX pRegEx );
-	BOOL hb_regexMatch( PHB_REGEX pRegEx, const char *szString,
-			    BOOL fFull );
+   BOOL hb_regexCompile( PHB_REGEX pRegEx, const char *szRegEx,
+              int iCFlags, int iEFlags );
+   BOOL hb_regexGet( PHB_REGEX pRegEx, PHB_ITEM pRegExItm,
+           int iCFlags, int iEFlags );
+   void hb_regexFree( PHB_REGEX pRegEx );
+   BOOL hb_regexMatch( PHB_REGEX pRegEx, const char *szString,
+             BOOL fFull );
       This is very basic set of function which allow to eliminate all
       direct regex_t access in xHarbour core code. I will work on it
       in the future adding missing functionality and eliminating POISX
