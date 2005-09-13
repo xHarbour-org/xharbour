@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.73 2005/09/02 18:29:03 druzus Exp $
+ * $Id: ads1.c,v 1.74 2005/09/11 19:39:11 druzus Exp $
  */
 
 /*
@@ -1872,12 +1872,6 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          called for EACH FIELD as it is assigned a value.
 
     --------------------------------------------------*/
-   if( bTestRecLocks )
-   {
-      if( ! hb_adsCheckLock( pArea ) == SUCCESS )
-         return FAILURE;
-   }
-
    /* resolve any pending relations */
    if( pArea->lpdbPendingRel )
       SELF_FORCEREL( ( AREAP ) pArea );
@@ -1886,6 +1880,12 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    {
       /* TODO: it should return SUCCESS for Clipper compatibility */
       return FAILURE;
+   }
+
+   if( bTestRecLocks )
+   {
+      if( ! hb_adsCheckLock( pArea ) == SUCCESS )
+         return FAILURE;
    }
 
    pField = pArea->lpFields + uiIndex - 1;
@@ -3950,12 +3950,71 @@ static ERRCODE adsUnLock( ADSAREAP pArea, PHB_ITEM pRecNo )
 #define  adsCloseMemFile          NULL
 #define  adsCreateMemFile         NULL
 
-/* TODO: implement it */
-#define  adsGetValueFile          NULL
+static ERRCODE adsGetValueFile( ADSAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode )
+{
+   UNSIGNED32 u32RetVal = 0;
+
+   HB_TRACE(HB_TR_DEBUG, ("adsGetValueFile(%p, %hu, %s, %hu)", pArea, uiIndex, szFile, uiMode));
+
+   HB_SYMBOL_UNUSED( uiMode );
+
+   if( !uiIndex || uiIndex > pArea->uiFieldCount )
+      return FAILURE;
+
+   /* resolve any pending relations */
+   if( pArea->lpdbPendingRel )
+      SELF_FORCEREL( ( AREAP ) pArea );
+
+   if( !pArea->fPositioned )
+      return SUCCESS;
+
+   u32RetVal = AdsBinaryToFile( pArea->hTable, ADSFIELD( uiIndex ),
+                                ( UNSIGNED8* ) szFile );
+   if( u32RetVal != AE_SUCCESS )
+   {
+      /* commonError( pArea, EG_READ, ( USHORT ) u32RetVal, NULL, 0 ); */
+      return FAILURE;
+   }
+   return SUCCESS;
+}
+
 #define  adsOpenMemFile           NULL
 
-/* TODO: implement it */
-#define  adsPutValueFile          NULL
+static ERRCODE adsPutValueFile( ADSAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode )
+{
+   UNSIGNED32 u32RetVal = 0;
+
+   HB_TRACE(HB_TR_DEBUG, ("adsPutValueFile(%p, %hu, %s, %hu)", pArea, uiIndex, szFile, uiMode));
+
+   if( !uiIndex || uiIndex > pArea->uiFieldCount )
+      return FAILURE;
+
+   /* resolve any pending relations */
+   if( pArea->lpdbPendingRel )
+      SELF_FORCEREL( ( AREAP ) pArea );
+
+   if( !pArea->fPositioned )
+      return SUCCESS;
+
+   if( bTestRecLocks )
+   {
+      if( ! hb_adsCheckLock( pArea ) == SUCCESS )
+         return FAILURE;
+   }
+
+   if( uiMode != ADS_BINARY && uiMode != ADS_IMAGE )
+      uiMode = ADS_BINARY;
+
+   u32RetVal = AdsFileToBinary( pArea->hTable, ADSFIELD( uiIndex ), uiMode,
+                                ( UNSIGNED8* ) szFile );
+   if( u32RetVal != AE_SUCCESS )
+   {
+      commonError( pArea, EG_WRITE, ( USHORT ) u32RetVal, NULL, 0 );
+      return FAILURE;
+   }
+   return SUCCESS;
+}
+
 #define  adsReadDBHeader          NULL
 #define  adsWriteDBHeader         NULL
 
@@ -4251,7 +4310,7 @@ static RDDFUNCS adsTable = { ( DBENTRYP_BP ) adsBof,
                              ( DBENTRYP_VP ) adsCreateMemFile,
                              ( DBENTRYP_SVPB ) adsGetValueFile,
                              ( DBENTRYP_VP ) adsOpenMemFile,
-                             ( DBENTRYP_SVP ) adsPutValueFile,
+                             ( DBENTRYP_SVPB ) adsPutValueFile,
                              ( DBENTRYP_V ) adsReadDBHeader,
                              ( DBENTRYP_V ) adsWriteDBHeader,
                              ( DBENTRYP_R ) adsInit,

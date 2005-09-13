@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.126 2005/09/02 18:30:28 druzus Exp $
+ * $Id: dbfntx1.c,v 1.127 2005/09/11 19:40:48 druzus Exp $
  */
 
 /*
@@ -5700,8 +5700,7 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                         }
                      }
                   }
-                  hb_ntxKeyFree( pTag->CurKeyInfo );
-                  pTag->CurKeyInfo = pKey;
+                  hb_ntxKeyFree( pKey );
                }
                if( fLck )
                {

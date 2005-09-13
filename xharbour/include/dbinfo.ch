@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.19 2005/09/02 18:29:21 druzus Exp $
+ * $Id: dbinfo.ch,v 1.20 2005/09/11 19:39:31 druzus Exp $
  */
 
 /*
@@ -304,6 +304,15 @@
 
 #define BLOB_EXPORT_APPEND      1
 #define BLOB_EXPORT_OVERWRITE   0
+
+#define BLOB_IMPORT_COMPRESS    1
+#define BLOB_IMPORT_ENCRYPT     2
+
+#define FILEGET_APPEND          BLOB_EXPORT_APPEND
+#define FILEGET_OVERWRITE       BLOB_EXPORT_OVERWRITE
+
+#define FILEPUT_COMPRESS        BLOB_IMPORT_COMPRESS
+#define FILEPUT_ENCRYPT         BLOB_IMPORT_ENCRYPT
 
 /* DBF TYPES */
 #define DB_DBF_STD            0

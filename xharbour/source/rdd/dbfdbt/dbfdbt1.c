@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.26 2005/08/23 10:59:03 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.27 2005/09/11 19:40:22 druzus Exp $
  */
 
 /*
@@ -199,7 +199,7 @@ static RDDFUNCS dbtTable =
    ( DBENTRYP_VP )    hb_dbtCreateMemFile,
    ( DBENTRYP_SVPB )  hb_dbtGetValueFile,
    ( DBENTRYP_VP )    hb_dbtOpenMemFile,
-   ( DBENTRYP_SVP )   hb_dbtPutValueFile,
+   ( DBENTRYP_SVPB )  hb_dbtPutValueFile,
 
 
    /* Database file header handling */
@@ -791,7 +791,7 @@ static ERRCODE hb_dbtOpenMemFile( DBTAREAP pArea, LPDBOPENINFO pOpenInfo )
    return ( pArea->hMemoFile == FS_ERROR ? FAILURE : SUCCESS );
 }
 
-/* ( DBENTRYP_SVP )   hb_dbtPutValueFile    : NULL */
+/* ( DBENTRYP_SVPB )  hb_dbtPutValueFile    : NULL */
 
 /*
  * Retrieve (set) information about RDD

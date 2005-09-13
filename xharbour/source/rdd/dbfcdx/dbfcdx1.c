@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.216 2005/09/02 18:30:13 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.217 2005/09/11 19:40:06 druzus Exp $
  */
 
 /*
@@ -268,7 +268,7 @@ static RDDFUNCS cdxTable =
    ( DBENTRYP_VP )    hb_cdxCreateMemFile,
    ( DBENTRYP_SVPB )  hb_cdxGetValueFile,
    ( DBENTRYP_VP )    hb_cdxOpenMemFile,
-   ( DBENTRYP_SVP )   hb_cdxPutValueFile,
+   ( DBENTRYP_SVPB )  hb_cdxPutValueFile,
 
 
    /* Database file header handling */
@@ -8180,7 +8180,7 @@ static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo )
 /* ( DBENTRYP_VP )    hb_cdxCreateMemFile   : NULL */
 /* ( DBENTRYP_SVPB )  hb_cdxGetValueFile    : NULL */
 /* ( DBENTRYP_VP )    hb_cdxOpenMemFile     : NULL */
-/* ( DBENTRYP_SVP )   hb_cdxPutValueFile    : NULL */
+/* ( DBENTRYP_SVPB )  hb_cdxPutValueFile    : NULL */
 
 /* ( DBENTRYP_V )     hb_cdxReadDBHeader    : NULL */
 /* ( DBENTRYP_V )     hb_cdxWriteDBHeader   : NULL */

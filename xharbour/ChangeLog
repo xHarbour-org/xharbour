@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4312 2005/09/12 07:39:45 druzus Exp $
+ * $Id: ChangeLog,v 1.4313 2005/09/12 16:54:49 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,45 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-13 03:46 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+    + added GETVALUEFILE() and PUTVALUEFILE() methods - now ADS*
+      RDDs works with dbFileGet()/dbFilePut() functions
+
+  * xharbour/include/dbinfo.ch
+    + added some missing CL5.3 and SIX3 like declarations:
+      FILEGET_APPEND, FILEGET_OVERWRITE, FILEPUT_COMPRESS, FILEPUT_ENCRYPT
+
+  * xharbour/include/hbapirdd.h
+  * xharbour/include/hbrddwrk.h
+    + added 3-rd parameter to PUTVALUEFILE()
+
+  * xharbour/include/hbrdddbf.h
+  * xharbour/source/rdd/dbf1.c
+    + added GETVALUEFILE() and PUTVALUEFILE() methods to DBF RDD - strange
+      but CL5.3 can use PUTVALUEFILE with "C" type fields
+    + added support for {"D", 4, 0} fields
+
+  * xharbour/include/hbrddfpt.h
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    + added GETVALUEFILE() and PUTVALUEFILE() methods - now
+      dbFileGet()/dbFilePut() functions can be used with DBT, FPT and SMT
+      files
+
+  * xharbour/source/rdd/dbcmd.c
+    + added 3-rd parameter to PUTVALUEFILE()
+    + accept also filed name in dbFileGet()/dbFilePut()
+
+  * xharbour/source/rdd/workarea.c
+    + added support for {"D", 4, 0} fields
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+    * updated for PUTVALUEFILE() modifications
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! fixed bug in positioning after record update
 
 2005-09-12 09:54 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbs_harb.ch

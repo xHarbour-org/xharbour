@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddwrk.h,v 1.6 2005/08/23 10:59:03 druzus Exp $
+ * $Id: hbrddwrk.h,v 1.7 2005/09/11 19:39:32 druzus Exp $
  */
 
 /*
@@ -153,7 +153,7 @@ extern ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock );
 #define hb_waCreateMemFile                  ( DBENTRYP_VP ) hb_waUnsupported
 #define hb_waGetValueFile                 ( DBENTRYP_SVPB ) hb_waUnsupported
 #define hb_waOpenMemFile                    ( DBENTRYP_VP ) hb_waUnsupported
-#define hb_waPutValueFile                  ( DBENTRYP_SVP ) hb_waUnsupported
+#define hb_waPutValueFile                 ( DBENTRYP_SVPB ) hb_waUnsupported
 #define hb_waReadDBHeader                                   hb_waUnsupported
 #define hb_waWriteDBHeader                                  hb_waUnsupported
 

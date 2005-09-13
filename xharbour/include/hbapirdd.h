@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.33 2005/08/23 10:59:02 druzus Exp $
+ * $Id: hbapirdd.h,v 1.34 2005/09/11 19:39:31 druzus Exp $
  */
 
 /*
@@ -583,7 +583,7 @@ typedef USHORT ( * DBENTRYP_S    )( AREAP area, USHORT param );
 typedef USHORT ( * DBENTRYP_LP   )( AREAP area, LONG * param );
 typedef USHORT ( * DBENTRYP_ULP  )( AREAP area, ULONG * param );
 typedef USHORT ( * DBENTRYP_SVP  )( AREAP area, USHORT index, void * param );
-typedef USHORT ( * DBENTRYP_SVPB )( AREAP area, USHORT index, void * param, BOOL p3 );
+typedef USHORT ( * DBENTRYP_SVPB )( AREAP area, USHORT index, void * param, USHORT p3 );
 typedef USHORT ( * DBENTRYP_VSP  )( AREAP area, USHORT action, ULONG lRecord );
 typedef USHORT ( * DBENTRYP_SVL  )( AREAP area, USHORT index, ULONG * param );
 typedef USHORT ( * DBENTRYP_SSI  )( AREAP area, USHORT p1, USHORT p2, PHB_ITEM p3 );
@@ -726,7 +726,7 @@ typedef struct _RDDFUNCS
    DBENTRYP_VP   createMemFile;     /* Create a memo file in the WorkArea. */
    DBENTRYP_SVPB getValueFile;      /*  */
    DBENTRYP_VP   openMemFile;       /* Open a memo file in the specified WorkArea. */
-   DBENTRYP_SVP  putValueFile;      /*  */
+   DBENTRYP_SVPB putValueFile;      /*  */
 
 
    /* Database file header handling */
@@ -900,9 +900,9 @@ typedef RDDNODE * LPRDDNODE;
 
 #define SELF_CLOSEMEMFILE(w)            ((*(w)->lprfsHost->closeMemFile)(w))
 #define SELF_CREATEMEMFILE(w,bp)        ((*(w)->lprfsHost->createMemFile)(w,bp))
-#define SELF_GETVALUEFILE(w,i,bp,b)     ((*(w)->lprfsHost->getValueFile)(w,i,bp,b))
+#define SELF_GETVALUEFILE(w,i,bp,u)     ((*(w)->lprfsHost->getValueFile)(w,i,bp,u))
 #define SELF_OPENMEMFILE(w,bp)          ((*(w)->lprfsHost->openMemFile)(w,bp))
-#define SELF_PUTVALUEFILE(w,i,bp)       ((*(w)->lprfsHost->putValueFile)(w,i,bp))
+#define SELF_PUTVALUEFILE(w,i,bp,u)     ((*(w)->lprfsHost->putValueFile)(w,i,bp,u))
 
 
 /* Database file header handling */
@@ -1064,9 +1064,9 @@ typedef RDDNODE * LPRDDNODE;
 
 #define SUPER_CLOSEMEMFILE(w)           ((*(SUPERTABLE)->closeMemFile)(w))
 #define SUPER_CREATEMEMFILE(w,bp)       ((*(SUPERTABLE)->createMemFile)(w,bp))
-#define SUPER_GETVALUEFILE(w,i,bp,b)    ((*(SUPERTABLE)->getValueFile)(w,i,bp,b))
+#define SUPER_GETVALUEFILE(w,i,bp,u)    ((*(SUPERTABLE)->getValueFile)(w,i,bp,u))
 #define SUPER_OPENMEMFILE(w,bp)         ((*(SUPERTABLE)->openMemFile)(w,bp))
-#define SUPER_PUTVALUEFILE(w,i,bp)      ((*(SUPERTABLE)->putValueFile)(w,i,bp))
+#define SUPER_PUTVALUEFILE(w,i,bp,u)    ((*(SUPERTABLE)->putValueFile)(w,i,bp,u))
 
 
 /* Database file header handling */

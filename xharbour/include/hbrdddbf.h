@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.22 2005/09/02 18:29:21 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.23 2005/09/11 19:39:32 druzus Exp $
  */
 
 /*
@@ -312,9 +312,10 @@ static ERRCODE hb_dbfLock( DBFAREAP pArea, LPDBLOCKINFO pLockInfo );
 static ERRCODE hb_dbfUnLock( DBFAREAP pArea, PHB_ITEM pRecNo );
 #define hb_dbfCloseMemFile                         NULL
 static ERRCODE hb_dbfCreateMemFile( DBFAREAP pArea, LPDBOPENINFO pCreateInfo );
-#define hb_dbfGetValueFile                         NULL
+static ERRCODE hb_dbfGetValueFile( DBFAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode );
 static ERRCODE hb_dbfOpenMemFile( DBFAREAP pArea, LPDBOPENINFO pOpenInfo );
-#define hb_dbfPutValueFile                         NULL
+static ERRCODE hb_dbfPutValueFile( DBFAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode );
+
 static ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea );
 static ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea );
 

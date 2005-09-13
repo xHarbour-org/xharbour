@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.128 2005/09/02 18:29:55 druzus Exp $
+ * $Id: dbf1.c,v 1.129 2005/09/11 19:39:49 druzus Exp $
  */
 
 /*
@@ -193,7 +193,7 @@ static RDDFUNCS dbfTable = { ( DBENTRYP_BP ) hb_dbfBof,
                              ( DBENTRYP_VP ) hb_dbfCreateMemFile,
                              ( DBENTRYP_SVPB ) hb_dbfGetValueFile,
                              ( DBENTRYP_VP ) hb_dbfOpenMemFile,
-                             ( DBENTRYP_SVP ) hb_dbfPutValueFile,
+                             ( DBENTRYP_SVPB ) hb_dbfPutValueFile,
                              ( DBENTRYP_V ) hb_dbfReadDBHeader,
                              ( DBENTRYP_V ) hb_dbfWriteDBHeader,
                              ( DBENTRYP_R ) hb_dbfInit,
@@ -220,7 +220,7 @@ static void hb_dbfSetBlankRecord( DBFAREAP pArea )
       USHORT uiLen = pField->uiLen;
 
       if( ( pField->uiType == HB_IT_MEMO && uiLen == 4 ) ||
-          ( pField->uiType == HB_IT_DATE && uiLen == 3 ) ||
+          ( pField->uiType == HB_IT_DATE && uiLen <= 4 ) ||
           pField->uiType == HB_IT_INTEGER ||
           pField->uiType == HB_IT_DOUBLE )
       {
@@ -1365,6 +1365,10 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
             hb_itemPutDL( pItem, HB_GET_LE_UINT24( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ) );
          }
+         else if( pField->uiLen == 4 )
+         {
+            hb_itemPutDL( pItem, HB_GET_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ) );
+         }
          else
          {
             char szBuffer[ 9 ];
@@ -1557,6 +1561,18 @@ static ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer )
 
       /* Copy data to buffer */
       memcpy( pArea->pRecord, pBuffer, pArea->uiRecordLen );
+
+      /* TODO: what should be default ? */
+#if 0
+      pArea->fEncrypted = ( pArea->pRecord[ 0 ] == 'D' ||
+                            pArea->pRecord[ 0 ] == 'E' );
+      pArea->fDeleted = pArea->fEncrypted ? pArea->pRecord[ 0 ] == 'D' :
+                                            pArea->pRecord[ 0 ] == '*';
+#else
+      pArea->pRecord[ 0 ] = pArea->fEncrypted ?
+                            ( pArea->fDeleted ? 'D' : 'E' ) :
+                            ( pArea->fDeleted ? '*' : ' ' );
+#endif
    }
    else /* if( pArea->fRecordChanged ) */
    {
@@ -1647,6 +1663,11 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             if( pField->uiLen == 3 )
             {
                HB_PUT_LE_UINT24( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
+                                 hb_itemGetDL( pItem ) );
+            }
+            else if( pField->uiLen == 4 )
+            {
+               HB_PUT_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
                                  hb_itemGetDL( pItem ) );
             }
             else
@@ -1769,8 +1790,6 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
      /* return FAILURE; */
    }
 
-   /* Update deleted flag */
-   pArea->pRecord[ 0 ] = pArea->fDeleted ? '*' : ' ';
    return SUCCESS;
 }
 
@@ -2771,7 +2790,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
 
          case 'D':
             pFieldInfo.uiType = HB_IT_DATE;
-            if( pFieldInfo.uiLen != 3 )
+            if( pFieldInfo.uiLen != 3 && pFieldInfo.uiLen != 4 )
                pFieldInfo.uiLen = 8;
             break;
 
@@ -3550,6 +3569,75 @@ static ERRCODE hb_dbfCreateMemFile( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    return FAILURE;
 }
 
+/* 
+ * BLOB2FILE - retrieve memo contents into file
+ */
+static ERRCODE hb_dbfGetValueFile( DBFAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode )
+{
+   USHORT uiError = SUCCESS;
+   LPFIELD pField;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfGetValueFile(%p, %hu, %s, %hu)", pArea, uiIndex, szFile, uiMode));
+
+   if( pArea->lpdbPendingRel )
+      SELF_FORCEREL( ( AREAP ) pArea );
+
+   /* Read record */
+   if( !pArea->fValidBuffer && !hb_dbfReadRecord( pArea ) )
+      return FAILURE;
+
+   if( --uiIndex >= pArea->uiFieldCount )
+      return FAILURE;
+
+   pField = pArea->lpFields + uiIndex;
+   if( pField->uiType == HB_IT_STRING )
+   {
+      FHANDLE hFile;
+
+      hFile = hb_fsExtOpen( szFile, NULL, FO_WRITE | FO_EXCLUSIVE |
+                            FXO_DEFAULTS | FXO_SHARELOCK |
+                            ( uiMode == FILEGET_APPEND ? FXO_APPEND : FXO_TRUNCATE ),
+                            NULL, NULL );
+      if( hFile == FS_ERROR )
+      {
+         uiError = uiMode != FILEGET_APPEND ? EDBF_CREATE : EDBF_OPEN_DBF;
+      }
+      else
+      {
+         hb_fsSeekLarge( hFile, 0, FS_END );
+         if( hb_fsWrite( hFile, pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
+                         pField->uiLen ) != pField->uiLen )
+         {
+            uiError = EDBF_WRITE;
+         }
+         hb_fsClose( hFile );
+      }
+   }
+   else
+   {
+      uiError = EDBF_DATATYPE;
+   }
+
+   /* Exit if any error */
+   if( uiError != SUCCESS )
+   {
+      PHB_ITEM pError = hb_errNew();
+      hb_errPutGenCode( pError, hb_dbfGetEGcode( uiError ) );
+      hb_errPutDescription( pError, hb_langDGetErrorDesc( hb_dbfGetEGcode( uiError ) ) );
+      hb_errPutSubCode( pError, uiError );
+      hb_errPutFlags( pError, EF_CANDEFAULT );
+      if( uiError != EDBF_DATATYPE )
+      {
+         hb_errPutOsCode( pError, hb_fsError() );
+         hb_errPutFileName( pError, ( char * ) szFile );
+      }
+      SELF_ERROR( ( AREAP ) pArea, pError );
+      hb_itemRelease( pError );
+      return FAILURE;
+   }
+   return SUCCESS;
+}
+
 /*
  * Open a memo file in the specified WorkArea.
  */
@@ -3567,6 +3655,81 @@ static ERRCODE hb_dbfOpenMemFile( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    SELF_ERROR( ( AREAP ) pArea, pError );
    hb_itemRelease( pError );
    return FAILURE;
+}
+
+/* 
+ * FILE2BLOB - store file contents in MEMO
+ */
+static ERRCODE hb_dbfPutValueFile( DBFAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode )
+{
+   USHORT uiError = SUCCESS, uiRead;
+   LPFIELD pField;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfPutValueFile(%p, %hu, %s, %hu)", pArea, uiIndex, szFile, uiMode));
+
+   HB_SYMBOL_UNUSED( uiMode );
+
+   if( pArea->lpdbPendingRel )
+      SELF_FORCEREL( ( AREAP ) pArea );
+
+   /* Read record */
+   if( !pArea->fValidBuffer && !hb_dbfReadRecord( pArea ) )
+      return FAILURE;
+
+   if( --uiIndex >= pArea->uiFieldCount )
+      return FAILURE;
+
+   if( !pArea->fPositioned )
+      return FAILURE;
+
+   /* Buffer is hot? */
+   if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == FAILURE )
+      return FAILURE;
+
+   pField = pArea->lpFields + uiIndex;
+   if( pField->uiType == HB_IT_STRING )
+   {
+      FHANDLE hFile;
+
+      hFile = hb_fsExtOpen( szFile, NULL, FO_READ | FO_DENYNONE |
+                            FXO_DEFAULTS | FXO_SHARELOCK, NULL, NULL );
+      if( hFile == FS_ERROR )
+      {
+         uiError = EDBF_OPEN_DBF;
+      }
+      else
+      {
+         uiRead = hb_fsRead( hFile, pArea->pRecord +
+                             pArea->pFieldOffset[ uiIndex ], pField->uiLen );
+         if( uiRead != ( USHORT ) FS_ERROR && uiRead < pField->uiLen )
+            memset( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] + uiRead,
+                    ' ', pField->uiLen - uiRead );
+         hb_fsClose( hFile );
+      }
+   }
+   else
+   {
+      uiError = EDBF_DATATYPE;
+   }
+
+   /* Exit if any error */
+   if( uiError != SUCCESS )
+   {
+      PHB_ITEM pError = hb_errNew();
+      hb_errPutGenCode( pError, hb_dbfGetEGcode( uiError ) );
+      hb_errPutDescription( pError, hb_langDGetErrorDesc( hb_dbfGetEGcode( uiError ) ) );
+      hb_errPutSubCode( pError, uiError );
+      hb_errPutFlags( pError, EF_CANDEFAULT );
+      if( uiError != EDBF_DATATYPE )
+      {
+         hb_errPutOsCode( pError, hb_fsError() );
+         hb_errPutFileName( pError, ( char * ) szFile );
+      }
+      SELF_ERROR( ( AREAP ) pArea, pError );
+      hb_itemRelease( pError );
+      return FAILURE;
+   }
+   return SUCCESS;
 }
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.164 2005/09/02 18:29:54 druzus Exp $
+ * $Id: dbcmd.c,v 1.165 2005/09/11 19:39:49 druzus Exp $
  */
 
 /*
@@ -3882,12 +3882,17 @@ HB_FUNC( DBFILEGET )
    {
       USHORT uiFields, uiIndex;
       PHB_ITEM pMode;
+      char * szField = hb_parc( 1 );
 
-      uiIndex = hb_parni( 1 );
+      if( szField )
+         uiIndex = hb_rddFieldIndex( pArea, szField );
+      else
+         uiIndex = hb_parni( 1 );
+
       pMode = hb_param( 3, HB_IT_NUMERIC );
-      if( pMode && hb_parclen( 2 ) > 0 &&
+      if( uiIndex > 0 && pMode && hb_parclen( 2 ) > 0 &&
           SELF_FIELDCOUNT( pArea, &uiFields ) == SUCCESS &&
-          uiIndex > 0 && uiIndex <= uiFields )
+          uiIndex <= uiFields )
       {
          hb_retl( SELF_GETVALUEFILE( pArea, uiIndex, hb_parc( 2 ),
                                      hb_itemGetNI( pMode ) ) == SUCCESS );
@@ -3909,13 +3914,18 @@ HB_FUNC( DBFILEPUT )
    if( pArea )
    {
       USHORT uiFields, uiIndex;
+      char * szField = hb_parc( 1 );
 
-      uiIndex = hb_parni( 1 );
-      if( hb_parclen( 2 ) > 0 &&
+      if( szField )
+         uiIndex = hb_rddFieldIndex( pArea, szField );
+      else
+         uiIndex = hb_parni( 1 );
+      if( uiIndex > 0 && hb_parclen( 2 ) > 0 &&
           SELF_FIELDCOUNT( pArea, &uiFields ) == SUCCESS &&
-          uiIndex > 0 && uiIndex <= uiFields )
+          uiIndex <= uiFields )
       {
-         hb_retl( SELF_PUTVALUEFILE( pArea, uiIndex, hb_parc( 2 ) ) == SUCCESS );
+         hb_retl( SELF_PUTVALUEFILE( pArea, uiIndex, hb_parc( 2 ),
+                                     hb_parni( 3 ) ) == SUCCESS );
          return;
       }
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBFILEPUTBADPARAMETER, NULL, "DBFILEPUT" );

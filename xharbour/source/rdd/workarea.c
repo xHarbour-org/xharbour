@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.52 2005/09/02 18:29:55 druzus Exp $
+ * $Id: workarea.c,v 1.53 2005/09/11 19:39:49 druzus Exp $
  */
 
 /*
@@ -315,12 +315,12 @@ ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
 
          case 'M':
             pFieldInfo.uiType = HB_IT_MEMO;
-            pFieldInfo.uiLen = (uiLen == 4) ? 4 : 10;
+            pFieldInfo.uiLen = ( uiLen == 4 ) ? 4 : 10;
             break;
 
          case 'D':
             pFieldInfo.uiType = HB_IT_DATE;
-            pFieldInfo.uiLen = ( uiLen == 3 ) ? 3 : 8;
+            pFieldInfo.uiLen = ( uiLen == 3 || uiLen == 4 ) ? uiLen : 8;
             break;
 
          case 'I':

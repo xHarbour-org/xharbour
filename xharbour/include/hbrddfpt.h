@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.17 2005/08/23 10:59:03 druzus Exp $
+ * $Id: hbrddfpt.h,v 1.18 2005/09/11 19:39:32 druzus Exp $
  */
 
 /*
@@ -321,9 +321,9 @@ static ERRCODE hb_fptSysName( FPTAREAP pArea, BYTE * pBuffer );
 #define hb_fptUnLock                               NULL
 #define hb_fptCloseMemFile                         NULL
 static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo );
-#define hb_fptGetValueFile                         NULL
+static ERRCODE hb_fptGetValueFile( FPTAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode );
 static ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo );
-#define hb_fptPutValueFile                         NULL
+static ERRCODE hb_fptPutValueFile( FPTAREAP pArea, USHORT uiIndex, BYTE * szFile, USHORT uiMode );
 #define hb_fptReadDBHeader                         NULL
 #define hb_fptWriteDBHeader                        NULL
 #define hb_fptInit                                 NULL
