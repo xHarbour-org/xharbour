@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.28 2005/02/26 16:14:05 patrickmast Exp $
+ * $Id: hbusage.c,v 1.29 2005/03/09 12:15:18 andijahja Exp $
  */
 
 /*
@@ -91,7 +91,7 @@ void hb_compPrintUsage( char * szSelf )
 /* TODO:   "\n          %cr[<lib>]        request linker to search <lib> (or none)", */
            "\n          %cs               syntax check only",
 /* TODO:   "\n          %ct<path>         path for temp file creation", */
-           "\n          %cu[<file>]       use command def set in <file> (or none)",
+           "\n          %cu[[+]<file>]    use command def set in <file> (or none)",
            "\n          %cundef:<id>      #undef <id>",
            "\n          %cv               variables are assumed M->",
            "\n          %cw[<level>]      set warning level number (0..3, default 1)",

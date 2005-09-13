@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.214 2005/05/29 14:34:27 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.215 2005/08/19 18:14:00 ronpinkas Exp $
  */
 
 /*
@@ -215,6 +215,7 @@ static int  s_aMatchers[ 256 - 'A' ];
 int *      hb_pp_aCondCompile = NULL;
 int        hb_pp_nCondCompile = 0;
 char *     hb_pp_STD_CH = NULL;
+int        hb_pp_STD_CH_ADDITIVE = 0;
 
 /* Ron Pinkas added 2000-11-21 */
 static BOOL s_bArray = FALSE;
@@ -303,6 +304,9 @@ void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
             {
                //printf( "Loading Standard Rules from: \'%s\'\n", szFileName );
 
+	       if( hb_pp_STD_CH_ADDITIVE )
+		  hb_pp_Table();
+	       
                hb_pp_Init();
 
                hb_pp_ReadRules();

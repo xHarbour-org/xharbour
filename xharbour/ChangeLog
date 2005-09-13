@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4314 2005/09/13 01:48:05 druzus Exp $
+ * $Id: ChangeLog,v 1.4315 2005/09/13 16:15:21 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-14 00:38 UTC+0100 Francesco Perillo <mc8647/at/mclink.it>
+  * source/compiler/cmdcheck.c
+  * source/compiler/hbusage.c
+  * source/pp/ppcore.c
+  * include/hbcomp.h
+    + Added support for "+" sign on /u compiler switch. It loads the 
+      specified file in addition to the precompiled command rules.
+      added a new hb_pp_STD_CH_ADDITIVE int variable
+      Doc not updated
 
 2005-09-13 23:25 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/gtwvw.c

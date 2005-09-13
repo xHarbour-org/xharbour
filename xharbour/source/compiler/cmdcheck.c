@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.21 2005/02/12 19:54:02 druzus Exp $
+ * $Id: cmdcheck.c,v 1.23 2005/03/31 14:34:03 andijahja Exp $
  */
 
 /*
@@ -897,8 +897,13 @@ void hb_compChkEnvironVar( char * szSwitch )
                    /* NOTE: Ignore these -undef: switches will be processed separately */
                    break;
                 }
-
-                hb_pp_STD_CH = hb_strdup( s + 1 );
+                if ( s[1] == '+' )
+	        {
+		    hb_pp_STD_CH_ADDITIVE = 1 ;
+                    hb_pp_STD_CH = hb_strdup( s + 2 );
+		}	
+		else
+                   hb_pp_STD_CH = hb_strdup( s + 1 );
                 break;
 
              case 'v':
