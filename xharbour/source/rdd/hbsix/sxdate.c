@@ -1,12 +1,17 @@
 /*
- * $Id: hbdbferr.h,v 1.4 2005/06/22 15:29:54 druzus Exp $
+ * $Id$
  */
 
 /*
  * xHarbour Project source code:
- * DBF error codes
+ *    SIX compatible functions:
+ *          hb_sxDtoP()
+ *          hb_sxPtoD()
  *
- * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
+ *          SX_DTOP()
+ *          SX_PTOD()
+ *
+ * Copyright 2005 Przemyslaw Czerpak <druzus@acn.waw.pl>
  * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,44 +55,49 @@
  *
  */
 
-#ifndef HB_DBFERR_H_
-#define HB_DBFERR_H_
+#include "hbsxfunc.h"
 
-HB_EXTERN_BEGIN
+char * hb_sxDtoP( char * pDate, LONG lJulian )
+{
+   int iYear, iMonth, iDay;
+   LONG lPDate;
 
-/* DBF errors */
-#define EDBF_OPEN_DBF                              1001
-#define EDBF_OPEN_MEMO                             1002
-#define EDBF_OPEN_INDEX                            1003
-#define EDBF_CREATE_DBF                            1004
-#define EDBF_CREATE_MEMO                           1005
-#define EDBF_CREATE_INDEX                          1006
-#define EDBF_CREATE                   EDBF_CREATE_INDEX
-#define EDBF_READ                                  1010
-#define EDBF_WRITE                                 1011
-#define EDBF_CORRUPT                               1012
-#define EDBF_DATATYPE                              1020
-#define EDBF_DATAWIDTH                             1021
-#define EDBF_UNLOCKED                              1022
-#define EDBF_SHARED                                1023
-#define EDBF_APPENDLOCK                            1024
-#define EDBF_READONLY                              1025
-#define EDBF_LIMITEXCEEDED                         1027
-#define EDBF_LOCKTIMEOUT                           1035
-#define EDBF_LOCK                                  1038
-/* ORDER errors */
-#define EDBF_INVALIDKEY                            1026
-#define EDBF_NOTINDEXED                            1201
-#define EDBF_INVALIDORDER                          1050
-#define EDBF_SCOPETYPE                             1051
-#define EDBF_NOTCUSTOM                             1052
-#define EDBF_INVALIDFOR                            1053
-#define EDBF_KEYLENGTH                             1054
-#define EDBF_SIGNATURE                             1055
+   HB_TRACE(HB_TR_DEBUG, ("hb_sxDtoP(%p, %ld)", pDate, lJulian));
 
-#define EDBF_MEMOTYPE                              1056
-#define EDBF_MEMOTOOLONG                           1057
+   hb_dateDecode( lJulian, &iYear, &iMonth, &iDay );
+   lPDate = ( ( ( iYear << 1 ) | ( iMonth >> 3 ) ) << 8 ) |
+            ( ( iMonth & 7 ) << 5 ) | iDay;
+   HB_PUT_BE_UINT24( pDate, lPDate );
 
-HB_EXTERN_END
+   return pDate;
+}
 
-#endif /* HB_DBFERR_H_ */
+LONG hb_sxPtoD( char * pDate )
+{
+   int iYear, iMonth, iDay;
+   LONG lPDate;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_sxPtoD(%p)", pDate));
+
+   if( pDate )
+   {
+      lPDate = HB_GET_BE_UINT24( pDate );
+      iDay = lPDate & 0x1f;
+      iMonth = ( lPDate >> 5 ) & 0x0f;
+      iYear = ( lPDate >> 9 );
+
+      return hb_dateEncode( iYear, iMonth, iDay );
+   }
+   return 0;
+}
+
+HB_FUNC( SX_DTOP )
+{
+   char pDate[ 3 ];
+   hb_retclen( hb_sxDtoP( pDate, hb_pardl( 1 ) ), 3 );
+}
+
+HB_FUNC( SX_PTOD )
+{
+   hb_retdl( hb_sxPtoD( hb_parclen( 1 ) < 3 ? NULL : hb_parc( 1 ) ) );
+}

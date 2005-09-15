@@ -1,12 +1,12 @@
 /*
- * $Id: hbdbferr.h,v 1.4 2005/06/22 15:29:54 druzus Exp $
+ * $Id$
  */
 
 /*
  * xHarbour Project source code:
- * DBF error codes
+ *    header file for SIX compatible functions
  *
- * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
+ * Copyright 2005 Przemyslaw Czerpak <druzus@acn.waw.pl>
  * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,44 +50,28 @@
  *
  */
 
-#ifndef HB_DBFERR_H_
-#define HB_DBFERR_H_
+#ifndef HB_SXFUNC_H_
+#define HB_SXFUNC_H_
+
+#include "hbapi.h"
+#include "hbapifs.h"
+#include "hbapirdd.h"
+#include "hbapierr.h"
+#include "hbdate.h"
 
 HB_EXTERN_BEGIN
 
-/* DBF errors */
-#define EDBF_OPEN_DBF                              1001
-#define EDBF_OPEN_MEMO                             1002
-#define EDBF_OPEN_INDEX                            1003
-#define EDBF_CREATE_DBF                            1004
-#define EDBF_CREATE_MEMO                           1005
-#define EDBF_CREATE_INDEX                          1006
-#define EDBF_CREATE                   EDBF_CREATE_INDEX
-#define EDBF_READ                                  1010
-#define EDBF_WRITE                                 1011
-#define EDBF_CORRUPT                               1012
-#define EDBF_DATATYPE                              1020
-#define EDBF_DATAWIDTH                             1021
-#define EDBF_UNLOCKED                              1022
-#define EDBF_SHARED                                1023
-#define EDBF_APPENDLOCK                            1024
-#define EDBF_READONLY                              1025
-#define EDBF_LIMITEXCEEDED                         1027
-#define EDBF_LOCKTIMEOUT                           1035
-#define EDBF_LOCK                                  1038
-/* ORDER errors */
-#define EDBF_INVALIDKEY                            1026
-#define EDBF_NOTINDEXED                            1201
-#define EDBF_INVALIDORDER                          1050
-#define EDBF_SCOPETYPE                             1051
-#define EDBF_NOTCUSTOM                             1052
-#define EDBF_INVALIDFOR                            1053
-#define EDBF_KEYLENGTH                             1054
-#define EDBF_SIGNATURE                             1055
+char * hb_sxDtoP( char * pDate, LONG lJulian );
+LONG hb_sxPtoD( char * pDate );
 
-#define EDBF_MEMOTYPE                              1056
-#define EDBF_MEMOTOOLONG                           1057
+void hb_sxEnCrypt( BYTE * pSrc, BYTE * pDst, BYTE * pKeyVal, ULONG ulLen );
+void hb_sxDeCrypt( BYTE * pSrc, BYTE * pDst, BYTE * pKeyVal, ULONG ulLen );
+
+BOOL hb_LZSSxDecompressMem( BYTE * pSrcBuf, ULONG ulSrcLen, BYTE * pDstBuf, ULONG ulDstLen );
+BOOL hb_LZSSxDecompressMem( BYTE * pSrcBuf, ULONG ulSrcLen, BYTE * pDstBuf, ULONG ulDstLen );
+BOOL hb_LZSSxCompressFile( FHANDLE hInput, FHANDLE hOutput, ULONG * pulSize );
+BOOL hb_LZSSxDecompressFile( FHANDLE hInput, FHANDLE hOutput );
 
 HB_EXTERN_END
 
-#endif /* HB_DBFERR_H_ */
+#endif /* HB_SXFUNC_H_ */

@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: pack_src.bat,v 1.9 2005/06/01 02:09:27 ronpinkas Exp $
+rem $Id: pack_src.bat,v 1.10 2005/06/09 23:38:37 ronpinkas Exp $
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
@@ -118,9 +118,10 @@ rem SOURCE\RDD\DBFNTX
 rem SOURCE\RDD\HSX
 %hb_archbin% %hb_archopt%  %hb_filename% source/rdd/hsx/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% source/rdd/hsx/*.c
-%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/hsx/*.h
-%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/hsx/*.ch
-%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/hsx/*.prg
+
+rem SOURCE\RDD\HBSIX
+%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/hbsix/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/hbsix/*.c
 
 rem SOURCE\RDD\NULSYS
 %hb_archbin% %hb_archopt%  %hb_filename% source/rdd/nulsys/Makefile
@@ -130,6 +131,12 @@ rem SOURCE\RTL
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/*.c
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/*.prg
+
+rem SOURCE\RTL\PCRE
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/pcre/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/pcre/ChangeLog
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/pcre/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% source/rtl/pcre/*.h
 
 rem SOURCE\RTL\GT_TPL
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/gt_tpl/Makefile

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.22 2005/07/20 22:18:18 likewolf Exp $
+# $Id: Makefile,v 1.23 2005/09/02 18:29:21 druzus Exp $
 #
 
 ROOT = ../
@@ -46,6 +46,7 @@ C_HEADERS=\
 	hbset.h      \
 	hbsetup.h    \
 	hbstack.h    \
+	hbsxfunc.h   \
 	hbtrace.h    \
 	hbtypes.h    \
 	hbver.h      \

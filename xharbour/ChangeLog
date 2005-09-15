@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4319 2005/09/15 03:05:10 peterrees Exp $
+ * $Id: ChangeLog,v 1.4320 2005/09/15 10:33:13 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,71 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-15 14:53 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  + xharbour/include/hbsxfunc.h
+  + xharbour/source/rdd/hbsix/Makefile
+  + xharbour/source/rdd/hbsix/sxcompr.c
+  + xharbour/source/rdd/hbsix/sxcrypt.c
+  + xharbour/source/rdd/hbsix/sxdate.c
+    + added hbsix library - please update non GNU makefiles
+
+  * xharbour/xharbour.spec
+  * xharbour/bin/bld.bat
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/pack_src.bat
+  * xharbour/bin/pack_src.sh
+  * xharbour/config/global.cf
+  * xharbour/include/Makefile
+    + added hbsix library
+    + updated for HSX/CFTS library (please update non GNU makefiles
+      to also include HSX library - it's a long time in CVS and many
+      users cannot use it)
+
+  * xharbour/include/hbdbferr.h
+    * formatting
+
+  * xharbour/include/hbrddfpt.h
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    + added support for SIX3 "V" fileds. It's a variable field in which
+      data is stored partialy in DBF and MEMO file. In "V" fields
+      strings, number, dates, logicals, arrays and nil items can be stored.
+      The size of "V" field can be: 3 {"V", 3, 0} and in such case it's
+      SIX3 packed date, 4 {"V", 4, 0} for 32-bit signed integer (the same as
+      {"I", 4, 0}) and >= 6 for variable weak typed field for any data type.
+      When "V" field size is greater then 6 then string items are partially
+      stored in "V" field and rest if necessary in memo. So when you create
+      {"V", 16, 0} field strings shorter then 15 bytes will be stored only
+      in DBF file and when they are longer first 10 bytes will be in DBF
+      and rest in MEMO file. The maximum string size in "V" field is 64'000
+      bytes (note that is a little bit less then 2^16=64KB). DOUBLE items
+      are stored in DBF when size >= 13 (SIX bug reproduced for compatibility
+      should be >=12) integer numbers, dates, logicals, nil are always stored
+      in DBF, arrays are always stored in MEMO.
+      When V3 or V4 is used only the memo type file is not necessary.
+      This field works exactly like in SIX3 and partially in ADS and
+      can be used with any MEMO types (DBT, FPT, SMT)
+
+  * xharbour/source/rdd/dbf1.c
+    + added support for SIX3 "V" (weakly typed) fileds
+    + always force FPT memos for newly created files when DBF type is
+      set to VFP
+    + added mapping for "Y", "T", "@" DBF types to number items for DBF
+      files with extended field types, unsupported by xHarbour VM
+
+  * xharbour/source/rdd/workarea.c
+    + added support for SIX3 "V" fileds. It's a variable field in which
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * formatting
+
+  * xharbour/source/vm/classes.c
+    ! initialize uninitialized variable
+
+  * xharbour/source/vm/extend.c
+    ! fixed memory leak in all hb_stor*() functions when the passed
+      parameter was an array with wrong size
+
 2005-09-15 11:27 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rdd/dbtotal.prg
     ! fixed function DbRead() to exclude memo fields

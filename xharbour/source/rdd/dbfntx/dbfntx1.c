@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.127 2005/09/11 19:40:48 druzus Exp $
+ * $Id: dbfntx1.c,v 1.128 2005/09/13 01:48:36 druzus Exp $
  */
 
 /*
@@ -281,7 +281,7 @@ static ULONG hb_ntxGetKeyRec( LPPAGEINFO pPage, SHORT iKey )
 /*
  * generate Run-Time error
  */
-static ERRCODE hb_ntxErrorRT( NTXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char * filename, USHORT uiOsCode, USHORT uiFlags )
+static ERRCODE hb_ntxErrorRT( NTXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char * szFileName, USHORT uiOsCode, USHORT uiFlags )
 {
    PHB_ITEM pError;
    ERRCODE iRet = FAILURE;
@@ -293,8 +293,8 @@ static ERRCODE hb_ntxErrorRT( NTXAREAP pArea, USHORT uiGenCode, USHORT uiSubCode
       hb_errPutSubCode( pError, uiSubCode );
       hb_errPutOsCode( pError, uiOsCode );
       hb_errPutDescription( pError, hb_langDGetErrorDesc( uiGenCode ) );
-      if( filename )
-         hb_errPutFileName( pError, filename );
+      if( szFileName )
+         hb_errPutFileName( pError, szFileName );
       if( uiFlags )
          hb_errPutFlags( pError, uiFlags );
       iRet = SELF_ERROR( ( AREAP ) pArea, pError );

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.158 2005/09/07 04:59:14 walito Exp $
+ * $Id: classes.c,v 1.159 2005/09/07 15:24:49 walito Exp $
  */
 
 /*
@@ -3966,7 +3966,7 @@ ULONG hb_clsDelSyncID( USHORT uiClass )
    HB_THREAD_STUB
 
    PSYNCID pSyncId = HB_VM_STACK.pSyncId;
-   ULONG ulCount, ulPos;
+   ULONG ulCount = 0, ulPos;
 
    if( pSyncId )
    {

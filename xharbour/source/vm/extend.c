@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.50 2005/04/06 14:48:13 snaiperis Exp $
+ * $Id: extend.c,v 1.51 2005/04/11 01:46:35 druzus Exp $
  */
 
 /*
@@ -999,9 +999,14 @@ void HB_EXPORT hb_storc( char * szText, int iParam, ... )
 
       if( HB_IS_ARRAY( pItem ) )
       {
+         PHB_ITEM pDstItem;
          va_list va;
          va_start( va, iParam );
-         hb_itemPutC( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), szText );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutC( pDstItem, szText );
+         }
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1027,9 +1032,14 @@ void HB_EXPORT hb_storclen( char * szText, ULONG ulLen, int iParam, ... )
 
       if( HB_IS_ARRAY( pItem ) )
       {
+         PHB_ITEM pDstItem;
          va_list va;
          va_start( va, iParam );
-         hb_itemPutCL( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), szText, ulLen );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutCL( pDstItem, szText, ulLen );
+         }
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1055,9 +1065,14 @@ void HB_EXPORT hb_storclenAdopt( char * szText, ULONG ulLen, int iParam, ... )
 
       if( HB_IS_ARRAY( pItem ) )
       {
+         PHB_ITEM pDstItem;
          va_list va;
          va_start( va, iParam );
-         hb_itemPutCPtr( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), szText, ulLen );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutCPtr( pDstItem, szText, ulLen );
+         }
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1085,9 +1100,14 @@ void HB_EXPORT hb_stords( char * szDate, int iParam, ... )
 
       if( HB_IS_ARRAY( pItem ) )
       {
+         PHB_ITEM pDstItem;
          va_list va;
          va_start( va, iParam );
-         hb_itemPutDS( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), szDate );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutDS( pDstItem, szDate );
+         }
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1113,9 +1133,14 @@ void HB_EXPORT hb_stordl( LONG lJulian, int iParam, ... )
 
       if( HB_IS_ARRAY( pItem ) )
       {
+         PHB_ITEM pDstItem;
          va_list va;
          va_start( va, iParam );
-         hb_itemPutDL( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), lJulian );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutDL( pDstItem, lJulian );
+         }
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1141,9 +1166,14 @@ void HB_EXPORT hb_storl( int iLogical, int iParam, ... )
 
       if( HB_IS_ARRAY( pItem ) )
       {
+         PHB_ITEM pDstItem;
          va_list va;
          va_start( va, iParam );
-         hb_itemPutL( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), iLogical ? TRUE : FALSE );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutL( pDstItem, iLogical ? TRUE : FALSE );
+         }
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1169,9 +1199,14 @@ void HB_EXPORT hb_storni( int iValue, int iParam, ... )
 
       if( HB_IS_ARRAY( pItem ) )
       {
+         PHB_ITEM pDstItem;
          va_list va;
          va_start( va, iParam );
-         hb_itemPutNI( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), iValue );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutNI( pDstItem, iValue );
+         }
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1197,9 +1232,14 @@ void HB_EXPORT hb_stornl( LONG lValue, int iParam, ... )
 
       if( HB_IS_ARRAY( pItem ) )
       {
+         PHB_ITEM pDstItem;
          va_list va;
          va_start( va, iParam );
-         hb_itemPutNL( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), lValue );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutNL( pDstItem, lValue );
+         }
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1253,9 +1293,14 @@ void HB_EXPORT hb_stornd( double dNumber, int iParam, ... )
 
       if( HB_IS_ARRAY( pItem ) )
       {
+         PHB_ITEM pDstItem;
          va_list va;
          va_start( va, iParam );
-         hb_itemPutND( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), dNumber );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutND( pDstItem, dNumber );
+         }
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1281,9 +1326,14 @@ void HB_EXPORT hb_storptr( void * pointer, int iParam, ... )
 
       if( HB_IS_ARRAY( pItem ) )
       {
+         PHB_ITEM pDstItem;
          va_list va;
          va_start( va, iParam );
-         hb_itemPutPtr( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), pointer );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutPtr( pDstItem, pointer );
+         }
          va_end( va );
       }
       else if( bByRef || iParam == -1 )
@@ -1311,9 +1361,14 @@ void HB_EXPORT hb_stornll( LONGLONG llNumber, int iParam, ... )
 
       if( HB_IS_ARRAY( pItem ) )
       {
+         PHB_ITEM pDstItem;
          va_list va;
          va_start( va, iParam );
-         hb_itemPutNLL( hb_arrayGetItemPtr( pItem, va_arg( va, ULONG )), llNumber );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutNLL( pDstItem, llNumber );
+         }
          va_end( va );
       }
       else if( bByRef || iParam == -1 )

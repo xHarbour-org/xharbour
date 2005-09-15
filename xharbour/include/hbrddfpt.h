@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.18 2005/09/11 19:39:32 druzus Exp $
+ * $Id: hbrddfpt.h,v 1.19 2005/09/13 01:48:06 druzus Exp $
  */
 
 /*
@@ -82,15 +82,16 @@ HB_EXTERN_BEGIN
 #define MAX_FLEXFREEBLOCKS                      126
 #define FLEXGCPAGE_SIZE                        1010
 
-/* usMemoType */
-/*
-#define MEMO_DBT              1
-#define MEMO_FPT_HB           2
-#define MEMO_FPT_SIX          3
-#define MEMO_FPT_SIXHB        4
-#define MEMO_FPT_FLEX         5
-#define MEMO_FPT_CLIP         6
-*/
+/* "V" filed types */
+#define HB_VF_CHAR            64000
+#define HB_VF_DATE            64001
+#define HB_VF_INT             64002
+#define HB_VF_LOG             64003
+#define HB_VF_DNUM            64004
+#define HB_VF_ARRAY           64005
+#define HB_VF_BLOB            64006
+#define HB_VF_BLOBCOMPRESS    64007
+#define HB_VF_BLOBENCRYPT     64008
 
 /* SMT types */
 #define SMT_IT_NIL            0
@@ -101,6 +102,7 @@ HB_EXTERN_BEGIN
 #define SMT_IT_LOGICAL        5
 #define SMT_IT_ARRAY          6
 
+#define FPTIT_DUMMY        0xDEADBEAF
 #define FPTIT_BINARY       0x0000
 #define FPTIT_PICT         0x0000      /* Picture */
 #define FPTIT_TEXT         0x0001      /* Text    */
