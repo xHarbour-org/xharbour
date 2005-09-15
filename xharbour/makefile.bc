@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.150 2005/08/31 15:00:14 mauriliolongo Exp $
+# $Id: makefile.bc,v 1.151 2005/09/02 15:46:11 paultucker Exp $
 #
 
 #
@@ -93,6 +93,8 @@ DBT_OBJ_DIR   = $(OBJ_DIR)
 FPT_OBJ_DIR   = $(OBJ_DIR)
 NTX_OBJ_DIR   = $(OBJ_DIR)
 CDX_OBJ_DIR   = $(OBJ_DIR)
+SIX_OBJ_DIR   = $(OBJ_DIR)
+HSX_OBJ_DIR   = $(OBJ_DIR)
 CT_OBJ_DIR    = $(OBJ_DIR)
 TIP_OBJ_DIR   = $(OBJ_DIR)
 PP_OBJ_DIR    = $(OBJ_DIR)
@@ -197,6 +199,8 @@ DBFCDX_LIB     = $(LIB_DIR)\dbfcdx$(HB_MT).lib
 DBFDBT_LIB     = $(LIB_DIR)\dbfdbt$(HB_MT).lib
 DBFFPT_LIB     = $(LIB_DIR)\dbffpt$(HB_MT).lib
 DBFNTX_LIB     = $(LIB_DIR)\dbfntx$(HB_MT).lib
+HBSIX_LIB      = $(LIB_DIR)\hbsix$(HB_MT).lib
+HSX_LIB        = $(LIB_DIR)\hsx$(HB_MT).lib
 DEBUG_LIB      = $(LIB_DIR)\debug.lib
 LANG_LIB       = $(LIB_DIR)\lang.lib
 MACRO_LIB      = $(LIB_DIR)\macro$(HB_MT).lib
@@ -649,6 +653,16 @@ DBFCDX_LIB_OBJS = \
    \
    $(CDX_OBJ_DIR)\dbfcdx0.obj
 
+HBSIX_LIB_OBJS = \
+   $(SIX_OBJ_DIR)\sxcompr.obj \
+   $(SIX_OBJ_DIR)\sxcrypt.obj \
+   $(SIX_OBJ_DIR)\sxdate.obj 
+
+HSX_LIB_OBJS = \
+   $(HSX_OBJ_DIR)\hsx.obj \
+   $(HSX_OBJ_DIR)\cftsfunc.obj
+
+
 #
 # PP.LIB rules
 #
@@ -1097,9 +1111,10 @@ ODBC_LIB_OBJS =       \
    $(OBJ_DIR)\odbc.obj \
    $(OBJ_DIR)\todbc.obj
 
-DLL_MAIN_LIB_OBJS = \
+DLL_MAIN_LIB_OBJS = \ 
    $(VM_OBJ_DIR)\mainstd.obj \
-   $(VM_OBJ_DIR)\mainwin.obj
+   $(VM_OBJ_DIR)\mainwin.obj \
+   $(VM_OBJ_DIR)\maindllh.obj 
 
 #
 # Our default target
@@ -1129,6 +1144,8 @@ PROJECT = \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(DBFCDX_LIB) \
+   $(HBSIX_LIB) \
+   $(HSX_LIB) \
    $(SAMPLES_LIB) \
    $(CT_LIB)
 
@@ -1190,6 +1207,23 @@ $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
 +)
 
 !
+
+$(HBSIX_LIB) : $(HBSIX_LIB_OBJS)
+    IF EXIST "$(HBSIX_LIB)" $(DEL) "$(HBSIX_LIB)" > NUL
+    $(LINKER) "$(HBSIX_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+
+!
+
+$(HSX_LIB) : $(HSX_LIB_OBJS)
+    IF EXIST "$(HSX_LIB)" $(DEL) "$(HSX_LIB)" > NUL
+    $(LINKER) "$(HSX_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+
+!
+
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
     IF EXIST "$(DBFNTX_LIB)" $(DEL) "$(DBFNTX_LIB)" > NUL
@@ -1757,6 +1791,9 @@ $(VM_OBJ_DIR)\mainstd.obj : $(VM_DIR)\mainstd.c
    $(CC_CMD)
 
 $(VM_OBJ_DIR)\mainwin.obj : $(VM_DIR)\mainwin.c
+   $(CC_CMD)
+
+$(VM_OBJ_DIR)\maindllh.obj : $(VM_DIR)\maindllh.c
    $(CC_CMD)
 
 $(VM_OBJ_DIR)\memvars.obj : $(VM_DIR)\memvars.c
@@ -2793,6 +2830,32 @@ $(CDX_OBJ_DIR)\dbfcdx0.obj : $(OBJ_DIR)\dbfcdx0.c
 $(CDX_OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
    $(CC_CMD)
 
+
+#
+# HBSIX.LIB dependencies
+#
+
+
+$(SIX_OBJ_DIR)\sxcompr.obj : $(RDD_DIR)\hbsix\sxcompr.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxcrypt.obj : $(RDD_DIR)\hbsix\sxcrypt.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxdate.obj : $(RDD_DIR)\hbsix\sxdate.c
+   $(CC_CMD)
+
+#
+# HSX.LIB dependencies
+#
+
+
+$(HSX_OBJ_DIR)\hsx.obj : $(RDD_DIR)\hsx\hsx.c
+   $(CC_CMD)
+
+$(HSX_OBJ_DIR)\cftsfunc.obj : $(RDD_DIR)\hsx\cftsfunc.c
+   $(CC_CMD)
+
 #
 # DEBUG.LIB dependencies
 #
@@ -3462,6 +3525,9 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
+   $(ECHO) $(HBSIX_LIB) >> make.tmp
+   $(ECHO) $(HSX_LIB) >> make.tmp
+
    $(ECHO) $(CODEPAGE_LIB) >> make.tmp
    $(CC) @make.tmp
    $(DEL) make.tmp
@@ -3513,6 +3579,9 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
+   $(ECHO) $(HBSIX_LIB) >> make.tmp
+   $(ECHO) $(HSX_LIB) >> make.tmp
+
 !if $d(HB_THREAD_SUPPORT)
    $(ECHO) cw32mt.lib >> make.tmp
 !endif
@@ -3632,6 +3701,8 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
+   $(ECHO) $(HBSIX_LIB) >> make.tmp
+   $(ECHO) $(HSX_LIB) >> make.tmp
 !if $d(HB_DOC_PDF)
    $(ECHO) $(OBJ_DIR)\genpdf1.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\pdfhbdoc.obj >> make.tmp
@@ -3791,6 +3862,9 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
    $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
+   $(ECHO) $(HBSIX_LIB) >> make.tmp
+   $(ECHO) $(HSX_LIB) >> make.tmp
+
    $(CC) @make.tmp
    $(DEL) make.tmp
 
@@ -3866,6 +3940,9 @@ $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
    $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
+   $(ECHO) $(HBSIX_LIB) >> make.tmp
+   $(ECHO) $(HSX_LIB) >> make.tmp
+
    $(ECHO) $(CT_LIB) >> make.tmp
    $(CC) @make.tmp
    $(DEL) make.tmp

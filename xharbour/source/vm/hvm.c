@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.486 2005/09/07 04:59:14 walito Exp $
+ * $Id: hvm.c,v 1.487 2005/09/11 19:41:11 druzus Exp $
  */
 
 /*
@@ -4604,6 +4604,15 @@ static void hb_vmEqual( BOOL bExact )
       pItem2->type = HB_IT_NIL;
       hb_stackDec();
    }
+   else if( HB_IS_POINTER( pItem1 ) && HB_IS_POINTER( pItem2 ) )
+   {
+      pItem1->item.asLogical.value = ( pItem1->item.asPointer.value ==
+                                       pItem2->item.asPointer.value );
+      pItem1->type = HB_IT_LOGICAL;
+      pItem2->type = HB_IT_NIL;
+      hb_stackDec();
+   }
+
    else if( hb_objGetOpOver( pItem1 ) & HB_CLASS_OP_EQUAL )
    {
       hb_vmOperatorCall( pItem1, pItem2, "__OPEQUAL", NULL, 2, NULL );
@@ -4700,6 +4709,15 @@ static void hb_vmNotEqual( void )
       pItem2->type = HB_IT_NIL;
       hb_stackDec();
    }
+   else if( HB_IS_POINTER( pItem1 ) && HB_IS_POINTER( pItem2 ) )
+   {
+      pItem1->item.asLogical.value = ( pItem1->item.asPointer.value !=
+                                       pItem2->item.asPointer.value );
+      pItem1->type = HB_IT_LOGICAL;
+      pItem2->type = HB_IT_NIL;
+      hb_stackDec();
+   }
+
    else if( hb_objGetOpOver( pItem1 ) & HB_CLASS_OP_NOTEQUAL )
    {
       hb_vmOperatorCall( pItem1, pItem2, "__OPNOTEQUAL", NULL, 2, NULL );
