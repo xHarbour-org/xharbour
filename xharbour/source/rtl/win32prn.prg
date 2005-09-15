@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.12 2005/08/23 04:02:51 peterrees Exp $
+ * $Id: win32prn.prg,v 1.13 2005/08/23 21:56:46 peterrees Exp $
  */
 
 /*
@@ -204,7 +204,7 @@ CLASS WIN32PRN
   VAR fBold           INIT 0      HIDDEN            // font darkness weight ( Bold). See wingdi.h or WIN SDK CreateFont() for valid values
   VAR fUnderLine      INIT .F.    HIDDEN            // UnderLine is on or off
   VAR fItalic         INIT .F.    HIDDEN            // Italic is on or off
-  VAR fCharSet        INIT 0      HIDDEN            // Default character set
+  VAR fCharSet        INIT -1      HIDDEN            // Default character set
 
   VAR PixelsPerInchY
   VAR PixelsPerInchX
@@ -819,7 +819,7 @@ HB_FUNC_STATIC( CREATEFONT )
   }
 
   hFont = CreateFont(iHeight, iWidth, 0, 0, iWeight, dwItalic, dwUnderLine, 0,
-        dwCharSet ? dwCharSet : DEFAULT_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS, DRAFT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,  pszFont) ;
+        dwCharSet >= 0 ? dwCharSet : DEFAULT_CHARSET, OUT_DEVICE_PRECIS, CLIP_DEFAULT_PRECIS, DRAFT_QUALITY, DEFAULT_PITCH | FF_DONTCARE,  pszFont) ;
   if (hFont)
   {
     Result = TRUE;

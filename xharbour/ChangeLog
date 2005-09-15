@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4315 2005/09/13 16:15:21 bdj Exp $
+ * $Id: ChangeLog,v 1.4316 2005/09/13 22:46:12 fperillo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,13 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-09-15 13:21 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/win32prn.prg
+    ! altered ::fDefault INIT to -1 so ANSI_CHARSET can be used
+       ie. oPrinter:CharSet( 0 ) now works
 
 2005-09-14 00:38 UTC+0100 Francesco Perillo <mc8647/at/mclink.it>
   * source/compiler/cmdcheck.c
   * source/compiler/hbusage.c
   * source/pp/ppcore.c
   * include/hbcomp.h
-    + Added support for "+" sign on /u compiler switch. It loads the 
+    + Added support for "+" sign on /u compiler switch. It loads the
       specified file in addition to the precompiled command rules.
       added a new hb_pp_STD_CH_ADDITIVE int variable
       Doc not updated
