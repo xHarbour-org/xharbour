@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.13 2005/08/23 21:56:46 peterrees Exp $
+ * $Id: win32prn.prg,v 1.14 2005/09/15 00:25:18 peterrees Exp $
  */
 
 /*
@@ -325,6 +325,9 @@ METHOD EndPage(lStartNewPage) CLASS WIN32PRN
   EndPage(::hPrinterDC)
   IF lStartNewPage
     ::StartPage()
+    IF OS_ISWIN9X() // Reset font on Win9X
+      ::SetFont()
+    ENDIF
   ENDIF
   RETURN(.T.)
 
