@@ -91,7 +91,7 @@
       EXTERN GetActiveObject
 
       EXTERN SIN, COS
-      
+
       #ifdef SQL
          REQUEST SQLRDD
          REQUEST SR_ODBC
@@ -684,8 +684,7 @@ PROCEDURE PP_Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
    IF bLoadRules
       bLoadRules := .F.
 
-      InitRules()
-      InitResults()
+      PP_InitStd()
 
       IF Len( aDefRules ) != Len( aDefResults )
          Eval( ErrorBlock(), ErrorNew( [PP], 1003, [Pre-Processing], [#DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
@@ -698,11 +697,6 @@ PROCEDURE PP_Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
       IF Len( aCommRules ) != Len( aCommResults )
          Eval( ErrorBlock(), ErrorNew( [PP], 1003, [Pre-Processing], [#COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
       ENDIF
-
-      CompileDefine( "__PP__" )
-      #ifdef __HARBOUR__
-         CompileDefine( "__HARBOUR__" )
-      #endif
    ELSE
       IF sCH == NIL
          PP_Warning( [Not using standard rules.] )
@@ -1249,9 +1243,7 @@ PROCEDURE RP_Dot()
 
    IF bLoadRules
       bLoadRules := .F.
-
-      InitRules()
-      InitResults()
+      PP_InitStd()
    ENDIF
 
    bCount := .F.
@@ -9763,12 +9755,9 @@ PROCEDURE PP_RunInit( aProcedures, aInitExit, nLine )
       aInitExit[2] := {}
    ENDIF
 
-   InitRules()
-   InitResults()
-
-   InitRunRules()
-   InitRunResults()
-
+   PP_InitStd()
+   PP_LoadRun()
+      
 RETURN
 
 //--------------------------------------------------------------//
@@ -10202,12 +10191,13 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
       nStartup := 1
    ENDIF
 
-   InitRules()
-   InitResults()
-
-   InitRunRules()
-   InitRunResults()
-
+/* Already pre-processed!
+   IF ! s_lRunLoaded  
+      PP_InitStd()
+      PP_LoadRun()
+   ENDIF
+*/
+      
    IF aProcedures == s_aProcedures
       bPreset := .F.
    ELSE
@@ -10285,6 +10275,11 @@ PROCEDURE PP_InitStd()
    InitRules()
    InitResults()
 
+   CompileDefine( "__PP__" )
+   #ifdef __HARBOUR__
+      CompileDefine( "__HARBOUR__" )
+   #endif
+
    s_lRunLoaded := .F.
    s_lClsLoaded := .F.
    s_lFWLoaded  := .F.
@@ -10296,6 +10291,7 @@ PROCEDURE PP_LoadRun()
 
    IF ! s_lRunLoaded
       s_lRunLoaded := .T.
+      
       InitRunRules()
       InitRunResults()
    ENDIF
@@ -10307,6 +10303,7 @@ PROCEDURE PP_LoadDot()
 
    IF ! s_lDotLoaded
       s_lDotLoaded := .T.
+      
       InitDotRules()
       InitDotResults()
    ENDIF

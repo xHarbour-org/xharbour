@@ -34,14 +34,19 @@
      DATA cText                INIT ""
      DATA acPPed               INIT {}
      DATA cPPed                INIT ""
-     DATA aCompiledProcs       INIT {}
-     DATA aInitExit            INIT { {}, {} }
+     DATA aCompiledProcs
+     DATA aInitExit
      DATA nProcs               INIT 0
      DATA aScriptHostGlobals   INIT {}
      DATA bWantsErrorObject    INIT .T.
      DATA nStartLine           INIT 1
      DATA cName                INIT ""
      DATA nID                  INIT 0
+
+     DATA aDefRules, aDefResults
+     DATA aTransRules, aTransResults
+     DATA aCommRules, aCommResults
+     DATA lRunLoaded, lClsLoaded, lFWLoaded
 
      METHOD New()              CONSTRUCTOR
 
@@ -81,9 +86,6 @@
 
      //TraceLog( "New" )
 
-     ::InitStdRules()
-     CompileDefine( "__HARBOUR__" )
-
   RETURN Self
 
   //----------------------------------------------------------------------------//
@@ -91,7 +93,7 @@
 
      LOCAL nLine, nLines, sLine, nProcID := ::nProcs
      LOCAL bErrHandler, oError
-     LOCAL nStart, acPPed, aCompiledProcs, aInitExit
+     LOCAL nStart, acPPed
 
      IF Empty( ::cText )
         RETURN .F.
@@ -102,20 +104,29 @@
      BEGIN SEQUENCE
 
         IF nProcID == 0
-           PP_InitStd()
-           PP_LoadRun()
-
+           ::aCompiledProcs     := {}
+           ::aInitExit          := {}
+           
+           PP_RunInit( ::aCompiledProcs, ::aInitExit, ::nStartLine )
+           
            ::cCompiledText      := ""
            ::cPPed              := ""
-           ::aCompiledProcs     := {}
+           
            ::acPPed             := {}
-           ::aInitExit          := { {}, {} }
+           
            ::nCompiledLines     := 0
            ::nProcs             := 0
+           
            ::nNextStartProc     := 1
            ::nID                := 0
         ELSE
            ::nNextStartProc := nProcID + 1
+
+           // Restore Rules Engine state.
+           aDefRules   := ::aDefRules  ; aDefResults   := ::aDefResults
+           aTransRules := ::aTransRules; aTransResults := ::aTransResults
+           aCommRules  := ::aCommRules ; aCommResults  := ::aCommResults
+           s_lRunLoaded := ::lRunLoaded; s_lClsLoaded := ::lClsLoaded; s_lFWLoaded := ::lFWLoaded
         ENDIF
 
         IF Empty( ::cName )
@@ -128,35 +139,39 @@
         nLines  := Len( ::acPPed )
         //TraceLog( ::cText, ::cPPed, nLines )
 
-	acPPed := ::acPPed
-        nStart := ::nCompiledLines + 1
-        FOR nLine := nStart TO nLines
-	   IF ! Empty( acPPed[ nLine ] )
-	      EXIT
-	   ENDIF
-	NEXT
+        // Save the Rules Engine state.
+        ::aDefRules   := aClone( aDefRules )  ; ::aDefResults   := aClone( aDefResults )
+        ::aTransRules := aClone( aTransRules ); ::aTransResults := aClone( aTransResults )
+        ::aCommRules  := aClone( aCommRules ) ; ::aCommResults  := aClone( aCommResults )
+        ::lRunLoaded := s_lRunLoaded; ::lClsLoaded := s_lClsLoaded; ::lFWLoaded := s_lFWLoaded
 
-	// No Code!
-	IF nLine > nLines
-	   Break( ErrorNew( [PP], 1003, [TInterpreter], [Nothing to compile], { acPPed } ) )
-	ELSE
-	   nStart := nLine
-	ENDIF
+        acPPed := ::acPPed
+        nStart := ::nCompiledLines + 1
+
+        FOR nLine := nStart TO nLines
+           IF ! Empty( acPPed[ nLine ] )
+              EXIT
+           ENDIF
+        NEXT
+
+        // No Code!
+        IF nLine > nLines
+           Break( ErrorNew( [PP], 1003, [TInterpreter], [Nothing to compile], { acPPed } ) )
+        ELSE
+           nStart := nLine
+        ENDIF
 
         IF nProcID > 0
-	   IF ! Left( acPPed[nStart], 7 ) == "PP_PROC"
-	      acPPed[ nStart ] := "PP_PROC Implied_Main" + LTrim( Str( ::nID++ ) ) + ";" + acPPed[ nStart ]
-	   ENDIF
-	ENDIF
-
-	aCompiledProcs := ::aCompiledProcs
-	aInitExit      := ::aInitExit
+           IF ! Left( acPPed[nStart], 7 ) == "PP_PROC"
+              acPPed[ nStart ] := "PP_PROC Implied_Main" + LTrim( Str( ::nID++ ) ) + ";" + acPPed[ nStart ]
+           ENDIF
+        ENDIF
 
         FOR nLine := nStart TO nLines
            sLine := acPPed[nLine]
            IF sLine != NIL
               //TraceLog( "COMPLE: " + sLine )
-              PP_CompileLine( sLine, nLine - nStart + 1, aCompiledProcs, aInitExit, @nProcId )
+              PP_CompileLine( sLine, nLine - nStart + 1, ::aCompiledProcs, ::aInitExit, @nProcId )
            ENDIF
         NEXT
 
@@ -2145,7 +2160,7 @@
               pcode[ 6] = 0;                 /* S_XRET */
 
               pcode[ 7] = HB_P_PUSHSYMNEAR;
-              pcode[ 8] = 30;               /* HB_APARAMS */
+              pcode[ 8] = 29;               /* HB_APARAMS */
 
               pcode[ 9] = HB_P_PUSHNIL;
 
@@ -2157,7 +2172,7 @@
               pcode[14] = 0;                /* S_APARAMS */
 
               pcode[15] = HB_P_PUSHSYMNEAR;
-              pcode[16] = 32;               /* PP_EXECPROCEDURE */
+              pcode[16] = 31;               /* PP_EXECPROCEDURE */
 
               pcode[17] = HB_P_PUSHNIL;
 
