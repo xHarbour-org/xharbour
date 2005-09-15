@@ -1,5 +1,5 @@
 /*
- * $Id:$
+ * $Id: dbtotal.prg,v 1.1 2002/08/28 00:27:41 lculik Exp $
  */
 
 /*
@@ -280,11 +280,13 @@ RETURN nil
 STATIC FUNCTION DbRead()
 
     LOCAL cAlias := Alias()
-    LOCAL aRec   := Array( Fcount() )
+    LOCAL aRec   := {}
     LOCAL nCount
 
-    FOR nCount := 1 TO Fcount()
-        aRec[ nCount ] := Fieldget( nCount )
+    FOR nCount := 1 TO FCount()
+        IF ( FieldType( nCount ) != "M" )
+            AAdd( aRec, Fieldget( nCount ) )
+        ENDIF
     NEXT
 
 RETURN aRec
