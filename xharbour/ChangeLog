@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4324 2005/09/15 00:00:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.4324 2005/09/16 02:58:22 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-16 12:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  * source/ct/getsecrt.prg
+    ! Fixes for CaClipper Tools compability.ESC key should not be processed, and
+      returned password should be same size of variable size passed
 
 2005-09-15 23:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/browdb.prg
@@ -36,7 +41,7 @@
   * utils/hbmake/hbmake.prg
     ! added new libs to lib list
   * source/vm/hvm.c
-    ! added pointer compararion types on hb_vmEqual/hb_vmNotEqual
+    ! added pointer comparasion types on hb_vmEqual/hb_vmNotEqual
 
 2005-09-15 14:53 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   + xharbour/include/hbsxfunc.h

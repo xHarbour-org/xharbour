@@ -1,5 +1,5 @@
 /*
- * $Id: getsecrt.prg,v 1.1 2004/10/12 12:28:59 lculik Exp $
+ * $Id: getsecrt.prg,v 1.2 2004/10/13 20:04:06 oh1 Exp $
  */
 
 /*
@@ -62,14 +62,14 @@
       => @ <row>, <col> GET <var>                                ;
                         [<clauses>]                              ;
                         SEND reader := {|oGet|                   ;
-                                        GetPassword(oGet) }      ;
+                                        GetPassword( oGet, nLen  ) }      ;
                         [<moreClauses>]
 
 
 #include "getexit.ch"
 #include "inkey.ch"
 #include "common.ch"
-proc GetPassword( oGet )
+proc GetPassword( oGet, nLen )
 
 LOCAL nKey,              ;
       nChar,             ;
@@ -92,30 +92,32 @@ LOCAL nKey,              ;
         nKey := InKey(0)
         IF nKey >= 32 .AND. nKey <= 255
           oGet:cargo += Chr(nKey)
-          GetApplyKey(oGet, Asc("*"))
+          GetApplyKey( oGet, Asc( "*" ) )
        	ELSEIF nKey == K_BS
-          oGet:cargo := Substr(oGet:cargo, 1, Len(oGet:cargo) - 1)
-          GetapplyKey(oGet, nKey)
+          oGet:cargo := Substr( oGet:cargo, 1, Len( oGet:cargo ) - 1 )
+          GetapplyKey( oGet, nKey)
+        ELSEIF nKey == K_ESC
         ELSEIF nKey == K_ENTER
-          GetApplyKey(oGet, nKey)
+          GetApplyKey( oGet, nKey )
         ENDIF
       ENDDO
 
       // disallow exit if the VALID condition is not satisfied
-      IF ( !GetPostValidate(oGet) )
+      IF ( !GetPostValidate( oGet ) )
         oGet:exitState := GE_NOEXIT
       ENDIF
     ENDDO
     // de-activate the GET
     oGet:KillFocus()
   ENDIF
+
   IF oGet:exitState != GE_ESCAPE
-    oGet:varPut(oGet:cargo)
+     oGet:varPut( oGet:cargo + Space( nLen - Len( oGet:cargo ) ) )
   ENDIF
 
 RETURN
 
-FUNCTION GetSecret( cDef,nrow,ncol,lSay,lPrompt)
+FUNCTION GetSecret( cDef, nRow, nCol, lSay, lPrompt )
 
    Local OldRow := Row()
    Local OldCol := Col()
@@ -125,12 +127,12 @@ FUNCTION GetSecret( cDef,nrow,ncol,lSay,lPrompt)
    DEFAULT nRow to Row(), nCol to Col(), lSay To .F.
 
    IF lPrompt <> Nil
-      @ nRow,nCol Say lPrompt Get cVar PASSWORD
+      @ nRow, nCol Say lPrompt Get cVar PASSWORD
    ELSE
-      @ nRow,nCol Get cVar PASSWORD
+      @ nRow, nCol Get cVar PASSWORD
    ENDIF
 
    READ
-   SetPos(OldRow,OldCol)
+   SetPos( OldRow, OldCol )
 
 RETURN cVar
