@@ -1,5 +1,5 @@
 /*
- * $Id: getsecrt.prg,v 1.2 2004/10/13 20:04:06 oh1 Exp $
+ * $Id: getsecrt.prg,v 1.3 2005/09/16 14:59:58 lculik Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
  */
 
 
-
+MEMVAR nLen
 #command @ <row>, <col> GET <var>                                ;
                         [<clauses,...>]                          ;
                         PASSWORD                                 ;
