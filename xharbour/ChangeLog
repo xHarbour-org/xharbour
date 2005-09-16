@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4322 2005/09/15 13:52:01 lculik Exp $
+ * $Id: ChangeLog,v 1.4324 2005/09/15 00:00:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-15 23:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/browdb.prg
+    * Added 5th parameter to TBrowse:New() passed from TBrowseDB()
+      function to control colorrect.
+
+  * source/rtl/tbrowse.prg
+    ! Fixed TBrowse/TBColumn colors management, as colorblock, colorrect,
+      colorspec and default color.
+    + Added hidden setrowpos method that allow us to change a row at run-time
+      via TBrowse:RowPos := n
+    + Added various hidden methods to control colorrect.
+    * Added 5th parameter to TBrowse:new() method passed from TBrowseNew()
+      and TBrowseDB() functions, to control colorrect.
+
+  * source/rtl/tbcolumn.prg
+    ! Fixed any assignable datas in TBColumn that was blocked, for example:
+      footing, heading, etc.
 
 2005-09-15 16:23 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * hrbdll.bc

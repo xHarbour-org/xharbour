@@ -1,5 +1,5 @@
 /*
- * $Id: browdb.prg,v 1.2 2003/04/01 22:20:29 iananderson Exp $
+ * $Id: browdb.prg,v 1.4 2005/09/15 00:00:00 modalsist Exp $
  */
 
 /*
@@ -50,14 +50,24 @@
  *
  */
 
+/*
+NOTE: TBrowseDB() is used by Browse() and DbEdit() functions also.
+*/
+
 #include "hbsetup.ch"
 
 FUNCTION TBrowseDB( nTop, nLeft, nBottom, nRight )
 
-   LOCAL oBrowse := TBrowseNew( nTop, nLeft, nBottom, nRight )
+/* 2005/Sep/15 - Eduardo Fernandes
+Please, don't remove/change 5th parameter <.T.> passed to TBrowse:New().
+See TBrowse:New() method for more details.
+*/
 
-   oBrowse:SkipBlock     := { | nRecs | DBSkipper( nRecs ) }
-   oBrowse:GoTopBlock    := { || dbGoTop() }
-   oBrowse:GoBottomBlock := { || dbGoBottom() }
+LOCAL oTB := TBrowse():New( nTop, nLeft, nBottom, nRight, .T. )
 
-   RETURN oBrowse
+   oTB:SkipBlock     := { | nRecs | DBSkipper( nRecs ) }
+   oTB:GoTopBlock    := { || dbGoTop() }
+   oTB:GoBottomBlock := { || dbGoBottom() }
+
+RETURN ( oTB )
+

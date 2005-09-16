@@ -1,5 +1,5 @@
 /*
- * $Id: tbcolumn.prg,v 1.10 2004/07/13 19:51:41 paultucker Exp $
+ * $Id: tbcolumn.prg,v 1.12 0000/00/00 00:00:00 modalsist Exp $
  */
 
 /*
@@ -59,37 +59,79 @@
 
 CLASS TBColumn
 
-   DATA  Block                // Code block to retrieve data for the column
-   DATA  Cargo                // User-definable variable
-   DATA  ColorBlock           // Code block that determines color of data items
-   DATA  ColSep               // Column separator character
-   DATA  DefColor             // Array of numeric indexes into the color table
-   DATA  Heading              // Column heading
-   DATA  Footing              // Column footing
-   DATA  FootSep              // Footing separator character
-   DATA  HeadSep              // Heading separator character
-   DATA  Picture              // Column picture string
 
-   ACCESS Width      INLINE ::nWidth      // Column display width
-   ASSIGN Width(n)   INLINE ::SetWidth(n)
+   ACCESS Block          INLINE ::bBlock
+   ASSIGN Block(b)       INLINE ::bBlock := iif(Valtype(b)="B",b,::bBlock)
+
+   ACCESS Cargo          INLINE ::uCargo
+   ASSIGN Cargo(u)       INLINE ::uCargo := u
+
+   ACCESS ColorBlock     INLINE ::bColorBlock
+   ASSIGN ColorBlock(b)  INLINE ::bColorBlock := iif(Valtype(b)="B",b,::bColorBlock)
+
+   ACCESS ColSep         INLINE ::cColSep
+   ASSIGN ColSep(c)      INLINE ::cColSep := iif(Valtype(c)="C",c,::cColSep)
+
+   ACCESS DefColor       INLINE ::aDefColor
+   ASSIGN DefColor(a)    INLINE ::aDefColor := iif(Valtype(a)="A",::SetDefColor(a),::aDefColor)
+
+   ACCESS Footing        INLINE ::cFooting
+   ASSIGN Footing(c)     INLINE ::cFooting := iif(Valtype(c)="C",c,::cFooting)
+
+   ACCESS FootSep        INLINE ::cFootSep
+   ASSIGN FootSep(c)     INLINE ::cFootSep := iif(Valtype(c)="C",c,::cFootSep)
+
+   ACCESS Heading        INLINE ::cHeading
+   ASSIGN Heading(c)     INLINE ::cHeading := iif(Valtype(c)="C",c,::cHeading)
+
+   ACCESS HeadSep        INLINE ::cHeadSep
+   ASSIGN HeadSep(c)     INLINE ::cHeadSep := iif(Valtype(c)="C",c,::cHeadSep)
+
+   ACCESS Picture        INLINE ::cPicture
+   ASSIGN Picture(c)     INLINE ::cPicture := iif(Valtype(c)="C",c,::cPicture)
+
+   ACCESS Width          INLINE ::nWidth
+   ASSIGN Width(n)       INLINE ::nWidth := iif(Valtype(n)="N",n,::nWidth)
+
 
    METHOD New(cHeading, bBlock)
 
-   #ifdef HB_COMPAT_C53
-   DATA  PreBlock             //
-   DATA  PostBlock            //
+
+#ifdef HB_COMPAT_C53
+
+   DATA  bPreBlock             //
+   DATA  bPostBlock            //
+
+   ACCESS PreBlock        INLINE ::bPreBlock
+   ASSIGN PreBlock(b)     INLINE ::bPreBlock := iif(Valtype(b)="B",b,::bPreBlock)
+
+   ACCESS PostBlock        INLINE ::bPostBlock
+   ASSIGN PostBlock(b)     INLINE ::bPostBlock := iif(Valtype(b)="B",b,::bPostBlock)
 
    METHOD SetStyle( nMode, lSetting )
-   #endif
+
+#endif
 
    HIDDEN:     /* H I D D E N */
 
-   DATA     nWidth
-   METHOD   SetWidth(n)
+   DATA  bBlock            // Code block to retrieve data for the column
+   DATA  uCargo            // User-definable variable
+   DATA  bColorBlock       // Code block that determines color of data items
+   DATA  cColSep           // Column separator character
+   DATA  aDefColor         // Array of numeric indexes into the color table
+   DATA  cFooting          // Column footing string
+   DATA  cFootSep          // Footing separator character
+   DATA  cHeading          // Column heading string
+   DATA  cHeadSep          // Heading separator character
+   DATA  cPicture          // Column picture string
+   DATA  nWidth            // Widht number of column
 
-   #ifdef HB_COMPAT_C53
-   DATA     aSetStyle
-   #endif
+
+#ifdef HB_COMPAT_C53
+   DATA  aSetStyle
+#endif
+
+   METHOD SetDefcolor(aDefColor)   // Set default color to column (2005/09/10) - E.F.)
 
 ENDCLASS
 
@@ -101,17 +143,17 @@ METHOD New( cHeading, bBlock ) CLASS TBColumn
 
    DEFAULT cHeading TO ""
 
-   ::DefColor := { 1, 2, 1, 1 }
-   ::ColSep   := nil
+   ::aDefColor := { 1, 2, 1, 1 }
+   ::cColSep   := nil
 
-   ::nWidth   := nil
-   ::Heading  := if( valtype( cHeading ) == 'C', cHeading, ' ' )
+   ::nWidth    := nil
+   ::cHeading  := if( valtype( cHeading ) == 'C', cHeading, ' ' )
 
    /* NOTE: needs to be initialized to an empty string or TBrowse()::WriteMLineText() does not work
             if there are columns which have a footing and others which don't
    */
-   ::Footing  := ""
-   ::block    := bBlock
+   ::cFooting := ""
+   ::bBlock    := bBlock
 
    #ifdef HB_COMPAT_C53
    ::aSetStyle := ARRAY( 3 )
@@ -125,17 +167,6 @@ return Self
 
 //-------------------------------------------------------------------//
 
-METHOD SetWidth(n) CLASS TBColumn
-
-   // From a TOFIX inside TBrowse.prg:
-   // "Also Clipper will not allow the user to assign a NIL to the :width variable."
-   if n <> nil
-      ::nWidth := n
-   endif
-
-return n
-
-//-------------------------------------------------------------------//
 
 #ifdef HB_COMPAT_C53
 METHOD SetStyle( nMode, lSetting ) CLASS TBColumn
@@ -153,6 +184,18 @@ METHOD SetStyle( nMode, lSetting ) CLASS TBColumn
 
 RETURN lRet
 #endif
+
+//-------------------------------------------------------------------//
+
+METHOD SetDefcolor( aDefColor ) CLASS TBColumn
+
+  aSize( aDefColor, 4 )
+  DEFAULT aDefColor[ 1 ] TO 1
+  DEFAULT aDefColor[ 2 ] TO 2
+  DEFAULT aDefColor[ 3 ] TO 1
+  DEFAULT aDefColor[ 4 ] TO 1
+
+RETURN (aDefColor)
 
 //-------------------------------------------------------------------//
 
