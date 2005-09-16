@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: sxcompr.c,v 1.1 2005/09/15 12:55:35 druzus Exp $
  */
 
 /*
@@ -182,6 +182,11 @@ typedef struct _HB_LZSSX_COMPR
    ULONG    outBuffPos;
    BOOL     fOutFree;
 
+   ULONG    ulMaxSize;
+   ULONG    ulOutSize;
+   BOOL     fResult;
+   BOOL     fContinue;
+
    BYTE     ring_buffer[ RBUFLENGTH + MAXLENGTH - 1 ];
 
    SHORT    match_offset;
@@ -225,6 +230,11 @@ static PHB_LZSSX_COMPR hb_LZSSxInit(
    pCompr->outBuffPos  = 0;
    pCompr->fOutFree    = ( hOutput != FS_ERROR && pDstBuf == NULL );
 
+   pCompr->ulMaxSize   = 0;
+   pCompr->ulOutSize   = 0;
+   pCompr->fResult     = TRUE;
+   pCompr->fContinue   = FALSE;
+
    if( pCompr->fInFree )
       pCompr->inBuffer    = ( BYTE * ) hb_xgrab( ulDstBuf );
    if( pCompr->fOutFree )
@@ -240,31 +250,35 @@ static PHB_LZSSX_COMPR hb_LZSSxInit(
 
 static BOOL hb_LZSSxFlush( PHB_LZSSX_COMPR pCompr )
 {
-   BOOL fResult = TRUE;
-   if( pCompr->hOutput != FS_ERROR )
+   if( pCompr->fResult && pCompr->hOutput != FS_ERROR )
    {
       if( hb_fsWriteLarge( pCompr->hOutput, pCompr->outBuffer,
                            pCompr->outBuffPos ) != pCompr->outBuffPos )
-         fResult = FALSE;
+      {
+         pCompr->fResult = FALSE;
+      }
       else
+      {
+         pCompr->ulOutSize += pCompr->outBuffPos;
          pCompr->outBuffPos = 0;
+      }
    }
-   return fResult;
+   return pCompr->fResult;
 }
 
 static BOOL hb_LZSSxWrite( PHB_LZSSX_COMPR pCompr, BYTE bVal )
 {
-   BOOL fResult = TRUE;
-
-   if( pCompr->outBuffPos == pCompr->outBuffSize )
-      fResult = hb_LZSSxFlush( pCompr );
-   if( pCompr->outBuffPos < pCompr->outBuffSize )
-      pCompr->outBuffer[pCompr->outBuffPos] = bVal;
-   else
-      fResult = FALSE;
+   if( pCompr->fResult )
+   {
+      if( pCompr->outBuffPos == pCompr->outBuffSize )
+         hb_LZSSxFlush( pCompr );
+      if( pCompr->outBuffPos < pCompr->outBuffSize )
+         pCompr->outBuffer[pCompr->outBuffPos] = bVal;
+      else
+         pCompr->fResult = FALSE;
+   }
    pCompr->outBuffPos++;
-
-   return fResult;
+   return pCompr->fResult || pCompr->fContinue;
 }
 
 static int hb_LZSSxRead( PHB_LZSSX_COMPR pCompr )
@@ -496,7 +510,10 @@ static ULONG hb_LZSSxEncode( PHB_LZSSX_COMPR pCompr )
       if( ( itemMask <<= 1 ) == 0 )
       {
          for( i = 0; i < iItem; i++ )
-            hb_LZSSxWrite( pCompr, itemSet[ i ] );
+         {
+            if( !hb_LZSSxWrite( pCompr, itemSet[ i ] ) )
+               return ( ULONG ) -1;
+         }
          ulSize += iItem;
          itemSet[ 0 ] = 0;
          iItem = itemMask = 1;
@@ -526,11 +543,16 @@ static ULONG hb_LZSSxEncode( PHB_LZSSX_COMPR pCompr )
    if( iItem > 1 )
    {
       for( i = 0; i < iItem; i++ )
-         hb_LZSSxWrite( pCompr, itemSet[ i ] );
+      {
+         if( !hb_LZSSxWrite( pCompr, itemSet[ i ] ) )
+            return ( ULONG ) -1;
+      }
       ulSize += iItem;
    }
 
-   hb_LZSSxFlush( pCompr );
+   if( !hb_LZSSxFlush( pCompr ) )
+      return ( ULONG ) -1;
+
    return ulSize;
 }
 

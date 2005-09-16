@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.31 2005/08/23 10:59:03 druzus Exp $
+ * $Id: hbrddntx.h,v 1.32 2005/09/11 19:39:32 druzus Exp $
  */
 
 /*
@@ -410,8 +410,10 @@ typedef struct _NTXAREA
    LPDBRELINFO lpdbPendingRel;      /* Pointer to parent rel struct */
    ULONG *  pLocksPos;              /* List of records locked */
    ULONG    ulNumLocksPos;          /* Number of records locked */
+   BYTE *   pCryptKey;              /* Pointer to encryption key */
+   PHB_DYNS pTriggerSym;            /* DynSym pointer to trigger function */
 #ifndef HB_CDP_SUPPORT_OFF
-   PHB_CODEPAGE cdPage;          /* Area's codepage pointer  */
+   PHB_CODEPAGE cdPage;             /* Area's codepage pointer  */
 #endif
 
    /*
@@ -422,9 +424,9 @@ typedef struct _NTXAREA
    *  example.
    */
 
+   BOOL           fNtxAppend;    /* TRUE if new record is added */
    LPNTXINDEX     lpIndexes;     /* Pointer to list of indexes */
    LPTAGINFO      lpCurTag;      /* Pointer to current order */
-   BOOL           fNtxAppend;    /* TRUE if new record is added */
    LPNTXSORTINFO  pSort;         /* Index build structure */
 
 } NTXAREA;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.47 2005/08/23 10:59:03 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.48 2005/09/11 19:39:32 druzus Exp $
  */
 
 /*
@@ -513,8 +513,10 @@ typedef struct _CDXAREA
    LPDBRELINFO lpdbPendingRel;      /* Pointer to parent rel struct */
    ULONG *  pLocksPos;              /* List of records locked */
    ULONG    ulNumLocksPos;          /* Number of records locked */
+   BYTE *   pCryptKey;              /* Pointer to encryption key */
+   PHB_DYNS pTriggerSym;            /* DynSym pointer to trigger function */
 #ifndef HB_CDP_SUPPORT_OFF
-   PHB_CODEPAGE cdPage;          /* Area's codepage pointer  */
+   PHB_CODEPAGE cdPage;             /* Area's codepage pointer  */
 #endif
 
    /*
@@ -528,8 +530,8 @@ typedef struct _CDXAREA
    BOOL           fCdxAppend;    /* Appended record changed */
    LPCDXINDEX     lpIndexes;     /* Pointer to indexes array  */
    USHORT         uiTag;         /* current tag focus */
-   BYTE *         bCdxSortTab;   /* Table with storted characters */
    LPCDXSORTINFO  pSort;         /* Index build structure */
+   BYTE *         bCdxSortTab;   /* Table with storted characters */
 
 } CDXAREA;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.50 2005/09/13 01:48:36 druzus Exp $
+ * $Id: dbffpt1.c,v 1.51 2005/09/15 12:55:35 druzus Exp $
  */
 
 /*
@@ -229,6 +229,9 @@ static RDDFUNCS fptTable =
 
    ( DBENTRYP_SVP )   hb_fptWhoCares
 };
+
+/* to satisfy old code which has: REQUES DBFDBT */
+HB_FUNC( DBFDBT ) {;}
 
 
 HB_FUNC( _DBFFPT ) {;}

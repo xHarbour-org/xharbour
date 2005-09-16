@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4324 2005/09/16 02:58:22 modalsist Exp $
+ * $Id: ChangeLog,v 1.4325 2005/09/16 14:59:57 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-17 00:16 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/hb-func.sh
+  * xharbour/bin/pack_src.sh
+  * xharbour/config/global.cf
+    * removed DBFDBT from library list
+
+  * xharbour/include/hbrddcdx.h
+  * xharbour/include/hbrdddbf.h
+  * xharbour/include/hbrddntx.h
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * added support for SIX encryption in DBF tables without MEMOs
+
+  * xharbour/source/rdd/hsx/hsx.c
+    ! fixed bug which cause that the last record was not found in
+      the list
+  * xharbour/source/rdd/hbsix/sxcompr.c
+    * some small extensions for SIX compression
 
 2005-09-16 12:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * source/ct/getsecrt.prg

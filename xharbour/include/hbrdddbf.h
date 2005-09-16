@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.23 2005/09/11 19:39:32 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.24 2005/09/13 01:48:06 druzus Exp $
  */
 
 /*
@@ -205,6 +205,8 @@ typedef struct _DBFAREA
    LPDBRELINFO lpdbPendingRel;      /* Pointer to parent rel struct */
    ULONG *  pLocksPos;              /* List of records locked */
    ULONG    ulNumLocksPos;          /* Number of records locked */
+   BYTE *   pCryptKey;              /* Pointer to encryption key */
+   PHB_DYNS pTriggerSym;            /* DynSym pointer to trigger function */
 #ifndef HB_CDP_SUPPORT_OFF
    PHB_CODEPAGE cdPage;             /* Area's codepage pointer  */
 #endif

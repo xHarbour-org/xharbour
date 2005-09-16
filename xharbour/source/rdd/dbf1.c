@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.130 2005/09/13 01:48:33 druzus Exp $
+ * $Id: dbf1.c,v 1.131 2005/09/15 12:55:35 druzus Exp $
  */
 
 /*
@@ -284,15 +284,15 @@ static BOOL hb_dbfReadRecord( DBFAREAP pArea )
       }
    }
 
+   /* Set record encryption flag */
+   pArea->fEncrypted = FALSE;
+
    if( SELF_GETREC( ( AREAP ) pArea, NULL ) == FAILURE )
       return FALSE;
 
    /* Set flags */
    pArea->fValidBuffer = pArea->fPositioned = TRUE;
-   pArea->fEncrypted = ( pArea->pRecord[ 0 ] == 'D' ||
-                         pArea->pRecord[ 0 ] == 'E' );
-   pArea->fDeleted = pArea->fEncrypted ? pArea->pRecord[ 0 ] == 'D' :
-                                         pArea->pRecord[ 0 ] == '*';
+   pArea->fDeleted = pArea->pRecord[ 0 ] == '*';
    return TRUE;
 }
 
@@ -966,7 +966,7 @@ static ERRCODE hb_dbfGoTo( DBFAREAP pArea, ULONG ulRecNo )
       pArea->fPositioned = pArea->fDeleted = pArea->fEncrypted = FALSE;
 
       /* Clear record buffer */
-      hb_dbfSetBlankRecord( pArea ) ;
+      hb_dbfSetBlankRecord( pArea );
    }
    pArea->fFound = FALSE;
 
@@ -1184,8 +1184,8 @@ static ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
    pArea->fAppend = pArea->fPositioned = TRUE;
    pArea->ulRecCount ++;
    pArea->ulRecNo = pArea->ulRecCount;
-   pArea->fDeleted = pArea->fEncrypted = pArea->fBof = pArea->fEof =
-   pArea->fFound = FALSE;
+   pArea->fDeleted = pArea->fBof = pArea->fEof = pArea->fFound = FALSE;
+   pArea->fEncrypted = pArea->pCryptKey != NULL && !pArea->fHasMemo;
 
    if( pArea->fShared )
    {
@@ -1219,7 +1219,7 @@ static ERRCODE hb_dbfDeleteRec( DBFAREAP pArea )
    if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-   pArea->pRecord[ 0 ] = pArea->fEncrypted ? 'D' : '*';
+   pArea->pRecord[ 0 ] = '*';
    pArea->fDeleted = TRUE;
    return SUCCESS;
 }
@@ -1308,6 +1308,21 @@ static ERRCODE hb_dbfGetRec( DBFAREAP pArea, BYTE ** pBuffer )
          SELF_ERROR( ( AREAP ) pArea, pError );
          hb_itemRelease( pError );
          return FAILURE;
+      }
+
+      if( pArea->pRecord[ 0 ] == 'D' || pArea->pRecord[ 0 ] == 'E' )
+      {
+         pArea->fEncrypted = TRUE;
+         pArea->pRecord[ 0 ] = pArea->pRecord[ 0 ] == 'D' ? '*' : ' ';
+         if( pArea->pCryptKey && pArea->bCryptType == DB_CRYPT_SIX )
+         {
+            hb_sxDeCrypt( pArea->pRecord + 1, pArea->pRecord + 1,
+                          pArea->pCryptKey, pArea->uiRecordLen - 1 );
+         }
+      }
+      else
+      {
+         pArea->fEncrypted = FALSE;
       }
    }
    return SUCCESS;
@@ -1579,26 +1594,45 @@ static ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer )
       /* Copy data to buffer */
       memcpy( pArea->pRecord, pBuffer, pArea->uiRecordLen );
 
-      /* TODO: what should be default ? */
-#if 0
-      pArea->fEncrypted = ( pArea->pRecord[ 0 ] == 'D' ||
-                            pArea->pRecord[ 0 ] == 'E' );
-      pArea->fDeleted = pArea->fEncrypted ? pArea->pRecord[ 0 ] == 'D' :
-                                            pArea->pRecord[ 0 ] == '*';
-#else
-      pArea->pRecord[ 0 ] = pArea->fEncrypted ?
-                            ( pArea->fDeleted ? 'D' : 'E' ) :
-                            ( pArea->fDeleted ? '*' : ' ' );
-#endif
+      /*
+       * TODO: such operation should be forbidden
+       * maybe it will be good to return FAILURE when
+       *    pArea->pRecord[ 0 ] != '*' && pArea->pRecord[ 0 ] != ' '
+       */
+      if( pArea->pRecord[ 0 ] == 'D' || pArea->pRecord[ 0 ] == 'E' )
+      {
+         pArea->fEncrypted = TRUE;
+         pArea->pRecord[ 0 ] = pArea->pRecord[ 0 ] == 'D' ? '*' : ' ';
+      }
+
+      pArea->fDeleted = pArea->pRecord[ 0 ] == '*';
    }
    else /* if( pArea->fRecordChanged ) */
    {
+      BYTE * pRecord = pArea->pRecord;
+      USHORT uiWritten;
+
+      if( pArea->pCryptKey )
+      {
+         if( pArea->bCryptType == DB_CRYPT_SIX && pArea->fEncrypted )
+         {
+            pRecord = ( BYTE * ) hb_xgrab( pArea->uiRecordLen );
+            pRecord[ 0 ] = pArea->fDeleted ? 'D' : 'E';
+            hb_sxEnCrypt( pArea->pRecord + 1, pRecord + 1, pArea->pCryptKey,
+                          pArea->uiRecordLen - 1 );
+         }
+      }
+
       /* Write data to file */
       hb_fsSeekLarge( pArea->hDataFile, ( HB_FOFFSET ) pArea->uiHeaderLen +
                       ( HB_FOFFSET ) ( pArea->ulRecNo - 1 ) *
                       ( HB_FOFFSET ) pArea->uiRecordLen, FS_SET );
-      if( hb_fsWrite( pArea->hDataFile, pArea->pRecord, pArea->uiRecordLen ) !=
-          pArea->uiRecordLen )
+      uiWritten = hb_fsWrite( pArea->hDataFile, pRecord, pArea->uiRecordLen );
+
+      if( pRecord != pArea->pRecord )
+         hb_xfree( pRecord );
+
+      if( uiWritten != pArea->uiRecordLen )
       {
          PHB_ITEM pError = hb_errNew();
 
@@ -1850,7 +1884,7 @@ static ERRCODE hb_dbfRecall( DBFAREAP pArea )
    if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == FAILURE )
       return FAILURE;
 
-   pArea->pRecord[ 0 ] = pArea->fEncrypted ? 'E' : ' ';
+   pArea->pRecord[ 0 ] = ' ';
    pArea->fDeleted = FALSE;
    return SUCCESS;
 }
@@ -1985,6 +2019,14 @@ static ERRCODE hb_dbfClose( DBFAREAP pArea )
    {
       hb_xfree( pArea->pRecord );
       pArea->pRecord = NULL;
+   }
+
+   /* Free encryption password key */
+   if( pArea->pCryptKey )
+   {
+      memset( pArea->pCryptKey, '\0', 8 );
+      hb_xfree( pArea->pCryptKey );
+      pArea->pCryptKey = NULL;
    }
 
    /* Free all filenames */
@@ -2460,11 +2502,68 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             if( pArea->fAppend )
             {
                hb_dbfSetBlankRecord( pArea );
-               pArea->fDeleted = pArea->fEncrypted = FALSE;
+               pArea->fDeleted = FALSE;
             }
             else
             {
                pArea->fRecordChanged = pArea->fValidBuffer = FALSE;
+            }
+         }
+         break;
+
+      case DBI_PASSWORD:
+         {
+            BYTE byBuffer[ 8 ];
+            ULONG ulLen = 0;
+            BOOL fSet = !pArea->fHasMemo && HB_IS_STRING( pItem );
+
+            if( fSet )
+            {
+               ulLen = hb_itemGetCLen( pItem );
+               if( ulLen > 0 )
+               {
+                  if( ulLen < 8 )
+                  {
+                     memcpy( byBuffer, hb_itemGetCPtr( pItem ), ulLen );
+                     memset( byBuffer + ulLen, '\0', 8 - ulLen );
+                  }
+                  else
+                  {
+                     memcpy( byBuffer, hb_itemGetCPtr( pItem ), 8 );
+                  }
+               }
+            }
+
+            if( pArea->pCryptKey )
+               hb_itemPutCL( pItem, ( char * ) pArea->pCryptKey, 8 );
+            else
+               hb_itemClear( pItem );
+
+            if( fSet )
+            {
+               if( pArea->fPositioned )
+               {
+                  SELF_GOCOLD( ( AREAP ) pArea );
+                  pArea->fValidBuffer = FALSE;
+               }
+               if( pArea->pCryptKey )
+               {
+                  /* clean the memory with password key - though it's not
+                   * a serious actions in such case ;-)
+                   */
+                  memset( pArea->pCryptKey, '\0', 8 );
+                  hb_xfree( pArea->pCryptKey );
+                  pArea->pCryptKey = NULL;
+               }
+               if( ulLen > 0 )
+               {
+                  /* at this moment only one encryption method is used,
+                     I'll add other later, [druzus] */
+                  pArea->bCryptType = DB_CRYPT_SIX;
+                  pArea->pCryptKey = ( BYTE * ) hb_xgrab( 8 );
+                  /* SIX encode the key with its own value before use */
+                  hb_sxEnCrypt( byBuffer, pArea->pCryptKey, byBuffer, 8 );
+               }
             }
          }
          break;

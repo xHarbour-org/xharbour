@@ -1,5 +1,5 @@
 /*
- * $Id: hsx.c,v 1.5 2005/08/01 22:21:29 druzus Exp $
+ * $Id: hsx.c,v 1.6 2005/08/23 10:59:04 druzus Exp $
  */
 
 /*
@@ -746,13 +746,13 @@ static int hb_hsxRead( int iHandle, ULONG ulRecord, BYTE ** pRecPtr )
       ulFirst = ulRecord;
       if ( pHSX->fWrLocked && pHSX->fShared )
          pHSX->ulBufRec = 1;
-      else if ( ulFirst + pHSX->ulBufSize <= pHSX->ulRecCount )
+      else if ( ulFirst + pHSX->ulBufSize - 1 <= pHSX->ulRecCount )
          pHSX->ulBufRec = pHSX->ulBufSize;
       else
       {
          if ( fCount )
             hb_hsxGetRecCount( pHSX );
-         pHSX->ulBufRec = HB_MIN( pHSX->ulBufSize, pHSX->ulRecCount - ulFirst );
+         pHSX->ulBufRec = HB_MIN( pHSX->ulBufSize, pHSX->ulRecCount - ulFirst + 1 );
       }
 
       fOffset = ( HB_FOFFSET ) HSXHEADER_LEN +
