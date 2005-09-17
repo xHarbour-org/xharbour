@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.11 2005/08/23 10:59:03 druzus Exp $
+ * $Id: delim1.c,v 1.12 2005/09/11 19:39:49 druzus Exp $
  */
 
 /*
@@ -59,14 +59,14 @@
 
 #define __PRG_SOURCE__ __FILE__
 
-HB_FUNC( _DELIMC );
+HB_FUNC( _DELIM );
 HB_FUNC( DELIM_GETFUNCTABLE );
 
 #undef HB_PRG_PCODE_VER
 #define HB_PRG_PCODE_VER HB_PCODE_VER
 
 HB_INIT_SYMBOLS_BEGIN( delim1__InitSymbols )
-{ "_DELIMC",            HB_FS_PUBLIC, {HB_FUNCNAME( _DELIMC )}, NULL },
+{ "_DELIM",            HB_FS_PUBLIC, {HB_FUNCNAME( _DELIM )}, NULL },
 { "DELIM_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DELIM_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( delim1__InitSymbols )
 
@@ -191,9 +191,7 @@ static RDDFUNCS delimTable = { hb_delimBof,
  */
 
 
-HB_FUNC( _DELIMC )
-{
-}
+HB_FUNC( _DELIM ) { ; }
 
 HB_FUNC( DELIM_GETFUNCTABLE )
 {

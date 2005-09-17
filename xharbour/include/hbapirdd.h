@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.34 2005/09/11 19:39:31 druzus Exp $
+ * $Id: hbapirdd.h,v 1.35 2005/09/13 01:48:06 druzus Exp $
  */
 
 /*
@@ -757,6 +757,7 @@ typedef struct _RDDNODE
 {
    char szName[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ]; /* Name of RDD */
    USHORT   uiType;           /* Type of RDD */
+   USHORT   rddID;            /* Type of RDD */
    RDDFUNCS pTable;           /* Table of functions */
    RDDFUNCS pSuperTable;      /* Table of super functions */
    USHORT   uiAreaSize;       /* Size of the WorkArea */

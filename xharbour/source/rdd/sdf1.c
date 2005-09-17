@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.11 2005/08/23 10:59:03 druzus Exp $
+ * $Id: sdf1.c,v 1.12 2005/09/11 19:39:49 druzus Exp $
  */
 
 /*
@@ -59,14 +59,14 @@
 
 #define __PRG_SOURCE__ __FILE__
 
-HB_FUNC( _SDFC );
+HB_FUNC( _SDF );
 HB_FUNC( SDF_GETFUNCTABLE );
 
 #undef HB_PRG_PCODE_VER
 #define HB_PRG_PCODE_VER HB_PCODE_VER
 
 HB_INIT_SYMBOLS_BEGIN( sdf1__InitSymbols )
-{ "_SDFC",            HB_FS_PUBLIC, {HB_FUNCNAME( _SDFC )}, NULL },
+{ "_SDF",            HB_FS_PUBLIC, {HB_FUNCNAME( _SDF )}, NULL },
 { "SDF_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( SDF_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( sdf1__InitSymbols )
 
@@ -192,9 +192,7 @@ static RDDFUNCS sdfTable = { hb_sdfBof,
 
 
 
-HB_FUNC( _SDFC )
-{
-}
+HB_FUNC( _SDF ) { ; }
 
 HB_FUNC( SDF_GETFUNCTABLE )
 {

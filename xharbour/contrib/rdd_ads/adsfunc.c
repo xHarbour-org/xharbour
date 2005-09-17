@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.60 2005/06/22 15:29:14 druzus Exp $
+ * $Id: adsfunc.c,v 1.61 2005/09/02 18:29:03 druzus Exp $
  */
 
 /*
@@ -344,7 +344,7 @@ HB_FUNC( ADSISRECORDLOCKED )
       }
       else
       {
-         ulRec = pArea->ulRecNo;
+         SELF_RECNO( ( AREAP ) pArea, &ulRec );
       }
       ulRetVal = AdsIsRecordLocked( pArea->hTable, ulRec, &pbLocked );
    }
@@ -688,18 +688,19 @@ HB_FUNC( ADSKEYCOUNT )
             }
             if( pusBufLen )             /* had a scope with AOF or filter, walk it. Skips obey filters */
             {
-               AdsGetRecordNum( pArea->hTable, ADS_IGNOREFILTERS,
-                     (UNSIGNED32 *)&(pArea->ulRecNo) );
-               AdsGotoTop( hIndex );
-               AdsAtEOF( pArea->hTable, (UNSIGNED16 *)&(pArea->fEof) );
+               ULONG ulRecNo;
+               UNSIGNED16 u16eof;
 
-               while( AdsSkip ( hIndex, 1 ) != AE_NO_CURRENT_RECORD && !pArea->fEof )
+               SELF_RECNO( ( AREAP ) pArea, &ulRecNo );
+               AdsGotoTop( hIndex );
+
+               AdsAtEOF( pArea->hTable, &u16eof );
+               while( AdsSkip ( hIndex, 1 ) != AE_NO_CURRENT_RECORD && !u16eof )
                {
-                  AdsAtEOF( pArea->hTable, (UNSIGNED16 *)&(pArea->fEof) );
+                  AdsAtEOF( pArea->hTable, &u16eof );
                   pulKey++;
                }
-               AdsGotoRecord( pArea->hTable, pArea->ulRecNo );
-               AdsAtEOF( pArea->hTable, (UNSIGNED16 *)&(pArea->fEof) );
+               SELF_GOTO( ( AREAP ) pArea, ulRecNo );
             }
             else
             {
@@ -1021,26 +1022,27 @@ HB_FUNC( ADSISRECORDINAOF )
 
 HB_FUNC( ADSISRECORDVALID )             // Does current record match any current filter?
 {
-   ADSAREAP pArea;
+   AREAP pArea;
    BOOL bReturn = FALSE;
    PHB_ITEM pResult;
 
-   pArea = hb_rddGetADSWorkAreaPointer();
+   pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
    if( pArea )
    {
-      if( pArea->fEof )
-      {
-         hb_retl( FALSE );
-         return;
-      }
-      if( ! pArea->dbfi.itmCobExpr )
-      {
-         hb_retl( TRUE );
-         return;
-      }
+      BOOL fEof;
 
-      pResult = hb_vmEvalBlock( pArea->dbfi.itmCobExpr );
-      bReturn = HB_IS_LOGICAL( pResult ) && hb_itemGetL( pResult );
+      if( SELF_EOF( ( AREAP ) pArea , &fEof ) == SUCCESS && !fEof )
+      {
+         if( ! pArea->dbfi.itmCobExpr )
+         {
+            bReturn = TRUE;
+         }
+         else
+         {
+            pResult = hb_vmEvalBlock( pArea->dbfi.itmCobExpr );
+            bReturn = HB_IS_LOGICAL( pResult ) && hb_itemGetL( pResult );
+         }
+      }
    }
 /*
    else

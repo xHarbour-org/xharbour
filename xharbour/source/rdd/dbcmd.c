@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.165 2005/09/11 19:39:49 druzus Exp $
+ * $Id: dbcmd.c,v 1.166 2005/09/13 01:48:06 druzus Exp $
  */
 
 /*
@@ -79,9 +79,6 @@
 #  include "hbapicdp.h"
 #endif
 
-HB_FUNC_EXTERN( _DBF );
-HB_FUNC_EXTERN( _SDF );
-HB_FUNC_EXTERN( _DELIM );
 HB_FUNC_EXTERN( RDDSYS );
 
 static char s_szDefDriver[HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1] = ""; /* Default RDD name */
@@ -137,27 +134,6 @@ static BOOL s_bNetError = FALSE;       /* Error on Networked environments */
  * -- DEFAULT METHODS --
  */
 
-/*
- * Force link the built-in RDD's.
- */
-static void hb_rddCheck( void )
-{
-   static BOOL fInit = FALSE;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddCheck()"));
-
-   if( !fInit )
-   {
-      /* Force link the built-in RDD's */
-      HB_FUNCNAME( _DBF )();
-      HB_FUNCNAME( _SDF )();
-      HB_FUNCNAME( _DELIM )();
-      HB_FUNCNAME( RDDSYS )();
-      fInit = TRUE;
-   }
-}
-
-
 #if 0
 /*
  * Empty method.
@@ -179,6 +155,11 @@ static ERRCODE hb_waUnsupported( AREAP pArea )
    PHB_ITEM pError;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_waUnsupported(%p)", pArea));
+
+   if( !pArea )
+   {
+      HB_FUNCNAME( RDDSYS )();
+   }
 
    pError = hb_errNew();
    hb_errPutGenCode( pError, EG_UNSUPPORTED );
@@ -382,6 +363,7 @@ static int hb_rddRegister( char * szDriver, USHORT uiType )
    /* Fill the new RDD node */
    strncat( pRddNewNode->szName, szDriver, HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
    pRddNewNode->uiType = uiType;
+   pRddNewNode->rddID = s_uiRddMax;
 
    /* Call <szDriver>_GETFUNCTABLE() */
    hb_vmPushSymbol( pGetFuncTable->pSymbol );
@@ -2154,7 +2136,6 @@ HB_FUNC( DBTABLEEXT )
    {
       LPRDDNODE pRddNode;
       USHORT uiRddID;
-      hb_rddCheck();
       pRddNode = hb_rddFindNode( s_szDefDriver, &uiRddID );
       if( pRddNode )
       {
@@ -2544,7 +2525,6 @@ HB_FUNC( ORDBAGEXT )
    {
       LPRDDNODE pRddNode;
       USHORT uiRddID;
-      hb_rddCheck();
       pRddNode = hb_rddFindNode( s_szDefDriver, &uiRddID );
       if( pRddNode )
       {
@@ -3254,7 +3234,6 @@ HB_FUNC( RDDLIST )
    USHORT uiType, uiCount;
    HB_ITEM_NEW( Name );
 
-   hb_rddCheck();
    hb_arrayNew( hb_stackReturnItem(), 0 );
    uiType = hb_parni( 1 );       /* 0 all types of RDD's */
    for( uiCount = 0; uiCount < s_uiRddMax; ++uiCount )
@@ -3290,8 +3269,6 @@ HB_FUNC( RDDREGISTER )
 {
    USHORT uiLen;
    char szDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
-
-   hb_rddCheck();
 
    uiLen = ( USHORT ) hb_parclen( 1 );
    if( uiLen > 0 )
@@ -3409,7 +3386,6 @@ HB_FUNC( __RDDSETDEFAULT )
    HB_THREAD_STUB
    USHORT uiLen;
 
-   hb_rddCheck();
    hb_retc( s_szDefDriver );
 
    uiLen = ( USHORT ) hb_parclen( 1 );
@@ -3431,7 +3407,6 @@ HB_FUNC( RDDSETDEFAULT )
    USHORT uiLen;
    char szNewDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
 
-   hb_rddCheck();
    hb_retc( s_szDefDriver );
 
    uiLen = ( USHORT ) hb_parclen( 1 );
@@ -3459,7 +3434,6 @@ HB_FUNC( DBSETDRIVER )
    USHORT uiLen;
    char szNewDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
 
-   hb_rddCheck();
    hb_retc( s_szDefDriver );
 
    uiLen = ( USHORT ) hb_parclen( 1 );

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.32 2005/09/11 19:39:32 druzus Exp $
+ * $Id: hbrddntx.h,v 1.33 2005/09/16 22:29:40 druzus Exp $
  */
 
 /*
@@ -234,6 +234,7 @@ typedef struct _TAGINFO
    BOOL        TagEOF;
    ULONG       HeadBlock;
    ULONG       RootBlock;
+   USHORT      uiNumber;
    BYTE        KeyType;
    USHORT      nField;
    USHORT      KeyLength;
@@ -424,10 +425,11 @@ typedef struct _NTXAREA
    *  example.
    */
 
-   BOOL           fNtxAppend;    /* TRUE if new record is added */
-   LPNTXINDEX     lpIndexes;     /* Pointer to list of indexes */
-   LPTAGINFO      lpCurTag;      /* Pointer to current order */
-   LPNTXSORTINFO  pSort;         /* Index build structure */
+   BOOL           fNtxAppend;       /* TRUE if new record is added */
+   BOOL           fSetTagNumbers;   /* Tag number should be recreated */
+   LPNTXINDEX     lpIndexes;        /* Pointer to list of indexes */
+   LPTAGINFO      lpCurTag;         /* Pointer to current order */
+   LPNTXSORTINFO  pSort;            /* Index build structure */
 
 } NTXAREA;
 typedef NTXAREA * LPNTXAREA;

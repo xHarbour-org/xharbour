@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.74 2005/09/11 19:39:11 druzus Exp $
+ * $Id: ads1.c,v 1.75 2005/09/13 01:48:05 druzus Exp $
  */
 
 /*
@@ -272,6 +272,30 @@ static void DumpArea( ADSAREAP pArea )  /* For debugging: call this to dump ads 
    }
 }
 #endif
+
+static int adsGetFileType( USHORT uiRddID )
+{
+   return ( uiRddID == s_uiRddIdADSCDX ? ADS_CDX :
+          ( uiRddID == s_uiRddIdADSNTX ? ADS_NTX :
+          ( uiRddID == s_uiRddIdADT    ? ADS_ADT : adsFileType ) ) );
+}
+
+static const char * adsTableExt( int iFileType )
+{
+   return iFileType == ADS_ADT ? ".adt" : ".dbf";
+}
+
+static const char * adsMemoExt( int iFileType )
+{
+   return iFileType == ADS_ADT ? ".adm" :
+        ( iFileType == ADS_CDX ? ".fpt" : ".dbt" );
+}
+
+static const char * adsIndexExt( int iFileType )
+{
+   return iFileType == ADS_ADT ? ".adi" :
+        ( iFileType == ADS_CDX ? ".cdx" : ".ntx" );
+}
 
 static ERRCODE hb_adsUpdateAreaFlags( ADSAREAP pArea )
 {
@@ -1219,7 +1243,7 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
                pFieldInfo.uiType = HB_IT_STRING;
                pFieldInfo.uiLen = uiLen + uiDec * 256;
             }
-            else if( ! hb_stricmp( szFieldType, "curdouble" ) && adsFileType == ADS_ADT )
+            else if( ! hb_stricmp( szFieldType, "curdouble" ) && pArea->iFileType == ADS_ADT )
             {
                pFieldInfo.uiType = HB_IT_LONG;
                pFieldInfo.uiTypeExtended = ADS_CURDOUBLE;
@@ -1239,14 +1263,14 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
 
          case 'M':
             pFieldInfo.uiType = HB_IT_MEMO;
-            pFieldInfo.uiLen = ( adsFileType == ADS_ADT ) ? 9 : 10;
+            pFieldInfo.uiLen = ( pArea->iFileType == ADS_ADT ) ? 9 : 10;
             break;
 
          case 'D':
             if( strlen( szFieldType ) == 1 || ! hb_stricmp( szFieldType, "date" ) )
             {
                pFieldInfo.uiType = HB_IT_DATE;
-               pFieldInfo.uiLen = ( adsFileType == ADS_ADT ) ? 4 : 8;
+               pFieldInfo.uiLen = ( pArea->iFileType == ADS_ADT ) ? 4 : 8;
             }
             else if( ! hb_stricmp( szFieldType, "double" ) )
             {
@@ -1275,7 +1299,7 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
             break;
 
          case 'A':
-            if( adsFileType == ADS_ADT )
+            if( pArea->iFileType == ADS_ADT )
             {
                pFieldInfo.uiType = HB_IT_LONG;
                pFieldInfo.uiTypeExtended = ADS_AUTOINC;
@@ -1289,7 +1313,7 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
          case 'B':
             pFieldInfo.uiType = HB_IT_MEMO;
             pFieldInfo.uiTypeExtended = ADS_BINARY;
-            pFieldInfo.uiLen = ( adsFileType == ADS_ADT ) ? 9 : 10;
+            pFieldInfo.uiLen = ( pArea->iFileType == ADS_ADT ) ? 9 : 10;
             break;
 
          case 'V':
@@ -1298,7 +1322,7 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
             break;
 
          case 'R':
-            if( adsFileType == ADS_ADT )
+            if( pArea->iFileType == ADS_ADT )
             {
                pFieldInfo.uiType = HB_IT_STRING;
                pFieldInfo.uiTypeExtended = ADS_RAW;
@@ -1316,7 +1340,7 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
                pFieldInfo.uiTypeExtended = ADS_COMPACTDATE;
                pFieldInfo.uiLen = 4;
             }
-            else if( !hb_stricmp( szFieldType, "shortint" ) && adsFileType == ADS_ADT )
+            else if( !hb_stricmp( szFieldType, "shortint" ) && pArea->iFileType == ADS_ADT )
             {
                pFieldInfo.uiType = HB_IT_LONG;
                pFieldInfo.uiTypeExtended = ADS_SHORTINT;
@@ -1329,13 +1353,13 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
             break;
 
          case 'T':
-            if( ! hb_stricmp( szFieldType, "timestamp" ) && adsFileType == ADS_ADT )
+            if( ! hb_stricmp( szFieldType, "timestamp" ) && pArea->iFileType == ADS_ADT )
             {
                pFieldInfo.uiType = HB_IT_LONG;
                pFieldInfo.uiTypeExtended = ADS_TIMESTAMP;
                pFieldInfo.uiLen = 8;
             }
-            else if( !hb_stricmp( szFieldType, "time" ) && adsFileType == ADS_ADT )
+            else if( !hb_stricmp( szFieldType, "time" ) && pArea->iFileType == ADS_ADT )
             {
                pFieldInfo.uiType = HB_IT_LONG;
                pFieldInfo.uiTypeExtended = ADS_TIME;
@@ -1358,7 +1382,7 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
             {
                pFieldInfo.uiType = HB_IT_MEMO;
                pFieldInfo.uiTypeExtended = ADS_IMAGE;
-               pFieldInfo.uiLen = ( adsFileType == ADS_ADT ) ? 9 : 10;
+               pFieldInfo.uiLen = ( pArea->iFileType == ADS_ADT ) ? 9 : 10;
             }
             else
             {
@@ -2304,7 +2328,7 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
    }
    /* printf( "\n%s",(char*)ucfieldDefs ); */
    uRetVal = AdsCreateTable( 0, pCreateInfo->abName, pCreateInfo->atomAlias,
-                             adsFileType, adsCharType,
+                             pArea->iFileType, adsCharType,
                              adsLockType, adsRights,
                              hb_set.HB_SET_MBLOCKSIZE,
                              ucfieldDefs, &hTable );
@@ -2413,7 +2437,7 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       }
 
       case DBI_TABLEEXT:
-         hb_itemPutC( pItem, ( ( pArea->iFileType == ADS_ADT ) ? ".adt" : ".dbf" ) );
+         hb_itemPutC( pItem, adsTableExt( pArea->iFileType ) );
          break;
 
       case DBI_FULLPATH :
@@ -2451,8 +2475,7 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_MEMOEXT:
-         hb_itemPutC( pItem, ( ( pArea->iFileType == ADS_ADT ) ? ".adm" :
-                               ( pArea->iFileType == ADS_CDX ) ? ".fpt" : ".dbt" ) );
+         hb_itemPutC( pItem, adsMemoExt( pArea->iFileType ) );
          break;
 
       case DBI_DB_VERSION     :   /* HOST driver Version */
@@ -2755,7 +2778,7 @@ static ERRCODE adsSysName( ADSAREAP pArea, BYTE * pBuffer )
    }
    else
    {
-      u16TableType = (UNSIGNED16) adsFileType;
+      u16TableType = (UNSIGNED16) pArea->iFileType;
    }
 
    switch( u16TableType )
@@ -3490,9 +3513,7 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_BAGEXT:
-         hb_itemPutC( pOrderInfo->itmResult,
-                      ( ( pArea->iFileType == ADS_ADT ) ? ".adi" :
-                        ( pArea->iFileType == ADS_CDX ) ? ".cdx" : ".ntx" ) );
+         hb_itemPutC( pOrderInfo->itmResult, adsIndexExt( pArea->iFileType ) );
          break;
 
       case DBOI_ORDERCOUNT:
@@ -4187,7 +4208,7 @@ static ERRCODE adsRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_
          break;
       }
       case RDDI_ISDBF:
-         hb_itemPutL( pItem, adsFileType != ADS_ADT );
+         hb_itemPutL( pItem, adsGetFileType( pRDD->rddID ) != ADS_ADT );
          break;
 
       case RDDI_CANPUTREC:
@@ -4195,19 +4216,17 @@ static ERRCODE adsRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_
          break;
 
       case RDDI_TABLEEXT:
-         hb_itemPutC( pItem, adsFileType == ADS_ADT ? ".adt" : ".dbf" );
+         hb_itemPutC( pItem, adsTableExt( adsGetFileType( pRDD->rddID ) ) );
          break;
 
       case RDDI_MEMOEXT:
-         hb_itemPutC( pItem, adsFileType == ADS_ADT ? ".adm" :
-                             ( adsFileType == ADS_CDX ? ".fpt" : ".dbt" ) );
+         hb_itemPutC( pItem, adsMemoExt( adsGetFileType( pRDD->rddID ) ) );
          break;
 
       case RDDI_ORDEREXT:
       case RDDI_ORDBAGEXT:
       case RDDI_ORDSTRUCTEXT:
-         hb_itemPutC( pItem, adsFileType == ADS_ADT ? ".adi" :
-                             ( adsFileType == ADS_CDX ? ".cdx" : ".nsx" ) );
+         hb_itemPutC( pItem, adsIndexExt( adsGetFileType( pRDD->rddID ) ) );
          break;
 
       default:

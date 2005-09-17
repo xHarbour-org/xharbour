@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.128 2005/09/13 01:48:36 druzus Exp $
+ * $Id: dbfntx1.c,v 1.129 2005/09/15 12:55:35 druzus Exp $
  */
 
 /*
@@ -1504,6 +1504,7 @@ static void hb_ntxTagDelete( LPTAGINFO pTag )
       }
    }
    hb_ntxTagFree( pTag );
+   pIndex->Owner->fSetTagNumbers = TRUE;
    return;
 }
 
@@ -1522,6 +1523,7 @@ static ERRCODE hb_ntxTagAdd( LPNTXINDEX pIndex, LPTAGINFO pTag )
       pIndex->lpTags = ( LPTAGINFO * ) hb_xgrab( sizeof( LPTAGINFO ) );
 
    pIndex->lpTags[ pIndex->iTags++ ] = pTag;
+   pIndex->Owner->fSetTagNumbers = TRUE;
    return SUCCESS;
 }
 
@@ -3404,8 +3406,6 @@ static BOOL hb_ntxTagPagesFree( LPTAGINFO pTag, ULONG ulPage )
  */
 static ERRCODE hb_ntxTagSpaceFree( LPTAGINFO pTag )
 {
-   ERRCODE errCode = SUCCESS;
-
    if( hb_ntxTagHeaderCheck( pTag ) )
    {
       if( pTag->RootBlock )
@@ -3418,7 +3418,7 @@ static ERRCODE hb_ntxTagSpaceFree( LPTAGINFO pTag )
       pTag->Owner->Changed = TRUE;
    }
    hb_ntxTagDelete( pTag );
-   return errCode;
+   return SUCCESS;
 }
 
 /*
@@ -3608,20 +3608,23 @@ static LPTAGINFO hb_ntxFindTag( NTXAREAP pArea, PHB_ITEM pTagItem,
  */
 static int hb_ntxFindTagNum( NTXAREAP pArea, LPTAGINFO pTag )
 {
-   LPNTXINDEX pIndex = pArea->lpIndexes;
-   int iNum = 1, i;
-
-   while( pIndex )
+   if( pArea->fSetTagNumbers )
    {
-      for( i = 0; i < pIndex->iTags; i++ )
+      LPNTXINDEX pIndex = pArea->lpIndexes;
+      USHORT uiNum = 0, i;
+
+      pTag->uiNumber = 0;
+      while( pIndex )
       {
-         if( pIndex->lpTags[ i ] == pTag )
-            return iNum;
-         ++iNum;
+         for( i = 0; i < pIndex->iTags; i++ )
+         {
+            pIndex->lpTags[ i ]->uiNumber = ++uiNum;
+         }
+         pIndex = pIndex->pNext;
       }
-      pIndex = pIndex->pNext;
+      pArea->fSetTagNumbers = FALSE;
    }
-   return 0;
+   return pTag->uiNumber;
 }
 
 /*
@@ -6062,11 +6065,11 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          if( pIndex == *pIndexPtr )
          {
             *pIndexPtr = pIndex->pNext;
+            hb_ntxIndexFree( pIndex );
             break;
          }
          pIndexPtr = &(*pIndexPtr)->pNext;
       }
-      hb_ntxIndexFree( pIndex );
       pIndex = NULL;
    }
 
@@ -6128,6 +6131,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          hb_ntxDestroyExp( pKeyExp );
          if( pForExp != NULL )
             hb_ntxDestroyExp( pForExp );
+         /* hb_ntxSetTagNumbers() */
          return FAILURE;
       }
 
@@ -6165,6 +6169,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
             hb_ntxDestroyExp( pKeyExp );
             if( pForExp != NULL )
                hb_ntxDestroyExp( pForExp );
+            /* hb_ntxSetTagNumbers() */
             hb_ntxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT, szFileName, 0, 0 );
             return errCode;
          }
@@ -6183,6 +6188,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       hb_ntxDestroyExp( pKeyExp );
       if( pForExp != NULL )
          hb_ntxDestroyExp( pForExp );
+      /* hb_ntxSetTagNumbers() */
       hb_ntxErrorRT( pArea, EG_LIMIT, EDBF_LIMITEXCEEDED, pIndex->IndexName, 0, 0 );
       return FAILURE;
    }
@@ -6267,6 +6273,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
    {
       *pIndexPtr = pIndex->pNext;
       hb_ntxIndexFree( pIndex );
+      /* hb_ntxSetTagNumbers() */
       return errCode;
    }
 
@@ -6286,6 +6293,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       pArea->fHasTags = TRUE;
       SELF_WRITEDBHEADER( ( AREAP ) pArea );
    }
+   /* hb_ntxSetTagNumbers() */
    pArea->lpCurTag = pTag;
    SELF_ORDSETCOND( ( AREAP ) pArea, NULL );
    return SELF_GOTOP( ( AREAP ) pArea );
@@ -6353,6 +6361,7 @@ static ERRCODE ntxOrderDestroy( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
             errCode = hb_ntxTagSpaceFree( pTag );
             hb_ntxIndexUnLockWrite( pIndex );
          }
+         /* hb_ntxSetTagNumbers() */
       }
    }
 
@@ -7051,6 +7060,7 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
          hb_ntxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT, szFileName, 0, 0 );
          return errCode;
       }
+      /* hb_ntxSetTagNumbers() */
    }
 
    if( !pArea->lpCurTag && pIndex->iTags )
@@ -7086,6 +7096,7 @@ static ERRCODE ntxOrderListClear( NTXAREAP pArea )
          hb_ntxIndexFree( pIndex );
       }
    }
+   /* hb_ntxSetTagNumbers() */
    return SUCCESS;
 }
 
@@ -7115,11 +7126,12 @@ static ERRCODE ntxOrderListDelete( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
          if( pIndex == *pIndexPtr )
          {
             *pIndexPtr = pIndex->pNext;
+            hb_ntxIndexFree( pIndex );
+            /* hb_ntxSetTagNumbers() */
             break;
          }
          pIndexPtr = &(*pIndexPtr)->pNext;
       }
-      hb_ntxIndexFree( pIndex );
    }
    return SUCCESS;
 }

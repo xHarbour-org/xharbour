@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4327 2005/09/16 23:15:29 modalsist Exp $
+ * $Id: ChangeLog,v 1.4328 2005/09/17 21:15:17 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-17 23:35 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/hb-func.sh
+    + added -hwgui switch for easier linking HWGUI application to xhb*
+      scripts
+    + add -l<libname> switch for xhbmk
+
+  * xharbour/contrib/rdd_ads/ads1.c
+    ! removed access to static adsFileType variable in WA methods.
+      Now only WA member iFIleType is used. It fixes real separation
+      of ADSCDX, ADSNTX and ADT RDDs.
+
+  * xharbour/contrib/rdd_ads/adsfunc.c
+    ! fixed some functions to use WA methods to avoid desynchronization
+      between ADS* RDD and ACE layer.
+
+  * xharbour/include/hbapirdd.h
+    + added rddID to AREANODE
+
+  * xharbour/include/hbextern.ch
+  * xharbour/source/rdd/delim0.prg
+  * xharbour/source/rdd/delim1.c
+  * xharbour/source/rdd/sdf0.prg
+  * xharbour/source/rdd/sdf1.c
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/rddsys.prg
+    ! fixed default RDD requests. Now ANNOUNCE RDDSYS disable linking of
+      any RDD.
+
+  * xharbour/include/hbrddntx.h
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    % optimize tag number request
 
 2005-09-16 18:15 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * utils/hbmake/hbmake.prg

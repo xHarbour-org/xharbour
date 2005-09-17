@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.57 2005/09/15 12:55:34 druzus Exp $
+# $Id: hb-func.sh,v 1.58 2005/09/16 22:29:40 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -176,6 +176,8 @@ if [ \$# = 0 ]; then
                         # link with more GTs. The first one will be
                         #      the default at runtime
     -xbgtk              # link with xbgtk library (xBase GTK+ interface)
+    -hwgui              # link with HWGUI library (GTK+ interface)
+    -l<libname>         # link with <libname> library
     -fmstat             # link with the memory statistics lib
     -nofmstat           # do not link with the memory statistics lib (default)
     -[no]strip          # strip (no strip) binaries
@@ -215,6 +217,8 @@ HB_FM_REQ=""
 HB_STRIP="yes"
 HB_MAIN_FUNC=""
 HB_XBGTK=""
+HB_HWGUI=""
+HB_USRLIBS=""
 [ -n "\$TMPDIR" ] || TMPDIR="\$TMP"
 [ -n "\$TMPDIR" ] || TMPDIR="\$TEMP"
 [ -n "\$TMPDIR" ] || TMPDIR="/tmp"
@@ -238,12 +242,14 @@ while [ \$n -lt \${#P[@]} ]; do
         -fullstatic) HB_STATIC="full" ;;
         -shared)     HB_STATIC="no" ;;
         -xbgtk)      HB_XBGTK="yes" ;;
+        -hwgui)      HB_HWGUI="yes" ;;
         -mt)         HB_MT="MT" ;;
         -gt*)        HB_GT_REQ="\${HB_GT_REQ} \${v#-gt}" ;;
         -fmstat)     HB_FM_REQ="STAT" ;;
         -nofmstat)   HB_FM_REQ="NOSTAT" ;;
         -strip)      HB_STRIP="yes" ;;
         -nostrip)    HB_STRIP="no" ;;
+        -l[a-zA-z]*) HB_USRLIBS="\${HB_USRLIBS} \${v}" ;;
         -main=*)     HB_MAIN_FUNC="\${v#*=}" ;;
         -*)          p="\${v}" ;;
         *)           [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
@@ -316,7 +322,7 @@ if [ "\${HB_STATIC}" = "full" ]; then
     LINK_OPT="\${LINK_OPT} -static"
     HB_STATIC="yes"
 fi
-if [ "\${HB_XBGTK}" = "yes" ]; then
+if [ "\${HB_XBGTK}" = "yes" ] || [ "\${HB_HWGUI}" = "yes" ]; then
     SYSTEM_LIBS="\${SYSTEM_LIBS} \`pkg-config --libs gtk+-2.0\`"
 fi
 
@@ -369,6 +375,9 @@ done
 if [ "\${HB_XBGTK}" = "yes" ]; then
     HARBOUR_LIBS="\${HARBOUR_LIBS} -lxbgtk"
 fi
+if [ "\${HB_HWGUI}" = "yes" ]; then
+    HARBOUR_LIBS="\${HARBOUR_LIBS} -lhwgui -lprocmisc -lhbxml"
+fi
 if [ "\${HB_ARCHITECTURE}" = "darwin" ] || [ "\${HB_ARCHITECTURE}" = "sunos" ]; then
     HARBOUR_LIBS="\${HARBOUR_LIBS} \${HARBOUR_LIBS}"
 else
@@ -414,9 +423,9 @@ hb_link()
     fi
     if [ -n "\${HB_LNK_REQ}" ] || [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
         hb_lnk_request > \${_TMP_FILE_} && \\
-        ${CCPREFIX}\${HB_CC} "\$@" \${CC_OPT} "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        ${CCPREFIX}\${HB_CC} "\$@" \${CC_OPT} "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${HB_USRLIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     else
-        ${CCPREFIX}\${HB_CC} "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        ${CCPREFIX}\${HB_CC} "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${HB_USRLIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     fi
 }
 

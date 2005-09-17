@@ -1,5 +1,5 @@
 /*
- * $Id: delim0.prg,v 1.1.1.1 2001/12/21 10:42:46 ronpinkas Exp $
+ * $Id: delim0.prg,v 1.2 2005/01/30 21:19:24 druzus Exp $
  */
 
 /*
@@ -52,11 +52,11 @@
 
 #include "rddsys.ch"
 
-ANNOUNCE _DELIM
+ANNOUNCE DELIM
 
 init procedure DELIMInit
 
-   REQUEST _DELIMC
+   REQUEST _DELIM
 
    rddRegister( "DELIM", RDT_TRANSFER )
 

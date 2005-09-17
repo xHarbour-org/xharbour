@@ -1,5 +1,5 @@
 /*
- * $Id: rddsys.prg,v 1.4 2005/01/30 21:19:24 druzus Exp $
+ * $Id: rddsys.prg,v 1.5 2005/09/11 19:39:49 druzus Exp $
  */
 
 /*
@@ -50,19 +50,16 @@
  *
  */
 
-// Standard Harbour RDDSys system
+/* Standard Harbour RDDSys system */
 
 ANNOUNCE RDDSYS
 
 PROCEDURE RddInit
 
+   REQUEST DBF
    REQUEST DBFNTX
    REQUEST DBFFPT
 
-   /* NOTE: Using this internal version of this functions, since at this
-            point the DBFNTX RDD may not be registered, depending on the
-            execution order of INIT procedures. */
-
-   __rddSetDefault( "DBFNTX" )
+   rddSetDefault( "DBFNTX" )
 
 return
