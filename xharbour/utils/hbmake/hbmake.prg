@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.151 2005/09/05 02:31:14 lculik Exp $
+ * $Id: hbmake.prg,v 1.152 2005/09/15 13:52:03 lculik Exp $
  */
 
 /*
@@ -1501,17 +1501,17 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL getlist          := {}
    LOCAL cTopFile         := Space( 50 )
    LOCAL cAppName         := s_Appname + Space( 50 )
-   LOCAL cDefBccLibs      := "lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib dbffpt.lib dbfdbt.lib common.lib gtwin.lib codepage.lib ct.lib tip.lib pcrepos.lib hsx.lib hbsix.lib"
+   LOCAL cDefBccLibs      := "lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib dbffpt.lib common.lib gtwin.lib codepage.lib ct.lib tip.lib pcrepos.lib hsx.lib hbsix.lib"
    LOCAL cDefGccLibs      := "-lvm -lrtl -lpcrepos -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -lhsx -lhbsix -lcommon -lcodepage  -lm "
    LOCAL cDefGccLibsw     := "-lvm -lrtl -lpcrepos -lgtwin -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -lhsx -lhbsix -lcommon -lcodepage -lm"
    LOCAL cGccLibsOs2      := "-lvm -lrtl -lpcrepos -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -lhsx -lhbsix -lcommon -lcodepage -lm"
    LOCAL cDefLibGccLibs   := "-lvm -lrtl -lpcrepos -lgtcrs -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -lhsx -lhbsix -lcommon -lcodepage -lgtnul"
-   LOCAL cDefBccLibsMt    := "lang.lib vmmt.lib rtlmt.lib rddmt.lib macromt.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib  dbffptmt.lib dbfdbtmt.lib common.lib gtwin.lib codepage.lib ctmt.lib tipmt.lib pcrepos.lib hsxmt.lib hbsixmt.lib"
+   LOCAL cDefBccLibsMt    := "lang.lib vmmt.lib rtlmt.lib rddmt.lib macromt.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib  dbffptmt.lib common.lib gtwin.lib codepage.lib ctmt.lib tipmt.lib pcrepos.lib hsxmt.lib hbsixmt.lib"
    LOCAL cDefGccLibsMt    := "-lvmmt -lrtlmt -lpcrepos -lgtdos -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -lhsxmt -lhbsixmt -lcommon -lcodepage -lm"
    LOCAL cDefGccLibsMtw    := "-lvmmt -lrtlmt -lpcrepos -lgtwin -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -lhsxmt -lhbsixmt -lcommon -lcodepage -lm"
    LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlmt -lpcrepos -lgtos2 -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -lhsxmt -lhbsixmt -lcommon -lcodepage -lm"
    LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlmt -lpcrepos -lgtcrs -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -lhsxmt -lhbsixmt -lcommon -lcodepage"
-   LOCAL cHarbDll         := "bcc640.lib harbour.lib"
+   LOCAL cHarbDll         := "harbour.lib"
    LOCAL cHARso           := "-lxharbour -lncurses -lgpm -lslang -lpthread -lm"
    LOCAL cSystemLibs      := "-lncurses -lslang -lgpm -lpthread -lm"
 
@@ -2668,7 +2668,7 @@ FUNCTION CreateMakeFile( cFile )
             cDefBccLibsMt := strtran(cDefBccLibsMt,"gtwin","gtwvw")
          endif
 
-         FWrite( s_nMakeFileHandle, "LIBFILES = " + iif( lGTWVT,"optgui.lib ",iif(!s_lasdll,"optcon.lib ","")) + iif( !s_lMt, "", "mt" )  + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         FWrite( s_nMakeFileHandle, "LIBFILES = " + iif( lGTWVT,"optgui",iif(!s_lasdll,"optcon","")) + iif( !s_lMt, "", "mt" )+".lib "  + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ENDIF
 
    ELSEIF s_lGcc
@@ -2702,7 +2702,7 @@ FUNCTION CreateMakeFile( cFile )
    IF s_lBcc
 
       FWrite( s_nMakeFileHandle, "CFLAG1 =  -OS $(CFLAGS) -d -L$(BHC)\lib"+iif(lFwh,";$(FWH)\lib -c","")+iif(!empty(s_cUserInclude)," -I" + alltrim( s_cUserInclude ),"") + " " +CRLF )
-      FWrite( s_nMakeFileHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include" + iif( s_lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG2 =  -I$(BHC)\include;$(BCB)\include" + iif( s_lMt, " -DHB_THREAD_SUPPORT " , "" ) + CRLF )
 
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
 /* added "-x" flag to LFLAGS statment to suppress creation of map file and speed up link. */
@@ -2717,7 +2717,7 @@ FUNCTION CreateMakeFile( cFile )
 
    ELSEIF s_lMSVcc
 
-      FWrite( s_nMakeFileHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" +IIF( s_lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" +IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" ) + CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 =  -c" +" -I" + alltrim( s_cUserInclude ) + " " + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(BCB)\lib /LIBPATH1:$(BHC)\lib /LIBPATH2:$(C4W)\lib"  +IIF(s_lMt, " /Nodefaultlib:LIBC "," /Nodefaultlib:LIBCMT " ) + CRLF )
@@ -2730,7 +2730,7 @@ FUNCTION CreateMakeFile( cFile )
 
    ELSEIF s_lPcc
 
-      FWrite( s_nMakeFileHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -Tx86-coff -W1 $(C_USR) $(CFLAGS)" +IIF( s_lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -Tx86-coff -W1 $(C_USR) $(CFLAGS)" +IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" ) + CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 = " + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(BCB)\lib /LIBPATH:$(BHC)\lib\win /SUBSYSTEM:CONSOLE" +IIF(s_lMt, " /Nodefaultlib:LIBC "," /Nodefaultlib:LIBCMT " ) + CRLF )
@@ -2743,7 +2743,7 @@ FUNCTION CreateMakeFile( cFile )
 
    ELSEIF s_lGcc
 
-      FWrite( s_nMakeFileHandle, "CFLAG1 = " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude ),"")        + IIF(  "Linux" IN cOS, "-I/usr/include/xharbour", " -I$(BHC)/include" ) + " -c -Wall" + IIF( s_lMt, "-DHB_THREAD_SUPPORT" , "" ) + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG1 = " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude ),"")        + IIF(  "Linux" IN cOS, "-I/usr/include/xharbour", " -I$(BHC)/include" ) + " -c -Wall" + IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" ) + CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 = " + IIF(  "Linux" IN cOS, "-L$(HB_LIB_INSTALL)", " -L$(BHC)/lib  -L$(BCB)/lib" )  + CRLF )
 
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
