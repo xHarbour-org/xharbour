@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.40 2005/05/16 21:45:18 andijahja Exp $
+# $Id: hrbdll.wc,v 1.41 2005/09/02 15:46:11 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -29,6 +29,8 @@ LANG_DIR          = source\lang
 MACRO_DIR         = source\macro
 PP_DIR            = source\pp
 RDD_DIR           = source\rdd
+HBSIX_DIR         = source\rdd\hbsix
+HSX_DIR           = source\rdd\hsx
 RTL_DIR           = source\rtl
 PCREPOS_DIR       = source\rtl\pcre
 TIP_DIR           = source\tip
@@ -416,8 +418,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\reserved.obj \
   $(OBJ_DIR)\dbfcdx1.obj \
   $(OBJ_DIR)\dbfcdx0.obj \
-  $(OBJ_DIR)\dbfdbt0.obj \
-  $(OBJ_DIR)\dbfdbt1.obj \
   $(OBJ_DIR)\dbffpt0.obj \
   $(OBJ_DIR)\dbffpt1.obj \
   $(OBJ_DIR)\dbfntx0.obj \
@@ -687,7 +687,18 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\scrmark.obj \
   $(OBJ_DIR)\spread.obj \
   $(OBJ_DIR)\untext.obj \
-  $(OBJ_DIR)\util.obj
+  $(OBJ_DIR)\util.obj \
+#
+# hbsixlib
+#
+  $(OBJ_DIR)\sxcompr.obj \
+  $(OBJ_DIR)\sxcrypt.obj \
+  $(OBJ_DIR)\sxdate.obj \
+#
+# hsxlib
+#
+  $(OBJ_DIR)\hsx.obj \
+  $(OBJ_DIR)\cftsfunc.obj
 
 # ÚÄÄÄÄÄÄÄÄÄ¿
 # ³ project ³Û
@@ -1945,15 +1956,6 @@ $(OBJ_DIR)\dbfcdx0.obj : $(OBJ_DIR)\dbfcdx0.c
 $(OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
    $(CC_CMD)
 
-$(OBJ_DIR)\dbfdbt0.c : $(RDD_DIR)\dbfdbt\dbfdbt0.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\dbfdbt0.obj : $(OBJ_DIR)\dbfdbt0.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dbfdbt1.obj : $(RDD_DIR)\dbfdbt\dbfdbt1.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\dbffpt0.c : $(RDD_DIR)\dbffpt\dbffpt0.prg
    $(HARBOUR_CMD)
 
@@ -2704,6 +2706,25 @@ $(OBJ_DIR)\pcre_xclass.obj : $(PCREPOS_DIR)\pcre_xclass.c
 
 $(OBJ_DIR)\ucp_findchar.obj : $(PCREPOS_DIR)\ucp_findchar.c 
    $(CC) -i$(PCREPOS_DIR) $(CLIBFLAGS) -dSUPPORT_UTF8 -dSUPPORT_UCP -dPOSIX_MALLOC_THRESHOLD=10 -Fo$@ $**
+
+# hbsix
+
+$(OBJ_DIR)\sxcompr.obj : $(HBSIX_DIR)\sxcompr.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxcrypt.obj : $(HBSIX_DIR)\sxcrypt.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
+   $(CC_CMD)
+
+# hsx
+
+$(OBJ_DIR)\hsx.obj : $(HSX_DIR)\hsx.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cftsfunc.obj : $(HSX_DIR)\cftsfunc.c
+   $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ HBTESTDLL.EXE dependencies ³Û

@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: hrbdll.gc,v 1.9 2005/05/16 21:45:17 andijahja Exp $
+# $Id: hrbdll.gc,v 1.10 2005/09/02 15:46:11 paultucker Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -28,6 +28,8 @@ CODEPAGE_DIR = $(HARBOUR_DIR)/source/codepage
 LANG_DIR     = $(HARBOUR_DIR)/source/lang
 MACRO_DIR    = $(HARBOUR_DIR)/source/macro
 RDD_DIR      = $(HARBOUR_DIR)/source/rdd
+HBSIX_DIR    = $(HARBOUR_DIR)/source/rdd/hbsix
+HSX_DIR      = $(HARBOUR_DIR)/source/rdd/hsx
 DEBUG_DIR    = $(HARBOUR_DIR)/source/debug
 CT_DIR       = $(HARBOUR_DIR)/source/ct
 TIP_DIR      = $(HARBOUR_DIR)/source/tip
@@ -441,9 +443,6 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/dbfntx1.o \
    $(OBJ_DIR)/dbfntx0.o \
    \
-   $(OBJ_DIR)/dbfdbt1.o \
-   $(OBJ_DIR)/dbfdbt0.o \
-   \
    $(OBJ_DIR)/gtwin.o \
    $(OBJ_DIR)/mousewin.o \
    \
@@ -583,7 +582,15 @@ DLL_OBJECTS = \
    $(OBJ_DIR)\pcre_valid_utf8.o \
    $(OBJ_DIR)\pcre_version.o \
    $(OBJ_DIR)\pcre_xclass.o \
-   $(OBJ_DIR)\ucp_findchar.o
+   $(OBJ_DIR)\ucp_findchar.o \
+   \
+   $(OBJ_DIR)\sxcompr.o \
+   $(OBJ_DIR)\sxcrypt.o \
+   $(OBJ_DIR)\sxdate.o \
+   \
+   $(OBJ_DIR)\hsx.o \
+   $(OBJ_DIR)\cftsfunc.o
+
 
 $(HARBOUR_DLL) : $(DLL_OBJECTS)
 	$(RM) $@
@@ -1844,6 +1851,25 @@ $(OBJ_DIR)/msgbywin.o : $(LANG_DIR)/msgbywin.c
 $(OBJ_DIR)/msgbgwin.o : $(LANG_DIR)/msgbgwin.c
 	$(CC_CMD)
 
+# hbsix
+
+$(OBJ_DIR)/sxcompr.o : $(HBSIX_DIR)/sxcompr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/sxcrypt.o : $(HBSIX_DIR)/sxcrypt.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/sxdate.o : $(HBSIX_DIR)/sxdate.c
+	$(CC_CMD)
+
+# hsx
+
+$(OBJ_DIR)/hsx.o : $(HSX_DIR)/hsx.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/cftsfunc.o : $(HSX_DIR)/cftsfunc.c
+	$(CC_CMD)
+
 # MACRO
 
 $(OBJ_DIR)/macroy.c : $(MACRO_DIR)/macro.y
@@ -1962,17 +1988,6 @@ $(OBJ_DIR)/dbfcdx0.o : $(OBJ_DIR)/dbfcdx0.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/dbfcdx1.o : $(RDD_DIR)/dbfcdx/dbfcdx1.c
-	$(CC_CMD)
-
-# DBFDBT
-
-$(OBJ_DIR)/dbfdbt0.c : $(RDD_DIR)/dbfdbt/dbfdbt0.prg
-	$(HARBOUR_CMD)
-
-$(OBJ_DIR)/dbfdbt0.o : $(OBJ_DIR)/dbfdbt0.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/dbfdbt1.o : $(RDD_DIR)/dbfdbt/dbfdbt1.c
 	$(CC_CMD)
 
 # DBFFPT

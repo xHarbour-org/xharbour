@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.pc,v 1.9 2005/05/16 21:45:18 andijahja Exp $
+# $Id: hrbdll.pc,v 1.10 2005/09/02 04:16:02 paultucker Exp $
 # makefile for creating Harbour.dll with PellesC compiler
 #
 
@@ -78,6 +78,8 @@ RTL_DIR      = $(XHARBOUR_ROOT)\source\rtl
 PCREPOS_DIR  = $(XHARBOUR_ROOT)\source\rtl\pcre
 LANG_DIR     = $(XHARBOUR_ROOT)\source\lang
 RDD_DIR      = $(XHARBOUR_ROOT)\source\rdd
+HBSIX_DIR    = $(XHARBOUR_ROOT)\source\rdd\hbsix
+HSX_DIR      = $(XHARBOUR_ROOT)\source\rdd\hsx
 
 ALL: $(HARBOUR_DLL) \
      $(HBDOCDLL_EXE) \
@@ -521,9 +523,6 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\dbfntx0.obj \
    $(OBJ_DIR)\dbfntx1.obj \
    \
-   $(OBJ_DIR)\dbfdbt0.obj \
-   $(OBJ_DIR)\dbfdbt1.obj \
-   \
    $(OBJ_DIR)\gtwin.obj \
    $(OBJ_DIR)\mousewin.obj \
    \
@@ -653,7 +652,14 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\pcre_valid_utf8.obj \
    $(OBJ_DIR)\pcre_version.obj \
    $(OBJ_DIR)\pcre_xclass.obj \
-   $(OBJ_DIR)\ucp_findchar.obj
+   $(OBJ_DIR)\ucp_findchar.obj \
+   \
+   $(OBJ_DIR)\sxcompr.obj \
+   $(OBJ_DIR)\sxcrypt.obj \
+   $(OBJ_DIR)\sxdate.obj \
+   \
+   $(OBJ_DIR)\hsx.obj \
+   $(OBJ_DIR)\cftsfunc.obj
    
 
 $(HARBOUR_DLL) : $(HRBDLL_OBJS)
@@ -1025,8 +1031,6 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\dbffpt1.obj    >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dbfntx0.obj    >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dbfntx1.obj    >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\dbfdbt0.obj    >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\dbfdbt1.obj    >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\gtwin.obj      >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\mousewin.obj   >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\base64x.obj    >> harbourdll.rsp
@@ -1132,28 +1136,33 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\setclear.obj   >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\util.obj       >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\untext.obj     >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\chartables.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\chartables.obj >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\pcreposix.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_compile.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_config.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_dfa_exec.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_compile.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_config.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_dfa_exec.obj >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\pcre_exec.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_fullinfo.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_get.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_globals.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_fullinfo.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_get.obj   >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_globals.obj >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\pcre_info.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_maketables.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_ord2utf8.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_printint.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_refcount.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_study.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_tables.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_try_flipped.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_ucp_findchar.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_valid_utf8.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_version.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\pcre_xclass.obj  >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\ucp_findchar.obj  >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_maketables.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_ord2utf8.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_printint.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_refcount.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_study.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_tables.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_try_flipped.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_ucp_findchar.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_valid_utf8.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_version.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\pcre_xclass.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\ucp_findchar.obj >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\sxcompr.obj    >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\sxcrypt.obj    >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\sxdate.obj     >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\hsx.obj        >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cftsfunc.obj   >> harbourdll.rsp
    $(ECHO) $(POCC_LIBRARY)           >> harbourdll.rsp
    $(POLINK) /OUT:$(HARBOUR_DLL) /IMPLIB:$(HRBDLL_LIB) $(LINKFLAGS) @harbourdll.rsp
    @if exist harbourdll.rsp $(DEL) harbourdll.rsp
@@ -2562,17 +2571,6 @@ $(OBJ_DIR)\dbfntx0.obj : $(OBJ_DIR)\dbfntx0.c
 $(OBJ_DIR)\dbfntx1.obj : $(RDD_DIR)\dbfntx\dbfntx1.c
    $(CC_CMD)
 
-# DBFDBT
-
-$(OBJ_DIR)\dbfdbt0.c : $(RDD_DIR)\dbfdbt\dbfdbt0.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\dbfdbt0.obj : $(OBJ_DIR)\dbfdbt0.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dbfdbt1.obj : $(RDD_DIR)\dbfdbt\dbfdbt1.c
-   $(CC_CMD)
-
 # GTWIN
 
 $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
@@ -3061,6 +3059,25 @@ $(OBJ_DIR)\pcre_xclass.obj : $(PCREPOS_DIR)\pcre_xclass.c
 
 $(OBJ_DIR)\ucp_findchar.obj : $(PCREPOS_DIR)\ucp_findchar.c 
    $(CC) /I"$(PCREPOS_DIR)" $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 /Fo$@ $**
+
+# hbsix
+
+$(OBJ_DIR)\sxcompr.obj : $(HBSIX_DIR)\sxcompr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)\sxcrypt.obj : $(HBSIX_DIR)\sxcrypt.c
+	$(CC_CMD)
+
+$(OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
+	$(CC_CMD)
+
+# hsx
+
+$(OBJ_DIR)\hsx.obj : $(HSX_DIR)\hsx.c
+	$(CC_CMD)
+
+$(OBJ_DIR)\cftsfunc.obj : $(HSX_DIR)\cftsfunc.c
+	$(CC_CMD)
 
 # DEBUG
 $(OBJ_DIR)\dbgmenu.c : $(DEBUG_DIR)\dbgmenu.prg

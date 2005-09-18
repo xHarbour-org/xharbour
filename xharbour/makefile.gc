@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.10 2005/05/16 21:45:18 andijahja Exp $
+# $Id: makefile.gc,v 1.11 2005/09/02 15:46:11 paultucker Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -38,6 +38,8 @@ LANG_DIR     = $(HARBOUR_DIR)/source/lang
 MACRO_DIR    = $(HARBOUR_DIR)/source/macro
 PP_DIR       = $(HARBOUR_DIR)/source/pp
 RDD_DIR      = $(HARBOUR_DIR)/source/rdd
+HBSIX_DIR    = $(HARBOUR_DIR)/source/rdd/hbsix
+HSX_DIR      = $(HARBOUR_DIR)/source/rdd/hsx
 SAMPLES_DIR  = $(HARBOUR_DIR)/source/clipsamp
 HBTEST_DIR   = $(HARBOUR_DIR)/utils/hbtest
 HBRUN_DIR    = $(HARBOUR_DIR)/utils/hbrun
@@ -65,7 +67,8 @@ ifeq ($(THREAD_MODE),mt)
    RTL_OBJ_DIR   = $(OBJ_DIR)/mt
    MACRO_OBJ_DIR = $(OBJ_DIR)/mt
    RDD_OBJ_DIR   = $(OBJ_DIR)/mt
-   DBT_OBJ_DIR   = $(OBJ_DIR)/mt
+   HBSIX_OBJ_DIR = $(OBJ_DIR)/mt
+   HSX_OBJ_DIR   = $(OBJ_DIR)/mt
    FPT_OBJ_DIR   = $(OBJ_DIR)/mt
    NTX_OBJ_DIR   = $(OBJ_DIR)/mt
    CDX_OBJ_DIR   = $(OBJ_DIR)/mt
@@ -88,7 +91,8 @@ else
    RTL_OBJ_DIR   = $(OBJ_DIR)
    MACRO_OBJ_DIR = $(OBJ_DIR)
    RDD_OBJ_DIR   = $(OBJ_DIR)
-   DBT_OBJ_DIR   = $(OBJ_DIR)
+   HBSIX_OBJ_DIR = $(OBJ_DIR)
+   HSX_OBJ_DIR   = $(OBJ_DIR)
    FPT_OBJ_DIR   = $(OBJ_DIR)
    NTX_OBJ_DIR   = $(OBJ_DIR)
    CDX_OBJ_DIR   = $(OBJ_DIR)
@@ -110,9 +114,10 @@ ODBC_LIB     = $(LIB_DIR)/libhbodbc$(THREAD_MODE).a
 PP_LIB       = $(LIB_DIR)/libpp$(THREAD_MODE).a
 MACRO_LIB    = $(LIB_DIR)/libmacro$(THREAD_MODE).a
 DBFCDX_LIB   = $(LIB_DIR)/libdbfcdx$(THREAD_MODE).a
-DBFDBT_LIB   = $(LIB_DIR)/libdbfdbt$(THREAD_MODE).a
 DBFFPT_LIB   = $(LIB_DIR)/libdbffpt$(THREAD_MODE).a
 DBFNTX_LIB   = $(LIB_DIR)/libdbfntx$(THREAD_MODE).a
+HBSIX_LIB    = $(LIB_DIR)/libhbsix$(THREAD_MODE).a
+HSX_LIB      = $(LIB_DIR)/libhsx$(THREAD_MODE).a
 RTL_LIB      = $(LIB_DIR)/librtl$(THREAD_MODE).a
 PCREPOS_LIB  = $(LIB_DIR)/libpcrepos$(THREAD_MODE).a
 VM_LIB       = $(LIB_DIR)/libvm$(THREAD_MODE).a
@@ -147,9 +152,10 @@ LIB_TO_LINK = \
    $(LANG_LIB) \
    $(MACRO_LIB) \
    $(DBFCDX_LIB) \
-   $(DBFDBT_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
+   $(HBSIX_LIB) \
+   $(HSX_LIB) \
    $(RTL_LIB) \
    $(VM_LIB) \
    $(RDD_LIB) \
@@ -170,7 +176,6 @@ MINGW_LIBRARY = \
    -ldbfntx$(THREAD_MODE) \
    -ldbffpt$(THREAD_MODE) \
    -lcommon \
-   -ldbfdbt$(THREAD_MODE) \
    -lpp$(THREAD_MODE) \
    -llang \
    -luser32 -lwinspool -lcomctl32 -lcomdlg32 -lgdi32 \
@@ -192,7 +197,6 @@ CC_CMD_DLL  = $(CC) $(CFLAGS) -DHB_EXEMEM_USED -mdll -o $@ $^
 PROJECT += \
    $(MACRO_LIB) \
    $(DBFCDX_LIB) \
-   $(DBFDBT_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(RTL_LIB) \
@@ -201,6 +205,8 @@ PROJECT += \
    $(SAMPLES_LIB) \
    $(RDD_LIB) \
    $(OPTCON_LIB) \
+   $(HBSIX_LIB) \
+   $(HSX_LIB) \
    $(OPTGUI_LIB) \
    $(GTWVW_LIB) \
    $(GTWVT_LIB) \
@@ -2464,24 +2470,6 @@ $(CDX_OBJ_DIR)/dbfcdx1.o : $(RDD_DIR)/dbfcdx/dbfcdx1.c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------
-# libdbfdbt.a
-#-------------------------------------------------------------------------------
-
-$(DBFDBT_LIB) : \
-   $(DBT_OBJ_DIR)/dbfdbt1.o \
-   $(DBT_OBJ_DIR)/dbfdbt0.o
-	$(AR_CMD)
-
-$(DBT_OBJ_DIR)/dbfdbt0.c : $(RDD_DIR)/dbfdbt/dbfdbt0.prg
-	$(HARBOUR_CMD)
-
-$(DBT_OBJ_DIR)/dbfdbt0.o : $(DBT_OBJ_DIR)/dbfdbt0.c
-	$(CC_CMD)
-
-$(DBT_OBJ_DIR)/dbfdbt1.o : $(RDD_DIR)/dbfdbt/dbfdbt1.c
-	$(CC_CMD)
-
-#-------------------------------------------------------------------------------
 # libdbffpt.a
 #-------------------------------------------------------------------------------
 
@@ -3908,6 +3896,40 @@ $(RDD_OBJ_DIR)/rddsys.c : $(RDD_DIR)/rddsys.prg
 
 $(RDD_OBJ_DIR)/rddsys.o : $(RDD_OBJ_DIR)/rddsys.c
 	$(CC_CMD)
+
+#-------------------------------------------------------------------------------
+# libhbsix.a
+#-------------------------------------------------------------------------------
+
+HBSIX_LIB_OBJS = \
+   $(OBJ_DIR)\sxcompr.o \
+   $(OBJ_DIR)\sxcrypt.o \
+   $(OBJ_DIR)\sxdate.o
+	$(AR_CMD)
+
+$(HBSIX_OBJ_DIR)/sxcompr.o : $(HBSIX_DIR)/sxcompr.c
+	$(CC_CMD)
+
+$(HBSIX_OBJ_DIR)/sxcrypt.o : $(HBSIX_DIR)/sxcrypt.c
+	$(CC_CMD)
+
+$(HBSIX_OBJ_DIR)/sxdate.o : $(HBSIX_DIR)/sxdate.c
+	$(CC_CMD)
+
+#-------------------------------------------------------------------------------
+# libhsx.a
+#-------------------------------------------------------------------------------
+
+HSX_LIB_OBJS = \
+   $(OBJ_DIR)\hsx.o \
+   $(OBJ_DIR)\cftsfunc.o
+
+$(HSX_OBJ_DIR)/hsx.o : $(HSX_DIR)/hsx.c
+	$(CC_CMD)
+
+$(HSX_OBJ_DIR)/cftsfunc.o : $(HSX_DIR)/cftsfunc.c
+	$(CC_CMD)
+
 
 #-------------------------------------------------------------------------------
 # libdebug.a

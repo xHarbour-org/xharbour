@@ -3,7 +3,7 @@
 # юддддддддддддддддддыш
 #  ъъъъъъъъъъъъъъъъъъъъ
 #
-# $Id: makefile.pc,v 1.8 2005/04/02 01:44:54 andijahja Exp $
+# $Id: makefile.pc,v 1.9 2005/05/16 21:45:18 andijahja Exp $
 # makefile for PellesC compiler
 #
 
@@ -61,6 +61,8 @@ VM_DIR       = $(XHARBOUR_ROOT)\source\vm
 RTL_DIR      = $(XHARBOUR_ROOT)\source\rtl
 LANG_DIR     = $(XHARBOUR_ROOT)\source\lang
 RDD_DIR      = $(XHARBOUR_ROOT)\source\rdd
+HBSIX_DIR    = $(XHARBOUR_ROOT)\source\rdd\hbsix
+HSX_DIR      = $(XHARBOUR_ROOT)\source\rdd\hsx
 NF_DIR       = $(XHARBOUR_ROOT)\contrib\libnf
 
 # зддддддддддддддддд©
@@ -76,10 +78,11 @@ VM_OBJ_DIR    = $(OBJ_DIR)\mt
 RTL_OBJ_DIR   = $(OBJ_DIR)\mt
 MACRO_OBJ_DIR = $(OBJ_DIR)\mt
 RDD_OBJ_DIR   = $(OBJ_DIR)\mt
-DBT_OBJ_DIR   = $(OBJ_DIR)\mt
 FPT_OBJ_DIR   = $(OBJ_DIR)\mt
 NTX_OBJ_DIR   = $(OBJ_DIR)\mt
 CDX_OBJ_DIR   = $(OBJ_DIR)\mt
+HBSIX_OBJ_DIR = $(OBJ_DIR)\mt
+HSX_OBJ_DIR   = $(OBJ_DIR)\mt
 CT_OBJ_DIR    = $(OBJ_DIR)\mt\ct
 TIP_OBJ_DIR   = $(OBJ_DIR)\mt
 PP_OBJ_DIR    = $(OBJ_DIR)\mt
@@ -98,10 +101,11 @@ VM_OBJ_DIR    = $(OBJ_DIR)
 RTL_OBJ_DIR   = $(OBJ_DIR)
 MACRO_OBJ_DIR = $(OBJ_DIR)
 RDD_OBJ_DIR   = $(OBJ_DIR)
-DBT_OBJ_DIR   = $(OBJ_DIR)
 FPT_OBJ_DIR   = $(OBJ_DIR)
 NTX_OBJ_DIR   = $(OBJ_DIR)
 CDX_OBJ_DIR   = $(OBJ_DIR)
+HBSIX_OBJ_DIR = $(OBJ_DIR)
+HSX_OBJ_DIR   = $(OBJ_DIR)
 CT_OBJ_DIR    = $(OBJ_DIR)\ct
 TIP_OBJ_DIR   = $(OBJ_DIR)
 PP_OBJ_DIR    = $(OBJ_DIR)
@@ -132,9 +136,10 @@ XBSCRIPT_EXE = $(BIN_DIR)\xbscript.exe
 PP_LIB       = $(LIB_DIR)\pp$(THREAD_MODE).lib
 MACRO_LIB    = $(LIB_DIR)\macro$(THREAD_MODE).lib
 DBFCDX_LIB   = $(LIB_DIR)\dbfcdx$(THREAD_MODE).lib
-DBFDBT_LIB   = $(LIB_DIR)\dbfdbt$(THREAD_MODE).lib
 DBFFPT_LIB   = $(LIB_DIR)\dbffpt$(THREAD_MODE).lib
 DBFNTX_LIB   = $(LIB_DIR)\dbfntx$(THREAD_MODE).lib
+HBSIX_LIB    = $(LIB_DIR)\hbsix$(THREAD_MODE).lib
+HSX_LIB      = $(LIB_DIR)\hsx$(THREAD_MODE).lib
 RTL_LIB      = $(LIB_DIR)\rtl$(THREAD_MODE).lib
 VM_LIB       = $(LIB_DIR)\vm$(THREAD_MODE).lib
 SAMPLES_LIB  = $(LIB_DIR)\samples$(THREAD_MODE).lib
@@ -182,7 +187,6 @@ HARBOUR_LIBRARY = \
    $(DBFCDX_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
-   $(DBFDBT_LIB) \
    $(RDD_LIB) \
    $(COMMON_LIB) \
    $(RTL_LIB) \
@@ -213,9 +217,10 @@ PROJECT = \
    $(PROJECT) \
    $(MACRO_LIB) \
    $(DBFCDX_LIB) \
-   $(DBFDBT_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
+   $(HBSIX_LIB) \
+   $(HSX_LIB) \
    $(RTL_LIB) \
    $(VM_LIB) \
    $(SAMPLES_LIB) \
@@ -488,7 +493,6 @@ HBTEST_EXE_OBJS = \
    $(DBFCDX_LIB) \
    $(DBFNTX_LIB) \
    $(DBFFPT_LIB) \
-   $(DBFDBT_LIB) \
    $(RDD_LIB) \
    $(COMMON_LIB) \
    $(RTL_LIB)
@@ -710,9 +714,14 @@ DBFNTX_LIB_OBJS = \
    $(NTX_OBJ_DIR)\dbfntx0.obj \
    $(NTX_OBJ_DIR)\dbfntx1.obj
 
-DBFDBT_LIB_OBJS = \
-   $(DBT_OBJ_DIR)\dbfdbt0.obj \
-   $(DBT_OBJ_DIR)\dbfdbt1.obj
+HBSIX_LIB_OBJS = \
+   $(HBSIX_OBJ_DIR)\sxcompr.obj \
+   $(HBSIX_OBJ_DIR)\sxcrypt.obj \
+   $(HBSIX_OBJ_DIR)\sxdate.obj 
+
+HSX_LIB_OBJS = \
+   $(HSX_OBJ_DIR)\hsx.obj \
+   $(HSX_OBJ_DIR)\cftsfunc.obj
 
 RDD_LIB_OBJS = \
    $(RDD_OBJ_DIR)\dbstrux.obj \
@@ -1264,6 +1273,12 @@ $(LIBMISC_LIB) : $(LIBMISC_LIB_OBJS)
 $(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
    $(POLIB_CMD)
 
+$(HBSIX_LIB) : $(HBSIX_LIB_OBJS)
+   $(POLIB_CMD)
+
+$(HSX_LIB) : $(HSX_LIB_OBJS)
+   $(POLIB_CMD)
+
 $(CT_LIB) : $(CT_LIB_OBJS)
    $(POLIB_CMD)
 
@@ -1274,9 +1289,6 @@ $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
    $(POLIB_CMD)
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
-   $(POLIB_CMD)
-
-$(DBFDBT_LIB) : $(DBFDBT_LIB_OBJS)
    $(POLIB_CMD)
 
 $(RDD_LIB) : $(RDD_LIB_OBJS)
@@ -1667,18 +1679,29 @@ $(NTX_OBJ_DIR)\dbfntx0.obj : $(NTX_OBJ_DIR)\dbfntx0.c
 $(NTX_OBJ_DIR)\dbfntx1.obj : $(RDD_DIR)\dbfntx\dbfntx1.c
    $(CC_CMD)
 
-# зддддддддддддддддддддддддд©
-# Ё DBFDBT.LIB Dependencies Ёш
-# юдддддддддддддддддддддддддыш
-#  ъъъъъъъъъъъъъъъъъъъъъъъъъъъ
+# здддддддддддддддддддддддд©
+# Ё HBSIX.LIB dependencies Ёш
+# юддддддддддддддддддддддддыш
+#  ъъъъъъъъъъъъъъъъъъъъъъъъъъ
 
-$(DBT_OBJ_DIR)\dbfdbt0.c : $(RDD_DIR)\dbfdbt\dbfdbt0.prg
-   $(HARBOUR_CMD)
-
-$(DBT_OBJ_DIR)\dbfdbt0.obj : $(DBT_OBJ_DIR)\dbfdbt0.c
+$(HBSIX_OBJ_DIR)\sxcompr.obj : $(HBSIX_DIR)\sxcompr.c
    $(CC_CMD)
 
-$(DBT_OBJ_DIR)\dbfdbt1.obj : $(RDD_DIR)\dbfdbt\dbfdbt1.c
+$(HBSIX_OBJ_DIR)\sxcrypt.obj : $(HBSIX_DIR)\sxcrypt.c
+   $(CC_CMD)
+
+$(HBSIX_OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
+   $(CC_CMD)
+
+# здддддддддддддддддддддд©
+# Ё HSX.LIB dependencies Ёш
+# юддддддддддддддддддддддыш
+#  ъъъъъъъъъъъъъъъъъъъъъъъъ
+
+$(HSX_OBJ_DIR)\hsx.obj : $(HSX_DIR)\hsx.c
+   $(CC_CMD)
+
+$(HSX_OBJ_DIR)\cftsfunc.obj : $(HSX_DIR)\cftsfunc.c
    $(CC_CMD)
 
 # здддддддддддддддддддддд©

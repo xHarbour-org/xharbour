@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.149 2005/04/14 05:58:31 ronpinkas Exp $
+# $Id: makefile.vc,v 1.150 2005/09/02 04:16:02 paultucker Exp $
 #
 
 #
@@ -153,12 +153,12 @@ CT_LIB           =$(LIB_DIR)\ct.lib
 CTMT_LIB         =$(LIB_DIR)\ct$(MT).lib
 DBFCDX_LIB       =$(LIB_DIR)\dbfcdx.lib
 DBFCDXMT_LIB     =$(LIB_DIR)\dbfcdx$(MT).lib
-DBFDBT_LIB       =$(LIB_DIR)\dbfdbt.lib
-DBFDBTMT_LIB     =$(LIB_DIR)\dbfdbt$(MT).lib
 DBFFPT_LIB       =$(LIB_DIR)\dbffpt.lib
 DBFFPTMT_LIB     =$(LIB_DIR)\dbffpt$(MT).lib
 DBFNTX_LIB       =$(LIB_DIR)\dbfntx.lib
 DBFNTXMT_LIB     =$(LIB_DIR)\dbfntx$(MT).lib
+HBSIX_LIB        =$(LIB_DIR)\hbsix$(HB_MT).lib
+HSX_LIB          =$(LIB_DIR)\hsx$(HB_MT).lib
 DEBUG_LIB        =$(LIB_DIR)\debug.lib
 LANG_LIB         =$(LIB_DIR)\lang.lib
 MACRO_LIB        =$(LIB_DIR)\macro.lib
@@ -259,9 +259,10 @@ LIBLIST = \
    $(LANG_LIB) \
    $(RDD_LIB) \
    $(DBFCDX_LIB) \
-   $(DBFDBT_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
+   $(HBSIX_LIB) \
+   $(HSX_LIB) \
    $(NULSYS_LIB) \
    $(VM_LIB) \
    $(VM_LIB_OPT_CON) \
@@ -281,15 +282,16 @@ LIBLISTMT = \
    $(PPMT_LIB) \
    $(RDDMT_LIB) \
    $(DBFCDXMT_LIB) \
-   $(DBFDBTMT_LIB) \
    $(DBFFPTMT_LIB) \
    $(DBFNTXMT_LIB) \
+   $(HBSIXMT_LIB) \
+   $(HSXMT_LIB) \
    $(VMMT_LIB) \
    $(VMMT_LIB_OPT_CON) \
    $(VMMT_LIB_OPT_GUI) \
    $(ODBCMT_LIB) \
-   $(CTMT_LIB) \
-   $(TIPMT_LIB)
+   $(TIPMT_LIB) \
+   $(CTMT_LIB)
 !endif
 
 #
@@ -536,7 +538,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\win32prn.obj \
    $(OBJ_DIR)$(MT)\winos.obj \
    $(OBJ_DIR)$(MT)\winreg.obj
-
 
 #
 # PCREPOS.LIB rules
@@ -790,25 +791,6 @@ DBFCDX_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbfcdx0.obj
 
 #
-# DBFDBT.LIB rules
-#
-
-{$(RDD_DIR)\dbfdbt}.c{$(OBJ_DIR)$(MT)}.obj:
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
-
-{$(RDD_DIR)\dbfdbt}.prg{$(OBJ_DIR)$(MT)}.c:
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-
-{$(RDD_DIR)\dbfdbt}.prg{$(OBJ_DIR)$(MT)}.obj:
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
-
-DBFDBT_LIB_OBJS = \
-   $(OBJ_DIR)$(MT)\dbfdbt1.obj \
-   \
-   $(OBJ_DIR)$(MT)\dbfdbt0.obj
-
-#
 # DBFFPT.LIB rules
 #
 
@@ -826,6 +808,43 @@ DBFFPT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbffpt1.obj \
    \
    $(OBJ_DIR)$(MT)\dbffpt0.obj
+
+#
+# HBSIX.LIB rules
+#
+
+{$(RDD_DIR)\hbsix}.c{$(OBJ_DIR)$(MT)}.obj:
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+{$(RDD_DIR)\hbsix}.prg{$(OBJ_DIR)$(MT)}.c:
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+
+{$(RDD_DIR)\hbsix}.prg{$(OBJ_DIR)$(MT)}.obj:
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+
+HBSIX_LIB_OBJS = \
+   $(OBJ_DIR)\sxcompr.obj \
+   $(OBJ_DIR)\sxcrypt.obj \
+   $(OBJ_DIR)\sxdate.obj 
+
+#
+# HSX.LIB rules
+#
+
+{$(RDD_DIR)\hsx}.c{$(OBJ_DIR)$(MT)}.obj:
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+{$(RDD_DIR)\hsx}.prg{$(OBJ_DIR)$(MT)}.c:
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+
+{$(RDD_DIR)\hsx}.prg{$(OBJ_DIR)$(MT)}.obj:
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+
+HSX_LIB_OBJS = \
+   $(OBJ_DIR)\hsx.obj \
+   $(OBJ_DIR)\cftsfunc.obj
 
 #
 # PP.LIB rules
@@ -1527,13 +1546,16 @@ $(RDDMT_LIB) : $(RDD_LIB_OBJS)
 $(DBFCDXMT_LIB) : $(DBFCDX_LIB_OBJS)
    lib /out:$@ $**
 
-$(DBFDBTMT_LIB) : $(DBFDBT_LIB_OBJS)
-   lib /out:$@ $**
-
 $(DBFFPTMT_LIB) : $(DBFFPT_LIB_OBJS)
    lib /out:$@ $**
 
 $(DBFNTXMT_LIB) : $(DBFNTX_LIB_OBJS)
+   lib /out:$@ $**
+
+$(HBSIXMT_LIB) : $(HBSIX_LIB_OBJS)
+   lib /out:$@ $**
+
+$(HSXMT_LIB) : $(HSX_LIB_OBJS)
    lib /out:$@ $**
 
 $(VMMT_LIB) : $(VM_LIB_OBJS)
@@ -1592,13 +1614,16 @@ $(RDD_LIB) : $(RDD_LIB_OBJS)
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
    lib /out:$@ $**
 
-$(DBFDBT_LIB) : $(DBFDBT_LIB_OBJS)
-   lib /out:$@ $**
-
 $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
    lib /out:$@ $**
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
+   lib /out:$@ $**
+
+$(HBSIX_LIB) : $(HBSIX_LIB_OBJS)
+   lib /out:$@ $**
+
+$(HSX_LIB) : $(HSX_LIB_OBJS)
    lib /out:$@ $**
 
 $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.45 2005/05/16 21:45:19 andijahja Exp $
+# $Id: makefile.wc,v 1.46 2005/09/02 15:46:11 paultucker Exp $
 #
 
 #
@@ -64,7 +64,8 @@ VM_OBJ_DIR    = $(OBJ_DIR)\mt
 RTL_OBJ_DIR   = $(OBJ_DIR)\mt
 MACRO_OBJ_DIR = $(OBJ_DIR)\mt
 RDD_OBJ_DIR   = $(OBJ_DIR)\mt
-DBT_OBJ_DIR   = $(OBJ_DIR)\mt
+HBSIX_OBJ_DIR = $(OBJ_DIR)\mt
+HSX_OBJ_DIR   = $(OBJ_DIR)\mt
 FPT_OBJ_DIR   = $(OBJ_DIR)\mt
 NTX_OBJ_DIR   = $(OBJ_DIR)\mt
 CDX_OBJ_DIR   = $(OBJ_DIR)\mt
@@ -80,7 +81,8 @@ VM_OBJ_DIR    = $(OBJ_DIR)
 RTL_OBJ_DIR   = $(OBJ_DIR)
 MACRO_OBJ_DIR = $(OBJ_DIR)
 RDD_OBJ_DIR   = $(OBJ_DIR)
-DBT_OBJ_DIR   = $(OBJ_DIR)
+HBSIX_OBJ_DIR = $(OBJ_DIR)
+HSX_OBJ_DIR   = $(OBJ_DIR)
 FPT_OBJ_DIR   = $(OBJ_DIR)
 NTX_OBJ_DIR   = $(OBJ_DIR)
 CDX_OBJ_DIR   = $(OBJ_DIR)
@@ -160,9 +162,10 @@ COMMON_LIB     = $(LIB_DIR)\common.lib
 CODEPAGE_LIB   = $(LIB_DIR)\codepage.lib
 CT_LIB         = $(LIB_DIR)\ct.lib
 DBFCDX_LIB     = $(LIB_DIR)\dbfcdx.lib
-DBFDBT_LIB     = $(LIB_DIR)\dbfdbt.lib
 DBFFPT_LIB     = $(LIB_DIR)\dbffpt.lib
 DBFNTX_LIB     = $(LIB_DIR)\dbfntx.lib
+HBSIX_LIB      = $(LIB_DIR)\hbsix.lib
+HSX_LIB        = $(LIB_DIR)\hsx.lib
 DEBUG_LIB      = $(LIB_DIR)\debug.lib
 LANG_LIB       = $(LIB_DIR)\lang.lib
 MACRO_LIB      = $(LIB_DIR)\macro.lib
@@ -182,10 +185,11 @@ VM_LIB_OPT_GUI   = $(LIB_DIR)\optgui.lib
 RTL_STLIB        = $(RTL_LIB)
 MACRO_STLIB      = $(MACRO_LIB)
 RDD_STLIB        = $(RDD_LIB)
-DBFDBT_STLIB     = $(DBFDBT_LIB)
 DBFFPT_STLIB     = $(DBFFPT_LIB)
 DBFNTX_STLIB     = $(DBFNTX_LIB)
 DBFCDX_STLIB     = $(DBFCDX_LIB)
+HBSIX_STLIB      = $(HBSIX_LIB)
+HSX_STLIB        = $(HSX_LIB)
 PP_STLIB         = $(PP_LIB)
 TIP_STLIB        = $(TIP_LIB)
 CT_STLIB         = $(CT_LIB)
@@ -198,10 +202,11 @@ VM_LIB_OPT_GUI = $(LIB_DIR)\optguimt.lib
 RTL_LIB        = $(LIB_DIR)\rtlmt.lib
 MACRO_LIB      = $(LIB_DIR)\macromt.lib
 RDD_LIB        = $(LIB_DIR)\rddmt.lib
-DBFDBT_LIB     = $(LIB_DIR)\dbfdbtmt.lib
 DBFFPT_LIB     = $(LIB_DIR)\dbffptmt.lib
 DBFNTX_LIB     = $(LIB_DIR)\dbfntxmt.lib
 DBFCDX_LIB     = $(LIB_DIR)\dbfcdxmt.lib
+HBSIX_LIB      = $(LIB_DIR)\hbsixmt.lib
+HSX_LIB        = $(LIB_DIR)\hsxmt.lib
 PP_LIB         = $(LIB_DIR)\ppmt.lib
 TIP_LIB        = $(LIB_DIR)\tipmt.lib
 CT_LIB         = $(LIB_DIR)\ctmt.lib
@@ -608,11 +613,6 @@ RDD_LIB_OBJS = \
 NULSYS_LIB_OBJS = \
    $(OBJ_DIR)\nulsys.obj
 
-DBFDBT_LIB_OBJS = \
-   $(DBT_OBJ_DIR)\dbfdbt1.obj \
-   \
-   $(DBT_OBJ_DIR)\dbfdbt0.obj
-
 DBFFPT_LIB_OBJS = \
    $(FPT_OBJ_DIR)\dbffpt1.obj \
    \
@@ -627,6 +627,15 @@ DBFCDX_LIB_OBJS = \
    $(CDX_OBJ_DIR)\dbfcdx1.obj \
    \
    $(CDX_OBJ_DIR)\dbfcdx0.obj
+
+HBSIX_LIB_OBJS = \
+   $(HBSIX_OBJ_DIR)\sxcompr.obj \
+   $(HBSIX_OBJ_DIR)\sxcrypt.obj \
+   $(HBSIX_OBJ_DIR)\sxdate.obj
+
+HSX_LIB_OBJS = \
+   $(HSX_OBJ_DIR)\hsx.obj \
+   $(HSX_OBJ_DIR)\cftsfunc.obj
 
 #
 # PP.LIB rules
@@ -1099,7 +1108,6 @@ PROJECT = \
    $(CT_LIB) \
    $(TIP_LIB) \
    $(NULSYS_LIB) \
-   $(DBFDBT_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(DBFCDX_LIB) \
@@ -1121,9 +1129,6 @@ all: $(PROJECT)
 #
 
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
-    LIB386 /nologo /out:$@ $**
-
-$(DBFDBT_LIB) : $(DBFDBT_LIB_OBJS)
     LIB386 /nologo /out:$@ $**
 
 $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
@@ -2696,19 +2701,6 @@ $(OBJ_DIR)\nulsys.obj : $(OBJ_DIR)\nulsys.c
    $(CC_CMD)
 
 #
-# DBFDBT.LIB dependencies
-#
-
-$(DBT_OBJ_DIR)\dbfdbt0.c : $(RDD_DIR)\dbfdbt\dbfdbt0.prg
-   $(HRB_CMD)
-
-$(DBT_OBJ_DIR)\dbfdbt0.obj : $(DBT_OBJ_DIR)\dbfdbt0.c
-   $(CC_CMD)
-
-$(DBT_OBJ_DIR)\dbfdbt1.obj : $(RDD_DIR)\dbfdbt\dbfdbt1.c
-   $(CC_CMD)
-
-#
 # DBFFPT.LIB dependencies
 #
 
@@ -2745,6 +2737,29 @@ $(CDX_OBJ_DIR)\dbfcdx0.obj : $(OBJ_DIR)\dbfcdx0.c
    $(CC_CMD)
 
 $(CDX_OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
+   $(CC_CMD)
+
+#
+# HBSIX.LIB dependencies
+#
+
+$(HBSIX_OBJ_DIR)\sxcompr.obj : $(HBSIX_DIR)\sxcompr.c
+   $(CC_CMD)
+
+$(HBSIX_OBJ_DIR)\sxcrypt.obj : $(HBSIX_DIR)\sxcrypt.c
+   $(CC_CMD)
+
+$(HBSIX_OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
+   $(CC_CMD)
+
+#
+# HSX.LIB dependencies
+#
+
+$(HSX_OBJ_DIR)\hsx.obj : $(HSX_DIR)\hsx.c
+   $(CC_CMD)
+
+$(HSX_OBJ_DIR)\cftsfunc.obj : $(HSX_DIR)\cftsfunc.c
    $(CC_CMD)
 
 #
@@ -3534,7 +3549,6 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
-   $(ECHO) $(DBFDBT_LIB) >> make.tmp
    $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
@@ -3580,7 +3594,6 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_STLIB) >> make.tmp
    $(ECHO) $(MACRO_STLIB) >> make.tmp
-   $(ECHO) $(DBFDBT_STLIB) >> make.tmp
    $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp
@@ -3691,7 +3704,6 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_STLIB) >> make.tmp
    $(ECHO) $(MACRO_STLIB) >> make.tmp
-   $(ECHO) $(DBFDBT_STLIB) >> make.tmp
    $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp
@@ -3848,7 +3860,6 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_STLIB) >> make.tmp
    $(ECHO) $(MACRO_STLIB) >> make.tmp
-   $(ECHO) $(DBFDBT_STLIB) >> make.tmp
    $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp
@@ -3922,7 +3933,6 @@ $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_STLIB) >> make.tmp
    $(ECHO) $(MACRO_STLIB) >> make.tmp
-   $(ECHO) $(DBFDBT_STLIB) >> make.tmp
    $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp

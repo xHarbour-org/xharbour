@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.74 2005/04/14 11:57:17 paultucker Exp $
+# $Id: hrbdll.vc,v 1.75 2005/09/02 04:16:02 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -35,6 +35,9 @@ RTL_DIR           = source\rtl
 PCREPOS_DIR       = source\rtl\pcre
 TIP_DIR           = source\tip
 VM_DIR            = source\vm
+SAMPLES_DIR       = source\clipsamp
+HBSIX_DIR         = source\rdd\hbsix
+HSX_DIR           = source\rdd\hsx
 XBSCRIPT_DIR      = utils\xbscript
 HBRUN_DIR         = utils\hbrun
 HBDOC_DIR         = utils\hbdoc
@@ -489,12 +492,6 @@ HARBOUR_DLL_OBJS = \
 #
   $(OBJ_DIR)\dbfcdx0.obj \
 #
-# dbfdbt
-#
-  $(OBJ_DIR)\dbfdbt1.obj \
-#
-  $(OBJ_DIR)\dbfdbt0.obj \
-#
 # dbffpt
 #
   $(OBJ_DIR)\dbffpt1.obj \
@@ -506,6 +503,17 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbfntx1.obj \
 #
   $(OBJ_DIR)\dbfntx0.obj \
+#
+#  HBSIX
+#
+  $(OBJ_DIR)\sxcompr.obj \
+  $(OBJ_DIR)\sxcrypt.obj \
+  $(OBJ_DIR)\sxdate.obj \
+#
+#  HSX
+#
+  $(OBJ_DIR)\hsx.obj \
+  $(OBJ_DIR)\cftsfunc.obj \
 #
 # Lang
 #
@@ -2005,15 +2013,6 @@ $(OBJ_DIR)\dbfcdx0.obj : $(OBJ_DIR)\dbfcdx0.c
 $(OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
    $(CC_CMD)
 
-$(OBJ_DIR)\dbfdbt0.c : $(RDD_DIR)\dbfdbt\dbfdbt0.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\dbfdbt0.obj : $(OBJ_DIR)\dbfdbt0.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dbfdbt1.obj : $(RDD_DIR)\dbfdbt\dbfdbt1.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\dbffpt0.c : $(RDD_DIR)\dbffpt\dbffpt0.prg
    $(HARBOUR_CMD)
 
@@ -2598,6 +2597,29 @@ $(OBJ_DIR)\util.c : $(CT_DIR)\util.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\util.obj : $(OBJ_DIR)\util.c
+   $(CC_CMD)
+
+#
+# HBSIX.LIB dependencies
+#
+
+$(OBJ_DIR)\sxcompr.obj : $(HBSIX_DIR)\sxcompr.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxcrypt.obj : $(HBSIX_DIR)\sxcrypt.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
+   $(CC_CMD)
+
+#
+# HSX.LIB dependencies
+#
+
+$(OBJ_DIR)\hsx.obj : $(HSX_DIR)\hsx.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cftsfunc.obj : $(HSX_DIR)\cftsfunc.c
    $(CC_CMD)
 
 # 旼컴컴컴컴컴컴컴컴컴컴컴컴컴커

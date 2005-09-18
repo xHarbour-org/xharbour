@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.151 2005/09/02 15:46:11 paultucker Exp $
+# $Id: makefile.bc,v 1.152 2005/09/15 13:52:01 lculik Exp $
 #
 
 #
@@ -89,7 +89,6 @@ VM_OBJ_DIR    = $(OBJ_DIR)
 RTL_OBJ_DIR   = $(OBJ_DIR)
 MACRO_OBJ_DIR = $(OBJ_DIR)
 RDD_OBJ_DIR   = $(OBJ_DIR)
-DBT_OBJ_DIR   = $(OBJ_DIR)
 FPT_OBJ_DIR   = $(OBJ_DIR)
 NTX_OBJ_DIR   = $(OBJ_DIR)
 CDX_OBJ_DIR   = $(OBJ_DIR)
@@ -196,7 +195,6 @@ COMMON_LIB     = $(LIB_DIR)\common.lib
 CODEPAGE_LIB   = $(LIB_DIR)\codepage.lib
 CT_LIB         = $(LIB_DIR)\ct$(HB_MT).lib
 DBFCDX_LIB     = $(LIB_DIR)\dbfcdx$(HB_MT).lib
-DBFDBT_LIB     = $(LIB_DIR)\dbfdbt$(HB_MT).lib
 DBFFPT_LIB     = $(LIB_DIR)\dbffpt$(HB_MT).lib
 DBFNTX_LIB     = $(LIB_DIR)\dbfntx$(HB_MT).lib
 HBSIX_LIB      = $(LIB_DIR)\hbsix$(HB_MT).lib
@@ -632,11 +630,6 @@ RDD_LIB_OBJS = \
 
 NULSYS_LIB_OBJS = \
    $(OBJ_DIR)\nulsys.obj
-
-DBFDBT_LIB_OBJS = \
-   $(DBT_OBJ_DIR)\dbfdbt1.obj \
-   \
-   $(DBT_OBJ_DIR)\dbfdbt0.obj
 
 DBFFPT_LIB_OBJS = \
    $(FPT_OBJ_DIR)\dbffpt1.obj \
@@ -1140,7 +1133,6 @@ PROJECT = \
    $(MACRO_LIB) \
    $(RDD_LIB) \
    $(TIP_LIB) \
-   $(DBFDBT_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(DBFCDX_LIB) \
@@ -1179,14 +1171,6 @@ ALL: $(PROJECT)
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
     IF EXIST "$(COMMON_LIB)" $(DEL) "$(COMMON_LIB)" > NUL
     $(LINKER) "$(COMMON_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
-
-$(DBFDBT_LIB) : $(DBFDBT_LIB_OBJS)
-    IF EXIST "$(DBFDBT_LIB)" $(DEL) "$(DBFDBT_LIB)" > NUL
-    $(LINKER) "$(DBFDBT_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
@@ -2779,19 +2763,6 @@ $(OBJ_DIR)\nulsys.obj : $(OBJ_DIR)\nulsys.c
    $(CC_CMD)
 
 #
-# DBFDBT.LIB dependencies
-#
-
-$(DBT_OBJ_DIR)\dbfdbt0.c : $(RDD_DIR)\dbfdbt\dbfdbt0.prg
-   $(HB_CMD)
-
-$(DBT_OBJ_DIR)\dbfdbt0.obj : $(DBT_OBJ_DIR)\dbfdbt0.c
-   $(CC_CMD)
-
-$(DBT_OBJ_DIR)\dbfdbt1.obj : $(RDD_DIR)\dbfdbt\dbfdbt1.c
-   $(CC_CMD)
-
-#
 # DBFFPT.LIB dependencies
 #
 
@@ -3521,7 +3492,6 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
-   $(ECHO) $(DBFDBT_LIB) >> make.tmp
    $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
@@ -3575,7 +3545,6 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
-   $(ECHO) $(DBFDBT_LIB) >> make.tmp
    $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
@@ -3697,7 +3666,6 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
-   $(ECHO) $(DBFDBT_LIB) >> make.tmp
    $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
@@ -3858,7 +3826,6 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
-   $(ECHO) $(DBFDBT_LIB) >> make.tmp
    $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
@@ -3936,7 +3903,6 @@ $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
    $(ECHO) $(LANG_LIB) >> make.tmp
    $(ECHO) $(RDD_LIB) >> make.tmp
    $(ECHO) $(MACRO_LIB) >> make.tmp
-   $(ECHO) $(DBFDBT_LIB) >> make.tmp
    $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
