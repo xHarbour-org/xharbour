@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.96 2005/09/15 23:23:46 ronpinkas Exp $
+# $Id: hrbdll.bc,v 1.97 2005/09/18 21:33:08 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -3364,7 +3364,7 @@ $(OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
 $(OBJ_DIR)\hsx.obj : $(HSX_DIR)\hsx.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\cftsfunc.obj : $(HSX_DIR)cftsfunc.c
+$(OBJ_DIR)\cftsfunc.obj : $(HSX_DIR)\cftsfunc.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
 #
