@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx0.prg,v 1.6 2005/01/30 21:19:24 druzus Exp $
+ * $Id: dbfntx0.prg,v 1.7 2005/09/11 19:40:48 druzus Exp $
  */
 
 /*
@@ -58,6 +58,7 @@ ANNOUNCE DBFNTX
 
 procedure DBFNTXInit
 
+   REQUEST _DBF
    REQUEST _DBFNTX
 
    rddRegister( "DBF", RDT_FULL )

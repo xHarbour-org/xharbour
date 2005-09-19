@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.33 2005/09/16 22:29:40 druzus Exp $
+ * $Id: hbrddntx.h,v 1.34 2005/09/17 21:35:41 druzus Exp $
  */
 
 /*
@@ -256,7 +256,7 @@ typedef struct _NTXINDEX
 {
    char *      IndexName;
    char *      RealName;
-   USHORT      Version;       /* The index VERSION filed to signal index updates for other stations */
+   ULONG       Version;       /* The index VERSION filed to signal index updates for other stations */
    ULONG       NextAvail;
    ULONG       TagBlock;      /* Index attr, next free page */
    struct     _NTXAREA * Owner;

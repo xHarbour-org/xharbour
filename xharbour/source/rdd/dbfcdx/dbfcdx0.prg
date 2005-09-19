@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx0.prg,v 1.8 2005/04/26 12:25:58 druzus Exp $
+ * $Id: dbfcdx0.prg,v 1.9 2005/05/10 10:22:27 druzus Exp $
  */
 
 /*
@@ -57,6 +57,7 @@ ANNOUNCE DBFCDX
 
 procedure DBFCDXInit
 
+   REQUEST _DBF
    REQUEST _DBFCDX
 
    rddRegister( "DBF", RDT_FULL )

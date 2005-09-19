@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.58 2005/09/16 22:29:40 druzus Exp $
+# $Id: hb-func.sh,v 1.59 2005/09/17 21:35:41 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -219,6 +219,7 @@ HB_MAIN_FUNC=""
 HB_XBGTK=""
 HB_HWGUI=""
 HB_USRLIBS=""
+HB_GENC=""
 [ -n "\$TMPDIR" ] || TMPDIR="\$TMP"
 [ -n "\$TMPDIR" ] || TMPDIR="\$TEMP"
 [ -n "\$TMPDIR" ] || TMPDIR="/tmp"
@@ -251,6 +252,7 @@ while [ \$n -lt \${#P[@]} ]; do
         -nostrip)    HB_STRIP="no" ;;
         -l[a-zA-z]*) HB_USRLIBS="\${HB_USRLIBS} \${v}" ;;
         -main=*)     HB_MAIN_FUNC="\${v#*=}" ;;
+        -gc|-gc[0-9]) HB_GENC="yes"; p="\${v}" ;;
         -*)          p="\${v}" ;;
         *)           [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
     esac
@@ -409,7 +411,14 @@ FOUTE="\${FOUTE%.[oc]}${hb_exesuf}"
 
 hb_cc()
 {
-    ${hb_cmpname} "\$@" \${HB_OPT} \${HB_PATHS} && [ -f "\${FOUTC}" ] 
+    ${CCPREFIX}\${HB_CC} "\$@" \${CC_OPT} \${GCC_PATHS}
+}
+
+hb_cmp()
+{
+    ${hb_cmpname} "\$@" \${HB_OPT} \${HB_PATHS} && [ -f "\${FOUTC}" ] && \\
+    hb_cc -c "\${FOUTC}" -o "\${FOUTO}" && \\
+    ( [ "\${HB_GENC}" = "yes" ] || rm -f "\${FOUTC}" )
 }
 
 hb_link()
@@ -423,17 +432,10 @@ hb_link()
     fi
     if [ -n "\${HB_LNK_REQ}" ] || [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
         hb_lnk_request > \${_TMP_FILE_} && \\
-        ${CCPREFIX}\${HB_CC} "\$@" \${CC_OPT} "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${HB_USRLIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        hb_cc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${HARBOUR_LIBS} \${HB_USRLIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     else
-        ${CCPREFIX}\${HB_CC} "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${HB_USRLIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        hb_cc "\$@" \${LINK_OPT} \${HARBOUR_LIBS} \${HB_USRLIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     fi
-}
-
-hb_cmp()
-{
-    hb_cc "\$@" && \\
-    ${CCPREFIX}\${HB_CC} -c \${CC_OPT} "\${FOUTC}" -o "\${FOUTO}" \${GCC_PATHS} && \\
-    rm -f "\${FOUTC}"
 }
 
 hb_lnk_request()

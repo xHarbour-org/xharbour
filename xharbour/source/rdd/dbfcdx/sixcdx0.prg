@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: sixcdx0.prg,v 1.1 2005/05/10 10:22:27 druzus Exp $
  */
 
 /*
@@ -57,6 +57,7 @@ ANNOUNCE SIXCDX
 
 procedure SIXCDXInit
 
+   REQUEST _DBF
    REQUEST _SIXCDX
 
    rddRegister( "DBF", RDT_FULL )

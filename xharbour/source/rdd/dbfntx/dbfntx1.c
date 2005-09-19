@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.129 2005/09/15 12:55:35 druzus Exp $
+ * $Id: dbfntx1.c,v 1.130 2005/09/17 21:35:41 druzus Exp $
  */
 
 /*
@@ -1906,9 +1906,8 @@ static ERRCODE hb_ntxIndexHeaderRead( LPNTXINDEX pIndex )
 #else
       LPCTXHEADER lpCTX = ( LPCTXHEADER ) pIndex->HeaderBuff;
       ULONG ulVersion, ulNext;
-      USHORT usTags;
+      /* USHORT usTags = HB_GET_LE_UINT16( lpCTX->ntags ); */
 
-      usTags = HB_GET_LE_UINT16( lpCTX->ntags );
       ulVersion = HB_GET_LE_UINT32( lpCTX->version );
       ulNext = HB_GET_LE_UINT32( lpCTX->freepage );
       pIndex->TagBlock = HB_GET_LE_UINT32( lpCTX->filesize );
@@ -5818,7 +5817,7 @@ static ERRCODE ntxStructSize( NTXAREAP pArea, USHORT * uiSize )
  */
 static ERRCODE ntxOpen( NTXAREAP pArea, LPDBOPENINFO pOpenInfo )
 {
-   ERRCODE errCode = SUCCESS;
+   ERRCODE errCode;
 
    HB_TRACE(HB_TR_DEBUG, ("ntxOpen(%p, %p)", pArea, pOpenInfo));
 
@@ -6365,7 +6364,7 @@ static ERRCODE ntxOrderDestroy( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
       }
    }
 
-   return SUCCESS;
+   return errCode;
 }
 
 static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo )
@@ -6465,7 +6464,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
       }
       case DBOI_BAGORDER:
       {
-         LPNTXINDEX pIndex = pArea->lpIndexes, pIndexSeek = NULL;
+         LPNTXINDEX pIndex = pArea->lpIndexes, pIndexSeek;
          int i = 0;
 
          if( hb_itemGetCLen( pInfo->atomBagName ) > 0 )

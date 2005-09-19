@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.148 2005/08/01 22:21:42 druzus Exp $
+ * $Id: filesys.c,v 1.149 2005/08/02 12:11:00 mauriliolongo Exp $
  */
 
 /*
@@ -3237,7 +3237,7 @@ FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
    {
       hb_fsAddSearchPath( ( char * ) pPaths, &pSearchPath );
       pNextPath = pSearchPath;
-      while( !fIsFile && pNextPath );
+      while( !fIsFile && pNextPath )
       {
          pFilepath->szPath = pNextPath->szPath;
          hb_fsFNameMerge( ( char * ) szPath, pFilepath );

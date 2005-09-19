@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: dbffpt0.prg,v 1.1 2003/09/08 12:56:53 druzus Exp $
  */
 
 /*
@@ -56,6 +56,7 @@ ANNOUNCE DBFFPT
 
 procedure DBFFPTInit
 
+   REQUEST _DBF
    REQUEST _DBFFPT
 
    rddRegister( "DBF", RDT_FULL )

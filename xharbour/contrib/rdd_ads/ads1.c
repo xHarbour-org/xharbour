@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.75 2005/09/13 01:48:05 druzus Exp $
+ * $Id: ads1.c,v 1.76 2005/09/17 21:35:41 druzus Exp $
  */
 
 /*
@@ -295,6 +295,61 @@ static const char * adsIndexExt( int iFileType )
 {
    return iFileType == ADS_ADT ? ".adi" :
         ( iFileType == ADS_CDX ? ".cdx" : ".ntx" );
+}
+
+static ADSHANDLE hb_adsFindBag( ADSAREAP pArea, char * szBagName )
+{
+   /* This method seems to be most easy one though I'm doubt
+      it's really the best one */
+#if 1
+   ADSHANDLE ahIndex[ 1 ];
+   UNSIGNED16 u16Count = 1;
+   UNSIGNED32 u32Result;
+
+   u32Result = AdsOpenIndex( pArea->hTable,
+                             ( UNSIGNED8* ) szBagName, ahIndex, &u16Count );
+   if( u32Result == AE_INDEX_ALREADY_OPEN )
+   {
+      return ahIndex[ 0 ];
+   }
+   if( u32Result == AE_SUCCESS )
+   {
+      AdsCloseIndex( ahIndex[ 0 ] );
+   }
+   return 0;
+#else
+   UNSIGNED8 pucName[ MAX_STR_LEN + 1 ];
+   UNSIGNED16 u16Option, u16Count, u16len, u;
+   ADSHANDLE hIndex = 0, hOrder;
+   PHB_FNAME pFileName;
+   
+   pFileName = hb_fsFNameSplit( szBagName );
+   if( pFileName->szPath )
+      u16Option = ADS_FULLPATHNAME;
+   else if( pFileName->szExtension )
+      u16Option = ADS_BASENAMEANDEXT;
+   else
+      u16Option = ADS_BASENAME;
+   hb_xfree( pFileName );
+
+   if( AdsGetNumIndexes( pArea->hTable, &u16Count ) == AE_SUCCESS )
+   {
+      for( u = 1; u <= u16Count; ++u )
+      {
+         if( AdsGetIndexHandleByOrder( pArea->hTable, u, &hOrder ) != AE_SUCCESS )
+            break;
+         u16len = MAX_STR_LEN;
+         if( AdsGetIndexFilename( hOrder, u16Option, pucName, &u16len ) != AE_SUCCESS )
+            break;
+         if( !hb_stricmp( szBagName, ( char * ) pucName ) )
+         {
+            hIndex = hOrder;
+            break;
+         }
+      }
+   }
+   return hIndex;
+#endif
 }
 
 static ERRCODE hb_adsUpdateAreaFlags( ADSAREAP pArea )
@@ -2554,7 +2609,7 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
 {
    ADSHANDLE hTable = 0;
    UNSIGNED32  ulRetVal = 0, u32Length, ulLastErr = 0;
-   UNSIGNED16 usLength = ADS_MAX_ERROR_LEN + 1;
+   UNSIGNED16 usLength = ADS_MAX_ERROR_LEN;
    UNSIGNED8  aucError[ ADS_MAX_ERROR_LEN + 1 ];
    USHORT uiFields = 0, uiCount;
    UNSIGNED8 szName[ ADS_MAX_FIELD_NAME + 1 ];
@@ -2576,10 +2631,10 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
                ( (pOpenInfo->fShared) ? ADS_SHARED : ADS_EXCLUSIVE ) |
                ( (pOpenInfo->fReadonly) ? ADS_READONLY : ADS_DEFAULT ),
                 &hTable );
-          if( ulRetVal != AE_SUCCESS )
-          {
-             AdsGetLastError( &ulLastErr, aucError, &usLength );
-          }
+       if( ulRetVal != AE_SUCCESS )
+       {
+          AdsGetLastError( &ulLastErr, aucError, &usLength );
+       }
    }
 
    // If the Advantage Data Dictionary open fails with an error indicating that this table is not
@@ -2987,11 +3042,38 @@ static ERRCODE adsOrderListClear( ADSAREAP pArea )
    return SUCCESS;
 }
 
-#define adsOrderListDelete                      NULL
+static ERRCODE adsOrderListDelete( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
+{
+   HB_TRACE(HB_TR_DEBUG, ("adsOrderListDelete(%p, %p)", pArea, pOrderInfo));
+
+   if( hb_itemGetCLen( pOrderInfo->atomBagName ) > 0 )
+   {
+      ADSHANDLE hIndex;
+
+      hIndex = hb_adsFindBag( pArea, hb_itemGetCPtr( pOrderInfo->atomBagName ) );
+      if( hIndex )
+      {
+         if( AdsCloseIndex( hIndex ) == AE_SUCCESS )
+         {
+            if( pArea->hOrdCurrent )
+            {
+               UNSIGNED16 u16Order;
+               if( AdsGetIndexOrderByHandle( pArea->hOrdCurrent, &u16Order ) != AE_SUCCESS )
+               {
+                  pArea->hOrdCurrent = 0;
+               }
+            }
+            return SUCCESS;
+         }
+      }
+   }
+   return FAILURE;
+
+}
 
 static ERRCODE adsOrderListFocus( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
-   ADSHANDLE phIndex;
+   ADSHANDLE hIndex;
    UNSIGNED8 pucTagName[ ADS_MAX_TAG_NAME + 1 ];
    UNSIGNED16 u16Len = ADS_MAX_TAG_NAME + 1, u16Order;
    UNSIGNED32 u32RetVal = AE_SUCCESS;
@@ -3023,7 +3105,7 @@ static ERRCODE adsOrderListFocus( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
             pArea->hOrdCurrent = 0;
             return SUCCESS;
          }
-         u32RetVal = AdsGetIndexHandle( pArea->hTable, pucTagName, &phIndex );
+         u32RetVal = AdsGetIndexHandle( pArea->hTable, pucTagName, &hIndex );
       }
       else if( HB_IS_NUMERIC( pOrderInfo->itmOrder ) )
       {
@@ -3033,7 +3115,7 @@ static ERRCODE adsOrderListFocus( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
             pArea->hOrdCurrent = 0;
             return SUCCESS;
          }
-         u32RetVal = AdsGetIndexHandleByOrder( pArea->hTable, u16Order, &phIndex );
+         u32RetVal = AdsGetIndexHandleByOrder( pArea->hTable, u16Order, &hIndex );
       }
       if( u32RetVal != AE_SUCCESS )
       {
@@ -3044,7 +3126,7 @@ static ERRCODE adsOrderListFocus( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
          pArea->hOrdCurrent = 0;
          return FAILURE;
       }
-      pArea->hOrdCurrent = phIndex;
+      pArea->hOrdCurrent = hIndex;
    }
    return SUCCESS;
 }
@@ -3062,7 +3144,7 @@ static ERRCODE adsOrderListRebuild( ADSAREAP pArea )
 
 static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
 {
-   ADSHANDLE  phIndex;
+   ADSHANDLE  hIndex;
    ADSHANDLE  hTableOrIndex ;
    UNSIGNED32 u32RetVal;
    UNSIGNED32 u32Options = ADS_DEFAULT;
@@ -3171,7 +3253,7 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
    u32RetVal = AdsCreateIndex( hTableOrIndex, pOrderInfo->abBagName,
            pOrderInfo->atomBagName, (UNSIGNED8*)hb_itemGetCPtr( pExprItem ),
            ( pArea->lpdbOrdCondInfo && pArea->lpdbOrdCondInfo->abFor ) ? (UNSIGNED8*)pArea->lpdbOrdCondInfo->abFor : (UNSIGNED8*)"",
-           pucWhile, u32Options, &phIndex);
+           pucWhile, u32Options, &hIndex);
 
    if( u32RetVal != AE_SUCCESS )
    {
@@ -3180,7 +3262,7 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
    }
    else
    {
-      pArea->hOrdCurrent = phIndex;
+      pArea->hOrdCurrent = hIndex;
    }
 
    if( pArea->lpdbOrdCondInfo && !pArea->lpdbOrdCondInfo->fAll &&
@@ -3204,7 +3286,7 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
 
 static ERRCODE adsOrderDestroy( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
-   ADSHANDLE phIndex;
+   ADSHANDLE hIndex;
    UNSIGNED32 u32RetVal;
    HB_TRACE(HB_TR_DEBUG, ("adsOrderDestroy(%p, %p)", pArea, pOrderInfo));
 
@@ -3215,17 +3297,17 @@ static ERRCODE adsOrderDestroy( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
       hb_strncpyUpperTrim( ( char * ) pucTagName, 
                            hb_itemGetCPtr( pOrderInfo->itmOrder ),
                            ADS_MAX_TAG_NAME );
-      u32RetVal = AdsGetIndexHandle( pArea->hTable, pucTagName, &phIndex );
+      u32RetVal = AdsGetIndexHandle( pArea->hTable, pucTagName, &hIndex );
       if( u32RetVal != AE_SUCCESS )
       {
          return FAILURE;
       }
-      u32RetVal = AdsDeleteIndex( phIndex );
+      u32RetVal = AdsDeleteIndex( hIndex );
       if( u32RetVal != AE_SUCCESS )
       {
          return FAILURE;
       }
-      if( phIndex == pArea->hOrdCurrent )
+      if( hIndex == pArea->hOrdCurrent )
       {
          pArea->hOrdCurrent = 0;
       }
@@ -3240,7 +3322,7 @@ static ERRCODE adsOrderDestroy( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
 
 static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrderInfo )
 {
-   ADSHANDLE  phIndex;
+   ADSHANDLE  hIndex;
    UNSIGNED8  aucBuffer[MAX_STR_LEN + 1];
    UNSIGNED16 u16len  = MAX_STR_LEN;
    UNSIGNED16 u16     = 0;
@@ -3266,47 +3348,47 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          hb_strncpyUpperTrim( ( char * ) pucTagName, 
                               hb_itemGetCPtr( pOrderInfo->itmOrder ),
                               ADS_MAX_TAG_NAME );
-         u32RetVal = AdsGetIndexHandle( pArea->hTable, pucTagName, &phIndex );
+         u32RetVal = AdsGetIndexHandle( pArea->hTable, pucTagName, &hIndex );
       }
       else if( HB_IS_NUMERIC( pOrderInfo->itmOrder ) )
       {
          u32RetVal = AdsGetIndexHandleByOrder( pArea->hTable,
-               (UNSIGNED16) hb_itemGetNI( pOrderInfo->itmOrder ), &phIndex );
+               (UNSIGNED16) hb_itemGetNI( pOrderInfo->itmOrder ), &hIndex );
       }
       if( u32RetVal != AE_SUCCESS )
       {
-         phIndex = 0;
+         hIndex = 0;
       }
    }
    else
    {
-      phIndex = pArea->hOrdCurrent;
+      hIndex = pArea->hOrdCurrent;
    }
 
    switch( uiIndex )
    {
       case DBOI_CONDITION:
-         if( phIndex )
+         if( hIndex )
          {
-            AdsGetIndexCondition( phIndex, aucBuffer, &u16len );
+            AdsGetIndexCondition( hIndex, aucBuffer, &u16len );
          }
 
          hb_itemPutCL( pOrderInfo->itmResult, (char*)aucBuffer, u16len );
          break;
 
       case DBOI_EXPRESSION:
-         if( phIndex )
+         if( hIndex )
          {
-            AdsGetIndexExpr( phIndex, aucBuffer, &u16len);
+            AdsGetIndexExpr( hIndex, aucBuffer, &u16len);
             hb_itemPutCL( pOrderInfo->itmResult, ( char* ) aucBuffer, u16len );
          }
 
          break;
 
       case DBOI_ISCOND:
-         if( phIndex )
+         if( hIndex )
          {
-            AdsGetIndexCondition( phIndex, aucBuffer, &u16 );
+            AdsGetIndexCondition( hIndex, aucBuffer, &u16 );
          }
          else
          {
@@ -3316,9 +3398,9 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_ISDESC:
-         if( phIndex )
+         if( hIndex )
          {
-            AdsIsIndexDescending( phIndex, &u16 );
+            AdsIsIndexDescending( hIndex, &u16 );
          }
          else
          {
@@ -3328,9 +3410,9 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_UNIQUE:
-         if( phIndex )
+         if( hIndex )
          {
-            AdsIsIndexUnique( phIndex, &u16 );
+            AdsIsIndexUnique( hIndex, &u16 );
          }
          else
          {
@@ -3340,9 +3422,9 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_KEYTYPE:
-         if( phIndex )
+         if( hIndex )
          {
-            AdsGetKeyType( phIndex, &u16 );
+            AdsGetKeyType( hIndex, &u16 );
             switch( u16 )
             {
                case ADS_STRING:
@@ -3370,9 +3452,9 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_KEYSIZE:
-         if( phIndex )
+         if( hIndex )
          {
-            AdsGetKeyLength( phIndex, &u16 );
+            AdsGetKeyLength( hIndex, &u16 );
          }
          else
          {
@@ -3382,15 +3464,15 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_KEYVAL:
-         if( !pArea->fEof && phIndex )
+         if( !pArea->fEof && hIndex )
          {
             /* ----------------------------------
              From ads docs: It is important to note that the key generated
              by this function is built on the client, and the key may not
              exist in the index.
              -----------------------------------*/
-            AdsExtractKey( phIndex, aucBuffer, &u16len );
-            AdsGetKeyType( phIndex, &u16);
+            AdsExtractKey( hIndex, aucBuffer, &u16len );
+            AdsGetKeyType( hIndex, &u16);
 
             adsGetKeyItem( pArea, pOrderInfo->itmResult, u16,
                            ( char * ) aucBuffer, u16len );
@@ -3406,8 +3488,8 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          if ( pOrderInfo->itmNewVal && HB_IS_NUMERIC( pOrderInfo->itmNewVal ) )
          {
             // TODO: results will be wrong if filter is not valid for ADS server
-            AdsGotoTop( phIndex );
-            AdsSkip( phIndex, hb_itemGetNL( pOrderInfo->itmNewVal ) - 1 );
+            AdsGotoTop( hIndex );
+            AdsSkip( hIndex, hb_itemGetNL( pOrderInfo->itmNewVal ) - 1 );
             hb_adsUpdateAreaFlags( pArea );
             /* Force relational movement in child WorkAreas */
             if( pArea->lpdbRelations )
@@ -3417,10 +3499,10 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          }
          else
          {
-            if( phIndex )
+            if( hIndex )
             {
                UNSIGNED16 usFilterOption = ( pArea->dbfi.itmCobExpr ? ADS_RESPECTFILTERS : ADS_RESPECTSCOPES ) ;
-               AdsGetKeyNum( phIndex, usFilterOption, &u32);
+               AdsGetKeyNum( hIndex, usFilterOption, &u32);
             }
             else
             {
@@ -3436,9 +3518,9 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
 
       case DBOI_RECNO :                 /* TODO: OR IS THIS JUST RECNO?? */
       case DBOI_KEYNORAW :
-         if( phIndex )
+         if( hIndex )
          {
-            AdsGetKeyNum( phIndex, ADS_RESPECTSCOPES, &u32 );
+            AdsGetKeyNum( hIndex, ADS_RESPECTSCOPES, &u32 );
             hb_itemPutNL( pOrderInfo->itmResult, u32 );
          }
          else
@@ -3452,19 +3534,19 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
       case DBOI_RELKEYPOS:
          if( pOrderInfo->itmNewVal && HB_IS_NUMERIC( pOrderInfo->itmNewVal ) )
          {
-            adsSetRelPos( pArea, phIndex, hb_itemGetND( pOrderInfo->itmNewVal ) );
+            adsSetRelPos( pArea, hIndex, hb_itemGetND( pOrderInfo->itmNewVal ) );
          }
          else
          {
             pOrderInfo->itmResult = hb_itemPutND( pOrderInfo->itmResult,
-                                             adsGetRelPos( pArea, phIndex ) );
+                                             adsGetRelPos( pArea, hIndex ) );
          }
          break;
 
       case DBOI_NAME:
-         if( phIndex )
+         if( hIndex )
          {
-            AdsGetIndexName( phIndex, aucBuffer, &u16len );
+            AdsGetIndexName( hIndex, aucBuffer, &u16len );
          }
          else
          {
@@ -3476,9 +3558,9 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
       case DBOI_NUMBER :
       {
          UNSIGNED16 usOrder = 0;
-         if( phIndex )
+         if( hIndex )
          {
-            AdsGetIndexOrderByHandle( phIndex, &usOrder );
+            AdsGetIndexOrderByHandle( hIndex, &usOrder );
          }
          else
          {
@@ -3489,9 +3571,9 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
       }
 
       case DBOI_BAGNAME:
-         if( phIndex )
+         if( hIndex )
          {
-            AdsGetIndexFilename( phIndex, ADS_BASENAME, aucBuffer, &u16len );
+            AdsGetIndexFilename( hIndex, ADS_BASENAME, aucBuffer, &u16len );
          }
          else
          {
@@ -3501,9 +3583,9 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_FULLPATH :
-         if( phIndex )
+         if( hIndex )
          {
-            AdsGetIndexFilename( phIndex, ADS_FULLPATHNAME, aucBuffer, &u16len );
+            AdsGetIndexFilename( hIndex, ADS_FULLPATHNAME, aucBuffer, &u16len );
          }
          else
          {
@@ -3517,14 +3599,32 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_ORDERCOUNT:
-         if( pOrderInfo->atomBagName && (UNSIGNED8*) hb_itemGetCPtr( pOrderInfo->atomBagName ) )
+         if( hb_itemGetCLen( pOrderInfo->atomBagName ) > 0 )
          {
             /* if already open, ads fills other info OK.
                TODO: verify it is already open, or be sure to close it!
+               (AE_INDEX_ALREADY_OPEN)
             */
-            AdsOpenIndex( pArea->hTable,
-                          (UNSIGNED8*) hb_itemGetCPtr( pOrderInfo->atomBagName ), NULL, &u16 );
-
+            u32 = AdsOpenIndex( pArea->hTable,
+                       (UNSIGNED8*) hb_itemGetCPtr( pOrderInfo->atomBagName ),
+                       NULL, &u16 );
+            
+            if( u32 != AE_INDEX_ALREADY_OPEN )
+            {
+               /* Close the index if we open new one */
+               if( u32 == AE_SUCCESS )
+               {
+                  ADSHANDLE ahIndex[ 1 ];
+                  u16 = 1;
+                  if( AdsOpenIndex( pArea->hTable,
+                       (UNSIGNED8*) hb_itemGetCPtr( pOrderInfo->atomBagName ),
+                       ahIndex, &u16 ) == AE_INDEX_ALREADY_OPEN )
+                  {
+                     AdsCloseIndex( ahIndex[ 0 ] );
+                  }
+               }
+               u16 = 0;
+            }
          }
          else    /* no specific bag requested; get all current indexes */
          {
@@ -3539,11 +3639,11 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
             TODO: If there are child areas that are not at the top of scope,
                   Skip movement may move them to first related record
          */
-         if( phIndex )
+         if( hIndex )
          {
             if ( pArea->dbfi.itmCobExpr )
             {
-               AdsGetScope( phIndex, ADS_BOTTOM, aucBuffer, &u16len );
+               AdsGetScope( hIndex, ADS_BOTTOM, aucBuffer, &u16len );
 
                if( u16len )
                {
@@ -3557,14 +3657,14 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
                      to the scope and then filtered.
                   */
                   SELF_RECNO( ( AREAP ) pArea, &ulRecNo );
-                  AdsGotoTop( phIndex );
+                  AdsGotoTop( hIndex );
                   do
                   {
                      AdsAtEOF( pArea->hTable, &u16 );
                      if( u16 )
                         break;
                      u32++;
-                     if( AdsSkip( phIndex, 1 ) == AE_NO_CURRENT_RECORD )
+                     if( AdsSkip( hIndex, 1 ) == AE_NO_CURRENT_RECORD )
                         break;
                   }
                   while( TRUE );
@@ -3572,12 +3672,12 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
                }
                else  /* no scope set */
                {
-                  AdsGetRecordCount( phIndex, ADS_RESPECTFILTERS, &u32 );
+                  AdsGetRecordCount( hIndex, ADS_RESPECTFILTERS, &u32 );
                }
             }
             else                        // no filter set
             {
-               AdsGetRecordCount( phIndex, ADS_RESPECTSCOPES, &u32 );
+               AdsGetRecordCount( hIndex, ADS_RESPECTSCOPES, &u32 );
             }
          }
          else
@@ -3589,20 +3689,20 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_KEYCOUNTRAW :           /* ignore filter but RESPECT SCOPE */
-         AdsGetRecordCount( (phIndex ? phIndex : pArea->hTable), ADS_RESPECTSCOPES, &u32 );
+         AdsGetRecordCount( (hIndex ? hIndex : pArea->hTable), ADS_RESPECTSCOPES, &u32 );
          hb_itemPutNL( pOrderInfo->itmResult, u32 );
          break;
 
       case DBOI_SCOPETOP:
-         if( phIndex )
+         if( hIndex )
          {
             if( pOrderInfo->itmResult )
             {
-               adsScopeGet( pArea, phIndex, 0, pOrderInfo->itmResult );
+               adsScopeGet( pArea, hIndex, 0, pOrderInfo->itmResult );
             }
             if( pOrderInfo->itmNewVal )
             {
-               adsScopeSet( pArea, phIndex, 0, pOrderInfo->itmNewVal );
+               adsScopeSet( pArea, hIndex, 0, pOrderInfo->itmNewVal );
             }
          }
          else if( pOrderInfo->itmResult )
@@ -3612,15 +3712,15 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_SCOPEBOTTOM :
-         if( phIndex )
+         if( hIndex )
          {
             if( pOrderInfo->itmResult )
             {
-               adsScopeGet( pArea, phIndex, 1, pOrderInfo->itmResult );
+               adsScopeGet( pArea, hIndex, 1, pOrderInfo->itmResult );
             }
             if( pOrderInfo->itmNewVal )
             {
-               adsScopeSet( pArea, phIndex, 1, pOrderInfo->itmNewVal );
+               adsScopeSet( pArea, hIndex, 1, pOrderInfo->itmNewVal );
             }
          }
          else if( pOrderInfo->itmResult )
@@ -3630,12 +3730,12 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_SCOPESET :
-         if( phIndex )
+         if( hIndex )
          {
             if( pOrderInfo->itmNewVal )
             {
-               adsScopeSet( pArea, phIndex, 0, pOrderInfo->itmNewVal );
-               adsScopeSet( pArea, phIndex, 1, pOrderInfo->itmNewVal );
+               adsScopeSet( pArea, hIndex, 0, pOrderInfo->itmNewVal );
+               adsScopeSet( pArea, hIndex, 1, pOrderInfo->itmNewVal );
             }
          }
          if( pOrderInfo->itmResult )
@@ -3645,13 +3745,13 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_SCOPETOPCLEAR :
-         if( phIndex )
+         if( hIndex )
          {
             if( pOrderInfo->itmResult )
             {
-               adsScopeGet( pArea, phIndex, 0, pOrderInfo->itmResult ) ;
+               adsScopeGet( pArea, hIndex, 0, pOrderInfo->itmResult ) ;
             }
-            AdsClearScope( phIndex, ADS_TOP );  /* ADS scopes are 1/2 instead of 0/1 */
+            AdsClearScope( hIndex, ADS_TOP );  /* ADS scopes are 1/2 instead of 0/1 */
          }
          else if( pOrderInfo->itmResult )
          {
@@ -3660,13 +3760,13 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_SCOPEBOTTOMCLEAR :
-         if( phIndex )
+         if( hIndex )
          {
             if( pOrderInfo->itmResult )
             {
-               adsScopeGet( pArea, phIndex, 1, pOrderInfo->itmResult ) ;
+               adsScopeGet( pArea, hIndex, 1, pOrderInfo->itmResult ) ;
             }
-            AdsClearScope( phIndex, ADS_BOTTOM );
+            AdsClearScope( hIndex, ADS_BOTTOM );
          }
          else if( pOrderInfo->itmResult )
          {
@@ -3675,10 +3775,10 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_SCOPECLEAR :
-         if( phIndex )
+         if( hIndex )
          {
-            AdsClearScope( phIndex, ADS_TOP );  /* ADS scopes are 1/2 instead of 0/1 */
-            AdsClearScope( phIndex, ADS_BOTTOM );
+            AdsClearScope( hIndex, ADS_TOP );  /* ADS scopes are 1/2 instead of 0/1 */
+            AdsClearScope( hIndex, ADS_BOTTOM );
          }
          if( pOrderInfo->itmResult )
          {
@@ -3687,9 +3787,9 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
       case DBOI_CUSTOM :
-         if( phIndex )
+         if( hIndex )
          {
-            AdsIsIndexCustom( phIndex, &u16 );
+            AdsIsIndexCustom( hIndex, &u16 );
          }
          hb_itemPutL( pOrderInfo->itmResult, u16 != 0 );
          break;
@@ -3711,12 +3811,12 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
 
       case DBOI_KEYADD :
          hb_itemPutL( pOrderInfo->itmResult,
-                      phIndex && AdsAddCustomKey( phIndex ) == AE_SUCCESS );
+                      hIndex && AdsAddCustomKey( hIndex ) == AE_SUCCESS );
          break;
 
       case DBOI_KEYDELETE :
          hb_itemPutL( pOrderInfo->itmResult,
-                      phIndex && AdsDeleteCustomKey( phIndex ) == AE_SUCCESS );
+                      hIndex && AdsDeleteCustomKey( hIndex ) == AE_SUCCESS );
          break;
 
 

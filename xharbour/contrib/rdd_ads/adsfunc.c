@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.61 2005/09/02 18:29:03 druzus Exp $
+ * $Id: adsfunc.c,v 1.62 2005/09/17 21:35:41 druzus Exp $
  */
 
 /*
@@ -1365,63 +1365,51 @@ HB_FUNC( ADSDISCONNECT )
 
 HB_FUNC( ADSCREATESQLSTATEMENT )
 {
-   UNSIGNED32 ulRetVal;
+   UNSIGNED32 u32RetVal;
    ADSAREAP pArea;
    ADSHANDLE adsStatementHandle;
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
-   UNSIGNED16 usTableType;
+   BOOL fResult = FALSE;
 
    if( adsConnectHandle )
    {
-      ulRetVal = AdsCreateSQLStatement( adsConnectHandle, &adsStatementHandle );
-      if( ulRetVal == AE_SUCCESS )
+      u32RetVal = AdsCreateSQLStatement( adsConnectHandle, &adsStatementHandle );
+      if( u32RetVal == AE_SUCCESS )
       {
-        if( !hb_rddInsertAreaNode( "ADS" ) )
-        {
-           AdsCloseSQLStatement( adsStatementHandle );
-           hb_retl( 0 );
-        }
-        else
-        {
-           pArea = hb_rddGetADSWorkAreaPointer();
-           if( ISCHAR( 1 ) )
-           {
-              strncpy( szAlias, hb_parcx( 1 ), HARBOUR_MAX_RDD_ALIAS_LENGTH );
-           }
-           else
-           {
-              strcpy( szAlias, "ADSSQL" );
-           }
-           pArea->atomAlias = hb_rddAllocWorkAreaAlias( szAlias, hb_rddGetCurrentWorkAreaNumber() );
-           if( ! pArea->atomAlias )
-           {
-              hb_retl( 0 );
-           }
-           if( ISNUM( 2 ) )
-           {
-              usTableType = hb_parni( 2 );
-              if( usTableType == ADS_CDX )
-              {
-                 AdsStmtSetTableType( adsStatementHandle, ADS_CDX );
-              }
-           }
-           pArea->uiArea = hb_rddGetCurrentWorkAreaNumber();
-           pArea = hb_rddGetADSWorkAreaPointer();
-           pArea->hStatement = adsStatementHandle;
-           pArea->hTable = 0;
-           pArea->hOrdCurrent = 0;
-           hb_retl( 1 );
-        }
-      }
-      else
-      {
-         hb_retl( 0 );
+         if( hb_parni( 2 ) == ADS_CDX )
+         {
+            AdsStmtSetTableType( adsStatementHandle, ADS_CDX );
+         }
+
+         if( !hb_rddInsertAreaNode( "ADS" ) )
+         {
+            AdsCloseSQLStatement( adsStatementHandle );
+         }
+         else
+         {
+            pArea = hb_rddGetADSWorkAreaPointer();
+            if( pArea )
+            {
+               hb_strncpy( szAlias, ISCHAR( 1 ) ? hb_parc( 1 ) : "ADSSQL",
+                           HARBOUR_MAX_RDD_ALIAS_LENGTH );
+               pArea->atomAlias = hb_rddAllocWorkAreaAlias( szAlias,
+                                                            pArea->uiArea );
+               if( !pArea->atomAlias )
+               {
+                  hb_rddReleaseCurrentArea();
+               }
+               else
+               {
+                  pArea->hTable = 0;
+                  pArea->hOrdCurrent = 0;
+                  pArea->hStatement = adsStatementHandle;
+                  fResult = TRUE;
+               }
+            }
+         }
       }
    }
-   else
-   {
-      hb_retl( 0 );
-   }
+   hb_retl( fResult );
 }
 
 HB_FUNC( ADSEXECUTESQLDIRECT )

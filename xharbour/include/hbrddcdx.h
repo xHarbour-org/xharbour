@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.48 2005/09/11 19:39:32 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.49 2005/09/16 22:29:40 druzus Exp $
  */
 
 /*
@@ -370,6 +370,7 @@ typedef CDXTAG * LPCDXTAG;
 typedef struct _CDXINDEX
 {
    char *      szFileName;    /* Name of index file */
+   char *      szRealName;    /* Real name of index file */
    FHANDLE     hFile;         /* Index file handle */
    struct _CDXAREA  * pArea;  /* Parent WorkArea */
    struct _CDXINDEX * pNext;  /* The next index in the list */
@@ -377,6 +378,7 @@ typedef struct _CDXINDEX
    LPCDXTAG    TagList;       /* List of tags in index file */
    BOOL        fShared;       /* Shared file */
    BOOL        fReadonly;     /* Read only file */
+   BOOL        fDelete;       /* delete on close flag */
    ULONG       nextAvail;     /* offset to next free page in the end of index file */
    ULONG       freePage;      /* offset to next free page inside index file */
    LPCDXLIST   freeLst;       /* list of free pages in index file */

@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.51 2005/09/15 12:55:35 druzus Exp $
+ * $Id: dbffpt1.c,v 1.52 2005/09/16 22:29:41 druzus Exp $
  */
 
 /*
@@ -1407,7 +1407,7 @@ static ERRCODE hb_fptReadRawSMTItem( FPTAREAP pArea, PHB_ITEM pItem )
             return EDBF_READ;
          ulLen = HB_GET_LE_UINT16( buffer );
          pBuffer = ( BYTE * ) hb_xgrab( ulLen + 1 );
-         if( hb_fsRead( pArea->hMemoFile, pBuffer, ulLen ) != ulLen )
+         if( hb_fsRead( pArea->hMemoFile, pBuffer, ulLen ) != ( USHORT ) ulLen )
          {
             hb_xfree( pBuffer );
             return EDBF_READ;
@@ -2272,8 +2272,6 @@ extern ERRCODE hb_fptReadBlobBlock( FPTAREAP pArea, PHB_ITEM pItem, FHANDLE hFil
 
 extern ERRCODE hb_fptReadSMTBlock( FPTAREAP pArea, PHB_ITEM pItem, ULONG ulBlock, ULONG ulSize )
 {
-   ERRCODE errCode = SUCCESS;
-
    if( ulBlock == 0 )
       return EDBF_CORRUPT;
 
@@ -2286,6 +2284,7 @@ extern ERRCODE hb_fptReadSMTBlock( FPTAREAP pArea, PHB_ITEM pItem, ULONG ulBlock
    }
    else
    {
+      ERRCODE errCode;
       BYTE * bBuffer = ( BYTE * ) hb_xalloc( ulSize ), * bMemoBuf;
 
       if( !bBuffer )
@@ -2304,8 +2303,8 @@ extern ERRCODE hb_fptReadSMTBlock( FPTAREAP pArea, PHB_ITEM pItem, ULONG ulBlock
          errCode = hb_fptReadSMTItem( pArea, &bMemoBuf, bMemoBuf + ulSize, pItem );
       }
       hb_xfree( bBuffer );
+      return errCode;
    }
-   return errCode;
 }
 
 /*
@@ -2313,7 +2312,7 @@ extern ERRCODE hb_fptReadSMTBlock( FPTAREAP pArea, PHB_ITEM pItem, ULONG ulBlock
  */
 static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem, FHANDLE hFile )
 {
-   ERRCODE errCode = SUCCESS;
+   ERRCODE errCode;
    ULONG ulBlock, ulSize, ulBufSize, ulType;
    BYTE * pBuffer, * bMemoBuf;
    FPTBLOCK fptBlock;
@@ -3533,7 +3532,7 @@ static ERRCODE hb_fptGetValueFile( FPTAREAP pArea, USHORT uiIndex, BYTE * szFile
        ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO ||
          pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_ANY ) )
    {
-      USHORT uiError = SUCCESS;
+      USHORT uiError;
       FHANDLE hFile;
 
       hFile = hb_fsExtOpen( szFile, NULL, FO_WRITE | FO_EXCLUSIVE |
@@ -3691,7 +3690,7 @@ static ERRCODE hb_fptPutValueFile( FPTAREAP pArea, USHORT uiIndex, BYTE * szFile
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
        pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
    {
-      USHORT uiError = SUCCESS;
+      USHORT uiError;
       BOOL bDeleted;
       FHANDLE hFile;
 

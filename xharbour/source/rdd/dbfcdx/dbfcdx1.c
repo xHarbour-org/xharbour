@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.217 2005/09/11 19:40:06 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.218 2005/09/13 01:48:34 druzus Exp $
  */
 
 /*
@@ -4817,19 +4817,30 @@ static void hb_cdxIndexFree( LPCDXINDEX pIndex )
    hb_cdxIndexFreeTags( pIndex );
 
    /* Close file */
-   if ( pIndex->hFile != FS_ERROR )
+   if( pIndex->hFile != FS_ERROR )
+   {
       hb_fsClose( pIndex->hFile );
+      if( pIndex->fDelete )
+      {
+         hb_fsDelete( ( BYTE * ) ( pIndex->szRealName ?
+                                   pIndex->szRealName : pIndex->szFileName ) );
+      }
+   }
 
 #ifdef HB_CDX_DBGCODE
-   if ( pIndex->fShared && ( pIndex->lockWrite || pIndex->lockRead ) )
+   if( pIndex->fShared && ( pIndex->lockWrite || pIndex->lockRead ) &&
+       hb_vmRequestQuery() == 0 )
       hb_errInternal( 9104, "hb_cdxIndexFree: index file still locked.", "", "" );
 
-   if ( pIndex->WrLck || pIndex->RdLck )
+   if( ( pIndex->WrLck || pIndex->RdLck ) &&
+       hb_vmRequestQuery() == 0 )
       hb_errInternal( 9104, "hb_cdxIndexFree: index file still locked (*)", "", "" );
 #endif
 
    if ( pIndex->szFileName != NULL )
       hb_xfree( pIndex->szFileName );
+   if( pIndex->szRealName )
+      hb_xfree( pIndex->szRealName );
 
    hb_xfree( pIndex );
 }
@@ -7248,16 +7259,16 @@ static ERRCODE hb_cdxOrderListRebuild( CDXAREAP pArea )
 static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
 {
    ULONG ulRecNo;
-   BOOL fNewFile, fOpenedIndex, fProd = FALSE;
-   PHB_ITEM pKeyExp, pForExp, pResult;
+   BOOL fNewFile, fOpenedIndex, fProd = FALSE, fAscend = TRUE, fCustom = FALSE,
+        fTemporary = FALSE, fExclusive = FALSE;
+   PHB_ITEM pKeyExp, pForExp = NULL, pResult;
    char szCpndTagName[ CDX_MAXTAGNAMELEN + 1 ], szTagName[ CDX_MAXTAGNAMELEN + 1 ];
-   char szFileName[ _POSIX_PATH_MAX + 1 ];
+   char szFileName[ _POSIX_PATH_MAX + 1 ], szTempFile[ _POSIX_PATH_MAX + 1 ];
+   char *szFor = NULL;
    LPCDXINDEX pIndex;
    LPCDXTAG pTag;
    USHORT uiLen;
    BYTE bType;
-
-   pForExp = NULL;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxOrderCreate(%p, %p)", pArea, pOrderInfo));
 
@@ -7317,11 +7328,17 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
                      1026, NULL, 0, 0 );
       return FAILURE;
    }
-   /* Check conditional expression */
    if ( pArea->lpdbOrdCondInfo )
    {
-      /* If we have a codeblock for the conditional expression, use it */
+      fAscend = !pArea->lpdbOrdCondInfo->fDescending;
+      fCustom = pArea->lpdbOrdCondInfo->fCustom;
+      fTemporary = pArea->lpdbOrdCondInfo->fTemporary;
+      fExclusive = pArea->lpdbOrdCondInfo->fExclusive;
+
+      /* Check conditional expression */
+      szFor = ( char * ) pArea->lpdbOrdCondInfo->abFor;
       if ( pArea->lpdbOrdCondInfo->itmCobFor )
+         /* If we have a codeblock for the conditional expression, use it */
          pForExp = hb_itemNew( pArea->lpdbOrdCondInfo->itmCobFor );
       else if ( pArea->lpdbOrdCondInfo->abFor )
       {
@@ -7415,15 +7432,23 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    if ( !fOpenedIndex )
    {
       FHANDLE hFile;
-      BOOL bRetry;
+      BOOL bRetry, fShared = pArea->fShared && !fTemporary && !fExclusive;
 
       do
       {
-         hFile = hb_fsExtOpen( ( BYTE * ) szFileName, NULL, FO_READWRITE |
-                               ( pArea->fShared ? FO_DENYNONE : FO_EXCLUSIVE ) |
-                               ( fNewFile ? FXO_TRUNCATE : FXO_APPEND ) |
-                               FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
-                               NULL, NULL );
+         if( fTemporary )
+         {
+            hFile = hb_fsCreateTemp( NULL, NULL, FC_NORMAL, ( BYTE * ) szTempFile );
+            fNewFile = TRUE;
+         }
+         else
+         {
+            hFile = hb_fsExtOpen( ( BYTE * ) szFileName, NULL, FO_READWRITE |
+                                  ( fShared ? FO_DENYNONE : FO_EXCLUSIVE ) |
+                                  ( fNewFile ? FXO_TRUNCATE : FXO_APPEND ) |
+                                  FXO_DEFAULTS | FXO_SHARELOCK | FXO_COPYNAME,
+                                  NULL, NULL );
+         }
          if( hFile == FS_ERROR )
             bRetry = ( hb_cdxErrorRT( pArea, EG_CREATE, EDBF_CREATE, szFileName,
                                       hb_fsError(), EF_CANRETRY | EF_CANDEFAULT ) == E_RETRY );
@@ -7440,9 +7465,12 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       {
          pIndex = hb_cdxIndexNew( pArea );
          pIndex->hFile      = hFile;
-         pIndex->fShared    = pArea->fShared;
+         pIndex->fShared    = fShared;
          pIndex->fReadonly  = FALSE;
          pIndex->szFileName = hb_strdup( szFileName );
+         pIndex->fDelete = fTemporary;
+         if( fTemporary )
+            pIndex->szRealName = hb_strdup( szTempFile );
 
          if ( !fNewFile )
          {
@@ -7492,8 +7520,22 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       hb_cdxIndexCreateStruct( pIndex, szCpndTagName );
    }
 
+   pTag = hb_cdxIndexAddTag( pIndex, szTagName, pOrderInfo->abExpr->item.asString.value,
+                      pKeyExp, bType, uiLen, szFor, pForExp,
+                      fAscend , pOrderInfo->fUnique, fCustom, FALSE );
+
+   if ( pArea->lpdbOrdCondInfo && ( !pArea->lpdbOrdCondInfo->fAll &&
+                                    !pArea->lpdbOrdCondInfo->fAdditive ) )
+   {
+#ifdef HB_CDX_CLIP_AUTOPEN
+      hb_cdxOrdListClear( pArea, !hb_set.HB_SET_AUTOPEN, pIndex );
+#else
+      hb_cdxOrdListClear( pArea, !pArea->fHasTags || !hb_set.HB_SET_AUTOPEN, pIndex );
+#endif
+   }
+   hb_cdxIndexUnLockWrite( pIndex );
    /* Update DBF header */
-   if ( !pArea->fHasTags && !fOpenedIndex )
+   if( !pArea->fHasTags && !fOpenedIndex && !pIndex->fDelete )
    {
       PHB_FNAME pFileName;
       pFileName = hb_fsFNameSplit( pArea->szDataFileName );
@@ -7510,24 +7552,6 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
             SELF_WRITEDBHEADER( ( AREAP ) pArea );
       }
    }
-
-   pTag = hb_cdxIndexAddTag( pIndex, szTagName, pOrderInfo->abExpr->item.asString.value,
-                      pKeyExp, bType, uiLen, ( char * ) ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->abFor :
-                      NULL ), pForExp,
-                      ( pArea->lpdbOrdCondInfo ? !pArea->lpdbOrdCondInfo->fDescending : TRUE ) , pOrderInfo->fUnique,
-                      ( pArea->lpdbOrdCondInfo ? pArea->lpdbOrdCondInfo->fCustom : FALSE ),
-                      FALSE );
-
-   if ( pArea->lpdbOrdCondInfo && ( !pArea->lpdbOrdCondInfo->fAll &&
-                                    !pArea->lpdbOrdCondInfo->fAdditive ) )
-   {
-#ifdef HB_CDX_CLIP_AUTOPEN
-      hb_cdxOrdListClear( pArea, !hb_set.HB_SET_AUTOPEN, pIndex );
-#else
-      hb_cdxOrdListClear( pArea, !pArea->fHasTags || !hb_set.HB_SET_AUTOPEN, pIndex );
-#endif
-   }
-   hb_cdxIndexUnLockWrite( pIndex );
    if ( !fOpenedIndex )
    {
       if ( fProd || pArea->lpIndexes == NULL )
@@ -7557,7 +7581,6 @@ static ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
    LPCDXINDEX pIndex, pIndexTmp;
    LPCDXTAG pTag;
-   char * szFileName;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxOrderDestroy(%p, %p)", pArea, pOrderInfo));
 
@@ -7606,10 +7629,8 @@ static ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
                      pIndexTmp->pNext = pIndex->pNext;
                   }
                }
-               szFileName = hb_strdup( pIndex->szFileName );
+               pIndex->fDelete = TRUE;
                hb_cdxIndexFree( pIndex );
-               hb_fsDelete( (BYTE *) szFileName );
-               hb_xfree( szFileName );
             }
          }
          else
@@ -7628,7 +7649,7 @@ static ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
  */
 static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrderInfo )
 {
-   LPCDXTAG pTag = NULL;
+   LPCDXTAG pTag;
    USHORT   uiTag = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxOrderInfo(%p, %hu, %p)", pArea, uiIndex, pOrderInfo));
@@ -7702,7 +7723,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
       case DBOI_BAGORDER:
       {
-         LPCDXINDEX pIndex = pArea->lpIndexes, pIndexSeek = NULL;
+         LPCDXINDEX pIndex = pArea->lpIndexes, pIndexSeek;
 
          if( hb_itemGetCLen( pOrderInfo->atomBagName ) > 0 )
             pIndexSeek = hb_cdxFindBag( pArea,

@@ -1,5 +1,5 @@
 /*
- * $Id: sxcompr.c,v 1.1 2005/09/15 12:55:35 druzus Exp $
+ * $Id: sxcompr.c,v 1.2 2005/09/16 22:29:41 druzus Exp $
  */
 
 /*
@@ -613,7 +613,7 @@ BOOL hb_LZSSxDecompressFile( FHANDLE hInput, FHANDLE hOutput )
 HB_FUNC( SX_FCOMPRESS )
 {
    BOOL fRet = FALSE;
-   FHANDLE hInput = FS_ERROR, hOutput = FS_ERROR;
+   FHANDLE hInput, hOutput;
    char * szSource = hb_parc( 1 ), * szDestin = hb_parc( 2 );
    BYTE buf[ 4 ];
    ULONG ulSize;
@@ -650,7 +650,7 @@ HB_FUNC( SX_FCOMPRESS )
 HB_FUNC( SX_FDECOMPRESS )
 {
    BOOL fRet = FALSE;
-   FHANDLE hInput = FS_ERROR, hOutput = FS_ERROR;
+   FHANDLE hInput, hOutput;
    char * szSource = hb_parc( 1 ), * szDestin = hb_parc( 2 );
 
    if( szSource && *szSource && szDestin && *szDestin )
