@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.114 2005/08/31 11:16:29 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.119 2005/09/19 20:13:02 ronpinkas Exp $
  */
 
 /*
@@ -2703,14 +2703,21 @@ METHOD DeHilite() CLASS TBrowse
       cCell := SaveScreen(nRow, nCol, nRow, nCol + ::aColsInfo[ ::nColPos, COLINFO_WIDTH ] - 1)
 
       // Write first char with dehighlighted attribute
-      DispOut(cCell[1], cColor)
+      // Bellow are changes for correct show of TBROWSE in HP-UX
+
+      IF "HP-UX"$os()
+         DispOut(cCell[3], cColor)
+      ELSE
+         DispOut(cCell[1], cColor)
+      ENDIF
 
       // Take dehighlighted attribute from screen
       cScr := SaveScreen(nRow, nCol, nRow, nCol + 1)
 
       // Replace highlighted attribute with dehighlighted inside string representing
       // highlighted cell
-      for i := 2 to len(cCell) step 2
+      for i := if("HP-UX"$ OS(),1,2) to len(cCell) step 2
+//      for i := 2 to len(cCell) step 2
          cCell[i] := cScr[2]
       next
 

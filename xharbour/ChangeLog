@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4332 2005/09/19 01:42:51 brianhays Exp $
+ * $Id: ChangeLog,v 1.4333 2005/09/19 20:13:02 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-19 17:50 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  * source/rtl/tbrowse.prg
+    * minor fix on dehilite method() for proper show of tbrowse on HPUX.
+      Fix sent by Nelson Ota <nelson_ota at hotmail.com>
 
 2005-09-19 13:11 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/browdb.prg
