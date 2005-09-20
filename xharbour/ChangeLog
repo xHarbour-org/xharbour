@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4338 2005/09/20 11:58:59 druzus Exp $
+ * $Id: ChangeLog,v 1.4336 2005/09/20 02:59:30 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,30 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2005-09-20 17:45 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
-  * source/rtl/tbrowse.prg
-    * Reverted to a previous version
+2005-09-20 09:07 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rdd/dbffpt/dbffpt1.c
+    * Reverted last GPF trap, was a build error.
 
-2005-09-20 13:57 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
-  * xharbour/contrib/rdd_ads/ads1.c
-  * xharbour/contrib/rdd_ads/adsfunc.c
-    + added support for using "SELECT ..." as file name in USE
-      command like in SQLRDD
-    * restored the functionality of ADSCREATESQLSTATEMENT()/
-      ADSEXECUTESQL[DIRECT]() - I do not have time to rewrite
-      this function.
-      I would like to ask ADS users to test the above and fix me
-      if necessary - I cannot test it without ADS server.
-
-  * xharbour/source/rdd/dbffpt/dbffpt1.c
-    ! store file size in little endian order in DBT memo header
-
-2005-09-20 11:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
-  * source/rtl/memoedit.prg
-  * source/rtl/teditor.prg
-    ! Support ( which was already present but accidently disabled by someone )
-      for mouse support. K_MWFORWARD, K_MWBACKWARD, K_CLICKS are now fully 
-      functional with correct behavior.
+  * dll_b32.bat
+    * Copy bin\b32\harbour.lib to lib\b32
 
 2005-09-19 19:58 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rdd/dbffpt/dbffpt1.c
@@ -498,6 +480,34 @@
       Please _only_ things which interacts with xHarbour extensions
       or Clipper bugs can be changed in hbtest but _never_ hbtest
       should be modified to hide bugs. Now it will show more errors
+      then before my commit but the results are Clipper compatible
+      and very important in many programs which needs real arguments
+      passed to error handler.
+    * cover code for string item unsharing when passed by reference
+      with macro HB_UNSHARE_REFERENCES
+
+  * xharbour/source/vm/arrays.c
+  * xharbour/source/vm/memvars.c
+    * cover code for string item unsharing when passed by reference
+      with macro HB_UNSHARE_REFERENCES
+
+  * xharbour/source/rtl/philes.c
+    * unshare given string item in FREAD() function
+
+  * xharbour/source/vm/macro.c
+    * replaced hb_dynsymFind_r() by hb_dynsymFind() - HB_DYNS symbols
+      cannot change their addresses at runtime or our while VM will not
+      work so it absolutely unnecessary to use hb_dynsymFind_r()
+
+  * xharbour/source/vm/thread.c
+    ! fixed possible GPF due to uninitialized variable
+
+  * xharbour/source/rdd/dbcmd.c
+    ! fixed internal error when DBCREATE() is called with empty array
+
+  * xharbour/source/rdd/dbf1.c
+    + added private RDD settings
+s. Now it will show more errors
       then before my commit but the results are Clipper compatible
       and very important in many programs which needs real arguments
       passed to error handler.

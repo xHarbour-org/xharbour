@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.54 2005/09/20 02:59:31 ronpinkas Exp $
+ * $Id: dbffpt1.c,v 1.55 2005/09/20 11:59:00 druzus Exp $
  */
 
 /*
@@ -3517,7 +3517,7 @@ static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo )
 }
 
 
-/* 
+/*
  * BLOB2FILE - retrieve memo contents into file
  * ( DBENTRYP_SVPB )  hb_fptGetValueFile
  */
@@ -3675,7 +3675,7 @@ static ERRCODE hb_fptOpenMemFile( FPTAREAP pArea, LPDBOPENINFO pOpenInfo )
    return SUCCESS;
 }
 
-/* 
+/*
  * FILE2BLOB - store file contents in MEMO
  * ( DBENTRYP_SVPB )   hb_fptPutValueFile
  */
@@ -3972,12 +3972,8 @@ static ERRCODE hb_fptRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, P
       {
          int iType = hb_itemGetNI( pItem );
 
-         if( pData == NULL )
-         {
-            break;
-         }
-
 		 hb_itemPutNI( pItem, pData->bMemoType ? pData->bMemoType : DB_MEMO_FPT );
+
          switch( iType )
          {
             case DB_MEMO_DBT:
