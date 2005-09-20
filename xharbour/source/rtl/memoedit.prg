@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.33 2005/06/16 23:38:15 peterrees Exp $
+ * $Id: memoedit.prg,v 1.34 2005/07/06 21:32:35 peterrees Exp $
  */
 
 /*
@@ -136,7 +136,7 @@ METHOD Edit() CLASS TMemoEditor
 
          nKey := Inkey( 0 )
 
-		 //	For Clipper compatibility:
+	 //	For Clipper compatibility:
          //  Ath 2004-05-25: All keys should be processed by the UDF before internal processing continues
 
          nUserKey := ::xDo( iif( ::lDirty, ME_UNKEYX, ME_UNKEY ) )
@@ -256,6 +256,8 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
    static aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T, K_CTRL_U }
    #endif
 
+   static aMouseKeys := { K_LBUTTONUP, K_MWFORWARD, K_MWBACKWARD }
+
    /* 05/08/2004 - <maurilio.longo@libero.it>
                    A little trick to be able to handle a nUserKey with value of NIL
                    like it had a value of ME_DEFAULT
@@ -268,7 +270,7 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
       case ME_DEFAULT
          // HBEditor is not able to handle keys with a value higher than 256 or lower than 1
          //
-         if ( nKey > 0 .AND. nKey <= 256 .OR. nKey IN { K_ALT_W, K_CTRL_W } ) .AND.;
+         if ( nKey > 0 .AND. nKey <= 256 .OR. nKey IN { K_ALT_W, K_CTRL_W } .OR. nKey IN aMouseKeys ) .AND.;
             ! ( nKey IN aUnHandledKeys )
 
             super:Edit( nKey )

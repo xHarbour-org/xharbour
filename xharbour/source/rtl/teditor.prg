@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.63 2005/07/06 21:32:35 peterrees Exp $
+/* $Id: teditor.prg,v 1.64 2005/07/11 04:13:40 peterrees Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.63 2005/07/06 21:32:35 peterrees Exp $
+/* $Id: teditor.prg,v 1.64 2005/07/11 04:13:40 peterrees Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -975,10 +975,11 @@ METHOD K_Mouse( nKey ) CLASS HBEditor
 
    Switch nKey
    case K_LBUTTONUP
+
       nRow := mRow()
       nCol := mCol()
 
-      if ( nRow >= ::nTop .and. nRow <= ::nRight )
+      if ( nRow >= ::nTop .and. nRow <= ::nBottom )
          if nCol >= ::nLeft .and. nCol <= ::nRight
             if ( ::nRow + ( nJump := nRow - ::nPhysRow ) ) <= ::naTextLen
                ::GotoPos( max( 1, ::nRow + nJump ), max( 1, ::nCol + ( nCol - ::nPhysCol ) ), .t. )
@@ -987,10 +988,10 @@ METHOD K_Mouse( nKey ) CLASS HBEditor
       endif
       exit
    case K_MWFORWARD
-      ::Down()
+      ::Up()
       exit
    case K_MWBACKWARD
-      ::Up()
+      ::Down()
       exit
    end
 

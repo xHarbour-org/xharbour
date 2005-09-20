@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4335 2005/09/19 23:20:46 druzus Exp $
+ * $Id: ChangeLog,v 1.4336 2005/09/20 02:59:30 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-20 11:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
+  * source/rtl/memoedit.prg
+  * source/rtl/teditor.prg
+    ! Support ( which was already present but accidently disabled by someone )
+      for mouse support. K_MWFORWARD, K_MWBACKWARD, K_CLICKS are now fully 
+      functional with correct behavior.
 
 2005-09-19 19:58 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rdd/dbffpt/dbffpt1.c
