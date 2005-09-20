@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4336 2005/09/20 02:59:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4337 2005/09/20 06:27:37 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-20 13:57 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/contrib/rdd_ads/adsfunc.c
+    + added support for using "SELECT ..." as file name in USE
+      command like in SQLRDD
+    * restored the functionality of ADSCREATESQLSTATEMENT()/
+      ADSEXECUTESQL[DIRECT]() - I do not have time to rewrite
+      this function.
+      I would like to ask ADS users to test the above and fix me
+      if necessary - I cannot test it without ADS server.
+
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    ! store file size in little endian order in DBT memo header
 
 2005-09-20 11:50 UTC+0530 Pritpal Bedi <pritpal@vouchcac.com>
   * source/rtl/memoedit.prg

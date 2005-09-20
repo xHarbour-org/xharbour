@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.62 2005/09/17 21:35:41 druzus Exp $
+ * $Id: adsfunc.c,v 1.63 2005/09/19 23:21:27 druzus Exp $
  */
 
 /*
@@ -1417,7 +1417,6 @@ HB_FUNC( ADSEXECUTESQLDIRECT )
    UNSIGNED32 ulRetVal;
    ADSHANDLE hCursor = 0;
    ADSAREAP pArea;
-   DBOPENINFO pInfo;
 
    if( adsConnectHandle && ( pArea = hb_rddGetADSWorkAreaPointer() ) != 0
                         && pArea->hStatement && ISCHAR( 1 ) )
@@ -1434,7 +1433,11 @@ HB_FUNC( ADSEXECUTESQLDIRECT )
       {
          if( hCursor )
          {
-            pInfo.atomAlias = NULL;
+            DBOPENINFO pInfo;
+
+            memset( &pInfo, 0, sizeof( DBOPENINFO ) );
+            pInfo.abName = ( BYTE * ) "";
+            pInfo.fReadonly = TRUE;
             pArea->hTable = hCursor;
             SELF_OPEN( ( AREAP ) pArea, &pInfo );
          }
@@ -1493,7 +1496,6 @@ HB_FUNC( ADSEXECUTESQL )
    UNSIGNED32 ulRetVal;
    ADSHANDLE hCursor = 0;
    ADSAREAP pArea;
-   DBOPENINFO pInfo;
 
    if( adsConnectHandle && ( pArea = hb_rddGetADSWorkAreaPointer() ) != 0
                         && pArea->hStatement )
@@ -1503,7 +1505,11 @@ HB_FUNC( ADSEXECUTESQL )
       {
          if( hCursor )
          {
-            pInfo.atomAlias = NULL;
+            DBOPENINFO pInfo;
+
+            memset( &pInfo, 0, sizeof( DBOPENINFO ) );
+            pInfo.abName = ( BYTE * ) "";
+            pInfo.fReadonly = TRUE;
             pArea->hTable = hCursor;
             SELF_OPEN( ( AREAP ) pArea, &pInfo );
          }

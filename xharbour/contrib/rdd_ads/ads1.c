@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.76 2005/09/17 21:35:41 druzus Exp $
+ * $Id: ads1.c,v 1.77 2005/09/19 23:21:27 druzus Exp $
  */
 
 /*
@@ -662,7 +662,7 @@ ERRCODE adsCloseCursor( ADSAREAP pArea )
    pArea->hOrdCurrent = 0;
    if( pArea->hTable )
    {
-      UNSIGNED32 u32RetVal = AdsCloseTable  ( pArea->hTable );
+      UNSIGNED32 u32RetVal = AdsCloseTable( pArea->hTable );
 
       if( u32RetVal != AE_SUCCESS )
       {
@@ -2234,7 +2234,7 @@ static ERRCODE adsClose( ADSAREAP pArea )
 
 static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
 {
-   ADSHANDLE hTable;
+   ADSHANDLE hTable, hConnection;
    UNSIGNED32 uRetVal, u32Length;
    UNSIGNED8 *ucfieldDefs;
    UNSIGNED8 ucBuffer[MAX_STR_LEN + 1], ucField[ADS_MAX_FIELD_NAME + 1];
@@ -2243,6 +2243,9 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
    char cType[8];
 
    HB_TRACE(HB_TR_DEBUG, ("adsCreate(%p, %p)", pArea, pCreateInfo));
+
+   hConnection = ( ADSHANDLE ) ( pCreateInfo->ulConnection ?
+                                 pCreateInfo->ulConnection : adsConnectHandle );
 
    pArea->szDataFileName = hb_strdup( ( char * ) pCreateInfo->abName );
 
@@ -2382,7 +2385,7 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
      pField++;
    }
    /* printf( "\n%s",(char*)ucfieldDefs ); */
-   uRetVal = AdsCreateTable( 0, pCreateInfo->abName, pCreateInfo->atomAlias,
+   uRetVal = AdsCreateTable( hConnection, pCreateInfo->abName, pCreateInfo->atomAlias,
                              pArea->iFileType, adsCharType,
                              adsLockType, adsRights,
                              hb_set.HB_SET_MBLOCKSIZE,
@@ -2607,70 +2610,122 @@ static ERRCODE adsNewArea( ADSAREAP pArea )
 
 static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
 {
-   ADSHANDLE hTable = 0;
-   UNSIGNED32  ulRetVal = 0, u32Length, ulLastErr = 0;
+   ADSHANDLE hTable = 0, hStatement = 0, hConnection;
+   UNSIGNED32  u32RetVal = 0, u32Length, ulLastErr = 0;
    UNSIGNED16 usLength = ADS_MAX_ERROR_LEN;
    UNSIGNED8  aucError[ ADS_MAX_ERROR_LEN + 1 ];
    USHORT uiFields = 0, uiCount;
    UNSIGNED8 szName[ ADS_MAX_FIELD_NAME + 1 ];
-      /* See adsGettValue() for why we don't use pArea->uiMaxFieldNameLength here */
+   /* See adsGettValue() for why we don't use pArea->uiMaxFieldNameLength here */
    UNSIGNED16 pusBufLen, pusType, pusDecimals;
    DBFIELDINFO dbFieldInfo;
-   char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
-
-   //TraceLog( NULL, "Open '%s'\n", pOpenInfo->abName );
+   char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ], *szSQL;
 
    HB_TRACE(HB_TR_DEBUG, ("adsOpen(%p)", pArea));
 
-   // When opening the file, first try with the correct settings for Advantage Data Dictionary
-   // if bDictionary was set
-   if( bDictionary )
-   {
-      ulRetVal = AdsOpenTable( adsConnectHandle, pOpenInfo->abName, pOpenInfo->atomAlias,
-               ADS_DEFAULT, adsCharType, adsLockType, adsRights,
-               ( (pOpenInfo->fShared) ? ADS_SHARED : ADS_EXCLUSIVE ) |
-               ( (pOpenInfo->fReadonly) ? ADS_READONLY : ADS_DEFAULT ),
-                &hTable );
-       if( ulRetVal != AE_SUCCESS )
-       {
-          AdsGetLastError( &ulLastErr, aucError, &usLength );
-       }
-   }
+   hConnection = ( ADSHANDLE ) ( pOpenInfo->ulConnection ?
+                                 pOpenInfo->ulConnection : adsConnectHandle );
 
-   // If the Advantage Data Dictionary open fails with an error indicating that this table is not
-   // in the dictionary, OR if we are not using a dictionary at all, try the open with standard settings.
-   // This change allows the use of a Dictionary, and non Dictionary temp files at the same time.
-   if( !bDictionary || ulLastErr == 5132L )
+   szSQL = ( char * ) pOpenInfo->abName;
+   if( pArea->hTable != 0 )
    {
-      ulRetVal = AdsOpenTable( 0, pOpenInfo->abName, pOpenInfo->atomAlias,
-               pArea->iFileType, adsCharType, adsLockType, adsRights,
-               ( (pOpenInfo->fShared) ? ADS_SHARED : ADS_EXCLUSIVE ) |
-               ( (pOpenInfo->fReadonly) ? ADS_READONLY : ADS_DEFAULT ),
-                &hTable );
+      /*
+       * table was open by ADSEXECUTESQL[DIRECT]() function
+       * I do not like the way how it was implemented but I also
+       * do not have time to change it so I simply restored this
+       * functionality, Druzus.
+       */
+      u32RetVal = AE_SUCCESS;
+      hTable = pArea->hTable;
+      hStatement = pArea->hStatement;
    }
-
-   if( ulRetVal != AE_SUCCESS )
+   else if( szSQL && hb_strnicmp( szSQL, "SELECT ", 7 ) == 0 )
    {
-      if( ulRetVal != 1001 && ulRetVal != 7008 )     /* 1001 and 7008 are standard ADS Open Errors that will usually be sharing issues */
+      u32RetVal = AdsCreateSQLStatement( hConnection, &hStatement );
+      if( u32RetVal == AE_SUCCESS )
       {
-         commonError( pArea, EG_OPEN, ( USHORT ) ulRetVal, ( char * ) pOpenInfo->abName, 0 );
+         if( pArea->iFileType == ADS_CDX )
+         {
+            AdsStmtSetTableType( hStatement, pArea->iFileType );
+         }
+#if ADS_REQUIRE_VERSION >= 6
+         if( adsOEM )
+         {
+            szSQL = hb_strdup( szSQL );
+            hb_oemansi( szSQL, strlen( szSQL ) );
+         }
+#endif
+
+         u32RetVal = AdsExecuteSQLDirect( hStatement, (UNSIGNED8 *) szSQL, &hTable );
+
+#if ADS_REQUIRE_VERSION >= 6
+         if( adsOEM )
+         {
+            hb_xfree( szSQL );
+         }
+#endif
+         if( u32RetVal != AE_SUCCESS )
+         {
+            AdsCloseSQLStatement( hStatement );
+         }
+      }
+   }
+   else
+   {
+      // When opening the file, first try with the correct settings for Advantage Data Dictionary
+      // if bDictionary was set
+      if( bDictionary )
+      {
+         u32RetVal = AdsOpenTable( hConnection,
+                        pOpenInfo->abName, pOpenInfo->atomAlias,
+                        ADS_DEFAULT, adsCharType, adsLockType, adsRights,
+                        ( pOpenInfo->fShared ? ADS_SHARED : ADS_EXCLUSIVE ) |
+                        ( pOpenInfo->fReadonly ? ADS_READONLY : ADS_DEFAULT ),
+                        &hTable );
+          if( u32RetVal != AE_SUCCESS )
+          {
+             AdsGetLastError( &ulLastErr, aucError, &usLength );
+          }
       }
 
-      return FAILURE;                /* just set neterr  */
+      // If the Advantage Data Dictionary open fails with an error indicating that this table is not
+      // in the dictionary, OR if we are not using a dictionary at all, try the open with standard settings.
+      // This change allows the use of a Dictionary, and non Dictionary temp files at the same time.
+      if( !bDictionary || ulLastErr == 5132L )
+      {
+         u32RetVal = AdsOpenTable( ( ADSHANDLE ) pOpenInfo->ulConnection,
+                        pOpenInfo->abName, pOpenInfo->atomAlias,
+                        pArea->iFileType, adsCharType, adsLockType, adsRights,
+                        ( pOpenInfo->fShared ? ADS_SHARED : ADS_EXCLUSIVE ) |
+                        ( pOpenInfo->fReadonly ? ADS_READONLY : ADS_DEFAULT ),
+                        &hTable );
+      }
+   }
+
+   if( u32RetVal != AE_SUCCESS )
+   {
+      /* 1001 and 7008 are standard ADS Open Errors that will usually be sharing issues */
+      if( u32RetVal != 1001 && u32RetVal != 7008 )
+      {
+         commonError( pArea, EG_OPEN, ( USHORT ) u32RetVal, ( char * ) pOpenInfo->abName, 0 );
+      }
+      return FAILURE;      /* just set neterr  */
    }
 
    /* Set default alias if necessary */
    if( !pOpenInfo->atomAlias )
    {
       UNSIGNED16 uiAliasLen = HARBOUR_MAX_RDD_ALIAS_LENGTH;
-      AdsGetTableAlias( hTable, (UNSIGNED8 *) szAlias, &uiAliasLen );
-      pOpenInfo->atomAlias = ( BYTE * ) szAlias;
+      if( AdsGetTableAlias( hTable, (UNSIGNED8 *) szAlias, &uiAliasLen ) == AE_SUCCESS )
+         pOpenInfo->atomAlias = ( BYTE * ) szAlias;
+      else
+         pOpenInfo->atomAlias = ( BYTE * ) "";
    }
 
    pArea->szDataFileName = hb_strdup( (char *) ( pOpenInfo->abName ) );
-   pArea->hStatement     = 0;
-   pArea->hOrdCurrent    = 0;
    pArea->hTable         = hTable;
+   pArea->hStatement     = hStatement;
+   pArea->hOrdCurrent    = 0;
    pArea->fShared        = pOpenInfo->fShared;
    pArea->fReadonly      = pOpenInfo->fReadonly;
 
@@ -4300,7 +4355,7 @@ static ERRCODE adsRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_
          {
             ulNewConnection = hb_itemGetNL( pItem );
          }
-         hb_itemPutNL( pItem, ulConnect ? ulConnect : adsConnectHandle );
+         hb_itemPutNL( pItem, ulConnect ? ulConnect : ( ULONG ) adsConnectHandle );
          if( ulNewConnection )
          {
             adsConnectHandle = ulNewConnection;

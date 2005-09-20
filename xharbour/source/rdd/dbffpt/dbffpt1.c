@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.53 2005/09/19 23:21:28 druzus Exp $
+ * $Id: dbffpt1.c,v 1.54 2005/09/20 02:59:31 ronpinkas Exp $
  */
 
 /*
@@ -799,7 +799,7 @@ static ERRCODE hb_fptReadGCdata( FPTAREAP pArea, LPMEMOGCTABLE pGCtable )
    hb_fsSeek( pArea->hMemoFile, 0, FS_SET );
    if ( hb_fsRead( pArea->hMemoFile, ( BYTE * ) &pGCtable->fptHeader, sizeof( FPTHEADER ) ) >= 512 )
    {
-      if( pArea->bMemoType == DB_MEMO_SMT )
+      if( pArea->bMemoType == DB_MEMO_SMT || pArea->bMemoType == DB_MEMO_DBT )
          pGCtable->ulNextBlock = HB_GET_LE_UINT32( pGCtable->fptHeader.nextBlock );
       else
          pGCtable->ulNextBlock = HB_GET_BE_UINT32( pGCtable->fptHeader.nextBlock );
@@ -1002,7 +1002,7 @@ static ERRCODE hb_fptWriteGCdata( FPTAREAP pArea, LPMEMOGCTABLE pGCtable )
       }
       if ( errCode == SUCCESS )
       {
-         if( pArea->bMemoType == DB_MEMO_SMT )
+         if( pArea->bMemoType == DB_MEMO_SMT || pArea->bMemoType == DB_MEMO_DBT )
             HB_PUT_LE_UINT32( pGCtable->fptHeader.nextBlock, pGCtable->ulNextBlock );
          else
             HB_PUT_BE_UINT32( pGCtable->fptHeader.nextBlock, pGCtable->ulNextBlock );
@@ -3488,7 +3488,7 @@ static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo )
       }
    }
    ulNextBlock = ( ulSize + pArea->uiMemoBlockSize - 1 ) / pArea->uiMemoBlockSize;
-   if( pArea->bMemoType == DB_MEMO_SMT )
+   if( pArea->bMemoType == DB_MEMO_SMT || pArea->bMemoType == DB_MEMO_DBT )
    {
       HB_PUT_LE_UINT32( fptHeader.nextBlock, ulNextBlock );
       HB_PUT_LE_UINT32( fptHeader.blockSize, pArea->uiMemoBlockSize );
