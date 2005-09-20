@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.52 2005/09/16 22:29:41 druzus Exp $
+ * $Id: dbffpt1.c,v 1.53 2005/09/19 23:21:28 druzus Exp $
  */
 
 /*
@@ -3972,7 +3972,12 @@ static ERRCODE hb_fptRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, P
       {
          int iType = hb_itemGetNI( pItem );
 
-         hb_itemPutNI( pItem, pData->bMemoType ? pData->bMemoType : DB_MEMO_FPT );
+         if( pData == NULL )
+         {
+            break;
+         }
+
+		 hb_itemPutNI( pItem, pData->bMemoType ? pData->bMemoType : DB_MEMO_FPT );
          switch( iType )
          {
             case DB_MEMO_DBT:
