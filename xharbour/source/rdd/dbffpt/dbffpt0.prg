@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt0.prg,v 1.1 2003/09/08 12:56:53 druzus Exp $
+ * $Id: dbffpt0.prg,v 1.2 2005/09/19 23:21:28 druzus Exp $
  */
 
 /*
@@ -62,4 +62,8 @@ procedure DBFFPTInit
    rddRegister( "DBF", RDT_FULL )
    rddRegister( "DBFFPT", RDT_FULL )
 
+return
+
+/* to satisfy old code which has: REQUEST DBFDBT */
+proc DBFDBT
 return

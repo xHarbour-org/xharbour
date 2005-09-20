@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.55 2005/09/20 11:59:00 druzus Exp $
+ * $Id: dbffpt1.c,v 1.56 2005/09/20 16:14:34 ronpinkas Exp $
  */
 
 /*
@@ -229,10 +229,6 @@ static RDDFUNCS fptTable =
 
    ( DBENTRYP_SVP )   hb_fptWhoCares
 };
-
-/* to satisfy old code which has: REQUES DBFDBT */
-HB_FUNC( DBFDBT ) {;}
-
 
 HB_FUNC( _DBFFPT ) {;}
 
@@ -803,6 +799,7 @@ static ERRCODE hb_fptReadGCdata( FPTAREAP pArea, LPMEMOGCTABLE pGCtable )
          pGCtable->ulNextBlock = HB_GET_LE_UINT32( pGCtable->fptHeader.nextBlock );
       else
          pGCtable->ulNextBlock = HB_GET_BE_UINT32( pGCtable->fptHeader.nextBlock );
+      pGCtable->ulPrevBlock = pGCtable->ulNextBlock;
 
       if ( pArea->uiMemoVersion == DB_MEMOVER_SIX ||
            pArea->bMemoType == DB_MEMO_SMT )
@@ -1011,7 +1008,7 @@ static ERRCODE hb_fptWriteGCdata( FPTAREAP pArea, LPMEMOGCTABLE pGCtable )
          {
             errCode = EDBF_WRITE;
          }
-         else
+         else if( pGCtable->ulNextBlock < pGCtable->ulPrevBlock )
          {
             /* trunc file */
             hb_fsSeekLarge( pArea->hMemoFile,
@@ -3838,19 +3835,20 @@ static ERRCODE hb_fptInfo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
       /* case DBI_RDD_VERSION */
 
-      case DBI_BLOB_DIRECT_EXPORT:
-      case DBI_BLOB_DIRECT_GET:
-      case DBI_BLOB_DIRECT_IMPORT:
-      case DBI_BLOB_DIRECT_PUT:
-      case DBI_BLOB_ROOT_GET:
-      case DBI_BLOB_ROOT_PUT:
+      case DBI_BLOB_DIRECT_EXPORT:  /* BLOBDirectExport() { <nPointer>, <cTargetFile>, <kMOde> */
+      case DBI_BLOB_DIRECT_GET:     /* BLOBDirectGet() { <nPointer>, <nStart>, <nCount> } */
+      case DBI_BLOB_DIRECT_IMPORT:  /* BLOBDirectImport() { <nOldPointer>, <cSourceFile> } */
+      case DBI_BLOB_DIRECT_PUT:     /* BLOBDirectPut() { <nOldPointer>, <xBlob> } */
+
+      case DBI_BLOB_ROOT_GET:       /* BLOBRootGet() */
+      case DBI_BLOB_ROOT_PUT:       /* BLOBRootPut( <xBlob> ) */
          break;
 
-      case DBI_BLOB_ROOT_LOCK:
+      case DBI_BLOB_ROOT_LOCK:      /* BLOBRootLock() */
          hb_itemPutL( pItem, hb_fptFileLockEx( pArea, FALSE ) );
          break;
 
-      case DBI_BLOB_ROOT_UNLOCK:
+      case DBI_BLOB_ROOT_UNLOCK:    /* BLOBRootUnlock() */
          hb_itemPutL( pItem, hb_fptFileUnLock( pArea ) );
          break;
 
@@ -3887,7 +3885,7 @@ static ERRCODE hb_fptFieldInfo( FPTAREAP pArea, USHORT uiIndex, USHORT uiType, P
 
       switch( uiType )
       {
-         case DBS_BLOB_GET:
+         case DBS_BLOB_GET:         /* BLOBGet() { <nStart>, <nCount> } */
             /* TODO: !!! pItem := { <nStart>, <nCount> } */
             return SUCCESS;
          case DBS_BLOB_LEN:
@@ -3896,7 +3894,8 @@ static ERRCODE hb_fptFieldInfo( FPTAREAP pArea, USHORT uiIndex, USHORT uiType, P
          case DBS_BLOB_OFFSET:
             hb_dbfGetMemoData( (DBFAREAP) pArea, uiIndex - 1,
                                &ulBlock, &ulSize, &ulType );
-            hb_itemPutNInt( pItem, ( HB_FOFFSET ) ulBlock * pArea->uiMemoBlockSize );
+            hb_itemPutNInt( pItem, ( HB_FOFFSET ) ulBlock * pArea->uiMemoBlockSize +
+                                   pArea->bMemoType == DB_MEMO_FPT ? sizeof( FPTBLOCK ) : 0 );
             return SUCCESS;
          case DBS_BLOB_POINTER:
             hb_dbfGetMemoData( (DBFAREAP) pArea, uiIndex - 1,
@@ -3972,7 +3971,7 @@ static ERRCODE hb_fptRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, P
       {
          int iType = hb_itemGetNI( pItem );
 
-		 hb_itemPutNI( pItem, pData->bMemoType ? pData->bMemoType : DB_MEMO_FPT );
+         hb_itemPutNI( pItem, pData->bMemoType ? pData->bMemoType : DB_MEMO_FPT );
 
          switch( iType )
          {

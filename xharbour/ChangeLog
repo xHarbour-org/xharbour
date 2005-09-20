@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4336 2005/09/20 02:59:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4340 2005/09/20 16:14:34 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-20 19:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbrddfpt.h
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+  * xharbour/source/rdd/dbffpt/dbffpt0.prg
+   % reduced one IO call on write
+   * added some descriptions about BLOB*() function syntax I'll add
+     after RC-1
+   * moved DBFDBT dummy function to dbffpt0.prg to force full DBFFPT
+     initialization
+
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * formatting
 
 2005-09-20 09:07 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rdd/dbffpt/dbffpt1.c

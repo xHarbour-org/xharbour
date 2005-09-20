@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.166 2005/09/13 01:48:06 druzus Exp $
+ * $Id: dbcmd.c,v 1.167 2005/09/17 21:35:41 druzus Exp $
  */
 
 /*
@@ -389,7 +389,7 @@ static int hb_rddRegister( char * szDriver, USHORT uiType )
 
    s_RddList[ s_uiRddMax++ ] = pRddNewNode;   /* Add the new RDD node */
 
-   if ( pRddNewNode->pTable.init != NULL )
+   if( pRddNewNode->pTable.init != NULL )
    {
       SELF_INIT( pRddNewNode );
    }

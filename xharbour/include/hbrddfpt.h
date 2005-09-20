@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.19 2005/09/13 01:48:06 druzus Exp $
+ * $Id: hbrddfpt.h,v 1.20 2005/09/15 12:55:35 druzus Exp $
  */
 
 /*
@@ -203,6 +203,7 @@ typedef struct _MEMOGCTABLE
    BYTE   bType;                    /* MEMO_FPT_SIX or MEMO_FPT_FLEX */
    BYTE   bChanged;                 /* Should we write GC data to disk */
    ULONG  ulNextBlock;              /* Next free block in the file */
+   ULONG  ulPrevBlock;              /* Previous next free block in the file */
    ULONG  ulRevPage;                /* FLEX Rev GC page offset */
    ULONG  ulDirPage;                /* FLEX Dir GC page offset */
    ULONG  ulCounter;                /* FLEX cyclic counter */

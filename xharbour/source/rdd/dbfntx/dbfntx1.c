@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.130 2005/09/17 21:35:41 druzus Exp $
+ * $Id: dbfntx1.c,v 1.131 2005/09/19 23:21:28 druzus Exp $
  */
 
 /*
@@ -7423,4 +7423,3 @@ HB_FUNC( DBFNTX_GETFUNCTABLE )
       hb_retni( FAILURE );
    }
 }
-
