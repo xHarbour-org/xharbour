@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.59 2005/08/01 22:19:19 druzus Exp $
+ * $Id: pptable.c,v 1.60 2005/09/21 01:55:54 ronpinkas Exp $
  */
 
 /*
@@ -333,8 +333,8 @@ void hb_pp_Table( void )
    static COMMANDS sC___163 = {0,"SELECT","\1A00","dbSelectArea( \1A30 )",&sC___162 };
    static COMMANDS sC___164 = {0,"SELECT","\1A00(\16\1B10\17)","dbSelectArea( \1A00(\1B00) )",&sC___163 };
    static COMMANDS sC___165 = {0,"USE","","dbCloseArea()",&sC___164 };
-   static COMMANDS sC___166 = {0,"USE","\1A40 \16VIA \1B00\17 \16ALIAS \1C00\17 \16\1D20 NEW>\17 \16\1E20 EXCLUSIVE>\17 \16\1F20 SHARED>\17 \16\1G20 READONLY>\17 \16CODEPAGE \1H00\17 \16INDEX \1I40 \16, \1J40\17\17",
-       "dbUseArea( \1D50, \1B00, \1A30, \1C30, IIF(\1F50 .or. \1E50, !\1E50, NIL), \1G50, \1H30 ) \16; dbSetIndex( \1I30 )\17 \16; dbSetIndex( \1J30 )\17",&sC___165 };
+   static COMMANDS sC___166 = {0,"USE","\1A40 \16VIA \1B00\17 \16ALIAS \1C00\17 \16\1D20 NEW>\17 \16\1E20 EXCLUSIVE>\17 \16\1F20 SHARED>\17 \16\1G20 READONLY>\17 \16CODEPAGE \1H00\17 \16CONNECTION \1I00\17 \16INDEX \1J40 \16, \1K40\17\17",
+       "dbUseArea( \1D50, \1B00, \1A30, \1C30, IIF(\1F50 .or. \1E50, !\1E50, NIL), \1G50, \1H30, \1I00 ) \16; dbSetIndex( \1J30 )\17 \16; dbSetIndex( \1K30 )\17",&sC___165 };
    static COMMANDS sC___167 = {0,"APPEND","BLANK","dbAppend()",&sC___166 };
    static COMMANDS sC___168 = {0,"PACK","","__dbPack()",&sC___167 };
    static COMMANDS sC___169 = {0,"ZAP","","__dbZap()",&sC___168 };
