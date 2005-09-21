@@ -1,6 +1,6 @@
 ************************************************************
 * xmltest.prg
-* $Id: xmltest.prg,v 1.8 2005/03/17 02:07:18 ronpinkas Exp $
+* $Id: xmltest.prg,v 1.9 2005/03/17 02:09:31 ronpinkas Exp $
 *
 * Test for XML routines of Xharbour rtl (MXML/HBXML)
 *
@@ -91,7 +91,7 @@ PROCEDURE Main( cFileName, cNode, cAttrib, cValue, cData )
       ENDIF
 
       ? Alltrim( Str( xmlNode:nType ) ), ", ", xmlNode:cName, " = ", ;
-            ValToPrg( xmlNode:aAttributes ), ", ", */ xmlNode:cData, ": ", cXml
+            ValToPrg( xmlNode:aAttributes ), ", ", xmlNode:cData, ": ", cXml
 
       xmlNode := xmlNode:NextInTree()
    ENDDO
