@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.ch,v 1.3 2003/06/30 23:06:27 jonnymind Exp $
+ * $Id: hbxml.ch,v 1.4 2003/07/04 10:34:34 jonnymind Exp $
  */
 
 /*
@@ -92,6 +92,7 @@
 #define HBXML_TYPE_PI             2
 #define HBXML_TYPE_DIRECTIVE      3
 #define HBXML_TYPE_DATA           4
-#define HBXML_TYPE_DOCUMENT       5
+#define HBXML_TYPE_CDATA          5
+#define HBXML_TYPE_DOCUMENT       6
 
 #endif

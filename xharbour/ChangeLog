@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4345 2005/09/21 02:34:10 mlombardo Exp $
+ * $Id: ChangeLog,v 1.4346 2005/09/22 01:11:55 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-22 12:48 UTC+0100 Giancarlo Niccolai (gc/at/niccolai.ws)
+  * include/hbxml.ch
+  * include/hbxml.h
+  * source/rtl/hbxml.c
+    + addedd support for CDATA nodes. A new type of node (CDATA) is
+      created, and the content of the node is not parsed.
+      CDATA blocks inside attribute values are not supported.
+
+  * tests/xmltest.prg
+  * tests/xmltest.xml
+    + Added a CDATA node to show the functionality of the new feature.
 
 2005-09-22 02:35 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/xharbour.spec
@@ -21,7 +33,7 @@
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
     * minor modification to allow opening CDX files with TAGNAME length
       not equal to 10 characters
-      
+
   * xharbour/include/hbapiitm.h
   * xharbour/source/clipsamp/date.c
   * xharbour/source/clipsamp/gauge.c

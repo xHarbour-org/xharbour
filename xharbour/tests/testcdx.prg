@@ -1,11 +1,11 @@
 //
-// $Id: testcdx.prg,v 1.6 2000/09/05 19:44:25 bcantero Exp $
+// $Id: testcdx.prg,v 1.1.1.1 2001/12/21 10:46:30 ronpinkas Exp $
 //
 
 request DBFCDX
 
 function Main()
-
+   local fh, size, data
    local aStruct := { { "CHARACTER", "C", 25, 0 }, ;
                       { "NUMERIC",   "N",  8, 0 }, ;
                       { "DOUBLE",    "N",  8, 2 }, ;
@@ -23,22 +23,34 @@ function Main()
    Select( "TESTDBF" )
    SET FILTER TO TESTDBF->SALARY > 140000
    TESTDBF->( dbGoTop() )
-//   while !TESTDBF->( Eof() )
-//      TESTCDX->( dbAppend() )
-//      TESTCDX->CHARACTER = TESTDBF->FIRST
-//      TESTCDX->NUMERIC = TESTDBF->SALARY
-//      TESTCDX->MEMO := TESTDBF->FIRST + Chr( 13 ) + Chr( 10 ) + ;
-//                       TESTDBF->LAST + Chr( 13 ) + Chr( 10 ) + ;
-//                       TESTDBF->STREET
-//      TESTDBF->( dbSkip() )
-//   end
+   fh := fopen( "test.jpg" )
+   FILESTATS( "test.jpg", 0, @size )
+   ? size
+   inkey(0)
+   data := ""
+   fh := fopen( "test.jpg" )
+   fread( fh, @data, size )
+   ? ferror()
+   fclose(fh)
+   while !TESTDBF->( Eof() )
+
+      TESTCDX->( dbAppend() )
+      TESTCDX->CHARACTER = TESTDBF->FIRST
+      TESTCDX->NUMERIC = TESTDBF->SALARY
+      TESTCDX->MEMO = data
+      ? len( data )
+      Inkey(0)
+      TESTDBF->( dbSkip() )
+   end
 
    ? TESTCDX->( RecCount() )
    TESTCDX->( dbGoTop() )
    ? TESTCDX->( Eof() )
    while !TESTCDX->( Eof() )
       ? TESTCDX->( RecNo() ), TESTCDX->NUMERIC
-      ? TESTCDX->MEMO
+      fh = fcreate( "test1.jpg" )
+      fwrite( fh, TESTCDX->MEMO )
+      fclose( fh )
       TESTCDX->( dbSkip() )
 //      ? "Press any key to continue..."
 //      InKey( 0 )

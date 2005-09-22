@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.28 2004/12/21 18:36:29 druzus Exp $
+ * $Id: hbxml.c,v 1.29 2005/09/08 13:35:50 alexstrickland Exp $
  */
 
 /*
@@ -1252,6 +1252,180 @@ static void mxml_node_read_comment( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM do
    }
 }
 
+static void mxml_node_read_cdata( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM pDoc )
+{
+   int iPos = 0, iAllocated;
+   int chr;
+   char *buf;
+   int iStatus = 0;
+   HB_ITEM hbtemp;
+
+   hbtemp.type = HB_IT_NIL;
+   hb_itemPutNI( &hbtemp, MXML_TYPE_CDATA );
+   hb_objSendMsg( pNode,"_NTYPE", 1, &hbtemp );
+
+   //  we'll put all the cdata into the data member, up to ]]>
+   // however, we are not still sure that this is really a cdata.
+   // we must finish to read it:
+
+   while ( iStatus < 6 ) {
+      chr = mxml_refil_getc( ref );
+      if ( chr == MXML_EOF ) break;
+
+      if ( chr == MXML_LINE_TERMINATOR )
+      {
+         hbxml_doc_new_line( pDoc );
+         // but is an error, so
+         iStatus = 100;
+      }
+
+      switch ( iStatus ) {
+         // scanning for C
+         case 0:
+            if ( chr == 'C' )
+            {
+               iStatus = 1;
+            }
+            else
+            {
+               iStatus = 100; //error
+            }
+         break;
+
+         case 1:
+            if ( chr == 'D' )
+            {
+               iStatus = 2;
+            }
+            else
+            {
+               iStatus = 100;
+            }
+         break;
+
+         case 2:
+            if ( chr == 'A' )
+            {
+               iStatus = 3;
+            }
+            else
+            {
+               iStatus = 100;
+            }
+         break;
+
+         case 3:
+            if ( chr == 'T' )
+            {
+               iStatus = 4;
+            }
+            else
+            {
+               iStatus = 100;
+            }
+         break;
+
+         case 4:
+            if ( chr == 'A' )
+            {
+               iStatus = 5;
+            }
+            else
+            {
+               iStatus = 100;
+            }
+         break;
+
+         case 5:
+            if ( chr == '[' )
+            {
+               iStatus = 6;
+            }
+            else
+            {
+               iStatus = 100;
+            }
+         break;
+      }
+
+   }
+
+   if ( iStatus == 100 )
+   {
+      hbxml_set_doc_status( ref, pDoc, pNode,
+         MXML_STATUS_MALFORMED, MXML_ERROR_INVNODE );
+      return;
+   }
+
+   iStatus = 0;
+
+   buf = (char *) MXML_ALLOCATOR( MXML_ALLOC_BLOCK );
+   iAllocated = MXML_ALLOC_BLOCK ;
+
+   // now we can read the node
+   while ( iStatus < 3 ) {
+      chr = mxml_refil_getc( ref );
+      if ( chr == MXML_EOF ) break;
+
+      switch ( iStatus ) {
+         // scanning for ->
+         case 0:
+            if ( chr == MXML_LINE_TERMINATOR )
+            {
+               hbxml_doc_new_line( pDoc );
+               buf[ iPos ++ ] = chr;
+            }
+            else if ( chr == ']' )
+               iStatus = 1;
+            else
+               buf[ iPos++ ] = chr;
+         break;
+
+         case 1:
+            if ( chr == ']' )
+               iStatus = 2;
+            else {
+               iStatus = 0;
+               buf[ iPos++ ] = ']';
+               mxml_refil_ungetc( ref, chr );
+            }
+         break;
+
+         case 2:
+            if ( chr == '>' )
+               iStatus = 3;
+            else {
+               iStatus = 0;
+               buf[ iPos++ ] = ']';
+               mxml_refil_ungetc( ref, chr );
+            }
+         break;
+
+      }
+
+      if ( iPos == iAllocated )
+      {
+         iAllocated += MXML_ALLOC_BLOCK;
+         buf = (char *) MXML_REALLOCATOR( buf, iAllocated );
+      }
+   }
+
+   if ( ref->status == MXML_STATUS_OK ) {
+      buf[ iPos ] = 0;
+      if ( iAllocated > iPos + 1 )
+      {
+         buf = (char *) MXML_REALLOCATOR( buf, iPos + 1 );
+      }
+      hb_itemPutCRaw( &hbtemp, buf, iPos );
+      hb_objSendMsg( pNode,"_CDATA", 1, &hbtemp );
+      --*( hbtemp.item.asString.pulHolders );
+   }
+   else {
+      MXML_DELETOR( buf );
+      hbxml_set_doc_status( ref, pDoc, pNode, ref->status, ref->error );
+   }
+}
+
 // checking closing tag
 static int mxml_node_read_closing( MXML_REFIL *ref, PHB_ITEM pNode, PHB_ITEM doc )
 {
@@ -1368,6 +1542,10 @@ static MXML_STATUS mxml_node_read( MXML_REFIL *ref, PHB_ITEM pNode,PHB_ITEM doc,
                node = mxml_node_new( doc );
                mxml_refil_ungetc( ref, chr );
                mxml_node_read_directive( ref, node, doc );
+            }
+            else if ( chr == '[' ) {
+               node = mxml_node_new( doc );
+               mxml_node_read_cdata( ref, node, doc );
             }
             else
             {
@@ -1599,6 +1777,16 @@ static MXML_STATUS mxml_node_write( MXML_OUTPUT *out, PHB_ITEM pNode, int style 
                HB_VM_STACK.Return.item.asString.value,
                HB_VM_STACK.Return.item.asString.length );
             mxml_output_string_len( out, " -->", 4 );
+            mxml_output_string( out, hb_conNewLine() );
+      break;
+
+      case MXML_TYPE_CDATA:
+            mxml_output_string_len( out, "<![CDATA[ ", 9 );
+            hb_objSendMsg( pNode, "CDATA", 0 );
+            mxml_output_string_len( out,
+               HB_VM_STACK.Return.item.asString.value,
+               HB_VM_STACK.Return.item.asString.length );
+            mxml_output_string_len( out, " ]]>", 4 );
             mxml_output_string( out, hb_conNewLine() );
       break;
 

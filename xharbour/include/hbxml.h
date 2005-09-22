@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.h,v 1.7 2004/04/04 22:52:41 jonnymind Exp $
+ * $Id: hbxml.h,v 1.8 2004/12/21 18:36:28 druzus Exp $
  */
 
 /*
@@ -133,6 +133,7 @@ typedef enum
    MXML_TYPE_PI,
    MXML_TYPE_DIRECTIVE,
    MXML_TYPE_DATA,
+   MXML_TYPE_CDATA,   // Used for <![CDATA[ nodes
    MXML_TYPE_DOCUMENT   // used for document level root node
 } MXML_NODE_TYPE;
 
