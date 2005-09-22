@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.108 2005/09/02 18:31:00 druzus Exp $
+ * $Id: memvars.c,v 1.109 2005/09/11 19:41:11 druzus Exp $
  */
 
 /*
@@ -1777,7 +1777,7 @@ HB_FUNC( __MVGET )
          ( &retValue )->type = HB_IT_NIL;
          hb_memvarGetValue( &retValue, pSymbol );
 
-         hb_itemReturn( &retValue );
+         hb_itemReturnForward( &retValue );
       }
       else
       {
@@ -2298,7 +2298,7 @@ HB_FUNC( __MVRESTORE )
                   hb_memvarCreateFromDynSymbol( pDyn, VS_PRIVATE, &Item );
                }
 
-               hb_itemReturn( &Item );
+               hb_itemReturnForward( &Item );
             }
          }
 
@@ -2443,5 +2443,5 @@ HB_FUNC( __MVSYMBOLINFO )
   Array.type = HB_IT_NIL;
   hb_arrayNew( &Array, 0 );
   hb_dynsymEval( hb_GetSymbolInfo, ( void * ) &Array );
-  hb_itemReturn( &Array);
+  hb_itemReturnForward( &Array);
 }

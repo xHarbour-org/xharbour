@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.17 2005/02/15 21:06:27 andijahja Exp $
+ * $Id: math.c,v 1.18 2005/03/01 16:27:29 mauriliolongo Exp $
  */
 
 /*
@@ -616,7 +616,7 @@ HB_FUNC (MATHERRORBLOCK)  /* ([<nNewErrorBlock>]) -> <nOldErrorBlock> */
   }
   else
   {
-    hb_itemReturnCopy( spMathErrorBlock );
+    hb_itemReturn( spMathErrorBlock );
   }
 
   if (hb_pcount() > 0)

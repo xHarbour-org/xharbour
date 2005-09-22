@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.40 2005/09/04 04:29:01 walito Exp $
+ * $Id: runner.c,v 1.41 2005/09/11 19:41:11 druzus Exp $
  */
 
 /*
@@ -884,6 +884,6 @@ void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] )
 
    if( pRetVal )
    {
-      hb_itemRelease( hb_itemReturn( pRetVal ) );
+      hb_itemRelease( hb_itemReturnForward( pRetVal ) );
    }
 }

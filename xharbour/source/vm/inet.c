@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.52 2005/01/10 18:45:41 druzus Exp $
+* $Id: inet.c,v 1.53 2005/06/17 17:04:22 lculik Exp $
 */
 
 /*
@@ -732,7 +732,7 @@ HB_FUNC( INETGETPERIODCALLBACK )
    }
    else
    {
-      hb_itemReturnCopy( Socket->caPeriodic );
+      hb_itemReturn( Socket->caPeriodic );
    }
 }
 
@@ -1463,7 +1463,7 @@ HB_FUNC( INETGETHOSTS )
 
    if( Host == NULL )
    {
-      hb_itemReturn( &aHosts );
+      hb_itemReturnForward( &aHosts );
       return;
    }
 
@@ -1473,7 +1473,7 @@ HB_FUNC( INETGETHOSTS )
       cHosts++;
    }
 
-   hb_itemReturn( &aHosts );
+   hb_itemReturnForward( &aHosts );
 }
 
 
@@ -1510,7 +1510,7 @@ HB_FUNC( INETGETALIAS )
 
    if( Host == NULL )
    {
-      hb_itemReturn( &aHosts );
+      hb_itemReturnForward( &aHosts );
       return;
    }
 
@@ -1521,7 +1521,7 @@ HB_FUNC( INETGETALIAS )
       cHosts++;
    }
 
-   hb_itemReturn( &aHosts );
+   hb_itemReturnForward( &aHosts );
 }
 
 

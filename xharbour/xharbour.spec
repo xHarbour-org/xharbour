@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.82 2005/09/12 07:39:46 druzus Exp $
+# $Id: xharbour.spec,v 1.83 2005/09/15 12:55:34 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -387,8 +387,9 @@ This RPM distribution of %{dname} includes extra commands to make compiling
 and linking with %{dname} a little easier. There are compiler and linker
 wrappers called "%{hb_pref}cc", "%{hb_pref}cmp", "%{hb_pref}lnk" and "%{hb_pref}mk".
 
-"%{hb_pref}cc" is a wrapper to the harbour compiler only. It only sets environment
-variables. The result of its work is a C file.
+"%{hb_pref}cc" is a wrapper to the C compiler only it sets all flags
+and paths necessary to compile .c files which include %{dname} header
+files. The result of its work is an object file.
 
 Use "%{hb_pref}cmp" exactly as you would use the harbour compiler itself.
 The main difference with %{hb_pref}cmp is that it results in an object file,

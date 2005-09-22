@@ -1,5 +1,5 @@
 /*
- * $Id: setkey.c,v 1.7 2003/01/05 06:50:36 ronpinkas Exp $
+ * $Id: setkey.c,v 1.8 2005/02/16 00:36:15 guerra000 Exp $
  */
 
 /*
@@ -202,7 +202,7 @@ HB_FUNC( SETKEY )
             }
             else
 #endif
-               hb_itemReturnCopy( sk_list_tmp->pAction );
+               hb_itemReturn( sk_list_tmp->pAction );
          }
       }
       else

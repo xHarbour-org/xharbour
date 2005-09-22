@@ -1,5 +1,5 @@
 /*
- * $Id: stack.c,v 1.2 2003/12/04 09:26:54 druzus Exp $
+ * $Id: stack.c,v 1.3 2004/03/06 02:32:37 andijahja Exp $
  */
 
 /*
@@ -63,7 +63,7 @@ HB_FUNC( STACKNEW )
 
    hb_arrayNew( &Return, 0 );   /* Create array */
 
-   hb_itemReturn( &Return );
+   hb_itemReturnForward( &Return );
 }
 
 /*  StackPush( <aStack>, <xValue> ) --> <aStack>
@@ -95,7 +95,7 @@ HB_FUNC( STACKPOP )
       hb_arraySize( pArray, HB_MAX( ulLen, 0 ) );
    }
 
-   hb_itemReturn( &Last );
+   hb_itemReturnForward( &Last );
 }
 
 /* StackIsEmpty( <aStack> ) --> <lEmpty>
@@ -119,5 +119,5 @@ HB_FUNC( STACKTOP )
 
    hb_arrayLast( pArray, &Last );
 
-   hb_itemReturn( &Last );
+   hb_itemReturnForward( &Last );
 }

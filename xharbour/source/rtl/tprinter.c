@@ -414,7 +414,7 @@ HB_FUNC( GETPRINTERS )
          }
       }
    }
-   hb_itemReturn( &ArrayPrinter );
+   hb_itemReturnForward( &ArrayPrinter );
 }
 
 #endif

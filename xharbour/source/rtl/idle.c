@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.19 2004/12/01 20:02:51 peterrees Exp $
+ * $Id: idle.c,v 1.20 2004/12/14 00:15:39 druzus Exp $
  */
 
 /*
@@ -402,7 +402,7 @@ HB_FUNC( HB_IDLEDEL )
    }
    else
    {
-      hb_itemReturn( pItem ); /* return a codeblock */
+      hb_itemReturnForward( pItem ); /* return a codeblock */
    }
 }
 

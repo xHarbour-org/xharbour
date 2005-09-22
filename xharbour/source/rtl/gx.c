@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.18 2004/10/28 04:33:25 paultucker Exp $
+ * $Id: gx.c,v 1.19 2004/11/23 17:04:22 lf_sfnet Exp $
  */
 
 /*
@@ -117,7 +117,7 @@ HB_FUNC( GETGTCLOSEHANDLER )
       hb_ret();
    }
    else {
-      hb_itemReturnCopy( pi );
+      hb_itemReturn( pi );
    }
 }
 

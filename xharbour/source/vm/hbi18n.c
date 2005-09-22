@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.17 2004/10/18 10:22:27 likewolf Exp $
+ * $Id: hbi18n.c,v 1.18 2004/11/21 21:44:27 druzus Exp $
  */
 
 /*
@@ -108,7 +108,8 @@ PHB_ITEM hb_i18n_scan_table( PHB_ITEM pStr, PHB_ITEM pTable, ULONG * ulIndex )
          * ulIndex = ulPoint;
          return hb_arrayGetItemPtr( pRow, 2 );
       }
-      else {
+      else
+      {
          if ( ulLower == ulHigher )
          {
             break;
@@ -484,7 +485,7 @@ HB_FUNC( HB_I18NLOADTABLE )
          hb_arrayNew( &ArrRet, 2 );
          hb_arraySetForward( &ArrRet, 1, pHeader );
          hb_arraySetForward( &ArrRet, 2, pTable );
-         hb_itemReturn( &ArrRet );
+         hb_itemReturnForward( &ArrRet );
          hb_itemRelease( pTable );
       }
       else
@@ -557,7 +558,7 @@ HB_FUNC( HB_I18NSORTTABLE )
       hb_arraySet( &ArrResult, pos, pTemp );
    }
 
-   hb_itemReturn( &ArrResult );
+   hb_itemReturnForward( &ArrResult );
 }
 
 /**
@@ -647,7 +648,7 @@ HB_FUNC( I18N ) // we get a license over HB_ naming convention for this
    }
    else
    {
-      hb_itemReturnCopy( pRet );
+      hb_itemReturn( pRet );
    }
 }
 
@@ -850,7 +851,7 @@ HB_FUNC( HB_HFIND )
 
    // The key scan returns the same pKey if not found
    if ( pRet != pKey )
-      hb_itemReturnCopy( pRet );
+      hb_itemReturn( pRet );
    else
       hb_ret();
 }

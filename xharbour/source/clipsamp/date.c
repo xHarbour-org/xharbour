@@ -1,5 +1,5 @@
 /*
- * $Id: date.c,v 1.3 2004/03/06 02:32:37 andijahja Exp $
+ * $Id: date.c,v 1.4 2004/11/21 21:43:39 druzus Exp $
  */
 
 /*
@@ -209,7 +209,7 @@ HB_FUNC( DATEASARRAY )
       hb_arrayAddForward( &Return, &Item );
    }
 
-   hb_itemReturn( &Return );
+   hb_itemReturnForward( &Return );
 }
 
 /* ARRAYASDATE( { <Year>, <Month>, <Day> } ) --> <dDate>

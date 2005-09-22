@@ -1,5 +1,5 @@
 /*
- * $Id: strpeek.c,v 1.2 2003/06/19 08:52:40 druzus Exp $
+ * $Id: strpeek.c,v 1.3 2004/12/28 06:39:23 druzus Exp $
  */
 
 /*
@@ -93,7 +93,7 @@ HB_FUNC( STRPOKE )
          hb_retclenAdopt( pszNew, ulLen );
       }
       else
-         hb_itemReturnCopy( pText );
+         hb_itemReturn( pText );
    }
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "STRPOKE", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );

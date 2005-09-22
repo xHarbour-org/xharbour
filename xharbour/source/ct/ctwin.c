@@ -1,5 +1,5 @@
 /*
- * $Id: ctwin.c,v 1.3 2004/11/02 22:10:31 oh1 Exp $
+ * $Id: ctwin.c,v 1.4 2005/05/16 21:45:40 andijahja Exp $
  */
 
 /*
@@ -432,7 +432,7 @@ HB_FUNC( WSTACK )
      hb_itemRelease( pN );
    }
 
-   hb_itemRelease( hb_itemReturn( pStack ) );
+   hb_itemRelease( hb_itemReturnForward( pStack ) );
 }
 /****************************************************************************/
 HB_FUNC( WSTEP ) /* Set the step width of interactive window movement */

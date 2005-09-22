@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.62 2005/06/16 05:57:48 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.63 2005/08/01 22:21:56 druzus Exp $
  */
 
 /*
@@ -1188,7 +1188,7 @@ HB_FUNC( THROW )
 
       if( pResult )
       {
-         hb_itemRelease( hb_itemReturn( pResult ) );
+         hb_itemRelease( hb_itemReturnForward( pResult ) );
       }
    }
    else
@@ -1465,7 +1465,7 @@ void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, const cha
 
    if( pResult )
    {
-      hb_itemRelease( hb_itemReturn( pResult ) );
+      hb_itemRelease( hb_itemReturnForward( pResult ) );
    }
 }
 

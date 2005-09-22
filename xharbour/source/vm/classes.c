@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.159 2005/09/07 15:24:49 walito Exp $
+ * $Id: classes.c,v 1.160 2005/09/15 12:55:36 druzus Exp $
  */
 
 /*
@@ -2779,7 +2779,7 @@ HB_FUNC( __OBJCLONE )
 
    if( pSrcObject )
    {
-      hb_itemRelease( hb_itemReturn( hb_objClone( pSrcObject ) ) );
+      hb_itemRelease( hb_itemReturnForward( hb_objClone( pSrcObject ) ) );
    }
    else
    {
@@ -3127,7 +3127,7 @@ HB_FUNC( __CLASSSEL )
       }
    }
 
-   hb_itemReturn( &Return );
+   hb_itemReturnForward( &Return );
 }
 
 /* to be used from Classes ERROR HANDLER method */
@@ -3418,7 +3418,7 @@ static HARBOUR hb___msgClsFullSel( void )
       hb_arraySize( &Return, uiPos );
    }
 
-   hb_itemReturn( &Return );
+   hb_itemReturnForward( &Return );
 }
 
 /*
@@ -3485,7 +3485,7 @@ static HARBOUR hb___msgClsSel( void )
       hb_arraySize( &Return, uiPos );
    }
 
-   hb_itemReturn( &Return );
+   hb_itemReturnForward( &Return );
 }
 
 /*
@@ -3576,7 +3576,7 @@ static HARBOUR hb___msgSuper( void )
    Super.item.asArray.value->uiClass    = (HB_VM_STACK.pMethod)->uiSprClass;                /* superclass handel casting */
    Super.item.asArray.value->puiClsTree = NULL;
 
-   hb_itemReturn( &Super );
+   hb_itemReturnForward( &Super );
 }
 
 /*
@@ -3716,7 +3716,7 @@ HARBOUR hb___msgSetData( void )
 
    hb_arraySet( pObject, uiIndex, pReturn );
 
-   hb_itemReturn( pReturn );
+   hb_itemReturnForward( pReturn );
 }
 
 /* No comment :-) */
@@ -3835,7 +3835,7 @@ HB_FUNC( __CLS_PARAM )
       hb_itemPutCStatic( hb_arrayGetItemPtr( &Array, 1), (char *) "HBObject" );
    }
 
-   hb_itemReturn( &Array );
+   hb_itemReturnForward( &Array );
 }
 
 /* This one is used when HB_NOTOBJECT is defined before HBCLASS.CH */
@@ -4121,7 +4121,7 @@ HB_FUNC( __CLSGETPROPERTIES )
       }
    }
 
-   hb_itemReturn( &Return );
+   hb_itemReturnForward( &Return );
 }
 
 HB_FUNC( __CLSGETPROPERTIESANDVALUES )
@@ -4165,7 +4165,7 @@ HB_FUNC( __CLSGETPROPERTIESANDVALUES )
          }
       }
 
-      hb_itemReturn( &Return );
+      hb_itemReturnForward( &Return );
    }
 }
 
@@ -4214,7 +4214,7 @@ HB_FUNC( __CLSGETIVARNAMESANDVALUES )
          }
       }
 
-      hb_itemReturn( &Return );
+      hb_itemReturnForward( &Return );
    }
 }
 

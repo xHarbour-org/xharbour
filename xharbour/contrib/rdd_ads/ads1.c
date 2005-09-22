@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.77 2005/09/19 23:21:27 druzus Exp $
+ * $Id: ads1.c,v 1.78 2005/09/20 11:59:00 druzus Exp $
  */
 
 /*
@@ -4349,17 +4349,13 @@ static ERRCODE adsRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_
 
       case RDDI_CONNECTION:
       {
-         ULONG ulNewConnection = 0;
+         ULONG ulOldConnection = adsConnectHandle;
 
          if( hb_itemType( pItem ) & HB_IT_NUMERIC )
          {
-            ulNewConnection = hb_itemGetNL( pItem );
+            adsConnectHandle = hb_itemGetNL( pItem );
          }
-         hb_itemPutNL( pItem, ulConnect ? ulConnect : ( ULONG ) adsConnectHandle );
-         if( ulNewConnection )
-         {
-            adsConnectHandle = ulNewConnection;
-         }
+         hb_itemPutNL( pItem, ulConnect ? ulConnect : ( ULONG ) ulOldConnection );
          break;
       }
       case RDDI_ISDBF:

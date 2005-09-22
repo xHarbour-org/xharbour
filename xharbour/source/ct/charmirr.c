@@ -1,5 +1,5 @@
 /*
- * $Id: charmirr.c,v 1.2 2004/07/22 16:58:26 likewolf Exp $
+ * $Id: charmirr.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
  */
 
 /*
@@ -141,8 +141,7 @@ HB_FUNC (CHARMIRR)
     
     if (pSubst != NULL)
     {
-      hb_itemReturn (pSubst);
-      hb_itemRelease (pSubst);
+      hb_itemRelease( hb_itemReturnForward( pSubst ) );
     }
     else
     {

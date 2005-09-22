@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4344 2005/09/21 01:55:53 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4345 2005/09/21 02:34:10 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,98 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-22 02:35 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/xharbour.spec
+    * changed description in README.RPM about xhbcc script behavior
+      Now it's a simple wrapper to C compiler which can be used in make
+      files instead of direct calling C compiler - it set all necessary
+      parameters to properly include xHarbur header files
+
+  * xharbour/contrib/rdd_ads/ads1.c
+    * modification in default connection setting
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * minor modification to allow opening CDX files with TAGNAME length
+      not equal to 10 characters
+      
+  * xharbour/include/hbapiitm.h
+  * xharbour/source/clipsamp/date.c
+  * xharbour/source/clipsamp/gauge.c
+  * xharbour/source/clipsamp/stack.c
+  * xharbour/source/clipsamp/status.c
+  * xharbour/source/ct/addascii.c
+  * xharbour/source/ct/asciisum.c
+  * xharbour/source/ct/ascpos.c
+  * xharbour/source/ct/atadjust.c
+  * xharbour/source/ct/atnum.c
+  * xharbour/source/ct/atrepl.c
+  * xharbour/source/ct/charevod.c
+  * xharbour/source/ct/charlist.c
+  * xharbour/source/ct/charmirr.c
+  * xharbour/source/ct/charmix.c
+  * xharbour/source/ct/charone.c
+  * xharbour/source/ct/charonly.c
+  * xharbour/source/ct/charop.c
+  * xharbour/source/ct/charrepl.c
+  * xharbour/source/ct/charsort.c
+  * xharbour/source/ct/charswap.c
+  * xharbour/source/ct/count.c
+  * xharbour/source/ct/ctmath2.c
+  * xharbour/source/ct/ctpad.c
+  * xharbour/source/ct/ctwin.c
+  * xharbour/source/ct/finan.c
+  * xharbour/source/ct/justify.c
+  * xharbour/source/ct/num1.c
+  * xharbour/source/ct/numat.c
+  * xharbour/source/ct/pos1.c
+  * xharbour/source/ct/pos2.c
+  * xharbour/source/ct/posdiff.c
+  * xharbour/source/ct/range.c
+  * xharbour/source/ct/relation.c
+  * xharbour/source/ct/remove.c
+  * xharbour/source/ct/replace.c
+  * xharbour/source/ct/strdiff.c
+  * xharbour/source/ct/strswap.c
+  * xharbour/source/ct/tab.c
+  * xharbour/source/ct/token1.c
+  * xharbour/source/ct/token2.c
+  * xharbour/source/ct/trig.c
+  * xharbour/source/ct/wordrepl.c
+  * xharbour/source/ct/wordtoch.c
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rtl/fparse.c
+  * xharbour/source/rtl/gx.c
+  * xharbour/source/rtl/idle.c
+  * xharbour/source/rtl/inkey.c
+  * xharbour/source/rtl/left.c
+  * xharbour/source/rtl/math.c
+  * xharbour/source/rtl/oemansi.c
+  * xharbour/source/rtl/round.c
+  * xharbour/source/rtl/set.c
+  * xharbour/source/rtl/setkey.c
+  * xharbour/source/rtl/strpeek.c
+  * xharbour/source/rtl/tprinter.c
+  * xharbour/source/rtl/transfrm.c
+  * xharbour/source/rtl/version.c
+  * xharbour/source/rtl/win32ole.prg
+  * xharbour/source/rtl/win32prn.prg
+  * xharbour/source/vm/arrayshb.c
+  * xharbour/source/vm/classes.c
+  * xharbour/source/vm/debug.c
+  * xharbour/source/vm/errorapi.c
+  * xharbour/source/vm/fastitem.c
+  * xharbour/source/vm/hash.c
+  * xharbour/source/vm/hbi18n.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/inet.c
+  * xharbour/source/vm/memvars.c
+  * xharbour/source/vm/runner.c
+  * xharbour/source/vm/thread.c
+    * changed hb_itemReturn() to work like in Clipper
+    * renamed hb_itemReturnCopy() to hb_itemReturnForward()
+    ! fixed few bugs with bad use previous version of hb_itemReturn()
+      and some memory leaks
 
 2005-09-20 23:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
   * source/pp/pptable.c

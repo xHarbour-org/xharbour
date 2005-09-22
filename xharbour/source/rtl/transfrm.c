@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.40 2005/03/19 13:09:26 andijahja Exp $
+ * $Id: transfrm.c,v 1.41 2005/05/14 02:29:56 kaddath Exp $
  */
 
 /*
@@ -963,7 +963,7 @@ HB_FUNC( TRANSFORM )
       }
       else if( HB_IS_STRING( pValue ) )
       {
-         hb_itemReturnCopy( pValue );
+         hb_itemReturn( pValue );
       }
       else if( HB_IS_DATE( pValue ) ) // Must precede HB_IS_NUMERIC()
       {

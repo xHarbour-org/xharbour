@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.40 2004/12/29 19:21:10 bdj Exp $
+ * $Id: inkey.c,v 1.41 2004/12/30 08:24:57 bdj Exp $
  */
 
 /*
@@ -437,7 +437,7 @@ HB_FUNC( SETINKEYBEFOREBLOCK )
 {
    USHORT uiPCount = hb_pcount();
 
-   hb_itemReturnCopy( &s_inKeyBlockBefore );
+   hb_itemReturn( &s_inKeyBlockBefore );
 
    if( uiPCount > 0 )
    {
@@ -459,7 +459,7 @@ HB_FUNC( SETINKEYAFTERBLOCK )
 {
    USHORT uiPCount = hb_pcount();
 
-   hb_itemReturnCopy( &s_inKeyBlockAfter );
+   hb_itemReturn( &s_inKeyBlockAfter );
 
    if ( uiPCount > 0 )
    {

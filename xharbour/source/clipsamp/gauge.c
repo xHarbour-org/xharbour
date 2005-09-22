@@ -1,5 +1,5 @@
 /*
- * $Id: gauge.c,v 1.5 2004/03/18 03:54:43 ronpinkas Exp $
+ * $Id: gauge.c,v 1.6 2005/06/13 02:02:49 peterrees Exp $
  */
 
 /*
@@ -107,7 +107,7 @@ HB_FUNC( GAUGENEW )
    hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BARCHAR),( ISCHAR( B_BARCHAR ) ? hb_parcx( B_BARCHAR ) : ( char * ) '\xdb'));
    hb_itemPutC( hb_arrayGetItemPtr( &Return, B_PERCENT), 0 );
 
-   hb_itemReturn( &Return );
+   hb_itemReturnForward( &Return );
 }
 
 /* GaugeDisplay( aGauge ) --> aGauge

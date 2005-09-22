@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.65 2005/06/10 04:05:33 peterrees Exp $
+ * $Id: set.c,v 1.66 2005/08/01 22:21:43 druzus Exp $
  */
 
 /*
@@ -1529,7 +1529,7 @@ HB_FUNC( SET )
          {
             hb_set.HB_SET_EOL = hb_itemPutC( NULL, hb_conNewLine() );
          }
-         hb_itemReturnCopy( hb_set.HB_SET_EOL );
+         hb_itemReturn( hb_set.HB_SET_EOL );
          if( args > 1 )
          {
             hb_itemClear( hb_set.HB_SET_EOL );

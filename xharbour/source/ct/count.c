@@ -1,5 +1,5 @@
 /*
- * $Id: count.c,v 1.2 2004/05/07 10:02:27 likewolf Exp $
+ * $Id: count.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
  */
 
 /*
@@ -126,8 +126,7 @@ static void do_count (int iSwitch)
     
     if (pSubst != NULL)
     {
-      hb_itemReturn (pSubst);
-      hb_itemRelease (pSubst);
+      hb_itemRelease( hb_itemReturnForward( pSubst ) );
     }
     else
     {

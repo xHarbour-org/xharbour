@@ -1,5 +1,5 @@
 /*
- * $Id: tab.c,v 1.2 2005/02/18 20:00:00 ptsarenko Exp $
+ * $Id: tab.c,v 1.2 2005/02/18 18:09:00 ptsarenko Exp $
  */
 
 /*
@@ -252,8 +252,7 @@ HB_FUNC (TABEXPAND)
     
     if (pSubst != NULL)
     {
-      hb_itemReturn (pSubst);
-      hb_itemRelease (pSubst);
+      hb_itemRelease( hb_itemReturnForward( pSubst ) );
     }
     else
     {
@@ -498,8 +497,7 @@ HB_FUNC (TABPACK)
     
     if (pSubst != NULL)
     {
-      hb_itemReturn (pSubst);
-      hb_itemRelease (pSubst);
+      hb_itemRelease( hb_itemReturnForward( pSubst ) );
     }
     else
     {

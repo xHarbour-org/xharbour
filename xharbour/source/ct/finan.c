@@ -1,5 +1,5 @@
 /*
- * $Id: finan.c,v 1.1 2003/03/04 21:04:35 lculik Exp $
+ * $Id: finan.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  */
 
 /*
@@ -123,8 +123,7 @@ HB_FUNC( FV )
     
     if (pSubst != NULL)
     {
-      hb_itemReturn (pSubst);
-      hb_itemRelease (pSubst);
+      hb_itemRelease( hb_itemReturnForward( pSubst ) );
     }
     else
     {
@@ -192,8 +191,7 @@ HB_FUNC( PV )
     
     if (pSubst != NULL)
     {
-      hb_itemReturn (pSubst);
-      hb_itemRelease (pSubst);
+      hb_itemRelease( hb_itemReturnForward( pSubst ) );
     }
     else
     {
@@ -261,8 +259,7 @@ HB_FUNC( PAYMENT )
     
     if (pSubst != NULL)
     {
-      hb_itemReturn (pSubst);
-      hb_itemRelease (pSubst);
+      hb_itemRelease( hb_itemReturnForward( pSubst ) );
     }
     else
     {
@@ -341,8 +338,7 @@ HB_FUNC( PERIODS )
     
     if (pSubst != NULL)
     {
-      hb_itemReturn (pSubst);
-      hb_itemRelease (pSubst);
+      hb_itemRelease( hb_itemReturnForward( pSubst ) );
     }
     else
     {
@@ -426,8 +422,7 @@ HB_FUNC( RATE )
     
     if (pSubst != NULL)
     {
-      hb_itemReturn (pSubst);
-      hb_itemRelease (pSubst);
+      hb_itemRelease( hb_itemReturnForward( pSubst ) );
     }
     else
     {

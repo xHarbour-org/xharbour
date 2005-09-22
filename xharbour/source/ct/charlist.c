@@ -1,5 +1,5 @@
 /*
- * $Id: charlist.c,v 1.2 2004/03/07 00:01:19 andijahja Exp $
+ * $Id: charlist.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
  */
 
 /*
@@ -181,7 +181,7 @@ static void do_list (int iSwitch)
         {
           hb_arraySetForward( &Array, sCnt+1, hb_itemPutNL (&Count, asCharCnt[sCnt]));
         }
-        hb_itemReturn (&Array);
+        hb_itemReturnForward (&Array);
       }; break;
 
     }

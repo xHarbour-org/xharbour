@@ -1,5 +1,5 @@
 /*
- * $Id: charswap.c,v 1.2 2005/03/09 23:00:00 ptsarenko Exp $
+ * $Id: charswap.c,v 1.2 2005/03/09 21:08:59 ptsarenko Exp $
  */
 
 /*
@@ -203,8 +203,7 @@ static void do_charswap (int iSwitch)
 
     if (pSubst != NULL)
     {
-      hb_itemReturn (pSubst);
-      hb_itemRelease (pSubst);
+      hb_itemRelease( hb_itemReturnForward( pSubst ) );
     }
     else
     {

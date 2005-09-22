@@ -1,5 +1,5 @@
 /*
- * $Id: numat.c,v 1.1 2003/03/04 21:04:42 lculik Exp $
+ * $Id: numat.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  */
 
 /*
@@ -155,8 +155,7 @@ HB_FUNC(NUMAT)
     
     if (pSubst != NULL)
     {
-      hb_itemReturn (pSubst);
-      hb_itemRelease (pSubst);
+      hb_itemRelease( hb_itemReturnForward( pSubst ) );
     }
     else
     {

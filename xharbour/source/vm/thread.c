@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.191 2005/09/04 04:29:01 walito Exp $
+* $Id: thread.c,v 1.192 2005/09/11 19:41:11 druzus Exp $
 */
 
 /*
@@ -2074,7 +2074,7 @@ HB_FUNC( HB_THREADGETTRYERRORARRAY )
 #if defined(HB_API_MACROS)
    HB_THREAD_STUB
 #endif
-   hb_itemReturnCopy( HB_VM_STACK.aTryCatchHandlerStack );
+   hb_itemReturn( HB_VM_STACK.aTryCatchHandlerStack );
 }
 
 /*
@@ -2563,7 +2563,7 @@ static void s_subscribeInternal( int mode )
          pStatus->type = HB_IT_LOGICAL;
          pStatus->item.asLogical.value = 1;
       }
-      hb_itemReturn( hb_arrayGetItemPtr( Mutex->aEventObjects, 1 ) );
+      hb_itemReturnForward( hb_arrayGetItemPtr( Mutex->aEventObjects, 1 ) );
       hb_arrayDel( Mutex->aEventObjects, 1 );
       hb_arraySize( Mutex->aEventObjects, hb_arrayLen( Mutex->aEventObjects) - 1);
    }

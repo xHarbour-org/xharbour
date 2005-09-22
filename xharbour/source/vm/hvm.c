@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.487 2005/09/11 19:41:11 druzus Exp $
+ * $Id: hvm.c,v 1.488 2005/09/15 13:52:03 lculik Exp $
  */
 
 /*
@@ -1103,7 +1103,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_backgroundRun();
             s_ulBackground = 0;
 
-            hb_itemRelease( hb_itemReturn( pSavedReturn ) );
+            hb_itemRelease( hb_itemReturnForward( pSavedReturn ) );
          }
       #else
          // Run background functions every unlock period
@@ -1115,7 +1115,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             hb_backgroundRun();
 
-            hb_itemRelease( hb_itemReturn( pSavedReturn ) );
+            hb_itemRelease( hb_itemReturnForward( pSavedReturn ) );
          }
       #endif
       }
@@ -6992,7 +6992,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
                if( pResult )
                {
-                  hb_itemRelease( hb_itemReturn( pResult ) );
+                  hb_itemRelease( hb_itemReturnForward( pResult ) );
                }
                else
                {

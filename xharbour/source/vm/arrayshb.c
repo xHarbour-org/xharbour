@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.58 2005/04/23 06:52:18 guerra000 Exp $
+ * $Id: arrayshb.c,v 1.59 2005/05/16 21:45:40 andijahja Exp $
  */
 
 /*
@@ -520,7 +520,7 @@ HB_FUNC( ACLONE )
 
    if( pSrcArray && ! hb_arrayIsObject( pSrcArray ) )
    {
-      hb_itemRelease( hb_itemReturn( hb_arrayClone( pSrcArray, NULL ) ) ); /* AClone() returns the new array */
+      hb_itemRelease( hb_itemReturnForward( hb_arrayClone( pSrcArray, NULL ) ) ); /* AClone() returns the new array */
    }
 }
 
@@ -530,7 +530,7 @@ HB_FUNC( HB_APARAMS )
 
    pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
-   hb_itemRelease( hb_itemReturn( hb_arrayFromParams( pBase ) ) );
+   hb_itemRelease( hb_itemReturnForward( hb_arrayFromParams( pBase ) ) );
 }
 
 HB_FUNC( HB_AEXPRESSIONS )

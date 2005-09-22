@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.14 2004/04/14 10:32:14 druzus Exp $
+ * $Id: debug.c,v 1.15 2005/04/26 05:38:04 ronpinkas Exp $
  */
 
 /*
@@ -131,7 +131,7 @@ HB_FUNC( HB_DBG_VMSTKGLIST )
       AddToArray( *pItem, &Return, uiPos++ );
    }
 
-   hb_itemReturn( &Return );
+   hb_itemReturnForward( &Return );
 }
 
 /* $Doc$
@@ -189,7 +189,7 @@ HB_FUNC( HB_DBG_VMSTKLLIST )
       AddToArray( *pItem, &Return, uiPos++ );
    }
 
-   hb_itemReturn( &Return );
+   hb_itemReturnForward( &Return );
 }
 
 /* $Doc$
@@ -226,7 +226,7 @@ HB_FUNC( HB_DBG_VMPARLLIST )
       AddToArray( *pItem, &Return, uiPos++ );
    }
 
-   hb_itemReturn( &Return );
+   hb_itemReturnForward( &Return );
 }
 
 static void hb_dbgStop(void)

@@ -1,5 +1,5 @@
 /*
- * $Id: atadjust.c,v 1.1 2003/03/04 21:03:59 lculik Exp $
+ * $Id: atadjust.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
  */
 
 /*
@@ -300,8 +300,7 @@ HB_FUNC (ATADJUST)
      
     if (pSubst != NULL)
     {
-      hb_itemReturn (pSubst);
-      hb_itemRelease (pSubst);
+      hb_itemRelease( hb_itemReturnForward( pSubst ) );
     }
     else
     {

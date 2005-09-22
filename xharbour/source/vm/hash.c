@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.38 2005/03/22 01:13:15 ronpinkas Exp $
+ * $Id: hash.c,v 1.39 2005/04/23 06:52:18 guerra000 Exp $
  */
 
 /*
@@ -1833,24 +1833,24 @@ HB_FUNC( HASH )
 
          if ( pKey == NULL )
          {
+            hb_hashRelease( pHash );
             hb_errRT_BASE( EG_BOUND, 1131,
                "Hash keys must be strings, numbers or dates",
                hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
-            hb_hashRelease( pHash );
             return;
          }
 
          if (! hb_hashAdd( pHash, ULONG_MAX, pKey, pValue ) )
          {
-            hb_errRT_BASE( EG_BOUND, 1131, "Hash value insertion failed", hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
             hb_hashRelease( pHash );
+            hb_errRT_BASE( EG_BOUND, 1131, "Hash value insertion failed", hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
             return;
          }
 
       }
    }
 
-   hb_itemReturn( pHash );
+   hb_itemReturnForward( pHash );
 }
 
 
@@ -1925,7 +1925,7 @@ HB_FUNC( HGET )
 
    hbRet.type = HB_IT_NIL;
    hb_hashGet( pHash, ulPos, &hbRet );
-   hb_itemReturn( &hbRet );
+   hb_itemReturnForward( &hbRet );
 }
 
 

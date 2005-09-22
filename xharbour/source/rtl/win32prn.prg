@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.14 2005/09/15 00:25:18 peterrees Exp $
+ * $Id: win32prn.prg,v 1.15 2005/09/15 03:05:11 peterrees Exp $
  */
 
 /*
@@ -988,7 +988,7 @@ HB_FUNC_STATIC( ENUMFONTS )
 
     EnumFonts(hDC, (LPCTSTR) NULL, (FONTENUMPROC) FontEnumCallBack, (LPARAM) &Array);
 
-    hb_itemReturn( &Array) ;
+    hb_itemReturnForward( &Array) ;
 
     Result = TRUE ;
   }

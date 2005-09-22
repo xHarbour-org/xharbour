@@ -1,5 +1,5 @@
 /*
- * $Id: pad.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: ctpad.c,v 1.1 2004/08/27 05:46:07 paultucker Exp $
  */
 
 /*
@@ -148,8 +148,7 @@ static void do_pad (int iSwitch)
     
     if (pSubst != NULL)
     {
-      hb_itemReturn (pSubst);
-      hb_itemRelease (pSubst);
+      hb_itemRelease( hb_itemReturnForward( pSubst ) );
     }
     else
     {

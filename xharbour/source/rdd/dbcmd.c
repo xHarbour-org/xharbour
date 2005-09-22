@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.167 2005/09/17 21:35:41 druzus Exp $
+ * $Id: dbcmd.c,v 1.168 2005/09/20 17:26:37 druzus Exp $
  */
 
 /*
@@ -2151,7 +2151,7 @@ HB_FUNC( DBTABLEEXT )
    {
       SELF_INFO( pArea, DBI_TABLEEXT, &Item );
    }
-   hb_itemReturn( &Item );
+   hb_itemReturnForward( &Item );
 }
 
 HB_FUNC( DBUNLOCK )
@@ -3306,7 +3306,7 @@ HB_FUNC( RECNO )
    hb_itemPutNL( &RecNo, 0 );
    if( pArea )
       SELF_RECID( pArea, &RecNo );
-   hb_itemReturn( &RecNo );
+   hb_itemReturnForward( &RecNo );
 }
 
 HB_FUNC( RECSIZE )

@@ -1,5 +1,5 @@
 /*
- * $Id: charone.c,v 1.3 2004/07/29 10:58:43 likewolf Exp $
+ * $Id: charone.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
  */
 
 /*
@@ -212,8 +212,7 @@ static void do_charone( int iSwitch )
      
       if ( pSubst != NULL )
       {
-         hb_itemReturn( pSubst );
-         hb_itemRelease( pSubst );
+         hb_itemRelease( hb_itemReturnForward( pSubst ) );
       }
       else
       {

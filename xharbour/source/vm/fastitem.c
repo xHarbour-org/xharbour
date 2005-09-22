@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.75 2005/03/31 04:02:25 druzus Exp $
+ * $Id: fastitem.c,v 1.76 2005/04/24 11:25:42 druzus Exp $
  */
 
 /*
@@ -123,21 +123,21 @@ PHB_ITEM HB_EXPORT hb_itemReturn( PHB_ITEM pItem )
 
    if( pItem )
    {
-      hb_itemForwardValue( &(HB_VM_STACK.Return), pItem );
+      hb_itemCopy( &(HB_VM_STACK.Return), pItem );
    }
 
    return pItem;
 }
 
-PHB_ITEM HB_EXPORT hb_itemReturnCopy( PHB_ITEM pItem )
+PHB_ITEM HB_EXPORT hb_itemReturnForward( PHB_ITEM pItem )
 {
    HB_THREAD_STUB
 
-   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturnCopy(%p)", pItem ) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturnForward(%p)", pItem ) );
 
    if( pItem )
    {
-      hb_itemCopy( &(HB_VM_STACK.Return), pItem );
+      hb_itemForwardValue( &(HB_VM_STACK.Return), pItem );
    }
 
    return pItem;

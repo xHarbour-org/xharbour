@@ -1,5 +1,5 @@
 /*
- * $Id: round.c,v 1.15 2004/08/04 20:39:38 lf_sfnet Exp $
+ * $Id: round.c,v 1.16 2004/11/21 21:44:20 druzus Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ HB_FUNC( INT )
    {
       if( HB_IS_NUMBER_INT( pNumber ) )
       {
-         hb_itemReturnCopy( pNumber );
+         hb_itemReturn( pNumber );
       }
       else
       {
@@ -102,7 +102,7 @@ HB_FUNC( ROUND )
 
       if( HB_IS_NUMBER_INT( pNumber ) && iDec == 0 )
       {
-         hb_itemReturnCopy( pNumber );
+         hb_itemReturn( pNumber );
       }
       else
       {

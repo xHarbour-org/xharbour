@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.7 2004/12/08 01:01:08 peterrees Exp $
+ * $Id: version.c,v 1.8 2005/03/09 05:35:25 andijahja Exp $
  */
 
 /*
@@ -187,14 +187,15 @@ HB_FUNC( HB_BUILDINFO )
       if( iQuery < _HB_VER_LAST )
       {
          HB_ITEM Query;
-	 ( &Query )->type = HB_IT_NIL;
+         ( &Query )->type = HB_IT_NIL;
          hb_arrayGet( &Return, iQuery, &Query );
-         hb_itemReturn( &Query );
+         hb_itemReturnForward( &Query );
       }
+      hb_itemClear( &Return );
    }
    else
    {
-      hb_itemReturn( &Return );
+      hb_itemReturnForward( &Return );
    }
 
    hb_itemClear( &hbInfo );

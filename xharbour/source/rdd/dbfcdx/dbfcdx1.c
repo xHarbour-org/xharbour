@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.218 2005/09/13 01:48:34 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.219 2005/09/19 23:21:28 druzus Exp $
  */
 
 /*
@@ -3703,11 +3703,12 @@ static void hb_cdxTagFree( LPCDXTAG pTag )
 static LPCDXTAG hb_cdxTagNew( LPCDXINDEX pIndex, char *szTagName, ULONG TagHdr )
 {
    LPCDXTAG pTag;
+   char szName[ CDX_MAXTAGNAMELEN + 1 ];
 
    pTag = ( LPCDXTAG ) hb_xgrab( sizeof( CDXTAG ) );
    memset( pTag, 0, sizeof( CDXTAG ) );
-   pTag->szName = ( char * ) hb_xgrab( CDX_MAXTAGNAMELEN + 1 );
-   hb_strncpyUpperTrim( pTag->szName, szTagName, CDX_MAXTAGNAMELEN );
+   hb_strncpyUpperTrim( szName, szTagName, CDX_MAXTAGNAMELEN );
+   pTag->szName = hb_strdup( szName );
    pTag->pIndex = pIndex;
    pTag->AscendKey = pTag->UsrAscend = TRUE;
    pTag->UsrUnique = FALSE;
@@ -4628,6 +4629,7 @@ static LPCDXTAG hb_cdxIndexCreateTag( BOOL fStruct, LPCDXINDEX pIndex,
  */
 static void hb_cdxIndexCreateStruct( LPCDXINDEX pIndex, char * szTagName )
 {
+   /* here we can change default tag name */
    pIndex->pCompound = hb_cdxIndexCreateTag( TRUE, pIndex, szTagName,
                            NULL, NULL, 'C', CDX_MAXTAGNAMELEN, NULL, NULL,
                            TRUE, FALSE, FALSE, FALSE );
@@ -4668,7 +4670,8 @@ static void hb_cdxIndexDelTag( LPCDXINDEX pIndex, char * szTagName )
    if ( *pTagPtr )
    {
       LPCDXTAG pTag = *pTagPtr;
-      LPCDXKEY pKey = hb_cdxKeyPutC( NULL, szTagName, CDX_MAXTAGNAMELEN, pTag->TagBlock );
+      LPCDXKEY pKey = hb_cdxKeyPutC( NULL, szTagName, pIndex->pCompound->uiLen,
+                                     pTag->TagBlock );
       if ( hb_cdxTagKeyDel( pIndex->pCompound, pKey ) )
       {
          if ( pTag != pIndex->TagList || pTag->pNext != NULL )
@@ -4719,7 +4722,7 @@ static LPCDXTAG hb_cdxIndexAddTag( LPCDXINDEX pIndex, char * szTagName,
    while ( *pTagPtr )
       pTagPtr = &(*pTagPtr)->pNext;
    *pTagPtr = pTag;
-   pKey = hb_cdxKeyPutC( NULL, szTagName, CDX_MAXTAGNAMELEN, pTag->TagBlock );
+   pKey = hb_cdxKeyPutC( NULL, szTagName, pIndex->pCompound->uiLen, pTag->TagBlock );
    hb_cdxTagKeyAdd( pIndex->pCompound, pKey );
    hb_cdxKeyFree( pKey );
    return pTag;

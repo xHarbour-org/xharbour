@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.83 2005/06/01 15:35:20 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.84 2005/06/01 17:01:09 ronpinkas Exp $
  */
 
 /*
@@ -956,7 +956,7 @@ RETURN xRet
               VariantClear( &mElem );
            }
 
-           hb_itemReturn( &Result );
+           hb_itemReturnForward( &Result );
         }
         break;
 /*- end ----------------------------->8-------------------------------------*/
@@ -1499,7 +1499,7 @@ RETURN xRet
            hb_itemPushForward( &OleClassName );
            hb_vmSend( 1 );
 
-           hb_itemReturn( &Return );
+           hb_itemReturnForward( &Return );
         }
      }
      else
@@ -1537,7 +1537,7 @@ RETURN xRet
 
         if( pReturn )
         {
-           hb_itemReturn( pReturn );
+           hb_itemRelease( hb_itemReturn( pReturn ) );
         }
      }
   }
