@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.488 2005/09/15 13:52:03 lculik Exp $
+ * $Id: hvm.c,v 1.489 2005/09/22 01:12:00 druzus Exp $
  */
 
 /*
@@ -7794,12 +7794,6 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
 
       //TraceLog( NULL, "OBJECT Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
-
-      #ifdef HB_ARRAY_USE_COUNTER
-         ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->ulHolders++;
-      #else
-         hb_arrayRegisterHolder( ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase, (void *) ( ( * HB_VM_STACK.pPos )->item.asBlock.value ) );
-      #endif
    }
    else
    {
@@ -7850,12 +7844,6 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
 
       //TraceLog( NULL, "OBJECT Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
-
-      #ifdef HB_ARRAY_USE_COUNTER
-         ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->ulHolders++;
-      #else
-         hb_arrayRegisterHolder( ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase, (void *) ( ( * HB_VM_STACK.pPos )->item.asBlock.value ) );
-      #endif
    }
    else
    {
@@ -7906,12 +7894,6 @@ static void hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols )
       ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
 
       //TraceLog( NULL, "OBJECT Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
-
-      #ifdef HB_ARRAY_USE_COUNTER
-         ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase->ulHolders++;
-      #else
-         hb_arrayRegisterHolder( ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase, (void *) ( ( * HB_VM_STACK.pPos )->item.asBlock.value ) );
-      #endif
    }
    else
    {
@@ -9603,12 +9585,6 @@ HB_FUNC( HB_RESTOREBLOCK )
             if( pSelf && HB_IS_OBJECT( pSelf ) )
             {
                Block.item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
-
-               #ifdef HB_ARRAY_USE_COUNTER
-                  Block.item.asBlock.value->pSelfBase->ulHolders++;
-               #else
-                  hb_arrayRegisterHolder( Block.item.asBlock.value->pSelfBase, (void *) ( Block.item.asBlock.value ) );
-               #endif
             }
             else
             {

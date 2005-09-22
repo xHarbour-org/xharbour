@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.160 2005/09/15 12:55:36 druzus Exp $
+ * $Id: classes.c,v 1.161 2005/09/22 01:12:00 druzus Exp $
  */
 
 /*
@@ -2385,12 +2385,6 @@ static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
                   if( HB_IS_BLOCK( pInitValue ) )
                   {
                      pInitValue->item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
-
-                     #ifdef HB_ARRAY_USE_COUNTER
-                        pInitValue->item.asBlock.value->pSelfBase->ulHolders++;
-                     #else
-                        hb_arrayRegisterHolder( pInitValue->item.asBlock.value->pSelfBase, (void *) pInitValue );
-                     #endif
                   }
                }
 
@@ -2434,12 +2428,6 @@ static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
                            if( HB_IS_BLOCK( pInit ) )
                            {
                               pInit->item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
-
-                              #ifdef HB_ARRAY_USE_COUNTER
-                                 pInit->item.asBlock.value->pSelfBase->ulHolders++;
-                              #else
-                                 hb_arrayRegisterHolder( pInit->item.asBlock.value->pSelfBase, (void *) pInit );
-                              #endif
                            }
                         }
 
@@ -2473,12 +2461,6 @@ static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
                            if( HB_IS_BLOCK( pInit ) )
                            {
                               pInit->item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
-
-                              #ifdef HB_ARRAY_USE_COUNTER
-                                 pInit->item.asBlock.value->pSelfBase->ulHolders++;
-                              #else
-                                 hb_arrayRegisterHolder( pInit->item.asBlock.value->pSelfBase, (void *) pInit );
-                              #endif
                            }
                         }
 
