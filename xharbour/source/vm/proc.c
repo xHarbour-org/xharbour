@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.22 2004/03/17 08:29:45 ronpinkas Exp $
+ * $Id: proc.c,v 1.23 2004/04/06 22:40:30 ronpinkas Exp $
  */
 
 /*
@@ -177,6 +177,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
          {
             strcpy( szName, "(b)" );
 
+            /*
             if( pSelf->item.asBlock.value->pSelfBase )
             {
                if( pSelf->item.asBlock.value->pSelfBase->uiClass <= hb_clsMaxClasses() )
@@ -191,6 +192,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
                   hb_errInternal( HB_EI_ERRUNRECOV, "Corrupted codeblock, points to invalid class id!", NULL, NULL );
                }
             }
+            */
 
             strcat( szName, pSelf->item.asBlock.value->procname );
          }

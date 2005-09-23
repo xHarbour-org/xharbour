@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.161 2005/09/22 01:12:00 druzus Exp $
+ * $Id: classes.c,v 1.162 2005/09/22 23:02:26 ronpinkas Exp $
  */
 
 /*
@@ -3672,10 +3672,7 @@ HARBOUR hb___msgGetData( void )
 
    hb_arrayGet( pObject, uiIndex, &(HB_VM_STACK.Return) );
 
-   if( HB_VM_STACK.Return.type == HB_IT_BLOCK && HB_VM_STACK.Return.item.asBlock.value->pSelfBase == NULL )
-   {
-      HB_VM_STACK.Return.item.asBlock.value->pSelfBase = pObject->item.asArray.value;
-   }
+   HB_VM_STACK.Return.item.asBlock.value->pSelfBase = pObject->item.asArray.value;
 }
 
 /*
