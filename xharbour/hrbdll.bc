@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.97 2005/09/18 21:33:08 paultucker Exp $
+# $Id: hrbdll.bc,v 1.98 2005/09/19 01:42:54 brianhays Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -491,6 +491,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\pplib.obj \
   $(OBJ_DIR)\pptable.obj \
   $(OBJ_DIR)\pragma.obj \
+  $(OBJ_DIR)\dbgentry.obj \
   $(OBJ_DIR)\dbgmenu.obj \
   $(OBJ_DIR)\dbgtmenu.obj \
   $(OBJ_DIR)\dbgtmitm.obj \
@@ -1174,6 +1175,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\mousewin.obj          + >> hdll.tmp
 !endif
 !endif
+  echo. $(OBJ_DIR)\dbgentry.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgmenu.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgtmenu.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgtmitm.obj          + >> hdll.tmp
@@ -2561,6 +2563,9 @@ $(OBJ_DIR)\dbfntx0.obj : $(OBJ_DIR)\dbfntx0.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbfntx1.obj : $(RDD_DIR)\dbfntx\dbfntx1.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dbgentry.obj : $(VM_DIR)\dbgentry.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbghelp.c : $(DEBUG_DIR)\dbghelp.prg
