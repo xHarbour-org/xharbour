@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.490 2005/09/22 23:02:26 ronpinkas Exp $
+ * $Id: hvm.c,v 1.491 2005/09/23 15:35:26 ronpinkas Exp $
  */
 
 /*
@@ -307,6 +307,7 @@ static BOOL     s_bDebugRequest;    /* debugger invoked via the VM */
 static BOOL     s_bDebugShowLines;  /* update source code line on the debugger display */
 static BOOL     s_bDebuggerIsWorking; /* to know when __DBGENTRY is beeing invoked */
 static PHB_SYMB s_pSymDbgEntry = NULL; /* Cached __DBGENTRY symbol */
+void (*hb_vm_pFunDbgEntry)( int nMode, int nLine, char *szName, int nIndex, int nFrame ) = NULL;
 
 /* Stores level of procedures call stack */
 static ULONG    s_ulProcLevel = 0;
@@ -7215,14 +7216,20 @@ static void hb_vmLocalName( USHORT uiLocal, char * szLocalName ) /* locals and p
    s_bDebugging = TRUE;
    s_bDebugShowLines = FALSE;
 
-   hb_vmPushSymbol( s_pSymDbgEntry );
-   hb_vmPushNil();
-   hb_vmPushLongConst( HB_DBG_LOCALNAME );
-   hb_vmPushLongConst( uiLocal );
-   hb_vmPushString( szLocalName, strlen( szLocalName ) );
-
    s_bDebuggerIsWorking = TRUE;
-   hb_vmDo( 3 );
+   if ( hb_vm_pFunDbgEntry )
+   {
+      hb_vm_pFunDbgEntry( HB_DBG_LOCALNAME, 0, szLocalName, uiLocal, 0 );
+   }
+   else
+   {
+      hb_vmPushSymbol( s_pSymDbgEntry );
+      hb_vmPushNil();
+      hb_vmPushLongConst( HB_DBG_LOCALNAME );
+      hb_vmPushLongConst( uiLocal );
+      hb_vmPushString( szLocalName, strlen( szLocalName ) );
+      hb_vmDo( 3 );
+   }
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
 }
@@ -7236,15 +7243,21 @@ static void hb_vmStaticName( USHORT uiStatic, char * szStaticName ) /* statics v
    s_bDebugging = TRUE;
    s_bDebugShowLines = FALSE;
 
-   hb_vmPushSymbol( s_pSymDbgEntry );
-   hb_vmPushNil();
-   hb_vmPushLongConst( HB_DBG_STATICNAME );
-   hb_vmPushLongConst( HB_VM_STACK.iStatics );  /* current static frame */
-   hb_vmPushLongConst( uiStatic );  /* variable index */
-   hb_vmPushString( szStaticName, strlen( szStaticName ) );
-
    s_bDebuggerIsWorking = TRUE;
-   hb_vmDo( 4 );
+   if ( hb_vm_pFunDbgEntry )
+   {
+      hb_vm_pFunDbgEntry( HB_DBG_STATICNAME, 0, szStaticName, uiStatic, HB_VM_STACK.iStatics );
+   }
+   else
+   {
+      hb_vmPushSymbol( s_pSymDbgEntry );
+      hb_vmPushNil();
+      hb_vmPushLongConst( HB_DBG_STATICNAME );
+      hb_vmPushLongConst( HB_VM_STACK.iStatics );  /* current static frame */
+      hb_vmPushLongConst( uiStatic );  /* variable index */
+      hb_vmPushString( szStaticName, strlen( szStaticName ) );
+      hb_vmDo( 4 );
+   }
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
 }
@@ -7256,19 +7269,33 @@ static void hb_vmModuleName( char * szModuleName ) /* PRG and function name info
    s_bDebugging = TRUE;
    s_bDebugShowLines = FALSE;
 
+   s_bDebuggerIsWorking = TRUE;
+
    /* Cache __DBGENTRY symbol to speed everything up */
-   if ( !s_pSymDbgEntry )
+   if ( !hb_vm_pFunDbgEntry && !s_pSymDbgEntry )
    {
       s_pSymDbgEntry = hb_dynsymFind( "__DBGENTRY" )->pSymbol;
+
+      /* Try to get C dbgEntry() function pointer */
+      hb_vmPushSymbol( s_pSymDbgEntry );
+      hb_vmPushNil();
+      hb_vmPushLongConst( HB_DBG_GETENTRY );
+      hb_vmDo( 1 );
    }
 
-   hb_vmPushSymbol( s_pSymDbgEntry );
-   hb_vmPushNil();
-   hb_vmPushLongConst( HB_DBG_MODULENAME );
-   hb_vmPushString( szModuleName, strlen( szModuleName ) );
+   if ( hb_vm_pFunDbgEntry )
+   {
+      hb_vm_pFunDbgEntry( HB_DBG_MODULENAME, 0, szModuleName, 0, 0 );
+   }
+   else
+   {
+      hb_vmPushSymbol( s_pSymDbgEntry );
+      hb_vmPushNil();
+      hb_vmPushLongConst( HB_DBG_MODULENAME );
+      hb_vmPushString( szModuleName, strlen( szModuleName ) );
 
-   s_bDebuggerIsWorking = TRUE;
-   hb_vmDo( 2 );
+      hb_vmDo( 2 );
+   }
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
 }
@@ -7400,11 +7427,18 @@ static void hb_vmDebuggerEndProc( void )
    hb_itemForwardValue( &item, &(HB_VM_STACK.Return) ); /* saves the previous returned value */
 
    s_bDebugShowLines = FALSE;
-   hb_vmPushSymbol( s_pSymDbgEntry );
-   hb_vmPushNil();
-   hb_vmPushLongConst( HB_DBG_ENDPROC );
    s_bDebuggerIsWorking = TRUE;
-   hb_vmDo( 1 );
+   if ( hb_vm_pFunDbgEntry )
+   {
+      hb_vm_pFunDbgEntry( HB_DBG_ENDPROC, 0, NULL, 0, 0 );
+   }
+   else
+   {
+      hb_vmPushSymbol( s_pSymDbgEntry );
+      hb_vmPushNil();
+      hb_vmPushLongConst( HB_DBG_ENDPROC );
+      hb_vmDo( 1 );
+   }
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
 
@@ -7416,12 +7450,19 @@ static void hb_vmDebuggerShowLine( USHORT uiLine ) /* makes the debugger shows a
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDebuggerShowLine(%hu)", uiLine));
 
    s_bDebugShowLines = FALSE;
-   hb_vmPushSymbol( s_pSymDbgEntry );
-   hb_vmPushNil();
-   hb_vmPushLongConst( HB_DBG_SHOWLINE );
-   hb_vmPushInteger( uiLine );
    s_bDebuggerIsWorking = TRUE;
-   hb_vmDo( 2 );
+   if ( hb_vm_pFunDbgEntry )
+   {
+      hb_vm_pFunDbgEntry( HB_DBG_SHOWLINE, uiLine, NULL, 0, 0 );
+   }
+   else
+   {
+      hb_vmPushSymbol( s_pSymDbgEntry );
+      hb_vmPushNil();
+      hb_vmPushLongConst( HB_DBG_SHOWLINE );
+      hb_vmPushInteger( uiLine );
+      hb_vmDo( 2 );
+   }
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
 }
@@ -9098,6 +9139,17 @@ HB_FUNC( HB_DBG_INVOKEDEBUG )
    hb_retl( bRequest );
 }
 
+
+BOOL HB_EXPORT
+hb_dbg_InvokeDebug( BOOL bInvoke )
+{
+   BOOL bRequest = s_bDebugRequest;
+
+   s_bDebugRequest = bInvoke;
+   return bRequest;
+}
+
+
 /* $Doc$
  * $FuncName$     <aStat> hb_dbg_vmVarSList()
  * $Description$  Return a clone of the statics array.
@@ -9123,6 +9175,14 @@ HB_FUNC( HB_DBG_VMVARSLEN )
    hb_retnl( s_aStatics.item.asArray.value->ulLen );
 }
 
+
+HB_EXPORT PHB_ITEM
+hb_dbg_vmVarSGet( int nStatic, int nOffset )
+{
+   return s_aStatics.item.asArray.value->pItems + nStatic + nOffset - 1;
+}
+
+
 /* $Doc$
  * $FuncName$     <xStat> hb_dbg_vmVarSGet(<nStatic>,<nOffset>)
  * $Description$  Return a specified statics
@@ -9132,7 +9192,7 @@ HB_FUNC( HB_DBG_VMVARSGET )
    HB_THREAD_STUB
 
    hb_itemCopy( &(HB_VM_STACK.Return),
-                s_aStatics.item.asArray.value->pItems + hb_parni( 1 ) + hb_parni( 2 ) - 1 );
+                hb_dbg_vmVarSGet( hb_parni( 1 ), hb_parni( 2 ) ) );
 }
 
 /* $Doc$
@@ -9143,6 +9203,14 @@ HB_FUNC( HB_DBG_VMVARSSET )
 {
    hb_itemCopy( s_aStatics.item.asArray.value->pItems + hb_parni(1) + hb_parni(2) - 1, hb_itemParamPtr( 3, HB_IT_ANY ) );
 }
+
+
+ULONG HB_EXPORT
+hb_dbg_ProcLevel( void )
+{
+   return s_ulProcLevel;
+}
+
 
 HB_FUNC( HB_DBG_PROCLEVEL )
 {
