@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4351 2005/09/23 15:00:52 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4352 2005/09/23 15:35:26 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-23 10:05 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/proc.c
+    * Restored utilization ofasBlock.value->pSelfBase which should now be safe.
 
 2005-09-23 08:34 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/classes.c
