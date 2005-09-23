@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.5 2005/04/30 15:41:57 lculik Exp $
+ * $Id: client.prg,v 1.6 2005/05/01 00:18:02 lculik Exp $
  */
 
 /*
@@ -122,7 +122,7 @@ METHOD New( oUrl, oCredentials,lTrace ) CLASS tIPClient
       InetInit()
       ::bInitSocks := .T.
    ENDIF
-   
+
    DO CASE
       CASE oUrl:cProto == "http"
          oRet := tIPClientHTTP():New(lTrace)
@@ -173,10 +173,12 @@ METHOD Open( cUrl ) CLASS tIPClient
 RETURN .T.
 
 METHOD Close() CLASS tIPClient
+   local nRet:=-1
    IF .not. Empty( ::SocketCon )
-      RETURN InetClose( ::SocketCon )
+      nRet:=InetClose( ::SocketCon )
+      ::SocketCon:=nil
    ENDIF
-RETURN -1
+RETURN(nRet)
 
 METHOD Reset() CLASS tIPClient
    ::bInitialized := .F.
@@ -344,7 +346,7 @@ METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
 RETURN ::nLastWrite
 METHOD InetSendAll( SocketCon, nLen, size ) CLASS tIPClient
 
-Local nRet 
+Local nRet
 
     if ::lTrace
        fWrite(::nHandle, [ Parameters recieved  on function InetSendAll  : SocketCon ] +cStr(SocketCon) + [  size  ] +cStr(size) + [  nLen  ] + cstr(nlen)  +hb_osnewline())
