@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4352 2005/09/23 15:35:26 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4353 2005/09/23 17:05:42 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-24 01:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbapi.h
+    + Added missing hb_memvarGetVarHandle() prototype.
+  * include/classes.h
+  * source/vm/classes.c
+    + Added hb_clsSetScope() - a C level equivalent for __SETCLASSSCOPE().
+  * include/hbdebug.ch
+  * include/hbvm.h
+  + source/vm/dbgentry.c
+  * source/vm/debug.c
+    * Rewrote the low level debugger routines as C code and added some API
+      functions and definitions to interact with the debugger UI.
+  * source/debug/debugger.prg
+    * Updated to use the new debugger API.
+  * source/vm/Makefile
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.nt
+  * makefile.pc
+  * makefile.vc
+  * makefile.wc
+    + Added dbgentry.c.
 
 2005-09-23 10:05 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/proc.c

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.163 2005/09/23 15:00:53 ronpinkas Exp $
+ * $Id: classes.c,v 1.164 2005/09/23 15:35:26 ronpinkas Exp $
  */
 
 /*
@@ -4350,6 +4350,17 @@ HB_FUNC( __SETCLASSSCOPE )
 
    hb_retl( bOldClsScope );
 }
+
+
+HB_EXPORT BOOL
+hb_clsSetScope( BOOL bClsScope )
+{
+   BOOL bOldClsScope = s_bClsScope;
+   
+   s_bClsScope = bClsScope;
+   return bOldClsScope;
+}
+
 
 /*
  * (C) 2003 - Francesco Saverio Giudice

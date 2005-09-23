@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.130 2005/09/02 04:16:02 paultucker Exp $
+# $Id: makefile.nt,v 1.131 2005/09/18 21:33:08 paultucker Exp $
 #
 
 #
@@ -1006,6 +1006,7 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\classes.obj \
    $(OBJ_DIR)$(MT)\cmdarg.obj \
    $(OBJ_DIR)$(MT)\codebloc.obj \
+   $(OBJ_DIR)$(MT)\dbgentry.obj \
    $(OBJ_DIR)$(MT)\debug.obj \
    $(OBJ_DIR)$(MT)\do.obj \
    $(OBJ_DIR)$(MT)\dynlibhb.obj \

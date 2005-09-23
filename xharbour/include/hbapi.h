@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.169 2005/08/13 15:00:35 walito Exp $
+ * $Id: hbapi.h,v 1.170 2005/09/04 04:29:00 walito Exp $
  */
 
 /*
@@ -611,6 +611,7 @@ extern           void     hb_memvarNewParameter( PHB_SYMB pSymbol, PHB_ITEM pVal
 extern           char   * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen );
 extern           void     hb_memvarCreateFromItem( PHB_ITEM pMemvar, BYTE bScope, PHB_ITEM pValue );
 extern           int      hb_memvarScope( char * szVarName ); /* retrieve scope of a dynamic variable symbol */
+extern           HB_HANDLE hb_memvarGetVarHandle( char *szName ); /* retrieve handle of a variable */
 extern HB_EXPORT PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar );
 extern           PHB_ITEM hb_memvarDetachLocal( HB_ITEM_PTR pLocal ); /* Detach a local variable from the eval stack */
 

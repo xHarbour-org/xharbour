@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.19 2004/11/21 21:44:24 druzus Exp $
+# $Id: Makefile,v 1.20 2004/11/23 18:22:44 mauriliolongo Exp $
 #
 
 ROOT = ../../
@@ -26,6 +26,7 @@ C_SOURCES=\
 	break.c      \
 	classes.c    \
 	cmdarg.c     \
+	dbgentry.c   \
 	debug.c      \
 	do.c         \
 	dynlibhb.c   \

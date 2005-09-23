@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.15 2005/04/26 05:38:04 ronpinkas Exp $
+ * $Id: debug.c,v 1.16 2005/09/22 01:12:00 druzus Exp $
  */
 
 /*
@@ -233,10 +233,10 @@ static void hb_dbgStop(void)
 {
 }
 
-HB_FUNC( HB_DBG_VMVARLGET )
+
+HB_EXPORT PHB_ITEM
+hb_dbg_vmVarLGet( int iLevel, int iLocal )
 {
-   int iLevel = hb_parni( 1 ) + 1;
-   int iLocal = hb_parni( 2 );
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
 
    while( ( iLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
@@ -253,20 +253,33 @@ HB_FUNC( HB_DBG_VMVARLGET )
 
    if( iLocal >= 0 )
    {
-     hb_itemCopy( &(HB_VM_STACK.Return), hb_itemUnRef( *(pBase + 1 + iLocal) ) );
+      return hb_itemUnRef( *(pBase + 1 + iLocal) );
+   }
+   if ( HB_IS_BLOCK( *(pBase+1) ) )
+   {
+      return hb_codeblockGetVar( *(pBase+1), ( LONG ) iLocal );
+   }
+   return NULL;
+}
+
+
+HB_FUNC( HB_DBG_VMVARLGET )
+{
+   int iLevel = hb_parni( 1 ) + 1;
+   int iLocal = hb_parni( 2 );
+   HB_ITEM *pItem;
+
+   pItem = hb_dbg_vmVarLGet( iLevel, iLocal );
+   if (pItem)
+   {
+      hb_itemCopy( &(HB_VM_STACK.Return), pItem );
    }
    else
    {
-     if( HB_IS_BLOCK( *(pBase+1) ) )
-     {
-        hb_itemCopy( &(HB_VM_STACK.Return), hb_codeblockGetVar( *(pBase+1), ( LONG ) iLocal ) );
-     }
-     else
-     {
-        hb_errRT_BASE( EG_ARG, 9999, NULL, "HB_DBG_VMVARLGET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-     }
+      hb_errRT_BASE( EG_ARG, 9999, NULL, "HB_DBG_VMVARLGET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 }
+
 
 HB_FUNC( HB_DBG_VMVARLSET )
 {

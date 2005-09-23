@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbdebug.ch,v 1.1 2004/01/27 09:56:08 likewolf Exp $
  */
 
 /*
@@ -61,5 +61,7 @@
 #define HB_DBG_STATICNAME     3  /* 2nd arg is a static var name */
 #define HB_DBG_ENDPROC        4  /* exit from a procedure */
 #define HB_DBG_SHOWLINE       5  /* show current line */
+#define HB_DBG_GETENTRY       6  /* initialize C __dbgEntry function pointer */
+#define HB_DBG_ACTIVATE       7  /* activate debugger interface */
 
 #endif /* HB_DEBUGGER_CH_ */

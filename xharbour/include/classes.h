@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.17 2005/08/23 10:59:02 druzus Exp $
+ * $Id: classes.h,v 1.18 2005/09/04 04:29:00 walito Exp $
  */
 
 /*
@@ -153,6 +153,8 @@ extern HB_EXPORT PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC p
 
 extern HB_EXPORT PCLASS hb_clsClassesArray( void );
 extern HB_EXPORT USHORT hb_clsMaxClasses( void );
+
+extern HB_EXPORT BOOL hb_clsSetScope( BOOL bClsScope );
 
 extern HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
 extern HB_EXPORT ULONG   hb_objGetOpOver( const PHB_ITEM pObject );

@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.gc,v 1.11 2005/09/02 15:46:11 paultucker Exp $
+# $Id: makefile.gc,v 1.12 2005/09/18 21:33:08 paultucker Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -3571,6 +3571,7 @@ $(VM_LIB) : \
    $(VM_OBJ_DIR)/classes.o \
    $(VM_OBJ_DIR)/cmdarg.o \
    $(VM_OBJ_DIR)/codebloc.o \
+   $(VM_OBJ_DIR)/dbgentry.o \
    $(VM_OBJ_DIR)/debug.o \
    $(VM_OBJ_DIR)/do.o \
    $(VM_OBJ_DIR)/dynlibhb.o \
@@ -3624,6 +3625,9 @@ $(VM_OBJ_DIR)/cmdarg.o : $(VM_DIR)/cmdarg.c
 	$(CC_CMD)
 
 $(VM_OBJ_DIR)/codebloc.o : $(VM_DIR)/codebloc.c
+	$(CC_CMD)
+
+$(VM_OBJ_DIR)/dbgentry.o : $(VM_DIR)/dbgentry.c
 	$(CC_CMD)
 
 $(VM_OBJ_DIR)/debug.o : $(VM_DIR)/debug.c

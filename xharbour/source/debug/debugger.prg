@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.59 2005/06/11 09:15:38 likewolf Exp $
+ * $Id: debugger.prg,v 1.60 2005/06/11 10:44:20 likewolf Exp $
  */
 
 /*
@@ -99,43 +99,29 @@
 
 
 /* Information structure stored in DATA aCallStack */
-#define CSTACK_FUNCTION    1  //function name
-#define CSTACK_LOCALS      2  //an array with local variables
+#define CSTACK_MODULE      1  //module name (.PRG file)
+#define CSTACK_FUNCTION    2  //function name
 #define CSTACK_LINE        3  //start line
-#define CSTACK_MODULE      4  //module name (.PRG file)
-#define CSTACK_STATICS     5  //an array with static variables
-#define CSTACK_LEVEL       6  //eval stack level of the function
+#define CSTACK_LEVEL       4  //eval stack level of the function
+#define CSTACK_LOCALS      5  //an array with local variables
+#define CSTACK_STATICS     6  //an array with static variables
 
 /* Information structure stored in aCallStack[n][ CSTACK_LOCALS ]
    { cLocalName, nLocalIndex, "Local", ProcName( 1 ), nLevel } */
 #define VAR_NAME        1
 #define VAR_POS         2
 #define VAR_TYPE        3
-#define VAR_FUNCNAME    4
-#define VAR_LEVEL       5  //eval stack level of the function
+#define VAR_LEVEL       4  //eval stack level of the function
 
 /* Information structure stored in ::aWatch (watchpoints) */
 #define WP_TYPE      1  //wp = watchpoint, tr = tracepoint
 #define WP_EXPR      2  //source of an expression
-#define WP_BLOCK     3  //codeblock to retrieve a value
 
-/* Information structure stored in ::aTrace (tracepoints) */
-#define TR_IDX       1  //index into ::aWatch item storing expression
-#define TR_VALUE     2  //the current value of the expression
 
 static s_oDebugger
-static s_lExit := .F.
-
-memvar __DbgStatics
 
 
 procedure __dbgAltDEntry()
-   /*s_lExit := .f.
-   if !s_oDebugger==nil    // protects if altd() in code and debugger
-                                // linked but not active
-      s_oDebugger:lGo := .F.
-      __dbgEntry( HB_DBG_SHOWLINE, ProcLine( 2 ) )
-   endif*/
    /* do not activate the debugger imediatelly because the module
       where ALTD() was called can have no debugger info - stop
       on first LINE with debugged info
@@ -143,198 +129,48 @@ procedure __dbgAltDEntry()
    HB_DBG_INVOKEDEBUG( SET( _SET_DEBUG ) )
 return
 
-procedure __dbgEntry( nMode, uParam1, uParam2, uParam3 )  // debugger entry point
 
-   local cModuleName, cProcName, cProcPrec
-   local nStaticsBase, nStaticIndex, cStaticName
-   local cLocalName, nLocalIndex
-   local nVarIndex, cVarName
-   local nAt, nSFrame
-   LOCAL aTrace, uValue, lSuccess, nLen
+procedure __dbgEntry( nMode, uParam1, uParam2, uParam3, uParam4, uParam5 )  // debugger entry point
+  LOCAL bStartup := .F.
+  
+  DO CASE
+    CASE nMode == HB_DBG_GETENTRY
+      HB_INLINE()
+      {
+         extern void ( *hb_vm_pFunDbgEntry )( int nMode, int nLine, char *szName, int nIndex, int nFrame );
+         extern void hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame );
+       
+         hb_vm_pFunDbgEntry = hb_dbgEntry;
+      }
 
-   IF( __MVSCOPE( "__DBGSTATICS" ) != HB_MV_PUBLIC )
-     public __DbgStatics
-     __DbgStatics := {}
-   ENDIF
-
-   do case
-      case nMode == HB_DBG_SHOWLINE
-        IF( s_lExit )
+    CASE nMode == HB_DBG_ACTIVATE
+      IF s_oDebugger == NIL
+        bStartup := .T.
+        s_oDebugger := TDebugger():New()
+        s_oDebugger:pInfo := uParam1
+      ENDIF
+      s_oDebugger:nProcLevel := uParam2
+      s_oDebugger:aCallStack := uParam3
+      s_oDebugger:aStaticModules := uParam4
+      s_oDebugger:aBreakPoints := uParam5
+      IF bStartup
+        IF s_oDebugger:lRunAtStartup
+          HB_INLINE( uParam1 )
+          {
+            hb_dbgSetGo( hb_parptr( 1 ) );
+          }
           RETURN
         ENDIF
-        IF s_oDebugger:lTracepoints
-          nLen := LEN(s_oDebugger:aTrace)
-          FOR nAt:=1 TO nLen
-            aTrace := s_oDebugger:aTrace[ nAt ]
-            uValue := GetWatchValue( s_oDebugger:aWatch[ aTrace[TR_IDX] ], @lSuccess, hb_dbg_ProcLevel()-1 )
-            IF !lSuccess
-              uValue := NIL
-            ENDIF
-            IF ( (VALTYPE(uValue) != VALTYPE(aTrace[TR_VALUE])) .OR. ;
-                 (uValue != aTrace[TR_VALUE]) )
-              aTrace[TR_VALUE] := uValue
-              s_oDebugger:lTrace :=.F.
-              s_oDebugger:lCodeblock :=.F.
-              s_oDebugger:lGo :=.F.
-              s_oDebugger:lToCursor :=.F.
-              s_oDebugger:lNextRoutine :=.F.
-              s_oDebugger:aCallStack[ 1 ][CSTACK_LINE] := uParam1
-              s_oDebugger:nProcLevel := hb_dbg_Proclevel() - IIf( ProcName( 2 ) == "ALTD", 3, 1 )
-              s_oDebugger:Activate()
-              RETURN
-            ENDIF
-          NEXT
-        ENDIF
-
-        // set the current line number on the CallStack
-        if s_oDebugger:lTrace
-          //In TRACE mode (step over procedure)
-          IF s_oDebugger:nTraceLevel < Len( s_oDebugger:aCallStack )
-            s_oDebugger:lTrace := (! s_oDebugger:IsBreakPoint( uParam1, s_oDebugger:aCallStack[1][ CSTACK_MODULE ] ) ;
-                                   .AND. !HB_DBG_INVOKEDEBUG())
-            IF s_oDebugger:lTrace
-              RETURN
-            ENDIF
-          ELSE
-            //Return back into a current procedure
-            s_oDebugger:lTrace := .f.
-          ENDIF
-        endif
-
-        IF s_oDebugger:lToCursor
-          IF ( s_oDebugger:aToCursor[1] == uParam1 .AND. ;
-               FILENAME_EQUAL( s_oDebugger:aToCursor[2], ;
-                               s_oDebugger:aCallStack[1][ CSTACK_MODULE ] ) )
-            s_oDebugger:lToCursor := .F.
-          ELSE
-            s_oDebugger:lToCursor := ( !s_oDebugger:IsBreakPoint( uParam1, s_oDebugger:aCallStack[1][ CSTACK_MODULE ] ) ;
-                                       .AND. !HB_DBG_INVOKEDEBUG() )
-            if s_oDebugger:lToCursor
-              RETURN
-            ENDIF
-          ENDIF
-        ENDIF
-
-        IF s_oDebugger:lNextRoutine .AND. !HB_DBG_INVOKEDEBUG()
-          s_oDebugger:lNextRoutine := ( !s_oDebugger:IsBreakPoint( uParam1, s_oDebugger:aCallStack[1][ CSTACK_MODULE ] ) ;
-                                        .AND. !HB_DBG_INVOKEDEBUG() )
-          if s_oDebugger:lNextRoutine
-            RETURN
-          ENDIF
-        ENDIF
-
-        if s_oDebugger:lGo
-          s_oDebugger:lGo := ! s_oDebugger:IsBreakPoint( uParam1, s_oDebugger:aCallStack[1][ CSTACK_MODULE ] )
-        endif
-
-        IF s_oDebugger:lCodeblock
-          s_oDebugger:lCodeblock := .F.
-          IF !s_oDebugger:lCBTrace
-            RETURN
-          ENDIF
-        ENDIF
-
-        s_oDebugger:aCallStack[ 1 ][CSTACK_LINE] := uParam1
-        if !s_oDebugger:lGo .or. HB_DBG_INVOKEDEBUG()
-          s_oDebugger:lGo := .F.
-          s_oDebugger:nProcLevel := hb_dbg_Proclevel() - IIf( ProcName( 2 ) == "ALTD", 3, 1 )
-          s_oDebugger:Activate()
-        endif
-
-      case nMode == HB_DBG_MODULENAME  // called from hvm.c hb_vmModuleName()
-        // add a call to the stack but don't try to show the code yet
-        cProcName := ProcName( 1 )
-
-        if cProcName == "(_INITSTATICS)"
-          //module wide static variable
-          AADD( __dbgStatics, { strip_path( uParam1 ), {} } )
-          return  // We can not use s_oDebugger yet, so we return
-        endif
-
-        IF s_lExit
-          RETURN
-        ENDIF
-
-        IF( s_oDebugger == NIL )
-          s_oDebugger := TDebugger():New()
-        ENDIF
-        if Left( cProcName, 3 ) == "(b)" // cProcName == "__EVAL" .OR. cProcName == "EVAL"
-          s_oDebugger:lCodeblock := .T.
-        ELSE
-          IF( s_oDebugger:lNextRoutine )
-            s_oDebugger:lNextRoutine :=.F.
-          ENDIF
-        endif
-        s_oDebugger:StackProc( uParam1, hb_dbg_ProcLevel() - 1 )
-
-      case nMode == HB_DBG_ENDPROC
-        if ProcName( 1 ) == "(_INITSTATICS)"
-          return
-        endif
-
-        IF s_lExit
-          RETURN
-        ENDIF
-
-        if s_oDebugger:lCodeblock
-          s_oDebugger:lCodeblock := .F.
-        endif
-        s_oDebugger:EndProc()
-
-      case nMode == HB_DBG_LOCALNAME
-        IF s_lExit
-          RETURN
-        ENDIF
-
-        cProcName := IIF( s_oDebugger:lCodeblock, s_oDebugger:aCallStack[1][CSTACK_FUNCTION], ProcName( 1 ) )
-        nVarIndex := uParam1
-        cVarName  := IIF(valtype(uParam2)=='C',uParam2,'NIL')
-        nAt       := hb_dbg_ProcLevel()-1
-
-        AAdd( s_oDebugger:aCallStack[ 1 ][ CSTACK_LOCALS ], ;
-              { cVarName, nVarIndex, "Local", cProcName, nAt } )
-
-        if s_oDebugger:lShowLocals
-          if ( nAt := AScan( s_oDebugger:aVars, ; // Is there another var with this name ?
-                             { | aVar | aVar[ 1 ] == cVarName } ) ) != 0
-            s_oDebugger:aVars[ nAt ] := ATAIL( s_oDebugger:aCallStack[ 1 ][ CSTACK_LOCALS ] )
-          else
-            AAdd( s_oDebugger:aVars, ATAIL( s_oDebugger:aCallStack[ 1 ][ CSTACK_LOCALS ] ) )
-          endif
-        endif
-
-      case nMode == HB_DBG_STATICNAME
-        nSFrame   := uParam1
-        nVarIndex := uParam2
-        cVarName  := uParam3
-        cProcName := ProcName( 1 )
-        if cProcName == "(_INITSTATICS)"
-          //module wide static variable
-          AAdd( ATAIL(__DbgStatics)[2], { cVarName, nVarIndex, "Static",, nSFrame } )
-          return  // We can not use s_oDebugger yet, so we return
-        endif
-
-        IF s_lExit
-          RETURN
-        ENDIF
-
-        AAdd( s_oDebugger:aCallStack[ 1 ][ CSTACK_STATICS ], { cVarName, nVarIndex, "Static",, nSFrame } )
-
-        if s_oDebugger:lShowStatics
-          if ( nAt := AScan( s_oDebugger:aVars,; // Is there another var with this name ?
-            { | aVar | aVar[ VAR_NAME ] == cVarName } ) ) != 0
-            s_oDebugger:aVars[ nAt ] := ATAIL( s_oDebugger:aCallStack[ 1 ][ CSTACK_STATICS ] )
-          else
-            AAdd( s_oDebugger:aVars, ATAIL( s_oDebugger:aCallStack[ 1 ][ CSTACK_STATICS ] ) )
-          endif
-        endif
-
-   endcase
+      ENDIF
+      s_oDebugger:lGo := .F.
+      s_oDebugger:Activate()
+  ENDCASE
 
 return
 
-CLASS TDebugger
 
+CLASS TDebugger
+   DATA   pInfo
    DATA   aWindows, nCurrentWindow
    DATA   oPullDown
    DATA   oWndCode, oWndCommand, oWndStack, oWndVars
@@ -348,8 +184,9 @@ CLASS TDebugger
    DATA   aCallStack    //stack of procedures with debug info
    DATA   aProcStack    //stack of all procedures
    DATA   nProcLevel    //procedure level where the debugger is currently
+   DATA   aStaticModules // array of modules with static variables
    DATA   aColors
-   DATA   aWatch, aTrace, lTracepoints
+   DATA   aWatch
    DATA   aLastCommands, nCommand, oGetListCommand
    DATA   lAnimate, lEnd, lCaseSensitive, lMonoDisplay, lSortVars
    DATA   cSearchString, cPathForFiles, cSettingsFileName, aPathDirs
@@ -357,14 +194,8 @@ CLASS TDebugger
    DATA   lShowPublics, lShowPrivates, lShowStatics, lShowLocals, lAll
    DATA   lShowCallStack
    DATA   lGo           //stores if GO was requested
-   DATA   lTrace        //stores if TRACE over procedure was requested
-   DATA   nTraceLevel   //procedure level where TRACE was requested
-   DATA   lCodeblock INIT .F.
    DATA   lActive INIT .F.
    DATA   lCBTrace INIT .T.   //stores if codeblock tracing is allowed
-   DATA   lToCursor INIT .F.
-   DATA   aToCursor
-   DATA   lNextRoutine INIT .F.
    DATA   oBrwPnt, oWndPnt
    DATA   lPPO INIT .F.
    DATA   lRunAtStartup
@@ -385,6 +216,7 @@ CLASS TDebugger
    METHOD ClrModal() INLINE iif( ::lMonoDisplay, "N/W, W+/W, W/N, W+/N",;
                                 "N/W, R/W, N/BG, R/BG" )
 
+   METHOD CodeblockTrace()
    METHOD CodeWindowProcessKey( nKey )
    METHOD Colors()
    METHOD CommandWindowProcessKey( nKey )
@@ -393,10 +225,10 @@ CLASS TDebugger
    METHOD EditColor( nColor, oBrwColors )
    METHOD EditSet( nSet, oBrwSets )
    METHOD EditVar( nVar )
-   METHOD EndProc()
    METHOD Exit() INLINE ::lEnd := .t.
    METHOD FindNext()
    METHOD FindPrevious()
+   METHOD GetExprValue( xExpr, lValid )
    METHOD Go()
    METHOD GoToLine( nLine )
    METHOD HandleEvent()
@@ -405,7 +237,6 @@ CLASS TDebugger
    METHOD HideVars()
    METHOD InputBox( cMsg, uValue, bValid, lEditable )
    METHOD Inspect( uValue, cValueName )
-   METHOD IsBreakPoint( nLine, cPrgName )
    METHOD LoadColors()
    METHOD LoadSettings()
    METHOD LoadVars()
@@ -419,7 +250,6 @@ CLASS TDebugger
    METHOD NextWindow()
    METHOD Open()
    METHOD OpenPPO()
-//   METHOD Resume() INLINE IIF( LEN(::aCallStack[1])>0, ::ShowCodeLine( ::aCallStack[1][ CSTACK_LINE ], ::aCallStack[1][ CSTACK_MODULE ] ), NIL)
    METHOD Resume() INLINE ::ShowCodeLine( 1 )
    METHOD OSShell()
    METHOD PathForFiles( cPathForFiles )
@@ -427,7 +257,7 @@ CLASS TDebugger
    METHOD PrevWindow()
    METHOD Private()
    METHOD Public()
-   METHOD Quit() INLINE ::Exit(), ::Hide(), s_lExit := .T., s_oDebugger := NIL, __QUIT()
+   METHOD Quit()
    METHOD RefreshVars()
    METHOD RestoreAppScreen()
    METHOD RestoreAppState()
@@ -440,7 +270,6 @@ CLASS TDebugger
    METHOD ShowAppScreen()
    METHOD ShowCallStack()
    METHOD ShowCodeLine( nProc )
-   METHOD StackProc( cModuleName, nProcLevel )
    METHOD ShowHelp( nTopic )
    METHOD ShowVars()
    METHOD RedisplayBreakpoints()
@@ -464,12 +293,10 @@ CLASS TDebugger
 
    METHOD ToggleBreakPoint()
 
-   METHOD Trace() INLINE ::lTrace := .t., ::nTraceLevel := Len( ::aCallStack ),;
-                         ::Step() //forces a Step()
+   METHOD Trace()
 
    METHOD ToCursor()
    METHOD NextRoutine()
-   METHOD CodeblockTrace() INLINE ::oPullDown:GetItemByIdent( "CODEBLOCK" ):checked := ::lCBTrace := ! ::lCBTrace
    METHOD ViewSets()
    METHOD WndVarsLButtonDown( nMRow, nMCol )
    METHOD LineNumbers( lLineNumbers ) // Toggles numbering of source code lines
@@ -485,7 +312,7 @@ CLASS TDebugger
    METHOD WatchpointsShow()
    METHOD WatchpointsHide()
    METHOD WatchpointEdit( nVar )
-   METHOD WatchGetInfo( aVar )
+   METHOD WatchGetInfo( nWatch )
 
    METHOD VarGetInfo( aVar )
    METHOD VarGetValue( aVar )
@@ -507,12 +334,10 @@ METHOD New() CLASS TDebugger
    ::nCurrentWindow    := 1
    ::lAnimate          := .f.
    ::lEnd              := .f.
-   ::lTrace            := .f.
    ::aBreakPoints      := {}
    ::aWatch            := {}
-   ::aTrace            := {}
-   ::lTracepoints      := .F.
    ::aCallStack        := {}
+   ::aStaticModules    := {}
    ::aProcStack        := {}
    ::aVars             := {}
    ::lCaseSensitive    := .f.
@@ -563,7 +388,6 @@ METHOD New() CLASS TDebugger
       ::LoadSettings()
    endif
    ::lGo := ::lRunAtStartup
-
 return Self
 
 
@@ -642,7 +466,7 @@ METHOD BuildBrowseStack() CLASS TDebugger
       ::oBrwStack:Cargo := 1 // Actual highligthed row
 
       ::oBrwStack:AddColumn( TBColumnNew( "", { || If( Len( ::aProcStack ) > 0,;
-            PadC( ::aProcStack[ ::oBrwStack:Cargo ][ 1 ], 14 ), Space( 14 ) ) } ) )
+            PadC( ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_FUNCTION ], 14 ), Space( 14 ) ) } ) )
    endif
 
 return nil
@@ -757,6 +581,16 @@ METHOD CallStackProcessKey( nKey ) CLASS TDebugger
    endif
 
 return nil
+
+
+METHOD CodeblockTrace()
+  ::oPullDown:GetItemByIdent( "CODEBLOCK" ):checked := ::lCBTrace := ! ::lCBTrace
+  HB_INLINE( ::pInfo, ::lCBTrace )
+  {
+    hb_dbgSetCBTrace( hb_parptr( 1 ), hb_parl( 2 ) );
+  }
+RETURN NIL
+
 
 METHOD CodeWindowProcessKey( nKey ) CLASS TDebugger
 
@@ -951,25 +785,19 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
       CASE cCommand == "??" .OR. cCommand == "?"
          aCmnd[WP_TYPE] := cCommand
          aCmnd[WP_EXPR] := cParam
-         cResult := CreateExpression( cParam, aCmnd )
-         IF( EMPTY(cResult) )
-            //valid syntax
-            ::RestoreAppState()
-            cResult := GetWatchValue( aCmnd, @lValid )
-            ::SaveAppState()
-            IF( aCmnd[WP_TYPE] == "??" )
-               IF( lValid )
-                  ::Inspect( aCmnd[WP_EXPR], cResult )
-               ENDIF
-               cResult := ''  //discard result
-            ELSE
-               IF( lValid )
-                  cResult := ValToStr( cResult )
-               ENDIF
+         
+         ::RestoreAppState()
+         cResult := ::GetExprValue( cParam, @lValid )
+         ::SaveAppState()
+         
+         IF( aCmnd[WP_TYPE] == "??" )
+            IF( lValid )
+               ::Inspect( aCmnd[WP_EXPR], cResult )
             ENDIF
+            cResult := ''  //discard result
          ELSE
-            IF( aCmnd[WP_TYPE] == "??" )
-               cResult := ''  //ignore error
+            IF( lValid )
+               cResult := ValToStr( cResult )
             ENDIF
          ENDIF
 
@@ -989,7 +817,7 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
            ELSE
               cParam1 := ::cPrgName
            ENDIF
-           AAdd( ::aBreakPoints, { Val( cParam ), strip_path( cParam1 ) } )
+           ::ToggleBreakPoint( Val( cParam ), strip_path( cParam1 ) )
         ELSE
            ::ToggleBreakPoint()
         ENDIF
@@ -1114,6 +942,33 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
          ELSE
             cResult := "Command error"
          ENDIF
+
+      CASE starts( "WINDOW", cCommand )
+         IF ( n := At( " ", cParam ) ) > 0
+            cParam1 := AllTrim( SubStr( cParam, n + 1 ) )
+            cParam := Left( cParam, n - 1 )
+         ENDIF
+         DO CASE
+            CASE starts( "MOVE", cParam )
+               WITH OBJECT ::aWindows[ ::nCurrentWindow ]
+                  n := At( " ", cParam1 )
+                  IF n > 0
+                    n := Val( SubStr( cParam1, n ) )
+                  ENDIF
+                  :Resize( Val( cParam1 ), n, ;
+                           :nBottom + Val( cParam1 ) - :nTop, :nRight + n - :nLeft )
+               END
+            CASE starts( "NEXT", cParam )
+               ::NextWindow()
+            CASE starts( "SIZE", cParam )
+               WITH OBJECT ::aWindows[ ::nCurrentWindow ]
+                  n := At( " ", cParam1 )
+                  IF Val( cParam1 ) >= 2 .AND. n > 0 .AND. Val( SubStr( cParam1, n ) ) > 0
+                     :Resize( :nTop, :nLeft, Val( cParam1 ) - 1 + :nTop, ;
+                              Val( SubStr( cParam1, n ) ) - 1 + :nLeft )
+                  ENDIF
+               END
+          ENDCASE
 
       CASE starts( "WP", cCommand )
          ::WatchpointAdd( cParam )
@@ -1269,17 +1124,6 @@ METHOD EditVar( nVar ) CLASS TDebugger
 
 return nil
 
-METHOD EndProc() CLASS TDebugger
-
-   if Len( ::aCallStack ) > 0
-      ADel( ::aCallStack, 1, .T. )
-      if ::oBrwStack != nil .and. ! ::lTrace
-         ::oBrwStack:RefreshAll()
-      endif
-   endif
-
-return nil
-
 
 METHOD FindNext() CLASS TDebugger
 RETURN ::Locate( 1, ::cSearchString )
@@ -1287,6 +1131,51 @@ RETURN ::Locate( 1, ::cSearchString )
 
 METHOD FindPrevious() CLASS TDebugger
 RETURN ::Locate( 2, ::cSearchString )
+
+
+METHOD GetExprValue( xExpr, lValid ) CLASS TDebugger
+  LOCAL xResult, oErr, bOldErrorBlock
+
+  lValid := .F.
+  bOldErrorBlock := ErrorBlock( {|oErr| Break( oErr ) } )
+  BEGIN SEQUENCE
+    xResult := HB_INLINE( ::pInfo, xExpr, @lValid )
+    {
+      PHB_ITEM item;
+      
+      if ( ISCHAR( 2 ) )
+      {
+        item = hb_dbgGetExpressionValue( hb_parptr( 1 ), hb_parc( 2 ) );
+      }
+      else
+      {
+        item = hb_dbgGetWatchValue( hb_parptr( 1 ), hb_parni( 2 ) - 1 );
+      }
+
+      if ( item )
+      {
+        hb_itemRelease( hb_itemReturn( item ) );
+        hb_storl( TRUE, 3 );
+      }
+      else
+      {
+        hb_storl( FALSE, 3 );
+        hb_ret();
+      }
+    }
+    IF !lValid
+      xResult := "Syntax error"
+    ENDIF
+  RECOVER USING oErr
+    xResult := oErr:operation + ": " + oErr:description
+    IF ValType( oErr:args ) == 'A'
+      xResult += "; arguments:"
+      AEval( oErr:args, {|x| xResult += " " + AllTrim( CStr( x ) ) } )
+    ENDIF
+      lValid := .F.
+   END SEQUENCE
+   ErrorBlock( bOldErrorBlock )
+RETURN xResult
 
 
 METHOD Go() CLASS TDebugger
@@ -1297,7 +1186,10 @@ METHOD Go() CLASS TDebugger
   ENDIF
   ::RestoreAppScreen()
   ::RestoreAppState()
-  ::lGo := .T.
+  HB_INLINE( ::pInfo )
+  {
+    hb_dbgSetGo( hb_parptr( 1 ) );
+  }
   ::Exit()
 RETURN NIL
 
@@ -1644,11 +1536,6 @@ METHOD Inspect( uValue, cValueName ) CLASS TDebugger
 return nil
 
 
-METHOD IsBreakPoint( nLine, cPrgName ) CLASS TDebugger
-RETURN AScan( ::aBreakPoints, {|aBreak| aBreak[ 1 ] == nLine ;
-                                        .AND. FILENAME_EQUAL( aBreak[ 2 ], cPrgName ) } ) != 0
-
-
 METHOD LineNumbers( lLineNumbers ) CLASS TDebugger
 
    If( lLineNumbers == NIL, lLineNumbers := !::lLineNumbers, )
@@ -1678,7 +1565,7 @@ METHOD LoadCallStack() CLASS TDebugger
       //a procedure with debug info
       ::aProcStack[i-nDebugLevel+1] := ::aCallStack[ nPos ]
     ELSE
-      ::aProcStack[i-nDebugLevel+1] := { PROCNAME( i )+"("+NTRIM(PROCLINE(i))+")", ,,,, nLevel }
+      ::aProcStack[i-nDebugLevel+1] := { , PROCNAME( i )+"("+NTRIM(PROCLINE(i))+")", , nLevel, , }
     ENDIF
   NEXT
 RETURN NIL
@@ -1721,9 +1608,9 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
       nCount := __mvDbgInfo( HB_MV_PUBLIC )
       for n := nCount to 1 step -1
          xValue := __mvDbgInfo( HB_MV_PUBLIC, n, @cName )
-         if cName != "__DBGSTATICS"  // reserved public used by the debugger
+         //if cName != "__DBGSTATICS"  // reserved public used by the debugger
             AAdd( aBVars, { cName, xValue, "Public" } )
-         endif
+         //endif
       next
    endif
 
@@ -1737,20 +1624,18 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
 
    IF ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] != nil
       if ::lShowStatics
-         if Type( "__DbgStatics" ) == "A"
-            cName := ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_MODULE ]
-            n := ASCAN( __dbgStatics, {|a| FILENAME_EQUAL( a[1], cName ) } )
-            IF ( n > 0 )
-               aVars := __DbgStatics[ n ][ 2 ]
-               for m := 1 to Len( aVars )
-                  AAdd( aBVars, aVars[ m ] )
-               next
-            ENDIF
-            aVars := ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_STATICS ]
-            for n := 1 to Len( aVars )
-               AAdd( aBVars, aVars[ n ] )
+         cName := ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_MODULE ]
+         n := ASCAN( ::aStaticModules, {|a| FILENAME_EQUAL( a[1], cName ) } )
+         IF ( n > 0 )
+            aVars := ::aStaticModules[ n ][ 2 ]
+            for m := 1 to Len( aVars )
+               AAdd( aBVars, aVars[ m ] )
             next
-         endif
+         ENDIF
+         aVars := ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_STATICS ]
+         for n := 1 to Len( aVars )
+            AAdd( aBVars, aVars[ n ] )
+         next
       endif
 
       if ::lShowLocals
@@ -1845,7 +1730,10 @@ return nil
 METHOD NextRoutine() CLASS TDebugger
   ::RestoreAppScreen()
   ::RestoreAppState()
-  ::lNextRoutine := .T.
+  HB_INLINE( ::pInfo )
+  {
+    hb_dbgSetNextRoutine( hb_parptr( 1 ) );
+  }
   ::Exit()
 RETURN self
 
@@ -1983,6 +1871,18 @@ METHOD OSShell() CLASS TDebugger
    SetColor( cColors )
 
 return nil
+
+
+METHOD Quit() CLASS TDebugger
+  ::Exit()
+  ::Hide()
+  HB_INLINE( ::pInfo )
+  {
+    hb_dbgSetQuit( hb_parptr( 1 ) );
+  }
+  s_oDebugger := NIL
+  __QUIT()
+RETURN NIL
 
 
 METHOD PathForFiles( cPathForFiles ) CLASS TDebugger
@@ -2281,15 +2181,6 @@ METHOD SaveSettings() CLASS TDebugger
          cInfo += "Run Speed " + AllTrim( Str( ::nSpeed ) ) + HB_OsNewLine()
       endif
 
-      for n := 1 to Len( ::aWindows )
-         oWnd := ::aWindows[ n ]
-         cInfo += "Window Size " + AllTrim( Str( oWnd:nBottom - oWnd:nTop + 1 ) ) + " "
-         cInfo += AllTrim( Str( oWnd:nRight - oWnd:nLeft + 1 ) ) + HB_OsNewLine()
-         cInfo += "Window Move " + AllTrim( Str( oWnd:nTop ) ) + " "
-         cInfo += AllTrim( Str( oWnd:nLeft ) ) + HB_OsNewLine()
-         cInfo += "Window Next" + HB_OsNewLine()
-      next
-
       if ::nTabWidth != 4
          cInfo += "Options Tab " + AllTrim( Str( ::nTabWidth ) ) + HB_OsNewLine()
       endif
@@ -2328,6 +2219,16 @@ METHOD SaveSettings() CLASS TDebugger
                      AllTrim( ::aBreakPoints[ n ][ 2 ] ) + HB_OsNewLine()
          next
       endif
+
+      /* This part of the script must be executed after all windows are created */
+      for n := 1 to Len( ::aWindows )
+         oWnd := ::aWindows[ n ]
+         cInfo += "Window Size " + AllTrim( Str( oWnd:nBottom - oWnd:nTop + 1 ) ) + " "
+         cInfo += AllTrim( Str( oWnd:nRight - oWnd:nLeft + 1 ) ) + HB_OsNewLine()
+         cInfo += "Window Move " + AllTrim( Str( oWnd:nTop ) ) + " "
+         cInfo += AllTrim( Str( oWnd:nLeft ) ) + HB_OsNewLine()
+         cInfo += "Window Next" + HB_OsNewLine()
+      next
 
       MemoWrit( ::cSettingsFileName, cInfo )
    endif
@@ -2436,17 +2337,17 @@ return nil
 METHOD ShowCodeLine( nProc ) CLASS TDebugger
    LOCAL nPos, nLevel
    LOCAL nLine, cPrgName
+   LOCAL xVal, oErr
 
    // we only update the stack window and up a new browse
    // to view the code if we have just broken execution
-   if !::lGo .AND. !::lTrace
+   if !::lGo
       if ::oWndStack != nil
          ::oBrwStack:RefreshAll()
       endif
 
       nLine := ::aProcStack[ nProc ][ CSTACK_LINE ]
       cPrgName := ::aProcStack[ nProc ][ CSTACK_MODULE ]
-
       IF ( nLine == NIL )
          ::oBrwText := nil
          ::oWndCode:Browser := nil
@@ -2649,20 +2550,6 @@ METHOD Stack() CLASS TDebugger
 return nil
 
 
-METHOD StackProc( cModuleName, nProcLevel ) CLASS TDebugger
-   LOCAL nPos:=RAT( ":", cModuleName )
-   LOCAL aEntry := { ;
-     IIF(::lCodeBlock,"(b)","")+SubStr( cModuleName, nPos + 1 ),;    //function name
-     {},;   //local vars
-     nil,;  //line no, nil means that no line number is stored yet
-     strip_path( LEFT( cModuleName, nPos - 1 ) ),; // and the module name
-     {}, ;  // static vars
-     nProcLevel }
-
-   AIns( ::aCallStack, 1, aEntry, .T. )
-return nil
-
-
 METHOD Static() CLASS TDebugger
 
    ::lShowStatics := ! ::lShowStatics
@@ -2691,10 +2578,12 @@ METHOD ToCursor() CLASS TDebugger
     cLine := SUBSTR( cLine, AT(":",cLine)+1 )
   ENDIF
   IF IsValidStopLine( cLine )
-    ::aToCursor := { ::oBrwText:nRow, strip_path( ::cPrgName ) }
+    HB_INLINE( ::pInfo, strip_path( ::cPrgName ), ::oBrwText:nRow )
+    {
+      hb_dbgSetToCursor( hb_parptr( 1 ), hb_parc( 2 ), hb_parni( 3 ) );
+    }
     ::RestoreAppScreen()
     ::RestoreAppState()
-    ::lToCursor := .T.
     ::Exit()
   ENDIF
 RETURN self
@@ -2702,39 +2591,64 @@ RETURN self
 
 // Toggle a breakpoint at the cursor position in the currently viewed file
 // which may be different from the file in which execution was broken
-METHOD ToggleBreakPoint() CLASS TDebugger
+METHOD ToggleBreakPoint( nLine, cFileName ) CLASS TDebugger
   // look for a breakpoint which matches both line number and program name
   local nAt
   LOCAL cLine
-  local cFileName
 
   IF !::lActive
     RETURN NIL
   ENDIF
 
-  cLine := ::oBrwText:GetLine( ::oBrwText:nRow )
-  IF ::oBrwText:lLineNumbers
-    cLine := SUBSTR( cLine, AT(":",cLine)+1 )
+  IF nLine == NIL
+    cLine := ::oBrwText:GetLine( ::oBrwText:nRow )
+    IF ::oBrwText:lLineNumbers
+      cLine := SUBSTR( cLine, AT(":",cLine)+1 )
+    ENDIF
+    IF IsValidStopLine( cLine )
+      cFileName := strip_path( ::cPrgName )
+      nLine := ::oBrwText:nRow
+    ELSE
+      RETURN NIL
+    ENDIF
   ENDIF
-  IF IsValidStopLine( cLine )
-    cFileName := strip_path( ::cPrgName )
 
-    nAt := AScan( ::aBreakPoints, { | aBreak | aBreak[ 1 ] == ::oBrwText:nRow ;
+  nAt := AScan( ::aBreakPoints, { | aBreak | aBreak[ 1 ] == nLine ;
                                     .AND. aBreak[ 2 ] == cFileName } ) // it was nLine
 
-    if nAt == 0
-      AAdd( ::aBreakPoints, { ::oBrwText:nRow, cFileName } )     // it was nLine
-      ::oBrwText:ToggleBreakPoint(::oBrwText:nRow, .T.)
-    else
-      ADel( ::aBreakPoints, nAt )
-      ASize( ::aBreakPoints, Len( ::aBreakPoints ) - 1 )
-      ::oBrwText:ToggleBreakPoint(::oBrwText:nRow, .F.)
-    endif
+  if nAt == 0
+    AAdd( ::aBreakPoints, { nLine, cFileName } )     // it was nLine
+    HB_INLINE( ::pInfo, cFileName, nLine )
+    {
+       hb_dbgAddBreak( hb_parptr( 1 ), hb_parc( 2 ), hb_parni( 3 ), NULL );
+    }
+    IF FILENAME_EQUAL( cFileName, ::cPrgName )
+      ::oBrwText:ToggleBreakPoint( nLine, .T. )
+    ENDIF
+  else
+    ADel( ::aBreakPoints, nAt )
+    ASize( ::aBreakPoints, Len( ::aBreakPoints ) - 1 )
+    HB_INLINE( ::pInfo, nAt - 1 )
+    {
+       hb_dbgDelBreak( hb_parptr( 1 ), hb_parni( 2 ) );
+    }
+    IF FILENAME_EQUAL( cFileName, ::cPrgName )
+      ::oBrwText:ToggleBreakPoint( nLine, .F. )
+    ENDIF
+  endif
 
-    ::oBrwText:RefreshCurrent()
-  ENDIF
+  ::oBrwText:RefreshCurrent()
 
 return nil
+
+
+METHOD Trace() CLASS TDebugger
+  HB_INLINE( ::pInfo )
+  {
+    hb_dbgSetTrace( hb_parptr( 1 ) );
+  }
+  ::Step() //forces a Step()
+RETURN Self
 
 
 METHOD TracepointAdd( cExpr ) CLASS TDebugger
@@ -2755,17 +2669,13 @@ METHOD TracepointAdd( cExpr ) CLASS TDebugger
       RETURN self
    ENDIF
    aWatch := {"tp", cExpr, NIL}
-   cErr := CreateExpression( cExpr, aWatch )
-   IF( !EMPTY(cErr) )
-      ALERT( cErr )
-      RETURN self
-   ENDIF
-   AADD( ::aWatch, aWatch )
    ::RestoreAppState()
-   uValue := GetWatchValue( aWatch, @lSuccess )
+   HB_INLINE( ::pInfo, cExpr )
+   {
+     hb_dbgAddWatch( hb_parptr( 1 ), hb_parc( 2 ), TRUE );
+   }
    ::SaveAppState()
-   AADD( ::aTrace, { LEN(::aWatch), IIF(lSuccess, uValue, NIL )} )
-   ::lTracepoints :=.T.
+   AADD( ::aWatch, aWatch )
    ::WatchpointsShow()
 
 RETURN self
@@ -2802,7 +2712,6 @@ METHOD VarGetValue( aVar ) CLASS TDebugger
 
   IF( cType == "L" )
     nProcLevel := hb_dbg_procLevel() - aVar[ VAR_LEVEL ]
-    cProc := aVar[ VAR_FUNCNAME ]
     uValue := hb_dbg_vmVarLGet( nProcLevel, aVar[ VAR_POS ] )
 
   ELSEIF( cType == "S" )
@@ -2823,7 +2732,6 @@ METHOD VarSetValue( aVar, uValue ) CLASS TDebugger
 
   IF( cType == "L" )
     nProcLevel := hb_dbg_procLevel() - aVar[VAR_LEVEL]   //skip debugger stack
-    cProc := aVar[ VAR_FUNCNAME ]
     hb_dbg_vmVarLSet( nProcLevel, aVar[ VAR_POS ], uValue )
 
   ELSEIF( cType == "S" )
@@ -2883,13 +2791,14 @@ METHOD ViewSets() CLASS TDebugger
 return nil
 
 
-METHOD WatchGetInfo( aWatch ) CLASS TDebugger
+METHOD WatchGetInfo( nWatch ) CLASS TDebugger
    LOCAL xVal
    LOCAL ctype
    LOCAL lValid
+   LOCAL aWatch := ::aWatch[ nWatch ]
 
    ::RestoreAppState()
-   xVal := GetWatchValue( aWatch, @lValid )
+   xVal := ::GetExprValue( nWatch, @lValid )
    ::SaveAppState()
    IF( lValid )
       cType := VALTYPE( xVal )
@@ -2897,7 +2806,7 @@ METHOD WatchGetInfo( aWatch ) CLASS TDebugger
    ELSE
       //xVal contains error description
       cType := 'U'
-//      xVal  := "Undefined"
+      //xVal  := "Undefined"
    ENDIF
 
 RETURN aWatch[WP_EXPR]+" <"+aWatch[WP_TYPE]+", " +cType+">: " +xVal
@@ -2918,12 +2827,11 @@ METHOD WatchpointAdd( cExpr ) CLASS TDebugger
    IF( EMPTY(cExpr) )
       RETURN self
    ENDIF
-   aWatch := {"wp", cExpr, NIL}
-   cErr := CreateExpression( cExpr, aWatch )
-   IF( !EMPTY(cErr) )
-      ALERT( cErr )
-      RETURN self
-   ENDIF
+   aWatch := { "wp", cExpr }
+   HB_INLINE( ::pInfo, cExpr )
+   {
+      hb_dbgAddWatch( hb_parptr( 1 ), hb_parc( 2 ), FALSE );
+   }
    AADD( ::aWatch, aWatch )
    ::WatchpointsShow()
 
@@ -2943,14 +2851,10 @@ METHOD WatchpointDel( nPos ) CLASS TDebugger
       IF( LastKey() != K_ESC )
          IF( nPos >=0 .AND. nPos < LEN(::aWatch) )
             ::oBrwPnt:gotop()
-            IF( ::aWatch[nPos+1][WP_TYPE] == "tp" )
-               nIdx := ASCAN( ::aTrace, {|a| a[TR_IDX]==nPos+1} )
-               IF( nIdx > 0 )
-                  ADEL( ::aTrace[nIdx] )
-                  ASIZE( ::aTrace, LEN(::aTrace)-1 )
-                  ::lTracepoints := LEN(::aTrace) > 0
-               ENDIF
-            ENDIF
+            HB_INLINE( ::pInfo, nPos )
+            {
+               hb_dbgDelWatch( hb_parptr( 1 ), hb_parni( 2 ) );
+            }
             ADEL( ::aWatch, nPos+1 )
             ASIZE( ::aWatch, LEN(::aWatch)-1 )
             IF( LEN(::aWatch) == 0 )
@@ -2979,12 +2883,11 @@ METHOD WatchpointEdit( nPos ) CLASS TDebugger
    IF( EMPTY(cExpr) )
       RETURN self
    ENDIF
-   aWatch := {"wp", cExpr, NIL}
-   cErr := CreateExpression( cExpr, aWatch )
-   IF( !EMPTY(cErr) )
-      ALERT( cErr )
-      RETURN self
-   ENDIF
+   aWatch := { "wp", cExpr }
+   HB_INLINE( ::pInfo, nPos - 1, cExpr )
+   {
+      hb_dbgSetWatch( hb_parptr( 1 ), hb_parni( 2 ), hb_parc( 3 ), FALSE );
+   }
    ::aWatch[ nPos ] := aWatch
    ::WatchpointsShow()
 
@@ -3055,7 +2958,7 @@ METHOD WatchPointsShow() CLASS TDebugger
       oCol := TBColumnNew( "", ;
          { || PadR( IIF( LEN( ::aWatch ) > 0, ;
                        AllTrim( Str( ::oBrwPnt:Cargo[1] -1 ) ) + ") " + ;
-                       ::WatchGetInfo( ::aWatch[ Max( ::oBrwPnt:Cargo[1], 1 ) ] ), ;
+                       ::WatchGetInfo( Max( ::oBrwPnt:Cargo[1], 1 ) ), ;
                        " " ), ;
                    ::oWndPnt:nWidth() - 2 ) } )
       ::oBrwPnt:AddColumn( oCol )
@@ -3221,218 +3124,6 @@ static function ValToStr( uVal )
    endcase
 
 return cResult
-
-
-STATIC FUNCTION GetWatchValue( aWatch, plSuccess )
-   LOCAL aVars, aNewVars, aScopes, i, j
-   LOCAL nLen, aLocVars
-   LOCAL cVar, nPos, cName
-   LOCAL xVal
-   LOCAL oErr
-   LOCAL bEBlock
-
-   plSuccess := .F.
-   bEblock := ErrorBlock( {|o| BREAK(o)} )
-   
-   BEGIN SEQUENCE
-      IF( aWatch[WP_BLOCK] != NIL )
-         nLen :=LEN(aWatch)-WP_BLOCK
-         IF( nLen > 0 )
-            aVars := ARRAY( nLen )
-            aScopes := Array( nLen )
-            aNewVars := Array( nLen )
-            FOR i:=1 TO nLen
-               cVar := aWatch[ i + WP_BLOCK ]
-               //search local variables in current procedure
-               aLocVars := s_oDebugger:aProcStack[1][CSTACK_LOCALS]
-               nPos := ASCAN( aLocVars, {|a| a[VAR_NAME]==cVar} )
-               IF( nPos > 0 )
-                  j := hb_dbg_ProcLevel() - aLocVars[ nPos ][ VAR_LEVEL ]
-                  aScopes[ i ] := { 'L', j, aLocVars[ nPos ][ VAR_POS ] }
-                  aVars[ i ] := hb_dbg_vmVarLGet( aScopes[ i ][ 2 ], aScopes[ i ][ 3 ] )
-               ELSE
-                  //search local statics
-                  aLocVars := s_oDebugger:aProcStack[1][CSTACK_STATICS]
-                  nPos := ASCAN( aLocVars, {|a| a[VAR_NAME]==cVar} )
-                  IF( nPos > 0 )
-                     aScopes[ i ] := { 'S', aLocVars[ nPos ][ VAR_LEVEL ], aLocVars[ nPos ][ VAR_POS ] }
-                     aVars[ i ] := hb_dbg_vmVarSGet( aScopes[ i ][ 2 ], aScopes[ i ][ 3 ] )
-                  ELSE
-                     //search global statics
-                     cName := s_oDebugger:aProcStack[1][CSTACK_MODULE]
-                     nPos := ASCAN( __dbgStatics, {|a| a[1]==cName} )
-                     IF( nPos > 0 )
-                        aLocVars := __dbgStatics[nPos][ 2 ]
-                        nPos := ASCAN( aLocVars, {|a| a[VAR_NAME]==cVar} )
-                        IF( nPos > 0 )
-                           aScopes[ i ] := { 'S', aLocVars[ nPos ][ VAR_LEVEL ], aLocVars[ nPos ][ VAR_POS ] }
-                           aVars[ i ] := hb_dbg_vmVarSGet( aScopes[ i ][ 2 ], aScopes[ i ][ 3 ] )
-                           EXIT
-                        ENDIF
-                     ENDIF
-                     IF( nPos == 0 )
-                        aVars[i] := &cVar
-                     ENDIF
-                  ENDIF
-               ENDIF
-            NEXT
-
-            /* Copy the vars array. Deep copy is unneeded here */
-            ACopy( aVars, aNewVars )
-         ENDIF
-
-         xVal := EVAL( aWatch[WP_BLOCK], aNewVars )
-
-         /* Set any variables in case the expression has changed them */
-         IF ValType( aNewVars ) == 'A'
-           FOR i := 1 TO Len( aNewVars )
-             IF ( ValType( aScopes[ i ] ) == 'A' ;
-                  .AND. ( ValType( aVars[ i ] ) != ValType( aNewVars[ i ] ) ;
-                          .OR. !( aVars[ i ] == aNewVars[ i ] ) ) )
-               IF aScopes[ i ][ 1 ] == 'L'
-                 hb_dbg_vmVarLSet( aScopes[ i ][ 2 ], aScopes[ i ][ 3 ], aNewVars[ i ] )
-               ELSEIF aScopes[ i ][ 1 ] == 'S'
-                 hb_dbg_vmVarSSet( aScopes[ i ][ 2 ], aScopes[ i ][ 3 ], aNewVars[ i ] )
-               ENDIF
-             ENDIF
-           NEXT
-         ENDIF
-         
-         plSuccess :=.T.
-      ENDIF
-
-   RECOVER USING oErr
-   
-      xVal := oErr:operation + ": " + oErr:description
-      IF ValType( oErr:args ) == 'A'
-        xVal += "; arguments:"
-        AEval( oErr:args, {|x| xVal += " " + AllTrim(CStr( x )) } )
-      ENDIF
-      
-   END SEQUENCE
-   ErrorBlock( bEBlock )
-
-RETURN xVal
-
-
-STATIC FUNCTION CreateExpression( cExpr, aWatch )
-   LOCAL nLen
-   LOCAL i,j
-   LOCAL c, lSpace
-   LOCAL cID, cBV, nPos
-   LOCAL oErr, oEBlock
-   LOCAL cRet
-
-   nLen := LEN(cExpr)
-   i := j := 1
-   lSpace :=.T.
-   DO WHILE( i <= nLen )
-      c := SUBSTR( cExpr, i, 1 )
-      IF( c == '_' .OR. ISALPHA(c) )
-         i++
-         DO WHILE( i<=nLen .AND. IsIdentChar(c:=SUBSTR(cExpr,i,1)) )
-            i++
-         ENDDO
-         cID := UPPER( SUBSTR( cExpr, j, i-j ) )
-         IF( i < nLen )
-            DO WHILE( SUBSTR(cExpr,i,1)==" ")
-               i++
-            ENDDO
-            IF( SUBSTR(cExpr,i,1) == '(' )
-               //function call
-               j := i+1
-               LOOP
-            ENDIF
-            IF( SUBSTR(cExpr,i,2) == "->" )
-               //alias expressions are not expanded
-               i += 2
-               DO WHILE( i<=nLen .AND. IsIdentChar(SUBSTR(cExpr,i,1)," ()") )
-                  i++
-               ENDDO
-               j := i+1
-               LOOP
-            ENDIF
-         ENDIF
-         nPos := ASCAN( aWatch, {|c| c==cID}, WP_BLOCK+1 )
-         IF( nPos == 0 )
-            AADD( aWatch, cID )
-            nPos := LEN( aWatch )
-         ENDIF
-
-         cBV := "__dbg[" +NTRIM(nPos - WP_BLOCK) +"]"
-         cExpr := LEFT( cExpr, j-1 ) + cBV + SUBSTR( cExpr, i )
-         nLen := LEN(cExpr)
-         i := j + LEN(cBV)
-         lSpace := .F.
-
-      ELSEIF( c $ " +-*/^!=<>(" )
-         lSpace := .T.
-         i++
-
-      ELSEIF( c == '&' )    //skip macro expression
-         i++
-         DO WHILE( i<=nLen .AND. IsIdentChar(SUBSTR(cExpr,i,1)," ()") )
-            i++
-         ENDDO
-
-      ELSEIF( c == '.' )    //skip logical values
-         i++
-         IF( SUBSTR(cExpr,i,1) $ "TtFf" .AND. SUBSTR(cExpr,i+1,1) == '.' )
-            i += 2
-         ENDIF
-
-      ELSEIF( c == ':' )    //skip send operator
-         i++
-         DO WHILE( i<=nLen .AND. IsIdentChar(SUBSTR(cExpr,i,1)) )
-            i++
-         ENDDO
-
-      ELSEIF( c == "'" .OR. c == '"' )   //STRING
-         i++
-         DO WHILE( i<=nLen .AND. SUBSTR(cExpr,i,1)!=c )
-            i++
-         ENDDO
-         i++
-
-      ELSEIF( c == "[" )
-         IF( lSpace )
-            //STRING
-            i++
-            DO WHILE( i<=nLen .AND. SUBSTR(cExpr,i,1)!="]" )
-               i++
-            ENDDO
-         ELSE
-            //array index
-            lSpace := .T.
-            i++
-         ENDIF
-      ELSE
-         i++
-      ENDIF
-      j := i
-   ENDDO
-
-   //   s_oDebugger:InputBox("AFTER", cExpr )
-   oEBlock := ErrorBlock( {|o| BREAK(o)} )
-   BEGIN SEQUENCE
-      aWatch[WP_BLOCK] := &( "{|__dbg|"+ cExpr +"}" )
-      cRet := NIL
-   RECOVER USING oErr
-      cRet := "Expression error: " +oErr:description
-      aWatch[WP_BLOCK] := NIL
-   END SEQUENCE
-   ErrorBlock( oEBlock )
-
-RETURN cRet
-
-
-STATIC FUNCTION IsIdentChar( cChar, cSeeAlso )
-
-   IF( ISALPHA(cChar) .OR. ISDIGIT(cChar) .OR. cChar == '_' )
-      RETURN .T.
-   ENDIF
-
-RETURN IIF(cSeeAlso!=NIL, cChar $ cSeeAlso, .F. )
 
 
 STATIC PROCEDURE StripUntil( pcLine, i, cChar )

@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.pc,v 1.9 2005/05/16 21:45:18 andijahja Exp $
+# $Id: makefile.pc,v 1.10 2005/09/18 21:33:08 paultucker Exp $
 # makefile for PellesC compiler
 #
 
@@ -870,6 +870,7 @@ VM_LIB_OBJS = \
    $(VM_OBJ_DIR)\classes.obj \
    $(VM_OBJ_DIR)\cmdarg.obj \
    $(VM_OBJ_DIR)\codebloc.obj \
+   $(VM_OBJ_DIR)\dbgentry.obj \
    $(VM_OBJ_DIR)\debug.obj \
    $(VM_OBJ_DIR)\dynlibhb.obj \
    $(VM_OBJ_DIR)\dynsym.obj \
@@ -2954,6 +2955,9 @@ $(VM_OBJ_DIR)\cmdarg.obj : $(VM_DIR)\cmdarg.c
    $(CC) /DHB_NO_TRACE $(CFLAGS) /Fo$@ $**
 
 $(VM_OBJ_DIR)\codebloc.obj : $(VM_DIR)\codebloc.c
+   $(CC_CMD)
+
+$(VM_OBJ_DIR)\dbgentry.obj : $(VM_DIR)\dbgentry.c
    $(CC_CMD)
 
 $(VM_OBJ_DIR)\debug.obj : $(VM_DIR)\debug.c

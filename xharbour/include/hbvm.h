@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.28 2005/05/04 11:39:51 druzus Exp $
+ * $Id: hbvm.h,v 1.29 2005/09/11 19:39:32 druzus Exp $
  */
 
 /*
@@ -134,6 +134,27 @@ HB_EXPORT extern void hb_vmProcessSymbols( PHB_SYMB pSymbols, ... );
 HB_EXPORT extern void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 );
 HB_EXPORT extern PSYMBOLS * hb_vmSymbols( void );
 HB_EXPORT extern void hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols );
+
+/* Debugger API */
+HB_EXPORT extern BOOL hb_dbg_InvokeDebug( BOOL bInvoke );
+HB_EXPORT extern ULONG hb_dbg_ProcLevel( void );
+HB_EXPORT extern PHB_ITEM hb_dbg_vmVarSGet( int nStatic, int nOffset );
+HB_EXPORT extern PHB_ITEM hb_dbg_vmVarLGet( int iLevel, int iLocal );
+HB_EXPORT extern void hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame );
+HB_EXPORT extern void hb_dbgAddBreak( void *handle, char *cModule, int nLine, char *szFunction );
+HB_EXPORT extern void hb_dbgAddWatch( void *handle, char *szExpr, BOOL bTrace );
+HB_EXPORT extern void hb_dbgDelBreak( void *handle, int nBreak );
+HB_EXPORT extern void hb_dbgDelWatch( void *handle, int nWatch );
+HB_EXPORT extern PHB_ITEM hb_dbgGetExpressionValue( void *handle, char *expression );
+HB_EXPORT extern PHB_ITEM hb_dbgGetWatchValue( void *handle, int nWatch );
+HB_EXPORT extern void hb_dbgSetCBTrace( void *handle, BOOL bCBTrace );
+HB_EXPORT extern void hb_dbgSetGo( void *handle );
+HB_EXPORT extern void hb_dbgSetInvoke( void *handle, BOOL ( *pFunInvoke )( void ) );
+HB_EXPORT extern void hb_dbgSetNextRoutine( void *handle );
+HB_EXPORT extern void hb_dbgSetQuit( void *handle );
+HB_EXPORT extern void hb_dbgSetToCursor( void *handle, char *szModule, int nLine );
+HB_EXPORT extern void hb_dbgSetTrace( void *handle );
+HB_EXPORT extern void hb_dbgSetWatch( void *handle, int nWatch, char *szExpr, BOOL bTrace );
 
 #if ( defined(__DMC__) || defined(__POCC__) )
    #if !defined(HB_DLL_REQUIRED_DLLMAIN)
