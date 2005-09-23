@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: dbgentry.c,v 1.1 2005/09/23 21:55:06 likewolf Exp $
  */
 
 /*
@@ -434,10 +434,11 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
          return;
 
       case HB_DBG_SHOWLINE:
-         nProcLevel = hb_dbg_ProcLevel();
          HB_CALLSTACKINFO *pTop = &info->aCallStack[ info->nCallStackLen - 1 ];
          BOOL bOldClsScope;
 
+         nProcLevel = hb_dbg_ProcLevel();
+         
          /* Check if we've hit a tracepoint */
          bOldClsScope = hb_clsSetScope( FALSE );
          for ( i = 0; i < info->nTracePoints; i++ )
@@ -902,7 +903,7 @@ hb_dbgEvalMakeBlock( HB_WATCHPOINT *watch )
             if ( watch->szExpr[ i ] == '-' && watch->szExpr[ i + 1 ] == '>' )
             {
                i += 2;
-               while ( ( c = watch->szExpr[ i ] ) && IS_IDENT_CHAR( c ) )
+               while ( ( c = watch->szExpr[ i ] ) != NULL && IS_IDENT_CHAR( c ) )
                {
                   i++;
                }
@@ -1323,10 +1324,8 @@ hb_dbgVarGet( HB_VARINFO *scope )
    {
       case 'L':
          return hb_dbg_vmVarLGet( scope->nFrame, scope->nIndex );
-         break;
       case 'S':
          return hb_dbg_vmVarSGet( scope->nFrame, scope->nIndex );
-         break;
       case 'M':
       {
          HB_HANDLE hMemVar = hb_memvarGetVarHandle( scope->szName );
