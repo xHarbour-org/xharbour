@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.489 2005/09/22 01:12:00 druzus Exp $
+ * $Id: hvm.c,v 1.490 2005/09/22 23:02:26 ronpinkas Exp $
  */
 
 /*
@@ -7369,6 +7369,11 @@ static void hb_vmRetValue( void )
 
 #if 1
    PHB_ITEM pItem = *( HB_VM_STACK.pPos - 1 );
+
+   if( HB_IS_BLOCK( pItem ) )
+   {
+      pItem->item.asBlock.value->pSelfBase = NULL;
+   }
 #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRetValue()"));
@@ -8529,6 +8534,11 @@ static void hb_vmPopLocal( SHORT iLocal )
       if( HB_IS_BYREF( pLocal ) )
       {
          pLocal = hb_itemUnRef( pLocal );
+
+         if( HB_IS_BLOCK( pVal ) )
+         {
+            pVal->item.asBlock.value->pSelfBase = NULL;
+         }
       }
    }
    else
