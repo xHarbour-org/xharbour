@@ -1,5 +1,5 @@
 /*
- * $Id: httpcln.prg,v 1.2 2005/04/30 15:14:29 lculik Exp $
+ * $Id: httpcln.prg,v 1.3 2005/09/23 13:31:36 gdrouillard Exp $
  */
 
 /*
@@ -350,7 +350,7 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
 
 RETURN cData
 Method ReadAll()
-   local cOut:=''
+   local cOut:='', cChunk
    IF .not. ::bInitialized
       ::bInitialized := .T.
       IF .not. ::Get()
@@ -373,7 +373,7 @@ method setCookie(cLine)
    //docs from http://www.ietf.org/rfc/rfc2109.txt
    local aParam,cParam
    local cCookie,aCookies
-   local cHost,cPath,cName,cValue,hHost,hPath
+   local cHost,cPath,cName,cValue,hHost,hPath, aElements, cElement
    local cDefaultHost:=::oUrl:cServer, cDefaultPath:=::oUrl:cPath
    local x,y
    IF empty(cDefaultPath)
@@ -414,9 +414,9 @@ method setCookie(cLine)
          ::hCookies[cHost][cPath]:={=>}
       endif
       ::hCookies[cHost][cPath][cName]:=cValue
-
    ENDIF
-   return
+return NIL
+
 method getcookies(cHost,cPath)
    local x,y,aDomKeys:={},aKeys,z,cKey,aPathKeys,nPath
    local a,b,cOut:='',cX,cY,c,d
