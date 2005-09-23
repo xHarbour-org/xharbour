@@ -1,5 +1,5 @@
 /*
- * $Id: httpcln.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
+ * $Id: httpcln.prg,v 1.2 2005/04/30 15:14:29 lculik Exp $
  */
 
 /*
@@ -77,6 +77,9 @@ CLASS tIPClientHTTP FROM tIPClient
    METHOD ReadHeaders()
    METHOD Read( nLen )
    METHOD UseBasicAuth()      INLINE   ::cAuthMode := "Basic"
+   Method ReadAll()
+   Method SetCookie
+   Method GetCookies
 
 HIDDEN:
    METHOD StandardFields()
@@ -108,7 +111,7 @@ RETURN .F.
 
 
 METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
-   LOCAL cData, nI, cTmp
+   LOCAL cData, nI, cTmp,y
 
    IF HB_IsHash( cPostData )
       cData := ""
@@ -125,6 +128,25 @@ METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
          cData += cTmp + "&"
       NEXT
       cData[-1] = ""
+   elseIF HB_IsArray( cPostData )
+      cData := ""
+      y:=Len(cPostData)
+      FOR nI := 1 TO y
+         cTmp := cPostData[ nI ,1]
+         cTmp := CStr( cTmp )
+         cTmp := AllTrim( cTmp )
+         cTmp := TipEncoderUrl_Encode( cTmp )
+         cData += cTmp +"="
+         cTmp := cPostData[ nI,2]
+         cTmp := CStr( cTmp )
+         cTmp := AllTrim( cTmp )
+         cTmp := TipEncoderUrl_Encode( cTmp )
+         cData += cTmp
+         IF nI!=y
+            cData+="&"
+         ENDIF
+      NEXT
+
    ELSEIF HB_IsString( cPostData )
       cData := cPostData
    ELSE
@@ -153,13 +175,15 @@ METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
       ::InetSendall( ::SocketCon, cData )
       ::bInitialized := .T.
       RETURN ::ReadHeaders()
+/*   else
+      alert("Post InetErrorCode:"+winsockerrorcode(::InetErrorCode( ::SocketCon  )))*/
    ENDIF
 RETURN .F.
 
 
 METHOD StandardFields() CLASS tIPClientHTTP
    LOCAL iCount
-   LOCAL oEncoder
+   LOCAL oEncoder,cCookies
 
    ::InetSendall( ::SocketCon, "Host: " + ::oUrl:cServer + ::cCRLF )
    ::InetSendall( ::SocketCon, "User-agent: " + ::cUserAgent + ::cCRLF )
@@ -175,15 +199,9 @@ METHOD StandardFields() CLASS tIPClientHTTP
 
 
    // send cookies
-   IF ! Empty( ::hCookies )
-      ::InetSendall( ::SocketCon, "Cookie: " )
-      FOR iCount := 1 TO Len( ::hCookies ) - 1
-         ::InetSendall( ::SocketCon, HGetKeyAt( ::hCookies, iCount ) +;
-            "=" + HGetValueAt( ::hCookies, iCount ) +"; ")
-      NEXT
-      iCount = Len( ::hCookies )
-      ::InetSendall( ::SocketCon, HGetKeyAt( ::hCookies, iCount ) +;
-         "=" + HGetValueAt( ::hCookies, iCount ) + ::cCRLF)
+   cCookies:=::getCookies()
+   IF ! Empty( cCookies )
+      ::InetSendall( ::SocketCon, "Cookie: " + cCookies+::cCRLF)
    ENDIF
 
    //Send optional Fields
@@ -196,7 +214,7 @@ RETURN .T.
 
 
 
-METHOD ReadHeaders() CLASS tIPClientHTTP
+METHOD ReadHeaders(lClear) CLASS tIPClientHTTP
    LOCAL cLine, nPos, aVersion
    LOCAL aHead, aCookie, cCookie
 
@@ -226,7 +244,9 @@ METHOD ReadHeaders() CLASS tIPClientHTTP
    ::nLength := -1
    ::bChunked := .F.
    cLine := ::InetRecvLine( ::SocketCon, @nPos, 500 )
-
+   IF !lClear=.f. .AND. !empty(::hHeaders)
+      ::hHeaders:={=>}
+   ENDIF
    DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .and. .not. Empty( cLine )
       aHead := HB_RegexSplit( ":", cLine,,, 1 )
       IF aHead == NIL .or. Len( aHead ) != 2
@@ -235,34 +255,25 @@ METHOD ReadHeaders() CLASS tIPClientHTTP
       ENDIF
 
       ::hHeaders[ aHead[1] ] := LTrim(aHead[2])
-
       DO CASE
 
          // RFC 2068 forces to discard content length on chunked encoding
-         CASE lower( aHead[1] ) == "content-length:" .and. .not. ::bChunked
+         CASE lower( aHead[1] ) == "content-length" .and. .not. ::bChunked
             cLine := Substr( cLine, 16 )
             ::nLength := Val( cLine )
 
          // as above
-         CASE lower( aHead[1] ) == "transfer-encoding:"
+         CASE lower( aHead[1] ) == "transfer-encoding"
             IF At( "chunked", lower( cLine ) ) > 0
                ::bChunked := .T.
                ::nLength := -1
             ENDIF
-
-         CASE lower( aHead[1] ) == "set-cookie:"
-            aCookie := HB_RegexSplit( ";", aHead[2] )
-            FOR EACH cCookie IN aCookie
-               aCookie := HB_RegexSplit( "=", cCookie, 1)
-               IF Len( aCookie ) == 2
-                  ::hCookie[ aCookie[1] ] := aCookie[2]
-               ENDIF
-            NEXT
+         CASE lower( aHead[1] ) == "set-cookie"
+            ::setCookie(aHead[2])
 
       ENDCASE
       cLine := ::InetRecvLine( ::SocketCon, @nPos, 500 )
    ENDDO
-
    IF ::InetErrorCode( ::SocketCon ) != 0
       RETURN .F.
    ENDIF
@@ -332,6 +343,134 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
    IF ::bEof .and. ::bChunked
       ::bEof := .F.
       ::nLength := -1
+     //chunked data is followed by a blank line
+      cLine := ::InetRecvLine( ::SocketCon, @nPos, 1024 )
+
    ENDIF
 
 RETURN cData
+Method ReadAll()
+   local cOut:=''
+   IF .not. ::bInitialized
+      ::bInitialized := .T.
+      IF .not. ::Get()
+         RETURN NIL
+      ENDIF
+   ENDIF
+   IF ::bChunked
+      cChunk:=::read()
+      while cChunk!=nil
+         cOut+=cChunk
+      // ::nLength:=-1
+         cChunk:=::read()
+      end
+   else
+      return(::read())
+   endif
+   return(cOut)
+
+method setCookie(cLine)
+   //docs from http://www.ietf.org/rfc/rfc2109.txt
+   local aParam,cParam
+   local cCookie,aCookies
+   local cHost,cPath,cName,cValue,hHost,hPath
+   local cDefaultHost:=::oUrl:cServer, cDefaultPath:=::oUrl:cPath
+   local x,y
+   IF empty(cDefaultPath)
+      cDefaultPath:='/'
+   ENDIF
+   //this function currently ignores expires, secure and other tags that may be in the cookie for now...
+//   ?'Setting COOKIE:',cLine
+   aParam := HB_RegexSplit( ";", cLine )
+   cName:=cValue:=''
+   cHost:=cDefaultHost
+   cPath:=cDefaultPath
+   y:=len(aParam)
+   FOR x:=1 to y
+      aElements := HB_RegexSplit( "=", aParam[x], 1)
+      IF len(aElements)==2
+         IF x=1
+            cName:=alltrim(aElements[1])
+            cValue:=alltrim(aElements[2])
+         else
+            cElement:=upper(alltrim(aElements[1]))
+            do case
+            //case cElement=='EXPIRES'
+            case cElement=='PATH'
+               cPath:=alltrim(aElements[2])
+            case cElement=='DOMAIN'
+               cHost:=alltrim(aElements[2])
+            endcase
+         ENDIF
+      ENDIF
+   next
+   IF !empty(cName)
+      //cookies are stored in hashes as host.path.name
+      //check if we have a host hash yet
+      if !HHASKEY(::hCookies,cHost)
+         ::hCookies[cHost]:={=>}
+      endif
+      if !HHASKEY(::hCookies[cHost],cPath)
+         ::hCookies[cHost][cPath]:={=>}
+      endif
+      ::hCookies[cHost][cPath][cName]:=cValue
+
+   ENDIF
+   return
+method getcookies(cHost,cPath)
+   local x,y,aDomKeys:={},aKeys,z,cKey,aPathKeys,nPath
+   local a,b,cOut:='',cX,cY,c,d
+   IF cHost=nil
+      cHost:=::oUrl:cServer
+   ENDIF
+   IF cPath=nil
+      cPath:=::oUrl:cPath
+      IF empty(cPath)
+         cPath:='/'
+      ENDIF
+   ENDIF
+   IF empty(cHost)
+      return(cOut)
+   ENDIF
+
+   //tail matching the domain
+   aKeys:=hgetkeys(::hCookies)
+   y:=len(aKeys)
+   z:=len(cHost)
+   cHost:=upper(cHost)
+   FOR x := 1 TO y
+      cKey:=upper(aKeys[x])
+      IF upper(right(cKey,z))==cHost.and.(len(cKey)=z .OR. substr(aKeys[x],0-z,1)=='.')
+         aadd(aDomKeys,aKeys[x])
+      ENDIF
+   NEXT
+   //more specific paths should be sent before lesser generic paths.
+   asort(aDomKeys,,, {|cX,cY| len(cX) > len(cY)} )
+   y:=len(aDomKeys)
+   //now that we have the domain matches we have to do path matchine
+   nPath:=len(cPath)
+   FOR x := 1 TO y
+      aKeys:=hgetkeys(::hCookies[aDomKeys[x]])
+      aPathKeys:={}
+      b:=len(aKeys)
+      FOR  a:= 1 TO b
+         cKey:=aKeys[a]
+         z:=len(cKey)
+         IF cKey=='/'.or.(z<=nPath.and.substr(cKey,1,nPath)==cKey)
+            aadd(aPathKeys,aKeys[a])
+         ENDIF
+      NEXT
+      asort(aPathKeys,,, {|cX,cY| len(cX) > len(cY)} )
+      b:=len(aPathKeys)
+      FOR a := 1 TO b
+         aKeys:=hgetkeys(::hCookies[aDomKeys[x]][aPathKeys[a]])
+         d:=len(aKeys)
+         FOR c := 1 TO d
+            IF !empty(cOut)
+               cOut+='; '
+            ENDIF
+            cOut+=aKeys[c]+'='+::hCookies[aDomKeys[x]][aPathKeys[a]][aKeys[c]]
+         NEXT
+      NEXT
+   NEXT
+   return(cOut)

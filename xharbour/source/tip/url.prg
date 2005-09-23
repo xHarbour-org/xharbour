@@ -1,5 +1,5 @@
 /*
- * $Id: tipmail.prg,v 1.26 2004/04/08 13:26:53 druzus Exp $
+ * $Id: url.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
  */
 
 /*
@@ -79,6 +79,7 @@ CLASS tURL
    METHOD SetAddress( cUrl )
    METHOD BuildAddress()
    METHOD BuildQuery( )
+   METHOD AddGetForm( cPostData )
 
 HIDDEN:
    CLASSDATA   cREuri   INIT HB_RegexComp("(?:(.*)://)?([^?/]*)(/[^?]*)?\??(.*)")
@@ -200,3 +201,46 @@ METHOD BuildQuery( ) CLASS tURL
 
 RETURN cLine
 
+METHOD AddGetForm( cPostData )
+   LOCAL cData:='', nI, cTmp,y
+
+   IF HB_IsHash( cPostData )
+      FOR nI := 1 TO Len( cPostData )
+         cTmp := HGetKeyAt( cPostData, nI )
+         cTmp := CStr( cTmp )
+         cTmp := AllTrim( cTmp )
+         cTmp := TipEncoderUrl_Encode( cTmp )
+         cData += cTmp +"="
+         cTmp := HGetValueAt( cPostData, nI )
+         cTmp := CStr( cTmp )
+         cTmp := AllTrim( cTmp )
+         cTmp := TipEncoderUrl_Encode( cTmp )
+         cData += cTmp + "&"
+      NEXT
+      cData[-1] = ""
+   elseIF HB_IsArray( cPostData )
+      y:=Len(cPostData)
+      FOR nI := 1 TO y
+         cTmp := cPostData[ nI ,1]
+         cTmp := CStr( cTmp )
+         cTmp := AllTrim( cTmp )
+         cTmp := TipEncoderUrl_Encode( cTmp )
+         cData += cTmp +"="
+         cTmp := cPostData[ nI,2]
+         cTmp := CStr( cTmp )
+         cTmp := AllTrim( cTmp )
+         cTmp := TipEncoderUrl_Encode( cTmp )
+         cData += cTmp
+         IF nI!=y
+            cData+="&"
+         ENDIF
+      NEXT
+
+   ELSEIF HB_IsString( cPostData )
+      cData := cPostData
+   Endif
+   IF empty(cData)
+      return
+   ENDIF
+   ::cQuery+=if(empty(::cQuery),'','&')+cData
+   return
