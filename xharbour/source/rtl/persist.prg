@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.20 2004/05/07 23:05:14 peterrees Exp $
+ * $Id: persist.prg,v 1.21 2005/05/31 21:42:25 ronpinkas Exp $
  */
 
 /*
@@ -87,108 +87,109 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
 
    EXTERN HB_RestoreBlock
 
-   LOCAL aLines, nLines, nLine := 1, cLine
-   LOCAL lStart := .T., aObjects := {}, nObjectLevel := 0
+   LOCAL oPure
+   LOCAL aLines, cLine
    LOCAL nAt
-   LOCAL cVersion2 := "// HBPersistent Ver 2.0"
    LOCAL xProperty
+   LOCAL lFix
+   LOCAL nWith
 
-   MEMVAR oObject
-   PRIVATE oObject := __ClsInst( QSelf():ClassH )
+   #define HB_PERSIST_VER_2 "// HBPersistent Ver 2.0"
+
+   PRIVATE oObject
+
+   oPure := __ClsInst( QSelf():ClassH )
 
    // Start with defalt values of clean instance.
    FOR EACH xProperty IN Self
-      xProperty := oObject[ HB_EnumIndex() ]
+      xProperty := oPure[ HB_EnumIndex() ]
    NEXT
 
    // To support macros down below.
-   oObject := QSelf()
+   HB_SetWith( Self )
+   nWith := 1
 
-   IF lIgnoreBadIVars == nil
-      lIgnoreBadIVars := .f.
-   ENDIF
+   TRY
+      IF lIgnoreBadIVars == nil
+         lIgnoreBadIVars := .f.
+      ENDIF
 
-   aLines := ArrayFromLFString( cObjectText )
-   nLines := Len( aLines )
+      aLines := ArrayFromLFString( cObjectText )
 
-   IF Left( cObjectText, Len( cVersion2 ) ) == cVersion2
-      nLine  := 2
-   ELSE
-      FOR nLine := 1 TO nLines
-         cLine := LTrim( aLines[nLine] )
+      IF Left( cObjectText, Len( HB_PERSIST_VER_2 ) ) == HB_PERSIST_VER_2
+         lFix := .F.
 
-         IF cLine[1] == ':'
+         // Remove version info.
+         aDel( aLines, 1, .T. )
+      ELSE
+         lFix := .T.
+      ENDIF
+
+      // Remove Outer OBJECT line.
+      aDel( aLines, 1, .T. )
+
+      // Remove Outer ENDOBJECT
+      aSize( aLines, Len( aLines ) - 1 )
+
+      FOR EACH cLine IN aLines
+         cLine := RTrim( LTrim( cLine ) )
+
+         IF lFix .AND. cLine[1] == ':'
             nAt := At( '=', cLine )
 
             IF nAt > 1
               cLine[ nAt - 1] := ':'
             ENDIF
-
-            aLines[nLine]:= cLine
          ENDIF
-      NEXT nLine
 
-      nLine  := 1
-   ENDIF
+         IF Empty( cLine )
+            LOOP
+         ENDIF
 
-   DO WHILE nLine <= nLines
-      cLine := RTrim( LTrim( aLines[nLine] ) )
+         //TraceLog( cLine )
 
-      IF Empty( cLine )
-         nLine++
-         LOOP
-      ENDIF
+         DO CASE
+            CASE Left( cLine, 2 ) == "::"
+               cLine := "HB_QWith()" + SubStr( cLine, 2 )
 
-      //TraceLog( cLine )
-
-      DO CASE
-         CASE Left( cLine, 2 ) == "::"
-            cLine := "oObject" + SubStr( cLine, 2 )
-
-            //TraceLog( cLine )
-            IF lIgnoreBadIVars
-               TRY
+               //TraceLog( cLine )
+               IF lIgnoreBadIVars
+                  TRY
+                     &( cLine )
+                  END
+               ELSE
                   &( cLine )
-               END
-            ELSE
+               ENDIF
+
+            CASE Left( cLine, 6 ) == "ARRAY "
+               cLine = SubStr( cLine, 8 )
+               cLine := "HB_QWith()" + cLine
+               cLine := StrTran( cLine, " LEN ", " := Array( " ) + ")"
+               //TraceLog( cLine )
                &( cLine )
-            ENDIF
 
-         CASE Left( cLine, 6 ) == "ARRAY "
-            cLine = SubStr( cLine, 8 )
-            cLine := "oObject" + cLine
-            cLine := StrTran( cLine, " LEN ", " := Array( " ) + ")"
-            //TraceLog( cLine )
-            &( cLine )
-
-         CASE Left( cLine, 7 ) == "OBJECT "
-            IF lStart == .T.
-               lStart := .F.
-            ELSE
-               nObjectLevel++
-               aSize( aObjects, nObjectLevel )
-               aObjects[ nObjectLevel ] := M->oObject
-
+            CASE Left( cLine, 7 ) == "OBJECT "
                cLine = SubStr( cLine, 9 )
-               cLine := "oObject" + cLine
+               cLine := "HB_QWith()" + cLine
                cLine := StrTran( cLine, " AS ", " := " ) + "()"
 
                //TraceLog( cLine )
-               M->oObject := &( cLine )
-            ENDIF
+               HB_SetWith( &( cLine ) )
+               nWith++
 
-         CASE Left( cLine, 9 ) == "ENDOBJECT"
-            IF nObjectLevel > 0
-               M->Self := aObjects[ nObjectLevel ]
-               nObjectLevel--
-            ENDIF
+            CASE Left( cLine, 9 ) == "ENDOBJECT"
+               HB_SetWith()
+               nWith--
 
-         OTHERWISE
-            // TraceLog( cLine )
-      ENDCASE
-
-      nLine++
-   ENDDO
+            OTHERWISE
+               // TraceLog( cLine )
+         ENDCASE
+      NEXT
+   FINALLY
+      WHILE nWith-- > 0
+         HB_SetWith()
+      ENDDO
+   END
 
 RETURN .T.
 
@@ -300,8 +301,6 @@ STATIC FUNCTION ValToText( xValue )
 
    LOCAL cType := ValType( xValue )
    LOCAL cText, cQuote := '"'
-
-   PRIVATE oObject
 
    SWITCH cType
       CASE "C"
