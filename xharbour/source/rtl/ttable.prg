@@ -1,5 +1,5 @@
 /*
- * $Id: ttable.prg,v 1.6 2005/04/22 21:30:00 ptsarenko Exp $
+ * $Id: ttable.prg,v 1.6 2005/04/22 18:41:29 ptsarenko Exp $
  */
 
 /*
@@ -322,7 +322,7 @@ FUNCTION NetDelete()
    ENDIF
 
    IF !NETERR()
-      DBSKIP( 0 ) 
+      DBSKIP( 0 )
       DBCOMMIT()
    ELSE
       slNetOK := .T.
@@ -341,7 +341,7 @@ FUNCTION NetReCall()
    ENDIF
 
    IF !NETERR()
-      DBSKIP( 0 ) 
+      DBSKIP( 0 )
       DBCOMMIT()
    ELSE
       slNetOK := .T.
@@ -418,6 +418,8 @@ RETURN n
 
 
 FUNCTION IsLocked( nRecId )
+default nRecID to recno()
+
 RETURN ( ASCAN( DBRLOCKLIST(), { | n | n == nRecID } ) > 0 )
 
 
@@ -582,7 +584,7 @@ PROCEDURE GET() CLASS HBRecord
       ::buffer[ HB_EnumIndex() ] := xField:value
    NEXT
 
-RETURN 
+RETURN
 
 
 PROCEDURE Put() CLASS HBRecord
@@ -596,7 +598,7 @@ PROCEDURE Put() CLASS HBRecord
       ENDIF
    NEXT
 
-RETURN 
+RETURN
 
 /****
 *
@@ -607,7 +609,7 @@ RETURN
 */
 
    //METHOD SetFocus()    INLINE (::Alias)->(Select( ::Area ))
-   // 
+   //
    //
    //encapsulated methods
    //
