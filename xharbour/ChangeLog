@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4356 2005/09/23 22:34:05 likewolf Exp $
+ * $Id: ChangeLog,v 1.4357 2005/09/23 22:54:46 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-23 18:15 UTC-0800 Tony Bretado <jabrecer@yahoo.com>
+  * source/rtl/ttable.prg
+    !Fixed function IsLocked().
+        + default parameter nRecID to recno(). Ads compatible.
+          Calling this function with no arguments, was returning FALSE always.
+          Compare with AX_IsLocked() or SX_IsLocked().
 
 2005-09-23 15:54 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/dbgentry.c
