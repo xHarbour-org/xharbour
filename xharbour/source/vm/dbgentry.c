@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.2 2005/09/23 22:34:05 likewolf Exp $
+ * $Id: dbgentry.c,v 1.3 2005/09/23 22:46:54 ronpinkas Exp $
  */
 
 /*
@@ -523,9 +523,9 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
                return;
          }
 
+         pTop->nLine = nLine;
          if ( !info->bGo )
          {
-            pTop->nLine = nLine;
             info->nProcLevel = nProcLevel - ( hb_dbgIsAltD() ? 2 : 0 );
             hb_dbgActivate( info );
          }
@@ -905,7 +905,7 @@ hb_dbgEvalMakeBlock( HB_WATCHPOINT *watch )
             if ( watch->szExpr[ i ] == '-' && watch->szExpr[ i + 1 ] == '>' )
             {
                i += 2;
-               while ( ( c = watch->szExpr[ i ] ) != NULL && IS_IDENT_CHAR( c ) )
+               while ( ( c = watch->szExpr[ i ] ) != '\0' && IS_IDENT_CHAR( c ) )
                {
                   i++;
                }
