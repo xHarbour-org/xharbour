@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.78 2005/09/20 11:59:00 druzus Exp $
+ * $Id: ads1.c,v 1.79 2005/09/22 01:11:58 druzus Exp $
  */
 
 /*
@@ -139,7 +139,7 @@ void adsSetListener_callback( HB_set_enum setting, HB_set_listener_enum when )
    HB_TRACE(HB_TR_DEBUG, ("adsSetListener_callback (%d  %d)", setting, when));
    if( when == HB_SET_LISTENER_AFTER )  /* we don't do anything with BEFORE calls */
    {
-      switch ( setting )
+      switch( setting )
       {
          case HB_SET_DATEFORMAT :
             AdsSetDateFormat( (UNSIGNED8*) hb_set.HB_SET_DATEFORMAT );
@@ -767,6 +767,9 @@ static ERRCODE adsGoTo( ADSAREAP pArea, ULONG ulRecNo )
  * Advantage proprietary table format (ADT) is an illegal operation and
  * will return the error 5022 (AE_INVALID_RECORD_NUMBER), invalid record
  * number.
+ *
+ * Sut 24 Sep 2005 16:24:18 CEST, Druzus
+ * IMHO such GOTO operation should reposition our RDD to phantom record
  */
    UNSIGNED32 ulRetVal = 0, u32RecNo;
    ULONG ulRecCount;
@@ -801,6 +804,16 @@ static ERRCODE adsGoTo( ADSAREAP pArea, ULONG ulRecNo )
     * internals
     */
    ulRetVal = AdsGotoRecord( pArea->hTable, ( UNSIGNED32 ) ulRecNo );
+   
+   if( ulRetVal == AE_INVALID_RECORD_NUMBER )
+   {
+      /*
+       * We are going to ADT deleted record - see above. GO to phantom
+       * record in such case
+       */
+      ulRecNo = 0;
+      ulRetVal = AdsGotoRecord( pArea->hTable, 0 );
+   }
 
    /* update area flag */
    hb_adsUpdateAreaFlags( pArea );
@@ -2223,12 +2236,6 @@ static ERRCODE adsClose( ADSAREAP pArea )
 
    uiError = adsCloseCursor( pArea );
 
-   if( pArea->szDataFileName )
-   {
-      hb_xfree( pArea->szDataFileName );
-      pArea->szDataFileName = NULL;
-   }
-
    return uiError;
 }
 
@@ -2434,11 +2441,8 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_GETHEADERSIZE:
-         if( !pArea->uiHeaderLen && pArea->iFileType != ADS_ADT )
-         {
-            pArea->uiHeaderLen = 32 + pArea->uiFieldCount * 32 + 2;
-         }
-         hb_itemPutNL( pItem, pArea->uiHeaderLen );
+         hb_itemPutNL( pItem, pArea->iFileType != ADS_ADT ? 0 : 
+                       32 + pArea->uiFieldCount * 32 + 2 );
          break;
 
       case DBI_LASTUPDATE:
@@ -2631,7 +2635,7 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
    {
       /*
        * table was open by ADSEXECUTESQL[DIRECT]() function
-       * I do not like the way how it was implemented but I also
+       * I do not like the way it was implemented but I also
        * do not have time to change it so I simply restored this
        * functionality, Druzus.
        */
@@ -2693,7 +2697,7 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       // This change allows the use of a Dictionary, and non Dictionary temp files at the same time.
       if( !bDictionary || ulLastErr == 5132L )
       {
-         u32RetVal = AdsOpenTable( ( ADSHANDLE ) pOpenInfo->ulConnection,
+         u32RetVal = AdsOpenTable( hConnection,
                         pOpenInfo->abName, pOpenInfo->atomAlias,
                         pArea->iFileType, adsCharType, adsLockType, adsRights,
                         ( pOpenInfo->fShared ? ADS_SHARED : ADS_EXCLUSIVE ) |
@@ -2882,8 +2886,8 @@ static ERRCODE adsSysName( ADSAREAP pArea, BYTE * pBuffer )
       u32RetVal = AdsGetTableType( pArea->hTable, &u16TableType );
       if( u32RetVal != AE_SUCCESS )
       {
-         TraceLog( NULL, "Error in adsSysName: %d  pArea->hTable %d\n", u32RetVal, pArea->hTable );
-         return SUCCESS;  // throwing an error here makes error logging fail so original errors are not described
+         HB_TRACE(HB_TR_ALWAYS, ("Error in adsSysName: %d  pArea->hTable %d\n", u32RetVal, pArea->hTable));
+         u16TableType = (UNSIGNED16) pArea->iFileType;
       }
    }
    else
@@ -4323,12 +4327,12 @@ static ERRCODE adsExit( LPRDDNODE pRDD )
    {
       if( ! --s_uiRddCount )
       {
-         AdsApplicationExit();
          if( iSetListenerHandle )
          {
             hb_setListenerRemove( iSetListenerHandle ) ;
             iSetListenerHandle = 0;
          }
+         AdsApplicationExit();
       }
    }
 

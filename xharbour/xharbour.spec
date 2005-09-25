@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.83 2005/09/15 12:55:34 druzus Exp $
+# $Id: xharbour.spec,v 1.84 2005/09/22 01:11:58 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -387,7 +387,7 @@ This RPM distribution of %{dname} includes extra commands to make compiling
 and linking with %{dname} a little easier. There are compiler and linker
 wrappers called "%{hb_pref}cc", "%{hb_pref}cmp", "%{hb_pref}lnk" and "%{hb_pref}mk".
 
-"%{hb_pref}cc" is a wrapper to the C compiler only it sets all flags
+"%{hb_pref}cc" is a wrapper to the C compiler only. It sets all flags
 and paths necessary to compile .c files which include %{dname} header
 files. The result of its work is an object file.
 
@@ -413,8 +413,12 @@ All these scripts accept command line switches:
 -gt<hbgt>               # link with <hbgt> GT driver, can be repeated to
                         # link with more GTs. The first one will be
                         #      the default at runtime
+-xbgtk                  # link with xbgtk library (xBase GTK+ interface)
+-hwgui                  # link with HWGUI library (GTK+ interface)
+-l<libname>             # link with <libname> library
 -fmstat                 # link with the memory statistics lib
 -nofmstat               # do not link with the memory statistics lib (default)
+-[no]strip              # strip (no strip) binaries
 -main=<main_func>       # set the name of main program function/procedure.
                         # if not set then 'MAIN' is used or if it doesn't
                         # exist the name of first public function/procedure

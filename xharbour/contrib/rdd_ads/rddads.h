@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.7 2005/03/10 16:35:23 snaiperis Exp $
+ * $Id: rddads.h,v 1.8 2005/09/02 18:29:03 druzus Exp $
  */
 
 /*
@@ -100,22 +100,23 @@ typedef struct _ADSAREA_
    */
 
    LPDBRELINFO lpdbPendingRel;   /* Pointer to parent rel struct */
-   BOOL fPositioned;             /* TRUE if we are not at phantom record */
 
-   char * szDataFileName;        /* Name of data file */
-   USHORT uiHeaderLen;           /* Size of header */
-   USHORT uiRecordLen;           /* Size of record */
-   ULONG ulRecNo;                /* Current record */
-   BYTE * pRecord;               /* Buffer of record data */
-   ULONG maxFieldLen;            /* Max field length in table record */
+   char *   szDataFileName;      /* Name of data file */
+   USHORT   uiRecordLen;         /* Size of record */
+   ULONG    ulRecNo;             /* Current record */
+   BYTE *   pRecord;             /* Buffer of record data */
+   ULONG    maxFieldLen;         /* Max field length in table record */
 
-   BOOL fShared;                 /* Shared file */
-   BOOL fReadonly;               /* Read only file */
-   BOOL fFLocked;                /* TRUE if file is locked */
+   BOOL     fPositioned;         /* TRUE if we are not at phantom record */
+   BOOL     fShared;             /* Shared file */
+   BOOL     fReadonly;           /* Read only file */
+   BOOL     fFLocked;            /* TRUE if file is locked */
+
+   int      iFileType;           /* adt/cdx/ntx */
+
    ADSHANDLE hTable;
    ADSHANDLE hOrdCurrent;
    ADSHANDLE hStatement;
-   int iFileType;                /* adt/cdx/ntx */
 } ADSAREA;
 
 typedef ADSAREA * ADSAREAP;
@@ -132,12 +133,12 @@ typedef ADSAREA * ADSAREAP;
 ADSAREAP hb_rddGetADSWorkAreaPointer( void );
 
 UNSIGNED32 ENTRYPOINT AdsSetFieldRaw( ADSHANDLE  hObj,
-                                       UNSIGNED8  *pucFldName,
-                                       UNSIGNED8  *pucBuf,
-                                       UNSIGNED32 ulLen );
+                                      UNSIGNED8  *pucFldName,
+                                      UNSIGNED8  *pucBuf,
+                                      UNSIGNED32 ulLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetFieldRaw( ADSHANDLE  hTbl,
-                                       UNSIGNED8  *pucFldName,
-                                       UNSIGNED8  *pucBuf,
-                                       UNSIGNED32 *pulLen );
+                                      UNSIGNED8  *pucFldName,
+                                      UNSIGNED8  *pucBuf,
+                                      UNSIGNED32 *pulLen );
 

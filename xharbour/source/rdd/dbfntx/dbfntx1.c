@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.131 2005/09/19 23:21:28 druzus Exp $
+ * $Id: dbfntx1.c,v 1.132 2005/09/20 17:26:37 druzus Exp $
  */
 
 /*
@@ -1933,9 +1933,8 @@ static ERRCODE hb_ntxIndexHeaderRead( LPNTXINDEX pIndex )
    else
    {
       LPNTXHEADER lpNTX = ( LPNTXHEADER ) pIndex->HeaderBuff;
+      ULONG ulRootPage, ulVersion;
       LPTAGINFO pTag;
-      USHORT usVersion;
-      ULONG ulRootPage;
 
       if( pIndex->Compound )
       {
@@ -1945,14 +1944,14 @@ static ERRCODE hb_ntxIndexHeaderRead( LPNTXINDEX pIndex )
       }
       pTag = pIndex->iTags ? pIndex->lpTags[0] : NULL;
 
-      usVersion = HB_GET_LE_UINT16( lpNTX->version );
+      ulVersion = HB_GET_LE_UINT16( lpNTX->version );
       ulRootPage = HB_GET_LE_UINT32( lpNTX->root );
       pIndex->NextAvail = HB_GET_LE_UINT32( lpNTX->next_page );
-      if( pIndex->Version != usVersion || ( pTag &&
+      if( pIndex->Version != ulVersion || ( pTag &&
           ( pTag->Signature != type || ulRootPage != pTag->RootBlock ) ) )
       {
          hb_ntxDiscardBuffers( pIndex );
-         pIndex->Version = usVersion;
+         pIndex->Version = ulVersion;
          if( pTag )
          {
             pTag->RootBlock = ulRootPage;
@@ -6763,11 +6762,13 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             hb_itemPutL( pInfo->itmResult, hb_ntxOrdSkipWild( pTag,
                               uiIndex == DBOI_SKIPWILD, pInfo->itmNewVal ) );
             break;
+#if defined(__XHARBOUR__)
          case DBOI_SKIPREGEX:
          case DBOI_SKIPREGEXBACK:
             hb_itemPutL( pInfo->itmResult, hb_ntxOrdSkipRegEx( pTag,
                               uiIndex == DBOI_SKIPREGEX, pInfo->itmNewVal ) );
             break;
+#endif
          case DBOI_FINDREC:
          case DBOI_FINDRECCONT:
             hb_itemPutL( pInfo->itmResult, hb_ntxOrdFindRec( pTag,

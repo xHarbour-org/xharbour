@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.46 2005/03/13 13:33:55 likewolf Exp $
+# $Id: make_tgz.sh,v 1.47 2005/04/07 23:18:36 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -85,7 +85,7 @@ case "$HB_ARCHITECTURE" in
     darwin)
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr/local"
         HB_INSTALL_GROUP=wheel
-	ETC="/private/etc"
+        ETC="/private/etc"
 	;;
     linux)
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr"
@@ -191,8 +191,7 @@ for l in ${hb_contrib}
 do
     (cd "contrib/$l"
      $MAKE -r clean
-     $MAKE -r
-    )
+     $MAKE -r)
 done
 
 # install

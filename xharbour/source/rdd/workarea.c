@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.54 2005/09/13 01:48:33 druzus Exp $
+ * $Id: workarea.c,v 1.55 2005/09/15 12:55:35 druzus Exp $
  */
 
 /*
@@ -1021,7 +1021,7 @@ ERRCODE hb_waTransRec( AREAP pArea, LPDBTRANSINFO pTransInfo )
    {
       PHB_ITEM pItem = hb_itemNew( NULL );
       LPDBTRANSITEM pTransItem;
-      USHORT uiCount = 0;
+      USHORT uiCount;
 
       /* Append a new record */
       errCode = SELF_APPEND( ( AREAP ) pTransInfo->lpaDest, TRUE );

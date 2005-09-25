@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4359 2005/09/24 07:03:40 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4360 2005/09/24 08:55:02 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-25 18:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/make_tgz.sh
+    * indent formatting
+
+  * xharbour/xharbour.spec
+    * updated README.RPM
+
+  * xharbour/contrib/rdd_ads/rddads.h
+  * xharbour/contrib/rdd_ads/ads1.c
+    * go to phantom record if after GOTO to deleted record in ADT
+      tables
+    * some minor cleanups
+  * xharbour/contrib/rdd_ads/adsfunc.c
+    ! store callback pointer in item created by hb_itemNew()
+      HB_ITEM_LOCK/HB_ITEM_UNLOCK is not structural safe when called
+      more then one times - it does not count of lock numbers
+
+  * xharbour/include/hbapi.h
+    + added declaration for hb_objSendSymbol()
+
+  * xharbour/include/hbextern.ch
+    * minor cleanups
+
+  * xharbour/source/rdd/dbcmd.c
+    * fixed possibly dangerous use of C stack HB_ITEM and some minor
+      optimizations
+
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/workarea.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * cleaned some BCC warning messages
 
 2005-09-24 12:52 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/vm/dbgentry.c

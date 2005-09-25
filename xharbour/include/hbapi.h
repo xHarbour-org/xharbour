@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.170 2005/09/04 04:29:00 walito Exp $
+ * $Id: hbapi.h,v 1.171 2005/09/23 21:55:06 likewolf Exp $
  */
 
 /*
@@ -528,6 +528,7 @@ extern HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg );
 extern HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend, BOOL *bSymbol );
 extern HB_EXPORT PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
 extern HB_EXPORT PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
+extern HB_EXPORT PHB_ITEM hb_objSendSymbol( PHB_ITEM pObj, PHB_SYMB pSymbol, ULONG ulArg, ... );
 extern HB_EXPORT USHORT   hb_objClassH( PHB_ITEM pObj );
 /*#define hb_objGetPropValue( pObj, szProp, pDestNullable ) \
    if ( pDestNullable == NULL ) \

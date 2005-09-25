@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.131 2005/09/15 12:55:35 druzus Exp $
+ * $Id: dbf1.c,v 1.132 2005/09/16 22:29:40 druzus Exp $
  */
 
 /*
@@ -2900,7 +2900,6 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    if( pError )
    {
       hb_itemRelease( pError );
-      pError = NULL;
    }
 
    /* Exit if error */

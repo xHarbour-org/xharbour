@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.63 2005/09/19 23:21:27 druzus Exp $
+ * $Id: adsfunc.c,v 1.64 2005/09/20 11:59:00 druzus Exp $
  */
 
 /*
@@ -81,7 +81,7 @@ BOOL bDictionary = FALSE;               /* Use Data Dictionary? */
 BOOL bTestRecLocks = FALSE;             /* Debug Implicit locks */
 
 #if !defined( ADS_LINUX )
-static HB_ITEM s_itmCobCallBack = HB_ITEM_NIL;
+static PHB_ITEM s_pItmCobCallBack = NULL;
 #endif
 
 #if ADS_REQUIRE_VERSION >= 6
@@ -1633,14 +1633,13 @@ HB_FUNC( ADSCONVERTTABLE )
 
 UNSIGNED32 WINAPI ShowPercentage( UNSIGNED16 usPercentDone )
 {
-   HB_ITEM PercentDone;
-
-   PercentDone.type = HB_IT_NIL;
-   hb_itemPutNI( &PercentDone, usPercentDone );
-
-   if( HB_IS_BLOCK( &s_itmCobCallBack ) )
+   if( s_pItmCobCallBack && HB_IS_BLOCK( s_pItmCobCallBack ) )
    {
-      return hb_itemGetL( hb_vmEvalBlockV( &s_itmCobCallBack, 1, &PercentDone ) ) ;
+      HB_ITEM PercentDone;
+      PercentDone.type = HB_IT_NIL;
+      hb_itemPutNI( &PercentDone, usPercentDone );
+
+      return hb_itemGetL( hb_vmEvalBlockV( s_pItmCobCallBack, 1, &PercentDone ) ) ;
    }
    else
    {
@@ -1659,7 +1658,7 @@ HB_FUNC( ADSREGCALLBACK )
    /* Note: current implementation is not thread safe.
       ADS can register multiple callbacks, but one per thread/connection.
       To be thread safe, we need multiple connections.
-      The registered function (and its codeblock s_itmCobCallBack) should
+      The registered function (and its codeblock s_pItmCobCallBack) should
       NOT make any Advantage Client Engine calls. If it does,
       it is possible to get error code 6619 "Communication Layer is busy".
 
@@ -1667,9 +1666,11 @@ HB_FUNC( ADSREGCALLBACK )
 
    if( ISBLOCK( 1 ) )
    {
-      HB_ITEM_UNLOCK( &s_itmCobCallBack );
-      hb_itemCopy( &s_itmCobCallBack, hb_param( 1, HB_IT_BLOCK ) );
-      HB_ITEM_LOCK( &s_itmCobCallBack );
+      if( s_pItmCobCallBack )
+      {
+         hb_itemRelease( s_pItmCobCallBack );
+      }
+      s_pItmCobCallBack = hb_itemNew( hb_param( 1, HB_IT_BLOCK ) );
 
       ulRetVal = AdsRegisterProgressCallback( ShowPercentage );
 
@@ -1680,8 +1681,8 @@ HB_FUNC( ADSREGCALLBACK )
       }
       else
       {
-         HB_ITEM_UNLOCK( &s_itmCobCallBack );
-         hb_itemClear( &s_itmCobCallBack );
+         hb_itemRelease( s_pItmCobCallBack );
+         s_pItmCobCallBack = NULL;
       }
    }
 
@@ -1691,8 +1692,11 @@ HB_FUNC( ADSREGCALLBACK )
 
 HB_FUNC( ADSCLRCALLBACK )
 {
-   HB_ITEM_UNLOCK( &s_itmCobCallBack );
-   hb_itemClear( &s_itmCobCallBack );
+   if( s_pItmCobCallBack )
+   {
+      hb_itemRelease( s_pItmCobCallBack );
+      s_pItmCobCallBack = NULL;
+   }
    hb_retni( AdsClearProgressCallback() );
 }
 
