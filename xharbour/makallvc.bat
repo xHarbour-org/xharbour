@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallvc.bat,v 1.14 2005/02/14 06:00:23 paultucker Exp $
+rem $Id: makallvc.bat,v 1.16 2005/09/26 09:00:00 modalsit Exp $
 rem 
 
 echo creating system files
@@ -122,13 +122,6 @@ if errorlevel 1 goto end
 echo WoopGui
 cd contrib\WoopGUI
 call make_vc.bat %1
-cd ..\..
-if errorlevel 1 goto end
-
-:xVisual
-echo xVisual
-cd contrib\xVisual
-if exist make_vc.bat call make_vc.bat %1
 cd ..\..
 if errorlevel 1 goto end
 
