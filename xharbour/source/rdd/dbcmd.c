@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.169 2005/09/22 01:11:59 druzus Exp $
+ * $Id: dbcmd.c,v 1.170 2005/09/25 16:14:21 druzus Exp $
  */
 
 /*
@@ -3256,7 +3256,7 @@ HB_FUNC( RDDLIST )
    {
       if( ( uiType == 0 ) || ( s_RddList[ uiCount ]->uiType == uiType ) )
       {
-         hb_itemPutC( hb_arrayGetItemPtr( pRddArray, uiIndex++ ), s_RddList[ uiCount ]->szName );
+         hb_itemPutC( hb_arrayGetItemPtr( pRddArray, ++uiIndex ), s_RddList[ uiCount ]->szName );
       }
    }
    hb_itemReturnForward( pRddArray );
