@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.3 2005/09/23 22:46:54 ronpinkas Exp $
+ * $Id: dbgentry.c,v 1.4 2005/09/24 08:55:02 likewolf Exp $
  */
 
 /*
@@ -74,10 +74,10 @@
    hb_gcFree( hb_gcUnlock( ptr ) )
 
 #define STRDUP( source ) \
-   strcpy( ALLOC( strlen( source ) + 1 ), source )
+   strcpy( (char *) ALLOC( strlen( source ) + 1 ), source )
 
 #define STRNDUP( dest, source, len ) \
-   ( ( dest = strncpy( ALLOC( len + 1 ), source, len ) ), \
+   ( ( dest = strncpy( (char *) ALLOC( len + 1 ), source, len ) ), \
      ( dest[ len ] = '\0' ) )
 
 #define ARRAY_ADD( type, array, length ) \
@@ -930,7 +930,7 @@ hb_dbgEvalMakeBlock( HB_WATCHPOINT *watch )
             FREE( szWord );
          }
          {
-            char *t = ALLOC( strlen( watch->szExpr ) - nLen + 9 + 1 );
+            char *t = (char *) ALLOC( strlen( watch->szExpr ) - nLen + 9 + 1 );
 
             memmove( t, watch->szExpr, nStart );
             memmove( t + nStart, "__dbg[", 6 );
@@ -1030,7 +1030,7 @@ hb_dbgEvalMakeBlock( HB_WATCHPOINT *watch )
    }
    {
       HB_ITEM block;
-      char *s = ALLOC( 8 + strlen( watch->szExpr ) + 1 + 1 );
+      char *s = (char *) ALLOC( 8 + strlen( watch->szExpr ) + 1 + 1 );
 
       strcpy( s, "{|__dbg|" );
       strcat( s, watch->szExpr );
@@ -1063,7 +1063,7 @@ hb_dbgEvalResolve( HB_DEBUGINFO *info, HB_WATCHPOINT *watch )
       return aVars;
    }
    
-   scopes = ALLOC( watch->nVars * sizeof( HB_VARINFO ) );
+   scopes = (HB_VARINFO *) ALLOC( watch->nVars * sizeof( HB_VARINFO ) );
    nProcLevel = hb_dbg_ProcLevel();
    
    for ( i = 0; i < info->nStaticModules; i++ )
