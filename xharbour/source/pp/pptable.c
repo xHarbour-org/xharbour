@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.60 2005/09/21 01:55:54 ronpinkas Exp $
+ * $Id: pptable.c,v 1.61 2005/09/21 02:34:11 mlombardo Exp $
  */
 
 /*
@@ -139,6 +139,8 @@ void hb_pp_Table( void )
    static DEFINES sD___68 = {"_SET_FORCEOPT",NULL,-1,"117", &sD___67 };
    static DEFINES sD___69 = {"_SET_EOL",NULL,-1,"118", &sD___68 };
    static DEFINES sD___70 = {"_SET_ERRORLOG",NULL,-1,"119", &sD___69 };
+   static DEFINES sD___71 = {"HB_SET_BASE",NULL,-1,"100", &sD___70 };
+   static DEFINES sD___72 = {"HB_SET_COUNT",NULL,-1,"20", &sD___71 };
 
    static COMMANDS sC___1 = {0,"NOTE","\1A30",NULL,NULL };
    static COMMANDS sC___2 = {0,"DO","WHILE \1A00","while \1A00",&sC___1 };
@@ -513,6 +515,6 @@ void hb_pp_Table( void )
    hb_pp_topCommand = &sC___259;
 #endif
 
-   hb_pp_topDefine = &sD___70;
+   hb_pp_topDefine = &sD___72;
    hb_pp_topTranslate = &sT___03;
 }
