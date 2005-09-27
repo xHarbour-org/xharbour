@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.99 2005/09/23 22:54:46 ronpinkas Exp $
+# $Id: hrbdll.bc,v 1.100 2005/09/27 05:24:53 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -375,7 +375,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\classes.obj \
   $(OBJ_DIR)\cmdarg.obj \
   $(OBJ_DIR)\codebloc.obj \
-  $(OBJ_DIR)\dbgentry.obj \
   $(OBJ_DIR)\debug.obj \
   $(OBJ_DIR)\dynlibhb.obj \
   $(OBJ_DIR)\dynsym.obj \
@@ -1049,7 +1048,6 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\classes.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cmdarg.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\codebloc.obj          + >> hdll.tmp
-  echo. $(OBJ_DIR)\dbgentry.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\debug.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\dynlibhb.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dynsym.obj            + >> hdll.tmp
@@ -1485,9 +1483,6 @@ $(OBJ_DIR)\cmdarg.obj : $(VM_DIR)\cmdarg.c
    $(CC_CMD)
 
 $(OBJ_DIR)\codebloc.obj : $(VM_DIR)\codebloc.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dbgentry.obj : $(VM_DIR)\dbgentry.c
    $(CC_CMD)
 
 $(OBJ_DIR)\debug.obj : $(VM_DIR)\debug.c
