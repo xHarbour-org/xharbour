@@ -19,7 +19,7 @@ PROCEDURE Main()
 
    TRY
       // Should be Ok.
-      ? "Ok from Expose Method:", Eval( oParent:ExposePrivateOfParent )
+      ? "Ok from Expose Method:", oParent:ExposePrivateOfParent()
    CATCH oErr
       ? "OOPS No Violation!", oErr:Description, ProcName() + '[' + Str( ProcLine(), 3 ) + ']'
    END

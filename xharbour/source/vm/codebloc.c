@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.49 2005/08/01 13:52:22 jacekp Exp $
+ * $Id: codebloc.c,v 1.50 2005/09/22 23:02:26 ronpinkas Exp $
  */
 
 /*
@@ -235,21 +235,8 @@ void  hb_codeblockDelete( HB_ITEM_PTR pItem )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockDelete(%p)", pItem));
 
-   #ifndef HB_ARRAY_USE_COUNTER
-   // Called recursively from hb_codeblockDeleteGarbage()!
-   if( pCBlock && pCBlock->pSelfBase == (PHB_BASEARRAY) 1 )
-   {
-      return;
-   }
-   #endif
-
    if( pCBlock && (--pCBlock->ulCounter == 0) )
    {
-      if( pCBlock->pSelfBase )
-      {
-         pCBlock->pSelfBase = NULL;
-      }
-
       if( pCBlock->pLocals )
       {
          USHORT ui = pCBlock->uiLocals;
@@ -296,11 +283,6 @@ HB_GARBAGE_FUNC( hb_codeblockDeleteGarbage )
    HB_CODEBLOCK_PTR pCBlock = ( HB_CODEBLOCK_PTR ) Cargo;
 
    HB_TRACE(HB_TR_INFO, ("hb_codeblockDeleteGarbage(%p)", Cargo));
-
-   if( pCBlock->pSelfBase )
-   {
-      pCBlock->pSelfBase = NULL;
-   }
 
    /* free space allocated for local variables
     */

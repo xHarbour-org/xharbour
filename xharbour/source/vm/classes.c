@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.164 2005/09/23 15:35:26 ronpinkas Exp $
+ * $Id: classes.c,v 1.165 2005/09/23 21:55:06 likewolf Exp $
  */
 
 /*
@@ -525,7 +525,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
                char *szCaller;
                char *pAt;
 
-               if( pCaller->item.asBlock.value->pSelfBase == NULL )
+               if( pCaller->item.asBlock.value->uiClass == 0 )
                {
                   szCaller = pCaller->item.asBlock.value->procname;
 
@@ -551,7 +551,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
                else
                {
                   // pObject and the HB_QSelf() of block are same class.
-                  if( strcmp( pClass->szName, ( s_pClasses + ( pCaller->item.asBlock.value->pSelfBase->uiClass - 1 ) )->szName ) == 0 )
+                  if( pCaller->item.asBlock.value->uiClass == pObject->item.asArray.value->uiClass )
                   {
                      return TRUE;
                   }
@@ -1747,6 +1747,8 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             pNewMeth->uiScope = uiScope;
             pNewMeth->uiScope &= ~((USHORT) HB_OO_CLSTP_SYMBOL);
 
+            ((PHB_ITEM) pFunc_or_BlockPointer)->item.asBlock.value->uiClass = uiClass;
+
             hb_arraySize( pClass->pInlines, pNewMeth->uiData );
             hb_arraySet( pClass->pInlines, pNewMeth->uiData, (PHB_ITEM) pFunc_or_BlockPointer );
             pNewMeth->pFunction = hb___msgEvalInline;
@@ -2384,7 +2386,7 @@ static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
 
                   if( HB_IS_BLOCK( pInitValue ) )
                   {
-                     pInitValue->item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
+                     pInitValue->item.asBlock.value->uiClass = pSelf->item.asArray.value->uiClass;
                   }
                }
 
@@ -2427,7 +2429,7 @@ static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
 
                            if( HB_IS_BLOCK( pInit ) )
                            {
-                              pInit->item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
+                              pInit->item.asBlock.value->uiClass = pSelf->item.asArray.value->uiClass;
                            }
                         }
 
@@ -2460,7 +2462,7 @@ static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
 
                            if( HB_IS_BLOCK( pInit ) )
                            {
-                              pInit->item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
+                              pInit->item.asBlock.value->uiClass = pSelf->item.asArray.value->uiClass;
                            }
                         }
 
@@ -3671,11 +3673,6 @@ HARBOUR hb___msgGetData( void )
    }
 
    hb_arrayGet( pObject, uiIndex, &(HB_VM_STACK.Return) );
-
-   if( HB_IS_BLOCK( &HB_VM_STACK.Return ) )
-   {
-      HB_VM_STACK.Return.item.asBlock.value->pSelfBase = pObject->item.asArray.value;
-   }
 }
 
 /*
@@ -4356,7 +4353,7 @@ HB_EXPORT BOOL
 hb_clsSetScope( BOOL bClsScope )
 {
    BOOL bOldClsScope = s_bClsScope;
-   
+
    s_bClsScope = bClsScope;
    return bOldClsScope;
 }

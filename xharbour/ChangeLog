@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4366 2005/09/26 12:00:14 modalsist Exp $
+ * $Id: ChangeLog,v 1.4367 2005/09/26 12:59:50 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-26 19:24 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbvmpub.h
+  * source/vm/arrays.c
+  * source/vm/classes.c
+  * source/vm/codebloc.c
+  * source/vm/garbage.c
+  * source/vm/hvm.c
+  * source/vm/proc.c
+    * Changed item.asBlock.value->pSelfBase to item.asBlock.value->uiClass (Przemek's suggestion)
+
+  * tests/scope1.prg
+  * tests/tstscope.prg
+    * Minor correction needed after above change.
 
 2005-09-26 10:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
   * source/vm/dbgentry.c

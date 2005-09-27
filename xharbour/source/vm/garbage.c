@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.83 2005/04/14 09:15:26 ronpinkas Exp $
+ * $Id: garbage.c,v 1.84 2005/09/23 15:00:53 ronpinkas Exp $
  */
 
 /*
@@ -518,16 +518,6 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
             hb_gcItemRef( &pCBlock->pLocals[ ui ] );
             ++ui;
          }
-
-         /*
-         if( pCBlock->pSelfBase )
-         {
-            HB_ITEM FakedItem;
-            FakedItem.type = HB_IT_ARRAY;
-            FakedItem.item.asArray.value = pCBlock->pSelfBase;
-            hb_gcItemRef( &FakedItem );
-         }
-         */
       }
    }
    /* all other data types don't need the GC */

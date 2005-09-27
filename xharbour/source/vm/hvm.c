@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.491 2005/09/23 15:35:26 ronpinkas Exp $
+ * $Id: hvm.c,v 1.492 2005/09/23 22:04:00 likewolf Exp $
  */
 
 /*
@@ -7394,24 +7394,13 @@ static void hb_vmRetValue( void )
 {
    HB_THREAD_STUB
 
-#if 1
    PHB_ITEM pItem = *( HB_VM_STACK.pPos - 1 );
-
-   if( HB_IS_BLOCK( pItem ) )
-   {
-      pItem->item.asBlock.value->pSelfBase = NULL;
-   }
-#endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRetValue()"));
 
-#if 0
-   hb_itemForwardValue( &(HB_VM_STACK.Return), *( HB_VM_STACK.pPos - 1 ) );
-#else
    /* for clipper compatibility */
    pItem->type &= ~HB_IT_MEMOFLAG;
    hb_itemForwardValue( &(HB_VM_STACK.Return), pItem ) ;
-#endif
 
    hb_stackDec();
 }
@@ -7837,7 +7826,7 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
 
    if( HB_IS_ARRAY( *( HB_VM_STACK.pBase + 1 ) ) )  /* it is a method name */
    {
-      ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
+      ( * HB_VM_STACK.pPos )->item.asBlock.value->uiClass = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value->uiClass;
 
       //TraceLog( NULL, "OBJECT Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
    }
@@ -7845,7 +7834,7 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    {
       //TraceLog( NULL, "PROC Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
 
-      ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = NULL;
+      ( * HB_VM_STACK.pPos )->item.asBlock.value->uiClass = 0;
    }
 
    ( * HB_VM_STACK.pPos )->item.asBlock.value->uLen = HB_PCODE_MKUSHORT( &( pCode[ 1 ] ) ) - ( 7 + uiLocals * 2 );
@@ -7887,7 +7876,7 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
 
    if( HB_IS_ARRAY( *( HB_VM_STACK.pBase + 1 ) ) )  /* it is a method name */
    {
-      ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
+      ( * HB_VM_STACK.pPos )->item.asBlock.value->uiClass = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value->uiClass;
 
       //TraceLog( NULL, "OBJECT Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
    }
@@ -7895,7 +7884,7 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    {
       //TraceLog( NULL, "PROC Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
 
-      ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = NULL;
+      ( * HB_VM_STACK.pPos )->item.asBlock.value->uiClass = 0;
    }
 
    ( * HB_VM_STACK.pPos )->item.asBlock.value->uLen = pCode[ 1 ] - 2;
@@ -7937,7 +7926,7 @@ static void hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols )
 
    if( HB_IS_ARRAY( *( HB_VM_STACK.pBase + 1 ) ) )  /* it is a method name */
    {
-      ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value;
+      ( * HB_VM_STACK.pPos )->item.asBlock.value->uiClass = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value->uiClass;
 
       //TraceLog( NULL, "OBJECT Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
    }
@@ -7945,7 +7934,7 @@ static void hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols )
    {
       //TraceLog( NULL, "PROC Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
 
-      ( * HB_VM_STACK.pPos )->item.asBlock.value->pSelfBase = NULL;
+      ( * HB_VM_STACK.pPos )->item.asBlock.value->uiClass = 0;
    }
 
    ( * HB_VM_STACK.pPos )->item.asBlock.value->uLen = HB_PCODE_MKUSHORT( &( pCode[ 1 ] ) ) - 5;
@@ -8575,11 +8564,6 @@ static void hb_vmPopLocal( SHORT iLocal )
       if( HB_IS_BYREF( pLocal ) )
       {
          pLocal = hb_itemUnRef( pLocal );
-
-         if( HB_IS_BLOCK( pVal ) )
-         {
-            pVal->item.asBlock.value->pSelfBase = NULL;
-         }
       }
    }
    else
@@ -9539,20 +9523,6 @@ HB_FUNC( HB_QSELF )
 
    while( ( HB_IS_BLOCK( *( pBase + 1 ) ) || lLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
    {
-      if( lLevel <= 0 )
-      {
-         if( (*( pBase + 1 ))->item.asBlock.value->pSelfBase )
-         {
-            HB_ITEM Self;
-
-            Self.type = HB_IT_ARRAY;
-            Self.item.asArray.value = (*( pBase + 1 ))->item.asBlock.value->pSelfBase;
-
-            hb_itemCopy( &(HB_VM_STACK.Return), &Self );
-            return;
-         }
-      }
-
       //TraceLog( NULL, "Skipped: %s\n", ( *pBase )->item.asSymbol.value->szName );
 
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
@@ -9662,11 +9632,11 @@ HB_FUNC( HB_RESTOREBLOCK )
 
             if( pSelf && HB_IS_OBJECT( pSelf ) )
             {
-               Block.item.asBlock.value->pSelfBase = pSelf->item.asArray.value;
+               Block.item.asBlock.value->uiClass = pSelf->item.asArray.value->uiClass;
             }
             else
             {
-               Block.item.asBlock.value->pSelfBase = NULL;
+               Block.item.asBlock.value->uiClass = 0;
             }
 
             //TraceLog( NULL, "Proc: %s Line %i Self: %p\n", Block.item.asBlock.value->procname, Block.item.asBlock.value->lineno, Block.item.asBlock.value->pSelfBase );

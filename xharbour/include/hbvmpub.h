@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.36 2005/05/09 10:04:09 druzus Exp $
+ * $Id: hbvmpub.h,v 1.37 2005/09/11 19:39:32 druzus Exp $
  */
 
 /*
@@ -279,7 +279,7 @@
       BOOL       dynBuffer;    /* is pcode buffer allocated dynamically */
       PHB_ITEM   **pGlobals;
       USHORT     uLen;
-      PHB_BASEARRAY pSelfBase;
+      USHORT     uiClass;
    } HB_CODEBLOCK, * PHB_CODEBLOCK, * HB_CODEBLOCK_PTR;
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.120 2005/07/10 05:07:06 walito Exp $
+ * $Id: arrays.c,v 1.121 2005/09/11 19:41:11 druzus Exp $
  */
 
 /*
@@ -1651,15 +1651,8 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
                {
                	#ifdef DEBUG_OWNERS
                    TraceLog( NULL, "Warning! (4) Invalid Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
-                #endif   
+                #endif
                }
-            }
-            else if( ((HB_CODEBLOCK_PTR) (pOwners->pOwner))->pSelfBase == pBaseArray )
-            {
-               //TraceLog( NULL, "Warning! (3) Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
-
-               // Forcing reset of the orphan refernce or else a GPF will folow when that item will be passed to hb_itemClear().
-               ((HB_CODEBLOCK_PTR) (pOwners->pOwner) )->pSelfBase = NULL;
             }
             else if( ((PHB_ITEM) (pOwners->pOwner))->type == HB_IT_BYREF &&
                      ((PHB_ITEM) (pOwners->pOwner))->item.asRefer.offset == 0 )
@@ -1673,7 +1666,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
                {
                	#ifdef DEBUG_OWNERS
                    TraceLog( NULL, "Warning! (4-2) Invalid Residual owner %p of array %p\n", pOwners->pOwner, pBaseArray );
-                #endif   
+                #endif
                }
 
             }
@@ -1682,9 +1675,9 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
             }
             else
             {
-            #ifdef DEBUG_OWNERS	
+            #ifdef DEBUG_OWNERS
                TraceLog( NULL, "Warning! (5) Invalid Residual owner %p type: %i\n", pOwners->pOwner, ((PHB_ITEM) (pOwners->pOwner))->type );
-            #endif   
+            #endif
             }
 
             pFree = pOwners;
@@ -1753,7 +1746,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
            hb_procinfo( 0, szProc, &uiLine, szModule  );
            TraceLog( NULL, "Warning! Could not locate old owner %p of array %p [%s->%s(%i)] Stack: %p\n",
                            pOldHolder, pBaseArray, szModule, szProc, uiLine, hb_stackItemFromTop(1) );
-        #endif                   
+        #endif
       }
 
       hb_arrayRegisterHolder( pBaseArray, pNewHolder );
@@ -1819,7 +1812,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 
            hb_procinfo( 0, szProc, &uiLine, szModule  );
            TraceLog( NULL, "Warning! Could not locate owner %p of array %p [%s->%s(%i)]\n", pHolder, pBaseArray, szModule, szProc, uiLine );
-        #endif   
+        #endif
       }
 
       //TraceLog( NULL, "DONE hb_arrayReleaseHolder( %p, %p )\n", pBaseArray, pHolder );

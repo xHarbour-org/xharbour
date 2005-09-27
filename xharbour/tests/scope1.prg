@@ -21,7 +21,7 @@ CLASS TParent
    PUBLIC:
    METHOD ChangeReadOnly(x) INLINE ::ReadOnlyOfParent := x
 
-   DATA ExposePrivateOfParent INIT {|| HB_QSelf():PrivateOfParent }
+   METHOD ExposePrivateOfParent INLINE Self:PrivateOfParent
 
 ENDCLASS
 
