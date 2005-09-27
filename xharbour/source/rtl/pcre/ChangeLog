@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: ChangeLog,v 1.1 2005/09/02 18:30:50 druzus Exp $
  */
 
 /*
@@ -16,6 +16,10 @@
  * 2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
  *
  */
+
+2005-09-27 10:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * pcre_globals.c
+    * minor modification to avoid G++ warning messages
 
 2005-09-01 12:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   + ChangeLog

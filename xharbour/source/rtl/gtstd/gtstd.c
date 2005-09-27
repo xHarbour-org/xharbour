@@ -1,5 +1,5 @@
  /*
- * $Id: gtstd.c,v 1.21 2005/01/11 23:53:45 likewolf Exp $
+ * $Id: gtstd.c,v 1.22 2005/02/27 11:56:06 andijahja Exp $
  */
 
 /*
@@ -63,6 +63,11 @@
 #if defined( OS_UNIX_COMPATIBLE )
    #include <unistd.h>  /* read() function requires it */
    #include <termios.h>
+   #include <sys/ioctl.h>
+   #include <signal.h>
+   #include <errno.h>
+   #include <sys/types.h>
+   #include <sys/wait.h>
 #else
    #if defined(_MSC_VER)
       #include <io.h>
@@ -82,6 +87,8 @@
 
 static SHORT  s_iRow;
 static SHORT  s_iCol;
+static SHORT  s_iCurRow;
+static SHORT  s_iCurCol;
 static USHORT s_uiMaxRow;
 static USHORT s_uiMaxCol;
 static USHORT s_uiCursorStyle;
@@ -99,44 +106,54 @@ static ULONG s_clipsize = 0;
 #define _GetScreenWidth()  ( s_uiMaxCol )
 #define _GetScreenHeight()  ( s_uiMaxRow )
 
-#if defined( OS_UNIX_COMPATIBLE )
-   static struct termios startup_attributes;
-#endif
-
 #if defined(_MSC_VER)
    static BOOL s_bStdinConsole;
+#endif
+
+#if defined( OS_UNIX_COMPATIBLE )
+   static volatile BOOL s_fRestTTY = FALSE;
+   static struct termios startup_attributes;
+
+   static void sig_handler( int iSigNo )
+   {
+      int e = errno, stat;
+      pid_t pid;
+
+      switch( iSigNo )
+      {
+         case SIGCHLD:
+            while ( ( pid = waitpid( -1, &stat, WNOHANG ) ) > 0 ) ;
+            break;
+         case SIGWINCH:
+            /* s_WinSizeChangeFlag = TRUE; */
+            break;
+         case SIGINT:
+            /* s_InetrruptFlag = TRUE; */
+            break;
+         case SIGQUIT:
+            /* s_BreakFlag = TRUE; */
+            break;
+         case SIGTSTP:
+            /* s_DebugFlag = TRUE; */
+            break;
+         case SIGTTOU:
+            s_fRestTTY = FALSE;
+            break;
+      }
+      errno = e;
+   }
 #endif
 
 void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
-#if ! defined( HB_UNIX_GT_DAEMON )
-#if defined( OS_UNIX_COMPATIBLE )
-   {
-      struct termios ta;
-
-      tcgetattr( STDIN_FILENO, &startup_attributes );
-/*      atexit( restore_input_mode ); */
-
-      tcgetattr( STDIN_FILENO, &ta );
-      ta.c_lflag &= ~( ICANON | ECHO );
-      ta.c_iflag &= ~ICRNL;
-      ta.c_cc[ VMIN ] = 0;
-      ta.c_cc[ VTIME ] = 0;
-      tcsetattr( STDIN_FILENO, TCSAFLUSH, &ta );
-   }
-#endif
-#endif
-
 #if defined(_MSC_VER)
    s_bStdinConsole = _isatty(0);
 #endif
 
    s_uiDispCount = 0;
-
-   s_iRow = 0;
-   s_iCol = 0;
+   s_iRow = s_iCol = s_iCurRow = s_iCurCol = 0;
 
 /* #if defined(OS_UNIX_COMPATIBLE) */
    s_uiMaxRow = 24;
@@ -145,7 +162,8 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 #else
    s_uiMaxRow = 32767;
    s_uiMaxCol = 32767;
-#endif */
+#endif
+*/
 
    s_uiCursorStyle = SC_NORMAL;
    s_bBlink = FALSE;
@@ -157,28 +175,75 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
    s_szCrLf = (BYTE *) hb_conNewLine();
    s_ulCrLf = strlen( (char *) s_szCrLf );
 
-#if ! defined( HB_UNIX_GT_DAEMON )
-   HB_GT_FUNC(mouse_Init());
+#if defined( OS_UNIX_COMPATIBLE )
+   s_fRestTTY = FALSE;
+   if( isatty( s_iFilenoStdin ) )
+   {
+      struct termios ta;
+      struct sigaction act, old;
+
+      s_fRestTTY = TRUE;
+
+      /* if( startup_attributes.c_lflag & TOSTOP ) != 0 */
+      sigaction( SIGTTOU, 0, &old );
+      memcpy( &act, &old, sizeof( struct sigaction ) );
+      act.sa_handler = sig_handler;
+      act.sa_flags = SA_RESTART;
+      sigaction( SIGTTOU, &act, 0 );
+
+      tcgetattr( s_iFilenoStdin, &startup_attributes );
+      memcpy( &ta, &startup_attributes, sizeof( struct termios ) );
+      /* atexit( restore_input_mode ); */
+      ta.c_lflag &= ~( ICANON | ECHO );
+      ta.c_iflag &= ~ICRNL;
+      ta.c_cc[ VMIN ] = 0;
+      ta.c_cc[ VTIME ] = 0;
+      tcsetattr( s_iFilenoStdin, TCSAFLUSH, &ta );
+      act.sa_handler = SIG_DFL;
+
+      sigaction( SIGTTOU, &old, 0 );
+   }
+   if( isatty( iFilenoStdout ) )
+   {
+      struct winsize win;
+
+      if ( ioctl( iFilenoStdout, TIOCGWINSZ, ( char * ) &win ) != -1 )
+      {
+         s_uiMaxRow = win.ws_row;
+         s_uiMaxCol = win.ws_col;
+      }
+   }
 #endif
+
+   HB_GT_FUNC(mouse_Init());
 }
 
 void HB_GT_FUNC(gt_Exit( void ))
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Exit()"));
 
+   /* update cursor position on exit */
+#if defined( OS_UNIX_COMPATIBLE )
+   if( s_fRestTTY && s_iCurCol > 0 )
+   {
+      s_iCurCol = 0;
+      s_iCurRow++;
+   }
+#endif
+   HB_GT_FUNC(gt_SetPos( s_iCurRow, s_iCurCol, HB_GT_SET_POS_BEFORE ));
+
    if ( s_clipboard !=  NULL )
    {
       hb_xfree( s_clipboard );
    }
    
-#if ! defined( HB_UNIX_GT_DAEMON )
-
    HB_GT_FUNC(mouse_Exit());
 
 #if defined( OS_UNIX_COMPATIBLE )
-   tcsetattr( STDIN_FILENO, TCSANOW, &startup_attributes );
-#endif
-
+   if( s_fRestTTY )
+   {
+      tcsetattr( s_iFilenoStdin, TCSANOW, &startup_attributes );
+   }
 #endif
 
 }
@@ -202,6 +267,7 @@ static void out_newline( void )
 
 int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
+   BYTE bChar;
    int ch = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
@@ -209,8 +275,10 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
    HB_SYMBOL_UNUSED( eventmask );
 
 #if defined(OS_UNIX_COMPATIBLE)
-   if( ! read( STDIN_FILENO, &ch, 1 ) )
-      ch = 0;
+   if( hb_fsRead( s_iFilenoStdin, &bChar, 1 ) == 1 )
+   {
+      ch = bChar;
+   }
 #else
 
    #if defined(_MSC_VER)
@@ -359,6 +427,8 @@ void HB_GT_FUNC(gt_SetPos( SHORT iRow, SHORT iCol, SHORT iMethod ))
       s_iRow = iRow;
       s_iCol = iCol;
    }
+   s_iCurRow = iRow;
+   s_iCurCol = iCol;
 }
 
 SHORT HB_GT_FUNC(gt_Col( void ))

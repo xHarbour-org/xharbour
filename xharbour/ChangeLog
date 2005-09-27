@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4368 2005/09/27 02:25:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4369 2005/09/27 05:24:17 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-27 10:52 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/odbc/odbc.c
+    * changed ODBC include files path to allow compilation with
+      OpenWatcom and Linux
+
+  * xharbour/source/rdd/dbcmd.c
+    * removed unnecessary HB_THREAD_STUB
+
+  * xharbour/source/rtl/gtstd/gtstd.c
+    * auto detect terminal size in *nixes when application run in TTY
+      device
+    ! reposition cursor to proper position at exit to avoid eating
+      empty lines added by repeated QOUT()
+    * do not stop application when run in TTY with TOSTOP flag set
+      in GTSTD init/exit code
+      Normal user output will still stop process what seems to be correct
+      behavior and user can control it using 'stty' and -tostop switch
+    * removed HB_UNIX_GT_DAEMON compilation macro - no longer usable
+
+  * xharbour/source/rtl/pcre/ChangeLog
+  * xharbour/source/rtl/pcre/pcre_globals.c
+   * fixed declaration of some function to avoid G++ warnings
 
 2005-09-26 01:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * hrbdll.bc

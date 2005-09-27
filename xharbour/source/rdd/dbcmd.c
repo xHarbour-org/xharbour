@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.170 2005/09/25 16:14:21 druzus Exp $
+ * $Id: dbcmd.c,v 1.171 2005/09/26 10:08:22 druzus Exp $
  */
 
 /*
@@ -3240,7 +3240,6 @@ HB_FUNC( ORDSETFOCUS )
 
 HB_FUNC( RDDLIST )
 {
-   HB_THREAD_STUB
    USHORT uiType, uiCount, uiRdds = 0, uiIndex = 0;
    PHB_ITEM pRddArray = hb_itemNew( NULL );
 

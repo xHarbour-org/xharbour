@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.29 2005/04/05 00:32:07 druzus Exp $
+ * $Id: odbc.c,v 1.30 2005/04/06 05:46:14 andijahja Exp $
  */
 
 /*
@@ -96,9 +96,16 @@
 #include <math.h>
 #include <stdlib.h>
 #include <ctype.h>
+
+#if defined(HB_OS_LINUX) && defined(__WATCOMC__)
+#include "/usr/include/sql.h"
+#include "/usr/include/sqlext.h"
+#include "/usr/include/sqltypes.h"
+#else
 #include <sql.h>
 #include <sqlext.h>
 #include <sqltypes.h>
+#endif
 
 #ifndef SQLLEN
    #ifdef _WIN64
