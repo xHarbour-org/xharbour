@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.5 2005/09/26 12:59:50 mlombardo Exp $
+ * $Id: dbgentry.c,v 1.6 2005/09/27 05:31:13 paultucker Exp $
  */
 
 /*
@@ -83,10 +83,11 @@
    ( (type *)( array_add( sizeof( type ), (void **)&array, &length ) ) )
 
 #define ARRAY_DEL( type, array, length, index ) \
-   if ( --length ) \
+   if ( !--length ) \
       FREE( array ); \
    else \
       memmove( array + index, array + index + 1, sizeof( type ) * ( length - index ) );
+
 
 typedef struct
 {
@@ -403,6 +404,8 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
    switch ( nMode )
    {
       case HB_DBG_MODULENAME:
+         HB_TRACE( HB_TR_DEBUG, ( "MODULENAME %s", szName ) );
+         
          hb_procinfo( 0, szProcName, NULL, NULL );
          if ( !strcmp( szProcName, "(_INITSTATICS)" ) )
          {
@@ -425,10 +428,14 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
          return;
 
       case HB_DBG_LOCALNAME:
+         HB_TRACE( HB_TR_DEBUG, ( "LOCALNAME %s index %d", szName, nIndex ) );
+         
          hb_dbgAddLocal( info, szName, nIndex, hb_dbg_ProcLevel() );
          return;
 
       case HB_DBG_STATICNAME:
+         HB_TRACE( HB_TR_DEBUG, ( "STATICNAME %s index %d frame %d", szName, nIndex, nFrame ) );
+         
          hb_dbgAddStatic( info, szName, nIndex, nFrame );
          return;
 
@@ -436,6 +443,8 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
       {
          HB_CALLSTACKINFO *pTop = &info->aCallStack[ info->nCallStackLen - 1 ];
          BOOL bOldClsScope;
+         
+         HB_TRACE( HB_TR_DEBUG, ( "SHOWLINE %d", nLine ) );
 
          nProcLevel = hb_dbg_ProcLevel();
 
@@ -534,6 +543,9 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
       case HB_DBG_ENDPROC:
          if ( info->bQuit )
             return;
+         
+         HB_TRACE( HB_TR_DEBUG, ( "ENDPROC", nLine ) );
+
          info->bCodeBlock = FALSE;
          hb_dbgEndProc( info );
          return;
@@ -591,7 +603,7 @@ hb_dbgAddStack( HB_DEBUGINFO *info, char *szName, int nProcLevel )
    }
    else
    {
-      top->szFunction = szFunction ? STRDUP( szFunction ) : STRDUP( "(INITSTATICS)" );
+      top->szFunction = szFunction ? STRDUP( szFunction ) : STRDUP( "(_INITSTATICS)" );
    }
    tmp = strrchr( szName, '/' );
    if ( tmp )
@@ -795,6 +807,8 @@ hb_dbgEval( HB_DEBUGINFO *info, HB_WATCHPOINT *watch )
 {
    HB_ITEM *xResult = NULL;
 
+   HB_TRACE( HB_TR_DEBUG, ( "expr %s", watch->szExpr ) );
+   
    /* Check if we have a cached pBlock */
    if ( !watch->pBlock )
    {
@@ -1202,7 +1216,7 @@ hb_dbgIsInitStatics( void )
    char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5];
 
    hb_procinfo( 0, szName, NULL, NULL );
-   return !strcmp( szName, "(INITSTATICS)" );
+   return !strcmp( szName, "(_INITSTATICS)" );
 }
 
 

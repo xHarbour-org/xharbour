@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.66 2005/08/01 22:21:43 druzus Exp $
+ * $Id: set.c,v 1.67 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -940,20 +940,23 @@ HB_FUNC( SET )
 
       case HB_SET_GTMODE      :
          hb_retni( hb_set.HB_SET_GTMODE );
-         if( args > 1 && HB_IS_STRING(pArg2) )
+         if ( args > 1 )
          {
-            if ( hb_stricmp( pArg2->item.asString.value, "DETACHED" ) == 0 )
+            if ( HB_IS_STRING( pArg2 ) )
             {
-               hb_set.HB_SET_GTMODE = 1;
-               break;
+               if ( hb_stricmp( pArg2->item.asString.value, "DETACHED" ) == 0 )
+               {
+                  hb_set.HB_SET_GTMODE = 1;
+                  break;
+               }
+               else if ( hb_stricmp( pArg2->item.asString.value, "INLINE" ) == 0 )
+               {
+                  hb_set.HB_SET_GTMODE = 0;
+                  break;
+               }
             }
-            else if ( hb_stricmp( pArg2->item.asString.value, "INLINE" ) == 0 )
-            {
-               hb_set.HB_SET_GTMODE = 0;
-               break;
-            }
+            hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
          }
-         hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
          break;
 
       case HB_SET_INSERT     :
@@ -1475,7 +1478,11 @@ HB_FUNC( SET )
          break;
 
       case HB_SET_OUTPUTSAFETY:
-         hb_set.HB_SET_OUTPUTSAFETY = set_logical(pArg2, TRUE );
+         hb_retl( hb_set.HB_SET_OUTPUTSAFETY );
+         if ( args > 1 )
+         {
+            hb_set.HB_SET_OUTPUTSAFETY = set_logical(pArg2, TRUE );
+         }
          break;
 
       case HB_SET_DBFLOCKSCHEME:

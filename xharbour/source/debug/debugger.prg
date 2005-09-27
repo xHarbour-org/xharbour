@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.61 2005/09/23 21:55:06 likewolf Exp $
+ * $Id: debugger.prg,v 1.62 2005/09/25 21:24:39 likewolf Exp $
  */
 
 /*
@@ -1001,8 +1001,7 @@ METHOD DoScript( cFileName ) CLASS TDebugger
       cInfo := MemoRead( cFileName )
       nLen := MLCount( cInfo, , , .F. )
       for n := 1 to nLen
-         /* Dreadful MemoLine() limit is 254. It often cuts the end of the PATH */
-         cLine := MemoLine( cInfo, 254, n, , .F. )
+         cLine := MemoLine( cInfo, 16384, n, , .F., .T. )
          ::DoCommand( cLine )
       next
    ENDIF
@@ -2616,7 +2615,7 @@ METHOD ToggleBreakPoint( nLine, cFileName ) CLASS TDebugger
   ENDIF
 
   nAt := AScan( ::aBreakPoints, { | aBreak | aBreak[ 1 ] == nLine ;
-                                    .AND. aBreak[ 2 ] == cFileName } ) // it was nLine
+                                    .AND. FILENAME_EQUAL( aBreak[ 2 ], cFileName ) } )
 
   if nAt == 0
     AAdd( ::aBreakPoints, { nLine, cFileName } )     // it was nLine
@@ -2624,7 +2623,7 @@ METHOD ToggleBreakPoint( nLine, cFileName ) CLASS TDebugger
     {
        hb_dbgAddBreak( hb_parptr( 1 ), hb_parc( 2 ), hb_parni( 3 ), NULL );
     }
-    IF FILENAME_EQUAL( cFileName, ::cPrgName )
+    IF FILENAME_EQUAL( cFileName, strip_path( ::cPrgName ) )
       ::oBrwText:ToggleBreakPoint( nLine, .T. )
     ENDIF
   else
@@ -2634,7 +2633,7 @@ METHOD ToggleBreakPoint( nLine, cFileName ) CLASS TDebugger
     {
        hb_dbgDelBreak( hb_parptr( 1 ), hb_parni( 2 ) );
     }
-    IF FILENAME_EQUAL( cFileName, ::cPrgName )
+    IF FILENAME_EQUAL( cFileName, strip_path( ::cPrgName ) )
       ::oBrwText:ToggleBreakPoint( nLine, .F. )
     ENDIF
   endif
