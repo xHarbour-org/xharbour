@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.8 2005/09/02 04:16:02 paultucker Exp $
+# $Id: hrbdll.dc,v 1.9 2005/09/18 21:33:08 paultucker Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -356,6 +356,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\classes.obj \
    $(OBJ_DIR)\cmdarg.obj \
    $(OBJ_DIR)\codebloc.obj \
+   $(OBJ_DIR)\dbgentry.obj \
    $(OBJ_DIR)\debug.obj \
    $(OBJ_DIR)\dynlibhb.obj \
    $(OBJ_DIR)\dynsym.obj \
@@ -871,6 +872,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\classes.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cmdarg.obj     + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\codebloc.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\dbgentry.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\debug.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dynlibhb.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dynsym.obj     + >> harbourdll.rsp
@@ -2028,6 +2030,9 @@ $(OBJ_DIR)\cmdarg.obj : $(VM_DIR)\cmdarg.c
    $(CC_CMD)
 
 $(OBJ_DIR)\codebloc.obj : $(VM_DIR)\codebloc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dbgentry.obj : $(VM_DIR)\dbentry.c
    $(CC_CMD)
 
 $(OBJ_DIR)\debug.obj : $(VM_DIR)\debug.c

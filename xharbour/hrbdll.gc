@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.gc,v 1.10 2005/09/02 15:46:11 paultucker Exp $
+# $Id: hrbdll.gc,v 1.11 2005/09/18 21:33:08 paultucker Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -279,6 +279,7 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/classes.o \
    $(OBJ_DIR)/cmdarg.o \
    $(OBJ_DIR)/codebloc.o \
+   $(OBJ_DIR)/dbgentry.o \
    $(OBJ_DIR)/debug.o \
    $(OBJ_DIR)/do.o \
    $(OBJ_DIR)/dynlibhb.o \
@@ -1460,6 +1461,9 @@ $(OBJ_DIR)/cmdarg.o : $(VM_DIR)/cmdarg.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/codebloc.o : $(VM_DIR)/codebloc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/dbgentry.o : $(VM_DIR)/dbgentry.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/debug.o : $(VM_DIR)/debug.c

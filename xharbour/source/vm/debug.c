@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.16 2005/09/22 01:12:00 druzus Exp $
+ * $Id: debug.c,v 1.17 2005/09/23 21:55:06 likewolf Exp $
  */
 
 /*
@@ -233,7 +233,7 @@ static void hb_dbgStop(void)
 {
 }
 
-
+HB_EXTERN_BEGIN
 HB_EXPORT PHB_ITEM
 hb_dbg_vmVarLGet( int iLevel, int iLocal )
 {
@@ -261,7 +261,7 @@ hb_dbg_vmVarLGet( int iLevel, int iLocal )
    }
    return NULL;
 }
-
+HB_EXTERN_END
 
 HB_FUNC( HB_DBG_VMVARLGET )
 {
