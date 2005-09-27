@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.4 2005/09/24 08:55:02 likewolf Exp $
+ * $Id: dbgentry.c,v 1.5 2005/09/26 12:59:50 mlombardo Exp $
  */
 
 /*
@@ -51,12 +51,11 @@
 
 #include <ctype.h>
 
-#include "hbapi.h"
+#include "hbvm.h"
 #include "hbapierr.h"
 #include "hbapiitm.h"
 #include "hbdebug.ch"
 #include "hbfast.h"
-#include "hbvm.h"
 #include "classes.h"
 
 
