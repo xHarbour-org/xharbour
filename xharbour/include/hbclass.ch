@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.33 2005/07/17 00:10:19 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.34 2005/09/04 04:29:00 walito Exp $
  */
 
 /*
@@ -808,7 +808,7 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
 
 #xcommand ACCESS <AccessName> [ AS <type> ] INLINE [Local <v>,] <code,...> [<persistent: PERSISTENT, PROPERTY>] => ;
    _HB_MEMBER <AccessName>() [ AS <type> ];;
-   s_oClass:AddInline( <(AccessName)>, {|Self [,<v>] | <code> }, HB_OO_CLSTP_EXPORTED + HB_OO_CLSTP_READONLY , <.persistent.> )
+   s_oClass:AddInline( <(AccessName)>, {|Self [,<v>] | <code> }, HB_OO_CLSTP_EXPORTED, <.persistent.> )
 
 #xcommand ACCESS <AccessName> [ AS <type> ] DEFERRED => ;
    _HB_MEMBER <AccessName>() [ AS <type> ];;
@@ -975,6 +975,8 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
 #xcommand ASSIGN <AssignName> CLASS <ClassName> => ;
           static function _<AssignName> ;;
           local Self AS CLASS <ClassName> := QSelf() AS CLASS <ClassName>
+
+METHOD <!ClassName!>:<MethodName> => METHOD <MethodName> CLASS <ClassName>
 
 #endif /* HB_SHORTNAMES */
 

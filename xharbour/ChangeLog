@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4373 2005/09/27 17:11:05 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4374 2005/09/27 21:18:47 ath1 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-27 16:48 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+   * include/hbclass.ch
+     - Removed HB_OO_CLSTP_READONLY from generated code for ACCESS ... INLINE ... rule.
+      /* I hope I'm not missing something, but I believe this is redundant
+         and causes problem with HB_P_IVARREF . */
+     + Added Xbase++ compatability:
+       METHOD <!ClassName!>:<MethodName> => METHOD <MethodName> CLASS <ClassName>
 
 2005-09-27 23:10 UTC-0100 Ath <Ath1 at sourceforge.net>
   * source/rtl/win32prn.prg
