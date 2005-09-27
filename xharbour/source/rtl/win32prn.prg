@@ -139,6 +139,8 @@ CLASS WIN32PRN
   METHOD Bold(nBoldWeight)
   METHOD UnderLine(lOn)
   METHOD Italic(lOn)
+  METHOD SetDuplexType(nDuplexType)                       // Get/Set current Duplexmode
+  METHOD SetPrintQuality(nPrintQuality)               // Get/Set Printquality
   METHOD CharSet(nCharSet)
 
 
@@ -147,8 +149,8 @@ CLASS WIN32PRN
          ::TextColor:=nClrText, ::BkColor:=nClrPane, ::TextAlign:=nAlign,;
          SetColor( ::hPrinterDC, nClrText, nClrPane, nAlign) )
 
-  METHOD TextOut(cString, lNewLine, lUpdatePosX)
-  METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX) // **WARNING** : (Col,Row) _NOT_ (Row,Col)
+  METHOD TextOut(cString, lNewLine, lUpdatePosX, nAlign)     // nAlign : 0 = left, 1 = right, 2 = centered
+  METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX, nAlign) // **WARNING** : (Col,Row) _NOT_ (Row,Col)
 
 
   METHOD SetPen(nStyle, nWidth, nColor) INLINE (;
@@ -179,7 +181,7 @@ CLASS WIN32PRN
 
   METHOD TextAtFont( nPosX, nPosY, cString, cFont, nPointSize,;     // Print text string at location
                      nWidth, nBold, lUnderLine, lItalic, lNewLine,; // in specified font and color.
-                     lUpdatePosX, nColor )                          // Restore original font and colour
+                     lUpdatePosX, nColor, nAlign )                  // Restore original font and colour
                                                                     // after printing.
   METHOD SetBkMode( nMode )  INLINE SetBkMode( ::hPrinterDc, nMode ) // OPAQUE= 2 or TRANSPARENT= 1
                                                                      // Set Background mode
@@ -220,6 +222,13 @@ CLASS WIN32PRN
   VAR fCharWidth     INIT 0      HIDDEN
   VAR BitmapsOk      INIT .F.
   VAR NumColors      INIT 1
+  VAR fDuplexType    INIT 1      HIDDEN              //DMDUP_SIMPLEX
+  VAR fPrintQuality  INIT -4     HIDDEN              //DMRES_HIGH
+  VAR fNewDuplexType INIT 1      HIDDEN
+  VAR fNewPrintQuality INIT -4   HIDDEN
+  VAR fOldLandScape  INIT .F.    HIDDEN
+  VAR fOldBinNumber  INIT 0      HIDDEN
+  VAR fOldFormType   INIT 0      HIDDEN
 
   VAR PosX           INIT 0
   VAR PosY           INIT 0
@@ -246,7 +255,9 @@ METHOD Create() CLASS WIN32PRN
     // Set Form Type
     // Set Number of Copies
     // Set Orientation
-    SetDocumentProperties(::hPrinterDC, ::PrinterName, ::FormType, ::Landscape, ::Copies, ::BinNumber)
+    // Set Duplex mode
+    // Set PrintQuality
+    SetDocumentProperties(::hPrinterDC, ::PrinterName, ::FormType, ::Landscape, ::Copies, ::BinNumber, ::fDuplexType, ::fPrintQuality)
     // Set mapping mode to pixels, topleft down
     SetMapMode(::hPrinterDC,MM_TEXT)
 //    SetTextCharacterExtra(::hPrinterDC,0); // do not add extra char spacing even if bold
@@ -270,6 +281,9 @@ METHOD Create() CLASS WIN32PRN
     // Set the standard font
     ::SetDefaultFont()
     ::HavePrinted:= ::Printing:= .F.
+    ::fOldFormType:= ::FormType  // Last formtype used
+    ::fOldLandScape:= ::LandScape
+    ::fOldBinNumber:= ::BinNumber
     Result:= .T.
   ENDIF
   RETURN(Result)
@@ -313,6 +327,25 @@ METHOD EndDoc(lAbortDoc) CLASS WIN32PRN
   RETURN(.T.)
 
 METHOD StartPage() CLASS WIN32PRN
+  LOCAL lLLandScape, nLBinNumber, nLFormType, nLDuplexType, nLPrintQuality
+  IF ::LandScape <> ::fOldLandScape  // Direct-modify property
+    lLLandScape:= ::fOldLandScape := ::LandScape
+  ENDIF
+  IF ::BinNumber <> ::fOldBinNumber  // Direct-modify property
+    nLBinNumber:= ::fOldBinNumber := ::BinNumber
+  ENDIF
+  IF ::FormType <> ::fOldFormType  // Direct-modify property
+    nLFormType:= ::fOldFormType := ::FormType
+  ENDIF
+  IF ::fDuplexType <> ::fNewDuplexType  // Get/Set property
+    nLDuplexType:= ::fDuplexType:= ::fNewDuplexType
+  ENDIF
+  IF ::fPrintQuality <> ::fNewPrintQuality  // Get/Set property
+    nLPrintQuality:= ::fPrintQuality:= ::fNewPrintQuality
+  ENDIF
+  IF lLLandScape <> NIL .or. nLBinNumber <> NIL .or. nLFormType <> NIL .or. nLDuplexType <> NIL .or. nLPrintQuality <> NIL
+    SetDocumentProperties(::hPrinterDC, ::PrinterName, nLFormType, lLLandscape, , nLBinNumber, nLDuplexType, nLPrintQuality)
+  ENDIF
   StartPage(::hPrinterDC)
   ::PosX:= ::LeftMargin
   ::PosY:= ::TopMargin
@@ -426,6 +459,26 @@ METHOD CharSet(nCharSet) CLASS WIN32PRN
   ENDIF
   RETURN(Result)
 
+METHOD SetDuplexType(nDuplexType) CLASS WIN32PRN
+  LOCAL Result:= ::fDuplexType
+  IF nDuplexType!= NIL
+    ::fNewDuplexType:= nDuplexType
+    IF !::Printing
+      ::fDuplexType:= nDuplexType
+    ENDIF
+  ENDIF
+  RETURN(Result)
+
+METHOD SetPrintQuality(nPrintQuality) CLASS WIN32PRN
+  LOCAL Result:= ::fPrintQuality
+  IF nPrintQuality!= NIL
+    ::fNewPrintQuality:= nPrintQuality
+    IF !::Printing
+      ::fPrintQuality:= nPrintQuality
+    ENDIF
+  ENDIF
+  RETURN(Result)
+
 METHOD GetFonts() CLASS WIN32PRN
   RETURN(ENUMFONTS(::hPrinterDC))
 
@@ -439,8 +492,11 @@ METHOD SetPos(nPosX, nPosY) CLASS WIN32PRN
   ENDIF
   RETURN(Result)
 
-METHOD TextOut(cString, lNewLine, lUpdatePosX) CLASS WIN32PRN
+METHOD TextOut(cString, lNewLine, lUpdatePosX, nAlign) CLASS WIN32PRN
   LOCAL nPosX
+  IF nAlign == NIL
+     nAlign:= 0
+  ENDIF
   IF lUpdatePosX == NIL
      lUpdatePosX:=.T.
   ENDIF
@@ -448,7 +504,7 @@ METHOD TextOut(cString, lNewLine, lUpdatePosX) CLASS WIN32PRN
     lNewLine:= .F.
   ENDIF
   IF cString!=NIL
-    nPosX:= TextOut(::hPrinterDC,::PosX, ::PosY, cString, LEN(cString), ::fCharWidth)
+    nPosX:= TextOut(::hPrinterDC,::PosX, ::PosY, cString, LEN(cString), ::fCharWidth, nAlign)
     ::HavePrinted:= .T.
     IF lUpdatePosX
       ::PosX+= nPosX
@@ -459,7 +515,7 @@ METHOD TextOut(cString, lNewLine, lUpdatePosX) CLASS WIN32PRN
   ENDIF
   RETURN( .T. )
 
-METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX) CLASS WIN32PRN
+METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX, nAlign) CLASS WIN32PRN
   IF lNewLine == NIL
     lNewLine:= .F.
   ENDIF
@@ -467,7 +523,7 @@ METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX) CLASS WIN32PRN
     lUpdatePosX:= .T.
   ENDIF
   ::SetPos(nPosX,nPosY)
-  ::TextOut(cString, lNewLine, lUpdatePosX)
+  ::TextOut(cString, lNewLine, lUpdatePosX, nAlign)
   RETURN(.T.)
 
 METHOD GetCharWidth() CLASS WIN32PRN
@@ -531,7 +587,7 @@ METHOD INCH_TO_POSX( nInch ) CLASS WIN32PRN
 METHOD INCH_TO_POSY( nInch ) CLASS WIN32PRN
   RETURN( INT( ( nInch * ::PixelsPerInchY ) - ::TopMargin ) )
 
-METHOD TextAtFont( nPosX, nPosY, cString, cFont, nPointSize, nWidth, nBold, lUnderLine, lItalic, nCharSet, lNewLine, lUpdatePosX, nColor ) CLASS WIN32PRN
+METHOD TextAtFont( nPosX, nPosY, cString, cFont, nPointSize, nWidth, nBold, lUnderLine, lItalic, nCharSet, lNewLine, lUpdatePosX, nColor, nAlign ) CLASS WIN32PRN
   LOCAL lCreated:= .F., nDiv:= 0, cType
   DEFAULT nPointSize TO ::FontPointSize
   IF cFont != NIL
@@ -547,7 +603,7 @@ METHOD TextAtFont( nPosX, nPosY, cString, cFont, nPointSize, nWidth, nBold, lUnd
   IF nColor != NIL
     nColor:= SetColor( ::hPrinterDC, nColor )
   ENDIF
-  ::TextOutAt( nPosX, nPosY, cString, lNewLine, lUpdatePosX)
+  ::TextOutAt( nPosX, nPosY, cString, lNewLine, lUpdatePosX, nAlign)
   IF lCreated
     ::SetFont()  // Reset font
   ENDIF
@@ -702,7 +758,21 @@ HB_FUNC_STATIC(TEXTOUT)
       int iCol   = (int) hb_parnl(3) ;
       char *pszData = hb_parc(4) ;
       int iWidth = ISNUM(6) ? (int) hb_parnl(6) : 0 ;
-      SetTextAlign((HDC) hDC, TA_BOTTOM | TA_LEFT | TA_NOUPDATECP) ;
+      if (ISNUM(7) && (hb_parnl(7) == 1 || hb_parnl(7) == 2))
+      {
+        if (hb_parnl(7) == 1)
+        {
+          SetTextAlign((HDC) hDC, TA_BOTTOM | TA_RIGHT | TA_NOUPDATECP) ;
+        }
+        else
+        {
+          SetTextAlign((HDC) hDC, TA_BOTTOM | TA_CENTER | TA_NOUPDATECP) ;
+        }
+      }
+      else
+      {
+        SetTextAlign((HDC) hDC, TA_BOTTOM | TA_LEFT | TA_NOUPDATECP) ;
+      }
       if (iWidth < 0 && iLen < 1024 )
       {
         int n= iLen, aFixed[1024] ;
@@ -880,10 +950,36 @@ HB_FUNC_STATIC( SETDOCUMENTPROPERTIES )
         if (pDevMode )
         {
           DocumentProperties(0,hPrinter,pszPrinterName, pDevMode,pDevMode,DM_OUT_BUFFER) ;
-          pDevMode->dmPaperSize     = ( short ) ( ISNUM(3) && hb_parnl(3) > 0 ? hb_parnl(3) : pDevMode->dmPaperSize ) ;
-          pDevMode->dmOrientation   = ISLOG(4) ? (hb_parl(4) ? 2 : 1) : pDevMode->dmOrientation;
-          pDevMode->dmCopies        = ( short ) ( ISNUM(5) && hb_parnl(5) > 0 ? hb_parnl(5) : pDevMode->dmCopies );
-          pDevMode->dmDefaultSource = ( short ) ( ISNUM(6) && hb_parnl(6) > 0 ? hb_parnl(6) : pDevMode->dmDefaultSource );
+          if (ISNUM(3) ) //&& hb_parnl(3) > 0)
+          {
+            pDevMode->dmPaperSize     = ( short ) hb_parnl(3) ;
+            pDevMode->dmFields = pDevMode->dmFields || DM_PAPERSIZE ;
+          }
+          if (ISLOG(4))
+          {
+            pDevMode->dmOrientation   = ( short ) (hb_parl(4) ? 2 : 1) ;
+            pDevMode->dmFields = pDevMode->dmFields || DM_ORIENTATION ;
+          }
+          if (ISNUM(5) && hb_parnl(5) > 0)
+          {
+            pDevMode->dmCopies        = ( short ) hb_parnl(5) ;
+            pDevMode->dmFields = pDevMode->dmFields || DM_COPIES ;
+          }
+          if (ISNUM(6) ) //&& hb_parnl(6) > 0)
+          {
+            pDevMode->dmDefaultSource = ( short ) hb_parnl(6) ;
+            pDevMode->dmFields = pDevMode->dmFields || DM_DEFAULTSOURCE ;
+          }
+          if (ISNUM(7) ) //&& hb_parnl(7) > 0)
+          {
+            pDevMode->dmDuplex = ( short ) hb_parnl(7) ;
+            pDevMode->dmFields = pDevMode->dmFields || DM_DUPLEX ;
+          }
+          if (ISNUM(8) ) //&& hb_parnl(8) <> 0)
+          {
+            pDevMode->dmPrintQuality = ( short ) hb_parnl(8) ;
+            pDevMode->dmFields = pDevMode->dmFields || DM_PRINTQUALITY ;
+          }
           Result= (BOOL) ResetDC(hDC, pDevMode) ;
           hb_xfree(pDevMode) ;
         }
