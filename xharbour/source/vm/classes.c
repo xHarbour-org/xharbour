@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.165 2005/09/23 21:55:06 likewolf Exp $
+ * $Id: classes.c,v 1.166 2005/09/27 02:25:40 ronpinkas Exp $
  */
 
 /*
@@ -3981,16 +3981,21 @@ void hb_clsUnmutexSync( void )
    HB_THREAD_STUB
 
    PSYNCID pSyncId = HB_VM_STACK.pSyncId;
-   ULONG ulCount = pSyncId->ulCount;
-   pSyncId++;
-
-   while( --ulCount )
+   ULONG ulCount;
+   
+   if( pSyncId )
    {
-      if( pSyncId->ulCount > 0 )
-      {
-         hb_threadMutexUnlock( (s_pClasses + pSyncId->uiClass - 1)->pMtxSync, FALSE);
-      }
+      ulCount = pSyncId->ulCount;
       pSyncId++;
+
+      while( --ulCount )
+      {
+         if( pSyncId->ulCount > 0 )
+         {
+            hb_threadMutexUnlock( (s_pClasses + pSyncId->uiClass - 1)->pMtxSync, FALSE);
+         }
+         pSyncId++;
+      }
    }
 }
 
@@ -3999,16 +4004,21 @@ void hb_clsRemutexSync( void )
    HB_THREAD_STUB
 
    PSYNCID pSyncId = HB_VM_STACK.pSyncId;
-   ULONG ulCount = pSyncId->ulCount;
-   pSyncId++;
-
-   while( --ulCount )
+   ULONG ulCount;
+   
+   if( pSyncId )
    {
-      if( pSyncId->ulCount > 0 )
-      {
-         hb_threadMutexLock( (s_pClasses + pSyncId->uiClass - 1)->pMtxSync, FALSE );
-      }
+      ulCount = pSyncId->ulCount;
       pSyncId++;
+
+      while( --ulCount )
+      {
+         if( pSyncId->ulCount > 0 )
+         {
+            hb_threadMutexLock( (s_pClasses + pSyncId->uiClass - 1)->pMtxSync, FALSE );
+         }
+         pSyncId++;
+      }
    }
 }
 
