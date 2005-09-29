@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4376 2005/09/29 05:07:19 walito Exp $
+ * $Id: ChangeLog,v 1.4377 2005/09/29 08:13:20 marcosgambeta Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-09-29 14:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  * source/ct/getsecrt.prg
+    ! minor fix
+    
 2005-09-29 05:11 UTC-0300 Marcos Antonio Gambeta <marcos_gambeta@hotmail.com>
   * contrib/wvtgui/wvtwin.ch
     + Added new constants:

@@ -1,5 +1,5 @@
 /*
- * $Id: getsecrt.prg,v 1.3 2005/09/16 14:59:58 lculik Exp $
+ * $Id: getsecrt.prg,v 1.4 2005/09/16 15:02:42 lculik Exp $
  */
 
 /*
@@ -62,7 +62,7 @@ MEMVAR nLen
       => @ <row>, <col> GET <var>                                ;
                         [<clauses>]                              ;
                         SEND reader := {|oGet|                   ;
-                                        GetPassword( oGet, nLen  ) }      ;
+                                        GetPassword( oGet, Len(<var>)  ) }      ;
                         [<moreClauses>]
 
 
