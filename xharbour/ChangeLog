@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4375 2005/09/27 23:49:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4376 2005/09/29 05:07:19 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-29 05:11 UTC-0300 Marcos Antonio Gambeta <marcos_gambeta@hotmail.com>
+  * contrib/wvtgui/wvtwin.ch
+    + Added new constants:
+      #define IDTRYAGAIN                      10 // (WINVER >= 0x0500)
+      #define IDCONTINUE                      11 // (WINVER >= 0x0500)
 
 2005-09-29 02:00 UTC-0300 Walter Negro <anegro-AT-overnet.com.ar>
    * source/vm/classes.c
