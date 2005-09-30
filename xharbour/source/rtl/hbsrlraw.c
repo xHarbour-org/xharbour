@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.26 2004/12/31 11:56:10 druzus Exp $
+ * $Id: hbsrlraw.c,v 1.27 2005/04/17 00:23:53 mlombardo Exp $
  */
 
 /*
@@ -76,20 +76,17 @@ HB_FUNC( HB_CREATELEN8 )
 
    if( ISNUM(1) )
    {
-      HB_LONG uRet = hb_parnint( 1 );
-      hb_createlen8( ret, uRet );
+      hb_createlen8( ret, hb_parnint( 1 ) );
       hb_retclen( ( char *) ret, 8 );
    }
-   else if( ISCHAR(1) )
+   else if( ISBYREF( 1 ) && ISCHAR(1) && ISNUM( 2 ) )
    {
-      PHB_ITEM pItem = hb_param(1, HB_IT_STRING);
-      HB_LONG uRet = hb_parnint( 2 );
-      if( pItem->item.asString.length >= 8 )
+      PHB_ITEM pItem = hb_itemUnShare( hb_param(1, HB_IT_STRING) );
+      if( pItem && pItem->item.asString.length >= 8 )
       {
-         hb_createlen8( ( BYTE *) pItem->item.asString.value, uRet );
+         hb_createlen8( ( BYTE *) pItem->item.asString.value, hb_parnint( 2 ) );
       }
    }
-
 }
 
 
@@ -111,14 +108,13 @@ static HB_LONG hb_getlen8( BYTE *cStr )
 
 HB_FUNC( HB_GETLEN8 )
 {
-   BYTE *cStr = (BYTE *) hb_parcx( 1 );
-   if ( cStr == NULL || hb_parclen( 1 ) < 4 )
+   if( hb_parclen( 1 ) < 8 )
    {
-      hb_retnl( -1l );
+      hb_retni( -1 );
    }
    else
    {
-      hb_retnint( hb_getlen8( cStr ) );
+      hb_retnint( hb_getlen8( ( BYTE * ) hb_parc( 1 ) ) );
    }
 }
 
@@ -159,7 +155,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
       case HB_IT_STRING:
       case HB_IT_MEMOFLAG | HB_IT_STRING:
          ulRet = (ULONG) (pItem->item.asString.length + 9);
-         cRet = (BYTE *) hb_xgrab( ulRet );
+         cRet = (BYTE *) hb_xgrab( ulRet + 1 );
          cRet[0] = (BYTE) 'C';
          hb_createlen8( cRet + 1, pItem->item.asString.length );
          memcpy( cRet + 9, pItem->item.asString.value, pItem->item.asString.length );
@@ -167,14 +163,14 @@ HB_FUNC( HB_SERIALIZESIMPLE )
 
       case HB_IT_LOGICAL:
          ulRet = 2;
-         cRet = (BYTE *)hb_xgrab( 2 );
+         cRet = (BYTE *)hb_xgrab( ulRet + 1 );
          cRet[0] = (BYTE)'L';
          cRet[1] = (BYTE) ( pItem->item.asLogical.value ? 'T' : 'F' );
       break;
 
       case HB_IT_INTEGER:
          ulRet = 10;
-         cRet = (BYTE *) hb_xgrab( ulRet );
+         cRet = (BYTE *) hb_xgrab( ulRet + 1 );
          cRet[0] = (BYTE)'N';
          cRet[1] = (BYTE)'I';
          hb_createlen8( cRet + 2, pItem->item.asInteger.value );
@@ -182,7 +178,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
 
       case HB_IT_LONG:
          ulRet = 10;
-         cRet = (BYTE *) hb_xgrab( ulRet );
+         cRet = (BYTE *) hb_xgrab( ulRet + 1 );
          cRet[0] = (BYTE)'N';
          cRet[1] = (BYTE)'L';
          hb_createlen8( cRet + 2, pItem->item.asLong.value );
@@ -190,7 +186,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
 
       case HB_IT_DOUBLE:
          ulRet = 2 + sizeof( double );
-        cRet = (BYTE *)hb_xgrab( ulRet );
+         cRet = (BYTE *)hb_xgrab( ulRet + 1 );
          cRet[0] = (BYTE)'N';
          cRet[1] = (BYTE)'D';
          memcpy( cRet + 2, &(pItem->item.asDouble.value), sizeof( double ) );
@@ -198,14 +194,14 @@ HB_FUNC( HB_SERIALIZESIMPLE )
 
       case HB_IT_DATE:
          ulRet = 9;
-         cRet = (BYTE *)hb_xgrab( ulRet );
+         cRet = (BYTE *)hb_xgrab( ulRet + 1 );
          cRet[0] = (BYTE)'D';
          hb_createlen8( cRet + 1, pItem->item.asDate.value );
       break;
 
       case HB_IT_NIL:
          ulRet = 1;
-         cRet = (BYTE *)hb_xgrab( ulRet );
+         cRet = (BYTE *)hb_xgrab( ulRet + 1 );
          cRet[0] = (BYTE)'Z';
       break;
 
@@ -215,7 +211,7 @@ HB_FUNC( HB_SERIALIZESIMPLE )
       return;
    }
 
-   hb_retclenAdoptRaw( (char *)cRet, ulRet );
+   hb_retclenAdopt( (char *)cRet, ulRet );
 }
 
 /* Deserializes a variable and get the value back
@@ -404,6 +400,7 @@ HB_FUNC( HB_DESERIALBEGIN )
 {
    BYTE *cBuf;
    PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
+
    if( pItem == NULL )
    {
       // TODO: error code
@@ -411,22 +408,8 @@ HB_FUNC( HB_DESERIALBEGIN )
       return;
    }
 
-   cBuf = (BYTE *) hb_xgrab( pItem->item.asString.length + 8 );
+   cBuf = (BYTE *) hb_xgrab( pItem->item.asString.length + 9 );
    hb_createlen8( cBuf, 9 );
    memcpy( cBuf+8, pItem->item.asString.value, pItem->item.asString.length );
-   hb_retclenAdoptRaw( ( char *) cBuf, 8 + pItem->item.asString.length );
-
-}
-
-
-HB_FUNC( HB_DESERIALRESET )
-{
-   PHB_ITEM pItem = hb_param( 1, HB_IT_STRING );
-   if( pItem == NULL )
-   {
-      // TODO: error code
-      hb_ret();
-      return;
-   }
-   hb_createlen8( ( BYTE *) pItem->item.asString.value, 9 );
+   hb_retclenAdopt( ( char *) cBuf, 8 + pItem->item.asString.length );
 }

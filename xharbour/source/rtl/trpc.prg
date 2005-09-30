@@ -1,6 +1,5 @@
-
 /*
- * $Id: trpc.prg,v 1.28 2004/09/26 15:24:20 jonnymind Exp $
+ * $Id: trpc.prg,v 1.29 2004/09/26 16:37:02 jonnymind Exp $
  */
 
 /*
@@ -856,8 +855,8 @@ METHOD FuncCall( cData ) CLASS tRPCServeCon
    IF cSer == NIL
       RETURN .F.
    ENDIF
-   cFuncName := HB_DeserialNext( cSer )
-   aParams := HB_DeserialNext( cSer )
+   cFuncName := HB_DeserialNext( @cSer )
+   aParams := HB_DeserialNext( @cSer )
 
    IF aParams == NIL
       RETURN .F.
@@ -877,11 +876,11 @@ METHOD FuncLoopCall( cMode, cData ) CLASS tRPCServeCon
    IF Empty( cSer )
       RETURN .F.
    ENDIF
-   nBegin := HB_DeserialNext( cSer )
-   nEnd := HB_DeserialNext( cSer )
-   nStep := HB_DeserialNext( cSer )
-   cFuncName := HB_DeserialNext( cSer )
-   aParams := HB_DeserialNext( cSer )
+   nBegin := HB_DeserialNext( @cSer )
+   nEnd := HB_DeserialNext( @cSer )
+   nStep := HB_DeserialNext( @cSer )
+   cFuncName := HB_DeserialNext( @cSer )
+   aParams := HB_DeserialNext( @cSer )
 
    IF aParams == NIL
       RETURN .F.
@@ -902,9 +901,9 @@ METHOD FuncForeachCall( cMode, cData ) CLASS tRPCServeCon
       RETURN .F.
    ENDIF
 
-   cFuncName := HB_DeserialNext( cSer )
-   aParams := HB_DeserialNext( cSer )
-   aItems := HB_DeserialNext( cSer )
+   cFuncName := HB_DeserialNext( @cSer )
+   aParams := HB_DeserialNext( @cSer )
+   aItems := HB_DeserialNext( @cSer )
 
    IF aItems  == NIL
       RETURN .F.
@@ -1480,11 +1479,11 @@ METHOD UDPInterpretRequest( cData, nPacketLen, cRes ) CLASS tRPCService
          /* minimal length to be valid */
          IF nPacketLen > 24
             cSerial := HB_DeserialBegin( Substr( cData, 7 ) )
-            cMatch := HB_DeserialNext( cSerial )
+            cMatch := HB_DeserialNext( @cSerial )
             cNumber := NIL
             IF .not. Empty ( cMatch )
                cMatch := HB_RegexComp( cMatch )
-               cNumber := HB_DeserialNext( cSerial )
+               cNumber := HB_DeserialNext( @cSerial )
             ELSE
                cMatch := HB_RegexComp( ".*" )
             ENDIF

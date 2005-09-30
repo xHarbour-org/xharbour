@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.492 2005/09/23 22:04:00 likewolf Exp $
+ * $Id: hvm.c,v 1.493 2005/09/27 02:26:07 ronpinkas Exp $
  */
 
 /*
@@ -838,6 +838,9 @@ int HB_EXPORT hb_vmQuit( void )
 
    hb_backgroundShutDown();
 
+   hb_inkeyExit();
+   //printf("\nAfter inkey\n" );
+
    hb_i18nExit();
 
 #if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN_5 )
@@ -867,7 +870,6 @@ int HB_EXPORT hb_vmQuit( void )
 
       ( *HB_VM_STACK.pPos )->type = HB_IT_NIL;
    }
-
    //printf("After Stack\n" );
 
    if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
@@ -914,9 +916,6 @@ int HB_EXPORT hb_vmQuit( void )
       HB_TRACE(HB_TR_DEBUG, ("   Released s_aStatics: %p\n", &s_aStatics) );
    }
    //printf("\nAfter Statics\n" );
-
-   hb_inkeyExit();
-   //printf("\nAfter inkey\n" );
 
    hb_errExit();
    //printf("After Err\n" );
@@ -1023,14 +1022,10 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    static unsigned short uiPolls = 1;
 #endif
 
-   #ifndef HB_THREAD_SUPPORT
-      ULONG ulBGMaxExecutions;
-   #endif
-
-   #ifndef HB_NO_PROFILER
-      ULONG ulLastOpcode = 0; /* opcodes profiler support */
-      ULONG ulPastClock = 0;  /* opcodes profiler support */
-   #endif
+#ifndef HB_NO_PROFILER
+   ULONG ulLastOpcode = 0; /* opcodes profiler support */
+   ULONG ulPastClock = 0;  /* opcodes profiler support */
+#endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p, %p)", pCode, pSymbols, pGlobals));
 
@@ -1045,80 +1040,55 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    /* NOTE: Initialization with 0 is needed to avoid GCC -O2 warning */
    ulPrivateBase = pSymbols ? hb_memvarGetPrivatesBase() : 0;
 
-   #ifndef HB_NO_PROFILER
-      if( hb_bProfiler )
-      {
-         ulPastClock = ( ULONG ) clock();
-      }
-   #endif
+#ifndef HB_NO_PROFILER
+   if( hb_bProfiler )
+   {
+      ulPastClock = ( ULONG ) clock();
+   }
+#endif
 
    do
    {
       curPCode = pCode[ w ];
 
-      #ifndef HB_NO_PROFILER
-         if( hb_bProfiler )
-         {
-            ULONG ulActualClock = ( ULONG ) clock();
+#ifndef HB_NO_PROFILER
+      if( hb_bProfiler )
+      {
+         ULONG ulActualClock = ( ULONG ) clock();
 
-            hb_ulOpcodesTime[ ulLastOpcode ] += ( ulActualClock - ulPastClock );
-            ulPastClock = ulActualClock;
-            ulLastOpcode = curPCode;
-            hb_ulOpcodesCalls[ ulLastOpcode ]++;
-         }
-      #endif
+         hb_ulOpcodesTime[ ulLastOpcode ] += ( ulActualClock - ulPastClock );
+         ulPastClock = ulActualClock;
+         ulLastOpcode = curPCode;
+         hb_ulOpcodesCalls[ ulLastOpcode ]++;
+      }
+#endif
 
 #ifndef HB_GUI
       if( ! --uiPolls )
       {
-         if(( hb_set.HB_SET_CANCEL ) || ( hb_set.HB_SET_DEBUG ))
+         if( hb_set.HB_SET_CANCEL || hb_set.HB_SET_DEBUG )
          {
-            int ch = hb_gt_ReadKey( hb_set.HB_SET_EVENTMASK );
-
-            switch( ch )
-            {
-               case K_ALT_C:              /* Check for normal Alt+C */
-               case HB_BREAK_FLAG:
-                  hb_vmRequestCancel();/* Request cancellation */
-                  break;
-               case K_ALT_D:              /* Check for normal Alt+C */
-                  hb_vmRequestDebug();/* Request debugger */
-                  break;
-               default:
-                  hb_inkeyPut( ch );
-            }
+            hb_inkeyPoll();
          }
       }
 #endif
 
-      if ( hb_set.HB_SET_BACKGROUNDTASKS )
+      if( hb_set.HB_SET_BACKGROUNDTASKS )
       {
-      #ifndef HB_THREAD_SUPPORT
-         ulBGMaxExecutions = ( hb_set.HB_SET_BACKGROUNDTICK ? hb_set.HB_SET_BACKGROUNDTICK : 1000 );
-         if( ulBGMaxExecutions < (++s_ulBackground) )
+#ifndef HB_THREAD_SUPPORT
+         if( ++s_ulBackground > hb_set.HB_SET_BACKGROUNDTICK ?
+                                hb_set.HB_SET_BACKGROUNDTICK : 1000 )
          {
-            PHB_ITEM pSavedReturn = hb_itemNew( NULL );
-
-            hb_itemForwardValue( pSavedReturn, &(HB_VM_STACK.Return) );
-
             hb_backgroundRun();
             s_ulBackground = 0;
-
-            hb_itemRelease( hb_itemReturnForward( pSavedReturn ) );
          }
-      #else
+#else
          // Run background functions every unlock period
          if( HB_VM_STACK.iPcodeCount == HB_VM_UNLOCK_PERIOD )
          {
-            PHB_ITEM pSavedReturn = hb_itemNew( NULL );
-
-            hb_itemForwardValue( pSavedReturn, &(HB_VM_STACK.Return) );
-
             hb_backgroundRun();
-
-            hb_itemRelease( hb_itemReturnForward( pSavedReturn ) );
          }
-      #endif
+#endif
       }
 
       switch( curPCode )
@@ -7470,6 +7440,16 @@ HB_EXPORT void hb_vmPush( PHB_ITEM pItem )
    hb_stackPush();
 }
 
+HB_EXPORT void hb_vmPushState( void )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNil()"));
+
+   hb_itemForwardValue( * HB_VM_STACK.pPos, &(HB_VM_STACK.Return) );
+   hb_stackPush();
+}
+
 HB_EXPORT void hb_vmPushNil( void )
 {
    HB_THREAD_STUB
@@ -8286,6 +8266,16 @@ static void hb_vmDuplTwo( void )
 /* ------------------------------- */
 /* Pop                             */
 /* ------------------------------- */
+
+HB_EXPORT void hb_vmPopState( void )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmPop(%p)", pItem ) );
+
+   hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromTop( -1 ) );
+   hb_stackPop();
+}
 
 static BOOL hb_vmPopLogical( void )
 {

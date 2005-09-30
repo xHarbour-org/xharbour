@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.167 2005/09/29 05:05:21 walito Exp $
+ * $Id: classes.c,v 1.168 2005/09/30 21:49:16 ronpinkas Exp $
  */
 
 /*
@@ -4049,13 +4049,7 @@ void hb_clsFinalize( PHB_ITEM pObject )
       {
          // To DISABLE GC here where no refernce to this object will cause GPF for double release!
          BOOL bCollecting = hb_gcSetCollecting( TRUE );
-
-         HB_ITEM SavedReturn;
          PHB_FUNC pDestructor = pClass->pDestructor;
-
-         // Save the existing Return Value if any.
-         SavedReturn.type = HB_IT_NIL;
-         hb_itemForwardValue( &SavedReturn, &( HB_VM_STACK.Return ) );
 
          if( pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
          {
@@ -4066,12 +4060,13 @@ void hb_clsFinalize( PHB_ITEM pObject )
          {
             hb_symDestructor.value.pFunPtr = pDestructor;
          }
+         // Save the existing Return Value if any.
+         hb_vmPushState();
          hb_vmPushSymbol( &hb_symDestructor );
          hb_vmPush( pObject ); // Do NOT Forward!!!
          hb_vmSend( 0 );
-
-         // Restore the prior Return Value if any.
-         hb_itemForwardValue( &( HB_VM_STACK.Return ), &SavedReturn );
+         // Restore the existing Return Value if any.
+         hb_vmPopState();
 
          hb_gcSetCollecting( bCollecting );
       }

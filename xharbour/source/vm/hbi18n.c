@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.18 2004/11/21 21:44:27 druzus Exp $
+ * $Id: hbi18n.c,v 1.19 2005/09/22 01:12:00 druzus Exp $
  */
 
 /*
@@ -67,7 +67,7 @@
     little thread safety required */
 
 /** Translation table; it's an array of 2 item arrays */
-static PHB_ITEM s_i18n_table;
+static PHB_ITEM s_i18n_table = NULL;
 
 /** Default translation files directory */
 static char s_default_i18n_dir[ _POSIX_PATH_MAX + 1];
@@ -424,7 +424,6 @@ BOOL hb_i18n_load_language( char *language )
          hb_itemRelease( s_i18n_table );
       }
       s_i18n_table = pTable;
-      hb_gcLock( s_i18n_table ); // avoid releasing it
       return TRUE;
    }
 
@@ -799,7 +798,6 @@ BOOL hb_i18nInit( char *i18n_dir, char *language )
    /* No automatic internationalization can be found */
    if ( language == NULL || ! hb_i18n_load_language( language ) )
    {
-      s_i18n_table = NULL;
       strncpy( s_current_language, s_base_language, HB_I18N_CODELEN );
       strncpy( s_current_language_name, s_base_language_name , HB_I18N_NAMELEN - 1 );
       // but we know that we don't want internationalization
@@ -817,8 +815,8 @@ void hb_i18nExit( void )
 {
    if( s_i18n_table != NULL )
    {
-      hb_gcUnlock( s_i18n_table );
       hb_itemRelease( s_i18n_table );
+      s_i18n_table = NULL;
    }
 }
 

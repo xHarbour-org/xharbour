@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4381 2005/09/30 21:49:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4382 2005/09/30 22:44:11 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,91 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-10-01 01:43 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/inkey.ch
+    * changed K_MAXMOUSE to 1016 - As I understand it should point to
+      maximum inkey() mouse event which is K_NCMOUSEMOVE now
+
+  * xharbour/include/hbapigt.h
+  * xharbour/source/rtl/inkey.c
+  * xharbour/source/rtl/set.c
+    * rewritten inkey functions to fix some differences between Clipper
+      It's now shorter more readable and should better play with
+      inkey poll checking
+    * hb_inkeyReset( BOOL fAllocate ) changed to hb_inkeyReset( void )
+    ! fixed EVENTMASK checking - now keys can be filltered properly
+      Filtering in low level GT drivers is wrong because hb_gt_ReadKey()
+      can be called asynchronously to user INKEY() call and use differ
+      mask. I hope this will make GTCRS and GTXWC users happy because
+      I didn't want to implement wrong by definition actions in these
+      GTs.
+
+  * xharbour/source/vm/asort.c
+    * minor modification
+
+  * xharbour/source/vm/itemapi.c
+    ! fixed bug reported on harbour-users group in comparison
+      empty strings with SET EXACT ON
+
+  * xharbour/include/hbvm.h
+  * xharbour/source/vm/hvm.c
+    + added hb_vmPushState()/hb_vmPopState() functions - to save/restore
+      VM state - now only hb_stack.Return is saved but maybe sth else
+      in the future so please do not copy these functions body to your
+      code but just simply call it.
+    * moved code with hb_stack.Return item saving into background
+      functions which execute background task - it eliminate some
+      unnecessary item coping when bkgtask is not executed and
+      allow to execute hb_backgroundRun() without additional code
+      to save/restore VM state
+
+  * xharbour/source/vm/classes.c
+    * use hb_vmPushState()/hb_vmPopState() functions - to save/restore
+      VM state in destructor call
+
+  * xharbour/source/vm/eval.c
+    * use hb_vmPushState()/hb_vmPopState() functions - to save/restore
+      VM state in hb_itemDo(), hb_itemDoC() and hb_itemDoCRef() functions
+    + added hb_execFromArray() to hb_itemDo() functions when first
+      parameter is HB_IT_ARRAY and support for execution with HB_SYMBOL
+      given as pointer - now hb_itemDo() can execute in practice any
+      type of items so can be used in any code
+
+  * xharbour/source/rtl/bkgtsks.c
+  * xharbour/source/rtl/idle.c
+    ! save/and restore VM stack before executing user code by using
+      hb_itemDo() function.
+
+  * xharbour/source/rtl/gtapi.c
+  * xharbour/source/rtl/hbserv.c
+    * keep blocks and arrays in hb_itemNew() envelope instead of
+      using hb_gcLock()/hb_gcUnlock() combination which is not
+      save for shared items - hb_gcUnlock() unlocks all instances.
+
+  * xharbour/source/rtl/empty.c
+    - removed unnecessary ~HB_IT_BYREF
+
+  * xharbour/source/rtl/filestat.c
+    * use extended API instead of direct item operations
+
+  * xharbour/source/rtl/hbcomprs.c
+  * xharbour/source/rtl/hbcrc32.c
+  * xharbour/source/rtl/hbcrypt.c
+  * xharbour/source/rtl/hbserial.prg
+  * xharbour/source/rtl/hbserv.c
+  * xharbour/source/rtl/hbsrlraw.c
+  * xharbour/source/rtl/trpc.prg
+  * xharbour/source/rtl/trpccli.prg
+  * xharbour/source/vm/hbi18n.c
+  * xharbour/source/vm/inet.c
+  * xharbour/source/vm/thread.c
+    ! fixes - writing to shared sting item buffers, GPFs,
+      some buffer overflow, wrong uses of AdoptRaw, etc.
+      see CVS diff for more info - I have not enough energy to
+      comment it - it's nearly 2:00 A.M and I have to return
+      to some of my business jobs and go to bed.
+      Now RPC test work when xharbour is compiled
+      without HB_UNSHARE_REFERENCES.
 
 2005-09-30 15:43 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/inet.c

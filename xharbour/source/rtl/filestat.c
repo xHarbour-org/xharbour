@@ -1,5 +1,5 @@
 /*
- * $Id: filestat.c,v 1.10 2005/01/10 18:45:33 druzus Exp $
+ * $Id: filestat.c,v 1.11 2005/02/24 10:44:07 andijahja Exp $
  */
 
 /*
@@ -275,15 +275,7 @@ static BOOL hb_fsFileStats(
 #ifdef HB_EXTENSION
 HB_FUNC( FILESTATS )
 {
-   PHB_ITEM pFileName = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pAttr  = hb_param( 2, HB_IT_BYREF );
-   PHB_ITEM pSize  = hb_param( 3, HB_IT_BYREF );
-   PHB_ITEM pCDate = hb_param( 4, HB_IT_BYREF );
-   PHB_ITEM pCTime = hb_param( 5, HB_IT_BYREF );
-   PHB_ITEM pMDate = hb_param( 6, HB_IT_BYREF );
-   PHB_ITEM pMTime = hb_param( 7, HB_IT_BYREF );
-
-   BYTE szAttr[21];
+   BYTE szAttr[21], *szFile = ( BYTE * ) hb_parc( 1 );
    HB_FOFFSET lSize;
    LONG lcDate;
    LONG lcTime;
@@ -291,40 +283,22 @@ HB_FUNC( FILESTATS )
    LONG lmTime;
 
    /* Parameter checking */
-   if ( pFileName == NULL )
+   if( !szFile || !*szFile )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "FILESTATS", 1,
             hb_paramError(1) );
       return;
    }
 
-   if ( hb_fsFileStats( (BYTE*) pFileName->item.asString.value,
-            szAttr, &lSize, &lcDate, &lcTime, &lmDate, &lmTime ) )
+   if ( hb_fsFileStats( szFile,
+                        szAttr, &lSize, &lcDate, &lcTime, &lmDate, &lmTime ) )
    {
-      if ( pAttr != NULL )
-      {
-         hb_itemPutC( pAttr, (char*) szAttr );
-      }
-      if ( pSize != NULL )
-      {
-         hb_itemPutNInt( pSize, lSize );
-      }
-      if ( pCDate != NULL )
-      {
-         hb_itemPutDL( pCDate, lcDate );
-      }
-      if ( pCTime != NULL )
-      {
-         hb_itemPutNI( pCTime, lcTime );
-      }
-      if ( pMDate != NULL )
-      {
-         hb_itemPutDL( pMDate, lmDate );
-      }
-      if ( pMTime != NULL )
-      {
-         hb_itemPutNI( pMTime, lmTime );
-      }
+      hb_storc   ( ( char * ) szAttr, 2 );
+      hb_stornint( lSize, 3 );
+      hb_stordl  ( lcDate, 4 );
+      hb_stornint( lcTime, 5 );
+      hb_stordl  ( lmDate, 6 );
+      hb_stornint( lmTime, 7 );
 
       hb_retl( TRUE );
    }

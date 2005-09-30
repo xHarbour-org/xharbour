@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.67 2005/09/22 01:11:59 druzus Exp $
+ * $Id: set.c,v 1.68 2005/09/27 14:12:49 likewolf Exp $
  */
 
 /*
@@ -1197,9 +1197,8 @@ HB_FUNC( SET )
             {
                 hb_set.HB_SET_TYPEAHEAD = 4096;
             }
-
-            /* Always reset the buffer, but only reallocate if the size changed */
-            hb_inkeyReset( old == hb_set.HB_SET_TYPEAHEAD ? FALSE : TRUE );
+            /* reset keyboard buffer */
+            hb_inkeyReset();
          }
          break;
 
@@ -1660,7 +1659,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_APPENDERROR = FALSE;
 
    hb_set.HB_SET_TRACESTACK = HB_SET_TRACESTACK_ALL;
-   hb_set.HB_SET_TYPEAHEAD = 50; hb_inkeyReset( TRUE ); /* Allocate keyboard typeahead buffer */
+   hb_set.HB_SET_TYPEAHEAD = HB_DEFAULT_INKEY_BUFSIZE;
    hb_set.HB_SET_UNIQUE = FALSE;
    hb_set.HB_SET_VIDEOMODE = 0;
 
@@ -1725,7 +1724,7 @@ void hb_setRelease( void )
    if( hb_set.HB_SET_PRINTFILE )  hb_xfree( hb_set.HB_SET_PRINTFILE );
    if( hb_set.hb_set_printerjob ) hb_xfree( hb_set.hb_set_printerjob );
 
-   hb_set.HB_SET_TYPEAHEAD = -1; hb_inkeyReset( TRUE ); /* Free keyboard typeahead buffer */
+   hb_set.HB_SET_TYPEAHEAD = 0;   hb_inkeyReset(); /* reset keyboard buffer */
 
    while( sp_sl_first )
    {

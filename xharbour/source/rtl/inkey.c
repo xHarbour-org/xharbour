@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.41 2004/12/30 08:24:57 bdj Exp $
+ * $Id: inkey.c,v 1.42 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -72,8 +72,10 @@
  */
 
 /* NOTE: For OS/2. Must be ahead of any and all #include statements */
-#define INCL_DOSPROCESS
-#define INCL_NOPMAPI
+#if defined( HB_OS_OS2 )
+#  define INCL_DOSPROCESS
+#  define INCL_NOPMAPI
+#endif
 
 #include "hbapi.h"
 #include "hbapierr.h"
@@ -89,368 +91,393 @@
   #include <unistd.h>
 #endif
 
-static int *  s_inkeyBuffer = NULL; /* Harbour keyboard buffer (empty if head == tail)     */
-static int    s_inkeyHead;       /* Harbour keyboard buffer head pointer (next insert)  */
-static int    s_inkeyTail;       /* Harbour keyboard buffer tail pointer (next extract) */
-static int    s_inkeyLast = 0;       /* Last key extracted from Harbour keyboard buffer     */
-static BOOL   s_inkeyPoll;       /* Flag to override no polling when TYPEAHEAD is 0     */
-static int    s_inkeyForce;      /* Variable to hold keyboard input when TYPEAHEAD is 0 */
+static int    s_defaultKeyBuffer[ HB_DEFAULT_INKEY_BUFSIZE + 1 ];
 
-static PHB_inkeyKB s_inkeyKB = NULL;
-static HB_inkey_enum s_eventmask;
+static int *  s_inkeyBuffer = s_defaultKeyBuffer;
+static int    s_inkeyBufferSize = HB_DEFAULT_INKEY_BUFSIZE;
+static int    s_inkeyHead = 0;
+static int    s_inkeyTail = 0;
 
-static HB_ITEM s_inKeyBlockBefore = HB_ITEM_NIL;
-static HB_ITEM s_inKeyBlockAfter  = HB_ITEM_NIL;
+static BYTE * s_StrBuffer = NULL;
+static ULONG  s_StrBufferSize;
+static ULONG  s_StrBufferPos;
 
-static void hb_inkeyKBfree( void )
+static int    s_inkeyLast = 0;
+
+static PHB_ITEM s_inKeyBlockBefore = NULL;
+static PHB_ITEM s_inKeyBlockAfter  = NULL;
+
+
+int hb_inkeyTranslate( int iKey, HB_inkey_enum event_mask )
 {
-   PHB_inkeyKB pNext;
+   /*
+    * Why bitfield has been defined as enum type?
+    * Bit operations on enum types are forbidden in
+    * many C/C++ compilers
+    */
+   int iMask;
 
-   if( s_inkeyKB )
+   switch( iKey )
    {
-      pNext     = s_inkeyKB->pNext;
-      hb_xfree( s_inkeyKB->String );
-      hb_xfree( s_inkeyKB );
-      s_inkeyKB = pNext;
+      case K_MOUSEMOVE:
+      case K_MMLEFTDOWN:
+      case K_MMRIGHTDOWN:
+      case K_MMMIDDLEDOWN:
+      case K_NCMOUSEMOVE:
+         iMask = INKEY_MOVE;
+         break;
+      case K_LBUTTONDOWN:
+      case K_LDBLCLK:
+         iMask = INKEY_LDOWN;
+         break;
+      case K_LBUTTONUP:
+         iMask = INKEY_LUP;
+         break;
+      case K_RBUTTONDOWN:
+      case K_RDBLCLK:
+         iMask = INKEY_RDOWN;
+         break;
+      case K_RBUTTONUP:
+         iMask = INKEY_RUP;
+         break;
+      case K_MBUTTONDOWN:
+      case K_MBUTTONUP:
+      case K_MDBLCLK:
+         iMask = INKEY_MMIDDLE;
+         break;
+      case K_MWFORWARD:
+      case K_MWBACKWARD:
+         iMask = INKEY_MWHEEL;
+         break;
+      default:
+         iMask = INKEY_KEYBOARD;
+         break;
+   }
+
+   if( ( iMask & ( int ) event_mask ) == 0 )
+      return 0;
+
+   return iKey;
+}
+
+
+
+/* Put the key into keyboard buffer */
+void HB_EXPORT hb_inkeyPut( int iKey )
+{
+   int iHead = s_inkeyHead;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyPut(%d)", iKey));
+
+   s_inkeyBuffer[ iHead++ ] = iKey;
+   if( iHead >= s_inkeyBufferSize )
+   {
+      iHead = 0;
+   }
+
+   if( iHead != s_inkeyTail )
+   {
+      s_inkeyHead = iHead;
    }
 }
 
-static int hb_inkeyFetch( void ) /* Extract the next key from the keyboard buffer */
+/* drop the next key in keyboard buffer */
+static void hb_inkeyPop( void )
 {
-   int key;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyFetch()"));
-
-   hb_inkeyPoll();
-   if( hb_set.HB_SET_TYPEAHEAD )
+   if( s_StrBuffer )
    {
-      /* Proper typeahead support is set */
-      if( s_inkeyHead == s_inkeyTail ) key = 0;    /* Keyboard buffer is empty */
-      else
-      {                                            /* Keyboard buffer is not empty */
-         s_inkeyLast = s_inkeyBuffer[ s_inkeyTail++ ];
-
-         if( s_inkeyLast == -99 && s_inkeyKB )
-         {
-            s_inkeyLast = s_inkeyKB->String[ s_inkeyKB->Pos-- ];
-
-            if( s_inkeyKB->Pos >= 0 )
-            {
-               s_inkeyTail--;
-            }
-            else
-            {
-               hb_inkeyKBfree( );
-            }
-         }
-
-         if( s_inkeyTail >= hb_set.HB_SET_TYPEAHEAD )
-            s_inkeyTail = 0;
-
-         key = s_inkeyLast;
+      if( ++s_StrBufferPos >= s_StrBufferSize )
+      {
+         hb_xfree( s_StrBuffer );
+         s_StrBuffer = NULL;
       }
-      s_inkeyForce = 0;
+   }
+   else if( s_inkeyHead != s_inkeyTail )
+   {
+      if( ++s_inkeyTail >= s_inkeyBufferSize )
+         s_inkeyTail = 0;
+   }
+}
+
+static BOOL hb_inkeyNextCheck( HB_inkey_enum event_mask, int * iKey )
+{
+   HB_TRACE( HB_TR_DEBUG, ("hb_inkeyNextCheck(%p)", iKey) );
+   
+   if( s_StrBuffer )
+   {
+      *iKey = s_StrBuffer[ s_StrBufferPos ];
+   }
+   else if( s_inkeyHead != s_inkeyTail )
+   {
+      *iKey = hb_inkeyTranslate( s_inkeyBuffer[ s_inkeyTail ], event_mask );
    }
    else
    {
-      s_inkeyLast = s_inkeyForce;           /* Typeahead support is disabled */
-
-      if( s_inkeyKB )
-      {
-         s_inkeyLast = s_inkeyKB->String[ s_inkeyKB->Pos-- ];
-
-         if( s_inkeyKB->Pos < 0 )
-         {
-            hb_inkeyKBfree( );
-            s_inkeyForce = 0;
-         }
-      }
-      key = s_inkeyLast;
+      return FALSE;
    }
 
-   return key;
-}
-
-
-/* Similar to hb_inkeyNext(), but this one discards chr(0).
-   Called by hb_inkey() if and only if bWait == TRUE */
-static int hb_inkeyNextNon0( HB_inkey_enum event_mask )
-{
-   int key = hb_inkeyNext( event_mask );  /* key==-99 if no char avail */
-
-   while (key == 0)
+   if( *iKey == 0 )
    {
-      hb_inkeyFetch();                    /* trash key==0 */
-      key = hb_inkeyNext( event_mask );   /* key==-99 if no char avail */
+      hb_inkeyPop();
+      return FALSE;
    }
 
-   return key;
+   return TRUE;
 }
 
-
-/* If bWait then call hb_inkeyNextNon0() which will disregard and discard chr(0).
-   This is Clipper compatible behaviour. */
-int hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask )
+static void hb_inkeyPollDo( void )
 {
-   int key;
+   int iKey;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_inkey(%d, %lf, %d)", (int) bWait, dSeconds, (int) event_mask));
+   HB_TRACE( HB_TR_DEBUG, ("hb_inkeyPollDo()") );
+   
+   iKey = hb_gt_ReadKey( ( HB_inkey_enum ) INKEY_ALL );
 
-   s_eventmask = event_mask;                   /* Set current input event mask */
-   s_inkeyPoll = TRUE;                         /* Force polling */
-
-   /* Wait for input events if requested */
-   if( bWait )
+   switch( iKey )
    {
-      if( ( dSeconds * CLOCKS_PER_SEC ) < 1 )  /* Wait forever ? */
-      {
-         /* There is no point in waiting forever for no input events! */
-         if( ( event_mask & ( INKEY_ALL + INKEY_RAW ) ) != 0 )
+      case HB_BREAK_FLAG:           /* Check for Ctrl+Break */
+      case K_ALT_C:                 /* Check for normal Alt+C */
+         if( hb_set.HB_SET_CANCEL )
          {
-            while( hb_inkeyNextNon0( event_mask ) == -99 )
-            {
-               // immediately break if a VM request is pending.
-               if ( hb_vmRequestQuery() != 0 )
-               {
-                  return 0;
-               }
-
-               hb_idleState( TRUE );
-            }
-            hb_idleReset();
+            hb_vmRequestCancel();   /* Request cancellation */
+            return;
          }
-      }
-      else
-      {
+         break;
+      case K_ALT_D:                 /* Check for normal Alt+D */
+         if( hb_set.HB_SET_DEBUG )
+         {
+            hb_vmRequestDebug();    /* Request the debugger */
+            return;
+         }
+   }
+
+   if( iKey )
+   {
+      hb_inkeyPut( iKey );
+   }
+}
+
+/* Poll the console keyboard to stuff the Harbour buffer */
+void hb_inkeyPoll( void )
+{
+   HB_TRACE( HB_TR_DEBUG, ("hb_inkeyPoll()") );
+
+   /*
+    * Clipper 5.3 always poll events without respecting
+    * hb_set.HB_SET_TYPEAHEAD when CL5.2 only when it's non zero.
+    * IMHO keeping CL5.2 behavior will be more accurate for xharbour
+    * because it allow to control it by user what some times could be
+    * necessary due to different low level GT behavior on some platforms
+    */
+   if( hb_set.HB_SET_TYPEAHEAD )
+   {
+      hb_inkeyPollDo();
+   }
+}
+
+/* Return the next key without extracting it */
+int hb_inkeyNext( HB_inkey_enum event_mask )
+{
+   int iKey = 0;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyNext(%d)", event_mask));
+
+   hb_inkeyPoll();
+   hb_inkeyNextCheck( event_mask, &iKey );
+
+   return iKey;
+}
+
+int hb_inkey( BOOL fWait, double dSeconds, HB_inkey_enum event_mask )
+{
+   clock_t end_clock = 0;
+   BOOL fPop = FALSE;
+
 #if defined( HB_OS_UNIX )
-         /* NOTE: clock() returns a time used by a program - if it is suspended
-          * then this time will be zero
-         */
-         clock_t end_clock;
-         struct tms tm;
-
-         end_clock = times( &tm ) + ( clock_t ) ( dSeconds * sysconf(_SC_CLK_TCK) );
-
-         while( hb_inkeyNextNon0( event_mask ) == -99 && (times( &tm ) < end_clock) )
+   /* NOTE: clock() returns a time used by a program - if it is suspended
+    * then this time will be zero
+    */
+   struct tms tm;
+   #define _HB_CUR_CLOCK() times( &tm )
+   #define _HB_CLOCK_TICK  sysconf(_SC_CLK_TCK)
 #else
-         clock_t end_clock = clock() + ( clock_t ) ( dSeconds * CLOCKS_PER_SEC );
-
-         while( hb_inkeyNextNon0( event_mask ) == -99 && clock() < end_clock )
+   #define _HB_CUR_CLOCK() clock()
+   #define _HB_CLOCK_TICK  CLOCKS_PER_SEC
 #endif
-         {
-            if ( hb_vmRequestQuery() != 0 )
-            {
-               return 0;
-            }
-            hb_idleState( FALSE );
-         }
-         hb_idleReset();
-      }
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkey(%d, %f, %d)", (int) fWait, dSeconds, (int) event_mask));
+
+   /* Wait forever ?, Use fixed value 100 for strict Clipper compatibility */
+   if( fWait && dSeconds * 100 >= 1 )
+   {
+      end_clock = _HB_CUR_CLOCK() + ( clock_t ) ( dSeconds * _HB_CLOCK_TICK );
    }
 
-   key = hb_inkeyFetch();            /* Get the current input event or 0 */
+   do
+   {
+      hb_inkeyPollDo();
+      fPop = hb_inkeyNextCheck( event_mask, &s_inkeyLast );
+      if( fPop )
+         break;
 
-   s_inkeyPoll = FALSE;                        /* Stop forced polling */
-   s_eventmask = hb_set.HB_SET_EVENTMASK;      /* Restore original input event mask */
+      /* immediately break if a VM request is pending. */
+      if( !fWait || hb_vmRequestQuery() != 0 )
+         return 0;
 
-   return hb_inkeyTranslate( key, event_mask );
+      hb_idleState( TRUE );
+   }
+   while( end_clock == 0 || end_clock >  _HB_CUR_CLOCK() );
+
+   hb_idleReset();
+
+   if( fPop )
+   {
+      hb_inkeyPop();
+      return s_inkeyLast;
+   }
+   return 0;
 }
 
-int hb_inkeyLast( HB_inkey_enum event_mask )      /* Return the value of the last key that was extracted */
+/* Return the value of the last key that was extracted */
+int hb_inkeyLast( HB_inkey_enum event_mask )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyLast()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyLast(%d)", event_mask));
 
    hb_inkeyPoll();
 
    return hb_inkeyTranslate( s_inkeyLast, event_mask );
 }
 
-int hb_setInkeyLast( int ch )      /* Force a value to s_inkeyLast and return previous value */
+/* Force a value to s_inkeyLast and return previous value */
+int hb_setInkeyLast( int iKey )
 {
-   int last = s_inkeyLast;
+   int iLast = s_inkeyLast;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_setInkeyLast()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_setInkeyLast(%d)", iKey));
 
-   s_inkeyLast = ch;
+   s_inkeyLast = iKey;
 
-   return last;
+   return iLast;
 }
 
-/*
-  bdj:
-  WARNING: hb_inkeyNext() returns -99 if no key is present
-           returns 0 if chr(0) is in kb buffer
-
-  See also hb_inkeyNextNon0()
-*/
-int hb_inkeyNext( HB_inkey_enum event_mask )      /* Return the next key without extracting it */
+/* Reset the keyboard buffer */
+void hb_inkeyReset( void )
 {
-   int key = (s_inkeyForce == 0 ? -99 : s_inkeyForce);    /* Assume that typeahead support is disabled */
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyReset()"));
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyNext()"));
-
-   hb_inkeyPoll();
-
-   if( hb_set.HB_SET_TYPEAHEAD )
+   if( s_StrBuffer )
    {
-      /* Proper typeahead support is enabled */
-      if( s_inkeyHead == s_inkeyTail )
+      hb_xfree( s_StrBuffer );
+      s_StrBuffer = NULL;
+   }
+
+   s_inkeyHead = 0;
+   s_inkeyTail = 0;
+
+   if( hb_set.HB_SET_TYPEAHEAD != s_inkeyBufferSize )
+   {
+      if( s_inkeyBufferSize > HB_DEFAULT_INKEY_BUFSIZE )
       {
-         key = -99;
+         hb_xfree( s_inkeyBuffer );
+      }
+      if( hb_set.HB_SET_TYPEAHEAD > HB_DEFAULT_INKEY_BUFSIZE )
+      {
+         s_inkeyBufferSize = hb_set.HB_SET_TYPEAHEAD;
+         s_inkeyBuffer = ( int * ) hb_xgrab( s_inkeyBufferSize * sizeof( int ) );
       }
       else
       {
-         key = s_inkeyBuffer[ s_inkeyTail ];    /* Next key */
-
-         if( key == -99  && s_inkeyKB )
-         {
-            key = s_inkeyKB->String[ s_inkeyKB->Pos ];
-         }
+         s_inkeyBufferSize = HB_DEFAULT_INKEY_BUFSIZE;
+         s_inkeyBuffer = s_defaultKeyBuffer;
       }
-   }
-   else
-   {
-      if( s_inkeyKB )
-         key = s_inkeyKB->String[ s_inkeyKB->Pos ];
-   }
-
-   return hb_inkeyTranslate( key, event_mask );
-}
-
-
-void hb_inkeyPoll( void )     /* Poll the console keyboard to stuff the Harbour buffer */
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyPoll()"));
-
-   if( hb_set.HB_SET_TYPEAHEAD || s_inkeyPoll )
-   {
-      int ch = hb_gt_ReadKey( s_eventmask );
-
-      switch( ch )
-      {
-         case HB_BREAK_FLAG:        /* Check for Ctrl+Break */
-            if( !hb_set.HB_SET_CANCEL ) ch = 0; /* Ignore if cancel disabled */
-         case K_ALT_C:              /* Check for normal Alt+C */
-            if( hb_set.HB_SET_CANCEL )
-            {
-               ch = 3;              /* Pretend it's a Ctrl+C */
-               hb_vmRequestCancel();/* Request cancellation */
-            }
-            break;
-         case K_ALT_D:              /* Check for normal Alt+D */
-            if( hb_set.HB_SET_DEBUG )
-            {
-               ch = 0;              /* Make the keystroke disappear */
-               hb_vmRequestDebug(); /* Request the debugger */
-            }
-      }
-
-      hb_inkeyPut( ch );
    }
 }
 
-void hb_inkeyReset( BOOL allocate )     /* Reset the keyboard buffer */
+void hb_inkeyExit( void )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyReset(%d)", (int) allocate));
-
-   /* Reset the buffer head and tail pointers, the last key value,
-      and the polling override flag */
-   s_inkeyHead = 0;
-   s_inkeyTail = 0;
-   //s_inkeyLast = 0;
-   s_inkeyPoll = FALSE;
-   s_inkeyForce = 0;
-
-   while( s_inkeyKB )
+   if( s_inKeyBlockBefore )
    {
-      hb_inkeyKBfree( );
+      hb_itemRelease( s_inKeyBlockBefore );
+      s_inKeyBlockBefore = NULL;
+   }
+   if( s_inKeyBlockAfter )
+   {
+      hb_itemRelease( s_inKeyBlockAfter );
+      s_inKeyBlockAfter = NULL;
    }
 
-   s_inkeyKB = NULL;
-
-   /* The allocate flag allows the same function to be used to reset the
-      buffer or to reset and allocate, reallocate, or free the buffer */
-   if( allocate )
+   if( s_StrBuffer )
    {
-      /* If the buffer already exists, free it */
-      if( s_inkeyBuffer )
-      {
-         hb_xfree( s_inkeyBuffer );
-         s_inkeyBuffer = NULL;
-      }
-
-      /* Always allocate a new buffer, unless it's being freed from hb_setRelease() */
-      if( hb_set.HB_SET_TYPEAHEAD > -1 )
-      {
-         /* The buffer min and max are determined by SET(HB_SET_TYPEAHEAD, but it
-            can also set the typeahead to 0 to disable polling, in which case the
-            minimum buffer size (which is 16) must still be allocated, because
-            even when polling is disabled, calling INKEY() or NEXTKEY() will
-            temporarily re-enable polling */
-         s_inkeyBuffer = ( int * ) hb_xgrab( sizeof( int ) * ( hb_set.HB_SET_TYPEAHEAD == 0 ? 16 : hb_set.HB_SET_TYPEAHEAD ) );
-      }
+      hb_xfree( s_StrBuffer );
+      s_StrBuffer = NULL;
+   }
+   if( s_inkeyBufferSize > HB_DEFAULT_INKEY_BUFSIZE )
+   {
+      hb_xfree( s_inkeyBuffer );
+      s_inkeyBufferSize = HB_DEFAULT_INKEY_BUFSIZE;
+      s_inkeyBuffer = s_defaultKeyBuffer;
    }
 }
 
 HB_FUNC( INKEY )
 {
-  BOOL bContinue ;
-  USHORT uiPCount = hb_pcount();
-  int iKey;
+   USHORT uiPCount = hb_pcount();
+   HB_ITEM Key;
+   int iKey;
 
-  if( s_inKeyBlockBefore.type == HB_IT_BLOCK )
-  {
-     hb_vmEvalBlock( &s_inKeyBlockBefore );
-  }
+   if( s_inKeyBlockBefore )
+   {
+      hb_vmEvalBlock( s_inKeyBlockBefore );
+   }
 
-  do
-  {
-    iKey = hb_inkey( uiPCount == 1 || ( uiPCount > 1 && ISNUM( 1 ) ),
+   do
+   {
+      iKey = hb_inkey( uiPCount == 1 || ( uiPCount > 1 && ISNUM( 1 ) ),
                        hb_parnd( 1 ),
-                       ISNUM( 2 ) ? ( HB_inkey_enum ) hb_parni( 2 ) : hb_set.HB_SET_EVENTMASK );
+                       ISNUM( 2 ) ? ( HB_inkey_enum ) hb_parni( 2 ) :
+                                    hb_set.HB_SET_EVENTMASK );
 
-    bContinue = iKey && s_inKeyBlockAfter.type == HB_IT_BLOCK;
-
-    if ( bContinue )
-    {
-      HB_ITEM Key;
-      PHB_ITEM pReturn;
+      if( iKey == 0 || !s_inKeyBlockAfter )
+         break;
 
       Key.type = HB_IT_NIL;
       hb_itemPutNI( &Key, iKey );
-      pReturn = hb_vmEvalBlockV( &s_inKeyBlockAfter, 1, &Key );
+      iKey = hb_itemGetNI( hb_vmEvalBlockV( s_inKeyBlockAfter, 1, &Key ) );
+      hb_setInkeyLast( iKey );
+   }
+   while( iKey == 0 );
 
-      // set iKey from return value of EvalBlock()
-      iKey = hb_itemGetNI( pReturn );
-      hb_setInkeyLast( iKey ) ; // Set LASTKEY()
-      // if iKey = 0 then we continue as iKey was handled in hb_vmEvalBlock( s_inKeyBlockAfter )
-      bContinue = (BOOL) !iKey ;
-      hb_itemClear( &Key );
-    }
-  }
-  while ( bContinue );
-
-  hb_retni(iKey);
+   hb_retni( iKey );
 }
 
 HB_FUNC( SETINKEYBEFOREBLOCK )
 {
    USHORT uiPCount = hb_pcount();
 
-   hb_itemReturn( &s_inKeyBlockBefore );
+   if( s_inKeyBlockBefore )
+   {
+      hb_itemReturn( s_inKeyBlockBefore );
+   }
+   else
+   {
+      hb_ret();
+   }
 
    if( uiPCount > 0 )
    {
-      if( s_inKeyBlockBefore.type == HB_IT_BLOCK )
-      {
-         HB_ITEM_UNLOCK( &s_inKeyBlockBefore );
-         hb_itemClear( &s_inKeyBlockBefore );
-      }
+      PHB_ITEM pBlock = hb_param( 1, HB_IT_BLOCK );
 
-      if( ISBLOCK(1) )
+      if( s_inKeyBlockBefore )
       {
-         hb_itemCopy ( &s_inKeyBlockBefore , hb_param( 1, HB_IT_BLOCK ) );
-         HB_ITEM_LOCK( &s_inKeyBlockBefore );
+         hb_itemRelease( s_inKeyBlockBefore );
+      }
+      if( pBlock )
+      {
+         s_inKeyBlockBefore = hb_itemNew( pBlock );
+      }
+      else
+      {
+         s_inKeyBlockBefore = NULL;
       }
    }
 }
@@ -459,20 +486,30 @@ HB_FUNC( SETINKEYAFTERBLOCK )
 {
    USHORT uiPCount = hb_pcount();
 
-   hb_itemReturn( &s_inKeyBlockAfter );
-
-   if ( uiPCount > 0 )
+   if( s_inKeyBlockAfter )
    {
-      if ( s_inKeyBlockAfter.type == HB_IT_BLOCK )
-      {
-         HB_ITEM_UNLOCK( &s_inKeyBlockAfter );
-         hb_itemClear( &s_inKeyBlockAfter );
-      }
+      hb_itemReturn( s_inKeyBlockAfter );
+   }
+   else
+   {
+      hb_ret();
+   }
 
-      if ( ISBLOCK(1) )
+   if( uiPCount > 0 )
+   {
+      PHB_ITEM pBlock = hb_param( 1, HB_IT_BLOCK );
+
+      if( s_inKeyBlockAfter )
       {
-         hb_itemCopy( &s_inKeyBlockAfter, hb_param( 1, HB_IT_BLOCK ));
-         HB_ITEM_LOCK( &s_inKeyBlockAfter );
+         hb_itemRelease( s_inKeyBlockAfter );
+      }
+      if( pBlock )
+      {
+         s_inKeyBlockAfter = hb_itemNew( pBlock );
+      }
+      else
+      {
+         s_inKeyBlockAfter = NULL;
       }
    }
 }
@@ -480,238 +517,57 @@ HB_FUNC( SETINKEYAFTERBLOCK )
 HB_FUNC( __KEYBOARD )
 {
    /* Clear the typeahead buffer without reallocating the keyboard buffer */
-   hb_inkeyReset( FALSE );
+   hb_inkeyReset();
 
    if( ISCHAR( 1 ) )
    {
-      ULONG size = hb_parclen( 1 );
+      ULONG ulSize = hb_parclen( 1 );
 
       /* It might be just a request to clear the buffer */
-      if( size != 0 )
+      if( ulSize != 0 )
       {
-         BYTE * fPtr = ( BYTE * ) hb_parcx( 1 );
-         BYTE * pString     = ( BYTE * ) hb_xgrab( size + 1 );
-         PHB_inkeyKB pInkey = ( PHB_inkeyKB ) hb_xgrab( sizeof( HB_inkeyKB ) );
-         PHB_inkeyKB pRoot;
-
-         pString[ size ] = 0;
-         pInkey->Pos    = size - 1;
-
-         while( size-- )
-         {
-            if( * fPtr == 59 )
-            {
-               pString[ size ] = 13; /* Convert ";" to CR, like Clipper does */
-            }
-            else
-            {
-               pString[ size ] = * fPtr;
-            }
-
-            fPtr++;
-         }
-
-         pInkey->String = pString;
-         pInkey->pNext  = NULL;
-
-         // printf( "pInkey->Pos = %i, pInkey->String = %s", pInkey->Pos, pInkey->String );
-
-         if( s_inkeyKB )
-         {
-            pRoot = s_inkeyKB;
-
-            while( pRoot->pNext )
-            {
-               pRoot = pRoot->pNext;
-            }
-
-            pRoot->pNext = pInkey;
-         }
-         else
-         {
-            s_inkeyKB = pInkey;
-         }
-
-         hb_inkeyPut( -99 );
-
-            /*
-            // Stuff the string
-            if( size >= ( ULONG ) hb_set.HB_SET_TYPEAHEAD )
-            {
-               // Have to allow for a zero size typehead buffer
-               if( hb_set.HB_SET_TYPEAHEAD )
-               {
-                  size = ( ULONG ) ( hb_set.HB_SET_TYPEAHEAD - 1 );
-               }
-               else
-               {
-                  size = 0;
-               }
-            }
-
-            while( size-- )
-            {
-               int ch = *fPtr++;
-
-               if( ch == 59 )
-               {
-                  ch = 13; // Convert ";" to CR, like Clipper does
-               }
-
-               hb_inkeyPut( ch );
-            }
-            */
+         s_StrBuffer = ( BYTE * ) hb_xgrab( ulSize );
+         memcpy( s_StrBuffer, hb_parc( 1 ), ulSize );
+         s_StrBufferSize = ulSize;
+         s_StrBufferPos = 0;
       }
    }
 #if defined( HB_EXTENSION )
-   else
+   else if( ISNUM( 1 ) )
    {
-      if( ISNUM( 1 ) )
-      {
-         hb_inkeyPut( hb_parni(1) );
-      }
+      hb_inkeyPut( hb_parni(1) );
    }
 #endif
 }
 
-void HB_EXPORT hb_inkeyPut( int ch )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyPut(%d)", ch));
-
-   if( ch )
-   {
-      if( hb_set.HB_SET_TYPEAHEAD )
-      {
-         /* Proper typeahead support is set */
-         int head = s_inkeyHead;
-
-         s_inkeyBuffer[ head++ ] = ch;
-
-         if( head >= hb_set.HB_SET_TYPEAHEAD )
-         {
-            head = 0;
-         }
-
-         if( head != s_inkeyTail )
-         {
-            s_inkeyHead = head;
-         }
-         else
-         {
-            /* TODO: Add error sound */ ;
-         }
-      }
-      else
-      {
-         s_inkeyForce = ch; /* Typeahead support is disabled */
-      }
-   }
-}
-
 #ifdef HB_EXTENSION
-
 HB_FUNC( HB_KEYPUT )
 {
    if( ISNUM( 1 ) )
       hb_inkeyPut( hb_parni( 1 ) );
 }
-
 #endif
 
-/* bdj:
-   As in Clipper, Nextkey() should return next available char in kbd buffer w/o extracting it,
-   EXCEPT when the char is chr(0).
- */
 HB_FUNC( NEXTKEY )
 {
-   int iRetval = hb_inkeyNext( ISNUM( 1 ) ? ( HB_inkey_enum ) hb_parni( 1 ) : hb_set.HB_SET_EVENTMASK );
-
-   /* iRetval==0 means we have chr(0) as next char */
-   if (iRetval==0)
-   {
-      /* must trash this key==0, but cannot use hb_inkeyFetch()
-         because we must not change s_inkeyLast.
-         The following is copied and modified from hb_inkeyFetch() */
-
-      int iKey;
-
-      if( hb_set.HB_SET_TYPEAHEAD )
-      {
-         /* Proper typeahead support is set */
-
-         iKey = s_inkeyBuffer[ s_inkeyTail++ ];
-
-         if( iKey == -99 && s_inkeyKB )
-         {
-            iKey = s_inkeyKB->String[ s_inkeyKB->Pos-- ];
-
-            if( s_inkeyKB->Pos >= 0 )
-            {
-               s_inkeyTail--;
-            }
-            else
-            {
-               hb_inkeyKBfree( );
-            }
-         }
-
-         if( s_inkeyTail >= hb_set.HB_SET_TYPEAHEAD )
-         {
-            s_inkeyTail = 0;
-         }
-
-         s_inkeyForce = 0;
-      }
-      else
-      {
-         if( s_inkeyKB )
-         {
-            s_inkeyKB->Pos--;
-
-            if( s_inkeyKB->Pos < 0 )
-            {
-               hb_inkeyKBfree( );
-               s_inkeyForce = 0;
-            }
-         }
-      }
-   } /* end chr(0) handling */
-
-   hb_retni( iRetval == -99 ? 0 : iRetval );
+   hb_retni( hb_inkeyNext( ISNUM( 1 ) ? ( HB_inkey_enum ) hb_parni( 1 ) :
+                                        hb_set.HB_SET_EVENTMASK ) );
 }
 
 HB_FUNC( LASTKEY )
 {
-   hb_retni( hb_inkeyTranslate( s_inkeyLast, ISNUM( 1 ) ? ( HB_inkey_enum ) hb_parni( 1 ) : hb_set.HB_SET_EVENTMASK ) );
+   hb_retni( hb_inkeyLast( ISNUM( 1 ) ? ( HB_inkey_enum ) hb_parni( 1 ) :
+                                        hb_set.HB_SET_EVENTMASK ) );
 }
 
 HB_FUNC( SETLASTKEY )
 {
-  if( ISNUM(1) )
-  {
-    hb_setInkeyLast( hb_parni(1) );
-  }
-  hb_retc( "" );
-}
-
-int hb_inkeyTranslate( int key, HB_inkey_enum event_mask )
-{
-   /* left for possible future use */
-   HB_SYMBOL_UNUSED( event_mask );
-   return key;
-}
-
-void hb_inkeyExit( void )
-{
-   if( s_inKeyBlockBefore.type == HB_IT_BLOCK )
+   if( ISNUM(1) )
    {
-      HB_ITEM_UNLOCK( &s_inKeyBlockBefore );
-      hb_itemClear( &s_inKeyBlockBefore );
+      hb_retni( hb_setInkeyLast( hb_parni(1) ) );
    }
-
-   if( s_inKeyBlockAfter.type == HB_IT_BLOCK )
+   else
    {
-      HB_ITEM_UNLOCK( &s_inKeyBlockAfter );
-      hb_itemClear( &s_inKeyBlockAfter );
+      hb_ret();
    }
 }

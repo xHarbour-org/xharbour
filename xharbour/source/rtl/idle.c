@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.20 2004/12/14 00:15:39 druzus Exp $
+ * $Id: idle.c,v 1.21 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -72,6 +72,7 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 #include "hbset.h"
 #include "hbvm.h"
 #include "error.ch"
@@ -204,15 +205,7 @@ void hb_idleState( BOOL bIndefinite )
       }
       else if ( s_uiIdleTask < s_uiIdleMaxTask )
       {
-         PHB_ITEM pItem = s_pIdleTasks[ s_uiIdleTask ];
-         if ( HB_IS_BLOCK( pItem ) )
-         {
-            hb_vmEvalBlock( pItem );
-         }
-         else
-         {
-            hb_execFromArray( pItem );
-         }
+         hb_itemRelease( hb_itemDo( s_pIdleTasks[ s_uiIdleTask ], 0 ) );
          ++s_uiIdleTask;
       }
       else

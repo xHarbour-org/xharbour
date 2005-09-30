@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.55 2005/09/30 08:39:22 jonnymind Exp $
+* $Id: inet.c,v 1.56 2005/09/30 22:44:11 ronpinkas Exp $
 */
 
 /*
@@ -711,7 +711,6 @@ HB_FUNC( INETSETPERIODCALLBACK )
    }
 
    Socket->caPeriodic  = hb_arrayClone( pArray, NULL );
-   hb_gcLock( Socket->caPeriodic );
 }
 
 
@@ -760,16 +759,19 @@ HB_FUNC( INETCLEARPERIODCALLBACK )
 static void s_inetRecvInternal( char *szFuncName, int iMode )
 {
    HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 1 );
-   PHB_ITEM pBuffer = hb_param( 2, HB_IT_BYREF );
+   PHB_ITEM pBuffer = hb_param( 2, HB_IT_STRING );
    char *Buffer;
    int iLen, iMaxLen, iReceived, iBufferLen;
    int iTimeElapsed;
 
-   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN || pBuffer == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN ||
+       pBuffer == NULL || !ISBYREF( 2 ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, szFuncName, 2, hb_paramError(1), hb_paramError(2) );
       return;
    }
+
+   pBuffer = hb_itemUnShare( pBuffer );
 
    if( ISNIL( 3 ) )
    {
@@ -779,10 +781,16 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
    {
       iMaxLen = hb_parni( 3 );
 
-      if( (signed int) pBuffer->item.asString.length < iMaxLen )
+      if( ( int ) pBuffer->item.asString.length < iMaxLen )
       {
+         iMaxLen = ( int ) pBuffer->item.asString.length;
+#if 0
          /* Should we issue a runtime error? */
-         hb_xrealloc(pBuffer->item.asString.value, iMaxLen );
+         pBuffer->item.asString.value =
+            ( char * ) hb_xrealloc( pBuffer->item.asString.value, iMaxLen + 1 );
+         pBuffer->item.asString.value[ iMaxLen ] = '\0';
+         pBuffer->item.asString.length = iMaxLen;
+#endif
       }
    }
 
@@ -1004,7 +1012,7 @@ static void s_inetRecvPattern( char *szFuncName, char *szPattern )
    {
       if( pResult )
       {
-         hb_itemPutNL( pResult, iLen );
+         hb_itemPutNI( pResult, iLen );
       }
 
       if( iLen == 0 )
@@ -1031,7 +1039,7 @@ static void s_inetRecvPattern( char *szFuncName, char *szPattern )
 
          if( pResult )
          {
-            hb_itemPutNL( pResult, iPos );
+            hb_itemPutNI( pResult, iPos );
          }
 
          hb_retclenAdopt( Buffer, iPos );
@@ -1042,7 +1050,7 @@ static void s_inetRecvPattern( char *szFuncName, char *szPattern )
 
          if( pResult )
          {
-            hb_itemPutNL( pResult, -2 );
+            hb_itemPutNI( pResult, -2 );
          }
 
          hb_xfree( (void *) Buffer );
@@ -1235,7 +1243,7 @@ HB_FUNC( INETRECVENDBLOCK )
    {
       if( pResult )
       {
-         hb_itemPutNL( pResult, iLen );
+         hb_itemPutNI( pResult, iLen );
       }
 
       if( iLen == 0 )
@@ -1262,7 +1270,7 @@ HB_FUNC( INETRECVENDBLOCK )
 
          if( pResult )
          {
-            hb_itemPutNL( pResult, iPos  - (iprotosize[ifindproto]-1) );
+            hb_itemPutNI( pResult, iPos  - (iprotosize[ifindproto]-1) );
          }
 
          hb_retclenAdopt( Buffer, iPos  - (iprotosize[ifindproto]-1) );
@@ -1273,7 +1281,7 @@ HB_FUNC( INETRECVENDBLOCK )
 
          if( pResult )
          {
-            hb_itemPutNL( pResult, -2 );
+            hb_itemPutNI( pResult, -2 );
          }
 
          hb_xfree( (void *) Buffer );
@@ -2039,12 +2047,15 @@ HB_FUNC( INETDGRAMRECV )
       socklen_t iDtLen = (socklen_t) sizeof( struct sockaddr );
    #endif
 
-   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN || pBuffer == NULL )
+   if( Socket == NULL || Socket->sign != HB_SOCKET_SIGN ||
+       pBuffer == NULL || !ISBYREF( 2 ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDGRAMRECV", 3,
          hb_paramError(1), hb_paramError(2), hb_paramError(3) );
       return;
    }
+
+   pBuffer = hb_itemUnShare( pBuffer );
 
    Buffer = pBuffer->item.asString.value;
 

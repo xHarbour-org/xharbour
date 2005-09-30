@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.192 2005/09/11 19:41:11 druzus Exp $
+* $Id: thread.c,v 1.193 2005/09/22 01:12:00 druzus Exp $
 */
 
 /*
@@ -325,14 +325,12 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
 
    tc->errorHandler = NULL;
    tc->errorBlock = hb_itemNew( NULL );
-   tc->aTryCatchHandlerStack = hb_itemNew( NULL );
+   tc->aTryCatchHandlerStack = hb_itemArrayNew( 0 );
 
    /* VM requests and recover sequence */
    tc->uiActionRequest = 0;
    tc->lRecoverBase = 0;
 
-   hb_arrayNew( tc->aTryCatchHandlerStack, 0 );
-   hb_gcLock(  tc->aTryCatchHandlerStack );
    tc->iLaunchCount = 0;
    tc->uiErrorDOS = 0;
 
@@ -2249,7 +2247,6 @@ PHB_ITEM hb_threadMutexCreate( PHB_ITEM pItem )
    mt->waiting = 0;
    mt->locker = 0;
    mt->aEventObjects = hb_itemArrayNew( 0 );
-   hb_gcLock( mt->aEventObjects );
    mt->next = 0;
 
    hb_threadLinkMutex( mt );

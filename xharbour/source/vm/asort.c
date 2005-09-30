@@ -1,5 +1,5 @@
 /*
- * $Id: asort.c,v 1.12 2004/12/02 03:26:20 druzus Exp $
+ * $Id: asort.c,v 1.13 2005/08/28 19:25:33 walito Exp $
  */
 
 /*
@@ -374,7 +374,7 @@ HB_FUNC( ASORT )
                     ISNUM( 3 ) ? &ulCount : NULL,
                     hb_param( 4, HB_IT_BLOCK ) );
 
-      hb_itemCopy( &(HB_VM_STACK.Return), pArray ); /* ASort() returns the array itself */
+      hb_itemReturn( pArray ); /* ASort() returns the array itself */
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.ch,v 1.13 2004/07/29 14:33:10 lf_sfnet Exp $
+ * $Id: inkey.ch,v 1.14 2004/09/21 02:40:39 paultucker Exp $
  */
 
 /*
@@ -90,7 +90,7 @@
 #define K_NCMOUSEMOVE           1016   // Non-Client Area Mouse Movement
 
 #define K_MINMOUSE              1001
-#define K_MAXMOUSE              1015
+#define K_MAXMOUSE              1016
 
 /* Cursor movement keys */
 

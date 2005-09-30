@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.17 2004/05/10 10:38:06 mauriliolongo Exp $
+ * $Id: bkgtsks.c,v 1.18 2004/07/21 23:03:57 fsgiudice Exp $
  */
 
 /*
@@ -64,6 +64,7 @@
 
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbfast.h"
 #include "hbstack.h"
 #include "hbset.h"
 #include "hbvm.h"
@@ -174,12 +175,12 @@ void hb_backgroundRun( void )
    {
       s_bIamBackground = TRUE;
 
-      if ( s_uiBackgroundTask < s_uiBackgroundMaxTask )
+      if( s_uiBackgroundTask < s_uiBackgroundMaxTask )
       {
          pBkgTask = (PHB_BACKGROUNDTASK) s_pBackgroundTasks[ s_uiBackgroundTask ];
 
          /* Check if a task can run */
-         if ( pBkgTask->bActive &&
+         if( pBkgTask->bActive &&
               ( pBkgTask->millisec == 0 ||
                 !( pBkgTask->dSeconds ) ||
                 //( ( ( hb_secondsCPU( 3 ) - pBkgTask->dSeconds ) * 1000 ) >= pBkgTask->millisec )
@@ -187,15 +188,7 @@ void hb_backgroundRun( void )
               )
             )
          {
-            PHB_ITEM pItem = pBkgTask->pTask;
-            if ( HB_IS_BLOCK( pItem ) )
-            {
-               hb_vmEvalBlock( pItem );
-            }
-            else
-            {
-               hb_execFromArray( pItem );
-            }
+            hb_itemRelease( hb_itemDo( pBkgTask->pTask, 0 ) );
             //pBkgTask->dSeconds = hb_secondsCPU( 3 );
             pBkgTask->dSeconds = hb_seconds();
          }
@@ -226,17 +219,7 @@ void hb_backgroundRunSingle( ULONG ulID )
       pBkgTask = hb_backgroundFind( ulID );
       if ( pBkgTask )
       {
-         PHB_ITEM pItem;
-         pItem = pBkgTask->pTask;
-
-         if ( HB_IS_BLOCK( pItem ) )
-         {
-            hb_vmEvalBlock( pItem );
-         }
-         else
-         {
-            hb_execFromArray( pItem );
-         }
+         hb_itemRelease( hb_itemDo( pBkgTask->pTask, 0 ) );
       }
 
       s_bIamBackground = FALSE;

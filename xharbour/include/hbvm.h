@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.29 2005/09/11 19:39:32 druzus Exp $
+ * $Id: hbvm.h,v 1.30 2005/09/23 21:55:06 likewolf Exp $
  */
 
 /*
@@ -127,6 +127,8 @@ HB_EXPORT extern void    hb_vmPushSymbol( PHB_SYMB pSym ); /* pushes a function 
 HB_EXPORT extern void    hb_vmPushPointer( void * ); /* push an item of HB_IT_POINTER type */
 HB_EXPORT extern void    hb_vmPushBaseArray( PHB_BASEARRAY pBaseArray );
 HB_EXPORT extern void    hb_vmPushItemRef( PHB_ITEM pItem, PHB_ITEM * pItemRef[], int iPos );
+HB_EXPORT extern void    hb_vmPushState( void ); /* push current VM state on stack */
+HB_EXPORT extern void    hb_vmPopState( void ); /* pop current VM state from stack */
 
 HB_EXPORT extern void hb_vmDoExitFunctions( void );
 HB_EXPORT extern PSYMBOLS hb_vmLastModule( void );

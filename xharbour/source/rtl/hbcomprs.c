@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomprs.c,v 1.10 2005/01/20 08:28:04 brianhays Exp $
+ * $Id: hbcomprs.c,v 1.11 2005/03/17 08:41:53 andijahja Exp $
  */
 
 /*
@@ -233,6 +233,15 @@ local const int base_dist[D_CODES] = {
    32,    48,    64,    96,   128,   192,   256,   384,   512,   768,
  1024,  1536,  2048,  3072,  4096,  6144,  8192, 12288, 16384, 24576
 };
+
+static void * hb_xgrabz( ULONG ulSize )
+{
+   void * ptr = hb_xgrab( ulSize );
+   memset( ptr, '\0', ulSize );
+   return ptr;
+}
+#undef hb_xgrab
+#define hb_xgrab( n )  hb_xgrabz( (n) )
 
 /* Number of bits used within bi_buf. (bi_buf might be implemented on
  * more than 16 bits on some systems.)
@@ -4014,7 +4023,7 @@ ULONG hb_destBuflen( ULONG srclen )
 HB_FUNC( HB_COMPRESS )
 {
    char *cDest, *cSource;
-   ULONG ulSrclen, ulDstlen;
+   ULONG ulSrclen, ulDstlen, ulBufLen;
    PHB_ITEM pSource, pDest =NULL, pDestLen = NULL;
    int nCompFactor, iFirst;
    int cerr;
@@ -4053,21 +4062,28 @@ HB_FUNC( HB_COMPRESS )
    {
       pDest = hb_param( iFirst + 3, HB_IT_BYREF);
       pDestLen = hb_param( iFirst + 4, HB_IT_BYREF);
-
-      if ( pDest == NULL || pDestLen == NULL )
+      ulDstlen = hb_parnl( iFirst + 4 );
+      cDest = NULL;
+      ulBufLen = 0;
+      if( pDest && pDestLen && ulDstlen > 0 )
+      {
+         pDest = hb_itemUnShare( pDest );
+         if( HB_IS_STRING( pDest ) )
+         {
+            cDest = hb_itemGetCPtr( pDest );
+            ulBufLen = hb_itemGetCLen( pDest );
+         }
+      }
+      if( cDest == NULL || ulBufLen < ulDstlen )
       {
          hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_COMPRESS", 1, hb_paramError(1) );
          return;
       }
-      pDest = hb_itemUnRef( pDest );
-      pDestLen = hb_itemUnRef( pDestLen );
-      ulDstlen = hb_parnl( iFirst + 4 );
-      cDest = pDest->item.asString.value;
    }
    else
    {
       ulDstlen = hb_destBuflen( ulSrclen );
-      cDest = (char *) hb_xgrab( ulDstlen );
+      cDest = (char *) hb_xgrab( ulDstlen + 1 );
    }
 
    cerr = compress( ( Bytef * ) cDest, &ulDstlen, ( const Bytef * ) cSource, ulSrclen,
@@ -4089,7 +4105,7 @@ HB_FUNC( HB_COMPRESS )
    {
       if (pDestLen != NULL )
       {
-         pDestLen->item.asLong.value = (LONG) ulDstlen;
+         hb_stornl( iFirst + 4, ( LONG ) ulDstlen );
          hb_retni( Z_OK );
       }
       else
@@ -4109,7 +4125,7 @@ HB_FUNC( HB_COMPRESS )
 HB_FUNC( HB_UNCOMPRESS )
 {
    char *cDest, *cSource;
-   ULONG ulSrclen, ulDstlen;
+   ULONG ulSrclen, ulDstlen, ulBufLen;
    PHB_ITEM pSource, pDest;
    int cerr;
 
@@ -4136,18 +4152,26 @@ HB_FUNC( HB_UNCOMPRESS )
    if ( hb_pcount() == 4 )
    {
       pDest = hb_param( 4, HB_IT_BYREF);
-
-      if ( pDest == NULL )
+      cDest = NULL;
+      ulBufLen = 0;
+      if( pDest )
+      {
+         pDest = hb_itemUnShare( pDest );
+         if( HB_IS_STRING( pDest ) )
+         {
+            cDest = hb_itemGetCPtr( pDest );
+            ulBufLen = hb_itemGetCLen( pDest );
+         }
+      }
+      if( cDest == NULL || ulBufLen < ulDstlen )
       {
          hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_UNCOMPRESS", 1, hb_paramError(1) );
          return;
       }
-      pDest = hb_itemUnRef( pDest );
-      cDest = pDest->item.asString.value;
    }
    else
    {
-      cDest = (char *) hb_xgrab( ulDstlen );
+      cDest = (char *) hb_xgrab( ulDstlen + 1 );
    }
 
    cerr = uncompress( ( Bytef * ) cDest, &ulDstlen, ( const Bytef * ) cSource, ulSrclen );
@@ -4192,10 +4216,7 @@ HB_FUNC( HB_COMPRESSERROR )
 
 HB_FUNC( HB_COMPRESSERRORDESC )
 {
-   const char *cErr = zError( hb_parni( 1 ) );
-   char *cError = (char *) hb_xgrab( strlen( cErr ) + 1 );
-   strcpy( cError, cErr );
-   hb_retcAdopt( cError );
+   hb_retcAdopt( hb_strdup( zError( hb_parni( 1 ) ) ) );
 }
 
 /*******************************

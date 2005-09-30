@@ -1,5 +1,5 @@
 /*
- * $Id: empty.c,v 1.7 2004/02/22 20:37:40 andijahja Exp $
+ * $Id: empty.c,v 1.8 2004/11/21 21:44:17 druzus Exp $
  */
 
 /*
@@ -58,7 +58,7 @@ HB_FUNC( EMPTY )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
 
-   switch( hb_itemType( pItem ) & ~HB_IT_BYREF )
+   switch( hb_itemType( pItem ) )
    {
       case HB_IT_ARRAY:
          hb_retl( pItem->item.asArray.value->ulLen == 0 );

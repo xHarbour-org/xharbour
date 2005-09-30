@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.27 2003/12/11 14:44:52 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.28 2004/09/26 16:37:02 jonnymind Exp $
  */
 
 /*
@@ -419,8 +419,8 @@ METHOD UDPParse( cData, nLen ) CLASS tRPCClient
       CASE cCode == "XHBR11"
          cData := Substr( cData, 7 )
          cSer := HB_DeserialBegin( cData )
-         cName := HB_DeserialNext( cSer, 64 )
-         cFunc := HB_DeserialNext( cSer, 64 )
+         cName := HB_DeserialNext( @cSer, 64 )
+         cFunc := HB_DeserialNext( @cSer, 64 )
          IF cName != NIL .and. cFunc != NIL
             aLoc := { InetAddress( ::skUDP ), cName, cFunc }
             AAdd( ::aFunctions, aLoc )

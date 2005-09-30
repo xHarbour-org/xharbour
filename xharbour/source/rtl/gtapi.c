@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.55 2005/05/09 10:04:13 druzus Exp $
+ * $Id: gtapi.c,v 1.56 2005/06/13 02:02:49 peterrees Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ static int s_closeEvent = 0;
 static int s_shutdownEvent = 0;
 static int s_resizeEvent = 0;
 static BOOL s_closing = FALSE;
-static PHB_ITEM s_pOnClose = 0;
+static PHB_ITEM s_pOnClose = NULL;
 
 /* GT graphic susbsystem */
 HB_GT_GOBJECT *hb_gt_gobjects;
@@ -283,6 +283,7 @@ void hb_gtExit( void )
       if ( s_pOnClose != NULL )
       {
          hb_itemRelease( s_pOnClose );
+         s_pOnClose = NULL;
       }
       hb_xfree( s_pColor );
    }
@@ -1709,7 +1710,7 @@ void HB_EXPORT hb_gtHandleClose()
 
    s_closing = TRUE;
 
-   if (s_pOnClose == 0 )
+   if( s_pOnClose == NULL )
    {
       if ( s_closeEvent == 0 )
       {
@@ -1721,8 +1722,9 @@ void HB_EXPORT hb_gtHandleClose()
          hb_inkeyPut( s_closeEvent );
       }
    }
-   else {
-      hb_execFromArray( s_pOnClose );
+   else
+   {
+      hb_itemRelease( hb_itemDo( s_pOnClose, 0 ) );
    }
 
    s_closing = FALSE;
@@ -1750,25 +1752,22 @@ BOOL HB_EXPORT hb_gtHandleShutdown()
 /****************************************************************************/
 BOOL HB_EXPORT hb_gtSetCloseHandler( PHB_ITEM handler )
 {
-   if ( s_pOnClose != 0 )
+   if ( s_pOnClose != NULL )
    {
       hb_itemRelease( s_pOnClose );
+      s_pOnClose = NULL;
    }
 
    if ( HB_IS_ARRAY( handler ) )
    {
-      s_pOnClose = hb_itemNew( 0 );
-      hb_itemCopy( s_pOnClose, handler );
-      hb_gcLock( s_pOnClose );
+      s_pOnClose = hb_itemNew( handler );
       return TRUE;
    }
    else if ( HB_IS_STRING( handler ) || HB_IS_NUMERIC( handler ) || HB_IS_BLOCK( handler ) )
    {
-      s_pOnClose = hb_itemNew( 0 );
+      s_pOnClose = hb_itemNew( NULL );
       hb_arrayNew( s_pOnClose, 1 );
-      hb_itemCopy( hb_arrayGetItemPtr( s_pOnClose, 1 ), handler );
-      hb_gcLock( s_pOnClose );
-      return TRUE;
+      return hb_arraySet( s_pOnClose, 1, handler );
    }
 
    return FALSE;

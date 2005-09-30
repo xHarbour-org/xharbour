@@ -1,5 +1,5 @@
 /*
- * $Id: hbcrypt.c,v 1.12 2004/02/14 01:29:42 andijahja Exp $
+ * $Id: hbcrypt.c,v 1.13 2004/02/14 21:01:17 andijahja Exp $
  */
 
 /*
@@ -337,9 +337,9 @@ void nxs_xorcyclic(
    ULONG crc1l, crc2l, crc3l;
 
    /* Build the cyclic key seed */
-   crc1 = adler32( 0, key, keylen - 2 );
-   crc2 = adler32( 0, key + 2 , keylen-4 );
-   crc3 = adler32( 0, key + 1, keylen - 2 );
+   crc1 = keylen >= 2 ? adler32( 0, key + 0, keylen - 2 ) : 1;
+   crc2 = keylen >= 4 ? adler32( 0, key + 2, keylen - 4 ) : 1;
+   crc3 = keylen >= 2 ? adler32( 0, key + 1, keylen - 2 ) : 1;
 
    crc1l = crc1 = nxs_cyclic_sequence( crc1 );
    crc2l = crc2 = nxs_cyclic_sequence( crc2 );
@@ -468,7 +468,7 @@ HB_FUNC( HB_DECRYPT )
       return;
    }
 
-   cRes = (BYTE *) hb_xgrab( pSource->item.asString.length + 8);
+   cRes = ( BYTE * ) hb_xgrab( pSource->item.asString.length + 8 );
 
    nxs_decrypt(
       (BYTE *) (pSource->item.asString.value), pSource->item.asString.length,

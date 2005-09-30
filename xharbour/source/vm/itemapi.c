@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.117 2005/07/17 18:29:14 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.118 2005/09/11 19:41:11 druzus Exp $
  */
 
 /*
@@ -1307,12 +1307,12 @@ PHB_ITEM HB_EXPORT hb_itemUnShare( PHB_ITEM pItem )
          memcpy( sString, pItem->item.asString.value, pItem->item.asString.length + 1 );
          if( !pItem->item.asString.bStatic )
          {
-            --*( pItem->item.asString.pulHolders );
+            --( *pItem->item.asString.pulHolders );
          }
          pItem->item.asString.value = sString;
          pItem->item.asString.bStatic = FALSE;
          pItem->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-         *( pItem->item.asString.pulHolders ) = 1;
+         *pItem->item.asString.pulHolders = 1;
       }
    }
 
@@ -1344,8 +1344,8 @@ int HB_EXPORT hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact
    {
       /* SET EXACT ON and not using == */
       /* Don't include trailing spaces */
-      while( ulLenFirst > 1 && szFirst[ ulLenFirst - 1 ] == ' ' ) ulLenFirst--;
-      while( ulLenSecond > 1 && szSecond[ ulLenSecond - 1 ] == ' ' ) ulLenSecond--;
+      while( ulLenFirst > 0 && szFirst[ ulLenFirst - 1 ] == ' ' ) ulLenFirst--;
+      while( ulLenSecond > 0 && szSecond[ ulLenSecond - 1 ] == ' ' ) ulLenSecond--;
    }
 
    ulMinLen = ulLenFirst < ulLenSecond ? ulLenFirst : ulLenSecond;

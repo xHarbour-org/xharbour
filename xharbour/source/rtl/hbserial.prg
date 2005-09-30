@@ -1,5 +1,5 @@
 /*
- * $Id: hbserial.prg,v 1.10 2004/01/31 20:18:26 tommir Exp $
+ * $Id: hbserial.prg,v 1.11 2004/06/23 18:14:08 paultucker Exp $
  */
 
 /*
@@ -248,7 +248,7 @@ FUNCTION HB_DeserialNext( cSerial, nMaxLen )
    oObject := HB_Deserialize( cStr, nMaxLen )
    IF oObject != NIL
       nPos += HB_SerialNext( cStr )
-      HB_CreateLen8( cSerial, nPos )
+      HB_CreateLen8( @cSerial, nPos )
    ENDIF
 
 RETURN oObject

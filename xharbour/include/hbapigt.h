@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.40 2005/05/09 10:04:08 druzus Exp $
+ * $Id: hbapigt.h,v 1.41 2005/06/13 02:02:47 peterrees Exp $
  */
 
 /*
@@ -137,14 +137,12 @@ typedef enum
    INKEY_RAW            = 256   /* Minimally Decoded Keyboard Events */
 } HB_inkey_enum;
 
-/* KEYBOARD struct */
 
-typedef struct _HB_inkeyKB
-{
-   int    Pos;
-   BYTE * String;
-   struct _HB_inkeyKB * pNext;
-} HB_inkeyKB, * PHB_inkeyKB;
+#if defined( HB_COMPAT_C53 ) && !defined( HB_C52_STRICT )
+#  define HB_DEFAULT_INKEY_BUFSIZE  15
+#else
+#  define HB_DEFAULT_INKEY_BUFSIZE  50
+#endif
 
 
 /* Cursor style constants */
@@ -445,14 +443,14 @@ extern void HB_EXPORT hb_gt_ProcessMessages( void );
                              used for all the Harbour builds that need it */
 
 /* Harbour keyboard support functions */
-extern int    hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask ); /* Wait for keyboard input */
-extern int    hb_inkeyGet( HB_inkey_enum event_mask );            /* Extract the next key from the Harbour keyboard buffer */
-extern HB_EXPORT void hb_inkeyPut( int ch );          /* Inserts an inkey code into the keyboard buffer */
-extern HB_EXPORT int  hb_inkeyLast( HB_inkey_enum event_mask );           /* Return the value of the last key that was extracted */
-extern HB_EXPORT int  hb_setInkeyLast( int ch );      /* Force a value to LASTKEY and return the previous value */
+extern int  hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask );      /* Wait for keyboard input */
+extern int  hb_inkeyGet( HB_inkey_enum event_mask );  /* Extract the next key from the Harbour keyboard buffer */
+extern HB_EXPORT void hb_inkeyPut( int iKey );        /* Inserts an inkey code into the keyboard buffer */
+extern HB_EXPORT int  hb_inkeyLast( HB_inkey_enum event_mask );   /* Return the value of the last key that was extracted */
+extern HB_EXPORT int  hb_setInkeyLast( int iKey );    /* Force a value to LASTKEY and return the previous value */
 extern HB_EXPORT int  hb_inkeyNext( HB_inkey_enum event_mask );           /* Return the next key without extracting it */
 extern HB_EXPORT void hb_inkeyPoll( void );           /* Poll the console keyboard to stuff the Harbour buffer */
-extern HB_EXPORT void hb_inkeyReset( BOOL allocate ); /* Reset the Harbour keyboard buffer */
+extern HB_EXPORT void hb_inkeyReset( void );          /* Reset the Harbour keyboard buffer */
 extern HB_EXPORT int  hb_inkeyTranslate( int key, HB_inkey_enum event_make ); /* Translation extended codes to normal codes, if needed */
 extern void hb_inkeyExit( void );
 

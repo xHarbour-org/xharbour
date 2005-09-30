@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.23 2005/08/28 19:25:33 walito Exp $
+ * $Id: eval.c,v 1.24 2005/09/04 04:29:01 walito Exp $
  */
 
 /*
@@ -216,51 +216,65 @@ PHB_ITEM HB_EXPORT hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pResult;
+   PHB_ITEM pResult = NULL;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_itemDo(%p, %hu, ...)", pItem, ulPCount));
 
    if( pItem )
    {
+      PHB_SYMB pSymbol = NULL;
+
       if( HB_IS_STRING( pItem ) )
       {
-         PHB_DYNS pDynSym;
-         char *ptr = pItem->item.asString.value;
-
-         pDynSym = hb_dynsymFindName( ptr );
+         PHB_DYNS pDynSym = hb_dynsymFindName( pItem->item.asString.value );
 
          if( pDynSym )
          {
-            ULONG ulParam;
-
-            hb_vmPushSymbol( pDynSym->pSymbol );
-            hb_vmPushNil();
-
-            if( ulPCount )
-            {
-               va_list va;
-
-               va_start( va, ulPCount );
-               for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
-               {
-                  hb_vmPush( va_arg( va, PHB_ITEM ) );
-               }
-               va_end( va );
-            }
-
-            hb_vmDo( ( USHORT ) ulPCount );
-
-            pResult = hb_itemNew( NULL );
-            hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+            pSymbol = pDynSym->pSymbol;
          }
-         else
+      }
+      else if( HB_IS_POINTER( pItem ) )
+      {
+         pSymbol = ( PHB_SYMB ) pItem->item.asPointer.value;
+      }
+      else if( HB_IS_SYMBOL( pItem ) )
+      {
+         pSymbol = pItem->item.asSymbol.value;
+      }
+
+      if( pSymbol )
+      {
+         ULONG ulParam;
+
+         hb_vmPushState();
+
+         hb_vmPushSymbol( pSymbol );
+         hb_vmPushNil();
+
+         if( ulPCount )
          {
-            pResult = NULL;
+            va_list va;
+
+            va_start( va, ulPCount );
+            for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
+            {
+               hb_vmPush( va_arg( va, PHB_ITEM ) );
+            }
+            va_end( va );
          }
+
+         hb_vmDo( ( USHORT ) ulPCount );
+
+         pResult = hb_itemNew( NULL );
+         hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+
+         hb_vmPopState();
       }
       else if( HB_IS_BLOCK( pItem ) )
       {
          ULONG ulParam;
+
+         hb_vmPushState();
 
          hb_vmPushSymbol( &hb_symEval );
          hb_vmPush( pItem );
@@ -281,39 +295,19 @@ PHB_ITEM HB_EXPORT hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
 
          pResult = hb_itemNew( NULL );
          hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+
+         hb_vmPopState();
       }
-      else if( HB_IS_SYMBOL( pItem ) )
+      else if( HB_IS_ARRAY( pItem ) )
       {
-         ULONG ulParam;
-
-         hb_vmPushSymbol( pItem->item.asSymbol.value );
-         hb_vmPushNil();
-
-         if( ulPCount )
+         hb_vmPushState();
+         if( hb_execFromArray( pItem ) )
          {
-            va_list va;
-
-            va_start( va, ulPCount );
-            for( ulParam = 1; ulParam <= ulPCount; ulParam++ )
-            {
-               hb_vmPush( va_arg( va, PHB_ITEM ) );
-            }
-            va_end( va );
+            pResult = hb_itemNew( NULL );
+            hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
          }
-
-         hb_vmDo( ( USHORT ) ulPCount );
-
-         pResult = hb_itemNew( NULL );
-         hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+         hb_vmPopState();
       }
-      else
-      {
-         pResult = NULL;
-      }
-   }
-   else
-   {
-      pResult = NULL;
    }
 
    return pResult;
@@ -326,7 +320,7 @@ PHB_ITEM HB_EXPORT hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pResult;
+   PHB_ITEM pResult = NULL;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_itemDoC(%s, %hu, ...)", szFunc, ulPCount));
 
@@ -339,6 +333,8 @@ PHB_ITEM HB_EXPORT hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
       if( pDynSym )
       {
          ULONG ulParam;
+
+         hb_vmPushState();
 
          hb_vmPushSymbol( pDynSym->pSymbol );
          hb_vmPushNil();
@@ -359,15 +355,9 @@ PHB_ITEM HB_EXPORT hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
 
          pResult = hb_itemNew( NULL );
          hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+
+         hb_vmPopState();
       }
-      else
-      {
-         pResult = NULL;
-      }
-   }
-   else
-   {
-      pResult = NULL;
    }
 
    return pResult;
@@ -380,7 +370,7 @@ PHB_ITEM HB_EXPORT hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pResult;
+   PHB_ITEM pResult = NULL;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_itemDoCRef(%s, %hu, %hu, ...)", szFunc, ulRefMask, ulPCount));
 
@@ -402,6 +392,8 @@ PHB_ITEM HB_EXPORT hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount
          itmRef.type = HB_IT_BYREF;
          itmRef.item.asRefer.offset = -1;
          itmRef.item.asRefer.BasePtr.itemsbasePtr = &pRefBase;
+
+         hb_vmPushState();
 
          hb_vmPushSymbol( pDynSym->pSymbol );
          hb_vmPushNil();
@@ -432,15 +424,9 @@ PHB_ITEM HB_EXPORT hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount
          hb_vmDo( ( USHORT ) ulPCount );
          pResult = hb_itemNew( NULL );
          hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+
+         hb_vmPopState();
       }
-      else
-      {
-         pResult = NULL;
-      }
-   }
-   else
-   {
-      pResult = NULL;
    }
 
    return pResult;

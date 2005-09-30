@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.28 2005/08/07 10:44:23 druzus Exp $
+* $Id: hbserv.c,v 1.29 2005/08/28 19:25:23 walito Exp $
 */
 
 /*
@@ -147,13 +147,9 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
 {
    UINT uiMask;
    UINT uiSig;
-   PHB_ITEM pFunction;
-   HB_ITEM ExecArray;
-   HB_ITEM Ret;
+   PHB_ITEM pFunction, pExecArray, pRet;
    ULONG ulPos;
-
-   Ret.type = HB_IT_NIL;
-   ExecArray.type = HB_IT_NIL;
+   int iRet;
 
    #if !( defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ ) )
    HB_SYMBOL_UNUSED(v);
@@ -183,39 +179,40 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
          // we don't unlock the mutex now, even if it is
          // a little dangerous. But we are in a signal hander...
          // for now just 2 parameters
-         hb_arrayNew( &ExecArray, 3 );
-         hb_arraySet( &ExecArray, 1, hb_arrayGetItemPtr( pFunction, 2 ) );
-         hb_itemPutNI( hb_arrayGetItemPtr( &ExecArray, 2), uiSig );
+         pExecArray = hb_itemArrayNew( 3 );
+         hb_arraySet( pExecArray, 1, hb_arrayGetItemPtr( pFunction, 2 ) );
+         hb_itemPutNI( hb_arrayGetItemPtr( pExecArray, 2), uiSig );
 
          // the third parameter is an array:
 
+         pRet = hb_arrayGetItemPtr( pExecArray, 3);
          #if defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ )
-         hb_arrayNew( &Ret, 1 );
+         hb_arrayNew( pRet, 1 );
          #elif defined( HB_OS_BSD )
-         hb_arrayNew( &Ret, info ? 6 : 1 );
+         hb_arrayNew( pRet, info ? 6 : 1 );
          #else
-         hb_arrayNew( &Ret, 6 );
+         hb_arrayNew( pRet, 6 );
          #endif
-         hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSSIGNAL), sig );
+         hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSSIGNAL), sig );
          #if !( defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ ) )
          #if defined( HB_OS_BSD )
          if (info)
          #endif
          {
-            hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSSUBSIG), info->si_code );
-            hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSERROR), info->si_errno );
-            hb_itemPutPtr( hb_arrayGetItemPtr( &Ret, HB_SERVICE_ADDRESS), (void *) info->si_addr );
-            hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_PROCESS), info->si_pid );
-            hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_UID), info->si_uid );
+            hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSSUBSIG), info->si_code );
+            hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSERROR), info->si_errno );
+            hb_itemPutPtr( hb_arrayGetItemPtr( pRet, HB_SERVICE_ADDRESS), (void *) info->si_addr );
+            hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_PROCESS), info->si_pid );
+            hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_UID), info->si_uid );
          }
          #endif
-         hb_itemForwardValue( hb_arrayGetItemPtr( &ExecArray, 3), &Ret );
 
-         // forbid a re-call
-         hb_execFromArray( &ExecArray );
+         pRet = hb_itemDo( pExecArray, 0 );
+         iRet = hb_itemGetNI( pRet );
+         hb_itemRelease( pRet );
+         hb_itemRelease( pExecArray );
 
-         Ret = HB_VM_STACK.Return;
-         switch( hb_itemGetNI( &Ret ) )
+         switch( iRet )
          {
             case HB_SERVICE_HANDLED:
                bSignalEnabled = TRUE;
@@ -405,13 +402,10 @@ static S_TUPLE s_sigTable[] = {
 //
 static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
 {
-   PHB_ITEM pFunction;
-   HB_ITEM ExecArray, Ret;
+   PHB_ITEM pFunction, pExecArray, pRet;
    ULONG ulPos;
    UINT uiSig, uiMask;
-
-   ExecArray.type = HB_IT_NIL;
-   Ret.type = HB_IT_NIL;
+   int iRet;
 
    // let's find the right signal handler.
    HB_CRITICAL_LOCK( s_ServiceMutex );
@@ -437,9 +431,9 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
          // we don't unlock the mutex now, even if it is
          // a little dangerous. But we are in a signal hander...
          // for now just 2 parameters
-         hb_arrayNew( &ExecArray, 3 );
-         hb_arraySetForward( &ExecArray, 1, hb_arrayGetItemPtr( pFunction, 2 ) );
-         hb_itemPutNI( hb_arrayGetItemPtr( &ExecArray, 2), uiSig );
+         pExecArray = hb_itemArrayNew( 3 );
+         hb_arraySetForward( pExecArray, 1, hb_arrayGetItemPtr( pFunction, 2 ) );
+         hb_itemPutNI( hb_arrayGetItemPtr( pExecArray, 2), uiSig );
 
          /* the third parameter is an array:
          * 1: low-level signal
@@ -450,35 +444,35 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
          * 6: UID of the riser
          */
 
-         hb_arrayNew( &Ret, 6 );
+         pRet = hb_arrayGetItemPtr( pExecArray, 3);
+         hb_arrayNew( pRet, 6 );
 
-         hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSSIGNAL), type );
-         hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSSUBSIG), sig );
+         hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSSIGNAL), type );
+         hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSSUBSIG), sig );
          //could be meaningless, but does not matter here
-         hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_OSERROR),
+         hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSERROR),
                GetLastError() );
 
          if (type == 0 ) //exception
          {
-            hb_itemPutPtr( hb_arrayGetItemPtr( &Ret,
+            hb_itemPutPtr( hb_arrayGetItemPtr( pRet,
                   HB_SERVICE_ADDRESS), ( void * ) exc->ExceptionAddress );
          }
          else
          {
-            hb_itemPutPtr( hb_arrayGetItemPtr( &Ret, HB_SERVICE_ADDRESS ), NULL );
+            hb_itemPutPtr( hb_arrayGetItemPtr( pRet, HB_SERVICE_ADDRESS ), NULL );
          }
          //TODO:
-         hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_PROCESS), GetCurrentThreadId() );
+         hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_PROCESS), GetCurrentThreadId() );
          //TODO:
-         hb_itemPutNI( hb_arrayGetItemPtr( &Ret, HB_SERVICE_UID ), 0 );
+         hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_UID ), 0 );
 
-         hb_itemForwardValue( hb_arrayGetItemPtr( &ExecArray, 3), &Ret );
+         pRet = hb_itemDo( pExecArray, 0 );
+         iRet = hb_itemGetNI( pRet );
+         hb_itemRelease( pRet );
+         hb_itemRelease( pExecArray );
 
-         // forbid a re-call
-         hb_execFromArray( &ExecArray );
-
-         Ret = HB_VM_STACK.Return;
-         switch( hb_itemGetNI( &Ret ) )
+         switch( iRet )
          {
             case HB_SERVICE_HANDLED:
                bSignalEnabled = TRUE;
@@ -731,7 +725,6 @@ static void s_signalHandlersInit()
 
    sp_hooks = hb_itemNew( NULL );
    hb_arrayNew( sp_hooks, 0 );
-   hb_gcLock( sp_hooks );
 }
 
 /*****************************************************************************
@@ -862,10 +855,7 @@ HB_FUNC( HB_SERVICELOOP )
 HB_FUNC( HB_PUSHSIGNALHANDLER )
 {
    int iMask = hb_parni( 1 );
-   PHB_ITEM pFunc = hb_param( 2, HB_IT_ANY );
-   HB_ITEM HandEntry;
-
-   HandEntry.type = HB_IT_NIL;
+   PHB_ITEM pFunc = hb_param( 2, HB_IT_ANY ), pHandEntry;
 
    if ( pFunc == NULL || iMask == 0 ||
          (pFunc->type != HB_IT_POINTER && ! HB_IS_STRING( pFunc ) && ! HB_IS_BLOCK( pFunc ) )
@@ -876,9 +866,9 @@ HB_FUNC( HB_PUSHSIGNALHANDLER )
       return;
    }
 
-   hb_arrayNew( &HandEntry, 2 );
-   hb_itemPutNI( hb_arrayGetItemPtr( &HandEntry, 1), iMask );
-   hb_arraySet( &HandEntry, 2, pFunc );
+   pHandEntry = hb_itemArrayNew( 2 );
+   hb_itemPutNI( hb_arrayGetItemPtr( pHandEntry, 1), iMask );
+   hb_arraySet( pHandEntry, 2, pFunc );
 
    /* if the hook is not initialized, initialize it */
    if ( sp_hooks == NULL )
@@ -888,9 +878,11 @@ HB_FUNC( HB_PUSHSIGNALHANDLER )
 
    HB_CRITICAL_LOCK( s_ServiceMutex );
 
-   hb_arrayAddForward( sp_hooks, &HandEntry );
+   hb_arrayAddForward( sp_hooks, pHandEntry );
 
    HB_CRITICAL_UNLOCK( s_ServiceMutex );
+
+   hb_itemRelease( pHandEntry );
 }
 
 
