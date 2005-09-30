@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4377 2005/09/29 08:13:20 marcosgambeta Exp $
+ * $Id: ChangeLog,v 1.4379 2005/09/29 16:51:28 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-29 22:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    ! Fixed bug in DelColumn() method. Reported by Teo Fonrouge.
 
 2005-09-29 14:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * source/ct/getsecrt.prg

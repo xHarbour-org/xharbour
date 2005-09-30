@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.121 2005/09/20 20:37:20 lf_sfnet Exp $
+ * $Id: tbrowse.prg,v 1.123 2005/09/29 22:00:00 modalsist Exp $
  */
 
 /*
@@ -768,6 +768,8 @@ METHOD DelColumn( nPos ) CLASS TBrowse
    LOCAL oCol
 
    if nPos > ::nColumns .or. nPos < 1
+    // For clipper compatibility we must call Errorsys with error 1132
+       Throw( ErrorNew( "BASE", 0, 1132, , "Bound error: array access" ) )
       return NIL
    endif
 
@@ -782,7 +784,7 @@ METHOD DelColumn( nPos ) CLASS TBrowse
    if nPos == ::nColPos .or. nPos == ::nColumns .or.;
               ::nColPos == ::nColumns .or. ::rightVisible == ::nColumns
 
-      if ::leftVisible == ::rightVisible
+      if ::leftVisible == ::rightVisible .AND. ::leftVisible > 1
          ::leftVisible--
       endif
       ::rightVisible--
