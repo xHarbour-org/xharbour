@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4379 2005/09/30 01:22:54 modalsist Exp $
+ * $Id: ChangeLog,v 1.4380 2005/09/30 08:39:21 jonnymind Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-09-30 14:48 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+   * source/vm/classes.c
+     * Incommented s_msgClsParent = hb_dynsymGet( "ISDERIVEDFROM" );
+       /* anyone knows why was it [partially] commented? */
 
 2005-09-30 10:38 UTC+0100 Giancarlo Niccolai (gc/at/niccolai.ws)
   * source/vm/inet.c

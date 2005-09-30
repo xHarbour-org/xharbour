@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.166 2005/09/27 02:25:40 ronpinkas Exp $
+ * $Id: classes.c,v 1.167 2005/09/29 05:05:21 walito Exp $
  */
 
 /*
@@ -1170,7 +1170,7 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
       s_msgClassSel  = hb_dynsymGet( "CLASSSEL" );
       s_msgClassFullSel = hb_dynsymGet( "CLASSFULLSEL" );
       s_msgEval      = hb_dynsymGet( "EVAL" );
-      /*s_msgClsParent = hb_dynsymGet( "ISDERIVEDFROM" );*/
+      s_msgClsParent = hb_dynsymGet( "ISDERIVEDFROM" );
       /*s_msgClass     = hb_dynsymGet( "CLASS" );*/
    }
 
@@ -3982,7 +3982,7 @@ void hb_clsUnmutexSync( void )
 
    PSYNCID pSyncId = HB_VM_STACK.pSyncId;
    ULONG ulCount;
-   
+
    if( pSyncId )
    {
       ulCount = pSyncId->ulCount;
@@ -4005,7 +4005,7 @@ void hb_clsRemutexSync( void )
 
    PSYNCID pSyncId = HB_VM_STACK.pSyncId;
    ULONG ulCount;
-   
+
    if( pSyncId )
    {
       ulCount = pSyncId->ulCount;
