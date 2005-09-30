@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.53 2005/06/17 17:04:22 lculik Exp $
+* $Id: inet.c,v 1.54 2005/09/22 01:12:00 druzus Exp $
 */
 
 /*
@@ -1843,10 +1843,10 @@ HB_FUNC( INETDGRAMBIND )
    HB_SOCKET_STRUCT *Socket;
 
    /* Parameter error checking */
-   if( iPort == 0 )
+   if( iPort == 0 || hb_pcount() == 4 && ! ISCHAR(4) )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDGRAMBIND", 1,
-         hb_paramError( 1 ) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDGRAMBIND", 4,
+         hb_paramError(1), hb_paramError(2), hb_paramError(3), hb_paramError(4) );
       return;
    }
 
@@ -1876,8 +1876,29 @@ HB_FUNC( INETDGRAMBIND )
       setsockopt( Socket->com, SOL_SOCKET, SO_BROADCAST, (const char *) &iOpt, sizeof( iOpt ));
    }
 
-   /* we'll be using non blocking sockets in all functions */
-   //hb_socketSetNonBlocking( Socket );
+   if ( hb_pcount() == 4 )
+   {
+      #ifndef IP_ADD_MEMBERSHIP
+         #define IP_ADD_MEMBERSHIP	5     // which header should this be in?
+      #endif
+      // this structure should be define in a header file.  The MS SDK indicates that
+      // it is in Ws2tcpip.h but I'm not sure I know where it should go in xHb
+      struct ip_mreq {
+         struct in_addr imr_multiaddr;	/* IP multicast address of group */
+         struct in_addr imr_interface;	/* local IP address of interface */
+      };
+      struct ip_mreq mreq ;
+
+      mreq.imr_multiaddr.s_addr = inet_addr( hb_parcx( 4 ) ); // HELLO_GROUP
+      mreq.imr_interface.s_addr = htonl( INADDR_ANY );
+      if ( setsockopt( Socket->com, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *) &mreq, sizeof( mreq )) < 0)
+      {
+         HB_SOCKET_SET_ERROR( Socket );
+         Socket->com = 0;
+         hb_retptrGC( Socket );
+         return;
+      }
+   }
 
    /* Binding here */
    iPort  = htons( iPort );
@@ -1901,6 +1922,7 @@ HB_FUNC( INETDGRAMBIND )
 
    hb_retptrGC( Socket );
 }
+
 
 HB_FUNC( INETDGRAM )
 {

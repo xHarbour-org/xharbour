@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4379 2005/09/29 16:51:28 modalsist Exp $
+ * $Id: ChangeLog,v 1.4379 2005/09/30 01:22:54 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-09-30 10:38 UTC+0100 Giancarlo Niccolai (gc/at/niccolai.ws)
+  * source/vm/inet.c
+    + Added a fuorth parameter to the INETDGRAMBIND function to
+      set the multicast address group. If given, the fuorth parameter
+      must be a string in quad dot format, and will mask the socket
+      so to receive multicasts only from a certain address range.
+
+      Thanks to Robb Hlawek for this code snippet.
+
 2005-09-29 22:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
     ! Fixed bug in DelColumn() method. Reported by Teo Fonrouge.
@@ -15,7 +24,7 @@
 2005-09-29 14:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * source/ct/getsecrt.prg
     ! minor fix
-    
+
 2005-09-29 05:11 UTC-0300 Marcos Antonio Gambeta <marcos_gambeta@hotmail.com>
   * contrib/wvtgui/wvtwin.ch
     + Added new constants:
