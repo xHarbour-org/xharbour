@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.54 2005/09/22 01:12:00 druzus Exp $
+* $Id: inet.c,v 1.55 2005/09/30 08:39:22 jonnymind Exp $
 */
 
 /*
@@ -1876,30 +1876,6 @@ HB_FUNC( INETDGRAMBIND )
       setsockopt( Socket->com, SOL_SOCKET, SO_BROADCAST, (const char *) &iOpt, sizeof( iOpt ));
    }
 
-   if ( hb_pcount() == 4 )
-   {
-      #ifndef IP_ADD_MEMBERSHIP
-         #define IP_ADD_MEMBERSHIP	5     // which header should this be in?
-      #endif
-      // this structure should be define in a header file.  The MS SDK indicates that
-      // it is in Ws2tcpip.h but I'm not sure I know where it should go in xHb
-      struct ip_mreq {
-         struct in_addr imr_multiaddr;	/* IP multicast address of group */
-         struct in_addr imr_interface;	/* local IP address of interface */
-      };
-      struct ip_mreq mreq ;
-
-      mreq.imr_multiaddr.s_addr = inet_addr( hb_parcx( 4 ) ); // HELLO_GROUP
-      mreq.imr_interface.s_addr = htonl( INADDR_ANY );
-      if ( setsockopt( Socket->com, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *) &mreq, sizeof( mreq )) < 0)
-      {
-         HB_SOCKET_SET_ERROR( Socket );
-         Socket->com = 0;
-         hb_retptrGC( Socket );
-         return;
-      }
-   }
-
    /* Binding here */
    iPort  = htons( iPort );
 
@@ -1918,6 +1894,34 @@ HB_FUNC( INETDGRAMBIND )
    {
       HB_SOCKET_SET_ERROR( Socket );
       HB_INET_CLOSE( Socket->com );
+   }
+
+   if ( hb_pcount() == 4 )
+   {
+      #ifndef IP_ADD_MEMBERSHIP
+         #define IP_ADD_MEMBERSHIP  5     // which header should this be in?
+      #endif
+
+      // this structure should be define in a header file.  The MS SDK indicates that
+      // it is in Ws2tcpip.h but I'm not sure I know where it should go in xHb
+      struct ip_mreq
+      {
+         struct in_addr imr_multiaddr;  /* IP multicast address of group */
+         struct in_addr imr_interface;  /* local IP address of interface */
+      };
+
+      struct ip_mreq mreq ;
+
+      mreq.imr_multiaddr.s_addr = inet_addr( hb_parcx( 4 ) ); // HELLO_GROUP
+      mreq.imr_interface.s_addr = htonl( INADDR_ANY );
+
+      if ( setsockopt( Socket->com, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *) &mreq, sizeof( mreq )) < 0)
+      {
+         HB_SOCKET_SET_ERROR( Socket );
+         Socket->com = 0;
+         hb_retptrGC( Socket );
+         return;
+      }
    }
 
    hb_retptrGC( Socket );
