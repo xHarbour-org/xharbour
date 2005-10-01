@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4382 2005/09/30 22:44:11 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4383 2005/09/30 23:44:04 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-01 11:30 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbexprb.c
+  * include/hbexprop.h
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * source/vm/hvm.c
+    + Added support for HB_PUSHARRAYREF
+  * include/error.ch
+    + Added #define EG_ARRREF       52      /* Harbour special */
+  + tests/arrbyref.prg
+    + New sample of passing array element by ref
 
 2005-10-01 01:43 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/inkey.ch

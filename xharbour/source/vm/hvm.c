@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.493 2005/09/27 02:26:07 ronpinkas Exp $
+ * $Id: hvm.c,v 1.494 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -1386,6 +1386,75 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_vmArrayPush();
             w++;
             break;
+
+
+         case HB_P_ARRAYPUSHREF:
+         {
+            PHB_ITEM pIndex;
+            PHB_ITEM pArray;
+            LONG     lIndex;
+
+            HB_TRACE(HB_TR_DEBUG, ("HB_P_ARRAYPUSHREF"));
+
+            pIndex = hb_stackItemFromTop( -1 );
+            pArray = hb_stackItemFromTop( -2 );
+
+            if( HB_IS_ARRAY( pArray ) )
+            {
+               if( HB_IS_INTEGER( pIndex ) )
+               {
+                  lIndex = ( LONG ) pIndex->item.asInteger.value;
+               }
+               else if( HB_IS_LONG( pIndex ) )
+               {
+                  lIndex = ( LONG ) pIndex->item.asLong.value;
+               }
+               else if( HB_IS_DOUBLE( pIndex ) )
+               {
+                  lIndex = ( LONG ) pIndex->item.asDouble.value;
+               }
+
+               #ifndef HB_C52_STRICT
+                  if( lIndex < 0 )
+                  {
+                     lIndex += ( pArray->item.asArray.value->ulLen + 1 );
+                  }
+               #endif
+
+               if( lIndex > 0 && (ULONG) lIndex <= pArray->item.asArray.value->ulLen )
+               {
+                 #ifdef HB_ARRAY_USE_COUNTER
+                  if( pArray->item.asArray.value->ulHolders > 1 )
+                 #else
+                  if( pArray->item.asArray.value->pOwners->pNext )
+                 #endif
+                  {
+                     PHB_ITEM pItemByRef = hb_stackItemFromTop( -2 );
+                     HB_ITEM_NEW( Array );
+
+                     hb_itemForwardValue( &Array, pArray );
+
+                     hb_arrayGetByRef( &Array, (ULONG) lIndex, pItemByRef );
+                     hb_stackPop();
+                  }
+                  else
+                  {
+                     // Literal array - can not push by ref!
+                     hb_errRT_BASE( EG_ARRREF, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+                  }
+               }
+               else
+               {
+                  hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+               }
+            }
+            else
+            {
+               hb_errRT_BASE( EG_ARRREF, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+            }
+            w++;
+            break;
+         }
 
          case HB_P_ARRAYPOP:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ARRAYPOP") );

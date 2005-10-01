@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.101 2005/07/25 15:09:21 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.102 2005/08/31 16:09:21 ronpinkas Exp $
  */
 
 /*
@@ -1234,7 +1234,14 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             }
             HB_EXPR_USE( pSelf->value.asList.pIndex, HB_EA_PUSH_PCODE );
 
-            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ARRAYPUSH );
+            if( pSelf->value.asList.bByRef )
+            {
+               HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ARRAYPUSHREF );
+            }
+            else
+            {
+               HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ARRAYPUSH );
+            }
          }
          break;
 

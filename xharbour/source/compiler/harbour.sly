@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.89 2005/07/28 15:37:29 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.90 2005/08/01 22:18:53 druzus Exp $
  */
 
 /*
@@ -914,6 +914,11 @@ Argument   :  EmptyExpression          { $$ = $1; }
                                                $$->value.asMacro.SubType = HB_ET_MACRO_VAR_REF;
                                                break;
 
+                                             case HB_ET_ARRAYAT:
+                                               $$ = $2;
+                                               $$->value.asList.bByRef = TRUE;
+                                               break;
+
                                              default:
                                                hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_REFER, hb_compExprDescription( $2 ), NULL );
                                                $$ = $2;
@@ -1375,20 +1380,20 @@ Get        : _Get_ LValue ','
                         if( bSetGet )
                         {
                            HB_EXPR_PTR pSetGetBlock, pGetVar = $2, pIsNil, pIfList, pIIF;
-                   
+
                            pIsNil       = hb_compExprSetOperand( hb_compExprNewEQ( hb_compExprNewVar( "_1" ) ), hb_compExprNewNil() );
-                   
+
                            pIfList      = hb_compExprNewList( pIsNil );
                            pIfList      = hb_compExprAddListExpr( pIfList, pGetVar );
                            pIfList      = hb_compExprAddListExpr( pIfList, hb_compExprAssign( hb_compExprClone( pGetVar ), hb_compExprNewVar( "_1" ) ) );
-                   
+
                            pIIF         = hb_compExprNewIIF( pIfList );
-                   
+
                            pSetGetBlock = hb_compExprNewCodeBlock();
                            pSetGetBlock = hb_compExprCBVarAdd( pSetGetBlock, "_1", ' ' );
-                   
+
                            hb_compExprAddListExpr( pSetGetBlock, pIIF );
-                   
+
                            pGetArgList = hb_compExprNewArgList( pSetGetBlock );
                         }
                         else
@@ -1398,20 +1403,20 @@ Get        : _Get_ LValue ','
 
                         break;
                      }
-   
+
                      case HB_ET_MACRO:
                         pGetArgList = hb_compExprNewArgList( hb_compExprNewNil() );
 
                         break;
-   
+
                      case HB_ET_ARRAYAT:
                      {
                         HB_EXPR_PTR pArrayVar;
 
-                        bTrancuateBaseArray = TRUE;                        
-      
+                        bTrancuateBaseArray = TRUE;
+
                         pGetVarArray = HB_EXPR_USE( $2, HB_EA_REDUCE );
-            
+
                         pArrayVar = pGetVarArray->value.asList.pExprList;
 
                         while( pArrayVar->ExprType == HB_ET_ARRAYAT )
@@ -1456,10 +1461,10 @@ Get        : _Get_ LValue ','
                   }
                }
 
-             EmptyExpression 
+             EmptyExpression
                { /* $6 */
                   HB_EXPR_PTR pVarName;
-   
+
                   switch( $2->ExprType )
                   {
                      case HB_ET_VARIABLE:
@@ -1469,7 +1474,7 @@ Get        : _Get_ LValue ','
                         pVarName = $5;
 
                         break;
-   
+
                      case HB_ET_MACRO:
                      {
                         if( $2->value.asMacro.cMacroOp == '&' )
@@ -1482,26 +1487,26 @@ Get        : _Get_ LValue ','
                         }
                         else
                         {
-                           /* 
+                           /*
                               Clipper allways error, but we can handle simple macros or macros with no declared symbols!!!
                               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_GET_COMPLEX_MACRO, NULL, NULL );
                             */
                            pVarName = $5;
                         }
-                      
+
                         break;
                      }
-   
+
                      /* HB_ET_ARRAYAT */
                      case HB_ET_CODEBLOCK:
-                     case HB_ET_NIL: 
+                     case HB_ET_NIL:
                      {
                         pVarName = pBaseArrayName ? pBaseArrayName : $5;
                         bTrancuateBaseArray = FALSE;
-   
+
                         break;
                      }
-   
+
                      default:
                         hb_compErrorLValue( $2 );
                         return 0;

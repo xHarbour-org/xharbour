@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.14 2004/11/21 21:43:38 druzus Exp $
+ * $Id: hbexprop.h,v 1.15 2005/07/16 03:04:26 ronpinkas Exp $
  */
 
 /*
@@ -212,6 +212,7 @@ typedef struct HB_EXPR_
       {
          struct HB_EXPR_ *pExprList;    /* list elements */
          struct HB_EXPR_ *pIndex;       /* array index, others */
+         BOOL bByRef;
       } asList;
       struct
       {
