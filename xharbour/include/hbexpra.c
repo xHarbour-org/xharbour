@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.16 2004/10/27 05:27:36 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.17 2005/03/31 14:34:02 andijahja Exp $
  */
 
 /*
@@ -344,6 +344,7 @@ HB_EXPR_PTR hb_compExprNewArrayAt( HB_EXPR_PTR pArray, HB_EXPR_PTR pIndex )
    HB_EXPR_USE( pIndex, HB_EA_ARRAY_INDEX );
    pExpr->value.asList.pExprList = pArray;
    pExpr->value.asList.pIndex = pIndex;
+   pExpr->value.asList.bByRef = FALSE;
 
    return pExpr;
 }
