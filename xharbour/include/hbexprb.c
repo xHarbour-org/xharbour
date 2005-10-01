@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.102 2005/08/31 16:09:21 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.103 2005/10/01 18:33:02 ronpinkas Exp $
  */
 
 /*
@@ -1932,6 +1932,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         pSelf->ExprType = HB_ET_ARRAYAT;
                         pSelf->value.asList.pExprList = pString;
                         pSelf->value.asList.pIndex    = pStart;
+                        pSelf->value.asList.bByRef    = FALSE;
 
                         PostOptimization :
                         ;
@@ -1959,6 +1960,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         pSelf->value.asList.pExprList = pString;
                         pStart->value.asNum.lVal      =  1;
                         pSelf->value.asList.pIndex    = pStart;
+                        pSelf->value.asList.bByRef    = FALSE;
                      }
                   }
                }
@@ -1978,6 +1980,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      pSelf->ExprType = HB_ET_ARRAYAT;
                      pSelf->value.asList.pExprList = pArray;
                      pSelf->value.asList.pIndex    = hb_compExprNewLong( -1 );
+                     pSelf->value.asList.bByRef    = FALSE;
                   }
                }
                // Type( <x> ) => Type( <x>, MacroFlags )
