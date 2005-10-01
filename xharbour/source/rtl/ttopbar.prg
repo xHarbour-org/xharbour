@@ -1,5 +1,5 @@
 /*
- * $Id: ttopbar.prg,v 1.7 2004/07/15 09:29:55 lculik Exp $
+ * $Id: ttopbar.prg,v 1.8 2005/03/18 16:39:29 maurifull Exp $
  */
 
 /*
@@ -333,10 +333,16 @@ RETURN HTNOWHERE
 
 //--------------------------------------------------------------------------//
 METHOD InsItem( nPos, oItem ) CLASS TopBarMenu
-
+   Local  n
    IF nPos > 0 .AND. nPos <= ::itemCount
+//      oItem:column := ::aItems[ nPos - 1 ]:column + Len( StrTran( ::aItems[ nPos - 1 ]:caption, "&", "" ) ) + 2
       aIns( ::aItems, nPos, oItem, .T. )
       ::itemCount++
+
+      For n := nPos to ::itemCount
+          ::aItems[ n ]:column := ::aItems[ n - 1 ]:column + Len( StrTran( ::aItems[ n -1 ]:caption, "&", "" ) ) + 2
+      NEXT
+
    ENDIF
 
 RETURN Self

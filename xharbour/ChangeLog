@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4385 2005/10/01 19:37:40 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4386 2005/10/01 20:08:39 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-01 17:50 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  * source/rtl/ttopbar.prg
+    ! fixed bug on insitem method. The  column pos of moved menu
+      item need to be recalculated. Reported by Mario
 
 2005-10-01 13:08 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbexprb.c
