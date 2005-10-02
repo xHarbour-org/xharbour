@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.496 2005/10/02 04:31:20 ronpinkas Exp $
+ * $Id: hvm.c,v 1.497 2005/10/02 12:35:11 druzus Exp $
  */
 
 /*
@@ -1413,13 +1413,29 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                {
                   lIndex = ( LONG ) pIndex->item.asDouble.value;
                }
+               else if( HB_IS_STRING( pIndex ) && pIndex->item.asString.length == 1 )
+               {
+                  lIndex = ( LONG ) ( BYTE ) pIndex->item.asString.value[0];
+               }
+               else
+               {
+                  PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARRREF, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
 
-               #ifndef HB_C52_STRICT
-                  if( lIndex < 0 )
+                  if( pResult )
                   {
-                     lIndex += ( pArray->item.asArray.value->ulLen + 1 );
+                     hb_stackPop();
+                     hb_stackPop();
+                     hb_itemPushForward( pResult );
+                     hb_itemRelease( pResult );
                   }
-               #endif
+
+                  break;
+               }
+
+               if( lIndex < 0 )
+               {
+                  lIndex += ( pArray->item.asArray.value->ulLen + 1 );
+               }
 
                if( lIndex > 0 && (ULONG) lIndex <= pArray->item.asArray.value->ulLen )
                {
@@ -1452,6 +1468,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                hb_errRT_BASE( EG_ARRREF, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
             }
+
             w++;
             break;
          }
@@ -8165,9 +8182,9 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
          iLocal += hb_stackBaseItem()->item.asSymbol.paramcnt - 256;
       }
 
+#ifdef HB_UNSHARE_REFERENCES
       pLocal = *( HB_VM_STACK.pBase + iLocal + 1 );
 
-#ifdef HB_UNSHARE_REFERENCES
       if( pLocal->type & HB_IT_STRING && ( pLocal->item.asString.bStatic || *( pLocal->item.asString.pulHolders ) > 1 ) )
       {
          char *sString = (char*) hb_xgrab( pLocal->item.asString.length + 1 );
