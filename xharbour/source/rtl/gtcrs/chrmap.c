@@ -1,5 +1,5 @@
 /*
- * $Id: chrmap.c,v 1.4 2004/02/03 14:01:14 druzus Exp $
+ * $Id: chrmap.c,v 1.5 2004/02/07 11:41:01 druzus Exp $
  */
 
 /*
@@ -188,8 +188,8 @@ static void chrmap_init( int *piTransTbl )
 
 static int chrmap_parse( FILE *fp, char *pszTerm, int *nTransTbl, char *pszFile )
 {
-    int line = 0, from, to, val, mod, i, n;
-    char buf[256], *s, op;
+    int line = 0, from = 0, to = 0, val = 0, mod = 0, i, n;
+    char buf[256], *s, op = 0;
     int isTerm = 0;
     fpos_t pos;
 

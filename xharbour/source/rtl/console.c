@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.56 2005/05/09 10:04:12 druzus Exp $
+ * $Id: console.c,v 1.57 2005/06/13 02:02:49 peterrees Exp $
  */
 /*
  * Harbour Project source code:
@@ -400,15 +400,14 @@ HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
 {
    HB_THREAD_STUB
 
-   USHORT uiPCount = hb_pcount();
-   USHORT uiParam;
+   int iPCount = hb_pcount(), iParam;
 
    HB_CONSOLE_SAFE_LOCK
 
-   for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
+   for( iParam = 1; iParam <= iPCount; iParam++ )
    {
-      hb_conOut( uiParam, hb_conOutStd );
-      if( uiParam < uiPCount )
+      hb_conOut( iParam, hb_conOutStd );
+      if( iParam < iPCount )
          hb_conOutStd( " ", 1 );
    }
 
@@ -420,15 +419,14 @@ HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
 {
    HB_THREAD_STUB
 
-   USHORT uiPCount = hb_pcount();
-   USHORT uiParam;
+   int iPCount = hb_pcount(), iParam;
 
    HB_CONSOLE_SAFE_LOCK
 
-   for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
+   for( iParam = 1; iParam <= iPCount; iParam++ )
    {
-      hb_conOut( uiParam, hb_conOutErr );
-      if( uiParam < uiPCount )
+      hb_conOut( iParam, hb_conOutErr );
+      if( iParam < iPCount )
          hb_conOutErr( " ", 1 );
    }
 
@@ -440,15 +438,14 @@ HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or pri
 {
    HB_THREAD_STUB
 
-   USHORT uiPCount = hb_pcount();
-   USHORT uiParam;
+   int iPCount = hb_pcount(), iParam;
 
    HB_CONSOLE_SAFE_LOCK
 
-   for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
+   for( iParam = 1; iParam <= iPCount; ++iParam )
    {
-      hb_conOut( uiParam, hb_conOutAlt );
-      if( uiParam < uiPCount )
+      hb_conOut( iParam, hb_conOutAlt );
+      if( iParam < iPCount )
       {
          hb_conOutAlt( " ", 1 );
       }

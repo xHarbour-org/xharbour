@@ -1,5 +1,5 @@
 /*
- * $Id: filestat.c,v 1.11 2005/02/24 10:44:07 andijahja Exp $
+ * $Id: filestat.c,v 1.12 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -276,11 +276,8 @@ static BOOL hb_fsFileStats(
 HB_FUNC( FILESTATS )
 {
    BYTE szAttr[21], *szFile = ( BYTE * ) hb_parc( 1 );
-   HB_FOFFSET lSize;
-   LONG lcDate;
-   LONG lcTime;
-   LONG lmDate;
-   LONG lmTime;
+   HB_FOFFSET lSize = 0;
+   LONG lcDate = 0, lcTime = 0, lmDate = 0, lmTime = 0;
 
    /* Parameter checking */
    if( !szFile || !*szFile )

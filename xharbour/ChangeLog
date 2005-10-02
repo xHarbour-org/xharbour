@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4387 2005/10/01 20:45:26 lculik Exp $
+ * $Id: ChangeLog,v 1.4388 2005/10/02 04:31:19 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-02 14:33 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapi.h
+  * xharbour/source/rtl/console.c
+  * xharbour/source/rtl/filestat.c
+  * xharbour/source/rtl/filesys.c
+  * xharbour/source/rtl/gtcrs/chrmap.c
+  * xharbour/source/rtl/gtstd/gtstd.c
+  * xharbour/source/vm/inet.c
+    * minor modifications - mostly code formatting and some GCC4
+      warnings clearing
+
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * small modification for compilation without LONGLONG support
+
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+    ! fixed call back calls to use hb_vmPushState()/hb_vmPopState()
+      Still codeblock holding has to be fixed.
+
+  * xharbour/source/vm/hvm.c
+    ! fixed typos in HB_TRACE debug messages after copy and past
+    ! added hb_stackPush()/hb_stackDec() to hb_vmPushState()/
+      hb_vmPopState() to safe currently process stack top item.
+      Ron we cleaned code with POP operation but in fact the same
+      may happen with PUSH when we add sth like filed references
+      you asked me - instead of fighting with this we should
+      always think that hb_stackTopItem() state is undefined and
+      properly save/restore them.
 
 2005-10-01 21:30 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/hvm.c

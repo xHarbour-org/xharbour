@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.56 2005/09/30 22:44:11 ronpinkas Exp $
+* $Id: inet.c,v 1.57 2005/09/30 23:44:05 druzus Exp $
 */
 
 /*
@@ -1851,7 +1851,7 @@ HB_FUNC( INETDGRAMBIND )
    HB_SOCKET_STRUCT *Socket;
 
    /* Parameter error checking */
-   if( iPort == 0 || hb_pcount() == 4 && ! ISCHAR(4) )
+   if( iPort == 0 || ( hb_pcount() == 4 && ! ISCHAR(4) ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "INETDGRAMBIND", 4,
          hb_paramError(1), hb_paramError(2), hb_paramError(3), hb_paramError(4) );
@@ -1920,7 +1920,7 @@ HB_FUNC( INETDGRAMBIND )
 
       struct ip_mreq mreq ;
 
-      mreq.imr_multiaddr.s_addr = inet_addr( hb_parcx( 4 ) ); // HELLO_GROUP
+      mreq.imr_multiaddr.s_addr = inet_addr( hb_parc( 4 ) ); // HELLO_GROUP
       mreq.imr_interface.s_addr = htonl( INADDR_ANY );
 
       if ( setsockopt( Socket->com, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *) &mreq, sizeof( mreq )) < 0)

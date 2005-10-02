@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.149 2005/08/02 12:11:00 mauriliolongo Exp $
+ * $Id: filesys.c,v 1.150 2005/09/19 23:21:29 druzus Exp $
  */
 
 /*
@@ -292,7 +292,7 @@ static BOOL s_fUseWaitLocks = TRUE;
       }
    #endif
 
-HANDLE DostoWinHandle( FHANDLE fHandle)
+HANDLE DostoWinHandle( FHANDLE fHandle )
 {
    HANDLE hHandle = (HANDLE) LongToHandle( fHandle );
 

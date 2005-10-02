@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.495 2005/10/01 18:33:02 ronpinkas Exp $
+ * $Id: hvm.c,v 1.496 2005/10/02 04:31:20 ronpinkas Exp $
  */
 
 /*
@@ -7513,7 +7513,10 @@ HB_EXPORT void hb_vmPushState( void )
 {
    HB_THREAD_STUB
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushNil()"));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushState()"));
+
+   /* safe top item which can be processed at this moment */
+   hb_stackPush();
 
    hb_itemForwardValue( * HB_VM_STACK.pPos, &(HB_VM_STACK.Return) );
    hb_stackPush();
@@ -8340,10 +8343,12 @@ HB_EXPORT void hb_vmPopState( void )
 {
    HB_THREAD_STUB
 
-   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmPop(%p)", pItem ) );
-
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmPopState(%p)", pItem ) );
+    
    hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromTop( -1 ) );
-   hb_stackPop();
+   hb_stackDec();
+   /* restore top item */
+   hb_stackDec();
 }
 
 static BOOL hb_vmPopLogical( void )

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.156 2005/06/29 21:40:41 peterrees Exp $
+ * $Id: gtwvt.c,v 1.157 2005/08/01 16:08:43 bdj Exp $
  */
 
 /*
@@ -1954,13 +1954,14 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
       if ( bPaint )
       {
-        if ( _s.pSymWVT_PAINT )
-        {
-           hb_vmPushSymbol( _s.pSymWVT_PAINT->pSymbol );
-           hb_vmPushNil();
-           hb_vmDo( 0 );
-           hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
-        }
+         if ( _s.pSymWVT_PAINT )
+         {
+            hb_vmPushState();
+            hb_vmPushSymbol( _s.pSymWVT_PAINT->pSymbol );
+            hb_vmPushNil();
+            hb_vmDo( 0 );
+            hb_vmPopState();
+         }
       }
       else
       {
@@ -1993,14 +1994,15 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
       if ( bGetFocus )
       {
-        if ( _s.pSymWVT_SETFOCUS )
-        {
-          hb_vmPushSymbol( _s.pSymWVT_SETFOCUS->pSymbol );
-          hb_vmPushNil();
-          hb_vmPushLong( ( LONG ) hWnd    );
-          hb_vmDo( 1 );
-          hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
-        }
+         if ( _s.pSymWVT_SETFOCUS )
+         {
+            hb_vmPushState();
+            hb_vmPushSymbol( _s.pSymWVT_SETFOCUS->pSymbol );
+            hb_vmPushNil();
+            hb_vmPushLong( ( LONG ) hWnd );
+            hb_vmDo( 1 );
+            hb_vmPopState();
+         }
       }
       else
       {
@@ -2022,11 +2024,12 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
       if ( _s.pSymWVT_KILLFOCUS )
       {
-        hb_vmPushSymbol( _s.pSymWVT_KILLFOCUS->pSymbol );
-        hb_vmPushNil();
-        hb_vmPushLong( ( LONG ) hWnd );
-        hb_vmDo( 1 );
-        hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+         hb_vmPushState();
+         hb_vmPushSymbol( _s.pSymWVT_KILLFOCUS->pSymbol );
+         hb_vmPushNil();
+         hb_vmPushLong( ( LONG ) hWnd );
+         hb_vmDo( 1 );
+         hb_vmPopState();
       }
       return( 0 );
     }
@@ -2419,10 +2422,11 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
     {
        if ( _s.pSymWVT_TIMER )
        {
+          hb_vmPushState();
           hb_vmPushSymbol( _s.pSymWVT_TIMER->pSymbol );
           hb_vmPushNil();
           hb_vmDo( 0 );
-          hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+          hb_vmPopState();
        }
        return( 0 );
     }
@@ -3328,6 +3332,7 @@ static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 
     if ( _s.pSymWVT_MOUSE && keyCode != 0 )
     {
+      hb_vmPushState();
       hb_vmPushSymbol( _s.pSymWVT_MOUSE->pSymbol );
       hb_vmPushNil();
       hb_vmPushLong( ( SHORT ) keyCode  );
@@ -3335,7 +3340,7 @@ static void hb_wvt_gtMouseEvent( HWND hWnd, UINT message, WPARAM wParam, LPARAM 
       hb_vmPushLong( ( SHORT ) colrow.x );
       hb_vmPushLong( ( SHORT ) keyState );
       hb_vmDo( 4 );
-      hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+      hb_vmPopState();
     }
 
     hb_wvt_gtAddCharToInputQueue( keyCode );
@@ -3578,7 +3583,7 @@ BOOL HB_EXPORT hb_wvt_gtEnableShortCuts( BOOL bEnable )
 IPicture * HB_EXPORT hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR cSection )
 {
    HRSRC    res;
-   IPicture *iPicture = NULL; // = ( IPicture* ) malloc( sizeof( IPicture ) );
+   LPVOID   iPicture = NULL;
 
    res = FindResource( ( HINSTANCE ) hb_hInstance, cResource, cSection );
    if ( res )
@@ -3596,7 +3601,7 @@ IPicture * HB_EXPORT hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR 
 
       CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
 
-      OleLoadPicture( iStream, nFileSize, TRUE, ( REFIID ) &IID_IPicture, ( LPVOID* ) &iPicture );
+      OleLoadPicture( iStream, nFileSize, TRUE, ( REFIID ) &IID_IPicture, &iPicture );
 
       FreeResource( mem );
    }
@@ -3609,12 +3614,11 @@ IPicture * HB_EXPORT hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR 
 IPicture * HB_EXPORT hb_wvt_gtLoadPicture( char * image )
 {
   IStream   *iStream;
-  IPicture  *iPicture;
+  LPVOID    iPicture = NULL;
   HGLOBAL   hGlobal;
   HANDLE    hFile;
   DWORD     nFileSize;
   DWORD     nReadByte;
-  IPicture  *Result = NULL;
 
   hFile = CreateFile( image, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
   if ( hFile != INVALID_HANDLE_VALUE )
@@ -3630,19 +3634,14 @@ IPicture * HB_EXPORT hb_wvt_gtLoadPicture( char * image )
         if ( ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ) )
         {
           CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
-          OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, ( LPVOID* ) &iPicture );
-          //iStream->release()
-          if ( iPicture )
-          {
-            Result = iPicture;
-          }
+          OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, &iPicture );
         }
         GlobalFree( hGlobal );
       }
     }
     CloseHandle( hFile );
   }
-  return( Result );
+  return ( IPicture * ) iPicture;
 }
 
 //-------------------------------------------------------------------//
@@ -4438,6 +4437,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
          case 1:  // Function Name
          {
             pDynSym = ( PHB_DYNS ) pFunc;
+            hb_vmPushState();
             hb_vmPushSymbol( pDynSym->pSymbol );
             hb_vmPushNil();
             hb_vmPushLong( ( ULONG ) hDlg    );
@@ -4445,7 +4445,8 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
             hb_vmPushLong( ( ULONG ) wParam  );
             hb_vmPushLong( ( ULONG ) lParam  );
             hb_vmDo( 4 );
-            bReturn = hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+            bReturn = hb_itemGetNL( &HB_VM_STACK.Return );
+            hb_vmPopState();
             break;
          }
 
@@ -4469,8 +4470,9 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
               hilParam.type = HB_IT_NIL;
               hb_itemPutNL( &hilParam, (ULONG) lParam );
 
-              pReturn = hb_vmEvalBlockV( (PHB_ITEM) _s.pFunc[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
+              pReturn = hb_itemDo( (PHB_ITEM) _s.pFunc[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
               bReturn = hb_itemGetNL( pReturn );
+              hb_itemRelease( pReturn );
             }
             else
             {
@@ -4570,6 +4572,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
          case 1:  // Function Name
          {
             pDynSym = ( PHB_DYNS ) pFunc;
+            hb_vmPushState();
             hb_vmPushSymbol( pDynSym->pSymbol );
             hb_vmPushNil();
             hb_vmPushLong( ( ULONG ) hDlg    );
@@ -4577,7 +4580,8 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
             hb_vmPushLong( ( ULONG ) wParam  );
             hb_vmPushLong( ( ULONG ) lParam  );
             hb_vmDo( 4 );
-            bReturn = hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+            bReturn = hb_itemGetNL( &HB_VM_STACK.Return );
+            hb_vmPopState();
             break;
          }
 
@@ -4601,8 +4605,9 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
               hilParam.type = HB_IT_NIL;
               hb_itemPutNL( &hilParam, (ULONG) lParam );
 
-              pReturn = hb_vmEvalBlockV( (PHB_ITEM) _s.pFuncModal[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
+              pReturn = hb_itemDo( (PHB_ITEM) _s.pFunc[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
               bReturn = hb_itemGetNL( pReturn );
+              hb_itemRelease( pReturn );
             }
             else
             {

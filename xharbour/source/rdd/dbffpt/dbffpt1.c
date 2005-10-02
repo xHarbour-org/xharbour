@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.56 2005/09/20 16:14:34 ronpinkas Exp $
+ * $Id: dbffpt1.c,v 1.57 2005/09/20 17:26:37 druzus Exp $
  */
 
 /*
@@ -3716,9 +3716,17 @@ static ERRCODE hb_fptPutValueFile( FPTAREAP pArea, USHORT uiIndex, BYTE * szFile
       }
       else
       {
+         ULONG ulSize, ulBlock, ulType, ulOldSize, ulOldType;
          HB_FOFFSET size = hb_fsSeekLarge( hFile, 0, FS_END );
-         ULONG ulSize = HB_MIN( size, 0xFFFFFFFF - sizeof( FPTBLOCK ) ),
-               ulBlock, ulType, ulOldSize, ulOldType;
+
+         if( ( size & 0xFFFFFFFF ) == size )
+         {
+            ulSize = HB_MIN( ( ULONG ) size, 0xFFFFFFFFUL - sizeof( FPTBLOCK ) );
+         }
+         else
+         {
+            ulSize = HB_MIN( size, ( HB_FOFFSET ) ( 0xFFFFFFFF - sizeof( FPTBLOCK ) ) );
+         }
 
          if( pArea->bMemoType == DB_MEMO_SMT )
             ulType = SMT_IT_CHAR;

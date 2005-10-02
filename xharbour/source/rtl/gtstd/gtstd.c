@@ -1,5 +1,5 @@
  /*
- * $Id: gtstd.c,v 1.22 2005/02/27 11:56:06 andijahja Exp $
+ * $Id: gtstd.c,v 1.23 2005/09/27 09:20:37 druzus Exp $
  */
 
 /*
@@ -69,7 +69,7 @@
    #include <sys/types.h>
    #include <sys/wait.h>
 #else
-   #if defined(_MSC_VER)
+   #if defined( _MSC_VER )
       #include <io.h>
       #include <conio.h>
    #endif
@@ -148,10 +148,6 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
-#if defined(_MSC_VER)
-   s_bStdinConsole = _isatty(0);
-#endif
-
    s_uiDispCount = 0;
    s_iRow = s_iCol = s_iCurRow = s_iCurCol = 0;
 
@@ -170,10 +166,15 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
    s_iFilenoStdin  = iFilenoStdin;
    s_iFilenoStdout = iFilenoStdout;
    s_iFilenoStderr = iFilenoStderr;
-   hb_fsSetDevMode( s_iFilenoStdout, FD_BINARY );
-
    s_szCrLf = (BYTE *) hb_conNewLine();
    s_ulCrLf = strlen( (char *) s_szCrLf );
+
+   hb_fsSetDevMode( s_iFilenoStdout, FD_BINARY );
+
+#if defined( _MSC_VER )
+   iFilenoStdin = 0;
+   s_bStdinConsole = _isatty( iFilenoStdin );
+#endif
 
 #if defined( OS_UNIX_COMPATIBLE )
    s_fRestTTY = FALSE;
@@ -274,24 +275,22 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 
    HB_SYMBOL_UNUSED( eventmask );
 
-#if defined(OS_UNIX_COMPATIBLE)
+#if defined( _MSC_VER )
+   if( s_bStdinConsole )
+   {
+      if( _kbhit() ) ch = _getch();
+   }
+   else if( !_eof( s_iFilenoStdin ) && _read( s_iFilenoStdin, &bChar, 1 ) == 1 )
+   {
+      ch = bChar;
+   }
+#elif defined( OS_UNIX_COMPATIBLE )
    if( hb_fsRead( s_iFilenoStdin, &bChar, 1 ) == 1 )
    {
       ch = bChar;
    }
 #else
-
-   #if defined(_MSC_VER)
-   if( s_bStdinConsole )
-   {
-      if( _kbhit() ) ch = _getch();
-   }
-   else
-   {
-      if(! _eof(0) ) _read(0, &ch, 1);
-   }
-   #endif
-
+   HB_SYMBOL_UNUSED( bChar );
 #endif
 
    /* TODO: */
