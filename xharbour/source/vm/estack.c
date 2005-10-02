@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.70 2005/01/25 10:47:54 druzus Exp $
+ * $Id: estack.c,v 1.71 2005/01/28 14:34:44 jacekp Exp $
  */
 
 /*
@@ -85,18 +85,18 @@ void HB_EXPORT hb_stackPop( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackPop()"));
 
-   if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems )
+   if( HB_IS_COMPLEX( *( HB_VM_STACK.pPos - 1 ) ) )
    {
-      hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
-   }
-
-   if( HB_IS_COMPLEX( *HB_VM_STACK.pPos ) )
-   {
-      hb_itemClear( *HB_VM_STACK.pPos );
+      hb_itemClear( *( HB_VM_STACK.pPos - 1 ) );
    }
    else
    {
-      ( *HB_VM_STACK.pPos )->type = HB_IT_NIL;
+      ( *( HB_VM_STACK.pPos - 1 ) )->type = HB_IT_NIL;
+   }
+
+   if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems )
+   {
+      hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
    }
 }
 
@@ -310,15 +310,15 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
 
    while( HB_VM_STACK.pPos > HB_VM_STACK.pBase )
    {
-      --HB_VM_STACK.pPos;
+      PHB_ITEM pItem = *( HB_VM_STACK.pPos - 1 );
 
-      iLocal = HB_VM_STACK.pPos - HB_VM_STACK.pBase - 1;
+      iLocal = HB_VM_STACK.pPos - HB_VM_STACK.pBase;
 
-      if( iLocal <= (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt && HB_IS_MEMVAR( *HB_VM_STACK.pPos ) )
+      if( iLocal <= (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt && HB_IS_MEMVAR( pItem ) )
       {
-         //printf( "Func: %s Params: %i Local %i Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, (*HB_VM_STACK.pPos)->type );
+         //printf( "Func: %s Params: %i Local %i Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, pItem->type );
 
-         pDetached = hb_itemUnRefOnce( *HB_VM_STACK.pPos );
+         pDetached = hb_itemUnRefOnce( pItem );
 
          //printf( "   Func: %s Params: %i Local %i UnRef Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, pDetached->type );
 
@@ -328,16 +328,18 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
             //printf( "Severed Detached Local: %i Type: %i\n", iLocal, pDetached->type );
          }
 
-         hb_itemClear( *HB_VM_STACK.pPos );
+         hb_itemClear( pItem );
       }
-      else if( HB_IS_COMPLEX( *HB_VM_STACK.pPos ) )
+      else if( HB_IS_COMPLEX( pItem ) )
       {
-         hb_itemClear( *HB_VM_STACK.pPos );
+         hb_itemClear( pItem );
       }
       else
       {
-         ( *HB_VM_STACK.pPos )->type = HB_IT_NIL;
+         pItem->type = HB_IT_NIL;
       }
+
+      --HB_VM_STACK.pPos;
    }
 
    HB_VM_STACK.pBase = HB_VM_STACK.pItems + pStack->lBaseItem;
@@ -387,9 +389,11 @@ HB_ITEM_PTR HB_EXPORT hb_stackItemFromTop( int nFromTop )
 {
 
    if( nFromTop > 0 )
+   {
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
+   }
 
-   return ( * ( HB_VM_STACK.pPos + nFromTop ) );
+   return ( *( HB_VM_STACK.pPos + nFromTop ) );
 }
 
 #undef hb_stackItemFromBase
@@ -416,7 +420,7 @@ HB_ITEM_PTR HB_EXPORT hb_stackItemFromBase( int nFromBase )
 #undef hb_stackTopItem
 HB_ITEM_PTR HB_EXPORT hb_stackTopItem( void )
 {
-    return * HB_VM_STACK.pPos;
+    return *HB_VM_STACK.pPos;
 }
 
 #undef hb_stackBaseItem

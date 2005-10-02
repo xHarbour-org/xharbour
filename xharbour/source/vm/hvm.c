@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.494 2005/09/30 23:44:05 druzus Exp $
+ * $Id: hvm.c,v 1.495 2005/10/01 18:33:02 ronpinkas Exp $
  */
 
 /*
@@ -861,14 +861,14 @@ int HB_EXPORT hb_vmQuit( void )
    */
    while( HB_VM_STACK.pPos > HB_VM_STACK.pItems )
    {
-      --HB_VM_STACK.pPos;
-
-      if( HB_IS_STRING( *HB_VM_STACK.pPos ) )
+      if( HB_IS_STRING( *( HB_VM_STACK.pPos - 1 ) ) )
       {
-         hb_itemReleaseString( *HB_VM_STACK.pPos );
+         hb_itemReleaseString( *( HB_VM_STACK.pPos - 1 ) );
       }
 
-      ( *HB_VM_STACK.pPos )->type = HB_IT_NIL;
+      ( *( HB_VM_STACK.pPos - 1 ) )->type = HB_IT_NIL;
+
+      --HB_VM_STACK.pPos;
    }
    //printf("After Stack\n" );
 
