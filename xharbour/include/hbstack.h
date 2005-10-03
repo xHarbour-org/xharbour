@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.29 2005/01/28 14:34:44 jacekp Exp $
+ * $Id: hbstack.h,v 1.30 2005/03/31 03:15:19 druzus Exp $
  */
 
 /*
@@ -130,28 +130,49 @@ typedef struct
    #define hb_stackItem( iItemPos )    ( * ( HB_VM_STACK.pItems + (LONG) iItemPos ) )
    #define hb_stackReturnItem( )       ( &(HB_VM_STACK.Return) )
 
-   #define hb_stackDec( )              do { \
+   #define hb_stackDec( )              do \
+                                       { \
                                           HB_THREAD_STUB \
+                                          \
                                           if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
+                                          { \
                                              hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
-                                       } while ( 0 )
+                                          } \
+                                       } \
+                                       while( 0 )
 
-   #define hb_stackPop( )              do { \
+   #define hb_stackPop( )              do \
+                                       { \
                                           HB_THREAD_STUB \
+                                          \
+                                          if( HB_IS_COMPLEX( *( HB_VM_STACK.pPos - 1 ) ) ) \
+                                          { \
+                                             hb_itemClear( *( HB_VM_STACK.pPos - 1 ) ); \
+                                          } \
+                                          else \
+                                          { \
+                                             ( *( HB_VM_STACK.pPos - 1 ) )->type = HB_IT_NIL; \
+                                          } \
+                                          \
                                           if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
+                                          { \
                                              hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
-                                          if( HB_IS_COMPLEX( * HB_VM_STACK.pPos ) ) \
-                                             hb_itemClear( * HB_VM_STACK.pPos ); \
-                                       } while ( 0 )
+                                          } \
+                                       } \
+                                       while( 0 )
 
-   #define hb_stackPush( )             do { \
+   #define hb_stackPush( )             do \
+                                       { \
                                           HB_THREAD_STUB \
+                                          \
                                           if( HB_VM_STACK.wItems - 1 <= HB_VM_STACK.pPos - HB_VM_STACK.pItems ) \
                                           { \
                                              hb_stackIncrease(); \
                                           } \
-                                          ( * (++HB_VM_STACK.pPos) )->type = HB_IT_NIL; \
-                                       } while ( 0 )
+                                          \
+                                          ( *(++HB_VM_STACK.pPos) )->type = HB_IT_NIL; \
+                                       } \
+                                       while( 0 )
 
 #else
    extern HB_ITEM_PTR HB_EXPORT hb_stackItemFromTop( int nFromTop );
