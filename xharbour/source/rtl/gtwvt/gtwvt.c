@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.157 2005/08/01 16:08:43 bdj Exp $
+ * $Id: gtwvt.c,v 1.158 2005/10/02 12:35:11 druzus Exp $
  */
 
 /*
@@ -4605,7 +4605,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
               hilParam.type = HB_IT_NIL;
               hb_itemPutNL( &hilParam, (ULONG) lParam );
 
-              pReturn = hb_itemDo( (PHB_ITEM) _s.pFunc[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
+              pReturn = hb_itemDo( (PHB_ITEM) _s.pFuncModal[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
               bReturn = hb_itemGetNL( pReturn );
               hb_itemRelease( pReturn );
             }
