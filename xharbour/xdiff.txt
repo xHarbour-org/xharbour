@@ -1,10 +1,23 @@
 xHarbour offers many syntax extensions over Harbour and Clipper, including:
 
+ARRAY ELEMENT BYREF
+-------------------
+
+xHArbour supports passing an array element BYREF as a function argument.
+
+
+   SomeFunc( @aArray[ nIndex ] )
+
+
+For sample usage please review tests\arrbyref.prg
+
+
 ASSOCIATE CLASS:
 ----------------
 The ASSOCIATE CLASS syntax allows the xHarbour developer to replace the
 standard classes for native types with any alternative class, including
-classes dervied from the standard classes.
+classes dervied from the standard classes. As well as complete support
+for Operator Overloading for native types.
 
    Syntax:
    -------

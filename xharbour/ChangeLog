@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4391 2005/10/03 03:48:28 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4392 2005/10/03 16:59:36 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-03 12:08 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * xdiff.txt
+    + Added note about Operator Overloading for Native Types
+    + Added ARRAY ELEMENT BYREF entry
 
 2005-10-04 00:10 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * xharbour/source/rtl/gtwvt/gtwvt.c
