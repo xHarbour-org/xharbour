@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4396 2005/10/04 15:52:38 kaddath Exp $
+ * $Id: ChangeLog,v 1.4397 2005/10/04 16:52:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-04 20:06 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbdefs.h
+  * xharbour/source/common/hbver.c
+  * xharbour/source/compiler/genc.c
+  * xharbour/source/ct/charone.c
+  * xharbour/source/rtl/filesys.c
+  * xharbour/source/rtl/hbserv.c
+  * xharbour/source/rtl/gtstd/gtstd.c
+   * cleaned some BCC warnings
+
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/rddsys.prg
+   ! fixed default RDD setting
 
 2005-10-04 09:52 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbclass.ch
@@ -51,7 +65,7 @@
       #define FW_HEAVY                   900
       #define FW_BLACK                   900
 
-2005-10-05 04:03 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+2005-10-04 04:03 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/common/hbver.c
     * a small extension to GCC compiler string to inform about
       C/C++ mode

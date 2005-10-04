@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.30 2005/08/02 21:06:43 peterrees Exp $
+ * $Id: hbver.c,v 1.31 2005/10/04 02:05:32 druzus Exp $
  */
 
 /*
@@ -616,7 +616,7 @@ char * hb_verCompiler( void )
 #elif defined(__BORLANDC__)
 
    {
-      char szSub[ 32 ];
+      //char szSub[ 32 ];
       /* QUESTION: Is there any better, safer, more official way to detect
                    the bit depth of the C compiler ? [vszakats] */
 

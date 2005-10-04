@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.172 2005/09/27 09:20:37 druzus Exp $
+ * $Id: dbcmd.c,v 1.173 2005/10/04 02:05:33 druzus Exp $
  */
 
 /*
@@ -334,6 +334,42 @@ static LPRDDNODE hb_rddFindNode( char * szDriver, USHORT * uiIndex )
    return NULL;
 }
 
+/*
+ * Get (/set) default RDD driver
+ */
+static char * hb_rddDefaultDrv( char * szDriver )
+{
+   static BOOL fInit = FALSE;
+
+   if( szDriver && *szDriver )
+   {
+      char szNewDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
+
+      hb_strncpyUpper( szNewDriver, szDriver, HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
+      if( !hb_rddFindNode( szNewDriver, NULL ) )
+      {
+         return NULL;
+      }
+      strcpy( s_szDefDriver, szNewDriver );
+   }
+   else if( !fInit && !s_szDefDriver[ 0 ] && s_uiRddMax )
+   {
+      char *szDrvTable[] = { "DBFNTX", "DBFCDX", "DBFFPT", "DBF", NULL };
+      int i;
+
+      for( i = 0; szDrvTable[ i ]; ++i )
+      {
+         if( hb_rddFindNode( szDrvTable[ i ], NULL ) )
+         {
+            strcpy( s_szDefDriver, szDrvTable[ i ] );
+            break;
+         }
+      }
+      fInit = TRUE;
+   }
+
+   return s_szDefDriver;
+}
 
 /*
  * Register a RDD driver.
@@ -1570,7 +1606,7 @@ static ERRCODE hb_rddOpenTable( char * szFileName,  char * szDriver,
    }
    else
    {
-      szDriver = s_szDefDriver;
+      szDriver = hb_rddDefaultDrv( NULL );
    }
 
    uiPrevArea = hb_rddGetCurrentWorkAreaNumber();
@@ -1638,7 +1674,7 @@ static ERRCODE hb_rddCreateTable( char * szFileName, PHB_ITEM pStruct,
    }
    else
    {
-      szDriver = s_szDefDriver;
+      szDriver = hb_rddDefaultDrv( NULL );
    }
 
    uiPrevArea = hb_rddGetCurrentWorkAreaNumber();
@@ -2142,7 +2178,7 @@ HB_FUNC( DBTABLEEXT )
    {
       LPRDDNODE pRddNode;
       USHORT uiRddID;
-      pRddNode = hb_rddFindNode( s_szDefDriver, &uiRddID );
+      pRddNode = hb_rddFindNode( hb_rddDefaultDrv( NULL ), &uiRddID );
       if( pRddNode )
       {
          pArea = hb_rddNewAreaNode( pRddNode, uiRddID );
@@ -2535,7 +2571,7 @@ HB_FUNC( ORDBAGEXT )
    {
       LPRDDNODE pRddNode;
       USHORT uiRddID;
-      pRddNode = hb_rddFindNode( s_szDefDriver, &uiRddID );
+      pRddNode = hb_rddFindNode( hb_rddDefaultDrv( NULL ), &uiRddID );
       if( pRddNode )
       {
          pArea = hb_rddNewAreaNode( pRddNode, uiRddID );
@@ -3421,26 +3457,15 @@ HB_FUNC( RDDSETDEFAULT )
 {
    HB_THREAD_STUB
 
-   USHORT uiLen;
-   char szNewDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
+   hb_retc( hb_rddDefaultDrv( NULL ) );
 
-   hb_retc( s_szDefDriver );
-
-   uiLen = ( USHORT ) hb_parclen( 1 );
-
-   if( uiLen > 0 )
+   if( hb_parclen( 1 ) > 0 )
    {
-      if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
-      {
-         uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
-      }
-      hb_strncpyUpper( szNewDriver, hb_parc( 1 ), uiLen );
-      if( ! hb_rddFindNode( szNewDriver, NULL ) )
+      if( ! hb_rddDefaultDrv( hb_parc( 1 ) ) )
       {
          hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "RDDSETDEFAULT" );
          return;
       }
-      strcpy( s_szDefDriver, szNewDriver );
    }
 }
 
@@ -3448,26 +3473,15 @@ HB_FUNC( DBSETDRIVER )
 {
    HB_THREAD_STUB
 
-   USHORT uiLen;
-   char szNewDriver[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
+   hb_retc( hb_rddDefaultDrv( NULL ) );
 
-   hb_retc( s_szDefDriver );
-
-   uiLen = ( USHORT ) hb_parclen( 1 );
-
-   if( uiLen > 0 )
+   if( hb_parclen( 1 ) > 0 )
    {
-      if( uiLen > HARBOUR_MAX_RDD_DRIVERNAME_LENGTH )
-      {
-         uiLen = HARBOUR_MAX_RDD_DRIVERNAME_LENGTH;
-      }
-      hb_strncpyUpper( szNewDriver, hb_parc( 1 ), uiLen );
-      if( !hb_rddFindNode( szNewDriver, NULL ) )
+      if( ! hb_rddDefaultDrv( hb_parc( 1 ) ) )
       {
          hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBSETDRIVER" );
          return;
       }
-      strcpy( s_szDefDriver, szNewDriver );
    }
 }
 
@@ -3940,7 +3954,7 @@ HB_FUNC( DBDROP )
    szDriver = hb_parc( 3 );
    if( !szDriver ) /* no VIA RDD parameter, use default */
    {
-      szDriver = s_szDefDriver;
+      szDriver = hb_rddDefaultDrv( NULL );
    }
 
    pRDDNode = hb_rddFindNode( szDriver, &uiRddID );  /* find the RDDNODE */
@@ -3965,7 +3979,7 @@ HB_FUNC( DBEXISTS )
    szDriver = hb_parc( 3 );
    if( !szDriver ) /* no VIA RDD parameter, use default */
    {
-      szDriver = s_szDefDriver;
+      szDriver = hb_rddDefaultDrv( NULL );
    }
 
    pRDDNode = hb_rddFindNode( szDriver, &uiRddID );  // find the RDD
@@ -3991,7 +4005,7 @@ HB_FUNC( RDDINFO )
    szDriver = hb_parc( 3 );
    if( !szDriver ) /* no VIA RDD parameter, use default */
    {
-      szDriver = s_szDefDriver;
+      szDriver = hb_rddDefaultDrv( NULL );
    }
    ulConnection = hb_parnl( 4 );
 

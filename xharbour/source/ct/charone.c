@@ -1,5 +1,5 @@
 /*
- * $Id: charone.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+ * $Id: charone.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -163,7 +163,7 @@ static void do_charone( int iSwitch )
 		     
 		     while ( sLen >= 2
 		             && ( pc = ct_at_exact_forward( pStart, sLen,
-		                                            pcSub, 2, NULL ) )
+		                                            pcSub, 2, NULL ) ) != 0
 			     && ( pc - pcDeleteSet ) % 2 == 1 )
 		     {
 		        pStart = pc + 1;

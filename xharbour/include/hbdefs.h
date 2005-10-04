@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.74 2005/06/22 15:29:54 druzus Exp $
+ * $Id: hbdefs.h,v 1.75 2005/08/23 10:59:02 druzus Exp $
  */
 
 /*
@@ -712,22 +712,22 @@ typedef long HB_PTRDIFF;
 #if defined( HB_STRICT_ALIGNMENT ) || !defined( HB_LITTLE_ENDIAN )
 
    #define HB_GET_LE_UINT16( p )    ( ( UINT16 ) \
-                                      ( ( UINT16 ) (( BYTE * )( p ))[0] | \
-                                        ( UINT16 ) (( BYTE * )( p ))[1] <<  8 ) )
+                                      ( ( ( UINT16 ) (( BYTE * )( p ))[0] ) | \
+                                        ( ( UINT16 ) (( BYTE * )( p ))[1] <<  8 ) ) )
    #define HB_GET_LE_UINT32( p )    ( ( UINT32 ) \
-                                      ( ( UINT32 ) (( BYTE * )( p ))[0] | \
-                                        ( UINT32 ) (( BYTE * )( p ))[1] <<  8 | \
-                                        ( UINT32 ) (( BYTE * )( p ))[2] << 16 | \
-                                        ( UINT32 ) (( BYTE * )( p ))[3] << 24 ) )
+                                      ( ( ( UINT32 ) (( BYTE * )( p ))[0] ) | \
+                                        ( ( UINT32 ) (( BYTE * )( p ))[1] <<  8 ) | \
+                                        ( ( UINT32 ) (( BYTE * )( p ))[2] << 16 ) | \
+                                        ( ( UINT32 ) (( BYTE * )( p ))[3] << 24 ) ) )
    #define HB_GET_LE_UINT64( p )    ( ( UINT64 ) \
-                                      ( ( UINT64 ) (( BYTE * )( p ))[0] | \
-                                        ( UINT64 ) (( BYTE * )( p ))[1] <<  8 | \
-                                        ( UINT64 ) (( BYTE * )( p ))[2] << 16 | \
-                                        ( UINT64 ) (( BYTE * )( p ))[3] << 24 | \
-                                        ( UINT64 ) (( BYTE * )( p ))[4] << 32 | \
-                                        ( UINT64 ) (( BYTE * )( p ))[5] << 40 | \
-                                        ( UINT64 ) (( BYTE * )( p ))[6] << 48 | \
-                                        ( UINT64 ) (( BYTE * )( p ))[7] << 56 ) )
+                                      ( ( ( UINT64 ) (( BYTE * )( p ))[0] ) | \
+                                        ( ( UINT64 ) (( BYTE * )( p ))[1] <<  8 ) | \
+                                        ( ( UINT64 ) (( BYTE * )( p ))[2] << 16 ) | \
+                                        ( ( UINT64 ) (( BYTE * )( p ))[3] << 24 ) | \
+                                        ( ( UINT64 ) (( BYTE * )( p ))[4] << 32 ) | \
+                                        ( ( UINT64 ) (( BYTE * )( p ))[5] << 40 ) | \
+                                        ( ( UINT64 ) (( BYTE * )( p ))[6] << 48 ) | \
+                                        ( ( UINT64 ) (( BYTE * )( p ))[7] << 56 ) ) )
 
    #define HB_PUT_LE_UINT16( p, w )    do { \
                                          (( BYTE * )( p ))[0] = ( BYTE )( w ); \
@@ -754,22 +754,22 @@ typedef long HB_PTRDIFF;
 #if defined( HB_STRICT_ALIGNMENT ) || !defined( HB_BIG_ENDIAN )
 
    #define HB_GET_BE_UINT16( p )    ( ( UINT16 ) \
-                                      ( ( UINT16 ) (( BYTE * )( p ))[0] << 8 | \
-                                        ( UINT16 ) (( BYTE * )( p ))[1] ) )
+                                      ( ( ( UINT16 ) (( BYTE * )( p ))[0] << 8 ) | \
+                                        ( ( UINT16 ) (( BYTE * )( p ))[1] ) ) )
    #define HB_GET_BE_UINT32( p )    ( ( UINT32 ) \
-                                      ( ( UINT32 ) (( BYTE * )( p ))[0] << 24 | \
-                                        ( UINT32 ) (( BYTE * )( p ))[1] << 16 | \
-                                        ( UINT32 ) (( BYTE * )( p ))[2] <<  8 | \
-                                        ( UINT32 ) (( BYTE * )( p ))[3] ) )
+                                      ( ( ( UINT32 ) (( BYTE * )( p ))[0] << 24 ) | \
+                                        ( ( UINT32 ) (( BYTE * )( p ))[1] << 16 ) | \
+                                        ( ( UINT32 ) (( BYTE * )( p ))[2] <<  8 ) | \
+                                        ( ( UINT32 ) (( BYTE * )( p ))[3] ) ) )
    #define HB_GET_BE_UINT64( p )    ( ( UINT64 ) \
-                                      ( ( UINT64 ) (( BYTE * )( p ))[0] << 56 | \
-                                        ( UINT64 ) (( BYTE * )( p ))[1] << 48 | \
-                                        ( UINT64 ) (( BYTE * )( p ))[2] << 40 | \
-                                        ( UINT64 ) (( BYTE * )( p ))[3] << 32 | \
-                                        ( UINT64 ) (( BYTE * )( p ))[4] << 24 | \
-                                        ( UINT64 ) (( BYTE * )( p ))[5] << 16 | \
-                                        ( UINT64 ) (( BYTE * )( p ))[6] <<  8 | \
-                                        ( UINT64 ) (( BYTE * )( p ))[7] ) )
+                                      ( ( ( UINT64 ) (( BYTE * )( p ))[0] << 56 ) | \
+                                        ( ( UINT64 ) (( BYTE * )( p ))[1] << 48 ) | \
+                                        ( ( UINT64 ) (( BYTE * )( p ))[2] << 40 ) | \
+                                        ( ( UINT64 ) (( BYTE * )( p ))[3] << 32 ) | \
+                                        ( ( UINT64 ) (( BYTE * )( p ))[4] << 24 ) | \
+                                        ( ( UINT64 ) (( BYTE * )( p ))[5] << 16 ) | \
+                                        ( ( UINT64 ) (( BYTE * )( p ))[6] <<  8 ) | \
+                                        ( ( UINT64 ) (( BYTE * )( p ))[7] ) ) )
 
    #define HB_PUT_BE_UINT16( p, w )    do { \
                                          (( BYTE * )( p ))[0] = ( BYTE )( (w) >>  8 ); \
@@ -798,28 +798,28 @@ typedef long HB_PTRDIFF;
  * so we always have to build them from BYTEs and cannot use C casting
  */
 #define HB_GET_LE_INT24( p )        ( ( INT32 ) \
-                                      ( ( INT32 ) (( BYTE * )( p ))[0] | \
-                                        ( INT32 ) (( BYTE * )( p ))[1] <<  8 | \
-                                        ( INT32 ) (( BYTE * )( p ))[2] << 16 | \
-                                        ( INT32 ) ((( BYTE * )( p ))[2] & 0x80 ? 0xFF : 0x00 ) << 24 ) )
+                                      ( ( ( INT32 ) (( BYTE * )( p ))[0] ) | \
+                                        ( ( INT32 ) (( BYTE * )( p ))[1] <<  8 ) | \
+                                        ( ( INT32 ) (( BYTE * )( p ))[2] << 16 ) | \
+                                        ( ( INT32 ) ((( BYTE * )( p ))[2] & 0x80 ? 0xFF : 0x00 ) << 24 ) ) )
 #define HB_GET_LE_UINT24( p )       ( ( UINT32 ) \
-                                      ( ( UINT32 ) (( BYTE * )( p ))[0] | \
-                                        ( UINT32 ) (( BYTE * )( p ))[1] <<  8 | \
-                                        ( UINT32 ) (( BYTE * )( p ))[2] << 16 ) )
+                                      ( ( ( UINT32 ) (( BYTE * )( p ))[0] ) | \
+                                        ( ( UINT32 ) (( BYTE * )( p ))[1] <<  8 ) | \
+                                        ( ( UINT32 ) (( BYTE * )( p ))[2] << 16 ) ) )
 #define HB_PUT_LE_UINT24( p, w )    do { \
                                        (( BYTE * )( p ))[0] = ( BYTE )( w ); \
                                        (( BYTE * )( p ))[1] = ( BYTE )( (w) >>  8 ); \
                                        (( BYTE * )( p ))[2] = ( BYTE )( (w) >> 16 ); \
                                     } while ( 0 )
 #define HB_GET_BE_INT24( p )        ( ( INT32 ) \
-                                      ( ( INT32 ) (( BYTE * )( p ))[2] | \
-                                        ( INT32 ) (( BYTE * )( p ))[1] <<  8 | \
-                                        ( INT32 ) (( BYTE * )( p ))[0] << 16 | \
-                                        ( INT32 ) ((( BYTE * )( p ))[0] & 0x80 ? 0xFF : 0x00 ) << 24 ) )
+                                      ( ( ( INT32 ) (( BYTE * )( p ))[2] ) | \
+                                        ( ( INT32 ) (( BYTE * )( p ))[1] <<  8 ) | \
+                                        ( ( INT32 ) (( BYTE * )( p ))[0] << 16 ) | \
+                                        ( ( INT32 ) ((( BYTE * )( p ))[0] & 0x80 ? 0xFF : 0x00 ) << 24 ) ) )
 #define HB_GET_BE_UINT24( p )       ( ( UINT32 ) \
-                                      ( ( UINT32 ) (( BYTE * )( p ))[2] | \
-                                        ( UINT32 ) (( BYTE * )( p ))[1] <<  8 | \
-                                        ( UINT32 ) (( BYTE * )( p ))[0] << 16 ) )
+                                      ( ( ( UINT32 ) (( BYTE * )( p ))[2] ) | \
+                                        ( ( UINT32 ) (( BYTE * )( p ))[1] <<  8 ) | \
+                                        ( ( UINT32 ) (( BYTE * )( p ))[0] << 16 ) ) )
 #define HB_PUT_BE_UINT24( p, w )    do { \
                                        (( BYTE * )( p ))[2] = ( BYTE )( w ); \
                                        (( BYTE * )( p ))[1] = ( BYTE )( (w) >>  8 ); \

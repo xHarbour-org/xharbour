@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.107 2005/09/02 18:29:39 druzus Exp $
+ * $Id: genc.c,v 1.108 2005/10/01 18:33:02 ronpinkas Exp $
  */
 
 /*
@@ -777,11 +777,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       hb_xfree( pDelete );
    }
 
-   #ifndef HB_BACK_END
-      #define HB_BACK_END 0
-   #endif
-
+#ifdef HB_BACK_END
    if( HB_BACK_END == 0 )
+#endif
    {
       if( ! hb_comp_bQuiet )
       {
