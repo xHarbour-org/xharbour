@@ -1,5 +1,5 @@
  /*
- * $Id: gtstd.c,v 1.23 2005/09/27 09:20:37 druzus Exp $
+ * $Id: gtstd.c,v 1.24 2005/10/02 12:35:11 druzus Exp $
  */
 
 /*
@@ -268,7 +268,6 @@ static void out_newline( void )
 
 int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 {
-   BYTE bChar;
    int ch = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
@@ -280,17 +279,22 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
    {
       if( _kbhit() ) ch = _getch();
    }
-   else if( !_eof( s_iFilenoStdin ) && _read( s_iFilenoStdin, &bChar, 1 ) == 1 )
+   else if( !_eof( s_iFilenoStdin )
    {
-      ch = bChar;
+      BYTE bChar;
+      if( _read( s_iFilenoStdin, &bChar, 1 ) == 1 )
+      {
+         ch = bChar;
+      }
    }
 #elif defined( OS_UNIX_COMPATIBLE )
-   if( hb_fsRead( s_iFilenoStdin, &bChar, 1 ) == 1 )
    {
-      ch = bChar;
+      BYTE bChar;
+      if( hb_fsRead( s_iFilenoStdin, &bChar, 1 ) == 1 )
+      {
+         ch = bChar;
+      }
    }
-#else
-   HB_SYMBOL_UNUSED( bChar );
 #endif
 
    /* TODO: */

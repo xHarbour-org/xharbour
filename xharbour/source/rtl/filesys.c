@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.150 2005/09/19 23:21:29 druzus Exp $
+ * $Id: filesys.c,v 1.151 2005/10/02 12:35:11 druzus Exp $
  */
 
 /*
@@ -3026,7 +3026,7 @@ USHORT HB_EXPORT  hb_fsChDrv( BYTE nDrive )
       HB_FS_SETDRIVE( nDrive );
       HB_FS_GETDRIVE( uiNewDrive );
 
-      if ( nDrive == uiNewDrive )
+      if( ( UINT ) nDrive == uiNewDrive )
       {
          uiResult = 0;
          hb_fsSetError( 0 );
@@ -3081,7 +3081,7 @@ USHORT HB_EXPORT  hb_fsIsDrv( BYTE nDrive )
       HB_FS_GETDRIVE( uiSave );
       HB_FS_SETDRIVE( nDrive );
       HB_FS_GETDRIVE( uiNewDrive );
-      if( nDrive != uiNewDrive )
+      if( ( UINT ) nDrive != uiNewDrive )
       {
          uiResult = (USHORT) FS_ERROR;
          hb_fsSetError( (USHORT) FS_ERROR );

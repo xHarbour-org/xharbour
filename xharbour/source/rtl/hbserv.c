@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.29 2005/08/28 19:25:23 walito Exp $
+* $Id: hbserv.c,v 1.30 2005/09/30 23:44:05 druzus Exp $
 */
 
 /*
@@ -775,7 +775,7 @@ HB_FUNC( HB_STARTSERVICE )
 
    // let's begin
    sb_isService = TRUE;
-   pHVMFuncService = (PHB_FUNC) &hb_isService;
+   pHVMFuncService = (PHB_FUNC) hb_isService;
 
    // in windows, we just detach from console
    #ifdef HB_OS_WIN_32

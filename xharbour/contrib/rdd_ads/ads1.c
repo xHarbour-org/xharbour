@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.80 2005/09/25 16:14:21 druzus Exp $
+ * $Id: ads1.c,v 1.81 2005/10/04 02:05:32 druzus Exp $
  */
 
 /*
@@ -2643,26 +2643,35 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
    }
    else
    {
+      BOOL fOpen = TRUE;
       // When opening the file, first try with the correct settings for Advantage Data Dictionary
       // if bDictionary was set
-      if( bDictionary )
+      if( bDictionary && pArea->rddID == s_uiRddIdADS )
       {
+         fOpen = FALSE;
          u32RetVal = AdsOpenTable( hConnection,
                         pOpenInfo->abName, pOpenInfo->atomAlias,
                         ADS_DEFAULT, adsCharType, adsLockType, adsRights,
                         ( pOpenInfo->fShared ? ADS_SHARED : ADS_EXCLUSIVE ) |
                         ( pOpenInfo->fReadonly ? ADS_READONLY : ADS_DEFAULT ),
                         &hTable );
-          if( u32RetVal != AE_SUCCESS )
-          {
-             AdsGetLastError( &ulLastErr, aucError, &usLength );
-          }
+         if( u32RetVal != AE_SUCCESS )
+         {
+            AdsGetLastError( &ulLastErr, aucError, &usLength );
+            // If the Advantage Data Dictionary open fails with an error indicating that this table is not
+            // in the dictionary, OR if we are not using a dictionary at all, try the open with standard settings.
+            // This change allows the use of a Dictionary, and non Dictionary temp files at the same time.
+
+            /*
+             * I kept this behavior only in "ADS" RDD for backward compatibility
+             * some programs may not want to use it.
+             */
+            if( pArea->rddID == s_uiRddIdADS && ulLastErr == 5132L )
+               fOpen = TRUE;
+         }
       }
 
-      // If the Advantage Data Dictionary open fails with an error indicating that this table is not
-      // in the dictionary, OR if we are not using a dictionary at all, try the open with standard settings.
-      // This change allows the use of a Dictionary, and non Dictionary temp files at the same time.
-      if( !bDictionary || ulLastErr == 5132L )
+      if( fOpen )
       {
          u32RetVal = AdsOpenTable( hConnection,
                         pOpenInfo->abName, pOpenInfo->atomAlias,
