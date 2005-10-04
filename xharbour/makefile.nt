@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.131 2005/09/18 21:33:08 paultucker Exp $
+# $Id: makefile.nt,v 1.132 2005/09/23 21:55:02 likewolf Exp $
 #
 
 #
@@ -761,7 +761,6 @@ RDD_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\delim1.obj \
    $(OBJ_DIR)$(MT)\sdf1.obj \
    \
-   $(OBJ_DIR)$(MT)\dbf0.obj \
    $(OBJ_DIR)$(MT)\dbtotal.obj \
    $(OBJ_DIR)$(MT)\dbfuncs.obj \
    $(OBJ_DIR)$(MT)\dblist.obj \
@@ -769,10 +768,8 @@ RDD_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hbdbsort.obj \
    $(OBJ_DIR)$(MT)\dbstrux.obj \
    $(OBJ_DIR)$(MT)\dbupdat.obj \
-   $(OBJ_DIR)$(MT)\delim0.obj \
    $(OBJ_DIR)$(MT)\rddord.obj \
-   $(OBJ_DIR)$(MT)\rddsys.obj \
-   $(OBJ_DIR)$(MT)\sdf0.obj
+   $(OBJ_DIR)$(MT)\rddsys.obj
 
 #
 # NULSYS.LIB rules
@@ -806,9 +803,7 @@ NULSYS_LIB_OBJS = \
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFNTX_LIB)2
 
 DBFNTX_LIB_OBJS = \
-   $(OBJ_DIR)$(MT)\dbfntx1.obj \
-   \
-   $(OBJ_DIR)$(MT)\dbfntx0.obj
+   $(OBJ_DIR)$(MT)\dbfntx1.obj
 
 #
 # DBFCDX.LIB rules
@@ -825,9 +820,7 @@ DBFNTX_LIB_OBJS = \
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFCDX_LIB)2
 
 DBFCDX_LIB_OBJS = \
-   $(OBJ_DIR)$(MT)\dbfcdx1.obj \
-   \
-   $(OBJ_DIR)$(MT)\dbfcdx0.obj
+   $(OBJ_DIR)$(MT)\dbfcdx1.obj
 
 #
 # DBFFPT.LIB rules
@@ -844,9 +837,7 @@ DBFCDX_LIB_OBJS = \
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFFPT_LIB)2
 
 DBFFPT_LIB_OBJS = \
-   $(OBJ_DIR)$(MT)\dbffpt1.obj \
-   \
-   $(OBJ_DIR)$(MT)\dbffpt0.obj
+   $(OBJ_DIR)$(MT)\dbffpt1.obj
 
 #
 # HBSIX.LIB rules
@@ -865,7 +856,7 @@ DBFFPT_LIB_OBJS = \
 HBSIX_LIB_OBJS = \
    $(OBJ_DIR)\sxcompr.obj \
    $(OBJ_DIR)\sxcrypt.obj \
-   $(OBJ_DIR)\sxdate.obj 
+   $(OBJ_DIR)\sxdate.obj
 
 #
 # HSX.LIB rules

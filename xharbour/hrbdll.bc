@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.100 2005/09/27 05:24:53 paultucker Exp $
+# $Id: hrbdll.bc,v 1.101 2005/09/27 17:09:14 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -407,17 +407,14 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbnubs.obj \
   $(OBJ_DIR)\delim1.obj \
   $(OBJ_DIR)\sdf1.obj \
-  $(OBJ_DIR)\dbf0.obj \
   $(OBJ_DIR)\dbfuncs.obj \
   $(OBJ_DIR)\dblist.obj \
   $(OBJ_DIR)\dbsort.obj \
   $(OBJ_DIR)\hbdbsort.obj \
   $(OBJ_DIR)\dbstrux.obj \
   $(OBJ_DIR)\dbupdat.obj \
-  $(OBJ_DIR)\delim0.obj \
   $(OBJ_DIR)\rddord.obj \
   $(OBJ_DIR)\rddsys.obj \
-  $(OBJ_DIR)\sdf0.obj \
   $(OBJ_DIR)\hbfsapi.obj \
   $(OBJ_DIR)\hbgete.obj \
   $(OBJ_DIR)\hbini.obj \
@@ -430,10 +427,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\expropt2.obj \
   $(OBJ_DIR)\reserved.obj \
   $(OBJ_DIR)\dbfcdx1.obj \
-  $(OBJ_DIR)\dbfcdx0.obj \
-  $(OBJ_DIR)\dbffpt0.obj \
   $(OBJ_DIR)\dbffpt1.obj \
-  $(OBJ_DIR)\dbfntx0.obj \
   $(OBJ_DIR)\dbfntx1.obj \
   $(OBJ_DIR)\msgbgwin.obj \
   $(OBJ_DIR)\msgby866.obj \
@@ -745,7 +739,6 @@ HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
 #
 !if $d(HB_RDDADS)
 HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
-  $(OBJ_DIR)\ads0.obj \
   $(OBJ_DIR)\ads1.obj \
   $(OBJ_DIR)\adsfunc.obj \
   $(OBJ_DIR)\adsmgmnt.obj
@@ -1081,17 +1074,14 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\dbnubs.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\delim1.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\sdf1.obj              + >> hdll.tmp
-  echo. $(OBJ_DIR)\dbf0.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\dbfuncs.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dblist.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\dbsort.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hbdbsort.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dbstrux.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbupdat.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\delim0.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\rddord.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\rddsys.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\sdf0.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\hbfsapi.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\hbgete.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hbini.obj             + >> hdll.tmp
@@ -1103,11 +1093,8 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\expropt1.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\expropt2.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\reserved.obj          + >> hdll.tmp
-  echo. $(OBJ_DIR)\dbfcdx0.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbfcdx1.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\dbffpt0.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbffpt1.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\dbfntx0.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbfntx1.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\msgbgwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgby866.obj          + >> hdll.tmp
@@ -1326,7 +1313,6 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\hsx.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\cftsfunc.obj          + >> hdll.tmp
 !if $d(HB_RDDADS)
-  echo. $(OBJ_DIR)\ads0.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\ads1.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\adsfunc.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\adsmgmnt.obj          + >> hdll.tmp
@@ -1383,12 +1369,6 @@ $(OBJ_DIR)\dbcmd.obj : $(RDD_DIR)\dbcmd.c
 $(OBJ_DIR)\workarea.obj : $(RDD_DIR)\workarea.c
    $(CC_CMD)
 
-$(OBJ_DIR)\dbf0.c : $(RDD_DIR)\dbf0.prg
-   $(HRB_CMD)
-
-$(OBJ_DIR)\dbf0.obj : $(OBJ_DIR)\dbf0.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\dbf1.obj : $(RDD_DIR)\dbf1.c
    $(CC_CMD)
 
@@ -1434,19 +1414,7 @@ $(OBJ_DIR)\dbtotal.c : $(RDD_DIR)\dbtotal.prg
 $(OBJ_DIR)\dbtotal.obj : $(OBJ_DIR)\dbtotal.c
    $(CC_CMD)
 
-$(OBJ_DIR)\sdf0.c : $(RDD_DIR)\sdf0.prg
-   $(HRB_CMD)
-
-$(OBJ_DIR)\sdf0.obj : $(OBJ_DIR)\sdf0.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\sdf1.obj : $(RDD_DIR)\sdf1.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\delim0.c : $(RDD_DIR)\delim0.prg
-   $(HRB_CMD)
-
-$(OBJ_DIR)\delim0.obj : $(OBJ_DIR)\delim0.c
    $(CC_CMD)
 
 $(OBJ_DIR)\delim1.obj : $(RDD_DIR)\delim1.c
@@ -2538,28 +2506,10 @@ $(OBJ_DIR)\nulsys.c : $(RDD_DIR)\nulsys\nulsys.prg
 $(OBJ_DIR)\nulsys.obj : $(OBJ_DIR)\nulsys.c
    $(CC_CMD)
 
-$(OBJ_DIR)\dbfcdx0.c : $(RDD_DIR)\dbfcdx\dbfcdx0.prg
-   $(HRB_CMD)
-
-$(OBJ_DIR)\dbfcdx0.obj : $(OBJ_DIR)\dbfcdx0.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
    $(CC_CMD)
 
-$(OBJ_DIR)\dbffpt0.c : $(RDD_DIR)\dbffpt\dbffpt0.prg
-   $(HRB_CMD)
-
-$(OBJ_DIR)\dbffpt0.obj : $(OBJ_DIR)\dbffpt0.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\dbffpt1.obj : $(RDD_DIR)\dbffpt\dbffpt1.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dbfntx0.c : $(RDD_DIR)\dbfntx\dbfntx0.prg
-   $(HRB_CMD)
-
-$(OBJ_DIR)\dbfntx0.obj : $(OBJ_DIR)\dbfntx0.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbfntx1.obj : $(RDD_DIR)\dbfntx\dbfntx1.c
@@ -3354,35 +3304,29 @@ $(OBJ_DIR)\ucp_findchar.obj : $(PCREPOS_DIR)\ucp_findchar.c
 #
 
 $(OBJ_DIR)\sxcompr.obj : $(HBSIX_DIR)\sxcompr.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
+   $(CC_CMD)
 
 $(OBJ_DIR)\sxcrypt.obj : $(HBSIX_DIR)\sxcrypt.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
+   $(CC_CMD)
 
 $(OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
+   $(CC_CMD)
 
 #
 # HSX.LIB dependencies
 #
 
 $(OBJ_DIR)\hsx.obj : $(HSX_DIR)\hsx.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
+   $(CC_CMD)
 
 $(OBJ_DIR)\cftsfunc.obj : $(HSX_DIR)\cftsfunc.c
-   $(CC) $(CLIBFLAGS) -o$@ $**
+   $(CC_CMD)
 
 #
 # ADS dependencies
 #
 
 !if $d(HB_RDDADS)
-
-$(OBJ_DIR)\ads0.c : $(RDDADS_DIR)\ads0.prg
-   $(HRB_CMD)
-
-$(OBJ_DIR)\ads0.obj : $(OBJ_DIR)\ads0.c
-   $(CC_CMD)
 
 $(OBJ_DIR)\ads1.obj : $(RDDADS_DIR)\ads1.c
    $(CC) $(CLIBFLAGS) -DWIN32 -o$@ $**

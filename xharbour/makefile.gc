@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.12 2005/09/18 21:33:08 paultucker Exp $
+# $Id: makefile.gc,v 1.13 2005/09/23 21:55:02 likewolf Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -234,7 +234,7 @@ ifeq ($(THREAD_MODE),)
       $(HBDOC_EXE) \
       $(HBMAKE_EXE) \
       $(HBPP_EXE) \
-      $(XBSCRIPT_EXE) 
+      $(XBSCRIPT_EXE)
 endif
 
 PROJECT += \
@@ -672,17 +672,10 @@ $(LIBMISC_OBJ_DIR)/twirler.o : $(LIBMISC_OBJ_DIR)/twirler.c
 #-------------------------------------------------------------------------------
 
 $(RDDADS_LIB) : \
-   $(RDDADS_OBJ_DIR)/ads0.o \
    $(RDDADS_OBJ_DIR)/ads1.o \
    $(RDDADS_OBJ_DIR)/adsfunc.o \
    $(RDDADS_OBJ_DIR)/adsmgmnt.o
 	$(AR_CMD)
-
-$(RDDADS_OBJ_DIR)/ads0.c : $(RDDADS_DIR)/ads0.prg
-	$(HARBOUR_CMD)
-
-$(RDDADS_OBJ_DIR)/ads0.o : $(RDDADS_OBJ_DIR)/ads0.c
-	$(CC) $(CFLAGS) -I$(RDDADS_DIR) -o $@ $^
 
 $(RDDADS_OBJ_DIR)/ads1.o : $(RDDADS_DIR)/ads1.c
 	$(CC) $(CFLAGS) -I$(RDDADS_DIR) -o $@ $^
@@ -2456,15 +2449,8 @@ $(OBJ_DIR)/macroc.o : $(MACRO_DIR)/macroc.c
 #-------------------------------------------------------------------------------
 
 $(DBFCDX_LIB) : \
-   $(CDX_OBJ_DIR)/dbfcdx1.o \
-   $(CDX_OBJ_DIR)/dbfcdx0.o
+   $(CDX_OBJ_DIR)/dbfcdx1.o
 	$(AR_CMD)
-
-$(CDX_OBJ_DIR)/dbfcdx0.c : $(RDD_DIR)/dbfcdx/dbfcdx0.prg
-	$(HARBOUR_CMD)
-
-$(CDX_OBJ_DIR)/dbfcdx0.o : $(CDX_OBJ_DIR)/dbfcdx0.c
-	$(CC_CMD)
 
 $(CDX_OBJ_DIR)/dbfcdx1.o : $(RDD_DIR)/dbfcdx/dbfcdx1.c
 	$(CC_CMD)
@@ -2474,15 +2460,8 @@ $(CDX_OBJ_DIR)/dbfcdx1.o : $(RDD_DIR)/dbfcdx/dbfcdx1.c
 #-------------------------------------------------------------------------------
 
 $(DBFFPT_LIB) : \
-   $(FPT_OBJ_DIR)/dbffpt1.o \
-   $(FPT_OBJ_DIR)/dbffpt0.o
+   $(FPT_OBJ_DIR)/dbffpt1.o
 	$(AR_CMD)
-
-$(FPT_OBJ_DIR)/dbffpt0.c : $(RDD_DIR)/dbfFPT/dbffpt0.prg
-	$(HARBOUR_CMD)
-
-$(FPT_OBJ_DIR)/dbffpt0.o : $(FPT_OBJ_DIR)/dbffpt0.c
-	$(CC_CMD)
 
 $(FPT_OBJ_DIR)/dbffpt1.o : $(RDD_DIR)/dbfFPT/dbffpt1.c
 	$(CC_CMD)
@@ -2492,15 +2471,8 @@ $(FPT_OBJ_DIR)/dbffpt1.o : $(RDD_DIR)/dbfFPT/dbffpt1.c
 #-------------------------------------------------------------------------------
 
 $(DBFNTX_LIB) : \
-   $(NTX_OBJ_DIR)/dbfntx1.o \
-   $(NTX_OBJ_DIR)/dbfntx0.o
+   $(NTX_OBJ_DIR)/dbfntx1.o
 	$(AR_CMD)
-
-$(NTX_OBJ_DIR)/dbfntx0.c : $(RDD_DIR)/dbfntx/dbfntx0.prg
-	$(HARBOUR_CMD)
-
-$(NTX_OBJ_DIR)/dbfntx0.o : $(NTX_OBJ_DIR)/dbfntx0.c
-	$(CC_CMD)
 
 $(NTX_OBJ_DIR)/dbfntx1.o : $(RDD_DIR)/dbfntx/dbfntx1.c
 	$(CC_CMD)
@@ -3800,7 +3772,6 @@ $(RDD_LIB) : \
    $(RDD_OBJ_DIR)/delim1.o \
    $(RDD_OBJ_DIR)/sdf1.o \
    \
-   $(RDD_OBJ_DIR)/dbf0.o \
    $(RDD_OBJ_DIR)/dbfuncs.o \
    $(RDD_OBJ_DIR)/dbtotal.o \
    $(RDD_OBJ_DIR)/dblist.o \
@@ -3808,22 +3779,14 @@ $(RDD_LIB) : \
    $(RDD_OBJ_DIR)/hbdbsort.o \
    $(RDD_OBJ_DIR)/dbstrux.o \
    $(RDD_OBJ_DIR)/dbupdat.o \
-   $(RDD_OBJ_DIR)/delim0.o \
    $(RDD_OBJ_DIR)/rddord.o \
-   $(RDD_OBJ_DIR)/rddsys.o \
-   $(RDD_OBJ_DIR)/sdf0.o
+   $(RDD_OBJ_DIR)/rddsys.o
 	$(AR_CMD)
 
 $(RDD_OBJ_DIR)/dbcmd.o : $(RDD_DIR)/dbcmd.c
 	$(CC_CMD)
 
 $(RDD_OBJ_DIR)/workarea.o : $(RDD_DIR)/workarea.c
-	$(CC_CMD)
-
-$(RDD_OBJ_DIR)/dbf0.c : $(RDD_DIR)/dbf0.prg
-	$(HARBOUR_CMD)
-
-$(RDD_OBJ_DIR)/dbf0.o : $(RDD_OBJ_DIR)/dbf0.c
 	$(CC_CMD)
 
 $(RDD_OBJ_DIR)/dbf1.o : $(RDD_DIR)/dbf1.c
@@ -3871,19 +3834,7 @@ $(RDD_OBJ_DIR)/dbupdat.c : $(RDD_DIR)/dbupdat.prg
 $(RDD_OBJ_DIR)/dbupdat.o : $(RDD_OBJ_DIR)/dbupdat.c
 	$(CC_CMD)
 
-$(RDD_OBJ_DIR)/sdf0.c : $(RDD_DIR)/sdf0.prg
-	$(HARBOUR_CMD)
-
-$(RDD_OBJ_DIR)/sdf0.o : $(RDD_OBJ_DIR)/sdf0.c
-	$(CC_CMD)
-
 $(RDD_OBJ_DIR)/sdf1.o : $(RDD_DIR)/sdf1.c
-	$(CC_CMD)
-
-$(RDD_OBJ_DIR)/delim0.c : $(RDD_DIR)/delim0.prg
-	$(HARBOUR_CMD)
-
-$(RDD_OBJ_DIR)/delim0.o : $(RDD_OBJ_DIR)/delim0.c
 	$(CC_CMD)
 
 $(RDD_OBJ_DIR)/delim1.o : $(RDD_DIR)/delim1.c

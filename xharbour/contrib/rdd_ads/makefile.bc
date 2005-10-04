@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.3 2003/10/31 12:29:01 toninhofwi Exp $
+# $Id: makefile.bc,v 1.4 2003/11/08 06:17:29 brianhays Exp $
 #
 
 # makefile for Borland C/C++ 32 bits
@@ -12,13 +12,10 @@ OBJ_DIR = ..\..\obj\b32
 LIB_DIR = ..\..\lib\b32
 
 $(LIB_DIR)\rddads.lib :   \
-   $(OBJ_DIR)\ads0.obj    \
    $(OBJ_DIR)\ads1.obj    \
    $(OBJ_DIR)\adsfunc.obj \
    $(OBJ_DIR)\adsmgmnt.obj
 
-$(OBJ_DIR)\ads0.c       : ads0.prg
-$(OBJ_DIR)\ads0.obj     : $(OBJ_DIR)\ads0.c
 $(OBJ_DIR)\ads1.obj     : ads1.c
 $(OBJ_DIR)\adsfunc.obj  : adsfunc.c
 $(OBJ_DIR)\adsmgmnt.obj : adsmgmnt.c

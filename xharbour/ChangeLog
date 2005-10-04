@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4394 2005/10/04 02:05:30 druzus Exp $
+ * $Id: ChangeLog,v 1.4395 2005/10/04 03:14:41 marcosgambeta Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-04 08:39 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * xharbour/makefile.bc
+  * xharbour/makefile.dc
+  * xharbour/makefile.gc
+  * xharbour/makefile.nt
+  * xharbour/makefile.pc
+  * xharbour/makefile.vc
+  * xharbour/makefile.wc
+  * xharbour/hrbdll.bc
+  * xharbour/hrbdll.dc
+  * xharbour/hrbdll.gc
+  * xharbour/hrbdll.nt
+  * xharbour/hrbdll.pc
+  * xharbour/hrbdll.vc
+  * xharbour/hrbdll.wc
+  * xharbour/contrib/rdd_ads/makefile.bc
+  * xharbour/contrib/rdd_ads/makefile.vc
+    Adjusted makefiles to match recent RDD modifications
 
 2005-10-04 00:13 UTC-0300 Marcos Antonio Gambeta <marcos_gambeta@hotmail.com>
   * contrib/wvtgui/wvtwin.ch
@@ -1809,7 +1828,7 @@ s. Now it will show more errors
   * source/pp/ppcore.c
     * Fixed case of wrong transformation of '[' ']' to '"' '"' when cLastChar is '.' in getExpReal()
 
-2005-08-36 17:20 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+2005-08-16 17:20 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * source/rtl/hblog.prg
     ! Fixed problem in which oldest log file wasn't being erased when maximum
       number of backup files was reached.  Posting on behalf of Brian Hays.
